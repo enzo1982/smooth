@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.xx.03 xx:xx - smooth alpha 0.8.61.0
+14.03.03 14:00 - smooth alpha 0.8.61.0
 
 - math.cpp		- new class: contains static mathematical functions
 - binary.cpp		- new class: contains static binary helper functions
@@ -28,6 +28,9 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - input.cpp		- new class: contains mouse and keyboard input functionality
 - droparea.cpp		- new class: receiver for drag & drop files
 - button.cpp		- new methods: SetFlags(Int), GetFlags(), flags: BF_NORMAL, BF_NOFRAME
+- editbox.cpp		- support for 'Home' and 'End' keys
+			- support for marking text
+			- support for copy and paste to/from clipboard
 
 - new namespace: smooth alias S
 - new namespace: smooth::XML

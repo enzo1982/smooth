@@ -430,6 +430,9 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 	if (wnd == NIL) return Success;
 
 	Surface		*surface = myContainer->GetDrawSurface();
+
+	EnterProtectedRegion();
+
 	Point		 realPos = GetRealPosition();
 	Int		 retVal = Success;
 	List::Entry	*operat;
@@ -691,6 +694,8 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 	}
+
+	LeaveProtectedRegion();
 
 	return retVal;
 }

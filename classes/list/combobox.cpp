@@ -58,7 +58,7 @@ S::GUI::ComboBox::~ComboBox()
 {
 	if (listBoxOpen)
 	{
-		delete listBox;
+		DeleteObject(listBox);
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);

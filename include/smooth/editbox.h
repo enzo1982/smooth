@@ -41,9 +41,14 @@ namespace smooth
 				Int		 promptPos;
 				Bool		 promptVisible;
 				Int		 markStart;
+				Int		 oMarkStart;
 				Int		 markEnd;
+				Bool		 marking;
 				Bool		 isAsterisk;
 				Int		 maxSize;
+
+				Void		 MarkText(Int, Int);
+				Void		 DeleteSelectedText();
 			public:
 						 EditBox(String, Point, Size, Int, Int);
 						~EditBox();

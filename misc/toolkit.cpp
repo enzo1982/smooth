@@ -138,7 +138,7 @@ int GetTextSizeX(String text, String font, int size, int weight)
 int GetTextSizeX(String text, int nofchars, String font, int size, int weight)
 {
 	if (text == NIL) return 0;
-	if (nofchars == 0) return -1;
+	if (nofchars == 0) return 0;
 
 	int	 sizex = 0;
 	int	 lines = 1;
@@ -184,7 +184,7 @@ int GetTextSizeX(String text, int nofchars, String font, int size, int weight)
 int GetLineSizeX(String text, int nofchars, String font, int size, int weight)
 {
 	if (text == NIL) return 0;
-	if (nofchars == 0) return -1;
+	if (nofchars == 0) return 0;
 
 	Size	 tsize;
 	HDC	 cdc;

@@ -101,16 +101,16 @@ Translator::Translator()
 
 	menu_file	= new Menu();
 
-	menubar->AddEntry("&File", NIL, menu_file);
+	menubar->AddEntry("File", NIL, menu_file);
 
-	menu_file->AddEntry("&New")->onClick.Connect(&Translator::NewFile, this);
-	menu_file->AddEntry("&Close")->onClick.Connect(&Translator::Close, this);
+	menu_file->AddEntry("New")->onClick.Connect(&Translator::NewFile, this);
+	menu_file->AddEntry("Close")->onClick.Connect(&Translator::Close, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("&Open")->onClick.Connect(&Translator::OpenFile, this);
-	menu_file->AddEntry("&Save")->onClick.Connect(&Translator::SaveFile, this);
-	menu_file->AddEntry("Save &as")->onClick.Connect(&Translator::SaveFileAs, this);
+	menu_file->AddEntry("Open")->onClick.Connect(&Translator::OpenFile, this);
+	menu_file->AddEntry("Save")->onClick.Connect(&Translator::SaveFile, this);
+	menu_file->AddEntry("Save as")->onClick.Connect(&Translator::SaveFileAs, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("E&xit")->onClick.Connect(&Window::Close, wnd);
+	menu_file->AddEntry("Exit")->onClick.Connect(&Window::Close, wnd);
 
 	text_id->Deactivate();
 	edit_id->Deactivate();

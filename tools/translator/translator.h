@@ -51,6 +51,8 @@ class Translator : public Application
 
 		Array<listEntry *>	 entries;
 
+		Bool		 modified;
+
 		Void		 OpenFile();
 		Void		 SaveFile();
 		Void		 SaveFileAs();

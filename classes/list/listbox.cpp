@@ -672,8 +672,19 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
 {
 	Surface	*surface = myContainer->GetDrawSurface();
+	Bool	 gotTabs = False;
 
-	if (header != NIL)
+	for (Int r = 0; r < text.Length(); r++)
+	{
+		if (text[r] == '\t')
+		{
+			gotTabs = True;
+
+			break;
+		}
+	}
+
+	if (header != NIL && gotTabs)
 	{
 		for (Int i = 0; i < header->GetNOfTabs(); i++)
 		{
@@ -681,6 +692,8 @@ S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
 			Rect	 rRect = rect;
 
 			rRect.left += header->GetNthTabOffset(i);
+
+			if (header->GetNOfTabs() >= i + 2) rRect.right = rRect.left + (header->GetNthTabOffset(i + 1) - header->GetNthTabOffset(i)) - 3;
 
 			Int	 tabCount = 0;
 

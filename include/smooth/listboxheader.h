@@ -31,6 +31,9 @@ namespace smooth
 			private:
 				ListBox		*listBox;
 
+				Int		 moveTab;
+				Bool		 innerLoop;
+
 				Array<String>	 tabNames;
 				Array<Int>	 tabWidths;
 				Array<Bool>	 tabChecked;

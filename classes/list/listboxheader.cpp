@@ -26,7 +26,10 @@ S::Int	 S::OBJ_LISTBOXHEADER = S::Object::RequestObjectID();
 
 S::GUI::ListBoxHeader::ListBoxHeader(ListBox *iListBox)
 {
-	listBox = iListBox;
+	listBox	= iListBox;
+
+	moveTab	= -1;
+	innerLoop = False;
 
 	type	= OBJ_LISTBOXHEADER;
 
@@ -180,6 +183,38 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_MOUSEMOVE:
+			if (innerLoop) break;
+
+			frame.left = realPos.x - 3;
+
+			for (Int j = 0; j < tabWidths.GetNOfEntries() - 1; j++)
+			{
+				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(j)) + 1);
+				frame.right = frame.left + 4;
+
+				if (wnd->IsMouseOn(frame))
+				{
+					if (moveTab != j)
+					{
+						moveTab = j;
+
+						wnd->cursorset = True;
+
+						LiSASetMouseCursor(LiSA_MOUSE_HSIZE);
+					}
+				}
+				else if (moveTab == j)
+				{
+					moveTab = -1;
+
+					wnd->cursorset = False;
+
+					LiSASetMouseCursor(LiSA_MOUSE_ARROW);
+				}
+			}
+
+			frame.left = realPos.x;
+
 			for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
 			{
 				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + objectProperties->size.cx);
@@ -187,26 +222,22 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 				frame.left++;
 				frame.top++;
 
-				if (wnd->IsMouseOn(frame) && !tabChecked.GetNthEntry(i))
+				if (wnd->IsMouseOn(frame) && !tabChecked.GetNthEntry(i) && moveTab == -1)
 				{
 					surface->Box(frame, Setup::LightGrayColor, FILLED);
 
 					frame.left += 2;
-
 					surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, FW_BOLD);
-
 					frame.left -= 2;
 
 					tabChecked.SetEntry(tabChecked.GetNthEntryIndex(i), True);
 				}
-				else if (!wnd->IsMouseOn(frame) && tabChecked.GetNthEntry(i))
+				else if ((!wnd->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNthEntry(i))
 				{
 					surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 					frame.left += 2;
-
 					surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, FW_BOLD);
-
 					frame.left -= 2;
 
 					tabChecked.SetEntry(tabChecked.GetNthEntryIndex(i), False);
@@ -216,6 +247,84 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 				frame.top--;
 
 				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) + 1);
+			}
+
+			break;
+		case SM_LBUTTONDOWN:
+			if (moveTab != -1)
+			{
+				Int	 leftButton;
+
+				if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
+				else					leftButton = VK_LBUTTON;
+
+				Point	 om;
+
+				{
+					POINT	 mp = om;
+
+					GetCursorPos(&mp);
+
+					om = mp;
+				}
+
+				innerLoop = True;
+
+				do
+				{
+					MSG	 msg;
+
+					if (peekLoop > 0)
+					{
+						if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
+						else				PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
+					}
+					else
+					{
+						if (Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
+						else				GetMessageA(&msg, NIL, 0, 0);
+					}
+
+					TranslateMessage(&msg);
+
+					if (Setup::enableUnicode)	DispatchMessageW(&msg);
+					else				DispatchMessageA(&msg);
+
+					if (peekLoop > 0)
+					{
+						if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
+						else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
+					}
+
+					Point	 m;
+
+					{
+						POINT	 mp = m;
+
+						GetCursorPos(&mp);
+
+						m = mp;
+					}
+
+					Int	 bias = om.x - m.x;
+
+					if (bias != 0)
+					{
+						tabWidths.SetEntry(moveTab, (Int) Math::Abs(tabWidths.GetEntry(moveTab)) - bias);
+						tabWidths.SetEntry(moveTab + 1, (Int) Math::Abs(tabWidths.GetEntry(moveTab + 1)) + bias);
+
+						om.x = m.x;
+
+						UpdateMetrics();
+
+						surface->StartPaint();
+						listBox->Paint(SP_PAINT);
+						surface->EndPaint();
+					}
+				}
+				while (GetAsyncKeyState(leftButton) != 0);
+
+				innerLoop = False;
 			}
 
 			break;

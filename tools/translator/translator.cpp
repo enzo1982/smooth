@@ -187,7 +187,7 @@ Translator::~Translator()
 
 Bool Translator::ExitProc()
 {
-	if (filename != "")
+	if (filename != "" && modified)
 	{
 		String	 file;
 		Int	 lastBs = -1;
@@ -214,6 +214,10 @@ Bool Translator::ExitProc()
 				return False;
 		}
 	}
+	else if (filename != "" && !modified)
+	{
+		CloseFile();
+	}
 
 	return True;
 }
@@ -223,6 +227,7 @@ void Translator::NewFile()
 	if (!ExitProc()) return;
 
 	filename = "unnamed";
+	modified = False;
 
 	text_id->Activate();
 	edit_id->Activate();
@@ -394,7 +399,7 @@ void Translator::OpenFile()
 				entry->id = xentry->GetAttributeByName("id")->GetContent().ToInt();
 				entry->original = xentry->GetAttributeByName("string")->GetContent();
 				entry->translation = xentry->GetContent();
-				entry->listid = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append(" - ").Append(entry->original).Append(" - ").Append(entry->translation))->code;
+				entry->listid = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append("\t").Append(entry->original).Append("\t").Append(entry->translation))->code;
 
 				entries.AddEntry(entry);
 			}
@@ -480,6 +485,8 @@ void Translator::SaveFileWithName(String file)
 	doc->SetRootNode(root);
 
 	doc->SaveFile(file);
+
+	modified = False;
 
 	delete doc;
 }
@@ -583,7 +590,7 @@ void Translator::SaveData()
 				entry->original = edit_original->GetText();
 				entry->translation = edit_translated->GetText();
 
-				list_entries->ModifyEntry(entry->listid, String(edit_id->GetText()).Append(" - ").Append(edit_original->GetText()).Append(" - ").Append(edit_translated->GetText()));
+				list_entries->ModifyEntry(entry->listid, String(edit_id->GetText()).Append("\t").Append(edit_original->GetText()).Append("\t").Append(edit_translated->GetText()));
 
 				break;
 			}
@@ -591,7 +598,7 @@ void Translator::SaveData()
 
 		if (entry == NULL)
 		{
-			int	 lid = list_entries->AddEntry(String(edit_id->GetText()).Append(" - ").Append(edit_original->GetText()).Append(" - ").Append(edit_translated->GetText()))->code;
+			int	 lid = list_entries->AddEntry(String(edit_id->GetText()).Append("\t").Append(edit_original->GetText()).Append("\t").Append(edit_translated->GetText()))->code;
 
 			entry = new listEntry;
 
@@ -626,6 +633,8 @@ void Translator::SaveData()
 			edit_translated->SetText("");
 		}
 	}
+
+	modified = True;
 }
 
 void Translator::SelectEntry()
@@ -685,11 +694,13 @@ void Translator::NewEntry()
 	edit_id->SetText(String::IntToString(max(entry->id, 0) + 1));
 	edit_original->SetText("");
 	edit_translated->SetText("");
+
+	modified = True;
 }
 
 void Translator::RemoveEntry()
 {
-	int		 lid = list_entries->GetSelectedEntry();
+	Int	 lid = list_entries->GetSelectedEntry();
 
 	for (int i = 0; i < entries.GetNOfEntries(); i++)
 	{
@@ -705,4 +716,6 @@ void Translator::RemoveEntry()
 
 	edit_original->SetText("");
 	edit_translated->SetText("");
+
+	modified = True;
 }

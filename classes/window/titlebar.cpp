@@ -206,8 +206,6 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	if (wnd == NIL) return Success;
 
 	Surface	*surface = myContainer->GetDrawSurface();
-	Point	 m;
-	Point	 mPos;
 	Size	 cpwp;
 	Rect	 rect;
 	Rect	 wRect;
@@ -219,13 +217,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	Rect	 closeButton;
 	Rect	 workArea;
 	Rect	 wndRect;
-	Int	 leftButton;
 	Int	 retVal = Success;
-
-#ifdef __WIN32__
-	MSG		 msg;
-#endif
-
 
 	titleFrame.left		= objectProperties->pos.x;
 	titleFrame.top		= objectProperties->pos.y;
@@ -306,8 +298,12 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			{
 				wnd->Process(SM_LOOSEFOCUS, 0, 0);
 
+				Int	 leftButton;
+
 				if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
 				else					leftButton = VK_LBUTTON;
+
+				Point	 mPos;
 
 				{
 					POINT	 mp = mPos;
@@ -327,6 +323,8 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				{
 					do
 					{
+						MSG	 msg;
+
 						if (peekLoop > 0)
 						{
 							if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
@@ -348,6 +346,8 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 							if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
 							else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 						}
+
+						Point	 m;
 
 						{
 							POINT	 mp = m;

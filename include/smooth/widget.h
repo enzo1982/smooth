@@ -49,6 +49,8 @@ namespace smooth
 								 Widget();
 				virtual				~Widget();
 
+				virtual Point			 GetRealPosition();
+
 				virtual Int			 Show();
 				virtual Int			 Hide();
 

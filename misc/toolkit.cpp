@@ -79,18 +79,6 @@ int GetBitmapSizeY(HBITMAP bmp)
 	return bitmap.bmHeight;
 }
 
-Rect GetBitmapMetrics(HBITMAP bmp)
-{
-	Rect	 rect;
-
-	rect.left	= 0;
-	rect.top	= 0;
-	rect.right	= GetBitmapSizeX(bmp);
-	rect.bottom	= GetBitmapSizeY(bmp);
-
-	return rect;
-}
-
 HDC GetContext(GUI::Window *wnd)
 {
 	int	 code = 0;
@@ -360,54 +348,4 @@ bool BlitFromBitmap(Rect srcrect, HBITMAP bitmap, Rect destrect, HDC dc)
 	::DeleteObject(backup);
 
 	return true;
-}
-
-HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon, int style, int exstyle)
-{
-	HWND	 hwnd;
-
-	if (Setup::enableUnicode)
-	{
-		WNDCLASSEXW	 wndclassw;
-
-		wndclassw.cbSize	= sizeof(wndclassw);
-		wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
-		wndclassw.lpfnWndProc	= GUI::WindowProc;
-		wndclassw.cbClsExtra	= 0;
-		wndclassw.cbWndExtra	= 0;
-		wndclassw.hInstance	= hInstance;
-		wndclassw.hIcon		= icon;
-		wndclassw.hCursor	= (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-		wndclassw.hbrBackground	= NIL;
-		wndclassw.lpszMenuName	= NIL;
-		wndclassw.lpszClassName	= className;
-		wndclassw.hIconSm	= icon;
-
-		RegisterClassExW(&wndclassw);
-
-		hwnd = CreateWindowExW(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
-	}
-	else
-	{
-		WNDCLASSEXA	 wndclassa;
-
-		wndclassa.cbSize	= sizeof(wndclassa);
-		wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
-		wndclassa.lpfnWndProc	= GUI::WindowProc;
-		wndclassa.cbClsExtra	= 0;
-		wndclassa.cbWndExtra	= 0;
-		wndclassa.hInstance	= hInstance;
-		wndclassa.hIcon		= icon;
-		wndclassa.hCursor	= (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-		wndclassa.hbrBackground	= NIL;
-		wndclassa.lpszMenuName	= NIL;
-		wndclassa.lpszClassName	= className;
-		wndclassa.hIconSm	= icon;
-
-		RegisterClassExA(&wndclassa);
-
-		hwnd = CreateWindowExA(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
-	}
-
-	return hwnd;
 }

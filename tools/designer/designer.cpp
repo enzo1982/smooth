@@ -90,19 +90,13 @@ Designer::~Designer()
 {
 	timer1->Stop();
 
-	wnd->UnregisterObject(title);
-	wnd->UnregisterObject(menubar);
-	wnd->UnregisterObject(iconbar);
-	wnd->UnregisterObject(statusbar);
+	DeleteObject(title);
+	DeleteObject(wnd);
+	DeleteObject(menubar);
+	DeleteObject(iconbar);
+	DeleteObject(statusbar);
+	DeleteObject(timer1);
 
-	UnregisterObject(wnd);
-
-	delete title;
-	delete wnd;
-	delete menubar;
-	delete iconbar;
-	delete statusbar;
-	delete timer1;
 	delete menu_file;
 	delete menu_dialog;
 	delete menu_widgets;

@@ -39,6 +39,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 - document.cpp		- added support for parsing XML documents in memory
 - popupview.cpp		- popups now open automatically when the mouse is moved on a popup entry
 
+- UnregisterObject() is no longer required unless you are removing an Object before the program quits
 - introduced a new font management system
 - fixed some PopupMenu issues
 - upgraded to IOLib v4.9.14.0

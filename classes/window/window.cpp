@@ -478,7 +478,48 @@ HWND S::GUI::Window::Create()
 		if (flags & WF_TOPMOST)		exstyle	= exstyle | WS_EX_TOPMOST;
 		if (flags & WF_NOTASKBUTTON)	exstyle = exstyle | WS_EX_TOOLWINDOW;
 
-		hwnd = CreateSimpleWindow(Rect(objectProperties->pos, objectProperties->size), objectProperties->text, className, sysicon, style, exstyle);
+		if (Setup::enableUnicode)
+		{
+			WNDCLASSEXW	 wndclassw;
+
+			wndclassw.cbSize	= sizeof(wndclassw);
+			wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
+			wndclassw.lpfnWndProc	= GUI::WindowProc;
+			wndclassw.cbClsExtra	= 0;
+			wndclassw.cbWndExtra	= 0;
+			wndclassw.hInstance	= hInstance;
+			wndclassw.hIcon		= sysicon;
+			wndclassw.hCursor	= (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+			wndclassw.hbrBackground	= NIL;
+			wndclassw.lpszMenuName	= NIL;
+			wndclassw.lpszClassName	= className;
+			wndclassw.hIconSm	= sysicon;
+
+			RegisterClassExW(&wndclassw);
+
+			hwnd = CreateWindowExW(exstyle, className, objectProperties->text, style, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, NIL, NIL, hInstance, NIL);
+		}
+		else
+		{
+			WNDCLASSEXA	 wndclassa;
+
+			wndclassa.cbSize	= sizeof(wndclassa);
+			wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
+			wndclassa.lpfnWndProc	= GUI::WindowProc;
+			wndclassa.cbClsExtra	= 0;
+			wndclassa.cbWndExtra	= 0;
+			wndclassa.hInstance	= hInstance;
+			wndclassa.hIcon		= sysicon;
+			wndclassa.hCursor	= (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+			wndclassa.hbrBackground	= NIL;
+			wndclassa.lpszMenuName	= NIL;
+			wndclassa.lpszClassName	= className;
+			wndclassa.hIconSm	= sysicon;
+
+			RegisterClassExA(&wndclassa);
+
+			hwnd = CreateWindowExA(exstyle, className, objectProperties->text, style, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, NIL, NIL, hInstance, NIL);
+		}
 
 		if (hwnd != NIL)
 		{
@@ -1019,7 +1060,7 @@ S::Int S::GUI::Window::Paint(Int message)
 
 			if (object->GetObjectType() == Widget::classID)
 			{
-				if (((Widget *) object)->IsVisible() && Affected(object, updateRect) && object->GetObjectType() != Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
+				if (((Widget *) object)->IsVisible() && Affected((Widget *) object, updateRect) && object->GetObjectType() != Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
 			}
 		}
 
@@ -1305,7 +1346,7 @@ S::Void S::GUI::Window::PaintTimer()
 
 		if (object->GetObjectType() == Widget::classID)
 		{
-			if (((Widget *) object)->IsVisible() && Affected(object, updateRect) && object->GetObjectType() == Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
+			if (((Widget *) object)->IsVisible() && Affected((Widget *) object, updateRect) && object->GetObjectType() == Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
 		}
 	}
 

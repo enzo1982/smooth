@@ -177,7 +177,7 @@ S::Int S::GUI::Button::Paint(Int message)
 					bmpRect.bottom	= bmpRect.top + bmpSize.cy;
 				}
 	
-				surface->BlitFromBitmap(bitmap, GetBitmapMetrics(bitmap), bmpRect);
+				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmpRect);
 			}
 
 			if (objectProperties->checked || (flags & BF_SHOWHIGHLIGHT))

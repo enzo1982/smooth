@@ -269,57 +269,31 @@ S::DialogColorSelection::DialogColorSelection()
 
 S::DialogColorSelection::~DialogColorSelection()
 {
-	dlgwnd->UnregisterObject(titlebar);
-	dlgwnd->UnregisterObject(divbar);
-	dlgwnd->UnregisterObject(okbtn);
-	dlgwnd->UnregisterObject(cancelbtn);
-	dlgwnd->UnregisterObject(hueslider);
-	dlgwnd->UnregisterObject(satslider);
-	dlgwnd->UnregisterObject(valslider);
-	dlgwnd->UnregisterObject(redslider);
-	dlgwnd->UnregisterObject(greenslider);
-	dlgwnd->UnregisterObject(blueslider);
-	dlgwnd->UnregisterObject(huetext);
-	dlgwnd->UnregisterObject(sattext);
-	dlgwnd->UnregisterObject(valtext);
-	dlgwnd->UnregisterObject(redtext);
-	dlgwnd->UnregisterObject(greentext);
-	dlgwnd->UnregisterObject(bluetext);
-	dlgwnd->UnregisterObject(hueedit);
-	dlgwnd->UnregisterObject(satedit);
-	dlgwnd->UnregisterObject(valedit);
-	dlgwnd->UnregisterObject(rededit);
-	dlgwnd->UnregisterObject(greenedit);
-	dlgwnd->UnregisterObject(blueedit);
-	dlgwnd->UnregisterObject(hextext);
-	dlgwnd->UnregisterObject(hexedit);
-	UnregisterObject(dlgwnd);
-
-	delete titlebar;
-	delete divbar;
-	delete dlgwnd;
-	delete okbtn;
-	delete cancelbtn;
-	delete hueslider;
-	delete satslider;
-	delete valslider;
-	delete redslider;
-	delete greenslider;
-	delete blueslider;
-	delete huetext;
-	delete sattext;
-	delete valtext;
-	delete redtext;
-	delete greentext;
-	delete bluetext;
-	delete hueedit;
-	delete satedit;
-	delete valedit;
-	delete rededit;
-	delete greenedit;
-	delete blueedit;
-	delete hextext;
-	delete hexedit;
+	DeleteObject(titlebar);
+	DeleteObject(divbar);
+	DeleteObject(dlgwnd);
+	DeleteObject(okbtn);
+	DeleteObject(cancelbtn);
+	DeleteObject(hueslider);
+	DeleteObject(satslider);
+	DeleteObject(valslider);
+	DeleteObject(redslider);
+	DeleteObject(greenslider);
+	DeleteObject(blueslider);
+	DeleteObject(huetext);
+	DeleteObject(sattext);
+	DeleteObject(valtext);
+	DeleteObject(redtext);
+	DeleteObject(greentext);
+	DeleteObject(bluetext);
+	DeleteObject(hueedit);
+	DeleteObject(satedit);
+	DeleteObject(valedit);
+	DeleteObject(rededit);
+	DeleteObject(greenedit);
+	DeleteObject(blueedit);
+	DeleteObject(hextext);
+	DeleteObject(hexedit);
 }
 
 S::Int S::DialogColorSelection::ShowDialog()

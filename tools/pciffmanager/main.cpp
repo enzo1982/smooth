@@ -54,16 +54,11 @@ PCIFFManager::PCIFFManager()
 
 PCIFFManager::~PCIFFManager()
 {
-	wnd->UnregisterObject(title);
-	wnd->UnregisterObject(menubar);
-	wnd->UnregisterObject(statusbar);
+	DeleteObject(title);
+	DeleteObject(wnd);
+	DeleteObject(menubar);
+	DeleteObject(statusbar);
 
-	UnregisterObject(wnd);
-
-	delete title;
-	delete wnd;
-	delete menubar;
-	delete statusbar;
 	delete menu_file;
 }
 

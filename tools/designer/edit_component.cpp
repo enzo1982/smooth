@@ -47,12 +47,8 @@ Designer_EditComponent::~Designer_EditComponent()
 {
 	if (wnd->IsVisible()) wnd->Close();
 
-	wnd->UnregisterObject(title);
-
-	UnregisterObject(wnd);
-
-	delete title;
-	delete wnd;
+	DeleteObject(title);
+	DeleteObject(wnd);
 }
 
 Void Designer_EditComponent::EventProc(Int message, Int wParam, Int lParam)

@@ -18,6 +18,7 @@ namespace smooth
 
 	namespace GUI
 	{
+		class Widget;
 		class Window;
 	};
 };
@@ -54,7 +55,7 @@ namespace smooth
 	HBITMAP	 DetectTransparentRegions(HBITMAP);
 #endif
 
-	Bool	 Affected(Object *, Rect &);
+	Bool	 Affected(GUI::Widget *, Rect &);
 #endif
 };
 

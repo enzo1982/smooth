@@ -32,7 +32,7 @@ namespace smooth
 			{
 				DisconnectAll();
 
-				function = proc;
+				function = (rt (*)()) proc;
 
 				return Success;
 			}
@@ -61,11 +61,9 @@ namespace smooth
 
 			Int Disconnect(rt (*proc)(CALLBACKS_ARGUMENT_TYPES))
 			{
-				if (function == proc)
+				if (function == (rt (*)()) proc)
 				{
 					function = NIL;
-
-					break;
 				}
 
 				return Success;

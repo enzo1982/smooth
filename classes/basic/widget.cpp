@@ -14,6 +14,7 @@
 #include <smooth/container.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolkit.h>
+#include <smooth/layer.h>
 
 const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
 
@@ -31,6 +32,56 @@ S::GUI::Widget::Widget()
 
 S::GUI::Widget::~Widget()
 {
+}
+
+S::Point S::GUI::Widget::GetRealPosition()
+{
+	if (!registered) return objectProperties->pos;
+
+	Point	 realPos = objectProperties->pos;
+
+	if (myContainer->GetContainerObject()->GetObjectType() == GUI::Layer::classID)
+	{
+		GUI::Layer	*layer = (GUI::Layer *) myContainer->GetContainerObject();
+		Point		 layerPos = layer->GetRealPosition();
+
+		realPos.x = layerPos.x + objectProperties->pos.x;
+		realPos.y = layerPos.y + objectProperties->pos.y;
+
+		if (objectProperties->orientation == OR_UPPERRIGHT)
+		{
+			realPos.x = layerPos.x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
+		}
+		else if (objectProperties->orientation == OR_LOWERLEFT)
+		{
+			realPos.y = layerPos.y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+		}
+		else if (objectProperties->orientation == OR_LOWERRIGHT)
+		{
+			realPos.x = layerPos.x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
+			realPos.y = layerPos.y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+		}
+	}
+	else
+	{
+		Object	*container = myContainer->GetContainerObject();
+
+		if (objectProperties->orientation == OR_UPPERRIGHT)
+		{
+			realPos.x = container->GetObjectProperties()->size.cx - objectProperties->pos.x;
+		}
+		else if (objectProperties->orientation == OR_LOWERLEFT)
+		{
+			realPos.y = container->GetObjectProperties()->size.cy - objectProperties->pos.y;
+		}
+		else if (objectProperties->orientation == OR_LOWERRIGHT)
+		{
+			realPos.x = container->GetObjectProperties()->size.cx - objectProperties->pos.x;
+			realPos.y = container->GetObjectProperties()->size.cy - objectProperties->pos.y;
+		}
+	}
+
+	return realPos;
 }
 
 S::Int S::GUI::Widget::Show()

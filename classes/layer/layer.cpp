@@ -100,7 +100,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 
 		if (object->GetObjectType() == Widget::classID)
 		{
-			if (((Widget *) object)->IsVisible() && Affected(object, updateRect)) ((Widget *) object)->Paint(SP_PAINT);
+			if (((Widget *) object)->IsVisible() && Affected((Widget *) object, updateRect)) ((Widget *) object)->Paint(SP_PAINT);
 		}
 	}
 

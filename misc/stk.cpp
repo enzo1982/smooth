@@ -47,7 +47,7 @@ S::Void S::SMOOTH::SendMessage(GUI::Window *window, Int message, Int wParam, Int
 	}
 }
 
-S::Bool S::Affected(Object *obj, Rect &urect)
+S::Bool S::Affected(GUI::Widget *obj, Rect &urect)
 {
 	Rect	 trect;
 	Point	 realpos = obj->GetObjectProperties()->pos;

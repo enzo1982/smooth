@@ -13,9 +13,7 @@
 #include <smooth/objectmanager.h>
 #include <smooth/i18n.h>
 #include <smooth/stk.h>
-#include <smooth/layer.h>
 #include <smooth/toolkit.h>
-#include <smooth/surface.h>
 
 const S::Int	 S::Object::classID = S::Object::RequestClassID();
 S::Int		 S::Object::objectCount = 0;
@@ -64,56 +62,6 @@ S::Int S::Object::GetFlags()
 S::Bool S::Object::IsRegistered()
 {
 	return registered;
-}
-
-S::Point S::Object::GetRealPosition()
-{
-	if (!registered) return objectProperties->pos;
-
-	Point		 realPos = objectProperties->pos;
-
-	if (myContainer->GetContainerObject()->GetObjectType() == GUI::Layer::classID)
-	{
-		GUI::Layer	*layer = (GUI::Layer *) myContainer->GetContainerObject();
-		Point		 layerPos = layer->GetRealPosition();
-
-		realPos.x = layerPos.x + objectProperties->pos.x;
-		realPos.y = layerPos.y + objectProperties->pos.y;
-
-		if (objectProperties->orientation == OR_UPPERRIGHT)
-		{
-			realPos.x = layerPos.x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
-		}
-		else if (objectProperties->orientation == OR_LOWERLEFT)
-		{
-			realPos.y = layerPos.y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
-		}
-		else if (objectProperties->orientation == OR_LOWERRIGHT)
-		{
-			realPos.x = layerPos.x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
-			realPos.y = layerPos.y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
-		}
-	}
-	else
-	{
-		Object	*container = myContainer->GetContainerObject();
-
-		if (objectProperties->orientation == OR_UPPERRIGHT)
-		{
-			realPos.x = container->GetObjectProperties()->size.cx - objectProperties->pos.x;
-		}
-		else if (objectProperties->orientation == OR_LOWERLEFT)
-		{
-			realPos.y = container->GetObjectProperties()->size.cy - objectProperties->pos.y;
-		}
-		else if (objectProperties->orientation == OR_LOWERRIGHT)
-		{
-			realPos.x = container->GetObjectProperties()->size.cx - objectProperties->pos.x;
-			realPos.y = container->GetObjectProperties()->size.cy - objectProperties->pos.y;
-		}
-	}
-
-	return realPos;
 }
 
 S::Bool S::Object::IsTypeCompatible(Int objType)

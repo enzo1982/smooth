@@ -17,13 +17,12 @@
 #include "size.h"
 #include "window.h"
 
-int	 GetLineSizeX	(S::String, int, S::String, int, int);
-int	 GetLineSizeY	(S::String, S::String, int, int);
+int GetLineSizeX(S::String, int, S::String, int, int);
+int GetLineSizeY(S::String, S::String, int, int);
 
 #ifdef __SMOOTH_DLL__
 int		 GetBitmapSizeX		(HBITMAP);
 int		 GetBitmapSizeY		(HBITMAP);
-S::Rect		 GetBitmapMetrics	(HBITMAP);
 int		 GetTextSizeX		(S::String, int, S::String, int, int);
 int		 GetTextSizeX		(S::String, S::String, int, int);
 int		 GetTextSizeY		(S::String, S::String, int, int);
@@ -36,7 +35,6 @@ void		 FreeCompatibleContext	(HDC);
 HBITMAP		 BlitToBitmap		(HDC, S::Rect);
 bool		 BlitToBitmap		(S::Rect, HDC, S::Rect, HBITMAP);
 bool		 BlitFromBitmap		(S::Rect, HBITMAP, S::Rect, HDC);
-HWND		 CreateSimpleWindow	(S::Rect, S::String, S::String, HICON, int, int);
 #endif
 
 #endif

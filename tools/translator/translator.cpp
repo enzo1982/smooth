@@ -153,37 +153,22 @@ Translator::~Translator()
 
 	entries.RemoveAll();
 
-	wnd->UnregisterObject(text_id);
-	wnd->UnregisterObject(edit_id);
-	wnd->UnregisterObject(text_original);
-	wnd->UnregisterObject(edit_original);
-	wnd->UnregisterObject(text_translated);
-	wnd->UnregisterObject(edit_translated);
-	wnd->UnregisterObject(button_save);
-	wnd->UnregisterObject(button_remove);
-	wnd->UnregisterObject(button_new);
-	wnd->UnregisterObject(list_entries);
-	wnd->UnregisterObject(title);
-	wnd->UnregisterObject(menubar);
-	wnd->UnregisterObject(statusbar);
+	DeleteObject(title);
+	DeleteObject(wnd);
+	DeleteObject(menubar);
+	DeleteObject(statusbar);
+	DeleteObject(text_id);
+	DeleteObject(edit_id);
+	DeleteObject(text_original);
+	DeleteObject(edit_original);
+	DeleteObject(text_translated);
+	DeleteObject(edit_translated);
+	DeleteObject(button_save);
+	DeleteObject(button_remove);
+	DeleteObject(button_new);
+	DeleteObject(list_entries);
 
-	UnregisterObject(wnd);
-
-	delete title;
-	delete wnd;
-	delete menubar;
-	delete statusbar;
 	delete menu_file;
-	delete text_id;
-	delete edit_id;
-	delete text_original;
-	delete edit_original;
-	delete text_translated;
-	delete edit_translated;
-	delete button_save;
-	delete button_remove;
-	delete button_new;
-	delete list_entries;
 }
 
 Bool Translator::ExitProc()

@@ -66,8 +66,6 @@ namespace smooth
 			Int			 SetFlags(Int);
 			Int			 GetFlags();
 
-			virtual Point		 GetRealPosition();
-
 			virtual Bool		 IsTypeCompatible(Int);
 
 			ObjectProperties	*GetObjectProperties();
@@ -79,13 +77,13 @@ namespace smooth
 			Void			 SetRegisteredFlag();
 			Void			 UnsetRegisteredFlag();
 
-			static Object		*GetObject(Int, Int);
+			Int			 IsObjectInUse();
+			Bool			 IsObjectDeleteable();
 
 			static Int		 RequestClassID();
 			static Int		 RequestObjectHandle();
 
-			Int			 IsObjectInUse();
-			Bool			 IsObjectDeleteable();
+			static Object		*GetObject(Int, Int);
 
 			static Int		 DeleteObject(Object *);
 	};

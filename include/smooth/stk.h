@@ -40,6 +40,7 @@ namespace smooth
 			static Void		 SetLanguage(Int);
 			static Bool		 SetStartDirectory(String);
 
+#ifdef __WIN32__
 			static HBITMAP		 LoadImage(String, Int, String);
 
 			static Void		 SendMessage(GUI::Window *, Int, Int, Int);
@@ -47,11 +48,15 @@ namespace smooth
 			static Int		 MessageBox(String, String, Int, char *);
 			static Int		 MessageBox(String, String, Int, wchar_t *);
 			static Int		 SplashScreen(HBITMAP, Int);
+#endif
 	};
 
 #ifdef __SMOOTH_DLL__
+#ifdef __WIN32__
 	HBITMAP	 GrayscaleBitmap(HBITMAP);
 	HBITMAP	 DetectTransparentRegions(HBITMAP);
+#endif
+
 	Bool	 Affected(Object *, Rect &);
 #endif
 };

@@ -46,8 +46,10 @@ namespace smooth
 
 				virtual Int	 SetText(String, Rect, String, Int, Int, Int);
 
+#ifdef __WIN32__
 				virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
 				virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+#endif
 		};
 	};
 };

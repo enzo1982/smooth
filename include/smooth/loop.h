@@ -23,11 +23,11 @@ namespace smooth
 	SMOOTHVAR int		 iCmdShow;
 
 	SMOOTHVAR HICON		 SMOOTHICON;
+#endif
 
 	Void SMOOTHAPI	 Init();
 	Void SMOOTHAPI	 Free();
 	Int SMOOTHAPI	 Loop();
-#endif
 
 #ifdef __SMOOTH_DLL__
 

@@ -77,8 +77,10 @@ namespace smooth
 				Bool				 created;
 				Bool				 destroyed;
 
+#ifdef __WIN32__
 				HBITMAP				 icon;
 				HICON				 sysicon;
+#endif
 
 				Rect				 offset;
 				Rect				 updateRect;
@@ -89,11 +91,16 @@ namespace smooth
 
 				PopupMenu			*popupMenu;
 
+#ifdef __WIN32__
 				HDC				 windowDC;
+#endif
 
 				Layer				*mainLayer;
 
+#ifdef __WIN32__
 				HWND				 Create();
+#endif
+
 				Void				 CalculateOffsets();
 
 				Bool				 DummyExitProc();
@@ -101,20 +108,26 @@ namespace smooth
 				static Int			 nOfActiveWindows;
 				Int				 value;
 
+#ifdef __WIN32__
 				HWND				 hwnd;
+#endif
+
 				Bool				 cursorset;
 				Bool				 initshow;
 
 								 Window(String title = NIL);
 								~Window();
 
-				Int				 SetMetrics(Point, Size);
+#ifdef __WIN32__
 				Void				 SetPositionFlag(HWND);
-				Void				 SetStyle(Int);
-				Void				 SetExStyle(Int);
 				Int				 SetIcon(HBITMAP);
 				Int				 SetApplicationIcon(HICON);
+#endif
+
 				Int				 SetApplicationIcon(Int);
+				Int				 SetMetrics(Point, Size);
+				Void				 SetStyle(Int);
+				Void				 SetExStyle(Int);
 				Int				 SetText(String);
 
 				Int				 SetStatusText(String);

@@ -193,7 +193,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 	}
 	else if (subtype == OR_VERT)
 	{
-		lineStart.x = (frame.right + frame.left) / 2;
+		lineStart.x = (frame.right + frame.left) / 2 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = (frame.top + (frame.right - frame.left) / 2) - 2;
 		lineEnd.x = lineStart.x + 1;
 		lineEnd.y = lineStart.y;
@@ -207,7 +207,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 			lineEnd.y++;
 		}
 
-		lineStart.x = (frame.right + frame.left) / 2 - 3;
+		lineStart.x = (frame.right + frame.left) / 2 - 3 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = (frame.bottom - (frame.right - frame.left) / 2) - 2;
 		lineEnd.x = lineStart.x + 7;
 		lineEnd.y = lineStart.y;

@@ -58,7 +58,7 @@ S::GUI::ComboBox::~ComboBox()
 
 		Window	*wnd = NIL;
 
-		if (myContainer != NIL) myContainer->GetContainerWindow();
+		if (myContainer != NIL) wnd = myContainer->GetContainerWindow();
 
 		if (wnd != NIL) wnd->UnregisterObject(toolWindow);
 
@@ -174,7 +174,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	frame.right++;
 	frame.left = realPos.x;
 
-	lineStart.x = frame.right - METRIC_COMBOBOXARROWOFFSETX;
+	lineStart.x = frame.right - METRIC_COMBOBOXARROWOFFSETX + (Setup::rightToLeft ? 1 : 0);
 	lineStart.y = frame.top + METRIC_COMBOBOXARROWOFFSETY;
 	lineEnd.x = lineStart.x + 7;
 	lineEnd.y = lineStart.y;

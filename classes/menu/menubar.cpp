@@ -219,7 +219,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				if (operat->onClick.GetNOfConnectedSlots() > 0) menuentry.right += 2;
 
-				p1.x = menuentry.right - METRIC_IBARROWSIZEX - 1;
+				p1.x = menuentry.right - METRIC_IBARROWSIZEX - 1 + (Setup::rightToLeft ? 1 : 0);
 				p2.x = p1.x + METRIC_IBARROWSIZEX;
 				p1.y = menuentry.top + (menuentry.bottom - menuentry.top - METRIC_IBARROWSIZEY) / 2 + 1;
 				p2.y = p1.y;
@@ -352,7 +352,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.right += (METRIC_IBARROWSIZEX + 3);
 				helpmenuentry.left = helpmenuentry.right - bitmapSize - METRIC_IBARROWSIZEX - 2;
 
-				p1.x = helpmenuentry.right - METRIC_IBARROWSIZEX - 1;
+				p1.x = helpmenuentry.right - METRIC_IBARROWSIZEX - 1 + (Setup::rightToLeft ? 1 : 0);
 				p2.x = p1.x + METRIC_IBARROWSIZEX;
 				p1.y = helpmenuentry.top + (helpmenuentry.bottom - helpmenuentry.top - METRIC_IBARROWSIZEY) / 2 + 1;
 				p2.y = p1.y;
@@ -713,8 +713,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
 						{
-							Point	 p1 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.top + 1);
-							Point	 p2 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.bottom - 1);
+							Point	 p1 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5 + (Setup::rightToLeft ? 2 : 0), operat->rect.top + 1);
+							Point	 p2 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5 + (Setup::rightToLeft ? 2 : 0), operat->rect.bottom - 1);
 
 							surface->Bar(p1, p2, OR_VERT);
 						}
@@ -742,8 +742,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
 						{
-							Point	 p1 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.top + 1);
-							Point	 p2 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.bottom);
+							Point	 p1 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5 + (Setup::rightToLeft ? 1 : 0), operat->rect.top + 1);
+							Point	 p2 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5 + (Setup::rightToLeft ? 1 : 0), operat->rect.bottom);
 
 							surface->Line(p1, p2, Setup::BackgroundColor);
 

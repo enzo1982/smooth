@@ -254,61 +254,37 @@ S::MessageBoxApp::~MessageBoxApp()
 	{
 		default:
 		case MB_OK:
-			lay->UnregisterObject(okbutton);
-
 			DeleteObject(okbutton);
 
 			break;
 		case MB_OKCANCEL:
-			lay->UnregisterObject(okbutton);
-			lay->UnregisterObject(cancelbutton);
-
 			DeleteObject(okbutton);
 			DeleteObject(cancelbutton);
 
 			break;
 		case MB_YESNO:
-			lay->UnregisterObject(yesbutton);
-			lay->UnregisterObject(nobutton);
-
 			DeleteObject(yesbutton);
 			DeleteObject(nobutton);
 
 			break;
 		case MB_YESNOCANCEL:
-			lay->UnregisterObject(yesbutton);
-			lay->UnregisterObject(nobutton);
-			lay->UnregisterObject(cancelbutton);
-
 			DeleteObject(yesbutton);
 			DeleteObject(nobutton);
 			DeleteObject(cancelbutton);
 
 			break;
 		case MB_RETRYCANCEL:
-			lay->UnregisterObject(retrybutton);
-			lay->UnregisterObject(cancelbutton);
-
 			DeleteObject(retrybutton);
 			DeleteObject(cancelbutton);
 
 			break;
 		case MB_ABORTRETRYIGNORE:
-			lay->UnregisterObject(abortbutton);
-			lay->UnregisterObject(retrybutton);
-			lay->UnregisterObject(ignorebutton);
-
 			DeleteObject(abortbutton);
 			DeleteObject(retrybutton);
 			DeleteObject(ignorebutton);
 
 			break;
 	}
-
-	msgbox->UnregisterObject(lay);
-	msgbox->UnregisterObject(titlebar);
-
-	UnregisterObject(msgbox);
 
 	DeleteObject(lay);
 	DeleteObject(titlebar);
@@ -359,7 +335,7 @@ S::Void S::MessageBoxApp::MessagePaintProc()
 			else				icon = (HICON) LoadImageA(hInstance, (char *) msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 		}
 
-		DrawIcon(dc, 17, 47, icon);
+		DrawIcon(dc, Setup::rightToLeft ? msgbox->GetObjectProperties()->size.cx - 17 - GetSystemMetrics(SM_CXICON) : 17, 47, icon);
 	}
 
 	for (int i = 0; i < lines; i++)

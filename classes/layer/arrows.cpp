@@ -142,7 +142,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
 
-		lineStart.x = (frame.right + frame.left) / 2;
+		lineStart.x = (frame.right + frame.left) / 2 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = (frame.top + (frame.top+frame.bottom) / 2) / 2 - 1;
 		lineEnd.x = lineStart.x + 1;
 		lineEnd.y = lineStart.y;
@@ -157,7 +157,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 			lineEnd.y++;
 		}
 
-		lineStart.x = (frame.right + frame.left) / 2 - 3;
+		lineStart.x = (frame.right + frame.left) / 2 - 3 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = (frame.bottom + (frame.top + frame.bottom) / 2) / 2 - 1;
 		lineEnd.x = lineStart.x + 7;
 		lineEnd.y = lineStart.y;

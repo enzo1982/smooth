@@ -261,6 +261,12 @@ S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
 					break;
 			}
 
+			if (object->GetObjectType() == ToolWindow::classID)
+			{
+				if (Setup::rightToLeft)	object->GetObjectProperties()->pos.x = objectProperties->size.cx - ((object->GetObjectProperties()->pos.x - objectProperties->pos.x) + object->GetObjectProperties()->size.cx) + objectProperties->pos.x;
+				((ToolWindow *) object)->Create();
+			}
+
 			if (object->GetObjectType() == Widget::classID)
 			{
 				((Widget *) object)->onRegister.Emit(this);

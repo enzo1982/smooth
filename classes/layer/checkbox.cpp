@@ -86,86 +86,86 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 
 	if (*variable == True)
 	{
-		lineStart.x = frame.left + 3;
+		lineStart.x = frame.left + 3 - (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 3;
-		lineEnd.x = frame.right;
+		lineEnd.x = frame.right - (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom;
 
 		surface->Line(lineStart, lineEnd, shadowColor);
 
-		lineStart.x = frame.left + 4;
+		lineStart.x = frame.left + 4 - (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 3;
-		lineEnd.x = frame.right;
+		lineEnd.x = frame.right - (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom - 1;
 
 		surface->Line(lineStart, lineEnd, shadowColor);
 
-		lineStart.x = frame.left + 3;
+		lineStart.x = frame.left + 3 - (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 4;
-		lineEnd.x = frame.right - 1;
+		lineEnd.x = frame.right - 1 - (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom;
 
 		surface->Line(lineStart, lineEnd, shadowColor);
 
-		lineStart.x = frame.right - 1;
+		lineStart.x = frame.right - 1 - (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 3;
-		lineEnd.x = frame.left + 2;
+		lineEnd.x = frame.left + 2 - (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom;
 
 		surface->Line(lineStart, lineEnd, shadowColor);
 
-		lineStart.x = frame.right - 1;
+		lineStart.x = frame.right - 1 - (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 4;
-		lineEnd.x = frame.left + 3;
+		lineEnd.x = frame.left + 3 - (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom;
 
 		surface->Line(lineStart, lineEnd, shadowColor);
 
-		lineStart.x = frame.right - 2;
+		lineStart.x = frame.right - 2 - (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 3;
-		lineEnd.x = frame.left + 2;
+		lineEnd.x = frame.left + 2 - (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom - 1;
 
 		surface->Line(lineStart, lineEnd, shadowColor);
 
-		lineStart.x = frame.left + 2;
+		lineStart.x = frame.left + 2 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 2;
-		lineEnd.x = frame.right - 1;
+		lineEnd.x = frame.right - 1 + (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom - 1;
 
 		surface->Line(lineStart, lineEnd, crossColor);
 
-		lineStart.x = frame.left + 3;
+		lineStart.x = frame.left + 3 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 2;
-		lineEnd.x = frame.right - 1;
+		lineEnd.x = frame.right - 1 + (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom - 2;
 
 		surface->Line(lineStart, lineEnd, crossColor);
 
-		lineStart.x = frame.left + 2;
+		lineStart.x = frame.left + 2 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 3;
-		lineEnd.x = frame.right - 2;
+		lineEnd.x = frame.right - 2 + (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom - 1;
 
 		surface->Line(lineStart, lineEnd, crossColor);
 
-		lineStart.x = frame.right - 2;
+		lineStart.x = frame.right - 2 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 2;
-		lineEnd.x = frame.left + 1;
+		lineEnd.x = frame.left + 1 + (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom - 1;
 
 		surface->Line(lineStart, lineEnd, crossColor);
 
-		lineStart.x = frame.right - 2;
+		lineStart.x = frame.right - 2 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 3;
-		lineEnd.x = frame.left + 2;
+		lineEnd.x = frame.left + 2 + (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom - 1;
 
 		surface->Line(lineStart, lineEnd, crossColor);
 
-		lineStart.x = frame.right - 3;
+		lineStart.x = frame.right - 3 + (Setup::rightToLeft ? 1 : 0);
 		lineStart.y = frame.top + 2;
-		lineEnd.x = frame.left + 1;
+		lineEnd.x = frame.left + 1 + (Setup::rightToLeft ? 1 : 0);
 		lineEnd.y = frame.bottom - 2;
 
 		surface->Line(lineStart, lineEnd, crossColor);

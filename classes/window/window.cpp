@@ -544,6 +544,7 @@ HWND S::GUI::Window::Create()
 			windowDC = GetContext(this);
 
 			drawSurface = new SurfaceGDI(windowDC);
+			drawSurface->SetSize(objectProperties->size);
 
 			onCreate.Emit();
 
@@ -1233,7 +1234,8 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 S::Int S::GUI::Window::MouseX()
 {
-	return Input::MouseX() - objectProperties->pos.x;
+	if (Setup::rightToLeft)	return objectProperties->size.cx - (Input::MouseX() - objectProperties->pos.x) - 1;
+	else			return Input::MouseX() - objectProperties->pos.x;
 }
 
 S::Int S::GUI::Window::MouseY()
@@ -1247,9 +1249,7 @@ S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 
 	if (surface->GetSurfaceType() != SURFACE_GDI) return False;
 
-	if (!PtVisible(((SurfaceGDI *) surface)->GetContext(), MouseX(), MouseY())) return False;
-
-	if (Setup::rightToLeft) rect = Rect(Point(objectProperties->size.cx - rect.right - 1, rect.top), Size(rect.right - rect.left, rect.bottom - rect.top));
+	if (!PtVisible(((SurfaceGDI *) surface)->GetContext(), Input::MouseX() - objectProperties->pos.x, Input::MouseY() - objectProperties->pos.y)) return False;
 
 	if ((MouseX() >= rect.left) && (MouseX() <= rect.right) && (MouseY() >= rect.top) && (MouseY() <= rect.bottom))	return True;
 	else														return False;
@@ -1287,6 +1287,7 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 			}
 			else if (object->GetObjectType() == ToolWindow::classID)
 			{
+				if (Setup::rightToLeft)	object->GetObjectProperties()->pos.x = objectProperties->size.cx - ((object->GetObjectProperties()->pos.x - objectProperties->pos.x) + object->GetObjectProperties()->size.cx) + objectProperties->pos.x;
 				((ToolWindow *) object)->Create();
 			}
 

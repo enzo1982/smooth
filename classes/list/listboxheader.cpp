@@ -261,15 +261,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 				if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
 				else					leftButton = VK_LBUTTON;
 
-				Point	 om;
-
-				{
-					POINT	 mp = om;
-
-					GetCursorPos(&mp);
-
-					om = mp;
-				}
+				Int	 omx = wnd->MouseX();
 
 				innerLoop = True;
 
@@ -299,24 +291,15 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 						else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 					}
 
-					Point	 m;
-
-					{
-						POINT	 mp = m;
-
-						GetCursorPos(&mp);
-
-						m = mp;
-					}
-
-					Int	 bias = om.x - m.x;
+					Int	 mx = wnd->MouseX();
+					Int	 bias = omx - mx;
 
 					if (bias != 0)
 					{
 						tabWidths.SetEntry(moveTab, (Int) Math::Max(Math::Abs(tabWidths.GetEntry(moveTab)) - bias, 1) * Math::Sign(tabWidths.GetEntry(moveTab)));
 						tabWidths.SetEntry(tabWidths.GetNOfEntries() - 1, (Int) Math::Max(Math::Abs(tabWidths.GetEntry(tabWidths.GetNOfEntries() - 1)) + bias, 1) * Math::Sign(tabWidths.GetEntry(tabWidths.GetNOfEntries() - 1)));
 
-						om.x = m.x;
+						omx = mx;
 
 						UpdateMetrics();
 

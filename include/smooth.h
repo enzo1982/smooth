@@ -136,13 +136,12 @@
 
 #include "smooth/extended.h"
 #include "smooth/graphics/bitmap.h"
+#include "smooth/graphics/bitmapbackend.h"
 
 #if defined __WIN32__
 #include "smooth/graphics/gdi/bitmapgdi.h"
 #include "smooth/graphics/gdi/surfacegdi.h"
 #include "smooth/graphics/gdi/windowgdi.h"
-#else
-#include "smooth/graphics/none/bitmapnone.h"
 #endif
 
 #endif

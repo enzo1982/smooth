@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/gdi/surfacegdi.h>
-#include <smooth/graphics/gdi/bitmapgdi.h>
+#include <smooth/graphics/bitmap.h>
 #include <smooth/stk.h>
 #include <smooth/color.h>
 #include <smooth/math.h>
@@ -26,8 +26,8 @@ S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 
 	bmp_dc = CreateCompatibleDC(gdi_dc);
 
-	HBITMAP		 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
-	BitmapGDI	 bmpGDI(bitmap);
+	HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
+	Bitmap	 bmpGDI(bitmap);
 
 	BlitToBitmap(Rect(Point(0, 0), size), bmpGDI, Rect(Point(0, 0), size));
 
@@ -316,7 +316,7 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font)
 
 S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, Rect srcRect, Rect destRect)
 {
-	BitmapGDI	 bitmap = oBitmap;
+	Bitmap	 bitmap = oBitmap;
 
 	if (bitmap.GetBitmapType() != BITMAP_GDI) return Error;
 
@@ -345,7 +345,7 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, Rect srcRect, R
 
 S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, const Bitmap &oBitmap, Rect destRect)
 {
-	BitmapGDI	 bitmap = oBitmap;
+	Bitmap	 bitmap = oBitmap;
 
 	if (bitmap.GetBitmapType() != BITMAP_GDI) return Error;
 

@@ -9,189 +9,150 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/bitmap.h>
-#include <smooth/graphics/surface.h>
-#include <smooth/color.h>
+#include <smooth/graphics/bitmapbackend.h>
 
-S::GUI::BitmapBase::BitmapBase()
+#ifdef __WIN32__
+#include <smooth/graphics/gdi/bitmapgdi.h>
+#endif
+
+S::GUI::Bitmap	 S::GUI::SI_DEFAULT = S::GUI::Bitmap();
+
+S::GUI::Bitmap::Bitmap(Void *iBitmap)
 {
-	type		= -1;
-
-	size		= Size(0, 0);
-	depth		= 0;
-
-	bytes		= NIL;
-	align		= 0;
+#ifdef __WIN32__
+	backend = new BitmapGDI(iBitmap);
+#else
+	backend = new BitmapBackend(iBitmap);
+#endif
 }
 
-S::GUI::BitmapBase::BitmapBase(const int nil)
+S::GUI::Bitmap::Bitmap(Int cx, Int cy, Int bpp)
 {
-	type		= -1;
-
-	size		= Size(0, 0);
-	depth		= 0;
-
-	bytes		= NIL;
-	align		= 0;
+#ifdef __WIN32__
+	backend = new BitmapGDI(cx, cy, bpp);
+#else
+	backend = new BitmapBackend(cx, cy, bpp);
+#endif
 }
 
-S::GUI::BitmapBase::BitmapBase(const BitmapBase &iBitmap)
+S::GUI::Bitmap::Bitmap(const int nil)
 {
-	type		= -1;
-
-	size		= iBitmap.size;
-	depth		= iBitmap.depth;
-
-	bytes		= iBitmap.bytes;
-	align		= iBitmap.align;
+#ifdef __WIN32__
+	backend = new BitmapGDI(nil);
+#else
+	backend = new BitmapBackend(nil);
+#endif
 }
 
-S::GUI::BitmapBase::~BitmapBase()
+S::GUI::Bitmap::Bitmap(const Bitmap &iBitmap)
 {
+#ifdef __WIN32__
+	backend = new BitmapGDI((BitmapGDI &) *(iBitmap.backend));
+#else
+	backend = new BitmapBackend((BitmapNone &) *(iBitmap.backend));
+#endif
 }
 
-S::Int S::GUI::BitmapBase::GetBitmapType()
+S::GUI::Bitmap::~Bitmap()
 {
-	return type;
+	delete backend;
 }
 
-S::Size S::GUI::BitmapBase::GetSize()
+S::Int S::GUI::Bitmap::GetBitmapType()
 {
-	return size;
+	return backend->GetBitmapType();
 }
 
-S::Int S::GUI::BitmapBase::GetDepth()
+S::Size S::GUI::Bitmap::GetSize()
 {
-	return depth;
+	return backend->GetSize();
 }
 
-S::UnsignedByte *S::GUI::BitmapBase::GetBytes()
+S::Int S::GUI::Bitmap::GetDepth()
 {
-	return bytes;
+	return backend->GetDepth();
 }
 
-S::Int S::GUI::BitmapBase::GetLineAlignment()
+S::UnsignedByte *S::GUI::Bitmap::GetBytes()
 {
-	return align;
+	return backend->GetBytes();
 }
 
-S::Bool S::GUI::BitmapBase::CreateBitmap(Int cx, Int cy, Int bpp)
+S::Int S::GUI::Bitmap::GetLineAlignment()
 {
-	return False;
+	return backend->GetLineAlignment();
 }
 
-S::Bool S::GUI::BitmapBase::DeleteBitmap()
+S::Bool S::GUI::Bitmap::CreateBitmap(Int cx, Int cy, Int bpp)
 {
-	return True;
+	return backend->CreateBitmap(cx, cy, bpp);
 }
 
-S::Int S::GUI::BitmapBase::GrayscaleBitmap()
+S::Bool S::GUI::Bitmap::DeleteBitmap()
 {
-	if (bytes == NIL) return Error;
-
-	Int	 color = 0;
-
-	for (Int y = 0; y < size.cy; y++)
-	{
-		for (Int x = 0; x < size.cx; x++)
-		{
-			color = GetPixel(x, y);
-			color = (GetRed(color) + GetGreen(color) + GetBlue(color)) / 3;
-			color = CombineColor(color, color, color);
-
-			SetPixel(x, y, color);
-		}
-	}
-
-	return Success;
+	return backend->DeleteBitmap();
 }
 
-S::Int S::GUI::BitmapBase::ReplaceColor(Int color1, Int color2)
+S::Bool S::GUI::Bitmap::SetBitmap(Void *nBitmap)
 {
-	if (bytes == NIL) return Error;
-
-	for (Int y = 0; y < size.cy; y++)
-	{
-		for (Int x = 0; x < size.cx; x++)
-		{
-			if (GetPixel(x, y) == (UnsignedInt) color1) SetPixel(x, y, color2);
-		}
-	}
-
-	return Success;
+	return backend->SetBitmap(nBitmap);
 }
 
-S::Int S::GUI::BitmapBase::BlitFromSurface(Surface *surface, Rect srcRect, Rect destRect)
+S::Void *S::GUI::Bitmap::GetBitmap()
 {
-	if (surface == NIL) return Error;
-
-	return surface->BlitToBitmap(srcRect, *(Bitmap *) this, destRect);
+	return backend->GetBitmap();
 }
 
-S::Int S::GUI::BitmapBase::BlitToSurface(Rect srcRect, Surface *surface, Rect destRect)
+S::Int S::GUI::Bitmap::GrayscaleBitmap()
 {
-	if (surface == NIL) return Error;
-
-	return surface->BlitFromBitmap(*(Bitmap *) this, srcRect, destRect);
+	return backend->GrayscaleBitmap();
 }
 
-S::Bool S::GUI::BitmapBase::SetPixel(Int x, Int y, UnsignedLong color)
+S::Int S::GUI::Bitmap::ReplaceColor(Int color1, Int color2)
 {
-	if (bytes == NIL)			return False;
-	if (y >= size.cy || x >= size.cx)	return False;
-
-	Bool	 done = False;
-	Int	 offset = 0;
-
-	switch (depth)
-	{
-		case 24:
-			offset = (size.cy - ++y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + x * 3;
-
-			bytes[offset + 0] = GetBlue(color);
-			bytes[offset + 1] = GetGreen(color);
-			bytes[offset + 2] = GetRed(color);
-
-			done = True;
-
-			break;
-		case 32:
-			offset = (size.cy - ++y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + x * 4;
-
-			bytes[offset + 0] = GetBlue(color);
-			bytes[offset + 1] = GetGreen(color);
-			bytes[offset + 2] = GetRed(color);
-
-			done = True;
-
-			break;
-	}
-
-	return done;
+	return backend->ReplaceColor(color1, color2);
 }
 
-S::UnsignedLong S::GUI::BitmapBase::GetPixel(Int x, Int y)
+S::Int S::GUI::Bitmap::BlitFromSurface(Surface *surface, Rect srcRect, Rect destRect)
 {
-	if (bytes == NIL)			return 0;
-	if (y >= size.cy || x >= size.cx)	return 0;
+	return backend->BlitFromSurface(surface, srcRect, destRect);
+}
 
-	UnsignedLong	 color = 0;
-	Int		 offset = 0;
+S::Int S::GUI::Bitmap::BlitToSurface(Rect srcRect, Surface *surface, Rect destRect)
+{
+	return backend->BlitToSurface(srcRect, surface, destRect);
+}
 
-	switch (depth)
-	{
-		case 24:
-			offset = (size.cy - ++y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + x * 3;
+S::Bool S::GUI::Bitmap::SetPixel(Int x, Int y, UnsignedLong color)
+{
+	return backend->SetPixel(x, y, color);
+}
 
-			color = CombineColor(bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]);
+S::UnsignedLong S::GUI::Bitmap::GetPixel(Int x, Int y)
+{
+	return backend->GetPixel(x, y);
+}
 
-			break;
-		case 32:
-			offset = (size.cy - ++y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + x * 4;
+S::GUI::Bitmap &S::GUI::Bitmap::operator =(const int nil)
+{
+	*backend = nil;
 
-			color = CombineColor(bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]);
+	return *this;
+}
 
-			break;
-	}
+S::GUI::Bitmap &S::GUI::Bitmap::operator =(const Bitmap &newBitmap)
+{
+	*backend = *(newBitmap.backend);
 
-	return color;
+	return *this;
+}
+
+S::Bool S::GUI::Bitmap::operator ==(const int nil)
+{
+	return (*backend == nil);
+}
+
+S::Bool S::GUI::Bitmap::operator !=(const int nil)
+{
+	return (*backend != nil);
 }

@@ -10,9 +10,7 @@
 
 #include <smooth/graphics/gdi/bitmapgdi.h>
 
-S::GUI::BitmapGDI	 S::GUI::SI_DEFAULT = S::GUI::BitmapGDI();
-
-S::GUI::BitmapGDI::BitmapGDI(HBITMAP iBitmap)
+S::GUI::BitmapGDI::BitmapGDI(Void *iBitmap)
 {
 	type	= BITMAP_GDI;
 	bitmap	= NIL;
@@ -110,7 +108,7 @@ S::Bool S::GUI::BitmapGDI::DeleteBitmap()
 	return True;
 }
 
-S::Bool S::GUI::BitmapGDI::SetBitmap(HBITMAP nBitmap)
+S::Bool S::GUI::BitmapGDI::SetBitmap(Void *nBitmap)
 {
 	if (nBitmap == NIL)
 	{
@@ -143,21 +141,14 @@ S::Bool S::GUI::BitmapGDI::SetBitmap(HBITMAP nBitmap)
 	return True;
 }
 
-HBITMAP S::GUI::BitmapGDI::GetBitmap()
+S::Void *S::GUI::BitmapGDI::GetBitmap()
 {
-	return bitmap;
+	return (Void *) bitmap;
 }
 
-S::GUI::BitmapGDI &S::GUI::BitmapGDI::operator =(const int nil)
+S::GUI::BitmapBackend &S::GUI::BitmapGDI::operator =(const BitmapBackend &newBitmap)
 {
-	SetBitmap(NIL);
-
-	return *this;
-}
-
-S::GUI::BitmapGDI &S::GUI::BitmapGDI::operator =(const BitmapGDI &newBitmap)
-{
-	SetBitmap(newBitmap.bitmap);
+	SetBitmap(((BitmapGDI &) newBitmap).bitmap);
 
 	return *this;
 }

@@ -437,26 +437,13 @@ SOURCE=..\classes\graphics\gdi\surfacegdi.cpp
 SOURCE=..\classes\graphics\gdi\windowgdi.cpp
 # End Source File
 # End Group
-# Begin Group "nonesources"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\classes\graphics\none\bitmapnone.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# End Group
 # Begin Source File
 
 SOURCE=..\classes\graphics\bitmap.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\bitmapbackend.cpp
 # End Source File
 # Begin Source File
 
@@ -729,17 +716,13 @@ SOURCE=..\include\smooth\graphics\gdi\surfacegdi.h
 SOURCE=..\include\smooth\graphics\gdi\windowgdi.h
 # End Source File
 # End Group
-# Begin Group "none"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\none\bitmapnone.h
-# End Source File
-# End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\graphics\bitmap.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\bitmapbackend.h
 # End Source File
 # Begin Source File
 

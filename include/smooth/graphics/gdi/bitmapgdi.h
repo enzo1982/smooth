@@ -19,7 +19,7 @@ namespace smooth
 	};
 };
 
-#include "../bitmap.h"
+#include "../bitmapbackend.h"
 
 namespace smooth
 {
@@ -27,12 +27,12 @@ namespace smooth
 	{
 		const Int	 BITMAP_GDI = 1;
 
-		class SMOOTHAPI BitmapGDI : public BitmapBase
+		class BitmapGDI : public BitmapBackend
 		{
 			private:
 				HBITMAP			 bitmap;
 			public:
-							 BitmapGDI(HBITMAP = NIL);
+							 BitmapGDI(Void * = NIL);
 							 BitmapGDI(Int, Int, Int);
 							 BitmapGDI(const int);
 							 BitmapGDI(const BitmapGDI &);
@@ -42,17 +42,14 @@ namespace smooth
 				Bool			 CreateBitmap(Int, Int, Int);
 				Bool			 DeleteBitmap();
 
-				Bool			 SetBitmap(HBITMAP);
-				HBITMAP			 GetBitmap();
+				Bool			 SetBitmap(Void *);
+				Void			*GetBitmap();
 
-				BitmapGDI &operator	 =(const int);
-				BitmapGDI &operator	 =(const BitmapGDI &);
+				BitmapBackend &operator	 =(const BitmapBackend &);
 
 				Bool operator		 ==(const int);
 				Bool operator		 !=(const int);
 		};
-
-		SMOOTHVAR S::GUI::BitmapGDI SI_DEFAULT;
 	};
 };
 

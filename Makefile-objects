@@ -73,14 +73,14 @@ $(OBJECTDIR)/windowgdi.o: $(GRAPHICSCLASSESDIR)/gdi/windowgdi.cpp $(SMOOTHINCLUD
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/windowgdi.cpp -o $(OBJECTDIR)/windowgdi.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/bitmapnone.o: $(GRAPHICSCLASSESDIR)/none/bitmapnone.cpp $(SMOOTHINCLUDEDIR)/graphics/none/bitmapnone.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/none/bitmapnone.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/none/bitmapnone.cpp -o $(OBJECTDIR)/bitmapnone.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/bitmap.o: $(GRAPHICSCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmap.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmap.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmap.cpp -o $(OBJECTDIR)/bitmap.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/bitmapbackend.o: $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmapbackend.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp -o $(OBJECTDIR)/bitmapbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/font.o: $(GRAPHICSCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/graphics/font.h

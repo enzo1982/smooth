@@ -11,7 +11,7 @@
 #ifndef _H_OBJSMOOTH_VERSION_
 #define _H_OBJSMOOTH_VERSION_
 
-#define SMOOTH_VERSION _TEXT("0.8.65.0")
+#define SMOOTH_VERSION "0.8.65.0"
 
 #ifdef __SMOOTH_DLL__
 #define SMOOTH_RESVERS 0,8,65,0

@@ -26,7 +26,6 @@
 
 	#include <windows.h>
 	#include <wtypes.h>
-	#include <tchar.h>
 	#include <wchar.h>
 
 	#if defined __SMOOTH_DLL__
@@ -93,14 +92,12 @@
 	#undef False
 	#undef Bool
 
-	#define _TEXT(x) L##x
-
 	#define __declspec(x)
 
 	#define MAX_PATH PATH_MAX
 #endif
 
-#ifndef __WIN32__
+#if !defined __WIN32__
 #ifndef __WINDOWS_TYPES__
 #define __WINDOWS_TYPES__
 

@@ -10,6 +10,9 @@
 
 #include <smooth.h>
 #include <smooth/main.h>
+
+#include <tchar.h>
+
 #include "beat.h"
 
 using namespace smooth::GUI::Dialogs;

@@ -1,0 +1,188 @@
+smooth bug list
+---------------
+
+Unfixed bugs:
+
+no known unfixed bugs
+
+------------------------------------------------------------------------
+
+07.01.03 - smooth alpha 0.8.61.0
+
+#0019 - Fehler bei Popups die Statusbar-Infos enthalten
+	Repro:	Programm starten und aus einem entspr. Popup ein Submenü aufrufen
+	Sym:	Grafikfehler
+	Rea:	Fehler beim Eintragen der Statusbar-Infos
+	Stat:	fixed
+	Occ:	08.04.03
+
+12.01.02 - smooth alpha 0.8.58.0
+
+#0018 - Instabile Popupmenüs
+	Repro:	Programm starten und Menüeinträge in Popups anklicken
+	Sym:	Programm stürzt ab
+	Rea:	Ursache liegt in der Art, wie Popupmenüs gelöscht werden. Nach dem Löschen
+		ist noch eine Funktion (Process(...) mit SM_LBUTTONUP) des Popups aktiv.
+	Stat:	fixed
+	Occ:	15.02.02
+
+06.06.01 - smooth alpha 0.8.54.0
+
+#0017 - ComboBoxen öffnen sich nicht
+	Repro:	Programm starten, ComboBox anklicken
+	Sym:	ComboBox öffnet sich nicht, bzw wird sofort wieder geschlossen
+	Rea:	smooth::GetObject sieht ToolWindows nicht als Typ OBJ_WINDOW an
+	Stat:	fixed
+	Occ:	07.06.01
+
+30.03.01 - smooth alpha 0.8.50.0
+
+#0016 - Serverauswahl hängt
+	Repro:	Session auswählen, Server beenden, erneut verbinden
+	Sym:	Dialog bleibt hängen
+	Rea:	?
+	Stat:	fixed
+	Occ:	30.03.01
+
+22.03.01 - smooth alpha 0.8.50.0
+
+#0015 - Serverauswahl stürzt ab
+	Repro:	Session auswählen und dann den Server beenden
+	Sym:	Programm stürzt ab
+	Rea:	Dialog merkt nicht, dass der Server beendet wurde
+	Stat:	fixed
+	Occ:	30.03.01
+
+22.03.01 - smooth alpha 0.8.50.0
+
+#0014 - Serverauswahl hängt
+	Repro:	Geschützte Session auswählen und als Passwort fidsa eingeben
+	Sym:	Dialog bleibt hängen
+	Rea:	durch XOR werden Zeichen des Passworts 0
+	Stat:	fixed
+	Occ:	27.06.01
+
+01.02.01 - smooth alpha 0.8.41.1
+
+#0013 - Programm startet nicht richtig
+	Repro:	Test starten (tritt nur gelegentlich auf)
+	Sym:	Widgets werden nicht gezeichnet
+	Rea:	RecArray Kette wurde während eines Durchlaufs verändert
+	Stat:	fixed
+	Occ:	22.07.01
+
+13.09.00 - smooth alpha 0.8.7.1
+
+#0012 - Programm wird nicht beendet, wenn ein Thread aktiv ist
+	Repro:	Test starten und beenden, ohne den MBThread zu beenden
+	Sym:	Test bleibt im Speicher
+	Rea:	Threads werden nicht zerstört bzw. beendet
+	Stat:	fixed
+	Occ:	21.09.00
+
+04.08.00 - smooth alpha 0.7.26.1
+
+#0011 - ListBox aktiviert mehrere Einträge
+	Repro:	ListBox mit vielen Einträgen erzeugen
+		Eintrag auswählen
+	Sym:	Manchmal sind mehrere Einträge selektiert
+	Rea:	Fehler in ListBox
+	Stat:	fixed
+	Occ:	05.08.00
+
+06.07.00 - smooth alpha 0.7.21.1
+
+#0010 - nur letzte ComboBox funktioniert
+	Repro:	mehrere ComboBoxen erstellen, Eintrag aus erster anwählen
+	Sym:	Programm stürzt sofort ab
+	Rea:	listbox wurde nicht auf NULL überprüft
+	Stat:	fixed
+	Occ:	12.07.00
+
+06.07.00 - smooth alpha 0.7.21.1
+
+#0009 - ComboBox zeichnet Hintergrund nicht neu
+	Repro:	ComboBox öffnen und schließen
+	Sym:	Bereich hinter der ComboBox wird nicht gezeichnet
+	Rea:	nicht implementiert
+	Stat:	fixed
+	Occ:	07.07.00
+
+04.06.00 - smooth alpha 0.7.14.0
+
+#0008 - Läuft nicht unter Windows 2000 Final
+	Repro:	Anwendung unter Windows 2000 starten
+	Sym:	Hauptfenster wird nicht geöffnet
+	Rea:	hCursor Feld von WNDCLASSEX nicht gesetzt
+	Stat:	fixed
+	Occ:	06.06.00
+
+28.05.00 - smooth alpha 0.7.11.0
+
+#0007 - Zeichnet in falschen DC
+	Repro:	Fenster maximieren
+		andere maximierte Anwendung aktivieren
+		smooth Fenster aktivieren
+		Tritt nur auf, wenn Process() auf WM_GETMINMAXINFO o.ä. reagiert
+	Sym:	Fenster wird nicht neugezeichnet
+	Rea:	?
+	Stat:	fixed
+	Occ:	28.05.00
+
+14.04.00 - smooth alpha 0.6.26.0
+
+#0006 - Fehlerhafte Darstellung bei großen Schriftarten
+	Repro:	smooth Anwendung bei großen Schriftarten starten
+	Sym:	Text wird zu groß gezeichnet
+	Rea:	Fehlerhafte Texthöhenberechnung
+	Stat:	fixed
+	Occ:	14.04.00
+
+13.04.00 - smooth alpha 0.6.25.1
+
+#0005 - Objekte Zeichnen manchmal in DeviceContext des Desktop
+	Repro:	Dialogfenster mit Layer öffnen
+		funktioniert nur unter Windows 9x
+	Sym:	Objekte werden außerhalb eines Fensters gezeichnet
+	Rea:	Fehler in window.cpp und layer.cpp
+	Stat:	fixed
+	Occ:	14.04.00
+
+02.04.00 - smooth alpha 0.6.22.0
+
+#0004 - Absturz bei MultiButton MessageBoxen
+	Repro:	MessageBox öffnen
+		auf Abbrechen klicken
+	Sym:	sofortiger Absturz
+	Rea:	Buttons werden in messagebox.cpp nicht richtig unregistriert
+	Stat:	fixed
+	Occ:	02.04.00
+
+22.03.00 - smooth alpha 0.6.20.0
+
+#0003 - Fehler bei ComboBoxen
+	Repro:	ComboBox öffnen
+		Slider einer anderen ListBox bewegen
+	Sym:	ComboBox wird nicht geschlossen
+	Rea:	?
+	Stat:	fixed
+	Occ:	07.06.00
+
+19.03.00 - smooth alpha 0.6.18.0
+
+#0002 - Abstürze bei ListBoxen
+	Repro:	test.exe starten
+		Scrollbar der ListBox mehrmals bewegen
+	Sym:	sofortiger Absturz
+	Rea:	Falsche Behandlung von Doppelklicks in scrollbar.cpp
+	Stat:	fixed
+	Occ:	14.04.00
+
+17.03.00 - smooth alpha 0.6.16.1
+
+#0001 - Programm stürzt gelegentlich ab
+	Repro:	?
+	Sym:	Absturz nach Beenden des Programms
+	Rea:	eventuell fehlerhafte deregistrierung von Objekten in Programm
+	Stat:	fixed
+	Occ:	17.03.00

@@ -403,6 +403,21 @@ $(OBJECTDIR)/threadposix.o: $(THREADSCLASSESDIR)/posix/threadposix.cpp $(SMOOTHI
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/posix/threadposix.cpp -o $(OBJECTDIR)/threadposix.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/mutexsdl.o: $(THREADSCLASSESDIR)/sdl/mutexsdl.cpp $(SMOOTHINCLUDEDIR)/threads/sdl/mutexsdl.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/sdl/mutexsdl.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/sdl/mutexsdl.cpp -o $(OBJECTDIR)/mutexsdl.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/semaphoresdl.o: $(THREADSCLASSESDIR)/sdl/semaphoresdl.cpp $(SMOOTHINCLUDEDIR)/threads/sdl/semaphoresdl.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/sdl/semaphoresdl.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/sdl/semaphoresdl.cpp -o $(OBJECTDIR)/semaphoresdl.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/threadsdl.o: $(THREADSCLASSESDIR)/sdl/threadsdl.cpp $(SMOOTHINCLUDEDIR)/threads/sdl/threadsdl.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/sdl/threadsdl.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/sdl/threadsdl.cpp -o $(OBJECTDIR)/threadsdl.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/mutexwin32.o: $(THREADSCLASSESDIR)/win32/mutexwin32.cpp $(SMOOTHINCLUDEDIR)/threads/win32/mutexwin32.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/win32/mutexwin32.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/win32/mutexwin32.cpp -o $(OBJECTDIR)/mutexwin32.o

@@ -396,6 +396,49 @@ SOURCE=..\classes\threads\win32\semaphorewin32.cpp
 SOURCE=..\classes\threads\win32\threadwin32.cpp
 # End Source File
 # End Group
+# Begin Group "sdlbackend"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\threads\sdl\mutexsdl.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\sdl\semaphoresdl.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\sdl\threadsdl.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\classes\threads\mutex.cpp
@@ -1044,6 +1087,49 @@ SOURCE=..\include\smooth\threads\win32\semaphorewin32.h
 # Begin Source File
 
 SOURCE=..\include\smooth\threads\win32\threadwin32.h
+# End Source File
+# End Group
+# Begin Group "sdlthreadsheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\sdl\mutexsdl.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\sdl\semaphoresdl.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\sdl\threadsdl.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File

@@ -19,10 +19,11 @@ namespace smooth
 	};
 };
 
-#include <libxml/parser.h>
-
 #include "../definitions.h"
+#include "../string.h"
 #include "node.h"
+
+#include <libxml/parser.h>
 
 namespace smooth
 {

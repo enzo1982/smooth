@@ -21,7 +21,7 @@
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surfacegdi.h>
+#include <smooth/graphics/gdi/surfacegdi.h>
 
 using namespace smooth::GUI;
 

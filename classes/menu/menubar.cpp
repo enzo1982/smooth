@@ -17,7 +17,7 @@
 #include <smooth/popupmenu.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/toolwindow.h>
 
 const S::Int	 S::GUI::Menubar::classID = S::Object::RequestClassID();
@@ -183,8 +183,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.top++;
 				menuentry.bottom++;
 
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
-				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(operat->bitmap->GetSize().cx, operat->bitmap->GetSize().cy)), menuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(operat->graymap->GetSize().cx, operat->graymap->GetSize().cy)), menuentry);
 
 				menuentry.left++;
 				menuentry.top--;
@@ -209,8 +209,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.top++;
 				menuentry.bottom++;
 
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
-				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(operat->bitmap->GetSize().cx, operat->bitmap->GetSize().cy)), menuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(operat->graymap->GetSize().cx, operat->graymap->GetSize().cy)), menuentry);
 
 				menuentry.left++;
 				menuentry.top--;
@@ -318,8 +318,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.top++;
 				helpmenuentry.bottom++;
 
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), helpmenuentry);
-				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), helpmenuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(operat->bitmap->GetSize().cx, operat->bitmap->GetSize().cy)), helpmenuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(operat->graymap->GetSize().cx, operat->graymap->GetSize().cy)), helpmenuentry);
 
 				helpmenuentry.top--;
 				helpmenuentry.bottom--;
@@ -344,8 +344,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.top++;
 				helpmenuentry.bottom++;
 
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), helpmenuentry);
-				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), helpmenuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(operat->bitmap->GetSize().cx, operat->bitmap->GetSize().cy)), helpmenuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(operat->graymap->GetSize().cx, operat->graymap->GetSize().cy)), helpmenuentry);
 
 				helpmenuentry.top--;
 				helpmenuentry.bottom--;
@@ -406,8 +406,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				menuentry.top++;
 
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
-				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(operat->bitmap->GetSize().cx, operat->bitmap->GetSize().cy)), menuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(operat->graymap->GetSize().cx, operat->graymap->GetSize().cy)), menuentry);
 
 				menuentry.top--;
 
@@ -623,8 +623,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.right	= bmprect.left + bitmapSize;
 						bmprect.bottom	= bmprect.top + bitmapSize;
 
-						if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
-						else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
+						if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(operat->bitmap->GetSize().cx, operat->bitmap->GetSize().cy)), bmprect);
+						else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(operat->graymap->GetSize().cx, operat->graymap->GetSize().cy)), bmprect);
 
 						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
 						{
@@ -708,7 +708,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.right	= bmprect.left + bitmapSize;
 						bmprect.bottom	= bmprect.top + bitmapSize;
 
-						surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
+						surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(operat->bitmap->GetSize().cx, operat->bitmap->GetSize().cy)), bmprect);
 						surface->Frame(operat->rect, FRAME_UP);
 
 						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
@@ -737,8 +737,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.right	= bmprect.left + bitmapSize;
 						bmprect.bottom	= bmprect.top + bitmapSize;
 
-						if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
-						else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
+						if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(operat->bitmap->GetSize().cx, operat->bitmap->GetSize().cy)), bmprect);
+						else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(operat->graymap->GetSize().cx, operat->graymap->GetSize().cy)), bmprect);
 
 						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
 						{

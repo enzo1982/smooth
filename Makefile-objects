@@ -58,6 +58,36 @@ $(OBJECTDIR)/widget.o: $(BASICCLASSESDIR)/widget.cpp $(SMOOTHINCLUDEDIR)/widget.
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/widget.cpp -o $(OBJECTDIR)/widget.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/bitmapgdi.o: $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/gdi/bitmapgdi.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp -o $(OBJECTDIR)/bitmapgdi.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/surfacegdi.o: $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp $(SMOOTHINCLUDEDIR)/graphics/gdi/surfacegdi.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp -o $(OBJECTDIR)/surfacegdi.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/bitmap.o: $(GRAPHICSCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmap.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmap.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmap.cpp -o $(OBJECTDIR)/bitmap.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/font.o: $(GRAPHICSCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/graphics/font.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/font.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/surface.o: $(GRAPHICSCLASSESDIR)/surface.cpp $(SMOOTHINCLUDEDIR)/graphics/surface.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/surface.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/surface.cpp -o $(OBJECTDIR)/surface.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/window.o: $(GRAPHICSCLASSESDIR)/window.cpp $(SMOOTHINCLUDEDIR)/graphics/window.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/window.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/window.cpp -o $(OBJECTDIR)/window.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/toolwindow.o: $(INTERNALCLASSESDIR)/toolwindow.cpp $(SMOOTHINCLUDEDIR)/toolwindow.h
 	$(ECHO) -n Compiling $(INTERNALCLASSESDIR)/toolwindow.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(INTERNALCLASSESDIR)/toolwindow.cpp -o $(OBJECTDIR)/toolwindow.o
@@ -213,11 +243,6 @@ $(OBJECTDIR)/datetime.o: $(MISCCLASSESDIR)/datetime.cpp $(SMOOTHINCLUDEDIR)/date
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/datetime.cpp -o $(OBJECTDIR)/datetime.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/font.o: $(MISCCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/font.h
-	$(ECHO) -n Compiling $(MISCCLASSESDIR)/font.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/i18n.o: $(MISCCLASSESDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/i18n.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/i18n.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/i18n.cpp -o $(OBJECTDIR)/i18n.o
@@ -231,16 +256,6 @@ $(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/math.h
 $(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/string.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/string.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string.cpp -o $(OBJECTDIR)/string.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/surface.o: $(MISCCLASSESDIR)/surface.cpp $(SMOOTHINCLUDEDIR)/surface.h
-	$(ECHO) -n Compiling $(MISCCLASSESDIR)/surface.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/surface.cpp -o $(OBJECTDIR)/surface.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/surfacegdi.o: $(MISCCLASSESDIR)/surfacegdi.cpp $(SMOOTHINCLUDEDIR)/surfacegdi.h
-	$(ECHO) -n Compiling $(MISCCLASSESDIR)/surfacegdi.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/surfacegdi.cpp -o $(OBJECTDIR)/surfacegdi.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/timer.o: $(MISCCLASSESDIR)/timer.cpp $(SMOOTHINCLUDEDIR)/timer.h
@@ -341,11 +356,6 @@ $(OBJECTDIR)/titlebar.o: $(WINDOWCLASSESDIR)/titlebar.cpp $(SMOOTHINCLUDEDIR)/ti
 $(OBJECTDIR)/tooltip.o: $(WINDOWCLASSESDIR)/tooltip.cpp $(SMOOTHINCLUDEDIR)/tooltip.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/tooltip.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/tooltip.cpp -o $(OBJECTDIR)/tooltip.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/window.o: $(WINDOWCLASSESDIR)/window.cpp $(SMOOTHINCLUDEDIR)/window.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/window.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/window.cpp -o $(OBJECTDIR)/window.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/xml_attribute.o: $(XMLCLASSESDIR)/attribute.cpp $(SMOOTHINCLUDEDIR)/xml/attribute.h

@@ -12,7 +12,7 @@
 #include <smooth/stk.h>
 #include <smooth/i18n.h>
 #include <smooth/shlobjmini.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 
 S::DialogDirSelection::DialogDirSelection()
 {

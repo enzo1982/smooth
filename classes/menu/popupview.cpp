@@ -19,7 +19,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/popupmenu.h>
 #include <smooth/toolwindow.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::PopupView::classID = S::Object::RequestClassID();
 

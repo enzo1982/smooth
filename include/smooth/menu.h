@@ -19,6 +19,7 @@ namespace smooth
 #include "object.h"
 #include "array.h"
 #include "menuentry.h"
+#include "graphics/bitmap.h"
 
 namespace smooth
 {
@@ -39,7 +40,7 @@ namespace smooth
 						 Menu();
 						~Menu();
 
-			MenuEntry		*AddEntry(String text = NIL, HBITMAP bitmap = NIL, Menu *popupMenu = NIL, Bool *bVar = NIL, Int *iVar = NIL, Int iCode = 0, Int orientation = OR_LEFT);
+			MenuEntry		*AddEntry(String = NIL, GUI::Bitmap * = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0, Int = OR_LEFT);
 			Int			 RemoveEntry(MenuEntry *);
 			Int			 RemoveEntry(Int);
 

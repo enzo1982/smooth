@@ -9,19 +9,20 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/setup.h>
+#include <smooth/color.h>
 
-S::Int S::Setup::BackgroundColor = RGB(192, 192, 192);
-S::Int S::Setup::ClientColor = RGB(255, 255, 255);
-S::Int S::Setup::ClientTextColor = RGB(0, 0, 0);
+S::Int S::Setup::BackgroundColor = CombineColor(192, 192, 192);
+S::Int S::Setup::ClientColor = CombineColor(255, 255, 255);
+S::Int S::Setup::ClientTextColor = CombineColor(0, 0, 0);
 S::Int S::Setup::LightGrayColor;
 S::Int S::Setup::DividerLightColor;
 S::Int S::Setup::DividerDarkColor;
-S::Int S::Setup::TextColor = RGB(0, 0, 0);
-S::Int S::Setup::GrayTextColor = RGB(128, 128, 128);
+S::Int S::Setup::TextColor = CombineColor(0, 0, 0);
+S::Int S::Setup::GrayTextColor = CombineColor(128, 128, 128);
 S::Int S::Setup::ShadowColor;
 S::Int S::Setup::GradientStartColor;
 S::Int S::Setup::GradientEndColor;
-S::Int S::Setup::GradientTextColor = RGB(255, 255, 255);
+S::Int S::Setup::GradientTextColor = CombineColor(255, 255, 255);
 S::Int S::Setup::InactiveGradientStartColor;
 S::Int S::Setup::InactiveGradientEndColor;
 S::Int S::Setup::InactiveGradientTextColor;

@@ -16,7 +16,7 @@
 #include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::TabWidget::classID = S::Object::RequestClassID();
 

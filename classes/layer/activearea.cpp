@@ -11,7 +11,7 @@
 #include <smooth/activearea.h>
 #include <smooth/definitions.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/layer.h>

@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/widget.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/rect.h>
 #include <smooth/container.h>
 #include <smooth/objectproperties.h>

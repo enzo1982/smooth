@@ -8,45 +8,50 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_TOOLWINDOW_
-#define _H_OBJSMOOTH_TOOLWINDOW_
+#ifndef _H_OBJSMOOTH_BITMAP_
+#define _H_OBJSMOOTH_BITMAP_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class ToolWindow;
+		class Bitmap;
 	};
-
-	class Object;
 };
 
-#include "definitions.h"
-#include "graphics/window.h"
+#include "../definitions.h"
+#include "../size.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI ToolWindow : public Window
+		const Int	 BITMAP_NONE = 0;
+
+		class SMOOTHAPI Bitmap
 		{
-			private:
-				Widget			*owner;
+			protected:
+				Int		 type;
+
+				Size		 size;
+				Int		 depth;
+
+				UnsignedByte	*bytes;
+				Int		 align;
 			public:
-				static const Int	 classID;
+						 Bitmap();
+						~Bitmap();
 
-							 ToolWindow();
-							~ToolWindow();
+				Int		 GetBitmapType();
 
-				Int			 SetOwner(Widget *);
-				Int			 FreeOwner();
+				Size		 GetSize();
+				Int		 GetDepth();
 
-				Int			 Paint(Int);
-				Int			 Process(Int, Int, Int);
+				UnsignedByte	*GetBytes();
+				Int		 GetLineAlignment();
 
-				Int			 RegisterObject(Object *);
-
-				Bool			 IsTypeCompatible(Int);
+				Bool		 SetPixel(Int, Int, UnsignedLong);
+				UnsignedLong	 GetPixel(Int, Int);
 		};
 	};
 };

@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 #include <smooth/layer.h>
 #include <smooth/definitions.h>
 #include <smooth/toolkit.h>
@@ -16,7 +16,7 @@
 #include <smooth/stk.h>
 #include <smooth/tabwidget.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Layer::classID = S::Object::RequestClassID();
 

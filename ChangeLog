@@ -7,8 +7,11 @@ xx.xx.03 xx:xx - smooth alpha 0.8.63.0
 - i18n.cpp		- new class: Translator; implements the i18n system known from BonkEnc
 - extended.cpp		- new template: provides support for data driven code execution (Extended Data Types, EDT)
 - image.cpp		- renamed class Bitmap to Image
+- bitmap.cpp		- new class: Bitmap; abstraction of bitmap objects in memory
+- bitmapgdi.cpp		- new class: BitmapGDI; Bitmap implementation for Windows GDI surfaces
 
 - removed obsolete friend declarations
+- changed classes directory layout
 - added support for right-to-left scripts like Arabic or Hebrew
 - improved stability on Windows 9x/ME
 - upgraded to libxml v2.5.10

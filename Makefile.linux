@@ -7,10 +7,6 @@ BINDIR = ./bin
 LIBDIR = ./lib
 OTHERLIBSDIR = ./libraries
 IOLIBDIR = $(OTHERLIBSDIR)/iolib
-PICTUREDIR = $(OTHERLIBSDIR)/picture
-LIBBZ2DIR = $(OTHERLIBSDIR)/bzlib
-LIBXMLDIR = $(OTHERLIBSDIR)/libxml
-LIBICONVDIR = $(OTHERLIBSDIR)/libiconv
 LISADIR = $(OTHERLIBSDIR)/lisa
 MISCDIR = ./misc
 DIALOGSDIR = ./dialogs
@@ -27,6 +23,7 @@ INTERNALCLASSESDIR = $(CLASSESDIR)/internal
 THREADSCLASSESDIR = $(CLASSESDIR)/threads
 XMLCLASSESDIR = $(CLASSESDIR)/xml
 PRIMITIVESCLASSESDIR = $(CLASSESDIR)/primitives
+GRAPHICSCLASSESDIR = $(CLASSESDIR)/graphics
 I18NDIR = ./i18n
 SAMPLESDIR = ./samples
 SAMPLE1DIR = $(SAMPLESDIR)/beatclock
@@ -38,26 +35,18 @@ DESIGNERDIR = ./tools/designer
 RESOURCEDIR = ./resources
 BINRESDIR = $(RESOURCEDIR)/binary
 
-OBJECTS = $(OBJECTDIR)/application.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectmanager.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/system.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/i18n.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadmanager.o $(OBJECTDIR)/tree.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/color.o $(OBJECTDIR)/pciio.o $(OBJECTDIR)/stk.o $(OBJECTDIR)/toolkit.o
+OBJECTS = $(OBJECTDIR)/application.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/system.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadmanager.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o
 
-SAMPLESLIBS = -lsmooth -liolib -lbz2 -lpicture -llisa -lxml -liconv -lX11
+SAMPLESLIBS = -lsmooth -bz2 -lxml -liconv -lX11
 
 DLLNAME = $(LIBDIR)/libsmooth.so
 
 LIBIOLIB = $(LIBDIR)/libiolib.a
-LIBPICTURE = $(LIBDIR)/libpicture.a
-LIBBZ2 = $(LIBDIR)/libbz2.a
-LIBXML = $(LIBDIR)/libxml.a
-LIBICONV = $(LIBDIR)/libiconv.a
 LIBLISA = $(LIBDIR)/liblisa.a
 
-OTHERLIBS = $(LIBIOLIB) $(LIBPICTURE) $(LIBBZ2) $(LIBXML) $(LIBICONV) $(LIBLISA)
+OTHERLIBS = $(LIBIOLIB) $(LIBLISA)
 
-IOLIBOBJECTS = $(OBJECTDIR)/iolib_instream.o $(OBJECTDIR)/iolib_iolib.o $(OBJECTDIR)/iolib_iolibdriver.o $(OBJECTDIR)/iolib_iolibfilter.o $(OBJECTDIR)/iolib_iolibstream.o $(OBJECTDIR)/iolib_outstream.o $(OBJECTDIR)/iolib_driver_ansi.o $(OBJECTDIR)/iolib_driver_posix.o $(OBJECTDIR)/iolib_driver_memory.o $(OBJECTDIR)/iolib_driver_socket.o $(OBJECTDIR)/iolib_driver_zero.o $(OBJECTDIR)/iolib_filter_bzip2.o $(OBJECTDIR)/iolib_filter_xor.o
-PICTUREOBJECTS = $(OBJECTDIR)/picture_picture.o
-LIBBZ2OBJECTS = $(OBJECTDIR)/libbz2_blocksort.o $(OBJECTDIR)/libbz2_bzlib.o $(OBJECTDIR)/libbz2_compress.o $(OBJECTDIR)/libbz2_crctable.o $(OBJECTDIR)/libbz2_decompress.o $(OBJECTDIR)/libbz2_huffman.o $(OBJECTDIR)/libbz2_randtable.o
-LIBXMLOBJECTS = $(OBJECTDIR)/libxml_catalog.o $(OBJECTDIR)/libxml_encoding.o $(OBJECTDIR)/libxml_entities.o $(OBJECTDIR)/libxml_error.o $(OBJECTDIR)/libxml_globals.o $(OBJECTDIR)/libxml_hash.o $(OBJECTDIR)/libxml_list.o $(OBJECTDIR)/libxml_parser.o $(OBJECTDIR)/libxml_parserInternals.o $(OBJECTDIR)/libxml_SAX.o $(OBJECTDIR)/libxml_threads.o $(OBJECTDIR)/libxml_tree.o $(OBJECTDIR)/libxml_uri.o $(OBJECTDIR)/libxml_valid.o $(OBJECTDIR)/libxml_xlink.o $(OBJECTDIR)/libxml_xmlIO.o $(OBJECTDIR)/libxml_xmlmemory.o $(OBJECTDIR)/libxml_xmlregexp.o $(OBJECTDIR)/libxml_xmlunicode.o $(OBJECTDIR)/libxml_xpath.o $(OBJECTDIR)/libxml_xpointer.o
-LIBICONVOBJECTS = $(OBJECTDIR)/libiconv_iconv.o $(OBJECTDIR)/libiconv_localcharset.o
+IOLIBOBJECTS = $(OBJECTDIR)/iolib_instream.o $(OBJECTDIR)/iolib_iolib.o $(OBJECTDIR)/iolib_iolibdriver.o $(OBJECTDIR)/iolib_iolibfilter.o $(OBJECTDIR)/iolib_iolibstream.o $(OBJECTDIR)/iolib_outstream.o $(OBJECTDIR)/iolib_driver_ansi.o $(OBJECTDIR)/iolib_driver_posix.o $(OBJECTDIR)/iolib_driver_memory.o $(OBJECTDIR)/iolib_driver_zero.o $(OBJECTDIR)/iolib_filter_bzip2.o $(OBJECTDIR)/iolib_filter_xor.o
 LISAOBJECTS = $(OBJECTDIR)/lisa_lisa.o
 
 DESIGNEROBJECTS = $(OBJECTDIR)/designer.o $(OBJECTDIR)/edit_component.o $(OBJECTDIR)/tools.o
@@ -85,10 +74,10 @@ REMOVER = rm
 COPIER = cp
 ECHO = echo
 AR = ar
-COMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -O6 -ffast-math -fPIC -Wall -Wno-pmf-conversions -fno-exceptions -fpermissive -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -c
+COMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/X11R6/include -march=i586 -O6 -ffast-math -fPIC -Wno-pmf-conversions -fno-exceptions -fpermissive -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -c
 LINKER_OPTS = -L$(LIBDIR) -L/usr/X11R6/lib -shared -Wl,-soname,libsmooth.so -o $(DLLNAME)
 PLUGIN_LINKER_OPTS = -L$(LIBDIR) -L/usr/X11R6/lib -o $(SAMPLE4DLL)
-EXECOMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -O6 -ffast-math -Wall -Wno-pmf-conversions -fno-exceptions -c
+EXECOMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/X11R6/include -march=i586 -O6 -ffast-math -Wno-pmf-conversions -fno-exceptions -c
 EXELINKER_OPTS = -L$(LIBDIR) $(SAMPLESLIBS)
 STRIP_OPTS = --strip-all
 LIBSTRIP_OPTS = --strip-debug
@@ -106,7 +95,7 @@ install:
 
 clean:
 	$(ECHO) -n Cleaning directories...
-	$(REMOVER) $(REMOVER_OPTS) $(OTHERLIBS) $(IOLIBOBJECTS) $(LIBBZ2OBJECTS) $(PICTUREOBJECTS) $(LIBXMLOBJECTS) $(LIBICONVOBJECTS) $(LISAOBJECTS)
+	$(REMOVER) $(REMOVER_OPTS) $(OTHERLIBS) $(IOLIBOBJECTS) $(LISAOBJECTS)
 	$(REMOVER) $(REMOVER_OPTS) $(OBJECTS) $(RESOURCES) $(DLLNAME) $(LIBNAME) $(DESIGNEREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4EXE) $(SAMPLE5EXE) $(SAMPLE1OBJECTS) $(SAMPLE2OBJECTS) $(SAMPLE3OBJECTS) $(SAMPLE4OBJECTS) $(SAMPLE5OBJECTS) $(SAMPLE4DLLOBJECTS) $(SAMPLE4DLL) $(SAMPLE4LIB)
 	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE1DIR)/smooth.so
 	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE2DIR)/smooth.so
@@ -117,7 +106,7 @@ clean:
 
 distribute: $(DLLNAME)
 	$(ECHO) -n Distributing files to directories...
-	$(REMOVER) $(REMOVER_OPTS) NULL
+	$(REMOVER) $(REMOVER_OPTS)
 	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE1DIR)/smooth.so
 	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE2DIR)/smooth.so
 	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE3DIR)/smooth.so
@@ -126,34 +115,14 @@ distribute: $(DLLNAME)
 	$(ECHO) done.
 
 $(DLLNAME): $(OBJECTS) $(RESOURCES) $(OTHERLIBS)
-	$(ECHO) Linking $(DLLNAME)...
-	$(LINKER) $(OBJECTS) $(RESOURCES) $(LINKER_OPTS)
+	$(ECHO) -n Linking $(DLLNAME)...
+	$(LINKER) $(OBJECTS) $(OTHERLIBS) $(RESOURCES) $(LINKER_OPTS)
 	$(STRIP) $(STRIP_OPTS) $(DLLNAME)
 	$(ECHO) done.
 
 $(LIBIOLIB): $(IOLIBOBJECTS)
 	$(ECHO) -n Linking $(LIBIOLIB)...
 	$(AR) r $(LIBIOLIB) $(IOLIBOBJECTS)
-	$(ECHO) done.
-
-$(LIBPICTURE): $(PICTUREOBJECTS)
-	$(ECHO) -n Linking $(LIBPICTURE)...
-	$(AR) r $(LIBPICTURE) $(PICTUREOBJECTS)
-	$(ECHO) done.
-
-$(LIBBZ2): $(LIBBZ2OBJECTS)
-	$(ECHO) -n Linking $(LIBBZ2)...
-	$(AR) r $(LIBBZ2) $(LIBBZ2OBJECTS)
-	$(ECHO) done.
-
-$(LIBXML): $(LIBXMLOBJECTS)
-	$(ECHO) -n Linking $(LIBXML)...
-	$(AR) r $(LIBXML) $(LIBXMLOBJECTS)
-	$(ECHO) done.
-
-$(LIBICONV): $(LIBICONVOBJECTS)
-	$(ECHO) -n Linking $(LIBICONV)...
-	$(AR) r $(LIBICONV) $(LIBICONVOBJECTS)
 	$(ECHO) done.
 
 $(LIBLISA): $(LISAOBJECTS)
@@ -169,7 +138,7 @@ $(DESIGNEREXE): $(DLLNAME) $(LIBNAME) $(DESIGNEROBJECTS)
 
 $(SAMPLE4DLL): $(SAMPLE4DLLOBJECTS)
 	$(ECHO) Linking $(SAMPLE4DLL)...
-	$(LINKER) $(SAMPLE4DLLOBJECTS) $(PLUGIN_LINKER_OPTS) $(SAMPLESLIBS) > NULL
+	$(LINKER) $(SAMPLE4DLLOBJECTS) $(PLUGIN_LINKER_OPTS) $(SAMPLESLIBS)
 	$(STRIP) $(STRIP_OPTS) $(SAMPLE4DLL)
 	$(STRIP) $(LIBSTRIP_OPTS) $(SAMPLE4LIB)
 	$(ECHO) done.

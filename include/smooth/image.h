@@ -20,6 +20,7 @@ namespace smooth
 };
 
 #include "widget.h"
+#include "graphics/bitmap.h"
 
 namespace smooth
 {
@@ -28,17 +29,17 @@ namespace smooth
 		class SMOOTHAPI Image : public Widget
 		{
 			protected:
-				HBITMAP			 bitmap;
+				Bitmap			*bitmap;
 			public:
 				static const Int	 classID;
 
-							 Image(HBITMAP, Point, Size);
+							 Image(Bitmap *, Point = Point(0, 0), Size = Size(0, 0));
 							~Image();
 
 				virtual Int		 Paint(Int);
 
-				Int			 SetBitmap(HBITMAP);
-				HBITMAP			 GetBitmap();
+				Int			 SetBitmap(Bitmap *);
+				Bitmap			*GetBitmap();
 		};
 	};
 };

@@ -167,10 +167,6 @@ SOURCE=..\classes\layer\arrows.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\layer\bitmap.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\classes\layer\button.cpp
 # End Source File
 # Begin Source File
@@ -192,6 +188,10 @@ SOURCE=..\classes\layer\groupbox.cpp
 # Begin Source File
 
 SOURCE=..\classes\layer\hyperlink.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\layer\image.cpp
 # End Source File
 # Begin Source File
 
@@ -295,10 +295,6 @@ SOURCE=..\classes\misc\datetime.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\misc\font.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\classes\misc\i18n.cpp
 # End Source File
 # Begin Source File
@@ -308,14 +304,6 @@ SOURCE=..\classes\misc\math.cpp
 # Begin Source File
 
 SOURCE=..\classes\misc\string.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\surface.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\surfacegdi.cpp
 # End Source File
 # Begin Source File
 
@@ -413,10 +401,6 @@ SOURCE=..\classes\window\titlebar.cpp
 
 SOURCE=..\classes\window\tooltip.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\classes\window\window.cpp
-# End Source File
 # End Group
 # Begin Group "xml"
 
@@ -432,6 +416,38 @@ SOURCE=..\classes\xml\document.cpp
 # Begin Source File
 
 SOURCE=..\classes\xml\node.cpp
+# End Source File
+# End Group
+# Begin Group "graphics"
+
+# PROP Default_Filter "*.cpp"
+# Begin Group "gdi"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\graphics\gdi\bitmapgdi.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\gdi\surfacegdi.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\classes\graphics\bitmap.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\font.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\surface.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\window.cpp
 # End Source File
 # End Group
 # End Group
@@ -677,6 +693,38 @@ SOURCE=..\include\smooth\callbacks\method.h
 SOURCE=..\include\smooth\i18n\smooth_de.h
 # End Source File
 # End Group
+# Begin Group "graphicsheaders"
+
+# PROP Default_Filter ""
+# Begin Group "gdiheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\gdi\bitmapgdi.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\gdi\surfacegdi.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\bitmap.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\font.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\surface.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\window.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\activearea.h
@@ -700,10 +748,6 @@ SOURCE=..\include\smooth\background.h
 # Begin Source File
 
 SOURCE=..\include\smooth\binary.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\bitmap.h
 # End Source File
 # Begin Source File
 
@@ -787,10 +831,6 @@ SOURCE=..\include\smooth\filedlg.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\font.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\fontdlg.h
 # End Source File
 # Begin Source File
@@ -804,6 +844,10 @@ SOURCE=..\include\smooth\hyperlink.h
 # Begin Source File
 
 SOURCE=..\include\smooth\i18n.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\image.h
 # End Source File
 # Begin Source File
 
@@ -971,14 +1015,6 @@ SOURCE=..\include\smooth\string.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\surface.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\surfacegdi.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\system.h
 # End Source File
 # Begin Source File
@@ -1041,26 +1077,10 @@ SOURCE=..\include\smooth\winapp.h
 
 SOURCE=..\include\smooth\windll.h
 # End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\window.h
-# End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\include\smooth.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smoothdll.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smoothplugin.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smoothx.h
 # End Source File
 # End Group
 # Begin Group "Ressourcendateien"
@@ -1079,8 +1099,8 @@ SOURCE=..\resources\icon.rc
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
-# ADD RSC /l 0x407 /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth" /i "I:\devel\projects\mpsd\src\smooth\resources" /d "__WIN32__" /d "__SMOOTH_DLL__"
+# ADD BASE RSC /l 0x407 /i "\devel\projects\private\smooth\resources" /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
+# ADD RSC /l 0x407 /i "\devel\projects\private\smooth\resources" /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth" /i "I:\devel\projects\mpsd\src\smooth\resources" /d "__WIN32__" /d "__SMOOTH_DLL__"
 
 !ENDIF 
 
@@ -1105,8 +1125,8 @@ SOURCE=..\resources\resources.rc
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
-# ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
-# ADD RSC /l 0x407 /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "..\resources" /i ".." /d "__WIN32__" /d "__SMOOTH_DLL__"
+# ADD BASE RSC /l 0x407 /i "\devel\projects\private\smooth\resources" /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
+# ADD RSC /l 0x407 /i "\devel\projects\private\smooth\resources" /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "..\resources" /i ".." /d "__WIN32__" /d "__SMOOTH_DLL__"
 
 !ENDIF 
 

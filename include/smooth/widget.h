@@ -22,7 +22,7 @@ namespace smooth
 };
 
 #include "object.h"
-#include "font.h"
+#include "graphics/font.h"
 #include "signals.h"
 
 namespace smooth

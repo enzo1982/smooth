@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/shortcut.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 
 const S::Int	 S::GUI::Shortcut::classID = S::Object::RequestClassID();
 

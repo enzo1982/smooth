@@ -27,6 +27,7 @@ INTERNALCLASSESDIR = $(CLASSESDIR)/internal
 THREADSCLASSESDIR = $(CLASSESDIR)/threads
 XMLCLASSESDIR = $(CLASSESDIR)/xml
 PRIMITIVESCLASSESDIR = $(CLASSESDIR)/primitives
+GRAPHICSCLASSESDIR = $(CLASSESDIR)/graphics
 I18NDIR = ./i18n
 SAMPLESDIR = ./samples
 SAMPLE1DIR = $(SAMPLESDIR)/beatclock
@@ -85,10 +86,10 @@ REMOVER = rm
 COPIER = cp
 ECHO = echo
 AR = ar
-COMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -O6 -ffast-math -fPIC -Wall -Wno-pmf-conversions -fno-exceptions -fpermissive -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -c
+COMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -O6 -ffast-math -fPIC -Wno-pmf-conversions -fno-exceptions -fpermissive -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -c
 LINKER_OPTS = -L$(LIBDIR) -shared -Wl,-soname,libsmooth.so -o $(DLLNAME)
 PLUGIN_LINKER_OPTS = -L$(LIBDIR) -o $(SAMPLE4DLL)
-EXECOMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -O6 -ffast-math -Wall -Wno-pmf-conversions -fno-exceptions -c
+EXECOMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -O6 -ffast-math -Wno-pmf-conversions -fno-exceptions -c
 EXELINKER_OPTS = -L$(LIBDIR) $(SAMPLESLIBS)
 STRIP_OPTS = --strip-all
 LIBSTRIP_OPTS = --strip-debug

@@ -8,9 +8,6 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <libxml/parser.h>
-
-#include <smooth/object.h>
 #include <smooth/xml/node.h>
 
 S::XML::Node::Node()

@@ -18,7 +18,8 @@ namespace smooth
 
 #include "object.h"
 #include "rect.h"
-#include "font.h"
+#include "graphics/font.h"
+#include "graphics/bitmap.h"
 #include "shortcut.h"
 
 namespace smooth
@@ -37,8 +38,8 @@ namespace smooth
 			String		 tooltip;
 			String		 description;
 
-			HBITMAP		 bitmap;
-			HBITMAP		 graymap;
+			GUI::Bitmap	*bitmap;
+			GUI::Bitmap	*graymap;
 
 			Int		 orientation;
 
@@ -70,7 +71,7 @@ namespace smooth
 			Int		 SetStatusText(String);
 			Int		 SetShortcut(Int, Int);
 
-			Int		 SetBitmap(HBITMAP);
+			Int		 SetBitmap(GUI::Bitmap *);
 
 			Int		 SetOrientation(Int);
 		signals:

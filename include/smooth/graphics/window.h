@@ -27,12 +27,12 @@ namespace smooth
 	};
 };
 
-#include "widget.h"
-#include "container.h"
-#include "rect.h"
-#include "loop.h"
-#include "menu.h"
-#include "timer.h"
+#include "../widget.h"
+#include "../container.h"
+#include "../rect.h"
+#include "../loop.h"
+#include "../menu.h"
+#include "../timer.h"
 
 namespace smooth
 {

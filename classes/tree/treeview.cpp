@@ -19,7 +19,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::TreeView::classID = S::Object::RequestClassID();
 

@@ -19,7 +19,7 @@ namespace smooth
 	};
 };
 
-#include "surface.h"
+#include "../surface.h"
 
 namespace smooth
 {
@@ -54,8 +54,8 @@ namespace smooth
 
 				Int	 SetText(String, Rect, Font);
 
-				Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
-				Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+				Int	 BlitFromBitmap(Bitmap *, Rect, Rect);
+				Int	 BlitToBitmap(Rect, Bitmap *, Rect);
 		};
 	};
 };

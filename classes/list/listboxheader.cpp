@@ -9,9 +9,9 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/listboxheader.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/listbox.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 #include <smooth/layer.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolkit.h>

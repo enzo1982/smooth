@@ -18,7 +18,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/timer.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Arrows::classID = S::Object::RequestClassID();
 

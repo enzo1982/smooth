@@ -8,12 +8,18 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/application.h>
-#include <smooth/window.h>
-#include <smooth/layer.h>
 #include <smooth/definitions.h>
-#include <smooth/objectmanager.h>
 #include <smooth/stk.h>
+
+size_t	 (*ex_iconv)(iconv_t, const char **, size_t *, char **, size_t *) = NIL;
+iconv_t	 (*ex_iconv_open)(const char *, const char *) = NIL;
+int	 (*ex_iconv_close)(iconv_t) = NIL;
+
+#ifdef __WIN32__
+#include <smooth/application.h>
+#include <smooth/graphics/window.h>
+#include <smooth/layer.h>
+#include <smooth/objectmanager.h>
 #include <smooth/toolkit.h>
 #include <smooth/object.h>
 #include <smooth/version.h>
@@ -25,10 +31,6 @@
 #include <smooth/mdiwindow.h>
 
 HMODULE	 iconvdll = NIL;
-
-size_t	 (*ex_iconv)(iconv_t, const char **, size_t *, char **, size_t *) = NIL;
-iconv_t	 (*ex_iconv_open)(const char *, const char *) = NIL;
-int	 (*ex_iconv_close)(iconv_t) = NIL;
 
 S::I18n::Translator	*S::SMOOTH::i18n = NIL;
 
@@ -182,9 +184,11 @@ HBITMAP S::DetectTransparentRegions(HBITMAP bmp)
 
 	return newbmp;
 }
+#endif
 
 S::Bool S::LoadIconvDLL()
 {
+#ifdef __WIN32__
 	iconvdll = LoadLibraryA(Application::GetApplicationDirectory().Append("iconv.dll"));
 
 	if (iconvdll == NIL) return false;
@@ -193,14 +197,24 @@ S::Bool S::LoadIconvDLL()
 	ex_iconv_open	= (iconv_t (*)(const char *, const char *)) GetProcAddress(iconvdll, "libiconv_open");
 	ex_iconv_close	= (int (*)(iconv_t)) GetProcAddress(iconvdll, "libiconv_close");
 
-	if (ex_iconv == NULL)		{ FreeLibrary(iconvdll); return false; }
-	if (ex_iconv_open == NULL)	{ FreeLibrary(iconvdll); return false; }
-	if (ex_iconv_close == NULL)	{ FreeLibrary(iconvdll); return false; }
+	if (ex_iconv == NIL)		{ FreeIconvDLL(); return false; }
+	if (ex_iconv_open == NIL)	{ FreeIconvDLL(); return false; }
+	if (ex_iconv_close == NIL)	{ FreeIconvDLL(); return false; }
+#else
+	ex_iconv	= iconv;
+	ex_iconv_open	= iconv_open;
+	ex_iconv_close	= iconv_close;
+#endif
 
 	return true;
 }
 
 S::Void S::FreeIconvDLL()
 {
+#ifdef __WIN32__
 	FreeLibrary(iconvdll);
+#endif
+	ex_iconv = NIL;
+	ex_iconv_open = NIL;
+	ex_iconv_close = NIL;
 }

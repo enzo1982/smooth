@@ -20,6 +20,7 @@
 #define _H_IOLIB_IOLIB_
 
 #include <stdio.h>
+#include <memory.h>
 
 #if defined WIN32 && !defined __WIN32__
 	#define __WIN32__

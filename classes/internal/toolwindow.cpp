@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/toolwindow.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 #include <smooth/toolkit.h>
 #include <smooth/object.h>
 #include <smooth/divider.h>
@@ -19,7 +19,7 @@
 #include <smooth/i18n.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surfacegdi.h>
+#include <smooth/graphics/gdi/surfacegdi.h>
 #include <smooth/layer.h>
 #include <smooth/math.h>
 

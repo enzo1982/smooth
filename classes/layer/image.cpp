@@ -17,11 +17,11 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Image::classID = S::Object::RequestClassID();
 
-S::GUI::Image::Image(HBITMAP bmp, Point pos, Size size)
+S::GUI::Image::Image(Bitmap *bmp, Point pos, Size size)
 {
 	type	= classID;
 	bitmap	= bmp;
@@ -33,8 +33,8 @@ S::GUI::Image::Image(HBITMAP bmp, Point pos, Size size)
 
 	if (size.cx == 0 && size.cy == 0)
 	{
-		objectProperties->size.cx = Math::Round(GetBitmapSizeX(bitmap) * Setup::FontSize);
-		objectProperties->size.cy = Math::Round(GetBitmapSizeY(bitmap) * Setup::FontSize);
+		objectProperties->size.cx = Math::Round(bitmap->GetSize().cx * Setup::FontSize);
+		objectProperties->size.cy = Math::Round(bitmap->GetSize().cy * Setup::FontSize);
 	}
 	else
 	{
@@ -67,7 +67,7 @@ S::Int S::GUI::Image::Paint(Int message)
 	return Success;
 }
 
-S::Int S::GUI::Image::SetBitmap(HBITMAP newBmp)
+S::Int S::GUI::Image::SetBitmap(Bitmap *newBmp)
 {
 	Bool	 prevVisible = visible;
 
@@ -77,8 +77,8 @@ S::Int S::GUI::Image::SetBitmap(HBITMAP newBmp)
 
 	if (objectProperties->size.cx == 0 && objectProperties->size.cy == 0)
 	{
-		objectProperties->size.cx = Math::Round(GetBitmapSizeX(bitmap) * Setup::FontSize);
-		objectProperties->size.cy = Math::Round(GetBitmapSizeY(bitmap) * Setup::FontSize);
+		objectProperties->size.cx = Math::Round(bitmap->GetSize().cx * Setup::FontSize);
+		objectProperties->size.cy = Math::Round(bitmap->GetSize().cy * Setup::FontSize);
 	}
 
 	if (prevVisible) Show();
@@ -86,7 +86,7 @@ S::Int S::GUI::Image::SetBitmap(HBITMAP newBmp)
 	return Success;
 }
 
-HBITMAP S::GUI::Image::GetBitmap()
+S::GUI::Bitmap *S::GUI::Image::GetBitmap()
 {
 	return bitmap;
 }

@@ -33,6 +33,7 @@ S::String S::Application::GetStartupDirectory()
 {
 	if (startupDirectory != NIL) return startupDirectory;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
 		wchar_t	*buffer = new wchar_t [MAX_PATH];
@@ -57,6 +58,7 @@ S::String S::Application::GetStartupDirectory()
 	Int	 len = startupDirectory.Length() - 1;
 
 	if (startupDirectory[len] != '\\') startupDirectory[++len] = '\\';
+#endif
 
 	return startupDirectory;
 }
@@ -65,6 +67,7 @@ S::String S::Application::GetApplicationDirectory()
 {
 	if (applicationDirectory != NIL) return applicationDirectory;
 
+#ifdef __WIN32__
 	String	 path;
 	Int	 lastBs = 0;
 
@@ -94,6 +97,7 @@ S::String S::Application::GetApplicationDirectory()
 	path[lastBs + 1] = 0;
 
 	applicationDirectory = path;
+#endif
 
 	return applicationDirectory;
 }

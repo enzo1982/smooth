@@ -75,9 +75,12 @@
 
 	#define SMOOTH_PLUGIN_API
 	#define SMOOTH_PLUGIN_VAR extern
+
+	#define __declspec(x)
 #else
 	#include <X11/Xlib.h>
 	#include <wchar.h>
+	#include <linux/limits.h>
 
 	#define SMOOTHAPI
 	#define SMOOTHVAR extern
@@ -88,8 +91,13 @@
 	#undef Success
 	#undef True
 	#undef False
+	#undef Bool
 
 	#define _TEXT(x) L##x
+
+	#define __declspec(x)
+
+	#define MAX_PATH PATH_MAX
 #endif
 
 #ifndef __WIN32__

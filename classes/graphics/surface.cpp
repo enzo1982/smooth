@@ -8,7 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
+#include <smooth/graphics/gdi/bitmapgdi.h>
 #include <smooth/color.h>
 #include <picture.h>
 
@@ -264,7 +265,11 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 	srect.right	= rect.right - rect.left;
 	srect.bottom	= rect.bottom - rect.top;
 
-	BlitFromBitmap(pic->GetBitmap(), srect, rect);
+	BitmapGDI	*bitmap = new BitmapGDI(pic->GetBitmap());
+
+	BlitFromBitmap(bitmap, srect, rect);
+
+	delete bitmap;
 
 	delete pic;
 
@@ -313,12 +318,12 @@ S::Int S::GUI::Surface::Bar(Point p1, Point p2, Int orientation)
 	return Success;
 }
 
-S::Int S::GUI::Surface::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
+S::Int S::GUI::Surface::BlitFromBitmap(Bitmap *bitmap, Rect srcRect, Rect destRect)
 {
 	return Success;
 }
 
-S::Int S::GUI::Surface::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
+S::Int S::GUI::Surface::BlitToBitmap(Rect srcRect, Bitmap *bitmap, Rect destRect)
 {
 	return Success;
 }

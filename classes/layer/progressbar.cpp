@@ -19,7 +19,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/color.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Progressbar::classID = S::Object::RequestClassID();
 

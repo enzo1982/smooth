@@ -10,7 +10,7 @@
 
 #include <smooth/colordlg.h>
 #include <smooth/application.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 #include <smooth/titlebar.h>
 #include <smooth/i18n.h>
 #include <smooth/toolkit.h>
@@ -27,7 +27,8 @@
 #include <smooth/loop.h>
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
+#include <smooth/graphics/gdi/bitmapgdi.h>
 
 #include <picture.h>
 
@@ -467,7 +468,11 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 			}
 		}
 
-		surface->BlitFromBitmap(pic->GetBitmap(), rect, irect);
+		BitmapGDI	*bmpGDI = new BitmapGDI(pic->GetBitmap());
+
+		surface->BlitFromBitmap(bmpGDI, rect, irect);
+
+		delete bmpGDI;
 	}
 
 	forcevsupdate = true;

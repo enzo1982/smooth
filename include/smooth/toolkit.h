@@ -15,7 +15,7 @@
 #include "point.h"
 #include "rect.h"
 #include "size.h"
-#include "window.h"
+#include "graphics/window.h"
 
 int GetLineSizeX(S::String, int, S::String, int, int);
 int GetLineSizeY(S::String, S::String, int, int);

@@ -13,7 +13,7 @@
 
 #include "object.h"
 #include "rect.h"
-#include "font.h"
+#include "graphics/font.h"
 
 namespace smooth
 {

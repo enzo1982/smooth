@@ -19,10 +19,11 @@ namespace smooth
 	};
 };
 
-#include "definitions.h"
-#include "rect.h"
-#include "string.h"
+#include "../definitions.h"
+#include "../rect.h"
+#include "../string.h"
 #include "font.h"
+#include "bitmap.h"
 
 namespace smooth
 {
@@ -70,8 +71,8 @@ namespace smooth
 				Int		 Gradient(Rect, Int, Int, Int);
 				Int		 Bar(Point, Point, Int);
 
-				virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
-				virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+				virtual Int	 BlitFromBitmap(Bitmap *, Rect, Rect);
+				virtual Int	 BlitToBitmap(Rect, Bitmap *, Rect);
 		};
 
 		const Int	 FRAME_UP	= 0;

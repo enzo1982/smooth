@@ -12,7 +12,7 @@
 
 #include <smooth/fontdlg.h>
 #include <smooth/stk.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 
 #include <commdlg.h>
 

@@ -17,9 +17,10 @@
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
 #include <smooth/toolkit.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/application.h>
 #include <smooth/binary.h>
+#include <smooth/graphics/gdi/bitmapgdi.h>
 
 const S::Int	 S::GUI::Titlebar::classID = S::Object::RequestClassID();
 
@@ -108,7 +109,11 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 		iconRect.right	= iconRect.left + METRIC_TBICONSIZE;
 		iconRect.bottom	= iconRect.top + METRIC_TBICONSIZE;
 
-		surface->BlitFromBitmap(icon, Rect(Point(0, 0), Size(GetBitmapSizeX(icon), GetBitmapSizeY(icon))), iconRect);
+		BitmapGDI	*bmpGDI = new BitmapGDI(icon);
+
+		surface->BlitFromBitmap(bmpGDI, Rect(Point(0, 0), Size(GetBitmapSizeX(icon), GetBitmapSizeY(icon))), iconRect);
+
+		delete bmpGDI;
 	}
 
 	tButtonRect.left	= titleGradient.right - METRIC_TBBUTTONBOXOFFSETX + 1 + (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 2 * METRIC_TBBUTTONSIZE + 6);

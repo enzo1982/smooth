@@ -11,7 +11,7 @@
 #include <smooth/background.h>
 #include <smooth/threadmanager.h>
 #include <smooth/objectmanager.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 #include <smooth/timer.h>
 
 S::BackgroundApplication	*S::backgroundApplication = NIL;

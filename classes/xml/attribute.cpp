@@ -8,9 +8,6 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <libxml/parser.h>
-
-#include <smooth/object.h>
 #include <smooth/xml/attribute.h>
 
 S::XML::Attribute::Attribute()

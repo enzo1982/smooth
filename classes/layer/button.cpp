@@ -17,7 +17,8 @@
 #include <smooth/tooltip.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
+#include <smooth/graphics/gdi/bitmapgdi.h>
 #include <smooth/layer.h>
 #include <smooth/timer.h>
 
@@ -176,8 +177,12 @@ S::Int S::GUI::Button::Paint(Int message)
 					bmpRect.right	= bmpRect.left + bmpSize.cx;
 					bmpRect.bottom	= bmpRect.top + bmpSize.cy;
 				}
+
+				BitmapGDI	*bmpGDI = new BitmapGDI(bitmap);
 	
-				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmpRect);
+				surface->BlitFromBitmap(bmpGDI, Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmpRect);
+
+				delete bmpGDI;
 			}
 
 			if (objectProperties->checked || (flags & BF_SHOWHIGHLIGHT))

@@ -22,7 +22,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
 #include <smooth/layer.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::ComboBox::classID = S::Object::RequestClassID();
 

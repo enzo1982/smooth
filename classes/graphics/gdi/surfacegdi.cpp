@@ -8,7 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/surfacegdi.h>
+#include <smooth/graphics/gdi/surfacegdi.h>
+#include <smooth/graphics/gdi/bitmapgdi.h>
 #include <smooth/stk.h>
 #include <smooth/toolkit.h>
 #include <smooth/color.h>
@@ -26,11 +27,13 @@ S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 
 	bmp_dc = CreateCompatibleDC(gdi_dc);
 
-	HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
+	BitmapGDI	*bitmap = new BitmapGDI(CreateCompatibleBitmap(gdi_dc, size.cx, size.cy));
 
 	BlitToBitmap(Rect(Point(0, 0), size), bitmap, Rect(Point(0, 0), size));
 
-	cDc_bitmap = (HBITMAP) SelectObject(bmp_dc, bitmap);
+	cDc_bitmap = (HBITMAP) SelectObject(bmp_dc, bitmap->GetBitmap());
+
+	delete bitmap;
 }
 
 S::GUI::SurfaceGDI::~SurfaceGDI()
@@ -313,10 +316,12 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font)
 	return Success;
 }
 
-S::Int S::GUI::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
+S::Int S::GUI::SurfaceGDI::BlitFromBitmap(Bitmap *bitmap, Rect srcRect, Rect destRect)
 {
+	if (bitmap->GetBitmapType() != BITMAP_GDI) return Error;
+
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
-	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);
+	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, ((BitmapGDI *) bitmap)->GetBitmap());
 
 	destRect = TranslateRect(destRect);
 
@@ -331,17 +336,19 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect des
 		StretchBlt(bmp_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
-	bitmap = (HBITMAP) SelectObject(cdc, backup);
+	((BitmapGDI *) bitmap)->SetBitmap((HBITMAP) SelectObject(cdc, backup));
 
 	DeleteDC(cdc);
 
 	return Success;
 }
 
-S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
+S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, Bitmap *bitmap, Rect destRect)
 {
+	if (bitmap->GetBitmapType() != BITMAP_GDI) return Error;
+
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
-	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);
+	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, ((BitmapGDI *) bitmap)->GetBitmap());
 
 	srcRect = TranslateRect(srcRect);
 
@@ -354,7 +361,7 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destR
 		StretchBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, gdi_dc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
-	bitmap = (HBITMAP) SelectObject(cdc, backup);
+	((BitmapGDI *) bitmap)->SetBitmap((HBITMAP) SelectObject(cdc, backup));
 
 	DeleteDC(cdc);
 

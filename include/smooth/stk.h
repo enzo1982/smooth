@@ -36,8 +36,6 @@ namespace smooth
 #undef LoadImage
 #endif
 
-extern HMODULE	 iconvdll;
-
 extern size_t	 (*ex_iconv)(iconv_t, const char **, size_t *, char **, size_t *);
 extern iconv_t	 (*ex_iconv_open)(const char *, const char *);
 extern int	 (*ex_iconv_close)(iconv_t);
@@ -47,9 +45,9 @@ namespace smooth
 	class SMOOTHAPI SMOOTH
 	{
 		public:
+#ifdef __WIN32__
 			static I18n::Translator	*i18n;
 
-#ifdef __WIN32__
 			static HBITMAP		 LoadImage(String, Int, String);
 
 			static Void		 SendMessage(GUI::Window *, Int, Int, Int);
@@ -65,11 +63,11 @@ namespace smooth
 	HBITMAP	 GrayscaleBitmap(HBITMAP);
 	HBITMAP	 DetectTransparentRegions(HBITMAP);
 
-	Bool	 LoadIconvDLL();
-	Void	 FreeIconvDLL();
+	Bool	 Affected(GUI::Widget *, Rect &);
 #endif
 
-	Bool	 Affected(GUI::Widget *, Rect &);
+	Bool	 LoadIconvDLL();
+	Void	 FreeIconvDLL();
 #endif
 };
 

@@ -10,7 +10,6 @@
 
 #include <smooth/string.h>
 #include <smooth/math.h>
-#include <smooth/timer.h>
 #include <smooth/stk.h>
 #include <iconv.h>
 #include <string.h>
@@ -1086,6 +1085,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		delete in;
 		delete out;
 	}
+#ifdef __WIN32__
 	else if (strcmp(outEncoding, "UTF-16LE") == 0)
 	{
 		Int	 codePage = CP_ACP;
@@ -1144,6 +1144,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		if (size >= outBytes) size = 0;
 	}
+#endif
 
 	if (delBuffer) delete [] outBuffer;
 

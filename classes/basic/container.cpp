@@ -9,9 +9,9 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/container.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/object.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 
 const S::Int	 S::Container::classID = S::Object::RequestClassID();
 

@@ -19,13 +19,18 @@ namespace smooth
 	};
 };
 
-#include "widget.h"
-#include "i18n.h"
+#include "../widget.h"
+#include "../i18n.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
+#ifndef __WIN32__
+		const Int	 FW_NORMAL	= 400;
+		const Int	 FW_BOLD	= 700;
+#endif
+
 		class SMOOTHAPI Font
 		{
 			protected:

@@ -20,6 +20,7 @@ namespace smooth
 };
 
 #include "../definitions.h"
+#include "../string.h"
 #include "node.h"
 
 namespace smooth

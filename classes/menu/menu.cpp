@@ -16,6 +16,7 @@
 #include <smooth/system.h>
 #include <smooth/metrics.h>
 #include <smooth/i18n.h>
+#include <smooth/graphics/gdi/bitmapgdi.h>
 
 S::Menu::Menu()
 {
@@ -35,7 +36,7 @@ S::Menu::~Menu()
 	}
 }
 
-S::MenuEntry *S::Menu::AddEntry(String text, HBITMAP bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
+S::MenuEntry *S::Menu::AddEntry(String text, GUI::Bitmap *bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
 {
 	Int	 id	= System::RequestGUID();
 	Int	 type	= SM_SEPARATOR;
@@ -47,8 +48,13 @@ S::MenuEntry *S::Menu::AddEntry(String text, HBITMAP bitmap, Menu *popupMenu, Bo
 
 	newEntry->text		= text;
 	newEntry->orientation	= orientation;
-	newEntry->bitmap	= DetectTransparentRegions(bitmap);
-	newEntry->graymap	= DetectTransparentRegions(GrayscaleBitmap(bitmap));
+
+	if (bitmap != NIL)
+	{
+		newEntry->bitmap	= new GUI::BitmapGDI(DetectTransparentRegions(((GUI::BitmapGDI *) bitmap)->GetBitmap()));
+		newEntry->graymap	= new GUI::BitmapGDI(DetectTransparentRegions(GrayscaleBitmap(((GUI::BitmapGDI *) bitmap)->GetBitmap())));
+	}
+
 	newEntry->popup		= popupMenu;
 	newEntry->bVar		= bVar;
 	newEntry->iVar		= iVar;

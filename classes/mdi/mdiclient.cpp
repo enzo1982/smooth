@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/mdiclient.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 #include <smooth/toolkit.h>
 #include <smooth/object.h>
 #include <smooth/divider.h>
@@ -20,7 +20,7 @@
 #include <smooth/binary.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surface.h>
+#include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::MDIClient::classID = S::Object::RequestClassID();
 

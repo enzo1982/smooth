@@ -12,7 +12,7 @@
 #include <smooth/toolkit.h>
 #include <smooth/string.h>
 #include <smooth/loop.h>
-#include <smooth/window.h>
+#include <smooth/graphics/window.h>
 #include <smooth/stk.h>
 #include <smooth/array.h>
 #include <smooth/shlobjmini.h>

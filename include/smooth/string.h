@@ -14,7 +14,6 @@
 namespace smooth
 {
 	class String;
-	class Timer;
 };
 
 #include "definitions.h"

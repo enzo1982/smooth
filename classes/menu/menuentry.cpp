@@ -11,6 +11,7 @@
 #include <smooth/menuentry.h>
 #include <smooth/definitions.h>
 #include <smooth/stk.h>
+#include <smooth/graphics/gdi/bitmapgdi.h>
 
 S::MenuEntry::MenuEntry(Int newType, Int newID)
 {
@@ -41,6 +42,9 @@ S::MenuEntry::MenuEntry(Int newType, Int newID)
 S::MenuEntry::~MenuEntry()
 {
 	if (shortcut != NIL) DeleteObject(shortcut);
+
+	if (bitmap != NIL) delete bitmap;
+	if (graymap != NIL) delete graymap;
 }
 
 S::Int S::MenuEntry::SetText(String newText)
@@ -77,19 +81,22 @@ S::Int S::MenuEntry::SetShortcut(Int nKey, Int nFlags)
 	return Success;
 }
 
-S::Int S::MenuEntry::SetBitmap(HBITMAP newBitmap)
+S::Int S::MenuEntry::SetBitmap(GUI::Bitmap *newBitmap)
 {
 	if (newBitmap == NIL)
 	{
 		type = (type | SM_BITMAP) ^ SM_BITMAP;
+
+		if (bitmap != NIL) delete bitmap;
+		if (graymap != NIL) delete graymap;
 
 		bitmap = NIL;
 		graymap = NIL;
 	}
 	else
 	{
-		bitmap = DetectTransparentRegions(newBitmap);
-		graymap = DetectTransparentRegions(GrayscaleBitmap(newBitmap));
+		bitmap = new GUI::BitmapGDI(DetectTransparentRegions(((GUI::BitmapGDI *) newBitmap)->GetBitmap()));
+		graymap = new GUI::BitmapGDI(DetectTransparentRegions(GrayscaleBitmap(((GUI::BitmapGDI *) newBitmap)->GetBitmap())));
 	}
 
 	return Success;

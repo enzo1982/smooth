@@ -8,22 +8,23 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/i18n.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/dllmain.h>
 #include <smooth/resources.h>
-#include <smooth/window.h>
-#include <smooth/metrics.h>
-#include <smooth/toolkit.h>
 #include <smooth/stk.h>
 #include <smooth/thread.h>
 #include <smooth/threadmanager.h>
+
+#ifdef __WIN32__
+#include <smooth/i18n.h>
+#include <smooth/graphics/window.h>
+#include <smooth/metrics.h>
+#include <smooth/toolkit.h>
 #include <smooth/background.h>
 #include <smooth/objectmanager.h>
 #include <smooth/color.h>
 
-#ifdef __WIN32__
 #include <winsock.h>
 #else
 #include <sys/socket.h>
@@ -35,9 +36,7 @@ __declspec (dllexport) HINSTANCE	 S::hInstance		= NIL;
 __declspec (dllexport) HINSTANCE	 S::hPrevInstance	= NIL;
 __declspec (dllexport) S::String	 S::szCmdLine		= NIL;
 __declspec (dllexport) int		 S::iCmdShow		= 0;
-#endif
 
-#ifdef __WIN32__
 __declspec (dllexport) HICON	 S::SMOOTHICON = NIL;
 #endif
 
@@ -55,6 +54,9 @@ S::Void S::Init()
 
 	Int	 codePage = 1252;
 
+	if (LoadIconvDLL() == True)	Setup::useIconv = True;
+	else				Setup::useIconv = False;
+
 #ifdef __WIN32__
 	WORD		 wVersionRequested = MAKEWORD(1,1);
 	WSADATA		 wsaData;
@@ -62,9 +64,6 @@ S::Void S::Init()
 	WSAStartup(wVersionRequested, &wsaData);
 
 	if (hDllInstance == NIL) hDllInstance = hInstance;
-
-	if (LoadIconvDLL() == True)	Setup::useIconv = True;
-	else				Setup::useIconv = False;
 
 	// decide if we want to use unicode:
 	{
@@ -85,12 +84,14 @@ S::Void S::Init()
 	codePage = GetACP();
 
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-#endif
 
 	mainObjectManager	= new ObjectManager();
 	mainThreadManager	= new ThreadManager();
+#endif
 
 	GetColors();
+
+#ifdef __WIN32__
 	SetMetrics();
 	SetMeasurement(SMT_UNITS);
 
@@ -107,22 +108,28 @@ S::Void S::Init()
 			break;
 	}
 
+#endif
+
 	String::SetInputFormat("ISO-8859-1");
 	String::SetOutputFormat(String("CP").Append(String::FromInt(codePage)));
 
+#ifdef __WIN32__
 	backgroundApplication = new BackgroundApplication();
+#endif
 }
 
 S::Void S::Free()
 {
 	if (--initCount) return;
 
+#ifdef __WIN32__
 	delete SMOOTH::i18n;
 
 	delete backgroundApplication;
 
 	delete mainThreadManager;
 	delete mainObjectManager;
+#endif
 
 	String::ClearTemporaryBuffers();
 
@@ -176,6 +183,7 @@ S::Int S::Loop()
 		initializing = false;
 		loopActive = true;
 
+#ifdef __WIN32__
 		for (int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 		{
 			wnd = (GUI::Window *) mainObjectManager->GetNthObject(i);
@@ -201,6 +209,7 @@ S::Int S::Loop()
 				if (thread->GetStatus() == THREAD_STARTME) thread->Start();
 			}
 		}
+#endif
 	}
 
 	if (peekLoop > 0)
@@ -279,6 +288,7 @@ S::Int S::Loop()
 #endif
 		loopActive = false;
 
+#ifdef __WIN32__
 		for (int i = 0; i < Object::objectCount; i++)
 		{
 			thread = mainThreadManager->RequestThread(i);
@@ -288,6 +298,7 @@ S::Int S::Loop()
 				if (!(thread->GetFlags() & THREAD_KILLFLAG_WAIT)) thread->Stop();
 			}
 		}
+#endif
 
 		while (Thread::counter > 0) LiSASleep(10);
 

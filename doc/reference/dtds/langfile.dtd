@@ -1,0 +1,16 @@
+<!-- LangFile DTD -->
+
+<!ENTITY % LangFile.Version "-//DTD LangFile 0.8 Draft//EN">
+
+<!ELEMENT LangFile (info?, data?)>
+
+	<!ELEMENT info (property*)>
+
+		<!ELEMENT property (#PCDATA)>
+		<!ATTLIST property name PCDATA #REQUIRED>
+
+	<!ELEMENT data (entry*)>
+
+		<!ELEMENT entry (#PCDATA)>
+		<!ATTLIST entry id CDATA #REQUIRED
+				string PCDATA #REQUIRED>

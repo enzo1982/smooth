@@ -1,0 +1,18 @@
+<!-- ConfigFile DTD -->
+
+<!ENTITY % ConfigFile.Version "-//DTD ConfigFile 0.8 Draft//EN">
+
+<!ELEMENT ConfigFile (info?, data?)>
+
+	<!ELEMENT info (property*)>
+
+		<!ELEMENT property (#PCDATA)>
+		<!ATTLIST property name PCDATA #REQUIRED>
+
+	<!ELEMENT data (section*)>
+
+		<!ELEMENT section (value*)>
+		<!ATTLIST section name PCDATA #REQUIRED>
+
+			<!ELEMENT value (#PCDATA)>
+			<!ATTLIST value name PCDATA #REQUIRED>

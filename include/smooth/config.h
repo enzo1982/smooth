@@ -33,6 +33,7 @@ namespace smooth
 			XML::Node	*FindValueNode(String, String);
 		public:
 					 Configuration();
+					 Configuration(String, Bool = True);
 					~Configuration();
 
 			Int		 Open(String = "config.xml", Bool = True);

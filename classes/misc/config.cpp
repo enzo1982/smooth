@@ -18,6 +18,15 @@ S::Configuration::Configuration()
 	configFile = NIL;
 }
 
+S::Configuration::Configuration(String file, Bool create)
+{
+	ownRoot = NIL;
+
+	configFile = NIL;
+
+	Open(file, create);
+}
+
 S::Configuration::~Configuration()
 {
 	if (configFile != NIL) Close();
@@ -25,6 +34,8 @@ S::Configuration::~Configuration()
 
 S::Int S::Configuration::Open(String file, Bool create)
 {
+	if (configFile != NIL) Close();
+
 	configFile = new XML::Document();
 
 	if (configFile->LoadFile(file) == Success)

@@ -23,11 +23,12 @@ class TestKey : public Application
 		Titlebar	*title;
 		Text		*text;
 
-		Void		 EventProc(Int, Int, Int);
 		Int		 GetBits(Int, UnsignedInt, UnsignedInt);
 	public:
 				 TestKey();
 				~TestKey();
+	slots:
+		Void		 EventProc(Int, Int, Int);
 };
 
 #endif

@@ -32,7 +32,7 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 
 	realMenu = new Menu();
 
-	for (Int i = 0; i < menu->GetNOfEntries(); i++)
+	for (Int i = 0; i < menu->GetNOfObjects(); i++)
 	{
 		MenuEntry	*entry = (MenuEntry *) menu->GetNthObject(i);
 		MenuEntry	*nEntry = realMenu->AddEntry(entry->GetText(), entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->GetObjectProperties()->orientation);
@@ -42,6 +42,10 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 
 		nEntry->onClick.Connect(&entry->onClick);
  	}
+
+	sizeset = False;
+
+	GetSize();
 }
 
 S::GUI::PopupMenu::~PopupMenu()
@@ -71,10 +75,10 @@ S::Int S::GUI::PopupMenu::Show()
 
 	EnterProtectedRegion();
 
-	realMenu->GetSize();
+	GetSize();
 
-	if (objectProperties->pos.x + realMenu->popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) objectProperties->pos.x = LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x - realMenu->popupsize.cx - 1;
-	if (objectProperties->pos.y + realMenu->popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) objectProperties->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - realMenu->popupsize.cy - 1;
+	if (objectProperties->pos.x + popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) objectProperties->pos.x = LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x - popupsize.cx - 1;
+	if (objectProperties->pos.y + popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) objectProperties->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - popupsize.cy - 1;
 
 	visible = True;
 
@@ -87,7 +91,7 @@ S::Int S::GUI::PopupMenu::Show()
 
 	SetMeasurement(SMT_PIXELS);
 
-	toolwnd->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y), Size(realMenu->popupsize.cx + 1, realMenu->popupsize.cy + 1));
+	toolwnd->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y), Size(popupsize.cx + 1, popupsize.cy + 1));
 
 	Setup::FontSize = oldMeasurement;
 
@@ -170,4 +174,54 @@ S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 	LeaveProtectedRegion();
 
 	return retVal;
+}
+
+
+S::Void S::GUI::PopupMenu::GetSize()
+{
+	if (!sizeset)
+	{
+		popupsize.cx = GetSizeX();
+		popupsize.cy = GetSizeY();
+
+		sizeset = True;
+	}
+}
+
+S::Int S::GUI::PopupMenu::GetSizeX()
+{
+	Int	 mSize = 50;
+	Int	 greatest = 0;
+
+	if (realMenu->GetNOfObjects() == 0) return mSize;
+
+	for (Int i = 0; i < realMenu->GetNOfObjects(); i++)
+	{
+		MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
+
+		if (entry->GetObjectProperties()->textSize.cx > greatest)
+		{
+			mSize		= 50 + entry->GetObjectProperties()->textSize.cx;
+			greatest	= entry->GetObjectProperties()->textSize.cx;
+		}
+	}
+
+	return mSize;
+}
+
+S::Int S::GUI::PopupMenu::GetSizeY()
+{
+	Int	 mSize = 4;
+
+	if (realMenu->GetNOfObjects() == 0) return mSize;
+
+	for (Int i = 0; i < realMenu->GetNOfObjects(); i++)
+	{
+		MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
+
+		if (entry->type == SM_SEPARATOR)	mSize = mSize + 5;
+		else					mSize = mSize + METRIC_POPUPENTRYSIZE;
+	}
+
+	return mSize;
 }

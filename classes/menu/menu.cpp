@@ -25,8 +25,6 @@ S::GUI::Menu::Menu()
 
 	type		= classID;
 	containerType	= classID;
-
-	sizeset = False;
 }
 
 S::GUI::Menu::~Menu()
@@ -40,8 +38,6 @@ S::GUI::MenuEntry *S::GUI::Menu::AddEntry(String text, Bitmap bitmap, Menu *popu
 
 	if (RegisterObject(newEntry) == Success)
 	{
-		sizeset = False;
-
 		newEntry->Show();
 
 		return newEntry;
@@ -78,58 +74,4 @@ S::Int S::GUI::Menu::Clear()
 	}
 
 	return Success;
-}
-
-S::Void S::GUI::Menu::GetSize()
-{
-	if (!sizeset)
-	{
-		popupsize.cx = GetSizeX();
-		popupsize.cy = GetSizeY();
-
-		sizeset = True;
-	}
-}
-
-S::Int S::GUI::Menu::GetSizeX()
-{
-	Int	 mSize = 50;
-	Int	 greatest = 0;
-
-	if (assocObjects.GetNOfEntries() == 0) return mSize;
-
-	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
-	{
-		MenuEntry	*entry = (MenuEntry *) assocObjects.GetNthEntry(i);
-
-		if (entry->GetObjectProperties()->textSize.cx > greatest)
-		{
-			mSize		= 50 + entry->GetObjectProperties()->textSize.cx;
-			greatest	= entry->GetObjectProperties()->textSize.cx;
-		}
-	}
-
-	return mSize;
-}
-
-S::Int S::GUI::Menu::GetSizeY()
-{
-	Int	 mSize = 4;
-
-	if (assocObjects.GetNOfEntries() == 0) return mSize;
-
-	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
-	{
-		MenuEntry	*entry = (MenuEntry *) assocObjects.GetNthEntry(i);
-
-		if (entry->type == SM_SEPARATOR)	mSize = mSize + 5;
-		else					mSize = mSize + METRIC_POPUPENTRYSIZE;
-	}
-
-	return mSize;
-}
-
-S::Int S::GUI::Menu::GetNOfEntries()
-{
-	return assocObjects.GetNOfEntries();
 }

@@ -56,17 +56,17 @@ S::Int S::GUI::PopupView::Paint(Int message)
 	Int		 currentXPos = 20;
 	Int		 currentYPos = 3;
 
-	realMenu->GetSize();
+	myPopup->GetSize();
 
 	popupRect.left		= 0;
 	popupRect.top		= 0;
-	popupRect.right		= realMenu->popupsize.cx;
-	popupRect.bottom	= realMenu->popupsize.cy;
+	popupRect.right		= myPopup->popupsize.cx;
+	popupRect.bottom	= myPopup->popupsize.cy;
 
 	surface->Box(popupRect, Setup::BackgroundColor, FILLED);
 	surface->Frame(popupRect, FRAME_UP);
 
-	for (Int i = 0; i < realMenu->GetNOfEntries(); i++)
+	for (Int i = 0; i < realMenu->GetNOfObjects(); i++)
 	{
 		entry = (MenuEntry *) realMenu->GetNthObject(i);
 
@@ -281,13 +281,13 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 	Rect	 popupRect;
 	Int	 retVal = Success;
 	Int	 i;
-	Rect	*entryRect = new Rect [realMenu->GetNOfEntries()];
+	Rect	*entryRect = new Rect [realMenu->GetNOfObjects()];
 	Rect	 frame;
 	Point	 p1;
 	Point	 p2;
 	Int	 currentX = 3;
 	Int	 currentY = 3;
-	Int	 maxX = realMenu->popupsize.cx - 3;
+	Int	 maxX = myPopup->popupsize.cx - 3;
 
 	String	 newStatus;
 	Bool	 updateStatus = False;
@@ -295,8 +295,8 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 	popupRect.left		= 0;
 	popupRect.top		= 0;
-	popupRect.right		= realMenu->popupsize.cx;
-	popupRect.bottom	= realMenu->popupsize.cy;
+	popupRect.right		= myPopup->popupsize.cx;
+	popupRect.bottom	= myPopup->popupsize.cy;
 
 	Window	*rWnd = myPopup->GetContainer()->GetContainerWindow();
 
@@ -311,7 +311,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		case SM_OPENPOPUP:
 			Process(SM_CLOSEPOPUP, 0, 0);
 
-			for (i = 0; i < realMenu->GetNOfEntries(); i++)
+			for (i = 0; i < realMenu->GetNOfObjects(); i++)
 			{
 				MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
@@ -335,12 +335,12 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					myPopup->nextPopup->prevPopup = myPopup;
 					myPopup->nextPopup->SetContainer(myContainer);
-					myPopup->nextPopup->realMenu->GetSize();
+					myPopup->nextPopup->GetSize();
 					myPopup->nextPopup->GetObjectProperties()->pos.x = entryRect[i].right - 1;
 					myPopup->nextPopup->GetObjectProperties()->pos.y = entryRect[i].top - 3;
 
-					if (myPopup->nextPopup->GetObjectProperties()->pos.x + myPopup->nextPopup->realMenu->popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) myPopup->nextPopup->GetObjectProperties()->pos.x = entryRect[i].left + 1 - myPopup->nextPopup->realMenu->popupsize.cx;
-					if (myPopup->nextPopup->GetObjectProperties()->pos.y + myPopup->nextPopup->realMenu->popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) myPopup->nextPopup->GetObjectProperties()->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - realMenu->popupsize.cy - 1;
+					if (myPopup->nextPopup->GetObjectProperties()->pos.x + myPopup->nextPopup->popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) myPopup->nextPopup->GetObjectProperties()->pos.x = entryRect[i].left + 1 - myPopup->nextPopup->popupsize.cx;
+					if (myPopup->nextPopup->GetObjectProperties()->pos.y + myPopup->nextPopup->popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) myPopup->nextPopup->GetObjectProperties()->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - myPopup->popupsize.cy - 1;
 
 					wnd->RegisterObject(myPopup->nextPopup);
 
@@ -385,7 +385,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONUP:
-			for (i = 0; i < realMenu->GetNOfEntries(); i++)
+			for (i = 0; i < realMenu->GetNOfObjects(); i++)
 			{
 				MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
@@ -501,7 +501,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-			for (i = 0; i < realMenu->GetNOfEntries(); i++)
+			for (i = 0; i < realMenu->GetNOfObjects(); i++)
 			{
 				MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
@@ -724,7 +724,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			currentY = 3;
 
-			for (i = 0; i < realMenu->GetNOfEntries(); i++)
+			for (i = 0; i < realMenu->GetNOfObjects(); i++)
 			{
 				MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
@@ -950,7 +950,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		}
 	}
 
-	if (realMenu->GetNOfEntries() > 0) delete [] entryRect;
+	if (realMenu->GetNOfObjects() > 0) delete [] entryRect;
 
 	iPopup = myPopup;
 
@@ -990,8 +990,8 @@ S::Void S::GUI::PopupView::CloseProc()
 
 	popupRect.left		= 0;
 	popupRect.top		= 0;
-	popupRect.right		= realMenu->popupsize.cx;
-	popupRect.bottom	= realMenu->popupsize.cy;
+	popupRect.right		= myPopup->popupsize.cx;
+	popupRect.bottom	= myPopup->popupsize.cy;
 
 	if (wnd->IsMouseOn(popupRect) && myPopup->nextPopup != NIL)
 	{

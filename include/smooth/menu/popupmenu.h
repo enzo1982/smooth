@@ -44,8 +44,14 @@ namespace smooth
 				PopupMenu		*nextPopup;
 
 				Menu			*realMenu;
+
+				Int			 GetSizeY();
+				Int			 GetSizeX();
 			public:
 				static const Int	 classID;
+
+				Bool			 sizeset;
+				Size			 popupsize;
 
 							 PopupMenu(Menu *);
 				 			~PopupMenu();
@@ -54,6 +60,8 @@ namespace smooth
 
 				Int			 Show();
 				Int			 Hide();
+
+				Void			 GetSize();
 		};
 	};
 };

@@ -77,7 +77,19 @@ S::Int S::GUI::MenuEntry::Paint(Int message)
 	{
 		default:
 		case SP_PAINT:
-			if (type == SM_TEXT)
+			if (type == SM_SEPARATOR)
+			{
+				Point	 p1 = Point(realPos.x + 4 + (Setup::rightToLeft ? 2 : 0), realPos.y);
+				Point	 p2 = Point(p1.x, p1.y + objectProperties->size.cy);
+
+				surface->Bar(p1, p2, OR_VERT);
+
+				p1.x += 2;
+				p2.x += 2;
+
+				surface->Bar(p1, p2, OR_VERT);
+			}
+			else if (type == SM_TEXT)
 			{
 				Rect	 textRect;
 
@@ -134,6 +146,8 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
+
+	if (type == SM_SEPARATOR)	return Success;
 
 	Window	*wnd = myContainer->GetContainerWindow();
 
@@ -227,7 +241,7 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 				break;
 			}
 
-			if (objectProperties->checked && (type != SM_SEPARATOR))
+			if (objectProperties->checked)
 			{
 				wnd->Process(SM_LOOSEFOCUS, handle, 0);
 
@@ -261,8 +275,8 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 						}
 						else if (objectProperties->orientation == OR_RIGHT)
 						{
-							popupMenu->realMenu->GetSize();
-							popupMenu->GetObjectProperties()->pos.x = objectProperties->pos.x + objectProperties->size.cx + 1 - popupMenu->realMenu->popupsize.cx;
+							popupMenu->GetSize();
+							popupMenu->GetObjectProperties()->pos.x = objectProperties->pos.x + objectProperties->size.cx + 1 - popupMenu->popupsize.cx;
 						}
 
 						popupMenu->GetObjectProperties()->pos.y = objectProperties->pos.y + objectProperties->size.cy + 2;
@@ -279,28 +293,7 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONUP:
 			if ((popup != NIL) && objectProperties->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL)) if (((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->IsVisible()) break;
 
-			if (type == SM_TEXT && objectProperties->clicked)
-			{
-				objectProperties->clicked = False;
-
-				surface->Frame(Rect(objectProperties->pos, objectProperties->size), FRAME_UP);
-
-				if (popup == NIL && bVar == NIL && iVar == NIL)
-				{
-					objectProperties->checked = False;
-
-					if (description != NIL && wnd->GetStatusText() == description) wnd->RestoreDefaultStatusText();
-
-					surface->Box(Rect(objectProperties->pos, Size(objectProperties->size.cx + 1, objectProperties->size.cy + 1)), Setup::BackgroundColor, OUTLINED);
-
-					onClick.Emit();
-
-					Process(SM_MOUSEMOVE, 0, 0);
-				}
-
-				retVal = Break;
-			}
-			else if (type == SM_BITMAP && objectProperties->clicked)
+			if (objectProperties->clicked)
 			{
 				objectProperties->clicked = False;
 
@@ -314,27 +307,30 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 					surface->Box(Rect(objectProperties->pos, Size(objectProperties->size.cx + 1, objectProperties->size.cy + 1)), Setup::BackgroundColor, OUTLINED);
 
-					Rect	 bmprect = Rect(objectProperties->pos, objectProperties->size);
-
-					bmprect.left	+= 2;
-					bmprect.top	+= 2;
-					bmprect.right	= bmprect.left + bitmap.GetSize().cx;
-					bmprect.bottom	= bmprect.top + bitmap.GetSize().cy;
-
-					if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmprect);
-					else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmprect);
-
-					if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
+					if (type == SM_BITMAP)
 					{
-						Point	 p1 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5, objectProperties->pos.y + 1);
-						Point	 p2 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5, objectProperties->pos.y + objectProperties->size.cy);
+						Rect	 bmprect = Rect(objectProperties->pos, objectProperties->size);
 
-						surface->Line(p1, p2, Setup::BackgroundColor);
+						bmprect.left	+= 2;
+						bmprect.top	+= 2;
+						bmprect.right	= bmprect.left + bitmap.GetSize().cx;
+						bmprect.bottom	= bmprect.top + bitmap.GetSize().cy;
 
-						p1.x++;
-						p2.x++;
+						if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmprect);
+						else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmprect);
 
-						surface->Line(p1, p2, Setup::BackgroundColor);
+						if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
+						{
+							Point	 p1 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5, objectProperties->pos.y + 1);
+							Point	 p2 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5, objectProperties->pos.y + objectProperties->size.cy);
+
+							surface->Line(p1, p2, Setup::BackgroundColor);
+
+							p1.x++;
+							p2.x++;
+
+							surface->Line(p1, p2, Setup::BackgroundColor);
+						}
 					}
 
 					onClick.Emit();

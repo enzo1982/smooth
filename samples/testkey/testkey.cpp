@@ -18,7 +18,7 @@ Int smooth::Main()
 
 	Loop();
 
-	delete app;
+	Object::DeleteObject(app);
 
 	return 0;
 }
@@ -50,9 +50,9 @@ TestKey::~TestKey()
 
 	UnregisterObject(wnd);
 
-	delete title;
-	delete wnd;
-	delete text;
+	DeleteObject(title);
+	DeleteObject(wnd);
+	DeleteObject(text);
 }
 
 Void TestKey::EventProc(Int message, Int wParam, Int lParam)

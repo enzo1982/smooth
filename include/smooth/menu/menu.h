@@ -31,23 +31,14 @@ namespace smooth
 	{
 		class SMOOTHAPI Menu : public Widget, public Container
 		{
-			protected:
-				Int			 GetSizeY();
-				Int			 GetSizeX();
 			public:
 				static const Int	 classID;
-
-				Bool			 sizeset;
-				Size			 popupsize;
 
 							 Menu();
 							~Menu();
 
 				MenuEntry		*AddEntry(String = NIL, Bitmap = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0, Int = OR_LEFT);
 				Int			 RemoveEntry(MenuEntry *);
-
-				Void			 GetSize();
-				Int			 GetNOfEntries();
 
 				Int			 Clear();
 		};

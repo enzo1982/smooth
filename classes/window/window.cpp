@@ -909,6 +909,8 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	if (created && visible)
 	{
+		onPaint.Emit();
+
 		for (Int i = 0; i < nOfObjects; i++)
 		{
 			object = assocObjects.GetNthEntry(i);
@@ -1022,8 +1024,6 @@ S::Int S::GUI::Window::Paint(Int message)
 				if (((Widget *) object)->IsVisible() && Affected(object, updateRect)) ((Widget *) object)->Paint(SP_PAINT);
 			}
 		}
-
-		onPaint.Emit();
 	}
 
 	surface->EndPaint();

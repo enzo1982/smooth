@@ -389,40 +389,43 @@ S::Int S::GUI::ListBox::Paint(Int message)
 							cbRect.right = cbRect.left + 9;
 							cbRect.bottom = (Int) Math::Min(cbRect.top + 9, operat->rect.bottom);
 
-							surface->Box(cbRect, Setup::ClientColor, FILLED);
-							surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
-
-							if (operat->selected)
+							if (cbRect.top <= cbRect.bottom - 1)
 							{
-								Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
-								Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
+								surface->Box(cbRect, Setup::ClientColor, FILLED);
+								surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
 
-								surface->Line(p1, p2, Setup::ClientTextColor);
+								if (operat->selected && cbRect.top <= cbRect.bottom - 3)
+								{
+									Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
+									Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
 
-								p1 = Point(cbRect.left + 3, cbRect.top + 2);
-								p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
+									surface->Line(p1, p2, Setup::ClientTextColor);
 
-								surface->Line(p1, p2, Setup::GrayTextColor);
+									p1 = Point(cbRect.left + 3, cbRect.top + 2);
+									p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
 
-								p1 = Point(cbRect.left + 2, cbRect.top + 3);
-								p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
+									surface->Line(p1, p2, Setup::GrayTextColor);
 
-								surface->Line(p1, p2, Setup::GrayTextColor);
+									p1 = Point(cbRect.left + 2, cbRect.top + 3);
+									p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
 
-								p1 = Point(cbRect.right - 3, cbRect.top + 2);
-								p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
+									surface->Line(p1, p2, Setup::GrayTextColor);
 
-								surface->Line(p1, p2, Setup::ClientTextColor);
+									p1 = Point(cbRect.right - 3, cbRect.top + 2);
+									p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
 
-								p1 = Point(cbRect.right - 3, cbRect.top + 3);
-								p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
+									surface->Line(p1, p2, Setup::ClientTextColor);
 
-								surface->Line(p1, p2, Setup::GrayTextColor);
+									p1 = Point(cbRect.right - 3, cbRect.top + 3);
+									p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
 
-								p1 = Point(cbRect.right - 4, cbRect.top + 2);
-								p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+									surface->Line(p1, p2, Setup::GrayTextColor);
 
-								surface->Line(p1, p2, Setup::GrayTextColor);
+									p1 = Point(cbRect.right - 4, cbRect.top + 2);
+									p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+
+									surface->Line(p1, p2, Setup::GrayTextColor);
+								}
 							}
 						}
 
@@ -485,40 +488,43 @@ S::Int S::GUI::ListBox::Paint(Int message)
 						cbRect.right = cbRect.left + 9;
 						cbRect.bottom = (Int) Math::Min(cbRect.top + 9, operat->rect.bottom);
 
-						surface->Box(cbRect, Setup::ClientColor, FILLED);
-						surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
-
-						if (operat->selected)
+						if (cbRect.top <= cbRect.bottom - 1)
 						{
-							Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
-							Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
+							surface->Box(cbRect, Setup::ClientColor, FILLED);
+							surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
 
-							surface->Line(p1, p2, Setup::ClientTextColor);
+							if (operat->selected && cbRect.top <= cbRect.bottom - 3)
+							{
+								Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
+								Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.left + 3, cbRect.top + 2);
-							p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
+								surface->Line(p1, p2, Setup::ClientTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.left + 3, cbRect.top + 2);
+								p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
 
-							p1 = Point(cbRect.left + 2, cbRect.top + 3);
-							p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
+								surface->Line(p1, p2, Setup::GrayTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.left + 2, cbRect.top + 3);
+								p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.right - 3, cbRect.top + 2);
-							p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
+								surface->Line(p1, p2, Setup::GrayTextColor);
 
-							surface->Line(p1, p2, Setup::ClientTextColor);
+								p1 = Point(cbRect.right - 3, cbRect.top + 2);
+								p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.right - 3, cbRect.top + 3);
-							p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
+								surface->Line(p1, p2, Setup::ClientTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.right - 3, cbRect.top + 3);
+								p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.right - 4, cbRect.top + 2);
-							p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+								surface->Line(p1, p2, Setup::GrayTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.right - 4, cbRect.top + 2);
+								p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+
+								surface->Line(p1, p2, Setup::GrayTextColor);
+							}
 						}
 					}
 
@@ -564,39 +570,42 @@ S::Int S::GUI::ListBox::Paint(Int message)
 						cbRect.right = cbRect.left + 9;
 						cbRect.bottom = (Int) Math::Min(cbRect.top + 9, operat->rect.bottom);
 
-						surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
-
-						if (operat->selected)
+						if (cbRect.top <= cbRect.bottom - 1)
 						{
-							Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
-							Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
+							surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
 
-							surface->Line(p1, p2, Setup::ClientTextColor);
+							if (operat->selected && cbRect.top <= cbRect.bottom - 3)
+							{
+								Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
+								Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.left + 3, cbRect.top + 2);
-							p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
+								surface->Line(p1, p2, Setup::ClientTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.left + 3, cbRect.top + 2);
+								p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
 
-							p1 = Point(cbRect.left + 2, cbRect.top + 3);
-							p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
+								surface->Line(p1, p2, Setup::GrayTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.left + 2, cbRect.top + 3);
+								p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.right - 3, cbRect.top + 2);
-							p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
+								surface->Line(p1, p2, Setup::GrayTextColor);
 
-							surface->Line(p1, p2, Setup::ClientTextColor);
+								p1 = Point(cbRect.right - 3, cbRect.top + 2);
+								p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.right - 3, cbRect.top + 3);
-							p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
+								surface->Line(p1, p2, Setup::ClientTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.right - 3, cbRect.top + 3);
+								p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.right - 4, cbRect.top + 2);
-							p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+								surface->Line(p1, p2, Setup::GrayTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.right - 4, cbRect.top + 2);
+								p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+
+								surface->Line(p1, p2, Setup::GrayTextColor);
+							}
 						}
 					}
 
@@ -645,40 +654,43 @@ S::Int S::GUI::ListBox::Paint(Int message)
 						cbRect.right = cbRect.left + 9;
 						cbRect.bottom = (Int) Math::Min(cbRect.top + 9, operat->rect.bottom);
 
-						surface->Box(cbRect, Setup::ClientColor, FILLED);
-						surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
-
-						if (operat->selected)
+						if (cbRect.top <= cbRect.bottom - 1)
 						{
-							Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
-							Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
+							surface->Box(cbRect, Setup::ClientColor, FILLED);
+							surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
 
-							surface->Line(p1, p2, Setup::ClientTextColor);
+							if (operat->selected && cbRect.top <= cbRect.bottom - 3)
+							{
+								Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
+								Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.left + 3, cbRect.top + 2);
-							p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
+								surface->Line(p1, p2, Setup::ClientTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.left + 3, cbRect.top + 2);
+								p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
 
-							p1 = Point(cbRect.left + 2, cbRect.top + 3);
-							p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
+								surface->Line(p1, p2, Setup::GrayTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.left + 2, cbRect.top + 3);
+								p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.right - 3, cbRect.top + 2);
-							p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
+								surface->Line(p1, p2, Setup::GrayTextColor);
 
-							surface->Line(p1, p2, Setup::ClientTextColor);
+								p1 = Point(cbRect.right - 3, cbRect.top + 2);
+								p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.right - 3, cbRect.top + 3);
-							p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
+								surface->Line(p1, p2, Setup::ClientTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.right - 3, cbRect.top + 3);
+								p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
 
-							p1 = Point(cbRect.right - 4, cbRect.top + 2);
-							p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+								surface->Line(p1, p2, Setup::GrayTextColor);
 
-							surface->Line(p1, p2, Setup::GrayTextColor);
+								p1 = Point(cbRect.right - 4, cbRect.top + 2);
+								p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+
+								surface->Line(p1, p2, Setup::GrayTextColor);
+							}
 						}
 					}
 				}

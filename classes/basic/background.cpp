@@ -48,10 +48,11 @@ S::Void S::BackgroundApplication::TimerProc()
 
 					continue;
 				}
-				else if (object->GetObjectType() == GUI::Window::classID)
-				{
-					((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
-				}
+			}
+
+			if (object->GetObjectType() == GUI::Window::classID)
+			{
+				((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
 			}
 		}
 	}

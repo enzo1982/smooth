@@ -352,7 +352,8 @@ S::Rect S::GUI::Window::GetClientRect()
 
 S::Rect S::GUI::Window::GetRestoredWindowRect()
 {
-	return backend->GetRestoredWindowRect();
+	if (IsMaximized())	return backend->GetRestoredWindowRect();
+	else			return GetWindowRect();
 }
 
 S::Rect S::GUI::Window::GetUpdateRect()

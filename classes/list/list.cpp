@@ -69,7 +69,7 @@ S::Int S::List::RemoveEntry(Int id)
 	{
 		delete GetEntry(id);
 
-		RemoveEntry(id);
+		Array<ListEntry *>::RemoveEntry(id);
 
 		return Success;
 	}

@@ -827,6 +827,10 @@ SOURCE=..\include\smooth\listboxheader.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\listentry.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\loop.h
 # End Source File
 # Begin Source File

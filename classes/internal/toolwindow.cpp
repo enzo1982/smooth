@@ -44,12 +44,9 @@ S::GUI::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
 	possibleContainers.AddEntry(OBJ_WINDOW);
 
 	owner				= NIL;
-
-#ifdef __WIN32__
 	style				= WS_BORDER | WS_POPUP;
 
 	SetExStyle(WS_EX_TOOLWINDOW);
-#endif
 }
 
 S::GUI::ToolWindow::~ToolWindow()
@@ -149,7 +146,6 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 			if (!cursorset) LiSASetMouseCursor(LiSA_MOUSE_ARROW);
 
 			break;
-#ifdef __WIN32__
 		case WM_CLOSE:
 			if (doQuit.Call())
 			{
@@ -266,7 +262,6 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 			updateRect.bottom	= updateRect.top + objectProperties->size.cy;
 
 			break;
-#endif
 	}
 
 	Object	*object = NIL;

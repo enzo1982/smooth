@@ -3,8 +3,8 @@ Status of smooth ports
 
 MinGW32		all versions	complete support
 MSVC		since 0.8.58.0	complete support
-Linux GCC	in the works	no GUI support (supported: threads, strings, primitives, arrays)
-QNX 6.1 GCC	in the works	no GUI support (supported: threads, strings, primitives, arrays)
+Linux GCC	in the works	no GUI support (supported: threads, strings, primitives, arrays, xml)
+QNX 6.1 GCC	in the works	no GUI support (supported: threads, strings, primitives, arrays, xml)
 
 Source and binary compatibility between different smooth Versions
 -----------------------------------------------------------------
@@ -12,6 +12,8 @@ Source and binary compatibility between different smooth Versions
 		Compatibility with older versions
 Version		Source		Binary			Comments
 ---------------------------------------------------------------------------------------------------------------------
+0.8.59.0	no		no			-
+0.8.58.1	yes		yes			-
 0.8.58.0	no		no			greater restructuring in class SObject and others
 0.8.57.0	yes		no			-
 0.8.56.0	no		no			layout of some classes changed; need Unicode adjustments

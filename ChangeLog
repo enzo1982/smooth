@@ -1,5 +1,22 @@
 ChangeLog for smooth
 
+20.09.02 23:21 - smooth alpha 0.8.59.0
+
+- groupbox.cpp		- fixed Hide() function
+- parser.cpp		- removed class SMOOTHXMLParser (XML parser is still present, but integrated into SMOOTHXMLDocument)
+
+- upgraded to IOLib v4.9.8.0
+- fixed some minor bugs
+
+18.08.02 12:15 - smooth alpha 0.8.58.1
+
+- objectmanager.cpp	- fixed a bug that could lead to an infinite loop when leaving a smooth application
+- popupview.cpp		- fixed a bug that could lead to crashes
+- editbox.cpp		- now uses WM_CHAR messages to get character codes
+
+- implemented a new standard dialogs api
+- smooth uses windows dialogs now
+
 28.06.02 16:06 - smooth alpha 0.8.58.0
 
 - titlebar.cpp		- fixed some minor bugs (maximizing)

@@ -89,7 +89,7 @@ SOURCE=..\libraries\libxml\catalog.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\libxml\encoding.c
+SOURCE=..\libraries\libxml\encoding.cpp
 # End Source File
 # Begin Source File
 

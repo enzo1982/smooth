@@ -1,0 +1,300 @@
+ChangeLog for smooth
+
+23.12.01 17:07 - smooth alpha 0.8.57.0
+
+- window.cpp		- Container Vereinheitlichung abgeschlossen
+- menubar.cpp		- vertikale Menubars implementiert
+			- Fehler behoben
+- primitive.cpp		- Basisklasse für geometrische Primitive
+- point.cpp		- Abstraktion von Punkten
+- size.cpp		- Abstraktion von Breite und Höhe
+- rect.cpp		- Abstraktion von Rechtecken
+- line.cpp		- Abstraktion von Linien
+- dllmain.cpp		- SMOOTHDllMain durch DllMain ersetzt (behebt Fehler)
+- object.cpp		- Paint() Methode durch Paint(int) ersetzt - Vorbereitung für Themes
+- containertype.cpp	- neue Klasse: Verwaltung verschiedener Container-Typen - ersetzt SMOOTHObjectInfo
+- hyperlink.cpp		- Links verändern jetzt die Farbe, wenn mit der Maus darauf gezeigt wird
+
+- SMOOTHObjectInfo Klasse entfernt
+- SMOOTH* Klassen können jetzt als S* geschrieben werden
+- LibXML Bibliothek integriert
+- 'Gray' wird jetzt überall mit a geschrieben
+- IOLib auf Version 4.0b aktualisiert
+- RecArray durch SMOOTHArray ersetzt (und Update auf Version 0.10.4.0 (MSVC kompatibel))
+- long long's entfernt (für MSVC Kompatibilität)
+- alle Object ID's werden jetzt mit SMOOTH::RequestObjectID() ermittelt
+- Anpassungen an vielen Objekten
+
+24.07.01 18:15 - smooth alpha 0.8.56.0
+
+- designer.cpp		- neue Anwendung: Dialogeditor
+- window.cpp		- SM_MOUSEMOVE Nachrichten, die von der SMOOTHBackgroundApplication kommen, werden jetzt nicht mehr an die MessageProc weitergegeben
+			- wertet jetzt auch WM_NC* Nachrichten aus
+			- updaterect wird jetzt korrekt gesetzt
+- popupmenu.cpp		- Popups werden jetzt korrekt geschlossen
+- titlebar.cpp		- die Größe von maximierten Fenstern kann jetzt nicht mehr geändert werden
+- drawable.cpp		- Blitting Funktionen übernehmen jetzt Source und Destination Rect
+- activearea.cpp	- SetColor ruft jetzt die eigene Paint Funktion auf (statt wnd->Paint())
+- toolwnd.cpp		- updaterect wird jetzt korrekt gesetzt
+- client.cpp		- zeichnet jetzt nur noch den Bereich im Updaterect neu
+- mdiclient.cpp		- zeichnet jetzt nur noch den Bereich im Updaterect neu
+- server.cpp		- Anpassungen
+- sessionmanagement.cpp	- Fehler #0014 behoben
+- hyperlink.cpp		- objprops->size enthält jetzt die korrekte Größe
+- i18n.cpp		- Falsche Zuordnung der chinesischen Zeichensätze behoben
+			- Standardschrift ist jetzt "MicroSoft Sans Serif" statt "MS Sans Serif" (Unicode Schriftart)
+			- Standardschrift für Japanisch: "MS PGothic"
+			- Sprachunterstützung verbessert
+- string.cpp		- Unabhängigkeit von mpstring
+			- Unterstützung von Unicode
+- stk.cpp		- Layer-Objekte, die außerhalb des Layers liegen, werden jetzt korrekt neugezeichnet
+- button.cpp		- Unterstützung für Tooltips implementiert
+- tooltip.cpp		- Neue Funktion: SetTimeout(...)
+
+- Komplett auf Unicode umgestellt
+- Übersetzungen angepasst
+- mpstring Library entfernt
+- Progressive Setup aktualisiert
+- IOLib auf Version 4.0a aktualisiert
+- RecArray erweitert (behebt Fehler #0013)
+- Anpassungen an fast allen Klassen
+
+21.06.01 15:58 - smooth alpha 0.8.55.0
+
+- tooltip.cpp		- neue Klasse: SMOOTHTooltip
+- stk.cpp		- neue Variablen: TooltipColor, TooltipTextColor
+
+07.06.01 19:49 - smooth alpha 0.8.54.0
+
+- string.cpp		- neue Klasse: SMOOTHString
+- objecttype.cpp	- neue Klasse: Abstrahiert Objekttypen
+- combobox.cpp		- meldet sich jetzt als 'Owner' des ToolWindows an
+- toolwindow.cpp	- gibt sich jetzt als OBJ_WINDOW kompatibel aus (über IsTypeCompatible; behebt Fehler #0017)
+
+- Dokumentation erweitert
+- Anpassungen an fast allen Objekten
+- IOLib Klassen werden von smooth jetzt als SMOOTHStream, SMOOTHInStream und SMOOTHOutStream exportiert
+- Progressive Setup upgedatet
+- IOLib und IOLib-Filters auf Version 4.0 aktualisiert
+
+30.05.01 18:26 - smooth alpha 0.8.53.0
+
+- window.cpp		- benutzt jetzt automatisch die erste Menubar
+- filedlg.cpp		- Verbesserungen
+- dirdlg.cpp		- Verbesserungen
+- menubar.cpp		- Menüs werden jetzt korrekt geschlossen
+- drawable.cpp		- neue Klasse: SMOOTHDrawable
+- stk.cpp		- GetApplication, GetLayer, GetWindow durch GetObject ersetzt
+
+- benutze jetzt neue MinGW32 Entwicklungsumgebung
+- Programme stürzen nicht mehr ab, wenn nicht alle Objekte deregistriert und gelöscht werden
+- IOLib auf Version 4.0-pre2 aktualisiert
+- Anpassungen an fast allen Objekten
+- Progressive Setup upgedatet
+- kit und include Verzeichnisse zusammengeführt
+
+20.04.01 16:57 - smooth alpha 0.8.52.0
+
+- menubar.cpp		- Vereinfachungen
+			- Geometrieverbesserungen
+- timer.cpp		- führt jetzt objprops->proc aus
+- object.cpp		- Konstante OBJ_ICONBAR entfernt
+- objectinfo.cpp	- Anpassungen
+
+- Progressive Setup upgedatet
+
+12.04.01 14:57 - smooth alpha 0.8.51.0
+
+- window.cpp		- Kann jetzt mehrere Menubars aufnehmen
+			- Containerschnittstelle für OR_TOP, OR_BOTTOM, OR_CENTER und OR_FREE Objekte unifiziert
+- menubar.cpp		- Menubar und Iconbar zusammengeführt
+			- Anpassungen
+- titlebar.cpp		- Anpassungen
+- client.cpp		- Anpassungen
+- mdiclient.cpp		- Anpassungen
+
+- Iconbar Objekt entfernt
+
+06.04.01 15:34 - smooth alpha 0.8.50.0
+
+- thread.cpp		- Startverhalten der Threads korrigiert
+			- Threads werden jetzt ordnungsgemäß angehalten und gelöscht
+- mutex.cpp		- Mutex Unterstützung integriert
+- semaphore.cpp		- Semaphoren Unterstützung integriert
+- listbox.cpp		- neue Funktion: ModifyEntry
+- combobox.cpp		- neue Funktion: ModifyEntry
+- sessionmanagement.cpp	- einige Funktionen gehören jetzt zur Klasse SMOOTH
+- odsmanager.cpp	- einige Funktionen gehören jetzt zur Klasse SMOOTH
+- definitions.cpp	- neue smooth Messages
+- progressbar.cpp	- IntegerToString Aufrufe durch itos ersetzt
+- colordlg.cpp		- IntegerToString Aufrufe durch itos ersetzt
+- toolkit.cpp		- mpToolkit ist jetzt Bestandteil der Core Bibliothek
+- messagebox.cpp	- Messageboxen ohne Titel sind jetzt möglich
+- winapp.cpp		- SMOOTH::Init erzeugt jetzt den mainObjectManager usw.
+- serverdlg.cpp		- Fehler #0015 behoben
+			- Fehler #0016 behoben
+- timer.cpp		- neue Klasse: SMOOTHTimer
+- popupmenu.cpp		- fast komplettes Rewrite
+
+- Anpassungen an vielen Objekten
+- IOLib aktualisiert
+
+18.03.01 15:47 - smooth alpha 0.8.49.0
+
+- thread.cpp		- nach Linux portiert (ohne Pause und Continue Methoden)
+			- kann jetzt auch Funktionen außerhalb von Funktionen verwalten
+- metrics.cpp		- Konstanten werden jetzt nicht mehr exportiert
+- popupmenu.cpp		- benutzt jetzt Toolkit-Funktionen zum Blitten
+- divisionbar.cpp	- SMOOTHDivisionbar und SMOOTHLayerDivisionbar zusammengeführt
+			- benutzt jetzt mainObjectManager um andere Divisionbars zu finden
+- stk.cpp		- neue Klasse: SMOOTH
+- winapp.cpp		- Farbvariablen befinden sich jetzt in der Klasse SMOOTH
+- window.cpp		- kann jetzt mehrere Layer aufnehmen
+- titlebar.cpp		- wird jetzt nicht mehr inaktiv, wenn eine ComboBox geöffnet wird
+- filedlg.cpp		- Layout verändert
+- messagebox.cpp	- Führt unter Windows jetzt ein MessageBeep aus
+
+- Anpassungen in fast allen Dateien
+- Copyright Informationen aktualisiert
+- mpToolkit erweitert
+- Progressive Setup aktualisiert
+
+18.02.01 17:32 - smooth alpha 0.8.48.1
+
+- optionbox.cpp		- wird jetzt sichtbar deaktiviert
+
+- Lizenz angepasst
+- BeatClock Version 2.0 fertiggestellt
+
+18.02.01 15:56 - smooth alpha 0.8.48.0
+
+- window.cpp		- Verbesserungen an RegisterObject und UnregisterObject
+- popupmenu.cpp		- Fehler behoben, der dazu führte, dass nur ein Popup Menü gleichzeitig geöffnet werden konnte
+- divisionbar.cpp	- SMOOTHDivisionbar benutzt jetzt nicht mehr SMOOTHWindow::divisionbars
+			- SMOOTHLayerDivisionbar benutzt jetzt nicht mehr SMOOTHLayer::assocObjects
+- client.cpp		- benutzt jetzt nicht mehr SMOOTHWindow::divisionbars
+- mdiclient.cpp		- benutzt jetzt nicht mehr SMOOTHWindow::divisionbars
+- layer.cpp		- SMOOTHLayerDivisionbar ist kein friend mehr
+
+- Verbesserungen der BeatClock
+- LibPCI unterstützt jetzt BZIP2 Komprimierung
+
+13.02.01 17:56 - smooth alpha 0.8.47.0
+
+- arrows.cpp		- SetTimer wird jetzt nicht mehr bei jedem Klick aufgerufen
+- scrollbar.cpp		- SetTimer wird jetzt nicht mehr bei jedem Klick aufgerufen
+- definitions.cpp	- neue Konstante: SMOOTHBreak
+- editbox.cpp		- neuer Stil: EDB_ASTERISK
+
+- Anpassungen an vielen Objekten
+- mpString Bibliothek aktualisiert
+
+12.02.01 18:13 - smooth alpha 0.8.46.1
+
+- Die Farbe RGB(192, 192, 192) wird jetzt automatisch zur Hintergrundfarbe
+
+12.02.01 17:10 - smooth alpha 0.8.46.0
+
+- editbox.cpp		- Erweiterungen
+
+- Fehler am Server behoben
+- Anpassungen an vielen Objekten
+- Progressive Setup aktualisiert
+- RecArray auf Version 0.10.2.0 upgedatet
+
+08.02.01 20:21 - smooth alpha 0.8.45.0
+
+- layer.cpp		- Paint() ruft sich jetzt selbst wieder auf, falls es unterbrochen wird
+- definitions.cpp	- neue Message: SM_MOUSELEAVE
+- window.cpp		- Anpassungen
+- titlebar.cpp		- Loop benutzt jetzt standardmäßig GetMessage() statt PeekMessage()
+- scrollbar.cpp		- Process() unterbricht jetzt nicht mehr die Message Bearbeitung bei WM_MOUSEMOVE
+
+- Anpassungen an vielen Objekten
+- IOLib upgedatet
+
+07.02.01 20:53 - smooth alpha 0.8.44.0
+
+- background.cpp	- Fehler behoben
+- titlebar.cpp		- Sendet jetzt SM_LOOSEFOCUS Message, wenn Fenster verschoben werden soll
+- hyperlink.cpp		- Verbesserungen
+- editbox.cpp		- Erweiterungen
+- window.cpp		- Fehler bei der Cursorbehandlung behoben
+
+- RecArray auf Version 0.10.1.0 aktualisiert
+
+06.02.01 20:14 - smooth alpha 0.8.43.0
+
+- background.cpp	- neue Klasse: Sendet im Hintergrund WM_MOUSEMOVE Messages in regelmäßigen Abständen an alle Fenster
+- dllmain.cpp		- Instantiiert jetzt SMOOTHBackgroundApplication
+- winapp.cpp		- Anpassungen
+- window.cpp		- Definition von NULLWND entfernt
+
+04.02.01 19:04 - smooth alpha 0.8.42.0
+
+- editbox.cpp		- Verbesserungen
+- winapp.cpp		- SMOOTHLoop() aufgeräumt
+- thread.cpp		- Threads werden jetzt erst gestartet, wenn ein Loop aktiv ist
+
+01.02.01 20:35 - smooth alpha 0.8.41.1
+
+- stk.cpp		- Anpassungen
+
+- Verbesserungen an LibPCI
+- komplett auf PCIFF umgestellt
+
+01.02.01 15:31 - smooth alpha 0.8.41.0
+
+- stk.cpp		- benutzt jetzt IOLib statt Windows Funktionen
+
+- LibPCI integriert
+
+31.01.01 20:16 - smooth alpha 0.8.40.0
+
+- IOLib auf Version 4.0-pre1 aktualisiert
+- Progressive Setup aktualisiert
+
+11.01.01 19:18 - smooth alpha 0.8.39.0
+
+- layer.cpp		- Fehler in Hide() behoben
+- stk.cpp		- neue Funktion: RequestGUID() ermittelt einen eindeutiges Handle
+- editbox.cpp		- kleinere Verbesserungen
+
+- Anpassungen am Server - Befehl getGUID implementiert
+- Objekte an neues GUID System angepasst
+
+06.01.01 19:54 - smooth alpha 0.8.38.0
+
+- combobox.cpp		- Fehler behoben
+- container.cpp		- prüft jetzt, ob Objekte NULL sind
+- application.cpp	- prüft jetzt, ob Objekte NULL sind
+- layer.cpp		- prüft jetzt, ob Objekte NULL sind
+- window.cpp		- prüft jetzt, ob Objekte NULL sind
+- register.cpp		- prüft jetzt, ob Objekte NULL sind
+- object.cpp		- zwei neue Funktionen: SetToolTip() und GetToolTip() (bisher aber nicht von Objekten implementiert)
+
+04.01.01 20:03 - smooth alpha 0.8.37.0
+
+- editbox.cpp		- Fehler in SetText() behoben
+- combobox.cpp		- Fehler behoben
+
+- Verbesserungen am Server
+
+03.01.01 21:55 - smooth alpha 0.8.36.1
+
+- combobox.cpp		- Font kann jetzt verändert werden
+			- geometrische Verbesserungen
+- listbox.cpp		- Font kann jetzt verändert werden
+			- Fehler behoben
+
+03.01.01 18:22 - smooth alpha 0.8.36.0
+
+- list.cpp		- SelectEntry() in SelectListEntry() umbenannt
+			- Cleanup() in CleanupList() umbenannt
+- combobox.cpp		- neue Funktionen: SelectEntry() und Cleanup()
+			- AddEntry() und RemoveEntry() rufen jetzt Paint() auf
+- listbox.cpp		- neue Funktionen: SelectEntry() und Cleanup()
+			- AddEntry() und RemoveEntry() rufen jetzt Paint() auf
+
+- Progressive Setup upgedatet
+- Versionsinfo aktualisiert

@@ -1,0 +1,184 @@
+ChangeLog for smooth
+
+30.12.99 18:04 - smooth alpha 0.1.5.1
+
+- window.cpp		- Neue Funktion SetPeekProc()
+- winapp.cpp		- Peek Funktionen integriert
+
+30.12.99 15:32 - smooth alpha 0.1.5.0
+
+- iconbar.cpp		- SMOOTHIconbar Objekt integriert
+- window.cpp		- Anpassungen für SMOOTHIconbar
+- client.cpp		- Anpassungen für SMOOTHIconbar
+- menu.cpp		- Änderung der SMOOTHMenu Konstanten
+- stk.cpp		- Neue Funktion LoadIconbarIcon()
+			- Änderungen für SMOOTHBackgroundColor
+
+29.12.99 19:23 - smooth alpha 0.1.4.2
+
+- RecArray auf Version 0.8.7.0 upgedatet
+
+29.12.99 19:12 - smooth alpha 0.1.4.1
+
+- menubar.cpp		- SMOOTHMenubar Objekt integriert
+- client.cpp		- Anpassungen für SMOOTHMenubar
+- window.cpp		- Anpassungen für SMOOTHMenubar
+			- Fehlerkorrektur beim Umgang mit SMOOTHClient Objekten
+- titlebar.cpp		- Anpassungen für SMOOTHMenubar
+- menu.cpp		- Vervollständigung der AddMenuEntry() und RemoveMenuEntry() Funktionen
+- menuentry.cpp		- Anpassung an Änderungen in menu.cpp
+- recarray.cpp		- Fehler in AddEntry(t, int) behoben
+
+29.12.99 16:56 - smooth alpha 0.1.4.0
+
+- Optimierungslevel wieder auf 6 gesetzt, dafür Architektur auf i568 heruntergesetzt
+
+28.12.99 20:13 - smooth alpha 0.1.3.1
+
+- window.cpp		- Abarbeitung der WM_ACTIVATEAPP (SS_APPTOPMOST) Message korrigiert
+
+28.12.99 15:44 - smooth alpha 0.1.3.0
+
+- client.cpp		- SMOOTHClient Objekt integriert
+- window.cpp		- 3 neue Fensterstile: SS_MODAL - Fenster bleibt innerhalb der Anwendung aktiv, SS_SYSMODAL - bleibt immer aktiv, SS_APPTOPMOST - bleibt innerhalb der Anwendung oben
+			- Unterstützung für Clientbereiche
+- menu.cpp		- SMOOTHMenu Objekt integriert
+- menuentry.cpp		- SMOOTHMenuEntry Objekt als Subklasse von SMOOTHMenu integriert
+
+27.12.99 22:10 - smooth alpha 0.1.2.5
+
+- Todo und globals.txt upgedatet
+
+27.12.99 20:38 - smooth alpha 0.1.2.4
+
+- window.cpp		- Wenn kein Maximierungsbutton existiert kann die Fenstergröße jetzt nicht mehr verändert werden
+			- Unterstützung für Icons
+			- Fenstertitel kann jetzt geändert werden
+- titlebar.cpp		- Unterstützung für Icons
+- stk.cpp		- Fehler behoben, der das exportieren von Funktionen verhinderte
+
+27.12.99 19:16 - smooth alpha 0.1.2.3
+
+- window.cpp		- Trennbalken integriert
+- titlebar.cpp		- Benutzt jetzt intensiver Farbkonstanten
+
+- Neue Toolkit Version integriert
+
+27.12.99 18:57 - smooth alpha 0.1.2.2
+
+- window.cpp		- nOfWindows in nOfActiveWindows umbenannt und In- bzw. Dekrementierungsmodus verändert
+			- Programm entfernt sich nun auch bei mehreren Fenstern problemlos aus der Taskliste (nein, ich meine nicht Taskleiste!!!)
+
+27.12.99 18:42 - smooth alpha 0.1.2.1
+
+- statusbar.cpp		- SMOOTHStatusbar Objekt integriert
+- window.cpp		- Anpassungen für SMOOTHStatusbar
+
+27.12.99 16:59 - smooth alpha 0.1.2.0
+
+- titlebar.cpp		- SMOOTHTitlebar Objekt integriert
+- container.cpp		- Register und Unregister Funktionen jetzt virtuell
+- window.cpp		- Anpassungen für SMOOTHTitlebar
+			- Eigene Register und Unregister Funktionen
+- application.cpp	- Eigene Register und Unregister Funktionen
+- stk.cpp		- Neue Funktion GetSMOOTHWindow(int) (by handle aka index)
+			- Neue Funktion Affected(SMOOTHObject *, RECT &) - prüft, ob sich das Objekt im Bereich von RECT befindet
+
+26.12.99 18:08 - smooth alpha 0.1.1.0
+
+- Versionsnummer auf 0.1 erhöht, da die DLL jetzt einsetzbar ist
+
+26.12.99 18:06 - smooth alpha 0.0.8.1
+
+- window.cpp		- Fenster können jetzt angezeigt und geschlossen werden
+			- Fehler in wndclass Initialisierung behoben
+			- Process Funktion erweitert
+
+- winapp.cpp		- loopActive Variable hinzugefügt
+
+26.12.99 16:55 - smooth alpha 0.0.8.0
+
+- container.cpp		- neue Klasse - enthält Kontainer Funktionen
+
+- Anpassungen in anderen Klassen
+- RecArray auf Version 0.8.6.0 upgedatet
+
+25.12.99 11:11 - smooth alpha 0.0.7.0
+
+- window.cpp		- Create() und Process() hinzugefügt
+- stk.cpp		- neue Datei - enthält Hilfsfunktionen
+
+24.12.99 15:22 - smooth alpha 0.0.6.2
+
+- window.cpp		- Funktionen aus smooth 0.8.13.1 hinzugefügt
+- object-manager.cpp	- wird jetzt nicht mehr exportiert
+
+24.12.99 14:49 - smooth alpha 0.0.6.1
+
+- window.cpp		- Klasse in neue Struktur integriert
+- winapp.cpp		- Datei smooth-app.cpp aus smooth 0.8.13.1 übernommen
+
+- Fehler behoben
+
+24.12.99 13:14 - smooth alpha 0.0.6.0
+
+- application.cpp	- Klasse in neue Struktur integriert
+- object-manager.cpp	- Klasse umstrukturiert
+- object.cpp		- Klasse umstrukturiert
+
+14.12.99 19:45 - smooth alpha 0.0.5.0
+
+- window.cpp		- Klasse entfernt
+- application.cpp	- Klasse entfernt
+- toolkit.cpp		- Anpassungen an GCC 2.95.2
+- object-manager.cpp	- Klasse hinzugefügt
+- dllmain.cpp		- Initialisierung für ObjectManager hinzugefügt
+- libiolib.a		- neue Version der IOLibrary
+
+01.12.99 15:01 - smooth alpha 0.0.4.0
+
+- window.cpp		- Funktion Show hinzugefügt um den ShowState zu ändern
+
+20.10.99 18:03 - smooth alpha 0.0.3.4
+
+- application.cpp	- Funktion AddObject hinzugefügt
+
+20.10.99 17:28 - smooth alpha 0.0.3.3
+
+- window.cpp		- Objekt SMOOTHWindow hinzugefügt
+
+20.10.99 17:08 - smooth alpha 0.0.3.2
+
+- application.cpp	- Objekt SMOOTHApplication hinzugefügt
+- toolkit.cpp		- Toolkit hinzugefügt
+
+20.10.99 16:42 - smooth alpha 0.0.3.1
+
+- libiolib.a		- IOLib integriert
+
+20.10.99 16:28 - smooth alpha 0.0.3.0
+
+- i18n.cpp		- Internationalisierungsdateien hinzugefügt
+
+19.10.99 18:23 - smooth alpha 0.0.2.1
+
+- recarray.h		- RecArray Klassen in Projekt integriert
+- object.cpp		- Array, das alle Objekte enthält, hinzugefügt
+
+19.10.99 18:04 - smooth alpha 0.0.2.0
+
+- object.cpp		- Objekt SMOOTHObject hinzugefügt
+- definitions.cpp	- Datei für Definitionen hinzugefügt
+
+02.10.99 17:54 - smooth alpha 0.0.1.2
+
+- version.rc		- Resource für Versionsinformationen hinzugefügt
+- linkhand.rc		- Resource für Hyperlinks hinzugefügt
+
+02.10.99 17:04 - smooth alpha 0.0.1.1
+
+- dllmain.cpp		- Initialisierungsfunktion hinzugefügt
+
+02.10.99 16:25 - smooth alpha 0.0.1.0
+
+- Start des 3. Rewrites von smooth

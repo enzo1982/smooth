@@ -143,7 +143,7 @@ S::Int S::GUI::Dialogs::TipOfTheDay::AddTip(const String &tip)
 	return Success;
 }
 
-S::Int S::GUI::Dialogs::TipOfTheDay::SetMode(Int nMode, Int nOffset)
+S::Int S::GUI::Dialogs::TipOfTheDay::SetMode(Int nMode, Int nOffset, Bool showOnStartup)
 {
 	switch (nMode)
 	{
@@ -161,7 +161,14 @@ S::Int S::GUI::Dialogs::TipOfTheDay::SetMode(Int nMode, Int nOffset)
 			return Error;
 	}
 
+	showTips = showOnStartup;
+
 	return Success;
+}
+
+S::Int S::GUI::Dialogs::TipOfTheDay::GetOffset()
+{
+	return offset;
 }
 
 S::Void S::GUI::Dialogs::TipOfTheDay::ButtonOK()

@@ -63,7 +63,9 @@ namespace smooth
 					Int		 ShowDialog();
 
 					Int		 AddTip(const String &);
-					Int		 SetMode(Int, Int = 0);
+					Int		 SetMode(Int, Int = 0, Bool = True);
+
+					Int		 GetOffset();
 				slots:
 					Void		 ButtonOK();
 					Void		 ButtonNext();

@@ -337,7 +337,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					{
 						LOGFONTW	 font;
 
-						font.lfHeight = objectProperties->font.GetSize();
+						font.lfHeight = -MulDiv(objectProperties->font.GetSize(), GetDeviceCaps((HDC) surface->GetSystemSurface(), LOGPIXELSY), 72);
 						font.lfWidth = 0;
 						font.lfEscapement = 0;
 						font.lfOrientation = 0;
@@ -358,7 +358,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					{
 						LOGFONTA	 font;
 
-						font.lfHeight = objectProperties->font.GetSize();
+						font.lfHeight = -MulDiv(objectProperties->font.GetSize(), GetDeviceCaps((HDC) surface->GetSystemSurface(), LOGPIXELSY), 72);
 						font.lfWidth = 0;
 						font.lfEscapement = 0;
 						font.lfOrientation = 0;

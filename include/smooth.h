@@ -95,5 +95,6 @@
 #include "smooth/fontdlg.h"
 #include "smooth/font.h"
 #include "smooth/shortcut.h"
+#include "smooth/extended.h"
 
 #endif

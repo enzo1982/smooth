@@ -57,6 +57,7 @@ namespace smooth
 
 				Int				 stay;
 				Bool				 maximized;
+				Bool				 minimized;
 
 				Bool				 created;
 				Bool				 destroyed;
@@ -120,12 +121,13 @@ namespace smooth
 				Int				 Show();
 				Int				 Hide();
 
+				Int				 Maximize();
 				Int				 Minimize();
 
-				Int				 Maximize();
 				Int				 Restore();
 
 				Bool				 IsMaximized();
+				Bool				 IsMinimized();
 
 				Int				 Stay();
 				Int				 Close();

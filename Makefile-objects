@@ -548,6 +548,31 @@ $(OBJECTDIR)/xml_node.o: $(XMLCLASSESDIR)/node.cpp $(SMOOTHINCLUDEDIR)/xml/node.
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/node.cpp -o $(OBJECTDIR)/xml_node.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/xul_menubar.o: $(XMLCLASSESDIR)/xul/menubar.cpp $(SMOOTHINCLUDEDIR)/xml/xul/menubar.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/menubar.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/menubar.cpp -o $(OBJECTDIR)/xul_menubar.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xul_popupmenu.o: $(XMLCLASSESDIR)/xul/popupmenu.cpp $(SMOOTHINCLUDEDIR)/xml/xul/popupmenu.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/popupmenu.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/popupmenu.cpp -o $(OBJECTDIR)/xul_popupmenu.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xul_renderer.o: $(XMLCLASSESDIR)/xul/renderer.cpp $(SMOOTHINCLUDEDIR)/xml/xul/renderer.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/renderer.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/renderer.cpp -o $(OBJECTDIR)/xul_renderer.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xul_widget.o: $(XMLCLASSESDIR)/xul/widget.cpp $(SMOOTHINCLUDEDIR)/xml/xul/widget.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/widget.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/widget.cpp -o $(OBJECTDIR)/xul_widget.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xul_window.o: $(XMLCLASSESDIR)/xul/window.cpp $(SMOOTHINCLUDEDIR)/xml/xul/window.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/window.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/window.cpp -o $(OBJECTDIR)/xul_window.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h
 	$(ECHO) -n Compiling $(MISCDIR)/codecs.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/codecs.cpp -o $(OBJECTDIR)/codecs.o

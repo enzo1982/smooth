@@ -3,7 +3,10 @@ ChangeLog for smooth
 xx.xx.04 xx:xx - smooth alpha 0.8.65.0
 
 - editbox.cpp	- improved multiline editbox
+- renderer.cpp	- started implementation of a XUL renderer
+- window.cpp	- windows can now be shown minimized initially
 
+- added auto registration for backends (just compile and link any new backends to use them; no need to change existing code)
 - improved smooth Translator utility
 - added an SDL threads backend
 

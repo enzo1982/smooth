@@ -42,8 +42,13 @@ namespace smooth
 		{
 			private:
 				System::Timer		*timer;
-
+			slots:
 				Void			 TimerProc();
+
+				Int			 GetNOfLines();
+				Int			 GetNOfInvisibleLines();
+
+				String			 GetVisibleText();
 			protected:
 				Int			 promptPos;
 				Bool			 promptVisible;
@@ -65,8 +70,10 @@ namespace smooth
 				Void			 MarkText(Int, Int);
 				Void			 DeleteSelectedText();
 				Void			 InsertText(String);
-
+				Int			 ModifyText(String);
+			slots:
 				Void			 DropDownListProc();
+				Void			 ScrollbarProc();
 			public:
 				static const Int	 classID;
 

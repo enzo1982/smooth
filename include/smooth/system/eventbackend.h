@@ -29,15 +29,21 @@ namespace smooth
 
 		class EventBackend
 		{
+			private:
+				static Array<EventBackend *(*)()>	*backend_creators;
 			protected:
-				Int		 type;
+				Int					 type;
 			public:
-						 EventBackend();
-				virtual		~EventBackend();
+				static Int				 AddBackend(EventBackend *(*)());
 
-				Int		 GetEventType();
+				static EventBackend			*CreateBackendInstance();
 
-				virtual Int	 ProcessNextEvent(Bool);
+									 EventBackend();
+				virtual					~EventBackend();
+
+				Int					 GetEventType();
+
+				virtual Int				 ProcessNextEvent(Bool);
 		};
 	};
 };

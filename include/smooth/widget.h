@@ -17,8 +17,6 @@ namespace smooth
 	{
 		class Widget;
 	};
-
-	class SMOOTH;
 };
 
 #include "object.h"

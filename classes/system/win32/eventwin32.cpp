@@ -11,6 +11,13 @@
 #include <smooth/system/event.h>
 #include <smooth/system/win32/eventwin32.h>
 
+S::System::EventBackend *CreateEventWin32()
+{
+	return new S::System::EventWin32();
+}
+
+S::Int	 eventWin32Tmp = S::System::EventBackend::AddBackend(&CreateEventWin32);
+
 S::System::EventWin32::EventWin32()
 {
 	type = EVENT_WIN32;

@@ -14,6 +14,13 @@
 #include <smooth/color.h>
 #include <smooth/misc/math.h>
 
+S::GUI::SurfaceBackend *CreateSurfaceGDI(S::Void *iSurface)
+{
+	return new S::GUI::SurfaceGDI(iSurface);
+}
+
+S::Int	 surfaceGDITmp = S::GUI::SurfaceBackend::AddBackend(&CreateSurfaceGDI);
+
 S::GUI::SurfaceGDI::SurfaceGDI(Void *iDc)
 {
 	type = SURFACE_GDI;

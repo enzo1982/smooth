@@ -29,18 +29,24 @@ namespace smooth
 
 		class TimerBackend
 		{
+			private:
+				static Array<TimerBackend *(*)()>	*backend_creators;
 			protected:
-				Int		 type;
+				Int					 type;
 			public:
-						 TimerBackend();
-				virtual		~TimerBackend();
+				static Int				 AddBackend(TimerBackend *(*)());
 
-				Int		 GetTimerType();
+				static TimerBackend			*CreateBackendInstance();
 
-				virtual Int	 Start(Int);
-				virtual Int	 Stop();
+									 TimerBackend();
+				virtual					~TimerBackend();
 
-				virtual Int	 GetID();
+				Int					 GetTimerType();
+
+				virtual Int				 Start(Int);
+				virtual Int				 Stop();
+
+				virtual Int				 GetID();
 		};
 	};
 };

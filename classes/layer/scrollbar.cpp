@@ -648,6 +648,8 @@ S::Void S::GUI::Scrollbar::TimerProc()
 
 S::Int S::GUI::Scrollbar::SetRange(Int rangeStart, Int rangeEnd)
 {
+	if (rangeStart == startValue && rangeEnd == endValue) return Success;
+
 	Int	 prevStartValue	= startValue;
 	Int	 prevEndValue	= endValue;
 	Int	 prevValue	= *variable;

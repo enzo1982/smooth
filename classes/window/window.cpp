@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/window/window.h>
+#include <smooth/window/windowbackend.h>
 #include <smooth/misc/i18n.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
@@ -33,23 +34,12 @@
 #include <smooth/dllmain.h>
 #include <smooth/system/event.h>
 
-#ifdef __WIN32__
-#include <smooth/window/gdi/windowgdi.h>
-#else
-#include <smooth/window/xlib/windowxlib.h>
-#endif
-
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
 S::Int		 S::GUI::Window::nOfActiveWindows = 0;
 
 S::GUI::Window::Window(String title, Void *iWindow)
 {
-#ifdef __WIN32__
-	backend = new WindowGDI(iWindow);
-#else
-	backend = new WindowXLib(iWindow);
-#endif
-
+	backend = WindowBackend::CreateBackendInstance();
 	backend->onEvent.Connect(&Window::Process, this);
 
 	self = this;
@@ -60,6 +50,7 @@ S::GUI::Window::Window(String title, Void *iWindow)
 
 	stay		= False;
 	maximized	= False;
+	minimized	= False;
 
 	nOfActiveWindows++;
 
@@ -263,6 +254,14 @@ S::Int S::GUI::Window::Show()
 		Maximize();
 	}
 
+	if (minimized && !initshow)
+	{
+		backend->Hide();
+
+		minimized = False;
+		Minimize();
+	}
+
 	backend->Show();
 
 	initshow	= True;
@@ -285,6 +284,12 @@ S::Int S::GUI::Window::Hide()
 		Maximize();
 	}
 
+	if (minimized && !initshow)
+	{
+		minimized = False;
+		Minimize();
+	}
+
 	initshow	= True;
 	visible		= False;
 
@@ -295,7 +300,20 @@ S::Int S::GUI::Window::Hide()
 
 S::Int S::GUI::Window::Minimize()
 {
-	return backend->Minimize();
+	if (minimized) return Success;
+
+	if (!created)
+	{
+		minimized = True;
+
+		return Success;
+	}
+
+	backend->Minimize();
+
+	minimized = True;
+
+	return Success;
 }
 
 S::Int S::GUI::Window::Maximize()
@@ -318,11 +336,12 @@ S::Int S::GUI::Window::Maximize()
 
 S::Int S::GUI::Window::Restore()
 {
-	if (!maximized) return Success;
+	if (!maximized && !minimized) return Success;
 
 	if (!created)
 	{
 		maximized = False;
+		minimized = False;
 
 		return Success;
 	}
@@ -330,6 +349,7 @@ S::Int S::GUI::Window::Restore()
 	backend->Restore();
 
 	maximized = False;
+	minimized = False;
 
 	return Success;
 }
@@ -337,6 +357,11 @@ S::Int S::GUI::Window::Restore()
 S::Bool S::GUI::Window::IsMaximized()
 {
 	return maximized;
+}
+
+S::Bool S::GUI::Window::IsMinimized()
+{
+	return minimized;
 }
 
 S::Rect S::GUI::Window::GetWindowRect()

@@ -14,28 +14,12 @@
 #include <smooth/color.h>
 #include <smooth/threads/mutex.h>
 
-#ifdef __WIN32__
-#include <smooth/graphics/gdi/surfacegdi.h>
-#endif
-
 S::GUI::Surface::Surface(Void *iSurface)
 {
-	if (iSurface == NIL)
-	{
-		mutex = NIL;
+	if (iSurface == NIL)	mutex = NIL;
+	else			mutex = new Threads::Mutex();
 
-		backend = new SurfaceBackend(iSurface);
-	}
-	else
-	{
-		mutex = new Threads::Mutex();
-
-#ifdef __WIN32__
-		backend = new SurfaceGDI(iSurface);
-#else
-		backend = new SurfaceBackend(iSurface);
-#endif
-	}
+	backend = SurfaceBackend::CreateBackendInstance(iSurface);
 }
 
 S::GUI::Surface::~Surface()

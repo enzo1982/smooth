@@ -33,47 +33,53 @@ namespace smooth
 
 		class SurfaceBackend
 		{
+			private:
+				static Array<SurfaceBackend *(*)(Void *)>	*backend_creators;
 			protected:
-				Int		 type;
+				Int						 type;
 
-				Size		 size;
-				Rect		 paintRect;
+				Size						 size;
+				Rect						 paintRect;
 
-				Int		 painting;
+				Int						 painting;
 
-				Int		 TranslateX(Int);
-				Point		 TranslatePoint(Point);
-				Rect		 TranslateRect(Rect);
+				Int						 TranslateX(Int);
+				Point						 TranslatePoint(Point);
+				Rect						 TranslateRect(Rect);
 			public:
-						 SurfaceBackend(Void * = NIL);
-				virtual		~SurfaceBackend();
+				static Int					 AddBackend(SurfaceBackend *(*)(Void *));
 
-				Int		 GetSurfaceType();
+				static SurfaceBackend				*CreateBackendInstance(Void * = NIL);
 
-				Int		 SetSize(Size);
-				const Size	 GetSize();
+										 SurfaceBackend(Void * = NIL);
+				virtual						~SurfaceBackend();
 
-				virtual Int	 PaintRect(Rect);
+				Int						 GetSurfaceType();
 
-				virtual Int	 StartPaint(Rect);
-				virtual Int	 EndPaint();
+				Int						 SetSize(Size);
+				const Size					 GetSize();
 
-				virtual Void	*GetSystemSurface();
+				virtual Int					 PaintRect(Rect);
 
-				virtual Int	 SetPixel(Int, Int, Int);
-				virtual Int	 GetPixel(Int, Int);
+				virtual Int					 StartPaint(Rect);
+				virtual Int					 EndPaint();
 
-				virtual Int	 Line(Point, Point, Int);
-				virtual Int	 Frame(Rect, Int);
-				virtual Int	 Box(Rect, Int, Int);
+				virtual Void					*GetSystemSurface();
 
-				virtual Int	 SetText(String, Rect, Font, Bool);
+				virtual Int					 SetPixel(Int, Int, Int);
+				virtual Int					 GetPixel(Int, Int);
 
-				Int		 Gradient(Rect, Int, Int, Int);
-				Int		 Bar(Point, Point, Int);
+				virtual Int					 Line(Point, Point, Int);
+				virtual Int					 Frame(Rect, Int);
+				virtual Int					 Box(Rect, Int, Int);
 
-				virtual Int	 BlitFromBitmap(const Bitmap &, Rect, Rect);
-				virtual Int	 BlitToBitmap(Rect, const Bitmap &, Rect);
+				virtual Int					 SetText(String, Rect, Font, Bool);
+
+				Int						 Gradient(Rect, Int, Int, Int);
+				Int						 Bar(Point, Point, Int);
+
+				virtual Int					 BlitFromBitmap(const Bitmap &, Rect, Rect);
+				virtual Int					 BlitToBitmap(Rect, const Bitmap &, Rect);
 		};
 	};
 };

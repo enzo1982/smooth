@@ -12,6 +12,13 @@
 #include <smooth/system/win32/timerwin32.h>
 #include <smooth/objectmanager.h>
 
+S::System::TimerBackend *CreateTimerWin32()
+{
+	return new S::System::TimerWin32();
+}
+
+S::Int	 timerWin32Tmp = S::System::TimerBackend::AddBackend(&CreateTimerWin32);
+
 S::System::TimerWin32::TimerWin32()
 {
 	type = TIMER_WIN32;

@@ -9,20 +9,11 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/event.h>
-
-#ifdef __WIN32__
-#include <smooth/system/win32/eventwin32.h>
-#else
 #include <smooth/system/eventbackend.h>
-#endif
 
 S::System::EventProcessor::EventProcessor()
 {
-#ifdef __WIN32__
-	backend = new EventWin32();
-#else
-	backend = new EventBackend();
-#endif
+	backend = EventBackend::CreateBackendInstance();
 }
 
 S::System::EventProcessor::~EventProcessor()

@@ -110,4 +110,6 @@
 #include "smooth/xml/document.h"
 #include "smooth/xml/node.h"
 
+#include "smooth/xml/xul/renderer.h"
+
 #endif

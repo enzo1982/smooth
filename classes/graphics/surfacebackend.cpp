@@ -13,6 +13,32 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/color.h>
 
+S::GUI::SurfaceBackend *CreateSurfaceBackend(S::Void *iSurface)
+{
+	return new S::GUI::SurfaceBackend(iSurface);
+}
+
+S::Int	 surfaceBackendTmp = S::GUI::SurfaceBackend::AddBackend(&CreateSurfaceBackend);
+
+S::Array<S::GUI::SurfaceBackend *(*)(S::Void *)>	*S::GUI::SurfaceBackend::backend_creators = NIL;
+
+S::Int S::GUI::SurfaceBackend::AddBackend(SurfaceBackend *(*backend)(Void *))
+{
+	if (backend == NIL) return Error;
+
+	if (backend_creators == NIL) backend_creators = new Array<SurfaceBackend *(*)(Void *)>;
+
+	backend_creators->AddEntry(backend);
+
+	return Success;
+}
+
+S::GUI::SurfaceBackend *S::GUI::SurfaceBackend::CreateBackendInstance(Void *iSurface)
+{
+	if (backend_creators->GetFirstEntry() != &CreateSurfaceBackend)	return backend_creators->GetFirstEntry()(iSurface);
+	else								return backend_creators->GetLastEntry()(iSurface);
+}
+
 S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface)
 {
 	type = SURFACE_NONE;

@@ -548,6 +548,75 @@ SOURCE=..\classes\window\windowbackend.cpp
 # Begin Group "xml"
 
 # PROP Default_Filter "*.cpp"
+# Begin Group "xul"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\xml\xul\menubar.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_xul"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\xml\xul\popupmenu.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_xul"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\xml\xul\renderer.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_xul"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\xml\xul\widget.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_xul"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\xml\xul\window.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_xul"
+
+!ENDIF 
+
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\classes\xml\attribute.cpp
@@ -882,6 +951,30 @@ SOURCE=..\include\smooth\types\void.h
 # Begin Group "xmlheaders"
 
 # PROP Default_Filter "*.h"
+# Begin Group "xulheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\xml\xul\menubar.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\xml\xul\popupmenu.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\xml\xul\renderer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\xml\xul\widget.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\xml\xul\window.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\xml\attribute.h

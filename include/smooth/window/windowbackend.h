@@ -34,43 +34,49 @@ namespace smooth
 
 		class WindowBackend
 		{
+			private:
+				static Array<WindowBackend *(*)()>	*backend_creators;
 			protected:
-				Int				 type;
+				Int					 type;
 
-				Surface				*nullSurface;
-				Surface				*drawSurface;
+				Surface					*nullSurface;
+				Surface					*drawSurface;
 			public:
-								 WindowBackend(Void * = NIL);
-				virtual				~WindowBackend();
+				static Int				 AddBackend(WindowBackend *(*)());
 
-				Int				 GetWindowType();
+				static WindowBackend			*CreateBackendInstance();
 
-				virtual Void			*GetSystemWindow();
+									 WindowBackend(Void * = NIL);
+				virtual					~WindowBackend();
 
-				virtual Surface			*GetDrawSurface();
+				Int					 GetWindowType();
 
-				virtual Int			 Open(String, Point, Size, Int);
-				virtual Int			 Close();
+				virtual Void				*GetSystemWindow();
 
-				virtual Int			 SetTitle(String);
-				virtual Int			 SetIcon(Bitmap &);
+				virtual Surface				*GetDrawSurface();
 
-				virtual Int			 SetMinimumSize(Size);
-				virtual Int			 SetMaximumSize(Size);
+				virtual Int				 Open(String, Point, Size, Int);
+				virtual Int				 Close();
 
-				virtual Int			 Show();
-				virtual Int			 Hide();
+				virtual Int				 SetTitle(String);
+				virtual Int				 SetIcon(Bitmap &);
 
-				virtual Rect			 GetRestoredWindowRect();
+				virtual Int				 SetMinimumSize(Size);
+				virtual Int				 SetMaximumSize(Size);
 
-				virtual Int			 SetMetrics(const Point &, const Size &);
+				virtual Int				 Show();
+				virtual Int				 Hide();
 
-				virtual Int			 Minimize();
+				virtual Rect				 GetRestoredWindowRect();
 
-				virtual Int			 Maximize();
-				virtual Int			 Restore();
+				virtual Int				 SetMetrics(const Point &, const Size &);
+
+				virtual Int				 Minimize();
+
+				virtual Int				 Maximize();
+				virtual Int				 Restore();
 			signals:
-				Callback3<Int, Int, Int, Int>	 onEvent;
+				Callback3<Int, Int, Int, Int>		 onEvent;
 		};
 	};
 };

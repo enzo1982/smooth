@@ -10,6 +10,32 @@
 
 #include <smooth/system/timerbackend.h>
 
+S::System::TimerBackend *CreateTimerBackend()
+{
+	return new S::System::TimerBackend();
+}
+
+S::Int	 timerBackendTmp = S::System::TimerBackend::AddBackend(&CreateTimerBackend);
+
+S::Array<S::System::TimerBackend *(*)()>	*S::System::TimerBackend::backend_creators = NIL;
+
+S::Int S::System::TimerBackend::AddBackend(TimerBackend *(*backend)())
+{
+	if (backend == NIL) return Error;
+
+	if (backend_creators == NIL) backend_creators = new Array<TimerBackend *(*)()>;
+
+	backend_creators->AddEntry(backend);
+
+	return Success;
+}
+
+S::System::TimerBackend *S::System::TimerBackend::CreateBackendInstance()
+{
+	if (backend_creators->GetFirstEntry() != &CreateTimerBackend)	return backend_creators->GetFirstEntry()();
+	else								return backend_creators->GetLastEntry()();
+}
+
 S::System::TimerBackend::TimerBackend()
 {
 	type = TIMER_NONE;

@@ -56,6 +56,8 @@ S::GUI::ListBox::~ListBox()
 		if (scrollbar->IsRegistered() && myContainer != NIL) myContainer->UnregisterObject(scrollbar);
 
 		DeleteObject(scrollbar);
+
+		scrollbar = NIL;
 	}
 
 	if (header != NIL)
@@ -63,6 +65,8 @@ S::GUI::ListBox::~ListBox()
 		if (registered && myContainer != NIL && !(flags & LF_HIDEHEADER)) myContainer->UnregisterObject(header);
 
 		DeleteObject(header);
+
+		header = NIL;
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);

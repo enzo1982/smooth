@@ -14,6 +14,13 @@
 #include <smooth/system/system.h>
 #include <smooth/loop.h>
 
+S::GUI::WindowBackend *CreateWindowGDI()
+{
+	return new S::GUI::WindowGDI();
+}
+
+S::Int	 windowGDITmp = S::GUI::WindowBackend::AddBackend(&CreateWindowGDI);
+
 S::Array<S::GUI::WindowGDI *>	 S::GUI::WindowGDI::windowBackends;
 
 LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)

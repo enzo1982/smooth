@@ -9,22 +9,13 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/timer.h>
-
-#ifdef __WIN32__
-#include <smooth/system/win32/timerwin32.h>
-#else
-#include <smooth/system/sdl/timersdl.h>
-#endif
+#include <smooth/system/timerbackend.h>
 
 const S::Int	 S::System::Timer::classID = S::Object::RequestClassID();
 
 S::System::Timer::Timer()
 {
-#ifdef __WIN32__
-	backend = new TimerWin32();
-#else
-	backend = new TimerSDL();
-#endif
+	backend = TimerBackend::CreateBackendInstance();
 
 	type = classID;
 

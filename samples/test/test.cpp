@@ -50,7 +50,6 @@ Test::Test()
 	mainWnd_menubar		= new Menubar();
 	mainWnd_menubar2	= new Menubar();
 	mainWnd_iconbar		= new Menubar();
-	mainWnd_menubar_file	= new Menu();
 	mainWnd_layer		= new Layer();
 	rlayer1			= new Layer("Register");
 	rlayer2			= new Layer("Test");
@@ -66,7 +65,7 @@ Test::Test()
 	mainWnd_layer_check2	= new CheckBox("Click me!", bp, bs, &checkbox);
 	bp.y += 20;
 	mainWnd_layer_active1	= new ActiveArea(RGB(0, 255, 0), bp, bs);
-	mainWnd_layer_active1->onClick.Connect(&Test::testDlgSelectColor, this);
+//	mainWnd_layer_active1->onClick.Connect(&Test::testDlgSelectColor, this);
 	bp.y -= 65;
 	bp.x += 90;
 	mainWnd_layer_option1	= new OptionBox("Chooseable", bp, bs, &optionboxes, 1);
@@ -134,21 +133,16 @@ Test::Test()
 
 	// fill the menus:
 
-	MenuEntry	*entry;
+	menu_file		= new Menu();
+	menu_file->AddEntry("Exit")->onClick.Connect(&Test::Close, this);
 
-	entry = mainWnd_menubar_file->AddEntry("Exit");
-	entry->onClick.Connect(&Test::Close, this);
-	entry->SetStatusText("Exit this program");
+	menu_dialogs		= new Menu();
+	menu_dialogs->AddEntry("Color selection...")->onClick.Connect(&Test::DlgColor, this);
+	menu_dialogs->AddEntry("File selection...")->onClick.Connect(&Test::DlgFile, this);
+	menu_dialogs->AddEntry("Dir selection...")->onClick.Connect(&Test::DlgDir, this);
 
-	entry = mainWnd_menubar_file->AddEntry("Test");
-	entry->onClick.Connect(&Test::HideEdb, this);
-	entry->SetStatusText("Execute test proc");
-
-	mainWnd_menubar_file->AddEntry("Exit", NIL, mainWnd_menubar_file);
-
-	mainWnd_menubar->AddEntry("File test")->onClick.Connect(&Test::testDlgOpenFile, this);
-	mainWnd_menubar->AddEntry("Directory test")->onClick.Connect(&Test::testDlgSelectDir, this);
-	mainWnd_menubar->AddEntry("File", NIL, mainWnd_menubar_file);
+	mainWnd_menubar->AddEntry("File", NIL, menu_file);
+	mainWnd_menubar->AddEntry("Dialogs", NIL, menu_dialogs);
 	mainWnd_menubar->AddEntry("Quit")->onClick.Connect(&Test::Close, this);
 
 	mainWnd_menubar2->AddEntry("ECM test");
@@ -258,6 +252,8 @@ mainWnd_iconbar->SetOrientation(OR_LEFT);
 	mainWnd->getTrackMenu.Connect(&Test::GetTrackMenu, this);
 	mainWnd->doQuit.Connect(&Test::mainWnd_KillProc, this);
 
+	mainWnd->onShow.Connect(&Test::ShowTipOfTheDay, this);
+
 	secWnd->SetMetrics(Point(480, 130), Size(170, 90));
 	secWnd->SetIcon(Bitmap::LoadBitmap("icons.pci", 0, NIL));
 	secWnd->SetFlags(WF_APPTOPMOST);
@@ -269,48 +265,6 @@ Test::~Test()
 {
 	messageBoxThread->Stop();
 
-	// das Programm wurde vom User beendet, alle Objekte werden dort abgemeldet, wo sie registriert wurden:
-	secWnd->UnregisterObject(secWnd_titlebar);
-
-	UnregisterObject(secWnd);
-
-	rlayer1->UnregisterObject(rlayer1_slider1);
-	rlayer1->UnregisterObject(rlayer1_arrows1);
-	rlayer2->UnregisterObject(rlayer2_editbox1);
-	rlayer3->UnregisterObject(rlayer3_scrollbar1);
-	rlayer3->UnregisterObject(rlayer3_progress1);
-
-	mainWnd_layer_reg1->UnregisterObject(rlayer1);
-	mainWnd_layer_reg1->UnregisterObject(rlayer2);
-	mainWnd_layer_reg1->UnregisterObject(rlayer3);
-
-	mainWnd_layer->UnregisterObject(mainWnd_layer_button);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_check1);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_check2);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_option1);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_option2);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_group1);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_text1);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_link1);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_active1);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_reg1);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_list1);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_list2);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_combo1);
-	mainWnd_layer->UnregisterObject(mainWnd_layer_tree1);
-
-	mainWnd->UnregisterObject(mainWnd_layer);
-	mainWnd->UnregisterObject(mainWnd_iconbar);
-	mainWnd->UnregisterObject(mainWnd_menubar);
-	mainWnd->UnregisterObject(mainWnd_menubar2);
-	mainWnd->UnregisterObject(mainWnd_divisionbar);
-	mainWnd->UnregisterObject(mainWnd_client);
-	mainWnd->UnregisterObject(mainWnd_statusbar);
-	mainWnd->UnregisterObject(mainWnd_titlebar);
-
-	UnregisterObject(mainWnd);
-
-	// alle Obbjekte werden aus dem Speicher entfernt:
 	DeleteObject(secWnd_titlebar);
 	DeleteObject(secWnd);
 
@@ -341,7 +295,8 @@ Test::~Test()
 	DeleteObject(rlayer2);
 	DeleteObject(rlayer3);
 
-	delete mainWnd_menubar_file;
+	delete menu_file;
+	delete menu_dialogs;
 
 	DeleteObject(mainWnd_layer);
 	DeleteObject(mainWnd_iconbar);
@@ -389,23 +344,9 @@ void Test::HideEdb()
 	rlayer2_editbox1->Hide();
 }
 
-void Test::Close()
-{
-	QuickMessage("You clicked the button!", "Hello", MB_OK, IDI_INFORMATION);
-//	mainWnd->Close();
-}
-
 Int Test::threadMessageBox(Thread *thread)
 {
 	thread->SetFlags(THREAD_KILLFLAG_WAIT);	// for this thread can quit itself (after closing the MessageBox) it needn't be terminated by smooth (KILLTHREAD_KILL is default)
-
-	TipOfTheDay	*dlg = new TipOfTheDay();
-
-	dlg->AddTip("...that smooth has a \'Tip of the day\' dialog?");
-
-	dlg->ShowDialog();
-
-	DeleteObject(dlg);
 
 	QuickMessage("This MessageBox is running in a separate thread!", "Info", MB_OK, IDI_INFORMATION);
 
@@ -414,21 +355,45 @@ Int Test::threadMessageBox(Thread *thread)
 	return Success;
 }
 
-Void Test::testDlgSelectColor()
+Menu *Test::GetTrackMenu(Int mouseX, Int mouseY)
+{
+	return menu_file;
+}
+
+/*----------------------------------------------*/
+
+Void Test::Close()
+{
+	mainWnd->Close();
+}
+
+Void Test::ShowTipOfTheDay()
+{
+	TipOfTheDay	*dialog = new TipOfTheDay();
+
+	dialog->AddTip("...that smooth has a \'Tip of the day\' dialog?");
+	dialog->AddTip("With this application you can test most of the smooth widgets\nand dialogs.");
+
+	dialog->ShowDialog();
+
+	DeleteObject(dialog);
+}
+
+Void Test::DlgColor()
 {
 	ColorSelection	*dialog = new ColorSelection();
 
 	dialog->SetParentWindow(mainWnd);
-	dialog->SetColor(mainWnd_layer_active1->GetColor());
+//	dialog->SetColor(mainWnd_layer_active1->GetColor());
 
 	dialog->ShowDialog();
 
-	mainWnd_layer_active1->SetColor(dialog->GetColor());
+//	mainWnd_layer_active1->SetColor(dialog->GetColor());
 
-	delete dialog;
+	DeleteObject(dialog);
 }
 
-Void Test::testDlgOpenFile()
+Void Test::DlgFile()
 {
 	FileSelection	*dialog = new FileSelection();
 
@@ -436,14 +401,14 @@ Void Test::testDlgOpenFile()
 	dialog->SetFlags(SFD_ALLOWMULTISELECT);
 
 	dialog->AddFilter("All Files", "*.*");
-	dialog->AddFilter("JPEG Files (*.jpg; *.jpeg)", "*.jpg; *.jpeg");
+	dialog->AddFilter("Image Files (*.jpg; *.jpeg)", "*.jpg; *.jpeg");
 	dialog->AddFilter("Text Files (*.txt)", "*.txt");
 
 	if (dialog->ShowDialog() == Success)
 	{
 		String	 message = "Selected files:\n";
 
-		for (int i = 0; i < dialog->GetNumberOfFiles(); i++)
+		for (Int i = 0; i < dialog->GetNumberOfFiles(); i++)
 		{
 			message.Append("\n").Append(dialog->GetNthFileName(i));
 		}
@@ -451,10 +416,10 @@ Void Test::testDlgOpenFile()
 		QuickMessage(message, "Info", MB_OK, IDI_INFORMATION);
 	}
 
-	delete dialog;
+	DeleteObject(dialog);
 }
 
-Void Test::testDlgSelectDir()
+Void Test::DlgDir()
 {
 	DirSelection	*dialog = new DirSelection();
 
@@ -462,13 +427,8 @@ Void Test::testDlgSelectDir()
 
 	if (dialog->ShowDialog() == Success)
 	{
-		QuickMessage(dialog->GetDirName(), "Info", MB_OK, IDI_INFORMATION);
+		QuickMessage(String("The following directory has been selected: ").Append(dialog->GetDirName()), "Info", MB_OK, IDI_INFORMATION);
 	}
 
-	delete dialog;
-}
-
-Menu *Test::GetTrackMenu(Int mouseX, Int mouseY)
-{
-	return mainWnd_menubar_file;
+	DeleteObject(dialog);
 }

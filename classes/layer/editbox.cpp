@@ -69,6 +69,8 @@ S::GUI::EditBox::~EditBox()
 		if (myContainer != NIL) myContainer->UnregisterObject(comboBox);
 
 		DeleteObject(comboBox);
+
+		comboBox = NIL;
 	}
 
 	if (scrollbar != NIL)
@@ -76,6 +78,8 @@ S::GUI::EditBox::~EditBox()
 		if (myContainer != NIL) myContainer->UnregisterObject(scrollbar);
 
 		DeleteObject(scrollbar);
+
+		scrollbar = NIL;
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
@@ -93,7 +97,6 @@ S::Int S::GUI::EditBox::Paint(Int message)
 	Rect	 frame;
 	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
-	String	 visText = objectProperties->text;
 
 	switch (message)
 	{
@@ -104,8 +107,12 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			frame.right	= realPos.x + objectProperties->size.cx - 1;
 			frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
+			if (scrollbar != NIL) frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
+
 			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
 			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+
+			if (scrollbar != NIL) frame.right += (METRIC_LISTBOXSBOFFSET + 1);
 
 			surface->Frame(frame, FRAME_DOWN);
 
@@ -144,7 +151,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 				scrollbarPos = 0;
 
-				scrollbar = new Scrollbar(Point(frame.right - layer->GetObjectProperties()->pos.x - 17, frame.top - layer->GetObjectProperties()->pos.y + 1), Size(0, objectProperties->size.cy - 2), OR_VERT, &scrollbarPos, 0, 100);
+				scrollbar = new Scrollbar(Point(frame.right - layer->GetObjectProperties()->pos.x - 17, frame.top - layer->GetObjectProperties()->pos.y + 1), Size(0, objectProperties->size.cy - 2), OR_VERT, &scrollbarPos, 0, GetNOfInvisibleLines());
+				scrollbar->onClick.Connect(&EditBox::ScrollbarProc, this);
 
 				myContainer->RegisterObject(scrollbar);
 
@@ -157,6 +165,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 				scrollbar->GetObjectProperties()->pos = Point(frame.right - layer->GetObjectProperties()->pos.x - 17, frame.top - layer->GetObjectProperties()->pos.y + 1);
 				scrollbar->GetObjectProperties()->size.cy = objectProperties->size.cy - 2;
 
+				scrollbar->SetRange(0, GetNOfInvisibleLines());
+
 				scrollbar->Paint(SP_PAINT);
 			}
 			else if ((flags | EDB_MULTILINE) && (objectProperties->font.GetTextSizeY(objectProperties->text) <= objectProperties->size.cy - 6) && (scrollbar != NIL))
@@ -168,19 +178,11 @@ S::Int S::GUI::EditBox::Paint(Int message)
 				DeleteObject(scrollbar);
 
 				scrollbar = NIL;
-			}
-
-			if (invisibleChars > 0)
-			{
-				visText = "";
-
-				for (Int i = 0; i < objectProperties->text.Length() - invisibleChars; i++)
-				{
-					visText[i] = objectProperties->text[i + invisibleChars];
-				}
+				scrollbarPos = 0;
 			}
 
 			Font	 font = objectProperties->font;
+			String	 visText = GetVisibleText();
 
 			if (!active) font.SetColor(Setup::TextColor);
 
@@ -213,17 +215,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 	Point	 p1;
 	Int	 newpos = 0;
 	Int	 leftButton = 0;
-	String	 visText = objectProperties->text;
-
-	if (invisibleChars > 0)
-	{
-		visText = "";
-
-		for (Int i = 0; i < objectProperties->text.Length() - invisibleChars; i++)
-		{
-			visText[i] = objectProperties->text[i + invisibleChars];
-		}
-	}
+	String	 visText = GetVisibleText();
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -677,18 +669,8 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 p1;
-	String	 visText = objectProperties->text;
+	String	 visText = GetVisibleText();
 	Int	 oInvisChars = invisibleChars;
-
-	if (invisibleChars > 0)
-	{
-		visText = "";
-
-		for (Int i = 0; i < objectProperties->text.Length() - invisibleChars; i++)
-		{
-			visText[i] = objectProperties->text[i + invisibleChars];
-		}
-	}
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -708,17 +690,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	if (promptPos <= invisibleChars && invisibleChars > 0) invisibleChars = promptPos;
 
-	visText = objectProperties->text;
-
-	if (invisibleChars > 0)
-	{
-		visText = "";
-
-		for (Int i = 0; i < objectProperties->text.Length() - invisibleChars; i++)
-		{
-			visText[i] = objectProperties->text[i + invisibleChars];
-		}
-	}
+	visText = GetVisibleText();
 
 	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
 	else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
@@ -738,7 +710,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 		else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 	}
 
-	if (invisibleChars != oInvisChars) SetText(objectProperties->text);
+	if (invisibleChars != oInvisChars) ModifyText(objectProperties->text);
 
 	promptPos = newPos;
 
@@ -780,17 +752,7 @@ S::Void S::GUI::EditBox::RemoveCursor()
 
 	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 p = GetRealPosition();
-	String	 visText = objectProperties->text;
-
-	if (invisibleChars > 0)
-	{
-		visText = "";
-
-		for (Int i = 0; i < objectProperties->text.Length() - invisibleChars; i++)
-		{
-			visText[i] = objectProperties->text[i + invisibleChars];
-		}
-	}
+	String	 visText = GetVisibleText();
 
 	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p.x += 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
 	else						p.x += 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
@@ -810,17 +772,7 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 p1;
-	String	 visText = objectProperties->text;
-
-	if (invisibleChars > 0)
-	{
-		visText = "";
-
-		for (Int i = 0; i < objectProperties->text.Length() - invisibleChars; i++)
-		{
-			visText[i] = objectProperties->text[i + invisibleChars];
-		}
-	}
+	String	 visText = GetVisibleText();
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -916,7 +868,7 @@ S::Void S::GUI::EditBox::DeleteSelectedText()
 	for (Int i = 0; i < bMarkStart; i++)		newText[i] = objectProperties->text[i];
 	for (Int j = bMarkEnd; j <= nOfChars; j++)	newText[j - (bMarkEnd - bMarkStart)] = objectProperties->text[j];
 
-	SetText(newText);
+	ModifyText(newText);
 
 	promptPos = prevPromptPos;
 
@@ -933,7 +885,7 @@ S::Void S::GUI::EditBox::InsertText(String insertText)
 	for (Int j = promptPos; j < promptPos + insertText.Length(); j++)	newText[j] = insertText[j - promptPos];
 	for (Int k = promptPos; k <= nOfChars; k++)				newText[k + insertText.Length()] = objectProperties->text[k];
 
-	SetText(newText);
+	ModifyText(newText);
 
 	promptPos = prevPromptPos;
 
@@ -988,6 +940,13 @@ S::Int S::GUI::EditBox::Deactivate()
 
 S::Int S::GUI::EditBox::SetText(String txt)
 {
+	scrollbarPos = 0;
+
+	return ModifyText(txt);
+}
+
+S::Int S::GUI::EditBox::ModifyText(String txt)
+{
 	RemoveCursor();
 
 	promptPos = 0;
@@ -1020,7 +979,7 @@ S::Void S::GUI::EditBox::DropDownListProc()
 {
 	if (comboBox->GetSelectedEntry() == NIL) return;
 
-	SetText(comboBox->GetSelectedEntry()->name);
+	ModifyText(comboBox->GetSelectedEntry()->name);
 
 	comboBox->GetSelectedEntry()->clicked = False;
 
@@ -1045,17 +1004,7 @@ S::Void S::GUI::EditBox::TimerProc()
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 lineStart;
-	String	 visText = objectProperties->text;
-
-	if (invisibleChars > 0)
-	{
-		visText = "";
-
-		for (Int i = 0; i < objectProperties->text.Length() - invisibleChars; i++)
-		{
-			visText[i] = objectProperties->text[i + invisibleChars];
-		}
-	}
+	String	 visText = GetVisibleText();
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -1074,8 +1023,78 @@ S::Void S::GUI::EditBox::TimerProc()
 	promptVisible = !promptVisible;
 }
 
+S::Void S::GUI::EditBox::ScrollbarProc()
+{
+	Surface	*surface = myContainer->GetDrawSurface();
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
+
+	frame.left	= realPos.x;
+	frame.top	= realPos.y;
+	frame.right	= realPos.x + objectProperties->size.cx - 1;
+	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+
+	surface->StartPaint(frame);
+	Paint(SP_PAINT);
+	surface->EndPaint();
+}
+
 S::Int S::GUI::EditBox::GetCursorPos()
 {
 	if (objectProperties->clicked)	return promptPos;
 	else				return -1;
+}
+
+S::Int S::GUI::EditBox::GetNOfLines()
+{
+	Int	 lines = 1;
+
+	for (Int i = 0; i < objectProperties->text.Length(); i++)
+	{
+		if (objectProperties->text[i] == '\n') lines++;
+	}
+
+	return lines;
+}
+
+S::Int S::GUI::EditBox::GetNOfInvisibleLines()
+{
+	return 1 + GetNOfLines() - Math::Floor((objectProperties->size.cy - 6) / (objectProperties->font.GetLineSizeY(objectProperties->text) + 1));
+}
+
+S::String S::GUI::EditBox::GetVisibleText()
+{
+	String	 visibleText = objectProperties->text;
+
+	if (invisibleChars > 0)
+	{
+		visibleText = "";
+
+		for (Int i = 0; i < objectProperties->text.Length() - invisibleChars; i++)
+		{
+			visibleText[i] = objectProperties->text[i + invisibleChars];
+		}
+	}
+
+	if (scrollbar != NIL)
+	{
+		visibleText = "";
+
+		Int	 invisibleLines = scrollbarPos;
+		Int	 i;
+
+		for (i = 0; i < objectProperties->text.Length(); i++)
+		{
+			if (objectProperties->text[i] == '\n') { invisibleLines--; i++; }
+
+			if (invisibleLines == 0) break;
+		}
+
+		for (Int j = 0; j < objectProperties->text.Length() - i; j++)
+		{
+			visibleText[j] = objectProperties->text[j + i];
+		}
+	}
+
+	return visibleText;
 }

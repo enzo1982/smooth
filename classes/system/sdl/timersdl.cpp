@@ -14,6 +14,13 @@
 
 #include <SDL/SDL.h>
 
+S::System::TimerBackend *CreateTimerSDL()
+{
+	return new S::System::TimerSDL();
+}
+
+S::Int	 timerSDLTmp = S::System::TimerBackend::AddBackend(&CreateTimerSDL);
+
 S::System::TimerSDL::TimerSDL()
 {
 	type = TIMER_SDL;

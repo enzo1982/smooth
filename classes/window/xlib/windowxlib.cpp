@@ -15,6 +15,13 @@
 #include <smooth/loop.h>
 #include <smooth/backends/xlib/backendxlib.h>
 
+S::GUI::WindowBackend *CreateWindowXLib()
+{
+	return new S::GUI::WindowXLib();
+}
+
+S::Int	 windowXLibTmp = S::GUI::WindowBackend::AddBackend(&CreateWindowXLib);
+
 S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 {
 	type = WINDOW_XLIB;

@@ -352,7 +352,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 	Bitmap		 bmp(256, 256, 24);
 	Rect		 urect = dlgwnd->GetUpdateRect();
 	Rect		 irect;
-	int		 hssize = Math::Round(205 * Setup::FontSize);
+	int		 hssize = Math::Round(205.0 * Setup::FontSize);
 	double		 hue = 0;
 	double		 huebias = 256 / (double) hssize;
 	register int	 xmin = 0;
@@ -422,6 +422,8 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 	rect.right	= rect.left + hssize;
 	rect.bottom	= rect.top + hssize;
 
+	surface->StartPaint(Rect(Point(3, yoffset - 4), Size(hssize + 35, hssize + 5)));
+
 	forcehupdate = true;
 	preventvsupdate = true;
 
@@ -446,11 +448,11 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 
 		for (register int sat = max(0, ymin); sat < min(hssize, ymax); sat++)
 		{
-			normrgb = colortable[acthue][255 - Math::Round(sat * (256 / (205 * Setup::FontSize)))];
+			normrgb = colortable[acthue][255 - Math::Round(sat * (256.0 / (205.0 * Setup::FontSize)))];
 
-			rbias = (double) GetRed(normrgb) / (255 / (256 / (205 * Setup::FontSize)));
-			gbias = (double) GetGreen(normrgb) / (255 / (256 / (205 * Setup::FontSize)));
-			bbias = (double) GetBlue(normrgb) / (255 / (256 / (205 * Setup::FontSize)));
+			rbias = (double) GetRed(normrgb) / (255.0 / (256.0 / (205.0 * Setup::FontSize)));
+			gbias = (double) GetGreen(normrgb) / (255.0 / (256.0 / (205.0 * Setup::FontSize)));
+			bbias = (double) GetBlue(normrgb) / (255.0 / (256.0 / (205.0 * Setup::FontSize)));
 
 			ared = -rbias + max(0, xmin) * rbias;
 			agreen = -gbias + max(0, xmin) * gbias;
@@ -469,6 +471,8 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 	preventhupdate = true;
 
 	ColorDlgUpdatePickers();
+
+	surface->EndPaint();
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int lparam)
@@ -482,7 +486,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 	int	 newsat;
 	int	 newhue;
 	int	 leftbutton;
-	int	 hssize = Math::Round(205 * Setup::FontSize);
+	int	 hssize = Math::Round(205.0 * Setup::FontSize);
 
 	huerect.left	= huexoffset;
 	huerect.top	= yoffset;
@@ -571,7 +575,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					break;
 				}
 
-				newhue = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
+				newhue = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (256.0 / (205.0 * Setup::FontSize)));
 
 				if (newhue != acthue)
 				{
@@ -609,8 +613,8 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					break;
 				}
 
-				newval = Math::Round(max(min(dlgwnd->MouseX() - 8, hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
-				newsat = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
+				newval = Math::Round(max(min(dlgwnd->MouseX() - 8, hssize - 1), 0) * (256.0 / (205.0 * Setup::FontSize)));
+				newsat = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (256.0 / (205.0 * Setup::FontSize)));
 
 				if ((newval != actval) || (newsat != actsat))
 				{
@@ -619,7 +623,11 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					actval = newval;
 					actsat = newsat;
 
+					surface->StartPaint(Rect(Point(3, yoffset - 4), Size(hssize + 5, hssize + 5)));
+
 					ColorDlgUpdatePickers();
+
+					surface->EndPaint();
 
 					actred = GetRed(ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)));
 					actgreen = GetGreen(ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)));
@@ -648,7 +656,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 	Point	 p2;
 	int	 ahrgb = ConvertColor(HSV, RGB, RGB(acthue, 255, 255));
 	int	 rgb;
-	int	 hssize = Math::Round(205 * Setup::FontSize);
+	int	 hssize = Math::Round(205.0 * Setup::FontSize);
 
 	if (((lasthue != acthue) || forcehupdate) && !preventhupdate)
 	{
@@ -656,16 +664,16 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 		if (lasthue != -1)
 		{
 			p1.x = huexoffset + 1;
-			p1.y = yoffset + 1 + (int) ((255 - lasthue) / (256 / (205 * Setup::FontSize)));
+			p1.y = yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / (205.0 * Setup::FontSize)));
 			p2.x = huexoffset + 17;
-			p2.y = yoffset + 1 + (int) ((255 - lasthue) / (256 / (205 * Setup::FontSize)));
+			p2.y = yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / (205.0 * Setup::FontSize)));
 
 			surface->Line(p1, p2, ConvertColor(HSV, RGB, RGB(lasthue, 255, 255)));
 		}
 
 		for (int x = huexoffset + 1; x < (huexoffset + 17); x++)
 		{
-			surface->SetPixel(x, yoffset + 1 + (int) ((255 - acthue) / (256 / (205 * Setup::FontSize))), RGB(255-GetRed(ahrgb), 255-GetGreen(ahrgb), 255-GetBlue(ahrgb)));
+			surface->SetPixel(x, yoffset + 1 + (int) ((255.0 - acthue) / (256.0 / (205.0 * Setup::FontSize))), RGB(255-GetRed(ahrgb), 255-GetGreen(ahrgb), 255-GetBlue(ahrgb)));
 		}
 
 		lasthue = acthue;
@@ -678,16 +686,16 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 		{
 			for (int x = 0; x < hssize; x++)
 			{
-				rgb = ConvertColor(HSV, RGB, RGB(acthue, lastsat, (int) (x * (256 / (205 * Setup::FontSize)))));
+				rgb = ConvertColor(HSV, RGB, RGB(acthue, lastsat, (int) (x * (256.0 / (205.0 * Setup::FontSize)))));
 
-				surface->SetPixel(x + 8, yoffset + 1 + (int) ((255 - lastsat) / (256 / (205 * Setup::FontSize))), rgb);
+				surface->SetPixel(x + 8, yoffset + 1 + (int) ((255.0 - lastsat) / (256.0 / (205.0 * Setup::FontSize))), rgb);
 			}
 
 			for (int y = 0; y < hssize; y++)
 			{
-				rgb = ConvertColor(HSV, RGB, RGB(acthue, (int) (255 - (y * (256 / (205 * Setup::FontSize)))), lastval));
+				rgb = ConvertColor(HSV, RGB, RGB(acthue, (int) (255.0 - (y * (256.0 / (205.0 * Setup::FontSize)))), lastval));
 
-				surface->SetPixel(8 + (int) (lastval / (256 / (205 * Setup::FontSize))), y + yoffset + 1, rgb);
+				surface->SetPixel(8 + (int) (lastval / (256.0 / (205.0 * Setup::FontSize))), y + yoffset + 1, rgb);
 			}
 		}
 
@@ -695,14 +703,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 		{
 			rgb = ConvertColor(HSV, RGB, RGB(acthue, actsat, x));
 
-			surface->SetPixel(x + 8, yoffset + 1 + (int) ((255 - actsat) / (256 / (205 * Setup::FontSize))), RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
+			surface->SetPixel(x + 8, yoffset + 1 + (int) ((255.0 - actsat) / (256.0 / (205.0 * Setup::FontSize))), RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
 		}
 
 		for (int y = 0; y < hssize; y++)
 		{
-			rgb = ConvertColor(HSV, RGB, RGB(acthue, 255 - y, actval));
+			rgb = ConvertColor(HSV, RGB, RGB(acthue, 255.0 - y, actval));
 
-			surface->SetPixel(8 + (int) (actval / (256 / (205 * Setup::FontSize))), y + yoffset + 1, RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
+			surface->SetPixel(8 + (int) (actval / (256.0 / (205.0 * Setup::FontSize))), y + yoffset + 1, RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
 		}
 
 		lastval = actval;

@@ -14,46 +14,26 @@
 #include <smooth/application.h>
 #include <smooth/pciio.h>
 
-#ifdef __WIN32__
-#include <smooth/graphics/gdi/bitmapgdi.h>
-#endif
-
 S::GUI::Bitmap	 S::GUI::SI_DEFAULT = S::GUI::Bitmap();
 
 S::GUI::Bitmap::Bitmap(Void *iBitmap)
 {
-#ifdef __WIN32__
-	backend = new BitmapGDI(iBitmap);
-#else
-	backend = new BitmapBackend(iBitmap);
-#endif
+	backend = BitmapBackend::CreateBackendInstance(iBitmap);
 }
 
 S::GUI::Bitmap::Bitmap(Int cx, Int cy, Int bpp)
 {
-#ifdef __WIN32__
-	backend = new BitmapGDI(cx, cy, bpp);
-#else
-	backend = new BitmapBackend(cx, cy, bpp);
-#endif
+	backend = BitmapBackend::CreateBackendInstance(cx, cy, bpp);
 }
 
 S::GUI::Bitmap::Bitmap(const int nil)
 {
-#ifdef __WIN32__
-	backend = new BitmapGDI(nil);
-#else
-	backend = new BitmapBackend(nil);
-#endif
+	backend = BitmapBackend::CreateBackendInstance(nil);
 }
 
 S::GUI::Bitmap::Bitmap(const Bitmap &iBitmap)
 {
-#ifdef __WIN32__
-	backend = new BitmapGDI((BitmapGDI &) *(iBitmap.backend));
-#else
-	backend = new BitmapBackend(*(iBitmap.backend));
-#endif
+	backend = BitmapBackend::CreateBackendInstance(*(iBitmap.backend));
 }
 
 S::GUI::Bitmap::~Bitmap()

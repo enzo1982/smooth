@@ -32,10 +32,14 @@ class Test : public Application
 		Statusbar	*mainWnd_statusbar;
 		Client		*mainWnd_client;
 		Divider		*mainWnd_divisionbar;
+
 		Menubar		*mainWnd_menubar;
 		Menubar		*mainWnd_menubar2;
 		Menubar		*mainWnd_iconbar;
-		Menu		*mainWnd_menubar_file;
+
+		Menu		*menu_file;
+		Menu		*menu_dialogs;
+
 		Layer		*mainWnd_layer;
 		Layer		*rlayer1;
 		Layer		*rlayer2;
@@ -72,11 +76,14 @@ class Test : public Application
 		void		 HideEdb();
 		Menu		*GetTrackMenu(Int, Int);
 		Int		 threadMessageBox(Thread *);
-		void		 Close();
+	slots:
+		Void		 Close();
 
-		Void		 testDlgSelectColor();
-		Void		 testDlgOpenFile();
-		Void		 testDlgSelectDir();
+		Void		 ShowTipOfTheDay();
+
+		Void		 DlgColor();
+		Void		 DlgFile();
+		Void		 DlgDir();
 	public:
 				 Test();
 				~Test();

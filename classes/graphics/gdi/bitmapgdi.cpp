@@ -10,6 +10,31 @@
 
 #include <smooth/graphics/gdi/bitmapgdi.h>
 
+S::GUI::BitmapBackend *CreateBitmapGDI_pV(S::Void *iBitmap)
+{
+	return new S::GUI::BitmapGDI(iBitmap);
+}
+
+S::GUI::BitmapBackend *CreateBitmapGDI_III(S::Int cx, S::Int cy, S::Int bpp)
+{
+	return new S::GUI::BitmapGDI(cx, cy, bpp);
+}
+
+S::GUI::BitmapBackend *CreateBitmapGDI_cI(const int nil)
+{
+	return new S::GUI::BitmapGDI(nil);
+}
+
+S::GUI::BitmapBackend *CreateBitmapGDI_crS(const S::GUI::BitmapBackend &iBitmap)
+{
+	return new S::GUI::BitmapGDI((const S::GUI::BitmapGDI &) iBitmap);
+}
+
+S::Int	 bitmapGDITmp_pV	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapGDI_pV);
+S::Int	 bitmapGDITmp_III	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapGDI_III);
+S::Int	 bitmapGDITmp_cI	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapGDI_cI);
+S::Int	 bitmapGDITmp_crS	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapGDI_crS);
+
 S::GUI::BitmapGDI::BitmapGDI(Void *iBitmap)
 {
 	type	= BITMAP_GDI;

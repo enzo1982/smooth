@@ -32,47 +32,62 @@ namespace smooth
 
 		class BitmapBackend
 		{
+			private:
+				static Array<BitmapBackend *(*)(Void *)>		*backend_creators_pV;
+				static Array<BitmapBackend *(*)(Int, Int, Int)>		*backend_creators_III;
+				static Array<BitmapBackend *(*)(const int)>		*backend_creators_cI;
+				static Array<BitmapBackend *(*)(const BitmapBackend &)>	*backend_creators_crS;
 			protected:
-				Int				 type;
+				Int							 type;
 
-				Size				 size;
-				Int				 depth;
+				Size							 size;
+				Int							 depth;
 
-				UnsignedByte			*bytes;
-				Int				 align;
+				UnsignedByte						*bytes;
+				Int							 align;
 			public:
-								 BitmapBackend(Void * = NIL);
-								 BitmapBackend(Int, Int, Int);
-								 BitmapBackend(const int);
-								 BitmapBackend(const BitmapBackend &);
+				static Int						 AddBackend(BitmapBackend *(*)(Void *));
+				static Int						 AddBackend(BitmapBackend *(*)(Int, Int, Int));
+				static Int						 AddBackend(BitmapBackend *(*)(const int));
+				static Int						 AddBackend(BitmapBackend *(*)(const BitmapBackend &));
 
-				virtual				~BitmapBackend();
+				static BitmapBackend					*CreateBackendInstance(Void *);
+				static BitmapBackend					*CreateBackendInstance(Int, Int, Int);
+				static BitmapBackend					*CreateBackendInstance(const int);
+				static BitmapBackend					*CreateBackendInstance(const BitmapBackend &);
 
-				Int				 GetBitmapType();
+											 BitmapBackend(Void * = NIL);
+											 BitmapBackend(Int, Int, Int);
+											 BitmapBackend(const int);
+											 BitmapBackend(const BitmapBackend &);
 
-				const Size			 GetSize();
-				Int				 GetDepth();
+				virtual							~BitmapBackend();
 
-				UnsignedByte			*GetBytes();
-				Int				 GetLineAlignment();
+				Int							 GetBitmapType();
 
-				virtual Bool			 CreateBitmap(Int, Int, Int);
-				virtual Bool			 DeleteBitmap();
+				const Size						 GetSize();
+				Int							 GetDepth();
 
-				virtual Bool			 SetSystemBitmap(Void *);
-				virtual Void			*GetSystemBitmap();
+				UnsignedByte						*GetBytes();
+				Int							 GetLineAlignment();
 
-				virtual Int			 GrayscaleBitmap();
-				virtual Int			 ReplaceColor(Int, Int);
+				virtual Bool						 CreateBitmap(Int, Int, Int);
+				virtual Bool						 DeleteBitmap();
 
-				virtual Bool			 SetPixel(Int, Int, UnsignedLong);
-				virtual UnsignedLong		 GetPixel(Int, Int);
+				virtual Bool						 SetSystemBitmap(Void *);
+				virtual Void						*GetSystemBitmap();
 
-				virtual BitmapBackend &operator	 =(const int);
-				virtual BitmapBackend &operator	 =(const BitmapBackend &);
+				virtual Int						 GrayscaleBitmap();
+				virtual Int						 ReplaceColor(Int, Int);
 
-				virtual Bool operator		 ==(const int);
-				virtual Bool operator		 !=(const int);
+				virtual Bool						 SetPixel(Int, Int, UnsignedLong);
+				virtual UnsignedLong					 GetPixel(Int, Int);
+
+				virtual BitmapBackend &operator				 =(const int);
+				virtual BitmapBackend &operator				 =(const BitmapBackend &);
+
+				virtual Bool operator					 ==(const int);
+				virtual Bool operator					 !=(const int);
 		};
 	};
 };

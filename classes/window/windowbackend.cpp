@@ -10,6 +10,32 @@
 
 #include <smooth/window/windowbackend.h>
 
+S::GUI::WindowBackend *CreateWindowBackend()
+{
+	return new S::GUI::WindowBackend();
+}
+
+S::Int	 windowBackendTmp = S::GUI::WindowBackend::AddBackend(&CreateWindowBackend);
+
+S::Array<S::GUI::WindowBackend *(*)()>	*S::GUI::WindowBackend::backend_creators = NIL;
+
+S::Int S::GUI::WindowBackend::AddBackend(WindowBackend *(*backend)())
+{
+	if (backend == NIL) return Error;
+
+	if (backend_creators == NIL) backend_creators = new Array<WindowBackend *(*)()>;
+
+	backend_creators->AddEntry(backend);
+
+	return Success;
+}
+
+S::GUI::WindowBackend *S::GUI::WindowBackend::CreateBackendInstance()
+{
+	if (backend_creators->GetFirstEntry() != &CreateWindowBackend)	return backend_creators->GetFirstEntry()();
+	else								return backend_creators->GetLastEntry()();
+}
+
 S::GUI::WindowBackend::WindowBackend(Void *iWindow)
 {
 	type = WINDOW_NONE;

@@ -12,6 +12,104 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/color.h>
 
+S::GUI::BitmapBackend *CreateBitmapBackend_pV(S::Void *iBitmap)
+{
+	return new S::GUI::BitmapBackend(iBitmap);
+}
+
+S::GUI::BitmapBackend *CreateBitmapBackend_III(S::Int cx, S::Int cy, S::Int bpp)
+{
+	return new S::GUI::BitmapBackend(cx, cy, bpp);
+}
+
+S::GUI::BitmapBackend *CreateBitmapBackend_cI(const int nil)
+{
+	return new S::GUI::BitmapBackend(nil);
+}
+
+S::GUI::BitmapBackend *CreateBitmapBackend_crS(const S::GUI::BitmapBackend &iBitmap)
+{
+	return new S::GUI::BitmapBackend(iBitmap);
+}
+
+S::Int	 bitmapBackendTmp_pV	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapBackend_pV);
+S::Int	 bitmapBackendTmp_III	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapBackend_III);
+S::Int	 bitmapBackendTmp_cI	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapBackend_cI);
+S::Int	 bitmapBackendTmp_crS	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapBackend_crS);
+
+S::Array<S::GUI::BitmapBackend *(*)(S::Void *)>				*S::GUI::BitmapBackend::backend_creators_pV	= NIL;
+S::Array<S::GUI::BitmapBackend *(*)(S::Int, S::Int, S::Int)>		*S::GUI::BitmapBackend::backend_creators_III	= NIL;
+S::Array<S::GUI::BitmapBackend *(*)(const int)>				*S::GUI::BitmapBackend::backend_creators_cI	= NIL;
+S::Array<S::GUI::BitmapBackend *(*)(const S::GUI::BitmapBackend &)>	*S::GUI::BitmapBackend::backend_creators_crS	= NIL;
+
+S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(Void *))
+{
+	if (backend == NIL) return Error;
+
+	if (backend_creators_pV == NIL) backend_creators_pV = new Array<BitmapBackend *(*)(Void *)>;
+
+	backend_creators_pV->AddEntry(backend);
+
+	return Success;
+}
+
+S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(Int, Int, Int))
+{
+	if (backend == NIL) return Error;
+
+	if (backend_creators_III == NIL) backend_creators_III = new Array<BitmapBackend *(*)(Int, Int, Int)>;
+
+	backend_creators_III->AddEntry(backend);
+
+	return Success;
+}
+
+S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(const int))
+{
+	if (backend == NIL) return Error;
+
+	if (backend_creators_cI == NIL) backend_creators_cI = new Array<BitmapBackend *(*)(const int)>;
+
+	backend_creators_cI->AddEntry(backend);
+
+	return Success;
+}
+
+S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(const BitmapBackend &))
+{
+	if (backend == NIL) return Error;
+
+	if (backend_creators_crS == NIL) backend_creators_crS = new Array<BitmapBackend *(*)(const BitmapBackend &)>;
+
+	backend_creators_crS->AddEntry(backend);
+
+	return Success;
+}
+
+S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(Void *iBitmap)
+{
+	if (backend_creators_pV->GetFirstEntry() != &CreateBitmapBackend_pV)	return backend_creators_pV->GetFirstEntry()(iBitmap);
+	else									return backend_creators_pV->GetLastEntry()(iBitmap);
+}
+
+S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(Int cx, Int cy, Int bpp)
+{
+	if (backend_creators_III->GetFirstEntry() != &CreateBitmapBackend_III)	return backend_creators_III->GetFirstEntry()(cx, cy, bpp);
+	else									return backend_creators_III->GetLastEntry()(cx, cy, bpp);
+}
+
+S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(const int nil)
+{
+	if (backend_creators_cI->GetFirstEntry() != &CreateBitmapBackend_cI)	return backend_creators_cI->GetFirstEntry()(nil);
+	else									return backend_creators_cI->GetLastEntry()(nil);
+}
+
+S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(const BitmapBackend &iBitmap)
+{
+	if (backend_creators_crS->GetFirstEntry() != &CreateBitmapBackend_crS)	return backend_creators_crS->GetFirstEntry()(iBitmap);
+	else									return backend_creators_crS->GetLastEntry()(iBitmap);
+}
+
 S::GUI::BitmapBackend::BitmapBackend(Void *iBitmap)
 {
 	type	= BITMAP_NONE;

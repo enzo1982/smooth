@@ -10,7 +10,6 @@
 
 #include <smooth/math.h>
 #include <smooth/arrows.h>
-#include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
@@ -19,6 +18,7 @@
 #include <smooth/layer.h>
 #include <smooth/timer.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/graphics/window.h>
 
 const S::Int	 S::GUI::Arrows::classID = S::Object::RequestClassID();
 

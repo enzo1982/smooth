@@ -14,7 +14,6 @@
 #include <smooth/codecs.h>
 
 #include <iolib-cxx.h>
-#include <smooth/toolkit.h>
 #include <smooth/string.h>
 #include <smooth/graphics/gdi/surfacegdi.h>
 

@@ -11,7 +11,6 @@
 #include <smooth/graphics/gdi/surfacegdi.h>
 #include <smooth/graphics/gdi/bitmapgdi.h>
 #include <smooth/stk.h>
-#include <smooth/toolkit.h>
 #include <smooth/color.h>
 #include <smooth/math.h>
 

@@ -12,7 +12,6 @@
 #include <smooth/i18n/smooth_de.h>
 #include <smooth/application.h>
 #include <smooth/math.h>
-#include <smooth/toolkit.h>
 #include <direct.h>
 #include <io.h>
 
@@ -52,7 +51,7 @@ S::I18n::Language::Language()
 
 	// get the default font
 	{
-		HDC		 dc = GetContext(0);
+		HDC		 dc = GetWindowDC(0);
 		LOGFONTA	 fontInfoA;
 		LOGFONTW	 fontInfoW;
 
@@ -72,7 +71,7 @@ S::I18n::Language::Language()
 		if (result == 0)	I18N_DEFAULTFONT = "Microsoft Sans Serif";
 		else			I18N_DEFAULTFONT = "MS Sans Serif";
 
-		FreeContext(0, dc);
+		ReleaseDC(0, dc);
 
 		I18N_DEFAULTFONTSIZE = 8;
 		I18N_SMALLFONTSIZE = 8;

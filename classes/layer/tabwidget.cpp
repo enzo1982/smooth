@@ -9,7 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/tabwidget.h>
-#include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/layer.h>
 #include <smooth/metrics.h>
@@ -17,6 +16,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/graphics/window.h>
 
 const S::Int	 S::GUI::TabWidget::classID = S::Object::RequestClassID();
 

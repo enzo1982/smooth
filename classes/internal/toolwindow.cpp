@@ -10,7 +10,6 @@
 
 #include <smooth/toolwindow.h>
 #include <smooth/graphics/window.h>
-#include <smooth/toolkit.h>
 #include <smooth/object.h>
 #include <smooth/divider.h>
 #include <smooth/definitions.h>
@@ -118,7 +117,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 				drawSurface = nullSurface;
 
-				FreeContext(this, windowDC);
+				ReleaseDC(hwnd, windowDC);
 
 				DestroyWindow(hwnd);
 

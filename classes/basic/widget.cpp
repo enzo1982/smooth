@@ -13,7 +13,6 @@
 #include <smooth/rect.h>
 #include <smooth/container.h>
 #include <smooth/objectproperties.h>
-#include <smooth/toolkit.h>
 #include <smooth/layer.h>
 #include <smooth/divider.h>
 

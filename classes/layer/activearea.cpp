@@ -12,10 +12,10 @@
 #include <smooth/definitions.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/graphics/window.h>
 #include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/layer.h>
-#include <smooth/toolkit.h>
 
 const S::Int	 S::GUI::ActiveArea::classID = S::Object::RequestClassID();
 

@@ -12,7 +12,6 @@
 #include <smooth/definitions.h>
 #include <smooth/math.h>
 #include <smooth/stk.h>
-#include <smooth/toolkit.h>
 
 using namespace smooth;
 

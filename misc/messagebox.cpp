@@ -14,14 +14,14 @@
 #include <smooth/i18n.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/toolkit.h>
 #include <smooth/button.h>
-#include <smooth/titlebar.h>
 #include <smooth/layer.h>
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/gdi/surfacegdi.h>
+#include <smooth/graphics/window.h>
+#include <smooth/titlebar.h>
 
 using namespace smooth::GUI;
 

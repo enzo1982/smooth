@@ -9,7 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/button.h>
-#include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
@@ -19,6 +18,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
+#include <smooth/graphics/window.h>
 #include <smooth/layer.h>
 #include <smooth/timer.h>
 

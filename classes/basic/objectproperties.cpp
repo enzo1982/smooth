@@ -12,7 +12,6 @@
 #include <smooth/objectproperties.h>
 #include <smooth/stk.h>
 #include <smooth/i18n.h>
-#include <smooth/toolkit.h>
 
 S::ObjectProperties::ObjectProperties()
 {

@@ -11,7 +11,6 @@
 #include <smooth/graphics/window.h>
 #include <smooth/tooltip.h>
 #include <smooth/definitions.h>
-#include <smooth/toolkit.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
 #include <smooth/i18n.h>

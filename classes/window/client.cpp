@@ -10,7 +10,6 @@
 
 #include <smooth/client.h>
 #include <smooth/graphics/window.h>
-#include <smooth/toolkit.h>
 #include <smooth/object.h>
 #include <smooth/divider.h>
 #include <smooth/definitions.h>

@@ -11,7 +11,6 @@
 #include <smooth/listbox.h>
 #include <smooth/list.h>
 #include <smooth/definitions.h>
-#include <smooth/toolkit.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>
@@ -22,6 +21,7 @@
 #include <smooth/scrollbar.h>
 #include <smooth/layer.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/graphics/window.h>
 #include <smooth/listboxheader.h>
 
 const S::Int	 S::GUI::ListBox::classID = S::Object::RequestClassID();

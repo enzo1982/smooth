@@ -9,10 +9,29 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/dllmain.h>
-#include <smooth/toolkit.h>
+#include <smooth/shlobjmini.h>
 
-#ifdef __WIN32__
-#include <windows.h>
+LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderA)(PBROWSEINFOA);
+LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderW)(PBROWSEINFOW);
+BOOL		 (WINAPI *ex_SHGetPathFromIDListA)(LPCITEMIDLIST, LPSTR);
+BOOL		 (WINAPI *ex_SHGetPathFromIDListW)(LPCITEMIDLIST, LPWSTR);
+
+HMODULE		 shellDLL;
+
+void SHLObjMini_Init()
+{
+	shellDLL = LoadLibraryA("shell32.dll");
+
+	ex_SHBrowseForFolderA = (LPITEMIDLIST (WINAPI *)(PBROWSEINFOA)) GetProcAddress(shellDLL, "SHBrowseForFolderA");
+	ex_SHBrowseForFolderW = (LPITEMIDLIST (WINAPI *)(PBROWSEINFOW)) GetProcAddress(shellDLL, "SHBrowseForFolderW");
+	ex_SHGetPathFromIDListA = (BOOL (WINAPI *)(LPCITEMIDLIST, LPSTR)) GetProcAddress(shellDLL, "SHGetPathFromIDListA");
+	ex_SHGetPathFromIDListW = (BOOL (WINAPI *)(LPCITEMIDLIST, LPWSTR)) GetProcAddress(shellDLL, "SHGetPathFromIDListW");
+}
+
+void SHLObjMini_Deinit()
+{
+	FreeLibrary(shellDLL);
+}
 
 HINSTANCE	 hDllInstance = NIL;
 
@@ -40,5 +59,4 @@ extern "C"
 	}
 }
 
-#endif
 #endif

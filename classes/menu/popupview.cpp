@@ -9,7 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/popupview.h>
-#include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/stk.h>
 #include <smooth/metrics.h>

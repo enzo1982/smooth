@@ -16,7 +16,6 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
-#include <smooth/toolkit.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/application.h>
 #include <smooth/binary.h>

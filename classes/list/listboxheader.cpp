@@ -14,7 +14,6 @@
 #include <smooth/graphics/window.h>
 #include <smooth/layer.h>
 #include <smooth/objectproperties.h>
-#include <smooth/toolkit.h>
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 

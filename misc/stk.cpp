@@ -21,7 +21,6 @@ int	 (*ex_iconv_close)(iconv_t) = NIL;
 #include <smooth/graphics/window.h>
 #include <smooth/layer.h>
 #include <smooth/objectmanager.h>
-#include <smooth/toolkit.h>
 #include <smooth/object.h>
 #include <smooth/version.h>
 #include <smooth/loop.h>

@@ -11,7 +11,6 @@
 #include <smooth/graphics/window.h>
 #include <smooth/i18n.h>
 #include <smooth/definitions.h>
-#include <smooth/toolkit.h>
 #include <smooth/loop.h>
 #include <smooth/titlebar.h>
 #include <smooth/statusbar.h>
@@ -191,7 +190,7 @@ S::GUI::Window::~Window()
 
 		drawSurface = nullSurface;
 
-		FreeContext(this, windowDC);
+		ReleaseDC(hwnd, windowDC);
 
 		DestroyWindow(hwnd);
 	}
@@ -558,7 +557,7 @@ HWND S::GUI::Window::Create()
 
 			CalculateOffsets();
 
-			windowDC = GetContext(this);
+			windowDC = GetWindowDC(hwnd);
 
 			drawSurface = new SurfaceGDI(windowDC);
 			drawSurface->SetSize(objectProperties->size);
@@ -688,7 +687,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				drawSurface = nullSurface;
 
-				FreeContext(this, windowDC);
+				ReleaseDC(hwnd, windowDC);
 
 				DestroyWindow(hwnd);
 

@@ -11,7 +11,6 @@
 #include <smooth/menu.h>
 #include <smooth/definitions.h>
 #include <smooth/array.h>
-#include <smooth/toolkit.h>
 #include <smooth/color.h>
 #include <smooth/system.h>
 #include <smooth/metrics.h>

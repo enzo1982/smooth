@@ -12,7 +12,6 @@
 #include <smooth/listbox.h>
 #include <smooth/list.h>
 #include <smooth/definitions.h>
-#include <smooth/toolkit.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>

@@ -11,9 +11,7 @@
 #include <smooth/colordlg.h>
 #include <smooth/application.h>
 #include <smooth/graphics/window.h>
-#include <smooth/titlebar.h>
 #include <smooth/i18n.h>
-#include <smooth/toolkit.h>
 #include <smooth/color.h>
 #include <smooth/stk.h>
 #include <smooth/button.h>
@@ -29,6 +27,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
+#include <smooth/titlebar.h>
 
 using namespace smooth::GUI;
 

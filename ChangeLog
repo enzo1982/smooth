@@ -7,4 +7,4 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 
 - removed some Windows API calls
 - preparing to remove smooth Toolkit (STK, stk.cpp)
-- preparing to remove mpToolkit (toolkit.cpp)
+- removed mpToolkit (toolkit.cpp)

@@ -448,11 +448,6 @@ $(OBJECTDIR)/stk.o: $(MISCDIR)/stk.cpp $(SMOOTHINCLUDEDIR)/stk.h $(SMOOTHINCLUDE
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/stk.cpp -o $(OBJECTDIR)/stk.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/toolkit.o: $(MISCDIR)/toolkit.cpp $(SMOOTHINCLUDEDIR)/toolkit.h
-	$(ECHO) -n Compiling $(MISCDIR)/toolkit.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/toolkit.cpp -o $(OBJECTDIR)/toolkit.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/resources.o: $(SMOOTHINCLUDEDIR)/resources.h $(RESOURCEDIR)/version.rc $(RESOURCEDIR)/resources.rc
 	$(ECHO) -n Compiling $(RESOURCEDIR)/resources.rc...
 	$(RESCOMP) $(RESCOMP_OPTS) $(RESOURCEDIR)/resources.rc -o $(OBJECTDIR)/resources.o

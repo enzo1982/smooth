@@ -9,7 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/scrollbar.h>
-#include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/math.h>
@@ -19,6 +18,7 @@
 #include <smooth/layer.h>
 #include <smooth/timer.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/graphics/window.h>
 
 const S::Int	 S::GUI::Scrollbar::classID = S::Object::RequestClassID();
 

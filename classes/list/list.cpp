@@ -11,7 +11,6 @@
 #include <smooth/list.h>
 #include <smooth/definitions.h>
 #include <smooth/array.h>
-#include <smooth/toolkit.h>
 #include <smooth/stk.h>
 #include <smooth/i18n.h>
 #include <smooth/metrics.h>

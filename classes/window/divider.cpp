@@ -10,7 +10,6 @@
 
 #include <smooth/divider.h>
 #include <smooth/objectmanager.h>
-#include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
 #include <smooth/math.h>
@@ -19,6 +18,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/graphics/window.h>
 
 const S::Int	 S::GUI::Divider::classID = S::Object::RequestClassID();
 

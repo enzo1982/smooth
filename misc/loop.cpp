@@ -20,7 +20,6 @@
 #include <smooth/i18n.h>
 #include <smooth/graphics/window.h>
 #include <smooth/metrics.h>
-#include <smooth/toolkit.h>
 #include <smooth/background.h>
 #include <smooth/objectmanager.h>
 #include <smooth/color.h>

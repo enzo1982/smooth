@@ -295,8 +295,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			if (message != SP_UPDATE)
 			{
+				if (header != NIL) frame.top += (METRIC_LISTBOXENTRYHEIGHT + 2);
+				if (needScrollbar) frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
+
 				if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
 				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+
+				if (header != NIL) frame.top -= (METRIC_LISTBOXENTRYHEIGHT + 2);
+				if (needScrollbar) frame.right += (METRIC_LISTBOXSBOFFSET + 1);
 
 				surface->Frame(frame, FRAME_DOWN);
 			}

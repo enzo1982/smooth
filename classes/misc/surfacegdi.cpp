@@ -269,8 +269,8 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int si
 
 		RECT	 Rect = rect;
 
-		if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS, NIL);
-		else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS, NIL);
+		if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
+		else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
 
 		rect.top += height;
 	}

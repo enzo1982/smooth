@@ -60,6 +60,7 @@ namespace smooth
 			Void		 CleanupList();
 
 			Int		 GetNOfEntries();
+			Int		 GetNthEntry(Int);
 			String		 GetNthEntryName(Int);
 
 			Int		 SelectListEntry(Int);

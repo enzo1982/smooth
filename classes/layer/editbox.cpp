@@ -599,7 +599,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					}
 				}
 
-				if (nOfChars == maxSize) break;
+				if (nOfChars == maxSize && markStart == markEnd) break;
 
 				if (wParam >= 32)
 				{

@@ -59,7 +59,10 @@ S::Void S::BackgroundApplication::TimerProc()
 
  	for (Int j = 0; j < mainThreadManager->GetNOfThreads(); j++)
 	{
-		if (Setup::enableUnicode)	PostThreadMessageW(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
-		else				PostThreadMessageA(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+		if (mainThreadManager->GetNthThread(j)->GetStatus() == THREAD_RUNNING)
+		{
+			if (Setup::enableUnicode)	PostThreadMessageW(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+			else				PostThreadMessageA(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+		}
 	}
 }

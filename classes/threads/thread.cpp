@@ -26,6 +26,7 @@ S::Thread::Thread()
 	type		= classID;
 	status		= THREAD_CREATED;
 	thread		= NIL;
+	threadID	= -1;
 
 	possibleContainers.AddEntry(Application::classID);
 

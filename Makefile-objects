@@ -563,6 +563,11 @@ $(OBJECTDIR)/translator_translator.o: $(TRANSLATORDIR)/translator.cpp $(DLLNAME)
 	$(COMPILER) $(EXECOMPILER_OPTS) $(TRANSLATORDIR)/translator.cpp -o $(OBJECTDIR)/translator_translator.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/translator_resources.o: $(TRANSLATORDIR)/translator.rc
+	$(ECHO) -n Compiling $(TRANSLATORDIR)/translator.rc...
+	$(RESCOMP) $(RESCOMP_OPTS) $(TRANSLATORDIR)/translator.rc -o $(OBJECTDIR)/translator_resources.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/iolib_instream.o: $(IOLIBDIR)/instream.cpp $(INCLUDEDIR)/iolib/instream-cxx.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/instream.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/instream.cpp -o $(OBJECTDIR)/iolib_instream.o

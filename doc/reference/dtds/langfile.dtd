@@ -7,10 +7,10 @@
 	<!ELEMENT info (property*)>
 
 		<!ELEMENT property (#PCDATA)>
-		<!ATTLIST property name PCDATA #REQUIRED>
+		<!ATTLIST property name CDATA #REQUIRED>
 
 	<!ELEMENT data (entry*)>
 
 		<!ELEMENT entry (#PCDATA)>
 		<!ATTLIST entry id CDATA #REQUIRED
-				string PCDATA #REQUIRED>
+				string CDATA #REQUIRED>

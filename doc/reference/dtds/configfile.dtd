@@ -2,19 +2,19 @@
 
 <!ENTITY % ConfigFile.Version "-//DTD ConfigFile 0.8 Draft//EN">
 
-<!ELEMENT ConfigFile (info?, data?)>
+<!ELEMENT ConfigFile (info?, configuration?)>
 
 	<!ELEMENT info (property*)>
 
 		<!ELEMENT property (#PCDATA)>
-		<!ATTLIST property name PCDATA #REQUIRED>
+		<!ATTLIST property name CDATA #REQUIRED>
 
 	<!ELEMENT configuration (section*)>
-	<!ATTLIST configuration name PCDATA #REQUIRED>
-	<!ATTLIST configuration inheriting PCDATA #IMPLIED>
+	<!ATTLIST configuration name CDATA #REQUIRED>
+	<!ATTLIST configuration inheriting CDATA #IMPLIED>
 
 		<!ELEMENT section (value*)>
-		<!ATTLIST section name PCDATA #REQUIRED>
+		<!ATTLIST section name CDATA #REQUIRED>
 
 			<!ELEMENT value (#PCDATA)>
-			<!ATTLIST value name PCDATA #REQUIRED>
+			<!ATTLIST value name CDATA #REQUIRED>

@@ -24,7 +24,7 @@ LIBICONVOBJECTS = $(OBJECTDIR)/libiconv_iconv.o $(OBJECTDIR)/libiconv_localchars
 LISAOBJECTS = $(OBJECTDIR)/lisa_lisa.o
 
 DESIGNEROBJECTS = $(OBJECTDIR)/designer_designer.o $(OBJECTDIR)/designer_edit_component.o
-TRANSLATOROBJECTS = $(OBJECTDIR)/translator_translator.o
+TRANSLATOROBJECTS = $(OBJECTDIR)/translator_translator.o $(OBJECTDIR)/translator_resources.o
 PCIFFMANOBJECTS = $(OBJECTDIR)/pciffman_main.o
 SAMPLE1OBJECTS = $(SAMPLE1DIR)/beat.o
 SAMPLE2OBJECTS = $(SAMPLE2DIR)/test.o

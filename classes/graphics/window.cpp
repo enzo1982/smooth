@@ -78,6 +78,7 @@ S::GUI::Window::Window(String title, Void *iWindow)
 	visible		= False;
 	destroyed	= False;
 	initshow	= False;
+	firstPaint	= True;
 
 	objectProperties->size.cx = Math::Round(200 * Setup::FontSize);
 	objectProperties->size.cy = Math::Round(200 * Setup::FontSize);
@@ -552,11 +553,13 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 					BeginPaint((HWND) backend->GetSystemWindow(), &ps);
 
-					if (Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20)	Paint(SP_DELAYED);
-					else																						Paint(SP_UPDATE);
+					if ((Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20) || firstPaint)	Paint(SP_DELAYED);
+					else																								Paint(SP_UPDATE);
 
 					EndPaint((HWND) backend->GetSystemWindow(), &ps);
 				}
+
+				firstPaint = False;
 			}
 
 			rVal = 0;
@@ -749,10 +752,10 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	Surface	*surface = GetDrawSurface();
 
-	if (updateRect.left < 2)				updateRect.left		= 2;
-	if (updateRect.top < 2)					updateRect.top		= 2;
-	if (objectProperties->size.cx - updateRect.right < 2)	updateRect.right	= objectProperties->size.cx - 2;
-	if (objectProperties->size.cy - updateRect.bottom < 2)	updateRect.bottom	= objectProperties->size.cy - 2;
+	if (firstPaint || (updateRect.left < 2))				updateRect.left		= 2;
+	if (firstPaint || (updateRect.top < 2))					updateRect.top		= 2;
+	if (firstPaint || (objectProperties->size.cx - updateRect.right < 2))	updateRect.right	= objectProperties->size.cx - 2;
+	if (firstPaint || (objectProperties->size.cy - updateRect.bottom < 2))	updateRect.bottom	= objectProperties->size.cy - 2;
 
 	if (message == SP_UPDATE)
 	{

@@ -61,6 +61,8 @@ namespace smooth
 				Bool				 created;
 				Bool				 destroyed;
 
+				Bool				 firstPaint;
+
 				Bitmap				 icon;
 
 				Rect				 innerOffset;

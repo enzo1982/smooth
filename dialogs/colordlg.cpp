@@ -27,6 +27,7 @@
 #include <smooth/loop.h>
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
+#include <smooth/surface.h>
 
 #include <picture.h>
 
@@ -390,6 +391,7 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 {
 	if (dlgwnd->hwnd == NIL) return;
 
+	Surface		*surface = dlgwnd->GetDrawSurface();
 	HDC		 dc = GetContext(dlgwnd);
 	Rect		 rect;
 	Point		 p1;
@@ -419,7 +421,7 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 
 	if (DoRectsOverlap(rect, urect))
 	{
-		Frame(dc, rect, FRAME_DOWN);
+		surface->Frame(rect, FRAME_DOWN);
 
 		for (int ypos = 0; ypos < hssize; ypos++)
 		{
@@ -428,7 +430,7 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 			p2.x = huexoffset + 17;
 			p2.y = yoffset + 1 + ypos;
 
-			Line(dc, p1, p2, ConvertColor(HSV, RGB, RGB(255 - Math::Round(hue), 255, 255)), PS_SOLID, 1);
+			surface->Line(p1, p2, ConvertColor(HSV, RGB, RGB(255 - Math::Round(hue), 255, 255)));
 
 			hue += huebias;
 		}
@@ -437,30 +439,30 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 	rect.left	= 7;
 	rect.right	= rect.left + hssize + 1;
 
-	Frame(dc, rect, FRAME_DOWN);
+	surface->Frame(rect, FRAME_DOWN);
 
 	rect.left = ncxoffset;
 	rect.top = yoffset;
 	rect.right = rect.left + crsizex;
 	rect.bottom = rect.top + crsizey;
 
-	Frame(dc, rect, FRAME_DOWN);
+	surface->Frame(rect, FRAME_DOWN);
 
 	rect.left++;
 	rect.top++;
 
-	Box(dc, rect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
+	surface->Box(rect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
 
 	rect.left = ocxoffset;
 	rect.right = rect.left + crsizex;
 	rect.top--;
 
-	Frame(dc, rect, FRAME_DOWN);
+	surface->Frame(rect, FRAME_DOWN);
 
 	rect.left++;
 	rect.top++;
 
-	Box(dc, rect, color, FILLED);
+	surface->Box(rect, color, FILLED);
 
 	rect.left	= 3;
 	rect.top	= yoffset - 4;
@@ -532,13 +534,11 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 
 void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int lparam)
 {
-	if (dlgwnd->hwnd == NIL) return;
-
+	Surface	*surface = dlgwnd->GetDrawSurface();
 	Rect	 huerect;
 	Rect	 vsrect;
 	Rect	 ncrect;
 	Rect	 ocrect;
-	HDC	 dc = GetContext(dlgwnd);
 	int	 newval;
 	int	 newsat;
 
@@ -573,19 +573,19 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			if (IsMouseOn(dlgwnd->hwnd, huerect, WINDOW))
+			if (dlgwnd->IsMouseOn(huerect))
 			{
 				huecapt = true;
 
 				ColorDlgMessageProc(SM_MOUSEMOVE, 0, 0);
 			}
-			else if (IsMouseOn(dlgwnd->hwnd, vsrect, WINDOW))
+			else if (dlgwnd->IsMouseOn(vsrect))
 			{
 				vscapt = true;
 
 				ColorDlgMessageProc(SM_MOUSEMOVE, 0, 0);
 			}
-			else if (IsMouseOn(dlgwnd->hwnd, ocrect, WINDOW))
+			else if (dlgwnd->IsMouseOn(ocrect))
 			{
 				lasthue = acthue;
 				lastsat = actsat;
@@ -639,7 +639,7 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 				}
 #endif
 
-				newhue = 255 - Math::Round(max(min(MouseY(dlgwnd->hwnd, WINDOW) - (yoffset + 1), hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
+				newhue = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
 
 				if (newhue != acthue)
 				{
@@ -663,7 +663,7 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 					blueedit->SetText(String::IntToString(actblue));
 					hexedit->SetText(hexval);
 
-					Box(dc, ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
+					surface->Box(ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
 				}
 			}
 			else if (vscapt)
@@ -679,8 +679,8 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 				}
 #endif
 
-				newval = Math::Round(max(min(MouseX(dlgwnd->hwnd, WINDOW) - 8, hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
-				newsat = 255 - Math::Round(max(min(MouseY(dlgwnd->hwnd, WINDOW) - (yoffset + 1), hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
+				newval = Math::Round(max(min(dlgwnd->MouseX() - 8, hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
+				newsat = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
 
 				if ((newval != actval) || (newsat != actsat))
 				{
@@ -704,22 +704,18 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 					blueedit->SetText(String::IntToString(actblue));
 					hexedit->SetText(hexval);
 
-					Box(dc, ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
+					surface->Box(ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
 				}
 			}
 			break;
 	}
-
-	FreeContext(dlgwnd, dc);
 }
 
 void S::DialogColorSelection::ColorDlgUpdatePickers()
 {
-	if (dlgwnd->hwnd == NIL) return;
-
+	Surface	*surface = dlgwnd->GetDrawSurface();
 	Point	 p1;
 	Point	 p2;
-	HDC	 dc = GetContext(dlgwnd);
 	int	 ahrgb = ConvertColor(HSV, RGB, RGB(acthue, 255, 255));
 	int	 rgb;
 	int	 hssize = Math::Round(205 * Setup::FontSize);
@@ -734,12 +730,12 @@ void S::DialogColorSelection::ColorDlgUpdatePickers()
 			p2.x = huexoffset + 17;
 			p2.y = yoffset + 1 + (int) ((255 - lasthue) / (256 / (205 * Setup::FontSize)));
 
-			Line(dc, p1, p2, ConvertColor(HSV, RGB, RGB(lasthue, 255, 255)), PS_SOLID, 1);
+			surface->Line(p1, p2, ConvertColor(HSV, RGB, RGB(lasthue, 255, 255)));
 		}
 
 		for (int x = huexoffset + 1; x < (huexoffset + 17); x++)
 		{
-			PaintPixel(dc, Point(x, yoffset + 1 + (int) ((255 - acthue) / (256 / (205 * Setup::FontSize)))), RGB(255-GetRed(ahrgb), 255-GetGreen(ahrgb), 255-GetBlue(ahrgb)));
+			surface->SetPixel(x, yoffset + 1 + (int) ((255 - acthue) / (256 / (205 * Setup::FontSize))), RGB(255-GetRed(ahrgb), 255-GetGreen(ahrgb), 255-GetBlue(ahrgb)));
 		}
 
 		lasthue = acthue;
@@ -754,14 +750,14 @@ void S::DialogColorSelection::ColorDlgUpdatePickers()
 			{
 				rgb = ConvertColor(HSV, RGB, RGB(acthue, lastsat, (int) (x * (256 / (205 * Setup::FontSize)))));
 
-				PaintPixel(dc, Point(x + 8, yoffset + 1 + (int) ((255 - lastsat) / (256 / (205 * Setup::FontSize)))), rgb);
+				surface->SetPixel(x + 8, yoffset + 1 + (int) ((255 - lastsat) / (256 / (205 * Setup::FontSize))), rgb);
 			}
 
 			for (int y = 0; y < hssize; y++)
 			{
 				rgb = ConvertColor(HSV, RGB, RGB(acthue, (int) (255 - (y * (256 / (205 * Setup::FontSize)))), lastval));
 
-				PaintPixel(dc, Point(8 + (int) (lastval / (256 / (205 * Setup::FontSize))), y + yoffset + 1), rgb);
+				surface->SetPixel(8 + (int) (lastval / (256 / (205 * Setup::FontSize))), y + yoffset + 1, rgb);
 			}
 		}
 
@@ -769,14 +765,14 @@ void S::DialogColorSelection::ColorDlgUpdatePickers()
 		{
 			rgb = ConvertColor(HSV, RGB, RGB(acthue, actsat, x));
 
-			PaintPixel(dc, Point(x + 8, yoffset + 1 + (int) ((255 - actsat) / (256 / (205 * Setup::FontSize)))), RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
+			surface->SetPixel(x + 8, yoffset + 1 + (int) ((255 - actsat) / (256 / (205 * Setup::FontSize))), RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
 		}
 
 		for (int y = 0; y < hssize; y++)
 		{
 			rgb = ConvertColor(HSV, RGB, RGB(acthue, 255 - y, actval));
 
-			PaintPixel(dc, Point(8 + (int) (actval / (256 / (205 * Setup::FontSize))), y + yoffset + 1), RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
+			surface->SetPixel(8 + (int) (actval / (256 / (205 * Setup::FontSize))), y + yoffset + 1, RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
 		}
 
 		lastval = actval;
@@ -787,8 +783,6 @@ void S::DialogColorSelection::ColorDlgUpdatePickers()
 	preventhupdate = false;
 	forcevsupdate = false;
 	preventvsupdate = false;
-
-	FreeContext(dlgwnd, dc);
 }
 
 void S::DialogColorSelection::ColorDlgOK()
@@ -835,7 +829,7 @@ void S::DialogColorSelection::ColorDlgHueSlider()
 
 void S::DialogColorSelection::ColorDlgSatSlider()
 {
-	HDC	 dc = GetContext(dlgwnd);
+	Surface	*surface = dlgwnd->GetDrawSurface();
 
 	ColorDlgUpdatePickers();
 
@@ -861,14 +855,12 @@ void S::DialogColorSelection::ColorDlgSatSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	Box(dc, Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
-
-	FreeContext(dlgwnd, dc);
+	surface->Box(Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
 }
 
 void S::DialogColorSelection::ColorDlgValSlider()
 {
-	HDC	 dc = GetContext(dlgwnd);
+	Surface	*surface = dlgwnd->GetDrawSurface();
 
 	ColorDlgUpdatePickers();
 
@@ -894,9 +886,7 @@ void S::DialogColorSelection::ColorDlgValSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	Box(dc, Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
-
-	FreeContext(dlgwnd, dc);
+	surface->Box(Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
 }
 
 void S::DialogColorSelection::ColorDlgRedSlider()

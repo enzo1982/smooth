@@ -44,13 +44,27 @@ namespace smooth
 				virtual Int	 Frame(Rect, Int);
 				virtual Int	 Box(Rect, Int, Int);
 
-				virtual Int	 SetText(String, Rect, String, Int, Int, Int);
+				virtual Int	 SetText(String, Rect, String, Int, Int, Int, Int = 0);
+				Int		 SetShadowedText(String, Rect, String, Int, Int, Int);
 
+				Int		 Gradient(Rect, Int, Int, Int);
+				Int		 Bar(Point, Point, Int);
 #ifdef __WIN32__
 				virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
 				virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
 #endif
 		};
+
+		const Int	 TF_NORMAL	= 0;
+		const Int	 TF_ITALIC	= 1;
+		const Int	 TF_UNDERLINE	= 2;
+		const Int	 TF_STRIKEOUT	= 4;
+
+		const Int	 FRAME_UP	= 0;
+		const Int	 FRAME_DOWN	= 1;
+		const Int	 FILLED		= 0;
+		const Int	 OUTLINED	= 1;
+		const Int	 OUTLINEDOTS	= 2;
 	};
 };
 

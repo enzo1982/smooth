@@ -19,6 +19,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
 #include <smooth/timer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -67,24 +68,24 @@ S::Int S::GUI::Tooltip::Show()
 
 	if (!registered) return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Float	 measurement = Setup::FontSize;
 	Rect	 wndRect;
-	HDC	 dc = GetContext(NIL);
 
 	wndRect.left	= 0;
 	wndRect.top	= 0;
 	wndRect.bottom	= 16;
 
-#ifdef __WIN32__
-	wndRect.right	= GetTextSizeX(dc, objectProperties->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL) + 6;
-#endif
+	HDC	 dc = GetContext(wnd);
 
-	FreeContext(NIL, dc);
+	wndRect.right	= GetTextSizeX(objectProperties->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL) + 6;
+
+	FreeContext(wnd, dc);
 
 	SetMeasurement(SMT_PIXELS);
 
@@ -97,17 +98,13 @@ S::Int S::GUI::Tooltip::Show()
 
 	Setup::FontSize = measurement;
 
-	dc = GetContext(toolWindow);
-
-	Box(dc, wndRect, Setup::TooltipColor, FILLED);
-	Box(dc, wndRect, RGB(0, 0, 0), OUTLINED);
+	surface->Box(wndRect, Setup::TooltipColor, FILLED);
+	surface->Box(wndRect, RGB(0, 0, 0), OUTLINED);
 
 	wndRect.left	+= 2;
 	wndRect.top	+= 1;
 
-	::SetText(dc, objectProperties->text, wndRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-
-	FreeContext(toolWindow, dc);
+	surface->SetText(objectProperties->text, wndRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 	if (timeOut != 0)
 	{

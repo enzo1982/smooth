@@ -16,7 +16,7 @@
 
 using namespace smooth;
 
-int ConvertColor(int cs1, int cs2, int col)
+Int ConvertColor(Int cs1, Int cs2, Int col)
 {
 	double	p1 = 0;
 	double	p2 = 0;
@@ -316,7 +316,7 @@ int ConvertColor(int cs1, int cs2, int col)
 	return col;
 }
 
-int DownsampleColor(int col, int bpcc)
+Int DownsampleColor(Int col, Int bpcc)
 {
 	if (bpcc == 8) return col;
 
@@ -333,7 +333,7 @@ int DownsampleColor(int col, int bpcc)
 	return (int) (first + Math::Pow(2, bpcc) * second + Math::Pow(4, bpcc) * third + Math::Pow(8, bpcc) * fourth);
 }
 
-int UpsampleColor(int col, int bpcc)
+Int UpsampleColor(Int col, Int bpcc)
 {
 	if (bpcc == 8) return col;
 

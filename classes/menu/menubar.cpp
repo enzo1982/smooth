@@ -17,6 +17,7 @@
 #include <smooth/popupmenu.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -47,10 +48,12 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Window		*wnd = (Window *) myContainer->GetContainerObject();
 
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
+
+	Surface		*surface = myContainer->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -92,12 +95,12 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			doublebar2.x = doublebar1.x;
 		}
 
-		VBar(dc, doublebar1, doublebar2);
+		surface->Bar(doublebar1, doublebar2, OR_VERT);
 
 		doublebar1.x = doublebar1.x + 2;
 		doublebar2.x = doublebar2.x + 2;
 
-		VBar(dc, doublebar1, doublebar2);
+		surface->Bar(doublebar1, doublebar2, OR_VERT);
 	}
 
 	if (objectProperties->orientation == OR_TOP || objectProperties->orientation == OR_BOTTOM)
@@ -128,12 +131,12 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				doublebar2.x = doublebar1.x;
 				doublebar2.y = menubar.bottom;
 
-				VBar(dc, doublebar1, doublebar2);
+				surface->Bar(doublebar1, doublebar2, OR_VERT);
 
 				doublebar1.x = doublebar1.x + 2;
 				doublebar2.x = doublebar2.x + 2;
 
-				VBar(dc, doublebar1, doublebar2);
+				surface->Bar(doublebar1, doublebar2, OR_VERT);
 
 				firstentry = True;
 			}
@@ -146,7 +149,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.right = menuentry.left + operat->size;
 
 				menuentry.bottom += 1;
-				::SetText(dc, operat->text, menuentry, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+				surface->SetText(operat->text, menuentry, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 				menuentry.bottom -= 1;
 
 				operat->rect.left	= menuentry.left - 3;
@@ -213,7 +216,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 					p2.x--;
 					p1.y++;
 					p2.y++;
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 				}
 
 				operat->rect.left	= menuentry.left - 3;
@@ -254,12 +257,12 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				doublebar2.x = doublebar1.x;
 				doublebar2.y = menubar.bottom;
 
-				VBar(dc, doublebar1, doublebar2);
+				surface->Bar(doublebar1, doublebar2, OR_VERT);
 
 				doublebar1.x = doublebar1.x + 2;
 				doublebar2.x = doublebar2.x + 2;
 
-				VBar(dc, doublebar1, doublebar2);
+				surface->Bar(doublebar1, doublebar2, OR_VERT);
 
 				firstentry = True;
 				prevbitmap = True;
@@ -274,7 +277,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.left = helpmenuentry.right - operat->size;
 
 				helpmenuentry.bottom += 1;
-				::SetText(dc, operat->text, helpmenuentry, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+				surface->SetText(operat->text, helpmenuentry, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 				helpmenuentry.bottom -= 1;
 
 				operat->rect.left	= helpmenuentry.left - 3;
@@ -338,7 +341,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 					p2.x--;
 					p1.y++;
 					p2.y++;
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 				}
 
 				operat->rect.left	= helpmenuentry.left - 3;
@@ -381,8 +384,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				menuentry.top++;
 
-				if (style == MB_GRAYSCALE)	PaintBitmap(dc, menuentry, operat->graymap);
-				else				PaintBitmap(dc, menuentry, operat->bitmap);
+				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
+				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
 
 				menuentry.top--;
 
@@ -427,13 +430,13 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Window		*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
+	Surface		*surface = myContainer->GetDrawSurface();
 	Menu::Entry	*operat;
 	Rect		 bmprect;
 	HDC		 dc;
@@ -449,8 +452,6 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			dc = GetContext(wnd);
-
 			for (i = 0; i < nOfEntries; i++)
 			{
 				operat = entries.GetNthEntry(i);
@@ -464,12 +465,12 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 					if (!operat->clicked)
 					{
 						operat->clicked = True;
-						Frame(dc, operat->rect, FRAME_DOWN);
+						surface->Frame(operat->rect, FRAME_DOWN);
 					}
 					else
 					{
 						operat->clicked = False;
-						Frame(dc, operat->rect, FRAME_UP);
+						surface->Frame(operat->rect, FRAME_UP);
 					}
 
 					if (operat->clicked && (operat->popup != NIL && operat->orientation == OR_LEFT))
@@ -504,8 +505,6 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_LBUTTONUP:
 			dc = GetContext(wnd);
@@ -519,7 +518,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 				if (operat->type == SM_TEXT && operat->clicked)
 				{
 					operat->clicked = False;
-					Frame(dc, operat->rect, FRAME_UP);
+					surface->Frame(operat->rect, FRAME_UP);
 
 					if (operat->onClick.GetNOfConnectedSlots() != 0 && operat->bVar == NIL && operat->iVar == NIL)
 					{
@@ -529,7 +528,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
+						surface->Box(operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
@@ -547,7 +546,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 				else if (operat->type == SM_BITMAP && operat->clicked)
 				{
 					operat->clicked = False;
-					Frame(dc, operat->rect, FRAME_UP);
+					surface->Frame(operat->rect, FRAME_UP);
 
 					if (operat->onClick.GetNOfConnectedSlots() != 0 && operat->bVar == NIL && operat->iVar == NIL)
 					{
@@ -557,7 +556,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
+						surface->Box(operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
@@ -597,7 +596,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 				if (operat->type == SM_TEXT)
 				{
-					if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && operat->checked)
+					if (!wnd->IsMouseOn(operat->rect) && operat->checked)
 					{
 						operat->checked = False;
 						operat->clicked = False;
@@ -606,14 +605,14 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
+						surface->Box(operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 					}
 				}
 				else if (operat->type == SM_BITMAP)
 				{
-					if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && operat->checked)
+					if (!wnd->IsMouseOn(operat->rect) && operat->checked)
 					{
 						operat->checked = False;
 						operat->clicked = False;
@@ -622,7 +621,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
+						surface->Box(operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 						bmprect = operat->rect;
@@ -651,7 +650,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 				if (operat->type == SM_TEXT)
 				{
-					if (IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && !operat->checked)
+					if (wnd->IsMouseOn(operat->rect) && !operat->checked)
 					{
 						operat->checked = True;
 
@@ -662,9 +661,9 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 							updateStatus = True;
 						}
 
-						Frame(dc, operat->rect, FRAME_UP);
+						surface->Frame(operat->rect, FRAME_UP);
 					}
-					else if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && operat->checked)
+					else if (!wnd->IsMouseOn(operat->rect) && operat->checked)
 					{
 						operat->checked = False;
 						operat->clicked = False;
@@ -673,14 +672,14 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
+						surface->Box(operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 					}
 				}
 				else if (operat->type == SM_BITMAP)
 				{
-					if (IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && !operat->checked)
+					if (wnd->IsMouseOn(operat->rect) && !operat->checked)
 					{
 						operat->checked = True;
 
@@ -697,9 +696,9 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
 						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
 						PaintBitmap(dc, bmprect, operat->bitmap);
-						Frame(dc, operat->rect, FRAME_UP);
+						surface->Frame(operat->rect, FRAME_UP);
 					}
-					else if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && operat->checked)
+					else if (!wnd->IsMouseOn(operat->rect) && operat->checked)
 					{
 						operat->checked = False;
 						operat->clicked = False;
@@ -708,7 +707,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
+						surface->Box(operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 						bmprect = operat->rect;

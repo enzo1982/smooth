@@ -29,6 +29,7 @@
 #include <smooth/menubar.h>
 #include <smooth/system.h>
 #include <smooth/mdiwindow.h>
+#include <smooth/input.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -785,8 +786,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				popup = new PopupMenu(menubar);
 
-				popup->GetObjectProperties()->pos.x = MouseX(hwnd, WINDOW);
-				popup->GetObjectProperties()->pos.y = MouseY(hwnd, WINDOW);
+				popup->GetObjectProperties()->pos.x = MouseX();
+				popup->GetObjectProperties()->pos.y = MouseY();
 
 				RegisterObject(popup);
 
@@ -798,11 +799,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSEMOVE:
 			dc = GetContext(this);
 
-			if (PtVisible(dc, MouseX(hwnd, WINDOW), MouseY(hwnd, WINDOW)) && (MouseX(hwnd, WINDOW) > 2 && MouseY(hwnd, WINDOW) > 2 && MouseX(hwnd, WINDOW) < objectProperties->size.cx - 3 && MouseY(hwnd, WINDOW) < objectProperties->size.cy - 3))
+			if (PtVisible(dc, MouseX(), MouseY()) && (MouseX() > 2 && MouseY() > 2 && MouseX() < objectProperties->size.cx - 3 && MouseY() < objectProperties->size.cy - 3))
 			{
 				if (!cursorset) LiSASetMouseCursor(LiSA_MOUSE_ARROW);
 			}
-			else if (!PtVisible(dc, MouseX(hwnd, WINDOW), MouseY(hwnd, WINDOW)))
+			else if (!PtVisible(dc, MouseX(), MouseY()))
 			{
 				message = SM_MOUSELEAVE;
 			}
@@ -882,9 +883,9 @@ S::Int S::GUI::Window::Paint(Int message)
 {
 	EnterProtectedRegion();
 
+	Surface	*surface = GetDrawSurface();
 	Object	*object;
-	Object	*lastobject = NIL;
-	HDC	 dc;
+	Widget	*lastWidget = NIL;
 	Point	 doublebar1;
 	Point	 doublebar2;
 	int	 bias = 0;
@@ -896,51 +897,52 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	if (created && visible)
 	{
-		dc = GetContext(this);
-
 		for (Int i = 0; i < nOfObjects; i++)
 		{
 			object = assocObjects.GetNthEntry(i);
 
-			if (object->GetObjectProperties()->orientation == OR_TOP)
+			if (object->GetObjectType() == OBJ_WIDGET)
 			{
-				topobjcount++;
-
-				lastobject = object;
-
-				if (object->subtype == WO_SEPARATOR)
+				if (object->GetObjectProperties()->orientation == OR_TOP)
 				{
-					bias = -3;
+					topobjcount++;
 
-					topoffset += object->GetObjectProperties()->size.cy + 3;
+					lastWidget = (Widget *) object;
 
-					doublebar1.x = 4;
-					doublebar1.y = topoffset - 2;
-					doublebar2.x = objectProperties->size.cx - 4;
-					doublebar2.y = doublebar1.y;
+					if (((Widget *) object)->subtype == WO_SEPARATOR)
+					{
+						bias = -3;
 
-					if (icon != NIL) doublebar1.x += METRIC_TITLEBARHEIGHT - 2;
+						topoffset += object->GetObjectProperties()->size.cy + 3;
 
-					HBar(dc, doublebar1, doublebar2);
+						doublebar1.x = 4;
+						doublebar1.y = topoffset - 2;
+						doublebar2.x = objectProperties->size.cx - 4;
+						doublebar2.y = doublebar1.y;
+
+						if (icon != NIL) doublebar1.x += METRIC_TITLEBARHEIGHT - 2;
+
+						surface->Bar(doublebar1, doublebar2, OR_HORZ);
+					}
+					else
+					{
+						bias = 0;
+
+						topoffset += object->GetObjectProperties()->size.cy;
+					}
 				}
-				else
+				else if (object->GetObjectProperties()->orientation == OR_BOTTOM)
 				{
-					bias = 0;
-
-					topoffset += object->GetObjectProperties()->size.cy;
+					btmobjcount++;
 				}
-			}
-			else if (object->GetObjectProperties()->orientation == OR_BOTTOM)
-			{
-				btmobjcount++;
-			}
-			else if (object->GetObjectProperties()->orientation == OR_LEFT)
-			{
-				leftobjcount++;
-			}
-			else if (object->GetObjectProperties()->orientation == OR_RIGHT)
-			{
-				rightobjcount++;
+				else if (object->GetObjectProperties()->orientation == OR_LEFT)
+				{
+					leftobjcount++;
+				}
+				else if (object->GetObjectProperties()->orientation == OR_RIGHT)
+				{
+					rightobjcount++;
+				}
 			}
 		}
 
@@ -950,16 +952,16 @@ S::Int S::GUI::Window::Paint(Int message)
 			doublebar1.y = offset.top - 2 + bias;
 			doublebar2.x = objectProperties->size.cx - 4;
 
-			if (topobjcount > 0) if (lastobject->subtype == WO_NOSEPARATOR) doublebar1.y -= 3;
+			if (topobjcount > 0) if (lastWidget->subtype == WO_NOSEPARATOR) doublebar1.y -= 3;
 
 			doublebar2.y = doublebar1.y;
 
-			HBar(dc, doublebar1, doublebar2);
+			surface->Bar(doublebar1, doublebar2, OR_HORZ);
 
 			doublebar1.y = doublebar1.y + 2;
 			doublebar2.y = doublebar2.y + 2;
 
-			HBar(dc, doublebar1, doublebar2);
+			surface->Bar(doublebar1, doublebar2, OR_HORZ);
 		}
 
 		if (btmobjcount > 0)
@@ -969,12 +971,12 @@ S::Int S::GUI::Window::Paint(Int message)
 			doublebar2.x = objectProperties->size.cx - 4;
 			doublebar2.y = doublebar1.y;
 
-			HBar(dc, doublebar1, doublebar2);
+			surface->Bar(doublebar1, doublebar2, OR_HORZ);
 
 			doublebar1.y = doublebar1.y + 2;
 			doublebar2.y = doublebar2.y + 2;
 
-			HBar(dc, doublebar1, doublebar2);
+			surface->Bar(doublebar1, doublebar2, OR_HORZ);
 		}
 
 		if (leftobjcount > 0)
@@ -984,7 +986,7 @@ S::Int S::GUI::Window::Paint(Int message)
 			doublebar2.x = doublebar1.x;
 			doublebar2.y = objectProperties->size.cy - offset.bottom - 2;
 
-			VBar(dc, doublebar1, doublebar2);
+			surface->Bar(doublebar1, doublebar2, OR_VERT);
 		}
 
 		if (rightobjcount > 0)
@@ -994,7 +996,7 @@ S::Int S::GUI::Window::Paint(Int message)
 			doublebar2.x = doublebar1.x;
 			doublebar2.y = objectProperties->size.cy - offset.bottom - 2;
 
-			VBar(dc, doublebar1, doublebar2);
+			surface->Bar(doublebar1, doublebar2, OR_VERT);
 		}
 
 		for (int j = 0; j < nOfObjects; j++)
@@ -1010,8 +1012,6 @@ S::Int S::GUI::Window::Paint(Int message)
 		}
 
 		onPaint.Emit();
-
-		FreeContext(this, dc);
 	}
 
 	LeaveProtectedRegion();
@@ -1024,7 +1024,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 	if (type == OBJ_TOOLWINDOW) return;
 
 	Object	*operat;
-	Object	*lastoperat = NIL;
+	Widget	*lastWidget = NIL;
 	Int	 rightobjcount = 0;
 	Int	 leftobjcount = 0;
 	Int	 btmobjcount = 0;
@@ -1041,7 +1041,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 		{
 			topobjcount++;
 
-			lastoperat = operat;
+			lastWidget = (Widget *) operat;
 
 			operat->GetObjectProperties()->pos.x	= offset.left;
 			operat->GetObjectProperties()->pos.y	= offset.top;
@@ -1049,7 +1049,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 			offset.top += operat->GetObjectProperties()->size.cy;
 
-			if (operat->subtype == WO_SEPARATOR) offset.top += 3;
+			if (((Widget *) operat)->subtype == WO_SEPARATOR) offset.top += 3;
 		}
 	}
 
@@ -1057,7 +1057,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 	{
 		offset.top += 3;
 
-		if (lastoperat->subtype == WO_NOSEPARATOR) offset.top += 3;
+		if (lastWidget->subtype == WO_NOSEPARATOR) offset.top += 3;
 	}
 
 	for (i = 0; i < nOfObjects; i++)
@@ -1126,6 +1126,22 @@ S::Void S::GUI::Window::CalculateOffsets()
 			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - offset.top - offset.bottom;
 		}
 	}
+}
+
+S::Int S::GUI::Window::MouseX()
+{
+	return Input::MouseX() - objectProperties->pos.x;
+}
+
+S::Int S::GUI::Window::MouseY()
+{
+	return Input::MouseY() - objectProperties->pos.y;
+}
+
+S::Bool S::GUI::Window::IsMouseOn(Rect rect)
+{
+	if ((MouseX() >= rect.left) && (MouseX() <= rect.right) && (MouseY() >= rect.top) && (MouseY() <= rect.bottom))	return True;
+	else														return False;
 }
 
 S::Int S::GUI::Window::RegisterObject(Object *object)

@@ -17,6 +17,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -64,13 +65,7 @@ S::Int S::GUI::Slider::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Point	 lineStart;
 	Point	 lineEnd;
@@ -93,7 +88,7 @@ S::Int S::GUI::Slider::Paint(Int message)
 			sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAWIDTH + 1;
 		}
 
-		Box(dc, sliderRect, Setup::BackgroundColor, FILLED);
+		surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
 	}
 
 	if (subtype == OR_HORZ)
@@ -103,24 +98,24 @@ S::Int S::GUI::Slider::Paint(Int message)
 		lineEnd.x = realPos.x + objectProperties->size.cx - METRIC_SLIDERAREAOFFSETX;
 		lineEnd.y = lineStart.y;
 
-		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
 		lineStart.y++;
 		lineEnd.y++;
 
-		Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
 
-		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y - 1), Setup::DividerLightColor);
+		surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
 
 		sliderRect.left		= realPos.x + (Int) (((Float) (objectProperties->size.cx - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		sliderRect.top		= realPos.y;
 		sliderRect.right	= sliderRect.left + METRIC_SLIDERAREAWIDTH - 1;
 		sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAHEIGHT - 2;
 
-		if (!objectProperties->clicked)	Box(dc, sliderRect, Setup::BackgroundColor, FILLED);
-		else				Box(dc, sliderRect, Setup::LightGrayColor, FILLED);
+		if (!objectProperties->clicked)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
+		else				surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
 
-		Frame(dc, sliderRect, FRAME_UP);
+		surface->Frame(sliderRect, FRAME_UP);
 	}
 	else
 	{
@@ -129,29 +124,27 @@ S::Int S::GUI::Slider::Paint(Int message)
 		lineEnd.x = lineStart.x;
 		lineEnd.y = realPos.y + objectProperties->size.cy - METRIC_SLIDERAREAOFFSETX;
 
-		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
 		lineStart.x++;
 		lineEnd.x++;
 
-		Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
 
-		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y - 1), Setup::DividerLightColor);
+		surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
 
 		sliderRect.left		= realPos.x;
 		sliderRect.top		= realPos.y + (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH) - (Int) (((Float) (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		sliderRect.right	= sliderRect.left + METRIC_SLIDERAREAHEIGHT - 1;
 		sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAWIDTH;
 
-		if (!objectProperties->clicked)	Box(dc, sliderRect, Setup::BackgroundColor, FILLED);
-		else				Box(dc, sliderRect, Setup::LightGrayColor, FILLED);
+		if (!objectProperties->clicked)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
+		else				surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
 
-		Frame(dc, sliderRect, FRAME_UP);
+		surface->Frame(sliderRect, FRAME_UP);
 	}
 
 	prevValue = *variable;
-
-	FreeContext(wnd, dc);
 
 	return Success;
 }
@@ -161,19 +154,17 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Rect	 slider;
 	Rect	 actionArea;
 	Int	 oldValue = *variable;
 	Float	 buffer;
-	HDC	 dc;
 
 	if (prevValue != *variable) Paint(SP_PAINT);
 
@@ -205,24 +196,22 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			dc = GetContext(wnd);
-
-			if (IsMouseOn(wnd->hwnd, slider, WINDOW) && !objectProperties->clicked)
+			if (wnd->IsMouseOn(slider) && !objectProperties->clicked)
 			{
 				objectProperties->clicked = True;
 
 				slider.left++;
 				slider.top++;
-				Box(dc, slider, Setup::LightGrayColor, FILLED);
+				surface->Box(slider, Setup::LightGrayColor, FILLED);
 				slider.left--;
 				slider.top--;
 
-				if (subtype == OR_HORZ)	mouseBias = (slider.left + METRIC_SLIDERAREAOFFSETX) - MouseX(wnd->hwnd, WINDOW);
-				else			mouseBias = (slider.top + METRIC_SLIDERAREAOFFSETX) - MouseY(wnd->hwnd, WINDOW);
+				if (subtype == OR_HORZ)	mouseBias = (slider.left + METRIC_SLIDERAREAOFFSETX) - wnd->MouseX();
+				else			mouseBias = (slider.top + METRIC_SLIDERAREAOFFSETX) - wnd->MouseY();
 
 				retVal = Break;
 			}
-			else if (IsMouseOn(wnd->hwnd, actionArea, WINDOW) && !objectProperties->clicked)
+			else if (wnd->IsMouseOn(actionArea) && !objectProperties->clicked)
 			{
 				mouseBias = 0;
 
@@ -235,36 +224,28 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_LBUTTONUP:
-			dc = GetContext(wnd);
-
 			if (objectProperties->clicked)
 			{
 				objectProperties->clicked = False;
 
 				slider.left++;
 				slider.top++;
-				Box(dc, slider, Setup::BackgroundColor, FILLED);
+				surface->Box(slider, Setup::BackgroundColor, FILLED);
 				slider.left--;
 				slider.top--;
 
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
 			if (objectProperties->clicked)
 			{
 				if (subtype == OR_HORZ)
 				{
-					buffer = ((Float) (endValue - startValue)) / (((Float) (objectProperties->size.cx - METRIC_SLIDERAREAWIDTH)) / ((Float) (MouseX(wnd->hwnd, WINDOW) + mouseBias - (realPos.x + METRIC_SLIDERAREAOFFSETX))));
+					buffer = ((Float) (endValue - startValue)) / (((Float) (objectProperties->size.cx - METRIC_SLIDERAREAWIDTH)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + METRIC_SLIDERAREAOFFSETX))));
 
 					*variable = startValue + Math::Round(buffer);
 
@@ -273,7 +254,7 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 				}
 				else
 				{
-					buffer = ((Float) (endValue - startValue)) / (((Float) (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH)) / ((Float) (MouseY(wnd->hwnd, WINDOW) + mouseBias - (realPos.y + METRIC_SLIDERAREAOFFSETX))));
+					buffer = ((Float) (endValue - startValue)) / (((Float) (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + METRIC_SLIDERAREAOFFSETX))));
 
 					*variable = endValue - Math::Round(buffer);
 
@@ -285,7 +266,7 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 				{
 					slider.right++;
 					slider.bottom++;
-					Box(dc, slider, Setup::BackgroundColor, FILLED);
+					surface->Box(slider, Setup::BackgroundColor, FILLED);
 					slider.right--;
 					slider.bottom--;
 
@@ -294,8 +275,6 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 					onClick.Emit();
 				}
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 	}

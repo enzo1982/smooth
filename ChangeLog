@@ -11,6 +11,8 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - pciio.cpp		- integrated LibPCI into the main library (will be replaced by a new API later)
 - window.cpp		- Windows now create a Layer automatically, so you can register Layer objects at a Window object
 			- new method: Close()
+			- new method: IsMouseOn(Rect)
+			- new methods: MouseX(), MouseY()
 - stk.cpp		- removed function CloseWindow(Window *)
 			- removed class Setup
 - colordlg.cpp		- color box now updates when the vertical hue selector is moved
@@ -20,6 +22,8 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - setup.cpp		- new class: replaces old SMOOTH::Setup
 - object.cpp		- moved many methods to class GUI::Widget
 - timer.cpp		- Timers no longer need to be registered and are now independent of Windows
+- surface.cpp		- new method: Gradient(...), replaces same function in toolkit.cpp
+- input.cpp		- new class: contains mouse and keyboard input functionality
 
 - new namespace: smooth alias S
 - new namespace: smooth::XML

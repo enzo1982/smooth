@@ -11,6 +11,7 @@
 #include <smooth/container.h>
 #include <smooth/surface.h>
 #include <smooth/object.h>
+#include <smooth/window.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -109,6 +110,22 @@ S::ContainerType S::Container::GetContainerType()
 S::Object *S::Container::GetContainerObject()
 {
 	return self;
+}
+
+S::GUI::Window *S::Container::GetContainerWindow()
+{
+	if (self == NIL) return NIL;
+
+	Object	*object = self;
+
+	while (object->GetObjectType() != OBJ_WINDOW)
+	{
+		object = object->GetContainer()->GetContainerObject();
+
+		if (object == NIL) return NIL;
+	}
+
+	return (GUI::Window *) object;
 }
 
 S::GUI::Surface *S::Container::GetDrawSurface()

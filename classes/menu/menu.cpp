@@ -173,7 +173,7 @@ S::Void S::Menu::GetMenuEntriesSize()
 		Menu::Entry	*operat = entries.GetNthEntry(i);
 
 #ifdef __WIN32__
-		if (!operat->sizeset) operat->size = GetTextSizeX(hdc, operat->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
+		if (!operat->sizeset) operat->size = GetTextSizeX(operat->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
 #endif
 
 		operat->sizeset = True;

@@ -139,10 +139,10 @@ HBITMAP S::GrayscaleBitmap(HBITMAP bmp)
 	{
 		for (int x = 0; x < isy; x++)
 		{
-			col = GetPixel(cdc, Point(x, y));
+			col = GetPixel(cdc, x, y);
 			col = (GetRed(col) + GetGreen(col) + GetBlue(col)) / 3;
 			col = RGB(col, col, col);
-			PaintPixel(cdc, Point(x, y), col);
+			SetPixel(cdc, x, y, col);
 		}
 	}
 
@@ -170,7 +170,7 @@ HBITMAP S::DetectTransparentRegions(HBITMAP bmp)
 	{
 		for (int x = 0; x < isy; x++)
 		{
-			if (GetPixel(cdc, Point(x, y)) == RGB(192, 192, 192)) PaintPixel(cdc, Point(x, y), Setup::BackgroundColor);
+			if (GetPixel(cdc, x, y) == RGB(192, 192, 192)) SetPixel(cdc, x, y, Setup::BackgroundColor);
 		}
 	}
 

@@ -8,35 +8,27 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_TIMER_
-#define _H_OBJSMOOTH_TIMER_
+#ifndef _H_INPUT_
+#define _H_INPUT_
 
 namespace smooth
 {
-	class Timer;
+	class Input;
 };
 
-#include "object.h"
+#include "definitions.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Timer : public Object
+	class SMOOTHAPI Input
 	{
 		private:
-			Int		 timerid;
+					 Input();
+					 Input(const Input &);
 		public:
-					 Timer();
-					~Timer();
-
-			Int		 Start(Int);
-			Int		 Stop();
-
-			Int		 GetID();
-		signals:
-			Signal0<Void>	 onInterval;
+			static Int	 MouseX();
+			static Int	 MouseY();
 	};
-
-	SMOOTHVAR Int OBJ_TIMER;
 };
 
 #endif

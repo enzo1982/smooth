@@ -25,6 +25,8 @@ S::GUI::Widget::Widget()
 {
 	visible	= False;
 	active	= True;
+
+	subtype	= 0;
 }
 
 S::GUI::Widget::~Widget()
@@ -145,6 +147,20 @@ S::Int S::GUI::Widget::SetText(String newText)
 S::String S::GUI::Widget::GetText()
 {
 	return objectProperties->text;
+}
+
+S::Int S::GUI::Widget::SetTooltip(String newTooltip)
+{
+	objectProperties->tooltip = newTooltip;
+
+	GetTextSize();
+
+	return Success;
+}
+
+S::String S::GUI::Widget::GetTooltip()
+{
+	return objectProperties->tooltip;
 }
 
 S::Int S::GUI::Widget::SetFont(String newFont, Int newFontSize, Int newFontColor, Int newFontWeight)

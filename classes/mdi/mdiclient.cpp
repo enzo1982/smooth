@@ -20,6 +20,7 @@
 #include <smooth/binary.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -45,16 +46,15 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Object	*object;
 	Divider	*db;
 	Rect	 client;
 	Rect	 updateRect = wnd->GetUpdateRect();
-	HDC	 dc = GetContext(wnd);
 
 	client.left	= objectProperties->pos.x + 2;
 	client.top	= objectProperties->pos.y + 2;
@@ -117,12 +117,10 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 		intersectRect = iRect;
 #endif
 
-		Box(dc, intersectRect, Setup::DividerDarkColor, FILLED);
+		surface->Box(intersectRect, Setup::DividerDarkColor, FILLED);
 
-		Frame(dc, client, FRAME_DOWN);
+		surface->Frame(client, FRAME_DOWN);
 	}
-
-	FreeContext(wnd, dc);
 
 	return Success;
 }

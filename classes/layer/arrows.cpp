@@ -18,6 +18,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/timer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -74,13 +75,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 lineStart;
@@ -91,7 +86,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	Frame(dc, frame, FRAME_UP);
+	surface->Frame(frame, FRAME_UP);
 
 	if (subtype == OR_HORZ)
 	{
@@ -100,12 +95,12 @@ S::Int S::GUI::Arrows::Paint(Int message)
 		lineEnd.x = lineStart.x;
 		lineEnd.y = frame.bottom;
 
-		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
 		lineStart.x++;
 		lineEnd.x++;
 
-		Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
 
 		lineStart.x = (frame.left + (frame.left + frame.right) / 2) / 2 - 1;
 		lineStart.y = (frame.bottom + frame.top) / 2;
@@ -114,7 +109,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		for (Int i = 0; i < 4; i++)
 		{
-			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+			surface->Line(lineStart, lineEnd, Setup::TextColor);
 
 			lineStart.x++;
 			lineStart.y--;
@@ -129,7 +124,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+			surface->Line(lineStart, lineEnd, Setup::TextColor);
 
 			lineStart.x++;
 			lineStart.y++;
@@ -144,12 +139,12 @@ S::Int S::GUI::Arrows::Paint(Int message)
 		lineEnd.x = frame.right;
 		lineEnd.y = lineStart.y;
 
-		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
 		lineStart.y++;
 		lineEnd.y++;
 
-		Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
 
 		lineStart.x = (frame.right + frame.left) / 2;
 		lineStart.y = (frame.top + (frame.top+frame.bottom) / 2) / 2 - 1;
@@ -158,7 +153,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		for (Int k = 0; k < 4; k++)
 		{
-			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+			surface->Line(lineStart, lineEnd, Setup::TextColor);
 
 			lineStart.x--;
 			lineStart.y++;
@@ -173,7 +168,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		for (Int l = 0; l < 4; l++)
 		{
-			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+			surface->Line(lineStart, lineEnd, Setup::TextColor);
 
 			lineStart.x++;
 			lineStart.y++;
@@ -181,8 +176,6 @@ S::Int S::GUI::Arrows::Paint(Int message)
 			lineEnd.y++;
 		}
 	}
-
-	FreeContext(wnd, dc);
 
 	return Success;
 }
@@ -192,18 +185,16 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Rect	 frame;
 	Rect	 arrow1Frame;
 	Rect	 arrow2Frame;
-	HDC	 dc;
 	Int	 prevValue = *variable;
 
 	frame.left	= realPos.x + 2;
@@ -214,8 +205,6 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			dc = GetContext(wnd);
-
 			if (!timerActive && timer == NIL && (arrow1Checked || arrow2Checked))
 			{
 				timer = new Timer();
@@ -234,7 +223,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				if (subtype == OR_VERT)	frame.bottom = realPos.y + objectProperties->size.cy / 2 - 3;
 				else			frame.right = realPos.x + objectProperties->size.cx / 2 - 3;
 
-				Frame(dc, frame, FRAME_DOWN);
+				surface->Frame(frame, FRAME_DOWN);
 
 				if (subtype == OR_HORZ)	(*variable)--;
 				else			(*variable)++;
@@ -253,7 +242,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				if (subtype == OR_VERT)	frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
 				else			frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
 
-				Frame(dc, frame, FRAME_DOWN);
+				surface->Frame(frame, FRAME_DOWN);
 
 				if (subtype == OR_HORZ)	(*variable)++;
 				else			(*variable)--;
@@ -266,14 +255,10 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_LBUTTONDBLCLK:
 			return Process(SM_LBUTTONDOWN, 0, 0);
 		case SM_LBUTTONUP:
-			dc = GetContext(wnd);
-
 			if (timerActive) timerActive = False;
 
 			if (arrow1Clicked)
@@ -286,7 +271,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -304,7 +289,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -313,12 +298,8 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSELEAVE:
-			dc = GetContext(wnd);
-
 			arrow1Frame = frame;
 			arrow2Frame = frame;
 
@@ -328,7 +309,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			if (subtype == OR_VERT)	arrow2Frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
 			else			arrow2Frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
 
-			if (arrow1Checked && !IsMouseOn(wnd->hwnd, arrow1Frame, WINDOW))
+			if (arrow1Checked && !wnd->IsMouseOn(arrow1Frame))
 			{
 				if (timerActive) timerActive = False;
 
@@ -337,11 +318,11 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				arrow1Frame.right++;
 				arrow1Frame.bottom++;
-				Box(dc, arrow1Frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(arrow1Frame, Setup::BackgroundColor, OUTLINED);
 				arrow1Frame.right--;
 				arrow1Frame.bottom--;
 			}
-			else if (arrow2Checked && !IsMouseOn(wnd->hwnd, arrow2Frame, WINDOW))
+			else if (arrow2Checked && !wnd->IsMouseOn(arrow2Frame))
 			{
 				if (timerActive) timerActive = False;
 
@@ -350,17 +331,13 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				arrow2Frame.right++;
 				arrow2Frame.bottom++;
-				Box(dc, arrow2Frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(arrow2Frame, Setup::BackgroundColor, OUTLINED);
 				arrow2Frame.right--;
 				arrow2Frame.bottom--;
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
 			arrow1Frame = frame;
 			arrow2Frame = frame;
 
@@ -370,13 +347,13 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			if (subtype == OR_VERT)	arrow2Frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
 			else			arrow2Frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
 
-			if (!arrow1Checked && IsMouseOn(wnd->hwnd, arrow1Frame, WINDOW))
+			if (!arrow1Checked && wnd->IsMouseOn(arrow1Frame))
 			{
 				arrow1Checked = True;
 
-				Frame(dc, arrow1Frame, FRAME_UP);
+				surface->Frame(arrow1Frame, FRAME_UP);
 			}
-			else if (arrow1Checked && !IsMouseOn(wnd->hwnd, arrow1Frame, WINDOW))
+			else if (arrow1Checked && !wnd->IsMouseOn(arrow1Frame))
 			{
 				if (timerActive) timerActive = False;
 
@@ -385,17 +362,17 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				arrow1Frame.right++;
 				arrow1Frame.bottom++;
-				Box(dc, arrow1Frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(arrow1Frame, Setup::BackgroundColor, OUTLINED);
 				arrow1Frame.right--;
 				arrow1Frame.bottom--;
 			}
-			else if (!arrow2Checked && IsMouseOn(wnd->hwnd, arrow2Frame, WINDOW))
+			else if (!arrow2Checked && wnd->IsMouseOn(arrow2Frame))
 			{
 				arrow2Checked = True;
 
-				Frame(dc, arrow2Frame, FRAME_UP);
+				surface->Frame(arrow2Frame, FRAME_UP);
 			}
-			else if (arrow2Checked && !IsMouseOn(wnd->hwnd, arrow2Frame, WINDOW))
+			else if (arrow2Checked && !wnd->IsMouseOn(arrow2Frame))
 			{
 				if (timerActive) timerActive = False;
 
@@ -404,12 +381,10 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				arrow2Frame.right++;
 				arrow2Frame.bottom++;
-				Box(dc, arrow2Frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(arrow2Frame, Setup::BackgroundColor, OUTLINED);
 				arrow2Frame.right--;
 				arrow2Frame.bottom--;
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 #ifdef __WIN32__

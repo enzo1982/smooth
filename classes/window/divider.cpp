@@ -18,6 +18,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -72,9 +73,9 @@ S::Int S::GUI::Divider::Paint(Int message)
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Object	*object;
 	Divider	*operat;
-	HDC	 dc = GetContext(wnd);
 	Point	 doubleBar1;
 	Point	 doubleBar2;
 	Bool	 afterMe = False;
@@ -159,7 +160,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 		objectProperties->size.cx = doubleBar2.x - doubleBar1.x + 4;
 		objectProperties->size.cy = 2;
 
-		HBar(dc, doubleBar1, doubleBar2);
+		surface->Bar(doubleBar1, doubleBar2, OR_HORZ);
 	}
 	else if (Binary::IsFlagSet(orientation, OR_VERT))
 	{
@@ -239,10 +240,8 @@ S::Int S::GUI::Divider::Paint(Int message)
 		objectProperties->size.cy = doubleBar2.y - doubleBar1.y + 4;
 		objectProperties->size.cx = 2;
 
-		VBar(dc, doubleBar1, doubleBar2);
+		surface->Bar(doubleBar1, doubleBar2, OR_VERT);
 	}
-
-	FreeContext(wnd, dc);
 
 	return Success;
 }

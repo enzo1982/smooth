@@ -19,6 +19,7 @@ namespace smooth
 	namespace GUI
 	{
 		class Surface;
+		class Window;
 	};
 };
 
@@ -52,6 +53,7 @@ namespace smooth
 			ContainerType		 GetContainerType();
 
 			Object			*GetContainerObject();
+			GUI::Window		*GetContainerWindow();
 
 			virtual GUI::Surface	*GetDrawSurface();
 	};

@@ -40,7 +40,7 @@ namespace smooth
 				Int	 Frame(Rect, Int);
 				Int	 Box(Rect, Int, Int);
 
-				Int	 SetText(String, Rect, String, Int, Int, Int);
+				Int	 SetText(String, Rect, String, Int, Int, Int, Int = 0);
 
 				Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
 				Int	 BlitToBitmap(Rect, HBITMAP, Rect);

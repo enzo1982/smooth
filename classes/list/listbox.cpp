@@ -389,17 +389,15 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window		*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface		*surface = myContainer->GetDrawSurface();
 	Point		 realPos = GetRealPosition();
 	Int		 retVal = Success;
 	List::Entry	*operat;
 	Rect		 frame;
-	HDC		 dc;
 	Bool		 change = False;
 	Int		 maxFrameY;
 	Int		 i;
@@ -412,8 +410,6 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_CHECKLISTBOXES:
-			dc = GetContext(wnd);
-
 			if (scrollbarPos != lastScrollbarPos)
 			{
 				lastScrollbarPos = scrollbarPos;
@@ -425,7 +421,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
 
-				Box(dc, frame, Setup::ClientColor, FILLED);
+				surface->Box(frame, Setup::ClientColor, FILLED);
 
 				frame.left	= realPos.x;
 				frame.top	= realPos.y;
@@ -457,7 +453,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 						frame.left += METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
-						::SetText(dc, operat->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						surface->SetText(operat->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 						frame.left -= METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
 
@@ -465,7 +461,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						{
 							operat->rect.right++;
 							operat->rect.bottom++;
-							Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
+							surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 							operat->rect.right--;
 							operat->rect.bottom--;
 						}
@@ -485,19 +481,15 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_LBUTTONDOWN:
-			dc = GetContext(wnd);
-
 			for (i = 0; i < nOfEntries; i++)
 			{
 				operat = entries.GetNthEntry(i);
 
 				if (operat == NIL) break;
 
-				if (IsMouseOn(wnd->hwnd, operat->rect, WINDOW))
+				if (wnd->IsMouseOn(operat->rect))
 				{
 					wnd->Process(SM_LOOSEFOCUS, handle, 0);
 
@@ -511,7 +503,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (operat == NIL) break;
 
-				if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW))
+				if (!wnd->IsMouseOn(operat->rect))
 				{
 					if (operat->clk && change)
 					{
@@ -519,7 +511,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						operat->clk = False;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::ClientColor, OUTLINED);
+						surface->Box(operat->rect, Setup::ClientColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 					}
@@ -532,7 +524,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (operat == NIL) break;
 
-				if (IsMouseOn(wnd->hwnd, operat->rect, WINDOW))
+				if (wnd->IsMouseOn(operat->rect))
 				{
 					if (!operat->clk || allowReselect)
 					{
@@ -540,7 +532,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						operat->clk = True;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
+						surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
@@ -552,32 +544,28 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSELEAVE:
-			dc = GetContext(wnd);
-
 			for (i = 0; i < nOfEntries; i++)
 			{
 				operat = entries.GetNthEntry(i);
 
 				if (operat == NIL) break;
 
-				if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW))
+				if (!wnd->IsMouseOn(operat->rect))
 				{
 					if (operat->chk)
 					{
 						operat->chk = False;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::ClientColor, FILLED);
+						surface->Box(operat->rect, Setup::ClientColor, FILLED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
 						operat->rect.left++;
 						operat->rect.top++;
-						::SetText(dc, operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						surface->SetText(operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -585,40 +573,36 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						{
 							operat->rect.right++;
 							operat->rect.bottom++;
-							Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
+							surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 							operat->rect.right--;
 							operat->rect.bottom--;
 						}
 					}
 				}
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
 			for (i = 0; i < nOfEntries; i++)
 			{
 				operat = entries.GetNthEntry(i);
 
 				if (operat == NIL) break;
 
-				if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW))
+				if (!wnd->IsMouseOn(operat->rect))
 				{
 					if (operat->chk)
 					{
 						operat->chk = False;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, Setup::ClientColor, FILLED);
+						surface->Box(operat->rect, Setup::ClientColor, FILLED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
 						operat->rect.left++;
 						operat->rect.top++;
-						::SetText(dc, operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						surface->SetText(operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -626,7 +610,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						{
 							operat->rect.right++;
 							operat->rect.bottom++;
-							Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
+							surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 							operat->rect.right--;
 							operat->rect.bottom--;
 						}
@@ -640,20 +624,20 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (operat == NIL) break;
 
-				if (IsMouseOn(wnd->hwnd, operat->rect, WINDOW))
+				if (wnd->IsMouseOn(operat->rect))
 				{
 					if (!operat->chk)
 					{
 						operat->chk = True;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Gradient(dc, operat->rect, Setup::GradientStartColor, Setup::GradientEndColor, GRADIENT_LR);
+						surface->Gradient(operat->rect, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
 						operat->rect.left++;
 						operat->rect.top++;
-						::SetText(dc, operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+						surface->SetText(operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -661,15 +645,13 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						{
 							operat->rect.right++;
 							operat->rect.bottom++;
-							Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
+							surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 							operat->rect.right--;
 							operat->rect.bottom--;
 						}
 					}
 				}
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 	}

@@ -13,7 +13,6 @@
 #include <smooth/objectmanager.h>
 #include <smooth/i18n.h>
 #include <smooth/stk.h>
-#include <smooth/window.h>
 #include <smooth/layer.h>
 #include <smooth/toolkit.h>
 #include <smooth/surface.h>
@@ -34,7 +33,6 @@ S::Object::Object()
 
 	type.object		= this;
 	type			= OBJ_OBJECT;
-	subtype			= 0;
 
 	registered		= False;
 
@@ -71,20 +69,6 @@ S::Int S::Object::IsObjectInUse()
 S::Bool S::Object::IsObjectDeleteable()
 {
 	return deleteObject;
-}
-
-S::Int S::Object::SetTooltip(String newTooltip)
-{
-	objectProperties->tooltip = newTooltip;
-
-	GetTextSize();
-
-	return Success;
-}
-
-S::String S::Object::GetTooltip()
-{
-	return objectProperties->tooltip;
 }
 
 S::Bool S::Object::IsRegistered()
@@ -162,17 +146,18 @@ S::Void S::Object::UnsetRegisteredFlag()
 
 S::Void S::Object::GetTextSize()
 {
-	HDC	 dc = GetContext(0);
-
-	objectProperties->textSize.cx = GetTextSizeX(dc, objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-	objectProperties->textSize.cy = GetTextSizeY(dc, objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	objectProperties->textSize.cx = GetTextSizeX(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	objectProperties->textSize.cy = GetTextSizeY(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 #ifdef __WIN32__
-	objectProperties->tooltipSize.cx = GetTextSizeX(dc, objectProperties->tooltip, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL);
-	objectProperties->tooltipSize.cy = GetTextSizeY(dc, objectProperties->tooltip, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL);
-#endif
+	HDC	 dc = GetWindowDC(0);
 
-	FreeContext(0, dc);
+	objectProperties->tooltipSize.cx = GetTextSizeX(objectProperties->tooltip, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL);
+	objectProperties->tooltipSize.cy = GetTextSizeY(objectProperties->tooltip, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL);
+
+	ReleaseDC(0, dc);
+	DeleteDC(dc);
+#endif
 }
 
 S::Object *S::Object::GetObject(Int objectHandle, Int objectType)

@@ -19,6 +19,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -53,13 +54,7 @@ S::Int S::GUI::TreeView::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 
@@ -68,15 +63,15 @@ S::Int S::GUI::TreeView::Paint(Int message)
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	Box(dc, frame, Setup::ClientColor, FILLED);
-	Frame(dc, frame, FRAME_DOWN);
+	surface->Box(frame, Setup::ClientColor, FILLED);
+	surface->Frame(frame, FRAME_DOWN);
 
 	if (objectProperties->text != NIL)
 	{
 		frame.left += 3;
 		frame.top += 2;
 
-		::SetText(dc, objectProperties->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+		surface->SetText(objectProperties->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 		frame.left -= 3;
 		frame.top -= 2;
@@ -87,21 +82,13 @@ S::Int S::GUI::TreeView::Paint(Int message)
 
 	PaintTree(this, 0, frame);
 
-	FreeContext(wnd, dc);
-
 	return Success;
 }
 
 S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 {
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
+	Surface		*surface = myContainer->GetDrawSurface();
 	Tree::Entry	*operat;
-	HDC		 dc = GetContext(wnd);
 	Rect		 oframe = frame;
 	Rect		 rect;
 	Point		 p1;
@@ -130,7 +117,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 		frame.top += 3;
 		frame.bottom = min(frame.bottom, oframe.bottom - 1);
 
-		::SetText(dc, operat->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+		surface->SetText(operat->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 		frame.left -= 3;
 		frame.top -= 3;
@@ -143,7 +130,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 
 				if ((frame.top - y) & 1)
 				{
-					PaintPixel(dc, Point(frame.left - 6, y), Setup::GrayTextColor);
+					surface->SetPixel(frame.left - 6, y, Setup::GrayTextColor);
 				}
 
 				if (y == frame.top + 9)
@@ -152,7 +139,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 					{
 						if (((frame.left - 5) - x) & 1)
 						{
-							PaintPixel(dc, Point(x, y), Setup::GrayTextColor);
+							surface->SetPixel(x, y, Setup::GrayTextColor);
 						}
 					}
 				}
@@ -172,30 +159,30 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 			p2.x = p1.x + 8;
 			p2.y = p1.y;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::GrayTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) surface->Line(p1, p2, Setup::GrayTextColor);
 
 			p1.y = p1.y + 8;
 			p2.y = p1.y;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::GrayTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) surface->Line(p1, p2, Setup::GrayTextColor);
 
 			p1.y = frame.top + 5;
 			p2.y = min(p2.y + 1, oframe.bottom - 1);
 			p2.x = p1.x;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::GrayTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) surface->Line(p1, p2, Setup::GrayTextColor);
 
 			p1.x = p1.x + 8;
 			p2.x = p1.x;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::GrayTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) surface->Line(p1, p2, Setup::GrayTextColor);
 
 			p1.x = rect.left + 2;
 			p1.y = rect.top + 4;
 			p2.x = rect.right - 2;
 			p2.y = p1.y;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::ClientTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) surface->Line(p1, p2, Setup::ClientTextColor);
 
 			if (!operat->open)
 			{
@@ -204,7 +191,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 				p2.x = p1.x;
 				p2.y = min(rect.bottom - 2, oframe.bottom - 1);
 
-				if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::ClientTextColor, PS_SOLID, 1);
+				if (p1.y < oframe.bottom - 1) surface->Line(p1, p2, Setup::ClientTextColor);
 			}
 
 			for (Int y = frame.top - 2; y <= frame.top + 9; y++)
@@ -213,7 +200,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 
 				if (((frame.top - y) & 1) && (y < frame.top + 7))
 				{
-					PaintPixel(dc, Point(frame.left - 6, y), Setup::GrayTextColor);
+					surface->SetPixel(frame.left - 6, y, Setup::GrayTextColor);
 				}
 
 				if (y == frame.top + 9)
@@ -222,7 +209,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 					{
 						if (((frame.left - 5) - x) & 1)
 						{
-							PaintPixel(dc, Point(x, y), Setup::GrayTextColor);
+							surface->SetPixel(x, y, Setup::GrayTextColor);
 						}
 					}
 				}
@@ -241,7 +228,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 
 				if ((frame.top - y) & 1)
 				{
-					PaintPixel(dc, Point(frame.left - 6, y), Setup::GrayTextColor);
+					surface->SetPixel(frame.left - 6, y, Setup::GrayTextColor);
 				}
 			}
 
@@ -252,8 +239,6 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 		frame.top += METRIC_TREEVIEWENTRYHEIGHT + METRIC_TREEVIEWENTRYHEIGHT * ste;
 		frame.bottom += METRIC_TREEVIEWENTRYHEIGHT + METRIC_TREEVIEWENTRYHEIGHT * ste;
 	}
-
-	FreeContext(wnd, dc);
 
 	return painted;
 }

@@ -16,6 +16,7 @@
 #include <smooth/stk.h>
 #include <smooth/tabwidget.h>
 #include <smooth/objectproperties.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -74,16 +75,16 @@ S::Int S::GUI::Layer::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Rect	 updateRect = wnd->GetUpdateRect();
+	Surface	*surface = myContainer->GetDrawSurface();
+
 	if (layerColor != -1)
 	{
 		Rect	 frame;
-		HDC	 dc = GetContext(wnd);
 
 		frame.left	= objectProperties->pos.x;
 		frame.top	= objectProperties->pos.y;
@@ -92,9 +93,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 
 		updateRect = frame;
 
-		Box(dc, frame, layerColor, FILLED);
-
-		FreeContext(wnd, dc);
+		surface->Box(frame, layerColor, FILLED);
 	}
 
 	Object	*object;
@@ -124,22 +123,15 @@ S::Int S::GUI::Layer::Show()
 
 	if (layerColor != -1)
 	{
-		Window	*wnd = (Window *) myContainer->GetContainerObject();
+		Surface	*surface = myContainer->GetDrawSurface();
+		Rect	 frame;
 
-		if (!(wnd == NIL || wnd->hwnd == NIL))
-		{
-			Rect	 frame;
-			HDC	 dc = GetContext(wnd);
+		frame.left	= objectProperties->pos.x;
+		frame.top	= objectProperties->pos.y;
+		frame.right	= objectProperties->pos.x + objectProperties->size.cx;
+		frame.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 
-			frame.left	= objectProperties->pos.x;
-			frame.top	= objectProperties->pos.y;
-			frame.right	= objectProperties->pos.x + objectProperties->size.cx;
-			frame.bottom	= objectProperties->pos.y + objectProperties->size.cy;
-
-			Box(dc, frame, layerColor, FILLED);
-
-			FreeContext(wnd, dc);
-		}
+		surface->Box(frame, layerColor, FILLED);
 	}
 
 	Object	*object;
@@ -185,22 +177,15 @@ S::Int S::GUI::Layer::Hide()
 
 	if (layerColor != -1)
 	{
-		Window	*wnd = (Window *) myContainer->GetContainerObject();
+		Surface	*surface = myContainer->GetDrawSurface();
+		Rect	 frame;
 
-		if (!(wnd == NIL || wnd->hwnd == NIL))
-		{
-			Rect	 frame;
-			HDC	 dc = GetContext(wnd);
+		frame.left	= objectProperties->pos.x;
+		frame.top	= objectProperties->pos.y;
+		frame.right	= objectProperties->pos.x + objectProperties->size.cx;
+		frame.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 
-			frame.left	= objectProperties->pos.x;
-			frame.top	= objectProperties->pos.y;
-			frame.right	= objectProperties->pos.x + objectProperties->size.cx;
-			frame.bottom	= objectProperties->pos.y + objectProperties->size.cy;
-
-			Box(dc, frame, Setup::BackgroundColor, FILLED);
-
-			FreeContext(wnd, dc);
-		}
+		surface->Box(frame, Setup::BackgroundColor, FILLED);
 	}
 
 	return Success;

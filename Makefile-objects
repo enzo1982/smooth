@@ -18,6 +18,11 @@ $(OBJECTDIR)/containertype.o: $(BASICCLASSESDIR)/containertype.cpp $(SMOOTHINCLU
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/containertype.cpp -o $(OBJECTDIR)/containertype.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/input.o: $(BASICCLASSESDIR)/input.cpp $(SMOOTHINCLUDEDIR)/input.h
+	$(ECHO) -n Compiling $(BASICCLASSESDIR)/input.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/input.cpp -o $(OBJECTDIR)/input.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/object.o: $(BASICCLASSESDIR)/object.cpp $(SMOOTHINCLUDEDIR)/object.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/object.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/object.cpp -o $(OBJECTDIR)/object.o

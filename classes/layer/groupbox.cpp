@@ -53,13 +53,7 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
@@ -69,28 +63,26 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	Frame(dc, frame, FRAME_DOWN);
+	surface->Frame(frame, FRAME_DOWN);
 
 	frame.left++;
 	frame.top++;
 	frame.right--;
 	frame.bottom--;
 
-	Frame(dc, frame, FRAME_UP);
+	surface->Frame(frame, FRAME_UP);
 
 	textRect.left	= frame.left + 9;
 	textRect.top	= frame.top - METRIC_GBTEXTOFFSETY;
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
 	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
-	Box(dc, textRect, Setup::BackgroundColor, FILLED);
+	surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
 	textRect.left++;
 
-	if (active)	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-	else		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
-
-	FreeContext(wnd, dc);
+	if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+	else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
 
 	return Success;
 }
@@ -102,13 +94,7 @@ S::Int S::GUI::GroupBox::Activate()
 	if (!registered)	return Success;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
 
@@ -117,13 +103,11 @@ S::Int S::GUI::GroupBox::Activate()
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
 	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
-	Box(dc, textRect, Setup::BackgroundColor, FILLED);
+	surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
 	textRect.left++;
 
-	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-
-	FreeContext(wnd, dc);
+	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 	return Success;
 }
@@ -135,13 +119,7 @@ S::Int S::GUI::GroupBox::Deactivate()
 	if (!registered)	return Success;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
 
@@ -150,13 +128,11 @@ S::Int S::GUI::GroupBox::Deactivate()
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
 	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
-	Box(dc, textRect, Setup::BackgroundColor, FILLED);
+	surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
 	textRect.left++;
 
-	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
-
-	FreeContext(wnd, dc);
+	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
 
 	return Success;
 }

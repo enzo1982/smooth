@@ -11,10 +11,10 @@
 #include <smooth/activearea.h>
 #include <smooth/definitions.h>
 #include <smooth/objectproperties.h>
-#include <smooth/layer.h>
 #include <smooth/surface.h>
 #include <smooth/math.h>
 #include <smooth/stk.h>
+#include <smooth/layer.h>
 #include <smooth/toolkit.h>
 
 #ifdef __WIN32__
@@ -85,14 +85,12 @@ S::Int S::GUI::ActiveArea::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
-	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
+	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 
 	frame.left	= realPos.x + 1;
@@ -103,7 +101,7 @@ S::Int S::GUI::ActiveArea::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			if (IsMouseOn(wnd->hwnd, frame, WINDOW))
+			if (wnd->IsMouseOn(frame))
 			{
 				onClick.Emit();
 

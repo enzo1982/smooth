@@ -17,6 +17,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -56,13 +57,7 @@ S::Int S::GUI::Bitmap::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Rect	 bmpRect;
 	Point	 realPos = GetRealPosition();
 
@@ -71,9 +66,7 @@ S::Int S::GUI::Bitmap::Paint(Int message)
 	bmpRect.right	= realPos.x + objectProperties->size.cx;
 	bmpRect.bottom	= realPos.y + objectProperties->size.cy;
 
-	PaintBitmap(dc, bmpRect, bitmap);
-
-	FreeContext(wnd, dc);
+	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), objectProperties->size), bmpRect);
 
 	return Success;
 }

@@ -11,6 +11,8 @@
 #include <smooth/timer.h>
 #include <smooth/objectmanager.h>
 
+S::Void WINAPI TimerProc(HWND, unsigned int, unsigned int, unsigned long);
+
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
@@ -56,19 +58,19 @@ S::Int S::Timer::GetID()
 	return timerid;
 }
 
-S::Void WINAPI S::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
+S::Void WINAPI TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
 {
-	for (Int i = 0; i < Object::objectCount; i++)
+	for (S::Int i = 0; i < S::Object::objectCount; i++)
 	{
-		Object *object = mainObjectManager->RequestObject(i);
+		S::Object *object = S::mainObjectManager->RequestObject(i);
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == OBJ_TIMER)
+			if (object->GetObjectType() == S::OBJ_TIMER)
 			{
-				if (((Timer *) object)->GetID() == (signed int) timerid)
+				if (((S::Timer *) object)->GetID() == (signed int) timerid)
 				{
-					((Timer *) object)->onInterval.Emit();
+					((S::Timer *) object)->onInterval.Emit();
 
 					return;
 				}

@@ -58,14 +58,10 @@ namespace smooth
 			Array<Int>		 possibleContainers;
 			static Int		 objectCount;
 
-			Int			 subtype;
 			Int			 handle;
 
 						 Object();
 			virtual			~Object();
-
-			virtual Int		 SetTooltip(String);
-			virtual String		 GetTooltip();
 
 			Bool			 IsRegistered();
 

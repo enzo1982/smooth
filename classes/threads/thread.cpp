@@ -16,6 +16,8 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 
+S::Void ThreadProcCaller(S::Thread *);
+
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
@@ -138,7 +140,7 @@ S::Int S::Thread::GetKillFlag()
 	return killflag;
 }
 
-S::Void S::ThreadProcCaller(Thread *thread)
+S::Void ThreadProcCaller(S::Thread *thread)
 {
 	thread->threadMain.Call(thread);
 }

@@ -8,35 +8,30 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_TIMER_
-#define _H_OBJSMOOTH_TIMER_
+#include <smooth/input.h>
 
-namespace smooth
+S::Input::Input()
 {
-	class Timer;
-};
+}
 
-#include "object.h"
-
-namespace smooth
+S::Input::Input(const Input &)
 {
-	class SMOOTHAPI Timer : public Object
-	{
-		private:
-			Int		 timerid;
-		public:
-					 Timer();
-					~Timer();
+}
 
-			Int		 Start(Int);
-			Int		 Stop();
+S::Int S::Input::MouseX()
+{
+	POINT	 point;
 
-			Int		 GetID();
-		signals:
-			Signal0<Void>	 onInterval;
-	};
+	GetCursorPos(&point);
 
-	SMOOTHVAR Int OBJ_TIMER;
-};
+	return point.x;
+}
 
-#endif
+S::Int S::Input::MouseY()
+{
+	POINT	 point;
+
+	GetCursorPos(&point);
+
+	return point.y;
+}

@@ -67,7 +67,7 @@ S::GUI::Button::~Button()
 	{
 		if (tooltip != NIL)
 		{
-			wnd = (Window *) tooltip->GetContainer()->GetContainerObject();
+			wnd = tooltip->GetContainer()->GetContainerWindow();
 
 			tooltip->Hide();
 
@@ -213,11 +213,9 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
@@ -279,7 +277,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSELEAVE:
-			if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
+			if (objectProperties->checked && !wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = False;
 				objectProperties->clicked = False;
@@ -309,7 +307,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-			if (!objectProperties->checked && IsMouseOn(wnd->hwnd, frame, WINDOW))
+			if (!objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = True;
 
@@ -323,7 +321,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 					tipTimer->Start(500);
 				}
 			}
-			else if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
+			else if (objectProperties->checked && !wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = False;
 				objectProperties->clicked = False;
@@ -350,7 +348,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 					tipTimer = NIL;
 				}
 			}
-			else if (objectProperties->checked && IsMouseOn(wnd->hwnd, frame, WINDOW))
+			else if (objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				if (tipTimer != NIL && wParam == 0)
 				{
@@ -371,15 +369,14 @@ S::Void S::GUI::Button::ActivateTooltip()
 {
 	if (tooltip != NIL) return;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 	Point	 pos;
 	Size	 size;
 
-	pos.x = MouseX(wnd->hwnd, WINDOW);
-	pos.y = MouseY(wnd->hwnd, WINDOW);
-	size.cx = 0;
-	size.cy = 0;
+	pos.x	= wnd->MouseX();
+	pos.y	= wnd->MouseY();
+	size.cx	= 0;
+	size.cy	= 0;
 
 	tooltip = new Tooltip();
 

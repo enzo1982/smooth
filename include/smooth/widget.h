@@ -33,6 +33,8 @@ namespace smooth
 				Bool		 visible;
 				Bool		 active;
 			public:
+				Int		 subtype;
+
 						 Widget();
 				virtual		~Widget();
 
@@ -50,6 +52,9 @@ namespace smooth
 
 				virtual Int	 SetText(String);
 				virtual String	 GetText();
+
+				virtual Int	 SetTooltip(String);
+				virtual String	 GetTooltip();
 
 				virtual Int	 SetFont(String, Int, Int, Int);
 				virtual Int	 SetOrientation(Int);

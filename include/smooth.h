@@ -90,5 +90,6 @@
 #include "smooth/widget.h"
 #include "smooth/system.h"
 #include "smooth/setup.h"
+#include "smooth/input.h"
 
 #endif

@@ -16,7 +16,7 @@
 #endif
 
 #include <smooth/system.h>
-#include <smooth/toolkit.h>
+#include <smooth/color.h>
 
 class picture
 {

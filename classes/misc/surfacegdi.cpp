@@ -11,6 +11,7 @@
 #include <smooth/surfacegdi.h>
 #include <smooth/stk.h>
 #include <smooth/toolkit.h>
+#include <smooth/color.h>
 
 S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 {
@@ -159,14 +160,16 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 	return Success;
 }
 
-S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int size, Int color, Int weight)
+S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int size, Int color, Int weight, Int flags)
 {
+	if (string == NIL) return Error;
+
 	HFONT	 hfont;
 	HFONT	 holdfont;
 	int	 lines = 1;
 	int	 offset = 0;
 	int	 origoffset;
-	int	 height = GetLineSizeY(gdi_dc, string, font, size, weight) + 3;
+	int	 height = GetLineSizeY(string, font, size, weight) + 3;
 	int	 txtsize = string.Length();
 	int	 i;
 	String	 line;
@@ -176,8 +179,8 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int si
 	SetBkMode(gdi_dc, TRANSPARENT);
 	SetTextColor(gdi_dc, color);
 
-	if (Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
-	else				hfont = CreateFontA(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	if (Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, flags & TF_ITALIC, flags & TF_UNDERLINE, flags & TF_STRIKEOUT, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	else				hfont = CreateFontA(size, 0, 0, 0, weight, flags & TF_ITALIC, flags & TF_UNDERLINE, flags & TF_STRIKEOUT, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
 
 	holdfont = (HFONT) SelectObject(gdi_dc, hfont);
 

@@ -18,6 +18,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -56,13 +57,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Rect	 textRect;
@@ -76,10 +71,10 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	frame.right	= frame.left + 10;
 	frame.bottom	= frame.top + 10;
 
-	if (active)	Box(dc, frame, Setup::ClientColor, FILLED);
-	else		Box(dc, frame, Setup::BackgroundColor, FILLED);
+	if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+	else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-	Frame(dc, frame, FRAME_DOWN);
+	surface->Frame(frame, FRAME_DOWN);
 
 	if (active)
 	{
@@ -99,84 +94,84 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 		lineEnd.x = frame.right;
 		lineEnd.y = frame.bottom;
 
-		Line(dc, lineStart, lineEnd, shadowColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, shadowColor);
 
 		lineStart.x = frame.left + 4;
 		lineStart.y = frame.top + 3;
 		lineEnd.x = frame.right;
 		lineEnd.y = frame.bottom - 1;
 
-		Line(dc, lineStart, lineEnd, shadowColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, shadowColor);
 
 		lineStart.x = frame.left + 3;
 		lineStart.y = frame.top + 4;
 		lineEnd.x = frame.right - 1;
 		lineEnd.y = frame.bottom;
 
-		Line(dc, lineStart, lineEnd, shadowColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, shadowColor);
 
 		lineStart.x = frame.right - 1;
 		lineStart.y = frame.top + 3;
 		lineEnd.x = frame.left + 2;
 		lineEnd.y = frame.bottom;
 
-		Line(dc, lineStart, lineEnd, shadowColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, shadowColor);
 
 		lineStart.x = frame.right - 1;
 		lineStart.y = frame.top + 4;
 		lineEnd.x = frame.left + 3;
 		lineEnd.y = frame.bottom;
 
-		Line(dc, lineStart, lineEnd, shadowColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, shadowColor);
 
 		lineStart.x = frame.right - 2;
 		lineStart.y = frame.top + 3;
 		lineEnd.x = frame.left + 2;
 		lineEnd.y = frame.bottom - 1;
 
-		Line(dc, lineStart, lineEnd, shadowColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, shadowColor);
 
 		lineStart.x = frame.left + 2;
 		lineStart.y = frame.top + 2;
 		lineEnd.x = frame.right - 1;
 		lineEnd.y = frame.bottom - 1;
 
-		Line(dc, lineStart, lineEnd, crossColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, crossColor);
 
 		lineStart.x = frame.left + 3;
 		lineStart.y = frame.top + 2;
 		lineEnd.x = frame.right - 1;
 		lineEnd.y = frame.bottom - 2;
 
-		Line(dc, lineStart, lineEnd, crossColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, crossColor);
 
 		lineStart.x = frame.left + 2;
 		lineStart.y = frame.top + 3;
 		lineEnd.x = frame.right - 2;
 		lineEnd.y = frame.bottom - 1;
 
-		Line(dc, lineStart, lineEnd, crossColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, crossColor);
 
 		lineStart.x = frame.right - 2;
 		lineStart.y = frame.top + 2;
 		lineEnd.x = frame.left + 1;
 		lineEnd.y = frame.bottom - 1;
 
-		Line(dc, lineStart, lineEnd, crossColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, crossColor);
 
 		lineStart.x = frame.right - 2;
 		lineStart.y = frame.top + 3;
 		lineEnd.x = frame.left + 2;
 		lineEnd.y = frame.bottom - 1;
 
-		Line(dc, lineStart, lineEnd, crossColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, crossColor);
 
 		lineStart.x = frame.right - 3;
 		lineStart.y = frame.top + 2;
 		lineEnd.x = frame.left + 1;
 		lineEnd.y = frame.bottom - 2;
 
-		Line(dc, lineStart, lineEnd, crossColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, crossColor);
 	}
 
 	textRect.left	= frame.right + 4;
@@ -184,12 +179,10 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	if (active)	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-	else		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
+	if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+	else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
 
-	if (objectProperties->checked) Frame(dc, frame, FRAME_UP);
-
-	FreeContext(wnd, dc);
+	if (objectProperties->checked) surface->Frame(frame, FRAME_UP);
 
 	return Success;
 }
@@ -199,17 +192,15 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered) return Error;
 	if ((!active && message != SM_CHECKCHECKBOXES) || !visible) return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Object	*object;
 	Rect	 frame;
-	HDC	 dc;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -230,23 +221,17 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONDOWN:
-			dc = GetContext(wnd);
-
 			if (objectProperties->checked)
 			{
 				objectProperties->clicked = True;
 
-				Frame(dc, frame, FRAME_DOWN);
+				surface->Frame(frame, FRAME_DOWN);
 
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_LBUTTONUP:
-			dc = GetContext(wnd);
-
 			if (objectProperties->clicked)
 			{
 				objectProperties->clicked = False;
@@ -255,7 +240,7 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 				frame.right++;
 				frame.bottom++;
 
-				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 
 				frame.right--;
 				frame.bottom--;
@@ -284,48 +269,38 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSELEAVE:
-			dc = GetContext(wnd);
-
-			if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
+			if (objectProperties->checked && !wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = False;
 				objectProperties->clicked = False;
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
-			if (!objectProperties->checked && IsMouseOn(wnd->hwnd, frame, WINDOW))
+			if (!objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = True;
-				Frame(dc, frame, FRAME_UP);
+				surface->Frame(frame, FRAME_UP);
 			}
-			else if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
+			else if (objectProperties->checked && !wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = False;
 				objectProperties->clicked = False;
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 	}

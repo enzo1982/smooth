@@ -18,6 +18,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -59,13 +60,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 textRect;
 	Point	 lineStart;
@@ -80,25 +75,25 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	lineEnd.x = lineStart.x + 5;
 	lineEnd.y = lineStart.y;
 
-	Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
+	surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
 	lineStart.x--;
 	lineStart.y++;
 	lineEnd.y++;
 
-	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
+	surface->Line(lineStart, lineEnd, lightColor);
 
-	PaintPixel(dc, lineStart, Setup::DividerDarkColor);
+	surface->SetPixel(lineStart.x, lineStart.y, Setup::DividerDarkColor);
 
 	lineStart.x--;
 	lineStart.y++;
 	lineEnd.x += 2;
 	lineEnd.y++;
 
-	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
+	surface->Line(lineStart, lineEnd, lightColor);
 
-	PaintPixel(dc, lineStart, Setup::DividerDarkColor);
-	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerLightColor);
+	surface->SetPixel(lineStart.x, lineStart.y, Setup::DividerDarkColor);
+	surface->SetPixel(lineEnd.x - 1, lineEnd.y, Setup::DividerLightColor);
 
 	lineStart.x--;
 	lineEnd.x++;
@@ -108,10 +103,10 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 		lineStart.y++;
 		lineEnd.y++;
 
-		Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, lightColor);
 
-		PaintPixel(dc, lineStart, Setup::DividerDarkColor);
-		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerLightColor);
+		surface->SetPixel(lineStart.x, lineStart.y, Setup::DividerDarkColor);
+		surface->SetPixel(lineEnd.x - 1, lineEnd.y, Setup::DividerLightColor);
 	}
 
 	lineStart.x++;
@@ -119,27 +114,27 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	lineEnd.x--;
 	lineEnd.y++;
 
-	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
+	surface->Line(lineStart, lineEnd, lightColor);
 
-	PaintPixel(dc, lineStart, Setup::DividerLightColor);
-	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerLightColor);
-
-	lineStart.x++;
-	lineStart.y++;
-	lineEnd.x--;
-	lineEnd.y++;
-
-	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
-
-	PaintPixel(dc, lineStart, Setup::DividerLightColor);
-	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerLightColor);
+	surface->SetPixel(lineStart.x, lineStart.y, Setup::DividerLightColor);
+	surface->SetPixel(lineEnd.x - 1, lineEnd.y, Setup::DividerLightColor);
 
 	lineStart.x++;
 	lineStart.y++;
 	lineEnd.x--;
 	lineEnd.y++;
 
-	Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
+	surface->Line(lineStart, lineEnd, lightColor);
+
+	surface->SetPixel(lineStart.x, lineStart.y, Setup::DividerLightColor);
+	surface->SetPixel(lineEnd.x - 1, lineEnd.y, Setup::DividerLightColor);
+
+	lineStart.x++;
+	lineStart.y++;
+	lineEnd.x--;
+	lineEnd.y++;
+
+	surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
 
 	if (*variable == code)
 	{
@@ -148,7 +143,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 		lineEnd.x--;
 		lineEnd.y -= 7;
 
-		Line(dc, lineStart, lineEnd, Setup::ClientTextColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::ClientTextColor);
 
 		lineStart.x--;
 		lineEnd.x++;
@@ -158,26 +153,26 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 			lineStart.y++;
 			lineEnd.y++;
 
-			Line(dc, lineStart, lineEnd, Setup::ClientTextColor, PS_SOLID, 1);
+			surface->Line(lineStart, lineEnd, Setup::ClientTextColor);
 		}
 
-		PaintPixel(dc, Point(lineEnd.x, lineEnd.y - 1), Setup::DividerDarkColor);
-		PaintPixel(dc, lineEnd, Setup::DividerDarkColor);
+		surface->SetPixel(lineEnd.x, lineEnd.y - 1, Setup::DividerDarkColor);
+		surface->SetPixel(lineEnd.x, lineEnd.y, Setup::DividerDarkColor);
 
 		lineStart.x++;
 		lineStart.y++;
 		lineEnd.y++;
 
-		Line(dc, lineStart, lineEnd, Setup::ClientTextColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::ClientTextColor);
 
-		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerDarkColor);
-		PaintPixel(dc, lineEnd, Setup::DividerDarkColor);
+		surface->SetPixel(lineEnd.x - 1, lineEnd.y, Setup::DividerDarkColor);
+		surface->SetPixel(lineEnd.x, lineEnd.y, Setup::DividerDarkColor);
 
 		lineStart.x++;
 		lineStart.y++;
 		lineEnd.y++;
 
-		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
+		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 	}
 
 	textRect.left	= realPos.x + METRIC_OPTBOXOFFSETXY + 14;
@@ -185,9 +180,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-
-	FreeContext(wnd, dc);
+	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 	return Success;
 }
@@ -197,17 +190,15 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered) return Error;
 	if ((!active && message != SM_CHECKOPTIONBOXES) || !visible) return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Object	*object;
 	Rect	 frame;
-	HDC	 dc;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -236,23 +227,17 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONDOWN:
-			dc = GetContext(wnd);
-
 			if (objectProperties->checked)
 			{
 				objectProperties->clicked = True;
 
-				Frame(dc, frame, FRAME_DOWN);
+				surface->Frame(frame, FRAME_DOWN);
 
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_LBUTTONUP:
-			dc = GetContext(wnd);
-
 			if (objectProperties->clicked)
 			{
 				objectProperties->clicked = False;
@@ -260,7 +245,7 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -290,48 +275,38 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSELEAVE:
-			dc = GetContext(wnd);
-
-			if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
+			if (objectProperties->checked && !wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = False;
 				objectProperties->clicked = False;
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
-			if (!objectProperties->checked && IsMouseOn(wnd->hwnd, frame, WINDOW))
+			if (!objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = True;
-				Frame(dc, frame, FRAME_UP);
+				surface->Frame(frame, FRAME_UP);
 			}
-			else if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
+			else if (objectProperties->checked && !wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = False;
 				objectProperties->clicked = False;
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 	}
@@ -347,28 +322,21 @@ S::Int S::GUI::OptionBox::SetText(String newText)
 		return Success;
 	}
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	Point	 realPos = GetRealPosition();
 	Rect	 textRect;
-	HDC	 dc = GetContext(wnd);
 
 	textRect.left	= realPos.x + METRIC_OPTBOXOFFSETXY + 14;
 	textRect.top	= realPos.y + METRIC_OPTBOXOFFSETXY - METRIC_OPTBOXTEXTOFFSETY;
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
+	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
 
 	objectProperties->text = newText;
 
-	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-
-	FreeContext(wnd, dc);
+	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 	return Success;
 }

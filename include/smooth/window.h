@@ -150,6 +150,11 @@ namespace smooth
 				Int				 Paint(Int);
 				Int				 Process(Int, Int, Int);
 
+				Int				 MouseX();
+				Int				 MouseY();
+
+				Bool				 IsMouseOn(Rect);
+
 				Int				 RegisterObject(Object *);
 				Int				 UnregisterObject(Object *);
 

@@ -8,14 +8,11 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/window.h>
 #include <smooth/statusbar.h>
-#include <smooth/definitions.h>
-#include <smooth/toolkit.h>
-#include <smooth/loop.h>
+#include <smooth/window.h>
 #include <smooth/metrics.h>
-#include <smooth/stk.h>
 #include <smooth/objectproperties.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -43,12 +40,7 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Rect	 textRect;
 
 	textRect.left	= objectProperties->pos.x + METRIC_SBTEXTOFFSETX;
@@ -56,9 +48,7 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	textRect.right	= objectProperties->pos.x + objectProperties->size.cx;
 	textRect.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 
-	::SetText(dc, objectProperties->text, textRect,  objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-
-	FreeContext(wnd, dc);
+	surface->SetText(objectProperties->text, textRect,  objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 	return Success;
 }
@@ -71,12 +61,7 @@ S::Int S::GUI::Statusbar::SetText(String newStatus)
 
 	if (!registered || !visible) return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Rect	 textRect;
 
 	textRect.left	= objectProperties->pos.x + METRIC_SBTEXTOFFSETX;
@@ -84,10 +69,8 @@ S::Int S::GUI::Statusbar::SetText(String newStatus)
 	textRect.right	= objectProperties->pos.x + objectProperties->size.cx;
 	textRect.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 
-	::SetText(dc, oldStatus, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
-	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-
-	FreeContext(wnd, dc);
+	surface->SetText(oldStatus, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
+	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 	return Success;
 }

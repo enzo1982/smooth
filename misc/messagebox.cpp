@@ -21,6 +21,7 @@
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
+#include <smooth/surface.h>
 
 using namespace smooth::GUI;
 
@@ -117,7 +118,7 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 		for (int j = 0; j < lines; j++)
 		{
 #ifdef __WIN32__
-			thissize = GetTextSizeX(dc, line[j], I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL);
+			thissize = GetTextSizeX(line[j], I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL);
 #endif
 
 			if (thissize > maxsize) maxsize = thissize;
@@ -137,7 +138,7 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 #ifdef __WIN32__
 	if (msgicon != NIL) msgbox->GetObjectProperties()->size.cx += GetSystemMetrics(SM_CXICON) + 20;
 
-	titlesize = GetTextSizeX(dc, title, I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_BOLD);
+	titlesize = GetTextSizeX(title, I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_BOLD);
 #endif
 
 	if (msgbox->GetObjectProperties()->size.cx < titlesize+80) msgbox->GetObjectProperties()->size.cx = titlesize+80;
@@ -342,6 +343,7 @@ S::Int S::MessageBoxApp::ShowMessageBox()
 
 S::Void S::MessageBoxApp::MessagePaintProc()
 {
+	Surface	*surface = msgbox->GetDrawSurface();
 	HDC	 dc = GetContext(msgbox);
 	Rect	 txtrect;
 
@@ -376,17 +378,17 @@ S::Void S::MessageBoxApp::MessagePaintProc()
 #endif
 	}
 
+	FreeContext(msgbox, dc);
+
 	for (int i = 0; i < lines; i++)
 	{
 #ifdef __WIN32__
-		::SetText(dc, line[i], txtrect, I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), Setup::TextColor, FW_NORMAL);
+		surface->SetText(line[i], txtrect, I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), Setup::TextColor, FW_NORMAL);
 #endif
 
 		txtrect.top += 16;
 		txtrect.bottom += 16;
 	}
-
-	FreeContext(msgbox, dc);
 }
 
 S::Bool S::MessageBoxApp::MessageKillProc()

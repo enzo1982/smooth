@@ -136,16 +136,14 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Rect	 frame;
-	HDC	 dc;
 	int	 nOfChars = objectProperties->text.Length();
 	Point	 p1;
 	Point	 p2;
@@ -168,21 +166,19 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LOOSEFOCUS:
-			dc = GetContext(wnd);
-
 			if (objectProperties->clicked)
 			{
 				objectProperties->clicked = False;
 				objectProperties->checked = False;
 
-				if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-				else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 				p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 				p2.x = p1.x;
 				p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-				Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
+				surface->Line(p1, p2, Setup::ClientColor);
 
 				promptPos = 0;
 				linePromptPos = 0;
@@ -199,27 +195,23 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				Process(SM_MOUSEMOVE, 0, 0);
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_LBUTTONDOWN:
 			if (!active) break;
-
-			dc = GetContext(wnd);
 
 			if (objectProperties->clicked)
 			{
 				objectProperties->clicked = False;
 				objectProperties->checked = False;
 
-				if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-				else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 				p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 				p2.x = p1.x;
 				p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-				Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
+				surface->Line(p1, p2, Setup::ClientColor);
 
 				promptPos = 0;
 				linePromptPos = 0;
@@ -246,7 +238,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					timer = NIL;
 				}
 
-				if (IsMouseOn(wnd->hwnd, frame, WINDOW) && lParam != 1)
+				if (wnd->IsMouseOn(frame) && lParam != 1)
 				{
 					objectProperties->checked = True;
 					Process(SM_LBUTTONDOWN, 0, 0);
@@ -259,16 +251,16 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 			else if (objectProperties->checked)
 			{
 				objectProperties->clicked = True;
-				Frame(dc, frame, FRAME_DOWN);
+				surface->Frame(frame, FRAME_DOWN);
 
 				if (!Binary::IsFlagSet(subtype, EDB_MULTILINE))
 				{
-					for (int i = 0; i <= visText.Length(); i++)
+					for (Int i = 0; i <= visText.Length(); i++)
 					{
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	newpos = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, i, objectProperties->font,objectProperties->fontSize, objectProperties->fontWeight);
-						else						newpos = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', i), i, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	newpos = frame.left + 3 + GetTextSizeX(visText, i, objectProperties->font,objectProperties->fontSize, objectProperties->fontWeight);
+						else						newpos = frame.left + 3 + GetTextSizeX(String().FillN('*', i), i, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
-						if (i > 0 && MouseX(wnd->hwnd, WINDOW) < (p1.x + newpos) / 2)
+						if (i > 0 && wnd->MouseX() < (p1.x + newpos) / 2)
 						{
 							promptPos = i - 1 + leftCut;
 							linePromptPos = i - 1 + leftCut;
@@ -292,14 +284,14 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 // insert multiline code here
 				}
 
-				if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-				else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 				p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 				p2.x = p1.x;
 				p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-				Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+				surface->Line(p1, p2, Setup::TextColor);
 
 				promptVisible = True;
 
@@ -365,15 +357,11 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				timer->Start(500);
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSEMOVE:
 			if (!active) break;
 
-			dc = GetContext(wnd);
-
-			if (!objectProperties->checked && IsMouseOn(wnd->hwnd, frame, WINDOW))
+			if (!objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				wnd->cursorset = True;
 
@@ -383,10 +371,10 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				if (!objectProperties->clicked)
 				{
-					Frame(dc, frame, FRAME_UP);
+					surface->Frame(frame, FRAME_UP);
 				}
 			}
-			else if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
+			else if (objectProperties->checked && !wnd->IsMouseOn(frame))
 			{
 				wnd->cursorset = False;
 
@@ -396,17 +384,13 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				if (!objectProperties->clicked)
 				{
-					Frame(dc, frame, FRAME_DOWN);
+					surface->Frame(frame, FRAME_DOWN);
 				}
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 		case SM_MOUSELEAVE:
 			if (!active) break;
-
-			dc = GetContext(wnd);
 
 			if (objectProperties->checked || objectProperties->clicked)
 			{
@@ -416,10 +400,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				objectProperties->checked = False;
 
-				if (!objectProperties->clicked) Frame(dc, frame, FRAME_DOWN);
+				if (!objectProperties->clicked) surface->Frame(frame, FRAME_DOWN);
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 #ifdef __WIN32__
@@ -431,8 +413,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 		case WM_KEYDOWN:
 			if (!active) break;
 
-			dc = GetContext(wnd);
-
 			if (objectProperties->clicked)
 			{
 				switch (wParam)
@@ -440,14 +420,14 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					case VK_LEFT:
 						if (promptPos == 0) break;
 
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 						p2.x = p1.x;
 						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-						Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
+						surface->Line(p1, p2, Setup::ClientColor);
 
 						if (!Binary::IsFlagSet(subtype, EDB_MULTILINE))
 						{
@@ -455,12 +435,12 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 							linePromptPos--;
 						}
 
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p2.x = p1.x;
 
-						Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+						surface->Line(p1, p2, Setup::TextColor);
 
 						{
 							HIMC		 hImc = ImmGetContext(wnd->hwnd);
@@ -481,14 +461,14 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					case VK_RIGHT:
 						if (promptPos >= nOfChars) break;
 
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 						p2.x = p1.x;
 						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-						Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
+						surface->Line(p1, p2, Setup::ClientColor);
 
 						if (!Binary::IsFlagSet(subtype, EDB_MULTILINE))
 						{
@@ -496,12 +476,12 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 							linePromptPos++;
 						}
 
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p2.x = p1.x;
 
-						Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+						surface->Line(p1, p2, Setup::TextColor);
 
 						{
 							HIMC		 hImc = ImmGetContext(wnd->hwnd);
@@ -543,14 +523,14 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						if (promptPos == 0 && wParam == VK_BACK) break;
 						if (promptPos == nOfChars && wParam == VK_DELETE) break;
 
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 						p2.x = p1.x;
 						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-						Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
+						surface->Line(p1, p2, Setup::ClientColor);
 
 						if (wParam == VK_BACK)
 						{
@@ -593,14 +573,14 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						linePromptPos = prevLinePromptPos;
 						currLine = prevCurrLine;
 
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 						p2.x = p1.x;
 						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-						Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+						surface->Line(p1, p2, Setup::TextColor);
 
 						{
 							HIMC		 hImc = ImmGetContext(wnd->hwnd);
@@ -625,13 +605,9 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case WM_CHAR:
 			if (!active) break;
-
-			dc = GetContext(wnd);
 
 			if (objectProperties->clicked)
 			{
@@ -653,14 +629,14 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						newtext[i+1] = objectProperties->text[i];
 					}
 
-					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-					else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+					else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 					p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 					p2.x = p1.x;
 					p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-					Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::ClientColor);
 
 					promptPos++;
 					linePromptPos++;
@@ -675,14 +651,14 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					linePromptPos = prevLinePromptPos;
 					currLine = prevCurrLine;
 
-					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-					else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+					else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 					p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 					p2.x = p1.x;
 					p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 
 					{
 						HIMC		 hImc = ImmGetContext(wnd->hwnd);
@@ -700,8 +676,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					promptVisible = True;
 				}
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 #endif
@@ -830,36 +804,26 @@ S::Void S::GUI::EditBox::TimerProc()
 	if (!registered)		return;
 	if (!active || !visible)	return;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return;
-	if (wnd->hwnd == NIL) return;
-
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 lineStart;
 	Point	 lineEnd;
-	HDC	 dc;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	dc = GetContext(wnd);
-
-	if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	lineStart.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-	else						lineStart.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	lineStart.x = frame.left + 3 + GetTextSizeX(visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	else						lineStart.x = frame.left + 3 + GetTextSizeX(String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 	lineStart.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 	lineEnd.x = lineStart.x;
 	lineEnd.y = lineStart.y + METRIC_EDITBOXLINEHEIGHT;
 
-	if (promptVisible)	Line(dc, lineStart, lineEnd, Setup::ClientColor, PS_SOLID, 1);
-	else			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+	if (promptVisible)	surface->Line(lineStart, lineEnd, Setup::ClientColor);
+	else			surface->Line(lineStart, lineEnd, Setup::TextColor);
 
 	promptVisible = !promptVisible;
-
-	FreeContext(wnd, dc);
 }

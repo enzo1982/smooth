@@ -35,7 +35,6 @@ namespace smooth
 
 	class SMOOTHAPI Thread : public Object
 	{
-		friend Void ThreadProcCaller(Thread *);
 		private:
 			Int			 killflag;
 			Int			 waitflag;
@@ -62,8 +61,6 @@ namespace smooth
 	};
 
 	SMOOTHVAR Int OBJ_THREAD;
-
-	Void ThreadProcCaller(Thread *);
 };
 
 #endif

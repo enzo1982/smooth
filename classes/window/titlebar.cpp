@@ -10,13 +10,14 @@
 
 #include <smooth/titlebar.h>
 #include <smooth/definitions.h>
-#include <smooth/toolkit.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
 #include <smooth/tooltip.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
+#include <smooth/toolkit.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -57,12 +58,14 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
 
-	HDC	 dc = GetContext(wnd);
+	EnterProtectedRegion();
+
 	Rect	 titleFrame;
 	Rect	 titleGradient;
 	Rect	 titleText;
@@ -83,19 +86,19 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 	if (icon != NIL) titleFrame.left = titleFrame.left + METRIC_TITLEBARHEIGHT - 1;
 
-	Frame(dc, titleFrame, FRAME_UP);
+	surface->Frame(titleFrame, FRAME_UP);
 
 	titleGradient.left	= titleFrame.left + 1;
 	titleGradient.top	= titleFrame.top + 1;
 	titleGradient.right	= titleFrame.right;
 	titleGradient.bottom	= titleFrame.bottom;
 
-	Bool	 paintactive = False;
+	Bool	 paintActive = False;
 
 #ifdef __WIN32__
 	if (GetActiveWindow() == wnd->hwnd)
 	{
-		paintactive = True;
+		paintActive = True;
 	}
 	else
 	{
@@ -103,13 +106,13 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 		{
 			if (Window::GetWindow(GetActiveWindow())->type == OBJ_TOOLWINDOW)
 			{
-				paintactive = True;
+				paintActive = True;
 			}
 		}
 	}
 
-	if (paintactive)	Gradient(dc, titleGradient, Setup::GradientStartColor, Setup::GradientEndColor, GRADIENT_LR);
-	else			Gradient(dc, titleGradient, Setup::InactiveGradientStartColor, Setup::InactiveGradientEndColor, GRADIENT_LR);
+	if (paintActive)	surface->Gradient(titleGradient, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
+	else			surface->Gradient(titleGradient, Setup::InactiveGradientStartColor, Setup::InactiveGradientEndColor, OR_HORZ);
 #endif
 
 	titleText.left		= titleGradient.left + METRIC_TBTEXTOFFSETX;
@@ -117,8 +120,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	titleText.right		= titleGradient.right - METRIC_TBBUTTONBOXOFFSETX + METRIC_TBBUTTONBOXWIDTH;
 	titleText.bottom	= titleGradient.bottom - METRIC_TBTEXTOFFSETY;
 
-	if (paintactive)	::SetText(dc, objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
-	else			::SetText(dc, objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, Setup::InactiveGradientTextColor, objectProperties->fontWeight);
+	if (paintActive)	surface->SetText(objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+	else			surface->SetText(objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, Setup::InactiveGradientTextColor, objectProperties->fontWeight);
 
 	if (icon != NIL)
 	{
@@ -127,7 +130,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 		iconRect.right	= iconRect.left + METRIC_TBICONSIZE;
 		iconRect.bottom	= iconRect.top + METRIC_TBICONSIZE;
 
-		PaintBitmap(dc, iconRect, icon);
+		surface->BlitFromBitmap(icon, Rect(Point(0, 0), Size(GetBitmapSizeX(icon), GetBitmapSizeY(icon))), iconRect);
 	}
 
 	tButtonRect.left	= titleGradient.right - METRIC_TBBUTTONBOXOFFSETX;
@@ -135,8 +138,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	tButtonRect.top		= titleGradient.top + METRIC_TBBUTTONBOXOFFSETY;
 	tButtonRect.bottom	= tButtonRect.top + METRIC_TBBUTTONBOXHEIGHT;
 
-	Box(dc, tButtonRect, Setup::BackgroundColor, FILLED);
-	Frame(dc, tButtonRect, FRAME_DOWN);
+	surface->Box(tButtonRect, Setup::BackgroundColor, FILLED);
+	surface->Frame(tButtonRect, FRAME_DOWN);
 
 	button.left	= tButtonRect.left + METRIC_TBBUTTONOFFSETX;
 	button.right	= button.left + METRIC_TBBUTTONSIZE;
@@ -146,7 +149,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	if (min)	buttonColor = Setup::TextColor;
 	else		buttonColor = Setup::GrayTextColor;
 
-	Box(dc, button, buttonColor, FILLED);
+	surface->Box(button, buttonColor, FILLED);
 
 	button.left	= button.right + 3;
 	button.right	= button.left + METRIC_TBBUTTONSIZE;
@@ -155,9 +158,9 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	if (max)	buttonColor = Setup::TextColor;
 	else		buttonColor = Setup::GrayTextColor;
 
-	Box(dc, button, buttonColor, OUTLINED);
+	surface->Box(button, buttonColor, OUTLINED);
 	button.top--;
-	Box(dc, button, buttonColor, OUTLINED);
+	surface->Box(button, buttonColor, OUTLINED);
 
 	button.left	= button.right + 3;
 	button.right	= button.left + METRIC_TBBUTTONSIZE + 1;
@@ -169,26 +172,26 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	if (close)	buttonColor = Setup::TextColor;
 	else		buttonColor = Setup::GrayTextColor;
 
-	Line(dc, start, end, buttonColor, PS_SOLID, 1);
+	surface->Line(start, end, buttonColor);
 
 	start.x++;
 	end.x++;
 
-	Line(dc, start, end, buttonColor, PS_SOLID, 1);
+	surface->Line(start, end, buttonColor);
 
 	start.y		= button.bottom-1;
 	end.y		= button.top-1;
 	start.x--;
 	end.x--;
 
-	Line(dc, start, end, buttonColor, PS_SOLID, 1);
+	surface->Line(start, end, buttonColor);
 
 	start.x++;
 	end.x++;
 
-	Line(dc, start, end, buttonColor, PS_SOLID, 1);
+	surface->Line(start, end, buttonColor);
 
-	FreeContext(wnd, dc);
+	LeaveProtectedRegion();
 
 	return Success;
 }
@@ -198,11 +201,11 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 m;
 	Point	 mPos;
 	Size	 cpwp;
@@ -218,7 +221,6 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	Rect	 wndRect;
 	Int	 leftButton;
 	Int	 retVal = Success;
-	HDC	 dc;
 
 #ifdef __WIN32__
 	MSG		 msg;
@@ -261,7 +263,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			Paint(SP_PAINT);
 			break;
 		case SM_LBUTTONDBLCLK:
-			if (max && IsMouseOn(wnd->hwnd, titleFrame, WINDOW) && !IsMouseOn(wnd->hwnd, tButtonRect, WINDOW))
+			if (max && wnd->IsMouseOn(titleFrame) && !wnd->IsMouseOn(tButtonRect))
 			{
 				if (wnd->maximized)
 				{
@@ -300,7 +302,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			}
 			break;
 		case SM_LBUTTONDOWN:
-			if (IsMouseOn(wnd->hwnd, titleFrame, WINDOW) && !IsMouseOn(wnd->hwnd, tButtonRect, WINDOW))
+			if (wnd->IsMouseOn(titleFrame) && !wnd->IsMouseOn(tButtonRect))
 			{
 				wnd->Process(SM_LOOSEFOCUS, 0, 0);
 
@@ -379,27 +381,23 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			{
 				if (minchk || maxchk || closechk)
 				{
-					dc = GetContext(wnd);
-
 					if (minchk)
 					{
 						minclk = True;
-						Frame(dc, minButton, FRAME_DOWN);
+						surface->Frame(minButton, FRAME_DOWN);
 					}
 
 					if (maxchk)
 					{
 						maxclk = True;
-						Frame(dc, maxButton, FRAME_DOWN);
+						surface->Frame(maxButton, FRAME_DOWN);
 					}
 
 					if (closechk)
 					{
 						closeclk = True;
-						Frame(dc, closeButton, FRAME_DOWN);
+						surface->Frame(closeButton, FRAME_DOWN);
 					}
-
-					FreeContext(wnd, dc);
 
 					retVal = Break;
 				}
@@ -456,135 +454,127 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			break;
 #endif
 		case SM_MOUSELEAVE:
-			dc = GetContext(wnd);
-
-			if (minchk && !IsMouseOn(wnd->hwnd, minButton, WINDOW))
+			if (minchk && !wnd->IsMouseOn(minButton))
 			{
 				minchk		= False;
 				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
-				Box(dc, minButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(minButton, Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
 			}
-			if (maxchk && !IsMouseOn(wnd->hwnd, maxButton, WINDOW))
+			if (maxchk && !wnd->IsMouseOn(maxButton))
 			{
 				maxchk		= False;
 				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
-				Box(dc, maxButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(maxButton, Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
 			}
-			if (closechk && !IsMouseOn(wnd->hwnd, closeButton, WINDOW))
+			if (closechk && !wnd->IsMouseOn(closeButton))
 			{
 				closechk	= False;
 				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
-				Box(dc, closeButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(closeButton, Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
-			if (minchk && !IsMouseOn(wnd->hwnd, minButton, WINDOW))
+			if (minchk && !wnd->IsMouseOn(minButton))
 			{
 				minchk		= False;
 				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
-				Box(dc, minButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(minButton, Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
 			}
-			if (maxchk && !IsMouseOn(wnd->hwnd, maxButton, WINDOW))
+			if (maxchk && !wnd->IsMouseOn(maxButton))
 			{
 				maxchk		= False;
 				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
-				Box(dc, maxButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(maxButton, Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
 			}
-			if (closechk && !IsMouseOn(wnd->hwnd, closeButton, WINDOW))
+			if (closechk && !wnd->IsMouseOn(closeButton))
 			{
 				closechk	= False;
 				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
-				Box(dc, closeButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(closeButton, Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
 			}
 
-			if (min && !minchk && IsMouseOn(wnd->hwnd, minButton, WINDOW))
+			if (min && !minchk && wnd->IsMouseOn(minButton))
 			{
 				maxchk		= False;
 				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
-				Box(dc, maxButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(maxButton, Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
 				closechk	= False;
 				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
-				Box(dc, closeButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(closeButton, Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
 				minchk		= True;
-				Frame(dc, minButton, FRAME_UP);
+				surface->Frame(minButton, FRAME_UP);
 			}
-			if (max && !maxchk && IsMouseOn(wnd->hwnd, maxButton, WINDOW))
+			if (max && !maxchk && wnd->IsMouseOn(maxButton))
 			{
 				minchk		= False;
 				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
-				Box(dc, minButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(minButton, Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
 				closechk	= False;
 				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
-				Box(dc, closeButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(closeButton, Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
 				maxchk		= True;
-				Frame(dc, maxButton, FRAME_UP);
+				surface->Frame(maxButton, FRAME_UP);
 			}
-			if (close && !closechk && IsMouseOn(wnd->hwnd, closeButton, WINDOW))
+			if (close && !closechk && wnd->IsMouseOn(closeButton))
 			{
 				minchk		= False;
 				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
-				Box(dc, minButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(minButton, Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
 				maxchk		= False;
 				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
-				Box(dc, maxButton, Setup::BackgroundColor, OUTLINED);
+				surface->Box(maxButton, Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
 				closechk	= True;
-				Frame(dc, closeButton, FRAME_UP);
+				surface->Frame(closeButton, FRAME_UP);
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 	}

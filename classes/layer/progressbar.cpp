@@ -18,6 +18,8 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
+#include <smooth/color.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -73,6 +75,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 	if (wnd->hwnd == NIL) return Success;
 
 	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 lineStart;
@@ -94,10 +97,10 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 	frame.top	= realPos.y;
 	frame.bottom	= realPos.y + objectProperties->size.cy;
 
-	if (active)	Box(dc, frame, Setup::ClientColor, FILLED);
-	else		Box(dc, frame, Setup::BackgroundColor, FILLED);
+	if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+	else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-	Frame(dc, frame, FRAME_DOWN);
+	surface->Frame(frame, FRAME_DOWN);
 
 	frame.left	= realPos.x + 1;
 	frame.top	= realPos.y + 1;
@@ -116,7 +119,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 				if ((i - realPos.x - 1) > 0)	color = RGB((Int) (rs + (re - rs) / ((Float) objectProperties->size.cx / (Float) (i - realPos.x - 1))), (Int) (gs + (ge - gs) / ((Float) objectProperties->size.cx / (Float) (i - realPos.x - 1))), (Int) (bs + (be - bs) / ((Float) objectProperties->size.cx / (Float) (i - realPos.x - 1))));
 				else				color = Setup::GradientStartColor;
 
-				Line(dc, lineStart, lineEnd, color, PS_SOLID, 1);
+				surface->Line(lineStart, lineEnd, color);
 			}
 		}
 	}
@@ -134,7 +137,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 				if ((i - realPos.y + 1) > 0)	color = RGB((Int) (re + (rs - re) / ((Float) objectProperties->size.cy / (Float) (i - realPos.y + 1))), (Int) (ge + (gs - ge) / ((Float) objectProperties->size.cy / (Float) (i - realPos.y + 1))), (Int) (be + (bs - be) / ((Float) objectProperties->size.cy / (Float) (i - realPos.y + 1 ))));
 				else				color = Setup::GradientStartColor;
 
-				Line(dc, lineStart, lineEnd, color, PS_SOLID, 1);
+				surface->Line(lineStart, lineEnd, color);
 			}
 		}
 	}
@@ -157,19 +160,19 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 				break;
 		}
 
-		textSize = GetTextSizeX(dc, objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+		textSize = GetTextSizeX(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
 		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
 		textRect.bottom	= realPos.y + objectProperties->size.cy;
 		textRect.right	= textRect.left + textSize;
 
-		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 		if (value > 0)	textRect.right = realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (value - startValue))) + 1;
 		else		textRect.right = 0;
 
-		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
 	}
 
 	FreeContext(wnd, dc);
@@ -195,6 +198,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 	if (wnd->hwnd == NIL) return Success;
 
 	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 lineStart;
@@ -232,15 +236,15 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				break;
 		}
 
-		textSize = GetTextSizeX(dc, objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+		textSize = GetTextSizeX(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
 		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
 		textRect.bottom	= realPos.y + objectProperties->size.cy;
 		textRect.right	= textRect.left + textSize;
 
-		if (active)	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::ClientColor, objectProperties->fontWeight);
-		else		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
+		if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::ClientColor, objectProperties->fontWeight);
+		else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
 
 		if (textRect.left <= realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (value - startValue))) + 1)
 		{
@@ -254,7 +258,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				if ((i - realPos.x - 1) > 0)	color = RGB((Int) (rs + (re - rs) / ((Float) objectProperties->size.cx / (Float) (i - realPos.x - 1))), (Int) (gs + (ge - gs) / ((Float) objectProperties->size.cx / (Float) (i - realPos.x - 1))), (Int) (bs + (be - bs) / ((Float) objectProperties->size.cx / (Float) (i - realPos.x - 1))));
 				else				color = Setup::GradientStartColor;
 
-				Line(dc, lineStart, lineEnd, color, PS_SOLID, 1);
+				surface->Line(lineStart, lineEnd, color);
 			}
 		}
 	}
@@ -273,7 +277,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				if ((i - realPos.x - 1) > 0)	color = RGB((Int) (rs + (re - rs) / ((Float) objectProperties->size.cx / (Float) (i - realPos.x - 1))), (Int) (gs + (ge - gs) / ((Float) objectProperties->size.cx / (Float) (i - realPos.x - 1))), (Int) (bs + (be - bs) / ((Float) objectProperties->size.cx / (Float) (i - realPos.x - 1))));
 				else				color = Setup::GradientStartColor;
 
-				Line(dc, lineStart, lineEnd, color, PS_SOLID, 1);
+				surface->Line(lineStart, lineEnd, color);
 			}
 		}
 		else if (newValue > 0 && newValue < value)
@@ -285,14 +289,14 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				lineEnd.x = i;
 				lineEnd.y = realPos.y + objectProperties->size.cy;
 
-				if (active)	Line(dc, lineStart, lineEnd, Setup::ClientColor, PS_SOLID, 1);
-				else		Line(dc, lineStart, lineEnd, Setup::BackgroundColor, PS_SOLID, 1);
+				if (active)	surface->Line(lineStart, lineEnd, Setup::ClientColor);
+				else		surface->Line(lineStart, lineEnd, Setup::BackgroundColor);
 			}
 		}
 		else if (newValue == 0 && value > 0)
 		{
-			if (active)	Box(dc, frame, Setup::ClientColor, FILLED);
-			else		Box(dc, frame, Setup::BackgroundColor, FILLED);
+			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 		}
 	}
 	else
@@ -309,7 +313,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				if ((i - realPos.y + 1) > 0)	color = RGB((Int) (re + (rs - re) / ((Float) objectProperties->size.cy / (Float) (i - realPos.y + 1))), (Int) (ge + (gs - ge) / ((Float) objectProperties->size.cy / (Float) (i - realPos.y + 1))), (Int) (be + (bs - be) / ((Float) objectProperties->size.cy / (Float) (i - realPos.y + 1 ))));
 				else				color = Setup::GradientStartColor;
 
-				Line(dc, lineStart, lineEnd, color, PS_SOLID, 1);
+				surface->Line(lineStart, lineEnd, color);
 			}
 		}
 		else if (newValue > 0 && newValue < value)
@@ -321,14 +325,14 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				lineEnd.x = realPos.x + objectProperties->size.cx;
 				lineEnd.y = i;
 
-				if (active)	Line(dc, lineStart, lineEnd, Setup::ClientColor, PS_SOLID, 1);
-				else		Line(dc, lineStart, lineEnd, Setup::BackgroundColor, PS_SOLID, 1);
+				if (active)	surface->Line(lineStart, lineEnd, Setup::ClientColor);
+				else		surface->Line(lineStart, lineEnd, Setup::BackgroundColor);
 			}
 		}
 		else if (newValue == 0 && value > 0)
 		{
-			if (active)	Box(dc, frame, Setup::ClientColor, FILLED);
-			else		Box(dc, frame, Setup::BackgroundColor, FILLED);
+			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 		}
 	}
 
@@ -352,19 +356,19 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				break;
 		}
 
-		textSize = GetTextSizeX(dc, objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+		textSize = GetTextSizeX(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
 		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
 		textRect.bottom	= realPos.y + objectProperties->size.cy;
 		textRect.right	= textRect.left + textSize;
 
-		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 		if (value > 0)	textRect.right = realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (value - startValue))) + 1;
 		else		textRect.right = 0;
 
-		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
 	}
 
 	FreeContext(wnd, dc);

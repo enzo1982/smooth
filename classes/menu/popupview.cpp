@@ -19,6 +19,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/popupmenu.h>
 #include <smooth/toolwindow.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -46,16 +47,12 @@ S::Int S::GUI::PopupView::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
+	Surface		*surface = myContainer->GetDrawSurface();
 
 	EnterProtectedRegion();
 
 	Menu::Entry	*entry;
 	Rect		 popupRect;
-	HDC		 dc = GetContext(wnd);
 	Point		 p1;
 	Point		 p2;
 	Rect		 frame;
@@ -70,8 +67,8 @@ S::Int S::GUI::PopupView::Paint(Int message)
 	popupRect.right		= realMenu->popupsize.cx;
 	popupRect.bottom	= realMenu->popupsize.cy;
 
-	Box(dc, popupRect, Setup::BackgroundColor, FILLED);
-	Frame(dc, popupRect, FRAME_UP);
+	surface->Box(popupRect, Setup::BackgroundColor, FILLED);
+	surface->Frame(popupRect, FRAME_UP);
 
 	for (Int i = 0; i < realMenu->GetNOfEntries(); i++)
 	{
@@ -86,7 +83,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 			p1.y = popupRect.top + currentYPos + 1;
 			p2.y = popupRect.top + currentYPos + 1;
 
-			HBar(dc, p1, p2);
+			surface->Bar(p1, p2, OR_HORZ);
 
 			currentYPos = currentYPos + 5;
 		}
@@ -97,7 +94,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 			textRect.top	= popupRect.top + currentYPos;
 			textRect.bottom	= textRect.top + METRIC_POPUPENTRYSIZE;
 
-			::SetText(dc, entry->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+			surface->SetText(entry->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 			if (entry->popup != NIL)
 			{
@@ -112,7 +109,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 					p2.x++;
 					p1.y++;
 					p2.y--;
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 				}
 			}
 
@@ -130,84 +127,84 @@ S::Int S::GUI::PopupView::Paint(Int message)
 					p2.x = frame.right;
 					p2.y = frame.bottom;
 
-					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::DividerDarkColor);
 
 					p1.x = frame.left + 4;
 					p1.y = frame.top + 3;
 					p2.x = frame.right;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::DividerDarkColor);
 
 					p1.x = frame.left + 3;
 					p1.y = frame.top + 4;
 					p2.x = frame.right - 1;
 					p2.y = frame.bottom;
 
-					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::DividerDarkColor);
 
 					p1.x = frame.right - 1;
 					p1.y = frame.top + 3;
 					p2.x = frame.left + 2;
 					p2.y = frame.bottom;
 
-					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::DividerDarkColor);
 
 					p1.x = frame.right - 1;
 					p1.y = frame.top + 4;
 					p2.x = frame.left + 3;
 					p2.y = frame.bottom;
 
-					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::DividerDarkColor);
 
 					p1.x = frame.right - 2;
 					p1.y = frame.top + 3;
 					p2.x = frame.left + 2;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::DividerDarkColor);
 
 					p1.x = frame.left + 2;
 					p1.y = frame.top + 2;
 					p2.x = frame.right - 1;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 
 					p1.x = frame.left + 3;
 					p1.y = frame.top + 2;
 					p2.x = frame.right - 1;
 					p2.y = frame.bottom - 2;
 
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 
 					p1.x = frame.left + 2;
 					p1.y = frame.top + 3;
 					p2.x = frame.right - 2;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 
 					p1.x = frame.right - 2;
 					p1.y = frame.top + 2;
 					p2.x = frame.left + 1;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 
 					p1.x = frame.right - 2;
 					p1.y = frame.top + 3;
 					p2.x = frame.left + 2;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 
 					p1.x = frame.right - 3;
 					p1.y = frame.top + 2;
 					p2.x = frame.left + 1;
 					p2.y = frame.bottom - 2;
 
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 				}
 			}
 
@@ -225,7 +222,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 					p2.x--;
 					p2.y -= 7;
 
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::TextColor);
 
 					p1.x--;
 					p2.x++;
@@ -235,33 +232,31 @@ S::Int S::GUI::PopupView::Paint(Int message)
 						p1.y++;
 						p2.y++;
 
-						Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+						surface->Line(p1, p2, Setup::TextColor);
 					}
 
-					PaintPixel(dc, Point(p2.x, p2.y - 1), Setup::DividerDarkColor);
-					PaintPixel(dc, p2, Setup::DividerDarkColor);
+					surface->SetPixel(p2.x, p2.y - 1, Setup::DividerDarkColor);
+					surface->SetPixel(p2.x, p2.y, Setup::DividerDarkColor);
 
 					p1.x++;
 					p1.y++;
 					p2.y++;
 
-					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
-					PaintPixel(dc, Point(p2.x - 1, p2.y), Setup::DividerDarkColor);
-					PaintPixel(dc, p2, Setup::DividerDarkColor);
+					surface->Line(p1, p2, Setup::TextColor);
+					surface->SetPixel(p2.x - 1, p2.y, Setup::DividerDarkColor);
+					surface->SetPixel(p2.x, p2.y, Setup::DividerDarkColor);
 
 					p1.x++;
 					p1.y++;
 					p2.y++;
 
-					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+					surface->Line(p1, p2, Setup::DividerDarkColor);
 				}
 			}
 
 			currentYPos = currentYPos + METRIC_POPUPENTRYSIZE;
 		}
 	}
-
-	FreeContext(wnd, dc);
 
 	LeaveProtectedRegion();
 
@@ -273,17 +268,17 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
+
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	EnterProtectedRegion();
 
 	Rect	 popupRect;
 	Int	 retVal = Success;
 	Int	 i;
-	HDC	 dc;
 	Rect	*entryRect = new Rect [realMenu->GetNOfEntries()];
 	Rect	 frame;
 	Point	 p1;
@@ -463,8 +458,6 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSELEAVE:
-			dc = GetContext(wnd);
-
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
 				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
@@ -478,7 +471,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					currentY = currentY + METRIC_POPUPENTRYSIZE;
 
-					if (!IsMouseOn(wnd->hwnd, entryRect[i], WINDOW) && entry->checked)
+					if (!wnd->IsMouseOn(entryRect[i]) && entry->checked)
 					{
 						entry->checked = False;
 
@@ -487,11 +480,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						entryRect[i].right++;
 						entryRect[i].bottom++;
 
-						Box(dc, entryRect[i], Setup::BackgroundColor, FILLED);
+						surface->Box(entryRect[i], Setup::BackgroundColor, FILLED);
 
 						entryRect[i].left = entryRect[i].left + 17;
 
-						::SetText(dc, entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						surface->SetText(entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 						if (entry->popup != NIL)
 						{
@@ -507,7 +500,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p1.y++;
 								p2.y--;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 							}
 						}
 
@@ -525,84 +518,84 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x = frame.right;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.left + 4;
 								p1.y = frame.top + 3;
 								p2.x = frame.right;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 4;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 4;
 								p2.x = frame.left + 3;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.right - 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.right - 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 							}
 						}
 
@@ -620,7 +613,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x--;
 								p2.y -= 7;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x--;
 								p2.x++;
@@ -630,25 +623,25 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 									p1.y++;
 									p2.y++;
 
-									Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+									surface->Line(p1, p2, Setup::TextColor);
 								}
 
-								PaintPixel(dc, Point(p2.x, p2.y - 1), Setup::DividerDarkColor);
-								PaintPixel(dc, p2, Setup::DividerDarkColor);
+								surface->SetPixel(p2.x, p2.y - 1, Setup::DividerDarkColor);
+								surface->SetPixel(p2.x, p2.y, Setup::DividerDarkColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
-								PaintPixel(dc, Point(p2.x - 1, p2.y), Setup::DividerDarkColor);
-								PaintPixel(dc, p2, Setup::DividerDarkColor);
+								surface->Line(p1, p2, Setup::TextColor);
+								surface->SetPixel(p2.x - 1, p2.y, Setup::DividerDarkColor);
+								surface->SetPixel(p2.x, p2.y, Setup::DividerDarkColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 							}
 						}
 					}
@@ -659,12 +652,8 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
 				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
@@ -678,7 +667,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					currentY = currentY + METRIC_POPUPENTRYSIZE;
 
-					if (IsMouseOn(wnd->hwnd, entryRect[i], WINDOW) && !entry->checked)
+					if (wnd->IsMouseOn(entryRect[i]) && !entry->checked)
 					{
 						entry->checked = True;
 
@@ -692,11 +681,13 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						entryRect[i].right++;
 						entryRect[i].bottom++;
 
-						Gradient(dc, entryRect[i], Setup::GradientStartColor, Setup::GradientEndColor, GRADIENT_LR);
+						Surface	*surface = myContainer->GetDrawSurface();
+
+						surface->Gradient(entryRect[i], Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 
 						entryRect[i].left = entryRect[i].left + 17;
 
-						::SetText(dc, entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+						surface->SetText(entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
 
 						if (entry->popup != NIL)
 						{
@@ -712,7 +703,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p1.y++;
 								p2.y--;
 
-								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::GradientTextColor);
 							}
 						}
 
@@ -730,84 +721,84 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x = frame.right;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::InactiveGradientTextColor);
 
 								p1.x = frame.left + 4;
 								p1.y = frame.top + 3;
 								p2.x = frame.right;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::InactiveGradientTextColor);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 4;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::InactiveGradientTextColor);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::InactiveGradientTextColor);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 4;
 								p2.x = frame.left + 3;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::InactiveGradientTextColor);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::InactiveGradientTextColor);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::GradientTextColor);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::GradientTextColor);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.right - 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::GradientTextColor);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::GradientTextColor);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::GradientTextColor);
 
 								p1.x = frame.right - 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::GradientTextColor);
 							}
 						}
 
@@ -825,7 +816,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x--;
 								p2.y -= 7;
 
-								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::GradientTextColor);
 
 								p1.x--;
 								p2.x++;
@@ -835,29 +826,29 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 									p1.y++;
 									p2.y++;
 
-									Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+									surface->Line(p1, p2, Setup::GradientTextColor);
 								}
 
-								PaintPixel(dc, Point(p2.x, p2.y - 1), Setup::InactiveGradientTextColor);
-								PaintPixel(dc, p2, Setup::InactiveGradientTextColor);
+								surface->SetPixel(p2.x, p2.y - 1, Setup::InactiveGradientTextColor);
+								surface->SetPixel(p2.x, p2.y, Setup::InactiveGradientTextColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
-								PaintPixel(dc, Point(p2.x - 1, p2.y), Setup::InactiveGradientTextColor);
-								PaintPixel(dc, p2, Setup::InactiveGradientTextColor);
+								surface->Line(p1, p2, Setup::GradientTextColor);
+								surface->SetPixel(p2.x - 1, p2.y, Setup::InactiveGradientTextColor);
+								surface->SetPixel(p2.x, p2.y, Setup::InactiveGradientTextColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::InactiveGradientTextColor);
 							}
 						}
 					}
-					else if (!IsMouseOn(wnd->hwnd, entryRect[i], WINDOW) && entry->checked)
+					else if (!wnd->IsMouseOn(entryRect[i]) && entry->checked)
 					{
 						entry->checked = False;
 
@@ -866,11 +857,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						entryRect[i].right++;
 						entryRect[i].bottom++;
 
-						Box(dc, entryRect[i], Setup::BackgroundColor, FILLED);
+						surface->Box(entryRect[i], Setup::BackgroundColor, FILLED);
 
 						entryRect[i].left = entryRect[i].left + 17;
 
-						::SetText(dc, entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						surface->SetText(entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 						if (entry->popup != NIL)
 						{
@@ -886,7 +877,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p1.y++;
 								p2.y--;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 							}
 						}
 
@@ -904,84 +895,84 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x = frame.right;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.left + 4;
 								p1.y = frame.top + 3;
 								p2.x = frame.right;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 4;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 4;
 								p2.x = frame.left + 3;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.right - 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x = frame.right - 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 							}
 						}
 
@@ -999,7 +990,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x--;
 								p2.y -= 7;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::TextColor);
 
 								p1.x--;
 								p2.x++;
@@ -1009,25 +1000,25 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 									p1.y++;
 									p2.y++;
 
-									Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+									surface->Line(p1, p2, Setup::TextColor);
 								}
 
-								PaintPixel(dc, Point(p2.x, p2.y - 1), Setup::DividerDarkColor);
-								PaintPixel(dc, p2, Setup::DividerDarkColor);
+								surface->SetPixel(p2.x, p2.y - 1, Setup::DividerDarkColor);
+								surface->SetPixel(p2.x, p2.y, Setup::DividerDarkColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
-								PaintPixel(dc, Point(p2.x - 1, p2.y), Setup::DividerDarkColor);
-								PaintPixel(dc, p2, Setup::DividerDarkColor);
+								surface->Line(p1, p2, Setup::TextColor);
+								surface->SetPixel(p2.x - 1, p2.y, Setup::DividerDarkColor);
+								surface->SetPixel(p2.x, p2.y, Setup::DividerDarkColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
+								surface->Line(p1, p2, Setup::DividerDarkColor);
 							}
 						}
 					}
@@ -1037,8 +1028,6 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					currentY = currentY + 5;
 				}
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 	}

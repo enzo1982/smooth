@@ -102,20 +102,15 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer	= (Layer *) myContainer->GetContainerObject();
-	Window	*wnd	= (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd	= myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	HDC	 dc = GetContext(wnd);
 	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
-
-#ifdef __WIN32__
-	HFONT		 hfont;
-	HFONT		 holdfont;
-#endif
+	Int	 textColor;
 
 	textRect.left	= realPos.x;
 	textRect.top	= realPos.y;
@@ -125,34 +120,19 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 		textRect.right	= textRect.left + objectProperties->textSize.cx;
 		textRect.bottom	= textRect.top + objectProperties->textSize.cy + 1;
 
-#ifdef __WIN32__
-		RECT	 trect = textRect;
-
-		SetBkMode(dc, TRANSPARENT);
-
 		switch (message)
 		{
 			default:
 			case SP_PAINT:
 			case SP_MOUSEOUT:
-				SetTextColor(dc, RGB(0, 0, 255));
+				textColor = RGB(0, 0, 255);
 				break;
 			case SP_MOUSEIN:
-				SetTextColor(dc, RGB(0, 128, 255));
+				textColor = RGB(0, 128, 255);
 				break;
 		}
 
-		if (Setup::enableUnicode)	hfont = CreateFontW(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
-		else				hfont = CreateFontA(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
-
-		holdfont = (HFONT) SelectObject(dc, hfont);
-
-		if (Setup::enableUnicode)	DrawTextW(dc, objectProperties->text, -1, &trect, DT_LEFT);
-		else				DrawTextA(dc, objectProperties->text, -1, &trect, DT_LEFT);
-
-		SelectObject(dc, holdfont);
-		::DeleteObject(hfont);
-#endif
+		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, textColor, objectProperties->fontWeight, TF_UNDERLINE);
 	}
 	else
 	{
@@ -172,11 +152,9 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
@@ -210,7 +188,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 			}
 			break;
 		case SM_MOUSELEAVE:
-			if (!IsMouseOn(wnd->hwnd, textRect, WINDOW) && objectProperties->checked)
+			if (!wnd->IsMouseOn(textRect) && objectProperties->checked)
 			{
 				objectProperties->checked = False;
 
@@ -222,7 +200,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 			}
 			break;
 		case SM_MOUSEMOVE:
-			if (IsMouseOn(wnd->hwnd, textRect, WINDOW) && !objectProperties->checked)
+			if (wnd->IsMouseOn(textRect) && !objectProperties->checked)
 			{
 				objectProperties->checked = True;
 
@@ -232,7 +210,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 
 				Paint(SP_MOUSEIN);
 			}
-			else if (!IsMouseOn(wnd->hwnd, textRect, WINDOW) && objectProperties->checked)
+			else if (!wnd->IsMouseOn(textRect) && objectProperties->checked)
 			{
 				objectProperties->checked = False;
 

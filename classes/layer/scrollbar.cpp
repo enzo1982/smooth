@@ -18,6 +18,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/timer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -72,13 +73,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Rect	 frame1;
@@ -127,11 +122,11 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 		frame3.bottom	= frame3.top + (frame.right - frame.left);
 	}
 
-	if (!button1Clicked && !button2Clicked) Box(dc, frame, Setup::LightGrayColor, FILLED);
+	if (!button1Clicked && !button2Clicked) surface->Box(frame, Setup::LightGrayColor, FILLED);
 
 	if (!button3Clicked)
 	{
-		Box(dc, frame3, Setup::BackgroundColor, FILLED);
+		surface->Box(frame3, Setup::BackgroundColor, FILLED);
 	}
 	else
 	{
@@ -139,7 +134,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 		frame3.right--;
 		frame3.left++;
 		frame3.top++;
-		Box(dc, frame3, Setup::LightGrayColor, FILLED);
+		surface->Box(frame3, Setup::LightGrayColor, FILLED);
 		frame3.bottom++;
 		frame3.right++;
 		frame3.left--;
@@ -148,23 +143,23 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 	frame3.bottom--;
 	frame3.right--;
-	Frame(dc, frame3, FRAME_UP);
+	surface->Frame(frame3, FRAME_UP);
 	frame3.bottom++;
 	frame3.right++;
 
 	if (button1Clicked || button2Clicked) return Success;
 
-	Box(dc, frame1, Setup::BackgroundColor, FILLED);
-	Box(dc, frame2, Setup::BackgroundColor, FILLED);
+	surface->Box(frame1, Setup::BackgroundColor, FILLED);
+	surface->Box(frame2, Setup::BackgroundColor, FILLED);
 
 	frame1.bottom--;
 	frame1.right--;
-	Frame(dc, frame1, FRAME_UP);
+	surface->Frame(frame1, FRAME_UP);
 	frame1.bottom++;
 	frame1.right++;
 	frame2.bottom--;
 	frame2.right--;
-	Frame(dc, frame2, FRAME_UP);
+	surface->Frame(frame2, FRAME_UP);
 	frame2.bottom++;
 	frame2.right++;
 
@@ -177,7 +172,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int i = 0; i < 4; i++)
 		{
-			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+			surface->Line(lineStart, lineEnd, Setup::TextColor);
 			lineStart.x++;
 			lineStart.y--;
 			lineEnd.x++;
@@ -191,7 +186,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+			surface->Line(lineStart, lineEnd, Setup::TextColor);
 			lineStart.x++;
 			lineStart.y++;
 			lineEnd.x++;
@@ -207,7 +202,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int i = 0; i < 4; i++)
 		{
-			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+			surface->Line(lineStart, lineEnd, Setup::TextColor);
 			lineStart.x--;
 			lineStart.y++;
 			lineEnd.x++;
@@ -221,15 +216,13 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+			surface->Line(lineStart, lineEnd, Setup::TextColor);
 			lineStart.x++;
 			lineStart.y++;
 			lineEnd.x--;
 			lineEnd.y++;
 		}
 	}
-
-	FreeContext(wnd, dc);
 
 	return Success;
 }
@@ -239,12 +232,11 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Rect	 frame;
@@ -255,7 +247,6 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 	Int	 prevValue = *variable;
 	Float	 buffer;
 	UINT	 scrolllines;
-	HDC	 dc;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -310,8 +301,6 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			dc = GetContext(wnd);
-
 			if (!timerActive && timer == NIL && (button1Checked || button2Checked))
 			{
 				timer = new Timer();
@@ -325,7 +314,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 			if (button1Checked)
 			{
-				if (!button1Clicked) Frame(dc, frame1, FRAME_DOWN);
+				if (!button1Clicked) surface->Frame(frame1, FRAME_DOWN);
 
 				button1Clicked = True;
 
@@ -338,7 +327,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				{
 					onClick.Emit();
 
-					Box(dc, frame3, Setup::LightGrayColor, FILLED);
+					surface->Box(frame3, Setup::LightGrayColor, FILLED);
 
 					Paint(SP_PAINT);
 				}
@@ -347,7 +336,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 			}
 			else if (button2Checked)
 			{
-				if (!button2Clicked) Frame(dc, frame2, FRAME_DOWN);
+				if (!button2Clicked) surface->Frame(frame2, FRAME_DOWN);
 
 				button2Clicked = True;
 
@@ -360,7 +349,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				{
 					onClick.Emit();
 
-					Box(dc, frame3, Setup::LightGrayColor, FILLED);
+					surface->Box(frame3, Setup::LightGrayColor, FILLED);
 
 					Paint(SP_PAINT);
 				}
@@ -368,7 +357,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 
-			if (IsMouseOn(wnd->hwnd, frame3, WINDOW) && !button3Clicked)
+			if (wnd->IsMouseOn(frame3) && !button3Clicked)
 			{
 				button3Clicked = True;
 
@@ -376,18 +365,18 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				frame3.top++;
 				frame3.right--;
 				frame3.bottom--;
-				Box(dc, frame3, Setup::LightGrayColor, FILLED);
+				surface->Box(frame3, Setup::LightGrayColor, FILLED);
 				frame3.left--;
 				frame3.top--;
 				frame3.right++;
 				frame3.bottom++;
 
-				if (subtype == OR_HORZ)	mouseBias = (frame3.left + (frame.bottom - frame.top) / 2) - MouseX(wnd->hwnd, WINDOW);
-				else			mouseBias = (frame3.top + (frame.right - frame.left) / 2) - MouseY(wnd->hwnd, WINDOW);
+				if (subtype == OR_HORZ)	mouseBias = (frame3.left + (frame.bottom - frame.top) / 2) - wnd->MouseX();
+				else			mouseBias = (frame3.top + (frame.right - frame.left) / 2) - wnd->MouseY();
 
 				retVal = Break;
 			}
-			else if (IsMouseOn(wnd->hwnd, actionArea, WINDOW) && !button3Clicked)
+			else if (wnd->IsMouseOn(actionArea) && !button3Clicked)
 			{
 				mouseBias = 0;
 
@@ -399,8 +388,6 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				retVal = Break;
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 		case SM_MOUSEWHEEL:
@@ -450,8 +437,6 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDBLCLK:
 			return Process(SM_LBUTTONDOWN, 0, 0);
 		case SM_LBUTTONUP:
-			dc = GetContext(wnd);
-
 			if (timerActive) timerActive = False;
 
 			if (button1Clicked)
@@ -461,7 +446,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame1, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame1, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -476,7 +461,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame2, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame2, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -493,7 +478,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				frame3.top++;
 				frame3.right--;
 				frame3.bottom--;
-				Box(dc, frame3, Setup::BackgroundColor, FILLED);
+				surface->Box(frame3, Setup::BackgroundColor, FILLED);
 				frame3.left--;
 				frame3.top--;
 				frame3.right++;
@@ -502,19 +487,15 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
-			if (!button1Checked && IsMouseOn(wnd->hwnd, frame1, WINDOW))
+			if (!button1Checked && wnd->IsMouseOn(frame1))
 			{
 				button1Checked = True;
 
-				Frame(dc, frame1, FRAME_UP);
+				surface->Frame(frame1, FRAME_UP);
 			}
-			else if (button1Checked && !IsMouseOn(wnd->hwnd, frame1, WINDOW))
+			else if (button1Checked && !wnd->IsMouseOn(frame1))
 			{
 				if (timerActive) timerActive = False;
 
@@ -523,17 +504,17 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				frame1.right++;
 				frame1.bottom++;
-				Box(dc, frame1, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame1, Setup::BackgroundColor, OUTLINED);
 				frame1.right--;
 				frame1.bottom--;
 			}
-			else if (!button2Checked && IsMouseOn(wnd->hwnd, frame2, WINDOW))
+			else if (!button2Checked && wnd->IsMouseOn(frame2))
 			{
 				button2Checked = True;
 
-				Frame(dc, frame2, FRAME_UP);
+				surface->Frame(frame2, FRAME_UP);
 			}
-			else if (button2Checked && !IsMouseOn(wnd->hwnd, frame2, WINDOW))
+			else if (button2Checked && !wnd->IsMouseOn(frame2))
 			{
 				if (timerActive) timerActive = False;
 
@@ -542,15 +523,15 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				frame2.right++;
 				frame2.bottom++;
-				Box(dc, frame2, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame2, Setup::BackgroundColor, OUTLINED);
 				frame2.right--;
 				frame2.bottom--;
 			}
 
 			if (button3Clicked)
 			{
-				if (subtype == OR_HORZ)	buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cx - (3 * (frame.bottom - frame.top) + 1)) / ((Float) (MouseX(wnd->hwnd, WINDOW) + mouseBias - (realPos.x + (frame.bottom - frame.top) + (frame.bottom - frame.top) / 2))));
-				else			buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cy - (3 * (frame.right - frame.left) + 1)) / ((Float) (MouseY(wnd->hwnd, WINDOW) + mouseBias - (realPos.y + (frame.right - frame.left) + (frame.right - frame.left) / 2))));
+				if (subtype == OR_HORZ)	buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cx - (3 * (frame.bottom - frame.top) + 1)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + (frame.bottom - frame.top) + (frame.bottom - frame.top) / 2))));
+				else			buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cy - (3 * (frame.right - frame.left) + 1)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + (frame.right - frame.left) + (frame.right - frame.left) / 2))));
 
 				*variable = startValue + Math::Round(buffer);
 
@@ -559,15 +540,13 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				if (*variable != prevValue)
 				{
-					Box(dc, frame3, Setup::BackgroundColor, FILLED);
+					surface->Box(frame3, Setup::BackgroundColor, FILLED);
 
 					Paint(SP_PAINT);
 
 					onClick.Emit();
 				}
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 #ifdef __WIN32__

@@ -228,10 +228,10 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 		}
 	}
 
-	if (owner != NIL) owner->Process(message, wParam, lParam);
-	
 	LeaveProtectedRegion();
 
+	if (owner != NIL) owner->Process(message, wParam, lParam);
+	
 	return Success;
 }
 

@@ -35,6 +35,7 @@ S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int iMaxSize)
 	markEnd				= -1;
 	maxSize				= iMaxSize;
 	promptPos			= 0;
+	promptVisible			= False;
 	timer				= NIL;
 	marking				= False;
 	invisibleChars			= 0;
@@ -167,7 +168,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 	Rect	 frame;
 	Int	 nOfChars = objectProperties->text.Length();
 	Point	 p1;
-	Point	 p2;
 	Int	 newpos = 0;
 	Int	 leftButton = 0;
 	String	 visText = objectProperties->text;
@@ -207,11 +207,10 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
 
 				p1.y = frame.top + 2;
-				p2.x = p1.x;
-				p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-				surface->Line(p1, p2, Setup::ClientColor);
+				if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
 
+				promptVisible = False;
 				promptPos = 0;
 
 				if (timer != NIL)
@@ -245,11 +244,10 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
 
 				p1.y = frame.top + 2;
-				p2.x = p1.x;
-				p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-				surface->Line(p1, p2, Setup::ClientColor);
+				if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
 
+				promptVisible = False;
 				promptPos = 0;
 
 				{
@@ -321,10 +319,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
 
 				p1.y = frame.top + 2;
-				p2.x = p1.x;
-				p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-				surface->Line(p1, p2, Setup::TextColor);
+				surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
 
 				promptVisible = True;
 
@@ -631,7 +627,6 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 p1;
-	Point	 p2;
 	String	 visText = objectProperties->text;
 	Int	 oInvisChars = invisibleChars;
 
@@ -654,10 +649,8 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 	else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
 
 	p1.y = frame.top + 2;
-	p2.x = p1.x;
-	p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-	surface->Line(p1, p2, Setup::ClientColor);
+	if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
 
 	promptPos = newPos;
 
@@ -697,9 +690,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	promptPos = newPos;
 
-	p2.x = p1.x;
-
-	surface->Line(p1, p2, Setup::TextColor);
+	surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
 
 	{
 		HIMC		 hImc = ImmGetContext(wnd->hwnd);
@@ -738,6 +729,7 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
+	Point	 p1;
 	String	 visText = objectProperties->text;
 
 	if (invisibleChars > 0)
@@ -761,6 +753,13 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	if (prevMarkStart != prevMarkEnd && prevMarkStart >= 0 && prevMarkEnd >= 0)
 	{
+		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+
+		p1.y = frame.top + 2;
+
+		if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+
 		for (int j = prevMarkStart; j < prevMarkEnd; j++) mText[j - prevMarkStart] = objectProperties->text[j];
 
 		frame.left = realPos.x + GetTextSizeX(visText, prevMarkStart - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight()) + 4;
@@ -774,12 +773,26 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 		frame.top++;
 
 		surface->SetText(mText, frame, objectProperties->font);
+
+		if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
 	}
 
 	mText = "";
 
+	frame.left	= realPos.x;
+	frame.top	= realPos.y;
+	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
+	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+
 	if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
 	{
+		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+
+		p1.y = frame.top + 2;
+
+		if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+
 		for (int j = markStart; j < markEnd; j++) mText[j - markStart] = objectProperties->text[j];
 
 		frame.left = realPos.x + GetTextSizeX(visText, markStart - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight()) + 4;
@@ -797,6 +810,8 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 		font.SetColor(tColor);
 
 		surface->SetText(mText, frame, font);
+
+		if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
 	}
 }
 
@@ -946,7 +961,6 @@ S::Void S::GUI::EditBox::TimerProc()
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 lineStart;
-	Point	 lineEnd;
 	String	 visText = objectProperties->text;
 
 	if (invisibleChars > 0)
@@ -968,11 +982,8 @@ S::Void S::GUI::EditBox::TimerProc()
 	else						lineStart.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
 
 	lineStart.y = frame.top + 2;
-	lineEnd.x = lineStart.x;
-	lineEnd.y = lineStart.y + METRIC_EDITBOXLINEHEIGHT;
 
-	if (promptVisible)	surface->Line(lineStart, lineEnd, Setup::ClientColor);
-	else			surface->Line(lineStart, lineEnd, Setup::TextColor);
+	surface->Box(Rect(lineStart, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
 
 	promptVisible = !promptVisible;
 }

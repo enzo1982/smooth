@@ -108,17 +108,19 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 				surface->Frame(frame, FRAME_UP);
 
-				surface->SetPixel(frame.left, frame.bottom, Setup::DividerLightColor);
+				if (Setup::rightToLeft) { frame.left++; frame.right++; }
+
+				surface->SetPixel(Setup::rightToLeft ? frame.right : frame.left, frame.bottom, Setup::ClientColor);
 
 				surface->SetPixel(frame.left, frame.top, Setup::BackgroundColor);
 				surface->SetPixel(frame.left + 1, frame.top, Setup::BackgroundColor);
 				surface->SetPixel(frame.left, frame.top + 1, Setup::BackgroundColor);
-				surface->SetPixel(frame.left + 1, frame.top + 1, Setup::DividerLightColor);
+				surface->SetPixel(frame.left + 1, frame.top + 1, Setup::rightToLeft ? Setup::DividerDarkColor : Setup::ClientColor);
 
 				surface->SetPixel(frame.right, frame.top, Setup::BackgroundColor);
 				surface->SetPixel(frame.right - 1, frame.top, Setup::BackgroundColor);
 				surface->SetPixel(frame.right, frame.top + 1, Setup::BackgroundColor);
-				surface->SetPixel(frame.right - 1, frame.top + 1, Setup::DividerDarkColor);
+				surface->SetPixel(frame.right - 1, frame.top + 1, Setup::rightToLeft ? Setup::ClientColor : Setup::DividerDarkColor);
 
 				lineStart.x = frame.left + 1;
 				lineStart.y = frame.bottom;
@@ -126,6 +128,8 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 				lineEnd.y = lineStart.y;
 
 				surface->Line(lineStart, lineEnd, Setup::BackgroundColor);
+
+				if (Setup::rightToLeft) { frame.left--; frame.right--; }
 
 				textrect.left	= frame.left + METRIC_REGISTERTEXTOFFSETX;
 				textrect.top	= frame.top + METRIC_REGISTERTEXTOFFSETY;
@@ -149,24 +153,26 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 				surface->Frame(frame, FRAME_UP);
 
+				if (Setup::rightToLeft) { frame.left++; frame.right++; }
+
 				surface->SetPixel(frame.right, frame.top, Setup::BackgroundColor);
 				surface->SetPixel(frame.right - 1, frame.top, Setup::BackgroundColor);
 				surface->SetPixel(frame.right, frame.top + 1, Setup::BackgroundColor);
-				surface->SetPixel(frame.right - 1, frame.top + 1, Setup::DividerDarkColor);
+				surface->SetPixel(frame.right - 1, frame.top + 1, Setup::rightToLeft ? Setup::ClientColor : Setup::DividerDarkColor);
 
 				lineStart.x = frame.left;
 				lineStart.y = frame.bottom;
 				lineEnd.x = frame.right + 1;
 				lineEnd.y = lineStart.y;
 
-				surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
+				surface->Line(lineStart, lineEnd, Setup::ClientColor);
 
 				if (j == 0)
 				{
 					surface->SetPixel(frame.left, frame.top, Setup::BackgroundColor);
 					surface->SetPixel(frame.left + 1, frame.top, Setup::BackgroundColor);
 					surface->SetPixel(frame.left, frame.top + 1, Setup::BackgroundColor);
-					surface->SetPixel(frame.left + 1, frame.top + 1, Setup::DividerLightColor);
+					surface->SetPixel(frame.left + 1, frame.top + 1, Setup::rightToLeft ? Setup::DividerDarkColor : Setup::ClientColor);
 				}
 
 				if (j > 0) if (prev->IsVisible())
@@ -179,7 +185,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 					surface->Line(lineStart, lineEnd, Setup::BackgroundColor);
 
 					surface->SetPixel(frame.left, frame.top, Setup::BackgroundColor);
-					surface->SetPixel(frame.left, frame.top + 1, Setup::DividerLightColor);
+					surface->SetPixel(frame.left, frame.top + 1, Setup::rightToLeft ? Setup::DividerDarkColor : Setup::ClientColor);
 
 					frame.left--;
 				}
@@ -188,8 +194,10 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 					surface->SetPixel(frame.left, frame.top, Setup::BackgroundColor);
 					surface->SetPixel(frame.left + 1, frame.top, Setup::BackgroundColor);
 					surface->SetPixel(frame.left, frame.top + 1, Setup::BackgroundColor);
-					surface->SetPixel(frame.left + 1, frame.top + 1, Setup::DividerLightColor);
+					surface->SetPixel(frame.left + 1, frame.top + 1, Setup::rightToLeft ? Setup::DividerDarkColor : Setup::ClientColor);
 				}
+
+				if (Setup::rightToLeft) { frame.left--; frame.right--; }
 
 				textrect.left	= frame.left + METRIC_REGISTERTEXTOFFSETX - 1;
 				textrect.top	= frame.top + METRIC_REGISTERTEXTOFFSETY;
@@ -267,7 +275,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 						if (wnd->IsMouseOn(frame))
 						{
-							surface->StartPaint(Rect(realPos, objectProperties->size));
+							surface->StartPaint(Rect(Point(wnd->GetObjectProperties()->size.cx - (realPos.x + objectProperties->size.cx), realPos.y), objectProperties->size));
 
 							for (Int j = 0; j < nOfObjects; j++)
 							{
@@ -282,7 +290,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 								}
 							}
 
-							wnd->SetUpdateRect(Rect(realPos, objectProperties->size));
+							wnd->SetUpdateRect(Rect(Point(wnd->GetObjectProperties()->size.cx - (realPos.x + objectProperties->size.cx), realPos.y), objectProperties->size));
 
 							Hide();
 

@@ -158,7 +158,12 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 		FrameRect(gdi_dc, &wRect, brush);
 		FrameRect(bmp_dc, &wRect, brush);
 	}
-	else
+	else if (style == INVERT)
+	{
+		InvertRect(gdi_dc, &wRect);
+		InvertRect(bmp_dc, &wRect);
+	}
+	else if (style == OUTLINEDOTS)
 	{
 		Bool	 dot = False;
 		Int	 x;

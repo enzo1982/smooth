@@ -79,6 +79,7 @@ namespace smooth
 		const Int	 FILLED		= 0;
 		const Int	 OUTLINED	= 1;
 		const Int	 OUTLINEDOTS	= 2;
+		const Int	 INVERT		= 3;
 	};
 };
 

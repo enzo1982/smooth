@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 /*
- * Most of the back-end structures from XML and SGML are shared
+ * Most of the back-end structures from XML and SGML are shared.
  */
 typedef xmlParserCtxt docbParserCtxt;
 typedef xmlParserCtxtPtr docbParserCtxtPtr;
@@ -30,9 +30,9 @@ typedef xmlNodePtr docbNodePtr;
 /*
  * There is only few public functions.
  */
-int                    docbEncodeEntities(unsigned char* out,
+int                    docbEncodeEntities(unsigned char *out,
                                         int *outlen,
-                                        const unsigned char* in,
+                                        const unsigned char *in,
                                         int *inlen, int quoteChar);
 
 docbDocPtr             docbSAXParseDoc (xmlChar *cur,
@@ -49,7 +49,7 @@ docbDocPtr             docbParseFile   (const char *filename,
                                         const char *encoding);
 
 /**
- * Interfaces for the Push mode
+ * Interfaces for the Push mode.
  */
 void                   docbFreeParserCtxt      (docbParserCtxtPtr ctxt);
 docbParserCtxtPtr      docbCreatePushParserCtxt(docbSAXHandlerPtr sax,

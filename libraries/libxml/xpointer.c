@@ -9,6 +9,7 @@
  * daniel@veillard.com
  */
 
+#define IN_LIBXML
 #include "libxml.h"
 
 /*
@@ -1020,6 +1021,8 @@ xmlXPtrEvalXPtrPart(xmlXPathParserContextPtr ctxt, xmlChar *name) {
 	
 	xmlXPathRegisterNs(ctxt->context, prefix, URI);
 	CUR_PTR = left;
+	xmlFree(URI);
+	xmlFree(prefix);
 #endif /* XPTR_XMLNS_SCHEME */
     } else {
         xmlGenericError(xmlGenericErrorContext,
@@ -1212,7 +1215,6 @@ xmlXPtrEvalXPointer(xmlXPathParserContextPtr ctxt) {
  *									*
  ************************************************************************/
 
-void xmlXPtrRangeToFunction(xmlXPathParserContextPtr ctxt, int nargs);
 void xmlXPtrStringRangeFunction(xmlXPathParserContextPtr ctxt, int nargs);
 void xmlXPtrStartPointFunction(xmlXPathParserContextPtr ctxt, int nargs);
 void xmlXPtrEndPointFunction(xmlXPathParserContextPtr ctxt, int nargs);
@@ -1629,11 +1631,7 @@ xmlXPtrNbLocChildren(xmlNodePtr node) {
         case XML_TEXT_NODE:
         case XML_CDATA_SECTION_NODE:
         case XML_ENTITY_REF_NODE:
-#ifndef XML_USE_BUFFER_CONTENT
 	    ret = xmlStrlen(node->content);
-#else
-	    ret = xmlBufferLength(node->content);
-#endif
 	    break;
 	default:
 	    return(-1);
@@ -2008,13 +2006,8 @@ xmlXPtrInsideRange(xmlXPathParserContextPtr ctxt, xmlXPathObjectPtr loc) {
 		    if (node->content == NULL) {
 			return(xmlXPtrNewRange(node, 0, node, 0));
 		    } else {
-#ifndef XML_USE_BUFFER_CONTENT
 			return(xmlXPtrNewRange(node, 0, node,
 					       xmlStrlen(node->content)));
-#else
-			return(xmlXPtrNewRange(node, 0, node,
-					       xmlBufferLength(node->content)));
-#endif
 		    }
 		}
 		case XML_ATTRIBUTE_NODE:
@@ -2045,13 +2038,8 @@ xmlXPtrInsideRange(xmlXPathParserContextPtr ctxt, xmlXPathObjectPtr loc) {
 			if (node->content == NULL) {
 			    return(xmlXPtrNewRange(node, 0, node, 0));
 			} else {
-#ifndef XML_USE_BUFFER_CONTENT
 			    return(xmlXPtrNewRange(node, 0, node,
 						   xmlStrlen(node->content)));
-#else
-			    return(xmlXPtrNewRange(node, 0, node,
-					       xmlBufferLength(node->content)));
-#endif
 			}
 		    }
 		    case XML_ATTRIBUTE_NODE:
@@ -2320,11 +2308,7 @@ xmlXPtrAdvanceChar(xmlNodePtr *node, int *indx, int bytes) {
 	len = 0;
 	if ((cur->type != XML_ELEMENT_NODE) &&
             (cur->content != NULL)) {
-#ifndef XML_USE_BUFFER_CONTENT
 	    len = xmlStrlen(cur->content);
-#else
-	    len = xmlBufferLength(cur->content);
-#endif
 	}
 	if (pos > len) {
 	    /* Strange, the indx in the text node is greater than it's len */
@@ -2387,18 +2371,9 @@ xmlXPtrMatchString(const xmlChar *string, xmlNodePtr start, int startindex,
 	    return(0);
 
 	if ((cur->type != XML_ELEMENT_NODE) && (cur->content != NULL)) {
-#ifndef XML_USE_BUFFER_CONTENT
 	    len = xmlStrlen(cur->content);
-#else
-	    len = xmlBufferLength(cur->content);
-#endif
 	    if (len >= pos + stringlen) {
-#ifndef XML_USE_BUFFER_CONTENT
 		match = (!xmlStrncmp(&cur->content[pos], string, stringlen));
-#else
-		len = (!xmlStrncmp(&xmlBufferContent(cur->content)[pos],
-			           string, stringlen));
-#endif
 		if (match) {
 #ifdef DEBUG_RANGES
 		    xmlGenericError(xmlGenericErrorContext,
@@ -2415,12 +2390,7 @@ xmlXPtrMatchString(const xmlChar *string, xmlNodePtr start, int startindex,
 		}
 	    } else {
                 int sub = len - pos;
-#ifndef XML_USE_BUFFER_CONTENT
 		match = (!xmlStrncmp(&cur->content[pos], string, sub));
-#else
-		len = (!xmlStrncmp(&xmlBufferContent(cur->content)[pos],
-			           string, sub));
-#endif
 		if (match) {
 #ifdef DEBUG_RANGES
 		    xmlGenericError(xmlGenericErrorContext,
@@ -2483,19 +2453,10 @@ xmlXPtrSearchString(const xmlChar *string, xmlNodePtr *start, int *startindex,
 
     while (cur != NULL) {
 	if ((cur->type != XML_ELEMENT_NODE) && (cur->content != NULL)) {
-#ifndef XML_USE_BUFFER_CONTENT
 	    len = xmlStrlen(cur->content);
-#else
-	    len = xmlBufferLength(cur->content);
-#endif
 	    while (pos <= len) {
 		if (first != 0) {
-#ifndef XML_USE_BUFFER_CONTENT
 		    str = xmlStrchr(&cur->content[pos], first);
-#else
-		    str = xmlStrchr(&xmlBufferContent(cur->content)[pos],
-			            first);
-#endif
 		    if (str != NULL) {
 			pos = (str - (xmlChar *)(cur->content));
 #ifdef DEBUG_RANGES
@@ -2581,11 +2542,7 @@ xmlXPtrGetLastChar(xmlNodePtr *node, int *indx) {
 	    cur = cur->last;
 	else if ((cur->type != XML_ELEMENT_NODE) &&
 	         (cur->content != NULL)) {
-#ifndef XML_USE_BUFFER_CONTENT
 	    len = xmlStrlen(cur->content);
-#else
-	    len = xmlBufferLength(cur->content);
-#endif
 	    break;
 	} else {
 	    return(-1);

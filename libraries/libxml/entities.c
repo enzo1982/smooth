@@ -6,6 +6,7 @@
  * daniel@veillard.com
  */
 
+#define IN_LIBXML
 #include "libxml.h"
 
 #include <string.h>
@@ -47,7 +48,7 @@ static xmlHashTablePtr xmlPredefinedEntities = NULL;
 static void xmlFreeEntity(xmlEntityPtr entity) {
     if (entity == NULL) return;
 
-    if ((entity->children) &&
+    if ((entity->children) && (entity->owner == 1) &&
 	(entity == (xmlEntityPtr) entity->children->parent))
 	xmlFreeNodeList(entity->children);
     if (entity->name != NULL)
@@ -126,6 +127,7 @@ xmlAddEntity(xmlDtdPtr dtd, const xmlChar *name, int type,
     ret->URI = NULL; /* to be computed by the layer knowing
 			the defining entity */
     ret->orig = NULL;
+    ret->owner = 0;
 
     if (xmlHashAddEntry(table, name, ret)) {
 	/*
@@ -323,6 +325,8 @@ xmlGetParameterEntity(xmlDocPtr doc, const xmlChar *name) {
     xmlEntitiesTablePtr table;
     xmlEntityPtr ret;
 
+    if (doc == NULL)
+	return(NULL);
     if ((doc->intSubset != NULL) && (doc->intSubset->pentities != NULL)) {
 	table = (xmlEntitiesTablePtr) doc->intSubset->pentities;
 	ret = xmlGetEntityFromTable(table, name);
@@ -343,6 +347,7 @@ xmlGetParameterEntity(xmlDocPtr doc, const xmlChar *name) {
  *
  * Do an entity lookup in the DTD entity hash table and
  * returns the corresponding entity, if found.
+ * Note: the first argument is the document node, not the DTD node.
  * 
  * Returns A pointer to the entity structure or NULL if not found.
  */
@@ -350,6 +355,8 @@ xmlEntityPtr
 xmlGetDtdEntity(xmlDocPtr doc, const xmlChar *name) {
     xmlEntitiesTablePtr table;
 
+    if (doc == NULL)
+	return(NULL);
     if ((doc->extSubset != NULL) && (doc->extSubset->entities != NULL)) {
 	table = (xmlEntitiesTablePtr) doc->extSubset->entities;
 	return(xmlGetEntityFromTable(table, name));
@@ -380,11 +387,14 @@ xmlGetDocEntity(xmlDocPtr doc, const xmlChar *name) {
 	    if (cur != NULL)
 		return(cur);
 	}
-	if ((doc->extSubset != NULL) && (doc->extSubset->entities != NULL)) {
-	    table = (xmlEntitiesTablePtr) doc->extSubset->entities;
-	    cur = xmlGetEntityFromTable(table, name);
-	    if (cur != NULL)
-		return(cur);
+	if (doc->standalone != 1) {
+	    if ((doc->extSubset != NULL) &&
+		(doc->extSubset->entities != NULL)) {
+		table = (xmlEntitiesTablePtr) doc->extSubset->entities;
+		cur = xmlGetEntityFromTable(table, name);
+		if (cur != NULL)
+		    return(cur);
+	    }
 	}
     }
     if (xmlPredefinedEntities == NULL)
@@ -410,9 +420,10 @@ static xmlChar *static_buffer = NULL;
 
 static int growBuffer(void) {
     static_buffer_size *= 2;
-    static_buffer = (xmlChar *) xmlRealloc(static_buffer, static_buffer_size * sizeof(xmlChar));
+    static_buffer = (xmlChar *) xmlRealloc(static_buffer,
+	                                static_buffer_size * sizeof(xmlChar));
     if (static_buffer == NULL) {
-        perror("realloc failed");
+        xmlGenericError(xmlGenericErrorContext, "malloc failed\n");
 	return(-1);
     }
     return(0);
@@ -457,9 +468,10 @@ xmlEncodeEntities(xmlDocPtr doc, const xmlChar *input) {
 
     if (static_buffer == NULL) {
         static_buffer_size = 1000;
-        static_buffer = (xmlChar *) xmlMalloc(static_buffer_size * sizeof(xmlChar));
+        static_buffer = (xmlChar *)
+	    xmlMalloc(static_buffer_size * sizeof(xmlChar));
 	if (static_buffer == NULL) {
-	    perror("malloc failed");
+	    xmlGenericError(xmlGenericErrorContext, "malloc failed\n");
             return(NULL);
 	}
 	out = static_buffer;
@@ -515,7 +527,7 @@ xmlEncodeEntities(xmlDocPtr doc, const xmlChar *input) {
 	} else if ((sizeof(xmlChar) == 1) && (*cur >= 0x80)) {
 	    char buf[10], *ptr;
 
-	    _snprintf(buf, sizeof(buf), "&#%d;", *cur);
+	    snprintf(buf, sizeof(buf), "&#%d;", *cur);
             buf[sizeof(buf) - 1] = 0;
             ptr = buf;
 	    while (*ptr != 0) *out++ = *ptr++;
@@ -523,7 +535,7 @@ xmlEncodeEntities(xmlDocPtr doc, const xmlChar *input) {
 	} else if (IS_CHAR(*cur)) {
 	    char buf[10], *ptr;
 
-	    _snprintf(buf, sizeof(buf), "&#%d;", *cur);
+	    snprintf(buf, sizeof(buf), "&#%d;", *cur);
             buf[sizeof(buf) - 1] = 0;
             ptr = buf;
 	    while (*ptr != 0) *out++ = *ptr++;
@@ -552,7 +564,7 @@ xmlEncodeEntities(xmlDocPtr doc, const xmlChar *input) {
     buffer = (xmlChar *)						\
     		xmlRealloc(buffer, buffer_size * sizeof(xmlChar));	\
     if (buffer == NULL) {						\
-	perror("realloc failed");					\
+	xmlGenericError(xmlGenericErrorContext, "realloc failed\n");	\
 	return(NULL);							\
     }									\
 }
@@ -588,7 +600,7 @@ xmlEncodeEntitiesReentrant(xmlDocPtr doc, const xmlChar *input) {
     buffer_size = 1000;
     buffer = (xmlChar *) xmlMalloc(buffer_size * sizeof(xmlChar));
     if (buffer == NULL) {
-	perror("malloc failed");
+	xmlGenericError(xmlGenericErrorContext, "malloc failed\n");
 	return(NULL);
     }
     out = buffer;
@@ -666,7 +678,7 @@ xmlEncodeEntitiesReentrant(xmlDocPtr doc, const xmlChar *input) {
 			    "xmlEncodeEntitiesReentrant : input not UTF-8\n");
 		    if (doc != NULL)
 			doc->encoding = xmlStrdup(BAD_CAST "ISO-8859-1");
-		    _snprintf(buf, sizeof(buf), "&#%d;", *cur);
+		    snprintf(buf, sizeof(buf), "&#%d;", *cur);
 		    buf[sizeof(buf) - 1] = 0;
 		    ptr = buf;
 		    while (*ptr != 0) *out++ = *ptr++;
@@ -699,7 +711,7 @@ xmlEncodeEntitiesReentrant(xmlDocPtr doc, const xmlChar *input) {
 			"xmlEncodeEntitiesReentrant : char out of range\n");
 		    if (doc != NULL)
 			doc->encoding = xmlStrdup(BAD_CAST "ISO-8859-1");
-		    _snprintf(buf, sizeof(buf), "&#%d;", *cur);
+		    snprintf(buf, sizeof(buf), "&#%d;", *cur);
 		    buf[sizeof(buf) - 1] = 0;
 		    ptr = buf;
 		    while (*ptr != 0) *out++ = *ptr++;
@@ -710,9 +722,9 @@ xmlEncodeEntitiesReentrant(xmlDocPtr doc, const xmlChar *input) {
 		 * We could do multiple things here. Just save as a char ref
 		 */
 		if (html)
-		    _snprintf(buf, sizeof(buf), "&#%d;", val);
+		    snprintf(buf, sizeof(buf), "&#%d;", val);
 		else
-		    _snprintf(buf, sizeof(buf), "&#x%X;", val);
+		    snprintf(buf, sizeof(buf), "&#x%X;", val);
 		buf[sizeof(buf) - 1] = 0;
 		ptr = buf;
 		while (*ptr != 0) *out++ = *ptr++;
@@ -722,7 +734,7 @@ xmlEncodeEntitiesReentrant(xmlDocPtr doc, const xmlChar *input) {
 	} else if (IS_CHAR(*cur)) {
 	    char buf[10], *ptr;
 
-	    _snprintf(buf, sizeof(buf), "&#%d;", *cur);
+	    snprintf(buf, sizeof(buf), "&#%d;", *cur);
 	    buf[sizeof(buf) - 1] = 0;
             ptr = buf;
 	    while (*ptr != 0) *out++ = *ptr++;
@@ -771,7 +783,7 @@ xmlEncodeSpecialChars(xmlDocPtr doc, const xmlChar *input) {
     buffer_size = 1000;
     buffer = (xmlChar *) xmlMalloc(buffer_size * sizeof(xmlChar));
     if (buffer == NULL) {
-	perror("malloc failed");
+	xmlGenericError(xmlGenericErrorContext, "malloc failed\n");
 	return(NULL);
     }
     out = buffer;
@@ -836,6 +848,20 @@ xmlCreateEntitiesTable(void) {
 }
 
 /**
+ * xmlFreeEntityWrapper:
+ * @entity:  An entity
+ * @name:  its name
+ *
+ * Deallocate the memory used by an entities in the hash table.
+ */
+static void
+xmlFreeEntityWrapper(xmlEntityPtr entity,
+	               const xmlChar *name ATTRIBUTE_UNUSED) {
+    if (entity != NULL)
+	xmlFreeEntity(entity);
+}
+
+/**
  * xmlFreeEntitiesTable:
  * @table:  An entity table
  *
@@ -843,7 +869,7 @@ xmlCreateEntitiesTable(void) {
  */
 void
 xmlFreeEntitiesTable(xmlEntitiesTablePtr table) {
-    xmlHashFree(table, (xmlHashDeallocator) xmlFreeEntity);
+    xmlHashFree(table, (xmlHashDeallocator) xmlFreeEntityWrapper);
 }
 
 /**
@@ -878,6 +904,8 @@ xmlCopyEntity(xmlEntityPtr ent) {
 	cur->content = xmlStrdup(ent->content);
     if (ent->orig != NULL)
 	cur->orig = xmlStrdup(ent->orig);
+    if (ent->URI != NULL)
+	cur->URI = xmlStrdup(ent->URI);
     return(cur);
 }
 

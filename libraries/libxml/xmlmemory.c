@@ -4,6 +4,7 @@
  * daniel@veillard.com
  */
 
+#define IN_LIBXML
 #include "libxml.h"
 
 #include <string.h>
@@ -11,19 +12,32 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+
 #ifdef HAVE_TIME_H
 #include <time.h>
 #endif
+
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#else
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
 #endif
-#ifdef HAVE_STDLIB_H
-#include <stdlib.h>
 #endif
+
 #ifdef HAVE_CTYPE_H
 #include <ctype.h>
 #endif
 
+/**
+ * MEM_LIST:
+ *
+ * keep track of all allocated blocks for error reporting 
+ * Always build the memory list !
+ */
+#ifndef MEM_LIST
+#define MEM_LIST /* keep a list of all the allocated memory blocks */
+#endif
 
 #include <libxml/xmlmemory.h>
 #include <libxml/globals.h>
@@ -31,7 +45,6 @@
 
 void xmlMallocBreakpoint(void);
 void * xmlMemMalloc(size_t size);
-void * xmlMallocLoc(size_t size, const char * file, int line);
 void * xmlMemRealloc(void *ptr,size_t size);
 void xmlMemFree(void *ptr);
 char * xmlMemoryStrdup(const char *str);
@@ -102,10 +115,10 @@ static int xmlMemInitialized = 0;
 static MEMHDR *memlist = NULL;
 #endif
 
-void debugmem_tag_error(void *addr);
+static void debugmem_tag_error(void *addr);
 #ifdef MEM_LIST
-void  debugmem_list_add(MEMHDR *);
-void debugmem_list_delete(MEMHDR *);
+static void  debugmem_list_add(MEMHDR *);
+static void debugmem_list_delete(MEMHDR *);
 #endif
 #define Mem_Tag_Err(a) debugmem_tag_error(a);
 
@@ -340,7 +353,7 @@ error:
 
 /**
  * xmlMemStrdupLoc:
- * @ptr:  the initial string pointer
+ * @str:  the initial string pointer
  * @file:  the file name or NULL
  * @line:  the line number
  *
@@ -399,7 +412,7 @@ error:
 
 /**
  * xmlMemoryStrdup:
- * @ptr:  the initial string pointer
+ * @str:  the initial string pointer
  *
  * a strdup() equivalent, with logging of the allocation info.
  *
@@ -414,7 +427,7 @@ xmlMemoryStrdup(const char *str) {
 /**
  * xmlMemUsed:
  *
- * returns the amount of memory currently allocated
+ * Provides the amount of memory currently allocated
  *
  * Returns an int representing the amount of memory allocated.
  */
@@ -446,7 +459,7 @@ xmlMemContentShow(FILE *fp, MEMHDR *p)
 
     for (i = 0;i < len;i++) {
         if (buf[i] == 0) break;
-	if (!isprint(buf[i])) break;
+	if (!isprint((unsigned char) buf[i])) break;
     }
     if ((i < 4) && ((buf[i] != 0) || (i == 0))) {
         if (len >= 4) {
@@ -506,7 +519,7 @@ xmlMemShow(FILE *fp, int nr)
 	fprintf(fp,"NUMBER   SIZE  TYPE   WHERE\n");
 	p = memlist;
 	while ((p) && nr > 0) {
-	      fprintf(fp,"%6lu %6u ",p->mh_number,p->mh_size);
+	      fprintf(fp,"%6lu %6lu ",p->mh_number,(unsigned long)p->mh_size);
 	    switch (p->mh_type) {
 	       case STRDUP_TYPE:fprintf(fp,"strdup()  in ");break;
 	       case MALLOC_TYPE:fprintf(fp,"malloc()  in ");break;
@@ -539,7 +552,7 @@ xmlMemDisplay(FILE *fp)
 {
 #ifdef MEM_LIST
     MEMHDR *p;
-    int     idx;
+    unsigned idx;
     int     nb = 0;
 #if defined(HAVE_LOCALTIME) && defined(HAVE_STRFTIME)
     time_t currentTime;
@@ -559,7 +572,8 @@ xmlMemDisplay(FILE *fp)
     idx = 0;
     p = memlist;
     while (p) {
-	  fprintf(fp,"%-5u  %6lu %6u ",idx++,p->mh_number,p->mh_size);
+	  fprintf(fp,"%-5u  %6lu %6lu ",idx++,p->mh_number,
+		  (unsigned long)p->mh_size);
         switch (p->mh_type) {
            case STRDUP_TYPE:fprintf(fp,"strdup()  in ");break;
            case MALLOC_TYPE:fprintf(fp,"malloc()  in ");break;
@@ -585,7 +599,7 @@ xmlMemDisplay(FILE *fp)
 
 #ifdef MEM_LIST
 
-void debugmem_list_add(MEMHDR *p)
+static void debugmem_list_add(MEMHDR *p)
 {
      p->mh_next = memlist;
      p->mh_prev = NULL;
@@ -597,7 +611,7 @@ void debugmem_list_add(MEMHDR *p)
 #endif
 }
 
-void debugmem_list_delete(MEMHDR *p)
+static void debugmem_list_delete(MEMHDR *p)
 {
      if (p->mh_next)
      p->mh_next->mh_prev = p->mh_prev;
@@ -613,10 +627,12 @@ void debugmem_list_delete(MEMHDR *p)
 #endif
 
 /*
- * debugmem_tag_error : internal error function.
+ * debugmem_tag_error:
+ *
+ * internal error function.
  */
  
-void debugmem_tag_error(void *p)
+static void debugmem_tag_error(void *p)
 {
      xmlGenericError(xmlGenericErrorContext,
 	     "Memory tag error occurs :%p \n\t bye\n", p);
@@ -626,9 +642,7 @@ void debugmem_tag_error(void *p)
 #endif
 }
 
-#if defined(DEBUG_MEMORY_LOCATION) | defined(DEBUG_MEMORY)
 static FILE *xmlMemoryDumpFile = NULL;
-#endif
 
 
 /**
@@ -640,9 +654,10 @@ static FILE *xmlMemoryDumpFile = NULL;
 void
 xmlMemoryDump(void)
 {
-#if defined(DEBUG_MEMORY_LOCATION) | defined(DEBUG_MEMORY)
     FILE *dump;
 
+    if (debugMaxMemSize == 0)
+	return;
     dump = fopen(".memdump", "w");
     if (dump == NULL)
 	xmlMemoryDumpFile = stderr;
@@ -651,7 +666,6 @@ xmlMemoryDump(void)
     xmlMemDisplay(xmlMemoryDumpFile);
 
     if (dump != NULL) fclose(dump);
-#endif
 }
 
 
@@ -661,6 +675,8 @@ xmlMemoryDump(void)
  *								*
  ****************************************************************/
 
+static int xmlInitMemoryDone = 0;
+
 /**
  * xmlInitMemory:
  *
@@ -668,9 +684,6 @@ xmlMemoryDump(void)
  *
  * Returns 0 on success
  */
-
-static int xmlInitMemoryDone = 0;
-
 int
 xmlInitMemory(void)
 {
@@ -699,6 +712,9 @@ xmlInitMemory(void)
      xmlGenericError(xmlGenericErrorContext,
 	     "xmlInitMemory() Ok\n");
 #endif     
+     xmlMemInitialized = 1;
+     xmlInitMemoryDone = 1;
+
      ret = 0;
      return(ret);
 }
@@ -738,12 +754,12 @@ xmlMemSetup(xmlFreeFunc freeFunc, xmlMallocFunc mallocFunc,
 
 /**
  * xmlMemGet:
- * @freeFunc: the free() function in use
- * @mallocFunc: the malloc() function in use
- * @reallocFunc: the realloc() function in use
- * @strdupFunc: the strdup() function in use
+ * @freeFunc: place to save the free() function in use
+ * @mallocFunc: place to save the malloc() function in use
+ * @reallocFunc: place to save the realloc() function in use
+ * @strdupFunc: place to save the strdup() function in use
  *
- * Return the memory access functions set currently in use
+ * Provides the memory access functions set currently in use
  *
  * Returns 0 on success
  */

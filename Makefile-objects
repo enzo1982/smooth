@@ -580,7 +580,7 @@ $(OBJECTDIR)/libxml_catalog.o: $(LIBXMLDIR)/catalog.c
 
 $(OBJECTDIR)/libxml_encoding.o: $(LIBXMLDIR)/encoding.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/encoding.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/encoding.c -o $(OBJECTDIR)/libxml_encoding.o
+	$(COMPILER) $(COMPILER_OPTS) -w $(LIBXMLDIR)/encoding.c -o $(OBJECTDIR)/libxml_encoding.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_entities.o: $(LIBXMLDIR)/entities.c
@@ -630,7 +630,7 @@ $(OBJECTDIR)/libxml_threads.o: $(LIBXMLDIR)/threads.c
 
 $(OBJECTDIR)/libxml_tree.o: $(LIBXMLDIR)/tree.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/tree.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/tree.c -o $(OBJECTDIR)/libxml_tree.o
+	$(COMPILER) $(COMPILER_OPTS) -w $(LIBXMLDIR)/tree.c -o $(OBJECTDIR)/libxml_tree.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_uri.o: $(LIBXMLDIR)/uri.c
@@ -650,12 +650,22 @@ $(OBJECTDIR)/libxml_xlink.o: $(LIBXMLDIR)/xlink.c
 
 $(OBJECTDIR)/libxml_xmlIO.o: $(LIBXMLDIR)/xmlIO.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlIO.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlIO.c -o $(OBJECTDIR)/libxml_xmlIO.o
+	$(COMPILER) $(COMPILER_OPTS) -w $(LIBXMLDIR)/xmlIO.c -o $(OBJECTDIR)/libxml_xmlIO.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_xmlmemory.o: $(LIBXMLDIR)/xmlmemory.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlmemory.c...
 	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlmemory.c -o $(OBJECTDIR)/libxml_xmlmemory.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/libxml_xmlregexp.o: $(LIBXMLDIR)/xmlregexp.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlregexp.c...
+	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlregexp.c -o $(OBJECTDIR)/libxml_xmlregexp.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/libxml_xmlunicode.o: $(LIBXMLDIR)/xmlunicode.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlunicode.c...
+	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlunicode.c -o $(OBJECTDIR)/libxml_xmlunicode.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_xpath.o: $(LIBXMLDIR)/xpath.c

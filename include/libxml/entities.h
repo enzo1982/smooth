@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 /*
- * The different valid entity types
+ * The different valid entity types.
  */
 typedef enum {
     XML_INTERNAL_GENERAL_ENTITY = 1,
@@ -32,14 +32,12 @@ typedef enum {
  * and the linkind data needed for the linking in the hash table.
  */
 
-typedef struct _xmlEntity xmlEntity;
-typedef xmlEntity *xmlEntityPtr;
 struct _xmlEntity {
     void           *_private;	        /* application data */
     xmlElementType          type;       /* XML_ENTITY_DECL, must be second ! */
-    const xmlChar          *name;	/* Attribute name */
-    struct _xmlNode    *children;	/* NULL */
-    struct _xmlNode        *last;	/* NULL */
+    const xmlChar          *name;	/* Entity name */
+    struct _xmlNode    *children;	/* First child link */
+    struct _xmlNode        *last;	/* Last child link */
     struct _xmlDtd       *parent;	/* -> DTD */
     struct _xmlNode        *next;	/* next sibling link  */
     struct _xmlNode        *prev;	/* previous sibling link  */
@@ -54,18 +52,19 @@ struct _xmlEntity {
 
     struct _xmlEntity     *nexte;	/* unused */
     const xmlChar           *URI;	/* the full URI as computed */
+    int                    owner;	/* does the entity own the childrens */
 };
 
 /*
- * All entities are stored in an hash table
- * there is 2 separate hash tables for global and parameter entities
+ * All entities are stored in an hash table.
+ * There is 2 separate hash tables for global and parameter entities.
  */
 
 typedef struct _xmlHashTable xmlEntitiesTable;
 typedef xmlEntitiesTable *xmlEntitiesTablePtr;
 
 /*
- * External functions :
+ * External functions:
  */
 
 void		xmlInitializePredefinedEntities	(void);

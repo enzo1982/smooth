@@ -8,6 +8,7 @@
  */
 
 
+#define IN_LIBXML
 #include "libxml.h"
 
 #include <string.h> /* for memset() only */
@@ -159,7 +160,7 @@ xlinkIsLink	(xmlDocPtr doc, xmlNodePtr node) {
 			ret = XLINK_TYPE_EXTENDED_SET;
 		} else {
 		    xmlChar buf[200];
-		    _snprintf((char *) buf, sizeof(buf), "%s:external-linkset",
+		    snprintf((char *) buf, sizeof(buf), "%s:external-linkset",
 			     (char *) xlink->prefix);
                     buf[sizeof(buf) - 1] = 0;
 		    if (xmlStrEqual(role, buf))

@@ -8,10 +8,14 @@
  * 14 Nov 2000 ht - for VMS, truncated name of long functions to under 32 char
  */
 
+#define IN_LIBXML
 #include "libxml.h"
 
 #include <string.h>
+#ifdef HAVE_ERRNO_H
 #include <errno.h>
+#endif
+
 
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
@@ -75,11 +79,6 @@
 #endif
 #include <libxml/globals.h>
 
-#ifdef VMS
-#define xmlRegisterDefaultInputCallbacks xmlRegisterDefInputCallbacks
-#define xmlRegisterDefaultOutputCallbacks xmlRegisterDefOutputCallbacks
-#endif
-
 /* #define VERBOSE_FAILURE */
 /* #define DEBUG_EXTERNAL_ENTITIES */
 /* #define DEBUG_INPUT */
@@ -122,6 +121,72 @@ static xmlOutputCallback xmlOutputCallbackTable[MAX_OUTPUT_CALLBACK];
 static int xmlOutputCallbackNr = 0;
 static int xmlOutputCallbackInitialized = 0;
 
+/************************************************************************
+ *									*
+ *		Handling of Windows file paths				*
+ *									*
+ ************************************************************************/
+
+#define IS_WINDOWS_PATH(p) 					\
+	((p != NULL) &&						\
+	 (((p[0] >= 'a') && (p[0] <= 'z')) ||			\
+	  ((p[0] >= 'A') && (p[0] <= 'Z'))) &&			\
+	 (p[1] == ':') && ((p[2] == '/') || (p[2] == '\\')))
+
+
+/**
+ * xmlNormalizeWindowsPath:
+ * @path:  a windows path like "C:/foo/bar"
+ *
+ * Normalize a Windows path to make an URL from it
+ *
+ * Returns a new URI which must be freed by the caller or NULL
+ *   in case of error
+ */
+xmlChar *
+xmlNormalizeWindowsPath(const xmlChar *path)
+{
+    int len, i = 0, j;
+    xmlChar *ret;
+
+    if (path == NULL)
+	return(NULL);
+
+    len = xmlStrlen(path);
+    if (!IS_WINDOWS_PATH(path)) {
+	ret = xmlStrdup(path);
+	if (ret == NULL)
+	    return(NULL);
+	j = 0;
+    } else {
+	ret = xmlMalloc(len + 10);
+	if (ret == NULL)
+	    return(NULL);
+	ret[0] = 'f';
+	ret[1] = 'i';
+	ret[2] = 'l';
+	ret[3] = 'e';
+	ret[4] = ':';
+	ret[5] = '/';
+	ret[6] = '/';
+	ret[7] = '/';
+	j = 8;
+    }
+
+    while (i < len) {
+	/* TODO: UTF8 conversion + URI escaping ??? */
+	if (path[i] == '\\')
+	    ret[j] = '/';
+	else
+	    ret[j] = path[i];
+	i++;
+	j++;
+    }
+    ret[j] = 0;
+
+    return(ret);
+}
+
 /**
  * xmlCleanupInputCallbacks:
  *
@@ -142,8 +207,10 @@ xmlCleanupInputCallbacks(void)
         xmlInputCallbackTable[i].readcallback = NULL;
         xmlInputCallbackTable[i].closecallback = NULL;
     }
+    xmlInputCallbackInitialized = 0;
 
     xmlInputCallbackNr = 0;
+    xmlInputCallbackInitialized = 0;
 }
 
 /**
@@ -166,8 +233,10 @@ xmlCleanupOutputCallbacks(void)
         xmlOutputCallbackTable[i].writecallback = NULL;
         xmlOutputCallbackTable[i].closecallback = NULL;
     }
+    xmlOutputCallbackInitialized = 0;
 
     xmlOutputCallbackNr = 0;
+    xmlOutputCallbackInitialized = 0;
 }
 
 /************************************************************************
@@ -177,7 +246,7 @@ xmlCleanupOutputCallbacks(void)
  ************************************************************************/
 
 /**
- * xmlCheckFilename
+ * xmlCheckFilename:
  * @path:  the path to check
  *
  * function checks to see if @path is a valid source
@@ -187,25 +256,22 @@ xmlCleanupOutputCallbacks(void)
  * returns 1.  if stat fails, returns 0 (if calling
  * stat on the filename fails, it can't be right).
  * if stat succeeds and the file is a directory,
- * sets errno to EISDIR and returns 0.  otherwise
- * returns 1.
+ * returns 2.  otherwise returns 1.
  */
 
-static int
+int
 xmlCheckFilename (const char *path)
 {
 #ifdef HAVE_STAT
-#ifdef S_ISDIR
     struct stat stat_buffer;
 
     if (stat(path, &stat_buffer) == -1)
         return 0;
 
+#ifdef S_ISDIR
     if (S_ISDIR(stat_buffer.st_mode)) {
- //       errno = EISDIR;
-        return 0;
+        return 2;
     }
-
 #endif
 #endif
     return 1;
@@ -267,7 +333,7 @@ xmlFdClose (void * context) {
  *
  * Returns 1 if matches, 0 otherwise
  */
-static int
+int
 xmlFileMatch (const char *filename ATTRIBUTE_UNUSED) {
     return(1);
 }
@@ -281,7 +347,7 @@ xmlFileMatch (const char *filename ATTRIBUTE_UNUSED) {
  *
  * Returns an I/O context or NULL in case of error
  */
-static void *
+void *
 xmlFileOpen (const char *filename) {
     const char *path = NULL;
     FILE *fd;
@@ -291,9 +357,13 @@ xmlFileOpen (const char *filename) {
 	return((void *) fd);
     }
 
-    if (!strncmp(filename, "file://localhost", 16))
+    if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file://localhost/", 17))
+#if defined (_WIN32) && !defined(__CYGWIN__)
+	path = &filename[17];
+#else
 	path = &filename[16];
-    else if (!strncmp(filename, "file:///", 8)) {
+#endif
+    else if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file:///", 8)) {
 #if defined (_WIN32) && !defined(__CYGWIN__)
 	path = &filename[8];
 #else
@@ -334,9 +404,13 @@ xmlFileOpenW (const char *filename) {
 	return((void *) fd);
     }
 
-    if (!strncmp(filename, "file://localhost", 16))
+    if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file://localhost/", 17))
+#if defined (_WIN32) && !defined(__CYGWIN__)
+	path = &filename[17];
+#else
 	path = &filename[16];
-    else if (!strncmp(filename, "file:///", 8)) {
+#endif
+    else if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file:///", 8)) {
 #if defined (_WIN32) && !defined(__CYGWIN__)
 	path = &filename[8];
 #else
@@ -362,7 +436,7 @@ xmlFileOpenW (const char *filename) {
  *
  * Returns the number of bytes written
  */
-static int
+int
 xmlFileRead (void * context, char * buffer, int len) {
     return(fread(&buffer[0], 1,  len, (FILE *) context));
 }
@@ -379,7 +453,11 @@ xmlFileRead (void * context, char * buffer, int len) {
  */
 static int
 xmlFileWrite (void * context, const char * buffer, int len) {
-    return(fwrite(&buffer[0], 1,  len, (FILE *) context));
+    int items;
+
+    items = fwrite(&buffer[0], len, 1, (FILE *) context);
+
+    return(items * len);
 }
 
 /**
@@ -387,8 +465,10 @@ xmlFileWrite (void * context, const char * buffer, int len) {
  * @context:  the I/O context
  *
  * Close an I/O channel
+ *
+ * Returns 0 or -1 in case of error
  */
-static int
+int
 xmlFileClose (void * context) {
     FILE *fil;
 
@@ -451,9 +531,13 @@ xmlGzfileOpen (const char *filename) {
 	return((void *) fd);
     }
 
-    if (!strncmp(filename, "file://localhost", 16))
+    if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file://localhost/", 17))
+#if defined (_WIN32) && !defined(__CYGWIN__)
+	path = &filename[17];
+#else
 	path = &filename[16];
-    else if (!strncmp(filename, "file:///", 8)) {
+#endif
+    else if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file:///", 8)) {
 #if defined (_WIN32) && !defined(__CYGWIN__)
 	path = &filename[8];
 #else
@@ -487,15 +571,19 @@ xmlGzfileOpenW (const char *filename, int compression) {
     char mode[15];
     gzFile fd;
 
-    sprintf(mode, "wb%d", compression);
+    snprintf(mode, sizeof(mode), "wb%d", compression);
     if (!strcmp(filename, "-")) {
         fd = gzdopen(dup(1), mode);
 	return((void *) fd);
     }
 
-    if (!strncmp(filename, "file://localhost", 16))
+    if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file://localhost/", 17))
+#if defined (_WIN32) && !defined(__CYGWIN__)
+	path = &filename[17];
+#else
 	path = &filename[16];
-    else if (!strncmp(filename, "file:///", 8)) {
+#endif
+    else if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file:///", 8)) {
 #if defined (_WIN32) && !defined(__CYGWIN__)
 	path = &filename[8];
 #else
@@ -709,9 +797,9 @@ xmlCreateZMemBuff( int compression ) {
     }
 
     /*  Set the header data.  The CRC will be needed for the trailer  */
-
     buff->crc = crc32( 0L, Z_NULL, 0 );
-    hdr_lgth = sprintf( (char *)buff->zbuff, "%c%c%c%c%c%c%c%c%c%c",
+    hdr_lgth = snprintf( (char *)buff->zbuff, buff->size,
+			"%c%c%c%c%c%c%c%c%c%c",
 			GZ_MAGIC1, GZ_MAGIC2, Z_DEFLATED, 
 			0, 0, 0, 0, 0, 0, LXML_ZLIB_OS_CODE );
     buff->zctrl.next_out  = buff->zbuff + hdr_lgth;
@@ -902,7 +990,7 @@ static void
 xmlFreeHTTPWriteCtxt( xmlIOHTTPWriteCtxtPtr ctxt )
 {
     if ( ctxt->uri != NULL )
-	free( ctxt->uri );
+	xmlFree( ctxt->uri );
 
     if ( ctxt->doc_buff != NULL ) {
 
@@ -917,7 +1005,7 @@ xmlFreeHTTPWriteCtxt( xmlIOHTTPWriteCtxtPtr ctxt )
 	}
     }
 
-    free( ctxt );
+    xmlFree( ctxt );
     return;
 }
 
@@ -930,9 +1018,9 @@ xmlFreeHTTPWriteCtxt( xmlIOHTTPWriteCtxtPtr ctxt )
  *
  * Returns 1 if matches, 0 otherwise
  */
-static int
+int
 xmlIOHTTPMatch (const char *filename) {
-    if (!strncmp(filename, "http://", 7))
+    if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "http://", 7))
 	return(1);
     return(0);
 }
@@ -945,13 +1033,13 @@ xmlIOHTTPMatch (const char *filename) {
  *
  * Returns an I/O context or NULL in case of error
  */
-static void *
+void *
 xmlIOHTTPOpen (const char *filename) {
     return(xmlNanoHTTPOpen(filename, NULL));
 }
 
 /**
- * xmlIOHTTPOpenW
+ * xmlIOHTTPOpenW:
  * @post_uri:  The destination URI for the document
  * @compression:  The compression desired for the document.
  *
@@ -962,56 +1050,56 @@ xmlIOHTTPOpen (const char *filename) {
  */
 
 void *
-xmlIOHTTPOpenW( const char * post_uri, int compression ) {
+xmlIOHTTPOpenW(const char *post_uri, int compression)
+{
 
-    xmlIOHTTPWriteCtxtPtr	ctxt = NULL;
+    xmlIOHTTPWriteCtxtPtr ctxt = NULL;
 
-    if ( post_uri == NULL )
-	return ( NULL );
+    if (post_uri == NULL)
+        return (NULL);
 
-    ctxt = xmlMalloc( sizeof( xmlIOHTTPWriteCtxt ) );
-    if ( ctxt == NULL ) {
-	xmlGenericError( xmlGenericErrorContext,
-		"xmlIOHTTPOpenW:  Failed to create output HTTP context.\n" );
-	return ( NULL );
+    ctxt = xmlMalloc(sizeof(xmlIOHTTPWriteCtxt));
+    if (ctxt == NULL) {
+        xmlGenericError(xmlGenericErrorContext,
+		    "xmlIOHTTPOpenW:  Failed to create output HTTP context.\n");
+        return (NULL);
     }
 
-    (void)memset( ctxt, 0, sizeof( xmlIOHTTPWriteCtxt ) );
+    (void) memset(ctxt, 0, sizeof(xmlIOHTTPWriteCtxt));
 
-    ctxt->uri = strdup( post_uri );
-    if ( ctxt->uri == NULL ) {
-	xmlGenericError( xmlGenericErrorContext,
-		"xmlIOHTTPOpenW:  Failed to duplicate destination URI.\n" );
-	xmlFreeHTTPWriteCtxt( ctxt );
-	return ( NULL );
+    ctxt->uri = (char *) xmlStrdup((const xmlChar *)post_uri);
+    if (ctxt->uri == NULL) {
+        xmlGenericError(xmlGenericErrorContext,
+		    "xmlIOHTTPOpenW:  Failed to duplicate destination URI.\n");
+        xmlFreeHTTPWriteCtxt(ctxt);
+        return (NULL);
     }
 
     /*
-    **  Since the document length is required for an HTTP post,
-    **  need to put the document into a buffer.  A memory buffer
-    **  is being used to avoid pushing the data to disk and back.
-    */
+     * **  Since the document length is required for an HTTP post,
+     * **  need to put the document into a buffer.  A memory buffer
+     * **  is being used to avoid pushing the data to disk and back.
+     */
 
 #ifdef HAVE_ZLIB_H
-    if ( ( compression > 0 ) && ( compression <= 9 ) ) {
-	
-	ctxt->compression = compression;
-	ctxt->doc_buff    = xmlCreateZMemBuff( compression );
-    }
-    else
+    if ((compression > 0) && (compression <= 9)) {
+
+        ctxt->compression = compression;
+        ctxt->doc_buff = xmlCreateZMemBuff(compression);
+    } else
 #endif
     {
-	/*  Any character conversions should have been done before this  */
+        /*  Any character conversions should have been done before this  */
 
-	ctxt->doc_buff = xmlAllocOutputBuffer( NULL );
+        ctxt->doc_buff = xmlAllocOutputBuffer(NULL);
     }
 
-    if ( ctxt->doc_buff == NULL ) {
-	xmlFreeHTTPWriteCtxt( ctxt );
-	ctxt = NULL;
+    if (ctxt->doc_buff == NULL) {
+        xmlFreeHTTPWriteCtxt(ctxt);
+        ctxt = NULL;
     }
 
-    return ( ctxt );
+    return (ctxt);
 }
 				
 /**
@@ -1039,7 +1127,7 @@ xmlIOHTTPDfltOpenW( const char * post_uri ) {
  *
  * Returns the number of bytes written
  */
-static int 
+int 
 xmlIOHTTPRead(void * context, char * buffer, int len) {
     return(xmlNanoHTTPRead(context, &buffer[0], len));
 }
@@ -1094,8 +1182,10 @@ xmlIOHTTPWrite( void * context, const char * buffer, int len ) {
  * @context:  the I/O context
  *
  * Close an HTTP I/O channel
+ *
+ * Returns 0
  */
-static int
+int
 xmlIOHTTPClose (void * context) {
     xmlNanoHTTPClose(context);
     return 0;
@@ -1177,7 +1267,7 @@ xmlIOHTTPCloseWrite( void * context, const char * http_mthd ) {
 
 	    dump_name = tempnam( NULL, "lxml" );
 	    if ( dump_name != NULL ) {
-		(void)sprintf( buffer, "%s.content", dump_name );
+		(void)snprintf( buffer, sizeof(buffer), "%s.content", dump_name );
 
 		tst_file = fopen( buffer, "w" );
 		if ( tst_file != NULL ) {
@@ -1189,7 +1279,7 @@ xmlIOHTTPCloseWrite( void * context, const char * http_mthd ) {
 		    fclose( tst_file );
 		}
 
-		(void)sprintf( buffer, "%s.reply", dump_name );
+		(void)snprintf( buffer, sizeof(buffer), "%s.reply", dump_name );
 		tst_file = fopen( buffer, "w" );
 		if ( tst_file != NULL ) {
 		    xmlGenericError( xmlGenericErrorContext,
@@ -1274,9 +1364,9 @@ xmlIOHTTPClosePost( void * ctxt ) {
  *
  * Returns 1 if matches, 0 otherwise
  */
-static int
+int
 xmlIOFTPMatch (const char *filename) {
-    if (!strncmp(filename, "ftp://", 6))
+    if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "ftp://", 6))
 	return(1);
     return(0);
 }
@@ -1289,7 +1379,7 @@ xmlIOFTPMatch (const char *filename) {
  *
  * Returns an I/O context or NULL in case of error
  */
-static void *
+void *
 xmlIOFTPOpen (const char *filename) {
     return(xmlNanoFTPOpen(filename));
 }
@@ -1304,7 +1394,7 @@ xmlIOFTPOpen (const char *filename) {
  *
  * Returns the number of bytes written
  */
-static int 
+int 
 xmlIOFTPRead(void * context, char * buffer, int len) {
     return(xmlNanoFTPRead(context, &buffer[0], len));
 }
@@ -1314,8 +1404,10 @@ xmlIOFTPRead(void * context, char * buffer, int len) {
  * @context:  the I/O context
  *
  * Close an FTP I/O channel
+ *
+ * Returns 0
  */
-static int
+int
 xmlIOFTPClose (void * context) {
     return ( xmlNanoFTPClose(context) );
 }
@@ -1378,11 +1470,7 @@ xmlRegisterOutputCallbacks(xmlOutputMatchCallback matchFunc,
  * Registers the default compiled-in I/O handlers.
  */
 void
-#ifdef VMS
-xmlRegisterDefInputCallbacks
-#else
 xmlRegisterDefaultInputCallbacks
-#endif
 (void) {
     if (xmlInputCallbackInitialized)
 	return;
@@ -1412,11 +1500,7 @@ xmlRegisterDefaultInputCallbacks
  * Registers the default compiled-in I/O handlers.
  */
 void
-#ifdef VMS
-xmlRegisterDefOutputCallbacks
-#else
 xmlRegisterDefaultOutputCallbacks
-#endif
 (void) {
     if (xmlOutputCallbackInitialized)
 	return;
@@ -1450,7 +1534,7 @@ xmlRegisterDefaultOutputCallbacks
 
 #ifdef LIBXML_HTTP_ENABLED
 /**
- * xmlRegisterHTTPPostCallbacks
+ * xmlRegisterHTTPPostCallbacks:
  *
  * By default, libxml submits HTTP output requests using the "PUT" method.
  * Calling this method changes the HTTP output method to use the "POST"
@@ -1619,8 +1703,6 @@ xmlOutputBufferClose(xmlOutputBufferPtr out) {
  * @URI:  a C string containing the URI or filename
  * @enc:  the charset encoding if known
  *
- * VMS version of xmlParserInputBufferCreateFilename()
- *
  * Returns the new parser input or NULL
  */
 /**
@@ -1637,21 +1719,20 @@ xmlOutputBufferClose(xmlOutputBufferPtr out) {
  * Returns the new parser input or NULL
  */
 xmlParserInputBufferPtr
-#ifdef VMS
-xmlParserInputBufferCreateFname
-#else
 xmlParserInputBufferCreateFilename
-#endif
 (const char *URI, xmlCharEncoding enc) {
     xmlParserInputBufferPtr ret;
     int i = 0;
     void *context = NULL;
     char *unescaped;
+    char *normalized;
 
     if (xmlInputCallbackInitialized == 0)
 	xmlRegisterDefaultInputCallbacks();
 
     if (URI == NULL) return(NULL);
+    normalized = (char *) xmlNormalizeWindowsPath((const xmlChar *)URI);
+    if (normalized == NULL) return(NULL);
 
 #ifdef LIBXML_CATALOG_ENABLED
 #endif
@@ -1661,7 +1742,7 @@ xmlParserInputBufferCreateFilename
      * Go in reverse to give precedence to user defined handlers.
      * try with an unescaped version of the URI
      */
-    unescaped = xmlURIUnescapeString(URI, 0, NULL);
+    unescaped = xmlURIUnescapeString((char *) normalized, 0, NULL);
     if (unescaped != NULL) {
 	for (i = xmlInputCallbackNr - 1;i >= 0;i--) {
 	    if ((xmlInputCallbackTable[i].matchcallback != NULL) &&
@@ -1682,12 +1763,13 @@ xmlParserInputBufferCreateFilename
 	for (i = xmlInputCallbackNr - 1;i >= 0;i--) {
 	    if ((xmlInputCallbackTable[i].matchcallback != NULL) &&
 		(xmlInputCallbackTable[i].matchcallback(URI) != 0)) {
-		context = xmlInputCallbackTable[i].opencallback(URI);
+		context = xmlInputCallbackTable[i].opencallback(normalized);
 		if (context != NULL)
 		    break;
 	    }
 	}
     }
+    xmlFree(normalized);
     if (context == NULL) {
 	return(NULL);
     }
@@ -1727,20 +1809,21 @@ xmlOutputBufferCreateFilename(const char *URI,
     int i = 0;
     void *context = NULL;
     char *unescaped;
+    char *normalized;
 
-#if defined LIBXML_HTTP_ENABLED || defined HAVE_ZLIB_H
     int is_http_uri = 0;	/*   Can't change if HTTP disabled  */
-#endif
 
     if (xmlOutputCallbackInitialized == 0)
 	xmlRegisterDefaultOutputCallbacks();
 
     if (URI == NULL) return(NULL);
+    normalized = (char *) xmlNormalizeWindowsPath((const xmlChar *)URI);
+    if (normalized == NULL) return(NULL);
 
 #ifdef LIBXML_HTTP_ENABLED
     /*  Need to prevent HTTP URI's from falling into zlib short circuit  */
 
-    is_http_uri = xmlIOHTTPMatch( URI );
+    is_http_uri = xmlIOHTTPMatch( normalized );
 #endif
 
 
@@ -1749,7 +1832,7 @@ xmlOutputBufferCreateFilename(const char *URI,
      * Go in reverse to give precedence to user defined handlers.
      * try with an unescaped version of the URI
      */
-    unescaped = xmlURIUnescapeString(URI, 0, NULL);
+    unescaped = xmlURIUnescapeString(normalized, 0, NULL);
     if (unescaped != NULL) {
 #ifdef HAVE_ZLIB_H
 	if ((compression > 0) && (compression <= 9) && (is_http_uri == 0)) {
@@ -1762,6 +1845,7 @@ xmlOutputBufferCreateFilename(const char *URI,
 		    ret->closecallback = xmlGzfileClose;
 		}
 		xmlFree(unescaped);
+		xmlFree(normalized);
 		return(ret);
 	    }
 	}
@@ -1790,7 +1874,7 @@ xmlOutputBufferCreateFilename(const char *URI,
     if (context == NULL) {
 #ifdef HAVE_ZLIB_H
 	if ((compression > 0) && (compression <= 9) && (is_http_uri == 0)) {
-	    context = xmlGzfileOpenW(URI, compression);
+	    context = xmlGzfileOpenW(normalized, compression);
 	    if (context != NULL) {
 		ret = xmlAllocOutputBuffer(encoder);
 		if (ret != NULL) {
@@ -1798,14 +1882,14 @@ xmlOutputBufferCreateFilename(const char *URI,
 		    ret->writecallback = xmlGzfileWrite;
 		    ret->closecallback = xmlGzfileClose;
 		}
+		xmlFree(normalized);
 		return(ret);
 	    }
 	}
 #endif
 	for (i = xmlOutputCallbackNr - 1;i >= 0;i--) {
 	    if ((xmlOutputCallbackTable[i].matchcallback != NULL) &&
-		(xmlOutputCallbackTable[i].matchcallback(URI) != 0)) {
-		context = xmlOutputCallbackTable[i].opencallback(URI);
+		(xmlOutputCallbackTable[i].matchcallback(normalized) != 0)) {
 #if defined(LIBXML_HTTP_ENABLED) && defined(HAVE_ZLIB_H)
 		/*  Need to pass compression parameter into HTTP open calls  */
 		if (xmlOutputCallbackTable[i].matchcallback == xmlIOHTTPMatch)
@@ -1818,6 +1902,7 @@ xmlOutputBufferCreateFilename(const char *URI,
 	    }
 	}
     }
+    xmlFree(normalized);
 
     if (context == NULL) {
 	return(NULL);
@@ -1968,7 +2053,7 @@ xmlOutputBufferCreateFd(int fd, xmlCharEncodingHandlerPtr encoder) {
     if (ret != NULL) {
         ret->context = (void *) (long) fd;
 	ret->writecallback = xmlFdWrite;
-	ret->closecallback = xmlFdClose;
+	ret->closecallback = NULL;
     }
 
     return(ret);
@@ -2008,7 +2093,7 @@ xmlParserInputBufferCreateIO(xmlInputReadCallback   ioread,
  * @iowrite:  an I/O write function
  * @ioclose:  an I/O close function
  * @ioctx:  an I/O handler
- * @enc:  the charset encoding if known
+ * @encoder:  the charset encoding if known
  *
  * Create a buffered output for the progressive saving
  * to an I/O handler
@@ -2083,6 +2168,19 @@ xmlParserInputBufferPush(xmlParserInputBufferPtr in,
 }
 
 /**
+ * endOfInput:
+ *
+ * When reading from an Input channel indicated end of file or error
+ * don't reread from it again.
+ */
+static int
+endOfInput (void * context ATTRIBUTE_UNUSED,
+	    char * buffer ATTRIBUTE_UNUSED,
+	    int len ATTRIBUTE_UNUSED) {
+    return(0);
+}
+
+/**
  * xmlParserInputBufferGrow:
  * @in:  a buffered parser input
  * @len:  indicative value of the amount of chars to read
@@ -2103,6 +2201,7 @@ xmlParserInputBufferGrow(xmlParserInputBufferPtr in, int len) {
     int res = 0;
     int nbchars = 0;
     int buffree;
+    unsigned int needSize;
 
     if ((len <= MINLEN) && (len != 4)) 
         len = MINLEN;
@@ -2115,27 +2214,29 @@ xmlParserInputBufferGrow(xmlParserInputBufferPtr in, int len) {
     if (len > buffree) 
         len = buffree;
 
-    buffer = (char *) xmlMalloc((len + 1) * sizeof(char));
-    if (buffer == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlParserInputBufferGrow : out of memory !\n");
-	return(-1);
+    needSize = in->buffer->use + len + 1;
+    if (needSize > in->buffer->size){
+        if (!xmlBufferResize(in->buffer, needSize)){
+            xmlGenericError(xmlGenericErrorContext,
+		    "xmlBufferAdd : out of memory!\n");
+            return(0);
+        }
     }
+    buffer = (char *)&in->buffer->content[in->buffer->use];
 
     /*
      * Call the read method for this I/O type.
      */
     if (in->readcallback != NULL) {
 	res = in->readcallback(in->context, &buffer[0], len);
+	if (res <= 0)
+	    in->readcallback = endOfInput;
     } else {
         xmlGenericError(xmlGenericErrorContext,
 		"xmlParserInputBufferGrow : no input !\n");
-	xmlFree(buffer);
 	return(-1);
     }
     if (res < 0) {
-	perror ("read error");
-	xmlFree(buffer);
 	return(-1);
     }
     len = res;
@@ -2159,15 +2260,14 @@ xmlParserInputBufferGrow(xmlParserInputBufferPtr in, int len) {
 	}
     } else {
 	nbchars = len;
-        buffer[nbchars] = 0;
-        xmlBufferAdd(in->buffer, (xmlChar *) buffer, nbchars);
+    	in->buffer->use += nbchars;
+	buffer[nbchars] = 0;
     }
 #ifdef DEBUG_INPUT
     xmlGenericError(xmlGenericErrorContext,
 	    "I/O: read %d chars, buffer %d/%d\n",
             nbchars, in->buffer->use, in->buffer->size);
 #endif
-    xmlFree(buffer);
     return(nbchars);
 }
 
@@ -2385,6 +2485,10 @@ xmlParserGetDirectory(const char *filename) {
     char *cur;
     char sep = '/';
 
+#ifdef _WIN32_WCE  /* easy way by now ... wince does not have dirs! */
+    return NULL;
+#endif
+
     if (xmlInputCallbackInitialized == 0)
 	xmlRegisterDefaultInputCallbacks();
 
@@ -2429,9 +2533,13 @@ static int xmlSysIDExists(const char *URL) {
     if (URL == NULL)
 	return(0);
 
-    if (!strncmp(URL, "file://localhost", 16))
+    if (!xmlStrncasecmp(BAD_CAST URL, BAD_CAST "file://localhost/", 17))
+#if defined (_WIN32) && !defined(__CYGWIN__)
+	path = &URL[17];
+#else
 	path = &URL[16];
-    else if (!strncmp(URL, "file:///", 8)) {
+#endif
+    else if (!xmlStrncasecmp(BAD_CAST URL, BAD_CAST "file:///", 8)) {
 #if defined (_WIN32) && !defined(__CYGWIN__)
 	path = &URL[8];
 #else
@@ -2530,6 +2638,8 @@ xmlDefaultExternalEntityLoader(const char *URL, const char *ID,
 	resource = (xmlChar *) URL;
 
     if (resource == NULL) {
+	if (ID == NULL)
+	    ID = "NULL";
 	if ((ctxt->validate) && (ctxt->sax != NULL) && 
             (ctxt->sax->error != NULL))
 	    ctxt->sax->error(ctxt,
@@ -2616,9 +2726,13 @@ xmlNoNetExists(const char *URL)
     if (URL == NULL)
         return (0);
 
-    if (!xmlStrncmp(BAD_CAST URL, BAD_CAST "file://localhost", 16))
-        path = &URL[16];
-    else if (!xmlStrncmp(BAD_CAST URL, BAD_CAST "file:///", 8)) {
+    if (!xmlStrncasecmp(BAD_CAST URL, BAD_CAST "file://localhost/", 17))
+#if defined (_WIN32) && !defined(__CYGWIN__)
+	path = &URL[17];
+#else
+	path = &URL[16];
+#endif
+    else if (!xmlStrncasecmp(BAD_CAST URL, BAD_CAST "file:///", 8)) {
 #if defined (_WIN32) && !defined(__CYGWIN__)
         path = &URL[8];
 #else
@@ -2711,10 +2825,8 @@ xmlNoNetExternalEntityLoader(const char *URL, const char *ID,
 	resource = (xmlChar *) URL;
 
     if (resource != NULL) {
-        if ((!xmlStrncasecmp((const xmlChar *) resource,
-		            (const xmlChar *) "ftp://", 6)) ||
-            (!xmlStrncasecmp((const xmlChar *) resource,
-		            (const xmlChar *) "http://", 7))) {
+        if ((!xmlStrncasecmp(BAD_CAST resource, BAD_CAST "ftp://", 6)) ||
+            (!xmlStrncasecmp(BAD_CAST resource, BAD_CAST "http://", 7))) {
 	    xmlGenericError(xmlGenericErrorContext,
 	            "Attempt to load network entity %s \n", resource);
 

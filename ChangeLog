@@ -34,3 +34,4 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - replaced the 'Procs' by a new template based callback mechanism
 - added support for signals and slots
 - Threads, Semaphores and Mutexecs no longer need to be registered
+- upgraded libxml to version 2.5.1

@@ -17,11 +17,8 @@
 
 #include <stdio.h>
 
-#if defined(WIN32) && defined(_MSC_VER)
-#include <libxml/xmlwin32version.h>
-#else
 #include <libxml/xmlversion.h>
-#endif
+
 #ifdef LIBXML_CATALOG_ENABLED
 
 #ifdef __cplusplus
@@ -31,15 +28,20 @@ extern "C" {
 /**
  * XML_CATALOGS_NAMESPACE:
  *
- * The namespace for the XML Catalogs elements
+ * The namespace for the XML Catalogs elements.
  */
 #define XML_CATALOGS_NAMESPACE					\
     (const xmlChar *) "urn:oasis:names:tc:entity:xmlns:xml:catalog"
+/**
+ * XML_CATALOG_PI:
+ *
+ * The specific XML Catalog Processing Instuction name.
+ */
 #define XML_CATALOG_PI						\
     (const xmlChar *) "oasis-xml-catalog"
 
 /*
- * The API is voluntarily limited to general cataloging
+ * The API is voluntarily limited to general cataloging.
  */
 typedef enum {
     XML_CATA_PREFER_NONE = 0,
@@ -58,7 +60,7 @@ typedef struct _xmlCatalog xmlCatalog;
 typedef xmlCatalog *xmlCatalogPtr;
 
 /*
- * Operations on a given catalog
+ * Operations on a given catalog.
  */
 xmlCatalogPtr	xmlNewCatalog		(int sgml);
 xmlCatalogPtr	xmlLoadACatalog		(const char *filename);
@@ -85,7 +87,7 @@ void		xmlFreeCatalog		(xmlCatalogPtr catal);
 int		xmlCatalogIsEmpty	(xmlCatalogPtr catal);
 
 /*
- * Global operations
+ * Global operations.
  */
 void		xmlInitializeCatalog	(void);
 int		xmlLoadCatalog		(const char *filename);
@@ -117,7 +119,7 @@ xmlChar *	xmlCatalogLocalResolve	(void *catalogs,
 xmlChar *	xmlCatalogLocalResolveURI(void *catalogs,
 					 const xmlChar *URI);
 /*
- * Preference settings
+ * Preference settings.
  */
 int		xmlCatalogSetDebug	(int level);
 xmlCatalogPrefer xmlCatalogSetDefaultPrefer(xmlCatalogPrefer prefer);

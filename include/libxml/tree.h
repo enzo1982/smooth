@@ -6,20 +6,13 @@
  *
  * daniel@veillard.com
  *
- * 14 Nov 2000 ht - added redefinition of xmlBufferWriteChar for VMS
- *
  */
 
 #ifndef __XML_TREE_H__
 #define __XML_TREE_H__
 
 #include <stdio.h>
-#if defined(WIN32) && defined(_MSC_VER)
-#include <libxml/xmlwin32version.h>
-#else
 #include <libxml/xmlversion.h>
-#endif
-#include <libxml/xmlmemory.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,19 +35,34 @@ typedef xmlParserInput *xmlParserInputPtr;
 typedef struct _xmlParserCtxt xmlParserCtxt;
 typedef xmlParserCtxt *xmlParserCtxtPtr;
 
+typedef struct _xmlSAXLocator xmlSAXLocator;
+typedef xmlSAXLocator *xmlSAXLocatorPtr;
+
+typedef struct _xmlSAXHandler xmlSAXHandler;
+typedef xmlSAXHandler *xmlSAXHandlerPtr;
+
+/* entities.h */
+typedef struct _xmlEntity xmlEntity;
+typedef xmlEntity *xmlEntityPtr;
+
+/**
+ * BASE_BUFFER_SIZE:
+ *
+ * default buffer size 4000.
+ */
 #define BASE_BUFFER_SIZE 4000
 
 /**
  * XML_XML_NAMESPACE:
  *
  * This is the namespace for the special xml: prefix predefined in the
- * XML Namespace specification
+ * XML Namespace specification.
  */
 #define XML_XML_NAMESPACE \
     (const xmlChar *) "http://www.w3.org/XML/1998/namespace"
 
 /*
- * The different element types carried by an XML tree
+ * The different element types carried by an XML tree.
  *
  * NOTE: This is synchronized with DOM Level1 values
  *       See http://www.w3.org/TR/REC-DOM-Level-1/
@@ -108,7 +116,7 @@ typedef unsigned char xmlChar;
 /**
  * xmlNotation:
  *
- * a DTD Notation definition
+ * A DTD Notation definition.
  */
 
 typedef struct _xmlNotation xmlNotation;
@@ -122,7 +130,7 @@ struct _xmlNotation {
 /**
  * xmlAttributeType:
  *
- * a DTD Attribute type definition
+ * A DTD Attribute type definition.
  */
 
 typedef enum {
@@ -141,7 +149,7 @@ typedef enum {
 /**
  * xmlAttributeDefault:
  *
- * a DTD Attribute default definition
+ * A DTD Attribute default definition.
  */
 
 typedef enum {
@@ -154,7 +162,7 @@ typedef enum {
 /**
  * xmlEnumeration:
  *
- * list structure used when there is an enumeration in DTDs
+ * List structure used when there is an enumeration in DTDs.
  */
 
 typedef struct _xmlEnumeration xmlEnumeration;
@@ -167,7 +175,7 @@ struct _xmlEnumeration {
 /**
  * xmlAttribute:
  *
- * an Attribute declaration in a DTD
+ * An Attribute declaration in a DTD.
  */
 
 typedef struct _xmlAttribute xmlAttribute;
@@ -195,7 +203,7 @@ struct _xmlAttribute {
 /**
  * xmlElementContentType:
  *
- * Possible definitions of element content types
+ * Possible definitions of element content types.
  */
 typedef enum {
     XML_ELEMENT_CONTENT_PCDATA = 1,
@@ -207,7 +215,7 @@ typedef enum {
 /**
  * xmlElementContentOccur:
  *
- * Possible definitions of element content occurrences
+ * Possible definitions of element content occurrences.
  */
 typedef enum {
     XML_ELEMENT_CONTENT_ONCE = 1,
@@ -219,7 +227,7 @@ typedef enum {
 /**
  * xmlElementContent:
  *
- * an XML Element content as stored after parsing an element definition
+ * An XML Element content as stored after parsing an element definition
  * in a DTD.
  */
 
@@ -232,13 +240,13 @@ struct _xmlElementContent {
     struct _xmlElementContent *c1;	/* first child */
     struct _xmlElementContent *c2;	/* second child */
     struct _xmlElementContent *parent;	/* parent */
-    const xmlChar             *prefix;	/* Element name */
+    const xmlChar             *prefix;	/* Namespace prefix */
 };
 
 /**
  * xmlElementTypeVal:
  *
- * the different possibilities for an element content type
+ * The different possibilities for an element content type.
  */
 
 typedef enum {
@@ -249,10 +257,19 @@ typedef enum {
     XML_ELEMENT_TYPE_ELEMENT
 } xmlElementTypeVal;
 
+
+#ifdef __cplusplus
+}
+#endif
+#include <libxml/xmlregexp.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * xmlElement:
  *
- * an XML Element declaration from a DTD
+ * An XML Element declaration from a DTD.
  */
 
 typedef struct _xmlElement xmlElement;
@@ -272,13 +289,18 @@ struct _xmlElement {
     xmlElementContentPtr content;	/* the allowed element content */
     xmlAttributePtr   attributes;	/* List of the declared attributes */
     const xmlChar        *prefix;	/* the namespace prefix if any */
+#ifdef LIBXML_REGEXP_ENABLED
+    xmlRegexpPtr       contModel;	/* the validating regexp */
+#else
+    void	      *contModel;
+#endif
 };
 
 
 /**
  * XML_LOCAL_NAMESPACE:
  *
- * A namespace declaration node
+ * A namespace declaration node.
  */
 #define XML_LOCAL_NAMESPACE XML_NAMESPACE_DECL
 typedef xmlElementType xmlNsType;
@@ -290,7 +312,7 @@ typedef xmlElementType xmlNsType;
  * Note that prefix == NULL is valid, it defines the default namespace
  * within the subtree (until overridden).
  *
- * xmlNsType is unified with xmlElementType
+ * xmlNsType is unified with xmlElementType.
  */
 
 typedef struct _xmlNs xmlNs;
@@ -300,13 +322,14 @@ struct _xmlNs {
     xmlNsType      type;	/* global or local */
     const xmlChar *href;	/* URL for the namespace */
     const xmlChar *prefix;	/* prefix for the namespace */
+    void           *_private;   /* application data */
 };
 
 /**
  * xmlDtd:
  *
  * An XML DTD, as defined by <!DOCTYPE ... There is actually one for
- * the internal subset and for the external subset
+ * the internal subset and for the external subset.
  */
 typedef struct _xmlDtd xmlDtd;
 typedef xmlDtd *xmlDtdPtr;
@@ -334,7 +357,7 @@ struct _xmlDtd {
 /**
  * xmlAttr:
  *
- * A attribute on an XML node.
+ * An attribute on an XML node.
  */
 typedef struct _xmlAttr xmlAttr;
 typedef xmlAttr *xmlAttrPtr;
@@ -364,6 +387,8 @@ struct _xmlID {
     struct _xmlID    *next;	/* next ID */
     const xmlChar    *value;	/* The ID name */
     xmlAttrPtr        attr;	/* The attribute holding it */
+    const xmlChar    *name;	/* The attribute if attr is not available */
+    int               lineno;	/* The line number if attr is not available */
 };
 
 /**
@@ -378,13 +403,15 @@ struct _xmlRef {
     struct _xmlRef    *next;	/* next Ref */
     const xmlChar     *value;	/* The Ref name */
     xmlAttrPtr        attr;	/* The attribute holding it */
+    const xmlChar    *name;	/* The attribute if attr is not available */
+    int               lineno;	/* The line number if attr is not available */
 };
 
 /**
  * xmlBufferAllocationScheme:
  *
  * A buffer allocation scheme can be defined to either match exactly the
- * need or double it's allocated size each time it is found too small
+ * need or double it's allocated size each time it is found too small.
  */
 
 typedef enum {
@@ -395,7 +422,7 @@ typedef enum {
 /**
  * xmlBuffer:
  *
- * A buffer structure
+ * A buffer structure.
  */
 typedef struct _xmlBuffer xmlBuffer;
 typedef xmlBuffer *xmlBufferPtr;
@@ -426,11 +453,7 @@ struct _xmlNode {
 
     /* End of common part */
     xmlNs           *ns;        /* pointer to the associated namespace */
-#ifndef XML_USE_BUFFER_CONTENT    
     xmlChar         *content;   /* the content */
-#else
-    xmlBufferPtr     content;   /* the content in a buffer */
-#endif
     struct _xmlAttr *properties;/* properties list */
     xmlNs           *nsDef;     /* namespace definitions on this node */
 };
@@ -438,7 +461,7 @@ struct _xmlNode {
 /**
  * XML_GET_CONTENT:
  *
- * macro to extract the content pointer of a node
+ * Macro to extract the content pointer of a node.
  */
 #define XML_GET_CONTENT(n)					\
     ((n)->type == XML_ELEMENT_NODE ? NULL : (n)->content)
@@ -446,9 +469,9 @@ struct _xmlNode {
 /**
  * XML_GET_LINE:
  *
- * macro to extract the line number of an element node. 
+ * Macro to extract the line number of an element node. 
  * This will work only if line numbering is activated by
- * calling xmlLineNumbersDefault(1) before parsing
+ * calling xmlLineNumbersDefault(1) before parsing.
  */
 #define XML_GET_LINE(n)						\
     ((n)->type == XML_ELEMENT_NODE ? (int) (n)->content : 0)
@@ -489,7 +512,7 @@ struct _xmlDoc {
 /**
  * xmlChildrenNode:
  *
- * Macro for compatibility naming layer with libxml1
+ * Macro for compatibility naming layer with libxml1.
  */
 #ifndef xmlChildrenNode
 #define xmlChildrenNode children
@@ -498,7 +521,7 @@ struct _xmlDoc {
 /**
  * xmlRootNode:
  *
- * Macro for compatibility naming layer with libxml1
+ * Macro for compatibility naming layer with libxml1.
  */
 #ifndef xmlRootNode
 #define xmlRootNode children
@@ -507,12 +530,13 @@ struct _xmlDoc {
 /*
  * Variables.
  */
-LIBXML_DLL_IMPORT extern xmlNsPtr baseDTD;
+#if 0
 LIBXML_DLL_IMPORT extern int oldXMLWDcompatibility;/* maintain compatibility with old WD */
 LIBXML_DLL_IMPORT extern int xmlIndentTreeOutput;  /* try to indent the tree dumps */
 LIBXML_DLL_IMPORT extern xmlBufferAllocationScheme xmlBufferAllocScheme; /* alloc scheme to use */
 LIBXML_DLL_IMPORT extern int xmlSaveNoEmptyTags; /* save empty tags as <empty></empty> */
 LIBXML_DLL_IMPORT extern int xmlDefaultBufferSize; /* default buffer size */
+#endif
 
 /*
  * Handling Buffers.
@@ -549,7 +573,7 @@ void		xmlBufferSetAllocationScheme(xmlBufferPtr buf,
 int		xmlBufferLength		(const xmlBufferPtr buf);
 
 /*
- * Creating/freeing new structures
+ * Creating/freeing new structures.
  */
 xmlDtdPtr	xmlCreateIntSubset	(xmlDocPtr doc,
 					 const xmlChar *name,
@@ -581,6 +605,10 @@ xmlAttrPtr	xmlNewNsProp		(xmlNodePtr node,
 					 xmlNsPtr ns,
 					 const xmlChar *name,
 					 const xmlChar *value);
+xmlAttrPtr	xmlNewNsPropEatName	(xmlNodePtr node,
+					 xmlNsPtr ns,
+					 xmlChar *name,
+					 const xmlChar *value);
 void		xmlFreePropList		(xmlAttrPtr cur);
 void		xmlFreeProp		(xmlAttrPtr cur);
 xmlAttrPtr	xmlCopyProp		(xmlNodePtr target,
@@ -592,11 +620,15 @@ xmlDocPtr	xmlCopyDoc		(xmlDocPtr doc,
 					 int recursive);
 
 /*
- * Creating new nodes
+ * Creating new nodes.
  */
 xmlNodePtr	xmlNewDocNode		(xmlDocPtr doc,
 					 xmlNsPtr ns,
 					 const xmlChar *name,
+					 const xmlChar *content);
+xmlNodePtr	xmlNewDocNodeEatName	(xmlDocPtr doc,
+					 xmlNsPtr ns,
+					 xmlChar *name,
 					 const xmlChar *content);
 xmlNodePtr	xmlNewDocRawNode	(xmlDocPtr doc,
 					 xmlNsPtr ns,
@@ -604,6 +636,8 @@ xmlNodePtr	xmlNewDocRawNode	(xmlDocPtr doc,
 					 const xmlChar *content);
 xmlNodePtr	xmlNewNode		(xmlNsPtr ns,
 					 const xmlChar *name);
+xmlNodePtr	xmlNewNodeEatName	(xmlNsPtr ns,
+					 xmlChar *name);
 xmlNodePtr	xmlNewChild		(xmlNodePtr parent,
 					 xmlNsPtr ns,
 					 const xmlChar *name,
@@ -634,14 +668,14 @@ xmlNodePtr	xmlNewReference		(xmlDocPtr doc,
 					 const xmlChar *name);
 xmlNodePtr	xmlCopyNode		(const xmlNodePtr node,
 					 int recursive);
-xmlNodePtr	xmlDocCopyNode		(xmlNodePtr node,
+xmlNodePtr	xmlDocCopyNode		(const xmlNodePtr node,
 					 xmlDocPtr doc,
 					 int recursive);
-xmlNodePtr	xmlCopyNodeList		(xmlNodePtr node);
+xmlNodePtr	xmlCopyNodeList		(const xmlNodePtr node);
 xmlNodePtr	xmlNewDocFragment	(xmlDocPtr doc);
 
 /*
- * Navigating
+ * Navigating.
  */
 long		xmlGetLineNo		(xmlNodePtr node);
 xmlChar *	xmlGetNodePath		(xmlNodePtr node);
@@ -651,7 +685,7 @@ int		xmlNodeIsText		(xmlNodePtr node);
 int		xmlIsBlankNode		(xmlNodePtr node);
 
 /*
- * Changing the structure
+ * Changing the structure.
  */
 xmlNodePtr	xmlDocSetRootElement	(xmlDocPtr doc,
 					 xmlNodePtr root);
@@ -683,7 +717,7 @@ void		xmlSetListDoc		(xmlNodePtr list,
 					 xmlDocPtr doc);
 
 /*
- * Namespaces
+ * Namespaces.
  */
 xmlNsPtr	xmlSearchNs		(xmlDocPtr doc,
 					 xmlNodePtr node,
@@ -762,36 +796,30 @@ int		xmlUnsetNsProp		(xmlNodePtr node,
 					 const xmlChar *name);
 
 /*
- * Internal, don't use
+ * Internal, don't use.
  */
-#ifdef VMS
-void		xmlBufferWriteXmlCHAR	(xmlBufferPtr buf,
-					 const xmlChar *string);
-#define 	xmlBufferWriteCHAR 	xmlBufferWriteXmlCHAR
-#else
 void		xmlBufferWriteCHAR	(xmlBufferPtr buf,
 					 const xmlChar *string);
-#endif
 void		xmlBufferWriteChar	(xmlBufferPtr buf,
 					 const char *string);
 void		xmlBufferWriteQuotedString(xmlBufferPtr buf,
 					 const xmlChar *string);
 
 /*
- * Namespace handling
+ * Namespace handling.
  */
 int		xmlReconciliateNs	(xmlDocPtr doc,
 					 xmlNodePtr tree);
 
 /*
- * Saving
+ * Saving.
  */
 void		xmlDocDumpFormatMemory	(xmlDocPtr cur,
-					 xmlChar**mem,
+					 xmlChar **mem,
 					 int *size,
 					 int format);
 void		xmlDocDumpMemory	(xmlDocPtr cur,
-					 xmlChar**mem,
+					 xmlChar **mem,
 					 int *size);
 void		xmlDocDumpMemoryEnc	(xmlDocPtr out_doc,
 					 xmlChar **doc_txt_ptr,
@@ -801,6 +829,9 @@ void		xmlDocDumpFormatMemoryEnc(xmlDocPtr out_doc,
 					 xmlChar **doc_txt_ptr,
 					 int * doc_txt_len,
 					 const char *txt_encoding,
+					 int format);
+int		xmlDocFormatDump(FILE *f,
+					 xmlDocPtr cur,
 					 int format);
 int		xmlDocDump		(FILE *f,
 					 xmlDocPtr cur);
@@ -812,7 +843,7 @@ int		xmlSaveFile		(const char *filename,
 int		xmlSaveFormatFile	(const char *filename,
 					 xmlDocPtr cur,
 					 int format);
-void		xmlNodeDump		(xmlBufferPtr buf,
+int		xmlNodeDump		(xmlBufferPtr buf,
 					 xmlDocPtr doc,
 					 xmlNodePtr cur,
 					 int level,
@@ -842,7 +873,13 @@ int		xmlSaveFileEnc		(const char *filename,
 					 const char *encoding);
 
 /*
- * Compression
+ * XHTML
+ */
+int		xmlIsXHTML		(const xmlChar *systemID,
+					 const xmlChar *publicID);
+
+/*
+ * Compression.
  */
 int		xmlGetDocCompressMode	(xmlDocPtr doc);
 void		xmlSetDocCompressMode	(xmlDocPtr doc,
@@ -852,6 +889,9 @@ void		xmlSetCompressMode	(int mode);
 
 #ifdef __cplusplus
 }
+#endif
+#ifndef __XML_PARSER_H__
+#include <libxml/xmlmemory.h>
 #endif
 
 #endif /* __XML_TREE_H__ */

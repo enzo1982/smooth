@@ -25,7 +25,7 @@ typedef struct _xmlXPathParserContext xmlXPathParserContext;
 typedef xmlXPathParserContext *xmlXPathParserContextPtr;
 
 /**
- * The set of XPath error codes
+ * The set of XPath error codes.
  */
 
 typedef enum {
@@ -54,7 +54,7 @@ typedef enum {
 } xmlXPathError;
 
 /*
- * A node-set (an unordered collection of nodes without duplicates) 
+ * A node-set (an unordered collection of nodes without duplicates).
  */
 typedef struct _xmlNodeSet xmlNodeSet;
 typedef xmlNodeSet *xmlNodeSetPtr;
@@ -62,6 +62,7 @@ struct _xmlNodeSet {
     int nodeNr;			/* number of nodes in the set */
     int nodeMax;		/* size of the array as allocated */
     xmlNodePtr *nodeTab;	/* array of nodes in no particular order */
+    /* @@ with_ns to check wether namespace nodes should be looked at @@ */
 };
 
 /*
@@ -102,9 +103,15 @@ struct _xmlXPathObject {
     int index2;
 };
 
-/*
+/**
+ * xmlXPathConvertFunc:
+ * @obj:  an XPath object
+ * @type:  the number of the target type
+ *
  * A conversion function is associated to a type and used to cast
  * the new type to primitive values.
+ *
+ * Returns -1 in case of error, 0 otherwise
  */
 typedef int (*xmlXPathConvertFunc) (xmlXPathObjectPtr obj, int type);
 
@@ -135,7 +142,7 @@ struct _xmlXPathVariable {
  * @ctxt: an XPath parser context
  * @nargs: the number of arguments passed to the function
  *
- * an XPath evaluation function, the parameters are on the XPath context stack
+ * An XPath evaluation function, the parameters are on the XPath context stack.
  */
 
 typedef void (*xmlXPathEvalFunc)(xmlXPathParserContextPtr ctxt,
@@ -152,14 +159,20 @@ struct _xmlXPathFunct {
     xmlXPathEvalFunc func;		/* the evaluation function */
 };
 
-/*
+/**
+ * xmlXPathAxisFunc:
+ * @ctxt:  the XPath interpreter context
+ * @cur:  the previous node being explored on that axis
+ *
  * An axis traversal function. To traverse an axis, the engine calls
  * the first time with cur == NULL and repeat until the function returns
  * NULL indicating the end of the axis traversal.
+ *
+ * Returns the next node in that axis or NULL if at the end of the axis.
  */
 
-typedef xmlXPathObjectPtr (*xmlXPathAxisFunc)	(xmlXPathParserContextPtr ctxt,
-						 xmlXPathObjectPtr cur);
+typedef xmlXPathObjectPtr (*xmlXPathAxisFunc) (xmlXPathParserContextPtr ctxt,
+				 xmlXPathObjectPtr cur);
 
 /*
  * Extra axis: a name and an axis function.
@@ -242,7 +255,7 @@ struct _xmlXPathContext {
 };
 
 /*
- * The structure of a compiled expression form is not public
+ * The structure of a compiled expression form is not public.
  */
 
 typedef struct _xmlXPathCompExpr xmlXPathCompExpr;
@@ -251,7 +264,7 @@ typedef xmlXPathCompExpr *xmlXPathCompExprPtr;
 /**
  * xmlXPathParserContext:
  *
- * An XPath parser context, it contains pure parsing informations,
+ * An XPath parser context. It contains pure parsing informations,
  * an xmlXPathContext, and the stack of objects.
  */
 struct _xmlXPathParserContext {
@@ -273,9 +286,11 @@ struct _xmlXPathParserContext {
 
 /**
  * xmlXPathFunction:
+ * @ctxt:  the XPath interprestation context
+ * @nargs:  the number of arguments
  *
- * An XPath function
- * The arguments (if any) are popped out of the context stack
+ * An XPath function.
+ * The arguments (if any) are popped out from the context stack
  * and the result is pushed on the stack.
  */
 
@@ -303,7 +318,7 @@ int		xmlXPathIsInf	(double val);
  * xmlXPathNodeSetGetLength:
  * @ns:  a node-set
  *
- * Implement a functionality similar to the DOM NodeList.length
+ * Implement a functionality similar to the DOM NodeList.length.
  *
  * Returns the number of nodes in the node-set.
  */
@@ -313,7 +328,7 @@ int		xmlXPathIsInf	(double val);
  * @ns:  a node-set
  * @index:  index of a node in the set
  *
- * Implements a functionality similar to the DOM NodeList.item()
+ * Implements a functionality similar to the DOM NodeList.item().
  *
  * Returns the xmlNodePtr at the given @index in @ns or NULL if
  *         @index is out of range (0 to length-1)
@@ -327,9 +342,9 @@ int		xmlXPathIsInf	(double val);
  * xmlXPathNodeSetIsEmpty:
  * @ns: a node-set
  *
- * Checks whether @ns is empty or not
+ * Checks whether @ns is empty or not.
  *
- * Returns %TRUE if @ns is an empty node-set
+ * Returns %TRUE if @ns is an empty node-set.
  */
 #define xmlXPathNodeSetIsEmpty(ns)                                      \
     (((ns) == NULL) || ((ns)->nodeNr == 0) || ((ns)->nodeTab == NULL))
@@ -343,7 +358,7 @@ xmlXPathObjectPtr  xmlXPathObjectCopy		(xmlXPathObjectPtr val);
 int		   xmlXPathCmpNodes		(xmlNodePtr node1,
 						 xmlNodePtr node2);
 /**
- * Conversion functions to basic types
+ * Conversion functions to basic types.
  */
 int		   xmlXPathCastNumberToBoolean	(double val);
 int		   xmlXPathCastStringToBoolean	(const xmlChar * val);
@@ -367,7 +382,7 @@ xmlXPathObjectPtr  xmlXPathConvertNumber	(xmlXPathObjectPtr val);
 xmlXPathObjectPtr  xmlXPathConvertString	(xmlXPathObjectPtr val);
 
 /**
- * Context handling
+ * Context handling.
  */
 void		   xmlXPathInit			(void);
 xmlXPathContextPtr xmlXPathNewContext		(xmlDocPtr doc);
@@ -383,7 +398,7 @@ xmlXPathObjectPtr  xmlXPathEvalExpression	(const xmlChar *str,
 int                xmlXPathEvalPredicate	(xmlXPathContextPtr ctxt,
 						 xmlXPathObjectPtr res);
 /**
- * Separate compilation/evaluation entry points
+ * Separate compilation/evaluation entry points.
  */
 xmlXPathCompExprPtr xmlXPathCompile		(const xmlChar *str);
 xmlXPathObjectPtr   xmlXPathCompiledEval	(xmlXPathCompExprPtr comp,

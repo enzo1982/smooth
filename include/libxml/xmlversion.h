@@ -1,6 +1,5 @@
 /*
- * xmlwin32version.h : compile-time version informations for the XML parser
- *                     when compiled on the Windows platform
+ * xmlversion.h : compile-time version informations for the XML parser.
  *
  * See Copyright for the status of this software.
  *
@@ -27,21 +26,21 @@ extern void xmlCheckVersion(int version);
  *
  * the version string like "1.2.3"
  */
-#define LIBXML_DOTTED_VERSION "2.4.13"
+#define LIBXML_DOTTED_VERSION "2.5.1"
 
 /**
  * LIBXML_VERSION:
  *
  * the version number: 1.2.3 value is 1002003
  */
-#define LIBXML_VERSION 20413
+#define LIBXML_VERSION 20501
 
 /**
  * LIBXML_VERSION_STRING:
  *
  * the version number string, 1.2.3 value is "1002003"
  */
-#define LIBXML_VERSION_STRING "20413"
+#define LIBXML_VERSION_STRING "20501"
 
 /**
  * LIBXML_TEST_VERSION:
@@ -49,8 +48,9 @@ extern void xmlCheckVersion(int version);
  * Macro to check that the libxml version in use is compatible with
  * the version the software has been compiled against
  */
-#define LIBXML_TEST_VERSION xmlCheckVersion(20413);
+#define LIBXML_TEST_VERSION xmlCheckVersion(20501);
 
+#ifndef VMS
 #if 0
 /**
  * WITH_TRIO:
@@ -66,15 +66,19 @@ extern void xmlCheckVersion(int version);
  */
 #define WITHOUT_TRIO
 #endif
+#else /* VMS */
+#define WITH_TRIO 1
+#endif /* VMS */
 
 /**
- * LIBXML_THREADS_ENABLED:
+ * LIBXML_THREAD_ENABLED:
  *
  * Whether the thread support is configured in
  */
 #if 1
+#if defined(_REENTRANT) || (_POSIX_C_SOURCE - 0 >= 199506L)
 #define LIBXML_THREAD_ENABLED
-#define LIBXML_THREADS_ENABLED
+#endif
 #endif
 
 /**
@@ -105,6 +109,15 @@ extern void xmlCheckVersion(int version);
 #endif
 
 /**
+ * LIBXML_C14N_ENABLED:
+ *
+ * Whether the Canonicalization support is configured in
+ */
+#if 1
+#define LIBXML_C14N_ENABLED
+#endif
+
+/**
  * LIBXML_CATALOG_ENABLED:
  *
  * Whether the Catalog support is configured in
@@ -118,7 +131,7 @@ extern void xmlCheckVersion(int version);
  *
  * Whether the SGML Docbook support is configured in
  */
-#if 0
+#if 1
 #define LIBXML_DOCB_ENABLED
 #endif
 
@@ -172,8 +185,44 @@ extern void xmlCheckVersion(int version);
  *
  * Whether the memory debugging is configured in
  */
-#if 0
+#if 1
 #define DEBUG_MEMORY_LOCATION
+#endif
+
+/**
+ * LIBXML_UNICODE_ENABLED
+ *
+ * Whether the Unicode related interfaces are compiled in
+ */
+#if 1
+#define LIBXML_UNICODE_ENABLED
+#endif
+
+/**
+ * LIBXML_REGEXP_ENABLED
+ *
+ * Whether the regular expressions interfaces are compiled in
+ */
+#if 1
+#define LIBXML_REGEXP_ENABLED
+#endif
+
+/**
+ * LIBXML_AUTOMATA_ENABLED
+ *
+ * Whether the automata interfaces are compiled in
+ */
+#if 1
+#define LIBXML_AUTOMATA_ENABLED
+#endif
+
+/**
+ * LIBXML_SCHEMAS_ENABLED
+ *
+ * Whether the Schemas validation interfaces are compiled in
+ */
+#if 1
+#define LIBXML_SCHEMAS_ENABLED
 #endif
 
 /**
@@ -192,7 +241,7 @@ extern void xmlCheckVersion(int version);
  * code which links against libxml statically. 
  */
 #ifndef LIBXML_DLL_IMPORT
-#if defined(_MSC_VER) && !defined(IN_LIBXML) && !defined(LIBXML_STATIC)
+#if (defined(_MSC_VER) || defined(__CYGWIN__)) && !defined(IN_LIBXML) && !defined(LIBXML_STATIC)
 #define LIBXML_DLL_IMPORT __declspec(dllimport)
 #else
 #define LIBXML_DLL_IMPORT
@@ -215,19 +264,9 @@ extern void xmlCheckVersion(int version);
 #define ATTRIBUTE_UNUSED
 #endif
 
-/**
- * #pragma comment(lib, "iconv.lib")
- *
- * pragma understood my MS compiler which enables a conditional link with
- * iconv.
- */
-#ifdef _MSC_VER
-#if defined LIBXML_ICONV_ENABLED && !defined LIBXML2_COMPILING_MSCCDEF
-#pragma comment(lib, "iconv.lib")
-#endif
-#endif
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 #endif
+
+

@@ -21,16 +21,11 @@
 #ifndef __XML_CHAR_ENCODING_H__
 #define __XML_CHAR_ENCODING_H__
 
-#if defined(WIN32) && defined(_MSC_VER)
-#include <libxml/xmlwin32version.h>
-#else
 #include <libxml/xmlversion.h>
-#endif
+
 #ifdef LIBXML_ICONV_ENABLED
 #include <iconv.h>
 #endif
-#include <libxml/tree.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,8 +33,8 @@ extern "C" {
 /**
  * xmlCharEncoding:
  *
- * Predefined values for some standard encodings
- * Libxml don't do beforehand translation on UTF8, ISOLatinX
+ * Predefined values for some standard encodings.
+ * Libxml don't do beforehand translation on UTF8, ISOLatinX.
  * It also support UTF16 (LE and BE) by default.
  *
  * Anything else would have to be translated to UTF8 before being
@@ -96,8 +91,8 @@ typedef enum {
  *     as the return value is positive, else unpredictiable.
  * The value of @outlen after return is the number of octets consumed.
  */
-typedef int (* xmlCharEncodingInputFunc)(unsigned char* out, int *outlen,
-                                         const unsigned char* in, int *inlen);
+typedef int (* xmlCharEncodingInputFunc)(unsigned char *out, int *outlen,
+                                         const unsigned char *in, int *inlen);
 
 
 /**
@@ -110,7 +105,7 @@ typedef int (* xmlCharEncodingInputFunc)(unsigned char* out, int *outlen,
  * Take a block of UTF-8 chars in and try to convert it to an other
  * encoding.
  * Note: a first call designed to produce heading info is called with
- * in = NULL. If stateful this should also initialize the encoder state
+ * in = NULL. If stateful this should also initialize the encoder state.
  *
  * Returns the number of byte written, or -1 by lack of space, or -2
  *     if the transcoding failed.
@@ -118,13 +113,13 @@ typedef int (* xmlCharEncodingInputFunc)(unsigned char* out, int *outlen,
  *     as the return value is positive, else unpredictiable.
  * The value of @outlen after return is the number of ocetes consumed.
  */
-typedef int (* xmlCharEncodingOutputFunc)(unsigned char* out, int *outlen,
-                                          const unsigned char* in, int *inlen);
+typedef int (* xmlCharEncodingOutputFunc)(unsigned char *out, int *outlen,
+                                          const unsigned char *in, int *inlen);
 
 
 /*
  * Block defining the handlers for non UTF-8 encodings.
- * If iconv is supported, there is two extra fields 
+ * If iconv is supported, there is two extra fields.
  */
 
 typedef struct _xmlCharEncodingHandler xmlCharEncodingHandler;
@@ -139,8 +134,16 @@ struct _xmlCharEncodingHandler {
 #endif /* LIBXML_ICONV_ENABLED */
 };
 
+#ifdef __cplusplus
+}
+#endif
+#include <libxml/tree.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
- * Interfaces for encoding handlers
+ * Interfaces for encoding handlers.
  */
 void	xmlInitCharEncodingHandlers	(void);
 void	xmlCleanupCharEncodingHandlers	(void);
@@ -149,10 +152,13 @@ xmlCharEncodingHandlerPtr
 	xmlGetCharEncodingHandler	(xmlCharEncoding enc);
 xmlCharEncodingHandlerPtr
 	xmlFindCharEncodingHandler	(const char *name);
-
+xmlCharEncodingHandlerPtr
+	xmlNewCharEncodingHandler	(const char *name, 
+                          		 xmlCharEncodingInputFunc input,
+                          		 xmlCharEncodingOutputFunc output);
 
 /*
- * Interfaces for encoding names and aliases
+ * Interfaces for encoding names and aliases.
  */
 int	xmlAddEncodingAlias		(const char *name,
 					 const char *alias);
@@ -161,15 +167,15 @@ const char *
 	xmlGetEncodingAlias		(const char *alias);
 void	xmlCleanupEncodingAliases	(void);
 xmlCharEncoding
-	xmlParseCharEncoding		(const char* name);
-const char*
+	xmlParseCharEncoding		(const char *name);
+const char *
 	xmlGetCharEncodingName		(xmlCharEncoding enc);
 
 /*
  * Interfaces directly used by the parsers.
  */
 xmlCharEncoding
-	xmlDetectCharEncoding		(const unsigned char* in,
+	xmlDetectCharEncoding		(const unsigned char *in,
 					 int len);
 
 int	xmlCharEncOutFunc		(xmlCharEncodingHandler *handler,
@@ -187,16 +193,18 @@ int	xmlCharEncCloseFunc		(xmlCharEncodingHandler *handler);
 /*
  * Export a few useful functions
  */
-int	UTF8Toisolat1			(unsigned char* out,
+int	UTF8Toisolat1			(unsigned char *out,
 					 int *outlen,
-					 const unsigned char* in,
+					 const unsigned char *in,
 					 int *inlen);
-int	isolat1ToUTF8			(unsigned char* out,
+int	isolat1ToUTF8			(unsigned char *out,
 					 int *outlen,
-					 const unsigned char* in,
+					 const unsigned char *in,
 					 int *inlen);
+int	xmlGetUTF8Char			(const unsigned char *utf,
+					 int *len);
 /*
- * exports additional "UTF-8 aware" string routines which are
+ * exports additional "UTF-8 aware" string routines which are.
  */
 
 int	xmlCheckUTF8			(const unsigned char *utf);

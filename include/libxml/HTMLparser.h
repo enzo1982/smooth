@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 /*
- * Most of the back-end structures from XML and HTML are shared
+ * Most of the back-end structures from XML and HTML are shared.
  */
 typedef xmlParserCtxt htmlParserCtxt;
 typedef xmlParserCtxtPtr htmlParserCtxtPtr;
@@ -28,7 +28,7 @@ typedef xmlDocPtr htmlDocPtr;
 typedef xmlNodePtr htmlNodePtr;
 
 /*
- * Internal description of an HTML element
+ * Internal description of an HTML element.
  */
 typedef struct _htmlElemDesc htmlElemDesc;
 typedef htmlElemDesc *htmlElemDescPtr;
@@ -45,7 +45,7 @@ struct _htmlElemDesc {
 };
 
 /*
- * Internal description of an HTML entity
+ * Internal description of an HTML entity.
  */
 typedef struct _htmlEntityDesc htmlEntityDesc;
 typedef htmlEntityDesc *htmlEntityDescPtr;
@@ -58,20 +58,21 @@ struct _htmlEntityDesc {
 /*
  * There is only few public functions.
  */
-const htmlElemDesc *	htmlTagLookup	(const xmlChar *tag);
-const htmlEntityDesc *	htmlEntityLookup(const xmlChar *name);
-const htmlEntityDesc *	htmlEntityValueLookup(unsigned int value);
+const htmlElemDesc * 	htmlTagLookup	(const xmlChar *tag);
+const htmlEntityDesc * 	htmlEntityLookup(const xmlChar *name);
+const htmlEntityDesc * 	htmlEntityValueLookup(unsigned int value);
 
 int			htmlIsAutoClosed(htmlDocPtr doc,
 					 htmlNodePtr elem);
 int			htmlAutoCloseTag(htmlDocPtr doc,
 					 const xmlChar *name,
 					 htmlNodePtr elem);
-const htmlEntityDesc *	htmlParseEntityRef(htmlParserCtxtPtr ctxt,
+const htmlEntityDesc * 	htmlParseEntityRef(htmlParserCtxtPtr ctxt,
 					 xmlChar **str);
 int			htmlParseCharRef(htmlParserCtxtPtr ctxt);
 void			htmlParseElement(htmlParserCtxtPtr ctxt);
 
+int			htmlParseDocument(htmlParserCtxtPtr ctxt);
 htmlDocPtr		htmlSAXParseDoc	(xmlChar *cur,
 					 const char *encoding,
 					 htmlSAXHandlerPtr sax,
@@ -84,19 +85,19 @@ htmlDocPtr		htmlSAXParseFile(const char *filename,
 					 void *userData);
 htmlDocPtr		htmlParseFile	(const char *filename,
 					 const char *encoding);
-int			UTF8ToHtml	(unsigned char* out,
+int			UTF8ToHtml	(unsigned char *out,
 					 int *outlen,
-					 const unsigned char* in,
+					 const unsigned char *in,
 					 int *inlen);
-int			htmlEncodeEntities(unsigned char* out,
+int			htmlEncodeEntities(unsigned char *out,
 					 int *outlen,
-					 const unsigned char* in,
+					 const unsigned char *in,
 					 int *inlen, int quoteChar);
 int			htmlIsScriptAttribute(const xmlChar *name);
 int			htmlHandleOmittedElem(int val);
 
 /**
- * Interfaces for the Push mode
+ * Interfaces for the Push mode.
  */
 void			htmlFreeParserCtxt	(htmlParserCtxtPtr ctxt);
 htmlParserCtxtPtr	htmlCreatePushParserCtxt(htmlSAXHandlerPtr sax,

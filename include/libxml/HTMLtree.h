@@ -19,38 +19,39 @@
 extern "C" {
 #endif
 
+
 /**
  * HTML_TEXT_NODE:
  *
- * Macro, a text node in a HTML document is really implemented
+ * Macro. A text node in a HTML document is really implemented
  * the same way as a text node in an XML document.
  */
 #define HTML_TEXT_NODE		XML_TEXT_NODE
 /**
  * HTML_ENTITY_REF_NODE:
  *
- * Macro, an entity reference in a HTML document is really implemented
+ * Macro. An entity reference in a HTML document is really implemented
  * the same way as an entity reference in an XML document.
  */
 #define HTML_ENTITY_REF_NODE	XML_ENTITY_REF_NODE
 /**
  * HTML_COMMENT_NODE:
  *
- * Macro, a comment in a HTML document is really implemented
+ * Macro. A comment in a HTML document is really implemented
  * the same way as a comment in an XML document.
  */
 #define HTML_COMMENT_NODE	XML_COMMENT_NODE
 /**
  * HTML_PRESERVE_NODE:
  *
- * Macro, a preserved node in a HTML document is really implemented
+ * Macro. A preserved node in a HTML document is really implemented
  * the same way as a CDATA section in an XML document.
  */
 #define HTML_PRESERVE_NODE	XML_CDATA_SECTION_NODE
 /**
  * HTML_PI_NODE:
  *
- * Macro, a processing instruction in a HTML document is really implemented
+ * Macro. A processing instruction in a HTML document is really implemented
  * the same way as a processing instruction in an XML document.
  */
 #define HTML_PI_NODE		XML_PI_NODE
@@ -63,13 +64,13 @@ const xmlChar *	htmlGetMetaEncoding	(htmlDocPtr doc);
 int		htmlSetMetaEncoding	(htmlDocPtr doc,
 					 const xmlChar *encoding);
 void		htmlDocDumpMemory	(xmlDocPtr cur,
-					 xmlChar**mem,
+					 xmlChar **mem,
 					 int *size);
 int		htmlDocDump		(FILE *f,
 					 xmlDocPtr cur);
 int		htmlSaveFile		(const char *filename,
 					 xmlDocPtr cur);
-void		htmlNodeDump		(xmlBufferPtr buf,
+int		htmlNodeDump		(xmlBufferPtr buf,
 					 xmlDocPtr doc,
 					 xmlNodePtr cur);
 void		htmlNodeDumpFile	(FILE *out,
@@ -100,6 +101,14 @@ void		htmlDocContentDumpFormatOutput(xmlOutputBufferPtr buf,
 					 xmlDocPtr cur,
 					 const char *encoding,
 					 int format);
+
+int		htmlIsBooleanAttr	(const xmlChar *name);
+void htmlNodeDumpOutput(xmlOutputBufferPtr buf, xmlDocPtr doc,
+	                xmlNodePtr cur, const char *encoding);
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

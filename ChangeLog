@@ -10,6 +10,7 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - surface.cpp	- splitted into a frontend and a system dependent backend part
 - messagebox.cpp- S::SMOOTH::MessageBox is now S::QuickMessage
 		- renamed MessageBoxApp to MessageDlg
+		- MessageDlg can now show a CheckBox with a message
 - callbackn.cpp	- You can now connect values directly to the Callback, the connected value will be returned without any function being called
 - config.cpp	- new class: Configuration; an interface to XML configuration files
 - tipodaydlg.cpp- new dialog: 'Tip of the Day' dialog window
@@ -18,6 +19,7 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - semaphore.cpp	- splitted into frontend and backend parts
 - thread.cpp	- splitted into frontend and backend parts
 		- revised and improved Thread API
+- string.cpp	- removed IsASCII() and IsUTF8() methods
 
 - new namespace GUI::Dialogs contains all dialogs plus MessageBox (now MessageDlg) and SplashScreen
 - new namespace Threads contains everything related to multi threading
@@ -29,3 +31,4 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - switched to an XML ToDo list system
 - add DTDs for ConfigFile and LangFile XML file types
 - smaller bugfixes and improvements
+- fixed Makefile.static

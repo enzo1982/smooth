@@ -389,6 +389,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 							cbRect.right = cbRect.left + 9;
 							cbRect.bottom = (Int) Math::Min(cbRect.top + 9, operat->rect.bottom);
 
+							surface->Box(cbRect, Setup::ClientColor, FILLED);
 							surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
 
 							if (operat->selected)
@@ -769,8 +770,15 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (wnd->IsMouseOn(operat->rect) && (!operat->clicked || (flags & LF_ALLOWRESELECT) || (flags & LF_MULTICHECKBOX)))
 				{
-					if (operat->selected)	operat->selected = False;
-					else			operat->selected = True;
+					Rect	 checkRect = operat->rect;
+
+					checkRect.right = checkRect.left + 13;
+
+					if (wnd->IsMouseOn(checkRect))
+					{
+						if (operat->selected)	operat->selected = False;
+						else			operat->selected = True;
+					}
 
 					Paint(SP_MOUSEDOWN);
 
@@ -853,6 +861,7 @@ S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
 			Rect	 rRect = rect;
 
 			rRect.left += header->GetNthTabOffset(i);
+			rRect.left -= (i >= 1 ? ((flags & LF_MULTICHECKBOX) ? 12 : 0) : 0);
 
 			if (header->GetNOfTabs() >= i + 2) rRect.right = rRect.left + (header->GetNthTabOffset(i + 1) - header->GetNthTabOffset(i)) - 3;
 

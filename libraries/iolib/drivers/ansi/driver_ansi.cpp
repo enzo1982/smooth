@@ -47,6 +47,10 @@ IOLibDriverANSI::IOLibDriverANSI(const char *fileName, int mode) : IOLibDriver()
 		return;
 	}
 
+	streamID = new char [strlen(fileName) + 1];
+
+	strcpy(streamID, fileName);
+
 	closeStream = true;
 }
 

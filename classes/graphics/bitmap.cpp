@@ -11,7 +11,7 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/bitmapbackend.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/application.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/pciio.h>
 
 S::GUI::Bitmap	 S::GUI::SI_DEFAULT = S::GUI::Bitmap();
@@ -46,7 +46,7 @@ S::Int S::GUI::Bitmap::GetBitmapType()
 	return backend->GetBitmapType();
 }
 
-const S::Size S::GUI::Bitmap::GetSize()
+const S::GUI::Size S::GUI::Bitmap::GetSize()
 {
 	return backend->GetSize();
 }

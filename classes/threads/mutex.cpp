@@ -10,7 +10,7 @@
 
 #include <smooth/object.h>
 #include <smooth/threads/mutex.h>
-#include <smooth/application.h>
+#include <smooth/gui/application/application.h>
 
 #ifdef __WIN32__
 #include <smooth/threads/win32/mutexwin32.h>
@@ -30,7 +30,7 @@ S::Threads::Mutex::Mutex(Void *iMutex)
 
 	type = classID;
 
-	possibleContainers.AddEntry(Application::classID);
+	possibleContainers.AddEntry(GUI::Application::classID);
 }
 
 S::Threads::Mutex::~Mutex()

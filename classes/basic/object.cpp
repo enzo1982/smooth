@@ -10,12 +10,12 @@
 
 #include <smooth/object.h>
 #include <smooth/objectproperties.h>
-#include <smooth/objectmanager.h>
 #include <smooth/misc/i18n.h>
 
-const S::Int	 S::Object::classID = S::Object::RequestClassID();
-S::Int		 S::Object::objectCount = 0;
-S::Int		 S::Object::nextID = 0;
+S::Array<S::Object *>	 S::Object::objects;
+const S::Int		 S::Object::classID	= S::Object::RequestClassID();
+S::Int			 S::Object::objectCount	= 0;
+S::Int			 S::Object::nextID	= 0;
 
 S::Object::Object() : type(this)
 {
@@ -34,14 +34,29 @@ S::Object::Object() : type(this)
 
 	myContainer		= NIL;
 
-	mainObjectManager->RegisterObject(this);
+	objects.AddEntry(this, handle);
 }
 
 S::Object::~Object()
 {
-	mainObjectManager->UnregisterObject(this);
+	objects.RemoveEntry(handle);
 
 	delete objectProperties;
+}
+
+S::Int S::Object::GetNOfObjects()
+{
+	return objects.GetNOfEntries();
+}
+
+S::Object *S::Object::GetNthObject(Int n)
+{
+	return objects.GetNthEntry(n);
+}
+
+S::Object *S::Object::RequestObject(Int objectHandle)
+{
+	return objects.GetEntry(objectHandle);
 }
 
 S::Int S::Object::SetFlags(Int nFlags)
@@ -77,14 +92,14 @@ S::ObjectType S::Object::GetObjectType()
 	return type;
 }
 
-S::Int S::Object::SetContainer(Container *newContainer)
+S::Int S::Object::SetContainer(GUI::Container *newContainer)
 {
 	myContainer = newContainer;
 
 	return Success;
 }
 
-S::Container *S::Object::GetContainer()
+S::GUI::Container *S::Object::GetContainer()
 {
 	return myContainer;
 }
@@ -101,7 +116,7 @@ S::Void S::Object::UnsetRegisteredFlag()
 
 S::Object *S::Object::GetObject(Int objectHandle, Int objectType)
 {
-	Object	*object = mainObjectManager->RequestObject(objectHandle);
+	Object	*object = RequestObject(objectHandle);
 
 	if (object == NIL) return NIL;
 

@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/misc/config.h>
-#include <smooth/application.h>
+#include <smooth/gui/application/application.h>
 
 S::Configuration::Configuration()
 {
@@ -46,13 +46,13 @@ S::Int S::Configuration::Open(String file, Bool create)
 	{
 		fileName = file;
 	}
-	else if (configFile->LoadFile(Application::GetStartupDirectory().Append(file)) == Success)
+	else if (configFile->LoadFile(GUI::Application::GetStartupDirectory().Append(file)) == Success)
 	{
-		fileName = Application::GetStartupDirectory().Append(file);
+		fileName = GUI::Application::GetStartupDirectory().Append(file);
 	}
-	else if (configFile->LoadFile(Application::GetApplicationDirectory().Append(file)) == Success)
+	else if (configFile->LoadFile(GUI::Application::GetApplicationDirectory().Append(file)) == Success)
 	{
-		fileName = Application::GetApplicationDirectory().Append(file);
+		fileName = GUI::Application::GetApplicationDirectory().Append(file);
 	}
 	else
 	{
@@ -72,7 +72,7 @@ S::Int S::Configuration::Open(String file, Bool create)
 
 			ownRoot->AddNode("configuration")->SetAttribute("name", "default");
 
-			fileName = Application::GetApplicationDirectory().Append(file);
+			fileName = GUI::Application::GetApplicationDirectory().Append(file);
 		}
 	}
 

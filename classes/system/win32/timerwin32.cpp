@@ -10,7 +10,6 @@
 
 #include <smooth/system/timer.h>
 #include <smooth/system/win32/timerwin32.h>
-#include <smooth/objectmanager.h>
 
 S::System::TimerBackend *CreateTimerWin32()
 {
@@ -60,9 +59,9 @@ S::Int S::System::TimerWin32::GetID()
 
 S::Void WINAPI S::System::TimerWin32::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
 {
-	for (S::Int i = 0; i < S::mainObjectManager->GetNOfObjects(); i++)
+	for (Int i = 0; i < Object::GetNOfObjects(); i++)
 	{
-		S::Object *object = S::mainObjectManager->GetNthObject(i);
+		Object *object = Object::GetNthObject(i);
 
 		if (object != NIL)
 		{

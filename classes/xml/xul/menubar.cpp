@@ -11,7 +11,7 @@
 #include <smooth/xml/xul/menubar.h>
 #include <smooth/xml/xul/popupmenu.h>
 #include <smooth/xml/node.h>
-#include <smooth/menu/menubar.h>
+#include <smooth/gui/widgets/multi/menu/menubar.h>
 
 S::XML::XUL::Menubar::Menubar(Node *node)
 {

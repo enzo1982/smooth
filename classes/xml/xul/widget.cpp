@@ -10,7 +10,7 @@
 
 #include <smooth/xml/xul/renderer.h>
 #include <smooth/xml/node.h>
-#include <smooth/widget.h>
+#include <smooth/gui/widgets/widget.h>
 
 S::XML::XUL::Widget::Widget()
 {

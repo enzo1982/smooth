@@ -10,7 +10,7 @@
 
 #include <smooth/misc/i18n.h>
 #include <smooth/i18n/smooth_de.h>
-#include <smooth/application.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 
 #ifdef __WIN32__
@@ -188,7 +188,7 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 
 	if (!internal)
 	{
-		String		 dir = Application::GetApplicationDirectory().Append("lang\\");
+		String		 dir = GUI::Application::GetApplicationDirectory().Append("lang\\");
 
 		chdir(dir);
 
@@ -240,7 +240,7 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 		delete fileData;
 #endif
 
-		chdir(Application::GetApplicationDirectory());
+		chdir(GUI::Application::GetApplicationDirectory());
 	}
 	else
 	{

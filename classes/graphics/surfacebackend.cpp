@@ -69,13 +69,13 @@ S::Int S::GUI::SurfaceBackend::TranslateY(Int y)
 	return y;
 }
 
-S::Point S::GUI::SurfaceBackend::TranslatePoint(Point p)
+S::GUI::Point S::GUI::SurfaceBackend::TranslatePoint(Point p)
 {
 	if (Setup::rightToLeft)	return Point(size.cx - p.x, p.y);
 	else			return p;
 }
 
-S::Rect S::GUI::SurfaceBackend::TranslateRect(Rect r)
+S::GUI::Rect S::GUI::SurfaceBackend::TranslateRect(Rect r)
 {
 	if (Setup::rightToLeft)	return Rect(Point(size.cx - r.right, r.top), Size(r.right - r.left, r.bottom - r.top));
 	else			return Rect(Point(r.left, r.top), Size(r.right - r.left, r.bottom - r.top));
@@ -93,7 +93,7 @@ S::Int S::GUI::SurfaceBackend::SetSize(Size nSize)
 	return Success;
 }
 
-const S::Size S::GUI::SurfaceBackend::GetSize()
+const S::GUI::Size S::GUI::SurfaceBackend::GetSize()
 {
 	return size;
 }

@@ -11,9 +11,8 @@
 #include <smooth/object.h>
 #include <smooth/threads/thread.h>
 #include <smooth/loop.h>
-#include <smooth/background.h>
+#include <smooth/gui/application/background.h>
 #include <smooth/objectproperties.h>
-#include <smooth/objectmanager.h>
 
 #ifdef __WIN32__
 #include <smooth/threads/win32/threadwin32.h>
@@ -36,7 +35,7 @@ S::Threads::Thread::Thread(Void *iThread)
 	type	= classID;
 	status	= THREAD_CREATED;
 
-	possibleContainers.AddEntry(Application::classID);
+	possibleContainers.AddEntry(GUI::Application::classID);
 }
 
 S::Threads::Thread::~Thread()
@@ -117,9 +116,9 @@ S::Int S::Threads::Thread::GetNOfRunningThreads()
 {
 	Int	 n = 0;
 
-	for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
+	for (Int i = 0; i < Object::GetNOfObjects(); i++)
 	{
-		Object	*object = mainObjectManager->GetNthObject(i);
+		Object	*object = Object::GetNthObject(i);
 
 		if (object != NIL)
 		{

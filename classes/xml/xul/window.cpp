@@ -11,8 +11,8 @@
 #include <smooth/xml/xul/window.h>
 #include <smooth/xml/xul/menubar.h>
 #include <smooth/xml/node.h>
-#include <smooth/window/window.h>
-#include <smooth/window/titlebar.h>
+#include <smooth/gui/window/window.h>
+#include <smooth/gui/widgets/basic/titlebar.h>
 
 S::XML::XUL::Window::Window(Node *node)
 {
@@ -24,7 +24,7 @@ S::XML::XUL::Window::Window(Node *node)
 		id = GetXMLAttributeValue(node, "id");
 
 		window = new GUI::Window(GetXMLAttributeValue(node, "title"));
-		window->SetMetrics(Point(GetXMLAttributeValue(node, "screenX").ToInt(), GetXMLAttributeValue(node, "screenY").ToInt()), Size(GetXMLAttributeValue(node, "width").ToInt(), GetXMLAttributeValue(node, "height").ToInt()));
+		window->SetMetrics(GUI::Point(GetXMLAttributeValue(node, "screenX").ToInt(), GetXMLAttributeValue(node, "screenY").ToInt()), GUI::Size(GetXMLAttributeValue(node, "width").ToInt(), GetXMLAttributeValue(node, "height").ToInt()));
 
 		if (GetXMLAttributeValue(node, "hidechrome") != "true" && GetXMLAttributeValue(node, "hidechrome") != "1")
 		{

@@ -10,7 +10,6 @@
 
 #include <smooth/system/timer.h>
 #include <smooth/system/sdl/timersdl.h>
-#include <smooth/objectmanager.h>
 
 #include <SDL/SDL.h>
 
@@ -62,9 +61,9 @@ S::Int S::System::TimerSDL::GetID()
 
 unsigned int S::System::TimerSDL::TimerProc(unsigned int interval, void *timerid)
 {
-	for (S::Int i = 0; i < S::mainObjectManager->GetNOfObjects(); i++)
+	for (Int i = 0; i < Object::GetNOfObjects(); i++)
 	{
-		S::Object *object = S::mainObjectManager->GetNthObject(i);
+		Object *object = Object::GetNthObject(i);
 
 		if (object != NIL)
 		{

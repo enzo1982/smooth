@@ -10,7 +10,7 @@
 
 #include <smooth/xml/xul/popupmenu.h>
 #include <smooth/xml/node.h>
-#include <smooth/menu/menu.h>
+#include <smooth/gui/widgets/multi/menu/menu.h>
 
 S::XML::XUL::PopupMenu::PopupMenu(Node *node)
 {

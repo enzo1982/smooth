@@ -163,7 +163,7 @@ S::Int S::GUI::BitmapBackend::GetBitmapType()
 	return type;
 }
 
-const S::Size S::GUI::BitmapBackend::GetSize()
+const S::GUI::Size S::GUI::BitmapBackend::GetSize()
 {
 	return size;
 }

@@ -42,7 +42,7 @@ S::Float S::Math::Atan(Float f)
 	return atan(f);
 }
 
-S::Float S::Math::Atan2(Float fy, S::Float fx)
+S::Float S::Math::Atan2(Float fy, Float fx)
 {
 	return atan2(fy, fx);
 }
@@ -87,22 +87,22 @@ S::Float S::Math::Log2(Float f)
 	return log(f) / log(2);
 }
 
-S::Float S::Math::Min(Float f1, S::Float f2)
+S::Float S::Math::Min(Float f1, Float f2)
 {
 	return (f1 < f2 ? f1 : f2);
 }
 
-S::Float S::Math::Max(Float f1, S::Float f2)
+S::Float S::Math::Max(Float f1, Float f2)
 {
 	return (f1 > f2 ? f1 : f2);
 }
 
-S::Float S::Math::Mod(Float fd, S::Float fb)
+S::Float S::Math::Mod(Float fd, Float fb)
 {
 	return fmod(fd, fb);
 }
 
-S::Float S::Math::Pow(Float fn, S::Float fe)
+S::Float S::Math::Pow(Float fn, Float fe)
 {
 	return pow(fn, fe);
 }
@@ -140,4 +140,33 @@ S::Float S::Math::Tan(Float f)
 S::Float S::Math::Tanh(Float f)
 {
 	return tanh(f);
+}
+
+S::Int S::Math::Abs(Int i)
+{
+	return i * Sign(i);
+}
+
+S::Int S::Math::Min(Int i1, Int i2)
+{
+	return (i1 < i2 ? i1 : i2);
+}
+
+S::Int S::Math::Max(Int i1, Int i2)
+{
+	return (i1 > i2 ? i1 : i2);
+}
+
+S::Int S::Math::Mod(Int id, Int ib)
+{
+	return id % ib;
+}
+
+S::Int S::Math::Pow(Int in, Int ie)
+{
+	Int	 value = 1;
+
+	for (Int i = 0; i < ie; i++) value *= in;
+
+	return value;
 }

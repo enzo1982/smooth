@@ -21,13 +21,13 @@ S::Binary::Binary(const Binary &)
 
 S::Bool S::Binary::GetBit(Int n, UnsignedInt bit)
 {
-	return IsFlagSet(n, (Int) Math::Pow(2, (signed) bit));
+	return IsFlagSet(n, Math::Pow(2l, (Signed) bit));
 }
 
 S::Int S::Binary::SetBit(Int &n, UnsignedInt bit, Bool value)
 {
-	if (value)	return (n |= (Int) Math::Pow(2, (signed) bit));
-	else		return (n = (n | (Int) Math::Pow(2, (signed) bit) ^ (Int) Math::Pow(2, (signed) bit)));
+	if (value)	return (n |= Math::Pow(2l, (Signed) bit));
+	else		return (n = (n | Math::Pow(2l, (Signed) bit) ^ Math::Pow(2l, (Signed) bit)));
 }
 
 S::Int S::Binary::GetBits(Int n, UnsignedInt startBit, UnsignedInt endBit)
@@ -38,7 +38,7 @@ S::Int S::Binary::GetBits(Int n, UnsignedInt startBit, UnsignedInt endBit)
 
 	for (UnsignedInt i = startBit; i <= endBit; i++)
 	{
-		retVal += (Int) Math::Pow(2, (signed) i - (signed) startBit) * ((n >> i) & 1);
+		retVal += Math::Pow(2l, (Signed) i - (Signed) startBit) * ((n >> i) & 1);
 	}
 
 	return retVal;

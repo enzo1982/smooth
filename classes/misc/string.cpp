@@ -840,7 +840,7 @@ S::Int S::String::ToInt()
 
 	for (Int j = first; j < (first + size); j++)
 	{
-		n += (Int) Math::Pow(10, size - (j - first) - 1) * (wString[j] - 48);
+		n += (Int) Math::Pow(10l, size - (j - first) - 1) * (wString[j] - 48);
 	}
 
 	if (!neg)	return n;
@@ -883,12 +883,12 @@ S::Float S::String::ToFloat()
 
 	for (Int j = first; j < (first + size); j++)
 	{
-		n += (Int) Math::Pow(10, size - (j - first) - 1) * (wString[j] - 48);
+		n += (Int) Math::Pow(10l, size - (j - first) - 1) * (wString[j] - 48);
 	}
 
 	for (Int k = firstafp; k < (firstafp + afpsize); k++)
 	{
-		n += (Float) Math::Pow(10, 0 - (k - firstafp) - 1) * (wString[k] - 48);
+		n += (Float) Math::Pow(10l, 0 - (k - firstafp) - 1) * (wString[k] - 48);
 	}
 
 	if (!neg)	return n;
@@ -910,14 +910,14 @@ S::String S::String::FromInt(const Int value)
 
 		for (Int i = 0; i < sz-1; i++)
 		{
-			newString[i + 1] = (wchar_t) Math::Floor(((-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
+			newString[i + 1] = (wchar_t) Math::Floor(((-value) % Math::Pow(10l, sz - i - 1)) / Math::Pow(10l, sz - (i + 1) - 1)) + 48;
 		}
 	}
 	else
 	{
 		for (Int i = 0; i < sz; i++)
 		{
-			newString[i] = (wchar_t) Math::Floor((value % (Int) Math::Pow(10, sz - i)) / Math::Pow(10, sz - (i + 1))) + 48;
+			newString[i] = (wchar_t) Math::Floor((value % Math::Pow(10, sz - i)) / Math::Pow(10l, sz - (i + 1))) + 48;
 		}
 	}
 
@@ -944,19 +944,19 @@ S::String S::String::FromFloat(Float value)
 
 		for (Int i = 0; i < sz-1; i++)
 		{
-			newString[i + 1] = (wchar_t) Math::Floor(((Int) (-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
+			newString[i + 1] = (wchar_t) Math::Floor(((Int) (-value) % Math::Pow(10l, sz - i - 1)) / Math::Pow(10l, sz - (i + 1) - 1)) + 48;
 		}
 
-		afps = FromInt((Int) (-(value - (Int) value) * (Int) Math::Pow(10, 8)));
+		afps = FromInt((Int) (-(value - (Int) value) * Math::Pow(10l, 8)));
 	}
 	else
 	{
 		for (Int i = 0; i < sz; i++)
 		{
-			newString[i] = (wchar_t) Math::Floor(((Int) value % (Int) Math::Pow(10, sz - i)) / Math::Pow(10, sz - (i + 1))) + 48;
+			newString[i] = (wchar_t) Math::Floor(((Int) value % Math::Pow(10l, sz - i)) / Math::Pow(10l, sz - (i + 1))) + 48;
 		}
 
-		afps = FromInt((Int) ((value - (Int) value) * (Int) Math::Pow(10, 8)));
+		afps = FromInt((Int) ((value - (Int) value) * Math::Pow(10l, 8)));
 	}
 
 	afpslen = afps.Length();

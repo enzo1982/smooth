@@ -279,6 +279,11 @@ S::Int S::GUI::Window::SetApplicationIcon(wchar_t *newicon)
 	return Success;
 }
 
+S::GUI::Layer *S::GUI::Window::GetMainLayer()
+{
+	return mainLayer;
+}
+
 S::Int S::GUI::Window::SetText(String title)
 {
 	objectProperties->text = title;

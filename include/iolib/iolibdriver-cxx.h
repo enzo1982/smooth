@@ -34,23 +34,27 @@ class
 IOLibDriver
 {
 	protected:
-		int		 size;
-		int		 position;
+		int			 size;
+		int			 position;
 
-		int		 lastError;
+		int			 lastError;
+
+		char			*streamID;
 	public:
-				 IOLibDriver();
-		virtual		~IOLibDriver();
+					 IOLibDriver();
+		virtual			~IOLibDriver();
 
-		int		 GetLastError();
+		int			 GetLastError();
 
-		virtual int	 ReadData(unsigned char *, int);
-		virtual int	 WriteData(unsigned char *, int);
+		virtual int		 ReadData(unsigned char *, int);
+		virtual int		 WriteData(unsigned char *, int);
 
-		virtual int	 Seek(int);
-		virtual int	 GetSize();
-		virtual int	 GetPos();
-		virtual int	 Flush();
+		virtual int		 Seek(int);
+		virtual int		 GetSize();
+		virtual int		 GetPos();
+		virtual int		 Flush();
+
+		virtual const char	*GetStreamID();
 };
 
 #endif

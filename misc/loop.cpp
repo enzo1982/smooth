@@ -63,14 +63,21 @@ S::Void S::Init()
 
 	if (hDllInstance == NIL) hDllInstance = hInstance;
 
-	OSVERSIONINFOA	 vInfo;
+	// decide if we want to use unicode:
+	{
+		OSVERSIONINFOA	 vInfo;
 
-	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
 
-	GetVersionExA(&vInfo);
+		GetVersionExA(&vInfo);
 
-	if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)	Setup::enableUnicode = True;
-	else							Setup::enableUnicode = False;
+		HMODULE		 hUnicows = LoadLibraryA("unicows.dll");
+
+		if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT || hUnicows != NIL)	Setup::enableUnicode = True;
+		else									Setup::enableUnicode = False;
+
+		FreeLibrary(hUnicows);
+	}
 
 	codePage = GetACP();
 

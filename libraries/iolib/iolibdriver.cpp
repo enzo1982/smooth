@@ -21,6 +21,8 @@
 
 IOLibDriver::IOLibDriver()
 {
+	streamID = NULL;
+
 	size = 2147483647;
 	position = 0;
 
@@ -72,4 +74,9 @@ int IOLibDriver::GetPos()
 int IOLibDriver::Flush()
 {
 	return 0;
+}
+
+const char *IOLibDriver::GetStreamID()
+{
+	return streamID;
 }

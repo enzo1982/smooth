@@ -116,6 +116,8 @@ namespace smooth
 				Void				 SetExStyle(Int);
 				Int				 SetText(String);
 
+				Layer				*GetMainLayer();
+
 				Int				 SetStatusText(String);
 				String				 GetStatusText();
 

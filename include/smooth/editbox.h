@@ -54,7 +54,7 @@ namespace smooth
 			Int		 nOfLines;	// the number of lines
 			Array<String>	 lines;
 		public:
-					 EditBox(String, Point, Size, Int, Int, ProcParam, Void *);
+					 EditBox(String, Point, Size, Int, Int);
 					~EditBox();
 
 			virtual Int	 Paint(Int);

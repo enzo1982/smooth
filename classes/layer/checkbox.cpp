@@ -25,13 +25,11 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_CHECKBOX = S::Object::RequestObjectID();
 
-S::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var, ProcParam, Void *procParam)
+S::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var)
 {
 	type				= OBJ_CHECKBOX;
 	objectProperties->text		= text;
 	variable			= var;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
 	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
 	state				= *variable;
 
@@ -281,7 +279,7 @@ S::Int S::CheckBox::Process(Int message, Int wParam, Int lParam)
 					}
 				}
 
-				ProcCall(objectProperties->proc, objectProperties->procParam);
+				onClick.Emit();
 
 				retVal = Break;
 			}

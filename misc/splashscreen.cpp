@@ -53,7 +53,7 @@ S::SplashScreenApp::SplashScreenApp(HBITMAP logo, int t)
 
 	splashscreen->RegisterObject(timer);
 
-	splashscreen->SetPaintProc(Proc(&SplashScreenApp::SplashPaintProc), this);
+	splashscreen->onPaint.Connect(&SplashScreenApp::SplashPaintProc, this);
 	splashscreen->SetKillProc(KillProc(&SplashScreenApp::SplashKillProc), this);
 
 	splashscreen->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - splashscreen->GetObjectProperties()->size.cx) / 2;
@@ -65,7 +65,7 @@ S::SplashScreenApp::SplashScreenApp(HBITMAP logo, int t)
 	splashscreen->SetExStyle(WS_EX_TOPMOST);
 #endif
 
-	timer->SetProc(Proc(&SplashScreenApp::TimerProc), this);
+	timer->onInterval.Connect(&SplashScreenApp::TimerProc, this);
 }
 
 S::SplashScreenApp::~SplashScreenApp()

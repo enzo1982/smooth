@@ -24,13 +24,11 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_SLIDER = S::Object::RequestObjectID();
 
-S::Slider::Slider(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd, ProcParam, Void *procParam)
+S::Slider::Slider(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd)
 {
 	type				= OBJ_SLIDER;
 	subtype				= subType;
 	variable			= var;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
 	objectProperties->clicked	= False;
 	startValue			= rangeStart;
 	endValue			= rangeEnd;
@@ -293,7 +291,7 @@ S::Int S::Slider::Process(Int message, Int wParam, Int lParam)
 
 					Paint(SP_PAINT);
 
-					ProcCall(objectProperties->proc, objectProperties->procParam);
+					onClick.Emit();
 				}
 			}
 
@@ -335,7 +333,7 @@ S::Int S::Slider::SetValue(Int newValue)
 
 	if (registered && prevVisible) Show();
 
-	ProcCall(objectProperties->proc, objectProperties->procParam);
+	onClick.Emit();
 
 	return Success;
 }

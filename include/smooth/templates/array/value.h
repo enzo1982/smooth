@@ -15,7 +15,15 @@
 
 namespace smooth
 {
-	template <class t> class Array_Value
+	class Array_Value_Base
+	{
+		public:
+			virtual	~Array_Value_Base()
+			{
+			}
+	};
+
+	template <class t> class Array_Value : public Array_Value_Base
 	{
 		private:
 			Bool		 filled;
@@ -30,6 +38,9 @@ namespace smooth
 			inline t	 GetValue();
 			inline Int	 GetIndex();
 			Bool		 SetIndex(Int);
+
+			static t	 GetValue(const Array_Value<t> *);
+			static Int	 GetIndex(const Array_Value<t> *);
 	};
 };
 

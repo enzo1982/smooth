@@ -8,25 +8,9 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_ACTIVEAREAPLUGIN_
-#define _H_ACTIVEAREAPLUGIN_
+#ifndef _H_SIGNALS_
+#define _H_SIGNALS_
 
-class ActiveAreaPlugin;
-
-#include <smooth.h>
-
-using namespace smooth;
-
-class SMOOTH_PLUGIN_API ActiveAreaPlugin : public Object
-{
-	public:
-		Int	 areaColor;
-			 ActiveAreaPlugin(Int, Point, Size);
-			~ActiveAreaPlugin();
-		Int	 Paint(Int);
-		Int	 Process(Int, Int, Int);
-};
-
-SMOOTH_PLUGIN_VAR Int OBJ_ACTIVEAREAPLUGIN;
+#include "templates/signals/signal0.h"
 
 #endif

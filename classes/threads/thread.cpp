@@ -25,14 +25,14 @@ S::Int	 S::Thread::counter = 0;
 
 S::Thread::Thread(ThreadProcParam, Void *procParam)
 {
-	type				= OBJ_THREAD;
-	threadProc			= (ThreadProcType) newProc;
-	altproc				= NIL;
-	objectProperties->procParam	= procParam;
-	status				= THREAD_CREATED;
-	thread				= NIL;
-	killflag			= THREAD_KILLFLAG_KILL;
-	waitflag			= THREAD_WAITFLAG_WAIT;
+	type		= OBJ_THREAD;
+	threadProc	= (ThreadProcType) newProc;
+	altproc		= NIL;
+	instance	= procParam;
+	status		= THREAD_CREATED;
+	thread		= NIL;
+	killflag	= THREAD_KILLFLAG_KILL;
+	waitflag	= THREAD_WAITFLAG_WAIT;
 
 	possibleContainers.AddEntry(OBJ_APPLICATION);
 
@@ -41,14 +41,14 @@ S::Thread::Thread(ThreadProcParam, Void *procParam)
 
 S::Thread::Thread(Void (*proc)(Thread *))
 {
-	type				= OBJ_THREAD;
-	threadProc			= NIL;
-	altproc				= proc;
-	objectProperties->procParam	= NIL;
-	status				= THREAD_CREATED;
-	thread				= NIL;
-	killflag			= THREAD_KILLFLAG_KILL;
-	waitflag			= THREAD_WAITFLAG_WAIT;
+	type		= OBJ_THREAD;
+	threadProc	= NIL;
+	altproc		= proc;
+	instance	= NIL;
+	status		= THREAD_CREATED;
+	thread		= NIL;
+	killflag	= THREAD_KILLFLAG_KILL;
+	waitflag	= THREAD_WAITFLAG_WAIT;
 
 	possibleContainers.AddEntry(OBJ_APPLICATION);
 
@@ -166,5 +166,5 @@ S::Int S::Thread::GetKillFlag()
 
 S::Void S::ThreadProcCaller(Thread *thread)
 {
-	ThreadProcCall(thread->threadProc, thread->GetObjectProperties()->procParam, thread);
+	ThreadProcCall(thread->threadProc, thread->instance, thread);
 }

@@ -34,11 +34,11 @@ PCIFFManager::PCIFFManager()
 
 	menu_file	= new PopupMenu();
 
-	menubar->AddEntry("&File", NIL, NULLPROC, menu_file);
+	menubar->AddEntry("&File", NIL, menu_file);
 
-	menu_file->AddEntry("&Open", NIL, Proc(&PCIFFManager::OpenFile), this);
+	menu_file->AddEntry("&Open")->onClick.Connect(&PCIFFManager::OpenFile, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("E&xit", NIL, Proc(wnd->*(&Window::Close)), wnd);
+	menu_file->AddEntry("E&xit")->onClick.Connect(&PCIFFManager::Close, this);
 
 	RegisterObject(wnd);
 
@@ -67,7 +67,12 @@ PCIFFManager::~PCIFFManager()
 	delete menu_file;
 }
 
-void PCIFFManager::OpenFile()
+Void PCIFFManager::Close()
+{
+	wnd->Close();
+}
+
+Void PCIFFManager::OpenFile()
 {
 	DialogFileSelection	*dialog = new DialogFileSelection();
 

@@ -28,6 +28,7 @@ class PCIFFManager : public Application
 
 		String		 filename;
 
+		Void		 Close();
 		Void		 OpenFile();
 	public:
 				 PCIFFManager();

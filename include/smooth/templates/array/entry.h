@@ -31,6 +31,9 @@ namespace smooth
 			Bool			 SetPrev(Array_Entry<t> *);
 			inline Array_Entry<t>	*GetNext();
 			inline Array_Entry<t>	*GetPrev();
+
+			static Array_Entry<t>	*GetNext(const Array_Entry<t> *);
+			static Array_Entry<t>	*GetPrev(const Array_Entry<t> *);
 	};
 };
 

@@ -51,12 +51,17 @@ BeatClock::BeatClock()
 	timer		= new Timer();
 	dragcontrol	= new DragControl();
 
-	timer->SetProc(Proc(&BeatClock::PaintTime), this);
+	timer->onInterval.Connect(&BeatClock::PaintTime, this);
 
-	menubar->AddEntry("Mode", NIL, Proc(&BeatClock::Mode), this);
-	menubar->AddEntry("Options", NIL, Proc(&BeatClock::Options), this);
+	Menu::Entry	*entry;
+
+	menubar->AddEntry("Mode")->onClick.Connect(&BeatClock::Mode, this);
+	menubar->AddEntry("Options")->onClick.Connect(&BeatClock::Options, this);
 	menubar->AddEntry()->SetOrientation(OR_RIGHT);
-	menubar->AddEntry("Info", NIL, Proc(&BeatClock::Info), this)->SetOrientation(OR_RIGHT);
+
+	entry = menubar->AddEntry("Info");
+	entry->onClick.Connect(&BeatClock::Info, this);
+	entry->SetOrientation(OR_RIGHT);
 
 	RegisterObject(wnd);
 
@@ -66,7 +71,7 @@ BeatClock::BeatClock()
 	wnd->RegisterObject(timer);
 
 	wnd->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
-	wnd->SetPaintProc(Proc(&BeatClock::PaintAll), this);
+	wnd->onPaint.Connect(&BeatClock::PaintAll, this);
 	wnd->SetExStyle(WS_EX_TOPMOST|WS_EX_TOOLWINDOW);
 	wnd->SetMetrics(Point(wpx, wpy), Size(164 * SMOOTH::Setup::FontSize, 103 * SMOOTH::Setup::FontSize));
 	wnd->SetMessageProc(MessageProc(&BeatClock::EventProc), this);
@@ -135,25 +140,31 @@ Void BeatClock::Options()
 	size.cx = 100;
 	size.cy = 0;
 
-	display_option1 = new OptionBox("Internet Beats", pos, size, &timeformat, 0, Proc(&BeatClock::OptionsBeats), this);
+	display_option1 = new OptionBox("Internet Beats", pos, size, &timeformat, 0);
+	display_option1->onClick.Connect(&BeatClock::OptionsBeats, this);
 
 	pos.y = 49;
 
-	display_option2 = new OptionBox("Standard (STF)", pos, size, &timeformat, 1, Proc(&BeatClock::OptionsSTF), this);
+	display_option2 = new OptionBox("Standard (STF)", pos, size, &timeformat, 1);
+	display_option2->onClick.Connect(&BeatClock::OptionsSTF, this);
 
 	pos.x = 126;
 	pos.y = 24;
 
-	if (timeformat == 0)	display_check1 = new CheckBox("Show centibeats", pos, size, &centi, Proc(&BeatClock::OptionsPaint), this);
-	else			display_check1 = new CheckBox("Show seconds", pos, size, &centi, Proc(&BeatClock::OptionsPaint), this);
+	if (timeformat == 0)	display_check1 = new CheckBox("Show centibeats", pos, size, &centi);
+	else			display_check1 = new CheckBox("Show seconds", pos, size, &centi);
+
+	display_check1->onClick.Connect(&BeatClock::OptionsPaint, this);
 
 	pos.x = 255;
 
-	display_option3 = new OptionBox("CET", pos, size, &timezone, 0, Proc(&BeatClock::OptionsPaint), this);
+	display_option3 = new OptionBox("CET", pos, size, &timezone, 0);
+	display_option3->onClick.Connect(&BeatClock::OptionsPaint, this);
 
 	pos.y = 49;
 
-	display_option4 = new OptionBox("Local time", pos, size, &timezone, 1, Proc(&BeatClock::OptionsPaint), this);
+	display_option4 = new OptionBox("Local time", pos, size, &timezone, 1);
+	display_option4->onClick.Connect(&BeatClock::OptionsPaint, this);
 
 	display->RegisterObject(display_group1);
 	display->RegisterObject(display_group2);
@@ -168,7 +179,8 @@ Void BeatClock::Options()
 	pos.x = 7;
 	pos.y = 7;
 
-	alarm_check1 = new CheckBox("Enable alarm", pos, size, &isalarm, Proc(&BeatClock::toggleAlarmState), this);
+	alarm_check1 = new CheckBox("Enable alarm", pos, size, &isalarm);
+	alarm_check1->onClick.Connect(&BeatClock::toggleAlarmState, this);
 
 	pos.y = 35;
 	pos.x = 9;
@@ -182,7 +194,7 @@ Void BeatClock::Options()
 	if (timeformat == 0)	alarmtext = String::IntToString(alarmbeats);
 	else			alarmtext = convertSecondsToTimeString(alarmsecs);
 
-	alarm_edit1 = new EditBox(alarmtext, pos, size, EDB_ALPHANUMERIC, 5, NULLPROC);
+	alarm_edit1 = new EditBox(alarmtext, pos, size, EDB_ALPHANUMERIC, 5);
 
 	pos.y = 35;
 	pos.x = 94;
@@ -194,11 +206,11 @@ Void BeatClock::Options()
 	pos.x = 172;
 	size.cx = 0;
 
-	alarm_option1 = new OptionBox("only once", pos, size, &alarmoption, 0, NULLPROC);
+	alarm_option1 = new OptionBox("only once", pos, size, &alarmoption, 0);
 
 	pos.y += 25;
 
-	alarm_option2 = new OptionBox("every day", pos, size, &alarmoption, 1, NULLPROC);
+	alarm_option2 = new OptionBox("every day", pos, size, &alarmoption, 1);
 
 	alarm->RegisterObject(alarm_check1);
 	alarm->RegisterObject(alarm_text1);
@@ -223,21 +235,21 @@ Void BeatClock::Options()
 	size.cx = 164;
 	size.cy = 0;
 
-	if (timeformat == 0)	misc_option1 = new OptionBox("Show/hide centibeats", pos, size, &modechange, 0, NULLPROC);
-	else			misc_option1 = new OptionBox("Show/hide seconds", pos, size, &modechange, 0, NULLPROC);
+	if (timeformat == 0)	misc_option1 = new OptionBox("Show/hide centibeats", pos, size, &modechange, 0);
+	else			misc_option1 = new OptionBox("Show/hide seconds", pos, size, &modechange, 0);
 
 	pos.y = 49;
 
-	misc_option2 = new OptionBox("Change time format", pos, size, &modechange, 1, NULLPROC);
+	misc_option2 = new OptionBox("Change time format", pos, size, &modechange, 1);
 
 	pos.x = 191;
 	pos.y = 24;
 
-	misc_option3 = new OptionBox("Change timezone", pos, size, &modechange, 2, NULLPROC);
+	misc_option3 = new OptionBox("Change timezone", pos, size, &modechange, 2);
 
 	pos.y = 49;
 
-	misc_option4 = new OptionBox("Change format and timezone", pos, size, &modechange, 3, NULLPROC);
+	misc_option4 = new OptionBox("Change format and timezone", pos, size, &modechange, 3);
 
 	misc->RegisterObject(misc_group1);
 	misc->RegisterObject(misc_option1);
@@ -266,12 +278,14 @@ Void BeatClock::Options()
 	size.cx = 0;
 	size.cy = 0;
 
-	main_button1 = new Button("OK", NIL, pos, size, Proc(&BeatClock::OptionsOK), this);
+	main_button1 = new Button("OK", NIL, pos, size);
+	main_button1->onClick.Connect(&BeatClock::OptionsOK, this);
 	main_button1->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 87;
 
-	main_button2 = new Button("Cancel", NIL, pos, size, Proc(&BeatClock::OptionsCancel), this);
+	main_button2 = new Button("Cancel", NIL, pos, size);
+	main_button2->onClick.Connect(&BeatClock::OptionsCancel, this);
 	main_button2->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 7;

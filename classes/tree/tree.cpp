@@ -35,18 +35,18 @@ S::Tree::~Tree()
 	entries.DeleteAll();
 }
 
-S::Tree::Entry *S::Tree::AddEntry(String name, ProcParam, Void *procParam)
+S::Tree::Entry *S::Tree::AddEntry(String name)
 {
 	counter++;
 
-	return AddTreeEntry(ST_ENTRY, counter, name, newProc, procParam, NIL);
+	return AddTreeEntry(ST_ENTRY, counter, name, NIL);
 }
 
 S::Tree::Entry *S::Tree::AddEntry(String name, Tree *sub)
 {
 	counter++;
 
-	return AddTreeEntry(ST_SUB, counter, name, NULLPROC, sub);
+	return AddTreeEntry(ST_SUB, counter, name, sub);
 }
 
 S::Int S::Tree::RemoveEntry(Int number)
@@ -56,13 +56,11 @@ S::Int S::Tree::RemoveEntry(Int number)
 	return Success;
 }
 
-S::Tree::Entry *S::Tree::AddTreeEntry(Int type, Int code, String text, ProcParam, Void *procParam, Tree *sub)
+S::Tree::Entry *S::Tree::AddTreeEntry(Int type, Int code, String text, Tree *sub)
 {
 	Tree::Entry	*newEntry = new Tree::Entry(type, code);
 
 	newEntry->text		= text;
-	newEntry->proc		= (ProcType) newProc;
-	newEntry->procParam	= procParam;
 	newEntry->sub		= sub;
 	newEntry->sizeset	= False;
 	newEntry->last		= True;

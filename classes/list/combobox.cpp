@@ -29,12 +29,10 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_COMBOBOX = S::Object::RequestObjectID();
 
-S::ComboBox::ComboBox(Point pos, Size size, ProcParam, Void *procParam)
+S::ComboBox::ComboBox(Point pos, Size size)
 {
-	type				= OBJ_COMBOBOX;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
-	entryCount			= -1;
+	type		= OBJ_COMBOBOX;
+	entryCount	= -1;
 
 	closeListBox	= False;
 	listBoxOpen	= False;
@@ -65,11 +63,11 @@ S::ComboBox::~ComboBox()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::List::Entry *S::ComboBox::AddEntry(String name, ProcParam, Void *procParam)
+S::List::Entry *S::ComboBox::AddEntry(String name)
 {
 	entryCount++;
 
-	Entry *newEntry = AddListEntry(entryCount, name, newProc, procParam);
+	Entry *newEntry = AddListEntry(entryCount, name);
 
 	if (entryCount == 0) entries.GetFirstEntry()->clk = True;
 
@@ -78,9 +76,9 @@ S::List::Entry *S::ComboBox::AddEntry(String name, ProcParam, Void *procParam)
 	return newEntry;
 }
 
-S::Int S::ComboBox::ModifyEntry(Int code, String name, ProcParam, Void *procParam)
+S::Int S::ComboBox::ModifyEntry(Int code, String name)
 {
-	if (ModifyListEntry(code, name, newProc, procParam) == Success)
+	if (ModifyListEntry(code, name) == Success)
 	{
 		Paint(SP_PAINT);
 
@@ -310,7 +308,9 @@ S::Int S::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				layer		= new Layer();
 				toolWindow	= new ToolWindow();
-				listBox		= new ListBox(Point(0, 0), lbs, Proc(&ComboBox::ListBoxProc), this);
+				listBox		= new ListBox(Point(0, 0), lbs);
+
+				listBox->onClick.Connect(&ComboBox::ListBoxProc, this);
 
 				lbp.x = frame.left + wnd->GetObjectProperties()->pos.x;
 				lbp.y = frame.bottom + 1 + wnd->GetObjectProperties()->pos.y;
@@ -337,7 +337,7 @@ S::Int S::ComboBox::Process(Int message, Int wParam, Int lParam)
 				{
 					operat = entries.GetNthEntry(i);
 
-					listBox->AddEntry(operat->text, NULLPROC);
+					listBox->AddEntry(operat->text);
 				}
 
 				listBox->SelectEntry(GetSelectedEntry());
@@ -483,8 +483,8 @@ S::Int S::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 					if (operat->clk)
 					{
-						ProcCall(objectProperties->proc, objectProperties->procParam);
-						ProcCall(operat->proc, operat->procParam);
+						onClick.Emit();
+						operat->onClick.Emit();
 
 						break;
 					}

@@ -13,18 +13,15 @@
 
 S::Tree::Entry::Entry(Int et, Int ec)
 {
-	type		= et;
-	code		= ec;
-	sub		= NIL;
+	type	= et;
+	code	= ec;
+	sub	= NIL;
 
-	proc		= NIL;
-	procParam	= NIL;
+	chk	= False;
+	clk	= False;
 
-	chk		= False;
-	clk		= False;
-
-	open		= False;
-	last		= False;
+	open	= False;
+	last	= False;
 }
 
 S::Tree::Entry::~Entry()

@@ -25,7 +25,7 @@ namespace smooth
 		protected:
 			Int		 areaColor;
 		public:
-					 ActiveArea(Int, Point, Size, ProcParam, Void *);
+					 ActiveArea(Int, Point, Size);
 					~ActiveArea();
 
 			virtual Int	 Paint(Int);

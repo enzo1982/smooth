@@ -147,7 +147,7 @@ Object *Designer_EditComponent::AddObject(Int objid)
 			size.cx = 0;
 			size.cy = 0;
 
-			newobj = new Button("Button", NIL, pos, size, NULLPROC);
+			newobj = new Button("Button", NIL, pos, size);
 			break;
 		case SMOOTH_MENUBAR:
 			registrar = wnd;

@@ -29,25 +29,24 @@ namespace smooth
 		public: class SMOOTHAPI Entry
 		{
 			public:
-				Int	 type;
-				Int	 code;
-				Bool	 last;
+				Int		 type;
+				Int		 code;
+				Bool		 last;
 
-				ProcMember;
-				Void	*procParam;
+				String		 text;
+				Tree		*sub;
 
-				String	 text;
-				Tree	*sub;
+				Bool		 chk;
+				Bool		 clk;
+				Bool		 open;
+				Int		 size;
+				Bool		 sizeset;
+				Rect		 rect;
 
-				Bool	 chk;
-				Bool	 clk;
-				Bool	 open;
-				Int	 size;
-				Bool	 sizeset;
-				Rect	 rect;
-
-					 Entry(Int, Int);
-					~Entry();
+						 Entry(Int, Int);
+						~Entry();
+			signals:
+				Signal0<>	 onClick;
 		};
 
 		protected:
@@ -60,7 +59,7 @@ namespace smooth
 			Int		 GetSizeY();
 			Int		 GetSizeX();
 			Void		 GetTreeEntriesSize();
-			Entry		*AddTreeEntry(Int, Int, String, ProcParam, Void *, Tree *);
+			Entry		*AddTreeEntry(Int, Int, String, Tree *);
 			Int		 RemoveTreeEntry(Int);
 		public:
 			Array<Entry *>	 entries;
@@ -68,7 +67,7 @@ namespace smooth
 					 Tree();
 			virtual		~Tree();
 
-			virtual Entry	*AddEntry(String, ProcParam, Void *);
+			virtual Entry	*AddEntry(String);
 			virtual Entry	*AddEntry(String, Tree *);
 			virtual Int	 RemoveEntry(Int);
 			Int		 GetNOfEntries();

@@ -44,7 +44,7 @@ Designer::Designer()
 	statusbar	= new Statusbar("Ready");
 
 	timer1		= new Timer();
-	timer1->SetProc(Proc(&Designer::TimerProc), this);
+	timer1->onInterval.Connect(&Designer::TimerProc, this);
 
 	menu_file	= new PopupMenu();
 	menu_dialog	= new PopupMenu();
@@ -53,21 +53,21 @@ Designer::Designer()
 	menu_widgets_add	= new PopupMenu();
 	menu_widgets_add_smooth	= new PopupMenu();
 
-	menubar->AddEntry("&File", NIL, NULLPROC, menu_file);
-	menubar->AddEntry("&Dialog", NIL, NULLPROC, menu_dialog);
-	menubar->AddEntry("&Widgets", NIL, NULLPROC, menu_widgets);
+	menubar->AddEntry("&File", NIL, menu_file);
+	menubar->AddEntry("&Dialog", NIL, menu_dialog);
+	menubar->AddEntry("&Widgets", NIL, menu_widgets);
 
-	menu_file->AddEntry("E&xit", NIL, Proc(&Designer::Close), this);
+	menu_file->AddEntry("E&xit")->onClick.Connect(&Designer::Close, this);
 
-	menu_dialog->AddEntry("&New", NIL, Proc(&Designer::NewDialog), this);
+	menu_dialog->AddEntry("&New")->onClick.Connect(&Designer::NewDialog, this);
 
-	menu_widgets->AddEntry("&Add", NIL, NULLPROC, menu_widgets_add);
+	menu_widgets->AddEntry("&Add", NIL, menu_widgets_add);
 
-	menu_widgets_add->AddEntry("&smooth controls", NIL, NULLPROC, menu_widgets_add_smooth);
+	menu_widgets_add->AddEntry("&smooth controls", NIL, menu_widgets_add_smooth);
 
-	menu_widgets_add_smooth->AddEntry("&Button", NIL, Proc(&Designer::AddButton), this);
-	menu_widgets_add_smooth->AddEntry("&Layer", NIL, Proc(&Designer::AddLayer), this);
-	menu_widgets_add_smooth->AddEntry("&Menubar", NIL, Proc(&Designer::AddMenubar), this);
+	menu_widgets_add_smooth->AddEntry("&Button")->onClick.Connect(&Designer::AddButton, this);
+	menu_widgets_add_smooth->AddEntry("&Layer")->onClick.Connect(&Designer::AddLayer, this);
+	menu_widgets_add_smooth->AddEntry("&Menubar")->onClick.Connect(&Designer::AddMenubar, this);
 
 	RegisterObject(wnd);
 

@@ -48,7 +48,7 @@ Test::Test()
 	mainWnd			= new Window("smooth Test");
 	mainWnd_titlebar	= new Titlebar(true, true, true);
 	mainWnd_statusbar	= new Statusbar("Ready");
-	mainWnd_client		= new Client(NULLPROC);
+	mainWnd_client		= new Client();
 	mainWnd_divisionbar	= new Divider(430, OR_VERT | OR_LEFT);
 	mainWnd_menubar		= new Menubar();
 	mainWnd_menubar2	= new Menubar();
@@ -58,19 +58,23 @@ Test::Test()
 	rlayer1			= new Layer("Register");
 	rlayer2			= new Layer("Test");
 	rlayer3			= new Layer("Other");
-	mainWnd_layer_button	= new Button("OK", NIL, bp, bs, Proc(&Test::Close), this);
+	mainWnd_layer_button	= new Button("OK", NIL, bp, bs);
+	mainWnd_layer_button->onClick.Connect(&Test::Close, this);
 	mainWnd_layer_button->SetTooltip("Don't click on this button!!!");
 	bp.y += 25;
-	mainWnd_layer_check1	= new CheckBox("Checkable", bp, bs, &checkbox, NULLPROC);
+	mainWnd_layer_check1	= new CheckBox("Checkable", bp, bs, &checkbox);
 	bp.y += 20;
-	mainWnd_layer_check2	= new CheckBox("Click me!", bp, bs, &checkbox, NULLPROC);
+	mainWnd_layer_check2	= new CheckBox("Click me!", bp, bs, &checkbox);
 	bp.y += 20;
-	mainWnd_layer_active1	= new ActiveArea(RGB(0, 255, 0), bp, bs, Proc(&Test::testDlgSelectColor), this);
+	mainWnd_layer_active1	= new ActiveArea(RGB(0, 255, 0), bp, bs);
+	mainWnd_layer_active1->onClick.Connect(&Test::testDlgSelectColor, this);
 	bp.y -= 65;
 	bp.x += 90;
-	mainWnd_layer_option1	= new OptionBox("Chooseable", bp, bs, &optionboxes, 1, Proc(&Test::ShowEdb), this);
+	mainWnd_layer_option1	= new OptionBox("Chooseable", bp, bs, &optionboxes, 1);
+	mainWnd_layer_option1->onClick.Connect(&Test::ShowEdb, this);
 	bp.y += 20;
-	mainWnd_layer_option2	= new OptionBox("Chooseable", bp, bs, &optionboxes, 2, Proc(&Test::HideEdb), this);
+	mainWnd_layer_option2	= new OptionBox("Chooseable", bp, bs, &optionboxes, 2);
+	mainWnd_layer_option2->onClick.Connect(&Test::HideEdb, this);
 	bp.y += 20;
 	mainWnd_layer_text1	= new Text("smooth::Text", bp);
 	bp.y += 20;
@@ -86,37 +90,38 @@ Test::Test()
 	mainWnd_layer_reg1	= new TabWidget(bp, bs);
 	bp.y = 300;
 	bs.cy = 120;
-	mainWnd_layer_list1	= new ListBox(bp, bs, NULLPROC);
+	mainWnd_layer_list1	= new ListBox(bp, bs);
 	bp.y = 28;
 	bp.x = 220;
 	bs.cx = 150;
 	bs.cy = 0;
-	mainWnd_layer_combo1	= new ComboBox(bp, bs, NULLPROC);
+	mainWnd_layer_combo1	= new ComboBox(bp, bs);
 	bp.y += 73;
 	bp.x += 20;
 	bs.cy = 200;
-	mainWnd_layer_tree1	= new TreeView("Library files", bp, bs, NULLPROC);
+	mainWnd_layer_tree1	= new TreeView("Library files", bp, bs);
 	bp.y += 220;
 	bs.cy = 100;
-	mainWnd_layer_list2	= new ListBox(bp, bs, NULLPROC);
+	mainWnd_layer_list2	= new ListBox(bp, bs);
 	bp.y = 40;
 	bp.x = 20;
 	bs.cx = 100;
 	bs.cy = 0;
-	rlayer1_slider1		= new Slider(bp, bs, OR_HORZ, &slider1, 0, 5, NULLPROC);
+	rlayer1_slider1		= new Slider(bp, bs, OR_HORZ, &slider1, 0, 5);
 	bp.x = 150;
 	bs.cx = 0;
 	bs.cy = 0;
-	rlayer1_arrows1		= new Arrows(bp, bs, OR_HORZ, &arrows1, 0, 100, NULLPROC);
+	rlayer1_arrows1		= new Arrows(bp, bs, OR_HORZ, &arrows1, 0, 100);
 	bp.x = 15;
 	bp.y = 20;
 	bs.cx = 150;
 	bs.cy = 70;
-	rlayer2_editbox1	= new EditBox("Hello to all testers!", bp, bs, EDB_ALPHANUMERIC, 0, NULLPROC);
+	rlayer2_editbox1	= new EditBox("Hello to all testers!", bp, bs, EDB_ALPHANUMERIC, 0);
 	bp.y = 40;
 	bs.cx = 60;
 	bs.cy = 0;
-	rlayer3_scrollbar1	= new Scrollbar(bp, bs, OR_HORZ, &scrollbar1, 0, 100, Proc(&Test::mainApp_ScrollbarProc), this);
+	rlayer3_scrollbar1	= new Scrollbar(bp, bs, OR_HORZ, &scrollbar1, 0, 100);
+	rlayer3_scrollbar1->onClick.Connect(&Test::mainApp_ScrollbarProc, this);
 	bp.y -= 30;
 	bs.cx = 160;
 	bs.cy = 0;
@@ -128,65 +133,73 @@ Test::Test()
 
 	// fill the menus:
 
-	mainWnd_menubar_file->AddEntry("Exit", NIL, Proc(&Test::Close), this)->SetStatusText("Exit this program");
-	mainWnd_menubar_file->AddEntry("Test", NIL, Proc(&Test::HideEdb), this)->SetStatusText("Execute test proc");
-	mainWnd_menubar_file->AddEntry("Exit", NIL, NULLPROC, mainWnd_menubar_file);
+	Menu::Entry	*entry;
 
-	mainWnd_menubar->AddEntry("File test", NIL, Proc(&Test::testDlgOpenFile), this);
-	mainWnd_menubar->AddEntry("Directory test", NIL, Proc(&Test::testDlgSelectDir), this);
-	mainWnd_menubar->AddEntry("&File", NIL, NULLPROC, mainWnd_menubar_file);
-	mainWnd_menubar->AddEntry("Quit", NIL, Proc(&Test::Close), this);
+	entry = mainWnd_menubar_file->AddEntry("Exit");
+	entry->onClick.Connect(&Test::Close, this);
+	entry->SetStatusText("Exit this program");
+
+	entry = mainWnd_menubar_file->AddEntry("Test");
+	entry->onClick.Connect(&Test::HideEdb, this);
+	entry->SetStatusText("Execute test proc");
+
+	mainWnd_menubar_file->AddEntry("Exit", NIL, mainWnd_menubar_file);
+
+	mainWnd_menubar->AddEntry("File test")->onClick.Connect(&Test::testDlgOpenFile, this);
+	mainWnd_menubar->AddEntry("Directory test")->onClick.Connect(&Test::testDlgSelectDir, this);
+	mainWnd_menubar->AddEntry("&File", NIL, mainWnd_menubar_file);
+	mainWnd_menubar->AddEntry("Quit")->onClick.Connect(&Test::Close, this);
 
 	mainWnd_menubar2->AddEntry("ECM test");
 	mainWnd_menubar2->AddEntry("Unicode: Да");
 
 //mainWnd_menubar2->SetOrientation(OR_BOTTOM);
 
-	mainWnd_iconbar->AddEntry(NIL, SMOOTH::LoadImage("icons.pci", 1, NIL), NULLPROC);//mainWnd_menubar_file);
-	mainWnd_iconbar->AddEntry(NIL, SMOOTH::LoadImage("icons.pci", 2, NIL), Proc(&Test::mainApp_InfoProc), this);
+	mainWnd_iconbar->AddEntry(NIL, SMOOTH::LoadImage("icons.pci", 1, NIL));//mainWnd_menubar_file);
+	mainWnd_iconbar->AddEntry(NIL, SMOOTH::LoadImage("icons.pci", 2, NIL))->onClick.Connect(&Test::mainApp_InfoProc, this);
 
 mainWnd_iconbar->SetOrientation(OR_LEFT);
 
-	mainWnd_layer_list1->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libmpstring.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libpicture.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libmpstring.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libpicture.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libmpstring.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libpicture.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libmpstring.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libpicture.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libmpstring.a", NULLPROC);
-	mainWnd_layer_list1->AddEntry("libpicture.a", NULLPROC);
+	mainWnd_layer_list1->AddEntry("libiolib.a");
+	mainWnd_layer_list1->AddEntry("libmpstring.a");
+	mainWnd_layer_list1->AddEntry("libpicture.a");
+	mainWnd_layer_list1->AddEntry("libiolib.a");
+	mainWnd_layer_list1->AddEntry("libmpstring.a");
+	mainWnd_layer_list1->AddEntry("libpicture.a");
+	mainWnd_layer_list1->AddEntry("libiolib.a");
+	mainWnd_layer_list1->AddEntry("libmpstring.a");
+	mainWnd_layer_list1->AddEntry("libpicture.a");
+	mainWnd_layer_list1->AddEntry("libiolib.a");
+	mainWnd_layer_list1->AddEntry("libmpstring.a");
+	mainWnd_layer_list1->AddEntry("libpicture.a");
+	mainWnd_layer_list1->AddEntry("libiolib.a");
+	mainWnd_layer_list1->AddEntry("libmpstring.a");
+	mainWnd_layer_list1->AddEntry("libpicture.a");
 
-	mainWnd_layer_list2->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_list2->AddEntry("libmpstring.a", NULLPROC);
-	mainWnd_layer_list2->AddEntry("libpicture.a", NULLPROC);
-	mainWnd_layer_list2->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_list2->AddEntry("libmpstring.a", NULLPROC);
-	mainWnd_layer_list2->AddEntry("libpicture.a", NULLPROC);
+	mainWnd_layer_list2->AddEntry("libiolib.a");
+	mainWnd_layer_list2->AddEntry("libmpstring.a");
+	mainWnd_layer_list2->AddEntry("libpicture.a");
+	mainWnd_layer_list2->AddEntry("libiolib.a");
+	mainWnd_layer_list2->AddEntry("libmpstring.a");
+	mainWnd_layer_list2->AddEntry("libpicture.a");
 
-	mainWnd_layer_combo1->AddEntry("libmpstring.a", NULLPROC);
-	mainWnd_layer_combo1->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_combo1->AddEntry("libpicture.a", NULLPROC);
-	mainWnd_layer_combo1->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_combo1->AddEntry("libmpstring.a", NULLPROC);
-	mainWnd_layer_combo1->AddEntry("libpicture.a", NULLPROC);
+	mainWnd_layer_combo1->AddEntry("libmpstring.a");
+	mainWnd_layer_combo1->AddEntry("libiolib.a");
+	mainWnd_layer_combo1->AddEntry("libpicture.a");
+	mainWnd_layer_combo1->AddEntry("libiolib.a");
+	mainWnd_layer_combo1->AddEntry("libmpstring.a");
+	mainWnd_layer_combo1->AddEntry("libpicture.a");
 
-	mainWnd_layer_subtree1->AddEntry("This", NULLPROC);
-	mainWnd_layer_subtree1->AddEntry("is", NULLPROC);
+	mainWnd_layer_subtree1->AddEntry("This");
+	mainWnd_layer_subtree1->AddEntry("is");
 	mainWnd_layer_subtree1->AddEntry("a", mainWnd_layer_subtree1);
 	mainWnd_layer_subtree1->AddEntry("subtree!", mainWnd_layer_subtree1);
 
-	mainWnd_layer_tree1->AddEntry("libpicture.a", NULLPROC);
-	mainWnd_layer_tree1->AddEntry("libiolib.a", NULLPROC);
-	mainWnd_layer_tree1->AddEntry("libmpstring.a", NULLPROC);
+	mainWnd_layer_tree1->AddEntry("libpicture.a");
+	mainWnd_layer_tree1->AddEntry("libiolib.a");
+	mainWnd_layer_tree1->AddEntry("libmpstring.a");
 	mainWnd_layer_tree1->AddEntry("SubTree", mainWnd_layer_subtree1);
-	mainWnd_layer_tree1->AddEntry("libpicture.a", NULLPROC);
+	mainWnd_layer_tree1->AddEntry("libpicture.a");
 
 	// alle Objekte dort registrieren, wo sie hingeh�ren:
 
@@ -337,13 +350,13 @@ Test::~Test()
 	DeleteObject(messageBoxThread);
 }
 
-Void Test::mainWnd_KillProc(Bool *quit)
+Bool Test::mainWnd_KillProc()
 {
 	SMOOTH::MessageBox("Leaving application now!", "Info", MB_OK, IDI_INFORMATION);
 
 	secWnd->Close();
 
-	*quit = True;
+	return True;
 }
 
 void Test::mainApp_InfoProc()

@@ -25,23 +25,21 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_SCROLLBAR = S::Object::RequestObjectID();
 
-S::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd, ProcParam, Void *procParam)
+S::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd)
 {
-	type				= OBJ_SCROLLBAR;
-	variable			= var;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
-	button1Checked			= False;
-	button1Clicked			= False;
-	button2Checked			= False;
-	button2Clicked			= False;
-	button3Checked			= False;
-	button3Clicked			= False;
-	subtype				= subType;
-	startValue			= rangeStart;
-	endValue			= rangeEnd;
-	timerActive			= False;
-	timer				= NIL;
+	type		= OBJ_SCROLLBAR;
+	variable	= var;
+	button1Checked	= False;
+	button1Clicked	= False;
+	button2Checked	= False;
+	button2Clicked	= False;
+	button3Checked	= False;
+	button3Clicked	= False;
+	subtype		= subType;
+	startValue	= rangeStart;
+	endValue	= rangeEnd;
+	timerActive	= False;
+	timer		= NIL;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -320,7 +318,7 @@ S::Int S::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				wnd->RegisterObject(timer);
 
-				timer->SetProc(Proc(&Scrollbar::TimerProc), this);
+				timer->onInterval.Connect(&Scrollbar::TimerProc, this);
 				timer->Start(200);
 
 				timerCount = 1;
@@ -340,7 +338,7 @@ S::Int S::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				if (*variable != prevValue)
 				{
-					ProcCall(objectProperties->proc, objectProperties->procParam);
+					onClick.Emit();
 
 					Box(dc, frame3, SMOOTH::Setup::LightGrayColor, FILLED);
 
@@ -362,7 +360,7 @@ S::Int S::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				if (*variable != prevValue)
 				{
-					ProcCall(objectProperties->proc, objectProperties->procParam);
+					onClick.Emit();
 
 					Box(dc, frame3, SMOOTH::Setup::LightGrayColor, FILLED);
 
@@ -419,7 +417,7 @@ S::Int S::Scrollbar::Process(Int message, Int wParam, Int lParam)
 			{
 				Paint(SP_PAINT);
 
-				ProcCall(objectProperties->proc, objectProperties->procParam);
+				onClick.Emit();
 			}
 
 			retVal = Break;
@@ -447,7 +445,7 @@ S::Int S::Scrollbar::Process(Int message, Int wParam, Int lParam)
 			{
 				Paint(SP_PAINT);
 
-				ProcCall(objectProperties->proc, objectProperties->procParam);
+				onClick.Emit();
 			}
 
 			break;
@@ -567,7 +565,7 @@ S::Int S::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 					Paint(SP_PAINT);
 
-					ProcCall(objectProperties->proc, objectProperties->procParam);
+					onClick.Emit();
 				}
 			}
 
@@ -632,7 +630,7 @@ S::Int S::Scrollbar::SetRange(Int rangeStart, Int rangeEnd)
 
 	*variable	= ((*variable) - prevStartValue) * ((endValue - startValue) / (prevEndValue - prevStartValue)) + startValue;
 
-	ProcCall(objectProperties->proc, objectProperties->procParam);
+	onClick.Emit();
 
 	return Success;
 }

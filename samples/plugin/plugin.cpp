@@ -26,14 +26,12 @@ __declspec (dllexport)
 
 Int	 OBJ_ACTIVEAREAPLUGIN = Object::RequestObjectID();
 
-ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point pos, Size size, ProcParam, Void *procParam)
+ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point pos, Size size)
 {
-	type				= OBJ_ACTIVEAREAPLUGIN;
-	areaColor			= color;
-	objectProperties->pos		= pos;
-	objectProperties->size		= size;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
+	type			= OBJ_ACTIVEAREAPLUGIN;
+	areaColor		= color;
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -178,7 +176,7 @@ Int ActiveAreaPlugin::Process(Int message, Int wParam, Int lParam)
 
 			if ((mousePos.x >= frame.left) && (mousePos.x <= frame.right) && (mousePos.y >= frame.top) && (mousePos.y <= frame.bottom))
 			{
-				ProcCall(objectProperties->proc, objectProperties->procParam);
+				onClick.Emit();
 
 				retVal = Break;
 			}

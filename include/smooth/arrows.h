@@ -40,7 +40,7 @@ namespace smooth
 			Int		 startValue;
 			Int 		 endValue;
 		public:
-					 Arrows(Point, Size, Int, Int *, Int, Int, ProcParam, Void *);
+					 Arrows(Point, Size, Int, Int *, Int, Int);
 					~Arrows();
 
 			virtual Int	 Paint(Int);

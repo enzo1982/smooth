@@ -8,42 +8,28 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_TIMER_
-#define _H_OBJSMOOTH_TIMER_
+#include "../../signals/method.h"
 
 namespace smooth
 {
-	class Timer;
-	class Window;
-};
-
-#include "object.h"
-
-namespace smooth
-{
-	class SMOOTHAPI Timer : public Object
+	template <class t> class Method0 : public Method
 	{
 		private:
-			Window		*timerwnd;
-			Int		 timerid;
+			t	 method;
 		public:
-					 Timer();
-					~Timer();
+			Method0(t iMethod)
+			{
+				method = iMethod;
+			}
 
-			Int		 Start(Int);
-			Int		 Stop();
+			t GetMethod()
+			{
+				return method;
+			}
 
-			Int		 GetID();
-
-			Int		 Process(Int, Int, Int);
-
-			Int		 Show();
-			Int		 Hide();
-		signals:
-			Signal0<>	 onInterval;
+			Method *Copy()
+			{
+				return new Method0<t>(method);
+			}
 	};
-
-	SMOOTHVAR Int OBJ_TIMER;
 };
-
-#endif

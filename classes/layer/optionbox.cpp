@@ -25,14 +25,12 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_OPTIONBOX = S::Object::RequestObjectID();
 
-S::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iCode, ProcParam, Void *procParam)
+S::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iCode)
 {
 	type				= OBJ_OPTIONBOX;
 	objectProperties->text		= text;
 	variable			= var;
 	code				= iCode;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
 	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
 
 	if (*variable == code)	state = True;
@@ -286,7 +284,7 @@ S::Int S::OptionBox::Process(Int message, Int wParam, Int lParam)
 						}
 					}
 
-					ProcCall(objectProperties->proc, objectProperties->procParam);
+					onClick.Emit();
 				}
 
 				retVal = Break;

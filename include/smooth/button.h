@@ -33,7 +33,7 @@ namespace smooth
 			HBITMAP		 bitmap;
 			Size		 bmpSize;
 		public:
-					 Button(String, HBITMAP, Point, Size, ProcParam, Void *);
+					 Button(String, HBITMAP, Point, Size);
 					~Button();
 
 			virtual Int	 Paint(Int);

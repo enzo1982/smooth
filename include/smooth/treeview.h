@@ -26,7 +26,7 @@ namespace smooth
 		private:
 			Int		 PaintTree(Tree *, Int, Rect);
 		public:
-					 TreeView(String, Point, Size, ProcParam, Void *);
+					 TreeView(String, Point, Size);
 					~TreeView();
 
 			virtual Int	 Paint(Int);

@@ -25,26 +25,23 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_ARROWS = S::Object::RequestObjectID();
 
-S::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart, Int rangeEnd, ProcParam, Void *procParam)
+S::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart, Int rangeEnd)
 {
-	type				= OBJ_ARROWS;
-	subtype				= sType;
+	type		= OBJ_ARROWS;
+	subtype		= sType;
 
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
+	arrow1Checked	= False;
+	arrow1Clicked	= False;
+	arrow2Checked	= False;
+	arrow2Clicked	= False;
 
-	arrow1Checked			= False;
-	arrow1Clicked			= False;
-	arrow2Checked			= False;
-	arrow2Clicked			= False;
+	startValue	= rangeStart;
+	endValue	= rangeEnd;
 
-	startValue			= rangeStart;
-	endValue			= rangeEnd;
+	variable	= var;
 
-	variable			= var;
-
-	timerActive			= False;
-	timer				= NIL;
+	timerActive	= False;
+	timer		= NIL;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -225,7 +222,7 @@ S::Int S::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				wnd->RegisterObject(timer);
 
-				timer->SetProc(Proc(&Arrows::TimerProc), this);
+				timer->onInterval.Connect(&Arrows::TimerProc, this);
 				timer->Start(250);
 
 				timerCount = 1;
@@ -247,7 +244,7 @@ S::Int S::Arrows::Process(Int message, Int wParam, Int lParam)
 				if (*variable < startValue)	*variable = startValue;
 				else if (*variable > endValue)	*variable = endValue;
 
-				if (*variable != prevValue) ProcCall(objectProperties->proc, objectProperties->procParam);
+				if (*variable != prevValue) onClick.Emit();
 
 				retVal = Break;
 			}
@@ -266,7 +263,7 @@ S::Int S::Arrows::Process(Int message, Int wParam, Int lParam)
 				if (*variable < startValue)	*variable = startValue;
 				else if (*variable > endValue)	*variable = endValue;
 
-				if (*variable != prevValue) ProcCall(objectProperties->proc, objectProperties->procParam);
+				if (*variable != prevValue) onClick.Emit();
 
 				retVal = Break;
 			}
@@ -483,7 +480,7 @@ S::Void S::Arrows::TimerProc()
 	if (*variable < startValue)	*variable = startValue;
 	else if (*variable > endValue)	*variable = endValue;
 
-	if (*variable != prevValue) ProcCall(objectProperties->proc, objectProperties->procParam);
+	if (*variable != prevValue) onClick.Emit();
 
 	timerCount++;
 }
@@ -499,7 +496,7 @@ S::Int S::Arrows::SetRange(Int rangeStart, Int rangeEnd)
 
 	*variable	= ((*variable) - prevStartValue) * ((endValue - startValue) / (prevEndValue - prevStartValue)) + startValue;
 
-	if (*variable != prevValue) ProcCall(objectProperties->proc, objectProperties->procParam);
+	if (*variable != prevValue) onClick.Emit();
 
 	return Success;
 }
@@ -513,7 +510,7 @@ S::Int S::Arrows::SetValue(Int newValue)
 
 	*variable = newValue;
 
-	ProcCall(objectProperties->proc, objectProperties->procParam);
+	onClick.Emit();
 
 	return Success;
 }

@@ -28,7 +28,7 @@ S::BackgroundApplication::BackgroundApplication()
 
 	backgroundWindow->RegisterObject(backgroundTimer);
 
-	backgroundTimer->SetProc(Proc(&BackgroundApplication::TimerProc), this);
+	backgroundTimer->onInterval.Connect(&BackgroundApplication::TimerProc, this);
 
 	backgroundWindow->Hide();
 

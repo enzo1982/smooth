@@ -31,7 +31,7 @@ namespace smooth
 			Int		 startValue;
 			Int		 endValue;
 		public:
-					 Slider(Point, Size, Int, Int *, Int, Int, ProcParam, Void *);
+					 Slider(Point, Size, Int, Int *, Int, Int);
 					~Slider();
 
 			virtual Int	 Paint(Int);

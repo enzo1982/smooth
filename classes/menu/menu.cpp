@@ -35,7 +35,7 @@ S::Menu::~Menu()
 	}
 }
 
-S::Menu::Entry *S::Menu::AddEntry(String text, HBITMAP bitmap, ProcParam, Void *procParam, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
+S::Menu::Entry *S::Menu::AddEntry(String text, HBITMAP bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
 {
 	Int	 id	= System::RequestGUID();
 	Int	 type	= SM_SEPARATOR;
@@ -47,8 +47,6 @@ S::Menu::Entry *S::Menu::AddEntry(String text, HBITMAP bitmap, ProcParam, Void *
 
 	newEntry->text		= text;
 	newEntry->orientation	= orientation;
-	newEntry->proc		= (ProcType) newProc;
-	newEntry->procParam	= procParam;
 	newEntry->bitmap	= DetectTransparentRegions(bitmap);
 	newEntry->graymap	= DetectTransparentRegions(GrayscaleBitmap(bitmap));
 	newEntry->popup		= popupMenu;

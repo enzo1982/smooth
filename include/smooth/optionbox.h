@@ -27,7 +27,7 @@ namespace smooth
 			Int		 code;
 			Bool		 state;
 		public:
-					 OptionBox(String, Point, Size, Int *, Int, ProcParam, Void *);
+					 OptionBox(String, Point, Size, Int *, Int);
 					~OptionBox();
 
 			virtual Int	 Paint(Int);

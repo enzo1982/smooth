@@ -14,10 +14,11 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - stk.cpp		- removed function CloseWindow(Window *)
 - colordlg.cpp		- color box now updates when the vertical hue selector is moved
 - system.cpp		- new class: includes basic functionality like GUIDs
+- array.cpp		- implemented static GetNthEntry method
 
 - new namespace: smooth alias S
 - new namespace: smooth::XML
 - ported the whole library to the new smooth namespace layout
 - added the pcitools (ras2pci and pci2ras)
 - TestKey now displays Unicode character codes
-- changed the way Procs are composed from 'class, instance, method' to '&class::method'
+- replaced the 'Procs' by a new Signals and Slots mechanism

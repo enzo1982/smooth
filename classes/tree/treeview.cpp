@@ -26,11 +26,9 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_TREEVIEW = S::Object::RequestObjectID();
 
-S::TreeView::TreeView(String name, Point pos, Size size, ProcParam, Void *procParam)
+S::TreeView::TreeView(String name, Point pos, Size size)
 {
 	type				= OBJ_TREEVIEW;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
 	objectProperties->text		= name;
 	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
 

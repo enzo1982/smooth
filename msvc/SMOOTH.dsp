@@ -560,6 +560,22 @@ SOURCE=..\include\smooth\templates\array\value.cpp
 SOURCE=..\include\smooth\templates\array\value.h
 # End Source File
 # End Group
+# Begin Group "signals_templates"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\signals\instance0.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\signals\method0.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\signals\signal0.h
+# End Source File
+# End Group
 # End Group
 # Begin Group "types"
 
@@ -595,6 +611,22 @@ SOURCE=..\include\smooth\xml\document.h
 # Begin Source File
 
 SOURCE=..\include\smooth\xml\node.h
+# End Source File
+# End Group
+# Begin Group "signals"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\signals\instance.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\signals\method.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\signals\signal.h
 # End Source File
 # End Group
 # Begin Source File
@@ -824,6 +856,10 @@ SOURCE=..\include\smooth\semaphore.h
 # Begin Source File
 
 SOURCE=..\include\smooth\shlobjmini.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\signals.h
 # End Source File
 # Begin Source File
 

@@ -45,6 +45,7 @@ namespace smooth
 
 			ThreadProcMember;
 			Void		 (*altproc)(Thread *);
+			Void		*instance;
 		public:
 			static Int	 counter;
 

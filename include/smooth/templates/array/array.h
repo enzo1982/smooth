@@ -15,7 +15,15 @@
 
 namespace smooth
 {
-	template <class t> class Array
+	class Array_Base
+	{
+		public:
+			virtual	~Array_Base()
+			{
+			}
+	};
+
+	template <class t> class Array : public Array_Base
 	{
 		private:
 			Int		 nOfEntries;
@@ -54,6 +62,9 @@ namespace smooth
 			t		 GetPrevEntry();
 			t		 GetNthEntry(Int);
 			Int		 GetNthEntryIndex(Int);
+
+			static Int	 GetNOfEntries(const Array<t> *);
+			static t	 GetNthEntry(const Array<t> *, Int);
 	};
 };
 

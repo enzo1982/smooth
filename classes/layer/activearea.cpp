@@ -23,12 +23,10 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_ACTIVEAREA = S::Object::RequestObjectID();
 
-S::ActiveArea::ActiveArea(Int color, Point pos, Size size, ProcParam, Void *procParam)
+S::ActiveArea::ActiveArea(Int color, Point pos, Size size)
 {
-	type				= OBJ_ACTIVEAREA;
-	areaColor			= color;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
+	type		= OBJ_ACTIVEAREA;
+	areaColor	= color;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -107,7 +105,7 @@ S::Int S::ActiveArea::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDOWN:
 			if (IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				ProcCall(objectProperties->proc, objectProperties->procParam);
+				onClick.Emit();
 
 				retVal = Break;
 			}

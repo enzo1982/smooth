@@ -24,6 +24,7 @@ namespace smooth
 #include "objecttype.h"
 #include "point.h"
 #include "size.h"
+#include "signals.h"
 
 namespace smooth
 {
@@ -79,7 +80,6 @@ namespace smooth
 			virtual Int		 SetTooltip(String);
 			virtual String		 GetTooltip();
 
-			virtual Int		 SetProc(ProcParam, Void *);
 			virtual Int		 SetFont(String, Int, Int, Int);
 			virtual Int		 SetOrientation(Int);
 			virtual Int		 SetPosition(Point);
@@ -109,6 +109,8 @@ namespace smooth
 
 			static Int		 RequestObjectID();
 			static Int		 RequestObjectHandle();
+		signals:
+			Signal0<>		 onClick;
 	};
 
 	SMOOTHVAR Int OBJ_OBJECT;

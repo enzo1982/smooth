@@ -13,13 +13,10 @@
 
 S::List::Entry::Entry(Int entryCode)
 {
-	code		= entryCode;
+	code	= entryCode;
 
-	proc		= NIL;
-	procParam	= NIL;
-
-	chk		= False;
-	clk		= False;
+	chk	= False;
+	clk	= False;
 }
 
 S::List::Entry::~Entry()

@@ -26,7 +26,7 @@ namespace smooth
 		protected:
 			Rect		 updateRect;
 		public:
-					 Client(ProcParam, Void *);
+					 Client();
 					~Client();
 
 			virtual Int	 Paint(Int);
@@ -37,6 +37,8 @@ namespace smooth
 
 			virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
 			virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+		signals:
+			Signal0<>	 onPaint;
 	};
 
 	SMOOTHVAR Int OBJ_CLIENT;

@@ -29,12 +29,10 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_LISTBOX = S::Object::RequestObjectID();
 
-S::ListBox::ListBox(Point pos, Size size, ProcParam, Void *procParam)
+S::ListBox::ListBox(Point pos, Size size)
 {
-	type				= OBJ_LISTBOX;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
-	entryCount			= -1;
+	type		= OBJ_LISTBOX;
+	entryCount	= -1;
 
 	needScrollbar		= False;
 	scrollbar		= NIL;
@@ -74,20 +72,20 @@ S::Int S::ListBox::AllowReselect(Bool value)
 	return Success;
 }
 
-S::List::Entry *S::ListBox::AddEntry(String name, ProcParam, Void *procParam)
+S::List::Entry *S::ListBox::AddEntry(String name)
 {
 	entryCount++;
 
-	Entry *newEntry = AddListEntry(entryCount, name, newProc, procParam);
+	Entry *newEntry = AddListEntry(entryCount, name);
 
 	Paint(SP_UPDATE);
 
 	return newEntry;
 }
 
-S::Int S::ListBox::ModifyEntry(Int code, String name, ProcParam, Void *procParam)
+S::Int S::ListBox::ModifyEntry(Int code, String name)
 {
-	if (ModifyListEntry(code, name, newProc, procParam) == Success)
+	if (ModifyListEntry(code, name) == Success)
 	{
 		Paint(SP_PAINT);
 
@@ -248,7 +246,9 @@ S::Int S::ListBox::Paint(Int message)
 
 					SetMeasurement(SMT_PIXELS);
 
-					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, nOfEntries - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT), Proc(&ListBox::ScrollbarProc), this);
+					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, nOfEntries - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
+
+					scrollbar->onClick.Connect(&ListBox::ScrollbarProc, this);
 
 					SMOOTH::Setup::FontSize = oldMeasurement;
 
@@ -494,8 +494,8 @@ S::Int S::ListBox::Process(Int message, Int wParam, Int lParam)
 						operat->rect.right--;
 						operat->rect.bottom--;
 
-						ProcCall(objectProperties->proc, objectProperties->procParam);
-						ProcCall(operat->proc, operat->procParam);
+						onClick.Emit();
+						operat->onClick.Emit();
 					}
 
 					retVal = Break;

@@ -33,7 +33,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_EDITBOX = S::Object::RequestObjectID();
 
-S::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMaxSize, ProcParam, Void *procParam)
+S::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMaxSize)
 {
 	type				= OBJ_EDITBOX;
 	objectProperties->text		= text;
@@ -42,8 +42,6 @@ S::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMaxSize
 	markStart			= 0;
 	markEnd				= 0;
 	leftCut				= 0;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
 	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
 	subtype				= subType;
 	maxSize				= iMaxSize;
@@ -369,7 +367,7 @@ S::Int S::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				wnd->RegisterObject(timer);
 
-				timer->SetProc(Proc(&EditBox::TimerProc), this);
+				timer->onInterval.Connect(&EditBox::TimerProc, this);
 				timer->Start(500);
 			}
 
@@ -777,7 +775,7 @@ S::Int S::EditBox::SetText(String txt)
 	{
 		Paint(SP_PAINT);
 
-		ProcCall(objectProperties->proc, objectProperties->procParam);
+		onClick.Emit();
 	}
 
 	return Success;

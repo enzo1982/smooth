@@ -69,4 +69,16 @@ template <class t> inline S::Array_Entry<t> *S::Array_Entry<t>::GetPrev()
 	else		return ARRAY_NULLPOINTER;
 }
 
+template <class t> S::Array_Entry<t> *S::Array_Entry<t>::GetNext(const Array_Entry<t> *entry)
+{
+	if (entry->gotNext)	return entry->nextEntry;
+	else			return ARRAY_NULLPOINTER;
+}
+
+template <class t> S::Array_Entry<t> *S::Array_Entry<t>::GetPrev(const Array_Entry<t> *entry)
+{
+	if (entry->gotPrev)	return entry->prevEntry;
+	else			return ARRAY_NULLPOINTER;
+}
+
 #endif

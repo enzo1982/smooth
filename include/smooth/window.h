@@ -83,10 +83,6 @@ namespace smooth
 
 			KillProcMember;
 			Void		*killProcParam;
-			PaintProcMember;
-			Void		*paintProcParam;
-			PeekProcMember;
-			Void		*peekProcParam;
 			MessageProcMember;
 			Void		*messageProcParam;
 
@@ -121,9 +117,7 @@ namespace smooth
 			Int		 SetStatusText(String);
 			String		 GetStatusText();
 
-			Void		 SetPaintProc(ProcParam, Void *);
 			Void		 SetKillProc(KillProcParam, Void *);
-			Void		 SetPeekProc(ProcParam, Void *);
 			Void		 SetMessageProc(MessageProcParam, Void *);
 
 			Rect		 GetUpdateRect();
@@ -145,6 +139,9 @@ namespace smooth
 
 			Int		 RegisterObject(Object *);
 			Int		 UnregisterObject(Object *);
+		signals:
+			Signal0<>	 onPaint;
+			Signal0<>	 onPeek;
 	};
 
 	SMOOTHVAR Int OBJ_WINDOW;

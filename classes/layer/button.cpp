@@ -27,15 +27,13 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_BUTTON = S::Object::RequestObjectID();
 
-S::Button::Button(String text, HBITMAP bmp, Point pos, Size size, ProcParam, Void *procParam)
+S::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
 {
-	type				= OBJ_BUTTON;
-	objectProperties->text		= text;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
-	bitmap				= DetectTransparentRegions(bmp);
-	tipTimer			= NIL;
-	tooltip				= NIL;
+	type			= OBJ_BUTTON;
+	objectProperties->text	= text;
+	bitmap			= DetectTransparentRegions(bmp);
+	tipTimer		= NIL;
+	tooltip			= NIL;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -280,7 +278,7 @@ S::Int S::Button::Process(Int message, Int wParam, Int lParam)
 				Paint(SP_MOUSEUP);
 				Process(SM_MOUSEMOVE, 0, 0);
 
-				ProcCall(objectProperties->proc, objectProperties->procParam);
+				onClick.Emit();
 
 				retVal = Break;
 			}
@@ -331,7 +329,7 @@ S::Int S::Button::Process(Int message, Int wParam, Int lParam)
 
 					wnd->RegisterObject(tipTimer);
 
-					tipTimer->SetProc(Proc(&Button::ActivateTooltip), this);
+					tipTimer->onInterval.Connect(&Button::ActivateTooltip, this);
 					tipTimer->Start(500);
 				}
 			}

@@ -30,45 +30,43 @@ namespace smooth
 		public: class SMOOTHAPI Entry
 		{
 			public:
-				Int	 type;
-				Int	 id;
+				Int		 type;
+				Int		 id;
 
-				String	 text;
-				String	 tooltip;
-				String	 description;
+				String		 text;
+				String		 tooltip;
+				String		 description;
 
-				HBITMAP	 bitmap;
-				HBITMAP	 graymap;
+				HBITMAP		 bitmap;
+				HBITMAP		 graymap;
 
-				Int	 orientation;
+				Int		 orientation;
 
-				Bool	 checked;
-				Bool	 clicked;
+				Bool		 checked;
+				Bool		 clicked;
 
-				ProcMember;
-				Void	*procParam;
+				Bool		*bVar;
+				Int		*iVar;
+				Int		 iCode;
 
-				Bool	*bVar;
-				Int	*iVar;
-				Int	 iCode;
+				Menu		*popup;
 
-				Menu	*popup;
+				Int		 size;
+				Bool		 sizeset;
+				Rect		 rect;
 
-				Int	 size;
-				Bool	 sizeset;
-				Rect	 rect;
+						 Entry(Int, Int);
+						~Entry();
 
-					 Entry(Int, Int);
-					~Entry();
+				Int		 SetText(String);
+				Int		 SetTooltip(String);
+				Int		 SetStatusText(String);
 
-				Int	 SetText(String);
-				Int	 SetTooltip(String);
-				Int	 SetStatusText(String);
+				Int		 SetBitmap(HBITMAP);
 
-				Int	 SetBitmap(HBITMAP);
-
-				Int	 SetOrientation(Int);
-				Int	 SetProc(ProcParam, Void *);
+				Int		 SetOrientation(Int);
+			signals:
+				Signal0<>	 onClick;
 		};
 
 		protected:
@@ -85,7 +83,7 @@ namespace smooth
 					 Menu();
 					~Menu();
 
-			Entry		*AddEntry(String text = NIL, HBITMAP bitmap = NIL, ProcParam = NIL, Void *procParam = NIL, Menu *popupMenu = NIL, Bool *bVar = NIL, Int *iVar = NIL, Int iCode = 0, Int orientation = OR_LEFT);
+			Entry		*AddEntry(String text = NIL, HBITMAP bitmap = NIL, Menu *popupMenu = NIL, Bool *bVar = NIL, Int *iVar = NIL, Int iCode = 0, Int orientation = OR_LEFT);
 			Int		 RemoveEntry(Entry *);
 			Int		 RemoveEntry(Int);
 

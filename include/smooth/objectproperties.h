@@ -44,9 +44,6 @@ namespace smooth
 			Bool		 clicked;
 			Bool		 checked;
 
-			ProcMember;
-			Void		*procParam;
-
 					 ObjectProperties();
 	};
 };

@@ -25,9 +25,6 @@ S::Menu::Entry::Entry(Int newType, Int newID)
 	checked		= False;
 	clicked		= False;
 
-	proc		= NIL;
-	procParam	= NIL;
-
 	bVar		= NIL;
 	iVar		= NIL;
 
@@ -75,14 +72,6 @@ S::Int S::Menu::Entry::SetBitmap(HBITMAP newBitmap)
 		bitmap = DetectTransparentRegions(newBitmap);
 		graymap = DetectTransparentRegions(GrayscaleBitmap(newBitmap));
 	}
-
-	return Success;
-}
-
-S::Int S::Menu::Entry::SetProc(ProcParam, Void *newProcParam)
-{
-	proc = (ProcType) newProc;
-	procParam = newProcParam;
 
 	return Success;
 }

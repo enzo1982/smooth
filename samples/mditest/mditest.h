@@ -28,6 +28,7 @@ class MDITest : public Application
 				 MDITest();
 				~MDITest();
 		Bool		 ExitProc();
+		Void		 Close();
 		Void		 NewMDI();
 };
 

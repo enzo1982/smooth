@@ -77,12 +77,14 @@ S::DialogColorSelection::DialogColorSelection()
 
 	titlebar	= new Titlebar(false, false, true);
 	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
-	okbtn		= new Button(TXT_OK, NIL, bp, bs, Proc(&DialogColorSelection::ColorDlgOK), this);
+	okbtn		= new Button(TXT_OK, NIL, bp, bs);
+	okbtn->onClick.Connect(&DialogColorSelection::ColorDlgOK, this);
 	okbtn->SetOrientation(OR_LOWERRIGHT);
 
 	bp.x = 175;
 
-	cancelbtn = new Button(TXT_CANCEL, NIL, bp, bs, Proc(&DialogColorSelection::ColorDlgCancel), this);
+	cancelbtn = new Button(TXT_CANCEL, NIL, bp, bs);
+	cancelbtn->onClick.Connect(&DialogColorSelection::ColorDlgCancel, this);
 	cancelbtn->SetOrientation(OR_LOWERRIGHT);
 
 	bp.x = 174;
@@ -90,32 +92,38 @@ S::DialogColorSelection::DialogColorSelection()
 	bs.cx = 129;
 	bs.cy = 0;
 
-	hueslider = new Slider(bp, bs, OR_HORZ, &acthue, 0, 255, Proc(&DialogColorSelection::ColorDlgHueSlider), this);
+	hueslider = new Slider(bp, bs, OR_HORZ, &acthue, 0, 255);
+	hueslider->onClick.Connect(&DialogColorSelection::ColorDlgHueSlider, this);
 	hueslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	satslider = new Slider(bp, bs, OR_HORZ, &actsat, 0, 255, Proc(&DialogColorSelection::ColorDlgSatSlider), this);
+	satslider = new Slider(bp, bs, OR_HORZ, &actsat, 0, 255);
+	satslider->onClick.Connect(&DialogColorSelection::ColorDlgSatSlider, this);
 	satslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	valslider = new Slider(bp, bs, OR_HORZ, &actval, 0, 255, Proc(&DialogColorSelection::ColorDlgValSlider), this);
+	valslider = new Slider(bp, bs, OR_HORZ, &actval, 0, 255);
+	valslider->onClick.Connect(&DialogColorSelection::ColorDlgValSlider, this);
 	valslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	redslider = new Slider(bp, bs, OR_HORZ, &actred, 0, 255, Proc(&DialogColorSelection::ColorDlgRedSlider), this);
+	redslider = new Slider(bp, bs, OR_HORZ, &actred, 0, 255);
+	redslider->onClick.Connect(&DialogColorSelection::ColorDlgRedSlider, this);
 	redslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	greenslider = new Slider(bp, bs, OR_HORZ, &actgreen, 0, 255, Proc(&DialogColorSelection::ColorDlgGreenSlider), this);
+	greenslider = new Slider(bp, bs, OR_HORZ, &actgreen, 0, 255);
+	greenslider->onClick.Connect(&DialogColorSelection::ColorDlgGreenSlider, this);
 	greenslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	blueslider = new Slider(bp, bs, OR_HORZ, &actblue, 0, 255, Proc(&DialogColorSelection::ColorDlgBlueSlider), this);
+	blueslider = new Slider(bp, bs, OR_HORZ, &actblue, 0, 255);
+	blueslider->onClick.Connect(&DialogColorSelection::ColorDlgBlueSlider, this);
 	blueslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.x = 189;
@@ -187,39 +195,46 @@ S::DialogColorSelection::DialogColorSelection()
 	bs.cx = 30;
 	bs.cy = 0;
 
-	hueedit = new EditBox(String::IntToString(acthue), bp, bs, EDB_NUMERIC, 3, Proc(&DialogColorSelection::ColorDlgHueEdit), this);
+	hueedit = new EditBox(String::IntToString(acthue), bp, bs, EDB_NUMERIC, 3);
+	hueedit->onClick.Connect(&DialogColorSelection::ColorDlgHueEdit, this);
 	hueedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	satedit = new EditBox(String::IntToString(actsat), bp, bs, EDB_NUMERIC, 3, Proc(&DialogColorSelection::ColorDlgSatEdit), this);
+	satedit = new EditBox(String::IntToString(actsat), bp, bs, EDB_NUMERIC, 3);
+	satedit->onClick.Connect(&DialogColorSelection::ColorDlgSatEdit, this);
 	satedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	valedit = new EditBox(String::IntToString(actval), bp, bs, EDB_NUMERIC, 3, Proc(&DialogColorSelection::ColorDlgValEdit), this);
+	valedit = new EditBox(String::IntToString(actval), bp, bs, EDB_NUMERIC, 3);
+	valedit->onClick.Connect(&DialogColorSelection::ColorDlgValEdit, this);
 	valedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	rededit = new EditBox(String::IntToString(actred), bp, bs, EDB_NUMERIC, 3, Proc(&DialogColorSelection::ColorDlgRedEdit), this);
+	rededit = new EditBox(String::IntToString(actred), bp, bs, EDB_NUMERIC, 3);
+	rededit->onClick.Connect(&DialogColorSelection::ColorDlgRedEdit, this);
 	rededit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	greenedit = new EditBox(String::IntToString(actgreen), bp, bs, EDB_NUMERIC, 3, Proc(&DialogColorSelection::ColorDlgGreenEdit), this);
+	greenedit = new EditBox(String::IntToString(actgreen), bp, bs, EDB_NUMERIC, 3);
+	greenedit->onClick.Connect(&DialogColorSelection::ColorDlgGreenEdit, this);
 	greenedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	blueedit = new EditBox(String::IntToString(actblue), bp, bs, EDB_NUMERIC, 3, Proc(&DialogColorSelection::ColorDlgBlueEdit), this);
+	blueedit = new EditBox(String::IntToString(actblue), bp, bs, EDB_NUMERIC, 3);
+	blueedit->onClick.Connect(&DialogColorSelection::ColorDlgBlueEdit, this);
 	blueedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.x += 40;
 	bp.y += 26;
 	bs.cx += 40;
 
-	hexedit = new EditBox(hexval, bp, bs, EDB_ALPHANUMERIC, 7, Proc(&DialogColorSelection::ColorDlgHexEdit), this);
+	hexedit = new EditBox(hexval, bp, bs, EDB_ALPHANUMERIC, 7);
+	hexedit->onClick.Connect(&DialogColorSelection::ColorDlgHexEdit, this);
 	hexedit->SetOrientation(OR_UPPERRIGHT);
 
 	huecapt = false;
@@ -259,7 +274,7 @@ S::DialogColorSelection::DialogColorSelection()
 
 	dlgwnd->SetMetrics(Point(100, 100), Size(436, 286));
 
-	dlgwnd->SetPaintProc(Proc(&DialogColorSelection::ColorDlgPaintProc), this);
+	dlgwnd->onPaint.Connect(&DialogColorSelection::ColorDlgPaintProc, this);
 	dlgwnd->SetMessageProc(MessageProc(&DialogColorSelection::ColorDlgMessageProc), this);
 	dlgwnd->SetKillProc(KillProc(&DialogColorSelection::ColorDlgKillProc), this);
 }

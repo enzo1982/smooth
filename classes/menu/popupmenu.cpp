@@ -160,12 +160,11 @@ S::Void S::PopupMenu::MenuToPopup(Menu *menu)
 	for (Int i = 0; i < menu->entries.GetNOfEntries(); i++)
 	{
 		Menu::Entry	*entry		= menu->entries.GetNthEntry(i);
-		Menu::Entry	*newEntry	= AddEntry(entry->text, entry->bitmap, NULLPROC, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->orientation);
+		Menu::Entry	*newEntry	= AddEntry(entry->text, entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->orientation);
 
 		newEntry->tooltip = entry->tooltip;
 		newEntry->description = entry->description;
 
-		newEntry->proc = entry->proc;
-		newEntry->procParam = entry->procParam;
+		newEntry->onClick = *(new Signal0<>(entry->onClick));
 	}
 }

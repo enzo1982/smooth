@@ -62,7 +62,7 @@ class Test : public Application
 
 		Thread		*messageBoxThread;
 
-		Void		 mainWnd_KillProc(Bool *);
+		Bool		 mainWnd_KillProc();
 		void		 mainApp_InfoProc();
 		void		 mainApp_ScrollbarProc();
 		void		 ShowEdb();

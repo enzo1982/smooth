@@ -33,13 +33,11 @@ S::List::~List()
 	entries.DeleteAll();
 }
 
-S::List::Entry *S::List::AddListEntry(Int code, String text, ProcParam, Void *procParam)
+S::List::Entry *S::List::AddListEntry(Int code, String text)
 {
 	List::Entry	*newEntry = new List::Entry(code);
 
-	newEntry->text		= text;
-	newEntry->proc		= (ProcType) newProc;
-	newEntry->procParam	= procParam;
+	newEntry->text = text;
 
 	if (entries.AddEntry(newEntry, code) == True)
 	{
@@ -57,15 +55,13 @@ S::List::Entry *S::List::AddListEntry(Int code, String text, ProcParam, Void *pr
 	}
 }
 
-S::Int S::List::ModifyListEntry(Int code, String text, ProcParam, Void *procParam)
+S::Int S::List::ModifyListEntry(Int code, String text)
 {
 	List::Entry	*entry = entries.GetEntry(code);
 
 	if (entry != NIL)
 	{
-		entry->text		= text;
-		entry->proc		= (ProcType) newProc;
-		entry->procParam	= procParam;
+		entry->text = text;
 
 		entrysizesset = False;
 

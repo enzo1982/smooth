@@ -117,7 +117,7 @@ S::Int S::Tooltip::Show()
 
 		wnd->RegisterObject(timer);
 
-		timer->SetProc(Proc(&Tooltip::TimerProc), this);
+		timer->onInterval.Connect(&Tooltip::TimerProc, this);
 		timer->Start(timeOut);
 	}
 

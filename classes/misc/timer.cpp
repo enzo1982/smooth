@@ -107,7 +107,7 @@ S::Int S::Timer::Process(Int message, Int wParam, Int lParam)
 		case SM_TIMER:
 			if (wParam == timerid)
 			{
-				ProcCall(objectProperties->proc, objectProperties->procParam);
+				onInterval.Emit();
 
 				retVal = Break;
 			}

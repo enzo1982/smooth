@@ -38,7 +38,8 @@ Translator::Translator()
 	pos.x = 7;
 	pos.y = 6;
 
-	button_new	= new Button("New", NULL, pos, size, Proc(&Translator::NewEntry), this);
+	button_new	= new Button("New", NULL, pos, size);
+	button_new->onClick.Connect(&Translator::NewEntry, this);
 
 	pos.x += 87;
 	pos.y += 4;
@@ -50,7 +51,7 @@ Translator::Translator()
 	size.cx = 37;
 	size.cy = 0;
 
-	edit_id		= new EditBox("", pos, size, EDB_NUMERIC, 5, NULLPROC);
+	edit_id		= new EditBox("", pos, size, EDB_NUMERIC, 5);
 
 	pos.x += 44;
 	pos.y += 3;
@@ -62,7 +63,7 @@ Translator::Translator()
 	size.cx = 158;
 	size.cy = 0;
 
-	edit_original	= new EditBox("", pos, size, EDB_ALPHANUMERIC, 0, NULLPROC);
+	edit_original	= new EditBox("", pos, size, EDB_ALPHANUMERIC, 0);
 
 	pos.x += 165;
 	pos.y += 3;
@@ -72,38 +73,41 @@ Translator::Translator()
 	pos.x += 62;
 	pos.y -= 3;
 
-	edit_translated	= new EditBox("", pos, size, EDB_ALPHANUMERIC, 0, NULLPROC);
+	edit_translated	= new EditBox("", pos, size, EDB_ALPHANUMERIC, 0);
 
 	pos.x += 166;
 	pos.y -= 1;
 	size.cx = 0;
 
-	button_save	= new Button("Save", NULL, pos, size, Proc(&Translator::SaveData), this);
+	button_save	= new Button("Save", NULL, pos, size);
+	button_save->onClick.Connect(&Translator::SaveData, this);
 
 	pos.x += 88;
 
-	button_remove	= new Button("Remove", NULL, pos, size, Proc(&Translator::RemoveEntry), this);
+	button_remove	= new Button("Remove", NULL, pos, size);
+	button_remove->onClick.Connect(&Translator::RemoveEntry, this);
 
 	pos.x = 7;
 	pos.y += 27;
 	size.cx = 757;
 	size.cy = 189;
 
-	list_entries	= new ListBox(pos, size, Proc(&Translator::SelectEntry), this);
+	list_entries	= new ListBox(pos, size);
+	list_entries->onClick.Connect(&Translator::SelectEntry, this);
 	list_entries->AllowReselect(True);
 
 	menu_file	= new PopupMenu();
 
-	menubar->AddEntry("&File", NIL, NULLPROC, menu_file);
+	menubar->AddEntry("&File", NIL, menu_file);
 
-	menu_file->AddEntry("&New", NIL, Proc(&Translator::NewFile), this);
-	menu_file->AddEntry("&Close", NIL, Proc(&Translator::Close), this);
+	menu_file->AddEntry("&New")->onClick.Connect(&Translator::NewFile, this);
+	menu_file->AddEntry("&Close")->onClick.Connect(&Translator::Close, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("&Open", NIL, Proc(&Translator::OpenFile), this);
-	menu_file->AddEntry("&Save", NIL, Proc(&Translator::SaveFile), this);
-	menu_file->AddEntry("Save &as", NIL, Proc(&Translator::SaveFileAs), this);
+	menu_file->AddEntry("&Open")->onClick.Connect(&Translator::OpenFile, this);
+	menu_file->AddEntry("&Save")->onClick.Connect(&Translator::SaveFile, this);
+	menu_file->AddEntry("Save &as")->onClick.Connect(&Translator::SaveFileAs, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("E&xit", NIL, Proc(wnd->*(&Window::Close)), wnd);
+	menu_file->AddEntry("E&xit")->onClick.Connect(&Translator::CloseApp, this);
 
 	text_id->Deactivate();
 	edit_id->Deactivate();
@@ -229,7 +233,7 @@ void Translator::NewFile()
 	list_entries->Activate();
 
 	{
-		int		 lid = list_entries->AddEntry("Program:", NULLPROC)->code;
+		int		 lid = list_entries->AddEntry("Program:")->code;
 		listEntry	*entry = new listEntry;
 
 		entry->listid = lid;
@@ -239,7 +243,7 @@ void Translator::NewFile()
 
 		entries.AddEntry(entry);
 
-		lid = list_entries->AddEntry("Version:", NULLPROC)->code;
+		lid = list_entries->AddEntry("Version:")->code;
 		entry = new listEntry;
 
 		entry->listid = lid;
@@ -249,7 +253,7 @@ void Translator::NewFile()
 
 		entries.AddEntry(entry);
 
-		lid = list_entries->AddEntry("Language:", NULLPROC)->code;
+		lid = list_entries->AddEntry("Language:")->code;
 		entry = new listEntry;
 
 		entry->listid = lid;
@@ -259,7 +263,7 @@ void Translator::NewFile()
 
 		entries.AddEntry(entry);
 
-		lid = list_entries->AddEntry("Author:", NULLPROC)->code;
+		lid = list_entries->AddEntry("Author:")->code;
 		entry = new listEntry;
 
 		entry->listid = lid;
@@ -269,7 +273,7 @@ void Translator::NewFile()
 
 		entries.AddEntry(entry);
 
-		lid = list_entries->AddEntry("URL:", NULLPROC)->code;
+		lid = list_entries->AddEntry("URL:")->code;
 		entry = new listEntry;
 
 		entry->listid = lid;
@@ -286,6 +290,13 @@ void Translator::NewFile()
 void Translator::Close()
 {
 	ExitProc();
+}
+
+void Translator::CloseApp()
+{
+	ExitProc();
+
+	wnd->Close();
 }
 
 void Translator::CloseFile()
@@ -372,7 +383,7 @@ void Translator::OpenFile()
 			{
 				entry->translation = info->GetNthNode(i)->GetContent();
 
-				list_entries->ModifyEntry(entry->listid, String(entry->original).Append(": ").Append(entry->translation), NULLPROC);
+				list_entries->ModifyEntry(entry->listid, String(entry->original).Append(": ").Append(entry->translation));
 			}
 		}
 
@@ -406,7 +417,7 @@ void Translator::OpenFile()
 
 				listEntry	*entry = new listEntry;
 
-				entry->listid = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append(" - ").Append(original).Append(" - ").Append(translation), NULLPROC)->code;
+				entry->listid = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append(" - ").Append(original).Append(" - ").Append(translation))->code;
 				entry->id = xentry->GetAttributeByName("id")->GetContent().ToInt();
 				entry->original = original;
 				entry->translation = translation;
@@ -508,7 +519,7 @@ void Translator::SaveData()
 
 		entry->translation = edit_translated->GetText();
 
-		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()));
 
 		entry = entries.GetNthEntry(1);
 
@@ -521,7 +532,7 @@ void Translator::SaveData()
 
 		entry->translation = edit_translated->GetText();
 
-		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()));
 
 		entry = entries.GetNthEntry(2);
 
@@ -534,7 +545,7 @@ void Translator::SaveData()
 
 		entry->translation = edit_translated->GetText();
 
-		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()));
 
 		entry = entries.GetNthEntry(3);
 
@@ -547,7 +558,7 @@ void Translator::SaveData()
 
 		entry->translation = edit_translated->GetText();
 
-		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()));
 
 		entry = entries.GetNthEntry(4);
 
@@ -560,7 +571,7 @@ void Translator::SaveData()
 
 		entry->translation = edit_translated->GetText();
 
-		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()));
 
 		text_id->Activate();
 		edit_id->Activate();
@@ -597,7 +608,7 @@ void Translator::SaveData()
 				entry->original = edit_original->GetText();
 				entry->translation = edit_translated->GetText();
 
-				list_entries->ModifyEntry(entry->listid, String(edit_id->GetText()).Append(" - ").Append(edit_original->GetText()).Append(" - ").Append(edit_translated->GetText()), NULLPROC);
+				list_entries->ModifyEntry(entry->listid, String(edit_id->GetText()).Append(" - ").Append(edit_original->GetText()).Append(" - ").Append(edit_translated->GetText()));
 
 				break;
 			}
@@ -605,7 +616,7 @@ void Translator::SaveData()
 
 		if (entry == NULL)
 		{
-			int	 lid = list_entries->AddEntry(String(edit_id->GetText()).Append(" - ").Append(edit_original->GetText()).Append(" - ").Append(edit_translated->GetText()), NULLPROC)->code;
+			int	 lid = list_entries->AddEntry(String(edit_id->GetText()).Append(" - ").Append(edit_original->GetText()).Append(" - ").Append(edit_translated->GetText()))->code;
 
 			entry = new listEntry;
 

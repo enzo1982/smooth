@@ -28,11 +28,9 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_CLIENT = S::Object::RequestObjectID();
 
-S::Client::Client(ProcParam, Void *procParam)
+S::Client::Client()
 {
 	type				= OBJ_CLIENT;
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= procParam;
 	objectProperties->orientation	= OR_CENTER;
 
 	possibleContainers.AddEntry(OBJ_WINDOW);
@@ -128,7 +126,7 @@ S::Int S::Client::Paint(Int message)
 		updateRect.right	= min(GetSize().cx - 1, updateRect.right) + 5;
 		updateRect.bottom	= min(GetSize().cy - 1, updateRect.bottom) + 5;
 
-		ProcCall(objectProperties->proc, objectProperties->procParam);
+		onPaint.Emit();
 	}
 	else
 	{

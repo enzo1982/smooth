@@ -36,11 +36,11 @@ namespace smooth
 
 			Void		 ScrollbarProc();
 		public:
-					 ListBox(Point, Size, ProcParam, Void *);
+					 ListBox(Point, Size);
 					~ListBox();
 
-			Entry		*AddEntry(String, ProcParam, Void *);
-			Int		 ModifyEntry(Int, String, ProcParam, Void *);
+			Entry		*AddEntry(String);
+			Int		 ModifyEntry(Int, String);
 			Int		 RemoveEntry(Int);
 			Int		 SelectEntry(Int);
 			Void		 Cleanup();

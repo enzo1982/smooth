@@ -28,25 +28,22 @@ S::Int	 S::Object::nextID = 0;
 
 S::Object::Object()
 {
-	objectProperties		= new ObjectProperties();
+	objectProperties	= new ObjectProperties();
 
-	handle				= RequestObjectHandle();
+	handle			= RequestObjectHandle();
 
-	type.object			= this;
-	type				= OBJ_OBJECT;
-	subtype				= 0;
+	type.object		= this;
+	type			= OBJ_OBJECT;
+	subtype			= 0;
 
-	objectProperties->proc		= NIL;
-	objectProperties->procParam	= NIL;
+	registered		= False;
+	visible			= False;
+	active			= True;
 
-	registered			= False;
-	visible				= False;
-	active				= True;
+	deleteObject		= False;
+	inUse			= 0;
 
-	deleteObject			= False;
-	inUse				= 0;
-
-	myContainer			= NIL;
+	myContainer		= NIL;
 
 	mainObjectManager->RegisterObject(this);
 }
@@ -196,14 +193,6 @@ S::Int S::Object::SetTooltip(String newTooltip)
 S::String S::Object::GetTooltip()
 {
 	return objectProperties->tooltip;
-}
-
-S::Int S::Object::SetProc(ProcParam, Void *newProcParam)
-{
-	objectProperties->proc		= (ProcType) newProc;
-	objectProperties->procParam	= newProcParam;
-
-	return Success;
 }
 
 S::Int S::Object::SetFont(String newFont, Int newFontSize, Int newFontColor, Int newFontWeight)

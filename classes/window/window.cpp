@@ -164,10 +164,6 @@ S::Window::Window(String title)
 
 	killProc		= NIL;
 	killProcParam		= NIL;
-	paintProc		= NIL;
-	paintProcParam		= NIL;
-	peekProc		= NIL;
-	peekProcParam		= NIL;
 	messageProc		= NIL;
 	messageProcParam	= NIL;
 
@@ -210,7 +206,7 @@ S::Window::~Window()
 		else					UnregisterClassA(className, hInstance);
 	}
 
-	if (peekProc != NIL) peekLoop--;
+	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop--;
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
@@ -245,20 +241,6 @@ S::Void S::Window::SetKillProc(KillProcParam, Void *procParam)
 {
 	killProc = (KillProcType) newProc;
 	killProcParam = procParam;
-}
-
-S::Void S::Window::SetPaintProc(ProcParam, Void *procParam)
-{
-	paintProc = (ProcType) newProc;
-	paintProcParam = procParam;
-}
-
-S::Void S::Window::SetPeekProc(ProcParam, Void *procParam)
-{
-	peekProc = (ProcType) newProc;
-	peekProcParam = procParam;
-
-	if (peekProc != NIL) peekLoop++;
 }
 
 S::Void S::Window::SetMessageProc(MessageProcParam, Void *procParam)
@@ -492,6 +474,8 @@ HWND S::Window::Create()
 		}
 	}
 
+	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop++;
+
 	return NIL;
 }
 
@@ -665,7 +649,7 @@ S::Int S::Window::Process(Int message, Int wParam, Int lParam)
 
 			return 0;
 		case SM_EXECUTEPEEK:
-			ProcCall(peekProc, peekProcParam);
+			onPeek.Emit();
 
 			LeaveProtectedRegion();
 
@@ -1031,7 +1015,7 @@ S::Int S::Window::Paint(Int message)
 			if (operat->IsVisible() && Affected(operat, updateRect)) operat->Paint(SP_PAINT);
 		}
 
-		ProcCall(paintProc, paintProcParam);
+		onPaint.Emit();
 
 		FreeContext(this, dc);
 	}

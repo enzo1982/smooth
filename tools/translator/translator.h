@@ -56,6 +56,7 @@ class Translator : public Application
 		Void		 SaveFileWithName(String);
 		Void		 NewFile();
 		Void		 Close();
+		Void		 CloseApp();
 		Void		 CloseFile();
 		Void		 SaveData();
 		Void		 SelectEntry();

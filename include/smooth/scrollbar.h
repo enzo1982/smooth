@@ -44,7 +44,7 @@ namespace smooth
 
 			Int		 mouseBias;
 		public:
-					 Scrollbar(Point, Size, Int, Int *, Int, Int, ProcParam, Void *);
+					 Scrollbar(Point, Size, Int, Int *, Int, Int);
 					~Scrollbar();
 
 			virtual Int	 Paint(Int);

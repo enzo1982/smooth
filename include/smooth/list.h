@@ -26,27 +26,27 @@ namespace smooth
 		public: class SMOOTHAPI Entry
 		{
 			public:
-				Int	 code;
-				ProcMember;
-				Void	*procParam;
-				String	 text;
+				Int		 code;
+				String		 text;
 
-				Bool	 chk;
-				Bool	 clk;
-				Int	 size;
-				Bool	 sizeset;
-				Rect	 rect;
+				Bool		 chk;
+				Bool		 clk;
+				Int		 size;
+				Bool		 sizeset;
+				Rect		 rect;
 
-					 Entry(Int);
-					~Entry();
+						 Entry(Int);
+						~Entry();
+			signals:
+				Signal0<>	 onClick;
 		};
 
 		protected:
 			Bool		 entrysizesset;
 			Int		 nOfEntries;
 
-			Entry		*AddListEntry(Int, String, ProcParam, Void *);
-			Int		 ModifyListEntry(Int, String, ProcParam, Void *);
+			Entry		*AddListEntry(Int, String);
+			Int		 ModifyListEntry(Int, String);
 			Int		 RemoveListEntry(Int);
 
 			Void		 GetSize();

@@ -607,4 +607,27 @@ template <class t> S::Int S::Array<t>::GetNthEntryIndex(Int n)
 	return entry->GetIndex();
 }
 
+template <class t> S::Int S::Array<t>::GetNOfEntries(const Array<t> *array)
+{
+	return array->nOfEntries;
+}
+
+template <class t> t S::Array<t>::GetNthEntry(const Array<t> *array, Int n)
+{
+	if (n >= array->nOfEntries) return ARRAY_NULLVALUE;
+
+	Array_Entry<t> *pEntry = array->firstEntry;
+
+	t	 ret = Array_Entry<t>::GetValue(pEntry);
+
+	for (Int i = 0; i < n; i++)
+	{
+		pEntry = Array_Entry<t>::GetNext(pEntry);
+
+		ret = Array_Entry<t>::GetValue(pEntry);
+	}
+
+	return ret;
+}
+
 #endif

@@ -34,11 +34,11 @@ MDITest::MDITest()
 	mainWnd_menubar		= new Menubar();
 	menu_file		= new PopupMenu();
 
-	menu_file->AddEntry("New", NIL, Proc(&MDITest::NewMDI), this);
+	menu_file->AddEntry("New")->onClick.Connect(&MDITest::NewMDI, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("Exit", NIL, Proc(mainWnd->*(&Window::Close)), mainWnd);
+	menu_file->AddEntry("Exit")->onClick.Connect(&MDITest::Close, this);
 
-	mainWnd_menubar->AddEntry("File", NIL, NULLPROC, menu_file);
+	mainWnd_menubar->AddEntry("File", NIL, menu_file);
 
 	RegisterObject(mainWnd);
 
@@ -81,6 +81,11 @@ Bool MDITest::ExitProc()
 		case IDNO:
 			return false;
 	}
+}
+
+Void MDITest::Close()
+{
+	mainWnd->Close();
 }
 
 Void MDITest::NewMDI()

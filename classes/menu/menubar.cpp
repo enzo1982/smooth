@@ -523,7 +523,7 @@ S::Int S::Menubar::Process(Int message, Int wParam, Int lParam)
 					operat->clicked = False;
 					Frame(dc, operat->rect, FRAME_UP);
 
-					if (operat->proc != NIL && operat->bVar == NIL && operat->iVar == NIL)
+					if (operat->onClick.GetNOfConnectedSlots() != 0 && operat->bVar == NIL && operat->iVar == NIL)
 					{
 						operat->checked = False;
 
@@ -535,7 +535,7 @@ S::Int S::Menubar::Process(Int message, Int wParam, Int lParam)
 						operat->rect.right--;
 						operat->rect.bottom--;
 
-						ProcCall(operat->proc, operat->procParam);
+						operat->onClick.Emit();
 
 						Process(SM_MOUSEMOVE, 0, 0);
 
@@ -551,7 +551,7 @@ S::Int S::Menubar::Process(Int message, Int wParam, Int lParam)
 					operat->clicked = False;
 					Frame(dc, operat->rect, FRAME_UP);
 
-					if (operat->proc != NIL && operat->bVar == NIL && operat->iVar == NIL)
+					if (operat->onClick.GetNOfConnectedSlots() != 0 && operat->bVar == NIL && operat->iVar == NIL)
 					{
 						operat->checked = False;
 
@@ -572,7 +572,7 @@ S::Int S::Menubar::Process(Int message, Int wParam, Int lParam)
 						if (style == MB_GRAYSCALE)	PaintBitmap(dc, bmprect, operat->graymap);
 						else				PaintBitmap(dc, bmprect, operat->bitmap);
 
-						ProcCall(operat->proc, operat->procParam);
+						operat->onClick.Emit();
 
 						Process(SM_MOUSEMOVE, 0, 0);
 

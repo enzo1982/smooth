@@ -356,7 +356,7 @@ S::Int S::PopupView::Process(Int message, Int wParam, Int lParam)
 			{
 				Menu::Entry	*entry = myPopup->entries.GetNthEntry(i);
 
-				if (entry->checked && (entry->proc != NIL && entry->bVar == NIL && entry->iVar == NIL))
+				if (entry->checked && (entry->onClick.GetNOfConnectedSlots() != 0 && entry->bVar == NIL && entry->iVar == NIL))
 				{
 					entry->checked = False;
 
@@ -372,7 +372,7 @@ S::Int S::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					PopupMenu::status = POPUP_FINISHED;
 
-					ProcCall(entry->proc, entry->procParam);
+					entry->onClick.Emit();
 
 					retVal = Break;
 
@@ -412,7 +412,7 @@ S::Int S::PopupView::Process(Int message, Int wParam, Int lParam)
 							}
 						}
 
-						ProcCall(entry->proc, entry->procParam);
+						entry->onClick.Emit();
 					}
 
 					retVal = Break;
@@ -452,7 +452,7 @@ S::Int S::PopupView::Process(Int message, Int wParam, Int lParam)
 							}
 						}
 
-						ProcCall(entry->proc, entry->procParam);
+						entry->onClick.Emit();
 					}
 
 					retVal = Break;

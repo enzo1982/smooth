@@ -26,7 +26,7 @@ namespace smooth
 			Bool		*variable;
 			Bool		 state;
 		public:
-					 CheckBox(String, Point, Size, Bool *, ProcParam, Void *);
+					 CheckBox(String, Point, Size, Bool *);
 					~CheckBox();
 
 			virtual Int	 Paint(Int);

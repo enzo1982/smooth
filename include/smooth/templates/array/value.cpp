@@ -66,4 +66,16 @@ template <class t> S::Bool S::Array_Value<t>::SetIndex(Int ind)
 	}
 }
 
+template <class t> t S::Array_Value<t>::GetValue(const Array_Value<t> *entry)
+{
+	if (entry->filled)	return entry->value;
+	else			return ARRAY_NULLVALUE;
+}
+
+template <class t> S::Int S::Array_Value<t>::GetIndex(const Array_Value<t> *entry)
+{
+	if (entry->filled)	return entry->index;
+	else			return -1;
+}
+
 #endif

@@ -71,7 +71,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	Point	 start;
 	Point	 end;
 	Int	 buttonColor;
-	HBITMAP	 icon = wnd->GetIcon();
+	Bitmap	 icon = wnd->GetIcon();
 
 	objectProperties->text = wnd->GetObjectProperties()->text;
 
@@ -109,7 +109,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 		iconRect.right	= iconRect.left + METRIC_TBICONSIZE;
 		iconRect.bottom	= iconRect.top + METRIC_TBICONSIZE;
 
-		surface->BlitFromBitmap(Bitmap(icon), Rect(Point(0, 0), Size(GetBitmapSizeX(icon), GetBitmapSizeY(icon))), iconRect);
+		surface->BlitFromBitmap(icon, Rect(Point(0, 0), icon.GetSize()), iconRect);
 	}
 
 	tButtonRect.left	= titleGradient.right - METRIC_TBBUTTONBOXOFFSETX + 1 + (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 2 * METRIC_TBBUTTONSIZE + 6);

@@ -42,6 +42,8 @@ namespace smooth
 				Bool operator		 ==(const int);
 				Bool operator		 !=(const int);
 		};
+
+		SMOOTHVAR S::GUI::BitmapNone SI_DEFAULT;
 	};
 };
 

@@ -56,6 +56,9 @@ namespace smooth
 				virtual Bool		 CreateBitmap(Int, Int, Int);
 				virtual Bool		 DeleteBitmap();
 
+				virtual Int		 GrayscaleBitmap();
+				virtual Int		 ReplaceColor(Int, Int);
+
 				virtual Int		 BlitFromSurface(Surface *, Rect, Rect);
 				virtual Int		 BlitToSurface(Rect, Surface *, Rect);
 

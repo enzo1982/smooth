@@ -24,6 +24,7 @@ namespace smooth
 
 #include "definitions.h"
 #include "application.h"
+#include "graphics/bitmap.h"
 
 namespace smooth
 {
@@ -32,11 +33,11 @@ namespace smooth
 		private:
 			static Int	 nOfSplashScreens;
 			Int		 time;
-			HBITMAP		 bitmap;
+			GUI::Bitmap	 bitmap;
 			GUI::Window	*splashscreen;
 			Timer		*timer;
 		public:
-					 SplashScreenApp(HBITMAP, Int);
+					 SplashScreenApp(const GUI::Bitmap &, Int);
 					~SplashScreenApp();
 			Void		 SplashPaintProc();
 			Bool		 SplashKillProc();

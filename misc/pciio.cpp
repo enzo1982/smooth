@@ -46,8 +46,14 @@ PCIIO::PCIIO(HBITMAP b)
 	colorspace = RGB;
 	quality = 100;
 	description = NIL;
-	sizex = GetBitmapSizeX(b);
-	sizey = GetBitmapSizeY(b);
+
+	BITMAP	 bitmap;
+
+	GetObjectA(b, sizeof(bitmap), &bitmap);
+
+	sizex = bitmap.bmWidth;
+	sizey = bitmap.bmHeight;
+
 	dpix = 75;
 	dpiy = 75;
 	bpcc = 8;

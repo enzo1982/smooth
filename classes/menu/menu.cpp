@@ -12,7 +12,7 @@
 #include <smooth/definitions.h>
 #include <smooth/array.h>
 #include <smooth/toolkit.h>
-#include <smooth/stk.h>
+#include <smooth/color.h>
 #include <smooth/system.h>
 #include <smooth/metrics.h>
 #include <smooth/i18n.h>
@@ -50,8 +50,13 @@ S::MenuEntry *S::Menu::AddEntry(String text, GUI::Bitmap bitmap, Menu *popupMenu
 
 	if (bitmap != NIL)
 	{
-		newEntry->bitmap	= GUI::Bitmap(DetectTransparentRegions(bitmap.GetBitmap()));
-		newEntry->graymap	= GUI::Bitmap(DetectTransparentRegions(GrayscaleBitmap(bitmap.GetBitmap())));
+		newEntry->bitmap	= bitmap;
+		newEntry->graymap	= bitmap;
+
+		newEntry->bitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+
+		newEntry->graymap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+		newEntry->graymap.GrayscaleBitmap();
 	}
 
 	newEntry->popup		= popupMenu;

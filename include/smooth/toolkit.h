@@ -21,8 +21,6 @@ int GetLineSizeX(S::String, int, S::String, int, int);
 int GetLineSizeY(S::String, S::String, int, int);
 
 #ifdef __SMOOTH_DLL__
-int		 GetBitmapSizeX		(HBITMAP);
-int		 GetBitmapSizeY		(HBITMAP);
 int		 GetTextSizeX		(S::String, int, S::String, int, int);
 int		 GetTextSizeX		(S::String, S::String, int, int);
 int		 GetTextSizeY		(S::String, S::String, int, int);
@@ -30,11 +28,6 @@ bool		 DoRectsOverlap		(S::Rect, S::Rect);
 S::Rect		 OverlapRect		(S::Rect, S::Rect);
 HDC		 GetContext		(S::GUI::Window *);
 void		 FreeContext		(S::GUI::Window *, HDC);
-HDC		 CreateCompatibleContext(HDC, S::Size);
-void		 FreeCompatibleContext	(HDC);
-HBITMAP		 BlitToBitmap		(HDC, S::Rect);
-bool		 BlitToBitmap		(S::Rect, HDC, S::Rect, HBITMAP);
-bool		 BlitFromBitmap		(S::Rect, HBITMAP, S::Rect, HDC);
 #endif
 
 #endif

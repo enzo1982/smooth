@@ -51,6 +51,8 @@ namespace smooth
 				Bool operator		 ==(const int);
 				Bool operator		 !=(const int);
 		};
+
+		SMOOTHVAR S::GUI::BitmapGDI SI_DEFAULT;
 	};
 };
 

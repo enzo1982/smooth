@@ -24,6 +24,7 @@
 #include <smooth/toolwindow.h>
 #include <smooth/timer.h>
 #include <smooth/stk.h>
+#include <smooth/color.h>
 #include <smooth/graphics/gdi/surfacegdi.h>
 #include <smooth/objectproperties.h>
 #include <smooth/menubar.h>
@@ -240,19 +241,24 @@ S::Void S::GUI::Window::SetExStyle(Int es)
 	if (!created) exstyle = exstyle | es;
 }
 
-S::Int S::GUI::Window::SetIcon(HBITMAP newicon)
+S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 {
-	if (newicon == SI_DEFAULT) newicon = (HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED);
+	Bitmap	 newIcon;
 
-	if (newicon != NIL)
+	if (&nIcon == &SI_DEFAULT)	newIcon = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
+	else				newIcon = nIcon;
+
+	if (newIcon != NIL)
 	{
-		if (GetBitmapSizeX(newicon) != 20 || GetBitmapSizeY(newicon) != 20)
+		if (newIcon.GetSize().cx != 20 || newIcon.GetSize().cy != 20)
 		{
 			return Error;
 		}
 		else
 		{
-			icon = DetectTransparentRegions(newicon);
+			icon = newIcon;
+
+			icon.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
 
 			return Success;
 		}
@@ -263,7 +269,7 @@ S::Int S::GUI::Window::SetIcon(HBITMAP newicon)
 	}
 }
 
-HBITMAP S::GUI::Window::GetIcon()
+S::GUI::Bitmap &S::GUI::Window::GetIcon()
 {
 	return icon;
 }

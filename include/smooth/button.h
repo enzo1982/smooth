@@ -23,6 +23,7 @@ namespace smooth
 };
 
 #include "widget.h"
+#include "graphics/bitmap.h"
 
 namespace smooth
 {
@@ -42,12 +43,12 @@ namespace smooth
 
 				Void			 ActivateTooltip();
 			protected:
-				HBITMAP			 bitmap;
+				Bitmap			 bitmap;
 				Size			 bmpSize;
 			public:
 				static const Int	 classID;
 
-							 Button(String, HBITMAP, Point, Size);
+							 Button(String, const Bitmap &, Point, Size);
 							~Button();
 
 				Int			 SetBackgroundColor(Int);

@@ -28,7 +28,7 @@ using namespace smooth::GUI;
 
 S::Int S::SplashScreenApp::nOfSplashScreens = 0;
 
-S::Int S::SMOOTH::SplashScreen(HBITMAP logo, Int time)
+S::Int S::SMOOTH::SplashScreen(const GUI::Bitmap &logo, Int time)
 {
 	Int		 rVal;
 	SplashScreenApp	*app = new SplashScreenApp(logo, time);
@@ -40,7 +40,7 @@ S::Int S::SMOOTH::SplashScreen(HBITMAP logo, Int time)
 	return rVal;
 }
 
-S::SplashScreenApp::SplashScreenApp(HBITMAP logo, Int t)
+S::SplashScreenApp::SplashScreenApp(const GUI::Bitmap &logo, Int t)
 {
 	splashscreen = new Window("Splash screen");
 
@@ -50,8 +50,8 @@ S::SplashScreenApp::SplashScreenApp(HBITMAP logo, Int t)
 
 	bitmap = logo;
 
-	splashscreen->GetObjectProperties()->size.cx = GetBitmapSizeX(bitmap) + 2;
-	splashscreen->GetObjectProperties()->size.cy = GetBitmapSizeY(bitmap) + 2;
+	splashscreen->GetObjectProperties()->size.cx = bitmap.GetSize().cx + 2;
+	splashscreen->GetObjectProperties()->size.cy = bitmap.GetSize().cy + 2;
 
 	RegisterObject(splashscreen);
 
@@ -80,7 +80,7 @@ S::SplashScreenApp::~SplashScreenApp()
 
 S::Int S::SplashScreenApp::ShowSplashScreen()
 {
-	int	 rval;
+	Int	 rVal;
 
 	nOfSplashScreens++;
 
@@ -90,22 +90,22 @@ S::Int S::SplashScreenApp::ShowSplashScreen()
 
 	splashscreen->value = 1;
 
-	rval = splashscreen->Stay();
+	rVal = splashscreen->Stay();
 
-	return rval;
+	return rVal;
 }
 
 S::Void S::SplashScreenApp::SplashPaintProc()
 {
 	Surface	*surface = splashscreen->GetDrawSurface();
-	Rect	 bmprect;
+	Rect	 bmpRect;
 
-	bmprect.left = 1;
-	bmprect.top = 1;
-	bmprect.right = GetBitmapSizeX(bitmap);
-	bmprect.bottom = GetBitmapSizeY(bitmap);
+	bmpRect.left	= 1;
+	bmpRect.top	= 1;
+	bmpRect.right	= bmpRect.left + bitmap.GetSize().cx;
+	bmpRect.bottom	= bmpRect.top + bitmap.GetSize().cy;
 
-	surface->BlitFromBitmap(Bitmap(bitmap), Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmprect);
+	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 }
 
 S::Bool S::SplashScreenApp::SplashKillProc()

@@ -60,24 +60,6 @@ void SHLObjMini_Deinit()
 	FreeLibrary(shelldll);
 }
 
-int GetBitmapSizeX(HBITMAP bmp)
-{
-	BITMAP	 bitmap;
-
-	GetObjectA(bmp, sizeof(bitmap), &bitmap);
-
-	return bitmap.bmWidth;
-}
-
-int GetBitmapSizeY(HBITMAP bmp)
-{
-	BITMAP	 bitmap;
-
-	GetObjectA(bmp, sizeof(bitmap), &bitmap);
-
-	return bitmap.bmHeight;
-}
-
 HDC GetContext(GUI::Window *wnd)
 {
 	int	 code = 0;
@@ -112,29 +94,6 @@ void FreeContext(GUI::Window *wnd, HDC hdc)
 		contexts.RemoveEntry(code);
 		contextCounts.RemoveEntry(code);
 	}
-}
-
-HDC CreateCompatibleContext(HDC origdc, Size bmpsize)
-{
-	HDC	 cdc = CreateCompatibleDC(origdc);
-	HBITMAP	 bmp = CreateCompatibleBitmap(origdc, bmpsize.cx, bmpsize.cy);
-	HBITMAP	 oldbmp;
-
-	oldbmp = (HBITMAP) SelectObject(cdc, bmp);
-
-	oldBitmaps.AddEntry(oldbmp, (int) cdc);
-
-	return cdc;
-}
-
-void FreeCompatibleContext(HDC cdc)
-{
-	HBITMAP	 bmp = (HBITMAP) SelectObject(cdc, oldBitmaps.GetEntry((int) cdc));
-
-	oldBitmaps.RemoveEntry((int) cdc);
-
-	::DeleteObject(bmp);
-	DeleteDC(cdc);
 }
 
 int GetTextSizeX(String text, String font, int size, int weight)
@@ -296,57 +255,4 @@ Rect OverlapRect(Rect rect1, Rect rect2)
 	}
 
 	return orect;
-}
-
-HBITMAP BlitToBitmap(HDC dc, Rect rect)
-{
-	HDC	 cdc = CreateCompatibleDC(dc);
-	HBITMAP	 newbmp;
-	HBITMAP	 backup;
-
-	newbmp = CreateCompatibleBitmap(dc, rect.right - rect.left + 1, rect.bottom - rect.top + 1);
-	backup = (HBITMAP) SelectObject(cdc, newbmp);
-
-	BitBlt(cdc, 0, 0, rect.right - rect.left + 1, rect.bottom - rect.top + 1, dc, rect.left, rect.top, SRCCOPY);
-
-	newbmp = (HBITMAP) SelectObject(cdc, backup);
-
-	DeleteDC(cdc);
-	::DeleteObject(backup);
-
-	return newbmp;
-}
-
-bool BlitToBitmap(Rect srcrect, HDC dc, Rect destrect, HBITMAP bmp)
-{
-	HDC	 cdc = CreateCompatibleDC(dc);
-	HBITMAP	 backup;
-
-	backup = (HBITMAP) SelectObject(cdc, bmp);
-
-	StretchBlt(cdc, destrect.left, destrect.top, destrect.right - destrect.left + 1, destrect.bottom - destrect.top + 1, dc, srcrect.left, srcrect.top, srcrect.right - srcrect.left + 1, srcrect.bottom - srcrect.top + 1, SRCCOPY);
-
-	bmp = (HBITMAP) SelectObject(cdc, backup);
-
-	DeleteDC(cdc);
-	::DeleteObject(backup);
-
-	return true;
-}
-
-bool BlitFromBitmap(Rect srcrect, HBITMAP bitmap, Rect destrect, HDC dc)
-{
-	HDC	 cdc = CreateCompatibleDC(dc);
-	HBITMAP	 backup;
-
-	backup = (HBITMAP) SelectObject(cdc, bitmap);
-
-	StretchBlt(dc, destrect.left, destrect.top, destrect.right - destrect.left + 1, destrect.bottom - destrect.top + 1, cdc, srcrect.left, srcrect.top, srcrect.right - srcrect.left + 1, srcrect.bottom - srcrect.top + 1, SRCCOPY);
-
-	bitmap = (HBITMAP) SelectObject(cdc, backup);
-
-	DeleteDC(cdc);
-	::DeleteObject(backup);
-
-	return true;
 }

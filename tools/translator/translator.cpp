@@ -38,7 +38,7 @@ Translator::Translator()
 	pos.x = 7;
 	pos.y = 6;
 
-	button_new	= new Button("New", NULL, pos, size);
+	button_new	= new Button("New", NIL, pos, size);
 	button_new->onClick.Connect(&Translator::NewEntry, this);
 
 	pos.x += 87;
@@ -80,12 +80,12 @@ Translator::Translator()
 	pos.y -= 1;
 	size.cx = 0;
 
-	button_save	= new Button("Save", NULL, pos, size);
+	button_save	= new Button("Save", NIL, pos, size);
 	button_save->onClick.Connect(&Translator::SaveData, this);
 
 	pos.x += 88;
 
-	button_remove	= new Button("Remove", NULL, pos, size);
+	button_remove	= new Button("Remove", NIL, pos, size);
 	button_remove->onClick.Connect(&Translator::RemoveEntry, this);
 
 	pos.x = 7;

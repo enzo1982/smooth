@@ -10,6 +10,7 @@ xx.12.03 xx:xx - smooth alpha 0.8.63.0
 - bitmap.cpp		- new class: Bitmap; abstraction of bitmap objects in memory
 - bitmapgdi.cpp		- new class: BitmapGDI; Bitmap implementation for Windows GDI surfaces
 
+- modified many APIs to use GUI::Bitmap instead of HBITMAP
 - removed obsolete friend declarations
 - changed classes directory layout
 - added support for right-to-left scripts like Arabic or Hebrew

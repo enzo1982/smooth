@@ -14,7 +14,7 @@
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
 #include <smooth/math.h>
-#include <smooth/stk.h>
+#include <smooth/color.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/graphics/surface.h>
@@ -33,12 +33,14 @@ S::GUI::Hyperlink::Hyperlink()
 	possibleContainers.AddEntry(Layer::classID);
 }
 
-S::GUI::Hyperlink::Hyperlink(String text, HBITMAP bitmap, String link, Point pos, Size size)
+S::GUI::Hyperlink::Hyperlink(String text, const Bitmap &bitmap, String link, Point pos, Size size)
 {
 	type			= classID;
 	objectProperties->text	= text;
 	linkURL			= link;
-	linkBitmap		= DetectTransparentRegions(bitmap);
+	linkBitmap		= bitmap;
+
+	linkBitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
 
 	objectProperties->font.SetUnderline(True);
 
@@ -51,8 +53,8 @@ S::GUI::Hyperlink::Hyperlink(String text, HBITMAP bitmap, String link, Point pos
 	{
 		if (size.cx == 0 && size.cy == 0)
 		{
-			objectProperties->size.cx = Math::Round(GetBitmapSizeX(linkBitmap) * Setup::FontSize);
-			objectProperties->size.cy = Math::Round(GetBitmapSizeY(linkBitmap) * Setup::FontSize);
+			objectProperties->size.cx = Math::Round(linkBitmap.GetSize().cx * Setup::FontSize);
+			objectProperties->size.cy = Math::Round(linkBitmap.GetSize().cy * Setup::FontSize);
 		}
 		else
 		{
@@ -139,9 +141,7 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 		textRect.right	= textRect.left + objectProperties->size.cx;
 		textRect.bottom	= textRect.top + objectProperties->size.cy;
 
-		Bitmap	 bmp(linkBitmap);
-
-		surface->BlitFromBitmap(bmp, Rect(Point(0, 0), Size(GetBitmapSizeX(linkBitmap), GetBitmapSizeY(linkBitmap))), textRect);
+		surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), textRect);
 	}
 
 	return Success;
@@ -210,10 +210,9 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-HBITMAP S::GUI::Hyperlink::GetBitmap()
+S::GUI::Bitmap &S::GUI::Hyperlink::GetBitmap()
 {
-	if (linkBitmap != NIL)	return linkBitmap;
-	else			return NIL;
+	return linkBitmap;
 }
 
 S::String S::GUI::Hyperlink::GetURL()
@@ -235,7 +234,7 @@ S::Int S::GUI::Hyperlink::SetURL(String newUrl)
 	return Success;
 }
 
-S::Int S::GUI::Hyperlink::SetBitmap(HBITMAP newBmp)
+S::Int S::GUI::Hyperlink::SetBitmap(const Bitmap &newBmp)
 {
 	return Error;
 }

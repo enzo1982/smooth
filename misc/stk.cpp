@@ -125,66 +125,6 @@ HBITMAP S::SMOOTH::LoadImage(String file, Int id, String name)
 
 	return bmp;
 }
-
-HBITMAP S::GrayscaleBitmap(HBITMAP bmp)
-{
-	if (bmp == NIL) return NIL;
-
-	int	 isx = GetBitmapSizeX(bmp);
-	int	 isy = GetBitmapSizeY(bmp);
-	HDC	 dc = GetContext(0);
-	HDC	 cdc = CreateCompatibleContext(dc, Size(isx, isy));
-	HBITMAP	 newbmp;
-	int	 col = 0;
-
-	BlitFromBitmap(Rect(Point(0, 0), Size(isx - 1, isy - 1)), bmp, Rect(Point(0, 0), Size(isx - 1, isy - 1)), cdc);
-
-	for (int y = 0; y < isx; y++)
-	{
-		for (int x = 0; x < isy; x++)
-		{
-			col = GetPixel(cdc, x, y);
-			col = (GetRed(col) + GetGreen(col) + GetBlue(col)) / 3;
-			col = RGB(col, col, col);
-			SetPixel(cdc, x, y, col);
-		}
-	}
-
-	newbmp = BlitToBitmap(cdc, Rect(Point(0, 0), Size(isx - 1, isy - 1)));
-
-	FreeCompatibleContext(cdc);
-	FreeContext(0, dc);
-
-	return newbmp;
-}
-
-HBITMAP S::DetectTransparentRegions(HBITMAP bmp)
-{
-	if (bmp == NIL) return NIL;
-
-	int		 isx = GetBitmapSizeX(bmp);
-	int		 isy = GetBitmapSizeY(bmp);
-	HDC		 dc = GetContext(0);
-	HDC		 cdc = CreateCompatibleContext(dc, Size(isx, isy));
-	HBITMAP		 newbmp;
-
-	BlitFromBitmap(Rect(Point(0, 0), Size(isx - 1, isy - 1)), bmp, Rect(Point(0, 0), Size(isx - 1, isy - 1)), cdc);
-
-	for (int y = 0; y < isx; y++)
-	{
-		for (int x = 0; x < isy; x++)
-		{
-			if (GetPixel(cdc, x, y) == RGB(192, 192, 192)) SetPixel(cdc, x, y, Setup::BackgroundColor);
-		}
-	}
-
-	newbmp = BlitToBitmap(cdc, Rect(Point(0, 0), Size(isx - 1, isy - 1)));
-
-	FreeCompatibleContext(cdc);
-	FreeContext(0, dc);
-
-	return newbmp;
-}
 #endif
 
 S::Bool S::LoadIconvDLL()

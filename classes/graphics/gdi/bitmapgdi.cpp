@@ -10,6 +10,8 @@
 
 #include <smooth/graphics/gdi/bitmapgdi.h>
 
+S::GUI::BitmapGDI	 S::GUI::SI_DEFAULT = S::GUI::BitmapGDI();
+
 S::GUI::BitmapGDI::BitmapGDI(HBITMAP iBitmap)
 {
 	type	= BITMAP_GDI;

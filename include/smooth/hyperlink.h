@@ -20,6 +20,7 @@ namespace smooth
 };
 
 #include "widget.h"
+#include "graphics/bitmap.h"
 
 namespace smooth
 {
@@ -29,12 +30,12 @@ namespace smooth
 		{
 			protected:
 				String			 linkURL;
-				HBITMAP			 linkBitmap;
+				Bitmap			 linkBitmap;
 			public:
 				static const Int	 classID;
 
 							 Hyperlink();
-							 Hyperlink(String, HBITMAP, String, Point, Size size = Size(0, 0));
+							 Hyperlink(String, const Bitmap &, String, Point, Size size = Size(0, 0));
 							~Hyperlink();
 
 				Int			 Hide();
@@ -42,11 +43,11 @@ namespace smooth
 				virtual Int		 Paint(Int);
 				Int			 Process(Int, Int, Int);
 
-				HBITMAP			 GetBitmap();
+				Bitmap			&GetBitmap();
 				String			 GetURL();
 
 				Int			 SetText(String);
-				Int			 SetBitmap(HBITMAP);
+				Int			 SetBitmap(const Bitmap &);
 				Int			 SetURL(String);
 		};
 	};

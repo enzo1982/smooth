@@ -10,7 +10,7 @@
 
 #include <smooth/menuentry.h>
 #include <smooth/definitions.h>
-#include <smooth/stk.h>
+#include <smooth/color.h>
 #include <smooth/graphics/bitmap.h>
 
 S::MenuEntry::MenuEntry(Int newType, Int newID)
@@ -77,10 +77,13 @@ S::Int S::MenuEntry::SetShortcut(Int nKey, Int nFlags)
 
 S::Int S::MenuEntry::SetBitmap(const GUI::Bitmap &newBitmap)
 {
-	GUI::Bitmap	 bmp = newBitmap;
+	bitmap	= newBitmap;
+	graymap	= newBitmap;
 
-	bitmap	= GUI::Bitmap(DetectTransparentRegions(bmp.GetBitmap()));
-	graymap	= GUI::Bitmap(DetectTransparentRegions(GrayscaleBitmap(bmp.GetBitmap())));
+	bitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+
+	graymap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+	graymap.GrayscaleBitmap();
 
 	return Success;
 }

@@ -10,6 +10,8 @@
 
 #include <smooth/graphics/none/bitmapnone.h>
 
+S::GUI::BitmapNone	 S::GUI::SI_DEFAULT = S::GUI::BitmapNone();
+
 S::GUI::BitmapNone::BitmapNone()
 {
 	type = BITMAP_NONE;

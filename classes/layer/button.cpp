@@ -15,7 +15,7 @@
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 #include <smooth/tooltip.h>
-#include <smooth/stk.h>
+#include <smooth/color.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
@@ -24,14 +24,16 @@
 
 const S::Int	 S::GUI::Button::classID = S::Object::RequestClassID();
 
-S::GUI::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
+S::GUI::Button::Button(String text, const Bitmap &bmp, Point pos, Size size)
 {
 	type			= classID;
 	objectProperties->text	= text;
-	bitmap			= DetectTransparentRegions(bmp);
+	bitmap			= bmp;
 	tipTimer		= NIL;
 	tooltip			= NIL;
 	backgroundColor		= -1;
+
+	bitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
 
 	possibleContainers.AddEntry(Layer::classID);
 
@@ -50,8 +52,8 @@ S::GUI::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
 	}
 	else
 	{
-		bmpSize.cx = Math::Round(GetBitmapSizeX(bitmap) * Setup::FontSize);
-		bmpSize.cy = Math::Round(GetBitmapSizeY(bitmap) * Setup::FontSize);
+		bmpSize.cx = Math::Round(bitmap.GetSize().cx * Setup::FontSize);
+		bmpSize.cy = Math::Round(bitmap.GetSize().cy * Setup::FontSize);
 	}
 
 	GetTextSize();
@@ -177,10 +179,8 @@ S::Int S::GUI::Button::Paint(Int message)
 					bmpRect.right	= bmpRect.left + bmpSize.cx;
 					bmpRect.bottom	= bmpRect.top + bmpSize.cy;
 				}
-
-				Bitmap	 bmp(bitmap);
 	
-				surface->BlitFromBitmap(bmp, Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmpRect);
+				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 			}
 
 			if (objectProperties->checked || (flags & BF_SHOWHIGHLIGHT))

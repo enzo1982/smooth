@@ -149,10 +149,6 @@ namespace smooth
 #define signals		public
 #define slots		public
 
-#ifdef __WIN32__
-const HBITMAP SI_DEFAULT		= (HBITMAP) -1;
-#endif
-
 const S::Int SM_MOUSEMOVE		= 1024;
 const S::Int SM_LBUTTONDOWN		= 1025;
 const S::Int SM_LBUTTONUP		= 1026;

@@ -27,6 +27,7 @@ namespace smooth
 #include "string.h"
 #include "rect.h"
 #include "i18n.h"
+#include "graphics/bitmap.h"
 
 #if defined MessageBox
 #undef MessageBox
@@ -54,15 +55,12 @@ namespace smooth
 
 			static Int		 MessageBox(String, String, Int, char *);
 			static Int		 MessageBox(String, String, Int, wchar_t *);
-			static Int		 SplashScreen(HBITMAP, Int);
+			static Int		 SplashScreen(const GUI::Bitmap &, Int);
 #endif
 	};
 
 #ifdef __SMOOTH_DLL__
 #ifdef __WIN32__
-	HBITMAP	 GrayscaleBitmap(HBITMAP);
-	HBITMAP	 DetectTransparentRegions(HBITMAP);
-
 	Bool	 Affected(GUI::Widget *, Rect &);
 #endif
 

@@ -33,6 +33,7 @@ namespace smooth
 #include "../loop.h"
 #include "../menu.h"
 #include "../timer.h"
+#include "bitmap.h"
 
 namespace smooth
 {
@@ -65,7 +66,7 @@ namespace smooth
 				Bool				 created;
 				Bool				 destroyed;
 
-				HBITMAP				 icon;
+				Bitmap				 icon;
 				HICON				 sysicon;
 
 				Rect				 innerOffset;
@@ -103,8 +104,8 @@ namespace smooth
 								 Window(String title = NIL);
 								~Window();
 
-				Int				 SetIcon(HBITMAP);
-				HBITMAP				 GetIcon();
+				Int				 SetIcon(const Bitmap &);
+				Bitmap				&GetIcon();
 
 				Int				 SetApplicationIcon(char *);
 				Int				 SetApplicationIcon(wchar_t *);

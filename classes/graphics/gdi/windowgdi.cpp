@@ -328,6 +328,11 @@ S::Int S::GUI::WindowGDI::Hide()
 	return Success;
 }
 
+S::Rect S::GUI::WindowGDI::GetRestoredWindowRect()
+{
+	return nonMaxRect;
+}
+
 S::Int S::GUI::WindowGDI::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	SetWindowPos(hwnd, 0, nPos.x, nPos.y, nSize.cx, nSize.cy, SWP_NOZORDER);

@@ -73,6 +73,11 @@ S::Int S::GUI::WindowBackend::Hide()
 	return Success;
 }
 
+S::Rect S::GUI::WindowBackend::GetRestoredWindowRect()
+{
+	return Rect();
+}
+
 S::Int S::GUI::WindowBackend::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	return Success;

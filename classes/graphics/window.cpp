@@ -126,12 +126,12 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	updateRect = Rect();
 
+	if (created) backend->SetMetrics(Point(Math::Round(nPos.x * Setup::FontSize), Math::Round(nPos.y * Setup::FontSize)), Size(Math::Round(nSize.cx * Setup::FontSize), Math::Round(nSize.cy * Setup::FontSize)));
+
 	objectProperties->pos.x		= Math::Round(nPos.x * Setup::FontSize);
 	objectProperties->pos.y		= Math::Round(nPos.y * Setup::FontSize);
 	objectProperties->size.cx	= Math::Round(nSize.cx * Setup::FontSize);
 	objectProperties->size.cy	= Math::Round(nSize.cy * Setup::FontSize);
-
-	if (created) backend->SetMetrics(objectProperties->pos, objectProperties->size);
 
 	return Success;
 }
@@ -348,6 +348,11 @@ S::Rect S::GUI::Window::GetWindowRect()
 S::Rect S::GUI::Window::GetClientRect()
 {
 	return innerOffset;
+}
+
+S::Rect S::GUI::Window::GetRestoredWindowRect()
+{
+	return backend->GetRestoredWindowRect();
 }
 
 S::Rect S::GUI::Window::GetUpdateRect()

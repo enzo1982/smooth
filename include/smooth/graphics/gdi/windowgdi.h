@@ -73,6 +73,8 @@ namespace smooth
 				Int				 Show();
 				Int				 Hide();
 
+				Rect				 GetRestoredWindowRect();
+
 				Int				 SetMetrics(const Point &, const Size &);
 
 				Int				 Minimize();

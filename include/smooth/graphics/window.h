@@ -103,6 +103,7 @@ namespace smooth
 
 				Rect				 GetWindowRect();
 				Rect				 GetClientRect();
+				Rect				 GetRestoredWindowRect();
 
 				Rect				 GetUpdateRect();
 				Int				 SetUpdateRect(Rect);

@@ -60,6 +60,8 @@ namespace smooth
 				virtual Int			 Show();
 				virtual Int			 Hide();
 
+				virtual Rect			 GetRestoredWindowRect();
+
 				virtual Int			 SetMetrics(const Point &, const Size &);
 
 				virtual Int			 Minimize();

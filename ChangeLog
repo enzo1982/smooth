@@ -10,6 +10,7 @@ xx.xx.xx xx:xx - smooth alpha 0.8.66.0
 - button.cpp	- new class: XUL::Button
 - label.cpp	- new class: XUL::Label
 - desc...ion.cpp- new class: XUL::Description
+- args.cpp	- new class: ArgumentsParser; parser for command line arguments
 
 - removed ObjectManager
 - removed ObjectProperties

@@ -10,7 +10,7 @@
 
 #include <smooth/metrics.h>
 #include <smooth/definitions.h>
-#include <smooth/messagebox.h>
+#include <smooth/dialogs/messagebox.h>
 #include <smooth/i18n.h>
 
 S::Int	 S::METRIC_TITLEBARHEIGHT;

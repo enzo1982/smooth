@@ -400,7 +400,7 @@ Int Test::threadMessageBox(Thread *thread)
 {
 	thread->SetFlags(THREAD_KILLFLAG_WAIT);	// for this thread can quit itself (after closing the MessageBox) it needn't be terminated by smooth (KILLTHREAD_KILL is default)
 
-	DialogTipOfTheDay	*dlg = new DialogTipOfTheDay();
+	TipOfTheDay	*dlg = new TipOfTheDay();
 
 	dlg->AddTip("...that smooth has a \'Tip of the day\' dialog?");
 
@@ -417,7 +417,7 @@ Int Test::threadMessageBox(Thread *thread)
 
 Void Test::testDlgSelectColor()
 {
-	DialogColorSelection	*dialog = new DialogColorSelection();
+	ColorSelection	*dialog = new ColorSelection();
 
 	dialog->SetParentWindow(mainWnd);
 	dialog->SetColor(mainWnd_layer_active1->GetColor());
@@ -431,7 +431,7 @@ Void Test::testDlgSelectColor()
 
 Void Test::testDlgOpenFile()
 {
-	DialogFileSelection	*dialog = new DialogFileSelection();
+	FileSelection	*dialog = new FileSelection();
 
 	dialog->SetParentWindow(mainWnd);
 	dialog->SetFlags(SFD_ALLOWMULTISELECT);
@@ -457,7 +457,7 @@ Void Test::testDlgOpenFile()
 
 Void Test::testDlgSelectDir()
 {
-	DialogDirSelection	*dialog = new DialogDirSelection();
+	DirSelection	*dialog = new DirSelection();
 
 	dialog->SetParentWindow(mainWnd);
 

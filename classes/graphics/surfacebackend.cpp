@@ -15,7 +15,7 @@
 
 S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface)
 {
-	type = SURFACE_NULL;
+	type = SURFACE_NONE;
 
 	size.cx	= 0;
 	size.cy	= 0;

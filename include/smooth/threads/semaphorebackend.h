@@ -8,30 +8,40 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_SEMAPHORE_
-#define _H_OBJSMOOTH_SEMAPHORE_
+#ifndef _H_OBJSMOOTH_SEMAPHOREBACKEND_
+#define _H_OBJSMOOTH_SEMAPHOREBACKEND_
 
 namespace smooth
 {
-	class Semaphore;
+	namespace Threads
+	{
+		class SemaphoreBackend;
+	};
 };
 
-#include "object.h"
+#include "../definitions.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Semaphore : public Object
+	namespace Threads
 	{
-		private:
-			LiSASemaphore		*semaphore;
-		public:
-			static const Int	 classID;
+		const Int	 SEMAPHORE_NONE = 0;
 
-						 Semaphore();
-						~Semaphore();
+		class SemaphoreBackend
+		{
+			protected:
+				Int		 type;
+			public:
+						 SemaphoreBackend(Void * = NIL);
+				virtual		~SemaphoreBackend();
 
-			Int			 Wait();
-			Int			 Release();
+				Int		 GetSemaphoreType();
+
+				virtual Void	*GetSystemSemaphore();
+
+				virtual Int	 Wait();
+				virtual Int	 Release();
+		};
 	};
 };
 

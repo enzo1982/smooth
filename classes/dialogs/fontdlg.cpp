@@ -15,15 +15,15 @@
 
 #include <commdlg.h>
 
-S::DialogFontSelection::DialogFontSelection()
+S::GUI::Dialogs::FontSelection::FontSelection()
 {
 }
 
-S::DialogFontSelection::~DialogFontSelection()
+S::GUI::Dialogs::FontSelection::~FontSelection()
 {
 }
 
-S::Int S::DialogFontSelection::ShowDialog()
+S::Int S::GUI::Dialogs::FontSelection::ShowDialog()
 {
 	static CHOOSEFONTW	 cfw;
 	static CHOOSEFONTA	 cfa;
@@ -87,7 +87,7 @@ S::Int S::DialogFontSelection::ShowDialog()
 	return retValue;
 }
 
-S::GUI::Font S::DialogFontSelection::GetFont()
+S::GUI::Font S::GUI::Dialogs::FontSelection::GetFont()
 {
 	return font;
 }

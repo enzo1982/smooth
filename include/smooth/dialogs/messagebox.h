@@ -24,7 +24,7 @@ namespace smooth
 	};
 };
 
-#include "application.h"
+#include "../application.h"
 
 namespace smooth
 {

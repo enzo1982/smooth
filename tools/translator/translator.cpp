@@ -321,7 +321,7 @@ void Translator::OpenFile()
 {
 	if (!ExitProc()) return;
 
-	DialogFileSelection	*dialog = new DialogFileSelection();
+	FileSelection	*dialog = new FileSelection();
 
 	dialog->SetParentWindow(wnd);
 
@@ -411,7 +411,7 @@ void Translator::SaveFileAs()
 {
 	if (filename == "") return;
 
-	DialogFileSelection	*dialog = new DialogFileSelection();
+	FileSelection	*dialog = new FileSelection();
 
 	dialog->SetParentWindow(wnd);
 	dialog->SetMode(SFM_SAVE);

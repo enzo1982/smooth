@@ -25,7 +25,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 WINDOW_NULL = 0;
+		const Int	 WINDOW_NONE = 0;
 
 		class WindowBackend
 		{

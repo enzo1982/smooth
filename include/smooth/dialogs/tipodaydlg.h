@@ -13,10 +13,13 @@
 
 namespace smooth
 {
-	class DialogTipOfTheDay;
-
 	namespace GUI
 	{
+		namespace Dialogs
+		{
+			class TipOfTheDay;
+		};
+
 		class Window;
 		class Button;
 		class CheckBox;
@@ -32,41 +35,47 @@ namespace smooth
 
 namespace smooth
 {
-	class SMOOTHAPI DialogTipOfTheDay : public Dialog
+	namespace GUI
 	{
-		private:
-			GUI::Window	*dlgwnd;
-			GUI::Titlebar	*titlebar;
-			GUI::Divider	*divbar;
-			GUI::Button	*btn_ok;
-			GUI::Button	*btn_next;
-			GUI::CheckBox	*check_showtips;
-			GUI::Text	*txt_didyouknow;
-			GUI::Text	*txt_tip;
-			GUI::Layer	*layer_inner;
+		namespace Dialogs
+		{
+			class SMOOTHAPI TipOfTheDay : public Dialog
+			{
+				private:
+					Window		*dlgwnd;
+					Titlebar	*titlebar;
+					Divider		*divbar;
+					Button		*btn_ok;
+					Button		*btn_next;
+					CheckBox	*check_showtips;
+					Text		*txt_didyouknow;
+					Text		*txt_tip;
+					Layer		*layer_inner;
 
-			Bool		 showTips;
+					Bool		 showTips;
 
-			Array<String>	 tips;
-			Int		 mode;
-			Int		 offset;
-		public:
-					 DialogTipOfTheDay();
-					~DialogTipOfTheDay();
+					Array<String>	 tips;
+					Int		 mode;
+					Int		 offset;
+				public:
+							 TipOfTheDay();
+							~TipOfTheDay();
 
-			Int		 ShowDialog();
+					Int		 ShowDialog();
 
-			Int		 AddTip(const String &);
-			Int		 SetMode(Int, Int = 0);
-		slots:
-			Void		 ButtonOK();
-			Void		 ButtonNext();
+					Int		 AddTip(const String &);
+					Int		 SetMode(Int, Int = 0);
+				slots:
+					Void		 ButtonOK();
+					Void		 ButtonNext();
 
-			Void		 Paint();
+					Void		 Paint();
+			};
+
+			const Int	 TIP_ORDERED	= 0;
+			const Int	 TIP_RANDOM	= 1;
+		};
 	};
-
-	const Int	 TIP_ORDERED	= 0;
-	const Int	 TIP_RANDOM	= 1;
 };
 
 #endif

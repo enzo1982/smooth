@@ -92,6 +92,13 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\samples\test\test.cpp
+
+!IF  "$(CFG)" == "smoothTest - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smoothTest - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header-Dateien"

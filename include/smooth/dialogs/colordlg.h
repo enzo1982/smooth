@@ -13,10 +13,13 @@
 
 namespace smooth
 {
-	class DialogColorSelection;
-
 	namespace GUI
 	{
+		namespace Dialogs
+		{
+			class ColorSelection;
+		};
+
 		class Window;
 		class Button;
 		class EditBox;
@@ -32,99 +35,105 @@ namespace smooth
 
 namespace smooth
 {
-	class SMOOTHAPI DialogColorSelection : public Dialog
+	namespace GUI
 	{
-		private:
-			Int		 color;
+		namespace Dialogs
+		{
+			class SMOOTHAPI ColorSelection : public Dialog
+			{
+				private:
+					Int		 color;
 
-			Int		 yoffset;
-			Int		 huexoffset;
-			Int		 ncxoffset;
-			Int		 ocxoffset;
-			Int		 crsizex;
-			Int		 crsizey;
+					Int		 yoffset;
+					Int		 huexoffset;
+					Int		 ncxoffset;
+					Int		 ocxoffset;
+					Int		 crsizex;
+					Int		 crsizey;
 
-			Bool		 huecapt;
-			Bool		 vscapt;
+					Bool		 huecapt;
+					Bool		 vscapt;
 
-			Bool		 forcehupdate;
-			Bool		 forcevsupdate;
-			Bool		 preventhupdate;
-			Bool		 preventvsupdate;
-			Bool		 updatetext;
-			Bool		 updatehextext;
+					Bool		 forcehupdate;
+					Bool		 forcevsupdate;
+					Bool		 preventhupdate;
+					Bool		 preventvsupdate;
+					Bool		 updatetext;
+					Bool		 updatehextext;
 
-			Int		 lasthue;
-			Int		 lastsat;
-			Int		 lastval;
+					Int		 lasthue;
+					Int		 lastsat;
+					Int		 lastval;
 
-			Int		 acthue;
-			Int		 actsat;
-			Int		 actval;
-			Int		 actred;
-			Int		 actgreen;
-			Int		 actblue;
+					Int		 acthue;
+					Int		 actsat;
+					Int		 actval;
+					Int		 actred;
+					Int		 actgreen;
+					Int		 actblue;
 
-			Int		 colortable[256][256];
+					Int		 colortable[256][256];
 
-			String		 hexval;
+					String		 hexval;
 
-			GUI::Window	*dlgwnd;
-			GUI::Titlebar	*titlebar;
-			GUI::Divider	*divbar;
-			GUI::Button	*okbtn;
-			GUI::Button	*cancelbtn;
-			GUI::Slider	*hueslider;
-			GUI::Slider	*satslider;
-			GUI::Slider	*valslider;
-			GUI::Slider	*redslider;
-			GUI::Slider	*greenslider;
-			GUI::Slider	*blueslider;
-			GUI::Text	*huetext;
-			GUI::Text	*sattext;
-			GUI::Text	*valtext;
-			GUI::Text	*redtext;
-			GUI::Text	*greentext;
-			GUI::Text	*bluetext;
-			GUI::Text	*hextext;
-			GUI::EditBox	*hueedit;
-			GUI::EditBox	*satedit;
-			GUI::EditBox	*valedit;
-			GUI::EditBox	*rededit;
-			GUI::EditBox	*greenedit;
-			GUI::EditBox	*blueedit;
-			GUI::EditBox	*hexedit;
+					Window		*dlgwnd;
+					Titlebar	*titlebar;
+					Divider		*divbar;
+					Button		*okbtn;
+					Button		*cancelbtn;
+					Slider		*hueslider;
+					Slider		*satslider;
+					Slider		*valslider;
+					Slider		*redslider;
+					Slider		*greenslider;
+					Slider		*blueslider;
+					Text		*huetext;
+					Text		*sattext;
+					Text		*valtext;
+					Text		*redtext;
+					Text		*greentext;
+					Text		*bluetext;
+					Text		*hextext;
+					EditBox		*hueedit;
+					EditBox		*satedit;
+					EditBox		*valedit;
+					EditBox		*rededit;
+					EditBox		*greenedit;
+					EditBox		*blueedit;
+					EditBox		*hexedit;
 
-			Void		 ColorDlgUpdateHexValue();
-			Void		 ColorDlgHexValueChanged();
+					Void		 ColorDlgUpdateHexValue();
+					Void		 ColorDlgHexValueChanged();
 
-			Void		 ColorDlgPaintProc();
-			Void		 ColorDlgMessageProc(Int, Int, Int);
-			Void		 ColorDlgUpdatePickers();
-			Bool		 ColorDlgKillProc();
-			Void		 ColorDlgOK();
-			Void		 ColorDlgCancel();
-			Void		 ColorDlgHueSlider();
-			Void		 ColorDlgSatSlider();
-			Void		 ColorDlgValSlider();
-			Void		 ColorDlgRedSlider();
-			Void		 ColorDlgGreenSlider();
-			Void		 ColorDlgBlueSlider();
-			Void		 ColorDlgHueEdit();
-			Void		 ColorDlgSatEdit();
-			Void		 ColorDlgValEdit();
-			Void		 ColorDlgRedEdit();
-			Void		 ColorDlgGreenEdit();
-			Void		 ColorDlgBlueEdit();
-			Void		 ColorDlgHexEdit();
-		public:
-					 DialogColorSelection();
-					~DialogColorSelection();
+					Void		 ColorDlgPaintProc();
+					Void		 ColorDlgMessageProc(Int, Int, Int);
+					Void		 ColorDlgUpdatePickers();
+					Bool		 ColorDlgKillProc();
+					Void		 ColorDlgOK();
+					Void		 ColorDlgCancel();
+					Void		 ColorDlgHueSlider();
+					Void		 ColorDlgSatSlider();
+					Void		 ColorDlgValSlider();
+					Void		 ColorDlgRedSlider();
+					Void		 ColorDlgGreenSlider();
+					Void		 ColorDlgBlueSlider();
+					Void		 ColorDlgHueEdit();
+					Void		 ColorDlgSatEdit();
+					Void		 ColorDlgValEdit();
+					Void		 ColorDlgRedEdit();
+					Void		 ColorDlgGreenEdit();
+					Void		 ColorDlgBlueEdit();
+					Void		 ColorDlgHexEdit();
+				public:
+							 ColorSelection();
+							~ColorSelection();
 
-			Int		 ShowDialog();
+					Int		 ShowDialog();
 
-			Int		 GetColor();
-			Int		 SetColor(Int);
+					Int		 GetColor();
+					Int		 SetColor(Int);
+			};
+		};
 	};
 };
 

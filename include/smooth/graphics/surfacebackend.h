@@ -29,7 +29,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 SURFACE_NULL = 0;
+		const Int	 SURFACE_NONE = 0;
 
 		class SurfaceBackend
 		{

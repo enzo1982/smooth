@@ -13,10 +13,13 @@
 
 namespace smooth
 {
-	class Dialog;
-
 	namespace GUI
 	{
+		namespace Dialogs
+		{
+			class Dialog;
+		};
+
 		class Window;
 	};
 };
@@ -26,19 +29,25 @@ namespace smooth
 
 namespace smooth
 {
-	class SMOOTHAPI Dialog : public Application
+	namespace GUI
 	{
-		protected:
-			String		 caption;
-			GUI::Window	*parentWindow;
-		public:
-					 Dialog();
-					~Dialog();
+		namespace Dialogs
+		{
+			class SMOOTHAPI Dialog : public Application
+			{
+				protected:
+					String		 caption;
+					Window		*parentWindow;
+				public:
+							 Dialog();
+							~Dialog();
 
-			virtual Int	 ShowDialog() = 0;
+					virtual Int	 ShowDialog() = 0;
 
-			Int		 SetCaption(String);
-			Int		 SetParentWindow(GUI::Window *);
+					Int		 SetCaption(String);
+					Int		 SetParentWindow(Window *);
+			};
+		};
 	};
 };
 

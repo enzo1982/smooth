@@ -164,7 +164,7 @@ S::GUI::Window::Window(String title, Void *iWindow)
 	minSize.cx = Math::Round(160 * Setup::FontSize);
 	minSize.cy = METRIC_TITLEBARHEIGHT + 5;
 
-	doQuit.Connect(&Window::DummyExitProc, this);
+	doQuit.Connect(True);
 
 	onCreate.SetParentObject(this);
 	onPaint.SetParentObject(this);
@@ -214,11 +214,6 @@ S::GUI::Window::~Window()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 
 	delete backend;
-}
-
-S::Bool S::GUI::Window::DummyExitProc()
-{
-	return True;
 }
 
 S::Int S::GUI::Window::SetMetrics(Point newPos, Size newSize)

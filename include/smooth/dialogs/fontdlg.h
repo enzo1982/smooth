@@ -13,7 +13,13 @@
 
 namespace smooth
 {
-	class DialogFontSelection;
+	namespace GUI
+	{
+		namespace Dialogs
+		{
+			class FontSelection;
+		};
+	};
 };
 
 #include "../definitions.h"
@@ -22,17 +28,23 @@ namespace smooth
 
 namespace smooth
 {
-	class SMOOTHAPI DialogFontSelection : public Dialog
+	namespace GUI
 	{
-		private:
-			GUI::Font	 font;
-		public:
-					 DialogFontSelection();
-					~DialogFontSelection();
+		namespace Dialogs
+		{
+			class SMOOTHAPI FontSelection : public Dialog
+			{
+				private:
+					Font	 font;
+				public:
+						 FontSelection();
+						~FontSelection();
 
-			Int		 ShowDialog();
+					Int	 ShowDialog();
 
-			GUI::Font	 GetFont();
+					Font	 GetFont();
+			};
+		};
 	};
 };
 

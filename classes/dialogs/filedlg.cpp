@@ -15,17 +15,17 @@
 
 #include <commdlg.h>
 
-S::DialogFileSelection::DialogFileSelection()
+S::GUI::Dialogs::FileSelection::FileSelection()
 {
 	flags = 0;
 	mode = 0;
 }
 
-S::DialogFileSelection::~DialogFileSelection()
+S::GUI::Dialogs::FileSelection::~FileSelection()
 {
 }
 
-S::Int S::DialogFileSelection::ShowDialog()
+S::Int S::GUI::Dialogs::FileSelection::ShowDialog()
 {
 	bool	 result;
 	Int	 retValue = Success;
@@ -273,7 +273,7 @@ S::Int S::DialogFileSelection::ShowDialog()
 	return retValue;
 }
 
-S::Int S::DialogFileSelection::AddFilter(String name, String filter)
+S::Int S::GUI::Dialogs::FileSelection::AddFilter(String name, String filter)
 {
 	filterNames.AddEntry(name);
 	filters.AddEntry(filter);
@@ -281,39 +281,39 @@ S::Int S::DialogFileSelection::AddFilter(String name, String filter)
 	return Success;
 }
 
-S::Int S::DialogFileSelection::SetFlags(Int newFlags)
+S::Int S::GUI::Dialogs::FileSelection::SetFlags(Int newFlags)
 {
 	flags |= newFlags;
 
 	return Success;
 }
 
-S::Int S::DialogFileSelection::SetMode(Int newMode)
+S::Int S::GUI::Dialogs::FileSelection::SetMode(Int newMode)
 {
 	mode = newMode;
 
 	return Success;
 }
 
-S::Int S::DialogFileSelection::SetDefaultExtension(String newDefExt)
+S::Int S::GUI::Dialogs::FileSelection::SetDefaultExtension(String newDefExt)
 {
 	defExt = newDefExt;
 
 	return Success;
 }
 
-S::Int S::DialogFileSelection::GetNumberOfFiles()
+S::Int S::GUI::Dialogs::FileSelection::GetNumberOfFiles()
 {
 	return files.GetNOfEntries();
 }
 
-S::String S::DialogFileSelection::GetFileName()
+S::String S::GUI::Dialogs::FileSelection::GetFileName()
 {
 	if (files.GetNOfEntries() > 0)	return files.GetFirstEntry();
 	else				return NIL;
 }
 
-S::String S::DialogFileSelection::GetNthFileName(Int n)
+S::String S::GUI::Dialogs::FileSelection::GetNthFileName(Int n)
 {
 	if (files.GetNOfEntries() > n)	return files.GetNthEntry(n);
 	else				return NIL;

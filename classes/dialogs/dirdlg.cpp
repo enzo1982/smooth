@@ -13,17 +13,17 @@
 #include <smooth/shlobjmini.h>
 #include <smooth/graphics/window.h>
 
-S::DialogDirSelection::DialogDirSelection()
+S::GUI::Dialogs::DirSelection::DirSelection()
 {
 	caption = I18n::Translator::defaultTranslator->TranslateString("Select directory");
 	directory = NIL;
 }
 
-S::DialogDirSelection::~DialogDirSelection()
+S::GUI::Dialogs::DirSelection::~DirSelection()
 {
 }
 
-S::Int S::DialogDirSelection::ShowDialog()
+S::Int S::GUI::Dialogs::DirSelection::ShowDialog()
 {
 	SHLObjMini_Init();
 
@@ -94,7 +94,7 @@ S::Int S::DialogDirSelection::ShowDialog()
 	}
 }
 
-S::String S::DialogDirSelection::GetDirName()
+S::String S::GUI::Dialogs::DirSelection::GetDirName()
 {
 	return directory;
 }

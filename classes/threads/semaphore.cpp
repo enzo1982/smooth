@@ -9,35 +9,51 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/object.h>
-#include <smooth/semaphore.h>
+#include <smooth/threads/semaphore.h>
 #include <smooth/application.h>
 
-const S::Int	 S::Semaphore::classID = S::Object::RequestClassID();
+#ifdef __WIN32__
+#include <smooth/threads/win32/semaphorewin32.h>
+#else
+#include <smooth/threads/posix/semaphoreposix.h>
+#endif
 
-S::Semaphore::Semaphore()
+const S::Int	 S::Threads::Semaphore::classID = S::Object::RequestClassID();
+
+S::Threads::Semaphore::Semaphore(Void *iSemaphore)
 {
-	type = classID;
+#ifdef __WIN32__
+	backend = new SemaphoreWin32(iSemaphore);
+#else
+	backend = new SemaphorePOSIX(iSemaphore);
+#endif
 
-	semaphore = LiSASemaphoreCreate();
+	type = classID;
 
 	possibleContainers.AddEntry(Application::classID);
 }
 
-S::Semaphore::~Semaphore()
+S::Threads::Semaphore::~Semaphore()
 {
-	LiSASemaphoreCloseHandle(semaphore);
+	delete backend;
 }
 
-S::Int S::Semaphore::Wait()
+S::Int S::Threads::Semaphore::GetSemaphoreType()
 {
-	LiSASemaphoreWait(semaphore);
-
-	return Success;
+	return backend->GetSemaphoreType();
 }
 
-S::Int S::Semaphore::Release()
+S::Void *S::Threads::Semaphore::GetSystemSemaphore()
 {
-	LiSASemaphoreRelease(semaphore);
+	return backend->GetSystemSemaphore();
+}
 
-	return Success;
+S::Int S::Threads::Semaphore::Wait()
+{
+	return backend->Wait();
+}
+
+S::Int S::Threads::Semaphore::Release()
+{
+	return backend->Release();
 }

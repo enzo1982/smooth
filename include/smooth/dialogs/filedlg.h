@@ -13,7 +13,13 @@
 
 namespace smooth
 {
-	class DialogFileSelection;
+	namespace GUI
+	{
+		namespace Dialogs
+		{
+			class FileSelection;
+		};
+	};
 };
 
 #include "../definitions.h"
@@ -22,41 +28,47 @@ namespace smooth
 
 namespace smooth
 {
-// File dialog mode constants - SFM_OPEN is default
-
-	const Int	 SFM_OPEN	= 0;
-	const Int	 SFM_SAVE	= 1;
-
-// File dialog flags - can be set with ->SetFlags(...); SFD_FILEMUSTEXIST is always set for SFM_OPEN mode
-
-	const Int	 SFD_ALLOWMULTISELECT	= 512;
-	const Int	 SFD_FILEMUSTEXIST	= 4096;
-	const Int	 SFD_CONFIRMOVERWRITE	= 2;
-
-	class SMOOTHAPI DialogFileSelection : public Dialog
+	namespace GUI
 	{
-		private:
-			Array<String>	 filterNames;
-			Array<String>	 filters;
-			Array<String>	 files;
-			Int		 flags;
-			Int		 mode;
-			String		 defExt;
-		public:
-					 DialogFileSelection();
-					~DialogFileSelection();
+		namespace Dialogs
+		{
+			// File dialog mode constants - SFM_OPEN is default
 
-			Int		 ShowDialog();
+			const Int	 SFM_OPEN	= 0;
+			const Int	 SFM_SAVE	= 1;
 
-			Int		 SetMode(Int);
-			Int		 SetFlags(Int);
-			Int		 SetDefaultExtension(String);
+			// File dialog flags - SFD_FILEMUSTEXIST is always set for SFM_OPEN mode
 
-			Int		 AddFilter(String, String);
+			const Int	 SFD_ALLOWMULTISELECT	= 512;
+			const Int	 SFD_FILEMUSTEXIST	= 4096;
+			const Int	 SFD_CONFIRMOVERWRITE	= 2;
 
-			Int		 GetNumberOfFiles();
-			String		 GetFileName();
-			String		 GetNthFileName(Int);
+			class SMOOTHAPI FileSelection : public Dialog
+			{
+				private:
+					Array<String>	 filterNames;
+					Array<String>	 filters;
+					Array<String>	 files;
+					Int		 flags;
+					Int		 mode;
+					String		 defExt;
+				public:
+							 FileSelection();
+							~FileSelection();
+
+					Int		 ShowDialog();
+
+					Int		 SetMode(Int);
+					Int		 SetFlags(Int);
+					Int		 SetDefaultExtension(String);
+
+					Int		 AddFilter(String, String);
+
+					Int		 GetNumberOfFiles();
+					String		 GetFileName();
+					String		 GetNthFileName(Int);
+			};
+		};
 	};
 };
 

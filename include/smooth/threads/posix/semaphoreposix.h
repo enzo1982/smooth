@@ -8,30 +8,41 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_MUTEX_
-#define _H_OBJSMOOTH_MUTEX_
+#ifndef _H_OBJSMOOTH_SEMAPHOREPOSIX_
+#define _H_OBJSMOOTH_SEMAPHOREPOSIX_
 
 namespace smooth
 {
-	class Mutex;
+	namespace Threads
+	{
+		class SemaphorePOSIX;
+	};
 };
 
-#include "object.h"
+#include "../semaphorebackend.h"
+
+#include <semaphore.h>
 
 namespace smooth
 {
-	class SMOOTHAPI Mutex : public Object
+	namespace Threads
 	{
-		private:
-			LiSAMutex		*mutex;
-		public:
-			static const Int	 classID;
+		const Int	 SEMAPHORE_POSIX	= 1;
 
-						 Mutex();
-						~Mutex();
+		class SemaphorePOSIX : public SemaphoreBackend
+		{
+			protected:
+				sem_t	*semaphore;
+				Bool	 mySemaphore;
+			public:
+					 SemaphorePOSIX(Void * = NIL);
+					~SemaphorePOSIX();
 
-			Int			 Lock();
-			Int			 Release();
+				Void	*GetSystemSemaphore();
+
+				Int	 Wait();
+				Int	 Release();
+		};
 	};
 };
 

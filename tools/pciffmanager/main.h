@@ -17,6 +17,7 @@ class PCIFFManager;
 
 using namespace smooth;
 using namespace smooth::GUI;
+using namespace smooth::GUI::Dialogs;
 
 class PCIFFManager : public Application
 {

@@ -36,13 +36,12 @@ S::GUI::Menu::~Menu()
 
 S::GUI::MenuEntry *S::GUI::Menu::AddEntry(String text, Bitmap bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
 {
-	Int	 id	= System::RequestGUID();
 	Int	 type	= SM_SEPARATOR;
 
 	if (text != NIL)	type = type | SM_TEXT;
 	if (bitmap != NIL)	type = type | SM_BITMAP;
 
-	MenuEntry	*newEntry = new MenuEntry(type, id);
+	MenuEntry	*newEntry = new MenuEntry(type);
 
 	newEntry->SetText(text);
 	newEntry->SetOrientation(orientation);

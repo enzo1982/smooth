@@ -1,25 +1,27 @@
-<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="4" FILEVERSION="7" LASTMODIFIED="18.01.2004">
-    <TASK PRIORITY="5" TITLE="smooth::Configure" PERCENTDONE="80" POS="1">
+<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="4" FILEVERSION="8" LASTMODIFIED="21.01.2004">
+    <TASK PRIORITY="5" TITLE="Make MessageDialog and SplashScreen smooth::Dialogs" POS="1"/>
+    <TASK PRIORITY="5" TITLE="Check Threads API" POS="2"/>
+    <TASK PRIORITY="5" TITLE="smooth::Configure" PERCENTDONE="80" POS="3">
         <TASK PRIORITY="5" TITLE="Make configurations inheritable" POS="1"/>
     </TASK>
-    <TASK PRIORITY="5" TITLE="Use more Signals &amp; Slots internally" POS="2"/>
-    <TASK PRIORITY="5" TITLE="Implement other backends than GDI (like Xlib, SDL, Qt)" POS="3">
+    <TASK PRIORITY="5" TITLE="Use more Signals &amp; Slots internally" POS="4"/>
+    <TASK PRIORITY="5" TITLE="Implement other backends than GDI (like Xlib, SDL, Qt)" POS="5">
         <TASK PRIORITY="5" TITLE="Split Window in frontend and backend parts" PERCENTDONE="20" POS="1"/>
     </TASK>
-    <TASK PRIORITY="5" TITLE="Check large fonts support" POS="4"/>
-    <TASK PRIORITY="5" TITLE="Add an UIML compiler and interpreter" POS="5"/>
-    <TASK PRIORITY="5" TITLE="Support RTL scripts" PERCENTDONE="50" POS="6">
+    <TASK PRIORITY="5" TITLE="Check large fonts support" POS="6"/>
+    <TASK PRIORITY="5" TITLE="Add an UIML compiler and interpreter" POS="7"/>
+    <TASK PRIORITY="5" TITLE="Support RTL scripts" PERCENTDONE="50" POS="8">
         <TASK PRIORITY="5" TITLE="Mirrored window elements" PERCENTDONE="100" DONEDATESTRING="08.01.2004" POS="1" DONEDATE="37994.85221065"/>
         <TASK PRIORITY="5" TITLE="Fix EditBoxes for RTL scripts" POS="2"/>
     </TASK>
-    <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="5" POS="7">
+    <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="5" POS="9">
         <TASK PRIORITY="5" TITLE="Make MenuEntries widgets" PERCENTDONE="30" POS="1"/>
         <TASK PRIORITY="5" TITLE="Implement menu shortcuts" POS="2"/>
         <TASK PRIORITY="5" TITLE="Redo Menubar::Paint()" PERCENTDONE="5" POS="3"/>
         <TASK PRIORITY="5" TITLE="ECM" POS="4"/>
         <TASK PRIORITY="5" TITLE="Tear off menus" POS="5"/>
     </TASK>
-    <TASK PRIORITY="5" TITLE="Widgets" PERCENTDONE="1" POS="8">
+    <TASK PRIORITY="5" TITLE="Widgets" PERCENTDONE="1" POS="10">
         <TASK PRIORITY="5" TITLE="ListBox" POS="1">
             <TASK PRIORITY="5" TITLE="Support editing of ListBox entries" POS="1"/>
             <TASK PRIORITY="5" TITLE="Support Drag &amp; Drop in ListBoxes" EXPANDED="1" POS="2">
@@ -36,5 +38,5 @@
         <TASK PRIORITY="5" TITLE="A technique to check the values of widgets like OptionBoxes or CheckBoxes" POS="6"/>
         <TASK PRIORITY="5" TITLE="Implement a Tabstop system" POS="7"/>
     </TASK>
-    <TASK PRIORITY="5" TITLE="Write documentation" PERCENTDONE="5" POS="9"/>
+    <TASK PRIORITY="5" TITLE="Write documentation" PERCENTDONE="5" POS="11"/>
 </TODOLIST>

@@ -31,9 +31,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-using namespace smooth::GUI;
-
-S::DialogTipOfTheDay::DialogTipOfTheDay()
+S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 {
 	showTips = True;
 
@@ -52,13 +50,13 @@ S::DialogTipOfTheDay::DialogTipOfTheDay()
 	pos.y = 29;
 
 	btn_ok		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, pos, size);
-	btn_ok->onClick.Connect(&DialogTipOfTheDay::ButtonOK, this);
+	btn_ok->onClick.Connect(&TipOfTheDay::ButtonOK, this);
 	btn_ok->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 175;
 
 	btn_next	= new Button(I18n::Translator::defaultTranslator->TranslateString("Next tip"), NIL, pos, size);
-	btn_next->onClick.Connect(&DialogTipOfTheDay::ButtonNext, this);
+	btn_next->onClick.Connect(&TipOfTheDay::ButtonNext, this);
 	btn_next->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 7;
@@ -106,10 +104,10 @@ S::DialogTipOfTheDay::DialogTipOfTheDay()
 
 	dlgwnd->SetMetrics(Point(Int((LiSAGetDisplaySizeX() - 350) / 2), Int((LiSAGetDisplaySizeY() - 300) / 2) - 50), Size(350, 300));
 
-	dlgwnd->onPaint.Connect(&DialogTipOfTheDay::Paint, this);
+	dlgwnd->onPaint.Connect(&TipOfTheDay::Paint, this);
 }
 
-S::DialogTipOfTheDay::~DialogTipOfTheDay()
+S::GUI::Dialogs::TipOfTheDay::~TipOfTheDay()
 {
 	DeleteObject(dlgwnd);
 
@@ -127,7 +125,7 @@ S::DialogTipOfTheDay::~DialogTipOfTheDay()
 	DeleteObject(txt_tip);
 }
 
-S::Int S::DialogTipOfTheDay::ShowDialog()
+S::Int S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 {
 	if (caption != NIL) dlgwnd->SetText(caption);
 
@@ -138,14 +136,14 @@ S::Int S::DialogTipOfTheDay::ShowDialog()
 	return dlgwnd->Stay();
 }
 
-S::Int S::DialogTipOfTheDay::AddTip(const String &tip)
+S::Int S::GUI::Dialogs::TipOfTheDay::AddTip(const String &tip)
 {
 	tips.AddEntry(tip);
 
 	return Success;
 }
 
-S::Int S::DialogTipOfTheDay::SetMode(Int nMode, Int nOffset)
+S::Int S::GUI::Dialogs::TipOfTheDay::SetMode(Int nMode, Int nOffset)
 {
 	switch (nMode)
 	{
@@ -166,14 +164,14 @@ S::Int S::DialogTipOfTheDay::SetMode(Int nMode, Int nOffset)
 	return Success;
 }
 
-S::Void S::DialogTipOfTheDay::ButtonOK()
+S::Void S::GUI::Dialogs::TipOfTheDay::ButtonOK()
 {
 	dlgwnd->value = showTips;
 
 	dlgwnd->Close();
 }
 
-S::Void S::DialogTipOfTheDay::ButtonNext()
+S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 {
 	String	 tip;
 	time_t	 timer;
@@ -197,7 +195,7 @@ S::Void S::DialogTipOfTheDay::ButtonNext()
 	txt_tip->SetText(tip);
 }
 
-S::Void S::DialogTipOfTheDay::Paint()
+S::Void S::GUI::Dialogs::TipOfTheDay::Paint()
 {
 	dlgwnd->GetDrawSurface()->Box(Rect(Point(7, 38) + dlgwnd->GetMainLayer()->GetObjectProperties()->pos, Size(330, 184)), 0, OUTLINED);
 }

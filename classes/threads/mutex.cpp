@@ -9,35 +9,51 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/object.h>
-#include <smooth/mutex.h>
+#include <smooth/threads/mutex.h>
 #include <smooth/application.h>
 
-const S::Int	 S::Mutex::classID = S::Object::RequestClassID();
+#ifdef __WIN32__
+#include <smooth/threads/win32/mutexwin32.h>
+#else
+#include <smooth/threads/posix/mutexposix.h>
+#endif
 
-S::Mutex::Mutex()
+const S::Int	 S::Threads::Mutex::classID = S::Object::RequestClassID();
+
+S::Threads::Mutex::Mutex(Void *iMutex)
 {
-	type = classID;
+#ifdef __WIN32__
+	backend = new MutexWin32(iMutex);
+#else
+	backend = new MutexPOSIX(iMutex);
+#endif
 
-	mutex = LiSAMutexCreate();
+	type = classID;
 
 	possibleContainers.AddEntry(Application::classID);
 }
 
-S::Mutex::~Mutex()
+S::Threads::Mutex::~Mutex()
 {
-	LiSAMutexCloseHandle(mutex);
+	delete backend;
 }
 
-S::Int S::Mutex::Lock()
+S::Int S::Threads::Mutex::GetMutexType()
 {
-	LiSAMutexLock(mutex);
-
-	return Success;
+	return backend->GetMutexType();
 }
 
-S::Int S::Mutex::Release()
+S::Void *S::Threads::Mutex::GetSystemMutex()
 {
-	LiSAMutexRelease(mutex);
+	return backend->GetSystemMutex();
+}
 
-	return Success;
+S::Int S::Threads::Mutex::Lock()
+{
+	return backend->Lock();
+}
+
+S::Int S::Threads::Mutex::Release()
+{
+	return backend->Release();
 }

@@ -58,6 +58,46 @@ $(OBJECTDIR)/widget.o: $(BASICCLASSESDIR)/widget.cpp $(SMOOTHINCLUDEDIR)/widget.
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/widget.cpp -o $(OBJECTDIR)/widget.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/colordlg.o: $(DIALOGSCLASSESDIR)/colordlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/colordlg.h $(SMOOTHINCLUDEDIR)/color.h
+	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/colordlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/colordlg.cpp -o $(OBJECTDIR)/colordlg.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/dialog.o: $(DIALOGSCLASSESDIR)/dialog.cpp $(SMOOTHINCLUDEDIR)/dialogs/dialog.h
+	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/dialog.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/dialog.cpp -o $(OBJECTDIR)/dialog.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/dirdlg.o: $(DIALOGSCLASSESDIR)/dirdlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/dirdlg.h
+	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/dirdlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/dirdlg.cpp -o $(OBJECTDIR)/dirdlg.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/filedlg.o: $(DIALOGSCLASSESDIR)/filedlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/filedlg.h
+	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/filedlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/filedlg.cpp -o $(OBJECTDIR)/filedlg.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fontdlg.o: $(DIALOGSCLASSESDIR)/fontdlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/fontdlg.h
+	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/fontdlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/fontdlg.cpp -o $(OBJECTDIR)/fontdlg.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/messagebox.o: $(DIALOGSCLASSESDIR)/messagebox.cpp $(SMOOTHINCLUDEDIR)/dialogs/messagebox.h
+	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/messagebox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/messagebox.cpp -o $(OBJECTDIR)/messagebox.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/splashscreen.o: $(DIALOGSCLASSESDIR)/splashscreen.cpp $(SMOOTHINCLUDEDIR)/dialogs/splashscreen.h
+	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/splashscreen.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/splashscreen.cpp -o $(OBJECTDIR)/splashscreen.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/tipodaydlg.o: $(DIALOGSCLASSESDIR)/tipodaydlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/tipodaydlg.h
+	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/tipodaydlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/tipodaydlg.cpp -o $(OBJECTDIR)/tipodaydlg.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/bitmapgdi.o: $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/gdi/bitmapgdi.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp -o $(OBJECTDIR)/bitmapgdi.o
@@ -313,24 +353,64 @@ $(OBJECTDIR)/size.o: $(PRIMITIVESCLASSESDIR)/size.cpp $(SMOOTHINCLUDEDIR)/size.h
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/size.cpp -o $(OBJECTDIR)/size.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mutex.o: $(THREADSCLASSESDIR)/mutex.cpp $(SMOOTHINCLUDEDIR)/mutex.h
+$(OBJECTDIR)/mutexposix.o: $(THREADSCLASSESDIR)/posix/mutexposix.cpp $(SMOOTHINCLUDEDIR)/threads/posix/mutexposix.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/posix/mutexposix.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/posix/mutexposix.cpp -o $(OBJECTDIR)/mutexposix.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/semaphoreposix.o: $(THREADSCLASSESDIR)/posix/semaphoreposix.cpp $(SMOOTHINCLUDEDIR)/threads/posix/semaphoreposix.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/posix/semaphoreposix.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/posix/semaphoreposix.cpp -o $(OBJECTDIR)/semaphoreposix.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/threadposix.o: $(THREADSCLASSESDIR)/posix/threadposix.cpp $(SMOOTHINCLUDEDIR)/threads/posix/threadposix.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/posix/threadposix.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/posix/threadposix.cpp -o $(OBJECTDIR)/threadposix.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/mutexwin32.o: $(THREADSCLASSESDIR)/win32/mutexwin32.cpp $(SMOOTHINCLUDEDIR)/threads/win32/mutexwin32.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/win32/mutexwin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/win32/mutexwin32.cpp -o $(OBJECTDIR)/mutexwin32.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/semaphorewin32.o: $(THREADSCLASSESDIR)/win32/semaphorewin32.cpp $(SMOOTHINCLUDEDIR)/threads/win32/semaphorewin32.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/win32/semaphorewin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/win32/semaphorewin32.cpp -o $(OBJECTDIR)/semaphorewin32.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/threadwin32.o: $(THREADSCLASSESDIR)/win32/threadwin32.cpp $(SMOOTHINCLUDEDIR)/threads/win32/threadwin32.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/win32/threadwin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/win32/threadwin32.cpp -o $(OBJECTDIR)/threadwin32.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/mutex.o: $(THREADSCLASSESDIR)/mutex.cpp $(SMOOTHINCLUDEDIR)/threads/mutex.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/mutex.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/mutex.cpp -o $(OBJECTDIR)/mutex.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/semaphore.o: $(THREADSCLASSESDIR)/semaphore.cpp $(SMOOTHINCLUDEDIR)/semaphore.h
+$(OBJECTDIR)/mutexbackend.o: $(THREADSCLASSESDIR)/mutexbackend.cpp $(SMOOTHINCLUDEDIR)/threads/mutexbackend.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/mutexbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/mutexbackend.cpp -o $(OBJECTDIR)/mutexbackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/semaphore.o: $(THREADSCLASSESDIR)/semaphore.cpp $(SMOOTHINCLUDEDIR)/threads/semaphore.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/semaphore.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/semaphore.cpp -o $(OBJECTDIR)/semaphore.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/thread.o: $(THREADSCLASSESDIR)/thread.cpp $(SMOOTHINCLUDEDIR)/thread.h
+$(OBJECTDIR)/semaphorebackend.o: $(THREADSCLASSESDIR)/semaphorebackend.cpp $(SMOOTHINCLUDEDIR)/threads/semaphorebackend.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/semaphorebackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/semaphorebackend.cpp -o $(OBJECTDIR)/semaphorebackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/thread.o: $(THREADSCLASSESDIR)/thread.cpp $(SMOOTHINCLUDEDIR)/threads/thread.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/thread.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/thread.cpp -o $(OBJECTDIR)/thread.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/threadmanager.o: $(THREADSCLASSESDIR)/threadmanager.cpp $(SMOOTHINCLUDEDIR)/threadmanager.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/threadmanager.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/threadmanager.cpp -o $(OBJECTDIR)/threadmanager.o
+$(OBJECTDIR)/threadbackend.o: $(THREADSCLASSESDIR)/threadbackend.cpp $(SMOOTHINCLUDEDIR)/threads/threadbackend.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/threadbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/threadbackend.cpp -o $(OBJECTDIR)/threadbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/tree.o: $(TREECLASSESDIR)/tree.cpp $(SMOOTHINCLUDEDIR)/tree.h
@@ -398,36 +478,6 @@ $(OBJECTDIR)/xml_node.o: $(XMLCLASSESDIR)/node.cpp $(SMOOTHINCLUDEDIR)/xml/node.
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/node.cpp -o $(OBJECTDIR)/xml_node.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/colordlg.o: $(DIALOGSDIR)/colordlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/colordlg.h $(SMOOTHINCLUDEDIR)/color.h
-	$(ECHO) -n Compiling $(DIALOGSDIR)/colordlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/colordlg.cpp -o $(OBJECTDIR)/colordlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/dialog.o: $(DIALOGSDIR)/dialog.cpp $(SMOOTHINCLUDEDIR)/dialogs/dialog.h
-	$(ECHO) -n Compiling $(DIALOGSDIR)/dialog.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/dialog.cpp -o $(OBJECTDIR)/dialog.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/dirdlg.o: $(DIALOGSDIR)/dirdlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/dirdlg.h
-	$(ECHO) -n Compiling $(DIALOGSDIR)/dirdlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/dirdlg.cpp -o $(OBJECTDIR)/dirdlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/filedlg.o: $(DIALOGSDIR)/filedlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/filedlg.h
-	$(ECHO) -n Compiling $(DIALOGSDIR)/filedlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/filedlg.cpp -o $(OBJECTDIR)/filedlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fontdlg.o: $(DIALOGSDIR)/fontdlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/fontdlg.h
-	$(ECHO) -n Compiling $(DIALOGSDIR)/fontdlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/fontdlg.cpp -o $(OBJECTDIR)/fontdlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/tipodaydlg.o: $(DIALOGSDIR)/tipodaydlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/tipodaydlg.h
-	$(ECHO) -n Compiling $(DIALOGSDIR)/tipodaydlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/tipodaydlg.cpp -o $(OBJECTDIR)/tipodaydlg.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h
 	$(ECHO) -n Compiling $(MISCDIR)/codecs.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/codecs.cpp -o $(OBJECTDIR)/codecs.o
@@ -448,11 +498,6 @@ $(OBJECTDIR)/loop.o: $(MISCDIR)/loop.cpp $(SMOOTHINCLUDEDIR)/loop.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/loop.cpp -o $(OBJECTDIR)/loop.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/messagebox.o: $(MISCDIR)/messagebox.cpp $(SMOOTHINCLUDEDIR)/messagebox.h
-	$(ECHO) -n Compiling $(MISCDIR)/messagebox.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/messagebox.cpp -o $(OBJECTDIR)/messagebox.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/metrics.o: $(MISCDIR)/metrics.cpp $(SMOOTHINCLUDEDIR)/metrics.h
 	$(ECHO) -n Compiling $(MISCDIR)/metrics.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/metrics.cpp -o $(OBJECTDIR)/metrics.o
@@ -461,11 +506,6 @@ $(OBJECTDIR)/metrics.o: $(MISCDIR)/metrics.cpp $(SMOOTHINCLUDEDIR)/metrics.h
 $(OBJECTDIR)/pciio.o: $(MISCDIR)/pciio.cpp $(SMOOTHINCLUDEDIR)/pciio.h
 	$(ECHO) -n Compiling $(MISCDIR)/pciio.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/pciio.cpp -o $(OBJECTDIR)/pciio.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/splashscreen.o: $(MISCDIR)/splashscreen.cpp $(SMOOTHINCLUDEDIR)/splashscreen.h
-	$(ECHO) -n Compiling $(MISCDIR)/splashscreen.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/splashscreen.cpp -o $(OBJECTDIR)/splashscreen.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/resources.o: $(SMOOTHINCLUDEDIR)/resources.h $(RESOURCEDIR)/version.rc $(RESOURCEDIR)/resources.rc

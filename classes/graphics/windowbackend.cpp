@@ -12,7 +12,7 @@
 
 S::GUI::WindowBackend::WindowBackend(Void *iWindow)
 {
-	type = WINDOW_NULL;
+	type = WINDOW_NONE;
 }
 
 S::GUI::WindowBackend::~WindowBackend()

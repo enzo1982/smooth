@@ -12,8 +12,7 @@
 #include <smooth/loop.h>
 #include <smooth/dllmain.h>
 #include <smooth/resources.h>
-#include <smooth/thread.h>
-#include <smooth/threadmanager.h>
+#include <smooth/threads/thread.h>
 
 #ifdef __WIN32__
 #include <smooth/i18n.h>
@@ -84,7 +83,6 @@ S::Void S::Init()
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
 	mainObjectManager	= new ObjectManager();
-	mainThreadManager	= new ThreadManager();
 #endif
 
 	GetColors();
@@ -125,7 +123,6 @@ S::Void S::Free()
 
 	delete backgroundApplication;
 
-	delete mainThreadManager;
 	delete mainObjectManager;
 #endif
 
@@ -169,9 +166,6 @@ S::Int S::Loop()
 	Int		 count = 0;
 #endif
 
-	GUI::Window	*wnd;
-	Thread		*thread;
-
 	if (!loopActive)
 	{
 #ifdef __WIN32__
@@ -181,32 +175,33 @@ S::Int S::Loop()
 		initializing = false;
 		loopActive = true;
 
-#ifdef __WIN32__
 		for (int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 		{
-			wnd = (GUI::Window *) mainObjectManager->GetNthObject(i);
+			Object	*object = mainObjectManager->GetNthObject(i);
 
-			if (wnd != (GUI::Window *) NIL)
+			if (object != NIL)
 			{
-				if (wnd->GetObjectType() == GUI::Window::classID)
+				if (object->GetObjectType() == GUI::Window::classID)
 				{
-					if (!wnd->initshow) wnd->Show();
+					if (!((GUI::Window *) object)->initshow) ((GUI::Window *) object)->Show();
 				}
 			}
 		}
 
 		// start waiting threads here
 
-		for (int j = 0; j < Object::objectCount; j++)
+		for (int j = 0; j < mainObjectManager->GetNOfObjects(); j++)
 		{
-			thread = mainThreadManager->RequestThread(j);
+			Object	*object = mainObjectManager->GetNthObject(j);
 
-			if (thread != (Thread *) NIL)
+			if (object != NIL)
 			{
-				if (thread->GetStatus() == THREAD_STARTME) thread->Start();
+				if (object->GetObjectType() == Threads::Thread::classID)
+				{
+					if (((Threads::Thread *) object)->GetStatus() == Threads::THREAD_STARTME) ((Threads::Thread *) object)->Start();
+				}
 			}
 		}
-#endif
 	}
 
 	if (peekLoop > 0)
@@ -285,19 +280,20 @@ S::Int S::Loop()
 #endif
 		loopActive = false;
 
-#ifdef __WIN32__
-		for (int i = 0; i < Object::objectCount; i++)
+		for (int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 		{
-			thread = mainThreadManager->RequestThread(i);
+			Object	*object = mainObjectManager->GetNthObject(i);
 
-			if (thread != (Thread *) NIL)
+			if (object != NIL)
 			{
-				if (!(thread->GetFlags() & THREAD_KILLFLAG_WAIT)) thread->Stop();
+				if (object->GetObjectType() == Threads::Thread::classID)
+				{
+					if (!(((Threads::Thread *) object)->GetFlags() & Threads::THREAD_KILLFLAG_WAIT)) ((Threads::Thread *) object)->Stop();
+				}
 			}
 		}
-#endif
 
-		while (Thread::counter > 0) LiSASleep(10);
+		while (Threads::Thread::GetNOfRunningThreads() > 0) LiSASleep(10);
 
 #ifdef __WIN32__
 		return msg.wParam;

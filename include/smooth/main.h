@@ -16,7 +16,7 @@
 #include "version.h"
 #include "string.h"
 #include "application.h"
-#include "messagebox.h"
+#include "dialogs/messagebox.h"
 
 using namespace smooth;
 

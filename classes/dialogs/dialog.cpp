@@ -10,23 +10,23 @@
 
 #include <smooth/dialogs/dialog.h>
 
-S::Dialog::Dialog()
+S::GUI::Dialogs::Dialog::Dialog()
 {
 	parentWindow = NIL;
 }
 
-S::Dialog::~Dialog()
+S::GUI::Dialogs::Dialog::~Dialog()
 {
 }
 
-S::Int S::Dialog::SetCaption(String newCaption)
+S::Int S::GUI::Dialogs::Dialog::SetCaption(String newCaption)
 {
 	caption = newCaption;
 
 	return Success;
 }
 
-S::Int S::Dialog::SetParentWindow(GUI::Window *newParent)
+S::Int S::GUI::Dialogs::Dialog::SetParentWindow(Window *newParent)
 {
 	parentWindow = newParent;
 

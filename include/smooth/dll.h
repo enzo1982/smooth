@@ -14,9 +14,8 @@
 #include "loop.h"
 #include "version.h"
 #include "system.h"
-#include "messagebox.h"
 #include "application.h"
-#include "messagebox.h"
+#include "dialogs/messagebox.h"
 
 using namespace smooth;
 

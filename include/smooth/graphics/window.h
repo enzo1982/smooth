@@ -86,8 +86,6 @@ namespace smooth
 
 				Void				 CalculateOffsets();
 
-				Bool				 DummyExitProc();
-
 				Void				 PopupProc();
 			public:
 				HWND				 hwnd;

@@ -22,9 +22,9 @@ namespace smooth
 	};
 };
 
-#include "definitions.h"
-#include "application.h"
-#include "graphics/bitmap.h"
+#include "../definitions.h"
+#include "../application.h"
+#include "../graphics/bitmap.h"
 
 namespace smooth
 {

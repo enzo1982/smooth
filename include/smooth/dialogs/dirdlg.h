@@ -13,7 +13,13 @@
 
 namespace smooth
 {
-	class DialogDirSelection;
+	namespace GUI
+	{
+		namespace Dialogs
+		{
+			class DirSelection;
+		};
+	};
 };
 
 #include "../definitions.h"
@@ -21,15 +27,23 @@ namespace smooth
 
 namespace smooth
 {
-	class SMOOTHAPI DialogDirSelection : public Dialog
+	namespace GUI
 	{
-		private:
-			String	 directory;
-		public:
-				 DialogDirSelection();
-				~DialogDirSelection();
-			Int	 ShowDialog();
-			String	 GetDirName();
+		namespace Dialogs
+		{
+			class SMOOTHAPI DirSelection : public Dialog
+			{
+				private:
+					String	 directory;
+				public:
+						 DirSelection();
+						~DirSelection();
+
+					Int	 ShowDialog();
+
+					String	 GetDirName();
+			};
+		};
 	};
 };
 

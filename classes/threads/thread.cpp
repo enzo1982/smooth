@@ -9,73 +9,70 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/object.h>
-#include <smooth/thread.h>
+#include <smooth/threads/thread.h>
 #include <smooth/loop.h>
-#include <smooth/threadmanager.h>
 #include <smooth/background.h>
 #include <smooth/objectproperties.h>
+#include <smooth/objectmanager.h>
 
-S::Void ThreadProcCaller(S::Thread *);
+#ifdef __WIN32__
+#include <smooth/threads/win32/threadwin32.h>
+#else
+#include <smooth/threads/posix/threadposix.h>
+#endif
 
-const S::Int	 S::Thread::classID = S::Object::RequestClassID();
-S::Int		 S::Thread::counter = 0;
+S::Void ThreadProcCaller(S::Threads::Thread *);
 
-S::Thread::Thread()
+const S::Int	 S::Threads::Thread::classID = S::Object::RequestClassID();
+
+S::Threads::Thread::Thread(Void *iThread)
 {
-	type		= classID;
-	status		= THREAD_CREATED;
-	thread		= NIL;
-	threadID	= -1;
+#ifdef __WIN32__
+	backend = new ThreadWin32(iThread);
+#else
+	backend = new ThreadPOSIX(iThread);
+#endif
+
+	type	= classID;
+	status	= THREAD_CREATED;
 
 	possibleContainers.AddEntry(Application::classID);
-
-	mainThreadManager->RegisterThread(this);
 }
 
-S::Thread::~Thread()
+S::Threads::Thread::~Thread()
 {
-	if (status == THREAD_CREATED || status == THREAD_STARTME)
+	if (status == THREAD_CREATED || status == THREAD_STARTME || status == THREAD_STOPPED_SELF)
 	{
 		status = THREAD_STOPPED;
-	}
-
-	if (status == THREAD_STOPPED_SELF)
-	{
-		status = THREAD_STOPPED;
-
-		LiSAThreadCloseHandle(thread);
 	}
 
 	if (status != THREAD_STOPPED)
 	{
 		status = THREAD_STOPPED;
-		counter--;
 
-		LiSAThreadCancel(thread);
-		LiSAThreadCloseHandle(thread);
+		backend->Stop();
 	}
 
-	mainThreadManager->UnregisterThread(this);
+	delete backend;
 }
 
-S::Int S::Thread::GetStatus()
+S::Int S::Threads::Thread::GetStatus()
 {
 	return status;
 }
 
-S::Int S::Thread::GetThreadID()
+S::Int S::Threads::Thread::GetThreadID()
 {
-	return threadID;
+	return backend->GetThreadID();
 }
 
-S::Int S::Thread::Start()
+S::Int S::Threads::Thread::Start()
 {
 	if ((status == THREAD_CREATED && !initializing) || status == THREAD_STARTME || (flags & THREAD_WAITFLAG_START))
 	{
-		thread = LiSAThreadCreate((unsigned long *) &threadID, (void (*)(void *)) ThreadProcCaller, this);
+		backend->Start((Void (*)(Void *)) ThreadProcCaller, this);
 
 		status = THREAD_RUNNING;
-		counter++;
 
 		return Success;
 	}
@@ -91,25 +88,22 @@ S::Int S::Thread::Start()
 	}
 }
 
-S::Int S::Thread::Stop()
+S::Int S::Threads::Thread::Stop()
 {
-	if (status == THREAD_RUNNING || status == THREAD_PAUSED)
+	if (status == THREAD_RUNNING)
 	{
-		if (LiSAThreadSelf() == thread)
+		if (backend->Self() == backend->GetSystemThread())
 		{
 			status = THREAD_STOPPED_SELF;
-			counter--;
 
-			LiSAThreadExit();
+			backend->Exit();
 
 			return Success;
 		}
 
 		status = THREAD_STOPPED;
-		counter--;
 
-		LiSAThreadCancel(thread);
-		LiSAThreadCloseHandle(thread);
+		backend->Stop();
 
 		return Success;
 	}
@@ -119,7 +113,29 @@ S::Int S::Thread::Stop()
 	}
 }
 
-S::Void ThreadProcCaller(S::Thread *thread)
+S::Int S::Threads::Thread::GetNOfRunningThreads()
+{
+	Int	 n = 0;
+
+	for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
+	{
+		Object	*object = mainObjectManager->GetNthObject(i);
+
+		if (object != NIL)
+		{
+			if (object->GetObjectType() == classID)
+			{
+				if (((Thread *) object)->GetStatus() == THREAD_RUNNING) n++;
+			}
+		}
+	}
+
+	return n;
+}
+
+S::Void ThreadProcCaller(S::Threads::Thread *thread)
 {
 	thread->threadMain.Call(thread);
+
+	thread->Stop();
 }

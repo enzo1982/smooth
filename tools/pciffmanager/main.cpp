@@ -69,7 +69,7 @@ Void PCIFFManager::Close()
 
 Void PCIFFManager::OpenFile()
 {
-	DialogFileSelection	*dialog = new DialogFileSelection();
+	FileSelection	*dialog = new FileSelection();
 
 	dialog->SetParentWindow(wnd);
 

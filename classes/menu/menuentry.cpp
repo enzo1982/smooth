@@ -18,10 +18,9 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/objectproperties.h>
 
-S::GUI::MenuEntry::MenuEntry(Int newType, Int newID)
+S::GUI::MenuEntry::MenuEntry(Int newType)
 {
 	type		= newType;
-	id		= newID;
 
 	scKey		= 0;
 	scFlags		= 0;

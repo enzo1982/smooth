@@ -10,7 +10,7 @@
 
 #include <smooth/objectmanager.h>
 #include <smooth/i18n.h>
-#include <smooth/messagebox.h>
+#include <smooth/dialogs/messagebox.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)

@@ -341,9 +341,72 @@ SOURCE=..\classes\primitives\size.cpp
 # Begin Group "threads"
 
 # PROP Default_Filter "*.cpp"
+# Begin Group "posixbackend"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\threads\posix\mutexposix.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\posix\semaphoreposix.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\posix\threadposix.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "win32backend"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\threads\win32\mutexwin32.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\win32\semaphorewin32.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\win32\threadwin32.cpp
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\classes\threads\mutex.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\mutexbackend.cpp
 # End Source File
 # Begin Source File
 
@@ -351,7 +414,15 @@ SOURCE=..\classes\threads\semaphore.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\threads\semaphorebackend.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\threads\thread.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\threadbackend.cpp
 # End Source File
 # Begin Source File
 
@@ -470,34 +541,42 @@ SOURCE=..\classes\graphics\window.cpp
 SOURCE=..\classes\graphics\windowbackend.cpp
 # End Source File
 # End Group
-# End Group
 # Begin Group "dialogs"
 
-# PROP Default_Filter "*.cpp"
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\dialogs\colordlg.cpp
+SOURCE=..\classes\dialogs\colordlg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\dialogs\dialog.cpp
+SOURCE=..\classes\dialogs\dialog.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\dialogs\dirdlg.cpp
+SOURCE=..\classes\dialogs\dirdlg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\dialogs\filedlg.cpp
+SOURCE=..\classes\dialogs\filedlg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\dialogs\fontdlg.cpp
+SOURCE=..\classes\dialogs\fontdlg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\dialogs\tipodaydlg.cpp
+SOURCE=..\classes\dialogs\messagebox.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\classes\dialogs\splashscreen.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\dialogs\tipodaydlg.cpp
+# End Source File
+# End Group
 # End Group
 # Begin Group "miscsources"
 
@@ -520,19 +599,11 @@ SOURCE=..\misc\loop.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\misc\messagebox.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\misc\metrics.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\misc\pciio.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\misc\splashscreen.cpp
 # End Source File
 # End Group
 # End Group
@@ -782,6 +853,14 @@ SOURCE=..\include\smooth\dialogs\fontdlg.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\dialogs\messagebox.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\dialogs\splashscreen.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\dialogs\tipodaydlg.h
 # End Source File
 # End Group
@@ -807,6 +886,97 @@ SOURCE=..\include\smooth\menu\popupmenu.h
 # Begin Source File
 
 SOURCE=..\include\smooth\menu\popupview.h
+# End Source File
+# End Group
+# Begin Group "threadsheaders"
+
+# PROP Default_Filter ""
+# Begin Group "posix"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\posix\mutexposix.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\posix\semaphoreposix.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\posix\threadposix.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "win32"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\win32\mutexwin32.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\win32\semaphorewin32.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\win32\threadwin32.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\mutex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\mutexbackend.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\semaphore.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\semaphorebackend.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\thread.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\threadbackend.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\threadmanager.h
 # End Source File
 # End Group
 # Begin Source File
@@ -963,15 +1133,7 @@ SOURCE=..\include\smooth\mdiwindow.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\messagebox.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\metrics.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\mutex.h
 # End Source File
 # Begin Source File
 
@@ -1023,10 +1185,6 @@ SOURCE=..\include\smooth\scrollbar.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\semaphore.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\setup.h
 # End Source File
 # Begin Source File
@@ -1047,10 +1205,6 @@ SOURCE=..\include\smooth\slider.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\splashscreen.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\statusbar.h
 # End Source File
 # Begin Source File
@@ -1068,14 +1222,6 @@ SOURCE=..\include\smooth\tabwidget.h
 # Begin Source File
 
 SOURCE=..\include\smooth\text.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\thread.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\threadmanager.h
 # End Source File
 # Begin Source File
 

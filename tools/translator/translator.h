@@ -17,6 +17,7 @@ class Translator;
 
 using namespace smooth;
 using namespace smooth::GUI;
+using namespace smooth::GUI::Dialogs;
 
 typedef struct
 {
@@ -30,44 +31,44 @@ listEntry;
 class Translator : public Application
 {
 	private:
-		Window		*wnd;
-		Titlebar	*title;
-		Menubar		*menubar;
-		Statusbar	*statusbar;
-		Menu		*menu_file;
+		Window			*wnd;
+		Titlebar		*title;
+		Menubar			*menubar;
+		Statusbar		*statusbar;
+		Menu			*menu_file;
 
-		Button		*button_new;
-		Text		*text_id;
-		EditBox		*edit_id;
-		Text		*text_original;
-		EditBox		*edit_original;
-		Text		*text_translated;
-		EditBox		*edit_translated;
-		Button		*button_save;
-		Button		*button_remove;
-		ListBox		*list_entries;
+		Button			*button_new;
+		Text			*text_id;
+		EditBox			*edit_id;
+		Text			*text_original;
+		EditBox			*edit_original;
+		Text			*text_translated;
+		EditBox			*edit_translated;
+		Button			*button_save;
+		Button			*button_remove;
+		ListBox			*list_entries;
 
-		String		 filename;
+		String			 filename;
 
 		Array<listEntry *>	 entries;
 
-		Bool		 modified;
+		Bool			 modified;
 
-		Void		 OpenFile();
-		Void		 SaveFile();
-		Void		 SaveFileAs();
-		Void		 SaveFileWithName(String);
-		Void		 NewFile();
-		Void		 Close();
-		Void		 CloseFile();
-		Void		 SaveData();
-		Void		 SelectEntry();
-		Void		 NewEntry();
-		Void		 RemoveEntry();
-		Bool		 ExitProc();
+		Void			 OpenFile();
+		Void			 SaveFile();
+		Void			 SaveFileAs();
+		Void			 SaveFileWithName(String);
+		Void			 NewFile();
+		Void			 Close();
+		Void			 CloseFile();
+		Void			 SaveData();
+		Void			 SelectEntry();
+		Void			 NewEntry();
+		Void			 RemoveEntry();
+		Bool			 ExitProc();
 	public:
-				 Translator();
-				~Translator();
+					 Translator();
+					~Translator();
 };
 
 #endif

@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/messagebox.h>
+#include <smooth/dialogs/messagebox.h>
 #include <smooth/array.h>
 #include <smooth/i18n.h>
 #include <smooth/definitions.h>

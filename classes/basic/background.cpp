@@ -9,10 +9,10 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/background.h>
-#include <smooth/threadmanager.h>
 #include <smooth/objectmanager.h>
 #include <smooth/graphics/window.h>
 #include <smooth/timer.h>
+#include <smooth/threads/thread.h>
 
 S::BackgroundApplication	*S::backgroundApplication = NIL;
 
@@ -54,15 +54,15 @@ S::Void S::BackgroundApplication::TimerProc()
 			{
 				if (((GUI::Window *) object)->IsInUse()) ((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
 			}
-		}
-	}
 
- 	for (Int j = 0; j < mainThreadManager->GetNOfThreads(); j++)
-	{
-		if (mainThreadManager->GetNthThread(j)->GetStatus() == THREAD_RUNNING)
-		{
-			if (Setup::enableUnicode)	PostThreadMessageW(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
-			else				PostThreadMessageA(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+			if (object->GetObjectType() == Threads::Thread::classID)
+			{
+				if (((Threads::Thread *) object)->GetStatus() == Threads::THREAD_RUNNING)
+				{
+					if (Setup::enableUnicode)	PostThreadMessageW(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+					else				PostThreadMessageA(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+				}
+			}
 		}
 	}
 }

@@ -55,10 +55,7 @@
 #include "smooth/version.h"
 #include "smooth/mdiclient.h"
 #include "smooth/mdiwindow.h"
-#include "smooth/thread.h"
 #include "smooth/toolwindow.h"
-#include "smooth/mutex.h"
-#include "smooth/semaphore.h"
 #include "smooth/timer.h"
 #include "smooth/string.h"
 #include "smooth/tooltip.h"
@@ -77,14 +74,16 @@
 #include "smooth/droparea.h"
 #include "smooth/shortcut.h"
 #include "smooth/extended.h"
-#include "smooth/messagebox.h"
-#include "smooth/splashscreen.h"
 #include "smooth/config.h"
 
 #include "smooth/types/bool.h"
 #include "smooth/types/float.h"
 #include "smooth/types/int.h"
 #include "smooth/types/void.h"
+
+#include "smooth/threads/mutex.h"
+#include "smooth/threads/semaphore.h"
+#include "smooth/threads/thread.h"
 
 #include "smooth/graphics/bitmap.h"
 #include "smooth/graphics/font.h"
@@ -99,6 +98,8 @@
 #include "smooth/dialogs/dirdlg.h"
 #include "smooth/dialogs/filedlg.h"
 #include "smooth/dialogs/fontdlg.h"
+#include "smooth/dialogs/messagebox.h"
+#include "smooth/dialogs/splashscreen.h"
 #include "smooth/dialogs/tipodaydlg.h"
 
 #include "smooth/xml/attribute.h"

@@ -36,7 +36,6 @@ namespace smooth
 		class SMOOTHAPI MenuEntry : public Widget
 		{
 			public:
-				Int		 id;
 				Int		 type;
 
 				String		 description;
@@ -58,7 +57,7 @@ namespace smooth
 
 				Shortcut	*shortcut;
 
-						 MenuEntry(Int, Int);
+						 MenuEntry(Int);
 						~MenuEntry();
 
 				Int		 Paint(Int);

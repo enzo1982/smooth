@@ -98,6 +98,7 @@
 #include "smooth/graphics/bitmapbackend.h"
 #include "smooth/messagebox.h"
 #include "smooth/splashscreen.h"
+#include "smooth/config.h"
 
 #if defined __WIN32__
 #include "smooth/graphics/gdi/bitmapgdi.h"

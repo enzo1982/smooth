@@ -11,8 +11,10 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - messagebox.cpp- S::SMOOTH::MessageBox is now S::QuickMessage
 		- renamed MessageBoxApp to MessageDialog
 - callbackn.cpp	- You can now connect values directly to the Callback, the connected value will be returned without any function being called
+- config.cpp	- new class: Configuration; an interface to XML configuration files
 
 - removed some Windows API calls
 - removed smooth Toolkit (STK, stk.cpp)
 - removed mpToolkit (toolkit.cpp)
 - switched to an XML ToDo list system
+- add DTDs for ConfigFile and LangFile XML file types

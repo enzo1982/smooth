@@ -253,6 +253,11 @@ $(OBJECTDIR)/binary.o: $(MISCCLASSESDIR)/binary.cpp $(SMOOTHINCLUDEDIR)/binary.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/binary.cpp -o $(OBJECTDIR)/binary.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/config.o: $(MISCCLASSESDIR)/config.cpp $(SMOOTHINCLUDEDIR)/config.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/config.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/config.cpp -o $(OBJECTDIR)/config.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/datetime.o: $(MISCCLASSESDIR)/datetime.cpp $(SMOOTHINCLUDEDIR)/datetime.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/datetime.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/datetime.cpp -o $(OBJECTDIR)/datetime.o

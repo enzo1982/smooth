@@ -1,5 +1,7 @@
-<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="4" FILEVERSION="3" LASTMODIFIED="11.01.2004">
-    <TASK PRIORITY="5" TITLE="Implement a smooth::Configure class to abstract XML configuration files" POS="1"/>
+<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="4" FILEVERSION="6" LASTMODIFIED="14.01.2004">
+    <TASK PRIORITY="5" TITLE="smooth::Configure" EXPANDED="1" PERCENTDONE="80" POS="1">
+        <TASK PRIORITY="5" TITLE="Make configurations inheritable" POS="1"/>
+    </TASK>
     <TASK PRIORITY="5" TITLE="Use more Signals &amp; Slots internally" POS="2"/>
     <TASK PRIORITY="5" TITLE="Implement other backends than GDI (like Xlib, SDL, Qt)" POS="3">
         <TASK PRIORITY="5" TITLE="Split Window in frontend and backend parts" PERCENTDONE="20" POS="1"/>

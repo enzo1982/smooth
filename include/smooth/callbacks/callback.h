@@ -22,16 +22,25 @@ namespace smooth
 			CMethod		*method;
 			CInstance<rt>	*instance;
 			rt 		 (*function)();
+			rt		 value;
+			Bool		 gotValue;
 		public:
 			Callback()
 			{
 				method = NIL;
 				instance = NIL;
 				function = NIL;
+				value = 0;
+				gotValue = False;
 			}
 
 			Callback(const Callback &oCallback)
 			{
+				method = NIL;
+				instance = NIL;
+
+				DisconnectAll();
+
 				if (oCallback.method != NIL)
 				{
 					method = oCallback.method->Copy();
@@ -39,6 +48,12 @@ namespace smooth
 				}
 
 				function = oCallback.function;
+
+				if (oCallback.gotValue)
+				{
+					value = oCallback.value;
+					gotValue = oCallback.gotValue;
+				}
 			}
 
 			virtual ~Callback()
@@ -58,6 +73,8 @@ namespace smooth
 				};
 
 				function = NIL;
+				value = 0;
+				gotValue = False;
 
 				return Success;
 			}

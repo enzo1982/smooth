@@ -44,7 +44,7 @@ namespace smooth
 				Int	 StartPaint(Rect);
 				Int	 EndPaint();
 
-				Void	*GetContext();
+				Void	*GetSystemSurface();
 
 				Int	 SetPixel(Int, Int, Int);
 				Int	 GetPixel(Int, Int);
@@ -52,7 +52,7 @@ namespace smooth
 				Int	 Line(Point, Point, Int);
 				Int	 Box(Rect, Int, Int);
 
-				Int	 SetText(String, Rect, Font);
+				Int	 SetText(String, Rect, Font, Bool);
 
 				Int	 BlitFromBitmap(const Bitmap &, Rect, Rect);
 				Int	 BlitToBitmap(Rect, const Bitmap &, Rect);

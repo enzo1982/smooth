@@ -15,7 +15,7 @@ S::GUI::BitmapGDI::BitmapGDI(Void *iBitmap)
 	type	= BITMAP_GDI;
 	bitmap	= NIL;
 
-	SetBitmap(iBitmap);
+	SetSystemBitmap(iBitmap);
 }
 
 S::GUI::BitmapGDI::BitmapGDI(Int cx, Int cy, Int bpp)
@@ -31,7 +31,7 @@ S::GUI::BitmapGDI::BitmapGDI(const int nil)
 	type	= BITMAP_GDI;
 	bitmap	= NIL;
 
-	SetBitmap(NIL);
+	SetSystemBitmap(NIL);
 }
 
 S::GUI::BitmapGDI::BitmapGDI(const BitmapGDI &iBitmap)
@@ -39,7 +39,7 @@ S::GUI::BitmapGDI::BitmapGDI(const BitmapGDI &iBitmap)
 	type	= BITMAP_GDI;
 	bitmap	= NIL;
 
-	SetBitmap(iBitmap.bitmap);
+	SetSystemBitmap(iBitmap.bitmap);
 }
 
 S::GUI::BitmapGDI::~BitmapGDI()
@@ -108,7 +108,7 @@ S::Bool S::GUI::BitmapGDI::DeleteBitmap()
 	return True;
 }
 
-S::Bool S::GUI::BitmapGDI::SetBitmap(Void *nBitmap)
+S::Bool S::GUI::BitmapGDI::SetSystemBitmap(Void *nBitmap)
 {
 	if (nBitmap == NIL)
 	{
@@ -141,14 +141,14 @@ S::Bool S::GUI::BitmapGDI::SetBitmap(Void *nBitmap)
 	return True;
 }
 
-S::Void *S::GUI::BitmapGDI::GetBitmap()
+S::Void *S::GUI::BitmapGDI::GetSystemBitmap()
 {
 	return (Void *) bitmap;
 }
 
 S::GUI::BitmapBackend &S::GUI::BitmapGDI::operator =(const BitmapBackend &newBitmap)
 {
-	SetBitmap(((BitmapGDI &) newBitmap).bitmap);
+	SetSystemBitmap(((BitmapGDI &) newBitmap).bitmap);
 
 	return *this;
 }

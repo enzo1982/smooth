@@ -61,9 +61,9 @@ S::Int S::GUI::Surface::EndPaint()
 	return backend->EndPaint();
 }
 
-S::Void *S::GUI::Surface::GetContext()
+S::Void *S::GUI::Surface::GetSystemSurface()
 {
-	return backend->GetContext();
+	return backend->GetSystemSurface();
 }
 
 S::Int S::GUI::Surface::SetPixel(Int x, Int y, Int color)
@@ -91,14 +91,9 @@ S::Int S::GUI::Surface::Box(Rect rect, Int color, Int style)
 	return backend->Box(rect, color, style);
 }
 
-S::Int S::GUI::Surface::SetText(String string, Rect rect, Font font)
+S::Int S::GUI::Surface::SetText(String string, Rect rect, Font font, Bool shadow)
 {
-	return backend->SetText(string, rect, font);
-}
-
-S::Int S::GUI::Surface::SetShadowedText(String string, Rect rect, Font font)
-{
-	return backend->SetShadowedText(string, rect, font);
+	return backend->SetText(string, rect, font, shadow);
 }
 
 S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)

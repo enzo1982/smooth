@@ -27,7 +27,6 @@ namespace smooth
 	{
 		class SMOOTHAPI WindowGDI : public WindowBase
 		{
-			friend Int SMOOTHAPI S::Loop();
 			private:
 				static LRESULT CALLBACK		 WindowProc(HWND, UINT, WPARAM, LPARAM);
 			protected:

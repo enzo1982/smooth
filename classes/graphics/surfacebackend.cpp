@@ -86,7 +86,7 @@ S::Int S::GUI::SurfaceBackend::EndPaint()
 	return Success;
 }
 
-S::Void *S::GUI::SurfaceBackend::GetContext()
+S::Void *S::GUI::SurfaceBackend::GetSystemSurface()
 {
 	return NIL;
 }
@@ -168,34 +168,30 @@ S::Int S::GUI::SurfaceBackend::Box(Rect rect, Int color, Int style)
 	return Success;
 }
 
-S::Int S::GUI::SurfaceBackend::SetText(String string, Rect rect, Font font)
+S::Int S::GUI::SurfaceBackend::SetText(String string, Rect rect, Font font, Bool shadow)
 {
-	return Success;
-}
+	if (shadow)
+	{
+		rect.left += 2;
+		rect.top += 2;
+		rect.right += 2;
+		rect.bottom += 2;
 
-S::Int S::GUI::SurfaceBackend::SetShadowedText(String string, Rect rect, Font font)
-{
-	if (string == NIL) return Error;
+		Int	 fontColor = font.GetColor();
 
-	rect.left += 2;
-	rect.top += 2;
-	rect.right += 2;
-	rect.bottom += 2;
+		font.SetColor(CombineColor((Int) ((Float) GetRed(Setup::BackgroundColor) / 3 * 2), (Int) ((Float) GetGreen(Setup::BackgroundColor) / 3 * 2), (Int) ((Float) GetBlue(Setup::BackgroundColor) / 3 * 2)));
 
-	Int	 fontColor = font.GetColor();
+		SetText(string, rect, font, False);
 
-	font.SetColor(CombineColor((Int) ((Float) GetRed(Setup::BackgroundColor) / 3 * 2), (Int) ((Float) GetGreen(Setup::BackgroundColor) / 3 * 2), (Int) ((Float) GetBlue(Setup::BackgroundColor) / 3 * 2)));
+		rect.left -= 2;
+		rect.top -= 2;
+		rect.right -= 2;
+		rect.bottom -= 2;
 
-	SetText(string, rect, font);
+		font.SetColor(fontColor);
 
-	rect.left -= 2;
-	rect.top -= 2;
-	rect.right -= 2;
-	rect.bottom -= 2;
-
-	font.SetColor(fontColor);
-
-	SetText(string, rect, font);
+		SetText(string, rect, font, False);
+	}
 
 	return Success;
 }

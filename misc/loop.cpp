@@ -190,7 +190,6 @@ S::Int S::Loop()
 			{
 				if (wnd->GetObjectType() == GUI::Window::classID)
 				{
-					if (!wnd->created) wnd->Create();
 					if (!wnd->initshow) wnd->Show();
 				}
 			}

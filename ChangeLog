@@ -10,6 +10,7 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - surface.cpp	- splitted into a frontend and a system dependent backend part
 - messagebox.cpp- S::SMOOTH::MessageBox is now S::QuickMessage
 		- renamed MessageBoxApp to MessageDialog
+- callbackn.cpp	- You can now connect values directly to the Callback, the connected value will be returned without any function being called
 
 - removed some Windows API calls
 - removed smooth Toolkit (STK, stk.cpp)

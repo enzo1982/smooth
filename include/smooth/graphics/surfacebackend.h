@@ -58,7 +58,7 @@ namespace smooth
 				virtual Int	 StartPaint(Rect);
 				virtual Int	 EndPaint();
 
-				virtual Void	*GetContext();
+				virtual Void	*GetSystemSurface();
 
 				virtual Int	 SetPixel(Int, Int, Int);
 				virtual Int	 GetPixel(Int, Int);
@@ -67,8 +67,7 @@ namespace smooth
 				virtual Int	 Frame(Rect, Int);
 				virtual Int	 Box(Rect, Int, Int);
 
-				virtual Int	 SetText(String, Rect, Font);
-				Int		 SetShadowedText(String, Rect, Font);
+				virtual Int	 SetText(String, Rect, Font, Bool);
 
 				Int		 Gradient(Rect, Int, Int, Int);
 				Int		 Bar(Point, Point, Int);

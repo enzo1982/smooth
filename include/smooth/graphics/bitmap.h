@@ -53,8 +53,8 @@ namespace smooth
 				Bool			 CreateBitmap(Int, Int, Int);
 				Bool			 DeleteBitmap();
 
-				Bool			 SetBitmap(Void *);
-				Void			*GetBitmap();
+				Bool			 SetSystemBitmap(Void *);
+				Void			*GetSystemBitmap();
 
 				Int			 GrayscaleBitmap();
 				Int			 ReplaceColor(Int, Int);

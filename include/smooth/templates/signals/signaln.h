@@ -68,7 +68,7 @@ namespace smooth
 			}
 #endif
 
-			template <class ct, class rrt> int Disconnect(rrt (ct::*proc)(SIGNALS_ARGUMENT_TYPES), ct *inst)
+			template <class ct, class rrt> Int Disconnect(rrt (ct::*proc)(SIGNALS_ARGUMENT_TYPES), ct *inst)
 			{
 				SIGNALS_INSTANCE_CLASS_NAME<ct, rrt SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	*instance = new SIGNALS_INSTANCE_CLASS_NAME<ct, rrt SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(inst);
 				MethodT<rrt (ct::*)(SIGNALS_ARGUMENT_TYPES)>						*method = new MethodT<rrt (ct::*)(SIGNALS_ARGUMENT_TYPES)>(proc);
@@ -124,7 +124,7 @@ namespace smooth
 			}
 
 #ifndef SIGNALS_SIGNAL_ZERO
-			template <class ct, class rrt> int Disconnect(rrt (ct::*proc)(), ct *inst)
+			template <class ct, class rrt> Int Disconnect(rrt (ct::*proc)(), ct *inst)
 			{
 				Instance0<ct, rrt>	*instance = new Instance0<ct, rrt>(inst);
 				MethodT<rrt (ct::*)()>	*method = new MethodT<rrt (ct::*)()>(proc);

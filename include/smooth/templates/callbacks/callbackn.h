@@ -37,7 +37,18 @@ namespace smooth
 				return Success;
 			}
 
-			template <class ct> int Disconnect(rt (ct::*proc)(CALLBACKS_ARGUMENT_TYPES), ct *inst)
+			Int Connect(rt nValue)
+			{
+				DisconnectAll();
+
+				value = nValue;
+
+				gotValue = True;
+
+				return Success;
+			}
+
+			template <class ct> Int Disconnect(rt (ct::*proc)(CALLBACKS_ARGUMENT_TYPES), ct *inst)
 			{
 				CALLBACKS_INSTANCE_CLASS_NAME<ct, rt CALLBACKS_CONDITIONAL_COMMA CALLBACKS_ARGUMENT_TYPES>	*minstance = new CALLBACKS_INSTANCE_CLASS_NAME<ct, rt CALLBACKS_CONDITIONAL_COMMA CALLBACKS_ARGUMENT_TYPES>(inst);
 				CMethodT<rt (ct::*)(CALLBACKS_ARGUMENT_TYPES)>							*mmethod = new CMethodT<rt (ct::*)(CALLBACKS_ARGUMENT_TYPES)>(proc);
@@ -67,12 +78,25 @@ namespace smooth
 				return Success;
 			}
 
+			Int Disconnect(rt dValue)
+			{
+				if (gotValue && value == dValue)
+				{
+					value = 0;
+
+					gotValue = False;
+				}
+
+				return Success;
+			}
+
 			rt Call(CALLBACKS_ARGUMENT_PARAMETER_LIST)
 			{
 				rt rVal = (rt) NIL;
 
 				if (method != NIL)		rVal = instance->Call(method CALLBACKS_CONDITIONAL_COMMA CALLBACKS_ARGUMENT_INV_PARAMETERS);
 				else if (function != NIL)	rVal = ((rt (*)(CALLBACKS_ARGUMENT_TYPES)) function)(CALLBACKS_ARGUMENT_PARAMETERS);
+				else if (gotValue)		rVal = value;
 
 				return rVal;
 			}

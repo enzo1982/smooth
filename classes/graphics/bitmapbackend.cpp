@@ -95,12 +95,12 @@ S::Bool S::GUI::BitmapBackend::DeleteBitmap()
 	return True;
 }
 
-S::Bool S::GUI::BitmapBackend::SetBitmap(Void *nBitmap)
+S::Bool S::GUI::BitmapBackend::SetSystemBitmap(Void *nBitmap)
 {
 	return False;
 }
 
-S::Void *S::GUI::BitmapBackend::GetBitmap()
+S::Void *S::GUI::BitmapBackend::GetSystemBitmap()
 {
 	return NIL;
 }
@@ -205,7 +205,7 @@ S::UnsignedLong S::GUI::BitmapBackend::GetPixel(Int x, Int y)
 
 S::GUI::BitmapBackend &S::GUI::BitmapBackend::operator =(const int nil)
 {
-	SetBitmap(NIL);
+	SetSystemBitmap(NIL);
 
 	return *this;
 }

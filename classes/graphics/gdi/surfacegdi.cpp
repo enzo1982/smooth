@@ -98,7 +98,7 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 	return Success;
 }
 
-S::Void *S::GUI::SurfaceGDI::GetContext()
+S::Void *S::GUI::SurfaceGDI::GetSystemSurface()
 {
 	if (painting)	return bmp_dc;
 	else		return gdi_dc;
@@ -226,9 +226,10 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 	return Success;
 }
 
-S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font)
+S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font, Bool shadow)
 {
-	if (string == NIL) return Error;
+	if (string == NIL)	return Error;
+	if (shadow)		return SurfaceBackend::SetText(string, rect, font, shadow);
 
 	HFONT	 hfont;
 	HFONT	 holdfont;
@@ -319,7 +320,7 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, Rect srcRect, R
 	Bitmap	 bitmap = oBitmap;
 
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
-	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetBitmap());
+	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
 	destRect = TranslateRect(destRect);
 
@@ -346,7 +347,7 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, const Bitmap &oBitmap, Rec
 	Bitmap	 bitmap = oBitmap;
 
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
-	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetBitmap());
+	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
 	srcRect = TranslateRect(srcRect);
 

@@ -96,14 +96,14 @@ S::Bool S::GUI::Bitmap::DeleteBitmap()
 	return backend->DeleteBitmap();
 }
 
-S::Bool S::GUI::Bitmap::SetBitmap(Void *nBitmap)
+S::Bool S::GUI::Bitmap::SetSystemBitmap(Void *nBitmap)
 {
-	return backend->SetBitmap(nBitmap);
+	return backend->SetSystemBitmap(nBitmap);
 }
 
-S::Void *S::GUI::Bitmap::GetBitmap()
+S::Void *S::GUI::Bitmap::GetSystemBitmap()
 {
-	return backend->GetBitmap();
+	return backend->GetSystemBitmap();
 }
 
 S::Int S::GUI::Bitmap::GrayscaleBitmap()

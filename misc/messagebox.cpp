@@ -306,7 +306,7 @@ S::Int S::MessageDialog::ShowDialog()
 S::Void S::MessageDialog::MessagePaintProc()
 {
 	Surface	*surface = msgbox->GetDrawSurface();
-	HDC	 dc = (HDC) surface->GetContext();
+	HDC	 dc = (HDC) surface->GetSystemSurface();
 	Rect	 txtrect;
 
 	txtrect.left = 17;

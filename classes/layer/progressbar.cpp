@@ -135,10 +135,10 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 		switch (textFlag)
 		{
 			case PB_VALUE:
-				objectProperties->text = String::FromInt(Math::Max(value, startValue));
+				objectProperties->text = String::FromInt((Int) Math::Max(value, startValue));
 				break;
 			case PB_PERCENT:
-				if (value > 0)	objectProperties->text = String::FromInt(Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
+				if (value > 0)	objectProperties->text = String::FromInt((Int) Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
 				else		objectProperties->text = "0";
 
 				objectProperties->text.Append("%");
@@ -206,10 +206,10 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 		switch (textFlag)
 		{
 			case PB_VALUE:
-				objectProperties->text = String::FromInt(Math::Max(value, startValue));
+				objectProperties->text = String::FromInt((Int) Math::Max(value, startValue));
 				break;
 			case PB_PERCENT:
-				if (value > 0)	objectProperties->text = String::FromInt(Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
+				if (value > 0)	objectProperties->text = String::FromInt((Int) Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
 				else		objectProperties->text = "0";
 
 				objectProperties->text.Append("%");
@@ -330,10 +330,10 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 		switch (textFlag)
 		{
 			case PB_VALUE:
-				objectProperties->text = String::FromInt(Math::Max(value, startValue));
+				objectProperties->text = String::FromInt((Int) Math::Max(value, startValue));
 				break;
 			case PB_PERCENT:
-				if (value > 0)	objectProperties->text = String::FromInt(Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
+				if (value > 0)	objectProperties->text = String::FromInt((Int) Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
 				else		objectProperties->text = "0";
 
 				objectProperties->text.Append("%");

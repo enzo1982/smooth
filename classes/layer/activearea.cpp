@@ -20,6 +20,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -55,29 +56,33 @@ SMOOTHInt SMOOTHActiveArea::Paint(SMOOTHInt message)
 	if (!registered)	return SMOOTH::Error;
 	if (!visible)		return SMOOTH::Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	EnterProtectedRegion();
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHPoint	 realPos = GetRealPosition();
 	SMOOTHRect	 frame;
+	SMOOTHPoint	 realPos = GetRealPosition();
 
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	switch (message)
+	{
+		default:
+		case SP_PAINT:
+			frame.left	= realPos.x;
+			frame.top	= realPos.y;
+			frame.right	= realPos.x + objectProperties->size.cx - 1;
+			frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	Frame(dc, frame, FRAME_DOWN);
+			surface->Frame(frame, FRAME_DOWN);
 
-	frame.left++;
-	frame.top++;
+			frame.left++;
+			frame.top++;
 
-	Box(dc, frame, areaColor, FILLED);
+			surface->Box(frame, areaColor, FILLED);
 
-	FreeContext(wnd, dc);
+			break;
+	}
+
+	LeaveProtectedRegion();
 
 	return SMOOTH::Success;
 }

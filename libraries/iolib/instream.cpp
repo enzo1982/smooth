@@ -578,7 +578,10 @@ bool InStream::SetFilter(IOLibFilter *newFilter)
 
 	filter->Activate();
 
-	ReadData();
+	while (currentBufferPos >= packageSize)
+	{
+		if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
+	}
 
 	return true;
 }

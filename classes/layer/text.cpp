@@ -20,6 +20,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
+#include <smooth/surface.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -51,27 +52,31 @@ SMOOTHInt SMOOTHText::Paint(SMOOTHInt message)
 	if (!registered)	return SMOOTH::Error;
 	if (!visible)		return SMOOTH::Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	EnterProtectedRegion();
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHPoint	 realPos = GetRealPosition();
 	SMOOTHRect	 textRect;
+	SMOOTHPoint	 realPos = GetRealPosition();
 
 	objectProperties->size = objectProperties->textSize;
 
-	textRect.left	= realPos.x;
-	textRect.top	= realPos.y;
-	textRect.right	= textRect.left + objectProperties->textSize.cx;
-	textRect.bottom	= textRect.top + roundtoint(objectProperties->textSize.cy * 1.2);
+	switch (message)
+	{
+		default:
+		case SP_PAINT:
+			textRect.left	= realPos.x;
+			textRect.top	= realPos.y;
+			textRect.right	= textRect.left + objectProperties->textSize.cx;
+			textRect.bottom	= textRect.top + roundtoint(objectProperties->textSize.cy * 1.2);
 
-	if (active)	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-	else		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GrayTextColor, objectProperties->fontWeight);
+			if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+			else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GrayTextColor, objectProperties->fontWeight);
 
-	FreeContext(wnd, dc);
+			break;
+	}
+
+	LeaveProtectedRegion();
 
 	return SMOOTH::Success;
 }

@@ -38,8 +38,8 @@ namespace smooth
 			String		 tooltip;
 			String		 description;
 
-			Bitmap		 bitmap;
-			Bitmap		 graymap;
+			GUI::Bitmap	 bitmap;
+			GUI::Bitmap	 graymap;
 
 			Int		 orientation;
 
@@ -71,7 +71,7 @@ namespace smooth
 			Int		 SetStatusText(String);
 			Int		 SetShortcut(Int, Int);
 
-			Int		 SetBitmap(const Bitmap &);
+			Int		 SetBitmap(const GUI::Bitmap &);
 
 			Int		 SetOrientation(Int);
 		signals:

@@ -75,12 +75,12 @@ S::Int S::MenuEntry::SetShortcut(Int nKey, Int nFlags)
 	return Success;
 }
 
-S::Int S::MenuEntry::SetBitmap(const Bitmap &newBitmap)
+S::Int S::MenuEntry::SetBitmap(const GUI::Bitmap &newBitmap)
 {
-	Bitmap	 bmp = newBitmap;
+	GUI::Bitmap	 bmp = newBitmap;
 
-	bitmap	= Bitmap(DetectTransparentRegions(bmp.GetBitmap()));
-	graymap	= Bitmap(DetectTransparentRegions(GrayscaleBitmap(bmp.GetBitmap())));
+	bitmap	= GUI::Bitmap(DetectTransparentRegions(bmp.GetBitmap()));
+	graymap	= GUI::Bitmap(DetectTransparentRegions(GrayscaleBitmap(bmp.GetBitmap())));
 
 	return Success;
 }

@@ -17,7 +17,6 @@
 #include <smooth/array.h>
 #include <smooth/shlobjmini.h>
 
-#include <picture.h>
 #include <iolib-cxx.h>
 
 #ifdef __WIN32__
@@ -196,7 +195,8 @@ int GetLineSizeX(String text, int nofchars, String font, int size, int weight)
 	if (text == NIL) return 0;
 	if (nofchars == 0) return 0;
 
-	HDC	 cdc = CreateCompatibleDC(0);
+	HDC	 ddc = GetWindowDC(0);
+	HDC	 cdc = CreateCompatibleDC(ddc);
 
 	size = -MulDiv(size, GetDeviceCaps(cdc, LOGPIXELSY), 72);
 
@@ -217,6 +217,7 @@ int GetLineSizeX(String text, int nofchars, String font, int size, int weight)
 	::DeleteObject(hfont);
 
 	DeleteDC(cdc);
+	ReleaseDC(0, ddc);
 
 	return tSize.cx;
 }

@@ -15,12 +15,14 @@ namespace smooth
 {
 	namespace GUI
 	{
+		class Surface;
 		class BitmapBase;
 	};
 };
 
 #include "../definitions.h"
 #include "../size.h"
+#include "../rect.h"
 
 namespace smooth
 {
@@ -29,46 +31,46 @@ namespace smooth
 		class SMOOTHAPI BitmapBase
 		{
 			protected:
-				Int				 type;
+				Int			 type;
 
-				Size				 size;
-				Int				 depth;
+				Size			 size;
+				Int			 depth;
 
-				UnsignedByte			*bytes;
-				Int				 align;
+				UnsignedByte		*bytes;
+				Int			 align;
 			public:
-								 BitmapBase();
-								 BitmapBase(const int);
-								 BitmapBase(const BitmapBase &);
+							 BitmapBase();
+							 BitmapBase(const int);
+							 BitmapBase(const BitmapBase &);
 
-				virtual				~BitmapBase();
+				virtual			~BitmapBase();
 
-				Int				 GetBitmapType();
+				Int			 GetBitmapType();
 
-				Size				 GetSize();
-				Int				 GetDepth();
+				Size			 GetSize();
+				Int			 GetDepth();
 
-				UnsignedByte			*GetBytes();
-				Int				 GetLineAlignment();
+				UnsignedByte		*GetBytes();
+				Int			 GetLineAlignment();
 
-				virtual Bool			 SetPixel(Int, Int, UnsignedLong);
-				virtual UnsignedLong		 GetPixel(Int, Int);
+				virtual Bool		 CreateBitmap(Int, Int, Int);
+				virtual Bool		 DeleteBitmap();
 
-//				virtual BitmapBase &operator	 =(const int) = 0;
-//				virtual BitmapBase &operator	 =(const BitmapBase &) = 0;
+				virtual Int		 BlitFromSurface(Surface *, Rect, Rect);
+				virtual Int		 BlitToSurface(Rect, Surface *, Rect);
 
-//				virtual Bool operator		 ==(const int) = 0;
-//				virtual Bool operator		 !=(const int) = 0;
+				virtual Bool		 SetPixel(Int, Int, UnsignedLong);
+				virtual UnsignedLong	 GetPixel(Int, Int);
 		};
 	};
 };
 
 #ifdef __WIN32__
 	#include "gdi/bitmapgdi.h"
-	#define Bitmap S::GUI::BitmapGDI
+	#define Bitmap BitmapGDI
 #else
 	#include "none/bitmapnone.h"
-	#define Bitmap S::GUI::BitmapNone
+	#define Bitmap BitmapNone
 #endif
 
 #endif

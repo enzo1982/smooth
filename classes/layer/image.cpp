@@ -86,7 +86,7 @@ S::Int S::GUI::Image::SetBitmap(const Bitmap &newBmp)
 	return Success;
 }
 
-Bitmap &S::GUI::Image::GetBitmap()
+S::GUI::Bitmap &S::GUI::Image::GetBitmap()
 {
 	return bitmap;
 }

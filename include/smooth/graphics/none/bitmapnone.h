@@ -36,8 +36,8 @@ namespace smooth
 
 							~BitmapNone();
 
-				BitmapBase &operator	 =(const int);
-				BitmapBase &operator	 =(const BitmapBase &);
+				BitmapNone &operator	 =(const int);
+				BitmapNone &operator	 =(const BitmapNone &);
 
 				Bool operator		 ==(const int);
 				Bool operator		 !=(const int);

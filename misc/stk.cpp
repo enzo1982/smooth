@@ -10,6 +10,7 @@
 
 #include <smooth/definitions.h>
 #include <smooth/stk.h>
+#include <smooth/color.h>
 
 size_t	 (*ex_iconv)(iconv_t, const char **, size_t *, char **, size_t *) = NIL;
 iconv_t	 (*ex_iconv_open)(const char *, const char *) = NIL;

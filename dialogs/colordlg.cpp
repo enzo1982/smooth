@@ -30,8 +30,6 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 
-#include <picture.h>
-
 using namespace smooth::GUI;
 
 S::DialogColorSelection::DialogColorSelection()
@@ -355,7 +353,7 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 	Rect		 rect;
 	Point		 p1;
 	Point		 p2;
-	picture		*pic = new picture(256, 256, 24);
+	Bitmap		 bmp(256, 256, 24);
 	Rect		 urect = dlgwnd->GetUpdateRect();
 	Rect		 irect;
 	int		 hssize = Math::Round(205 * Setup::FontSize);
@@ -464,19 +462,17 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 
 			for (register int val = max(0, xmin); val < min(hssize, xmax); val++)
 			{
-				pic->SetPixel(val, sat, RGB(Math::Round(ared += rbias), Math::Round(agreen += gbias), Math::Round(ablue += bbias)));
+				bmp.SetPixel(val, sat, CombineColor(Math::Round(ared += rbias), Math::Round(agreen += gbias), Math::Round(ablue += bbias)));
 			}
 		}
 
-		surface->BlitFromBitmap(Bitmap(pic->GetBitmap()), rect, irect);
+		surface->BlitFromBitmap(bmp, rect, irect);
 	}
 
 	forcevsupdate = true;
 	preventhupdate = true;
 
 	ColorDlgUpdatePickers();
-
-	delete pic;
 }
 
 void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int lparam)

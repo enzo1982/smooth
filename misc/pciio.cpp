@@ -16,19 +16,13 @@
 #include <iolib-cxx.h>
 #include <smooth/toolkit.h>
 #include <smooth/string.h>
+#include <smooth/graphics/gdi/surfacegdi.h>
 
 S::String	 cfNames[10];
 S::String	 cpNames[5];
 
 PCIIO::PCIIO(HBITMAP b)
 {
-#ifdef __WIN32__
-	HDC	 ddc = GetWindowDC(0);
-	HDC	 cdc = CreateCompatibleDC(ddc);
-	HBITMAP	 oldbmp;
-	RECT	 tgt;
-#endif
-
 	cfNames[RGB]		= "RGB";
 	cfNames[HSV]		= "HSV";
 	cfNames[YUV]		= "YUV";
@@ -62,22 +56,31 @@ PCIIO::PCIIO(HBITMAP b)
 	imagename = NIL;
 	rlebits = 8;
 
-	pic = new picture(sizex, sizey, 24, true);
+	bmp.CreateBitmap(sizex, sizey, 24);
 
 #ifdef __WIN32__
+	HDC	 ddc = GetWindowDC(NIL);
+	HDC	 cdc = CreateCompatibleDC(ddc);
+	HBITMAP	 oldbmp;
+	S::Rect	 tgt;
+
 	oldbmp = (HBITMAP) SelectObject(cdc, b);
+
+	S::GUI::SurfaceGDI	*surface = new S::GUI::SurfaceGDI(cdc);
 
 	tgt.left = 0;
 	tgt.top = 0;
 	tgt.right = tgt.left + sizex;
 	tgt.bottom = tgt.top + sizey;
 
-	pic->BlitFromDC(cdc, &tgt);
+	bmp.BlitFromSurface(surface, tgt, tgt);
+
+	delete surface;
 
 	b = (HBITMAP) SelectObject(cdc, oldbmp);
 
-	ReleaseDC(0, ddc);
 	DeleteDC(cdc);
+	ReleaseDC(NIL, ddc);
 #endif
 }
 
@@ -102,13 +105,11 @@ PCIIO::PCIIO()
 
 	rlebits = 8;
 	quality = 100;
-
-	pic = NULL;
 }
 
 PCIIO::~PCIIO()
 {
-	delete pic;
+	bmp.DeleteBitmap();
 }
 
 void PCIIO::SetCompressionType(int t)
@@ -164,21 +165,31 @@ void PCIIO::SetImageName(S::String name)
 HBITMAP PCIIO::GetBitmap()
 {
 #ifdef __WIN32__
-	HDC	 ddc = GetWindowDC(0);
+	HDC	 ddc = GetWindowDC(NIL);
 	HDC	 cdc = CreateCompatibleDC(ddc);
-	HBITMAP	 bmp = CreateCompatibleBitmap(ddc, sizex, sizey);
+	HBITMAP	 hbmp = CreateCompatibleBitmap(ddc, sizex, sizey);
 	HBITMAP	 oldbmp;
+	S::Rect	 tgt;
 
-	oldbmp = (HBITMAP) SelectObject(cdc, bmp);
+	oldbmp = (HBITMAP) SelectObject(cdc, hbmp);
 
-	pic->BlitToDC(cdc);
+	S::GUI::SurfaceGDI	*surface = new S::GUI::SurfaceGDI(cdc);
 
-	bmp = (HBITMAP) SelectObject(cdc, oldbmp);
+	tgt.left = 0;
+	tgt.top = 0;
+	tgt.right = tgt.left + sizex;
+	tgt.bottom = tgt.top + sizey;
 
-	ReleaseDC(0, ddc);
+	bmp.BlitToSurface(tgt, surface, tgt);
+
+	delete surface;
+
+	hbmp = (HBITMAP) SelectObject(cdc, oldbmp);
+
 	DeleteDC(cdc);
+	ReleaseDC(NIL, ddc);
 
-	return bmp;
+	return hbmp;
 #else
 	return NIL;
 #endif
@@ -637,7 +648,7 @@ bool ReadDATATAG(PCIIn in, PCIIO &ior)
 			{
 				in->RelSeek(4);
 
-				ior.pic = new picture(ior.sizex, ior.sizey, 24, true);
+				ior.bmp.CreateBitmap(ior.sizex, ior.sizey, 24);
 
 				DecompressPCI(in, ior);
 

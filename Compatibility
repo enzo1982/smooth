@@ -2,14 +2,14 @@ Status of smooth ports
 ----------------------
 
 MinGW 1.x		all versions	complete support
-MinGW 2.0		in the works	not supported, yet
+MinGW 2.x, 3.x		in the works	not supported, yet, due to a bug in the MinGW linker
 MSVC			since 0.8.58.0	complete support
 Linux GCC		in the works	no GUI support (supported: threads, strings, primitives, arrays, xml)
 QNX 6.1 GCC		in the works	no GUI support (supported: threads, strings, primitives, arrays, xml)
 
 Windows 2000/XP		all versions	complete support
-Windows NT 4.0		unknown		no official support
-Windows 98/SE/ME	all versions	limited Unicode support
+Windows NT 4.0		supported	seems to work, no official support
+Windows 98/SE/ME	all versions	limited Unicode support, stability issues
 Windows 95		since 0.8.62.0	limited Unicode support, requires msvcrt.dll
 
 Source and binary compatibility between different smooth Versions
@@ -18,7 +18,7 @@ Source and binary compatibility between different smooth Versions
 		Compatibility with older versions
 Version		Source		Binary			Comments
 ---------------------------------------------------------------------------------------------------------------------
-0.8.63.0	no		no			minor API changes
+0.8.63.0	no		no			replaced class picture with smooth::GUI::Bitmap
 0.8.62.0	no		no			major changes again
 0.8.61.0	no		no			major API changes
 0.8.60.0	yes		no			-

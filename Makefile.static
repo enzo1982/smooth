@@ -7,7 +7,6 @@ BINDIR = ./bin
 LIBDIR = ./lib
 OTHERLIBSDIR = ./libraries
 IOLIBDIR = $(OTHERLIBSDIR)/iolib
-PICTUREDIR = $(OTHERLIBSDIR)/picture
 LIBBZ2DIR = $(OTHERLIBSDIR)/bzlib
 LIBXMLDIR = $(OTHERLIBSDIR)/libxml
 LIBICONVDIR = $(OTHERLIBSDIR)/libiconv
@@ -48,16 +47,14 @@ SAMPLESLIBS = -lsmooth -lwsock32 -limm32 -lstdc++
 LIBNAME = $(LIBDIR)/libsmooth.a
 
 LIBIOLIB = $(LIBDIR)/libiolib.a
-LIBPICTURE = $(LIBDIR)/libpicture.a
 LIBBZ2 = $(LIBDIR)/libbz2.a
 LIBXML = $(LIBDIR)/libxml.a
 LIBICONV = $(LIBDIR)/libiconv.a
 LIBLISA = $(LIBDIR)/liblisa.a
 
-OTHERLIBS = $(LIBIOLIB) $(LIBPICTURE) $(LIBBZ2) $(LIBXML) $(LIBICONV) $(LIBLISA)
+OTHERLIBS = $(LIBIOLIB) $(LIBBZ2) $(LIBXML) $(LIBICONV) $(LIBLISA)
 
 IOLIBOBJECTS = $(OBJECTDIR)/iolib_instream.o $(OBJECTDIR)/iolib_iolib.o $(OBJECTDIR)/iolib_iolibdriver.o $(OBJECTDIR)/iolib_iolibfilter.o $(OBJECTDIR)/iolib_iolibstream.o $(OBJECTDIR)/iolib_outstream.o $(OBJECTDIR)/iolib_driver_ansi.o $(OBJECTDIR)/iolib_driver_posix.o $(OBJECTDIR)/iolib_driver_memory.o $(OBJECTDIR)/iolib_driver_socket.o $(OBJECTDIR)/iolib_driver_socks4.o $(OBJECTDIR)/iolib_driver_socks5.o $(OBJECTDIR)/iolib_driver_zero.o $(OBJECTDIR)/iolib_filter_bzip2.o $(OBJECTDIR)/iolib_filter_xor.o
-PICTUREOBJECTS = $(OBJECTDIR)/picture_picture.o
 LIBBZ2OBJECTS = $(OBJECTDIR)/libbz2_blocksort.o $(OBJECTDIR)/libbz2_bzlib.o $(OBJECTDIR)/libbz2_compress.o $(OBJECTDIR)/libbz2_crctable.o $(OBJECTDIR)/libbz2_decompress.o $(OBJECTDIR)/libbz2_huffman.o $(OBJECTDIR)/libbz2_randtable.o
 LIBXMLOBJECTS = $(OBJECTDIR)/libxml_catalog.o $(OBJECTDIR)/libxml_encoding.o $(OBJECTDIR)/libxml_entities.o $(OBJECTDIR)/libxml_error.o $(OBJECTDIR)/libxml_globals.o $(OBJECTDIR)/libxml_hash.o $(OBJECTDIR)/libxml_list.o $(OBJECTDIR)/libxml_parser.o $(OBJECTDIR)/libxml_parserInternals.o $(OBJECTDIR)/libxml_SAX.o $(OBJECTDIR)/libxml_threads.o $(OBJECTDIR)/libxml_tree.o $(OBJECTDIR)/libxml_uri.o $(OBJECTDIR)/libxml_valid.o $(OBJECTDIR)/libxml_xlink.o $(OBJECTDIR)/libxml_xmlIO.o $(OBJECTDIR)/libxml_xmlmemory.o $(OBJECTDIR)/libxml_xmlregexp.o $(OBJECTDIR)/libxml_xmlunicode.o $(OBJECTDIR)/libxml_xpath.o $(OBJECTDIR)/libxml_xpointer.o
 LIBICONVOBJECTS = $(OBJECTDIR)/libiconv_iconv.o $(OBJECTDIR)/libiconv_localcharset.o
@@ -120,7 +117,7 @@ install:
 
 clean:
 	$(ECHO) -n Cleaning directories...
-	$(REMOVER) $(REMOVER_OPTS) $(OTHERLIBS) $(IOLIBOBJECTS) $(LIBBZ2OBJECTS) $(PICTUREOBJECTS) $(LIBXMLOBJECTS) $(LIBICONVOBJECTS) $(LISAOBJECTS)
+	$(REMOVER) $(REMOVER_OPTS) $(OTHERLIBS) $(IOLIBOBJECTS) $(LIBBZ2OBJECTS) $(LIBXMLOBJECTS) $(LIBICONVOBJECTS) $(LISAOBJECTS)
 	$(REMOVER) $(REMOVER_OPTS) $(OBJECTS) $(RESOURCES) $(LIBNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4EXE) $(SAMPLE5EXE) $(DESIGNEROBJECTS) $(PCIFFMANOBJECTS) $(TRANSLATOROBJECTS) $(SAMPLE1OBJECTS) $(SAMPLE2OBJECTS) $(SAMPLE3OBJECTS) $(SAMPLE4OBJECTS) $(SAMPLE5OBJECTS) $(SAMPLE4DLLOBJECTS) $(SAMPLE4DLL) $(SAMPLE4LIB) $(SAMPLE4DEF) $(SAMPLE4EXP)
 	$(ECHO) done.
 
@@ -131,18 +128,13 @@ distribute:
 
 $(LIBNAME): $(OBJECTS) $(RESOURCES) $(OTHERLIBS)
 	$(ECHO) -n Linking $(LIBNAME)...
-	$(AR) r $(LIBNAME) $(OBJECTS) $(IOLIBOBJECTS) $(PICTUREOBJECTS) $(LIBBZ2OBJECTS) $(LIBICONVOBJECTS) $(LISAOBJECTS) $(LIBXMLOBJECTS) $(RESOURCES) > NULL
+	$(AR) r $(LIBNAME) $(OBJECTS) $(IOLIBOBJECTS) $(LIBBZ2OBJECTS) $(LIBICONVOBJECTS) $(LISAOBJECTS) $(LIBXMLOBJECTS) $(RESOURCES) > NULL
 	$(STRIP) $(LIBSTRIP_OPTS) $(LIBNAME)
 	$(ECHO) done.
 
 $(LIBIOLIB): $(IOLIBOBJECTS)
 	$(ECHO) -n Linking $(LIBIOLIB)...
 	$(AR) r $(LIBIOLIB) $(IOLIBOBJECTS)
-	$(ECHO) done.
-
-$(LIBPICTURE): $(PICTUREOBJECTS)
-	$(ECHO) -n Linking $(LIBPICTURE)...
-	$(AR) r $(LIBPICTURE) $(PICTUREOBJECTS)
 	$(ECHO) done.
 
 $(LIBBZ2): $(LIBBZ2OBJECTS)

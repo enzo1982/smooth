@@ -143,7 +143,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 
 	for (x = 0; x < ior.sizex; x++)
 	{
-		line[x] = DownsampleColor(ConvertColor(RGB, ior.colorspace, ior.pic->GetPixel(x, y)), ior.bpcc);
+		line[x] = DownsampleColor(ConvertColor(RGB, ior.colorspace, ior.bmp.GetPixel(x, y)), ior.bpcc);
 	}
 
 	switch (ior.compression)
@@ -583,7 +583,7 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 
 	for (x = 0; x < ior.sizex; x++)
 	{
-		ior.pic->SetPixel(x, y, ConvertColor(ior.colorspace, RGB, UpsampleColor(line[x], ior.bpcc)));
+		ior.bmp.SetPixel(x, y, ConvertColor(ior.colorspace, RGB, UpsampleColor(line[x], ior.bpcc)));
 	}
 
 	delete [] line;

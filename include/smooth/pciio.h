@@ -13,9 +13,9 @@
 
 #include "system.h"
 #include "string.h"
+#include "graphics/bitmap.h"
 
 #include <iolib-cxx.h>
-#include <picture.h>
 
 #define PCIMajorVersion		1
 #define PCIMinorVersion		2
@@ -74,7 +74,7 @@ class SMOOTHAPI PCIIO
 	private:
 		int		 majorversion;	// major version of PIC file format
 		int		 minorversion;	// minor version of PCI file format
-		picture		*pic;
+		S::GUI::Bitmap	 bmp;
 		int		 sizex;		// horizontal pixels
 		int		 sizey;		// vertical pixels
 		int		 dpix;		// horizontal dots per inch

@@ -558,11 +558,6 @@ $(OBJECTDIR)/iolib_filter_xor.o: $(IOLIBDIR)/filters/xor/filter_xor.cpp $(INCLUD
 	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/filters/xor/filter_xor.cpp -o $(OBJECTDIR)/iolib_filter_xor.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/picture_picture.o: $(PICTUREDIR)/picture.cpp $(INCLUDEDIR)/picture.h
-	$(ECHO) -n Compiling $(PICTUREDIR)/picture.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(PICTUREDIR)/picture.cpp -o $(OBJECTDIR)/picture_picture.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/libbz2_blocksort.o: $(LIBBZ2DIR)/blocksort.c
 	$(ECHO) -n Compiling $(LIBBZ2DIR)/blocksort.c...
 	$(COMPILER) $(COMPILER_OPTS) $(LIBBZ2DIR)/blocksort.c -o $(OBJECTDIR)/libbz2_blocksort.o

@@ -29,12 +29,12 @@ S::GUI::BitmapNone::~BitmapNone()
 {
 }
 
-S::GUI::BitmapBase &S::GUI::BitmapNone::operator =(const int nil)
+S::GUI::BitmapNone &S::GUI::BitmapNone::operator =(const int nil)
 {
 	return *this;
 }
 
-S::GUI::BitmapBase &S::GUI::BitmapNone::operator =(const BitmapBase &newBitmap)
+S::GUI::BitmapNone &S::GUI::BitmapNone::operator =(const BitmapNone &newBitmap)
 {
 	return *this;
 }

@@ -40,7 +40,7 @@ namespace smooth
 						 Menu();
 						~Menu();
 
-			MenuEntry		*AddEntry(String = NIL, Bitmap = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0, Int = OR_LEFT);
+			MenuEntry		*AddEntry(String = NIL, GUI::Bitmap = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0, Int = OR_LEFT);
 			Int			 RemoveEntry(MenuEntry *);
 			Int			 RemoveEntry(Int);
 

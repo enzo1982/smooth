@@ -33,16 +33,20 @@ namespace smooth
 				HBITMAP			 bitmap;
 			public:
 							 BitmapGDI(HBITMAP = NIL);
+							 BitmapGDI(Int, Int, Int);
 							 BitmapGDI(const int);
 							 BitmapGDI(const BitmapGDI &);
 
 							~BitmapGDI();
 
+				Bool			 CreateBitmap(Int, Int, Int);
+				Bool			 DeleteBitmap();
+
 				Bool			 SetBitmap(HBITMAP);
 				HBITMAP			 GetBitmap();
 
-				BitmapBase &operator	 =(const int);
-				BitmapBase &operator	 =(const BitmapBase &);
+				BitmapGDI &operator	 =(const int);
+				BitmapGDI &operator	 =(const BitmapGDI &);
 
 				Bool operator		 ==(const int);
 				Bool operator		 !=(const int);

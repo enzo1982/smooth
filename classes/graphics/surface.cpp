@@ -11,7 +11,6 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/color.h>
-#include <picture.h>
 
 S::GUI::Surface::Surface()
 {
@@ -205,7 +204,7 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 	Float	 blue2	= GetBlue(color2);
 	Int	 xmax	= rect.right - rect.left;
 	Int	 ymax	= rect.bottom - rect.top;
-	picture	*pic	= new picture(rect.right - rect.left, rect.bottom - rect.top, 24);
+	Bitmap	 bmp(rect.right - rect.left, rect.bottom - rect.top, 24);
 
 	switch (style)
 	{
@@ -223,7 +222,7 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 					green1	= green1 + biasg;
 					blue1	= blue1 + biasb;
 
-					for (Int y = 0; y < ymax; y++) pic->SetPixel(x, y, CombineColor(red1, green1, blue1));
+					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, CombineColor(red1, green1, blue1));
 				}
 			}
 			else
@@ -234,7 +233,7 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 					green1	= green1 + biasg;
 					blue1	= blue1 + biasb;
 
-					for (Int y = 0; y < ymax; y++) pic->SetPixel(x, y, CombineColor(red1, green1, blue1));
+					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, CombineColor(red1, green1, blue1));
 				}
 			}
 		}
@@ -252,7 +251,7 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 				green1	= green1 + biasg;
 				blue1	= blue1 + biasb;
 
-				for (Int x = 0; x < xmax; x++) pic->SetPixel(x, y, CombineColor(red1, green1, blue1));
+				for (Int x = 0; x < xmax; x++) bmp.SetPixel(x, y, CombineColor(red1, green1, blue1));
 			}
 		}
 		break;
@@ -265,9 +264,7 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 	srect.right	= rect.right - rect.left;
 	srect.bottom	= rect.bottom - rect.top;
 
-	BlitFromBitmap(Bitmap(pic->GetBitmap()), srect, rect);
-
-	delete pic;
+	BlitFromBitmap(bmp, srect, rect);
 
 	return Success;
 }

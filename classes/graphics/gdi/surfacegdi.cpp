@@ -337,7 +337,7 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, Rect srcRect, R
 		StretchBlt(bmp_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
-	bitmap.SetBitmap((HBITMAP) SelectObject(cdc, backup));
+	SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
 
@@ -364,7 +364,7 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, const Bitmap &oBitmap, Rec
 		StretchBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, gdi_dc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
-	bitmap.SetBitmap((HBITMAP) SelectObject(cdc, backup));
+	SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
 

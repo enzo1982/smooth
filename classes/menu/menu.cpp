@@ -35,7 +35,7 @@ S::Menu::~Menu()
 	}
 }
 
-S::MenuEntry *S::Menu::AddEntry(String text, Bitmap bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
+S::MenuEntry *S::Menu::AddEntry(String text, GUI::Bitmap bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
 {
 	Int	 id	= System::RequestGUID();
 	Int	 type	= SM_SEPARATOR;
@@ -50,8 +50,8 @@ S::MenuEntry *S::Menu::AddEntry(String text, Bitmap bitmap, Menu *popupMenu, Boo
 
 	if (bitmap != NIL)
 	{
-		newEntry->bitmap	= Bitmap(DetectTransparentRegions(bitmap.GetBitmap()));
-		newEntry->graymap	= Bitmap(DetectTransparentRegions(GrayscaleBitmap(bitmap.GetBitmap())));
+		newEntry->bitmap	= GUI::Bitmap(DetectTransparentRegions(bitmap.GetBitmap()));
+		newEntry->graymap	= GUI::Bitmap(DetectTransparentRegions(GrayscaleBitmap(bitmap.GetBitmap())));
 	}
 
 	newEntry->popup		= popupMenu;

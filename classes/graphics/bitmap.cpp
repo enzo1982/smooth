@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/bitmap.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/color.h>
 
 S::GUI::BitmapBase::BitmapBase()
@@ -71,6 +72,30 @@ S::UnsignedByte *S::GUI::BitmapBase::GetBytes()
 S::Int S::GUI::BitmapBase::GetLineAlignment()
 {
 	return align;
+}
+
+S::Bool S::GUI::BitmapBase::CreateBitmap(Int cx, Int cy, Int bpp)
+{
+	return False;
+}
+
+S::Bool S::GUI::BitmapBase::DeleteBitmap()
+{
+	return True;
+}
+
+S::Int S::GUI::BitmapBase::BlitFromSurface(Surface *surface, Rect srcRect, Rect destRect)
+{
+	if (surface == NIL) return Error;
+
+	return surface->BlitToBitmap(srcRect, *(Bitmap *) this, destRect);
+}
+
+S::Int S::GUI::BitmapBase::BlitToSurface(Rect srcRect, Surface *surface, Rect destRect)
+{
+	if (surface == NIL) return Error;
+
+	return surface->BlitFromBitmap(*(Bitmap *) this, srcRect, destRect);
 }
 
 S::Bool S::GUI::BitmapBase::SetPixel(Int x, Int y, UnsignedLong color)

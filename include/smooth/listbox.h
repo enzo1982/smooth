@@ -55,6 +55,8 @@ namespace smooth
 				Void		 Cleanup();
 
 				Int		 AddTab(String, Int = 0);
+				Int		 GetNthTabOffset(Int);
+				Int		 GetNthTabWidth(Int);
 
 				Int		 ClearTabs();
 

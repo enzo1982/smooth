@@ -109,6 +109,11 @@ S::Int S::GUI::ListBoxHeader::GetNthTabOffset(Int n)
 	return offset;
 }
 
+S::Int S::GUI::ListBoxHeader::GetNthTabWidth(Int n)
+{
+	return (Int) Math::Abs(tabWidths.GetNthEntry(n));
+}
+
 S::Int S::GUI::ListBoxHeader::Paint(Int message)
 {
 	if (!registered)	return Error;
@@ -174,6 +179,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 	Rect	 frame;
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
+	Int	 i = 0;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -187,23 +193,23 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 			frame.left = realPos.x - 3;
 
-			for (Int j = 0; j < tabWidths.GetNOfEntries() - 1; j++)
+			for (i = 0; i < tabWidths.GetNOfEntries() - 1; i++)
 			{
-				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(j)) + 1);
+				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) + 1);
 				frame.right = frame.left + 4;
 
 				if (wnd->IsMouseOn(frame))
 				{
-					if (moveTab != j)
+					if (moveTab != i)
 					{
-						moveTab = j;
+						moveTab = i;
 
 						wnd->cursorset = True;
 
 						LiSASetMouseCursor(LiSA_MOUSE_HSIZE);
 					}
 				}
-				else if (moveTab == j)
+				else if (moveTab == i)
 				{
 					moveTab = -1;
 
@@ -215,7 +221,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 			frame.left = realPos.x;
 
-			for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
+			for (i = 0; i < tabWidths.GetNOfEntries(); i++)
 			{
 				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + objectProperties->size.cx);
 
@@ -310,8 +316,8 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 					if (bias != 0)
 					{
-						tabWidths.SetEntry(moveTab, (Int) Math::Abs(tabWidths.GetEntry(moveTab)) - bias);
-						tabWidths.SetEntry(moveTab + 1, (Int) Math::Abs(tabWidths.GetEntry(moveTab + 1)) + bias);
+						tabWidths.SetEntry(moveTab, (Int) Math::Max(Math::Abs(tabWidths.GetEntry(moveTab)) - bias, 1) * Math::Sign(tabWidths.GetEntry(moveTab)));
+						tabWidths.SetEntry(tabWidths.GetNOfEntries() - 1, (Int) Math::Max(Math::Abs(tabWidths.GetEntry(tabWidths.GetNOfEntries() - 1)) + bias, 1) * Math::Sign(tabWidths.GetEntry(tabWidths.GetNOfEntries() - 1)));
 
 						om.x = m.x;
 

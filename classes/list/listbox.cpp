@@ -184,6 +184,26 @@ S::Int S::GUI::ListBox::ClearTabs()
 	return Success;
 }
 
+S::Int S::GUI::ListBox::GetNthTabOffset(Int n)
+{
+	if (header != NIL)
+	{
+		return header->GetNthTabOffset(n);
+	}
+
+	return 0;
+}
+
+S::Int S::GUI::ListBox::GetNthTabWidth(Int n)
+{
+	if (header != NIL)
+	{
+		return header->GetNthTabWidth(n);
+	}
+
+	return 0;
+}
+
 S::Int S::GUI::ListBox::Show()
 {
 	if (visible)	return Success;

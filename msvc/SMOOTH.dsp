@@ -115,6 +115,10 @@ SOURCE=..\classes\basic\containertype.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\basic\input.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\basic\object.cpp
 # End Source File
 # Begin Source File
@@ -796,6 +800,10 @@ SOURCE=..\include\smooth\hyperlink.h
 # Begin Source File
 
 SOURCE=..\include\smooth\i18n.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\input.h
 # End Source File
 # Begin Source File
 

@@ -50,6 +50,7 @@ namespace smooth
 
 				Int		 GetNOfTabs();
 				Int		 GetNthTabOffset(Int);
+				Int		 GetNthTabWidth(Int);
 
 				Int		 UpdateMetrics();
 		};

@@ -153,6 +153,8 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 	BlitFromBitmap(pic->GetBitmap(), srect, rect);
 
 	delete pic;
+
+	return Success;
 }
 
 S::Int S::GUI::Surface::Bar(Point p1, Point p2, Int orientation)

@@ -25,6 +25,13 @@ namespace smooth
 
 namespace smooth
 {
+	const Int SP_PAINT	= 0;
+	const Int SP_MOUSEIN	= 1;
+	const Int SP_MOUSEOUT	= 2;
+	const Int SP_MOUSEDOWN	= 3;
+	const Int SP_MOUSEUP	= 4;
+	const Int SP_UPDATE	= 5;
+
 	namespace GUI
 	{
 		class SMOOTHAPI Widget : public Object

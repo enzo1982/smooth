@@ -278,7 +278,7 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font)
 			}
 		}
 
-		rect.right = rect.left + GetTextSizeX(line, font.GetName(), font.GetSize(), font.GetWeight());
+		if (Setup::rightToLeft) rect.right = rect.left + GetTextSizeX(line, font.GetName(), font.GetSize(), font.GetWeight());
 
 		RECT	 Rect = TranslateRect(rect);
 

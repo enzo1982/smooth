@@ -53,6 +53,8 @@ namespace smooth
 				ComboBox		*comboBox;
 
 				Void			 SetCursor(Int);
+				Void			 RemoveCursor();
+
 				Void			 MarkText(Int, Int);
 				Void			 DeleteSelectedText();
 				Void			 InsertText(String);

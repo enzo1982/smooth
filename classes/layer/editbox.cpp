@@ -722,6 +722,34 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 	promptVisible = True;
 }
 
+S::Void S::GUI::EditBox::RemoveCursor()
+{
+	if (!promptVisible) return;
+
+	Surface	*surface = myContainer->GetDrawSurface();
+	Point	 p = GetRealPosition();
+	String	 visText = objectProperties->text;
+
+	if (invisibleChars > 0)
+	{
+		visText = "";
+
+		for (Int i = 0; i < objectProperties->text.Length() - invisibleChars; i++)
+		{
+			visText[i] = objectProperties->text[i + invisibleChars];
+		}
+	}
+
+	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p.x += 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+	else						p.x += 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+
+	p.y += 2;
+
+	surface->Box(Rect(p, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+
+	promptVisible = False;
+}
+
 S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 {
 	if (prevMarkStart == markStart && prevMarkEnd == markEnd) return;
@@ -906,6 +934,8 @@ S::Int S::GUI::EditBox::Deactivate()
 
 S::Int S::GUI::EditBox::SetText(String txt)
 {
+	RemoveCursor();
+
 	promptPos = 0;
 
 	if (objectProperties->text == txt)

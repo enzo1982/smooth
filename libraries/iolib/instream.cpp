@@ -212,7 +212,8 @@ bool InStream::ReadData()
 		currentBufferPos = 0;
 	}
 
-	return true;
+	if (packageSize == 0)	return ReadData();
+	else			return true;
 }
 
 long InStream::InputNumber(int bytes)	// Intel byte order DCBA

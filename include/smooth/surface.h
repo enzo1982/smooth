@@ -31,11 +31,16 @@ namespace smooth
 		{
 			protected:
 				Size		 size;
+
+				Int		 painting;
 			public:
 						 Surface();
 				virtual		~Surface();
 
 				Size		 GetSize();
+
+				virtual Int	 StartPaint();
+				virtual Int	 EndPaint();
 
 				virtual Int	 GetPixel(Int, Int);
 

@@ -16,6 +16,7 @@
 S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 {
 	gdi_dc = iDc;
+	real_dc = iDc;
 
 	size.cx	= 0;
 	size.cy	= 0;
@@ -23,6 +24,63 @@ S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 
 S::GUI::SurfaceGDI::~SurfaceGDI()
 {
+}
+
+S::Int S::GUI::SurfaceGDI::StartPaint()
+{
+	if (!painting)
+	{
+		HBITMAP	 bitmap = CreateBitmap(GetDeviceCaps(gdi_dc, HORZRES), GetDeviceCaps(gdi_dc, VERTRES), GetDeviceCaps(gdi_dc, PLANES), GetDeviceCaps(gdi_dc, BITSPIXEL), NIL);
+		Rect	 bmpRect;
+
+		bmpRect.left = 0;
+		bmpRect.top = 0;
+		bmpRect.right = GetDeviceCaps(gdi_dc, HORZRES);
+		bmpRect.bottom = GetDeviceCaps(gdi_dc, VERTRES);
+
+		BlitToBitmap(bmpRect, bitmap, bmpRect);
+
+		gdi_dc = CreateCompatibleDC(real_dc);
+
+		cDc_bitmap = (HBITMAP) SelectObject(gdi_dc, bitmap);
+	}
+
+	painting++;
+
+	return Success;
+}
+
+S::Int S::GUI::SurfaceGDI::EndPaint()
+{
+	if (!painting) return Error;
+
+	if (painting == 1)
+	{
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(gdi_dc, cDc_bitmap);
+		Rect	 bmpRect;
+
+		bmpRect.left = 0;
+		bmpRect.top = 0;
+		bmpRect.right = GetDeviceCaps(gdi_dc, HORZRES);
+		bmpRect.bottom = GetDeviceCaps(gdi_dc, VERTRES);
+
+		DeleteDC(gdi_dc);
+
+		gdi_dc = real_dc;
+
+		BlitFromBitmap(bitmap, bmpRect, bmpRect);
+
+		DestroyBitmap(bitmap);
+	}
+
+	painting--;
+
+	return Success;
+}
+
+HDC S::GUI::SurfaceGDI::GetContext()
+{
+	return gdi_dc;
 }
 
 S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
@@ -228,7 +286,14 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect des
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);
 
-	StretchBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left + 1, destRect.bottom - destRect.top + 1, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left + 1, srcRect.bottom - srcRect.top + 1, SRCCOPY);
+	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
+	{
+		BitBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
+	}
+	else
+	{
+		StretchBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+	}
 
 	bitmap = (HBITMAP) SelectObject(cdc, backup);
 
@@ -243,7 +308,14 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destR
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);
 
-	StretchBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left + 1, destRect.bottom - destRect.top + 1, gdi_dc, srcRect.left, srcRect.top, srcRect.right - srcRect.left + 1, srcRect.bottom - srcRect.top + 1, SRCCOPY);
+	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
+	{
+		BitBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, gdi_dc, srcRect.left, srcRect.top, SRCCOPY);
+	}
+	else
+	{
+		StretchBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, gdi_dc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+	}
 
 	bitmap = (HBITMAP) SelectObject(cdc, backup);
 

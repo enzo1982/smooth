@@ -21,6 +21,7 @@
 #include <smooth/metrics.h>
 #include <smooth/timer.h>
 #include <smooth/objectproperties.h>
+#include <smooth/surface.h>
 
 using namespace smooth::GUI;
 
@@ -99,7 +100,7 @@ S::Int S::SplashScreenApp::ShowSplashScreen()
 
 S::Void S::SplashScreenApp::SplashPaintProc()
 {
-	HDC	 dc = GetContext(splashscreen);
+	Surface	*surface = splashscreen->GetDrawSurface();
 	Rect	 bmprect;
 
 	bmprect.left = 1;
@@ -107,9 +108,7 @@ S::Void S::SplashScreenApp::SplashPaintProc()
 	bmprect.right = GetBitmapSizeX(bitmap);
 	bmprect.bottom = GetBitmapSizeY(bitmap);
 
-	PaintBitmap(dc, bmprect, bitmap);
-
-	FreeContext(splashscreen, dc);
+	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmprect);
 }
 
 S::Bool S::SplashScreenApp::SplashKillProc()

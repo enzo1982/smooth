@@ -311,7 +311,6 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 S::Void S::GUI::TabWidget::GetSize()
 {
-	HDC	 dc = GetContext(NIL);
 	Layer	*object;
 
 	for (Int i = 0; i < nOfObjects; i++)
@@ -328,8 +327,6 @@ S::Void S::GUI::TabWidget::GetSize()
 			}
 		}
 	}
-
-	FreeContext(NIL, dc);
 }
 
 S::Int S::GUI::TabWidget::SelectTab(Int layerid)

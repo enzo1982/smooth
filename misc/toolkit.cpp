@@ -128,23 +128,6 @@ void FreeCompatibleContext(HDC cdc)
 	DeleteDC(cdc);
 }
 
-void PaintBitmap(HDC hdc, Rect iconrect, HBITMAP iconmap)
-{
-	HDC	 icondc;
-	HBITMAP	 oldbmp;
-	BITMAP	 bmp;
-
-	GetObjectA(iconmap, sizeof(bmp), &bmp);
-
-	icondc = (HDC) CreateCompatibleDC(hdc);
-	oldbmp = (HBITMAP) SelectObject(icondc, iconmap);
-
-	StretchBlt(hdc, iconrect.left, iconrect.top, iconrect.right - iconrect.left, iconrect.bottom - iconrect.top, icondc, 0, 0, bmp.bmWidth, bmp.bmHeight, SRCCOPY);
-
-	iconmap = (HBITMAP) SelectObject(icondc, oldbmp);
-	DeleteDC(icondc);
-}
-
 int GetTextSizeX(String text, String font, int size, int weight)
 {
 	if (text == NIL) return 0;
@@ -403,7 +386,7 @@ HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon
 	wndclassw.hInstance	= hInstance;
 	wndclassw.hIcon		= icon;
 	wndclassw.hCursor	= NIL;
-	wndclassw.hbrBackground	= (HBRUSH) (COLOR_BTNFACE + 1);
+	wndclassw.hbrBackground	= NIL;
 	wndclassw.lpszMenuName	= NIL;
 	wndclassw.lpszClassName	= className;
 	wndclassw.hIconSm	= icon;
@@ -416,7 +399,7 @@ HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon
 	wndclassa.hInstance	= hInstance;
 	wndclassa.hIcon		= icon;
 	wndclassa.hCursor	= NIL;
-	wndclassa.hbrBackground	= (HBRUSH) (COLOR_BTNFACE + 1);
+	wndclassa.hbrBackground	= NIL;
 	wndclassa.lpszMenuName	= NIL;
 	wndclassa.lpszClassName	= className;
 	wndclassa.hIconSm	= icon;

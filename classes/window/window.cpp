@@ -897,6 +897,16 @@ S::Int S::GUI::Window::Paint(Int message)
 	int	 btmobjcount = 0;
 	int	 topobjcount = 0;
 
+	surface->StartPaint();
+
+	if (updateRect.left < 2)	updateRect.left = 2;
+	if (updateRect.top < 2)		updateRect.top = 2;
+
+	if (objectProperties->size.cx - updateRect.right < 2)	updateRect.right = objectProperties->size.cx - 2;
+	if (objectProperties->size.cy - updateRect.bottom < 2)	updateRect.bottom = objectProperties->size.cy - 2;
+
+	surface->Box(updateRect, GetSysColor(COLOR_BTNFACE), FILLED);
+
 	if (created && visible)
 	{
 		for (Int i = 0; i < nOfObjects; i++)
@@ -1015,6 +1025,8 @@ S::Int S::GUI::Window::Paint(Int message)
 
 		onPaint.Emit();
 	}
+
+	surface->EndPaint();
 
 	LeaveProtectedRegion();
 

@@ -102,12 +102,7 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd	= myContainer->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
-
 	Surface	*surface = myContainer->GetDrawSurface();
-	HDC	 dc = GetContext(wnd);
 	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
 	Int	 textColor;
@@ -139,10 +134,8 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 		textRect.right	= textRect.left + objectProperties->size.cx;
 		textRect.bottom	= textRect.top + objectProperties->size.cy;
 
-		PaintBitmap(dc, textRect, linkBitmap);
+		surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(linkBitmap), GetBitmapSizeY(linkBitmap))), textRect);
 	}
-
-	FreeContext(wnd, dc);
 
 	return Success;
 }

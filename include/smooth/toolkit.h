@@ -24,7 +24,6 @@ int	 GetLineSizeY	(S::String, S::String, int, int);
 int		 GetBitmapSizeX		(HBITMAP);
 int		 GetBitmapSizeY		(HBITMAP);
 S::Rect		 GetBitmapMetrics	(HBITMAP);
-void		 PaintBitmap		(HDC, S::Rect, HBITMAP);
 int		 GetTextSizeX		(S::String, int, S::String, int, int);
 int		 GetTextSizeX		(S::String, S::String, int, int);
 int		 GetTextSizeY		(S::String, S::String, int, int);

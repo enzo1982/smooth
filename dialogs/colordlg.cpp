@@ -509,17 +509,7 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 			}
 		}
 
-#ifdef __WIN32__
-		{
-			RECT	 iRect = irect;
-			RECT	 Rect = rect;
-
-			pic->BlitToDC(dc, &iRect, &Rect);
-
-			rect = Rect;
-			irect = iRect;
-		}
-#endif
+		surface->BlitFromBitmap(pic->GetBitmap(), rect, irect);
 	}
 
 	forcevsupdate = true;

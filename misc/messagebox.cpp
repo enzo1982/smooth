@@ -21,7 +21,7 @@
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
-#include <smooth/surface.h>
+#include <smooth/surfacegdi.h>
 
 using namespace smooth::GUI;
 
@@ -344,7 +344,7 @@ S::Int S::MessageBoxApp::ShowMessageBox()
 S::Void S::MessageBoxApp::MessagePaintProc()
 {
 	Surface	*surface = msgbox->GetDrawSurface();
-	HDC	 dc = GetContext(msgbox);
+	HDC	 dc = ((SurfaceGDI *) surface)->GetContext();
 	Rect	 txtrect;
 
 	txtrect.left = 17;
@@ -377,8 +377,6 @@ S::Void S::MessageBoxApp::MessagePaintProc()
 		DestroyIcon(icon);
 #endif
 	}
-
-	FreeContext(msgbox, dc);
 
 	for (int i = 0; i < lines; i++)
 	{

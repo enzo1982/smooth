@@ -68,13 +68,6 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
 	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
@@ -175,8 +168,6 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
 	}
 
-	FreeContext(wnd, dc);
-
 	return Success;
 }
 
@@ -191,13 +182,6 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 		return Success;
 	}
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
-
-	HDC	 dc = GetContext(wnd);
 	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
@@ -370,8 +354,6 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 
 		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
 	}
-
-	FreeContext(wnd, dc);
 
 	return Success;
 }

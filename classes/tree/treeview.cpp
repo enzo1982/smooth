@@ -257,7 +257,6 @@ S::Int S::GUI::TreeView::Process(Int message, Int wParam, Int lParam)
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Rect	 frame;
-	HDC	 dc;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -267,16 +266,8 @@ S::Int S::GUI::TreeView::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			dc = GetContext(wnd);
-
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
-			FreeContext(wnd, dc);
-
 			break;
 	}
 

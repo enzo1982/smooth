@@ -58,7 +58,6 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	EnterProtectedRegion();
 
 	Menu::Entry	*operat;
-	HDC		 dc = GetContext(wnd);
 	Rect		 menubar;
 	Rect		 menuentry;
 	Rect		 helpmenuentry;
@@ -171,8 +170,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.top++;
 				menuentry.bottom++;
 
-				if (style == MB_GRAYSCALE)	PaintBitmap(dc, menuentry, operat->graymap);
-				else				PaintBitmap(dc, menuentry, operat->bitmap);
+				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
+				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
 
 				menuentry.left++;
 				menuentry.top--;
@@ -197,8 +196,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.top++;
 				menuentry.bottom++;
 
-				if (style == MB_GRAYSCALE)	PaintBitmap(dc, menuentry, operat->graymap);
-				else				PaintBitmap(dc, menuentry, operat->bitmap);
+				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
+				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
 
 				menuentry.left++;
 				menuentry.top--;
@@ -296,8 +295,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.top++;
 				helpmenuentry.bottom++;
 
-				if (style == MB_GRAYSCALE)	PaintBitmap(dc, helpmenuentry, operat->graymap);
-				else				PaintBitmap(dc, helpmenuentry, operat->bitmap);
+				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), helpmenuentry);
+				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), helpmenuentry);
 
 				helpmenuentry.top--;
 				helpmenuentry.bottom--;
@@ -322,8 +321,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.top++;
 				helpmenuentry.bottom++;
 
-				if (style == MB_GRAYSCALE)	PaintBitmap(dc, helpmenuentry, operat->graymap);
-				else				PaintBitmap(dc, helpmenuentry, operat->bitmap);
+				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), helpmenuentry);
+				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), helpmenuentry);
 
 				helpmenuentry.top--;
 				helpmenuentry.bottom--;
@@ -418,8 +417,6 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		}
 	}
 
-	FreeContext(wnd, dc);
-
 	LeaveProtectedRegion();
 
 	return Success;
@@ -439,7 +436,6 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 	Surface		*surface = myContainer->GetDrawSurface();
 	Menu::Entry	*operat;
 	Rect		 bmprect;
-	HDC		 dc;
 	Int		 retVal = Success;
 	bool		 cont = False;
 	Int		 i;
@@ -507,8 +503,6 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONUP:
-			dc = GetContext(wnd);
-
 			for (i = 0; i < nOfEntries; i++)
 			{
 				operat = entries.GetNthEntry(i);
@@ -566,8 +560,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
 						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
 
-						if (style == MB_GRAYSCALE)	PaintBitmap(dc, bmprect, operat->graymap);
-						else				PaintBitmap(dc, bmprect, operat->bitmap);
+						if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
+						else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
 
 						operat->onClick.Emit();
 
@@ -582,12 +576,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			FreeContext(wnd, dc);
-
 			break;
 		case SM_MOUSELEAVE:
-			dc = GetContext(wnd);
-
 			for (i = 0; i < nOfEntries; i++)
 			{
 				operat = entries.GetNthEntry(i);
@@ -630,18 +620,14 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
 						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
 
-						if (style == MB_GRAYSCALE)	PaintBitmap(dc, bmprect, operat->graymap);
-						else				PaintBitmap(dc, bmprect, operat->bitmap);
+						if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
+						else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
 					}
 				}
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 		case SM_MOUSEMOVE:
-			dc = GetContext(wnd);
-
 			for (i = 0; i < nOfEntries; i++)
 			{
 				operat = entries.GetNthEntry(i);
@@ -695,7 +681,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.top	+= 2;
 						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
 						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
-						PaintBitmap(dc, bmprect, operat->bitmap);
+						surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
 						surface->Frame(operat->rect, FRAME_UP);
 					}
 					else if (!wnd->IsMouseOn(operat->rect) && operat->checked)
@@ -716,13 +702,11 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
 						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
 
-						if (style == MB_GRAYSCALE)	PaintBitmap(dc, bmprect, operat->graymap);
-						else				PaintBitmap(dc, bmprect, operat->bitmap);
+						if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
+						else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
 					}
 				}
 			}
-
-			FreeContext(wnd, dc);
 
 			break;
 	}

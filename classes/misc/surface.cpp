@@ -16,6 +16,8 @@ S::GUI::Surface::Surface()
 {
 	size.cx	= 0;
 	size.cy	= 0;
+
+	painting = 0;
 }
 
 S::GUI::Surface::~Surface()
@@ -25,6 +27,20 @@ S::GUI::Surface::~Surface()
 S::Size S::GUI::Surface::GetSize()
 {
 	return size;
+}
+
+S::Int S::GUI::Surface::StartPaint()
+{
+	painting++;
+
+	return Success;
+}
+
+S::Int S::GUI::Surface::EndPaint()
+{
+	painting--;
+
+	return Success;
 }
 
 S::Int S::GUI::Surface::SetPixel(Int x, Int y, Int color)

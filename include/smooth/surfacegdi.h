@@ -29,9 +29,17 @@ namespace smooth
 		{
 			protected:
 				HDC	 gdi_dc;
+				HDC	 real_dc;
+
+				HBITMAP	 cDc_bitmap;
 			public:
 					 SurfaceGDI(HDC);
 					~SurfaceGDI();
+
+				Int	 StartPaint();
+				Int	 EndPaint();
+
+				HDC	 GetContext();
 
 				Int	 GetPixel(Int, Int);
 

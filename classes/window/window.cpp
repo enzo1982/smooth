@@ -173,8 +173,8 @@ S::GUI::Window::Window(String title)
 	minSize.cx = Math::Round(160 * Setup::FontSize);
 	minSize.cy = METRIC_TITLEBARHEIGHT + 5;
 
-	maxSize.cx = 2147483647;
-	maxSize.cy = 2147483647;
+	maxSize.cx = 32768;
+	maxSize.cy = 32768;
 
 	hwnd = NIL;
 

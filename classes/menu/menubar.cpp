@@ -451,6 +451,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
+		case SM_LBUTTONDBLCLK:
 		case SM_LBUTTONDOWN:
 			for (i = 0; i < nOfEntries; i++)
 			{

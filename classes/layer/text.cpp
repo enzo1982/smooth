@@ -53,7 +53,8 @@ S::Int S::GUI::Text::Paint(Int message)
 	Point	 realPos = GetRealPosition();
 	Font	 font = objectProperties->font;
 
-	objectProperties->size = objectProperties->textSize;
+	objectProperties->size.cx = objectProperties->textSize.cx;
+	objectProperties->size.cy = objectProperties->textSize.cy + 1;
 
 	switch (message)
 	{

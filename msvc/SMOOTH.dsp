@@ -395,6 +395,10 @@ SOURCE=..\classes\window\drag.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\window\shortcut.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\window\statusbar.cpp
 # End Source File
 # Begin Source File
@@ -952,6 +956,10 @@ SOURCE=..\include\smooth\setup.h
 # Begin Source File
 
 SOURCE=..\include\smooth\shlobjmini.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\shortcut.h
 # End Source File
 # Begin Source File
 

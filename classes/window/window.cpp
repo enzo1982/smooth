@@ -661,6 +661,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				SetFlags((flags | WF_MODAL) ^ WF_MODAL);
 				SetFlags((flags | WF_SYSTEMMODAL) ^ WF_SYSTEMMODAL);
+				SetFlags((flags | WF_TOPMOST) ^ WF_TOPMOST);
+				SetFlags((flags | WF_APPTOPMOST) ^ WF_APPTOPMOST);
 
 				delete drawSurface;
 

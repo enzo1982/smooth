@@ -356,8 +356,6 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				toolWindow->RegisterObject(layer);
 				layer->RegisterObject(listBox);
 
-				toolWindow->SetOwner(this);
-
 				toolWindow->Show();
 
 				listBox->Paint(SP_PAINT);

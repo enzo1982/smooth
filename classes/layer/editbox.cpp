@@ -107,6 +107,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			{
 				comboBox = new ComboBox(objectProperties->pos, objectProperties->size);
 				comboBox->SetFlags(CB_HOTSPOTONLY);
+				comboBox->SetOrientation(objectProperties->orientation);
 				comboBox->onClick.Connect(&EditBox::DropDownListProc, this);
 
 				for (Int i = 0; i < dropDownList->GetNOfEntries(); i++)

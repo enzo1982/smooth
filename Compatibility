@@ -1,0 +1,60 @@
+Status of smooth ports
+----------------------
+
+MinGW32		all versions	complete support
+MSVC		since 0.8.58.0	complete support
+Linux GCC	in the works	no GUI support (supported: threads, strings, primitives, arrays)
+QNX 6.1 GCC	in the works	no GUI support (supported: threads, strings, primitives, arrays)
+
+Source and binary compatibility between different smooth Versions
+-----------------------------------------------------------------
+
+		Compatibility with older versions
+Version		Source		Binary			Comments
+---------------------------------------------------------------------------------------------------------------------
+0.8.58.0	no		no			greater restructuring in class SObject and others
+0.8.57.0	yes		no			-
+0.8.56.0	no		no			layout of some classes changed; need Unicode adjustments
+0.8.55.0	yes		no			new class: SMOOTHTooltip; layout of class SMOOTH changed
+0.8.54.0	yes		no			new classes
+0.8.53.0	no		no			-
+0.8.52.0	yes		yes			-
+0.8.51.0	no		no			many changes
+0.8.50.0	no		no			many changes
+0.8.49.0	no		no			many changes
+0.8.48.1	yes		yes			-
+0.8.48.0	yes		no			Layout of SMOOTHWindow class changed
+0.8.47.0	yes		no			mpString library has been updated
+0.8.46.1	yes		yes			-
+0.8.46.0	yes		yes			-
+0.8.45.0	yes		yes			-
+0.8.44.0	yes		no			Layout of SMOOTHHyperlink class changed
+0.8.43.0	yes		yes			-
+0.8.42.0	yes		yes			-
+0.8.41.1	no		no			-
+0.8.41.0	yes		yes			-
+0.8.40.0	yes		yes			-
+0.8.39.0	yes		no			Some object's layouts changed
+0.8.38.0	yes		no			Added ToolTip functionality
+0.8.37.0	yes		yes			-
+0.8.36.1	yes		yes			-
+0.8.36.0	yes		no			Modifications of the SMOOTHComboBox and SMOOTHListBox classes
+0.8.35.1	yes		yes			-
+0.8.35.0	yes		yes			-
+0.8.34.0	yes		no			-
+0.8.33.2	yes		no			Layout of SMOOTHWindow class has changed
+0.8.33.1	yes		no			Layout of SMOOTHWindow class has changed
+0.8.33.0	no		no			New class and many adjustments
+0.8.32.0	yes		yes			-
+0.8.31.0	no		no			Added SIZE parameter to Bitmap object
+0.8.30.0	yes		no			Started to rewrite the EditBox object
+0.8.29.0	yes		yes			-
+0.8.28.0	yes		yes			-
+0.8.27.0	yes		yes			-
+0.8.26.0	yes		yes			-
+0.8.25.1	yes		yes			-
+0.8.25.0	no		no			Object positions have to be adjusted
+0.8.24.0	yes		yes			-
+0.8.23.1	yes		yes			Default language is now determined automatically
+0.8.23.0	no		no			Object positions have to be adjusted
+0.8.22.0	yes		no			-

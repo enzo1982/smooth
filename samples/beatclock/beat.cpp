@@ -51,7 +51,7 @@ BeatClock::BeatClock()
 
 	timer->onInterval.Connect(&BeatClock::PaintTime, this);
 
-	Menu::Entry	*entry;
+	MenuEntry	*entry;
 
 	menubar->AddEntry("Mode")->onClick.Connect(&BeatClock::Mode, this);
 	menubar->AddEntry("Options")->onClick.Connect(&BeatClock::Options, this);

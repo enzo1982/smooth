@@ -318,6 +318,11 @@ $(OBJECTDIR)/drag.o: $(WINDOWCLASSESDIR)/drag.cpp $(SMOOTHINCLUDEDIR)/drag.h
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/drag.cpp -o $(OBJECTDIR)/drag.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/shortcut.o: $(WINDOWCLASSESDIR)/shortcut.cpp $(SMOOTHINCLUDEDIR)/shortcut.h
+	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/shortcut.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/shortcut.cpp -o $(OBJECTDIR)/shortcut.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/statusbar.o: $(WINDOWCLASSESDIR)/statusbar.cpp $(SMOOTHINCLUDEDIR)/statusbar.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/statusbar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/statusbar.cpp -o $(OBJECTDIR)/statusbar.o

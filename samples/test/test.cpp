@@ -135,7 +135,7 @@ Test::Test()
 
 	// fill the menus:
 
-	Menu::Entry	*entry;
+	MenuEntry	*entry;
 
 	entry = mainWnd_menubar_file->AddEntry("Exit");
 	entry->onClick.Connect(&Test::Close, this);

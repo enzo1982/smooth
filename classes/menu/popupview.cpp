@@ -985,6 +985,8 @@ S::Void S::GUI::PopupView::CloseProc()
 
 	closeTimer = NIL;
 
+	if (!registered) return;
+
 	Window	*wnd = myContainer->GetContainerWindow();
 	Rect	 popupRect;
 

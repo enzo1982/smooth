@@ -169,7 +169,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	}
 
 	textRect.left	= realPos.x + 17;
-	textRect.top	= realPos.y + 4;
+	textRect.top	= realPos.y + 2;
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 

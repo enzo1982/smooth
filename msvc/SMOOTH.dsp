@@ -831,6 +831,18 @@ SOURCE=..\classes\system\timer.cpp
 SOURCE=..\classes\system\timerbackend.cpp
 # End Source File
 # End Group
+# Begin Group "files"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\files\directory.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\files\file.cpp
+# End Source File
+# End Group
 # End Group
 # Begin Group "miscsources"
 
@@ -903,9 +915,73 @@ SOURCE=..\include\smooth\templates\array\entry.cpp
 
 SOURCE=..\include\smooth\templates\array\entry.h
 # End Source File
+# End Group
+# Begin Group "slots"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\templates\array\value.cpp
+SOURCE=..\include\smooth\templates\slots\slot_base.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slots\slot_class.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slots\slot_global.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slots\slot_signal.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slots\slotr_base.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slots\slotr_class.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slots\slotr_global.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slots\slotr_signal.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slots\slotr_value.h
+# End Source File
+# End Group
+# Begin Group "signals"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\signals\callback.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\signals\signal.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\signals\signal_base.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\signals\signalr.h
+# End Source File
+# End Group
+# Begin Group "extended"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\extended\extended.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -918,39 +994,7 @@ SOURCE=..\include\smooth\templates\array\value.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\templates\array\value.h
-# End Source File
-# End Group
-# Begin Group "signals_templates"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\include\smooth\templates\signals\instancen.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\templates\signals\methodt.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\templates\signals\signaln.h
-# End Source File
-# End Group
-# Begin Group "callbacks_templates"
-
-# PROP Default_Filter "*.h"
-# Begin Source File
-
-SOURCE=..\include\smooth\templates\callbacks\callbackn.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\templates\callbacks\instancen.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\templates\callbacks\methodt.h
+SOURCE=..\include\smooth\templates\extended\extended.h
 # End Source File
 # End Group
 # End Group
@@ -1012,38 +1056,6 @@ SOURCE=..\include\smooth\xml\document.h
 # Begin Source File
 
 SOURCE=..\include\smooth\xml\node.h
-# End Source File
-# End Group
-# Begin Group "signals"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\include\smooth\signals\instance.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\signals\method.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\signals\signal.h
-# End Source File
-# End Group
-# Begin Group "callbacks"
-
-# PROP Default_Filter "*.h"
-# Begin Source File
-
-SOURCE=..\include\smooth\callbacks\callback.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\callbacks\instance.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\callbacks\method.h
 # End Source File
 # End Group
 # Begin Group "i18n"
@@ -1506,6 +1518,18 @@ SOURCE=..\include\smooth\window\window.h
 SOURCE=..\include\smooth\window\windowbackend.h
 # End Source File
 # End Group
+# Begin Group "filesheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\files\directory.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\files\file.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\activearea.h
@@ -1688,7 +1712,19 @@ SOURCE=..\include\smooth\signals.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\signalsr.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\slider.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\slots.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\slotsr.h
 # End Source File
 # Begin Source File
 

@@ -16,7 +16,7 @@ namespace smooth
 			virtual													~SIGNALS_SLOT_BASE_CLASS_NAME() {}
 
 			virtual SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	*Copy() = 0;
-			virtual Void												 Emit(SIGNALS_ARGUMENT_TYPES) = 0;
+			virtual returnTYPE											 Emit(SIGNALS_ARGUMENT_TYPES) = 0;
 
 			virtual Bool operator											 ==(const SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &) = 0;
 	};

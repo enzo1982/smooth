@@ -19,7 +19,7 @@ namespace smooth
 														 SIGNALS_SLOT_CLASS_CLASS_NAME(returnTYPE (classTYPE::*iMethod)(SIGNALS_ARGUMENT_TYPES), classTYPE *iInstance)	{ method = iMethod; instance = iInstance; }
 			SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	*Copy()														{ return new SIGNALS_SLOT_CLASS_CLASS_NAME<classTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(method, instance); }
 
-			Void Call(SIGNALS_ARGUMENT_PARAMETER_LIST)
+			Void Emit(SIGNALS_ARGUMENT_PARAMETER_LIST)
 			{
 				(instance->*(method))(SIGNALS_ARGUMENT_PARAMETERS);
 			}

@@ -11,6 +11,8 @@
 #ifndef _H_SIGNALS_
 #define _H_SIGNALS_
 
+#include "slots.h"
+
 #define SIGNALS_SIGNAL_ZERO
 #define SIGNALS_SIGNAL_CLASS_NAME	Signal0
 #define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase0

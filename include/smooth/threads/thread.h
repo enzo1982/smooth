@@ -21,6 +21,7 @@ namespace smooth
 };
 
 #include "../object.h"
+#include "../callbacks.h"
 
 namespace smooth
 {

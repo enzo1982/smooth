@@ -22,7 +22,6 @@ namespace smooth
 #include "misc/string.h"
 #include "array.h"
 #include "objecttype.h"
-#include "callbacks.h"
 
 namespace smooth
 {

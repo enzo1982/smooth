@@ -33,6 +33,7 @@ namespace smooth
 #include "../loop.h"
 #include "../menu/menu.h"
 #include "../graphics/bitmap.h"
+#include "../callbacks.h"
 
 namespace smooth
 {

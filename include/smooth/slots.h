@@ -8,29 +8,26 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_CALLBACKS_
-#define _H_CALLBACKS_
+#ifndef _H_SLOTS_
+#define _H_SLOTS_
 
-#include "slotsr.h"
-
-#define SIGNALS_SIGNAL_ZERO
-#define SIGNALS_CALLBACK_CLASS_NAME	Callback0
-#define SIGNALS_SIGNAL_CLASS_NAME	SignalR0
-#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotRBase0
-#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotRGlobal0
-#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotRClass0
-#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotRSignal0
+#define SIGNALS_SIGNAL_CLASS_NAME	Signal0
+#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase0
+#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotGlobal0
+#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotClass0
+#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotSignal0
 #define SIGNALS_CONDITIONAL_COMMA
 #define SIGNALS_ARGUMENT_LIST
 #define SIGNALS_ARGUMENT_TYPES
 #define SIGNALS_ARGUMENT_PARAMETER_LIST
 #define SIGNALS_ARGUMENT_PARAMETERS
 
-#include "templates/signals/callback.h"
+#include "templates/slots/slot_base.h"
+#include "templates/slots/slot_class.h"
+#include "templates/slots/slot_global.h"
+#include "templates/slots/slot_signal.h"
 
-#undef SIGNALS_SIGNAL_ZERO
 #undef SIGNALS_SIGNAL_CLASS_NAME
-#undef SIGNALS_CALLBACK_CLASS_NAME
 #undef SIGNALS_SLOT_BASE_CLASS_NAME
 #undef SIGNALS_SLOT_GLOBAL_CLASS_NAME
 #undef SIGNALS_SLOT_CLASS_CLASS_NAME
@@ -41,21 +38,22 @@
 #undef SIGNALS_ARGUMENT_PARAMETER_LIST
 #undef SIGNALS_ARGUMENT_PARAMETERS
 
-#define SIGNALS_CALLBACK_CLASS_NAME	Callback1
-#define SIGNALS_SIGNAL_CLASS_NAME	SignalR1
-#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotRBase1
-#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotRGlobal1
-#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotRClass1
-#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotRSignal1
+#define SIGNALS_SIGNAL_CLASS_NAME	Signal1
+#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase1
+#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotGlobal1
+#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotClass1
+#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotSignal1
 #define SIGNALS_CONDITIONAL_COMMA	,
 #define SIGNALS_ARGUMENT_LIST		class pt1
 #define SIGNALS_ARGUMENT_TYPES		pt1
 #define SIGNALS_ARGUMENT_PARAMETER_LIST	pt1 p1
 #define SIGNALS_ARGUMENT_PARAMETERS	p1
 
-#include "templates/signals/callback.h"
+#include "templates/slots/slot_base.h"
+#include "templates/slots/slot_class.h"
+#include "templates/slots/slot_global.h"
+#include "templates/slots/slot_signal.h"
 
-#undef SIGNALS_CALLBACK_CLASS_NAME
 #undef SIGNALS_SIGNAL_CLASS_NAME
 #undef SIGNALS_SLOT_BASE_CLASS_NAME
 #undef SIGNALS_SLOT_GLOBAL_CLASS_NAME
@@ -67,21 +65,22 @@
 #undef SIGNALS_ARGUMENT_PARAMETER_LIST
 #undef SIGNALS_ARGUMENT_PARAMETERS
 
-#define SIGNALS_CALLBACK_CLASS_NAME	Callback2
-#define SIGNALS_SIGNAL_CLASS_NAME	SignalR2
-#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotRBase2
-#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotRGlobal2
-#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotRClass2
-#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotRSignal2
+#define SIGNALS_SIGNAL_CLASS_NAME	Signal2
+#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase2
+#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotGlobal2
+#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotClass2
+#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotSignal2
 #define SIGNALS_CONDITIONAL_COMMA	,
 #define SIGNALS_ARGUMENT_LIST		class pt1, class pt2
 #define SIGNALS_ARGUMENT_TYPES		pt1, pt2
 #define SIGNALS_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2
 #define SIGNALS_ARGUMENT_PARAMETERS	p1, p2
 
-#include "templates/signals/callback.h"
+#include "templates/slots/slot_base.h"
+#include "templates/slots/slot_class.h"
+#include "templates/slots/slot_global.h"
+#include "templates/slots/slot_signal.h"
 
-#undef SIGNALS_CALLBACK_CLASS_NAME
 #undef SIGNALS_SIGNAL_CLASS_NAME
 #undef SIGNALS_SLOT_BASE_CLASS_NAME
 #undef SIGNALS_SLOT_GLOBAL_CLASS_NAME
@@ -93,21 +92,22 @@
 #undef SIGNALS_ARGUMENT_PARAMETER_LIST
 #undef SIGNALS_ARGUMENT_PARAMETERS
 
-#define SIGNALS_CALLBACK_CLASS_NAME	Callback3
-#define SIGNALS_SIGNAL_CLASS_NAME	SignalR3
-#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotRBase3
-#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotRGlobal3
-#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotRClass3
-#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotRSignal3
+#define SIGNALS_SIGNAL_CLASS_NAME	Signal3
+#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase3
+#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotGlobal3
+#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotClass3
+#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotSignal3
 #define SIGNALS_CONDITIONAL_COMMA	,
 #define SIGNALS_ARGUMENT_LIST		class pt1, class pt2, class pt3
 #define SIGNALS_ARGUMENT_TYPES		pt1, pt2, pt3
 #define SIGNALS_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3
 #define SIGNALS_ARGUMENT_PARAMETERS	p1, p2, p3
 
-#include "templates/signals/callback.h"
+#include "templates/slots/slot_base.h"
+#include "templates/slots/slot_class.h"
+#include "templates/slots/slot_global.h"
+#include "templates/slots/slot_signal.h"
 
-#undef SIGNALS_CALLBACK_CLASS_NAME
 #undef SIGNALS_SIGNAL_CLASS_NAME
 #undef SIGNALS_SLOT_BASE_CLASS_NAME
 #undef SIGNALS_SLOT_GLOBAL_CLASS_NAME
@@ -119,21 +119,22 @@
 #undef SIGNALS_ARGUMENT_PARAMETER_LIST
 #undef SIGNALS_ARGUMENT_PARAMETERS
 
-#define SIGNALS_CALLBACK_CLASS_NAME	Callback4
-#define SIGNALS_SIGNAL_CLASS_NAME	SignalR4
-#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotRBase4
-#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotRGlobal4
-#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotRClass4
-#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotRSignal4
+#define SIGNALS_SIGNAL_CLASS_NAME	Signal4
+#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase4
+#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotGlobal4
+#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotClass4
+#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotSignal4
 #define SIGNALS_CONDITIONAL_COMMA	,
 #define SIGNALS_ARGUMENT_LIST		class pt1, class pt2, class pt3, class pt4
 #define SIGNALS_ARGUMENT_TYPES		pt1, pt2, pt3, pt4
 #define SIGNALS_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4
 #define SIGNALS_ARGUMENT_PARAMETERS	p1, p2, p3, p4
 
-#include "templates/signals/callback.h"
+#include "templates/slots/slot_base.h"
+#include "templates/slots/slot_class.h"
+#include "templates/slots/slot_global.h"
+#include "templates/slots/slot_signal.h"
 
-#undef SIGNALS_CALLBACK_CLASS_NAME
 #undef SIGNALS_SIGNAL_CLASS_NAME
 #undef SIGNALS_SLOT_BASE_CLASS_NAME
 #undef SIGNALS_SLOT_GLOBAL_CLASS_NAME
@@ -145,21 +146,22 @@
 #undef SIGNALS_ARGUMENT_PARAMETER_LIST
 #undef SIGNALS_ARGUMENT_PARAMETERS
 
-#define SIGNALS_CALLBACK_CLASS_NAME	Callback5
-#define SIGNALS_SIGNAL_CLASS_NAME	SignalR5
-#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotRBase5
-#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotRGlobal5
-#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotRClass5
-#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotRSignal5
+#define SIGNALS_SIGNAL_CLASS_NAME	Signal5
+#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase5
+#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotGlobal5
+#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotClass5
+#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotSignal5
 #define SIGNALS_CONDITIONAL_COMMA	,
 #define SIGNALS_ARGUMENT_LIST		class pt1, class pt2, class pt3, class pt4, class pt5
 #define SIGNALS_ARGUMENT_TYPES		pt1, pt2, pt3, pt4, pt5
 #define SIGNALS_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4, pt5 p5
 #define SIGNALS_ARGUMENT_PARAMETERS	p1, p2, p3, p4, p5
 
-#include "templates/signals/callback.h"
+#include "templates/slots/slot_base.h"
+#include "templates/slots/slot_class.h"
+#include "templates/slots/slot_global.h"
+#include "templates/slots/slot_signal.h"
 
-#undef SIGNALS_CALLBACK_CLASS_NAME
 #undef SIGNALS_SIGNAL_CLASS_NAME
 #undef SIGNALS_SLOT_BASE_CLASS_NAME
 #undef SIGNALS_SLOT_GLOBAL_CLASS_NAME
@@ -171,21 +173,22 @@
 #undef SIGNALS_ARGUMENT_PARAMETER_LIST
 #undef SIGNALS_ARGUMENT_PARAMETERS
 
-#define SIGNALS_CALLBACK_CLASS_NAME	Callback6
-#define SIGNALS_SIGNAL_CLASS_NAME	SignalR6
-#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotRBase6
-#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotRGlobal6
-#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotRClass6
-#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotRSignal6
+#define SIGNALS_SIGNAL_CLASS_NAME	Signal6
+#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase6
+#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotGlobal6
+#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotClass6
+#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotSignal6
 #define SIGNALS_CONDITIONAL_COMMA	,
 #define SIGNALS_ARGUMENT_LIST		class pt1, class pt2, class pt3, class pt4, class pt5, class pt6
 #define SIGNALS_ARGUMENT_TYPES		pt1, pt2, pt3, pt4, pt5, pt6
 #define SIGNALS_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4, pt5 p5, pt6 p6
 #define SIGNALS_ARGUMENT_PARAMETERS	p1, p2, p3, p4, p5, p6
 
-#include "templates/signals/callback.h"
+#include "templates/slots/slot_base.h"
+#include "templates/slots/slot_class.h"
+#include "templates/slots/slot_global.h"
+#include "templates/slots/slot_signal.h"
 
-#undef SIGNALS_CALLBACK_CLASS_NAME
 #undef SIGNALS_SIGNAL_CLASS_NAME
 #undef SIGNALS_SLOT_BASE_CLASS_NAME
 #undef SIGNALS_SLOT_GLOBAL_CLASS_NAME
@@ -197,21 +200,22 @@
 #undef SIGNALS_ARGUMENT_PARAMETER_LIST
 #undef SIGNALS_ARGUMENT_PARAMETERS
 
-#define SIGNALS_CALLBACK_CLASS_NAME	Callback7
-#define SIGNALS_SIGNAL_CLASS_NAME	SignalR7
-#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotRBase7
-#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotRGlobal7
-#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotRClass7
-#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotRSignal7
+#define SIGNALS_SIGNAL_CLASS_NAME	Signal7
+#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase7
+#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotGlobal7
+#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotClass7
+#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotSignal7
 #define SIGNALS_CONDITIONAL_COMMA	,
 #define SIGNALS_ARGUMENT_LIST		class pt1, class pt2, class pt3, class pt4, class pt5, class pt6, class pt7
 #define SIGNALS_ARGUMENT_TYPES		pt1, pt2, pt3, pt4, pt5, pt6, pt7
 #define SIGNALS_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4, pt5 p5, pt6 p6, pt7 p7
 #define SIGNALS_ARGUMENT_PARAMETERS	p1, p2, p3, p4, p5, p6, p7
 
-#include "templates/signals/callback.h"
+#include "templates/slots/slot_base.h"
+#include "templates/slots/slot_class.h"
+#include "templates/slots/slot_global.h"
+#include "templates/slots/slot_signal.h"
 
-#undef SIGNALS_CALLBACK_CLASS_NAME
 #undef SIGNALS_SIGNAL_CLASS_NAME
 #undef SIGNALS_SLOT_BASE_CLASS_NAME
 #undef SIGNALS_SLOT_GLOBAL_CLASS_NAME
@@ -223,21 +227,22 @@
 #undef SIGNALS_ARGUMENT_PARAMETER_LIST
 #undef SIGNALS_ARGUMENT_PARAMETERS
 
-#define SIGNALS_CALLBACK_CLASS_NAME	Callback8
-#define SIGNALS_SIGNAL_CLASS_NAME	SignalR8
-#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotRBase8
-#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotRGlobal8
-#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotRClass8
-#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotRSignal8
+#define SIGNALS_SIGNAL_CLASS_NAME	Signal8
+#define SIGNALS_SLOT_BASE_CLASS_NAME	SlotBase8
+#define SIGNALS_SLOT_GLOBAL_CLASS_NAME	SlotGlobal8
+#define SIGNALS_SLOT_CLASS_CLASS_NAME	SlotClass8
+#define SIGNALS_SLOT_SIGNAL_CLASS_NAME	SlotSignal8
 #define SIGNALS_CONDITIONAL_COMMA	,
 #define SIGNALS_ARGUMENT_LIST		class pt1, class pt2, class pt3, class pt4, class pt5, class pt6, class pt7, class pt8
 #define SIGNALS_ARGUMENT_TYPES		pt1, pt2, pt3, pt4, pt5, pt6, pt7, pt8
 #define SIGNALS_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4, pt5 p5, pt6 p6, pt7 p7, pt8 p8
 #define SIGNALS_ARGUMENT_PARAMETERS	p1, p2, p3, p4, p5, p6, p7, p8
 
-#include "templates/signals/callback.h"
+#include "templates/slots/slot_base.h"
+#include "templates/slots/slot_class.h"
+#include "templates/slots/slot_global.h"
+#include "templates/slots/slot_signal.h"
 
-#undef SIGNALS_CALLBACK_CLASS_NAME
 #undef SIGNALS_SIGNAL_CLASS_NAME
 #undef SIGNALS_SLOT_BASE_CLASS_NAME
 #undef SIGNALS_SLOT_GLOBAL_CLASS_NAME

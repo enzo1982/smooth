@@ -15,8 +15,8 @@ namespace smooth
 	template <class returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_LIST> class SIGNALS_SIGNAL_CLASS_NAME : public Signal
 	{
 		protected:
-			Array<SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *>	 slotsN;
-			Array<SlotBase0<Void> *>									 slots0;
+			Array<SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *>	 slotsN;
+			Array<SlotBase0<returnTYPE> *>										 slots0;
 		public:
 			SIGNALS_SIGNAL_CLASS_NAME()
 			{
@@ -42,59 +42,66 @@ namespace smooth
 				DisconnectAll();
 			}
 
-			template <class classTYPE, class oClassTYPE, class slotReturnTYPE> Int Connect(slotReturnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)
+			template <class classTYPE, class oClassTYPE> Int Connect(returnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)
 			{
-				slotsN.AddEntry(new SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst));
+				slotsN.AddEntry(new SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst));
 
 				return Success;
 			}
 
-			template <class slotReturnTYPE> Int Connect(slotReturnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
+			Int Connect(returnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
 			{
-				slotsN.AddEntry(new SIGNALS_SLOT_GLOBAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc));
+				slotsN.AddEntry(new SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc));
 
 				return Success;
 			}
 
-			template <class slotReturnTYPE> Int Connect(SIGNALS_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
+			Int Connect(SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
 			{
 				if ((Signal *) sig == (Signal *) this) return Error;
 
-				slotsN.AddEntry(new SIGNALS_SLOT_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig));
+				slotsN.AddEntry(new SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig));
 		
 				return Success;
 			}
 
+			Int Connect(const returnTYPE &value)
+			{
+				slots0.AddEntry(new SlotRValue0<returnTYPE>(value));
+
+				return Success;
+			}
+
 #ifndef SIGNALS_SIGNAL_ZERO
-			template <class classTYPE, class oClassTYPE, class slotReturnTYPE> Int Connect(slotReturnTYPE (classTYPE::*proc)(), oClassTYPE *inst)
+			template <class classTYPE, class oClassTYPE> Int Connect(returnTYPE (classTYPE::*proc)(), oClassTYPE *inst)
 			{
-				slots0.AddEntry(new SlotClass0<oClassTYPE, slotReturnTYPE>(proc, inst));
+				slots0.AddEntry(new SlotRClass0<oClassTYPE, returnTYPE>(proc, inst));
 
 				return Success;
 			}
 
-			template <class slotReturnTYPE> Int Connect(slotReturnTYPE (*proc)())
+			template Int Connect(returnTYPE (*proc)())
 			{
-				slots0.AddEntry(new SlotGlobal0<slotReturnTYPE>(proc));
+				slots0.AddEntry(new SlotRGlobal0<returnTYPE>(proc));
 
 				return Success;
 			}
 
-			template <class slotReturnTYPE> Int Connect(Signal0<slotReturnTYPE> *sig)
+			template Int Connect(SignalR0<returnTYPE> *sig)
 			{
 				if ((Signal *) sig == (Signal *) this) return Error;
 
-				slots0.AddEntry(new SlotSignal0<slotReturnTYPE>(sig));
+				slots0.AddEntry(new SlotRSignal0<returnTYPE>(sig));
 
 				return Success;
 			}
 #endif
 
-			template <class classTYPE, class oClassTYPE, class slotReturnTYPE> Int Disconnect(slotReturnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)
+			template <class classTYPE, class oClassTYPE> Int Disconnect(returnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)
 			{
 				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
 				{
-					if ((*slotsN.GetNthEntry(i)) == SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst))
+					if ((*slotsN.GetNthEntry(i)) == SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst))
 					{
 						delete slotsN.GetNthEntry(i);
 
@@ -107,11 +114,11 @@ namespace smooth
 				return Success;
 			}
 
-			template <class slotReturnTYPE> Int Disconnect(slotReturnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
+			Int Disconnect(returnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
 			{
 				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
 				{
-					if ((*slotsN.GetNthEntry(i)) == SIGNALS_SLOT_GLOBAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc))
+					if ((*slotsN.GetNthEntry(i)) == SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc))
 					{
 						delete slotsN.GetNthEntry(i);
 
@@ -124,15 +131,32 @@ namespace smooth
 				return Success;
 			}
 
-			template <class slotReturnTYPE> Int Disconnect(SIGNALS_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
+			Int Disconnect(SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
 			{
 				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
 				{
-					if ((*slotsN.GetNthEntry(i)) == SIGNALS_SLOT_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig))
+					if ((*slotsN.GetNthEntry(i)) == SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig))
 					{
 						delete slotsN.GetNthEntry(i);
 
 						slotsN.RemoveEntry(slotsN.GetNthEntryIndex(i));
+
+						break;
+					}
+				}
+
+				return Success;
+			}
+
+			Int Disconnect(const returnTYPE &value)
+			{
+				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
+				{
+					if ((*slots0.GetNthEntry(i)) == SlotRValue0<returnTYPE>(value))
+					{
+						delete slots0.GetNthEntry(i);
+
+						slots0.RemoveEntry(slots0.GetNthEntryIndex(i));
 
 						break;
 					}
@@ -142,11 +166,11 @@ namespace smooth
 			}
 
 #ifndef SIGNALS_SIGNAL_ZERO
-			template <class classTYPE, class oClassTYPE, class slotReturnTYPE> Int Disconnect(slotReturnTYPE (classTYPE::*proc)(), oClassTYPE *inst)
+			template <class classTYPE, class oClassTYPE> Int Disconnect(returnTYPE (classTYPE::*proc)(), oClassTYPE *inst)
 			{
 				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
 				{
-					if ((*slots0.GetNthEntry(i)) == SlotClass0<oClassTYPE, slotReturnTYPE>(proc, inst))
+					if ((*slots0.GetNthEntry(i)) == SlotRClass0<oClassTYPE, returnTYPE>(proc, inst))
 					{
 						delete slots0.GetNthEntry(i);
 
@@ -159,11 +183,11 @@ namespace smooth
 				return Success;
 			}
 
-			template <class slotReturnTYPE> Int Disconnect(slotReturnTYPE (*proc)())
+			Int Disconnect(returnTYPE (*proc)())
 			{
 				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
 				{
-					if ((*slots0.GetNthEntry(i)) == SlotGlobal0<slotReturnTYPE>(proc))
+					if ((*slots0.GetNthEntry(i)) == SlotRGlobal0<returnTYPE>(proc))
 					{
 						delete slots0.GetNthEntry(i);
 
@@ -176,11 +200,11 @@ namespace smooth
 				return Success;
 			}
 
-			template <class slotReturnTYPE> Int Disconnect(Signal0<slotReturnTYPE> *sig)
+			Int Disconnect(SignalR0<returnTYPE> *sig)
 			{
 				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
 				{
-					if ((*slots0.GetNthEntry(i)) == SlotSignal0<slotReturnTYPE>(sig))
+					if ((*slots0.GetNthEntry(i)) == SlotRSignal0<returnTYPE>(sig))
 					{
 						delete slots0.GetNthEntry(i);
 
@@ -205,14 +229,18 @@ namespace smooth
 				return Success;
 			}
 
-			Void Emit(SIGNALS_ARGUMENT_PARAMETER_LIST)
+			returnTYPE Emit(SIGNALS_ARGUMENT_PARAMETER_LIST)
 			{
+				returnTYPE	 returnValue = (returnTYPE) NIL;
+
 				ProtectParent();
 
-				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	slotsN.GetNthEntry(i)->Emit(SIGNALS_ARGUMENT_PARAMETERS);
-				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	slots0.GetNthEntry(j)->Emit();
+				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	returnValue = slotsN.GetNthEntry(i)->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	returnValue = slots0.GetNthEntry(j)->Emit();
 
 				UnprotectParent();
+
+				return returnValue;
 			}
 
 			Int GetNOfConnectedSlots()

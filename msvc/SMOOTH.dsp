@@ -299,6 +299,10 @@ SOURCE=..\classes\misc\font.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\misc\i18n.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\misc\math.cpp
 # End Source File
 # Begin Source File
@@ -431,22 +435,6 @@ SOURCE=..\classes\xml\node.cpp
 # End Source File
 # End Group
 # End Group
-# Begin Group "i18n"
-
-# PROP Default_Filter "*.cpp"
-# Begin Source File
-
-SOURCE=..\i18n\english.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\german.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\i18n.cpp
-# End Source File
-# End Group
 # Begin Group "dialogs"
 
 # PROP Default_Filter "*.cpp"
@@ -522,18 +510,6 @@ SOURCE=..\misc\toolkit.cpp
 # Begin Group "smooth"
 
 # PROP Default_Filter "*.h"
-# Begin Group "i18nheaders"
-
-# PROP Default_Filter "*.h"
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\english.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\german.h
-# End Source File
-# End Group
 # Begin Group "templates"
 
 # PROP Default_Filter "*.h"
@@ -691,6 +667,14 @@ SOURCE=..\include\smooth\callbacks\instance.h
 # Begin Source File
 
 SOURCE=..\include\smooth\callbacks\method.h
+# End Source File
+# End Group
+# Begin Group "i18n"
+
+# PROP Default_Filter "*.h"
+# Begin Source File
+
+SOURCE=..\include\smooth\i18n\smooth_de.h
 # End Source File
 # End Group
 # Begin Source File

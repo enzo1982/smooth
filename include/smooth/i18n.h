@@ -12,51 +12,60 @@
 #define _H_OBJSMOOTH_I18N_
 
 #include "string.h"
+#include "xml/document.h"
 
 namespace smooth
 {
-	SMOOTHVAR Int DefaultLanguage;
-
-	SMOOTHVAR Int I18N_DEFAULTFONTSIZE;
-	SMOOTHVAR Int I18N_SMALLFONTSIZE;
+	SMOOTHVAR Int	 I18N_DEFAULTFONTSIZE;
+	SMOOTHVAR Int	 I18N_SMALLFONTSIZE;
 	SMOOTHVAR String I18N_DEFAULTFONT;
 
-#ifdef __SMOOTH_DLL__
-	Int GetDefaultLanguage();
+	namespace I18n
+	{
+		class SMOOTHAPI Language
+		{
+			public:
+				Array<String>	 strings;
 
-	extern String TXT_OK;
-	extern String TXT_CANCEL;
-	extern String TXT_YES;
-	extern String TXT_NO;
-	extern String TXT_RETRY;
-	extern String TXT_ABORT;
-	extern String TXT_IGNORE;
+				String		 name;
+				String		 encoding;
+				String		 magic;
+				String		 author;
+				String		 url;
+				Bool		 rightToLeft;
 
-	extern String TXT_SMOOTHAPPLICATION;
+						 Language();
+						~Language();
+		};
 
-	extern String TXT_COLORSELECTION;
-	extern String TXT_HTMLCODE;
-	extern String TXT_REDSHORT;
-	extern String TXT_GREENSHORT;
-	extern String TXT_BLUESHORT;
-	extern String TXT_HUESHORT;
-	extern String TXT_SATURATIONSHORT;
-	extern String TXT_VALUESHORT;
+		class SMOOTHAPI Translator
+		{
+			private:
+				Int			 internal;
 
-	extern String TXT_OPENFILE;
-	extern String TXT_SAVEFILE;
-	extern String TXT_SAVEFILEAS;
+				Array<Language *>	 languages;
+				Language		*activeLanguage;
 
-	extern String TXT_SELECTDIR;
-	extern String TXT_SELECTFONT;
+				Int			 GetSupportedLanguages();
+				Int			 LoadDoc(XML::Document *, Language *);
+			public:
+							 Translator(Bool = False);
+							~Translator();
 
-	extern String TXT_SPLASHSCREEN;
+				Int			 SetInternalLanguageInfo(String, String, String, Bool);
 
-	extern String TXT_SMOOTHTOOLWINDOW;
-#endif
+				Int			 GetNOfLanguages();
 
-	const Int LNG_ENGLISH	= 0;
-	const Int LNG_GERMAN	= 1;
+				String			 GetNthLanguageName(Int);
+				String			 GetNthLanguageID(Int);
+				String			 GetNthLanguageAuthor(Int);
+				String			 GetNthLanguageEncoding(Int);
+				String			 GetNthLanguageURL(Int);
+
+				Int			 ActivateLanguage(String);
+				String			 TranslateString(String);
+		};
+	};
 };
 
 #endif

@@ -76,17 +76,17 @@ S::DialogColorSelection::DialogColorSelection()
 	bs.cx = 0;
 	bs.cy = 0;
 
-	dlgwnd = new Window(TXT_COLORSELECTION);
+	dlgwnd = new Window(SMOOTH::i18n->TranslateString("Color selection"));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
-	okbtn		= new Button(TXT_OK, NIL, bp, bs);
+	okbtn		= new Button(SMOOTH::i18n->TranslateString("OK"), NIL, bp, bs);
 	okbtn->onClick.Connect(&DialogColorSelection::ColorDlgOK, this);
 	okbtn->SetOrientation(OR_LOWERRIGHT);
 
 	bp.x = 175;
 
-	cancelbtn = new Button(TXT_CANCEL, NIL, bp, bs);
+	cancelbtn = new Button(SMOOTH::i18n->TranslateString("Cancel"), NIL, bp, bs);
 	cancelbtn->onClick.Connect(&DialogColorSelection::ColorDlgCancel, this);
 	cancelbtn->SetOrientation(OR_LOWERRIGHT);
 
@@ -132,43 +132,43 @@ S::DialogColorSelection::DialogColorSelection()
 	bp.x = 189;
 	bp.y = 37;
 
-	huetext = new Text(TXT_HUESHORT, bp);
+	huetext = new Text(SMOOTH::i18n->TranslateString("H"), bp);
 	huetext->SetOrientation(OR_UPPERRIGHT);
 	huetext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
-	sattext = new Text(TXT_SATURATIONSHORT, bp);
+	sattext = new Text(SMOOTH::i18n->TranslateString("S"), bp);
 	sattext->SetOrientation(OR_UPPERRIGHT);
 	sattext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
-	valtext = new Text(TXT_VALUESHORT, bp);
+	valtext = new Text(SMOOTH::i18n->TranslateString("V"), bp);
 	valtext->SetOrientation(OR_UPPERRIGHT);
 	valtext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
-	redtext = new Text(TXT_REDSHORT, bp);
+	redtext = new Text(SMOOTH::i18n->TranslateString("R"), bp);
 	redtext->SetOrientation(OR_UPPERRIGHT);
 	redtext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(255, 0, 0)));
 
 	bp.y += 26;
 
-	greentext = new Text(TXT_GREENSHORT, bp);
+	greentext = new Text(SMOOTH::i18n->TranslateString("G"), bp);
 	greentext->SetOrientation(OR_UPPERRIGHT);
 	greentext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 160, 0)));
 
 	bp.y += 26;
 
-	bluetext = new Text(TXT_BLUESHORT, bp);
+	bluetext = new Text(SMOOTH::i18n->TranslateString("B"), bp);
 	bluetext->SetOrientation(OR_UPPERRIGHT);
 	bluetext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 0, 255)));
 
 	bp.y += 26;
 
-	hextext = new Text(TXT_HTMLCODE, bp);
+	hextext = new Text(SMOOTH::i18n->TranslateString("HTML code"), bp);
 	hextext->SetOrientation(OR_UPPERRIGHT);
 	hextext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 

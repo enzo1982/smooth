@@ -26,6 +26,7 @@ namespace smooth
 #include "definitions.h"
 #include "string.h"
 #include "rect.h"
+#include "i18n.h"
 
 #if defined MessageBox
 #undef MessageBox
@@ -40,7 +41,7 @@ namespace smooth
 	class SMOOTHAPI SMOOTH
 	{
 		public:
-			static Void		 SetLanguage(Int);
+			static I18n::Translator	*i18n;
 
 #ifdef __WIN32__
 			static HBITMAP		 LoadImage(String, Int, String);

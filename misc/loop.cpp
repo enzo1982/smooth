@@ -90,8 +90,18 @@ S::Void S::Init()
 	GetColors();
 	SetMetrics();
 	SetMeasurement(SMT_UNITS);
-	GetDefaultLanguage();
-	SMOOTH::SetLanguage(DefaultLanguage);
+	SMOOTH::i18n = new I18n::Translator(True);
+
+	switch (PRIMARYLANGID(GetUserDefaultLangID()))
+	{
+		default:
+		case LANG_ENGLISH:
+			SMOOTH::i18n->ActivateLanguage("internal");
+			break;
+		case LANG_GERMAN:
+			SMOOTH::i18n->ActivateLanguage("smooth_de");
+			break;
+	}
 
 	String::SetInputFormat("ISO-8859-1");
 	String::SetOutputFormat(String("CP").Append(String::FromInt(codePage)));
@@ -102,6 +112,8 @@ S::Void S::Init()
 S::Void S::Free()
 {
 	if (--initCount) return;
+
+	delete SMOOTH::i18n;
 
 	delete backgroundApplication;
 

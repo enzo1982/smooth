@@ -24,7 +24,7 @@ S::Application::Application(String name)
 	type		= classID;
 	containerType	= classID;
 
-	objectProperties->text		= name == NIL ? TXT_SMOOTHAPPLICATION : name;
+	objectProperties->text		= name == NIL ? String("smooth Application") : name;
 	objectProperties->size.cx	= LiSAGetDisplaySizeX();
 	objectProperties->size.cy	= LiSAGetDisplaySizeY();
 }

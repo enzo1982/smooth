@@ -218,6 +218,11 @@ $(OBJECTDIR)/font.o: $(MISCCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/font.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/i18n.o: $(MISCCLASSESDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/i18n.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/i18n.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/i18n.cpp -o $(OBJECTDIR)/i18n.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/math.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/math.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/math.cpp -o $(OBJECTDIR)/math.o
@@ -381,21 +386,6 @@ $(OBJECTDIR)/filedlg.o: $(DIALOGSDIR)/filedlg.cpp $(SMOOTHINCLUDEDIR)/filedlg.h
 $(OBJECTDIR)/fontdlg.o: $(DIALOGSDIR)/fontdlg.cpp $(SMOOTHINCLUDEDIR)/fontdlg.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/fontdlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/fontdlg.cpp -o $(OBJECTDIR)/fontdlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/english.o: $(I18NDIR)/english.cpp $(SMOOTHINCLUDEDIR)/i18n/english.h
-	$(ECHO) -n Compiling $(I18NDIR)/english.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/english.cpp -o $(OBJECTDIR)/english.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/german.o: $(I18NDIR)/german.cpp $(SMOOTHINCLUDEDIR)/i18n/german.h
-	$(ECHO) -n Compiling $(I18NDIR)/german.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/german.cpp -o $(OBJECTDIR)/german.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/i18n.o: $(I18NDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/i18n.h
-	$(ECHO) -n Compiling $(I18NDIR)/i18n.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/i18n.cpp -o $(OBJECTDIR)/i18n.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h

@@ -275,7 +275,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 						if (wnd->IsMouseOn(frame))
 						{
-							surface->StartPaint(Rect(Point(wnd->GetObjectProperties()->size.cx - (realPos.x + objectProperties->size.cx), realPos.y), objectProperties->size));
+							surface->StartPaint(Rect(Point(Setup::rightToLeft ? (wnd->GetObjectProperties()->size.cx - (realPos.x + objectProperties->size.cx)) : realPos.x, realPos.y), objectProperties->size));
 
 							for (Int j = 0; j < nOfObjects; j++)
 							{
@@ -290,7 +290,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 								}
 							}
 
-							wnd->SetUpdateRect(Rect(Point(wnd->GetObjectProperties()->size.cx - (realPos.x + objectProperties->size.cx), realPos.y), objectProperties->size));
+							wnd->SetUpdateRect(Rect(Point(Setup::rightToLeft ? (wnd->GetObjectProperties()->size.cx - (realPos.x + objectProperties->size.cx)) : realPos.x, realPos.y), objectProperties->size));
 
 							Hide();
 

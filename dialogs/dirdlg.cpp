@@ -16,7 +16,7 @@
 
 S::DialogDirSelection::DialogDirSelection()
 {
-	caption = TXT_SELECTDIR;
+	caption = SMOOTH::i18n->TranslateString("Select directory");
 	directory = NIL;
 }
 

@@ -41,7 +41,7 @@ S::Int S::SMOOTH::SplashScreen(HBITMAP logo, Int time)
 
 S::SplashScreenApp::SplashScreenApp(HBITMAP logo, Int t)
 {
-	splashscreen = new Window(TXT_SPLASHSCREEN);
+	splashscreen = new Window("Splash screen");
 
 	timer = new Timer();
 

@@ -25,6 +25,9 @@ S::MenuEntry::MenuEntry(Int newType, Int newID)
 	checked		= False;
 	clicked		= False;
 
+	scKey		= 0;
+	scFlags		= 0;
+
 	bVar		= NIL;
 	iVar		= NIL;
 
@@ -56,6 +59,14 @@ S::Int S::MenuEntry::SetTooltip(String newTooltip)
 S::Int S::MenuEntry::SetStatusText(String newDescription)
 {
 	description = newDescription;
+
+	return Success;
+}
+
+S::Int S::MenuEntry::SetShortcut(Int nKey, Int nFlags)
+{
+	scKey	= nKey;
+	scFlags	= nFlags;
 
 	return Success;
 }

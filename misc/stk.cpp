@@ -24,6 +24,8 @@
 #include <smooth/pciio.h>
 #include <smooth/mdiwindow.h>
 
+S::I18n::Translator	*S::SMOOTH::i18n = NIL;
+
 S::Void S::SMOOTH::SendMessage(GUI::Window *window, Int message, Int wParam, Int lParam)
 {
 	if (window != NIL)

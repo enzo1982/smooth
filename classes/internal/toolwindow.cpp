@@ -25,7 +25,7 @@
 
 const S::Int	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
 
-S::GUI::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
+S::GUI::ToolWindow::ToolWindow() : Window("smooth ToolWindow")
 {
 	type				= classID;
 	containerType			= Window::classID;

@@ -127,7 +127,7 @@ S::GUI::Window::Window(String title)
 	type = classID;
 
 	if (title != NIL)	objectProperties->text = title;
-	else			objectProperties->text = TXT_SMOOTHAPPLICATION;
+	else			objectProperties->text = "smooth Application";
 
 	className = String(title).Append(String::FromInt(System::RequestGUID()));
 

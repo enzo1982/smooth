@@ -54,6 +54,9 @@ namespace smooth
 			Bool		 sizeset;
 			Rect		 rect;
 
+			Int		 scKey;
+			Int		 scFlags;
+
 			GUI::Font	 font;
 
 					 MenuEntry(Int, Int);
@@ -62,6 +65,7 @@ namespace smooth
 			Int		 SetText(String);
 			Int		 SetTooltip(String);
 			Int		 SetStatusText(String);
+			Int		 SetShortcut(Int, Int);
 
 			Int		 SetBitmap(HBITMAP);
 

@@ -160,7 +160,7 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 		case MB_OK:
 			if (msgbox->GetObjectProperties()->size.cx < (buttonWidth + 30)) msgbox->GetObjectProperties()->size.cx = buttonWidth + 30;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - buttonWidth) / 2 - 3;
-			okbutton = new Button(TXT_OK, NIL, bpos, bsize);
+			okbutton = new Button(SMOOTH::i18n->TranslateString("OK"), NIL, bpos, bsize);
 			okbutton->onClick.Connect(&MessageBoxApp::MessageOK, this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(okbutton);
@@ -168,11 +168,11 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 		case MB_OKCANCEL:
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
-			okbutton = new Button(TXT_OK, NIL, bpos, bsize);
+			okbutton = new Button(SMOOTH::i18n->TranslateString("OK"), NIL, bpos, bsize);
 			okbutton->onClick.Connect(&MessageBoxApp::MessageOK, this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize);
+			cancelbutton = new Button(SMOOTH::i18n->TranslateString("Cancel"), NIL, bpos, bsize);
 			cancelbutton->onClick.Connect(&MessageBoxApp::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(okbutton);
@@ -181,11 +181,11 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 		case MB_YESNO:
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
-			yesbutton = new Button(TXT_YES, NIL, bpos, bsize);
+			yesbutton = new Button(SMOOTH::i18n->TranslateString("Yes"), NIL, bpos, bsize);
 			yesbutton->onClick.Connect(&MessageBoxApp::MessageYes, this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			nobutton = new Button(TXT_NO, NIL, bpos, bsize);
+			nobutton = new Button(SMOOTH::i18n->TranslateString("No"), NIL, bpos, bsize);
 			nobutton->onClick.Connect(&MessageBoxApp::MessageNo, this);
 			nobutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(yesbutton);
@@ -194,15 +194,15 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 		case MB_YESNOCANCEL:
 			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
-			yesbutton = new Button(TXT_YES, NIL, bpos, bsize);
+			yesbutton = new Button(SMOOTH::i18n->TranslateString("Yes"), NIL, bpos, bsize);
 			yesbutton->onClick.Connect(&MessageBoxApp::MessageYes, this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			nobutton = new Button(TXT_NO, NIL, bpos, bsize);
+			nobutton = new Button(SMOOTH::i18n->TranslateString("No"), NIL, bpos, bsize);
 			nobutton->onClick.Connect(&MessageBoxApp::MessageNo, this);
 			nobutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize);
+			cancelbutton = new Button(SMOOTH::i18n->TranslateString("Cancel"), NIL, bpos, bsize);
 			cancelbutton->onClick.Connect(&MessageBoxApp::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(yesbutton);
@@ -212,11 +212,11 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 		case MB_RETRYCANCEL:
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
-			retrybutton = new Button(TXT_RETRY, NIL, bpos, bsize);
+			retrybutton = new Button(SMOOTH::i18n->TranslateString("Retry"), NIL, bpos, bsize);
 			retrybutton->onClick.Connect(&MessageBoxApp::MessageRetry, this);
 			retrybutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize);
+			cancelbutton = new Button(SMOOTH::i18n->TranslateString("Cancel"), NIL, bpos, bsize);
 			cancelbutton->onClick.Connect(&MessageBoxApp::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(retrybutton);
@@ -225,15 +225,15 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 		case MB_ABORTRETRYIGNORE:
 			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
-			abortbutton = new Button(TXT_ABORT, NIL, bpos, bsize);
+			abortbutton = new Button(SMOOTH::i18n->TranslateString("Abort"), NIL, bpos, bsize);
 			abortbutton->onClick.Connect(&MessageBoxApp::MessageAbort, this);
 			abortbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			retrybutton = new Button(TXT_RETRY, NIL, bpos, bsize);
+			retrybutton = new Button(SMOOTH::i18n->TranslateString("Retry"), NIL, bpos, bsize);
 			retrybutton->onClick.Connect(&MessageBoxApp::MessageRetry, this);
 			retrybutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			ignorebutton = new Button(TXT_IGNORE, NIL, bpos, bsize);
+			ignorebutton = new Button(SMOOTH::i18n->TranslateString("Ignore"), NIL, bpos, bsize);
 			ignorebutton->onClick.Connect(&MessageBoxApp::MessageIgnore, this);
 			ignorebutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(abortbutton);

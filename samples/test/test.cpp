@@ -14,7 +14,6 @@
 
 Int smooth::Main()
 {
-	SMOOTH::SetLanguage(LNG_ENGLISH);
 	String::SetInputFormat("UTF-8");
 
 	Test	*app = new Test();

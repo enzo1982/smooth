@@ -65,9 +65,6 @@ namespace smooth
 				virtual Int			 GrayscaleBitmap();
 				virtual Int			 ReplaceColor(Int, Int);
 
-				virtual Int			 BlitFromSurface(Surface *, Rect, Rect);
-				virtual Int			 BlitToSurface(Rect, Surface *, Rect);
-
 				virtual Bool			 SetPixel(Int, Int, UnsignedLong);
 				virtual UnsignedLong		 GetPixel(Int, Int);
 

@@ -318,8 +318,6 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, Rect srcRect, R
 {
 	Bitmap	 bitmap = oBitmap;
 
-	if (bitmap.GetBitmapType() != BITMAP_GDI) return Error;
-
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetBitmap());
 
@@ -346,8 +344,6 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, Rect srcRect, R
 S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, const Bitmap &oBitmap, Rect destRect)
 {
 	Bitmap	 bitmap = oBitmap;
-
-	if (bitmap.GetBitmapType() != BITMAP_GDI) return Error;
 
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetBitmap());

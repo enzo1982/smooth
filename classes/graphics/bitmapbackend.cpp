@@ -141,20 +141,6 @@ S::Int S::GUI::BitmapBackend::ReplaceColor(Int color1, Int color2)
 	return Success;
 }
 
-S::Int S::GUI::BitmapBackend::BlitFromSurface(Surface *surface, Rect srcRect, Rect destRect)
-{
-	if (surface == NIL) return Error;
-
-	return surface->BlitToBitmap(srcRect, *(Bitmap *) this, destRect);
-}
-
-S::Int S::GUI::BitmapBackend::BlitToSurface(Rect srcRect, Surface *surface, Rect destRect)
-{
-	if (surface == NIL) return Error;
-
-	return surface->BlitFromBitmap(*(Bitmap *) this, srcRect, destRect);
-}
-
 S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, UnsignedLong color)
 {
 	if (bytes == NIL)			return False;

@@ -10,6 +10,7 @@
 
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/bitmapbackend.h>
+#include <smooth/graphics/surface.h>
 
 #ifdef __WIN32__
 #include <smooth/graphics/gdi/bitmapgdi.h>
@@ -49,7 +50,7 @@ S::GUI::Bitmap::Bitmap(const Bitmap &iBitmap)
 #ifdef __WIN32__
 	backend = new BitmapGDI((BitmapGDI &) *(iBitmap.backend));
 #else
-	backend = new BitmapBackend((BitmapNone &) *(iBitmap.backend));
+	backend = new BitmapBackend(*(iBitmap.backend));
 #endif
 }
 
@@ -115,12 +116,16 @@ S::Int S::GUI::Bitmap::ReplaceColor(Int color1, Int color2)
 
 S::Int S::GUI::Bitmap::BlitFromSurface(Surface *surface, Rect srcRect, Rect destRect)
 {
-	return backend->BlitFromSurface(surface, srcRect, destRect);
+	if (surface == NIL) return Error;
+
+	return surface->BlitToBitmap(srcRect, *this, destRect);
 }
 
 S::Int S::GUI::Bitmap::BlitToSurface(Rect srcRect, Surface *surface, Rect destRect)
 {
-	return backend->BlitToSurface(srcRect, surface, destRect);
+	if (surface == NIL) return Error;
+
+	return surface->BlitFromBitmap(*this, srcRect, destRect);
 }
 
 S::Bool S::GUI::Bitmap::SetPixel(Int x, Int y, UnsignedLong color)

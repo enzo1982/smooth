@@ -316,7 +316,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			frame.bottom = min(frame.bottom, maxFrameY);
 
-			if (METRIC_LISTBOXENTRYHEIGHT * nOfEntries + 4 > objectProperties->size.cy)
+			if (METRIC_LISTBOXENTRYHEIGHT * nOfEntries + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1) + 4 > objectProperties->size.cy)
 			{
 				if (!needScrollbar)
 				{

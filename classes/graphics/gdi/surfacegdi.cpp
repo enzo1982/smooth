@@ -237,7 +237,7 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font)
 	int	 lines = 1;
 	int	 offset = 0;
 	int	 origoffset;
-	int	 height = GetLineSizeY(string, font.GetName(), font.GetSize(), font.GetWeight()) + 3;
+	int	 height = font.GetLineSizeY(string) + 3;
 	int	 txtsize = string.Length();
 	String	 line;
 

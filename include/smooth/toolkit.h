@@ -12,22 +12,11 @@
 #define _H_OBJSMOOTH_TOOLKIT_
 
 #include "system.h"
-#include "point.h"
-#include "rect.h"
-#include "size.h"
 #include "graphics/window.h"
 
-int GetLineSizeX(S::String, int, S::String, int, int);
-int GetLineSizeY(S::String, S::String, int, int);
-
 #ifdef __SMOOTH_DLL__
-int		 GetTextSizeX		(S::String, int, S::String, int, int);
-int		 GetTextSizeX		(S::String, S::String, int, int);
-int		 GetTextSizeY		(S::String, S::String, int, int);
-bool		 DoRectsOverlap		(S::Rect, S::Rect);
-S::Rect		 OverlapRect		(S::Rect, S::Rect);
-HDC		 GetContext		(S::GUI::Window *);
-void		 FreeContext		(S::GUI::Window *, HDC);
+HDC	 GetContext	(S::GUI::Window *);
+void	 FreeContext	(S::GUI::Window *, HDC);
 #endif
 
 #endif

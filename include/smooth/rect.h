@@ -33,8 +33,12 @@ namespace smooth
 			Int		 top;
 			Int		 right;
 			Int		 bottom;
+
 					 Rect();
 					 Rect(Point, Size);
+
+			static Bool	 DoRectsOverlap(Rect, Rect);
+			static Rect	 OverlapRect(Rect, Rect);
 	};
 };
 

@@ -116,7 +116,9 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 
 		for (int j = 0; j < lines; j++)
 		{
-			thissize = GetTextSizeX(line[j], I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, FW_NORMAL);
+			GUI::Font	 font;
+
+			thissize = font.GetTextSizeX(line[j]);
 
 			if (thissize > maxsize) maxsize = thissize;
 		}
@@ -134,7 +136,9 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 
 	if (msgicon != NIL) msgbox->GetObjectProperties()->size.cx += GetSystemMetrics(SM_CXICON) + 20;
 
-	titlesize = GetTextSizeX(title, I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, FW_BOLD);
+	Font	 tbFont(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, 0, FW_BOLD);
+
+	titlesize = tbFont.GetTextSizeX(title);
 
 	if (msgbox->GetObjectProperties()->size.cx < titlesize + 80) msgbox->GetObjectProperties()->size.cx = titlesize + 80;
 

@@ -97,20 +97,12 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 	}
 	else
 	{
-		if (DoRectsOverlap(updateRect, client) || (updateRect.left == 0 && updateRect.top == 0 && updateRect.right == 0 && updateRect.bottom == 0))
+		if (Rect::DoRectsOverlap(updateRect, client) || (updateRect.left == 0 && updateRect.top == 0 && updateRect.right == 0 && updateRect.bottom == 0))
 		{
-			Rect	 intersectRect;
-
 			updateRect.right += 5;
 			updateRect.bottom += 5;
 
-			RECT	 iRect = intersectRect;
-			RECT	 uRect = updateRect;
-			RECT	 cRect = client;
-
-			IntersectRect(&iRect, &uRect, &cRect);
-
-			intersectRect = iRect;
+			Rect	 intersectRect = Rect::OverlapRect(updateRect, client);
 
 			surface->Box(intersectRect, Setup::DividerDarkColor, FILLED);
 

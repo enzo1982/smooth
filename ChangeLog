@@ -2,4 +2,9 @@ ChangeLog for smooth
 
 xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 
-- no changes, yet
+- rect.cpp	- new methods: Bool DoRectsOverlap(Rect, Rect); and Rect OverlapRect(Rect, Rect);
+- widget.cpp	- new method: Bool IsAffected(Rect &); replaces corresponding STK function
+
+- removed some Windows API calls
+- preparing to remove smooth Toolkit (STK, stk.cpp)
+- preparing to remove mpToolkit (toolkit.cpp)

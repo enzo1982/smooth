@@ -150,7 +150,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 				break;
 		}
 
-		textSize = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		textSize = objectProperties->font.GetTextSizeX(objectProperties->text);
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
 		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
@@ -221,7 +221,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				break;
 		}
 
-		textSize = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		textSize = objectProperties->font.GetTextSizeX(objectProperties->text);
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
 		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
@@ -345,7 +345,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				break;
 		}
 
-		textSize = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		textSize = objectProperties->font.GetTextSizeX(objectProperties->text);
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
 		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;

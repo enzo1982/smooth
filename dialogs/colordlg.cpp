@@ -376,7 +376,7 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 	rect.right	= rect.left + 17;
 	rect.bottom	= rect.top + hssize + 1;
 
-	if (DoRectsOverlap(rect, urect))
+	if (Rect::DoRectsOverlap(rect, urect))
 	{
 		surface->Frame(rect, FRAME_DOWN);
 
@@ -431,9 +431,9 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 
 	ColorDlgUpdatePickers();
 
-	if (DoRectsOverlap(rect, urect))
+	if (Rect::DoRectsOverlap(rect, urect))
 	{
-		irect = OverlapRect(rect, urect);
+		irect = Rect::OverlapRect(rect, urect);
 
 		irect.right += 5;
 		irect.bottom += 5;

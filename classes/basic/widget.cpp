@@ -15,6 +15,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/toolkit.h>
 #include <smooth/layer.h>
+#include <smooth/divider.h>
 
 const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
 
@@ -40,11 +41,13 @@ S::GUI::Widget::~Widget()
 
 S::Void S::GUI::Widget::GetTextSize()
 {
-	objectProperties->textSize.cx = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-	objectProperties->textSize.cy = GetTextSizeY(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+	objectProperties->textSize.cx = objectProperties->font.GetTextSizeX(objectProperties->text);
+	objectProperties->textSize.cy = objectProperties->font.GetTextSizeY(objectProperties->text);
 
-	objectProperties->tooltipSize.cx = GetTextSizeX(objectProperties->tooltip, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
-	objectProperties->tooltipSize.cy = GetTextSizeY(objectProperties->tooltip, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
+	Font	 tooltipFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
+
+	objectProperties->tooltipSize.cx = tooltipFont.GetTextSizeX(objectProperties->tooltip);
+	objectProperties->tooltipSize.cy = tooltipFont.GetTextSizeY(objectProperties->tooltip);
 }
 
 S::Point S::GUI::Widget::GetRealPosition()
@@ -296,6 +299,30 @@ S::Int S::GUI::Widget::SetMetrics(Point newPos, Size newSize)
 	if (registered && prevVisible) Show();
 
 	return Success;
+}
+
+S::Bool S::GUI::Widget::IsAffected(Rect &uRect)
+{
+	Rect	 tRect;
+	Point	 realpos = objectProperties->pos;
+
+	if (type == GUI::Layer::classID || type == GUI::Divider::classID) return True;
+
+	if (objectProperties->pos.x == 0 && objectProperties->pos.y == 0 && objectProperties->size.cx == 0 && objectProperties->size.cy == 0) return True;
+
+	if (myContainer != NIL)
+	{
+		if (myContainer->GetContainerObject()->GetObjectType() == GUI::Layer::classID) realpos = GetRealPosition();
+	}
+
+	tRect.left	= realpos.x - 10;
+	tRect.top	= realpos.y - 10;
+	tRect.right	= realpos.x + objectProperties->size.cx + 10;
+	tRect.bottom	= realpos.y + objectProperties->size.cy + 10;
+
+	if (!Rect::DoRectsOverlap(uRect, tRect)) return False;
+
+	return True;
 }
 
 S::Bool S::GUI::Widget::IsTypeCompatible(Int compType)

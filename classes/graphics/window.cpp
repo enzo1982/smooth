@@ -311,7 +311,7 @@ S::Int S::GUI::Window::SetText(String title)
 	if (Setup::enableUnicode)	SetWindowTextW(hwnd, title);
 	else				SetWindowTextA(hwnd, title);
 
-	SMOOTH::SendMessage(this, SM_WINDOWTITLECHANGED, 0, 0);
+	Process(SM_WINDOWTITLECHANGED, 0, 0);
 
 	return Success;
 }
@@ -591,11 +591,11 @@ S::Int S::GUI::Window::Stay()
 
 	stay	= True;
 
-	if (Setup::enableUnicode)	SendMessageW(hwnd, WM_KILLFOCUS, 0, 0);
-	else				SendMessageA(hwnd, WM_KILLFOCUS, 0, 0);
+	if (Setup::enableUnicode)	::SendMessageW(hwnd, WM_KILLFOCUS, 0, 0);
+	else				::SendMessageA(hwnd, WM_KILLFOCUS, 0, 0);
 
-	if (Setup::enableUnicode)	SendMessageW(hwnd, WM_ACTIVATEAPP, 1, 0);
-	else				SendMessageA(hwnd, WM_ACTIVATEAPP, 1, 0);
+	if (Setup::enableUnicode)	::SendMessageW(hwnd, WM_ACTIVATEAPP, 1, 0);
+	else				::SendMessageA(hwnd, WM_ACTIVATEAPP, 1, 0);
 
 	while (!destroyed)
 	{
@@ -703,8 +703,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			if (nOfActiveWindows == 0 && loopActive)
 			{
-				if (Setup::enableUnicode)	SendMessageW(hwnd, WM_QUIT, 0, 0);
-				else				SendMessageA(hwnd, WM_QUIT, 0, 0);
+				if (Setup::enableUnicode)	::SendMessageW(hwnd, WM_QUIT, 0, 0);
+				else				::SendMessageA(hwnd, WM_QUIT, 0, 0);
 			}
 			else
 			{
@@ -1101,7 +1101,7 @@ S::Int S::GUI::Window::Paint(Int message)
 
 			if (object->GetObjectType() == Widget::classID)
 			{
-				if (((Widget *) object)->IsVisible() && Affected((Widget *) object, updateRect) && object->GetObjectType() != Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
+				if (((Widget *) object)->IsVisible() && ((Widget *) object)->IsAffected(updateRect) && object->GetObjectType() != Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
 			}
 		}
 
@@ -1405,7 +1405,7 @@ S::Void S::GUI::Window::PaintTimer()
 
 		if (object->GetObjectType() == Widget::classID)
 		{
-			if (((Widget *) object)->IsVisible() && Affected((Widget *) object, timedUpdateRect) && object->GetObjectType() == Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
+			if (((Widget *) object)->IsVisible() && ((Widget *) object)->IsAffected(timedUpdateRect) && object->GetObjectType() == Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
 		}
 	}
 

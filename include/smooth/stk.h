@@ -51,8 +51,6 @@ namespace smooth
 
 			static HBITMAP		 LoadImage(String, Int, String);
 
-			static Void		 SendMessage(GUI::Window *, Int, Int, Int);
-
 			static Int		 MessageBox(String, String, Int, char *);
 			static Int		 MessageBox(String, String, Int, wchar_t *);
 			static Int		 SplashScreen(const GUI::Bitmap &, Int);
@@ -60,10 +58,6 @@ namespace smooth
 	};
 
 #ifdef __SMOOTH_DLL__
-#ifdef __WIN32__
-	Bool	 Affected(GUI::Widget *, Rect &);
-#endif
-
 	Bool	 LoadIconvDLL();
 	Void	 FreeIconvDLL();
 #endif

@@ -53,6 +53,8 @@ S::Bool S::GUI::BitmapGDI::CreateBitmap(Int cx, Int cy, Int bpp)
 {
 	DeleteBitmap();
 
+	if (bpp != 24 && bpp != 32) bpp = 32;
+
 	UnsignedByte	*buffer = new UnsignedByte [sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)];
 	BITMAPINFO	*bmpInfo = (BITMAPINFO *) buffer;
 

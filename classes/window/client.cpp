@@ -101,20 +101,12 @@ S::Int S::GUI::Client::Paint(Int message)
 	}
 	else
 	{
-		if (DoRectsOverlap(updateRect, client))
+		if (Rect::DoRectsOverlap(updateRect, client))
 		{
-			Rect	 intersectRect;
-
 			updateRect.right += 5;
 			updateRect.bottom += 5;
 
-			RECT	 iRect = intersectRect;
-			RECT	 uRect = updateRect;
-			RECT	 cRect = client;
-
-			IntersectRect(&iRect, &uRect, &cRect);
-
-			intersectRect = iRect;
+			Rect	 intersectRect = Rect::OverlapRect(updateRect, client);
 
 			surface->Box(intersectRect, Setup::ClientColor, FILLED);
 

@@ -35,53 +35,6 @@ HMODULE	 iconvdll = NIL;
 
 S::I18n::Translator	*S::SMOOTH::i18n = NIL;
 
-S::Void S::SMOOTH::SendMessage(GUI::Window *window, Int message, Int wParam, Int lParam)
-{
-	if (window != NIL)
-	{
-		window->Process(message, wParam, lParam);
-	}
-	else
-	{
-		for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
-		{
-			Object	*object = mainObjectManager->GetNthObject(i);
-
-			if (object != NIL)
-			{
-				if (object->GetObjectType() == GUI::Window::classID || object->GetObjectType() == GUI::MDIWindow::classID || object->GetObjectType() == GUI::ToolWindow::classID)
-				{
-					((GUI::Window *) object)->Process(message, wParam, lParam);
-				}
-			}
-		}
-	}
-}
-
-S::Bool S::Affected(GUI::Widget *obj, Rect &urect)
-{
-	Rect	 trect;
-	Point	 realpos = obj->GetObjectProperties()->pos;
-
-	if (obj->GetObjectType() == GUI::Layer::classID || obj->GetObjectType() == GUI::Divider::classID) return true;
-
-	if (obj->GetObjectProperties()->pos.x == 0 && obj->GetObjectProperties()->pos.y == 0 && obj->GetObjectProperties()->size.cx == 0 && obj->GetObjectProperties()->size.cy == 0) return true;
-
-	if (obj->GetContainer() != NIL)
-	{
-		if (obj->GetContainer()->GetContainerObject()->GetObjectType() == GUI::Layer::classID) realpos = obj->GetRealPosition();
-	}
-
-	trect.left	= realpos.x - 10;
-	trect.top	= realpos.y - 10;
-	trect.right	= realpos.x + obj->GetObjectProperties()->size.cx + 10;
-	trect.bottom	= realpos.y + obj->GetObjectProperties()->size.cy + 10;
-
-	if (!DoRectsOverlap(urect, trect)) return false;
-
-	return true;
-}
-
 HBITMAP S::SMOOTH::LoadImage(String file, Int id, String name)
 {
 	HBITMAP	 bmp;

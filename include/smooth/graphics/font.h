@@ -65,6 +65,13 @@ namespace smooth
 				Bool		 GetItalic();
 				Bool		 GetUnderline();
 				Bool		 GetStrikeOut();
+
+				Int		 GetLineSizeX(String, Int);
+				Int		 GetLineSizeY(String);
+
+				Int		 GetTextSizeX(String, Int);
+				Int		 GetTextSizeX(String);
+				Int		 GetTextSizeY(String);
 		};
 	};
 };

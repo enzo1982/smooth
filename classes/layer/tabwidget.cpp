@@ -334,7 +334,7 @@ S::Void S::GUI::TabWidget::GetSize()
 		{
 			if (!sizeSet.GetEntry(object->handle))
 			{
-				textSize.SetEntry(object->handle, GetTextSizeX(object->GetObjectProperties()->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight()));
+				textSize.SetEntry(object->handle, objectProperties->font.GetTextSizeX(object->GetObjectProperties()->text));
 
 				sizeSet.SetEntry(object->handle, True);
 			}

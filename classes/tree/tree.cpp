@@ -140,8 +140,9 @@ S::Void S::Tree::GetTreeEntriesSize()
 	for (Int i = 0; i < nOfEntries; i++)
 	{
 		Tree::Entry	*operat = entries.GetNthEntry(i);
+		GUI::Font	 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
 
-		if (!operat->sizeset) operat->size = GetTextSizeX(operat->text, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
+		if (!operat->sizeset) operat->size = font.GetTextSizeX(operat->text);
 
 		operat->sizeset = True;
 	}

@@ -203,8 +203,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				objectProperties->clicked = False;
 				objectProperties->checked = False;
 
-				if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-				else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+				if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+				else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
 				p1.y = frame.top + 2;
 
@@ -240,8 +240,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				objectProperties->clicked = False;
 				objectProperties->checked = False;
 
-				if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-				else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+				if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+				else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
 				p1.y = frame.top + 2;
 
@@ -288,8 +288,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				for (Int i = 0; i <= objectProperties->text.Length() - invisibleChars + 1; i++)
 				{
-					if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	newpos = frame.left + 3 + GetTextSizeX(visText, i, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-					else						newpos = frame.left + 3 + GetTextSizeX(String().FillN('*', i), i, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+					if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	newpos = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, i);
+					else						newpos = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', i), i);
 
 					if (i > 0 && wnd->MouseX() < (p1.x + newpos) / 2)
 					{
@@ -315,8 +315,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				MarkText(prevMarkStart, prevMarkEnd);
 
-				if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-				else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+				if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+				else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
 				p1.y = frame.top + 2;
 
@@ -424,8 +424,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				for (Int i = 0; i <= objectProperties->text.Length() - invisibleChars + 1; i++)
 				{
-					if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	newpos = frame.left + 3 + GetTextSizeX(visText, i, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-					else						newpos = frame.left + 3 + GetTextSizeX(String().FillN('*', i), i, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+					if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	newpos = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, i);
+					else						newpos = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', i), i);
 
 					if (i > 0 && wnd->MouseX() < (p1.x + newpos) / 2)
 					{
@@ -645,8 +645,8 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-	else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+	else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
 	p1.y = frame.top + 2;
 
@@ -668,8 +668,8 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 		}
 	}
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-	else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+	else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
 	while (p1.x >= (frame.right - 1))
 	{
@@ -682,8 +682,8 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 			visText[i] = objectProperties->text[i + invisibleChars];
 		}
 
-		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-		else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+		else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 	}
 
 	if (invisibleChars != oInvisChars) SetText(objectProperties->text);
@@ -740,8 +740,8 @@ S::Void S::GUI::EditBox::RemoveCursor()
 		}
 	}
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p.x += 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-	else						p.x += 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p.x += 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+	else						p.x += 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
 	p.y += 2;
 
@@ -781,8 +781,8 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	if (prevMarkStart != prevMarkEnd && prevMarkStart >= 0 && prevMarkEnd >= 0)
 	{
-		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-		else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+		else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
 		p1.y = frame.top + 2;
 
@@ -790,9 +790,9 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 		for (int j = prevMarkStart; j < prevMarkEnd; j++) mText[j - prevMarkStart] = objectProperties->text[j];
 
-		frame.left = realPos.x + GetTextSizeX(visText, prevMarkStart - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight()) + 4;
+		frame.left = realPos.x + objectProperties->font.GetTextSizeX(visText, prevMarkStart - invisibleChars) + 4;
 		frame.top = realPos.y + 2;
-		frame.right = frame.left + GetTextSizeX(mText, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		frame.right = frame.left + objectProperties->font.GetTextSizeX(mText);
 		frame.bottom = realPos.y + objectProperties->size.cy - 2;
 
 		surface->Box(frame, Setup::ClientColor, FILLED);
@@ -814,8 +814,8 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
 	{
-		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-		else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+		else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
 		p1.y = frame.top + 2;
 
@@ -823,9 +823,9 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 		for (int j = markStart; j < markEnd; j++) mText[j - markStart] = objectProperties->text[j];
 
-		frame.left = realPos.x + GetTextSizeX(visText, markStart - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight()) + 4;
+		frame.left = realPos.x + objectProperties->font.GetTextSizeX(visText, markStart - invisibleChars) + 4;
 		frame.top = realPos.y + 2;
-		frame.right = frame.left + GetTextSizeX(mText, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+		frame.right = frame.left + objectProperties->font.GetTextSizeX(mText);
 		frame.bottom = realPos.y + objectProperties->size.cy - 2;
 
 		surface->Box(frame, bColor, FILLED);
@@ -1008,8 +1008,8 @@ S::Void S::GUI::EditBox::TimerProc()
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	lineStart.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-	else						lineStart.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	lineStart.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
+	else						lineStart.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
 	lineStart.y = frame.top + 2;
 

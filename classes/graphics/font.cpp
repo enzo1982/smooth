@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/font.h>
+#include <smooth/math.h>
 
 S::GUI::Font::Font(String iFontName, Int iFontSize, Int iFontColor, Int iFontWeight, Bool iFontItalic, Bool iFontUnderline, Bool iFontStrikeOut)
 {
@@ -155,4 +156,128 @@ S::Bool S::GUI::Font::GetUnderline()
 S::Bool S::GUI::Font::GetStrikeOut()
 {
 	return fontStrikeOut;
+}
+
+S::Int S::GUI::Font::GetTextSizeX(String text)
+{
+	if (text == NIL) return 0;
+
+	return GetTextSizeX(text, text.Length());
+}
+
+S::Int S::GUI::Font::GetTextSizeX(String text, Int nOfChars)
+{
+	if (text == NIL)	return 0;
+	if (nOfChars == 0)	return 0;
+
+	Int	 sizex	= 0;
+	Int	 lines	= 1;
+	Int	 offset	= 0;
+
+	for (Int k = 0; k < nOfChars; k++) if (text[k] == 10) lines++;
+
+	for (Int i = 0; i < lines; i++)
+	{
+		Int	 origOffset = offset;
+		String	 line;
+
+		for (Int j = 0; j <= nOfChars; j++)
+		{
+			if (j + origOffset == nOfChars)
+			{
+				line[j] = 0;
+				break;
+			}
+
+			if (text[j + origOffset] == 10 || text[j + origOffset] == 0)
+			{
+				offset++;
+				line[j] = 0;
+				break;
+			}
+			else
+			{
+				offset++;
+				line[j] = text[j + origOffset];
+			}
+		}
+
+		sizex = (Int) Math::Max(sizex, GetLineSizeX(line, line.Length()));
+	}
+
+	return sizex;
+}
+
+S::Int S::GUI::Font::GetLineSizeX(String text, Int nOfChars)
+{
+	if (text == NIL)	return 0;
+	if (nOfChars == 0)	return 0;
+
+	HDC	 ddc	= GetWindowDC(0);
+	HDC	 cdc	= CreateCompatibleDC(ddc);
+	Int	 size	= -MulDiv(fontSize, GetDeviceCaps(cdc, LOGPIXELSY), 72);
+	HFONT	 hFont;
+	HFONT	 hOldFont;
+
+	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	else				hFont = CreateFontA(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+
+	hOldFont = (HFONT) SelectObject(cdc, hFont);
+
+	SIZE	 tSize;
+
+	if (Setup::enableUnicode)	GetTextExtentPoint32W(cdc, text, nOfChars, &tSize);
+	else				GetTextExtentPoint32A(cdc, text, nOfChars, &tSize);
+
+	SelectObject(cdc, hOldFont);
+	::DeleteObject(hFont);
+
+	DeleteDC(cdc);
+	ReleaseDC(0, ddc);
+
+	return tSize.cx;
+}
+
+S::Int S::GUI::Font::GetTextSizeY(String text)
+{
+	if (text == NIL) return 0;
+
+	Int	 lines		= 1;
+	Int	 txtSize	= text.Length();
+
+	for (Int i = 0; i < txtSize; i++)
+	{
+		if (text[i] == 10) lines++;
+	}
+
+	return (lines * GetLineSizeY(text)) + (lines - 1) * 3;
+}
+
+S::Int S::GUI::Font::GetLineSizeY(String text)
+{
+	if (text == NIL) return 0;
+
+	HDC	 ddc	= GetWindowDC(0);
+	HDC	 cdc	= CreateCompatibleDC(ddc);
+	Int	 size	= -MulDiv(fontSize, GetDeviceCaps(cdc, LOGPIXELSY), 72);
+	HFONT	 hFont;
+	HFONT	 hOldFont;
+
+	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	else				hFont = CreateFontA(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+
+	hOldFont = (HFONT) SelectObject(cdc, hFont);
+
+	SIZE	 tSize;
+
+	if (Setup::enableUnicode)	GetTextExtentPoint32W(cdc, text, text.Length(), &tSize);
+	else				GetTextExtentPoint32A(cdc, text, text.Length(), &tSize);
+
+	SelectObject(cdc, hOldFont);
+	::DeleteObject(hFont);
+
+	DeleteDC(cdc);
+	ReleaseDC(0, ddc);
+
+	return tSize.cy - 1;
 }

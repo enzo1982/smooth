@@ -77,7 +77,9 @@ S::Int S::GUI::Tooltip::Show()
 	wndRect.top	= 0;
 	wndRect.bottom	= 16;
 
-	wndRect.right	= GetTextSizeX(objectProperties->text, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL) + 6;
+	Font	 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
+
+	wndRect.right	= font.GetTextSizeX(objectProperties->text) + 6;
 
 	SetMeasurement(SMT_PIXELS);
 
@@ -145,7 +147,9 @@ S::Int S::GUI::Tooltip::DrawTooltip()
 	wndRect.top	= 0;
 	wndRect.bottom	= 16;
 
-	wndRect.right	= GetTextSizeX(objectProperties->text, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL) + 6;
+	Font	 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
+
+	wndRect.right	= font.GetTextSizeX(objectProperties->text) + 6;
 
 	Surface	*surface = toolWindow->GetDrawSurface();
 

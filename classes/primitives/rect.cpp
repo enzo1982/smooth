@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/rect.h>
+#include <smooth/math.h>
 
 S::Rect::Rect()
 {
@@ -49,3 +50,31 @@ S::Rect &S::Rect::operator =(const RECT rect)
 	return *this;
 }
 #endif
+
+
+S::Bool S::Rect::DoRectsOverlap(Rect rect1, Rect rect2)
+{
+	if ((rect1.left < rect2.right) && (rect1.right > rect2.left) && (rect1.top < rect2.bottom) && (rect1.bottom > rect2.top))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+S::Rect S::Rect::OverlapRect(Rect rect1, Rect rect2)
+{
+	Rect	 oRect;
+
+	if (DoRectsOverlap(rect1, rect2))
+	{
+		oRect.left	= (Int) Math::Max(rect1.left, rect2.left);
+		oRect.top	= (Int) Math::Max(rect1.top, rect2.top);
+		oRect.right	= (Int) Math::Min(rect1.right, rect2.right);
+		oRect.bottom	= (Int) Math::Min(rect1.bottom, rect2.bottom);
+	}
+
+	return oRect;
+}

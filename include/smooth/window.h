@@ -51,11 +51,6 @@ namespace smooth
 
 		class SMOOTHAPI Window : public Widget, public Container
 		{
-			friend class SMOOTHAPI S::SMOOTH;
-			friend class SMOOTHAPI Menubar;
-			friend class SMOOTHAPI Divider;
-			friend class SMOOTHAPI Titlebar;
-			friend class SMOOTHAPI Layer;
 			friend Int SMOOTHAPI S::Loop();
 			private:
 				static LRESULT CALLBACK		 WindowProc(HWND, UINT, WPARAM, LPARAM);
@@ -73,7 +68,7 @@ namespace smooth
 				HBITMAP				 icon;
 				HICON				 sysicon;
 
-				Rect				 offset;
+				Rect				 innerOffset;
 				Rect				 updateRect;
 				Rect				 timedUpdateRect;
 
@@ -109,6 +104,8 @@ namespace smooth
 								~Window();
 
 				Int				 SetIcon(HBITMAP);
+				HBITMAP				 GetIcon();
+
 				Int				 SetApplicationIcon(char *);
 				Int				 SetApplicationIcon(wchar_t *);
 				Int				 SetMetrics(Point, Size);
@@ -122,6 +119,7 @@ namespace smooth
 				String				 GetStatusText();
 
 				Rect				 GetWindowRect();
+				Rect				 GetClientRect();
 
 				Rect				 GetUpdateRect();
 				Int				 SetUpdateRect(Rect);

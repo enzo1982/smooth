@@ -89,7 +89,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		doublebar2.y	= menubar.bottom;
 		doublebar2.x	= doublebar1.x;
 
-		if (wnd->icon != NIL && objectProperties->orientation == OR_TOP)
+		if (wnd->GetIcon() != NIL && objectProperties->orientation == OR_TOP)
 		{
 			doublebar1.x = doublebar1.x + METRIC_TITLEBARHEIGHT - 2;
 			doublebar2.x = doublebar1.x;
@@ -114,7 +114,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		menuentry.top		= menubar.top + METRIC_MBTEXTOFFSETY - 1;
 		menuentry.left		= METRIC_MBTEXTOFFSETX;
 
-		if (wnd->icon != NIL && objectProperties->orientation == OR_TOP) menuentry.left = menuentry.left + METRIC_TITLEBARHEIGHT - 2;
+		if (wnd->GetIcon() != NIL && objectProperties->orientation == OR_TOP) menuentry.left = menuentry.left + METRIC_TITLEBARHEIGHT - 2;
 
 		menuentry.right		= menuentry.left - METRIC_MBENTRYSPACING;
 		menuentry.bottom	= menuentry.top + bitmapSize;

@@ -23,12 +23,11 @@ namespace smooth
 {
 	class SMOOTHAPI ObjectType
 	{
-		friend class SMOOTHAPI Object;
 		private:
 			Int		 type;
 			Object		*object;
 		public:
-					 ObjectType();
+					 ObjectType(Object *);
 					 ObjectType(const ObjectType &);
 
 			operator	 Int();

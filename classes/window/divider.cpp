@@ -186,9 +186,9 @@ S::Int S::GUI::Divider::Paint(Int message)
 			if (Binary::IsFlagSet(flags, OR_LEFT))		doubleBar1.x = objectProperties->pos.x;
 			else if	(Binary::IsFlagSet(flags, OR_RIGHT))	doubleBar1.x = wnd->GetObjectProperties()->size.cx - objectProperties->pos.x;
 
-			doubleBar1.y = wnd->offset.top;
+			doubleBar1.y = wnd->GetClientRect().top;
 			doubleBar2.x = doubleBar1.x;
-			doubleBar2.y = wnd->GetObjectProperties()->size.cy - wnd->offset.bottom - 2;
+			doubleBar2.y = wnd->GetObjectProperties()->size.cy - wnd->GetClientRect().bottom - 2;
 
 			for (Int i = mainObjectManager->GetNOfObjects() - 1; i >= 0; i--)
 			{

@@ -35,8 +35,6 @@ namespace smooth
 
 		class SMOOTHAPI Titlebar : public Widget
 		{
-			friend class SMOOTHAPI Menubar;
-			friend class SMOOTHAPI Window;
 			private:
 				Bool			 paintActive;
 				Bool			 minchk;
@@ -45,9 +43,6 @@ namespace smooth
 				Bool			 maxclk;
 				Bool			 closechk;
 				Bool			 closeclk;
-				Bool			 min;
-				Bool			 max;
-				Bool			 close;
 			public:
 				static const Int	 classID;
 

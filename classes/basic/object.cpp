@@ -19,9 +19,8 @@ const S::Int	 S::Object::classID = S::Object::RequestClassID();
 S::Int		 S::Object::objectCount = 0;
 S::Int		 S::Object::nextID = 0;
 
-S::Object::Object()
+S::Object::Object() : type(this)
 {
-	type.object		= this;
 	type			= classID;
 
 	objectProperties	= new ObjectProperties();

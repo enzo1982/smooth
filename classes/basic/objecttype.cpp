@@ -11,9 +11,8 @@
 #include <smooth/objecttype.h>
 #include <smooth/object.h>
 
-S::ObjectType::ObjectType()
+S::ObjectType::ObjectType(Object *iObject)
 {
-	object	= NIL;
 	type	= Object::classID;
 }
 

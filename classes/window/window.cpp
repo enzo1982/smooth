@@ -32,6 +32,7 @@
 #include <smooth/input.h>
 #include <smooth/dllmain.h>
 #include <smooth/resources.h>
+#include <smooth/binary.h>
 
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
 S::Int		 S::GUI::Window::nOfActiveWindows = 0;
@@ -133,7 +134,7 @@ S::GUI::Window::Window(String title)
 
 	value = 0;
 
-	offset = Rect(Point(3, 3), Size(0, 0));
+	innerOffset = Rect(Point(3, 3), Size(0, 0));
 
 	updateRect = Rect(Point(-1, -1), Size(0, 0));
 	timedUpdateRect = Rect(Point(-1, -1), Size(0, 0));
@@ -260,6 +261,11 @@ S::Int S::GUI::Window::SetIcon(HBITMAP newicon)
 	{
 		return Success;
 	}
+}
+
+HBITMAP S::GUI::Window::GetIcon()
+{
+	return icon;
 }
 
 S::Int S::GUI::Window::SetApplicationIcon(char *newicon)
@@ -451,6 +457,11 @@ S::Rect S::GUI::Window::GetWindowRect()
 {
 	if (maximized)	return nonmaxrect;
 	else		return Rect(objectProperties->pos, objectProperties->size);
+}
+
+S::Rect S::GUI::Window::GetClientRect()
+{
+	return innerOffset;
 }
 
 S::Rect S::GUI::Window::GetUpdateRect()
@@ -1026,7 +1037,7 @@ S::Int S::GUI::Window::Paint(Int message)
 		if (topobjcount > 0)
 		{
 			doublebar1.x = 4;
-			doublebar1.y = offset.top - 2 + bias;
+			doublebar1.y = innerOffset.top - 2 + bias;
 			doublebar2.x = objectProperties->size.cx - 4;
 
 			if (topobjcount > 0) if (lastWidget->subtype == WO_NOSEPARATOR) doublebar1.y -= 3;
@@ -1044,7 +1055,7 @@ S::Int S::GUI::Window::Paint(Int message)
 		if (btmobjcount > 0)
 		{
 			doublebar1.x = 4;
-			doublebar1.y = objectProperties->size.cy - offset.bottom;
+			doublebar1.y = objectProperties->size.cy - innerOffset.bottom;
 			doublebar2.x = objectProperties->size.cx - 4;
 			doublebar2.y = doublebar1.y;
 
@@ -1058,20 +1069,20 @@ S::Int S::GUI::Window::Paint(Int message)
 
 		if (leftobjcount > 0)
 		{
-			doublebar1.x = offset.left - 3;
-			doublebar1.y = offset.top;
+			doublebar1.x = innerOffset.left - 3;
+			doublebar1.y = innerOffset.top;
 			doublebar2.x = doublebar1.x;
-			doublebar2.y = objectProperties->size.cy - offset.bottom - 2;
+			doublebar2.y = objectProperties->size.cy - innerOffset.bottom - 2;
 
 			surface->Bar(doublebar1, doublebar2, OR_VERT);
 		}
 
 		if (rightobjcount > 0)
 		{
-			doublebar1.x = objectProperties->size.cx - offset.right + 1;
-			doublebar1.y = offset.top;
+			doublebar1.x = objectProperties->size.cx - innerOffset.right + 1;
+			doublebar1.y = innerOffset.top;
 			doublebar2.x = doublebar1.x;
-			doublebar2.y = objectProperties->size.cy - offset.bottom - 2;
+			doublebar2.y = objectProperties->size.cy - innerOffset.bottom - 2;
 
 			surface->Bar(doublebar1, doublebar2, OR_VERT);
 		}
@@ -1135,7 +1146,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 	Int	 topobjcount = 0;
 	Int	 i;
 
-	offset = Rect(Point(3, 3), Size(0, 0));
+	innerOffset = Rect(Point(3, 3), Size(0, 0));
 
 	for (i = 0; i < nOfObjects; i++)
 	{
@@ -1147,21 +1158,21 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 			lastWidget = (Widget *) operat;
 
-			operat->GetObjectProperties()->pos.x	= offset.left;
-			operat->GetObjectProperties()->pos.y	= offset.top;
-			operat->GetObjectProperties()->size.cx	= objectProperties->size.cx - offset.left - offset.right;
+			operat->GetObjectProperties()->pos.x	= innerOffset.left;
+			operat->GetObjectProperties()->pos.y	= innerOffset.top;
+			operat->GetObjectProperties()->size.cx	= objectProperties->size.cx - innerOffset.left - innerOffset.right;
 
-			offset.top += operat->GetObjectProperties()->size.cy;
+			innerOffset.top += operat->GetObjectProperties()->size.cy;
 
-			if (((Widget *) operat)->subtype == WO_SEPARATOR) offset.top += 3;
+			if (((Widget *) operat)->subtype == WO_SEPARATOR) innerOffset.top += 3;
 		}
 	}
 
 	if (topobjcount > 0)
 	{
-		offset.top += 3;
+		innerOffset.top += 3;
 
-		if (lastWidget->subtype == WO_NOSEPARATOR) offset.top += 3;
+		if (lastWidget->subtype == WO_NOSEPARATOR) innerOffset.top += 3;
 	}
 
 	for (i = 0; i < nOfObjects; i++)
@@ -1172,15 +1183,15 @@ S::Void S::GUI::Window::CalculateOffsets()
 		{
 			btmobjcount++;
 
-			operat->GetObjectProperties()->pos.x	= offset.left;
-			operat->GetObjectProperties()->pos.y	= objectProperties->size.cy - offset.bottom - operat->GetObjectProperties()->size.cy;
-			operat->GetObjectProperties()->size.cx	= objectProperties->size.cx - offset.left - offset.right;
+			operat->GetObjectProperties()->pos.x	= innerOffset.left;
+			operat->GetObjectProperties()->pos.y	= objectProperties->size.cy - innerOffset.bottom - operat->GetObjectProperties()->size.cy;
+			operat->GetObjectProperties()->size.cx	= objectProperties->size.cx - innerOffset.left - innerOffset.right;
 
-			offset.bottom += operat->GetObjectProperties()->size.cy;
+			innerOffset.bottom += operat->GetObjectProperties()->size.cy;
 		}
 	}
 
-	if (btmobjcount > 0) offset.bottom += 4;
+	if (btmobjcount > 0) innerOffset.bottom += 4;
 
 	for (i = 0; i < nOfObjects; i++)
 	{
@@ -1190,15 +1201,15 @@ S::Void S::GUI::Window::CalculateOffsets()
 		{
 			leftobjcount++;
 
-			operat->GetObjectProperties()->pos.x	= offset.left;
-			operat->GetObjectProperties()->pos.y	= offset.top;
-			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - offset.top - offset.bottom;
+			operat->GetObjectProperties()->pos.x	= innerOffset.left;
+			operat->GetObjectProperties()->pos.y	= innerOffset.top;
+			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - innerOffset.top - innerOffset.bottom;
 
-			offset.left += operat->GetObjectProperties()->size.cx;
+			innerOffset.left += operat->GetObjectProperties()->size.cx;
 		}
 	}
 
-	if (leftobjcount > 0) offset.left += 3;
+	if (leftobjcount > 0) innerOffset.left += 3;
 
 	for (i = 0; i < nOfObjects; i++)
 	{
@@ -1208,15 +1219,15 @@ S::Void S::GUI::Window::CalculateOffsets()
 		{
 			rightobjcount++;
 
-			operat->GetObjectProperties()->pos.x	= objectProperties->size.cx - offset.right - operat->GetObjectProperties()->size.cx;
-			operat->GetObjectProperties()->pos.y	= offset.top;
-			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - offset.top - offset.bottom;
+			operat->GetObjectProperties()->pos.x	= objectProperties->size.cx - innerOffset.right - operat->GetObjectProperties()->size.cx;
+			operat->GetObjectProperties()->pos.y	= innerOffset.top;
+			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - innerOffset.top - innerOffset.bottom;
 
-			offset.right += operat->GetObjectProperties()->size.cx;
+			innerOffset.right += operat->GetObjectProperties()->size.cx;
 		}
 	}
 
-	if (rightobjcount > 0) offset.right += 3;
+	if (rightobjcount > 0) innerOffset.right += 3;
 
 	for (i = 0; i < nOfObjects; i++)
 	{
@@ -1224,10 +1235,10 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 		if (operat->GetObjectProperties()->orientation == OR_CENTER)
 		{
-			operat->GetObjectProperties()->pos.x	= offset.left;
-			operat->GetObjectProperties()->pos.y	= offset.top;
-			operat->GetObjectProperties()->size.cx	= objectProperties->size.cx - offset.left - offset.right;
-			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - offset.top - offset.bottom;
+			operat->GetObjectProperties()->pos.x	= innerOffset.left;
+			operat->GetObjectProperties()->pos.y	= innerOffset.top;
+			operat->GetObjectProperties()->size.cx	= objectProperties->size.cx - innerOffset.left - innerOffset.right;
+			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - innerOffset.top - innerOffset.bottom;
 		}
 	}
 }
@@ -1283,7 +1294,7 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 
 			if (object->GetObjectType() == Titlebar::classID)
 			{
-				if (!((Titlebar *) object)->max) style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
+				if (!Binary::IsFlagSet(object->GetFlags(), TB_MAXBUTTON)) style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
 			}
 			else if (object->GetObjectType() == ToolWindow::classID)
 			{

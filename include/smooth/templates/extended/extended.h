@@ -11,7 +11,7 @@
 #ifndef _H_EXTENDED_
 #define _H_EXTENDED_
 
-#include "../../signals.h"
+#include "../../callbacks.h"
 
 namespace smooth
 {
@@ -19,11 +19,14 @@ namespace smooth
 	{
 		private:
 			t			 var;
+
+			t			&DefaultRead(t &);
+			t			&DefaultWrite(t &);
 		public:
 						 Extended();
 						 Extended(const t &);
 
-			t &operator		 =(t);
+			t &operator		 =(t &);
 
 			t &operator		 ++();
 			t operator		 ++(int);
@@ -31,32 +34,34 @@ namespace smooth
 			t &operator		 --();
 			t operator		 --(int);
 
-			Bool operator		 ==(t);
-			Bool operator		 !=(t);
+			Bool operator		 ==(t &);
+			Bool operator		 !=(t &);
 
-			Bool operator		 <(t);
-			Bool operator		 >(t);
-			Bool operator		 <=(t);
-			Bool operator		 >=(t);
+			Bool operator		 <(t &);
+			Bool operator		 >(t &);
+			Bool operator		 <=(t &);
+			Bool operator		 >=(t &);
 
-			t &operator		 +=(t);
-			t &operator		 -=(t);
-			t &operator		 *=(t);
-			t &operator		 /=(t);
-			t &operator		 %=(t);
+			t &operator		 +=(t &);
+			t &operator		 -=(t &);
+			t &operator		 *=(t &);
+			t &operator		 /=(t &);
+			t &operator		 %=(t &);
 
-			t &operator		 &=(t);
-			t &operator		 ^=(t);
-			t &operator		 |=(t);
+			t &operator		 &=(t &);
+			t &operator		 ^=(t &);
+			t &operator		 |=(t &);
 
-			t &operator		 <<=(t);
-			t &operator		 >>=(t);
+			t &operator		 <<=(t &);
+			t &operator		 >>=(t &);
 
 			operator		 t();
-		signals:
-			Signal1<Void, t>	 onRead;
-			Signal1<Void, t>	 beforeWrite;
-			Signal1<Void, t>	 onWrite;
+
+			t &operator		 *();
+			t *operator		 ->();
+		callbacks:
+			Callback1<t &, t &>	 onRead;
+			Callback1<t &, t &>	 onWrite;
 	};
 };
 

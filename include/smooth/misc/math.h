@@ -53,6 +53,12 @@ namespace smooth
 			static Float		 Sqrt(Float);
 			static Float		 Tan(Float);
 			static Float		 Tanh(Float);
+
+			static Int		 Abs(Int);
+			static Int		 Min(Int, Int);
+			static Int		 Max(Int, Int);
+			static Int		 Mod(Int, Int);
+			static Int		 Pow(Int, Int);
 	};
 };
 

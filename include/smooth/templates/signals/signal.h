@@ -215,6 +215,12 @@ namespace smooth
 				UnprotectParent();
 			}
 
+			Void EmitUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST)
+			{
+				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	slotsN.GetNthEntry(i)->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	slots0.GetNthEntry(j)->Emit();
+			}
+
 			Int GetNOfConnectedSlots()
 			{
 				return slotsN.GetNOfEntries() + slots0.GetNOfEntries();

@@ -14,11 +14,10 @@
 #include <smooth/resources.h>
 #include <smooth/threads/thread.h>
 #include <smooth/backends/backend.h>
-#include <smooth/window/window.h>
-#include <smooth/objectmanager.h>
+#include <smooth/gui/window/window.h>
 #include <smooth/color.h>
 #include <smooth/misc/i18n.h>
-#include <smooth/background.h>
+#include <smooth/gui/application/background.h>
 #include <smooth/system/event.h>
 
 #ifdef __WIN32__
@@ -86,8 +85,6 @@ S::Void S::Init()
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 #endif
 
-	mainObjectManager	= new ObjectManager();
-
 	GetColors();
 
 #ifdef __WIN32__
@@ -110,7 +107,7 @@ S::Void S::Init()
 	String::SetOutputFormat(String("CP").Append(String::FromInt(codePage)));
 
 #ifdef __WIN32__
-	backgroundApplication = new BackgroundApplication();
+	GUI::backgroundApplication = new GUI::BackgroundApplication();
 #endif
 }
 
@@ -121,12 +118,8 @@ S::Void S::Free()
 #ifdef __WIN32__
 	delete I18n::Translator::defaultTranslator;
 
-	delete backgroundApplication;
-#endif
+	delete GUI::backgroundApplication;
 
-	delete mainObjectManager;
-
-#ifdef __WIN32__
 	if (Setup::useIconv) FreeIconvDLL();
 #endif
 
@@ -168,9 +161,9 @@ S::Int S::Loop()
 		initializing = false;
 		loopActive = true;
 
-		for (int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
+		for (int i = 0; i < Object::GetNOfObjects(); i++)
 		{
-			Object	*object = mainObjectManager->GetNthObject(i);
+			Object	*object = Object::GetNthObject(i);
 
 			if (object != NIL)
 			{
@@ -183,9 +176,9 @@ S::Int S::Loop()
 
 		// start waiting threads here
 
-		for (int j = 0; j < mainObjectManager->GetNOfObjects(); j++)
+		for (int j = 0; j < Object::GetNOfObjects(); j++)
 		{
-			Object	*object = mainObjectManager->GetNthObject(j);
+			Object	*object = Object::GetNthObject(j);
 
 			if (object != NIL)
 			{
@@ -215,9 +208,9 @@ S::Int S::Loop()
 
 	loopActive = false;
 
-	for (int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
+	for (int i = 0; i < Object::GetNOfObjects(); i++)
 	{
-		Object	*object = mainObjectManager->GetNthObject(i);
+		Object	*object = Object::GetNthObject(i);
 
 		if (object != NIL)
 		{

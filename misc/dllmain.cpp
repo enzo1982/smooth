@@ -10,7 +10,7 @@
 
 #include <smooth/dllmain.h>
 #include <smooth/shlobjmini.h>
-#include <smooth/application.h>
+#include <smooth/gui/application/application.h>
 #include <iconv.h>
 
 LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderA)(PBROWSEINFOA) = NIL;
@@ -48,7 +48,7 @@ HMODULE	 iconvDLL = NIL;
 
 S::Bool S::LoadIconvDLL()
 {
-	iconvDLL = LoadLibraryA(Application::GetApplicationDirectory().Append("iconv.dll"));
+	iconvDLL = LoadLibraryA(GUI::Application::GetApplicationDirectory().Append("iconv.dll"));
 
 	if (iconvDLL == NIL) return False;
 

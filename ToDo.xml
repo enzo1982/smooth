@@ -1,50 +1,50 @@
-<?xml version="1.0" encoding="windows-1252"?>
-<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="5" FILEVERSION="23" LASTMODIFIED="30.03.2004">
-    <TASK PRIORITY="5" TITLE="0.8.65.0" EXPANDED="1" PERCENTDONE="5" POS="1">
-        <TASK PRIORITY="5" TITLE="Implement Linux backends" PERCENTDONE="5" POS="1"/>
-        <TASK PRIORITY="5" TITLE="Menu System" EXPANDED="1" PERCENTDONE="10" POS="2">
-            <TASK PRIORITY="5" TITLE="Make MenuEntries widgets" PERCENTDONE="50" POS="1"/>
-            <TASK PRIORITY="5" TITLE="Implement menu shortcuts" POS="2"/>
-        </TASK>
-    </TASK>
-    <TASK PRIORITY="5" TITLE="0.9" EXPANDED="1" PERCENTDONE="5" POS="2">
-        <TASK PRIORITY="5" TITLE="Use more Signals &amp; Slots internally" POS="1"/>
-        <TASK PRIORITY="5" TITLE="Implement large fonts support" POS="2"/>
-        <TASK PRIORITY="5" TITLE="Support RTL scripts" PERCENTDONE="50" POS="3">
-            <TASK PRIORITY="5" TITLE="Mirrored window elements" PERCENTDONE="100" DONEDATESTRING="08.01.2004" POS="1" DONEDATE="37994.85221065"/>
-            <TASK PRIORITY="5" TITLE="Fix EditBoxes for RTL scripts" POS="2"/>
-        </TASK>
-        <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="10" POS="4">
-            <TASK PRIORITY="5" TITLE="Redo Menubar::Paint()" PERCENTDONE="5" POS="1"/>
-            <TASK PRIORITY="5" TITLE="ECM" POS="2"/>
-            <TASK PRIORITY="5" TITLE="Tear off menus" POS="3"/>
-        </TASK>
-        <TASK PRIORITY="5" TITLE="Widgets" EXPANDED="1" PERCENTDONE="1" POS="5">
-            <TASK PRIORITY="5" TITLE="ListBox" POS="1">
-                <TASK PRIORITY="5" TITLE="Support editing of ListBox entries" POS="1"/>
-                <TASK PRIORITY="5" TITLE="Support Drag &amp; Drop in ListBoxes" EXPANDED="1" POS="2">
-                    <TASK PRIORITY="5" TITLE="Add methods for moving entries in Arrays" POS="1"/>
-                </TASK>
-            </TASK>
-            <TASK PRIORITY="5" TITLE="Multi line EditBoxes" POS="2"/>
-            <TASK PRIORITY="5" TITLE="Document Editing Areas" POS="3"/>
-            <TASK PRIORITY="5" TITLE="Implement MDI functionality" POS="4">
-                <TASK PRIORITY="5" TITLE="MDIArea" POS="1"/>
-                <TASK PRIORITY="5" TITLE="MDIBar" POS="2"/>
-            </TASK>
-            <TASK PRIORITY="5" TITLE="Complete the TreeView widget" PERCENTDONE="10" POS="5"/>
-            <TASK PRIORITY="5" TITLE="A technique to check the values of widgets like OptionBoxes or CheckBoxes" POS="6"/>
-            <TASK PRIORITY="5" TITLE="Implement a Tabstop system" POS="7"/>
-            <TASK PRIORITY="5" TITLE="Implement Statusbar panes" POS="8"/>
-        </TASK>
-    </TASK>
-    <TASK PRIORITY="5" TITLE="XUL" EXPANDED="1" PERCENTDONE="3" POS="3">
-        <TASK PRIORITY="5" TITLE="XUL Renderer" EXPANDED="1" PERCENTDONE="5" POS="1">
-            <TASK PRIORITY="5" TITLE="Window" PERCENTDONE="10" POS="1"/>
-            <TASK PRIORITY="5" TITLE="Widgets" PERCENTDONE="2" POS="2"/>
-            <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="5" POS="3"/>
-        </TASK>
-        <TASK PRIORITY="5" TITLE="XUL Compiler" POS="2"/>
-    </TASK>
-    <TASK PRIORITY="5" TITLE="Write documentation" PERCENTDONE="5" POS="4"/>
-</TODOLIST>
+<?xml version="1.0" encoding="windows-1252"?>
+<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="5" FILEVERSION="23" LASTMODIFIED="30.03.2004">
+    <TASK PRIORITY="5" TITLE="0.8.65.0" EXPANDED="1" PERCENTDONE="5" POS="1">
+        <TASK PRIORITY="5" TITLE="Implement Linux backends" PERCENTDONE="5" POS="1"/>
+        <TASK PRIORITY="5" TITLE="Menu System" EXPANDED="1" PERCENTDONE="10" POS="2">
+            <TASK PRIORITY="5" TITLE="Make MenuEntries widgets" PERCENTDONE="50" POS="1"/>
+            <TASK PRIORITY="5" TITLE="Implement menu shortcuts" POS="2"/>
+        </TASK>
+    </TASK>
+    <TASK PRIORITY="5" TITLE="0.9" EXPANDED="1" PERCENTDONE="5" POS="2">
+        <TASK PRIORITY="5" TITLE="Use more Signals &amp; Slots internally" POS="1"/>
+        <TASK PRIORITY="5" TITLE="Implement large fonts support" POS="2"/>
+        <TASK PRIORITY="5" TITLE="Support RTL scripts" PERCENTDONE="50" POS="3">
+            <TASK PRIORITY="5" TITLE="Mirrored window elements" PERCENTDONE="100" DONEDATESTRING="08.01.2004" POS="1" DONEDATE="37994.85221065"/>
+            <TASK PRIORITY="5" TITLE="Fix EditBoxes for RTL scripts" POS="2"/>
+        </TASK>
+        <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="10" POS="4">
+            <TASK PRIORITY="5" TITLE="Redo Menubar::Paint()" PERCENTDONE="5" POS="1"/>
+            <TASK PRIORITY="5" TITLE="ECM" POS="2"/>
+            <TASK PRIORITY="5" TITLE="Tear off menus" POS="3"/>
+        </TASK>
+        <TASK PRIORITY="5" TITLE="Widgets" EXPANDED="1" PERCENTDONE="1" POS="5">
+            <TASK PRIORITY="5" TITLE="ListBox" POS="1">
+                <TASK PRIORITY="5" TITLE="Support editing of ListBox entries" POS="1"/>
+                <TASK PRIORITY="5" TITLE="Support Drag &amp; Drop in ListBoxes" EXPANDED="1" POS="2">
+                    <TASK PRIORITY="5" TITLE="Add methods for moving entries in Arrays" POS="1"/>
+                </TASK>
+            </TASK>
+            <TASK PRIORITY="5" TITLE="Multi line EditBoxes" POS="2"/>
+            <TASK PRIORITY="5" TITLE="Document Editing Areas" POS="3"/>
+            <TASK PRIORITY="5" TITLE="Implement MDI functionality" POS="4">
+                <TASK PRIORITY="5" TITLE="MDIArea" POS="1"/>
+                <TASK PRIORITY="5" TITLE="MDIBar" POS="2"/>
+            </TASK>
+            <TASK PRIORITY="5" TITLE="Complete the TreeView widget" PERCENTDONE="10" POS="5"/>
+            <TASK PRIORITY="5" TITLE="A technique to check the values of widgets like OptionBoxes or CheckBoxes" POS="6"/>
+            <TASK PRIORITY="5" TITLE="Implement a Tabstop system" POS="7"/>
+            <TASK PRIORITY="5" TITLE="Implement Statusbar panes" POS="8"/>
+        </TASK>
+    </TASK>
+    <TASK PRIORITY="5" TITLE="XUL" EXPANDED="1" PERCENTDONE="3" POS="3">
+        <TASK PRIORITY="5" TITLE="XUL Renderer" EXPANDED="1" PERCENTDONE="5" POS="1">
+            <TASK PRIORITY="5" TITLE="Window" PERCENTDONE="10" POS="1"/>
+            <TASK PRIORITY="5" TITLE="Widgets" PERCENTDONE="2" POS="2"/>
+            <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="5" POS="3"/>
+        </TASK>
+        <TASK PRIORITY="5" TITLE="XUL Compiler" POS="2"/>
+    </TASK>
+    <TASK PRIORITY="5" TITLE="Write documentation" PERCENTDONE="5" POS="4"/>
+</TODOLIST>

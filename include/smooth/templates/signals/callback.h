@@ -66,7 +66,7 @@ namespace smooth
 				return Success;
 			}
 
-			Int Connect(const returnTYPE &value)
+			Int Connect(const returnTYPE value)
 			{
 				DisconnectAll();
 
@@ -127,7 +127,7 @@ namespace smooth
 				return Success;
 			}
 
-			Int Disconnect(const returnTYPE &value)
+			Int Disconnect(const returnTYPE value)
 			{
 				if ((*slot0) == SlotRValue0<returnTYPE>(value)) DisconnectAll();
 
@@ -167,7 +167,7 @@ namespace smooth
 
 			returnTYPE Call(SIGNALS_ARGUMENT_PARAMETER_LIST)
 			{
-				returnTYPE	 returnValue = (returnTYPE) NIL;
+				returnTYPE	 returnValue = NIL;
 
 				ProtectParent();
 
@@ -177,6 +177,12 @@ namespace smooth
 				UnprotectParent();
 
 				return returnValue;
+			}
+
+			returnTYPE CallUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST)
+			{
+				if (slotN != NIL)	return slotN->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+				if (slot0 != NIL)	return slot0->Emit();
 			}
 
 			Int GetNOfConnectedSlots()

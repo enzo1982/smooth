@@ -14,8 +14,12 @@
 namespace smooth
 {
 	class Object;
-	class Container;
 	class ObjectProperties;
+
+	namespace GUI
+	{
+		class Container;
+	};
 };
 
 #include "definitions.h"
@@ -25,11 +29,13 @@ namespace smooth
 
 namespace smooth
 {
-	class SMOOTHAPI Object
+	abstract class SMOOTHAPI Object
 	{
 		friend class Signal;
 		private:
 			static Int		 nextID;
+
+			static Array<Object *>	 objects;
 
 			Bool			 deleteObject;
 			Int			 inUse;
@@ -40,11 +46,15 @@ namespace smooth
 			Bool			 registered;
 
 			ObjectProperties	*objectProperties;
-			Container		*myContainer;
+			GUI::Container		*myContainer;
 
 			Int			 EnterProtectedRegion();
 			Int			 LeaveProtectedRegion();
 		public:
+			static Int		 GetNOfObjects();
+			static Object		*GetNthObject(Int);
+			static Object		*RequestObject(Int);
+
 			static const Int	 classID;
 
 			Array<Int>		 possibleContainers;
@@ -65,8 +75,8 @@ namespace smooth
 			ObjectProperties	*GetObjectProperties();
 			ObjectType		 GetObjectType();
 
-			Int			 SetContainer(Container *);
-			Container		*GetContainer();
+			Int			 SetContainer(GUI::Container *);
+			GUI::Container		*GetContainer();
 
 			Void			 SetRegisteredFlag();
 			Void			 UnsetRegisteredFlag();

@@ -75,7 +75,7 @@ BeatClock::BeatClock()
 	wnd->SetIcon(Bitmap::LoadBitmap("beat.pci", 0, NIL));
 	wnd->onPaint.Connect(&BeatClock::PaintAll, this);
 	wnd->SetFlags(WF_TOPMOST | WF_NOTASKBUTTON);
-	wnd->SetMetrics(Point(wpx, wpy), Size(164 * Setup::FontSize, 103 * Setup::FontSize));
+	wnd->SetMetrics(Point(wpx, wpy), Size(Math::Round(164 * Setup::FontSize), Math::Round(103 * Setup::FontSize)));
 	wnd->onEvent.Connect(&BeatClock::EventProc, this);
 	wnd->Show();
 

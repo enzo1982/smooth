@@ -22,9 +22,9 @@ namespace smooth
 };
 
 #include "../definitions.h"
-#include "../primitives/size.h"
-#include "../primitives/rect.h"
 #include "../misc/string.h"
+#include "size.h"
+#include "rect.h"
 
 namespace smooth
 {

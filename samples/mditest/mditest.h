@@ -22,7 +22,7 @@ class MDITest : public Application
 		Window		*mainWnd;
 		Titlebar	*mainWnd_titlebar;
 		Statusbar	*mainWnd_statusbar;
-		MDIClient	*mainWnd_client;
+		MDI::Client	*mainWnd_client;
 		Menubar		*mainWnd_menubar;
 		Menu		*menu_file;
 	public:

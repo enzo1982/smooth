@@ -8,34 +8,22 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_BACKENDWIN32_
-#define _H_OBJSMOOTH_BACKENDWIN32_
+#ifndef	_H_XULTEST_
+#define _H_XULTEST_
 
-namespace smooth
+#include <smooth.h>
+
+using namespace smooth;
+using namespace smooth::GUI;
+using namespace smooth::XML::XUL;
+
+class XULTest : public Application
 {
-	namespace Backends
-	{
-		class BackendWin32;
-	};
-};
-
-#include "../backend.h"
-
-namespace smooth
-{
-	namespace Backends
-	{
-		const Int	 BACKEND_WIN32 = 2;
-
-		class SMOOTH_STATIC_EXPORT BackendWin32 : public Backend
-		{
-			public:
-					 BackendWin32();
-
-				Int	 Init();
-				Int	 Deinit();
-		};
-	};
+	private:
+		Renderer	*xulRenderer;
+	public:
+				 XULTest();
+				~XULTest();
 };
 
 #endif

@@ -104,7 +104,7 @@ Int TestKey::GetBits(Int number, UnsignedInt startBit, UnsignedInt endBit)
 
 	for (UnsignedInt i = startBit; i <= endBit; i++)
 	{
-		retVal += (Int) Math::Pow(2, i - startBit) * ((number >> i) % 2);
+		retVal += Math::Pow(2l, i - startBit) * ((number >> i) % 2);
 	}
 
 	return retVal;

@@ -14,8 +14,8 @@
 #include "loop.h"
 #include "version.h"
 #include "system/system.h"
-#include "application.h"
-#include "dialogs/messagebox.h"
+#include "gui/application/application.h"
+#include "gui/dialogs/messagebox.h"
 
 using namespace smooth;
 
@@ -38,8 +38,8 @@ extern "C"
 					GUI::Dialogs::QuickMessage("This DLL might not be compatible with the\nSMOOTH library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
 				}
 
-				Application::GetStartupDirectory();
-				Application::GetApplicationDirectory();
+				GUI::Application::GetStartupDirectory();
+				GUI::Application::GetApplicationDirectory();
 
 				AttachDLL();
 

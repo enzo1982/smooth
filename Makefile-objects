@@ -1,8 +1,3 @@
-$(OBJECTDIR)/backend.o: $(BACKENDSCLASSESDIR)/backend.cpp $(SMOOTHINCLUDEDIR)/backends/backend.h
-	$(ECHO) -n Compiling $(BACKENDSCLASSESDIR)/backend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/backend.cpp -o $(OBJECTDIR)/backend.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/backendwin32.o: $(BACKENDSCLASSESDIR)/win32/backendwin32.cpp $(SMOOTHINCLUDEDIR)/backends/win32/backendwin32.h
 	$(ECHO) -n Compiling $(BACKENDSCLASSESDIR)/win32/backendwin32.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/win32/backendwin32.cpp -o $(OBJECTDIR)/backendwin32.o
@@ -18,24 +13,9 @@ $(OBJECTDIR)/backendxlib.o: $(BACKENDSCLASSESDIR)/xlib/backendxlib.cpp $(SMOOTHI
 	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/xlib/backendxlib.cpp -o $(OBJECTDIR)/backendxlib.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/application.o: $(BASICCLASSESDIR)/application.cpp $(SMOOTHINCLUDEDIR)/application.h
-	$(ECHO) -n Compiling $(BASICCLASSESDIR)/application.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/application.cpp -o $(OBJECTDIR)/application.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/background.o: $(BASICCLASSESDIR)/background.cpp $(SMOOTHINCLUDEDIR)/background.h
-	$(ECHO) -n Compiling $(BASICCLASSESDIR)/background.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/background.cpp -o $(OBJECTDIR)/background.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/container.o: $(BASICCLASSESDIR)/container.cpp $(SMOOTHINCLUDEDIR)/container.h
-	$(ECHO) -n Compiling $(BASICCLASSESDIR)/container.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/container.cpp -o $(OBJECTDIR)/container.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/containertype.o: $(BASICCLASSESDIR)/containertype.cpp $(SMOOTHINCLUDEDIR)/containertype.h
-	$(ECHO) -n Compiling $(BASICCLASSESDIR)/containertype.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/containertype.cpp -o $(OBJECTDIR)/containertype.o
+$(OBJECTDIR)/backend.o: $(BACKENDSCLASSESDIR)/backend.cpp $(SMOOTHINCLUDEDIR)/backends/backend.h
+	$(ECHO) -n Compiling $(BACKENDSCLASSESDIR)/backend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/backend.cpp -o $(OBJECTDIR)/backend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/input.o: $(BASICCLASSESDIR)/input.cpp $(SMOOTHINCLUDEDIR)/input.h
@@ -46,11 +26,6 @@ $(OBJECTDIR)/input.o: $(BASICCLASSESDIR)/input.cpp $(SMOOTHINCLUDEDIR)/input.h
 $(OBJECTDIR)/object.o: $(BASICCLASSESDIR)/object.cpp $(SMOOTHINCLUDEDIR)/object.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/object.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/object.cpp -o $(OBJECTDIR)/object.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/objectmanager.o: $(BASICCLASSESDIR)/objectmanager.cpp $(SMOOTHINCLUDEDIR)/objectmanager.h
-	$(ECHO) -n Compiling $(BASICCLASSESDIR)/objectmanager.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/objectmanager.cpp -o $(OBJECTDIR)/objectmanager.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/objectproperties.o: $(BASICCLASSESDIR)/objectproperties.cpp $(SMOOTHINCLUDEDIR)/objectproperties.h
@@ -66,51 +41,6 @@ $(OBJECTDIR)/objecttype.o: $(BASICCLASSESDIR)/objecttype.cpp $(SMOOTHINCLUDEDIR)
 $(OBJECTDIR)/setup.o: $(BASICCLASSESDIR)/setup.cpp $(SMOOTHINCLUDEDIR)/setup.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/setup.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/setup.cpp -o $(OBJECTDIR)/setup.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/widget.o: $(BASICCLASSESDIR)/widget.cpp $(SMOOTHINCLUDEDIR)/widget.h
-	$(ECHO) -n Compiling $(BASICCLASSESDIR)/widget.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/widget.cpp -o $(OBJECTDIR)/widget.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/colordlg.o: $(DIALOGSCLASSESDIR)/colordlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/colordlg.h $(SMOOTHINCLUDEDIR)/color.h
-	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/colordlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/colordlg.cpp -o $(OBJECTDIR)/colordlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/dialog.o: $(DIALOGSCLASSESDIR)/dialog.cpp $(SMOOTHINCLUDEDIR)/dialogs/dialog.h
-	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/dialog.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/dialog.cpp -o $(OBJECTDIR)/dialog.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/dirdlg.o: $(DIALOGSCLASSESDIR)/dirdlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/dirdlg.h
-	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/dirdlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/dirdlg.cpp -o $(OBJECTDIR)/dirdlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/filedlg.o: $(DIALOGSCLASSESDIR)/filedlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/filedlg.h
-	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/filedlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/filedlg.cpp -o $(OBJECTDIR)/filedlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fontdlg.o: $(DIALOGSCLASSESDIR)/fontdlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/fontdlg.h
-	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/fontdlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/fontdlg.cpp -o $(OBJECTDIR)/fontdlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/messagebox.o: $(DIALOGSCLASSESDIR)/messagebox.cpp $(SMOOTHINCLUDEDIR)/dialogs/messagebox.h
-	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/messagebox.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/messagebox.cpp -o $(OBJECTDIR)/messagebox.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/splashscreen.o: $(DIALOGSCLASSESDIR)/splashscreen.cpp $(SMOOTHINCLUDEDIR)/dialogs/splashscreen.h
-	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/splashscreen.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/splashscreen.cpp -o $(OBJECTDIR)/splashscreen.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/tipodaydlg.o: $(DIALOGSCLASSESDIR)/tipodaydlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/tipodaydlg.h
-	$(ECHO) -n Compiling $(DIALOGSCLASSESDIR)/tipodaydlg.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/tipodaydlg.cpp -o $(OBJECTDIR)/tipodaydlg.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/directory.o: $(FILESCLASSESDIR)/directory.cpp $(SMOOTHINCLUDEDIR)/files/directory.h
@@ -153,6 +83,31 @@ $(OBJECTDIR)/bitmapbackend.o: $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp $(SMOOTHIN
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp -o $(OBJECTDIR)/bitmapbackend.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/form.o: $(GRAPHICSCLASSESDIR)/form.cpp $(SMOOTHINCLUDEDIR)/graphics/form.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/form.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/form.cpp -o $(OBJECTDIR)/form.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/line.o: $(GRAPHICSCLASSESDIR)/line.cpp $(SMOOTHINCLUDEDIR)/graphics/line.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/line.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/line.cpp -o $(OBJECTDIR)/line.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/point.o: $(GRAPHICSCLASSESDIR)/point.cpp $(SMOOTHINCLUDEDIR)/graphics/point.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/point.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/point.cpp -o $(OBJECTDIR)/point.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/rect.o: $(GRAPHICSCLASSESDIR)/rect.cpp $(SMOOTHINCLUDEDIR)/graphics/rect.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/rect.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/rect.cpp -o $(OBJECTDIR)/rect.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/size.o: $(GRAPHICSCLASSESDIR)/size.cpp $(SMOOTHINCLUDEDIR)/graphics/size.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/size.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/size.cpp -o $(OBJECTDIR)/size.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/surface.o: $(GRAPHICSCLASSESDIR)/surface.cpp $(SMOOTHINCLUDEDIR)/graphics/surface.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/surface.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/surface.cpp -o $(OBJECTDIR)/surface.o
@@ -163,149 +118,289 @@ $(OBJECTDIR)/surfacebackend.o: $(GRAPHICSCLASSESDIR)/surfacebackend.cpp $(SMOOTH
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/surfacebackend.cpp -o $(OBJECTDIR)/surfacebackend.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/toolwindow.o: $(INTERNALCLASSESDIR)/toolwindow.cpp $(SMOOTHINCLUDEDIR)/toolwindow.h
-	$(ECHO) -n Compiling $(INTERNALCLASSESDIR)/toolwindow.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(INTERNALCLASSESDIR)/toolwindow.cpp -o $(OBJECTDIR)/toolwindow.o
+$(OBJECTDIR)/application.o: $(GUICLASSESDIR)/application/application.cpp $(SMOOTHINCLUDEDIR)/gui/application/application.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/application/application.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/application/application.cpp -o $(OBJECTDIR)/application.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/activearea.o: $(LAYERCLASSESDIR)/activearea.cpp $(SMOOTHINCLUDEDIR)/activearea.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/activearea.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/activearea.cpp -o $(OBJECTDIR)/activearea.o
+$(OBJECTDIR)/background.o: $(GUICLASSESDIR)/application/background.cpp $(SMOOTHINCLUDEDIR)/gui/application/background.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/application/background.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/application/background.cpp -o $(OBJECTDIR)/background.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/arrows.o: $(LAYERCLASSESDIR)/arrows.cpp $(SMOOTHINCLUDEDIR)/arrows.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/arrows.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/arrows.cpp -o $(OBJECTDIR)/arrows.o
+$(OBJECTDIR)/xulloader.o: $(GUICLASSESDIR)/application/xulloader.cpp $(SMOOTHINCLUDEDIR)/gui/application/xulloader.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/application/xulloader.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/application/xulloader.cpp -o $(OBJECTDIR)/xulloader.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/button.o: $(LAYERCLASSESDIR)/button.cpp $(SMOOTHINCLUDEDIR)/button.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/button.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/button.cpp -o $(OBJECTDIR)/button.o
+$(OBJECTDIR)/colordlg.o: $(GUICLASSESDIR)/dialogs/colordlg.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/colordlg.h $(SMOOTHINCLUDEDIR)/color.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/dialogs/colordlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/dialogs/colordlg.cpp -o $(OBJECTDIR)/colordlg.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/checkbox.o: $(LAYERCLASSESDIR)/checkbox.cpp $(SMOOTHINCLUDEDIR)/checkbox.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/checkbox.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/checkbox.cpp -o $(OBJECTDIR)/checkbox.o
+$(OBJECTDIR)/dialog.o: $(GUICLASSESDIR)/dialogs/dialog.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/dialog.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/dialogs/dialog.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/dialogs/dialog.cpp -o $(OBJECTDIR)/dialog.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/droparea.o: $(LAYERCLASSESDIR)/droparea.cpp $(SMOOTHINCLUDEDIR)/droparea.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/droparea.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/droparea.cpp -o $(OBJECTDIR)/droparea.o
+$(OBJECTDIR)/dirdlg.o: $(GUICLASSESDIR)/dialogs/dirdlg.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/dirdlg.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/dialogs/dirdlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/dialogs/dirdlg.cpp -o $(OBJECTDIR)/dirdlg.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/editbox.o: $(LAYERCLASSESDIR)/editbox.cpp $(SMOOTHINCLUDEDIR)/editbox.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/editbox.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/editbox.cpp -o $(OBJECTDIR)/editbox.o
+$(OBJECTDIR)/filedlg.o: $(GUICLASSESDIR)/dialogs/filedlg.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/filedlg.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/dialogs/filedlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/dialogs/filedlg.cpp -o $(OBJECTDIR)/filedlg.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/groupbox.o: $(LAYERCLASSESDIR)/groupbox.cpp $(SMOOTHINCLUDEDIR)/groupbox.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/groupbox.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/groupbox.cpp -o $(OBJECTDIR)/groupbox.o
+$(OBJECTDIR)/fontdlg.o: $(GUICLASSESDIR)/dialogs/fontdlg.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/fontdlg.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/dialogs/fontdlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/dialogs/fontdlg.cpp -o $(OBJECTDIR)/fontdlg.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/hyperlink.o: $(LAYERCLASSESDIR)/hyperlink.cpp $(SMOOTHINCLUDEDIR)/hyperlink.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/hyperlink.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/hyperlink.cpp -o $(OBJECTDIR)/hyperlink.o
+$(OBJECTDIR)/messagebox.o: $(GUICLASSESDIR)/dialogs/messagebox.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/messagebox.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/dialogs/messagebox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/dialogs/messagebox.cpp -o $(OBJECTDIR)/messagebox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/image.o: $(LAYERCLASSESDIR)/image.cpp $(SMOOTHINCLUDEDIR)/image.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/image.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/image.cpp -o $(OBJECTDIR)/image.o
+$(OBJECTDIR)/splashscreen.o: $(GUICLASSESDIR)/dialogs/splashscreen.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/splashscreen.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/dialogs/splashscreen.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/dialogs/splashscreen.cpp -o $(OBJECTDIR)/splashscreen.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/layer.o: $(LAYERCLASSESDIR)/layer.cpp $(SMOOTHINCLUDEDIR)/layer.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/layer.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/layer.cpp -o $(OBJECTDIR)/layer.o
+$(OBJECTDIR)/tipodaydlg.o: $(GUICLASSESDIR)/dialogs/tipodaydlg.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/tipodaydlg.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/dialogs/tipodaydlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/dialogs/tipodaydlg.cpp -o $(OBJECTDIR)/tipodaydlg.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/optionbox.o: $(LAYERCLASSESDIR)/optionbox.cpp $(SMOOTHINCLUDEDIR)/optionbox.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/optionbox.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/optionbox.cpp -o $(OBJECTDIR)/optionbox.o
+$(OBJECTDIR)/mdiclient.o: $(GUICLASSESDIR)/mdi/client.cpp $(SMOOTHINCLUDEDIR)/gui/mdi/client.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/mdi/client.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/mdi/client.cpp -o $(OBJECTDIR)/mdiclient.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/progressbar.o: $(LAYERCLASSESDIR)/progressbar.cpp $(SMOOTHINCLUDEDIR)/progressbar.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/progressbar.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/progressbar.cpp -o $(OBJECTDIR)/progressbar.o
+$(OBJECTDIR)/mdiwindow.o: $(GUICLASSESDIR)/mdi/window.cpp $(SMOOTHINCLUDEDIR)/gui/mdi/window.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/mdi/window.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/mdi/window.cpp -o $(OBJECTDIR)/mdiwindow.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/scrollbar.o: $(LAYERCLASSESDIR)/scrollbar.cpp $(SMOOTHINCLUDEDIR)/scrollbar.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/scrollbar.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/scrollbar.cpp -o $(OBJECTDIR)/scrollbar.o
+$(OBJECTDIR)/activearea.o: $(GUICLASSESDIR)/widgets/basic/activearea.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/activearea.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/activearea.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/activearea.cpp -o $(OBJECTDIR)/activearea.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/slider.o: $(LAYERCLASSESDIR)/slider.cpp $(SMOOTHINCLUDEDIR)/slider.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/slider.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/slider.cpp -o $(OBJECTDIR)/slider.o
+$(OBJECTDIR)/arrows.o: $(GUICLASSESDIR)/widgets/basic/arrows.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/arrows.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/arrows.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/arrows.cpp -o $(OBJECTDIR)/arrows.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/tabwidget.o: $(LAYERCLASSESDIR)/tabwidget.cpp $(SMOOTHINCLUDEDIR)/tabwidget.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/tabwidget.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/tabwidget.cpp -o $(OBJECTDIR)/tabwidget.o
+$(OBJECTDIR)/button.o: $(GUICLASSESDIR)/widgets/basic/button.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/button.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/button.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/button.cpp -o $(OBJECTDIR)/button.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/text.o: $(LAYERCLASSESDIR)/text.cpp $(SMOOTHINCLUDEDIR)/text.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/text.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/text.cpp -o $(OBJECTDIR)/text.o
+$(OBJECTDIR)/checkbox.o: $(GUICLASSESDIR)/widgets/basic/checkbox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/checkbox.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/checkbox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/checkbox.cpp -o $(OBJECTDIR)/checkbox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/combobox.o: $(LISTCLASSESDIR)/combobox.cpp $(SMOOTHINCLUDEDIR)/combobox.h
-	$(ECHO) -n Compiling $(LISTCLASSESDIR)/combobox.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/combobox.cpp -o $(OBJECTDIR)/combobox.o
+$(OBJECTDIR)/client.o: $(GUICLASSESDIR)/widgets/basic/client.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/client.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/client.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/client.cpp -o $(OBJECTDIR)/client.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/list.o: $(LISTCLASSESDIR)/list.cpp $(SMOOTHINCLUDEDIR)/list.h
-	$(ECHO) -n Compiling $(LISTCLASSESDIR)/list.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/list.cpp -o $(OBJECTDIR)/list.o
+$(OBJECTDIR)/divider.o: $(GUICLASSESDIR)/widgets/basic/divider.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/divider.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/divider.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/divider.cpp -o $(OBJECTDIR)/divider.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/listbox.o: $(LISTCLASSESDIR)/listbox.cpp $(SMOOTHINCLUDEDIR)/listbox.h
-	$(ECHO) -n Compiling $(LISTCLASSESDIR)/listbox.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/listbox.cpp -o $(OBJECTDIR)/listbox.o
+$(OBJECTDIR)/editbox.o: $(GUICLASSESDIR)/widgets/basic/editbox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/editbox.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/editbox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/editbox.cpp -o $(OBJECTDIR)/editbox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/listboxheader.o: $(LISTCLASSESDIR)/listboxheader.cpp $(SMOOTHINCLUDEDIR)/listboxheader.h
-	$(ECHO) -n Compiling $(LISTCLASSESDIR)/listboxheader.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/listboxheader.cpp -o $(OBJECTDIR)/listboxheader.o
+$(OBJECTDIR)/groupbox.o: $(GUICLASSESDIR)/widgets/basic/groupbox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/groupbox.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/groupbox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/groupbox.cpp -o $(OBJECTDIR)/groupbox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/listentry.o: $(LISTCLASSESDIR)/listentry.cpp $(SMOOTHINCLUDEDIR)/list.h
-	$(ECHO) -n Compiling $(LISTCLASSESDIR)/listentry.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/listentry.cpp -o $(OBJECTDIR)/listentry.o
+$(OBJECTDIR)/hyperlink.o: $(GUICLASSESDIR)/widgets/basic/hyperlink.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/hyperlink.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/hyperlink.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/hyperlink.cpp -o $(OBJECTDIR)/hyperlink.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mdiclient.o: $(MDICLASSESDIR)/mdiclient.cpp $(SMOOTHINCLUDEDIR)/mdiclient.h
-	$(ECHO) -n Compiling $(MDICLASSESDIR)/mdiclient.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MDICLASSESDIR)/mdiclient.cpp -o $(OBJECTDIR)/mdiclient.o
+$(OBJECTDIR)/image.o: $(GUICLASSESDIR)/widgets/basic/image.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/image.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/image.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/image.cpp -o $(OBJECTDIR)/image.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mdiwindow.o: $(MDICLASSESDIR)/mdiwindow.cpp $(SMOOTHINCLUDEDIR)/mdiwindow.h
-	$(ECHO) -n Compiling $(MDICLASSESDIR)/mdiwindow.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MDICLASSESDIR)/mdiwindow.cpp -o $(OBJECTDIR)/mdiwindow.o
+$(OBJECTDIR)/optionbox.o: $(GUICLASSESDIR)/widgets/basic/optionbox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/optionbox.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/optionbox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/optionbox.cpp -o $(OBJECTDIR)/optionbox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/menu.o: $(MENUCLASSESDIR)/menu.cpp $(SMOOTHINCLUDEDIR)/menu/menu.h
-	$(ECHO) -n Compiling $(MENUCLASSESDIR)/menu.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/menu.cpp -o $(OBJECTDIR)/menu.o
+$(OBJECTDIR)/progressbar.o: $(GUICLASSESDIR)/widgets/basic/progressbar.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/progressbar.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/progressbar.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/progressbar.cpp -o $(OBJECTDIR)/progressbar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/menubar.o: $(MENUCLASSESDIR)/menubar.cpp $(SMOOTHINCLUDEDIR)/menu/menubar.h
-	$(ECHO) -n Compiling $(MENUCLASSESDIR)/menubar.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/menubar.cpp -o $(OBJECTDIR)/menubar.o
+$(OBJECTDIR)/scrollbar.o: $(GUICLASSESDIR)/widgets/basic/scrollbar.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/scrollbar.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/scrollbar.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/scrollbar.cpp -o $(OBJECTDIR)/scrollbar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/menuentry.o: $(MENUCLASSESDIR)/menuentry.cpp $(SMOOTHINCLUDEDIR)/menu/menuentry.h
-	$(ECHO) -n Compiling $(MENUCLASSESDIR)/menuentry.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/menuentry.cpp -o $(OBJECTDIR)/menuentry.o
+$(OBJECTDIR)/slider.o: $(GUICLASSESDIR)/widgets/basic/slider.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/slider.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/slider.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/slider.cpp -o $(OBJECTDIR)/slider.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/popupmenu.o: $(MENUCLASSESDIR)/popupmenu.cpp $(SMOOTHINCLUDEDIR)/menu/popupmenu.h
-	$(ECHO) -n Compiling $(MENUCLASSESDIR)/popupmenu.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/popupmenu.cpp -o $(OBJECTDIR)/popupmenu.o
+$(OBJECTDIR)/statusbar.o: $(GUICLASSESDIR)/widgets/basic/statusbar.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/statusbar.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/statusbar.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/statusbar.cpp -o $(OBJECTDIR)/statusbar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/popupview.o: $(MENUCLASSESDIR)/popupview.cpp $(SMOOTHINCLUDEDIR)/menu/popupview.h
-	$(ECHO) -n Compiling $(MENUCLASSESDIR)/popupview.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/popupview.cpp -o $(OBJECTDIR)/popupview.o
+$(OBJECTDIR)/tabwidget.o: $(GUICLASSESDIR)/widgets/basic/tabwidget.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/tabwidget.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/tabwidget.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/tabwidget.cpp -o $(OBJECTDIR)/tabwidget.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/text.o: $(GUICLASSESDIR)/widgets/basic/text.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/text.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/text.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/text.cpp -o $(OBJECTDIR)/text.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/titlebar.o: $(GUICLASSESDIR)/widgets/basic/titlebar.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/titlebar.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/titlebar.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/titlebar.cpp -o $(OBJECTDIR)/titlebar.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/combobox.o: $(GUICLASSESDIR)/widgets/multi/list/combobox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/list/combobox.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/list/combobox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/list/combobox.cpp -o $(OBJECTDIR)/combobox.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/list.o: $(GUICLASSESDIR)/widgets/multi/list/list.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/list/list.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/list/list.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/list/list.cpp -o $(OBJECTDIR)/list.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/listbox.o: $(GUICLASSESDIR)/widgets/multi/list/listbox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/list/listbox.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/list/listbox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/list/listbox.cpp -o $(OBJECTDIR)/listbox.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/listboxheader.o: $(GUICLASSESDIR)/widgets/multi/list/listboxheader.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/list/listboxheader.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/list/listboxheader.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/list/listboxheader.cpp -o $(OBJECTDIR)/listboxheader.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/listentry.o: $(GUICLASSESDIR)/widgets/multi/list/listentry.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/list/list.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/list/listentry.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/list/listentry.cpp -o $(OBJECTDIR)/listentry.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/menu.o: $(GUICLASSESDIR)/widgets/multi/menu/menu.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/menu.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/menu.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/menu.cpp -o $(OBJECTDIR)/menu.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/menubar.o: $(GUICLASSESDIR)/widgets/multi/menu/menubar.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/menubar.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/menubar.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/menubar.cpp -o $(OBJECTDIR)/menubar.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/menuentry.o: $(GUICLASSESDIR)/widgets/multi/menu/menuentry.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/menuentry.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/menuentry.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/menuentry.cpp -o $(OBJECTDIR)/menuentry.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/popupmenu.o: $(GUICLASSESDIR)/widgets/multi/menu/popupmenu.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/popupmenu.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/popupmenu.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupmenu.cpp -o $(OBJECTDIR)/popupmenu.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/popupview.o: $(GUICLASSESDIR)/widgets/multi/menu/popupview.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/popupview.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/popupview.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupview.cpp -o $(OBJECTDIR)/popupview.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/tree.o: $(GUICLASSESDIR)/widgets/multi/tree/tree.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/tree/tree.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/tree/tree.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/tree/tree.cpp -o $(OBJECTDIR)/tree.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/treeentry.o: $(GUICLASSESDIR)/widgets/multi/tree/treeentry.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/tree/tree.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/tree/treeentry.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/tree/treeentry.cpp -o $(OBJECTDIR)/treeentry.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/treeview.o: $(GUICLASSESDIR)/widgets/multi/tree/treeview.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/tree/treeview.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/tree/treeview.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/tree/treeview.cpp -o $(OBJECTDIR)/treeview.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/dragcontrol.o: $(GUICLASSESDIR)/widgets/special/dragcontrol.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/special/dragcontrol.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/special/dragcontrol.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/special/dragcontrol.cpp -o $(OBJECTDIR)/dragcontrol.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/droparea.o: $(GUICLASSESDIR)/widgets/special/droparea.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/special/droparea.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/special/droparea.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/special/droparea.cpp -o $(OBJECTDIR)/droparea.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/shortcut.o: $(GUICLASSESDIR)/widgets/special/shortcut.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/special/shortcut.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/special/shortcut.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/special/shortcut.cpp -o $(OBJECTDIR)/shortcut.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/tooltip.o: $(GUICLASSESDIR)/widgets/special/tooltip.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/special/tooltip.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/special/tooltip.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/special/tooltip.cpp -o $(OBJECTDIR)/tooltip.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/container.o: $(GUICLASSESDIR)/widgets/container.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/container.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/container.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/container.cpp -o $(OBJECTDIR)/container.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/containertype.o: $(GUICLASSESDIR)/widgets/containertype.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/containertype.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/containertype.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/containertype.cpp -o $(OBJECTDIR)/containertype.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/layer.o: $(GUICLASSESDIR)/widgets/layer.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/layer.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/layer.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/layer.cpp -o $(OBJECTDIR)/layer.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/widget.o: $(GUICLASSESDIR)/widgets/widget.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/widget.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/widget.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/widget.cpp -o $(OBJECTDIR)/widget.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/windowgdi.o: $(GUICLASSESDIR)/window/gdi/windowgdi.cpp $(SMOOTHINCLUDEDIR)/gui/window/gdi/windowgdi.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/gdi/windowgdi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/gdi/windowgdi.cpp -o $(OBJECTDIR)/windowgdi.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/windowxlib.o: $(GUICLASSESDIR)/window/xlib/windowxlib.cpp $(SMOOTHINCLUDEDIR)/gui/window/xlib/windowxlib.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/xlib/windowxlib.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/xlib/windowxlib.cpp -o $(OBJECTDIR)/windowxlib.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/toolwindow.o: $(GUICLASSESDIR)/window/toolwindow.cpp $(SMOOTHINCLUDEDIR)/gui/window/toolwindow.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/toolwindow.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/toolwindow.cpp -o $(OBJECTDIR)/toolwindow.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/window.o: $(GUICLASSESDIR)/window/window.cpp $(SMOOTHINCLUDEDIR)/gui/window/window.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/window.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/window.cpp -o $(OBJECTDIR)/window.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/windowbackend.o: $(GUICLASSESDIR)/window/windowbackend.cpp $(SMOOTHINCLUDEDIR)/gui/window/windowbackend.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/windowbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/windowbackend.cpp -o $(OBJECTDIR)/windowbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/binary.o: $(MISCCLASSESDIR)/binary.cpp $(SMOOTHINCLUDEDIR)/misc/binary.h
@@ -341,31 +436,6 @@ $(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/misc/math.h
 $(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/misc/string.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/string.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string.cpp -o $(OBJECTDIR)/string.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/line.o: $(PRIMITIVESCLASSESDIR)/line.cpp $(SMOOTHINCLUDEDIR)/primitives/line.h
-	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/line.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/line.cpp -o $(OBJECTDIR)/line.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/point.o: $(PRIMITIVESCLASSESDIR)/point.cpp $(SMOOTHINCLUDEDIR)/primitives/point.h
-	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/point.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/point.cpp -o $(OBJECTDIR)/point.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/primitive.o: $(PRIMITIVESCLASSESDIR)/primitive.cpp $(SMOOTHINCLUDEDIR)/primitives/primitive.h
-	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/primitive.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/primitive.cpp -o $(OBJECTDIR)/primitive.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/rect.o: $(PRIMITIVESCLASSESDIR)/rect.cpp $(SMOOTHINCLUDEDIR)/primitives/rect.h
-	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/rect.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/rect.cpp -o $(OBJECTDIR)/rect.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/size.o: $(PRIMITIVESCLASSESDIR)/size.cpp $(SMOOTHINCLUDEDIR)/primitives/size.h
-	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/size.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/size.cpp -o $(OBJECTDIR)/size.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/timersdl.o: $(SYSTEMCLASSESDIR)/sdl/timersdl.cpp $(SMOOTHINCLUDEDIR)/system/sdl/timersdl.h
@@ -483,91 +553,6 @@ $(OBJECTDIR)/threadbackend.o: $(THREADSCLASSESDIR)/threadbackend.cpp $(SMOOTHINC
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/threadbackend.cpp -o $(OBJECTDIR)/threadbackend.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/tree.o: $(TREECLASSESDIR)/tree.cpp $(SMOOTHINCLUDEDIR)/tree.h
-	$(ECHO) -n Compiling $(TREECLASSESDIR)/tree.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(TREECLASSESDIR)/tree.cpp -o $(OBJECTDIR)/tree.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/treeentry.o: $(TREECLASSESDIR)/treeentry.cpp $(SMOOTHINCLUDEDIR)/tree.h
-	$(ECHO) -n Compiling $(TREECLASSESDIR)/treeentry.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(TREECLASSESDIR)/treeentry.cpp -o $(OBJECTDIR)/treeentry.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/treeview.o: $(TREECLASSESDIR)/treeview.cpp $(SMOOTHINCLUDEDIR)/treeview.h
-	$(ECHO) -n Compiling $(TREECLASSESDIR)/treeview.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(TREECLASSESDIR)/treeview.cpp -o $(OBJECTDIR)/treeview.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/windowgdi.o: $(WINDOWCLASSESDIR)/gdi/windowgdi.cpp $(SMOOTHINCLUDEDIR)/window/gdi/windowgdi.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/gdi/windowgdi.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/gdi/windowgdi.cpp -o $(OBJECTDIR)/windowgdi.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/windowxlib.o: $(WINDOWCLASSESDIR)/xlib/windowxlib.cpp $(SMOOTHINCLUDEDIR)/window/xlib/windowxlib.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/xlib/windowxlib.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/xlib/windowxlib.cpp -o $(OBJECTDIR)/windowxlib.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/client.o: $(WINDOWCLASSESDIR)/client.cpp $(SMOOTHINCLUDEDIR)/window/client.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/client.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/client.cpp -o $(OBJECTDIR)/client.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/divider.o: $(WINDOWCLASSESDIR)/divider.cpp $(SMOOTHINCLUDEDIR)/window/divider.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/divider.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/divider.cpp -o $(OBJECTDIR)/divider.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/drag.o: $(WINDOWCLASSESDIR)/drag.cpp $(SMOOTHINCLUDEDIR)/window/drag.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/drag.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/drag.cpp -o $(OBJECTDIR)/drag.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/shortcut.o: $(WINDOWCLASSESDIR)/shortcut.cpp $(SMOOTHINCLUDEDIR)/window/shortcut.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/shortcut.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/shortcut.cpp -o $(OBJECTDIR)/shortcut.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/statusbar.o: $(WINDOWCLASSESDIR)/statusbar.cpp $(SMOOTHINCLUDEDIR)/window/statusbar.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/statusbar.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/statusbar.cpp -o $(OBJECTDIR)/statusbar.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/titlebar.o: $(WINDOWCLASSESDIR)/titlebar.cpp $(SMOOTHINCLUDEDIR)/window/titlebar.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/titlebar.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/titlebar.cpp -o $(OBJECTDIR)/titlebar.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/tooltip.o: $(WINDOWCLASSESDIR)/tooltip.cpp $(SMOOTHINCLUDEDIR)/window/tooltip.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/tooltip.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/tooltip.cpp -o $(OBJECTDIR)/tooltip.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/window.o: $(WINDOWCLASSESDIR)/window.cpp $(SMOOTHINCLUDEDIR)/window/window.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/window.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/window.cpp -o $(OBJECTDIR)/window.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/windowbackend.o: $(WINDOWCLASSESDIR)/windowbackend.cpp $(SMOOTHINCLUDEDIR)/window/windowbackend.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/windowbackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/windowbackend.cpp -o $(OBJECTDIR)/windowbackend.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/xml_attribute.o: $(XMLCLASSESDIR)/attribute.cpp $(SMOOTHINCLUDEDIR)/xml/attribute.h
-	$(ECHO) -n Compiling $(XMLCLASSESDIR)/attribute.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/attribute.cpp -o $(OBJECTDIR)/xml_attribute.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/xml_document.o: $(XMLCLASSESDIR)/document.cpp $(SMOOTHINCLUDEDIR)/xml/document.h
-	$(ECHO) -n Compiling $(XMLCLASSESDIR)/document.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/document.cpp -o $(OBJECTDIR)/xml_document.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/xml_node.o: $(XMLCLASSESDIR)/node.cpp $(SMOOTHINCLUDEDIR)/xml/node.h
-	$(ECHO) -n Compiling $(XMLCLASSESDIR)/node.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/node.cpp -o $(OBJECTDIR)/xml_node.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/xul_menubar.o: $(XMLCLASSESDIR)/xul/menubar.cpp $(SMOOTHINCLUDEDIR)/xml/xul/menubar.h
 	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/menubar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/menubar.cpp -o $(OBJECTDIR)/xul_menubar.o
@@ -591,6 +576,21 @@ $(OBJECTDIR)/xul_widget.o: $(XMLCLASSESDIR)/xul/widget.cpp $(SMOOTHINCLUDEDIR)/x
 $(OBJECTDIR)/xul_window.o: $(XMLCLASSESDIR)/xul/window.cpp $(SMOOTHINCLUDEDIR)/xml/xul/window.h
 	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/window.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/window.cpp -o $(OBJECTDIR)/xul_window.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xml_attribute.o: $(XMLCLASSESDIR)/attribute.cpp $(SMOOTHINCLUDEDIR)/xml/attribute.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/attribute.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/attribute.cpp -o $(OBJECTDIR)/xml_attribute.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xml_document.o: $(XMLCLASSESDIR)/document.cpp $(SMOOTHINCLUDEDIR)/xml/document.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/document.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/document.cpp -o $(OBJECTDIR)/xml_document.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xml_node.o: $(XMLCLASSESDIR)/node.cpp $(SMOOTHINCLUDEDIR)/xml/node.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/node.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/node.cpp -o $(OBJECTDIR)/xml_node.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h

@@ -17,8 +17,8 @@ namespace smooth
 };
 
 #include "definitions.h"
-#include "primitives/point.h"
-#include "primitives/size.h"
+#include "graphics/point.h"
+#include "graphics/size.h"
 #include "misc/font.h"
 
 namespace smooth
@@ -26,16 +26,16 @@ namespace smooth
 	class SMOOTHAPI ObjectProperties
 	{
 		public:
-			Point		 pos;
-			Size		 size;
+			GUI::Point	 pos;
+			GUI::Size	 size;
 
 			Int		 orientation;
 
 			String		 text;
 			String		 tooltip;
 
-			Size		 textSize;
-			Size		 tooltipSize;
+			GUI::Size	 textSize;
+			GUI::Size	 tooltipSize;
 
 			GUI::Font	 font;
 

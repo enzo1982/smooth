@@ -15,8 +15,8 @@
 #include "loop.h"
 #include "version.h"
 #include "misc/string.h"
-#include "application.h"
-#include "dialogs/messagebox.h"
+#include "gui/application/application.h"
+#include "gui/dialogs/messagebox.h"
 
 using namespace smooth;
 
@@ -40,8 +40,8 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdL
 		}
 	}
 
-	Application::GetStartupDirectory();
-	Application::GetApplicationDirectory();
+	GUI::Application::GetStartupDirectory();
+	GUI::Application::GetApplicationDirectory();
 
 	Int	 retValue = Main();
 

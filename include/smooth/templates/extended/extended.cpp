@@ -15,251 +15,184 @@
 
 template <class t> S::Extended<t>::Extended()
 {
+	onRead.Connect(&Extended<t>::DefaultRead, this);
+	onWrite.Connect(&Extended<t>::DefaultWrite, this);
 }
 
 template <class t> S::Extended<t>::Extended(const t &iValue)
 {
-	beforeWrite.Emit(iValue);
+	onRead.Connect(&Extended::DefaultRead, this);
+	onWrite.Connect(&Extended::DefaultWrite, this);
 
-	var = iValue;
+	t	 value = iValue;
 
-	onWrite.Emit(iValue);
+	var = onWrite.CallUnprotected(value);
 }
 
-template <class t> t &S::Extended<t>::operator =(t nValue)
+template <class t> t &S::Extended<t>::DefaultRead(t &value)
 {
-	beforeWrite.Emit(nValue);
+	return value;
+}
 
-	var = nValue;
+template <class t> t &S::Extended<t>::DefaultWrite(t &value)
+{
+	return value;
+}
 
-	onWrite.Emit(nValue);
+template <class t> t &S::Extended<t>::operator =(t &nValue)
+{
+	var = onWrite.CallUnprotected(nValue);
 
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
 template <class t> t &S::Extended<t>::operator ++()
 {
-	beforeWrite.Emit(var++);
-	onWrite.Emit(var);
+	var = onWrite.CallUnprotected(++var);
 
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
 template <class t> t S::Extended<t>::operator ++(int)
 {
-	t	 oValue = var;
+	t	 oValue = onRead.CallUnprotected(var);
 
-	beforeWrite.Emit(var++);
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
+	var = onWrite.CallUnprotected(++var);
 
 	return oValue;
 }
 
 template <class t> t &S::Extended<t>::operator --()
 {
-	beforeWrite.Emit(var--);
-	onWrite.Emit(var);
+	var = onWrite.CallUnprotected(--var);
 
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
 template <class t> t S::Extended<t>::operator --(int)
 {
-	t	 oValue = var;
+	t	 oValue = onRead.CallUnprotected(var);
 
-	beforeWrite.Emit(var--);
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
+	var = onWrite.CallUnprotected(--var);
 
 	return oValue;
 }
 
-template <class t> S::Bool S::Extended<t>::operator ==(t cValue)
+template <class t> S::Bool S::Extended<t>::operator ==(t &cValue)
 {
-	onRead.Emit(var);
-
-	return var == cValue;
+	return onRead.CallUnprotected(var) == onWrite.CallUnprotected(cValue);
 }
 
-template <class t> S::Bool S::Extended<t>::operator !=(t cValue)
+template <class t> S::Bool S::Extended<t>::operator !=(t &cValue)
 {
-	onRead.Emit(var);
-
-	return var != cValue;
+	return onRead.CallUnprotected(var) != onWrite.CallUnprotected(cValue);
 }
 
-template <class t> S::Bool S::Extended<t>::operator <(t cValue)
+template <class t> S::Bool S::Extended<t>::operator <(t &cValue)
 {
-	onRead.Emit(var);
-
-	return var < cValue;
+	return onRead.CallUnprotected(var) < onWrite.CallUnprotected(cValue);
 }
 
-template <class t> S::Bool S::Extended<t>::operator >(t cValue)
+template <class t> S::Bool S::Extended<t>::operator >(t &cValue)
 {
-	onRead.Emit(var);
-
-	return var > cValue;
+	return onRead.CallUnprotected(var) > onWrite.CallUnprotected(cValue);
 }
 
-template <class t> S::Bool S::Extended<t>::operator <=(t cValue)
+template <class t> S::Bool S::Extended<t>::operator <=(t &cValue)
 {
-	onRead.Emit(var);
-
-	return var <= cValue;
+	return onRead.CallUnprotected(var) <= onWrite.CallUnprotected(cValue);
 }
 
-template <class t> S::Bool S::Extended<t>::operator >=(t cValue)
+template <class t> S::Bool S::Extended<t>::operator >=(t &cValue)
 {
-	onRead.Emit(var);
-
-	return var >= cValue;
+	return onRead.CallUnprotected(var) >= onWrite.CallUnprotected(cValue);
 }
 
-template <class t> t &S::Extended<t>::operator +=(t nValue)
+template <class t> t &S::Extended<t>::operator +=(t &nValue)
 {
-	beforeWrite.Emit(var + nValue);
+	var = onWrite.CallUnprotected(var + nValue);
 
-	var += nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
-template <class t> t &S::Extended<t>::operator -=(t nValue)
+template <class t> t &S::Extended<t>::operator -=(t &nValue)
 {
-	beforeWrite.Emit(var - nValue);
+	var = onWrite.CallUnprotected(var - nValue);
 
-	var -= nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
-template <class t> t &S::Extended<t>::operator *=(t nValue)
+template <class t> t &S::Extended<t>::operator *=(t &nValue)
 {
-	beforeWrite.Emit(var * nValue);
+	var = onWrite.CallUnprotected(var * nValue);
 
-	var *= nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
-template <class t> t &S::Extended<t>::operator /=(t nValue)
+template <class t> t &S::Extended<t>::operator /=(t &nValue)
 {
-	beforeWrite.Emit(var / nValue);
+	var = onWrite.CallUnprotected(var / nValue);
 
-	var /= nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
-template <class t> t &S::Extended<t>::operator %=(t nValue)
+template <class t> t &S::Extended<t>::operator %=(t &nValue)
 {
-	beforeWrite.Emit(var % nValue);
+	var = onWrite.CallUnprotected(var % nValue);
 
-	var %= nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
-template <class t> t &S::Extended<t>::operator &=(t nValue)
+template <class t> t &S::Extended<t>::operator &=(t &nValue)
 {
-	beforeWrite.Emit(var & nValue);
+	var = onWrite.CallUnprotected(var & nValue);
 
-	var &= nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
-template <class t> t &S::Extended<t>::operator ^=(t nValue)
+template <class t> t &S::Extended<t>::operator ^=(t &nValue)
 {
-	beforeWrite.Emit(var ^ nValue);
+	var = onWrite.CallUnprotected(var ^ nValue);
 
-	var ^= nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
-template <class t> t &S::Extended<t>::operator |=(t nValue)
+template <class t> t &S::Extended<t>::operator |=(t &nValue)
 {
-	beforeWrite.Emit(var | nValue);
+	var = onWrite.CallUnprotected(var | nValue);
 
-	var |= nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
-template <class t> t &S::Extended<t>::operator <<=(t nValue)
+template <class t> t &S::Extended<t>::operator <<=(t &nValue)
 {
-	beforeWrite.Emit(var << nValue);
+	var = onWrite.CallUnprotected(var << nValue);
 
-	var <<= nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
-template <class t> t &S::Extended<t>::operator >>=(t nValue)
+template <class t> t &S::Extended<t>::operator >>=(t &nValue)
 {
-	beforeWrite.Emit(var >> nValue);
+	var = onWrite.CallUnprotected(var >> nValue);
 
-	var >>= nValue;
-
-	onWrite.Emit(var);
-
-	onRead.Emit(var);
-
-	return var;
+	return onRead.CallUnprotected(var);
 }
 
 template <class t> S::Extended<t>::operator t()
 {
-	onRead.Emit(var);
+	return onRead.CallUnprotected(var);
+}
 
-	return var;
+template <class t> t &S::Extended<t>::operator *()
+{
+	return onRead.CallUnprotected(var);
+}
+
+template <class t> t *S::Extended<t>::operator ->()
+{
+	t	&value = onRead.CallUnprotected(var);
+
+	return &value;
 }
 
 #endif

@@ -65,7 +65,7 @@ namespace smooth
 				return Success;
 			}
 
-			Int Connect(const returnTYPE &value)
+			Int Connect(const returnTYPE value)
 			{
 				slots0.AddEntry(new SlotRValue0<returnTYPE>(value));
 
@@ -148,7 +148,7 @@ namespace smooth
 				return Success;
 			}
 
-			Int Disconnect(const returnTYPE &value)
+			Int Disconnect(const returnTYPE value)
 			{
 				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
 				{
@@ -241,6 +241,27 @@ namespace smooth
 				UnprotectParent();
 
 				return returnValue;
+			}
+
+			returnTYPE EmitUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST)
+			{
+				Bool	 last = False;
+
+				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
+				{
+					if (i == slotsN.GetNOfEntries() - 1 && slots0.GetNOfEntries() == 0) last = True;
+
+					if (last)	return slotsN.GetNthEntry(i)->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+					else		slotsN.GetNthEntry(i)->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+				}
+
+				for (Int j = 0; j < slots0.GetNOfEntries(); j++)
+				{
+					if (j == slots0.GetNOfEntries() - 1) last = True;
+
+					if (last)	return slots0.GetNthEntry(j)->Emit();
+					else		slots0.GetNthEntry(j)->Emit();
+				}
 			}
 
 			Int GetNOfConnectedSlots()

@@ -2,7 +2,7 @@
 
 include Makefile-common
 
-OBJECTS = $(OBJECTDIR)/backend.o $(OBJECTDIR)/backendwin32.o $(OBJECTDIR)/application.o $(OBJECTDIR)/background.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/input.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectmanager.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/widget.o $(OBJECTDIR)/colordlg.o $(OBJECTDIR)/dialog.o $(OBJECTDIR)/dirdlg.o $(OBJECTDIR)/filedlg.o $(OBJECTDIR)/fontdlg.o $(OBJECTDIR)/messagebox.o $(OBJECTDIR)/splashscreen.o $(OBJECTDIR)/tipodaydlg.o $(OBJECTDIR)/directory.o $(OBJECTDIR)/file.o $(OBJECTDIR)/bitmapgdi.o $(OBJECTDIR)/surfacegdi.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/bitmapbackend.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/surfacebackend.o $(OBJECTDIR)/toolwindow.o $(OBJECTDIR)/activearea.o $(OBJECTDIR)/arrows.o $(OBJECTDIR)/button.o $(OBJECTDIR)/checkbox.o $(OBJECTDIR)/droparea.o $(OBJECTDIR)/editbox.o $(OBJECTDIR)/groupbox.o $(OBJECTDIR)/hyperlink.o $(OBJECTDIR)/image.o $(OBJECTDIR)/layer.o $(OBJECTDIR)/optionbox.o $(OBJECTDIR)/progressbar.o $(OBJECTDIR)/scrollbar.o $(OBJECTDIR)/slider.o $(OBJECTDIR)/tabwidget.o $(OBJECTDIR)/text.o $(OBJECTDIR)/combobox.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listbox.o $(OBJECTDIR)/listboxheader.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/mdiclient.o $(OBJECTDIR)/mdiwindow.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menubar.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/popupmenu.o $(OBJECTDIR)/popupview.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/config.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/font.o $(OBJECTDIR)/i18n.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/eventwin32.o $(OBJECTDIR)/timerwin32.o $(OBJECTDIR)/event.o $(OBJECTDIR)/eventbackend.o $(OBJECTDIR)/system.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/timerbackend.o $(OBJECTDIR)/mutexwin32.o $(OBJECTDIR)/semaphorewin32.o $(OBJECTDIR)/threadwin32.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/mutexbackend.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/semaphorebackend.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadbackend.o $(OBJECTDIR)/tree.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/treeview.o $(OBJECTDIR)/windowgdi.o $(OBJECTDIR)/client.o $(OBJECTDIR)/divider.o $(OBJECTDIR)/drag.o $(OBJECTDIR)/shortcut.o $(OBJECTDIR)/statusbar.o $(OBJECTDIR)/titlebar.o $(OBJECTDIR)/tooltip.o $(OBJECTDIR)/window.o $(OBJECTDIR)/windowbackend.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/xul_menubar.o $(OBJECTDIR)/xul_popupmenu.o $(OBJECTDIR)/xul_renderer.o $(OBJECTDIR)/xul_widget.o $(OBJECTDIR)/xul_window.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/color.o $(OBJECTDIR)/dllmain.o $(OBJECTDIR)/loop.o $(OBJECTDIR)/pciio.o
+OBJECTS = $(OBJECTDIR)/backendwin32.o $(OBJECTDIR)/backend.o $(OBJECTDIR)/input.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/directory.o $(OBJECTDIR)/file.o $(OBJECTDIR)/bitmapgdi.o $(OBJECTDIR)/surfacegdi.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/bitmapbackend.o $(OBJECTDIR)/form.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/surfacebackend.o $(OBJECTDIR)/application.o $(OBJECTDIR)/background.o $(OBJECTDIR)/xulloader.o $(OBJECTDIR)/colordlg.o $(OBJECTDIR)/dialog.o $(OBJECTDIR)/dirdlg.o $(OBJECTDIR)/filedlg.o $(OBJECTDIR)/fontdlg.o $(OBJECTDIR)/messagebox.o $(OBJECTDIR)/splashscreen.o $(OBJECTDIR)/tipodaydlg.o $(OBJECTDIR)/mdiclient.o $(OBJECTDIR)/mdiwindow.o $(OBJECTDIR)/activearea.o $(OBJECTDIR)/arrows.o $(OBJECTDIR)/button.o $(OBJECTDIR)/checkbox.o $(OBJECTDIR)/client.o $(OBJECTDIR)/divider.o $(OBJECTDIR)/editbox.o $(OBJECTDIR)/groupbox.o $(OBJECTDIR)/hyperlink.o $(OBJECTDIR)/image.o $(OBJECTDIR)/optionbox.o $(OBJECTDIR)/progressbar.o $(OBJECTDIR)/scrollbar.o $(OBJECTDIR)/slider.o $(OBJECTDIR)/statusbar.o $(OBJECTDIR)/tabwidget.o $(OBJECTDIR)/text.o $(OBJECTDIR)/titlebar.o $(OBJECTDIR)/combobox.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listbox.o $(OBJECTDIR)/listboxheader.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menubar.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/popupmenu.o $(OBJECTDIR)/popupview.o $(OBJECTDIR)/tree.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/treeview.o $(OBJECTDIR)/dragcontrol.o $(OBJECTDIR)/droparea.o $(OBJECTDIR)/shortcut.o $(OBJECTDIR)/tooltip.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/layer.o $(OBJECTDIR)/widget.o $(OBJECTDIR)/windowgdi.o $(OBJECTDIR)/toolwindow.o $(OBJECTDIR)/window.o $(OBJECTDIR)/windowbackend.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/config.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/font.o $(OBJECTDIR)/i18n.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/eventwin32.o $(OBJECTDIR)/timerwin32.o $(OBJECTDIR)/event.o $(OBJECTDIR)/eventbackend.o $(OBJECTDIR)/system.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/timerbackend.o $(OBJECTDIR)/mutexwin32.o $(OBJECTDIR)/semaphorewin32.o $(OBJECTDIR)/threadwin32.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/mutexbackend.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/semaphorebackend.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadbackend.o $(OBJECTDIR)/xul_menubar.o $(OBJECTDIR)/xul_popupmenu.o $(OBJECTDIR)/xul_renderer.o $(OBJECTDIR)/xul_widget.o $(OBJECTDIR)/xul_window.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/color.o $(OBJECTDIR)/dllmain.o $(OBJECTDIR)/loop.o $(OBJECTDIR)/pciio.o
 RESOURCES = $(OBJECTDIR)/resources.o
 
 LIBS = -lunicows -mwindows -lfribidi -liolib -lbz2 -llisa -lxml -lwsock32 -limm32 -lstdc++
@@ -66,8 +66,8 @@ ECHO = echo
 AR = ar
 PACKER = upx
 COMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -Os -g0 -Wall -fno-exceptions -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -DIOLIB_DLL -DLIBICONV_PLUG -c
-LINKER_OPTS = -L$(LIBDIR) -mwindows --output-lib $(LIBNAME) --output-exp $(EXPNAME) --output-def $(DEFNAME) -o $(DLLNAME)
-PLUGIN_LINKER_OPTS = -L$(LIBDIR) -mwindows --output-lib $(SAMPLE4LIB) --output-exp $(SAMPLE4EXP) --output-def $(SAMPLE4DEF) -o $(SAMPLE4DLL)
+LINKER_OPTS = -L$(LIBDIR) -mwindows -k --output-lib $(LIBNAME) --output-exp $(EXPNAME) --output-def $(DEFNAME) -o $(DLLNAME)
+PLUGIN_LINKER_OPTS = -L$(LIBDIR) -mwindows -k --output-lib $(SAMPLE4LIB) --output-exp $(SAMPLE4EXP) --output-def $(SAMPLE4DEF) -o $(SAMPLE4DLL)
 EXECOMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -Os -Wall -fno-exceptions -DUNICODE -D_UNICODE -c
 EXELINKER_OPTS = -L$(LIBDIR) $(SAMPLESLIBS) -mwindows
 RESCOMP_OPTS = -D__SMOOTH_DLL__ -O coff
@@ -88,24 +88,19 @@ install:
 
 clean:
 	$(ECHO) -n Cleaning directories...
-	$(REMOVER) $(REMOVER_OPTS)
 	$(REMOVER) $(REMOVER_OPTS) $(OBJECTS) $(RESOURCES) $(DLLNAME) $(LIBNAME) $(EXPNAME) $(DEFNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4EXE) $(SAMPLE5EXE) $(DESIGNEROBJECTS) $(PCIFFMANOBJECTS) $(TRANSLATOROBJECTS) $(SAMPLE1OBJECTS) $(SAMPLE2OBJECTS) $(SAMPLE3OBJECTS) $(SAMPLE4OBJECTS) $(SAMPLE5OBJECTS) $(SAMPLE4DLLOBJECTS) $(SAMPLE4DLL) $(SAMPLE4LIB) $(SAMPLE4DEF) $(SAMPLE4EXP)
 	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE1DIR)/smooth.dll
 	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE2DIR)/smooth.dll
 	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE3DIR)/smooth.dll
 	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE4DIR)/smooth.dll
 	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE5DIR)/smooth.dll
+	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE6DIR)/smooth.dll
+	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE7DIR)/smooth.dll
 	$(ECHO) done.
 
-clean_all:
-	$(ECHO) -n Cleaning directories...
+clean_all: clean
+	$(ECHO) -n Cleaning 3rd party libraries...
 	$(REMOVER) $(REMOVER_OPTS) $(OTHERLIBS) $(IOLIBOBJECTS) $(LIBBZ2OBJECTS) $(LIBXMLOBJECTS) $(LIBICONVOBJECTS) $(LISAOBJECTS) $(FRIBIDIOBJECTS)
-	$(REMOVER) $(REMOVER_OPTS) $(OBJECTS) $(RESOURCES) $(DLLNAME) $(LIBNAME) $(EXPNAME) $(DEFNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4EXE) $(SAMPLE5EXE) $(DESIGNEROBJECTS) $(PCIFFMANOBJECTS) $(TRANSLATOROBJECTS) $(SAMPLE1OBJECTS) $(SAMPLE2OBJECTS) $(SAMPLE3OBJECTS) $(SAMPLE4OBJECTS) $(SAMPLE5OBJECTS) $(SAMPLE4DLLOBJECTS) $(SAMPLE4DLL) $(SAMPLE4LIB) $(SAMPLE4DEF) $(SAMPLE4EXP)
-	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE1DIR)/smooth.dll
-	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE2DIR)/smooth.dll
-	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE3DIR)/smooth.dll
-	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE4DIR)/smooth.dll
-	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE5DIR)/smooth.dll
 	$(ECHO) done.
 
 distribute: $(DLLNAME)
@@ -116,11 +111,13 @@ distribute: $(DLLNAME)
 	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE3DIR)/smooth.dll
 	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE4DIR)/smooth.dll
 	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE5DIR)/smooth.dll
+	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE6DIR)/smooth.dll
+	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE7DIR)/smooth.dll
 	$(ECHO) done.
 
 $(DLLNAME): $(OBJECTS) $(RESOURCES) $(OTHERLIBS)
-	$(ECHO) Linking $(DLLNAME)...
-	$(LINKER) $(OBJECTS) $(LIBIOLIB) $(RESOURCES) $(LINKER_OPTS) $(LIBS)
+	$(ECHO) -n Linking $(DLLNAME)...
+	$(LINKER) $(OBJECTS) $(LIBIOLIB) $(RESOURCES) $(LINKER_OPTS) $(LIBS) &> NULL
 	$(STRIP) $(STRIP_OPTS) $(DLLNAME)
 	$(STRIP) $(LIBSTRIP_OPTS) $(LIBNAME)
 	$(PACKER) $(PACKER_OPTS) $(DLLNAME) > NULL
@@ -128,22 +125,22 @@ $(DLLNAME): $(OBJECTS) $(RESOURCES) $(OTHERLIBS)
 
 $(LIBIOLIB): $(IOLIBOBJECTS)
 	$(ECHO) -n Linking $(LIBIOLIB)...
-	$(AR) r $(LIBIOLIB) $(IOLIBOBJECTS)
+	$(AR) r $(LIBIOLIB) $(IOLIBOBJECTS) &> NULL
 	$(ECHO) done.
 
 $(LIBBZ2): $(LIBBZ2OBJECTS)
 	$(ECHO) -n Linking $(LIBBZ2)...
-	$(AR) r $(LIBBZ2) $(LIBBZ2OBJECTS)
+	$(AR) r $(LIBBZ2) $(LIBBZ2OBJECTS) &> NULL
 	$(ECHO) done.
 
 $(LIBXML): $(LIBXMLOBJECTS)
 	$(ECHO) -n Linking $(LIBXML)...
-	$(AR) r $(LIBXML) $(LIBXMLOBJECTS)
+	$(AR) r $(LIBXML) $(LIBXMLOBJECTS) &> NULL
 	$(ECHO) done.
 
 $(LIBICONV): $(LIBICONVOBJECTS)
-	$(ECHO) Linking $(LIBICONV)...
-	$(LINKER) $(LIBICONVOBJECTS) -L$(LIBDIR) -mwindows -o $(LIBICONV)
+	$(ECHO) -n Linking $(LIBICONV)...
+	$(LINKER) $(LIBICONVOBJECTS) -L$(LIBDIR) -mwindows -o $(LIBICONV) &> NULL
 	$(STRIP) $(STRIP_OPTS) $(LIBICONV)
 	$(STRIP) $(LIBSTRIP_OPTS) $(LIBICONV)
 	$(PACKER) $(PACKER_OPTS) $(LIBICONV) > NULL
@@ -151,12 +148,12 @@ $(LIBICONV): $(LIBICONVOBJECTS)
 
 $(LIBLISA): $(LISAOBJECTS)
 	$(ECHO) -n Linking $(LIBLISA)...
-	$(AR) r $(LIBLISA) $(LISAOBJECTS)
+	$(AR) r $(LIBLISA) $(LISAOBJECTS) &> NULL
 	$(ECHO) done.
 
 $(LIBFRIBIDI): $(FRIBIDIOBJECTS)
 	$(ECHO) -n Linking $(LIBFRIBIDI)...
-	$(AR) r $(LIBFRIBIDI) $(FRIBIDIOBJECTS)
+	$(AR) r $(LIBFRIBIDI) $(FRIBIDIOBJECTS) &> NULL
 	$(ECHO) done.
 
 $(DESIGNEREXE): $(DLLNAME) $(LIBNAME) $(DESIGNEROBJECTS)

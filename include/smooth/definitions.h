@@ -132,6 +132,8 @@
 #define NIL	(0)
 #endif
 
+#include "types/generic.h"
+
 #include "types/bool.h"
 #include "types/float.h"
 #include "types/int.h"
@@ -159,6 +161,8 @@ namespace smooth
 #define callbacks	public
 #define signals		public
 #define slots		public
+
+#define abstract
 
 const S::Int SM_MOUSEMOVE		= 1024;
 const S::Int SM_LBUTTONDOWN		= 1025;

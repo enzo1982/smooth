@@ -30,7 +30,7 @@ MDITest::MDITest()
 	mainWnd			= new Window("MDITest");
 	mainWnd_titlebar	= new Titlebar();
 	mainWnd_statusbar	= new Statusbar("Ready");
-	mainWnd_client		= new MDIClient();
+	mainWnd_client		= new MDI::Client();
 	mainWnd_menubar		= new Menubar();
 	menu_file		= new Menu();
 

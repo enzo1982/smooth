@@ -618,7 +618,7 @@ int GetRLE(int line[], int sx, int x, int maxbits)
 
 	int	 rle = 0;
 
-	for (int i = x + 1; i < x + Math::Pow(2, maxbits); i++)
+	for (int i = x + 1; i < x + Math::Pow(2l, maxbits); i++)
 	{
 		if (line[i] == line[x]) rle++;
 		else break;
@@ -634,7 +634,7 @@ int GetVRLE(int line[], int prevline[], int sx, int x, int maxbits)
 
 	int	 rle = 0;
 
-	for (int i = x + 1; i < x + Math::Pow(2, maxbits); i++)
+	for (int i = x + 1; i < x + Math::Pow(2l, maxbits); i++)
 	{
 		if (line[i] == prevline[i]) rle++;
 		else break;
@@ -668,7 +668,7 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 		case 1:
 			bias = line[x]-(pixb1+prevline[x])/2;
 
-			if ((bias > -Math::Pow(2, 3)) && (bias <= Math::Pow(2, 3)))
+			if ((bias > -Math::Pow(2l, 3)) && (bias <= Math::Pow(2l, 3)))
 			{
 				return 1;
 			}
@@ -679,7 +679,7 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 			greenbias = GetGreen(line[x])-(GetGreen(pixb1)+GetGreen(prevline[x]))/2;
 			bluebias = GetBlue(line[x])-(GetBlue(pixb1)+GetBlue(prevline[x]))/2;
 
-			if (((redbias > -Math::Pow(2, 5)) && (redbias <= Math::Pow(2, 5))) && ((greenbias > -Math::Pow(2, 5)) && (greenbias <= Math::Pow(2, 5))) && ((bluebias > -Math::Pow(2, 5)) && (bluebias <= Math::Pow(2, 5))))
+			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))))
 			{
 				return 1;
 			}
@@ -691,7 +691,7 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 			bluebias = GetBlue(line[x])-(GetBlue(pixb1)+GetBlue(prevline[x]))/2;
 			alphabias = GetAlpha(line[x])-(GetAlpha(pixb1)+GetAlpha(prevline[x]))/2;
 
-			if (((redbias > -Math::Pow(2, 5)) && (redbias <= Math::Pow(2, 5))) && ((greenbias > -Math::Pow(2, 5)) && (greenbias <= Math::Pow(2, 5))) && ((bluebias > -Math::Pow(2, 5)) && (bluebias <= Math::Pow(2, 5))) && ((alphabias > -Math::Pow(2, 5)) && (alphabias <= Math::Pow(2, 5))))
+			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))) && ((alphabias > -Math::Pow(2l, 5)) && (alphabias <= Math::Pow(2l, 5))))
 			{
 				return 1;
 			}
@@ -738,22 +738,22 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 			greenbias = GetGreen(line[x])-(GetGreen(pixb1)+GetGreen(prevline[x]))/2;
 			bluebias = GetBlue(line[x])-(GetBlue(pixb1)+GetBlue(prevline[x]))/2;
 
-			if (((redbias > -Math::Pow(2, 2)) && (redbias <= Math::Pow(2, 2))) && ((greenbias > -Math::Pow(2, 2)) && (greenbias <= Math::Pow(2, 2))) && ((bluebias > -Math::Pow(2, 2)) && (bluebias <= Math::Pow(2, 2))))
+			if (((redbias > -Math::Pow(2l, 2)) && (redbias <= Math::Pow(2l, 2))) && ((greenbias > -Math::Pow(2l, 2)) && (greenbias <= Math::Pow(2l, 2))) && ((bluebias > -Math::Pow(2l, 2)) && (bluebias <= Math::Pow(2l, 2))))
 			{
 				out->OutputNumberPBD(0, 2);
 				md = 2;
 			}
-			else if (((redbias > -Math::Pow(2, 3)) && (redbias <= Math::Pow(2, 3))) && ((greenbias > -Math::Pow(2, 3)) && (greenbias <= Math::Pow(2, 3))) && ((bluebias > -Math::Pow(2, 3)) && (bluebias <= Math::Pow(2, 3))))
+			else if (((redbias > -Math::Pow(2l, 3)) && (redbias <= Math::Pow(2l, 3))) && ((greenbias > -Math::Pow(2l, 3)) && (greenbias <= Math::Pow(2l, 3))) && ((bluebias > -Math::Pow(2l, 3)) && (bluebias <= Math::Pow(2l, 3))))
 			{
 				out->OutputNumberPBD(1, 2);
 				md = 3;
 			}
-			else if (((redbias > -Math::Pow(2, 4)) && (redbias <= Math::Pow(2, 4))) && ((greenbias > -Math::Pow(2, 4)) && (greenbias <= Math::Pow(2, 4))) && ((bluebias > -Math::Pow(2, 4)) && (bluebias <= Math::Pow(2, 4))))
+			else if (((redbias > -Math::Pow(2l, 4)) && (redbias <= Math::Pow(2l, 4))) && ((greenbias > -Math::Pow(2l, 4)) && (greenbias <= Math::Pow(2l, 4))) && ((bluebias > -Math::Pow(2l, 4)) && (bluebias <= Math::Pow(2l, 4))))
 			{
 				out->OutputNumberPBD(2, 2);
 				md = 4;
 			}
-			else if (((redbias > -Math::Pow(2, 5)) && (redbias <= Math::Pow(2, 5))) && ((greenbias > -Math::Pow(2, 5)) && (greenbias <= Math::Pow(2, 5))) && ((bluebias > -Math::Pow(2, 5)) && (bluebias <= Math::Pow(2, 5))))
+			else if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))))
 			{
 				out->OutputNumberPBD(3, 2);
 				md = 5;
@@ -797,22 +797,22 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 			bluebias = GetBlue(line[x])-(GetBlue(pixb1)+GetBlue(prevline[x]))/2;
 			alphabias = GetAlpha(line[x])-(GetAlpha(pixb1)+GetAlpha(prevline[x]))/2;
 
-			if (((redbias > -Math::Pow(2, 2)) && (redbias <= Math::Pow(2, 2))) && ((greenbias > -Math::Pow(2, 2)) && (greenbias <= Math::Pow(2, 2))) && ((bluebias > -Math::Pow(2, 2)) && (bluebias <= Math::Pow(2, 2))) && ((alphabias > -Math::Pow(2, 2)) && (alphabias <= Math::Pow(2, 2))))
+			if (((redbias > -Math::Pow(2l, 2)) && (redbias <= Math::Pow(2l, 2))) && ((greenbias > -Math::Pow(2l, 2)) && (greenbias <= Math::Pow(2l, 2))) && ((bluebias > -Math::Pow(2l, 2)) && (bluebias <= Math::Pow(2l, 2))) && ((alphabias > -Math::Pow(2l, 2)) && (alphabias <= Math::Pow(2l, 2))))
 			{
 				out->OutputNumberPBD(0, 2);
 				md = 2;
 			}
-			else if (((redbias > -Math::Pow(2, 3)) && (redbias <= Math::Pow(2, 3))) && ((greenbias > -Math::Pow(2, 3)) && (greenbias <= Math::Pow(2, 3))) && ((bluebias > -Math::Pow(2, 3)) && (bluebias <= Math::Pow(2, 3))) && ((alphabias > -Math::Pow(2, 3)) && (alphabias <= Math::Pow(2, 3))))
+			else if (((redbias > -Math::Pow(2l, 3)) && (redbias <= Math::Pow(2l, 3))) && ((greenbias > -Math::Pow(2l, 3)) && (greenbias <= Math::Pow(2l, 3))) && ((bluebias > -Math::Pow(2l, 3)) && (bluebias <= Math::Pow(2l, 3))) && ((alphabias > -Math::Pow(2l, 3)) && (alphabias <= Math::Pow(2l, 3))))
 			{
 				out->OutputNumberPBD(1, 2);
 				md = 3;
 			}
-			else if (((redbias > -Math::Pow(2, 4)) && (redbias <= Math::Pow(2, 4))) && ((greenbias > -Math::Pow(2, 4)) && (greenbias <= Math::Pow(2, 4))) && ((bluebias > -Math::Pow(2, 4)) && (bluebias <= Math::Pow(2, 4))) && ((alphabias > -Math::Pow(2, 4)) && (alphabias <= Math::Pow(2, 4))))
+			else if (((redbias > -Math::Pow(2l, 4)) && (redbias <= Math::Pow(2l, 4))) && ((greenbias > -Math::Pow(2l, 4)) && (greenbias <= Math::Pow(2l, 4))) && ((bluebias > -Math::Pow(2l, 4)) && (bluebias <= Math::Pow(2l, 4))) && ((alphabias > -Math::Pow(2l, 4)) && (alphabias <= Math::Pow(2l, 4))))
 			{
 				out->OutputNumberPBD(2, 2);
 				md = 4;
 			}
-			else if (((redbias > -Math::Pow(2, 5)) && (redbias <= Math::Pow(2, 5))) && ((greenbias > -Math::Pow(2, 5)) && (greenbias <= Math::Pow(2, 5))) && ((bluebias > -Math::Pow(2, 5)) && (bluebias <= Math::Pow(2, 5))) && ((alphabias > -Math::Pow(2, 5)) && (alphabias <= Math::Pow(2, 5))))
+			else if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))) && ((alphabias > -Math::Pow(2l, 5)) && (alphabias <= Math::Pow(2l, 5))))
 			{
 				out->OutputNumberPBD(3, 2);
 				md = 5;
@@ -983,7 +983,7 @@ int GetMinimumBits(int number)
 {
 	for (int i = 0; i <= 32; i++)
 	{
-		if (number < Math::Pow(2, i)) return i;
+		if (number < Math::Pow(2l, i)) return i;
 	} 
 
 	return 0;
@@ -993,7 +993,7 @@ int GetMinimumTriples(int number)
 {
 	for (int i = 0; i <= 20; i++)
 	{
-		if (number < Math::Pow(3, i)) return i;
+		if (number < Math::Pow(3l, i)) return i;
 	}
 
 	return 0;
@@ -1003,7 +1003,7 @@ int GetMinimumDecades(int number)
 {
 	for (int i = 0; i <= 9; i++)
 	{
-		if (number < Math::Pow(10, i)) return i;
+		if (number < Math::Pow(10l, i)) return i;
 	}
 
 	return 0;

@@ -598,6 +598,10 @@ SOURCE=..\classes\system\timerbackend.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\classes\misc\args.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\misc\binary.cpp
 # End Source File
 # Begin Source File
@@ -1205,6 +1209,10 @@ SOURCE=..\include\smooth\i18n\smooth_de.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\include\smooth\misc\args.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\misc\binary.h
 # End Source File
 # Begin Source File
@@ -1700,6 +1708,10 @@ SOURCE=..\include\smooth\gui\window\windowbackend.h
 # End Source File
 # End Group
 # End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\args.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\include\smooth\array.h

@@ -96,6 +96,9 @@ int IOLibDriverUnicode::GetPos()
 
 int IOLibDriverUnicode::Flush()
 {
-	if (FlushFileBuffers(stream))	return 0;
-	else				return -1;
+	/* The FlushFileBuffers function we would normally call here	  *
+	 * really slows things down, so we let Windows handle the buffers *
+	 * and just do nothing here.					  */
+
+	return 0;
 }

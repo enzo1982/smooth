@@ -22,7 +22,6 @@ namespace smooth
 	};
 };
 
-#include "../../array.h"
 #include "containertype.h"
 #include "widget.h"
 

@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_WINAPPLICATION_
-#define _H_OBJSMOOTH_WINAPPLICATION_
+#ifndef _H_OBJSMOOTH_MAIN_
+#define _H_OBJSMOOTH_MAIN_
 
 #include "system/system.h"
 #include "loop.h"
@@ -52,6 +52,8 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdL
 #else
 int main(int argc, char **argv)
 {
+	for (Int i = 1; i < argc; i++) szCmdLine.Append(String(i > 1 ? " " : "").Append(argv[i]));
+
 	Init();
 
 	if (System::System::GetVersionString() != (String) SMOOTH_VERSION)

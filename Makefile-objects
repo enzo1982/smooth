@@ -403,6 +403,11 @@ $(OBJECTDIR)/windowbackend.o: $(GUICLASSESDIR)/window/windowbackend.cpp $(SMOOTH
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/windowbackend.cpp -o $(OBJECTDIR)/windowbackend.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/args.o: $(MISCCLASSESDIR)/args.cpp $(SMOOTHINCLUDEDIR)/misc/args.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/args.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/args.cpp -o $(OBJECTDIR)/args.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/binary.o: $(MISCCLASSESDIR)/binary.cpp $(SMOOTHINCLUDEDIR)/misc/binary.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/binary.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/binary.cpp -o $(OBJECTDIR)/binary.o

@@ -149,14 +149,20 @@ namespace smooth
 
 	const Bool True		= (Bool) -1;
 	const Bool False	= (Bool) 0;
-
-	Int	 Main();
-	Void	 AttachDLL();
-	Void	 DetachDLL();
 };
 
 #include "array.h"
+#include "misc/string.h"
 #include "basic/setup.h"
+
+namespace smooth
+{
+	Int	 Main();
+	Int	 Main(Array<String> &);
+
+	Void	 AttachDLL();
+	Void	 DetachDLL();
+};
 
 #define callbacks	public
 #define signals		public

@@ -1,0 +1,60 @@
+ChangeLog for smooth
+
+28.06.02 16:06 - smooth alpha 0.8.58.0
+
+- titlebar.cpp		- fixed some minor bugs (maximizing)
+- editbox.cpp		- EditBoxes with EDB_NUMERIC style accept decimal numbers now
+- drag.cpp		- new class: SMOOTHDragControl; allows easy moving of windows
+- layer.cpp		- added support for colored layers
+			- allowed SetMetrics for layers
+- date.cpp		- new class: SMOOTHDate
+- time.cpp		- new class: SMOOTHTime
+- object.cpp		- removed containerindex variable and replaced it with myContainer
+			- added GetRealPosition from stk.cpp
+			- a bit of 'code beautifying'
+			- new functions EnterProtectedRegion and LeaveProtectedRegion
+- popupmenu.cpp		- splitted to PopupMenu and PopupView
+			- complete reimplementation
+			- many bugfixes (fixes bug #0018)
+- popupview.cpp		- new class: viewing of popup menus
+- string.cpp		- ImportMBCS uses libiconv now
+			- replaced SIF_ANSI with SIF_ISO (ISO-8859-1)
+- hyperlink.cpp		- great increase in API compatibility
+- menu.cpp		- replaced SMOOTHMenuEntry with Entry
+			- restructured Entry
+			- entries can now have a description that is displayed in the statusbar
+- tree.cpp		- replaced SMOOTHTreeEntry with Entry
+- list.cpp		- replaced SMOOTHListEntry with Entry
+- document.cpp		- new class: SMOOTHXMLDocument
+- node.cpp		- new class: SMOOTHXMLNode
+- attribute.cpp		- new class: SMOOTHXMLAttribute
+- window.cpp		- new function: SetStatusText - changes the text of the statusbar (if it exists)
+			- new function: SetMinimumSize
+- background.cpp	- implemented a method for save deletion of objects
+- stk.cpp		- new function: DeleteObject(SMOOTHObject *)
+- surface.cpp		- metaclass for surfaces (currently only Windows GDI)
+- surfacegdi.cpp	- surface implementation for Windows GDI
+- thread.cpp		- Pause() and Continue() are no longer supported
+
+- removed session management and ODS functionality (will be readded later)
+- SMOOTH now uses LiSAThreads on all systems
+- removed SMOOTHDrawable class
+- renamed SMOOTHRegister to SMOOTHTabRegister
+- allowed compilation without Unicode support
+- added a test for the 'Microsoft Sans Serif' font
+- many bugfixes, unifications and 'code beautifying'
+- added basic smooth types (SMOOTH* {Bool, Byte, Float, Int, Short, Void})
+- replaced RECT, POINT and SIZE variables by SMOOTHRect, SMOOTHPoint and SMOOTHSize
+- updated Copyright information
+- updated Progressive Setup
+- fixed errors in RecArray
+- updated IOLib to version 4.9.6.0
+- updated libxml2 to version 2.4.13
+- integrated libiconv v1.7
+- integrated LiSA
+- many restructurings
+- started the QNX port
+- finished the MSVC port
+- smooth is now spelled with lower case letters
+- replaced the roadmap with a more extensive ToDo list
+- changed to english as the only language in ChangeLog, ToDo, Buglist, etc

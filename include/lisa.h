@@ -74,6 +74,8 @@ void LiSASleep(int);
  *					marking text etc.	 *
  *		LiSA_MOUSE_HAND		the hand cursor used for *
  *					hyperlinks		 *
+ *		LiSA_MOUSE_HSIZE	a horizontal resizer	 *
+ *		LiSA_MOUSE_VSIZE	a vertical resizer	 *
  *								 *
  * Return:	LiSASetMouseCursor returns 0 if everything goes	 *
  *		well. A positive integer is returned in case of	 *
@@ -88,6 +90,8 @@ int LiSASetMouseCursor(int);
 const int	 LiSA_MOUSE_ARROW	= 0;
 const int	 LiSA_MOUSE_TEXTEDIT	= 1;
 const int	 LiSA_MOUSE_HAND	= 2;
+const int	 LiSA_MOUSE_HSIZE	= 3;
+const int	 LiSA_MOUSE_VSIZE	= 4;
 
 /* LiSAOpenURL - Open a URL in a browser *************************
  *								 *

@@ -95,7 +95,9 @@ Translator::Translator()
 	list_entries	= new ListBox(pos, size);
 	list_entries->onClick.Connect(&Translator::SelectEntry, this);
 	list_entries->AllowReselect(True);
-	list_entries->AddTab("ID");
+	list_entries->AddTab("ID", 30);
+	list_entries->AddTab("String");
+	list_entries->AddTab("Translation");
 
 	menu_file	= new Menu();
 

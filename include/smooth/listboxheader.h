@@ -33,6 +33,7 @@ namespace smooth
 
 				Array<String>	 tabNames;
 				Array<Int>	 tabWidths;
+				Array<Bool>	 tabChecked;
 			public:
 						 ListBoxHeader(ListBox *);
 						~ListBoxHeader();

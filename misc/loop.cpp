@@ -21,6 +21,7 @@
 #include <smooth/threadmanager.h>
 #include <smooth/background.h>
 #include <smooth/objectmanager.h>
+#include <smooth/color.h>
 
 #ifdef __WIN32__
 #include <winsock.h>
@@ -124,9 +125,9 @@ S::Void S::GetColors()
 	Setup::InactiveGradientStartColor	= GetSysColor(COLOR_INACTIVECAPTION);
 	Setup::InactiveGradientEndColor		= GetSysColor(28);
 	Setup::InactiveGradientTextColor	= GetSysColor(COLOR_INACTIVECAPTIONTEXT);
-	Setup::DividerLightColor		= GetSysColor(COLOR_3DHIGHLIGHT);
+	Setup::DividerLightColor		= RGB(GetRed(Setup::BackgroundColor) + (255 - GetRed(Setup::BackgroundColor)) * 0.6, GetGreen(Setup::BackgroundColor) + (255 - GetGreen(Setup::BackgroundColor)) * 0.6, GetBlue(Setup::BackgroundColor) + (255 - GetBlue(Setup::BackgroundColor)) * 0.6);
 	Setup::DividerDarkColor			= GetSysColor(COLOR_3DSHADOW);
-	Setup::LightGrayColor			= GetSysColor(COLOR_3DHIGHLIGHT);
+	Setup::LightGrayColor			= RGB(GetRed(Setup::BackgroundColor) + (255 - GetRed(Setup::BackgroundColor)) * 0.6, GetGreen(Setup::BackgroundColor) + (255 - GetGreen(Setup::BackgroundColor)) * 0.6, GetBlue(Setup::BackgroundColor) + (255 - GetBlue(Setup::BackgroundColor)) * 0.6);
 	Setup::TooltipColor			= GetSysColor(COLOR_INFOBK);
 	Setup::TooltipTextColor			= GetSysColor(COLOR_INFOTEXT);
 #endif

@@ -28,9 +28,13 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Int	 SURFACE_NULL = 0;
+
 		class SMOOTHAPI Surface
 		{
 			protected:
+				Int		 type;
+
 				Size		 size;
 				Rect		 paintRect;
 
@@ -38,6 +42,8 @@ namespace smooth
 			public:
 						 Surface();
 				virtual		~Surface();
+
+				Int		 GetSurfaceType();
 
 				Size		 GetSize();
 

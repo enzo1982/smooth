@@ -16,12 +16,13 @@
 S::XML::Document::Document()
 {
 	rootNode	= NIL;
+	ownRoot		= False;
 	encoding	= "UTF-8";
 }
 
 S::XML::Document::~Document()
 {
-	if (rootNode != NIL) delete rootNode;
+	if (rootNode != NIL && ownRoot) delete rootNode;
 }
 
 S::XML::Node *S::XML::Document::GetRootNode()
@@ -32,6 +33,7 @@ S::XML::Node *S::XML::Document::GetRootNode()
 S::Int S::XML::Document::SetRootNode(Node *newRootNode)
 {
 	rootNode = newRootNode;
+	ownRoot = False;
 
 	return Success;
 }
@@ -58,7 +60,8 @@ S::Int S::XML::Document::LoadFile(String fileName)
 		root->SetName((char *) xmlRoot->name);
 		root->SetContent((char *) xmlRoot->content);
 
-		SetRootNode(root);
+		rootNode = root;
+		ownRoot = True;
 
 		LoadNode(xmlRoot, rootNode);
 
@@ -89,7 +92,8 @@ S::Int S::XML::Document::ParseMemory(Void *buffer, Int size)
 		root->SetName((char *) xmlRoot->name);
 		root->SetContent((char *) xmlRoot->content);
 
-		SetRootNode(root);
+		rootNode = root;
+		ownRoot = True;
 
 		LoadNode(xmlRoot, rootNode);
 

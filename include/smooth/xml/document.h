@@ -33,6 +33,8 @@ namespace smooth
 			private:
 				String	 encoding;
 				Node	*rootNode;
+				Bool	 ownRoot;
+
 				Int	 LoadNode(xmlNodePtr, Node *);
 				Int	 SaveNode(Node *, xmlNodePtr);
 			public:

@@ -20,6 +20,8 @@
 
 IOLibDriverANSI::IOLibDriverANSI(const char *fileName, int mode) : IOLibDriver()
 {
+	closeStream = false;
+
 	switch (mode)
 	{
 		default:
@@ -63,6 +65,8 @@ IOLibDriverANSI::IOLibDriverANSI(FILE *iStream) : IOLibDriver()
 IOLibDriverANSI::~IOLibDriverANSI()
 {
 	if (closeStream) fclose(stream);
+
+	if (streamID != NULL) delete [] streamID;
 }
 
 int IOLibDriverANSI::ReadData(unsigned char *data, int dataSize)

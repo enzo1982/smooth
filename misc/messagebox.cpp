@@ -38,7 +38,7 @@ S::Int S::SMOOTH::MessageBox(String text, String title, Int buttons, char *icon)
 
 	rVal = app->ShowMessageBox();
 
-	DeleteObject(app);
+	Object::DeleteObject(app);
 
 	return rVal;
 }
@@ -50,7 +50,7 @@ S::Int S::SMOOTH::MessageBox(String text, String title, Int buttons, wchar_t *ic
 
 	rVal = app->ShowMessageBox();
 
-	DeleteObject(app);
+	Object::DeleteObject(app);
 
 	return rVal;
 }

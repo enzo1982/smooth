@@ -34,7 +34,7 @@ S::Int S::SMOOTH::SplashScreen(HBITMAP logo, Int time)
 
 	rVal = app->ShowSplashScreen();
 
-	DeleteObject(app);
+	Object::DeleteObject(app);
 
 	return rVal;
 }

@@ -14,6 +14,8 @@
 
 S::GUI::Surface::Surface()
 {
+	type = SURFACE_NULL;
+
 	size.cx	= 0;
 	size.cy	= 0;
 
@@ -27,6 +29,11 @@ S::GUI::Surface::Surface()
 
 S::GUI::Surface::~Surface()
 {
+}
+
+S::Int S::GUI::Surface::GetSurfaceType()
+{
+	return type;
 }
 
 S::Size S::GUI::Surface::GetSize()

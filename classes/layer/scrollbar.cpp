@@ -626,7 +626,7 @@ S::Void S::GUI::Scrollbar::TimerProc()
 	{
 		timer->Stop();
 
-		delete timer;
+		DeleteObject(timer);
 
 		timer = NIL;
 

@@ -364,7 +364,7 @@ S::Void S::GUI::Arrows::TimerProc()
 	{
 		timer->Stop();
 
-		delete timer;
+		DeleteObject(timer);
 
 		timer = NIL;
 

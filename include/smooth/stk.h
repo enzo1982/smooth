@@ -31,6 +31,10 @@ namespace smooth
 #undef MessageBox
 #endif
 
+#if defined LoadImage
+#undef LoadImage
+#endif
+
 namespace smooth
 {
 	class SMOOTHAPI SMOOTH

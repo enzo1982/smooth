@@ -25,6 +25,8 @@ IOLibDriverSOCKS4::IOLibDriverSOCKS4(const char *proxy, int socksPort, const cha
 {
 	InitNetworking();
 
+	closeStream = false;
+
 	size = -1;
 
 	unsigned char	*socksdata;

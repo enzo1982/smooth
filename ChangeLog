@@ -8,6 +8,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 			- string only uses unicode internally now
 			- default input format is now ISO-8859-1 again
 			- String no longer hangs when input doesn't match input format
+			- buffers returned from ConvertTo or SetInputFormat are now deleted regularly
 - window.cpp		- Paint() now uses SP_UPDATE
 			- added new callback: Menu *getTrackMenu(Int mouseX, Int mouseY)
 			- fixed issues with modal and topmost windows

@@ -16,6 +16,8 @@
 
 S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 {
+	type = SURFACE_GDI;
+
 	gdi_dc = iDc;
 	real_dc = iDc;
 

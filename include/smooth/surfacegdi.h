@@ -25,6 +25,8 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Int	 SURFACE_GDI	= 1;
+
 		class SMOOTHAPI SurfaceGDI : public Surface
 		{
 			protected:

@@ -1234,6 +1234,8 @@ S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 {
 	Surface	*surface = GetDrawSurface();
 
+	if (surface->GetSurfaceType() != SURFACE_GDI) return False;
+
 	if (!PtVisible(((SurfaceGDI *) surface)->GetContext(), MouseX(), MouseY())) return False;
 
 	if ((MouseX() >= rect.left) && (MouseX() <= rect.right) && (MouseY() >= rect.top) && (MouseY() <= rect.bottom))	return True;

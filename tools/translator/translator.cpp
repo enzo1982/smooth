@@ -475,6 +475,7 @@ void Translator::SaveFileWithName(String file)
 	modified = False;
 
 	delete doc;
+	delete root;
 }
 
 void Translator::SaveData()

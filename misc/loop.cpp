@@ -108,6 +108,8 @@ S::Void S::Free()
 	delete mainThreadManager;
 	delete mainObjectManager;
 
+	String::ClearTemporaryBuffers();
+
 #ifdef __WIN32__
 	WSACleanup();
 #endif
@@ -141,6 +143,7 @@ S::Int S::Loop()
 {
 #ifdef __WIN32__
 	MSG		 msg;
+	Int		 count = 0;
 #endif
 
 	GUI::Window	*wnd;
@@ -187,6 +190,8 @@ S::Int S::Loop()
 #ifdef __WIN32__
 		do
 		{
+			String::ClearTemporaryBuffers();
+
 			bool	 result;
 
 			if (Setup::enableUnicode)	result = PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
@@ -208,6 +213,8 @@ S::Int S::Loop()
 
 			if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
 			else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
+
+			if (++count == 1000) { count = 0; String::ClearTemporaryBuffers(); }
 
 			if (peekLoop == 0) break;
 		}
@@ -236,6 +243,8 @@ S::Int S::Loop()
 
 			if (Setup::enableUnicode)	DispatchMessageW(&msg);
 			else				DispatchMessageA(&msg);
+
+			if (++count == 1000) { count = 0; String::ClearTemporaryBuffers(); }
 
 			if (peekLoop > 0) break;
 		}

@@ -10,12 +10,18 @@
 
 #include <smooth/string.h>
 #include <smooth/math.h>
+#include <smooth/timer.h>
 #include <iconv.h>
 #include <string.h>
 #include <iolib-cxx.h>
 
-char	*S::String::inputFormat		= "ISO-8859-1";
-char	*S::String::outputFormat	= "ISO-8859-1";
+char	*S::String::origInputFormat	= "ISO-8859-1";
+char	*S::String::origOutputFormat	= "ISO-8859-1";
+
+char	*S::String::inputFormat		= origInputFormat;
+char	*S::String::outputFormat	= origOutputFormat;
+
+S::Array<char *>	 S::String::allocatedBuffers;
 
 S::String::String()
 {
@@ -88,6 +94,13 @@ S::String::~String()
 	Clean();
 }
 
+S::Void S::String::ClearTemporaryBuffers()
+{
+	for (Int i = 0; i < allocatedBuffers.GetNOfEntries(); i++) delete [] allocatedBuffers.GetNthEntry(i);
+
+	allocatedBuffers.RemoveAll();
+}
+
 S::Void S::String::Clean()
 {
 	if (wString != NIL) delete [] wString;
@@ -104,6 +117,8 @@ char *S::String::SetInputFormat(const char *iFormat)
 
 	strcpy(inputFormat, iFormat);
 
+	if (previousInputFormat != origInputFormat) allocatedBuffers.AddEntry(previousInputFormat);
+
 	return previousInputFormat;
 }
 
@@ -114,6 +129,8 @@ char *S::String::SetOutputFormat(const char *oFormat)
 	outputFormat = new char [strlen(oFormat) + 1];
 
 	strcpy(outputFormat, oFormat);
+
+	if (previousOutputFormat != origOutputFormat) allocatedBuffers.AddEntry(previousOutputFormat);
 
 	return previousOutputFormat;
 }
@@ -160,6 +177,8 @@ char *S::String::ConvertTo(const char *encoding)
 	char	*buffer = new char [bufferSize];
 
 	ConvertString((char *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize, encoding);
+
+	allocatedBuffers.AddEntry(buffer);
 
 	return buffer;
 }

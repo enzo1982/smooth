@@ -24,6 +24,8 @@ IOLibDriverSocket::IOLibDriverSocket(const char *hostName, int port) : IOLibDriv
 {
 	InitNetworking();
 
+	closeStream = false;
+
 	size = -1;
 
 	mode = MODE_SOCKET_BLOCKING;

@@ -34,6 +34,8 @@
 
 IOLibDriverPOSIX::IOLibDriverPOSIX(const char *fileName, int mode) : IOLibDriver()
 {
+	closeStream = false;
+
 	switch (mode)
 	{
 		default:
@@ -77,6 +79,8 @@ IOLibDriverPOSIX::IOLibDriverPOSIX(int iStream) : IOLibDriver()
 IOLibDriverPOSIX::~IOLibDriverPOSIX()
 {
 	if (closeStream) close(stream);
+
+	if (streamID != NULL) delete [] streamID;
 }
 
 int IOLibDriverPOSIX::ReadData(unsigned char *data, int dataSize)

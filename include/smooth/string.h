@@ -14,9 +14,11 @@
 namespace smooth
 {
 	class String;
+	class Timer;
 };
 
 #include "definitions.h"
+#include "array.h"
 
 namespace smooth
 {
@@ -26,8 +28,13 @@ namespace smooth
 			wchar_t			*wString;
 			Int			 stringSize;
 
+			static char		*origInputFormat;
+			static char		*origOutputFormat;
+
 			static char		*inputFormat;
 			static char		*outputFormat;
+
+			static Array<char *>	 allocatedBuffers;
 
 			Void			 ImportFormat(const char *, const char *);
 		public:
@@ -38,6 +45,8 @@ namespace smooth
 						 String(const String &);
 
 						~String();
+
+			static Void		 ClearTemporaryBuffers();
 
 			Void			 Clean();
 

@@ -54,7 +54,7 @@ OutStream::OutStream(int type, const char *file, int mode)
 	{
 		driver = new IOLibDriverPOSIX(file, mode);
 
-		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); return; }
+		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
@@ -75,7 +75,7 @@ OutStream::OutStream(int type, FILE *openfile)
 	{
 		driver = new IOLibDriverANSI(openfile);
 
-		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); return; }
+		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
@@ -99,7 +99,7 @@ OutStream::OutStream(int type, void *outbuffer, long bufsize)
 	{
 		driver = new IOLibDriverMemory(outbuffer, bufsize);
 
-		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); return; }
+		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();

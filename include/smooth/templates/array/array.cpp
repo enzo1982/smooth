@@ -371,50 +371,47 @@ template <class t> S::Bool S::Array<t>::RemoveEntry(Int index)
 		{
 			operat = firstEntry;
 		}
+		else if (operat->gotNext)	
+		{
+			prev = operat;
+			operat = operat->GetNext();
+		}
 		else
 		{
-			if (operat->GetIndex() == index)
+			break;
+		}
+
+		if (operat->GetIndex() == index)
+		{
+			if (operat->gotNext && prev != ARRAY_NULLPOINTER)
 			{
-				if (operat->gotNext && prev != ARRAY_NULLPOINTER)
-				{
-					prev->SetNext(operat->GetNext());
-					operat->GetNext()->SetPrev(prev);
-				}
-				else if (operat->gotNext && prev == ARRAY_NULLPOINTER)
-				{
-					firstEntry = operat->GetNext();
-					operat->GetNext()->SetPrev(ARRAY_NULLPOINTER);
-				}
-				else if (!operat->gotNext && prev != ARRAY_NULLPOINTER)
-				{
-					prev->SetNext(ARRAY_NULLPOINTER);
-					lastEntry = prev;
-				}
-
-				if (operat == prevEntry) prevEntry = ARRAY_NULLPOINTER;
-				if (!operat->gotNext && operat == firstEntry) firstEntry = ARRAY_NULLPOINTER;
-				if (operat == prevDeletedEntry) prevDeletedEntry = ARRAY_NULLPOINTER;
-
-				prevDeletedEntry = prev;
-
-				operat->Clear();
-				delete operat;
-
-				nOfEntries--;
-				outlinedEntry = True;
-
-				return True;
+				prev->SetNext(operat->GetNext());
+				operat->GetNext()->SetPrev(prev);
+			}
+			else if (operat->gotNext && prev == ARRAY_NULLPOINTER)
+			{
+				firstEntry = operat->GetNext();
+				operat->GetNext()->SetPrev(ARRAY_NULLPOINTER);
+			}
+			else if (!operat->gotNext && prev != ARRAY_NULLPOINTER)
+			{
+				prev->SetNext(ARRAY_NULLPOINTER);
+				lastEntry = prev;
 			}
 
-			if (operat->gotNext)	
-			{
-				prev = operat;
-				operat = operat->GetNext();
-			}
-			else
-			{
-				break;
-			}
+			if (operat == prevEntry) prevEntry = ARRAY_NULLPOINTER;
+			if (!operat->gotNext && operat == firstEntry) firstEntry = ARRAY_NULLPOINTER;
+			if (operat == prevDeletedEntry) prevDeletedEntry = ARRAY_NULLPOINTER;
+
+			prevDeletedEntry = prev;
+
+			operat->Clear();
+			delete operat;
+
+			nOfEntries--;
+			outlinedEntry = True;
+
+			return True;
 		}
 	}
 

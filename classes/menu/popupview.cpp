@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_POPUPVIEW_
-#define __OBJSMOOTH_POPUPVIEW_
 
 #include <smooth/popupview.h>
 #include <smooth/toolkit.h>
@@ -27,9 +24,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_POPUPVIEW = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_POPUPVIEW = S::Object::RequestObjectID();
 
-SMOOTHPopupView::SMOOTHPopupView(SMOOTHPopupMenu *popupMenu)
+S::PopupView::PopupView(PopupMenu *popupMenu)
 {
 	type				= OBJ_POPUPVIEW;
 	objectProperties->orientation	= OR_FREE;
@@ -38,32 +35,32 @@ SMOOTHPopupView::SMOOTHPopupView(SMOOTHPopupMenu *popupMenu)
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-SMOOTHPopupView::~SMOOTHPopupView()
+S::PopupView::~PopupView()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHPopupView::Paint(SMOOTHInt message)
+S::Int S::PopupView::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
-	SMOOTHMenu::Entry	*entry;
-	SMOOTHRect		 popupRect;
-	HDC			 dc = GetContext(wnd);
-	SMOOTHPoint		 p1;
-	SMOOTHPoint		 p2;
-	SMOOTHRect		 frame;
-	SMOOTHRect		 textRect;
-	SMOOTHInt		 currentXPos = 20;
-	SMOOTHInt		 currentYPos = 3;
+	Menu::Entry	*entry;
+	Rect		 popupRect;
+	HDC		 dc = GetContext(wnd);
+	Point		 p1;
+	Point		 p2;
+	Rect		 frame;
+	Rect		 textRect;
+	Int		 currentXPos = 20;
+	Int		 currentYPos = 3;
 
 	myPopup->GetSize();
 
@@ -75,7 +72,7 @@ SMOOTHInt SMOOTHPopupView::Paint(SMOOTHInt message)
 	Box(dc, popupRect, SMOOTH::Setup::BackgroundColor, FILLED);
 	Frame(dc, popupRect, FRAME_UP);
 
-	for (SMOOTHInt i = 0; i < myPopup->nOfEntries; i++)
+	for (Int i = 0; i < myPopup->nOfEntries; i++)
 	{
 		entry = myPopup->entries.GetNthEntry(i);
 
@@ -120,7 +117,7 @@ SMOOTHInt SMOOTHPopupView::Paint(SMOOTHInt message)
 
 			if (entry->bVar != NIL)
 			{
-				if (*(entry->bVar) == SMOOTH::True)
+				if (*(entry->bVar) == True)
 				{
 					frame.left = textRect.left - 15;
 					frame.top = textRect.top + 2;
@@ -240,7 +237,7 @@ SMOOTHInt SMOOTHPopupView::Paint(SMOOTHInt message)
 						Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 					}
 
-					PaintPixel(dc, SMOOTHPoint(p2.x, p2.y - 1), SMOOTH::Setup::DividerDarkColor);
+					PaintPixel(dc, Point(p2.x, p2.y - 1), SMOOTH::Setup::DividerDarkColor);
 					PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
 
 					p1.x++;
@@ -248,7 +245,7 @@ SMOOTHInt SMOOTHPopupView::Paint(SMOOTHInt message)
 					p2.y++;
 
 					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
-					PaintPixel(dc, SMOOTHPoint(p2.x - 1, p2.y), SMOOTH::Setup::DividerDarkColor);
+					PaintPixel(dc, Point(p2.x - 1, p2.y), SMOOTH::Setup::DividerDarkColor);
 					PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
 
 					p1.x++;
@@ -267,36 +264,36 @@ SMOOTHInt SMOOTHPopupView::Paint(SMOOTHInt message)
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::PopupView::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
-	SMOOTHRect	 popupRect;
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHInt	 i;
-	HDC		 dc;
-	SMOOTHRect	*entryRect = new SMOOTHRect [myPopup->nOfEntries];
-	SMOOTHRect	 frame;
-	SMOOTHPoint	 p1;
-	SMOOTHPoint	 p2;
-	SMOOTHInt	 currentX = 3;
-	SMOOTHInt	 currentY = 3;
-	SMOOTHInt	 maxX = myPopup->popupsize.cx - 3;
+	Rect	 popupRect;
+	Int	 retVal = Success;
+	Int	 i;
+	HDC	 dc;
+	Rect	*entryRect = new Rect [myPopup->nOfEntries];
+	Rect	 frame;
+	Point	 p1;
+	Point	 p2;
+	Int	 currentX = 3;
+	Int	 currentY = 3;
+	Int	 maxX = myPopup->popupsize.cx - 3;
 
-	SMOOTHString	 newStatus;
-	SMOOTHBool	 updateStatus = SMOOTH::False;
-	SMOOTHBool	 setOldStatus = SMOOTH::False;
+	String	 newStatus;
+	Bool	 updateStatus = False;
+	Bool	 setOldStatus = False;
 
 	popupRect.left		= 0;
 	popupRect.top		= 0;
@@ -310,14 +307,14 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 			{
 				myPopup->nextPopup->Hide();
 
-				SMOOTH::DeleteObject(myPopup->nextPopup);
+				DeleteObject(myPopup->nextPopup);
 
 				myPopup->nextPopup = NIL;
 			}
 
 			for (i = 0; i < myPopup->nOfEntries; i++)
 			{
-				SMOOTHMenu::Entry	*entry = myPopup->entries.GetNthEntry(i);
+				Menu::Entry	*entry = myPopup->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -335,7 +332,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 				if (entry->checked && (entry->popup != NIL))
 				{
-					myPopup->nextPopup = new SMOOTHPopupMenu();
+					myPopup->nextPopup = new PopupMenu();
 
 					myPopup->nextPopup->prevPopup = myPopup;
 					myPopup->nextPopup->MenuToPopup(entry->popup);
@@ -349,7 +346,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 					wnd->RegisterObject(myPopup->nextPopup);
 
-					retVal = SMOOTH::Break;
+					retVal = Break;
 				}
 			}
 
@@ -357,57 +354,57 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 		case SM_LBUTTONUP:
 			for (i = 0; i < myPopup->nOfEntries; i++)
 			{
-				SMOOTHMenu::Entry	*entry = myPopup->entries.GetNthEntry(i);
+				Menu::Entry	*entry = myPopup->entries.GetNthEntry(i);
 
 				if (entry->checked && (entry->proc != NIL && entry->bVar == NIL && entry->iVar == NIL))
 				{
-					entry->checked = SMOOTH::False;
+					entry->checked = False;
 
 					if (entry->description != NIL) wnd->SetStatusText(backupStatusText);
 
-					SMOOTHPopupMenu::status = POPUP_PENDING;
+					PopupMenu::status = POPUP_PENDING;
 
-					SMOOTHPopupMenu *popup = myPopup;
+					PopupMenu *popup = myPopup;
 
 					while (popup->prevPopup != NIL) popup = popup->prevPopup;
 
 					popup->toolwnd->Hide();
 
-					SMOOTHPopupMenu::status = POPUP_FINISHED;
+					PopupMenu::status = POPUP_FINISHED;
 
-					SMOOTHProcCall(entry->proc, entry->procParam);
+					ProcCall(entry->proc, entry->procParam);
 
-					retVal = SMOOTH::Break;
+					retVal = Break;
 
 					break;
 				}
 
 				if (entry->checked && (entry->bVar != NIL))
 				{
-					SMOOTHBool	 valueChanged = SMOOTH::False;
+					Bool	 valueChanged = False;
 
-					entry->checked = SMOOTH::False;
+					entry->checked = False;
 
 					if (entry->description != NIL) wnd->SetStatusText(backupStatusText);
 
-					SMOOTHPopupMenu::status = POPUP_PENDING;
+					PopupMenu::status = POPUP_PENDING;
 
-					SMOOTHPopupMenu *popup = myPopup;
+					PopupMenu *popup = myPopup;
 
 					while (popup->prevPopup != NIL) popup = popup->prevPopup;
 
 					popup->toolwnd->Hide();
 
-					SMOOTHPopupMenu::status = POPUP_FINISHED;
+					PopupMenu::status = POPUP_FINISHED;
 
-					if (*(entry->bVar) == SMOOTH::False)	{ *(entry->bVar) = SMOOTH::True; valueChanged = SMOOTH::True; }
-					else					{ *(entry->bVar) = SMOOTH::False; valueChanged = SMOOTH::True; }
+					if (*(entry->bVar) == False)	{ *(entry->bVar) = True; valueChanged = True; }
+					else				{ *(entry->bVar) = False; valueChanged = True; }
 
 					if (valueChanged)
 					{
-						for (int j = 0; j < SMOOTHObject::objectCount; j++)
+						for (int j = 0; j < Object::objectCount; j++)
 						{
-							SMOOTHObject	*object = mainObjectManager->RequestObject(j);
+							Object	*object = mainObjectManager->RequestObject(j);
 
 							if (object != NIL)
 							{
@@ -415,39 +412,39 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 							}
 						}
 
-						SMOOTHProcCall(entry->proc, entry->procParam);
+						ProcCall(entry->proc, entry->procParam);
 					}
 
-					retVal = SMOOTH::Break;
+					retVal = Break;
 
 					break;
 				}
 
 				if (entry->checked && (entry->iVar != NIL))
 				{
-					SMOOTHBool	 valueChanged = SMOOTH::False;
+					Bool	 valueChanged = False;
 
-					entry->checked = SMOOTH::False;
+					entry->checked = False;
 
 					if (entry->description != NIL) wnd->SetStatusText(backupStatusText);
 
-					SMOOTHPopupMenu::status = POPUP_PENDING;
+					PopupMenu::status = POPUP_PENDING;
 
-					SMOOTHPopupMenu *popup = myPopup;
+					PopupMenu *popup = myPopup;
 
 					while (popup->prevPopup != NIL) popup = popup->prevPopup;
 
 					popup->toolwnd->Hide();
 
-					SMOOTHPopupMenu::status = POPUP_FINISHED;
+					PopupMenu::status = POPUP_FINISHED;
 
-					if (*(entry->iVar) != entry->iCode) { *(entry->iVar) = entry->iCode; valueChanged = SMOOTH::True; }
+					if (*(entry->iVar) != entry->iCode) { *(entry->iVar) = entry->iCode; valueChanged = True; }
 
 					if (valueChanged)
 					{
-						for (int j = 0; j < SMOOTHObject::objectCount; j++)
+						for (int j = 0; j < Object::objectCount; j++)
 						{
-							SMOOTHObject	*object = mainObjectManager->RequestObject(j);
+							Object	*object = mainObjectManager->RequestObject(j);
 
 							if (object != NIL)
 							{
@@ -455,10 +452,10 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 							}
 						}
 
-						SMOOTHProcCall(entry->proc, entry->procParam);
+						ProcCall(entry->proc, entry->procParam);
 					}
 
-					retVal = SMOOTH::Break;
+					retVal = Break;
 
 					break;
 				}
@@ -470,7 +467,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 			for (i = 0; i < myPopup->nOfEntries; i++)
 			{
-				SMOOTHMenu::Entry	*entry = myPopup->entries.GetNthEntry(i);
+				Menu::Entry	*entry = myPopup->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -483,9 +480,9 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 					if (!IsMouseOn(wnd->hwnd, entryRect[i], WINDOW) && entry->checked)
 					{
-						entry->checked = SMOOTH::False;
+						entry->checked = False;
 
-						if (entry->description != NIL) setOldStatus = SMOOTH::True;
+						if (entry->description != NIL) setOldStatus = True;
 
 						entryRect[i].right++;
 						entryRect[i].bottom++;
@@ -503,7 +500,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 							p1.y = entryRect[i].top + METRIC_POPUPARROWOFFSETY;
 							p2.y = p1.y + 9;
 
-							for (SMOOTHInt x = 0; x < 4; x++)
+							for (Int x = 0; x < 4; x++)
 							{
 								p1.x++;
 								p2.x++;
@@ -516,7 +513,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 						if (entry->bVar != NIL)
 						{
-							if (*(entry->bVar) == SMOOTH::True)
+							if (*(entry->bVar) == True)
 							{
 								frame.left = entryRect[i].left - 15;
 								frame.top = entryRect[i].top + 2;
@@ -628,7 +625,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 								p1.x--;
 								p2.x++;
 
-								for (SMOOTHInt j = 0; j < 3; j++)
+								for (Int j = 0; j < 3; j++)
 								{
 									p1.y++;
 									p2.y++;
@@ -636,7 +633,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 									Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 								}
 
-								PaintPixel(dc, SMOOTHPoint(p2.x, p2.y - 1), SMOOTH::Setup::DividerDarkColor);
+								PaintPixel(dc, Point(p2.x, p2.y - 1), SMOOTH::Setup::DividerDarkColor);
 								PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
 
 								p1.x++;
@@ -644,7 +641,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 								p2.y++;
 
 								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
-								PaintPixel(dc, SMOOTHPoint(p2.x - 1, p2.y), SMOOTH::Setup::DividerDarkColor);
+								PaintPixel(dc, Point(p2.x - 1, p2.y), SMOOTH::Setup::DividerDarkColor);
 								PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
 
 								p1.x++;
@@ -670,7 +667,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 			for (i = 0; i < myPopup->nOfEntries; i++)
 			{
-				SMOOTHMenu::Entry	*entry = myPopup->entries.GetNthEntry(i);
+				Menu::Entry	*entry = myPopup->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -683,13 +680,13 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 					if (IsMouseOn(wnd->hwnd, entryRect[i], WINDOW) && !entry->checked)
 					{
-						entry->checked = SMOOTH::True;
+						entry->checked = True;
 
 						if (entry->description != NIL)
 						{
 							newStatus = entry->description;
 
-							updateStatus = SMOOTH::True;
+							updateStatus = True;
 						}
 
 						entryRect[i].right++;
@@ -708,7 +705,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 							p1.y = entryRect[i].top + METRIC_POPUPARROWOFFSETY;
 							p2.y = p1.y + 9;
 
-							for (SMOOTHInt x = 0; x < 4; x++)
+							for (Int x = 0; x < 4; x++)
 							{
 								p1.x++;
 								p2.x++;
@@ -721,7 +718,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 						if (entry->bVar != NIL)
 						{
-							if (*(entry->bVar) == SMOOTH::True)
+							if (*(entry->bVar) == True)
 							{
 								frame.left = entryRect[i].left - 15;
 								frame.top = entryRect[i].top + 2;
@@ -833,7 +830,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 								p1.x--;
 								p2.x++;
 
-								for (SMOOTHInt j = 0; j < 3; j++)
+								for (Int j = 0; j < 3; j++)
 								{
 									p1.y++;
 									p2.y++;
@@ -841,7 +838,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 									Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
 								}
 
-								PaintPixel(dc, SMOOTHPoint(p2.x, p2.y - 1), SMOOTH::Setup::InactiveGradientTextColor);
+								PaintPixel(dc, Point(p2.x, p2.y - 1), SMOOTH::Setup::InactiveGradientTextColor);
 								PaintPixel(dc, p2, SMOOTH::Setup::InactiveGradientTextColor);
 
 								p1.x++;
@@ -849,7 +846,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 								p2.y++;
 
 								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
-								PaintPixel(dc, SMOOTHPoint(p2.x - 1, p2.y), SMOOTH::Setup::InactiveGradientTextColor);
+								PaintPixel(dc, Point(p2.x - 1, p2.y), SMOOTH::Setup::InactiveGradientTextColor);
 								PaintPixel(dc, p2, SMOOTH::Setup::InactiveGradientTextColor);
 
 								p1.x++;
@@ -862,9 +859,9 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 					}
 					else if (!IsMouseOn(wnd->hwnd, entryRect[i], WINDOW) && entry->checked)
 					{
-						entry->checked = SMOOTH::False;
+						entry->checked = False;
 
-						if (entry->description != NIL) setOldStatus = SMOOTH::True;
+						if (entry->description != NIL) setOldStatus = True;
 
 						entryRect[i].right++;
 						entryRect[i].bottom++;
@@ -882,7 +879,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 							p1.y = entryRect[i].top + METRIC_POPUPARROWOFFSETY;
 							p2.y = p1.y + 9;
 
-							for (SMOOTHInt x = 0; x < 4; x++)
+							for (Int x = 0; x < 4; x++)
 							{
 								p1.x++;
 								p2.x++;
@@ -895,7 +892,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 						if (entry->bVar != NIL)
 						{
-							if (*(entry->bVar) == SMOOTH::True)
+							if (*(entry->bVar) == True)
 							{
 								frame.left = entryRect[i].left - 15;
 								frame.top = entryRect[i].top + 2;
@@ -1007,7 +1004,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 								p1.x--;
 								p2.x++;
 
-								for (SMOOTHInt j = 0; j < 3; j++)
+								for (Int j = 0; j < 3; j++)
 								{
 									p1.y++;
 									p2.y++;
@@ -1015,7 +1012,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 									Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 								}
 
-								PaintPixel(dc, SMOOTHPoint(p2.x, p2.y - 1), SMOOTH::Setup::DividerDarkColor);
+								PaintPixel(dc, Point(p2.x, p2.y - 1), SMOOTH::Setup::DividerDarkColor);
 								PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
 
 								p1.x++;
@@ -1023,7 +1020,7 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 								p2.y++;
 
 								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
-								PaintPixel(dc, SMOOTHPoint(p2.x - 1, p2.y), SMOOTH::Setup::DividerDarkColor);
+								PaintPixel(dc, Point(p2.x - 1, p2.y), SMOOTH::Setup::DividerDarkColor);
 								PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
 
 								p1.x++;
@@ -1048,13 +1045,11 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 	if (updateStatus || setOldStatus)
 	{
-		SMOOTHWindow	*rWnd;
-
-		rWnd = (SMOOTHWindow *) myPopup->GetContainer()->GetContainerObject();
+		Window	*rWnd = (Window *) myPopup->GetContainer()->GetContainerObject();
 
 		for (;;)
 		{
-			if (rWnd->GetContainer()->GetContainerObject()->GetObjectType() != OBJ_APPLICATION)	rWnd = (SMOOTHWindow *) rWnd->GetContainer()->GetContainerObject();
+			if (rWnd->GetContainer()->GetContainerObject()->GetObjectType() != OBJ_APPLICATION)	rWnd = (Window *) rWnd->GetContainer()->GetContainerObject();
 			else											break;
 		}
 
@@ -1074,5 +1069,3 @@ SMOOTHInt SMOOTHPopupView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 	return retVal;
 }
-
-#endif

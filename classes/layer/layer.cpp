@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,25 +8,22 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_LAYER_
-#define __OBJSMOOTH_LAYER_
-
 #include <smooth/window.h>
 #include <smooth/layer.h>
 #include <smooth/definitions.h>
 #include <smooth/toolkit.h>
 #include <smooth/i18n.h>
 #include <smooth/stk.h>
-#include <smooth/tabregister.h>
+#include <smooth/tabwidget.h>
 #include <smooth/objectproperties.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_LAYER = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_LAYER = S::Object::RequestObjectID();
 
-SMOOTHLayer::SMOOTHLayer(SMOOTHString name)
+S::Layer::Layer(String name)
 {
 	self = this;
 
@@ -36,7 +33,7 @@ SMOOTHLayer::SMOOTHLayer(SMOOTHString name)
 	objectProperties->text		= name;
 	objectProperties->orientation	= OR_CENTER;
 
-	visible = SMOOTH::False;
+	visible = False;
 
 	layerColor = -1;
 
@@ -44,48 +41,48 @@ SMOOTHLayer::SMOOTHLayer(SMOOTHString name)
 	possibleContainers.AddEntry(OBJ_TABREGISTER);
 }
 
-SMOOTHLayer::~SMOOTHLayer()
+S::Layer::~Layer()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHLayer::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Layer::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
-	if (nOfObjects == 0)		return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
+	if (nOfObjects == 0)		return Success;
 
-	SMOOTHObject	*object;
+	Object	*object;
 
-	for (SMOOTHInt i = nOfObjects - 1; i >= 0; i--)
+	for (Int i = nOfObjects - 1; i >= 0; i--)
 	{
 		object = assocObjects.GetNthEntry(i);
 
 		if (object == NIL) continue;
 
-		if (object->Process(message, wParam, lParam) == SMOOTH::Break) return SMOOTH::Break;
+		if (object->Process(message, wParam, lParam) == Break) return Break;
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHLayer::Paint(SMOOTHInt message)
+S::Int S::Layer::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHRect	 updateRect = wnd->GetUpdateRect();
-	SMOOTHObject	*object;
+	Rect	 updateRect = wnd->GetUpdateRect();
+	Object	*object;
 
 	if (layerColor != -1)
 	{
-		SMOOTHRect	 frame;
-		HDC		 dc = GetContext(wnd);
+		Rect	 frame;
+		HDC	 dc = GetContext(wnd);
 
 		frame.left	= objectProperties->pos.x;
 		frame.top	= objectProperties->pos.y;
@@ -99,7 +96,7 @@ SMOOTHInt SMOOTHLayer::Paint(SMOOTHInt message)
 		FreeContext(wnd, dc);
 	}
 
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
 		object = assocObjects.GetNthEntry(i);
 
@@ -108,27 +105,27 @@ SMOOTHInt SMOOTHLayer::Paint(SMOOTHInt message)
 		if (object->IsVisible() && Affected(object, updateRect)) object->Paint(SP_PAINT);
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHLayer::Show()
+S::Int S::Layer::Show()
 {
-	if (visible) return SMOOTH::Success;
+	if (visible) return Success;
 
-	visible = SMOOTH::True;
+	visible = True;
 
-	if (!registered) return SMOOTH::Success;
+	if (!registered) return Success;
 
-	SMOOTHObject	*object;
+	Object	*object;
 
 	if (layerColor != -1)
 	{
-		SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+		Window	*wnd = (Window *) myContainer->GetContainerObject();
 
 		if (!(wnd == NIL || wnd->hwnd == NIL))
 		{
-			SMOOTHRect	 frame;
-			HDC		 dc = GetContext(wnd);
+			Rect	 frame;
+			HDC	 dc = GetContext(wnd);
 
 			frame.left	= objectProperties->pos.x;
 			frame.top	= objectProperties->pos.y;
@@ -141,27 +138,27 @@ SMOOTHInt SMOOTHLayer::Show()
 		}
 	}
 
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
 		object = assocObjects.GetNthEntry(i);
 
 		if (object != NIL) object->Show();
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHLayer::Hide()
+S::Int S::Layer::Hide()
 {
-	if (!visible) return SMOOTH::Success;
+	if (!visible) return Success;
 
-	visible = SMOOTH::False;
+	visible = False;
 
-	if (!registered) return SMOOTH::Success;
+	if (!registered) return Success;
 
-	SMOOTHObject	*object;
+	Object	*object;
 
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
 		object = assocObjects.GetNthEntry(i);
 
@@ -170,12 +167,12 @@ SMOOTHInt SMOOTHLayer::Hide()
 
 	if (layerColor != -1)
 	{
-		SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+		Window	*wnd = (Window *) myContainer->GetContainerObject();
 
 		if (!(wnd == NIL || wnd->hwnd == NIL))
 		{
-			SMOOTHRect	 frame;
-			HDC		 dc = GetContext(wnd);
+			Rect	 frame;
+			HDC	 dc = GetContext(wnd);
 
 			frame.left	= objectProperties->pos.x;
 			frame.top	= objectProperties->pos.y;
@@ -188,35 +185,35 @@ SMOOTHInt SMOOTHLayer::Hide()
 		}
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHLayer::SetColor(SMOOTHInt newColor)
+S::Int S::Layer::SetColor(Int newColor)
 {
 	layerColor = newColor;
 
 	Paint(SP_PAINT);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHLayer::SetMetrics(SMOOTHPoint pos, SMOOTHSize size)
+S::Int S::Layer::SetMetrics(Point pos, Size size)
 {
 	objectProperties->orientation = OR_FREE;
 
-	return SMOOTHObject::SetMetrics(pos, size);
+	return Object::SetMetrics(pos, size);
 }
 
-SMOOTHSurface *SMOOTHLayer::GetDrawSurface()
+S::Surface *S::Layer::GetDrawSurface()
 {
 	if (!registered) return nullSurface;
 
 	return myContainer->GetDrawSurface();
 }
 
-SMOOTHInt SMOOTHLayer::RegisterObject(SMOOTHObject *object)
+S::Int S::Layer::RegisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -230,22 +227,22 @@ SMOOTHInt SMOOTHLayer::RegisterObject(SMOOTHObject *object)
 
 			if (visible) object->Show();
 
-			return SMOOTH::Success;
+			return Success;
 		}
 	}
 
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHInt SMOOTHLayer::UnregisterObject(SMOOTHObject *object)
+S::Int S::Layer::UnregisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
 	if (containerType == &object->possibleContainers)
 	{
 		if (nOfObjects > 0 && object->IsRegistered())
 		{
-			if (assocObjects.DeleteEntry(object->handle) == SMOOTH::True)
+			if (assocObjects.DeleteEntry(object->handle) == True)
 			{
 				nOfObjects--;
 
@@ -254,12 +251,10 @@ SMOOTHInt SMOOTHLayer::UnregisterObject(SMOOTHObject *object)
 				object->UnsetRegisteredFlag();
 				object->SetContainer(NIL);
 
-				return SMOOTH::Success;
+				return Success;
 			}
 		}
 	}
 
-	return SMOOTH::Error;
+	return Error;
 }
-
-#endif

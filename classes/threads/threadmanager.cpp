@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_THREADMANAGER_
-#define __OBJSMOOTH_THREADMANAGER_
 
 #include <smooth/threadmanager.h>
 #include <smooth/thread.h>
@@ -21,72 +18,70 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHThreadManager	*mainThreadManager;
-SMOOTHBool		 SMOOTHThreadManager::threadManagerExists = SMOOTH::False;
+S::ThreadManager	*S::mainThreadManager;
+S::Bool			 S::ThreadManager::threadManagerExists = S::False;
 
-SMOOTHThreadManager::SMOOTHThreadManager()
+S::ThreadManager::ThreadManager()
 {
 	if (threadManagerExists)
 	{
-		iAmTheOne = SMOOTH::False;
+		iAmTheOne = False;
 
 #ifdef __WIN32__
-		SMOOTH::MessageBox(TXT_ERROR, TXT_ERROR_THREADMANAGEREXISTS, MB_OK, IDI_INFORMATION);
+		SMOOTH::MessageBox(TXT_ERROR_THREADMANAGEREXISTS, TXT_ERROR, MB_OK, IDI_INFORMATION);
 #endif
 
 		delete this;
 	}
 	else
 	{
-		iAmTheOne = SMOOTH::True;
+		iAmTheOne = True;
 		nOfThreads = 0;
 
-		threadManagerExists = SMOOTH::True;
+		threadManagerExists = True;
 	}
 }
 
-SMOOTHThreadManager::~SMOOTHThreadManager()
+S::ThreadManager::~ThreadManager()
 {
-	for (SMOOTHInt i = 0; i < nOfThreads; i++)
+	for (Int i = 0; i < nOfThreads; i++)
 	{
 		delete assocThreads.GetNthEntry(i);
 	}
 
 	assocThreads.DeleteAll();
 
-	if (iAmTheOne) threadManagerExists = SMOOTH::False;
+	if (iAmTheOne) threadManagerExists = False;
 }
 
-SMOOTHInt SMOOTHThreadManager::RegisterThread(SMOOTHThread *thread)
+S::Int S::ThreadManager::RegisterThread(Thread *thread)
 {
 	assocThreads.AddEntry(thread, thread->handle);
 	nOfThreads++;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHThreadManager::UnregisterThread(SMOOTHThread *thread)
+S::Int S::ThreadManager::UnregisterThread(Thread *thread)
 {
-	if (assocThreads.DeleteEntry(thread->handle) == SMOOTH::True)
+	if (assocThreads.DeleteEntry(thread->handle) == True)
 	{
 		nOfThreads--;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 	else
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 }
 
-SMOOTHThread *SMOOTHThreadManager::RequestThread(SMOOTHInt threadhandle)
+S::Thread *S::ThreadManager::RequestThread(Int threadhandle)
 {
 	return assocThreads.GetEntry(threadhandle);
 }
 
-SMOOTHInt SMOOTHThreadManager::GetNOfThreads()
+S::Int S::ThreadManager::GetNOfThreads()
 {
 	return nOfThreads;
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,16 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_XMLNODE_
-#define __OBJSMOOTH_XMLNODE_
-
 #include <libxml/parser.h>
 
 #include <smooth/object.h>
 #include <smooth/xml/node.h>
-#include <smooth/stk.h>
 
-SMOOTHXMLNode::SMOOTHXMLNode()
+S::XML::Node::Node()
 {
 	nextNode	= NIL;
 	prevNode	= NIL;
@@ -30,119 +26,119 @@ SMOOTHXMLNode::SMOOTHXMLNode()
 	content		= NIL;
 }
 
-SMOOTHXMLNode::~SMOOTHXMLNode()
+S::XML::Node::~Node()
 {
-	SMOOTHInt	 nOfAttributes	= GetNOfAttributes();
-	SMOOTHInt	 nOfNodes	= GetNOfNodes();
+	Int	 nOfAttributes	= GetNOfAttributes();
+	Int	 nOfNodes	= GetNOfNodes();
 
-	for (SMOOTHInt i = 0; i < nOfAttributes; i++)	RemoveAttribute(GetNthAttribute(0));
-	for (SMOOTHInt j = 0; j < nOfNodes; j++)	RemoveNode(GetNthNode(0));
+	for (Int i = 0; i < nOfAttributes; i++)	RemoveAttribute(GetNthAttribute(0));
+	for (Int j = 0; j < nOfNodes; j++)	RemoveNode(GetNthNode(0));
 }
 
-SMOOTHXMLDocument *SMOOTHXMLNode::GetParentDocument()
+S::XML::Document *S::XML::Node::GetParentDocument()
 {
 	return parentDoc;
 }
 
-SMOOTHInt SMOOTHXMLNode::SetParentDocument(SMOOTHXMLDocument *newParentDoc)
+S::Int S::XML::Node::SetParentDocument(S::XML::Document *newParentDoc)
 {
 	parentDoc = newParentDoc;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHXMLNode *SMOOTHXMLNode::GetParentNode()
+S::XML::Node *S::XML::Node::GetParentNode()
 {
 	return parentNode;
 }
 
-SMOOTHInt SMOOTHXMLNode::SetParentNode(SMOOTHXMLNode *newParentNode)
+S::Int S::XML::Node::SetParentNode(Node *newParentNode)
 {
 	parentNode = newParentNode;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLNode::GetNodeID()
+S::Int S::XML::Node::GetNodeID()
 {
 	return nodeID;
 }
 
-SMOOTHInt SMOOTHXMLNode::SetNodeID(SMOOTHInt newID)
+S::Int S::XML::Node::SetNodeID(Int newID)
 {
 	nodeID = newID;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHXMLNode *SMOOTHXMLNode::GetNextNode()
+S::XML::Node *S::XML::Node::GetNextNode()
 {
 	return nextNode;
 }
 
-SMOOTHXMLNode *SMOOTHXMLNode::GetPrevNode()
+S::XML::Node *S::XML::Node::GetPrevNode()
 {
 	return prevNode;
 }
 
-SMOOTHInt SMOOTHXMLNode::SetNextNode(SMOOTHXMLNode *newNode)
+S::Int S::XML::Node::SetNextNode(Node *newNode)
 {
 	nextNode = newNode;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLNode::SetPrevNode(SMOOTHXMLNode *newNode)
+S::Int S::XML::Node::SetPrevNode(Node *newNode)
 {
 	prevNode = newNode;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHString SMOOTHXMLNode::GetName()
+S::String S::XML::Node::GetName()
 {
 	return name;
 }
 
-SMOOTHInt SMOOTHXMLNode::SetName(SMOOTHString newName)
+S::Int S::XML::Node::SetName(String newName)
 {
 	name = newName;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHString SMOOTHXMLNode::GetContent()
+S::String S::XML::Node::GetContent()
 {
 	return content;
 }
 
-SMOOTHInt SMOOTHXMLNode::SetContent(SMOOTHString newContent)
+S::Int S::XML::Node::SetContent(String newContent)
 {
 	content = newContent;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLNode::GetNOfAttributes()
+S::Int S::XML::Node::GetNOfAttributes()
 {
 	return attributes.GetNOfEntries();
 }
 
-SMOOTHXMLAttribute *SMOOTHXMLNode::GetNthAttribute(SMOOTHInt attributeNumber)
+S::XML::Attribute *S::XML::Node::GetNthAttribute(Int attributeNumber)
 {
 	if (attributeNumber >= GetNOfAttributes()) return NIL;
 
 	return attributes.GetNthEntry(attributeNumber);
 }
 
-SMOOTHXMLAttribute *SMOOTHXMLNode::GetAttributeByName(SMOOTHString attributeName)
+S::XML::Attribute *S::XML::Node::GetAttributeByName(String attributeName)
 {
 	if (GetNOfAttributes() == 0) return NIL;
 
-	SMOOTHXMLAttribute	*attribute	= GetNthAttribute(0);
-	SMOOTHInt		 nOfAttributes	= GetNOfAttributes();
+	Attribute	*attribute	= GetNthAttribute(0);
+	Int		 nOfAttributes	= GetNOfAttributes();
 
-	for (SMOOTHInt i = 1; i < nOfAttributes; i++)
+	for (Int i = 1; i < nOfAttributes; i++)
 	{
 		if (attribute->GetName() == attributeName) return attribute;
 
@@ -154,13 +150,13 @@ SMOOTHXMLAttribute *SMOOTHXMLNode::GetAttributeByName(SMOOTHString attributeName
 	return NIL;
 }
 
-SMOOTHXMLAttribute *SMOOTHXMLNode::SetAttribute(SMOOTHString attributeName, SMOOTHString attributeContent)
+S::XML::Attribute *S::XML::Node::SetAttribute(String attributeName, String attributeContent)
 {
-	SMOOTHXMLAttribute	*attribute = GetAttributeByName(attributeName);
+	Attribute	*attribute = GetAttributeByName(attributeName);
 
 	if (attribute == NIL)
 	{
-		attribute = new SMOOTHXMLAttribute();
+		attribute = new Attribute();
 
 		attribute->SetParentNode(this);
 
@@ -184,11 +180,11 @@ SMOOTHXMLAttribute *SMOOTHXMLNode::SetAttribute(SMOOTHString attributeName, SMOO
 	return attribute;
 }
 
-SMOOTHInt SMOOTHXMLNode::RemoveAttribute(SMOOTHXMLAttribute *attribute)
+S::Int S::XML::Node::RemoveAttribute(Attribute *attribute)
 {
 	if (attribute == NIL)
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 	else
 	{
@@ -211,34 +207,34 @@ SMOOTHInt SMOOTHXMLNode::RemoveAttribute(SMOOTHXMLAttribute *attribute)
 		delete attribute;
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLNode::RemoveAttributeByName(SMOOTHString attributeName)
+S::Int S::XML::Node::RemoveAttributeByName(String attributeName)
 {
 	return RemoveAttribute(GetAttributeByName(attributeName));
 }
 
-SMOOTHInt SMOOTHXMLNode::GetNOfNodes()
+S::Int S::XML::Node::GetNOfNodes()
 {
 	return subnodes.GetNOfEntries();
 }
 
-SMOOTHXMLNode *SMOOTHXMLNode::GetNthNode(SMOOTHInt nodeNumber)
+S::XML::Node *S::XML::Node::GetNthNode(Int nodeNumber)
 {
 	if (nodeNumber >= GetNOfNodes()) return NIL;
 
 	return subnodes.GetNthEntry(nodeNumber);
 }
 
-SMOOTHXMLNode *SMOOTHXMLNode::GetNodeByName(SMOOTHString nodeName)
+S::XML::Node *S::XML::Node::GetNodeByName(String nodeName)
 {
 	if (GetNOfNodes() == 0) return NIL;
 
-	SMOOTHXMLNode	*node		= GetNthNode(0);
-	int		 nOfNodes	= GetNOfNodes();
+	Node	*node		= GetNthNode(0);
+	Int	 nOfNodes	= GetNOfNodes();
 
-	for (SMOOTHInt i = 1; i < nOfNodes; i++)
+	for (Int i = 1; i < nOfNodes; i++)
 	{
 		if (node->GetName() == nodeName) return node;
 
@@ -250,9 +246,9 @@ SMOOTHXMLNode *SMOOTHXMLNode::GetNodeByName(SMOOTHString nodeName)
 	return NIL;
 }
 
-SMOOTHXMLNode *SMOOTHXMLNode::AddNode(SMOOTHString nodeName, SMOOTHString nodeContent)
+S::XML::Node *S::XML::Node::AddNode(String nodeName, String nodeContent)
 {
-	SMOOTHXMLNode	*node = new SMOOTHXMLNode();
+	Node	*node = new Node();
 
 	node->SetParentNode(this);
 
@@ -271,13 +267,13 @@ SMOOTHXMLNode *SMOOTHXMLNode::AddNode(SMOOTHString nodeName, SMOOTHString nodeCo
 	return node;
 }
 
-SMOOTHXMLNode *SMOOTHXMLNode::SetNode(SMOOTHString nodeName, SMOOTHString nodeContent)
+S::XML::Node *S::XML::Node::SetNode(String nodeName, String nodeContent)
 {
-	SMOOTHXMLNode	*node = GetNodeByName(nodeName);
+	Node	*node = GetNodeByName(nodeName);
 
 	if (node == NIL)
 	{
-		node = new SMOOTHXMLNode();
+		node = new Node();
 
 		node->SetParentNode(this);
 
@@ -301,11 +297,11 @@ SMOOTHXMLNode *SMOOTHXMLNode::SetNode(SMOOTHString nodeName, SMOOTHString nodeCo
 	return node;
 }
 
-SMOOTHInt SMOOTHXMLNode::RemoveNode(SMOOTHXMLNode *node)
+S::Int S::XML::Node::RemoveNode(Node *node)
 {
 	if (node == NIL)
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 	else
 	{
@@ -328,12 +324,10 @@ SMOOTHInt SMOOTHXMLNode::RemoveNode(SMOOTHXMLNode *node)
 		delete node;
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLNode::RemoveNodeByName(SMOOTHString nodeName)
+S::Int S::XML::Node::RemoveNodeByName(String nodeName)
 {
 	return RemoveNode(GetNodeByName(nodeName));
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,19 +8,15 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_COMBOBOX_
-#define __OBJSMOOTH_COMBOBOX_
-
 #include <smooth/combobox.h>
-#include <smooth/listBox.h>
+#include <smooth/listbox.h>
 #include <smooth/list.h>
 #include <smooth/definitions.h>
 #include <smooth/toolkit.h>
 #include <smooth/loop.h>
-#include <smooth/binary.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/i18n.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
@@ -31,17 +27,17 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_COMBOBOX = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_COMBOBOX = S::Object::RequestObjectID();
 
-SMOOTHComboBox::SMOOTHComboBox(SMOOTHPoint pos, SMOOTHSize size, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::ComboBox::ComboBox(Point pos, Size size, ProcParam, Void *procParam)
 {
 	type				= OBJ_COMBOBOX;
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 	entryCount			= -1;
 
-	closeListBox	= SMOOTH::False;
-	listBoxOpen	= SMOOTH::False;
+	closeListBox	= False;
+	listBoxOpen	= False;
 	listBox		= NIL;
 	toolWindow	= NIL;
 	layer		= NIL;
@@ -50,96 +46,94 @@ SMOOTHComboBox::SMOOTHComboBox(SMOOTHPoint pos, SMOOTHSize size, SMOOTHProcParam
 
 	SetFont(objectProperties->font, I18N_SMALLFONTSIZE, SMOOTH::Setup::ClientTextColor, objectProperties->fontWeight);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = roundtoint(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = roundtoint(19 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-SMOOTHComboBox::~SMOOTHComboBox()
+S::ComboBox::~ComboBox()
 {
 	if (listBoxOpen)
 	{
-		if (listBox->registered && myContainer != NIL) myContainer->UnregisterObject(listBox);
-
 		delete listBox;
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHComboBox::AddEntry(SMOOTHString name, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::List::Entry *S::ComboBox::AddEntry(String name, ProcParam, Void *procParam)
 {
 	entryCount++;
 
-	AddListEntry(entryCount, name, newProc, procParam);
+	Entry *newEntry = AddListEntry(entryCount, name, newProc, procParam);
 
-	if (entryCount == 0) entries.GetFirstEntry()->clk = SMOOTH::True;
+	if (entryCount == 0) entries.GetFirstEntry()->clk = True;
 
 	Paint(SP_PAINT);
 
-	return entryCount;
+	return newEntry;
 }
 
-SMOOTHInt SMOOTHComboBox::ModifyEntry(SMOOTHInt code, SMOOTHString name, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::Int S::ComboBox::ModifyEntry(Int code, String name, ProcParam, Void *procParam)
 {
-	if (ModifyListEntry(code, name, newProc, procParam) == SMOOTH::Success)
+	if (ModifyListEntry(code, name, newProc, procParam) == Success)
 	{
 		Paint(SP_PAINT);
 
-		return SMOOTH::Success;
+		return Success;
 	}
 	else
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 }
 
-SMOOTHInt SMOOTHComboBox::RemoveEntry(SMOOTHInt number)
+S::Int S::ComboBox::RemoveEntry(Int number)
 {
 	RemoveListEntry(number);
 
 	Paint(SP_PAINT);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHVoid SMOOTHComboBox::Cleanup()
+S::Void S::ComboBox::Cleanup()
 {
 	CleanupList();
 
 	Paint(SP_PAINT);
 }
 
-SMOOTHInt SMOOTHComboBox::SelectEntry(SMOOTHInt code)
+S::Int S::ComboBox::SelectEntry(Int code)
 {
 	SelectListEntry(code);
 
 	Paint(SP_PAINT);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHComboBox::Paint(SMOOTHInt message)
+S::Int S::ComboBox::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*lay = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) lay->GetContainer()->GetContainerObject();
+	Layer	*lay = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) lay->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC			 dc = GetContext(wnd);
-	SMOOTHPoint		 realPos = GetRealPosition();
-	SMOOTHList::Entry	*operat;
-	SMOOTHRect		 frame;
-	SMOOTHPoint		 lineStart;
-	SMOOTHPoint		 lineEnd;
+	HDC		 dc = GetContext(wnd);
+	Point		 realPos = GetRealPosition();
+	List::Entry	*operat;
+	Rect		 frame;
+	Point		 lineStart;
+	Point		 lineEnd;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -169,7 +163,7 @@ SMOOTHInt SMOOTHComboBox::Paint(SMOOTHInt message)
 	lineEnd.x = lineStart.x + 7;
 	lineEnd.y = lineStart.y;
 
-	for (SMOOTHInt i = 0; i < 4; i++)
+	for (Int i = 0; i < 4; i++)
 	{
 		if (active)	Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 		else		Line(dc, lineStart, lineEnd, SMOOTH::Setup::GrayTextColor, PS_SOLID, 1);
@@ -180,7 +174,7 @@ SMOOTHInt SMOOTHComboBox::Paint(SMOOTHInt message)
 		lineEnd.y++;
 	}
 
-	for (SMOOTHInt j = 0; j < nOfEntries; j++)
+	for (Int j = 0; j < nOfEntries; j++)
 	{
 		operat = entries.GetNthEntry(j);
 
@@ -200,30 +194,30 @@ SMOOTHInt SMOOTHComboBox::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::ComboBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHLayer	*lay = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) lay->GetContainer()->GetContainerObject();
+	Layer	*lay = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) lay->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint		 realPos = GetRealPosition();
-	SMOOTHInt		 retVal = SMOOTH::Success;
-	SMOOTHList::Entry	*operat;
-	SMOOTHRect		 frame;
-	SMOOTHRect		 lbframe;
-	HDC			 dc;
-	SMOOTHPoint		 lbp;
-	SMOOTHSize		 lbs;
-	SMOOTHBool		 executeProcs = SMOOTH::False;
-	SMOOTHFloat		 oldMeasurement;
+	Point		 realPos = GetRealPosition();
+	Int		 retVal = Success;
+	List::Entry	*operat;
+	Rect		 frame;
+	Rect		 lbframe;
+	HDC		 dc;
+	Point		 lbp;
+	Size		 lbs;
+	Bool		 executeProcs = False;
+	Float		 oldMeasurement;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -241,7 +235,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (listBoxOpen)
 			{
-				listBoxOpen = SMOOTH::False;
+				listBoxOpen = False;
 
 				wnd->UnregisterObject(toolWindow);
 				toolWindow->UnregisterObject(layer);
@@ -270,7 +264,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 			{
 				if ((IsMouseOn(wnd->hwnd, frame, WINDOW) && listBoxOpen) || (!IsMouseOn(wnd->hwnd, frame, WINDOW) && !IsMouseOn(wnd->hwnd, lbframe, WINDOW) && listBoxOpen))
 				{
-					listBoxOpen = SMOOTH::False;
+					listBoxOpen = False;
 
 					wnd->UnregisterObject(toolWindow);
 					toolWindow->UnregisterObject(layer);
@@ -286,7 +280,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 					layer		= NIL;
 					toolWindow	= NIL;
 
-					retVal = SMOOTH::Break;
+					retVal = Break;
 				}
 			}
 
@@ -303,7 +297,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 			{
 				wnd->Process(SM_LOOSEFOCUS, handle, 0);
 
-				listBoxOpen = SMOOTH::True;
+				listBoxOpen = True;
 
 				lbp.x = frame.left - lay->GetObjectProperties()->pos.x;
 				lbp.y = frame.bottom + 1 - lay->GetObjectProperties()->pos.y;
@@ -312,18 +306,18 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 				oldMeasurement = SMOOTH::Setup::FontSize;
 
-				SMOOTHSetMeasurement(SMT_PIXELS);
+				SetMeasurement(SMT_PIXELS);
 
-				layer		= new SMOOTHLayer();
-				toolWindow	= new SMOOTHToolWindow();
-				listBox		= new SMOOTHListBox(SMOOTHPoint(0, 0), lbs, SMOOTHProc(SMOOTHComboBox, this, ListBoxProc));
+				layer		= new Layer();
+				toolWindow	= new ToolWindow();
+				listBox		= new ListBox(Point(0, 0), lbs, Proc(ComboBox, this, ListBoxProc));
 
 				lbp.x = frame.left + wnd->GetObjectProperties()->pos.x;
 				lbp.y = frame.bottom + 1 + wnd->GetObjectProperties()->pos.y;
 
 				if (objectProperties->checked)
 				{
-					objectProperties->clicked = SMOOTH::True;
+					objectProperties->clicked = True;
 
 					frame.top	+= 3;
 					frame.bottom	-= 3;
@@ -337,9 +331,9 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 				SMOOTH::Setup::FontSize = oldMeasurement;
 
-				listBox->allowReselect = SMOOTH::True;
+				listBox->AllowReselect(True);
 
-				for (SMOOTHInt i = 0; i < nOfEntries; i++)
+				for (Int i = 0; i < nOfEntries; i++)
 				{
 					operat = entries.GetNthEntry(i);
 
@@ -358,15 +352,15 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 				listBox->Paint(SP_PAINT);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 			else if ((IsMouseOn(wnd->hwnd, frame, WINDOW) && listBoxOpen) || (!IsMouseOn(wnd->hwnd, frame, WINDOW) && !IsMouseOn(wnd->hwnd, lbframe, WINDOW) && listBoxOpen))
 			{
-				listBoxOpen = SMOOTH::False;
+				listBoxOpen = False;
 
 				if (objectProperties->checked)
 				{
-					objectProperties->clicked = SMOOTH::True;
+					objectProperties->clicked = True;
 
 					frame.top	+= 3;
 					frame.bottom	-= 3;
@@ -406,7 +400,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 				if (!IsMouseOn(wnd->hwnd, frame, WINDOW) && !IsMouseOn(wnd->hwnd, lbframe, WINDOW)) wnd->Process(SM_LBUTTONDOWN, 0, 0);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			FreeContext(wnd, dc);
@@ -417,7 +411,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (closeListBox)
 			{
-				for (SMOOTHInt i = 0; i < nOfEntries; i++)
+				for (Int i = 0; i < nOfEntries; i++)
 				{
 					operat = entries.GetNthEntry(i);
 
@@ -435,11 +429,11 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 					}
 				}
 
-				if (GetSelectedEntry() != listBox->GetSelectedEntry()) executeProcs = SMOOTH::True;
+				if (GetSelectedEntry() != listBox->GetSelectedEntry()) executeProcs = True;
 
 				SelectEntry(listBox->GetSelectedEntry());
 
-				for (SMOOTHInt j = 0; j < nOfEntries; j++)
+				for (Int j = 0; j < nOfEntries; j++)
 				{
 					operat = entries.GetNthEntry(j);
 
@@ -459,7 +453,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 				if (listBoxOpen)
 				{
-					listBoxOpen = SMOOTH::False;
+					listBoxOpen = False;
 
 					wnd->UnregisterObject(toolWindow);
 					toolWindow->UnregisterObject(layer);
@@ -476,21 +470,21 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 					toolWindow	= NIL;
 				}
 
-				closeListBox = SMOOTH::False;
+				closeListBox = False;
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			if (executeProcs)
 			{
-				for (SMOOTHInt i = 0; i < nOfEntries; i++)
+				for (Int i = 0; i < nOfEntries; i++)
 				{
 					operat = entries.GetNthEntry(i);
 
 					if (operat->clk)
 					{
-						SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
-						SMOOTHProcCall(operat->proc, operat->procParam);
+						ProcCall(objectProperties->proc, objectProperties->procParam);
+						ProcCall(operat->proc, operat->procParam);
 
 						break;
 					}
@@ -499,7 +493,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (objectProperties->clicked)
 			{
-				objectProperties->clicked = SMOOTH::False;
+				objectProperties->clicked = False;
 
 				if (objectProperties->checked)
 				{
@@ -539,8 +533,8 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
 
-				objectProperties->checked = SMOOTH::False;
-				objectProperties->clicked = SMOOTH::False;
+				objectProperties->checked = False;
+				objectProperties->clicked = False;
 			}
 
 			FreeContext(wnd, dc);
@@ -558,7 +552,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 			{
 				Frame(dc, frame, FRAME_UP);
 
-				objectProperties->checked = SMOOTH::True;
+				objectProperties->checked = True;
 			}
 			else if (!IsMouseOn(wnd->hwnd, frame, WINDOW) && objectProperties->checked)
 			{
@@ -567,8 +561,8 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
 
-				objectProperties->checked = SMOOTH::False;
-				objectProperties->clicked = SMOOTH::False;
+				objectProperties->checked = False;
+				objectProperties->clicked = False;
 			}
 
 			FreeContext(wnd, dc);
@@ -579,11 +573,11 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (listBox != NIL)
 			{
-				closeListBox = SMOOTH::True;
+				closeListBox = True;
 				
 				toolWindow->SetOwner(this);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			FreeContext(wnd, dc);
@@ -594,9 +588,7 @@ SMOOTHInt SMOOTHComboBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 	return retVal;
 }
 
-SMOOTHVoid SMOOTHComboBox::ListBoxProc()
+S::Void S::ComboBox::ListBoxProc()
 {
 	Process(SM_CHECKCOMBOBOXES, 0, 0);
 }
-
-#endif

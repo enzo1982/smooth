@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,10 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-/* TODO: rewrite SMOOTHEditBox from scratch */
-
-#ifndef __OBJSMOOTH_EDITBOX_
-#define __OBJSMOOTH_EDITBOX_
+/* TODO: rewrite EditBox from scratch */
 
 #include <smooth/editbox.h>
 #include <smooth/toolkit.h>
@@ -21,29 +18,31 @@
 #include <smooth/binary.h>
 #include <smooth/string.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/timer.h>
 #include <smooth/surface.h>
 
+#include <imm.h>
+
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_EDITBOX = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_EDITBOX = S::Object::RequestObjectID();
 
-SMOOTHEditBox::SMOOTHEditBox(SMOOTHString text, SMOOTHPoint pos, SMOOTHSize size, SMOOTHInt subType, SMOOTHInt iMaxSize, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMaxSize, ProcParam, Void *procParam)
 {
 	type				= OBJ_EDITBOX;
 	objectProperties->text		= text;
-	isRight				= SMOOTH::False;
-	isAsterisk			= SMOOTH::False;
+	isRight				= False;
+	isAsterisk			= False;
 	markStart			= 0;
 	markEnd				= 0;
 	leftCut				= 0;
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
 	subtype				= subType;
@@ -68,32 +67,32 @@ SMOOTHEditBox::SMOOTHEditBox(SMOOTHString text, SMOOTHPoint pos, SMOOTHSize size
 
 	if (maxSize <= 0) maxSize = 32768;
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = roundtoint(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = roundtoint(19 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-SMOOTHEditBox::~SMOOTHEditBox()
+S::EditBox::~EditBox()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHEditBox::Paint(SMOOTHInt message)
+S::Int S::EditBox::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	SMOOTHRect	 frame;
-	SMOOTHRect	 textRect;
-	SMOOTHPoint	 realPos = GetRealPosition();
+	Rect	 frame;
+	Rect	 textRect;
+	Point	 realPos = GetRealPosition();
 
 	switch (message)
 	{
@@ -113,10 +112,10 @@ SMOOTHInt SMOOTHEditBox::Paint(SMOOTHInt message)
 			textRect.top	= frame.top + 3;
 			textRect.right	= textRect.left + objectProperties->size.cx - 6;
 
-			if (IsBitSet(subtype, EDB_MULTILINE))	textRect.bottom	= textRect.top + objectProperties->size.cy - 6;
-			else					textRect.bottom = textRect.top + 16;
+			if (Binary::IsFlagSet(subtype, EDB_MULTILINE))	textRect.bottom	= textRect.top + objectProperties->size.cy - 6;
+			else						textRect.bottom = textRect.top + 16;
 
-			for (SMOOTHInt i = 0; i < nOfLines; i++)
+			for (Int i = 0; i < nOfLines; i++)
 			{
 				if (active)	surface->SetText(GetLine(i), textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 				else		surface->SetText(GetLine(i), textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::TextColor, objectProperties->fontWeight);
@@ -131,36 +130,36 @@ SMOOTHInt SMOOTHEditBox::Paint(SMOOTHInt message)
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::EditBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHRect	 frame;
-	HDC		 dc;
-	int		 nOfChars = objectProperties->text.Length();
-	SMOOTHPoint	 p1;
-	SMOOTHPoint	 p2;
-	SMOOTHString	 newtext;
-	SMOOTHString	 lrcaddtext;
-	int		 newpos;
-	int		 i;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
+	Rect	 frame;
+	HDC	 dc;
+	int	 nOfChars = objectProperties->text.Length();
+	Point	 p1;
+	Point	 p2;
+	String	 newtext;
+	String	 lrcaddtext;
+	int	 newpos;
+	int	 i;
 
 #ifdef __WIN32__
-	int		 prevPromptPos;
-	int		 prevLinePromptPos;
-	int		 prevCurrLine;
+	int	 prevPromptPos;
+	int	 prevLinePromptPos;
+	int	 prevCurrLine;
 #endif
 
 	frame.left	= realPos.x;
@@ -175,11 +174,11 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 			if (objectProperties->clicked)
 			{
-				objectProperties->clicked = SMOOTH::False;
-				objectProperties->checked = SMOOTH::False;
+				objectProperties->clicked = False;
+				objectProperties->checked = False;
 
-				if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-				else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 				p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 				p2.x = p1.x;
@@ -214,11 +213,11 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 			if (objectProperties->clicked)
 			{
-				objectProperties->clicked = SMOOTH::False;
-				objectProperties->checked = SMOOTH::False;
+				objectProperties->clicked = False;
+				objectProperties->checked = False;
 
-				if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-				else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 				p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 				p2.x = p1.x;
@@ -228,6 +227,19 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 				promptPos = 0;
 				linePromptPos = 0;
+
+				{
+					HIMC		 hImc = ImmGetContext(wnd->hwnd);
+					COMPOSITIONFORM	 info;
+
+					info.dwStyle = CFS_POINT;
+					info.ptCurrentPos.x = p1.x - 3;
+					info.ptCurrentPos.y = p1.y - 2;
+
+					ImmSetCompositionWindow(hImc, &info);
+
+					ImmDestroyContext(hImc);
+				}
 
 				if (timer != NIL)
 				{
@@ -242,7 +254,7 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 				if (IsMouseOn(wnd->hwnd, frame, WINDOW) && lParam != 1)
 				{
-					objectProperties->checked = SMOOTH::True;
+					objectProperties->checked = True;
 					Process(SM_LBUTTONDOWN, 0, 0);
 				}
 				else
@@ -252,15 +264,15 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 			}
 			else if (objectProperties->checked)
 			{
-				objectProperties->clicked = SMOOTH::True;
+				objectProperties->clicked = True;
 				Frame(dc, frame, FRAME_DOWN);
 
-				if (!IsBitSet(subtype, EDB_MULTILINE))
+				if (!Binary::IsFlagSet(subtype, EDB_MULTILINE))
 				{
 					for (int i = 0; i <= visText.Length(); i++)
 					{
-						if (!IsBitSet(subtype, EDB_ASTERISK))	newpos = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, i, objectProperties->font,objectProperties->fontSize, objectProperties->fontWeight);
-						else					newpos = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', i), i, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	newpos = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, i, objectProperties->font,objectProperties->fontSize, objectProperties->fontWeight);
+						else						newpos = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', i), i, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						if (i > 0 && MouseX(wnd->hwnd, WINDOW) < (p1.x + newpos) / 2)
 						{
@@ -286,8 +298,8 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 // insert multiline code here
 				}
 
-				if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-				else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+				else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 				p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 				p2.x = p1.x;
@@ -295,13 +307,69 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 				Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 
-				promptVisible = SMOOTH::True;
+				promptVisible = True;
 
-				timer = new SMOOTHTimer();
+				{
+					HIMC		 hImc = ImmGetContext(wnd->hwnd);
+					COMPOSITIONFORM	 info;
+
+					info.dwStyle = CFS_POINT;
+					info.ptCurrentPos.x = p1.x - 4;
+					info.ptCurrentPos.y = p1.y - 2;
+
+					ImmSetCompositionWindow(hImc, &info);
+
+					if (SMOOTH::Setup::enableUnicode)
+					{
+						LOGFONTW	 font;
+
+						font.lfHeight = objectProperties->fontSize;
+						font.lfWidth = 0;
+						font.lfEscapement = 0;
+						font.lfOrientation = 0;
+						font.lfWeight = objectProperties->fontWeight;
+						font.lfItalic = false;
+						font.lfUnderline = false;
+						font.lfStrikeOut = false;
+						font.lfOutPrecision = OUT_DEFAULT_PRECIS;
+						font.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+						font.lfCharSet = DEFAULT_CHARSET;
+						font.lfQuality = DEFAULT_QUALITY;
+						font.lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
+						wcscpy(font.lfFaceName, objectProperties->font);
+
+						ImmSetCompositionFontW(hImc, &font);
+					}
+					else
+					{
+						LOGFONTA	 font;
+
+						font.lfHeight = objectProperties->fontSize;
+						font.lfWidth = 0;
+						font.lfEscapement = 0;
+						font.lfOrientation = 0;
+						font.lfWeight = objectProperties->fontWeight;
+						font.lfItalic = false;
+						font.lfUnderline = false;
+						font.lfStrikeOut = false;
+						font.lfOutPrecision = OUT_DEFAULT_PRECIS;
+						font.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+						font.lfCharSet = DEFAULT_CHARSET;
+						font.lfQuality = DEFAULT_QUALITY;
+						font.lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
+						strcpy(font.lfFaceName, objectProperties->font);
+
+						ImmSetCompositionFontA(hImc, &font);
+					}
+
+					ImmDestroyContext(hImc);
+				}
+
+				timer = new Timer();
 
 				wnd->RegisterObject(timer);
 
-				timer->SetProc(SMOOTHProc(SMOOTHEditBox, this, TimerProc));
+				timer->SetProc(Proc(EditBox, this, TimerProc));
 				timer->Start(500);
 			}
 
@@ -315,11 +383,11 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 			if (!objectProperties->checked && IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				wnd->cursorset = SMOOTH::True;
+				wnd->cursorset = True;
 
 				LiSASetMouseCursor(LiSA_MOUSE_TEXTEDIT);
 
-				objectProperties->checked = SMOOTH::True;
+				objectProperties->checked = True;
 
 				if (!objectProperties->clicked)
 				{
@@ -328,11 +396,11 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 			}
 			else if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				wnd->cursorset = SMOOTH::False;
+				wnd->cursorset = False;
 
 				LiSASetMouseCursor(LiSA_MOUSE_ARROW);
 
-				objectProperties->checked = SMOOTH::False;
+				objectProperties->checked = False;
 
 				if (!objectProperties->clicked)
 				{
@@ -350,11 +418,11 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 			if (objectProperties->checked || objectProperties->clicked)
 			{
-				wnd->cursorset = SMOOTH::False;
+				wnd->cursorset = False;
 
 				LiSASetMouseCursor(LiSA_MOUSE_ARROW);
 
-				objectProperties->checked = SMOOTH::False;
+				objectProperties->checked = False;
 
 				if (!objectProperties->clicked) Frame(dc, frame, FRAME_DOWN);
 			}
@@ -380,8 +448,8 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 					case VK_LEFT:
 						if (promptPos == 0) break;
 
-						if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 						p2.x = p1.x;
@@ -389,27 +457,40 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 						Line(dc, p1, p2, SMOOTH::Setup::ClientColor, PS_SOLID, 1);
 
-						if (!IsBitSet(subtype, EDB_MULTILINE))
+						if (!Binary::IsFlagSet(subtype, EDB_MULTILINE))
 						{
 							promptPos--;
 							linePromptPos--;
 						}
 
-						if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p2.x = p1.x;
 
 						Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 
-						promptVisible = SMOOTH::True;
+						{
+							HIMC		 hImc = ImmGetContext(wnd->hwnd);
+							COMPOSITIONFORM	 info;
+
+							info.dwStyle = CFS_POINT;
+							info.ptCurrentPos.x = p1.x - 3;
+							info.ptCurrentPos.y = p1.y - 2;
+
+							ImmSetCompositionWindow(hImc, &info);
+
+							ImmDestroyContext(hImc);
+						}
+
+						promptVisible = True;
 
 						break;
 					case VK_RIGHT:
 						if (promptPos >= nOfChars) break;
 
-						if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 						p2.x = p1.x;
@@ -417,20 +498,33 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 						Line(dc, p1, p2, SMOOTH::Setup::ClientColor, PS_SOLID, 1);
 
-						if (!IsBitSet(subtype, EDB_MULTILINE))
+						if (!Binary::IsFlagSet(subtype, EDB_MULTILINE))
 						{
 							promptPos++;
 							linePromptPos++;
 						}
 
-						if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p2.x = p1.x;
 
 						Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 
-						promptVisible = SMOOTH::True;
+						{
+							HIMC		 hImc = ImmGetContext(wnd->hwnd);
+							COMPOSITIONFORM	 info;
+
+							info.dwStyle = CFS_POINT;
+							info.ptCurrentPos.x = p1.x - 3;
+							info.ptCurrentPos.y = p1.y - 2;
+
+							ImmSetCompositionWindow(hImc, &info);
+
+							ImmDestroyContext(hImc);
+						}
+
+						promptVisible = True;
 
 						break;
 					case VK_UP:
@@ -438,11 +532,11 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 						break;
 					case VK_DOWN:
-						if (IsBitSet(subtype, EDB_MULTILINE) && (nOfLines > (currLine + 1))) currLine++;
+						if (Binary::IsFlagSet(subtype, EDB_MULTILINE) && (nOfLines > (currLine + 1))) currLine++;
 
 						break;
 					case VK_RETURN:
-						if (IsBitSet(subtype, EDB_MULTILINE))
+						if (Binary::IsFlagSet(subtype, EDB_MULTILINE))
 						{
 // insert multiline code here
 						}
@@ -457,8 +551,8 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 						if (promptPos == 0 && wParam == VK_BACK) break;
 						if (promptPos == nOfChars && wParam == VK_DELETE) break;
 
-						if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 						p2.x = p1.x;
@@ -507,8 +601,8 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 						linePromptPos = prevLinePromptPos;
 						currLine = prevCurrLine;
 
-						if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 						p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 						p2.x = p1.x;
@@ -516,14 +610,27 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 						Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 
-						promptVisible = SMOOTH::True;
+						{
+							HIMC		 hImc = ImmGetContext(wnd->hwnd);
+							COMPOSITIONFORM	 info;
+
+							info.dwStyle = CFS_POINT;
+							info.ptCurrentPos.x = p1.x - 3;
+							info.ptCurrentPos.y = p1.y - 2;
+
+							ImmSetCompositionWindow(hImc, &info);
+
+							ImmDestroyContext(hImc);
+						}
+
+						promptVisible = True;
 
 						break;
 					default:
 						break;
 				}
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			FreeContext(wnd, dc);
@@ -540,7 +647,7 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 				if (wParam >= 32)
 				{
-					if (IsBitSet(subtype, EDB_NUMERIC) && (wParam < '0' || wParam > '9') && wParam != 45 && wParam != '.') break;
+					if (Binary::IsFlagSet(subtype, EDB_NUMERIC) && (wParam < '0' || wParam > '9') && wParam != 45 && wParam != '.') break;
 
 					for (i = 0; i < promptPos; i++)
 					{
@@ -554,8 +661,8 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 						newtext[i+1] = objectProperties->text[i];
 					}
 
-					if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-					else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+					else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 					p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 					p2.x = p1.x;
@@ -576,8 +683,8 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 					linePromptPos = prevLinePromptPos;
 					currLine = prevCurrLine;
 
-					if (!IsBitSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-					else					p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+					else						p1.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 					p1.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 					p2.x = p1.x;
@@ -585,7 +692,20 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 
-					promptVisible = SMOOTH::True;
+					{
+						HIMC		 hImc = ImmGetContext(wnd->hwnd);
+						COMPOSITIONFORM	 info;
+
+						info.dwStyle = CFS_POINT;
+						info.ptCurrentPos.x = p1.x - 3;
+						info.ptCurrentPos.y = p1.y - 2;
+
+						ImmSetCompositionWindow(hImc, &info);
+
+						ImmDestroyContext(hImc);
+					}
+
+					promptVisible = True;
 				}
 			}
 
@@ -598,26 +718,26 @@ SMOOTHInt SMOOTHEditBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 	return retVal;
 }
 
-SMOOTHInt SMOOTHEditBox::Deactivate()
+S::Int S::EditBox::Deactivate()
 {
-	if (!active) return SMOOTH::Success;
+	if (!active) return Success;
 
 	if (!registered)
 	{
-		active = SMOOTH::False;
+		active = False;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 
 	if (objectProperties->clicked)
 	{
 		if (timer != NIL)
 		{
-			SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-			SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+			Layer	*layer = (Layer *) myContainer->GetContainerObject();
+			Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-			if (wnd == NIL) return SMOOTHObject::Deactivate();
-			if (wnd->hwnd == NIL) return SMOOTHObject::Deactivate();
+			if (wnd == NIL) return Object::Deactivate();
+			if (wnd->hwnd == NIL) return Object::Deactivate();
 
 			timer->Stop();
 
@@ -628,13 +748,13 @@ SMOOTHInt SMOOTHEditBox::Deactivate()
 			timer = NIL;
 		}
 
-		objectProperties->clicked = SMOOTH::False;
+		objectProperties->clicked = False;
 	}
 
-	return SMOOTHObject::Deactivate();
+	return Object::Deactivate();
 }
 
-SMOOTHInt SMOOTHEditBox::SetText(SMOOTHString txt)
+S::Int S::EditBox::SetText(String txt)
 {
 	objectProperties->text = txt;
 
@@ -657,17 +777,17 @@ SMOOTHInt SMOOTHEditBox::SetText(SMOOTHString txt)
 	{
 		Paint(SP_PAINT);
 
-		SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+		ProcCall(objectProperties->proc, objectProperties->procParam);
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHEditBox::CountLines()
+S::Int S::EditBox::CountLines()
 {
-	SMOOTHInt	 retVal = 1;
-	SMOOTHString	 currLine;
-	SMOOTHInt	 currPos = 0;
+	Int	 retVal = 1;
+	String	 currLine;
+	Int	 currPos = 0;
 
 	lines.DeleteAll();
 
@@ -696,18 +816,18 @@ SMOOTHInt SMOOTHEditBox::CountLines()
 			i++;
 		}
 
-		if (objectProperties->text[i] == 13 || objectProperties->text[i] == 10)	i--;
-		else									currLine[(int) currPos++] = objectProperties->text[i];
+		if (objectProperties->text[i] == 13 || objectProperties->text[i] == 10) i--;
+		else currLine[(int) currPos++] = objectProperties->text[i];
 	}
 
 	return retVal;
 }
 
-SMOOTHString SMOOTHEditBox::GetLine(SMOOTHInt number)
+S::String S::EditBox::GetLine(Int number)
 {
 	if (number >= nOfLines) return NIL;
 
-	if (!IsBitSet(subtype, EDB_ASTERISK))
+	if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))
 	{
 		if (number == currLine) return visText;
 
@@ -715,28 +835,28 @@ SMOOTHString SMOOTHEditBox::GetLine(SMOOTHInt number)
 	}
 	else
 	{
-		if (number == currLine) return SMOOTHString().FillN('*', visText.Length());
+		if (number == currLine) return String().FillN('*', visText.Length());
 
-		return SMOOTHString().FillN('*', lines.GetEntry(number).Length());
+		return String().FillN('*', lines.GetEntry(number).Length());
 	}
 }
 
-SMOOTHVoid SMOOTHEditBox::TimerProc()
+S::Void S::EditBox::TimerProc()
 {
 	if (!registered)		return;
 	if (!active || !visible)	return;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
 	if (wnd == NIL) return;
 	if (wnd->hwnd == NIL) return;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHRect	 frame;
-	SMOOTHPoint	 lineStart;
-	SMOOTHPoint	 lineEnd;
-	HDC		 dc;
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
+	Point	 lineStart;
+	Point	 lineEnd;
+	HDC	 dc;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -745,8 +865,8 @@ SMOOTHVoid SMOOTHEditBox::TimerProc()
 
 	dc = GetContext(wnd);
 
-	if (!IsBitSet(subtype, EDB_ASTERISK))	lineStart.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-	else					lineStart.x = frame.left + 4 + GetTextSizeXNoExtend(dc, SMOOTHString().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	lineStart.x = frame.left + 4 + GetTextSizeXNoExtend(dc, visText, linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	else						lineStart.x = frame.left + 4 + GetTextSizeXNoExtend(dc, String().FillN('*', linePromptPos - leftCut), linePromptPos - leftCut, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
 
 	lineStart.y = frame.top + 2 + currLine * METRIC_EDITBOXLINEHEIGHT;
 	lineEnd.x = lineStart.x;
@@ -759,5 +879,3 @@ SMOOTHVoid SMOOTHEditBox::TimerProc()
 
 	FreeContext(wnd, dc);
 }
-
-#endif

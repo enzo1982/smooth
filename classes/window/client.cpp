@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,61 +8,58 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_CLIENT_
-#define __OBJSMOOTH_CLIENT_
-
 #include <smooth/client.h>
 #include <smooth/window.h>
 #include <smooth/toolkit.h>
 #include <smooth/object.h>
-#include <smooth/divisionbar.h>
+#include <smooth/divider.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
-#include <smooth/binary.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/surface.h>
+#include <smooth/binary.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_CLIENT = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_CLIENT = S::Object::RequestObjectID();
 
-SMOOTHClient::SMOOTHClient(SMOOTHProcParam, SMOOTHVoid *procParam)
+S::Client::Client(ProcParam, Void *procParam)
 {
 	type				= OBJ_CLIENT;
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 	objectProperties->orientation	= OR_CENTER;
 
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-SMOOTHClient::~SMOOTHClient()
+S::Client::~Client()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHClient::Paint(SMOOTHInt message)
+S::Int S::Client::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHSurface		*surface = myContainer->GetDrawSurface();
-	SMOOTHWindow		*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Surface	*surface = myContainer->GetDrawSurface();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
-	SMOOTHObject		*object;
-	SMOOTHDivisionbar	*db;
-	SMOOTHRect		 clientFrame;
-	SMOOTHRect		 client;
+	Object	*object;
+	Divider	*db;
+	Rect	 clientFrame;
+	Rect	 client;
 
 	updateRect = wnd->GetUpdateRect();
 
@@ -71,25 +68,25 @@ SMOOTHInt SMOOTHClient::Paint(SMOOTHInt message)
 	client.right	= objectProperties->size.cx + objectProperties->pos.x - 1;
 	client.bottom	= objectProperties->size.cy + objectProperties->pos.y - 2;
 
-	for (SMOOTHInt i = SMOOTHObject::objectCount - 1; i >= 0; i--)
+	for (Int i = Object::objectCount - 1; i >= 0; i--)
 	{
 		object = mainObjectManager->RequestObject(i);
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == OBJ_DIVISIONBAR && object->GetContainer() == myContainer)
+			if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
 			{
-				db = (SMOOTHDivisionbar *) object;
+				db = (Divider *) object;
 
-				if (IsBitSet(db->orientation, OR_VERT))
+				if (Binary::IsFlagSet(db->orientation, OR_VERT))
 				{
-					if (IsBitSet(db->orientation, OR_LEFT) && db->GetObjectProperties()->pos.x >= client.left - 3)		client.left = db->GetObjectProperties()->pos.x + 5;
-					else if (!IsBitSet(db->orientation, OR_LEFT) && db->GetObjectProperties()->pos.x <= client.right + 1)	client.right = wnd->GetObjectProperties()->size.cx - db->GetObjectProperties()->pos.x - 2;
+					if (Binary::IsFlagSet(db->orientation, OR_LEFT) && db->GetObjectProperties()->pos.x >= client.left - 3)		client.left = db->GetObjectProperties()->pos.x + 5;
+					else if (!Binary::IsFlagSet(db->orientation, OR_LEFT) && db->GetObjectProperties()->pos.x <= client.right + 1)	client.right = wnd->GetObjectProperties()->size.cx - db->GetObjectProperties()->pos.x - 2;
 				}
-				else if (IsBitSet(db->orientation, OR_HORZ))
+				else if (Binary::IsFlagSet(db->orientation, OR_HORZ))
 				{
-					if (IsBitSet(db->orientation, OR_TOP) && db->GetObjectProperties()->pos.y >= client.top - 2)		client.top = db->GetObjectProperties()->pos.y + 5;
-					else if (!IsBitSet(db->orientation, OR_TOP) && db->GetObjectProperties()->pos.y <= client.bottom + 1)	client.bottom = wnd->GetObjectProperties()->size.cy - db->GetObjectProperties()->pos.y - 2;
+					if (Binary::IsFlagSet(db->orientation, OR_TOP) && db->GetObjectProperties()->pos.y >= client.top - 2)		client.top = db->GetObjectProperties()->pos.y + 5;
+					else if (!Binary::IsFlagSet(db->orientation, OR_TOP) && db->GetObjectProperties()->pos.y <= client.bottom + 1)	client.bottom = wnd->GetObjectProperties()->size.cy - db->GetObjectProperties()->pos.y - 2;
 				}
 			}
 		}
@@ -97,7 +94,7 @@ SMOOTHInt SMOOTHClient::Paint(SMOOTHInt message)
 
 	if (DoRectsOverlap(updateRect, client))
 	{
-		SMOOTHRect	 intersectRect;
+		Rect	 intersectRect;
 
 		updateRect.right += 5;
 		updateRect.bottom += 5;
@@ -131,31 +128,31 @@ SMOOTHInt SMOOTHClient::Paint(SMOOTHInt message)
 		updateRect.right	= min(GetSize().cx - 1, updateRect.right) + 5;
 		updateRect.bottom	= min(GetSize().cy - 1, updateRect.bottom) + 5;
 
-		SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+		ProcCall(objectProperties->proc, objectProperties->procParam);
 	}
 	else
 	{
-		updateRect = SMOOTHRect(SMOOTHPoint(0, 0), SMOOTHSize(0, 0));
+		updateRect = Rect(Point(0, 0), Size(0, 0));
 	}
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHRect SMOOTHClient::GetUpdateRect()
+S::Rect S::Client::GetUpdateRect()
 {
 	return updateRect;
 }
 
-SMOOTHSize SMOOTHClient::GetSize()
+S::Size S::Client::GetSize()
 {
-	return SMOOTHSize(objectProperties->size.cx - 6, objectProperties->size.cy - 7);
+	return Size(objectProperties->size.cx - 6, objectProperties->size.cy - 7);
 }
 
-SMOOTHInt SMOOTHClient::BlitFromBitmap(HBITMAP bitmap, SMOOTHRect srcRect, SMOOTHRect destRect)
+S::Int S::Client::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
 {
-	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	destRect.left	+= (objectProperties->pos.x + 3);
 	destRect.top	+= (objectProperties->pos.y + 3);
@@ -165,9 +162,9 @@ SMOOTHInt SMOOTHClient::BlitFromBitmap(HBITMAP bitmap, SMOOTHRect srcRect, SMOOT
 	return surface->BlitFromBitmap(bitmap, srcRect, destRect);
 }
 
-SMOOTHInt SMOOTHClient::BlitToBitmap(SMOOTHRect srcRect, HBITMAP bitmap, SMOOTHRect destRect)
+S::Int S::Client::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
 {
-	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	srcRect.left	+= (objectProperties->pos.x + 3);
 	srcRect.top	+= (objectProperties->pos.y + 3);
@@ -176,5 +173,3 @@ SMOOTHInt SMOOTHClient::BlitToBitmap(SMOOTHRect srcRect, HBITMAP bitmap, SMOOTHR
 
 	return surface->BlitToBitmap(srcRect, bitmap, destRect);
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_OBJECT_
-#define __OBJSMOOTH_OBJECT_
 
 #include <smooth/object.h>
 #include <smooth/objectproperties.h>
@@ -25,14 +22,15 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_OBJECT = SMOOTH::RequestObjectID();
-SMOOTHInt	 SMOOTHObject::objectCount = 0;
+S::Int	 S::OBJ_OBJECT = S::Object::RequestObjectID();
+S::Int	 S::Object::objectCount = 0;
+S::Int	 S::Object::nextID = 0;
 
-SMOOTHObject::SMOOTHObject()
+S::Object::Object()
 {
-	objectProperties		= new SMOOTHObjectProperties();
+	objectProperties		= new ObjectProperties();
 
-	handle				= SMOOTH::RequestObjectHandle();
+	handle				= RequestObjectHandle();
 
 	type.object			= this;
 	type				= OBJ_OBJECT;
@@ -41,11 +39,11 @@ SMOOTHObject::SMOOTHObject()
 	objectProperties->proc		= NIL;
 	objectProperties->procParam	= NIL;
 
-	registered			= SMOOTH::False;
-	visible				= SMOOTH::False;
-	active				= SMOOTH::True;
+	registered			= False;
+	visible				= False;
+	active				= True;
 
-	deleteObject			= SMOOTH::False;
+	deleteObject			= False;
 	inUse				= 0;
 
 	myContainer			= NIL;
@@ -53,64 +51,57 @@ SMOOTHObject::SMOOTHObject()
 	mainObjectManager->RegisterObject(this);
 }
 
-SMOOTHObject::~SMOOTHObject()
+S::Object::~Object()
 {
 	mainObjectManager->UnregisterObject(this);
 
 	delete objectProperties;
 }
 
-SMOOTHInt SMOOTHObject::EnterProtectedRegion()
+S::Int S::Object::EnterProtectedRegion()
 {
 	return ++inUse;
 }
 
-SMOOTHInt SMOOTHObject::LeaveProtectedRegion()
+S::Int S::Object::LeaveProtectedRegion()
 {
 	return --inUse;
 }
 
-SMOOTHInt SMOOTHObject::IsObjectInUse()
+S::Int S::Object::IsObjectInUse()
 {
 	return inUse;
 }
 
-SMOOTHBool SMOOTHObject::IsObjectDeleteable()
+S::Bool S::Object::IsObjectDeleteable()
 {
 	return deleteObject;
 }
 
-SMOOTHInt SMOOTHObject::DeleteObject()
+S::Int S::Object::Show()
 {
-	deleteObject = SMOOTH::True;
+	if (visible)		return Success;
 
-	return SMOOTH::Success;
-}
+	visible = True;
 
-SMOOTHInt SMOOTHObject::Show()
-{
-	if (visible)		return SMOOTH::Success;
-
-	visible = SMOOTH::True;
-
-	if (!registered)	return SMOOTH::Success;
+	if (!registered)	return Success;
 
 	Paint(SP_PAINT);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::Hide()
+S::Int S::Object::Hide()
 {
-	if (!visible)		return SMOOTH::Success;
+	if (!visible)		return Success;
 
-	visible = SMOOTH::False;
+	visible = False;
 
-	if (!registered)	return SMOOTH::Success;
+	if (!registered)	return Success;
 
-	SMOOTHRect	 rect;
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
+	Rect	 rect;
+	Point	 realPos = GetRealPosition();
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	rect.left	= realPos.x;
 	rect.top	= realPos.y;
@@ -119,58 +110,58 @@ SMOOTHInt SMOOTHObject::Hide()
 
 	surface->Box(rect, SMOOTH::Setup::BackgroundColor, FILLED);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::Activate()
+S::Int S::Object::Activate()
 {
-	if (active) return SMOOTH::Success;
+	if (active) return Success;
 
-	SMOOTHBool	 prevVisible = visible;
+	Bool	 prevVisible = visible;
 
 	if (registered && visible) Hide();
 
-	active = SMOOTH::True;
+	active = True;
 
 	if (registered && prevVisible) Show();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::Deactivate()
+S::Int S::Object::Deactivate()
 {
-	if (!active) return SMOOTH::Success;
+	if (!active) return Success;
 
-	SMOOTHBool	 prevVisible = visible;
+	Bool	 prevVisible = visible;
 
 	if (registered && visible) Hide();
 
-	active = SMOOTH::False;
+	active = False;
 
 	if (registered && prevVisible) Show();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::Paint(SMOOTHInt message)
+S::Int S::Object::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Object::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::SetText(SMOOTHString newText)
+S::Int S::Object::SetText(String newText)
 {
-	SMOOTHBool	 prevVisible = visible;
+	Bool	 prevVisible = visible;
 
 	if (registered && visible) Hide();
 
@@ -178,46 +169,46 @@ SMOOTHInt SMOOTHObject::SetText(SMOOTHString newText)
 
 	GetTextSize();
 
-	objectProperties->checked = SMOOTH::False;
-	objectProperties->clicked = SMOOTH::False;
+	objectProperties->checked = False;
+	objectProperties->clicked = False;
 
 	if (registered && prevVisible) Show();
 
 	Process(SM_MOUSEMOVE, 0, 0);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHString SMOOTHObject::GetText()
+S::String S::Object::GetText()
 {
 	return objectProperties->text;
 }
 
-SMOOTHInt SMOOTHObject::SetTooltip(SMOOTHString newTooltip)
+S::Int S::Object::SetTooltip(String newTooltip)
 {
 	objectProperties->tooltip = newTooltip;
 
 	GetTextSize();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHString SMOOTHObject::GetTooltip()
+S::String S::Object::GetTooltip()
 {
 	return objectProperties->tooltip;
 }
 
-SMOOTHInt SMOOTHObject::SetProc(SMOOTHProcParam, SMOOTHVoid *newProcParam)
+S::Int S::Object::SetProc(ProcParam, Void *newProcParam)
 {
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= newProcParam;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::SetFont(SMOOTHString newFont, SMOOTHInt newFontSize, SMOOTHInt newFontColor, SMOOTHInt newFontWeight)
+S::Int S::Object::SetFont(String newFont, Int newFontSize, Int newFontColor, Int newFontWeight)
 {
-	SMOOTHBool	 prevVisible = visible;
+	Bool	 prevVisible = visible;
 
 	if (registered && visible) Hide();
 
@@ -238,12 +229,12 @@ SMOOTHInt SMOOTHObject::SetFont(SMOOTHString newFont, SMOOTHInt newFontSize, SMO
 
 	if (registered && prevVisible) Show();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::SetOrientation(SMOOTHInt newOrientation)
+S::Int S::Object::SetOrientation(Int newOrientation)
 {
-	SMOOTHBool	 prevVisible = visible;
+	Bool	 prevVisible = visible;
 
 	if (registered && visible) Hide();
 
@@ -251,12 +242,12 @@ SMOOTHInt SMOOTHObject::SetOrientation(SMOOTHInt newOrientation)
 
 	if (registered && prevVisible) Show();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::SetPosition(SMOOTHPoint newPos)
+S::Int S::Object::SetPosition(Point newPos)
 {
-	SMOOTHBool	 prevVisible = visible;
+	Bool	 prevVisible = visible;
 
 	if (registered && visible) Hide();
 
@@ -264,12 +255,12 @@ SMOOTHInt SMOOTHObject::SetPosition(SMOOTHPoint newPos)
 
 	if (registered && prevVisible) Show();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObject::SetMetrics(SMOOTHPoint newPos, SMOOTHSize newSize)
+S::Int S::Object::SetMetrics(Point newPos, Size newSize)
 {
-	SMOOTHBool	 prevVisible = visible;
+	Bool	 prevVisible = visible;
 
 	if (registered && visible) Hide();
 
@@ -278,32 +269,32 @@ SMOOTHInt SMOOTHObject::SetMetrics(SMOOTHPoint newPos, SMOOTHSize newSize)
 
 	if (registered && prevVisible) Show();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHBool SMOOTHObject::IsRegistered()
+S::Bool S::Object::IsRegistered()
 {
 	return registered;
 }
 
-SMOOTHBool SMOOTHObject::IsVisible()
+S::Bool S::Object::IsVisible()
 {
 	return visible;
 }
 
-SMOOTHBool SMOOTHObject::IsActive()
+S::Bool S::Object::IsActive()
 {
 	return active;
 }
 
-SMOOTHPoint SMOOTHObject::GetRealPosition()
+S::Point S::Object::GetRealPosition()
 {
 	if (!registered) return objectProperties->pos;
 
-	SMOOTHLayer	*layer = NIL;
-	SMOOTHPoint	 realPos = objectProperties->pos;
+	Layer	*layer = NIL;
+	Point	 realPos = objectProperties->pos;
 
-	if (myContainer->GetContainerObject()->GetObjectType() == OBJ_LAYER)	layer = (SMOOTHLayer *) myContainer->GetContainerObject();
+	if (myContainer->GetContainerObject()->GetObjectType() == OBJ_LAYER)	layer = (Layer *) myContainer->GetContainerObject();
 	else									return realPos;
 
 	realPos.x = layer->GetObjectProperties()->pos.x + objectProperties->pos.x;
@@ -326,45 +317,45 @@ SMOOTHPoint SMOOTHObject::GetRealPosition()
 	return realPos;
 }
 
-SMOOTHBool SMOOTHObject::IsTypeCompatible(SMOOTHInt objType)
+S::Bool S::Object::IsTypeCompatible(Int objType)
 {
-	if (objType == OBJ_OBJECT)	return SMOOTH::True;
-	else				return SMOOTH::False;
+	if (objType == OBJ_OBJECT)	return True;
+	else				return False;
 }
 
-SMOOTHObjectProperties *SMOOTHObject::GetObjectProperties()
+S::ObjectProperties *S::Object::GetObjectProperties()
 {
 	return objectProperties;
 }
 
-SMOOTHObjectType SMOOTHObject::GetObjectType()
+S::ObjectType S::Object::GetObjectType()
 {
 	return type;
 }
 
-SMOOTHInt SMOOTHObject::SetContainer(SMOOTHContainer *newContainer)
+S::Int S::Object::SetContainer(Container *newContainer)
 {
 	myContainer = newContainer;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHContainer *SMOOTHObject::GetContainer()
+S::Container *S::Object::GetContainer()
 {
 	return myContainer;
 }
 
-SMOOTHVoid SMOOTHObject::SetRegisteredFlag()
+S::Void S::Object::SetRegisteredFlag()
 {
-	registered = SMOOTH::True;
+	registered = True;
 }
 
-SMOOTHVoid SMOOTHObject::UnsetRegisteredFlag()
+S::Void S::Object::UnsetRegisteredFlag()
 {
-	registered = SMOOTH::False;
+	registered = False;
 }
 
-SMOOTHVoid SMOOTHObject::GetTextSize()
+S::Void S::Object::GetTextSize()
 {
 	HDC	 dc = GetContext(0);
 
@@ -379,4 +370,31 @@ SMOOTHVoid SMOOTHObject::GetTextSize()
 	FreeContext(0, dc);
 }
 
-#endif
+S::Int S::Object::DeleteObject(Object *object)
+{
+	if (object != NIL)
+	{
+		if (!object->IsObjectInUse())
+		{
+			delete object;
+
+			return Success;
+		}
+
+		object->deleteObject = True;
+
+		return Success;
+	}
+
+	return Error;
+}
+
+S::Int S::Object::RequestObjectID()
+{
+	return nextID++;
+}
+
+S::Int S::Object::RequestObjectHandle()
+{
+	return 	objectCount++;
+}

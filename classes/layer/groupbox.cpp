@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,15 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_GROUPBOX_
-#define __OBJSMOOTH_GROUPBOX_
-
 #include <smooth/groupbox.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -26,46 +23,46 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_GROUPBOX = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_GROUPBOX = S::Object::RequestObjectID();
 
-SMOOTHGroupBox::SMOOTHGroupBox(SMOOTHString text, SMOOTHPoint pos, SMOOTHSize size)
+S::GroupBox::GroupBox(String text, Point pos, Size size)
 {
 	type			= OBJ_GROUPBOX;
 	objectProperties->text	= text;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = roundtoint(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = roundtoint(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(80 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 
 	GetTextSize();
 }
 
-SMOOTHGroupBox::~SMOOTHGroupBox()
+S::GroupBox::~GroupBox()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHGroupBox::Paint(SMOOTHInt message)
+S::Int S::GroupBox::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHRect	 textRect;
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHRect	 frame;
+	HDC	 dc = GetContext(wnd);
+	Rect	 textRect;
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -84,7 +81,7 @@ SMOOTHInt SMOOTHGroupBox::Paint(SMOOTHInt message)
 	textRect.left	= frame.left + 9;
 	textRect.top	= frame.top - METRIC_GBTEXTOFFSETY;
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
-	textRect.bottom	= textRect.top + roundtoint(objectProperties->textSize.cy * 1.2);
+	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
 	Box(dc, textRect, SMOOTH::Setup::BackgroundColor, FILLED);
 
@@ -95,30 +92,30 @@ SMOOTHInt SMOOTHGroupBox::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHGroupBox::Activate()
+S::Int S::GroupBox::Activate()
 {
-	active = SMOOTH::True;
+	active = True;
 
-	if (!registered)	return SMOOTH::Success;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Success;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHRect	 textRect;
-	SMOOTHPoint	 realPos = GetRealPosition();
+	HDC	 dc = GetContext(wnd);
+	Rect	 textRect;
+	Point	 realPos = GetRealPosition();
 
 	textRect.left	= realPos.x + 10;
 	textRect.top	= realPos.y - METRIC_GBTEXTOFFSETY + 1;
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
-	textRect.bottom	= textRect.top + roundtoint(objectProperties->textSize.cy * 1.2);
+	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
 	Box(dc, textRect, SMOOTH::Setup::BackgroundColor, FILLED);
 
@@ -128,30 +125,30 @@ SMOOTHInt SMOOTHGroupBox::Activate()
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHGroupBox::Deactivate()
+S::Int S::GroupBox::Deactivate()
 {
-	active = SMOOTH::False;
+	active = False;
 
-	if (!registered)	return SMOOTH::Success;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Success;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHRect	 textRect;
-	SMOOTHPoint	 realPos = GetRealPosition();
+	HDC	 dc = GetContext(wnd);
+	Rect	 textRect;
+	Point	 realPos = GetRealPosition();
 
 	textRect.left	= realPos.x + 10;
 	textRect.top	= realPos.y - METRIC_GBTEXTOFFSETY + 1;
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
-	textRect.bottom	= textRect.top + roundtoint(objectProperties->textSize.cy * 1.2);
+	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
 	Box(dc, textRect, SMOOTH::Setup::BackgroundColor, FILLED);
 
@@ -161,25 +158,25 @@ SMOOTHInt SMOOTHGroupBox::Deactivate()
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHGroupBox::Hide()
+S::Int S::GroupBox::Hide()
 {
-	if (!visible)		return SMOOTH::Success;
+	if (!visible)		return Success;
 
-	visible = SMOOTH::False;
+	visible = False;
 
-	if (!registered)	return SMOOTH::Success;
+	if (!registered)	return Success;
 
-	SMOOTHRect	 rect;
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
+	Rect	 rect;
+	Point	 realPos = GetRealPosition();
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	rect.left	= realPos.x + 10;
 	rect.top	= realPos.y - METRIC_GBTEXTOFFSETY + 1;
 	rect.right	= rect.left + objectProperties->textSize.cx + 3;
-	rect.bottom	= rect.top + roundtoint(objectProperties->textSize.cy * 1.2);
+	rect.bottom	= rect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
 	surface->Box(rect, SMOOTH::Setup::BackgroundColor, FILLED);
 
@@ -190,7 +187,5 @@ SMOOTHInt SMOOTHGroupBox::Hide()
 
 	surface->Box(rect, SMOOTH::Setup::BackgroundColor, FILLED);
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

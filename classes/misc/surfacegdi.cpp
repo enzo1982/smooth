@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,14 +8,11 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_SURFACEGDI_
-#define __OBJSMOOTH_SURFACEGDI_
-
 #include <smooth/surfacegdi.h>
 #include <smooth/stk.h>
 #include <smooth/toolkit.h>
 
-SMOOTHSurfaceGDI::SMOOTHSurfaceGDI(HDC iDc)
+S::SurfaceGDI::SurfaceGDI(HDC iDc)
 {
 	gdi_dc = iDc;
 
@@ -23,23 +20,23 @@ SMOOTHSurfaceGDI::SMOOTHSurfaceGDI(HDC iDc)
 	size.cy	= 0;
 }
 
-SMOOTHSurfaceGDI::~SMOOTHSurfaceGDI()
+S::SurfaceGDI::~SurfaceGDI()
 {
 }
 
-SMOOTHInt SMOOTHSurfaceGDI::SetPixel(SMOOTHInt x, SMOOTHInt y, SMOOTHInt color)
+S::Int S::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 {
 	::SetPixel(gdi_dc, x, y, color);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurfaceGDI::GetPixel(SMOOTHInt x, SMOOTHInt y)
+S::Int S::SurfaceGDI::GetPixel(Int x, Int y)
 {
 	return ::GetPixel(gdi_dc, x, y);
 }
 
-SMOOTHInt SMOOTHSurfaceGDI::Line(SMOOTHPoint pos1, SMOOTHPoint pos2, SMOOTHInt color)
+S::Int S::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
 {
 	HPEN	 hPen = CreatePen(PS_SOLID, 1, color);
 	HPEN	 hOldPen = (HPEN) SelectObject(gdi_dc, hPen);
@@ -50,17 +47,17 @@ SMOOTHInt SMOOTHSurfaceGDI::Line(SMOOTHPoint pos1, SMOOTHPoint pos2, SMOOTHInt c
 	hPen = (HPEN) SelectObject(gdi_dc, hOldPen);
 	DeleteObject(hPen);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurfaceGDI::Frame(SMOOTHRect rect, SMOOTHInt style)
+S::Int S::SurfaceGDI::Frame(Rect rect, Int style)
 {
-	long		 color1 = 0;
-	long		 color2 = 0;
-	SMOOTHPoint	 p1;
-	SMOOTHPoint	 p2;
-	SMOOTHPoint	 p3;
-	SMOOTHPoint	 p4;
+	Long	 color1 = 0;
+	Long	 color2 = 0;
+	Point	 p1;
+	Point	 p2;
+	Point	 p3;
+	Point	 p4;
 
 	p1.x = rect.left;
 	p1.y = rect.top;
@@ -94,10 +91,10 @@ SMOOTHInt SMOOTHSurfaceGDI::Frame(SMOOTHRect rect, SMOOTHInt style)
 	p4.x++;
 	Line(p3, p4, color2);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurfaceGDI::Box(SMOOTHRect rect, SMOOTHInt color, SMOOTHInt style)
+S::Int S::SurfaceGDI::Box(Rect rect, Int color, Int style)
 {
 	HBRUSH	 brush = CreateSolidBrush(color);
 	RECT	 wRect = rect;
@@ -106,73 +103,73 @@ SMOOTHInt SMOOTHSurfaceGDI::Box(SMOOTHRect rect, SMOOTHInt color, SMOOTHInt styl
 	else if (style == OUTLINED)	FrameRect(gdi_dc, &wRect, brush);
 	else
 	{
-		bool	 dot = false;
-		int	 x;
-		int	 y = rect.top;
+		Bool	 dot = False;
+		Int	 x;
+		Int	 y = rect.top;
 
 		for (x = rect.left; x < rect.right - 1; x++)
 		{
-			if (dot == true)
+			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
-				dot = false;
+				dot = False;
 			}
-			else dot = true;
+			else dot = True;
 		}
 
 		x = rect.right - 1;
 
 		for (y = rect.top; y < rect.bottom; y++)
 		{
-			if (dot == true)
+			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
-				dot = false;
+				dot = False;
 			}
-			else dot = true;
+			else dot = True;
 		}
 
 		y = rect.bottom - 1;
 
 		for (x = rect.right - 2; x >= rect.left; x--)
 		{
-			if (dot == true)
+			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
-				dot = false;
+				dot = False;
 			}
-			else dot = true;
+			else dot = True;
 		}
 
 		x = rect.left;
 
 		for (y = rect.bottom - 2; y >= rect.top; y--)
 		{
-			if (dot == true)
+			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
-				dot = false;
+				dot = False;
 			}
-			else dot = true;
+			else dot = True;
 		}
 	}
 
 	DeleteObject(brush);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurfaceGDI::SetText(SMOOTHString string, SMOOTHRect rect, SMOOTHString font, SMOOTHInt size, SMOOTHInt color, SMOOTHInt weight)
+S::Int S::SurfaceGDI::SetText(String string, Rect rect, String font, Int size, Int color, Int weight)
 {
-	HFONT		 hfont;
-	HFONT		 holdfont;
-	int		 lines = 1;
-	int		 offset = 0;
-	int		 origoffset;
-	int		 height = GetLineSizeY(gdi_dc, string, font, size, weight) + 3;
-	int		 txtsize = string.Length();
-	int		 i;
-	SMOOTHString	 line;
+	HFONT	 hfont;
+	HFONT	 holdfont;
+	int	 lines = 1;
+	int	 offset = 0;
+	int	 origoffset;
+	int	 height = GetLineSizeY(gdi_dc, string, font, size, weight) + 3;
+	int	 txtsize = string.Length();
+	int	 i;
+	String	 line;
 
 	for (i = 0; i < txtsize; i++) if (string[i] == 10) lines++;
 
@@ -211,8 +208,8 @@ SMOOTHInt SMOOTHSurfaceGDI::SetText(SMOOTHString string, SMOOTHRect rect, SMOOTH
 
 		RECT	 Rect = rect;
 
-		if (SMOOTH::Setup::enableUnicode)	DrawTextW(gdi_dc, line, -1, &Rect, DT_LEFT);
-		else					DrawTextA(gdi_dc, line, -1, &Rect, DT_LEFT);
+		if (SMOOTH::Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS, NIL);
+		else					DrawTextExA(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS, NIL);
 
 		rect.top += height;
 	}
@@ -220,10 +217,10 @@ SMOOTHInt SMOOTHSurfaceGDI::SetText(SMOOTHString string, SMOOTHRect rect, SMOOTH
 	SelectObject(gdi_dc, holdfont);
 	DeleteObject(hfont);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurfaceGDI::BlitFromBitmap(HBITMAP bitmap, SMOOTHRect srcRect, SMOOTHRect destRect)
+S::Int S::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
 {
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);
@@ -235,10 +232,10 @@ SMOOTHInt SMOOTHSurfaceGDI::BlitFromBitmap(HBITMAP bitmap, SMOOTHRect srcRect, S
 	DeleteDC(cdc);
 	DestroyBitmap(backup);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurfaceGDI::BlitToBitmap(SMOOTHRect srcRect, HBITMAP bitmap, SMOOTHRect destRect)
+S::Int S::SurfaceGDI::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
 {
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);
@@ -250,7 +247,5 @@ SMOOTHInt SMOOTHSurfaceGDI::BlitToBitmap(SMOOTHRect srcRect, HBITMAP bitmap, SMO
 	DeleteDC(cdc);
 	DestroyBitmap(backup);
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,15 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_HYPERLINK_
-#define __OBJSMOOTH_HYPERLINK_
-
 #include <smooth/hyperlink.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -26,9 +23,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_HYPERLINK = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_HYPERLINK = S::Object::RequestObjectID();
 
-SMOOTHHyperlink::SMOOTHHyperlink()
+S::Hyperlink::Hyperlink()
 {
 	type		= OBJ_HYPERLINK;
 	linkURL		= NIL;
@@ -37,7 +34,7 @@ SMOOTHHyperlink::SMOOTHHyperlink()
 	possibleContainers.AddEntry(OBJ_LAYER);
 }
 
-SMOOTHHyperlink::SMOOTHHyperlink(SMOOTHString text, HBITMAP bitmap, SMOOTHString link, SMOOTHPoint pos, SMOOTHSize size)
+S::Hyperlink::Hyperlink(String text, HBITMAP bitmap, String link, Point pos, Size size)
 {
 	type			= OBJ_HYPERLINK;
 	objectProperties->text	= text;
@@ -46,20 +43,20 @@ SMOOTHHyperlink::SMOOTHHyperlink(SMOOTHString text, HBITMAP bitmap, SMOOTHString
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
 	if (linkBitmap != NIL)
 	{
 		if (size.cx == 0 && size.cy == 0)
 		{
-			objectProperties->size.cx = roundtoint(GetBitmapSizeX(linkBitmap) * SMOOTH::Setup::FontSize);
-			objectProperties->size.cy = roundtoint(GetBitmapSizeY(linkBitmap) * SMOOTH::Setup::FontSize);
+			objectProperties->size.cx = Math::Round(GetBitmapSizeX(linkBitmap) * SMOOTH::Setup::FontSize);
+			objectProperties->size.cy = Math::Round(GetBitmapSizeY(linkBitmap) * SMOOTH::Setup::FontSize);
 		}
 		else
 		{
-			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 		}
 	}
 	else
@@ -71,22 +68,22 @@ SMOOTHHyperlink::SMOOTHHyperlink(SMOOTHString text, HBITMAP bitmap, SMOOTHString
 	}
 }
 
-SMOOTHHyperlink::~SMOOTHHyperlink()
+S::Hyperlink::~Hyperlink()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHHyperlink::Hide()
+S::Int S::Hyperlink::Hide()
 {
-	if (!visible) return SMOOTH::Success;
+	if (!visible) return Success;
 
-	visible = SMOOTH::False;
+	visible = False;
 
-	if (!registered) return SMOOTH::Success;
+	if (!registered) return Success;
 
-	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
-	SMOOTHRect	 rect;
-	SMOOTHPoint	 realPos = GetRealPosition();
+	Surface	*surface = myContainer->GetDrawSurface();
+	Rect	 rect;
+	Point	 realPos = GetRealPosition();
 
 	if (linkBitmap == NIL) objectProperties->size = objectProperties->textSize;
 
@@ -97,23 +94,23 @@ SMOOTHInt SMOOTHHyperlink::Hide()
 
 	surface->Box(rect, SMOOTH::Setup::BackgroundColor, FILLED);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHHyperlink::Paint(SMOOTHInt message)
+S::Int S::Hyperlink::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHRect	 textRect;
-	SMOOTHPoint	 realPos = GetRealPosition();
+	HDC	 dc = GetContext(wnd);
+	Rect	 textRect;
+	Point	 realPos = GetRealPosition();
 
 #ifdef __WIN32__
 	HFONT		 hfont;
@@ -145,8 +142,8 @@ SMOOTHInt SMOOTHHyperlink::Paint(SMOOTHInt message)
 				break;
 		}
 
-		if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, SMOOTH::True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
-		else					hfont = CreateFontA(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, SMOOTH::True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
+		if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
+		else					hfont = CreateFontA(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
 
 		holdfont = (HFONT) SelectObject(dc, hfont);
 
@@ -167,23 +164,23 @@ SMOOTHInt SMOOTHHyperlink::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHHyperlink::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Hyperlink::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHRect	 textRect;
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
+	Rect	 textRect;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
 
 	textRect.left	= realPos.x;
 	textRect.top	= realPos.y;
@@ -209,15 +206,15 @@ SMOOTHInt SMOOTHHyperlink::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 				wnd->Process(SM_MOUSEMOVE, 0, 0);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 			break;
 		case SM_MOUSELEAVE:
 			if (!IsMouseOn(wnd->hwnd, textRect, WINDOW) && objectProperties->checked)
 			{
-				objectProperties->checked = SMOOTH::False;
+				objectProperties->checked = False;
 
-				wnd->cursorset = SMOOTH::False;
+				wnd->cursorset = False;
 
 				LiSASetMouseCursor(LiSA_MOUSE_ARROW);
 
@@ -227,9 +224,9 @@ SMOOTHInt SMOOTHHyperlink::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 		case SM_MOUSEMOVE:
 			if (IsMouseOn(wnd->hwnd, textRect, WINDOW) && !objectProperties->checked)
 			{
-				objectProperties->checked = SMOOTH::True;
+				objectProperties->checked = True;
 
-				wnd->cursorset = SMOOTH::True;
+				wnd->cursorset = True;
 
 				LiSASetMouseCursor(LiSA_MOUSE_HAND);
 
@@ -237,9 +234,9 @@ SMOOTHInt SMOOTHHyperlink::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 			}
 			else if (!IsMouseOn(wnd->hwnd, textRect, WINDOW) && objectProperties->checked)
 			{
-				objectProperties->checked = SMOOTH::False;
+				objectProperties->checked = False;
 
-				wnd->cursorset = SMOOTH::False;
+				wnd->cursorset = False;
 
 				LiSASetMouseCursor(LiSA_MOUSE_ARROW);
 
@@ -251,34 +248,32 @@ SMOOTHInt SMOOTHHyperlink::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 	return retVal;
 }
 
-HBITMAP SMOOTHHyperlink::GetBitmap()
+HBITMAP S::Hyperlink::GetBitmap()
 {
 	if (linkBitmap != NIL)	return linkBitmap;
 	else			return NIL;
 }
 
-SMOOTHString SMOOTHHyperlink::GetURL()
+S::String S::Hyperlink::GetURL()
 {
 	return linkURL;
 }
 
-SMOOTHInt SMOOTHHyperlink::SetText(SMOOTHString newText)
+S::Int S::Hyperlink::SetText(String newText)
 {
 	if (linkBitmap != NIL) linkBitmap = NIL;
 
-	return SMOOTHObject::SetText(newText);
+	return Object::SetText(newText);
 }
 
-SMOOTHInt SMOOTHHyperlink::SetURL(SMOOTHString newUrl)
+S::Int S::Hyperlink::SetURL(String newUrl)
 {
 	linkURL = newUrl;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHHyperlink::SetBitmap(HBITMAP newBmp)
+S::Int S::Hyperlink::SetBitmap(HBITMAP newBmp)
 {
-	return SMOOTH::Error;
+	return Error;
 }
-
-#endif

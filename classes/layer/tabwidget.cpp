@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,15 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_TABREGISTER_
-#define __OBJSMOOTH_TABREGISTER_
-
-#include <smooth/tabregister.h>
+#include <smooth/tabwidget.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/layer.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 
@@ -24,9 +21,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_TABREGISTER = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_TABREGISTER = S::Object::RequestObjectID();
 
-SMOOTHTabRegister::SMOOTHTabRegister(SMOOTHPoint pos, SMOOTHSize size)
+S::TabWidget::TabWidget(Point pos, Size size)
 {
 	self = this;
 
@@ -35,45 +32,45 @@ SMOOTHTabRegister::SMOOTHTabRegister(SMOOTHPoint pos, SMOOTHSize size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = roundtoint(120 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = roundtoint(100 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(100 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-SMOOTHTabRegister::~SMOOTHTabRegister()
+S::TabWidget::~TabWidget()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHTabRegister::Paint(SMOOTHInt message)
+S::Int S::TabWidget::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHLayer	*object = NIL;
-	SMOOTHLayer	*prev = NIL;
-	SMOOTHRect	 frame;
-	SMOOTHRect	 textrect;
-	SMOOTHPoint	 lineStart;
-	SMOOTHPoint	 lineEnd;
+	HDC	 dc = GetContext(wnd);
+	Point	 realPos = GetRealPosition();
+	Layer	*object = NIL;
+	Layer	*prev = NIL;
+	Rect	 frame;
+	Rect	 textrect;
+	Point	 lineStart;
+	Point	 lineEnd;
 
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
 		if (i > 0) prev = object;
 
-		object = (SMOOTHLayer *) assocObjects.GetNthEntry(i);
+		object = (Layer *) assocObjects.GetNthEntry(i);
 
 		if (object != NIL)
 		{
@@ -100,11 +97,11 @@ SMOOTHInt SMOOTHTabRegister::Paint(SMOOTHInt message)
 	frame.right	= frame.left;
 	frame.bottom	= frame.top + METRIC_REGISTEROFFSETY;
 
-	for (SMOOTHInt j = 0; j < nOfObjects; j++)
+	for (Int j = 0; j < nOfObjects; j++)
 	{
 		if (j > 0) prev = object;
 
-		object = (SMOOTHLayer *) assocObjects.GetNthEntry(j);
+		object = (Layer *) assocObjects.GetNthEntry(j);
 
 		if (object != NIL)
 		{
@@ -120,17 +117,17 @@ SMOOTHInt SMOOTHTabRegister::Paint(SMOOTHInt message)
 
 				Frame(dc, frame, FRAME_UP);
 
-				PaintPixel(dc, SMOOTHPoint(frame.left, frame.bottom), SMOOTH::Setup::DividerLightColor);
+				PaintPixel(dc, Point(frame.left, frame.bottom), SMOOTH::Setup::DividerLightColor);
 
-				PaintPixel(dc, SMOOTHPoint(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, SMOOTHPoint(frame.left + 1, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, SMOOTHPoint(frame.left, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, SMOOTHPoint(frame.left + 1, frame.top + 1), SMOOTH::Setup::DividerLightColor);
+				PaintPixel(dc, Point(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.left + 1, frame.top), SMOOTH::Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.left, frame.top + 1), SMOOTH::Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.left + 1, frame.top + 1), SMOOTH::Setup::DividerLightColor);
 
-				PaintPixel(dc, SMOOTHPoint(frame.right, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, SMOOTHPoint(frame.right - 1, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, SMOOTHPoint(frame.right, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, SMOOTHPoint(frame.right - 1, frame.top + 1), SMOOTH::Setup::DividerDarkColor);
+				PaintPixel(dc, Point(frame.right, frame.top), SMOOTH::Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right - 1, frame.top), SMOOTH::Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right, frame.top + 1), SMOOTH::Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right - 1, frame.top + 1), SMOOTH::Setup::DividerDarkColor);
 
 				lineStart.x = frame.left + 1;
 				lineStart.y = frame.bottom;
@@ -161,10 +158,10 @@ SMOOTHInt SMOOTHTabRegister::Paint(SMOOTHInt message)
 
 				Frame(dc, frame, FRAME_UP);
 
-				PaintPixel(dc, SMOOTHPoint(frame.right, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, SMOOTHPoint(frame.right - 1, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, SMOOTHPoint(frame.right, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, SMOOTHPoint(frame.right - 1, frame.top + 1), SMOOTH::Setup::DividerDarkColor);
+				PaintPixel(dc, Point(frame.right, frame.top), SMOOTH::Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right - 1, frame.top), SMOOTH::Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right, frame.top + 1), SMOOTH::Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right - 1, frame.top + 1), SMOOTH::Setup::DividerDarkColor);
 
 				lineStart.x = frame.left;
 				lineStart.y = frame.bottom;
@@ -175,10 +172,10 @@ SMOOTHInt SMOOTHTabRegister::Paint(SMOOTHInt message)
 
 				if (j == 0)
 				{
-					PaintPixel(dc, SMOOTHPoint(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, SMOOTHPoint(frame.left + 1, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, SMOOTHPoint(frame.left, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, SMOOTHPoint(frame.left + 1, frame.top + 1), SMOOTH::Setup::DividerLightColor);
+					PaintPixel(dc, Point(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left + 1, frame.top), SMOOTH::Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left, frame.top + 1), SMOOTH::Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left + 1, frame.top + 1), SMOOTH::Setup::DividerLightColor);
 				}
 
 				if (j > 0) if (prev->IsVisible())
@@ -190,17 +187,17 @@ SMOOTHInt SMOOTHTabRegister::Paint(SMOOTHInt message)
 
 					Line(dc, lineStart, lineEnd, SMOOTH::Setup::BackgroundColor, PS_SOLID, 1);
 
-					PaintPixel(dc, SMOOTHPoint(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, SMOOTHPoint(frame.left, frame.top + 1), SMOOTH::Setup::DividerLightColor);
+					PaintPixel(dc, Point(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left, frame.top + 1), SMOOTH::Setup::DividerLightColor);
 
 					frame.left--;
 				}
 				else
 				{
-					PaintPixel(dc, SMOOTHPoint(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, SMOOTHPoint(frame.left + 1, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, SMOOTHPoint(frame.left, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, SMOOTHPoint(frame.left + 1, frame.top + 1), SMOOTH::Setup::DividerLightColor);
+					PaintPixel(dc, Point(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left + 1, frame.top), SMOOTH::Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left, frame.top + 1), SMOOTH::Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left + 1, frame.top + 1), SMOOTH::Setup::DividerLightColor);
 				}
 
 				textrect.left	= frame.left + METRIC_REGISTERTEXTOFFSETX - 1;
@@ -217,25 +214,25 @@ SMOOTHInt SMOOTHTabRegister::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHTabRegister::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::TabWidget::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHLayer	*object;
-	SMOOTHLayer	*object2;
-	SMOOTHRect	 frame;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
+	Layer	*object;
+	Layer	*object2;
+	Rect	 frame;
 
 	GetSize();
 
@@ -243,9 +240,9 @@ SMOOTHInt SMOOTHTabRegister::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTH
 	frame.right	= realPos.x;
 	frame.bottom	= realPos.y + METRIC_REGISTEROFFSETY;
 
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
-		object = (SMOOTHLayer *) assocObjects.GetNthEntry(i);
+		object = (Layer *) assocObjects.GetNthEntry(i);
 
 		object->SetContainer(myContainer->GetContainerObject()->GetContainer());
 
@@ -256,16 +253,16 @@ SMOOTHInt SMOOTHTabRegister::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTH
 
 		if (object->IsVisible())
 		{
-			if (object->Process(message, wParam, lParam) == SMOOTH::Break) return SMOOTH::Break;
+			if (object->Process(message, wParam, lParam) == Break) return Break;
 		}
 	}
 
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			for (SMOOTHInt i = 0; i < nOfObjects; i++)
+			for (Int i = 0; i < nOfObjects; i++)
 			{
-				object = (SMOOTHLayer *) assocObjects.GetNthEntry(i);
+				object = (Layer *) assocObjects.GetNthEntry(i);
 
 				if (object != NIL)
 				{
@@ -280,9 +277,9 @@ SMOOTHInt SMOOTHTabRegister::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTH
 
 						if (IsMouseOn(wnd->hwnd, frame, WINDOW))
 						{
-							for (SMOOTHInt j = 0; j < nOfObjects; j++)
+							for (Int j = 0; j < nOfObjects; j++)
 							{
-								object2 = (SMOOTHLayer *) assocObjects.GetNthEntry(j);
+								object2 = (Layer *) assocObjects.GetNthEntry(j);
 
 								if (object2 != NIL)
 								{
@@ -299,7 +296,7 @@ SMOOTHInt SMOOTHTabRegister::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTH
 
 							Show();
 
-							retVal = SMOOTH::Break;
+							retVal = Break;
 
 							break;
 						}
@@ -319,14 +316,14 @@ SMOOTHInt SMOOTHTabRegister::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTH
 	return retVal;
 }
 
-SMOOTHVoid SMOOTHTabRegister::GetSize()
+S::Void S::TabWidget::GetSize()
 {
-	HDC		 dc = GetContext(NIL);
-	SMOOTHLayer	*object;
+	HDC	 dc = GetContext(NIL);
+	Layer	*object;
 
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
-		object = (SMOOTHLayer *) assocObjects.GetNthEntry(i);
+		object = (Layer *) assocObjects.GetNthEntry(i);
 
 		if (object != NIL)
 		{
@@ -334,7 +331,7 @@ SMOOTHVoid SMOOTHTabRegister::GetSize()
 			{
 				textSize.SetEntry(object->handle, GetTextSizeX(dc, object->GetObjectProperties()->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight));
 
-				sizeSet.SetEntry(object->handle, SMOOTH::True);
+				sizeSet.SetEntry(object->handle, True);
 			}
 		}
 	}
@@ -342,17 +339,32 @@ SMOOTHVoid SMOOTHTabRegister::GetSize()
 	FreeContext(NIL, dc);
 }
 
-SMOOTHInt SMOOTHTabRegister::RegisterObject(SMOOTHObject *object)
+S::Int S::TabWidget::SelectTab(Int layerid)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (object == NIL)	return SMOOTH::Error;
+	Layer	*object;
+
+	for (Int i = 0; i < nOfObjects; i++)
+	{
+		object = (Layer *) assocObjects.GetNthEntry(i);
+
+		if (object->handle == layerid)	object->Show();
+		else				object->Hide();
+	}
+
+	return Success;
+}
+
+S::Int S::TabWidget::RegisterObject(Object *object)
+{
+	if (!registered)	return Error;
+	if (object == NIL)	return Error;
 
 	if (containerType == &object->possibleContainers)
 	{
 		if (!object->IsRegistered())
 		{
 			assocObjects.AddEntry(object, object->handle);
-			sizeSet.AddEntry(SMOOTH::False, object->handle);
+			sizeSet.AddEntry(False, object->handle);
 			textSize.AddEntry(0, object->handle);
 
 			nOfObjects++;
@@ -360,34 +372,34 @@ SMOOTHInt SMOOTHTabRegister::RegisterObject(SMOOTHObject *object)
 			object->SetContainer(myContainer->GetContainerObject()->GetContainer());
 			object->SetRegisteredFlag();
 
-			if (nOfObjects == 1)	((SMOOTHLayer *) object)->Show();
-			else			((SMOOTHLayer *) object)->Hide();
+			if (nOfObjects == 1)	((Layer *) object)->Show();
+			else			((Layer *) object)->Hide();
 
-			return SMOOTH::Success;
+			return Success;
 		}
 	}
 
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHInt SMOOTHTabRegister::UnregisterObject(SMOOTHObject *object)
+S::Int S::TabWidget::UnregisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
-	SMOOTHBool	 activateNew = SMOOTH::False;
+	Bool	 activateNew = False;
 
 	if (containerType == &object->possibleContainers)
 	{
 		if (nOfObjects > 0 && object->IsRegistered())
 		{
-			if (((SMOOTHLayer *) object)->IsVisible())
+			if (((Layer *) object)->IsVisible())
 			{
-				((SMOOTHLayer *) object)->Hide();
+				((Layer *) object)->Hide();
 
-				activateNew = SMOOTH::True;
+				activateNew = True;
 			}
 
-			if (assocObjects.DeleteEntry(object->handle) == SMOOTH::True)
+			if (assocObjects.DeleteEntry(object->handle) == True)
 			{
 				sizeSet.DeleteEntry(object->handle);
 				textSize.DeleteEntry(object->handle);
@@ -396,14 +408,12 @@ SMOOTHInt SMOOTHTabRegister::UnregisterObject(SMOOTHObject *object)
 				object->UnsetRegisteredFlag();
 				object->SetContainer(NIL);
 
-				if (activateNew && nOfObjects > 0) ((SMOOTHLayer *) assocObjects.GetFirstEntry())->Show();
+				if (activateNew && nOfObjects > 0) ((Layer *) assocObjects.GetFirstEntry())->Show();
 
-				return SMOOTH::Success;
+				return Success;
 			}
 		}
 	}
 
-	return SMOOTH::Error;
+	return Error;
 }
-
-#endif

@@ -8,20 +8,25 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/line.h>
+#include <smooth/system.h>
+#include <smooth/version.h>
 
-S::Line::Line()
+S::Int S::System::nextGUID	= 0;
+
+S::System::System()
 {
-	sx = 0;
-	sy = 0;
-	ex = 0;
-	ey = 0;
 }
 
-S::Line::Line(Point iStart, Point iEnd)
+S::System::System(const System &)
 {
-	sx = iStart.x;
-	sy = iStart.y;
-	ex = iEnd.x;
-	ey = iEnd.y;
+}
+
+S::Int S::System::RequestGUID()
+{
+	return nextGUID++;
+}
+
+S::String S::System::GetVersionString()
+{
+	return SMOOTH_VERSION;
 }

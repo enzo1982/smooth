@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,12 +8,9 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_RECT_
-#define __OBJSMOOTH_RECT_
-
 #include <smooth/rect.h>
 
-SMOOTHRect::SMOOTHRect()
+S::Rect::Rect()
 {
 	left	= 0;
 	top	= 0;
@@ -21,7 +18,7 @@ SMOOTHRect::SMOOTHRect()
 	bottom	= 0;
 }
 
-SMOOTHRect::SMOOTHRect(SMOOTHPoint iPos, SMOOTHSize iSize)
+S::Rect::Rect(Point iPos, Size iSize)
 {
 	left	= iPos.x;
 	top	= iPos.y;
@@ -30,7 +27,7 @@ SMOOTHRect::SMOOTHRect(SMOOTHPoint iPos, SMOOTHSize iSize)
 }
 
 #ifdef __WIN32__
-SMOOTHRect::operator RECT()
+S::Rect::operator RECT()
 {
 	RECT	 rect;
 
@@ -42,7 +39,7 @@ SMOOTHRect::operator RECT()
 	return rect;
 }
 
-SMOOTHRect &SMOOTHRect::operator =(const RECT rect)
+S::Rect &S::Rect::operator =(const RECT rect)
 {
 	left	= rect.left;
 	top	= rect.top;
@@ -51,6 +48,4 @@ SMOOTHRect &SMOOTHRect::operator =(const RECT rect)
 
 	return *this;
 }
-#endif
-
 #endif

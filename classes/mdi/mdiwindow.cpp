@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_MDIWINDOW_
-#define __OBJSMOOTH_MDIWINDOW_
 
 #include <smooth/mdiwindow.h>
 #include <smooth/window.h>
@@ -21,9 +18,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_MDIWINDOW = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_MDIWINDOW = S::Object::RequestObjectID();
 
-SMOOTHMDIWindow::SMOOTHMDIWindow(SMOOTHString title) : SMOOTHWindow(title)
+S::MDIWindow::MDIWindow(String title) : Window(title)
 {
 	type				= OBJ_MDIWINDOW;
 	containerType			= OBJ_WINDOW;
@@ -38,9 +35,7 @@ SMOOTHMDIWindow::SMOOTHMDIWindow(SMOOTHString title) : SMOOTHWindow(title)
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-SMOOTHMDIWindow::~SMOOTHMDIWindow()
+S::MDIWindow::~MDIWindow()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,23 +8,17 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_PRIMITIVE_
-#define __OBJSMOOTH_PRIMITIVE_
-
 #include <smooth/primitive.h>
-#include <smooth/stk.h>
 
-SMOOTHPrimitive::SMOOTHPrimitive()
+S::Primitive::Primitive()
 {
 }
 
-SMOOTHPrimitive::~SMOOTHPrimitive()
+S::Primitive::~Primitive()
 {
 }
 
-SMOOTHInt SMOOTHPrimitive::Draw(SMOOTHDrawable *drawAble)
+S::Int S::Primitive::Draw(Drawable *drawAble)
 {
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

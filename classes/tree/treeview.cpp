@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,18 +8,14 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_TREEVIEW_
-#define __OBJSMOOTH_TREEVIEW_
-
 #include <smooth/treeview.h>
 #include <smooth/tree.h>
 #include <smooth/definitions.h>
 #include <smooth/toolkit.h>
 #include <smooth/loop.h>
-#include <smooth/binary.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -28,46 +24,46 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_TREEVIEW = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_TREEVIEW = S::Object::RequestObjectID();
 
-SMOOTHTreeView::SMOOTHTreeView(SMOOTHString name, SMOOTHPoint pos, SMOOTHSize size, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::TreeView::TreeView(String name, Point pos, Size size, ProcParam, Void *procParam)
 {
 	type				= OBJ_TREEVIEW;
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 	objectProperties->text		= name;
 	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = roundtoint(100 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = roundtoint(120 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(100 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(120 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-SMOOTHTreeView::~SMOOTHTreeView()
+S::TreeView::~TreeView()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHTreeView::Paint(SMOOTHInt message)
+S::Int S::TreeView::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHRect	 frame;
+	HDC	 dc = GetContext(wnd);
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -95,30 +91,30 @@ SMOOTHInt SMOOTHTreeView::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHTreeView::PaintTree(SMOOTHTree *tree, SMOOTHInt level, SMOOTHRect frame)
+S::Int S::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 {
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHTree::Entry	*operat;
-	HDC			 dc = GetContext(wnd);
-	SMOOTHRect		 oframe = frame;
-	SMOOTHRect		 rect;
-	SMOOTHPoint		 p1;
-	SMOOTHPoint		 p2;
-	SMOOTHInt		 ste;
-	SMOOTHInt		 painted = tree->GetNOfEntries();
+	Tree::Entry	*operat;
+	HDC		 dc = GetContext(wnd);
+	Rect		 oframe = frame;
+	Rect		 rect;
+	Point		 p1;
+	Point		 p2;
+	Int		 ste;
+	Int		 painted = tree->GetNOfEntries();
 
 	frame.left += (METRIC_TREEVIEWENTRYHEIGHT - 1) * (level + 1);
 	frame.bottom = frame.top + METRIC_TREEVIEWENTRYHEIGHT;
 
-	for (SMOOTHInt i = 0; i < tree->GetNOfEntries(); i++)
+	for (Int i = 0; i < tree->GetNOfEntries(); i++)
 	{
 		if (frame.top >= oframe.bottom) break;
 
@@ -143,22 +139,22 @@ SMOOTHInt SMOOTHTreeView::PaintTree(SMOOTHTree *tree, SMOOTHInt level, SMOOTHRec
 
 		if (operat->type == ST_ENTRY)
 		{
-			for (SMOOTHInt y = frame.top - 2; y < frame.bottom; y++)
+			for (Int y = frame.top - 2; y < frame.bottom; y++)
 			{
 				if (y >= oframe.bottom - 1) break;
 
 				if ((frame.top - y) & 1)
 				{
-					PaintPixel(dc, SMOOTHPoint(frame.left - 6, y), SMOOTH::Setup::GrayTextColor);
+					PaintPixel(dc, Point(frame.left - 6, y), SMOOTH::Setup::GrayTextColor);
 				}
 
 				if (y == frame.top + 9)
 				{
-					for (SMOOTHInt x = frame.left - 5; x <= frame.left + 2; x++)
+					for (Int x = frame.left - 5; x <= frame.left + 2; x++)
 					{
 						if (((frame.left - 5) - x) & 1)
 						{
-							PaintPixel(dc, SMOOTHPoint(x, y), SMOOTH::Setup::GrayTextColor);
+							PaintPixel(dc, Point(x, y), SMOOTH::Setup::GrayTextColor);
 						}
 					}
 				}
@@ -213,22 +209,22 @@ SMOOTHInt SMOOTHTreeView::PaintTree(SMOOTHTree *tree, SMOOTHInt level, SMOOTHRec
 				if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, SMOOTH::Setup::ClientTextColor, PS_SOLID, 1);
 			}
 
-			for (SMOOTHInt y = frame.top - 2; y <= frame.top + 9; y++)
+			for (Int y = frame.top - 2; y <= frame.top + 9; y++)
 			{
 				if (y >= oframe.bottom - 1) break;
 
 				if (((frame.top - y) & 1) && (y < frame.top + 7))
 				{
-					PaintPixel(dc, SMOOTHPoint(frame.left - 6, y), SMOOTH::Setup::GrayTextColor);
+					PaintPixel(dc, Point(frame.left - 6, y), SMOOTH::Setup::GrayTextColor);
 				}
 
 				if (y == frame.top + 9)
 				{
-					for (SMOOTHInt x = frame.left - 3; x <= frame.left + 2; x++)
+					for (Int x = frame.left - 3; x <= frame.left + 2; x++)
 					{
 						if (((frame.left - 5) - x) & 1)
 						{
-							PaintPixel(dc, SMOOTHPoint(x, y), SMOOTH::Setup::GrayTextColor);
+							PaintPixel(dc, Point(x, y), SMOOTH::Setup::GrayTextColor);
 						}
 					}
 				}
@@ -241,13 +237,13 @@ SMOOTHInt SMOOTHTreeView::PaintTree(SMOOTHTree *tree, SMOOTHInt level, SMOOTHRec
 		{
 			ste = PaintTree(operat->sub, level + 1, oframe);
 
-			for (SMOOTHInt y = frame.top + (METRIC_TREEVIEWENTRYHEIGHT - 2); y <= frame.bottom + METRIC_TREEVIEWENTRYHEIGHT * ste; y++)
+			for (Int y = frame.top + (METRIC_TREEVIEWENTRYHEIGHT - 2); y <= frame.bottom + METRIC_TREEVIEWENTRYHEIGHT * ste; y++)
 			{
 				if (y >= oframe.bottom - 1) break;
 
 				if ((frame.top - y) & 1)
 				{
-					PaintPixel(dc, SMOOTHPoint(frame.left - 6, y), SMOOTH::Setup::GrayTextColor);
+					PaintPixel(dc, Point(frame.left - 6, y), SMOOTH::Setup::GrayTextColor);
 				}
 			}
 
@@ -264,21 +260,21 @@ SMOOTHInt SMOOTHTreeView::PaintTree(SMOOTHTree *tree, SMOOTHInt level, SMOOTHRec
 	return painted;
 }
 
-SMOOTHInt SMOOTHTreeView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::TreeView::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHRect	 frame;
-	HDC		 dc;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
+	Rect	 frame;
+	HDC	 dc;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -303,5 +299,3 @@ SMOOTHInt SMOOTHTreeView::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 	return retVal;
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_LIST_
-#define __OBJSMOOTH_LIST_
 
 #include <smooth/list.h>
 #include <smooth/definitions.h>
@@ -19,16 +16,16 @@
 #include <smooth/i18n.h>
 #include <smooth/metrics.h>
 
-SMOOTHList::SMOOTHList()
+S::List::List()
 {
 	nOfEntries = 0;
 
-	entrysizesset = SMOOTH::False;
+	entrysizesset = False;
 }
 
-SMOOTHList::~SMOOTHList()
+S::List::~List()
 {
-	for (SMOOTHInt i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
 		delete entries.GetNthEntry(i);
 	}
@@ -36,51 +33,51 @@ SMOOTHList::~SMOOTHList()
 	entries.DeleteAll();
 }
 
-SMOOTHInt SMOOTHList::AddListEntry(SMOOTHInt code, SMOOTHString text, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::List::Entry *S::List::AddListEntry(Int code, String text, ProcParam, Void *procParam)
 {
-	SMOOTHList::Entry	*newentry = new SMOOTHList::Entry(code);
+	List::Entry	*newEntry = new List::Entry(code);
 
-	newentry->text		= text;
-	newentry->proc		= (SMOOTHProcType) newProc;
-	newentry->procParam	= procParam;
+	newEntry->text		= text;
+	newEntry->proc		= (ProcType) newProc;
+	newEntry->procParam	= procParam;
 
-	if (entries.AddEntry(newentry, code) == SMOOTH::True)
+	if (entries.AddEntry(newEntry, code) == True)
 	{
 		nOfEntries++;
 
-		entrysizesset = SMOOTH::False;
+		entrysizesset = False;
 
-		return SMOOTH::Success;
+		return newEntry;
 	}
 	else
 	{
-		delete newentry;
+		delete newEntry;
 
-		return SMOOTH::Error;
+		return NIL;
 	}
 }
 
-SMOOTHInt SMOOTHList::ModifyListEntry(SMOOTHInt code, SMOOTHString text, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::Int S::List::ModifyListEntry(Int code, String text, ProcParam, Void *procParam)
 {
-	SMOOTHList::Entry	*entry = entries.GetEntry(code);
+	List::Entry	*entry = entries.GetEntry(code);
 
 	if (entry != NIL)
 	{
 		entry->text		= text;
-		entry->proc		= (SMOOTHProcType) newProc;
+		entry->proc		= (ProcType) newProc;
 		entry->procParam	= procParam;
 
-		entrysizesset = SMOOTH::False;
+		entrysizesset = False;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 	else
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 }
 
-SMOOTHInt SMOOTHList::RemoveListEntry(SMOOTHInt code)
+S::Int S::List::RemoveListEntry(Int code)
 {
 	if (entries.GetEntry(code) != NIL)
 	{
@@ -90,19 +87,19 @@ SMOOTHInt SMOOTHList::RemoveListEntry(SMOOTHInt code)
 
 		nOfEntries--;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 	else
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 }
 
-SMOOTHVoid SMOOTHList::CleanupList()
+S::Void S::List::CleanupList()
 {
-	SMOOTHList::Entry	*operat;
+	List::Entry	*operat;
 
-	for (SMOOTHInt i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
 		operat = entries.GetNthEntry(i);
 
@@ -114,23 +111,23 @@ SMOOTHVoid SMOOTHList::CleanupList()
 	nOfEntries = 0;
 }
 
-SMOOTHVoid SMOOTHList::GetSize()
+S::Void S::List::GetSize()
 {
 	if (!entrysizesset)
 	{
 		GetListEntriesSize();
-		entrysizesset = SMOOTH::True;
+		entrysizesset = True;
 	}
 }
 
-SMOOTHVoid SMOOTHList::GetListEntriesSize()
+S::Void S::List::GetListEntriesSize()
 {
 	if (nOfEntries == 0) return;
 
-	SMOOTHList::Entry	*operat;
-	HDC			 hdc = GetContext(0);
+	List::Entry	*operat;
+	HDC		 hdc = GetContext(0);
 
-	for (SMOOTHInt i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
 		operat = entries.GetNthEntry(i);
 
@@ -138,19 +135,19 @@ SMOOTHVoid SMOOTHList::GetListEntriesSize()
 		if (!operat->sizeset) operat->size = GetTextSizeX(hdc, operat->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
 #endif
 
-		operat->sizeset = SMOOTH::True;
+		operat->sizeset = True;
 	}
 
 	FreeContext(0, hdc);
 }
 
-SMOOTHInt SMOOTHList::GetSelectedEntry()
+S::Int S::List::GetSelectedEntry()
 {
 	if (nOfEntries == 0) return -1;
 
-	SMOOTHList::Entry	*operat;
+	List::Entry	*operat;
 
-	for (SMOOTHInt i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
 		operat = entries.GetNthEntry(i);
 
@@ -160,29 +157,29 @@ SMOOTHInt SMOOTHList::GetSelectedEntry()
 	return -1;
 }
 
-SMOOTHInt SMOOTHList::SelectListEntry(SMOOTHInt code)
+S::Int S::List::SelectListEntry(Int code)
 {
-	if (nOfEntries == 0) return SMOOTH::Error;
+	if (nOfEntries == 0) return Error;
 
-	SMOOTHList::Entry	*operat;
+	List::Entry	*operat;
 
-	for (SMOOTHInt i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
 		operat = entries.GetNthEntry(i);
 
-		if (operat->clk) operat->clk = SMOOTH::False;
+		if (operat->clk) operat->clk = False;
 
-		if (operat->code == code) operat->clk = SMOOTH::True;
+		if (operat->code == code) operat->clk = True;
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHString SMOOTHList::GetSelectedEntryName()
+S::String S::List::GetSelectedEntryName()
 {
-	SMOOTHList::Entry	*operat;
+	List::Entry	*operat;
 
-	for (SMOOTHInt i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
 		operat = entries.GetNthEntry(i);
 
@@ -192,9 +189,7 @@ SMOOTHString SMOOTHList::GetSelectedEntryName()
 	return NIL;
 }
 
-SMOOTHInt SMOOTHList::GetNOfEntries()
+S::Int S::List::GetNOfEntries()
 {
 	return nOfEntries;
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,16 +8,13 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_OPTIONBOX_
-#define __OBJSMOOTH_OPTIONBOX_
-
 #include <smooth/optionbox.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -26,54 +23,56 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_OPTIONBOX = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_OPTIONBOX = S::Object::RequestObjectID();
 
-SMOOTHOptionBox::SMOOTHOptionBox(SMOOTHString text, SMOOTHPoint pos, SMOOTHSize size, SMOOTHInt *var, SMOOTHInt iCode, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iCode, ProcParam, Void *procParam)
 {
 	type				= OBJ_OPTIONBOX;
 	objectProperties->text		= text;
 	variable			= var;
 	code				= iCode;
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
 
-	if (*variable == code)	state = SMOOTH::True;
-	else			state = SMOOTH::False;
+	if (*variable == code)	state = True;
+	else			state = False;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = roundtoint(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = roundtoint(16 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(16 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+
+	GetTextSize();
 }
 
-SMOOTHOptionBox::~SMOOTHOptionBox()
+S::OptionBox::~OptionBox()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHOptionBox::Paint(SMOOTHInt message)
+S::Int S::OptionBox::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHRect	 textRect;
-	SMOOTHPoint	 lineStart;
-	SMOOTHPoint	 lineEnd;
-	SMOOTHInt	 lightColor;
+	HDC	 dc = GetContext(wnd);
+	Point	 realPos = GetRealPosition();
+	Rect	 textRect;
+	Point	 lineStart;
+	Point	 lineEnd;
+	Int	 lightColor;
 
 	if (active)	lightColor = SMOOTH::Setup::ClientColor;
 	else		lightColor = SMOOTH::Setup::BackgroundColor;
@@ -101,12 +100,12 @@ SMOOTHInt SMOOTHOptionBox::Paint(SMOOTHInt message)
 	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
 
 	PaintPixel(dc, lineStart, SMOOTH::Setup::DividerDarkColor);
-	PaintPixel(dc, SMOOTHPoint(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
+	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
 
 	lineStart.x--;
 	lineEnd.x++;
 
-	for (SMOOTHInt i = 0; i < 5; i++)
+	for (Int i = 0; i < 5; i++)
 	{
 		lineStart.y++;
 		lineEnd.y++;
@@ -114,7 +113,7 @@ SMOOTHInt SMOOTHOptionBox::Paint(SMOOTHInt message)
 		Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
 
 		PaintPixel(dc, lineStart, SMOOTH::Setup::DividerDarkColor);
-		PaintPixel(dc, SMOOTHPoint(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
+		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
 	}
 
 	lineStart.x++;
@@ -125,7 +124,7 @@ SMOOTHInt SMOOTHOptionBox::Paint(SMOOTHInt message)
 	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
 
 	PaintPixel(dc, lineStart, SMOOTH::Setup::DividerLightColor);
-	PaintPixel(dc, SMOOTHPoint(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
+	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
 
 	lineStart.x++;
 	lineStart.y++;
@@ -135,7 +134,7 @@ SMOOTHInt SMOOTHOptionBox::Paint(SMOOTHInt message)
 	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
 
 	PaintPixel(dc, lineStart, SMOOTH::Setup::DividerLightColor);
-	PaintPixel(dc, SMOOTHPoint(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
+	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
 
 	lineStart.x++;
 	lineStart.y++;
@@ -156,7 +155,7 @@ SMOOTHInt SMOOTHOptionBox::Paint(SMOOTHInt message)
 		lineStart.x--;
 		lineEnd.x++;
 
-		for (SMOOTHInt i = 0; i < 3; i++)
+		for (Int i = 0; i < 3; i++)
 		{
 			lineStart.y++;
 			lineEnd.y++;
@@ -164,7 +163,7 @@ SMOOTHInt SMOOTHOptionBox::Paint(SMOOTHInt message)
 			Line(dc, lineStart, lineEnd, SMOOTH::Setup::ClientTextColor, PS_SOLID, 1);
 		}
 
-		PaintPixel(dc, SMOOTHPoint(lineEnd.x, lineEnd.y - 1), SMOOTH::Setup::DividerDarkColor);
+		PaintPixel(dc, Point(lineEnd.x, lineEnd.y - 1), SMOOTH::Setup::DividerDarkColor);
 		PaintPixel(dc, lineEnd, SMOOTH::Setup::DividerDarkColor);
 
 		lineStart.x++;
@@ -173,7 +172,7 @@ SMOOTHInt SMOOTHOptionBox::Paint(SMOOTHInt message)
 
 		Line(dc, lineStart, lineEnd, SMOOTH::Setup::ClientTextColor, PS_SOLID, 1);
 
-		PaintPixel(dc, SMOOTHPoint(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerDarkColor);
+		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerDarkColor);
 		PaintPixel(dc, lineEnd, SMOOTH::Setup::DividerDarkColor);
 
 		lineStart.x++;
@@ -192,25 +191,25 @@ SMOOTHInt SMOOTHOptionBox::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHOptionBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::OptionBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered) return SMOOTH::Error;
-	if ((!active && message != SM_CHECKOPTIONBOXES) || !visible) return SMOOTH::Success;
+	if (!registered) return Error;
+	if ((!active && message != SM_CHECKOPTIONBOXES) || !visible) return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHObject	*object;
-	SMOOTHRect	 frame;
-	HDC		 dc;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
+	Object	*object;
+	Rect	 frame;
+	HDC	 dc;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -220,21 +219,21 @@ SMOOTHInt SMOOTHOptionBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 	switch (message)
 	{
 		case SM_CHECKOPTIONBOXES:
-			if (state == SMOOTH::True && *variable != code)
+			if (state == True && *variable != code)
 			{
-				state = SMOOTH::False;
+				state = False;
 
 				Paint(SP_PAINT);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
-			else if (state == SMOOTH::False && *variable == code)
+			else if (state == False && *variable == code)
 			{
-				state = SMOOTH::True;
+				state = True;
 
 				Paint(SP_PAINT);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			break;
@@ -243,11 +242,11 @@ SMOOTHInt SMOOTHOptionBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 			if (objectProperties->checked)
 			{
-				objectProperties->clicked = SMOOTH::True;
+				objectProperties->clicked = True;
 
 				Frame(dc, frame, FRAME_DOWN);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			FreeContext(wnd, dc);
@@ -258,8 +257,8 @@ SMOOTHInt SMOOTHOptionBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 			if (objectProperties->clicked)
 			{
-				objectProperties->clicked = SMOOTH::False;
-				objectProperties->checked = SMOOTH::False;
+				objectProperties->clicked = False;
+				objectProperties->checked = False;
 
 				frame.right++;
 				frame.bottom++;
@@ -273,11 +272,11 @@ SMOOTHInt SMOOTHOptionBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 				{
 					*variable = code;
 
-					state = SMOOTH::True;
+					state = True;
 
 					Paint(SP_PAINT);
 
-					for (SMOOTHInt i = 0; i < SMOOTHObject::objectCount; i++)
+					for (Int i = 0; i < Object::objectCount; i++)
 					{
 						object = mainObjectManager->RequestObject(i);
 
@@ -287,10 +286,10 @@ SMOOTHInt SMOOTHOptionBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 						}
 					}
 
-					SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+					ProcCall(objectProperties->proc, objectProperties->procParam);
 				}
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			FreeContext(wnd, dc);
@@ -301,8 +300,8 @@ SMOOTHInt SMOOTHOptionBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 			if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				objectProperties->checked = SMOOTH::False;
-				objectProperties->clicked = SMOOTH::False;
+				objectProperties->checked = False;
+				objectProperties->clicked = False;
 
 				frame.right++;
 				frame.bottom++;
@@ -319,13 +318,13 @@ SMOOTHInt SMOOTHOptionBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 
 			if (!objectProperties->checked && IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				objectProperties->checked = SMOOTH::True;
+				objectProperties->checked = True;
 				Frame(dc, frame, FRAME_UP);
 			}
 			else if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				objectProperties->checked = SMOOTH::False;
-				objectProperties->clicked = SMOOTH::False;
+				objectProperties->checked = False;
+				objectProperties->clicked = False;
 
 				frame.right++;
 				frame.bottom++;
@@ -342,23 +341,23 @@ SMOOTHInt SMOOTHOptionBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 	return retVal;
 }
 
-SMOOTHInt SMOOTHOptionBox::SetText(SMOOTHString newText)
+S::Int S::OptionBox::SetText(String newText)
 {
 	if (!registered || !visible)
 	{
 		objectProperties->text = newText;
-		return SMOOTH::Success;
+		return Success;
 	}
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHRect	 textRect;
-	HDC		 dc = GetContext(wnd);
+	Point	 realPos = GetRealPosition();
+	Rect	 textRect;
+	HDC	 dc = GetContext(wnd);
 
 	textRect.left	= realPos.x + METRIC_OPTBOXOFFSETXY + 14;
 	textRect.top	= realPos.y + METRIC_OPTBOXOFFSETXY - METRIC_OPTBOXTEXTOFFSETY;
@@ -373,7 +372,5 @@ SMOOTHInt SMOOTHOptionBox::SetText(SMOOTHString newText)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

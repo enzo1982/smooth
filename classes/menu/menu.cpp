@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,48 +8,46 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_MENU_
-#define __OBJSMOOTH_MENU_
-
 #include <smooth/menu.h>
 #include <smooth/definitions.h>
 #include <smooth/array.h>
 #include <smooth/toolkit.h>
 #include <smooth/stk.h>
+#include <smooth/system.h>
 #include <smooth/metrics.h>
 #include <smooth/i18n.h>
 
-SMOOTHMenu::SMOOTHMenu()
+S::Menu::Menu()
 {
 	nOfEntries = 0;
 
-	sizeset = SMOOTH::False;
-	entrysizesset = SMOOTH::False;
+	sizeset = False;
+	entrysizesset = False;
 }
 
-SMOOTHMenu::~SMOOTHMenu()
+S::Menu::~Menu()
 {
-	SMOOTHInt	 maxCount = nOfEntries;
+	Int	 maxCount = nOfEntries;
 
-	for (SMOOTHInt i = 0; i < maxCount; i++)
+	for (Int i = 0; i < maxCount; i++)
 	{
 		RemoveEntry(entries.GetFirstEntry());
 	}
 }
 
-SMOOTHMenu::Entry *SMOOTHMenu::AddEntry(SMOOTHString text, HBITMAP bitmap, SMOOTHProcParam, SMOOTHVoid *procParam, SMOOTHMenu *popupMenu, SMOOTHBool *bVar, SMOOTHInt *iVar, SMOOTHInt iCode, SMOOTHInt orientation)
+S::Menu::Entry *S::Menu::AddEntry(String text, HBITMAP bitmap, ProcParam, Void *procParam, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
 {
-	SMOOTHInt	 id	= SMOOTH::RequestGUID();
-	SMOOTHInt	 type	= SM_SEPARATOR;
+	Int	 id	= System::RequestGUID();
+	Int	 type	= SM_SEPARATOR;
 
 	if (text != NIL)	type = type | SM_TEXT;
 	if (bitmap != NIL)	type = type | SM_BITMAP;
 
-	SMOOTHMenu::Entry	*newEntry = new SMOOTHMenu::Entry(type, id);
+	Menu::Entry	*newEntry = new Menu::Entry(type, id);
 
 	newEntry->text		= text;
 	newEntry->orientation	= orientation;
-	newEntry->proc		= (SMOOTHProcType) newProc;
+	newEntry->proc		= (ProcType) newProc;
 	newEntry->procParam	= procParam;
 	newEntry->bitmap	= DetectTransparentRegions(bitmap);
 	newEntry->graymap	= DetectTransparentRegions(GrayscaleBitmap(bitmap));
@@ -57,14 +55,14 @@ SMOOTHMenu::Entry *SMOOTHMenu::AddEntry(SMOOTHString text, HBITMAP bitmap, SMOOT
 	newEntry->bVar		= bVar;
 	newEntry->iVar		= iVar;
 	newEntry->iCode		= iCode;
-	newEntry->sizeset	= SMOOTH::False;
+	newEntry->sizeset	= False;
 
-	if (entries.AddEntry(newEntry, id) == SMOOTH::True)
+	if (entries.AddEntry(newEntry, id) == True)
 	{
 		nOfEntries++;
 
-		sizeset		= SMOOTH::False;
-		entrysizesset	= SMOOTH::False;
+		sizeset		= False;
+		entrysizesset	= False;
 
 		return newEntry;
 	}
@@ -76,9 +74,9 @@ SMOOTHMenu::Entry *SMOOTHMenu::AddEntry(SMOOTHString text, HBITMAP bitmap, SMOOT
 	}
 }
 
-SMOOTHInt SMOOTHMenu::RemoveEntry(SMOOTHMenu::Entry *entry)
+S::Int S::Menu::RemoveEntry(Menu::Entry *entry)
 {
-	if (entry == NIL) return SMOOTH::Error;
+	if (entry == NIL) return Error;
 
 	if (entries.GetEntry(entry->id) != NIL)
 	{
@@ -88,131 +86,105 @@ SMOOTHInt SMOOTHMenu::RemoveEntry(SMOOTHMenu::Entry *entry)
 
 		nOfEntries--;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHInt SMOOTHMenu::RemoveEntry(SMOOTHInt id)
+S::Int S::Menu::RemoveEntry(Int id)
 {
 	return RemoveEntry(entries.GetEntry(id));
 }
 
-SMOOTHInt SMOOTHMenu::Clear()
+S::Int S::Menu::Clear()
 {
-	SMOOTHInt	 maxCount = nOfEntries;
+	Int	 maxCount = nOfEntries;
 
-	for (SMOOTHInt i = 0; i < maxCount; i++)
+	for (Int i = 0; i < maxCount; i++)
 	{
 		RemoveEntry(entries.GetFirstEntry());
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHVoid SMOOTHMenu::GetSize()
+S::Void S::Menu::GetSize()
 {
 	if (!entrysizesset)
 	{
 		GetMenuEntriesSize();
 
-		entrysizesset = SMOOTH::True;
+		entrysizesset = True;
 	}
 	if (!sizeset)
 	{
 		popupsize.cx = GetSizeX();
 		popupsize.cy = GetSizeY();
 
-		sizeset = SMOOTH::True;
+		sizeset = True;
 	}
 }
 
-SMOOTHInt SMOOTHMenu::GetSizeX()
+S::Int S::Menu::GetSizeX()
 {
-	SMOOTHMenu::Entry	*operat;
-	HDC			 hdc;
-	SMOOTHInt		 msize = 50;
-	SMOOTHInt		 greatest = 0;
-	SMOOTHInt		 textsize;
+	Int	 mSize = 50;
+	Int	 greatest = 0;
 
-	if (nOfEntries == 0) return msize;
-	else
+	if (nOfEntries == 0) return mSize;
+
+	for (Int i = 0; i < nOfEntries; i++)
 	{
-		hdc = GetContext(0);
+		Menu::Entry	*entry = entries.GetNthEntry(i);
 
-		for (SMOOTHInt i = 0; i < nOfEntries; i++)
+		if (entry->size > greatest)
 		{
-			operat = entries.GetNthEntry(i);
-
-			textsize = operat->size;
-
-			if (textsize > greatest)
-			{
-				msize = 50 + textsize;
-				greatest = textsize;
-			}
+			mSize		= 50 + entry->size;
+			greatest	= entry->size;
 		}
 	}
 
-	FreeContext(0, hdc);
-
-	return msize;
+	return mSize;
 }
 
-SMOOTHInt SMOOTHMenu::GetSizeY()
+S::Int S::Menu::GetSizeY()
 {
-	SMOOTHMenu::Entry	*operat;
-	HDC			 hdc;
-	SMOOTHInt		 msize = 4;
+	Int	 mSize = 4;
 
-	if (nOfEntries == 0) return msize;
-	else
+	if (nOfEntries == 0) return mSize;
+
+	for (Int i = 0; i < nOfEntries; i++)
 	{
-		hdc = GetContext(0);
+		Menu::Entry	*entry = entries.GetNthEntry(i);
 
-		for (SMOOTHInt i = 0; i < nOfEntries; i++)
-		{
-			operat = entries.GetNthEntry(i);
-
-			if (operat->type == SM_SEPARATOR)	msize = msize + 5;
-			else					msize = msize + METRIC_POPUPENTRYSIZE;
-		}
+		if (entry->type == SM_SEPARATOR)	mSize = mSize + 5;
+		else					mSize = mSize + METRIC_POPUPENTRYSIZE;
 	}
 
-	FreeContext(0, hdc);
-
-	return msize;
+	return mSize;
 }
 
-SMOOTHVoid SMOOTHMenu::GetMenuEntriesSize()
+S::Void S::Menu::GetMenuEntriesSize()
 {
-	SMOOTHMenu::Entry	*operat;
-	HDC			 hdc;
-
 	if (nOfEntries == 0) return;
-	else
-	{
-		hdc = GetContext(0);
 
-		for (SMOOTHInt i = 0; i < nOfEntries; i++)
-		{
-			operat = entries.GetNthEntry(i);
+	HDC	 hdc = GetContext(0);
+
+	for (Int i = 0; i < nOfEntries; i++)
+	{
+		Menu::Entry	*operat = entries.GetNthEntry(i);
 
 #ifdef __WIN32__
-			if (!operat->sizeset) operat->size = GetTextSizeX(hdc, operat->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
+		if (!operat->sizeset) operat->size = GetTextSizeX(hdc, operat->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
 #endif
 
-			operat->sizeset = SMOOTH::True;
-		}
-
-		FreeContext(0, hdc);
+		operat->sizeset = True;
 	}
+
+	FreeContext(0, hdc);
 }
 
-SMOOTHInt SMOOTHMenu::GetNOfEntries()
+S::Int S::Menu::GetNOfEntries()
 {
 	return nOfEntries;
 }
-
-#endif

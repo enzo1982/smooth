@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_TITLEBAR_
-#define __OBJSMOOTH_TITLEBAR_
 
 #include <smooth/titlebar.h>
 #include <smooth/definitions.h>
@@ -25,20 +22,20 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_TITLEBAR = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_TITLEBAR = S::Object::RequestObjectID();
 
-SMOOTHTitlebar::SMOOTHTitlebar(SMOOTHBool minButton, SMOOTHBool maxButton, SMOOTHBool closeButton)
+S::Titlebar::Titlebar(Bool minButton, Bool maxButton, Bool closeButton)
 {
 	type				= OBJ_TITLEBAR;
 	min				= minButton;
 	max				= maxButton;
 	close				= closeButton;
-	closechk			= SMOOTH::False;
-	minchk				= SMOOTH::False;
-	maxchk				= SMOOTH::False;
-	closeclk			= SMOOTH::False;
-	minclk				= SMOOTH::False;
-	maxclk				= SMOOTH::False;
+	closechk			= False;
+	minchk				= False;
+	maxchk				= False;
+	closeclk			= False;
+	minclk				= False;
+	maxclk				= False;
 	objectProperties->orientation	= OR_TOP;
 	objectProperties->size.cy	= METRIC_TITLEBARHEIGHT;
 	subtype				= WO_NOSEPARATOR;
@@ -50,32 +47,32 @@ SMOOTHTitlebar::SMOOTHTitlebar(SMOOTHBool minButton, SMOOTHBool maxButton, SMOOT
 #endif
 }
 
-SMOOTHTitlebar::~SMOOTHTitlebar()
+S::Titlebar::~Titlebar()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHTitlebar::Paint(SMOOTHInt message)
+S::Int S::Titlebar::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHRect	 titleFrame;
-	SMOOTHRect	 titleGradient;
-	SMOOTHRect	 titleText;
-	SMOOTHRect	 iconRect;
-	SMOOTHRect	 tButtonRect;
-	SMOOTHRect	 button;
-	SMOOTHPoint	 start;
-	SMOOTHPoint	 end;
-	SMOOTHInt	 buttonColor;
-	HBITMAP		 icon = wnd->icon;
+	HDC	 dc = GetContext(wnd);
+	Rect	 titleFrame;
+	Rect	 titleGradient;
+	Rect	 titleText;
+	Rect	 iconRect;
+	Rect	 tButtonRect;
+	Rect	 button;
+	Point	 start;
+	Point	 end;
+	Int	 buttonColor;
+	HBITMAP	 icon = wnd->icon;
 
 	objectProperties->text = wnd->GetObjectProperties()->text;
 
@@ -93,12 +90,12 @@ SMOOTHInt SMOOTHTitlebar::Paint(SMOOTHInt message)
 	titleGradient.right	= titleFrame.right;
 	titleGradient.bottom	= titleFrame.bottom;
 
-	SMOOTHBool	 paintactive = SMOOTH::False;
+	Bool	 paintactive = False;
 
 #ifdef __WIN32__
 	if (GetActiveWindow() == wnd->hwnd)
 	{
-		paintactive = SMOOTH::True;
+		paintactive = True;
 	}
 	else
 	{
@@ -106,7 +103,7 @@ SMOOTHInt SMOOTHTitlebar::Paint(SMOOTHInt message)
 		{
 			if (SMOOTH::GetWindow(GetActiveWindow())->type == OBJ_TOOLWINDOW)
 			{
-				paintactive = SMOOTH::True;
+				paintactive = True;
 			}
 		}
 	}
@@ -193,35 +190,35 @@ SMOOTHInt SMOOTHTitlebar::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Titlebar::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 m;
-	SMOOTHPoint	 mPos;
-	SMOOTHSize	 cpwp;
-	SMOOTHRect	 rect;
-	SMOOTHRect	 wRect;
-	SMOOTHRect	 titleFrame;
-	SMOOTHRect	 tButtonRect;
-	SMOOTHRect	 updateRect;
-	SMOOTHRect	 minButton;
-	SMOOTHRect	 maxButton;
-	SMOOTHRect	 closeButton;
-	SMOOTHRect	 workArea;
-	SMOOTHRect	 wndRect;
-	SMOOTHInt	 leftButton;
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	HDC		 dc;
+	Point	 m;
+	Point	 mPos;
+	Size	 cpwp;
+	Rect	 rect;
+	Rect	 wRect;
+	Rect	 titleFrame;
+	Rect	 tButtonRect;
+	Rect	 updateRect;
+	Rect	 minButton;
+	Rect	 maxButton;
+	Rect	 closeButton;
+	Rect	 workArea;
+	Rect	 wndRect;
+	Int	 leftButton;
+	Int	 retVal = Success;
+	HDC	 dc;
 
 #ifdef __WIN32__
 	MSG		 msg;
@@ -269,7 +266,7 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 				if (wnd->maximized)
 				{
 					SetWindowPos(wnd->hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right-nonmaxrect.left, nonmaxrect.bottom-nonmaxrect.top, 0);
-					wnd->maximized = SMOOTH::False;
+					wnd->maximized = False;
 
 					if (SMOOTH::Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, origwndstyle);
 					else					SetWindowLongA(wnd->hwnd, GWL_STYLE, origwndstyle);
@@ -290,7 +287,7 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 					}
 
 					SetWindowPos(wnd->hwnd, 0, workArea.left - 2, workArea.top - 2, workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4, 0);
-					wnd->maximized = SMOOTH::True;
+					wnd->maximized = True;
 
 					if (SMOOTH::Setup::enableUnicode)	origwndstyle = GetWindowLongW(wnd->hwnd, GWL_STYLE);
 					else					origwndstyle = GetWindowLongA(wnd->hwnd, GWL_STYLE);
@@ -299,7 +296,7 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 					else					SetWindowLongA(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
 				}
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 			break;
 		case SM_LBUTTONDOWN:
@@ -376,7 +373,7 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 					while (GetAsyncKeyState(leftButton) != 0);
 				}
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 			else
 			{
@@ -386,42 +383,42 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 					if (minchk)
 					{
-						minclk = SMOOTH::True;
+						minclk = True;
 						Frame(dc, minButton, FRAME_DOWN);
 					}
 
 					if (maxchk)
 					{
-						maxclk = SMOOTH::True;
+						maxclk = True;
 						Frame(dc, maxButton, FRAME_DOWN);
 					}
 
 					if (closechk)
 					{
-						closeclk = SMOOTH::True;
+						closeclk = True;
 						Frame(dc, closeButton, FRAME_DOWN);
 					}
 
 					FreeContext(wnd, dc);
 
-					retVal = SMOOTH::Break;
+					retVal = Break;
 				}
 			}
 			break;
 		case SM_LBUTTONUP:
 			if (minclk)
 			{
-				minclk = SMOOTH::False;
+				minclk = False;
 				ShowWindow(wnd->hwnd, SW_MINIMIZE);
 			}
 			if (maxclk)
 			{
-				maxclk = SMOOTH::False;
+				maxclk = False;
 
 				if (wnd->maximized)
 				{
 					SetWindowPos(wnd->hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right-nonmaxrect.left, nonmaxrect.bottom-nonmaxrect.top, 0);
-					wnd->maximized = SMOOTH::False;
+					wnd->maximized = False;
 
 					if (SMOOTH::Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, origwndstyle);
 					else					SetWindowLongA(wnd->hwnd, GWL_STYLE, origwndstyle);
@@ -442,7 +439,7 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 					}
 
 					SetWindowPos(wnd->hwnd, 0, workArea.left-2, workArea.top-2, workArea.right-workArea.left+4, workArea.bottom-workArea.top+4, 0);
-					wnd->maximized = SMOOTH::True;
+					wnd->maximized = True;
 
 					if (SMOOTH::Setup::enableUnicode)	origwndstyle = GetWindowLongW(wnd->hwnd, GWL_STYLE);
 					else					origwndstyle = GetWindowLongA(wnd->hwnd, GWL_STYLE);
@@ -453,8 +450,8 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 			}
 			if (closeclk)
 			{
-				closeclk = SMOOTH::False;
-				SMOOTH::CloseWindow(wnd);
+				closeclk = False;
+				wnd->Close();
 			}
 			break;
 #endif
@@ -463,8 +460,8 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (minchk && !IsMouseOn(wnd->hwnd, minButton, WINDOW))
 			{
-				minchk	= SMOOTH::False;
-				minclk	= SMOOTH::False;
+				minchk		= False;
+				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
 				Box(dc, minButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
@@ -473,8 +470,8 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 			}
 			if (maxchk && !IsMouseOn(wnd->hwnd, maxButton, WINDOW))
 			{
-				maxchk	= SMOOTH::False;
-				maxclk	= SMOOTH::False;
+				maxchk		= False;
+				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
 				Box(dc, maxButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
@@ -483,8 +480,8 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 			}
 			if (closechk && !IsMouseOn(wnd->hwnd, closeButton, WINDOW))
 			{
-				closechk	= SMOOTH::False;
-				closeclk	= SMOOTH::False;
+				closechk	= False;
+				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
 				Box(dc, closeButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
@@ -500,8 +497,8 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (minchk && !IsMouseOn(wnd->hwnd, minButton, WINDOW))
 			{
-				minchk	= SMOOTH::False;
-				minclk	= SMOOTH::False;
+				minchk		= False;
+				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
 				Box(dc, minButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
@@ -510,8 +507,8 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 			}
 			if (maxchk && !IsMouseOn(wnd->hwnd, maxButton, WINDOW))
 			{
-				maxchk	= SMOOTH::False;
-				maxclk	= SMOOTH::False;
+				maxchk		= False;
+				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
 				Box(dc, maxButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
@@ -520,8 +517,8 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 			}
 			if (closechk && !IsMouseOn(wnd->hwnd, closeButton, WINDOW))
 			{
-				closechk	= SMOOTH::False;
-				closeclk	= SMOOTH::False;
+				closechk	= False;
+				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
 				Box(dc, closeButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
@@ -531,59 +528,59 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (min && !minchk && IsMouseOn(wnd->hwnd, minButton, WINDOW))
 			{
-				maxchk	= SMOOTH::False;
-				maxclk	= SMOOTH::False;
+				maxchk		= False;
+				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
 				Box(dc, maxButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
-				closechk	= SMOOTH::False;
-				closeclk	= SMOOTH::False;
+				closechk	= False;
+				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
 				Box(dc, closeButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
-				minchk = SMOOTH::True;
+				minchk		= True;
 				Frame(dc, minButton, FRAME_UP);
 			}
 			if (max && !maxchk && IsMouseOn(wnd->hwnd, maxButton, WINDOW))
 			{
-				minchk	= SMOOTH::False;
-				minclk	= SMOOTH::False;
+				minchk		= False;
+				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
 				Box(dc, minButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
-				closechk	= SMOOTH::False;
-				closeclk	= SMOOTH::False;
+				closechk	= False;
+				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
 				Box(dc, closeButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
-				maxchk = SMOOTH::True;
+				maxchk		= True;
 				Frame(dc, maxButton, FRAME_UP);
 			}
 			if (close && !closechk && IsMouseOn(wnd->hwnd, closeButton, WINDOW))
 			{
-				minchk	= SMOOTH::False;
-				minclk	= SMOOTH::False;
+				minchk		= False;
+				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
 				Box(dc, minButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
-				maxchk	= SMOOTH::False;
-				maxclk	= SMOOTH::False;
+				maxchk		= False;
+				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
 				Box(dc, maxButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
-				closechk = SMOOTH::True;
+				closechk	= True;
 				Frame(dc, closeButton, FRAME_UP);
 			}
 
@@ -594,5 +591,3 @@ SMOOTHInt SMOOTHTitlebar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 	return retVal;
 }
-
-#endif

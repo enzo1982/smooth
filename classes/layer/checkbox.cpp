@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,16 +8,13 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_CHECKBOX_
-#define __OBJSMOOTH_CHECKBOX_
-
 #include <smooth/checkbox.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -26,53 +23,55 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_CHECKBOX = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_CHECKBOX = S::Object::RequestObjectID();
 
-SMOOTHCheckBox::SMOOTHCheckBox(SMOOTHString text, SMOOTHPoint pos, SMOOTHSize size, SMOOTHBool *var, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var, ProcParam, Void *procParam)
 {
 	type				= OBJ_CHECKBOX;
 	objectProperties->text		= text;
 	variable			= var;
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
 	state				= *variable;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = roundtoint(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = roundtoint(16 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(16 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+
+	GetTextSize();
 }
 
-SMOOTHCheckBox::~SMOOTHCheckBox()
+S::CheckBox::~CheckBox()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHCheckBox::Paint(SMOOTHInt message)
+S::Int S::CheckBox::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHRect	 frame;
-	SMOOTHRect	 textRect;
-	SMOOTHPoint	 lineStart;
-	SMOOTHPoint	 lineEnd;
-	SMOOTHInt	 shadowColor;
-	SMOOTHInt	 crossColor;
+	HDC	 dc = GetContext(wnd);
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
+	Rect	 textRect;
+	Point	 lineStart;
+	Point	 lineEnd;
+	Int	 shadowColor;
+	Int	 crossColor;
 
 	frame.left	= realPos.x + METRIC_CHECKBOXOFFSETXY;
 	frame.top	= realPos.y + METRIC_CHECKBOXOFFSETXY;
@@ -95,7 +94,7 @@ SMOOTHInt SMOOTHCheckBox::Paint(SMOOTHInt message)
 		crossColor = SMOOTH::Setup::GrayTextColor;
 	}
 
-	if (*variable == SMOOTH::True)
+	if (*variable == True)
 	{
 		lineStart.x = frame.left + 3;
 		lineStart.y = frame.top + 3;
@@ -190,27 +189,29 @@ SMOOTHInt SMOOTHCheckBox::Paint(SMOOTHInt message)
 	if (active)	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 	else		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GrayTextColor, objectProperties->fontWeight);
 
+	if (objectProperties->checked) Frame(dc, frame, FRAME_UP);
+
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::CheckBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered) return SMOOTH::Error;
-	if ((!active && message != SM_CHECKCHECKBOXES) || !visible) return SMOOTH::Success;
+	if (!registered) return Error;
+	if ((!active && message != SM_CHECKCHECKBOXES) || !visible) return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHObject	*object;
-	SMOOTHRect	 frame;
-	HDC		 dc;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
+	Object	*object;
+	Rect	 frame;
+	HDC	 dc;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -226,7 +227,7 @@ SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 				Paint(SP_PAINT);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			break;
@@ -235,11 +236,11 @@ SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (objectProperties->checked)
 			{
-				objectProperties->clicked = SMOOTH::True;
+				objectProperties->clicked = True;
 
 				Frame(dc, frame, FRAME_DOWN);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			FreeContext(wnd, dc);
@@ -250,8 +251,8 @@ SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (objectProperties->clicked)
 			{
-				objectProperties->clicked = SMOOTH::False;
-				objectProperties->checked = SMOOTH::False;
+				objectProperties->clicked = False;
+				objectProperties->checked = False;
 
 				frame.right++;
 				frame.bottom++;
@@ -261,8 +262,8 @@ SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 				frame.right--;
 				frame.bottom--;
 
-				if (*variable == SMOOTH::False)	*variable = SMOOTH::True;
-				else				*variable = SMOOTH::False;
+				if (*variable == False)	*variable = True;
+				else			*variable = False;
 
 				state = *variable;
 
@@ -270,7 +271,7 @@ SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 				Process(SM_MOUSEMOVE, 0, 0);
 
-				for (SMOOTHInt i = 0; i < SMOOTHObject::objectCount; i++)
+				for (Int i = 0; i < objectCount; i++)
 				{
 					object = mainObjectManager->RequestObject(i);
 
@@ -280,9 +281,9 @@ SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 					}
 				}
 
-				SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+				ProcCall(objectProperties->proc, objectProperties->procParam);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			FreeContext(wnd, dc);
@@ -293,8 +294,8 @@ SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				objectProperties->checked = SMOOTH::False;
-				objectProperties->clicked = SMOOTH::False;
+				objectProperties->checked = False;
+				objectProperties->clicked = False;
 
 				frame.right++;
 				frame.bottom++;
@@ -311,13 +312,13 @@ SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 			if (!objectProperties->checked && IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				objectProperties->checked = SMOOTH::True;
+				objectProperties->checked = True;
 				Frame(dc, frame, FRAME_UP);
 			}
 			else if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				objectProperties->checked = SMOOTH::False;
-				objectProperties->clicked = SMOOTH::False;
+				objectProperties->checked = False;
+				objectProperties->clicked = False;
 
 				frame.right++;
 				frame.bottom++;
@@ -333,5 +334,3 @@ SMOOTHInt SMOOTHCheckBox::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 
 	return retVal;
 }
-
-#endif

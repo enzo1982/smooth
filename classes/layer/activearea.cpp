@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,60 +8,55 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_ACTIVEAREA_
-#define __OBJSMOOTH_ACTIVEAREA_
-
 #include <smooth/activearea.h>
-#include <smooth/toolkit.h>
 #include <smooth/definitions.h>
-#include <smooth/loop.h>
-#include <smooth/metrics.h>
-#include <smooth/mathtools.h>
-#include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/surface.h>
+#include <smooth/math.h>
+#include <smooth/stk.h>
+#include <smooth/toolkit.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_ACTIVEAREA = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_ACTIVEAREA = S::Object::RequestObjectID();
 
-SMOOTHActiveArea::SMOOTHActiveArea(SMOOTHInt color, SMOOTHPoint pos, SMOOTHSize size, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::ActiveArea::ActiveArea(Int color, Point pos, Size size, ProcParam, Void *procParam)
 {
 	type				= OBJ_ACTIVEAREA;
 	areaColor			= color;
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = roundtoint(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = roundtoint(20 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(20 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-SMOOTHActiveArea::~SMOOTHActiveArea()
+S::ActiveArea::~ActiveArea()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHActiveArea::Paint(SMOOTHInt message)
+S::Int S::ActiveArea::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	SMOOTHRect	 frame;
-	SMOOTHPoint	 realPos = GetRealPosition();
+	Rect	 frame;
+	Point	 realPos = GetRealPosition();
 
 	switch (message)
 	{
@@ -84,23 +79,23 @@ SMOOTHInt SMOOTHActiveArea::Paint(SMOOTHInt message)
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHActiveArea::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::ActiveArea::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHRect	 frame;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
+	Rect	 frame;
 
 	frame.left	= realPos.x + 1;
 	frame.top	= realPos.y + 1;
@@ -112,9 +107,9 @@ SMOOTHInt SMOOTHActiveArea::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHI
 		case SM_LBUTTONDOWN:
 			if (IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+				ProcCall(objectProperties->proc, objectProperties->procParam);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			break;
@@ -123,21 +118,19 @@ SMOOTHInt SMOOTHActiveArea::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHI
 	return retVal;
 }
 
-SMOOTHInt SMOOTHActiveArea::SetColor(SMOOTHInt newColor)
+S::Int S::ActiveArea::SetColor(Int newColor)
 {
 	areaColor = newColor;
 
-	if (!registered)	return SMOOTH::Success;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Success;
+	if (!visible)		return Success;
 
 	Paint(SP_PAINT);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHActiveArea::GetColor()
+S::Int S::ActiveArea::GetColor()
 {
 	return areaColor;
 }
-
-#endif

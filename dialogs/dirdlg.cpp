@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,34 +8,31 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_DIRDLG_
-#define __OBJSMOOTH_DIRDLG_
-
 #include <smooth/dirdlg.h>
 #include <smooth/stk.h>
 #include <smooth/i18n.h>
 #include <smooth/shlobjmini.h>
 #include <smooth/window.h>
 
-SMOOTHDialogDirSelection::SMOOTHDialogDirSelection()
+S::DialogDirSelection::DialogDirSelection()
 {
 	caption = TXT_SELECTDIR;
 	directory = NIL;
 }
 
-SMOOTHDialogDirSelection::~SMOOTHDialogDirSelection()
+S::DialogDirSelection::~DialogDirSelection()
 {
 }
 
-SMOOTHInt SMOOTHDialogDirSelection::ShowDialog()
+S::Int S::DialogDirSelection::ShowDialog()
 {
 	BROWSEINFOW	 infow;
 	BROWSEINFOA	 infoa;
 	wchar_t		*bufferw = new wchar_t [32768];
 	char		*buffera = new char [32768];
 
-	for (SMOOTHInt i = 0; i < 32768; i++) bufferw[i] = 0;
-	for (SMOOTHInt j = 0; j < 32768; j++) buffera[j] = 0;
+	for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
+	for (Int j = 0; j < 32768; j++) buffera[j] = 0;
  
 	if (parentWindow != NIL)
 	{
@@ -79,17 +76,15 @@ SMOOTHInt SMOOTHDialogDirSelection::ShowDialog()
 	{
 		if (directory[directory.Length() - 1] != '\\') directory[directory.Length()] = '\\';
 	
-		return SMOOTH::Success;
+		return Success;
 	}
 	else
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 }
 
-SMOOTHString SMOOTHDialogDirSelection::GetDirName()
+S::String S::DialogDirSelection::GetDirName()
 {
 	return directory;
 }
-
-#endif

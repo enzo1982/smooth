@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_COLORDLG_
-#define __OBJSMOOTH_COLORDLG_
 
 #include <smooth/colordlg.h>
 #include <smooth/application.h>
@@ -19,22 +16,21 @@
 #include <smooth/toolkit.h>
 #include <smooth/color.h>
 #include <smooth/stk.h>
-#include <smooth/layer.h>
 #include <smooth/button.h>
 #include <smooth/definitions.h>
-#include <smooth/divisionbar.h>
+#include <smooth/divider.h>
 #include <smooth/slider.h>
 #include <smooth/text.h>
 #include <smooth/editbox.h>
 #include <smooth/string.h>
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/objectproperties.h>
 
 #include <picture.h>
 
-SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
+S::DialogColorSelection::DialogColorSelection()
 {
 	for (int y = 0; y < 256; y++)
 	{
@@ -44,8 +40,8 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 		}
 	}
 
-	SMOOTHPoint	 bp;
-	SMOOTHSize	 bs;
+	Point	 bp;
+	Size	 bs;
 
 	color = 0;
 
@@ -56,12 +52,12 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 	updatetext = true;
 	updatehextext = true;
 
-	yoffset = roundtoint(32 * SMOOTH::Setup::FontSize);
-	huexoffset = roundtoint(219 * SMOOTH::Setup::FontSize);
-	ncxoffset = roundtoint(242 * SMOOTH::Setup::FontSize);
-	ocxoffset = roundtoint(338 * SMOOTH::Setup::FontSize);
-	crsizex = roundtoint(90 * SMOOTH::Setup::FontSize);
-	crsizey = roundtoint(22 * SMOOTH::Setup::FontSize);
+	yoffset = Math::Round(32 * SMOOTH::Setup::FontSize);
+	huexoffset = Math::Round(219 * SMOOTH::Setup::FontSize);
+	ncxoffset = Math::Round(242 * SMOOTH::Setup::FontSize);
+	ocxoffset = Math::Round(338 * SMOOTH::Setup::FontSize);
+	crsizex = Math::Round(90 * SMOOTH::Setup::FontSize);
+	crsizey = Math::Round(22 * SMOOTH::Setup::FontSize);
 
 	acthue = GetRed(ConvertColor(RGB, HSV, color));
 	actsat = GetGreen(ConvertColor(RGB, HSV, color));
@@ -77,17 +73,16 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 	bs.cx = 0;
 	bs.cy = 0;
 
-	dlgwnd = new SMOOTHWindow(TXT_COLORSELECTION);
+	dlgwnd = new Window(TXT_COLORSELECTION);
 
-	titlebar	= new SMOOTHTitlebar(false, false, true);
-	divbar		= new SMOOTHDivisionbar(42, OR_HORZ | OR_BOTTOM);
-	layer		= new SMOOTHLayer();
-	okbtn		= new SMOOTHButton(TXT_OK, NIL, bp, bs, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgOK));
+	titlebar	= new Titlebar(false, false, true);
+	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
+	okbtn		= new Button(TXT_OK, NIL, bp, bs, Proc(DialogColorSelection, this, ColorDlgOK));
 	okbtn->SetOrientation(OR_LOWERRIGHT);
 
 	bp.x = 175;
 
-	cancelbtn = new SMOOTHButton(TXT_CANCEL, NIL, bp, bs, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgCancel));
+	cancelbtn = new Button(TXT_CANCEL, NIL, bp, bs, Proc(DialogColorSelection, this, ColorDlgCancel));
 	cancelbtn->SetOrientation(OR_LOWERRIGHT);
 
 	bp.x = 174;
@@ -95,38 +90,38 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 	bs.cx = 129;
 	bs.cy = 0;
 
-	hueslider = new SMOOTHSlider(bp, bs, OR_HORZ, &acthue, 0, 255, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgHueSlider));
+	hueslider = new Slider(bp, bs, OR_HORZ, &acthue, 0, 255, Proc(DialogColorSelection, this, ColorDlgHueSlider));
 	hueslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	satslider = new SMOOTHSlider(bp, bs, OR_HORZ, &actsat, 0, 255, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgSatSlider));
+	satslider = new Slider(bp, bs, OR_HORZ, &actsat, 0, 255, Proc(DialogColorSelection, this, ColorDlgSatSlider));
 	satslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	valslider = new SMOOTHSlider(bp, bs, OR_HORZ, &actval, 0, 255, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgValSlider));
+	valslider = new Slider(bp, bs, OR_HORZ, &actval, 0, 255, Proc(DialogColorSelection, this, ColorDlgValSlider));
 	valslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	redslider = new SMOOTHSlider(bp, bs, OR_HORZ, &actred, 0, 255, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgRedSlider));
+	redslider = new Slider(bp, bs, OR_HORZ, &actred, 0, 255, Proc(DialogColorSelection, this, ColorDlgRedSlider));
 	redslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	greenslider = new SMOOTHSlider(bp, bs, OR_HORZ, &actgreen, 0, 255, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgGreenSlider));
+	greenslider = new Slider(bp, bs, OR_HORZ, &actgreen, 0, 255, Proc(DialogColorSelection, this, ColorDlgGreenSlider));
 	greenslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	blueslider = new SMOOTHSlider(bp, bs, OR_HORZ, &actblue, 0, 255, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgBlueSlider));
+	blueslider = new Slider(bp, bs, OR_HORZ, &actblue, 0, 255, Proc(DialogColorSelection, this, ColorDlgBlueSlider));
 	blueslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.x = 189;
 	bp.y = 37;
 
-	huetext = new SMOOTHText(TXT_HUESHORT, bp);
+	huetext = new Text(TXT_HUESHORT, bp);
 	huetext->SetOrientation(OR_UPPERRIGHT);
 
 #ifdef __WIN32__
@@ -135,7 +130,7 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 
 	bp.y += 26;
 
-	sattext = new SMOOTHText(TXT_SATURATIONSHORT, bp);
+	sattext = new Text(TXT_SATURATIONSHORT, bp);
 	sattext->SetOrientation(OR_UPPERRIGHT);
 
 #ifdef __WIN32__
@@ -144,7 +139,7 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 
 	bp.y += 26;
 
-	valtext = new SMOOTHText(TXT_VALUESHORT, bp);
+	valtext = new Text(TXT_VALUESHORT, bp);
 	valtext->SetOrientation(OR_UPPERRIGHT);
 
 #ifdef __WIN32
@@ -153,7 +148,7 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 
 	bp.y += 26;
 
-	redtext = new SMOOTHText(TXT_REDSHORT, bp);
+	redtext = new Text(TXT_REDSHORT, bp);
 	redtext->SetOrientation(OR_UPPERRIGHT);
 
 #ifdef __WIN32__
@@ -162,7 +157,7 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 
 	bp.y += 26;
 
-	greentext = new SMOOTHText(TXT_GREENSHORT, bp);
+	greentext = new Text(TXT_GREENSHORT, bp);
 	greentext->SetOrientation(OR_UPPERRIGHT);
 
 #ifdef __WIN32__
@@ -171,7 +166,7 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 
 	bp.y += 26;
 
-	bluetext = new SMOOTHText(TXT_BLUESHORT, bp);
+	bluetext = new Text(TXT_BLUESHORT, bp);
 	bluetext->SetOrientation(OR_UPPERRIGHT);
 
 #ifdef __WIN32__
@@ -180,7 +175,7 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 
 	bp.y += 26;
 
-	hextext = new SMOOTHText(TXT_HTMLCODE, bp);
+	hextext = new Text(TXT_HTMLCODE, bp);
 	hextext->SetOrientation(OR_UPPERRIGHT);
 
 #ifdef __WIN32__
@@ -192,39 +187,39 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 	bs.cx = 30;
 	bs.cy = 0;
 
-	hueedit = new SMOOTHEditBox(SMOOTHString::IntToString(acthue), bp, bs, EDB_NUMERIC, 3, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgHueEdit));
+	hueedit = new EditBox(String::IntToString(acthue), bp, bs, EDB_NUMERIC, 3, Proc(DialogColorSelection, this, ColorDlgHueEdit));
 	hueedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	satedit = new SMOOTHEditBox(SMOOTHString::IntToString(actsat), bp, bs, EDB_NUMERIC, 3, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgSatEdit));
+	satedit = new EditBox(String::IntToString(actsat), bp, bs, EDB_NUMERIC, 3, Proc(DialogColorSelection, this, ColorDlgSatEdit));
 	satedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	valedit = new SMOOTHEditBox(SMOOTHString::IntToString(actval), bp, bs, EDB_NUMERIC, 3, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgValEdit));
+	valedit = new EditBox(String::IntToString(actval), bp, bs, EDB_NUMERIC, 3, Proc(DialogColorSelection, this, ColorDlgValEdit));
 	valedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	rededit = new SMOOTHEditBox(SMOOTHString::IntToString(actred), bp, bs, EDB_NUMERIC, 3, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgRedEdit));
+	rededit = new EditBox(String::IntToString(actred), bp, bs, EDB_NUMERIC, 3, Proc(DialogColorSelection, this, ColorDlgRedEdit));
 	rededit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	greenedit = new SMOOTHEditBox(SMOOTHString::IntToString(actgreen), bp, bs, EDB_NUMERIC, 3, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgGreenEdit));
+	greenedit = new EditBox(String::IntToString(actgreen), bp, bs, EDB_NUMERIC, 3, Proc(DialogColorSelection, this, ColorDlgGreenEdit));
 	greenedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	blueedit = new SMOOTHEditBox(SMOOTHString::IntToString(actblue), bp, bs, EDB_NUMERIC, 3, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgBlueEdit));
+	blueedit = new EditBox(String::IntToString(actblue), bp, bs, EDB_NUMERIC, 3, Proc(DialogColorSelection, this, ColorDlgBlueEdit));
 	blueedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.x += 40;
 	bp.y += 26;
 	bs.cx += 40;
 
-	hexedit = new SMOOTHEditBox(hexval, bp, bs, EDB_ALPHANUMERIC, 7, SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgHexEdit));
+	hexedit = new EditBox(hexval, bp, bs, EDB_ALPHANUMERIC, 7, Proc(DialogColorSelection, this, ColorDlgHexEdit));
 	hexedit->SetOrientation(OR_UPPERRIGHT);
 
 	huecapt = false;
@@ -235,73 +230,71 @@ SMOOTHDialogColorSelection::SMOOTHDialogColorSelection()
 	lastval = -1;
 
 	RegisterObject(dlgwnd);
-	layer->RegisterObject(okbtn);
-	layer->RegisterObject(cancelbtn);
-	layer->RegisterObject(hueslider);
-	layer->RegisterObject(satslider);
-	layer->RegisterObject(valslider);
-	layer->RegisterObject(redslider);
-	layer->RegisterObject(greenslider);
-	layer->RegisterObject(blueslider);
-	layer->RegisterObject(huetext);
-	layer->RegisterObject(sattext);
-	layer->RegisterObject(valtext);
-	layer->RegisterObject(redtext);
-	layer->RegisterObject(greentext);
-	layer->RegisterObject(bluetext);
-	layer->RegisterObject(hueedit);
-	layer->RegisterObject(satedit);
-	layer->RegisterObject(valedit);
-	layer->RegisterObject(rededit);
-	layer->RegisterObject(greenedit);
-	layer->RegisterObject(blueedit);
-	layer->RegisterObject(hextext);
-	layer->RegisterObject(hexedit);
+	dlgwnd->RegisterObject(okbtn);
+	dlgwnd->RegisterObject(cancelbtn);
+	dlgwnd->RegisterObject(hueslider);
+	dlgwnd->RegisterObject(satslider);
+	dlgwnd->RegisterObject(valslider);
+	dlgwnd->RegisterObject(redslider);
+	dlgwnd->RegisterObject(greenslider);
+	dlgwnd->RegisterObject(blueslider);
+	dlgwnd->RegisterObject(huetext);
+	dlgwnd->RegisterObject(sattext);
+	dlgwnd->RegisterObject(valtext);
+	dlgwnd->RegisterObject(redtext);
+	dlgwnd->RegisterObject(greentext);
+	dlgwnd->RegisterObject(bluetext);
+	dlgwnd->RegisterObject(hueedit);
+	dlgwnd->RegisterObject(satedit);
+	dlgwnd->RegisterObject(valedit);
+	dlgwnd->RegisterObject(rededit);
+	dlgwnd->RegisterObject(greenedit);
+	dlgwnd->RegisterObject(blueedit);
+	dlgwnd->RegisterObject(hextext);
+	dlgwnd->RegisterObject(hexedit);
 	dlgwnd->RegisterObject(titlebar);
-	dlgwnd->RegisterObject(layer);
 	dlgwnd->RegisterObject(divbar);
 
 	dlgwnd->value = 0;
 
-	dlgwnd->SetMetrics(SMOOTHPoint(100, 100), SMOOTHSize(436, 286));
-	dlgwnd->SetPaintProc(SMOOTHProc(SMOOTHDialogColorSelection, this, ColorDlgPaintProc));
-	dlgwnd->SetMessageProc(SMOOTHMessageProc(SMOOTHDialogColorSelection, this, ColorDlgMessageProc));
-	dlgwnd->SetKillProc(SMOOTHKillProc(SMOOTHDialogColorSelection, this, ColorDlgKillProc));
+	dlgwnd->SetMetrics(Point(100, 100), Size(436, 286));
+
+	dlgwnd->SetPaintProc(Proc(DialogColorSelection, this, ColorDlgPaintProc));
+	dlgwnd->SetMessageProc(MessageProc(DialogColorSelection, this, ColorDlgMessageProc));
+	dlgwnd->SetKillProc(KillProc(DialogColorSelection, this, ColorDlgKillProc));
 }
 
-SMOOTHDialogColorSelection::~SMOOTHDialogColorSelection()
+S::DialogColorSelection::~DialogColorSelection()
 {
 	dlgwnd->UnregisterObject(titlebar);
-	dlgwnd->UnregisterObject(layer);
 	dlgwnd->UnregisterObject(divbar);
-	layer->UnregisterObject(okbtn);
-	layer->UnregisterObject(cancelbtn);
-	layer->UnregisterObject(hueslider);
-	layer->UnregisterObject(satslider);
-	layer->UnregisterObject(valslider);
-	layer->UnregisterObject(redslider);
-	layer->UnregisterObject(greenslider);
-	layer->UnregisterObject(blueslider);
-	layer->UnregisterObject(huetext);
-	layer->UnregisterObject(sattext);
-	layer->UnregisterObject(valtext);
-	layer->UnregisterObject(redtext);
-	layer->UnregisterObject(greentext);
-	layer->UnregisterObject(bluetext);
-	layer->UnregisterObject(hueedit);
-	layer->UnregisterObject(satedit);
-	layer->UnregisterObject(valedit);
-	layer->UnregisterObject(rededit);
-	layer->UnregisterObject(greenedit);
-	layer->UnregisterObject(blueedit);
-	layer->UnregisterObject(hextext);
-	layer->UnregisterObject(hexedit);
+	dlgwnd->UnregisterObject(okbtn);
+	dlgwnd->UnregisterObject(cancelbtn);
+	dlgwnd->UnregisterObject(hueslider);
+	dlgwnd->UnregisterObject(satslider);
+	dlgwnd->UnregisterObject(valslider);
+	dlgwnd->UnregisterObject(redslider);
+	dlgwnd->UnregisterObject(greenslider);
+	dlgwnd->UnregisterObject(blueslider);
+	dlgwnd->UnregisterObject(huetext);
+	dlgwnd->UnregisterObject(sattext);
+	dlgwnd->UnregisterObject(valtext);
+	dlgwnd->UnregisterObject(redtext);
+	dlgwnd->UnregisterObject(greentext);
+	dlgwnd->UnregisterObject(bluetext);
+	dlgwnd->UnregisterObject(hueedit);
+	dlgwnd->UnregisterObject(satedit);
+	dlgwnd->UnregisterObject(valedit);
+	dlgwnd->UnregisterObject(rededit);
+	dlgwnd->UnregisterObject(greenedit);
+	dlgwnd->UnregisterObject(blueedit);
+	dlgwnd->UnregisterObject(hextext);
+	dlgwnd->UnregisterObject(hexedit);
 	UnregisterObject(dlgwnd);
 
 	delete titlebar;
 	delete divbar;
 	delete dlgwnd;
-	delete layer;
 	delete okbtn;
 	delete cancelbtn;
 	delete hueslider;
@@ -326,9 +319,9 @@ SMOOTHDialogColorSelection::~SMOOTHDialogColorSelection()
 	delete hexedit;
 }
 
-SMOOTHInt SMOOTHDialogColorSelection::ShowDialog()
+S::Int S::DialogColorSelection::ShowDialog()
 {
-	if (parentWindow != NIL)	dlgwnd->SetMetrics(SMOOTHPoint(parentWindow->GetObjectProperties()->pos.x + 25, parentWindow->GetObjectProperties()->pos.y + 25), SMOOTHSize(436, 286));
+	if (parentWindow != NIL)	dlgwnd->SetMetrics(Point(parentWindow->GetObjectProperties()->pos.x + 25, parentWindow->GetObjectProperties()->pos.y + 25), Size(436, 286));
 	if (caption != NIL)		dlgwnd->SetText(caption);
 
 	dlgwnd->Show();
@@ -340,12 +333,12 @@ SMOOTHInt SMOOTHDialogColorSelection::ShowDialog()
 	return color;
 }
 
-SMOOTHInt SMOOTHDialogColorSelection::GetColor()
+S::Int S::DialogColorSelection::GetColor()
 {
 	return color;
 }
 
-SMOOTHInt SMOOTHDialogColorSelection::SetColor(SMOOTHInt newColor)
+S::Int S::DialogColorSelection::SetColor(Int newColor)
 {
 	color = newColor;
 
@@ -358,36 +351,36 @@ SMOOTHInt SMOOTHDialogColorSelection::SetColor(SMOOTHInt newColor)
 
 	ColorDlgUpdateHexValue();
 
-	hueedit->SetText(SMOOTHString::IntToString(acthue));
-	satedit->SetText(SMOOTHString::IntToString(actsat));
-	valedit->SetText(SMOOTHString::IntToString(actval));
-	rededit->SetText(SMOOTHString::IntToString(actred));
-	greenedit->SetText(SMOOTHString::IntToString(actgreen));
-	blueedit->SetText(SMOOTHString::IntToString(actblue));
+	hueedit->SetText(String::IntToString(acthue));
+	satedit->SetText(String::IntToString(actsat));
+	valedit->SetText(String::IntToString(actval));
+	rededit->SetText(String::IntToString(actred));
+	greenedit->SetText(String::IntToString(actgreen));
+	blueedit->SetText(String::IntToString(actblue));
 	hexedit->SetText(hexval);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHBool SMOOTHDialogColorSelection::ColorDlgKillProc()
+S::Bool S::DialogColorSelection::ColorDlgKillProc()
 {
 	if (dlgwnd->value == 0) dlgwnd->value = color;
 
 	return true;
 }
 
-void SMOOTHDialogColorSelection::ColorDlgPaintProc()
+void S::DialogColorSelection::ColorDlgPaintProc()
 {
 	if (dlgwnd->hwnd == NIL) return;
 
 	HDC		 dc = GetContext(dlgwnd);
-	SMOOTHRect	 rect;
-	SMOOTHPoint	 p1;
-	SMOOTHPoint	 p2;
+	Rect		 rect;
+	Point		 p1;
+	Point		 p2;
 	picture		*pic = new picture(256, 256, 24);
-	SMOOTHRect	 urect = dlgwnd->GetUpdateRect();
-	SMOOTHRect	 irect;
-	int		 hssize = roundtoint(205 * SMOOTH::Setup::FontSize);
+	Rect		 urect = dlgwnd->GetUpdateRect();
+	Rect		 irect;
+	int		 hssize = Math::Round(205 * SMOOTH::Setup::FontSize);
 	double		 hue = 0;
 	double		 huebias = 256 / (double) hssize;
 	register int	 xmin = 0;
@@ -418,7 +411,7 @@ void SMOOTHDialogColorSelection::ColorDlgPaintProc()
 			p2.x = huexoffset + 17;
 			p2.y = yoffset + 1 + ypos;
 
-			Line(dc, p1, p2, ConvertColor(HSV, RGB, RGB(255 - roundtoint(hue), 255, 255)), PS_SOLID, 1);
+			Line(dc, p1, p2, ConvertColor(HSV, RGB, RGB(255 - Math::Round(hue), 255, 255)), PS_SOLID, 1);
 
 			hue += huebias;
 		}
@@ -481,7 +474,7 @@ void SMOOTHDialogColorSelection::ColorDlgPaintProc()
 
 		for (register int sat = max(0, ymin); sat < min(hssize, ymax); sat++)
 		{
-			normrgb = colortable[acthue][255 - roundtoint(sat * (256 / (205 * SMOOTH::Setup::FontSize)))];
+			normrgb = colortable[acthue][255 - Math::Round(sat * (256 / (205 * SMOOTH::Setup::FontSize)))];
 
 			rbias = (double) GetRed(normrgb) / (255 / (256 / (205 * SMOOTH::Setup::FontSize)));
 			gbias = (double) GetGreen(normrgb) / (255 / (256 / (205 * SMOOTH::Setup::FontSize)));
@@ -493,7 +486,7 @@ void SMOOTHDialogColorSelection::ColorDlgPaintProc()
 
 			for (register int val = max(0, xmin); val < min(hssize, xmax); val++)
 			{
-				pic->SetPixel(val, sat, RGB(roundtoint(ared += rbias), roundtoint(agreen += gbias), roundtoint(ablue += bbias)));
+				pic->SetPixel(val, sat, RGB(Math::Round(ared += rbias), Math::Round(agreen += gbias), Math::Round(ablue += bbias)));
 			}
 		}
 
@@ -520,25 +513,25 @@ void SMOOTHDialogColorSelection::ColorDlgPaintProc()
 	delete pic;
 }
 
-void SMOOTHDialogColorSelection::ColorDlgMessageProc(SMOOTHInt message, SMOOTHInt wparam, SMOOTHInt lparam)
+void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int lparam)
 {
 	if (dlgwnd->hwnd == NIL) return;
 
-	SMOOTHRect	 huerect;
-	SMOOTHRect	 vsrect;
-	SMOOTHRect	 ncrect;
-	SMOOTHRect	 ocrect;
-	HDC		 dc = GetContext(dlgwnd);
-	int		 newval;
-	int		 newsat;
+	Rect	 huerect;
+	Rect	 vsrect;
+	Rect	 ncrect;
+	Rect	 ocrect;
+	HDC	 dc = GetContext(dlgwnd);
+	int	 newval;
+	int	 newsat;
 
-	int		 newhue;
+	int	 newhue;
 
 #ifdef __WIN32__
-	int		 leftbutton;
+	int	 leftbutton;
 #endif
 
-	int		 hssize = roundtoint(205 * SMOOTH::Setup::FontSize);
+	int	 hssize = Math::Round(205 * SMOOTH::Setup::FontSize);
 
 	huerect.left	= huexoffset;
 	huerect.top	= yoffset;
@@ -590,12 +583,12 @@ void SMOOTHDialogColorSelection::ColorDlgMessageProc(SMOOTHInt message, SMOOTHIn
 
 				ColorDlgUpdateHexValue();
 
-				hueedit->SetText(SMOOTHString::IntToString(acthue));
-				satedit->SetText(SMOOTHString::IntToString(actsat));
-				valedit->SetText(SMOOTHString::IntToString(actval));
-				rededit->SetText(SMOOTHString::IntToString(actred));
-				greenedit->SetText(SMOOTHString::IntToString(actgreen));
-				blueedit->SetText(SMOOTHString::IntToString(actblue));
+				hueedit->SetText(String::IntToString(acthue));
+				satedit->SetText(String::IntToString(actsat));
+				valedit->SetText(String::IntToString(actval));
+				rededit->SetText(String::IntToString(actred));
+				greenedit->SetText(String::IntToString(actgreen));
+				blueedit->SetText(String::IntToString(actblue));
 				hexedit->SetText(hexval);
 
 				dlgwnd->SetUpdateRect(vsrect);
@@ -629,14 +622,17 @@ void SMOOTHDialogColorSelection::ColorDlgMessageProc(SMOOTHInt message, SMOOTHIn
 				}
 #endif
 
-				newhue = 255 - roundtoint(max(min(MouseY(dlgwnd->hwnd, WINDOW) - (yoffset + 1), hssize - 1), 0) * (255 / (204 * SMOOTH::Setup::FontSize)));
+				newhue = 255 - Math::Round(max(min(MouseY(dlgwnd->hwnd, WINDOW) - (yoffset + 1), hssize - 1), 0) * (255 / (204 * SMOOTH::Setup::FontSize)));
 
 				if (newhue != acthue)
 				{
 					lasthue = acthue;
 					acthue = newhue;
 
-					ColorDlgUpdatePickers();
+					int	 hssize = Math::Round(205 * SMOOTH::Setup::FontSize);
+
+					dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
+					ColorDlgPaintProc();
 
 					actred = GetRed(ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)));
 					actgreen = GetGreen(ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)));
@@ -644,10 +640,10 @@ void SMOOTHDialogColorSelection::ColorDlgMessageProc(SMOOTHInt message, SMOOTHIn
 
 					ColorDlgUpdateHexValue();
 
-					hueedit->SetText(SMOOTHString::IntToString(acthue));
-					rededit->SetText(SMOOTHString::IntToString(actred));
-					greenedit->SetText(SMOOTHString::IntToString(actgreen));
-					blueedit->SetText(SMOOTHString::IntToString(actblue));
+					hueedit->SetText(String::IntToString(acthue));
+					rededit->SetText(String::IntToString(actred));
+					greenedit->SetText(String::IntToString(actgreen));
+					blueedit->SetText(String::IntToString(actblue));
 					hexedit->SetText(hexval);
 
 					Box(dc, ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
@@ -666,8 +662,8 @@ void SMOOTHDialogColorSelection::ColorDlgMessageProc(SMOOTHInt message, SMOOTHIn
 				}
 #endif
 
-				newval = roundtoint(max(min(MouseX(dlgwnd->hwnd, WINDOW) - 8, hssize - 1), 0) * (255 / (204 * SMOOTH::Setup::FontSize)));
-				newsat = 255 - roundtoint(max(min(MouseY(dlgwnd->hwnd, WINDOW) - (yoffset + 1), hssize - 1), 0) * (255 / (204 * SMOOTH::Setup::FontSize)));
+				newval = Math::Round(max(min(MouseX(dlgwnd->hwnd, WINDOW) - 8, hssize - 1), 0) * (255 / (204 * SMOOTH::Setup::FontSize)));
+				newsat = 255 - Math::Round(max(min(MouseY(dlgwnd->hwnd, WINDOW) - (yoffset + 1), hssize - 1), 0) * (255 / (204 * SMOOTH::Setup::FontSize)));
 
 				if ((newval != actval) || (newsat != actsat))
 				{
@@ -684,11 +680,11 @@ void SMOOTHDialogColorSelection::ColorDlgMessageProc(SMOOTHInt message, SMOOTHIn
 
 					ColorDlgUpdateHexValue();
 
-					valedit->SetText(SMOOTHString::IntToString(actval));
-					satedit->SetText(SMOOTHString::IntToString(actsat));
-					rededit->SetText(SMOOTHString::IntToString(actred));
-					greenedit->SetText(SMOOTHString::IntToString(actgreen));
-					blueedit->SetText(SMOOTHString::IntToString(actblue));
+					valedit->SetText(String::IntToString(actval));
+					satedit->SetText(String::IntToString(actsat));
+					rededit->SetText(String::IntToString(actred));
+					greenedit->SetText(String::IntToString(actgreen));
+					blueedit->SetText(String::IntToString(actblue));
 					hexedit->SetText(hexval);
 
 					Box(dc, ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
@@ -700,16 +696,16 @@ void SMOOTHDialogColorSelection::ColorDlgMessageProc(SMOOTHInt message, SMOOTHIn
 	FreeContext(dlgwnd, dc);
 }
 
-void SMOOTHDialogColorSelection::ColorDlgUpdatePickers()
+void S::DialogColorSelection::ColorDlgUpdatePickers()
 {
 	if (dlgwnd->hwnd == NIL) return;
 
-	SMOOTHPoint	 p1;
-	SMOOTHPoint	 p2;
-	HDC		 dc = GetContext(dlgwnd);
-	int		 ahrgb = ConvertColor(HSV, RGB, RGB(acthue, 255, 255));
-	int		 rgb;
-	int		 hssize = roundtoint(205 * SMOOTH::Setup::FontSize);
+	Point	 p1;
+	Point	 p2;
+	HDC	 dc = GetContext(dlgwnd);
+	int	 ahrgb = ConvertColor(HSV, RGB, RGB(acthue, 255, 255));
+	int	 rgb;
+	int	 hssize = Math::Round(205 * SMOOTH::Setup::FontSize);
 
 	if (((lasthue != acthue) || forcehupdate) && !preventhupdate)
 	{
@@ -726,7 +722,7 @@ void SMOOTHDialogColorSelection::ColorDlgUpdatePickers()
 
 		for (int x = huexoffset + 1; x < (huexoffset + 17); x++)
 		{
-			PaintPixel(dc, SMOOTHPoint(x, yoffset + 1 + (int) ((255 - acthue) / (256 / (205 * SMOOTH::Setup::FontSize)))), RGB(255-GetRed(ahrgb), 255-GetGreen(ahrgb), 255-GetBlue(ahrgb)));
+			PaintPixel(dc, Point(x, yoffset + 1 + (int) ((255 - acthue) / (256 / (205 * SMOOTH::Setup::FontSize)))), RGB(255-GetRed(ahrgb), 255-GetGreen(ahrgb), 255-GetBlue(ahrgb)));
 		}
 
 		lasthue = acthue;
@@ -741,14 +737,14 @@ void SMOOTHDialogColorSelection::ColorDlgUpdatePickers()
 			{
 				rgb = ConvertColor(HSV, RGB, RGB(acthue, lastsat, (int) (x * (256 / (205 * SMOOTH::Setup::FontSize)))));
 
-				PaintPixel(dc, SMOOTHPoint(x + 8, yoffset + 1 + (int) ((255 - lastsat) / (256 / (205 * SMOOTH::Setup::FontSize)))), rgb);
+				PaintPixel(dc, Point(x + 8, yoffset + 1 + (int) ((255 - lastsat) / (256 / (205 * SMOOTH::Setup::FontSize)))), rgb);
 			}
 
 			for (int y = 0; y < hssize; y++)
 			{
 				rgb = ConvertColor(HSV, RGB, RGB(acthue, (int) (255 - (y * (256 / (205 * SMOOTH::Setup::FontSize)))), lastval));
 
-				PaintPixel(dc, SMOOTHPoint(8 + (int) (lastval / (256 / (205 * SMOOTH::Setup::FontSize))), y + yoffset + 1), rgb);
+				PaintPixel(dc, Point(8 + (int) (lastval / (256 / (205 * SMOOTH::Setup::FontSize))), y + yoffset + 1), rgb);
 			}
 		}
 
@@ -756,14 +752,14 @@ void SMOOTHDialogColorSelection::ColorDlgUpdatePickers()
 		{
 			rgb = ConvertColor(HSV, RGB, RGB(acthue, actsat, x));
 
-			PaintPixel(dc, SMOOTHPoint(x + 8, yoffset + 1 + (int) ((255 - actsat) / (256 / (205 * SMOOTH::Setup::FontSize)))), RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
+			PaintPixel(dc, Point(x + 8, yoffset + 1 + (int) ((255 - actsat) / (256 / (205 * SMOOTH::Setup::FontSize)))), RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
 		}
 
 		for (int y = 0; y < hssize; y++)
 		{
 			rgb = ConvertColor(HSV, RGB, RGB(acthue, 255 - y, actval));
 
-			PaintPixel(dc, SMOOTHPoint(8 + (int) (actval / (256 / (205 * SMOOTH::Setup::FontSize))), y + yoffset + 1), RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
+			PaintPixel(dc, Point(8 + (int) (actval / (256 / (205 * SMOOTH::Setup::FontSize))), y + yoffset + 1), RGB(255-GetRed(rgb), 255-GetGreen(rgb), 255-GetBlue(rgb)));
 		}
 
 		lastval = actval;
@@ -778,30 +774,21 @@ void SMOOTHDialogColorSelection::ColorDlgUpdatePickers()
 	FreeContext(dlgwnd, dc);
 }
 
-void SMOOTHDialogColorSelection::ColorDlgOK()
+void S::DialogColorSelection::ColorDlgOK()
 {
 	dlgwnd->value = ConvertColor(HSV, RGB, RGB(acthue, actsat, actval));
-
-	SMOOTH::CloseWindow(dlgwnd);
+	dlgwnd->Close();
 }
 
-void SMOOTHDialogColorSelection::ColorDlgCancel()
+void S::DialogColorSelection::ColorDlgCancel()
 {
 	dlgwnd->value = color;
-
-	SMOOTH::CloseWindow(dlgwnd);
+	dlgwnd->Close();
 }
 
-void SMOOTHDialogColorSelection::ColorDlgHueSlider()
+void S::DialogColorSelection::ColorDlgHueSlider()
 {
-	SMOOTHRect	 vsrect;
-	HDC		 dc = GetContext(dlgwnd);
-	int		 hssize = roundtoint(205 * SMOOTH::Setup::FontSize);
-
-	vsrect.left	= 8;
-	vsrect.top	= yoffset + 1;
-	vsrect.right	= vsrect.left + hssize;
-	vsrect.bottom	= vsrect.top + hssize;
+	int	 hssize = Math::Round(205 * SMOOTH::Setup::FontSize);
 
 	actred = GetRed(ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)));
 	actgreen = GetGreen(ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)));
@@ -809,10 +796,10 @@ void SMOOTHDialogColorSelection::ColorDlgHueSlider()
 
 	if (updatetext)
 	{
-		hueedit->SetText(SMOOTHString::IntToString(acthue));
-		rededit->SetText(SMOOTHString::IntToString(actred));
-		greenedit->SetText(SMOOTHString::IntToString(actgreen));
-		blueedit->SetText(SMOOTHString::IntToString(actblue));
+		hueedit->SetText(String::IntToString(acthue));
+		rededit->SetText(String::IntToString(actred));
+		greenedit->SetText(String::IntToString(actgreen));
+		blueedit->SetText(String::IntToString(actblue));
 	}
 
 	if (updatehextext)
@@ -825,21 +812,13 @@ void SMOOTHDialogColorSelection::ColorDlgHueSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	dlgwnd->SetUpdateRect(vsrect);
+	dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
 	ColorDlgPaintProc();
-
-	FreeContext(dlgwnd, dc);
 }
 
-void SMOOTHDialogColorSelection::ColorDlgSatSlider()
+void S::DialogColorSelection::ColorDlgSatSlider()
 {
-	SMOOTHRect	 ncrect;
-	HDC		 dc = GetContext(dlgwnd);
-
-	ncrect.left = ncxoffset + 1;
-	ncrect.top = yoffset + 1;
-	ncrect.right = ncrect.left + (crsizex - 1);
-	ncrect.bottom = ncrect.top + (crsizey - 1);
+	HDC	 dc = GetContext(dlgwnd);
 
 	ColorDlgUpdatePickers();
 
@@ -849,10 +828,10 @@ void SMOOTHDialogColorSelection::ColorDlgSatSlider()
 
 	if (updatetext)
 	{
-		satedit->SetText(SMOOTHString::IntToString(actsat));
-		rededit->SetText(SMOOTHString::IntToString(actred));
-		greenedit->SetText(SMOOTHString::IntToString(actgreen));
-		blueedit->SetText(SMOOTHString::IntToString(actblue));
+		satedit->SetText(String::IntToString(actsat));
+		rededit->SetText(String::IntToString(actred));
+		greenedit->SetText(String::IntToString(actgreen));
+		blueedit->SetText(String::IntToString(actblue));
 	}
 
 	if (updatehextext)
@@ -865,20 +844,14 @@ void SMOOTHDialogColorSelection::ColorDlgSatSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	Box(dc, ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
+	Box(dc, Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
 
 	FreeContext(dlgwnd, dc);
 }
 
-void SMOOTHDialogColorSelection::ColorDlgValSlider()
+void S::DialogColorSelection::ColorDlgValSlider()
 {
-	SMOOTHRect	 ncrect;
-	HDC		 dc = GetContext(dlgwnd);
-
-	ncrect.left = ncxoffset + 1;
-	ncrect.top = yoffset + 1;
-	ncrect.right = ncrect.left + (crsizex - 1);
-	ncrect.bottom = ncrect.top + (crsizey - 1);
+	HDC	 dc = GetContext(dlgwnd);
 
 	ColorDlgUpdatePickers();
 
@@ -888,10 +861,10 @@ void SMOOTHDialogColorSelection::ColorDlgValSlider()
 
 	if (updatetext)
 	{
-		valedit->SetText(SMOOTHString::IntToString(actval));
-		rededit->SetText(SMOOTHString::IntToString(actred));
-		greenedit->SetText(SMOOTHString::IntToString(actgreen));
-		blueedit->SetText(SMOOTHString::IntToString(actblue));
+		valedit->SetText(String::IntToString(actval));
+		rededit->SetText(String::IntToString(actred));
+		greenedit->SetText(String::IntToString(actgreen));
+		blueedit->SetText(String::IntToString(actblue));
 	}
 
 	if (updatehextext)
@@ -904,21 +877,14 @@ void SMOOTHDialogColorSelection::ColorDlgValSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	Box(dc, ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
+	Box(dc, Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
 
 	FreeContext(dlgwnd, dc);
 }
 
-void SMOOTHDialogColorSelection::ColorDlgRedSlider()
+void S::DialogColorSelection::ColorDlgRedSlider()
 {
-	SMOOTHRect	 vsrect;
-	HDC		 dc = GetContext(dlgwnd);
-	int		 hssize = roundtoint(205 * SMOOTH::Setup::FontSize);
-
-	vsrect.left	= 8;
-	vsrect.top	= yoffset + 1;
-	vsrect.right	= vsrect.left + hssize;
-	vsrect.bottom	= vsrect.top + hssize;
+	int	 hssize = Math::Round(205 * SMOOTH::Setup::FontSize);
 
 	acthue = GetRed(ConvertColor(RGB, HSV, RGB(actred, actgreen, actblue)));
 	actsat = GetGreen(ConvertColor(RGB, HSV, RGB(actred, actgreen, actblue)));
@@ -926,10 +892,10 @@ void SMOOTHDialogColorSelection::ColorDlgRedSlider()
 
 	if (updatetext)
 	{
-		hueedit->SetText(SMOOTHString::IntToString(acthue));
-		satedit->SetText(SMOOTHString::IntToString(actsat));
-		valedit->SetText(SMOOTHString::IntToString(actval));
-		rededit->SetText(SMOOTHString::IntToString(actred));
+		hueedit->SetText(String::IntToString(acthue));
+		satedit->SetText(String::IntToString(actsat));
+		valedit->SetText(String::IntToString(actval));
+		rededit->SetText(String::IntToString(actred));
 	}
 
 	if (updatehextext)
@@ -942,22 +908,13 @@ void SMOOTHDialogColorSelection::ColorDlgRedSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	dlgwnd->SetUpdateRect(vsrect);
+	dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
 	ColorDlgPaintProc();
-
-	FreeContext(dlgwnd, dc);
 }
 
-void SMOOTHDialogColorSelection::ColorDlgGreenSlider()
+void S::DialogColorSelection::ColorDlgGreenSlider()
 {
-	SMOOTHRect	 vsrect;
-	HDC		 dc = GetContext(dlgwnd);
-	int		 hssize = roundtoint(205 * SMOOTH::Setup::FontSize);
-
-	vsrect.left	= 8;
-	vsrect.top	= yoffset + 1;
-	vsrect.right	= vsrect.left + hssize;
-	vsrect.bottom	= vsrect.top + hssize;
+	int	 hssize = Math::Round(205 * SMOOTH::Setup::FontSize);
 
 	acthue = GetRed(ConvertColor(RGB, HSV, RGB(actred, actgreen, actblue)));
 	actsat = GetGreen(ConvertColor(RGB, HSV, RGB(actred, actgreen, actblue)));
@@ -965,10 +922,10 @@ void SMOOTHDialogColorSelection::ColorDlgGreenSlider()
 
 	if (updatetext)
 	{
-		hueedit->SetText(SMOOTHString::IntToString(acthue));
-		satedit->SetText(SMOOTHString::IntToString(actsat));
-		valedit->SetText(SMOOTHString::IntToString(actval));
-		greenedit->SetText(SMOOTHString::IntToString(actgreen));
+		hueedit->SetText(String::IntToString(acthue));
+		satedit->SetText(String::IntToString(actsat));
+		valedit->SetText(String::IntToString(actval));
+		greenedit->SetText(String::IntToString(actgreen));
 	}
 
 	if (updatehextext)
@@ -981,22 +938,13 @@ void SMOOTHDialogColorSelection::ColorDlgGreenSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	dlgwnd->SetUpdateRect(vsrect);
+	dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
 	ColorDlgPaintProc();
-
-	FreeContext(dlgwnd, dc);
 }
 
-void SMOOTHDialogColorSelection::ColorDlgBlueSlider()
+void S::DialogColorSelection::ColorDlgBlueSlider()
 {
-	SMOOTHRect	 vsrect;
-	HDC		 dc = GetContext(dlgwnd);
-	int		 hssize = roundtoint(205 * SMOOTH::Setup::FontSize);
-
-	vsrect.left	= 8;
-	vsrect.top	= yoffset + 1;
-	vsrect.right	= vsrect.left + hssize;
-	vsrect.bottom	= vsrect.top + hssize;
+	int	 hssize = Math::Round(205 * SMOOTH::Setup::FontSize);
 
 	acthue = GetRed(ConvertColor(RGB, HSV, RGB(actred, actgreen, actblue)));
 	actsat = GetGreen(ConvertColor(RGB, HSV, RGB(actred, actgreen, actblue)));
@@ -1004,13 +952,11 @@ void SMOOTHDialogColorSelection::ColorDlgBlueSlider()
 
 	if (updatetext)
 	{
-		hueedit->SetText(SMOOTHString::IntToString(acthue));
-		satedit->SetText(SMOOTHString::IntToString(actsat));
-		valedit->SetText(SMOOTHString::IntToString(actval));
-		blueedit->SetText(SMOOTHString::IntToString(actblue));
+		hueedit->SetText(String::IntToString(acthue));
+		satedit->SetText(String::IntToString(actsat));
+		valedit->SetText(String::IntToString(actval));
+		blueedit->SetText(String::IntToString(actblue));
 	}
-
-	updatetext = true;
 
 	if (updatehextext)
 	{
@@ -1020,14 +966,13 @@ void SMOOTHDialogColorSelection::ColorDlgBlueSlider()
 	}
 
 	updatehextext = true;
+	updatetext = true;
 
-	dlgwnd->SetUpdateRect(vsrect);
+	dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
 	ColorDlgPaintProc();
-
-	FreeContext(dlgwnd, dc);
 }
 
-void SMOOTHDialogColorSelection::ColorDlgHueEdit()
+void S::DialogColorSelection::ColorDlgHueEdit()
 {
 	int newhue = max(0, min(255, hueedit->GetText().ToInt()));
 
@@ -1041,7 +986,7 @@ void SMOOTHDialogColorSelection::ColorDlgHueEdit()
 	}
 }
 
-void SMOOTHDialogColorSelection::ColorDlgSatEdit()
+void S::DialogColorSelection::ColorDlgSatEdit()
 {
 	int newsat = max(0, min(255, satedit->GetText().ToInt()));
 
@@ -1055,7 +1000,7 @@ void SMOOTHDialogColorSelection::ColorDlgSatEdit()
 	}
 }
 
-void SMOOTHDialogColorSelection::ColorDlgValEdit()
+void S::DialogColorSelection::ColorDlgValEdit()
 {
 	int newval = max(0, min(255, valedit->GetText().ToInt()));
 
@@ -1069,7 +1014,7 @@ void SMOOTHDialogColorSelection::ColorDlgValEdit()
 	}
 }
 
-void SMOOTHDialogColorSelection::ColorDlgRedEdit()
+void S::DialogColorSelection::ColorDlgRedEdit()
 {
 	int newred = max(0, min(255, rededit->GetText().ToInt()));
 
@@ -1083,7 +1028,7 @@ void SMOOTHDialogColorSelection::ColorDlgRedEdit()
 	}
 }
 
-void SMOOTHDialogColorSelection::ColorDlgGreenEdit()
+void S::DialogColorSelection::ColorDlgGreenEdit()
 {
 	int newgreen = max(0, min(255, greenedit->GetText().ToInt()));
 
@@ -1097,7 +1042,7 @@ void SMOOTHDialogColorSelection::ColorDlgGreenEdit()
 	}
 }
 
-void SMOOTHDialogColorSelection::ColorDlgBlueEdit()
+void S::DialogColorSelection::ColorDlgBlueEdit()
 {
 	int newblue = max(0, min(255, blueedit->GetText().ToInt()));
 
@@ -1111,7 +1056,7 @@ void SMOOTHDialogColorSelection::ColorDlgBlueEdit()
 	}
 }
 
-void SMOOTHDialogColorSelection::ColorDlgUpdateHexValue()
+void S::DialogColorSelection::ColorDlgUpdateHexValue()
 {
 	hexval[0] = '#';
 	hexval[1] = 48 + (actred / 16);
@@ -1127,12 +1072,10 @@ void SMOOTHDialogColorSelection::ColorDlgUpdateHexValue()
 	}
 }
 
-void SMOOTHDialogColorSelection::ColorDlgHexValueChanged()
+void S::DialogColorSelection::ColorDlgHexValueChanged()
 {
 }
 
-void SMOOTHDialogColorSelection::ColorDlgHexEdit()
+void S::DialogColorSelection::ColorDlgHexEdit()
 {
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,11 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_CONTAINER_
-#define __OBJSMOOTH_CONTAINER_
-
 #include <smooth/container.h>
-#include <smooth/stk.h>
 #include <smooth/surface.h>
 #include <smooth/object.h>
 
@@ -20,24 +16,24 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_CONTAINER = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_CONTAINER = S::Object::RequestObjectID();
 
-SMOOTHContainer::SMOOTHContainer()
+S::Container::Container()
 {
 	self			= NIL;
 	nOfObjects		= 0;
 	containerType.container	= this;
 	containerType		= OBJ_CONTAINER;
 
-	nullSurface = new SMOOTHSurface();
+	nullSurface = new Surface();
 	drawSurface = nullSurface;
 }
 
-SMOOTHContainer::~SMOOTHContainer()
+S::Container::~Container()
 {
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
-		if (UnregisterObject(assocObjects.GetFirstEntry()) == SMOOTH::Success) nOfObjects++;
+		if (UnregisterObject(assocObjects.GetFirstEntry()) == Success) nOfObjects++;
 	}
 
 	assocObjects.DeleteAll();
@@ -45,9 +41,9 @@ SMOOTHContainer::~SMOOTHContainer()
 	delete nullSurface;
 }
 
-SMOOTHInt SMOOTHContainer::RegisterObject(SMOOTHObject *object)
+S::Int S::Container::RegisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -59,65 +55,63 @@ SMOOTHInt SMOOTHContainer::RegisterObject(SMOOTHObject *object)
 			object->SetContainer(this);
 			object->SetRegisteredFlag();
 
-			return SMOOTH::Success;
+			return Success;
 		}
 	}
 
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHInt SMOOTHContainer::UnregisterObject(SMOOTHObject *object)
+S::Int S::Container::UnregisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
 	if (containerType == &object->possibleContainers)
 	{
 		if (object->IsRegistered())
 		{
-			if (assocObjects.DeleteEntry(object->handle) == SMOOTH::True)
+			if (assocObjects.DeleteEntry(object->handle) == True)
 			{
 				nOfObjects--;
 
 				object->UnsetRegisteredFlag();
 				object->SetContainer(NIL);
 
-				return SMOOTH::Success;
+				return Success;
 			}
 		}
 	}
 
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHInt SMOOTHContainer::GetNOfObjects()
+S::Int S::Container::GetNOfObjects()
 {
 	return nOfObjects;
 }
 
-SMOOTHObject *SMOOTHContainer::RequestObject(SMOOTHInt objectHandle)
+S::Object *S::Container::RequestObject(Int objectHandle)
 {
 	return assocObjects.GetEntry(objectHandle);
 }
 
-SMOOTHBool SMOOTHContainer::IsContainerCompatible(SMOOTHInt objType)
+S::Bool S::Container::IsContainerCompatible(Int objType)
 {
-	if (objType == OBJ_CONTAINER)	return SMOOTH::True;
-	else				return SMOOTH::False;
+	if (objType == OBJ_CONTAINER)	return True;
+	else				return False;
 }
 
-SMOOTHContainerType SMOOTHContainer::GetContainerType()
+S::ContainerType S::Container::GetContainerType()
 {
 	return containerType;
 }
 
-SMOOTHObject *SMOOTHContainer::GetContainerObject()
+S::Object *S::Container::GetContainerObject()
 {
 	return self;
 }
 
-SMOOTHSurface *SMOOTHContainer::GetDrawSurface()
+S::Surface *S::Container::GetDrawSurface()
 {
 	return drawSurface;
 }
-
-#endif

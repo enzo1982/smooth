@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_TREE_
-#define __OBJSMOOTH_TREE_
 
 #include <smooth/tree.h>
 #include <smooth/definitions.h>
@@ -19,18 +16,18 @@
 #include <smooth/i18n.h>
 #include <smooth/metrics.h>
 
-SMOOTHTree::SMOOTHTree()
+S::Tree::Tree()
 {
 	nOfEntries = 0;
 
-	sizeset = SMOOTH::False;
-	entrysizesset = SMOOTH::False;
+	sizeset = False;
+	entrysizesset = False;
 	counter = -1;
 }
 
-SMOOTHTree::~SMOOTHTree()
+S::Tree::~Tree()
 {
-	for (SMOOTHInt i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
 		delete entries.GetNthEntry(i);
 	}
@@ -38,62 +35,58 @@ SMOOTHTree::~SMOOTHTree()
 	entries.DeleteAll();
 }
 
-SMOOTHInt SMOOTHTree::AddEntry(SMOOTHString name, SMOOTHProcParam, SMOOTHVoid *pparam)
+S::Tree::Entry *S::Tree::AddEntry(String name, ProcParam, Void *procParam)
 {
 	counter++;
 
-	AddTreeEntry(ST_ENTRY, counter, name, newProc, pparam, NIL);
-
-	return counter;
+	return AddTreeEntry(ST_ENTRY, counter, name, newProc, procParam, NIL);
 }
 
-SMOOTHInt SMOOTHTree::AddEntry(SMOOTHString name, SMOOTHTree *sub)
+S::Tree::Entry *S::Tree::AddEntry(String name, Tree *sub)
 {
 	counter++;
 
-	AddTreeEntry(ST_SUB, counter, name, NULLPROC, sub);
-
-	return counter;
+	return AddTreeEntry(ST_SUB, counter, name, NULLPROC, sub);
 }
 
-SMOOTHInt SMOOTHTree::RemoveEntry(SMOOTHInt number)
+S::Int S::Tree::RemoveEntry(Int number)
 {
 	RemoveTreeEntry(number);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHTree::AddTreeEntry(SMOOTHInt type, SMOOTHInt code, SMOOTHString text, SMOOTHProcParam, SMOOTHVoid *pparam, SMOOTHTree *sub)
+S::Tree::Entry *S::Tree::AddTreeEntry(Int type, Int code, String text, ProcParam, Void *procParam, Tree *sub)
 {
-	SMOOTHTree::Entry	*newentry = new SMOOTHTree::Entry(type, code);
+	Tree::Entry	*newEntry = new Tree::Entry(type, code);
 
-	newentry->text		= text;
-	newentry->proc		= (SMOOTHProcType) newProc;
-	newentry->procParam	= pparam;
-	newentry->sub		= sub;
-	newentry->sizeset	= SMOOTH::False;
-	newentry->last		= SMOOTH::True;
+	newEntry->text		= text;
+	newEntry->proc		= (ProcType) newProc;
+	newEntry->procParam	= procParam;
+	newEntry->sub		= sub;
+	newEntry->sizeset	= False;
+	newEntry->last		= True;
 
-	if (nOfEntries != 0) entries.GetLastEntry()->last = SMOOTH::False;
+	if (nOfEntries != 0) entries.GetLastEntry()->last = False;
 
-	if (entries.AddEntry(newentry, code) == SMOOTH::True)
+	if (entries.AddEntry(newEntry, code) == True)
 	{
 		nOfEntries++;
 
-		sizeset = SMOOTH::False;
-		entrysizesset = SMOOTH::False;
+		sizeset = False;
+		entrysizesset = False;
 
-		return SMOOTH::Success;
+		return newEntry;
 	}
 	else
 	{
-		delete newentry;
+		delete newEntry;
 
-		return SMOOTH::Error;
+		return NIL;
 	}
 }
 
-SMOOTHInt SMOOTHTree::RemoveTreeEntry(SMOOTHInt code)
+S::Int S::Tree::RemoveTreeEntry(Int code)
 {
 	if (entries.GetEntry(code) != NIL)
 	{
@@ -103,114 +96,80 @@ SMOOTHInt SMOOTHTree::RemoveTreeEntry(SMOOTHInt code)
 
 		nOfEntries--;
 
-		if (nOfEntries != 0) entries.GetLastEntry()->last = SMOOTH::True;
+		if (nOfEntries != 0) entries.GetLastEntry()->last = True;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 	else
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 }
 
-SMOOTHVoid SMOOTHTree::GetSize()
+S::Void S::Tree::GetSize()
 {
 	if (!entrysizesset)
 	{
 		GetTreeEntriesSize();
-		entrysizesset = SMOOTH::True;
+		entrysizesset = True;
 	}
 	if (!sizeset)
 	{
 		subsize.cx = GetSizeX();
 		subsize.cy = GetSizeY();
-		sizeset = SMOOTH::True;
+		sizeset = True;
 	}
 }
 
-SMOOTHInt SMOOTHTree::GetSizeX()
+S::Int S::Tree::GetSizeX()
 {
-	SMOOTHTree::Entry	*operat;
-	HDC			 hdc;
-	SMOOTHInt		 msize = 50;
-	SMOOTHInt		 greatest = 0;
-	SMOOTHInt		 textsize;
+	Int	 mSize = 50;
+	Int	 greatest = 0;
 
-	if (nOfEntries == 0) return msize;
-	else
+	if (nOfEntries == 0) return mSize;
+
+	for (Int i = 0; i < nOfEntries; i++)
 	{
-		hdc = GetContext(0);
+		Tree::Entry	*entry = entries.GetNthEntry(i);
 
-		for (SMOOTHInt i = 0; i < nOfEntries; i++)
+		if (entry->size > greatest)
 		{
-			operat = entries.GetNthEntry(i);
-
-			textsize = operat->size;
-			if (textsize > greatest)
-			{
-				msize = 50 + textsize;
-				greatest = textsize;
-			}
+			mSize = 50 + entry->size;
+			greatest = entry->size;
 		}
 	}
 
-	FreeContext(0, hdc);
-
-	return msize;
+	return mSize;
 }
 
-SMOOTHInt SMOOTHTree::GetSizeY()
+S::Int S::Tree::GetSizeY()
 {
-	SMOOTHTree::Entry	*operat;
-	HDC			 hdc;
-	SMOOTHInt		 msize = 4;
+	if (nOfEntries == 0) return 4;
 
-	if (nOfEntries == 0) return msize;
-	else
-	{
-		hdc = GetContext(0);
-
-		for (SMOOTHInt i = 0; i < nOfEntries; i++)
-		{
-			operat = entries.GetNthEntry(i);
-
-			msize = msize + 19;
-		}
-	}
-
-	FreeContext(0, hdc);
-
-	return msize;
+	return 4 + 19 * nOfEntries;
 }
 
-SMOOTHVoid SMOOTHTree::GetTreeEntriesSize()
+S::Void S::Tree::GetTreeEntriesSize()
 {
-	SMOOTHTree::Entry	*operat;
-	HDC			 hdc;
-
 	if (nOfEntries == 0) return;
-	else
-	{
-		hdc = GetContext(0);
 
-		for (SMOOTHInt i = 0; i < nOfEntries; i++)
-		{
-			operat = entries.GetNthEntry(i);
+	HDC	 hdc = GetContext(0);
+
+	for (Int i = 0; i < nOfEntries; i++)
+	{
+		Tree::Entry	*operat = entries.GetNthEntry(i);
 
 #ifdef __WIN32__
-			if (!operat->sizeset) operat->size = GetTextSizeX(hdc, operat->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
+		if (!operat->sizeset) operat->size = GetTextSizeX(hdc, operat->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
 #endif
 
-			operat->sizeset = SMOOTH::True;
-		}
-
-		FreeContext(0, hdc);
+		operat->sizeset = True;
 	}
+
+	FreeContext(0, hdc);
 }
 
-SMOOTHInt SMOOTHTree::GetNOfEntries()
+S::Int S::Tree::GetNOfEntries()
 {
 	return nOfEntries;
 }
-
-#endif

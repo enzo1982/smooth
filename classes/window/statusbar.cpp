@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_STATUSBAR_
-#define __OBJSMOOTH_STATUSBAR_
 
 #include <smooth/window.h>
 #include <smooth/statusbar.h>
@@ -24,9 +21,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_STATUSBAR = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_STATUSBAR = S::Object::RequestObjectID();
 
-SMOOTHStatusbar::SMOOTHStatusbar(SMOOTHString status)
+S::Statusbar::Statusbar(String status)
 {
 	type				= OBJ_STATUSBAR;
 	objectProperties->text		= status;
@@ -36,23 +33,23 @@ SMOOTHStatusbar::SMOOTHStatusbar(SMOOTHString status)
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-SMOOTHStatusbar::~SMOOTHStatusbar()
+S::Statusbar::~Statusbar()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHStatusbar::Paint(SMOOTHInt message)
+S::Int S::Statusbar::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHRect	 textRect;
+	HDC	 dc = GetContext(wnd);
+	Rect	 textRect;
 
 	textRect.left	= objectProperties->pos.x + METRIC_SBTEXTOFFSETX;
 	textRect.top	= objectProperties->pos.y + METRIC_SBTEXTOFFSETY;
@@ -63,24 +60,24 @@ SMOOTHInt SMOOTHStatusbar::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHStatusbar::SetText(SMOOTHString newStatus)
+S::Int S::Statusbar::SetText(String newStatus)
 {
-	SMOOTHString	 oldStatus = objectProperties->text;
+	String	 oldStatus = objectProperties->text;
 
 	objectProperties->text = newStatus;
 
-	if (!registered || !visible) return SMOOTH::Success;
+	if (!registered || !visible) return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHRect	 textRect;
+	HDC	 dc = GetContext(wnd);
+	Rect	 textRect;
 
 	textRect.left	= objectProperties->pos.x + METRIC_SBTEXTOFFSETX;
 	textRect.top	= objectProperties->pos.y + METRIC_SBTEXTOFFSETY;
@@ -92,7 +89,5 @@ SMOOTHInt SMOOTHStatusbar::SetText(SMOOTHString newStatus)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

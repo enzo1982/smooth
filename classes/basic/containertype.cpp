@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,62 +8,56 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_CONTAINERTYPE_
-#define __OBJSMOOTH_CONTAINERTYPE_
-
 #include <smooth/containertype.h>
-#include <smooth/stk.h>
 #include <smooth/container.h>
 
-SMOOTHContainerType::SMOOTHContainerType()
+S::ContainerType::ContainerType()
 {
 	container	= NIL;
 	type		= OBJ_CONTAINER;
 }
 
-SMOOTHContainerType::SMOOTHContainerType(const SMOOTHContainerType &containerType)
+S::ContainerType::ContainerType(const ContainerType &containerType)
 {
 	container	= containerType.container;
 	type		= containerType.type;
 }
 
-SMOOTHContainerType::operator SMOOTHInt()
+S::ContainerType::operator S::Int()
 {
 	return type;
 }
 
-SMOOTHInt SMOOTHContainerType::operator =(SMOOTHInt newType)
+S::Int S::ContainerType::operator =(Int newType)
 {
 	type = newType;
 
 	return type;
 }
 
-SMOOTHBool SMOOTHContainerType::operator ==(SMOOTHInt objType)
+S::Bool S::ContainerType::operator ==(Int objType)
 {
-	if (type == objType)					return SMOOTH::True;
-	else if (container->IsContainerCompatible(objType))	return SMOOTH::True;
-	else							return SMOOTH::False;
+	if (type == objType)					return True;
+	else if (container->IsContainerCompatible(objType))	return True;
+	else							return False;
 }
 
-SMOOTHBool SMOOTHContainerType::operator !=(SMOOTHInt objType)
+S::Bool S::ContainerType::operator !=(Int objType)
 {
 	return !(*this == objType);
 }
 
-SMOOTHBool SMOOTHContainerType::operator ==(SMOOTHArray<SMOOTHInt> *objTypes)
+S::Bool S::ContainerType::operator ==(Array<Int> *objTypes)
 {
-	for (SMOOTHInt i = 0; i < objTypes->GetNOfEntries(); i++)
+	for (Int i = 0; i < objTypes->GetNOfEntries(); i++)
 	{
-		if (*this == objTypes->GetNthEntry(i)) return SMOOTH::True;
+		if (*this == objTypes->GetNthEntry(i)) return True;
 	}
 
-	return SMOOTH::False;
+	return False;
 }
 
-SMOOTHBool SMOOTHContainerType::operator !=(SMOOTHArray<SMOOTHInt> *objTypes)
+S::Bool S::ContainerType::operator !=(Array<Int> *objTypes)
 {
 	return !(*this == objTypes);
 }
-
-#endif

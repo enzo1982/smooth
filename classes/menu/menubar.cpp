@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,15 +8,11 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_MENUBAR_
-#define __OBJSMOOTH_MENUBAR_
-
 #include <smooth/definitions.h>
 #include <smooth/menubar.h>
 #include <smooth/menu.h>
 #include <smooth/toolkit.h>
 #include <smooth/loop.h>
-#include <smooth/binary.h>
 #include <smooth/metrics.h>
 #include <smooth/popupmenu.h>
 #include <smooth/stk.h>
@@ -26,9 +22,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_MENUBAR = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_MENUBAR = S::Object::RequestObjectID();
 
-SMOOTHMenubar::SMOOTHMenubar()
+S::Menubar::Menubar()
 {
 	type				= OBJ_MENUBAR;
 	objectProperties->orientation	= OR_TOP;
@@ -41,36 +37,36 @@ SMOOTHMenubar::SMOOTHMenubar()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-SMOOTHMenubar::~SMOOTHMenubar()
+S::Menubar::~Menubar()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
+S::Int S::Menubar::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
-	SMOOTHMenu::Entry	*operat;
-	HDC			 dc = GetContext(wnd);
-	SMOOTHRect		 menubar;
-	SMOOTHRect		 menuentry;
-	SMOOTHRect		 helpmenuentry;
-	SMOOTHPoint		 doublebar1;
-	SMOOTHPoint		 doublebar2;
-	SMOOTHPoint		 p1;
-	SMOOTHPoint		 p2;
-	bool			 firstentry = SMOOTH::True;
-	bool			 prevbitmap = SMOOTH::False;
-	bool			 prevtext = SMOOTH::False;
-	int			 i;
+	Menu::Entry	*operat;
+	HDC		 dc = GetContext(wnd);
+	Rect		 menubar;
+	Rect		 menuentry;
+	Rect		 helpmenuentry;
+	Point		 doublebar1;
+	Point		 doublebar2;
+	Point		 p1;
+	Point		 p2;
+	bool		 firstentry = True;
+	bool		 prevbitmap = False;
+	bool		 prevtext = False;
+	int		 i;
 
 	menubar.left	= objectProperties->pos.x;
 	menubar.top	= objectProperties->pos.y;
@@ -139,7 +135,7 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 
 				VBar(dc, doublebar1, doublebar2);
 
-				firstentry = SMOOTH::True;
+				firstentry = True;
 			}
 			else if (operat->type == SM_TEXT && operat->orientation == OR_LEFT)
 			{
@@ -158,7 +154,7 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 				operat->rect.right	= menuentry.right + 3;
 				operat->rect.bottom	= menuentry.top + METRIC_MBENTRYHEIGHT;
 
-				prevtext = SMOOTH::True;
+				prevtext = True;
 			}
 			else if (operat->type == SM_BITMAP && operat->orientation == OR_LEFT && operat->popup == NIL)
 			{
@@ -184,7 +180,7 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 				operat->rect.right	= menuentry.right + 1;
 				operat->rect.bottom	= menuentry.bottom + 2;
 
-				prevbitmap = SMOOTH::True;
+				prevbitmap = True;
 			}
 			else if (operat->type == SM_BITMAP && operat->orientation == OR_LEFT && operat->popup != NIL)
 			{
@@ -225,20 +221,20 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 				operat->rect.right	= menuentry.right + 1;
 				operat->rect.bottom	= menuentry.bottom + 2;
 
-				prevbitmap = SMOOTH::True;
+				prevbitmap = True;
 			}
 
 			if (operat->orientation == OR_LEFT)
 			{
-				if (operat->type != SM_SEPARATOR)	firstentry = SMOOTH::False;
-				if (operat->type != SM_BITMAP)		prevbitmap = SMOOTH::False;
-				if (operat->type != SM_TEXT)		prevtext = SMOOTH::False;
+				if (operat->type != SM_SEPARATOR)	firstentry = False;
+				if (operat->type != SM_BITMAP)		prevbitmap = False;
+				if (operat->type != SM_TEXT)		prevtext = False;
 			}
 		}
 
-		firstentry = SMOOTH::True;
-		prevbitmap = SMOOTH::False;
-		prevtext = SMOOTH::False;
+		firstentry = True;
+		prevbitmap = False;
+		prevtext = False;
 
 		helpmenuentry.top	= menuentry.top;
 		helpmenuentry.bottom	= menuentry.bottom;
@@ -265,8 +261,8 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 
 				VBar(dc, doublebar1, doublebar2);
 
-				firstentry = SMOOTH::True;
-				prevbitmap = SMOOTH::True;
+				firstentry = True;
+				prevbitmap = True;
 			}
 			else if (operat->type == SM_TEXT  && operat->orientation == OR_RIGHT)
 			{
@@ -309,7 +305,7 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 				operat->rect.right	= helpmenuentry.right + 1;
 				operat->rect.bottom	= helpmenuentry.bottom + 2;
 
-				prevtext = SMOOTH::True;
+				prevtext = True;
 			}
 			else if (operat->type == SM_BITMAP && operat->orientation == OR_RIGHT && operat->popup != NIL)
 			{
@@ -350,14 +346,14 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 				operat->rect.right	= helpmenuentry.right + 1;
 				operat->rect.bottom	= helpmenuentry.bottom + 2;
 
-				prevtext = SMOOTH::True;
+				prevtext = True;
 			}
 
 			if (operat->orientation == OR_RIGHT)
 			{
-				if (operat->type != SM_SEPARATOR)	firstentry = SMOOTH::False;
-				if (operat->type != SM_BITMAP)		prevbitmap = SMOOTH::False;
-				if (operat->type != SM_TEXT)		prevtext = SMOOTH::False;
+				if (operat->type != SM_SEPARATOR)	firstentry = False;
+				if (operat->type != SM_BITMAP)		prevbitmap = False;
+				if (operat->type != SM_TEXT)		prevtext = False;
 			}
 		}
 	}
@@ -395,14 +391,14 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 				operat->rect.right	= menuentry.right + 1;
 				operat->rect.bottom	= menuentry.bottom + 2;
 
-				prevbitmap = SMOOTH::True;
+				prevbitmap = True;
 			}
 
 			if (operat->orientation == OR_LEFT)
 			{
-				if (operat->type != SM_SEPARATOR)	firstentry = SMOOTH::False;
-				if (operat->type != SM_BITMAP)		prevbitmap = SMOOTH::False;
-				if (operat->type != SM_TEXT)		prevtext = SMOOTH::False;
+				if (operat->type != SM_SEPARATOR)	firstentry = False;
+				if (operat->type != SM_BITMAP)		prevbitmap = False;
+				if (operat->type != SM_TEXT)		prevtext = False;
 			}
 		}
 
@@ -412,9 +408,9 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 
 			if (operat->orientation == OR_RIGHT)
 			{
-				if (operat->type != SM_SEPARATOR)	firstentry = SMOOTH::False;
-				if (operat->type != SM_BITMAP)		prevbitmap = SMOOTH::False;
-				if (operat->type != SM_TEXT)		prevtext = SMOOTH::False;
+				if (operat->type != SM_SEPARATOR)	firstentry = False;
+				if (operat->type != SM_BITMAP)		prevbitmap = False;
+				if (operat->type != SM_TEXT)		prevtext = False;
 			}
 		}
 	}
@@ -423,32 +419,32 @@ SMOOTHInt SMOOTHMenubar::Paint(SMOOTHInt message)
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Menubar::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
-	SMOOTHMenu::Entry	*operat;
-	SMOOTHRect		 bmprect;
-	HDC			 dc;
-	SMOOTHInt		 retVal = SMOOTH::Success;
-	bool			 cont = SMOOTH::False;
-	SMOOTHInt		 i;
-	SMOOTHPopupMenu		*popupMenu = NIL;
+	Menu::Entry	*operat;
+	Rect		 bmprect;
+	HDC		 dc;
+	Int		 retVal = Success;
+	bool		 cont = False;
+	Int		 i;
+	PopupMenu	*popupMenu = NIL;
 
-	SMOOTHString		 newStatus;
-	SMOOTHBool		 updateStatus = SMOOTH::False;
-	SMOOTHBool		 setOldStatus = SMOOTH::False;
+	String		 newStatus;
+	Bool		 updateStatus = False;
+	Bool		 setOldStatus = False;
 
 	switch (message)
 	{
@@ -467,18 +463,18 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 					if (!operat->clicked)
 					{
-						operat->clicked = SMOOTH::True;
+						operat->clicked = True;
 						Frame(dc, operat->rect, FRAME_DOWN);
 					}
 					else
 					{
-						operat->clicked = SMOOTH::False;
+						operat->clicked = False;
 						Frame(dc, operat->rect, FRAME_UP);
 					}
 
 					if (operat->clicked && (operat->popup != NIL && operat->orientation == OR_LEFT))
 					{
-						popupMenu = new SMOOTHPopupMenu();
+						popupMenu = new PopupMenu();
 
 						popupHandle = popupMenu->handle;
 
@@ -488,25 +484,25 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 						wnd->RegisterObject(popupMenu);
 
-						cont = SMOOTH::True;
+						cont = True;
 					}
 					else if (operat->clicked && (operat->popup != NIL && operat->orientation == OR_RIGHT))
 					{
-						popupMenu = new SMOOTHPopupMenu();
+						popupMenu = new PopupMenu();
 
 						popupHandle = popupMenu->handle;
 
 						popupMenu->MenuToPopup(operat->popup);
-						((SMOOTHMenu *) popupMenu)->GetSize();
-						popupMenu->GetObjectProperties()->pos.x = operat->rect.right + 1 - ((SMOOTHMenu *) popupMenu)->popupsize.cx;
+						((Menu *) popupMenu)->GetSize();
+						popupMenu->GetObjectProperties()->pos.x = operat->rect.right + 1 - ((Menu *) popupMenu)->popupsize.cx;
 						popupMenu->GetObjectProperties()->pos.y = operat->rect.bottom + 2;
 
 						wnd->RegisterObject(popupMenu);
 
-						cont = SMOOTH::True;
+						cont = True;
 					}
 
-					retVal = SMOOTH::Break;
+					retVal = Break;
 				}
 			}
 
@@ -524,12 +520,12 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 
 				if (operat->type == SM_TEXT && operat->clicked)
 				{
-					operat->clicked = SMOOTH::False;
+					operat->clicked = False;
 					Frame(dc, operat->rect, FRAME_UP);
 
 					if (operat->proc != NIL && operat->bVar == NIL && operat->iVar == NIL)
 					{
-						operat->checked = SMOOTH::False;
+						operat->checked = False;
 
 						if (operat->description != NIL) wnd->SetStatusText(backupStatusText);
 
@@ -539,25 +535,25 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 						operat->rect.right--;
 						operat->rect.bottom--;
 
-						SMOOTHProcCall(operat->proc, operat->procParam);
+						ProcCall(operat->proc, operat->procParam);
 
 						Process(SM_MOUSEMOVE, 0, 0);
 
-						retVal = SMOOTH::Break;
+						retVal = Break;
 
 						break;
 					}
 
-					retVal = SMOOTH::Break;
+					retVal = Break;
 				}
 				else if (operat->type == SM_BITMAP && operat->clicked)
 				{
-					operat->clicked = SMOOTH::False;
+					operat->clicked = False;
 					Frame(dc, operat->rect, FRAME_UP);
 
 					if (operat->proc != NIL && operat->bVar == NIL && operat->iVar == NIL)
 					{
-						operat->checked = SMOOTH::False;
+						operat->checked = False;
 
 						if (operat->description != NIL) wnd->SetStatusText(backupStatusText);
 
@@ -576,16 +572,16 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 						if (style == MB_GRAYSCALE)	PaintBitmap(dc, bmprect, operat->graymap);
 						else				PaintBitmap(dc, bmprect, operat->bitmap);
 
-						SMOOTHProcCall(operat->proc, operat->procParam);
+						ProcCall(operat->proc, operat->procParam);
 
 						Process(SM_MOUSEMOVE, 0, 0);
 
-						retVal = SMOOTH::Break;
+						retVal = Break;
 
 						break;
 					}
 
-					retVal = SMOOTH::Break;
+					retVal = Break;
 				}
 			}
 
@@ -605,10 +601,10 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 				{
 					if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && operat->checked)
 					{
-						operat->checked = SMOOTH::False;
-						operat->clicked = SMOOTH::False;
+						operat->checked = False;
+						operat->clicked = False;
 
-						if (operat->description != NIL) setOldStatus = SMOOTH::True;
+						if (operat->description != NIL) setOldStatus = True;
 
 						operat->rect.right++;
 						operat->rect.bottom++;
@@ -621,10 +617,10 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 				{
 					if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && operat->checked)
 					{
-						operat->checked = SMOOTH::False;
-						operat->clicked = SMOOTH::False;
+						operat->checked = False;
+						operat->clicked = False;
 
-						if (operat->description != NIL) setOldStatus = SMOOTH::True;
+						if (operat->description != NIL) setOldStatus = True;
 
 						operat->rect.right++;
 						operat->rect.bottom++;
@@ -659,23 +655,23 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 				{
 					if (IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && !operat->checked)
 					{
-						operat->checked = SMOOTH::True;
+						operat->checked = True;
 
 						if (operat->description != NIL)
 						{
 							newStatus = operat->description;
 
-							updateStatus = SMOOTH::True;
+							updateStatus = True;
 						}
 
 						Frame(dc, operat->rect, FRAME_UP);
 					}
 					else if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && operat->checked)
 					{
-						operat->checked = SMOOTH::False;
-						operat->clicked = SMOOTH::False;
+						operat->checked = False;
+						operat->clicked = False;
 
-						if (operat->description != NIL) setOldStatus = SMOOTH::True;
+						if (operat->description != NIL) setOldStatus = True;
 
 						operat->rect.right++;
 						operat->rect.bottom++;
@@ -688,13 +684,13 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 				{
 					if (IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && !operat->checked)
 					{
-						operat->checked = SMOOTH::True;
+						operat->checked = True;
 
 						if (operat->description != NIL)
 						{
 							newStatus = operat->description;
 
-							updateStatus = SMOOTH::True;
+							updateStatus = True;
 						}
 
 						bmprect = operat->rect;
@@ -707,10 +703,10 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 					}
 					else if (!IsMouseOn(wnd->hwnd, operat->rect, WINDOW) && operat->checked)
 					{
-						operat->checked = SMOOTH::False;
-						operat->clicked = SMOOTH::False;
+						operat->checked = False;
+						operat->clicked = False;
 
-						if (operat->description != NIL) setOldStatus = SMOOTH::True;
+						if (operat->description != NIL) setOldStatus = True;
 
 						operat->rect.right++;
 						operat->rect.bottom++;
@@ -748,18 +744,16 @@ SMOOTHInt SMOOTHMenubar::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 	return retVal;
 }
 
-SMOOTHInt SMOOTHMenubar::SetStyle(SMOOTHInt newstyle)
+S::Int S::Menubar::SetStyle(Int newstyle)
 {
 	if (newstyle == MB_GRAYSCALE || newstyle == MB_COLOR)
 	{
 		style = newstyle;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 	else
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 }
-
-#endif

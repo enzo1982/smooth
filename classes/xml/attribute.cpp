@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,16 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_XMLATTRIBUTE_
-#define __OBJSMOOTH_XMLATTRIBUTE_
-
 #include <libxml/parser.h>
 
 #include <smooth/object.h>
 #include <smooth/xml/attribute.h>
-#include <smooth/stk.h>
 
-SMOOTHXMLAttribute::SMOOTHXMLAttribute()
+S::XML::Attribute::Attribute()
 {
 	nextAttribute	= NIL;
 	prevAttribute	= NIL;
@@ -29,80 +25,78 @@ SMOOTHXMLAttribute::SMOOTHXMLAttribute()
 	content		= NIL;
 }
 
-SMOOTHXMLAttribute::~SMOOTHXMLAttribute()
+S::XML::Attribute::~Attribute()
 {
 }
 
-SMOOTHXMLNode *SMOOTHXMLAttribute::GetParentNode()
+S::XML::Node *S::XML::Attribute::GetParentNode()
 {
 	return parentNode;
 }
 
-SMOOTHInt SMOOTHXMLAttribute::SetParentNode(SMOOTHXMLNode *newParentNode)
+S::Int S::XML::Attribute::SetParentNode(Node *newParentNode)
 {
 	parentNode = newParentNode;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLAttribute::GetAttributeID()
+S::Int S::XML::Attribute::GetAttributeID()
 {
 	return attributeID;
 }
 
-SMOOTHInt SMOOTHXMLAttribute::SetAttributeID(SMOOTHInt newID)
+S::Int S::XML::Attribute::SetAttributeID(Int newID)
 {
 	attributeID = newID;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHXMLAttribute *SMOOTHXMLAttribute::GetNextAttribute()
+S::XML::Attribute *S::XML::Attribute::GetNextAttribute()
 {
 	return nextAttribute;
 }
 
-SMOOTHXMLAttribute *SMOOTHXMLAttribute::GetPrevAttribute()
+S::XML::Attribute *S::XML::Attribute::GetPrevAttribute()
 {
 	return prevAttribute;
 }
 
-SMOOTHInt SMOOTHXMLAttribute::SetNextAttribute(SMOOTHXMLAttribute *newAttribute)
+S::Int S::XML::Attribute::SetNextAttribute(Attribute *newAttribute)
 {
 	nextAttribute = newAttribute;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLAttribute::SetPrevAttribute(SMOOTHXMLAttribute *newAttribute)
+S::Int S::XML::Attribute::SetPrevAttribute(Attribute *newAttribute)
 {
 	prevAttribute = newAttribute;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHString SMOOTHXMLAttribute::GetName()
+S::String S::XML::Attribute::GetName()
 {
 	return name;
 }
 
-SMOOTHInt SMOOTHXMLAttribute::SetName(SMOOTHString newName)
+S::Int S::XML::Attribute::SetName(String newName)
 {
 	name = newName;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHString SMOOTHXMLAttribute::GetContent()
+S::String S::XML::Attribute::GetContent()
 {
 	return content;
 }
 
-SMOOTHInt SMOOTHXMLAttribute::SetContent(SMOOTHString newContent)
+S::Int S::XML::Attribute::SetContent(String newContent)
 {
 	content = newContent;
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

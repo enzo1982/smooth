@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_OBJECTMANAGER_
-#define __OBJSMOOTH_OBJECTMANAGER_
 
 #include <smooth/objectmanager.h>
 #include <smooth/i18n.h>
@@ -19,63 +16,61 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHObjectManager	*mainObjectManager;
-SMOOTHBool		 SMOOTHObjectManager::objectManagerExists = SMOOTH::False;
+S::ObjectManager	*S::mainObjectManager;
+S::Bool			 S::ObjectManager::objectManagerExists = S::False;
 
-SMOOTHObjectManager::SMOOTHObjectManager()
+S::ObjectManager::ObjectManager()
 {
 	if (objectManagerExists)
 	{
-		iAmTheOne = SMOOTH::False;
+		iAmTheOne = False;
 
 #ifdef __WIN32__
-		SMOOTH::MessageBox(TXT_ERROR, TXT_ERROR_OBJECTMANAGEREXISTS, MB_OK, IDI_INFORMATION);
+		SMOOTH::MessageBox(TXT_ERROR_OBJECTMANAGEREXISTS, TXT_ERROR, MB_OK, IDI_INFORMATION);
 #endif
 
 		delete this;
 	}
 	else
 	{
-		iAmTheOne = SMOOTH::True;
+		iAmTheOne = True;
 
-		objectManagerExists = SMOOTH::True;
+		objectManagerExists = True;
 	}
 }
 
-SMOOTHObjectManager::~SMOOTHObjectManager()
+S::ObjectManager::~ObjectManager()
 {
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
 		delete assocObjects.GetNthEntry(i);
 	}
 
 	nOfObjects = 0;
 
-	if (iAmTheOne) objectManagerExists = SMOOTH::False;
+	if (iAmTheOne) objectManagerExists = False;
 }
 
-SMOOTHInt SMOOTHObjectManager::RegisterObject(SMOOTHObject *object)
+S::Int S::ObjectManager::RegisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
 	assocObjects.AddEntry(object, object->handle);
 	nOfObjects++;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHObjectManager::UnregisterObject(SMOOTHObject *object)
+S::Int S::ObjectManager::UnregisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
-	if (assocObjects.DeleteEntry(object->handle) == SMOOTH::True)
+	if (assocObjects.DeleteEntry(object->handle) == True)
 	{
 		nOfObjects--;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 
-	return SMOOTH::Error;
+	return Error;
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,15 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_TEXT_
-#define __OBJSMOOTH_TEXT_
-
 #include <smooth/text.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -26,38 +23,38 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_TEXT = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_TEXT = S::Object::RequestObjectID();
 
-SMOOTHText::SMOOTHText(SMOOTHString text, SMOOTHPoint pos)
+S::Text::Text(String text, Point pos)
 {
 	type = OBJ_TEXT;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
 	objectProperties->text = text;
 
 	GetTextSize();
 }
 
-SMOOTHText::~SMOOTHText()
+S::Text::~Text()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHText::Paint(SMOOTHInt message)
+S::Int S::Text::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	SMOOTHRect	 textRect;
-	SMOOTHPoint	 realPos = GetRealPosition();
+	Rect	 textRect;
+	Point	 realPos = GetRealPosition();
 
 	objectProperties->size = objectProperties->textSize;
 
@@ -68,7 +65,7 @@ SMOOTHInt SMOOTHText::Paint(SMOOTHInt message)
 			textRect.left	= realPos.x;
 			textRect.top	= realPos.y;
 			textRect.right	= textRect.left + objectProperties->textSize.cx;
-			textRect.bottom	= textRect.top + roundtoint(objectProperties->textSize.cy * 1.2);
+			textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
 			if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 			else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GrayTextColor, objectProperties->fontWeight);
@@ -78,7 +75,5 @@ SMOOTHInt SMOOTHText::Paint(SMOOTHInt message)
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

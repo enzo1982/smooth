@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,14 +8,11 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_MDICLIENT_
-#define __OBJSMOOTH_MDICLIENT_
-
 #include <smooth/mdiclient.h>
 #include <smooth/window.h>
 #include <smooth/toolkit.h>
 #include <smooth/object.h>
-#include <smooth/divisionbar.h>
+#include <smooth/divider.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
@@ -28,9 +25,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_MDICLIENT = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_MDICLIENT = S::Object::RequestObjectID();
 
-SMOOTHMDIClient::SMOOTHMDIClient()
+S::MDIClient::MDIClient()
 {
 	type				= OBJ_MDICLIENT;
 	objectProperties->orientation	= OR_CENTER;
@@ -38,45 +35,45 @@ SMOOTHMDIClient::SMOOTHMDIClient()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-SMOOTHMDIClient::~SMOOTHMDIClient()
+S::MDIClient::~MDIClient()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHMDIClient::Paint(SMOOTHInt message)
+S::Int S::MDIClient::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHObject		*object;
-	SMOOTHDivisionbar	*db;
-	SMOOTHRect		 client;
-	SMOOTHRect		 updateRect = wnd->GetUpdateRect();
-	HDC			 dc = GetContext(wnd);
+	Object	*object;
+	Divider	*db;
+	Rect	 client;
+	Rect	 updateRect = wnd->GetUpdateRect();
+	HDC	 dc = GetContext(wnd);
 
 	client.left	= objectProperties->pos.x + 2;
 	client.top	= objectProperties->pos.y + 2;
 	client.right	= objectProperties->size.cx + objectProperties->pos.x - 1;
 	client.bottom	= objectProperties->size.cy + objectProperties->pos.y - 2;
 
-	for (SMOOTHInt i = SMOOTHObject::objectCount - 1; i >= 0; i--)
+	for (Int i = Object::objectCount - 1; i >= 0; i--)
 	{
 		object = mainObjectManager->RequestObject(i);
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == OBJ_DIVISIONBAR && object->GetContainer() == myContainer)
+			if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
 			{
-				db = (SMOOTHDivisionbar *) object;
+				db = (Divider *) object;
 
-				if (IsBitSet(db->orientation, OR_VERT))
+				if (Binary::IsFlagSet(db->orientation, OR_VERT))
 				{
-					if (IsBitSet(db->orientation, OR_LEFT))
+					if (Binary::IsFlagSet(db->orientation, OR_LEFT))
 					{
 						if (db->GetObjectProperties()->pos.x >= client.left - 3) client.left = db->GetObjectProperties()->pos.x + 5;
 					}
@@ -85,9 +82,9 @@ SMOOTHInt SMOOTHMDIClient::Paint(SMOOTHInt message)
 						if (db->GetObjectProperties()->pos.x <= client.right + 1) client.right = wnd->GetObjectProperties()->size.cx - db->GetObjectProperties()->pos.x - 2;
 					}
 				}
-				else if (IsBitSet(db->orientation, OR_HORZ))
+				else if (Binary::IsFlagSet(db->orientation, OR_HORZ))
 				{
-					if (IsBitSet(db->orientation, OR_TOP))
+					if (Binary::IsFlagSet(db->orientation, OR_TOP))
 					{
 						if (db->GetObjectProperties()->pos.y >= client.top - 2) client.top = db->GetObjectProperties()->pos.y + 5;
 					}
@@ -102,7 +99,7 @@ SMOOTHInt SMOOTHMDIClient::Paint(SMOOTHInt message)
 
 	if (DoRectsOverlap(updateRect, client))
 	{
-		SMOOTHRect	 intersectRect;
+		Rect	 intersectRect;
 
 		client.bottom--;
 		client.right--;
@@ -127,7 +124,5 @@ SMOOTHInt SMOOTHMDIClient::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

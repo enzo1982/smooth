@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,30 +8,27 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_TOOLWINDOW_
-#define __OBJSMOOTH_TOOLWINDOW_
-
 #include <smooth/toolwindow.h>
 #include <smooth/window.h>
 #include <smooth/toolkit.h>
 #include <smooth/object.h>
-#include <smooth/divisionbar.h>
+#include <smooth/divider.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
 #include <smooth/i18n.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
-
-#include <math.h>
+#include <smooth/surfacegdi.h>
+#include <smooth/layer.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_TOOLWINDOW = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_TOOLWINDOW = S::Object::RequestObjectID();
 
-SMOOTHToolWindow::SMOOTHToolWindow() : SMOOTHWindow(TXT_SMOOTHTOOLWINDOW)
+S::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
 {
 	type				= OBJ_TOOLWINDOW;
 	containerType			= OBJ_WINDOW;
@@ -54,35 +51,39 @@ SMOOTHToolWindow::SMOOTHToolWindow() : SMOOTHWindow(TXT_SMOOTHTOOLWINDOW)
 #endif
 }
 
-SMOOTHToolWindow::~SMOOTHToolWindow()
+S::ToolWindow::~ToolWindow()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHToolWindow::SetOwner(SMOOTHObject *newOwner)
+S::Int S::ToolWindow::SetOwner(Object *newOwner)
 {
 	owner = newOwner;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHToolWindow::FreeOwner()
+S::Int S::ToolWindow::FreeOwner()
 {
 	owner = NIL;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-HWND SMOOTHToolWindow::Create()
+HWND S::ToolWindow::Create()
 {
 	if (registered && !created)
 	{
-		hwnd = CreateSimpleWindow(SMOOTHRect(objectProperties->pos, objectProperties->size), objectProperties->text, className, sysicon, style, exstyle);
+		hwnd = CreateSimpleWindow(Rect(objectProperties->pos, objectProperties->size), objectProperties->text, className, sysicon, style, exstyle);
 
 		if (hwnd != NIL)
 		{
-			created = SMOOTH::True;
-			visible = SMOOTH::False;
+			created = True;
+			visible = False;
+
+			windowDC = GetContext(this);
+
+			drawSurface = new SurfaceGDI(windowDC);
 
 			return hwnd;
 		}
@@ -95,16 +96,16 @@ HWND SMOOTHToolWindow::Create()
 	return NIL;
 }
 
-SMOOTHInt SMOOTHToolWindow::Paint(SMOOTHInt message)
+S::Int S::ToolWindow::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHObject	*object;
+	Object	*object;
 
 	if (created)
 	{
-		for (SMOOTHInt i = 0; i < nOfObjects; i++)
+		for (Int i = 0; i < nOfObjects; i++)
 		{
 			object = assocObjects.GetNthEntry(i);
 
@@ -112,17 +113,17 @@ SMOOTHInt SMOOTHToolWindow::Paint(SMOOTHInt message)
 		}
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHToolWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::ToolWindow::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
 	EnterProtectedRegion();
 
-	if (!(message == SM_MOUSEMOVE && wParam == 1)) SMOOTHMessageProcCall(messageProc, messageProcParam, message, wParam, lParam);
+	if (!(message == SM_MOUSEMOVE && wParam == 1)) MessageProcCall(messageProc, messageProcParam, message, wParam, lParam);
 
 	switch (message)
 	{
@@ -132,8 +133,14 @@ SMOOTHInt SMOOTHToolWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHI
 			break;
 #ifdef __WIN32__
 		case WM_CLOSE:
-			if (SMOOTHKillProcCall(killProc, killProcParam))
+			if (KillProcCall(killProc, killProcParam))
 			{
+				delete drawSurface;
+
+				drawSurface = nullSurface;
+
+				FreeContext(this, windowDC);
+
 				DestroyWindow(hwnd);
 
 				hwnd = NIL;
@@ -143,11 +150,11 @@ SMOOTHInt SMOOTHToolWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHI
 
 			return 0;
 		case WM_DESTROY:
-			destroyed = SMOOTH::True;
+			destroyed = True;
 
 			if (nOfActiveWindows == 1 && loopActive)
 			{
-				if (SMOOTH::Setup::enableUnicode)	SendMessageW(hwnd, WM_QUIT, 0, 0);
+				if (S::SMOOTH::Setup::enableUnicode)	SendMessageW(hwnd, WM_QUIT, 0, 0);
 				else					SendMessageA(hwnd, WM_QUIT, 0, 0);
 			}
 			else
@@ -159,7 +166,7 @@ SMOOTHInt SMOOTHToolWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHI
 
 			return 0;
 		case WM_QUIT:
-			destroyed = SMOOTH::True;
+			destroyed = True;
 
 			nOfActiveWindows--;
 
@@ -215,9 +222,9 @@ SMOOTHInt SMOOTHToolWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHI
 		case WM_WINDOWPOSCHANGED:
 			{
 				WINDOWPOS	*wndPos = (LPWINDOWPOS) lParam;
-				SMOOTHObject	*object = NIL;
+				Object		*object = NIL;
 
-				for (SMOOTHInt i = 0; i < nOfObjects; i++)
+				for (Int i = 0; i < nOfObjects; i++)
 				{
 					object = assocObjects.GetNthEntry(i);
 
@@ -243,17 +250,17 @@ SMOOTHInt SMOOTHToolWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHI
 #endif
 	}
 
-	SMOOTHObject	*object = NIL;
+	Object	*object = NIL;
 
-	for (SMOOTHInt j = nOfObjects - 1; j >= 0; j--)
+	for (Int j = nOfObjects - 1; j >= 0; j--)
 	{
 		object = assocObjects.GetNthEntry(j);
 
-		if (object->Process(message, wParam, lParam) == SMOOTH::Break)
+		if (object->Process(message, wParam, lParam) == Break)
 		{
 			LeaveProtectedRegion();
 
-			return SMOOTH::Break;
+			return Break;
 		}
 	}
 
@@ -261,12 +268,12 @@ SMOOTHInt SMOOTHToolWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHI
 	
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHToolWindow::RegisterObject(SMOOTHObject *object)
+S::Int S::ToolWindow::RegisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -292,17 +299,19 @@ SMOOTHInt SMOOTHToolWindow::RegisterObject(SMOOTHObject *object)
 
 			object->Show();
 
-			return SMOOTH::Success;
+			return Success;
 		}
 	}
+	else
+	{
+		return mainLayer->RegisterObject(object);
+	}
 
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHBool SMOOTHToolWindow::IsTypeCompatible(SMOOTHInt compType)
+S::Bool S::ToolWindow::IsTypeCompatible(Int compType)
 {
-	if (compType == OBJ_OBJECT || compType == OBJ_WINDOW)	return SMOOTH::True;
-	else							return SMOOTH::False;
+	if (compType == OBJ_OBJECT || compType == OBJ_WINDOW)	return True;
+	else							return False;
 }
-
-#endif

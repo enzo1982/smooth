@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_WINDOW_
-#define __OBJSMOOTH_WINDOW_
 
 #include <smooth/window.h>
 #include <smooth/i18n.h>
@@ -19,33 +16,34 @@
 #include <smooth/titlebar.h>
 #include <smooth/statusbar.h>
 #include <smooth/popupmenu.h>
-#include <smooth/divisionbar.h>
+#include <smooth/divider.h>
 #include <smooth/layer.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/toolwindow.h>
 #include <smooth/timer.h>
 #include <smooth/stk.h>
 #include <smooth/surfacegdi.h>
 #include <smooth/objectproperties.h>
 #include <smooth/menubar.h>
+#include <smooth/system.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_WINDOW = SMOOTH::RequestObjectID();
-SMOOTHInt	 SMOOTHWindow::nOfActiveWindows = 0;
+S::Int	 S::OBJ_WINDOW = S::Object::RequestObjectID();
+S::Int	 S::Window::nOfActiveWindows = 0;
 
 #ifdef __WIN32__
-LRESULT CALLBACK SMOOTHWindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK S::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	SMOOTHWindow	*smoothWindow = SMOOTH::GetWindow(window);
-	SMOOTHInt	 retVal;
-	SMOOTHInt	 originalMessage = message;
-	SMOOTHInt	 param1 = wParam;
-	SMOOTHInt	 param2 = lParam;
+	Window	*smoothWindow = SMOOTH::GetWindow(window);
+	Int	 retVal;
+	Int	 originalMessage = message;
+	Int	 param1 = wParam;
+	Int	 param2 = lParam;
 
 	switch (message)
 	{
@@ -53,6 +51,11 @@ LRESULT CALLBACK SMOOTHWindowProc(HWND window, UINT message, WPARAM wParam, LPAR
 		case WM_NCMOUSEMOVE:
 			message = SM_MOUSEMOVE;
 			param1 = 0;
+			param2 = 0;
+			break;
+		case WM_MOUSEWHEEL:
+			message = SM_MOUSEWHEEL;
+			param1 = (short) HIWORD(wParam);
 			param2 = 0;
 			break;
 		case WM_LBUTTONDOWN:
@@ -107,7 +110,7 @@ LRESULT CALLBACK SMOOTHWindowProc(HWND window, UINT message, WPARAM wParam, LPAR
 }
 #endif
 
-SMOOTHWindow::SMOOTHWindow(SMOOTHString title)
+S::Window::Window(String title)
 {
 	self = this;
 
@@ -120,11 +123,11 @@ SMOOTHWindow::SMOOTHWindow(SMOOTHString title)
 #endif
 
 	exstyle		= 0;
-	modal		= SMOOTH::False;
-	sysmodal	= SMOOTH::False;
-	stay		= SMOOTH::False;
-	apptopmost	= SMOOTH::False;
-	maximized	= SMOOTH::False;
+	modal		= False;
+	sysmodal	= False;
+	stay		= False;
+	apptopmost	= False;
+	maximized	= False;
 
 	nOfActiveWindows++;
 
@@ -133,11 +136,11 @@ SMOOTHWindow::SMOOTHWindow(SMOOTHString title)
 	if (title != NIL)	objectProperties->text = title;
 	else			objectProperties->text = TXT_SMOOTHAPPLICATION;
 
-	className = SMOOTHString(title).Append(SMOOTHString::IntToString(SMOOTH::RequestGUID()));
+	className = String(title).Append(String::IntToString(System::RequestGUID()));
 
 	value = 0;
 
-	offset = SMOOTHRect(SMOOTHPoint(3, 3), SMOOTHSize(0, 0));
+	offset = Rect(Point(3, 3), Size(0, 0));
 
 	icon = NIL;
 
@@ -145,14 +148,14 @@ SMOOTHWindow::SMOOTHWindow(SMOOTHString title)
 	sysicon = LoadIconA(NIL, MAKEINTRESOURCEA(32512));
 #endif
 
-	created		= SMOOTH::False;
-	visible		= SMOOTH::False;
-	destroyed	= SMOOTH::False;
-	cursorset	= SMOOTH::False;
-	initshow	= SMOOTH::False;
+	created		= False;
+	visible		= False;
+	destroyed	= False;
+	cursorset	= False;
+	initshow	= False;
 
-	objectProperties->size.cx = roundtoint(200 * SMOOTH::Setup::FontSize);
-	objectProperties->size.cy = roundtoint(200 * SMOOTH::Setup::FontSize);
+	objectProperties->size.cx = Math::Round(200 * SMOOTH::Setup::FontSize);
+	objectProperties->size.cy = Math::Round(200 * SMOOTH::Setup::FontSize);
 
 	updateRect.left		= 0;
 	updateRect.top		= 0;
@@ -170,21 +173,28 @@ SMOOTHWindow::SMOOTHWindow(SMOOTHString title)
 
 	popupMenu = NIL;
 
-	minSize.cx = roundtoint(160 * SMOOTH::Setup::FontSize);
+	mainLayer = new Layer();
+
+	RegisterObject(mainLayer);
+
+	minSize.cx = Math::Round(160 * SMOOTH::Setup::FontSize);
 	minSize.cy = METRIC_TITLEBARHEIGHT + 5;
 
 	hwnd = NIL;
 }
 
-SMOOTHWindow::~SMOOTHWindow()
+S::Window::~Window()
 {
+	UnregisterObject(mainLayer);
+	DeleteObject(mainLayer);
+
 	if (popupMenu != NIL)
 	{
-		SMOOTHPopupMenu	*popup = popupMenu;
+		PopupMenu	*popup = popupMenu;
 
 		UnregisterObject(popup);
 
-		SMOOTH::DeleteObject(popup);
+		DeleteObject(popup);
 	}
 
 	if (created && !destroyed)
@@ -205,12 +215,12 @@ SMOOTHWindow::~SMOOTHWindow()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHWindow::SetMetrics(SMOOTHPoint newPos, SMOOTHSize newSize)
+S::Int S::Window::SetMetrics(Point newPos, Size newSize)
 {
-	objectProperties->pos.x		= roundtoint(newPos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y		= roundtoint(newPos.y * SMOOTH::Setup::FontSize);
-	objectProperties->size.cx	= roundtoint(newSize.cx * SMOOTH::Setup::FontSize);
-	objectProperties->size.cy	= roundtoint(newSize.cy * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x		= Math::Round(newPos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y		= Math::Round(newPos.y * SMOOTH::Setup::FontSize);
+	objectProperties->size.cx	= Math::Round(newSize.cx * SMOOTH::Setup::FontSize);
+	objectProperties->size.cy	= Math::Round(newSize.cy * SMOOTH::Setup::FontSize);
 
 	updateRect.left		= 0;
 	updateRect.top		= 0;
@@ -221,80 +231,80 @@ SMOOTHInt SMOOTHWindow::SetMetrics(SMOOTHPoint newPos, SMOOTHSize newSize)
 	if (created) SetWindowPos(hwnd, 0, objectProperties->pos.x, objectProperties->pos.x, objectProperties->size.cx, objectProperties->size.cy, 0);
 #endif
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHVoid SMOOTHWindow::SetPositionFlag(HWND pf)
+S::Void S::Window::SetPositionFlag(HWND pf)
 {
 #ifdef __WIN32__
 	SetWindowPos(hwnd, pf, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 #endif
 }
 
-SMOOTHVoid SMOOTHWindow::SetKillProc(SMOOTHKillProcParam, SMOOTHVoid *procParam)
+S::Void S::Window::SetKillProc(KillProcParam, Void *procParam)
 {
-	killProc = (SMOOTHKillProcType) newProc;
+	killProc = (KillProcType) newProc;
 	killProcParam = procParam;
 }
 
-SMOOTHVoid SMOOTHWindow::SetPaintProc(SMOOTHPaintProcParam, SMOOTHVoid *procParam)
+S::Void S::Window::SetPaintProc(PaintProcParam, Void *procParam)
 {
-	paintProc = (SMOOTHPaintProcType) newProc;
+	paintProc = (PaintProcType) newProc;
 	paintProcParam = procParam;
 }
 
-SMOOTHVoid SMOOTHWindow::SetPeekProc(SMOOTHPeekProcParam, SMOOTHVoid *procParam)
+S::Void S::Window::SetPeekProc(PeekProcParam, Void *procParam)
 {
-	peekProc = (SMOOTHPeekProcType) newProc;
+	peekProc = (PeekProcType) newProc;
 	peekProcParam = procParam;
 
 	if (peekProc != NIL) peekLoop++;
 }
 
-SMOOTHVoid SMOOTHWindow::SetMessageProc(SMOOTHMessageProcParam, SMOOTHVoid *procParam)
+S::Void S::Window::SetMessageProc(MessageProcParam, Void *procParam)
 {
-	messageProc = (SMOOTHMessageProcType) newProc;
+	messageProc = (MessageProcType) newProc;
 	messageProcParam = procParam;
 }
 
-SMOOTHVoid SMOOTHWindow::SetStyle(SMOOTHInt s)
+S::Void S::Window::SetStyle(Int s)
 {
 	switch (s)
 	{
 		case SS_MODAL:
-			modal = SMOOTH::True;
-			sysmodal = SMOOTH::False;
+			modal		= True;
+			sysmodal	= False;
 			break;
 		case SS_SYSMODAL:
-			modal = SMOOTH::False;
-			sysmodal = SMOOTH::True;
+			modal		= False;
+			sysmodal	= True;
 			break;
 		case SS_APPTOPMOST:
-			apptopmost = SMOOTH::True;
+			apptopmost	= True;
 
 #ifdef __WIN32__
-			if (!created) exstyle = exstyle|WS_EX_TOPMOST;
+			if (!created) exstyle = exstyle | WS_EX_TOPMOST;
 #endif
 
 			break;
 		case SS_NORESIZE:
 #ifdef __WIN32__
-			style = (style^WS_THICKFRAME)|WS_DLGFRAME;
+			style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
 #endif
 
 			break;
 		default:
-			if (!created) style = style|s;
+			if (!created) style = style | s;
 			break;
 	}
 }
 
-SMOOTHVoid SMOOTHWindow::SetExStyle(SMOOTHInt es)
+S::Void S::Window::SetExStyle(Int es)
 {
-	if (!created) exstyle = exstyle|es;
+	if (!created) exstyle = exstyle | es;
 }
 
-SMOOTHInt SMOOTHWindow::SetIcon(HBITMAP newicon)
+S::Int S::Window::SetIcon(HBITMAP newicon)
 {
 #ifdef __WIN32__
 	if (newicon == SI_DEFAULT) newicon = DEFAULTICON;
@@ -304,7 +314,7 @@ SMOOTHInt SMOOTHWindow::SetIcon(HBITMAP newicon)
 	{
 		if (GetBitmapSizeX(newicon) != 20 || GetBitmapSizeY(newicon) != 20)
 		{
-			return SMOOTH::Error;
+			return Error;
 		}
 		else
 		{
@@ -312,27 +322,27 @@ SMOOTHInt SMOOTHWindow::SetIcon(HBITMAP newicon)
 
 			icon = newicon;
 
-			return SMOOTH::Success;
+			return Success;
 		}
 	}
 	else
 	{
-		return SMOOTH::Success;
+		return Success;
 	}
 }
 
-SMOOTHInt SMOOTHWindow::SetApplicationIcon(HICON newicon)
+S::Int S::Window::SetApplicationIcon(HICON newicon)
 {
 #ifdef __WIN32__
 	sysicon = newicon;
 
-	return SMOOTH::Success;
+	return Success;
 #else
-	return SMOOTH::Error;
+	return Error;
 #endif
 }
 
-SMOOTHInt SMOOTHWindow::SetApplicationIcon(SMOOTHInt newicon)
+S::Int S::Window::SetApplicationIcon(Int newicon)
 {
 #ifdef __WIN32__
 	HICON	 ic = LoadIconA(hInstance, MAKEINTRESOURCEA(newicon));
@@ -340,14 +350,14 @@ SMOOTHInt SMOOTHWindow::SetApplicationIcon(SMOOTHInt newicon)
 	sysicon = ic;
 #endif
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHWindow::SetText(SMOOTHString title)
+S::Int S::Window::SetText(String title)
 {
 	objectProperties->text = title;
 
-	if (!created) return SMOOTH::Success;
+	if (!created) return Success;
 
 #ifdef __WIN32__
 	if (SMOOTH::Setup::enableUnicode)	SetWindowTextW(hwnd, title);
@@ -356,14 +366,14 @@ SMOOTHInt SMOOTHWindow::SetText(SMOOTHString title)
 
 	SMOOTH::SendMessage(this, SM_WINDOWTITLECHANGED, 0, 0);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHWindow::SetStatusText(SMOOTHString newStatus)
+S::Int S::Window::SetStatusText(String newStatus)
 {
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
-		SMOOTHObject *object = assocObjects.GetNthEntry(i);
+		Object *object = assocObjects.GetNthEntry(i);
 
 		if (object == NIL) continue;
 
@@ -371,18 +381,18 @@ SMOOTHInt SMOOTHWindow::SetStatusText(SMOOTHString newStatus)
 		{
 			object->SetText(newStatus);
 
-			return SMOOTH::Success;
+			return Success;
 		}
 	}
 
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHString SMOOTHWindow::GetStatusText()
+S::String S::Window::GetStatusText()
 {
-	for (SMOOTHInt i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < nOfObjects; i++)
 	{
-		SMOOTHObject *object = assocObjects.GetNthEntry(i);
+		Object *object = assocObjects.GetNthEntry(i);
 
 		if (object == NIL) continue;
 
@@ -395,13 +405,12 @@ SMOOTHString SMOOTHWindow::GetStatusText()
 	return NIL;
 }
 
-SMOOTHInt SMOOTHWindow::Show()
+S::Int S::Window::Show()
 {
 	if (!created) Create();
 
-	initshow = SMOOTH::True;
-
-	visible = SMOOTH::True;
+	initshow	= True;
+	visible		= True;
 
 #ifdef __WIN32__
 	ShowWindow(hwnd, SW_SHOW);
@@ -414,66 +423,66 @@ SMOOTHInt SMOOTHWindow::Show()
 #endif
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHWindow::Hide()
+S::Int S::Window::Hide()
 {
 	if (!created) Create();
 
-	initshow = SMOOTH::True;
+	initshow = True;
 
-	visible = SMOOTH::False;
+	visible = False;
 
 #ifdef __WIN32__
 	ShowWindow(hwnd, SW_HIDE);
 #endif
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHBool SMOOTHWindow::IsMaximized()
+S::Bool S::Window::IsMaximized()
 {
-	if (!created) return SMOOTH::False;
+	if (!created) return False;
 
 	return maximized;
 }
 
-SMOOTHRect SMOOTHWindow::GetUpdateRect()
+S::Rect S::Window::GetUpdateRect()
 {
 	return updateRect;
 }
 
-SMOOTHInt SMOOTHWindow::SetUpdateRect(SMOOTHRect newUpdateRect)
+S::Int S::Window::SetUpdateRect(Rect newUpdateRect)
 {
 	updateRect = newUpdateRect;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHWindow::SetMinimumSize(SMOOTHSize newMinSize)
+S::Int S::Window::SetMinimumSize(Size newMinSize)
 {
 	minSize = newMinSize;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-HWND SMOOTHWindow::Create()
+HWND S::Window::Create()
 {
 	if (registered)
 	{
-		hwnd = CreateSimpleWindow(SMOOTHRect(objectProperties->pos, objectProperties->size), objectProperties->text, className, sysicon, style, exstyle);
+		hwnd = CreateSimpleWindow(Rect(objectProperties->pos, objectProperties->size), objectProperties->text, className, sysicon, style, exstyle);
 
 		if (hwnd != NIL)
 		{
-			created = SMOOTH::True;
-			visible = SMOOTH::False;
+			created = True;
+			visible = False;
 
 			CalculateOffsets();
 
 			windowDC = GetContext(this);
 
-			drawSurface = new SMOOTHSurfaceGDI(windowDC);
+			drawSurface = new SurfaceGDI(windowDC);
 
 			return hwnd;
 		}
@@ -486,7 +495,7 @@ HWND SMOOTHWindow::Create()
 	return NIL;
 }
 
-SMOOTHInt SMOOTHWindow::Stay()
+S::Int S::Window::Stay()
 {
 	if (!registered) return value;
 
@@ -499,8 +508,8 @@ SMOOTHInt SMOOTHWindow::Stay()
 	if (!created)	Create();
 	if (!visible)	Show();
 
-	modal = SMOOTH::True;
-	stay = SMOOTH::True;
+	modal	= True;
+	stay	= True;
 
 #ifdef __WIN32__
 	if (SMOOTH::Setup::enableUnicode)	SendMessageW(hwnd, WM_KILLFOCUS, 0, 0);
@@ -548,24 +557,34 @@ SMOOTHInt SMOOTHWindow::Stay()
 	return value;
 }
 
-SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Window::Close()
+{
+	if (hwnd == NIL) return Error;
+
+	if (SMOOTH::Setup::enableUnicode)	::SendMessageW(hwnd, WM_CLOSE, 0, 0);
+	else					::SendMessageA(hwnd, WM_CLOSE, 0, 0);
+
+	return Success;
+}
+
+S::Int S::Window::Process(Int message, Int wParam, Int lParam)
 {
 	EnterProtectedRegion();
 
-	if (popupMenu != NIL && SMOOTHPopupMenu::status == POPUP_FINISHED)
+	if (popupMenu != NIL && PopupMenu::status == POPUP_FINISHED)
 	{
-		SMOOTHPopupMenu	*popup = popupMenu;
+		PopupMenu	*popup = popupMenu;
 
 		UnregisterObject(popup);
 
-		SMOOTH::DeleteObject(popup);
+		DeleteObject(popup);
 	}
 
-	HDC		 dc;
-	SMOOTHRect	 rect;
-	HWND		 act;
-	SMOOTHMenubar	*menubar = NIL;
-	int		 i;
+	HDC	 dc;
+	Rect	 rect;
+	HWND	 act;
+	Menubar	*menubar = NIL;
+	int	 i;
 
 
 #ifdef __WIN32__
@@ -573,9 +592,9 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 	WINDOWPOS	*wndpos;
 #endif
 
-	SMOOTHObject	*operat;
+	Object	*operat;
 
-	if (!(message == SM_MOUSEMOVE && wParam == 1)) SMOOTHMessageProcCall(messageProc, messageProcParam, message, wParam, lParam);
+	if (!(message == SM_MOUSEMOVE && wParam == 1)) MessageProcCall(messageProc, messageProcParam, message, wParam, lParam);
 
 	switch (message)
 	{
@@ -586,11 +605,11 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 		case SM_CHECKPOPUPS:
 			if (popupMenu != NIL)
 			{
-				SMOOTHPopupMenu	*popup = popupMenu;
+				PopupMenu	*popup = popupMenu;
 
 				UnregisterObject(popup);
 
-				SMOOTH::DeleteObject(popup);
+				DeleteObject(popup);
 			}
 
 			break;
@@ -598,18 +617,18 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 		case WM_KILLFOCUS:
 			if (popupMenu != NIL)
 			{
-				SMOOTHBool	 deletePopup = SMOOTH::True;
-				HWND		 activeWindow = (HWND) wParam;
+				Bool	 deletePopup = True;
+				HWND	 activeWindow = (HWND) wParam;
 
 				if (SMOOTH::GetWindow(activeWindow) != NIL)
 				{
-					SMOOTHPopupMenu	*popup = popupMenu;
+					PopupMenu	*popup = popupMenu;
 
 					do
 					{
 						if (activeWindow == popup->toolwnd->hwnd)
 						{
-							deletePopup = SMOOTH::False;
+							deletePopup = False;
 
 							break;
 						}
@@ -622,16 +641,16 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 							break;
 						}
 					}
-					while (SMOOTH::True);
+					while (True);
 				}
 
 				if (deletePopup)
 				{
-					SMOOTHPopupMenu	*popup = popupMenu;
+					PopupMenu	*popup = popupMenu;
 
 					UnregisterObject(popup);
 
-					SMOOTH::DeleteObject(popup);
+					DeleteObject(popup);
 				}
 			}
 
@@ -646,13 +665,13 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 			return 0;
 		case SM_EXECUTEPEEK:
-			SMOOTHPeekProcCall(peekProc, peekProcParam);
+			PeekProcCall(peekProc, peekProcParam);
 
 			LeaveProtectedRegion();
 
 			return 0;
 		case WM_CLOSE:
-			if (SMOOTHKillProcCall(killProc, killProcParam))
+			if (KillProcCall(killProc, killProcParam))
 			{
 				delete drawSurface;
 
@@ -669,7 +688,7 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 			return 0;
 		case WM_DESTROY:
-			destroyed = SMOOTH::True;
+			destroyed = True;
 
 			if (nOfActiveWindows == 1 && loopActive)
 			{
@@ -685,7 +704,7 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 			return 0;
 		case WM_QUIT:
-			destroyed = SMOOTH::True;
+			destroyed = True;
 
 			nOfActiveWindows--;
 
@@ -707,7 +726,7 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 			return 0;
 		case WM_SYSCOLORCHANGE:
-			SMOOTHGetColors();
+			GetColors();
 
 			break;
 		case WM_PAINT:
@@ -769,7 +788,7 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 				if (operat->GetObjectType() == OBJ_MENUBAR)
 				{
-					menubar = (SMOOTHMenubar *) operat;
+					menubar = (Menubar *) operat;
 
 					break;
 				}
@@ -777,20 +796,20 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 			if (menubar != NIL)
 			{
-				SMOOTHPopupMenu	*popup = NIL;
+				PopupMenu	*popup = NIL;
 
 				Process(SM_LOOSEFOCUS, handle, 0);
 
 				if (popupMenu != NIL)
 				{
-					SMOOTHPopupMenu	*popup = popupMenu;
+					PopupMenu	*popup = popupMenu;
 
 					UnregisterObject(popup);
 
-					SMOOTH::DeleteObject(popup);
+					DeleteObject(popup);
 				}
 
-				popup = new SMOOTHPopupMenu();
+				popup = new PopupMenu();
 
 				popup->GetObjectProperties()->pos.x = MouseX(hwnd, WINDOW);
 				popup->GetObjectProperties()->pos.y = MouseY(hwnd, WINDOW);
@@ -820,7 +839,7 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 			break;
 		case WM_ACTIVATE:
-			if ((LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE) && popupMenu == NIL && SMOOTHPopupMenu::status != POPUP_PENDING) SMOOTH::SendMessage(NIL, SM_CHECKPOPUPS, 0, 0);
+			if ((LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE) && popupMenu == NIL && PopupMenu::status != POPUP_PENDING) SMOOTH::SendMessage(NIL, SM_CHECKPOPUPS, 0, 0);
 			break;
 		case WM_ACTIVATEAPP:
 			if (apptopmost)
@@ -835,7 +854,7 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 				if (SMOOTH::GetWindow(act) == 0) SetForegroundWindow(hwnd);
 				else if (SMOOTH::GetWindow(act)->type == OBJ_TOOLWINDOW) break;
-				else if (act != hwnd && SMOOTH::GetWindow(act)->sysmodal == SMOOTH::False && SMOOTH::GetWindow(act)->modal == SMOOTH::False) SetForegroundWindow(hwnd);
+				else if (act != hwnd && SMOOTH::GetWindow(act)->sysmodal == False && SMOOTH::GetWindow(act)->modal == False) SetForegroundWindow(hwnd);
 				else if (act != hwnd && SMOOTH::GetWindow(act)->handle < handle) SetForegroundWindow(hwnd);
 			}
 			else if (modal)
@@ -845,7 +864,7 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 				if (SMOOTH::GetWindow(act) == 0) break;
 				else if (SMOOTH::GetWindow(act)->type == OBJ_TOOLWINDOW) break;
 
-				if (act != hwnd && SMOOTH::GetWindow(act)->modal == SMOOTH::False && SMOOTH::GetWindow(act)->sysmodal == SMOOTH::False) SetActiveWindow(hwnd);
+				if (act != hwnd && SMOOTH::GetWindow(act)->modal == False && SMOOTH::GetWindow(act)->sysmodal == False) SetActiveWindow(hwnd);
 				else if (act != hwnd && SMOOTH::GetWindow(act)->handle < handle) SetActiveWindow(hwnd);
 			}
 			break;
@@ -871,7 +890,7 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 		if (operat == NIL) continue;
 
-		if (operat->Process(message, wParam, lParam) == SMOOTH::Break)
+		if (operat->Process(message, wParam, lParam) == Break)
 		{
 			LeaveProtectedRegion();
 
@@ -884,21 +903,21 @@ SMOOTHInt SMOOTHWindow::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 	return -1;
 }
 
-SMOOTHInt SMOOTHWindow::Paint(SMOOTHInt message)
+S::Int S::Window::Paint(Int message)
 {
 	EnterProtectedRegion();
 
-	SMOOTHObject	*operat;
-	SMOOTHObject	*lastoperat = NIL;
-	HDC		 dc;
-	SMOOTHPoint	 doublebar1;
-	SMOOTHPoint	 doublebar2;
-	int		 bias = 0;
-	int		 topoffset = 3;
-	int		 rightobjcount = 0;
-	int		 leftobjcount = 0;
-	int		 btmobjcount = 0;
-	int		 topobjcount = 0;
+	Object	*operat;
+	Object	*lastoperat = NIL;
+	HDC	 dc;
+	Point	 doublebar1;
+	Point	 doublebar2;
+	int	 bias = 0;
+	int	 topoffset = 3;
+	int	 rightobjcount = 0;
+	int	 leftobjcount = 0;
+	int	 btmobjcount = 0;
+	int	 topobjcount = 0;
 
 	if (created && visible)
 	{
@@ -1012,29 +1031,29 @@ SMOOTHInt SMOOTHWindow::Paint(SMOOTHInt message)
 			if (operat->IsVisible() && Affected(operat, updateRect)) operat->Paint(SP_PAINT);
 		}
 
-		SMOOTHPaintProcCall(paintProc, paintProcParam);
+		PaintProcCall(paintProc, paintProcParam);
 
 		FreeContext(this, dc);
 	}
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHVoid SMOOTHWindow::CalculateOffsets()
+S::Void S::Window::CalculateOffsets()
 {
 	if (type == OBJ_TOOLWINDOW) return;
 
-	SMOOTHObject	*operat;
-	SMOOTHObject	*lastoperat = NIL;
-	SMOOTHInt	 rightobjcount = 0;
-	SMOOTHInt	 leftobjcount = 0;
-	SMOOTHInt	 btmobjcount = 0;
-	SMOOTHInt	 topobjcount = 0;
-	SMOOTHInt	 i;
+	Object	*operat;
+	Object	*lastoperat = NIL;
+	Int	 rightobjcount = 0;
+	Int	 leftobjcount = 0;
+	Int	 btmobjcount = 0;
+	Int	 topobjcount = 0;
+	Int	 i;
 
-	offset = SMOOTHRect(SMOOTHPoint(3, 3), SMOOTHSize(0, 0));
+	offset = Rect(Point(3, 3), Size(0, 0));
 
 	for (i = 0; i < nOfObjects; i++)
 	{
@@ -1131,9 +1150,9 @@ SMOOTHVoid SMOOTHWindow::CalculateOffsets()
 	}
 }
 
-SMOOTHInt SMOOTHWindow::RegisterObject(SMOOTHObject *object)
+S::Int S::Window::RegisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -1148,47 +1167,51 @@ SMOOTHInt SMOOTHWindow::RegisterObject(SMOOTHObject *object)
 			if (object->GetObjectType() == OBJ_TITLEBAR)
 			{
 #ifdef __WIN32__
-				if (!((SMOOTHTitlebar *) object)->max)	style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
+				if (!((Titlebar *) object)->max)	style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
 #endif
 			}
 			else if (object->GetObjectType() == OBJ_TOOLWINDOW)
 			{
-				((SMOOTHToolWindow *) object)->Create();
+				((ToolWindow *) object)->Create();
 			}
 			else if (object->GetObjectType() == OBJ_POPUP)
 			{
 				if (popupMenu != NIL)
 				{
-					SMOOTHPopupMenu	*popup = popupMenu;
+					PopupMenu	*popup = popupMenu;
 
 					UnregisterObject(popup);
 
-					SMOOTH::DeleteObject(popup);
+					DeleteObject(popup);
 				}
 
-				popupMenu = (SMOOTHPopupMenu *) object;
+				popupMenu = (PopupMenu *) object;
 			}
 
 			CalculateOffsets();
 
 			object->Show();
 
-			return SMOOTH::Success;
+			return Success;
 		}
 	}
+	else
+	{
+		return mainLayer->RegisterObject(object);
+	}
 
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHInt SMOOTHWindow::UnregisterObject(SMOOTHObject *object)
+S::Int S::Window::UnregisterObject(Object *object)
 {
-	if (object == NIL) return SMOOTH::Error;
+	if (object == NIL) return Error;
 
 	if (containerType == &object->possibleContainers)
 	{
 		if (nOfObjects > 0 && object->IsRegistered())
 		{
-			if (assocObjects.DeleteEntry(object->handle) == SMOOTH::True)
+			if (assocObjects.DeleteEntry(object->handle) == True)
 			{
 				nOfObjects--;
 
@@ -1204,12 +1227,14 @@ SMOOTHInt SMOOTHWindow::UnregisterObject(SMOOTHObject *object)
 
 				CalculateOffsets();
 
-				return SMOOTH::Success;
+				return Success;
 			}
 		}
 	}
+	else
+	{
+		return mainLayer->UnregisterObject(object);
+	}
 
-	return SMOOTH::Error;
+	return Error;
 }
-
-#endif

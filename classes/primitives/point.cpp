@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,25 +8,22 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_POINT_
-#define __OBJSMOOTH_POINT_
-
 #include <smooth/point.h>
 
-SMOOTHPoint::SMOOTHPoint()
+S::Point::Point()
 {
 	x = 0;
 	y = 0;
 }
 
-SMOOTHPoint::SMOOTHPoint(SMOOTHInt iX, SMOOTHInt iY)
+S::Point::Point(Int iX, Int iY)
 {
 	x = iX;
 	y = iY;
 }
 
 #ifdef __WIN32__
-SMOOTHPoint::operator POINT()
+S::Point::operator POINT()
 {
 	POINT	 point;
 
@@ -36,13 +33,11 @@ SMOOTHPoint::operator POINT()
 	return point;
 }
 
-SMOOTHPoint &SMOOTHPoint::operator =(const POINT point)
+S::Point &S::Point::operator =(const POINT point)
 {
 	x = point.x;
 	y = point.y;
 
 	return *this;
 }
-#endif
-
 #endif

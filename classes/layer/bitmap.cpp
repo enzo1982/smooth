@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,15 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_BITMAP_
-#define __OBJSMOOTH_BITMAP_
-
 #include <smooth/bitmap.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -25,49 +22,49 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_HBITMAP = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_HBITMAP = S::Object::RequestObjectID();
 
-SMOOTHBitmap::SMOOTHBitmap(HBITMAP bmp, SMOOTHPoint pos, SMOOTHSize size)
+S::Bitmap::Bitmap(HBITMAP bmp, Point pos, Size size)
 {
 	type	= OBJ_HBITMAP;
 	bitmap	= bmp;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
 	if (size.cx == 0 && size.cy == 0)
 	{
-		objectProperties->size.cx = roundtoint(GetBitmapSizeX(bitmap) * SMOOTH::Setup::FontSize);
-		objectProperties->size.cy = roundtoint(GetBitmapSizeY(bitmap) * SMOOTH::Setup::FontSize);
+		objectProperties->size.cx = Math::Round(GetBitmapSizeX(bitmap) * SMOOTH::Setup::FontSize);
+		objectProperties->size.cy = Math::Round(GetBitmapSizeY(bitmap) * SMOOTH::Setup::FontSize);
 	}
 	else
 	{
-		objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-		objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+		objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+		objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 	}
 }
 
-SMOOTHBitmap::~SMOOTHBitmap()
+S::Bitmap::~Bitmap()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHBitmap::Paint(SMOOTHInt message)
+S::Int S::Bitmap::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHRect	 bmpRect;
-	SMOOTHPoint	 realPos = GetRealPosition();
+	HDC	 dc = GetContext(wnd);
+	Rect	 bmpRect;
+	Point	 realPos = GetRealPosition();
 
 	bmpRect.left	= realPos.x;
 	bmpRect.top	= realPos.y;
@@ -78,12 +75,12 @@ SMOOTHInt SMOOTHBitmap::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHBitmap::SetBitmap(HBITMAP newBmp)
+S::Int S::Bitmap::SetBitmap(HBITMAP newBmp)
 {
-	SMOOTHBool	 prevVisible = visible;
+	Bool	 prevVisible = visible;
 
 	if (visible) Hide();
 
@@ -91,18 +88,16 @@ SMOOTHInt SMOOTHBitmap::SetBitmap(HBITMAP newBmp)
 
 	if (objectProperties->size.cx == 0 && objectProperties->size.cy == 0)
 	{
-		objectProperties->size.cx = roundtoint(GetBitmapSizeX(bitmap) * SMOOTH::Setup::FontSize);
-		objectProperties->size.cy = roundtoint(GetBitmapSizeY(bitmap) * SMOOTH::Setup::FontSize);
+		objectProperties->size.cx = Math::Round(GetBitmapSizeX(bitmap) * SMOOTH::Setup::FontSize);
+		objectProperties->size.cy = Math::Round(GetBitmapSizeY(bitmap) * SMOOTH::Setup::FontSize);
 	}
 
 	if (prevVisible) Show();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-HBITMAP SMOOTHBitmap::GetBitmap()
+HBITMAP S::Bitmap::GetBitmap()
 {
 	return bitmap;
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_SEMAPHORE_
-#define __OBJSMOOTH_SEMAPHORE_
 
 #include <smooth/object.h>
 #include <smooth/semaphore.h>
@@ -20,9 +17,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_SEMAPHORE = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_SEMAPHORE = S::Object::RequestObjectID();
 
-SMOOTHSemaphore::SMOOTHSemaphore()
+S::Semaphore::Semaphore()
 {
 	type = OBJ_SEMAPHORE;
 
@@ -31,29 +28,27 @@ SMOOTHSemaphore::SMOOTHSemaphore()
 	possibleContainers.AddEntry(OBJ_APPLICATION);
 }
 
-SMOOTHSemaphore::~SMOOTHSemaphore()
+S::Semaphore::~Semaphore()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 
 	LiSASemaphoreCloseHandle(semaphore);
 }
 
-SMOOTHInt SMOOTHSemaphore::Wait()
+S::Int S::Semaphore::Wait()
 {
-	if (!registered) return SMOOTH::Error;
+	if (!registered) return Error;
 
 	LiSASemaphoreWait(semaphore);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSemaphore::Release()
+S::Int S::Semaphore::Release()
 {
-	if (!registered) return SMOOTH::Error;
+	if (!registered) return Error;
 
 	LiSASemaphoreRelease(semaphore);
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

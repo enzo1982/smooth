@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,9 +8,6 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_BACKGROUND_APPLICATION_
-#define __OBJSMOOTH_BACKGROUND_APPLICATION_
-
 #include <smooth/background.h>
 #include <smooth/objectmanager.h>
 #include <smooth/i18n.h>
@@ -18,32 +15,31 @@
 #include <smooth/timer.h>
 #include <smooth/stk.h>
 
-SMOOTHBackgroundApplication	*backgroundApplication = NIL;
+S::BackgroundApplication	*S::backgroundApplication = NIL;
 
-SMOOTHBackgroundApplication::SMOOTHBackgroundApplication()
+S::BackgroundApplication::BackgroundApplication()
 {
 	SetText(TXT_SMOOTHBACKGROUNDAPPLICATION);
 
-	backgroundWindow	= new SMOOTHWindow(TXT_SMOOTHBACKGROUNDAPPLICATION);
-	backgroundTimer		= new SMOOTHTimer();
+	backgroundWindow	= new Window(TXT_SMOOTHBACKGROUNDAPPLICATION);
+	backgroundTimer		= new Timer();
 
 	RegisterObject(backgroundWindow);
 
 	backgroundWindow->RegisterObject(backgroundTimer);
 
-	backgroundTimer->SetProc(SMOOTHProc(SMOOTHBackgroundApplication, this, TimerProc));
+	backgroundTimer->SetProc(Proc(BackgroundApplication, this, TimerProc));
 
 	backgroundWindow->Hide();
 
 	backgroundTimer->Start(10);
 }
 
-SMOOTHBackgroundApplication::~SMOOTHBackgroundApplication()
+S::BackgroundApplication::~BackgroundApplication()
 {
 	backgroundTimer->Stop();
 
-	SMOOTH::CloseWindow(backgroundWindow);
-
+	backgroundWindow->Close();
 	backgroundWindow->UnregisterObject(backgroundTimer);
 
 	UnregisterObject(backgroundWindow);
@@ -52,11 +48,11 @@ SMOOTHBackgroundApplication::~SMOOTHBackgroundApplication()
 	delete backgroundTimer;
 }
 
-SMOOTHVoid SMOOTHBackgroundApplication::TimerProc()
+S::Void S::BackgroundApplication::TimerProc()
 {
-	SMOOTHObject	*object;
+	Object	*object;
 
-	for (SMOOTHInt i = 0; i < SMOOTHObject::objectCount; i++)
+	for (Int i = 0; i < Object::objectCount; i++)
 	{
 		object = mainObjectManager->RequestObject(i);
 
@@ -80,5 +76,3 @@ SMOOTHVoid SMOOTHBackgroundApplication::TimerProc()
 		}
 	}
 }
-
-#endif

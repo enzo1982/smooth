@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,17 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_ARROWS_
-#define __OBJSMOOTH_ARROWS_
-
-#include <math.h>
-
+#include <smooth/math.h>
 #include <smooth/arrows.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -28,71 +23,71 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_ARROWS = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_ARROWS = S::Object::RequestObjectID();
 
-SMOOTHArrows::SMOOTHArrows(SMOOTHPoint pos, SMOOTHSize size, SMOOTHInt sType, SMOOTHInt *var, SMOOTHInt rangeStart, SMOOTHInt rangeEnd, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart, Int rangeEnd, ProcParam, Void *procParam)
 {
 	type				= OBJ_ARROWS;
 	subtype				= sType;
 
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 
-	arrow1Checked			= SMOOTH::False;
-	arrow1Clicked			= SMOOTH::False;
-	arrow2Checked			= SMOOTH::False;
-	arrow2Clicked			= SMOOTH::False;
+	arrow1Checked			= False;
+	arrow1Clicked			= False;
+	arrow2Checked			= False;
+	arrow2Clicked			= False;
 
 	startValue			= rangeStart;
 	endValue			= rangeEnd;
 
 	variable			= var;
 
-	timerActive			= SMOOTH::False;
+	timerActive			= False;
 	timer				= NIL;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
 	if (subtype == OR_VERT)
 	{
-		if (size.cx == 0)	objectProperties->size.cx = roundtoint(18 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = roundtoint(24 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+		if (size.cx == 0)	objectProperties->size.cx = Math::Round(18 * SMOOTH::Setup::FontSize);
+		else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+		if (size.cy == 0)	objectProperties->size.cy = Math::Round(24 * SMOOTH::Setup::FontSize);
+		else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 	}
 	else
 	{
-		if (size.cx == 0)	objectProperties->size.cx = roundtoint(24 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = roundtoint(18 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+		if (size.cx == 0)	objectProperties->size.cx = Math::Round(24 * SMOOTH::Setup::FontSize);
+		else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+		if (size.cy == 0)	objectProperties->size.cy = Math::Round(18 * SMOOTH::Setup::FontSize);
+		else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 	}
 }
 
-SMOOTHArrows::~SMOOTHArrows()
+S::Arrows::~Arrows()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHArrows::Paint(SMOOTHInt message)
+S::Int S::Arrows::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetContext(wnd);
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHRect	 frame;
-	SMOOTHPoint	 lineStart;
-	SMOOTHPoint	 lineEnd;
+	HDC	 dc = GetContext(wnd);
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
+	Point	 lineStart;
+	Point	 lineEnd;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -120,7 +115,7 @@ SMOOTHInt SMOOTHArrows::Paint(SMOOTHInt message)
 		lineEnd.x = lineStart.x;
 		lineEnd.y = lineStart.y + 1;
 
-		for (SMOOTHInt i = 0; i < 4; i++)
+		for (Int i = 0; i < 4; i++)
 		{
 			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 
@@ -135,7 +130,7 @@ SMOOTHInt SMOOTHArrows::Paint(SMOOTHInt message)
 		lineEnd.x = lineStart.x;
 		lineEnd.y = lineStart.y + 7;
 
-		for (SMOOTHInt j = 0; j < 4; j++)
+		for (Int j = 0; j < 4; j++)
 		{
 			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 
@@ -164,7 +159,7 @@ SMOOTHInt SMOOTHArrows::Paint(SMOOTHInt message)
 		lineEnd.x = lineStart.x + 1;
 		lineEnd.y = lineStart.y;
 
-		for (SMOOTHInt k = 0; k < 4; k++)
+		for (Int k = 0; k < 4; k++)
 		{
 			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 
@@ -179,7 +174,7 @@ SMOOTHInt SMOOTHArrows::Paint(SMOOTHInt message)
 		lineEnd.x = lineStart.x + 7;
 		lineEnd.y = lineStart.y;
 
-		for (SMOOTHInt l = 0; l < 4; l++)
+		for (Int l = 0; l < 4; l++)
 		{
 			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
 
@@ -192,27 +187,27 @@ SMOOTHInt SMOOTHArrows::Paint(SMOOTHInt message)
 
 	FreeContext(wnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Arrows::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHRect	 frame;
-	SMOOTHRect	 arrow1Frame;
-	SMOOTHRect	 arrow2Frame;
-	HDC		 dc;
-	SMOOTHInt	 prevValue = *variable;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
+	Rect	 frame;
+	Rect	 arrow1Frame;
+	Rect	 arrow2Frame;
+	HDC	 dc;
+	Int	 prevValue = *variable;
 
 	frame.left	= realPos.x + 2;
 	frame.top	= realPos.y + 2;
@@ -226,20 +221,20 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 			if (!timerActive && timer == NIL && (arrow1Checked || arrow2Checked))
 			{
-				timer = new SMOOTHTimer();
+				timer = new Timer();
 
 				wnd->RegisterObject(timer);
 
-				timer->SetProc(SMOOTHProc(SMOOTHArrows, this, TimerProc));
+				timer->SetProc(Proc(Arrows, this, TimerProc));
 				timer->Start(250);
 
 				timerCount = 1;
-				timerActive = SMOOTH::True;
+				timerActive = True;
 			}
 
 			if (arrow1Checked)
 			{
-				arrow1Clicked = SMOOTH::True;
+				arrow1Clicked = True;
 
 				if (subtype == OR_VERT)	frame.bottom = realPos.y + objectProperties->size.cy / 2 - 3;
 				else			frame.right = realPos.x + objectProperties->size.cx / 2 - 3;
@@ -252,13 +247,13 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 				if (*variable < startValue)	*variable = startValue;
 				else if (*variable > endValue)	*variable = endValue;
 
-				if (*variable != prevValue) SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+				if (*variable != prevValue) ProcCall(objectProperties->proc, objectProperties->procParam);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 			else if (arrow2Checked)
 			{
-				arrow2Clicked = SMOOTH::True;
+				arrow2Clicked = True;
 
 				if (subtype == OR_VERT)	frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
 				else			frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
@@ -271,9 +266,9 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 				if (*variable < startValue)	*variable = startValue;
 				else if (*variable > endValue)	*variable = endValue;
 
-				if (*variable != prevValue) SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+				if (*variable != prevValue) ProcCall(objectProperties->proc, objectProperties->procParam);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			FreeContext(wnd, dc);
@@ -284,12 +279,12 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 		case SM_LBUTTONUP:
 			dc = GetContext(wnd);
 
-			if (timerActive) timerActive = SMOOTH::False;
+			if (timerActive) timerActive = False;
 
 			if (arrow1Clicked)
 			{
-				arrow1Clicked = SMOOTH::False;
-				arrow1Checked = SMOOTH::False;
+				arrow1Clicked = False;
+				arrow1Checked = False;
 
 				if (subtype == OR_VERT)	frame.bottom = realPos.y + objectProperties->size.cy / 2 - 3;
 				else			frame.right = realPos.x + objectProperties->size.cx / 2 - 3;
@@ -302,12 +297,12 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 				Process(SM_MOUSEMOVE, 0, 0);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 			else if (arrow2Clicked)
 			{
-				arrow2Clicked = SMOOTH::False;
-				arrow2Checked = SMOOTH::False;
+				arrow2Clicked = False;
+				arrow2Checked = False;
 
 				if (subtype == OR_VERT)	frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
 				else			frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
@@ -320,7 +315,7 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 				Process(SM_MOUSEMOVE, 0, 0);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			FreeContext(wnd, dc);
@@ -340,10 +335,10 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 			if (arrow1Checked && !IsMouseOn(wnd->hwnd, arrow1Frame, WINDOW))
 			{
-				if (timerActive) timerActive = SMOOTH::False;
+				if (timerActive) timerActive = False;
 
-				arrow1Checked = SMOOTH::False;
-				arrow1Clicked = SMOOTH::False;
+				arrow1Checked = False;
+				arrow1Clicked = False;
 
 				arrow1Frame.right++;
 				arrow1Frame.bottom++;
@@ -353,10 +348,10 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 			}
 			else if (arrow2Checked && !IsMouseOn(wnd->hwnd, arrow2Frame, WINDOW))
 			{
-				if (timerActive) timerActive = SMOOTH::False;
+				if (timerActive) timerActive = False;
 
-				arrow2Checked = SMOOTH::False;
-				arrow2Clicked = SMOOTH::False;
+				arrow2Checked = False;
+				arrow2Clicked = False;
 
 				arrow2Frame.right++;
 				arrow2Frame.bottom++;
@@ -382,16 +377,16 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 			if (!arrow1Checked && IsMouseOn(wnd->hwnd, arrow1Frame, WINDOW))
 			{
-				arrow1Checked = SMOOTH::True;
+				arrow1Checked = True;
 
 				Frame(dc, arrow1Frame, FRAME_UP);
 			}
 			else if (arrow1Checked && !IsMouseOn(wnd->hwnd, arrow1Frame, WINDOW))
 			{
-				if (timerActive) timerActive = SMOOTH::False;
+				if (timerActive) timerActive = False;
 
-				arrow1Checked = SMOOTH::False;
-				arrow1Clicked = SMOOTH::False;
+				arrow1Checked = False;
+				arrow1Clicked = False;
 
 				arrow1Frame.right++;
 				arrow1Frame.bottom++;
@@ -401,16 +396,16 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 			}
 			else if (!arrow2Checked && IsMouseOn(wnd->hwnd, arrow2Frame, WINDOW))
 			{
-				arrow2Checked = SMOOTH::True;
+				arrow2Checked = True;
 
 				Frame(dc, arrow2Frame, FRAME_UP);
 			}
 			else if (arrow2Checked && !IsMouseOn(wnd->hwnd, arrow2Frame, WINDOW))
 			{
-				if (timerActive) timerActive = SMOOTH::False;
+				if (timerActive) timerActive = False;
 
-				arrow2Checked = SMOOTH::False;
-				arrow2Clicked = SMOOTH::False;
+				arrow2Checked = False;
+				arrow2Clicked = False;
 
 				arrow2Frame.right++;
 				arrow2Frame.bottom++;
@@ -432,19 +427,19 @@ SMOOTHInt SMOOTHArrows::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 	return retVal;
 }
 
-SMOOTHVoid SMOOTHArrows::TimerProc()
+S::Void S::Arrows::TimerProc()
 {
 	if (!registered)		return;
 	if (!active || !visible)	return;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
 	if (wnd == NIL) return;
 	if (wnd->hwnd == NIL) return;
 
-	SMOOTHInt	 prevValue = *variable;
-	SMOOTHInt	 plus = 1;
+	Int	 prevValue = *variable;
+	Int	 plus = 1;
 
 	if (!timerActive && timer != NIL)
 	{
@@ -465,11 +460,11 @@ SMOOTHVoid SMOOTHArrows::TimerProc()
 		timer->Start(100);
 	}
 
-	for (SMOOTHInt n = 1; n < 10; n++)
+	for (Int n = 1; n < 10; n++)
 	{
-		if (timerCount >= 20 * n && *variable % (SMOOTHInt) pow(10, n) == 0)
+		if (timerCount >= 20 * n && *variable % (Int) Math::Pow(10, n) == 0)
 		{
-			plus = (SMOOTHInt) pow(10, n);
+			plus = (Int) Math::Pow(10, n);
 		}
 	}
 
@@ -477,58 +472,53 @@ SMOOTHVoid SMOOTHArrows::TimerProc()
 	{
 		if (subtype == OR_HORZ)	(*variable) -= plus;
 		else			(*variable) += plus;
-
-		if (*variable < startValue)	*variable = startValue;
-		else if (*variable > endValue)	*variable = endValue;
-
-		if (*variable != prevValue) SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
 	}
 	else if (arrow2Clicked)
 	{
 		if (subtype == OR_HORZ)	(*variable) += plus;
 		else			(*variable) -= plus;
-
-		if (*variable < startValue)	*variable = startValue;
-		else if (*variable > endValue)	*variable = endValue;
-
-		if (*variable != prevValue) SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
 	}
+
+
+	if (*variable < startValue)	*variable = startValue;
+	else if (*variable > endValue)	*variable = endValue;
+
+	if (*variable != prevValue) ProcCall(objectProperties->proc, objectProperties->procParam);
 
 	timerCount++;
 }
 
-SMOOTHInt SMOOTHArrows::SetRange(SMOOTHInt rangeStart, SMOOTHInt rangeEnd)
+S::Int S::Arrows::SetRange(Int rangeStart, Int rangeEnd)
 {
-	SMOOTHInt	 prevStartValue	= startValue;
-	SMOOTHInt	 prevEndValue	= endValue;
+	Int	 prevStartValue	= startValue;
+	Int	 prevEndValue	= endValue;
+	Int	 prevValue	= *variable;
 
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
 
 	*variable	= ((*variable) - prevStartValue) * ((endValue - startValue) / (prevEndValue - prevStartValue)) + startValue;
 
-	SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+	if (*variable != prevValue) ProcCall(objectProperties->proc, objectProperties->procParam);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHArrows::SetValue(SMOOTHInt newValue)
+S::Int S::Arrows::SetValue(Int newValue)
 {
 	if (newValue < startValue)	newValue = startValue;
 	if (newValue > endValue)	newValue = endValue;
 
-	if (*variable == newValue) return SMOOTH::Success;
+	if (*variable == newValue) return Success;
 
 	*variable = newValue;
 
-	SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+	ProcCall(objectProperties->proc, objectProperties->procParam);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHArrows::GetValue()
+S::Int S::Arrows::GetValue()
 {
 	return *variable;
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,301 +8,299 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_STRING_
-#define __OBJSMOOTH_STRING_
-
-#include <math.h>
-#include <string.h>
-
 #include <smooth/string.h>
-#include <smooth/definitions.h>
-#include <smooth/toolkit.h>
-#include <smooth/stk.h>
+#include <smooth/math.h>
+#include <iconv.h>
+#include <string.h>
+#include <iolib-cxx.h>
 
-int	 SMOOTHString::inputFormat		= SIF_ISO;
-int	 SMOOTHString::previousInputFormat	= SIF_ISO;
+char	*S::String::inputFormat = NIL;
+char	*S::String::previousInputFormat = NIL;
 
-SMOOTHString::SMOOTHString()
+S::String::String()
 {
-	bstring = NIL;
-	wstring = NIL;
+	bString = NIL;
+	wString = NIL;
 
 	Clean();
 }
 
-SMOOTHString::SMOOTHString(const int nil)
+S::String::String(const int nil)
 {
-	bstring = NIL;
-	wstring = NIL;
+	bString = NIL;
+	wString = NIL;
 
 	Clean();
 }
 
-SMOOTHString::SMOOTHString(const char *newstring)
+S::String::String(const char *iString)
 {
-	if (newstring == NIL)
+	if (iString == NIL)
 	{
-		bstring = NIL;
-		wstring = NIL;
+		bString = NIL;
+		wString = NIL;
 
 		Clean();
 	}
 	else
 	{
-		bstring = NIL;
-		wstring = NIL;
+		bString = NIL;
+		wString = NIL;
 
-		ImportMBCS(SMOOTHString::inputFormat, newstring);
+		ImportFormat(iString, inputFormat);
 	}
 }
 
-SMOOTHString::SMOOTHString(const wchar_t *newstring)
+S::String::String(const wchar_t *iString)
 {
-	if (newstring == NIL)
+	if (iString == NIL)
 	{
-		bstring = NIL;
-		wstring = NIL;
+		bString = NIL;
+		wString = NIL;
 
 		Clean();
 	}
 	else
 	{
-		stringsize = wcslen(newstring) + 1;
+		stringSize = wcslen(iString) + 1;
 
-		bstring = new char [stringsize];
-		wstring = new wchar_t [stringsize];
+		bString = new char [stringSize];
+		wString = new wchar_t [stringSize];
 
-		wcscpy(wstring, newstring);
+		wcscpy(wString, iString);
 
-		for (int i = 0; i < stringsize - 1; i++)
+		for (Int i = 0; i < stringSize - 1; i++)
 		{
-			bstring[i] = wstring[i];
+			bString[i] = wString[i];
 		}
 
-		bstring[stringsize - 1] = 0;
+		bString[stringSize - 1] = 0;
 
-		checkinconsistency = SMOOTH::False;
+		checkInconsistency = False;
 	}
 }
 
-SMOOTHString::SMOOTHString(const SMOOTHString &newstring)
+S::String::String(const String &iString)
 {
-	if (newstring.wstring == NIL)
+	if (iString.wString == NIL)
 	{
-		bstring = NIL;
-		wstring = NIL;
+		bString = NIL;
+		wString = NIL;
 
 		Clean();
 	}
 	else
 	{
-		stringsize = newstring.stringsize;
+		stringSize = iString.stringSize;
 
-		bstring = new char [stringsize];
-		wstring = new wchar_t [stringsize];
+		bString = new char [stringSize];
+		wString = new wchar_t [stringSize];
 
-		strncpy(bstring, newstring.bstring, stringsize);
-		wcsncpy(wstring, newstring.wstring, stringsize);
+		strncpy(bString, iString.bString, stringSize);
+		wcsncpy(wString, iString.wString, stringSize);
 
-		checkinconsistency = newstring.checkinconsistency;
+		checkInconsistency = iString.checkInconsistency;
 
 		FixInconsistency();
 	}
 }
 
-SMOOTHString::~SMOOTHString()
+S::String::~String()
 {
 	Clean();
 }
 
-void SMOOTHString::Clean()
+S::Void S::String::Clean()
 {
-	if (bstring != NIL) delete [] bstring;
-	if (wstring != NIL) delete [] wstring;
+	if (bString != NIL) delete [] bString;
+	if (wString != NIL) delete [] wString;
 
-	bstring = NIL;
-	wstring = NIL;
-	stringsize = 0;
-	checkinconsistency = SMOOTH::False;
+	bString = NIL;
+	wString = NIL;
+	stringSize = 0;
+	checkInconsistency = False;
 }
 
-bool SMOOTHString::SetInputFormat(int inpform)
+char *S::String::SetInputFormat(const char *iFormat)
 {
-	int	 backup;
+	delete [] previousInputFormat;
 
-	switch (inpform)
-	{
-		default:
-		case SIF_DEFAULT:
-		case SIF_ISO:
-			SMOOTHString::previousInputFormat = SMOOTHString::inputFormat;
-			SMOOTHString::inputFormat = SIF_ISO;
-			break;
-		case SIF_CURRENT:
-			SMOOTHString::previousInputFormat = SMOOTHString::inputFormat;
-			break;
-		case SIF_PREVIOUS:
-			backup = SMOOTHString::inputFormat;
-			SMOOTHString::inputFormat = SMOOTHString::previousInputFormat;
-			SMOOTHString::previousInputFormat = backup;
-			break;
-		case SIF_UTF8:
-			SMOOTHString::previousInputFormat = SMOOTHString::inputFormat;
-			SMOOTHString::inputFormat = SIF_UTF8;
-			break;
-	}
+	previousInputFormat = inputFormat;
 
-	return SMOOTH::True;
+	inputFormat = new char [strlen(iFormat) + 1];
+
+	strcpy(inputFormat, iFormat);
+
+	return previousInputFormat;
 }
 
-void SMOOTHString::FixInconsistency()
+S::Void S::String::FixInconsistency()
 {
-	if (!checkinconsistency) return;
+	if (!checkInconsistency) return;
 
-	checkinconsistency = SMOOTH::False;
+	checkInconsistency = False;
 
-	for (int i = 0; i < stringsize; i++)
+	for (Int i = 0; i < stringSize; i++)
 	{
-		if (bstring[i] != wstring[i]) bstring[i] = wstring[i];
+		if (bString[i] != wString[i]) bString[i] = wString[i];
 	}
 }
 
-void SMOOTHString::ImportMBCS(int format, const char *str)
+S::Void S::String::ImportFormat(const char *str, const char *format)
 {
 	Clean();
 
-	char	*informat = NIL;
-
-	if (format == SIF_ISO)		informat = "ISO-8859-1";
-	else if (format == SIF_UTF8)	informat = "UTF-8";
-
-	stringsize = ConvertString(str, strlen(str), informat, NIL, 0, "UTF-16LE") / 2 + 1;
-
-	if (stringsize == 0) return;
-
-	bstring = new char [stringsize];
-	wstring = new wchar_t [stringsize];
-
-	ConvertString(str, strlen(str), informat, (char *) wstring, stringsize * 2, "UTF-16LE");
-
-	for (int i = 0; i < stringsize - 1; i++)
+	if (format == NIL)
 	{
-		bstring[i] = wstring[i];
+		SetInputFormat("UTF-8");
+
+		format = inputFormat;
 	}
 
-	bstring[stringsize - 1] = 0;
-	wstring[stringsize - 1] = 0;
+	stringSize = ConvertString(str, strlen(str), format, NIL, 0, "UTF-16LE") / 2 + 1;
+
+	if (stringSize == 0) return;
+
+	bString = new char [stringSize];
+	wString = new wchar_t [stringSize];
+
+	ConvertString(str, strlen(str), format, (char *) wString, stringSize * 2, "UTF-16LE");
+
+	for (Int i = 0; i < stringSize - 1; i++)
+	{
+		bString[i] = wString[i];
+	}
+
+	bString[stringSize - 1] = 0;
+	wString[stringSize - 1] = 0;
 }
 
-wchar_t &SMOOTHString::operator [](int n)
+char *S::String::ConvertTo(String encoding)
+{
+	if (stringSize == 0) return NIL;
+
+	Int	 bufferSize	= ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, encoding) + 1;
+	char	*buffer		= new char [bufferSize * 4];
+
+	ConvertString((char *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize, encoding);
+
+	return buffer;
+}
+
+wchar_t &S::String::operator [](int n)
 {
 	FixInconsistency();
 
-	char	*bbuffer;
-	wchar_t	*wbuffer;
+	char	*bBuffer;
+	wchar_t	*wBuffer;
 
-	if (n >= stringsize - 1)
+	if (n >= stringSize - 1)
 	{
-		if (stringsize > 0)
+		if (stringSize > 0)
 		{
-			bbuffer = new char [stringsize];
-			wbuffer = new wchar_t [stringsize];
+			bBuffer = new char [stringSize];
+			wBuffer = new wchar_t [stringSize];
 
-			strncpy(bbuffer, bstring, stringsize);
-			wcsncpy(wbuffer, wstring, stringsize);
+			strncpy(bBuffer, bString, stringSize);
+			wcsncpy(wBuffer, wString, stringSize);
 
-			delete [] bstring;
-			delete [] wstring;
+			delete [] bString;
+			delete [] wString;
 
-			bstring = new char [n + 2];
-			wstring = new wchar_t [n + 2];
+			bString = new char [n + 2];
+			wString = new wchar_t [n + 2];
 
-			for (int i = 0; i < (n + 1); i++)
+			for (Int i = 0; i < (n + 1); i++)
 			{
-				bstring[i] = 32;
-				wstring[i] = 32;
+				bString[i] = 32;
+				wString[i] = 32;
 			}
 
-			bstring[n + 1] = 0;
-			wstring[n + 1] = 0;
+			bString[n + 1] = 0;
+			wString[n + 1] = 0;
 
-			for (int j = 0; j < stringsize - 1; j++)
+			for (Int j = 0; j < stringSize - 1; j++)
 			{
-				bstring[j] = bbuffer[j];
-				wstring[j] = wbuffer[j];
+				bString[j] = bBuffer[j];
+				wString[j] = wBuffer[j];
 			}
 
-			stringsize = n + 2;
+			stringSize = n + 2;
 
-			delete [] bbuffer;
-			delete [] wbuffer;
+			delete [] bBuffer;
+			delete [] wBuffer;
 		}
 		else
 		{
 			Clean();
 
-			bstring = new char [n + 2];
-			wstring = new wchar_t [n + 2];
+			bString = new char [n + 2];
+			wString = new wchar_t [n + 2];
 
-			for (int i = 0; i < (n + 1); i++)
+			for (Int i = 0; i < (n + 1); i++)
 			{
-				bstring[i] = 32;
-				wstring[i] = 32;
+				bString[i] = 32;
+				wString[i] = 32;
 			}
 
-			bstring[n + 1] = 0;
-			wstring[n + 1] = 0;
+			bString[n + 1] = 0;
+			wString[n + 1] = 0;
 
-			stringsize = n + 2;
+			stringSize = n + 2;
 		}
 
-		bstring[n] = 0;
-		wstring[n] = 0;
+		bString[n] = 0;
+		wString[n] = 0;
 	}
 
-	checkinconsistency = SMOOTH::True;
+	checkInconsistency = True;
 
-	return wstring[n];
+	return wString[n];
 }
 
-SMOOTHString::operator char *()
+wchar_t &S::String::operator [](Int n)
+{
+	return (*this)[(int) n];
+}
+
+S::String::operator char *()
 {
 	FixInconsistency();
 
-	return bstring;
+	return bString;
 }
 
-SMOOTHString::operator wchar_t *()
+S::String::operator wchar_t *()
 {
 	FixInconsistency();
 
-	return wstring;
+	return wString;
 }
 
-SMOOTHString &SMOOTHString::operator =(const int nil)
+S::String &S::String::operator =(const int nil)
 {
 	Clean();
 
 	return *this;
 }
 
-SMOOTHString &SMOOTHString::operator =(const char *newstring)
+S::String &S::String::operator =(const char *newString)
 {
-	if (newstring == NIL)
+	if (newString == NIL)
 	{
 		Clean();
 	}
 	else
 	{
-		ImportMBCS(SMOOTHString::inputFormat, newstring);
+		ImportFormat(newString, inputFormat);
 	}
 
 	return *this;
 }
 
-SMOOTHString &SMOOTHString::operator =(const wchar_t *newstring)
+S::String &S::String::operator =(const wchar_t *newString)
 {
-	if (newstring == NIL)
+	if (newString == NIL)
 	{
 		Clean();
 	}
@@ -310,45 +308,45 @@ SMOOTHString &SMOOTHString::operator =(const wchar_t *newstring)
 	{
 		Clean();
 
-		stringsize = wcslen(newstring) + 1;
+		stringSize = wcslen(newString) + 1;
 
-		bstring = new char [stringsize];
-		wstring = new wchar_t [stringsize];
+		bString = new char [stringSize];
+		wString = new wchar_t [stringSize];
 
-		wcscpy(wstring, newstring);
+		wcscpy(wString, newString);
 
-		for (int i = 0; i < stringsize - 1; i++)
+		for (Int i = 0; i < stringSize - 1; i++)
 		{
-			bstring[i] = wstring[i];
+			bString[i] = wString[i];
 		}
 
-		bstring[stringsize - 1] = 0;
+		bString[stringSize - 1] = 0;
 	}
 
 	return *this;
 }
 
-SMOOTHString &SMOOTHString::operator =(const SMOOTHString &newstring)
+S::String &S::String::operator =(const String &newString)
 {
-	if (newstring.wstring == NIL)
+	if (newString.wString == NIL)
 	{
 		Clean();
 	}
 	else
 	{
-		SMOOTHString	 bak(newstring);
+		String	 backup(newString);
 
 		Clean();
 
-		stringsize = bak.stringsize;
+		stringSize = backup.stringSize;
 
-		bstring = new char [stringsize];
-		wstring = new wchar_t [stringsize];
+		bString = new char [stringSize];
+		wString = new wchar_t [stringSize];
 
-		strncpy(bstring, bak.bstring, stringsize);
-		wcsncpy(wstring, bak.wstring, stringsize);
+		strncpy(bString, backup.bString, stringSize);
+		wcsncpy(wString, backup.wString, stringSize);
 
-		checkinconsistency = newstring.checkinconsistency;
+		checkInconsistency = newString.checkInconsistency;
 
 		FixInconsistency();
 	}
@@ -356,122 +354,122 @@ SMOOTHString &SMOOTHString::operator =(const SMOOTHString &newstring)
 	return *this;
 }
 
-bool SMOOTHString::operator ==(const int nil)
+S::Bool S::String::operator ==(const int nil)
 {
-	if (wstring == NIL)	return SMOOTH::True;
-	else			return SMOOTH::False;
+	if (wString == NIL)	return True;
+	else			return False;
 }
 
-bool SMOOTHString::operator ==(const char *str)
+S::Bool S::String::operator ==(const char *str)
 {
-	if (bstring == NIL && str == NIL)	return SMOOTH::True;
-	if (bstring == NIL || str == NIL)	return SMOOTH::False;
+	if (bString == NIL && str == NIL)	return True;
+	if (bString == NIL || str == NIL)	return False;
 
-	if (!Compare(str))	return SMOOTH::True;
-	else			return SMOOTH::False;
+	if (!Compare(str))	return True;
+	else			return False;
 }
 
-bool SMOOTHString::operator ==(const wchar_t *str)
+S::Bool S::String::operator ==(const wchar_t *str)
 {
-	if (wstring == NIL && str == NIL)	return SMOOTH::True;
-	if (wstring == NIL || str == NIL)	return SMOOTH::False;
+	if (wString == NIL && str == NIL)	return True;
+	if (wString == NIL || str == NIL)	return False;
 
-	if (!Compare(str))	return SMOOTH::True;
-	else			return SMOOTH::False;
+	if (!Compare(str))	return True;
+	else			return False;
 }
 
-bool SMOOTHString::operator ==(const SMOOTHString &str)
+S::Bool S::String::operator ==(const String &str)
 {
-	if (wstring == NIL && str.wstring == NIL)	return SMOOTH::True;
-	if (wstring == NIL || str.wstring == NIL)	return SMOOTH::False;
+	if (wString == NIL && str.wString == NIL)	return True;
+	if (wString == NIL || str.wString == NIL)	return False;
 
-	if (!Compare(str))	return SMOOTH::True;
-	else			return SMOOTH::False;
+	if (!Compare(str))	return True;
+	else			return False;
 }
 
-bool SMOOTHString::operator !=(const int nil)
+S::Bool S::String::operator !=(const int nil)
 {
-	if (wstring == NIL)	return SMOOTH::False;
-	else			return SMOOTH::True;
+	if (wString == NIL)	return False;
+	else			return True;
 }
 
-bool SMOOTHString::operator !=(const char *str)
+S::Bool S::String::operator !=(const char *str)
 {
-	if (bstring == NIL && str == NIL)	return SMOOTH::False;
-	if (bstring == NIL || str == NIL)	return SMOOTH::True;
+	if (bString == NIL && str == NIL)	return False;
+	if (bString == NIL || str == NIL)	return True;
 
-	if (Compare(str) != 0)	return SMOOTH::True;
-	else			return SMOOTH::False;
+	if (Compare(str) != 0)	return True;
+	else			return False;
 }
 
-bool SMOOTHString::operator !=(const wchar_t *str)
+S::Bool S::String::operator !=(const wchar_t *str)
 {
-	if (wstring == NIL && str == NIL)	return SMOOTH::False;
-	if (wstring == NIL || str == NIL)	return SMOOTH::True;
+	if (wString == NIL && str == NIL)	return False;
+	if (wString == NIL || str == NIL)	return True;
 
-	if (Compare(str) != 0)	return SMOOTH::True;
-	else			return SMOOTH::False;
+	if (Compare(str) != 0)	return True;
+	else			return False;
 }
 
-bool SMOOTHString::operator !=(const SMOOTHString &str)
+S::Bool S::String::operator !=(const String &str)
 {
-	if (wstring == NIL && str.wstring == NULL)	return SMOOTH::False;
-	if (wstring == NIL || str.wstring == NULL)	return SMOOTH::True;
+	if (wString == NIL && str.wString == NULL)	return False;
+	if (wString == NIL || str.wString == NULL)	return True;
 
-	if (Compare(str) != 0)	return SMOOTH::True;
-	else			return SMOOTH::False;
+	if (Compare(str) != 0)	return True;
+	else			return False;
 }
 
-int SMOOTHString::Length()
+S::Int S::String::Length()
 {
-	if (stringsize == 0) return 0;
+	if (stringSize == 0) return 0;
 
-	stringsize = 1;
+	stringSize = 1;
 
-	for (int i = 0; i >= 0; i++)
+	for (Int i = 0; i >= 0; i++)
 	{
-		if (wstring[i] == 0) break;
+		if (wString[i] == 0) break;
 
-		stringsize++;
+		stringSize++;
 	}
 
-	return stringsize - 1;
+	return stringSize - 1;
 }
 
-SMOOTHString &SMOOTHString::Append(const char *str)
+S::String &S::String::Append(const char *str)
 {
-	SMOOTHString	 str2 = str;
+	String	 str2 = str;
 
 	return Append(str2);
 }
 
-SMOOTHString &SMOOTHString::Append(const wchar_t *str)
+S::String &S::String::Append(const wchar_t *str)
 {
-	SMOOTHString	 str2 = str;
+	String	 str2 = str;
 
 	return Append(str2);
 }
 
-SMOOTHString &SMOOTHString::Append(const SMOOTHString &str)
+S::String &S::String::Append(const String &str)
 {
-	int	 len1 = Length();
-	int	 len2 = SMOOTHString(str).Length();
+	Int	 len1 = Length();
+	Int	 len2 = String(str).Length();
 
 	wchar_t	*composed = new wchar_t [len1 + len2 + 1];
 
-	for (int i = 0; i < (len1 + len2 + 1); i++)
+	for (Int i = 0; i < (len1 + len2 + 1); i++)
 	{
 		composed[i] = 0;
 	}
 
-	for (int j = 0; j < len1; j++)
+	for (Int j = 0; j < len1; j++)
 	{
-		composed[j] = wstring[j];
+		composed[j] = wString[j];
 	}
 
-	for (int k = len1; k < (len1 + len2); k++)
+	for (Int k = len1; k < (len1 + len2); k++)
 	{
-		composed[k] = str.wstring[k - len1];
+		composed[k] = str.wString[k - len1];
 	}
 
 	*this = composed;
@@ -481,75 +479,75 @@ SMOOTHString &SMOOTHString::Append(const SMOOTHString &str)
 	return *this;
 }
 
-SMOOTHString &SMOOTHString::Copy(const char *str)
+S::String &S::String::Copy(const char *str)
 {
-	SMOOTHString 	 str2 = str;
+	String 	 str2 = str;
 
 	return Copy(str2);
 }
 
-SMOOTHString &SMOOTHString::Copy(const wchar_t *str)
+S::String &S::String::Copy(const wchar_t *str)
 {
-	SMOOTHString 	 str2 = str;
+	String 	 str2 = str;
 
 	return Copy(str2);
 }
 
-SMOOTHString &SMOOTHString::Copy(const SMOOTHString &str)
+S::String &S::String::Copy(const String &str)
 {
 	*this = str;
 
 	return *this;
 }
 
-SMOOTHString &SMOOTHString::CopyN(const char *str, int n)
+S::String &S::String::CopyN(const char *str, const Int n)
 {
-	SMOOTHString 	 str2 = str;
+	String 	 str2 = str;
 
 	return CopyN(str2, n);
 }
 
-SMOOTHString &SMOOTHString::CopyN(const wchar_t *str, int n)
+S::String &S::String::CopyN(const wchar_t *str, const Int n)
 {
-	SMOOTHString 	 str2 = str;
+	String 	 str2 = str;
 
 	return CopyN(str2, n);
 }
 
-SMOOTHString &SMOOTHString::CopyN(const SMOOTHString &str, int n)
+S::String &S::String::CopyN(const String &str, const Int n)
 {
-	SMOOTHString	 bak(str);
+	String	 backup(str);
 
 	Clean();
 
-	for (int i = n - 1; i >= 0; i--)
+	for (Int i = n - 1; i >= 0; i--)
 	{
-		(*this)[i] = bak[i];
+		(*this)[i] = backup[i];
 	}
 
 	return *this;
 }
 
-int SMOOTHString::Compare(const char *str)
+S::Int S::String::Compare(const char *str)
 {
-	SMOOTHString 	 str2 = str;
+	String 	 str2 = str;
 
 	return Compare(str2);
 }
 
-int SMOOTHString::Compare(const wchar_t *str)
+S::Int S::String::Compare(const wchar_t *str)
 {
-	SMOOTHString 	 str2 = str;
+	String 	 str2 = str;
 
 	return Compare(str2);
 }
 
-int SMOOTHString::Compare(const SMOOTHString &str)
+S::Int S::String::Compare(const String &str)
 {
 	FixInconsistency();
 
-	int	 len1 = Length();
-	int	 len2 = SMOOTHString(str).Length();
+	Int	 len1 = Length();
+	Int	 len2 = String(str).Length();
 
 	if (len1 != len2)
 	{
@@ -557,18 +555,46 @@ int SMOOTHString::Compare(const SMOOTHString &str)
 	}
 	else
 	{
-		for (int i = 0; i <= len1; i++)
+		for (Int i = 0; i <= len1; i++)
 		{
-			if (wstring[i] != str.wstring[i]) return 1;
+			if (wString[i] != str.wString[i]) return 1;
 		}
 	}
 
 	return 0;
 }
 
-SMOOTHString &SMOOTHString::Fill(int value)
+S::Int S::String::CompareN(const char *str, Int n)
 {
-	for (int i = 0; i < Length(); i++)
+	String 	 str2 = str;
+
+	return CompareN(str2, n);
+}
+
+S::Int S::String::CompareN(const wchar_t *str, Int n)
+{
+	String 	 str2 = str;
+
+	return CompareN(str2, n);
+}
+
+S::Int S::String::CompareN(const String &str, Int n)
+{
+	FixInconsistency();
+
+	if (Length() < n) return 1;
+
+	for (int i = 0; i < n; i++)
+	{
+		if (wString[i] != str.wString[i]) return 1;
+	}
+
+	return 0;
+}
+
+S::String &S::String::Fill(const Int value)
+{
+	for (Int i = 0; i < Length(); i++)
 	{
 		(*this)[i] = value;
 	}
@@ -578,11 +604,11 @@ SMOOTHString &SMOOTHString::Fill(int value)
 	return *this;
 }
 
-SMOOTHString &SMOOTHString::FillN(int value, int count)
+S::String &S::String::FillN(const Int value, const Int count)
 {
 	Clean();
 
-	for (int i = count - 1; i >= 0; i--)
+	for (Int i = count - 1; i >= 0; i--)
 	{
 		(*this)[i] = value;
 	}
@@ -592,149 +618,149 @@ SMOOTHString &SMOOTHString::FillN(int value, int count)
 	return *this;
 }
 
-int SMOOTHString::ToInt()
+S::Int S::String::ToInt()
 {
-	bool	 neg = SMOOTH::False;
-	int	 first = 0;
-	int	 n = 0;
-	int	 size = Length();
+	Bool	 neg = False;
+	Int	 first = 0;
+	Int	 n = 0;
+	Int	 size = Length();
 
-	for (int i = size - 1; i >= 0; i--)
+	for (Int i = size - 1; i >= 0; i--)
 	{
-		if ((wstring[i] < 48 || wstring[i] > 57) && wstring[i] != 45) size = i;
+		if ((wString[i] < 48 || wString[i] > 57) && wString[i] != 45) size = i;
 	}
 
-	if (wstring[0] == '-')
+	if (wString[0] == '-')
 	{
-		neg = SMOOTH::True;
+		neg = True;
 		first = 1;
 		size--;
 	}
 
-	for (int j = first; j < (first + size); j++)
+	for (Int j = first; j < (first + size); j++)
 	{
-		n += (int) pow(10, size-(j-first)-1) * (wstring[j] - 48);
+		n += (Int) Math::Pow(10, size - (j - first) - 1) * (wString[j] - 48);
 	}
 
 	if (!neg)	return n;
 	else		return 0 - n;
 }
 
-double SMOOTHString::ToDouble()
+S::Float S::String::ToDouble()
 {
-	bool		 neg = SMOOTH::False;
-	int		 first = 0;
-	long double	 n = 0;
-	int		 size = Length();
-	int		 afpsize = 0;
-	int		 firstafp = 0;
+	Bool	 neg = False;
+	Int	 first = 0;
+	Float	 n = 0;
+	Int	 size = Length();
+	Int	 afpsize = 0;
+	Int	 firstafp = 0;
 
-	for (int i = size - 1; i >= 0; i--)
+	for (Int i = size - 1; i >= 0; i--)
 	{
-		if ((wstring[i] < 48 || wstring[i] > 57) && wstring[i] != 45) size = i;
+		if ((wString[i] < 48 || wString[i] > 57) && wString[i] != 45) size = i;
 	}
 
-	if (wstring[size] == '.')
+	if (wString[size] == '.')
 	{
 		firstafp = size + 1;
 
-		for (int i = size + 1; i < Length(); i++)
+		for (Int i = size + 1; i < Length(); i++)
 		{
-			if (wstring[i] >= 48 && wstring[i] <= 57)	afpsize++;
+			if (wString[i] >= 48 && wString[i] <= 57)	afpsize++;
 			else						break;
 		}
 	}
 
-	if (wstring[0] == '-')
+	if (wString[0] == '-')
 	{
-		neg = SMOOTH::True;
+		neg = True;
 		first = 1;
 		size--;
 	}
 
-	for (int j = first; j < (first + size); j++)
+	for (Int j = first; j < (first + size); j++)
 	{
-		n += (int) pow(10, size-(j-first)-1) * (wstring[j] - 48);
+		n += (Int) Math::Pow(10, size - (j - first) - 1) * (wString[j] - 48);
 	}
 
-	for (int k = firstafp; k < (firstafp + afpsize); k++)
+	for (Int k = firstafp; k < (firstafp + afpsize); k++)
 	{
-		n += (double) pow(10, 0-(k-firstafp)-1) * (wstring[k] - 48);
+		n += (Float) Math::Pow(10, 0 - (k - firstafp) - 1) * (wString[k] - 48);
 	}
 
 	if (!neg)	return n;
 	else		return 0 - n;
 }
 
-SMOOTHString SMOOTHString::IntToString(int value)
+S::String S::String::IntToString(const Int value)
 {
-	SMOOTHString	 newstring;
-	int		 sz;
+	String	 newString;
+	Int	 sz;
 
 	if (value == 0)		sz = 1;
-	else if (value < 0)	sz = (int) log10(-value) + 2;
-	else			sz = (int) log10(value) + 1;
+	else if (value < 0)	sz = (Int) Math::Log10(-value) + 2;
+	else			sz = (Int) Math::Log10(value) + 1;
 
 	if (value < 0)
 	{
-		newstring[0] = 45;
+		newString[0] = 45;
 
-		for (int i = 0; i < sz-1; i++)
+		for (Int i = 0; i < sz-1; i++)
 		{
-			newstring[i+1] = (wchar_t) floor(((-value) % (int) pow(10, sz - i - 1)) / pow(10, sz - (i + 1) - 1)) + 48;
+			newString[i+1] = (wchar_t) Math::Floor(((-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
 		}
 	}
 	else
 	{
-		for (int i = 0; i < sz; i++)
+		for (Int i = 0; i < sz; i++)
 		{
-			newstring[i] = (wchar_t) floor((value % (int) pow(10, sz - i)) / pow(10, sz - (i + 1))) + 48;
+			newString[i] = (wchar_t) Math::Floor((value % (Int) Math::Pow(10, sz - i)) / Math::Pow(10, sz - (i + 1))) + 48;
 		}
 	}
 
-	newstring.FixInconsistency();
+	newString.FixInconsistency();
 
-	return newstring;
+	return newString;
 }
 
-SMOOTHString SMOOTHString::DoubleToString(double value)
+S::String S::String::DoubleToString(Float value)
 {
-	SMOOTHString	 newstring;
-	int		 sz;
-	int		 afpslen;
-	int		 lastnn = 0;
-	SMOOTHString	 afps;
+	String	 newString;
+	Int	 sz;
+	Int	 afpslen;
+	Int	 lastnn = 0;
+	String	 afps;
 
-	if ((int) value == 0)	sz = 1;
-	else if (value < 0)	sz = (int) log10(-value) + 1;
-	else			sz = (int) log10(value) + 1;
+	if ((Int) value == 0)	sz = 1;
+	else if (value < 0)	sz = (Int) Math::Log10(-value) + 1;
+	else			sz = (Int) Math::Log10(value) + 1;
 
 	if (value < 0)
 	{
 		sz++;
 
-		newstring[0] = 45;
+		newString[0] = 45;
 
-		for (int i = 0; i < sz-1; i++)
+		for (Int i = 0; i < sz-1; i++)
 		{
-			newstring[i+1] = (wchar_t) floor(((int) (-value) % (int) pow(10, sz - i - 1)) / pow(10, sz - (i + 1) - 1)) + 48;
+			newString[i+1] = (wchar_t) Math::Floor(((Int) (-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
 		}
 
-		afps = SMOOTHString::IntToString((int) (-(value - (int) value) * (int) pow(10, 9)));
+		afps = IntToString((Int) (-(value - (Int) value) * (Int) Math::Pow(10, 9)));
 	}
 	else
 	{
-		for (int i = 0; i < sz; i++)
+		for (Int i = 0; i < sz; i++)
 		{
-			newstring[i] = (wchar_t) floor(((int) value % (int) pow(10, sz - i)) / pow(10, sz - (i + 1))) + 48;
+			newString[i] = (wchar_t) Math::Floor(((Int) value % (Int) Math::Pow(10, sz - i)) / Math::Pow(10, sz - (i + 1))) + 48;
 		}
 
-		afps = SMOOTHString::IntToString((int) ((value - (int) value) * (int) pow(10, 9)));
+		afps = IntToString((Int) ((value - (Int) value) * (Int) Math::Pow(10, 9)));
 	}
 
 	afpslen = afps.Length();
 
-	for (int i = 0; i < afpslen; i++)
+	for (Int i = 0; i < afpslen; i++)
 	{
 		if (afps[i] != 48) lastnn = i + 1;
 	}
@@ -743,7 +769,7 @@ SMOOTHString SMOOTHString::DoubleToString(double value)
 
 	lastnn = 0;
 
-	for (int j = 0; j < afpslen; j++)
+	for (Int j = 0; j < afpslen; j++)
 	{
 		if (afps[j] != 57) lastnn = j + 1;
 	}
@@ -753,19 +779,109 @@ SMOOTHString SMOOTHString::DoubleToString(double value)
 
 	if (lastnn != 0) afps[lastnn - 1] = afps[lastnn - 1] + 1;
 
-	if (value - (int) value != 0)
+	if (value - (Int) value != 0)
 	{
-		newstring.Append(".");
+		newString.Append(".");
 
-		for (int i = 0; i < (9 - afpslen); i++)
+		for (Int i = 0; i < (9 - afpslen); i++)
 		{
-			newstring.Append("0");
+			newString.Append("0");
 		}
 
-		newstring.Append(afps);
+		newString.Append(afps);
 	}
 
-	return newstring;
+	return newString;
 }
 
-#endif
+S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncoding, char *outBuffer, Int outBytes, const char *outEncoding)
+{
+	Bool	 delBuffer = False;
+
+	if (outBuffer == NIL)
+	{
+		delBuffer	= True;
+		outBytes	= inBytes * 8;
+		outBuffer	= new char [outBytes];
+	}
+
+	for (Int i = 0; i < outBytes; i++) outBuffer[i] = 0;
+
+	InStream	*in	= new InStream(STREAM_BUFFER, (void *) inBuffer, inBytes);
+	OutStream	*out	= new OutStream(STREAM_BUFFER, (void *) outBuffer, outBytes);
+	iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
+	Int		 size	= 0;
+
+	iconv(cd, NULL, NULL, NULL, NULL);
+
+	char		 inBuf[4096 + 4096];
+	size_t		 inBufRest = 0;
+	char		 outBuf[4096];
+
+	for (;;)
+	{
+		size_t	 inBufSize = min(in->Size() - in->GetPos(), 4096);
+
+		in->InputData((void *) (inBuf + 4096), inBufSize);
+
+		if (inBufSize == 0)
+		{
+			if (inBufRest == 0)
+			{
+				break;
+			}
+			else
+			{
+				iconv_close(cd);
+
+				delete in;
+				delete out;
+
+				return 0;
+			}
+		}
+		else
+		{
+			const char	*inPtr	= inBuf + 4096 - inBufRest;
+			size_t		 inSize	= inBufRest + inBufSize;
+
+			inBufRest = 0;
+
+			while (inSize > 0)
+			{
+				char	*outPtr		= outBuf;
+				size_t	 outSize	= sizeof(outBuf);
+
+				iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize);
+
+				if (outPtr != outBuf)
+				{
+					out->OutputData((void *) outBuf, outPtr - outBuf);
+					size += (outPtr - outBuf);
+				}
+			}
+		}
+	}
+
+	char	*outPtr		= outBuf;
+	size_t	 outSize	= sizeof(outBuf);
+
+	iconv(cd, NULL, NULL, &outPtr, &outSize);
+
+	if (outPtr != outBuf)
+	{
+		out->OutputData((void *) outBuf, outPtr - outBuf);
+		size += (outPtr - outBuf);
+	}
+
+	iconv_close(cd);
+
+	if (size >= outBytes) size = 0;
+
+	delete in;
+	delete out;
+
+	if (delBuffer) delete [] outBuffer;
+
+	return size;
+}

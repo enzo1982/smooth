@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,25 +8,22 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_SIZE_
-#define __OBJSMOOTH_SIZE_
-
 #include <smooth/size.h>
 
-SMOOTHSize::SMOOTHSize()
+S::Size::Size()
 {
 	cx = 0;
 	cy = 0;
 }
 
-SMOOTHSize::SMOOTHSize(SMOOTHInt iCX, SMOOTHInt iCY)
+S::Size::Size(Int iCX, Int iCY)
 {
 	cx = iCX;
 	cy = iCY;
 }
 
 #ifdef __WIN32__
-SMOOTHSize::operator SIZE()
+S::Size::operator SIZE()
 {
 	SIZE	 size;
 
@@ -36,13 +33,11 @@ SMOOTHSize::operator SIZE()
 	return size;
 }
 
-SMOOTHSize &SMOOTHSize::operator =(const SIZE size)
+S::Size &S::Size::operator =(const SIZE size)
 {
 	cx = size.cx;
 	cy = size.cy;
 
 	return *this;
 }
-#endif
-
 #endif

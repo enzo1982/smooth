@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,16 +8,13 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_OBJECTPROPERTIES_
-#define __OBJSMOOTH_OBJECTPROPERTIES_
-
 #include <smooth/object.h>
 #include <smooth/objectproperties.h>
 #include <smooth/stk.h>
 #include <smooth/i18n.h>
 #include <smooth/toolkit.h>
 
-SMOOTHObjectProperties::SMOOTHObjectProperties()
+S::ObjectProperties::ObjectProperties()
 {
 	HDC	 dc = GetContext(0);
 
@@ -36,8 +33,8 @@ SMOOTHObjectProperties::SMOOTHObjectProperties()
 	tooltipSize.cx	= 0;
 	tooltipSize.cy	= 0;
 
-	checked		= SMOOTH::False;
-	clicked		= SMOOTH::False;
+	checked		= False;
+	clicked		= False;
 
 	font		= I18N_DEFAULTFONT;
 	fontColor	= SMOOTH::Setup::TextColor;
@@ -49,5 +46,3 @@ SMOOTHObjectProperties::SMOOTHObjectProperties()
 
 	FreeContext(0, dc);
 }
-
-#endif

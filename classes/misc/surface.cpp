@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,65 +8,59 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_SURFACE_
-#define __OBJSMOOTH_SURFACE_
-
 #include <smooth/surface.h>
-#include <smooth/stk.h>
 
-SMOOTHSurface::SMOOTHSurface()
+S::Surface::Surface()
 {
 	size.cx	= 0;
 	size.cy	= 0;
 }
 
-SMOOTHSurface::~SMOOTHSurface()
+S::Surface::~Surface()
 {
 }
 
-SMOOTHSize SMOOTHSurface::GetSize()
+S::Size S::Surface::GetSize()
 {
 	return size;
 }
 
-SMOOTHInt SMOOTHSurface::SetPixel(SMOOTHInt x, SMOOTHInt y, SMOOTHInt color)
+S::Int S::Surface::SetPixel(Int x, Int y, Int color)
 {
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurface::GetPixel(SMOOTHInt x, SMOOTHInt y)
+S::Int S::Surface::GetPixel(Int x, Int y)
 {
 	return 0;
 }
 
-SMOOTHInt SMOOTHSurface::Line(SMOOTHPoint pos1, SMOOTHPoint pos2, SMOOTHInt color)
+S::Int S::Surface::Line(Point pos1, Point pos2, Int color)
 {
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurface::Frame(SMOOTHRect rect, SMOOTHInt style)
+S::Int S::Surface::Frame(Rect rect, Int style)
 {
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurface::Box(SMOOTHRect rect, SMOOTHInt color, SMOOTHInt style)
+S::Int S::Surface::Box(Rect rect, Int color, Int style)
 {
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurface::SetText(SMOOTHString string, SMOOTHRect rect, SMOOTHString font, SMOOTHInt size, SMOOTHInt color, SMOOTHInt weight)
+S::Int S::Surface::SetText(String string, Rect rect, String font, Int size, Int color, Int weight)
 {
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurface::BlitFromBitmap(HBITMAP bitmap, SMOOTHRect srcRect, SMOOTHRect destRect)
+S::Int S::Surface::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
 {
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHSurface::BlitToBitmap(SMOOTHRect srcRect, HBITMAP bitmap, SMOOTHRect destRect)
+S::Int S::Surface::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
 {
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_FILEDLG_
-#define __OBJSMOOTH_FILEDLG_
 
 #define MAKEUNICODESTR(x) L##x
 
@@ -19,17 +16,17 @@
 
 #include <commdlg.h>
 
-SMOOTHDialogFileSelection::SMOOTHDialogFileSelection()
+S::DialogFileSelection::DialogFileSelection()
 {
 	flags = 0;
 	mode = 0;
 }
 
-SMOOTHDialogFileSelection::~SMOOTHDialogFileSelection()
+S::DialogFileSelection::~DialogFileSelection()
 {
 }
 
-SMOOTHInt SMOOTHDialogFileSelection::ShowDialog()
+S::Int S::DialogFileSelection::ShowDialog()
 {
 	static OPENFILENAMEW	 ofnw;
 	static OPENFILENAMEA	 ofna;
@@ -38,10 +35,10 @@ SMOOTHInt SMOOTHDialogFileSelection::ShowDialog()
 	wchar_t			*bufferw = new wchar_t [32768];
 	char			*buffera = new char [32768];
 	bool			 result;
-	SMOOTHInt		 retValue = SMOOTH::Success;
+	Int			 retValue = Success;
 
-	for (SMOOTHInt i = 0; i < 32768; i++) bufferw[i] = 0;
-	for (SMOOTHInt j = 0; j < 32768; j++) buffera[j] = 0;
+	for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
+	for (Int j = 0; j < 32768; j++) buffera[j] = 0;
 
 	if (parentWindow != NIL)
 	{
@@ -74,7 +71,7 @@ SMOOTHInt SMOOTHDialogFileSelection::ShowDialog()
 	ofna.Flags		= OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | flags;
 	ofna.lpstrDefExt	= defExt;
 
-	SMOOTHInt	 bpos = 0;
+	Int	 bpos = 0;
 
 	for (int k = 0; k < filters.GetNOfEntries(); k++)
 	{
@@ -113,8 +110,8 @@ SMOOTHInt SMOOTHDialogFileSelection::ShowDialog()
 
 	if (mode == SFM_OPEN)
 	{
-		ofnw.Flags = ofnw.Flags | OFN_FILEMUSTEXIST;
-		ofna.Flags = ofna.Flags | OFN_FILEMUSTEXIST;
+		ofnw.Flags |= OFN_FILEMUSTEXIST;
+		ofna.Flags |= OFN_FILEMUSTEXIST;
 
 		if (SMOOTH::Setup::enableUnicode)	result = GetOpenFileNameW(&ofnw);
 		else					result = GetOpenFileNameA(&ofna);
@@ -127,12 +124,12 @@ SMOOTHInt SMOOTHDialogFileSelection::ShowDialog()
 
 	if (result)
 	{
-		SMOOTHInt	 n;
-		SMOOTHInt	 pos = 0;
-		SMOOTHString	 dir;
-		SMOOTHString	 file;
-		wchar_t		*buffer2w = new wchar_t [1024];
-		char		*buffer2a = new char [1024];
+		Int	 n;
+		Int	 pos = 0;
+		String	 dir;
+		String	 file;
+		wchar_t	*buffer2w = new wchar_t [1024];
+		char	*buffer2a = new char [1024];
 
 		if (SMOOTH::Setup::enableUnicode)
 		{
@@ -210,7 +207,7 @@ SMOOTHInt SMOOTHDialogFileSelection::ShowDialog()
 	}
 	else
 	{
-		retValue = SMOOTH::Error;
+		retValue = Error;
 	}
 
 	delete [] bufferw;
@@ -221,50 +218,48 @@ SMOOTHInt SMOOTHDialogFileSelection::ShowDialog()
 	return retValue;
 }
 
-SMOOTHInt SMOOTHDialogFileSelection::AddFilter(SMOOTHString name, SMOOTHString filter)
+S::Int S::DialogFileSelection::AddFilter(String name, String filter)
 {
 	filterNames.AddEntry(name);
 	filters.AddEntry(filter);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHDialogFileSelection::SetFlags(SMOOTHInt newFlags)
+S::Int S::DialogFileSelection::SetFlags(Int newFlags)
 {
-	flags = flags | newFlags;
+	flags |= newFlags;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHDialogFileSelection::SetMode(SMOOTHInt newMode)
+S::Int S::DialogFileSelection::SetMode(Int newMode)
 {
 	mode = newMode;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHDialogFileSelection::SetDefaultExtension(SMOOTHString newDefExt)
+S::Int S::DialogFileSelection::SetDefaultExtension(String newDefExt)
 {
 	defExt = newDefExt;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHDialogFileSelection::GetNumberOfFiles()
+S::Int S::DialogFileSelection::GetNumberOfFiles()
 {
 	return files.GetNOfEntries();
 }
 
-SMOOTHString SMOOTHDialogFileSelection::GetFileName()
+S::String S::DialogFileSelection::GetFileName()
 {
 	if (files.GetNOfEntries() > 0)	return files.GetFirstEntry();
 	else				return NIL;
 }
 
-SMOOTHString SMOOTHDialogFileSelection::GetNthFileName(SMOOTHInt n)
+S::String S::DialogFileSelection::GetNthFileName(Int n)
 {
 	if (files.GetNOfEntries() > n)	return files.GetNthEntry(n);
 	else				return NIL;
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,46 +8,49 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_XMLDOCUMENT_
-#define __OBJSMOOTH_XMLDOCUMENT_
-
 #include <libxml/parser.h>
 
 #include <smooth/object.h>
 #include <smooth/xml/document.h>
-#include <smooth/stk.h>
 
-SMOOTHXMLDocument::SMOOTHXMLDocument()
+S::XML::Document::Document()
 {
 	rootNode	= NIL;
+	encoding	= "UTF-8";
 }
 
-SMOOTHXMLDocument::~SMOOTHXMLDocument()
+S::XML::Document::~Document()
 {
 	if (rootNode != NIL) delete rootNode;
 }
 
-SMOOTHXMLNode *SMOOTHXMLDocument::GetRootNode()
+S::XML::Node *S::XML::Document::GetRootNode()
 {
 	return rootNode;
 }
 
-SMOOTHInt SMOOTHXMLDocument::SetRootNode(SMOOTHXMLNode *newRootNode)
+S::Int S::XML::Document::SetRootNode(Node *newRootNode)
 {
 	rootNode = newRootNode;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLDocument::LoadFile(SMOOTHString fileName)
+S::Int S::XML::Document::SetEncoding(String newEncoding)
 {
-	xmlKeepBlanksDefault(SMOOTH::False);
+	encoding = newEncoding;
+
+	return Success;
+}
+
+S::Int S::XML::Document::LoadFile(String fileName)
+{
+	xmlKeepBlanksDefault(False);
 
 	xmlDocPtr	 doc = xmlParseFile(fileName);
 	xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
-	SMOOTHXMLNode	*root = new SMOOTHXMLNode();
-
-	SMOOTHString::SetInputFormat(SIF_UTF8);
+	Node		*root = new Node();
+	String		 inputFormat = String::SetInputFormat("UTF-8");
 
 	root->SetName((char *) xmlRoot->name);
 	root->SetContent((char *) xmlRoot->content);
@@ -56,14 +59,14 @@ SMOOTHInt SMOOTHXMLDocument::LoadFile(SMOOTHString fileName)
 
 	LoadNode(xmlRoot, rootNode);
 
-	SMOOTHString::SetInputFormat(SIF_PREVIOUS);
+	String::SetInputFormat(inputFormat);
 
 	xmlFreeDoc(doc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLDocument::LoadNode(xmlNodePtr node, SMOOTHXMLNode *smoothNode)
+S::Int S::XML::Document::LoadNode(xmlNodePtr node, Node *smoothNode)
 {
 	if (node->properties != NIL)
 	{
@@ -92,45 +95,43 @@ SMOOTHInt SMOOTHXMLDocument::LoadNode(xmlNodePtr node, SMOOTHXMLNode *smoothNode
 		while (xmlNode != NIL);
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLDocument::SaveFile(SMOOTHString fileName)
+S::Int S::XML::Document::SaveFile(String fileName)
 {
 	xmlDocPtr	 doc = xmlNewDoc((xmlChar *) "1.0");
 
 	if (rootNode != NIL)
 	{
-		doc->children = xmlNewDocNode(doc, NIL, (xmlChar *) (char *) rootNode->GetName(), (xmlChar *) (char *) rootNode->GetContent());
+		doc->children = xmlNewDocNode(doc, NIL, (xmlChar *) rootNode->GetName().ConvertTo("UTF-8"), (xmlChar *) rootNode->GetContent().ConvertTo("UTF-8"));
 
 		SaveNode(rootNode, doc->children);
 	}
 
-	xmlSaveFormatFile(fileName, doc, SMOOTH::True);
+	xmlSaveFormatFileEnc(fileName, doc, encoding, True);
 
 	xmlFreeDoc(doc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHXMLDocument::SaveNode(SMOOTHXMLNode *node, xmlNodePtr parent)
+S::Int S::XML::Document::SaveNode(Node *node, xmlNodePtr parent)
 {
-	for (SMOOTHInt i = 0; i < node->GetNOfAttributes(); i++)
+	for (Int i = 0; i < node->GetNOfAttributes(); i++)
 	{
-		SMOOTHXMLAttribute *attribute = node->GetNthAttribute(i);
+		Attribute	*attribute = node->GetNthAttribute(i);
 
-		xmlSetProp(parent, (xmlChar *) (char *) attribute->GetName(), (xmlChar *) (char *) attribute->GetContent());
+		xmlSetProp(parent, (xmlChar *) attribute->GetName().ConvertTo("UTF-8"), (xmlChar *) attribute->GetContent().ConvertTo("UTF-8"));
 	}
 
-	for (SMOOTHInt j = 0; j < node->GetNOfNodes(); j++)
+	for (Int j = 0; j < node->GetNOfNodes(); j++)
 	{
-		SMOOTHXMLNode	*subNode = node->GetNthNode(j);
-		xmlNodePtr	 xmlNode = xmlNewChild(parent, NIL, (xmlChar *) (char *) subNode->GetName(), (xmlChar *) (char *) subNode->GetContent());
+		Node		*subNode = node->GetNthNode(j);
+		xmlNodePtr	 xmlNode = xmlNewChild(parent, NIL, (xmlChar *) subNode->GetName().ConvertTo("UTF-8"), (xmlChar *) subNode->GetContent().ConvertTo("UTF-8"));
 
 		SaveNode(subNode, xmlNode);
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

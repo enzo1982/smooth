@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,22 +8,20 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_TIMER_
-#define __OBJSMOOTH_TIMER_
-
 #include <smooth/object.h>
 #include <smooth/timer.h>
 #include <smooth/toolkit.h>
 #include <smooth/stk.h>
+#include <smooth/system.h>
 #include <smooth/objectproperties.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_TIMER = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_TIMER = S::Object::RequestObjectID();
 
-SMOOTHTimer::SMOOTHTimer()
+S::Timer::Timer()
 {
 	type = OBJ_TIMER;
 
@@ -35,83 +33,83 @@ SMOOTHTimer::SMOOTHTimer()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-SMOOTHTimer::~SMOOTHTimer()
+S::Timer::~Timer()
 {
 	Stop();
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHTimer::Show()
+S::Int S::Timer::Show()
 {
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHInt SMOOTHTimer::Hide()
+S::Int S::Timer::Hide()
 {
-	return SMOOTH::Error;
+	return Error;
 }
 
-SMOOTHInt SMOOTHTimer::Start(SMOOTHInt interval)
+S::Int S::Timer::Start(Int interval)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (timerid != 0)	return SMOOTH::Error;
+	if (!registered)	return Error;
+	if (timerid != 0)	return Error;
 
-	timerwnd	= (SMOOTHWindow *) myContainer->GetContainerObject();
-	timerid		= SMOOTH::RequestGUID();
+	timerwnd	= (Window *) myContainer->GetContainerObject();
+	timerid		= System::RequestGUID();
 
-	if (timerwnd == NIL) return SMOOTH::Error;
+	if (timerwnd == NIL) return Error;
 
 #ifdef __WIN32__
 	SetTimer(timerwnd->hwnd, timerid, interval, NIL);
 
 	return timerid;
 #else
-	return SMOOTH::Error;
+	return Error;
 #endif
 }
 
-SMOOTHInt SMOOTHTimer::Stop()
+S::Int S::Timer::Stop()
 {
-	if (!registered)	return SMOOTH::Error;
-	if (timerid == 0)	return SMOOTH::Error;
+	if (!registered)	return Error;
+	if (timerid == 0)	return Error;
 
 #ifdef __WIN32__
 	KillTimer(timerwnd->hwnd, timerid);
 
 	timerid = 0;
 
-	return SMOOTH::Success;
+	return Success;
 #else
-	return SMOOTH::Error;
+	return Error;
 #endif
 }
 
-SMOOTHInt SMOOTHTimer::GetID()
+S::Int S::Timer::GetID()
 {
-	if (!registered)	return SMOOTH::Error;
-	if (timerid == 0)	return SMOOTH::Error;
+	if (!registered)	return Error;
+	if (timerid == 0)	return Error;
 
 	return timerid;
 }
 
-SMOOTHInt SMOOTHTimer::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Timer::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!active)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!active)		return Success;
 
 	EnterProtectedRegion();
 
-	SMOOTHInt	 retVal = SMOOTH::Success;
+	Int	 retVal = Success;
 
 	switch (message)
 	{
 		case SM_TIMER:
 			if (wParam == timerid)
 			{
-				SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+				ProcCall(objectProperties->proc, objectProperties->procParam);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 			break;
 	}
@@ -120,5 +118,3 @@ SMOOTHInt SMOOTHTimer::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lP
 
 	return retVal;
 }
-
-#endif

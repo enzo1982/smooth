@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,15 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_BUTTON_
-#define __OBJSMOOTH_BUTTON_
-
 #include <smooth/button.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/tooltip.h>
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
@@ -28,13 +25,13 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_BUTTON = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_BUTTON = S::Object::RequestObjectID();
 
-SMOOTHButton::SMOOTHButton(SMOOTHString text, HBITMAP bmp, SMOOTHPoint pos, SMOOTHSize size, SMOOTHProcParam, SMOOTHVoid *procParam)
+S::Button::Button(String text, HBITMAP bmp, Point pos, Size size, ProcParam, Void *procParam)
 {
 	type				= OBJ_BUTTON;
 	objectProperties->text		= text;
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 	bitmap				= DetectTransparentRegions(bmp);
 	tipTimer			= NIL;
@@ -42,13 +39,13 @@ SMOOTHButton::SMOOTHButton(SMOOTHString text, HBITMAP bmp, SMOOTHPoint pos, SMOO
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = roundtoint(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = roundtoint(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = roundtoint(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = roundtoint(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = roundtoint(22 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = roundtoint(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(22 * SMOOTH::Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 
 	if (bitmap == NIL)
 	{
@@ -57,39 +54,39 @@ SMOOTHButton::SMOOTHButton(SMOOTHString text, HBITMAP bmp, SMOOTHPoint pos, SMOO
 	}
 	else
 	{
-		bmpSize.cx = roundtoint(GetBitmapSizeX(bitmap) * SMOOTH::Setup::FontSize);
-		bmpSize.cy = roundtoint(GetBitmapSizeY(bitmap) * SMOOTH::Setup::FontSize);
+		bmpSize.cx = Math::Round(GetBitmapSizeX(bitmap) * SMOOTH::Setup::FontSize);
+		bmpSize.cy = Math::Round(GetBitmapSizeY(bitmap) * SMOOTH::Setup::FontSize);
 	}
 
 	GetTextSize();
 }
 
-SMOOTHButton::~SMOOTHButton()
+S::Button::~Button()
 {
-	SMOOTHWindow	*wnd = NIL;
+	Window	*wnd = NIL;
 
 	if (tipTimer != NIL)
 	{
 		if (tooltip != NIL)
 		{
-			wnd = (SMOOTHWindow *) tooltip->GetContainer()->GetContainerObject();
+			wnd = (Window *) tooltip->GetContainer()->GetContainerObject();
 
 			tooltip->Hide();
 
 			wnd->UnregisterObject(tooltip);
 
-			SMOOTH::DeleteObject(tooltip);
+			DeleteObject(tooltip);
 
 			tooltip = NIL;
 		}
 
-		wnd = (SMOOTHWindow *) tipTimer->GetContainer()->GetContainerObject();
+		wnd = (Window *) tipTimer->GetContainer()->GetContainerObject();
 
 		tipTimer->Stop();
 
 		wnd->UnregisterObject(tipTimer);
 
-		SMOOTH::DeleteObject(tipTimer);
+		DeleteObject(tipTimer);
 
 		tipTimer = NIL;
 	}
@@ -97,19 +94,19 @@ SMOOTHButton::~SMOOTHButton()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHButton::Paint(SMOOTHInt message)
+S::Int S::Button::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHSurface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = myContainer->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	SMOOTHRect	 frame;
-	SMOOTHRect	 textRect;
-	SMOOTHRect	 bmpRect;
-	SMOOTHPoint	 realPos = GetRealPosition();
+	Rect	 frame;
+	Rect	 textRect;
+	Rect	 bmpRect;
+	Point	 realPos = GetRealPosition();
 
 	switch (message)
 	{
@@ -136,14 +133,14 @@ SMOOTHInt SMOOTHButton::Paint(SMOOTHInt message)
 					textRect.left	= frame.left + ((objectProperties->size.cx - objectProperties->textSize.cx - bmpSize.cx - 7) / 2) + bmpSize.cx + 6;
 					textRect.top	= frame.top + ((objectProperties->size.cy - objectProperties->textSize.cy) / 2) - 2;
 					textRect.right	= textRect.left + objectProperties->textSize.cx + 1;
-					textRect.bottom	= textRect.top + roundtoint(objectProperties->textSize.cy * 1.2);
+					textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 				}
 				else
 				{
 					textRect.left	= frame.left + ((objectProperties->size.cx - objectProperties->textSize.cx) / 2) - 1;
 					textRect.top	= frame.top + ((objectProperties->size.cy - objectProperties->textSize.cy) / 2) - 2;
 					textRect.right	= textRect.left + objectProperties->textSize.cx + 1;
-					textRect.bottom	= textRect.top + roundtoint(objectProperties->textSize.cy * 1.2);
+					textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 				}
 
 				if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
@@ -214,25 +211,25 @@ SMOOTHInt SMOOTHButton::Paint(SMOOTHInt message)
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Button::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
-	SMOOTHRect	 frame;
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
+	Rect	 frame;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
 
 	frame.left	= realPos.x + 4;
 	frame.top	= realPos.y + 4;
@@ -244,11 +241,11 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 		case SM_LBUTTONDOWN:
 			if (objectProperties->checked)
 			{
-				objectProperties->clicked = SMOOTH::True;
+				objectProperties->clicked = True;
 
 				Paint(SP_MOUSEDOWN);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 
 				if (tipTimer != NIL)
 				{
@@ -258,7 +255,7 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 						wnd->UnregisterObject(tooltip);
 
-						SMOOTH::DeleteObject(tooltip);
+						DeleteObject(tooltip);
 
 						tooltip = NIL;
 					}
@@ -267,7 +264,7 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 					wnd->UnregisterObject(tipTimer);
 
-					SMOOTH::DeleteObject(tipTimer);
+					DeleteObject(tipTimer);
 
 					tipTimer = NIL;
 				}
@@ -277,24 +274,23 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 		case SM_LBUTTONUP:
 			if (objectProperties->clicked)
 			{
-				objectProperties->clicked = SMOOTH::False;
-				objectProperties->checked = SMOOTH::False;
+				objectProperties->clicked = False;
+				objectProperties->checked = False;
 
 				Paint(SP_MOUSEUP);
-
 				Process(SM_MOUSEMOVE, 0, 0);
 
-				SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+				ProcCall(objectProperties->proc, objectProperties->procParam);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			break;
 		case SM_MOUSELEAVE:
 			if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				objectProperties->checked = SMOOTH::False;
-				objectProperties->clicked = SMOOTH::False;
+				objectProperties->checked = False;
+				objectProperties->clicked = False;
 
 				Paint(SP_MOUSEOUT);
 
@@ -306,7 +302,7 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 						wnd->UnregisterObject(tooltip);
 
-						SMOOTH::DeleteObject(tooltip);
+						DeleteObject(tooltip);
 
 						tooltip = NIL;
 					}
@@ -315,7 +311,7 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 					wnd->UnregisterObject(tipTimer);
 
-					SMOOTH::DeleteObject(tipTimer);
+					DeleteObject(tipTimer);
 
 					tipTimer = NIL;
 				}
@@ -325,24 +321,24 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 		case SM_MOUSEMOVE:
 			if (!objectProperties->checked && IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				objectProperties->checked = SMOOTH::True;
+				objectProperties->checked = True;
 
 				Paint(SP_MOUSEIN);
 
 				if (objectProperties->tooltip != NIL)
 				{
-					tipTimer = new SMOOTHTimer();
+					tipTimer = new Timer();
 
 					wnd->RegisterObject(tipTimer);
 
-					tipTimer->SetProc(SMOOTHProc(SMOOTHButton, this, ActivateTooltip));
+					tipTimer->SetProc(Proc(Button, this, ActivateTooltip));
 					tipTimer->Start(500);
 				}
 			}
 			else if (objectProperties->checked && !IsMouseOn(wnd->hwnd, frame, WINDOW))
 			{
-				objectProperties->checked = SMOOTH::False;
-				objectProperties->clicked = SMOOTH::False;
+				objectProperties->checked = False;
+				objectProperties->clicked = False;
 
 				Paint(SP_MOUSEOUT);
 
@@ -354,7 +350,7 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 						wnd->UnregisterObject(tooltip);
 
-						SMOOTH::DeleteObject(tooltip);
+						DeleteObject(tooltip);
 
 						tooltip = NIL;
 					}
@@ -363,7 +359,7 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 
 					wnd->UnregisterObject(tipTimer);
 
-					SMOOTH::DeleteObject(tipTimer);
+					DeleteObject(tipTimer);
 
 					tipTimer = NIL;
 				}
@@ -385,21 +381,21 @@ SMOOTHInt SMOOTHButton::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt l
 	return retVal;
 }
 
-SMOOTHVoid SMOOTHButton::ActivateTooltip()
+S::Void S::Button::ActivateTooltip()
 {
 	if (tooltip != NIL) return;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
-	SMOOTHPoint	 pos;
-	SMOOTHSize	 size;
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Point	 pos;
+	Size	 size;
 
 	pos.x = MouseX(wnd->hwnd, WINDOW);
 	pos.y = MouseY(wnd->hwnd, WINDOW);
 	size.cx = 0;
 	size.cy = 0;
 
-	tooltip = new SMOOTHTooltip();
+	tooltip = new Tooltip();
 
 	tooltip->SetText(objectProperties->tooltip);
 	tooltip->SetMetrics(pos, size);
@@ -407,5 +403,3 @@ SMOOTHVoid SMOOTHButton::ActivateTooltip()
 
 	wnd->RegisterObject(tooltip);
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_THREAD_
-#define __OBJSMOOTH_THREAD_
 
 #include <smooth/object.h>
 #include <smooth/thread.h>
@@ -23,13 +20,13 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_THREAD = SMOOTH::RequestObjectID();
-SMOOTHInt	 SMOOTHThread::counter = 0;
+S::Int	 S::OBJ_THREAD = S::Object::RequestObjectID();
+S::Int	 S::Thread::counter = 0;
 
-SMOOTHThread::SMOOTHThread(SMOOTHThreadProcParam, SMOOTHVoid *procParam)
+S::Thread::Thread(ThreadProcParam, Void *procParam)
 {
 	type				= OBJ_THREAD;
-	threadProc			= (SMOOTHThreadProcType) newProc;
+	threadProc			= (ThreadProcType) newProc;
 	altproc				= NIL;
 	objectProperties->procParam	= procParam;
 	status				= THREAD_CREATED;
@@ -42,7 +39,7 @@ SMOOTHThread::SMOOTHThread(SMOOTHThreadProcParam, SMOOTHVoid *procParam)
 	mainThreadManager->RegisterThread(this);
 }
 
-SMOOTHThread::SMOOTHThread(SMOOTHVoid (*proc)(SMOOTHThread *))
+S::Thread::Thread(Void (*proc)(Thread *))
 {
 	type				= OBJ_THREAD;
 	threadProc			= NIL;
@@ -58,7 +55,7 @@ SMOOTHThread::SMOOTHThread(SMOOTHVoid (*proc)(SMOOTHThread *))
 	mainThreadManager->RegisterThread(this);
 }
 
-SMOOTHThread::~SMOOTHThread()
+S::Thread::~Thread()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 
@@ -86,40 +83,40 @@ SMOOTHThread::~SMOOTHThread()
 	mainThreadManager->UnregisterThread(this);
 }
 
-SMOOTHInt SMOOTHThread::GetStatus()
+S::Int S::Thread::GetStatus()
 {
 	return status;
 }
 
-SMOOTHInt SMOOTHThread::Start()
+S::Int S::Thread::Start()
 {
-	if (!registered) return SMOOTH::Error;
+	if (!registered) return Error;
 
 	if ((status == THREAD_CREATED && !initializing) || status == THREAD_STARTME || waitflag == THREAD_WAITFLAG_START)
 	{
-		if (threadProc != NIL)		thread = LiSAThreadCreate((void (*)(void *)) SMOOTHThreadProcCaller, this);
+		if (threadProc != NIL)		thread = LiSAThreadCreate((void (*)(void *)) ThreadProcCaller, this);
 		else if (altproc != NIL)	thread = LiSAThreadCreate((void (*)(void *)) altproc, this);
 
 		status = THREAD_RUNNING;
 		counter++;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 	else if (status == THREAD_CREATED && initializing)
 	{
 		status = THREAD_STARTME;
 
-		return SMOOTH::Success;
+		return Success;
 	}
 	else
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 }
 
-SMOOTHInt SMOOTHThread::Stop()
+S::Int S::Thread::Stop()
 {
-	if (!registered) return SMOOTH::Error;
+	if (!registered) return Error;
 
 	if (status == THREAD_RUNNING || status == THREAD_PAUSED)
 	{
@@ -130,7 +127,7 @@ SMOOTHInt SMOOTHThread::Stop()
 
 			LiSAThreadExit();
 
-			return SMOOTH::Success;
+			return Success;
 		}
 
 		status = THREAD_STOPPED;
@@ -139,37 +136,35 @@ SMOOTHInt SMOOTHThread::Stop()
 		LiSAThreadCancel(thread);
 		LiSAThreadCloseHandle(thread);
 
-		return SMOOTH::Success;
+		return Success;
 	}
 	else
 	{
-		return SMOOTH::Error;
+		return Error;
 	}
 }
 
-SMOOTHVoid SMOOTHThread::SetWaitFlag(SMOOTHInt wf)
+S::Void S::Thread::SetWaitFlag(Int wf)
 {
 	waitflag = wf;
 }
 
-SMOOTHInt SMOOTHThread::GetWaitFlag()
+S::Int S::Thread::GetWaitFlag()
 {
 	return waitflag;
 }
 
-SMOOTHVoid SMOOTHThread::SetKillFlag(SMOOTHInt kf)
+S::Void S::Thread::SetKillFlag(Int kf)
 {
 	killflag = kf;
 }
 
-SMOOTHInt SMOOTHThread::GetKillFlag()
+S::Int S::Thread::GetKillFlag()
 {
 	return killflag;
 }
 
-SMOOTHVoid SMOOTHThreadProcCaller(SMOOTHThread *thread)
+S::Void S::ThreadProcCaller(Thread *thread)
 {
-	SMOOTHThreadProcCall(thread->threadProc, thread->GetObjectProperties()->procParam, thread);
+	ThreadProcCall(thread->threadProc, thread->GetObjectProperties()->procParam, thread);
 }
-
-#endif

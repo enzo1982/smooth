@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_MUTEX_
-#define __OBJSMOOTH_MUTEX_
 
 #include <smooth/object.h>
 #include <smooth/mutex.h>
@@ -20,9 +17,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_MUTEX = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_MUTEX = S::Object::RequestObjectID();
 
-SMOOTHMutex::SMOOTHMutex()
+S::Mutex::Mutex()
 {
 	type = OBJ_MUTEX;
 
@@ -31,29 +28,27 @@ SMOOTHMutex::SMOOTHMutex()
 	possibleContainers.AddEntry(OBJ_APPLICATION);
 }
 
-SMOOTHMutex::~SMOOTHMutex()
+S::Mutex::~Mutex()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 
 	LiSAMutexCloseHandle(mutex);
 }
 
-SMOOTHInt SMOOTHMutex::Lock()
+S::Int S::Mutex::Lock()
 {
-	if (!registered) return SMOOTH::Error;
+	if (!registered) return Error;
 
 	LiSAMutexLock(mutex);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHMutex::Release()
+S::Int S::Mutex::Release()
 {
-	if (!registered) return SMOOTH::Error;
+	if (!registered) return Error;
 
 	LiSAMutexRelease(mutex);
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

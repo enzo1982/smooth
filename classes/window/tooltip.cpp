@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_TOOLTIP_
-#define __OBJSMOOTH_TOOLTIP_
 
 #include <smooth/window.h>
 #include <smooth/tooltip.h>
@@ -27,9 +24,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_TOOLTIP = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_TOOLTIP = S::Object::RequestObjectID();
 
-SMOOTHTooltip::SMOOTHTooltip()
+S::Tooltip::Tooltip()
 {
 	type				= OBJ_TOOLTIP;
 	objectProperties->orientation	= OR_FREE;
@@ -41,7 +38,7 @@ SMOOTHTooltip::SMOOTHTooltip()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-SMOOTHTooltip::~SMOOTHTooltip()
+S::Tooltip::~Tooltip()
 {
 	if (timer != NIL)
 	{
@@ -49,7 +46,7 @@ SMOOTHTooltip::~SMOOTHTooltip()
 
 		if (timer->IsRegistered() && timer->GetContainer() != NIL) timer->GetContainer()->UnregisterObject(timer);
 
-		SMOOTH::DeleteObject(timer);
+		DeleteObject(timer);
 	}
 
 	if (toolWindow != NIL)
@@ -58,28 +55,28 @@ SMOOTHTooltip::~SMOOTHTooltip()
 
 		if (toolWindow->IsRegistered() && toolWindow->GetContainer() != NIL) toolWindow->GetContainer()->UnregisterObject(toolWindow);
 
-		SMOOTH::DeleteObject(toolWindow);
+		DeleteObject(toolWindow);
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHTooltip::Show()
+S::Int S::Tooltip::Show()
 {
-	if (visible) return SMOOTH::Success;
+	if (visible) return Success;
 
-	visible = SMOOTH::True;
+	visible = True;
 
-	if (!registered) return SMOOTH::Success;
+	if (!registered) return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHFloat	 measurement = SMOOTH::Setup::FontSize;
-	SMOOTHRect	 wndRect;
-	HDC		 dc = GetContext(NIL);
+	Float	 measurement = SMOOTH::Setup::FontSize;
+	Rect	 wndRect;
+	HDC	 dc = GetContext(NIL);
 
 	wndRect.left	= 0;
 	wndRect.top	= 0;
@@ -91,11 +88,11 @@ SMOOTHInt SMOOTHTooltip::Show()
 
 	FreeContext(NIL, dc);
 
-	SMOOTHSetMeasurement(SMT_PIXELS);
+	SetMeasurement(SMT_PIXELS);
 
-	toolWindow = new SMOOTHToolWindow();
+	toolWindow = new ToolWindow();
 
-	toolWindow->SetMetrics(SMOOTHPoint(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y - wndRect.bottom), SMOOTHSize(wndRect.right, wndRect.bottom));
+	toolWindow->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y - wndRect.bottom), Size(wndRect.right, wndRect.bottom));
 	toolWindow->SetOwner(this);
 
 	wnd->RegisterObject(toolWindow);
@@ -116,29 +113,29 @@ SMOOTHInt SMOOTHTooltip::Show()
 
 	if (timeOut != 0)
 	{
-		timer = new SMOOTHTimer();
+		timer = new Timer();
 
 		wnd->RegisterObject(timer);
 
-		timer->SetProc(SMOOTHProc(SMOOTHTooltip, this, TimerProc));
+		timer->SetProc(Proc(Tooltip, this, TimerProc));
 		timer->Start(timeOut);
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHTooltip::Hide()
+S::Int S::Tooltip::Hide()
 {
-	if (!visible) return SMOOTH::Success;
+	if (!visible) return Success;
 
-	visible = SMOOTH::False;
+	visible = False;
 
-	if (!registered) return SMOOTH::Success;
+	if (!registered) return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
 	if (toolWindow != NIL)
 	{
@@ -146,24 +143,24 @@ SMOOTHInt SMOOTHTooltip::Hide()
 
 		wnd->UnregisterObject(toolWindow);
 
-		SMOOTH::DeleteObject(toolWindow);
+		DeleteObject(toolWindow);
 
 		toolWindow = NIL;
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHTooltip::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::Tooltip::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
-	SMOOTHInt	 retVal = SMOOTH::Success;
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Int	 retVal = Success;
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
 	switch (message)
 	{
@@ -172,14 +169,14 @@ SMOOTHInt SMOOTHTooltip::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt 
 	return retVal;
 }
 
-SMOOTHInt SMOOTHTooltip::SetTimeout(SMOOTHInt mSeconds)
+S::Int S::Tooltip::SetTimeout(Int mSeconds)
 {
 	timeOut = mSeconds;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHVoid SMOOTHTooltip::TimerProc()
+S::Void S::Tooltip::TimerProc()
 {
 	Hide();
 
@@ -187,9 +184,7 @@ SMOOTHVoid SMOOTHTooltip::TimerProc()
 
 	if (timer->IsRegistered() && timer->GetContainer() != NIL) timer->GetContainer()->UnregisterObject(timer);
 
-	SMOOTH::DeleteObject(timer);
+	DeleteObject(timer);
 
 	timer = NIL;
 }
-
-#endif

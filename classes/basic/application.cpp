@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,22 +8,17 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_APPLICATION_
-#define __OBJSMOOTH_APPLICATION_
-
 #include <smooth/application.h>
-#include <smooth/window.h>
 #include <smooth/i18n.h>
 #include <smooth/objectproperties.h>
-#include <smooth/stk.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_APPLICATION = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_APPLICATION = S::Object::RequestObjectID();
 
-SMOOTHApplication::SMOOTHApplication()
+S::Application::Application()
 {
 	self		= this;
 
@@ -35,7 +30,7 @@ SMOOTHApplication::SMOOTHApplication()
 	objectProperties->size.cy	= LiSAGetDisplaySizeY();
 }
 
-SMOOTHApplication::SMOOTHApplication(SMOOTHString name)
+S::Application::Application(String name)
 {
 	self		= this;
 
@@ -46,5 +41,3 @@ SMOOTHApplication::SMOOTHApplication(SMOOTHString name)
 	objectProperties->size.cx	= LiSAGetDisplaySizeX();
 	objectProperties->size.cy	= LiSAGetDisplaySizeY();
 }
-
-#endif

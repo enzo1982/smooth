@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_DRAGCONTROL_
-#define __OBJSMOOTH_DRAGCONTROL_
 
 #include <smooth/window.h>
 #include <smooth/drag.h>
@@ -22,9 +19,9 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_DRAGCONTROL = SMOOTH::RequestObjectID();
+S::Int	 S::OBJ_DRAGCONTROL = S::Object::RequestObjectID();
 
-SMOOTHDragControl::SMOOTHDragControl()
+S::DragControl::DragControl()
 {
 	type				= OBJ_DRAGCONTROL;
 	objectProperties->orientation	= OR_CENTER;
@@ -32,31 +29,31 @@ SMOOTHDragControl::SMOOTHDragControl()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-SMOOTHDragControl::~SMOOTHDragControl()
+S::DragControl::~DragControl()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHDragControl::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::DragControl::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 mPos;
-	SMOOTHPoint	 m;
-	SMOOTHSize	 cpwp;
-	SMOOTHRect	 wRect;
-	SMOOTHRect	 rect;
-	SMOOTHRect	 updateRect;
-	SMOOTHRect	 wndRect;
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHInt	 leftButton;
-	HDC		 dc = NIL;
+	Point	 mPos;
+	Point	 m;
+	Size	 cpwp;
+	Rect	 wRect;
+	Rect	 rect;
+	Rect	 updateRect;
+	Rect	 wndRect;
+	Int	 retVal = Success;
+	Int	 leftButton;
+	HDC	 dc = NIL;
 
 #ifdef __WIN32__
 	MSG		 msg;
@@ -172,12 +169,10 @@ SMOOTHInt SMOOTHDragControl::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTH
 #endif
 			}
 
-			retVal = SMOOTH::Break;
+			retVal = Break;
 
 			break;
 	}
 
 	return retVal;
 }
-
-#endif

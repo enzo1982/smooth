@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,14 +8,11 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_MENUENTRY_
-#define __OBJSMOOTH_MENUENTRY_
-
 #include <smooth/menu.h>
 #include <smooth/definitions.h>
 #include <smooth/stk.h>
 
-SMOOTHMenu::Entry::Entry(SMOOTHInt newType, SMOOTHInt newID)
+S::Menu::Entry::Entry(Int newType, Int newID)
 {
 	type		= newType;
 	id		= newID;
@@ -25,8 +22,8 @@ SMOOTHMenu::Entry::Entry(SMOOTHInt newType, SMOOTHInt newID)
 
 	orientation	= OR_LEFT;
 
-	checked		= SMOOTH::False;
-	clicked		= SMOOTH::False;
+	checked		= False;
+	clicked		= False;
 
 	proc		= NIL;
 	procParam	= NIL;
@@ -37,34 +34,34 @@ SMOOTHMenu::Entry::Entry(SMOOTHInt newType, SMOOTHInt newID)
 	popup		= NIL;
 }
 
-SMOOTHMenu::Entry::~Entry()
+S::Menu::Entry::~Entry()
 {
 }
 
-SMOOTHInt SMOOTHMenu::Entry::SetText(SMOOTHString newText)
+S::Int S::Menu::Entry::SetText(String newText)
 {
 	if (newText == NIL) type = (type | SM_TEXT) ^ SM_TEXT;
 
 	text = newText;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHMenu::Entry::SetTooltip(SMOOTHString newTooltip)
+S::Int S::Menu::Entry::SetTooltip(String newTooltip)
 {
 	tooltip = newTooltip;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHMenu::Entry::SetStatusText(SMOOTHString newDescription)
+S::Int S::Menu::Entry::SetStatusText(String newDescription)
 {
 	description = newDescription;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHMenu::Entry::SetBitmap(HBITMAP newBitmap)
+S::Int S::Menu::Entry::SetBitmap(HBITMAP newBitmap)
 {
 	if (newBitmap == NIL)
 	{
@@ -79,25 +76,23 @@ SMOOTHInt SMOOTHMenu::Entry::SetBitmap(HBITMAP newBitmap)
 		graymap = DetectTransparentRegions(GrayscaleBitmap(newBitmap));
 	}
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHMenu::Entry::SetProc(SMOOTHProcParam, SMOOTHVoid *newProcParam)
+S::Int S::Menu::Entry::SetProc(ProcParam, Void *newProcParam)
 {
-	proc = (SMOOTHProcType) newProc;
+	proc = (ProcType) newProc;
 	procParam = newProcParam;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHMenu::Entry::SetOrientation(SMOOTHInt newOrientation)
+S::Int S::Menu::Entry::SetOrientation(Int newOrientation)
 {
 	if (newOrientation == OR_TOP)		newOrientation = OR_LEFT;
 	else if (newOrientation == OR_BOTTOM)	newOrientation = OR_RIGHT;
 
 	orientation = newOrientation;
 
-	return SMOOTH::Success;
+	return Success;
 }
-
-#endif

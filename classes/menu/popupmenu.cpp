@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_POPUPMENU_
-#define __OBJSMOOTH_POPUPMENU_
 
 #include <smooth/popupmenu.h>
 #include <smooth/toolkit.h>
@@ -25,10 +22,10 @@
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_POPUP = SMOOTH::RequestObjectID();
-SMOOTHInt	 SMOOTHPopupMenu::status = POPUP_NORMAL;
+S::Int	 S::OBJ_POPUP = S::Object::RequestObjectID();
+S::Int	 S::PopupMenu::status = POPUP_NORMAL;
 
-SMOOTHPopupMenu::SMOOTHPopupMenu()
+S::PopupMenu::PopupMenu()
 {
 	type				= OBJ_POPUP;
 	objectProperties->orientation	= OR_FREE;
@@ -42,26 +39,26 @@ SMOOTHPopupMenu::SMOOTHPopupMenu()
 	status = POPUP_NORMAL;
 }
 
-SMOOTHPopupMenu::~SMOOTHPopupMenu()
+S::PopupMenu::~PopupMenu()
 {
 	if (visible) Hide();
 
-	if (nextPopup != NIL) SMOOTH::DeleteObject(nextPopup);
+	if (nextPopup != NIL) DeleteObject(nextPopup);
 
 	if (prevPopup != NIL) prevPopup->nextPopup = NIL;
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHPopupMenu::Show()
+S::Int S::PopupMenu::Show()
 {
-	if (!registered)	return SMOOTH::Error;
-	if (visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (visible)		return Success;
 
-	SMOOTHWindow		*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window		*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Error;
-	if (wnd->hwnd == NIL) return SMOOTH::Error;
+	if (wnd == NIL) return Error;
+	if (wnd->hwnd == NIL) return Error;
 
 	EnterProtectedRegion();
 
@@ -70,18 +67,18 @@ SMOOTHInt SMOOTHPopupMenu::Show()
 	if (objectProperties->pos.x + popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) objectProperties->pos.x = LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x - popupsize.cx - 1;
 	if (objectProperties->pos.y + popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) objectProperties->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - popupsize.cy - 1;
 
-	visible = SMOOTH::True;
+	visible = True;
 
-	toolwnd		= new SMOOTHToolWindow();
-	popupView	= new SMOOTHPopupView(this);
+	toolwnd		= new ToolWindow();
+	popupView	= new PopupView(this);
 
 	toolwnd->SetOwner(this);
 
-	SMOOTHFloat	 oldMeasurement = SMOOTH::Setup::FontSize;
+	Float	 oldMeasurement = SMOOTH::Setup::FontSize;
 
-	SMOOTHSetMeasurement(SMT_PIXELS);
+	SetMeasurement(SMT_PIXELS);
 
-	toolwnd->SetMetrics(SMOOTHPoint(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y), SMOOTHSize(popupsize.cx + 1, popupsize.cy + 1));
+	toolwnd->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y), Size(popupsize.cx + 1, popupsize.cy + 1));
 
 	SMOOTH::Setup::FontSize = oldMeasurement;
 
@@ -91,17 +88,17 @@ SMOOTHInt SMOOTHPopupMenu::Show()
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHPopupMenu::Hide()
+S::Int S::PopupMenu::Hide()
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Error;
+	if (wnd == NIL) return Error;
 
 	EnterProtectedRegion();
 
@@ -115,33 +112,33 @@ SMOOTHInt SMOOTHPopupMenu::Hide()
 
 		toolwnd->UnregisterObject(popupView);
 
-		SMOOTH::DeleteObject(popupView);
-		SMOOTH::DeleteObject(toolwnd);
+		DeleteObject(popupView);
+		DeleteObject(toolwnd);
 
 		popupView = NIL;
 		toolwnd = NIL;
 	}
 
-	visible = SMOOTH::False;
+	visible = False;
 
 	LeaveProtectedRegion();
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHPopupMenu::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Int S::PopupMenu::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
-	SMOOTHInt	 retVal = SMOOTH::Success;
+	Int	 retVal = Success;
 
 	switch (message)
 	{
@@ -158,12 +155,12 @@ SMOOTHInt SMOOTHPopupMenu::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHIn
 	return retVal;
 }
 
-SMOOTHVoid SMOOTHPopupMenu::MenuToPopup(SMOOTHMenu *menu)
+S::Void S::PopupMenu::MenuToPopup(Menu *menu)
 {
-	for (SMOOTHInt i = 0; i < menu->entries.GetNOfEntries(); i++)
+	for (Int i = 0; i < menu->entries.GetNOfEntries(); i++)
 	{
-		SMOOTHMenu::Entry	*entry		= menu->entries.GetNthEntry(i);
-		SMOOTHMenu::Entry	*newEntry	= AddEntry(entry->text, entry->bitmap, NULLPROC, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->orientation);
+		Menu::Entry	*entry		= menu->entries.GetNthEntry(i);
+		Menu::Entry	*newEntry	= AddEntry(entry->text, entry->bitmap, NULLPROC, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->orientation);
 
 		newEntry->tooltip = entry->tooltip;
 		newEntry->description = entry->description;
@@ -172,5 +169,3 @@ SMOOTHVoid SMOOTHPopupMenu::MenuToPopup(SMOOTHMenu *menu)
 		newEntry->procParam = entry->procParam;
 	}
 }
-
-#endif

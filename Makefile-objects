@@ -73,11 +73,6 @@ $(OBJECTDIR)/arrows.o: $(LAYERCLASSESDIR)/arrows.cpp $(SMOOTHINCLUDEDIR)/arrows.
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/arrows.cpp -o $(OBJECTDIR)/arrows.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/bitmap.o: $(LAYERCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/bitmap.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/bitmap.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/bitmap.cpp -o $(OBJECTDIR)/bitmap.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/button.o: $(LAYERCLASSESDIR)/button.cpp $(SMOOTHINCLUDEDIR)/button.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/button.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/button.cpp -o $(OBJECTDIR)/button.o
@@ -106,6 +101,11 @@ $(OBJECTDIR)/groupbox.o: $(LAYERCLASSESDIR)/groupbox.cpp $(SMOOTHINCLUDEDIR)/gro
 $(OBJECTDIR)/hyperlink.o: $(LAYERCLASSESDIR)/hyperlink.cpp $(SMOOTHINCLUDEDIR)/hyperlink.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/hyperlink.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/hyperlink.cpp -o $(OBJECTDIR)/hyperlink.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/image.o: $(LAYERCLASSESDIR)/image.cpp $(SMOOTHINCLUDEDIR)/image.h
+	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/image.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/image.cpp -o $(OBJECTDIR)/image.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/layer.o: $(LAYERCLASSESDIR)/layer.cpp $(SMOOTHINCLUDEDIR)/layer.h

@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/bitmap.h>
+#include <smooth/image.h>
 #include <smooth/toolkit.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
@@ -19,9 +19,9 @@
 #include <smooth/layer.h>
 #include <smooth/surface.h>
 
-const S::Int	 S::GUI::Bitmap::classID = S::Object::RequestClassID();
+const S::Int	 S::GUI::Image::classID = S::Object::RequestClassID();
 
-S::GUI::Bitmap::Bitmap(HBITMAP bmp, Point pos, Size size)
+S::GUI::Image::Image(HBITMAP bmp, Point pos, Size size)
 {
 	type	= classID;
 	bitmap	= bmp;
@@ -43,12 +43,12 @@ S::GUI::Bitmap::Bitmap(HBITMAP bmp, Point pos, Size size)
 	}
 }
 
-S::GUI::Bitmap::~Bitmap()
+S::GUI::Image::~Image()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::GUI::Bitmap::Paint(Int message)
+S::Int S::GUI::Image::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -67,7 +67,7 @@ S::Int S::GUI::Bitmap::Paint(Int message)
 	return Success;
 }
 
-S::Int S::GUI::Bitmap::SetBitmap(HBITMAP newBmp)
+S::Int S::GUI::Image::SetBitmap(HBITMAP newBmp)
 {
 	Bool	 prevVisible = visible;
 
@@ -86,7 +86,7 @@ S::Int S::GUI::Bitmap::SetBitmap(HBITMAP newBmp)
 	return Success;
 }
 
-HBITMAP S::GUI::Bitmap::GetBitmap()
+HBITMAP S::GUI::Image::GetBitmap()
 {
 	return bitmap;
 }

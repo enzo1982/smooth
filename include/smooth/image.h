@@ -8,14 +8,14 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_BITMAP_
-#define _H_OBJSMOOTH_BITMAP_
+#ifndef _H_OBJSMOOTH_IMAGE_
+#define _H_OBJSMOOTH_IMAGE_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class Bitmap;
+		class Image;
 	};
 };
 
@@ -25,15 +25,15 @@ namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI Bitmap : public Widget
+		class SMOOTHAPI Image : public Widget
 		{
 			protected:
 				HBITMAP			 bitmap;
 			public:
 				static const Int	 classID;
 
-							 Bitmap(HBITMAP, Point, Size);
-							~Bitmap();
+							 Image(HBITMAP, Point, Size);
+							~Image();
 
 				virtual Int		 Paint(Int);
 

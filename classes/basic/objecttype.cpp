@@ -13,6 +13,7 @@
 
 S::ObjectType::ObjectType(Object *iObject)
 {
+	object	= iObject;
 	type	= Object::classID;
 }
 

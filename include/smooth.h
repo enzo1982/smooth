@@ -42,7 +42,7 @@
 #include "smooth/text.h"
 #include "smooth/activearea.h"
 #include "smooth/hyperlink.h"
-#include "smooth/bitmap.h"
+#include "smooth/image.h"
 #include "smooth/arrows.h"
 #include "smooth/tabwidget.h"
 #include "smooth/slider.h"

@@ -299,7 +299,6 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
 			arrow1Frame = frame;
 			arrow2Frame = frame;
 
@@ -309,7 +308,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			if (subtype == OR_VERT)	arrow2Frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
 			else			arrow2Frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
 
-			if (message == SM_MOUSEMOVE && !arrow1Checked && wnd->IsMouseOn(arrow1Frame))
+			if (!arrow1Checked && wnd->IsMouseOn(arrow1Frame))
 			{
 				arrow1Checked = True;
 
@@ -328,7 +327,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				arrow1Frame.right--;
 				arrow1Frame.bottom--;
 			}
-			else if (message == SM_MOUSEMOVE && !arrow2Checked && wnd->IsMouseOn(arrow2Frame))
+			else if (!arrow2Checked && wnd->IsMouseOn(arrow2Frame))
 			{
 				arrow2Checked = True;
 

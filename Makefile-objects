@@ -213,6 +213,11 @@ $(OBJECTDIR)/datetime.o: $(MISCCLASSESDIR)/datetime.cpp $(SMOOTHINCLUDEDIR)/date
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/datetime.cpp -o $(OBJECTDIR)/datetime.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/font.o: $(MISCCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/font.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/font.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/math.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/math.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/math.cpp -o $(OBJECTDIR)/math.o
@@ -366,6 +371,11 @@ $(OBJECTDIR)/dirdlg.o: $(DIALOGSDIR)/dirdlg.cpp $(SMOOTHINCLUDEDIR)/dirdlg.h
 $(OBJECTDIR)/filedlg.o: $(DIALOGSDIR)/filedlg.cpp $(SMOOTHINCLUDEDIR)/filedlg.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/filedlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/filedlg.cpp -o $(OBJECTDIR)/filedlg.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fontdlg.o: $(DIALOGSDIR)/fontdlg.cpp $(SMOOTHINCLUDEDIR)/fontdlg.h
+	$(ECHO) -n Compiling $(DIALOGSDIR)/fontdlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/fontdlg.cpp -o $(OBJECTDIR)/fontdlg.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/english.o: $(I18NDIR)/english.cpp $(SMOOTHINCLUDEDIR)/i18n/english.h

@@ -22,11 +22,11 @@ S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 	size.cx	= GetDeviceCaps(gdi_dc, HORZRES) + 2;
 	size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 
-	HBITMAP	 bitmap = CreateBitmap(size.cx, size.cy, GetDeviceCaps(gdi_dc, PLANES), GetDeviceCaps(gdi_dc, BITSPIXEL), NIL);
+	bmp_dc = CreateCompatibleDC(gdi_dc);
+
+	HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
 
 	BlitToBitmap(Rect(Point(0, 0), size), bitmap, Rect(Point(0, 0), size));
-
-	bmp_dc = CreateCompatibleDC(gdi_dc);
 
 	cDc_bitmap = (HBITMAP) SelectObject(bmp_dc, bitmap);
 }
@@ -213,7 +213,7 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 	return Success;
 }
 
-S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int size, Int color, Int weight, Int flags)
+S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font)
 {
 	if (string == NIL) return Error;
 
@@ -223,26 +223,25 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int si
 	int	 lines = 1;
 	int	 offset = 0;
 	int	 origoffset;
-	int	 height = GetLineSizeY(string, font, size, weight) + 3;
+	int	 height = GetLineSizeY(string, font.GetName(), font.GetSize(), font.GetWeight()) + 3;
 	int	 txtsize = string.Length();
-	int	 i;
 	String	 line;
 
-	for (i = 0; i < txtsize; i++) if (string[i] == 10) lines++;
+	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
 
-	if (Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, flags & TF_ITALIC, flags & TF_UNDERLINE, flags & TF_STRIKEOUT, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
-	else				hfont = CreateFontA(size, 0, 0, 0, weight, flags & TF_ITALIC, flags & TF_UNDERLINE, flags & TF_STRIKEOUT, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	if (Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(font.GetSize(), GetDeviceCaps(gdi_dc, LOGPIXELSY), 72), 0, 0, 0, font.GetWeight(), font.GetItalic(), font.GetUnderline(), font.GetStrikeOut(), ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	else				hfont = CreateFontA(-MulDiv(font.GetSize(), GetDeviceCaps(gdi_dc, LOGPIXELSY), 72), 0, 0, 0, font.GetWeight(), font.GetItalic(), font.GetUnderline(), font.GetStrikeOut(), ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 
 	SetBkMode(gdi_dc, TRANSPARENT);
 	SetBkMode(bmp_dc, TRANSPARENT);
 
-	SetTextColor(gdi_dc, color);
-	SetTextColor(bmp_dc, color);
+	SetTextColor(gdi_dc, font.GetColor());
+	SetTextColor(bmp_dc, font.GetColor());
 
 	holdfont = (HFONT) SelectObject(gdi_dc, hfont);
 	holdfont2 = (HFONT) SelectObject(bmp_dc, hfont);
 
-	for (i = 0; i < lines; i++)
+	for (Int i = 0; i < lines; i++)
 	{
 		origoffset = offset;
 

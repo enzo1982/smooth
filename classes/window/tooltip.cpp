@@ -32,9 +32,10 @@ S::GUI::Tooltip::Tooltip()
 	type				= OBJ_TOOLTIP;
 	objectProperties->orientation	= OR_FREE;
 	toolWindow			= NIL;
-	objectProperties->fontColor	= Setup::TooltipTextColor;
 	timeOut				= 5000;
 	timer				= NIL;
+
+	objectProperties->font.SetColor(Setup::TooltipTextColor);
 
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
@@ -80,11 +81,7 @@ S::Int S::GUI::Tooltip::Show()
 	wndRect.top	= 0;
 	wndRect.bottom	= 16;
 
-	HDC	 dc = GetContext(wnd);
-
-	wndRect.right	= GetTextSizeX(objectProperties->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL) + 6;
-
-	FreeContext(wnd, dc);
+	wndRect.right	= GetTextSizeX(objectProperties->text, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL) + 6;
 
 	SetMeasurement(SMT_PIXELS);
 
@@ -152,11 +149,7 @@ S::Int S::GUI::Tooltip::DrawTooltip()
 	wndRect.top	= 0;
 	wndRect.bottom	= 16;
 
-	HDC	 dc = GetContext(wnd);
-
-	wndRect.right	= GetTextSizeX(objectProperties->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL) + 6;
-
-	FreeContext(wnd, dc);
+	wndRect.right	= GetTextSizeX(objectProperties->text, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL) + 6;
 
 	Surface	*surface = toolWindow->GetDrawSurface();
 
@@ -166,7 +159,7 @@ S::Int S::GUI::Tooltip::DrawTooltip()
 	wndRect.left	+= 2;
 	wndRect.top	+= 1;
 
-	surface->SetText(objectProperties->text, wndRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+	surface->SetText(objectProperties->text, wndRect, objectProperties->font);
 
 	return Success;
 }

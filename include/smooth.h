@@ -92,5 +92,7 @@
 #include "smooth/setup.h"
 #include "smooth/input.h"
 #include "smooth/droparea.h"
+#include "smooth/fontdlg.h"
+#include "smooth/font.h"
 
 #endif

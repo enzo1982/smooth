@@ -22,6 +22,7 @@ namespace smooth
 };
 
 #include "object.h"
+#include "font.h"
 
 namespace smooth
 {
@@ -39,8 +40,6 @@ namespace smooth
 			protected:
 				Bool				 visible;
 				Bool				 active;
-
-				Int				 flags;
 			public:
 				Int				 subtype;
 
@@ -65,10 +64,7 @@ namespace smooth
 				virtual Int			 SetTooltip(String);
 				virtual String			 GetTooltip();
 
-				Int				 SetFlags(Int);
-				Int				 GetFlags();
-
-				virtual Int			 SetFont(String, Int, Int, Int);
+				virtual Int			 SetFont(Font);
 				virtual Int			 SetOrientation(Int);
 				virtual Int			 SetPosition(Point);
 				virtual Int			 SetMetrics(Point, Size);

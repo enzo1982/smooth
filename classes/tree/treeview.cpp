@@ -31,7 +31,8 @@ S::GUI::TreeView::TreeView(String name, Point pos, Size size)
 {
 	type				= OBJ_TREEVIEW;
 	objectProperties->text		= name;
-	objectProperties->fontColor	= Setup::ClientTextColor;
+
+	objectProperties->font.SetColor(Setup::ClientTextColor);
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -71,7 +72,7 @@ S::Int S::GUI::TreeView::Paint(Int message)
 		frame.left += 3;
 		frame.top += 2;
 
-		surface->SetText(objectProperties->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+		surface->SetText(objectProperties->text, frame, objectProperties->font);
 
 		frame.left -= 3;
 		frame.top -= 2;
@@ -117,7 +118,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 		frame.top += 3;
 		frame.bottom = min(frame.bottom, oframe.bottom - 1);
 
-		surface->SetText(operat->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+		surface->SetText(operat->text, frame, objectProperties->font);
 
 		frame.left -= 3;
 		frame.top -= 3;

@@ -3,7 +3,6 @@ ToDo for smooth
 - implement tabstops
 - implement menu shortcuts
 - implement a technique to smoothly check the values of widgets like optionboxes or checkboxes
-- implement font dialog
 - complete treeview widget
 - allow applets in menubars
 - integrate UIML compiler and interpreter

@@ -45,7 +45,7 @@ S::GUI::Titlebar::Titlebar(Int buttons)
 
 	possibleContainers.AddEntry(OBJ_WINDOW);
 
-	objectProperties->fontWeight	= FW_BOLD;
+	objectProperties->font.SetWeight(FW_BOLD);
 }
 
 S::GUI::Titlebar::~Titlebar()
@@ -101,8 +101,10 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	titleText.right		= titleGradient.right - METRIC_TBBUTTONBOXOFFSETX + METRIC_TBBUTTONBOXWIDTH;
 	titleText.bottom	= titleGradient.bottom - METRIC_TBTEXTOFFSETY;
 
-	if (paintActive)	surface->SetText(objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
-	else			surface->SetText(objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, Setup::InactiveGradientTextColor, objectProperties->fontWeight);
+	if (paintActive)	objectProperties->font.SetColor(Setup::GradientTextColor);
+	else			objectProperties->font.SetColor(Setup::InactiveGradientTextColor);
+
+	surface->SetText(objectProperties->text, titleText, objectProperties->font);
 
 	if (icon != NIL)
 	{
@@ -231,7 +233,6 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	Rect	 maxButton;
 	Rect	 closeButton;
 	Rect	 workArea;
-	Rect	 wndRect;
 	Bool	 paint = False;
 	Int	 retVal = Success;
 
@@ -351,7 +352,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				cpwp.cx = mPos.x - wRect.left;
 				cpwp.cy = mPos.y - wRect.top;
 
-				if (!wnd->maximized)
+				if (!wnd->IsMaximized())
 				{
 					do
 					{
@@ -381,25 +382,21 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 							else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 						}
 
+						POINT	 mp;
+
+						GetCursorPos(&mp);
+
 						Point	 m;
+						m = mp;
 
-						{
-							POINT	 mp = m;
+						SetWindowPos(wnd->hwnd, 0, m.x - cpwp.cx, m.y - cpwp.cy, wnd->GetObjectProperties()->size.cx, wnd->GetObjectProperties()->size.cy, 0);
 
-							GetCursorPos(&mp);
+						RECT	 wRect;
 
-							m = mp;
-						}
+						GetWindowRect(wnd->hwnd, &wRect);
 
-						SetWindowPos(wnd->hwnd, 0, m.x-cpwp.cx, m.y-cpwp.cy, wnd->GetObjectProperties()->size.cx, wnd->GetObjectProperties()->size.cy, 0);
-
-						{
-							RECT wRect = wndRect;
-
-							GetWindowRect(wnd->hwnd, &wRect);
-
-							wndRect = wRect;
-						}
+						Rect	 wndRect;
+						wndRect = wRect;
 
 						wnd->GetObjectProperties()->pos.x	= wndRect.left;
 						wnd->GetObjectProperties()->pos.y	= wndRect.top;
@@ -457,7 +454,6 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			}
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
 			if (min && minchk && !wnd->IsMouseOn(minButton))
 			{
 				minchk		= False;
@@ -489,7 +485,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				closeButton.bottom--;
 			}
 
-			if (min && message == SM_MOUSEMOVE && !minchk && wnd->IsMouseOn(minButton))
+			if (min && !minchk && wnd->IsMouseOn(minButton))
 			{
 				maxchk		= False;
 				maxclk		= False;
@@ -508,7 +504,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				minchk		= True;
 				surface->Frame(minButton, FRAME_UP);
 			}
-			if (max && message == SM_MOUSEMOVE && !maxchk && wnd->IsMouseOn(maxButton))
+			if (max && !maxchk && wnd->IsMouseOn(maxButton))
 			{
 				minchk		= False;
 				minclk		= False;
@@ -527,7 +523,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				maxchk		= True;
 				surface->Frame(maxButton, FRAME_UP);
 			}
-			if (close && message == SM_MOUSEMOVE && !closechk && wnd->IsMouseOn(closeButton))
+			if (close && !closechk && wnd->IsMouseOn(closeButton))
 			{
 				minchk		= False;
 				minclk		= False;

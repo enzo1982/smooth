@@ -85,3 +85,8 @@ S::Int S::ThreadManager::GetNOfThreads()
 {
 	return nOfThreads;
 }
+
+S::Thread *S::ThreadManager::GetNthThread(Int n)
+{
+	return assocThreads.GetNthEntry(n);
+}

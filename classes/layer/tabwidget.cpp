@@ -136,7 +136,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 				textrect.right	= textrect.left + textSize.GetEntry(object->handle);
 				textrect.bottom	= textrect.top + 20;
 
-				surface->SetText(object->GetObjectProperties()->text, textrect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+				surface->SetText(object->GetObjectProperties()->text, textrect, objectProperties->font);
 
 				object->Paint(SP_PAINT);
 
@@ -200,7 +200,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 				textrect.right	= textrect.left + textSize.GetEntry(object->handle);
 				textrect.bottom	= textrect.top + 20;
 
-				surface->SetText(object->GetObjectProperties()->text, textrect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+				surface->SetText(object->GetObjectProperties()->text, textrect, objectProperties->font);
 
 				frame.top--;
 			}
@@ -326,7 +326,7 @@ S::Void S::GUI::TabWidget::GetSize()
 		{
 			if (!sizeSet.GetEntry(object->handle))
 			{
-				textSize.SetEntry(object->handle, GetTextSizeX(object->GetObjectProperties()->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight));
+				textSize.SetEntry(object->handle, GetTextSizeX(object->GetObjectProperties()->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight()));
 
 				sizeSet.SetEntry(object->handle, True);
 			}

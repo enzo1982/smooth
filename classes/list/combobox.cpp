@@ -43,7 +43,7 @@ S::GUI::ComboBox::ComboBox(Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	SetFont(objectProperties->font, I18N_SMALLFONTSIZE, Setup::ClientTextColor, objectProperties->fontWeight);
+	SetFont(Font(objectProperties->font.GetName(), I18N_SMALLFONTSIZE, Setup::ClientTextColor));
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
@@ -188,7 +188,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 				frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
 				frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-				surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+				surface->SetText(operat->name, frame, objectProperties->font);
 
 				frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 				frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -435,7 +435,11 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 							frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
 							frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-							surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, Setup::ClientColor, objectProperties->fontWeight);
+							Font	 font = objectProperties->font;
+
+							font.SetColor(Setup::ClientColor);
+
+							surface->SetText(operat->name, frame, font);
 
 							frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 							frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -460,7 +464,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 							frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
 							frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-							surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+							surface->SetText(operat->name, frame, objectProperties->font);
 
 							frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 							frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -541,7 +545,6 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
 			if (!(flags & CB_HOTSPOTONLY))
 			{
 				frame.top	+= 3;
@@ -550,7 +553,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
 			}
 
-			if (message == SM_MOUSEMOVE && wnd->IsMouseOn(frame) && !objectProperties->checked)
+			if (wnd->IsMouseOn(frame) && !objectProperties->checked)
 			{
 				surface->Frame(frame, FRAME_UP);
 

@@ -94,7 +94,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 			textRect.top	= popupRect.top + currentYPos;
 			textRect.bottom	= textRect.top + METRIC_POPUPENTRYSIZE;
 
-			surface->SetText(entry->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+			surface->SetText(entry->text, textRect, objectProperties->font);
 
 			if (entry->popup != NIL)
 			{
@@ -469,7 +469,6 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
 				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
@@ -483,7 +482,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					currentY = currentY + METRIC_POPUPENTRYSIZE;
 
-					if (message == SM_MOUSEMOVE && wnd->IsMouseOn(entryRect[i]) && !entry->checked)
+					if (wnd->IsMouseOn(entryRect[i]) && !entry->checked)
 					{
 						entry->checked = True;
 
@@ -503,7 +502,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 						entryRect[i].left = entryRect[i].left + 17;
 
-						surface->SetText(entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+						Font	 font = objectProperties->font;
+
+						font.SetColor(Setup::GradientTextColor);
+
+						surface->SetText(entry->text, entryRect[i], font);
 
 						if (entry->popup != NIL)
 						{
@@ -677,7 +680,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 						entryRect[i].left = entryRect[i].left + 17;
 
-						surface->SetText(entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						surface->SetText(entry->text, entryRect[i], objectProperties->font);
 
 						if (entry->popup != NIL)
 						{

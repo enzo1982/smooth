@@ -251,14 +251,13 @@ mainWnd_iconbar->SetOrientation(OR_LEFT);
 	// jetzt werden einige Fensterparameter festgelegt und die Fenster werden erzeugt:
 	mainWnd->SetMetrics(Point(100, 50), Size(570, 550));
 	mainWnd->SetIcon(SMOOTH::LoadImage("icons.pci", 0, NIL));
-	mainWnd->SetApplicationIcon(LoadIconA(NULL, MAKEINTRESOURCEA(32517)));
+	mainWnd->SetApplicationIcon(MAKEINTRESOURCEW(32517));
 	mainWnd->getTrackMenu.Connect(&Test::GetTrackMenu, this);
 	mainWnd->doQuit.Connect(&Test::mainWnd_KillProc, this);
 
 	secWnd->SetMetrics(Point(480, 130), Size(170, 90));
 	secWnd->SetIcon(SMOOTH::LoadImage("icons.pci", 0, NIL));
-	secWnd->SetStyle(SS_APPTOPMOST);
-	secWnd->SetParentWindow(mainWnd);
+	secWnd->SetFlags(WF_APPTOPMOST);
 
 	messageBoxThread->Start();
 }
@@ -395,7 +394,7 @@ void Test::Close()
 
 Int Test::threadMessageBox(Thread *thread)
 {
-	thread->SetKillFlag(THREAD_KILLFLAG_WAIT);	// for this thread can quit itself (after closing the MessageBox) it needn't be terminated by smooth (KILLTHREAD_KILL is default)
+	thread->SetFlags(THREAD_KILLFLAG_WAIT);	// for this thread can quit itself (after closing the MessageBox) it needn't be terminated by smooth (KILLTHREAD_KILL is default)
 
 	SMOOTH::MessageBox("This MessageBox is running in a separate thread!", "Info", MB_OK, IDI_INFORMATION);
 

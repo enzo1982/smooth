@@ -49,7 +49,6 @@ bool picture::DeleteBitmap()
 {
 	int ret = 0;
 
-#ifdef __WIN32__
 	if (hdc)
 	{
 		::SelectObject(hdc, bmOld);
@@ -57,7 +56,6 @@ bool picture::DeleteBitmap()
 	}
 
 	if(bmPic) ret += ::DeleteObject(bmPic);
-#endif
 
 	hdc = NIL;
 	width = 0;
@@ -72,7 +70,6 @@ bool picture::DeleteBitmap()
 
 bool picture::CreateBitmap(unsigned long cx, unsigned long cy, unsigned char bpp, bool toHDC)
 {
-#ifdef __WIN32__
 	BITMAP		 bm;
 	BITMAPINFO	*pBMI;
 	DWORD		*pBmBits;
@@ -114,7 +111,7 @@ bool picture::CreateBitmap(unsigned long cx, unsigned long cy, unsigned char bpp
 
 	if (toHDC)
 	{
-		HDC dc = ::GetDC(NIL); 
+		HDC dc = ::GetWindowDC(NIL); 
 		hdc = ::CreateCompatibleDC(dc);
 		bmOld = (HBITMAP) ::SelectObject(hdc, bmPic);
 		::ReleaseDC(NIL, dc);
@@ -122,19 +119,15 @@ bool picture::CreateBitmap(unsigned long cx, unsigned long cy, unsigned char bpp
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
-#ifdef __WIN32__
 bool picture::BlitToDC(HDC dc, RECT *rcTrg, RECT *rcSrc)
 {
 	int retcode = 0;
 	RECT rc = { 0, 0, width, height }; 
 	SIZE szS;
 	SIZE szT;
-
+
 	if (bmPic)
 	{
 		if (!rcSrc) rcSrc = &rc;
@@ -197,4 +190,3 @@ bool picture::BlitFromDC(HDC dc, RECT *rcSrc, RECT *rcTrg)
 
 	return retcode;
 }
-#endif

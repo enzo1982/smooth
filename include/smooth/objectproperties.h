@@ -19,6 +19,7 @@ namespace smooth
 #include "definitions.h"
 #include "point.h"
 #include "size.h"
+#include "font.h"
 
 namespace smooth
 {
@@ -36,10 +37,7 @@ namespace smooth
 			Size		 textSize;
 			Size		 tooltipSize;
 
-			String		 font;
-			Int		 fontSize;
-			Int		 fontWeight;
-			Int		 fontColor;
+			GUI::Font	 font;
 
 			Bool		 clicked;
 			Bool		 checked;

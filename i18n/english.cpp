@@ -13,7 +13,6 @@
 #include <smooth/toolkit.h>
 #include <smooth/stk.h>
 
-#ifdef __WIN32__
 int CALLBACK EnumFontProcA(ENUMLOGFONTEXA *lpelfe, NEWTEXTMETRICEXA *lpntme, int fontType, LPARAM lParam)
 {
 	if (S::String(lpelfe->elfLogFont.lfFaceName) == "Microsoft Sans Serif")	return 0;
@@ -25,13 +24,10 @@ int CALLBACK EnumFontProcW(ENUMLOGFONTEXW *lpelfe, NEWTEXTMETRICEXW *lpntme, int
 	if (S::String(lpelfe->elfLogFont.lfFaceName) == "Microsoft Sans Serif")	return 0;
 	else									return 1;
 }
-#endif
 
-void S::ActivateEnglishLanguage()
+S::Void S::ActivateEnglishLanguage()
 {
 	HDC		 dc = GetContext(0);
-
-#ifdef __WIN32__
 	LOGFONTA	 fontInfoA;
 	LOGFONTW	 fontInfoW;
 
@@ -51,8 +47,6 @@ void S::ActivateEnglishLanguage()
 	if (result == 0)	I18N_DEFAULTFONT = "Microsoft Sans Serif";
 	else			I18N_DEFAULTFONT = "MS Sans Serif";
 
-#endif
-
 	FreeContext(0, dc);
 
 	I18N_DEFAULTFONTSIZE = 8;
@@ -63,7 +57,6 @@ void S::ActivateEnglishLanguage()
 	TXT_ERROR = "Error";
 	TXT_ERROR_OBJECTMANAGEREXISTS = "ObjectManager already exists! Creation refused!";
 	TXT_ERROR_THREADMANAGEREXISTS = "ThreadManager already exists! Creation refused!";
-	TXT_ERROR_POPUPMANAGEREXISTS = "PopupManager already exists! Creation refused!";
 
 	TXT_OK = "OK";
 	TXT_CANCEL = "Cancel";

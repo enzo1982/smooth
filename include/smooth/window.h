@@ -37,13 +37,15 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int SS_MODAL		= 1;
-		const Int SS_SYSMODAL		= 2;
-		const Int SS_APPTOPMOST		= 3;
-		const Int SS_NORESIZE		= 4;
+		const Int	 WF_MODAL		= 1;
+		const Int	 WF_SYSTEMMODAL		= 2;
+		const Int	 WF_TOPMOST		= 4;
+		const Int	 WF_APPTOPMOST		= 8;
+		const Int	 WF_NORESIZE		= 16;
+		const Int	 WF_NOTASKBUTTON	= 32;
 
-		const Int WO_SEPARATOR		= 1;
-		const Int WO_NOSEPARATOR	= 2;
+		const Int	 WO_SEPARATOR	= 1;
+		const Int	 WO_NOSEPARATOR	= 2;
 
 #ifdef __SMOOTH_DLL__
 		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
@@ -64,9 +66,6 @@ namespace smooth
 			protected:
 				Int				 style;
 				Int				 exstyle;
-				Bool				 modal;
-				Bool				 sysmodal;
-				Bool				 apptopmost;
 				Bool				 stay;
 				Bool				 maximized;
 				Rect				 nonmaxrect;
@@ -91,7 +90,6 @@ namespace smooth
 				HDC				 windowDC;
 
 				Layer				*mainLayer;
-				Window				*parentWindow;
 
 				HWND				 Create();
 				Void				 CalculateOffsets();
@@ -108,11 +106,9 @@ namespace smooth
 								 Window(String title = NIL);
 								~Window();
 
-				Int				 SetParentWindow(Window *);
-
 				Int				 SetIcon(HBITMAP);
-				Int				 SetApplicationIcon(HICON);
-				Int				 SetApplicationIcon(Int);
+				Int				 SetApplicationIcon(char *);
+				Int				 SetApplicationIcon(wchar_t *);
 				Int				 SetMetrics(Point, Size);
 				Void				 SetStyle(Int);
 				Void				 SetExStyle(Int);

@@ -79,7 +79,6 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 	int	 actpos = 0;
 	int	 thissize = 0;
 	int	 maxsize = 0;
-	HDC	 dc = GetContext(NIL);
 	Point	 bpos;
 	Size	 bsize;
 	int	 titlesize = 0;
@@ -117,9 +116,7 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 
 		for (int j = 0; j < lines; j++)
 		{
-#ifdef __WIN32__
-			thissize = GetTextSizeX(line[j], I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL);
-#endif
+			thissize = GetTextSizeX(line[j], I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, FW_NORMAL);
 
 			if (thissize > maxsize) maxsize = thissize;
 		}
@@ -130,18 +127,16 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 		thissize = 0;
 	}
 
-	msgbox->GetObjectProperties()->size.cx = maxsize+34;
-	msgbox->GetObjectProperties()->size.cy = ((lines+1)*16) + 68 + buttonHeight;
+	msgbox->GetObjectProperties()->size.cx = maxsize + 34;
+	msgbox->GetObjectProperties()->size.cy = (((Int) Math::Max(2, lines) + 1) * 16) + 68 + buttonHeight;
 
 	if (lines == 1 && msgicon != NIL) msgbox->GetObjectProperties()->size.cy = 116 + buttonHeight;
 
-#ifdef __WIN32__
 	if (msgicon != NIL) msgbox->GetObjectProperties()->size.cx += GetSystemMetrics(SM_CXICON) + 20;
 
-	titlesize = GetTextSizeX(title, I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_BOLD);
-#endif
+	titlesize = GetTextSizeX(title, I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, FW_BOLD);
 
-	if (msgbox->GetObjectProperties()->size.cx < titlesize+80) msgbox->GetObjectProperties()->size.cx = titlesize+80;
+	if (msgbox->GetObjectProperties()->size.cx < titlesize + 80) msgbox->GetObjectProperties()->size.cx = titlesize + 80;
 
 	RegisterObject(msgbox);
 
@@ -161,7 +156,6 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 
 	switch (buttons)
 	{
-#ifdef __WIN32__
 		default:
 		case MB_OK:
 			if (msgbox->GetObjectProperties()->size.cx < (buttonWidth + 30)) msgbox->GetObjectProperties()->size.cx = buttonWidth + 30;
@@ -246,22 +240,18 @@ S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 			lay->RegisterObject(retrybutton);
 			lay->RegisterObject(ignorebutton);
 			break;
-#endif
 	}
 
 	Setup::FontSize = oldmeasurement;
 
 	msgbox->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - msgbox->GetObjectProperties()->size.cx) / 2 + (nOfMessageBoxes - 1) * 25;
 	msgbox->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - msgbox->GetObjectProperties()->size.cy) / 2 + (nOfMessageBoxes - 1) * 25;
-
-	FreeContext(NIL, dc);
 }
 
 S::MessageBoxApp::~MessageBoxApp()
 {
 	switch (buttons)
 	{
-#ifdef __WIN32__
 		default:
 		case MB_OK:
 			lay->UnregisterObject(okbutton);
@@ -313,7 +303,6 @@ S::MessageBoxApp::~MessageBoxApp()
 			DeleteObject(ignorebutton);
 
 			break;
-#endif
 	}
 
 	msgbox->UnregisterObject(lay);
@@ -332,9 +321,7 @@ S::Int S::MessageBoxApp::ShowMessageBox()
 
 	nOfMessageBoxes++;
 
-#ifdef __WIN32__
 	MessageBeep(MB_ICONASTERISK);
-#endif
 
 	rval = msgbox->Stay();
 
@@ -357,31 +344,27 @@ S::Void S::MessageBoxApp::MessagePaintProc()
 
 	if (msgicon != NIL)
 	{
-#ifdef __WIN32__
 		HICON	 icon = NIL;
 
-		txtrect.left += GetSystemMetrics(SM_CXICON)+20;
+		txtrect.left += GetSystemMetrics(SM_CXICON) + 20;
 
 		if (msgicon == MAKEINTRESOURCEW(32512) || msgicon == MAKEINTRESOURCEW(32516) || msgicon == MAKEINTRESOURCEW(32515) || msgicon == MAKEINTRESOURCEW(32513) || msgicon == MAKEINTRESOURCEW(32514) || msgicon == MAKEINTRESOURCEW(32517))
 		{
-			if (Setup::enableUnicode)	icon = LoadIconW(NIL, msgicon);
-			else				icon = LoadIconA(NIL, (char *) msgicon);
+			if (Setup::enableUnicode)	icon = (HICON) LoadImageW(NIL, msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+			else				icon = (HICON) LoadImageA(NIL, (char *) msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 		}
 		else
 		{
-			if (Setup::enableUnicode)	icon = LoadIconW(hInstance, msgicon);
-			else				icon = LoadIconA(hInstance, (char *) msgicon);
+			if (Setup::enableUnicode)	icon = (HICON) LoadImageW(hInstance, msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+			else				icon = (HICON) LoadImageA(hInstance, (char *) msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 		}
 
 		DrawIcon(dc, 17, 47, icon);
-#endif
 	}
 
 	for (int i = 0; i < lines; i++)
 	{
-#ifdef __WIN32__
-		surface->SetText(line[i], txtrect, I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), Setup::TextColor, FW_NORMAL);
-#endif
+		surface->SetText(line[i], txtrect, Font());
 
 		txtrect.top += 16;
 		txtrect.bottom += 16;

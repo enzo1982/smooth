@@ -135,21 +135,21 @@ typedef void LiSAMutex;
 #define LSemaphore	LiSASemaphore
 #define LMutex		LiSAMutex
 
-/* LiSAThreadCreate - Create a new thread ************************************************
- *											 *
- * Syntax:	int LiSAThreadCreate(void (*threadProc)(void *), void *threadParam);	 *
- *											 *
- * Explanation:	LiSAThreadCreate starts threadProc in a new thread. threadParam is the	 *
- *		first argument to threadProc.						 *
- *											 *
- * Return:	LiSAThreadCreate returns a handle to the created thread or NULL if an	 *
- *		error occurred.								 *
- *											 *
- *****************************************************************************************/
+/* LiSAThreadCreate - Create a new thread *********************************************************************
+ *													      *
+ * Syntax:	int LiSAThreadCreate(unsigned long *threadID, void (*threadProc)(void *), void *threadParam); *
+ *													      *
+ * Explanation:	LiSAThreadCreate starts threadProc in a new thread. threadParam is the first argument to      *
+ *		to threadProc. A thread identifier will be written to threadID.				      *
+ *													      *
+ * Return:	LiSAThreadCreate returns a handle to the created thread or NULL if an			      *
+ *		error occurred.										      *
+ *													      *
+ **************************************************************************************************************/
 
 #define LThreadCreate LiSAThreadCreate
 
-LiSAThread	*LiSAThreadCreate(void (*)(void *), void *);
+LiSAThread	*LiSAThreadCreate(unsigned long *, void (*)(void *), void *);
 
 /* LiSAThreadCancel - Cancel a thread ****************************
  *								 *

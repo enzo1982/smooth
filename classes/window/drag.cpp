@@ -45,17 +45,11 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 	if (wnd->hwnd == NIL) return Success;
 
 	Point	 mPos;
-	Point	 m;
 	Size	 cpwp;
 	Rect	 wRect;
 	Rect	 rect;
-	Rect	 updateRect;
-	Rect	 wndRect;
 	Int	 retVal = Success;
 	Int	 leftButton;
-	HDC	 dc = NIL;
-	MSG		 msg;
-	PAINTSTRUCT	 ps;
 
 	switch (message)
 	{
@@ -83,6 +77,8 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 			{
 				do
 				{
+					MSG	 msg;
+
 					if (peekLoop > 0)
 					{
 						if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
@@ -94,41 +90,10 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 						else				GetMessageA(&msg, NIL, 0, 0);
 					}
 
-					if (msg.message == WM_PAINT)
-					{
-						RECT uRect;
+					TranslateMessage(&msg);
 
-						if (GetUpdateRect(msg.hwnd, &uRect, 0))
-						{
-							updateRect = uRect;
-
-							dc = BeginPaint(msg.hwnd, &ps);
-
-							{
-								RECT r;
-
-								GetClientRect(msg.hwnd, &r);
-
-								rect = r;
-							}
-
-							EndPaint(msg.hwnd, &ps);
-
-							Window::GetWindow(msg.hwnd)->SetUpdateRect(updateRect);
-							Window::GetWindow(msg.hwnd)->Paint(SP_PAINT);
-						}
-						else
-						{
-							updateRect = uRect;
-						}
-					}
-					else
-					{
-						TranslateMessage(&msg);
-
-						if (Setup::enableUnicode)	DispatchMessageW(&msg);
-						else				DispatchMessageA(&msg);
-					}
+					if (Setup::enableUnicode)	DispatchMessageW(&msg);
+					else				DispatchMessageA(&msg);
 
 					if (peekLoop > 0)
 					{
@@ -136,23 +101,21 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 						else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 					}
 
-					{
-						POINT	 mp;
+					POINT	 mp;
 
-						GetCursorPos(&mp);
+					GetCursorPos(&mp);
 
-						m = mp;
-					}
+					Point	 m;
+					m = mp;
 
-					SetWindowPos(wnd->hwnd, 0, m.x-cpwp.cx, m.y-cpwp.cy, wnd->GetObjectProperties()->size.cx, wnd->GetObjectProperties()->size.cy, 0);
+					SetWindowPos(wnd->hwnd, 0, m.x - cpwp.cx, m.y - cpwp.cy, wnd->GetObjectProperties()->size.cx, wnd->GetObjectProperties()->size.cy, 0);
 
-					{
-						RECT wRect;
+					RECT wRect;
 
-						GetWindowRect(wnd->hwnd, &wRect);
+					GetWindowRect(wnd->hwnd, &wRect);
 
-						wndRect = wRect;
-					}
+					Rect	 wndRect;
+					wndRect = wRect;
 
 					wnd->GetObjectProperties()->pos.x	= wndRect.left;
 					wnd->GetObjectProperties()->pos.y	= wndRect.top;

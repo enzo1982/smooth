@@ -67,11 +67,13 @@ int LiSAGetDisplaySizeY()
 	return HeightOfScreen(DefaultScreenOfDisplay(default_display));
 }
 
-LiSAThread *LiSAThreadCreate(void (*threadProc)(void *), void *threadParam)
+LiSAThread *LiSAThreadCreate(unsigned long *threadID, void (*threadProc)(void *), void *threadParam)
 {
 	pthread_t	*thread = new pthread_t;
 
 	pthread_create(thread, NULL, (void *(*)(void *)) threadProc, threadParam);
+
+	*threadID = (unsigned long) thread;
 
 	return (LiSAThread *) thread;
 }

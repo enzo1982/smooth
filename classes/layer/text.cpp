@@ -55,6 +55,7 @@ S::Int S::GUI::Text::Paint(Int message)
 
 	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
+	Font	 font = objectProperties->font;
 
 	objectProperties->size = objectProperties->textSize;
 
@@ -67,8 +68,9 @@ S::Int S::GUI::Text::Paint(Int message)
 			textRect.right	= textRect.left + objectProperties->textSize.cx;
 			textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
-			if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-			else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
+			if (!active) font.SetColor(Setup::GrayTextColor);
+
+			surface->SetText(objectProperties->text, textRect, font);
 
 			break;
 	}

@@ -117,12 +117,12 @@ S::Int S::GUI::Surface::Box(Rect rect, Int color, Int style)
 	return Success;
 }
 
-S::Int S::GUI::Surface::SetText(String string, Rect rect, String font, Int size, Int color, Int weight, Int flags)
+S::Int S::GUI::Surface::SetText(String string, Rect rect, Font font)
 {
 	return Success;
 }
 
-S::Int S::GUI::Surface::SetShadowedText(String string, Rect rect, String font, Int size, Int color, Int weight)
+S::Int S::GUI::Surface::SetShadowedText(String string, Rect rect, Font font)
 {
 	if (string == NIL) return Error;
 
@@ -131,14 +131,20 @@ S::Int S::GUI::Surface::SetShadowedText(String string, Rect rect, String font, I
 	rect.right += 2;
 	rect.bottom += 2;
 
-	SetText(string, rect, font, size, CombineColor(((Float) GetRed(Setup::BackgroundColor)) / 3 * 2, ((Float) GetGreen(Setup::BackgroundColor)) / 3 * 2, ((Float) GetBlue(Setup::BackgroundColor)) / 3 * 2), weight);
+	Int	 fontColor = font.GetColor();
+
+	font.SetColor(CombineColor(((Float) GetRed(Setup::BackgroundColor)) / 3 * 2, ((Float) GetGreen(Setup::BackgroundColor)) / 3 * 2, ((Float) GetBlue(Setup::BackgroundColor)) / 3 * 2));
+
+	SetText(string, rect, font);
 
 	rect.left -= 2;
 	rect.top -= 2;
 	rect.right -= 2;
 	rect.bottom -= 2;
 
-	SetText(string, rect, font, size, color, weight);
+	font.SetColor(fontColor);
+
+	SetText(string, rect, font);
 
 	return Success;
 }

@@ -26,14 +26,16 @@ S::Int	 S::OBJ_LISTBOXHEADER = S::Object::RequestObjectID();
 
 S::GUI::ListBoxHeader::ListBoxHeader(ListBox *iListBox)
 {
-	listBox	= iListBox;
+	listBox		= iListBox;
 
-	moveTab	= -1;
-	innerLoop = False;
+	moveTab		= -1;
+	innerLoop	= False;
 
-	type	= OBJ_LISTBOXHEADER;
+	type		= OBJ_LISTBOXHEADER;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
+
+	objectProperties->font.SetWeight(FW_BOLD);
 
 	UpdateMetrics();
 }
@@ -148,8 +150,11 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 				frame.left += 3;
 				frame.top += 1;
 
-				if (active)	surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, FW_BOLD);
-				else		surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, FW_BOLD);
+				Font	 font = objectProperties->font;
+
+				if (!active) font.SetColor(Setup::GrayTextColor);
+
+				surface->SetText(tabNames.GetNthEntry(i), frame, font);
 
 				frame.top -= 1;
 				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) - 2);
@@ -229,7 +234,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					surface->Box(frame, Setup::LightGrayColor, FILLED);
 
 					frame.left += 2;
-					surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, FW_BOLD);
+					surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font);
 					frame.left -= 2;
 
 					tabChecked.SetEntry(tabChecked.GetNthEntryIndex(i), True);
@@ -239,7 +244,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 					frame.left += 2;
-					surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, FW_BOLD);
+					surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font);
 					frame.left -= 2;
 
 					tabChecked.SetEntry(tabChecked.GetNthEntryIndex(i), False);

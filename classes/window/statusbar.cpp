@@ -48,7 +48,7 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	textRect.right	= objectProperties->pos.x + objectProperties->size.cx;
 	textRect.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 
-	surface->SetText(objectProperties->text, textRect,  objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+	surface->SetText(objectProperties->text, textRect,  objectProperties->font);
 
 	return Success;
 }
@@ -69,8 +69,12 @@ S::Int S::GUI::Statusbar::SetText(String newStatus)
 	textRect.right	= objectProperties->pos.x + objectProperties->size.cx;
 	textRect.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 
-	surface->SetText(oldStatus, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
-	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+	Font	 font = objectProperties->font;
+
+	font.SetColor(Setup::BackgroundColor);
+
+	surface->SetText(oldStatus, textRect, font);
+	surface->SetText(objectProperties->text, textRect, objectProperties->font);
 
 	return Success;
 }

@@ -98,7 +98,6 @@ void FreeContext(GUI::Window *wnd, HDC hdc)
 	if (contextCounts.GetEntry(code) == 0)
 	{
 		ReleaseDC((HWND) code, contexts.GetEntry(code));
-		DeleteDC(contexts.GetEntry(code));
 
 		contexts.RemoveEntry(code);
 		contextCounts.RemoveEntry(code);
@@ -108,7 +107,7 @@ void FreeContext(GUI::Window *wnd, HDC hdc)
 HDC CreateCompatibleContext(HDC origdc, Size bmpsize)
 {
 	HDC	 cdc = CreateCompatibleDC(origdc);
-	HBITMAP	 bmp = CreateBitmap(bmpsize.cx, bmpsize.cy, GetDeviceCaps(cdc, PLANES), GetDeviceCaps(cdc, BITSPIXEL), NIL);
+	HBITMAP	 bmp = CreateCompatibleBitmap(origdc, bmpsize.cx, bmpsize.cy);
 	HBITMAP	 oldbmp;
 
 	oldbmp = (HBITMAP) SelectObject(cdc, bmp);
@@ -186,48 +185,29 @@ int GetLineSizeX(String text, int nofchars, String font, int size, int weight)
 	if (text == NIL) return 0;
 	if (nofchars == 0) return 0;
 
-	Size	 tsize;
-	HDC	 cdc;
+	HDC	 cdc = CreateCompatibleDC(0);
+
+	size = -MulDiv(size, GetDeviceCaps(cdc, LOGPIXELSY), 72);
+
 	HFONT	 hfont;
 	HFONT	 holdfont;
-	int	 txsize = size;
-	String	 filtered;
-	int	 bias = 0;
 
-	// filtering out '&'s
-
-	for (int i = 0; i < nofchars; i++)
-	{
-		filtered[i] = 0;
-
-		if (text[i] == '&')	bias++;
-		else			filtered[i-bias] = text[i];
-	}
-
-	filtered[nofchars] = 0;
-
-	if (size < 0) size = size - (2 * size);
-
-	cdc = CreateCompatibleDC(0);
-
-	if (Setup::enableUnicode)	hfont = CreateFontW(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
-	else				hfont = CreateFontA(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	if (Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	else				hfont = CreateFontA(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
 
 	holdfont = (HFONT) SelectObject(cdc, hfont);
 
-	SIZE	 ts = tsize;
+	SIZE	 tSize;
 
-	if (Setup::enableUnicode)	GetTextExtentPoint32W(cdc, filtered, nofchars-bias, &ts);
-	else				GetTextExtentPoint32A(cdc, filtered, nofchars-bias, &ts);
-
-	tsize = ts;
+	if (Setup::enableUnicode)	GetTextExtentPoint32W(cdc, text, nofchars, &tSize);
+	else				GetTextExtentPoint32A(cdc, text, nofchars, &tSize);
 
 	SelectObject(cdc, holdfont);
 	::DeleteObject(hfont);
 
 	DeleteDC(cdc);
 
-	return tsize.cx;
+	return tSize.cx;
 }
 
 int GetTextSizeY(String text, String font, int size, int weight)
@@ -249,35 +229,29 @@ int GetLineSizeY(String text, String font, int size, int weight)
 {
 	if (text == NIL) return 0;
 
-	Size	 tsize;
-	HDC	 cdc;
+	HDC	 cdc = CreateCompatibleDC(0);
+
+	size = -MulDiv(size, GetDeviceCaps(cdc, LOGPIXELSY), 72);
+
 	HFONT	 hfont;
 	HFONT	 holdfont;
-	int	 txsize = size;
-	int	 nofchars = text.Length();
 
-	if (size < 0) size = size - (2 * size);
-
-	cdc = CreateCompatibleDC(0);
-
-	if (Setup::enableUnicode)	hfont = CreateFontW(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
-	else				hfont = CreateFontA(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	if (Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	else				hfont = CreateFontA(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
 
 	holdfont = (HFONT) SelectObject(cdc, hfont);
 
-	SIZE	 ts = tsize;
+	SIZE	 tSize;
 
-	if (Setup::enableUnicode)	GetTextExtentPoint32W(cdc, text, nofchars, &ts);
-	else				GetTextExtentPoint32A(cdc, text, nofchars, &ts);
-
-	tsize = ts;
+	if (Setup::enableUnicode)	GetTextExtentPoint32W(cdc, text, text.Length(), &tSize);
+	else				GetTextExtentPoint32A(cdc, text, text.Length(), &tSize);
 
 	SelectObject(cdc, holdfont);
 	::DeleteObject(hfont);
 
 	DeleteDC(cdc);
 
-	return tsize.cy - 1;
+	return tSize.cy - 1;
 }
 
 bool DoRectsOverlap(Rect rect1, Rect rect2)
@@ -318,7 +292,7 @@ HBITMAP BlitToBitmap(HDC dc, Rect rect)
 	HBITMAP	 newbmp;
 	HBITMAP	 backup;
 
-	newbmp = CreateBitmap(rect.right - rect.left + 1, rect.bottom - rect.top + 1, GetDeviceCaps(dc, PLANES), GetDeviceCaps(dc, BITSPIXEL), NIL);
+	newbmp = CreateCompatibleBitmap(dc, rect.right - rect.left + 1, rect.bottom - rect.top + 1);
 	backup = (HBITMAP) SelectObject(cdc, newbmp);
 
 	BitBlt(cdc, 0, 0, rect.right - rect.left + 1, rect.bottom - rect.top + 1, dc, rect.left, rect.top, SRCCOPY);
@@ -378,7 +352,7 @@ HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon
 	wndclassw.cbWndExtra	= 0;
 	wndclassw.hInstance	= hInstance;
 	wndclassw.hIcon		= icon;
-	wndclassw.hCursor	= DEFAULTCURSOR;
+	wndclassw.hCursor	= (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 	wndclassw.hbrBackground	= NIL;
 	wndclassw.lpszMenuName	= NIL;
 	wndclassw.lpszClassName	= className;
@@ -391,7 +365,7 @@ HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon
 	wndclassa.cbWndExtra	= 0;
 	wndclassa.hInstance	= hInstance;
 	wndclassa.hIcon		= icon;
-	wndclassa.hCursor	= NIL;
+	wndclassa.hCursor	= (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 	wndclassa.hbrBackground	= NIL;
 	wndclassa.lpszMenuName	= NIL;
 	wndclassa.lpszClassName	= className;

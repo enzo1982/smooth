@@ -134,43 +134,43 @@ S::DialogColorSelection::DialogColorSelection()
 
 	huetext = new Text(TXT_HUESHORT, bp);
 	huetext->SetOrientation(OR_UPPERRIGHT);
-	huetext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor, FW_NORMAL);
+	huetext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
 	sattext = new Text(TXT_SATURATIONSHORT, bp);
 	sattext->SetOrientation(OR_UPPERRIGHT);
-	sattext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor, FW_NORMAL);
+	sattext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
 	valtext = new Text(TXT_VALUESHORT, bp);
 	valtext->SetOrientation(OR_UPPERRIGHT);
-	valtext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor, FW_NORMAL);
+	valtext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
 	redtext = new Text(TXT_REDSHORT, bp);
 	redtext->SetOrientation(OR_UPPERRIGHT);
-	redtext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(255, 0, 0), FW_NORMAL);
+	redtext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(255, 0, 0)));
 
 	bp.y += 26;
 
 	greentext = new Text(TXT_GREENSHORT, bp);
 	greentext->SetOrientation(OR_UPPERRIGHT);
-	greentext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 160, 0), FW_NORMAL);
+	greentext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 160, 0)));
 
 	bp.y += 26;
 
 	bluetext = new Text(TXT_BLUESHORT, bp);
 	bluetext->SetOrientation(OR_UPPERRIGHT);
-	bluetext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 0, 255), FW_NORMAL);
+	bluetext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 0, 255)));
 
 	bp.y += 26;
 
 	hextext = new Text(TXT_HTMLCODE, bp);
 	hextext->SetOrientation(OR_UPPERRIGHT);
-	hextext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor, FW_NORMAL);
+	hextext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.x = 37;
 	bp.y = 34;
@@ -371,7 +371,6 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 	if (dlgwnd->hwnd == NIL) return;
 
 	Surface		*surface = dlgwnd->GetDrawSurface();
-	HDC		 dc = GetContext(dlgwnd);
 	Rect		 rect;
 	Point		 p1;
 	Point		 p2;
@@ -495,8 +494,6 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 	preventhupdate = true;
 
 	ColorDlgUpdatePickers();
-
-	FreeContext(dlgwnd, dc);
 
 	delete pic;
 }

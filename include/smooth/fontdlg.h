@@ -8,34 +8,32 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_LOOP_
-#define _H_OBJSMOOTH_LOOP_
-
-#include "definitions.h"
-#include "string.h"
+#ifndef _H_OBJSMOOTH_FONTDLG_
+#define _H_OBJSMOOTH_FONTDLG_
 
 namespace smooth
 {
-#ifdef __WIN32__
-	SMOOTHVAR HINSTANCE	 hInstance;
-	SMOOTHVAR HINSTANCE	 hPrevInstance;
-	SMOOTHVAR String	 szCmdLine;
-	SMOOTHVAR int		 iCmdShow;
+	class DialogFontSelection;
+};
 
-	SMOOTHVAR HICON		 SMOOTHICON;
-#endif
+#include "definitions.h"
+#include "dialog.h"
+#include "font.h"
 
-	Void SMOOTHAPI	 Init();
-	Void SMOOTHAPI	 Free();
-	Int SMOOTHAPI	 Loop();
+namespace smooth
+{
+	class SMOOTHAPI DialogFontSelection : public Dialog
+	{
+		private:
+			GUI::Font	 font;
+		public:
+					 DialogFontSelection();
+					~DialogFontSelection();
 
-#ifdef __SMOOTH_DLL__
-	extern bool	 initializing;
-	extern bool	 loopActive;
-	extern int	 peekLoop;
+			Int		 ShowDialog();
 
-	Void	 GetColors();
-#endif
+			GUI::Font	 GetFont();
+	};
 };
 
 #endif

@@ -166,7 +166,7 @@ HBITMAP PCIIO::GetBitmap()
 #ifdef __WIN32__
 	HDC	 ddc = GetWindowDC(0);
 	HDC	 cdc = CreateCompatibleDC(ddc);
-	HBITMAP	 bmp = CreateBitmap(sizex, sizey, GetDeviceCaps(ddc, PLANES), GetDeviceCaps(ddc, BITSPIXEL), NULL);
+	HBITMAP	 bmp = CreateCompatibleBitmap(ddc, sizex, sizey);
 	HBITMAP	 oldbmp;
 
 	oldbmp = (HBITMAP) SelectObject(cdc, bmp);

@@ -62,11 +62,7 @@ S::SplashScreenApp::SplashScreenApp(HBITMAP logo, Int t)
 	splashscreen->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - splashscreen->GetObjectProperties()->size.cx) / 2;
 	splashscreen->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - splashscreen->GetObjectProperties()->size.cy) / 2-40;
 
-	splashscreen->SetStyle(SS_NORESIZE);
-
-#ifdef __WIN32__
-	splashscreen->SetExStyle(WS_EX_TOPMOST);
-#endif
+	splashscreen->SetFlags(WF_NORESIZE | WF_TOPMOST);
 
 	timer->onInterval.Connect(&SplashScreenApp::TimerProc, this);
 }

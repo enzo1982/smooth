@@ -148,7 +148,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.right = menuentry.left + operat->size;
 
 				menuentry.bottom += 1;
-				surface->SetText(operat->text, menuentry, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+				surface->SetText(operat->text, menuentry, objectProperties->font);
 				menuentry.bottom -= 1;
 
 				operat->rect.left	= menuentry.left - 3;
@@ -280,7 +280,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.left = helpmenuentry.right - operat->size;
 
 				helpmenuentry.bottom += 1;
-				surface->SetText(operat->text, helpmenuentry, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+				surface->SetText(operat->text, helpmenuentry, objectProperties->font);
 				helpmenuentry.bottom -= 1;
 
 				operat->rect.left	= helpmenuentry.left - 3;
@@ -598,7 +598,6 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
 			for (i = 0; i < nOfEntries; i++)
 			{
 				operat = entries.GetNthEntry(i);
@@ -607,7 +606,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 				if (operat->type == SM_TEXT)
 				{
-					if (message == SM_MOUSEMOVE && wnd->IsMouseOn(operat->rect) && !operat->checked)
+					if (wnd->IsMouseOn(operat->rect) && !operat->checked)
 					{
 						operat->checked = True;
 
@@ -636,7 +635,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 				}
 				else if (operat->type == SM_BITMAP)
 				{
-					if (message == SM_MOUSEMOVE && wnd->IsMouseOn(operat->rect) && !operat->checked)
+					if (wnd->IsMouseOn(operat->rect) && !operat->checked)
 					{
 						operat->checked = True;
 

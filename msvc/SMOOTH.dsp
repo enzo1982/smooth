@@ -295,6 +295,10 @@ SOURCE=..\classes\misc\datetime.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\misc\font.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\misc\math.cpp
 # End Source File
 # Begin Source File
@@ -457,6 +461,10 @@ SOURCE=..\dialogs\dirdlg.cpp
 # Begin Source File
 
 SOURCE=..\dialogs\filedlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\dialogs\fontdlg.cpp
 # End Source File
 # End Group
 # Begin Group "miscsources"
@@ -788,6 +796,14 @@ SOURCE=..\include\smooth\editbox.h
 # Begin Source File
 
 SOURCE=..\include\smooth\filedlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\font.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\fontdlg.h
 # End Source File
 # Begin Source File
 

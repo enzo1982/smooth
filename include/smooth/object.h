@@ -38,6 +38,8 @@ namespace smooth
 		protected:
 			ObjectType		 type;
 
+			Int			 flags;
+
 			Bool			 registered;
 
 			ObjectProperties	*objectProperties;
@@ -57,6 +59,9 @@ namespace smooth
 			virtual			~Object();
 
 			Bool			 IsRegistered();
+
+			Int			 SetFlags(Int);
+			Int			 GetFlags();
 
 			virtual Point		 GetRealPosition();
 

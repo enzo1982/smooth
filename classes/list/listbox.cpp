@@ -43,7 +43,7 @@ S::GUI::ListBox::ListBox(Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	SetFont(objectProperties->font, I18N_SMALLFONTSIZE, Setup::ClientTextColor, objectProperties->fontWeight);
+	SetFont(Font(objectProperties->font.GetName(), I18N_SMALLFONTSIZE, Setup::ClientTextColor));
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
@@ -424,7 +424,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 						frame.left += (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
-						DrawEntryText(operat->name, frame, objectProperties->fontColor);
+						DrawEntryText(operat->name, frame, objectProperties->font.GetColor());
 						frame.left -= (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
 					}
@@ -602,7 +602,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					operat->rect.left += (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top++;
-					DrawEntryText(operat->name, operat->rect, objectProperties->fontColor);
+					DrawEntryText(operat->name, operat->rect, objectProperties->font.GetColor());
 					operat->rect.left -= (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top--;
 
@@ -812,7 +812,6 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
 				operat = GetNthEntry(i);
@@ -835,7 +834,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (operat == NIL) break;
 
-				if (message == SM_MOUSEMOVE && wnd->IsMouseOn(operat->rect) && !operat->checked)
+				if (wnd->IsMouseOn(operat->rect) && !operat->checked)
 				{
 					Paint(SP_MOUSEIN);
 
@@ -868,6 +867,10 @@ S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
 		}
 	}
 
+	Font	 font = objectProperties->font;
+
+	font.SetColor(color);
+
 	if (header != NIL && gotTabs)
 	{
 		for (Int i = 0; i < header->GetNOfTabs(); i++)
@@ -898,12 +901,12 @@ S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
 				if (text[p] == '\t') tabCount++;
 			}
 
-			surface->SetText(nText, rRect, objectProperties->font, objectProperties->fontSize, color, objectProperties->fontWeight);
+			surface->SetText(nText, rRect, font);
 		}
 	}
 	else
 	{
-		surface->SetText(text, rect, objectProperties->font, objectProperties->fontSize, color, objectProperties->fontWeight);
+		surface->SetText(text, rect, font);
 	}
 }
 

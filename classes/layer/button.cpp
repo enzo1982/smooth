@@ -157,8 +157,11 @@ S::Int S::GUI::Button::Paint(Int message)
 					textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 				}
 
-				if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-				else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
+				Font	 font = objectProperties->font;
+
+				if (!active) font.SetColor(Setup::GrayTextColor);
+
+				surface->SetText(objectProperties->text, textRect, font);
 			}
 
 			if (bitmap != NIL)
@@ -310,8 +313,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
-			if (message == SM_MOUSEMOVE && !objectProperties->checked && wnd->IsMouseOn(frame))
+			if (!objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = True;
 
@@ -352,7 +354,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 					tipTimer = NIL;
 				}
 			}
-			else if (message == SM_MOUSEMOVE && objectProperties->checked && wnd->IsMouseOn(frame))
+			else if (objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				if (tipTimer != NIL && wParam == 0)
 				{

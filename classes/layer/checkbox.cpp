@@ -31,8 +31,9 @@ S::GUI::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var)
 	type				= OBJ_CHECKBOX;
 	objectProperties->text		= text;
 	variable			= var;
-	objectProperties->fontColor	= Setup::ClientTextColor;
 	state				= *variable;
+
+	objectProperties->font.SetColor(Setup::ClientTextColor);
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -55,7 +56,7 @@ S::GUI::CheckBox::~CheckBox()
 S::Int S::GUI::CheckBox::Paint(Int message)
 {
 	if (!registered)	return Error;
-	if (!visible)		return Success;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
@@ -179,8 +180,11 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-	else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
+	Font	 font = objectProperties->font;
+
+	if (!active) font.SetColor(Setup::GrayTextColor);
+
+	surface->SetText(objectProperties->text, textRect, font);
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -277,8 +281,7 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
-			if (message == SM_MOUSEMOVE && !objectProperties->checked && wnd->IsMouseOn(frame))
+			if (!objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = True;
 				surface->Frame(frame, FRAME_UP);

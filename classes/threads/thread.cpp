@@ -30,8 +30,6 @@ S::Thread::Thread()
 	type		= OBJ_THREAD;
 	status		= THREAD_CREATED;
 	thread		= NIL;
-	killflag	= THREAD_KILLFLAG_KILL;
-	waitflag	= THREAD_WAITFLAG_WAIT;
 
 	possibleContainers.AddEntry(OBJ_APPLICATION);
 
@@ -69,11 +67,16 @@ S::Int S::Thread::GetStatus()
 	return status;
 }
 
+S::Int S::Thread::GetThreadID()
+{
+	return threadID;
+}
+
 S::Int S::Thread::Start()
 {
-	if ((status == THREAD_CREATED && !initializing) || status == THREAD_STARTME || waitflag == THREAD_WAITFLAG_START)
+	if ((status == THREAD_CREATED && !initializing) || status == THREAD_STARTME || (flags & THREAD_WAITFLAG_START))
 	{
-		thread = LiSAThreadCreate((void (*)(void *)) ThreadProcCaller, this);
+		thread = LiSAThreadCreate((unsigned long *) &threadID, (void (*)(void *)) ThreadProcCaller, this);
 
 		status = THREAD_RUNNING;
 		counter++;
@@ -118,26 +121,6 @@ S::Int S::Thread::Stop()
 	{
 		return Error;
 	}
-}
-
-S::Void S::Thread::SetWaitFlag(Int wf)
-{
-	waitflag = wf;
-}
-
-S::Int S::Thread::GetWaitFlag()
-{
-	return waitflag;
-}
-
-S::Void S::Thread::SetKillFlag(Int kf)
-{
-	killflag = kf;
-}
-
-S::Int S::Thread::GetKillFlag()
-{
-	return killflag;
 }
 
 S::Void ThreadProcCaller(S::Thread *thread)

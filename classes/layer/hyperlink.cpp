@@ -31,6 +31,8 @@ S::GUI::Hyperlink::Hyperlink()
 	linkURL		= NIL;
 	linkBitmap	= NIL;
 
+	objectProperties->font.SetUnderline(True);
+
 	possibleContainers.AddEntry(OBJ_LAYER);
 }
 
@@ -40,6 +42,8 @@ S::GUI::Hyperlink::Hyperlink(String text, HBITMAP bitmap, String link, Point pos
 	objectProperties->text	= text;
 	linkURL			= link;
 	linkBitmap		= DetectTransparentRegions(bitmap);
+
+	objectProperties->font.SetUnderline(True);
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -127,7 +131,11 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 				break;
 		}
 
-		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, textColor, objectProperties->fontWeight, TF_UNDERLINE);
+		Font	 font = objectProperties->font;
+
+		font.SetColor(textColor);
+
+		surface->SetText(objectProperties->text, textRect, font);
 	}
 	else
 	{
@@ -181,8 +189,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 			}
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
-			if (message == SM_MOUSEMOVE && wnd->IsMouseOn(textRect) && !objectProperties->checked)
+			if (wnd->IsMouseOn(textRect) && !objectProperties->checked)
 			{
 				objectProperties->checked = True;
 

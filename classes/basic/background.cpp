@@ -9,8 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/background.h>
-#include <smooth/objectmanager.h>
-#include <smooth/window.h>
+#include <smooth/threadmanager.h>
 #include <smooth/timer.h>
 
 S::BackgroundApplication	*S::backgroundApplication = NIL;
@@ -29,14 +28,14 @@ S::BackgroundApplication::~BackgroundApplication()
 
 	delete backgroundTimer;
 }
+#include <smooth/objectmanager.h>
+#include <smooth/window.h>
 
 S::Void S::BackgroundApplication::TimerProc()
 {
-	Object	*object;
-
 	for (Int i = 0; i < Object::objectCount; i++)
 	{
-		object = mainObjectManager->RequestObject(i);
+		Object	*object = mainObjectManager->RequestObject(i);
 
 		if (object != NIL)
 		{
@@ -56,5 +55,10 @@ S::Void S::BackgroundApplication::TimerProc()
 				}
 			}
 		}
+	}
+
+ 	for (Int i = 0; i < mainThreadManager->GetNOfThreads(); i++)
+	{
+		PostThreadMessage(mainThreadManager->GetNthThread(i)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
 	}
 }

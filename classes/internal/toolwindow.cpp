@@ -46,7 +46,7 @@ S::GUI::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
 	owner				= NIL;
 	style				= WS_BORDER | WS_POPUP;
 
-	SetExStyle(WS_EX_TOOLWINDOW);
+	SetFlags(WF_TOPMOST | WF_NOTASKBUTTON);
 }
 
 S::GUI::ToolWindow::~ToolWindow()
@@ -66,32 +66,6 @@ S::Int S::GUI::ToolWindow::FreeOwner()
 	owner = NIL;
 
 	return Success;
-}
-
-HWND S::GUI::ToolWindow::Create()
-{
-	if (registered && !created)
-	{
-		hwnd = CreateSimpleWindow(Rect(objectProperties->pos, objectProperties->size), objectProperties->text, className, sysicon, style, exstyle);
-
-		if (hwnd != NIL)
-		{
-			created = True;
-			visible = False;
-
-			windowDC = GetContext(this);
-
-			drawSurface = new SurfaceGDI(windowDC);
-
-			return hwnd;
-		}
-		else
-		{
-			return NIL;
-		}
-	}
-
-	return NIL;
 }
 
 S::Int S::GUI::ToolWindow::Paint(Int message)
@@ -186,24 +160,10 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 			return 0;
 		case WM_PAINT:
-			if (::GetUpdateRect(hwnd, NULL, 0) == 0)
 			{
-				updateRect.left		= 0;
-				updateRect.top		= 0;
-				updateRect.right	= objectProperties->size.cx;
-				updateRect.bottom	= objectProperties->size.cy;
+				RECT	 uRect = { 0, 0, 0, 0 };
 
-				PAINTSTRUCT	 ps;
-
-				BeginPaint(hwnd, &ps);
-
-				Paint(SP_PAINT);
-
-				EndPaint(hwnd, &ps);
-			}
-			else
-			{
-				RECT	 uRect = updateRect;
+				updateRect = uRect;
 
 				if (::GetUpdateRect(hwnd, &uRect, 0))
 				{
@@ -220,10 +180,6 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 					else																						Paint(SP_UPDATE);
 
 					EndPaint(hwnd, &ps);
-				}
-				else
-				{
-					updateRect = uRect;
 				}
 			}
 

@@ -11,14 +11,13 @@
 #include <smooth/i18n/german.h>
 #include <smooth/i18n.h>
 
-void S::ActivateGermanLanguage()
+S::Void S::ActivateGermanLanguage()
 {
 	String	 inputFormat = String::SetInputFormat("UTF-8");
 
 	TXT_ERROR = "Fehler";
 	TXT_ERROR_OBJECTMANAGEREXISTS = "ObjectManager existiert bereits! Kann keine neue Instanz erzeugen!";
 	TXT_ERROR_THREADMANAGEREXISTS = "ThreadManager existiert bereits! Kann keine neue Instanz erzeugen!";
-	TXT_ERROR_POPUPMANAGEREXISTS = "PopupManager existiert bereits! Kann keine neue Instanz erzeugen!";
 
 	TXT_OK = "OK";
 	TXT_CANCEL = "Abbrechen";

@@ -69,7 +69,7 @@ BeatClock::BeatClock()
 
 	wnd->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
 	wnd->onPaint.Connect(&BeatClock::PaintAll, this);
-	wnd->SetExStyle(WS_EX_TOPMOST|WS_EX_TOOLWINDOW);
+	wnd->SetFlags(WF_TOPMOST | WF_NOTASKBUTTON);
 	wnd->SetMetrics(Point(wpx, wpy), Size(164 * Setup::FontSize, 103 * Setup::FontSize));
 	wnd->onEvent.Connect(&BeatClock::EventProc, this);
 	wnd->Show();
@@ -306,7 +306,6 @@ Void BeatClock::Options()
 	optionsdialog->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
 	optionsdialog->SetMetrics(Point(100, 100), Size(397, 181));
 	optionsdialog->doQuit.Connect(&BeatClock::OptionsKillProc, this);
-	optionsdialog->SetStyle(SS_MODAL);
 
 	oldtf = timeformat;
 	oldct = centi;

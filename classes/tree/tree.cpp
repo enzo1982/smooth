@@ -137,20 +137,14 @@ S::Void S::Tree::GetTreeEntriesSize()
 {
 	if (nOfEntries == 0) return;
 
-	HDC	 hdc = GetContext(0);
-
 	for (Int i = 0; i < nOfEntries; i++)
 	{
 		Tree::Entry	*operat = entries.GetNthEntry(i);
 
-#ifdef __WIN32__
-		if (!operat->sizeset) operat->size = GetTextSizeX(operat->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
-#endif
+		if (!operat->sizeset) operat->size = GetTextSizeX(operat->text, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
 
 		operat->sizeset = True;
 	}
-
-	FreeContext(0, hdc);
 }
 
 S::Int S::Tree::GetNOfEntries()

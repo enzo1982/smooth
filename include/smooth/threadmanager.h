@@ -37,7 +37,9 @@ namespace smooth
 			Int		 UnregisterThread(Thread *);
 
 			Thread		*RequestThread(Int);
+
 			Int		 GetNOfThreads();
+			Thread		*GetNthThread(Int);
 	};
 
 	SMOOTHVAR ThreadManager	*mainThreadManager;

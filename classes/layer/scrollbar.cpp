@@ -502,8 +502,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
-			if (message == SM_MOUSEMOVE && !button1Checked && wnd->IsMouseOn(frame1))
+			if (!button1Checked && wnd->IsMouseOn(frame1))
 			{
 				button1Checked = True;
 
@@ -522,7 +521,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				frame1.right--;
 				frame1.bottom--;
 			}
-			else if (message == SM_MOUSEMOVE && !button2Checked && wnd->IsMouseOn(frame2))
+			else if (!button2Checked && wnd->IsMouseOn(frame2))
 			{
 				button2Checked = True;
 

@@ -32,7 +32,8 @@ S::GUI::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iC
 	objectProperties->text		= text;
 	variable			= var;
 	code				= iCode;
-	objectProperties->fontColor	= Setup::ClientTextColor;
+
+	objectProperties->font.SetColor(Setup::ClientTextColor);
 
 	if (*variable == code)	state = True;
 	else			state = False;
@@ -180,7 +181,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+	surface->SetText(objectProperties->text, textRect, objectProperties->font);
 
 	return Success;
 }
@@ -277,8 +278,7 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-		case SM_MOUSELEAVE:
-			if (message == SM_MOUSEMOVE && !objectProperties->checked && wnd->IsMouseOn(frame))
+			if (!objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = True;
 				surface->Frame(frame, FRAME_UP);
@@ -319,11 +319,15 @@ S::Int S::GUI::OptionBox::SetText(String newText)
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
+	Font	 font = objectProperties->font;
+
+	font.SetColor(Setup::BackgroundColor);
+
+	surface->SetText(objectProperties->text, textRect, font);
 
 	objectProperties->text = newText;
 
-	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+	surface->SetText(objectProperties->text, textRect, objectProperties->font);
 
 	return Success;
 }

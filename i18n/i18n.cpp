@@ -19,26 +19,29 @@
 __declspec (dllexport)
 #endif
 
-int S::DefaultLanguage = S::LNG_ENGLISH;
+S::Int S::DefaultLanguage = S::LNG_ENGLISH;
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-int S::I18N_DEFAULTFONTSIZE;
+S::Int S::I18N_DEFAULTFONTSIZE;
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-int S::I18N_SMALLFONTSIZE;
+S::Int S::I18N_SMALLFONTSIZE;
+
+#ifdef __WIN32__
+__declspec (dllexport)
+#endif
 
 S::String S::I18N_DEFAULTFONT;
 
 S::String S::TXT_ERROR;
 S::String S::TXT_ERROR_OBJECTMANAGEREXISTS;
 S::String S::TXT_ERROR_THREADMANAGEREXISTS;
-S::String S::TXT_ERROR_POPUPMANAGEREXISTS;
 
 S::String S::TXT_OK;
 S::String S::TXT_CANCEL;
@@ -71,12 +74,10 @@ S::String S::TXT_SPLASHSCREEN;
 
 S::String S::TXT_SMOOTHTOOLWINDOW;
 
-int GetSystemLanguage();
-void ActivateLanguage(int);
+S::Void ActivateLanguage(S::Int);
 
-int S::GetDefaultLanguage()
+S::Int S::GetDefaultLanguage()
 {
-#ifdef __WIN32__
 	switch (PRIMARYLANGID(GetUserDefaultLangID()))
 	{
 		default:
@@ -87,32 +88,11 @@ int S::GetDefaultLanguage()
 			DefaultLanguage = LNG_GERMAN;
 			break;
 	}
-#endif
 
 	return DefaultLanguage;
 }
 
-int GetSystemLanguage()
-{
-	int	 systemLanguage = S::LNG_ENGLISH;
-
-#ifdef __WIN32__
-	switch (PRIMARYLANGID(GetSystemDefaultLangID()))
-	{
-		default:
-		case LANG_ENGLISH:
-			systemLanguage = S::LNG_ENGLISH;
-			break;
-		case LANG_GERMAN:
-			systemLanguage = S::LNG_GERMAN;
-			break;
-	}
-#endif
-
-	return systemLanguage;
-}
-
-void ActivateLanguage(int language)
+S::Void ActivateLanguage(S::Int language)
 {
 	switch (language)
 	{

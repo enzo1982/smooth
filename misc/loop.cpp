@@ -41,9 +41,6 @@ __declspec (dllexport) int		 S::iCmdShow		= 0;
 __declspec (dllexport) HICON	 S::SMOOTHICON = NIL;
 #endif
 
-HBITMAP	 S::DEFAULTICON		= NIL;
-HCURSOR	 S::DEFAULTCURSOR	= NIL;
-
 bool	 S::loopActive		= false;
 int	 S::peekLoop		= 0;
 bool	 S::initializing	= true;
@@ -81,10 +78,7 @@ S::Void S::Init()
 
 	codePage = cpInfo.CodePage;
 
-	DEFAULTICON = LoadBitmapA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON));
-	SMOOTHICON = LoadIconA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON));
-
-	DEFAULTCURSOR = LoadCursorA(0, MAKEINTRESOURCEA(32512));
+	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 #endif
 
 	mainObjectManager	= new ObjectManager();
@@ -105,10 +99,6 @@ S::Void S::Init()
 S::Void S::Free()
 {
 	if (--initCount) return;
-
-#ifdef __WIN32__
-	::DeleteObject(DEFAULTICON);
-#endif
 
 	delete backgroundApplication;
 
@@ -265,7 +255,7 @@ S::Int S::Loop()
 
 			if (thread != (Thread *) NIL)
 			{
-				if (thread->GetKillFlag() == THREAD_KILLFLAG_KILL) thread->Stop();
+				if (!(thread->GetFlags() & THREAD_KILLFLAG_WAIT)) thread->Stop();
 			}
 		}
 

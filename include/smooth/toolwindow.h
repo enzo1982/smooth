@@ -39,8 +39,6 @@ namespace smooth
 				Int	 SetOwner(Widget *);
 				Int	 FreeOwner();
 
-				HWND	 Create();
-
 				Int	 Paint(Int);
 				Int	 Process(Int, Int, Int);
 

@@ -9,6 +9,8 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 			- default input format is now ISO-8859-1 again
 - window.cpp		- Paint() now uses SP_UPDATE
 			- added new callback: Menu *getTrackMenu(Int mouseX, Int mouseY)
+			- fixed issues with modal and topmost windows
+			- removed SM_MOUSELEAVE message (functionality is now integrated in Window::IsMouseOn(...))
 - surface.cpp		- modified StartPaint and EndPaint methods
 			- added PaintRect method: updates the requested region
 - pciio.cpp		- read-only files can now be opened
@@ -28,8 +30,12 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 			- slots taking zero parameters can now be connected to any signal
 - titlebar.cpp		- hide min/max buttons if both are inactive
 - editbox.cpp		- added support for dropdown lists with default strings
+- font.cpp		- new class: abstraction of font metrics
+- fontdlg.cpp		- implemented a font selection dialog
+- background.cpp	- messages are now sent to all threads; fixes some problems with multithreaded applications
 
-- many smaller bugfixes
+- introduced a new font management system
+- many bugfixes
 
 16.03.03 07:00 - smooth alpha 0.8.61.0
 

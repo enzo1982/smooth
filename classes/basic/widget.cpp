@@ -26,58 +26,51 @@ S::GUI::Widget::Widget()
 	visible	= False;
 	active	= True;
 
-	flags	= 0;
-
 	subtype	= 0;
+
+	objectProperties->font.SetColor(Setup::TextColor);
 }
 
 S::GUI::Widget::~Widget()
 {
 }
 
-S::Int S::GUI::Widget::SetFlags(Int nFlags)
-{
-	flags = nFlags;
-
-	return Success;
-}
-
-S::Int S::GUI::Widget::GetFlags()
-{
-	return flags;
-}
-
 S::Int S::GUI::Widget::Show()
 {
-	if (visible)		return Success;
+	if (visible) return Success;
 
 	visible = True;
 
-	if (!registered)	return Success;
+	if (!registered) return Success;
 
-	Paint(SP_PAINT);
+	if (IsVisible()) Paint(SP_PAINT);
 
 	return Success;
 }
 
 S::Int S::GUI::Widget::Hide()
 {
-	if (!visible)		return Success;
+	if (!visible) return Success;
+
+	Bool	 wasVisible = IsVisible();
 
 	visible = False;
 
-	if (!registered)	return Success;
+	if (!registered) return Success;
 
-	Rect	 rect;
-	Point	 realPos = GetRealPosition();
-	Surface	*surface = myContainer->GetDrawSurface();
+	if (wasVisible)
+	{
+		Rect	 rect;
+		Point	 realPos = GetRealPosition();
+		Surface	*surface = myContainer->GetDrawSurface();
 
-	rect.left	= realPos.x;
-	rect.top	= realPos.y;
-	rect.right	= realPos.x + objectProperties->size.cx;
-	rect.bottom	= realPos.y + objectProperties->size.cy;
+		rect.left	= realPos.x;
+		rect.top	= realPos.y;
+		rect.right	= realPos.x + objectProperties->size.cx;
+		rect.bottom	= realPos.y + objectProperties->size.cy;
 
-	surface->Box(rect, Setup::BackgroundColor, FILLED);
+		surface->Box(rect, Setup::BackgroundColor, FILLED);
+	}
 
 	return Success;
 }
@@ -86,9 +79,9 @@ S::Int S::GUI::Widget::Activate()
 {
 	if (active) return Success;
 
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (registered && visible) Hide();
+	if (registered && prevVisible) Hide();
 
 	active = True;
 
@@ -101,9 +94,9 @@ S::Int S::GUI::Widget::Deactivate()
 {
 	if (!active) return Success;
 
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (registered && visible) Hide();
+	if (registered && prevVisible) Hide();
 
 	active = False;
 
@@ -130,7 +123,18 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 S::Bool S::GUI::Widget::IsVisible()
 {
-	return visible;
+	if (!registered)	return visible;
+	if (!visible)		return False;
+
+	Bool	 isVisible = True;
+	Object	*container = myContainer->GetContainerObject();
+
+	if (container->GetObjectType() == OBJ_WIDGET)
+	{
+		if (!((Widget *) container)->IsVisible()) isVisible = False;
+	}
+
+	return isVisible;
 }
 
 S::Bool S::GUI::Widget::IsActive()
@@ -140,9 +144,9 @@ S::Bool S::GUI::Widget::IsActive()
 
 S::Int S::GUI::Widget::SetText(String newText)
 {
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (registered && visible) Hide();
+	if (registered && prevVisible) Hide();
 
 	objectProperties->text = newText;
 
@@ -177,22 +181,13 @@ S::String S::GUI::Widget::GetTooltip()
 	return objectProperties->tooltip;
 }
 
-S::Int S::GUI::Widget::SetFont(String newFont, Int newFontSize, Int newFontColor, Int newFontWeight)
+S::Int S::GUI::Widget::SetFont(Font newFont)
 {
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (registered && visible) Hide();
+	if (registered && prevVisible) Hide();
 
 	objectProperties->font = newFont;
-	objectProperties->fontColor = newFontColor;
-
-	HDC	 dc = GetContext(0);
-
-	objectProperties->fontSize = -MulDiv(newFontSize, GetDeviceCaps(dc, LOGPIXELSY), 72);
-
-	FreeContext(0, dc);
-
-	objectProperties->fontWeight = newFontWeight;
 
 	GetTextSize();
 
@@ -203,9 +198,9 @@ S::Int S::GUI::Widget::SetFont(String newFont, Int newFontSize, Int newFontColor
 
 S::Int S::GUI::Widget::SetOrientation(Int newOrientation)
 {
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (registered && visible) Hide();
+	if (registered && prevVisible) Hide();
 
 	objectProperties->orientation = newOrientation;
 
@@ -216,9 +211,9 @@ S::Int S::GUI::Widget::SetOrientation(Int newOrientation)
 
 S::Int S::GUI::Widget::SetPosition(Point newPos)
 {
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (registered && visible) Hide();
+	if (registered && prevVisible) Hide();
 
 	objectProperties->pos = newPos;
 
@@ -229,9 +224,9 @@ S::Int S::GUI::Widget::SetPosition(Point newPos)
 
 S::Int S::GUI::Widget::SetMetrics(Point newPos, Size newSize)
 {
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (registered && visible) Hide();
+	if (registered && prevVisible) Hide();
 
 	objectProperties->pos	= newPos;
 	objectProperties->size	= newSize;

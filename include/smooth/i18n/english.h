@@ -11,9 +11,11 @@
 #ifndef _H_OBJSMOOTH_ENGLISH_
 #define _H_OBJSMOOTH_ENGLISH_
 
+#include "../types/void.h"
+
 namespace smooth
 {
-	void ActivateEnglishLanguage();
+	Void ActivateEnglishLanguage();
 };
 
 #endif

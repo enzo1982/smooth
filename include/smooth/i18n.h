@@ -15,20 +15,18 @@
 
 namespace smooth
 {
-	SMOOTHVAR int DefaultLanguage;
+	SMOOTHVAR Int DefaultLanguage;
 
-	SMOOTHVAR int I18N_DEFAULTFONTSIZE;
-	SMOOTHVAR int I18N_SMALLFONTSIZE;
+	SMOOTHVAR Int I18N_DEFAULTFONTSIZE;
+	SMOOTHVAR Int I18N_SMALLFONTSIZE;
+	SMOOTHVAR String I18N_DEFAULTFONT;
 
 #ifdef __SMOOTH_DLL__
-	int GetDefaultLanguage();
-
-	extern String I18N_DEFAULTFONT;
+	Int GetDefaultLanguage();
 
 	extern String TXT_ERROR;
 	extern String TXT_ERROR_OBJECTMANAGEREXISTS;
 	extern String TXT_ERROR_THREADMANAGEREXISTS;
-	extern String TXT_ERROR_POPUPMANAGEREXISTS;
 
 	extern String TXT_OK;
 	extern String TXT_CANCEL;
@@ -62,8 +60,8 @@ namespace smooth
 	extern String TXT_SMOOTHTOOLWINDOW;
 #endif
 
-	const int LNG_ENGLISH	= 0;
-	const int LNG_GERMAN	= 1;
+	const Int LNG_ENGLISH	= 0;
+	const Int LNG_GERMAN	= 1;
 };
 
 #endif

@@ -16,8 +16,6 @@
 
 S::ObjectProperties::ObjectProperties()
 {
-	HDC	 dc = GetContext(0);
-
 	pos.x		= 0;
 	pos.y		= 0;
 	size.cx		= 100;
@@ -35,14 +33,4 @@ S::ObjectProperties::ObjectProperties()
 
 	checked		= False;
 	clicked		= False;
-
-	font		= I18N_DEFAULTFONT;
-	fontColor	= Setup::TextColor;
-
-#ifdef __WIN32__
-	fontSize	= -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72);
-	fontWeight	= FW_NORMAL;
-#endif
-
-	FreeContext(0, dc);
 }

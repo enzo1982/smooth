@@ -31,16 +31,15 @@ namespace smooth
 	const Int	 THREAD_KILLFLAG_WAIT	= 1;
 
 	const Int	 THREAD_WAITFLAG_WAIT	= 0;
-	const Int	 THREAD_WAITFLAG_START	= 1;
+	const Int	 THREAD_WAITFLAG_START	= 2;
 
 	class SMOOTHAPI Thread : public Object
 	{
 		private:
-			Int			 killflag;
-			Int			 waitflag;
 			Int			 status;
 
 			LiSAThread		*thread;
+			Int			 threadID;
 		public:
 			static Int		 counter;
 
@@ -48,14 +47,10 @@ namespace smooth
 						~Thread();
 
 			Int			 GetStatus();
+			Int			 GetThreadID();
 
 			Int			 Start();
 			Int			 Stop();
-
-			Void			 SetWaitFlag(Int);
-			Int			 GetWaitFlag();
-			Void			 SetKillFlag(Int);
-			Int			 GetKillFlag();
 		callbacks:
 			Callback1<Int, Thread *> threadMain;
 	};

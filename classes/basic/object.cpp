@@ -34,6 +34,8 @@ S::Object::Object()
 	type.object		= this;
 	type			= OBJ_OBJECT;
 
+	flags			= 0;
+
 	registered		= False;
 
 	deleteObject		= False;
@@ -49,6 +51,18 @@ S::Object::~Object()
 	mainObjectManager->UnregisterObject(this);
 
 	delete objectProperties;
+}
+
+S::Int S::Object::SetFlags(Int nFlags)
+{
+	flags = nFlags;
+
+	return Success;
+}
+
+S::Int S::Object::GetFlags()
+{
+	return flags;
 }
 
 S::Int S::Object::EnterProtectedRegion()
@@ -166,18 +180,11 @@ S::Void S::Object::UnsetRegisteredFlag()
 
 S::Void S::Object::GetTextSize()
 {
-	objectProperties->textSize.cx = GetTextSizeX(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-	objectProperties->textSize.cy = GetTextSizeY(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	objectProperties->textSize.cx = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+	objectProperties->textSize.cy = GetTextSizeY(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
 
-#ifdef __WIN32__
-	HDC	 dc = GetWindowDC(0);
-
-	objectProperties->tooltipSize.cx = GetTextSizeX(objectProperties->tooltip, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL);
-	objectProperties->tooltipSize.cy = GetTextSizeY(objectProperties->tooltip, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL);
-
-	ReleaseDC(0, dc);
-	DeleteDC(dc);
-#endif
+	objectProperties->tooltipSize.cx = GetTextSizeX(objectProperties->tooltip, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
+	objectProperties->tooltipSize.cy = GetTextSizeY(objectProperties->tooltip, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
 }
 
 S::Object *S::Object::GetObject(Int objectHandle, Int objectType)

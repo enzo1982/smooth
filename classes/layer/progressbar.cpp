@@ -35,7 +35,8 @@ S::GUI::Progressbar::Progressbar(Point pos, Size size, Int subType, Int iTextFla
 	endValue			= rangeEnd;
 	textFlag			= iTextFlag;
 	value				= (Int) Math::Min(endValue, Math::Max(startValue, iValue));
-	objectProperties->fontColor	= Setup::ClientTextColor;
+
+	objectProperties->font.SetColor(Setup::ClientTextColor);
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -153,19 +154,23 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 				break;
 		}
 
-		textSize = GetTextSizeX(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+		textSize = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
 		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
 		textRect.bottom	= realPos.y + objectProperties->size.cy;
 		textRect.right	= textRect.left + textSize;
 
-		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+		surface->SetText(objectProperties->text, textRect, objectProperties->font);
 
 		if (value > 0)	textRect.right = realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (value - startValue))) + 1;
 		else		textRect.right = 0;
 
-		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+		Font	 font = objectProperties->font;
+
+		font.SetColor(Setup::GradientTextColor);
+
+		surface->SetText(objectProperties->text, textRect, font);
 	}
 
 	return Success;
@@ -220,15 +225,19 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				break;
 		}
 
-		textSize = GetTextSizeX(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+		textSize = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
 		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
 		textRect.bottom	= realPos.y + objectProperties->size.cy;
 		textRect.right	= textRect.left + textSize;
 
-		if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::ClientColor, objectProperties->fontWeight);
-		else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
+		Font	 font = objectProperties->font;
+
+		if (active)	font.SetColor(Setup::ClientColor);
+		else		font.SetColor(Setup::BackgroundColor);
+
+		surface->SetText(objectProperties->text, textRect, font);
 
 		if (textRect.left <= realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (value - startValue))) + 1)
 		{
@@ -340,19 +349,23 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 				break;
 		}
 
-		textSize = GetTextSizeX(objectProperties->text, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+		textSize = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
 		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
 		textRect.bottom	= realPos.y + objectProperties->size.cy;
 		textRect.right	= textRect.left + textSize;
 
-		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+		surface->SetText(objectProperties->text, textRect, objectProperties->font);
 
 		if (value > 0)	textRect.right = realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (value - startValue))) + 1;
 		else		textRect.right = 0;
 
-		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+		Font	 font = objectProperties->font;
+
+		font.SetColor(Setup::GradientTextColor);
+
+		surface->SetText(objectProperties->text, textRect, font);
 	}
 
 	return Success;

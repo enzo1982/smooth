@@ -11,9 +11,11 @@
 #ifndef _H_OBJSMOOTH_GERMAN_
 #define _H_OBJSMOOTH_GERMAN_
 
+#include "../types/void.h"
+
 namespace smooth
 {
-	void ActivateGermanLanguage();
+	Void ActivateGermanLanguage();
 };
 
 #endif

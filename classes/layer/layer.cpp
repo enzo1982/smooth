@@ -54,11 +54,9 @@ S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 	if (!active || !visible)	return Success;
 	if (nOfObjects == 0)		return Success;
 
-	Object	*object;
-
 	for (Int i = nOfObjects - 1; i >= 0; i--)
 	{
-		object = assocObjects.GetNthEntry(i);
+		Object	*object = assocObjects.GetNthEntry(i);
 
 		if (object == NIL) continue;
 
@@ -74,7 +72,7 @@ S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 S::Int S::GUI::Layer::Paint(Int message)
 {
 	if (!registered)	return Error;
-	if (!visible)		return Success;
+	if (!IsVisible())	return Success;
 
 	Window	*wnd = myContainer->GetContainerWindow();
 
@@ -98,11 +96,9 @@ S::Int S::GUI::Layer::Paint(Int message)
 		surface->Box(frame, layerColor, FILLED);
 	}
 
-	Object	*object;
-
 	for (Int i = 0; i < nOfObjects; i++)
 	{
-		object = assocObjects.GetNthEntry(i);
+		Object	*object = assocObjects.GetNthEntry(i);
 
 		if (object == NIL) continue;
 
@@ -125,7 +121,7 @@ S::Int S::GUI::Layer::Show()
 
 	Point	 realPos = GetRealPosition();
 
-	if (layerColor != -1)
+	if (layerColor != -1 && IsVisible())
 	{
 		Surface	*surface = myContainer->GetDrawSurface();
 		Rect	 frame;
@@ -138,17 +134,21 @@ S::Int S::GUI::Layer::Show()
 		surface->Box(frame, layerColor, FILLED);
 	}
 
-	Object	*object;
-
 	for (Int i = 0; i < nOfObjects; i++)
 	{
-		object = assocObjects.GetNthEntry(i);
+		Object	*object = assocObjects.GetNthEntry(i);
 
 		if (object != NIL)
 		{
 			if (object->GetObjectType() == OBJ_WIDGET)
 			{
-				((Widget *) object)->Show();
+				if (((Widget *) object)->IsVisible())
+				{
+					visible = False;
+					((Widget *) object)->Hide();
+					visible = True;
+					((Widget *) object)->Show();
+				}
 			}
 		}
 	}
@@ -160,28 +160,34 @@ S::Int S::GUI::Layer::Hide()
 {
 	if (!visible) return Success;
 
-	visible = False;
-
-	if (!registered) return Success;
-
-	Object	*object;
-	Point	 realPos = GetRealPosition();
-
 	for (Int i = 0; i < nOfObjects; i++)
 	{
-		object = assocObjects.GetNthEntry(i);
+		Object	*object = assocObjects.GetNthEntry(i);
 
 		if (object != NIL)
 		{
 			if (object->GetObjectType() == OBJ_WIDGET)
 			{
-				((Widget *) object)->Hide();
+				if (((Widget *) object)->IsVisible())
+				{
+					((Widget *) object)->Hide();
+					visible = False;
+					((Widget *) object)->Show();
+					visible = True;
+				}
 			}
 		}
 	}
 
-	if (layerColor != -1)
+	Bool	 wasVisible = IsVisible();
+
+	visible = False;
+
+	if (!registered) return Success;
+
+	if (layerColor != -1 && wasVisible)
 	{
+		Point	 realPos = GetRealPosition();
 		Surface	*surface = myContainer->GetDrawSurface();
 		Rect	 frame;
 
@@ -236,7 +242,7 @@ S::Int S::GUI::Layer::RegisterObject(Object *object)
 			if (object->GetObjectType() == OBJ_WIDGET)
 			{
 				((Widget *) object)->onRegister.Emit(this);
-				if (visible) ((Widget *) object)->Show();
+				((Widget *) object)->Show();
 			}
 
 			return Success;
@@ -260,7 +266,7 @@ S::Int S::GUI::Layer::UnregisterObject(Object *object)
 
 				if (object->GetObjectType() == OBJ_WIDGET)
 				{
-					if (visible) ((Widget *) object)->onUnregister.Emit(this);
+					((Widget *) object)->onUnregister.Emit(this);
 					((Widget *) object)->Hide();
 				}
 

@@ -30,6 +30,8 @@
 #include <smooth/system.h>
 #include <smooth/mdiwindow.h>
 #include <smooth/input.h>
+#include <smooth/dllmain.h>
+#include <smooth/resources.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -118,15 +120,10 @@ S::GUI::Window::Window(String title)
 
 	possibleContainers.AddEntry(OBJ_APPLICATION);
 
-	parentWindow = NIL;
-
 	style		= WS_THICKFRAME | WS_SYSMENU | WS_POPUP;
 
 	exstyle		= 0;
-	modal		= False;
-	sysmodal	= False;
 	stay		= False;
-	apptopmost	= False;
 	maximized	= False;
 
 	nOfActiveWindows++;
@@ -144,7 +141,8 @@ S::GUI::Window::Window(String title)
 
 	icon = NIL;
 
-	sysicon = LoadIconA(NIL, MAKEINTRESOURCEA(32512));
+	if (Setup::enableUnicode)	sysicon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+	else				sysicon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
 	created		= False;
 	visible		= False;
@@ -153,11 +151,6 @@ S::GUI::Window::Window(String title)
 
 	objectProperties->size.cx = Math::Round(200 * Setup::FontSize);
 	objectProperties->size.cy = Math::Round(200 * Setup::FontSize);
-
-	updateRect.left		= 0;
-	updateRect.top		= 0;
-	updateRect.right	= updateRect.left + objectProperties->size.cx;
-	updateRect.bottom	= updateRect.top + objectProperties->size.cy;
 
 	popupMenu = NIL;
 
@@ -212,13 +205,6 @@ S::GUI::Window::~Window()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::GUI::Window::SetParentWindow(Window *pWnd)
-{
-	parentWindow = pWnd;
-
-	return Success;
-}
-
 S::Bool S::GUI::Window::DummyExitProc()
 {
 	return True;
@@ -231,42 +217,16 @@ S::Int S::GUI::Window::SetMetrics(Point newPos, Size newSize)
 	objectProperties->size.cx	= Math::Round(newSize.cx * Setup::FontSize);
 	objectProperties->size.cy	= Math::Round(newSize.cy * Setup::FontSize);
 
-	updateRect.left		= 0;
-	updateRect.top		= 0;
-	updateRect.right	= updateRect.left + objectProperties->size.cx;
-	updateRect.bottom	= updateRect.top + objectProperties->size.cy;
+	updateRect = Rect();
 
-	if (created) SetWindowPos(hwnd, 0, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, 0);
+	if (created) SetWindowPos(hwnd, 0, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOZORDER);
 
 	return Success;
 }
 
 S::Void S::GUI::Window::SetStyle(Int s)
 {
-	switch (s)
-	{
-		case SS_MODAL:
-			modal		= True;
-			sysmodal	= False;
-			break;
-		case SS_SYSMODAL:
-			modal		= False;
-			sysmodal	= True;
-			break;
-		case SS_APPTOPMOST:
-			apptopmost	= True;
-
-			if (!created) exstyle = exstyle | WS_EX_TOPMOST;
-
-			break;
-		case SS_NORESIZE:
-			style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
-
-			break;
-		default:
-			if (!created) style = style | s;
-			break;
-	}
+	if (!created) style = style | s;
 }
 
 S::Void S::GUI::Window::SetExStyle(Int es)
@@ -276,7 +236,7 @@ S::Void S::GUI::Window::SetExStyle(Int es)
 
 S::Int S::GUI::Window::SetIcon(HBITMAP newicon)
 {
-	if (newicon == SI_DEFAULT) newicon = DEFAULTICON;
+	if (newicon == SI_DEFAULT) newicon = (HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED);
 
 	if (newicon != NIL)
 	{
@@ -286,9 +246,7 @@ S::Int S::GUI::Window::SetIcon(HBITMAP newicon)
 		}
 		else
 		{
-			newicon = DetectTransparentRegions(newicon);
-
-			icon = newicon;
+			icon = DetectTransparentRegions(newicon);
 
 			return Success;
 		}
@@ -299,18 +257,25 @@ S::Int S::GUI::Window::SetIcon(HBITMAP newicon)
 	}
 }
 
-S::Int S::GUI::Window::SetApplicationIcon(HICON newicon)
+S::Int S::GUI::Window::SetApplicationIcon(char *newicon)
 {
-	sysicon = newicon;
-
-	return Success;
+	return SetApplicationIcon((wchar_t *) newicon);
 }
 
-S::Int S::GUI::Window::SetApplicationIcon(Int newicon)
+S::Int S::GUI::Window::SetApplicationIcon(wchar_t *newicon)
 {
-	HICON	 ic = LoadIconA(hInstance, MAKEINTRESOURCEA(newicon));
+	{ sysicon = NIL; return Success; }
 
-	sysicon = ic;
+	if (newicon == MAKEINTRESOURCEW(32512) || newicon == MAKEINTRESOURCEW(32516) || newicon == MAKEINTRESOURCEW(32515) || newicon == MAKEINTRESOURCEW(32513) || newicon == MAKEINTRESOURCEW(32514) || newicon == MAKEINTRESOURCEW(32517))
+	{
+		if (Setup::enableUnicode)	sysicon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(newicon), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+		else				sysicon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(newicon), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+	}
+	else
+	{
+		if (Setup::enableUnicode)	sysicon = (HICON) LoadImageW(hInstance, MAKEINTRESOURCEW(newicon), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+		else				sysicon = (HICON) LoadImageA(hInstance, MAKEINTRESOURCEA(newicon), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+	}
 
 	return Success;
 }
@@ -370,11 +335,6 @@ S::Int S::GUI::Window::Show()
 	if (!created) Create();
 
 	ShowWindow(hwnd, SW_SHOW);
-
-	if (apptopmost || modal || sysmodal || type == OBJ_TOOLWINDOW)
-	{
-		SetWindowPos(hwnd, HWND_TOPMOST, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE | SWP_SHOWWINDOW);
-	}
 
 	if (maximized && !initshow)
 	{
@@ -507,8 +467,12 @@ S::Int S::GUI::Window::SetMaximumSize(Size newMaxSize)
 
 HWND S::GUI::Window::Create()
 {
-	if (registered)
+	if (registered && !created)
 	{
+		if (flags & WF_NORESIZE)	style	= (style ^ WS_THICKFRAME) | WS_DLGFRAME;
+		if (flags & WF_TOPMOST)		exstyle	= exstyle | WS_EX_TOPMOST;
+		if (flags & WF_NOTASKBUTTON)	exstyle = exstyle | WS_EX_TOOLWINDOW;
+
 		hwnd = CreateSimpleWindow(Rect(objectProperties->pos, objectProperties->size), objectProperties->text, className, sysicon, style, exstyle);
 
 		if (hwnd != NIL)
@@ -543,10 +507,11 @@ S::Int S::GUI::Window::Stay()
 
 	MSG	 msg;
 
+	SetFlags(flags | WF_MODAL);
+
 	if (!created)	Create();
 	if (!visible)	Show();
 
-	modal	= True;
 	stay	= True;
 
 	if (Setup::enableUnicode)	SendMessageW(hwnd, WM_KILLFOCUS, 0, 0);
@@ -610,16 +575,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		DeleteObject(popup);
 	}
 
-	HDC	 dc;
 	Rect	 rect;
-	HWND	 act;
 	Menu	*trackMenu = NIL;
 	Int	 i;
 
 	Object	*object;
-
-	PAINTSTRUCT	 ps;
-	WINDOWPOS	*wndpos;
 
 	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);
 
@@ -699,6 +659,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_CLOSE:
 			if (doQuit.Call())
 			{
+				SetFlags((flags | WF_MODAL) ^ WF_MODAL);
+				SetFlags((flags | WF_SYSTEMMODAL) ^ WF_SYSTEMMODAL);
+
 				delete drawSurface;
 
 				drawSurface = nullSurface;
@@ -756,22 +719,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_PAINT:
-			if (::GetUpdateRect(hwnd, NULL, 0) == 0)
 			{
-				updateRect.left = 0;
-				updateRect.top = 0;
-				updateRect.right = objectProperties->size.cx;
-				updateRect.bottom = objectProperties->size.cy;
+				RECT	 uRect = { 0, 0, 0, 0 };
 
-				dc = BeginPaint(hwnd, &ps);
-
-				Paint(SP_PAINT);
-
-				EndPaint(hwnd, &ps);
-			}
-			else
-			{
-				RECT	 uRect = updateRect;
+				updateRect = uRect;
 
 				if (::GetUpdateRect(hwnd, &uRect, 0))
 				{
@@ -780,16 +731,14 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 					updateRect.right += 5;
 					updateRect.bottom += 5;
 
-					dc = BeginPaint(hwnd, &ps);
+					PAINTSTRUCT	 ps;
+
+					BeginPaint(hwnd, &ps);
 
 					if (Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20)	Paint(SP_PAINT);
 					else																						Paint(SP_UPDATE);
 
 					EndPaint(hwnd, &ps);
-				}
-				else
-				{
-					updateRect = uRect;
 				}
 			}
 
@@ -797,19 +746,21 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			return 0;
 		case WM_WINDOWPOSCHANGED:
-			wndpos = (LPWINDOWPOS) lParam;
+			{
+				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
 
-			objectProperties->pos.x		= wndpos->x;
-			objectProperties->pos.y		= wndpos->y;
-			objectProperties->size.cx	= wndpos->cx;
-			objectProperties->size.cy	= wndpos->cy;
+				objectProperties->pos.x		= wndpos->x;
+				objectProperties->pos.y		= wndpos->y;
+				objectProperties->size.cx	= wndpos->cx;
+				objectProperties->size.cy	= wndpos->cy;
 
-			updateRect.left = 0;
-			updateRect.top = 0;
-			updateRect.right = updateRect.left + objectProperties->size.cx;
-			updateRect.bottom = updateRect.top + objectProperties->size.cy;
+				updateRect.left = 0;
+				updateRect.top = 0;
+				updateRect.right = updateRect.left + objectProperties->size.cx;
+				updateRect.bottom = updateRect.top + objectProperties->size.cy;
 
-			CalculateOffsets();
+				CalculateOffsets();
+			}
 
 			break;
 		case SM_RBUTTONDOWN:
@@ -842,57 +793,83 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				return 0;
 			}
 			break;
-		case SM_MOUSEMOVE:
-			dc = GetContext(this);
-
-			if (!PtVisible(dc, MouseX(), MouseY())) message = SM_MOUSELEAVE;
-
-			FreeContext(this, dc);
-
-			break;
 		case WM_ACTIVATE:
 			if ((LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE) && popupMenu == NIL && PopupMenu::status != POPUP_PENDING) SMOOTH::SendMessage(NIL, SM_CHECKPOPUPS, 0, 0);
 			break;
 		case WM_ACTIVATEAPP:
-			if (apptopmost)
+		case WM_KILLFOCUS:
+			if (flags & WF_MODAL)
 			{
-				if (wParam != 0)
+				Bool	 activate = False;
+				HWND	 actWnd = GetActiveWindow();
+
+				if (actWnd == hwnd) break;
+
+				if (GetWindow(actWnd) == NIL)				activate = False;
+				else if (GetWindow(actWnd)->type == OBJ_TOOLWINDOW)	break;
+				else if (GetWindow(actWnd)->handle < handle)		activate = True;
+				else if (GetWindow(actWnd)->handle > handle)		GetWindow(actWnd)->SetFlags(WF_MODAL);
+
+				if (activate && message == WM_ACTIVATEAPP)
 				{
-					SetWindowPos(hwnd, HWND_TOPMOST, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+					if (wParam)	activate = True;
+					else		activate = False;
 				}
+
+				if (activate && message == WM_KILLFOCUS)
+				{
+					if (GetWindow(SetActiveWindow(hwnd)) != NIL)	activate = True;
+					else						activate = False;
+				}
+
+				if (activate)	SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+				else		SetWindowPos(hwnd, message == WM_KILLFOCUS ? HWND_NOTOPMOST : GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+			}
+
+			if (flags & WF_APPTOPMOST && message == WM_ACTIVATEAPP)
+			{
+				Bool	 activate = False;
+				HWND	 actWnd = GetActiveWindow();
+
+				if (actWnd == hwnd) break;
+
+				if (GetWindow(actWnd) == NIL)				activate = False;
+				else if (GetWindow(actWnd)->type == OBJ_TOOLWINDOW)	break;
+				else							activate = True;
+
+				if (activate)
+				{
+					if (wParam)	activate = True;
+					else		activate = False;
+				}
+
+				if (activate) SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 				else
 				{
-					if (parentWindow != NIL)
-					{
-						SetWindowPos(hwnd, parentWindow->hwnd, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE);
-						SetWindowPos(parentWindow->hwnd, hwnd, parentWindow->objectProperties->pos.x, parentWindow->objectProperties->pos.y, parentWindow->objectProperties->size.cx, parentWindow->objectProperties->size.cy, SWP_NOACTIVATE);
-					}
-					else
-					{
-						SetWindowPos(hwnd, HWND_BOTTOM, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE);
-					}
+					SetWindowPos(hwnd, GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+					SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 				}
 			}
-		case WM_KILLFOCUS:
-			if (sysmodal)
+
+			if (flags & WF_SYSTEMMODAL && message == WM_KILLFOCUS)
 			{
-				act = GetForegroundWindow();
+				Bool	 activate = False;
+				HWND	 actWnd = GetForegroundWindow();
 
-				if (GetWindow(act) == NIL) SetForegroundWindow(hwnd);
-				else if (GetWindow(act)->type == OBJ_TOOLWINDOW) break;
-				else if (act != hwnd && GetWindow(act)->sysmodal == False && GetWindow(act)->modal == False) SetForegroundWindow(hwnd);
-				else if (act != hwnd && GetWindow(act)->handle < handle) SetForegroundWindow(hwnd);
+				if (actWnd == hwnd) break;
+
+				if (GetWindow(actWnd) == NIL)				activate = True;
+				else if (GetWindow(actWnd)->type == OBJ_TOOLWINDOW)	activate = False;
+				else if (GetWindow(actWnd)->handle < handle)		activate = True;
+				else if (GetWindow(actWnd)->handle > handle)		GetWindow(actWnd)->SetFlags(WF_SYSTEMMODAL);
+
+				if (activate)
+				{
+					SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+					SetForegroundWindow(hwnd);
+				}
 			}
-			else if (modal)
-			{
-				act = GetActiveWindow();
 
-				if (GetWindow(act) == NIL) break;
-				else if (GetWindow(act)->type == OBJ_TOOLWINDOW) break;
-
-				if (act != hwnd && GetWindow(act)->modal == False && GetWindow(act)->sysmodal == False) SetActiveWindow(hwnd);
-				else if (act != hwnd && GetWindow(act)->handle < handle) SetActiveWindow(hwnd);
-			}
 			break;
 		case WM_GETMINMAXINFO:
 			if (style & WS_DLGFRAME)
@@ -939,15 +916,17 @@ S::Int S::GUI::Window::Paint(Int message)
 	if (!created)		return Success;
 	if (!visible)		return Success;
 
+	if ((updateRect.right - updateRect.left == 0) || (updateRect.bottom - updateRect.top == 0)) return Success;
+
 	EnterProtectedRegion();
 
 	Surface	*surface = GetDrawSurface();
 	Object	*object;
 
-	if (updateRect.left < 2)				updateRect.left = 2;
-	if (updateRect.top < 2)					updateRect.top = 2;
-	if (objectProperties->size.cx - updateRect.right < 2)	updateRect.right = objectProperties->size.cx - 2;
-	if (objectProperties->size.cy - updateRect.bottom < 2)	updateRect.bottom = objectProperties->size.cy - 2;
+	if (updateRect.left < 2)				updateRect.left		= 2;
+	if (updateRect.top < 2)					updateRect.top		= 2;
+	if (objectProperties->size.cx - updateRect.right < 2)	updateRect.right	= objectProperties->size.cx - 2;
+	if (objectProperties->size.cy - updateRect.bottom < 2)	updateRect.bottom	= objectProperties->size.cy - 2;
 
 	if (message == SP_UPDATE)
 	{
@@ -1214,6 +1193,10 @@ S::Int S::GUI::Window::MouseY()
 
 S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 {
+	Surface	*surface = GetDrawSurface();
+
+	if (!PtVisible(((SurfaceGDI *) surface)->GetContext(), MouseX(), MouseY())) return False;
+
 	if ((MouseX() >= rect.left) && (MouseX() <= rect.right) && (MouseY() >= rect.top) && (MouseY() <= rect.bottom))	return True;
 	else														return False;
 }
@@ -1315,11 +1298,11 @@ S::Int S::GUI::Window::UnregisterObject(Object *object)
 
 S::GUI::Window *S::GUI::Window::GetWindow(HWND hwnd)
 {
-	Window	*window;
+	if (hwnd == NIL) return NIL;
 
-	for (int i = 0; i < Object::objectCount; i++)
+	for (Int i = 0; i < Object::objectCount; i++)
 	{
-		window = (Window *) mainObjectManager->RequestObject(i);
+		Window	*window = (Window *) mainObjectManager->RequestObject(i);
 
 		if (window != NIL)
 		{

@@ -23,7 +23,7 @@ namespace smooth
 {
 	class SMOOTHAPI ObjectType
 	{
-		friend class Object;
+		friend class SMOOTHAPI Object;
 		private:
 			Int		 type;
 			Object		*object;

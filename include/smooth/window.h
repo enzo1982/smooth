@@ -55,16 +55,16 @@ namespace smooth
 
 		class SMOOTHAPI Window : public Widget, public Container
 		{
-			friend		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-			friend class	S::SMOOTH;
-			friend class	Menubar;
-			friend class	Client;
-			friend class	MDIClient;
-			friend class	Divider;
-			friend class	Titlebar;
-			friend class	Layer;
-			friend class	ToolWindow;
-			friend		Int SMOOTHAPI S::Loop();
+			friend LRESULT CALLBACK	WindowProc(HWND, UINT, WPARAM, LPARAM);
+			friend class SMOOTHAPI S::SMOOTH;
+			friend class SMOOTHAPI Menubar;
+			friend class SMOOTHAPI Client;
+			friend class SMOOTHAPI MDIClient;
+			friend class SMOOTHAPI Divider;
+			friend class SMOOTHAPI Titlebar;
+			friend class SMOOTHAPI Layer;
+			friend class SMOOTHAPI ToolWindow;
+			friend Int SMOOTHAPI S::Loop();
 			protected:
 				Int				 style;
 				Int				 exstyle;

@@ -23,7 +23,7 @@ namespace smooth
 {
 	class SMOOTHAPI ContainerType
 	{
-		friend class Container;
+		friend class SMOOTHAPI Container;
 		private:
 			Int		 type;
 			Container	*container;

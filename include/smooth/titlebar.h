@@ -35,8 +35,8 @@ namespace smooth
 
 		class SMOOTHAPI Titlebar : public Widget
 		{
-			friend class Menubar;
-			friend class Window;
+			friend class SMOOTHAPI Menubar;
+			friend class SMOOTHAPI Window;
 			private:
 				Bool			 paintActive;
 				Bool			 minchk;

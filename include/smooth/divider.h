@@ -29,8 +29,8 @@ namespace smooth
 	{
 		class SMOOTHAPI Divider : public Widget
 		{
-			friend class Client;
-			friend class MDIClient;
+			friend class SMOOTHAPI Client;
+			friend class SMOOTHAPI MDIClient;
 			protected:
 				Int			 orientation;
 			public:

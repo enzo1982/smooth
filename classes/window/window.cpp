@@ -228,7 +228,7 @@ S::Int S::GUI::Window::SetMetrics(Point newPos, Size newSize)
 	updateRect.bottom	= updateRect.top + objectProperties->size.cy;
 
 #ifdef __WIN32__
-	if (created) SetWindowPos(hwnd, 0, objectProperties->pos.x, objectProperties->pos.x, objectProperties->size.cx, objectProperties->size.cy, 0);
+	if (created) SetWindowPos(hwnd, 0, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, 0);
 #endif
 
 	return Success;

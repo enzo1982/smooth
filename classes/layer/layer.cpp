@@ -39,6 +39,7 @@ S::GUI::Layer::Layer(String name)
 	layerColor = -1;
 
 	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(OBJ_LAYER);
 	possibleContainers.AddEntry(OBJ_TABREGISTER);
 }
 
@@ -81,15 +82,16 @@ S::Int S::GUI::Layer::Paint(Int message)
 
 	Rect	 updateRect = wnd->GetUpdateRect();
 	Surface	*surface = myContainer->GetDrawSurface();
+	Point	 realPos = GetRealPosition();
 
 	if (layerColor != -1)
 	{
 		Rect	 frame;
 
-		frame.left	= objectProperties->pos.x;
-		frame.top	= objectProperties->pos.y;
-		frame.right	= objectProperties->pos.x + objectProperties->size.cx;
-		frame.bottom	= objectProperties->pos.y + objectProperties->size.cy;
+		frame.left	= realPos.x;
+		frame.top	= realPos.y;
+		frame.right	= realPos.x + objectProperties->size.cx;
+		frame.bottom	= realPos.y + objectProperties->size.cy;
 
 		updateRect = frame;
 
@@ -121,15 +123,17 @@ S::Int S::GUI::Layer::Show()
 
 	if (!registered) return Success;
 
+	Point	 realPos = GetRealPosition();
+
 	if (layerColor != -1)
 	{
 		Surface	*surface = myContainer->GetDrawSurface();
 		Rect	 frame;
 
-		frame.left	= objectProperties->pos.x;
-		frame.top	= objectProperties->pos.y;
-		frame.right	= objectProperties->pos.x + objectProperties->size.cx;
-		frame.bottom	= objectProperties->pos.y + objectProperties->size.cy;
+		frame.left	= realPos.x;
+		frame.top	= realPos.y;
+		frame.right	= realPos.x + objectProperties->size.cx;
+		frame.bottom	= realPos.y + objectProperties->size.cy;
 
 		surface->Box(frame, layerColor, FILLED);
 	}
@@ -161,6 +165,7 @@ S::Int S::GUI::Layer::Hide()
 	if (!registered) return Success;
 
 	Object	*object;
+	Point	 realPos = GetRealPosition();
 
 	for (Int i = 0; i < nOfObjects; i++)
 	{
@@ -180,10 +185,10 @@ S::Int S::GUI::Layer::Hide()
 		Surface	*surface = myContainer->GetDrawSurface();
 		Rect	 frame;
 
-		frame.left	= objectProperties->pos.x;
-		frame.top	= objectProperties->pos.y;
-		frame.right	= objectProperties->pos.x + objectProperties->size.cx;
-		frame.bottom	= objectProperties->pos.y + objectProperties->size.cy;
+		frame.left	= realPos.x;
+		frame.top	= realPos.y;
+		frame.right	= realPos.x + objectProperties->size.cx;
+		frame.bottom	= realPos.y + objectProperties->size.cy;
 
 		surface->Box(frame, Setup::BackgroundColor, FILLED);
 	}
@@ -202,7 +207,7 @@ S::Int S::GUI::Layer::SetColor(Int newColor)
 
 S::Int S::GUI::Layer::SetMetrics(Point pos, Size size)
 {
-	objectProperties->orientation = OR_FREE;
+	if (objectProperties->orientation == OR_CENTER) objectProperties->orientation = OR_FREE;
 
 	return Widget::SetMetrics(pos, size);
 }

@@ -88,6 +88,11 @@ $(OBJECTDIR)/checkbox.o: $(LAYERCLASSESDIR)/checkbox.cpp $(SMOOTHINCLUDEDIR)/che
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/checkbox.cpp -o $(OBJECTDIR)/checkbox.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/droparea.o: $(LAYERCLASSESDIR)/droparea.cpp $(SMOOTHINCLUDEDIR)/droparea.h
+	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/droparea.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/droparea.cpp -o $(OBJECTDIR)/droparea.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/editbox.o: $(LAYERCLASSESDIR)/editbox.cpp $(SMOOTHINCLUDEDIR)/editbox.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/editbox.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/editbox.cpp -o $(OBJECTDIR)/editbox.o

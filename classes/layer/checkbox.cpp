@@ -182,6 +182,11 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 	else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
 
+	frame.left	= realPos.x;
+	frame.top	= realPos.y;
+	frame.right	= frame.left + objectProperties->size.cx;
+	frame.bottom	= frame.top + objectProperties->size.cy;
+
 	if (objectProperties->checked) surface->Frame(frame, FRAME_UP);
 
 	return Success;

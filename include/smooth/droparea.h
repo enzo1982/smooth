@@ -35,7 +35,9 @@ namespace smooth
 							 DropArea(Point, Size);
 							~DropArea();
 
-				Int			 Process(Int, Int, Int);
+				virtual Int		 Hide();
+
+				virtual Int		 Process(Int, Int, Int);
 			signals:
 				Signal1<Void, String *>	 onDropFile;
 		};

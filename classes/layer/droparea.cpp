@@ -60,6 +60,17 @@ S::Void S::GUI::DropArea::Init()
 	DragAcceptFiles(wnd->hwnd, True);
 }
 
+S::Int S::GUI::DropArea::Hide()
+{
+	if (!visible)		return Success;
+
+	visible = False;
+
+	if (!registered)	return Success;
+
+	return Success;
+}
+
 S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;

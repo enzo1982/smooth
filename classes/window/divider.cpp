@@ -47,6 +47,28 @@ S::GUI::Divider::~Divider()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
+S::Int S::GUI::Divider::SetPos(Int pos)
+{
+	Bool	 prevVisible = visible;
+
+	if (registered && visible) Hide();
+
+	if (Binary::IsFlagSet(orientation, OR_HORZ))		objectProperties->pos.y = pos;
+	else if (Binary::IsFlagSet(orientation, OR_VERT))	objectProperties->pos.x = pos;
+
+	if (registered && prevVisible) Show();
+
+	return Success;
+}
+
+S::Int S::GUI::Divider::GetPos()
+{
+	if (Binary::IsFlagSet(orientation, OR_HORZ))		return objectProperties->pos.y;
+	else if (Binary::IsFlagSet(orientation, OR_VERT))	return objectProperties->pos.x;
+
+	return 0;
+}
+
 S::Int S::GUI::Divider::Paint(Int message)
 {
 	if (!registered)	return Error;
@@ -106,7 +128,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 						{
 							if (Binary::IsFlagSet(operat->orientation, OR_LEFT))
 							{
-								if (operat->GetObjectProperties()->pos.x >= doubleBar1.x-2) doubleBar1.x = operat->GetObjectProperties()->pos.x + 3;
+								if (operat->GetObjectProperties()->pos.x >= doubleBar1.x - 2) doubleBar1.x = operat->GetObjectProperties()->pos.x + 3;
 							}
 							else
 							{

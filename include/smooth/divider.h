@@ -37,6 +37,9 @@ namespace smooth
 						 Divider(Int, Int);
 						~Divider();
 
+				Int		 SetPos(Int);
+				Int		 GetPos();
+
 				virtual Int	 Paint(Int);
 		};
 	};

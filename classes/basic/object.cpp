@@ -80,27 +80,47 @@ S::Point S::Object::GetRealPosition()
 {
 	if (!registered) return objectProperties->pos;
 
-	GUI::Layer	*layer = NIL;
 	Point		 realPos = objectProperties->pos;
 
-	if (myContainer->GetContainerObject()->GetObjectType() == OBJ_LAYER)	layer = (GUI::Layer *) myContainer->GetContainerObject();
-	else									return realPos;
+	if (myContainer->GetContainerObject()->GetObjectType() == OBJ_LAYER)
+	{
+		GUI::Layer	*layer = (GUI::Layer *) myContainer->GetContainerObject();
+		Point		 layerPos = layer->GetRealPosition();
 
-	realPos.x = layer->GetObjectProperties()->pos.x + objectProperties->pos.x;
-	realPos.y = layer->GetObjectProperties()->pos.y + objectProperties->pos.y;
+		realPos.x = layerPos.x + objectProperties->pos.x;
+		realPos.y = layerPos.y + objectProperties->pos.y;
 
-	if (objectProperties->orientation == OR_UPPERRIGHT)
-	{
-		realPos.x = layer->GetObjectProperties()->pos.x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
+		if (objectProperties->orientation == OR_UPPERRIGHT)
+		{
+			realPos.x = layerPos.x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
+		}
+		else if (objectProperties->orientation == OR_LOWERLEFT)
+		{
+			realPos.y = layerPos.y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+		}
+		else if (objectProperties->orientation == OR_LOWERRIGHT)
+		{
+			realPos.x = layerPos.x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
+			realPos.y = layerPos.y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+		}
 	}
-	else if (objectProperties->orientation == OR_LOWERLEFT)
+	else
 	{
-		realPos.y = layer->GetObjectProperties()->pos.y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
-	}
-	else if (objectProperties->orientation == OR_LOWERRIGHT)
-	{
-		realPos.x = layer->GetObjectProperties()->pos.x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
-		realPos.y = layer->GetObjectProperties()->pos.y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+		Object	*container = myContainer->GetContainerObject();
+
+		if (objectProperties->orientation == OR_UPPERRIGHT)
+		{
+			realPos.x = container->GetObjectProperties()->size.cx - objectProperties->pos.x;
+		}
+		else if (objectProperties->orientation == OR_LOWERLEFT)
+		{
+			realPos.y = container->GetObjectProperties()->size.cy - objectProperties->pos.y;
+		}
+		else if (objectProperties->orientation == OR_LOWERRIGHT)
+		{
+			realPos.x = container->GetObjectProperties()->size.cx - objectProperties->pos.x;
+			realPos.y = container->GetObjectProperties()->size.cy - objectProperties->pos.y;
+		}
 	}
 
 	return realPos;

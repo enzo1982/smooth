@@ -39,12 +39,17 @@ namespace smooth
 				Rect		 paintRect;
 
 				Int		 painting;
+
+				Int		 TranslateX(Int);
+				Point		 TranslatePoint(Point);
+				Rect		 TranslateRect(Rect);
 			public:
 						 Surface();
 				virtual		~Surface();
 
 				Int		 GetSurfaceType();
 
+				Int		 SetSize(Size);
 				Size		 GetSize();
 
 				virtual Int	 PaintRect(Rect);

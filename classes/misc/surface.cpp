@@ -31,9 +31,34 @@ S::GUI::Surface::~Surface()
 {
 }
 
+S::Int S::GUI::Surface::TranslateX(Int x)
+{
+	if (Setup::rightToLeft)	return size.cx - x;
+	else			return x;
+}
+
+S::Point S::GUI::Surface::TranslatePoint(Point p)
+{
+	if (Setup::rightToLeft)	return Point(size.cx - p.x, p.y);
+	else			return p;
+}
+
+S::Rect S::GUI::Surface::TranslateRect(Rect r)
+{
+	if (Setup::rightToLeft)	return Rect(Point(size.cx - r.right, r.top), Size(r.right - r.left, r.bottom - r.top));
+	else			return r;
+}
+
 S::Int S::GUI::Surface::GetSurfaceType()
 {
 	return type;
+}
+
+S::Int S::GUI::Surface::SetSize(Size nSize)
+{
+	size = nSize;
+
+	return Success;
 }
 
 S::Size S::GUI::Surface::GetSize()
@@ -84,6 +109,13 @@ S::Int S::GUI::Surface::Frame(Rect rect, Int style)
 	Point	 p3;
 	Point	 p4;
 
+	if (Setup::rightToLeft)
+	{
+		rect = TranslateRect(rect);
+		rect.left--;
+		rect.right--;
+	}
+
 	p1.x = rect.left;
 	p1.y = rect.top;
 	p2.x = rect.right;
@@ -110,11 +142,17 @@ S::Int S::GUI::Surface::Frame(Rect rect, Int style)
 		break;
 	}
 
+	Bool	 preRTL = Setup::rightToLeft;
+
+	Setup::rightToLeft = False;
+
 	Line(p1, p2, color1);
 	Line(p1, p3, color1);
 	Line(p2, p4, color2);
 	p4.x++;
 	Line(p3, p4, color2);
+
+	Setup::rightToLeft = preRTL;
 
 	return Success;
 }
@@ -176,13 +214,27 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 			Float	 biasg = (green2 - green1) / xmax;
 			Float	 biasb = (blue2 - blue1) / xmax;
 
-			for (Int x = 0; x < xmax; x++)
+			if (Setup::rightToLeft)
 			{
-				red1	= red1 + biasr;
-				green1	= green1 + biasg;
-				blue1	= blue1 + biasb;
+				for (Int x = xmax - 1; x >= 0; x--)
+				{
+					red1	= red1 + biasr;
+					green1	= green1 + biasg;
+					blue1	= blue1 + biasb;
 
-				for (Int y = 0; y < ymax; y++) pic->SetPixel(x, y, CombineColor(red1, green1, blue1));
+					for (Int y = 0; y < ymax; y++) pic->SetPixel(x, y, CombineColor(red1, green1, blue1));
+				}
+			}
+			else
+			{
+				for (Int x = 0; x < xmax; x++)
+				{
+					red1	= red1 + biasr;
+					green1	= green1 + biasg;
+					blue1	= blue1 + biasb;
+
+					for (Int y = 0; y < ymax; y++) pic->SetPixel(x, y, CombineColor(red1, green1, blue1));
+				}
 			}
 		}
 		break;
@@ -221,6 +273,23 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 
 S::Int S::GUI::Surface::Bar(Point p1, Point p2, Int orientation)
 {
+	if (Setup::rightToLeft && orientation == OR_HORZ)
+	{
+		Point	 px = TranslatePoint(p1);
+
+		p1 = TranslatePoint(p2);
+		p2 = px;
+	}
+	else
+	{
+		p1 = TranslatePoint(p1);
+		p2 = TranslatePoint(p2);
+	}
+
+	Bool	 preRTL = Setup::rightToLeft;
+
+	Setup::rightToLeft = False;
+
 	if (orientation == OR_HORZ)
 	{
 		Line(p1, p2, RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0)));
@@ -238,6 +307,8 @@ S::Int S::GUI::Surface::Bar(Point p1, Point p2, Int orientation)
 		p2.x++;
 		Line(p1, p2, RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255)));
 	}
+
+	Setup::rightToLeft = preRTL;
 
 	return Success;
 }

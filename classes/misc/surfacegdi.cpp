@@ -105,21 +105,24 @@ HDC S::GUI::SurfaceGDI::GetContext()
 
 S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 {
-	::SetPixel(gdi_dc, x, y, color);
-	::SetPixel(bmp_dc, x, y, color);
+	::SetPixel(gdi_dc, TranslateX(x), y, color);
+	::SetPixel(bmp_dc, TranslateX(x), y, color);
 
 	return Success;
 }
 
 S::Int S::GUI::SurfaceGDI::GetPixel(Int x, Int y)
 {
-	return ::GetPixel(gdi_dc, x, y);
+	return ::GetPixel(gdi_dc, TranslateX(x), y);
 }
 
 S::Int S::GUI::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
 {
 	HPEN	 hPen = CreatePen(PS_SOLID, 1, color);
 	HPEN	 hOldPen = (HPEN) SelectObject(gdi_dc, hPen);
+
+	pos1 = TranslatePoint(pos1);
+	pos2 = TranslatePoint(pos2);
 
 	MoveToEx(gdi_dc, pos1.x, pos1.y, NIL);
 	LineTo(gdi_dc, pos2.x, pos2.y);
@@ -140,6 +143,8 @@ S::Int S::GUI::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
 
 S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 {
+	rect = TranslateRect(rect);
+
 	HBRUSH	 brush = CreateSolidBrush(color);
 	RECT	 wRect = rect;
 
@@ -268,7 +273,15 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font)
 			}
 		}
 
-		RECT	 Rect = rect;
+		rect.right = rect.left + GetTextSizeX(line, font.GetName(), font.GetSize(), font.GetWeight());
+
+		RECT	 Rect = TranslateRect(rect);
+
+		if (Setup::rightToLeft)
+		{
+			Rect.left--;
+			Rect.right--;
+		}
 
 		if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
 		else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
@@ -292,6 +305,8 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect des
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);
 
+	destRect = TranslateRect(destRect);
+
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
 		BitBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
@@ -314,6 +329,8 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destR
 {
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);
+
+	srcRect = TranslateRect(srcRect);
 
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{

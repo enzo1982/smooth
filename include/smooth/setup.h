@@ -47,6 +47,7 @@ namespace smooth
 			static Int	 TooltipTextColor;
 
 			static Bool	 enableUnicode;
+			static Bool	 rightToLeft;
 
 			static Float	 FontSize;
 	};

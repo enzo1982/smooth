@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 xx.xx.03 xx:xx - smooth alpha 0.8.63.0
 
+- added support for right-to-left scripts like Arabic or Hebrew
 - smaller improvements
 
 03.07.03 17:13 - smooth alpha 0.8.62.0

@@ -201,6 +201,8 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 				objectProperties->pos.y		= wndPos->y;
 				objectProperties->size.cx	= wndPos->cx;
 				objectProperties->size.cy	= wndPos->cy;
+
+				drawSurface->SetSize(objectProperties->size);
 			}
 
 			updateRect.left		= 0;

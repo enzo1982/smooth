@@ -766,6 +766,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				objectProperties->size.cx	= wndpos->cx;
 				objectProperties->size.cy	= wndpos->cy;
 
+				drawSurface->SetSize(objectProperties->size);
+
 				if (resized)
 				{
 					updateRect.left = 0;
@@ -994,6 +996,7 @@ S::Int S::GUI::Window::Paint(Int message)
 						doublebar2.y = doublebar1.y;
 
 						if (icon != NIL) doublebar1.x += METRIC_TITLEBARHEIGHT - 2;
+						if (Setup::rightToLeft) doublebar1.x++;
 
 						surface->Bar(doublebar1, doublebar2, OR_HORZ);
 					}
@@ -1245,6 +1248,8 @@ S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 	if (surface->GetSurfaceType() != SURFACE_GDI) return False;
 
 	if (!PtVisible(((SurfaceGDI *) surface)->GetContext(), MouseX(), MouseY())) return False;
+
+	if (Setup::rightToLeft) rect = Rect(Point(objectProperties->size.cx - rect.right - 1, rect.top), Size(rect.right - rect.left, rect.bottom - rect.top));
 
 	if ((MouseX() >= rect.left) && (MouseX() <= rect.right) && (MouseY() >= rect.top) && (MouseY() <= rect.bottom))	return True;
 	else														return False;

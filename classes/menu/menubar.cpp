@@ -95,6 +95,12 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			doublebar2.x = doublebar1.x;
 		}
 
+		if (Setup::rightToLeft)
+		{
+			doublebar1.x += 2;
+			doublebar2.x += 2;
+		}
+
 		surface->Bar(doublebar1, doublebar2, OR_VERT);
 
 		doublebar1.x = doublebar1.x + 2;
@@ -130,6 +136,12 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				doublebar1.y = menubar.top + 2;
 				doublebar2.x = doublebar1.x;
 				doublebar2.y = menubar.bottom;
+
+				if (Setup::rightToLeft)
+				{
+					doublebar1.x += 2;
+					doublebar2.x += 2;
+				}
 
 				surface->Bar(doublebar1, doublebar2, OR_VERT);
 
@@ -260,6 +272,12 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				doublebar1.y = menubar.top + 2;
 				doublebar2.x = doublebar1.x;
 				doublebar2.y = menubar.bottom;
+
+				if (Setup::rightToLeft)
+				{
+					doublebar1.x += 2;
+					doublebar2.x += 2;
+				}
 
 				surface->Bar(doublebar1, doublebar2, OR_VERT);
 

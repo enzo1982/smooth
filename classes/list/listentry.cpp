@@ -20,6 +20,8 @@ S::ListEntry::ListEntry(Int entryID)
 	selected	= False;
 
 	size		= -1;
+
+	font.SetColor(Setup::ClientTextColor);
 }
 
 S::ListEntry::~ListEntry()

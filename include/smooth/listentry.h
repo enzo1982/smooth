@@ -13,6 +13,7 @@
 
 #include "object.h"
 #include "rect.h"
+#include "font.h"
 
 namespace smooth
 {
@@ -27,6 +28,8 @@ namespace smooth
 			Bool		 selected;
 			Int		 size;
 			Rect		 rect;
+
+			GUI::Font	 font;
 
 					 ListEntry(Int);
 					~ListEntry();

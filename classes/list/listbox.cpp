@@ -54,14 +54,14 @@ S::GUI::ListBox::~ListBox()
 {
 	if (scrollbar != NIL)
 	{
-		if (myContainer != NIL) myContainer->UnregisterObject(scrollbar);
+		if (scrollbar->IsRegistered() && myContainer != NIL) myContainer->UnregisterObject(scrollbar);
 
 		DeleteObject(scrollbar);
 	}
 
 	if (header != NIL)
 	{
-		if (myContainer != NIL && !(flags & LF_HIDEHEADER)) myContainer->UnregisterObject(header);
+		if (registered && myContainer != NIL && !(flags & LF_HIDEHEADER)) myContainer->UnregisterObject(header);
 
 		DeleteObject(header);
 	}
@@ -428,7 +428,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 						frame.left += (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
-						DrawEntryText(operat->name, frame, objectProperties->font.GetColor());
+						DrawEntryText(operat->name, frame, operat->font.GetColor());
 						frame.left -= (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
 					}
@@ -602,7 +602,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					operat->rect.left += (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top++;
-					DrawEntryText(operat->name, operat->rect, objectProperties->font.GetColor());
+					DrawEntryText(operat->name, operat->rect, operat->font.GetColor());
 					operat->rect.left -= (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top--;
 

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,28 +11,32 @@
 #ifndef _H_OBJSMOOTH_OPTIONBOX_
 #define _H_OBJSMOOTH_OPTIONBOX_
 
-#define SOptionBox SMOOTHOptionBox
-
-class SMOOTHOptionBox;
+namespace smooth
+{
+	class OptionBox;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHOptionBox : public SMOOTHObject
+namespace smooth
 {
-	protected:
-		SMOOTHInt		*variable;
-		SMOOTHInt		 code;
-		SMOOTHBool		 state;
-	public:
-					 SMOOTHOptionBox(SMOOTHString, SMOOTHPoint, SMOOTHSize, SMOOTHInt *, SMOOTHInt, SMOOTHProcParam, SMOOTHVoid *);
-					~SMOOTHOptionBox();
+	class SMOOTHAPI OptionBox : public Object
+	{
+		protected:
+			Int		*variable;
+			Int		 code;
+			Bool		 state;
+		public:
+					 OptionBox(String, Point, Size, Int *, Int, ProcParam, Void *);
+					~OptionBox();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
 
-		SMOOTHInt		 SetText(SMOOTHString);
+			Int		 SetText(String);
+	};
+
+	SMOOTHVAR Int OBJ_OPTIONBOX;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_OPTIONBOX;
 
 #endif

@@ -8,7 +8,7 @@
   This file is a part of bzip2 and/or libbzip2, a program and
   library for lossless, block-sorting data compression.
 
-  Copyright (C) 1996-2000 Julian R Seward.  All rights reserved.
+  Copyright (C) 1996-2002 Julian R Seward.  All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -76,7 +76,7 @@
 
 /*-- General stuff. --*/
 
-#define BZ_VERSION  "1.0.1, 23-June-2000"
+#define BZ_VERSION  "1.0.2, 30-Dec-2001"
 
 typedef char            Char;
 typedef unsigned char   Bool;
@@ -93,10 +93,57 @@ typedef unsigned short  UInt16;
 #define __inline__  /* */
 #endif 
 
+#ifndef BZ_NO_STDIO
+extern void BZ2_bz__AssertH__fail ( int errcode );
+#define AssertH(cond,errcode) \
+   { if (!(cond)) BZ2_bz__AssertH__fail ( errcode ); }
+#if BZ_DEBUG
+#define AssertD(cond,msg) \
+   { if (!(cond)) {       \
+      fprintf ( stderr,   \
+        "\n\nlibbzip2(debug build): internal error\n\t%s\n", msg );\
+      exit(1); \
+   }}
+#else
+#define AssertD(cond,msg) /* */
+#endif
+#define VPrintf0(zf) \
+   fprintf(stderr,zf)
+#define VPrintf1(zf,za1) \
+   fprintf(stderr,zf,za1)
+#define VPrintf2(zf,za1,za2) \
+   fprintf(stderr,zf,za1,za2)
+#define VPrintf3(zf,za1,za2,za3) \
+   fprintf(stderr,zf,za1,za2,za3)
+#define VPrintf4(zf,za1,za2,za3,za4) \
+   fprintf(stderr,zf,za1,za2,za3,za4)
+#define VPrintf5(zf,za1,za2,za3,za4,za5) \
+   fprintf(stderr,zf,za1,za2,za3,za4,za5)
+#else
+extern void bz_internal_error ( int errcode );
+#define AssertH(cond,errcode) \
+   { if (!(cond)) bz_internal_error ( errcode ); }
+#define AssertD(cond,msg) /* */
+#define VPrintf0(zf) /* */
+#define VPrintf1(zf,za1) /* */
+#define VPrintf2(zf,za1,za2) /* */
+#define VPrintf3(zf,za1,za2,za3) /* */
+#define VPrintf4(zf,za1,za2,za3,za4) /* */
+#define VPrintf5(zf,za1,za2,za3,za4,za5) /* */
+#endif
+
+
 #define BZALLOC(nnn) (strm->bzalloc)(strm->opaque,(nnn),1)
 #define BZFREE(ppp)  (strm->bzfree)(strm->opaque,(ppp))
 
 
+/*-- Header bytes. --*/
+
+#define BZ_HDR_B 0x42   /* 'B' */
+#define BZ_HDR_Z 0x5a   /* 'Z' */
+#define BZ_HDR_h 0x68   /* 'h' */
+#define BZ_HDR_0 0x30   /* '0' */
+  
 /*-- Constants for the back end. --*/
 
 #define BZ_MAX_ALPHA_SIZE 258

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,26 +11,30 @@
 #ifndef _H_OBJSMOOTH_OBJECTMANAGER_
 #define _H_OBJSMOOTH_OBJECTMANAGER_
 
-#define SObjectManager SMOOTHObjectManager
-
-class SMOOTHObjectManager;
+namespace smooth
+{
+	class ObjectManager;
+};
 
 #include "application.h"
 #include "container.h"
 
-class SMOOTHAPI SMOOTHObjectManager : public SMOOTHContainer
+namespace smooth
 {
-	protected:
-		static SMOOTHBool	 objectManagerExists;
-		SMOOTHBool		 iAmTheOne;
-	public:
-					 SMOOTHObjectManager();
-					~SMOOTHObjectManager();
+	class SMOOTHAPI ObjectManager : public Container
+	{
+		protected:
+			static Bool	 objectManagerExists;
+			Bool		 iAmTheOne;
+		public:
+					 ObjectManager();
+					~ObjectManager();
 
-		SMOOTHInt		 RegisterObject(SMOOTHObject *);
-		SMOOTHInt		 UnregisterObject(SMOOTHObject *);
+			Int		 RegisterObject(Object *);
+			Int		 UnregisterObject(Object *);
+	};
+
+	SMOOTHVAR ObjectManager	*mainObjectManager;
 };
-
-SMOOTHVAR SMOOTHObjectManager	*mainObjectManager;
 
 #endif

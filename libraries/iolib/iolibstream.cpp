@@ -32,9 +32,6 @@
 
 IOLibStream::IOLibStream()
 {
-	NULLDRIVER = new IOLibDriver();
-	NULLFILTER = new IOLibFilter();
-
 	streamType	= STREAM_NONE;
 	size		= 0;
 	currentFilePos	= 0;
@@ -45,8 +42,8 @@ IOLibStream::IOLibStream()
 	data		= NULL;
 	closefile	= true;
 	crosslinked	= false;
-	driver		= NULLDRIVER;
-	filter		= NULLFILTER;
+	driver		= NULL;
+	filter		= NULL;
 	allowpackset	= true;
 	packageSize	= DEFAULT_PACKAGE_SIZE;
 	stdpacksize	= packageSize;
@@ -58,8 +55,6 @@ IOLibStream::IOLibStream()
 
 IOLibStream::~IOLibStream()
 {
-	delete NULLDRIVER;
-	delete NULLFILTER;
 }
 
 int IOLibStream::GetStreamType()

@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="SMOOTHTest" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="smoothTest" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** NICHT BEARBEITEN **
 
 # TARGTYPE "Win32 (x86) Application" 0x0101
 
-CFG=SMOOTHTest - Win32 Debug
+CFG=smoothTest - Win32 Debug
 !MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
 !MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
 !MESSAGE 
-!MESSAGE NMAKE /f "SMOOTHTest.mak".
+!MESSAGE NMAKE /f "smoothTest.mak".
 !MESSAGE 
 !MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
 !MESSAGE 
-!MESSAGE NMAKE /f "SMOOTHTest.mak" CFG="SMOOTHTest - Win32 Debug"
+!MESSAGE NMAKE /f "smoothTest.mak" CFG="smoothTest - Win32 Debug"
 !MESSAGE 
 !MESSAGE Für die Konfiguration stehen zur Auswahl:
 !MESSAGE 
-!MESSAGE "SMOOTHTest - Win32 Release" (basierend auf  "Win32 (x86) Application")
-!MESSAGE "SMOOTHTest - Win32 Debug" (basierend auf  "Win32 (x86) Application")
+!MESSAGE "smoothTest - Win32 Release" (basierend auf  "Win32 (x86) Application")
+!MESSAGE "smoothTest - Win32 Debug" (basierend auf  "Win32 (x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -29,7 +29,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "SMOOTHTest - Win32 Release"
+!IF  "$(CFG)" == "smoothTest - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -54,17 +54,17 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
 
-!ELSEIF  "$(CFG)" == "SMOOTHTest - Win32 Debug"
+!ELSEIF  "$(CFG)" == "smoothTest - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "SMOOTHTest___Win32_Debug"
-# PROP BASE Intermediate_Dir "SMOOTHTest___Win32_Debug"
+# PROP BASE Output_Dir "smoothTest___Win32_Debug"
+# PROP BASE Intermediate_Dir "smoothTest___Win32_Debug"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "Build"
-# PROP Intermediate_Dir "SMOOTHTest___Win32_Debug"
+# PROP Intermediate_Dir "smoothTest___Win32_Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
@@ -84,8 +84,8 @@ LINK32=link.exe
 
 # Begin Target
 
-# Name "SMOOTHTest - Win32 Release"
-# Name "SMOOTHTest - Win32 Debug"
+# Name "smoothTest - Win32 Release"
+# Name "smoothTest - Win32 Debug"
 # Begin Group "Quellcodedateien"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"

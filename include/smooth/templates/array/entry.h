@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,24 +11,27 @@
 #ifndef _H_SMOOTHARRAY_ENTRY_
 #define _H_SMOOTHARRAY_ENTRY_
 
-#define SArray_Entry SMOOTHArray_Entry
-
 #include "value.h"
 
-template <class t> class SMOOTHArray_Entry : public SMOOTHArray_Value<t>
+namespace smooth
 {
-	private:
-		SMOOTHArray_Entry<t>		*nextEntry;
-		SMOOTHArray_Entry<t>		*prevEntry;
-	public:
-		bool				 gotNext;
-		bool				 gotPrev;
-						 SMOOTHArray_Entry();
-						~SMOOTHArray_Entry();
-		bool				 SetNext(SMOOTHArray_Entry<t> *);
-		bool				 SetPrev(SMOOTHArray_Entry<t> *);
-		inline SMOOTHArray_Entry<t>	*GetNext();
-		inline SMOOTHArray_Entry<t>	*GetPrev();
+	template <class t> class Array_Entry : public Array_Value<t>
+	{
+		private:
+			Array_Entry<t>	*nextEntry;
+			Array_Entry<t>	*prevEntry;
+		public:
+			Bool			 gotNext;
+			Bool			 gotPrev;
+
+						 Array_Entry();
+						~Array_Entry();
+
+			Bool			 SetNext(Array_Entry<t> *);
+			Bool			 SetPrev(Array_Entry<t> *);
+			inline Array_Entry<t>	*GetNext();
+			inline Array_Entry<t>	*GetPrev();
+	};
 };
 
 #endif

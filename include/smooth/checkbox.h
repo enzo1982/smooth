@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,25 +11,29 @@
 #ifndef _H_OBJSMOOTH_CHECKBOX_
 #define _H_OBJSMOOTH_CHECKBOX_
 
-#define SCheckBox SMOOTHCheckBox
-
-class SMOOTHCheckBox;
+namespace smooth
+{
+	class CheckBox;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHCheckBox : public SMOOTHObject
+namespace smooth
 {
-	protected:
-		SMOOTHBool		*variable;
-		SMOOTHBool		 state;
-	public:
-					 SMOOTHCheckBox(SMOOTHString, SMOOTHPoint, SMOOTHSize, SMOOTHBool *, SMOOTHProcParam, SMOOTHVoid *);
-					~SMOOTHCheckBox();
+	class SMOOTHAPI CheckBox : public Object
+	{
+		protected:
+			Bool		*variable;
+			Bool		 state;
+		public:
+					 CheckBox(String, Point, Size, Bool *, ProcParam, Void *);
+					~CheckBox();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
+	};
+
+	SMOOTHVAR Int OBJ_CHECKBOX;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_CHECKBOX;
 
 #endif

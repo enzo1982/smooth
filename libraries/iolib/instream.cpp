@@ -23,32 +23,9 @@
 #include <stdarg.h>
 #include <iolib-cxx.h>
 
-#include "drivers/ansi/driver_ansi.cpp"
-#include "drivers/posix/driver_posix.cpp"
-#include "drivers/zero/driver_zero.cpp"
-#include "drivers/memory/driver_memory.cpp"
-
- InStream::InStream(int type)
-{
-	if (type == STREAM_ZERO)
-	{
-		driver = new IOLibDriverZero();
-
-		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); return; }
-
-		streamType	= STREAM_DRIVER;
-		size		= driver->GetSize();
-		currentBufferPos= DEFAULT_PACKAGE_SIZE;
-		origsize	= size;
-		data		= new unsigned char [packageSize];
-
-		return;
-	}
-	else
-	{
-		{ lastError = IOLIB_ERROR_BADPARAM; return; }
-	}
-}
+#include "drivers/ansi/driver_ansi.h"
+#include "drivers/posix/driver_posix.h"
+#include "drivers/memory/driver_memory.h"
 
 InStream::InStream(int type, IOLibDriver *iDriver)
 {
@@ -63,6 +40,7 @@ InStream::InStream(int type, IOLibDriver *iDriver)
 		currentBufferPos= DEFAULT_PACKAGE_SIZE;
 		origsize	= size;
 		data		= new unsigned char [packageSize];
+		closefile	= false;
 
 		return;
 	}
@@ -82,29 +60,6 @@ InStream::InStream(int type, const char *filename, int mode)
 
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
-		currentBufferPos= DEFAULT_PACKAGE_SIZE;
-		origsize	= size;
-		data		= new unsigned char [packageSize];
-
-		return;
-	}
-	else
-	{
-		{ lastError = IOLIB_ERROR_BADPARAM; return; }
-	}
-}
-
-InStream::InStream(int type, int file)
-{
-	if (type == STREAM_POSIX)
-	{
-		driver = new IOLibDriverPOSIX(file);
-
-		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); return; }
-
-		streamType	= STREAM_DRIVER;
-		size		= driver->GetSize();
-		currentFilePos	= driver->GetPos();
 		currentBufferPos= DEFAULT_PACKAGE_SIZE;
 		origsize	= size;
 		data		= new unsigned char [packageSize];
@@ -211,7 +166,7 @@ bool InStream::ReadData()
 
 	if (streamType == STREAM_DRIVER)
 	{
-		if (filter != NULLFILTER)
+		if (filter != NULL)
 		{
 			if (filter->packageSize > 0)	packageSize = filter->packageSize;
 			else				packageSize = stdpacksize;
@@ -223,17 +178,28 @@ bool InStream::ReadData()
 
 		delete [] data;
 
-		data = new unsigned char [packageSize];
+		data = NULL;
 
-		driver->Seek(currentFilePos);
+		if (filter == NULL)
+		{
+			data = new unsigned char [packageSize];
 
-		driver->ReadData(data, ((packageSize)<(size-currentFilePos)?(packageSize):(size-currentFilePos)));
+			driver->Seek(currentFilePos);
 
-		if (packageSize <= size-currentFilePos || (filter != NULLFILTER && filter->packageSize == 0))
+			if (size != -1)	decsize = driver->ReadData(data, ((packageSize)<(size-currentFilePos)?(packageSize):(size-currentFilePos)));
+			else		decsize = driver->ReadData(data, packageSize);
+		}
+		else
+		{
+			if (size != -1)	decsize = filter->ReadData(&data, ((packageSize)<(size-currentFilePos)?(packageSize):(size-currentFilePos)));
+			else		decsize = filter->ReadData(&data, packageSize);
+		}
+
+		if (packageSize <= size-currentFilePos || filter != NULL || size == -1)
 		{
 			origfilepos = currentFilePos + packageSize;
 
-			if (!filter->DecodeData(&data, ((packageSize)<(size-currentFilePos)?(packageSize):(size-currentFilePos)), &decsize))
+			if (decsize == -1)
 			{
 				packageSize = 0;
 
@@ -243,7 +209,7 @@ bool InStream::ReadData()
 			packageSize	= decsize;
 			origsize	= size;
 
-			if (packageSize + currentFilePos > size) size = packageSize + currentFilePos;
+			if (packageSize + currentFilePos > size && size != -1) size = packageSize + currentFilePos;
 		}
 
 		currentBufferPos = 0;
@@ -559,6 +525,8 @@ bool InStream::SetFilter(IOLibFilter *newFilter)
 
 	filter = newFilter;
 
+	filter->SetDriver(driver);
+
 	allowpackset = true;
 
 	if (filter->packageSize > 0)
@@ -592,7 +560,7 @@ bool InStream::RemoveFilter()
 
 	filter->Deactivate();
 
-	filter = NULLFILTER;
+	filter = NULL;
 
 	allowpackset = true;
 
@@ -605,6 +573,10 @@ bool InStream::Close()
 {
 	if (streamType == STREAM_NONE) { lastError = IOLIB_ERROR_NOTOPEN; return false; }
 
+	if (pbd) CompletePBD();
+
+	if (filter != NULL) RemoveFilter();
+
 	if (crosslinked)
 	{
 		if (closefile) outStream->closefile = true;
@@ -615,9 +587,7 @@ bool InStream::Close()
 		closefile = false;
 	}
 
-	if (pbd) CompletePBD();
-
-	if (closefile && driver != NULLDRIVER) delete driver;
+	if (closefile) delete driver;
 
 	delete [] data;
 	data = NULL;

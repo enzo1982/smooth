@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,90 +11,97 @@
 #ifndef _H_OBJSMOOTH_STRING_
 #define _H_OBJSMOOTH_STRING_
 
-#define SString SMOOTHString
-
-class SMOOTHString;
-
-#include "system.h"
-
-const int	 SIF_DEFAULT	= 0;
-const int	 SIF_CURRENT	= 1;
-const int	 SIF_PREVIOUS	= 2;
-const int	 SIF_ISO	= 3;
-const int	 SIF_UTF8	= 4;
-
-class SMOOTHAPI SMOOTHString
+namespace smooth
 {
-	private:
-		char			*bstring;
-		wchar_t			*wstring;
-		int			 stringsize;
-		bool			 checkinconsistency;
+	class String;
+};
 
-		static int		 inputFormat;
-		static int		 previousInputFormat;
+#include "definitions.h"
 
-		void			 FixInconsistency();
-		void			 ImportMBCS(int, const char *);
-	public:
-					 SMOOTHString();
-					 SMOOTHString(const int);
-					 SMOOTHString(const char *);
-					 SMOOTHString(const wchar_t *);
-					 SMOOTHString(const SMOOTHString &);
+namespace smooth
+{
+	class SMOOTHAPI String
+	{
+		private:
+			char			*bString;
+			wchar_t			*wString;
+			Int			 stringSize;
+			Bool			 checkInconsistency;
 
-					~SMOOTHString();
+			static char		*inputFormat;
+			static char		*previousInputFormat;
 
-		void			 Clean();
+			Void			 FixInconsistency();
+			Void			 ImportFormat(const char *, const char *);
+		public:
+						 String();
+						 String(const int);
+						 String(const char *);
+						 String(const wchar_t *);
+						 String(const String &);
 
-		static bool		 SetInputFormat(int);
+						~String();
 
-		SMOOTHString		&Append(const char *);
-		SMOOTHString		&Append(const wchar_t *);
-		SMOOTHString		&Append(const SMOOTHString &);
+			Void			 Clean();
 
-		SMOOTHString		&Copy(const char *);
-		SMOOTHString		&Copy(const wchar_t *);
-		SMOOTHString		&Copy(const SMOOTHString &);
+			static char		*SetInputFormat(const char *);
 
-		SMOOTHString		&CopyN(const char *, int);
-		SMOOTHString		&CopyN(const wchar_t *, int);
-		SMOOTHString		&CopyN(const SMOOTHString &, int);
+			char			*ConvertTo(const String);
 
-		int			 Compare(const char *);
-		int			 Compare(const wchar_t *);
-		int			 Compare(const SMOOTHString &);
+			String			&Append(const char *);
+			String			&Append(const wchar_t *);
+			String			&Append(const String &);
 
-		SMOOTHString		&Fill(int);
-		SMOOTHString		&FillN(int, int);
+			String			&Copy(const char *);
+			String			&Copy(const wchar_t *);
+			String			&Copy(const String &);
 
-		int			 Length();
+			String			&CopyN(const char *, const Int);
+			String			&CopyN(const wchar_t *, const Int);
+			String			&CopyN(const String &, const Int);
 
-		int			 ToInt();
-		double			 ToDouble();
+			Int			 Compare(const char *);
+			Int			 Compare(const wchar_t *);
+			Int			 Compare(const String &);
 
-		wchar_t &operator	 [](int);
+			Int			 CompareN(const char *, const Int);
+			Int			 CompareN(const wchar_t *, const Int);
+			Int			 CompareN(const String &, const Int);
 
-		operator		 char *();
-		operator		 wchar_t *();
+			String			&Fill(const Int);
+			String			&FillN(const Int, const Int);
 
-		SMOOTHString &operator	 =(const int);
-		SMOOTHString &operator	 =(const char *);
-		SMOOTHString &operator	 =(const wchar_t *);
-		SMOOTHString &operator	 =(const SMOOTHString &);
+			Int			 Length();
 
-		bool operator		 ==(const int);
-		bool operator		 ==(const char *);
-		bool operator		 ==(const wchar_t *);
-		bool operator		 ==(const SMOOTHString &);
+			Int			 ToInt();
+			Float			 ToDouble();
 
-		bool operator		 !=(const int);
-		bool operator		 !=(const char *);
-		bool operator		 !=(const wchar_t *);
-		bool operator		 !=(const SMOOTHString &);
+			wchar_t &operator	 [](const int);
+			wchar_t &operator	 [](const Int);
 
-		static SMOOTHString	 IntToString(int);
-		static SMOOTHString	 DoubleToString(double);
+			operator		 char *();
+			operator		 wchar_t *();
+
+			String &operator	 =(const int);
+			String &operator	 =(const char *);
+			String &operator	 =(const wchar_t *);
+			String &operator	 =(const String &);
+
+			Bool operator		 ==(const int);
+			Bool operator		 ==(const char *);
+			Bool operator		 ==(const wchar_t *);
+			Bool operator		 ==(const String &);
+
+			Bool operator		 !=(const int);
+			Bool operator		 !=(const char *);
+			Bool operator		 !=(const wchar_t *);
+			Bool operator		 !=(const String &);
+
+			static String		 IntToString(const Int);
+			static String		 DoubleToString(const Float);
+	};
+
+	Int	 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
 #endif

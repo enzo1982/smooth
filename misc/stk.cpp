@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_STK_
-#define __OBJSMOOTH_STK_
 
 #include <smooth/application.h>
 #include <smooth/window.h>
@@ -24,60 +21,36 @@
 #include <smooth/mdiwindow.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
-#include <smooth/divisionbar.h>
+#include <smooth/divider.h>
+#include <smooth/pciio.h>
 
-#include <pciio.h>
+S::Int S::SMOOTH::Setup::BackgroundColor = RGB(192, 192, 192);
+S::Int S::SMOOTH::Setup::ClientColor = RGB(255, 255, 255);
+S::Int S::SMOOTH::Setup::ClientTextColor = RGB(0, 0, 0);
+S::Int S::SMOOTH::Setup::LightGrayColor;
+S::Int S::SMOOTH::Setup::DividerLightColor;
+S::Int S::SMOOTH::Setup::DividerDarkColor;
+S::Int S::SMOOTH::Setup::TextColor = RGB(0, 0, 0);
+S::Int S::SMOOTH::Setup::GrayTextColor = RGB(128, 128, 128);
+S::Int S::SMOOTH::Setup::ShadowColor;
+S::Int S::SMOOTH::Setup::GradientStartColor;
+S::Int S::SMOOTH::Setup::GradientEndColor;
+S::Int S::SMOOTH::Setup::GradientTextColor = RGB(255, 255, 255);
+S::Int S::SMOOTH::Setup::InactiveGradientStartColor;
+S::Int S::SMOOTH::Setup::InactiveGradientEndColor;
+S::Int S::SMOOTH::Setup::InactiveGradientTextColor;
+S::Int S::SMOOTH::Setup::TooltipColor;
+S::Int S::SMOOTH::Setup::TooltipTextColor;
 
-SMOOTHInt SMOOTH::nextID = 0;
-SMOOTHInt SMOOTH::nextGUID = 0;
+S::Bool S::SMOOTH::Setup::enableUnicode = S::False;
 
-SMOOTHInt SMOOTH::Setup::BackgroundColor = RGB(192, 192, 192);
-SMOOTHInt SMOOTH::Setup::ClientColor = RGB(255, 255, 255);
-SMOOTHInt SMOOTH::Setup::ClientTextColor = RGB(0, 0, 0);
-SMOOTHInt SMOOTH::Setup::LightGrayColor;
-SMOOTHInt SMOOTH::Setup::DividerLightColor;
-SMOOTHInt SMOOTH::Setup::DividerDarkColor;
-SMOOTHInt SMOOTH::Setup::TextColor = RGB(0, 0, 0);
-SMOOTHInt SMOOTH::Setup::GrayTextColor = RGB(128, 128, 128);
-SMOOTHInt SMOOTH::Setup::ShadowColor;
-SMOOTHInt SMOOTH::Setup::GradientStartColor;
-SMOOTHInt SMOOTH::Setup::GradientEndColor;
-SMOOTHInt SMOOTH::Setup::GradientTextColor = RGB(255, 255, 255);
-SMOOTHInt SMOOTH::Setup::InactiveGradientStartColor;
-SMOOTHInt SMOOTH::Setup::InactiveGradientEndColor;
-SMOOTHInt SMOOTH::Setup::InactiveGradientTextColor;
-SMOOTHInt SMOOTH::Setup::TooltipColor;
-SMOOTHInt SMOOTH::Setup::TooltipTextColor;
+S::Float S::SMOOTH::Setup::FontSize = 1.00;
 
-SMOOTHBool SMOOTH::Setup::enableUnicode = SMOOTH::False;
+S::String S::SMOOTH::StartDirectory = NIL;
 
-SMOOTHFloat SMOOTH::Setup::FontSize = 1.00;
-
-SMOOTHInt SMOOTH::Success	= 1;
-SMOOTHInt SMOOTH::Error		= 0;
-SMOOTHInt SMOOTH::Break		= -1;
-
-SMOOTHBool SMOOTH::True		= true;
-SMOOTHBool SMOOTH::False	= false;
-
-SMOOTHString SMOOTH::StartDirectory = NIL;
-
-SMOOTHVoid SMOOTH::CloseWindow(SMOOTHWindow *wnd)
+S::Object *S::SMOOTH::GetObject(Int objectHandle, Int objectType)
 {
-	if (wnd == NIL) return;
-
-#ifdef __WIN32__
-	if (wnd->hwnd != NIL)
-	{
-		if (SMOOTH::Setup::enableUnicode)	::SendMessageW(wnd->hwnd, WM_CLOSE, 0, 0);
-		else					::SendMessageA(wnd->hwnd, WM_CLOSE, 0, 0);
-	}
-#endif
-}
-
-SMOOTHObject *SMOOTH::GetObject(SMOOTHInt objectHandle, SMOOTHInt objectType)
-{
-	SMOOTHObject	*retVal = mainObjectManager->RequestObject(objectHandle);
+	Object	*retVal = mainObjectManager->RequestObject(objectHandle);
 
 	if (retVal == NIL) return NIL;
 
@@ -85,15 +58,15 @@ SMOOTHObject *SMOOTH::GetObject(SMOOTHInt objectHandle, SMOOTHInt objectType)
 	else						return NIL;
 }
 
-SMOOTHWindow *SMOOTH::GetWindow(HWND wnd)
+S::Window *S::SMOOTH::GetWindow(HWND wnd)
 {
-	SMOOTHWindow	*rval;
+	Window	*rval;
 
-	for (int i = 0; i < SMOOTHObject::objectCount; i++)
+	for (int i = 0; i < Object::objectCount; i++)
 	{
-		rval = (SMOOTHWindow *) mainObjectManager->RequestObject(i);
+		rval = (Window *) mainObjectManager->RequestObject(i);
 
-		if (rval != (SMOOTHWindow *) NIL)
+		if (rval != (Window *) NIL)
 		{
 			if (rval->type == OBJ_WINDOW || rval->type == OBJ_MDIWINDOW || rval->type == OBJ_TOOLWINDOW)
 			{
@@ -105,24 +78,7 @@ SMOOTHWindow *SMOOTH::GetWindow(HWND wnd)
 	return NIL;
 }
 
-SMOOTHInt SMOOTH::DeleteObject(SMOOTHObject *object)
-{
-	if (object != NIL)
-	{
-		if (!object->IsObjectInUse())
-		{
-			delete object;
-
-			return SMOOTH::Success;
-		}
-
-		return object->DeleteObject();
-	}
-
-	return SMOOTH::Error;
-}
-
-SMOOTHBool SMOOTH::SetStartDirectory(SMOOTHString dir)
+S::Bool S::SMOOTH::SetStartDirectory(String dir)
 {
 	int	 len = dir.Length() - 1;
 
@@ -130,10 +86,10 @@ SMOOTHBool SMOOTH::SetStartDirectory(SMOOTHString dir)
 
 	SMOOTH::StartDirectory = dir;
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHVoid SMOOTH::SendMessage(SMOOTHWindow *window, SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+S::Void S::SMOOTH::SendMessage(Window *window, Int message, Int wParam, Int lParam)
 {
 	if (window != NIL)
 	{
@@ -141,9 +97,9 @@ SMOOTHVoid SMOOTH::SendMessage(SMOOTHWindow *window, SMOOTHInt message, SMOOTHIn
 	}
 	else
 	{
-		for (SMOOTHInt i = 0; i < SMOOTHObject::objectCount; i++)
+		for (Int i = 0; i < Object::objectCount; i++)
 		{
-			SMOOTHObject	*object = mainObjectManager->RequestObject(i);
+			Object	*object = mainObjectManager->RequestObject(i);
 
 			if (object != NIL)
 			{
@@ -156,12 +112,12 @@ SMOOTHVoid SMOOTH::SendMessage(SMOOTHWindow *window, SMOOTHInt message, SMOOTHIn
 	}
 }
 
-SMOOTHBool Affected(SMOOTHObject *obj, SMOOTHRect &urect)
+S::Bool S::Affected(Object *obj, Rect &urect)
 {
-	SMOOTHRect	 trect;
-	SMOOTHPoint	 realpos = obj->GetObjectProperties()->pos;
+	Rect	 trect;
+	Point	 realpos = obj->GetObjectProperties()->pos;
 
-	if (obj->GetObjectType() == OBJ_LAYER || obj->GetObjectType() == OBJ_DIVISIONBAR) return true;
+	if (obj->GetObjectType() == OBJ_LAYER || obj->GetObjectType() == OBJ_DIVIDER) return true;
 
 	if (obj->GetObjectProperties()->pos.x == 0 && obj->GetObjectProperties()->pos.y == 0 && obj->GetObjectProperties()->size.cx == 0 && obj->GetObjectProperties()->size.cy == 0) return true;
 
@@ -180,11 +136,11 @@ SMOOTHBool Affected(SMOOTHObject *obj, SMOOTHRect &urect)
 	return true;
 }
 
-HBITMAP SMOOTH::LoadImage(SMOOTHString file, SMOOTHInt id, SMOOTHString name)
+HBITMAP S::SMOOTH::LoadImage(String file, Int id, String name)
 {
-	HBITMAP		 bmp;
-	PCIIn		 pci = OpenPCIForInput((char *) file);
-	SMOOTHString	 startdir = SMOOTH::StartDirectory;
+	HBITMAP	 bmp;
+	PCIIn	 pci = OpenPCIForInput((char *) file);
+	String	 startdir = SMOOTH::StartDirectory;
 
 	if (pci->GetLastError() != IOLIB_ERROR_OK)
 	{
@@ -218,31 +174,31 @@ HBITMAP SMOOTH::LoadImage(SMOOTHString file, SMOOTHInt id, SMOOTHString name)
 	return bmp;
 }
 
-HBITMAP GrayscaleBitmap(HBITMAP bmp)
+HBITMAP S::GrayscaleBitmap(HBITMAP bmp)
 {
 	if (bmp == NIL) return NIL;
 
-	int		 isx = GetBitmapSizeX(bmp);
-	int		 isy = GetBitmapSizeY(bmp);
-	HDC		 dc = GetContext(0);
-	HDC		 cdc = CreateCompatibleContext(dc, SMOOTHSize(isx, isy));
-	HBITMAP		 newbmp;
-	int		 col = 0;
+	int	 isx = GetBitmapSizeX(bmp);
+	int	 isy = GetBitmapSizeY(bmp);
+	HDC	 dc = GetContext(0);
+	HDC	 cdc = CreateCompatibleContext(dc, Size(isx, isy));
+	HBITMAP	 newbmp;
+	int	 col = 0;
 
-	BlitFromBitmap(SMOOTHRect(SMOOTHPoint(0, 0), SMOOTHSize(isx - 1, isy - 1)), bmp, SMOOTHRect(SMOOTHPoint(0, 0), SMOOTHSize(isx - 1, isy - 1)), cdc);
+	BlitFromBitmap(Rect(Point(0, 0), Size(isx - 1, isy - 1)), bmp, Rect(Point(0, 0), Size(isx - 1, isy - 1)), cdc);
 
 	for (int y = 0; y < isx; y++)
 	{
 		for (int x = 0; x < isy; x++)
 		{
-			col = GetPixel(cdc, SMOOTHPoint(x, y));
+			col = GetPixel(cdc, Point(x, y));
 			col = (GetRed(col) + GetGreen(col) + GetBlue(col)) / 3;
 			col = RGB(col, col, col);
-			PaintPixel(cdc, SMOOTHPoint(x, y), col);
+			PaintPixel(cdc, Point(x, y), col);
 		}
 	}
 
-	newbmp = BlitToBitmap(cdc, SMOOTHRect(SMOOTHPoint(0, 0), SMOOTHSize(isx - 1, isy - 1)));
+	newbmp = BlitToBitmap(cdc, Rect(Point(0, 0), Size(isx - 1, isy - 1)));
 
 	FreeCompatibleContext(cdc);
 	FreeContext(0, dc);
@@ -250,52 +206,30 @@ HBITMAP GrayscaleBitmap(HBITMAP bmp)
 	return newbmp;
 }
 
-HBITMAP DetectTransparentRegions(HBITMAP bmp)
+HBITMAP S::DetectTransparentRegions(HBITMAP bmp)
 {
 	if (bmp == NIL) return NIL;
 
 	int		 isx = GetBitmapSizeX(bmp);
 	int		 isy = GetBitmapSizeY(bmp);
 	HDC		 dc = GetContext(0);
-	HDC		 cdc = CreateCompatibleContext(dc, SMOOTHSize(isx, isy));
+	HDC		 cdc = CreateCompatibleContext(dc, Size(isx, isy));
 	HBITMAP		 newbmp;
 
-	BlitFromBitmap(SMOOTHRect(SMOOTHPoint(0, 0), SMOOTHSize(isx - 1, isy - 1)), bmp, SMOOTHRect(SMOOTHPoint(0, 0), SMOOTHSize(isx - 1, isy - 1)), cdc);
+	BlitFromBitmap(Rect(Point(0, 0), Size(isx - 1, isy - 1)), bmp, Rect(Point(0, 0), Size(isx - 1, isy - 1)), cdc);
 
 	for (int y = 0; y < isx; y++)
 	{
 		for (int x = 0; x < isy; x++)
 		{
-			if (GetPixel(cdc, SMOOTHPoint(x, y)) == RGB(192, 192, 192)) PaintPixel(cdc, SMOOTHPoint(x, y), SMOOTH::Setup::BackgroundColor);
+			if (GetPixel(cdc, Point(x, y)) == RGB(192, 192, 192)) PaintPixel(cdc, Point(x, y), SMOOTH::Setup::BackgroundColor);
 		}
 	}
 
-	newbmp = BlitToBitmap(cdc, SMOOTHRect(SMOOTHPoint(0, 0), SMOOTHSize(isx - 1, isy - 1)));
+	newbmp = BlitToBitmap(cdc, Rect(Point(0, 0), Size(isx - 1, isy - 1)));
 
 	FreeCompatibleContext(cdc);
 	FreeContext(0, dc);
 
 	return newbmp;
 }
-
-SMOOTHString SMOOTH::GetVersionString()
-{
-	return SMOOTH_VERSION;
-}
-
-SMOOTHInt SMOOTH::RequestObjectID()
-{
-	return nextID++;
-}
-
-SMOOTHInt SMOOTH::RequestObjectHandle()
-{
-	return 	SMOOTHObject::objectCount++;
-}
-
-SMOOTHInt SMOOTH::RequestGUID()
-{
-	return nextGUID++;
-}
-
-#endif

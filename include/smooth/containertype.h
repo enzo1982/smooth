@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,31 +11,34 @@
 #ifndef _H_OBJSMOOTH_CONTAINERTYPE_
 #define _H_OBJSMOOTH_CONTAINERTYPE_
 
-#define SContainerType SMOOTHContainerType
-
-class SMOOTHContainer;
-class SMOOTHContainerType;
+namespace smooth
+{
+	class Container;
+	class ContainerType;
+};
 
 #include "definitions.h"
-#include "array.h"
 
-class SMOOTHAPI SMOOTHContainerType
+namespace smooth
 {
-	friend class SMOOTHContainer;
-	private:
-		SMOOTHInt		 type;
-		SMOOTHContainer		*container;
-	public:
-					 SMOOTHContainerType();
-					 SMOOTHContainerType(const SMOOTHContainerType &);
+	class SMOOTHAPI ContainerType
+	{
+		friend class Container;
+		private:
+			Int		 type;
+			Container	*container;
+		public:
+					 ContainerType();
+					 ContainerType(const ContainerType &);
 
-		operator		 SMOOTHInt();
-		SMOOTHInt operator	 =(SMOOTHInt);
+			operator	 Int();
+			Int operator	 =(Int);
 
-		SMOOTHBool operator	 ==(SMOOTHInt);
-		SMOOTHBool operator	 !=(SMOOTHInt);
-		SMOOTHBool operator	 ==(SMOOTHArray<SMOOTHInt> *);
-		SMOOTHBool operator	 !=(SMOOTHArray<SMOOTHInt> *);
+			Bool operator	 ==(Int);
+			Bool operator	 !=(Int);
+			Bool operator	 ==(Array<Int> *);
+			Bool operator	 !=(Array<Int> *);
+	};
 };
 
 #endif

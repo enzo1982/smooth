@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -13,35 +13,37 @@
 
 class Designer_EditComponent;
 
-#include <smoothx.h>
+#include <smooth.h>
 #include "designer.h"
 #include "status.h"
 
-class Designer_EditComponent : public SMOOTHApplication
+using namespace smooth;
+
+class Designer_EditComponent : public Application
 {
 	private:
-		SMOOTHWindow			*wnd;
-		SMOOTHTitlebar			*title;
+		Window		*wnd;
+		Titlebar	*title;
 
-		SMOOTHArray<SMOOTHObject *>	 objects;
+		Array<Object *>	 objects;
 
-		Designer			*designer;
-		Designer_Status			 status;
+		Designer	*designer;
+		Designer_Status	 status;
 
-		SMOOTHVoid			 MessageProc(SMOOTHInt, SMOOTHInt, SMOOTHInt);
-		SMOOTHBool			 KillProc();
+		Void		 EventProc(Int, Int, Int);
+		Bool		 ExitProc();
 	public:
-						 Designer_EditComponent(Designer *, SMOOTHString);
-						~Designer_EditComponent();
-		SMOOTHVoid			 ShowDialog();
-		SMOOTHString			 GetName();
-		SMOOTHWindow			*GetWindow();
-		SMOOTHObject			*AddObject(SMOOTHInt);
-		SMOOTHObject			*GetFirstObject(SMOOTHInt);
+				 Designer_EditComponent(Designer *, String);
+				~Designer_EditComponent();
+		Void		 ShowDialog();
+		String		 GetName();
+		Window		*GetWindow();
+		Object		*AddObject(Int);
+		Object		*GetFirstObject(Int);
 };
 
-const SMOOTHInt	 SMOOTH_BUTTON		=  1;
-const SMOOTHInt	 SMOOTH_MENUBAR		=  2;
-const SMOOTHInt	 SMOOTH_LAYER		=  3;
+const Int	 SMOOTH_BUTTON		=  1;
+const Int	 SMOOTH_MENUBAR		=  2;
+const Int	 SMOOTH_LAYER		=  3;
 
 #endif

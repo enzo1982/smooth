@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,96 +11,107 @@
 #ifndef _H_OBJSMOOTH_OBJECT_
 #define _H_OBJSMOOTH_OBJECT_
 
-#define SObject SMOOTHObject
-
-class SMOOTHObject;
-class SMOOTHContainer;
-class SMOOTHObjectProperties;
+namespace smooth
+{
+	class Object;
+	class Container;
+	class ObjectProperties;
+};
 
 #include "definitions.h"
 #include "string.h"
 #include "array.h"
 #include "objecttype.h"
+#include "point.h"
+#include "size.h"
 
-const SMOOTHInt SP_PAINT	= 0;
-const SMOOTHInt SP_MOUSEIN	= 1;
-const SMOOTHInt SP_MOUSEOUT	= 2;
-const SMOOTHInt SP_MOUSEDOWN	= 3;
-const SMOOTHInt SP_MOUSEUP	= 4;
-
-class SMOOTHAPI SMOOTHObject
+namespace smooth
 {
-	private:
-		SMOOTHBool		 deleteObject;
-		SMOOTHInt		 inUse;
-	protected:
-		SMOOTHObjectType	 type;
+	const Int SP_PAINT	= 0;
+	const Int SP_MOUSEIN	= 1;
+	const Int SP_MOUSEOUT	= 2;
+	const Int SP_MOUSEDOWN	= 3;
+	const Int SP_MOUSEUP	= 4;
+	const Int SP_UPDATE	= 5;
 
-		SMOOTHBool		 registered;
-		SMOOTHBool		 visible;
-		SMOOTHBool		 active;
+	class SMOOTHAPI Object
+	{
+		private:
+			Bool			 deleteObject;
+			Int			 inUse;
+			static Int		 nextID;
+		protected:
+			ObjectType		 type;
 
-		SMOOTHObjectProperties	*objectProperties;
-		SMOOTHContainer		*myContainer;
+			Bool			 registered;
+			Bool			 visible;
+			Bool			 active;
 
-		SMOOTHVoid		 GetTextSize();
+			ObjectProperties	*objectProperties;
+			Container		*myContainer;
 
-		SMOOTHInt		 EnterProtectedRegion();
-		SMOOTHInt		 LeaveProtectedRegion();
-	public:
-		SMOOTHArray<SMOOTHInt>	 possibleContainers;
-		static SMOOTHInt	 objectCount;
+			Void			 GetTextSize();
 
-		SMOOTHInt		 subtype;
-		SMOOTHInt		 handle;
+			Int			 EnterProtectedRegion();
+			Int			 LeaveProtectedRegion();
+		public:
+			Array<Int>		 possibleContainers;
+			static Int		 objectCount;
 
-					 SMOOTHObject();
-		virtual			~SMOOTHObject();
+			Int			 subtype;
+			Int			 handle;
 
-		virtual SMOOTHInt	 Show();
-		virtual SMOOTHInt	 Hide();
+						 Object();
+			virtual			~Object();
 
-		virtual SMOOTHInt	 Activate();
-		virtual SMOOTHInt	 Deactivate();
+			virtual Int		 Show();
+			virtual Int		 Hide();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		virtual SMOOTHInt	 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int		 Activate();
+			virtual Int		 Deactivate();
 
-		virtual SMOOTHInt	 SetText(SMOOTHString);
-		virtual SMOOTHString	 GetText();
+			virtual Int		 Paint(Int);
+			virtual Int		 Process(Int, Int, Int);
 
-		virtual SMOOTHInt	 SetTooltip(SMOOTHString);
-		virtual SMOOTHString	 GetTooltip();
+			virtual Int		 SetText(String);
+			virtual String		 GetText();
 
-		virtual SMOOTHInt	 SetProc(SMOOTHProcParam, SMOOTHVoid *);
-		virtual SMOOTHInt	 SetFont(SMOOTHString, SMOOTHInt, SMOOTHInt, SMOOTHInt);
-		virtual SMOOTHInt	 SetOrientation(SMOOTHInt);
-		virtual SMOOTHInt	 SetPosition(SMOOTHPoint);
-		virtual SMOOTHInt	 SetMetrics(SMOOTHPoint, SMOOTHSize);
+			virtual Int		 SetTooltip(String);
+			virtual String		 GetTooltip();
 
-		SMOOTHBool		 IsRegistered();
-		SMOOTHBool		 IsVisible();
-		SMOOTHBool		 IsActive();
+			virtual Int		 SetProc(ProcParam, Void *);
+			virtual Int		 SetFont(String, Int, Int, Int);
+			virtual Int		 SetOrientation(Int);
+			virtual Int		 SetPosition(Point);
+			virtual Int		 SetMetrics(Point, Size);
 
-		virtual SMOOTHPoint	 GetRealPosition();
+			Bool			 IsRegistered();
+			Bool			 IsVisible();
+			Bool			 IsActive();
 
-		virtual SMOOTHBool	 IsTypeCompatible(SMOOTHInt);
+			virtual Point		 GetRealPosition();
 
-		SMOOTHObjectProperties	*GetObjectProperties();
-		SMOOTHObjectType	 GetObjectType();
+			virtual Bool		 IsTypeCompatible(Int);
 
-		SMOOTHInt		 SetContainer(SMOOTHContainer *);
-		SMOOTHContainer		*GetContainer();
+			ObjectProperties	*GetObjectProperties();
+			ObjectType		 GetObjectType();
 
-		SMOOTHVoid		 SetRegisteredFlag();
-		SMOOTHVoid		 UnsetRegisteredFlag();
+			Int			 SetContainer(Container *);
+			Container		*GetContainer();
 
-		SMOOTHInt		 IsObjectInUse();
-		SMOOTHBool		 IsObjectDeleteable();
+			Void			 SetRegisteredFlag();
+			Void			 UnsetRegisteredFlag();
 
-		SMOOTHInt		 DeleteObject();
+			Int			 IsObjectInUse();
+			Bool			 IsObjectDeleteable();
+
+			static Int		 DeleteObject(Object *);
+
+			static Int		 RequestObjectID();
+			static Int		 RequestObjectHandle();
+	};
+
+	SMOOTHVAR Int OBJ_OBJECT;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_OBJECT;
 
 #endif

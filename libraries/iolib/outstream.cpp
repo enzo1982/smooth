@@ -27,30 +27,7 @@
 
 #include "drivers/ansi/driver_ansi.h"
 #include "drivers/posix/driver_posix.h"
-#include "drivers/zero/driver_zero.h"
 #include "drivers/memory/driver_memory.h"
-
- OutStream::OutStream(int type)
-{
-	if (type == STREAM_ZERO)
-	{
-		driver = new IOLibDriverZero();
-
-		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); return; }
-
-		streamType	= STREAM_DRIVER;
-		size		= driver->GetSize();
-		lastfilepos	= 0;
-		packageSize	= DEFAULT_PACKAGE_SIZE;
-		data		= new unsigned char [packageSize];
-
-		return;
-	}
-	else
-	{
-		{ lastError = IOLIB_ERROR_BADPARAM; return; }
-	}
-}
 
 OutStream::OutStream(int type, IOLibDriver *iDriver)
 {
@@ -63,8 +40,8 @@ OutStream::OutStream(int type, IOLibDriver *iDriver)
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
 		currentFilePos	= driver->GetPos();
-		lastfilepos	= driver->GetPos();
 		data		= new unsigned char [packageSize];
+		closefile	= false;
 
 		return;
 	}
@@ -85,29 +62,6 @@ OutStream::OutStream(int type, const char *file, int mode)
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
 		currentFilePos	= size;
-		lastfilepos	= size;
-		data		= new unsigned char [packageSize];
-
-		return;
-	}
-	else
-	{
-		{ lastError = IOLIB_ERROR_BADPARAM; return; }
-	}
-}
-
-OutStream::OutStream(int type, int file)
-{
-	if (type == STREAM_POSIX)
-	{
-		driver = new IOLibDriverPOSIX(file);
-
-		if (driver->GetLastError() != IOLIB_ERROR_OK) { lastError = driver->GetLastError(); return; }
-
-		streamType	= STREAM_DRIVER;
-		size		= driver->GetSize();
-		currentFilePos	= driver->GetPos();
-		lastfilepos	= 0;
 		data		= new unsigned char [packageSize];
 
 		return;
@@ -129,7 +83,6 @@ OutStream::OutStream(int type, FILE *openfile)
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
 		currentFilePos	= driver->GetPos();
-		lastfilepos	= 0;
 		packageSize	= 1; // low package size, 'cause openfile could point at the console or so
 		stdpacksize	= packageSize;
 		origpacksize	= packageSize;
@@ -153,7 +106,6 @@ OutStream::OutStream(int type, void *outbuffer, long bufsize)
 
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
-		lastfilepos	= 0;
 		packageSize	= 1;
 		stdpacksize	= packageSize;
 		origpacksize	= packageSize;
@@ -185,7 +137,6 @@ OutStream::OutStream(int type, InStream *in)
 		closefile	= false;
 		driver		= inStream->driver;
 		currentFilePos	= inStream->currentFilePos;
-		lastfilepos	= currentFilePos;
 		packageSize	= 1;
 		stdpacksize	= packageSize;
 		origpacksize	= packageSize;
@@ -212,14 +163,18 @@ bool OutStream::Flush()
 	int	 ps		= packageSize;
 	int	 oldcpos	= currentBufferPos;
 
-	if (filter != NULLFILTER && filter->packageSize > 0)
+	if (filter != NULL)
 	{
-		for (int i = 0; i < (packageSize - oldcpos); i++)
+		if (filter->packageSize > 0)
 		{
-			OutputNumber(0, 1);
+			for (int i = 0; i < (packageSize - oldcpos); i++)
+			{
+				OutputNumber(0, 1);
+			}
 		}
 	}
-	else
+
+	if (currentBufferPos > 0)
 	{
 		packageSize = currentBufferPos;
 
@@ -244,48 +199,52 @@ bool OutStream::WriteData()
 	unsigned char	*databuffer;
 	int		 encsize = 0;
 
-	if (filter->packageSize == -1)
+	if (filter != NULL)
 	{
-		databuffer = new unsigned char [packageSize];
+		if (filter->packageSize == -1)
+		{
+			databuffer = new unsigned char [packageSize];
 
-		memcpy((void *) databuffer, (void *) data, packageSize);
+			memcpy((void *) databuffer, (void *) data, packageSize);
 
-		delete [] data;
+			delete [] data;
 
-		data = new unsigned char [packageSize + DEFAULT_PACKAGE_SIZE];
+			data = new unsigned char [packageSize + DEFAULT_PACKAGE_SIZE];
 
-		memcpy((void *) data, (void *) databuffer, packageSize);
+			memcpy((void *) data, (void *) databuffer, packageSize);
 
-		delete [] databuffer;
+			delete [] databuffer;
 
-		packageSize += DEFAULT_PACKAGE_SIZE;
-		stdpacksize = packageSize;
+			packageSize += DEFAULT_PACKAGE_SIZE;
+			stdpacksize = packageSize;
 
-		return true;
+			return true;
+		}
 	}
 
 	if (streamType == STREAM_DRIVER)
 	{
-		driver->Seek(lastfilepos);
-
-		if (!filter->EncodeData(&data, packageSize, &encsize))
+		if (filter == NULL)
 		{
-			packageSize = 0;
+			encsize = driver->WriteData(data, packageSize);
+		}
+		else
+		{
+			encsize = filter->WriteData(data, packageSize);
 
-			return false;
+			if (encsize == -1)
+			{
+				packageSize = 0;
+
+				return false;
+			}
 		}
 
-		driver->WriteData(data, encsize);
 		driver->Flush();
-
-		delete [] data;
-
-		data = new unsigned char [packageSize];
 
 		currentBufferPos -= packageSize;
 		if (size == currentFilePos) size -= (packageSize - encsize);
 		currentFilePos -= (packageSize - encsize);
-		lastfilepos += encsize;
 	}
 
 	return true;
@@ -559,8 +518,6 @@ bool OutStream::SetPackageSize(int newPackagesize)
 
 	Flush();
 
-	lastfilepos = currentFilePos;
-
 	delete [] data;
 
 	data = new unsigned char [newPackagesize];
@@ -594,6 +551,7 @@ bool OutStream::SetFilter(IOLibFilter *newFilter)
 
 	filter = newFilter;
 
+	filter->SetDriver(driver);
 	filter->Activate();
 
 	return true;
@@ -633,7 +591,7 @@ bool OutStream::RemoveFilter()
 
 	filter->Deactivate();
 
-	filter = NULLFILTER;
+	filter = NULL;
 
 	SetPackageSize(origpacksize);
 
@@ -644,7 +602,9 @@ bool OutStream::Close()
 {
 	if (streamType == STREAM_NONE) { lastError = IOLIB_ERROR_NOTOPEN; return false; }
 
-	if (filter != NULLFILTER) RemoveFilter();
+	if (pbd) CompletePBD();
+
+	if (filter != NULL) RemoveFilter();
 
 	Flush();
 
@@ -658,7 +618,7 @@ bool OutStream::Close()
 		closefile = false;
 	}
 
-	if (closefile && driver != NULLDRIVER) delete driver;
+	if (closefile) delete driver;
 
 	delete [] data;
 	data = NULL;
@@ -678,7 +638,6 @@ bool OutStream::Seek(long position)
 
 	currentFilePos		= position;
 	currentBufferPos	= 0;
-	lastfilepos		= position;
 
 	return true;
 }
@@ -693,7 +652,6 @@ bool OutStream::RelSeek(long offset)
 
 	currentFilePos		+= offset;
 	currentBufferPos	= 0;
-	lastfilepos		= currentFilePos;
 
 	return true;
 }

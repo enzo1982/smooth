@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,69 +11,79 @@
 #ifndef _H_OBJSMOOTH_XMLNODE_
 #define _H_OBJSMOOTH_XMLNODE_
 
-#define SXMLNode SMOOTHXMLNode
-
-class SMOOTHXMLNode;
+namespace smooth
+{
+	namespace XML
+	{
+		class Node;
+	};
+};
 
 #include "../definitions.h"
 #include "attribute.h"
 #include "document.h"
 
-class SMOOTHAPI SMOOTHXMLNode
+namespace smooth
 {
-	private:
-		SMOOTHXMLNode				*nextNode;
-		SMOOTHXMLNode				*prevNode;
+	namespace XML
+	{
+		class SMOOTHAPI Node
+		{
+			private:
+				Node			*nextNode;
+				Node			*prevNode;
 
-		SMOOTHXMLDocument			*parentDoc;
-		SMOOTHXMLNode				*parentNode;
-		SMOOTHArray<SMOOTHXMLAttribute *>	 attributes;
-		SMOOTHArray<SMOOTHXMLNode *>		 subnodes;
+				Document		*parentDoc;
+				Node			*parentNode;
+				Array<Attribute *>	 attributes;
+				Array<Node *>		 subnodes;
 
-		SMOOTHInt				 nodeID;
-		SMOOTHString				 name;
-		SMOOTHString				 content;
-	public:
-							 SMOOTHXMLNode();
-							~SMOOTHXMLNode();
+				Int			 nodeID;
+				String			 name;
+				String			 content;
+			public:
+							 Node();
+							~Node();
 
-		SMOOTHXMLDocument			*GetParentDocument();
-		SMOOTHInt				 SetParentDocument(SMOOTHXMLDocument *);
+				Document		*GetParentDocument();
+				Int			 SetParentDocument(Document *);
 
-		SMOOTHXMLNode				*GetParentNode();
-		SMOOTHInt				 SetParentNode(SMOOTHXMLNode *);
+				Node			*GetParentNode();
+				Int			 SetParentNode(Node *);
 
-		SMOOTHInt				 GetNodeID();
-		SMOOTHInt				 SetNodeID(SMOOTHInt);
+				Int			 GetNodeID();
+				Int			 SetNodeID(Int);
 
-		SMOOTHXMLNode				*GetNextNode();
-		SMOOTHXMLNode				*GetPrevNode();
+				Node			*GetNextNode();
+				Node			*GetPrevNode();
 
-		SMOOTHInt				 SetNextNode(SMOOTHXMLNode *);
-		SMOOTHInt				 SetPrevNode(SMOOTHXMLNode *);
+				Int			 SetNextNode(Node *);
+				Int			 SetPrevNode(Node *);
 
-		SMOOTHString				 GetName();
-		SMOOTHInt				 SetName(SMOOTHString);
+				String			 GetName();
+				Int			 SetName(String);
 
-		SMOOTHString				 GetContent();
-		SMOOTHInt				 SetContent(SMOOTHString);
+				String			 GetContent();
+				Int			 SetContent(String);
 
-		SMOOTHInt				 GetNOfAttributes();
-		SMOOTHXMLAttribute			*GetNthAttribute(SMOOTHInt);
-		SMOOTHXMLAttribute			*GetAttributeByName(SMOOTHString);
+				Int			 GetNOfAttributes();
+				Attribute		*GetNthAttribute(Int);
+				Attribute		*GetAttributeByName(String);
 
-		SMOOTHXMLAttribute			*SetAttribute(SMOOTHString, SMOOTHString);
-		SMOOTHInt				 RemoveAttribute(SMOOTHXMLAttribute *);
-		SMOOTHInt				 RemoveAttributeByName(SMOOTHString);
+				Attribute		*SetAttribute(String, String);
+				Int			 RemoveAttribute(Attribute *);
+				Int			 RemoveAttributeByName(String);
 
-		SMOOTHInt				 GetNOfNodes();
-		SMOOTHXMLNode				*GetNthNode(SMOOTHInt);
-		SMOOTHXMLNode				*GetNodeByName(SMOOTHString);
+				Int			 GetNOfNodes();
+				Node			*GetNthNode(Int);
+				Node			*GetNodeByName(String);
 
-		SMOOTHXMLNode				*AddNode(SMOOTHString, SMOOTHString = NIL);
-		SMOOTHXMLNode				*SetNode(SMOOTHString, SMOOTHString = NIL);
-		SMOOTHInt				 RemoveNode(SMOOTHXMLNode *);
-		SMOOTHInt				 RemoveNodeByName(SMOOTHString);
+				Node			*AddNode(String, String = NIL);
+				Node			*SetNode(String, String = NIL);
+				Int			 RemoveNode(Node *);
+				Int			 RemoveNodeByName(String);
+		};
+	};
 };
 
 #endif

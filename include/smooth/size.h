@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,24 +11,27 @@
 #ifndef _H_OBJSMOOTH_SIZE_
 #define _H_OBJSMOOTH_SIZE_
 
-#define SSize SMOOTHSize
-
-class SMOOTHSize;
+namespace smooth
+{
+	class Size;
+};
 
 #include "primitive.h"
-#include "definitions.h"
 
-class SMOOTHAPI SMOOTHSize : public SMOOTHPrimitive
+namespace smooth
 {
-	public:
+	class SMOOTHAPI Size : public Primitive
+	{
+		public:
 #ifdef __WIN32__
-		operator		 SIZE();
-		SMOOTHSize &operator	 =(const SIZE);
+			operator	 SIZE();
+			Size &operator	 =(const SIZE);
 #endif
-		SMOOTHInt		 cx;
-		SMOOTHInt		 cy;
-					 SMOOTHSize();
-					 SMOOTHSize(SMOOTHInt, SMOOTHInt);
+			Int		 cx;
+			Int		 cy;
+					 Size();
+					 Size(Int, Int);
+	};
 };
 
 #endif

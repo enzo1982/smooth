@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,26 +11,31 @@
 #ifndef _H_OBJSMOOTH_RECT_
 #define _H_OBJSMOOTH_RECT_
 
-#define SRect SMOOTHRect
-
-class SMOOTHRect;
+namespace smooth
+{
+	class Rect;
+};
 
 #include "primitive.h"
-#include "definitions.h"
+#include "point.h"
+#include "size.h"
 
-class SMOOTHAPI SMOOTHRect : public SMOOTHPrimitive
+namespace smooth
 {
-	public:
+	class SMOOTHAPI Rect : public Primitive
+	{
+		public:
 #ifdef __WIN32__
-		operator		 RECT();
-		SMOOTHRect &operator	 =(const RECT);
+			operator	 RECT();
+			Rect &operator	 =(const RECT);
 #endif
-		SMOOTHInt		 left;
-		SMOOTHInt		 top;
-		SMOOTHInt		 right;
-		SMOOTHInt		 bottom;
-					 SMOOTHRect();
-					 SMOOTHRect(SMOOTHPoint, SMOOTHSize);
+			Int		 left;
+			Int		 top;
+			Int		 right;
+			Int		 bottom;
+					 Rect();
+					 Rect(Point, Size);
+	};
 };
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,45 +11,49 @@
 #ifndef _H_OBJSMOOTH_SCROLLBAR_
 #define _H_OBJSMOOTH_SCROLLBAR_
 
-#define SScrollbar SMOOTHScrollbar
-
-class SMOOTHScrollbar;
-class SMOOTHTimer;
+namespace smooth
+{
+	class Scrollbar;
+	class Timer;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHScrollbar : public SMOOTHObject
+namespace smooth
 {
-	private:
-		SMOOTHTimer		*timer;
-		SMOOTHBool		 timerActive;
-		SMOOTHInt		 timerCount;
+	class SMOOTHAPI Scrollbar : public Object
+	{
+		private:
+			Timer		*timer;
+			Bool		 timerActive;
+			Int		 timerCount;
 
-		SMOOTHVoid		 TimerProc();
-	protected:
-		SMOOTHBool		 button1Clicked;
-		SMOOTHBool		 button2Clicked;
-		SMOOTHBool		 button3Clicked;
-		SMOOTHBool		 button1Checked;
-		SMOOTHBool		 button2Checked;
-		SMOOTHBool		 button3Checked;
+			Void		 TimerProc();
+		protected:
+			Bool		 button1Clicked;
+			Bool		 button2Clicked;
+			Bool		 button3Clicked;
+			Bool		 button1Checked;
+			Bool		 button2Checked;
+			Bool		 button3Checked;
 
-		SMOOTHInt		*variable;
+			Int		*variable;
 
-		SMOOTHInt		 startValue;
-		SMOOTHInt 		 endValue;
+			Int		 startValue;
+			Int 		 endValue;
 
-		SMOOTHInt		 mouseBias;
-	public:
-					 SMOOTHScrollbar(SMOOTHPoint, SMOOTHSize, SMOOTHInt, SMOOTHInt *, SMOOTHInt, SMOOTHInt, SMOOTHProcParam, SMOOTHVoid *);
-					~SMOOTHScrollbar();
+			Int		 mouseBias;
+		public:
+					 Scrollbar(Point, Size, Int, Int *, Int, Int, ProcParam, Void *);
+					~Scrollbar();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
 
-		SMOOTHInt		 SetRange(SMOOTHInt, SMOOTHInt);
+			Int		 SetRange(Int, Int);
+	};
+
+	SMOOTHVAR Int OBJ_SCROLLBAR;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_SCROLLBAR;
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,57 +11,61 @@
 #ifndef _H_OBJSMOOTH_THREAD_
 #define _H_OBJSMOOTH_THREAD_
 
-#define SThread SMOOTHThread
-
-class SMOOTHThread;
+namespace smooth
+{
+	class Thread;
+};
 
 #include "object.h"
 
-const SMOOTHInt	 THREAD_CREATED		= 0;
-const SMOOTHInt	 THREAD_RUNNING		= 1;
-const SMOOTHInt	 THREAD_STOPPED		= 2;
-const SMOOTHInt	 THREAD_PAUSED		= 3;
-const SMOOTHInt	 THREAD_STARTME		= 4;
-const SMOOTHInt	 THREAD_STOPPED_SELF	= 5;
-
-const SMOOTHInt	 THREAD_KILLFLAG_KILL	= 0;
-const SMOOTHInt	 THREAD_KILLFLAG_WAIT	= 1;
-
-const SMOOTHInt	 THREAD_WAITFLAG_WAIT	= 0;
-const SMOOTHInt	 THREAD_WAITFLAG_START	= 1;
-
-class SMOOTHAPI SMOOTHThread : public SMOOTHObject
+namespace smooth
 {
-	friend SMOOTHVoid SMOOTHThreadProcCaller(SMOOTHThread *);
-	private:
-		SMOOTHInt		 killflag;
-		SMOOTHInt		 waitflag;
-		SMOOTHInt		 status;
+	const Int	 THREAD_CREATED		= 0;
+	const Int	 THREAD_RUNNING		= 1;
+	const Int	 THREAD_STOPPED		= 2;
+	const Int	 THREAD_PAUSED		= 3;
+	const Int	 THREAD_STARTME		= 4;
+	const Int	 THREAD_STOPPED_SELF	= 5;
 
-		LiSAThread		*thread;
+	const Int	 THREAD_KILLFLAG_KILL	= 0;
+	const Int	 THREAD_KILLFLAG_WAIT	= 1;
 
-		SMOOTHThreadProcMember;
-		SMOOTHVoid		 (*altproc)(SMOOTHThread *);
-	public:
-		static SMOOTHInt	 counter;
+	const Int	 THREAD_WAITFLAG_WAIT	= 0;
+	const Int	 THREAD_WAITFLAG_START	= 1;
 
-					 SMOOTHThread(SMOOTHThreadProcParam, SMOOTHVoid *);
-					 SMOOTHThread(SMOOTHVoid (*)(SMOOTHThread *));
-					~SMOOTHThread();
+	class SMOOTHAPI Thread : public Object
+	{
+		friend Void ThreadProcCaller(Thread *);
+		private:
+			Int		 killflag;
+			Int		 waitflag;
+			Int		 status;
 
-		SMOOTHInt		 GetStatus();
+			LiSAThread	*thread;
 
-		SMOOTHInt		 Start();
-		SMOOTHInt		 Stop();
+			ThreadProcMember;
+			Void		 (*altproc)(Thread *);
+		public:
+			static Int	 counter;
 
-		SMOOTHVoid		 SetWaitFlag(SMOOTHInt);
-		SMOOTHInt		 GetWaitFlag();
-		SMOOTHVoid		 SetKillFlag(SMOOTHInt);
-		SMOOTHInt		 GetKillFlag();
+					 Thread(ThreadProcParam, Void *);
+					 Thread(Void (*)(Thread *));
+					~Thread();
+
+			Int		 GetStatus();
+
+			Int		 Start();
+			Int		 Stop();
+
+			Void		 SetWaitFlag(Int);
+			Int		 GetWaitFlag();
+			Void		 SetKillFlag(Int);
+			Int		 GetKillFlag();
+	};
+
+	Void ThreadProcCaller(Thread *);
+
+	SMOOTHVAR Int OBJ_THREAD;
 };
-
-SMOOTHVoid SMOOTHThreadProcCaller(SMOOTHThread *);
-
-SMOOTHVAR SMOOTHInt OBJ_THREAD;
 
 #endif

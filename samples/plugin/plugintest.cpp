@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -9,34 +9,37 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth.h>
+#include <smooth/main.h>
 #include "plugin.h"
 #include "plugintest.h"
 
-SVoid SMOOTH::Main()
+Int smooth::Main()
 {
 	PlugInTest	*app = new PlugInTest();
 
-	SMOOTH::Loop();
+	Loop();
 
 	delete app;
+
+	return 0;
 }
 
 PlugInTest::PlugInTest()
 {
-	SetText("SMOOTH PlugIn Test");
+	SetText("smooth PlugIn Test");
 
-	SPoint	 pos;
-	SSize	 size;
+	Point	 pos;
+	Size	 size;
 
 	pos.x	= 15;
 	pos.y	= 15;
 	size.cx	= 50;
 	size.cy	= 30;
 
-	wnd		= new SWindow("SMOOTH plug-in test");
-	layer		= new SLayer();
-	title		= new STitlebar(true, false, true);
-	activearea	= new SActiveAreaPlugin(RGB(255, 255, 128), pos, size, SProc(PlugInTest, this, activeAreaProc));
+	wnd		= new Window("smooth plug-in test");
+	layer		= new Layer();
+	title		= new Titlebar(true, false, true);
+	activearea	= new ActiveAreaPlugin(RGB(255, 255, 128), pos, size, Proc(PlugInTest, this, activeAreaProc));
 	
 	RegisterObject(wnd);
 
@@ -45,7 +48,7 @@ PlugInTest::PlugInTest()
 
 	layer->RegisterObject(activearea);
 
-	wnd->SetMetrics(SPoint(200, 150), SSize(250, 100));
+	wnd->SetMetrics(Point(200, 150), Size(250, 100));
 }
 
 PlugInTest::~PlugInTest()
@@ -63,7 +66,7 @@ PlugInTest::~PlugInTest()
 	delete layer;
 }
 
-SVoid PlugInTest::activeAreaProc()
+Void PlugInTest::activeAreaProc()
 {
-	SMOOTH::MessageBox("This is a SMOOTH plug-in!", "Info", MB_OK, IDI_INFORMATION);
+	SMOOTH::MessageBox("This is a smooth plug-in!", "Info", MB_OK, IDI_INFORMATION);
 }

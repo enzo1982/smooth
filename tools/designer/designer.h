@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -13,43 +13,45 @@
 
 class Designer;
 
-#include <smoothx.h>
+#include <smooth.h>
 #include "edit_component.h"
 #include "status.h"
 
-class Designer : public SMOOTHApplication
+using namespace smooth;
+
+class Designer : public Application
 {
 	private:
-		SMOOTHWindow				*wnd;
-		SMOOTHTitlebar				*title;
-		SMOOTHMenubar				*menubar;
-		SMOOTHMenubar				*iconbar;
-		SMOOTHStatusbar				*statusbar;
-		SMOOTHPopupMenu				*menu_file;
-		SMOOTHPopupMenu				*menu_dialog;
-		SMOOTHPopupMenu				*menu_widgets;
-		SMOOTHPopupMenu				*menu_widgets_add;
-		SMOOTHPopupMenu				*menu_widgets_add_smooth;
+		Window				*wnd;
+		Titlebar			*title;
+		Menubar				*menubar;
+		Menubar				*iconbar;
+		Statusbar			*statusbar;
+		PopupMenu			*menu_file;
+		PopupMenu			*menu_dialog;
+		PopupMenu			*menu_widgets;
+		PopupMenu			*menu_widgets_add;
+		PopupMenu			*menu_widgets_add_smooth;
 
-		SMOOTHTimer				*timer1;
+		Timer				*timer1;
 
-		SMOOTHInt				 dlgcounter;
-		Designer_Status				 status;
-		SMOOTHArray<Designer_EditComponent *>	 dlgs;
-		Designer_EditComponent			*active_dlg;
+		Int				 dlgcounter;
+		Designer_Status			 status;
+		Array<Designer_EditComponent *>	 dlgs;
+		Designer_EditComponent		*active_dlg;
 
-		SMOOTHVoid				 CloseWindow();
-		SMOOTHVoid				 NewDialog();
-		SMOOTHBool				 KillProc();
-		SMOOTHVoid				 TimerProc();
+		Void				 NewDialog();
+		Bool				 ExitProc();
+		Void				 TimerProc();
+		Void				 Close();
 
-		SMOOTHVoid				 AddButton();
-		SMOOTHVoid				 AddLayer();
-		SMOOTHVoid				 AddMenubar();
+		Void				 AddButton();
+		Void				 AddLayer();
+		Void				 AddMenubar();
 	public:
-							 Designer();
-							~Designer();
-		SMOOTHVoid				 ReportStatus(Designer_Status);
+						 Designer();
+						~Designer();
+		Void				 ReportStatus(Designer_Status);
 };
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,25 +11,29 @@
 #ifndef _H_OBJSMOOTH_TREEVIEW_
 #define _H_OBJSMOOTH_TREEVIEW_
 
-#define STreeView SMOOTHTreeView
-
-class SMOOTHTreeView;
+namespace smooth
+{
+	class TreeView;
+};
 
 #include "object.h"
 #include "tree.h"
 
-class SMOOTHAPI SMOOTHTreeView : public SMOOTHObject, public SMOOTHTree
+namespace smooth
 {
-	private:
-		SMOOTHInt		 PaintTree(SMOOTHTree *, SMOOTHInt, SMOOTHRect);
-	public:
-					 SMOOTHTreeView(SMOOTHString, SMOOTHPoint, SMOOTHSize, SMOOTHProcParam, SMOOTHVoid *);
-					~SMOOTHTreeView();
+	class SMOOTHAPI TreeView : public Object, public Tree
+	{
+		private:
+			Int		 PaintTree(Tree *, Int, Rect);
+		public:
+					 TreeView(String, Point, Size, ProcParam, Void *);
+					~TreeView();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
+	};
+
+	SMOOTHVAR Int OBJ_TREEVIEW;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_TREEVIEW;
 
 #endif

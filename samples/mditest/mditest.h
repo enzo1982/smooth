@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,23 +11,24 @@
 #ifndef _H_MDITEST_
 #define _H_MDITEST_
 
-#include <smoothx.h>
+#include <smooth.h>
 
-class MDITest : public SMOOTHApplication
+using namespace smooth;
+
+class MDITest : public Application
 {
 	private:
-		SMOOTHWindow		*mainWnd;
-		SMOOTHTitlebar		*mainWnd_titlebar;
-		SMOOTHStatusbar		*mainWnd_statusbar;
-		SMOOTHMDIClient		*mainWnd_client;
-		SMOOTHMenubar		*mainWnd_menubar;
-		SMOOTHPopupMenu		*menu_file;
+		Window		*mainWnd;
+		Titlebar	*mainWnd_titlebar;
+		Statusbar	*mainWnd_statusbar;
+		MDIClient	*mainWnd_client;
+		Menubar		*mainWnd_menubar;
+		PopupMenu	*menu_file;
 	public:
-					 MDITest();
-					~MDITest();
-		SMOOTHVoid		 QuitProc();
-		SMOOTHBool		 KillProc();
-		SMOOTHVoid		 NewMDI();
+				 MDITest();
+				~MDITest();
+		Bool		 ExitProc();
+		Void		 NewMDI();
 };
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,31 +11,35 @@
 #ifndef _H_OBJSMOOTH_SURFACEGDI_
 #define _H_OBJSMOOTH_SURFACEGDI_
 
-#define SSurfaceGDI SMOOTHSurfaceGDI
-
-class SMOOTHSurfaceGDI;
+namespace smooth
+{
+	class SurfaceGDI;
+};
 
 #include "surface.h"
 
-class SMOOTHAPI SMOOTHSurfaceGDI : public SMOOTHSurface
+namespace smooth
 {
-	protected:
-		HDC		 gdi_dc;
-	public:
-				 SMOOTHSurfaceGDI(HDC);
-				~SMOOTHSurfaceGDI();
+	class SMOOTHAPI SurfaceGDI : public Surface
+	{
+		protected:
+			HDC	 gdi_dc;
+		public:
+				 SurfaceGDI(HDC);
+				~SurfaceGDI();
 
-		SMOOTHInt	 GetPixel(SMOOTHInt, SMOOTHInt);
+			Int	 GetPixel(Int, Int);
 
-		SMOOTHInt	 SetPixel(SMOOTHInt, SMOOTHInt, SMOOTHInt);
-		SMOOTHInt	 Line(SMOOTHPoint, SMOOTHPoint, SMOOTHInt);
-		SMOOTHInt	 Frame(SMOOTHRect, SMOOTHInt);
-		SMOOTHInt	 Box(SMOOTHRect, SMOOTHInt, SMOOTHInt);
+			Int	 SetPixel(Int, Int, Int);
+			Int	 Line(Point, Point, Int);
+			Int	 Frame(Rect, Int);
+			Int	 Box(Rect, Int, Int);
 
-		SMOOTHInt	 SetText(SMOOTHString, SMOOTHRect, SMOOTHString, SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			Int	 SetText(String, Rect, String, Int, Int, Int);
 
-		SMOOTHInt	 BlitFromBitmap(HBITMAP, SMOOTHRect, SMOOTHRect);
-		SMOOTHInt	 BlitToBitmap(SMOOTHRect, HBITMAP, SMOOTHRect);
+			Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
+			Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+	};
 };
 
 #endif

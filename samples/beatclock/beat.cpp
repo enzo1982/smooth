@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -9,15 +9,18 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth.h>
+#include <smooth/main.h>
 #include "beat.h"
 
-SMOOTHVoid SMOOTH::Main()
+Int smooth::Main()
 {
 	BeatClock	*app = new BeatClock();
 
-	SMOOTH::Loop();
+	Loop();
 
 	delete app;
+
+	return 0;
 }
 
 BeatClock::BeatClock()
@@ -42,18 +45,18 @@ BeatClock::BeatClock()
 
 	InputValues();
 
-	wnd	= new SMOOTHWindow("BeatClock");
-	title	= new SMOOTHTitlebar(false, false, true);
-	menubar	= new SMOOTHMenubar();
-	timer	= new SMOOTHTimer();
-	dragcontrol = new SMOOTHDragControl();
+	wnd		= new Window("BeatClock");
+	title		= new Titlebar(false, false, true);
+	menubar		= new Menubar();
+	timer		= new Timer();
+	dragcontrol	= new DragControl();
 
-	timer->SetProc(SMOOTHProc(BeatClock, this, PaintTime));
+	timer->SetProc(Proc(BeatClock, this, PaintTime));
 
-	menubar->AddEntry("Mode", NIL, SMOOTHProc(BeatClock, this, Mode));
-	menubar->AddEntry("Options", NIL, SMOOTHProc(BeatClock, this, Options));
+	menubar->AddEntry("Mode", NIL, Proc(BeatClock, this, Mode));
+	menubar->AddEntry("Options", NIL, Proc(BeatClock, this, Options));
 	menubar->AddEntry()->SetOrientation(OR_RIGHT);
-	menubar->AddEntry("Info", NIL, SMOOTHProc(BeatClock, this, Info))->SetOrientation(OR_RIGHT);
+	menubar->AddEntry("Info", NIL, Proc(BeatClock, this, Info))->SetOrientation(OR_RIGHT);
 
 	RegisterObject(wnd);
 
@@ -63,10 +66,10 @@ BeatClock::BeatClock()
 	wnd->RegisterObject(timer);
 
 	wnd->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
-	wnd->SetPaintProc(SMOOTHProc(BeatClock, this, PaintAll));
+	wnd->SetPaintProc(Proc(BeatClock, this, PaintAll));
 	wnd->SetExStyle(WS_EX_TOPMOST|WS_EX_TOOLWINDOW);
-	wnd->SetMetrics(SMOOTHPoint(wpx, wpy), SMOOTHSize(164 * SMOOTH::Setup::FontSize, 103 * SMOOTH::Setup::FontSize));
-	wnd->SetMessageProc(SMOOTHMessageProc(BeatClock, this, MessageProc));
+	wnd->SetMetrics(Point(wpx, wpy), Size(164 * SMOOTH::Setup::FontSize, 103 * SMOOTH::Setup::FontSize));
+	wnd->SetMessageProc(MessageProc(BeatClock, this, EventProc));
 	wnd->Show();
 
 	timer->Start(50);
@@ -92,7 +95,7 @@ BeatClock::~BeatClock()
 	delete dragcontrol;
 }
 
-SMOOTHVoid BeatClock::MessageProc(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+Void BeatClock::EventProc(Int message, Int wParam, Int lParam)
 {
 	if (message == WM_WINDOWPOSCHANGED)
 	{
@@ -101,18 +104,17 @@ SMOOTHVoid BeatClock::MessageProc(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt
 	}
 }
 
-SMOOTHVoid BeatClock::Options()
+Void BeatClock::Options()
 {
-	optionsdialog	= new SMOOTHWindow("BeatClock Options");
-	mainlayer	= new SMOOTHLayer();
-	display		= new SMOOTHLayer("Display");
-	alarm		= new SMOOTHLayer("Alarm");
-	misc		= new SMOOTHLayer("Misc");
-	info		= new SMOOTHLayer("Info");
-	optitle		= new SMOOTHTitlebar(false, false, true);
+	optionsdialog	= new Window("BeatClock Options");
+	display		= new Layer("Display");
+	alarm		= new Layer("Alarm");
+	misc		= new Layer("Misc");
+	info		= new Layer("Info");
+	optitle		= new Titlebar(false, false, true);
 
-	SMOOTHPoint	 pos;
-	SMOOTHSize	 size;
+	Point	 pos;
+	Size	 size;
 
 // Configuring "Display" Layer:
 
@@ -121,37 +123,37 @@ SMOOTHVoid BeatClock::Options()
 	size.cx = 230;
 	size.cy = 65;
 
-	display_group1 = new SMOOTHGroupBox("Time format", pos, size);
+	display_group1 = new GroupBox("Time format", pos, size);
 
 	pos.x = 245;
 	size.cx = 121;
 
-	display_group2 = new SMOOTHGroupBox("Timezone", pos, size);
+	display_group2 = new GroupBox("Timezone", pos, size);
 
 	pos.x = 17;
 	pos.y = 24;
 	size.cx = 100;
 	size.cy = 0;
 
-	display_option1 = new SMOOTHOptionBox("Internet Beats", pos, size, &timeformat, 0, SMOOTHProc(BeatClock, this, OptionsBeats));
+	display_option1 = new OptionBox("Internet Beats", pos, size, &timeformat, 0, Proc(BeatClock, this, OptionsBeats));
 
 	pos.y = 49;
 
-	display_option2 = new SMOOTHOptionBox("Standard (STF)", pos, size, &timeformat, 1, SMOOTHProc(BeatClock, this, OptionsSTF));
+	display_option2 = new OptionBox("Standard (STF)", pos, size, &timeformat, 1, Proc(BeatClock, this, OptionsSTF));
 
 	pos.x = 126;
 	pos.y = 24;
 
-	if (timeformat == 0)	display_check1 = new SMOOTHCheckBox("Show centibeats", pos, size, &centi, SMOOTHProc(BeatClock, this, OptionsPaint));
-	else			display_check1 = new SMOOTHCheckBox("Show seconds", pos, size, &centi, SMOOTHProc(BeatClock, this, OptionsPaint));
+	if (timeformat == 0)	display_check1 = new CheckBox("Show centibeats", pos, size, &centi, Proc(BeatClock, this, OptionsPaint));
+	else			display_check1 = new CheckBox("Show seconds", pos, size, &centi, Proc(BeatClock, this, OptionsPaint));
 
 	pos.x = 255;
 
-	display_option3 = new SMOOTHOptionBox("CET", pos, size, &timezone, 0, SMOOTHProc(BeatClock, this, OptionsPaint));
+	display_option3 = new OptionBox("CET", pos, size, &timezone, 0, Proc(BeatClock, this, OptionsPaint));
 
 	pos.y = 49;
 
-	display_option4 = new SMOOTHOptionBox("Local time", pos, size, &timezone, 1, SMOOTHProc(BeatClock, this, OptionsPaint));
+	display_option4 = new OptionBox("Local time", pos, size, &timezone, 1, Proc(BeatClock, this, OptionsPaint));
 
 	display->RegisterObject(display_group1);
 	display->RegisterObject(display_group2);
@@ -166,37 +168,37 @@ SMOOTHVoid BeatClock::Options()
 	pos.x = 7;
 	pos.y = 7;
 
-	alarm_check1 = new SMOOTHCheckBox("Enable alarm", pos, size, &isalarm, SMOOTHProc(BeatClock, this, toggleAlarmState));
+	alarm_check1 = new CheckBox("Enable alarm", pos, size, &isalarm, Proc(BeatClock, this, toggleAlarmState));
 
 	pos.y = 35;
 	pos.x = 9;
 
-	alarm_text1 = new SMOOTHText("Ring at:", pos);
+	alarm_text1 = new Text("Ring at:", pos);
 
 	pos.x = 53;
 	pos.y = 32;
 	size.cx = 34;
 
-	if (timeformat == 0)	alarmtext = SMOOTHString::IntToString(alarmbeats);
+	if (timeformat == 0)	alarmtext = String::IntToString(alarmbeats);
 	else			alarmtext = convertSecondsToTimeString(alarmsecs);
 
-	alarm_edit1 = new SMOOTHEditBox(alarmtext, pos, size, EDB_ALPHANUMERIC, 5, NULLPROC);
+	alarm_edit1 = new EditBox(alarmtext, pos, size, EDB_ALPHANUMERIC, 5, NULLPROC);
 
 	pos.y = 35;
 	pos.x = 94;
 
-	if (timeformat == 0)	alarm_text2 = new SMOOTHText("Internet Beats", pos);
-	else			alarm_text2 = new SMOOTHText("Hours/Minutes", pos);
+	if (timeformat == 0)	alarm_text2 = new Text("Internet Beats", pos);
+	else			alarm_text2 = new Text("Hours/Minutes", pos);
 
 	pos.y = 21;
 	pos.x = 172;
 	size.cx = 0;
 
-	alarm_option1 = new SMOOTHOptionBox("only once", pos, size, &alarmoption, 0, NULLPROC);
+	alarm_option1 = new OptionBox("only once", pos, size, &alarmoption, 0, NULLPROC);
 
 	pos.y += 25;
 
-	alarm_option2 = new SMOOTHOptionBox("every day", pos, size, &alarmoption, 1, NULLPROC);
+	alarm_option2 = new OptionBox("every day", pos, size, &alarmoption, 1, NULLPROC);
 
 	alarm->RegisterObject(alarm_check1);
 	alarm->RegisterObject(alarm_text1);
@@ -214,28 +216,28 @@ SMOOTHVoid BeatClock::Options()
 	size.cx = 359;
 	size.cy = 65;
 
-	misc_group1 = new SMOOTHGroupBox("'Mode' button action", pos, size);
+	misc_group1 = new GroupBox("'Mode' button action", pos, size);
 
 	pos.x = 17;
 	pos.y = 24;
 	size.cx = 164;
 	size.cy = 0;
 
-	if (timeformat == 0)	misc_option1 = new SMOOTHOptionBox("Show/hide centibeats", pos, size, &modechange, 0, NULLPROC);
-	else			misc_option1 = new SMOOTHOptionBox("Show/hide seconds", pos, size, &modechange, 0, NULLPROC);
+	if (timeformat == 0)	misc_option1 = new OptionBox("Show/hide centibeats", pos, size, &modechange, 0, NULLPROC);
+	else			misc_option1 = new OptionBox("Show/hide seconds", pos, size, &modechange, 0, NULLPROC);
 
 	pos.y = 49;
 
-	misc_option2 = new SMOOTHOptionBox("Change time format", pos, size, &modechange, 1, NULLPROC);
+	misc_option2 = new OptionBox("Change time format", pos, size, &modechange, 1, NULLPROC);
 
 	pos.x = 191;
 	pos.y = 24;
 
-	misc_option3 = new SMOOTHOptionBox("Change timezone", pos, size, &modechange, 2, NULLPROC);
+	misc_option3 = new OptionBox("Change timezone", pos, size, &modechange, 2, NULLPROC);
 
 	pos.y = 49;
 
-	misc_option4 = new SMOOTHOptionBox("Change format and timezone", pos, size, &modechange, 3, NULLPROC);
+	misc_option4 = new OptionBox("Change format and timezone", pos, size, &modechange, 3, NULLPROC);
 
 	misc->RegisterObject(misc_group1);
 	misc->RegisterObject(misc_option1);
@@ -248,11 +250,11 @@ SMOOTHVoid BeatClock::Options()
 	pos.x = 6;
 	pos.y = 5;
 
-	info_text1 = new SMOOTHText("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2002\nGive it to all your friends!", pos);
+	info_text1 = new Text("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2003\nGive it to all your friends!", pos);
 
 	pos.x = 222;
 
-	info_text2 = new SMOOTHText("\n\neMail: robert.kausch@gmx.net", pos);
+	info_text2 = new Text("\n\neMail: robert.kausch@gmx.net", pos);
 
 	info->RegisterObject(info_text1);
 	info->RegisterObject(info_text2);
@@ -264,12 +266,12 @@ SMOOTHVoid BeatClock::Options()
 	size.cx = 0;
 	size.cy = 0;
 
-	main_button1 = new SMOOTHButton("OK", NIL, pos, size, SMOOTHProc(BeatClock, this, OptionsOK));
+	main_button1 = new Button("OK", NIL, pos, size, Proc(BeatClock, this, OptionsOK));
 	main_button1->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 87;
 
-	main_button2 = new SMOOTHButton("Cancel", NIL, pos, size, SMOOTHProc(BeatClock, this, OptionsCancel));
+	main_button2 = new Button("Cancel", NIL, pos, size, Proc(BeatClock, this, OptionsCancel));
 	main_button2->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 7;
@@ -277,16 +279,14 @@ SMOOTHVoid BeatClock::Options()
 	size.cx = 376;
 	size.cy = 105;
 
-	main_reg1 = new SMOOTHTabRegister(pos, size);
+	main_reg1 = new TabWidget(pos, size);
 
 	RegisterObject(optionsdialog);
 
 	optionsdialog->RegisterObject(optitle);
-	optionsdialog->RegisterObject(mainlayer);
-
-	mainlayer->RegisterObject(main_button1);
-	mainlayer->RegisterObject(main_button2);
-	mainlayer->RegisterObject(main_reg1);
+	optionsdialog->RegisterObject(main_button1);
+	optionsdialog->RegisterObject(main_button2);
+	optionsdialog->RegisterObject(main_reg1);
 
 	main_reg1->RegisterObject(display);
 	main_reg1->RegisterObject(misc);
@@ -294,8 +294,8 @@ SMOOTHVoid BeatClock::Options()
 	main_reg1->RegisterObject(info);
 
 	optionsdialog->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
-	optionsdialog->SetMetrics(SMOOTHPoint(100, 100), SMOOTHSize(397, 181));
-	optionsdialog->SetKillProc(SMOOTHKillProc(BeatClock, this, OptionsKillProc));
+	optionsdialog->SetMetrics(Point(100, 100), Size(397, 181));
+	optionsdialog->SetKillProc(KillProc(BeatClock, this, OptionsKillProc));
 	optionsdialog->SetStyle(SS_MODAL);
 
 	oldtf = timeformat;
@@ -334,19 +334,17 @@ SMOOTHVoid BeatClock::Options()
 	info->UnregisterObject(info_text1);
 	info->UnregisterObject(info_text2);
 
-	mainlayer->UnregisterObject(main_button1);
-	mainlayer->UnregisterObject(main_button2);
-	mainlayer->UnregisterObject(main_reg1);
-
 	main_reg1->UnregisterObject(display);
 	main_reg1->UnregisterObject(alarm);
 	main_reg1->UnregisterObject(misc);
 	main_reg1->UnregisterObject(info);
 
-	UnregisterObject(optionsdialog);
-
 	optionsdialog->UnregisterObject(optitle);
-	optionsdialog->UnregisterObject(mainlayer);
+	optionsdialog->UnregisterObject(main_button1);
+	optionsdialog->UnregisterObject(main_button2);
+	optionsdialog->UnregisterObject(main_reg1);
+
+	UnregisterObject(optionsdialog);
 
 	delete optitle;
 	delete optionsdialog;
@@ -354,7 +352,6 @@ SMOOTHVoid BeatClock::Options()
 	delete alarm;
 	delete misc;
 	delete info;
-	delete mainlayer;
 	delete main_button1;
 	delete main_button2;
 	delete main_reg1;
@@ -380,7 +377,7 @@ SMOOTHVoid BeatClock::Options()
 	delete display_option4;
 }
 
-SMOOTHVoid BeatClock::OptionsOK()
+Void BeatClock::OptionsOK()
 {
 	if (timeformat == 0)
 	{
@@ -393,12 +390,12 @@ SMOOTHVoid BeatClock::OptionsOK()
 		alarmbeats = convertSecondsToBeats(alarmsecs);
 	}
 
-	SMOOTH::CloseWindow(optionsdialog);
+	optionsdialog->Close();
 }
 
-SMOOTHVoid BeatClock::OptionsCancel()
+Void BeatClock::OptionsCancel()
 {
-	SMOOTH::CloseWindow(optionsdialog);
+	optionsdialog->Close();
 
 	timeformat = oldtf;
 	centi = oldct;
@@ -411,15 +408,15 @@ SMOOTHVoid BeatClock::OptionsCancel()
 	alarmoption = oldao;
 }
 
-SMOOTHVoid BeatClock::OptionsBeats()
+Void BeatClock::OptionsBeats()
 {
 	display_check1->SetText("Show centibeats");
 	misc_option1->SetText("Show/hide centibeats");
 	alarm_text2->SetText("Internet Beats");
-	alarm_edit1->SetText(SMOOTHString::IntToString(min(999, convertSecondsToBeats(convertTimeStringToSeconds(alarm_edit1->GetText())))));
+	alarm_edit1->SetText(String::IntToString(min(999, convertSecondsToBeats(convertTimeStringToSeconds(alarm_edit1->GetText())))));
 }
 
-SMOOTHVoid BeatClock::OptionsSTF()
+Void BeatClock::OptionsSTF()
 {
 	display_check1->SetText("Show seconds");
 	misc_option1->SetText("Show/hide seconds");
@@ -427,17 +424,17 @@ SMOOTHVoid BeatClock::OptionsSTF()
 	alarm_edit1->SetText(convertSecondsToTimeString(min(86340, convertBeatsToSeconds(alarm_edit1->GetText().ToInt()))));
 }
 
-SMOOTHVoid BeatClock::OptionsPaint()
+Void BeatClock::OptionsPaint()
 {
 	PaintAll();
 }
 
-SMOOTHBool BeatClock::OptionsKillProc()
+Bool BeatClock::OptionsKillProc()
 {
 	return true;
 }
 
-SMOOTHVoid BeatClock::toggleAlarmState()
+Void BeatClock::toggleAlarmState()
 {
 	if (isalarm)
 	{
@@ -453,7 +450,7 @@ SMOOTHVoid BeatClock::toggleAlarmState()
 	}
 }
 
-SMOOTHVoid BeatClock::Mode()
+Void BeatClock::Mode()
 {
 	if (modechange == 0)
 	{
@@ -517,14 +514,14 @@ SMOOTHVoid BeatClock::Mode()
 	PaintAll();
 }
 
-SMOOTHVoid BeatClock::PaintTime()
+Void BeatClock::PaintTime()
 {
 	wmpaint = false;
 	PaintAll();
 	wmpaint = true;
 }
 
-SMOOTHVoid BeatClock::PaintAll()
+Void BeatClock::PaintAll()
 {
 	HDC			 dc = GetWindowDC(wnd->hwnd);
 	RECT			 textrect;
@@ -536,8 +533,8 @@ SMOOTHVoid BeatClock::PaintAll()
 	int			 beats = 0;
 	int			 cbeats = 0;
 	int			 ccbeats = 0;
-	SMOOTHString		 btext = "@";
-	SMOOTHString		 btext2 = "@";
+	String			 btext = "@";
+	String			 btext2 = "@";
 	HBRUSH			 brush = CreateSolidBrush(SMOOTH::Setup::BackgroundColor);
 	HFONT			 hfont;
 	HFONT			 holdfont;
@@ -663,7 +660,7 @@ SMOOTHVoid BeatClock::PaintAll()
 
 			if (alarmoption == 0) isalarm = false;
 
-			SMOOTH::MessageBox(SMOOTHString("It is @").Append(SMOOTHString::IntToString(beats)).Append(" internet beats!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
+			SMOOTH::MessageBox(String("It is @").Append(String::IntToString(beats)).Append(" internet beats!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
 		}
 
 		if (beats != alarmbeats && alarmexec)
@@ -679,7 +676,7 @@ SMOOTHVoid BeatClock::PaintAll()
 
 			if (alarmoption == 0) isalarm = false;
 
-			SMOOTH::MessageBox(SMOOTHString("The time is ").Append(convertSecondsToTimeString(alarmsecs)).Append("!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
+			SMOOTH::MessageBox(String("The time is ").Append(convertSecondsToTimeString(alarmsecs)).Append("!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
 		}
 
 		if (((int) (mseconds / 1000)) != alarmsecs && alarmexec)
@@ -703,8 +700,8 @@ SMOOTHVoid BeatClock::PaintAll()
 				SetBkMode(dc, TRANSPARENT);
 				SetTextColor(dc, RGB(0, 0, 0));
 
-				if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, SMOOTHString("Arial"));
-				else					hfont = CreateFontA(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, SMOOTHString("Arial"));
+				if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
+				else					hfont = CreateFontA(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
 
 				holdfont = (HFONT) SelectObject(dc, hfont);
 
@@ -732,8 +729,8 @@ SMOOTHVoid BeatClock::PaintAll()
 					SetBkMode(dc, TRANSPARENT);
 					SetTextColor(dc, RGB(0, 0, 0));
 
-					if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, SMOOTHString("Arial"));
-					else					hfont = CreateFontA(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, SMOOTHString("Arial"));
+					if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
+					else					hfont = CreateFontA(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
 
 					holdfont = (HFONT) SelectObject(dc, hfont);
 
@@ -756,12 +753,12 @@ SMOOTHVoid BeatClock::PaintAll()
 	::DeleteObject(brush);
 }
 
-SMOOTHVoid BeatClock::Info()
+Void BeatClock::Info()
 {
-	SMOOTH::MessageBox("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2002\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
+	SMOOTH::MessageBox("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2003\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
 }
 
-SMOOTHInt BeatClock::GetDayOfWeek(SMOOTHInt day, SMOOTHInt month, SMOOTHInt year)
+Int BeatClock::GetDayOfWeek(Int day, Int month, Int year)
 {
 	month += 10;
 	year = (month - 24) / 12 + year;
@@ -770,7 +767,7 @@ SMOOTHInt BeatClock::GetDayOfWeek(SMOOTHInt day, SMOOTHInt month, SMOOTHInt year
 	return day;
 }
 
-SMOOTHBool BeatClock::OutOfMonth(SMOOTHInt day, SMOOTHInt month, SMOOTHInt year)
+Bool BeatClock::OutOfMonth(Int day, Int month, Int year)
 {
 	if (day > 31) return true;
 	else if (day > 30 && (month == 4 || month == 6 || month == 9 || month == 11)) return true;
@@ -779,37 +776,37 @@ SMOOTHBool BeatClock::OutOfMonth(SMOOTHInt day, SMOOTHInt month, SMOOTHInt year)
 	else return false;
 }
 
-SMOOTHInt BeatClock::convertBeatsToSeconds(SMOOTHInt beats)
+Int BeatClock::convertBeatsToSeconds(Int beats)
 {
 	return (int) (beats * 86.4);
 }
 
-SMOOTHInt BeatClock::convertSecondsToBeats(SMOOTHInt seconds)
+Int BeatClock::convertSecondsToBeats(Int seconds)
 {
 	return (int) (seconds / 86.4);
 }
 
-SMOOTHString BeatClock::convertSecondsToTimeString(SMOOTHInt seconds)
+String BeatClock::convertSecondsToTimeString(Int seconds)
 {
-	SMOOTHString	 rstring = "";
+	String	 rstring = "";
 
 	if (((int) (seconds / 3600)) < 10) rstring.Append("0");
 
-	rstring.Append(SMOOTHString::IntToString(seconds / 3600));
+	rstring.Append(String::IntToString(seconds / 3600));
 	rstring.Append(":");
 
 	if (((int) ((seconds % 3600) / 60)) < 10) rstring.Append("0");
 
-	rstring.Append(SMOOTHString::IntToString((seconds % 3600) / 60));
+	rstring.Append(String::IntToString((seconds % 3600) / 60));
 
 	return rstring;
 }
 
-SMOOTHInt BeatClock::convertTimeStringToSeconds(SMOOTHString time)
+Int BeatClock::convertTimeStringToSeconds(String time)
 {
-	SMOOTHString	 buffer;
-	int		 counter = 0;
-	int		 rval;
+	String	 buffer;
+	int	 counter = 0;
+	int	 rval;
 
 	buffer[0] = time[counter];
 	counter++;
@@ -838,7 +835,7 @@ SMOOTHInt BeatClock::convertTimeStringToSeconds(SMOOTHString time)
 	return rval;
 }
 
-SMOOTHVoid BeatClock::RegisterValues()
+Void BeatClock::RegisterValues()
 {
 	HKEY	 beatclock;
 
@@ -858,7 +855,7 @@ SMOOTHVoid BeatClock::RegisterValues()
 	RegCloseKey(beatclock);
 }
 
-SMOOTHVoid BeatClock::InputValues()
+Void BeatClock::InputValues()
 {
 	HKEY	beatclock;
 	DWORD	size;

@@ -8,7 +8,7 @@
   This file is a part of bzip2 and/or libbzip2, a program and
   library for lossless, block-sorting data compression.
 
-  Copyright (C) 1996-2000 Julian R Seward.  All rights reserved.
+  Copyright (C) 1996-2002 Julian R Seward.  All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -59,7 +59,7 @@
 --*/
 
 
-#include <bzlib_private.h>
+#include "bzlib_private.h"
 
 
 /*---------------------------------------------------*/
@@ -235,18 +235,18 @@ Int32 BZ2_decompress ( DState* s )
    switch (s->state) {
 
       GET_UCHAR(BZ_X_MAGIC_1, uc);
-      if (uc != 'B') RETURN(BZ_DATA_ERROR_MAGIC);
+      if (uc != BZ_HDR_B) RETURN(BZ_DATA_ERROR_MAGIC);
 
       GET_UCHAR(BZ_X_MAGIC_2, uc);
-      if (uc != 'Z') RETURN(BZ_DATA_ERROR_MAGIC);
+      if (uc != BZ_HDR_Z) RETURN(BZ_DATA_ERROR_MAGIC);
 
       GET_UCHAR(BZ_X_MAGIC_3, uc)
-      if (uc != 'h') RETURN(BZ_DATA_ERROR_MAGIC);
+      if (uc != BZ_HDR_h) RETURN(BZ_DATA_ERROR_MAGIC);
 
       GET_BITS(BZ_X_MAGIC_4, s->blockSize100k, 8)
-      if (s->blockSize100k < '1' || 
-          s->blockSize100k > '9') RETURN(BZ_DATA_ERROR_MAGIC);
-      s->blockSize100k -= '0';
+      if (s->blockSize100k < (BZ_HDR_0 + 1) || 
+          s->blockSize100k > (BZ_HDR_0 + 9)) RETURN(BZ_DATA_ERROR_MAGIC);
+      s->blockSize100k -= BZ_HDR_0;
 
       if (s->smallDecompress) {
          s->ll16 = BZALLOC( s->blockSize100k * 100000 * sizeof(UInt16) );
@@ -275,6 +275,8 @@ Int32 BZ2_decompress ( DState* s )
       if (uc != 0x59) RETURN(BZ_DATA_ERROR);
 
       s->currBlockNo++;
+      if (s->verbosity >= 2)
+         VPrintf1 ( "\n    [%d: huff+mtf ", s->currBlockNo );
  
       s->storedBlockCRC = 0;
       GET_UCHAR(BZ_X_BCRC_1, uc);
@@ -526,6 +528,7 @@ Int32 BZ2_decompress ( DState* s )
       s->state_out_ch  = 0;
       BZ_INITIALISE_CRC ( s->calculatedBlockCRC );
       s->state = BZ_X_OUTPUT;
+      if (s->verbosity >= 2) VPrintf0 ( "rt+rld" );
 
       /*-- Set up cftab to facilitate generation of T^(-1) --*/
       s->cftab[0] = 0;
@@ -615,7 +618,11 @@ Int32 BZ2_decompress ( DState* s )
 
       s->state = BZ_X_IDLE;
       RETURN(BZ_STREAM_END);
+
+      default: AssertH ( False, 4001 );
    }
+
+   AssertH ( False, 4002 );
 
    save_state_and_return:
 

@@ -1,9 +1,9 @@
-$(OBJECTDIR)/application.o: $(BASICCLASSESDIR)/application.cpp $(SMOOTHINCLUDEDIR)/application.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/application.o: $(BASICCLASSESDIR)/application.cpp $(SMOOTHINCLUDEDIR)/application.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/application.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/application.cpp -o $(OBJECTDIR)/application.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/background.o: $(BASICCLASSESDIR)/background.cpp $(SMOOTHINCLUDEDIR)/background.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/background.o: $(BASICCLASSESDIR)/background.cpp $(SMOOTHINCLUDEDIR)/background.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/background.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/background.cpp -o $(OBJECTDIR)/background.o
 	$(ECHO) done.
@@ -18,7 +18,7 @@ $(OBJECTDIR)/containertype.o: $(BASICCLASSESDIR)/containertype.cpp $(SMOOTHINCLU
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/containertype.cpp -o $(OBJECTDIR)/containertype.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/object.o: $(BASICCLASSESDIR)/object.cpp $(SMOOTHINCLUDEDIR)/object.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/object.o: $(BASICCLASSESDIR)/object.cpp $(SMOOTHINCLUDEDIR)/object.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/object.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/object.cpp -o $(OBJECTDIR)/object.o
 	$(ECHO) done.
@@ -38,82 +38,87 @@ $(OBJECTDIR)/objecttype.o: $(BASICCLASSESDIR)/objecttype.cpp $(SMOOTHINCLUDEDIR)
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/objecttype.cpp -o $(OBJECTDIR)/objecttype.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/toolwindow.o: $(INTERNALCLASSESDIR)/toolwindow.cpp $(SMOOTHINCLUDEDIR)/toolwindow.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/system.o: $(BASICCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system.h
+	$(ECHO) -n Compiling $(BASICCLASSESDIR)/system.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/system.cpp -o $(OBJECTDIR)/system.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/toolwindow.o: $(INTERNALCLASSESDIR)/toolwindow.cpp $(SMOOTHINCLUDEDIR)/toolwindow.h
 	$(ECHO) -n Compiling $(INTERNALCLASSESDIR)/toolwindow.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(INTERNALCLASSESDIR)/toolwindow.cpp -o $(OBJECTDIR)/toolwindow.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/activearea.o: $(LAYERCLASSESDIR)/activearea.cpp $(SMOOTHINCLUDEDIR)/activearea.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/activearea.o: $(LAYERCLASSESDIR)/activearea.cpp $(SMOOTHINCLUDEDIR)/activearea.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/activearea.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/activearea.cpp -o $(OBJECTDIR)/activearea.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/arrows.o: $(LAYERCLASSESDIR)/arrows.cpp $(SMOOTHINCLUDEDIR)/arrows.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/arrows.o: $(LAYERCLASSESDIR)/arrows.cpp $(SMOOTHINCLUDEDIR)/arrows.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/arrows.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/arrows.cpp -o $(OBJECTDIR)/arrows.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/bitmap.o: $(LAYERCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/bitmap.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/bitmap.o: $(LAYERCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/bitmap.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/bitmap.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/bitmap.cpp -o $(OBJECTDIR)/bitmap.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/button.o: $(LAYERCLASSESDIR)/button.cpp $(SMOOTHINCLUDEDIR)/button.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/button.o: $(LAYERCLASSESDIR)/button.cpp $(SMOOTHINCLUDEDIR)/button.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/button.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/button.cpp -o $(OBJECTDIR)/button.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/checkbox.o: $(LAYERCLASSESDIR)/checkbox.cpp $(SMOOTHINCLUDEDIR)/checkbox.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/checkbox.o: $(LAYERCLASSESDIR)/checkbox.cpp $(SMOOTHINCLUDEDIR)/checkbox.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/checkbox.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/checkbox.cpp -o $(OBJECTDIR)/checkbox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/editbox.o: $(LAYERCLASSESDIR)/editbox.cpp $(SMOOTHINCLUDEDIR)/editbox.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/editbox.o: $(LAYERCLASSESDIR)/editbox.cpp $(SMOOTHINCLUDEDIR)/editbox.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/editbox.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/editbox.cpp -o $(OBJECTDIR)/editbox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/groupbox.o: $(LAYERCLASSESDIR)/groupbox.cpp $(SMOOTHINCLUDEDIR)/groupbox.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/groupbox.o: $(LAYERCLASSESDIR)/groupbox.cpp $(SMOOTHINCLUDEDIR)/groupbox.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/groupbox.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/groupbox.cpp -o $(OBJECTDIR)/groupbox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/hyperlink.o: $(LAYERCLASSESDIR)/hyperlink.cpp $(SMOOTHINCLUDEDIR)/hyperlink.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/hyperlink.o: $(LAYERCLASSESDIR)/hyperlink.cpp $(SMOOTHINCLUDEDIR)/hyperlink.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/hyperlink.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/hyperlink.cpp -o $(OBJECTDIR)/hyperlink.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/layer.o: $(LAYERCLASSESDIR)/layer.cpp $(SMOOTHINCLUDEDIR)/layer.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/layer.o: $(LAYERCLASSESDIR)/layer.cpp $(SMOOTHINCLUDEDIR)/layer.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/layer.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/layer.cpp -o $(OBJECTDIR)/layer.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/optionbox.o: $(LAYERCLASSESDIR)/optionbox.cpp $(SMOOTHINCLUDEDIR)/optionbox.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/optionbox.o: $(LAYERCLASSESDIR)/optionbox.cpp $(SMOOTHINCLUDEDIR)/optionbox.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/optionbox.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/optionbox.cpp -o $(OBJECTDIR)/optionbox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/progressbar.o: $(LAYERCLASSESDIR)/progressbar.cpp $(SMOOTHINCLUDEDIR)/progressbar.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/progressbar.o: $(LAYERCLASSESDIR)/progressbar.cpp $(SMOOTHINCLUDEDIR)/progressbar.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/progressbar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/progressbar.cpp -o $(OBJECTDIR)/progressbar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/scrollbar.o: $(LAYERCLASSESDIR)/scrollbar.cpp $(SMOOTHINCLUDEDIR)/scrollbar.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/scrollbar.o: $(LAYERCLASSESDIR)/scrollbar.cpp $(SMOOTHINCLUDEDIR)/scrollbar.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/scrollbar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/scrollbar.cpp -o $(OBJECTDIR)/scrollbar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/slider.o: $(LAYERCLASSESDIR)/slider.cpp $(SMOOTHINCLUDEDIR)/slider.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/slider.o: $(LAYERCLASSESDIR)/slider.cpp $(SMOOTHINCLUDEDIR)/slider.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/slider.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/slider.cpp -o $(OBJECTDIR)/slider.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/tabregister.o: $(LAYERCLASSESDIR)/tabregister.cpp $(SMOOTHINCLUDEDIR)/tabregister.h $(SMOOTHINCLUDEDIR)/definitions.h
-	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/tabregister.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/tabregister.cpp -o $(OBJECTDIR)/tabregister.o
+$(OBJECTDIR)/tabwidget.o: $(LAYERCLASSESDIR)/tabwidget.cpp $(SMOOTHINCLUDEDIR)/tabwidget.h
+	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/tabwidget.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/tabwidget.cpp -o $(OBJECTDIR)/tabwidget.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/text.o: $(LAYERCLASSESDIR)/text.cpp $(SMOOTHINCLUDEDIR)/text.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/text.o: $(LAYERCLASSESDIR)/text.cpp $(SMOOTHINCLUDEDIR)/text.h
 	$(ECHO) -n Compiling $(LAYERCLASSESDIR)/text.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LAYERCLASSESDIR)/text.cpp -o $(OBJECTDIR)/text.o
 	$(ECHO) done.
@@ -123,7 +128,7 @@ $(OBJECTDIR)/combobox.o: $(LISTCLASSESDIR)/combobox.cpp $(SMOOTHINCLUDEDIR)/comb
 	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/combobox.cpp -o $(OBJECTDIR)/combobox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/list.o: $(LISTCLASSESDIR)/list.cpp $(SMOOTHINCLUDEDIR)/list.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/list.o: $(LISTCLASSESDIR)/list.cpp $(SMOOTHINCLUDEDIR)/list.h
 	$(ECHO) -n Compiling $(LISTCLASSESDIR)/list.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/list.cpp -o $(OBJECTDIR)/list.o
 	$(ECHO) done.
@@ -133,187 +138,192 @@ $(OBJECTDIR)/listbox.o: $(LISTCLASSESDIR)/listbox.cpp $(SMOOTHINCLUDEDIR)/listbo
 	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/listbox.cpp -o $(OBJECTDIR)/listbox.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/listentry.o: $(LISTCLASSESDIR)/listentry.cpp $(SMOOTHINCLUDEDIR)/list.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/listentry.o: $(LISTCLASSESDIR)/listentry.cpp $(SMOOTHINCLUDEDIR)/list.h
 	$(ECHO) -n Compiling $(LISTCLASSESDIR)/listentry.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/listentry.cpp -o $(OBJECTDIR)/listentry.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mdiclient.o: $(MDICLASSESDIR)/mdiclient.cpp $(SMOOTHINCLUDEDIR)/mdiclient.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/mdiclient.o: $(MDICLASSESDIR)/mdiclient.cpp $(SMOOTHINCLUDEDIR)/mdiclient.h
 	$(ECHO) -n Compiling $(MDICLASSESDIR)/mdiclient.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MDICLASSESDIR)/mdiclient.cpp -o $(OBJECTDIR)/mdiclient.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mdiwindow.o: $(MDICLASSESDIR)/mdiwindow.cpp $(SMOOTHINCLUDEDIR)/mdiwindow.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/mdiwindow.o: $(MDICLASSESDIR)/mdiwindow.cpp $(SMOOTHINCLUDEDIR)/mdiwindow.h
 	$(ECHO) -n Compiling $(MDICLASSESDIR)/mdiwindow.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MDICLASSESDIR)/mdiwindow.cpp -o $(OBJECTDIR)/mdiwindow.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/menu.o: $(MENUCLASSESDIR)/menu.cpp $(SMOOTHINCLUDEDIR)/menu.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/menu.o: $(MENUCLASSESDIR)/menu.cpp $(SMOOTHINCLUDEDIR)/menu.h
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/menu.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/menu.cpp -o $(OBJECTDIR)/menu.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/menubar.o: $(MENUCLASSESDIR)/menubar.cpp $(SMOOTHINCLUDEDIR)/menubar.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/menubar.o: $(MENUCLASSESDIR)/menubar.cpp $(SMOOTHINCLUDEDIR)/menubar.h
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/menubar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/menubar.cpp -o $(OBJECTDIR)/menubar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/menuentry.o: $(MENUCLASSESDIR)/menuentry.cpp $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/menuentry.o: $(MENUCLASSESDIR)/menuentry.cpp
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/menuentry.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/menuentry.cpp -o $(OBJECTDIR)/menuentry.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/popupmenu.o: $(MENUCLASSESDIR)/popupmenu.cpp $(SMOOTHINCLUDEDIR)/popupmenu.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/popupmenu.o: $(MENUCLASSESDIR)/popupmenu.cpp $(SMOOTHINCLUDEDIR)/popupmenu.h
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/popupmenu.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/popupmenu.cpp -o $(OBJECTDIR)/popupmenu.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/popupview.o: $(MENUCLASSESDIR)/popupview.cpp $(SMOOTHINCLUDEDIR)/popupview.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/popupview.o: $(MENUCLASSESDIR)/popupview.cpp $(SMOOTHINCLUDEDIR)/popupview.h
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/popupview.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/popupview.cpp -o $(OBJECTDIR)/popupview.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/date.o: $(MISCCLASSESDIR)/date.cpp $(SMOOTHINCLUDEDIR)/date.h
-	$(ECHO) -n Compiling $(MISCCLASSESDIR)/date.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/date.cpp -o $(OBJECTDIR)/date.o
+$(OBJECTDIR)/binary.o: $(MISCCLASSESDIR)/binary.cpp $(SMOOTHINCLUDEDIR)/binary.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/binary.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/binary.cpp -o $(OBJECTDIR)/binary.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/string.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/datetime.o: $(MISCCLASSESDIR)/datetime.cpp $(SMOOTHINCLUDEDIR)/datetime.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/datetime.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/datetime.cpp -o $(OBJECTDIR)/datetime.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/math.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/math.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/math.cpp -o $(OBJECTDIR)/math.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/string.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/string.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string.cpp -o $(OBJECTDIR)/string.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/surface.o: $(MISCCLASSESDIR)/surface.cpp $(SMOOTHINCLUDEDIR)/surface.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/surface.o: $(MISCCLASSESDIR)/surface.cpp $(SMOOTHINCLUDEDIR)/surface.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/surface.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/surface.cpp -o $(OBJECTDIR)/surface.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/surfacegdi.o: $(MISCCLASSESDIR)/surfacegdi.cpp $(SMOOTHINCLUDEDIR)/surfacegdi.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/surfacegdi.o: $(MISCCLASSESDIR)/surfacegdi.cpp $(SMOOTHINCLUDEDIR)/surfacegdi.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/surfacegdi.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/surfacegdi.cpp -o $(OBJECTDIR)/surfacegdi.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/time.o: $(MISCCLASSESDIR)/time.cpp $(SMOOTHINCLUDEDIR)/time.h
-	$(ECHO) -n Compiling $(MISCCLASSESDIR)/time.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/time.cpp -o $(OBJECTDIR)/time.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/timer.o: $(MISCCLASSESDIR)/timer.cpp $(SMOOTHINCLUDEDIR)/timer.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/timer.o: $(MISCCLASSESDIR)/timer.cpp $(SMOOTHINCLUDEDIR)/timer.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/timer.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/timer.cpp -o $(OBJECTDIR)/timer.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/line.o: $(PRIMITIVESCLASSESDIR)/line.cpp $(SMOOTHINCLUDEDIR)/line.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/line.o: $(PRIMITIVESCLASSESDIR)/line.cpp $(SMOOTHINCLUDEDIR)/line.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/line.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/line.cpp -o $(OBJECTDIR)/line.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/point.o: $(PRIMITIVESCLASSESDIR)/point.cpp $(SMOOTHINCLUDEDIR)/point.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/point.o: $(PRIMITIVESCLASSESDIR)/point.cpp $(SMOOTHINCLUDEDIR)/point.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/point.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/point.cpp -o $(OBJECTDIR)/point.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/primitive.o: $(PRIMITIVESCLASSESDIR)/primitive.cpp $(SMOOTHINCLUDEDIR)/primitive.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/primitive.o: $(PRIMITIVESCLASSESDIR)/primitive.cpp $(SMOOTHINCLUDEDIR)/primitive.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/primitive.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/primitive.cpp -o $(OBJECTDIR)/primitive.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/rect.o: $(PRIMITIVESCLASSESDIR)/rect.cpp $(SMOOTHINCLUDEDIR)/rect.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/rect.o: $(PRIMITIVESCLASSESDIR)/rect.cpp $(SMOOTHINCLUDEDIR)/rect.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/rect.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/rect.cpp -o $(OBJECTDIR)/rect.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/size.o: $(PRIMITIVESCLASSESDIR)/size.cpp $(SMOOTHINCLUDEDIR)/size.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/size.o: $(PRIMITIVESCLASSESDIR)/size.cpp $(SMOOTHINCLUDEDIR)/size.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/size.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/size.cpp -o $(OBJECTDIR)/size.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mutex.o: $(THREADSCLASSESDIR)/mutex.cpp $(SMOOTHINCLUDEDIR)/mutex.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/mutex.o: $(THREADSCLASSESDIR)/mutex.cpp $(SMOOTHINCLUDEDIR)/mutex.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/mutex.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/mutex.cpp -o $(OBJECTDIR)/mutex.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/semaphore.o: $(THREADSCLASSESDIR)/semaphore.cpp $(SMOOTHINCLUDEDIR)/semaphore.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/semaphore.o: $(THREADSCLASSESDIR)/semaphore.cpp $(SMOOTHINCLUDEDIR)/semaphore.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/semaphore.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/semaphore.cpp -o $(OBJECTDIR)/semaphore.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/thread.o: $(THREADSCLASSESDIR)/thread.cpp $(SMOOTHINCLUDEDIR)/thread.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/thread.o: $(THREADSCLASSESDIR)/thread.cpp $(SMOOTHINCLUDEDIR)/thread.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/thread.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/thread.cpp -o $(OBJECTDIR)/thread.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/threadmanager.o: $(THREADSCLASSESDIR)/threadmanager.cpp $(SMOOTHINCLUDEDIR)/threadmanager.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/threadmanager.o: $(THREADSCLASSESDIR)/threadmanager.cpp $(SMOOTHINCLUDEDIR)/threadmanager.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/threadmanager.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/threadmanager.cpp -o $(OBJECTDIR)/threadmanager.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/tree.o: $(TREECLASSESDIR)/tree.cpp $(SMOOTHINCLUDEDIR)/tree.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/tree.o: $(TREECLASSESDIR)/tree.cpp $(SMOOTHINCLUDEDIR)/tree.h
 	$(ECHO) -n Compiling $(TREECLASSESDIR)/tree.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(TREECLASSESDIR)/tree.cpp -o $(OBJECTDIR)/tree.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/treeentry.o: $(TREECLASSESDIR)/treeentry.cpp $(SMOOTHINCLUDEDIR)/tree.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/treeentry.o: $(TREECLASSESDIR)/treeentry.cpp $(SMOOTHINCLUDEDIR)/tree.h
 	$(ECHO) -n Compiling $(TREECLASSESDIR)/treeentry.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(TREECLASSESDIR)/treeentry.cpp -o $(OBJECTDIR)/treeentry.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/treeview.o: $(TREECLASSESDIR)/treeview.cpp $(SMOOTHINCLUDEDIR)/treeview.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/treeview.o: $(TREECLASSESDIR)/treeview.cpp $(SMOOTHINCLUDEDIR)/treeview.h
 	$(ECHO) -n Compiling $(TREECLASSESDIR)/treeview.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(TREECLASSESDIR)/treeview.cpp -o $(OBJECTDIR)/treeview.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/client.o: $(WINDOWCLASSESDIR)/client.cpp $(SMOOTHINCLUDEDIR)/client.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/client.o: $(WINDOWCLASSESDIR)/client.cpp $(SMOOTHINCLUDEDIR)/client.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/client.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/client.cpp -o $(OBJECTDIR)/client.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/divisionbar.o: $(WINDOWCLASSESDIR)/divisionbar.cpp $(SMOOTHINCLUDEDIR)/divisionbar.h $(SMOOTHINCLUDEDIR)/definitions.h
-	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/divisionbar.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/divisionbar.cpp -o $(OBJECTDIR)/divisionbar.o
+$(OBJECTDIR)/divider.o: $(WINDOWCLASSESDIR)/divider.cpp $(SMOOTHINCLUDEDIR)/divider.h
+	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/divider.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/divider.cpp -o $(OBJECTDIR)/divider.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/drag.o: $(WINDOWCLASSESDIR)/drag.cpp $(SMOOTHINCLUDEDIR)/drag.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/drag.o: $(WINDOWCLASSESDIR)/drag.cpp $(SMOOTHINCLUDEDIR)/drag.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/drag.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/drag.cpp -o $(OBJECTDIR)/drag.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/statusbar.o: $(WINDOWCLASSESDIR)/statusbar.cpp $(SMOOTHINCLUDEDIR)/statusbar.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/statusbar.o: $(WINDOWCLASSESDIR)/statusbar.cpp $(SMOOTHINCLUDEDIR)/statusbar.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/statusbar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/statusbar.cpp -o $(OBJECTDIR)/statusbar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/titlebar.o: $(WINDOWCLASSESDIR)/titlebar.cpp $(SMOOTHINCLUDEDIR)/titlebar.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/titlebar.o: $(WINDOWCLASSESDIR)/titlebar.cpp $(SMOOTHINCLUDEDIR)/titlebar.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/titlebar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/titlebar.cpp -o $(OBJECTDIR)/titlebar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/tooltip.o: $(WINDOWCLASSESDIR)/tooltip.cpp $(SMOOTHINCLUDEDIR)/tooltip.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/tooltip.o: $(WINDOWCLASSESDIR)/tooltip.cpp $(SMOOTHINCLUDEDIR)/tooltip.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/tooltip.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/tooltip.cpp -o $(OBJECTDIR)/tooltip.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/window.o: $(WINDOWCLASSESDIR)/window.cpp $(SMOOTHINCLUDEDIR)/window.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/window.o: $(WINDOWCLASSESDIR)/window.cpp $(SMOOTHINCLUDEDIR)/window.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/window.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/window.cpp -o $(OBJECTDIR)/window.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/xml_attribute.o: $(XMLCLASSESDIR)/attribute.cpp $(SMOOTHINCLUDEDIR)/xml/attribute.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/xml_attribute.o: $(XMLCLASSESDIR)/attribute.cpp $(SMOOTHINCLUDEDIR)/xml/attribute.h
 	$(ECHO) -n Compiling $(XMLCLASSESDIR)/attribute.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/attribute.cpp -o $(OBJECTDIR)/xml_attribute.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/xml_document.o: $(XMLCLASSESDIR)/document.cpp $(SMOOTHINCLUDEDIR)/xml/document.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/xml_document.o: $(XMLCLASSESDIR)/document.cpp $(SMOOTHINCLUDEDIR)/xml/document.h
 	$(ECHO) -n Compiling $(XMLCLASSESDIR)/document.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/document.cpp -o $(OBJECTDIR)/xml_document.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/xml_node.o: $(XMLCLASSESDIR)/node.cpp $(SMOOTHINCLUDEDIR)/xml/node.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/xml_node.o: $(XMLCLASSESDIR)/node.cpp $(SMOOTHINCLUDEDIR)/xml/node.h
 	$(ECHO) -n Compiling $(XMLCLASSESDIR)/node.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/node.cpp -o $(OBJECTDIR)/xml_node.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/colordlg.o: $(DIALOGSDIR)/colordlg.cpp $(SMOOTHINCLUDEDIR)/colordlg.h $(SMOOTHINCLUDEDIR)/definitions.h $(SMOOTHINCLUDEDIR)/color.h
+$(OBJECTDIR)/colordlg.o: $(DIALOGSDIR)/colordlg.cpp $(SMOOTHINCLUDEDIR)/colordlg.h $(SMOOTHINCLUDEDIR)/color.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/colordlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/colordlg.cpp -o $(OBJECTDIR)/colordlg.o
 	$(ECHO) done.
@@ -323,69 +333,14 @@ $(OBJECTDIR)/dialog.o: $(DIALOGSDIR)/dialog.cpp $(SMOOTHINCLUDEDIR)/dialog.h
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/dialog.cpp -o $(OBJECTDIR)/dialog.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/dirdlg.o: $(DIALOGSDIR)/dirdlg.cpp $(SMOOTHINCLUDEDIR)/dirdlg.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/dirdlg.o: $(DIALOGSDIR)/dirdlg.cpp $(SMOOTHINCLUDEDIR)/dirdlg.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/dirdlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/dirdlg.cpp -o $(OBJECTDIR)/dirdlg.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/filedlg.o: $(DIALOGSDIR)/filedlg.cpp $(SMOOTHINCLUDEDIR)/filedlg.h $(SMOOTHINCLUDEDIR)/definitions.h
+$(OBJECTDIR)/filedlg.o: $(DIALOGSDIR)/filedlg.cpp $(SMOOTHINCLUDEDIR)/filedlg.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/filedlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/filedlg.cpp -o $(OBJECTDIR)/filedlg.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/afrikaans.o: $(I18NDIR)/afrikaans.cpp $(SMOOTHINCLUDEDIR)/i18n/afrikaans.h
-	$(ECHO) -n Compiling $(I18NDIR)/afrikaans.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/afrikaans.cpp -o $(OBJECTDIR)/afrikaans.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/basque.o: $(I18NDIR)/basque.cpp $(SMOOTHINCLUDEDIR)/i18n/basque.h
-	$(ECHO) -n Compiling $(I18NDIR)/basque.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/basque.cpp -o $(OBJECTDIR)/basque.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/breton.o: $(I18NDIR)/breton.cpp $(SMOOTHINCLUDEDIR)/i18n/breton.h
-	$(ECHO) -n Compiling $(I18NDIR)/breton.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/breton.cpp -o $(OBJECTDIR)/breton.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/bulgarian.o: $(I18NDIR)/bulgarian.cpp $(SMOOTHINCLUDEDIR)/i18n/bulgarian.h
-	$(ECHO) -n Compiling $(I18NDIR)/bulgarian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/bulgarian.cpp -o $(OBJECTDIR)/bulgarian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/catalan.o: $(I18NDIR)/catalan.cpp $(SMOOTHINCLUDEDIR)/i18n/catalan.h
-	$(ECHO) -n Compiling $(I18NDIR)/catalan.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/catalan.cpp -o $(OBJECTDIR)/catalan.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/chinese.o: $(I18NDIR)/chinese.cpp $(SMOOTHINCLUDEDIR)/i18n/chinese.h
-	$(ECHO) -n Compiling $(I18NDIR)/chinese.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/chinese.cpp -o $(OBJECTDIR)/chinese.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/chinese-simplified.o: $(I18NDIR)/chinese-simplified.cpp $(SMOOTHINCLUDEDIR)/i18n/chinese-simplified.h
-	$(ECHO) -n Compiling $(I18NDIR)/chinese-simplified.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/chinese-simplified.cpp -o $(OBJECTDIR)/chinese-simplified.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/croatian.o: $(I18NDIR)/croatian.cpp $(SMOOTHINCLUDEDIR)/i18n/croatian.h
-	$(ECHO) -n Compiling $(I18NDIR)/croatian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/croatian.cpp -o $(OBJECTDIR)/croatian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/czech.o: $(I18NDIR)/czech.cpp $(SMOOTHINCLUDEDIR)/i18n/czech.h
-	$(ECHO) -n Compiling $(I18NDIR)/czech.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/czech.cpp -o $(OBJECTDIR)/czech.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/danish.o: $(I18NDIR)/danish.cpp $(SMOOTHINCLUDEDIR)/i18n/danish.h
-	$(ECHO) -n Compiling $(I18NDIR)/danish.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/danish.cpp -o $(OBJECTDIR)/danish.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/dutch.o: $(I18NDIR)/dutch.cpp $(SMOOTHINCLUDEDIR)/i18n/dutch.h
-	$(ECHO) -n Compiling $(I18NDIR)/dutch.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/dutch.cpp -o $(OBJECTDIR)/dutch.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/english.o: $(I18NDIR)/english.cpp $(SMOOTHINCLUDEDIR)/i18n/english.h
@@ -393,49 +348,9 @@ $(OBJECTDIR)/english.o: $(I18NDIR)/english.cpp $(SMOOTHINCLUDEDIR)/i18n/english.
 	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/english.cpp -o $(OBJECTDIR)/english.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/esperanto.o: $(I18NDIR)/esperanto.cpp $(SMOOTHINCLUDEDIR)/i18n/esperanto.h
-	$(ECHO) -n Compiling $(I18NDIR)/esperanto.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/esperanto.cpp -o $(OBJECTDIR)/esperanto.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/estonian.o: $(I18NDIR)/estonian.cpp $(SMOOTHINCLUDEDIR)/i18n/estonian.h
-	$(ECHO) -n Compiling $(I18NDIR)/estonian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/estonian.cpp -o $(OBJECTDIR)/estonian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/finnish.o: $(I18NDIR)/finnish.cpp $(SMOOTHINCLUDEDIR)/i18n/finnish.h
-	$(ECHO) -n Compiling $(I18NDIR)/finnish.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/finnish.cpp -o $(OBJECTDIR)/finnish.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/french.o: $(I18NDIR)/french.cpp $(SMOOTHINCLUDEDIR)/i18n/french.h
-	$(ECHO) -n Compiling $(I18NDIR)/french.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/french.cpp -o $(OBJECTDIR)/french.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/galician.o: $(I18NDIR)/galician.cpp $(SMOOTHINCLUDEDIR)/i18n/galician.h
-	$(ECHO) -n Compiling $(I18NDIR)/galician.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/galician.cpp -o $(OBJECTDIR)/galician.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/german.o: $(I18NDIR)/german.cpp $(SMOOTHINCLUDEDIR)/i18n/german.h
 	$(ECHO) -n Compiling $(I18NDIR)/german.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/german.cpp -o $(OBJECTDIR)/german.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/greek.o: $(I18NDIR)/greek.cpp $(SMOOTHINCLUDEDIR)/i18n/greek.h
-	$(ECHO) -n Compiling $(I18NDIR)/greek.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/greek.cpp -o $(OBJECTDIR)/greek.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/hebrew.o: $(I18NDIR)/hebrew.cpp $(SMOOTHINCLUDEDIR)/i18n/hebrew.h
-	$(ECHO) -n Compiling $(I18NDIR)/hebrew.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/hebrew.cpp -o $(OBJECTDIR)/hebrew.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/hungarian.o: $(I18NDIR)/hungarian.cpp $(SMOOTHINCLUDEDIR)/i18n/hungarian.h
-	$(ECHO) -n Compiling $(I18NDIR)/hungarian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/hungarian.cpp -o $(OBJECTDIR)/hungarian.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/i18n.o: $(I18NDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/i18n.h
@@ -443,159 +358,14 @@ $(OBJECTDIR)/i18n.o: $(I18NDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/i18n.h
 	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/i18n.cpp -o $(OBJECTDIR)/i18n.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/icelandic.o: $(I18NDIR)/icelandic.cpp $(SMOOTHINCLUDEDIR)/i18n/icelandic.h
-	$(ECHO) -n Compiling $(I18NDIR)/icelandic.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/icelandic.cpp -o $(OBJECTDIR)/icelandic.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/irish.o: $(I18NDIR)/irish.cpp $(SMOOTHINCLUDEDIR)/i18n/irish.h
-	$(ECHO) -n Compiling $(I18NDIR)/irish.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/irish.cpp -o $(OBJECTDIR)/irish.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/italian.o: $(I18NDIR)/italian.cpp $(SMOOTHINCLUDEDIR)/i18n/italian.h
-	$(ECHO) -n Compiling $(I18NDIR)/italian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/italian.cpp -o $(OBJECTDIR)/italian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/japanese.o: $(I18NDIR)/japanese.cpp $(SMOOTHINCLUDEDIR)/i18n/japanese.h
-	$(ECHO) -n Compiling $(I18NDIR)/japanese.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/japanese.cpp -o $(OBJECTDIR)/japanese.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/korean.o: $(I18NDIR)/korean.cpp $(SMOOTHINCLUDEDIR)/i18n/korean.h
-	$(ECHO) -n Compiling $(I18NDIR)/korean.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/korean.cpp -o $(OBJECTDIR)/korean.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/latin.o: $(I18NDIR)/latin.cpp $(SMOOTHINCLUDEDIR)/i18n/latin.h
-	$(ECHO) -n Compiling $(I18NDIR)/latin.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/latin.cpp -o $(OBJECTDIR)/latin.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/latvian.o: $(I18NDIR)/latvian.cpp $(SMOOTHINCLUDEDIR)/i18n/latvian.h
-	$(ECHO) -n Compiling $(I18NDIR)/latvian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/latvian.cpp -o $(OBJECTDIR)/latvian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/lithuanian.o: $(I18NDIR)/lithuanian.cpp $(SMOOTHINCLUDEDIR)/i18n/lithuanian.h
-	$(ECHO) -n Compiling $(I18NDIR)/lithuanian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/lithuanian.cpp -o $(OBJECTDIR)/lithuanian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/macedonian.o: $(I18NDIR)/macedonian.cpp $(SMOOTHINCLUDEDIR)/i18n/macedonian.h
-	$(ECHO) -n Compiling $(I18NDIR)/macedonian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/macedonian.cpp -o $(OBJECTDIR)/macedonian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/maori.o: $(I18NDIR)/maori.cpp $(SMOOTHINCLUDEDIR)/i18n/maori.h
-	$(ECHO) -n Compiling $(I18NDIR)/maori.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/maori.cpp -o $(OBJECTDIR)/maori.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/norwegian.o: $(I18NDIR)/norwegian.cpp $(SMOOTHINCLUDEDIR)/i18n/norwegian.h
-	$(ECHO) -n Compiling $(I18NDIR)/norwegian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/norwegian.cpp -o $(OBJECTDIR)/norwegian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/occitan.o: $(I18NDIR)/occitan.cpp $(SMOOTHINCLUDEDIR)/i18n/occitan.h
-	$(ECHO) -n Compiling $(I18NDIR)/occitan.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/occitan.cpp -o $(OBJECTDIR)/occitan.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/polish.o: $(I18NDIR)/polish.cpp $(SMOOTHINCLUDEDIR)/i18n/polish.h
-	$(ECHO) -n Compiling $(I18NDIR)/polish.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/polish.cpp -o $(OBJECTDIR)/polish.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/portuguese.o: $(I18NDIR)/portuguese.cpp $(SMOOTHINCLUDEDIR)/i18n/portuguese.h
-	$(ECHO) -n Compiling $(I18NDIR)/portuguese.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/portuguese.cpp -o $(OBJECTDIR)/portuguese.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/portuguese-brazil.o: $(I18NDIR)/portuguese-brazil.cpp $(SMOOTHINCLUDEDIR)/i18n/portuguese-brazil.h
-	$(ECHO) -n Compiling $(I18NDIR)/portuguese-brazil.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/portuguese-brazil.cpp -o $(OBJECTDIR)/portuguese-brazil.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/romanian.o: $(I18NDIR)/romanian.cpp $(SMOOTHINCLUDEDIR)/i18n/romanian.h
-	$(ECHO) -n Compiling $(I18NDIR)/romanian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/romanian.cpp -o $(OBJECTDIR)/romanian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/russian.o: $(I18NDIR)/russian.cpp $(SMOOTHINCLUDEDIR)/i18n/russian.h
-	$(ECHO) -n Compiling $(I18NDIR)/russian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/russian.cpp -o $(OBJECTDIR)/russian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/serbian.o: $(I18NDIR)/serbian.cpp $(SMOOTHINCLUDEDIR)/i18n/serbian.h
-	$(ECHO) -n Compiling $(I18NDIR)/serbian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/serbian.cpp -o $(OBJECTDIR)/serbian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/slovak.o: $(I18NDIR)/slovak.cpp $(SMOOTHINCLUDEDIR)/i18n/slovak.h
-	$(ECHO) -n Compiling $(I18NDIR)/slovak.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/slovak.cpp -o $(OBJECTDIR)/slovak.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/slovenian.o: $(I18NDIR)/slovenian.cpp $(SMOOTHINCLUDEDIR)/i18n/slovenian.h
-	$(ECHO) -n Compiling $(I18NDIR)/slovenian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/slovenian.cpp -o $(OBJECTDIR)/slovenian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/spanish.o: $(I18NDIR)/spanish.cpp $(SMOOTHINCLUDEDIR)/i18n/spanish.h
-	$(ECHO) -n Compiling $(I18NDIR)/spanish.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/spanish.cpp -o $(OBJECTDIR)/spanish.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/swedish.o: $(I18NDIR)/swedish.cpp $(SMOOTHINCLUDEDIR)/i18n/swedish.h
-	$(ECHO) -n Compiling $(I18NDIR)/swedish.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/swedish.cpp -o $(OBJECTDIR)/swedish.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/tamil.o: $(I18NDIR)/tamil.cpp $(SMOOTHINCLUDEDIR)/i18n/tamil.h
-	$(ECHO) -n Compiling $(I18NDIR)/tamil.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/tamil.cpp -o $(OBJECTDIR)/tamil.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/thai.o: $(I18NDIR)/thai.cpp $(SMOOTHINCLUDEDIR)/i18n/thai.h
-	$(ECHO) -n Compiling $(I18NDIR)/thai.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/thai.cpp -o $(OBJECTDIR)/thai.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/turkish.o: $(I18NDIR)/turkish.cpp $(SMOOTHINCLUDEDIR)/i18n/turkish.h
-	$(ECHO) -n Compiling $(I18NDIR)/turkish.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/turkish.cpp -o $(OBJECTDIR)/turkish.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/ukrainian.o: $(I18NDIR)/ukrainian.cpp $(SMOOTHINCLUDEDIR)/i18n/ukrainian.h
-	$(ECHO) -n Compiling $(I18NDIR)/ukrainian.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/ukrainian.cpp -o $(OBJECTDIR)/ukrainian.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/walloon.o: $(I18NDIR)/walloon.cpp $(SMOOTHINCLUDEDIR)/i18n/walloon.h
-	$(ECHO) -n Compiling $(I18NDIR)/walloon.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/walloon.cpp -o $(OBJECTDIR)/walloon.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/welsh.o: $(I18NDIR)/welsh.cpp $(SMOOTHINCLUDEDIR)/i18n/welsh.h
-	$(ECHO) -n Compiling $(I18NDIR)/welsh.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NDIR)/welsh.cpp -o $(OBJECTDIR)/welsh.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/binary.o: $(MISCDIR)/binary.cpp $(SMOOTHINCLUDEDIR)/binary.h
-	$(ECHO) -n Compiling $(MISCDIR)/binary.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/binary.cpp -o $(OBJECTDIR)/binary.o
+$(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h
+	$(ECHO) -n Compiling $(MISCDIR)/codecs.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/codecs.cpp -o $(OBJECTDIR)/codecs.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/color.o: $(MISCDIR)/color.cpp $(SMOOTHINCLUDEDIR)/color.h
 	$(ECHO) -n Compiling $(MISCDIR)/color.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/color.cpp -o $(OBJECTDIR)/color.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/definitions.o: $(MISCDIR)/definitions.cpp $(SMOOTHINCLUDEDIR)/definitions.h
-	$(ECHO) -n Compiling $(MISCDIR)/definitions.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/definitions.cpp -o $(OBJECTDIR)/definitions.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/dllmain.o: $(MISCDIR)/dllmain.cpp $(SMOOTHINCLUDEDIR)/dllmain.h
@@ -608,11 +378,6 @@ $(OBJECTDIR)/loop.o: $(MISCDIR)/loop.cpp $(SMOOTHINCLUDEDIR)/loop.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/loop.cpp -o $(OBJECTDIR)/loop.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mathtools.o: $(MISCDIR)/mathtools.cpp $(SMOOTHINCLUDEDIR)/mathtools.h
-	$(ECHO) -n Compiling $(MISCDIR)/mathtools.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/mathtools.cpp -o $(OBJECTDIR)/mathtools.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/messagebox.o: $(MISCDIR)/messagebox.cpp $(SMOOTHINCLUDEDIR)/messagebox.h
 	$(ECHO) -n Compiling $(MISCDIR)/messagebox.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/messagebox.cpp -o $(OBJECTDIR)/messagebox.o
@@ -621,6 +386,11 @@ $(OBJECTDIR)/messagebox.o: $(MISCDIR)/messagebox.cpp $(SMOOTHINCLUDEDIR)/message
 $(OBJECTDIR)/metrics.o: $(MISCDIR)/metrics.cpp $(SMOOTHINCLUDEDIR)/metrics.h
 	$(ECHO) -n Compiling $(MISCDIR)/metrics.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/metrics.cpp -o $(OBJECTDIR)/metrics.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/pciio.o: $(MISCDIR)/pciio.cpp $(SMOOTHINCLUDEDIR)/pciio.h
+	$(ECHO) -n Compiling $(MISCDIR)/pciio.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/pciio.cpp -o $(OBJECTDIR)/pciio.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/splashscreen.o: $(MISCDIR)/splashscreen.cpp $(SMOOTHINCLUDEDIR)/splashscreen.h
@@ -643,27 +413,32 @@ $(OBJECTDIR)/resources.o: $(SMOOTHINCLUDEDIR)/resources.h $(RESOURCEDIR)/version
 	$(RESCOMP) $(RESCOMP_OPTS) $(RESOURCEDIR)/resources.rc -o $(OBJECTDIR)/resources.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/designer.o: $(DESIGNERDIR)/designer.cpp $(DLLNAME)
+$(OBJECTDIR)/designer_designer.o: $(DESIGNERDIR)/designer.cpp $(DLLNAME)
 	$(ECHO) -n Compiling $(DESIGNERDIR)/designer.cpp...
-	$(COMPILER) $(EXECOMPILER_OPTS) $(DESIGNERDIR)/designer.cpp -o $(OBJECTDIR)/designer.o
+	$(COMPILER) $(EXECOMPILER_OPTS) $(DESIGNERDIR)/designer.cpp -o $(OBJECTDIR)/designer_designer.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/edit_component.o: $(DESIGNERDIR)/edit_component.cpp $(DLLNAME)
+$(OBJECTDIR)/designer_edit_component.o: $(DESIGNERDIR)/edit_component.cpp $(DLLNAME)
 	$(ECHO) -n Compiling $(DESIGNERDIR)/edit_component.cpp...
-	$(COMPILER) $(EXECOMPILER_OPTS) $(DESIGNERDIR)/edit_component.cpp -o $(OBJECTDIR)/edit_component.o
+	$(COMPILER) $(EXECOMPILER_OPTS) $(DESIGNERDIR)/edit_component.cpp -o $(OBJECTDIR)/designer_edit_component.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/tools.o: $(DESIGNERDIR)/tools.cpp $(DLLNAME)
+$(OBJECTDIR)/designer_tools.o: $(DESIGNERDIR)/tools.cpp $(DLLNAME)
 	$(ECHO) -n Compiling $(DESIGNERDIR)/tools.cpp...
-	$(COMPILER) $(EXECOMPILER_OPTS) $(DESIGNERDIR)/tools.cpp -o $(OBJECTDIR)/tools.o
+	$(COMPILER) $(EXECOMPILER_OPTS) $(DESIGNERDIR)/tools.cpp -o $(OBJECTDIR)/designer_tools.o
 	$(ECHO) done.
 
-$(OBJTESTDIR)/objtest.o: $(OBJTESTDIR)/objtest.cpp $(DLLNAME)
-	$(ECHO) -n Compiling $(OBJTESTDIR)/objtest.cpp...
-	$(COMPILER) $(EXECOMPILER_OPTS) $(OBJTESTDIR)/objtest.cpp -o $(OBJTESTDIR)/objtest.o
+$(OBJECTDIR)/pciffman_main.o: $(PCIFFMANDIR)/main.cpp $(DLLNAME)
+	$(ECHO) -n Compiling $(PCIFFMANDIR)/main.cpp...
+	$(COMPILER) $(EXECOMPILER_OPTS) $(PCIFFMANDIR)/main.cpp -o $(OBJECTDIR)/pciffman_main.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/iolib_instream.o: $(IOLIBDIR)/instream.cpp $(INCLUDEDIR)/instream-cxx.h
+$(OBJECTDIR)/translator_translator.o: $(TRANSLATORDIR)/translator.cpp $(DLLNAME)
+	$(ECHO) -n Compiling $(TRANSLATORDIR)/translator.cpp...
+	$(COMPILER) $(EXECOMPILER_OPTS) $(TRANSLATORDIR)/translator.cpp -o $(OBJECTDIR)/translator_translator.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_instream.o: $(IOLIBDIR)/instream.cpp $(INCLUDEDIR)/iolib/instream-cxx.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/instream.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/instream.cpp -o $(OBJECTDIR)/iolib_instream.o
 	$(ECHO) done.
@@ -673,39 +448,74 @@ $(OBJECTDIR)/iolib_iolib.o: $(IOLIBDIR)/iolib.cpp $(INCLUDEDIR)/iolib-cxx.h
 	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/iolib.cpp -o $(OBJECTDIR)/iolib_iolib.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/iolib_iolibdriver.o: $(IOLIBDIR)/iolibdriver.cpp $(INCLUDEDIR)/iolibdriver-cxx.h
+$(OBJECTDIR)/iolib_iolibdriver.o: $(IOLIBDIR)/iolibdriver.cpp $(INCLUDEDIR)/iolib/iolibdriver-cxx.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/iolibdriver.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/iolibdriver.cpp -o $(OBJECTDIR)/iolib_iolibdriver.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/iolib_iolibfilter.o: $(IOLIBDIR)/iolibfilter.cpp $(INCLUDEDIR)/iolibfilter-cxx.h
+$(OBJECTDIR)/iolib_iolibfilter.o: $(IOLIBDIR)/iolibfilter.cpp $(INCLUDEDIR)/iolib/iolibfilter-cxx.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/iolibfilter.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/iolibfilter.cpp -o $(OBJECTDIR)/iolib_iolibfilter.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/iolib_iolibstream.o: $(IOLIBDIR)/iolibstream.cpp $(INCLUDEDIR)/iolibstream-cxx.h
+$(OBJECTDIR)/iolib_iolibstream.o: $(IOLIBDIR)/iolibstream.cpp $(INCLUDEDIR)/iolib/iolibstream-cxx.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/iolibstream.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/iolibstream.cpp -o $(OBJECTDIR)/iolib_iolibstream.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/iolib_outstream.o: $(IOLIBDIR)/outstream.cpp $(INCLUDEDIR)/outstream-cxx.h
+$(OBJECTDIR)/iolib_outstream.o: $(IOLIBDIR)/outstream.cpp $(INCLUDEDIR)/iolib/outstream-cxx.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/outstream.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/outstream.cpp -o $(OBJECTDIR)/iolib_outstream.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_driver_ansi.o: $(IOLIBDIR)/drivers/ansi/driver_ansi.cpp $(INCLUDEDIR)/iolib/drivers/driver_ansi.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/ansi/driver_ansi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/ansi/driver_ansi.cpp -o $(OBJECTDIR)/iolib_driver_ansi.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_driver_memory.o: $(IOLIBDIR)/drivers/memory/driver_memory.cpp $(INCLUDEDIR)/iolib/drivers/driver_memory.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/memory/driver_memory.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/memory/driver_memory.cpp -o $(OBJECTDIR)/iolib_driver_memory.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_driver_posix.o: $(IOLIBDIR)/drivers/posix/driver_posix.cpp $(INCLUDEDIR)/iolib/drivers/driver_posix.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/posix/driver_posix.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/posix/driver_posix.cpp -o $(OBJECTDIR)/iolib_driver_posix.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_driver_socket.o: $(IOLIBDIR)/drivers/socket/driver_socket.cpp $(INCLUDEDIR)/iolib/drivers/driver_socket.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socket/driver_socket.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socket/driver_socket.cpp -o $(OBJECTDIR)/iolib_driver_socket.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_driver_socks4.o: $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp $(INCLUDEDIR)/iolib/drivers/driver_socks4.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp -o $(OBJECTDIR)/iolib_driver_socks4.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_driver_socks5.o: $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp $(INCLUDEDIR)/iolib/drivers/driver_socks5.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp -o $(OBJECTDIR)/iolib_driver_socks5.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_driver_zero.o: $(IOLIBDIR)/drivers/zero/driver_zero.cpp $(INCLUDEDIR)/iolib/drivers/driver_zero.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/zero/driver_zero.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/zero/driver_zero.cpp -o $(OBJECTDIR)/iolib_driver_zero.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_filter_bzip2.o: $(IOLIBDIR)/filters/bzip2/filter_bzip2.cpp $(INCLUDEDIR)/iolib/filters/filter_bzip2.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/filters/bzip2/filter_bzip2.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/filters/bzip2/filter_bzip2.cpp -o $(OBJECTDIR)/iolib_filter_bzip2.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_filter_xor.o: $(IOLIBDIR)/filters/xor/filter_xor.cpp $(INCLUDEDIR)/iolib/filters/filter_xor.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/filters/xor/filter_xor.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/filters/xor/filter_xor.cpp -o $(OBJECTDIR)/iolib_filter_xor.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/picture_picture.o: $(PICTUREDIR)/picture.cpp $(INCLUDEDIR)/picture.h
 	$(ECHO) -n Compiling $(PICTUREDIR)/picture.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PICTUREDIR)/picture.cpp -o $(OBJECTDIR)/picture_picture.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libpci_codecs.o: $(LIBPCIDIR)/codecs.cpp $(INCLUDEDIR)/codecs.h
-	$(ECHO) -n Compiling $(LIBPCIDIR)/codecs.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBPCIDIR)/codecs.cpp -o $(OBJECTDIR)/libpci_codecs.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libpci_pciio.o: $(LIBPCIDIR)/pciio.cpp $(INCLUDEDIR)/pciio.h
-	$(ECHO) -n Compiling $(LIBPCIDIR)/pciio.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBPCIDIR)/pciio.cpp -o $(OBJECTDIR)/libpci_pciio.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libbz2_blocksort.o: $(LIBBZ2DIR)/blocksort.c
@@ -741,21 +551,6 @@ $(OBJECTDIR)/libbz2_huffman.o: $(LIBBZ2DIR)/huffman.c
 $(OBJECTDIR)/libbz2_randtable.o: $(LIBBZ2DIR)/randtable.c
 	$(ECHO) -n Compiling $(LIBBZ2DIR)/randtable.c...
 	$(COMPILER) $(COMPILER_OPTS) $(LIBBZ2DIR)/randtable.c -o $(OBJECTDIR)/libbz2_randtable.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_iolib-filters.o: $(INCLUDEDIR)/iolib-filters-cxx.h $(IOLIBFILTERSDIR)/iolib-filters.cpp
-	$(ECHO) -n Compiling $(IOLIBFILTERSDIR)/iolib-filters.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBFILTERSDIR)/iolib-filters.cpp -o $(OBJECTDIR)/iolib_iolib-filters.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_filter-bz2.o: $(INCLUDEDIR)/filter-bz2-cxx.h $(IOLIBFILTERSDIR)/filter-bz2.cpp
-	$(ECHO) -n Compiling $(IOLIBFILTERSDIR)/filter-bz2.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBFILTERSDIR)/filter-bz2.cpp -o $(OBJECTDIR)/iolib_filter-bz2.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_filter-xor.o: $(INCLUDEDIR)/filter-xor-cxx.h $(IOLIBFILTERSDIR)/filter-xor.cpp
-	$(ECHO) -n Compiling $(IOLIBFILTERSDIR)/filter-xor.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBFILTERSDIR)/filter-xor.cpp -o $(OBJECTDIR)/iolib_filter-xor.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_catalog.o: $(LIBXMLDIR)/catalog.c
@@ -891,14 +686,4 @@ $(SAMPLE4DIR)/plugin.o: $(SAMPLE4DIR)/plugin.cpp $(DLLNAME)
 $(SAMPLE5DIR)/mditest.o: $(SAMPLE5DIR)/mditest.cpp $(DLLNAME)
 	$(ECHO) -n Compiling $(SAMPLE5DIR)/mditest.cpp...
 	$(COMPILER) $(EXECOMPILER_OPTS) $(SAMPLE5DIR)/mditest.cpp -o $(SAMPLE5DIR)/mditest.o
-	$(ECHO) done.
-
-$(TUTORIAL01DIR)/t01.o: $(TUTORIAL01DIR)/t01.cpp $(DLLNAME)
-	$(ECHO) -n Compiling $(TUTORIAL01DIR)/t01.cpp...
-	$(COMPILER) $(EXECOMPILER_OPTS) $(TUTORIAL01DIR)/t01.cpp -o $(TUTORIAL01DIR)/t01.o
-	$(ECHO) done.
-
-$(TUTORIAL02DIR)/t02.o: $(TUTORIAL02DIR)/t02.cpp $(DLLNAME)
-	$(ECHO) -n Compiling $(TUTORIAL02DIR)/t02.cpp...
-	$(COMPILER) $(EXECOMPILER_OPTS) $(TUTORIAL02DIR)/t02.cpp -o $(TUTORIAL02DIR)/t02.o
 	$(ECHO) done.

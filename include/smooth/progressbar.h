@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,35 +11,39 @@
 #ifndef _H_OBJSMOOTH_PROGRESSBAR_
 #define _H_OBJSMOOTH_PROGRESSBAR_
 
-#define SProgressbar SMOOTHProgressbar
-
-class SMOOTHProgressbar;
+namespace smooth
+{
+	class Progressbar;
+};
 
 #include "object.h"
 
-const SMOOTHInt PB_NOTEXT	= 0;
-const SMOOTHInt PB_VALUE	= 1;
-const SMOOTHInt PB_PERCENT	= 2;
-
-class SMOOTHAPI SMOOTHProgressbar : public SMOOTHObject
+namespace smooth
 {
-	protected:
-		SMOOTHInt		 value;
+	const Int PB_NOTEXT	= 0;
+	const Int PB_VALUE	= 1;
+	const Int PB_PERCENT	= 2;
 
-		SMOOTHInt		 startValue;
-		SMOOTHInt		 endValue;
+	class SMOOTHAPI Progressbar : public Object
+	{
+		protected:
+			Int		 value;
 
-		SMOOTHInt		 textFlag;
-	public:
-					 SMOOTHProgressbar(SMOOTHPoint, SMOOTHSize, SMOOTHInt, SMOOTHInt, SMOOTHInt, SMOOTHInt, SMOOTHInt);
-					~SMOOTHProgressbar();
+			Int		 startValue;
+			Int		 endValue;
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
+			Int		 textFlag;
+		public:
+					 Progressbar(Point, Size, Int, Int, Int, Int, Int);
+					~Progressbar();
 
-		SMOOTHInt		 SetValue(SMOOTHInt);
-		SMOOTHInt		 GetValue();
+			virtual Int	 Paint(Int);
+
+			Int		 SetValue(Int);
+			Int		 GetValue();
+	};
+
+	SMOOTHVAR Int OBJ_PROGRESSBAR;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_PROGRESSBAR;
 
 #endif

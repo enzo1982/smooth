@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -9,70 +9,69 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth.h>
-#include <math.h>
+#include <smooth/main.h>
 #include "testkey.h"
 
-void SMOOTH::Main()
+Int smooth::Main()
 {
 	TestKey	*app = new TestKey();
 
-	SMOOTH::Loop();
+	Loop();
 
 	delete app;
+
+	return 0;
 }
 
 TestKey::TestKey()
 {
 	SetText("TestKey");
 
-	SMOOTHPoint	 pos;
+	Point	 pos;
 
-	pos.x = 69;
-	pos.y = 43;
+	pos.x = 85;
+	pos.y = 28;
 
-	wnd	= new SWindow("TestKey - by Robert Kausch 2000-2002");
-	layer	= new SLayer();
-	title	= new STitlebar(true, false, true);
-	text	= new SText("ASCII-Code: 000\nScanCode: 000\nVirtual keycode: 000", pos);
+	wnd	= new Window("TestKey - by Robert Kausch 2000-2003");
+	title	= new Titlebar(true, false, true);
+	text	= new Text("ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000", pos);
 
 	RegisterObject(wnd);
 
 	wnd->RegisterObject(title);
-	wnd->RegisterObject(layer);
+	wnd->RegisterObject(text);
 
-	layer->RegisterObject(text);
-
-	wnd->SetMessageProc(SMessageProc(TestKey, this, MessageProc));
-	wnd->SetMetrics(SPoint(80, 80), SSize(240, 160));
+	wnd->SetMessageProc(MessageProc(TestKey, this, EventProc));
+	wnd->SetMetrics(Point(80, 80), Size(300, 160));
 }
 
 TestKey::~TestKey()
 {
-	layer->UnregisterObject(text);
-
+	wnd->UnregisterObject(text);
 	wnd->UnregisterObject(title);
-	wnd->UnregisterObject(layer);
 
 	UnregisterObject(wnd);
 
 	delete title;
 	delete wnd;
 	delete text;
-	delete layer;
 }
 
-SVoid TestKey::MessageProc(SInt message, SInt wParam, SInt lParam)
+Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 {
-	SByte	 newText[51]	= "ASCII-Code: 000\nScanCode: 000\nVirtual keycode: 000";
-	SByte	 asciiCode	= 0;
-	SInt	 scanCode	= 0;
-	SInt	 vkCode		= 0;
-	SByte	 keys[256];
+	Byte		 newText[77]	= "ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000";
+	UnsignedByte	 asciiCode	= 0;
+	Int		 unicode	= 0;
+	Int		 scanCode	= 0;
+	Int		 vkCode		= 0;
+	Byte		 keys[256];
 
 	if (message == WM_KEYDOWN)
 	{
-		GetKeyboardState((SUByte *) &keys);
-		ToAscii(wParam, GetBits(lParam, 16, 23), (SUByte *) &keys, (SUShort *) &asciiCode, 0);
+		GetKeyboardState((UnsignedByte *) &keys);
+		ToAscii(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (UnsignedShort *) &asciiCode, 0);
+
+		if (SMOOTH::Setup::enableUnicode) ToUnicode(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (wchar_t *) &unicode, 1, 0);
 
 		scanCode	= GetBits(lParam, 16, 23);
 		vkCode		= wParam;
@@ -81,27 +80,33 @@ SVoid TestKey::MessageProc(SInt message, SInt wParam, SInt lParam)
 		newText[13] = asciiCode % 100 / 10 + 48;
 		newText[14] = asciiCode % 100 % 10 + 48;
 
-		newText[26] = scanCode / 100 + 48;
-		newText[27] = scanCode % 100 / 10 + 48;
-		newText[28] = scanCode % 100 % 10 + 48;
+		newText[35] = unicode / 10000 + 48;
+		newText[36] = unicode % 10000 / 1000 + 48;
+		newText[37] = unicode % 10000 % 1000 / 100 + 48;
+		newText[38] = unicode % 10000 % 1000 % 100 / 10 + 48;
+		newText[39] = unicode % 10000 % 1000 % 100 % 10 + 48;
 
-		newText[47] = vkCode / 100 + 48;
-		newText[48] = vkCode % 100 / 10 + 48;
-		newText[49] = vkCode % 100 % 10 + 48;
+		newText[52] = scanCode / 100 + 48;
+		newText[53] = scanCode % 100 / 10 + 48;
+		newText[54] = scanCode % 100 % 10 + 48;
+
+		newText[73] = vkCode / 100 + 48;
+		newText[74] = vkCode % 100 / 10 + 48;
+		newText[75] = vkCode % 100 % 10 + 48;
 
 		text->SetText(newText);
 	}
 }
 
-SInt TestKey::GetBits(SInt number, SUInt startBit, SUInt endBit)
+Int TestKey::GetBits(Int number, UnsignedInt startBit, UnsignedInt endBit)
 {
-	SInt	retVal = 0;
+	Int	retVal = 0;
 
 	if (startBit >= 64 || endBit >= 64) return -1;
 
-	for (SUInt i = startBit; i <= endBit; i++)
+	for (UnsignedInt i = startBit; i <= endBit; i++)
 	{
-		retVal += (SInt) pow(2, i - startBit) * ((number >> i) % 2);
+		retVal += (Int) Math::Pow(2, i - startBit) * ((number >> i) % 2);
 	}
 
 	return retVal;

@@ -1,45 +1,48 @@
-#include <smooth.h>
-#include "t02.h"
+/*
+ * smooth tutorial 1
+ */
 
-SMOOTHVoid SMOOTH::Main()
+#include <smooth/main.h>
+#include "t01.h"
+
+Int smooth::Main()
 {
-	HelloWorld	*app = new HelloWorld();
+	Hello	*app = new Hello();
 
-	SMOOTH::MessageBox("Hello World!", "Message", MB_OK, IDI_INFORMATION);	// this displays a message box. The fourth parameter can be any valid Windows icon
+	Loop();
 
-	SMOOTH::Loop();
+	Object::DeleteObject(app);
 
-	delete app;
+	return 0;
 }
 
-HelloWorld::HelloWorld()
+Hello::Hello()
 {
-	SetText("Hello World!");						// name our application "Hello World!"
+	mainWnd	= new Window();
+	title	= new Titlebar(False, False, True);
+	hello	= new Button("Hello, World!", NIL, Point(20, 15), Size(160, 40));
 
-	wnd	= new SMOOTHWindow("Hello World!");
-	title	= new SMOOTHTitlebar(true, false, true);
-	client	= new SMOOTHClient(NULLPROC);					// a client area without a PaintProc
-	dbar	= new SMOOTHDivisionbar(75, OR_VERT | OR_LEFT);			// a vertical divisionbar
+	hello->onClick.Connect(&Hello::Quit, this);
 
-	RegisterObject(wnd);
+	mainWnd->RegisterObject(hello);
+	mainWnd->RegisterObject(title);
 
-	wnd->RegisterObject(title);
-	wnd->RegisterObject(client);
-	wnd->RegisterObject(dbar);
+	RegisterObject(mainWnd);
 
-	wnd->SetMetrics(SMOOTHPoint(80, 80), SMOOTHSize(200, 150));
+	mainWnd->SetMetrics(Point(100, 100), Size(200, 100));
 }
 
-HelloWorld::~HelloWorld()
+Hello::~Hello()
 {
-	wnd->UnregisterObject(title);
-	wnd->UnregisterObject(client);
-	wnd->UnregisterObject(dbar);
+	mainWnd->UnregisterObject(title);
+	mainWnd->UnregisterObject(hello);
 
-	UnregisterObject(wnd);
+	DeleteObject(mainWnd);
+	DeleteObject(title);
+	DeleteObject(hello);
+}
 
-	SMOOTH::DeleteObject(title);
-	SMOOTH::DeleteObject(client);
-	SMOOTH::DeleteObject(wnd);
-	SMOOTH::DeleteObject(dbar);
+Void Hello::Quit()
+{
+	mainWnd->Close();
 }

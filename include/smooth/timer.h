@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,33 +11,37 @@
 #ifndef _H_OBJSMOOTH_TIMER_
 #define _H_OBJSMOOTH_TIMER_
 
-#define STimer SMOOTHTimer
-
-class SMOOTHTimer;
-class SMOOTHWindow;
+namespace smooth
+{
+	class Timer;
+	class Window;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHTimer : public SMOOTHObject
+namespace smooth
 {
-	private:
-		SMOOTHWindow	*timerwnd;
-		SMOOTHInt	 timerid;
-	public:
-				 SMOOTHTimer();
-				~SMOOTHTimer();
+	class SMOOTHAPI Timer : public Object
+	{
+		private:
+			Window	*timerwnd;
+			Int	 timerid;
+		public:
+				 Timer();
+				~Timer();
 
-		SMOOTHInt	 Start(SMOOTHInt);
-		SMOOTHInt	 Stop();
+			Int	 Start(Int);
+			Int	 Stop();
 
-		SMOOTHInt	 GetID();
+			Int	 GetID();
 
-		SMOOTHInt	 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			Int	 Process(Int, Int, Int);
 
-		SMOOTHInt	 Show();
-		SMOOTHInt	 Hide();
+			Int	 Show();
+			Int	 Hide();
+	};
+
+	SMOOTHVAR Int OBJ_TIMER;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_TIMER;
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,22 +11,26 @@
 #ifndef _H_OBJSMOOTH_LINE_
 #define _H_OBJSMOOTH_LINE_
 
-#define SLine SMOOTHLine
-
-class SMOOTHLine;
+namespace smooth
+{
+	class Line;
+};
 
 #include "primitive.h"
 #include "point.h"
 
-class SMOOTHAPI SMOOTHLine : public SMOOTHPrimitive
+namespace smooth
 {
-	public:
-		SMOOTHInt	 sx;
-		SMOOTHInt	 sy;
-		SMOOTHInt	 ex;
-		SMOOTHInt	 ey;
-				 SMOOTHLine();
-				 SMOOTHLine(SMOOTHPoint, SMOOTHPoint);
+	class SMOOTHAPI Line : public Primitive
+	{
+		public:
+			Int	 sx;
+			Int	 sy;
+			Int	 ex;
+			Int	 ey;
+				 Line();
+				 Line(Point, Point);
+	};
 };
 
 #endif

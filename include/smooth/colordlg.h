@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,115 +11,117 @@
 #ifndef _H_OBJSMOOTH_COLORDLG_
 #define _H_OBJSMOOTH_COLORDLG_
 
-#define SDialogColorSelection SMOOTHDialogColorSelection
-
-class SMOOTHDialogColorSelection;
-class SMOOTHWindow;
-class SMOOTHLayer;
-class SMOOTHButton;
-class SMOOTHEditBox;
-class SMOOTHText;
-class SMOOTHSlider;
-class SMOOTHTitlebar;
-class SMOOTHDivisionbar;
+namespace smooth
+{
+	class DialogColorSelection;
+	class Window;
+	class Button;
+	class EditBox;
+	class Text;
+	class Slider;
+	class Titlebar;
+	class Divider;
+};
 
 #include "definitions.h"
 #include "dialog.h"
 
-class SMOOTHAPI SMOOTHDialogColorSelection : public SMOOTHDialog
+namespace smooth
 {
-	private:
-		int			 color;
+	class SMOOTHAPI DialogColorSelection : public Dialog
+	{
+		private:
+			int		 color;
 
-		int			 yoffset;
-		int			 huexoffset;
-		int			 ncxoffset;
-		int			 ocxoffset;
-		int			 crsizex;
-		int			 crsizey;
+			int		 yoffset;
+			int		 huexoffset;
+			int		 ncxoffset;
+			int		 ocxoffset;
+			int		 crsizex;
+			int		 crsizey;
 
-		bool			 huecapt;
-		bool			 vscapt;
+			bool		 huecapt;
+			bool		 vscapt;
 
-		bool			 forcehupdate;
-		bool			 forcevsupdate;
-		bool			 preventhupdate;
-		bool			 preventvsupdate;
-		bool			 updatetext;
-		bool			 updatehextext;
+			bool		 forcehupdate;
+			bool		 forcevsupdate;
+			bool		 preventhupdate;
+			bool		 preventvsupdate;
+			bool		 updatetext;
+			bool		 updatehextext;
 
-		int			 lasthue;
-		int			 lastsat;
-		int			 lastval;
+			int		 lasthue;
+			int		 lastsat;
+			int		 lastval;
 
-		SMOOTHInt		 acthue;
-		SMOOTHInt		 actsat;
-		SMOOTHInt		 actval;
-		SMOOTHInt		 actred;
-		SMOOTHInt		 actgreen;
-		SMOOTHInt		 actblue;
+			Int		 acthue;
+			Int		 actsat;
+			Int		 actval;
+			Int		 actred;
+			Int		 actgreen;
+			Int		 actblue;
 
-		int			 colortable[256][256];
+			int		 colortable[256][256];
 
-		SMOOTHString		 hexval;
+			String		 hexval;
 
-		SMOOTHWindow		*dlgwnd;
-		SMOOTHTitlebar		*titlebar;
-		SMOOTHDivisionbar	*divbar;
-		SMOOTHLayer		*layer;
-		SMOOTHButton		*okbtn;
-		SMOOTHButton		*cancelbtn;
-		SMOOTHSlider		*hueslider;
-		SMOOTHSlider		*satslider;
-		SMOOTHSlider		*valslider;
-		SMOOTHSlider		*redslider;
-		SMOOTHSlider		*greenslider;
-		SMOOTHSlider		*blueslider;
-		SMOOTHText		*huetext;
-		SMOOTHText		*sattext;
-		SMOOTHText		*valtext;
-		SMOOTHText		*redtext;
-		SMOOTHText		*greentext;
-		SMOOTHText		*bluetext;
-		SMOOTHText		*hextext;
-		SMOOTHEditBox		*hueedit;
-		SMOOTHEditBox		*satedit;
-		SMOOTHEditBox		*valedit;
-		SMOOTHEditBox		*rededit;
-		SMOOTHEditBox		*greenedit;
-		SMOOTHEditBox		*blueedit;
-		SMOOTHEditBox		*hexedit;
+			Window		*dlgwnd;
+			Titlebar	*titlebar;
+			Divider		*divbar;
+			Button		*okbtn;
+			Button		*cancelbtn;
+			Slider		*hueslider;
+			Slider		*satslider;
+			Slider		*valslider;
+			Slider		*redslider;
+			Slider		*greenslider;
+			Slider		*blueslider;
+			Text		*huetext;
+			Text		*sattext;
+			Text		*valtext;
+			Text		*redtext;
+			Text		*greentext;
+			Text		*bluetext;
+			Text		*hextext;
+			EditBox		*hueedit;
+			EditBox		*satedit;
+			EditBox		*valedit;
+			EditBox		*rededit;
+			EditBox		*greenedit;
+			EditBox		*blueedit;
+			EditBox		*hexedit;
 
-		void			 ColorDlgUpdateHexValue();
-		void			 ColorDlgHexValueChanged();
+			void		 ColorDlgUpdateHexValue();
+			void		 ColorDlgHexValueChanged();
 
-		void			 ColorDlgPaintProc();
-		void			 ColorDlgMessageProc(SMOOTHInt, SMOOTHInt, SMOOTHInt);
-		void			 ColorDlgUpdatePickers();
-		SMOOTHBool		 ColorDlgKillProc();
-		void			 ColorDlgOK();
-		void			 ColorDlgCancel();
-		void			 ColorDlgHueSlider();
-		void			 ColorDlgSatSlider();
-		void			 ColorDlgValSlider();
-		void			 ColorDlgRedSlider();
-		void			 ColorDlgGreenSlider();
-		void			 ColorDlgBlueSlider();
-		void			 ColorDlgHueEdit();
-		void			 ColorDlgSatEdit();
-		void			 ColorDlgValEdit();
-		void			 ColorDlgRedEdit();
-		void			 ColorDlgGreenEdit();
-		void			 ColorDlgBlueEdit();
-		void			 ColorDlgHexEdit();
-	public:
-					 SMOOTHDialogColorSelection();
-					~SMOOTHDialogColorSelection();
+			void		 ColorDlgPaintProc();
+			void		 ColorDlgMessageProc(Int, Int, Int);
+			void		 ColorDlgUpdatePickers();
+			Bool		 ColorDlgKillProc();
+			void		 ColorDlgOK();
+			void		 ColorDlgCancel();
+			void		 ColorDlgHueSlider();
+			void		 ColorDlgSatSlider();
+			void		 ColorDlgValSlider();
+			void		 ColorDlgRedSlider();
+			void		 ColorDlgGreenSlider();
+			void		 ColorDlgBlueSlider();
+			void		 ColorDlgHueEdit();
+			void		 ColorDlgSatEdit();
+			void		 ColorDlgValEdit();
+			void		 ColorDlgRedEdit();
+			void		 ColorDlgGreenEdit();
+			void		 ColorDlgBlueEdit();
+			void		 ColorDlgHexEdit();
+		public:
+					 DialogColorSelection();
+					~DialogColorSelection();
 
-		SMOOTHInt		 ShowDialog();
+			Int		 ShowDialog();
 
-		SMOOTHInt		 GetColor();
-		SMOOTHInt		 SetColor(SMOOTHInt);
+			Int		 GetColor();
+			Int		 SetColor(Int);
+	};
 };
 
 #endif

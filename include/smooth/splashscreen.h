@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,30 +11,34 @@
 #ifndef _H_OBJSMOOTH_SPLASHSCREEN_
 #define _H_OBJSMOOTH_SPLASHSCREEN_
 
-#define SSplashScreeApp SMOOTHsplashScreenApp
-
-class SMOOTHSplashScreenApp;
-class SMOOTHWindow;
-class SMOOTHTimer;
+namespace smooth
+{
+	class SplashScreenApp;
+	class Window;
+	class Timer;
+};
 
 #include "definitions.h"
 #include "application.h"
 
-class SMOOTHSplashScreenApp : public SMOOTHApplication
+namespace smooth
 {
-	private:
-		static int	 nOfSplashScreens;
-		int		 time;
-		HBITMAP		 bitmap;
-		SMOOTHWindow	*splashscreen;
-		SMOOTHTimer	*timer;
-	public:
-				 SMOOTHSplashScreenApp(HBITMAP, int);
-				~SMOOTHSplashScreenApp();
-		void		 SplashPaintProc();
-		bool		 SplashKillProc();
-		int		 ShowSplashScreen();
-		void		 TimerProc();
+	class SplashScreenApp : public Application
+	{
+		private:
+			static int	 nOfSplashScreens;
+			int		 time;
+			HBITMAP		 bitmap;
+			Window		*splashscreen;
+			Timer		*timer;
+		public:
+					 SplashScreenApp(HBITMAP, int);
+					~SplashScreenApp();
+			void		 SplashPaintProc();
+			bool		 SplashKillProc();
+			int		 ShowSplashScreen();
+			void		 TimerProc();
+	};
 };
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,58 +8,67 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smoothplugin.h>
+#include <smooth.h>
+#include <smooth/dll.h>
 #include "plugin.h"
+
+Void smooth::AttachDLL()
+{
+}
+
+Void smooth::DetachDLL()
+{
+}
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
-SMOOTHInt	 OBJ_ACTIVEAREAPLUGIN = SMOOTH::RequestObjectID();
+Int	 OBJ_ACTIVEAREAPLUGIN = Object::RequestObjectID();
 
-SMOOTHActiveAreaPlugin::SMOOTHActiveAreaPlugin(SMOOTHInt color, SMOOTHPoint pos, SMOOTHSize size, SMOOTHProcParam, SMOOTHVoid *procParam)
+ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point pos, Size size, ProcParam, Void *procParam)
 {
 	type				= OBJ_ACTIVEAREAPLUGIN;
 	areaColor			= color;
 	objectProperties->pos		= pos;
 	objectProperties->size		= size;
-	objectProperties->proc		= (SMOOTHProcType) newProc;
+	objectProperties->proc		= (ProcType) newProc;
 	objectProperties->procParam	= procParam;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x		= (int) (pos.x * SMOOTH::Setup::FontSize + 0.5);
-	objectProperties->pos.y		= (int) (pos.y * SMOOTH::Setup::FontSize + 0.5);
-	objectProperties->size.cx	= (int) (size.cx * SMOOTH::Setup::FontSize + 0.5) ;
-	objectProperties->size.cy	= (int) (size.cy * SMOOTH::Setup::FontSize + 0.5);
+	objectProperties->pos.x		= Math::Round(pos.x * SMOOTH::Setup::FontSize);
+	objectProperties->pos.y		= Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->size.cx	= Math::Round(size.cx * SMOOTH::Setup::FontSize);
+	objectProperties->size.cy	= Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-SMOOTHActiveAreaPlugin::~SMOOTHActiveAreaPlugin()
+ActiveAreaPlugin::~ActiveAreaPlugin()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-SMOOTHInt SMOOTHActiveAreaPlugin::Paint(SMOOTHInt message)
+Int ActiveAreaPlugin::Paint(Int message)
 {
-	if (!registered)	return SMOOTH::Error;
-	if (!visible)		return SMOOTH::Success;
+	if (!registered)	return Error;
+	if (!visible)		return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	HDC		 dc = GetWindowDC(wnd->hwnd);
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHRect	 frame;
-	HBRUSH		 brush = CreateSolidBrush(areaColor);
-	HPEN		 hpen;
-	HPEN		 holdpen;
-	SMOOTHPoint	 p1;
-	SMOOTHPoint	 p2;
-	SMOOTHPoint	 p3;
-	SMOOTHPoint	 p4;
+	HDC	 dc = GetWindowDC(wnd->hwnd);
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
+	HBRUSH	 brush = CreateSolidBrush(areaColor);
+	HPEN	 hpen;
+	HPEN	 holdpen;
+	Point	 p1;
+	Point	 p2;
+	Point	 p3;
+	Point	 p4;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -124,23 +133,23 @@ SMOOTHInt SMOOTHActiveAreaPlugin::Paint(SMOOTHInt message)
 
 	ReleaseDC(wnd->hwnd, dc);
 
-	return SMOOTH::Success;
+	return Success;
 }
 
-SMOOTHInt SMOOTHActiveAreaPlugin::Process(SMOOTHInt message, SMOOTHInt wParam, SMOOTHInt lParam)
+Int ActiveAreaPlugin::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return SMOOTH::Error;
-	if (!active || !visible)	return SMOOTH::Success;
+	if (!registered)		return Error;
+	if (!active || !visible)	return Success;
 
-	SMOOTHLayer	*layer = (SMOOTHLayer *) myContainer->GetContainerObject();
-	SMOOTHWindow	*wnd = (SMOOTHWindow *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer = (Layer *) myContainer->GetContainerObject();
+	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
-	if (wnd == NIL) return SMOOTH::Success;
-	if (wnd->hwnd == NIL) return SMOOTH::Success;
+	if (wnd == NIL) return Success;
+	if (wnd->hwnd == NIL) return Success;
 
-	SMOOTHPoint	 realPos = GetRealPosition();
-	SMOOTHInt	 retVal = SMOOTH::Success;
-	SMOOTHRect	 frame;
+	Point	 realPos = GetRealPosition();
+	Int	 retVal = Success;
+	Rect	 frame;
 
 	frame.left	= realPos.x + 1;
 	frame.top	= realPos.y + 1;
@@ -150,8 +159,8 @@ SMOOTHInt SMOOTHActiveAreaPlugin::Process(SMOOTHInt message, SMOOTHInt wParam, S
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			SMOOTHPoint	 mousePos;
-			SMOOTHRect	 winRect;
+			Point	 mousePos;
+			Rect	 winRect;
 
 			{
 				RECT	 wRect = winRect;
@@ -169,9 +178,9 @@ SMOOTHInt SMOOTHActiveAreaPlugin::Process(SMOOTHInt message, SMOOTHInt wParam, S
 
 			if ((mousePos.x >= frame.left) && (mousePos.x <= frame.right) && (mousePos.y >= frame.top) && (mousePos.y <= frame.bottom))
 			{
-				SMOOTHProcCall(objectProperties->proc, objectProperties->procParam);
+				ProcCall(objectProperties->proc, objectProperties->procParam);
 
-				retVal = SMOOTH::Break;
+				retVal = Break;
 			}
 
 			break;

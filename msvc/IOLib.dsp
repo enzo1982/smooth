@@ -83,6 +83,86 @@ LIB32=link.exe -lib
 # Begin Group "Quellcodedateien"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Group "drivers"
+
+# PROP Default_Filter ""
+# Begin Group "ansi"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\drivers\ansi\driver_ansi.cpp
+# End Source File
+# End Group
+# Begin Group "memory"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\drivers\memory\driver_memory.cpp
+# End Source File
+# End Group
+# Begin Group "posix"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\drivers\posix\driver_posix.cpp
+# End Source File
+# End Group
+# Begin Group "socket"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\drivers\socket\driver_socket.cpp
+# End Source File
+# End Group
+# Begin Group "zero"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\drivers\zero\driver_zero.cpp
+# End Source File
+# End Group
+# Begin Group "socks4"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\drivers\socks4\driver_socks4.cpp
+# End Source File
+# End Group
+# Begin Group "socks5"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\drivers\socks5\driver_socks5.cpp
+# End Source File
+# End Group
+# End Group
+# Begin Group "filters"
+
+# PROP Default_Filter ""
+# Begin Group "xor"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\filters\xor\filter_xor.cpp
+# End Source File
+# End Group
+# Begin Group "bzip2"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\filters\bzip2\filter_bzip2.cpp
+# End Source File
+# End Group
+# End Group
 # Begin Source File
 
 SOURCE=..\libraries\iolib\instream.cpp
@@ -111,29 +191,69 @@ SOURCE=..\libraries\iolib\outstream.cpp
 # Begin Group "Header-Dateien"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Group "iolib"
+
+# PROP Default_Filter ""
+# Begin Group "drivers-headers"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE="..\include\instream-cxx.h"
+SOURCE=..\include\iolib\drivers\driver_ansi.h
 # End Source File
+# Begin Source File
+
+SOURCE=..\include\iolib\drivers\driver_memory.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\iolib\drivers\driver_posix.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\iolib\drivers\driver_socket.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\iolib\drivers\driver_zero.h
+# End Source File
+# End Group
+# Begin Group "filters-headers"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\iolib\filters\filter_bzip2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\iolib\filters\filter_xor.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE="..\include\iolib\instream-cxx.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\include\iolib\iolibdriver-cxx.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\include\iolib\iolibfilter-cxx.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\include\iolib\iolibstream-cxx.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\include\iolib\outstream-cxx.h"
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE="..\include\iolib-cxx.h"
-# End Source File
-# Begin Source File
-
-SOURCE="..\include\iolibdriver-cxx.h"
-# End Source File
-# Begin Source File
-
-SOURCE="..\include\iolibfilter-cxx.h"
-# End Source File
-# Begin Source File
-
-SOURCE="..\include\iolibstream-cxx.h"
-# End Source File
-# Begin Source File
-
-SOURCE="..\include\outstream-cxx.h"
 # End Source File
 # End Group
 # End Target

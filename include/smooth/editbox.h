@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,57 +11,61 @@
 #ifndef _H_OBJSMOOTH_EDITBOX_
 #define _H_OBJSMOOTH_EDITBOX_
 
-#define SEditBox SMOOTHEditBox
-
-class SMOOTHEditBox;
-class SMOOTHTimer;
+namespace smooth
+{
+	class EditBox;
+	class Timer;
+};
 
 #include "object.h"
 
-const SMOOTHInt EDB_ALPHANUMERIC	= 0;
-const SMOOTHInt EDB_NUMERIC		= 1;
-const SMOOTHInt EDB_MULTILINE		= 2;
-const SMOOTHInt EDB_HSCROLL		= 4;
-const SMOOTHInt EDB_VSCROLL		= 8;
-const SMOOTHInt EDB_ASTERISK		= 16;
-
-class SMOOTHAPI SMOOTHEditBox : public SMOOTHObject
+namespace smooth
 {
-	private:
-		SMOOTHTimer			*timer;
+	const Int EDB_ALPHANUMERIC	= 0;
+	const Int EDB_NUMERIC		= 1;
+	const Int EDB_MULTILINE		= 2;
+	const Int EDB_HSCROLL		= 4;
+	const Int EDB_VSCROLL		= 8;
+	const Int EDB_ASTERISK		= 16;
 
-		SMOOTHVoid			 TimerProc();
+	class SMOOTHAPI EditBox : public Object
+	{
+		private:
+			Timer		*timer;
 
-		SMOOTHInt			 CountLines();
-		SMOOTHString			 GetLine(SMOOTHInt);
-	protected:
-		SMOOTHInt			 promptPos;	// the current position of the cursor in the whole text
-		SMOOTHInt			 linePromptPos;	// the current cursor position in the active line
-		SMOOTHInt			 currLine;	// the current line (1st line = 0)
-		SMOOTHBool			 promptVisible;
-		SMOOTHInt			 markStart;
-		SMOOTHInt			 markEnd;
-		SMOOTHInt			 leftCut;	// how much text of the current line is invisible
-		SMOOTHString			 lcText;	// the invisible text
-		SMOOTHString			 visText;	// the visible text of the current line
-		SMOOTHBool			 isRight;
-		SMOOTHBool			 isLeft;
-		SMOOTHBool			 isAsterisk;
-		SMOOTHInt			 maxSize;
-		SMOOTHInt			 nOfLines;	// the number of lines
-		SMOOTHArray<SMOOTHString>	 lines;
-	public:
-						 SMOOTHEditBox(SMOOTHString, SMOOTHPoint, SMOOTHSize, SMOOTHInt, SMOOTHInt, SMOOTHProcParam, SMOOTHVoid *);
-						~SMOOTHEditBox();
+			Void		 TimerProc();
 
-		virtual SMOOTHInt		 Paint(SMOOTHInt);
-		SMOOTHInt			 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			Int		 CountLines();
+			String		 GetLine(Int);
+		protected:
+			Int		 promptPos;	// the current position of the cursor in the whole text
+			Int		 linePromptPos;	// the current cursor position in the active line
+			Int		 currLine;	// the current line (1st line = 0)
+			Bool		 promptVisible;
+			Int		 markStart;
+			Int		 markEnd;
+			Int		 leftCut;	// how much text of the current line is invisible
+			String		 lcText;	// the invisible text
+			String		 visText;	// the visible text of the current line
+			Bool		 isRight;
+			Bool		 isLeft;
+			Bool		 isAsterisk;
+			Int		 maxSize;
+			Int		 nOfLines;	// the number of lines
+			Array<String>	 lines;
+		public:
+					 EditBox(String, Point, Size, Int, Int, ProcParam, Void *);
+					~EditBox();
 
-		SMOOTHInt			 Deactivate();
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
 
-		SMOOTHInt			 SetText(SMOOTHString);
+			Int		 Deactivate();
+
+			Int		 SetText(String);
+	};
+
+	SMOOTHVAR Int OBJ_EDITBOX;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_EDITBOX;
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,63 +11,68 @@
 #ifndef _H_OBJSMOOTH_TREE_
 #define _H_OBJSMOOTH_TREE_
 
-#define STree SMOOTHTree
-
-class SMOOTHTree;
+namespace smooth
+{
+	class Tree;
+};
 
 #include "object.h"
+#include "rect.h"
 
-const SMOOTHInt ST_ENTRY	= 0;
-const SMOOTHInt ST_SUB		= 1;
-
-class SMOOTHAPI SMOOTHTree
+namespace smooth
 {
-	public: class SMOOTHAPI Entry
+	const Int ST_ENTRY	= 0;
+	const Int ST_SUB	= 1;
+
+	class SMOOTHAPI Tree
 	{
-		public:
-			SMOOTHInt	 type;
-			SMOOTHInt	 code;
-			SMOOTHBool	 last;
+		public: class SMOOTHAPI Entry
+		{
+			public:
+				Int	 type;
+				Int	 code;
+				Bool	 last;
 
-			SMOOTHProcMember;
-			SMOOTHVoid	*procParam;
+				ProcMember;
+				Void	*procParam;
 
-			SMOOTHString	 text;
-			SMOOTHTree	*sub;
+				String	 text;
+				Tree	*sub;
 
-			SMOOTHBool	 chk;
-			SMOOTHBool	 clk;
-			SMOOTHBool	 open;
-			SMOOTHInt	 size;
-			SMOOTHBool	 sizeset;
-			SMOOTHRect	 rect;
+				Bool	 chk;
+				Bool	 clk;
+				Bool	 open;
+				Int	 size;
+				Bool	 sizeset;
+				Rect	 rect;
 
-					 Entry(SMOOTHInt, SMOOTHInt);
+					 Entry(Int, Int);
 					~Entry();
+		};
+
+		protected:
+			Size		 subsize;
+			Bool		 sizeset;
+			Bool		 entrysizesset;
+			Int		 nOfEntries;
+			Int		 counter;
+			Void		 GetSize();
+			Int		 GetSizeY();
+			Int		 GetSizeX();
+			Void		 GetTreeEntriesSize();
+			Entry		*AddTreeEntry(Int, Int, String, ProcParam, Void *, Tree *);
+			Int		 RemoveTreeEntry(Int);
+		public:
+			Array<Entry *>	 entries;
+
+					 Tree();
+			virtual		~Tree();
+
+			virtual Entry	*AddEntry(String, ProcParam, Void *);
+			virtual Entry	*AddEntry(String, Tree *);
+			virtual Int	 RemoveEntry(Int);
+			Int		 GetNOfEntries();
 	};
-
-	protected:
-		SMOOTHSize		 subsize;
-		SMOOTHBool		 sizeset;
-		SMOOTHBool		 entrysizesset;
-		SMOOTHInt		 nOfEntries;
-		SMOOTHInt		 counter;
-		SMOOTHVoid		 GetSize();
-		SMOOTHInt		 GetSizeY();
-		SMOOTHInt		 GetSizeX();
-		SMOOTHVoid		 GetTreeEntriesSize();
-		SMOOTHInt		 AddTreeEntry(SMOOTHInt, SMOOTHInt, SMOOTHString, SMOOTHProcParam, SMOOTHVoid *, SMOOTHTree *);
-		SMOOTHInt		 RemoveTreeEntry(SMOOTHInt);
-	public:
-		SMOOTHArray<Entry *>	 entries;
-
-					 SMOOTHTree();
-		virtual			~SMOOTHTree();
-
-		virtual SMOOTHInt	 AddEntry(SMOOTHString, SMOOTHProcParam, SMOOTHVoid *);
-		virtual SMOOTHInt	 AddEntry(SMOOTHString, SMOOTHTree *);
-		virtual SMOOTHInt	 RemoveEntry(SMOOTHInt);
-		SMOOTHInt		 GetNOfEntries();
 };
 
 #endif

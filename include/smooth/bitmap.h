@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,26 +11,30 @@
 #ifndef _H_OBJSMOOTH_BITMAP_
 #define _H_OBJSMOOTH_BITMAP_
 
-#define SBitmap SMOOTHBitmap
-
-class SMOOTHBitmap;
+namespace smooth
+{
+	class Bitmap;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHBitmap : public SMOOTHObject
+namespace smooth
 {
-	protected:
-		HBITMAP			 bitmap;
-	public:
-					 SMOOTHBitmap(HBITMAP, SMOOTHPoint, SMOOTHSize);
-					~SMOOTHBitmap();
+	class SMOOTHAPI Bitmap : public Object
+	{
+		protected:
+			HBITMAP		 bitmap;
+		public:
+					 Bitmap(HBITMAP, Point, Size);
+					~Bitmap();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
+			virtual Int	 Paint(Int);
 
-		SMOOTHInt		 SetBitmap(HBITMAP);
-		HBITMAP			 GetBitmap();
+			Int		 SetBitmap(HBITMAP);
+			HBITMAP		 GetBitmap();
+	};
+
+	SMOOTHVAR Int OBJ_HBITMAP;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_HBITMAP;
 
 #endif

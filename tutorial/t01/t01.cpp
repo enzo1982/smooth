@@ -1,33 +1,41 @@
-#include <smooth.h>					// smooth.h provides all SMOOTH objects
+/*
+ * smooth tutorial 1
+ */
+
+#include <smooth/main.h>
 #include "t01.h"
 
-SMOOTHVoid SMOOTH::Main()				// Every SMOOTH program starts at SMOOTHMain
+Int smooth::Main()
 {
-	HelloWorld	*app = new HelloWorld();	// create an instance of our HelloWorld application
+	Hello	*app = new Hello();
 
-	SMOOTH::Loop();					// enter the main loop
+	Loop();
 
-	delete app;					// delete our application object after the program has finished
+	Object::DeleteObject(app);
+
+	return 0;
 }
 
-HelloWorld::HelloWorld()				// the constructor creates the application interface
+Hello::Hello()
 {
-	wnd	= new SMOOTHWindow("Hello World!");	// create a SMOOTHWindow named "Hello World!"
-	title	= new SMOOTHTitlebar(true, false, true);// create a titlebar for that window
+	mainWnd	= new Window();
+	title	= new Titlebar(False, False, True);
+	hello	= new Button("Hello, World!", NIL, Point(20, 15), Size(160, 40));
 
-	RegisterObject(wnd);				// register the window at our application
+	mainWnd->RegisterObject(hello);
+	mainWnd->RegisterObject(title);
 
-	wnd->RegisterObject(title);			// register the titlebar at our window
+	RegisterObject(mainWnd);
 
-	wnd->SetMetrics(SMOOTHPoint(80, 80), SMOOTHSize(200, 150));	// set window metrics
+	mainWnd->SetMetrics(Point(100, 100), Size(200, 100));
 }
 
-HelloWorld::~HelloWorld()				// the destructor deletes all interface objects
+Hello::~Hello()
 {
-	wnd->UnregisterObject(title);			// unregister the titlebar
+	mainWnd->UnregisterObject(title);
+	mainWnd->UnregisterObject(hello);
 
-	UnregisterObject(wnd);				// unregister the window
-
-	SMOOTH::DeleteObject(title);			// delete the titlebar object
-	SMOOTH::DeleteObject(wnd);			// delete the window object
+	DeleteObject(mainWnd);
+	DeleteObject(title);
+	DeleteObject(hello);
 }

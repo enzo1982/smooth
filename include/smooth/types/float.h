@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,8 +11,11 @@
 #ifndef _H_OBJSMOOTH_FLOAT_
 #define _H_OBJSMOOTH_FLOAT_
 
-#define SFloat SMOOTHFloat
-
-typedef double SMOOTHFloat;
+namespace smooth
+{
+	typedef float		 ShortFloat;
+	typedef double		 Float;
+	typedef long double	 LongFloat;
+};
 
 #endif

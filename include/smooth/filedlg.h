@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,49 +11,53 @@
 #ifndef _H_OBJSMOOTH_FILEDLG_
 #define _H_OBJSMOOTH_FILEDLG_
 
-#define SDialogFileSelection SMOOTHDialogFileSelection
-
-class SMOOTHDialogFileSelection;
+namespace smooth
+{
+	class DialogFileSelection;
+};
 
 #include "definitions.h"
 #include "dialog.h"
 #include "array.h"
 
+namespace smooth
+{
 // File dialog mode constants - SFM_OPEN is default
 
-const SMOOTHInt	 SFM_OPEN	= 0;
-const SMOOTHInt	 SFM_SAVE	= 1;
+	const Int	 SFM_OPEN	= 0;
+	const Int	 SFM_SAVE	= 1;
 
 // File dialog flags - can be set with ->SetFlags(...); SFD_FILEMUSTEXIST is always set for SFM_OPEN mode
 
-const SMOOTHInt	 SFD_ALLOWMULTISELECT	= 512;
-const SMOOTHInt	 SFD_FILEMUSTEXIST	= 4096;
-const SMOOTHInt	 SFD_CONFIRMOVERWRITE	= 2;
+	const Int	 SFD_ALLOWMULTISELECT	= 512;
+	const Int	 SFD_FILEMUSTEXIST	= 4096;
+	const Int	 SFD_CONFIRMOVERWRITE	= 2;
 
-class SMOOTHAPI SMOOTHDialogFileSelection : public SMOOTHDialog
-{
-	private:
-		SMOOTHArray<SMOOTHString>	 filterNames;
-		SMOOTHArray<SMOOTHString>	 filters;
-		SMOOTHArray<SMOOTHString>	 files;
-		SMOOTHInt			 flags;
-		SMOOTHInt			 mode;
-		SMOOTHString			 defExt;
-	public:
-						 SMOOTHDialogFileSelection();
-						~SMOOTHDialogFileSelection();
+	class SMOOTHAPI DialogFileSelection : public Dialog
+	{
+		private:
+			Array<String>	 filterNames;
+			Array<String>	 filters;
+			Array<String>	 files;
+			Int		 flags;
+			Int		 mode;
+			String		 defExt;
+		public:
+					 DialogFileSelection();
+					~DialogFileSelection();
 
-		SMOOTHInt			 ShowDialog();
+			Int		 ShowDialog();
 
-		SMOOTHInt			 SetMode(SMOOTHInt);
-		SMOOTHInt			 SetFlags(SMOOTHInt);
-		SMOOTHInt			 SetDefaultExtension(SMOOTHString);
+			Int		 SetMode(Int);
+			Int		 SetFlags(Int);
+			Int		 SetDefaultExtension(String);
 
-		SMOOTHInt			 AddFilter(SMOOTHString, SMOOTHString);
+			Int		 AddFilter(String, String);
 
-		SMOOTHInt			 GetNumberOfFiles();
-		SMOOTHString			 GetFileName();
-		SMOOTHString			 GetNthFileName(SMOOTHInt);
+			Int		 GetNumberOfFiles();
+			String		 GetFileName();
+			String		 GetNthFileName(Int);
+	};
 };
 
 #endif

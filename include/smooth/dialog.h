@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,27 +11,31 @@
 #ifndef _H_OBJSMOOTH_DIALOG_
 #define _H_OBJSMOOTH_DIALOG_
 
-#define SDialog SMOOTHDialog
-
-class SMOOTHDialog;
-class SMOOTHWindow;
+namespace smooth
+{
+	class Dialog;
+	class Window;
+};
 
 #include "definitions.h"
 #include "application.h"
 
-class SMOOTHAPI SMOOTHDialog : public SMOOTHApplication
+namespace smooth
 {
-	protected:
-		SMOOTHString		 caption;
-		SMOOTHWindow		*parentWindow;
-	public:
-					 SMOOTHDialog();
-					~SMOOTHDialog();
+	class SMOOTHAPI Dialog : public Application
+	{
+		protected:
+			String		 caption;
+			Window		*parentWindow;
+		public:
+					 Dialog();
+					~Dialog();
 
-		virtual SMOOTHInt	 ShowDialog() = 0;
+			virtual Int	 ShowDialog() = 0;
 
-		SMOOTHInt		 SetCaption(SMOOTHString);
-		SMOOTHInt		 SetParentWindow(SMOOTHWindow *);
+			Int		 SetCaption(String);
+			Int		 SetParentWindow(Window *);
+	};
 };
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,21 +8,21 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_DESIGNER_
-#define __OBJSMOOTH_DESIGNER_
-
 #include <smooth.h>
+#include <smooth/main.h>
 #include "designer.h"
 #include "edit_component.h"
 #include "tools.h"
 
-SMOOTHVoid SMOOTH::Main()
+Int smooth::Main()
 {
 	Designer	*app = new Designer();
 
-	SMOOTH::Loop();
+	Loop();
 
 	delete app;
+
+	return 0;
 }
 
 Designer::Designer()
@@ -37,38 +37,37 @@ Designer::Designer()
 	size.cx = 389;
 	size.cy = 169;
 
-	wnd		= new SMOOTHWindow(SMOOTHString("SMOOTH Designer v").Append(SMOOTH_VERSION));
-	title		= new SMOOTHTitlebar(true, false, true);
-	menubar		= new SMOOTHMenubar();
-	iconbar		= new SMOOTHMenubar();
-	statusbar	= new SMOOTHStatusbar("Ready");
+	wnd		= new Window(String("smooth Designer v").Append(SMOOTH_VERSION));
+	title		= new Titlebar(true, false, true);
+	menubar		= new Menubar();
+	iconbar		= new Menubar();
+	statusbar	= new Statusbar("Ready");
 
-	timer1		= new SMOOTHTimer();
+	timer1		= new Timer();
+	timer1->SetProc(Proc(Designer, this, TimerProc));
 
-	timer1->SetProc(SMOOTHProc(Designer, this, TimerProc));
+	menu_file	= new PopupMenu();
+	menu_dialog	= new PopupMenu();
 
-	menu_file	= new SMOOTHPopupMenu();
-	menu_dialog	= new SMOOTHPopupMenu();
-
-	menu_widgets		= new SMOOTHPopupMenu();
-	menu_widgets_add	= new SMOOTHPopupMenu();
-	menu_widgets_add_smooth	= new SMOOTHPopupMenu();
+	menu_widgets		= new PopupMenu();
+	menu_widgets_add	= new PopupMenu();
+	menu_widgets_add_smooth	= new PopupMenu();
 
 	menubar->AddEntry("&File", NIL, NULLPROC, menu_file);
 	menubar->AddEntry("&Dialog", NIL, NULLPROC, menu_dialog);
 	menubar->AddEntry("&Widgets", NIL, NULLPROC, menu_widgets);
 
-	menu_file->AddEntry("E&xit", NIL, SMOOTHProc(Designer, this, CloseWindow));
+	menu_file->AddEntry("E&xit", NIL, Proc(Designer, this, Close));
 
-	menu_dialog->AddEntry("&New", NIL, SMOOTHProc(Designer, this, NewDialog));
+	menu_dialog->AddEntry("&New", NIL, Proc(Designer, this, NewDialog));
 
 	menu_widgets->AddEntry("&Add", NIL, NULLPROC, menu_widgets_add);
 
-	menu_widgets_add->AddEntry("&SMOOTH controls", NIL, NULLPROC, menu_widgets_add_smooth);
+	menu_widgets_add->AddEntry("&smooth controls", NIL, NULLPROC, menu_widgets_add_smooth);
 
-	menu_widgets_add_smooth->AddEntry("SMOOTH&Button", NIL, SMOOTHProc(Designer, this, AddButton));
-	menu_widgets_add_smooth->AddEntry("SMOOTH&Layer", NIL, SMOOTHProc(Designer, this, AddLayer));
-	menu_widgets_add_smooth->AddEntry("SMOOTH&Menubar", NIL, SMOOTHProc(Designer, this, AddMenubar));
+	menu_widgets_add_smooth->AddEntry("&Button", NIL, Proc(Designer, this, AddButton));
+	menu_widgets_add_smooth->AddEntry("&Layer", NIL, Proc(Designer, this, AddLayer));
+	menu_widgets_add_smooth->AddEntry("&Menubar", NIL, Proc(Designer, this, AddMenubar));
 
 	RegisterObject(wnd);
 
@@ -78,9 +77,10 @@ Designer::Designer()
 	wnd->RegisterObject(statusbar);
 	wnd->RegisterObject(timer1);
 
-	wnd->SetMetrics(SMOOTHPoint(50, 50), SMOOTHSize(600, 85));
+	wnd->SetMetrics(Point(50, 50), Size(600, 85));
 	wnd->SetIcon(SI_DEFAULT);
-	wnd->SetKillProc(SMOOTHKillProc(Designer, this, KillProc));
+
+	wnd->SetKillProc(KillProc(Designer, this, ExitProc));
 
 	wnd->Show();
 
@@ -112,12 +112,12 @@ Designer::~Designer()
 	delete menu_widgets_add_smooth;
 }
 
-void Designer::CloseWindow()
+void Designer::Close()
 {
-	SMOOTH::CloseWindow(wnd);
+	wnd->Close();
 }
 
-bool Designer::KillProc()
+bool Designer::ExitProc()
 {
 	for (int i = 0; i < dlgs.GetNOfEntries(); i++)
 	{
@@ -126,12 +126,12 @@ bool Designer::KillProc()
 
 	dlgs.DeleteAll();
 
-	return true;
+	return True;
 }
 
 void Designer::NewDialog()
 {
-	Designer_EditComponent	*dlg = new Designer_EditComponent(this, SMOOTHString("Dialog").Append(SMOOTHString::IntToString(dlgcounter++)));
+	Designer_EditComponent	*dlg = new Designer_EditComponent(this, String("Dialog").Append(String::IntToString(dlgcounter++)));
 
 	dlgs.AddEntry(dlg);
 
@@ -143,20 +143,20 @@ void Designer::ReportStatus(Designer_Status stat)
 	switch (stat.event)
 	{
 		case STATUS_EVENT_REPORT_NAME:
-			if (active_dlg != stat.dlg) wnd->SetText(SMOOTHString("SMOOTH Designer v").Append(SMOOTH_VERSION).Append(" - ").Append(stat.currdlgname));
+			if (active_dlg != stat.dlg) wnd->SetText(String("smooth Designer v").Append(SMOOTH_VERSION).Append(" - ").Append(stat.currdlgname));
 			active_dlg = stat.dlg;
 			break;
 		case STATUS_EVENT_REPORT_MOUSEPOSITION:
-			statusbar->SetText(SMOOTHString("Mouse: ").Append(SMOOTHString::IntToString(stat.mousex)).Append(", ").Append(SMOOTHString::IntToString(stat.mousey)));
+			statusbar->SetText(String("Mouse: ").Append(String::IntToString(stat.mousex)).Append(", ").Append(String::IntToString(stat.mousey)));
 			break;
 		case STATUS_EVENT_REPORT_WINDOWPOSITION:
-			statusbar->SetText(SMOOTHString("Position: ").Append(SMOOTHString::IntToString(stat.wndposx)).Append(", ").Append(SMOOTHString::IntToString(stat.wndposy)));
+			statusbar->SetText(String("Position: ").Append(String::IntToString(stat.wndposx)).Append(", ").Append(String::IntToString(stat.wndposy)));
 			break;
 		case STATUS_EVENT_REPORT_WINDOWSIZE:
-			statusbar->SetText(SMOOTHString("Size: ").Append(SMOOTHString::IntToString(stat.wndsizex)).Append(", ").Append(SMOOTHString::IntToString(stat.wndsizey)));
+			statusbar->SetText(String("Size: ").Append(String::IntToString(stat.wndsizex)).Append(", ").Append(String::IntToString(stat.wndsizey)));
 			break;
 		case STATUS_EVENT_REPORT_QUIT:
-			wnd->SetText(SMOOTHString("SMOOTH Designer v").Append(SMOOTH_VERSION));
+			wnd->SetText(String("SMOOTH Designer v").Append(SMOOTH_VERSION));
 			break;
 	}
 
@@ -197,5 +197,3 @@ void Designer::AddMenubar()
 {
 	active_dlg->AddObject(SMOOTH_MENUBAR);
 }
-
-#endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,22 +11,26 @@
 #ifndef _H_OBJSMOOTH_DIRDLG_
 #define _H_OBJSMOOTH_DIRDLG_
 
-#define SDialogDirSelection SMOOTHDialogDirSelection
-
-class SMOOTHDialogDirSelection;
+namespace smooth
+{
+	class DialogDirSelection;
+};
 
 #include "definitions.h"
 #include "dialog.h"
 
-class SMOOTHAPI SMOOTHDialogDirSelection : public SMOOTHDialog
+namespace smooth
 {
-	private:
-		SMOOTHString	 directory;
-	public:
-				 SMOOTHDialogDirSelection();
-				~SMOOTHDialogDirSelection();
-		SMOOTHInt	 ShowDialog();
-		SMOOTHString	 GetDirName();
+	class SMOOTHAPI DialogDirSelection : public Dialog
+	{
+		private:
+			String	 directory;
+		public:
+				 DialogDirSelection();
+				~DialogDirSelection();
+			Int	 ShowDialog();
+			String	 GetDirName();
+	};
 };
 
 #endif

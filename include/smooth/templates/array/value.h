@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,22 +11,26 @@
 #ifndef _H_SMOOTHARRAY_VALUE_
 #define _H_SMOOTHARRAY_VALUE_
 
-#define SArray_Value SMOOTHArray_Value
+#include "../../definitions.h"
 
-template <class t> class SMOOTHArray_Value
+namespace smooth
 {
-	private:
-		bool		 filled;
-		t		 value;
-		long		 index;
-	public:
-				 SMOOTHArray_Value();
-				~SMOOTHArray_Value();
-		bool		 Fill(t);
-		bool		 Clear();
-		inline t	 GetValue();
-		inline long	 GetIndex();
-		bool		 SetIndex(long);
+	template <class t> class Array_Value
+	{
+		private:
+			Bool		 filled;
+			t		 value;
+			Int		 index;
+		public:
+					 Array_Value();
+					~Array_Value();
+
+			Bool		 Fill(t);
+			Bool		 Clear();
+			inline t	 GetValue();
+			inline Int	 GetIndex();
+			Bool		 SetIndex(Int);
+	};
 };
 
 #endif

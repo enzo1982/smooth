@@ -1,16 +1,18 @@
-#ifndef	_H_T01_
-#define _H_T01_
+/*
+ * smooth tutorial 1
+ */
 
-#include <smoothx.h>				// include smoothx.h instead of smooth.h in headers
+#include <smooth.h>
 
-class HelloWorld : public SMOOTHApplication	// every application class derives from SMOOTHApplication
+using namespace smooth;
+
+class Hello : public Application
 {
 	private:
-		SMOOTHWindow	*wnd;		// this will be our main window
-		SMOOTHTitlebar	*title;		// this will be the windows titlebar
+		Window		*mainWnd;
+		Titlebar	*title;
+		Button		*hello;
 	public:
-				 HelloWorld();	// every application needs a constructor
-				~HelloWorld();	// and a destructor
+				 Hello();
+				~Hello();
 };
-
-#endif

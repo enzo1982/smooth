@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,28 +11,32 @@
 #ifndef _H_OBJSMOOTH_OBJECTTYPE_
 #define _H_OBJSMOOTH_OBJECTTYPE_
 
-#define SObjectType SMOOTHObjectType
-
-class SMOOTHObject;
-class SMOOTHObjectType;
+namespace smooth
+{
+	class Object;
+	class ObjectType;
+};
 
 #include "definitions.h"
 
-class SMOOTHAPI SMOOTHObjectType
+namespace smooth
 {
-	friend class SMOOTHObject;
-	private:
-		SMOOTHInt		 type;
-		SMOOTHObject		*object;
-	public:
-					 SMOOTHObjectType();
-					 SMOOTHObjectType(const SMOOTHObjectType &);
+	class SMOOTHAPI ObjectType
+	{
+		friend class Object;
+		private:
+			Int		 type;
+			Object		*object;
+		public:
+					 ObjectType();
+					 ObjectType(const ObjectType &);
 
-		operator		 SMOOTHInt();
-		SMOOTHInt operator	 =(SMOOTHInt);
+			operator	 Int();
+			Int operator	 =(Int);
 
-		SMOOTHBool operator	 ==(SMOOTHInt);
-		SMOOTHBool operator	 !=(SMOOTHInt);
+			Bool operator	 ==(Int);
+			Bool operator	 !=(Int);
+	};
 };
 
 #endif

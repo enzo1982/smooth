@@ -1,4 +1,4 @@
-/* Copyright (C) 1999-2001 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2002 Free Software Foundation, Inc.
    This file is part of the GNU LIBICONV Library.
 
    The GNU LIBICONV Library is free software; you can redistribute it
@@ -21,7 +21,7 @@
 #ifndef _LIBICONV_H
 #define _LIBICONV_H
 
-#define _LIBICONV_VERSION 0x0107    /* version number: (major<<8) + minor */
+#define _LIBICONV_VERSION 0x0108    /* version number: (major<<8) + minor */
 extern int _libiconv_version;       /* Likewise */
 
 /* We would like to #include any system header file which could define
@@ -51,11 +51,11 @@ typedef void* iconv_t;
 
 /* Get errno declaration and values. */
 #include <errno.h>
-/* Some systems, like SunOS 4, don't have EILSEQ. On these systems, define
-   EILSEQ ourselves, but don't define it as EINVAL, because iconv() callers
-   want to distinguish EINVAL and EILSEQ. */
+/* Some systems, like SunOS 4, don't have EILSEQ. Some systems, like BSD/OS,
+   have EILSEQ in a different header.  On these systems, define EILSEQ
+   ourselves. */
 #ifndef EILSEQ
-#define EILSEQ ENOENT
+#define EILSEQ @EILSEQ@
 #endif
 
 
@@ -100,7 +100,15 @@ extern int iconvctl (iconv_t cd, int request, void* argument);
 #define ICONV_TRIVIALP            0  /* int *argument */
 #define ICONV_GET_TRANSLITERATE   1  /* int *argument */
 #define ICONV_SET_TRANSLITERATE   2  /* const int *argument */
+#define ICONV_GET_DISCARD_ILSEQ   3  /* int *argument */
+#define ICONV_SET_DISCARD_ILSEQ   4  /* const int *argument */
 
+/* Listing of locale independent encodings. */
+#define iconvlist libiconvlist
+extern void iconvlist (int (*do_one) (unsigned int namescount,
+                                      const char * const * names,
+                                      void* data),
+                       void* data);
 #endif
 
 

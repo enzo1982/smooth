@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,16 +8,13 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_COLOR_
-#define __OBJSMOOTH_COLOR_
-
-#include <math.h>
-
 #include <smooth/color.h>
 #include <smooth/definitions.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/stk.h>
 #include <smooth/toolkit.h>
+
+using namespace smooth;
 
 int ConvertColor(int cs1, int cs2, int col)
 {
@@ -90,8 +87,8 @@ int ConvertColor(int cs1, int cs2, int col)
 					p2 = s * 255;
 					p3 = v;
 
-					p1 = roundtoint(p1);
-					p2 = roundtoint(p2);
+					p1 = Math::Round(p1);
+					p2 = Math::Round(p2);
 
 					return RGB((int) p1, (int) p2, (int) p3);
 				case YUV:
@@ -99,7 +96,7 @@ int ConvertColor(int cs1, int cs2, int col)
 					p2 = GetBlue(col);
 					p3 = GetRed(col);
 
-					p1 = roundtoint(p1);
+					p1 = Math::Round(p1);
 
 					return RGB((int) p1, (int) p2, (int) p3);
 				case CMY:
@@ -199,9 +196,9 @@ int ConvertColor(int cs1, int cs2, int col)
 						}
 					}
 
-					p1 = roundtoint(p1);
-					p2 = roundtoint(p2);
-					p3 = roundtoint(p3);
+					p1 = Math::Round(p1);
+					p2 = Math::Round(p2);
+					p3 = Math::Round(p3);
 
 					return RGB((int) p1, (int) p2, (int) p3);
 				case HSV:
@@ -333,24 +330,22 @@ int DownsampleColor(int col, int bpcc)
 	third >>= (8 - bpcc);
 	fourth >>= (8 - bpcc);
 
-	return (int) (first + pow(2, bpcc) * second + pow(4, bpcc) * third + pow(8, bpcc) * fourth);
+	return (int) (first + Math::Pow(2, bpcc) * second + Math::Pow(4, bpcc) * third + Math::Pow(8, bpcc) * fourth);
 }
 
 int UpsampleColor(int col, int bpcc)
 {
 	if (bpcc == 8) return col;
 
-	int first = col & (int) (pow(2, bpcc) - 1);
-	int second = (col >> bpcc) & (int) (pow(2, bpcc) - 1);
-	int third = (col >> (2 * bpcc)) & (int) (pow(2, bpcc) - 1);
-	int fourth = (col >> (3 * bpcc)) & (int) (pow(2, bpcc) - 1);
+	int first = col & (int) (Math::Pow(2, bpcc) - 1);
+	int second = (col >> bpcc) & (int) (Math::Pow(2, bpcc) - 1);
+	int third = (col >> (2 * bpcc)) & (int) (Math::Pow(2, bpcc) - 1);
+	int fourth = (col >> (3 * bpcc)) & (int) (Math::Pow(2, bpcc) - 1);
 
-	first = (int) (255 / (pow(2, bpcc) - 1) * (double) first);
-	second = (int) (255 / (pow(2, bpcc) - 1) * (double) second);
-	third = (int) (255 / (pow(2, bpcc) - 1) * (double) third);
-	fourth = (int) (255 / (pow(2, bpcc) - 1) * (double) fourth);
+	first = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) first);
+	second = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) second);
+	third = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) third);
+	fourth = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) fourth);
 
 	return CombineColor(first, second, third, fourth);
 }
-
-#endif

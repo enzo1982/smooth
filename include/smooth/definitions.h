@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,149 +11,244 @@
 #ifndef _H_OBJSMOOTH_DEFS_
 #define _H_OBJSMOOTH_DEFS_
 
+#include <lisa.h>
+
+#ifdef __GNUC__
+	#ifndef __int64
+		#define __int64 long long
+	#endif
+#endif
+
+#if defined __WIN32__
+	#if defined __SMOOTH_DLL__ && !defined WIN32_LEAN_AND_MEAN
+	#define WIN32_LEAN_AND_MEAN
+	#endif
+
+	#include <windows.h>
+	#include <wtypes.h>
+	#include <tchar.h>
+	#include <wchar.h>
+
+	#if defined __SMOOTH_DLL__
+		#define SMOOTHAPI __declspec (dllexport)
+		#define SMOOTHVAR extern __declspec (dllexport)
+	#elif defined __SMOOTH_PLUGIN_DLL__ && defined __SMOOTH_STATIC__
+		#define SMOOTHAPI
+		#define SMOOTHVAR extern
+
+		#define SMOOTH_PLUGIN_API __declspec (dllexport)
+		#define SMOOTH_PLUGIN_VAR extern __declspec (dllexport)
+
+		#define __SMOOTH_DLL__
+	#elif defined __SMOOTH_STATIC__
+		#define SMOOTHAPI
+		#define SMOOTHVAR extern
+
+		#define SMOOTH_PLUGIN_API __declspec (dllimport)
+		#define SMOOTH_PLUGIN_VAR __declspec (dllimport)
+
+		#define __SMOOTH_DLL__
+	#elif defined __SMOOTH_PLUGIN_DLL__
+		#define SMOOTHAPI __declspec (dllimport)
+		#define SMOOTHVAR __declspec (dllimport)
+
+		#define SMOOTH_PLUGIN_API __declspec (dllexport)
+		#define SMOOTH_PLUGIN_VAR extern __declspec (dllexport)
+	#else
+		#define SMOOTHAPI __declspec (dllimport)
+		#define SMOOTHVAR __declspec (dllimport)
+
+		#define SMOOTH_PLUGIN_API __declspec (dllimport)
+		#define SMOOTH_PLUGIN_VAR __declspec (dllimport)
+	#endif
+
+	#if !defined WM_MOUSEWHEEL
+		#define WM_MOUSEWHEEL 522
+	#endif
+#elif defined __QNX__
+	#include <Ph.h>
+	#include <Pt.h>
+	#include <wchar.h>
+
+	#define SMOOTHAPI
+	#define SMOOTHVAR extern
+
+	#define SMOOTH_PLUGIN_API
+	#define SMOOTH_PLUGIN_VAR extern
+#else
+	#include <X11/Xlib.h>
+	#include <wchar.h>
+
+	#define SMOOTHAPI
+	#define SMOOTHVAR extern
+
+	#define SMOOTH_PLUGIN_API
+	#define SMOOTH_PLUGIN_VAR extern
+
+	#undef Success
+	#undef True
+	#undef False
+
+	#define _TEXT(x) L##x
+#endif
+
+#ifndef __WIN32__
+#ifndef __WINDOWS_TYPES__
+#define __WINDOWS_TYPES__
+
+#define NIL	(0)
+
+#define PS_SOLID	0
+#define PS_DASH		1
+#define PS_DOT		2
+#define PS_DASHDOT	3
+#define PS_DASHDOTDOT	4
+#define PS_NULL		5
+
+#define RGB(r,g,b) CombineColor(r,g,b)
+#define max(a,b) ((a)>(b)?(a):(b))
+#define min(a,b) ((a)<(b)?(a):(b))
+#endif
+#else
+#define NIL	(0)
+#endif
+
 #include "types/bool.h"
-#include "types/byte.h"
 #include "types/float.h"
 #include "types/int.h"
-#include "types/short.h"
 #include "types/void.h"
 
-#include "system.h"
+namespace S = smooth;
 
-#include "point.h"
-#include "size.h"
-#include "rect.h"
-#include "line.h"
+namespace smooth
+{
+	const Int Success	= 1;
+	const Int Error		= 0;
+	const Int Break		= -1;
 
-#include "string.h"
+	const Bool True		= (Bool) -1;
+	const Bool False	= (Bool) 0;
+
+	Int	 Main();
+	Void	 AttachDLL();
+	Void	 DetachDLL();
+};
+
 #include "array.h"
 
 #ifdef _MSC_VER
-	#define SMOOTHProc(x,p,y)	 (SMOOTHVoid (SMOOTHObject::*)())p->y,(SMOOTHVoid *)p
-	#define SMOOTHPaintProc(x,p,y)	 (SMOOTHVoid (SMOOTHObject::*)())p->y,(SMOOTHVoid *)p
-	#define SMOOTHPeekProc(x,p,y)	 (SMOOTHVoid (SMOOTHObject::*)())p->y,(SMOOTHVoid *)p
-	#define SMOOTHKillProc(x,p,y)	 (SMOOTHBool (SMOOTHObject::*)())p->y,(SMOOTHVoid *)p
-	#define SMOOTHMessageProc(x,p,y) (SMOOTHVoid (SMOOTHObject::*)(SMOOTHInt,SMOOTHInt,SMOOTHInt))p->y,(SMOOTHVoid *)p
-	#define SMOOTHThreadProc(x,p,y)	 (SMOOTHVoid (SMOOTHObject::*)(SMOOTHThread *))p->y,(SMOOTHVoid *)p
+	#define Proc(x,p,y)		 (S::Void (S::Object::*)())p->y,(S::Void *)p
+	#define PaintProc(x,p,y)	 (S::Void (S::Object::*)())p->y,(S::Void *)p
+	#define PeekProc(x,p,y)		 (S::Void (S::Object::*)())p->y,(S::Void *)p
+	#define KillProc(x,p,y)		 (S::Bool (S::Object::*)())p->y,(S::Void *)p
+	#define MessageProc(x,p,y)	 (S::Void (S::Object::*)(S::Int,S::Int,S::Int))p->y,(S::Void *)p
+	#define ThreadProc(x,p,y)	 (S::Void (S::Object::*)(S::Thread *))p->y,(S::Void *)p
 
-	#define SProc(x,p,y)		 (SMOOTHVoid (SMOOTHObject::*)())p->y,(SMOOTHVoid *)p
-	#define SPaintProc(x,p,y)	 (SMOOTHVoid (SMOOTHObject::*)())p->y,(SMOOTHVoid *)p
-	#define SPeekProc(x,p,y)	 (SMOOTHVoid (SMOOTHObject::*)())p->y,(SMOOTHVoid *)p
-	#define SKillProc(x,p,y)	 (SMOOTHBool (SMOOTHObject::*)())p->y,(SMOOTHVoid *)p
-	#define SMessageProc(x,p,y)	 (SMOOTHVoid (SMOOTHObject::*)(SMOOTHInt,SMOOTHInt,SMOOTHInt))p->y,(SMOOTHVoid *)p
-	#define SThreadProc(x,p,y)	 (SMOOTHVoid (SMOOTHObject::*)(SMOOTHThread *))p->y,(SMOOTHVoid *)p
+	#define ProcType		 S::Void(S::Object::*)()
+	#define PaintProcType		 S::Void(S::Object::*)()
+	#define PeekProcType		 S::Void(S::Object::*)()
+	#define KillProcType		 S::Bool(S::Object::*)()
+	#define MessageProcType		 S::Void(S::Object::*)(S::Int,S::Int,S::Int)
+	#define ThreadProcType		 S::Void(S::Object::*)(S::Thread *)
 
-	#define SMOOTHProcType		 SMOOTHVoid(SMOOTHObject::*)()
-	#define SMOOTHPaintProcType	 SMOOTHVoid(SMOOTHObject::*)()
-	#define SMOOTHPeekProcType	 SMOOTHVoid(SMOOTHObject::*)()
-	#define SMOOTHKillProcType	 SMOOTHBool(SMOOTHObject::*)()
-	#define SMOOTHMessageProcType	 SMOOTHVoid(SMOOTHObject::*)(SMOOTHInt,SMOOTHInt,SMOOTHInt)
-	#define SMOOTHThreadProcType	 SMOOTHVoid(SMOOTHObject::*)(SMOOTHThread *)
+	#define ProcMember		 S::Void(S::Object::*proc)()
+	#define PaintProcMember		 S::Void(S::Object::*paintProc)()
+	#define PeekProcMember		 S::Void(S::Object::*peekProc)()
+	#define KillProcMember		 S::Bool(S::Object::*killProc)()
+	#define MessageProcMember	 S::Void(S::Object::*messageProc)(S::Int,S::Int,S::Int)
+	#define ThreadProcMember	 S::Void(S::Object::*threadProc)(S::Thread *)
 
-	#define SMOOTHProcMember	 SMOOTHVoid(SMOOTHObject::*proc)()
-	#define SMOOTHPaintProcMember	 SMOOTHVoid(SMOOTHObject::*paintProc)()
-	#define SMOOTHPeekProcMember	 SMOOTHVoid(SMOOTHObject::*peekProc)()
-	#define SMOOTHKillProcMember	 SMOOTHBool(SMOOTHObject::*killProc)()
-	#define SMOOTHMessageProcMember	 SMOOTHVoid(SMOOTHObject::*messageProc)(SMOOTHInt,SMOOTHInt,SMOOTHInt)
-	#define SMOOTHThreadProcMember	 SMOOTHVoid(SMOOTHObject::*threadProc)(SMOOTHThread *)
+	#define ProcParam		 S::Void(S::Object::*newProc)()
+	#define PaintProcParam		 S::Void(S::Object::*newProc)()
+	#define PeekProcParam		 S::Void(S::Object::*newProc)()
+	#define KillProcParam		 S::Bool(S::Object::*newProc)()
+	#define MessageProcParam	 S::Void(S::Object::*newProc)(S::Int,S::Int,S::Int)
+	#define ThreadProcParam		 S::Void(S::Object::*newProc)(S::Thread *)
 
-	#define SMOOTHProcParam		 SMOOTHVoid(SMOOTHObject::*newProc)()
-	#define SMOOTHPaintProcParam	 SMOOTHVoid(SMOOTHObject::*newProc)()
-	#define SMOOTHPeekProcParam	 SMOOTHVoid(SMOOTHObject::*newProc)()
-	#define SMOOTHKillProcParam	 SMOOTHBool(SMOOTHObject::*newProc)()
-	#define SMOOTHMessageProcParam	 SMOOTHVoid(SMOOTHObject::*newProc)(SMOOTHInt,SMOOTHInt,SMOOTHInt)
-	#define SMOOTHThreadProcParam	 SMOOTHVoid(SMOOTHObject::*newProc)(SMOOTHThread *)
-
-	#define SMOOTHProcCall(p,c)		 if(p!=NIL)(((SMOOTHObject *) c)->*p)()
-	#define SMOOTHPaintProcCall(p,c)	 if(p!=NIL)(((SMOOTHObject *) c)->*p)()
-	#define SMOOTHPeekProcCall(p,c)		 if(p!=NIL)(((SMOOTHObject *) c)->*p)()
-	#define SMOOTHKillProcCall(p,c)		 (p==NIL)?(SMOOTH::True):(((SMOOTHObject *) c)->*p)()
-	#define SMOOTHMessageProcCall(p,c,m,w,l) if(p!=NIL)(((SMOOTHObject *) c)->*p)(m,w,l)
-	#define SMOOTHThreadProcCall(p,c,t)	 if(p!=NIL)(((SMOOTHObject *) c)->*p)(t)
+	#define ProcCall(p,c)			 if(p!=NIL)(((S::Object *) c)->*p)()
+	#define PaintProcCall(p,c)		 if(p!=NIL)(((S::Object *) c)->*p)()
+	#define PeekProcCall(p,c)		 if(p!=NIL)(((S::Object *) c)->*p)()
+	#define KillProcCall(p,c)		 (p==NIL)?(S::True):(((S::Object *) c)->*p)()
+	#define MessageProcCall(p,c,m,w,l)	 if(p!=NIL)(((S::Object *) c)->*p)(m,w,l)
+	#define ThreadProcCall(p,c,t)		 if(p!=NIL)(((S::Object *) c)->*p)(t)
 #else
-	#define SMOOTHProc(x,p,y)	 (SMOOTHVoid(*)())(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SMOOTHPaintProc(x,p,y)	 (SMOOTHVoid(*)())(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SMOOTHPeekProc(x,p,y)	 (SMOOTHVoid(*)())(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SMOOTHKillProc(x,p,y)	 (SMOOTHBool(*)())(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SMOOTHMessageProc(x,p,y) (SMOOTHVoid(*)(SMOOTHInt,SMOOTHInt,SMOOTHInt))(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SMOOTHThreadProc(x,p,y)	 (SMOOTHVoid(*)(SMOOTHThread *))(p->*(&x::y)),(SMOOTHVoid *)p
+	#define Proc(x,p,y)		 (S::Void(*)())(p->*(&x::y)),(S::Void *)p
+	#define PaintProc(x,p,y)	 (S::Void(*)())(p->*(&x::y)),(S::Void *)p
+	#define PeekProc(x,p,y)		 (S::Void(*)())(p->*(&x::y)),(S::Void *)p
+	#define KillProc(x,p,y)		 (S::Bool(*)())(p->*(&x::y)),(S::Void *)p
+	#define MessageProc(x,p,y)	 (S::Void(*)(S::Int,S::Int,S::Int))(p->*(&x::y)),(S::Void *)p
+	#define ThreadProc(x,p,y)	 (S::Void(*)(S::Thread *))(p->*(&x::y)),(S::Void *)p
 
-	#define SProc(x,p,y)		 (SMOOTHVoid(*)())(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SPaintProc(x,p,y)	 (SMOOTHVoid(*)())(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SPeekProc(x,p,y)	 (SMOOTHVoid(*)())(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SKillProc(x,p,y)	 (SMOOTHBool(*)())(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SMessageProc(x,p,y)	 (SMOOTHVoid(*)(SMOOTHInt,SMOOTHInt,SMOOTHInt))(p->*(&x::y)),(SMOOTHVoid *)p
-	#define SThreadProc(x,p,y)	 (SMOOTHVoid(*)(SMOOTHThread *))(p->*(&x::y)),(SMOOTHVoid *)p
+	#define ProcType		 S::Void(*)(S::Void *)
+	#define PaintProcType		 S::Void(*)(S::Void *)
+	#define PeekProcType		 S::Void(*)(S::Void *)
+	#define KillProcType		 S::Bool(*)(S::Void *)
+	#define MessageProcType		 S::Void(*)(S::Void *,S::Int,S::Int,S::Int)
+	#define ThreadProcType		 S::Void(*)(S::Void *,S::Thread *)
 
-	#define SMOOTHProcType		 SMOOTHVoid(*)(SMOOTHVoid *)
-	#define SMOOTHPaintProcType	 SMOOTHVoid(*)(SMOOTHVoid *)
-	#define SMOOTHPeekProcType	 SMOOTHVoid(*)(SMOOTHVoid *)
-	#define SMOOTHKillProcType	 SMOOTHBool(*)(SMOOTHVoid *)
-	#define SMOOTHMessageProcType	 SMOOTHVoid(*)(SMOOTHVoid *,SMOOTHInt,SMOOTHInt,SMOOTHInt)
-	#define SMOOTHThreadProcType	 SMOOTHVoid(*)(SMOOTHVoid *,SMOOTHThread *)
+	#define ProcMember		 S::Void(*proc)(S::Void *)
+	#define PaintProcMember		 S::Void(*paintProc)(S::Void *)
+	#define PeekProcMember		 S::Void(*peekProc)(S::Void *)
+	#define KillProcMember		 S::Bool(*killProc)(S::Void *)
+	#define MessageProcMember	 S::Void(*messageProc)(S::Void *,S::Int,S::Int,S::Int)
+	#define ThreadProcMember	 S::Void(*threadProc)(S::Void *,S::Thread *)
 
-	#define SMOOTHProcMember	 SMOOTHVoid(*proc)(SMOOTHVoid *)
-	#define SMOOTHPaintProcMember	 SMOOTHVoid(*paintProc)(SMOOTHVoid *)
-	#define SMOOTHPeekProcMember	 SMOOTHVoid(*peekProc)(SMOOTHVoid *)
-	#define SMOOTHKillProcMember	 SMOOTHBool(*killProc)(SMOOTHVoid *)
-	#define SMOOTHMessageProcMember	 SMOOTHVoid(*messageProc)(SMOOTHVoid *,SMOOTHInt,SMOOTHInt,SMOOTHInt)
-	#define SMOOTHThreadProcMember	 SMOOTHVoid(*threadProc)(SMOOTHVoid *,SMOOTHThread *)
+	#define ProcParam		 S::Void(*newProc)()
+	#define PaintProcParam		 S::Void(*newProc)()
+	#define PeekProcParam		 S::Void(*newProc)()
+	#define KillProcParam		 S::Bool(*newProc)()
+	#define MessageProcParam	 S::Void(*newProc)(S::Int,S::Int,S::Int)
+	#define ThreadProcParam		 S::Void(*newProc)(S::Thread *)
 
-	#define SMOOTHProcParam		 SMOOTHVoid(*newProc)()
-	#define SMOOTHPaintProcParam	 SMOOTHVoid(*newProc)()
-	#define SMOOTHPeekProcParam	 SMOOTHVoid(*newProc)()
-	#define SMOOTHKillProcParam	 SMOOTHBool(*newProc)()
-	#define SMOOTHMessageProcParam	 SMOOTHVoid(*newProc)(SMOOTHInt,SMOOTHInt,SMOOTHInt)
-	#define SMOOTHThreadProcParam	 SMOOTHVoid(*newProc)(SMOOTHThread *)
-
-	#define SMOOTHProcCall(p,c)		 if(p!=NIL)p(c)
-	#define SMOOTHPaintProcCall(p,c)	 if(p!=NIL)p(c)
-	#define SMOOTHPeekProcCall(p,c)		 if(p!=NIL)p(c)
-	#define SMOOTHKillProcCall(p,c)		 (p==NIL)?(SMOOTH::True):p(c)
-	#define SMOOTHMessageProcCall(p,c,m,w,l) if(p!=NIL)p(c, m, w, l)
-	#define SMOOTHThreadProcCall(p,c,t)	 if(p!=NIL)p(c, t)
+	#define ProcCall(p,c)			 if(p!=NIL)p(c)
+	#define PaintProcCall(p,c)		 if(p!=NIL)p(c)
+	#define PeekProcCall(p,c)		 if(p!=NIL)p(c)
+	#define KillProcCall(p,c)		 (p==NIL)?(S::True):p(c)
+	#define MessageProcCall(p,c,m,w,l)	 if(p!=NIL)p(c, m, w, l)
+	#define ThreadProcCall(p,c,t)		 if(p!=NIL)p(c, t)
 #endif
 
 #define NULLPROC NIL,NIL
 
 const HBITMAP SI_DEFAULT		= (HBITMAP) -1;
 
-const SMOOTHInt SM_MOUSEMOVE		= 1024;
-const SMOOTHInt SM_LBUTTONDOWN		= 1025;
-const SMOOTHInt SM_LBUTTONUP		= 1026;
-const SMOOTHInt SM_RBUTTONDOWN		= 1027;
-const SMOOTHInt SM_RBUTTONUP		= 1028;
-const SMOOTHInt SM_LBUTTONDBLCLK	= 1029;
-const SMOOTHInt SM_RBUTTONDBLCLK	= 1030;
-const SMOOTHInt SM_WINDOWTITLECHANGED	= 1031;
-const SMOOTHInt SM_LOSTCONN		= 1032;
-const SMOOTHInt SM_MOUSELEAVE		= 1033;
-const SMOOTHInt SM_SHOWTOOLTIP		= 1034;
+const S::Int SM_MOUSEMOVE		= 1024;
+const S::Int SM_LBUTTONDOWN		= 1025;
+const S::Int SM_LBUTTONUP		= 1026;
+const S::Int SM_RBUTTONDOWN		= 1027;
+const S::Int SM_RBUTTONUP		= 1028;
+const S::Int SM_LBUTTONDBLCLK		= 1029;
+const S::Int SM_RBUTTONDBLCLK		= 1030;
+const S::Int SM_WINDOWTITLECHANGED	= 1031;
+const S::Int SM_LOSTCONN		= 1032;
+const S::Int SM_MOUSELEAVE		= 1033;
+const S::Int SM_SHOWTOOLTIP		= 1034;
+const S::Int SM_MOUSEWHEEL		= 1035;
 
-const SMOOTHInt SM_EXECUTEPEEK		= 1536;
-const SMOOTHInt SM_CHECKCHECKBOXES	= 1537;
-const SMOOTHInt SM_CHECKOPTIONBOXES	= 1538;
-const SMOOTHInt SM_CHECKLISTBOXES	= 1539;
-const SMOOTHInt SM_CHECKCOMBOBOXES	= 1540;
-const SMOOTHInt SM_LOOSEFOCUS		= 1541;
-const SMOOTHInt SM_TIMER		= 1542;
-const SMOOTHInt SM_CHECKPOPUPS		= 1543;
+const S::Int SM_EXECUTEPEEK		= 1536;
+const S::Int SM_CHECKCHECKBOXES		= 1537;
+const S::Int SM_CHECKOPTIONBOXES	= 1538;
+const S::Int SM_CHECKLISTBOXES		= 1539;
+const S::Int SM_CHECKCOMBOBOXES		= 1540;
+const S::Int SM_LOOSEFOCUS		= 1541;
+const S::Int SM_TIMER			= 1542;
+const S::Int SM_CHECKPOPUPS		= 1543;
 
-const SMOOTHInt OR_UPPERLEFT		= 0;
-const SMOOTHInt OR_UPPERRIGHT		= 1;
-const SMOOTHInt OR_LOWERLEFT		= 2;
-const SMOOTHInt OR_LOWERRIGHT		= 3;
+const S::Int OR_UPPERLEFT		= 0;
+const S::Int OR_UPPERRIGHT		= 1;
+const S::Int OR_LOWERLEFT		= 2;
+const S::Int OR_LOWERRIGHT		= 3;
 
-const SMOOTHInt OR_HORZ			= 1;
-const SMOOTHInt OR_VERT			= 2;
+const S::Int OR_HORZ			= 1;
+const S::Int OR_VERT			= 2;
 
-const SMOOTHInt OR_TOP			= 4;
-const SMOOTHInt OR_BOTTOM		= 8;
+const S::Int OR_TOP			= 4;
+const S::Int OR_BOTTOM			= 8;
 
-const SMOOTHInt OR_LEFT			= 16;
-const SMOOTHInt OR_RIGHT		= 32;
+const S::Int OR_LEFT			= 16;
+const S::Int OR_RIGHT			= 32;
 
-const SMOOTHInt OR_CENTER		= 64;
-const SMOOTHInt OR_FREE			= 128;
+const S::Int OR_CENTER			= 64;
+const S::Int OR_FREE			= 128;
 
 #endif

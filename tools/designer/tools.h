@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,13 +11,13 @@
 #ifndef _H_OBJSMOOTH_DESIGNER_TOOLS_
 #define _H_OBJSMOOTH_DESIGNER_TOOLS_
 
-#include <smoothx.h>
+#include <smooth.h>
 
-const SMOOTHInt	 WINDOW		= 0;
-const SMOOTHInt	 CLIENT		= 1;
-const SMOOTHInt	 SCREEN		= 2;
+const S::Int	 WINDOW		= 0;
+const S::Int	 CLIENT		= 1;
+const S::Int	 SCREEN		= 2;
 
-SMOOTHInt MouseX(HWND, SMOOTHInt);
-SMOOTHInt MouseY(HWND, SMOOTHInt);
+S::Int MouseX(HWND, S::Int);
+S::Int MouseY(HWND, S::Int);
 
 #endif

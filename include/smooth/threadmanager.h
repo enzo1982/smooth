@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,32 +11,36 @@
 #ifndef _H_OBJSMOOTH_THREADMANAGER_
 #define _H_OBJSMOOTH_THREADMANAGER_
 
-#define SThreadManager SMOOTHThreadManager
-
-class SMOOTHThreadManager;
+namespace smooth
+{
+	class ThreadManager;
+};
 
 #include "application.h"
 #include "thread.h"
 
-class SMOOTHAPI SMOOTHThreadManager
+namespace smooth
 {
-	protected:
-		SMOOTHArray<SMOOTHThread *>	 assocThreads;
-		SMOOTHInt			 nOfThreads;
+	class SMOOTHAPI ThreadManager
+	{
+		protected:
+			Array<Thread *>	 assocThreads;
+			Int		 nOfThreads;
 
-		static SMOOTHBool		 threadManagerExists;
-		SMOOTHBool			 iAmTheOne;
-	public:
-						 SMOOTHThreadManager();
-						~SMOOTHThreadManager();
+			static Bool	 threadManagerExists;
+			Bool		 iAmTheOne;
+		public:
+					 ThreadManager();
+					~ThreadManager();
 
-		SMOOTHInt			 RegisterThread(SMOOTHThread *);
-		SMOOTHInt			 UnregisterThread(SMOOTHThread *);
+			Int		 RegisterThread(Thread *);
+			Int		 UnregisterThread(Thread *);
 
-		SMOOTHThread			*RequestThread(SMOOTHInt);
-		SMOOTHInt			 GetNOfThreads();
+			Thread		*RequestThread(Int);
+			Int		 GetNOfThreads();
+	};
+
+	SMOOTHVAR ThreadManager	*mainThreadManager;
 };
-
-SMOOTHVAR SMOOTHThreadManager	*mainThreadManager;
 
 #endif

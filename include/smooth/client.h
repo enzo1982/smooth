@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,30 +11,35 @@
 #ifndef _H_OBJSMOOTH_CLIENT_
 #define _H_OBJSMOOTH_CLIENT_
 
-#define SClient SMOOTHClient
-
-class SMOOTHClient;
-
-#include "object.h"
-
-class SMOOTHAPI SMOOTHClient : public SMOOTHObject
+namespace smooth
 {
-	protected:
-		SMOOTHRect		 updateRect;
-	public:
-					 SMOOTHClient(SMOOTHProcParam, SMOOTHVoid *);
-					~SMOOTHClient();
-
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-
-		SMOOTHRect		 GetUpdateRect();
-
-		virtual SMOOTHSize	 GetSize();
-
-		virtual SMOOTHInt	 BlitFromBitmap(HBITMAP, SMOOTHRect, SMOOTHRect);
-		virtual SMOOTHInt	 BlitToBitmap(SMOOTHRect, HBITMAP, SMOOTHRect);
+	class Client;
 };
 
-SMOOTHVAR SMOOTHInt OBJ_CLIENT;
+#include "object.h"
+#include "rect.h"
+
+namespace smooth
+{
+	class SMOOTHAPI Client : public Object
+	{
+		protected:
+			Rect		 updateRect;
+		public:
+					 Client(ProcParam, Void *);
+					~Client();
+
+			virtual Int	 Paint(Int);
+
+			Rect		 GetUpdateRect();
+
+			virtual Size	 GetSize();
+
+			virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
+			virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+	};
+
+	SMOOTHVAR Int OBJ_CLIENT;
+};
 
 #endif

@@ -1,18 +1,20 @@
-#ifndef	_H_T02_
-#define _H_T02_
+/*
+ * smooth tutorial 1
+ */
 
-#include <smoothx.h>
+#include <smooth.h>
 
-class HelloWorld : public SMOOTHApplication
+using namespace smooth;
+
+class Hello : public Application
 {
 	private:
-		SMOOTHWindow		*wnd;
-		SMOOTHTitlebar		*title;
-		SMOOTHClient		*client;	// the windows client area
-		SMOOTHDivisionbar	*dbar;		// and a divisionbar
+		Window		*mainWnd;
+		Titlebar	*title;
+		Button		*hello;
 	public:
-					 HelloWorld();
-					~HelloWorld();
+				 Hello();
+				~Hello();
+	slots:
+		Void		 Quit();
 };
-
-#endif

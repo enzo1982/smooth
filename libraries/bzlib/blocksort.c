@@ -8,7 +8,7 @@
   This file is a part of bzip2 and/or libbzip2, a program and
   library for lossless, block-sorting data compression.
 
-  Copyright (C) 1996-2000 Julian R Seward.  All rights reserved.
+  Copyright (C) 1996-2002 Julian R Seward.  All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -66,7 +66,7 @@
 --*/
 
 
-#include <bzlib_private.h>
+#include "bzlib_private.h"
 
 /*---------------------------------------------*/
 /*--- Fallback O(N log(N)^2) sorting        ---*/
@@ -155,6 +155,8 @@ void fallbackQSort3 ( UInt32* fmap,
 
    while (sp > 0) {
 
+      AssertH ( sp < FALLBACK_QSORT_STACK_SIZE, 1004 );
+
       fpop ( lo, hi );
       if (hi - lo < FALLBACK_QSORT_SMALL_THRESH) {
          fallbackSimpleSort ( fmap, eclass, lo, hi );
@@ -203,6 +205,8 @@ void fallbackQSort3 ( UInt32* fmap,
          if (unLo > unHi) break;
          fswap(fmap[unLo], fmap[unHi]); unLo++; unHi--;
       }
+
+      AssertD ( unHi == unLo-1, "fallbackQSort3(2)" );
 
       if (gtHi < ltLo) continue;
 
@@ -269,6 +273,8 @@ void fallbackSort ( UInt32* fmap,
       Initial 1-char radix sort to generate
       initial fmap and initial BH bits.
    --*/
+   if (verb >= 4)
+      VPrintf0 ( "        bucket sorting ...\n" );
    for (i = 0; i < 257;    i++) ftab[i] = 0;
    for (i = 0; i < nblock; i++) ftab[eclass8[i]]++;
    for (i = 0; i < 256;    i++) ftabCopy[i] = ftab[i];
@@ -300,6 +306,9 @@ void fallbackSort ( UInt32* fmap,
    /*-- the log(N) loop --*/
    H = 1;
    while (1) {
+
+      if (verb >= 4) 
+         VPrintf1 ( "        depth %6d has ", H );
 
       j = 0;
       for (i = 0; i < nblock; i++) {
@@ -343,6 +352,9 @@ void fallbackSort ( UInt32* fmap,
          }
       }
 
+      if (verb >= 4) 
+         VPrintf1 ( "%6d unresolved strings\n", nNotDone );
+
       H *= 2;
       if (H > nblock || nNotDone == 0) break;
    }
@@ -352,12 +364,15 @@ void fallbackSort ( UInt32* fmap,
       eclass8 [0 .. nblock-1], since the
       previous phase destroyed it.
    --*/
+   if (verb >= 4)
+      VPrintf0 ( "        reconstructing block ...\n" );
    j = 0;
    for (i = 0; i < nblock; i++) {
       while (ftabCopy[j] == 0) j++;
       ftabCopy[j]--;
       eclass8[fmap[i]] = (UChar)j;
    }
+   AssertH ( j < 256, 1005 );
 }
 
 #undef       SET_BH
@@ -387,6 +402,7 @@ Bool mainGtU ( UInt32  i1,
    UChar  c1, c2;
    UInt16 s1, s2;
 
+   AssertD ( i1 != i2, "mainGtU" );
    /* 1 */
    c1 = block[i1]; c2 = block[i2];
    if (c1 != c2) return (c1 > c2);
@@ -674,6 +690,8 @@ void mainQSort3 ( UInt32* ptr,
 
    while (sp > 0) {
 
+      AssertH ( sp < MAIN_QSORT_STACK_SIZE, 1001 );
+
       mpop ( lo, hi, d );
       if (hi - lo < MAIN_QSORT_SMALL_THRESH || 
           d > MAIN_QSORT_DEPTH_THRESH) {
@@ -715,6 +733,8 @@ void mainQSort3 ( UInt32* ptr,
          mswap(ptr[unLo], ptr[unHi]); unLo++; unHi--;
       }
 
+      AssertD ( unHi == unLo-1, "mainQSort3(2)" );
+
       if (gtHi < ltLo) {
          mpush(lo, hi, d+1 );
          continue;
@@ -733,6 +753,9 @@ void mainQSort3 ( UInt32* ptr,
       if (mnextsize(0) < mnextsize(1)) mnextswap(0,1);
       if (mnextsize(1) < mnextsize(2)) mnextswap(1,2);
       if (mnextsize(0) < mnextsize(1)) mnextswap(0,1);
+
+      AssertD (mnextsize(0) >= mnextsize(1), "mainQSort3(8)" );
+      AssertD (mnextsize(1) >= mnextsize(2), "mainQSort3(9)" );
 
       mpush (nextLo[0], nextHi[0], nextD[0]);
       mpush (nextLo[1], nextHi[1], nextD[1]);
@@ -788,6 +811,7 @@ void mainSort ( UInt32* ptr,
    UChar  c1;
    Int32  numQSorted;
    UInt16 s;
+   if (verb >= 4) VPrintf0 ( "        main sort initialise ...\n" );
 
    /*-- set up the 2-byte frequency table --*/
    for (i = 65536; i >= 0; i--) ftab[i] = 0;
@@ -819,6 +843,8 @@ void mainSort ( UInt32* ptr,
       block   [nblock+i] = block[i];
       quadrant[nblock+i] = 0;
    }
+
+   if (verb >= 4) VPrintf0 ( "        bucket sorting ...\n" );
 
    /*-- Complete the initial radix sort --*/
    for (i = 1; i <= 65536; i++) ftab[i] += ftab[i-1];
@@ -911,6 +937,10 @@ void mainSort ( UInt32* ptr,
                Int32 lo = ftab[sb]   & CLEARMASK;
                Int32 hi = (ftab[sb+1] & CLEARMASK) - 1;
                if (hi > lo) {
+                  if (verb >= 4)
+                     VPrintf4 ( "        qsort [0x%x, 0x%x]   "
+                                "done %d   this %d\n",
+                                ss, j, numQSorted, hi - lo + 1 );
                   mainQSort3 ( 
                      ptr, block, quadrant, nblock, 
                      lo, hi, BZ_N_RADIX, budget 
@@ -922,6 +952,8 @@ void mainSort ( UInt32* ptr,
             ftab[sb] |= SETMASK;
          }
       }
+
+      AssertH ( !bigDone[ss], 1006 );
 
       /*--
          Step 2:
@@ -948,6 +980,15 @@ void mainSort ( UInt32* ptr,
                ptr[ copyEnd[c1]-- ] = k;
          }
       }
+
+      AssertH ( (copyStart[ss]-1 == copyEnd[ss])
+                || 
+                /* Extremely rare case missing in bzip2-1.0.0 and 1.0.1.
+                   Necessity for this case is demonstrated by compressing 
+                   a sequence of approximately 48.5 million of character 
+                   251; 1.0.0/1.0.1 will then die here. */
+                (copyStart[ss] == 0 && copyEnd[ss] == nblock-1),
+                1007 )
 
       for (j = 0; j <= 255; j++) ftab[(j << 8) + ss] |= SETMASK;
 
@@ -1006,9 +1047,14 @@ void mainSort ( UInt32* ptr,
             if (a2update < BZ_N_OVERSHOOT)
                quadrant[a2update + nblock] = qVal;
          }
+         AssertH ( ((bbSize-1) >> shifts) <= 65535, 1002 );
       }
 
    }
+
+   if (verb >= 4)
+      VPrintf3 ( "        %d pointers, %d sorted, %d scanned\n",
+                 nblock, numQSorted, nblock - numQSorted );
 }
 
 #undef BIGFREQ
@@ -1067,7 +1113,16 @@ void BZ2_blockSort ( EState* s )
       budget = budgetInit;
 
       mainSort ( ptr, block, quadrant, ftab, nblock, verb, &budget );
+      if (verb >= 3) 
+         VPrintf3 ( "      %d work, %d block, ratio %5.2f\n",
+                    budgetInit - budget,
+                    nblock, 
+                    (float)(budgetInit - budget) /
+                    (float)(nblock==0 ? 1 : nblock) ); 
       if (budget < 0) {
+         if (verb >= 2) 
+            VPrintf0 ( "    too repetitive; using fallback"
+                       " sorting algorithm\n" );
          fallbackSort ( s->arr1, s->arr2, ftab, nblock, verb );
       }
    }
@@ -1076,6 +1131,8 @@ void BZ2_blockSort ( EState* s )
    for (i = 0; i < s->nblock; i++)
       if (ptr[i] == 0)
          { s->origPtr = i; break; };
+
+   AssertH( s->origPtr != -1, 1003 );
 }
 
 

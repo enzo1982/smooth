@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -13,57 +13,57 @@
 
 #include "entry.h"
 
-template <class t> SMOOTHArray_Entry<t>::SMOOTHArray_Entry()
+template <class t> S::Array_Entry<t>::Array_Entry()
 {
-	gotNext = false;
-	gotPrev = false;
+	gotNext = False;
+	gotPrev = False;
 	nextEntry = ARRAY_NULLPOINTER;
 	prevEntry = ARRAY_NULLPOINTER;
 }
 
-template <class t> SMOOTHArray_Entry<t>::~SMOOTHArray_Entry()
+template <class t> S::Array_Entry<t>::~Array_Entry()
 {
 }
 
-template <class t> bool SMOOTHArray_Entry<t>::SetNext(SMOOTHArray_Entry<t> *entry)
+template <class t> S::Bool S::Array_Entry<t>::SetNext(Array_Entry<t> *entry)
 {
 	if (entry != ARRAY_NULLPOINTER)
 	{
-		gotNext = true;
+		gotNext = True;
 		nextEntry = entry;
-		return true;
 	}
 	else
 	{
-		gotNext = false;
+		gotNext = False;
 		nextEntry = ARRAY_NULLPOINTER;
-		return true;
 	}
+
+	return True;
 }
 
-template <class t> bool SMOOTHArray_Entry<t>::SetPrev(SMOOTHArray_Entry<t> *entry)
+template <class t> S::Bool S::Array_Entry<t>::SetPrev(Array_Entry<t> *entry)
 {
 	if (entry != ARRAY_NULLPOINTER)
 	{
-		gotPrev = true;
+		gotPrev = True;
 		prevEntry = entry;
-		return true;
 	}
 	else
 	{
-		gotPrev = false;
+		gotPrev = False;
 		prevEntry = ARRAY_NULLPOINTER;
-		return true;
 	}
+
+	return True;
 }
 
-template <class t> inline SMOOTHArray_Entry<t> *SMOOTHArray_Entry<t>::GetNext()
+template <class t> inline S::Array_Entry<t> *S::Array_Entry<t>::GetNext()
 {
 	if (gotNext)	return nextEntry;
 	else		return ARRAY_NULLPOINTER;
 }
 
-template <class t> inline SMOOTHArray_Entry<t> *SMOOTHArray_Entry<t>::GetPrev()
+template <class t> inline S::Array_Entry<t> *S::Array_Entry<t>::GetPrev()
 {
 	if (gotPrev)	return prevEntry;
 	else		return ARRAY_NULLPOINTER;

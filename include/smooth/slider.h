@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,35 +11,39 @@
 #ifndef _H_OBJSMOOTH_SLIDER_
 #define _H_OBJSMOOTH_SLIDER_
 
-#define SSlider SMOOTHSlider
-
-class SMOOTHSlider;
+namespace smooth
+{
+	class Slider;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHSlider : public SMOOTHObject
+namespace smooth
 {
-	private:
-		SMOOTHInt		 mouseBias;
-		SMOOTHInt		 prevValue;
-	protected:
-		SMOOTHInt		*variable;
+	class SMOOTHAPI Slider : public Object
+	{
+		private:
+			Int		 mouseBias;
+			Int		 prevValue;
+		protected:
+			Int		*variable;
 
-		SMOOTHInt		 startValue;
-		SMOOTHInt		 endValue;
-	public:
-					 SMOOTHSlider(SMOOTHPoint, SMOOTHSize, SMOOTHInt, SMOOTHInt *, SMOOTHInt, SMOOTHInt, SMOOTHProcParam, SMOOTHVoid *);
-					~SMOOTHSlider();
+			Int		 startValue;
+			Int		 endValue;
+		public:
+					 Slider(Point, Size, Int, Int *, Int, Int, ProcParam, Void *);
+					~Slider();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
 
-		SMOOTHInt		 SetRange(SMOOTHInt, SMOOTHInt);
+			Int		 SetRange(Int, Int);
 
-		SMOOTHInt		 SetValue(SMOOTHInt);
-		SMOOTHInt		 GetValue();
+			Int		 SetValue(Int);
+			Int		 GetValue();
+	};
+
+	SMOOTHVAR Int OBJ_SLIDER;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_SLIDER;
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,30 +11,43 @@
 #ifndef _H_OBJSMOOTH_XMLDOCUMENT_
 #define _H_OBJSMOOTH_XMLDOCUMENT_
 
-#define SXMLDocument SMOOTHXMLDocument
-
-class SMOOTHXMLDocument;
+namespace smooth
+{
+	namespace XML
+	{
+		class Document;
+	};
+};
 
 #include <libxml/parser.h>
 
 #include "../definitions.h"
 #include "node.h"
 
-class SMOOTHAPI SMOOTHXMLDocument
+namespace smooth
 {
-	private:
-		SMOOTHXMLNode	*rootNode;
-		SMOOTHInt	 LoadNode(xmlNodePtr, SMOOTHXMLNode *);
-		SMOOTHInt	 SaveNode(SMOOTHXMLNode *, xmlNodePtr);
-	public:
-				 SMOOTHXMLDocument();
-				~SMOOTHXMLDocument();
+	namespace XML
+	{
+		class SMOOTHAPI Document
+		{
+			private:
+				String	 encoding;
+				Node	*rootNode;
+				Int	 LoadNode(xmlNodePtr, Node *);
+				Int	 SaveNode(Node *, xmlNodePtr);
+			public:
+					 Document();
+					~Document();
 
-		SMOOTHXMLNode	*GetRootNode();
-		SMOOTHInt	 SetRootNode(SMOOTHXMLNode *);
+				Node	*GetRootNode();
+				Int	 SetRootNode(Node *);
 
-		SMOOTHInt	 LoadFile(SMOOTHString);
-		SMOOTHInt	 SaveFile(SMOOTHString);
+				Int	 SetEncoding(String);
+
+				Int	 LoadFile(String);
+				Int	 SaveFile(String);
+		};
+	};
 };
 
 #endif

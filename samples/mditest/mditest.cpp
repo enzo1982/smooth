@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -9,33 +9,36 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth.h>
+#include <smooth/main.h>
 #include "mditest.h"
 
-void SMOOTH::Main()
+Int smooth::Main()
 {
 	MDITest	*app = new MDITest();
 
-	SMOOTH::Loop();
+	Loop();
 
 	delete app;
+
+	return 0;
 }
 
 MDITest::MDITest()
 {
 	SetText("MDITest");
 
-	mainWnd			= new SMOOTHWindow("MDITest");
-	mainWnd_titlebar	= new SMOOTHTitlebar(true, true, true);
-	mainWnd_statusbar	= new SMOOTHStatusbar("Bereit");
-	mainWnd_client		= new SMOOTHMDIClient();
-	mainWnd_menubar		= new SMOOTHMenubar();
-	menu_file		= new SMOOTHPopupMenu();
+	mainWnd			= new Window("MDITest");
+	mainWnd_titlebar	= new Titlebar(true, true, true);
+	mainWnd_statusbar	= new Statusbar("Ready");
+	mainWnd_client		= new MDIClient();
+	mainWnd_menubar		= new Menubar();
+	menu_file		= new PopupMenu();
 
-	menu_file->AddEntry("Neu", NIL, SMOOTHProc(MDITest, this, NewMDI));
+	menu_file->AddEntry("New", NIL, Proc(MDITest, this, NewMDI));
 	menu_file->AddEntry();
-	menu_file->AddEntry("Beenden", NIL, SMOOTHProc(MDITest, this, QuitProc));
+	menu_file->AddEntry("Exit", NIL, Proc(Window, mainWnd, Close));
 
-	mainWnd_menubar->AddEntry("Datei", NIL, NULLPROC, menu_file);
+	mainWnd_menubar->AddEntry("File", NIL, NULLPROC, menu_file);
 
 	RegisterObject(mainWnd);
 
@@ -44,9 +47,9 @@ MDITest::MDITest()
 	mainWnd->RegisterObject(mainWnd_client);
 	mainWnd->RegisterObject(mainWnd_menubar);
 
-	mainWnd->SetMetrics(SMOOTHPoint(50, 50), SMOOTHSize(700, 500));
+	mainWnd->SetMetrics(Point(50, 50), Size(700, 500));
 	mainWnd->SetIcon(SI_DEFAULT);
-	mainWnd->SetKillProc(SMOOTHKillProc(MDITest, this, KillProc));
+	mainWnd->SetKillProc(KillProc(MDITest, this, ExitProc));
 }
 
 MDITest::~MDITest()
@@ -66,14 +69,9 @@ MDITest::~MDITest()
 	delete mainWnd;
 }
 
-SMOOTHVoid MDITest::QuitProc()
+Bool MDITest::ExitProc()
 {
-	SMOOTH::CloseWindow(mainWnd);
-}
-
-SMOOTHBool MDITest::KillProc()
-{
-	SMOOTHInt	 id = SMOOTH::MessageBox("Möchten sie das Programm wirklich beenden?", "Frage", MB_YESNO, IDI_QUESTION);
+	Int	 id = SMOOTH::MessageBox("Do you really want to quit?", "Exit program", MB_YESNO, IDI_QUESTION);
 
 	switch (id)
 	{
@@ -85,6 +83,6 @@ SMOOTHBool MDITest::KillProc()
 	}
 }
 
-SMOOTHVoid MDITest::NewMDI()
+Void MDITest::NewMDI()
 {
 }

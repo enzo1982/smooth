@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="SMOOTH" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="smooth" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** NICHT BEARBEITEN **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=SMOOTH - Win32 Debug
+CFG=smooth - Win32 Debug
 !MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
 !MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
 !MESSAGE 
-!MESSAGE NMAKE /f "SMOOTH.mak".
+!MESSAGE NMAKE /f "smooth.mak".
 !MESSAGE 
 !MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
 !MESSAGE 
-!MESSAGE NMAKE /f "SMOOTH.mak" CFG="SMOOTH - Win32 Debug"
+!MESSAGE NMAKE /f "smooth.mak" CFG="smooth - Win32 Debug"
 !MESSAGE 
 !MESSAGE Für die Konfiguration stehen zur Auswahl:
 !MESSAGE 
-!MESSAGE "SMOOTH - Win32 Release" (basierend auf  "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "SMOOTH - Win32 Debug" (basierend auf  "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "smooth - Win32 Release" (basierend auf  "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "smooth - Win32 Debug" (basierend auf  "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -29,7 +29,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "SMOOTH - Win32 Release"
+!IF  "$(CFG)" == "smooth - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -54,7 +54,7 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
 
-!ELSEIF  "$(CFG)" == "SMOOTH - Win32 Debug"
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -64,7 +64,7 @@ LINK32=link.exe
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "Build"
-# PROP Intermediate_Dir "SMOOTH___Win32_Debug"
+# PROP Intermediate_Dir "smooth___Win32_Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SMOOTH_EXPORTS" /YX /FD /GZ /c
@@ -79,15 +79,15 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 IOLib.lib IOLibFilters.lib libbz2.lib lisa.lib libpci.lib libpicture.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib msvcrt.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Build"
+# ADD LINK32 IOLib.lib libbz2.lib lisa.lib libpicture.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Build"
 # SUBTRACT LINK32 /verbose /pdb:none /incremental:no /map
 
 !ENDIF 
 
 # Begin Target
 
-# Name "SMOOTH - Win32 Release"
-# Name "SMOOTH - Win32 Debug"
+# Name "smooth - Win32 Release"
+# Name "smooth - Win32 Debug"
 # Begin Group "Quellcodedateien"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -128,6 +128,10 @@ SOURCE=..\classes\basic\objectproperties.cpp
 # Begin Source File
 
 SOURCE=..\classes\basic\objecttype.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\basic\system.cpp
 # End Source File
 # End Group
 # Begin Group "internal"
@@ -195,7 +199,7 @@ SOURCE=..\classes\layer\slider.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\layer\tabregister.cpp
+SOURCE=..\classes\layer\tabwidget.cpp
 # End Source File
 # Begin Source File
 
@@ -263,7 +267,15 @@ SOURCE=..\classes\menu\popupview.cpp
 # PROP Default_Filter "*.cpp"
 # Begin Source File
 
-SOURCE=..\classes\misc\date.cpp
+SOURCE=..\classes\misc\binary.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\misc\datetime.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\misc\math.cpp
 # End Source File
 # Begin Source File
 
@@ -276,10 +288,6 @@ SOURCE=..\classes\misc\surface.cpp
 # Begin Source File
 
 SOURCE=..\classes\misc\surfacegdi.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\time.cpp
 # End Source File
 # Begin Source File
 
@@ -355,7 +363,7 @@ SOURCE=..\classes\window\client.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\window\divisionbar.cpp
+SOURCE=..\classes\window\divider.cpp
 # End Source File
 # Begin Source File
 
@@ -400,71 +408,7 @@ SOURCE=..\classes\xml\node.cpp
 # PROP Default_Filter "*.cpp"
 # Begin Source File
 
-SOURCE=..\i18n\afrikaans.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\basque.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\breton.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\bulgarian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\catalan.cpp
-# End Source File
-# Begin Source File
-
-SOURCE="..\i18n\chinese-simplified.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\chinese.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\croatian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\czech.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\danish.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\dutch.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\i18n\english.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\esperanto.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\estonian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\finnish.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\french.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\galician.cpp
 # End Source File
 # Begin Source File
 
@@ -472,131 +416,7 @@ SOURCE=..\i18n\german.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\i18n\greek.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\hebrew.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\hungarian.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\i18n\i18n.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\icelandic.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\irish.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\italian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\japanese.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\korean.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\latin.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\latvian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\lithuanian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\macedonian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\maori.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\norwegian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\occitan.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\polish.cpp
-# End Source File
-# Begin Source File
-
-SOURCE="..\i18n\portuguese-brazil.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\portuguese.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\romanian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\russian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\serbian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\slovak.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\slovenian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\spanish.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\swedish.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\tamil.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\thai.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\turkish.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\ukrainian.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\walloon.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\i18n\welsh.cpp
 # End Source File
 # End Group
 # Begin Group "dialogs"
@@ -624,15 +444,11 @@ SOURCE=..\dialogs\filedlg.cpp
 # PROP Default_Filter "*.cpp"
 # Begin Source File
 
-SOURCE=..\misc\binary.cpp
+SOURCE=..\misc\codecs.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\misc\color.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\misc\definitions.cpp
 # End Source File
 # Begin Source File
 
@@ -644,15 +460,15 @@ SOURCE=..\misc\loop.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\misc\mathtools.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\misc\messagebox.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\misc\metrics.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\misc\pciio.cpp
 # End Source File
 # Begin Source File
 
@@ -679,199 +495,11 @@ SOURCE=..\misc\toolkit.cpp
 # PROP Default_Filter "*.h"
 # Begin Source File
 
-SOURCE=..\include\smooth\i18n\afrikaans.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\basque.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\breton.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\bulgarian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\catalan.h
-# End Source File
-# Begin Source File
-
-SOURCE="..\include\smooth\i18n\chinese-simplified.h"
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\chinese.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\croatian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\czech.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\danish.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\dutch.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\i18n\english.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\i18n\esperanto.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\estonian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\finnish.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\french.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\galician.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\i18n\german.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\greek.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\hebrew.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\hungarian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\icelandic.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\irish.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\italian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\japanese.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\korean.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\latin.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\latvian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\lithuanian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\macedonian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\maori.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\norwegian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\occitan.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\polish.h
-# End Source File
-# Begin Source File
-
-SOURCE="..\include\smooth\i18n\portuguese-brazil.h"
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\portuguese.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\romanian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\russian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\serbian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\slovak.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\slovenian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\spanish.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\swedish.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\tamil.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\thai.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\turkish.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\ukrainian.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\walloon.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\welsh.h
 # End Source File
 # End Group
 # Begin Group "templates"
@@ -884,9 +512,9 @@ SOURCE=..\include\smooth\i18n\welsh.h
 
 SOURCE=..\include\smooth\templates\array\array.cpp
 
-!IF  "$(CFG)" == "SMOOTH - Win32 Release"
+!IF  "$(CFG)" == "smooth - Win32 Release"
 
-!ELSEIF  "$(CFG)" == "SMOOTH - Win32 Debug"
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
@@ -901,9 +529,9 @@ SOURCE=..\include\smooth\templates\array\array.h
 
 SOURCE=..\include\smooth\templates\array\entry.cpp
 
-!IF  "$(CFG)" == "SMOOTH - Win32 Release"
+!IF  "$(CFG)" == "smooth - Win32 Release"
 
-!ELSEIF  "$(CFG)" == "SMOOTH - Win32 Debug"
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
@@ -918,9 +546,9 @@ SOURCE=..\include\smooth\templates\array\entry.h
 
 SOURCE=..\include\smooth\templates\array\value.cpp
 
-!IF  "$(CFG)" == "SMOOTH - Win32 Release"
+!IF  "$(CFG)" == "smooth - Win32 Release"
 
-!ELSEIF  "$(CFG)" == "SMOOTH - Win32 Debug"
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 
@@ -942,19 +570,11 @@ SOURCE=..\include\smooth\types\bool.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\types\byte.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\types\float.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\include\smooth\types\int.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\types\short.h
 # End Source File
 # Begin Source File
 
@@ -1019,6 +639,10 @@ SOURCE=..\include\smooth\client.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\codecs.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\color.h
 # End Source File
 # Begin Source File
@@ -1039,7 +663,7 @@ SOURCE=..\include\smooth\containertype.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\date.h
+SOURCE=..\include\smooth\datetime.h
 # End Source File
 # Begin Source File
 
@@ -1055,7 +679,7 @@ SOURCE=..\include\smooth\dirdlg.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\divisionbar.h
+SOURCE=..\include\smooth\divider.h
 # End Source File
 # Begin Source File
 
@@ -1107,7 +731,7 @@ SOURCE=..\include\smooth\loop.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\mathtools.h
+SOURCE=..\include\smooth\math.h
 # End Source File
 # Begin Source File
 
@@ -1159,6 +783,10 @@ SOURCE=..\include\smooth\optionbox.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\pciio.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\point.h
 # End Source File
 # Begin Source File
@@ -1195,7 +823,7 @@ SOURCE=..\include\smooth\semaphore.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\size.h
+SOURCE=..\include\smooth\shlobjmini.h
 # End Source File
 # Begin Source File
 
@@ -1215,10 +843,6 @@ SOURCE=..\include\smooth\stk.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\stream.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\string.h
 # End Source File
 # Begin Source File
@@ -1235,7 +859,7 @@ SOURCE=..\include\smooth\system.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\tabregister.h
+SOURCE=..\include\smooth\tabwidget.h
 # End Source File
 # Begin Source File
 
@@ -1248,10 +872,6 @@ SOURCE=..\include\smooth\thread.h
 # Begin Source File
 
 SOURCE=..\include\smooth\threadmanager.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\time.h
 # End Source File
 # Begin Source File
 
@@ -1326,9 +946,9 @@ SOURCE=..\resources\resources\binary\icon.ico
 
 SOURCE=..\resources\icon.rc
 
-!IF  "$(CFG)" == "SMOOTH - Win32 Release"
+!IF  "$(CFG)" == "smooth - Win32 Release"
 
-!ELSEIF  "$(CFG)" == "SMOOTH - Win32 Debug"
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Exclude_From_Build 1
 # ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
@@ -1351,14 +971,14 @@ SOURCE=..\resources\linkhand.rc
 
 SOURCE=..\resources\resources.rc
 
-!IF  "$(CFG)" == "SMOOTH - Win32 Release"
+!IF  "$(CFG)" == "smooth - Win32 Release"
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "SMOOTH - Win32 Debug"
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
-# ADD RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth" /i "I:\devel\projects\mpsd\src\smooth\resources" /d "__WIN32__" /d "__SMOOTH_DLL__"
+# ADD RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "c:\devel\projects\mpsd\src\smooth" /d "__WIN32__" /d "__SMOOTH_DLL__"
 
 !ENDIF 
 

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_LOOP_
-#define __OBJSMOOTH_LOOP_
 
 #include <smooth/i18n.h>
 #include <smooth/definitions.h>
@@ -33,27 +30,36 @@
 #endif
 
 #ifdef __WIN32__
-__declspec (dllexport) HINSTANCE	 hInstance = NIL;
-__declspec (dllexport) HINSTANCE	 hPrevInstance = NIL;
-__declspec (dllexport) SMOOTHString	 szCmdLine = NIL;
-__declspec (dllexport) int		 iCmdShow = 0;
+__declspec (dllexport) HINSTANCE	 S::hInstance		= NIL;
+__declspec (dllexport) HINSTANCE	 S::hPrevInstance	= NIL;
+__declspec (dllexport) S::String	 S::szCmdLine		= NIL;
+__declspec (dllexport) int		 S::iCmdShow		= 0;
 #endif
 
 #ifdef __WIN32__
-__declspec (dllexport) HICON	 SMOOTHICON = NIL;
+__declspec (dllexport) HICON	 S::SMOOTHICON = NIL;
 #endif
 
-HBITMAP	 DEFAULTICON = NIL;
+HBITMAP	 S::DEFAULTICON		= NIL;
 
-bool	 loopActive	= false;
-int	 peekLoop	= 0;
-bool	 initializing	= true;
+bool	 S::loopActive		= false;
+int	 S::peekLoop		= 0;
+bool	 S::initializing	= true;
 
-SMOOTHVoid SMOOTH::Init()
+S::Int	 initCount = 0;
+
+S::Void S::Init()
 {
+	if (initCount++) return;
+
 	LiSAInit();
 
 #ifdef __WIN32__
+	WORD		 wVersionRequested = MAKEWORD(1,1);
+	WSADATA		 wsaData;
+
+	WSAStartup(wVersionRequested, &wsaData);
+
 	if (hDllInstance == NIL) hDllInstance = hInstance;
 
 	OSVERSIONINFOA	 vInfo;
@@ -62,29 +68,31 @@ SMOOTHVoid SMOOTH::Init()
 
 	GetVersionExA(&vInfo);
 
-	if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)	SMOOTH::Setup::enableUnicode = SMOOTH::True;
-	else							SMOOTH::Setup::enableUnicode = SMOOTH::False;
+	if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)	SMOOTH::Setup::enableUnicode = True;
+	else							SMOOTH::Setup::enableUnicode = False;
 
 	DEFAULTICON = LoadBitmapA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON));
 	SMOOTHICON = LoadIconA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON));
 #endif
 
-	mainObjectManager	= new SMOOTHObjectManager();
-	mainThreadManager	= new SMOOTHThreadManager();
+	mainObjectManager	= new ObjectManager();
+	mainThreadManager	= new ThreadManager();
 
-	SMOOTHGetColors();
-	SMOOTHSetMetrics();
-	SMOOTHSetMeasurement(SMT_UNITS);
-	SMOOTHGetDefaultLanguage();
-	SMOOTH::SetLanguage(SMOOTHDefaultLanguage);
+	GetColors();
+	SetMetrics();
+	SetMeasurement(SMT_UNITS);
+	GetDefaultLanguage();
+	SMOOTH::SetLanguage(DefaultLanguage);
 
-	SMOOTHString::SetInputFormat(SIF_ISO);
+	String::SetInputFormat("UTF-8");
 
-	backgroundApplication = new SMOOTHBackgroundApplication();
+	backgroundApplication = new BackgroundApplication();
 }
 
-SMOOTHVoid SMOOTH::Free()
+S::Void S::Free()
 {
+	if (--initCount) return;
+
 #ifdef __WIN32__
 	::DeleteObject(DEFAULTICON);
 	DestroyIcon(SMOOTHICON);
@@ -95,10 +103,14 @@ SMOOTHVoid SMOOTH::Free()
 	delete mainThreadManager;
 	delete mainObjectManager;
 
+#ifdef __WIN32__
+	WSACleanup();
+#endif
+
 	LiSADeinit();
 }
 
-void SMOOTHGetColors()
+S::Void S::GetColors()
 {
 #ifdef __WIN32__
 	SMOOTH::Setup::BackgroundColor			= GetSysColor(COLOR_3DFACE);
@@ -120,31 +132,29 @@ void SMOOTHGetColors()
 #endif
 }
 
-SMOOTHInt SMOOTH::Loop()
+S::Int S::Loop()
 {
 #ifdef __WIN32__
 	MSG		 msg;
 #endif
 
-	SMOOTHWindow	*wnd;
-	SMOOTHThread	*thread;
+	Window	*wnd;
+	Thread	*thread;
 
 	if (!loopActive)
 	{
 #ifdef __WIN32__
-		if (SMOOTHWindow::nOfActiveWindows == 0) PostQuitMessage(0);
+		if (Window::nOfActiveWindows == 0) PostQuitMessage(0);
 #endif
 
 		initializing = false;
 		loopActive = true;
 
-		SMOOTHInitNetworking();
-
-		for (int i = 0; i < SMOOTHObject::objectCount; i++)
+		for (int i = 0; i < Object::objectCount; i++)
 		{
-			wnd = (SMOOTHWindow *) mainObjectManager->RequestObject(i);
+			wnd = (Window *) mainObjectManager->RequestObject(i);
 
-			if (wnd != (SMOOTHWindow *) NIL)
+			if (wnd != (Window *) NIL)
 			{
 				if (wnd->type == OBJ_WINDOW)
 				{
@@ -156,11 +166,11 @@ SMOOTHInt SMOOTH::Loop()
 
 		// start waiting threads here
 
-		for (int j = 0; j < SMOOTHObject::objectCount; j++)
+		for (int j = 0; j < Object::objectCount; j++)
 		{
 			thread = mainThreadManager->RequestThread(j);
 
-			if (thread != (SMOOTHThread *) NIL)
+			if (thread != (Thread *) NIL)
 			{
 				if (thread->GetStatus() == THREAD_STARTME) thread->Start();
 			}
@@ -179,7 +189,7 @@ SMOOTHInt SMOOTH::Loop()
 
 			if (result)
 			{
-				if (SMOOTHWindow::nOfActiveWindows == 1)
+				if (Window::nOfActiveWindows == 1)
 				{
 					msg.message = WM_QUIT;
 					break;
@@ -211,7 +221,7 @@ SMOOTHInt SMOOTH::Loop()
 
 			if (!result) break;
 
-			if (SMOOTHWindow::nOfActiveWindows == 1)
+			if (Window::nOfActiveWindows == 1)
 			{
 				msg.message = WM_QUIT;
 				break;
@@ -230,26 +240,24 @@ SMOOTHInt SMOOTH::Loop()
 #ifdef __WIN32__
 	if (msg.message != WM_QUIT)
 	{
-		return SMOOTH::Loop();	// respawn if only peekstate has changed
+		return Loop();	// respawn if only peekstate has changed
 	}
 	else
 	{
 #endif
 		loopActive = false;
 
-		for (int i = 0; i < SMOOTHObject::objectCount; i++)
+		for (int i = 0; i < Object::objectCount; i++)
 		{
 			thread = mainThreadManager->RequestThread(i);
 
-			if (thread != (SMOOTHThread *) NIL)
+			if (thread != (Thread *) NIL)
 			{
 				if (thread->GetKillFlag() == THREAD_KILLFLAG_KILL) thread->Stop();
 			}
 		}
 
-		while (SMOOTHThread::counter > 0) LiSASleep(10);
-
-		SMOOTHFinishNetworking();
+		while (Thread::counter > 0) LiSASleep(10);
 
 #ifdef __WIN32__
 		return msg.wParam;
@@ -258,22 +266,3 @@ SMOOTHInt SMOOTH::Loop()
 	return 0;
 #endif
 }
-
-void SMOOTHInitNetworking()
-{
-#ifdef __WIN32__
-	WORD		 wVersionRequested = MAKEWORD(1,1);
-	WSADATA		 wsaData;
-
-	WSAStartup(wVersionRequested, &wsaData);
-#endif
-}
-
-void SMOOTHFinishNetworking()
-{
-#ifdef __WIN32__
-	WSACleanup();
-#endif
-}
-
-#endif

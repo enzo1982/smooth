@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,53 +11,58 @@
 #ifndef _H_OBJSMOOTH_LIST_
 #define _H_OBJSMOOTH_LIST_
 
-#define SList SMOOTHList
-
-class SMOOTHList;
+namespace smooth
+{
+	class List;
+};
 
 #include "object.h"
+#include "rect.h"
 
-class SMOOTHAPI SMOOTHList
+namespace smooth
 {
-	public: class SMOOTHAPI Entry
+	class SMOOTHAPI List
 	{
-		public:
-			SMOOTHInt	 code;
-			SMOOTHProcMember;
-			SMOOTHVoid	*procParam;
-			SMOOTHString	 text;
+		public: class SMOOTHAPI Entry
+		{
+			public:
+				Int	 code;
+				ProcMember;
+				Void	*procParam;
+				String	 text;
 
-			SMOOTHBool	 chk;
-			SMOOTHBool	 clk;
-			SMOOTHInt	 size;
-			SMOOTHBool	 sizeset;
-			SMOOTHRect	 rect;
+				Bool	 chk;
+				Bool	 clk;
+				Int	 size;
+				Bool	 sizeset;
+				Rect	 rect;
 
-					 Entry(SMOOTHInt);
+					 Entry(Int);
 					~Entry();
+		};
+
+		protected:
+			Bool		 entrysizesset;
+			Int		 nOfEntries;
+
+			Entry		*AddListEntry(Int, String, ProcParam, Void *);
+			Int		 ModifyListEntry(Int, String, ProcParam, Void *);
+			Int		 RemoveListEntry(Int);
+
+			Void		 GetSize();
+			Void		 GetListEntriesSize();
+		public:
+			Array<Entry *>	 entries;
+
+					 List();
+					~List();
+
+			Void		 CleanupList();
+			Int		 GetNOfEntries();
+			Int		 SelectListEntry(Int);
+			Int		 GetSelectedEntry();
+			String		 GetSelectedEntryName();
 	};
-
-	protected:
-		SMOOTHBool		 entrysizesset;
-		SMOOTHInt		 nOfEntries;
-
-		SMOOTHInt		 AddListEntry(SMOOTHInt, SMOOTHString, SMOOTHProcParam, SMOOTHVoid *);
-		SMOOTHInt		 ModifyListEntry(SMOOTHInt, SMOOTHString, SMOOTHProcParam, SMOOTHVoid *);
-		SMOOTHInt		 RemoveListEntry(SMOOTHInt);
-
-		SMOOTHVoid		 GetSize();
-		SMOOTHVoid		 GetListEntriesSize();
-	public:
-		SMOOTHArray<Entry *>	 entries;
-
-					 SMOOTHList();
-					~SMOOTHList();
-
-		SMOOTHVoid		 CleanupList();
-		SMOOTHInt		 GetNOfEntries();
-		SMOOTHInt		 SelectListEntry(SMOOTHInt);
-		SMOOTHInt		 GetSelectedEntry();
-		SMOOTHString		 GetSelectedEntryName();
 };
 
 #endif

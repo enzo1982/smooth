@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,107 +11,108 @@
 #ifndef _H_BEAT_
 #define _H_BEAT_
 
-#include <smoothx.h>
+#include <smooth.h>
 
-class BeatClock : public SMOOTHApplication
+using namespace smooth;
+
+class BeatClock : public Application
 {
 	private:
-		SMOOTHWindow		*wnd;
-		SMOOTHTitlebar		*title;
-		SMOOTHMenubar		*menubar;
+		Window		*wnd;
+		Titlebar	*title;
+		Menubar		*menubar;
 
-		SMOOTHWindow		*optionsdialog;
-		SMOOTHLayer		*mainlayer;
-		SMOOTHLayer		*display;
-		SMOOTHLayer		*alarm;
-		SMOOTHLayer		*misc;
-		SMOOTHLayer		*info;
-		SMOOTHTitlebar		*optitle;
-		SMOOTHDragControl	*dragcontrol;
+		Window		*optionsdialog;
+		Layer		*display;
+		Layer		*alarm;
+		Layer		*misc;
+		Layer		*info;
+		Titlebar	*optitle;
+		DragControl	*dragcontrol;
 
-		SMOOTHGroupBox 		*display_group1;
-		SMOOTHGroupBox		*display_group2;
-		SMOOTHOptionBox		*display_option1;
-		SMOOTHOptionBox		*display_option2;
-		SMOOTHCheckBox		*display_check1;
-		SMOOTHOptionBox		*display_option3;
-		SMOOTHOptionBox		*display_option4;
+		GroupBox 	*display_group1;
+		GroupBox	*display_group2;
+		OptionBox	*display_option1;
+		OptionBox	*display_option2;
+		CheckBox	*display_check1;
+		OptionBox	*display_option3;
+		OptionBox	*display_option4;
 
-		SMOOTHCheckBox		*alarm_check1;
-		SMOOTHText		*alarm_text1;
-		SMOOTHEditBox		*alarm_edit1;
-		SMOOTHText		*alarm_text2;
-		SMOOTHOptionBox		*alarm_option1;
-		SMOOTHOptionBox		*alarm_option2;
+		CheckBox	*alarm_check1;
+		Text		*alarm_text1;
+		EditBox		*alarm_edit1;
+		Text		*alarm_text2;
+		OptionBox	*alarm_option1;
+		OptionBox	*alarm_option2;
 
-		SMOOTHGroupBox		*misc_group1;
-		SMOOTHOptionBox		*misc_option1;
-		SMOOTHOptionBox		*misc_option2;
-		SMOOTHOptionBox		*misc_option3;
-		SMOOTHOptionBox		*misc_option4;
+		GroupBox	*misc_group1;
+		OptionBox	*misc_option1;
+		OptionBox	*misc_option2;
+		OptionBox	*misc_option3;
+		OptionBox	*misc_option4;
 
-		SMOOTHText		*info_text1;
-		SMOOTHText		*info_text2;
+		Text		*info_text1;
+		Text		*info_text2;
 
-		SMOOTHButton		*main_button1;
-		SMOOTHButton		*main_button2;
-		SMOOTHTabRegister	*main_reg1;
+		Button		*main_button1;
+		Button		*main_button2;
+		TabWidget	*main_reg1;
 
-		SMOOTHTimer		*timer;
+		Timer		*timer;
 
-		SMOOTHInt		 actbeats;
-		SMOOTHInt		 actcbeats;
-		SMOOTHInt		 actccbeats;
-		SMOOTHBool		 wmpaint;
-		SMOOTHInt		 timeformat;
-		SMOOTHBool		 centi;
-		SMOOTHBool		 isalarm;
-		SMOOTHBool		 alarmexec;
-		SMOOTHInt		 alarmbeats;
-		SMOOTHInt		 alarmsecs;
-		SMOOTHInt		 wpx;
-		SMOOTHInt		 wpy;
-		SMOOTHInt		 modechange;
-		SMOOTHInt		 timezone;
-		SMOOTHInt		 centihandle1;
-		SMOOTHInt		 centihandle2;
-		SMOOTHString		 alarmtext;
-		SMOOTHInt		 alarmoption;
+		Int		 actbeats;
+		Int		 actcbeats;
+		Int		 actccbeats;
+		Bool		 wmpaint;
+		Int		 timeformat;
+		Bool		 centi;
+		Bool		 isalarm;
+		Bool		 alarmexec;
+		Int		 alarmbeats;
+		Int		 alarmsecs;
+		Int		 wpx;
+		Int		 wpy;
+		Int		 modechange;
+		Int		 timezone;
+		Int		 centihandle1;
+		Int		 centihandle2;
+		String		 alarmtext;
+		Int		 alarmoption;
 
-		SMOOTHInt		 oldtf;
-		SMOOTHBool		 oldct;
-		SMOOTHInt		 oldmc;
-		SMOOTHInt		 oldtz;
-		SMOOTHBool		 oldia;
-		SMOOTHInt		 oldab;
-		SMOOTHInt		 oldas;
-		SMOOTHString		 oldat;
-		SMOOTHInt		 oldao;
+		Int		 oldtf;
+		Bool		 oldct;
+		Int		 oldmc;
+		Int		 oldtz;
+		Bool		 oldia;
+		Int		 oldab;
+		Int		 oldas;
+		String		 oldat;
+		Int		 oldao;
 
-		SMOOTHInt		 GetDayOfWeek(SMOOTHInt, SMOOTHInt, SMOOTHInt);
-		SMOOTHBool		 OutOfMonth(SMOOTHInt, SMOOTHInt, SMOOTHInt);
-		SMOOTHInt		 convertBeatsToSeconds(SMOOTHInt);
-		SMOOTHInt		 convertSecondsToBeats(SMOOTHInt);
-		SMOOTHString		 convertSecondsToTimeString(SMOOTHInt);
-		SMOOTHInt		 convertTimeStringToSeconds(SMOOTHString);
-		SMOOTHVoid		 RegisterValues();
-		SMOOTHVoid		 InputValues();
+		Int		 GetDayOfWeek(Int, Int, Int);
+		Bool		 OutOfMonth(Int, Int, Int);
+		Int		 convertBeatsToSeconds(Int);
+		Int		 convertSecondsToBeats(Int);
+		String		 convertSecondsToTimeString(Int);
+		Int		 convertTimeStringToSeconds(String);
+		Void		 RegisterValues();
+		Void		 InputValues();
 	public:
-					 BeatClock();
-					~BeatClock();
-		SMOOTHVoid		 MessageProc(SMOOTHInt, SMOOTHInt, SMOOTHInt);
-		SMOOTHVoid		 Options();
-		SMOOTHVoid		 OptionsOK();
-		SMOOTHVoid		 OptionsCancel();
-		SMOOTHVoid		 OptionsBeats();
-		SMOOTHVoid		 OptionsSTF();
-		SMOOTHVoid		 OptionsPaint();
-		SMOOTHBool		 OptionsKillProc();
-		SMOOTHVoid		 toggleAlarmState();
-		SMOOTHVoid		 Mode();
-		SMOOTHVoid		 PaintAll();
-		SMOOTHVoid		 PaintTime();
-		SMOOTHVoid		 Info();
+				 BeatClock();
+				~BeatClock();
+		Void		 EventProc(Int, Int, Int);
+		Void		 Options();
+		Void		 OptionsOK();
+		Void		 OptionsCancel();
+		Void		 OptionsBeats();
+		Void		 OptionsSTF();
+		Void		 OptionsPaint();
+		Bool		 OptionsKillProc();
+		Void		 toggleAlarmState();
+		Void		 Mode();
+		Void		 PaintAll();
+		Void		 PaintTime();
+		Void		 Info();
 };
 
 #endif

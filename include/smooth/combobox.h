@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,43 +11,47 @@
 #ifndef _H_OBJSMOOTH_COMBOBOX_
 #define _H_OBJSMOOTH_COMBOBOX_
 
-#define SComboBox SMOOTHComboBox
-
-class SMOOTHComboBox;
-class SMOOTHLayer;
-class SMOOTHToolWindow;
-class SMOOTHListBox;
+namespace smooth
+{
+	class ComboBox;
+	class Layer;
+	class ToolWindow;
+	class ListBox;
+};
 
 #include "object.h"
 #include "list.h"
 
-class SMOOTHAPI SMOOTHComboBox : public SMOOTHObject, public SMOOTHList
+namespace smooth
 {
-	private:
-		SMOOTHInt		 entryCount;
+	class SMOOTHAPI ComboBox : public Object, public List
+	{
+		private:
+			Int		 entryCount;
 
-		SMOOTHToolWindow	*toolWindow;
-		SMOOTHLayer		*layer;
-		SMOOTHListBox		*listBox;
+			ToolWindow	*toolWindow;
+			Layer		*layer;
+			ListBox		*listBox;
 
-		SMOOTHBool		 listBoxOpen;
-		SMOOTHBool		 closeListBox;
+			Bool		 listBoxOpen;
+			Bool		 closeListBox;
 
-		SMOOTHVoid		 ListBoxProc();
-	public:
-					 SMOOTHComboBox(SMOOTHPoint, SMOOTHSize, SMOOTHProcParam, SMOOTHVoid *);
-					~SMOOTHComboBox();
+			Void		 ListBoxProc();
+		public:
+					 ComboBox(Point, Size, ProcParam, Void *);
+					~ComboBox();
 
-		SMOOTHInt		 AddEntry(SMOOTHString, SMOOTHProcParam, SMOOTHVoid *);
-		SMOOTHInt		 ModifyEntry(SMOOTHInt, SMOOTHString, SMOOTHProcParam, SMOOTHVoid *);
-		SMOOTHInt		 RemoveEntry(SMOOTHInt);
-		SMOOTHInt		 SelectEntry(SMOOTHInt);
-		SMOOTHVoid		 Cleanup();
+			Entry		*AddEntry(String, ProcParam, Void *);
+			Int		 ModifyEntry(Int, String, ProcParam, Void *);
+			Int		 RemoveEntry(Int);
+			Int		 SelectEntry(Int);
+			Void		 Cleanup();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
+	};
+
+	SMOOTHVAR Int OBJ_COMBOBOX;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_COMBOBOX;
 
 #endif

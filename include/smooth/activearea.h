@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,27 +11,31 @@
 #ifndef _H_OBJSMOOTH_ACTIVEAREA_
 #define _H_OBJSMOOTH_ACTIVEAREA_
 
-#define SActiveArea SMOOTHActiveArea
-
-class SMOOTHActiveArea;
+namespace smooth
+{
+	class ActiveArea;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHActiveArea : public SMOOTHObject
+namespace smooth
 {
-	protected:
-		SMOOTHInt		 areaColor;
-	public:
-					 SMOOTHActiveArea(SMOOTHInt, SMOOTHPoint, SMOOTHSize, SMOOTHProcParam, SMOOTHVoid *);
-					~SMOOTHActiveArea();
+	class SMOOTHAPI ActiveArea : public Object
+	{
+		protected:
+			Int		 areaColor;
+		public:
+					 ActiveArea(Int, Point, Size, ProcParam, Void *);
+					~ActiveArea();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
 
-		SMOOTHInt		 SetColor(SMOOTHInt);
-		SMOOTHInt		 GetColor();
+			Int		 SetColor(Int);
+			Int		 GetColor();
+	};
+
+	SMOOTHVAR Int OBJ_ACTIVEAREA;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_ACTIVEAREA;
 
 #endif

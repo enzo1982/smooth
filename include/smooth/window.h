@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,132 +11,143 @@
 #ifndef _H_OBJSMOOTH_WINDOW_
 #define _H_OBJSMOOTH_WINDOW_
 
-#define SWindow SMOOTHWindow
-
-class SMOOTHWindow;
-class SMOOTHToolWindow;
-class SMOOTHPopupMenu;
-class SMOOTHMenubar;
-class SMOOTHTitlebar;
-class SMOOTHClient;
-class SMOOTHMDIClient;
-class SMOOTHLayer;
-class SMOOTHDivisionbar;
+namespace smooth
+{
+	class Window;
+	class ToolWindow;
+	class PopupMenu;
+	class Menubar;
+	class Titlebar;
+	class Client;
+	class MDIClient;
+	class Layer;
+	class Divider;
+};
 
 #include "object.h"
 #include "container.h"
+#include "rect.h"
 
-const SMOOTHInt SS_MODAL	= 1;
-const SMOOTHInt SS_SYSMODAL	= 2;
-const SMOOTHInt SS_APPTOPMOST	= 3;
-const SMOOTHInt SS_NORESIZE	= 4;
+namespace smooth
+{
+	const Int SS_MODAL		= 1;
+	const Int SS_SYSMODAL		= 2;
+	const Int SS_APPTOPMOST		= 3;
+	const Int SS_NORESIZE		= 4;
 
-const SMOOTHInt WO_SEPARATOR	= 1;
-const SMOOTHInt WO_NOSEPARATOR	= 2;
+	const Int WO_SEPARATOR		= 1;
+	const Int WO_NOSEPARATOR	= 2;
 
 #ifdef __SMOOTH_DLL__
 #ifdef __WIN32__
-LRESULT CALLBACK SMOOTHWindowProc(HWND, UINT, WPARAM, LPARAM);
+	LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 #endif
 #endif
 
-class SMOOTHAPI SMOOTHWindow : public SMOOTHObject, public SMOOTHContainer
-{
+	class SMOOTHAPI Window : public Object, public Container
+	{
 #ifdef __WIN32__
-	friend		LRESULT CALLBACK	 SMOOTHWindowProc(HWND, UINT, WPARAM, LPARAM);
+		friend		LRESULT CALLBACK	 WindowProc(HWND, UINT, WPARAM, LPARAM);
 #endif
 
-	friend class	SMOOTH;
-	friend class	SMOOTHMenubar;
-	friend class	SMOOTHClient;
-	friend class	SMOOTHMDIClient;
-	friend class	SMOOTHDivisionbar;
-	friend class	SMOOTHTitlebar;
-	friend class	SMOOTHLayer;
-	friend class	SMOOTHToolWindow;
-	protected:
-		SMOOTHInt			 style;
-		SMOOTHInt			 exstyle;
-		SMOOTHBool			 modal;
-		SMOOTHBool			 sysmodal;
-		SMOOTHBool			 apptopmost;
-		SMOOTHBool			 stay;
-		SMOOTHBool			 maximized;
+		friend class	SMOOTH;
+		friend class	Menubar;
+		friend class	Client;
+		friend class	MDIClient;
+		friend class	Divider;
+		friend class	Titlebar;
+		friend class	Layer;
+		friend class	ToolWindow;
+		friend		Int SMOOTHAPI Loop();
+		protected:
+			Int		 style;
+			Int		 exstyle;
+			Bool		 modal;
+			Bool		 sysmodal;
+			Bool		 apptopmost;
+			Bool		 stay;
+			Bool		 maximized;
 
-		SMOOTHBool			 created;
-		SMOOTHBool			 destroyed;
+			Bool		 created;
+			Bool		 destroyed;
 
-		HBITMAP				 icon;
-		HICON				 sysicon;
+			HBITMAP		 icon;
+			HICON		 sysicon;
 
-		SMOOTHRect			 offset;
-		SMOOTHRect			 updateRect;
+			Rect		 offset;
+			Rect		 updateRect;
 
-		SMOOTHSize			 minSize;
+			Size		 minSize;
 
-		SMOOTHString			 className;
+			String		 className;
 
-		SMOOTHKillProcMember;
-		SMOOTHVoid			*killProcParam;
-		SMOOTHPaintProcMember;
-		SMOOTHVoid			*paintProcParam;
-		SMOOTHPeekProcMember;
-		SMOOTHVoid			*peekProcParam;
-		SMOOTHMessageProcMember;
-		SMOOTHVoid			*messageProcParam;
+			KillProcMember;
+			Void		*killProcParam;
+			PaintProcMember;
+			Void		*paintProcParam;
+			PeekProcMember;
+			Void		*peekProcParam;
+			MessageProcMember;
+			Void		*messageProcParam;
 
-		SMOOTHPopupMenu			*popupMenu;
+			PopupMenu	*popupMenu;
 
-		HDC				 windowDC;
+			HDC		 windowDC;
 
-		HWND				 Create();
-		SMOOTHVoid			 CalculateOffsets();
-	public:
-		static SMOOTHInt		 nOfActiveWindows;
-		SMOOTHInt			 value;
+			Layer		*mainLayer;
 
-		HWND				 hwnd;
-		SMOOTHBool			 cursorset;
-		SMOOTHBool			 initshow;
+			HWND		 Create();
+			Void		 CalculateOffsets();
+		public:
+			static Int	 nOfActiveWindows;
+			Int		 value;
 
-						 SMOOTHWindow(SMOOTHString title = NIL);
-						~SMOOTHWindow();
+			HWND		 hwnd;
+			Bool		 cursorset;
+			Bool		 initshow;
 
-		SMOOTHInt			 SetMetrics(SMOOTHPoint, SMOOTHSize);
-		SMOOTHVoid			 SetPositionFlag(HWND);
-		SMOOTHVoid			 SetStyle(SMOOTHInt);
-		SMOOTHVoid			 SetExStyle(SMOOTHInt);
-		SMOOTHInt			 SetIcon(HBITMAP);
-		SMOOTHInt			 SetApplicationIcon(HICON);
-		SMOOTHInt			 SetApplicationIcon(SMOOTHInt);
-		SMOOTHInt			 SetText(SMOOTHString);
+					 Window(String title = NIL);
+					~Window();
 
-		SMOOTHInt			 SetStatusText(SMOOTHString);
-		SMOOTHString			 GetStatusText();
+			Int		 SetMetrics(Point, Size);
+			Void		 SetPositionFlag(HWND);
+			Void		 SetStyle(Int);
+			Void		 SetExStyle(Int);
+			Int		 SetIcon(HBITMAP);
+			Int		 SetApplicationIcon(HICON);
+			Int		 SetApplicationIcon(Int);
+			Int		 SetText(String);
 
-		SMOOTHVoid			 SetPaintProc(SMOOTHPaintProcParam, SMOOTHVoid *);
-		SMOOTHVoid			 SetKillProc(SMOOTHKillProcParam, SMOOTHVoid *);
-		SMOOTHVoid			 SetPeekProc(SMOOTHPeekProcParam, SMOOTHVoid *);
-		SMOOTHVoid			 SetMessageProc(SMOOTHMessageProcParam, SMOOTHVoid *);
+			Int		 SetStatusText(String);
+			String		 GetStatusText();
 
-		SMOOTHRect			 GetUpdateRect();
-		SMOOTHInt			 SetUpdateRect(SMOOTHRect);
+			Void		 SetPaintProc(PaintProcParam, Void *);
+			Void		 SetKillProc(KillProcParam, Void *);
+			Void		 SetPeekProc(PeekProcParam, Void *);
+			Void		 SetMessageProc(MessageProcParam, Void *);
 
-		SMOOTHInt			 SetMinimumSize(SMOOTHSize);
+			Rect		 GetUpdateRect();
+			Int		 SetUpdateRect(Rect);
 
-		SMOOTHInt			 Show();
-		SMOOTHInt			 Hide();
-		SMOOTHInt			 Stay();
+			Int		 SetMinimumSize(Size);
 
-		SMOOTHBool			 IsMaximized();
+			Int		 Show();
+			Int		 Hide();
 
-		SMOOTHInt			 Paint(SMOOTHInt);
-		SMOOTHInt			 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			Int		 Close();
 
-		SMOOTHInt			 RegisterObject(SMOOTHObject *);
-		SMOOTHInt			 UnregisterObject(SMOOTHObject *);
+			Int		 Stay();
+
+			Bool		 IsMaximized();
+
+			Int		 Paint(Int);
+			Int		 Process(Int, Int, Int);
+
+			Int		 RegisterObject(Object *);
+			Int		 UnregisterObject(Object *);
+	};
+
+	SMOOTHVAR Int OBJ_WINDOW;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_WINDOW;
 
 #endif

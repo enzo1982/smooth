@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -19,9 +19,7 @@
 #include <smooth/stk.h>
 #include <smooth/array.h>
 
-#include <math.h>
 #include <picture.h>
-#include <iconv.h>
 #include <iolib-cxx.h>
 
 #ifdef __WIN32__
@@ -30,9 +28,11 @@
 #include <unistd.h>
 #endif
 
-SMOOTHArray<HBITMAP>	 oldBitmaps;
-SMOOTHArray<HDC>	 contexts;
-SMOOTHArray<int>	 contextCounts;
+using namespace smooth;
+
+Array<HBITMAP>	 oldBitmaps;
+Array<HDC>	 contexts;
+Array<int>	 contextCounts;
 
 #ifndef __WIN32__
 #ifdef __QNX__
@@ -130,14 +130,14 @@ int MouseX(HWND hwnd, int wincl)
 	GetWindowRect(hwnd, &rect);
 	GetCursorPos(&point);
 #elif defined __QNX__
-	SMOOTHPoint		 point;
-	SMOOTHRect		 rect;
+	Point			 point;
+	Rect			 rect;
 
 	point.x = 0;
 	rect.left = 0;
 #else
-	SMOOTHPoint		 point;
-	SMOOTHRect		 rect;
+	Point			 point;
+	Rect			 rect;
 	Window			 root_return;
 	Window			 child_return;
 	int			 root_x_return;
@@ -176,14 +176,14 @@ int MouseY(HWND hwnd, int wincl)
 	GetWindowRect(hwnd, &rect);
 	GetCursorPos(&point);
 #elif defined __QNX__
-	SMOOTHPoint		 point;
-	SMOOTHRect		 rect;
+	Point			 point;
+	Rect			 rect;
 	
 	point.y = 0;
 	rect.top = 0;
 #else
-	SMOOTHPoint		 point;
-	SMOOTHRect		 rect;
+	Point			 point;
+	Rect			 rect;
 	Window			 root_return;
 	Window			 child_return;
 	int			 root_x_return;
@@ -221,12 +221,12 @@ int WinX(HWND hwnd, int wincl)
 	if (wincl == WINDOW)	GetWindowRect(hwnd, &rect);
 	else			GetClientRect(hwnd, &rect);
 #elif defined __QNX__
-	SMOOTHRect		 rect;
+	Rect			 rect;
 	
 	rect.right = 0;
 	rect.left = 0;
 #else
-	SMOOTHRect		 rect;
+	Rect			 rect;
 	XWindowAttributes	 window_attributes_return;
 
 	if (hwnd == 0)
@@ -252,12 +252,12 @@ int WinY(HWND hwnd, int wincl)
 	if (wincl == WINDOW)	GetWindowRect(hwnd, &rect);
 	else			GetClientRect(hwnd, &rect);
 #elif defined __QNX__
-	SMOOTHRect		 rect;
+	Rect			 rect;
 	
 	rect.bottom = 0;
 	rect.top = 0;
 #else
-	SMOOTHRect		 rect;
+	Rect			 rect;
 	XWindowAttributes	 window_attributes_return;
 
 	if (hwnd == 0)
@@ -301,9 +301,9 @@ int GetBitmapSizeY(HBITMAP bmp)
 #endif
 }
 
-SMOOTHRect GetBitmapMetrics(HBITMAP bmp)
+Rect GetBitmapMetrics(HBITMAP bmp)
 {
-	SMOOTHRect	 rect;
+	Rect	 rect;
 
 	rect.left	= 0;
 	rect.top	= 0;
@@ -313,7 +313,7 @@ SMOOTHRect GetBitmapMetrics(HBITMAP bmp)
 	return rect;
 }
 
-HDC GetContext(SMOOTHWindow *wnd)
+HDC GetContext(Window *wnd)
 {
 #if defined __WIN32__
 	int	 code = 0;
@@ -356,7 +356,7 @@ HDC GetContext(SMOOTHWindow *wnd)
 #endif
 }
 
-void FreeContext(SMOOTHWindow *wnd, HDC hdc)
+void FreeContext(Window *wnd, HDC hdc)
 {
 #if defined __WIN32__
 	int	 code = 0;
@@ -379,7 +379,7 @@ void FreeContext(SMOOTHWindow *wnd, HDC hdc)
 #endif
 }
 
-HDC CreateCompatibleContext(HDC origdc, SMOOTHSize bmpsize)
+HDC CreateCompatibleContext(HDC origdc, Size bmpsize)
 {
 #ifdef __WIN32__
 	HDC	 cdc = CreateCompatibleDC(origdc);
@@ -408,7 +408,7 @@ void FreeCompatibleContext(HDC cdc)
 #endif
 }
 
-void Line(HDC hdc, SMOOTHPoint p1, SMOOTHPoint p2, long color, int style, int width)
+void Line(HDC hdc, Point p1, Point p2, long color, int style, int width)
 {
 #ifdef __WIN32__
 	HPEN	 hpen;
@@ -423,15 +423,15 @@ void Line(HDC hdc, SMOOTHPoint p1, SMOOTHPoint p2, long color, int style, int wi
 #endif
 }
 
-void Frame(HDC hdc, SMOOTHRect rect, int style)
+void Frame(HDC hdc, Rect rect, int style)
 {
 #ifdef __WIN32__
-	long		 color1 = 0;
-	long		 color2 = 0;
-	SMOOTHPoint	 p1;
-	SMOOTHPoint	 p2;
-	SMOOTHPoint	 p3;
-	SMOOTHPoint	 p4;
+	long	 color1 = 0;
+	long	 color2 = 0;
+	Point	 p1;
+	Point	 p2;
+	Point	 p3;
+	Point	 p4;
 
 	p1.x = rect.left;
 	p1.y = rect.top;
@@ -467,22 +467,22 @@ void Frame(HDC hdc, SMOOTHRect rect, int style)
 #endif
 }
 
-void Gradient(HDC hdc, SMOOTHRect rect, long col1, long col2, int style)
+void Gradient(HDC hdc, Rect rect, long col1, long col2, int style)
 {
 #ifdef __WIN32__
-	double		 red1 = GetRed(col1);
-	double		 green1 = GetGreen(col1);
-	double		 blue1 = GetBlue(col1);
-	double		 red2 = GetRed(col2);
-	double		 green2 = GetGreen(col2);
-	double		 blue2 = GetBlue(col2);
-	double		 biasr;
-	double		 biasg;
-	double		 biasb;
-	int		 xmax;
-	int		 ymax;
-	SMOOTHRect	 srect;
-	picture		*pic = new picture(rect.right-rect.left, rect.bottom-rect.top, 24);
+	double	 red1 = GetRed(col1);
+	double	 green1 = GetGreen(col1);
+	double	 blue1 = GetBlue(col1);
+	double	 red2 = GetRed(col2);
+	double	 green2 = GetGreen(col2);
+	double	 blue2 = GetBlue(col2);
+	double	 biasr;
+	double	 biasg;
+	double	 biasb;
+	int	 xmax;
+	int	 ymax;
+	Rect	 srect;
+	picture	*pic = new picture(rect.right-rect.left, rect.bottom-rect.top, 24);
 
 	xmax = rect.right-rect.left;
 	ymax = rect.bottom-rect.top;
@@ -538,14 +538,13 @@ void Gradient(HDC hdc, SMOOTHRect rect, long col1, long col2, int style)
 #endif
 }
 
-void Box(HDC hdc, SMOOTHRect rect, int color, int style)
+void Box(HDC hdc, Rect rect, int color, int style)
 {
 #ifdef __WIN32__
-	HBRUSH	brush = CreateSolidBrush(color);
-	bool	dot = false;
-	int	x;
-	int	y;
-
+	HBRUSH	 brush = CreateSolidBrush(color);
+	bool	 dot = false;
+	int	 x;
+	int	 y;
 	RECT	 Rect = rect;
 
 	if (style == FILLED)		FillRect(hdc, &Rect, brush);
@@ -606,7 +605,7 @@ void Box(HDC hdc, SMOOTHRect rect, int color, int style)
 #endif
 }
 
-void HBar(HDC hdc, SMOOTHPoint p1, SMOOTHPoint p2)
+void HBar(HDC hdc, Point p1, Point p2)
 {
 #ifdef __WIN32__
 	Line(hdc, p1, p2, RGB(max(GetRed(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetGreen(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetBlue(SMOOTH::Setup::BackgroundColor) - 64, 0)), PS_SOLID, 1);
@@ -618,7 +617,7 @@ void HBar(HDC hdc, SMOOTHPoint p1, SMOOTHPoint p2)
 #endif
 }
 
-void VBar(HDC hdc, SMOOTHPoint p1, SMOOTHPoint p2)
+void VBar(HDC hdc, Point p1, Point p2)
 {
 #ifdef __WIN32__
 	p2.y++;
@@ -629,7 +628,7 @@ void VBar(HDC hdc, SMOOTHPoint p1, SMOOTHPoint p2)
 #endif
 }
 
-void PaintPixel(HDC hdc, SMOOTHPoint point, int color)
+void PaintPixel(HDC hdc, Point point, int color)
 {
 #if defined __WIN32__
 	SetPixel(hdc, point.x, point.y, color);
@@ -641,7 +640,7 @@ void PaintPixel(HDC hdc, SMOOTHPoint point, int color)
 #endif
 }
 
-int GetPixel(HDC hdc, SMOOTHPoint point)
+int GetPixel(HDC hdc, Point point)
 {
 #ifdef __WIN32__
 	return GetPixel(hdc, point.x, point.y);
@@ -650,7 +649,7 @@ int GetPixel(HDC hdc, SMOOTHPoint point)
 #endif
 }
 
-void PaintBitmap(HDC hdc, SMOOTHRect iconrect, HBITMAP iconmap)
+void PaintBitmap(HDC hdc, Rect iconrect, HBITMAP iconmap)
 {
 #ifdef __WIN32__
 	HDC	 icondc;
@@ -669,7 +668,7 @@ void PaintBitmap(HDC hdc, SMOOTHRect iconrect, HBITMAP iconmap)
 #endif
 }
 
-void SetShadowedText(HDC hdc, SMOOTHString string, SMOOTHRect rect, SMOOTHString font, int size, int color, int weight)
+void SetShadowedText(HDC hdc, String string, Rect rect, String font, int size, int color, int weight)
 {
 #ifdef __WIN32__
 	if (string == NIL) return;
@@ -690,20 +689,20 @@ void SetShadowedText(HDC hdc, SMOOTHString string, SMOOTHRect rect, SMOOTHString
 #endif
 }
 
-void SetText(HDC hdc, SMOOTHString string, SMOOTHRect rect, SMOOTHString font, int size, int color, int weight)
+void SetText(HDC hdc, String string, Rect rect, String font, int size, int color, int weight)
 {
 #ifdef __WIN32__
 	if (string == NIL) return;
 
-	HFONT		 hfont;
-	HFONT		 holdfont;
-	int		 lines = 1;
-	int		 offset = 0;
-	int		 origoffset;
-	int		 height = GetLineSizeY(hdc, string, font, size, weight) + 3;
-	int		 txtsize = string.Length();
-	int		 i;
-	SMOOTHString	 line;
+	HFONT	 hfont;
+	HFONT	 holdfont;
+	int	 lines = 1;
+	int	 offset = 0;
+	int	 origoffset;
+	int	 height = GetLineSizeY(hdc, string, font, size, weight) + 3;
+	int	 txtsize = string.Length();
+	int	 i;
+	String	 line;
 
 	for (i = 0; i < txtsize; i++) if (string[i] == 10) lines++;
 
@@ -742,8 +741,8 @@ void SetText(HDC hdc, SMOOTHString string, SMOOTHRect rect, SMOOTHString font, i
 
 		RECT	 Rect = rect;
 
-		if (SMOOTH::Setup::enableUnicode)	DrawTextW(hdc, line, -1, &Rect, DT_LEFT);
-		else					DrawTextA(hdc, line, -1, &Rect, DT_LEFT);
+		if (SMOOTH::Setup::enableUnicode)	DrawTextW(hdc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
+		else					DrawTextA(hdc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
 
 		rect.top += height;
 	}
@@ -753,11 +752,11 @@ void SetText(HDC hdc, SMOOTHString string, SMOOTHRect rect, SMOOTHString font, i
 #endif
 }
 
-bool IsMouseOn(HWND hwnd, SMOOTHRect rect, int wincl)
+bool IsMouseOn(HWND hwnd, Rect rect, int wincl)
 {
 #ifdef __WIN32__
-	SMOOTHPoint	mousepos;
-	SMOOTHRect	winrect;
+	Point	mousepos;
+	Rect	winrect;
 
 	if (wincl == WINDOW)
 	{
@@ -799,46 +798,46 @@ bool IsMouseOn(HWND hwnd, SMOOTHRect rect, int wincl)
 #endif
 }
 
-int GetTextSizeXNoExtend(HDC hdc, SMOOTHString text, SMOOTHString font, int size, int weight)
+int GetTextSizeXNoExtend(HDC hdc, String text, String font, int size, int weight)
 {
 	if (text == NIL) return 0;
 
 	return GetTextSizeX(hdc, text, text.Length(), font, size, weight, false);
 }
 
-int GetTextSizeXNoExtend(HDC hdc, SMOOTHString text, int nofchars, SMOOTHString font, int size, int weight)
+int GetTextSizeXNoExtend(HDC hdc, String text, int nofchars, String font, int size, int weight)
 {
 	if (text == NIL) return 0;
 
 	return GetTextSizeX(hdc, text, nofchars, font, size, weight, false);
 }
 
-int GetTextSizeX(HDC hdc, SMOOTHString text, int nofchars, SMOOTHString font, int size, int weight)
+int GetTextSizeX(HDC hdc, String text, int nofchars, String font, int size, int weight)
 {
 	if (text == NIL) return 0;
 
 	return GetTextSizeX(hdc, text, nofchars, font, size, weight, true);
 }
 
-int GetTextSizeX(HDC hdc, SMOOTHString text, SMOOTHString font, int size, int weight)
+int GetTextSizeX(HDC hdc, String text, String font, int size, int weight)
 {
 	if (text == NIL) return 0;
 
 	return GetTextSizeX(hdc, text, text.Length(), font, size, weight, true);
 }
 
-int GetTextSizeX(HDC hdc, SMOOTHString text, int nofchars, SMOOTHString font, int size, int weight, bool extend)
+int GetTextSizeX(HDC hdc, String text, int nofchars, String font, int size, int weight, bool extend)
 {
 	if (text == NIL) return 0;
 	if (nofchars == 0) return -1;
 
-	int		 sizex = 0;
-	int		 lines = 1;
-	int		 offset = 0;
-	int		 origoffset;
-	int		 txtlen = nofchars;
-	SMOOTHString	 line;
-	int		 i;
+	int	 sizex = 0;
+	int	 lines = 1;
+	int	 offset = 0;
+	int	 origoffset;
+	int	 txtlen = nofchars;
+	String	 line;
+	int	 i;
 
 	for (i = 0; i < txtlen; i++) if (text[i] == 10) lines++;
 
@@ -873,22 +872,22 @@ int GetTextSizeX(HDC hdc, SMOOTHString text, int nofchars, SMOOTHString font, in
 	return sizex;
 }
 
-int GetLineSizeX(HDC hdc, SMOOTHString text, int nofchars, SMOOTHString font, int size, int weight, bool extend)
+int GetLineSizeX(HDC hdc, String text, int nofchars, String font, int size, int weight, bool extend)
 {
 #ifdef __WIN32__
 	if (text == NIL) return 0;
 	if (nofchars == 0) return -1;
 
-	SMOOTHRect	 rect;
-	SMOOTHSize	 tsize;
-	HDC		 cdc;
-	HFONT		 hfont;
-	HFONT		 holdfont;
-	HBITMAP		 bmpbmp;
-	HBITMAP		 newbmp;
-	int		 txsize = size;
-	SMOOTHString	 filtered;
-	int		 bias = 0;
+	Rect	 rect;
+	Size	 tsize;
+	HDC	 cdc;
+	HFONT	 hfont;
+	HFONT	 holdfont;
+	HBITMAP	 bmpbmp;
+	HBITMAP	 newbmp;
+	int	 txsize = size;
+	String	 filtered;
+	int	 bias = 0;
 
 	// filtering out '&'s
 
@@ -931,8 +930,8 @@ int GetLineSizeX(HDC hdc, SMOOTHString text, int nofchars, SMOOTHString font, in
 
 	RECT	 Rect = rect;
 
-	if (SMOOTH::Setup::enableUnicode)	DrawTextW(cdc, filtered, -1, &Rect, DT_LEFT);
-	else					DrawTextA(cdc, filtered, -1, &Rect, DT_LEFT);
+	if (SMOOTH::Setup::enableUnicode)	DrawTextW(cdc, filtered, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
+	else					DrawTextA(cdc, filtered, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
 
 	rect = Rect;
 
@@ -962,7 +961,7 @@ int GetLineSizeX(HDC hdc, SMOOTHString text, int nofchars, SMOOTHString font, in
 #endif
 }
 
-int GetTextSizeY(HDC hdc, SMOOTHString text, SMOOTHString font, int size, int weight)
+int GetTextSizeY(HDC hdc, String text, String font, int size, int weight)
 {
 	if (text == NIL) return 0;
 
@@ -977,19 +976,19 @@ int GetTextSizeY(HDC hdc, SMOOTHString text, SMOOTHString font, int size, int we
 	return (lines * GetLineSizeY(hdc, text, font, size, weight)) + (lines - 1) * 3;
 }
 
-int GetLineSizeY(HDC hdc, SMOOTHString text, SMOOTHString font, int size, int weight)
+int GetLineSizeY(HDC hdc, String text, String font, int size, int weight)
 {
 #ifdef __WIN32__
 	if (text == NIL) return 0;
 
-	SMOOTHSize	 tsize;
-	HDC		 cdc;
-	HFONT		 hfont;
-	HFONT		 holdfont;
-	int		 txsize = size;
-	int		 nofchars = text.Length();
+	Size	 tsize;
+	HDC	 cdc;
+	HFONT	 hfont;
+	HFONT	 holdfont;
+	int	 txsize = size;
+	int	 nofchars = text.Length();
 
-	if (size < 0) size = size - (2*size);
+	if (size < 0) size = size - (2 * size);
 
 	cdc = CreateCompatibleDC(hdc);
 
@@ -1016,7 +1015,7 @@ int GetLineSizeY(HDC hdc, SMOOTHString text, SMOOTHString font, int size, int we
 #endif
 }
 
-bool DoRectsOverlap(SMOOTHRect rect1, SMOOTHRect rect2)
+bool DoRectsOverlap(Rect rect1, Rect rect2)
 {
 	if ((rect1.left < rect2.right) && (rect1.right > rect2.left) && (rect1.top < rect2.bottom) && (rect1.bottom > rect2.top))
 	{
@@ -1028,9 +1027,9 @@ bool DoRectsOverlap(SMOOTHRect rect1, SMOOTHRect rect2)
 	}
 }
 
-SMOOTHRect OverlapRect(SMOOTHRect rect1, SMOOTHRect rect2)
+Rect OverlapRect(Rect rect1, Rect rect2)
 {
-	SMOOTHRect orect;
+	Rect orect;
 
 	orect.left	= 0;
 	orect.top	= 0;
@@ -1048,7 +1047,7 @@ SMOOTHRect OverlapRect(SMOOTHRect rect1, SMOOTHRect rect2)
 	return orect;
 }
 
-HBITMAP BlitToBitmap(HDC dc, SMOOTHRect rect)
+HBITMAP BlitToBitmap(HDC dc, Rect rect)
 {
 #ifdef __WIN32__
 	HDC	 cdc = CreateCompatibleDC(dc);
@@ -1071,7 +1070,7 @@ HBITMAP BlitToBitmap(HDC dc, SMOOTHRect rect)
 #endif
 }
 
-bool BlitToBitmap(SMOOTHRect srcrect, HDC dc, SMOOTHRect destrect, HBITMAP bmp)
+bool BlitToBitmap(Rect srcrect, HDC dc, Rect destrect, HBITMAP bmp)
 {
 #ifdef __WIN32__
 	HDC	 cdc = CreateCompatibleDC(dc);
@@ -1092,7 +1091,7 @@ bool BlitToBitmap(SMOOTHRect srcrect, HDC dc, SMOOTHRect destrect, HBITMAP bmp)
 #endif
 }
 
-bool BlitFromBitmap(SMOOTHRect srcrect, HBITMAP bitmap, SMOOTHRect destrect, HDC dc)
+bool BlitFromBitmap(Rect srcrect, HBITMAP bitmap, Rect destrect, HDC dc)
 {
 #ifdef __WIN32__
 	HDC	 cdc = CreateCompatibleDC(dc);
@@ -1124,7 +1123,7 @@ bool DestroyBitmap(HBITMAP bitmap)
 #endif
 }
 
-HWND CreateSimpleWindow(SMOOTHRect wndrect, SMOOTHString title, SMOOTHString className, HICON icon, int style, int exstyle)
+HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon, int style, int exstyle)
 {
 #if defined __WIN32__
 	WNDCLASSEXW	 wndclassw;
@@ -1133,7 +1132,7 @@ HWND CreateSimpleWindow(SMOOTHRect wndrect, SMOOTHString title, SMOOTHString cla
 
 	wndclassw.cbSize	= sizeof(wndclassw);
 	wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-	wndclassw.lpfnWndProc	= SMOOTHWindowProc;
+	wndclassw.lpfnWndProc	= WindowProc;
 	wndclassw.cbClsExtra	= 0;
 	wndclassw.cbWndExtra	= 0;
 	wndclassw.hInstance	= hInstance;
@@ -1146,7 +1145,7 @@ HWND CreateSimpleWindow(SMOOTHRect wndrect, SMOOTHString title, SMOOTHString cla
 
 	wndclassa.cbSize	= sizeof(wndclassa);
 	wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-	wndclassa.lpfnWndProc	= SMOOTHWindowProc;
+	wndclassa.lpfnWndProc	= WindowProc;
 	wndclassa.cbClsExtra	= 0;
 	wndclassa.cbWndExtra	= 0;
 	wndclassa.hInstance	= hInstance;
@@ -1186,98 +1185,6 @@ HWND CreateSimpleWindow(SMOOTHRect wndrect, SMOOTHString title, SMOOTHString cla
 
 	return hwnd;
 #endif
-}
-
-int ConvertString(const char *inbuffer, int inbytes, const char *inencoding, char *outbuffer, int outbytes, const char *outencoding)
-{
-	bool	 delbuffer = false;
-
-	if (outbuffer == NIL)
-	{
-		delbuffer = true;
-		outbytes = inbytes * 8;
-		outbuffer = new char [outbytes];
-	}
-
-	for (int i = 0; i < outbytes; i++) outbuffer[i] = 0;
-
-	InStream	*in	= new InStream(STREAM_BUFFER, (void *) inbuffer, inbytes);
-	OutStream	*out	= new OutStream(STREAM_BUFFER, (void *) outbuffer, outbytes);
-	iconv_t		 cd	= iconv_open(outencoding, inencoding);
-	int		 size	= 0;
-
-	iconv(cd, NULL, NULL, NULL, NULL);
-
-	char		 inbuf[4096 + 4096];
-	size_t		 inbufrest = 0;
-	char		 outbuf[4096];
-
-	for (;;)
-	{
-		size_t	 inbufsize = min(in->Size() - in->GetPos(), 4096);
-
-		in->InputData((void *) (inbuf + 4096), inbufsize);
-
-		if (inbufsize == 0)
-		{
-			if (inbufrest == 0)
-			{
-				break;
-			}
-			else
-			{
-				iconv_close(cd);
-
-				delete in;
-				delete out;
-
-				return 0;
-			}
-		}
-		else
-		{
-			const char	*inptr	= inbuf + 4096 - inbufrest;
-			size_t		 insize	= inbufrest + inbufsize;
-
-			inbufrest = 0;
-
-			while (insize > 0)
-			{
-				char	*outptr		= outbuf;
-				size_t	 outsize	= sizeof(outbuf);
-
-				iconv(cd, (const char **) &inptr, &insize, &outptr, &outsize);
-
-				if (outptr != outbuf)
-				{
-					out->OutputData((void *) outbuf, outptr - outbuf);
-					size += (outptr - outbuf);
-				}
-			}
-		}
-	}
-
-	char	*outptr		= outbuf;
-	size_t	 outsize	= sizeof(outbuf);
-
-	iconv(cd, NULL, NULL, &outptr, &outsize);
-
-	if (outptr != outbuf)
-	{
-		out->OutputData((void *) outbuf, outptr - outbuf);
-		size += (outptr - outbuf);
-	}
-
-	iconv_close(cd);
-
-	if (size >= outbytes) size = 0;
-
-	delete in;
-	delete out;
-
-	if (delbuffer) delete [] outbuffer;
-
-	return size;
 }
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,45 +11,48 @@
 #ifndef _H_OBJSMOOTH_CONTAINER_
 #define _H_OBJSMOOTH_CONTAINER_
 
-#define SContainer SMOOTHContainer
-
-class SMOOTHContainer;
-class SMOOTHObject;
-class SMOOTHSurface;
+namespace smooth
+{
+	class Container;
+	class Object;
+	class Surface;
+};
 
 #include "array.h"
 #include "containertype.h"
 
-class SMOOTHAPI SMOOTHContainer
+namespace smooth
 {
-	protected:
-		SMOOTHContainerType		 containerType;
-		SMOOTHObject			*self;
+	class SMOOTHAPI Container
+	{
+		protected:
+			ContainerType	 containerType;
+			Object		*self;
 
-		SMOOTHInt			 nOfObjects;
-		SMOOTHArray<SMOOTHObject *>	 assocObjects;
+			Int		 nOfObjects;
+			Array<Object *>	 assocObjects;
 
-		SMOOTHSurface			*nullSurface;
-		SMOOTHSurface			*drawSurface;
-	public:
+			Surface		*nullSurface;
+			Surface		*drawSurface;
+		public:
+					 Container();
+			virtual		~Container();
 
-						 SMOOTHContainer();
-		virtual				~SMOOTHContainer();
+			virtual Int	 RegisterObject(Object *);
+			virtual Int	 UnregisterObject(Object *);
 
-		virtual SMOOTHInt		 RegisterObject(SMOOTHObject *);
-		virtual SMOOTHInt		 UnregisterObject(SMOOTHObject *);
+			Int		 GetNOfObjects();
+			Object		*RequestObject(Int);
 
-		SMOOTHInt			 GetNOfObjects();
-		SMOOTHObject			*RequestObject(SMOOTHInt);
+			virtual Bool	 IsContainerCompatible(Int);
+			ContainerType	 GetContainerType();
 
-		virtual SMOOTHBool		 IsContainerCompatible(SMOOTHInt);
-		SMOOTHContainerType		 GetContainerType();
+			Object		*GetContainerObject();
 
-		SMOOTHObject			*GetContainerObject();
+			virtual Surface	*GetDrawSurface();
+	};
 
-		virtual SMOOTHSurface		*GetDrawSurface();
+	SMOOTHVAR Int OBJ_CONTAINER;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_CONTAINER;
 
 #endif

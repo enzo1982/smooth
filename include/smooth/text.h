@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,21 +11,25 @@
 #ifndef _H_OBJSMOOTH_TEXT_
 #define _H_OBJSMOOTH_TEXT_
 
-#define SText SMOOTHText
-
-class SMOOTHText;
+namespace smooth
+{
+	class Text;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHText : public SMOOTHObject
+namespace smooth
 {
-	public:
-					 SMOOTHText(SMOOTHString, SMOOTHPoint);
-					~SMOOTHText();
+	class SMOOTHAPI Text : public Object
+	{
+		public:
+					 Text(String, Point);
+					~Text();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
+			virtual Int	 Paint(Int);
+	};
+
+	SMOOTHVAR Int OBJ_TEXT;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_TEXT;
 
 #endif

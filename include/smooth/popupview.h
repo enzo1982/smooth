@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,27 +11,31 @@
 #ifndef _H_OBJSMOOTH_POPUPVIEW_
 #define _H_OBJSMOOTH_POPUPVIEW_
 
-#define SPopupView SMOOTHPopupView
-
-class SMOOTHPopupView;
-class SMOOTHPopupMenu;
+namespace smooth
+{
+	class PopupView;
+	class PopupMenu;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHPopupView : public SMOOTHObject
+namespace smooth
 {
-	private:
-		SMOOTHString		 backupStatusText;
-	protected:
-		SMOOTHPopupMenu		*myPopup;
-	public:
-					 SMOOTHPopupView(SMOOTHPopupMenu *);
-					~SMOOTHPopupView();
+	class SMOOTHAPI PopupView : public Object
+	{
+		private:
+			String		 backupStatusText;
+		protected:
+			PopupMenu	*myPopup;
+		public:
+					 PopupView(PopupMenu *);
+					~PopupView();
 
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
-		SMOOTHInt		 Paint(SMOOTHInt);
+			Int		 Process(Int, Int, Int);
+			Int		 Paint(Int);
+	};
+
+	SMOOTHVAR Int OBJ_POPUPVIEW;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_POPUPVIEW;
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,84 +11,89 @@
 #ifndef _H_OBJSMOOTH_MENU_
 #define _H_OBJSMOOTH_MENU_
 
-#define SMenu SMOOTHMenu
-
-class SMOOTHMenu;
+namespace smooth
+{
+	class Menu;
+};
 
 #include "object.h"
+#include "rect.h"
 
-const SMOOTHInt SM_SEPARATOR		= 0;
-const SMOOTHInt SM_TEXT			= 1;
-const SMOOTHInt SM_BITMAP		= 2;
-
-class SMOOTHAPI SMOOTHMenu
+namespace smooth
 {
-	public: class SMOOTHAPI Entry
+	const Int SM_SEPARATOR	= 0;
+	const Int SM_TEXT	= 1;
+	const Int SM_BITMAP	= 2;
+
+	class SMOOTHAPI Menu
 	{
-		public:
-			SMOOTHInt	 type;
-			SMOOTHInt	 id;
+		public: class SMOOTHAPI Entry
+		{
+			public:
+				Int	 type;
+				Int	 id;
 
-			SMOOTHString	 text;
-			SMOOTHString	 tooltip;
-			SMOOTHString	 description;
+				String	 text;
+				String	 tooltip;
+				String	 description;
 
-			HBITMAP		 bitmap;
-			HBITMAP		 graymap;
+				HBITMAP	 bitmap;
+				HBITMAP	 graymap;
 
-			SMOOTHInt	 orientation;
+				Int	 orientation;
 
-			SMOOTHBool	 checked;
-			SMOOTHBool	 clicked;
+				Bool	 checked;
+				Bool	 clicked;
 
-			SMOOTHProcMember;
-			SMOOTHVoid	*procParam;
+				ProcMember;
+				Void	*procParam;
 
-			SMOOTHBool	*bVar;
-			SMOOTHInt	*iVar;
-			SMOOTHInt	 iCode;
+				Bool	*bVar;
+				Int	*iVar;
+				Int	 iCode;
 
-			SMOOTHMenu	*popup;
+				Menu	*popup;
 
-			SMOOTHInt	 size;
-			SMOOTHBool	 sizeset;
-			SMOOTHRect	 rect;
+				Int	 size;
+				Bool	 sizeset;
+				Rect	 rect;
 
-					 Entry(SMOOTHInt, SMOOTHInt);
+					 Entry(Int, Int);
 					~Entry();
 
-			SMOOTHInt	 SetText(SMOOTHString);
-			SMOOTHInt	 SetTooltip(SMOOTHString);
-			SMOOTHInt	 SetStatusText(SMOOTHString);
+				Int	 SetText(String);
+				Int	 SetTooltip(String);
+				Int	 SetStatusText(String);
 
-			SMOOTHInt	 SetBitmap(HBITMAP);
+				Int	 SetBitmap(HBITMAP);
 
-			SMOOTHInt	 SetOrientation(SMOOTHInt);
-			SMOOTHInt	 SetProc(SMOOTHProcParam, SMOOTHVoid *);
+				Int	 SetOrientation(Int);
+				Int	 SetProc(ProcParam, Void *);
+		};
+
+		protected:
+			Int		 nOfEntries;
+			Int		 GetSizeY();
+			Int		 GetSizeX();
+			Void		 GetMenuEntriesSize();
+		public:
+			Bool		 sizeset;
+			Bool		 entrysizesset;
+			Array<Entry *>	 entries;
+			Size		 popupsize;
+
+					 Menu();
+					~Menu();
+
+			Entry		*AddEntry(String text = NIL, HBITMAP bitmap = NIL, ProcParam = NIL, Void *procParam = NIL, Menu *popupMenu = NIL, Bool *bVar = NIL, Int *iVar = NIL, Int iCode = 0, Int orientation = OR_LEFT);
+			Int		 RemoveEntry(Entry *);
+			Int		 RemoveEntry(Int);
+
+			Void		 GetSize();
+			Int		 GetNOfEntries();
+
+			Int		 Clear();
 	};
-
-	protected:
-		SMOOTHInt		 nOfEntries;
-		SMOOTHInt		 GetSizeY();
-		SMOOTHInt		 GetSizeX();
-		SMOOTHVoid		 GetMenuEntriesSize();
-	public:
-		SMOOTHBool		 sizeset;
-		SMOOTHBool		 entrysizesset;
-		SMOOTHArray<Entry *>	 entries;
-		SMOOTHSize		 popupsize;
-
-					 SMOOTHMenu();
-					~SMOOTHMenu();
-
-		Entry			*AddEntry(SMOOTHString text = NIL, HBITMAP bitmap = NIL, SMOOTHProcParam = NIL, SMOOTHVoid *procParam = NIL, SMOOTHMenu *popupMenu = NIL, SMOOTHBool *bVar = NIL, SMOOTHInt *iVar = NIL, SMOOTHInt iCode = 0, SMOOTHInt orientation = OR_LEFT);
-		SMOOTHInt		 RemoveEntry(Entry *);
-		SMOOTHInt		 RemoveEntry(SMOOTHInt);
-
-		SMOOTHVoid		 GetSize();
-		SMOOTHInt		 GetNOfEntries();
-
-		SMOOTHInt		 Clear();
 };
 
 #endif

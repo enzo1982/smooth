@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,8 +11,38 @@
 #ifndef _H_OBJSMOOTH_BINARY_
 #define _H_OBJSMOOTH_BINARY_
 
-bool	 GetBit(int, int);
-int	 GetBits(int, unsigned int, unsigned int);
-bool	 IsBitSet(int, int);
+namespace smooth
+{
+	class Binary;
+};
+
+#include "definitions.h"
+
+namespace smooth
+{
+	class SMOOTHAPI Binary
+	{
+		private:
+					 Binary();
+					 Binary(const Binary &);
+		public:
+			static Bool	 GetBit(Int, UnsignedInt);
+			static Int	 SetBit(Int &, UnsignedInt, Bool);
+
+			static Int	 GetBits(Int, UnsignedInt, UnsignedInt);
+			static Int	 SetBits(Int &, UnsignedInt, UnsignedInt, Int);
+
+			static Int	 And(Int, Int);
+			static Int	 Or(Int, Int);
+			static Int	 Xor(Int, Int);
+			static Int	 Not(Int);
+
+			static Int	 ShiftL(Int, Int);
+			static Int	 ShiftR(Int, Int);
+
+			static Bool	 IsFlagSet(Int, Int);
+			static Int	 SetFlag(Int &, Int);
+	};
+};
 
 #endif

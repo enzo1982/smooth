@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,24 +11,28 @@
 #ifndef _H_OBJSMOOTH_MUTEX_
 #define _H_OBJSMOOTH_MUTEX_
 
-#define SMutex SMOOTHMutex
-
-class SMOOTHMutex;
+namespace smooth
+{
+	class Mutex;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHMutex : public SMOOTHObject
+namespace smooth
 {
-	private:
-		LiSAMutex	*mutex;
-	public:
-				 SMOOTHMutex();
-				~SMOOTHMutex();
+	class SMOOTHAPI Mutex : public Object
+	{
+		private:
+			LiSAMutex	*mutex;
+		public:
+					 Mutex();
+					~Mutex();
 
-		SMOOTHInt	 Lock();
-		SMOOTHInt	 Release();
+			Int		 Lock();
+			Int		 Release();
+	};
+
+	SMOOTHVAR Int OBJ_MUTEX;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_MUTEX;
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,21 +11,25 @@
 #ifndef _H_OBJSMOOTH_MDICLIENT_
 #define _H_OBJSMOOTH_MDICLIENT_
 
-#define SMDIClient SMOOTHMDIClient
-
-class SMOOTHMDIClient;
+namespace smooth
+{
+	class MDIClient;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHMDIClient : public SMOOTHObject
+namespace smooth
 {
-	public:
-					 SMOOTHMDIClient();
-					~SMOOTHMDIClient();
+	class SMOOTHAPI MDIClient : public Object
+	{
+		public:
+					 MDIClient();
+					~MDIClient();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
+			virtual Int	 Paint(Int);
+	};
+
+	SMOOTHVAR Int OBJ_MDICLIENT;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_MDICLIENT;
 
 #endif

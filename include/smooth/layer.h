@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,36 +11,40 @@
 #ifndef _H_OBJSMOOTH_LAYER_
 #define _H_OBJSMOOTH_LAYER_
 
-#define SLayer SMOOTHLayer
-
-class SMOOTHLayer;
+namespace smooth
+{
+	class Layer;
+};
 
 #include "object.h"
 #include "container.h"
 
-class SMOOTHAPI SMOOTHLayer : public SMOOTHObject, public SMOOTHContainer
+namespace smooth
 {
-	protected:
-		SMOOTHInt		 layerColor;
-	public:
-					 SMOOTHLayer(SMOOTHString name = NIL);
-					~SMOOTHLayer();
+	class SMOOTHAPI Layer : public Object, public Container
+	{
+		protected:
+			Int		 layerColor;
+		public:
+					 Layer(String name = NIL);
+					~Layer();
 
-		SMOOTHInt		 Show();
-		SMOOTHInt		 Hide();
+			Int		 Show();
+			Int		 Hide();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
 
-		SMOOTHInt		 SetColor(SMOOTHInt);
-		SMOOTHInt		 SetMetrics(SMOOTHPoint, SMOOTHSize);
+			Int		 SetColor(Int);
+			Int		 SetMetrics(Point, Size);
 
-		SMOOTHSurface		*GetDrawSurface();
+			Surface		*GetDrawSurface();
 
-		SMOOTHInt		 RegisterObject(SMOOTHObject *);
-		SMOOTHInt		 UnregisterObject(SMOOTHObject *);
+			Int		 RegisterObject(Object *);
+			Int		 UnregisterObject(Object *);
+	};
+
+	SMOOTHVAR Int OBJ_LAYER;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_LAYER;
 
 #endif

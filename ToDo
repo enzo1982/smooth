@@ -9,13 +9,13 @@ ToDo for smooth
 - complete treeview widget
 - allow applets in menubars
 - integrate UIML compiler and interpreter
-- redo SMOOTHMenubar::Paint(int)
+- redo Menubar::Paint(int)
 - use other surfaces than GDI (OpenGL, DirectFB, SDL, DirectX)
 - complete XML parser
-- implement a new event->procedure model
 - check large fonts support
 - implement MDI functionality (MDIBar, MDIArea)
 - implement Document Editing Areas
 - implement ECM
 - implement tear off menus
 - write documentation
+- implement signals and slots mechanism

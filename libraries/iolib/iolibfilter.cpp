@@ -30,6 +30,11 @@ IOLibFilter::~IOLibFilter()
 {
 }
 
+void IOLibFilter::SetDriver(IOLibDriver *iDriver)
+{
+	driver = iDriver;
+}
+
 bool IOLibFilter::Activate()
 {
 	return true;
@@ -40,18 +45,18 @@ bool IOLibFilter::Deactivate()
 	return true;
 }
 
-bool IOLibFilter::EncodeData(unsigned char **data, int size, int *outsize)
+int IOLibFilter::WriteData(unsigned char *data, int size)
 {
-	*outsize = size;
-
-	return true;
+	return driver->WriteData(data, size);
 }
 
-bool IOLibFilter::DecodeData(unsigned char **data, int size, int *outsize)
+int IOLibFilter::ReadData(unsigned char **data, int size)
 {
-	*outsize = size;
+	if (size > (driver->GetSize() - driver->GetPos())) size = driver->GetSize() - driver->GetPos();
 
-	return true;
+	*data = new unsigned char [size];
+
+	return driver->ReadData(*data, size);
 }
 
 #endif

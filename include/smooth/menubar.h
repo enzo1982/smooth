@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,33 +11,37 @@
 #ifndef _H_OBJSMOOTH_MENUBAR_
 #define _H_OBJSMOOTH_MENUBAR_
 
-#define SMenubar SMOOTHMenubar
-
-class SMOOTHMenubar;
+namespace smooth
+{
+	class Menubar;
+};
 
 #include "object.h"
 #include "menu.h"
 
-const SMOOTHInt	 MB_GRAYSCALE	= 0;
-const SMOOTHInt	 MB_COLOR	= 1;
-
-class SMOOTHAPI SMOOTHMenubar : public SMOOTHObject, public SMOOTHMenu
+namespace smooth
 {
-	private:
-		SMOOTHInt		 popupHandle;
-		SMOOTHInt		 style;
+	const Int	 MB_GRAYSCALE	= 0;
+	const Int	 MB_COLOR	= 1;
 
-		SMOOTHString		 backupStatusText;
-	public:
-					 SMOOTHMenubar();
-					~SMOOTHMenubar();
+	class SMOOTHAPI Menubar : public Object, public Menu
+	{
+		private:
+			Int		 popupHandle;
+			Int		 style;
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			String		 backupStatusText;
+		public:
+					 Menubar();
+					~Menubar();
 
-		SMOOTHInt		 SetStyle(SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
+
+			Int		 SetStyle(Int);
+	};
+
+	SMOOTHVAR Int OBJ_MENUBAR;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_MENUBAR;
 
 #endif

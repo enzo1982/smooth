@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -14,50 +14,50 @@
 #include "array.h"
 #include "entry.h"
 
-template <class t> SMOOTHArray<t>::SMOOTHArray()
+template <class t> S::Array<t>::Array()
 {
 	nOfEntries = 0;
 	greatestIndex = -1;
-	outlinedEntry = false;
+	outlinedEntry = False;
 	firstEntry = ARRAY_NULLPOINTER;
 	lastEntry = ARRAY_NULLPOINTER;
 	prevEntry = ARRAY_NULLPOINTER;
 	prevDeletedEntry = ARRAY_NULLPOINTER;
 }
 
-template <class t> SMOOTHArray<t>::~SMOOTHArray()
+template <class t> S::Array<t>::~Array()
 {
 	DeleteAll();
 }
 
-template <class t> bool SMOOTHArray<t>::Cleanup(SMOOTHArray_Entry<t> *entry)
+template <class t> S::Bool S::Array<t>::Cleanup(Array_Entry<t> *entry)
 {
 	if (entry != ARRAY_NULLPOINTER)
 	{
 		if (entry->gotNext) Cleanup(entry->GetNext());
 		DeleteEntry(entry->GetIndex());
 
-		return true;
+		return True;
 	}
 	else
 	{
-		return false;
+		return False;
 	}
 }
 
-template <class t> bool SMOOTHArray<t>::IndexAvailable(long index)
+template <class t> S::Bool S::Array<t>::IndexAvailable(Int index)
 {
-	if (GetEntry(index) == ARRAY_NULLVALUE)	return true;
-	else					return false;
+	if (GetEntry(index) == ARRAY_NULLVALUE)	return True;
+	else					return False;
 }
 
-template <class t> long SMOOTHArray<t>::AddEntry(t entry)
+template <class t> S::Int S::Array<t>::AddEntry(t entry)
 {
 	if (nOfEntries == 0)
 	{
-		outlinedEntry = false;
+		outlinedEntry = False;
 
-		firstEntry = new SMOOTHArray_Entry<t>;
+		firstEntry = new Array_Entry<t>;
 		firstEntry->Fill(entry);
 		firstEntry->SetIndex(nOfEntries);
 		lastEntry = firstEntry;
@@ -65,7 +65,7 @@ template <class t> long SMOOTHArray<t>::AddEntry(t entry)
 	}
 	else
 	{
-		lastEntry->SetNext(new SMOOTHArray_Entry<t>);
+		lastEntry->SetNext(new Array_Entry<t>);
 		lastEntry->GetNext()->SetPrev(lastEntry);
 		lastEntry = lastEntry->GetNext();
 		lastEntry->Fill(entry);
@@ -89,18 +89,18 @@ template <class t> long SMOOTHArray<t>::AddEntry(t entry)
 	return lastEntry->GetIndex();
 }
 
-template <class t> bool SMOOTHArray<t>::AddEntry(t entry, long index)
+template <class t> S::Bool S::Array<t>::AddEntry(t entry, Int index)
 {
 	if (index > greatestIndex)
 	{
 		AddEntry(entry);
 		prevEntry->SetIndex(index);
 
-		outlinedEntry = true;
+		outlinedEntry = True;
 
 		greatestIndex = index;
 
-		return true;
+		return True;
 	}
 	else
 	{
@@ -115,23 +115,23 @@ template <class t> bool SMOOTHArray<t>::AddEntry(t entry, long index)
 			}
 			else
 			{
-				outlinedEntry = true;
+				outlinedEntry = True;
 			}
 
-			return true;
+			return True;
 		}
 		else
 		{
-			return false;
+			return False;
 		}
 	}
 }
 
-template <class t> long SMOOTHArray<t>::InsertEntryAfter(long prev, t entry)
+template <class t> S::Int S::Array<t>::InsertEntryAfter(Int prev, t entry)
 {
 	if (GetEntry(prev) == ARRAY_NULLVALUE) return -1;
 
-	SMOOTHArray_Entry<t>	*operat = new SMOOTHArray_Entry<t>;
+	Array_Entry<t>	*operat = new Array_Entry<t>;
 
 	operat->SetNext(prevEntry->GetNext());
 	prevEntry->SetNext(operat);
@@ -148,7 +148,7 @@ template <class t> long SMOOTHArray<t>::InsertEntryAfter(long prev, t entry)
 
 	operat->Fill(entry);
 
-	outlinedEntry = true;
+	outlinedEntry = True;
 
 	operat->SetIndex(greatestIndex + 1);
 	greatestIndex++;
@@ -160,7 +160,7 @@ template <class t> long SMOOTHArray<t>::InsertEntryAfter(long prev, t entry)
 	return operat->GetIndex();
 }
 
-template <class t> bool SMOOTHArray<t>::InsertEntryAfter(long prev, t entry, long index)
+template <class t> S::Bool S::Array<t>::InsertEntryAfter(Int prev, t entry, Int index)
 {
 	if (GetEntry(prev) == ARRAY_NULLVALUE) return -1;
 
@@ -169,11 +169,11 @@ template <class t> bool SMOOTHArray<t>::InsertEntryAfter(long prev, t entry, lon
 		InsertEntryAfter(prev, entry);
 		prevEntry->SetIndex(index);
 
-		outlinedEntry = true;
+		outlinedEntry = True;
 
 		greatestIndex = index;
 
-		return true;
+		return True;
 	}
 	else
 	{
@@ -184,28 +184,26 @@ template <class t> bool SMOOTHArray<t>::InsertEntryAfter(long prev, t entry, lon
 
 			greatestIndex--;
 
-			return true;
+			return True;
 		}
 		else
 		{
-			return false;
+			return False;
 		}
 	}
 }
 
-template <class t> long SMOOTHArray<t>::InsertEntryAtPos(long pos, t entry)
+template <class t> S::Int S::Array<t>::InsertEntryAtPos(Int pos, t entry)
 {
 	if (nOfEntries < pos) return -1;
 
-	SMOOTHArray_Entry<t>	*operat;
-
-	for (int i = 0; i < pos; i++)
+	for (Int i = 0; i < pos; i++)
 	{
 		if (i == 0)	GetFirstEntry();
 		else		GetNextEntry();
 	}
 
-	operat = new SMOOTHArray_Entry<t>;
+	Array_Entry<t>	*operat = new Array_Entry<t>;
 
 	if (pos == 0)
 	{
@@ -227,7 +225,7 @@ template <class t> long SMOOTHArray<t>::InsertEntryAtPos(long pos, t entry)
 
 	operat->Fill(entry);
 
-	outlinedEntry = true;
+	outlinedEntry = True;
 
 	operat->SetIndex(greatestIndex + 1);
 	greatestIndex++;
@@ -239,7 +237,7 @@ template <class t> long SMOOTHArray<t>::InsertEntryAtPos(long pos, t entry)
 	return operat->GetIndex();
 }
 
-template <class t> bool SMOOTHArray<t>::InsertEntryAtPos(long pos, t entry, long index)
+template <class t> S::Bool S::Array<t>::InsertEntryAtPos(Int pos, t entry, Int index)
 {
 	if (nOfEntries < pos) return -1;
 
@@ -248,11 +246,11 @@ template <class t> bool SMOOTHArray<t>::InsertEntryAtPos(long pos, t entry, long
 		InsertEntryAtPos(pos, entry);
 		prevEntry->SetIndex(index);
 
-		outlinedEntry = true;
+		outlinedEntry = True;
 
 		greatestIndex = index;
 
-		return true;
+		return True;
 	}
 	else
 	{
@@ -263,21 +261,21 @@ template <class t> bool SMOOTHArray<t>::InsertEntryAtPos(long pos, t entry, long
 
 			greatestIndex--;
 
-			return true;
+			return True;
 		}
 		else
 		{
-			return false;
+			return False;
 		}
 	}
 }
 
-template <class t> bool SMOOTHArray<t>::DeleteEntry(long index)
+template <class t> S::Bool S::Array<t>::DeleteEntry(Int index)
 {
-	if (nOfEntries == 0) return false;
+	if (nOfEntries == 0) return False;
 
-	SMOOTHArray_Entry<t>	*operat = ARRAY_NULLPOINTER;
-	SMOOTHArray_Entry<t>	*prev = ARRAY_NULLPOINTER;
+	Array_Entry<t>	*operat = ARRAY_NULLPOINTER;
+	Array_Entry<t>	*prev = ARRAY_NULLPOINTER;
 
 	if (prevDeletedEntry != ARRAY_NULLPOINTER)
 	{
@@ -304,9 +302,9 @@ template <class t> bool SMOOTHArray<t>::DeleteEntry(long index)
 				delete operat;
 
 				nOfEntries--;
-				outlinedEntry = true;
+				outlinedEntry = True;
 
-				return true;
+				return True;
 			}
 		}
 
@@ -333,14 +331,14 @@ template <class t> bool SMOOTHArray<t>::DeleteEntry(long index)
 				delete operat;
 
 				nOfEntries--;
-				outlinedEntry = true;
+				outlinedEntry = True;
 
-				return true;
+				return True;
 			}
 		}
 	}
 
-	for (long i = 0; ; i++)
+	for (Int i = 0; ; i++)
 	{
 		if (i == 0)
 		{
@@ -376,9 +374,9 @@ template <class t> bool SMOOTHArray<t>::DeleteEntry(long index)
 				delete operat;
 
 				nOfEntries--;
-				outlinedEntry = true;
+				outlinedEntry = True;
 
-				return true;
+				return True;
 			}
 
 			if (operat->gotNext)	
@@ -392,12 +390,13 @@ template <class t> bool SMOOTHArray<t>::DeleteEntry(long index)
 			}
 		}
 	}
-	return false;
+
+	return False;
 }
 
-template <class t> bool SMOOTHArray<t>::DeleteAll()
+template <class t> S::Bool S::Array<t>::DeleteAll()
 {
-	if (nOfEntries == 0) return false;
+	if (nOfEntries == 0) return False;
 
 	Cleanup(firstEntry);
 
@@ -405,12 +404,12 @@ template <class t> bool SMOOTHArray<t>::DeleteAll()
 
 	nOfEntries = 0;
 
-	return true;
+	return True;
 }
 
-template <class t> t SMOOTHArray<t>::GetEntry(long index)
+template <class t> t S::Array<t>::GetEntry(Int index)
 {
-	SMOOTHArray_Entry<t>	*operat = ARRAY_NULLPOINTER;
+	Array_Entry<t>	*operat = ARRAY_NULLPOINTER;
 
 	if (nOfEntries == 0) return ARRAY_NULLVALUE;
 
@@ -437,7 +436,7 @@ template <class t> t SMOOTHArray<t>::GetEntry(long index)
 		}
 	}
 
-	for (long i = 0; ; i++)
+	for (Int i = 0; ; i++)
 	{
 		if (i == 0)
 		{
@@ -459,9 +458,9 @@ template <class t> t SMOOTHArray<t>::GetEntry(long index)
 	return ARRAY_NULLVALUE;
 }
 
-template <class t> bool SMOOTHArray<t>::SetEntry(long index, t entry)
+template <class t> S::Bool S::Array<t>::SetEntry(Int index, t entry)
 {
-	SMOOTHArray_Entry<t>	*operat = ARRAY_NULLPOINTER;
+	Array_Entry<t>	*operat = ARRAY_NULLPOINTER;
 
 	if (prevEntry != ARRAY_NULLPOINTER)
 	{
@@ -473,7 +472,7 @@ template <class t> bool SMOOTHArray<t>::SetEntry(long index, t entry)
 
 				prevEntry->Fill(entry);
 
-				return true;
+				return True;
 			}
 		}
 
@@ -485,12 +484,12 @@ template <class t> bool SMOOTHArray<t>::SetEntry(long index, t entry)
 
 				prevEntry->Fill(entry);
 
-				return true;
+				return True;
 			}
 		}
 	}
 
-	for (long i = 0; ; i++)
+	for (Int i = 0; ; i++)
 	{
 		if (i == 0)
 		{
@@ -502,7 +501,7 @@ template <class t> bool SMOOTHArray<t>::SetEntry(long index, t entry)
 			{
 				prevEntry = operat;
 				operat->Fill(entry);
-				return true;
+				return True;
 			}
 
 			if (operat->gotNext)	operat = operat->GetNext();
@@ -510,15 +509,15 @@ template <class t> bool SMOOTHArray<t>::SetEntry(long index, t entry)
 		}
 	}
 
-	return false;
+	return False;
 }
 
-template <class t> long SMOOTHArray<t>::GetNOfEntries()
+template <class t> S::Int S::Array<t>::GetNOfEntries()
 {
 	return nOfEntries;
 }
 
-template <class t> t SMOOTHArray<t>::GetFirstEntry()
+template <class t> t S::Array<t>::GetFirstEntry()
 {
 	if (nOfEntries > 0 && firstEntry != ARRAY_NULLPOINTER)
 	{
@@ -529,7 +528,7 @@ template <class t> t SMOOTHArray<t>::GetFirstEntry()
 	else	return ARRAY_NULLVALUE;
 }
 
-template <class t> t SMOOTHArray<t>::GetLastEntry()
+template <class t> t S::Array<t>::GetLastEntry()
 {
 	if (nOfEntries > 0 && lastEntry != ARRAY_NULLPOINTER)
 	{
@@ -540,9 +539,9 @@ template <class t> t SMOOTHArray<t>::GetLastEntry()
 	else	return ARRAY_NULLVALUE;
 }
 
-template <class t> t SMOOTHArray<t>::GetNextEntry()
+template <class t> t S::Array<t>::GetNextEntry()
 {
-	SMOOTHArray_Entry<t>	*ret;
+	Array_Entry<t>	*ret;
 
 	if (prevEntry != ARRAY_NULLPOINTER)
 	{
@@ -560,9 +559,9 @@ template <class t> t SMOOTHArray<t>::GetNextEntry()
 	return ARRAY_NULLVALUE;
 }
 
-template <class t> t SMOOTHArray<t>::GetPrevEntry()
+template <class t> t S::Array<t>::GetPrevEntry()
 {
-	SMOOTHArray_Entry<t>	*ret;
+	Array_Entry<t>	*ret;
 
 	if (prevEntry != ARRAY_NULLPOINTER)
 	{
@@ -580,18 +579,32 @@ template <class t> t SMOOTHArray<t>::GetPrevEntry()
 	return ARRAY_NULLVALUE;
 }
 
-template <class t> t SMOOTHArray<t>::GetNthEntry(int n)
+template <class t> t S::Array<t>::GetNthEntry(Int n)
 {
 	if (n >= nOfEntries) return ARRAY_NULLVALUE;
 
 	t	 ret = GetFirstEntry();
 
-	for (int i = 0; i < n; i++)
+	for (Int i = 0; i < n; i++)
 	{
 		ret = GetNextEntry();
 	}
 
 	return ret;
+}
+
+template <class t> S::Int S::Array<t>::GetNthEntryIndex(Int n)
+{
+	if (n >= nOfEntries) return -1;
+
+	Array_Entry<t>	*entry = firstEntry;
+
+	for (Int i = 0; i < n; i++)
+	{
+		entry = entry->GetNext();
+	}
+
+	return entry->GetIndex();
 }
 
 #endif

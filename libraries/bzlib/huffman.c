@@ -8,7 +8,7 @@
   This file is a part of bzip2 and/or libbzip2, a program and
   library for lossless, block-sorting data compression.
 
-  Copyright (C) 1996-2000 Julian R Seward.  All rights reserved.
+  Copyright (C) 1996-2002 Julian R Seward.  All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -59,7 +59,7 @@
 --*/
 
 
-#include <bzlib_private.h>
+#include "bzlib_private.h"
 
 /*---------------------------------------------------*/
 #define WEIGHTOF(zz0)  ((zz0) & 0xffffff00)
@@ -135,6 +135,8 @@ void BZ2_hbMakeCodeLengths ( UChar *len,
          UPHEAP(nHeap);
       }
 
+      AssertH( nHeap < (BZ_MAX_ALPHA_SIZE+2), 2001 );
+   
       while (nHeap > 1) {
          n1 = heap[1]; heap[1] = heap[nHeap]; nHeap--; DOWNHEAP(1);
          n2 = heap[1]; heap[1] = heap[nHeap]; nHeap--; DOWNHEAP(1);
@@ -146,6 +148,8 @@ void BZ2_hbMakeCodeLengths ( UChar *len,
          heap[nHeap] = nNodes;
          UPHEAP(nHeap);
       }
+
+      AssertH( nNodes < (BZ_MAX_ALPHA_SIZE * 2), 2002 );
 
       tooLong = False;
       for (i = 1; i <= alphaSize; i++) {

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_SPLASHSCREEN_
-#define __OBJSMOOTH_SPLASHSCREEN_
 
 #include <smooth/splashscreen.h>
 #include <smooth/array.h>
@@ -25,25 +22,25 @@
 #include <smooth/timer.h>
 #include <smooth/objectproperties.h>
 
-int SMOOTHSplashScreenApp::nOfSplashScreens = 0;
+int S::SplashScreenApp::nOfSplashScreens = 0;
 
-SMOOTHInt SMOOTH::SplashScreen(HBITMAP logo, SMOOTHInt time)
+S::Int S::SMOOTH::SplashScreen(HBITMAP logo, Int time)
 {
-	SMOOTHInt		 rVal;
-	SMOOTHSplashScreenApp	*app = new SMOOTHSplashScreenApp(logo, time);
+	Int		 rVal;
+	SplashScreenApp	*app = new SplashScreenApp(logo, time);
 
 	rVal = app->ShowSplashScreen();
 
-	SMOOTH::DeleteObject(app);
+	DeleteObject(app);
 
 	return rVal;
 }
 
-SMOOTHSplashScreenApp::SMOOTHSplashScreenApp(HBITMAP logo, int t)
+S::SplashScreenApp::SplashScreenApp(HBITMAP logo, int t)
 {
-	splashscreen = new SMOOTHWindow(TXT_SPLASHSCREEN);
+	splashscreen = new Window(TXT_SPLASHSCREEN);
 
-	timer = new SMOOTHTimer();
+	timer = new Timer();
 
 	time = t;
 
@@ -56,8 +53,8 @@ SMOOTHSplashScreenApp::SMOOTHSplashScreenApp(HBITMAP logo, int t)
 
 	splashscreen->RegisterObject(timer);
 
-	splashscreen->SetPaintProc(SMOOTHProc(SMOOTHSplashScreenApp, this, SplashPaintProc));
-	splashscreen->SetKillProc(SMOOTHKillProc(SMOOTHSplashScreenApp, this, SplashKillProc));
+	splashscreen->SetPaintProc(Proc(SplashScreenApp, this, SplashPaintProc));
+	splashscreen->SetKillProc(KillProc(SplashScreenApp, this, SplashKillProc));
 
 	splashscreen->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - splashscreen->GetObjectProperties()->size.cx) / 2;
 	splashscreen->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - splashscreen->GetObjectProperties()->size.cy) / 2-40;
@@ -68,20 +65,20 @@ SMOOTHSplashScreenApp::SMOOTHSplashScreenApp(HBITMAP logo, int t)
 	splashscreen->SetExStyle(WS_EX_TOPMOST);
 #endif
 
-	timer->SetProc(SMOOTHProc(SMOOTHSplashScreenApp, this, TimerProc));
+	timer->SetProc(Proc(SplashScreenApp, this, TimerProc));
 }
 
-SMOOTHSplashScreenApp::~SMOOTHSplashScreenApp()
+S::SplashScreenApp::~SplashScreenApp()
 {
 	splashscreen->UnregisterObject(timer);
 
 	UnregisterObject(splashscreen);
 
-	SMOOTH::DeleteObject(splashscreen);
-	SMOOTH::DeleteObject(timer);
+	DeleteObject(splashscreen);
+	DeleteObject(timer);
 }
 
-int SMOOTHSplashScreenApp::ShowSplashScreen()
+int S::SplashScreenApp::ShowSplashScreen()
 {
 	int	 rval;
 
@@ -98,10 +95,10 @@ int SMOOTHSplashScreenApp::ShowSplashScreen()
 	return rval;
 }
 
-void SMOOTHSplashScreenApp::SplashPaintProc()
+void S::SplashScreenApp::SplashPaintProc()
 {
-	HDC		 dc = GetContext(splashscreen);
-	SMOOTHRect	 bmprect;
+	HDC	 dc = GetContext(splashscreen);
+	Rect	 bmprect;
 
 	bmprect.left = 1;
 	bmprect.top = 1;
@@ -113,9 +110,9 @@ void SMOOTHSplashScreenApp::SplashPaintProc()
 	FreeContext(splashscreen, dc);
 }
 
-bool SMOOTHSplashScreenApp::SplashKillProc()
+bool S::SplashScreenApp::SplashKillProc()
 {
-	if (splashscreen->value == 0) splashscreen->value = SMOOTH::Success;
+	if (splashscreen->value == 0) splashscreen->value = Success;
 
 	timer->Stop();
 
@@ -124,11 +121,11 @@ bool SMOOTHSplashScreenApp::SplashKillProc()
 	return true;
 }
 
-void SMOOTHSplashScreenApp::TimerProc()
+void S::SplashScreenApp::TimerProc()
 {
 	if (splashscreen->value == 1)
 	{
-		SMOOTH::CloseWindow(splashscreen);
+		splashscreen->Close();
 	}
 	else
 	{
@@ -136,5 +133,3 @@ void SMOOTHSplashScreenApp::TimerProc()
 		timer->Start(10);
 	}
 }
-
-#endif

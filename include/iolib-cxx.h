@@ -25,9 +25,12 @@
 	#define __WIN32__
 #endif
 
+#if defined __WIN32__
+	#include <windows.h>
+#endif
+
 #if defined __WIN32__ && !defined __CYGWIN32__
 	#include <io.h>
-	#include <winsock.h>
 #else
 	#if defined __CYGWIN32__
 		#include <sys/ioctl.h>
@@ -35,15 +38,6 @@
 	#if defined __FreeBSD__
 		#include <sys/types.h>
 	#endif
-	#include <netinet/in.h>
-	#if !defined MSDOS
-		#include <sys/socket.h>
-		#include <netdb.h>
-	#endif
-#endif
-
-#if defined __WIN32__
-	#include <windows.h>
 #endif
 
 #if defined __WIN32__ && !defined i386
@@ -56,11 +50,9 @@
 	const int	 STREAM_NONE		= 0;
 	const int	 STREAM_STREAM		= 1;
 	const int	 STREAM_DRIVER		= 2;
-	const int	 STREAM_ZERO		= 3;
-	const int	 STREAM_FILE		= 4;
-	const int	 STREAM_POSIX		= 5;
-	const int	 STREAM_ANSI		= 6;
-	const int	 STREAM_BUFFER		= 7;
+	const int	 STREAM_FILE		= 3;
+	const int	 STREAM_ANSI		= 4;
+	const int	 STREAM_BUFFER		= 5;
 #endif
 
 #ifndef IOLIB_ERROR_CODES
@@ -80,11 +72,11 @@
 	#define	DEFAULT_PACKAGE_SIZE	131072
 #endif
 
-#include "iolibdriver-cxx.h"
-#include "iolibfilter-cxx.h"
-#include "iolibstream-cxx.h"
-#include "instream-cxx.h"
-#include "outstream-cxx.h"
+#include "iolib/iolibdriver-cxx.h"
+#include "iolib/iolibfilter-cxx.h"
+#include "iolib/iolibstream-cxx.h"
+#include "iolib/instream-cxx.h"
+#include "iolib/outstream-cxx.h"
 
 #if defined __CYGWIN32__ && defined IOLIB_DLL
 	#include <windows.h>

@@ -1,0 +1,6 @@
+  { "EUC-JISX0213", ei_euc_jisx0213 },
+  { "SHIFT_JISX0213", ei_shift_jisx0213 },
+  { "ISO-2022-JP-3", ei_iso2022_jp3 },
+  { "TDS565", ei_tds565 },
+  { "ISO-IR-230", ei_tds565 },
+  { "RISCOS-LATIN1", ei_riscos1 },

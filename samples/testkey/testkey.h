@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,18 +11,19 @@
 #ifndef	_H_TESTKEY_
 #define _H_TESTKEY_
 
-#include <smoothx.h>
+#include <smooth.h>
 
-class TestKey : public SApplication
+using namespace smooth;
+
+class TestKey : public Application
 {
 	private:
-		SWindow		*wnd;
-		SLayer		*layer;
-		STitlebar	*title;
-		SText		*text;
+		Window		*wnd;
+		Titlebar	*title;
+		Text		*text;
 
-		SVoid		 MessageProc(SInt, SInt, SInt);
-		SInt		 GetBits(SInt, SUInt, SUInt);
+		Void		 EventProc(Int, Int, Int);
+		Int		 GetBits(Int, UnsignedInt, UnsignedInt);
 	public:
 				 TestKey();
 				~TestKey();

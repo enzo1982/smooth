@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,38 +11,44 @@
 #ifndef _H_OBJSMOOTH_OBJECTPROPERTIES_
 #define _H_OBJSMOOTH_OBJECTPROPERTIES_
 
-#define SObjectProperties SMOOTHObjectProperties
-
-class SMOOTHObjectProperties;
+namespace smooth
+{
+	class ObjectProperties;
+};
 
 #include "definitions.h"
+#include "point.h"
+#include "size.h"
 
-class SMOOTHAPI SMOOTHObjectProperties
+namespace smooth
 {
-	public:
-		SMOOTHPoint	 pos;
-		SMOOTHSize	 size;
+	class SMOOTHAPI ObjectProperties
+	{
+		public:
+			Point		 pos;
+			Size		 size;
 
-		SMOOTHInt	 orientation;
+			Int		 orientation;
 
-		SMOOTHString	 text;
-		SMOOTHString	 tooltip;
+			String		 text;
+			String		 tooltip;
 
-		SMOOTHSize	 textSize;
-		SMOOTHSize	 tooltipSize;
+			Size		 textSize;
+			Size		 tooltipSize;
 
-		SMOOTHString	 font;
-		SMOOTHInt	 fontSize;
-		SMOOTHInt	 fontWeight;
-		SMOOTHInt	 fontColor;
+			String		 font;
+			Int		 fontSize;
+			Int		 fontWeight;
+			Int		 fontColor;
 
-		SMOOTHBool	 clicked;
-		SMOOTHBool	 checked;
+			Bool		 clicked;
+			Bool		 checked;
 
-		SMOOTHProcMember;
-		SMOOTHVoid	*procParam;
+			ProcMember;
+			Void		*procParam;
 
-				 SMOOTHObjectProperties();
+					 ObjectProperties();
+	};
 };
 
 #endif

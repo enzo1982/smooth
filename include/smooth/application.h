@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,20 +11,24 @@
 #ifndef _H_OBJSMOOTH_APPLICATION_
 #define _H_OBJSMOOTH_APPLICATION_
 
-#define SApplication SMOOTHApplication
-
-class SMOOTHApplication;
+namespace smooth
+{
+	class Application;
+};
 
 #include "object.h"
 #include "container.h"
 
-class SMOOTHAPI SMOOTHApplication : public SMOOTHObject, public SMOOTHContainer
+namespace smooth
 {
-	public:
-		 SMOOTHApplication();
-		 SMOOTHApplication(SMOOTHString);
-};
+	class SMOOTHAPI Application : public Object, public Container
+	{
+		public:
+			 Application();
+			 Application(String);
+	};
 
-SMOOTHVAR SMOOTHInt OBJ_APPLICATION;
+	SMOOTHVAR Int OBJ_APPLICATION;
+};
 
 #endif

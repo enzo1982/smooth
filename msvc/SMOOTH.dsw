@@ -39,18 +39,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "IOLibFilters"=.\IOLibFilters.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "LiSA"=.\LiSA.dsp - Package Owner=<4>
 
 Package=<5>
@@ -63,7 +51,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "SMOOTH"=.\SMOOTH.dsp - Package Owner=<4>
+Project: "smooth"=.\smooth.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -75,7 +63,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "SMOOTHTest"=.\SMOOTHTest.dsp - Package Owner=<4>
+Project: "smoothTest"=.\smoothTest.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -100,18 +88,6 @@ Package=<4>
 ###############################################################################
 
 Project: "libiconv"=.\libiconv.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "libpci"=.\libpci.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

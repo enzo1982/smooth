@@ -8,7 +8,7 @@
   This file is a part of bzip2 and/or libbzip2, a program and
   library for lossless, block-sorting data compression.
 
-  Copyright (C) 1996-2000 Julian R Seward.  All rights reserved.
+  Copyright (C) 1996-2002 Julian R Seward.  All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -70,7 +70,7 @@
         do a bit better on small files
 --*/
 
-#include <bzlib_private.h>
+#include "bzlib_private.h"
 
 
 /*---------------------------------------------------*/
@@ -206,8 +206,10 @@ void generateMTFValues ( EState* s )
 
    for (i = 0; i < s->nblock; i++) {
       UChar ll_i;
+      AssertD ( wr <= i, "generateMTFValues(1)" );
       j = ptr[i]-1; if (j < 0) j += s->nblock;
       ll_i = s->unseqToSeq[block[j]];
+      AssertD ( ll_i < s->nInUse, "generateMTFValues(2a)" );
 
       if (yy[0] == ll_i) { 
          zPend++;
@@ -300,12 +302,18 @@ void sendMTFValues ( EState* s )
 
    UInt16* mtfv = s->mtfv;
 
+   if (s->verbosity >= 3)
+      VPrintf3( "      %d in block, %d after MTF & 1-2 coding, "
+                "%d+2 syms in use\n", 
+                s->nblock, s->nMTF, s->nInUse );
+
    alphaSize = s->nInUse+2;
    for (t = 0; t < BZ_N_GROUPS; t++)
       for (v = 0; v < alphaSize; v++)
          s->len[t][v] = BZ_GREATER_ICOST;
 
    /*--- Decide how many coding tables to use ---*/
+   AssertH ( s->nMTF > 0, 3001 );
    if (s->nMTF < 200)  nGroups = 2; else
    if (s->nMTF < 600)  nGroups = 3; else
    if (s->nMTF < 1200) nGroups = 4; else
@@ -335,6 +343,12 @@ void sendMTFValues ( EState* s )
             ge--;
          }
 
+         if (s->verbosity >= 3)
+            VPrintf5( "      initial group %d, [%d .. %d], "
+                      "has %d syms (%4.1f%%)\n",
+                      nPart, gs, ge, aFreq, 
+                      (100.0 * (float)aFreq) / (float)(s->nMTF) );
+ 
          for (v = 0; v < alphaSize; v++)
             if (v >= gs && v <= ge) 
                s->len[nPart-1][v] = BZ_LESSER_ICOST; else
@@ -463,6 +477,13 @@ void sendMTFValues ( EState* s )
 
          gs = ge+1;
       }
+      if (s->verbosity >= 3) {
+         VPrintf2 ( "      pass %d: size is %d, grp uses are ", 
+                   iter+1, totc/8 );
+         for (t = 0; t < nGroups; t++)
+            VPrintf1 ( "%d ", fave[t] );
+         VPrintf0 ( "\n" );
+      }
 
       /*--
         Recompute the tables based on the accumulated frequencies.
@@ -471,6 +492,12 @@ void sendMTFValues ( EState* s )
          BZ2_hbMakeCodeLengths ( &(s->len[t][0]), &(s->rfreq[t][0]), 
                                  alphaSize, 20 );
    }
+
+
+   AssertH( nGroups < 8, 3002 );
+   AssertH( nSelectors < 32768 &&
+            nSelectors <= (2 + (900000 / BZ_G_SIZE)),
+            3003 );
 
 
    /*--- Compute MTF values for the selectors. ---*/
@@ -500,6 +527,8 @@ void sendMTFValues ( EState* s )
          if (s->len[t][i] > maxLen) maxLen = s->len[t][i];
          if (s->len[t][i] < minLen) minLen = s->len[t][i];
       }
+      AssertH ( !(maxLen > 20), 3004 );
+      AssertH ( !(minLen < 1),  3005 );
       BZ2_hbAssignCodes ( &(s->code[t][0]), &(s->len[t][0]), 
                           minLen, maxLen, alphaSize );
    }
@@ -522,6 +551,9 @@ void sendMTFValues ( EState* s )
             for (j = 0; j < 16; j++) {
                if (s->inUse[i * 16 + j]) bsW(s,1,1); else bsW(s,1,0);
             }
+
+      if (s->verbosity >= 3) 
+         VPrintf1( "      bytes: mapping %d, ", s->numZ-nBytes );
    }
 
    /*--- Now the selectors. ---*/
@@ -532,6 +564,8 @@ void sendMTFValues ( EState* s )
       for (j = 0; j < s->selectorMtf[i]; j++) bsW(s,1,1);
       bsW(s,1,0);
    }
+   if (s->verbosity >= 3)
+      VPrintf1( "selectors %d, ", s->numZ-nBytes );
 
    /*--- Now the coding tables. ---*/
    nBytes = s->numZ;
@@ -546,6 +580,9 @@ void sendMTFValues ( EState* s )
       }
    }
 
+   if (s->verbosity >= 3)
+      VPrintf1 ( "code lengths %d, ", s->numZ-nBytes );
+
    /*--- And finally, the block data proper ---*/
    nBytes = s->numZ;
    selCtr = 0;
@@ -554,6 +591,7 @@ void sendMTFValues ( EState* s )
       if (gs >= s->nMTF) break;
       ge = gs + BZ_G_SIZE - 1; 
       if (ge >= s->nMTF) ge = s->nMTF-1;
+      AssertH ( s->selector[selCtr] < nGroups, 3006 );
 
       if (nGroups == 6 && 50 == ge-gs+1) {
             /*--- fast track the common case ---*/
@@ -595,6 +633,10 @@ void sendMTFValues ( EState* s )
       gs = ge+1;
       selCtr++;
    }
+   AssertH( selCtr == nSelectors, 3007 );
+
+   if (s->verbosity >= 3)
+      VPrintf1( "codes %d\n", s->numZ-nBytes );
 }
 
 
@@ -608,6 +650,11 @@ void BZ2_compressBlock ( EState* s, Bool is_last_block )
       s->combinedCRC ^= s->blockCRC;
       if (s->blockNo > 1) s->numZ = 0;
 
+      if (s->verbosity >= 2)
+         VPrintf4( "    block %d: crc = 0x%8x, "
+                   "combined CRC = 0x%8x, size = %d\n",
+                   s->blockNo, s->blockCRC, s->combinedCRC, s->nblock );
+
       BZ2_blockSort ( s );
    }
 
@@ -616,10 +663,10 @@ void BZ2_compressBlock ( EState* s, Bool is_last_block )
    /*-- If this is the first block, create the stream header. --*/
    if (s->blockNo == 1) {
       BZ2_bsInitWrite ( s );
-      bsPutUChar ( s, 'B' );
-      bsPutUChar ( s, 'Z' );
-      bsPutUChar ( s, 'h' );
-      bsPutUChar ( s, (UChar)('0' + s->blockSize100k) );
+      bsPutUChar ( s, BZ_HDR_B );
+      bsPutUChar ( s, BZ_HDR_Z );
+      bsPutUChar ( s, BZ_HDR_h );
+      bsPutUChar ( s, (UChar)(BZ_HDR_0 + s->blockSize100k) );
    }
 
    if (s->nblock > 0) {
@@ -655,6 +702,8 @@ void BZ2_compressBlock ( EState* s, Bool is_last_block )
       bsPutUChar ( s, 0x45 ); bsPutUChar ( s, 0x38 );
       bsPutUChar ( s, 0x50 ); bsPutUChar ( s, 0x90 );
       bsPutUInt32 ( s, s->combinedCRC );
+      if (s->verbosity >= 2)
+         VPrintf1( "    final combined CRC = 0x%x\n   ", s->combinedCRC );
       bsFinishWrite ( s );
    }
 }

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,44 +11,48 @@
 #ifndef _H_OBJSMOOTH_ARROWS_
 #define _H_OBJSMOOTH_ARROWS_
 
-#define SArrows SMOOTHArrows
-
-class SMOOTHArrows;
-class SMOOTHTimer;
+namespace smooth
+{
+	class Arrows;
+	class Timer;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHArrows : public SMOOTHObject
+namespace smooth
 {
-	private:
-		SMOOTHTimer		*timer;
-		SMOOTHBool		 timerActive;
-		SMOOTHInt		 timerCount;
+	class SMOOTHAPI Arrows : public Object
+	{
+		private:
+			Timer		*timer;
+			Bool		 timerActive;
+			Int		 timerCount;
 
-		SMOOTHVoid		 TimerProc();
-	protected:
-		SMOOTHBool		 arrow1Clicked;
-		SMOOTHBool		 arrow2Clicked;
-		SMOOTHBool		 arrow1Checked;
-		SMOOTHBool		 arrow2Checked;
+			Void		 TimerProc();
+		protected:
+			Bool		 arrow1Clicked;
+			Bool		 arrow2Clicked;
+			Bool		 arrow1Checked;
+			Bool		 arrow2Checked;
 
-		SMOOTHInt		*variable;
+			Int		*variable;
 
-		SMOOTHInt		 startValue;
-		SMOOTHInt 		 endValue;
-	public:
-					 SMOOTHArrows(SMOOTHPoint, SMOOTHSize, SMOOTHInt, SMOOTHInt *, SMOOTHInt, SMOOTHInt, SMOOTHProcParam, SMOOTHVoid *);
-					~SMOOTHArrows();
+			Int		 startValue;
+			Int 		 endValue;
+		public:
+					 Arrows(Point, Size, Int, Int *, Int, Int, ProcParam, Void *);
+					~Arrows();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
 
-		SMOOTHInt		 SetRange(SMOOTHInt, SMOOTHInt);
+			Int		 SetRange(Int, Int);
 
-		SMOOTHInt		 SetValue(SMOOTHInt);
-		SMOOTHInt		 GetValue();
+			Int		 SetValue(Int);
+			Int		 GetValue();
+	};
+
+	SMOOTHVAR Int OBJ_ARROWS;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_ARROWS;
 
 #endif

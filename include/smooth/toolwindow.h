@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,35 +11,39 @@
 #ifndef _H_OBJSMOOTH_TOOLWINDOW_
 #define _H_OBJSMOOTH_TOOLWINDOW_
 
-#define SToolWindow SMOOTHToolWindow
-
-class SMOOTHToolWindow;
-class SMOOTHObject;
+namespace smooth
+{
+	class ToolWindow;
+	class Object;
+};
 
 #include "definitions.h"
 #include "window.h"
 
-class SMOOTHAPI SMOOTHToolWindow : public SMOOTHWindow
+namespace smooth
 {
-	private:
-		SMOOTHObject	*owner;
-	public:
-				 SMOOTHToolWindow();
-				~SMOOTHToolWindow();
+	class SMOOTHAPI ToolWindow : public Window
+	{
+		private:
+			Object	*owner;
+		public:
+				 ToolWindow();
+				~ToolWindow();
 
-		SMOOTHInt	 SetOwner(SMOOTHObject *);
-		SMOOTHInt	 FreeOwner();
+			Int	 SetOwner(Object *);
+			Int	 FreeOwner();
 
-		HWND		 Create();
+			HWND	 Create();
 
-		SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt	 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			Int	 Paint(Int);
+			Int	 Process(Int, Int, Int);
 
-		SMOOTHInt	 RegisterObject(SMOOTHObject *);
+			Int	 RegisterObject(Object *);
 
-		SMOOTHBool	 IsTypeCompatible(SMOOTHInt);
+			Bool	 IsTypeCompatible(Int);
+	};
+
+	SMOOTHVAR Int OBJ_TOOLWINDOW;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_TOOLWINDOW;
 
 #endif

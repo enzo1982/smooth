@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,23 +11,27 @@
 #ifndef _H_OBJSMOOTH_STATUSBAR_
 #define _H_OBJSMOOTH_STATUSBAR_
 
-#define SStatusbar SMOOTHStatusbar
-
-class SMOOTHStatusbar;
+namespace smooth
+{
+	class Statusbar;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHStatusbar : public SMOOTHObject
+namespace smooth
 {
-	public:
-				 SMOOTHStatusbar(SMOOTHString);
-				~SMOOTHStatusbar();
+	class SMOOTHAPI Statusbar : public Object
+	{
+		public:
+				 Statusbar(String);
+				~Statusbar();
 
-		SMOOTHInt	 Paint(SMOOTHInt);
+			Int	 Paint(Int);
 
-		SMOOTHInt	 SetText(SMOOTHString);
+			Int	 SetText(String);
+	};
+
+	SMOOTHVAR Int OBJ_STATUSBAR;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_STATUSBAR;
 
 #endif

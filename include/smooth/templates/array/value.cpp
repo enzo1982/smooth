@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -13,56 +13,56 @@
 
 #include "value.h"
 
-template <class t> SMOOTHArray_Value<t>::SMOOTHArray_Value()
+template <class t> S::Array_Value<t>::Array_Value()
 {
-	filled = false;
+	filled = False;
 	value = ARRAY_NULLVALUE;
 	index = 0;
 }
 
-template <class t> SMOOTHArray_Value<t>::~SMOOTHArray_Value()
+template <class t> S::Array_Value<t>::~Array_Value()
 {
 	Clear();
 }
 
-template <class t> bool SMOOTHArray_Value<t>::Fill(t entry)
+template <class t> S::Bool S::Array_Value<t>::Fill(t entry)
 {
 	value = entry;
-	filled = true;
+	filled = True;
 
-	return true;
+	return True;
 }
 
-template <class t> bool SMOOTHArray_Value<t>::Clear()
+template <class t> S::Bool S::Array_Value<t>::Clear()
 {
 	value = ARRAY_NULLVALUE;
-	filled = false;
+	filled = False;
 
-	return true;
+	return True;
 }
 
-template <class t> inline t SMOOTHArray_Value<t>::GetValue()
+template <class t> inline t S::Array_Value<t>::GetValue()
 {
 	if (filled)	return value;
 	else		return ARRAY_NULLVALUE;
 }
 
-template <class t> inline long SMOOTHArray_Value<t>::GetIndex()
+template <class t> inline S::Int S::Array_Value<t>::GetIndex()
 {
 	if (filled)	return index;
 	else		return -1;
 }
 
-template <class t> bool SMOOTHArray_Value<t>::SetIndex(long ind)
+template <class t> S::Bool S::Array_Value<t>::SetIndex(Int ind)
 {
 	if (filled)
 	{
 		index = ind;
-		return true;
+		return True;
 	}
 	else
 	{
-		return false;
+		return False;
 	}
 }
 

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,35 +11,39 @@
 #ifndef _H_OBJSMOOTH_HYPERLINK_
 #define _H_OBJSMOOTH_HYPERLINK_
 
-#define SHyperlink SMOOTHHyperlink
-
-class SMOOTHHyperlink;
+namespace smooth
+{
+	class Hyperlink;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHHyperlink : public SMOOTHObject
+namespace smooth
 {
-	protected:
-		SMOOTHString		 linkURL;
-		HBITMAP			 linkBitmap;
-	public:
-					 SMOOTHHyperlink();
-					 SMOOTHHyperlink(SMOOTHString, HBITMAP, SMOOTHString, SMOOTHPoint, SMOOTHSize size = SMOOTHSize(0, 0));
-					~SMOOTHHyperlink();
+	class SMOOTHAPI Hyperlink : public Object
+	{
+		protected:
+			String		 linkURL;
+			HBITMAP		 linkBitmap;
+		public:
+					 Hyperlink();
+					 Hyperlink(String, HBITMAP, String, Point, Size size = Size(0, 0));
+					~Hyperlink();
 
-		SMOOTHInt		 Hide();
+			Int		 Hide();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			virtual Int	 Paint(Int);
+			Int		 Process(Int, Int, Int);
 
-		HBITMAP			 GetBitmap();
-		SMOOTHString		 GetURL();
+			HBITMAP		 GetBitmap();
+			String		 GetURL();
 
-		SMOOTHInt		 SetText(SMOOTHString);
-		SMOOTHInt		 SetBitmap(HBITMAP);
-		SMOOTHInt		 SetURL(SMOOTHString);
+			Int		 SetText(String);
+			Int		 SetBitmap(HBITMAP);
+			Int		 SetURL(String);
+	};
+
+	SMOOTHVAR Int OBJ_HYPERLINK;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_HYPERLINK;
 
 #endif

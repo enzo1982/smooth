@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,46 +11,50 @@
 #ifndef _H_OBJSMOOTH_POPUPMENU_
 #define _H_OBJSMOOTH_POPUPMENU_
 
-#define SPopupMenu SMOOTHPopupMenu
-
 #include "definitions.h"
 
-const SMOOTHInt	 POPUP_NORMAL	= 0;
-const SMOOTHInt	 POPUP_FINISHED	= 1;
-const SMOOTHInt	 POPUP_PENDING	= 2;
+namespace smooth
+{
+	const Int	 POPUP_NORMAL	= 0;
+	const Int	 POPUP_FINISHED	= 1;
+	const Int	 POPUP_PENDING	= 2;
 
-class SMOOTHPopupMenu;
-class SMOOTHWindow;
-class SMOOTHToolWindow;
-class SMOOTHPopupView;
+	class PopupMenu;
+	class Window;
+	class ToolWindow;
+	class PopupView;
+};
 
 #include "object.h"
 #include "menu.h"
 
-class SMOOTHAPI SMOOTHPopupMenu : public SMOOTHObject, public SMOOTHMenu
+namespace smooth
 {
-	friend class SMOOTHWindow;
-	friend class SMOOTHPopupView;
-	private:
-		SMOOTHToolWindow	*toolwnd;
-		SMOOTHPopupView		*popupView;
+	class SMOOTHAPI PopupMenu : public Object, public Menu
+	{
+		friend class Window;
+		friend class PopupView;
+		private:
+			ToolWindow	*toolwnd;
+			PopupView	*popupView;
 
-		SMOOTHPopupMenu		*prevPopup;
-		SMOOTHPopupMenu		*nextPopup;
-	public:
-		static SMOOTHInt	 status;
+			PopupMenu	*prevPopup;
+			PopupMenu	*nextPopup;
+		public:
+			static Int	 status;
 
-					 SMOOTHPopupMenu();
-					~SMOOTHPopupMenu();
+					 PopupMenu();
+			 		~PopupMenu();
 
-		SMOOTHVoid		 MenuToPopup(SMOOTHMenu *);
+			Void		 MenuToPopup(Menu *);
 
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			Int		 Process(Int, Int, Int);
 
-		SMOOTHInt		 Show();
-		SMOOTHInt		 Hide();
+			Int		 Show();
+			Int		 Hide();
+	};
+
+	SMOOTHVAR Int OBJ_POPUP;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_POPUP;
 
 #endif

@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,21 +11,25 @@
 #ifndef _H_OBJSMOOTH_DRAGCONTROL_
 #define _H_OBJSMOOTH_DRAGCONTROL_
 
-#define SDragControl SMOOTHDragControl
-
-class SMOOTHDragControl;
+namespace smooth
+{
+	class DragControl;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHDragControl : public SMOOTHObject
+namespace smooth
 {
-	public:
-				 SMOOTHDragControl();
-				~SMOOTHDragControl();
+	class SMOOTHAPI DragControl : public Object
+	{
+		public:
+				 DragControl();
+				~DragControl();
 
-		SMOOTHInt	 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			Int	 Process(Int, Int, Int);
+	};
+
+	SMOOTHVAR Int OBJ_DRAGCONTROL;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_DRAGCONTROL;
 
 #endif

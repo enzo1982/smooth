@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -8,13 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __OBJSMOOTH_DESIGNER_TOOLS_
-#define __OBJSMOOTH_DESIGNER_TOOLS_
-
-#include <smoothx.h>
+#include <smooth.h>
 #include "tools.h"
 
-SMOOTHInt MouseX(HWND hwnd, SMOOTHInt wincl)
+S::Int MouseX(HWND hwnd, S::Int wincl)
 {
 	POINT	 point;
 	RECT	 rect;
@@ -25,11 +22,11 @@ SMOOTHInt MouseX(HWND hwnd, SMOOTHInt wincl)
 #else
 	Window			 root_return;
 	Window			 child_return;
-	SMOOTHInt		 root_x_return;
-	SMOOTHInt		 root_y_return;
-	SMOOTHInt		 win_x_return;
-	SMOOTHInt		 win_y_return;
-	SMOOTHUnsignedInt	 mask_return;
+	S::Int			 root_x_return;
+	S::Int			 root_y_return;
+	S::Int			 win_x_return;
+	S::Int			 win_y_return;
+	S::UnsignedInt		 mask_return;
 	XWindowAttributes	 window_attributes_return;
 
 	if (hwnd == 0)
@@ -52,7 +49,7 @@ SMOOTHInt MouseX(HWND hwnd, SMOOTHInt wincl)
 	return -1;
 }
 
-SMOOTHInt MouseY(HWND hwnd, SMOOTHInt wincl)
+S::Int MouseY(HWND hwnd, S::Int wincl)
 {
 	POINT	 point;
 	RECT	 rect;
@@ -63,11 +60,11 @@ SMOOTHInt MouseY(HWND hwnd, SMOOTHInt wincl)
 #else
 	Window			 root_return;
 	Window			 child_return;
-	SMOOTHInt		 root_x_return;
-	SMOOTHInt		 root_y_return;
-	SMOOTHInt		 win_x_return;
-	SMOOTHInt		 win_y_return;
-	SMOOTHUnsignedInt	 mask_return;
+	S::Int			 root_x_return;
+	S::Int			 root_y_return;
+	S::Int			 win_x_return;
+	S::Int			 win_y_return;
+	S::UnsignedInt		 mask_return;
 	XWindowAttributes	 window_attributes_return;
 
 	if (hwnd == 0)
@@ -89,6 +86,3 @@ SMOOTHInt MouseY(HWND hwnd, SMOOTHInt wincl)
 
 	return -1;
 }
-
-
-#endif

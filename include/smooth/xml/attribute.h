@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,45 +11,55 @@
 #ifndef _H_OBJSMOOTH_XMLATTRIBUTE_
 #define _H_OBJSMOOTH_XMLATTRIBUTE_
 
-#define SXMLAttribute SMOOTHXMLAttribute
-
-class SMOOTHXMLAttribute;
+namespace smooth
+{
+	namespace XML
+	{
+		class Attribute;
+	};
+};
 
 #include "../definitions.h"
 #include "node.h"
 
-class SMOOTHAPI SMOOTHXMLAttribute
+namespace smooth
 {
-	private:
-		SMOOTHXMLAttribute	*nextAttribute;
-		SMOOTHXMLAttribute	*prevAttribute;
+	namespace XML
+	{
+		class SMOOTHAPI Attribute
+		{
+			private:
+				Attribute	*nextAttribute;
+				Attribute	*prevAttribute;
 
-		SMOOTHXMLNode		*parentNode;
+				Node		*parentNode;
 
-		SMOOTHInt		 attributeID;
-		SMOOTHString		 name;
-		SMOOTHString		 content;
-	public:
-					 SMOOTHXMLAttribute();
-					~SMOOTHXMLAttribute();
+				Int		 attributeID;
+				String		 name;
+				String		 content;
+			public:
+						 Attribute();
+						~Attribute();
 
-		SMOOTHXMLNode		*GetParentNode();
-		SMOOTHInt		 SetParentNode(SMOOTHXMLNode *);
+				Node		*GetParentNode();
+				Int		 SetParentNode(Node *);
 
-		SMOOTHInt		 GetAttributeID();
-		SMOOTHInt		 SetAttributeID(SMOOTHInt);
+				Int		 GetAttributeID();
+				Int		 SetAttributeID(Int);
 
-		SMOOTHXMLAttribute	*GetNextAttribute();
-		SMOOTHXMLAttribute	*GetPrevAttribute();
+				Attribute	*GetNextAttribute();
+				Attribute	*GetPrevAttribute();
 
-		SMOOTHInt		 SetNextAttribute(SMOOTHXMLAttribute *);
-		SMOOTHInt		 SetPrevAttribute(SMOOTHXMLAttribute *);
+				Int		 SetNextAttribute(Attribute *);
+				Int		 SetPrevAttribute(Attribute *);
 
-		SMOOTHString		 GetName();
-		SMOOTHInt		 SetName(SMOOTHString);
+				String		 GetName();
+				Int		 SetName(String);
 
-		SMOOTHString		 GetContent();
-		SMOOTHInt		 SetContent(SMOOTHString);
+				String		 GetContent();
+				Int		 SetContent(String);
+		};
+	};
 };
 
 #endif

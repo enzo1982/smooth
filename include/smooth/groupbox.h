@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,26 +11,30 @@
 #ifndef _H_OBJSMOOTH_GROUPBOX_
 #define _H_OBJSMOOTH_GROUPBOX_
 
-#define SGroupBox SMOOTHGroupBox
-
-class SMOOTHGroupBox;
+namespace smooth
+{
+	class GroupBox;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHGroupBox : public SMOOTHObject
+namespace smooth
 {
-	public:
-					 SMOOTHGroupBox(SMOOTHString, SMOOTHPoint, SMOOTHSize);
-					~SMOOTHGroupBox();
+	class SMOOTHAPI GroupBox : public Object
+	{
+		public:
+					 GroupBox(String, Point, Size);
+					~GroupBox();
 
-		virtual SMOOTHInt	 Paint(SMOOTHInt);
+			virtual Int	 Paint(Int);
 
-		SMOOTHInt		 Activate();
-		SMOOTHInt		 Deactivate();
+			Int		 Activate();
+			Int		 Deactivate();
 
-		SMOOTHInt		 Hide();
+			Int		 Hide();
+	};
+
+	SMOOTHVAR Int OBJ_GROUPBOX;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_GROUPBOX;
 
 #endif

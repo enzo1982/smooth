@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -7,9 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#ifndef __OBJSMOOTH_MESSAGEBOX_
-#define __OBJSMOOTH_MESSAGEBOX_
 
 #include <smooth/messagebox.h>
 #include <smooth/array.h>
@@ -22,47 +19,51 @@
 #include <smooth/titlebar.h>
 #include <smooth/layer.h>
 #include <smooth/metrics.h>
-#include <smooth/mathtools.h>
+#include <smooth/math.h>
 #include <smooth/objectproperties.h>
 
-int SMOOTHMessageBoxApp::nOfMessageBoxes = 0;
+#if defined MessageBox
+#undef MessageBox
+#endif
 
-SMOOTHInt SMOOTH::MessageBox(SMOOTHString text, SMOOTHString title, SMOOTHInt buttons, char *icon)
+int S::MessageBoxApp::nOfMessageBoxes = 0;
+
+S::Int S::SMOOTH::MessageBox(String text, String title, Int buttons, char *icon)
 {
-	SMOOTHInt		 rVal;
-	SMOOTHMessageBoxApp	*app = new SMOOTHMessageBoxApp(text, title, buttons, (wchar_t *) icon);
+	Int		 rVal;
+	MessageBoxApp	*app = new MessageBoxApp(text, title, buttons, (wchar_t *) icon);
 
 	rVal = app->ShowMessageBox();
 
-	SMOOTH::DeleteObject(app);
+	DeleteObject(app);
 
 	return rVal;
 }
 
-SMOOTHInt SMOOTH::MessageBox(SMOOTHString text, SMOOTHString title, SMOOTHInt buttons, wchar_t *icon)
+S::Int S::SMOOTH::MessageBox(String text, String title, Int buttons, wchar_t *icon)
 {
-	SMOOTHInt		 rVal;
-	SMOOTHMessageBoxApp	*app = new SMOOTHMessageBoxApp(text, title, buttons, icon);
+	Int		 rVal;
+	MessageBoxApp	*app = new MessageBoxApp(text, title, buttons, icon);
 
 	rVal = app->ShowMessageBox();
 
-	SMOOTH::DeleteObject(app);
+	DeleteObject(app);
 
 	return rVal;
 }
 
-SMOOTHMessageBoxApp::SMOOTHMessageBoxApp(SMOOTHString text, SMOOTHString title, int btns, wchar_t *icon)
+S::MessageBoxApp::MessageBoxApp(String text, String title, int btns, wchar_t *icon)
 {
 	msgicon = icon;
 
 	Create(text, title, btns);
 }
 
-void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns)
+void S::MessageBoxApp::Create(String text, String title, int btns)
 {
-	msgbox		= new SMOOTHWindow(title);
-	titlebar	= new SMOOTHTitlebar(false, false, true);
-	lay		= new SMOOTHLayer();
+	msgbox		= new Window(title);
+	titlebar	= new Titlebar(false, false, true);
+	lay		= new Layer();
 	okbutton	= NIL;
 	yesbutton	= NIL;
 	nobutton	= NIL;
@@ -72,16 +73,16 @@ void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns
 	ignorebutton	= NIL;
 	buttons		= btns;
 
-	int		 actpos = 0;
-	int		 thissize = 0;
-	int		 maxsize = 0;
-	HDC		 dc = GetContext(NIL);
-	SMOOTHPoint	 bpos;
-	SMOOTHSize	 bsize;
-	int		 titlesize = 0;
-	double		 oldmeasurement;
-	SMOOTHInt	 buttonWidth = roundtoint(80 * SMOOTH::Setup::FontSize);
-	SMOOTHInt	 buttonHeight = roundtoint(22 * SMOOTH::Setup::FontSize);
+	int	 actpos = 0;
+	int	 thissize = 0;
+	int	 maxsize = 0;
+	HDC	 dc = GetContext(NIL);
+	Point	 bpos;
+	Size	 bsize;
+	int	 titlesize = 0;
+	double	 oldmeasurement;
+	Int	 buttonWidth = Math::Round(80 * SMOOTH::Setup::FontSize);
+	Int	 buttonHeight = Math::Round(22 * SMOOTH::Setup::FontSize);
 
 	lines = 1;
 	msgbox->GetObjectProperties()->size.cx = 0;
@@ -144,8 +145,8 @@ void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns
 	msgbox->RegisterObject(titlebar);
 	msgbox->RegisterObject(lay);
 
-	msgbox->SetPaintProc(SMOOTHProc(SMOOTHMessageBoxApp, this, MessagePaintProc));
-	msgbox->SetKillProc(SMOOTHKillProc(SMOOTHMessageBoxApp, this, MessageKillProc));
+	msgbox->SetPaintProc(Proc(MessageBoxApp, this, MessagePaintProc));
+	msgbox->SetKillProc(KillProc(MessageBoxApp, this, MessageKillProc));
 
 	bpos.y = 14 + buttonHeight;
 	bsize.cy = 0;
@@ -153,7 +154,7 @@ void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns
 
 	oldmeasurement = SMOOTH::Setup::FontSize;
 
-	SMOOTHSetMeasurement(SMT_PIXELS);
+	SetMeasurement(SMT_PIXELS);
 
 	switch (buttons)
 	{
@@ -162,17 +163,17 @@ void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns
 		case MB_OK:
 			if (msgbox->GetObjectProperties()->size.cx < (buttonWidth + 30)) msgbox->GetObjectProperties()->size.cx = buttonWidth + 30;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - buttonWidth) / 2 - 3;
-			okbutton = new SMOOTHButton(TXT_OK, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageOK));
+			okbutton = new Button(TXT_OK, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageOK));
 			okbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(okbutton);
 			break;
 		case MB_OKCANCEL:
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
-			okbutton = new SMOOTHButton(TXT_OK, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageOK));
+			okbutton = new Button(TXT_OK, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageOK));
 			okbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			cancelbutton = new SMOOTHButton(TXT_CANCEL, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageCancel));
+			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageCancel));
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(okbutton);
 			lay->RegisterObject(cancelbutton);
@@ -180,10 +181,10 @@ void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns
 		case MB_YESNO:
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
-			yesbutton = new SMOOTHButton(TXT_YES, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageYes));
+			yesbutton = new Button(TXT_YES, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageYes));
 			yesbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			nobutton = new SMOOTHButton(TXT_NO, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageNo));
+			nobutton = new Button(TXT_NO, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageNo));
 			nobutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(yesbutton);
 			lay->RegisterObject(nobutton);
@@ -191,13 +192,13 @@ void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns
 		case MB_YESNOCANCEL:
 			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
-			yesbutton = new SMOOTHButton(TXT_YES, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageYes));
+			yesbutton = new Button(TXT_YES, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageYes));
 			yesbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			nobutton = new SMOOTHButton(TXT_NO, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageNo));
+			nobutton = new Button(TXT_NO, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageNo));
 			nobutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			cancelbutton = new SMOOTHButton(TXT_CANCEL, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageCancel));
+			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageCancel));
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(yesbutton);
 			lay->RegisterObject(nobutton);
@@ -206,10 +207,10 @@ void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns
 		case MB_RETRYCANCEL:
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
-			retrybutton = new SMOOTHButton(TXT_RETRY, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageRetry));
+			retrybutton = new Button(TXT_RETRY, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageRetry));
 			retrybutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			cancelbutton = new SMOOTHButton(TXT_CANCEL, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageCancel));
+			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageCancel));
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(retrybutton);
 			lay->RegisterObject(cancelbutton);
@@ -217,13 +218,13 @@ void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns
 		case MB_ABORTRETRYIGNORE:
 			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
-			abortbutton = new SMOOTHButton(TXT_ABORT, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageAbort));
+			abortbutton = new Button(TXT_ABORT, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageAbort));
 			abortbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			retrybutton = new SMOOTHButton(TXT_RETRY, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageRetry));
+			retrybutton = new Button(TXT_RETRY, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageRetry));
 			retrybutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			ignorebutton = new SMOOTHButton(TXT_IGNORE, NIL, bpos, bsize, SMOOTHProc(SMOOTHMessageBoxApp, this, MessageIgnore));
+			ignorebutton = new Button(TXT_IGNORE, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageIgnore));
 			ignorebutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(abortbutton);
 			lay->RegisterObject(retrybutton);
@@ -240,7 +241,7 @@ void SMOOTHMessageBoxApp::Create(SMOOTHString text, SMOOTHString title, int btns
 	FreeContext(NIL, dc);
 }
 
-SMOOTHMessageBoxApp::~SMOOTHMessageBoxApp()
+S::MessageBoxApp::~MessageBoxApp()
 {
 	switch (buttons)
 	{
@@ -249,23 +250,23 @@ SMOOTHMessageBoxApp::~SMOOTHMessageBoxApp()
 		case MB_OK:
 			lay->UnregisterObject(okbutton);
 
-			SMOOTH::DeleteObject(okbutton);
+			DeleteObject(okbutton);
 
 			break;
 		case MB_OKCANCEL:
 			lay->UnregisterObject(okbutton);
 			lay->UnregisterObject(cancelbutton);
 
-			SMOOTH::DeleteObject(okbutton);
-			SMOOTH::DeleteObject(cancelbutton);
+			DeleteObject(okbutton);
+			DeleteObject(cancelbutton);
 
 			break;
 		case MB_YESNO:
 			lay->UnregisterObject(yesbutton);
 			lay->UnregisterObject(nobutton);
 
-			SMOOTH::DeleteObject(yesbutton);
-			SMOOTH::DeleteObject(nobutton);
+			DeleteObject(yesbutton);
+			DeleteObject(nobutton);
 
 			break;
 		case MB_YESNOCANCEL:
@@ -273,17 +274,17 @@ SMOOTHMessageBoxApp::~SMOOTHMessageBoxApp()
 			lay->UnregisterObject(nobutton);
 			lay->UnregisterObject(cancelbutton);
 
-			SMOOTH::DeleteObject(yesbutton);
-			SMOOTH::DeleteObject(nobutton);
-			SMOOTH::DeleteObject(cancelbutton);
+			DeleteObject(yesbutton);
+			DeleteObject(nobutton);
+			DeleteObject(cancelbutton);
 
 			break;
 		case MB_RETRYCANCEL:
 			lay->UnregisterObject(retrybutton);
 			lay->UnregisterObject(cancelbutton);
 
-			SMOOTH::DeleteObject(retrybutton);
-			SMOOTH::DeleteObject(cancelbutton);
+			DeleteObject(retrybutton);
+			DeleteObject(cancelbutton);
 
 			break;
 		case MB_ABORTRETRYIGNORE:
@@ -291,9 +292,9 @@ SMOOTHMessageBoxApp::~SMOOTHMessageBoxApp()
 			lay->UnregisterObject(retrybutton);
 			lay->UnregisterObject(ignorebutton);
 
-			SMOOTH::DeleteObject(abortbutton);
-			SMOOTH::DeleteObject(retrybutton);
-			SMOOTH::DeleteObject(ignorebutton);
+			DeleteObject(abortbutton);
+			DeleteObject(retrybutton);
+			DeleteObject(ignorebutton);
 
 			break;
 #endif
@@ -304,12 +305,12 @@ SMOOTHMessageBoxApp::~SMOOTHMessageBoxApp()
 
 	UnregisterObject(msgbox);
 
-	SMOOTH::DeleteObject(lay);
-	SMOOTH::DeleteObject(titlebar);
-	SMOOTH::DeleteObject(msgbox);
+	DeleteObject(lay);
+	DeleteObject(titlebar);
+	DeleteObject(msgbox);
 }
 
-int SMOOTHMessageBoxApp::ShowMessageBox()
+int S::MessageBoxApp::ShowMessageBox()
 {
 	int	 rval;
 
@@ -324,10 +325,10 @@ int SMOOTHMessageBoxApp::ShowMessageBox()
 	return rval;
 }
 
-void SMOOTHMessageBoxApp::MessagePaintProc()
+void S::MessageBoxApp::MessagePaintProc()
 {
-	HDC		 dc = GetContext(msgbox);
-	SMOOTHRect	 txtrect;
+	HDC	 dc = GetContext(msgbox);
+	Rect	 txtrect;
 
 	txtrect.left = 17;
 	txtrect.top = 47;
@@ -373,78 +374,53 @@ void SMOOTHMessageBoxApp::MessagePaintProc()
 	FreeContext(msgbox, dc);
 }
 
-bool SMOOTHMessageBoxApp::MessageKillProc()
+bool S::MessageBoxApp::MessageKillProc()
 {
-#ifdef __WIN32__
 	if (msgbox->value == 0) msgbox->value = IDCLOSE;
-#endif
 
 	nOfMessageBoxes--;
 
 	return true;
 }
 
-void SMOOTHMessageBoxApp::MessageOK()
+void S::MessageBoxApp::MessageOK()
 {
-#ifdef __WIN32__
 	msgbox->value = IDOK;
-#endif
-
-	SMOOTH::CloseWindow(msgbox);
+	msgbox->Close();
 }
 
-void SMOOTHMessageBoxApp::MessageCancel()
+void S::MessageBoxApp::MessageCancel()
 {
-#ifdef __WIN32__
 	msgbox->value = IDCANCEL;
-#endif
-
-	SMOOTH::CloseWindow(msgbox);
+	msgbox->Close();
 }
 
-void SMOOTHMessageBoxApp::MessageYes()
+void S::MessageBoxApp::MessageYes()
 {
-#ifdef __WIN32__
 	msgbox->value = IDYES;
-#endif
-
-	SMOOTH::CloseWindow(msgbox);
+	msgbox->Close();
 }
 
-void SMOOTHMessageBoxApp::MessageNo()
+void S::MessageBoxApp::MessageNo()
 {
-#ifdef __WIN32__
 	msgbox->value = IDNO;
-#endif
-
-	SMOOTH::CloseWindow(msgbox);
+	msgbox->Close();
 }
 
-void SMOOTHMessageBoxApp::MessageRetry()
+void S::MessageBoxApp::MessageRetry()
 {
-#ifdef __WIN32__
 	msgbox->value = IDRETRY;
-#endif
-
-	SMOOTH::CloseWindow(msgbox);
+	msgbox->Close();
 }
 
-void SMOOTHMessageBoxApp::MessageAbort()
+void S::MessageBoxApp::MessageAbort()
 {
-#ifdef __WIN32__
 	msgbox->value = IDABORT;
-#endif
-
-	SMOOTH::CloseWindow(msgbox);
+	msgbox->Close();
 }
 
-void SMOOTHMessageBoxApp::MessageIgnore()
+void S::MessageBoxApp::MessageIgnore()
 {
-#ifdef __WIN32__
 	msgbox->value = IDIGNORE;
-#endif
-
-	SMOOTH::CloseWindow(msgbox);
+	msgbox->Close();
 }
-
-#endif

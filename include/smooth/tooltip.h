@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,35 +11,39 @@
 #ifndef _H_OBJSMOOTH_TOOLTIP_
 #define _H_OBJSMOOTH_TOOLTIP_
 
-#define STooltip SMOOTHTooltip
-
-class SMOOTHTooltip;
-class SMOOTHTimer;
-class SMOOTHToolWindow;
+namespace smooth
+{
+	class Tooltip;
+	class Timer;
+	class ToolWindow;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHTooltip : public SMOOTHObject
+namespace smooth
 {
-	private:
-		SMOOTHToolWindow	*toolWindow;
-		SMOOTHTimer		*timer;
+	class SMOOTHAPI Tooltip : public Object
+	{
+		private:
+			ToolWindow	*toolWindow;
+			Timer		*timer;
 
-		SMOOTHVoid		 TimerProc();
-	protected:
-		SMOOTHInt		 timeOut;
-	public:
-					 SMOOTHTooltip();
-					~SMOOTHTooltip();
+			Void		 TimerProc();
+		protected:
+			Int		 timeOut;
+		public:
+					 Tooltip();
+					~Tooltip();
 
-		SMOOTHInt		 Process(SMOOTHInt, SMOOTHInt, SMOOTHInt);
+			Int		 Process(Int, Int, Int);
 
-		SMOOTHInt		 Show();
-		SMOOTHInt		 Hide();
+			Int		 Show();
+			Int		 Hide();
 
-		SMOOTHInt		 SetTimeout(SMOOTHInt);
+			Int		 SetTimeout(Int);
+	};
+
+	SMOOTHVAR Int OBJ_TOOLTIP;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_TOOLTIP;
 
 #endif

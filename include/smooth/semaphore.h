@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,24 +11,28 @@
 #ifndef _H_OBJSMOOTH_SEMAPHORE_
 #define _H_OBJSMOOTH_SEMAPHORE_
 
-#define SSemaphore SMOOTHSemaphore
-
-class SMOOTHSemaphore;
+namespace smooth
+{
+	class Semaphore;
+};
 
 #include "object.h"
 
-class SMOOTHAPI SMOOTHSemaphore : public SMOOTHObject
+namespace smooth
 {
-	private:
-		LiSASemaphore	*semaphore;
-	public:
-				 SMOOTHSemaphore();
-				~SMOOTHSemaphore();
+	class SMOOTHAPI Semaphore : public Object
+	{
+		private:
+			LiSASemaphore	*semaphore;
+		public:
+					 Semaphore();
+					~Semaphore();
 
-		SMOOTHInt	 Wait();
-		SMOOTHInt	 Release();
+			Int		 Wait();
+			Int		 Release();
+	};
+
+	SMOOTHVAR Int OBJ_SEMAPHORE;
 };
-
-SMOOTHVAR SMOOTHInt OBJ_SEMAPHORE;
 
 #endif

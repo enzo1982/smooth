@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,8 +11,9 @@
 #ifndef _H_OBJSMOOTH_VOID_
 #define _H_OBJSMOOTH_VOID_
 
-#define SVoid SMOOTHVoid
-
-typedef void SMOOTHVoid;
+namespace smooth
+{
+	typedef void Void;
+};
 
 #endif

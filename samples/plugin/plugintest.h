@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,20 +11,22 @@
 #ifndef _H_PLUGINTEST_
 #define _H_PLUGINTEST_
 
-#include <smoothx.h>
+#include <smooth.h>
 #include "plugin.h"
 
-class PlugInTest : public SApplication
+using namespace smooth;
+
+class PlugInTest : public Application
 {
 	private:
-		SWindow			*wnd;
-		SLayer			*layer;
-		STitlebar		*title;
-		SActiveAreaPlugin	*activearea;
+		Window			*wnd;
+		Layer			*layer;
+		Titlebar		*title;
+		ActiveAreaPlugin	*activearea;
 	public:
 					 PlugInTest();
 					~PlugInTest();
-		SVoid			 activeAreaProc();
+		Void			 activeAreaProc();
 };
 
 #endif

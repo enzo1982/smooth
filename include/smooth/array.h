@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -16,7 +16,7 @@
 #define ARRAY_NULLPOINTER	(0)
 #else
 #define ARRAY_NULLVALUE		((t)				0)
-#define ARRAY_NULLPOINTER	((SMOOTHArray_Entry<t> *)	0)
+#define ARRAY_NULLPOINTER	((smooth::Array_Entry<t> *)	0)
 #endif
 
 #include "templates/array/value.h"

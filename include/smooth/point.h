@@ -1,5 +1,5 @@
- /* The SMOOTH Windowing Toolkit
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the "Artistic License".
@@ -11,23 +11,27 @@
 #ifndef _H_OBJSMOOTH_POINT_
 #define _H_OBJSMOOTH_POINT_
 
-#define SPoint SMOOTHPoint
-
-class SMOOTHPoint;
+namespace smooth
+{
+	class Point;
+};
 
 #include "primitive.h"
 
-class SMOOTHAPI SMOOTHPoint : public SMOOTHPrimitive
+namespace smooth
 {
-	public:
+	class SMOOTHAPI Point : public Primitive
+	{
+		public:
 #ifdef __WIN32__
-		operator		 POINT();
-		SMOOTHPoint &operator	 =(const POINT);
+			operator	 POINT();
+			Point &operator	 =(const POINT);
 #endif
-		SMOOTHInt		 x;
-		SMOOTHInt		 y;
-					 SMOOTHPoint();
-					 SMOOTHPoint(SMOOTHInt, SMOOTHInt);
+			Int		 x;
+			Int		 y;
+					 Point();
+					 Point(Int, Int);
+	};
 };
 
 #endif

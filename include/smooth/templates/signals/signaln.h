@@ -23,16 +23,12 @@ namespace smooth
 				instances.AddEntry(new SIGNALS_INSTANCE_CLASS_NAME<ct, rrt SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(inst));
 				methods.AddEntry(new MethodT<rrt (ct::*)(SIGNALS_ARGUMENT_TYPES)>(proc));
 
-				nOfMethods++;
-
 				return Success;
 			}
 
 			template <class rrt> Int Connect(rrt (*proc)(SIGNALS_ARGUMENT_TYPES))
 			{
 				functions.AddEntry((Void (*)()) proc);
-
-				nOfFunctions++;
 
 				return Success;
 			}
@@ -43,8 +39,6 @@ namespace smooth
 
 				sigs.AddEntry(sig);
 
-				nOfSignals++;
-
 				return Success;
 			}
 
@@ -53,7 +47,7 @@ namespace smooth
 				SIGNALS_INSTANCE_CLASS_NAME<ct, rrt SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	*instance = new SIGNALS_INSTANCE_CLASS_NAME<ct, rrt SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(inst);
 				MethodT<rrt (ct::*)(SIGNALS_ARGUMENT_TYPES)>						*method = new MethodT<rrt (ct::*)(SIGNALS_ARGUMENT_TYPES)>(proc);
 
-				for (Int i = 0; i < nOfMethods; i++)
+				for (Int i = 0; i < methods.GetNOfEntries(); i++)
 				{
 					if (*instances.GetNthEntry(i) == *instance && *methods.GetNthEntry(i) == *method)
 					{
@@ -62,8 +56,6 @@ namespace smooth
 
 						instances.DeleteEntry(instances.GetNthEntryIndex(i));
 						methods.DeleteEntry(methods.GetNthEntryIndex(i));
-
-						nOfMethods--;
 
 						break;
 					}
@@ -77,13 +69,11 @@ namespace smooth
 
 			template <class rrt> Int Disconnect(rrt (*proc)(SIGNALS_ARGUMENT_TYPES))
 			{
-				for (Int i = 0; i < nOfFunctions; i++)
+				for (Int i = 0; i < functions.GetNOfEntries(); i++)
 				{
 					if (functions.GetNthEntry(i) == (Void (*)()) proc)
 					{
 						functions.DeleteEntry(functions.GetNthEntryIndex(i));
-
-						nOfFunctions--;
 
 						break;
 					}
@@ -94,13 +84,11 @@ namespace smooth
 
 			Int Disconnect(SIGNALS_SIGNAL_CLASS_NAME *sig)
 			{
-				for (Int i = 0; i < nOfSignals; i++)
+				for (Int i = 0; i < sigs.GetNOfEntries(); i++)
 				{
 					if (sigs.GetNthEntry(i) == sig)
 					{
 						sigs.DeleteEntry(sigs.GetNthEntryIndex(i));
-
-						nOfSignals--;
 
 						break;
 					}
@@ -111,17 +99,17 @@ namespace smooth
 
 			Void Emit(SIGNALS_ARGUMENT_PARAMETER_LIST)
 			{
-				for (Int i = 0; i < nOfMethods; i++)
+				for (Int i = 0; i < methods.GetNOfEntries(); i++)
 				{
 					instances.GetNthEntry(i)->Call(methods.GetNthEntry(i) SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_INV_PARAMETERS);
 				}
 
-				for (Int j = 0; j < nOfFunctions; j++)
+				for (Int j = 0; j < functions.GetNOfEntries(); j++)
 				{
 					((Void (*)(SIGNALS_ARGUMENT_TYPES)) functions.GetNthEntry(j))(SIGNALS_ARGUMENT_PARAMETERS);
 				}
 
-				for (Int k = 0; k < nOfSignals; k++)
+				for (Int k = 0; k < sigs.GetNOfEntries(); k++)
 				{
 					((SIGNALS_SIGNAL_CLASS_NAME *) sigs.GetNthEntry(k))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
 				}

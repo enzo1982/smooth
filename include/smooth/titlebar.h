@@ -39,11 +39,9 @@ namespace smooth
 				Bool		 maxclk;
 				Bool		 closechk;
 				Bool		 closeclk;
-				Rect		 nonmaxrect;
 				Bool		 min;
 				Bool		 max;
 				Bool		 close;
-				Int		 origwndstyle;
 			public:
 						 Titlebar(Bool, Bool, Bool);
 			 			~Titlebar();

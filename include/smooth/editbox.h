@@ -29,9 +29,6 @@ namespace smooth
 	{
 		const Int EDB_ALPHANUMERIC	= 0;
 		const Int EDB_NUMERIC		= 1;
-		const Int EDB_MULTILINE		= 2;
-		const Int EDB_HSCROLL		= 4;
-		const Int EDB_VSCROLL		= 8;
 		const Int EDB_ASTERISK		= 16;
 
 		class SMOOTHAPI EditBox : public Widget
@@ -40,25 +37,13 @@ namespace smooth
 				Timer		*timer;
 
 				Void		 TimerProc();
-
-				Int		 CountLines();
-				String		 GetLine(Int);
 			protected:
-				Int		 promptPos;	// the current position of the cursor in the whole text
-				Int		 linePromptPos;	// the current cursor position in the active line
-				Int		 currLine;	// the current line (1st line = 0)
+				Int		 promptPos;
 				Bool		 promptVisible;
 				Int		 markStart;
 				Int		 markEnd;
-				Int		 leftCut;	// how much text of the current line is invisible
-				String		 lcText;	// the invisible text
-				String		 visText;	// the visible text of the current line
-				Bool		 isRight;
-				Bool		 isLeft;
 				Bool		 isAsterisk;
 				Int		 maxSize;
-				Int		 nOfLines;	// the number of lines
-				Array<String>	 lines;
 			public:
 						 EditBox(String, Point, Size, Int, Int);
 						~EditBox();

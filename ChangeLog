@@ -13,6 +13,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 			- new method: Close()
 			- new method: IsMouseOn(Rect)
 			- new methods: MouseX(), MouseY()
+			- new methods: Maximize(), Restore()
 - stk.cpp		- removed function CloseWindow(Window *)
 			- removed class Setup
 - colordlg.cpp		- color box now updates when the vertical hue selector is moved

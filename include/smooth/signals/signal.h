@@ -23,36 +23,25 @@ namespace smooth
 			Array<Instance *>	instances;
 			Array<Void (*)()>	functions;
 			Array<Signal *>		sigs;
-
-			Int	 nOfMethods;
-			Int	 nOfFunctions;
-			Int	 nOfSignals;
 		public:
 			Signal()
 			{
-				nOfMethods = 0;
-				nOfFunctions = 0;
-				nOfSignals = 0;
 			}
 
 			Signal(const Signal &oSignal)
 			{
-				nOfMethods = oSignal.nOfMethods;
-				nOfFunctions = oSignal.nOfFunctions;
-				nOfSignals = oSignal.nOfSignals;
-
-				for (int i = 0; i < nOfMethods; i++)
+				for (int i = 0; i < Array<Method *>::GetNOfEntries(&oSignal.methods); i++)
 				{
 					methods.AddEntry(Array<Method *>::GetNthEntry(&oSignal.methods, i)->Copy());
 					instances.AddEntry(Array<Instance *>::GetNthEntry(&oSignal.instances, i)->Copy());
 				}
 
-				for (int j = 0; j < nOfFunctions; j++)
+				for (int j = 0; j < Array<Void (*)()>::GetNOfEntries(&oSignal.functions); j++)
 				{
 					functions.AddEntry(Array<Void (*)()>::GetNthEntry(&oSignal.functions, j));
 				}
 
-				for (int k= 0; k < nOfSignals; k++)
+				for (int k= 0; k < Array<Signal *>::GetNOfEntries(&oSignal.sigs); k++)
 				{
 					sigs.AddEntry(Array<Signal *>::GetNthEntry(&oSignal.sigs, k));
 				}
@@ -65,7 +54,7 @@ namespace smooth
 
 			Int DisconnectAll()
 			{
-				for (Int i = 0; i < nOfMethods; i++)
+				for (Int i = 0; i < methods.GetNOfEntries(); i++)
 				{
 					delete instances.GetNthEntry(i);
 					delete methods.GetNthEntry(i);
@@ -76,16 +65,12 @@ namespace smooth
 				functions.DeleteAll();
 				sigs.DeleteAll();
 
-				nOfMethods = 0;
-				nOfFunctions = 0;
-				nOfSignals = 0;
-
 				return Success;
 			}
 
 			Int GetNOfConnectedSlots()
 			{
-				return nOfMethods + nOfFunctions + nOfSignals;
+				return methods.GetNOfEntries() + functions.GetNOfEntries() + sigs.GetNOfEntries();
 			}
 	};
 };

@@ -257,38 +257,8 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDBLCLK:
 			if (max && wnd->IsMouseOn(titleFrame) && !wnd->IsMouseOn(tButtonRect))
 			{
-				if (wnd->maximized)
-				{
-					SetWindowPos(wnd->hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right-nonmaxrect.left, nonmaxrect.bottom-nonmaxrect.top, 0);
-					wnd->maximized = False;
-
-					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, origwndstyle);
-					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, origwndstyle);
-				}
-				else
-				{
-					{
-						RECT	 rect;
-
-						if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-						else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
-
-						workArea = rect;
-
-						GetWindowRect(wnd->hwnd, &rect);
-
-						nonmaxrect = rect;
-					}
-
-					SetWindowPos(wnd->hwnd, 0, workArea.left - 2, workArea.top - 2, workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4, 0);
-					wnd->maximized = True;
-
-					if (Setup::enableUnicode)	origwndstyle = GetWindowLongW(wnd->hwnd, GWL_STYLE);
-					else				origwndstyle = GetWindowLongA(wnd->hwnd, GWL_STYLE);
-
-					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-				}
+				if (wnd->IsMaximized())	wnd->Restore();
+				else			wnd->Maximize();
 
 				retVal = Break;
 			}
@@ -413,38 +383,8 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			{
 				maxclk = False;
 
-				if (wnd->maximized)
-				{
-					SetWindowPos(wnd->hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right - nonmaxrect.left, nonmaxrect.bottom - nonmaxrect.top, 0);
-					wnd->maximized = False;
-
-					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, origwndstyle);
-					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, origwndstyle);
-				}
-				else
-				{
-					{
-						RECT rect;
-
-						if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-						else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
-
-						workArea = rect;
-
-						GetWindowRect(wnd->hwnd, &rect);
-
-						nonmaxrect = rect;
-					}
-
-					SetWindowPos(wnd->hwnd, 0, workArea.left - 2, workArea.top - 2, workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4, 0);
-					wnd->maximized = True;
-
-					if (Setup::enableUnicode)	origwndstyle = GetWindowLongW(wnd->hwnd, GWL_STYLE);
-					else				origwndstyle = GetWindowLongA(wnd->hwnd, GWL_STYLE);
-
-					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-				}
+				if (wnd->IsMaximized())	wnd->Restore();
+				else			wnd->Maximize();
 			}
 			if (closeclk)
 			{

@@ -383,19 +383,21 @@ S::Int S::GUI::Window::Show()
 {
 	if (!created) Create();
 
-	initshow	= True;
-	visible		= True;
-
-#ifdef __WIN32__
 	ShowWindow(hwnd, SW_SHOW);
-#endif
 
 	if (apptopmost || modal || sysmodal || type == OBJ_TOOLWINDOW)
 	{
-#ifdef __WIN32__
 		SetWindowPos(hwnd, HWND_TOPMOST, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE|SWP_SHOWWINDOW);
-#endif
 	}
+
+	if (maximized && !initshow)
+	{
+		maximized = False;
+		Maximize();
+	}
+
+	initshow	= True;
+	visible		= True;
 
 	return Success;
 }
@@ -404,13 +406,76 @@ S::Int S::GUI::Window::Hide()
 {
 	if (!created) Create();
 
-	initshow = True;
-
-	visible = False;
-
-#ifdef __WIN32__
 	ShowWindow(hwnd, SW_HIDE);
-#endif
+
+	if (maximized && !initshow)
+	{
+		maximized = False;
+		Maximize();
+	}
+
+	initshow	= True;
+	visible		= False;
+
+	return Success;
+}
+
+S::Int S::GUI::Window::Maximize()
+{
+	if (maximized) return Success;
+
+	if (!created)
+	{
+		maximized = True;
+
+		return Success;
+	}
+
+	Rect	 workArea;
+
+	{
+		RECT rect;
+
+		if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
+		else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
+
+		workArea = rect;
+
+		::GetWindowRect(hwnd, &rect);
+
+		nonmaxrect = rect;
+	}
+
+	SetWindowPos(hwnd, 0, workArea.left - 2, workArea.top - 2, workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4, 0);
+
+	maximized = True;
+
+	if (Setup::enableUnicode)	origwndstyle = GetWindowLongW(hwnd, GWL_STYLE);
+	else				origwndstyle = GetWindowLongA(hwnd, GWL_STYLE);
+
+	if (Setup::enableUnicode)	SetWindowLongW(hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+	else				SetWindowLongA(hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+
+	return Success;
+}
+
+S::Int S::GUI::Window::Restore()
+{
+	if (!maximized) return Success;
+
+	if (!created)
+	{
+		maximized = False;
+
+		return Success;
+	}
+
+	SetWindowPos(hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right - nonmaxrect.left, nonmaxrect.bottom - nonmaxrect.top, 0);
+
+	maximized = False;
+
+	if (Setup::enableUnicode)	SetWindowLongW(hwnd, GWL_STYLE, origwndstyle);
+	else				SetWindowLongA(hwnd, GWL_STYLE, origwndstyle);
 
 	return Success;
 }
@@ -420,6 +485,12 @@ S::Bool S::GUI::Window::IsMaximized()
 	if (!created) return False;
 
 	return maximized;
+}
+
+S::Rect S::GUI::Window::GetWindowRect()
+{
+	if (maximized)	return nonmaxrect;
+	else		return Rect(objectProperties->pos, objectProperties->size);
 }
 
 S::Rect S::GUI::Window::GetUpdateRect()
@@ -479,9 +550,7 @@ S::Int S::GUI::Window::Stay()
 
 	SetStyle(SS_APPTOPMOST);
 
-#ifdef __WIN32__
 	MSG	 msg;
-#endif
 
 	if (!created)	Create();
 	if (!visible)	Show();
@@ -489,19 +558,16 @@ S::Int S::GUI::Window::Stay()
 	modal	= True;
 	stay	= True;
 
-#ifdef __WIN32__
 	if (Setup::enableUnicode)	SendMessageW(hwnd, WM_KILLFOCUS, 0, 0);
 	else				SendMessageA(hwnd, WM_KILLFOCUS, 0, 0);
 
 	if (Setup::enableUnicode)	SendMessageW(hwnd, WM_ACTIVATEAPP, 1, 0);
 	else				SendMessageA(hwnd, WM_ACTIVATEAPP, 1, 0);
-#endif
 
 	while (!destroyed)
 	{
 		if (peekLoop > 0)
 		{
-#ifdef __WIN32__
 			if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
 			else				PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
 
@@ -512,11 +578,9 @@ S::Int S::GUI::Window::Stay()
 
 			if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
 			else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
-#endif
 		}
 		else
 		{
-#ifdef __WIN32__
 			if (Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
 			else				GetMessageA(&msg, NIL, 0, 0);
 
@@ -524,13 +588,10 @@ S::Int S::GUI::Window::Stay()
 
 			if (Setup::enableUnicode)	DispatchMessageW(&msg);
 			else				DispatchMessageA(&msg);
-#endif
 		}
 	}
 
-#ifdef __WIN32__
 	if (nOfActiveWindows == 0 && !initializing) PostQuitMessage(0);
-#endif
 
 	return value;
 }
@@ -566,10 +627,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	Object	*object;
 
-#ifdef __WIN32__
 	PAINTSTRUCT	 ps;
 	WINDOWPOS	*wndpos;
-#endif
 
 	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);
 
@@ -636,7 +695,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
-#ifdef __WIN32__
 		case WM_NCDESTROY:
 			LeaveProtectedRegion();
 
@@ -856,7 +914,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				((LPMINMAXINFO) lParam)->ptMinTrackSize.y = minSize.cy;
 			}
 			break;
-#endif
 	}
 
 	for (i = nOfObjects - 1; i >= 0; i--)

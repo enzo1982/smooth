@@ -45,17 +45,12 @@ namespace smooth
 		const Int WO_NOSEPARATOR	= 2;
 
 #ifdef __SMOOTH_DLL__
-#ifdef __WIN32__
 		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-#endif
 #endif
 
 		class SMOOTHAPI Window : public Widget, public Container
 		{
-#ifdef __WIN32__
-			friend		LRESULT CALLBACK	 WindowProc(HWND, UINT, WPARAM, LPARAM);
-#endif
-
+			friend		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 			friend class	S::SMOOTH;
 			friend class	Menubar;
 			friend class	Client;
@@ -73,14 +68,14 @@ namespace smooth
 				Bool				 apptopmost;
 				Bool				 stay;
 				Bool				 maximized;
+				Rect				 nonmaxrect;
+				Int				 origwndstyle;
 
 				Bool				 created;
 				Bool				 destroyed;
 
-#ifdef __WIN32__
 				HBITMAP				 icon;
 				HICON				 sysicon;
-#endif
 
 				Rect				 offset;
 				Rect				 updateRect;
@@ -91,16 +86,11 @@ namespace smooth
 
 				PopupMenu			*popupMenu;
 
-#ifdef __WIN32__
 				HDC				 windowDC;
-#endif
 
 				Layer				*mainLayer;
 
-#ifdef __WIN32__
 				HWND				 Create();
-#endif
-
 				Void				 CalculateOffsets();
 
 				Bool				 DummyExitProc();
@@ -108,9 +98,7 @@ namespace smooth
 				static Int			 nOfActiveWindows;
 				Int				 value;
 
-#ifdef __WIN32__
 				HWND				 hwnd;
-#endif
 
 				Bool				 cursorset;
 				Bool				 initshow;
@@ -118,12 +106,9 @@ namespace smooth
 								 Window(String title = NIL);
 								~Window();
 
-#ifdef __WIN32__
 				Void				 SetPositionFlag(HWND);
 				Int				 SetIcon(HBITMAP);
 				Int				 SetApplicationIcon(HICON);
-#endif
-
 				Int				 SetApplicationIcon(Int);
 				Int				 SetMetrics(Point, Size);
 				Void				 SetStyle(Int);
@@ -132,6 +117,8 @@ namespace smooth
 
 				Int				 SetStatusText(String);
 				String				 GetStatusText();
+
+				Rect				 GetWindowRect();
 
 				Rect				 GetUpdateRect();
 				Int				 SetUpdateRect(Rect);
@@ -145,6 +132,8 @@ namespace smooth
 
 				Int				 Stay();
 
+				Int				 Maximize();
+				Int				 Restore();
 				Bool				 IsMaximized();
 
 				Int				 Paint(Int);

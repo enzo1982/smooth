@@ -38,7 +38,6 @@ namespace smooth
 			Int		 lastN;
 			Array_Entry<t>	*lastNthEntry;
 
-			Bool		 Cleanup(Array_Entry<t> *);
 			Bool		 IndexAvailable(Int);
 		public:
 					 Array();

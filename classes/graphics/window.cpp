@@ -495,22 +495,16 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		}
 	}
 
+	Int	 rVal = -1;
+
 	switch (message)
 	{
 		case WM_CLOSE:
-			if (doQuit.Call())
-			{
-				SetFlags((flags | WF_MODAL) ^ WF_MODAL);
-				SetFlags((flags | WF_SYSTEMMODAL) ^ WF_SYSTEMMODAL);
-				SetFlags((flags | WF_TOPMOST) ^ WF_TOPMOST);
-				SetFlags((flags | WF_APPTOPMOST) ^ WF_APPTOPMOST);
+			if (doQuit.Call()) backend->Close();
 
-				backend->Close();
-			}
+			rVal = 0;
 
-			LeaveProtectedRegion();
-
-			return 0;
+			break;
 		case WM_DESTROY:
 			destroyed = True;
 
@@ -524,9 +518,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				nOfActiveWindows--;
 			}
 
-			LeaveProtectedRegion();
+			rVal = 0;
 
-			return 0;
+			break;
 		case WM_QUIT:
 			destroyed = True;
 
@@ -565,9 +559,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			LeaveProtectedRegion();
+			rVal = 0;
 
-			return 0;
+			break;
 		case WM_WINDOWPOSCHANGED:
 			{
 				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
@@ -601,12 +595,15 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				{
 					Object	*object = mainObjectManager->GetNthObject(i);
 
-					if (object != NIL)
+					if (object == NIL) continue;
+
+					if (object->GetObjectType() == classID && object->handle > handle && (object->GetFlags() & WF_MODAL))
 					{
-						if (object->GetObjectType() == classID)
-						{
-							if (object->handle > handle && (object->GetFlags() & WF_MODAL)) SetActiveWindow((HWND) ((Window *) object)->GetSystemWindow());
-						}
+						SetActiveWindow((HWND) ((Window *) object)->GetSystemWindow());
+
+						rVal = 0;
+
+						break;
 					}
 				}
 			}
@@ -614,7 +611,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			break;
 		case WM_ACTIVATEAPP:
 		case WM_KILLFOCUS:
-			if (flags & WF_MODAL && (message == WM_ACTIVATEAPP || message == WM_KILLFOCUS))
+			if (flags & WF_MODAL)
 			{
 				Bool	 activate = False;
 				HWND	 actWnd = GetActiveWindow();
@@ -642,7 +639,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				else		SetWindowPos((HWND) backend->GetSystemWindow(), message == WM_KILLFOCUS ? HWND_NOTOPMOST : GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 			}
 
-			if (flags & WF_APPTOPMOST && (message == WM_ACTIVATEAPP || message == WM_KILLFOCUS))
+			if (flags & WF_APPTOPMOST)
 			{
 				Bool	 activate = False;
 				HWND	 actWnd = GetActiveWindow();
@@ -690,9 +687,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case SM_EXECUTEPEEK:
 			onPeek.Emit();
 
-			LeaveProtectedRegion();
+			rVal = 0;
 
-			return 0;
+			break;
 		case SM_RBUTTONDOWN:
 			{
 				Menu	*track = getTrackMenu.Call(MouseX(), MouseY());
@@ -708,35 +705,36 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 					RegisterObject(trackMenu);
 
-					LeaveProtectedRegion();
-
-					return 0;
+					rVal = 0;
 				}
 			}
 
 			break;
 	}
 
-	for (Int i = GetNOfObjects() - 1; i >= 0; i--)
+	if (rVal == -1)
 	{
-		Object	*object = assocObjects.GetNthEntry(i);
-
-		if (object == NIL) continue;
-
-		if (object->GetObjectType() == Widget::classID)
+		for (Int i = GetNOfObjects() - 1; i >= 0; i--)
 		{
-			if (((Widget *) object)->Process(message, wParam, lParam) == Break)
-			{
-				LeaveProtectedRegion();
+			Object	*object = assocObjects.GetNthEntry(i);
 
-				return 0;
+			if (object == NIL) continue;
+
+			if (object->GetObjectType() == Widget::classID)
+			{
+				if (((Widget *) object)->Process(message, wParam, lParam) == Break)
+				{
+					rVal = 0;
+
+					break;
+				}
 			}
 		}
 	}
 
 	LeaveProtectedRegion();
 
-	return -1;
+	return rVal;
 }
 
 S::Int S::GUI::Window::Paint(Int message)
@@ -1202,12 +1200,11 @@ S::GUI::Window *S::GUI::Window::GetWindow(Void *sysWindow)
 	{
 		Object	*window = mainObjectManager->GetNthObject(i);
 
-		if (window != NIL)
+		if (window == NIL) continue;
+
+		if (window->GetObjectType() == Window::classID || window->GetObjectType() == MDIWindow::classID || window->GetObjectType() == ToolWindow::classID)
 		{
-			if (window->GetObjectType() == Window::classID || window->GetObjectType() == MDIWindow::classID || window->GetObjectType() == ToolWindow::classID)
-			{
-				if (((Window *) window)->GetSystemWindow() == sysWindow) return (Window *) window;
-			}
+			if (((Window *) window)->GetSystemWindow() == sysWindow) return (Window *) window;
 		}
 	}
 

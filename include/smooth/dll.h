@@ -26,7 +26,8 @@ extern "C"
 		switch (reason)
 		{
 			case DLL_PROCESS_ATTACH:
-				hInstance	= shInstance;
+				if (hInstance == NIL) hInstance = shInstance;
+
 				hPrevInstance	= NULL;
 				iCmdShow	= SW_SHOW;
 

@@ -109,11 +109,13 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 
 	if (Setup::enableUnicode)	sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 	else				sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+
+	destroyIcon	= False;
 }
 
 S::GUI::WindowGDI::~WindowGDI()
 {
-	DestroyIcon(sysIcon);
+	if (destroyIcon) DestroyIcon(sysIcon);
 
 	windowBackends.RemoveEntry(id);
 }
@@ -274,16 +276,12 @@ S::Int S::GUI::WindowGDI::Close()
 
 	if (Setup::enableUnicode)
 	{
-		DestroyCursor(((WNDCLASSEXW *) wndclass)->hCursor);
-
 		UnregisterClassW(className, hInstance);
 
 		delete (WNDCLASSEXW *) wndclass;
 	}
 	else
 	{
-		DestroyCursor(((WNDCLASSEXA *) wndclass)->hCursor);
-
 		UnregisterClassA(className, hInstance);
 
 		delete (WNDCLASSEXA *) wndclass;
@@ -304,7 +302,7 @@ S::Int S::GUI::WindowGDI::SetTitle(String nTitle)
 
 S::Int S::GUI::WindowGDI::SetIcon(Bitmap &newIcon)
 {
-	DestroyIcon(sysIcon);
+	if (destroyIcon) DestroyIcon(sysIcon);
 
 	ICONINFO	 icon;
 	Bitmap		 mask = newIcon;
@@ -325,6 +323,7 @@ S::Int S::GUI::WindowGDI::SetIcon(Bitmap &newIcon)
 	icon.hbmColor	= (HBITMAP) newIcon.GetSystemBitmap();
 
 	sysIcon = CreateIconIndirect(&icon);
+	destroyIcon = True;
 
 	return Success;
 }

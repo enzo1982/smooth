@@ -11,7 +11,7 @@
 #ifndef _H_OBJSMOOTH_DLLMAIN_
 #define _H_OBJSMOOTH_DLLMAIN_
 
-#include "system/system.h"
+#include "definitions.h"
 
 namespace smooth
 {

@@ -11,7 +11,7 @@
 #ifndef _H_OBJSMOOTH_PCIIO_
 #define _H_OBJSMOOTH_PCIIO_
 
-#include "system/system.h"
+#include "definitions.h"
 #include "string.h"
 #include "graphics/bitmap.h"
 

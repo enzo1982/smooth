@@ -48,6 +48,7 @@ namespace smooth
 				String				 className;
 
 				HICON				 sysIcon;
+				Bool				 destroyIcon;
 
 				Int				 origWndStyle;
 				Rect				 nonMaxRect;

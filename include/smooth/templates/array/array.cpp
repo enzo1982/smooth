@@ -33,21 +33,6 @@ template <class t> S::Array<t>::~Array()
 	RemoveAll();
 }
 
-template <class t> S::Bool S::Array<t>::Cleanup(Array_Entry<t> *entry)
-{
-	if (entry != ARRAY_NULLPOINTER)
-	{
-		if (entry->gotNext) Cleanup(entry->GetNext());
-		RemoveEntry(entry->GetIndex());
-
-		return True;
-	}
-	else
-	{
-		return False;
-	}
-}
-
 template <class t> S::Bool S::Array<t>::IndexAvailable(Int index)
 {
 	if (GetEntry(index) == ARRAY_NULLVALUE)	return True;
@@ -422,15 +407,18 @@ template <class t> S::Bool S::Array<t>::RemoveAll()
 {
 	if (nOfEntries == 0) return False;
 
-	Cleanup(firstEntry);
+	while (firstEntry != ARRAY_NULLPOINTER)
+	{
+		RemoveEntry(firstEntry->GetIndex());
+	}
 
-	nOfEntries = 0;
-	greatestIndex = -1;
-	outlinedEntry = False;
-	firstEntry = ARRAY_NULLPOINTER;
-	lastEntry = ARRAY_NULLPOINTER;
-	prevEntry = ARRAY_NULLPOINTER;
-	prevDeletedEntry = ARRAY_NULLPOINTER;
+	nOfEntries		= 0;
+	greatestIndex		= -1;
+	outlinedEntry		= False;
+	firstEntry		= ARRAY_NULLPOINTER;
+	lastEntry		= ARRAY_NULLPOINTER;
+	prevEntry		= ARRAY_NULLPOINTER;
+	prevDeletedEntry	= ARRAY_NULLPOINTER;
 
 	lastN = -1024;
 	lastNthEntry = ARRAY_NULLPOINTER;

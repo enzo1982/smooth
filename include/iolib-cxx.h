@@ -82,18 +82,7 @@
 	extern "C" BOOL APIENTRY _cygwin_dll_entry(HINSTANCE, DWORD, LPVOID);
 #endif
 
-inline unsigned char GetByte(unsigned long number, int byte)
-{
-	if (byte > 3) return false;
-
-	return (unsigned char) ((number >> (8 * byte)) & 255);
-}
-
-inline bool GetBit(unsigned long number, int bit)
-{
-	if (bit > 31) return false;
-
-	return (number >> bit) & 1;
-}
+#define IOLibGetByte(x, y) (y > 3)  ? 0 : ((x >> (8 * y)) & 255)
+#define IOLibGetBit(x, y)  (y > 31) ? 0 : ((x >>      y ) & 1)
 
 #endif

@@ -86,10 +86,10 @@ IOLibDriverSOCKS4::IOLibDriverSOCKS4(const char *proxy, int socksPort, const cha
 		socksdata[1] = 1;
 		socksdata[2] = htons((short) port) % 256;
 		socksdata[3] = htons((short) port) / 256;
-		socksdata[4] = GetByte(htonl(GetIPAddress(hostName)), 0);
-		socksdata[5] = GetByte(htonl(GetIPAddress(hostName)), 1);
-		socksdata[6] = GetByte(htonl(GetIPAddress(hostName)), 2);
-		socksdata[7] = GetByte(htonl(GetIPAddress(hostName)), 3);
+		socksdata[4] = IOLibGetByte(htonl(GetIPAddress(hostName)), 0);
+		socksdata[5] = IOLibGetByte(htonl(GetIPAddress(hostName)), 1);
+		socksdata[6] = IOLibGetByte(htonl(GetIPAddress(hostName)), 2);
+		socksdata[7] = IOLibGetByte(htonl(GetIPAddress(hostName)), 3);
 		socksdata[8] = 0;
 
 		send(stream, (char *) socksdata, 9, 0);

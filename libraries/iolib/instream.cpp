@@ -325,7 +325,7 @@ long InStream::InputNumberPBD(int bits)
 
 		for (int i = 0; i < 8; i++)
 		{
-			pbdBuffer[pbdLength] = GetBit(inp, i);
+			pbdBuffer[pbdLength] = IOLibGetBit(inp, i);
 			pbdLength++;
 		}
 	}

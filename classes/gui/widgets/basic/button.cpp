@@ -306,7 +306,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 				Paint(SP_MOUSEIN);
 
-				if (tooltip != NIL)
+				if (tooltipText != NIL)
 				{
 					tipTimer = new System::Timer();
 

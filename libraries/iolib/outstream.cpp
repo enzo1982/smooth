@@ -257,7 +257,7 @@ bool OutStream::OutputNumber(long number, int bytes)
 			if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
 		}
 
-		data[currentBufferPos] = GetByte(number, i);
+		data[currentBufferPos] = IOLibGetByte(number, i);
 		if (currentFilePos == size) size++;
 		currentBufferPos++;
 		currentFilePos++;
@@ -285,7 +285,7 @@ bool OutStream::OutputNumberRaw(long number, int bytes)
 			if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
 		}
 
-		data[currentBufferPos] = GetByte(number, i);
+		data[currentBufferPos] = IOLibGetByte(number, i);
 		if (currentFilePos == size) size++;
 		currentBufferPos++;
 		currentFilePos++;
@@ -317,7 +317,7 @@ bool OutStream::OutputNumberPDP(long number, int bytes)
 				if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
 			}
 
-			data[currentBufferPos] = GetByte(number, (3 - i) ^ 1);
+			data[currentBufferPos] = IOLibGetByte(number, (3 - i) ^ 1);
 			if (currentFilePos == size) size++;
 			currentBufferPos++;
 			currentFilePos++;
@@ -343,7 +343,7 @@ bool OutStream::OutputNumberPBD(long number, int bits)
 
 	for (int j = 0; j < bits; j++)
 	{
-		pbdBuffer[pbdLength] = GetBit(number, j);
+		pbdBuffer[pbdLength] = IOLibGetBit(number, j);
 		pbdLength++;
 	}
 

@@ -20,7 +20,7 @@ namespace smooth
 	};
 };
 
-#include "../object.h"
+#include "../basic/object.h"
 
 namespace smooth
 {

@@ -70,10 +70,6 @@
 	const int	 IOLIB_ERROR_NODATA	= 8;	// no data is available in the queue
 #endif
 
-#ifndef DEFAULT_PACKAGE_SIZE
-	#define	DEFAULT_PACKAGE_SIZE	131072
-#endif
-
 #include "iolib/iolibdriver-cxx.h"
 #include "iolib/iolibfilter-cxx.h"
 #include "iolib/iolibstream-cxx.h"

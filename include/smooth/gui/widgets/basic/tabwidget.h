@@ -44,8 +44,8 @@ namespace smooth
 
 				Int			 SelectTab(Int);
 
-				Int			 RegisterObject(Object *);
-				Int			 UnregisterObject(Object *);
+				Int			 RegisterObject(Widget *);
+				Int			 UnregisterObject(Widget *);
 		};
 	};
 };

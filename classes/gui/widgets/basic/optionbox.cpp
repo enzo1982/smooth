@@ -12,39 +12,38 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::OptionBox::classID = S::Object::RequestClassID();
 
-S::GUI::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iCode)
+S::GUI::OptionBox::OptionBox(String iText, Point iPos, Size iSize, Int *var, Int iCode)
 {
-	type				= classID;
-	objectProperties->text		= text;
-	variable			= var;
-	code				= iCode;
+	type		= classID;
+	text		= iText;
+	variable	= var;
+	code		= iCode;
 
-	objectProperties->font.SetColor(Setup::ClientTextColor);
+	font.SetColor(Setup::ClientTextColor);
 
 	if (*variable == code)	state = True;
 	else			state = False;
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos		= iPos;
+	size		= iSize;
 
-	if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
-	if (objectProperties->size.cy == 0) objectProperties->size.cy = 16;
+	if (size.cx == 0) size.cx = 80;
+	if (size.cy == 0) size.cy = 16;
 
 	GetTextSize();
 }
 
 S::GUI::OptionBox::~OptionBox()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::OptionBox::Paint(Int message)
@@ -52,7 +51,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 textRect;
 	Point	 lineStart;
@@ -169,10 +168,10 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 	textRect.left	= realPos.x + 17;
 	textRect.top	= realPos.y + 2;
-	textRect.right	= textRect.left + objectProperties->size.cx;
+	textRect.right	= textRect.left + size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	surface->SetText(objectProperties->text, textRect, objectProperties->font);
+	surface->SetText(text, textRect, font);
 
 	return Success;
 }
@@ -182,11 +181,11 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered) return Error;
 	if ((!active && message != SM_CHECKOPTIONBOXES) || !visible) return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Object	*object;
@@ -194,8 +193,8 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx;
-	frame.bottom	= realPos.y + objectProperties->size.cy;
+	frame.right	= realPos.x + size.cx;
+	frame.bottom	= realPos.y + size.cy;
 
 	switch (message)
 	{
@@ -219,9 +218,9 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONDOWN:
-			if (objectProperties->checked)
+			if (checked)
 			{
-				objectProperties->clicked = True;
+				clicked = True;
 
 				surface->Frame(frame, FRAME_DOWN);
 
@@ -230,10 +229,10 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONUP:
-			if (objectProperties->clicked)
+			if (clicked)
 			{
-				objectProperties->clicked = False;
-				objectProperties->checked = False;
+				clicked = False;
+				checked = False;
 
 				frame.right++;
 				frame.bottom++;
@@ -269,15 +268,15 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-			if (!objectProperties->checked && wnd->IsMouseOn(frame))
+			if (!checked && wnd->IsMouseOn(frame))
 			{
-				objectProperties->checked = True;
+				checked = True;
 				surface->Frame(frame, FRAME_UP);
 			}
-			else if (objectProperties->checked && !wnd->IsMouseOn(frame))
+			else if (checked && !wnd->IsMouseOn(frame))
 			{
-				objectProperties->checked = False;
-				objectProperties->clicked = False;
+				checked = False;
+				clicked = False;
 
 				frame.right++;
 				frame.bottom++;
@@ -296,30 +295,30 @@ S::Int S::GUI::OptionBox::SetText(const String &newText)
 {
 	if (!registered || !visible)
 	{
-		objectProperties->text = newText;
+		text = newText;
 
 		return Success;
 	}
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 
 	Point	 realPos = GetRealPosition();
 	Rect	 textRect;
 
 	textRect.left	= realPos.x + 17;
 	textRect.top	= realPos.y + 4;
-	textRect.right	= textRect.left + objectProperties->size.cx;
+	textRect.right	= textRect.left + size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	Font	 font = objectProperties->font;
+	Font	 nFont = font;
 
-	font.SetColor(Setup::BackgroundColor);
+	nFont.SetColor(Setup::BackgroundColor);
 
-	surface->SetText(objectProperties->text, textRect, font);
+	surface->SetText(text, textRect, nFont);
 
-	objectProperties->text = newText;
+	text = newText;
 
-	surface->SetText(objectProperties->text, textRect, objectProperties->font);
+	surface->SetText(text, textRect, font);
 
 	return Success;
 }

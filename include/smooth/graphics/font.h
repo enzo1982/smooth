@@ -19,8 +19,8 @@ namespace smooth
 	};
 };
 
-#include "../gui/widgets/widget.h"
-#include "i18n.h"
+#include "../definitions.h"
+#include "../misc/i18n.h"
 
 namespace smooth
 {

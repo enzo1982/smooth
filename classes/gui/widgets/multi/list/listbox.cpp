@@ -14,7 +14,6 @@
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/i18n.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/basic/scrollbar.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
@@ -23,7 +22,7 @@
 
 const S::Int	 S::GUI::ListBox::classID = S::Object::RequestClassID();
 
-S::GUI::ListBox::ListBox(Point pos, Size size)
+S::GUI::ListBox::ListBox(Point iPos, Size iSize)
 {
 	type			= classID;
 	entryCount		= -1;
@@ -36,20 +35,20 @@ S::GUI::ListBox::ListBox(Point pos, Size size)
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	SetFont(Font(objectProperties->font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
+	SetFont(Font(font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos			= iPos;
+	size			= iSize;
 
-	if (objectProperties->size.cx == 0) objectProperties->size.cx = 120;
-	if (objectProperties->size.cy == 0) objectProperties->size.cy = 80;
+	if (size.cx == 0) size.cx = 120;
+	if (size.cy == 0)size.cy = 80;
 }
 
 S::GUI::ListBox::~ListBox()
 {
 	if (scrollbar != NIL)
 	{
-		if (scrollbar->IsRegistered() && myContainer != NIL) myContainer->UnregisterObject(scrollbar);
+		if (scrollbar->IsRegistered() && container != NIL) container->UnregisterObject(scrollbar);
 
 		DeleteObject(scrollbar);
 
@@ -58,14 +57,14 @@ S::GUI::ListBox::~ListBox()
 
 	if (header != NIL)
 	{
-		if (registered && myContainer != NIL && !(flags & LF_HIDEHEADER)) myContainer->UnregisterObject(header);
+		if (registered && container != NIL && !(flags & LF_HIDEHEADER)) container->UnregisterObject(header);
 
 		DeleteObject(header);
 
 		header = NIL;
 	}
 
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::ListEntry *S::GUI::ListBox::AddEntry(String name, Int id)
@@ -101,12 +100,12 @@ S::Int S::GUI::ListBox::RemoveEntry(Int number)
 
 	if (scrollbar != NIL)
 	{
-		if (15 * GetNOfEntries() + 4 <= objectProperties->size.cy)
+		if (15 * GetNOfEntries() + 4 <= size.cy)
 		{
 			scrollbarPos = 0;
 			lastScrollbarPos = 0;
 
-			myContainer->UnregisterObject(scrollbar);
+			container->UnregisterObject(scrollbar);
 
 			DeleteObject(scrollbar);
 
@@ -132,7 +131,7 @@ S::Int S::GUI::ListBox::RemoveAll()
 		scrollbarPos = 0;
 		lastScrollbarPos = 0;
 
-		myContainer->UnregisterObject(scrollbar);
+		container->UnregisterObject(scrollbar);
 
 		DeleteObject(scrollbar);
 
@@ -159,7 +158,7 @@ S::Int S::GUI::ListBox::AddTab(String tabName, Int iTabWidth)
 	{
 		header = new ListBoxHeader(this);
 
-		if (visible && !(flags & LF_HIDEHEADER)) myContainer->RegisterObject(header);
+		if (visible && !(flags & LF_HIDEHEADER)) container->RegisterObject(header);
 	}
 
 	return header->AddTab(tabName, iTabWidth);
@@ -201,13 +200,13 @@ S::Int S::GUI::ListBox::Show()
 
 	if (scrollbar != NIL)
 	{
-		Layer	*layer = (Layer *) myContainer;
+		Layer	*layer = (Layer *) container;
 		Point	 realPos = GetRealPosition();
-		Point	 sbp = Point(realPos.x + objectProperties->size.cx - layer->GetObjectProperties()->pos.x - 18, realPos.y + 1 - layer->GetObjectProperties()->pos.y + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
-		Size	 sbs = Size(scrollbar->GetObjectProperties()->size.cx, objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
+		Point	 sbp = Point(realPos.x + size.cx - layer->pos.x - 18, realPos.y + 1 - layer->pos.y + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
+		Size	 sbs = Size(scrollbar->size.cx, size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
 
 		scrollbar->SetMetrics(sbp, sbs);
-		scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
+		scrollbar->SetRange(0, GetNOfEntries() - (int) ((size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
 
 		scrollbar->Show();
 	}
@@ -216,7 +215,7 @@ S::Int S::GUI::ListBox::Show()
 	{
 		header->UpdateMetrics();
 
-		if (!(flags & LF_HIDEHEADER)) myContainer->RegisterObject(header);
+		if (!(flags & LF_HIDEHEADER)) container->RegisterObject(header);
 	}
 
 	return Widget::Show();
@@ -226,7 +225,7 @@ S::Int S::GUI::ListBox::Hide()
 {
 	if (!visible)	return Success;
 
-	if (header != NIL && !(flags & LF_HIDEHEADER)) myContainer->UnregisterObject(header);
+	if (header != NIL && !(flags & LF_HIDEHEADER)) container->UnregisterObject(header);
 
 	if (scrollbar != NIL) scrollbar->Hide();
 
@@ -258,11 +257,11 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	Layer		*layer = (Layer *) myContainer;
+	Layer		*layer = (Layer *) container;
 	Point		 realPos = GetRealPosition();
 	ListEntry	*operat;
 	Rect		 frame;
@@ -280,8 +279,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			frame.left	= realPos.x;
 			frame.top	= realPos.y;
-			frame.right	= realPos.x + objectProperties->size.cx - 1;
-			frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+			frame.right	= realPos.x + size.cx - 1;
+			frame.bottom	= realPos.y + size.cy - 1;
 
 			if (message != SP_UPDATE)
 			{
@@ -306,16 +305,16 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			frame.bottom = min(frame.bottom, maxFrameY);
 
-			if (15 * GetNOfEntries() + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16) + 4 > objectProperties->size.cy && !(flags & LF_HIDESCROLLBAR))
+			if (15 * GetNOfEntries() + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16) + 4 > size.cy && !(flags & LF_HIDESCROLLBAR))
 			{
 				if (scrollbar == NIL)
 				{
-					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - 16;
-					sbp.y = frame.top - layer->GetObjectProperties()->pos.y;
+					sbp.x = frame.right - layer->pos.x - 16;
+					sbp.y = frame.top - layer->pos.y;
 					sbs.cx = 0;
-					sbs.cy = objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
+					sbs.cy = size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
 
-					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
+					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, GetNOfEntries() - (Int) ((size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
 
 					scrollbar->onClick.Connect(&ListBox::ScrollbarProc, this);
 
@@ -325,14 +324,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 				else
 				{
-					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - 16;
-					sbp.y = frame.top - layer->GetObjectProperties()->pos.y;
-					sbs.cy = objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
+					sbp.x = frame.right - layer->pos.x - 16;
+					sbp.y = frame.top - layer->pos.y;
+					sbs.cy = size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
 
-					scrollbar->GetObjectProperties()->pos = sbp;
-					scrollbar->GetObjectProperties()->size.cy = sbs.cy;
+					scrollbar->pos = sbp;
+					scrollbar->size.cy = sbs.cy;
 
-					scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
+					scrollbar->SetRange(0, GetNOfEntries() - (Int) ((size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
 				}
 
 				frame.right -= 17;
@@ -632,7 +631,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 				if (operat == NIL) break;
 
-				Window	*wnd = myContainer->GetContainerWindow();
+				Window	*wnd = container->GetContainerWindow();
 				if (wnd == NIL) break;
 
 				if (wnd->IsMouseOn(operat->rect) && (!operat->clicked || (flags & LF_ALLOWRESELECT) || (flags & LF_MULTICHECKBOX)))
@@ -702,7 +701,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 				if (operat == NIL) break;
 
-				Window	*wnd = myContainer->GetContainerWindow();
+				Window	*wnd = container->GetContainerWindow();
 
 				if (wnd == NIL) break;
 
@@ -729,7 +728,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -751,7 +750,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (wnd->IsMouseOn(operat->rect))
 				{
-					wnd->Process(SM_LOOSEFOCUS, handle, 0);
+					wnd->Process(SM_LOOSEFOCUS, GetHandle(), 0);
 
 					change = True;
 				}
@@ -844,14 +843,14 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
+S::Void S::GUI::ListBox::DrawEntryText(String newText, Rect rect, Int color)
 {
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Bool	 gotTabs = False;
 
-	for (Int r = 0; r < text.Length(); r++)
+	for (Int r = 0; r < newText.Length(); r++)
 	{
-		if (text[r] == '\t')
+		if (newText[r] == '\t')
 		{
 			gotTabs = True;
 
@@ -859,9 +858,9 @@ S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
 		}
 	}
 
-	Font	 font = objectProperties->font;
+	Font	 nFont = font;
 
-	font.SetColor(color);
+	nFont.SetColor(color);
 
 	if (header != NIL && gotTabs)
 	{
@@ -877,36 +876,36 @@ S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
 
 			Int	 tabCount = 0;
 
-			for (Int p = 0; p < text.Length(); p++)
+			for (Int p = 0; p < newText.Length(); p++)
 			{
 				if (tabCount == i)
 				{
-					for (Int q = p; q < text.Length(); q++)
+					for (Int q = p; q < newText.Length(); q++)
 					{
-						if (text[q] == '\t') break;
+						if (newText[q] == '\t') break;
 
-						nText[q - p] = text[q];
+						nText[q - p] = newText[q];
 					}
 
 					break;
 				}
 
-				if (text[p] == '\t') tabCount++;
+				if (newText[p] == '\t') tabCount++;
 			}
 
-			surface->SetText(nText, rRect, font);
+			surface->SetText(nText, rRect, nFont);
 		}
 	}
 	else
 	{
-		surface->SetText(text, rect, font);
+		surface->SetText(newText, rect, nFont);
 	}
 }
 
 S::Int S::GUI::ListBox::ScrollUp(Int nLines)
 {
 	scrollbarPos -= nLines;
-	scrollbarPos = (Int) Math::Max(scrollbarPos, 0);
+	scrollbarPos = Math::Max(scrollbarPos, 0);
 
 	if (scrollbar != NIL) scrollbar->Paint(SP_PAINT);
 
@@ -918,7 +917,7 @@ S::Int S::GUI::ListBox::ScrollUp(Int nLines)
 S::Int S::GUI::ListBox::ScrollDown(Int nLines)
 {
 	scrollbarPos += nLines;
-	scrollbarPos = (Int) Math::Min(scrollbarPos, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
+	scrollbarPos = Math::Min(scrollbarPos, GetNOfEntries() - (Int) ((size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
 
 	if (scrollbar != NIL) scrollbar->Paint(SP_PAINT);
 
@@ -929,14 +928,14 @@ S::Int S::GUI::ListBox::ScrollDown(Int nLines)
 
 S::Void S::GUI::ListBox::ScrollbarProc()
 {
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	frame.right	= realPos.x + size.cx - 1;
+	frame.bottom	= realPos.y + size.cy - 1;
 
 	if (scrollbarPos != lastScrollbarPos)
 	{

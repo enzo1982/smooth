@@ -131,10 +131,6 @@ SOURCE=..\classes\basic\object.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\basic\objectproperties.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\classes\basic\objecttype.cpp
 # End Source File
 # Begin Source File
@@ -247,6 +243,10 @@ SOURCE=..\classes\graphics\bitmapbackend.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\graphics\font.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\graphics\form.cpp
 # End Source File
 # Begin Source File
@@ -292,6 +292,45 @@ SOURCE=..\classes\files\file.cpp
 # Begin Group "xul"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\xml\xul\button.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_XUL"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\xml\xul\description.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_XUL"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\xml\xul\label.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_XUL"
+
+!ENDIF 
+
+# End Source File
 # Begin Source File
 
 SOURCE=..\classes\xml\xul\menubar.cpp
@@ -568,10 +607,6 @@ SOURCE=..\classes\misc\config.cpp
 # Begin Source File
 
 SOURCE=..\classes\misc\datetime.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\font.cpp
 # End Source File
 # Begin Source File
 
@@ -1055,6 +1090,27 @@ SOURCE=..\include\smooth\templates\slots\slotr_signal.h
 SOURCE=..\include\smooth\templates\slots\slotr_value.h
 # End Source File
 # End Group
+# Begin Group "buffer"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\buffer\buffer.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\buffer\buffer.h
+# End Source File
+# End Group
 # End Group
 # Begin Group "filesheaders"
 
@@ -1102,6 +1158,10 @@ SOURCE=..\include\smooth\graphics\bitmap.h
 # Begin Source File
 
 SOURCE=..\include\smooth\graphics\bitmapbackend.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\font.h
 # End Source File
 # Begin Source File
 
@@ -1154,10 +1214,6 @@ SOURCE=..\include\smooth\misc\config.h
 # Begin Source File
 
 SOURCE=..\include\smooth\misc\datetime.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\misc\font.h
 # End Source File
 # Begin Source File
 
@@ -1222,6 +1278,18 @@ SOURCE=..\include\smooth\system\timerbackend.h
 # Begin Group "xulheaders"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\xml\xul\button.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\xml\xul\description.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\xml\xul\label.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\include\smooth\xml\xul\menubar.h
@@ -1679,10 +1747,6 @@ SOURCE=..\include\smooth\main.h
 # Begin Source File
 
 SOURCE=..\include\smooth\object.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\objectproperties.h
 # End Source File
 # Begin Source File
 

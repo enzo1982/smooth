@@ -16,7 +16,7 @@ namespace smooth
 	class List;
 };
 
-#include "../../../../object.h"
+#include "../../../../basic/object.h"
 #include "../../../../array.h"
 #include "listentry.h"
 

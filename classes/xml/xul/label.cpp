@@ -8,38 +8,28 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/basic/input.h>
+#include <smooth/xml/xul/label.h>
+#include <smooth/xml/node.h>
+#include <smooth/gui/widgets/basic/text.h>
 
-S::Input::Input()
+S::XML::XUL::Label::Label(Node *node)
 {
+	text = NIL;
+
+	if (node != NIL)
+	{
+		id = GetXMLAttributeValue(node, "id");
+
+		text = new GUI::Text(GetXMLAttributeValue(node, "value"), GUI::Point(0, 0));
+	}
 }
 
-S::Input::Input(const Input &)
+S::XML::XUL::Label::~Label()
 {
+	if (text != NIL) Object::DeleteObject(text);
 }
 
-S::Int S::Input::MouseX()
+S::GUI::Widget *S::XML::XUL::Label::GetWidget()
 {
-#ifdef __WIN32__
-	POINT	 point;
-
-	GetCursorPos(&point);
-
-	return point.x;
-#else
-	return 0;
-#endif
-}
-
-S::Int S::Input::MouseY()
-{
-#ifdef __WIN32__
-	POINT	 point;
-
-	GetCursorPos(&point);
-
-	return point.y;
-#else
-	return 0;
-#endif
+	return text;
 }

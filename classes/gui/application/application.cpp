@@ -10,7 +10,6 @@
 
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/i18n.h>
-#include <smooth/objectproperties.h>
 
 const S::Int	 S::GUI::Application::classID = S::Object::RequestClassID();
 
@@ -24,9 +23,8 @@ S::GUI::Application::Application(String name)
 
 	visible		= true;
 
-	objectProperties->text		= name == NIL ? String("smooth Application") : name;
-	objectProperties->size.cx	= LiSAGetDisplaySizeX();
-	objectProperties->size.cy	= LiSAGetDisplaySizeY();
+	text		= name == NIL ? String("smooth Application") : name;
+	size		= Size(LiSAGetDisplaySizeX(), LiSAGetDisplaySizeY());
 }
 
 S::String S::GUI::Application::GetStartupDirectory()

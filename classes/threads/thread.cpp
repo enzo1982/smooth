@@ -8,11 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/object.h>
 #include <smooth/threads/thread.h>
 #include <smooth/loop.h>
-#include <smooth/gui/application/background.h>
-#include <smooth/objectproperties.h>
 
 #ifdef __WIN32__
 #include <smooth/threads/win32/threadwin32.h>
@@ -34,8 +31,6 @@ S::Threads::Thread::Thread(Void *iThread)
 
 	type	= classID;
 	status	= THREAD_CREATED;
-
-	possibleContainers.AddEntry(GUI::Application::classID);
 }
 
 S::Threads::Thread::~Thread()

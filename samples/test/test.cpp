@@ -56,7 +56,7 @@ Test::Test()
 	rlayer3			= new Layer("Other");
 	mainWnd_layer_button	= new Button("OK", NIL, bp, bs);
 	mainWnd_layer_button->onClick.Connect(&Test::Close, this);
-	mainWnd_layer_button->SetTooltip("Don't click on this button!!!");
+	mainWnd_layer_button->SetTooltipText("Don't click on this button!!!");
 	mainWnd_layer_button->SetBackgroundColor(RGB(255, 0, 0));
 	mainWnd_layer_button->SetFlags(BF_NOFRAME | BF_SHOWHIGHLIGHT);
 	bp.y += 25;

@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/misc/font.h>
+#include <smooth/graphics/font.h>
 #include <smooth/misc/math.h>
 
 S::GUI::Font::Font(String iFontName, Int iFontSize, Int iFontColor, Int iFontWeight, Bool iFontItalic, Bool iFontUnderline, Bool iFontStrikeOut)

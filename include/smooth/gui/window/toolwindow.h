@@ -44,7 +44,7 @@ namespace smooth
 				Int			 Paint(Int);
 				Int			 Process(Int, Int, Int);
 
-				Int			 RegisterObject(Object *);
+				Int			 RegisterObject(Widget *);
 
 				Bool			 IsTypeCompatible(Int);
 		};

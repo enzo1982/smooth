@@ -12,36 +12,35 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::CheckBox::classID = S::Object::RequestClassID();
 
-S::GUI::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var)
+S::GUI::CheckBox::CheckBox(String iText, Point iPos, Size iSize, Bool *var)
 {
-	type				= classID;
-	objectProperties->text		= text;
-	variable			= var;
-	state				= *variable;
+	type		= classID;
+	text		= iText;
+	variable	= var;
+	state		= *variable;
 
-	objectProperties->font.SetColor(Setup::ClientTextColor);
+	font.SetColor(Setup::ClientTextColor);
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos		= iPos;
+	size		= iSize;
 
-	if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
-	if (objectProperties->size.cy == 0) objectProperties->size.cy = 16;
+	if (size.cx == 0) size.cx = 80;
+	if (size.cy == 0) size.cy = 16;
 
 	GetTextSize();
 }
 
 S::GUI::CheckBox::~CheckBox()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::CheckBox::Paint(Int message)
@@ -49,7 +48,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	if (!registered)	return Error;
 	if (!IsVisible())	return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Rect	 textRect;
@@ -168,21 +167,21 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 
 	textRect.left	= frame.right + 4;
 	textRect.top	= frame.top - 1;
-	textRect.right	= textRect.left + objectProperties->size.cx;
+	textRect.right	= textRect.left + size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	Font	 font = objectProperties->font;
+	Font	 nFont = font;
 
-	if (!active) font.SetColor(Setup::GrayTextColor);
+	if (!active) nFont.SetColor(Setup::GrayTextColor);
 
-	surface->SetText(objectProperties->text, textRect, font);
+	surface->SetText(text, textRect, nFont);
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= frame.left + objectProperties->size.cx;
-	frame.bottom	= frame.top + objectProperties->size.cy;
+	frame.right	= frame.left + size.cx;
+	frame.bottom	= frame.top + size.cy;
 
-	if (objectProperties->checked) surface->Frame(frame, FRAME_UP);
+	if (checked) surface->Frame(frame, FRAME_UP);
 
 	return Success;
 }
@@ -192,11 +191,11 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered) return Error;
 	if ((!active && message != SM_CHECKCHECKBOXES) || !visible) return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Object	*object;
@@ -204,8 +203,8 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx;
-	frame.bottom	= realPos.y + objectProperties->size.cy;
+	frame.right	= realPos.x + size.cx;
+	frame.bottom	= realPos.y + size.cy;
 
 	switch (message)
 	{
@@ -222,9 +221,9 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 			break;
 		case SM_LBUTTONDOWN:
 		case SM_LBUTTONDBLCLK:
-			if (objectProperties->checked)
+			if (checked)
 			{
-				objectProperties->clicked = True;
+				clicked = True;
 
 				surface->Frame(frame, FRAME_DOWN);
 
@@ -233,10 +232,10 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONUP:
-			if (objectProperties->clicked)
+			if (clicked)
 			{
-				objectProperties->clicked = False;
-				objectProperties->checked = False;
+				clicked = False;
+				checked = False;
 
 				frame.right++;
 				frame.bottom++;
@@ -272,15 +271,15 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-			if (!objectProperties->checked && wnd->IsMouseOn(frame))
+			if (!checked && wnd->IsMouseOn(frame))
 			{
-				objectProperties->checked = True;
+				checked = True;
 				surface->Frame(frame, FRAME_UP);
 			}
-			else if (objectProperties->checked && !wnd->IsMouseOn(frame))
+			else if (checked && !wnd->IsMouseOn(frame))
 			{
-				objectProperties->checked = False;
-				objectProperties->clicked = False;
+				checked = False;
+				clicked = False;
 
 				frame.right++;
 				frame.bottom++;

@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/setup.h>
+#include <smooth/basic/setup.h>
 #include <smooth/color.h>
 
 S::Int S::Setup::BackgroundColor = CombineColor(192, 192, 192);

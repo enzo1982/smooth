@@ -26,7 +26,7 @@ class Designer_EditComponent : public Application
 		Window		*wnd;
 		Titlebar	*title;
 
-		Array<Object *>	 objects;
+		Array<Widget *>	 objects;
 
 		Designer	*designer;
 		Designer_Status	 status;
@@ -39,8 +39,8 @@ class Designer_EditComponent : public Application
 		Void		 ShowDialog();
 		String		 GetName();
 		Window		*GetWindow();
-		Object		*AddObject(Int);
-		Object		*GetFirstObject(Int);
+		Widget		*AddObject(Int);
+		Widget		*GetFirstObject(Int);
 };
 
 const Int	 SMOOTH_BUTTON		=  1;

@@ -10,14 +10,17 @@
 
 #include <smooth/xml/xul/window.h>
 #include <smooth/xml/xul/menubar.h>
+#include <smooth/xml/xul/button.h>
+#include <smooth/xml/xul/label.h>
+#include <smooth/xml/xul/description.h>
 #include <smooth/xml/node.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/basic/titlebar.h>
 
 S::XML::XUL::Window::Window(Node *node)
 {
-	titlebar = NIL;
-	window = NIL;
+	titlebar	= NIL;
+	window		= NIL;
 
 	if (node != NIL)
 	{
@@ -55,6 +58,30 @@ S::XML::XUL::Window::Window(Node *node)
 						widgets.AddEntry(menu);
 					}
 				}
+			}
+			else if (nNode->GetName() == "button")
+			{
+				XUL::Button	*button = new XUL::Button(nNode);
+
+				window->RegisterObject(button->GetWidget());
+
+				widgets.AddEntry(button);
+			}
+			else if (nNode->GetName() == "label")
+			{
+				XUL::Label	*label = new XUL::Label(nNode);
+
+				window->RegisterObject(label->GetWidget());
+
+				widgets.AddEntry(label);
+			}
+			else if (nNode->GetName() == "description")
+			{
+				XUL::Description	*description = new XUL::Description(nNode);
+
+				window->RegisterObject(description->GetWidget());
+
+				widgets.AddEntry(description);
 			}
 		}
 	}

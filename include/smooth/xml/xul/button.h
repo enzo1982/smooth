@@ -8,41 +8,50 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_OBJECTPROPERTIES_
-#define _H_OBJSMOOTH_OBJECTPROPERTIES_
+#ifndef _H_OBJSMOOTH_XULBUTTON_
+#define _H_OBJSMOOTH_XULBUTTON_
 
 namespace smooth
 {
-	class ObjectProperties;
+	namespace XML
+	{
+		namespace XUL
+		{
+			class Button;
+		};
+
+		class Node;
+	};
+
+	namespace GUI
+	{
+		class Button;
+	};
+
+	class Object;
 };
 
-#include "definitions.h"
-#include "graphics/point.h"
-#include "graphics/size.h"
-#include "misc/font.h"
+#include "../../definitions.h"
+#include "../../misc/string.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI ObjectProperties
+	namespace XML
 	{
-		public:
-			GUI::Point	 pos;
-			GUI::Size	 size;
+		namespace XUL
+		{
+			class Button : public Widget
+			{
+				private:
+					GUI::Button	*button;
+				public:
+							 Button(Node *);
+							~Button();
 
-			Int		 orientation;
-
-			String		 text;
-			String		 tooltip;
-
-			GUI::Size	 textSize;
-			GUI::Size	 tooltipSize;
-
-			GUI::Font	 font;
-
-			Bool		 clicked;
-			Bool		 checked;
-
-					 ObjectProperties();
+					GUI::Widget	*GetWidget();
+			};
+		};
 	};
 };
 

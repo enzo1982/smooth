@@ -13,11 +13,10 @@
 
 namespace smooth
 {
-	class Object;
-
 	namespace GUI
 	{
 		class Container;
+		class Widget;
 		class Surface;
 		class Window;
 	};
@@ -36,7 +35,7 @@ namespace smooth
 			protected:
 				ContainerType		 containerType;
 
-				Array<Object *>		 assocObjects;
+				Array<Widget *>		 assocObjects;
 
 				Surface			*nullSurface;
 				Surface			*drawSurface;
@@ -46,12 +45,12 @@ namespace smooth
 							 Container();
 				virtual			~Container();
 
-				virtual Int		 RegisterObject(Object *);
-				virtual Int		 UnregisterObject(Object *);
+				virtual Int		 RegisterObject(Widget *);
+				virtual Int		 UnregisterObject(Widget *);
 
 				Int			 GetNOfObjects();
-				Object			*GetNthObject(Int);
-				Object			*RequestObject(Int);
+				Widget			*GetNthObject(Int);
+				Widget			*RequestObject(Int);
 
 				virtual Bool		 IsContainerCompatible(Int);
 				ContainerType		 GetContainerType();

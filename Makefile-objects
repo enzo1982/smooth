@@ -18,27 +18,22 @@ $(OBJECTDIR)/backend.o: $(BACKENDSCLASSESDIR)/backend.cpp $(SMOOTHINCLUDEDIR)/ba
 	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/backend.cpp -o $(OBJECTDIR)/backend.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/input.o: $(BASICCLASSESDIR)/input.cpp $(SMOOTHINCLUDEDIR)/input.h
+$(OBJECTDIR)/input.o: $(BASICCLASSESDIR)/input.cpp $(SMOOTHINCLUDEDIR)/basic/input.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/input.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/input.cpp -o $(OBJECTDIR)/input.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/object.o: $(BASICCLASSESDIR)/object.cpp $(SMOOTHINCLUDEDIR)/object.h
+$(OBJECTDIR)/object.o: $(BASICCLASSESDIR)/object.cpp $(SMOOTHINCLUDEDIR)/basic/object.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/object.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/object.cpp -o $(OBJECTDIR)/object.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/objectproperties.o: $(BASICCLASSESDIR)/objectproperties.cpp $(SMOOTHINCLUDEDIR)/objectproperties.h
-	$(ECHO) -n Compiling $(BASICCLASSESDIR)/objectproperties.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/objectproperties.cpp -o $(OBJECTDIR)/objectproperties.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/objecttype.o: $(BASICCLASSESDIR)/objecttype.cpp $(SMOOTHINCLUDEDIR)/objecttype.h $(SMOOTHINCLUDEDIR)/object.h
+$(OBJECTDIR)/objecttype.o: $(BASICCLASSESDIR)/objecttype.cpp $(SMOOTHINCLUDEDIR)/basic/objecttype.h $(SMOOTHINCLUDEDIR)/basic/object.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/objecttype.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/objecttype.cpp -o $(OBJECTDIR)/objecttype.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/setup.o: $(BASICCLASSESDIR)/setup.cpp $(SMOOTHINCLUDEDIR)/setup.h
+$(OBJECTDIR)/setup.o: $(BASICCLASSESDIR)/setup.cpp $(SMOOTHINCLUDEDIR)/basic/setup.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/setup.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/setup.cpp -o $(OBJECTDIR)/setup.o
 	$(ECHO) done.
@@ -81,6 +76,11 @@ $(OBJECTDIR)/bitmap.o: $(GRAPHICSCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/grap
 $(OBJECTDIR)/bitmapbackend.o: $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmapbackend.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp -o $(OBJECTDIR)/bitmapbackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/font.o: $(GRAPHICSCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/graphics/font.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/font.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/form.o: $(GRAPHICSCLASSESDIR)/form.cpp $(SMOOTHINCLUDEDIR)/graphics/form.h
@@ -418,11 +418,6 @@ $(OBJECTDIR)/datetime.o: $(MISCCLASSESDIR)/datetime.cpp $(SMOOTHINCLUDEDIR)/misc
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/datetime.cpp -o $(OBJECTDIR)/datetime.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/font.o: $(MISCCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/misc/font.h
-	$(ECHO) -n Compiling $(MISCCLASSESDIR)/font.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/i18n.o: $(MISCCLASSESDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/misc/i18n.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/i18n.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/i18n.cpp -o $(OBJECTDIR)/i18n.o
@@ -551,6 +546,21 @@ $(OBJECTDIR)/thread.o: $(THREADSCLASSESDIR)/thread.cpp $(SMOOTHINCLUDEDIR)/threa
 $(OBJECTDIR)/threadbackend.o: $(THREADSCLASSESDIR)/threadbackend.cpp $(SMOOTHINCLUDEDIR)/threads/threadbackend.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/threadbackend.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/threadbackend.cpp -o $(OBJECTDIR)/threadbackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xul_button.o: $(XMLCLASSESDIR)/xul/button.cpp $(SMOOTHINCLUDEDIR)/xml/xul/button.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/button.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/button.cpp -o $(OBJECTDIR)/xul_button.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xul_description.o: $(XMLCLASSESDIR)/xul/description.cpp $(SMOOTHINCLUDEDIR)/xml/xul/description.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/description.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/description.cpp -o $(OBJECTDIR)/xul_description.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xul_label.o: $(XMLCLASSESDIR)/xul/label.cpp $(SMOOTHINCLUDEDIR)/xml/xul/label.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/label.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/label.cpp -o $(OBJECTDIR)/xul_label.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/xul_menubar.o: $(XMLCLASSESDIR)/xul/menubar.cpp $(SMOOTHINCLUDEDIR)/xml/xul/menubar.h

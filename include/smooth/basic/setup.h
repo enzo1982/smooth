@@ -16,7 +16,7 @@ namespace smooth
 	class Setup;
 };
 
-#include "definitions.h"
+#include "../definitions.h"
 
 namespace smooth
 {

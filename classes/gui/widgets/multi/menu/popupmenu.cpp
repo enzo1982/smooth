@@ -11,7 +11,6 @@
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/multi/menu/popupview.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/gui/application/application.h>
@@ -20,12 +19,12 @@ const S::Int	 S::GUI::PopupMenu::classID = S::Object::RequestClassID();
 
 S::GUI::PopupMenu::PopupMenu(Menu *menu)
 {
-	type				= classID;
-	objectProperties->orientation	= OR_FREE;
-	toolwnd				= NIL;
-	popupView			= NIL;
-	prevPopup			= NIL;
-	nextPopup			= NIL;
+	type		= classID;
+	orientation	= OR_FREE;
+	toolwnd		= NIL;
+	popupView	= NIL;
+	prevPopup	= NIL;
+	nextPopup	= NIL;
 
 	possibleContainers.AddEntry(Window::classID);
 
@@ -34,9 +33,9 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 	for (Int i = 0; i < menu->GetNOfObjects(); i++)
 	{
 		MenuEntry	*entry = (MenuEntry *) menu->GetNthObject(i);
-		MenuEntry	*nEntry = realMenu->AddEntry(entry->GetText(), entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->GetObjectProperties()->orientation);
+		MenuEntry	*nEntry = realMenu->AddEntry(entry->GetText(), entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->GetOrientation());
 
-		nEntry->SetTooltip(entry->GetTooltip());
+		nEntry->SetTooltipText(entry->GetTooltipText());
 		nEntry->SetStatusText(entry->description);
 
 		nEntry->onClick.Connect(&entry->onClick);
@@ -60,7 +59,7 @@ S::GUI::PopupMenu::~PopupMenu()
 
 	delete realMenu;
 
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::PopupMenu::Show()
@@ -68,7 +67,7 @@ S::Int S::GUI::PopupMenu::Show()
 	if (!registered)	return Error;
 	if (visible)		return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Error;
 
@@ -76,8 +75,8 @@ S::Int S::GUI::PopupMenu::Show()
 
 	GetSize();
 
-	if (objectProperties->pos.x + popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) objectProperties->pos.x = LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x - popupsize.cx - 1;
-	if (objectProperties->pos.y + popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) objectProperties->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - popupsize.cy - 1;
+	if (pos.x + popupsize.cx >= LiSAGetDisplaySizeX() - wnd->pos.x) pos.x = LiSAGetDisplaySizeX() - wnd->pos.x - popupsize.cx - 1;
+	if (pos.y + popupsize.cy >= LiSAGetDisplaySizeY() - wnd->pos.y) pos.y = LiSAGetDisplaySizeY() - wnd->pos.y - popupsize.cy - 1;
 
 	visible = True;
 
@@ -85,7 +84,7 @@ S::Int S::GUI::PopupMenu::Show()
 	popupView	= new PopupView(this, realMenu);
 
 	toolwnd->SetOwner(this);
-	toolwnd->SetMetrics(objectProperties->pos + wnd->GetObjectProperties()->pos, Size(popupsize.cx + 1, popupsize.cy + 1));
+	toolwnd->SetMetrics(pos + wnd->pos, Size(popupsize.cx + 1, popupsize.cy + 1));
 	toolwnd->RegisterObject(popupView);
 
 	wnd->RegisterObject(toolwnd);
@@ -102,7 +101,7 @@ S::Int S::GUI::PopupMenu::Hide()
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Error;
 
@@ -140,7 +139,7 @@ S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -190,10 +189,10 @@ S::Int S::GUI::PopupMenu::GetSizeX()
 	{
 		MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
-		if (entry->GetObjectProperties()->textSize.cx > greatest)
+		if (entry->textSize.cx > greatest)
 		{
-			mSize		= 50 + entry->GetObjectProperties()->textSize.cx;
-			greatest	= entry->GetObjectProperties()->textSize.cx;
+			mSize		= 50 + entry->textSize.cx;
+			greatest	= entry->textSize.cx;
 		}
 	}
 

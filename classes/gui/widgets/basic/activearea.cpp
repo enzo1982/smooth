@@ -10,7 +10,6 @@
 
 #include <smooth/gui/widgets/basic/activearea.h>
 #include <smooth/definitions.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/misc/math.h>
@@ -18,23 +17,23 @@
 
 const S::Int	 S::GUI::ActiveArea::classID = S::Object::RequestClassID();
 
-S::GUI::ActiveArea::ActiveArea(Int color, Point pos, Size size)
+S::GUI::ActiveArea::ActiveArea(Int color, Point iPos, Size iSize)
 {
 	type		= classID;
 	areaColor	= color;
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos		= iPos;
+	size		= iSize;
 
-	if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
-	if (objectProperties->size.cy == 0) objectProperties->size.cy = 20;
+	if (size.cx == 0) size.cx = 80;
+	if (size.cy == 0) size.cy = 20;
 }
 
 S::GUI::ActiveArea::~ActiveArea()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::ActiveArea::Paint(Int message)
@@ -42,7 +41,7 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -55,8 +54,8 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 		case SP_PAINT:
 			frame.left	= realPos.x;
 			frame.top	= realPos.y;
-			frame.right	= realPos.x + objectProperties->size.cx - 1;
-			frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+			frame.right	= realPos.x + size.cx - 1;
+			frame.bottom	= realPos.y + size.cy - 1;
 
 			surface->Frame(frame, FRAME_DOWN);
 
@@ -78,7 +77,7 @@ S::Int S::GUI::ActiveArea::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -88,8 +87,8 @@ S::Int S::GUI::ActiveArea::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x + 1;
 	frame.top	= realPos.y + 1;
-	frame.right	= realPos.x + objectProperties->size.cx - 2;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 2;
+	frame.right	= realPos.x + size.cx - 2;
+	frame.bottom	= realPos.y + size.cy - 2;
 
 	switch (message)
 	{

@@ -22,24 +22,24 @@ Void smooth::DetachDLL()
 
 const Int	 ActiveAreaPlugin::classID = Object::RequestClassID();
 
-ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point pos, Size size)
+ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point iPos, Size iSize)
 {
-	type			= classID;
-	areaColor		= color;
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	type		= classID;
+	areaColor	= color;
+	pos		= iPos;
+	size		= iSize;
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos.x		= Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y		= Math::Round(pos.y * Setup::FontSize);
-	objectProperties->size.cx	= Math::Round(size.cx * Setup::FontSize);
-	objectProperties->size.cy	= Math::Round(size.cy * Setup::FontSize);
+	pos.x	= Math::Round(pos.x * Setup::FontSize);
+	pos.y	= Math::Round(pos.y * Setup::FontSize);
+	size.cx	= Math::Round(size.cx * Setup::FontSize);
+	size.cy	= Math::Round(size.cy * Setup::FontSize);
 }
 
 ActiveAreaPlugin::~ActiveAreaPlugin()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 Int ActiveAreaPlugin::Paint(Int message)
@@ -47,7 +47,7 @@ Int ActiveAreaPlugin::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -57,8 +57,8 @@ Int ActiveAreaPlugin::Paint(Int message)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	frame.right	= realPos.x + size.cx - 1;
+	frame.bottom	= realPos.y + size.cy - 1;
 
 	surface->Frame(frame, FRAME_DOWN);
 
@@ -75,7 +75,7 @@ Int ActiveAreaPlugin::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -85,7 +85,7 @@ Int ActiveAreaPlugin::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			if ((wnd->MouseX() > realPos.x) && (wnd->MouseX() < (realPos.x + objectProperties->size.cx - 1)) && (wnd->MouseY() > realPos.y) && (wnd->MouseY() < (realPos.y + objectProperties->size.cy - 1)))
+			if ((wnd->MouseX() > realPos.x) && (wnd->MouseX() < (realPos.x + size.cx - 1)) && (wnd->MouseY() > realPos.y) && (wnd->MouseY() < (realPos.y + size.cy - 1)))
 			{
 				onClick.Emit(wnd->MouseX(), wnd->MouseY());
 

@@ -8,9 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/object.h>
 #include <smooth/threads/semaphore.h>
-#include <smooth/gui/application/application.h>
 
 #ifdef __WIN32__
 #include <smooth/threads/win32/semaphorewin32.h>
@@ -29,8 +27,6 @@ S::Threads::Semaphore::Semaphore(Void *iSemaphore)
 #endif
 
 	type = classID;
-
-	possibleContainers.AddEntry(GUI::Application::classID);
 }
 
 S::Threads::Semaphore::~Semaphore()

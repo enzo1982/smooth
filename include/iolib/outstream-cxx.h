@@ -44,22 +44,30 @@ OutStream : public IOLibStream
 
 		bool			 InitPBD		();
 		bool			 CompletePBD		();
+
 		bool			 WriteData		();
 	public:
 		bool			 OutputNumber		(long, int);
 		bool			 OutputNumberRaw	(long, int);
 		bool			 OutputNumberPDP	(long, int);
 		bool			 OutputNumberPBD	(long, int);
+
 		bool			 OutputString		(const char *);
 		bool			 OutputLine		(const char *);
 		bool			 OutputData		(const void *, int);
+
 		bool			 SetPackageSize		(int);
+
 		bool			 SetFilter		(IOLibFilter *);
 		bool			 RemoveFilter		();
+
 		bool			 Close			();
+
 		bool			 Seek			(long);
 		bool			 RelSeek		(long);
+
 		bool			 Flush			();
+
 					 OutStream		(int, IOLibDriver *);
 					 OutStream		(int, const char *, int = OS_APPEND);
 					 OutStream		(int, FILE *);

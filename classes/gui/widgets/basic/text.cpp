@@ -12,27 +12,26 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Text::classID = S::Object::RequestClassID();
 
-S::GUI::Text::Text(String text, Point pos)
+S::GUI::Text::Text(String iText, Point iPos)
 {
-	type = classID;
+	type	= classID;
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos = pos;
-	objectProperties->text = text;
+	pos	= iPos;
+	text	= iText;
 
 	GetTextSize();
 }
 
 S::GUI::Text::~Text()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Text::Paint(Int message)
@@ -40,16 +39,16 @@ S::Int S::GUI::Text::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
 	Rect	 textRect;
-	Point	 realPos = GetRealPosition();
-	Font	 font = objectProperties->font;
+	Point	 realPos	= GetRealPosition();
+	Font	 nFont		= font;
 
-	objectProperties->size.cx = objectProperties->textSize.cx;
-	objectProperties->size.cy = objectProperties->textSize.cy + 1;
+	size.cx = textSize.cx;
+	size.cy = textSize.cy + 1;
 
 	switch (message)
 	{
@@ -57,12 +56,12 @@ S::Int S::GUI::Text::Paint(Int message)
 		case SP_PAINT:
 			textRect.left	= realPos.x;
 			textRect.top	= realPos.y;
-			textRect.right	= textRect.left + objectProperties->textSize.cx;
-			textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
+			textRect.right	= textRect.left + textSize.cx;
+			textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
 
-			if (!active) font.SetColor(Setup::GrayTextColor);
+			if (!active) nFont.SetColor(Setup::GrayTextColor);
 
-			surface->SetText(objectProperties->text, textRect, font);
+			surface->SetText(text, textRect, nFont);
 
 			break;
 	}

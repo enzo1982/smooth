@@ -12,41 +12,40 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/gui/widgets/special/tooltip.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/binary.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/input.h>
+#include <smooth/basic/input.h>
 #include <smooth/system/event.h>
 
 const S::Int	 S::GUI::Titlebar::classID = S::Object::RequestClassID();
 
 S::GUI::Titlebar::Titlebar(Int buttons)
 {
-	type				= classID;
-	paintActive			= True;
-	flags				= buttons;
-	closechk			= False;
-	minchk				= False;
-	maxchk				= False;
-	closeclk			= False;
-	minclk				= False;
-	maxclk				= False;
-	objectProperties->orientation	= OR_TOP;
-	objectProperties->size.cy	= 19;
-	subtype				= WO_NOSEPARATOR;
+	type		= classID;
+	paintActive	= True;
+	flags		= buttons;
+	closechk	= False;
+	minchk		= False;
+	maxchk		= False;
+	closeclk	= False;
+	minclk		= False;
+	maxclk		= False;
+	orientation	= OR_TOP;
+	size.cy		= 19;
+	subtype		= WO_NOSEPARATOR;
 
 	possibleContainers.AddEntry(Window::classID);
 
-	objectProperties->font.SetWeight(FW_BOLD);
+	font.SetWeight(FW_BOLD);
 }
 
 S::GUI::Titlebar::~Titlebar()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Titlebar::Paint(Int message)
@@ -54,8 +53,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface	= myContainer->GetDrawSurface();
-	Window	*wnd		= myContainer->GetContainerWindow();
+	Surface	*surface	= container->GetDrawSurface();
+	Window	*wnd		= container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -72,12 +71,12 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	Int	 buttonColor;
 	Bitmap	 icon = wnd->GetIcon();
 
-	objectProperties->text = wnd->GetObjectProperties()->text;
+	text = wnd->GetText();
 
-	titleFrame.left		= objectProperties->pos.x;
-	titleFrame.top		= objectProperties->pos.y;
-	titleFrame.right	= titleFrame.left + objectProperties->size.cx - 1;
-	titleFrame.bottom	= titleFrame.top + objectProperties->size.cy - 1;
+	titleFrame.left		= pos.x;
+	titleFrame.top		= pos.y;
+	titleFrame.right	= titleFrame.left + size.cx - 1;
+	titleFrame.bottom	= titleFrame.top + size.cy - 1;
 
 	if (icon != NIL) titleFrame.left += 18;
 
@@ -96,10 +95,10 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	titleText.right		= titleGradient.right - 4;
 	titleText.bottom	= titleGradient.bottom - 2;
 
-	if (paintActive)	objectProperties->font.SetColor(Setup::GradientTextColor);
-	else			objectProperties->font.SetColor(Setup::InactiveGradientTextColor);
+	if (paintActive)	font.SetColor(Setup::GradientTextColor);
+	else			font.SetColor(Setup::InactiveGradientTextColor);
 
-	surface->SetText(objectProperties->text, titleText, objectProperties->font);
+	surface->SetText(text, titleText, font);
 
 	if (icon != NIL)
 	{
@@ -213,11 +212,11 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Size	 cpwp;
 	Rect	 rect;
 	Rect	 wRect;
@@ -231,10 +230,10 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	Bool	 paint = False;
 	Int	 retVal = Success;
 
-	titleFrame.left		= objectProperties->pos.x;
-	titleFrame.top		= objectProperties->pos.y;
-	titleFrame.right	= titleFrame.left + objectProperties->size.cx - 1;
-	titleFrame.bottom	= titleFrame.top + objectProperties->size.cy;
+	titleFrame.left		= pos.x;
+	titleFrame.top		= pos.y;
+	titleFrame.right	= titleFrame.left + size.cx - 1;
+	titleFrame.bottom	= titleFrame.top + size.cy;
 
 	if (wnd->GetIcon() != NIL) titleFrame.left += 18;
 
@@ -350,12 +349,12 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 						if (peekLoop > 0)	event->ProcessNextEvent(False);
 						else			event->ProcessNextEvent(True);
 
-						SetWindowPos((HWND) wnd->GetSystemWindow(), 0, Input::MouseX() - cpwp.cx, Input::MouseY() - cpwp.cy, wnd->GetObjectProperties()->size.cx, wnd->GetObjectProperties()->size.cy, 0);
+						SetWindowPos((HWND) wnd->GetSystemWindow(), 0, Input::MouseX() - cpwp.cx, Input::MouseY() - cpwp.cy, wnd->size.cx, wnd->size.cy, 0);
 
 						Rect	 wndRect = wnd->GetWindowRect();
 
-						wnd->GetObjectProperties()->pos = Point(wndRect.left, wndRect.top);
-						wnd->GetObjectProperties()->size = Size(wndRect.right - wndRect.left, wndRect.bottom - wndRect.top);
+						wnd->pos = Point(wndRect.left, wndRect.top);
+						wnd->size = Size(wndRect.right - wndRect.left, wndRect.bottom - wndRect.top);
 					}
 					while (GetAsyncKeyState(leftButton) != 0);
 

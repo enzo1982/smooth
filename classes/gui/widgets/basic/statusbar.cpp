@@ -10,24 +10,23 @@
 
 #include <smooth/gui/widgets/basic/statusbar.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Statusbar::classID = S::Object::RequestClassID();
 
 S::GUI::Statusbar::Statusbar(String status)
 {
-	type				= classID;
-	objectProperties->text		= status;
-	objectProperties->orientation	= OR_BOTTOM;
-	objectProperties->size.cy	= 16;
+	type		= classID;
+	text		= status;
+	orientation	= OR_BOTTOM;
+	size.cy		= 16;
 
 	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::Statusbar::~Statusbar()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Statusbar::Paint(Int message)
@@ -35,41 +34,41 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Rect	 textRect;
 
-	textRect.left	= objectProperties->pos.x + 4;
-	textRect.top	= objectProperties->pos.y + 1;
-	textRect.right	= objectProperties->pos.x + objectProperties->size.cx;
-	textRect.bottom	= objectProperties->pos.y + objectProperties->size.cy;
+	textRect.left	= pos.x + 4;
+	textRect.top	= pos.y + 1;
+	textRect.right	= pos.x + size.cx;
+	textRect.bottom	= pos.y + size.cy;
 
-	surface->SetText(objectProperties->text, textRect,  objectProperties->font);
+	surface->SetText(text, textRect, font);
 
 	return Success;
 }
 
 S::Int S::GUI::Statusbar::SetText(const String &newStatus)
 {
-	String	 oldStatus = objectProperties->text;
+	String	 oldStatus = text;
 
-	objectProperties->text = newStatus;
+	text = newStatus;
 
 	if (!registered || !visible) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Rect	 textRect;
 
-	textRect.left	= objectProperties->pos.x + 4;
-	textRect.top	= objectProperties->pos.y + 1;
-	textRect.right	= objectProperties->pos.x + objectProperties->size.cx;
-	textRect.bottom	= objectProperties->pos.y + objectProperties->size.cy;
+	textRect.left	= pos.x + 4;
+	textRect.top	= pos.y + 1;
+	textRect.right	= pos.x + size.cx;
+	textRect.bottom	= pos.y + size.cy;
 
-	Font	 font = objectProperties->font;
+	Font	 nFont = font;
 
-	font.SetColor(Setup::BackgroundColor);
+	nFont.SetColor(Setup::BackgroundColor);
 
-	surface->SetText(oldStatus, textRect, font);
-	surface->SetText(objectProperties->text, textRect, objectProperties->font);
+	surface->SetText(oldStatus, textRect, nFont);
+	surface->SetText(text, textRect, font);
 
 	return Success;
 }

@@ -22,7 +22,6 @@
 #include <smooth/misc/string.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/gui/widgets/basic/titlebar.h>
@@ -294,7 +293,7 @@ S::GUI::Dialogs::ColorSelection::~ColorSelection()
 
 S::Int S::GUI::Dialogs::ColorSelection::ShowDialog()
 {
-	if (parentWindow != NIL)	dlgwnd->SetMetrics(Point(parentWindow->GetObjectProperties()->pos.x + 25, parentWindow->GetObjectProperties()->pos.y + 25), Size(436, 286));
+	if (parentWindow != NIL)	dlgwnd->SetMetrics(Point(parentWindow->pos.x + 25, parentWindow->pos.y + 25), Size(436, 286));
 	if (caption != NIL)		dlgwnd->SetText(caption);
 
 	dlgwnd->Show();

@@ -8,27 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/object.h>
-#include <smooth/objectproperties.h>
-#include <smooth/misc/i18n.h>
+#ifndef _H_OBJSMOOTH_BUFFER_INCLUDE_
+#define _H_OBJSMOOTH_BUFFER_INCLUDE_
 
-S::ObjectProperties::ObjectProperties()
-{
-	pos.x		= 0;
-	pos.y		= 0;
-	size.cx		= 100;
-	size.cy		= 100;
+#include "templates/buffer/buffer.h"
+#include "templates/buffer/buffer.cpp"
 
-	orientation	= OR_UPPERLEFT;
-
-	text		= NIL;
-	tooltip		= NIL;
-
-	textSize.cx	= 0;
-	textSize.cy	= 0;
-	tooltipSize.cx	= 0;
-	tooltipSize.cy	= 0;
-
-	checked		= False;
-	clicked		= False;
-}
+#endif

@@ -44,21 +44,28 @@ InStream : public IOLibStream
 
 		bool			 InitPBD		();
 		bool			 CompletePBD		();
+
 		bool			 ReadData		();
 	public:
 		long			 InputNumber		(int);
 		long			 InputNumberRaw		(int);
 		long			 InputNumberPDP		(int);
 		long			 InputNumberPBD		(int);
+
 		char			*InputString		(int);
 		char			*InputLine		();
 		void			*InputData		(void *, int);
+
 		bool			 SetPackageSize		(int);
+
 		bool			 SetFilter		(IOLibFilter *);
 		bool			 RemoveFilter		();
+
 		bool			 Close			();
+
 		bool			 Seek			(long);
 		bool			 RelSeek		(long);
+
 					 InStream		(int, IOLibDriver *);
 					 InStream		(int, const char *, int = IS_NORMAL);
 					 InStream		(int, FILE *);

@@ -40,7 +40,7 @@ S::Void S::GUI::BackgroundApplication::TimerProc()
 		{
 			if (!object->IsObjectInUse())
 			{
-				if (object->IsObjectDeleteable())
+				if (object->IsObjectDeletable())
 				{
 					delete object;
 

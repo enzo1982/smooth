@@ -20,14 +20,16 @@
 #include "iolib-cxx.h"
 
 #include "smooth/definitions.h"
-#include "smooth/object.h"
-#include "smooth/array.h"
-#include "smooth/objectproperties.h"
 #include "smooth/loop.h"
 #include "smooth/version.h"
-#include "smooth/setup.h"
-#include "smooth/input.h"
+
+#include "smooth/array.h"
+#include "smooth/buffer.h"
 #include "smooth/extended.h"
+
+#include "smooth/basic/input.h"
+#include "smooth/basic/object.h"
+#include "smooth/basic/setup.h"
 
 #include "smooth/types/bool.h"
 #include "smooth/types/float.h"
@@ -45,6 +47,7 @@
 #include "smooth/threads/thread.h"
 
 #include "smooth/graphics/bitmap.h"
+#include "smooth/graphics/font.h"
 #include "smooth/graphics/line.h"
 #include "smooth/graphics/point.h"
 #include "smooth/graphics/rect.h"
@@ -54,7 +57,6 @@
 #include "smooth/misc/binary.h"
 #include "smooth/misc/config.h"
 #include "smooth/misc/datetime.h"
-#include "smooth/misc/font.h"
 #include "smooth/misc/i18n.h"
 #include "smooth/misc/math.h"
 #include "smooth/misc/string.h"

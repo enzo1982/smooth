@@ -23,10 +23,9 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/system/timer.h>
 #include <smooth/color.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/multi/menu/menubar.h>
 #include <smooth/gui/mdi/window.h>
-#include <smooth/input.h>
+#include <smooth/basic/input.h>
 #include <smooth/resources.h>
 #include <smooth/misc/binary.h>
 #include <smooth/graphics/surface.h>
@@ -54,8 +53,8 @@ S::GUI::Window::Window(String title, Void *iWindow)
 
 	type = classID;
 
-	if (title != NIL)	objectProperties->text = title;
-	else			objectProperties->text = "smooth Application";
+	if (title != NIL)	text = title;
+	else			text = "smooth Application";
 
 	value = 0;
 
@@ -72,7 +71,7 @@ S::GUI::Window::Window(String title, Void *iWindow)
 	initshow	= False;
 	firstPaint	= True;
 
-	objectProperties->size = Size(200, 200);
+	size = Size(200, 200);
 
 	trackMenu = NIL;
 	paintTimer = NIL;
@@ -108,7 +107,7 @@ S::GUI::Window::~Window()
 
 	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop--;
 
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 
 	delete backend;
 }
@@ -119,8 +118,8 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 
 	if (created) backend->SetMetrics(nPos, nSize);
 
-	objectProperties->pos	= nPos;
-	objectProperties->size	= nSize;
+	pos	= nPos;
+	size	= nSize;
 
 	return Success;
 }
@@ -159,21 +158,21 @@ S::GUI::Layer *S::GUI::Window::GetMainLayer()
 	return mainLayer;
 }
 
-S::Int S::GUI::Window::SetText(const String &newTitle)
+S::Int S::GUI::Window::SetText(const String &nTitle)
 {
-	objectProperties->text = newTitle;
+	text = nTitle;
 
 	if (created)
 	{
 		Process(SM_WINDOWTITLECHANGED, 0, 0);
 
-		backend->SetTitle(objectProperties->text);
+		backend->SetTitle(text);
 	}
 
 	return Success;
 }
 
-S::Int S::GUI::Window::SetStatusText(String newStatus)
+S::Int S::GUI::Window::SetStatusText(String nStatus)
 {
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -183,7 +182,7 @@ S::Int S::GUI::Window::SetStatusText(String newStatus)
 
 		if (object->GetObjectType() == Statusbar::classID)
 		{
-			((Statusbar *) object)->SetText(newStatus);
+			((Statusbar *) object)->SetText(nStatus);
 
 			return Success;
 		}
@@ -209,9 +208,9 @@ S::String S::GUI::Window::GetStatusText()
 	return NIL;
 }
 
-S::Int S::GUI::Window::SetDefaultStatusText(String newStatus)
+S::Int S::GUI::Window::SetDefaultStatusText(String nStatus)
 {
-	defaultStatus = newStatus;
+	defaultStatus = nStatus;
 
 	RestoreDefaultStatusText();
 
@@ -361,7 +360,7 @@ S::Bool S::GUI::Window::IsMinimized()
 
 S::GUI::Rect S::GUI::Window::GetWindowRect()
 {
-	return Rect(objectProperties->pos, objectProperties->size);
+	return Rect(pos, size);
 }
 
 S::GUI::Rect S::GUI::Window::GetClientRect()
@@ -409,7 +408,7 @@ S::Bool S::GUI::Window::Create()
 {
 	if (registered && !created)
 	{
-		if (backend->Open(objectProperties->text, objectProperties->pos, objectProperties->size, flags) == Success)
+		if (backend->Open(text, pos, size, flags) == Success)
 		{
 			created = True;
 			visible = False;
@@ -499,7 +498,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 	{
 		Bool	 destroyPopup = True;
 
-		if (message == WM_KILLFOCUS && Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->handle >= trackMenu->handle) destroyPopup = False;
+		if (message == WM_KILLFOCUS && Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->GetHandle() >= trackMenu->GetHandle()) destroyPopup = False;
 
 		if (destroyPopup)
 		{
@@ -565,8 +564,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 					BeginPaint((HWND) backend->GetSystemWindow(), &ps);
 
-					if ((Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20) || firstPaint)	Paint(SP_DELAYED);
-					else																								Paint(SP_UPDATE);
+					if ((Math::Abs((updateRect.right - updateRect.left) - size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - size.cy) < 20) || firstPaint)	Paint(SP_DELAYED);
+					else																			Paint(SP_UPDATE);
 
 					EndPaint((HWND) backend->GetSystemWindow(), &ps);
 				}
@@ -580,16 +579,16 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_WINDOWPOSCHANGED:
 			{
 				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
-				Bool		 resized = (objectProperties->size.cx != wndpos->cx || objectProperties->size.cy != wndpos->cy);
+				Bool		 resized = (size.cx != wndpos->cx || size.cy != wndpos->cy);
 
-				objectProperties->pos	= Point(wndpos->x, wndpos->y);
-				objectProperties->size	= Size(wndpos->cx, wndpos->cy);
+				pos	= Point(wndpos->x, wndpos->y);
+				size	= Size(wndpos->cx, wndpos->cy);
 
-				GetDrawSurface()->SetSize(objectProperties->size);
+				GetDrawSurface()->SetSize(size);
 
 				if (resized)
 				{
-					updateRect = Rect(Point(0, 0), objectProperties->size);
+					updateRect = Rect(Point(0, 0), size);
 
 					CalculateOffsets();
 
@@ -607,7 +606,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 					if (object == NIL) continue;
 
-					if (object->GetObjectType() == classID && object->handle > handle && (object->GetFlags() & WF_MODAL))
+					if (object->GetObjectType() == classID && object->GetHandle() > GetHandle() && (object->GetFlags() & WF_MODAL))
 					{
 						SetActiveWindow((HWND) ((Window *) object)->GetSystemWindow());
 
@@ -630,8 +629,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (GetWindow(actWnd) == NIL)					activate = False;
 				else if (GetWindow(actWnd)->type == ToolWindow::classID)	break;
-				else if (GetWindow(actWnd)->handle < handle)			activate = True;
-				else if (GetWindow(actWnd)->handle > handle)			GetWindow(actWnd)->SetFlags(WF_MODAL);
+				else if (GetWindow(actWnd)->GetHandle() < GetHandle())		activate = True;
+				else if (GetWindow(actWnd)->GetHandle() > GetHandle())		GetWindow(actWnd)->SetFlags(WF_MODAL);
 
 				if (activate && message == WM_ACTIVATEAPP)
 				{
@@ -683,8 +682,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (GetWindow(actWnd) == NIL)					activate = True;
 				else if (GetWindow(actWnd)->type == ToolWindow::classID)	activate = False;
-				else if (GetWindow(actWnd)->handle < handle)			activate = True;
-				else if (GetWindow(actWnd)->handle > handle)			GetWindow(actWnd)->SetFlags(WF_SYSTEMMODAL);
+				else if (GetWindow(actWnd)->GetHandle() < GetHandle())		activate = True;
+				else if (GetWindow(actWnd)->GetHandle() > GetHandle())		GetWindow(actWnd)->SetFlags(WF_SYSTEMMODAL);
 
 				if (activate)
 				{
@@ -708,8 +707,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				{
 					trackMenu = new PopupMenu(track);
 
-					trackMenu->GetObjectProperties()->pos.x = MouseX();
-					trackMenu->GetObjectProperties()->pos.y = MouseY();
+					trackMenu->pos.x = MouseX();
+					trackMenu->pos.y = MouseY();
 
 					trackMenu->onClick.Connect(&Window::PopupProc, this);
 
@@ -727,18 +726,15 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 	{
 		for (Int i = GetNOfObjects() - 1; i >= 0; i--)
 		{
-			Object	*object = assocObjects.GetNthEntry(i);
+			Widget	*object = assocObjects.GetNthEntry(i);
 
 			if (object == NIL) continue;
 
-			if (object->GetObjectType() == Widget::classID)
+			if (object->Process(message, wParam, lParam) == Break)
 			{
-				if (((Widget *) object)->Process(message, wParam, lParam) == Break)
-				{
-					rVal = 0;
+				rVal = 0;
 
-					break;
-				}
+				break;
 			}
 		}
 	}
@@ -760,10 +756,10 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	Surface	*surface = GetDrawSurface();
 
-	if (firstPaint || (updateRect.left < 2))				updateRect.left		= 2;
-	if (firstPaint || (updateRect.top < 2))					updateRect.top		= 2;
-	if (firstPaint || (objectProperties->size.cx - updateRect.right < 2))	updateRect.right	= objectProperties->size.cx - 2;
-	if (firstPaint || (objectProperties->size.cy - updateRect.bottom < 2))	updateRect.bottom	= objectProperties->size.cy - 2;
+	if (firstPaint || (updateRect.left < 2))		updateRect.left		= 2;
+	if (firstPaint || (updateRect.top < 2))			updateRect.top		= 2;
+	if (firstPaint || (size.cx - updateRect.right < 2))	updateRect.right	= size.cx - 2;
+	if (firstPaint || (size.cy - updateRect.bottom < 2))	updateRect.bottom	= size.cy - 2;
 
 	if (message == SP_UPDATE)
 	{
@@ -786,51 +782,48 @@ S::Int S::GUI::Window::Paint(Int message)
 
 		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
-			Object	*object = assocObjects.GetNthEntry(i);
+			Widget	*object = assocObjects.GetNthEntry(i);
 
-			if (object->GetObjectType() == Widget::classID)
+			if (object->GetOrientation() == OR_TOP)
 			{
-				if (object->GetObjectProperties()->orientation == OR_TOP)
+				topobjcount++;
+
+				lastWidget = object;
+
+				if (object->subtype == WO_SEPARATOR)
 				{
-					topobjcount++;
+					bias = -3;
 
-					lastWidget = (Widget *) object;
+					topoffset += object->size.cy + 3;
 
-					if (((Widget *) object)->subtype == WO_SEPARATOR)
-					{
-						bias = -3;
+					doublebar1.x = 4;
+					doublebar1.y = topoffset - 2;
+					doublebar2.x = size.cx - 4;
+					doublebar2.y = doublebar1.y;
 
-						topoffset += object->GetObjectProperties()->size.cy + 3;
+					if (icon != NIL) doublebar1.x += 17;
+					if (Setup::rightToLeft) doublebar1.x++;
 
-						doublebar1.x = 4;
-						doublebar1.y = topoffset - 2;
-						doublebar2.x = objectProperties->size.cx - 4;
-						doublebar2.y = doublebar1.y;
-
-						if (icon != NIL) doublebar1.x += 17;
-						if (Setup::rightToLeft) doublebar1.x++;
-
-						surface->Bar(doublebar1, doublebar2, OR_HORZ);
-					}
-					else
-					{
-						bias = 0;
-
-						topoffset += object->GetObjectProperties()->size.cy;
-					}
+					surface->Bar(doublebar1, doublebar2, OR_HORZ);
 				}
-				else if (object->GetObjectProperties()->orientation == OR_BOTTOM)
+				else
 				{
-					btmobjcount++;
+					bias = 0;
+
+					topoffset += object->size.cy;
 				}
-				else if (object->GetObjectProperties()->orientation == OR_LEFT)
-				{
-					leftobjcount++;
-				}
-				else if (object->GetObjectProperties()->orientation == OR_RIGHT)
-				{
-					rightobjcount++;
-				}
+			}
+			else if (object->GetOrientation() == OR_BOTTOM)
+			{
+				btmobjcount++;
+			}
+			else if (object->GetOrientation() == OR_LEFT)
+			{
+				leftobjcount++;
+			}
+			else if (object->GetOrientation() == OR_RIGHT)
+			{
+				rightobjcount++;
 			}
 		}
 
@@ -838,7 +831,7 @@ S::Int S::GUI::Window::Paint(Int message)
 		{
 			doublebar1.x = 4;
 			doublebar1.y = innerOffset.top - 2 + bias;
-			doublebar2.x = objectProperties->size.cx - 4;
+			doublebar2.x = size.cx - 4;
 
 			if (topobjcount > 0) if (lastWidget->subtype == WO_NOSEPARATOR) doublebar1.y -= 3;
 
@@ -855,8 +848,8 @@ S::Int S::GUI::Window::Paint(Int message)
 		if (btmobjcount > 0)
 		{
 			doublebar1.x = 4;
-			doublebar1.y = objectProperties->size.cy - innerOffset.bottom;
-			doublebar2.x = objectProperties->size.cx - 4;
+			doublebar1.y = size.cy - innerOffset.bottom;
+			doublebar2.x = size.cx - 4;
 			doublebar2.y = doublebar1.y;
 
 			surface->Bar(doublebar1, doublebar2, OR_HORZ);
@@ -872,31 +865,28 @@ S::Int S::GUI::Window::Paint(Int message)
 			doublebar1.x = innerOffset.left - 3;
 			doublebar1.y = innerOffset.top;
 			doublebar2.x = doublebar1.x;
-			doublebar2.y = objectProperties->size.cy - innerOffset.bottom - 2;
+			doublebar2.y = size.cy - innerOffset.bottom - 2;
 
 			surface->Bar(doublebar1, doublebar2, OR_VERT);
 		}
 
 		if (rightobjcount > 0)
 		{
-			doublebar1.x = objectProperties->size.cx - innerOffset.right + 1;
+			doublebar1.x = size.cx - innerOffset.right + 1;
 			doublebar1.y = innerOffset.top;
 			doublebar2.x = doublebar1.x;
-			doublebar2.y = objectProperties->size.cy - innerOffset.bottom - 2;
+			doublebar2.y = size.cy - innerOffset.bottom - 2;
 
 			surface->Bar(doublebar1, doublebar2, OR_VERT);
 		}
 
 		for (Int j = 0; j < GetNOfObjects(); j++)
 		{
-			Object	*object = assocObjects.GetNthEntry(j);
+			Widget	*object = assocObjects.GetNthEntry(j);
 
 			if (object == NIL) continue;
 
-			if (object->GetObjectType() == Widget::classID)
-			{
-				if (((Widget *) object)->IsVisible() && ((Widget *) object)->IsAffected(updateRect) && object->GetObjectType() != Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
-			}
+			if (object->IsVisible() && object->IsAffected(updateRect) && object->GetObjectType() != Layer::classID) object->Paint(SP_PAINT);
 		}
 
 		if ((message == SP_DELAYED) && (flags & WF_DELAYPAINT))
@@ -938,7 +928,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 {
 	if (type == ToolWindow::classID) return;
 
-	Object	*operat;
+	Widget	*operat;
 	Widget	*lastWidget = NIL;
 	Int	 rightobjcount = 0;
 	Int	 leftobjcount = 0;
@@ -952,19 +942,19 @@ S::Void S::GUI::Window::CalculateOffsets()
 	{
 		operat = assocObjects.GetNthEntry(i);
 
-		if (operat->GetObjectProperties()->orientation == OR_TOP)
+		if (operat->GetOrientation() == OR_TOP)
 		{
 			topobjcount++;
 
-			lastWidget = (Widget *) operat;
+			lastWidget = operat;
 
-			operat->GetObjectProperties()->pos.x	= innerOffset.left;
-			operat->GetObjectProperties()->pos.y	= innerOffset.top;
-			operat->GetObjectProperties()->size.cx	= objectProperties->size.cx - innerOffset.left - innerOffset.right;
+			operat->pos.x	= innerOffset.left;
+			operat->pos.y	= innerOffset.top;
+			operat->size.cx	= size.cx - innerOffset.left - innerOffset.right;
 
-			innerOffset.top += operat->GetObjectProperties()->size.cy;
+			innerOffset.top += operat->size.cy;
 
-			if (((Widget *) operat)->subtype == WO_SEPARATOR) innerOffset.top += 3;
+			if (operat->subtype == WO_SEPARATOR) innerOffset.top += 3;
 		}
 	}
 
@@ -979,15 +969,15 @@ S::Void S::GUI::Window::CalculateOffsets()
 	{
 		operat = assocObjects.GetNthEntry(i);
 
-		if (operat->GetObjectProperties()->orientation == OR_BOTTOM)
+		if (operat->GetOrientation() == OR_BOTTOM)
 		{
 			btmobjcount++;
 
-			operat->GetObjectProperties()->pos.x	= innerOffset.left;
-			operat->GetObjectProperties()->pos.y	= objectProperties->size.cy - innerOffset.bottom - operat->GetObjectProperties()->size.cy;
-			operat->GetObjectProperties()->size.cx	= objectProperties->size.cx - innerOffset.left - innerOffset.right;
+			operat->pos.x	= innerOffset.left;
+			operat->pos.y	= size.cy - innerOffset.bottom - operat->size.cy;
+			operat->size.cx	= size.cx - innerOffset.left - innerOffset.right;
 
-			innerOffset.bottom += operat->GetObjectProperties()->size.cy;
+			innerOffset.bottom += operat->size.cy;
 		}
 	}
 
@@ -997,15 +987,15 @@ S::Void S::GUI::Window::CalculateOffsets()
 	{
 		operat = assocObjects.GetNthEntry(i);
 
-		if (operat->GetObjectProperties()->orientation == OR_LEFT)
+		if (operat->GetOrientation() == OR_LEFT)
 		{
 			leftobjcount++;
 
-			operat->GetObjectProperties()->pos.x	= innerOffset.left;
-			operat->GetObjectProperties()->pos.y	= innerOffset.top;
-			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - innerOffset.top - innerOffset.bottom;
+			operat->pos.x	= innerOffset.left;
+			operat->pos.y	= innerOffset.top;
+			operat->size.cy	= size.cy - innerOffset.top - innerOffset.bottom;
 
-			innerOffset.left += operat->GetObjectProperties()->size.cx;
+			innerOffset.left += operat->size.cx;
 		}
 	}
 
@@ -1015,15 +1005,15 @@ S::Void S::GUI::Window::CalculateOffsets()
 	{
 		operat = assocObjects.GetNthEntry(i);
 
-		if (operat->GetObjectProperties()->orientation == OR_RIGHT)
+		if (operat->GetOrientation() == OR_RIGHT)
 		{
 			rightobjcount++;
 
-			operat->GetObjectProperties()->pos.x	= objectProperties->size.cx - innerOffset.right - operat->GetObjectProperties()->size.cx;
-			operat->GetObjectProperties()->pos.y	= innerOffset.top;
-			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - innerOffset.top - innerOffset.bottom;
+			operat->pos.x	= size.cx - innerOffset.right - operat->size.cx;
+			operat->pos.y	= innerOffset.top;
+			operat->size.cy	= size.cy - innerOffset.top - innerOffset.bottom;
 
-			innerOffset.right += operat->GetObjectProperties()->size.cx;
+			innerOffset.right += operat->size.cx;
 		}
 	}
 
@@ -1033,25 +1023,25 @@ S::Void S::GUI::Window::CalculateOffsets()
 	{
 		operat = assocObjects.GetNthEntry(i);
 
-		if (operat->GetObjectProperties()->orientation == OR_CENTER)
+		if (operat->GetOrientation() == OR_CENTER)
 		{
-			operat->GetObjectProperties()->pos.x	= innerOffset.left;
-			operat->GetObjectProperties()->pos.y	= innerOffset.top;
-			operat->GetObjectProperties()->size.cx	= objectProperties->size.cx - innerOffset.left - innerOffset.right;
-			operat->GetObjectProperties()->size.cy	= objectProperties->size.cy - innerOffset.top - innerOffset.bottom;
+			operat->pos.x	= innerOffset.left;
+			operat->pos.y	= innerOffset.top;
+			operat->size.cx	= size.cx - innerOffset.left - innerOffset.right;
+			operat->size.cy	= size.cy - innerOffset.top - innerOffset.bottom;
 		}
 	}
 }
 
 S::Int S::GUI::Window::MouseX()
 {
-	if (Setup::rightToLeft)	return objectProperties->size.cx - (Input::MouseX() - objectProperties->pos.x) - 1;
-	else			return Input::MouseX() - objectProperties->pos.x;
+	if (Setup::rightToLeft)	return size.cx - (Input::MouseX() - pos.x) - 1;
+	else			return Input::MouseX() - pos.x;
 }
 
 S::Int S::GUI::Window::MouseY()
 {
-	return Input::MouseY() - objectProperties->pos.y;
+	return Input::MouseY() - pos.y;
 }
 
 S::Bool S::GUI::Window::IsMouseOn(Rect rect)
@@ -1061,7 +1051,7 @@ S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 	if (surface->GetSystemSurface() == NIL) return False;
 
 #ifdef __WIN32__
-	if (!PtVisible((HDC) surface->GetSystemSurface(), Input::MouseX() - objectProperties->pos.x, Input::MouseY() - objectProperties->pos.y)) return False;
+	if (!PtVisible((HDC) surface->GetSystemSurface(), Input::MouseX() - pos.x, Input::MouseY() - pos.y)) return False;
 #endif
 
 	if ((MouseX() >= rect.left) && (MouseX() <= rect.right) && (MouseY() >= rect.top) && (MouseY() <= rect.bottom))	return True;
@@ -1090,7 +1080,7 @@ S::Void S::GUI::Window::PopupProc()
 	}
 }
 
-S::Int S::GUI::Window::RegisterObject(Object *object)
+S::Int S::GUI::Window::RegisterObject(Widget *object)
 {
 	if (object == NIL) return Error;
 
@@ -1098,7 +1088,7 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 	{
 		if (!object->IsRegistered())
 		{
-			assocObjects.AddEntry(object, object->handle);
+			assocObjects.AddEntry(object, object->GetHandle());
 
 			object->SetContainer(this);
 			object->SetRegisteredFlag();
@@ -1109,21 +1099,18 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 			}
 			else if (object->GetObjectType() == Statusbar::classID)
 			{
-				SetDefaultStatusText(object->GetObjectProperties()->text);
+				SetDefaultStatusText(object->GetText());
 			}
 			else if (object->GetObjectType() == ToolWindow::classID)
 			{
-				if (Setup::rightToLeft)	object->GetObjectProperties()->pos.x = objectProperties->size.cx - ((object->GetObjectProperties()->pos.x - objectProperties->pos.x) + object->GetObjectProperties()->size.cx) + objectProperties->pos.x;
+				if (Setup::rightToLeft)	object->pos.x = size.cx - ((object->pos.x - pos.x) + object->size.cx) + pos.x;
 				((Window *) object)->Create();
 			}
 
 			CalculateOffsets();
 
-			if (object->GetObjectType() == Widget::classID)
-			{
-				((Widget *) object)->onRegister.Emit(this);
-				((Widget *) object)->Show();
-			}
+			object->onRegister.Emit(this);
+			object->Show();
 
 			return Success;
 		}
@@ -1136,7 +1123,7 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 	return Error;
 }
 
-S::Int S::GUI::Window::UnregisterObject(Object *object)
+S::Int S::GUI::Window::UnregisterObject(Widget *object)
 {
 	if (object == NIL) return Error;
 
@@ -1144,13 +1131,10 @@ S::Int S::GUI::Window::UnregisterObject(Object *object)
 	{
 		if (GetNOfObjects() > 0 && object->IsRegistered())
 		{
-			if (assocObjects.RemoveEntry(object->handle) == True)
+			if (assocObjects.RemoveEntry(object->GetHandle()) == True)
 			{
-				if (object->GetObjectType() == Widget::classID)
-				{
-					((Widget *) object)->onUnregister.Emit(this);
-					((Widget *) object)->Hide();
-				}
+				object->onUnregister.Emit(this);
+				object->Hide();
 
 				object->UnsetRegisteredFlag();
 				object->SetContainer(NIL);
@@ -1186,14 +1170,11 @@ S::Void S::GUI::Window::PaintTimer()
 
 	for (Int j = 0; j < GetNOfObjects(); j++)
 	{
-		Object	*object = assocObjects.GetNthEntry(j);
+		Widget	*object = assocObjects.GetNthEntry(j);
 
 		if (object == NIL) continue;
 
-		if (object->GetObjectType() == Widget::classID)
-		{
-			if (((Widget *) object)->IsVisible() && ((Widget *) object)->IsAffected(timedUpdateRect) && object->GetObjectType() == Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
-		}
+		if (object->IsVisible() && object->IsAffected(timedUpdateRect) && object->GetObjectType() == Layer::classID) object->Paint(SP_PAINT);
 	}
 
 	onPaint.Emit();

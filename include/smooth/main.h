@@ -50,7 +50,7 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdL
 	return retValue;
 }
 #else
-int main()
+int main(int argc, char **argv)
 {
 	Init();
 

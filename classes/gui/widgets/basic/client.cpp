@@ -10,11 +10,9 @@
 
 #include <smooth/gui/widgets/basic/client.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/object.h>
 #include <smooth/gui/widgets/basic/divider.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/binary.h>
 
@@ -22,8 +20,8 @@ const S::Int	 S::GUI::Client::classID = S::Object::RequestClassID();
 
 S::GUI::Client::Client()
 {
-	type				= classID;
-	objectProperties->orientation	= OR_CENTER;
+	type		= classID;
+	orientation	= OR_CENTER;
 
 	possibleContainers.AddEntry(Window::classID);
 
@@ -32,7 +30,7 @@ S::GUI::Client::Client()
 
 S::GUI::Client::~Client()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Client::Paint(Int message)
@@ -40,8 +38,8 @@ S::Int S::GUI::Client::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface	= myContainer->GetDrawSurface();
-	Window	*wnd		= myContainer->GetContainerWindow();
+	Surface	*surface	= container->GetDrawSurface();
+	Window	*wnd		= container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -53,10 +51,10 @@ S::Int S::GUI::Client::Paint(Int message)
 	Rect	 client;
 	Rect	 updateRect = wnd->GetUpdateRect();
 
-	client.left	= objectProperties->pos.x + 2;
-	client.top	= objectProperties->pos.y + 2;
-	client.right	= objectProperties->size.cx + objectProperties->pos.x - 1;
-	client.bottom	= objectProperties->size.cy + objectProperties->pos.y - 2;
+	client.left	= pos.x + 2;
+	client.top	= pos.y + 2;
+	client.right	= size.cx + pos.x - 1;
+	client.bottom	= size.cy + pos.y - 2;
 
 	for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
 	{
@@ -64,19 +62,22 @@ S::Int S::GUI::Client::Paint(Int message)
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == Divider::classID && object->GetContainer() == myContainer)
+			if (object->GetObjectType() == Divider::classID)
 			{
-				db = (Divider *) object;
+				if (((Widget *) object)->GetContainer() == container)
+				{
+					db = (Divider *) object;
 
-				if (Binary::IsFlagSet(db->GetFlags(), OR_VERT))
-				{
-					if (Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && db->GetObjectProperties()->pos.x >= client.left - 3)		client.left = db->GetObjectProperties()->pos.x + 5;
-					else if (!Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && db->GetObjectProperties()->pos.x <= client.right + 1)	client.right = wnd->GetObjectProperties()->size.cx - db->GetObjectProperties()->pos.x - 2;
-				}
-				else if (Binary::IsFlagSet(db->GetFlags(), OR_HORZ))
-				{
-					if (Binary::IsFlagSet(db->GetFlags(), OR_TOP) && db->GetObjectProperties()->pos.y >= client.top - 2)		client.top = db->GetObjectProperties()->pos.y + 5;
-					else if (!Binary::IsFlagSet(db->GetFlags(), OR_TOP) && db->GetObjectProperties()->pos.y <= client.bottom + 1)	client.bottom = wnd->GetObjectProperties()->size.cy - db->GetObjectProperties()->pos.y - 2;
+					if (Binary::IsFlagSet(db->GetFlags(), OR_VERT))
+					{
+						if (Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && db->pos.x >= client.left - 3)		client.left = db->pos.x + 5;
+						else if (!Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && db->pos.x <= client.right + 1)	client.right = wnd->size.cx - db->pos.x - 2;
+					}
+					else if (Binary::IsFlagSet(db->GetFlags(), OR_HORZ))
+					{
+						if (Binary::IsFlagSet(db->GetFlags(), OR_TOP) && db->pos.y >= client.top - 2)		client.top = db->pos.y + 5;
+						else if (!Binary::IsFlagSet(db->GetFlags(), OR_TOP) && db->pos.y <= client.bottom + 1)	client.bottom = wnd->size.cy - db->pos.y - 2;
+					}
 				}
 			}
 		}
@@ -124,5 +125,5 @@ S::Int S::GUI::Client::Paint(Int message)
 
 S::GUI::Size S::GUI::Client::GetSize()
 {
-	return Size(objectProperties->size.cx - 6, objectProperties->size.cy - 7);
+	return Size(size.cx - 6, size.cy - 7);
 }

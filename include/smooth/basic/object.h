@@ -14,17 +14,11 @@
 namespace smooth
 {
 	class Object;
-	class ObjectProperties;
-
-	namespace GUI
-	{
-		class Container;
-	};
 };
 
-#include "definitions.h"
-#include "misc/string.h"
-#include "array.h"
+#include "../definitions.h"
+#include "../misc/string.h"
+#include "../array.h"
 #include "objecttype.h"
 
 namespace smooth
@@ -33,63 +27,53 @@ namespace smooth
 	{
 		friend class Signal;
 		private:
-			static Int		 nextID;
+			static Int		 nextClassID;
+			static Int		 nextObjectHandle;
 
 			static Array<Object *>	 objects;
 
+			Int			 handle;
+			String			 name;
+
 			Bool			 deleteObject;
-			Int			 inUse;
+			Int			 isObjectInUse;
 		protected:
-			Int			 flags;
 			ObjectType		 type;
 
-			Bool			 registered;
-
-			ObjectProperties	*objectProperties;
-			GUI::Container		*myContainer;
+			Int			 flags;
 
 			Int			 EnterProtectedRegion();
 			Int			 LeaveProtectedRegion();
 		public:
-			static Int		 GetNOfObjects();
-			static Object		*GetNthObject(Int);
-			static Object		*RequestObject(Int);
-
 			static const Int	 classID;
-
-			Array<Int>		 possibleContainers;
-			static Int		 objectCount;
-
-			Int			 handle;
-
-						 Object();
-			virtual			~Object();
-
-			Bool			 IsRegistered();
-
-			Int			 SetFlags(Int);
-			Int			 GetFlags();
-
-			virtual Bool		 IsTypeCompatible(Int);
-
-			ObjectProperties	*GetObjectProperties();
-			ObjectType		 GetObjectType();
-
-			Int			 SetContainer(GUI::Container *);
-			GUI::Container		*GetContainer();
-
-			Void			 SetRegisteredFlag();
-			Void			 UnsetRegisteredFlag();
-
-			Int			 IsObjectInUse();
-			Bool			 IsObjectDeleteable();
 
 			static Int		 RequestClassID();
 			static Int		 RequestObjectHandle();
 
-			static Object		*GetObject(Int, Int);
+			static Int		 GetNOfObjects();
+			static Object		*GetNthObject(Int);
+
+			static Object		*GetObject(Int, Int = Object::classID);
+			static Object		*GetObject(String);
 
 			static Int		 DeleteObject(Object *);
+
+						 Object();
+			virtual			~Object();
+
+			Int			 GetHandle();
+
+			Int			 SetName(String);
+			String			 GetName();
+
+			Int			 SetFlags(Int);
+			Int			 GetFlags();
+
+			ObjectType		 GetObjectType();
+			virtual Bool		 IsTypeCompatible(Int);
+
+			Bool			 IsObjectInUse();
+			Bool			 IsObjectDeletable();
 	};
 };
 

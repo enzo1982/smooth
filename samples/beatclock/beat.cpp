@@ -539,7 +539,7 @@ Void BeatClock::PaintAll()
 {
 	Surface			*surface = wnd->GetDrawSurface();
 
-	surface->StartPaint(Rect(Point(10, 50), Size(wnd->GetObjectProperties()->size.cx - 20, 50)));
+	surface->StartPaint(Rect(Point(10, 50), Size(wnd->size.cx - 20, 50)));
 
 	Rect			 textRect;
 	SYSTEMTIME		 time;
@@ -707,7 +707,7 @@ Void BeatClock::PaintAll()
 			case True:
 				textRect.left = (Int) ((16 * Setup::FontSize) + 0.5);
 				textRect.top = (Int) ((53 * Setup::FontSize) + 0.5);
-				textRect.right = wnd->GetObjectProperties()->size.cx - (Int) ((16 * Setup::FontSize) + 0.5);
+				textRect.right = wnd->size.cx - (Int) ((16 * Setup::FontSize) + 0.5);
 				textRect.bottom = textRect.top + (Int) ((40 * Setup::FontSize) + 0.5);
 
 				surface->Box(textRect, Setup::BackgroundColor, FILLED);
@@ -722,7 +722,7 @@ Void BeatClock::PaintAll()
 				{
 					textRect.left = (Int) ((16 * Setup::FontSize) + 0.5);
 					textRect.top = (Int) ((53 * Setup::FontSize) + 0.5);
-					textRect.right = wnd->GetObjectProperties()->size.cx - (Int) ((16 * Setup::FontSize) + 0.5);
+					textRect.right = wnd->size.cx - (Int) ((16 * Setup::FontSize) + 0.5);
 					textRect.bottom = textRect.top + (Int) ((40 * Setup::FontSize) + 0.5);
 
 					surface->Box(textRect, Setup::BackgroundColor, FILLED);

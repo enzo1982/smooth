@@ -8,33 +8,37 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_OBJECTTYPE_
-#define _H_OBJSMOOTH_OBJECTTYPE_
+#ifndef _H_OBJSMOOTH_BUFFER_
+#define _H_OBJSMOOTH_BUFFER_
+
+#include "../../definitions.h"
 
 namespace smooth
 {
-	class Object;
-	class ObjectType;
-};
-
-#include "definitions.h"
-
-namespace smooth
-{
-	class SMOOTHAPI ObjectType
+	template <class t> class Buffer
 	{
 		private:
-			Int		 type;
-			Object		*object;
+			t		*memory;
+
+			Int		 size;
+			Int		 allocated;
 		public:
-					 ObjectType(Object *);
-					 ObjectType(const ObjectType &);
+					 Buffer();
+					 Buffer(Int);
+					 Buffer(const Buffer<t> &);
 
-			operator	 Int();
-			Int operator	 =(Int);
+					~Buffer();
 
-			Bool operator	 ==(Int);
-			Bool operator	 !=(Int);
+			Int		 Size();
+			Int		 Resize(Int);
+
+			Int		 Zero();
+			Int		 Free();
+
+			t &operator	 [](const int);
+			t &operator	 [](const Int);
+
+			operator	 t *();
 	};
 };
 

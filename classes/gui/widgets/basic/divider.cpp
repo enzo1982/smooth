@@ -12,41 +12,40 @@
 #include <smooth/definitions.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/binary.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::Divider::classID = S::Object::RequestClassID();
 
-S::GUI::Divider::Divider(Int pos, Int iOrientation)
+S::GUI::Divider::Divider(Int position, Int iOrientation)
 {
-	type				= classID;
-	flags				= iOrientation;
-	objectProperties->orientation	= OR_FREE;
+	type		= classID;
+	flags		= iOrientation;
+	orientation	= OR_FREE;
 
-	if (pos == 0) pos = 120;
+	if (position == 0) position = 120;
 
 	possibleContainers.AddEntry(Window::classID);
 	possibleContainers.AddEntry(Layer::classID);
 
-	if (Binary::IsFlagSet(flags, OR_HORZ))		{ objectProperties->pos.x = 0; objectProperties->pos.y = pos; }
-	else if (Binary::IsFlagSet(flags, OR_VERT))	{ objectProperties->pos.x = pos; objectProperties->pos.y = 0; }
+	if (Binary::IsFlagSet(flags, OR_HORZ))		{ pos.x = 0; pos.y = position; }
+	else if (Binary::IsFlagSet(flags, OR_VERT))	{ pos.x = position; pos.y = 0; }
 }
 
 S::GUI::Divider::~Divider()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
-S::Int S::GUI::Divider::SetPos(Int pos)
+S::Int S::GUI::Divider::SetPos(Int position)
 {
 	Bool	 prevVisible = visible;
 
 	if (registered && visible) Hide();
 
-	if (Binary::IsFlagSet(flags, OR_HORZ))		objectProperties->pos.y = pos;
-	else if (Binary::IsFlagSet(flags, OR_VERT))	objectProperties->pos.x = pos;
+	if (Binary::IsFlagSet(flags, OR_HORZ))		pos.y = position;
+	else if (Binary::IsFlagSet(flags, OR_VERT))	pos.x = position;
 
 	if (registered && prevVisible) Show();
 
@@ -55,8 +54,8 @@ S::Int S::GUI::Divider::SetPos(Int pos)
 
 S::Int S::GUI::Divider::GetPos()
 {
-	if (Binary::IsFlagSet(flags, OR_HORZ))		return objectProperties->pos.y;
-	else if (Binary::IsFlagSet(flags, OR_VERT))	return objectProperties->pos.x;
+	if (Binary::IsFlagSet(flags, OR_HORZ))		return pos.y;
+	else if (Binary::IsFlagSet(flags, OR_VERT))	return pos.x;
 
 	return 0;
 }
@@ -66,11 +65,11 @@ S::Int S::GUI::Divider::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Object	*object;
 	Divider	*operat;
 	Point	 doubleBar1;
@@ -79,14 +78,14 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 	if (Binary::IsFlagSet(flags, OR_HORZ))
 	{
-		if (myContainer->GetObjectType() == Window::classID)
+		if (container->GetObjectType() == Window::classID)
 		{
 			doubleBar1.x = 4;
 
-			if (Binary::IsFlagSet(flags, OR_TOP))		doubleBar1.y = objectProperties->pos.y;
-			else if	(Binary::IsFlagSet(flags, OR_BOTTOM))	doubleBar1.y = wnd->GetObjectProperties()->size.cy - objectProperties->pos.y;
+			if (Binary::IsFlagSet(flags, OR_TOP))		doubleBar1.y = pos.y;
+			else if	(Binary::IsFlagSet(flags, OR_BOTTOM))	doubleBar1.y = wnd->size.cy - pos.y;
 
-			doubleBar2.x = wnd->GetObjectProperties()->size.cx - 4;
+			doubleBar2.x = wnd->size.cx - 4;
 			doubleBar2.y = doubleBar1.y;
 
 			for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
@@ -95,35 +94,38 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 				if (object != NIL)
 				{
-					if (object->GetObjectType() == classID && object->GetContainer() == myContainer)
+					if (object->GetObjectType() == classID)
 					{
-						operat = (Divider *) object;
-
-						if (afterMe && Binary::IsFlagSet(operat->flags, OR_VERT))
+						if (((Widget *) object)->GetContainer() == container)
 						{
-							if (Binary::IsFlagSet(operat->flags, OR_LEFT))
-							{
-								if (operat->GetObjectProperties()->pos.x >= doubleBar1.x - 2) doubleBar1.x = operat->GetObjectProperties()->pos.x + 3;
-							}
-							else
-							{
-								if (operat->GetObjectProperties()->pos.x <= doubleBar2.x+1) doubleBar2.x = wnd->GetObjectProperties()->size.cx - operat->GetObjectProperties()->pos.x - 2;
-							}
-						}
+							operat = (Divider *) object;
 
-						if (operat == this) afterMe = True;
+							if (afterMe && Binary::IsFlagSet(operat->flags, OR_VERT))
+							{
+								if (Binary::IsFlagSet(operat->flags, OR_LEFT))
+								{
+									if (operat->pos.x >= doubleBar1.x - 2) doubleBar1.x = operat->pos.x + 3;
+								}
+								else
+								{
+									if (operat->pos.x <= doubleBar2.x+1) doubleBar2.x = wnd->size.cx - operat->pos.x - 2;
+								}
+							}
+
+							if (operat == this) afterMe = True;
+						}
 					}
 				}
 			}
 		}
-		else if (myContainer->GetObjectType() == Layer::classID)
+		else if (container->GetObjectType() == Layer::classID)
 		{
-			doubleBar1.x = ((Layer *) myContainer)->GetRealPosition().x + 4;
+			doubleBar1.x = ((Layer *) container)->GetRealPosition().x + 4;
 
-			if (Binary::IsFlagSet(flags, OR_TOP))		doubleBar1.y = ((Layer *) myContainer)->GetRealPosition().y + objectProperties->pos.y;
-			else if	(Binary::IsFlagSet(flags, OR_BOTTOM))	doubleBar1.y = ((Layer *) myContainer)->GetRealPosition().y + ((Layer *) myContainer)->GetObjectProperties()->size.cy - objectProperties->pos.y;
+			if (Binary::IsFlagSet(flags, OR_TOP))		doubleBar1.y = ((Layer *) container)->GetRealPosition().y + pos.y;
+			else if	(Binary::IsFlagSet(flags, OR_BOTTOM))	doubleBar1.y = ((Layer *) container)->GetRealPosition().y + ((Layer *) container)->size.cy - pos.y;
 
-			doubleBar2.x = ((Layer *) myContainer)->GetRealPosition().x + ((Layer *) myContainer)->GetObjectProperties()->size.cx - 4;
+			doubleBar2.x = ((Layer *) container)->GetRealPosition().x + ((Layer *) container)->size.cx - 4;
 			doubleBar2.y = doubleBar1.y;
 
 			for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
@@ -132,43 +134,46 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 				if (object != NIL)
 				{
-					if (object->GetObjectType() == classID && object->GetContainer() == myContainer)
+					if (object->GetObjectType() == classID)
 					{
-						operat = (Divider *) object;
-
-						if (afterMe && Binary::IsFlagSet(operat->flags, OR_VERT))
+						if (((Widget *) object)->GetContainer() == container)
 						{
-							if (Binary::IsFlagSet(operat->flags, OR_LEFT))
-							{
-								if (((Layer *) myContainer)->GetRealPosition().x + operat->GetObjectProperties()->pos.x >= doubleBar1.x-2) doubleBar1.x = ((Layer *) myContainer)->GetRealPosition().x + operat->GetObjectProperties()->pos.x + 3;
-							}
-							else
-							{
-								if (((Layer *) myContainer)->GetRealPosition().x + ((Layer *) myContainer)->GetObjectProperties()->size.cx - operat->GetObjectProperties()->pos.x <= doubleBar2.x+1) doubleBar2.x = ((Layer *) myContainer)->GetRealPosition().x + ((Layer *) myContainer)->GetObjectProperties()->size.cx - operat->GetObjectProperties()->pos.x - 2;
-							}
-						}
+							operat = (Divider *) object;
 
-						if (operat == this) afterMe = True;
+							if (afterMe && Binary::IsFlagSet(operat->flags, OR_VERT))
+							{
+								if (Binary::IsFlagSet(operat->flags, OR_LEFT))
+								{
+									if (((Layer *) container)->GetRealPosition().x + operat->pos.x >= doubleBar1.x-2) doubleBar1.x = ((Layer *) container)->GetRealPosition().x + operat->pos.x + 3;
+								}
+								else
+								{
+									if (((Layer *) container)->GetRealPosition().x + ((Layer *) container)->size.cx - operat->pos.x <= doubleBar2.x+1) doubleBar2.x = ((Layer *) container)->GetRealPosition().x + ((Layer *) container)->size.cx - operat->pos.x - 2;
+								}
+							}
+
+							if (operat == this) afterMe = True;
+						}
 					}
 				}
 			}
 		}
 
-		objectProperties->size.cx = doubleBar2.x - doubleBar1.x + 4;
-		objectProperties->size.cy = 2;
+		size.cx = doubleBar2.x - doubleBar1.x + 4;
+		size.cy = 2;
 
 		surface->Bar(doubleBar1, doubleBar2, OR_HORZ);
 	}
 	else if (Binary::IsFlagSet(flags, OR_VERT))
 	{
-		if (myContainer->GetObjectType() == Window::classID)
+		if (container->GetObjectType() == Window::classID)
 		{
-			if (Binary::IsFlagSet(flags, OR_LEFT))		doubleBar1.x = objectProperties->pos.x;
-			else if	(Binary::IsFlagSet(flags, OR_RIGHT))	doubleBar1.x = wnd->GetObjectProperties()->size.cx - objectProperties->pos.x;
+			if (Binary::IsFlagSet(flags, OR_LEFT))		doubleBar1.x = pos.x;
+			else if	(Binary::IsFlagSet(flags, OR_RIGHT))	doubleBar1.x = wnd->size.cx - pos.x;
 
 			doubleBar1.y = wnd->GetClientRect().top;
 			doubleBar2.x = doubleBar1.x;
-			doubleBar2.y = wnd->GetObjectProperties()->size.cy - wnd->GetClientRect().bottom - 2;
+			doubleBar2.y = wnd->size.cy - wnd->GetClientRect().bottom - 2;
 
 			for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
 			{
@@ -176,35 +181,38 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 				if (object != NIL)
 				{
-					if (object->GetObjectType() == classID && object->GetContainer() == myContainer)
+					if (object->GetObjectType() == classID)
 					{
-						operat = (Divider *) object;
-
-						if (afterMe && Binary::IsFlagSet(operat->flags, OR_HORZ))
+						if (((Widget *) object)->GetContainer() == container)
 						{
-							if (Binary::IsFlagSet(operat->flags, OR_TOP))
-							{
-								if (operat->GetObjectProperties()->pos.y >= doubleBar1.y-2) doubleBar1.y = operat->GetObjectProperties()->pos.y + 3;
-							}
-							else
-							{
-								if (operat->GetObjectProperties()->pos.y <= doubleBar2.y+1) doubleBar2.y = wnd->GetObjectProperties()->size.cy - operat->GetObjectProperties()->pos.y - 2;
-							}
-						}
+							operat = (Divider *) object;
 
-						if (operat == this) afterMe = True;
+							if (afterMe && Binary::IsFlagSet(operat->flags, OR_HORZ))
+							{
+								if (Binary::IsFlagSet(operat->flags, OR_TOP))
+								{
+									if (operat->pos.y >= doubleBar1.y-2) doubleBar1.y = operat->pos.y + 3;
+								}
+								else
+								{
+									if (operat->pos.y <= doubleBar2.y+1) doubleBar2.y = wnd->size.cy - operat->pos.y - 2;
+								}
+							}
+
+							if (operat == this) afterMe = True;
+						}
 					}
 				}
 			}
 		}
-		else if (myContainer->GetObjectType() == Layer::classID)
+		else if (container->GetObjectType() == Layer::classID)
 		{
-			if (Binary::IsFlagSet(flags, OR_LEFT))		doubleBar1.x = ((Layer *) myContainer)->GetRealPosition().x + objectProperties->pos.x;
-			else if (Binary::IsFlagSet(flags, OR_RIGHT))	doubleBar1.x = ((Layer *) myContainer)->GetRealPosition().x + ((Layer *) myContainer)->GetObjectProperties()->size.cx - objectProperties->pos.x;
+			if (Binary::IsFlagSet(flags, OR_LEFT))		doubleBar1.x = ((Layer *) container)->GetRealPosition().x + pos.x;
+			else if (Binary::IsFlagSet(flags, OR_RIGHT))	doubleBar1.x = ((Layer *) container)->GetRealPosition().x + ((Layer *) container)->size.cx - pos.x;
 
-			doubleBar1.y = ((Layer *) myContainer)->GetRealPosition().y + 4;
+			doubleBar1.y = ((Layer *) container)->GetRealPosition().y + 4;
 			doubleBar2.x = doubleBar1.x;
-			doubleBar2.y = ((Layer *) myContainer)->GetRealPosition().y + ((Layer *) myContainer)->GetObjectProperties()->size.cy - 4;
+			doubleBar2.y = ((Layer *) container)->GetRealPosition().y + ((Layer *) container)->size.cy - 4;
 
 			for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
 			{
@@ -212,30 +220,33 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 				if (object != NIL)
 				{
-					if (object->GetObjectType() == classID && object->GetContainer() == myContainer)
+					if (object->GetObjectType() == classID)
 					{
-						operat = (Divider *) object;
-
-						if (afterMe && Binary::IsFlagSet(operat->flags, OR_HORZ))
+						if (((Widget *) object)->GetContainer() == container)
 						{
-							if (Binary::IsFlagSet(operat->flags, OR_TOP))
-							{
-								if (((Layer *) myContainer)->GetRealPosition().y + operat->GetObjectProperties()->pos.y >= doubleBar1.y-2) doubleBar1.y = ((Layer *) myContainer)->GetRealPosition().y + operat->GetObjectProperties()->pos.y + 3;
-							}
-							else
-							{
-								if (((Layer *) myContainer)->GetRealPosition().y + ((Layer *) myContainer)->GetObjectProperties()->size.cy - operat->GetObjectProperties()->pos.y <= doubleBar2.y+1) doubleBar2.y = ((Layer *) myContainer)->GetRealPosition().y + ((Layer *) myContainer)->GetObjectProperties()->size.cy - operat->GetObjectProperties()->pos.y - 2;
-							}
-						}
+							operat = (Divider *) object;
 
-						if (operat == this) afterMe = True;
+							if (afterMe && Binary::IsFlagSet(operat->flags, OR_HORZ))
+							{
+								if (Binary::IsFlagSet(operat->flags, OR_TOP))
+								{
+									if (((Layer *) container)->GetRealPosition().y + operat->pos.y >= doubleBar1.y-2) doubleBar1.y = ((Layer *) container)->GetRealPosition().y + operat->pos.y + 3;
+								}
+								else
+								{
+									if (((Layer *) container)->GetRealPosition().y + ((Layer *) container)->size.cy - operat->pos.y <= doubleBar2.y+1) doubleBar2.y = ((Layer *) container)->GetRealPosition().y + ((Layer *) container)->size.cy - operat->pos.y - 2;
+								}
+							}
+
+							if (operat == this) afterMe = True;
+						}
 					}
 				}
 			}
 		}
 
-		objectProperties->size.cy = doubleBar2.y - doubleBar1.y + 4;
-		objectProperties->size.cx = 2;
+		size.cy = doubleBar2.y - doubleBar1.y + 4;
+		size.cx = 2;
 
 		surface->Bar(doubleBar1, doubleBar2, OR_VERT);
 	}

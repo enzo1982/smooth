@@ -11,7 +11,7 @@
 #ifndef _H_OBJSMOOTH_SIGNAL_
 #define _H_OBJSMOOTH_SIGNAL_
 
-#include "../../object.h"
+#include "../../basic/object.h"
 
 namespace smooth
 {

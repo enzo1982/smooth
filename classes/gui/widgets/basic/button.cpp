@@ -14,7 +14,6 @@
 #include <smooth/misc/math.h>
 #include <smooth/gui/widgets/special/tooltip.h>
 #include <smooth/color.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/gui/window/window.h>
@@ -23,24 +22,24 @@
 
 const S::Int	 S::GUI::Button::classID = S::Object::RequestClassID();
 
-S::GUI::Button::Button(String text, const Bitmap &bmp, Point pos, Size size)
+S::GUI::Button::Button(String iText, const Bitmap &bmp, Point iPos, Size iSize)
 {
-	type			= classID;
-	objectProperties->text	= text;
-	bitmap			= bmp;
-	tipTimer		= NIL;
-	tooltip			= NIL;
-	backgroundColor		= -1;
+	type		= classID;
+	text		= iText;
+	bitmap		= bmp;
+	tipTimer	= NIL;
+	tooltip		= NIL;
+	backgroundColor	= -1;
 
 	bitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos		= iPos;
+	size		= iSize;
 
-	if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
-	if (objectProperties->size.cy == 0) objectProperties->size.cy = 22;
+	if (size.cx == 0) size.cx = 80;
+	if (size.cy == 0) size.cy = 22;
 
 	if (bitmap == NIL)	bmpSize = Size(0, 0);
 	else			bmpSize = bitmap.GetSize();
@@ -74,7 +73,7 @@ S::GUI::Button::~Button()
 		tooltip = NIL;
 	}
 
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Button::SetBackgroundColor(Int nColor)
@@ -89,7 +88,7 @@ S::Int S::GUI::Button::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -104,8 +103,8 @@ S::Int S::GUI::Button::Paint(Int message)
 		case SP_PAINT:
 			frame.left	= realPos.x;
 			frame.top	= realPos.y;
-			frame.right	= realPos.x + objectProperties->size.cx - 1;
-			frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+			frame.right	= realPos.x + size.cx - 1;
+			frame.bottom	= realPos.y + size.cy - 1;
 
 			if (!(flags & BF_NOFRAME)) surface->Frame(frame, FRAME_DOWN);
 
@@ -122,41 +121,41 @@ S::Int S::GUI::Button::Paint(Int message)
 
 				iFrame.left	= realPos.x + 4;
 				iFrame.top	= realPos.y + 4;
-				iFrame.right	= realPos.x + objectProperties->size.cx - 4;
-				iFrame.bottom	= realPos.y + objectProperties->size.cy - 4;
+				iFrame.right	= realPos.x + size.cx - 4;
+				iFrame.bottom	= realPos.y + size.cy - 4;
 
 				surface->Box(iFrame, backgroundColor, FILLED);
 			}
 
-			if (objectProperties->text != NIL)
+			if (text != NIL)
 			{
 				if (bitmap != NIL)
 				{
-					textRect.left	= frame.left + ((objectProperties->size.cx - objectProperties->textSize.cx - bmpSize.cx - 7) / 2) + bmpSize.cx + 6;
-					textRect.top	= frame.top + ((objectProperties->size.cy - objectProperties->textSize.cy) / 2) - 2;
-					textRect.right	= textRect.left + objectProperties->textSize.cx + 1;
-					textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
+					textRect.left	= frame.left + ((size.cx - textSize.cx - bmpSize.cx - 7) / 2) + bmpSize.cx + 6;
+					textRect.top	= frame.top + ((size.cy - textSize.cy) / 2) - 2;
+					textRect.right	= textRect.left + textSize.cx + 1;
+					textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
 				}
 				else
 				{
-					textRect.left	= frame.left + ((objectProperties->size.cx - objectProperties->textSize.cx) / 2) - 1;
-					textRect.top	= frame.top + ((objectProperties->size.cy - objectProperties->textSize.cy) / 2) - 2;
-					textRect.right	= textRect.left + objectProperties->textSize.cx + 1;
-					textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
+					textRect.left	= frame.left + ((size.cx - textSize.cx) / 2) - 1;
+					textRect.top	= frame.top + ((size.cy - textSize.cy) / 2) - 2;
+					textRect.right	= textRect.left + textSize.cx + 1;
+					textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
 				}
 
-				Font	 font = objectProperties->font;
+				Font	 nFont = font;
 
-				if (!active) font.SetColor(Setup::GrayTextColor);
+				if (!active) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->SetText(objectProperties->text, textRect, font);
+				surface->SetText(text, textRect, nFont);
 			}
 
 			if (bitmap != NIL)
 			{
-				if (objectProperties->text != NIL)
+				if (text != NIL)
 				{
-					bmpRect.left	= frame.left + (frame.right - frame.left - bmpSize.cx - objectProperties->textSize.cx - 7) / 2 + 1;
+					bmpRect.left	= frame.left + (frame.right - frame.left - bmpSize.cx - textSize.cx - 7) / 2 + 1;
 					bmpRect.top	= frame.top + (frame.bottom - frame.top - bmpSize.cy) / 2 + 1;
 					bmpRect.right	= bmpRect.left + bmpSize.cx;
 					bmpRect.bottom	= bmpRect.top + bmpSize.cy;
@@ -172,15 +171,15 @@ S::Int S::GUI::Button::Paint(Int message)
 				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 			}
 
-			if (objectProperties->checked || (flags & BF_SHOWHIGHLIGHT))
+			if (checked || (flags & BF_SHOWHIGHLIGHT))
 			{
 				frame.left	= realPos.x + 4;
 				frame.top	= realPos.y + 4;
-				frame.right	= realPos.x + objectProperties->size.cx - 5;
-				frame.bottom	= realPos.y + objectProperties->size.cy - 5;
+				frame.right	= realPos.x + size.cx - 5;
+				frame.bottom	= realPos.y + size.cy - 5;
 
-				if (objectProperties->clicked)	surface->Frame(frame, FRAME_DOWN);
-				else				surface->Frame(frame, FRAME_UP);
+				if (clicked)	surface->Frame(frame, FRAME_DOWN);
+				else		surface->Frame(frame, FRAME_UP);
 			}
 
 			break;
@@ -188,8 +187,8 @@ S::Int S::GUI::Button::Paint(Int message)
 		case SP_MOUSEUP:
 			frame.left	= realPos.x + 4;
 			frame.top	= realPos.y + 4;
-			frame.right	= realPos.x + objectProperties->size.cx - 5;
-			frame.bottom	= realPos.y + objectProperties->size.cy - 5;
+			frame.right	= realPos.x + size.cx - 5;
+			frame.bottom	= realPos.y + size.cy - 5;
 
 			surface->Frame(frame, FRAME_UP);
 
@@ -197,8 +196,8 @@ S::Int S::GUI::Button::Paint(Int message)
 		case SP_MOUSEDOWN:
 			frame.left	= realPos.x + 4;
 			frame.top	= realPos.y + 4;
-			frame.right	= realPos.x + objectProperties->size.cx - 5;
-			frame.bottom	= realPos.y + objectProperties->size.cy - 5;
+			frame.right	= realPos.x + size.cx - 5;
+			frame.bottom	= realPos.y + size.cy - 5;
 
 			surface->Frame(frame, FRAME_DOWN);
 
@@ -208,8 +207,8 @@ S::Int S::GUI::Button::Paint(Int message)
 			{
 				frame.left	= realPos.x + 4;
 				frame.top	= realPos.y + 4;
-				frame.right	= realPos.x + objectProperties->size.cx - 5;
-				frame.bottom	= realPos.y + objectProperties->size.cy - 5;
+				frame.right	= realPos.x + size.cx - 5;
+				frame.bottom	= realPos.y + size.cy - 5;
 
 				surface->Frame(frame, FRAME_UP);
 			}
@@ -217,8 +216,8 @@ S::Int S::GUI::Button::Paint(Int message)
 			{
 				frame.left	= realPos.x + 4;
 				frame.top	= realPos.y + 4;
-				frame.right	= realPos.x + objectProperties->size.cx - 4;
-				frame.bottom	= realPos.y + objectProperties->size.cy - 4;
+				frame.right	= realPos.x + size.cx - 4;
+				frame.bottom	= realPos.y + size.cy - 4;
 
 				surface->Box(frame, backgroundColor >= 0 ? backgroundColor : Setup::BackgroundColor, OUTLINED);
 			}
@@ -236,7 +235,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -248,16 +247,16 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x + 4;
 	frame.top	= realPos.y + 4;
-	frame.right	= realPos.x + objectProperties->size.cx - 5;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 5;
+	frame.right	= realPos.x + size.cx - 5;
+	frame.bottom	= realPos.y + size.cy - 5;
 
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
 		case SM_LBUTTONDBLCLK:
-			if (objectProperties->checked)
+			if (checked)
 			{
-				objectProperties->clicked = True;
+				clicked = True;
 
 				Paint(SP_MOUSEDOWN);
 
@@ -286,10 +285,10 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONUP:
-			if (objectProperties->clicked)
+			if (clicked)
 			{
-				objectProperties->clicked = False;
-				objectProperties->checked = False;
+				clicked = False;
+				checked = False;
 
 				Paint(SP_MOUSEUP);
 				Process(SM_MOUSEMOVE, 0, 0);
@@ -301,13 +300,13 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-			if (!objectProperties->checked && wnd->IsMouseOn(frame))
+			if (!checked && wnd->IsMouseOn(frame))
 			{
-				objectProperties->checked = True;
+				checked = True;
 
 				Paint(SP_MOUSEIN);
 
-				if (objectProperties->tooltip != NIL)
+				if (tooltip != NIL)
 				{
 					tipTimer = new System::Timer();
 
@@ -315,10 +314,10 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 					tipTimer->Start(500);
 				}
 			}
-			else if (objectProperties->checked && !wnd->IsMouseOn(frame))
+			else if (checked && !wnd->IsMouseOn(frame))
 			{
-				objectProperties->checked = False;
-				objectProperties->clicked = False;
+				checked = False;
+				clicked = False;
 
 				Paint(SP_MOUSEOUT);
 
@@ -342,7 +341,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 					tooltip = NIL;
 				}
 			}
-			else if (objectProperties->checked && wnd->IsMouseOn(frame))
+			else if (checked && wnd->IsMouseOn(frame))
 			{
 				if (tipTimer != NIL && wParam == 0)
 				{
@@ -369,19 +368,14 @@ S::Void S::GUI::Button::ActivateTooltip()
 
 	tipTimer = NIL;
 
-	Window	*wnd = myContainer->GetContainerWindow();
-	Point	 pos;
-	Size	 size;
-
-	pos.x	= wnd->MouseX();
-	pos.y	= wnd->MouseY();
-	size.cx	= 0;
-	size.cy	= 0;
+	Window	*wnd	= container->GetContainerWindow();
+	Point	 nPos	= Point(wnd->MouseX(), wnd->MouseY());
+	Size	 nSize	= Size(0, 0);
 
 	tooltip = new Tooltip();
 
-	tooltip->SetText(objectProperties->tooltip);
-	tooltip->SetMetrics(pos, size);
+	tooltip->SetText(tooltipText);
+	tooltip->SetMetrics(nPos, nSize);
 	tooltip->SetTimeout(3000);
 
 	wnd->RegisterObject(tooltip);

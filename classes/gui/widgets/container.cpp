@@ -10,7 +10,6 @@
 
 #include <smooth/gui/widgets/container.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/object.h>
 #include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::Container::classID = S::Object::RequestClassID();
@@ -37,18 +36,18 @@ S::GUI::Container::~Container()
 	delete nullSurface;
 }
 
-S::Int S::GUI::Container::RegisterObject(Object *object)
+S::Int S::GUI::Container::RegisterObject(Widget *widget)
 {
-	if (object == NIL) return Error;
+	if (widget == NIL) return Error;
 
-	if (containerType == &object->possibleContainers)
+	if (containerType == &widget->possibleContainers)
 	{
-		if (!object->IsRegistered())
+		if (!widget->IsRegistered())
 		{
-			assocObjects.AddEntry(object, object->handle);
+			assocObjects.AddEntry(widget, widget->GetHandle());
 
-			object->SetContainer(this);
-			object->SetRegisteredFlag();
+			widget->SetContainer(this);
+			widget->SetRegisteredFlag();
 
 			return Success;
 		}
@@ -57,18 +56,18 @@ S::Int S::GUI::Container::RegisterObject(Object *object)
 	return Error;
 }
 
-S::Int S::GUI::Container::UnregisterObject(Object *object)
+S::Int S::GUI::Container::UnregisterObject(Widget *widget)
 {
-	if (object == NIL) return Error;
+	if (widget == NIL) return Error;
 
-	if (containerType == &object->possibleContainers)
+	if (containerType == &widget->possibleContainers)
 	{
-		if (object->IsRegistered())
+		if (widget->IsRegistered())
 		{
-			if (assocObjects.RemoveEntry(object->handle) == True)
+			if (assocObjects.RemoveEntry(widget->GetHandle()) == True)
 			{
-				object->UnsetRegisteredFlag();
-				object->SetContainer(NIL);
+				widget->UnsetRegisteredFlag();
+				widget->SetContainer(NIL);
 
 				return Success;
 			}
@@ -83,12 +82,12 @@ S::Int S::GUI::Container::GetNOfObjects()
 	return assocObjects.GetNOfEntries();
 }
 
-S::Object *S::GUI::Container::GetNthObject(Int n)
+S::GUI::Widget *S::GUI::Container::GetNthObject(Int n)
 {
 	return assocObjects.GetNthEntry(n);
 }
 
-S::Object *S::GUI::Container::RequestObject(Int objectHandle)
+S::GUI::Widget *S::GUI::Container::RequestObject(Int objectHandle)
 {
 	return assocObjects.GetEntry(objectHandle);
 }
@@ -106,18 +105,18 @@ S::GUI::ContainerType S::GUI::Container::GetContainerType()
 
 S::GUI::Window *S::GUI::Container::GetContainerWindow()
 {
-	Object	*object = this;
+	Widget	*widget = this;
 
-	while (object->GetObjectType() != GUI::Window::classID)
+	while (widget->GetObjectType() != Window::classID)
 	{
-		if (object->GetContainer() == NIL) return NIL;
+		if (widget->GetContainer() == NIL) return NIL;
 
-		object = object->GetContainer();
+		widget = widget->GetContainer();
 
-		if (object == NIL) return NIL;
+		if (widget == NIL) return NIL;
 	}
 
-	return (GUI::Window *) object;
+	return (Window *) widget;
 }
 
 S::GUI::Surface *S::GUI::Container::GetDrawSurface()

@@ -127,9 +127,9 @@ Window *Designer_EditComponent::GetWindow()
 	return wnd;
 }
 
-Object *Designer_EditComponent::AddObject(Int objid)
+Widget *Designer_EditComponent::AddObject(Int objid)
 {
-	Object		*newobj;
+	Widget		*newobj;
 	Container	*registrar;
 	Point		 pos;
 	Size		 size;
@@ -162,7 +162,7 @@ Object *Designer_EditComponent::AddObject(Int objid)
 	return newobj;
 }
 
-Object *Designer_EditComponent::GetFirstObject(Int objtype)
+Widget *Designer_EditComponent::GetFirstObject(Int objtype)
 {
 	for (Int i = 0; i < objects.GetNOfEntries(); i++)
 	{

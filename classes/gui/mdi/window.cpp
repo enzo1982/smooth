@@ -11,16 +11,15 @@
 #include <smooth/gui/mdi/window.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/definitions.h>
-#include <smooth/objectproperties.h>
 
 const S::Int	 S::GUI::MDI::Window::classID = S::Object::RequestClassID();
 
 S::GUI::MDI::Window::Window(String title) : GUI::Window(title)
 {
-	type				= classID;
-	containerType			= GUI::Window::classID;
+	type		= classID;
+	containerType	= GUI::Window::classID;
 
-	objectProperties->orientation	= OR_FREE;
+	orientation	= OR_FREE;
 
 	possibleContainers.RemoveAll();
 	possibleContainers.AddEntry(GUI::Window::classID);
@@ -28,5 +27,5 @@ S::GUI::MDI::Window::Window(String title) : GUI::Window(title)
 
 S::GUI::MDI::Window::~Window()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }

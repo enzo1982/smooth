@@ -34,7 +34,7 @@ InStream::InStream(int type, IOLibDriver *iDriver)
 
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
-		currentBufferPos= DEFAULT_PACKAGE_SIZE;
+		currentBufferPos= defaultPackageSize;
 		origsize	= size;
 		data		= new unsigned char [packageSize];
 		closefile	= false;
@@ -57,7 +57,7 @@ InStream::InStream(int type, const char *filename, int mode)
 
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
-		currentBufferPos= DEFAULT_PACKAGE_SIZE;
+		currentBufferPos= defaultPackageSize;
 		origsize	= size;
 		data		= new unsigned char [packageSize];
 
@@ -80,7 +80,7 @@ InStream::InStream(int type, FILE *openfile)
 		streamType	= STREAM_DRIVER;
 		size		= driver->GetSize();
 		currentFilePos	= driver->GetPos();
-		currentBufferPos= DEFAULT_PACKAGE_SIZE;
+		currentBufferPos= defaultPackageSize;
 		origsize	= size;
 		packageSize	= 1;
 		stdpacksize	= packageSize;
@@ -529,6 +529,7 @@ bool InStream::SetFilter(IOLibFilter *newFilter)
 	filter = newFilter;
 
 	filter->SetDriver(driver);
+	filter->Activate();
 
 	allowpackset = true;
 
@@ -546,8 +547,6 @@ bool InStream::SetFilter(IOLibFilter *newFilter)
 	}
 
 	Seek(currentFilePos);
-
-	filter->Activate();
 
 	while (currentBufferPos >= packageSize)
 	{

@@ -102,7 +102,7 @@ Translator::Translator()
 	edit_original->SetOrientation(OR_LOWERLEFT);
 
 	pos.x -= 62;
-	pos.y -= edit_original->GetObjectProperties()->size.cy + 11;
+	pos.y -= edit_original->size.cy + 11;
 
 	text_translated	= new Text("Translation:", pos);
 	text_translated->SetOrientation(OR_LOWERLEFT);
@@ -228,17 +228,17 @@ Bool Translator::ExitProc()
 
 Void Translator::ResizeProc()
 {
-	list_entries->GetObjectProperties()->size = Size(wnd->GetObjectProperties()->size.cx - 20, wnd->GetObjectProperties()->size.cy - 247);
+	list_entries->size = Size(wnd->size.cx - 20, wnd->size.cy - 247);
 
-	wnd->GetDrawSurface()->StartPaint(Rect(list_entries->GetObjectProperties()->pos, list_entries->GetObjectProperties()->size));
+	wnd->GetDrawSurface()->StartPaint(Rect(list_entries->pos, list_entries->size));
 
 	list_entries->Hide();
 	list_entries->Show();
 
 	wnd->GetDrawSurface()->EndPaint();
 
-	edit_original->GetObjectProperties()->size = Size(wnd->GetObjectProperties()->size.cx - 169, edit_original->GetObjectProperties()->size.cy);
-	edit_translated->GetObjectProperties()->size = Size(wnd->GetObjectProperties()->size.cx - 169, edit_translated->GetObjectProperties()->size.cy);
+	edit_original->size = Size(wnd->size.cx - 169, edit_original->size.cy);
+	edit_translated->size = Size(wnd->size.cx - 169, edit_translated->size.cy);
 }
 
 void Translator::NewFile()

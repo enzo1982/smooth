@@ -13,7 +13,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/i18n.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
@@ -22,13 +21,13 @@ const S::Int	 S::GUI::Tooltip::classID = S::Object::RequestClassID();
 
 S::GUI::Tooltip::Tooltip()
 {
-	type				= classID;
-	objectProperties->orientation	= OR_FREE;
-	toolWindow			= NIL;
-	timeOut				= 5000;
-	timer				= NIL;
+	type		= classID;
+	orientation	= OR_FREE;
+	toolWindow	= NIL;
+	timeOut		= 5000;
+	timer		= NIL;
 
-	objectProperties->font.SetColor(Setup::TooltipTextColor);
+	font.SetColor(Setup::TooltipTextColor);
 
 	possibleContainers.AddEntry(Window::classID);
 }
@@ -51,7 +50,7 @@ S::GUI::Tooltip::~Tooltip()
 		DeleteObject(toolWindow);
 	}
 
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Tooltip::Show()
@@ -62,7 +61,7 @@ S::Int S::GUI::Tooltip::Show()
 
 	if (!registered) return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerWindow();
+	Window	*wnd = (Window *) container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -71,14 +70,11 @@ S::Int S::GUI::Tooltip::Show()
 	wndRect.left	= 0;
 	wndRect.top	= 0;
 	wndRect.bottom	= 16;
-
-	Font	 font;
-
-	wndRect.right	= font.GetTextSizeX(objectProperties->text) + 6;
+	wndRect.right	= font.GetTextSizeX(text) + 6;
 
 	toolWindow = new ToolWindow();
 
-	toolWindow->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y - wndRect.bottom), Size(wndRect.right, wndRect.bottom));
+	toolWindow->SetMetrics(Point(pos.x + wnd->pos.x, pos.y + wnd->pos.y - wndRect.bottom), Size(wndRect.right, wndRect.bottom));
 	toolWindow->SetOwner(this);
 	toolWindow->onPaint.Connect(&Tooltip::DrawTooltip, this);
 
@@ -105,7 +101,7 @@ S::Int S::GUI::Tooltip::Hide()
 
 	if (!registered) return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -130,7 +126,7 @@ S::Int S::GUI::Tooltip::DrawTooltip()
 	if (!visible)		return Success;
 	if (!registered)	return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerWindow();
+	Window	*wnd = (Window *) container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -139,10 +135,7 @@ S::Int S::GUI::Tooltip::DrawTooltip()
 	wndRect.left	= 0;
 	wndRect.top	= 0;
 	wndRect.bottom	= 16;
-
-	Font	 font;
-
-	wndRect.right	= font.GetTextSizeX(objectProperties->text) + 6;
+	wndRect.right	= font.GetTextSizeX(text) + 6;
 
 	Surface	*surface = toolWindow->GetDrawSurface();
 
@@ -152,7 +145,7 @@ S::Int S::GUI::Tooltip::DrawTooltip()
 	wndRect.left	+= 2;
 	wndRect.top	+= 1;
 
-	surface->SetText(objectProperties->text, wndRect, objectProperties->font);
+	surface->SetText(text, wndRect, font);
 
 	return Success;
 }

@@ -8,9 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/object.h>
 #include <smooth/threads/mutex.h>
-#include <smooth/gui/application/application.h>
 
 #ifdef __WIN32__
 #include <smooth/threads/win32/mutexwin32.h>
@@ -29,8 +27,6 @@ S::Threads::Mutex::Mutex(Void *iMutex)
 #endif
 
 	type = classID;
-
-	possibleContainers.AddEntry(GUI::Application::classID);
 }
 
 S::Threads::Mutex::~Mutex()

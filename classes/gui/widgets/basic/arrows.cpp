@@ -12,7 +12,6 @@
 #include <smooth/gui/widgets/basic/arrows.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
@@ -20,7 +19,7 @@
 
 const S::Int	 S::GUI::Arrows::classID = S::Object::RequestClassID();
 
-S::GUI::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart, Int rangeEnd)
+S::GUI::Arrows::Arrows(Point iPos, Size iSize, Int sType, Int *var, Int rangeStart, Int rangeEnd)
 {
 	type		= classID;
 	subtype		= sType;
@@ -40,24 +39,24 @@ S::GUI::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos		= iPos;
+	size		= iSize;
 
 	if (subtype == OR_VERT)
 	{
-		if (objectProperties->size.cx == 0) objectProperties->size.cx = 18;
-		if (objectProperties->size.cy == 0) objectProperties->size.cy = 24;
+		if (size.cx == 0) size.cx = 18;
+		if (size.cy == 0) size.cy = 24;
 	}
 	else
 	{
-		if (objectProperties->size.cx == 0) objectProperties->size.cx = 24;
-		if (objectProperties->size.cy == 0) objectProperties->size.cy = 18;
+		if (size.cx == 0) size.cx = 24;
+		if (size.cy == 0) size.cy = 18;
 	}
 }
 
 S::GUI::Arrows::~Arrows()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 
 	if (timer != NIL)
 	{
@@ -74,7 +73,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Point	 lineStart;
@@ -82,8 +81,8 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	frame.right	= realPos.x + size.cx - 1;
+	frame.bottom	= realPos.y + size.cy - 1;
 
 	surface->Frame(frame, FRAME_UP);
 
@@ -184,11 +183,11 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Rect	 frame;
@@ -198,8 +197,8 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x + 2;
 	frame.top	= realPos.y + 2;
-	frame.right	= realPos.x + objectProperties->size.cx - 3;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 3;
+	frame.right	= realPos.x + size.cx - 3;
+	frame.bottom	= realPos.y + size.cy - 3;
 
 	switch (message)
 	{
@@ -220,8 +219,8 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			{
 				arrow1Clicked = True;
 
-				if (subtype == OR_VERT)	frame.bottom = realPos.y + objectProperties->size.cy / 2 - 3;
-				else			frame.right = realPos.x + objectProperties->size.cx / 2 - 3;
+				if (subtype == OR_VERT)	frame.bottom = realPos.y + size.cy / 2 - 3;
+				else			frame.right = realPos.x + size.cx / 2 - 3;
 
 				surface->Frame(frame, FRAME_DOWN);
 
@@ -239,8 +238,8 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			{
 				arrow2Clicked = True;
 
-				if (subtype == OR_VERT)	frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
-				else			frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
+				if (subtype == OR_VERT)	frame.top = realPos.y + size.cy / 2 + 2;
+				else			frame.left = realPos.x + size.cx / 2 + 2;
 
 				surface->Frame(frame, FRAME_DOWN);
 
@@ -264,8 +263,8 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				arrow1Clicked = False;
 				arrow1Checked = False;
 
-				if (subtype == OR_VERT)	frame.bottom = realPos.y + objectProperties->size.cy / 2 - 3;
-				else			frame.right = realPos.x + objectProperties->size.cx / 2 - 3;
+				if (subtype == OR_VERT)	frame.bottom = realPos.y + size.cy / 2 - 3;
+				else			frame.right = realPos.x + size.cx / 2 - 3;
 
 				frame.right++;
 				frame.bottom++;
@@ -282,8 +281,8 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				arrow2Clicked = False;
 				arrow2Checked = False;
 
-				if (subtype == OR_VERT)	frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
-				else			frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
+				if (subtype == OR_VERT)	frame.top = realPos.y + size.cy / 2 + 2;
+				else			frame.left = realPos.x + size.cx / 2 + 2;
 
 				frame.right++;
 				frame.bottom++;
@@ -301,11 +300,11 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			arrow1Frame = frame;
 			arrow2Frame = frame;
 
-			if (subtype == OR_VERT)	arrow1Frame.bottom = realPos.y + objectProperties->size.cy / 2 - 3;
-			else			arrow1Frame.right = realPos.x + objectProperties->size.cx / 2 - 3;
+			if (subtype == OR_VERT)	arrow1Frame.bottom = realPos.y + size.cy / 2 - 3;
+			else			arrow1Frame.right = realPos.x + size.cx / 2 - 3;
 
-			if (subtype == OR_VERT)	arrow2Frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
-			else			arrow2Frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
+			if (subtype == OR_VERT)	arrow2Frame.top = realPos.y + size.cy / 2 + 2;
+			else			arrow2Frame.left = realPos.x + size.cx / 2 + 2;
 
 			if (!arrow1Checked && wnd->IsMouseOn(arrow1Frame))
 			{

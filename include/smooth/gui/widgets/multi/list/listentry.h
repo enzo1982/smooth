@@ -11,9 +11,10 @@
 #ifndef _H_OBJSMOOTH_LISTENTRY_
 #define _H_OBJSMOOTH_LISTENTRY_
 
-#include "../../../../object.h"
+#include "../../../../basic/object.h"
 #include "../../../../graphics/rect.h"
-#include "../../../../misc/font.h"
+#include "../../../../graphics/font.h"
+#include "../../../../signals.h"
 
 namespace smooth
 {

@@ -3,10 +3,16 @@ ChangeLog for smooth
 xx.xx.xx xx:xx - smooth alpha 0.8.66.0
 
 - object.cpp	- incorporated object manager functionality into Object
+- window.cpp	- fixed a possible crash on window close
+- widget.cpp	- added attributes from former ObjectProperties
+		- only widgets can be registered at container objects now
 - xulloader.cpp	- added a XUL loader that can be executed via rundll32
-- window.cpp	- fixed a possible crash
+- button.cpp	- new class: XUL::Button
+- label.cpp	- new class: XUL::Label
+- desc...ion.cpp- new class: XUL::Description
 
 - removed ObjectManager
+- removed ObjectProperties
 - upgrade to libXML2 version 2.6.16
 
 18.11.04 00:06 - smooth alpha 0.8.65.0

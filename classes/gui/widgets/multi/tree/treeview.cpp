@@ -13,32 +13,31 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::TreeView::classID = S::Object::RequestClassID();
 
-S::GUI::TreeView::TreeView(String name, Point pos, Size size)
+S::GUI::TreeView::TreeView(String name, Point iPos, Size iSize)
 {
-	type				= classID;
-	objectProperties->text		= name;
+	type	= classID;
+	text	= name;
 
-	objectProperties->font.SetColor(Setup::ClientTextColor);
+	font.SetColor(Setup::ClientTextColor);
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos	= iPos;
+	size	= iSize;
 
-	if (objectProperties->size.cx == 0) objectProperties->size.cx = 100;
-	if (objectProperties->size.cy == 0) objectProperties->size.cy = 120;
+	if (size.cx == 0) size.cx = 100;
+	if (size.cy == 0) size.cy = 120;
 }
 
 S::GUI::TreeView::~TreeView()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::TreeView::Paint(Int message)
@@ -46,24 +45,24 @@ S::Int S::GUI::TreeView::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	frame.right	= realPos.x + size.cx - 1;
+	frame.bottom	= realPos.y + size.cy - 1;
 
 	surface->Box(frame, Setup::ClientColor, FILLED);
 	surface->Frame(frame, FRAME_DOWN);
 
-	if (objectProperties->text != NIL)
+	if (text != NIL)
 	{
 		frame.left += 3;
 		frame.top += 2;
 
-		surface->SetText(objectProperties->text, frame, objectProperties->font);
+		surface->SetText(text, frame, font);
 
 		frame.left -= 3;
 		frame.top -= 2;
@@ -79,7 +78,7 @@ S::Int S::GUI::TreeView::Paint(Int message)
 
 S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 {
-	Surface		*surface = myContainer->GetDrawSurface();
+	Surface		*surface = container->GetDrawSurface();
 	Tree::Entry	*operat;
 	Rect		 oframe = frame;
 	Rect		 rect;
@@ -109,7 +108,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 		frame.top += 3;
 		frame.bottom = min(frame.bottom, oframe.bottom - 1);
 
-		surface->SetText(operat->text, frame, objectProperties->font);
+		surface->SetText(operat->text, frame, font);
 
 		frame.left -= 3;
 		frame.top -= 3;
@@ -240,7 +239,7 @@ S::Int S::GUI::TreeView::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -250,8 +249,8 @@ S::Int S::GUI::TreeView::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	frame.right	= realPos.x + size.cx - 1;
+	frame.bottom	= realPos.y + size.cy - 1;
 
 	switch (message)
 	{

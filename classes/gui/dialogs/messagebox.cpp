@@ -16,7 +16,6 @@
 #include <smooth/gui/widgets/basic/button.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/misc/math.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/basic/titlebar.h>
@@ -75,8 +74,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 	Int	 buttonHeight = 22;
 
 	lines = 1;
-	msgbox->GetObjectProperties()->size.cx = 0;
-	msgbox->GetObjectProperties()->size.cy = 0;
+	msgbox->size.cx = 0;
+	msgbox->size.cy = 0;
 
 	if (text != NIL)
 	{
@@ -117,18 +116,18 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 		thissize = 0;
 	}
 
-	msgbox->GetObjectProperties()->size.cx = maxsize + 34;
-	msgbox->GetObjectProperties()->size.cy = (((Int) Math::Max(2, lines) + 1) * 16) + 68 + buttonHeight;
+	msgbox->size.cx = maxsize + 34;
+	msgbox->size.cy = (((Int) Math::Max(2, lines) + 1) * 16) + 68 + buttonHeight;
 
-	if (lines == 1 && msgicon != NIL) msgbox->GetObjectProperties()->size.cy = 116 + buttonHeight;
+	if (lines == 1 && msgicon != NIL) msgbox->size.cy = 116 + buttonHeight;
 
-	if (msgicon != NIL) msgbox->GetObjectProperties()->size.cx += GetSystemMetrics(SM_CXICON) + 20;
+	if (msgicon != NIL) msgbox->size.cx += GetSystemMetrics(SM_CXICON) + 20;
 
 	Font	 tbFont(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, 0, FW_BOLD);
 
 	titlesize = tbFont.GetTextSizeX(title);
 
-	if (msgbox->GetObjectProperties()->size.cx < titlesize + 80) msgbox->GetObjectProperties()->size.cx = titlesize + 80;
+	if (msgbox->size.cx < titlesize + 80) msgbox->size.cx = titlesize + 80;
 
 	RegisterObject(msgbox);
 
@@ -146,16 +145,16 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 	{
 		default:
 		case MB_OK:
-			if (msgbox->GetObjectProperties()->size.cx < (buttonWidth + 30)) msgbox->GetObjectProperties()->size.cx = buttonWidth + 30;
-			bpos.x = (msgbox->GetObjectProperties()->size.cx - buttonWidth) / 2 - 3;
+			if (msgbox->size.cx < (buttonWidth + 30)) msgbox->size.cx = buttonWidth + 30;
+			bpos.x = (msgbox->size.cx - buttonWidth) / 2 - 3;
 			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bpos, bsize);
 			okbutton->onClick.Connect(&MessageDlg::MessageOK, this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(okbutton);
 			break;
 		case MB_OKCANCEL:
-			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
-			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
+			if (msgbox->size.cx < (2 * buttonWidth + 39)) msgbox->size.cx = 2 * buttonWidth + 39;
+			bpos.x = (msgbox->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
 			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bpos, bsize);
 			okbutton->onClick.Connect(&MessageDlg::MessageOK, this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
@@ -167,8 +166,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 			lay->RegisterObject(cancelbutton);
 			break;
 		case MB_YESNO:
-			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
-			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
+			if (msgbox->size.cx < (2 * buttonWidth + 39)) msgbox->size.cx = 2 * buttonWidth + 39;
+			bpos.x = (msgbox->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
 			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, bpos, bsize);
 			yesbutton->onClick.Connect(&MessageDlg::MessageYes, this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
@@ -180,8 +179,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 			lay->RegisterObject(nobutton);
 			break;
 		case MB_YESNOCANCEL:
-			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
-			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
+			if (msgbox->size.cx < (3 * buttonWidth + 48)) msgbox->size.cx = 3 * buttonWidth + 48;
+			bpos.x = (msgbox->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
 			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, bpos, bsize);
 			yesbutton->onClick.Connect(&MessageDlg::MessageYes, this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
@@ -198,8 +197,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 			lay->RegisterObject(cancelbutton);
 			break;
 		case MB_RETRYCANCEL:
-			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
-			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
+			if (msgbox->size.cx < (2 * buttonWidth + 39)) msgbox->size.cx = 2 * buttonWidth + 39;
+			bpos.x = (msgbox->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
 			retrybutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Retry"), NIL, bpos, bsize);
 			retrybutton->onClick.Connect(&MessageDlg::MessageRetry, this);
 			retrybutton->SetOrientation(OR_LOWERLEFT);
@@ -211,8 +210,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 			lay->RegisterObject(cancelbutton);
 			break;
 		case MB_ABORTRETRYIGNORE:
-			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
-			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
+			if (msgbox->size.cx < (3 * buttonWidth + 48)) msgbox->size.cx = 3 * buttonWidth + 48;
+			bpos.x = (msgbox->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
 			abortbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Abort"), NIL, bpos, bsize);
 			abortbutton->onClick.Connect(&MessageDlg::MessageAbort, this);
 			abortbutton->SetOrientation(OR_LOWERLEFT);
@@ -239,15 +238,15 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 
 		checkbox = new CheckBox(checkBoxText, pos, size, cVar);
 		checkbox->SetOrientation(OR_LOWERLEFT);
-		checkbox->SetMetrics(checkbox->GetObjectProperties()->pos, Size(checkbox->GetObjectProperties()->textSize.cx + 20, checkbox->GetObjectProperties()->size.cy));
+		checkbox->SetMetrics(checkbox->pos, Size(checkbox->textSize.cx + 20, checkbox->size.cy));
 
-		msgbox->GetObjectProperties()->size.cy += 22;
+		msgbox->size.cy += 22;
 
 		lay->RegisterObject(checkbox);
 	}
 
-	msgbox->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - msgbox->GetObjectProperties()->size.cx) / 2 + (nOfMessageBoxes - 1) * 25;
-	msgbox->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - msgbox->GetObjectProperties()->size.cy) / 2 + (nOfMessageBoxes - 1) * 25;
+	msgbox->pos.x = (LiSAGetDisplaySizeX() - msgbox->size.cx) / 2 + (nOfMessageBoxes - 1) * 25;
+	msgbox->pos.y = (LiSAGetDisplaySizeY() - msgbox->size.cy) / 2 + (nOfMessageBoxes - 1) * 25;
 }
 
 S::GUI::Dialogs::MessageDlg::~MessageDlg()
@@ -312,7 +311,7 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 
 	txtrect.left = 17;
 	txtrect.top = 47;
-	txtrect.right = txtrect.left + msgbox->GetObjectProperties()->size.cx - 32;
+	txtrect.right = txtrect.left + msgbox->size.cx - 32;
 
 	if (lines == 1 && msgicon != NIL) txtrect.top = 55;
 
@@ -335,7 +334,7 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 			else				icon = (HICON) LoadImageA(hInstance, (char *) msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 		}
 
-		DrawIcon(dc, Setup::rightToLeft ? msgbox->GetObjectProperties()->size.cx - 17 - GetSystemMetrics(SM_CXICON) : 17, 47, icon);
+		DrawIcon(dc, Setup::rightToLeft ? msgbox->size.cx - 17 - GetSystemMetrics(SM_CXICON) : 17, 47, icon);
 	}
 
 	for (int i = 0; i < lines; i++)

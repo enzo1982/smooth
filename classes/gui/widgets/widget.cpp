@@ -12,7 +12,6 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/rect.h>
 #include <smooth/gui/widgets/container.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/gui/widgets/basic/divider.h>
 
@@ -20,14 +19,35 @@ const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
 
 S::GUI::Widget::Widget()
 {
-	type = classID;
+	type		= classID;
 
-	visible	= False;
-	active	= True;
+	registered	= False;
+	container	= NIL;
 
-	subtype	= 0;
+	visible		= False;
+	active		= True;
 
-	objectProperties->font.SetColor(Setup::TextColor);
+	subtype		= 0;
+
+	pos.x		= 0;
+	pos.y		= 0;
+	size.cx		= 100;
+	size.cy		= 100;
+
+	orientation	= OR_UPPERLEFT;
+
+	text		= NIL;
+	tooltipText	= NIL;
+
+	textSize.cx	= 0;
+	textSize.cy	= 0;
+	tooltipSize.cx	= 0;
+	tooltipSize.cy	= 0;
+
+	checked		= False;
+	clicked		= False;
+
+	font.SetColor(Setup::TextColor);
 
 	onShow.SetParentObject(this);
 	onHide.SetParentObject(this);
@@ -42,58 +62,85 @@ S::GUI::Widget::~Widget()
 {
 }
 
+S::Bool S::GUI::Widget::IsRegistered()
+{
+	return registered;
+}
+
+S::Int S::GUI::Widget::SetContainer(Container *newContainer)
+{
+	container = newContainer;
+
+	return Success;
+}
+
+S::GUI::Container *S::GUI::Widget::GetContainer()
+{
+	return container;
+}
+
+S::Void S::GUI::Widget::SetRegisteredFlag()
+{
+	registered = True;
+}
+
+S::Void S::GUI::Widget::UnsetRegisteredFlag()
+{
+	registered = False;
+}
+
 S::Void S::GUI::Widget::GetTextSize()
 {
-	objectProperties->textSize.cx = objectProperties->font.GetTextSizeX(objectProperties->text);
-	objectProperties->textSize.cy = objectProperties->font.GetTextSizeY(objectProperties->text);
+	textSize.cx = font.GetTextSizeX(text);
+	textSize.cy = font.GetTextSizeY(text);
 
 	Font	 tooltipFont;
 
-	objectProperties->tooltipSize.cx = tooltipFont.GetTextSizeX(objectProperties->tooltip);
-	objectProperties->tooltipSize.cy = tooltipFont.GetTextSizeY(objectProperties->tooltip);
+	tooltipSize.cx = tooltipFont.GetTextSizeX(tooltipText);
+	tooltipSize.cy = tooltipFont.GetTextSizeY(tooltipText);
 }
 
 S::GUI::Point S::GUI::Widget::GetRealPosition()
 {
-	if (!registered) return objectProperties->pos;
+	if (!registered) return pos;
 
-	Point	 realPos = objectProperties->pos;
+	Point	 realPos = pos;
 
-	if (myContainer->GetObjectType() == GUI::Layer::classID)
+	if (container->GetObjectType() == GUI::Layer::classID)
 	{
-		Point	 layerPos = myContainer->GetRealPosition();
+		Point	 layerPos = container->GetRealPosition();
 
-		realPos.x = layerPos.x + objectProperties->pos.x;
-		realPos.y = layerPos.y + objectProperties->pos.y;
+		realPos.x = layerPos.x + pos.x;
+		realPos.y = layerPos.y + pos.y;
 
-		if (objectProperties->orientation == OR_UPPERRIGHT)
+		if (orientation == OR_UPPERRIGHT)
 		{
-			realPos.x = layerPos.x + myContainer->GetObjectProperties()->size.cx - objectProperties->pos.x;
+			realPos.x = layerPos.x + container->size.cx - pos.x;
 		}
-		else if (objectProperties->orientation == OR_LOWERLEFT)
+		else if (orientation == OR_LOWERLEFT)
 		{
-			realPos.y = layerPos.y + myContainer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+			realPos.y = layerPos.y + container->size.cy - pos.y;
 		}
-		else if (objectProperties->orientation == OR_LOWERRIGHT)
+		else if (orientation == OR_LOWERRIGHT)
 		{
-			realPos.x = layerPos.x + myContainer->GetObjectProperties()->size.cx - objectProperties->pos.x;
-			realPos.y = layerPos.y + myContainer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+			realPos.x = layerPos.x + container->size.cx - pos.x;
+			realPos.y = layerPos.y + container->size.cy - pos.y;
 		}
 	}
 	else
 	{
-		if (objectProperties->orientation == OR_UPPERRIGHT)
+		if (orientation == OR_UPPERRIGHT)
 		{
-			realPos.x = myContainer->GetObjectProperties()->size.cx - objectProperties->pos.x;
+			realPos.x = container->size.cx - pos.x;
 		}
-		else if (objectProperties->orientation == OR_LOWERLEFT)
+		else if (orientation == OR_LOWERLEFT)
 		{
-			realPos.y = myContainer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+			realPos.y = container->size.cy - pos.y;
 		}
-		else if (objectProperties->orientation == OR_LOWERRIGHT)
+		else if (orientation == OR_LOWERRIGHT)
 		{
-			realPos.x = myContainer->GetObjectProperties()->size.cx - objectProperties->pos.x;
-			realPos.y = myContainer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+			realPos.x = container->size.cx - pos.x;
+			realPos.y = container->size.cy - pos.y;
 		}
 	}
 
@@ -129,16 +176,16 @@ S::Int S::GUI::Widget::Hide()
 	{
 		Rect	 rect;
 		Point	 realPos = GetRealPosition();
-		Surface	*surface = myContainer->GetDrawSurface();
+		Surface	*surface = container->GetDrawSurface();
 
 		rect.left	= realPos.x;
 		rect.top	= realPos.y;
-		rect.right	= realPos.x + objectProperties->size.cx;
-		rect.bottom	= realPos.y + objectProperties->size.cy;
+		rect.right	= realPos.x + size.cx;
+		rect.bottom	= realPos.y + size.cy;
 
 		UnsignedLong	 bgColor;
 
-		if (myContainer->GetObjectType() == Layer::classID)	bgColor = ((Layer *) myContainer)->GetColor();
+		if (container->GetObjectType() == Layer::classID)	bgColor = ((Layer *) container)->GetColor();
 		else							bgColor = Setup::BackgroundColor;
 
 		surface->Box(rect, bgColor, FILLED);
@@ -202,9 +249,9 @@ S::Bool S::GUI::Widget::IsVisible()
 
 	Bool	 isVisible = True;
 
-	if (myContainer->GetObjectType() == classID)
+	if (container->GetObjectType() == classID)
 	{
-		if (!myContainer->IsVisible()) isVisible = False;
+		if (!container->IsVisible()) isVisible = False;
 	}
 
 	return isVisible;
@@ -221,12 +268,12 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 
 	if (registered && prevVisible) Hide();
 
-	objectProperties->text = newText;
+	text = newText;
 
 	GetTextSize();
 
-	objectProperties->checked = False;
-	objectProperties->clicked = False;
+	checked = False;
+	clicked = False;
 
 	if (registered && prevVisible) Show();
 
@@ -237,30 +284,30 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 
 S::String S::GUI::Widget::GetText()
 {
-	return objectProperties->text;
+	return text;
 }
 
-S::Int S::GUI::Widget::SetTooltip(const String &newTooltip)
+S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 {
-	objectProperties->tooltip = newTooltip;
+	tooltipText = nTooltipText;
 
 	GetTextSize();
 
 	return Success;
 }
 
-S::String S::GUI::Widget::GetTooltip()
+S::String S::GUI::Widget::GetTooltipText()
 {
-	return objectProperties->tooltip;
+	return tooltipText;
 }
 
-S::Int S::GUI::Widget::SetFont(Font newFont)
+S::Int S::GUI::Widget::SetFont(Font nFont)
 {
 	Bool	 prevVisible = IsVisible();
 
 	if (registered && prevVisible) Hide();
 
-	objectProperties->font = newFont;
+	font = nFont;
 
 	GetTextSize();
 
@@ -269,40 +316,50 @@ S::Int S::GUI::Widget::SetFont(Font newFont)
 	return Success;
 }
 
-S::Int S::GUI::Widget::SetOrientation(Int newOrientation)
+S::GUI::Font S::GUI::Widget::GetFont()
+{
+	return font;
+}
+
+S::Int S::GUI::Widget::SetOrientation(Int nOrientation)
 {
 	Bool	 prevVisible = IsVisible();
 
 	if (registered && prevVisible) Hide();
 
-	objectProperties->orientation = newOrientation;
+	orientation = nOrientation;
 
 	if (registered && prevVisible) Show();
 
 	return Success;
 }
 
-S::Int S::GUI::Widget::SetPosition(Point newPos)
+S::Int S::GUI::Widget::GetOrientation()
+{
+	return orientation;
+}
+
+S::Int S::GUI::Widget::SetPosition(Point nPos)
 {
 	Bool	 prevVisible = IsVisible();
 
 	if (registered && prevVisible) Hide();
 
-	objectProperties->pos = newPos;
+	pos	= nPos;
 
 	if (registered && prevVisible) Show();
 
 	return Success;
 }
 
-S::Int S::GUI::Widget::SetMetrics(Point newPos, Size newSize)
+S::Int S::GUI::Widget::SetMetrics(Point nPos, Size nSize)
 {
 	Bool	 prevVisible = IsVisible();
 
 	if (registered && prevVisible) Hide();
 
-	objectProperties->pos	= newPos;
-	objectProperties->size	= newSize;
+	pos	= nPos;
+	size	= nSize;
 
 	if (registered && prevVisible) Show();
 
@@ -312,21 +369,21 @@ S::Int S::GUI::Widget::SetMetrics(Point newPos, Size newSize)
 S::Bool S::GUI::Widget::IsAffected(const Rect &uRect)
 {
 	Rect	 tRect;
-	Point	 realpos = objectProperties->pos;
+	Point	 realpos = pos;
 
 	if (type == GUI::Layer::classID || type == GUI::Divider::classID) return True;
 
-	if (objectProperties->pos.x == 0 && objectProperties->pos.y == 0 && objectProperties->size.cx == 0 && objectProperties->size.cy == 0) return True;
+	if (pos.x == 0 && pos.y == 0 && size.cx == 0 && size.cy == 0) return True;
 
-	if (myContainer != NIL)
+	if (container != NIL)
 	{
-		if (myContainer->GetObjectType() == GUI::Layer::classID) realpos = GetRealPosition();
+		if (container->GetObjectType() == GUI::Layer::classID) realpos = GetRealPosition();
 	}
 
 	tRect.left	= realpos.x - 10;
 	tRect.top	= realpos.y - 10;
-	tRect.right	= realpos.x + objectProperties->size.cx + 10;
-	tRect.bottom	= realpos.y + objectProperties->size.cy + 10;
+	tRect.right	= realpos.x + size.cx + 10;
+	tRect.bottom	= realpos.y + size.cy + 10;
 
 	if (!Rect::DoRectsOverlap(uRect, tRect)) return False;
 

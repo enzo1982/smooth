@@ -25,7 +25,7 @@ S::GUI::Shortcut::Shortcut(Int iKey, Int iFlags, Int iParam)
 
 S::GUI::Shortcut::~Shortcut()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Shortcut::Process(Int message, Int param1, Int param2)
@@ -33,7 +33,7 @@ S::Int S::GUI::Shortcut::Process(Int message, Int param1, Int param2)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 

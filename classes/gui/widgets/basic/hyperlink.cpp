@@ -13,7 +13,6 @@
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
 #include <smooth/color.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
@@ -27,42 +26,42 @@ S::GUI::Hyperlink::Hyperlink()
 	linkURL		= NIL;
 	linkBitmap	= NIL;
 
-	objectProperties->font.SetUnderline(True);
+	font.SetUnderline(True);
 
 	possibleContainers.AddEntry(Layer::classID);
 }
 
-S::GUI::Hyperlink::Hyperlink(String text, const Bitmap &bitmap, String link, Point pos, Size size)
+S::GUI::Hyperlink::Hyperlink(String iText, const Bitmap &bitmap, String link, Point iPos, Size iSize)
 {
-	type			= classID;
-	objectProperties->text	= text;
-	linkURL			= link;
-	linkBitmap		= bitmap;
+	type		= classID;
+	text		= iText;
+	linkURL		= link;
+	linkBitmap	= bitmap;
 
 	linkBitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
 
-	objectProperties->font.SetUnderline(True);
+	font.SetUnderline(True);
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos	= iPos;
+	size	= iSize;
 
 	if (linkBitmap != NIL)
 	{
-		if (size.cx == 0 && size.cy == 0) objectProperties->size = linkBitmap.GetSize();
+		if (size.cx == 0 && size.cy == 0) size = linkBitmap.GetSize();
 	}
 	else
 	{
 		GetTextSize();
 
-		objectProperties->size = objectProperties->textSize;
+		size = textSize;
 	}
 }
 
 S::GUI::Hyperlink::~Hyperlink()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Hyperlink::Hide()
@@ -73,16 +72,16 @@ S::Int S::GUI::Hyperlink::Hide()
 
 	if (!registered) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Rect	 rect;
 	Point	 realPos = GetRealPosition();
 
-	if (linkBitmap == NIL) objectProperties->size = objectProperties->textSize;
+	if (linkBitmap == NIL) size = textSize;
 
 	rect.left	= realPos.x;
 	rect.top	= realPos.y;
-	rect.right	= realPos.x + objectProperties->size.cx + 1;
-	rect.bottom	= realPos.y + objectProperties->size.cy + 1;
+	rect.right	= realPos.x + size.cx + 1;
+	rect.bottom	= realPos.y + size.cy + 1;
 
 	surface->Box(rect, Setup::BackgroundColor, FILLED);
 
@@ -94,7 +93,7 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
 	Int	 textColor;
@@ -104,8 +103,8 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 
 	if (linkBitmap == NIL)
 	{
-		textRect.right	= textRect.left + objectProperties->textSize.cx;
-		textRect.bottom	= textRect.top + objectProperties->textSize.cy + 1;
+		textRect.right	= textRect.left + textSize.cx;
+		textRect.bottom	= textRect.top + textSize.cy + 1;
 
 		switch (message)
 		{
@@ -119,16 +118,16 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 				break;
 		}
 
-		Font	 font = objectProperties->font;
+		Font	 nFont = font;
 
-		font.SetColor(textColor);
+		nFont.SetColor(textColor);
 
-		surface->SetText(objectProperties->text, textRect, font);
+		surface->SetText(text, textRect, nFont);
 	}
 	else
 	{
-		textRect.right	= textRect.left + objectProperties->size.cx;
-		textRect.bottom	= textRect.top + objectProperties->size.cy;
+		textRect.right	= textRect.left + size.cx;
+		textRect.bottom	= textRect.top + size.cy;
 
 		surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), textRect);
 	}
@@ -141,7 +140,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -154,19 +153,19 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 
 	if (linkBitmap == NIL)
 	{
-		textRect.right	= textRect.left + objectProperties->textSize.cx;
-		textRect.bottom	= textRect.top + objectProperties->textSize.cy + 1;
+		textRect.right	= textRect.left + textSize.cx;
+		textRect.bottom	= textRect.top + textSize.cy + 1;
 	}
 	else
 	{
-		textRect.right	= textRect.left + objectProperties->size.cx - 1;
-		textRect.bottom	= textRect.top + objectProperties->size.cy - 1;
+		textRect.right	= textRect.left + size.cx - 1;
+		textRect.bottom	= textRect.top + size.cy - 1;
 	}
 
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			if (objectProperties->checked)
+			if (checked)
 			{
 				if (Setup::enableUnicode)	LiSAOpenURLW(linkURL);
 				else				LiSAOpenURLA(linkURL);
@@ -177,17 +176,17 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 			}
 			break;
 		case SM_MOUSEMOVE:
-			if (wnd->IsMouseOn(textRect) && !objectProperties->checked)
+			if (wnd->IsMouseOn(textRect) && !checked)
 			{
-				objectProperties->checked = True;
+				checked = True;
 
 				LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_HAND);
 
 				Paint(SP_MOUSEIN);
 			}
-			else if (!wnd->IsMouseOn(textRect) && objectProperties->checked)
+			else if (!wnd->IsMouseOn(textRect) && checked)
 			{
-				objectProperties->checked = False;
+				checked = False;
 
 				LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_ARROW);
 

@@ -8,31 +8,27 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/object.h>
-#include <smooth/objectproperties.h>
+#include <smooth/basic/object.h>
 #include <smooth/misc/i18n.h>
 
+const S::Int		 S::Object::classID		= S::Object::RequestClassID();
+
+S::Int			 S::Object::nextClassID		= 0;
+S::Int			 S::Object::nextObjectHandle	= 0;
+
 S::Array<S::Object *>	 S::Object::objects;
-const S::Int		 S::Object::classID	= S::Object::RequestClassID();
-S::Int			 S::Object::objectCount	= 0;
-S::Int			 S::Object::nextID	= 0;
 
 S::Object::Object() : type(this)
 {
 	type			= classID;
 
-	objectProperties	= new ObjectProperties();
-
 	handle			= RequestObjectHandle();
+	name			= String("Object::").Append(String::FromInt(handle));
 
 	deleteObject		= False;
-	inUse			= 0;
+	isObjectInUse		= 0;
 
 	flags			= 0;
-
-	registered		= False;
-
-	myContainer		= NIL;
 
 	objects.AddEntry(this, handle);
 }
@@ -40,8 +36,6 @@ S::Object::Object() : type(this)
 S::Object::~Object()
 {
 	objects.RemoveEntry(handle);
-
-	delete objectProperties;
 }
 
 S::Int S::Object::GetNOfObjects()
@@ -54,9 +48,43 @@ S::Object *S::Object::GetNthObject(Int n)
 	return objects.GetNthEntry(n);
 }
 
-S::Object *S::Object::RequestObject(Int objectHandle)
+S::Object *S::Object::GetObject(Int objectHandle, Int objectType)
 {
-	return objects.GetEntry(objectHandle);
+	Object	*object = objects.GetEntry(objectHandle);
+
+	if (object == NIL) return NIL;
+
+	if (object->GetObjectType() == objectType)	return object;
+	else						return NIL;
+}
+
+S::Object *S::Object::GetObject(String objectName)
+{
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		if (GetNthObject(i)->GetName() == objectName) return GetNthObject(i);
+	}
+
+	return NIL;
+}
+
+S::Int S::Object::GetHandle()
+{
+	return handle;
+}
+
+S::Int S::Object::SetName(String nName)
+{
+	if (GetObject(nName) != NIL) return Error;
+
+	name = nName;
+
+	return Success;
+}
+
+S::String S::Object::GetName()
+{
+	return name;
 }
 
 S::Int S::Object::SetFlags(Int nFlags)
@@ -71,20 +99,10 @@ S::Int S::Object::GetFlags()
 	return flags;
 }
 
-S::Bool S::Object::IsRegistered()
-{
-	return registered;
-}
-
 S::Bool S::Object::IsTypeCompatible(Int objType)
 {
 	if (objType == classID)	return True;
 	else			return False;
-}
-
-S::ObjectProperties *S::Object::GetObjectProperties()
-{
-	return objectProperties;
 }
 
 S::ObjectType S::Object::GetObjectType()
@@ -92,64 +110,32 @@ S::ObjectType S::Object::GetObjectType()
 	return type;
 }
 
-S::Int S::Object::SetContainer(GUI::Container *newContainer)
-{
-	myContainer = newContainer;
-
-	return Success;
-}
-
-S::GUI::Container *S::Object::GetContainer()
-{
-	return myContainer;
-}
-
-S::Void S::Object::SetRegisteredFlag()
-{
-	registered = True;
-}
-
-S::Void S::Object::UnsetRegisteredFlag()
-{
-	registered = False;
-}
-
-S::Object *S::Object::GetObject(Int objectHandle, Int objectType)
-{
-	Object	*object = RequestObject(objectHandle);
-
-	if (object == NIL) return NIL;
-
-	if (object->GetObjectType() == objectType)	return object;
-	else						return NIL;
-}
-
 S::Int S::Object::RequestClassID()
 {
-	return nextID++;
+	return nextClassID++;
 }
 
 S::Int S::Object::RequestObjectHandle()
 {
-	return 	objectCount++;
+	return 	nextObjectHandle++;
 }
 
 S::Int S::Object::EnterProtectedRegion()
 {
-	return ++inUse;
+	return ++isObjectInUse;
 }
 
 S::Int S::Object::LeaveProtectedRegion()
 {
-	return --inUse;
+	return --isObjectInUse;
 }
 
-S::Int S::Object::IsObjectInUse()
+S::Bool S::Object::IsObjectInUse()
 {
-	return inUse;
+	return isObjectInUse > 0;
 }
 
-S::Bool S::Object::IsObjectDeleteable()
+S::Bool S::Object::IsObjectDeletable()
 {
 	return deleteObject;
 }

@@ -202,13 +202,13 @@ bool OutStream::WriteData()
 
 			delete [] data;
 
-			data = new unsigned char [packageSize + DEFAULT_PACKAGE_SIZE];
+			data = new unsigned char [packageSize + defaultPackageSize];
 
 			memcpy((void *) data, (void *) databuffer, packageSize);
 
 			delete [] databuffer;
 
-			packageSize += DEFAULT_PACKAGE_SIZE;
+			packageSize += defaultPackageSize;
 			stdpacksize = packageSize;
 
 			return true;
@@ -527,25 +527,25 @@ bool OutStream::SetFilter(IOLibFilter *newFilter)
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
-	allowpackset = true;
-
-	if (newFilter->packageSize > 0)
-	{
-		SetPackageSize(newFilter->packageSize);	// package size must be eqv filter size
-
-		allowpackset = false;
-	}
-	else if (newFilter->packageSize == -1)
-	{
-		SetPackageSize(DEFAULT_PACKAGE_SIZE);
-
-		allowpackset = false;
-	}
-
 	filter = newFilter;
 
 	filter->SetDriver(driver);
 	filter->Activate();
+
+	allowpackset = true;
+
+	if (filter->packageSize > 0)
+	{
+		SetPackageSize(filter->packageSize);	// package size must be eqv filter size
+
+		allowpackset = false;
+	}
+	else if (filter->packageSize == -1)
+	{
+		SetPackageSize(defaultPackageSize);
+
+		allowpackset = false;
+	}
 
 	return true;
 }

@@ -2,7 +2,9 @@
  * smooth tutorial 2
  */
 
+#include <smooth.h>
 #include <smooth/main.h>
+
 #include "t02.h"
 
 Int smooth::Main()
@@ -36,6 +38,8 @@ Hello::~Hello()
 {
 	mainWnd->UnregisterObject(title);
 	mainWnd->UnregisterObject(hello);
+
+	UnregisterObject(mainWnd);
 
 	DeleteObject(mainWnd);
 	DeleteObject(title);

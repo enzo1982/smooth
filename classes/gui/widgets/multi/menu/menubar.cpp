@@ -13,7 +13,6 @@
 #include <smooth/gui/widgets/multi/menu/menu.h>
 #include <smooth/loop.h>
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/toolwindow.h>
 
@@ -21,12 +20,11 @@ const S::Int	 S::GUI::Menubar::classID = S::Object::RequestClassID();
 
 S::GUI::Menubar::Menubar()
 {
-	type				= classID;
-	objectProperties->orientation	= OR_TOP;
-	objectProperties->size.cx	= 18;
-	objectProperties->size.cy	= 18;
-	subtype				= WO_SEPARATOR;
-	bitmapSize			= 12;
+	type		= classID;
+	orientation	= OR_TOP;
+	size		= Size(18, 18);
+	subtype		= WO_SEPARATOR;
+	bitmapSize	= 12;
 
 	possibleContainers.AddEntry(Window::classID);
 
@@ -35,7 +33,7 @@ S::GUI::Menubar::Menubar()
 
 S::GUI::Menubar::~Menubar()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Void S::GUI::Menubar::OnRegister()
@@ -53,11 +51,11 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window		*wnd = myContainer->GetContainerWindow();
+	Window		*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface		*surface = myContainer->GetDrawSurface();
+	Surface		*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -70,23 +68,23 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	bool		 prevtext = False;
 	int		 i;
 
-	menubar.left	= objectProperties->pos.x;
-	menubar.top	= objectProperties->pos.y;
-	menubar.right	= menubar.left + objectProperties->size.cx - 1;
-	menubar.bottom	= menubar.top + objectProperties->size.cy - 1;
+	menubar.left	= pos.x;
+	menubar.top	= pos.y;
+	menubar.right	= menubar.left + size.cx - 1;
+	menubar.bottom	= menubar.top + size.cy - 1;
 
-	if (objectProperties->orientation == OR_BOTTOM)
+	if (orientation == OR_BOTTOM)
 	{
 		menubar.top--;
 		menubar.bottom--;
 	}
 
-	if (objectProperties->orientation == OR_TOP || objectProperties->orientation == OR_BOTTOM)
+	if (orientation == OR_TOP || orientation == OR_BOTTOM)
 	{
 		Point	 p1 = Point(menubar.left + 1 + (Setup::rightToLeft ? 2 : 0), menubar.top + 2);
 		Point	 p2 = Point(p1.x, menubar.bottom);
 
-		if (wnd->GetIcon() != NIL && objectProperties->orientation == OR_TOP)
+		if (wnd->GetIcon() != NIL && orientation == OR_TOP)
 		{
 			p1.x += 17;
 			p2.x += 17;
@@ -100,12 +98,12 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		surface->Bar(p1, p2, OR_VERT);
 	}
 
-	if (objectProperties->orientation == OR_TOP || objectProperties->orientation == OR_BOTTOM)
+	if (orientation == OR_TOP || orientation == OR_BOTTOM)
 	{
 		menuentry.top		= menubar.top + 3;
 		menuentry.left		= 12;
 
-		if (wnd->GetIcon() != NIL && objectProperties->orientation == OR_TOP) menuentry.left += 17;
+		if (wnd->GetIcon() != NIL && orientation == OR_TOP) menuentry.left += 17;
 
 		menuentry.right		= menuentry.left - 9;
 		menuentry.bottom	= menuentry.top + bitmapSize;
@@ -114,7 +112,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		{
 			operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-			if (operat->GetObjectProperties()->orientation != OR_LEFT) continue;
+			if (operat->GetOrientation() != OR_LEFT) continue;
 
 			if (operat->type == SM_SEPARATOR)
 			{
@@ -124,7 +122,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				menuentry.right = menuentry.left;
 
-				operat->GetObjectProperties()->size.cy	= menubar.bottom - menubar.top - 2;
+				operat->size.cy	= menubar.bottom - menubar.top - 2;
 
 				firstentry = True;
 			}
@@ -134,7 +132,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				if (prevbitmap) menuentry.left -= 3;
 
-				menuentry.right = menuentry.left + operat->GetObjectProperties()->textSize.cx;
+				menuentry.right = menuentry.left + operat->textSize.cx;
 
 				prevtext = True;
 			}
@@ -159,14 +157,14 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				prevbitmap = True;
 			}
 
-			operat->GetObjectProperties()->pos.x = menuentry.left - 3;
-			operat->GetObjectProperties()->pos.y = menuentry.top - 1;
+			operat->pos.x = menuentry.left - 3;
+			operat->pos.y = menuentry.top - 1;
 
 			if (operat->type != SM_SEPARATOR)	firstentry = False;
 			if (operat->type != SM_BITMAP)		prevbitmap = False;
 			if (operat->type != SM_TEXT)		prevtext = False;
 
-			if (operat->GetObjectProperties()->checked && !operat->GetObjectProperties()->clicked) surface->Frame(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size), FRAME_UP);
+			if (operat->checked && !operat->clicked) surface->Frame(Rect(operat->pos, operat->size), FRAME_UP);
 		}
 
 		firstentry = True;
@@ -175,21 +173,21 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 		helpmenuentry.top	= menuentry.top;
 		helpmenuentry.bottom	= menuentry.bottom;
-		helpmenuentry.right	= wnd->GetObjectProperties()->size.cx + 1;
+		helpmenuentry.right	= wnd->size.cx + 1;
 		helpmenuentry.left	= helpmenuentry.right;
 
 		for (i = assocObjects.GetNOfEntries() - 1; i >= 0; i--)
 		{
 			operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-			if (operat->GetObjectProperties()->orientation != OR_RIGHT) continue;
+			if (operat->GetOrientation() != OR_RIGHT) continue;
 
 			if (operat->type == SM_SEPARATOR)
 			{
 				helpmenuentry.right = helpmenuentry.left - 9;
 				helpmenuentry.left = helpmenuentry.right;
 
-				operat->GetObjectProperties()->size.cy	= menubar.bottom - menubar.top - 2;
+				operat->size.cy	= menubar.bottom - menubar.top - 2;
 
 				firstentry = True;
 				prevbitmap = True;
@@ -201,7 +199,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				if (prevbitmap) helpmenuentry.right += 1;
 				if (prevtext) helpmenuentry.right += 1;
 
-				helpmenuentry.left = helpmenuentry.right - operat->GetObjectProperties()->textSize.cx;
+				helpmenuentry.left = helpmenuentry.right - operat->textSize.cx;
 			}
 			else if (operat->type == SM_BITMAP)
 			{
@@ -216,15 +214,15 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				prevtext = True;
 			}
 
-			operat->GetObjectProperties()->pos.x = helpmenuentry.left - 3;
-			operat->GetObjectProperties()->pos.y = helpmenuentry.top - 1;
+			operat->pos.x = helpmenuentry.left - 3;
+			operat->pos.y = helpmenuentry.top - 1;
 
 			if (operat->type != SM_SEPARATOR)	firstentry = False;
 			if (operat->type != SM_BITMAP)		prevbitmap = False;
 			if (operat->type != SM_TEXT)		prevtext = False;
 		}
 	}
-	else if (objectProperties->orientation == OR_LEFT || objectProperties->orientation == OR_RIGHT)
+	else if (orientation == OR_LEFT || orientation == OR_RIGHT)
 	{
 		menuentry.top		= menubar.top + 4;
 		menuentry.left		= 6;
@@ -247,8 +245,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				prevbitmap = True;
 			}
 
-			operat->GetObjectProperties()->pos.x	= menuentry.left - 3;
-			operat->GetObjectProperties()->pos.y	= menuentry.top - 1;
+			operat->pos.x	= menuentry.left - 3;
+			operat->pos.y	= menuentry.top - 1;
 
 			if (operat->type != SM_SEPARATOR)	firstentry = False;
 			if (operat->type != SM_BITMAP)		prevbitmap = False;
@@ -297,8 +295,8 @@ S::Int S::GUI::Menubar::SetBitmapSize(Int nSize)
 {
 	bitmapSize = nSize;
 
-	objectProperties->size.cx = bitmapSize + 6;
-	objectProperties->size.cy = bitmapSize + 6;
+	size.cx = bitmapSize + 6;
+	size.cy = bitmapSize + 6;
 
 	return Success;
 }
@@ -307,5 +305,5 @@ S::GUI::Surface *S::GUI::Menubar::GetDrawSurface()
 {
 	if (!registered) return nullSurface;
 
-	return myContainer->GetDrawSurface();
+	return container->GetDrawSurface();
 }

@@ -8,26 +8,33 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_INPUT_
-#define _H_INPUT_
+#ifndef _H_OBJSMOOTH_OBJECTTYPE_
+#define _H_OBJSMOOTH_OBJECTTYPE_
 
 namespace smooth
 {
-	class Input;
+	class Object;
+	class ObjectType;
 };
 
-#include "definitions.h"
+#include "../definitions.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Input
+	class SMOOTHAPI ObjectType
 	{
 		private:
-					 Input();
-					 Input(const Input &);
+			Int		 type;
+			Object		*object;
 		public:
-			static Int	 MouseX();
-			static Int	 MouseY();
+					 ObjectType(Object *);
+					 ObjectType(const ObjectType &);
+
+			operator	 Int();
+			Int operator	 =(Int);
+
+			Bool operator	 ==(Int);
+			Bool operator	 !=(Int);
 	};
 };
 

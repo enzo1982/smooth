@@ -8,40 +8,48 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_FONTDLG_
-#define _H_OBJSMOOTH_FONTDLG_
+#ifndef _H_OBJSMOOTH_XULDESCRIPTION_
+#define _H_OBJSMOOTH_XULDESCRIPTION_
 
 namespace smooth
 {
+	namespace XML
+	{
+		namespace XUL
+		{
+			class Description;
+		};
+
+		class Node;
+	};
+
 	namespace GUI
 	{
-		namespace Dialogs
-		{
-			class FontSelection;
-		};
+		class Text;
 	};
+
+	class Object;
 };
 
-#include "dialog.h"
-#include "../../graphics/font.h"
+#include "../../definitions.h"
+#include "../../misc/string.h"
+#include "widget.h"
 
 namespace smooth
 {
-	namespace GUI
+	namespace XML
 	{
-		namespace Dialogs
+		namespace XUL
 		{
-			class SMOOTHAPI FontSelection : public Dialog
+			class Description : public Widget
 			{
 				private:
-					Font	 font;
+					GUI::Text	*text;
 				public:
-						 FontSelection();
-						~FontSelection();
+							 Description(Node *);
+							~Description();
 
-					Int	 ShowDialog();
-
-					Font	 GetFont();
+					GUI::Widget	*GetWidget();
 			};
 		};
 	};

@@ -49,8 +49,8 @@ namespace smooth
 
 				Surface			*GetDrawSurface();
 
-				Int			 RegisterObject(Object *);
-				Int			 UnregisterObject(Object *);
+				Int			 RegisterObject(Widget *);
+				Int			 UnregisterObject(Widget *);
 		};
 	};
 };

@@ -12,29 +12,28 @@
 #include <smooth/definitions.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/misc/math.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::TabWidget::classID = S::Object::RequestClassID();
 
-S::GUI::TabWidget::TabWidget(Point pos, Size size)
+S::GUI::TabWidget::TabWidget(Point iPos, Size iSize)
 {
 	type		= classID;
 	containerType	= classID;
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos		= iPos;
+	size		= iSize;
 
-	if (objectProperties->size.cx == 0) objectProperties->size.cx = 120;
-	if (objectProperties->size.cy == 0) objectProperties->size.cy = 100;
+	if (size.cx == 0) size.cx = 120;
+	if (size.cy == 0) size.cy = 100;
 }
 
 S::GUI::TabWidget::~TabWidget()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::TabWidget::Paint(Int message)
@@ -42,7 +41,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Layer	*object = NIL;
 	Layer	*prev = NIL;
@@ -61,16 +60,16 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 		{
 			if (object->GetContainer() == NIL)
 			{
-				object->SetContainer(myContainer->GetContainer());
+				object->SetContainer(container->GetContainer());
 				object->SetRegisteredFlag();
 
 				((Widget *) object)->onRegister.Emit(this);
 			}
 
-			object->GetObjectProperties()->pos.x = realPos.x;
-			object->GetObjectProperties()->pos.y = realPos.y + 19;
-			object->GetObjectProperties()->size.cx = objectProperties->size.cx;
-			object->GetObjectProperties()->size.cy = objectProperties->size.cy - 19;
+			object->pos.x = realPos.x;
+			object->pos.y = realPos.y + 19;
+			object->size.cx = size.cx;
+			object->size.cy = size.cy - 19;
 		}
 	}
 
@@ -78,8 +77,8 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx;
-	frame.bottom	= realPos.y + objectProperties->size.cy;
+	frame.right	= realPos.x + size.cx;
+	frame.bottom	= realPos.y + size.cy;
 
 	frame.top += 19;
 	surface->Frame(frame, FRAME_UP);
@@ -96,15 +95,15 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 		if (object != NIL)
 		{
-			object->GetObjectProperties()->pos.x = realPos.x + 2;
-			object->GetObjectProperties()->pos.y = realPos.y + 21;
-			object->GetObjectProperties()->size.cx = objectProperties->size.cx - 3;
-			object->GetObjectProperties()->size.cy = objectProperties->size.cy - 22;
+			object->pos.x = realPos.x + 2;
+			object->pos.y = realPos.y + 21;
+			object->size.cx = size.cx - 3;
+			object->size.cy = size.cy - 22;
 
 			if (object->IsVisible())
 			{
 				frame.left = frame.right;
-				frame.right = frame.left + textSize.GetEntry(object->handle) + 13;
+				frame.right = frame.left + textSize.GetEntry(object->GetHandle()) + 13;
 
 				surface->Frame(frame, FRAME_UP);
 
@@ -133,10 +132,10 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 				textrect.left	= frame.left + 7;
 				textrect.top	= frame.top + 2;
-				textrect.right	= textrect.left + textSize.GetEntry(object->handle);
+				textrect.right	= textrect.left + textSize.GetEntry(object->GetHandle());
 				textrect.bottom	= textrect.top + 20;
 
-				surface->SetText(object->GetObjectProperties()->text, textrect, objectProperties->font);
+				surface->SetText(object->GetText(), textrect, font);
 
 				object->Paint(SP_PAINT);
 
@@ -147,7 +146,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 				frame.top++;
 				frame.left = frame.right + 1;
 
-				frame.right = frame.left + textSize.GetEntry(object->handle) + 11;
+				frame.right = frame.left + textSize.GetEntry(object->GetHandle()) + 11;
 
 				if (j > 0) if (prev->IsVisible()) frame.left++;
 
@@ -201,10 +200,10 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 				textrect.left	= frame.left + 6;
 				textrect.top	= frame.top + 2;
-				textrect.right	= textrect.left + textSize.GetEntry(object->handle);
+				textrect.right	= textrect.left + textSize.GetEntry(object->GetHandle());
 				textrect.bottom	= textrect.top + 20;
 
-				surface->SetText(object->GetObjectProperties()->text, textrect, objectProperties->font);
+				surface->SetText(object->GetText(), textrect, font);
 
 				frame.top--;
 			}
@@ -219,7 +218,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -244,16 +243,16 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 		{
 			if (object->GetContainer() == NIL)
 			{
-				object->SetContainer(myContainer->GetContainer());
+				object->SetContainer(container->GetContainer());
 				object->SetRegisteredFlag();
 
 				((Widget *) object)->onRegister.Emit(this);
 			}
 
-			object->GetObjectProperties()->pos.x = realPos.x + 2;
-			object->GetObjectProperties()->pos.y = realPos.y + 21;
-			object->GetObjectProperties()->size.cx = objectProperties->size.cx - 3;
-			object->GetObjectProperties()->size.cy = objectProperties->size.cy - 22;
+			object->pos.x = realPos.x + 2;
+			object->pos.y = realPos.y + 21;
+			object->size.cx = size.cx - 3;
+			object->size.cy = size.cy - 22;
 
 			if (object->IsVisible())
 			{
@@ -278,11 +277,11 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 						if (i == 0) frame.left--;
 
-						frame.right = frame.left + textSize.GetEntry(object->handle) + 12;
+						frame.right = frame.left + textSize.GetEntry(object->GetHandle()) + 12;
 
 						if (wnd->IsMouseOn(frame))
 						{
-							surface->StartPaint(Rect(Point(Setup::rightToLeft ? (wnd->GetObjectProperties()->size.cx - (realPos.x + objectProperties->size.cx)) : realPos.x, realPos.y), objectProperties->size));
+							surface->StartPaint(Rect(Point(Setup::rightToLeft ? (wnd->size.cx - (realPos.x + size.cx)) : realPos.x, realPos.y), size));
 
 							for (Int j = 0; j < GetNOfObjects(); j++)
 							{
@@ -297,7 +296,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 								}
 							}
 
-							wnd->SetUpdateRect(Rect(Point(Setup::rightToLeft ? (wnd->GetObjectProperties()->size.cx - (realPos.x + objectProperties->size.cx)) : realPos.x, realPos.y), objectProperties->size));
+							wnd->SetUpdateRect(Rect(Point(Setup::rightToLeft ? (wnd->size.cx - (realPos.x + size.cx)) : realPos.x, realPos.y), size));
 
 							Hide();
 
@@ -319,7 +318,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 					else
 					{
 						frame.left = frame.right;
-						frame.right = frame.left + textSize.GetEntry(object->handle) + 12;
+						frame.right = frame.left + textSize.GetEntry(object->GetHandle()) + 12;
 					}
 				}
 			}
@@ -337,11 +336,11 @@ S::Void S::GUI::TabWidget::GetLayersSize()
 
 		if (object != NIL)
 		{
-			if (!sizeSet.GetEntry(object->handle))
+			if (!sizeSet.GetEntry(object->GetHandle()))
 			{
-				textSize.SetEntry(object->handle, objectProperties->font.GetTextSizeX(object->GetObjectProperties()->text));
+				textSize.SetEntry(object->GetHandle(), font.GetTextSizeX(object->GetText()));
 
-				sizeSet.SetEntry(object->handle, True);
+				sizeSet.SetEntry(object->GetHandle(), True);
 			}
 		}
 	}
@@ -353,14 +352,14 @@ S::Int S::GUI::TabWidget::SelectTab(Int layerid)
 	{
 		Layer	*object = (Layer *) assocObjects.GetNthEntry(i);
 
-		if (object->handle == layerid)	object->Show();
-		else				object->Hide();
+		if (object->GetHandle() == layerid)	object->Show();
+		else					object->Hide();
 	}
 
 	return Success;
 }
 
-S::Int S::GUI::TabWidget::RegisterObject(Object *object)
+S::Int S::GUI::TabWidget::RegisterObject(Widget *object)
 {
 	if (!registered)	return Error;
 	if (object == NIL)	return Error;
@@ -369,12 +368,12 @@ S::Int S::GUI::TabWidget::RegisterObject(Object *object)
 	{
 		if (!object->IsRegistered())
 		{
-			assocObjects.AddEntry(object, object->handle);
-			sizeSet.AddEntry(False, object->handle);
-			textSize.AddEntry(0, object->handle);
+			assocObjects.AddEntry(object, object->GetHandle());
+			sizeSet.AddEntry(False, object->GetHandle());
+			textSize.AddEntry(0, object->GetHandle());
 
-			if (GetNOfObjects() == 1)	((Layer *) object)->Show();
-			else				((Layer *) object)->Hide();
+			if (GetNOfObjects() == 1)	object->Show();
+			else				object->Hide();
 
 			return Success;
 		}
@@ -383,7 +382,7 @@ S::Int S::GUI::TabWidget::RegisterObject(Object *object)
 	return Error;
 }
 
-S::Int S::GUI::TabWidget::UnregisterObject(Object *object)
+S::Int S::GUI::TabWidget::UnregisterObject(Widget *object)
 {
 	if (object == NIL) return Error;
 
@@ -393,24 +392,24 @@ S::Int S::GUI::TabWidget::UnregisterObject(Object *object)
 	{
 		if (GetNOfObjects() > 0 && object->IsRegistered())
 		{
-			if (((Layer *) object)->IsVisible())
+			if (object->IsVisible())
 			{
-				((Layer *) object)->Hide();
+				object->Hide();
 
 				activateNew = True;
 			}
 
-			((Widget *) object)->onUnregister.Emit(this);
+			object->onUnregister.Emit(this);
 
-			if (assocObjects.RemoveEntry(object->handle) == True)
+			if (assocObjects.RemoveEntry(object->GetHandle()) == True)
 			{
-				sizeSet.RemoveEntry(object->handle);
-				textSize.RemoveEntry(object->handle);
+				sizeSet.RemoveEntry(object->GetHandle());
+				textSize.RemoveEntry(object->GetHandle());
 
 				object->UnsetRegisteredFlag();
 				object->SetContainer(NIL);
 
-				if (activateNew && GetNOfObjects() > 0) ((Layer *) assocObjects.GetFirstEntry())->Show();
+				if (activateNew && GetNOfObjects() > 0) assocObjects.GetFirstEntry()->Show();
 
 				return Success;
 			}

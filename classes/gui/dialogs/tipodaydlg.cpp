@@ -12,7 +12,6 @@
 
 #include <smooth/definitions.h>
 #include <smooth/gui/application/application.h>
-#include <smooth/objectproperties.h>
 
 #include <smooth/graphics/surface.h>
 
@@ -72,7 +71,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 
 	check_showtips	= new CheckBox(I18n::Translator::defaultTranslator->TranslateString("Show tips on startup"), pos, size, &showTips);
 	check_showtips->SetOrientation(OR_LOWERLEFT);
-	check_showtips->SetMetrics(check_showtips->GetObjectProperties()->pos, Size(check_showtips->GetObjectProperties()->textSize.cx + 20, check_showtips->GetObjectProperties()->size.cy));
+	check_showtips->SetMetrics(check_showtips->pos, Size(check_showtips->textSize.cx + 20, check_showtips->size.cy));
 
 	pos.x = 5;
 	pos.y = 3;
@@ -223,5 +222,5 @@ S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 
 S::Void S::GUI::Dialogs::TipOfTheDay::Paint()
 {
-	dlgwnd->GetDrawSurface()->Box(Rect(Point(7, 38) + dlgwnd->GetMainLayer()->GetObjectProperties()->pos, Size(330, 184)), 0, OUTLINED);
+	dlgwnd->GetDrawSurface()->Box(Rect(Point(7, 38) + dlgwnd->GetMainLayer()->pos, Size(330, 184)), 0, OUTLINED);
 }

@@ -12,7 +12,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
@@ -20,7 +19,7 @@
 
 const S::Int	 S::GUI::Scrollbar::classID = S::Object::RequestClassID();
 
-S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd)
+S::GUI::Scrollbar::Scrollbar(Point iPos, Size iSize, Int subType, Int *var, Int rangeStart, Int rangeEnd)
 {
 	type		= classID;
 	variable	= var;
@@ -42,24 +41,24 @@ S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int ra
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos		= iPos;
+	size		= iSize;
 
 	if (subtype == OR_VERT)
 	{
-		if (objectProperties->size.cx == 0) objectProperties->size.cx = 17;
-		if (objectProperties->size.cy == 0) objectProperties->size.cy = 120;
+		if (size.cx == 0) size.cx = 17;
+		if (size.cy == 0) size.cy = 120;
 	}
 	else
 	{
-		if (objectProperties->size.cx == 0) objectProperties->size.cx = 120;
-		if (objectProperties->size.cy == 0) objectProperties->size.cy = 17;
+		if (size.cx == 0) size.cx = 120;
+		if (size.cy == 0) size.cy = 17;
 	}
 }
 
 S::GUI::Scrollbar::~Scrollbar()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 
 	if (timer != NIL)
 	{
@@ -76,7 +75,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	Rect	 frame1;
@@ -87,8 +86,8 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx;
-	frame.bottom	= realPos.y + objectProperties->size.cy;
+	frame.right	= realPos.x + size.cx;
+	frame.bottom	= realPos.y + size.cy;
 
 	if (subtype == OR_HORZ)
 	{
@@ -102,7 +101,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 		frame2.right	= frame.right;
 		frame2.bottom	= frame.bottom;
 
-		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) objectProperties->size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		frame3.top	= frame.top;
 		frame3.right	= frame3.left + (frame.bottom - frame.top);
 		frame3.bottom	= frame.bottom;
@@ -120,7 +119,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 		frame2.bottom	= frame.bottom;
 
 		frame3.left	= frame.left;
-		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) objectProperties->size.cy - 3 * (frame.right - frame.left)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) size.cy - 3 * (frame.right - frame.left)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		frame3.right	= frame.right;
 		frame3.bottom	= frame3.top + (frame.right - frame.left);
 	}
@@ -237,11 +236,11 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Rect	 frame;
@@ -255,8 +254,8 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx;
-	frame.bottom	= realPos.y + objectProperties->size.cy;
+	frame.right	= realPos.x + size.cx;
+	frame.bottom	= realPos.y + size.cy;
 
 	if (subtype == OR_HORZ)
 	{
@@ -270,7 +269,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 		frame2.right	= frame.right - 3;
 		frame2.bottom	= frame.bottom - 3;
 
-		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) objectProperties->size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		frame3.top	= frame.top;
 		frame3.right	= frame3.left + (frame.bottom - frame.top);
 		frame3.bottom	= frame.bottom;
@@ -293,7 +292,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 		frame2.bottom	= frame.bottom - 3;
 
 		frame3.left	= frame.left;
-		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) objectProperties->size.cy - 3 * (frame.right - frame.left)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) size.cy - 3 * (frame.right - frame.left)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		frame3.right	= frame.right;
 		frame3.bottom	= frame3.top + (frame.right - frame.left);
 
@@ -548,8 +547,8 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 			if (button3Clicked)
 			{
-				if (subtype == OR_HORZ)	buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + (frame.bottom - frame.top) + (frame.bottom - frame.top) / 2))));
-				else			buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cy - 3 * (frame.right - frame.left)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + (frame.right - frame.left) + (frame.right - frame.left) / 2))));
+				if (subtype == OR_HORZ)	buffer = ((Float) (endValue - startValue)) / (((Float) size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + (frame.bottom - frame.top) + (frame.bottom - frame.top) / 2))));
+				else			buffer = ((Float) (endValue - startValue)) / (((Float) size.cy - 3 * (frame.right - frame.left)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + (frame.right - frame.left) + (frame.right - frame.left) / 2))));
 
 				*variable = startValue + Math::Round(buffer);
 

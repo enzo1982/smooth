@@ -11,11 +11,9 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/window/windowbackend.h>
-#include <smooth/object.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/i18n.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/misc/math.h>
@@ -25,12 +23,12 @@ const S::Int	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
 
 S::GUI::ToolWindow::ToolWindow() : Window("smooth ToolWindow")
 {
-	type				= classID;
-	containerType			= Window::classID;
+	type		= classID;
+	containerType	= Window::classID;
 
-	objectProperties->orientation	= OR_FREE;
+	orientation	= OR_FREE;
 
-	owner				= NIL;
+	owner		= NIL;
 
 	possibleContainers.RemoveAll();
 	possibleContainers.AddEntry(Window::classID);
@@ -40,7 +38,7 @@ S::GUI::ToolWindow::ToolWindow() : Window("smooth ToolWindow")
 
 S::GUI::ToolWindow::~ToolWindow()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::ToolWindow::SetOwner(Widget *newOwner)
@@ -85,12 +83,7 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 
 		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
-			Object	*object = assocObjects.GetNthEntry(i);
-
-			if (object->GetObjectType() == Widget::classID)
-			{
-				((Widget *) object)->Paint(SP_PAINT);
-			}
+			assocObjects.GetNthEntry(i)->Paint(SP_PAINT);
 		}
 	}
 
@@ -163,8 +156,8 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 					BeginPaint((HWND) backend->GetSystemWindow(), &ps);
 
-					if (Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20)	Paint(SP_PAINT);
-					else																						Paint(SP_UPDATE);
+					if (Math::Abs((updateRect.right - updateRect.left) - size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - size.cy) < 20)	Paint(SP_PAINT);
+					else																	Paint(SP_UPDATE);
 
 					EndPaint((HWND) backend->GetSystemWindow(), &ps);
 				}
@@ -176,31 +169,30 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 		case WM_WINDOWPOSCHANGED:
 			{
 				WINDOWPOS	*wndPos = (LPWINDOWPOS) lParam;
-				Object		*object = NIL;
 
 				for (Int i = 0; i < GetNOfObjects(); i++)
 				{
-					object = assocObjects.GetNthEntry(i);
+					Widget	*object = assocObjects.GetNthEntry(i);
 
-					if (object->GetObjectProperties()->orientation == OR_CENTER)
+					if (object->GetOrientation() == OR_CENTER)
 					{
-						object->GetObjectProperties()->size.cx = wndPos->cx;
-						object->GetObjectProperties()->size.cy = wndPos->cy;
+						object->size.cx = wndPos->cx;
+						object->size.cy = wndPos->cy;
 					}
 				}
 
-				objectProperties->pos.x		= wndPos->x;
-				objectProperties->pos.y		= wndPos->y;
-				objectProperties->size.cx	= wndPos->cx;
-				objectProperties->size.cy	= wndPos->cy;
+				pos.x	= wndPos->x;
+				pos.y	= wndPos->y;
+				size.cx	= wndPos->cx;
+				size.cy	= wndPos->cy;
 
-				drawSurface->SetSize(objectProperties->size);
+				drawSurface->SetSize(size);
 			}
 
 			updateRect.left		= 0;
 			updateRect.top		= 0;
-			updateRect.right	= updateRect.left + objectProperties->size.cx;
-			updateRect.bottom	= updateRect.top + objectProperties->size.cy;
+			updateRect.right	= updateRect.left + size.cx;
+			updateRect.bottom	= updateRect.top + size.cy;
 
 			break;
 	}
@@ -208,16 +200,13 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 	for (Int j = GetNOfObjects() - 1; j >= 0; j--)
 	{
-		Object	*object = assocObjects.GetNthEntry(j);
+		Widget	*object = assocObjects.GetNthEntry(j);
 
-		if (object->GetObjectType() == Widget::classID)
+		if (object->Process(message, wParam, lParam) == Break)
 		{
-			if (((Widget *) object)->Process(message, wParam, lParam) == Break)
-			{
-				LeaveProtectedRegion();
+			LeaveProtectedRegion();
 
-				return Break;
-			}
+			return Break;
 		}
 	}
 
@@ -228,7 +217,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 	return Success;
 }
 
-S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
+S::Int S::GUI::ToolWindow::RegisterObject(Widget *object)
 {
 	if (object == NIL) return Error;
 
@@ -236,34 +225,30 @@ S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
 	{
 		if (!object->IsRegistered())
 		{
-			assocObjects.AddEntry(object, object->handle);
+			assocObjects.AddEntry(object, object->GetHandle());
 
 			object->SetContainer(this);
 			object->SetRegisteredFlag();
 
-			switch (object->GetObjectProperties()->orientation)
+			switch (object->GetOrientation())
 			{
 				case OR_CENTER:
-					object->GetObjectProperties()->pos.x	= 0;
-					object->GetObjectProperties()->pos.y	= 0;
-
-					object->GetObjectProperties()->size.cy	= objectProperties->size.cy;
-					object->GetObjectProperties()->size.cx	= objectProperties->size.cx;
+					object->pos.x	= 0;
+					object->pos.y	= 0;
+					object->size.cy	= size.cy;
+					object->size.cx	= size.cx;
 
 					break;
 			}
 
 			if (object->GetObjectType() == ToolWindow::classID)
 			{
-				if (Setup::rightToLeft)	object->GetObjectProperties()->pos.x = objectProperties->size.cx - ((object->GetObjectProperties()->pos.x - objectProperties->pos.x) + object->GetObjectProperties()->size.cx) + objectProperties->pos.x;
+				if (Setup::rightToLeft)	object->pos.x = size.cx - ((object->pos.x - pos.x) + object->size.cx) + pos.x;
 				((ToolWindow *) object)->Create();
 			}
 
-			if (object->GetObjectType() == Widget::classID)
-			{
-				((Widget *) object)->onRegister.Emit(this);
-				((Widget *) object)->Show();
-			}
+			object->onRegister.Emit(this);
+			object->Show();
 
 			return Success;
 		}

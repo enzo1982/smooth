@@ -148,8 +148,8 @@ namespace smooth
 
 				static Window			*GetWindow(Void *);
 
-				Int				 RegisterObject(Object *);
-				Int				 UnregisterObject(Object *);
+				Int				 RegisterObject(Widget *);
+				Int				 UnregisterObject(Widget *);
 			signals:
 				Signal0<Void>			 onCreate;
 

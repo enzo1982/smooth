@@ -34,6 +34,8 @@ class
 IOLibStream
 {
 	protected:
+		static int	 defaultPackageSize;
+
 		int		 streamType;
 		bool		 crosslinked;
 		bool		 closefile;
@@ -62,10 +64,14 @@ IOLibStream
 
 		int		 lastError;
 	public:
+		static bool	 SetDefaultPackageSize	(int);
+
 		long		 Size			();
+
 		long		 GetPos			();
 		int		 GetStreamType		();
 		int		 GetLastError		();
+
 				 IOLibStream		();
 				~IOLibStream		();
 };

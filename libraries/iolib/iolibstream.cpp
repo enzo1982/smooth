@@ -27,31 +27,45 @@
 	#include <sys/ioctl.h>
 #endif
 
+int	 IOLibStream::defaultPackageSize = 131072;
+
 IOLibStream::IOLibStream()
 {
-	streamType	= STREAM_NONE;
-	size		= 0;
-	currentFilePos	= 0;
-	currentBufferPos= 0;
-	pbdActive	= false;
-	keepPbd		= false;
-	pbdLength	= 0;
-	data		= NULL;
-	closefile	= true;
-	crosslinked	= false;
-	driver		= NULL;
-	filter		= NULL;
-	allowpackset	= true;
-	packageSize	= DEFAULT_PACKAGE_SIZE;
-	stdpacksize	= packageSize;
-	origpacksize	= packageSize;
-	origsize	= 0;
-	origfilepos	= 0;
-	lastError	= IOLIB_ERROR_OK;
+	streamType		= STREAM_NONE;
+	size			= 0;
+	currentFilePos		= 0;
+	currentBufferPos	= 0;
+	pbdActive		= false;
+	keepPbd			= false;
+	pbdLength		= 0;
+	data			= NULL;
+	closefile		= true;
+	crosslinked		= false;
+	driver			= NULL;
+	filter			= NULL;
+	allowpackset		= true;
+	packageSize		= defaultPackageSize;
+	stdpacksize		= packageSize;
+	origpacksize		= packageSize;
+	origsize		= 0;
+	origfilepos		= 0;
+	lastError		= IOLIB_ERROR_OK;
 }
 
 IOLibStream::~IOLibStream()
 {
+}
+
+bool IOLibStream::SetDefaultPackageSize(int nDefaultPackageSize)
+{
+	if (nDefaultPackageSize > 0)
+	{
+		defaultPackageSize = nDefaultPackageSize;
+
+		return true;
+	}
+
+	return false;
 }
 
 int IOLibStream::GetStreamType()

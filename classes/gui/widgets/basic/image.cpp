@@ -12,28 +12,27 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Image::classID = S::Object::RequestClassID();
 
-S::GUI::Image::Image(Bitmap &bmp, Point pos, Size size)
+S::GUI::Image::Image(Bitmap &bmp, Point iPos, Size iSize)
 {
 	type	= classID;
 	bitmap	= bmp;
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos	= iPos;
+	size	= iSize;
 
-	if (size.cx == 0 && size.cy == 0) objectProperties->size = bitmap.GetSize();
+	if (size.cx == 0 && size.cy == 0) size = bitmap.GetSize();
 }
 
 S::GUI::Image::~Image()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Image::Paint(Int message)
@@ -41,16 +40,16 @@ S::Int S::GUI::Image::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 	Rect	 bmpRect;
 	Point	 realPos = GetRealPosition();
 
 	bmpRect.left	= realPos.x;
 	bmpRect.top	= realPos.y;
-	bmpRect.right	= realPos.x + objectProperties->size.cx;
-	bmpRect.bottom	= realPos.y + objectProperties->size.cy;
+	bmpRect.right	= realPos.x + size.cx;
+	bmpRect.bottom	= realPos.y + size.cy;
 
-	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), objectProperties->size), bmpRect);
+	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), size), bmpRect);
 
 	return Success;
 }
@@ -63,7 +62,7 @@ S::Int S::GUI::Image::SetBitmap(const Bitmap &newBmp)
 
 	bitmap = newBmp;
 
-	if (objectProperties->size.cx == 0 && objectProperties->size.cy == 0) objectProperties->size = bitmap.GetSize();
+	if (size.cx == 0 && size.cy == 0) size = bitmap.GetSize();
 
 	if (prevVisible) Show();
 

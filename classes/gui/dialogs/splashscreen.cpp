@@ -14,7 +14,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/system/timer.h>
-#include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/gui/window/window.h>
@@ -31,18 +30,16 @@ S::GUI::Dialogs::SplashScreen::SplashScreen(const GUI::Bitmap &logo, Int t)
 
 	bitmap = logo;
 
-	splashscreen->GetObjectProperties()->size.cx = bitmap.GetSize().cx + 2;
-	splashscreen->GetObjectProperties()->size.cy = bitmap.GetSize().cy + 2;
+	splashscreen->size.cx = bitmap.GetSize().cx + 2;
+	splashscreen->size.cy = bitmap.GetSize().cy + 2;
 
 	RegisterObject(splashscreen);
-
-	splashscreen->RegisterObject(timer);
 
 	splashscreen->onPaint.Connect(&SplashScreen::SplashPaintProc, this);
 	splashscreen->doQuit.Connect(&SplashScreen::SplashKillProc, this);
 
-	splashscreen->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - splashscreen->GetObjectProperties()->size.cx) / 2;
-	splashscreen->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - splashscreen->GetObjectProperties()->size.cy) / 2-40;
+	splashscreen->pos.x = (LiSAGetDisplaySizeX() - splashscreen->size.cx) / 2;
+	splashscreen->pos.y = (LiSAGetDisplaySizeY() - splashscreen->size.cy) / 2-40;
 
 	splashscreen->SetFlags(WF_NORESIZE | WF_TOPMOST);
 
@@ -51,8 +48,6 @@ S::GUI::Dialogs::SplashScreen::SplashScreen(const GUI::Bitmap &logo, Int t)
 
 S::GUI::Dialogs::SplashScreen::~SplashScreen()
 {
-	splashscreen->UnregisterObject(timer);
-
 	UnregisterObject(splashscreen);
 
 	DeleteObject(splashscreen);

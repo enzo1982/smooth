@@ -12,7 +12,6 @@
 #include <smooth/definitions.h>
 #include <smooth/gui/widgets/basic/optionbox.h>
 #include <smooth/gui/widgets/basic/checkbox.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/surface.h>
@@ -23,19 +22,19 @@ const S::Int	 S::GUI::PopupView::classID = S::Object::RequestClassID();
 
 S::GUI::PopupView::PopupView(PopupMenu *popupMenu, Menu *iRealMenu)
 {
-	type				= classID;
-	objectProperties->orientation	= OR_FREE;
-	myPopup				= popupMenu;
-	realMenu			= iRealMenu;
-	openTimer			= NIL;
-	closeTimer			= NIL;
+	type		= classID;
+	orientation	= OR_FREE;
+	myPopup		= popupMenu;
+	realMenu	= iRealMenu;
+	openTimer	= NIL;
+	closeTimer	= NIL;
 
 	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::PopupView::~PopupView()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::PopupView::Paint(Int message)
@@ -43,7 +42,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface		*surface = myContainer->GetDrawSurface();
+	Surface		*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -90,7 +89,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 			textRect.top	= popupRect.top + currentYPos;
 			textRect.bottom	= textRect.top + 16;
 
-			surface->SetText(entry->GetText(), textRect, objectProperties->font);
+			surface->SetText(entry->GetText(), textRect, font);
 
 			if (entry->popup != NIL)
 			{
@@ -264,11 +263,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -317,10 +316,10 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 				if (entry->type != SM_SEPARATOR)
 				{
-					entryRect[i].left	= objectProperties->pos.x + currentX;
-					entryRect[i].right	= objectProperties->pos.x + maxX;
-					entryRect[i].top	= objectProperties->pos.y + currentY;
-					entryRect[i].bottom	= objectProperties->pos.y + currentY + 16 - 2;
+					entryRect[i].left	= pos.x + currentX;
+					entryRect[i].right	= pos.x + maxX;
+					entryRect[i].top	= pos.y + currentY;
+					entryRect[i].bottom	= pos.y + currentY + 16 - 2;
 
 					currentY = currentY + 16;
 				}
@@ -329,18 +328,18 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					currentY = currentY + 5;
 				}
 
-				if (entry->GetObjectProperties()->checked && (entry->popup != NIL))
+				if (entry->checked && (entry->popup != NIL))
 				{
 					myPopup->nextPopup = new PopupMenu(entry->popup);
 
 					myPopup->nextPopup->prevPopup = myPopup;
-					myPopup->nextPopup->SetContainer(myContainer);
+					myPopup->nextPopup->SetContainer(container);
 					myPopup->nextPopup->GetSize();
-					myPopup->nextPopup->GetObjectProperties()->pos.x = entryRect[i].right - 1;
-					myPopup->nextPopup->GetObjectProperties()->pos.y = entryRect[i].top - 3;
+					myPopup->nextPopup->pos.x = entryRect[i].right - 1;
+					myPopup->nextPopup->pos.y = entryRect[i].top - 3;
 
-					if (myPopup->nextPopup->GetObjectProperties()->pos.x + myPopup->nextPopup->popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) myPopup->nextPopup->GetObjectProperties()->pos.x = entryRect[i].left + 1 - myPopup->nextPopup->popupsize.cx;
-					if (myPopup->nextPopup->GetObjectProperties()->pos.y + myPopup->nextPopup->popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) myPopup->nextPopup->GetObjectProperties()->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - myPopup->popupsize.cy - 1;
+					if (myPopup->nextPopup->pos.x + myPopup->nextPopup->popupsize.cx >= LiSAGetDisplaySizeX() - wnd->pos.x) myPopup->nextPopup->pos.x = entryRect[i].left + 1 - myPopup->nextPopup->popupsize.cx;
+					if (myPopup->nextPopup->pos.y + myPopup->nextPopup->popupsize.cy >= LiSAGetDisplaySizeY() - wnd->pos.y) myPopup->nextPopup->pos.y = LiSAGetDisplaySizeY() - wnd->pos.y - myPopup->popupsize.cy - 1;
 
 					wnd->RegisterObject(myPopup->nextPopup);
 
@@ -391,10 +390,10 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 				if (entry->type != SM_SEPARATOR)
 				{
-					entryRect[i].left	= objectProperties->pos.x + currentX;
-					entryRect[i].right	= objectProperties->pos.x + maxX;
-					entryRect[i].top	= objectProperties->pos.y + currentY;
-					entryRect[i].bottom	= objectProperties->pos.y + currentY + 16 - 2;
+					entryRect[i].left	= pos.x + currentX;
+					entryRect[i].right	= pos.x + maxX;
+					entryRect[i].top	= pos.y + currentY;
+					entryRect[i].bottom	= pos.y + currentY + 16 - 2;
 
 					currentY = currentY + 16;
 				}
@@ -403,9 +402,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					currentY = currentY + 5;
 				}
 
-				if (entry->GetObjectProperties()->checked && wnd->IsMouseOn(entryRect[i]) && (entry->popup == NIL && entry->bVar == NIL && entry->iVar == NIL))
+				if (entry->checked && wnd->IsMouseOn(entryRect[i]) && (entry->popup == NIL && entry->bVar == NIL && entry->iVar == NIL))
 				{
-					entry->GetObjectProperties()->checked = False;
+					entry->checked = False;
 
 					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
@@ -423,11 +422,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					break;
 				}
 
-				if (entry->GetObjectProperties()->checked && wnd->IsMouseOn(entryRect[i]) && (entry->bVar != NIL))
+				if (entry->checked && wnd->IsMouseOn(entryRect[i]) && (entry->bVar != NIL))
 				{
 					Bool	 valueChanged = False;
 
-					entry->GetObjectProperties()->checked = False;
+					entry->checked = False;
 
 					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
@@ -461,11 +460,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					break;
 				}
 
-				if (entry->GetObjectProperties()->checked && wnd->IsMouseOn(entryRect[i]) && (entry->iVar != NIL))
+				if (entry->checked && wnd->IsMouseOn(entryRect[i]) && (entry->iVar != NIL))
 				{
 					Bool	 valueChanged = False;
 
-					entry->GetObjectProperties()->checked = False;
+					entry->checked = False;
 
 					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
@@ -514,7 +513,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					currentY = currentY + 16;
 
-					if (!wnd->IsMouseOn(entryRect[i]) && entry->GetObjectProperties()->checked)
+					if (!wnd->IsMouseOn(entryRect[i]) && entry->checked)
 					{
 						if (entry->description != NIL) setOldStatus = True;
 
@@ -526,7 +525,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 							if (wnd->IsMouseOn(popupRect) || myPopup->nextPopup == NIL)
 							{
-								entry->GetObjectProperties()->checked = False;
+								entry->checked = False;
 
 								entryRect[i].right++;
 								entryRect[i].bottom++;
@@ -535,7 +534,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 								entryRect[i].left = entryRect[i].left + 17;
 
-								surface->SetText(entry->GetText(), entryRect[i], objectProperties->font);
+								surface->SetText(entry->GetText(), entryRect[i], font);
 
 								p1.x = entryRect[i].right - 9;
 								p2.x = p1.x;
@@ -562,7 +561,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						}
 						else
 						{
-							entry->GetObjectProperties()->checked = False;
+							entry->checked = False;
 
 							entryRect[i].right++;
 							entryRect[i].bottom++;
@@ -571,7 +570,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 							entryRect[i].left = entryRect[i].left + 17;
 
-							surface->SetText(entry->GetText(), entryRect[i], objectProperties->font);
+							surface->SetText(entry->GetText(), entryRect[i], font);
 						}
 
 						if (entry->bVar != NIL)
@@ -737,9 +736,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					currentY = currentY + 16;
 
-					if (wnd->IsMouseOn(entryRect[i]) && !entry->GetObjectProperties()->checked)
+					if (wnd->IsMouseOn(entryRect[i]) && !entry->checked)
 					{
-						entry->GetObjectProperties()->checked = True;
+						entry->checked = True;
 
 						if (entry->description != NIL)
 						{
@@ -751,17 +750,17 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						entryRect[i].right++;
 						entryRect[i].bottom++;
 
-						Surface	*surface = myContainer->GetDrawSurface();
+						Surface	*surface = container->GetDrawSurface();
 
 						surface->Gradient(entryRect[i], Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 
 						entryRect[i].left = entryRect[i].left + 17;
 
-						Font	 font = objectProperties->font;
+						Font	 nFont = font;
 
-						font.SetColor(Setup::GradientTextColor);
+						nFont.SetColor(Setup::GradientTextColor);
 
-						surface->SetText(entry->GetText(), entryRect[i], font);
+						surface->SetText(entry->GetText(), entryRect[i], nFont);
 
 						if (entry->popup != NIL)
 						{
@@ -985,7 +984,7 @@ S::Void S::GUI::PopupView::CloseProc()
 
 	if (!registered) return;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 	Rect	 popupRect;
 
 	popupRect.left		= 0;

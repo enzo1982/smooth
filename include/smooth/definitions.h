@@ -156,7 +156,7 @@ namespace smooth
 };
 
 #include "array.h"
-#include "setup.h"
+#include "basic/setup.h"
 
 #define callbacks	public
 #define signals		public

@@ -16,12 +16,14 @@ namespace smooth
 	namespace GUI
 	{
 		class Menu;
+		class Menubar;
+		class PopupView;
 	};
 };
 
-#include "../../../../object.h"
+#include "../../../../basic/object.h"
 #include "../../../../graphics/rect.h"
-#include "../../../../misc/font.h"
+#include "../../../../graphics/font.h"
 #include "../../../../graphics/bitmap.h"
 #include "../../special/shortcut.h"
 
@@ -35,6 +37,8 @@ namespace smooth
 
 		class SMOOTHAPI MenuEntry : public Widget
 		{
+			friend class Menubar;
+			friend class PopupView;
 			private:
 				Int		 popupHandle;
 

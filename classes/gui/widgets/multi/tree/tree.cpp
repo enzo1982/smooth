@@ -12,7 +12,7 @@
 #include <smooth/definitions.h>
 #include <smooth/array.h>
 #include <smooth/misc/i18n.h>
-#include <smooth/misc/font.h>
+#include <smooth/graphics/font.h>
 #include <smooth/system/system.h>
 
 S::Tree::Tree()

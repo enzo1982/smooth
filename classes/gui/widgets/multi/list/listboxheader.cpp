@@ -13,7 +13,6 @@
 #include <smooth/gui/widgets/multi/list/listbox.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/layer.h>
-#include <smooth/objectproperties.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/event.h>
 
@@ -30,14 +29,14 @@ S::GUI::ListBoxHeader::ListBoxHeader(ListBox *iListBox)
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->font.SetWeight(FW_BOLD);
+	font.SetWeight(FW_BOLD);
 
 	UpdateMetrics();
 }
 
 S::GUI::ListBoxHeader::~ListBoxHeader()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::ListBoxHeader::AddTab(String tabName, Int iTabWidth)
@@ -64,11 +63,11 @@ S::Int S::GUI::ListBoxHeader::ClearTabs()
 
 S::Int S::GUI::ListBoxHeader::UpdateMetrics()
 {
-	objectProperties->pos.x = listBox->GetObjectProperties()->pos.x + 1;
-	objectProperties->pos.y = listBox->GetObjectProperties()->pos.y + 1;
+	pos.x = listBox->pos.x + 1;
+	pos.y = listBox->pos.y + 1;
 
-	objectProperties->size.cx = listBox->GetObjectProperties()->size.cx - 3;
-	objectProperties->size.cy = 15;
+	size.cx = listBox->size.cx - 3;
+	size.cy = 15;
 
 	Int	 varSizeTabs = 0;
 	Int	 sumFixedTabSizes = 0;
@@ -81,7 +80,7 @@ S::Int S::GUI::ListBoxHeader::UpdateMetrics()
 
 	for (Int j = 0; j < tabWidths.GetNOfEntries(); j++)
 	{
-		if (tabWidths.GetNthEntry(j) <= 0) tabWidths.SetEntry(tabWidths.GetNthEntryIndex(j), -max(0, (objectProperties->size.cx - sumFixedTabSizes) / varSizeTabs));
+		if (tabWidths.GetNthEntry(j) <= 0) tabWidths.SetEntry(tabWidths.GetNthEntryIndex(j), -Math::Max(0, (size.cx - sumFixedTabSizes) / varSizeTabs));
 	}
 
 	return Success;
@@ -116,7 +115,7 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -129,15 +128,15 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 		case SP_PAINT:
 			frame.left	= realPos.x;
 			frame.top	= realPos.y;
-			frame.right	= realPos.x + objectProperties->size.cx;
-			frame.bottom	= realPos.y + objectProperties->size.cy;
+			frame.right	= realPos.x + size.cx;
+			frame.bottom	= realPos.y + size.cy;
 
 			surface->Box(frame, Setup::BackgroundColor, FILLED);
 			surface->Frame(frame, FRAME_UP);
 
 			for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
 			{
-				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + objectProperties->size.cx);
+				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + size.cx);
 
 				surface->Box(frame, Setup::BackgroundColor, FILLED);
 				surface->Frame(frame, FRAME_UP);
@@ -145,11 +144,11 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 				frame.left += 3;
 				frame.top += 1;
 
-				Font	 font = objectProperties->font;
+				Font	 nFont = font;
 
-				if (!active) font.SetColor(Setup::GrayTextColor);
+				if (!active) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->SetText(tabNames.GetNthEntry(i), frame, font);
+				surface->SetText(tabNames.GetNthEntry(i), frame, nFont);
 
 				frame.top -= 1;
 				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) - 2);
@@ -168,11 +167,11 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	Surface	*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -183,8 +182,8 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx;
-	frame.bottom	= realPos.y + objectProperties->size.cy;
+	frame.right	= realPos.x + size.cx;
+	frame.bottom	= realPos.y + size.cy;
 
 	switch (message)
 	{
@@ -219,7 +218,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 			for (i = 0; i < tabWidths.GetNOfEntries(); i++)
 			{
-				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + objectProperties->size.cx);
+				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + size.cx);
 
 				frame.left++;
 				frame.top++;
@@ -229,7 +228,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					surface->Box(frame, Setup::LightGrayColor, FILLED);
 
 					frame.left += 2;
-					surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font);
+					surface->SetText(tabNames.GetNthEntry(i), frame, font);
 					frame.left -= 2;
 
 					tabChecked.SetEntry(tabChecked.GetNthEntryIndex(i), True);
@@ -239,7 +238,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 					frame.left += 2;
-					surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font);
+					surface->SetText(tabNames.GetNthEntry(i), frame, font);
 					frame.left -= 2;
 
 					tabChecked.SetEntry(tabChecked.GetNthEntryIndex(i), False);
@@ -283,7 +282,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 						UpdateMetrics();
 
-						surface->StartPaint(Rect(listBox->GetRealPosition(), listBox->GetObjectProperties()->size));
+						surface->StartPaint(Rect(listBox->GetRealPosition(), listBox->size));
 						listBox->Paint(SP_PAINT);
 						surface->EndPaint();
 					}

@@ -15,14 +15,13 @@
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/i18n.h>
-#include <smooth/objectproperties.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::ComboBox::classID = S::Object::RequestClassID();
 
-S::GUI::ComboBox::ComboBox(Point pos, Size size)
+S::GUI::ComboBox::ComboBox(Point iPos, Size iSize)
 {
 	type		= classID;
 	entryCount	= -1;
@@ -35,13 +34,13 @@ S::GUI::ComboBox::ComboBox(Point pos, Size size)
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	SetFont(Font(objectProperties->font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
+	SetFont(Font(font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos		= iPos;
+	size		= iSize;
 
-	if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
-	if (objectProperties->size.cy == 0) objectProperties->size.cy = 19;
+	if (size.cx == 0) size.cx = 80;
+	if (size.cy == 0) size.cy = 19;
 }
 
 S::GUI::ComboBox::~ComboBox()
@@ -52,7 +51,7 @@ S::GUI::ComboBox::~ComboBox()
 
 		Window	*wnd = NIL;
 
-		if (myContainer != NIL) wnd = myContainer->GetContainerWindow();
+		if (container != NIL) wnd = container->GetContainerWindow();
 
 		if (wnd != NIL) wnd->UnregisterObject(toolWindow);
 
@@ -66,7 +65,7 @@ S::GUI::ComboBox::~ComboBox()
 		DeleteObject(toolWindow);
 	}
 
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::ListEntry *S::GUI::ComboBox::AddEntry(String name, Int id)
@@ -132,7 +131,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 	if (flags & LF_ADDNILENTRY) addNil = True;
 
-	Surface		*surface = myContainer->GetDrawSurface();
+	Surface		*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -144,8 +143,8 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	frame.right	= realPos.x + size.cx - 1;
+	frame.bottom	= realPos.y + size.cy - 1;
 
 	if (!(flags & CB_HOTSPOTONLY))
 	{
@@ -198,15 +197,15 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 				frame.top	+= 3;
 				frame.right	-= 18;
 
-				String	 text = operat->name;
+				String	 nText = operat->name;
 
 				for (Int k = 0; k < operat->name.Length(); k++)
 				{
-					if (operat->name[k] == '\t')	text[k] = 0;
-					else				text[k] = operat->name[k];
+					if (operat->name[k] == '\t')	nText[k] = 0;
+					else				nText[k] = operat->name[k];
 				}
 
-				surface->SetText(text, frame, objectProperties->font);
+				surface->SetText(nText, frame, font);
 
 				frame.right	+= 18;
 				frame.left	-= 3;
@@ -225,12 +224,12 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer		*lay = (Layer *) myContainer;
-	Window		*wnd = myContainer->GetContainerWindow();
+	Layer		*lay = (Layer *) container;
+	Window		*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface		*surface = myContainer->GetDrawSurface();
+	Surface		*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
@@ -245,8 +244,8 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	frame.right	= realPos.x + size.cx - 1;
+	frame.bottom	= realPos.y + size.cy - 1;
 
 	if (flags & CB_HOTSPOTONLY)
 	{
@@ -289,12 +288,12 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LOOSEFOCUS:
-			lbframe.top	= realPos.y + objectProperties->size.cy;
-			lbframe.bottom	= lbframe.top + min(15 * GetNOfEntries() + 4, 15 * 5 + 4);
-			lbframe.right	= realPos.x + objectProperties->size.cx - 1;
+			lbframe.top	= realPos.y + size.cy;
+			lbframe.bottom	= lbframe.top + Math::Min((Int) (15 * GetNOfEntries() + 4), 15 * 5 + 4);
+			lbframe.right	= realPos.x + size.cx - 1;
 			lbframe.left	= realPos.x;
 
-			if (wParam != handle)
+			if (wParam != GetHandle())
 			{
 				if ((wnd->IsMouseOn(frame) && listBoxOpen) || (!wnd->IsMouseOn(frame) && !wnd->IsMouseOn(lbframe) && listBoxOpen))
 				{
@@ -323,21 +322,21 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 			break;
 		case SM_LBUTTONDOWN:
 		case SM_LBUTTONDBLCLK:
-			lbframe.top	= realPos.y + objectProperties->size.cy;
-			lbframe.bottom	= lbframe.top + min(15 * GetNOfEntries() + 4, 15 * 5 + 4);
-			lbframe.right	= realPos.x + objectProperties->size.cx - 1;
+			lbframe.top	= realPos.y + size.cy;
+			lbframe.bottom	= lbframe.top + Math::Min((Int) (15 * GetNOfEntries() + 4), 15 * 5 + 4);
+			lbframe.right	= realPos.x + size.cx - 1;
 			lbframe.left	= realPos.x;
 
 			if (wnd->IsMouseOn(frame) && !listBoxOpen)
 			{
-				wnd->Process(SM_LOOSEFOCUS, handle, 0);
+				wnd->Process(SM_LOOSEFOCUS, GetHandle(), 0);
 
 				listBoxOpen = True;
 
-				lbp.x = lbframe.left - lay->GetObjectProperties()->pos.x;
-				lbp.y = realPos.y + objectProperties->size.cy - lay->GetObjectProperties()->pos.y;
-				lbs.cx = objectProperties->size.cx;
-				lbs.cy = min(15 * GetNOfEntries() + 4, 15 * 5 + 4);
+				lbp.x = lbframe.left - lay->pos.x;
+				lbp.y = realPos.y + size.cy - lay->pos.y;
+				lbs.cx = size.cx;
+				lbs.cy = Math::Min((Int) (15 * GetNOfEntries() + 4), 15 * 5 + 4);
 
 				layer		= new Layer();
 				toolWindow	= new ToolWindow();
@@ -345,12 +344,12 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				listBox->onClick.Connect(&ComboBox::ListBoxProc, this);
 
-				lbp.x = lbframe.left + wnd->GetObjectProperties()->pos.x;
-				lbp.y = realPos.y + objectProperties->size.cy + wnd->GetObjectProperties()->pos.y;
+				lbp.x = lbframe.left + wnd->pos.x;
+				lbp.y = realPos.y + size.cy + wnd->pos.y;
 
-				if (objectProperties->checked)
+				if (checked)
 				{
-					objectProperties->clicked = True;
+					clicked = True;
 
 					if (!(flags & CB_HOTSPOTONLY))
 					{
@@ -387,9 +386,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 			{
 				listBoxOpen = False;
 
-				if (objectProperties->checked)
+				if (checked)
 				{
-					objectProperties->clicked = True;
+					clicked = True;
 
 					if (!(flags & CB_HOTSPOTONLY))
 					{
@@ -411,7 +410,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				}
 
 				frame.top	= frame.bottom + 1;
-				frame.bottom	= frame.top + min(15 * GetNOfEntries() + 4, 15 * 5 + 4);
+				frame.bottom	= frame.top + Math::Min((Int) (15 * GetNOfEntries() + 4), 15 * 5 + 4);
 				frame.right++;
 
 				wnd->UnregisterObject(toolWindow);
@@ -430,8 +429,8 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.left	= realPos.x;
 				frame.top	= realPos.y;
-				frame.right	= realPos.x + objectProperties->size.cx - 1;
-				frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+				frame.right	= realPos.x + size.cx - 1;
+				frame.bottom	= realPos.y + size.cy - 1;
 			}
 
 			break;
@@ -450,19 +449,19 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 							frame.top	+= 3;
 							frame.right	-= 18;
 
-							Font	 font = objectProperties->font;
+							Font	 nFont = font;
 
-							font.SetColor(Setup::ClientColor);
+							nFont.SetColor(Setup::ClientColor);
 
-							String	 text = operat->name;
+							String	 nText = operat->name;
 
 							for (Int k = 0; k < operat->name.Length(); k++)
 							{
-								if (operat->name[k] == '\t')	text[k] = 0;
-								else				text[k] = operat->name[k];
+								if (operat->name[k] == '\t')	nText[k] = 0;
+								else				nText[k] = operat->name[k];
 							}
 
-							surface->SetText(text, frame, font);
+							surface->SetText(nText, frame, nFont);
 
 							frame.right	+= 18;
 							frame.left	-= 3;
@@ -487,15 +486,15 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 							frame.top	+= 3;
 							frame.right	-= 18;
 
-							String	 text = operat->name;
+							String	 nText = operat->name;
 
 							for (Int k = 0; k < operat->name.Length(); k++)
 							{
-								if (operat->name[k] == '\t')	text[k] = 0;
-								else				text[k] = operat->name[k];
+								if (operat->name[k] == '\t')	nText[k] = 0;
+								else				nText[k] = operat->name[k];
 							}
 
-							surface->SetText(text, frame, objectProperties->font);
+							surface->SetText(nText, frame, font);
 
 							frame.right	+= 18;
 							frame.left	-= 3;
@@ -546,11 +545,11 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			if (objectProperties->clicked)
+			if (clicked)
 			{
-				objectProperties->clicked = False;
+				clicked = False;
 
-				if (objectProperties->checked)
+				if (checked)
 				{
 					if (!(flags & CB_HOTSPOTONLY))
 					{
@@ -586,21 +585,21 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				frame.left	= frame.right - 12;
 			}
 
-			if (wnd->IsMouseOn(frame) && !objectProperties->checked)
+			if (wnd->IsMouseOn(frame) && !checked)
 			{
 				surface->Frame(frame, FRAME_UP);
 
-				objectProperties->checked = True;
+				checked = True;
 			}
-			else if (!wnd->IsMouseOn(frame) && objectProperties->checked)
+			else if (!wnd->IsMouseOn(frame) && checked)
 			{
 				frame.right++;
 				frame.bottom++;
 
 				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 
-				objectProperties->checked = False;
-				objectProperties->clicked = False;
+				checked = False;
+				clicked = False;
 			}
 
 			break;

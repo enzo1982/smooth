@@ -16,11 +16,12 @@ namespace smooth
 	namespace GUI
 	{
 		class Widget;
+		class Container;
 	};
 };
 
-#include "../../object.h"
-#include "../../misc/font.h"
+#include "../../basic/object.h"
+#include "../../graphics/font.h"
 #include "../../signals.h"
 #include "../../graphics/rect.h"
 
@@ -44,14 +45,43 @@ namespace smooth
 				Bool				 visible;
 				Bool				 active;
 
+				Bool				 clicked;
+				Bool				 checked;
+
+				Int				 orientation;
+
+				String				 text;
+				String				 tooltipText;
+
+				Font				 font;
+
+				Bool				 registered;
+				Container			*container;
+
 				Void				 GetTextSize();
 			public:
 				static const Int		 classID;
 
+				Array<Int>			 possibleContainers;
+
 				Int				 subtype;
+
+				Point				 pos;
+				Size				 size;
+
+				Size				 textSize;
+				Size				 tooltipSize;
 
 								 Widget();
 				virtual				~Widget();
+
+				Bool				 IsRegistered();
+
+				Int				 SetContainer(Container *);
+				Container			*GetContainer();
+
+				Void				 SetRegisteredFlag();
+				Void				 UnsetRegisteredFlag();
 
 				virtual Point			 GetRealPosition();
 
@@ -70,11 +100,15 @@ namespace smooth
 				virtual Int			 SetText(const String &);
 				virtual String			 GetText();
 
-				virtual Int			 SetTooltip(const String &);
-				virtual String			 GetTooltip();
+				virtual Int			 SetTooltipText(const String &);
+				virtual String			 GetTooltipText();
 
 				virtual Int			 SetFont(Font);
+				virtual Font			 GetFont();
+
 				virtual Int			 SetOrientation(Int);
+				virtual Int			 GetOrientation();
+
 				virtual Int			 SetPosition(Point);
 				virtual Int			 SetMetrics(Point, Size);
 

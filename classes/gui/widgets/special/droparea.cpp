@@ -12,7 +12,6 @@
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/gui/widgets/special/droparea.h>
 #include <smooth/definitions.h>
-#include <smooth/objectproperties.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
 
@@ -20,27 +19,27 @@
 
 const S::Int	 S::GUI::DropArea::classID = S::Object::RequestClassID();
 
-S::GUI::DropArea::DropArea(Point pos, Size size)
+S::GUI::DropArea::DropArea(Point iPos, Size iSize)
 {
-	type				= classID;
-	objectProperties->orientation	= OR_CENTER;
+	type		= classID;
+	orientation	= OR_CENTER;
 
 	possibleContainers.AddEntry(Layer::classID);
 
 	onRegister.Connect(&DropArea::OnRegister, this);
 
-	objectProperties->pos	= pos;
-	objectProperties->size	= size;
+	pos		= iPos;
+	size		= iSize;
 
-	if (objectProperties->size.cx == 0) objectProperties->size.cx = LiSAGetDisplaySizeX();
-	if (objectProperties->size.cy == 0) objectProperties->size.cy = LiSAGetDisplaySizeY();
+	if (size.cx == 0) size.cx = LiSAGetDisplaySizeX();
+	if (size.cy == 0) size.cy = LiSAGetDisplaySizeY();
 
 	onDropFile.SetParentObject(this);
 }
 
 S::GUI::DropArea::~DropArea()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Void S::GUI::DropArea::OnRegister(Container *container)
@@ -50,7 +49,7 @@ S::Void S::GUI::DropArea::OnRegister(Container *container)
 
 S::Void S::GUI::DropArea::Init()
 {
-	Window	*wnd = (Window *) myContainer->GetContainerWindow();
+	Window	*wnd = (Window *) container->GetContainerWindow();
 
 	DragAcceptFiles((HWND) wnd->GetSystemWindow(), True);
 }
@@ -71,7 +70,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -89,7 +88,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 				Point	 pos(pPos.x, pPos.y);
 
-				if (pos.x > realPos.x && pos.x < (realPos.x + objectProperties->size.cx) && pos.y > realPos.y && pos.y < (realPos.y + objectProperties->size.cy))
+				if (pos.x > realPos.x && pos.x < (realPos.x + size.cx) && pos.y > realPos.y && pos.y < (realPos.y + size.cy))
 				{
 					Int	 nOfFiles;
 

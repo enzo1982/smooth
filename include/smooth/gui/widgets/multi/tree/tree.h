@@ -16,7 +16,7 @@ namespace smooth
 	class Tree;
 };
 
-#include "../../../../object.h"
+#include "../../../../basic/object.h"
 #include "../../../../graphics/rect.h"
 #include "../../../../signals.h"
 

@@ -165,6 +165,14 @@ SOURCE=..\libraries\libxml\xmlmemory.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\libraries\libxml\xmlregexp.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\libraries\libxml\xmlunicode.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\libraries\libxml\xpath.c
 # End Source File
 # Begin Source File
@@ -178,6 +186,10 @@ SOURCE=..\libraries\libxml\xpointer.c
 # Begin Group "libxml"
 
 # PROP Default_Filter "*.h"
+# Begin Source File
+
+SOURCE=..\include\libxml\c14n.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\include\libxml\catalog.h
@@ -240,6 +252,10 @@ SOURCE=..\include\libxml\SAX.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\libxml\schemasInternals.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\libxml\threads.h
 # End Source File
 # Begin Source File
@@ -264,6 +280,10 @@ SOURCE=..\include\libxml\xlink.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\libxml\xmlautomata.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\libxml\xmlerror.h
 # End Source File
 # Begin Source File
@@ -276,11 +296,27 @@ SOURCE=..\include\libxml\xmlmemory.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\libxml\xmlversion.h
+SOURCE=..\include\libxml\xmlreader.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\libxml\xmlwin32version.h
+SOURCE=..\include\libxml\xmlregexp.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\libxml\xmlschemas.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\libxml\xmlschemastypes.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\libxml\xmlunicode.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\libxml\xmlversion.h
 # End Source File
 # Begin Source File
 

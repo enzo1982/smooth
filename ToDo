@@ -1,0 +1,21 @@
+ToDo for smooth
+
+- implement tabstops
+- implement menu shortcuts
+- implement a technique to smoothly check the values of widgets like optionboxes or checkboxes
+- mark text in editboxes
+- complete standard dialogs
+- complete editbox widget
+- complete treeview widget
+- allow applets in menubars
+- integrate UIML compiler and interpreter
+- redo SMOOTHMenubar::Paint(int)
+- use other surfaces than GDI (OpenGL, DirectFB, SDL, DirectX)
+- complete XML parser
+- implement a new event->procedure model
+- check large fonts support
+- implement MDI functionality (MDIBar, MDIArea)
+- implement Document Editing Areas
+- implement ECM
+- implement tear off menus
+- write documentation

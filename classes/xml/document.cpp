@@ -47,46 +47,62 @@ S::Int S::XML::Document::LoadFile(String fileName)
 {
 	xmlKeepBlanksDefault(False);
 
-	xmlDocPtr	 doc = xmlParseFile(fileName);
-	xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
-	Node		*root = new Node();
-	String		 inputFormat = String::SetInputFormat("UTF-8");
+	xmlDocPtr doc = xmlParseFile(fileName);
 
-	root->SetName((char *) xmlRoot->name);
-	root->SetContent((char *) xmlRoot->content);
+	if (doc != NIL)
+	{
+		xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
+		Node		*root = new Node();
+		String		 inputFormat = String::SetInputFormat("UTF-8");
 
-	SetRootNode(root);
+		root->SetName((char *) xmlRoot->name);
+		root->SetContent((char *) xmlRoot->content);
 
-	LoadNode(xmlRoot, rootNode);
+		SetRootNode(root);
 
-	String::SetInputFormat(inputFormat);
+		LoadNode(xmlRoot, rootNode);
 
-	xmlFreeDoc(doc);
+		String::SetInputFormat(inputFormat);
 
-	return Success;
+		xmlFreeDoc(doc);
+
+		return Success;
+	}
+	else
+	{
+		return Error;
+	}			
 }
 
 S::Int S::XML::Document::ParseMemory(Void *buffer, Int size)
 {
 	xmlKeepBlanksDefault(False);
 
-	xmlDocPtr	 doc = xmlParseMemory((char *) buffer, size);
-	xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
-	Node		*root = new Node();
-	String		 inputFormat = String::SetInputFormat("UTF-8");
+	xmlDocPtr doc = xmlParseMemory((char *) buffer, size);
 
-	root->SetName((char *) xmlRoot->name);
-	root->SetContent((char *) xmlRoot->content);
+	if (doc != NIL)
+	{
+		xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
+		Node		*root = new Node();
+		String		 inputFormat = String::SetInputFormat("UTF-8");
 
-	SetRootNode(root);
+		root->SetName((char *) xmlRoot->name);
+		root->SetContent((char *) xmlRoot->content);
 
-	LoadNode(xmlRoot, rootNode);
+		SetRootNode(root);
 
-	String::SetInputFormat(inputFormat);
+		LoadNode(xmlRoot, rootNode);
 
-	xmlFreeDoc(doc);
+		String::SetInputFormat(inputFormat);
 
-	return Success;
+		xmlFreeDoc(doc);
+
+		return Success;
+	}
+	else
+	{
+		return Error;
+	}			
 }
 
 S::Int S::XML::Document::LoadNode(xmlNodePtr node, Node *smoothNode)

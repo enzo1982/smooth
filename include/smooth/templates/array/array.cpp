@@ -56,6 +56,9 @@ template <class t> S::Bool S::Array<t>::IndexAvailable(Int index)
 
 template <class t> S::Int S::Array<t>::AddEntry(t entry)
 {
+	lastN = -1024;
+	lastNthEntry = ARRAY_NULLPOINTER;
+
 	if (nOfEntries == 0)
 	{
 		outlinedEntry = False;
@@ -94,6 +97,9 @@ template <class t> S::Int S::Array<t>::AddEntry(t entry)
 
 template <class t> S::Bool S::Array<t>::AddEntry(t entry, Int index)
 {
+	lastN = -1024;
+	lastNthEntry = ARRAY_NULLPOINTER;
+
 	if (index > greatestIndex)
 	{
 		AddEntry(entry);
@@ -134,6 +140,9 @@ template <class t> S::Int S::Array<t>::InsertEntryAfter(Int prev, t entry)
 {
 	if (GetEntry(prev) == ARRAY_NULLVALUE) return -1;
 
+	lastN = -1024;
+	lastNthEntry = ARRAY_NULLPOINTER;
+
 	Array_Entry<t>	*operat = new Array_Entry<t>;
 
 	operat->SetNext(prevEntry->GetNext());
@@ -167,6 +176,9 @@ template <class t> S::Bool S::Array<t>::InsertEntryAfter(Int prev, t entry, Int 
 {
 	if (GetEntry(prev) == ARRAY_NULLVALUE) return -1;
 
+	lastN = -1024;
+	lastNthEntry = ARRAY_NULLPOINTER;
+
 	if (index > greatestIndex)
 	{
 		InsertEntryAfter(prev, entry);
@@ -199,6 +211,9 @@ template <class t> S::Bool S::Array<t>::InsertEntryAfter(Int prev, t entry, Int 
 template <class t> S::Int S::Array<t>::InsertEntryAtPos(Int pos, t entry)
 {
 	if (nOfEntries < pos) return -1;
+
+	lastN = -1024;
+	lastNthEntry = ARRAY_NULLPOINTER;
 
 	for (Int i = 0; i < pos; i++)
 	{
@@ -244,6 +259,9 @@ template <class t> S::Bool S::Array<t>::InsertEntryAtPos(Int pos, t entry, Int i
 {
 	if (nOfEntries < pos) return -1;
 
+	lastN = -1024;
+	lastNthEntry = ARRAY_NULLPOINTER;
+
 	if (index > greatestIndex)
 	{
 		InsertEntryAtPos(pos, entry);
@@ -276,6 +294,9 @@ template <class t> S::Bool S::Array<t>::InsertEntryAtPos(Int pos, t entry, Int i
 template <class t> S::Bool S::Array<t>::RemoveEntry(Int index)
 {
 	if (nOfEntries == 0) return False;
+
+	lastN = -1024;
+	lastNthEntry = ARRAY_NULLPOINTER;
 
 	Array_Entry<t>	*operat = ARRAY_NULLPOINTER;
 	Array_Entry<t>	*prev = ARRAY_NULLPOINTER;

@@ -99,7 +99,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 		frame2.right	= frame.right;
 		frame2.bottom	= frame.bottom;
 
-		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) objectProperties->size.cx - (3 * (frame.bottom - frame.top) + 1)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) objectProperties->size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		frame3.top	= frame.top;
 		frame3.right	= frame3.left + (frame.bottom - frame.top);
 		frame3.bottom	= frame.bottom;
@@ -117,7 +117,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 		frame2.bottom	= frame.bottom;
 
 		frame3.left	= frame.left;
-		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) objectProperties->size.cy - (3 * (frame.right - frame.left) + 1)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) objectProperties->size.cy - 3 * (frame.right - frame.left)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		frame3.right	= frame.right;
 		frame3.bottom	= frame3.top + (frame.right - frame.left);
 	}
@@ -267,7 +267,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 		frame2.right	= frame.right - 3;
 		frame2.bottom	= frame.bottom - 3;
 
-		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) objectProperties->size.cx - (3 * (frame.bottom - frame.top) + 1)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) objectProperties->size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		frame3.top	= frame.top;
 		frame3.right	= frame3.left + (frame.bottom - frame.top);
 		frame3.bottom	= frame.bottom;
@@ -290,7 +290,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 		frame2.bottom	= frame.bottom - 3;
 
 		frame3.left	= frame.left;
-		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) objectProperties->size.cy - (3 * (frame.right - frame.left) + 1)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) objectProperties->size.cy - 3 * (frame.right - frame.left)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		frame3.right	= frame.right;
 		frame3.bottom	= frame3.top + (frame.right - frame.left);
 
@@ -543,8 +543,8 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 			if (button3Clicked)
 			{
-				if (subtype == OR_HORZ)	buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cx - (3 * (frame.bottom - frame.top) + 1)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + (frame.bottom - frame.top) + (frame.bottom - frame.top) / 2))));
-				else			buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cy - (3 * (frame.right - frame.left) + 1)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + (frame.right - frame.left) + (frame.right - frame.left) / 2))));
+				if (subtype == OR_HORZ)	buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + (frame.bottom - frame.top) + (frame.bottom - frame.top) / 2))));
+				else			buffer = ((Float) (endValue - startValue)) / (((Float) objectProperties->size.cy - 3 * (frame.right - frame.left)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + (frame.right - frame.left) + (frame.right - frame.left) / 2))));
 
 				*variable = startValue + Math::Round(buffer);
 

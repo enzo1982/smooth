@@ -46,6 +46,19 @@ S::Int S::GUI::ListBoxHeader::AddTab(String tabName, Int iTabWidth)
 	tabWidths.AddEntry(iTabWidth);
 	tabChecked.AddEntry(False);
 
+	UpdateMetrics();
+
+	return Success;
+}
+
+S::Int S::GUI::ListBoxHeader::ClearTabs()
+{
+	tabNames.DeleteAll();
+	tabWidths.DeleteAll();
+	tabChecked.DeleteAll();
+
+	UpdateMetrics();
+
 	return Success;
 }
 
@@ -100,7 +113,7 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 
 			for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
 			{
-				frame.right = min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + objectProperties->size.cx);
+				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + objectProperties->size.cx);
 
 				surface->Box(frame, Setup::BackgroundColor, FILLED);
 				surface->Frame(frame, FRAME_UP);
@@ -112,7 +125,7 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 				else		surface->SetText(tabNames.GetNthEntry(i), frame, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, FW_BOLD);
 
 				frame.top -= 1;
-				frame.left += (Math::Abs(tabWidths.GetNthEntry(i)) - 2);
+				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) - 2);
 			}
 
 			break;
@@ -150,7 +163,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSEMOVE:
 			for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
 			{
-				frame.right = min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + objectProperties->size.cx);
+				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + objectProperties->size.cx);
 
 				frame.left++;
 				frame.top++;
@@ -183,7 +196,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 				frame.left--;
 				frame.top--;
 
-				frame.left += (Math::Abs(tabWidths.GetNthEntry(i)) + 1);
+				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) + 1);
 			}
 
 			break;

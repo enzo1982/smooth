@@ -40,6 +40,8 @@ namespace smooth
 
 				Int		 AddTab(String, Int);
 
+				Int		 ClearTabs();
+
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);
 

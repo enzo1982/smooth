@@ -334,7 +334,7 @@ void Translator::OpenFile()
 
 	dialog->SetParentWindow(wnd);
 
-	dialog->AddFilter("XML Language Files", "lang_*.xml");
+	dialog->AddFilter("XML Language Files", "*.xml");
 	dialog->AddFilter("All Files", "*.*");
 
 	if (dialog->ShowDialog() == Success)
@@ -383,40 +383,18 @@ void Translator::OpenFile()
 			}
 		}
 
-		XML::Node	*xentry = doc->GetRootNode()->GetNodeByName("entry");
+		XML::Node	*xentry = doc->GetRootNode()->GetNodeByName("data")->GetNodeByName("entry");
 
 		while (xentry != NIL)
 		{
 			if (xentry->GetName() == "entry")
 			{
-				XML::Node	*property = xentry->GetNodeByName("property");
-				String		 translation;
-				String		 original;
-
-				do
-				{
-					if (property->GetName() == "property")
-					{
-						if (property->GetAttributeByName("name")->GetContent() == "string")
-						{
-							original = property->GetContent();
-						}
-						else if (property->GetAttributeByName("name")->GetContent() == "translation")
-						{
-							translation = property->GetContent();
-						}
-					}
-
-					property = property->GetNextNode();
-				}
-				while (property != NIL);
-
 				listEntry	*entry = new listEntry;
 
-				entry->listid = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append(" - ").Append(original).Append(" - ").Append(translation))->code;
 				entry->id = xentry->GetAttributeByName("id")->GetContent().ToInt();
-				entry->original = original;
-				entry->translation = translation;
+				entry->original = xentry->GetAttributeByName("string")->GetContent();
+				entry->translation = xentry->GetContent();
+				entry->listid = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append(" - ").Append(entry->original).Append(" - ").Append(entry->translation))->code;
 
 				entries.AddEntry(entry);
 			}
@@ -448,7 +426,7 @@ void Translator::SaveFileAs()
 	dialog->SetMode(SFM_SAVE);
 	dialog->SetDefaultExtension("xml");
 
-	dialog->AddFilter("XML Language Files", "lang_*.xml");
+	dialog->AddFilter("XML Language Files", "*.xml");
 	dialog->AddFilter("All Files", "*.*");
 
 	if (dialog->ShowDialog() == Success)
@@ -486,15 +464,16 @@ void Translator::SaveFileWithName(String file)
 	info->AddNode("property", entries.GetNthEntry(3)->translation)->SetAttribute("name", "author");
 	info->AddNode("property", entries.GetNthEntry(4)->translation)->SetAttribute("name", "url");
 
+	XML::Node	*data = root->AddNode("data", NIL);
+
 	for (int i = 5; i < entries.GetNOfEntries(); i++)
 	{
 		listEntry	*entry = entries.GetNthEntry(i);
-		XML::Node	*xentry = root->AddNode("entry", NIL);
+
+		XML::Node	*xentry = data->AddNode("entry", entry->translation);
 
 		xentry->SetAttribute("id", String::IntToString(entry->id));
-
-		xentry->AddNode("property", entry->original)->SetAttribute("name", "string");
-		xentry->AddNode("property", entry->translation)->SetAttribute("name", "translation");
+		xentry->SetAttribute("string", entry->original);
 	}
 
 	doc->SetEncoding("UTF-8");

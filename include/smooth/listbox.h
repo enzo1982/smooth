@@ -55,6 +55,8 @@ namespace smooth
 
 				Int		 AddTab(String, Int = 0);
 
+				Int		 ClearTabs();
+
 				virtual Int	 Show();
 				virtual Int	 Hide();
 

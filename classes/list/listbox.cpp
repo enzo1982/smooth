@@ -174,6 +174,16 @@ S::Int S::GUI::ListBox::AddTab(String tabName, Int iTabWidth)
 	return header->AddTab(tabName, iTabWidth);
 }
 
+S::Int S::GUI::ListBox::ClearTabs()
+{
+	if (header != NIL)
+	{
+		return header->ClearTabs();
+	}
+
+	return Success;
+}
+
 S::Int S::GUI::ListBox::Show()
 {
 	if (visible)	return Success;

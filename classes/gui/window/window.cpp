@@ -597,6 +597,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+		case WM_SIZE:
+			if (wParam == SIZE_RESTORED) minimized = False;
+
+			break;
 		case WM_ACTIVATE:
 			if (LOWORD(wParam) != WA_INACTIVE && !(flags & WF_SYSTEMMODAL))
 			{

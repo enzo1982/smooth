@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.01.05 xx:xx - smooth alpha 0.8.66.0
+09.01.05 14:00 - smooth alpha 0.8.66.0
 
 - object.cpp	- incorporated object manager functionality into Object
 - window.cpp	- fixed a possible crash on window close

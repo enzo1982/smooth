@@ -189,3 +189,11 @@ S::Int S::List::GetNOfEntries()
 {
 	return nOfEntries;
 }
+
+S::String S::List::GetNthEntryName(Int n)
+{
+	List::Entry	*operat = entries.GetNthEntry(n);
+
+	if (operat != NIL)	return operat->text;
+	else			return NIL;
+}

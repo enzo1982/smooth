@@ -204,6 +204,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.bottom--;
 				menuentry.right = menuentry.left + METRIC_IBICONSIZE + METRIC_IBARROWSIZEX + 2;
 
+				if (operat->onClick.GetNOfConnectedSlots() > 0) menuentry.right += 2;
+
 				p1.x = menuentry.right - METRIC_IBARROWSIZEX - 1;
 				p2.x = p1.x + METRIC_IBARROWSIZEX;
 				p1.y = menuentry.top + METRIC_IBARROWOFFSETY + 1;
@@ -232,6 +234,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				if (operat->type != SM_BITMAP)		prevbitmap = False;
 				if (operat->type != SM_TEXT)		prevtext = False;
 			}
+
+			if (operat->checked && !operat->clicked) surface->Frame(operat->rect, FRAME_UP);
 		}
 
 		firstentry = True;
@@ -469,32 +473,32 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						surface->Frame(operat->rect, FRAME_UP);
 					}
 
-					if (operat->clicked && (operat->popup != NIL && operat->orientation == OR_LEFT))
+					if (operat->clicked && operat->popup != NIL)
 					{
-						popupMenu = new PopupMenu(operat->popup);
+						Rect	 popupFrame = Rect(Point(operat->rect.right - METRIC_IBARROWSIZEX - 4, operat->rect.top), Size(METRIC_IBARROWSIZEX + 4, operat->rect.bottom - operat->rect.top));
 
-						popupHandle = popupMenu->handle;
+						if (operat->onClick.GetNOfConnectedSlots() == 0 || wnd->IsMouseOn(popupFrame))
+						{
+							popupMenu = new PopupMenu(operat->popup);
 
-						popupMenu->GetObjectProperties()->pos.x = operat->rect.left - 1;
-						popupMenu->GetObjectProperties()->pos.y = operat->rect.bottom + 2;
+							popupHandle = popupMenu->handle;
 
-						wnd->RegisterObject(popupMenu);
+							if (operat->orientation == OR_LEFT)
+							{
+								popupMenu->GetObjectProperties()->pos.x = operat->rect.left - 1;
+							}
+							else if (operat->orientation == OR_RIGHT)
+							{
+								popupMenu->realMenu->GetSize();
+								popupMenu->GetObjectProperties()->pos.x = operat->rect.right + 1 - popupMenu->realMenu->popupsize.cx;
+							}
 
-						cont = True;
-					}
-					else if (operat->clicked && (operat->popup != NIL && operat->orientation == OR_RIGHT))
-					{
-						popupMenu = new PopupMenu(operat->popup);
+							popupMenu->GetObjectProperties()->pos.y = operat->rect.bottom + 2;
 
-						popupHandle = popupMenu->handle;
+							wnd->RegisterObject(popupMenu);
 
-						popupMenu->realMenu->GetSize();
-						popupMenu->GetObjectProperties()->pos.x = operat->rect.right + 1 - popupMenu->realMenu->popupsize.cx;
-						popupMenu->GetObjectProperties()->pos.y = operat->rect.bottom + 2;
-
-						wnd->RegisterObject(popupMenu);
-
-						cont = True;
+							cont = True;
+						}
 					}
 
 					retVal = Break;
@@ -563,6 +567,19 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
 						else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
 
+						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
+						{
+							Point	 p1 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.top + 1);
+							Point	 p2 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.bottom);
+
+							surface->Line(p1, p2, Setup::BackgroundColor);
+
+							p1.x++;
+							p2.x++;
+
+							surface->Line(p1, p2, Setup::BackgroundColor);
+						}
+
 						operat->onClick.Emit();
 
 						Process(SM_MOUSEMOVE, 0, 0);
@@ -622,6 +639,19 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
 						else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
+
+						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
+						{
+							Point	 p1 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.top + 1);
+							Point	 p2 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.bottom);
+
+							surface->Line(p1, p2, Setup::BackgroundColor);
+
+							p1.x++;
+							p2.x++;
+
+							surface->Line(p1, p2, Setup::BackgroundColor);
+						}
 					}
 				}
 			}
@@ -681,8 +711,17 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.top	+= 2;
 						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
 						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
+
 						surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
 						surface->Frame(operat->rect, FRAME_UP);
+
+						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
+						{
+							Point	 p1 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.top + 1);
+							Point	 p2 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.bottom - 1);
+
+							surface->Bar(p1, p2, OR_VERT);
+						}
 					}
 					else if (!wnd->IsMouseOn(operat->rect) && operat->checked)
 					{
@@ -704,6 +743,19 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
 						else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
+
+						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
+						{
+							Point	 p1 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.top + 1);
+							Point	 p2 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.bottom);
+
+							surface->Line(p1, p2, Setup::BackgroundColor);
+
+							p1.x++;
+							p2.x++;
+
+							surface->Line(p1, p2, Setup::BackgroundColor);
+						}
 					}
 				}
 			}

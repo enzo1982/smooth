@@ -367,6 +367,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					PopupMenu::status = POPUP_FINISHED;
 
+					myPopup->realMenu->lastClicked = entry->id;
 					entry->onClick.Emit();
 
 					retVal = Break;
@@ -407,6 +408,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 							}
 						}
 
+						myPopup->realMenu->lastClicked = entry->id;
 						entry->onClick.Emit();
 					}
 
@@ -447,6 +449,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 							}
 						}
 
+						myPopup->realMenu->lastClicked = entry->id;
 						entry->onClick.Emit();
 					}
 

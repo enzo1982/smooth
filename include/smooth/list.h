@@ -58,7 +58,10 @@ namespace smooth
 					~List();
 
 			Void		 CleanupList();
+
 			Int		 GetNOfEntries();
+			String		 GetNthEntryName(Int);
+
 			Int		 SelectListEntry(Int);
 			Int		 GetSelectedEntry();
 			String		 GetSelectedEntryName();

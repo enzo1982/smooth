@@ -620,6 +620,8 @@ S::String &S::String::FillN(const Int value, const Int count)
 
 S::Int S::String::ToInt()
 {
+	if (Length() == 0) return 0;
+
 	Bool	 neg = False;
 	Int	 first = 0;
 	Int	 n = 0;
@@ -648,6 +650,8 @@ S::Int S::String::ToInt()
 
 S::Float S::String::ToDouble()
 {
+	if (Length() == 0) return 0;
+
 	Bool	 neg = False;
 	Int	 first = 0;
 	Float	 n = 0;

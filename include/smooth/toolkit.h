@@ -36,7 +36,6 @@ void		 FreeCompatibleContext	(HDC);
 HBITMAP		 BlitToBitmap		(HDC, S::Rect);
 bool		 BlitToBitmap		(S::Rect, HDC, S::Rect, HBITMAP);
 bool		 BlitFromBitmap		(S::Rect, HBITMAP, S::Rect, HDC);
-bool		 DestroyBitmap		(HBITMAP);
 HWND		 CreateSimpleWindow	(S::Rect, S::String, S::String, HICON, int, int);
 #endif
 

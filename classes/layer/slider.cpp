@@ -272,7 +272,7 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 
 					Paint(SP_PAINT);
 
-					onClick.Emit();
+					onClick.Emit(wnd->MouseX(), wnd->MouseY());
 				}
 			}
 
@@ -290,7 +290,8 @@ S::Int S::GUI::Slider::SetRange(Int rangeStart, Int rangeEnd)
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
 
-	*variable	= ((*variable) - prevStartValue) * ((endValue - startValue) / (prevEndValue - prevStartValue)) + startValue;
+	*variable	= (Int) (((Float) (*variable) - prevStartValue) * ((Float) (endValue - startValue) / (prevEndValue - prevStartValue)) + startValue);
+	*variable	= (Int) Math::Max(rangeStart, Math::Min(rangeEnd, *variable));
 
 	SetValue(*variable);
 
@@ -312,7 +313,7 @@ S::Int S::GUI::Slider::SetValue(Int newValue)
 
 	if (registered && prevVisible) Show();
 
-	onClick.Emit();
+	onClick.Emit(0, 0);
 
 	return Success;
 }

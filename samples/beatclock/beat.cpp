@@ -44,7 +44,7 @@ BeatClock::BeatClock()
 	InputValues();
 
 	wnd		= new Window("BeatClock");
-	title		= new Titlebar(false, false, true);
+	title		= new Titlebar(TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	timer		= new Timer();
 	dragcontrol	= new DragControl();
@@ -112,7 +112,7 @@ Void BeatClock::Options()
 	alarm		= new Layer("Alarm");
 	misc		= new Layer("Misc");
 	info		= new Layer("Info");
-	optitle		= new Titlebar(false, false, true);
+	optitle		= new Titlebar(TB_CLOSEBUTTON);
 
 	Point	 pos;
 	Size	 size;

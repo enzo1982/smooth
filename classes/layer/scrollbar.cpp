@@ -49,7 +49,7 @@ S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int ra
 
 	if (subtype == OR_VERT)
 	{
-		if (size.cx == 0)	objectProperties->size.cx = Math::Round(18 * Setup::FontSize);
+		if (size.cx == 0)	objectProperties->size.cx = Math::Round(17 * Setup::FontSize);
 		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
 		if (size.cy == 0)	objectProperties->size.cy = Math::Round(120 * Setup::FontSize);
 		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
@@ -58,7 +58,7 @@ S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int ra
 	{
 		if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * Setup::FontSize);
 		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = Math::Round(18 * Setup::FontSize);
+		if (size.cy == 0)	objectProperties->size.cy = Math::Round(17 * Setup::FontSize);
 		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 	}
 }
@@ -84,8 +84,8 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	frame.right	= realPos.x + objectProperties->size.cx;
+	frame.bottom	= realPos.y + objectProperties->size.cy;
 
 	if (subtype == OR_HORZ)
 	{
@@ -124,26 +124,19 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 	if (!button1Clicked && !button2Clicked) surface->Box(frame, Setup::LightGrayColor, FILLED);
 
-	if (!button3Clicked)
-	{
-		surface->Box(frame3, Setup::BackgroundColor, FILLED);
-	}
-	else
-	{
-		frame3.bottom--;
-		frame3.right--;
-		frame3.left++;
-		frame3.top++;
-		surface->Box(frame3, Setup::LightGrayColor, FILLED);
-		frame3.bottom++;
-		frame3.right++;
-		frame3.left--;
-		frame3.top--;
-	}
-
 	frame3.bottom--;
 	frame3.right--;
+	frame3.left++;
+	frame3.top++;
+
+	if (!button3Clicked)	surface->Box(frame3, Setup::BackgroundColor, FILLED);
+	else			surface->Box(frame3, Setup::LightGrayColor, FILLED);
+
+	frame3.left--;
+	frame3.top--;
+
 	surface->Frame(frame3, FRAME_UP);
+
 	frame3.bottom++;
 	frame3.right++;
 
@@ -154,14 +147,23 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 	frame1.bottom--;
 	frame1.right--;
+
 	surface->Frame(frame1, FRAME_UP);
+
 	frame1.bottom++;
 	frame1.right++;
 	frame2.bottom--;
 	frame2.right--;
+
 	surface->Frame(frame2, FRAME_UP);
+
 	frame2.bottom++;
 	frame2.right++;
+
+	Int	 arrowColor = 0;
+
+	if (active)	arrowColor = Setup::TextColor;
+	else		arrowColor = Setup::GrayTextColor;
 
 	if (subtype == OR_HORZ)
 	{
@@ -172,7 +174,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int i = 0; i < 4; i++)
 		{
-			surface->Line(lineStart, lineEnd, Setup::TextColor);
+			surface->Line(lineStart, lineEnd, arrowColor);
 			lineStart.x++;
 			lineStart.y--;
 			lineEnd.x++;
@@ -186,7 +188,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			surface->Line(lineStart, lineEnd, Setup::TextColor);
+			surface->Line(lineStart, lineEnd, arrowColor);
 			lineStart.x++;
 			lineStart.y++;
 			lineEnd.x++;
@@ -202,7 +204,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int i = 0; i < 4; i++)
 		{
-			surface->Line(lineStart, lineEnd, Setup::TextColor);
+			surface->Line(lineStart, lineEnd, arrowColor);
 			lineStart.x--;
 			lineStart.y++;
 			lineEnd.x++;
@@ -216,7 +218,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			surface->Line(lineStart, lineEnd, Setup::TextColor);
+			surface->Line(lineStart, lineEnd, arrowColor);
 			lineStart.x++;
 			lineStart.y++;
 			lineEnd.x--;
@@ -250,8 +252,8 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	frame.right	= realPos.x + objectProperties->size.cx;
+	frame.bottom	= realPos.y + objectProperties->size.cy;
 
 	if (subtype == OR_HORZ)
 	{
@@ -326,7 +328,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				if (*variable != prevValue)
 				{
-					onClick.Emit();
+					onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 					surface->Box(frame3, Setup::LightGrayColor, FILLED);
 
@@ -348,7 +350,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				if (*variable != prevValue)
 				{
-					onClick.Emit();
+					onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 					surface->Box(frame3, Setup::LightGrayColor, FILLED);
 
@@ -409,7 +411,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				surface->EndPaint();
 
-				onClick.Emit();
+				onClick.Emit(0, 0);
 			}
 
 			retVal = Break;
@@ -443,7 +445,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				surface->EndPaint();
 
-				onClick.Emit();
+				onClick.Emit(0, 0);
 			}
 
 			break;
@@ -501,7 +503,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 			break;
 		case SM_MOUSEMOVE:
 		case SM_MOUSELEAVE:
-			if (!button1Checked && wnd->IsMouseOn(frame1))
+			if (message == SM_MOUSEMOVE && !button1Checked && wnd->IsMouseOn(frame1))
 			{
 				button1Checked = True;
 
@@ -520,7 +522,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				frame1.right--;
 				frame1.bottom--;
 			}
-			else if (!button2Checked && wnd->IsMouseOn(frame2))
+			else if (message == SM_MOUSEMOVE && !button2Checked && wnd->IsMouseOn(frame2))
 			{
 				button2Checked = True;
 
@@ -560,7 +562,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 					surface->EndPaint();
 
-					onClick.Emit();
+					onClick.Emit(wnd->MouseX(), wnd->MouseY());
 				}
 			}
 
@@ -656,9 +658,12 @@ S::Int S::GUI::Scrollbar::SetRange(Int rangeStart, Int rangeEnd)
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
 
-	*variable	= ((*variable) - prevStartValue) * ((endValue - startValue) / (prevEndValue - prevStartValue)) + startValue;
+	*variable	= (Int) (((Float) (*variable) - prevStartValue) * ((Float) (endValue - startValue) / (prevEndValue - prevStartValue)) + startValue);
+	*variable	= (Int) Math::Max(rangeStart, Math::Min(rangeEnd, *variable));
 
-	onClick.Emit();
+	Paint(SP_PAINT);
+
+	onClick.Emit(0, 0);
 
 	return Success;
 }

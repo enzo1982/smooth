@@ -95,10 +95,12 @@ LIBSTRIP_OPTS = --strip-debug
 REMOVER_OPTS = -f
 COPIER_OPTS = -f
 
-.PHONY: all install clean distribute
+.PHONY: all programs install clean distribute
 .SILENT:
 
-all: $(OBJECTS) $(OTHERLIBS) $(DLLNAME) $(DESIGNEREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4DLL) $(SAMPLE4EXE) $(SAMPLE5EXE) distribute
+all: $(OBJECTS) $(OTHERLIBS) $(DLLNAME) distribute
+
+programs: $(DLLNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4DLL) $(SAMPLE4EXE) $(SAMPLE5EXE)
 
 install:
 
@@ -113,7 +115,7 @@ clean:
 	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE5DIR)/smooth.so
 	$(ECHO) done.
 
-distribute: $(DLLNAME) $(DESIGNEREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE)
+distribute: $(DLLNAME)
 	$(ECHO) -n Distributing files to directories...
 	$(REMOVER) $(REMOVER_OPTS) NULL
 	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE1DIR)/smooth.so

@@ -25,22 +25,23 @@ namespace smooth
 	class SMOOTHAPI List : public Array<ListEntry *>
 	{
 		protected:
-			Bool			 entrysizesset;
+			List			*referenceList;
 
-			virtual ListEntry	*AddEntry(Int, String);
-			virtual Int		 ModifyEntry(Int, String);
-			virtual Int		 RemoveEntry(Int);
-
-			Void			 GetSize();
-			Void			 GetListEntriesSize();
+			Bool			 IsListSane();
+			Int			 SynchronizeList();
 		public:
 						 List();
 						~List();
 
-			virtual Void		 Cleanup();
+			virtual ListEntry	*AddEntry(String, Int);
+			virtual Int		 ModifyEntry(Int, String);
+			virtual Int		 RemoveEntry(Int);
+			virtual Int		 RemoveAll();
 
 			virtual Int		 SelectEntry(Int);
 			ListEntry		*GetSelectedEntry();
+
+			Int			 SetReferenceList(List *);
 	};
 };
 

@@ -68,6 +68,7 @@ class Test : public Application
 		void		 mainApp_ScrollbarProc();
 		void		 ShowEdb();
 		void		 HideEdb();
+		Menu		*GetTrackMenu(Int, Int);
 		Int		 threadMessageBox(Thread *);
 		void		 Close();
 

@@ -60,32 +60,34 @@ void LiSADeinit();
 
 void LiSASleep(int);
 
-/* LiSASetMouseCursor - Set the mouse cursor picture *************
- *								 *
- * Syntax:	int LiSASetMouseCursor(int mouseCursor);	 *
- *								 *
- * Explanation:	LiSASetMouseCursor changes the picture used as	 *
- *		your mouse cursor.				 *
- *								 *
- * mouseCursor:	The mouse cursor ID. One of the following:	 *
- *								 *
- *		LiSA_MOUSE_ARROW	the standard arrow	 *
- *		LiSA_MOUSE_TEXTEDIT	the cursor used for	 *
- *					marking text etc.	 *
- *		LiSA_MOUSE_HAND		the hand cursor used for *
- *					hyperlinks		 *
- *		LiSA_MOUSE_HSIZE	a horizontal resizer	 *
- *		LiSA_MOUSE_VSIZE	a vertical resizer	 *
- *								 *
- * Return:	LiSASetMouseCursor returns 0 if everything goes	 *
- *		well. A positive integer is returned in case of	 *
- *		an error.					 *
- *								 *
- *****************************************************************/
+/* LiSASetMouseCursor - Set the mouse cursor picture *********************
+ *									 *
+ * Syntax:	int LiSASetMouseCursor(LiSAWindow *, int mouseCursor);	 *
+ *									 *
+ * Explanation:	LiSASetMouseCursor changes the picture used as		 *
+ *		your mouse cursor.					 *
+ *									 *
+ * mouseCursor:	The mouse cursor ID. One of the following:		 *
+ *									 *
+ *		LiSA_MOUSE_ARROW	the standard arrow		 *
+ *		LiSA_MOUSE_TEXTEDIT	the cursor used for		 *
+ *					marking text etc.		 *
+ *		LiSA_MOUSE_HAND		the hand cursor used for	 *
+ *					hyperlinks			 *
+ *		LiSA_MOUSE_HSIZE	a horizontal resizer		 *
+ *		LiSA_MOUSE_VSIZE	a vertical resizer		 *
+ *									 *
+ * Return:	LiSASetMouseCursor returns 0 if everything goes		 *
+ *		well. A positive integer is returned in case of		 *
+ *		an error.						 *
+ *									 *
+ *************************************************************************/
+
+typedef void LiSAWindow;
 
 #define LSetMouseCursor LiSASetMouseCursor
 
-int LiSASetMouseCursor(int);
+int LiSASetMouseCursor(LiSAWindow *, int);
 
 const int	 LiSA_MOUSE_ARROW	= 0;
 const int	 LiSA_MOUSE_TEXTEDIT	= 1;

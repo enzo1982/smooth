@@ -64,7 +64,7 @@ signals that you are interested in.
 <p> <center><img src="signals-and-slots.png"></center> <blockquote><p align="center"><em> Signals and Slots facilitate true type-safe component programming
 </em></p>
 </blockquote><p> The signals and slots mechanism is type safe: the signature of a
-signal must match the signature of the receiving slot. Since the signatures are compatible, the
+signal must match the signature of the receiving slot. (In fact a slot taking zero arguments can be connected to any signal because it can ignore extra arguments.) Since the signatures are compatible, the
 compiler can help us detect type mismatches. Signals and slots are
 loosely coupled: a class which emits a signal neither knows nor cares
 which slots receive the signal. smooth's signals and slots mechanism
@@ -73,7 +73,7 @@ called with the signal's parameters at the right time. Signals and
 slots can take up to eight arguments of any type (extending smooth for using signals with more arguments is easy, though). They are
 completely typesafe: no more callback core dumps!
 <p> smooth continues to support callbacks, though, but it implements them in a
-typesafe manner. There are some cases where callbacks are more usefull than
+typesafe manner. There are some cases where callbacks are more useful than
 signals. If you want to be sure that only one function is connected to an event
 or you want to receive a return value from a function, you probably want to
 use callbacks rather than signals.

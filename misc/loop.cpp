@@ -42,6 +42,7 @@ __declspec (dllexport) HICON	 S::SMOOTHICON = NIL;
 #endif
 
 HBITMAP	 S::DEFAULTICON		= NIL;
+HCURSOR	 S::DEFAULTCURSOR	= NIL;
 
 bool	 S::loopActive		= false;
 int	 S::peekLoop		= 0;
@@ -54,6 +55,8 @@ S::Void S::Init()
 	if (initCount++) return;
 
 	LiSAInit();
+
+	Int	 codePage = 1252;
 
 #ifdef __WIN32__
 	WORD		 wVersionRequested = MAKEWORD(1,1);
@@ -72,8 +75,16 @@ S::Void S::Init()
 	if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)	Setup::enableUnicode = True;
 	else							Setup::enableUnicode = False;
 
+	CPINFOEXA	 cpInfo;
+
+	GetCPInfoExA(CP_ACP, 0, &cpInfo);
+
+	codePage = cpInfo.CodePage;
+
 	DEFAULTICON = LoadBitmapA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON));
 	SMOOTHICON = LoadIconA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON));
+
+	DEFAULTCURSOR = LoadCursorA(0, MAKEINTRESOURCEA(32512));
 #endif
 
 	mainObjectManager	= new ObjectManager();
@@ -85,7 +96,8 @@ S::Void S::Init()
 	GetDefaultLanguage();
 	SMOOTH::SetLanguage(DefaultLanguage);
 
-	String::SetInputFormat("UTF-8");
+	String::SetInputFormat("ISO-8859-1");
+	String::SetOutputFormat(String("CP").Append(String::FromInt(codePage)));
 
 	backgroundApplication = new BackgroundApplication();
 }
@@ -96,7 +108,6 @@ S::Void S::Free()
 
 #ifdef __WIN32__
 	::DeleteObject(DEFAULTICON);
-	DestroyIcon(SMOOTHICON);
 #endif
 
 	delete backgroundApplication;

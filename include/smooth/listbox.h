@@ -31,6 +31,8 @@ namespace smooth
 		const Int	 LF_NORMAL		= 0;
 		const Int	 LF_HIDESCROLLBAR	= 1;
 		const Int	 LF_ALLOWRESELECT	= 2;
+		const Int	 LF_MULTICHECKBOX	= 4;
+		const Int	 LF_HIDEHEADER		= 8;
 
 		class SMOOTHAPI ListBox : public Widget, public List
 		{
@@ -49,11 +51,11 @@ namespace smooth
 						 ListBox(Point, Size);
 						~ListBox();
 
-				ListEntry	*AddEntry(String);
+				ListEntry	*AddEntry(String, Int = -1);
 				Int		 ModifyEntry(Int, String);
 				Int		 RemoveEntry(Int);
 				Int		 SelectEntry(Int);
-				Void		 Cleanup();
+				Int		 RemoveAll();
 
 				Int		 AddTab(String, Int = 0);
 				Int		 GetNthTabOffset(Int);

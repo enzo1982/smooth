@@ -31,7 +31,7 @@ TestKey::TestKey()
 	pos.y = 28;
 
 	wnd	= new Window("TestKey - by Robert Kausch 2000-2003");
-	title	= new Titlebar(true, false, true);
+	title	= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	text	= new Text("ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000", pos);
 
 	RegisterObject(wnd);

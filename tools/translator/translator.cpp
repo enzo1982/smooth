@@ -31,7 +31,7 @@ Translator::Translator()
 	Size	 size;
 
 	wnd		= new Window(String("smooth Translator v").Append(SMOOTH_VERSION));
-	title		= new Titlebar(true, false, true);
+	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
 
@@ -310,7 +310,7 @@ void Translator::CloseFile()
 
 	entries.RemoveAll();
 
-	list_entries->Cleanup();
+	list_entries->RemoveAll();
 
 	text_original->SetText("Original:");
 	text_translated->SetText("Translation:");

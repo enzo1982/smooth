@@ -46,6 +46,9 @@ S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMa
 	marking				= False;
 	invisibleChars			= 0;
 
+	dropDownList			= NIL;
+	comboBox			= NIL;
+
 	possibleContainers.AddEntry(OBJ_LAYER);
 
 	if (maxSize <= 0) maxSize = 32768;
@@ -61,6 +64,13 @@ S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMa
 
 S::GUI::EditBox::~EditBox()
 {
+	if (comboBox != NIL)
+	{
+		if (myContainer != NIL) myContainer->UnregisterObject(comboBox);
+
+		DeleteObject(comboBox);
+	}
+
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
@@ -92,9 +102,23 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 			surface->Frame(frame, FRAME_DOWN);
 
+			if (dropDownList != NIL && comboBox == NIL)
+			{
+				comboBox = new ComboBox(objectProperties->pos, objectProperties->size);
+				comboBox->SetFlags(CB_HOTSPOTONLY);
+				comboBox->onClick.Connect(&EditBox::DropDownListProc, this);
+
+				for (Int i = 0; i < dropDownList->GetNOfEntries(); i++)
+				{
+					comboBox->AddEntry(dropDownList->GetNthEntry(i)->name);
+				}
+
+				myContainer->RegisterObject(comboBox);
+			}
+
 			textRect.left	= frame.left + 3;
 			textRect.top	= frame.top + 3;
-			textRect.right	= textRect.left + objectProperties->size.cx - 6;
+			textRect.right	= textRect.left + objectProperties->size.cx - 6 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXARROWOFFSETX + 4);
 			textRect.bottom	= textRect.top + 16;
 
 			if (invisibleChars > 0)
@@ -109,6 +133,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 			if (active)	surface->SetText(visText, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 			else		surface->SetText(visText, textRect, objectProperties->font, objectProperties->fontSize, Setup::TextColor, objectProperties->fontWeight);
+
+			if (comboBox != NIL) comboBox->Paint(SP_PAINT);
 
 			break;
 	}
@@ -150,7 +176,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
+	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
 	switch (message)
@@ -194,8 +220,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONDOWN:
-			if (!active) break;
-
 			if (objectProperties->clicked)
 			{
 				Int	 prevMarkStart = markStart;
@@ -255,7 +279,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 			else if (objectProperties->checked)
 			{
 				objectProperties->clicked = True;
-				surface->Frame(frame, FRAME_DOWN);
 
 				for (Int i = 0; i <= objectProperties->text.Length() - invisibleChars + 1; i++)
 				{
@@ -361,8 +384,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONUP:
-			if (!active) break;
-
 			if (objectProperties->clicked && markStart != -1)
 			{
 				if (markStart == markEnd) { markStart = -1; markEnd = -1; }
@@ -373,33 +394,17 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 			break;
 		case SM_MOUSEMOVE:
 		case SM_MOUSELEAVE:
-			if (!active) break;
-
-			if (!objectProperties->checked && wnd->IsMouseOn(frame))
+			if (message == SM_MOUSEMOVE && !objectProperties->checked && wnd->IsMouseOn(frame))
 			{
-				wnd->cursorset = True;
-
-				LiSASetMouseCursor(LiSA_MOUSE_TEXTEDIT);
+				LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_TEXTEDIT);
 
 				objectProperties->checked = True;
-
-				if (!objectProperties->clicked)
-				{
-					surface->Frame(frame, FRAME_UP);
-				}
 			}
 			else if (objectProperties->checked && !wnd->IsMouseOn(frame))
 			{
-				wnd->cursorset = False;
-
-				LiSASetMouseCursor(LiSA_MOUSE_ARROW);
+				LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_ARROW);
 
 				objectProperties->checked = False;
-
-				if (!objectProperties->clicked)
-				{
-					surface->Frame(frame, FRAME_DOWN);
-				}
 			}
 
 			if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
@@ -460,8 +465,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_KEYDOWN:
-			if (!active) break;
-
 			if (objectProperties->clicked)
 			{
 				Int	 prevMarkStart = markStart;
@@ -527,8 +530,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_CHAR:
-			if (!active) break;
-
 			if (objectProperties->clicked)
 			{
 				if (wParam == 3 && !(lParam & (1 << 30)))
@@ -639,7 +640,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
+	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
 	if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(visText, promptPos - invisibleChars, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
@@ -730,7 +731,7 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
+	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
 	Int	 bColor = GetSysColor(COLOR_HIGHLIGHT);
@@ -817,17 +818,29 @@ S::Void S::GUI::EditBox::InsertText(String insertText)
 	SetCursor(promptPos + insertText.Length());
 }
 
+S::Int S::GUI::EditBox::Show()
+{
+	if (comboBox != NIL) comboBox->Show();
+
+	return Widget::Show();
+}
+
+S::Int S::GUI::EditBox::Hide()
+{
+	if (comboBox != NIL) comboBox->Hide();
+
+	return Widget::Hide();
+}
+
+S::Int S::GUI::EditBox::Activate()
+{
+	if (comboBox != NIL) comboBox->Activate();
+
+	return Widget::Activate();
+}
+
 S::Int S::GUI::EditBox::Deactivate()
 {
-	if (!active) return Success;
-
-	if (!registered)
-	{
-		active = False;
-
-		return Success;
-	}
-
 	if (objectProperties->clicked)
 	{
 		if (timer != NIL)
@@ -842,22 +855,55 @@ S::Int S::GUI::EditBox::Deactivate()
 		objectProperties->clicked = False;
 	}
 
+	if (comboBox != NIL) comboBox->Deactivate();
+
 	return Widget::Deactivate();
 }
 
 S::Int S::GUI::EditBox::SetText(String txt)
 {
-	objectProperties->text	= txt;
-	promptPos		= 0;
+	promptPos = 0;
 
-	if (registered && visible)
+	if (objectProperties->text == txt)
 	{
 		Paint(SP_PAINT);
 
-		onClick.Emit();
+		return Success;
 	}
 
+	objectProperties->text = txt;
+
+	Paint(SP_PAINT);
+
+	if (registered) onClick.Emit(0, 0);
+
 	return Success;
+}
+
+S::Int S::GUI::EditBox::SetDropDownList(List *nDropDownList)
+{
+	dropDownList = nDropDownList;
+
+	return Success;
+}
+
+S::Void S::GUI::EditBox::DropDownListProc()
+{
+	if (comboBox->GetSelectedEntry() == NIL) return;
+
+	SetText(comboBox->GetSelectedEntry()->name);
+
+	comboBox->GetSelectedEntry()->clicked = False;
+
+	objectProperties->checked = True;
+
+	Process(SM_LBUTTONDOWN, 0, 0);
+
+	markStart = 0;
+	markEnd = objectProperties->text.Length();
+
+	MarkText(0, 0);
+	SetCursor(objectProperties->text.Length());
 }
 
 S::Void S::GUI::EditBox::TimerProc()

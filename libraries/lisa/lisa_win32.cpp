@@ -38,10 +38,6 @@ void LiSAInit()
 
 void LiSADeinit()
 {
-	if (LiSA_CURSOR_HAND != LiSA_CURSOR_ARROW) DestroyCursor(LiSA_CURSOR_HAND);
-
-	DestroyCursor(LiSA_CURSOR_ARROW);
-	DestroyCursor(LiSA_CURSOR_TEXTEDIT);
 }
 
 void LiSASleep(int mSeconds)
@@ -51,8 +47,11 @@ void LiSASleep(int mSeconds)
 	Sleep(mSeconds);
 }
 
-int LiSASetMouseCursor(int mouseCursor)
+int LiSASetMouseCursor(LiSAWindow *window, int mouseCursor)
 {
+	if (mouseCursor != LiSA_MOUSE_ARROW)	SetClassLongA((HWND) window, GCL_HCURSOR, (LONG) NULL);
+	else					SetClassLongA((HWND) window, GCL_HCURSOR, (LONG) LiSA_CURSOR_ARROW);
+
 	switch (mouseCursor)
 	{
 		case LiSA_MOUSE_ARROW:

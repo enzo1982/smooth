@@ -204,18 +204,14 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					{
 						moveTab = i;
 
-						wnd->cursorset = True;
-
-						LiSASetMouseCursor(LiSA_MOUSE_HSIZE);
+						LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_HSIZE);
 					}
 				}
 				else if (moveTab == i)
 				{
 					moveTab = -1;
 
-					wnd->cursorset = False;
-
-					LiSASetMouseCursor(LiSA_MOUSE_ARROW);
+					LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_ARROW);
 				}
 			}
 

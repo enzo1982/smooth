@@ -26,7 +26,7 @@ Int smooth::Main()
 MDITest::MDITest()
 {
 	mainWnd			= new Window("MDITest");
-	mainWnd_titlebar	= new Titlebar(true, true, true);
+	mainWnd_titlebar	= new Titlebar();
 	mainWnd_statusbar	= new Statusbar("Ready");
 	mainWnd_client		= new MDIClient();
 	mainWnd_menubar		= new Menubar();

@@ -20,6 +20,7 @@ S::Int MouseX(HWND hwnd, S::Int wincl)
 	GetWindowRect(hwnd, &rect);
 	GetCursorPos(&point);
 #else
+
 	Window			 root_return;
 	Window			 child_return;
 	S::Int			 root_x_return;

@@ -74,8 +74,8 @@ S::Int S::GUI::Widget::Hide()
 
 	rect.left	= realPos.x;
 	rect.top	= realPos.y;
-	rect.right	= realPos.x + objectProperties->size.cx + 1;
-	rect.bottom	= realPos.y + objectProperties->size.cy + 1;
+	rect.right	= realPos.x + objectProperties->size.cx;
+	rect.bottom	= realPos.y + objectProperties->size.cy;
 
 	surface->Box(rect, Setup::BackgroundColor, FILLED);
 

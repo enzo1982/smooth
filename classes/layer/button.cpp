@@ -303,44 +303,15 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 				Paint(SP_MOUSEUP);
 				Process(SM_MOUSEMOVE, 0, 0);
 
-				onClick.Emit();
+				onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 				retVal = Break;
 			}
 
 			break;
-		case SM_MOUSELEAVE:
-			if (objectProperties->checked && !wnd->IsMouseOn(frame))
-			{
-				objectProperties->checked = False;
-				objectProperties->clicked = False;
-
-				Paint(SP_MOUSEOUT);
-
-				if (tipTimer != NIL)
-				{
-					if (tooltip != NIL)
-					{
-						tooltip->Hide();
-
-						wnd->UnregisterObject(tooltip);
-
-						DeleteObject(tooltip);
-
-						tooltip = NIL;
-					}
-
-					tipTimer->Stop();
-
-					DeleteObject(tipTimer);
-
-					tipTimer = NIL;
-				}
-			}
-
-			break;
 		case SM_MOUSEMOVE:
-			if (!objectProperties->checked && wnd->IsMouseOn(frame))
+		case SM_MOUSELEAVE:
+			if (message == SM_MOUSEMOVE && !objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = True;
 
@@ -381,7 +352,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 					tipTimer = NIL;
 				}
 			}
-			else if (objectProperties->checked && wnd->IsMouseOn(frame))
+			else if (message == SM_MOUSEMOVE && objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				if (tipTimer != NIL && wParam == 0)
 				{

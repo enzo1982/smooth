@@ -78,7 +78,7 @@ S::DialogColorSelection::DialogColorSelection()
 
 	dlgwnd = new Window(TXT_COLORSELECTION);
 
-	titlebar	= new Titlebar(false, false, true);
+	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
 	okbtn		= new Button(TXT_OK, NIL, bp, bs);
 	okbtn->onClick.Connect(&DialogColorSelection::ColorDlgOK, this);
@@ -134,64 +134,43 @@ S::DialogColorSelection::DialogColorSelection()
 
 	huetext = new Text(TXT_HUESHORT, bp);
 	huetext->SetOrientation(OR_UPPERRIGHT);
-
-#ifdef __WIN32__
 	huetext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor, FW_NORMAL);
-#endif
 
 	bp.y += 26;
 
 	sattext = new Text(TXT_SATURATIONSHORT, bp);
 	sattext->SetOrientation(OR_UPPERRIGHT);
-
-#ifdef __WIN32__
 	sattext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor, FW_NORMAL);
-#endif
 
 	bp.y += 26;
 
 	valtext = new Text(TXT_VALUESHORT, bp);
 	valtext->SetOrientation(OR_UPPERRIGHT);
-
-#ifdef __WIN32
 	valtext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor, FW_NORMAL);
-#endif
 
 	bp.y += 26;
 
 	redtext = new Text(TXT_REDSHORT, bp);
 	redtext->SetOrientation(OR_UPPERRIGHT);
-
-#ifdef __WIN32__
 	redtext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(255, 0, 0), FW_NORMAL);
-#endif
 
 	bp.y += 26;
 
 	greentext = new Text(TXT_GREENSHORT, bp);
 	greentext->SetOrientation(OR_UPPERRIGHT);
-
-#ifdef __WIN32__
 	greentext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 160, 0), FW_NORMAL);
-#endif
 
 	bp.y += 26;
 
 	bluetext = new Text(TXT_BLUESHORT, bp);
 	bluetext->SetOrientation(OR_UPPERRIGHT);
-
-#ifdef __WIN32__
 	bluetext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 0, 255), FW_NORMAL);
-#endif
 
 	bp.y += 26;
 
 	hextext = new Text(TXT_HTMLCODE, bp);
 	hextext->SetOrientation(OR_UPPERRIGHT);
-
-#ifdef __WIN32__
 	hextext->SetFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor, FW_NORMAL);
-#endif
 
 	bp.x = 37;
 	bp.y = 34;
@@ -531,13 +510,8 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 	Rect	 ocrect;
 	int	 newval;
 	int	 newsat;
-
 	int	 newhue;
-
-#ifdef __WIN32__
 	int	 leftbutton;
-#endif
-
 	int	 hssize = Math::Round(205 * Setup::FontSize);
 
 	huerect.left	= huexoffset;
@@ -618,7 +592,6 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 		case SM_MOUSEMOVE:
 			if (huecapt)
 			{
-#ifdef __WIN32__
 				if (GetSystemMetrics(SM_SWAPBUTTON))	leftbutton = VK_RBUTTON;
 				else					leftbutton = VK_LBUTTON;
 
@@ -627,7 +600,6 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 					ColorDlgMessageProc(SM_LBUTTONUP, 0, 0);
 					break;
 				}
-#endif
 
 				newhue = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
 
@@ -658,7 +630,6 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 			}
 			else if (vscapt)
 			{
-#ifdef __WIN32__
 				if (GetSystemMetrics(SM_SWAPBUTTON))	leftbutton = VK_RBUTTON;
 				else					leftbutton = VK_LBUTTON;
 
@@ -667,7 +638,6 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 					ColorDlgMessageProc(SM_LBUTTONUP, 0, 0);
 					break;
 				}
-#endif
 
 				newval = Math::Round(max(min(dlgwnd->MouseX() - 8, hssize - 1), 0) * (255 / (204 * Setup::FontSize)));
 				newsat = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (255 / (204 * Setup::FontSize)));

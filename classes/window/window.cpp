@@ -38,7 +38,6 @@ __declspec (dllexport)
 S::Int	 S::OBJ_WINDOW = S::Object::RequestObjectID();
 S::Int	 S::GUI::Window::nOfActiveWindows = 0;
 
-#ifdef __WIN32__
 LRESULT CALLBACK S::GUI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	Window	*smoothWindow = Window::GetWindow(window);
@@ -110,7 +109,6 @@ LRESULT CALLBACK S::GUI::WindowProc(HWND window, UINT message, WPARAM wParam, LP
 	else if (Setup::enableUnicode)	return DefWindowProcW(window, originalMessage, wParam, lParam);
 	else				return DefWindowProcA(window, originalMessage, wParam, lParam);
 }
-#endif
 
 S::GUI::Window::Window(String title)
 {
@@ -120,9 +118,9 @@ S::GUI::Window::Window(String title)
 
 	possibleContainers.AddEntry(OBJ_APPLICATION);
 
-#ifdef __WIN32__
-	style		= WS_THICKFRAME|WS_SYSMENU|WS_POPUP;
-#endif
+	parentWindow = NIL;
+
+	style		= WS_THICKFRAME | WS_SYSMENU | WS_POPUP;
 
 	exstyle		= 0;
 	modal		= False;
@@ -146,14 +144,11 @@ S::GUI::Window::Window(String title)
 
 	icon = NIL;
 
-#ifdef __WIN32__
 	sysicon = LoadIconA(NIL, MAKEINTRESOURCEA(32512));
-#endif
 
 	created		= False;
 	visible		= False;
 	destroyed	= False;
-	cursorset	= False;
 	initshow	= False;
 
 	objectProperties->size.cx = Math::Round(200 * Setup::FontSize);
@@ -197,9 +192,13 @@ S::GUI::Window::~Window()
 
 	if (created && !destroyed)
 	{
-#ifdef __WIN32__
+		delete drawSurface;
+
+		drawSurface = nullSurface;
+
+		FreeContext(this, windowDC);
+
 		DestroyWindow(hwnd);
-#endif
 	}
 
 	if (created)
@@ -211,6 +210,13 @@ S::GUI::Window::~Window()
 	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop--;
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+}
+
+S::Int S::GUI::Window::SetParentWindow(Window *pWnd)
+{
+	parentWindow = pWnd;
+
+	return Success;
 }
 
 S::Bool S::GUI::Window::DummyExitProc()
@@ -230,18 +236,9 @@ S::Int S::GUI::Window::SetMetrics(Point newPos, Size newSize)
 	updateRect.right	= updateRect.left + objectProperties->size.cx;
 	updateRect.bottom	= updateRect.top + objectProperties->size.cy;
 
-#ifdef __WIN32__
 	if (created) SetWindowPos(hwnd, 0, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, 0);
-#endif
 
 	return Success;
-}
-
-S::Void S::GUI::Window::SetPositionFlag(HWND pf)
-{
-#ifdef __WIN32__
-	SetWindowPos(hwnd, pf, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
-#endif
 }
 
 S::Void S::GUI::Window::SetStyle(Int s)
@@ -259,15 +256,11 @@ S::Void S::GUI::Window::SetStyle(Int s)
 		case SS_APPTOPMOST:
 			apptopmost	= True;
 
-#ifdef __WIN32__
 			if (!created) exstyle = exstyle | WS_EX_TOPMOST;
-#endif
 
 			break;
 		case SS_NORESIZE:
-#ifdef __WIN32__
 			style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
-#endif
 
 			break;
 		default:
@@ -283,9 +276,7 @@ S::Void S::GUI::Window::SetExStyle(Int es)
 
 S::Int S::GUI::Window::SetIcon(HBITMAP newicon)
 {
-#ifdef __WIN32__
 	if (newicon == SI_DEFAULT) newicon = DEFAULTICON;
-#endif
 
 	if (newicon != NIL)
 	{
@@ -310,22 +301,16 @@ S::Int S::GUI::Window::SetIcon(HBITMAP newicon)
 
 S::Int S::GUI::Window::SetApplicationIcon(HICON newicon)
 {
-#ifdef __WIN32__
 	sysicon = newicon;
 
 	return Success;
-#else
-	return Error;
-#endif
 }
 
 S::Int S::GUI::Window::SetApplicationIcon(Int newicon)
 {
-#ifdef __WIN32__
 	HICON	 ic = LoadIconA(hInstance, MAKEINTRESOURCEA(newicon));
 
 	sysicon = ic;
-#endif
 
 	return Success;
 }
@@ -336,10 +321,8 @@ S::Int S::GUI::Window::SetText(String title)
 
 	if (!created) return Success;
 
-#ifdef __WIN32__
 	if (Setup::enableUnicode)	SetWindowTextW(hwnd, title);
 	else				SetWindowTextA(hwnd, title);
-#endif
 
 	SMOOTH::SendMessage(this, SM_WINDOWTITLECHANGED, 0, 0);
 
@@ -390,7 +373,7 @@ S::Int S::GUI::Window::Show()
 
 	if (apptopmost || modal || sysmodal || type == OBJ_TOOLWINDOW)
 	{
-		SetWindowPos(hwnd, HWND_TOPMOST, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE|SWP_SHOWWINDOW);
+		SetWindowPos(hwnd, HWND_TOPMOST, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE | SWP_SHOWWINDOW);
 	}
 
 	if (maximized && !initshow)
@@ -558,8 +541,6 @@ S::Int S::GUI::Window::Stay()
 {
 	if (!registered) return value;
 
-	SetStyle(SS_APPTOPMOST);
-
 	MSG	 msg;
 
 	if (!created)	Create();
@@ -632,7 +613,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 	HDC	 dc;
 	Rect	 rect;
 	HWND	 act;
-	Menubar	*menubar = NIL;
+	Menu	*trackMenu = NIL;
 	Int	 i;
 
 	Object	*object;
@@ -832,19 +813,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_RBUTTONDOWN:
-			for (i = 0; i < nOfObjects; i++)
-			{
-				object = assocObjects.GetNthEntry(i);
+			trackMenu = getTrackMenu.Call(MouseX(), MouseY());
 
-				if (object->GetObjectType() == OBJ_MENUBAR)
-				{
-					menubar = (Menubar *) object;
-
-					break;
-				}
-			}
-
-			if (menubar != NIL)
+			if (trackMenu != NIL)
 			{
 				PopupMenu	*popup = NIL;
 
@@ -859,7 +830,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 					DeleteObject(popup);
 				}
 
-				popup = new PopupMenu(menubar);
+				popup = new PopupMenu(trackMenu);
 
 				popup->GetObjectProperties()->pos.x = MouseX();
 				popup->GetObjectProperties()->pos.y = MouseY();
@@ -874,14 +845,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSEMOVE:
 			dc = GetContext(this);
 
-			if (PtVisible(dc, MouseX(), MouseY()) && (MouseX() > 2 && MouseY() > 2 && MouseX() < objectProperties->size.cx - 3 && MouseY() < objectProperties->size.cy - 3))
-			{
-				if (!cursorset) LiSASetMouseCursor(LiSA_MOUSE_ARROW);
-			}
-			else if (!PtVisible(dc, MouseX(), MouseY()))
-			{
-				message = SM_MOUSELEAVE;
-			}
+			if (!PtVisible(dc, MouseX(), MouseY())) message = SM_MOUSELEAVE;
 
 			FreeContext(this, dc);
 
@@ -892,15 +856,29 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_ACTIVATEAPP:
 			if (apptopmost)
 			{
-				if (wParam != 0)	SetWindowPos(hwnd, HWND_TOPMOST, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE|SWP_SHOWWINDOW);
-				else			SetWindowPos(hwnd, HWND_BOTTOM, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE);
+				if (wParam != 0)
+				{
+					SetWindowPos(hwnd, HWND_TOPMOST, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+				}
+				else
+				{
+					if (parentWindow != NIL)
+					{
+						SetWindowPos(hwnd, parentWindow->hwnd, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE);
+						SetWindowPos(parentWindow->hwnd, hwnd, parentWindow->objectProperties->pos.x, parentWindow->objectProperties->pos.y, parentWindow->objectProperties->size.cx, parentWindow->objectProperties->size.cy, SWP_NOACTIVATE);
+					}
+					else
+					{
+						SetWindowPos(hwnd, HWND_BOTTOM, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOACTIVATE);
+					}
+				}
 			}
 		case WM_KILLFOCUS:
 			if (sysmodal)
 			{
 				act = GetForegroundWindow();
 
-				if (GetWindow(act) == 0) SetForegroundWindow(hwnd);
+				if (GetWindow(act) == NIL) SetForegroundWindow(hwnd);
 				else if (GetWindow(act)->type == OBJ_TOOLWINDOW) break;
 				else if (act != hwnd && GetWindow(act)->sysmodal == False && GetWindow(act)->modal == False) SetForegroundWindow(hwnd);
 				else if (act != hwnd && GetWindow(act)->handle < handle) SetForegroundWindow(hwnd);
@@ -909,7 +887,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				act = GetActiveWindow();
 
-				if (GetWindow(act) == 0) break;
+				if (GetWindow(act) == NIL) break;
 				else if (GetWindow(act)->type == OBJ_TOOLWINDOW) break;
 
 				if (act != hwnd && GetWindow(act)->modal == False && GetWindow(act)->sysmodal == False) SetActiveWindow(hwnd);
@@ -1256,9 +1234,7 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 
 			if (object->GetObjectType() == OBJ_TITLEBAR)
 			{
-#ifdef __WIN32__
 				if (!((Titlebar *) object)->max)	style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
-#endif
 			}
 			else if (object->GetObjectType() == OBJ_TOOLWINDOW)
 			{

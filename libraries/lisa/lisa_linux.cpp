@@ -41,7 +41,7 @@ void LiSASleep(int mSeconds)
 	usleep(mSeconds * 1000);
 }
 
-int LiSASetMouseCursor(int mouseCursor)
+int LiSASetMouseCursor(LiSAWindow *window, int mouseCursor)
 {
 	if (mouseCursor == LiSA_MOUSE_ARROW)	return 0;
 	else					return 1;

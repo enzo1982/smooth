@@ -36,7 +36,7 @@ PlugInTest::PlugInTest()
 
 	wnd		= new Window("smooth plug-in test");
 	layer		= new Layer();
-	title		= new Titlebar(true, false, true);
+	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	activearea	= new ActiveAreaPlugin(RGB(255, 255, 128), pos, size);
 	activearea->onClick.Connect(&PlugInTest::activeAreaProc, this);
 	

@@ -124,7 +124,7 @@ void FreeCompatibleContext(HDC cdc)
 
 	oldBitmaps.RemoveEntry((int) cdc);
 
-	DestroyBitmap(bmp);
+	::DeleteObject(bmp);
 	DeleteDC(cdc);
 }
 
@@ -223,7 +223,7 @@ int GetLineSizeX(String text, int nofchars, String font, int size, int weight)
 	tsize = ts;
 
 	SelectObject(cdc, holdfont);
-	DeleteObject(hfont);
+	::DeleteObject(hfont);
 
 	DeleteDC(cdc);
 
@@ -273,7 +273,7 @@ int GetLineSizeY(String text, String font, int size, int weight)
 	tsize = ts;
 
 	SelectObject(cdc, holdfont);
-	DeleteObject(hfont);
+	::DeleteObject(hfont);
 
 	DeleteDC(cdc);
 
@@ -326,7 +326,7 @@ HBITMAP BlitToBitmap(HDC dc, Rect rect)
 	newbmp = (HBITMAP) SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
-	DestroyBitmap(backup);
+	::DeleteObject(backup);
 
 	return newbmp;
 }
@@ -343,7 +343,7 @@ bool BlitToBitmap(Rect srcrect, HDC dc, Rect destrect, HBITMAP bmp)
 	bmp = (HBITMAP) SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
-	DestroyBitmap(backup);
+	::DeleteObject(backup);
 
 	return true;
 }
@@ -360,14 +360,7 @@ bool BlitFromBitmap(Rect srcrect, HBITMAP bitmap, Rect destrect, HDC dc)
 	bitmap = (HBITMAP) SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
-	DestroyBitmap(backup);
-
-	return true;
-}
-
-bool DestroyBitmap(HBITMAP bitmap)
-{
-	DeleteObject(bitmap);
+	::DeleteObject(backup);
 
 	return true;
 }
@@ -379,20 +372,20 @@ HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon
 	HWND		 hwnd;
 
 	wndclassw.cbSize	= sizeof(wndclassw);
-	wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
 	wndclassw.lpfnWndProc	= GUI::WindowProc;
 	wndclassw.cbClsExtra	= 0;
 	wndclassw.cbWndExtra	= 0;
 	wndclassw.hInstance	= hInstance;
 	wndclassw.hIcon		= icon;
-	wndclassw.hCursor	= NIL;
+	wndclassw.hCursor	= DEFAULTCURSOR;
 	wndclassw.hbrBackground	= NIL;
 	wndclassw.lpszMenuName	= NIL;
 	wndclassw.lpszClassName	= className;
 	wndclassw.hIconSm	= icon;
 
 	wndclassa.cbSize	= sizeof(wndclassa);
-	wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
 	wndclassa.lpfnWndProc	= GUI::WindowProc;
 	wndclassa.cbClsExtra	= 0;
 	wndclassa.cbWndExtra	= 0;

@@ -115,10 +115,12 @@ REMOVER_OPTS = -f
 COPIER_OPTS = -f
 PACKER_OPTS = -9 -q
 
-.PHONY: all install clean clean_all distribute
+.PHONY: all programs install clean clean_all distribute
 .SILENT:
 
-all: $(OBJECTS) $(RESOURCES) $(OTHERLIBS) $(DLLNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4DLL) $(SAMPLE4EXE) $(SAMPLE5EXE) distribute
+all: $(OBJECTS) $(RESOURCES) $(OTHERLIBS) $(DLLNAME) distribute
+
+programs: $(DLLNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4DLL) $(SAMPLE4EXE) $(SAMPLE5EXE)
 
 install:
 
@@ -144,7 +146,7 @@ clean_all:
 	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE5DIR)/smooth.dll
 	$(ECHO) done.
 
-distribute: $(DLLNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE)
+distribute: $(DLLNAME)
 	$(ECHO) -n Distributing files to directories...
 	$(REMOVER) $(REMOVER_OPTS) NULL
 	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE1DIR)/smooth.dll

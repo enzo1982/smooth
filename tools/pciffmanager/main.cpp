@@ -28,7 +28,7 @@ PCIFFManager::PCIFFManager()
 	filename = "";
 
 	wnd		= new Window(String("smooth PCIFF Manager v").Append(SMOOTH_VERSION));
-	title		= new Titlebar(true, false, true);
+	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
 

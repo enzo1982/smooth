@@ -85,7 +85,6 @@ namespace smooth
 	extern int	 METRIC_LISTBOXENTRYHEIGHT;
 	extern int	 METRIC_LISTBOXTEXTOFFSETXY;
 	extern int	 METRIC_LISTBOXSBOFFSET;
-	extern int	 METRIC_LISTBOXSBSIZE;
 
 	void SetMetrics();
 #endif

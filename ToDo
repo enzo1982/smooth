@@ -8,7 +8,7 @@ ToDo for smooth
 - allow applets in menubars
 - integrate UIML compiler and interpreter
 - redo Menubar::Paint(int)
-- redo the whole menu system
+- redo the whole menu system (most important: popup menus)
 - use other surfaces than GDI (OpenGL, DirectFB, SDL, DirectX)
 - check large fonts support
 - implement MDI functionality (MDIBar, MDIArea)
@@ -17,10 +17,7 @@ ToDo for smooth
 - implement tear off menus
 - write documentation
 - write multi line editboxes
-- redo the listbox system (to make listboxes use pointers to lists)
-- add editable comboboxes
-- support multiple selects in listboxes
 - support drag & drop in listboxes
 - support keyboard input in listboxes and comboboxes
-- support track menus
 - add methods for moving entries in arrays
+- use more signals & slots internally

@@ -19,7 +19,7 @@ Int smooth::Main()
 Hello::Hello()
 {
 	mainWnd	= new Window();
-	title	= new Titlebar(False, False, True);
+	title	= new Titlebar(TB_CLOSEBUTTON);
 	hello	= new Button("Hello, World!", NIL, Point(20, 15), Size(160, 40));
 
 	hello->onClick.Connect(&Hello::Quit, this);

@@ -14,12 +14,11 @@
 #include <string.h>
 #include <iolib-cxx.h>
 
-char	*S::String::inputFormat = NIL;
-char	*S::String::previousInputFormat = NIL;
+char	*S::String::inputFormat		= "ISO-8859-1";
+char	*S::String::outputFormat	= "ISO-8859-1";
 
 S::String::String()
 {
-	bString = NIL;
 	wString = NIL;
 
 	Clean();
@@ -27,7 +26,6 @@ S::String::String()
 
 S::String::String(const int nil)
 {
-	bString = NIL;
 	wString = NIL;
 
 	Clean();
@@ -37,14 +35,12 @@ S::String::String(const char *iString)
 {
 	if (iString == NIL)
 	{
-		bString = NIL;
 		wString = NIL;
 
 		Clean();
 	}
 	else
 	{
-		bString = NIL;
 		wString = NIL;
 
 		ImportFormat(iString, inputFormat);
@@ -55,7 +51,6 @@ S::String::String(const wchar_t *iString)
 {
 	if (iString == NIL)
 	{
-		bString = NIL;
 		wString = NIL;
 
 		Clean();
@@ -64,19 +59,9 @@ S::String::String(const wchar_t *iString)
 	{
 		stringSize = wcslen(iString) + 1;
 
-		bString = new char [stringSize];
 		wString = new wchar_t [stringSize];
 
 		wcscpy(wString, iString);
-
-		for (Int i = 0; i < stringSize - 1; i++)
-		{
-			bString[i] = wString[i];
-		}
-
-		bString[stringSize - 1] = 0;
-
-		checkInconsistency = False;
 	}
 }
 
@@ -84,7 +69,6 @@ S::String::String(const String &iString)
 {
 	if (iString.wString == NIL)
 	{
-		bString = NIL;
 		wString = NIL;
 
 		Clean();
@@ -93,15 +77,9 @@ S::String::String(const String &iString)
 	{
 		stringSize = iString.stringSize;
 
-		bString = new char [stringSize];
 		wString = new wchar_t [stringSize];
 
-		strncpy(bString, iString.bString, stringSize);
 		wcsncpy(wString, iString.wString, stringSize);
-
-		checkInconsistency = iString.checkInconsistency;
-
-		FixInconsistency();
 	}
 }
 
@@ -112,20 +90,15 @@ S::String::~String()
 
 S::Void S::String::Clean()
 {
-	if (bString != NIL) delete [] bString;
 	if (wString != NIL) delete [] wString;
 
-	bString = NIL;
 	wString = NIL;
 	stringSize = 0;
-	checkInconsistency = False;
 }
 
 char *S::String::SetInputFormat(const char *iFormat)
 {
-	delete [] previousInputFormat;
-
-	previousInputFormat = inputFormat;
+	char	*previousInputFormat = inputFormat;
 
 	inputFormat = new char [strlen(iFormat) + 1];
 
@@ -134,16 +107,15 @@ char *S::String::SetInputFormat(const char *iFormat)
 	return previousInputFormat;
 }
 
-S::Void S::String::FixInconsistency()
+char *S::String::SetOutputFormat(const char *oFormat)
 {
-	if (!checkInconsistency) return;
+	char	*previousOutputFormat = outputFormat;
 
-	checkInconsistency = False;
+	outputFormat = new char [strlen(oFormat) + 1];
 
-	for (Int i = 0; i < stringSize; i++)
-	{
-		if (bString[i] != wString[i]) bString[i] = wString[i];
-	}
+	strcpy(outputFormat, oFormat);
+
+	return previousOutputFormat;
 }
 
 S::Void S::String::ImportFormat(const char *str, const char *format)
@@ -152,7 +124,7 @@ S::Void S::String::ImportFormat(const char *str, const char *format)
 
 	if (format == NIL)
 	{
-		SetInputFormat("UTF-8");
+		SetInputFormat("ISO-8859-1");
 
 		format = inputFormat;
 	}
@@ -161,26 +133,23 @@ S::Void S::String::ImportFormat(const char *str, const char *format)
 
 	if (stringSize == 0) return;
 
-	bString = new char [stringSize];
 	wString = new wchar_t [stringSize];
 
 	ConvertString(str, strlen(str), format, (char *) wString, stringSize * 2, "UTF-16LE");
 
-	for (Int i = 0; i < stringSize - 1; i++)
-	{
-		bString[i] = wString[i];
-	}
-
-	bString[stringSize - 1] = 0;
 	wString[stringSize - 1] = 0;
 }
 
-char *S::String::ConvertTo(String encoding)
+char *S::String::ConvertTo(const char *encoding)
 {
 	if (stringSize == 0) return NIL;
 
-	Int	 bufferSize	= ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, encoding) + 1;
-	char	*buffer		= new char [bufferSize * 4];
+	Int	 bufferSize = ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, encoding) + 1;
+
+	if (bufferSize == 0)	bufferSize = ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, "ISO-8859-1") + 1;
+	if (bufferSize == 1)	return "";
+
+	char	*buffer = new char [bufferSize];
 
 	ConvertString((char *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize, encoding);
 
@@ -189,71 +158,54 @@ char *S::String::ConvertTo(String encoding)
 
 wchar_t &S::String::operator [](int n)
 {
-	FixInconsistency();
-
-	char	*bBuffer;
 	wchar_t	*wBuffer;
 
 	if (n >= stringSize - 1)
 	{
 		if (stringSize > 0)
 		{
-			bBuffer = new char [stringSize];
 			wBuffer = new wchar_t [stringSize];
 
-			strncpy(bBuffer, bString, stringSize);
 			wcsncpy(wBuffer, wString, stringSize);
 
-			delete [] bString;
 			delete [] wString;
 
-			bString = new char [n + 2];
 			wString = new wchar_t [n + 2];
 
 			for (Int i = 0; i < (n + 1); i++)
 			{
-				bString[i] = 32;
 				wString[i] = 32;
 			}
 
-			bString[n + 1] = 0;
 			wString[n + 1] = 0;
 
 			for (Int j = 0; j < stringSize - 1; j++)
 			{
-				bString[j] = bBuffer[j];
 				wString[j] = wBuffer[j];
 			}
 
 			stringSize = n + 2;
 
-			delete [] bBuffer;
 			delete [] wBuffer;
 		}
 		else
 		{
 			Clean();
 
-			bString = new char [n + 2];
 			wString = new wchar_t [n + 2];
 
 			for (Int i = 0; i < (n + 1); i++)
 			{
-				bString[i] = 32;
 				wString[i] = 32;
 			}
 
-			bString[n + 1] = 0;
 			wString[n + 1] = 0;
 
 			stringSize = n + 2;
 		}
 
-		bString[n] = 0;
 		wString[n] = 0;
 	}
-
-	checkInconsistency = True;
 
 	return wString[n];
 }
@@ -265,15 +217,11 @@ wchar_t &S::String::operator [](Int n)
 
 S::String::operator char *()
 {
-	FixInconsistency();
-
-	return bString;
+	return ConvertTo(outputFormat);
 }
 
 S::String::operator wchar_t *()
 {
-	FixInconsistency();
-
 	return wString;
 }
 
@@ -310,17 +258,9 @@ S::String &S::String::operator =(const wchar_t *newString)
 
 		stringSize = wcslen(newString) + 1;
 
-		bString = new char [stringSize];
 		wString = new wchar_t [stringSize];
 
 		wcscpy(wString, newString);
-
-		for (Int i = 0; i < stringSize - 1; i++)
-		{
-			bString[i] = wString[i];
-		}
-
-		bString[stringSize - 1] = 0;
 	}
 
 	return *this;
@@ -340,15 +280,9 @@ S::String &S::String::operator =(const String &newString)
 
 		stringSize = backup.stringSize;
 
-		bString = new char [stringSize];
 		wString = new wchar_t [stringSize];
 
-		strncpy(bString, backup.bString, stringSize);
 		wcsncpy(wString, backup.wString, stringSize);
-
-		checkInconsistency = newString.checkInconsistency;
-
-		FixInconsistency();
 	}
 
 	return *this;
@@ -362,8 +296,8 @@ S::Bool S::String::operator ==(const int nil)
 
 S::Bool S::String::operator ==(const char *str)
 {
-	if (bString == NIL && str == NIL)	return True;
-	if (bString == NIL || str == NIL)	return False;
+	if (wString == NIL && str == NIL)	return True;
+	if (wString == NIL || str == NIL)	return False;
 
 	if (!Compare(str))	return True;
 	else			return False;
@@ -395,8 +329,8 @@ S::Bool S::String::operator !=(const int nil)
 
 S::Bool S::String::operator !=(const char *str)
 {
-	if (bString == NIL && str == NIL)	return False;
-	if (bString == NIL || str == NIL)	return True;
+	if (wString == NIL && str == NIL)	return False;
+	if (wString == NIL || str == NIL)	return True;
 
 	if (Compare(str) != 0)	return True;
 	else			return False;
@@ -544,8 +478,6 @@ S::Int S::String::Compare(const wchar_t *str)
 
 S::Int S::String::Compare(const String &str)
 {
-	FixInconsistency();
-
 	Int	 len1 = Length();
 	Int	 len2 = String(str).Length();
 
@@ -580,8 +512,6 @@ S::Int S::String::CompareN(const wchar_t *str, Int n)
 
 S::Int S::String::CompareN(const String &str, Int n)
 {
-	FixInconsistency();
-
 	if (Length() < n) return 1;
 
 	for (int i = 0; i < n; i++)
@@ -599,8 +529,6 @@ S::String &S::String::Fill(const Int value)
 		(*this)[i] = value;
 	}
 
-	FixInconsistency();
-
 	return *this;
 }
 
@@ -612,8 +540,6 @@ S::String &S::String::FillN(const Int value, const Int count)
 	{
 		(*this)[i] = value;
 	}
-
-	FixInconsistency();
 
 	return *this;
 }
@@ -711,7 +637,7 @@ S::String S::String::FromInt(const Int value)
 
 		for (Int i = 0; i < sz-1; i++)
 		{
-			newString[i+1] = (wchar_t) Math::Floor(((-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
+			newString[i + 1] = (wchar_t) Math::Floor(((-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
 		}
 	}
 	else
@@ -721,8 +647,6 @@ S::String S::String::FromInt(const Int value)
 			newString[i] = (wchar_t) Math::Floor((value % (Int) Math::Pow(10, sz - i)) / Math::Pow(10, sz - (i + 1))) + 48;
 		}
 	}
-
-	newString.FixInconsistency();
 
 	return newString;
 }
@@ -747,7 +671,7 @@ S::String S::String::FromFloat(Float value)
 
 		for (Int i = 0; i < sz-1; i++)
 		{
-			newString[i+1] = (wchar_t) Math::Floor(((Int) (-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
+			newString[i + 1] = (wchar_t) Math::Floor(((Int) (-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
 		}
 
 		afps = FromInt((Int) (-(value - (Int) value) * (Int) Math::Pow(10, 9)));
@@ -811,9 +735,12 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 	for (Int i = 0; i < outBytes; i++) outBuffer[i] = 0;
 
+	iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
+
+	if ((int) cd == -1) return -1;
+
 	InStream	*in	= new InStream(STREAM_BUFFER, (void *) inBuffer, inBytes);
 	OutStream	*out	= new OutStream(STREAM_BUFFER, (void *) outBuffer, outBytes);
-	iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
 	Int		 size	= 0;
 
 	iconv(cd, NULL, NULL, NULL, NULL);

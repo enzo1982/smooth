@@ -54,18 +54,14 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 	Int	 retVal = Success;
 	Int	 leftButton;
 	HDC	 dc = NIL;
-
-#ifdef __WIN32__
 	MSG		 msg;
 	PAINTSTRUCT	 ps;
-#endif
 
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
 			wnd->Process(SM_LOOSEFOCUS, 0, 0);
 
-#ifdef __WIN32__
 			if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
 			else					leftButton = VK_LBUTTON;
 
@@ -79,14 +75,12 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 				mPos = mp;
 				wRect = wr;
 			}
-#endif
 
 			cpwp.cx = mPos.x - wRect.left;
 			cpwp.cy = mPos.y - wRect.top;
 
 			if (!wnd->IsMaximized())
 			{
-#ifdef __WIN32__
 				do
 				{
 					if (peekLoop > 0)
@@ -166,7 +160,6 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 					wnd->GetObjectProperties()->size.cy	= wndRect.bottom - wndRect.top;
 				}
 				while (GetAsyncKeyState(leftButton) != 0);
-#endif
 			}
 
 			retVal = Break;

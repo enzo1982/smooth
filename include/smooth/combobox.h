@@ -29,6 +29,9 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Int	 CB_NORMAL	= 0;
+		const Int	 CB_HOTSPOTONLY	= 1;
+
 		class SMOOTHAPI ComboBox : public Widget, public List
 		{
 			private:
@@ -46,11 +49,11 @@ namespace smooth
 						 ComboBox(Point, Size);
 						~ComboBox();
 
-				ListEntry	*AddEntry(String);
+				ListEntry	*AddEntry(String, Int = -1);
 				Int		 ModifyEntry(Int, String);
 				Int		 RemoveEntry(Int);
 				Int		 SelectEntry(Int);
-				Void		 Cleanup();
+				Int		 RemoveAll();
 
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);

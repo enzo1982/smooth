@@ -42,6 +42,32 @@ namespace smooth
 				return Success;
 			}
 
+#ifndef SIGNALS_SIGNAL_ZERO
+			template <class ct, class rrt> Int Connect(rrt (ct::*proc)(), ct *inst)
+			{
+				instances0.AddEntry(new Instance0<ct, rrt>(inst));
+				methods0.AddEntry(new MethodT<rrt (ct::*)()>(proc));
+
+				return Success;
+			}
+
+			template <class rrt> Int Connect(rrt (*proc)())
+			{
+				functions0.AddEntry((Void (*)()) proc);
+
+				return Success;
+			}
+
+			Int Connect(Signal0<Void> *sig)
+			{
+				if (sig == this) return Error;
+
+				sigs0.AddEntry(sig);
+
+				return Success;
+			}
+#endif
+
 			template <class ct, class rrt> int Disconnect(rrt (ct::*proc)(SIGNALS_ARGUMENT_TYPES), ct *inst)
 			{
 				SIGNALS_INSTANCE_CLASS_NAME<ct, rrt SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	*instance = new SIGNALS_INSTANCE_CLASS_NAME<ct, rrt SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(inst);
@@ -97,6 +123,63 @@ namespace smooth
 				return Success;
 			}
 
+#ifndef SIGNALS_SIGNAL_ZERO
+			template <class ct, class rrt> int Disconnect(rrt (ct::*proc)(), ct *inst)
+			{
+				Instance0<ct, rrt>	*instance = new Instance0<ct, rrt>(inst);
+				MethodT<rrt (ct::*)()>	*method = new MethodT<rrt (ct::*)()>(proc);
+
+				for (Int i = 0; i < methods0.GetNOfEntries(); i++)
+				{
+					if (*instances0.GetNthEntry(i) == instance && *methods0.GetNthEntry(i) == method)
+					{
+						delete instances0.GetNthEntry(i);
+						delete methods0.GetNthEntry(i);
+
+						instances0.RemoveEntry(instances0.GetNthEntryIndex(i));
+						methods0.RemoveEntry(methods0.GetNthEntryIndex(i));
+
+						break;
+					}
+				}
+
+				delete instance;
+				delete method;
+
+				return Success;
+			}
+
+			template <class rrt> Int Disconnect(rrt (*proc)())
+			{
+				for (Int i = 0; i < functions0.GetNOfEntries(); i++)
+				{
+					if (functions0.GetNthEntry(i) == (Void (*)()) proc)
+					{
+						functions0.RemoveEntry(functions0.GetNthEntryIndex(i));
+
+						break;
+					}
+				}
+
+				return Success;
+			}
+
+			Int Disconnect(Signal0<Void> *sig)
+			{
+				for (Int i = 0; i < sigs0.GetNOfEntries(); i++)
+				{
+					if (sigs0.GetNthEntry(i) == sig)
+					{
+						sigs0.RemoveEntry(sigs0.GetNthEntryIndex(i));
+
+						break;
+					}
+				}
+
+				return Success;
+			}
+#endif
+
 			Void Emit(SIGNALS_ARGUMENT_PARAMETER_LIST)
 			{
 				for (Int i = 0; i < methods.GetNOfEntries(); i++)
@@ -112,6 +195,21 @@ namespace smooth
 				for (Int k = 0; k < sigs.GetNOfEntries(); k++)
 				{
 					((SIGNALS_SIGNAL_CLASS_NAME *) sigs.GetNthEntry(k))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+				}
+
+				for (Int l = 0; l < methods0.GetNOfEntries(); l++)
+				{
+					instances0.GetNthEntry(l)->Call(methods0.GetNthEntry(l));
+				}
+
+				for (Int m = 0; m < functions0.GetNOfEntries(); m++)
+				{
+					((Void (*)()) functions0.GetNthEntry(m))();
+				}
+
+				for (Int n = 0; n < sigs0.GetNOfEntries(); n++)
+				{
+					((Signal0<Void> *) sigs0.GetNthEntry(n))->Emit();
 				}
 			}
 	};

@@ -51,84 +51,25 @@ Int ActiveAreaPlugin::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Surface	*surface = wnd->GetDrawSurface();
-	HDC	 dc = ((SurfaceGDI *) surface)->GetContext();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
-	HBRUSH	 brush = CreateSolidBrush(areaColor);
-	HPEN	 hpen;
-	HPEN	 holdpen;
-	Point	 p1;
-	Point	 p2;
-	Point	 p3;
-	Point	 p4;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	p1.x = frame.left;
-	p1.y = frame.top;
-	p2.x = frame.right;
-	p2.y = frame.top;
-	p3.x = frame.left;
-	p3.y = frame.bottom;
-	p4.x = frame.right;
-	p4.y = frame.bottom;
-
-	hpen = CreatePen(PS_SOLID, 1, RGB(max((Setup::BackgroundColor & 255) - 64, 0), max(((Setup::BackgroundColor >> 8) & 255) - 64, 0), max(((Setup::BackgroundColor >> 16) & 255) - 64, 0)));
-	holdpen = (HPEN) SelectObject(dc, hpen);
-
-	MoveToEx(dc, p1.x, p1.y, NIL);
-	LineTo(dc, p2.x, p2.y);
-
-	SelectObject(dc, holdpen);
-	::DeleteObject(hpen);
-
-	hpen = CreatePen(PS_SOLID, 1, RGB(max((Setup::BackgroundColor & 255) - 64, 0), max(((Setup::BackgroundColor >> 8) & 255) - 64, 0), max(((Setup::BackgroundColor >> 16) & 255) - 64, 0)));
-	holdpen = (HPEN) SelectObject(dc, hpen);
-
-	MoveToEx(dc, p1.x, p1.y, NIL);
-	LineTo(dc, p3.x, p3.y);
-
-	SelectObject(dc, holdpen);
-	::DeleteObject(hpen);
-
-	hpen = CreatePen(PS_SOLID, 1, RGB(min((Setup::BackgroundColor & 255) + 64, 255), min(((Setup::BackgroundColor >> 8) & 255) + 64, 255), min(((Setup::BackgroundColor >> 16) & 255) + 64, 255)));
-	holdpen = (HPEN) SelectObject(dc, hpen);
-
-	MoveToEx(dc, p2.x, p2.y, NIL);
-	LineTo(dc, p4.x, p4.y);
-
-	SelectObject(dc, holdpen);
-	::DeleteObject(hpen);
-
-	hpen = CreatePen(PS_SOLID, 1, RGB(min((Setup::BackgroundColor & 255) + 64, 255), min(((Setup::BackgroundColor >> 8) & 255) + 64, 255), min(((Setup::BackgroundColor >> 16) & 255) + 64, 255)));
-	holdpen = (HPEN) SelectObject(dc, hpen);
-
-	p4.x++;
-
-	MoveToEx(dc, p3.x, p3.y, NIL);
-	LineTo(dc, p4.x, p4.y);
-
-	SelectObject(dc, holdpen);
-	::DeleteObject(hpen);
+	surface->Frame(frame, FRAME_DOWN);
 
 	frame.left++;
 	frame.top++;
 
-	RECT	 fRect = frame;
-
-	FillRect(dc, &fRect, brush);
-
-	::DeleteObject(brush);
+	surface->Box(frame, areaColor, FILLED);
 
 	return Success;
 }
@@ -138,44 +79,19 @@ Int ActiveAreaPlugin::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
-	Rect	 frame;
-
-	frame.left	= realPos.x + 1;
-	frame.top	= realPos.y + 1;
-	frame.right	= realPos.x + objectProperties->size.cx - 2;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 2;
 
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			Point	 mousePos;
-			Rect	 winRect;
-
+			if ((wnd->MouseX() > realPos.x) && (wnd->MouseX() < (realPos.x + objectProperties->size.cx - 1)) && (wnd->MouseY() > realPos.y) && (wnd->MouseY() < (realPos.y + objectProperties->size.cy - 1)))
 			{
-				RECT	 wRect = winRect;
-				POINT	 mPos = mousePos;
-
-				GetWindowRect(wnd->hwnd, &wRect);
-				GetCursorPos(&mPos);
-
-				winRect = wRect;
-				mousePos = mPos;
-			}
-
-			mousePos.x = mousePos.x - winRect.left;
-			mousePos.y = mousePos.y - winRect.top;
-
-			if ((mousePos.x >= frame.left) && (mousePos.x <= frame.right) && (mousePos.y >= frame.top) && (mousePos.y <= frame.bottom))
-			{
-				onClick.Emit();
+				onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 				retVal = Break;
 			}

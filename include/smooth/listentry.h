@@ -22,15 +22,17 @@ namespace smooth
 			Int		 id;
 			String		 name;
 
-			Bool		 chk;
-			Bool		 clk;
+			Bool		 checked;
+			Bool		 clicked;
+			Bool		 selected;
 			Int		 size;
-			Bool		 sizeset;
 			Rect		 rect;
 
 					 ListEntry(Int);
 					~ListEntry();
 		signals:
+			Signal0<Void>	 onMouseOver;
+			Signal0<Void>	 onMouseOut;
 			Signal0<Void>	 onClick;
 	};
 };

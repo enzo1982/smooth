@@ -64,13 +64,15 @@ S::GUI::ComboBox::~ComboBox()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::ListEntry *S::GUI::ComboBox::AddEntry(String name)
+S::ListEntry *S::GUI::ComboBox::AddEntry(String name, Int id)
 {
-	entryCount++;
+	if (id >= 0 && GetEntry(id) != NIL) return NIL;
 
-	ListEntry *newEntry = List::AddEntry(entryCount, name);
+	if (id == -1) id = ++entryCount;
 
-	if (entryCount == 0) GetFirstEntry()->clk = True;
+	ListEntry *newEntry = List::AddEntry(name, id);
+
+	if (entryCount == 0 && newEntry != NIL && !(flags & CB_HOTSPOTONLY)) GetFirstEntry()->clicked = True;
 
 	Paint(SP_PAINT);
 
@@ -93,18 +95,20 @@ S::Int S::GUI::ComboBox::ModifyEntry(Int code, String name)
 
 S::Int S::GUI::ComboBox::RemoveEntry(Int number)
 {
-	List::RemoveEntry(number);
+	if (List::RemoveEntry(number) == Error) return Error;
 
 	Paint(SP_PAINT);
 
 	return Success;
 }
 
-S::Void S::GUI::ComboBox::Cleanup()
+S::Int S::GUI::ComboBox::RemoveAll()
 {
-	List::Cleanup();
+	if (List::RemoveAll() == Error) return Error;
 
 	Paint(SP_PAINT);
+
+	return Success;
 }
 
 S::Int S::GUI::ComboBox::SelectEntry(Int id)
@@ -133,10 +137,13 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
-	else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+	if (!(flags & CB_HOTSPOTONLY))
+	{
+		if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+		else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-	surface->Frame(frame, FRAME_DOWN);
+		surface->Frame(frame, FRAME_DOWN);
+	}
 
 	frame.top++;
 	frame.bottom--;
@@ -167,21 +174,26 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 		lineEnd.y++;
 	}
 
-	for (Int j = 0; j < GetNOfEntries(); j++)
+	if (!(flags & CB_HOTSPOTONLY))
 	{
-		operat = GetNthEntry(j);
+		if (!IsListSane()) SynchronizeList();
 
-		if (operat->clk)
+		for (Int j = 0; j < GetNOfEntries(); j++)
 		{
-			frame.left	+= METRIC_COMBOBOXTEXTOFFSETXY;
-			frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
-			frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
+			operat = GetNthEntry(j);
 
-			surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+			if (operat->clicked)
+			{
+				frame.left	+= METRIC_COMBOBOXTEXTOFFSETXY;
+				frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
+				frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-			frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
-			frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
-			frame.top	-= METRIC_COMBOBOXTEXTOFFSETXY;
+				surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+
+				frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
+				frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
+				frame.top	-= METRIC_COMBOBOXTEXTOFFSETXY;
+			}
 		}
 	}
 
@@ -214,14 +226,21 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
+	if (flags & CB_HOTSPOTONLY)
+	{
+		frame.top	+= 3;
+		frame.bottom	-= 3;
+		frame.right	-= 3;
+		frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+	}
+
 	switch (message)
 	{
-#ifdef __WIN32__
 		case WM_ACTIVATE:
-			if (message == WM_ACTIVATE) if (toolWindow != NIL) if (((HWND) lParam) == toolWindow->hwnd) break;
 		case WM_ACTIVATEAPP:
 		case WM_KILLFOCUS:
-			if (message == WM_KILLFOCUS) if (toolWindow != NIL) if (((HWND) wParam) == toolWindow->hwnd) break;
+			if (message == WM_ACTIVATE && toolWindow != NIL) if (((HWND) lParam) == toolWindow->hwnd) break;
+			if (message == WM_KILLFOCUS && toolWindow != NIL) if (((HWND) wParam) == toolWindow->hwnd) break;
 
 			if (listBoxOpen)
 			{
@@ -240,15 +259,16 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				listBox		= NIL;
 				layer		= NIL;
 				toolWindow	= NIL;
+
+				if (!wnd->IsMouseOn(frame)) wnd->Process(SM_LBUTTONDOWN, 0, 0);
 			}
 
 			break;
-#endif
 		case SM_LOOSEFOCUS:
-			lbframe.top	= frame.bottom + 1;
+			lbframe.top	= realPos.y + objectProperties->size.cy;
 			lbframe.bottom	= lbframe.top + min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
-			lbframe.right	= frame.right;
-			lbframe.left	= frame.left;
+			lbframe.right	= realPos.x + objectProperties->size.cx - 1;
+			lbframe.left	= realPos.x;
 
 			if (wParam != handle)
 			{
@@ -276,10 +296,11 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONDOWN:
-			lbframe.top	= frame.bottom + 1;
+		case SM_LBUTTONDBLCLK:
+			lbframe.top	= realPos.y + objectProperties->size.cy;
 			lbframe.bottom	= lbframe.top + min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
-			lbframe.right	= frame.right;
-			lbframe.left	= frame.left;
+			lbframe.right	= realPos.x + objectProperties->size.cx - 1;
+			lbframe.left	= realPos.x;
 
 			if (wnd->IsMouseOn(frame) && !listBoxOpen)
 			{
@@ -287,8 +308,8 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				listBoxOpen = True;
 
-				lbp.x = frame.left - lay->GetObjectProperties()->pos.x;
-				lbp.y = frame.bottom + 1 - lay->GetObjectProperties()->pos.y;
+				lbp.x = lbframe.left - lay->GetObjectProperties()->pos.x;
+				lbp.y = realPos.y + objectProperties->size.cy - lay->GetObjectProperties()->pos.y;
 				lbs.cx = objectProperties->size.cx;
 				lbs.cy = min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
 
@@ -302,17 +323,20 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				listBox->onClick.Connect(&ComboBox::ListBoxProc, this);
 
-				lbp.x = frame.left + wnd->GetObjectProperties()->pos.x;
-				lbp.y = frame.bottom + 1 + wnd->GetObjectProperties()->pos.y;
+				lbp.x = lbframe.left + wnd->GetObjectProperties()->pos.x;
+				lbp.y = realPos.y + objectProperties->size.cy + wnd->GetObjectProperties()->pos.y;
 
 				if (objectProperties->checked)
 				{
 					objectProperties->clicked = True;
 
-					frame.top	+= 3;
-					frame.bottom	-= 3;
-					frame.right	-= 3;
-					frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+					if (!(flags & CB_HOTSPOTONLY))
+					{
+						frame.top	+= 3;
+						frame.bottom	-= 3;
+						frame.right	-= 3;
+						frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+					}
 
 					surface->Frame(frame, FRAME_DOWN);
 				}
@@ -321,16 +345,12 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				Setup::FontSize = oldMeasurement;
 
+				if (!IsListSane()) SynchronizeList();
+
 				listBox->SetFlags(LF_ALLOWRESELECT);
+				listBox->SetReferenceList(this);
 
-				for (Int i = 0; i < GetNOfEntries(); i++)
-				{
-					operat = GetNthEntry(i);
-
-					listBox->AddEntry(operat->name);
-				}
-
-				listBox->SelectEntry(GetSelectedEntry()->id);
+				if (GetSelectedEntry() != NIL) listBox->SelectEntry(GetSelectedEntry()->id);
 
 				wnd->RegisterObject(toolWindow);
 				toolWindow->RegisterObject(layer);
@@ -352,17 +372,23 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				{
 					objectProperties->clicked = True;
 
-					frame.top	+= 3;
-					frame.bottom	-= 3;
-					frame.right	-= 3;
-					frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+					if (!(flags & CB_HOTSPOTONLY))
+					{
+						frame.top	+= 3;
+						frame.bottom	-= 3;
+						frame.right	-= 3;
+						frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+					}
 
 					surface->Frame(frame, FRAME_DOWN);
 
-					frame.top	-= 3;
-					frame.bottom	+= 3;
-					frame.right	+= 3;
-					frame.left	= realPos.x;
+					if (!(flags & CB_HOTSPOTONLY))
+					{
+						frame.top	-= 3;
+						frame.bottom	+= 3;
+						frame.right	+= 3;
+						frame.left	= realPos.x;
+					}
 				}
 
 				frame.top	= frame.bottom + 1;
@@ -397,43 +423,49 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONUP:
 			if (closeListBox)
 			{
-				for (Int i = 0; i < GetNOfEntries(); i++)
+				if (!(flags & CB_HOTSPOTONLY))
 				{
-					operat = GetNthEntry(i);
-
-					if (operat->clk)
+					for (Int i = 0; i < GetNOfEntries(); i++)
 					{
-						frame.left	+= METRIC_COMBOBOXTEXTOFFSETXY;
-						frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
-						frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
+						operat = GetNthEntry(i);
 
-						surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, Setup::ClientColor, objectProperties->fontWeight);
+						if (operat->clicked)
+						{
+							frame.left	+= METRIC_COMBOBOXTEXTOFFSETXY;
+							frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
+							frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-						frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
-						frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
-						frame.top	-= METRIC_COMBOBOXTEXTOFFSETXY;
+							surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, Setup::ClientColor, objectProperties->fontWeight);
+
+							frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
+							frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
+							frame.top	-= METRIC_COMBOBOXTEXTOFFSETXY;
+						}
 					}
 				}
 
 				if (GetSelectedEntry() != listBox->GetSelectedEntry()) executeProcs = True;
 
-				SelectEntry(listBox->GetSelectedEntry()->id);
+				if (listBox->GetSelectedEntry() != NIL) SelectEntry(listBox->GetSelectedEntry()->id);
 
-				for (Int j = 0; j < GetNOfEntries(); j++)
+				if (!(flags & CB_HOTSPOTONLY))
 				{
-					operat = GetNthEntry(j);
-
-					if (operat->clk)
+					for (Int j = 0; j < GetNOfEntries(); j++)
 					{
-						frame.left	+= METRIC_COMBOBOXTEXTOFFSETXY;
-						frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
-						frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
+						operat = GetNthEntry(j);
 
-						surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						if (operat->clicked)
+						{
+							frame.left	+= METRIC_COMBOBOXTEXTOFFSETXY;
+							frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
+							frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-						frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
-						frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
-						frame.top	-= METRIC_COMBOBOXTEXTOFFSETXY;
+							surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+
+							frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
+							frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
+							frame.top	-= METRIC_COMBOBOXTEXTOFFSETXY;
+						}
 					}
 				}
 
@@ -467,9 +499,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				{
 					operat = GetNthEntry(i);
 
-					if (operat->clk)
+					if (operat->clicked)
 					{
-						onClick.Emit();
+						onClick.Emit(wnd->MouseX(), wnd->MouseY());
 						operat->onClick.Emit();
 
 						break;
@@ -483,50 +515,42 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				if (objectProperties->checked)
 				{
-					frame.top	+= 3;
-					frame.bottom	-= 3;
-					frame.right	-= 3;
-					frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+					if (!(flags & CB_HOTSPOTONLY))
+					{
+						frame.top	+= 3;
+						frame.bottom	-= 3;
+						frame.right	-= 3;
+						frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+					}
 
 					surface->Frame(frame, FRAME_UP);
 				}
 				else
 				{
-					frame.top	+= 3;
-					frame.bottom	-= 2;
-					frame.right	-= 2;
-					frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 3;
+					if (!(flags & CB_HOTSPOTONLY))
+					{
+						frame.top	+= 3;
+						frame.bottom	-= 2;
+						frame.right	-= 2;
+						frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 3;
+					}
 
 					surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 				}
 			}
 
 			break;
+		case SM_MOUSEMOVE:
 		case SM_MOUSELEAVE:
-			frame.top	+= 3;
-			frame.bottom	-= 3;
-			frame.right	-= 3;
-			frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
-
-			if (!wnd->IsMouseOn(frame) && objectProperties->checked)
+			if (!(flags & CB_HOTSPOTONLY))
 			{
-				frame.right++;
-				frame.bottom++;
-
-				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
-
-				objectProperties->checked = False;
-				objectProperties->clicked = False;
+				frame.top	+= 3;
+				frame.bottom	-= 3;
+				frame.right	-= 3;
+				frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
 			}
 
-			break;
-		case SM_MOUSEMOVE:
-			frame.top	+= 3;
-			frame.bottom	-= 3;
-			frame.right	-= 3;
-			frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
-
-			if (wnd->IsMouseOn(frame) && !objectProperties->checked)
+			if (message == SM_MOUSEMOVE && wnd->IsMouseOn(frame) && !objectProperties->checked)
 			{
 				surface->Frame(frame, FRAME_UP);
 

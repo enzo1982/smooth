@@ -38,7 +38,18 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 
 	status = POPUP_NORMAL;
 
-	realMenu = menu;
+	realMenu = new Menu();
+
+	for (Int i = 0; i < menu->GetNOfEntries(); i++)
+	{
+		Menu::Entry	*entry = menu->entries.GetNthEntry(i);
+		Menu::Entry	*nEntry = realMenu->AddEntry(entry->text, entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->orientation);
+
+		nEntry->SetTooltip(entry->tooltip);
+		nEntry->SetStatusText(entry->description);
+
+		nEntry->onClick.Connect(&entry->onClick);
+ 	}
 }
 
 S::GUI::PopupMenu::~PopupMenu()
@@ -49,6 +60,8 @@ S::GUI::PopupMenu::~PopupMenu()
 
 	if (prevPopup != NIL) prevPopup->nextPopup = NIL;
 
+	delete realMenu;
+
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
@@ -57,7 +70,7 @@ S::Int S::GUI::PopupMenu::Show()
 	if (!registered)	return Error;
 	if (visible)		return Success;
 
-	Window		*wnd = (Window *) myContainer->GetContainerObject();
+	Window		*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Error;
 	if (wnd->hwnd == NIL) return Error;
@@ -98,7 +111,7 @@ S::Int S::GUI::PopupMenu::Hide()
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Error;
 
@@ -109,6 +122,7 @@ S::Int S::GUI::PopupMenu::Hide()
 	if (toolwnd != NIL)
 	{
 		toolwnd->FreeOwner();
+		toolwnd->Close();
 
 		wnd->UnregisterObject(toolwnd);
 
@@ -133,7 +147,7 @@ S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;

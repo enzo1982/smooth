@@ -12,10 +12,14 @@
 
 S::ListEntry::ListEntry(Int entryID)
 {
-	id	= entryID;
+	id		= entryID;
 
-	chk	= False;
-	clk	= False;
+	checked		= False;
+	clicked		= False;
+
+	selected	= False;
+
+	size		= -1;
 }
 
 S::ListEntry::~ListEntry()

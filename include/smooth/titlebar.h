@@ -28,11 +28,17 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Int	 TB_NONE	= 0;
+		const Int	 TB_MINBUTTON	= 1;
+		const Int	 TB_MAXBUTTON	= 2;
+		const Int	 TB_CLOSEBUTTON	= 4;
+
 		class SMOOTHAPI Titlebar : public Widget
 		{
 			friend class Menubar;
 			friend class Window;
 			private:
+				Bool		 paintActive;
 				Bool		 minchk;
 				Bool		 minclk;
 				Bool		 maxchk;
@@ -43,7 +49,7 @@ namespace smooth
 				Bool		 max;
 				Bool		 close;
 			public:
-						 Titlebar(Bool, Bool, Bool);
+						 Titlebar(Int = TB_MINBUTTON | TB_MAXBUTTON | TB_CLOSEBUTTON);
 			 			~Titlebar();
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);

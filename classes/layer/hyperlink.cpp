@@ -180,26 +180,13 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 				retVal = Break;
 			}
 			break;
-		case SM_MOUSELEAVE:
-			if (!wnd->IsMouseOn(textRect) && objectProperties->checked)
-			{
-				objectProperties->checked = False;
-
-				wnd->cursorset = False;
-
-				LiSASetMouseCursor(LiSA_MOUSE_ARROW);
-
-				Paint(SP_MOUSEOUT);
-			}
-			break;
 		case SM_MOUSEMOVE:
-			if (wnd->IsMouseOn(textRect) && !objectProperties->checked)
+		case SM_MOUSELEAVE:
+			if (message == SM_MOUSEMOVE && wnd->IsMouseOn(textRect) && !objectProperties->checked)
 			{
 				objectProperties->checked = True;
 
-				wnd->cursorset = True;
-
-				LiSASetMouseCursor(LiSA_MOUSE_HAND);
+				LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_HAND);
 
 				Paint(SP_MOUSEIN);
 			}
@@ -207,9 +194,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 			{
 				objectProperties->checked = False;
 
-				wnd->cursorset = False;
-
-				LiSASetMouseCursor(LiSA_MOUSE_ARROW);
+				LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_ARROW);
 
 				Paint(SP_MOUSEOUT);
 			}

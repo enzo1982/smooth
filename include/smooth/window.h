@@ -31,6 +31,7 @@ namespace smooth
 #include "container.h"
 #include "rect.h"
 #include "loop.h"
+#include "menu.h"
 
 namespace smooth
 {
@@ -90,6 +91,7 @@ namespace smooth
 				HDC				 windowDC;
 
 				Layer				*mainLayer;
+				Window				*parentWindow;
 
 				HWND				 Create();
 				Void				 CalculateOffsets();
@@ -101,13 +103,13 @@ namespace smooth
 
 				HWND				 hwnd;
 
-				Bool				 cursorset;
 				Bool				 initshow;
 
 								 Window(String title = NIL);
 								~Window();
 
-				Void				 SetPositionFlag(HWND);
+				Int				 SetParentWindow(Window *);
+
 				Int				 SetIcon(HBITMAP);
 				Int				 SetApplicationIcon(HICON);
 				Int				 SetApplicationIcon(Int);
@@ -157,6 +159,7 @@ namespace smooth
 				Signal0<Void>			 onPeek;
 				Signal3<Void, Int, Int, Int>	 onEvent;
 			callbacks:
+				Callback2<Menu *, Int, Int>	 getTrackMenu;
 				Callback0<Bool>			 doQuit;
 		};
 	};

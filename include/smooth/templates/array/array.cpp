@@ -588,24 +588,32 @@ template <class t> t S::Array<t>::GetNthEntry(Int n)
 
 	t	 ret;
 
-	if (n == lastN + 1 && lastNthEntry == prevEntry)
+	if (lastNthEntry == prevEntry)
 	{
-		ret = GetNextEntry();
+		if (n == lastN)
+		{
+			return prevEntry->GetValue();
+		}
 
-		lastN++;
-		lastNthEntry = prevEntry;
+		if (n == lastN + 1)
+		{
+			ret = GetNextEntry();
 
-		return ret;
-	}
+			lastN++;
+			lastNthEntry = prevEntry;
 
-	if (n == lastN - 1 && lastNthEntry == prevEntry)
-	{
-		ret = GetPrevEntry();
+			return ret;
+		}
 
-		lastN--;
-		lastNthEntry = prevEntry;
+		if (n == lastN - 1)
+		{
+			ret = GetPrevEntry();
 
-		return ret;
+			lastN--;
+			lastNthEntry = prevEntry;
+
+			return ret;
+		}
 	}
 
 	ret = GetFirstEntry();

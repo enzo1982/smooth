@@ -38,7 +38,7 @@ Designer::Designer()
 	size.cy = 169;
 
 	wnd		= new Window(String("smooth Designer v").Append(SMOOTH_VERSION));
-	title		= new Titlebar(true, false, true);
+	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	iconbar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
@@ -154,7 +154,7 @@ void Designer::ReportStatus(Designer_Status stat)
 			statusbar->SetText(String("Size: ").Append(String::FromInt(stat.wndsizex)).Append(", ").Append(String::FromInt(stat.wndsizey)));
 			break;
 		case STATUS_EVENT_REPORT_QUIT:
-			wnd->SetText(String("SMOOTH Designer v").Append(SMOOTH_VERSION));
+			wnd->SetText(String("smooth Designer v").Append(SMOOTH_VERSION));
 			break;
 	}
 

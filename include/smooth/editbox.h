@@ -22,6 +22,8 @@ namespace smooth
 };
 
 #include "widget.h"
+#include "list.h"
+#include "combobox.h"
 
 namespace smooth
 {
@@ -29,7 +31,7 @@ namespace smooth
 	{
 		const Int EDB_ALPHANUMERIC	= 0;
 		const Int EDB_NUMERIC		= 1;
-		const Int EDB_ASTERISK		= 16;
+		const Int EDB_ASTERISK		= 2;
 
 		class SMOOTHAPI EditBox : public Widget
 		{
@@ -48,10 +50,15 @@ namespace smooth
 				Int		 maxSize;
 				Int		 invisibleChars;
 
+				List		*dropDownList;
+				ComboBox	*comboBox;
+
 				Void		 SetCursor(Int);
 				Void		 MarkText(Int, Int);
 				Void		 DeleteSelectedText();
 				Void		 InsertText(String);
+
+				Void		 DropDownListProc();
 			public:
 						 EditBox(String, Point, Size, Int, Int);
 						~EditBox();
@@ -59,9 +66,15 @@ namespace smooth
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);
 
+				Int		 Show();
+				Int		 Hide();
+
+				Int		 Activate();
 				Int		 Deactivate();
 
 				Int		 SetText(String);
+
+				Int		 SetDropDownList(List *);
 		};
 	};
 

@@ -232,7 +232,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				if (*variable < startValue)	*variable = startValue;
 				else if (*variable > endValue)	*variable = endValue;
 
-				if (*variable != prevValue) onClick.Emit();
+				if (*variable != prevValue) onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 				retVal = Break;
 			}
@@ -251,7 +251,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				if (*variable < startValue)	*variable = startValue;
 				else if (*variable > endValue)	*variable = endValue;
 
-				if (*variable != prevValue) onClick.Emit();
+				if (*variable != prevValue) onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 				retVal = Break;
 			}
@@ -298,6 +298,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+		case SM_MOUSEMOVE:
 		case SM_MOUSELEAVE:
 			arrow1Frame = frame;
 			arrow2Frame = frame;
@@ -308,45 +309,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			if (subtype == OR_VERT)	arrow2Frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
 			else			arrow2Frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
 
-			if (arrow1Checked && !wnd->IsMouseOn(arrow1Frame))
-			{
-				if (timerActive) timerActive = False;
-
-				arrow1Checked = False;
-				arrow1Clicked = False;
-
-				arrow1Frame.right++;
-				arrow1Frame.bottom++;
-				surface->Box(arrow1Frame, Setup::BackgroundColor, OUTLINED);
-				arrow1Frame.right--;
-				arrow1Frame.bottom--;
-			}
-			else if (arrow2Checked && !wnd->IsMouseOn(arrow2Frame))
-			{
-				if (timerActive) timerActive = False;
-
-				arrow2Checked = False;
-				arrow2Clicked = False;
-
-				arrow2Frame.right++;
-				arrow2Frame.bottom++;
-				surface->Box(arrow2Frame, Setup::BackgroundColor, OUTLINED);
-				arrow2Frame.right--;
-				arrow2Frame.bottom--;
-			}
-
-			break;
-		case SM_MOUSEMOVE:
-			arrow1Frame = frame;
-			arrow2Frame = frame;
-
-			if (subtype == OR_VERT)	arrow1Frame.bottom = realPos.y + objectProperties->size.cy / 2 - 3;
-			else			arrow1Frame.right = realPos.x + objectProperties->size.cx / 2 - 3;
-
-			if (subtype == OR_VERT)	arrow2Frame.top = realPos.y + objectProperties->size.cy / 2 + 2;
-			else			arrow2Frame.left = realPos.x + objectProperties->size.cx / 2 + 2;
-
-			if (!arrow1Checked && wnd->IsMouseOn(arrow1Frame))
+			if (message == SM_MOUSEMOVE && !arrow1Checked && wnd->IsMouseOn(arrow1Frame))
 			{
 				arrow1Checked = True;
 
@@ -365,7 +328,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				arrow1Frame.right--;
 				arrow1Frame.bottom--;
 			}
-			else if (!arrow2Checked && wnd->IsMouseOn(arrow2Frame))
+			else if (message == SM_MOUSEMOVE && !arrow2Checked && wnd->IsMouseOn(arrow2Frame))
 			{
 				arrow2Checked = True;
 
@@ -386,11 +349,9 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
-#ifdef __WIN32__
 		case WM_KILLFOCUS:
 		case WM_ACTIVATEAPP:
 			return Process(SM_LBUTTONUP, 0, 0);
-#endif
 	}
 
 	return retVal;
@@ -444,7 +405,7 @@ S::Void S::GUI::Arrows::TimerProc()
 	if (*variable < startValue)	*variable = startValue;
 	else if (*variable > endValue)	*variable = endValue;
 
-	if (*variable != prevValue) onClick.Emit();
+	if (*variable != prevValue) onClick.Emit(0, 0);
 
 	timerCount++;
 }
@@ -458,9 +419,10 @@ S::Int S::GUI::Arrows::SetRange(Int rangeStart, Int rangeEnd)
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
 
-	*variable	= ((*variable) - prevStartValue) * ((endValue - startValue) / (prevEndValue - prevStartValue)) + startValue;
+	*variable	= (Int) (((Float) (*variable) - prevStartValue) * ((Float) (endValue - startValue) / (prevEndValue - prevStartValue)) + startValue);
+	*variable	= (Int) Math::Max(rangeStart, Math::Min(rangeEnd, *variable));
 
-	if (*variable != prevValue) onClick.Emit();
+	if (*variable != prevValue) onClick.Emit(0, 0);
 
 	return Success;
 }
@@ -474,7 +436,7 @@ S::Int S::GUI::Arrows::SetValue(Int newValue)
 
 	*variable = newValue;
 
-	onClick.Emit();
+	onClick.Emit(0, 0);
 
 	return Success;
 }

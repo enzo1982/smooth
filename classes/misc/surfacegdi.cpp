@@ -36,8 +36,7 @@ S::GUI::SurfaceGDI::~SurfaceGDI()
 	HBITMAP	 bitmap = (HBITMAP) SelectObject(bmp_dc, cDc_bitmap);
 
 	DeleteDC(bmp_dc);
-
-	DestroyBitmap(bitmap);
+	::DeleteObject(bitmap);
 }
 
 S::Int S::GUI::SurfaceGDI::PaintRect(Rect pRect)
@@ -132,7 +131,7 @@ S::Int S::GUI::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
 
 	hPen = (HPEN) SelectObject(bmp_dc, hOldPen);
 
-	DeleteObject(hPen);
+	::DeleteObject(hPen);
 
 	return Success;
 }
@@ -209,7 +208,7 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 		}
 	}
 
-	DeleteObject(brush);
+	::DeleteObject(brush);
 
 	return Success;
 }
@@ -282,7 +281,7 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int si
 	SelectObject(gdi_dc, holdfont);
 	SelectObject(bmp_dc, holdfont2);
 
-	DeleteObject(hfont);
+	::DeleteObject(hfont);
 
 	return Success;
 }
@@ -306,7 +305,6 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect des
 	bitmap = (HBITMAP) SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
-	DestroyBitmap(backup);
 
 	return Success;
 }
@@ -328,7 +326,6 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destR
 	bitmap = (HBITMAP) SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
-	DestroyBitmap(backup);
 
 	return Success;
 }

@@ -296,6 +296,14 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 	popupRect.right		= realMenu->popupsize.cx;
 	popupRect.bottom	= realMenu->popupsize.cy;
 
+	Window	*rWnd = myPopup->GetContainer()->GetContainerWindow();
+
+	while (True)
+	{
+		if (rWnd->GetContainer()->GetContainerObject()->GetObjectType() != OBJ_APPLICATION)	rWnd = rWnd->GetContainer()->GetContainerWindow();
+		else											break;
+	}
+
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
@@ -347,15 +355,15 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONUP:
-			for (i = 0; i <realMenu->GetNOfEntries(); i++)
+			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
 				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
 
-				if (entry->checked && (entry->onClick.GetNOfConnectedSlots() != 0 && entry->bVar == NIL && entry->iVar == NIL))
+				if (entry->checked && (entry->popup == NIL && entry->bVar == NIL && entry->iVar == NIL))
 				{
 					entry->checked = False;
 
-					if (entry->description != NIL) wnd->SetStatusText(backupStatusText);
+					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
 					PopupMenu::status = POPUP_PENDING;
 
@@ -381,7 +389,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					entry->checked = False;
 
-					if (entry->description != NIL) wnd->SetStatusText(backupStatusText);
+					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
 					PopupMenu::status = POPUP_PENDING;
 
@@ -423,7 +431,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					entry->checked = False;
 
-					if (entry->description != NIL) wnd->SetStatusText(backupStatusText);
+					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
 					PopupMenu::status = POPUP_PENDING;
 
@@ -460,6 +468,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+		case SM_MOUSEMOVE:
 		case SM_MOUSELEAVE:
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
@@ -474,203 +483,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					currentY = currentY + METRIC_POPUPENTRYSIZE;
 
-					if (!wnd->IsMouseOn(entryRect[i]) && entry->checked)
-					{
-						entry->checked = False;
-
-						if (entry->description != NIL) setOldStatus = True;
-
-						entryRect[i].right++;
-						entryRect[i].bottom++;
-
-						surface->Box(entryRect[i], Setup::BackgroundColor, FILLED);
-
-						entryRect[i].left = entryRect[i].left + 17;
-
-						surface->SetText(entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-
-						if (entry->popup != NIL)
-						{
-							p1.x = entryRect[i].right - 9;
-							p2.x = p1.x;
-							p1.y = entryRect[i].top + METRIC_POPUPARROWOFFSETY;
-							p2.y = p1.y + 9;
-
-							for (Int x = 0; x < 4; x++)
-							{
-								p1.x++;
-								p2.x++;
-								p1.y++;
-								p2.y--;
-
-								surface->Line(p1, p2, Setup::TextColor);
-							}
-						}
-
-						if (entry->bVar != NIL)
-						{
-							if (*(entry->bVar) == True)
-							{
-								frame.left = entryRect[i].left - 15;
-								frame.top = entryRect[i].top + 2;
-								frame.right = frame.left + 10;
-								frame.bottom = frame.top + 10;
-
-								p1.x = frame.left + 3;
-								p1.y = frame.top + 3;
-								p2.x = frame.right;
-								p2.y = frame.bottom;
-
-								surface->Line(p1, p2, Setup::DividerDarkColor);
-
-								p1.x = frame.left + 4;
-								p1.y = frame.top + 3;
-								p2.x = frame.right;
-								p2.y = frame.bottom - 1;
-
-								surface->Line(p1, p2, Setup::DividerDarkColor);
-
-								p1.x = frame.left + 3;
-								p1.y = frame.top + 4;
-								p2.x = frame.right - 1;
-								p2.y = frame.bottom;
-
-								surface->Line(p1, p2, Setup::DividerDarkColor);
-
-								p1.x = frame.right - 1;
-								p1.y = frame.top + 3;
-								p2.x = frame.left + 2;
-								p2.y = frame.bottom;
-
-								surface->Line(p1, p2, Setup::DividerDarkColor);
-
-								p1.x = frame.right - 1;
-								p1.y = frame.top + 4;
-								p2.x = frame.left + 3;
-								p2.y = frame.bottom;
-
-								surface->Line(p1, p2, Setup::DividerDarkColor);
-
-								p1.x = frame.right - 2;
-								p1.y = frame.top + 3;
-								p2.x = frame.left + 2;
-								p2.y = frame.bottom - 1;
-
-								surface->Line(p1, p2, Setup::DividerDarkColor);
-
-								p1.x = frame.left + 2;
-								p1.y = frame.top + 2;
-								p2.x = frame.right - 1;
-								p2.y = frame.bottom - 1;
-
-								surface->Line(p1, p2, Setup::TextColor);
-
-								p1.x = frame.left + 3;
-								p1.y = frame.top + 2;
-								p2.x = frame.right - 1;
-								p2.y = frame.bottom - 2;
-
-								surface->Line(p1, p2, Setup::TextColor);
-
-								p1.x = frame.left + 2;
-								p1.y = frame.top + 3;
-								p2.x = frame.right - 2;
-								p2.y = frame.bottom - 1;
-
-								surface->Line(p1, p2, Setup::TextColor);
-
-								p1.x = frame.right - 2;
-								p1.y = frame.top + 2;
-								p2.x = frame.left + 1;
-								p2.y = frame.bottom - 1;
-
-								surface->Line(p1, p2, Setup::TextColor);
-
-								p1.x = frame.right - 2;
-								p1.y = frame.top + 3;
-								p2.x = frame.left + 2;
-								p2.y = frame.bottom - 1;
-
-								surface->Line(p1, p2, Setup::TextColor);
-
-								p1.x = frame.right - 3;
-								p1.y = frame.top + 2;
-								p2.x = frame.left + 1;
-								p2.y = frame.bottom - 2;
-
-								surface->Line(p1, p2, Setup::TextColor);
-							}
-						}
-
-						if (entry->iVar != NIL)
-						{
-							p1.x = entryRect[i].left - 12;
-							p1.y = entryRect[i].top + 12;
-							p2.x = p1.x + 5;
-							p2.y = p1.y;
-
-							if (*(entry->iVar) == entry->iCode)
-							{
-								p1.x++;
-								p1.y -= 7;
-								p2.x--;
-								p2.y -= 7;
-
-								surface->Line(p1, p2, Setup::TextColor);
-
-								p1.x--;
-								p2.x++;
-
-								for (Int j = 0; j < 3; j++)
-								{
-									p1.y++;
-									p2.y++;
-
-									surface->Line(p1, p2, Setup::TextColor);
-								}
-
-								surface->SetPixel(p2.x, p2.y - 1, Setup::DividerDarkColor);
-								surface->SetPixel(p2.x, p2.y, Setup::DividerDarkColor);
-
-								p1.x++;
-								p1.y++;
-								p2.y++;
-
-								surface->Line(p1, p2, Setup::TextColor);
-								surface->SetPixel(p2.x - 1, p2.y, Setup::DividerDarkColor);
-								surface->SetPixel(p2.x, p2.y, Setup::DividerDarkColor);
-
-								p1.x++;
-								p1.y++;
-								p2.y++;
-
-								surface->Line(p1, p2, Setup::DividerDarkColor);
-							}
-						}
-					}
-				}
-				else
-				{
-					currentY = currentY + 5;
-				}
-			}
-
-			break;
-		case SM_MOUSEMOVE:
-			for (i = 0; i < realMenu->GetNOfEntries(); i++)
-			{
-				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
-
-				if (entry->type != SM_SEPARATOR)
-				{
-					entryRect[i].left	= currentX;
-					entryRect[i].right	= maxX;
-					entryRect[i].top	= currentY;
-					entryRect[i].bottom	= currentY + METRIC_POPUPENTRYSIZE - 2;
-
-					currentY = currentY + METRIC_POPUPENTRYSIZE;
-
-					if (wnd->IsMouseOn(entryRect[i]) && !entry->checked)
+					if (message == SM_MOUSEMOVE && wnd->IsMouseOn(entryRect[i]) && !entry->checked)
 					{
 						entry->checked = True;
 
@@ -1037,14 +850,6 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 	if (updateStatus || setOldStatus)
 	{
-		Window	*rWnd = (Window *) myPopup->GetContainer()->GetContainerObject();
-
-		for (;;)
-		{
-			if (rWnd->GetContainer()->GetContainerObject()->GetObjectType() != OBJ_APPLICATION)	rWnd = (Window *) rWnd->GetContainer()->GetContainerObject();
-			else											break;
-		}
-
 		if (setOldStatus && !updateStatus) rWnd->SetStatusText(backupStatusText);
 
 		if (updateStatus)

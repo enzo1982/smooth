@@ -451,8 +451,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
-		case SM_LBUTTONDBLCLK:
 		case SM_LBUTTONDOWN:
+		case SM_LBUTTONDBLCLK:
 			for (i = 0; i < nOfEntries; i++)
 			{
 				operat = entries.GetNthEntry(i);
@@ -471,7 +471,9 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 					else
 					{
 						operat->clicked = False;
-						surface->Frame(operat->rect, FRAME_UP);
+
+						if (!wnd->IsMouseOn(operat->rect))	surface->Box(Rect(Point(operat->rect.left, operat->rect.top), Size(operat->rect.right - operat->rect.left + 1, operat->rect.bottom - operat->rect.top + 1)), Setup::BackgroundColor, OUTLINED);
+						else					surface->Frame(operat->rect, FRAME_UP);
 					}
 
 					if (operat->clicked && operat->popup != NIL)
@@ -519,7 +521,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 					operat->clicked = False;
 					surface->Frame(operat->rect, FRAME_UP);
 
-					if (operat->onClick.GetNOfConnectedSlots() != 0 && operat->bVar == NIL && operat->iVar == NIL)
+					if (operat->popup == NIL && operat->bVar == NIL && operat->iVar == NIL)
 					{
 						operat->checked = False;
 
@@ -547,7 +549,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 					operat->clicked = False;
 					surface->Frame(operat->rect, FRAME_UP);
 
-					if (operat->onClick.GetNOfConnectedSlots() != 0 && operat->bVar == NIL && operat->iVar == NIL)
+					if (operat->popup == NIL && operat->bVar == NIL && operat->iVar == NIL)
 					{
 						operat->checked = False;
 
@@ -595,6 +597,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+		case SM_MOUSEMOVE:
 		case SM_MOUSELEAVE:
 			for (i = 0; i < nOfEntries; i++)
 			{
@@ -604,70 +607,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 				if (operat->type == SM_TEXT)
 				{
-					if (!wnd->IsMouseOn(operat->rect) && operat->checked)
-					{
-						operat->checked = False;
-						operat->clicked = False;
-
-						if (operat->description != NIL) setOldStatus = True;
-
-						operat->rect.right++;
-						operat->rect.bottom++;
-						surface->Box(operat->rect, Setup::BackgroundColor, OUTLINED);
-						operat->rect.right--;
-						operat->rect.bottom--;
-					}
-				}
-				else if (operat->type == SM_BITMAP)
-				{
-					if (!wnd->IsMouseOn(operat->rect) && operat->checked)
-					{
-						operat->checked = False;
-						operat->clicked = False;
-
-						if (operat->description != NIL) setOldStatus = True;
-
-						operat->rect.right++;
-						operat->rect.bottom++;
-						surface->Box(operat->rect, Setup::BackgroundColor, OUTLINED);
-						operat->rect.right--;
-						operat->rect.bottom--;
-						bmprect = operat->rect;
-						bmprect.left	+= 2;
-						bmprect.top	+= 2;
-						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
-						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
-
-						if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
-						else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
-
-						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
-						{
-							Point	 p1 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.top + 1);
-							Point	 p2 = Point(operat->rect.right - METRIC_IBARROWSIZEX - 5, operat->rect.bottom);
-
-							surface->Line(p1, p2, Setup::BackgroundColor);
-
-							p1.x++;
-							p2.x++;
-
-							surface->Line(p1, p2, Setup::BackgroundColor);
-						}
-					}
-				}
-			}
-
-			break;
-		case SM_MOUSEMOVE:
-			for (i = 0; i < nOfEntries; i++)
-			{
-				operat = entries.GetNthEntry(i);
-
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL)) if (((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->IsVisible()) continue;
-
-				if (operat->type == SM_TEXT)
-				{
-					if (wnd->IsMouseOn(operat->rect) && !operat->checked)
+					if (message == SM_MOUSEMOVE && wnd->IsMouseOn(operat->rect) && !operat->checked)
 					{
 						operat->checked = True;
 
@@ -696,7 +636,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 				}
 				else if (operat->type == SM_BITMAP)
 				{
-					if (wnd->IsMouseOn(operat->rect) && !operat->checked)
+					if (message == SM_MOUSEMOVE && wnd->IsMouseOn(operat->rect) && !operat->checked)
 					{
 						operat->checked = True;
 

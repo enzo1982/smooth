@@ -142,10 +142,6 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
-		case SM_MOUSEMOVE:
-			if (!cursorset) LiSASetMouseCursor(LiSA_MOUSE_ARROW);
-
-			break;
 		case WM_CLOSE:
 			if (doQuit.Call())
 			{

@@ -38,6 +38,7 @@ namespace smooth
 #endif
 
 	extern HBITMAP		 DEFAULTICON;
+	extern HCURSOR		 DEFAULTCURSOR;
 
 	extern bool		 initializing;
 	extern bool		 loopActive;

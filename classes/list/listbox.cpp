@@ -60,24 +60,26 @@ S::GUI::ListBox::~ListBox()
 	{
 		if (myContainer != NIL) myContainer->UnregisterObject(scrollbar);
 
-		delete scrollbar;
+		DeleteObject(scrollbar);
 	}
 
 	if (header != NIL)
 	{
-		if (myContainer != NIL) myContainer->UnregisterObject(header);
+		if (myContainer != NIL && !(flags & LF_HIDEHEADER)) myContainer->UnregisterObject(header);
 
-		delete header;
+		DeleteObject(header);
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::ListEntry *S::GUI::ListBox::AddEntry(String name)
+S::ListEntry *S::GUI::ListBox::AddEntry(String name, Int id)
 {
-	entryCount++;
+	if (id >= 0 && GetEntry(id) != NIL) return NIL;
 
-	ListEntry *newEntry = List::AddEntry(entryCount, name);
+	if (id == -1) id = ++entryCount;
+
+	ListEntry *newEntry = List::AddEntry(name, id);
 
 	Paint(SP_UPDATE);
 
@@ -100,7 +102,7 @@ S::Int S::GUI::ListBox::ModifyEntry(Int code, String name)
 
 S::Int S::GUI::ListBox::RemoveEntry(Int number)
 {
-	List::RemoveEntry(number);
+	if (List::RemoveEntry(number) == Error) return Error;
 
 	if (scrollbar != NIL)
 	{
@@ -108,12 +110,16 @@ S::Int S::GUI::ListBox::RemoveEntry(Int number)
 		{
 			scrollbarPos = 0;
 			lastScrollbarPos = 0;
+
+			myContainer->UnregisterObject(scrollbar);
+
+			delete scrollbar;
+			scrollbar = NIL;
 		}
-
-		myContainer->UnregisterObject(scrollbar);
-
-		delete scrollbar;
-		scrollbar = NIL;
+		else
+		{
+			scrollbarPos++;
+		}
 	}
 
 	Paint(SP_PAINT);
@@ -121,9 +127,9 @@ S::Int S::GUI::ListBox::RemoveEntry(Int number)
 	return Success;
 }
 
-S::Void S::GUI::ListBox::Cleanup()
+S::Int S::GUI::ListBox::RemoveAll()
 {
-	List::Cleanup();
+	if (List::RemoveAll() == Error) return Error;
 
 	if (scrollbar != NIL)
 	{
@@ -137,6 +143,8 @@ S::Void S::GUI::ListBox::Cleanup()
 	}
 
 	Paint(SP_PAINT);
+
+	return Success;
 }
 
 S::Int S::GUI::ListBox::SelectEntry(Int id)
@@ -154,7 +162,7 @@ S::Int S::GUI::ListBox::AddTab(String tabName, Int iTabWidth)
 	{
 		header = new ListBoxHeader(this);
 
-		if (visible) myContainer->RegisterObject(header);
+		if (visible && !(flags & LF_HIDEHEADER)) myContainer->RegisterObject(header);
 	}
 
 	return header->AddTab(tabName, iTabWidth);
@@ -198,14 +206,14 @@ S::Int S::GUI::ListBox::Show()
 	{
 		Layer	*layer = (Layer *) myContainer->GetContainerObject();
 		Point	 realPos = GetRealPosition();
-		Point	 sbp = Point(realPos.x + objectProperties->size.cx - 2 - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET, realPos.y + 1 - layer->GetObjectProperties()->pos.y + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1));
-		Size	 sbs = Size(METRIC_LISTBOXSBSIZE, objectProperties->size.cy - 1 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1));
+		Point	 sbp = Point(realPos.x + objectProperties->size.cx - 2 - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET, realPos.y + 1 - layer->GetObjectProperties()->pos.y + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1));
+		Size	 sbs = Size(scrollbar->GetObjectProperties()->size.cx, objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1));
 		Float	 oldMeasurement = Setup::FontSize;
 
 		SetMeasurement(SMT_PIXELS);
 
 		scrollbar->SetMetrics(sbp, sbs);
-		scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+		scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 
 		Setup::FontSize = oldMeasurement;
 
@@ -216,7 +224,7 @@ S::Int S::GUI::ListBox::Show()
 	{
 		header->UpdateMetrics();
 
-		myContainer->RegisterObject(header);
+		if (!(flags & LF_HIDEHEADER)) myContainer->RegisterObject(header);
 	}
 
 	return Widget::Show();
@@ -226,7 +234,7 @@ S::Int S::GUI::ListBox::Hide()
 {
 	if (!visible)	return Success;
 
-	if (header != NIL) myContainer->UnregisterObject(header);
+	if (header != NIL && !(flags & LF_HIDEHEADER)) myContainer->UnregisterObject(header);
 
 	if (scrollbar != NIL) scrollbar->Hide();
 
@@ -237,6 +245,7 @@ S::Int S::GUI::ListBox::Activate()
 {
 	Int	 rVal = Widget::Activate();
 
+	if (rVal == Success && scrollbar != NIL) scrollbar->Activate();
 	if (rVal == Success && header != NIL) header->Activate();
 
 	return rVal;
@@ -246,6 +255,7 @@ S::Int S::GUI::ListBox::Deactivate()
 {
 	Int	 rVal = Widget::Deactivate();
 
+	if (rVal == Success && scrollbar != NIL) scrollbar->Deactivate();
 	if (rVal == Success && header != NIL) header->Deactivate();
 
 	return rVal;
@@ -268,12 +278,15 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	Size		 sbs;
 	Int		 maxFrameY;
 	Float		 oldMeasurement;
+	Int		 i;
 
 	switch (message)
 	{
 		default:
 		case SP_PAINT:
 		case SP_UPDATE:
+			if (!IsListSane()) SynchronizeList();
+
 			frame.left	= realPos.x;
 			frame.top	= realPos.y;
 			frame.right	= realPos.x + objectProperties->size.cx - 1;
@@ -281,14 +294,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			if (message != SP_UPDATE)
 			{
-				if (header != NIL)	frame.top += (METRIC_LISTBOXENTRYHEIGHT + 2);
-				if (scrollbar != NIL)	frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
+				if (header != NIL && !(flags & LF_HIDEHEADER))	frame.top += (METRIC_LISTBOXENTRYHEIGHT + 2);
+				if (scrollbar != NIL)				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
 
 				if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
 				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-				if (header != NIL)	frame.top -= (METRIC_LISTBOXENTRYHEIGHT + 2);
-				if (scrollbar != NIL)	frame.right += (METRIC_LISTBOXSBOFFSET + 1);
+				if (header != NIL && !(flags & LF_HIDEHEADER))	frame.top -= (METRIC_LISTBOXENTRYHEIGHT + 2);
+				if (scrollbar != NIL)				frame.right += (METRIC_LISTBOXSBOFFSET + 1);
 
 				surface->Frame(frame, FRAME_DOWN);
 			}
@@ -296,26 +309,26 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			maxFrameY = frame.bottom - 1;
 
 			frame.left++;
-			frame.top = frame.top + 1 + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
+			frame.top = frame.top + 1 + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
 			frame.right--;
 			frame.bottom = frame.top + METRIC_LISTBOXENTRYHEIGHT;
 
 			frame.bottom = min(frame.bottom, maxFrameY);
 
-			if (METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1) + 4 > objectProperties->size.cy && !(flags & LF_HIDESCROLLBAR))
+			if (METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1) + 4 > objectProperties->size.cy && !(flags & LF_HIDESCROLLBAR))
 			{
 				if (scrollbar == NIL)
 				{
 					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET;
 					sbp.y = frame.top - layer->GetObjectProperties()->pos.y;
-					sbs.cx = METRIC_LISTBOXSBSIZE;
-					sbs.cy = objectProperties->size.cy - 1 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
+					sbs.cx = 0;
+					sbs.cy = objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
 
 					oldMeasurement = Setup::FontSize;
 
 					SetMeasurement(SMT_PIXELS);
 
-					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 
 					scrollbar->onClick.Connect(&ListBox::ScrollbarProc, this);
 
@@ -327,7 +340,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 				else
 				{
-					scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 				}
 
 				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
@@ -348,7 +361,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			lastScrollbarPos = scrollbarPos;
 
-			for (int i = 0; i < GetNOfEntries(); i++)
+			for (i = 0; i < GetNOfEntries(); i++)
 			{
 				operat = GetNthEntry(i);
 
@@ -364,14 +377,59 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					if (i == (GetNOfEntries() - 1) || message != SP_UPDATE)
 					{
-						frame.left += METRIC_LISTBOXTEXTOFFSETXY;
+						if (flags & LF_MULTICHECKBOX)
+						{
+							Rect	 cbRect = operat->rect;
+
+							cbRect.left += 2;
+							cbRect.top += 3;
+							cbRect.right = cbRect.left + 9;
+							cbRect.bottom = (Int) Math::Min(cbRect.top + 9, operat->rect.bottom);
+
+							surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
+
+							if (operat->selected)
+							{
+								Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
+								Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
+
+								surface->Line(p1, p2, Setup::ClientTextColor);
+
+								p1 = Point(cbRect.left + 3, cbRect.top + 2);
+								p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
+
+								surface->Line(p1, p2, Setup::GrayTextColor);
+
+								p1 = Point(cbRect.left + 2, cbRect.top + 3);
+								p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
+
+								surface->Line(p1, p2, Setup::GrayTextColor);
+
+								p1 = Point(cbRect.right - 3, cbRect.top + 2);
+								p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
+
+								surface->Line(p1, p2, Setup::ClientTextColor);
+
+								p1 = Point(cbRect.right - 3, cbRect.top + 3);
+								p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
+
+								surface->Line(p1, p2, Setup::GrayTextColor);
+
+								p1 = Point(cbRect.right - 4, cbRect.top + 2);
+								p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+
+								surface->Line(p1, p2, Setup::GrayTextColor);
+							}
+						}
+
+						frame.left += (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
 						DrawEntryText(operat->name, frame, objectProperties->fontColor);
-						frame.left -= METRIC_LISTBOXTEXTOFFSETXY;
+						frame.left -= (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
 					}
 
-					if (operat->clk && frame.top < frame.bottom)
+					if (operat->clicked && frame.top < frame.bottom)
 					{
 						operat->rect.right++;
 						operat->rect.bottom++;
@@ -383,8 +441,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					frame.top += METRIC_LISTBOXENTRYHEIGHT;
 					frame.bottom += METRIC_LISTBOXENTRYHEIGHT;
 
-					frame.top = min(frame.top, maxFrameY);
-					frame.bottom = min(frame.bottom, maxFrameY);
+					frame.top = (Int) Math::Min(frame.top, maxFrameY);
+					frame.bottom = (Int) Math::Min(frame.bottom, maxFrameY);
 				}
 				else
 				{
@@ -392,13 +450,266 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 			}
 
+			if (header != NIL && !(flags & LF_HIDEHEADER)) header->Paint(SP_PAINT);
+
+			break;
+		case SP_MOUSEIN:
+			for (i = scrollbarPos; i < GetNOfEntries(); i++)
+			{
+				operat = GetNthEntry(i);
+
+				if (operat == NIL) break;
+
+				Window	*wnd = myContainer->GetContainerWindow();
+
+				if (wnd == NIL) break;
+
+				if (wnd->IsMouseOn(operat->rect) && !operat->checked)
+				{
+					operat->rect.right++;
+					operat->rect.bottom++;
+					surface->Gradient(operat->rect, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
+					operat->rect.right--;
+					operat->rect.bottom--;
+
+					if (flags & LF_MULTICHECKBOX)
+					{
+						Rect	 cbRect = operat->rect;
+
+						cbRect.left += 2;
+						cbRect.top += 3;
+						cbRect.right = cbRect.left + 9;
+						cbRect.bottom = (Int) Math::Min(cbRect.top + 9, operat->rect.bottom);
+
+						surface->Box(cbRect, Setup::ClientColor, FILLED);
+						surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
+
+						if (operat->selected)
+						{
+							Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
+							Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::ClientTextColor);
+
+							p1 = Point(cbRect.left + 3, cbRect.top + 2);
+							p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+
+							p1 = Point(cbRect.left + 2, cbRect.top + 3);
+							p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+
+							p1 = Point(cbRect.right - 3, cbRect.top + 2);
+							p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::ClientTextColor);
+
+							p1 = Point(cbRect.right - 3, cbRect.top + 3);
+							p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+
+							p1 = Point(cbRect.right - 4, cbRect.top + 2);
+							p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+						}
+					}
+
+					operat->rect.left += (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
+					operat->rect.top++;
+					DrawEntryText(operat->name, operat->rect, Setup::GradientTextColor);
+					operat->rect.left -= (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
+					operat->rect.top--;
+
+					if (operat->clicked)
+					{
+						operat->rect.right++;
+						operat->rect.bottom++;
+						surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
+						operat->rect.right--;
+						operat->rect.bottom--;
+					}
+				}
+			}
+
+			break;
+		case SP_MOUSEOUT:
+			for (i = scrollbarPos; i < GetNOfEntries(); i++)
+			{
+				operat = GetNthEntry(i);
+
+				if (operat == NIL) break;
+
+				Window	*wnd = myContainer->GetContainerWindow();
+
+				if (wnd == NIL) break;
+
+				if (!wnd->IsMouseOn(operat->rect) && operat->checked)
+				{
+					operat->rect.right++;
+					operat->rect.bottom++;
+					surface->Box(operat->rect, Setup::ClientColor, FILLED);
+					operat->rect.right--;
+					operat->rect.bottom--;
+
+					if (flags & LF_MULTICHECKBOX)
+					{
+						Rect	 cbRect = operat->rect;
+
+						cbRect.left += 2;
+						cbRect.top += 3;
+						cbRect.right = cbRect.left + 9;
+						cbRect.bottom = (Int) Math::Min(cbRect.top + 9, operat->rect.bottom);
+
+						surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
+
+						if (operat->selected)
+						{
+							Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
+							Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::ClientTextColor);
+
+							p1 = Point(cbRect.left + 3, cbRect.top + 2);
+							p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+
+							p1 = Point(cbRect.left + 2, cbRect.top + 3);
+							p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+
+							p1 = Point(cbRect.right - 3, cbRect.top + 2);
+							p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::ClientTextColor);
+
+							p1 = Point(cbRect.right - 3, cbRect.top + 3);
+							p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+
+							p1 = Point(cbRect.right - 4, cbRect.top + 2);
+							p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+						}
+					}
+
+					operat->rect.left += (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
+					operat->rect.top++;
+					DrawEntryText(operat->name, operat->rect, objectProperties->fontColor);
+					operat->rect.left -= (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
+					operat->rect.top--;
+
+					if (operat->clicked)
+					{
+						operat->rect.right++;
+						operat->rect.bottom++;
+						surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
+						operat->rect.right--;
+						operat->rect.bottom--;
+					}
+				}
+			}
+
+			break;
+		case SP_MOUSEDOWN:
+			for (i = 0; i < GetNOfEntries(); i++)
+			{
+				operat = GetNthEntry(i);
+
+				if (operat == NIL) break;
+
+				Window	*wnd = myContainer->GetContainerWindow();
+				if (wnd == NIL) break;
+
+				if (wnd->IsMouseOn(operat->rect) && (!operat->clicked || (flags & LF_ALLOWRESELECT) || (flags & LF_MULTICHECKBOX)))
+				{
+					operat->rect.right++;
+					operat->rect.bottom++;
+					surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
+					operat->rect.right--;
+					operat->rect.bottom--;
+
+					if (flags & LF_MULTICHECKBOX)
+					{
+						Rect	 cbRect = operat->rect;
+
+						cbRect.left += 2;
+						cbRect.top += 3;
+						cbRect.right = cbRect.left + 9;
+						cbRect.bottom = (Int) Math::Min(cbRect.top + 9, operat->rect.bottom);
+
+						surface->Box(cbRect, Setup::ClientColor, FILLED);
+						surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
+
+						if (operat->selected)
+						{
+							Point	 p1 = Point(cbRect.left + 2, cbRect.top + 2);
+							Point	 p2 = Point(cbRect.right - 2, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::ClientTextColor);
+
+							p1 = Point(cbRect.left + 3, cbRect.top + 2);
+							p2 = Point(cbRect.right - 2, cbRect.bottom - 3);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+
+							p1 = Point(cbRect.left + 2, cbRect.top + 3);
+							p2 = Point(cbRect.right - 3, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+
+							p1 = Point(cbRect.right - 3, cbRect.top + 2);
+							p2 = Point(cbRect.left + 1, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::ClientTextColor);
+
+							p1 = Point(cbRect.right - 3, cbRect.top + 3);
+							p2 = Point(cbRect.left + 2, cbRect.bottom - 2);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+
+							p1 = Point(cbRect.right - 4, cbRect.top + 2);
+							p2 = Point(cbRect.left + 1, cbRect.bottom - 3);
+
+							surface->Line(p1, p2, Setup::GrayTextColor);
+						}
+					}
+				}
+			}
+
+			break;
+		case SP_MOUSEUP:
+			for (i = 0; i < GetNOfEntries(); i++)
+			{
+				operat = GetNthEntry(i);
+
+				if (operat == NIL) break;
+
+				Window	*wnd = myContainer->GetContainerWindow();
+
+				if (wnd == NIL) break;
+
+				if (!wnd->IsMouseOn(operat->rect) && operat->clicked)
+				{
+					operat->rect.right++;
+					operat->rect.bottom++;
+					surface->Box(operat->rect, Setup::ClientColor, OUTLINED);
+					operat->rect.right--;
+					operat->rect.bottom--;
+				}
+			}
+
 			break;
 	}
 
 	LeaveProtectedRegion();
-
-	if (scrollbar != NIL) scrollbar->Paint(SP_PAINT);
-	if (header != NIL) header->Paint(SP_PAINT);
 
 	return Success;
 }
@@ -421,7 +732,6 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 	ListEntry	*operat;
 	Rect		 frame;
 	Bool		 change = False;
-	Int		 maxFrameY;
 	Int		 i;
 
 	frame.left	= realPos.x;
@@ -438,69 +748,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				surface->StartPaint(frame);
 
-				frame.left++;
-				frame.top = frame.top + 1 + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
-				frame.right--;
-				frame.bottom--;
-
-				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
-
-				surface->Box(frame, Setup::ClientColor, FILLED);
-
-				frame.left	= realPos.x;
-				frame.top	= realPos.y;
-				frame.right	= realPos.x + objectProperties->size.cx - 1;
-				frame.bottom	= realPos.y + objectProperties->size.cy - 1;
-
-				maxFrameY = frame.bottom - 1;
-
-				frame.left++;
-				frame.top	= frame.top + 1 + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
-				frame.right	-= (METRIC_LISTBOXSBOFFSET + 2);
-				frame.bottom	= frame.top + METRIC_LISTBOXENTRYHEIGHT;
-
-				frame.bottom = min(frame.bottom, maxFrameY);
-
-				for (i = 0; i < GetNOfEntries(); i++)
-				{
-					operat = GetNthEntry(i);
-
-					if (operat == NIL) break;
-
-					if (i >= scrollbarPos && frame.top < maxFrameY)
-					{
-						operat->rect = frame;
-
-						operat->rect.left++;
-						operat->rect.top++;
-						operat->rect.right--;
-
-						frame.left += METRIC_LISTBOXTEXTOFFSETXY;
-						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
-						DrawEntryText(operat->name, frame, objectProperties->fontColor);
-						frame.left -= METRIC_LISTBOXTEXTOFFSETXY;
-						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
-
-						if (operat->clk && frame.top < frame.bottom)
-						{
-							operat->rect.right++;
-							operat->rect.bottom++;
-							surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
-							operat->rect.right--;
-							operat->rect.bottom--;
-						}
-
-						frame.top += METRIC_LISTBOXENTRYHEIGHT;
-						frame.bottom += METRIC_LISTBOXENTRYHEIGHT;
-
-						frame.top = min(frame.top, maxFrameY);
-						frame.bottom = min(frame.bottom, maxFrameY);
-					}
-					else
-					{
-						operat->rect = Rect(Point(-1, -1), Size(0, 0));
-					}
-				}
+				Paint(SP_PAINT);
 
 				surface->EndPaint();
 
@@ -509,6 +757,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONDOWN:
+		case SM_LBUTTONDBLCLK:
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
 				operat = GetNthEntry(i);
@@ -529,18 +778,12 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (operat == NIL) break;
 
-				if (!wnd->IsMouseOn(operat->rect))
+				if (!wnd->IsMouseOn(operat->rect) && operat->clicked && change)
 				{
-					if (operat->clk && change)
-					{
-						operat->chk = False;
-						operat->clk = False;
-						operat->rect.right++;
-						operat->rect.bottom++;
-						surface->Box(operat->rect, Setup::ClientColor, OUTLINED);
-						operat->rect.right--;
-						operat->rect.bottom--;
-					}
+					Paint(SP_MOUSEUP);
+
+					operat->checked = False;
+					operat->clicked = False;
 				}
 			}
 
@@ -550,27 +793,25 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (operat == NIL) break;
 
-				if (wnd->IsMouseOn(operat->rect))
+				if (wnd->IsMouseOn(operat->rect) && (!operat->clicked || (flags & LF_ALLOWRESELECT) || (flags & LF_MULTICHECKBOX)))
 				{
-					if (!operat->clk || (flags & LF_ALLOWRESELECT))
-					{
-						operat->chk = True;
-						operat->clk = True;
-						operat->rect.right++;
-						operat->rect.bottom++;
-						surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
-						operat->rect.right--;
-						operat->rect.bottom--;
+					if (operat->selected)	operat->selected = False;
+					else			operat->selected = True;
 
-						onClick.Emit();
-						operat->onClick.Emit();
-					}
+					Paint(SP_MOUSEDOWN);
+
+					operat->checked = True;
+					operat->clicked = True;
+
+					onClick.Emit(wnd->MouseX(), wnd->MouseY());
+					operat->onClick.Emit();
 
 					retVal = Break;
 				}
 			}
 
 			break;
+		case SM_MOUSEMOVE:
 		case SM_MOUSELEAVE:
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
@@ -578,69 +819,13 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (operat == NIL) break;
 
-				if (!wnd->IsMouseOn(operat->rect))
+				if (!wnd->IsMouseOn(operat->rect) && operat->checked)
 				{
-					if (operat->chk)
-					{
-						operat->chk = False;
-						operat->rect.right++;
-						operat->rect.bottom++;
-						surface->Box(operat->rect, Setup::ClientColor, FILLED);
-						operat->rect.right--;
-						operat->rect.bottom--;
+					Paint(SP_MOUSEOUT);
 
-						operat->rect.left++;
-						operat->rect.top++;
-						DrawEntryText(operat->name, operat->rect, objectProperties->fontColor);
-						operat->rect.left--;
-						operat->rect.top--;
+					operat->checked = False;
 
-						if (operat->clk)
-						{
-							operat->rect.right++;
-							operat->rect.bottom++;
-							surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
-							operat->rect.right--;
-							operat->rect.bottom--;
-						}
-					}
-				}
-			}
-
-			break;
-		case SM_MOUSEMOVE:
-			for (i = 0; i < GetNOfEntries(); i++)
-			{
-				operat = GetNthEntry(i);
-
-				if (operat == NIL) break;
-
-				if (!wnd->IsMouseOn(operat->rect))
-				{
-					if (operat->chk)
-					{
-						operat->chk = False;
-						operat->rect.right++;
-						operat->rect.bottom++;
-						surface->Box(operat->rect, Setup::ClientColor, FILLED);
-						operat->rect.right--;
-						operat->rect.bottom--;
-
-						operat->rect.left++;
-						operat->rect.top++;
-						DrawEntryText(operat->name, operat->rect, objectProperties->fontColor);
-						operat->rect.left--;
-						operat->rect.top--;
-
-						if (operat->clk)
-						{
-							operat->rect.right++;
-							operat->rect.bottom++;
-							surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
-							operat->rect.right--;
-							operat->rect.bottom--;
-						}
-					}
+					operat->onMouseOut.Emit();
 				}
 			}
 
@@ -650,32 +835,13 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (operat == NIL) break;
 
-				if (wnd->IsMouseOn(operat->rect))
+				if (message == SM_MOUSEMOVE && wnd->IsMouseOn(operat->rect) && !operat->checked)
 				{
-					if (!operat->chk)
-					{
-						operat->chk = True;
-						operat->rect.right++;
-						operat->rect.bottom++;
-						surface->Gradient(operat->rect, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
-						operat->rect.right--;
-						operat->rect.bottom--;
+					Paint(SP_MOUSEIN);
 
-						operat->rect.left++;
-						operat->rect.top++;
-						DrawEntryText(operat->name, operat->rect, Setup::GradientTextColor);
-						operat->rect.left--;
-						operat->rect.top--;
+					operat->checked = True;
 
-						if (operat->clk)
-						{
-							operat->rect.right++;
-							operat->rect.bottom++;
-							surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
-							operat->rect.right--;
-							operat->rect.bottom--;
-						}
-					}
+					operat->onMouseOver.Emit();
 				}
 			}
 
@@ -756,7 +922,7 @@ S::Int S::GUI::ListBox::ScrollUp(Int nLines)
 S::Int S::GUI::ListBox::ScrollDown(Int nLines)
 {
 	scrollbarPos += nLines;
-	scrollbarPos = (Int) Math::Min(scrollbarPos, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+	scrollbarPos = (Int) Math::Min(scrollbarPos, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 
 	if (scrollbar != NIL) scrollbar->Paint(SP_PAINT);
 

@@ -44,7 +44,7 @@ Test::Test()
 
 	// create objects for our application:
 	mainWnd			= new Window("smooth Test");
-	mainWnd_titlebar	= new Titlebar(true, true, true);
+	mainWnd_titlebar	= new Titlebar();
 	mainWnd_statusbar	= new Statusbar("Ready");
 	mainWnd_client		= new Client();
 	mainWnd_divisionbar	= new Divider(430, OR_VERT | OR_LEFT);
@@ -91,6 +91,7 @@ Test::Test()
 	bp.y = 300;
 	bs.cy = 120;
 	mainWnd_layer_list1	= new ListBox(bp, bs);
+	mainWnd_layer_list1->SetFlags(LF_MULTICHECKBOX);
 	bp.y = 28;
 	bp.x = 220;
 	bs.cx = 150;
@@ -115,8 +116,9 @@ Test::Test()
 	bp.x = 15;
 	bp.y = 20;
 	bs.cx = 150;
-	bs.cy = 70;
+	bs.cy = 0;
 	rlayer2_editbox1	= new EditBox("Hello to all testers!", bp, bs, EDB_ALPHANUMERIC, 0);
+	rlayer2_editbox1->SetDropDownList(mainWnd_layer_list2);
 	bp.y = 40;
 	bs.cx = 60;
 	bs.cy = 0;
@@ -128,7 +130,7 @@ Test::Test()
 	rlayer3_progress1	= new Progressbar(bp, bs, OR_HORZ, PB_PERCENT, 0, 100, 50);
 
 	secWnd			= new Window("Another window");
-	secWnd_titlebar		= new Titlebar(true, false, true);
+	secWnd_titlebar		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	mainWnd_layer_subtree1	= new Tree();
 
 	// fill the menus:
@@ -250,11 +252,13 @@ mainWnd_iconbar->SetOrientation(OR_LEFT);
 	mainWnd->SetMetrics(Point(100, 50), Size(570, 550));
 	mainWnd->SetIcon(SMOOTH::LoadImage("icons.pci", 0, NIL));
 	mainWnd->SetApplicationIcon(LoadIconA(NULL, MAKEINTRESOURCEA(32517)));
+	mainWnd->getTrackMenu.Connect(&Test::GetTrackMenu, this);
 	mainWnd->doQuit.Connect(&Test::mainWnd_KillProc, this);
 
 	secWnd->SetMetrics(Point(480, 130), Size(170, 90));
 	secWnd->SetIcon(SMOOTH::LoadImage("icons.pci", 0, NIL));
 	secWnd->SetStyle(SS_APPTOPMOST);
+	secWnd->SetParentWindow(mainWnd);
 
 	messageBoxThread->Start();
 }
@@ -375,12 +379,12 @@ void Test::mainApp_ScrollbarProc()
 
 void Test::ShowEdb()
 {
-	rlayer2_editbox1->Activate();
+	rlayer2_editbox1->Show();
 }
 
 void Test::HideEdb()
 {
-	rlayer2_editbox1->Deactivate();
+	rlayer2_editbox1->Hide();
 }
 
 void Test::Close()
@@ -452,4 +456,9 @@ Void Test::testDlgSelectDir()
 	}
 
 	delete dialog;
+}
+
+Menu *Test::GetTrackMenu(Int mouseX, Int mouseY)
+{
+	return mainWnd_menubar_file;
 }

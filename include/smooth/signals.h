@@ -11,6 +11,7 @@
 #ifndef _H_SIGNALS_
 #define _H_SIGNALS_
 
+#define SIGNALS_SIGNAL_ZERO
 #define SIGNALS_SIGNAL_CLASS_NAME	Signal0
 #define SIGNALS_INSTANCE_CLASS_NAME	Instance0
 #define SIGNALS_CONDITIONAL_COMMA
@@ -23,6 +24,7 @@
 
 #include "templates/signals/signaln.h"
 
+#undef SIGNALS_SIGNAL_ZERO
 #undef SIGNALS_SIGNAL_CLASS_NAME
 #undef SIGNALS_INSTANCE_CLASS_NAME
 #undef SIGNALS_CONDITIONAL_COMMA

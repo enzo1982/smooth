@@ -269,29 +269,16 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 						}
 					}
 
-					onClick.Emit();
+					onClick.Emit(wnd->MouseX(), wnd->MouseY());
 				}
 
 				retVal = Break;
 			}
 
 			break;
-		case SM_MOUSELEAVE:
-			if (objectProperties->checked && !wnd->IsMouseOn(frame))
-			{
-				objectProperties->checked = False;
-				objectProperties->clicked = False;
-
-				frame.right++;
-				frame.bottom++;
-				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
-				frame.right--;
-				frame.bottom--;
-			}
-
-			break;
 		case SM_MOUSEMOVE:
-			if (!objectProperties->checked && wnd->IsMouseOn(frame))
+		case SM_MOUSELEAVE:
+			if (message == SM_MOUSEMOVE && !objectProperties->checked && wnd->IsMouseOn(frame))
 			{
 				objectProperties->checked = True;
 				surface->Frame(frame, FRAME_UP);

@@ -65,7 +65,7 @@ S::MessageBoxApp::MessageBoxApp(String text, String title, Int btns, wchar_t *ic
 S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 {
 	msgbox		= new Window(title);
-	titlebar	= new Titlebar(false, false, true);
+	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	lay		= new Layer();
 	okbutton	= NIL;
 	yesbutton	= NIL;
@@ -374,7 +374,6 @@ S::Void S::MessageBoxApp::MessagePaintProc()
 		}
 
 		DrawIcon(dc, 17, 47, icon);
-		DestroyIcon(icon);
 #endif
 	}
 

@@ -23,15 +23,12 @@ namespace smooth
 	class SMOOTHAPI String
 	{
 		private:
-			char			*bString;
 			wchar_t			*wString;
 			Int			 stringSize;
-			Bool			 checkInconsistency;
 
 			static char		*inputFormat;
-			static char		*previousInputFormat;
+			static char		*outputFormat;
 
-			Void			 FixInconsistency();
 			Void			 ImportFormat(const char *, const char *);
 		public:
 						 String();
@@ -45,8 +42,9 @@ namespace smooth
 			Void			 Clean();
 
 			static char		*SetInputFormat(const char *);
+			static char		*SetOutputFormat(const char *);
 
-			char			*ConvertTo(const String);
+			char			*ConvertTo(const char *);
 
 			String			&Append(const char *);
 			String			&Append(const wchar_t *);

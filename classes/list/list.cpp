@@ -18,24 +18,26 @@
 
 S::List::List()
 {
-	entrysizesset = False;
+	referenceList = NIL;
 }
 
 S::List::~List()
 {
-	Cleanup();
+	referenceList = NIL;
+
+	RemoveAll();
 }
 
-S::ListEntry *S::List::AddEntry(Int id, String name)
+S::ListEntry *S::List::AddEntry(String name, Int id)
 {
+	if (referenceList != NIL) return NIL;
+
 	ListEntry	*newEntry = new ListEntry(id);
 
 	newEntry->name = name;
 
 	if (Array<ListEntry *>::AddEntry(newEntry, id) == True)
 	{
-		entrysizesset = False;
-
 		return newEntry;
 	}
 	else
@@ -48,12 +50,13 @@ S::ListEntry *S::List::AddEntry(Int id, String name)
 
 S::Int S::List::ModifyEntry(Int id, String name)
 {
+	if (referenceList != NIL) return Error;
+
 	ListEntry	*entry = GetEntry(id);
 
 	if (entry != NIL)
 	{
-		entry->name	= name;
-		entrysizesset	= False;
+		entry->name = name;
 
 		return Success;
 	}
@@ -65,9 +68,13 @@ S::Int S::List::ModifyEntry(Int id, String name)
 
 S::Int S::List::RemoveEntry(Int id)
 {
-	if (GetEntry(id) != NIL)
+	if (referenceList != NIL) return Error;
+
+	ListEntry	*entry = GetEntry(id);
+
+	if (entry != NIL)
 	{
-		delete GetEntry(id);
+		delete entry;
 
 		Array<ListEntry *>::RemoveEntry(id);
 
@@ -79,41 +86,18 @@ S::Int S::List::RemoveEntry(Int id)
 	}
 }
 
-S::Void S::List::Cleanup()
+S::Int S::List::RemoveAll()
 {
+	if (referenceList != NIL) return Error;
+
 	for (Int i = 0; i < GetNOfEntries(); i++)
 	{
 		delete GetNthEntry(i);
 	}
 
-	RemoveAll();
-}
+	Array<ListEntry *>::RemoveAll();
 
-S::Void S::List::GetSize()
-{
-	if (!entrysizesset)
-	{
-		GetListEntriesSize();
-		entrysizesset = True;
-	}
-}
-
-S::Void S::List::GetListEntriesSize()
-{
-	if (GetNOfEntries() == 0) return;
-
-	HDC	 hdc = GetContext(0);
-
-	for (Int i = 0; i < GetNOfEntries(); i++)
-	{
-		ListEntry	*operat = GetNthEntry(i);
-
-		if (!operat->sizeset) operat->size = GetTextSizeX(operat->name, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
-
-		operat->sizeset = True;
-	}
-
-	FreeContext(0, hdc);
+	return Success;
 }
 
 S::ListEntry *S::List::GetSelectedEntry()
@@ -124,7 +108,7 @@ S::ListEntry *S::List::GetSelectedEntry()
 	{
 		ListEntry	*operat = GetNthEntry(i);
 
-		if (operat->clk) return operat;
+		if (operat->clicked) return operat;
 	}
 
 	return NIL;
@@ -138,9 +122,52 @@ S::Int S::List::SelectEntry(Int id)
 	{
 		ListEntry	*operat = GetNthEntry(i);
 
-		if (operat->clk)	operat->clk = False;
-		if (operat->id == id)	operat->clk = True;
+		if (operat->clicked)	operat->clicked = False;
+		if (operat->id == id)	operat->clicked = True;
 	}
+
+	return Success;
+}
+
+S::Int S::List::SetReferenceList(List *nRefList)
+{
+	referenceList = nRefList;
+
+	SynchronizeList();
+
+	return Success;
+}
+
+S::Bool S::List::IsListSane()
+{
+	if (referenceList == NIL) return True;
+	if (GetNOfEntries() != referenceList->GetNOfEntries()) return False;
+
+	for (Int i = 0; i < referenceList->GetNOfEntries(); i++)
+	{
+		if (referenceList->GetNthEntry(i)->id != GetNthEntry(i)->id)		return False;
+		else if (referenceList->GetNthEntry(i)->name != GetNthEntry(i)->name)	return False;
+	}
+
+	return True;
+}
+
+S::Int S::List::SynchronizeList()
+{
+	if (referenceList == NIL) return Error;
+
+	List	*rList = referenceList;
+
+	referenceList = NIL;
+
+	RemoveAll();
+
+	for (Int i = 0; i < rList->GetNOfEntries(); i++)
+	{
+		AddEntry(rList->GetNthEntry(i)->name, rList->GetNthEntry(i)->id);
+	}
+
+	referenceList = rList;
 
 	return Success;
 }

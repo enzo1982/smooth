@@ -104,7 +104,7 @@ S::Int S::GUI::ActiveArea::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDBLCLK:
 			if (wnd->IsMouseOn(frame))
 			{
-				onClick.Emit();
+				onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 				retVal = Break;
 			}

@@ -13,17 +13,19 @@
 
 #include "system.h"
 
-#ifdef __WIN32__
+namespace smooth
+{
+	Bool	 LoadIconvDLL();
+	Void	 FreeIconvDLL();
+};
+
 extern HINSTANCE	 hDllInstance;
 
 #ifndef __SMOOTH_STATIC__
-
 extern "C"
 {
 	BOOL WINAPI DllMain(HINSTANCE, DWORD, LPVOID);
 }
-
-#endif
 #endif
 
 #endif

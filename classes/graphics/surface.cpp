@@ -178,7 +178,7 @@ S::Int S::GUI::Surface::SetShadowedText(String string, Rect rect, Font font)
 
 	Int	 fontColor = font.GetColor();
 
-	font.SetColor(CombineColor(((Float) GetRed(Setup::BackgroundColor)) / 3 * 2, ((Float) GetGreen(Setup::BackgroundColor)) / 3 * 2, ((Float) GetBlue(Setup::BackgroundColor)) / 3 * 2));
+	font.SetColor(CombineColor((Int) ((Float) GetRed(Setup::BackgroundColor) / 3 * 2), (Int) ((Float) GetGreen(Setup::BackgroundColor) / 3 * 2), (Int) ((Float) GetBlue(Setup::BackgroundColor) / 3 * 2)));
 
 	SetText(string, rect, font);
 
@@ -222,7 +222,7 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 					green1	= green1 + biasg;
 					blue1	= blue1 + biasb;
 
-					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, CombineColor(red1, green1, blue1));
+					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, CombineColor((Int) red1, (Int) green1, (Int) blue1));
 				}
 			}
 			else
@@ -233,7 +233,7 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 					green1	= green1 + biasg;
 					blue1	= blue1 + biasb;
 
-					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, CombineColor(red1, green1, blue1));
+					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, CombineColor((Int) red1, (Int) green1, (Int) blue1));
 				}
 			}
 		}
@@ -251,7 +251,7 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 				green1	= green1 + biasg;
 				blue1	= blue1 + biasb;
 
-				for (Int x = 0; x < xmax; x++) bmp.SetPixel(x, y, CombineColor(red1, green1, blue1));
+				for (Int x = 0; x < xmax; x++) bmp.SetPixel(x, y, CombineColor((Int) red1, (Int) green1, (Int) blue1));
 			}
 		}
 		break;

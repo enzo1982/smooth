@@ -213,6 +213,7 @@ S::Int S::GUI::Font::GetLineSizeX(String text, Int nOfChars)
 	if (text == NIL)	return 0;
 	if (nOfChars == 0)	return 0;
 
+#ifdef __WIN32__
 	HDC	 ddc	= GetWindowDC(0);
 	HDC	 cdc	= CreateCompatibleDC(ddc);
 	Int	 size	= -MulDiv(fontSize, GetDeviceCaps(cdc, LOGPIXELSY), 72);
@@ -236,6 +237,9 @@ S::Int S::GUI::Font::GetLineSizeX(String text, Int nOfChars)
 	ReleaseDC(0, ddc);
 
 	return tSize.cx;
+#else
+	return 0;
+#endif
 }
 
 S::Int S::GUI::Font::GetTextSizeY(String text)
@@ -257,6 +261,7 @@ S::Int S::GUI::Font::GetLineSizeY(String text)
 {
 	if (text == NIL) return 0;
 
+#ifdef __WIN32__
 	HDC	 ddc	= GetWindowDC(0);
 	HDC	 cdc	= CreateCompatibleDC(ddc);
 	Int	 size	= -MulDiv(fontSize, GetDeviceCaps(cdc, LOGPIXELSY), 72);
@@ -280,4 +285,7 @@ S::Int S::GUI::Font::GetLineSizeY(String text)
 	ReleaseDC(0, ddc);
 
 	return tSize.cy - 1;
+#else
+	return 0;
+#endif
 }

@@ -17,6 +17,11 @@ S::GUI::BitmapNone::BitmapNone()
 	type = BITMAP_NONE;
 }
 
+S::GUI::BitmapNone::BitmapNone(Int cx, Int cy, Int bpp)
+{
+	type = BITMAP_NONE;
+}
+
 S::GUI::BitmapNone::BitmapNone(const int nil)
 {
 	type = BITMAP_NONE;
@@ -29,6 +34,16 @@ S::GUI::BitmapNone::BitmapNone(const BitmapNone &iBitmap)
 
 S::GUI::BitmapNone::~BitmapNone()
 {
+}
+
+S::Bool S::GUI::BitmapNone::CreateBitmap(Int cx, Int cy, Int bpp)
+{
+	return True;
+}
+
+S::Bool S::GUI::BitmapNone::DeleteBitmap()
+{
+	return True;
 }
 
 S::GUI::BitmapNone &S::GUI::BitmapNone::operator =(const int nil)

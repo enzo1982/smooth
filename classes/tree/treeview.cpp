@@ -249,7 +249,6 @@ S::Int S::GUI::TreeView::Process(Int message, Int wParam, Int lParam)
 	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;

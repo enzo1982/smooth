@@ -12,7 +12,6 @@
 #include <smooth/main.h>
 #include "designer.h"
 #include "edit_component.h"
-#include "tools.h"
 
 Int smooth::Main()
 {
@@ -164,7 +163,7 @@ void Designer::TimerProc()
 	{
 		operat = dlgs.GetNthEntry(i);
 
-		if (MouseX(operat->GetWindow()->hwnd, WINDOW) > 0 && MouseY(operat->GetWindow()->hwnd, WINDOW) > 0 && MouseX(operat->GetWindow()->hwnd, WINDOW) < operat->GetWindow()->GetObjectProperties()->size.cx && MouseY(operat->GetWindow()->hwnd, WINDOW) < operat->GetWindow()->GetObjectProperties()->size.cy)
+		if (operat->GetWindow()->MouseX() > 0 && operat->GetWindow()->MouseY() > 0 && operat->GetWindow()->MouseX() < operat->GetWindow()->GetObjectProperties()->size.cx && operat->GetWindow()->MouseY() < operat->GetWindow()->GetObjectProperties()->size.cy)
 		{
 			mouseonwindow = true;
 

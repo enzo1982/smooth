@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 IOLib.lib libbz2.lib lisa.lib libpicture.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Build"
+# ADD LINK32 IOLib.lib libbz2.lib lisa.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Build"
 # SUBTRACT LINK32 /verbose /pdb:none /incremental:no /map
 
 !ENDIF 
@@ -432,6 +432,27 @@ SOURCE=..\classes\graphics\gdi\bitmapgdi.cpp
 
 SOURCE=..\classes\graphics\gdi\surfacegdi.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\gdi\windowgdi.cpp
+# End Source File
+# End Group
+# Begin Group "nonesources"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\graphics\none\bitmapnone.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Source File
 
@@ -513,10 +534,6 @@ SOURCE=..\misc\splashscreen.cpp
 # Begin Source File
 
 SOURCE=..\misc\stk.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\misc\toolkit.cpp
 # End Source File
 # End Group
 # End Group
@@ -706,6 +723,18 @@ SOURCE=..\include\smooth\graphics\gdi\bitmapgdi.h
 # Begin Source File
 
 SOURCE=..\include\smooth\graphics\gdi\surfacegdi.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\gdi\windowgdi.h
+# End Source File
+# End Group
+# Begin Group "none"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\none\bitmapnone.h
 # End Source File
 # End Group
 # Begin Source File
@@ -1040,10 +1069,6 @@ SOURCE=..\include\smooth\timer.h
 # Begin Source File
 
 SOURCE=..\include\smooth\titlebar.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\toolkit.h
 # End Source File
 # Begin Source File
 

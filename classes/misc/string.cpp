@@ -10,9 +10,8 @@
 
 #include <smooth/string.h>
 #include <smooth/math.h>
-#include <smooth/stk.h>
 #include <iconv.h>
-#include <string.h>
+#include <memory.h>
 #include <iolib-cxx.h>
 
 char	*S::String::origInputFormat	= "ISO-8859-1";
@@ -1000,14 +999,14 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 	if (Setup::useIconv)
 	{
-		iconv_t		 cd	= ex_iconv_open(outEncoding, inEncoding);
+		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
 
 		if ((int) cd == -1) return -1;
 
 		InStream	*in	= new InStream(STREAM_BUFFER, (void *) inBuffer, inBytes);
 		OutStream	*out	= new OutStream(STREAM_BUFFER, (void *) outBuffer, outBytes);
 
-		ex_iconv(cd, NULL, NULL, NULL, NULL);
+		iconv(cd, NULL, NULL, NULL, NULL);
 
 		char		 inBuf[4096 + 4096];
 		size_t		 inBufRest = 0;
@@ -1028,7 +1027,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 				}
 				else
 				{
-					ex_iconv_close(cd);
+					iconv_close(cd);
 
 					delete in;
 					delete out;
@@ -1048,7 +1047,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 					char	*outPtr		= outBuf;
 					size_t	 outSize	= sizeof(outBuf);
 
-					if ((signed) ex_iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize) < 0)
+					if ((signed) iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize) < 0)
 					{
 						convError = True;
 
@@ -1069,7 +1068,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		char	*outPtr		= outBuf;
 		size_t	 outSize	= sizeof(outBuf);
 
-		ex_iconv(cd, NULL, NULL, &outPtr, &outSize);
+		iconv(cd, NULL, NULL, &outPtr, &outSize);
 
 		if (outPtr != outBuf)
 		{
@@ -1077,7 +1076,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 			size += (outPtr - outBuf);
 		}
 
-		ex_iconv_close(cd);
+		iconv_close(cd);
 
 		if (size >= outBytes) size = 0;
 		if (convError) size = -1;

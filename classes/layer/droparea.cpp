@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/graphics/window.h>
+#include <smooth/graphics/gdi/windowgdi.h>
 #include <smooth/layer.h>
 #include <smooth/droparea.h>
 #include <smooth/definitions.h>
@@ -53,7 +53,7 @@ S::Void S::GUI::DropArea::OnRegister(Container *container)
 
 S::Void S::GUI::DropArea::Init()
 {
-	Window	*wnd = myContainer->GetContainerWindow();
+	WindowGDI	*wnd = (WindowGDI *) myContainer->GetContainerWindow();
 
 	DragAcceptFiles(wnd->hwnd, True);
 }

@@ -12,7 +12,7 @@
 
 #include <smooth/fontdlg.h>
 #include <smooth/stk.h>
-#include <smooth/graphics/window.h>
+#include <smooth/graphics/gdi/windowgdi.h>
 
 #include <commdlg.h>
 
@@ -35,8 +35,8 @@ S::Int S::DialogFontSelection::ShowDialog()
 
 	if (parentWindow != NIL)
 	{
-		cfw.hwndOwner = parentWindow->hwnd;
-		cfa.hwndOwner = parentWindow->hwnd;
+		cfw.hwndOwner = ((GUI::WindowGDI *) parentWindow)->hwnd;
+		cfa.hwndOwner = ((GUI::WindowGDI *) parentWindow)->hwnd;
 	}
 	else
 	{

@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/graphics/window.h>
+#include <smooth/graphics/gdi/windowgdi.h>
 #include <smooth/drag.h>
 #include <smooth/definitions.h>
 #include <smooth/objectproperties.h>
@@ -35,10 +35,9 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
+	WindowGDI	*wnd = (WindowGDI *) myContainer->GetContainerObject();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Point	 mPos;
 	Size	 cpwp;

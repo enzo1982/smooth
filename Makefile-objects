@@ -68,6 +68,11 @@ $(OBJECTDIR)/surfacegdi.o: $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp $(SMOOTHINCL
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp -o $(OBJECTDIR)/surfacegdi.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/windowgdi.o: $(GRAPHICSCLASSESDIR)/gdi/windowgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/gdi/windowgdi.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/gdi/windowgdi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/windowgdi.cpp -o $(OBJECTDIR)/windowgdi.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/bitmapnone.o: $(GRAPHICSCLASSESDIR)/none/bitmapnone.cpp $(SMOOTHINCLUDEDIR)/graphics/none/bitmapnone.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/none/bitmapnone.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/none/bitmapnone.cpp -o $(OBJECTDIR)/bitmapnone.o
@@ -463,11 +468,6 @@ $(OBJECTDIR)/designer_edit_component.o: $(DESIGNERDIR)/edit_component.cpp $(DLLN
 	$(COMPILER) $(EXECOMPILER_OPTS) $(DESIGNERDIR)/edit_component.cpp -o $(OBJECTDIR)/designer_edit_component.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/designer_tools.o: $(DESIGNERDIR)/tools.cpp $(DLLNAME)
-	$(ECHO) -n Compiling $(DESIGNERDIR)/tools.cpp...
-	$(COMPILER) $(EXECOMPILER_OPTS) $(DESIGNERDIR)/tools.cpp -o $(OBJECTDIR)/designer_tools.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/pciffman_main.o: $(PCIFFMANDIR)/main.cpp $(DLLNAME)
 	$(ECHO) -n Compiling $(PCIFFMANDIR)/main.cpp...
 	$(COMPILER) $(EXECOMPILER_OPTS) $(PCIFFMANDIR)/main.cpp -o $(OBJECTDIR)/pciffman_main.o
@@ -695,12 +695,12 @@ $(OBJECTDIR)/libxml_xpointer.o: $(LIBXMLDIR)/xpointer.c
 
 $(OBJECTDIR)/libiconv_iconv.o: $(LIBICONVDIR)/iconv.c $(LIBICONVDIR)/config.h
 	$(ECHO) -n Compiling $(LIBICONVDIR)/iconv.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBICONVDIR)/iconv.c -o $(OBJECTDIR)/libiconv_iconv.o
+	$(COMPILER) $(COMPILER_OPTS) -D_ICONVDLL_ $(LIBICONVDIR)/iconv.c -o $(OBJECTDIR)/libiconv_iconv.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libiconv_localcharset.o: $(LIBICONVDIR)/localcharset.c $(LIBICONVDIR)/config.h
 	$(ECHO) -n Compiling $(LIBICONVDIR)/localcharset.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBICONVDIR)/localcharset.c -o $(OBJECTDIR)/libiconv_localcharset.o
+	$(COMPILER) $(COMPILER_OPTS) -D_ICONVDLL_ $(LIBICONVDIR)/localcharset.c -o $(OBJECTDIR)/libiconv_localcharset.o
 	$(ECHO) done.
 
 $(SAMPLE1DIR)/beat.o: $(SAMPLE1DIR)/beat.cpp $(DLLNAME)

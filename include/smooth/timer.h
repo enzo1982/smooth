@@ -26,7 +26,9 @@ namespace smooth
 		private:
 			Int			 timerid;
 
+#ifdef __WIN32__
 			static Void WINAPI	 TimerProc(HWND, unsigned int, unsigned int, unsigned long);
+#endif
 		public:
 			static const Int	 classID;
 

@@ -15,7 +15,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		class Window;
+		class WindowBase;
 		class ToolWindow;
 		class PopupMenu;
 		class Menubar;
@@ -50,24 +50,19 @@ namespace smooth
 		const Int	 WO_SEPARATOR	= 1;
 		const Int	 WO_NOSEPARATOR	= 2;
 
-		class SMOOTHAPI Window : public Widget, public Container
+		class SMOOTHAPI WindowBase : public Widget, public Container
 		{
-			friend Int SMOOTHAPI S::Loop();
-			private:
-				static LRESULT CALLBACK		 WindowProc(HWND, UINT, WPARAM, LPARAM);
 			protected:
 				Int				 style;
 				Int				 exstyle;
 				Bool				 stay;
 				Bool				 maximized;
 				Rect				 nonmaxrect;
-				Int				 origwndstyle;
 
 				Bool				 created;
 				Bool				 destroyed;
 
 				Bitmap				 icon;
-				HICON				 sysicon;
 
 				Rect				 innerOffset;
 				Rect				 updateRect;
@@ -80,12 +75,11 @@ namespace smooth
 
 				PopupMenu			*trackMenu;
 
-				HDC				 windowDC;
-
 				Layer				*mainLayer;
 				Timer				*paintTimer;
 
-				HWND				 Create();
+				virtual Bool			 Create();
+
 				Void				 CalculateOffsets();
 
 				Bool				 DummyExitProc();
@@ -97,22 +91,21 @@ namespace smooth
 				static Int			 nOfActiveWindows;
 				Int				 value;
 
-				HWND				 hwnd;
-
 				Bool				 initshow;
 
-								 Window(String title = NIL);
-								~Window();
+								 WindowBase(String title = NIL);
+								~WindowBase();
 
-				Int				 SetIcon(const Bitmap &);
+				virtual Int			 SetIcon(const Bitmap &);
 				Bitmap				&GetIcon();
 
 				Int				 SetApplicationIcon(char *);
 				Int				 SetApplicationIcon(wchar_t *);
-				Int				 SetMetrics(Point, Size);
+
+				virtual Int			 SetMetrics(Point, Size);
 				Void				 SetStyle(Int);
 				Void				 SetExStyle(Int);
-				Int				 SetText(String);
+				virtual Int			 SetText(String);
 
 				Layer				*GetMainLayer();
 
@@ -128,29 +121,28 @@ namespace smooth
 				Int				 SetMinimumSize(Size);
 				Int				 SetMaximumSize(Size);
 
-				Int				 Show();
-				Int				 Hide();
+				virtual Int			 Show();
+				virtual Int			 Hide();
 
-				Int				 Close();
-
-				Int				 Stay();
-
-				Int				 Maximize();
-				Int				 Restore();
+				virtual Int			 Maximize();
+				virtual Int			 Restore();
 				Bool				 IsMaximized();
 
-				Int				 Paint(Int);
-				Int				 Process(Int, Int, Int);
+				virtual Int			 Stay();
+				virtual Int			 Close();
+
+				Bool				 IsInUse();
+
+				virtual Int			 Paint(Int);
+				virtual Int			 Process(Int, Int, Int);
 
 				Int				 MouseX();
 				Int				 MouseY();
 
-				Bool				 IsMouseOn(Rect);
+				virtual Bool			 IsMouseOn(Rect);
 
-				Int				 RegisterObject(Object *);
-				Int				 UnregisterObject(Object *);
-
-				static Window			*GetWindow(HWND);
+				virtual Int			 RegisterObject(Object *);
+				virtual Int			 UnregisterObject(Object *);
 			signals:
 				Signal0<Void>			 onCreate;
 
@@ -166,5 +158,12 @@ namespace smooth
 		};
 	};
 };
+
+#ifdef __WIN32__
+	#include "gdi/windowgdi.h"
+	#define Window WindowGDI
+#else
+	#define Window WindowBase
+#endif
 
 #endif

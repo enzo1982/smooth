@@ -38,8 +38,8 @@
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
-#include <smooth/stk.h>
 #include <smooth/setup.h>
+#include <iconv.h>
 #endif
 #include <libxml/encoding.h>
 #include <libxml/xmlmemory.h>
@@ -1922,14 +1922,14 @@ xmlFindCharEncodingHandler(const char *name) {
 #ifdef LIBXML_ICONV_ENABLED
     if (S::Setup::useIconv) {
     /* check whether iconv can handle this */
-    icv_in = ex_iconv_open("UTF-8", name);
-    icv_out = ex_iconv_open(name, "UTF-8");
+    icv_in = iconv_open("UTF-8", name);
+    icv_out = iconv_open(name, "UTF-8");
     if ((icv_in != (iconv_t) -1) && (icv_out != (iconv_t) -1)) {
 	    enc = (xmlCharEncodingHandlerPtr)
 	          xmlMalloc(sizeof(xmlCharEncodingHandler));
 	    if (enc == NULL) {
-	        ex_iconv_close(icv_in);
-	        ex_iconv_close(icv_out);
+	        iconv_close(icv_in);
+	        iconv_close(icv_out);
 		return(NULL);
 	    }
 	    enc->name = xmlMemStrdup(name);
@@ -2012,7 +2012,7 @@ xmlIconvWrapper(iconv_t cd,
     char *icv_out = (char *) out;
     int ret;
 
-    ret = ex_iconv(cd, (const char **) &icv_in, &icv_inlen, &icv_out, &icv_outlen);
+    ret = iconv(cd, (const char **) &icv_in, &icv_inlen, &icv_out, &icv_outlen);
     if (in != NULL) {
         *inlen -= icv_inlen;
         *outlen -= icv_outlen;
@@ -2427,12 +2427,12 @@ xmlCharEncCloseFunc(xmlCharEncodingHandler *handler) {
 	    xmlFree(handler->name);
 	handler->name = NULL;
 	if (handler->iconv_out != NULL) {
-	    if (ex_iconv_close(handler->iconv_out))
+	    if (iconv_close(handler->iconv_out))
 		ret = -1;
 	    handler->iconv_out = NULL;
 	}
 	if (handler->iconv_in != NULL) {
-	    if (ex_iconv_close(handler->iconv_in))
+	    if (iconv_close(handler->iconv_in))
 		ret = -1;
 	    handler->iconv_in = NULL;
 	}

@@ -67,7 +67,6 @@ S::Int S::GUI::Tooltip::Show()
 	Window	*wnd = (Window *) myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Float	 measurement = Setup::FontSize;
 	Rect	 wndRect;
@@ -114,7 +113,6 @@ S::Int S::GUI::Tooltip::Hide()
 	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	if (toolWindow != NIL)
 	{
@@ -138,7 +136,6 @@ S::Int S::GUI::Tooltip::DrawTooltip()
 	Window	*wnd = (Window *) myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Rect	 wndRect;
 

@@ -52,7 +52,7 @@ S::Void S::BackgroundApplication::TimerProc()
 
 			if (object->GetObjectType() == GUI::Window::classID)
 			{
-				if (((GUI::Window *) object)->hwnd != NIL) ((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
+				if (((GUI::Window *) object)->IsInUse()) ((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
 			}
 		}
 	}

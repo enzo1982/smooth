@@ -223,7 +223,6 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Surface	*surface = wnd->GetDrawSurface();
 	Point	 realPos = GetRealPosition();

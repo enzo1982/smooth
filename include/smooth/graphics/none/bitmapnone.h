@@ -31,10 +31,14 @@ namespace smooth
 		{
 			public:
 							 BitmapNone();
+							 BitmapNone(Int, Int, Int);
 							 BitmapNone(const int);
 							 BitmapNone(const BitmapNone &);
 
 							~BitmapNone();
+
+				Bool			 CreateBitmap(Int, Int, Int);
+				Bool			 DeleteBitmap();
 
 				BitmapNone &operator	 =(const int);
 				BitmapNone &operator	 =(const BitmapNone &);

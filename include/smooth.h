@@ -140,8 +140,9 @@
 #if defined __WIN32__
 #include "smooth/graphics/gdi/bitmapgdi.h"
 #include "smooth/graphics/gdi/surfacegdi.h"
+#include "smooth/graphics/gdi/windowgdi.h"
 #else
-#include "smooth/graphics/gdi/bitmapnone.h"
+#include "smooth/graphics/none/bitmapnone.h"
 #endif
 
 #endif

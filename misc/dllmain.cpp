@@ -10,11 +10,13 @@
 
 #include <smooth/dllmain.h>
 #include <smooth/shlobjmini.h>
+#include <smooth/application.h>
+#include <iconv.h>
 
-LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderA)(PBROWSEINFOA);
-LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderW)(PBROWSEINFOW);
-BOOL		 (WINAPI *ex_SHGetPathFromIDListA)(LPCITEMIDLIST, LPSTR);
-BOOL		 (WINAPI *ex_SHGetPathFromIDListW)(LPCITEMIDLIST, LPWSTR);
+LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderA)(PBROWSEINFOA) = NIL;
+LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderW)(PBROWSEINFOW) = NIL;
+BOOL		 (WINAPI *ex_SHGetPathFromIDListA)(LPCITEMIDLIST, LPSTR) = NIL;
+BOOL		 (WINAPI *ex_SHGetPathFromIDListW)(LPCITEMIDLIST, LPWSTR) = NIL;
 
 HMODULE		 shellDLL;
 
@@ -22,15 +24,52 @@ void SHLObjMini_Init()
 {
 	shellDLL = LoadLibraryA("shell32.dll");
 
-	ex_SHBrowseForFolderA = (LPITEMIDLIST (WINAPI *)(PBROWSEINFOA)) GetProcAddress(shellDLL, "SHBrowseForFolderA");
-	ex_SHBrowseForFolderW = (LPITEMIDLIST (WINAPI *)(PBROWSEINFOW)) GetProcAddress(shellDLL, "SHBrowseForFolderW");
-	ex_SHGetPathFromIDListA = (BOOL (WINAPI *)(LPCITEMIDLIST, LPSTR)) GetProcAddress(shellDLL, "SHGetPathFromIDListA");
-	ex_SHGetPathFromIDListW = (BOOL (WINAPI *)(LPCITEMIDLIST, LPWSTR)) GetProcAddress(shellDLL, "SHGetPathFromIDListW");
+	ex_SHBrowseForFolderA	= (LPITEMIDLIST (WINAPI *)(PBROWSEINFOA)) GetProcAddress(shellDLL, "SHBrowseForFolderA");
+	ex_SHBrowseForFolderW	= (LPITEMIDLIST (WINAPI *)(PBROWSEINFOW)) GetProcAddress(shellDLL, "SHBrowseForFolderW");
+	ex_SHGetPathFromIDListA	= (BOOL (WINAPI *)(LPCITEMIDLIST, LPSTR)) GetProcAddress(shellDLL, "SHGetPathFromIDListA");
+	ex_SHGetPathFromIDListW	= (BOOL (WINAPI *)(LPCITEMIDLIST, LPWSTR)) GetProcAddress(shellDLL, "SHGetPathFromIDListW");
 }
 
 void SHLObjMini_Deinit()
 {
 	FreeLibrary(shellDLL);
+
+	ex_SHBrowseForFolderA	= NIL;
+	ex_SHBrowseForFolderW	= NIL;
+	ex_SHGetPathFromIDListA	= NIL;
+	ex_SHGetPathFromIDListW	= NIL;
+}
+
+size_t	 (*iconv)(iconv_t, const char **, size_t *, char **, size_t *) = NIL;
+iconv_t	 (*iconv_open)(const char *, const char *) = NIL;
+int	 (*iconv_close)(iconv_t) = NIL;
+
+HMODULE	 iconvDLL = NIL;
+
+S::Bool S::LoadIconvDLL()
+{
+	iconvDLL = LoadLibraryA(Application::GetApplicationDirectory().Append("iconv.dll"));
+
+	if (iconvDLL == NIL) return False;
+
+	iconv		= (size_t (*)(iconv_t, const char **, size_t *, char **, size_t *)) GetProcAddress(iconvDLL, "iconv");
+	iconv_open	= (iconv_t (*)(const char *, const char *)) GetProcAddress(iconvDLL, "iconv_open");
+	iconv_close	= (int (*)(iconv_t)) GetProcAddress(iconvDLL, "iconv_close");
+
+	if (iconv == NIL)	{ FreeIconvDLL(); return False; }
+	if (iconv_open == NIL)	{ FreeIconvDLL(); return False; }
+	if (iconv_close == NIL)	{ FreeIconvDLL(); return False; }
+
+	return True;
+}
+
+S::Void S::FreeIconvDLL()
+{
+	FreeLibrary(iconvDLL);
+
+	iconv		= NIL;
+	iconv_open	= NIL;
+	iconv_close	= NIL;
 }
 
 HINSTANCE	 hDllInstance = NIL;

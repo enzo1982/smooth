@@ -476,7 +476,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 				{
 					Bool	 destroyPopup = True;
 
-					if (Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->handle >= ((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->handle) destroyPopup = False;
+					if (WindowGDI::GetWindow((HWND) wParam) != NIL) if (WindowGDI::GetWindow((HWND) wParam)->handle >= ((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->handle) destroyPopup = False;
 
 					if (destroyPopup)
 					{

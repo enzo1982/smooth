@@ -66,10 +66,9 @@ S::Int S::GUI::PopupMenu::Show()
 	if (!registered)	return Error;
 	if (visible)		return Success;
 
-	Window		*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Error;
-	if (wnd->hwnd == NIL) return Error;
 
 	EnterProtectedRegion();
 
@@ -146,7 +145,6 @@ S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 

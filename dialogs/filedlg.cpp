@@ -12,7 +12,7 @@
 
 #include <smooth/filedlg.h>
 #include <smooth/stk.h>
-#include <smooth/graphics/window.h>
+#include <smooth/graphics/gdi/windowgdi.h>
 
 #include <commdlg.h>
 
@@ -40,7 +40,7 @@ S::Int S::DialogFileSelection::ShowDialog()
 
 		for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
 
-		if (parentWindow != NIL)	ofnw.hwndOwner = parentWindow->hwnd;
+		if (parentWindow != NIL)	ofnw.hwndOwner = ((GUI::WindowGDI *) parentWindow)->hwnd;
 		else				ofnw.hwndOwner = NIL;
 
 		ofnw.lStructSize	= sizeof(OPENFILENAMEW);
@@ -159,7 +159,7 @@ S::Int S::DialogFileSelection::ShowDialog()
 
 		for (Int j = 0; j < 32768; j++) buffera[j] = 0;
 
-		if (parentWindow != NIL)	ofna.hwndOwner = parentWindow->hwnd;
+		if (parentWindow != NIL)	ofna.hwndOwner = ((GUI::WindowGDI *) parentWindow)->hwnd;
 		else				ofna.hwndOwner = NIL;
 
 		ofna.lStructSize	= sizeof(OPENFILENAMEA);

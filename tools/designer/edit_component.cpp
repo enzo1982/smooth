@@ -11,7 +11,6 @@
 #include <smooth.h>
 #include <time.h>
 #include "edit_component.h"
-#include "tools.h"
 
 Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 {
@@ -58,10 +57,10 @@ Void Designer_EditComponent::EventProc(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_MOUSEMOVE:
-			if ((status.mousex != MouseX(wnd->hwnd, WINDOW) || status.mousey != MouseY(wnd->hwnd, WINDOW)) && !(status.event == STATUS_EVENT_REPORT_WINDOWPOSITION && (clock() - status.ticks) < 100))
+			if ((status.mousex != wnd->MouseX() || status.mousey != wnd->MouseY()) && !(status.event == STATUS_EVENT_REPORT_WINDOWPOSITION && (clock() - status.ticks) < 100))
 			{
-				status.mousex = MouseX(wnd->hwnd, WINDOW);
-				status.mousey = MouseY(wnd->hwnd, WINDOW);
+				status.mousex = wnd->MouseX();
+				status.mousey = wnd->MouseY();
 
 				status.event = STATUS_EVENT_REPORT_MOUSEPOSITION;
 

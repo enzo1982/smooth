@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W1 /Gm /GX /ZI /Od /I "../include" /D "WIN32" /D "__WIN32__" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_UNICODE" /D "UNICODE" /YX /FD /GZ /c
+# ADD CPP /nologo /Gm /GX /ZI /Od /I "../include" /D "WIN32" /D "__WIN32__" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_UNICODE" /D "UNICODE" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
@@ -97,10 +97,6 @@ SOURCE=..\tools\designer\designer.cpp
 
 SOURCE=..\tools\designer\edit_component.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\tools\designer\tools.cpp
-# End Source File
 # End Group
 # Begin Group "Header-Dateien"
 
@@ -116,10 +112,6 @@ SOURCE=..\tools\designer\edit_component.h
 # Begin Source File
 
 SOURCE=..\tools\designer\status.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\tools\designer\tools.h
 # End Source File
 # End Group
 # Begin Group "Ressourcendateien"

@@ -63,8 +63,8 @@ LIB32=link.exe -lib
 # PROP Output_Dir "Build"
 # PROP Intermediate_Dir "libiconv___Win32_Debug"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ  /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../include" /D "WIN32" /D "__WIN32__" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ  /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../include" /D "WIN32" /D "__WIN32__" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "_ICONVDLL_" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -655,6 +655,14 @@ SOURCE=..\libraries\libiconv\viscii.h
 # Begin Group "Header-Dateien"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Group "libiconv"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\libiconv\iconv.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\include\iconv.h

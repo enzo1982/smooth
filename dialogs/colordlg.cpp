@@ -346,8 +346,6 @@ S::Bool S::DialogColorSelection::ColorDlgKillProc()
 
 void S::DialogColorSelection::ColorDlgPaintProc()
 {
-	if (dlgwnd->hwnd == NIL) return;
-
 	Surface		*surface = dlgwnd->GetDrawSurface();
 	Rect		 rect;
 	Point		 p1;

@@ -4,6 +4,8 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 
 - rect.cpp	- new methods: Bool DoRectsOverlap(Rect, Rect); and Rect OverlapRect(Rect, Rect);
 - widget.cpp	- new method: Bool IsAffected(Rect &); replaces corresponding STK function
+- window.cpp	- renamed Window to WindowBase; it is now a common base class for different system dependend implementations
+- windowgdi.cpp	- new class: WindowGDI; implements Window API for Win32 systems
 
 - removed some Windows API calls
 - preparing to remove smooth Toolkit (STK, stk.cpp)

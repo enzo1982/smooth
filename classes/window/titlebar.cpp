@@ -20,6 +20,7 @@
 #include <smooth/application.h>
 #include <smooth/binary.h>
 #include <smooth/graphics/bitmap.h>
+#include <smooth/graphics/gdi/windowgdi.h>
 
 const S::Int	 S::GUI::Titlebar::classID = S::Object::RequestClassID();
 
@@ -57,7 +58,6 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
@@ -213,7 +213,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = myContainer->GetContainerWindow();
+	WindowGDI	*wnd = (WindowGDI *) myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -273,11 +273,11 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			}
 			else if (GetActiveWindow() != wnd->hwnd)
 			{
-				if (Window::GetWindow(GetActiveWindow()) != NIL)
+				if (WindowGDI::GetWindow(GetActiveWindow()) != NIL)
 				{
-					if (Window::GetWindow(GetActiveWindow())->GetObjectType() == ToolWindow::classID)
+					if (WindowGDI::GetWindow(GetActiveWindow())->GetObjectType() == ToolWindow::classID)
 					{
-						Window	*rWnd = Window::GetWindow(GetActiveWindow());
+						Window	*rWnd = WindowGDI::GetWindow(GetActiveWindow());
 
 						while (True)
 						{

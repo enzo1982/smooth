@@ -12,10 +12,6 @@
 #include <smooth/stk.h>
 #include <smooth/color.h>
 
-size_t	 (*ex_iconv)(iconv_t, const char **, size_t *, char **, size_t *) = NIL;
-iconv_t	 (*ex_iconv_open)(const char *, const char *) = NIL;
-int	 (*ex_iconv_close)(iconv_t) = NIL;
-
 #ifdef __WIN32__
 #include <smooth/application.h>
 #include <smooth/graphics/window.h>
@@ -29,8 +25,6 @@ int	 (*ex_iconv_close)(iconv_t) = NIL;
 #include <smooth/divider.h>
 #include <smooth/pciio.h>
 #include <smooth/mdiwindow.h>
-
-HMODULE	 iconvdll = NIL;
 
 S::I18n::Translator	*S::SMOOTH::i18n = NIL;
 
@@ -78,36 +72,3 @@ HBITMAP S::SMOOTH::LoadImage(String file, Int id, String name)
 	return bmp;
 }
 #endif
-
-S::Bool S::LoadIconvDLL()
-{
-#ifdef __WIN32__
-	iconvdll = LoadLibraryA(Application::GetApplicationDirectory().Append("iconv.dll"));
-
-	if (iconvdll == NIL) return false;
-
-	ex_iconv	= (size_t (*)(iconv_t, const char **, size_t *, char **, size_t *)) GetProcAddress(iconvdll, "libiconv");
-	ex_iconv_open	= (iconv_t (*)(const char *, const char *)) GetProcAddress(iconvdll, "libiconv_open");
-	ex_iconv_close	= (int (*)(iconv_t)) GetProcAddress(iconvdll, "libiconv_close");
-
-	if (ex_iconv == NIL)		{ FreeIconvDLL(); return false; }
-	if (ex_iconv_open == NIL)	{ FreeIconvDLL(); return false; }
-	if (ex_iconv_close == NIL)	{ FreeIconvDLL(); return false; }
-#else
-	ex_iconv	= iconv;
-	ex_iconv_open	= iconv_open;
-	ex_iconv_close	= iconv_close;
-#endif
-
-	return true;
-}
-
-S::Void S::FreeIconvDLL()
-{
-#ifdef __WIN32__
-	FreeLibrary(iconvdll);
-#endif
-	ex_iconv = NIL;
-	ex_iconv_open = NIL;
-	ex_iconv_close = NIL;
-}

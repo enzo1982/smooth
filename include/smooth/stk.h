@@ -37,10 +37,6 @@ namespace smooth
 #undef LoadImage
 #endif
 
-extern size_t	 (*ex_iconv)(iconv_t, const char **, size_t *, char **, size_t *);
-extern iconv_t	 (*ex_iconv_open)(const char *, const char *);
-extern int	 (*ex_iconv_close)(iconv_t);
-
 namespace smooth
 {
 	class SMOOTHAPI SMOOTH
@@ -56,11 +52,6 @@ namespace smooth
 			static Int		 SplashScreen(const GUI::Bitmap &, Int);
 #endif
 	};
-
-#ifdef __SMOOTH_DLL__
-	Bool	 LoadIconvDLL();
-	Void	 FreeIconvDLL();
-#endif
 };
 
 #endif

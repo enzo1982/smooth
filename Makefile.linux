@@ -35,9 +35,9 @@ DESIGNERDIR = ./tools/designer
 RESOURCEDIR = ./resources
 BINRESDIR = $(RESOURCEDIR)/binary
 
-OBJECTS = $(OBJECTDIR)/application.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/system.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadmanager.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o
+OBJECTS = $(OBJECTDIR)/application.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectmanager.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/system.o $(OBJECTDIR)/bitmapnone.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/font.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/window.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadmanager.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o
 
-SAMPLESLIBS = -lsmooth -bz2 -lxml -liconv -lX11
+SAMPLESLIBS = -lsmooth -bzip2 -lxml2 -lpthread -lX11
 
 DLLNAME = $(LIBDIR)/libsmooth.so
 
@@ -49,7 +49,7 @@ OTHERLIBS = $(LIBIOLIB) $(LIBLISA)
 IOLIBOBJECTS = $(OBJECTDIR)/iolib_instream.o $(OBJECTDIR)/iolib_iolib.o $(OBJECTDIR)/iolib_iolibdriver.o $(OBJECTDIR)/iolib_iolibfilter.o $(OBJECTDIR)/iolib_iolibstream.o $(OBJECTDIR)/iolib_outstream.o $(OBJECTDIR)/iolib_driver_ansi.o $(OBJECTDIR)/iolib_driver_posix.o $(OBJECTDIR)/iolib_driver_memory.o $(OBJECTDIR)/iolib_driver_zero.o $(OBJECTDIR)/iolib_filter_bzip2.o $(OBJECTDIR)/iolib_filter_xor.o
 LISAOBJECTS = $(OBJECTDIR)/lisa_lisa.o
 
-DESIGNEROBJECTS = $(OBJECTDIR)/designer.o $(OBJECTDIR)/edit_component.o $(OBJECTDIR)/tools.o
+DESIGNEROBJECTS = $(OBJECTDIR)/designer.o $(OBJECTDIR)/edit_component.o
 SAMPLE1OBJECTS = $(SAMPLE1DIR)/beat.o
 SAMPLE2OBJECTS = $(SAMPLE2DIR)/test.o
 SAMPLE3OBJECTS = $(SAMPLE3DIR)/testkey.o
@@ -74,7 +74,7 @@ REMOVER = rm
 COPIER = cp
 ECHO = echo
 AR = ar
-COMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/X11R6/include -march=i586 -O6 -ffast-math -fPIC -Wno-pmf-conversions -fno-exceptions -fpermissive -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -c
+COMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/X11R6/include -march=i586 -O6 -ffast-math -fPIC -Wno-pmf-conversions -fno-exceptions -fpermissive -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -DLIBICONV_PLUG -c
 LINKER_OPTS = -L$(LIBDIR) -L/usr/X11R6/lib -shared -Wl,-soname,libsmooth.so -o $(DLLNAME)
 PLUGIN_LINKER_OPTS = -L$(LIBDIR) -L/usr/X11R6/lib -o $(SAMPLE4DLL)
 EXECOMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/X11R6/include -march=i586 -O6 -ffast-math -Wno-pmf-conversions -fno-exceptions -c

@@ -19,6 +19,7 @@ namespace smooth
 	Void	 FreeIconvDLL();
 };
 
+#ifdef __WIN32__
 extern HINSTANCE	 hDllInstance;
 
 #ifndef __SMOOTH_STATIC__
@@ -26,6 +27,8 @@ extern "C"
 {
 	BOOL WINAPI DllMain(HINSTANCE, DWORD, LPVOID);
 }
+#endif
+
 #endif
 
 #endif

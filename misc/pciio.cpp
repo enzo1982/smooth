@@ -15,7 +15,6 @@
 
 #include <iolib-cxx.h>
 #include <smooth/string.h>
-#include <smooth/graphics/gdi/surfacegdi.h>
 
 S::String	 cfNames[10];
 S::String	 cpNames[5];

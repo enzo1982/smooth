@@ -16,7 +16,7 @@ S::Threads::SemaphorePOSIX::SemaphorePOSIX(Void *iSemaphore)
 
 	if (iSemaphore != NIL)
 	{
-		semaphore	= (sem_t) iSemaphore;
+		semaphore	= (sem_t *) iSemaphore;
 		mySemaphore	= False;
 	}
 	else

@@ -34,6 +34,8 @@
 
 #ifdef __WIN32__
 #include <smooth/graphics/gdi/windowgdi.h>
+#else
+#include <smooth/graphics/windowbackend.h>
 #endif
 
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
@@ -143,10 +145,11 @@ S::GUI::Bitmap &S::GUI::Window::GetIcon()
 
 S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 {
-	Bitmap	 newIcon;
+	Bitmap	 newIcon = nIcon;
 
-	if (&nIcon == &SI_DEFAULT)	newIcon = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
-	else				newIcon = nIcon;
+#ifdef __WIN32__
+	if (&nIcon == &SI_DEFAULT) newIcon = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
+#endif
 
 	if (newIcon != NIL)
 	{
@@ -411,6 +414,7 @@ S::Int S::GUI::Window::Stay()
 {
 	if (!registered) return value;
 
+#ifdef __WIN32__
 	MSG	 msg;
 
 	SetFlags(flags | WF_MODAL);
@@ -454,6 +458,7 @@ S::Int S::GUI::Window::Stay()
 	}
 
 	if (nOfActiveWindows == 0 && !initializing) PostQuitMessage(0);
+#endif
 
 	return value;
 }
@@ -462,8 +467,10 @@ S::Int S::GUI::Window::Close()
 {
 	Process(SM_LOOSEFOCUS, 0, 0);
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)	::PostMessageW((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
 	else				::PostMessageA((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
+#endif
 
 	return Success;
 }
@@ -481,6 +488,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);
 
+	Int	 rVal = -1;
+
+#ifdef __WIN32__
 	if (trackMenu != NIL && (message == SM_LBUTTONDOWN || message == SM_RBUTTONDOWN || message == WM_KILLFOCUS))
 	{
 		Bool	 destroyPopup = True;
@@ -495,8 +505,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			trackMenu = NIL;
 		}
 	}
-
-	Int	 rVal = -1;
 
 	switch (message)
 	{
@@ -714,6 +722,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 	}
+#endif
 
 	if (rVal == -1)
 	{
@@ -1052,7 +1061,9 @@ S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 
 	if (surface->GetSystemSurface() == NIL) return False;
 
+#ifdef __WIN32__
 	if (!PtVisible((HDC) surface->GetSystemSurface(), Input::MouseX() - objectProperties->pos.x, Input::MouseY() - objectProperties->pos.y)) return False;
+#endif
 
 	if ((MouseX() >= rect.left) && (MouseX() <= rect.right) && (MouseY() >= rect.top) && (MouseY() <= rect.bottom))	return True;
 	else														return False;

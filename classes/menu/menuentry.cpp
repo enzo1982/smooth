@@ -342,6 +342,7 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+#ifdef __WIN32__
 		case WM_KILLFOCUS:
 			if ((popup != NIL) && objectProperties->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 			{
@@ -362,6 +363,7 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+#endif
 	}
 
 	LeaveProtectedRegion();

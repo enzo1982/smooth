@@ -16,7 +16,7 @@ S::Threads::ThreadPOSIX::ThreadPOSIX(Void *iThread)
 
 	if (iThread != NIL)
 	{
-		thread		= (pthread_t) iThread;
+		thread		= (pthread_t *) iThread;
 		myThread	= False;
 	}
 	else
@@ -38,7 +38,7 @@ S::Void *S::Threads::ThreadPOSIX::GetSystemThread()
 
 S::Int S::Threads::ThreadPOSIX::GetThreadID()
 {
-	return thread - NIL;
+	return thread - (pthread_t *) NIL;
 }
 
 S::Int S::Threads::ThreadPOSIX::Start(Void (*threadProc)(Void *), Void *threadParam)

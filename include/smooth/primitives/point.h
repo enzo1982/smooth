@@ -36,6 +36,9 @@ namespace smooth
 			Point operator	 +(const Point &);
 			Point operator	 -(const Point &);
 
+			Point operator	 *(const Float);
+			Point operator	 /(const Float);
+
 			Bool operator	 ==(const Point &);
 			Bool operator	 !=(const Point &);
 	};

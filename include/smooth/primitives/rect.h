@@ -37,6 +37,9 @@ namespace smooth
 					 Rect();
 					 Rect(const Point &, const Size &);
 
+			Rect operator	 *(const Float);
+			Rect operator	 /(const Float);
+
 			Bool operator	 ==(const Rect &);
 			Bool operator	 !=(const Rect &);
 

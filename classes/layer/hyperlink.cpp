@@ -45,28 +45,18 @@ S::GUI::Hyperlink::Hyperlink(String text, const Bitmap &bitmap, String link, Poi
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
 	if (linkBitmap != NIL)
 	{
-		if (size.cx == 0 && size.cy == 0)
-		{
-			objectProperties->size.cx = Math::Round(linkBitmap.GetSize().cx * Setup::FontSize);
-			objectProperties->size.cy = Math::Round(linkBitmap.GetSize().cy * Setup::FontSize);
-		}
-		else
-		{
-			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
-		}
+		if (size.cx == 0 && size.cy == 0) objectProperties->size = linkBitmap.GetSize();
 	}
 	else
 	{
 		GetTextSize();
 
-		objectProperties->size.cx = objectProperties->textSize.cx;
-		objectProperties->size.cy = objectProperties->textSize.cy;
+		objectProperties->size = objectProperties->textSize;
 	}
 }
 

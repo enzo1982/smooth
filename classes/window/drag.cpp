@@ -75,10 +75,8 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 
 					Rect	 wndRect = wnd->GetWindowRect();
 
-					wnd->GetObjectProperties()->pos.x	= wndRect.left;
-					wnd->GetObjectProperties()->pos.y	= wndRect.top;
-					wnd->GetObjectProperties()->size.cx	= wndRect.right - wndRect.left;
-					wnd->GetObjectProperties()->size.cy	= wndRect.bottom - wndRect.top;
+					wnd->GetObjectProperties()->pos = Point(wndRect.left, wndRect.top);
+					wnd->GetObjectProperties()->size = Size(wndRect.right - wndRect.left, wndRect.bottom - wndRect.top);
 				}
 				while (GetAsyncKeyState(leftButton) != 0);
 

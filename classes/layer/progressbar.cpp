@@ -33,22 +33,18 @@ S::GUI::Progressbar::Progressbar(Point pos, Size size, Int subType, Int iTextFla
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
 	if (subtype == OR_HORZ)
 	{
-		if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
-		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * Setup::FontSize);
-		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+		if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
+		if (objectProperties->size.cy == 0) objectProperties->size.cy = 19;
 	}
 	else
 	{
-		if (size.cx == 0)	objectProperties->size.cx = Math::Round(19 * Setup::FontSize);
-		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = Math::Round(80 * Setup::FontSize);
-		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+		if (objectProperties->size.cx == 0) objectProperties->size.cx = 19;
+		if (objectProperties->size.cy == 0) objectProperties->size.cy = 80;
 	}
 }
 

@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/primitives/point.h>
+#include <smooth/misc/math.h>
 
 S::Point::Point()
 {
@@ -32,6 +33,20 @@ S::Point S::Point::operator +(const Point &point)
 S::Point S::Point::operator -(const Point &point)
 {
 	Point	 retP(x - point.x, y - point.y);
+
+	return retP;
+}
+
+S::Point S::Point::operator *(const Float factor)
+{
+	Point	 retP(Math::Round(x * factor), Math::Round(y * factor));
+
+	return retP;
+}
+
+S::Point S::Point::operator /(const Float divisor)
+{
+	Point	 retP(Math::Round(x / divisor), Math::Round(y / divisor));
 
 	return retP;
 }

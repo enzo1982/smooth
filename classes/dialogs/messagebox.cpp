@@ -71,8 +71,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 	Point	 bpos;
 	Size	 bsize;
 	int	 titlesize = 0;
-	Int	 buttonWidth = Math::Round(80 * Setup::FontSize);
-	Int	 buttonHeight = Math::Round(22 * Setup::FontSize);
+	Int	 buttonWidth = 80;
+	Int	 buttonHeight = 22;
 
 	lines = 1;
 	msgbox->GetObjectProperties()->size.cx = 0;

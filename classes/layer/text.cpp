@@ -24,9 +24,7 @@ S::GUI::Text::Text(String text, Point pos)
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
-
+	objectProperties->pos = pos;
 	objectProperties->text = text;
 
 	GetTextSize();

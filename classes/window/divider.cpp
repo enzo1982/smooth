@@ -26,8 +26,7 @@ S::GUI::Divider::Divider(Int pos, Int iOrientation)
 	flags				= iOrientation;
 	objectProperties->orientation	= OR_FREE;
 
-	if (pos == 0)	pos = Math::Round(120 * Setup::FontSize);
-	else		pos = Math::Round(pos * Setup::FontSize);
+	if (pos == 0) pos = 120;
 
 	possibleContainers.AddEntry(Window::classID);
 	possibleContainers.AddEntry(Layer::classID);

@@ -36,6 +36,9 @@ namespace smooth
 			Size operator	 +(const Size &);
 			Size operator	 -(const Size &);
 
+			Size operator	 *(const Float);
+			Size operator	 /(const Float);
+
 			Bool operator	 ==(const Size &);
 			Bool operator	 !=(const Size &);
 	};

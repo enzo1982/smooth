@@ -27,6 +27,19 @@ S::Rect::Rect(const Point &iPos, const Size &iSize)
 	bottom	= top + iSize.cy;
 }
 
+S::Rect S::Rect::operator *(const Float factor)
+{
+	Rect	 retR(Point(left, top) * factor, Size(right - left, bottom - top) * factor);
+
+	return retR;
+}
+
+S::Rect S::Rect::operator /(const Float divisor)
+{
+	Rect	 retR(Point(left, top) / divisor, Size(right - left, bottom - top) / divisor);
+
+	return retR;
+}
 
 S::Bool S::Rect::operator ==(const Rect &rect)
 {

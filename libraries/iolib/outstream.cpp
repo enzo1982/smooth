@@ -178,10 +178,6 @@ bool OutStream::Flush()
 		WriteData();
 
 		packageSize = ps;
-
-		delete [] data;
-
-		data = new unsigned char [packageSize];
 	}
 
 	return true;

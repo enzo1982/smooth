@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/primitives/size.h>
+#include <smooth/misc/math.h>
 
 S::Size::Size()
 {
@@ -24,14 +25,28 @@ S::Size::Size(Int iCX, Int iCY)
 
 S::Size S::Size::operator +(const Size &size)
 {
-	Size	 retP(cx + size.cx, cy + size.cy);
+	Size	 retS(cx + size.cx, cy + size.cy);
 
-	return retP;
+	return retS;
 }
 
 S::Size S::Size::operator -(const Size &size)
 {
 	Size	 retS(cx - size.cx, cy - size.cy);
+
+	return retS;
+}
+
+S::Size S::Size::operator *(const Float factor)
+{
+	Size	 retS(Math::Round(cx * factor), Math::Round(cy * factor));
+
+	return retS;
+}
+
+S::Size S::Size::operator /(const Float divisor)
+{
+	Size	 retS(Math::Round(cx / divisor), Math::Round(cy / divisor));
 
 	return retS;
 }

@@ -126,8 +126,8 @@ S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 {
 	if (gdi_dc == NIL) return Success;
 
-	::SetPixel(gdi_dc, TranslateX(x), y, color);
-	::SetPixel(bmp_dc, TranslateX(x), y, color);
+	::SetPixel(gdi_dc, TranslateX(x), TranslateY(y), color);
+	::SetPixel(bmp_dc, TranslateX(x), TranslateY(y), color);
 
 	return Success;
 }
@@ -136,7 +136,7 @@ S::Int S::GUI::SurfaceGDI::GetPixel(Int x, Int y)
 {
 	if (gdi_dc == NIL) return 0;
 
-	return ::GetPixel(gdi_dc, TranslateX(x), y);
+	return ::GetPixel(gdi_dc, TranslateX(x), TranslateY(y));
 }
 
 S::Int S::GUI::SurfaceGDI::Line(Point pos1, Point pos2, Int color)

@@ -44,6 +44,7 @@ namespace smooth
 				Int						 painting;
 
 				Int						 TranslateX(Int);
+				Int						 TranslateY(Int);
 				Point						 TranslatePoint(Point);
 				Rect						 TranslateRect(Rect);
 			public:

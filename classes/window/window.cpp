@@ -73,8 +73,7 @@ S::GUI::Window::Window(String title, Void *iWindow)
 	initshow	= False;
 	firstPaint	= True;
 
-	objectProperties->size.cx = Math::Round(200 * Setup::FontSize);
-	objectProperties->size.cy = Math::Round(200 * Setup::FontSize);
+	objectProperties->size = Size(200, 200);
 
 	trackMenu = NIL;
 	paintTimer = NIL;
@@ -119,12 +118,10 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	updateRect = Rect();
 
-	if (created) backend->SetMetrics(Point(Math::Round(nPos.x * Setup::FontSize), Math::Round(nPos.y * Setup::FontSize)), Size(Math::Round(nSize.cx * Setup::FontSize), Math::Round(nSize.cy * Setup::FontSize)));
+	if (created) backend->SetMetrics(nPos, nSize);
 
-	objectProperties->pos.x		= Math::Round(nPos.x * Setup::FontSize);
-	objectProperties->pos.y		= Math::Round(nPos.y * Setup::FontSize);
-	objectProperties->size.cx	= Math::Round(nSize.cx * Setup::FontSize);
-	objectProperties->size.cy	= Math::Round(nSize.cy * Setup::FontSize);
+	objectProperties->pos	= nPos;
+	objectProperties->size	= nSize;
 
 	return Success;
 }
@@ -586,19 +583,14 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
 				Bool		 resized = (objectProperties->size.cx != wndpos->cx || objectProperties->size.cy != wndpos->cy);
 
-				objectProperties->pos.x		= wndpos->x;
-				objectProperties->pos.y		= wndpos->y;
-				objectProperties->size.cx	= wndpos->cx;
-				objectProperties->size.cy	= wndpos->cy;
+				objectProperties->pos	= Point(wndpos->x, wndpos->y);
+				objectProperties->size	= Size(wndpos->cx, wndpos->cy);
 
 				GetDrawSurface()->SetSize(objectProperties->size);
 
 				if (resized)
 				{
-					updateRect.left = 0;
-					updateRect.top = 0;
-					updateRect.right = updateRect.left + objectProperties->size.cx;
-					updateRect.bottom = updateRect.top + objectProperties->size.cy;
+					updateRect = Rect(Point(0, 0), objectProperties->size);
 
 					CalculateOffsets();
 

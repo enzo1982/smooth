@@ -149,7 +149,7 @@ Object *Designer_EditComponent::AddObject(Int objid)
 			newobj = new Menubar();
 			break;
 		default:
-			SMOOTH::MessageBox("Unknown object ID!", "Error", MB_OK, IDI_HAND);
+			QuickMessage("Unknown object ID!", "Error", MB_OK, IDI_HAND);
 			return NIL;
 	}
 

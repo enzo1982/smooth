@@ -14,7 +14,6 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/window.h>
 #include <smooth/math.h>
-#include <smooth/stk.h>
 #include <smooth/layer.h>
 
 const S::Int	 S::GUI::ActiveArea::classID = S::Object::RequestClassID();

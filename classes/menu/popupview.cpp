@@ -10,7 +10,6 @@
 
 #include <smooth/popupview.h>
 #include <smooth/definitions.h>
-#include <smooth/stk.h>
 #include <smooth/metrics.h>
 #include <smooth/optionbox.h>
 #include <smooth/checkbox.h>

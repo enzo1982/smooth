@@ -25,7 +25,6 @@
 #include "smooth/object.h"
 #include "smooth/container.h"
 #include "smooth/array.h"
-#include "smooth/stk.h"
 #include "smooth/graphics/window.h"
 #include "smooth/titlebar.h"
 #include "smooth/statusbar.h"
@@ -97,6 +96,8 @@
 #include "smooth/extended.h"
 #include "smooth/graphics/bitmap.h"
 #include "smooth/graphics/bitmapbackend.h"
+#include "smooth/messagebox.h"
+#include "smooth/splashscreen.h"
 
 #if defined __WIN32__
 #include "smooth/graphics/gdi/bitmapgdi.h"

@@ -182,7 +182,7 @@ Bool Translator::ExitProc()
 
 		for (int j = ++lastBs; j < filename.Length(); j++) file[j - lastBs] = filename[j];
 
-		Int	 id = SMOOTH::MessageBox(String("Do you want to save changes in ").Append(file).Append("?"), "smooth Translator", MB_YESNOCANCEL, IDI_QUESTION);
+		Int	 id = QuickMessage(String("Do you want to save changes in ").Append(file).Append("?"), "smooth Translator", MB_YESNOCANCEL, IDI_QUESTION);
 
 		switch (id)
 		{

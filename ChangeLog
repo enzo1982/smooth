@@ -7,7 +7,9 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - window.cpp	- renamed Window to WindowBase; it is now a common base class for different system dependend implementations
 - windowgdi.cpp	- new class: WindowGDI; implements Window API for Win32 systems
 - bitmap.cpp	- splitted into a frontend and a system dependent backend part
+- messagebox.cpp- S::SMOOTH::MessageBox is now S::QuickMessage
+		- renamed MessageBoxApp to MessageDialog
 
 - removed some Windows API calls
-- preparing to remove smooth Toolkit (STK, stk.cpp)
+- removed smooth Toolkit (STK, stk.cpp)
 - removed mpToolkit (toolkit.cpp)

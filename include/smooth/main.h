@@ -11,12 +11,12 @@
 #ifndef _H_OBJSMOOTH_WINAPPLICATION_
 #define _H_OBJSMOOTH_WINAPPLICATION_
 
-#include "stk.h"
 #include "system.h"
 #include "loop.h"
 #include "version.h"
 #include "string.h"
 #include "application.h"
+#include "messagebox.h"
 
 using namespace smooth;
 
@@ -32,7 +32,7 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdL
 
 	if (System::GetVersionString() != (String) SMOOTH_VERSION)
 	{
-		if (IDNO == SMOOTH::MessageBox("This program might not be compatible with the SMOOTH library\ninstalled on your system. Continue execution?", "Warning", MB_YESNO, IDI_QUESTION))
+		if (IDNO == QuickMessage("This program might not be compatible with the SMOOTH library\ninstalled on your system. Continue execution?", "Warning", MB_YESNO, IDI_QUESTION))
 		{
 			Free();
 

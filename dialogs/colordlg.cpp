@@ -13,7 +13,6 @@
 #include <smooth/graphics/window.h>
 #include <smooth/i18n.h>
 #include <smooth/color.h>
-#include <smooth/stk.h>
 #include <smooth/button.h>
 #include <smooth/definitions.h>
 #include <smooth/divider.h>
@@ -74,17 +73,17 @@ S::DialogColorSelection::DialogColorSelection()
 	bs.cx = 0;
 	bs.cy = 0;
 
-	dlgwnd = new Window(SMOOTH::i18n->TranslateString("Color selection"));
+	dlgwnd = new Window(I18n::Translator::defaultTranslator->TranslateString("Color selection"));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
-	okbtn		= new Button(SMOOTH::i18n->TranslateString("OK"), NIL, bp, bs);
+	okbtn		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bp, bs);
 	okbtn->onClick.Connect(&DialogColorSelection::ColorDlgOK, this);
 	okbtn->SetOrientation(OR_LOWERRIGHT);
 
 	bp.x = 175;
 
-	cancelbtn = new Button(SMOOTH::i18n->TranslateString("Cancel"), NIL, bp, bs);
+	cancelbtn = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bp, bs);
 	cancelbtn->onClick.Connect(&DialogColorSelection::ColorDlgCancel, this);
 	cancelbtn->SetOrientation(OR_LOWERRIGHT);
 
@@ -130,43 +129,43 @@ S::DialogColorSelection::DialogColorSelection()
 	bp.x = 189;
 	bp.y = 37;
 
-	huetext = new Text(SMOOTH::i18n->TranslateString("H"), bp);
+	huetext = new Text(I18n::Translator::defaultTranslator->TranslateString("H"), bp);
 	huetext->SetOrientation(OR_UPPERRIGHT);
 	huetext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
-	sattext = new Text(SMOOTH::i18n->TranslateString("S"), bp);
+	sattext = new Text(I18n::Translator::defaultTranslator->TranslateString("S"), bp);
 	sattext->SetOrientation(OR_UPPERRIGHT);
 	sattext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
-	valtext = new Text(SMOOTH::i18n->TranslateString("V"), bp);
+	valtext = new Text(I18n::Translator::defaultTranslator->TranslateString("V"), bp);
 	valtext->SetOrientation(OR_UPPERRIGHT);
 	valtext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
-	redtext = new Text(SMOOTH::i18n->TranslateString("R"), bp);
+	redtext = new Text(I18n::Translator::defaultTranslator->TranslateString("R"), bp);
 	redtext->SetOrientation(OR_UPPERRIGHT);
 	redtext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(255, 0, 0)));
 
 	bp.y += 26;
 
-	greentext = new Text(SMOOTH::i18n->TranslateString("G"), bp);
+	greentext = new Text(I18n::Translator::defaultTranslator->TranslateString("G"), bp);
 	greentext->SetOrientation(OR_UPPERRIGHT);
 	greentext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 160, 0)));
 
 	bp.y += 26;
 
-	bluetext = new Text(SMOOTH::i18n->TranslateString("B"), bp);
+	bluetext = new Text(I18n::Translator::defaultTranslator->TranslateString("B"), bp);
 	bluetext->SetOrientation(OR_UPPERRIGHT);
 	bluetext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 0, 255)));
 
 	bp.y += 26;
 
-	hextext = new Text(SMOOTH::i18n->TranslateString("HTML code"), bp);
+	hextext = new Text(I18n::Translator::defaultTranslator->TranslateString("HTML code"), bp);
 	hextext->SetOrientation(OR_UPPERRIGHT);
 	hextext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 

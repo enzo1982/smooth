@@ -28,7 +28,7 @@ namespace smooth
 
 namespace smooth
 {
-	class MessageBoxApp : public Application
+	class MessageDialog : public Application
 	{
 		private:
 			static Int	 nOfMessageBoxes;
@@ -49,8 +49,9 @@ namespace smooth
 
 			Void		 Create(String, String, Int);
 		public:
-					 MessageBoxApp(String, String, Int, wchar_t *);
-					~MessageBoxApp();
+					 MessageDialog(String, String, Int, wchar_t *);
+					~MessageDialog();
+
 			Void		 MessagePaintProc();
 			Bool		 MessageKillProc();
 
@@ -61,8 +62,12 @@ namespace smooth
 			Void		 MessageRetry();
 			Void		 MessageAbort();
 			Void		 MessageIgnore();
-			Int		 ShowMessageBox();
+
+			Int		 ShowDialog();
 	};
+
+	SMOOTHAPI Int	 QuickMessage(String, String, Int, char *);
+	SMOOTHAPI Int	 QuickMessage(String, String, Int, wchar_t *);
 };
 
 #endif

@@ -16,7 +16,6 @@
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
-#include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/binary.h>

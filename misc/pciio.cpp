@@ -20,7 +20,7 @@
 S::String	 cfNames[10];
 S::String	 cpNames[5];
 
-PCIIO::PCIIO(HBITMAP b)
+PCIIO::PCIIO(const S::GUI::Bitmap &b)
 {
 	cfNames[RGB]		= "RGB";
 	cfNames[HSV]		= "HSV";
@@ -46,13 +46,6 @@ PCIIO::PCIIO(HBITMAP b)
 	quality = 100;
 	description = NIL;
 
-	BITMAP	 bitmap;
-
-	GetObjectA(b, sizeof(bitmap), &bitmap);
-
-	sizex = bitmap.bmWidth;
-	sizey = bitmap.bmHeight;
-
 	dpix = 75;
 	dpiy = 75;
 	bpcc = 8;
@@ -61,32 +54,10 @@ PCIIO::PCIIO(HBITMAP b)
 	imagename = NIL;
 	rlebits = 8;
 
-	bmp.CreateBitmap(sizex, sizey, 24);
+	bmp = b;
 
-#ifdef __WIN32__
-	HDC	 ddc = GetWindowDC(NIL);
-	HDC	 cdc = CreateCompatibleDC(ddc);
-	HBITMAP	 oldbmp;
-	S::Rect	 tgt;
-
-	oldbmp = (HBITMAP) SelectObject(cdc, b);
-
-	S::GUI::SurfaceGDI	*surface = new S::GUI::SurfaceGDI(cdc);
-
-	tgt.left = 0;
-	tgt.top = 0;
-	tgt.right = tgt.left + sizex;
-	tgt.bottom = tgt.top + sizey;
-
-	bmp.BlitFromSurface(surface, tgt, tgt);
-
-	delete surface;
-
-	b = (HBITMAP) SelectObject(cdc, oldbmp);
-
-	DeleteDC(cdc);
-	ReleaseDC(NIL, ddc);
-#endif
+	sizex = bmp.GetSize().cx;
+	sizey = bmp.GetSize().cy;
 }
 
 PCIIO::PCIIO()
@@ -167,37 +138,9 @@ void PCIIO::SetImageName(S::String name)
 	imagename = name;
 }
 
-HBITMAP PCIIO::GetBitmap()
+S::GUI::Bitmap &PCIIO::GetBitmap()
 {
-#ifdef __WIN32__
-	HDC	 ddc = GetWindowDC(NIL);
-	HDC	 cdc = CreateCompatibleDC(ddc);
-	HBITMAP	 hbmp = CreateCompatibleBitmap(ddc, sizex, sizey);
-	HBITMAP	 oldbmp;
-	S::Rect	 tgt;
-
-	oldbmp = (HBITMAP) SelectObject(cdc, hbmp);
-
-	S::GUI::SurfaceGDI	*surface = new S::GUI::SurfaceGDI(cdc);
-
-	tgt.left = 0;
-	tgt.top = 0;
-	tgt.right = tgt.left + sizex;
-	tgt.bottom = tgt.top + sizey;
-
-	bmp.BlitToSurface(tgt, surface, tgt);
-
-	delete surface;
-
-	hbmp = (HBITMAP) SelectObject(cdc, oldbmp);
-
-	DeleteDC(cdc);
-	ReleaseDC(NIL, ddc);
-
-	return hbmp;
-#else
-	return NIL;
-#endif
+	return bmp;
 }
 
 PCIOut CreatePCI(S::String filename)

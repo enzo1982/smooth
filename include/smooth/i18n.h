@@ -70,6 +70,8 @@ namespace smooth
 
 				Int			 ActivateLanguage(String);
 				String			 TranslateString(String);
+
+				static Translator	*defaultTranslator;
 		};
 	};
 };

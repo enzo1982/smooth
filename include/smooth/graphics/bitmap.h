@@ -24,6 +24,7 @@ namespace smooth
 #include "../definitions.h"
 #include "../size.h"
 #include "../rect.h"
+#include "../string.h"
 
 namespace smooth
 {
@@ -69,6 +70,8 @@ namespace smooth
 
 				Bool operator		 ==(const int);
 				Bool operator		 !=(const int);
+
+				static Bitmap		 LoadBitmap(String, Int, String);
 		};
 
 		SMOOTHVAR S::GUI::Bitmap SI_DEFAULT;

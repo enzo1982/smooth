@@ -13,7 +13,6 @@
 #include <smooth/droparea.h>
 #include <smooth/definitions.h>
 #include <smooth/objectproperties.h>
-#include <smooth/stk.h>
 #include <smooth/loop.h>
 #include <smooth/math.h>
 

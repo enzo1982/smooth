@@ -89,7 +89,7 @@ class SMOOTHAPI PCIIO
 		bool		 overwrite;	// overwrite file or append to PCI file
 		int		 imageid;	// image ID in file
 	public:
-				 PCIIO(HBITMAP);
+				 PCIIO(const S::GUI::Bitmap &);
 				 PCIIO();
 				~PCIIO();
 		void		 SetCompressionType(int);
@@ -102,7 +102,7 @@ class SMOOTHAPI PCIIO
 		void		 SelectImage(S::String);
 		void		 SetImageID(int);
 		void		 SetImageName(S::String);
-		HBITMAP		 GetBitmap();
+		S::GUI::Bitmap	&GetBitmap();
 };
 
 SMOOTHAPI PCIOut	 CreatePCI(S::String);		// creates a new PCI file

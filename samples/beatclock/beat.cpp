@@ -67,7 +67,7 @@ BeatClock::BeatClock()
 	wnd->RegisterObject(title);
 	wnd->RegisterObject(menubar);
 
-	wnd->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
+	wnd->SetIcon(Bitmap::LoadBitmap("beat.pci", 0, NIL));
 	wnd->onPaint.Connect(&BeatClock::PaintAll, this);
 	wnd->SetFlags(WF_TOPMOST | WF_NOTASKBUTTON);
 	wnd->SetMetrics(Point(wpx, wpy), Size(164 * Setup::FontSize, 103 * Setup::FontSize));
@@ -303,7 +303,7 @@ Void BeatClock::Options()
 	main_reg1->RegisterObject(alarm);
 	main_reg1->RegisterObject(info);
 
-	optionsdialog->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
+	optionsdialog->SetIcon(Bitmap::LoadBitmap("beat.pci", 0, NIL));
 	optionsdialog->SetMetrics(Point(100, 100), Size(397, 181));
 	optionsdialog->doQuit.Connect(&BeatClock::OptionsKillProc, this);
 
@@ -673,7 +673,7 @@ Void BeatClock::PaintAll()
 
 			if (alarmoption == 0) isalarm = false;
 
-			SMOOTH::MessageBox(String("It is @").Append(String::FromInt(beats)).Append(" internet beats!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
+			QuickMessage(String("It is @").Append(String::FromInt(beats)).Append(" internet beats!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
 		}
 
 		if (beats != alarmbeats && alarmexec)
@@ -689,7 +689,7 @@ Void BeatClock::PaintAll()
 
 			if (alarmoption == 0) isalarm = false;
 
-			SMOOTH::MessageBox(String("The time is ").Append(convertSecondsToTimeString(alarmsecs)).Append("!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
+			QuickMessage(String("The time is ").Append(convertSecondsToTimeString(alarmsecs)).Append("!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
 		}
 
 		if (((int) (mseconds / 1000)) != alarmsecs && alarmexec)
@@ -768,7 +768,7 @@ Void BeatClock::PaintAll()
 
 Void BeatClock::Info()
 {
-	SMOOTH::MessageBox("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2004\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
+	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2004\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
 }
 
 Int BeatClock::GetDayOfWeek(Int day, Int month, Int year)

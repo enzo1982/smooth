@@ -9,7 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/dialog.h>
-#include <smooth/stk.h>
 
 S::Dialog::Dialog()
 {

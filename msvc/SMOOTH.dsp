@@ -518,10 +518,6 @@ SOURCE=..\misc\pciio.cpp
 
 SOURCE=..\misc\splashscreen.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\misc\stk.cpp
-# End Source File
 # End Group
 # End Group
 # Begin Group "Header-Dateien"
@@ -1016,10 +1012,6 @@ SOURCE=..\include\smooth\splashscreen.h
 # Begin Source File
 
 SOURCE=..\include\smooth\statusbar.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\stk.h
 # End Source File
 # Begin Source File
 

@@ -44,6 +44,8 @@ namespace smooth
 			Int		 ShowSplashScreen();
 			Void		 TimerProc();
 	};
+
+	SMOOTHAPI Int	 SplashScreen(const GUI::Bitmap &, Int);
 };
 
 #endif

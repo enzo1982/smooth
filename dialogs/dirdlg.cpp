@@ -9,14 +9,13 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/dirdlg.h>
-#include <smooth/stk.h>
 #include <smooth/i18n.h>
 #include <smooth/shlobjmini.h>
 #include <smooth/graphics/gdi/windowgdi.h>
 
 S::DialogDirSelection::DialogDirSelection()
 {
-	caption = SMOOTH::i18n->TranslateString("Select directory");
+	caption = I18n::Translator::defaultTranslator->TranslateString("Select directory");
 	directory = NIL;
 }
 

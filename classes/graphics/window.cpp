@@ -22,7 +22,6 @@
 #include <smooth/math.h>
 #include <smooth/toolwindow.h>
 #include <smooth/timer.h>
-#include <smooth/stk.h>
 #include <smooth/color.h>
 #include <smooth/objectproperties.h>
 #include <smooth/menubar.h>

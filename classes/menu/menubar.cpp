@@ -14,7 +14,6 @@
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
 #include <smooth/popupmenu.h>
-#include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/toolwindow.h>

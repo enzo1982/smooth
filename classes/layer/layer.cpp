@@ -12,7 +12,6 @@
 #include <smooth/layer.h>
 #include <smooth/definitions.h>
 #include <smooth/i18n.h>
-#include <smooth/stk.h>
 #include <smooth/tabwidget.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>

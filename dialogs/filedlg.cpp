@@ -11,7 +11,6 @@
 #define MAKEUNICODESTR(x) L##x
 
 #include <smooth/filedlg.h>
-#include <smooth/stk.h>
 #include <smooth/graphics/gdi/windowgdi.h>
 
 #include <commdlg.h>

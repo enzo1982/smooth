@@ -12,7 +12,6 @@
 #include <smooth/drag.h>
 #include <smooth/definitions.h>
 #include <smooth/objectproperties.h>
-#include <smooth/stk.h>
 #include <smooth/loop.h>
 
 const S::Int	 S::GUI::DragControl::classID = S::Object::RequestClassID();

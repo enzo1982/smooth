@@ -16,7 +16,6 @@
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 #include <smooth/i18n.h>
-#include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/scrollbar.h>
 #include <smooth/layer.h>

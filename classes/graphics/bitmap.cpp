@@ -11,6 +11,8 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/bitmapbackend.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/application.h>
+#include <smooth/pciio.h>
 
 #ifdef __WIN32__
 #include <smooth/graphics/gdi/bitmapgdi.h>
@@ -160,4 +162,46 @@ S::Bool S::GUI::Bitmap::operator ==(const int nil)
 S::Bool S::GUI::Bitmap::operator !=(const int nil)
 {
 	return (*backend != nil);
+}
+
+S::GUI::Bitmap S::GUI::Bitmap::LoadBitmap(String file, Int id, String name)
+{
+	GUI::Bitmap	 bmp;
+	PCIIn		 pci = OpenPCIForInput(file);
+
+	if (pci->GetLastError() != IOLIB_ERROR_OK)
+	{
+		ClosePCI(pci);
+
+		pci = OpenPCIForInput(Application::GetStartupDirectory().Append(file));
+
+		if (pci->GetLastError() != IOLIB_ERROR_OK)
+		{
+			ClosePCI(pci);
+
+			pci = OpenPCIForInput(Application::GetApplicationDirectory().Append(file));
+
+			if (pci->GetLastError() != IOLIB_ERROR_OK)
+			{
+				ClosePCI(pci);
+
+				return NIL;
+			}
+		}
+	}
+
+	PCIIO	*pio = new PCIIO();
+
+	if (id >= 0)		pio->SelectImage(id);
+	else if (name != NIL)	pio->SelectImage(name);
+
+	ReadPCI(pci, *pio);
+
+	ClosePCI(pci);
+
+	bmp = pio->GetBitmap();
+
+	delete pio;
+
+	return bmp;
 }

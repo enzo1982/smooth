@@ -10,7 +10,7 @@
 
 #include <smooth/objectmanager.h>
 #include <smooth/i18n.h>
-#include <smooth/stk.h>
+#include <smooth/messagebox.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -26,7 +26,7 @@ S::ObjectManager::ObjectManager()
 		iAmTheOne = False;
 
 #ifdef __WIN32__
-		SMOOTH::MessageBox("ObjectManager already exists! Creation refused!", "Error", MB_OK, IDI_INFORMATION);
+		QuickMessage("ObjectManager already exists! Creation refused!", "Error", MB_OK, IDI_INFORMATION);
 #endif
 
 		delete this;

@@ -9,7 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/datetime.h>
-#include <smooth/stk.h>
 
 S::DateTime::DateTime()
 {

@@ -10,7 +10,6 @@
 
 #include <smooth/object.h>
 #include <smooth/semaphore.h>
-#include <smooth/stk.h>
 #include <smooth/application.h>
 
 const S::Int	 S::Semaphore::classID = S::Object::RequestClassID();

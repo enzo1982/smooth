@@ -11,8 +11,8 @@
 #include <smooth/threadmanager.h>
 #include <smooth/thread.h>
 #include <smooth/i18n.h>
-#include <smooth/stk.h>
 #include <smooth/definitions.h>
+#include <smooth/messagebox.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -28,7 +28,7 @@ S::ThreadManager::ThreadManager()
 		iAmTheOne = False;
 
 #ifdef __WIN32__
-		SMOOTH::MessageBox("ThreadManager already exists! Creation refused!", "Error", MB_OK, IDI_INFORMATION);
+		QuickMessage("ThreadManager already exists! Creation refused!", "Error", MB_OK, IDI_INFORMATION);
 #endif
 
 		delete this;

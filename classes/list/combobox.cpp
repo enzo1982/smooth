@@ -17,7 +17,6 @@
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 #include <smooth/i18n.h>
-#include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
 #include <smooth/layer.h>

@@ -13,7 +13,6 @@
 #include <smooth/loop.h>
 #include <smooth/threadmanager.h>
 #include <smooth/background.h>
-#include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 
 S::Void ThreadProcCaller(S::Thread *);

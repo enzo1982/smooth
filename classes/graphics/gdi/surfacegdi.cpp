@@ -10,7 +10,6 @@
 
 #include <smooth/graphics/gdi/surfacegdi.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/stk.h>
 #include <smooth/color.h>
 #include <smooth/math.h>
 

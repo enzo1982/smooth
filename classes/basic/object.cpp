@@ -12,7 +12,6 @@
 #include <smooth/objectproperties.h>
 #include <smooth/objectmanager.h>
 #include <smooth/i18n.h>
-#include <smooth/stk.h>
 
 const S::Int	 S::Object::classID = S::Object::RequestClassID();
 S::Int		 S::Object::objectCount = 0;

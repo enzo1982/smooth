@@ -11,7 +11,6 @@
 #include <smooth/mdiwindow.h>
 #include <smooth/graphics/window.h>
 #include <smooth/definitions.h>
-#include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 
 const S::Int	 S::GUI::MDIWindow::classID = S::Object::RequestClassID();

@@ -12,7 +12,6 @@
 #include <smooth/loop.h>
 #include <smooth/dllmain.h>
 #include <smooth/resources.h>
-#include <smooth/stk.h>
 #include <smooth/thread.h>
 #include <smooth/threadmanager.h>
 
@@ -94,16 +93,16 @@ S::Void S::Init()
 	SetMetrics();
 	SetMeasurement(SMT_UNITS);
 
-	SMOOTH::i18n = new I18n::Translator(True);
+	I18n::Translator::defaultTranslator = new I18n::Translator(True);
 
 	switch (PRIMARYLANGID(GetUserDefaultLangID()))
 	{
 		default:
 		case LANG_ENGLISH:
-			SMOOTH::i18n->ActivateLanguage("internal");
+			I18n::Translator::defaultTranslator->ActivateLanguage("internal");
 			break;
 		case LANG_GERMAN:
-			SMOOTH::i18n->ActivateLanguage("smooth_de");
+			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_de");
 			break;
 	}
 
@@ -122,7 +121,7 @@ S::Void S::Free()
 	if (--initCount) return;
 
 #ifdef __WIN32__
-	delete SMOOTH::i18n;
+	delete I18n::Translator::defaultTranslator;
 
 	delete backgroundApplication;
 

@@ -11,7 +11,6 @@
 #include <smooth/color.h>
 #include <smooth/definitions.h>
 #include <smooth/math.h>
-#include <smooth/stk.h>
 
 using namespace smooth;
 

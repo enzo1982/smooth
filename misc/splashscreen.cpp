@@ -10,7 +10,6 @@
 
 #include <smooth/splashscreen.h>
 #include <smooth/array.h>
-#include <smooth/stk.h>
 #include <smooth/i18n.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
@@ -28,7 +27,7 @@ using namespace smooth::GUI;
 
 S::Int S::SplashScreenApp::nOfSplashScreens = 0;
 
-S::Int S::SMOOTH::SplashScreen(const GUI::Bitmap &logo, Int time)
+S::Int S::SplashScreen(const GUI::Bitmap &logo, Int time)
 {
 	Int		 rVal;
 	SplashScreenApp	*app = new SplashScreenApp(logo, time);

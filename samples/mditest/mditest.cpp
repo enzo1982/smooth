@@ -69,7 +69,7 @@ MDITest::~MDITest()
 
 Bool MDITest::ExitProc()
 {
-	Int	 id = SMOOTH::MessageBox("Do you really want to quit?", "Exit program", MB_YESNO, IDI_QUESTION);
+	Int	 id = QuickMessage("Do you really want to quit?", "Exit program", MB_YESNO, IDI_QUESTION);
 
 	switch (id)
 	{

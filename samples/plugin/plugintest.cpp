@@ -67,5 +67,5 @@ PlugInTest::~PlugInTest()
 
 Void PlugInTest::activeAreaProc()
 {
-	SMOOTH::MessageBox("This is a smooth plug-in!", "Info", MB_OK, IDI_INFORMATION);
+	QuickMessage("This is a smooth plug-in!", "Info", MB_OK, IDI_INFORMATION);
 }

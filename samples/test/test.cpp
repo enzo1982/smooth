@@ -156,13 +156,11 @@ Test::Test()
 
 //mainWnd_menubar2->SetOrientation(OR_BOTTOM);
 
-	Bitmap	 bmp;
-
-	bmp.SetBitmap(SMOOTH::LoadImage("icons.pci", 1, NIL));
+	Bitmap	 bmp = Bitmap::LoadBitmap("icons.pci", 1, NIL);
 
 	mainWnd_iconbar->AddEntry(NIL, bmp);//mainWnd_menubar_file);
 
-	bmp.SetBitmap(SMOOTH::LoadImage("icons.pci", 2, NIL));
+	bmp = Bitmap::LoadBitmap("icons.pci", 2, NIL);
 
 	mainWnd_iconbar->AddEntry(NIL, bmp)->onClick.Connect(&Test::mainApp_InfoProc, this);
 
@@ -256,13 +254,13 @@ mainWnd_iconbar->SetOrientation(OR_LEFT);
 
 	// jetzt werden einige Fensterparameter festgelegt und die Fenster werden erzeugt:
 	mainWnd->SetMetrics(Point(100, 50), Size(570, 550));
-	mainWnd->SetIcon(SMOOTH::LoadImage("icons.pci", 0, NIL));
+	mainWnd->SetIcon(Bitmap::LoadBitmap("icons.pci", 0, NIL));
 	mainWnd->SetApplicationIcon(MAKEINTRESOURCEW(32517));
 	mainWnd->getTrackMenu.Connect(&Test::GetTrackMenu, this);
 	mainWnd->doQuit.Connect(&Test::mainWnd_KillProc, this);
 
 	secWnd->SetMetrics(Point(480, 130), Size(170, 90));
-	secWnd->SetIcon(SMOOTH::LoadImage("icons.pci", 0, NIL));
+	secWnd->SetIcon(Bitmap::LoadBitmap("icons.pci", 0, NIL));
 	secWnd->SetFlags(WF_APPTOPMOST);
 
 	messageBoxThread->Start();
@@ -361,7 +359,7 @@ Test::~Test()
 
 Bool Test::mainWnd_KillProc()
 {
-	SMOOTH::MessageBox("Leaving application now!", "Info", MB_OK, IDI_INFORMATION);
+	QuickMessage("Leaving application now!", "Info", MB_OK, IDI_INFORMATION);
 
 	secWnd->Close();
 
@@ -370,7 +368,7 @@ Bool Test::mainWnd_KillProc()
 
 void Test::mainApp_InfoProc()
 {
-	SMOOTH::MessageBox("Hallo!", "Info", MB_OKCANCEL, IDI_INFORMATION);
+	QuickMessage("Hallo!", "Info", MB_OKCANCEL, IDI_INFORMATION);
 
 	mainWnd_layer_check1->SetText("Changed!");
 }
@@ -394,7 +392,7 @@ void Test::HideEdb()
 
 void Test::Close()
 {
-	SMOOTH::MessageBox("You clicked the button!", "Hello", MB_OK, IDI_INFORMATION);
+	QuickMessage("You clicked the button!", "Hello", MB_OK, IDI_INFORMATION);
 //	mainWnd->Close();
 }
 
@@ -402,7 +400,7 @@ Int Test::threadMessageBox(Thread *thread)
 {
 	thread->SetFlags(THREAD_KILLFLAG_WAIT);	// for this thread can quit itself (after closing the MessageBox) it needn't be terminated by smooth (KILLTHREAD_KILL is default)
 
-	SMOOTH::MessageBox("This MessageBox is running in a separate thread!", "Info", MB_OK, IDI_INFORMATION);
+	QuickMessage("This MessageBox is running in a separate thread!", "Info", MB_OK, IDI_INFORMATION);
 
 	thread->Stop();
 
@@ -443,7 +441,7 @@ Void Test::testDlgOpenFile()
 			message.Append("\n").Append(dialog->GetNthFileName(i));
 		}
 
-		SMOOTH::MessageBox(message, "Info", MB_OK, IDI_INFORMATION);
+		QuickMessage(message, "Info", MB_OK, IDI_INFORMATION);
 	}
 
 	delete dialog;
@@ -457,7 +455,7 @@ Void Test::testDlgSelectDir()
 
 	if (dialog->ShowDialog() == Success)
 	{
-		SMOOTH::MessageBox(dialog->GetDirName(), "Info", MB_OK, IDI_INFORMATION);
+		QuickMessage(dialog->GetDirName(), "Info", MB_OK, IDI_INFORMATION);
 	}
 
 	delete dialog;

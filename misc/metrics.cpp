@@ -10,7 +10,6 @@
 
 #include <smooth/metrics.h>
 #include <smooth/definitions.h>
-#include <smooth/stk.h>
 #include <smooth/messagebox.h>
 #include <smooth/i18n.h>
 
@@ -227,7 +226,7 @@ S::Void S::SetMetrics()
 			METRIC_LISTBOXSBOFFSET = 18;
 
 #ifdef __WIN32__
-			SMOOTH::MessageBox("You have selected large fonts in the Windows settings.\nIt is not recommended to use large fonts with smooth applications.\n\nClick OK to continue.", "Information", MB_OK, IDI_INFORMATION);
+			QuickMessage("You have selected large fonts in the Windows settings.\nIt is not recommended to use large fonts with smooth applications.\n\nClick OK to continue.", "Information", MB_OK, IDI_INFORMATION);
 
 #endif
 

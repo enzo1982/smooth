@@ -11,7 +11,6 @@
 #include <smooth/tree.h>
 #include <smooth/definitions.h>
 #include <smooth/array.h>
-#include <smooth/stk.h>
 #include <smooth/i18n.h>
 #include <smooth/metrics.h>
 #include <smooth/graphics/font.h>

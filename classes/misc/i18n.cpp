@@ -15,6 +15,8 @@
 #include <direct.h>
 #include <io.h>
 
+S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
+
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif

@@ -10,7 +10,6 @@
 
 #include <smooth/object.h>
 #include <smooth/mutex.h>
-#include <smooth/stk.h>
 #include <smooth/application.h>
 
 const S::Int	 S::Mutex::classID = S::Object::RequestClassID();

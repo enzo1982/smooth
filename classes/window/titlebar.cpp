@@ -13,7 +13,6 @@
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
 #include <smooth/tooltip.h>
-#include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
 #include <smooth/graphics/surface.h>

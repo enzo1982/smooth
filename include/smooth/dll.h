@@ -13,10 +13,10 @@
 
 #include "loop.h"
 #include "version.h"
-#include "stk.h"
 #include "system.h"
 #include "messagebox.h"
 #include "application.h"
+#include "messagebox.h"
 
 using namespace smooth;
 
@@ -35,7 +35,7 @@ extern "C"
 
 				if (System::GetVersionString() != (String) SMOOTH_VERSION)
 				{
-					SMOOTH::MessageBox("This DLL might not be compatible with the\nSMOOTH library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
+					QuickMessage("This DLL might not be compatible with the\nSMOOTH library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
 				}
 
 				Application::GetStartupDirectory();

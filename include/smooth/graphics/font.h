@@ -24,13 +24,13 @@ namespace smooth
 
 namespace smooth
 {
-	namespace GUI
-	{
 #ifndef __WIN32__
-		const Int	 FW_NORMAL	= 400;
-		const Int	 FW_BOLD	= 700;
+	const Int	 FW_NORMAL	= 400;
+	const Int	 FW_BOLD	= 700;
 #endif
 
+	namespace GUI
+	{
 		class SMOOTHAPI Font
 		{
 			protected:

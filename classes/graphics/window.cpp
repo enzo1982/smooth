@@ -440,7 +440,7 @@ S::Int S::GUI::WindowBase::Paint(Int message)
 	else
 	{
 		surface->StartPaint(updateRect);
-		surface->Box(updateRect, GetSysColor(COLOR_BTNFACE), FILLED);
+		surface->Box(updateRect, Setup::BackgroundColor, FILLED);
 
 		Widget	*lastWidget = NIL;
 		Point	 doublebar1;
@@ -756,7 +756,7 @@ S::Int S::GUI::WindowBase::RegisterObject(Object *object)
 
 			if (object->GetObjectType() == Titlebar::classID)
 			{
-				if (!Binary::IsFlagSet(object->GetFlags(), TB_MAXBUTTON)) style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
+				if (!Binary::IsFlagSet(object->GetFlags(), TB_MAXBUTTON)) flags = flags | WF_NORESIZE;
 			}
 			else if (object->GetObjectType() == ToolWindow::classID)
 			{

@@ -86,6 +86,9 @@ S::Void S::SetMetrics()
 	Int	 dpiy = GetDeviceCaps(dc, LOGPIXELSY);
 
 	ReleaseDC(0, dc);
+#else
+	Int	 dpiy = 0;
+#endif
 
 	switch (dpiy)
 	{
@@ -223,11 +226,13 @@ S::Void S::SetMetrics()
 			METRIC_LISTBOXTEXTOFFSETXY = 3;
 			METRIC_LISTBOXSBOFFSET = 18;
 
+#ifdef __WIN32__
 			SMOOTH::MessageBox("You have selected large fonts in the Windows settings.\nIt is not recommended to use large fonts with smooth applications.\n\nClick OK to continue.", "Information", MB_OK, IDI_INFORMATION);
+
+#endif
 
 			break;
 	}
-#endif
 }
 
 S::Void S::SetMeasurement(Int type)

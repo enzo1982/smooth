@@ -152,6 +152,7 @@ S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
+#ifdef __WIN32__
 		case WM_KILLFOCUS:
 			if (lParam == -1) break;
 
@@ -160,6 +161,7 @@ S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 			wnd->Process(WM_KILLFOCUS, wParam, -1);
 
 			break;
+#endif
 	}
 
 	LeaveProtectedRegion();

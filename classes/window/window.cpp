@@ -866,8 +866,6 @@ S::Int S::GUI::Window::Paint(Int message)
 
 		surface->Box(updateRect, GetSysColor(COLOR_BTNFACE), FILLED);
 
-		onPaint.Emit();
-
 		Widget	*lastWidget = NIL;
 		Point	 doublebar1;
 		Point	 doublebar2;
@@ -991,6 +989,8 @@ S::Int S::GUI::Window::Paint(Int message)
 				if (((Widget *) object)->IsVisible() && Affected(object, updateRect)) ((Widget *) object)->Paint(SP_PAINT);
 			}
 		}
+
+		onPaint.Emit();
 
 		surface->EndPaint();
 	}

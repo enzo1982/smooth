@@ -22,7 +22,6 @@ S::Tree::Tree()
 
 	sizeset = False;
 	entrysizesset = False;
-	counter = -1;
 }
 
 S::Tree::~Tree()
@@ -35,30 +34,14 @@ S::Tree::~Tree()
 	entries.DeleteAll();
 }
 
-S::Tree::Entry *S::Tree::AddEntry(String name)
+S::Tree::Entry *S::Tree::AddEntry(String text, Tree *sub)
 {
-	counter++;
+	Int	 id	= System::RequestGUID();
+	Int	 type	= ST_ENTRY;
 
-	return AddTreeEntry(ST_ENTRY, counter, name, NIL);
-}
+	if (sub != NIL) type = ST_SUB;
 
-S::Tree::Entry *S::Tree::AddEntry(String name, Tree *sub)
-{
-	counter++;
-
-	return AddTreeEntry(ST_SUB, counter, name, sub);
-}
-
-S::Int S::Tree::RemoveEntry(Int number)
-{
-	RemoveTreeEntry(number);
-
-	return Success;
-}
-
-S::Tree::Entry *S::Tree::AddTreeEntry(Int type, Int code, String text, Tree *sub)
-{
-	Tree::Entry	*newEntry = new Tree::Entry(type, code);
+	Tree::Entry	*newEntry = new Tree::Entry(type, id);
 
 	newEntry->text		= text;
 	newEntry->sub		= sub;
@@ -67,7 +50,7 @@ S::Tree::Entry *S::Tree::AddTreeEntry(Int type, Int code, String text, Tree *sub
 
 	if (nOfEntries != 0) entries.GetLastEntry()->last = False;
 
-	if (entries.AddEntry(newEntry, code) == True)
+	if (entries.AddEntry(newEntry, id) == True)
 	{
 		nOfEntries++;
 
@@ -84,24 +67,27 @@ S::Tree::Entry *S::Tree::AddTreeEntry(Int type, Int code, String text, Tree *sub
 	}
 }
 
-S::Int S::Tree::RemoveTreeEntry(Int code)
+S::Int S::Tree::RemoveEntry(Tree::Entry *entry)
 {
-	if (entries.GetEntry(code) != NIL)
-	{
-		delete entries.GetEntry(code);
+	if (entry == NIL) return Error;
 
-		entries.DeleteEntry(code);
+	if (entries.GetEntry(entry->id) != NIL)
+	{
+		entries.DeleteEntry(entry->id);
+
+		delete entry;
 
 		nOfEntries--;
 
-		if (nOfEntries != 0) entries.GetLastEntry()->last = True;
-
 		return Success;
 	}
-	else
-	{
-		return Error;
-	}
+
+	return Error;
+}
+
+S::Int S::Tree::RemoveEntry(Int id)
+{
+	return RemoveEntry(entries.GetEntry(id));
 }
 
 S::Void S::Tree::GetSize()

@@ -54,22 +54,20 @@ namespace smooth
 			Bool		 sizeset;
 			Bool		 entrysizesset;
 			Int		 nOfEntries;
-			Int		 counter;
 			Void		 GetSize();
 			Int		 GetSizeY();
 			Int		 GetSizeX();
 			Void		 GetTreeEntriesSize();
-			Entry		*AddTreeEntry(Int, Int, String, Tree *);
-			Int		 RemoveTreeEntry(Int);
 		public:
 			Array<Entry *>	 entries;
 
 					 Tree();
 			virtual		~Tree();
 
-			virtual Entry	*AddEntry(String);
-			virtual Entry	*AddEntry(String, Tree *);
-			virtual Int	 RemoveEntry(Int);
+			Entry		*AddEntry(String, Tree * = NIL);
+			Int		 RemoveEntry(Entry *);
+			Int		 RemoveEntry(Int);
+
 			Int		 GetNOfEntries();
 	};
 };

@@ -14,7 +14,7 @@
 S::Tree::Entry::Entry(Int et, Int ec)
 {
 	type	= et;
-	code	= ec;
+	id	= ec;
 	sub	= NIL;
 
 	chk	= False;

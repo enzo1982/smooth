@@ -1,0 +1,35 @@
+#include <windows.h>
+#include "../include/smooth/resources.h"
+#include "../include/smooth/version.h"
+
+IDR_VERSION		VERSIONINFO
+  FILEVERSION		SMOOTH_RESVERS
+  PRODUCTVERSION	SMOOTH_RESPROD
+  FILEFLAGSMASK		VS_FFI_FILEFLAGSMASK
+  FILEFLAGS		VS_FF_DEBUG|VS_FF_PRERELEASE|VS_FF_PRIVATEBUILD
+  FILEOS		VOS_NT_WINDOWS32
+  FILETYPE		VFT_DLL
+  FILESUBTYPE		0	// not used
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004B0"	// Block: language ID = Multilingual, char set = Unicode
+        BEGIN
+            VALUE	"FileDescription",	"Developers version of the SMOOTH library.\0"
+            VALUE	"FileVersion",		SMOOTH_FILEVER
+            VALUE	"InternalName",		"SMOOTH\0"
+            VALUE	"OriginalFilename",	"smooth.dll\0"
+            VALUE	"ProductName",		"SMOOTH Windowing Toolkit\0"
+            VALUE	"ProductVersion",	SMOOTH_PRODUCT
+            VALUE	"LegalCopyright",	"Copyright © 1998-2002 Robert Kausch\0"
+            VALUE	"Official website",	"http://smooth.sf.net\0"
+            VALUE	"eMail contact",	"robert.kausch@gmx.net\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE	"Translation", 0x0000, 1200
+    END
+END
+
+

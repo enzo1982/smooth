@@ -1,0 +1,74 @@
+[Progressive Setup]
+Version=v0.1
+
+[Application]
+Name=SMOOTH
+Version=v0.8.58.0 (Build 265)
+
+[Name Font]
+Weight=700
+Italic=1
+Underline=0
+Font=Courier New
+Color=16777215
+Size=48
+XPos=50
+YPos=30
+
+[Setup]
+DisplayBackgroundWindow=0
+DisplayAppName=1
+DisplayCompanyName=0
+DisplayAppVersion=1
+
+[Dialogs]
+Introduction=1
+License=0
+Directory=0
+Components=0
+Summary=1
+Bye=1
+Reboot=1
+
+[Introduction]
+Title=SMOOTH Windowing Toolkit Setup
+Lines=10
+1=Willkommen beim Setup-Programm für das
+2=SMOOTH Windowing Toolkit Version 0.8.58.0.
+3=
+4=
+5=Beenden sie vor der Installation unbedingt alle
+6=Windows-Programme.
+7=
+8=Mit "Abbrechen" können sie das Setup verlassen
+9=und laufende Programme beenden. Klicken sie
+10=auf "Weiter", um das Setup fortzusetzen.
+
+[Bye]
+Title=Installation fertiggestellt
+Lines=1
+1=Die Installation wurde erfolgreich beendet.
+
+[Reboot]
+Title=Reboot
+Lines=2
+1=Der Computer muss neu gestartet werden,
+2=damit sie mit dem Programm arbeiten können.
+
+[Components]
+1=Sourcecodes
+2=Vorkompilierte Bibliotheken
+3=Dokumentation
+4=Beispielanwendungen
+
+[Component Config]
+1=optional
+2=optional
+3=optional
+4=optional
+
+[Component Files]
+1=source.tar.bz2
+2=kit.tar.bz2
+3=misc.tar.bz2
+4=samples.tar.bz2

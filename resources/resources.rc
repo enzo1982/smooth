@@ -1,0 +1,3 @@
+#include "icon.rc"
+#include "iconbmp.rc"
+#include "version.rc"

@@ -27,7 +27,7 @@ namespace smooth
 	};
 };
 
-#include "definitions.h"
+#include "../definitions.h"
 #include "dialog.h"
 
 namespace smooth

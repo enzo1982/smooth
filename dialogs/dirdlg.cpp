@@ -8,10 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/dirdlg.h>
+#include <smooth/dialogs/dirdlg.h>
 #include <smooth/i18n.h>
 #include <smooth/shlobjmini.h>
-#include <smooth/graphics/gdi/windowgdi.h>
+#include <smooth/graphics/window.h>
 
 S::DialogDirSelection::DialogDirSelection()
 {
@@ -34,7 +34,7 @@ S::Int S::DialogDirSelection::ShowDialog()
 
 		for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
 
-		if (parentWindow != NIL)	infow.hwndOwner = ((GUI::WindowGDI *) parentWindow)->hwnd;
+		if (parentWindow != NIL)	infow.hwndOwner = parentWindow->hwnd;
 		else				infow.hwndOwner = NIL;
 
 		infow.pidlRoot = NIL;
@@ -60,7 +60,7 @@ S::Int S::DialogDirSelection::ShowDialog()
 
 		for (Int i = 0; i < 32768; i++) buffera[i] = 0;
 
-		if (parentWindow != NIL)	infoa.hwndOwner = ((GUI::WindowGDI *) parentWindow)->hwnd;
+		if (parentWindow != NIL)	infoa.hwndOwner = parentWindow->hwnd;
 		else				infoa.hwndOwner = NIL;
 
 		infoa.pidlRoot = NIL;

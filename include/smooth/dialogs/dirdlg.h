@@ -8,37 +8,28 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_DIALOG_
-#define _H_OBJSMOOTH_DIALOG_
+#ifndef _H_OBJSMOOTH_DIRDLG_
+#define _H_OBJSMOOTH_DIRDLG_
 
 namespace smooth
 {
-	class Dialog;
-
-	namespace GUI
-	{
-		class Window;
-	};
+	class DialogDirSelection;
 };
 
-#include "definitions.h"
-#include "application.h"
+#include "../definitions.h"
+#include "dialog.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Dialog : public Application
+	class SMOOTHAPI DialogDirSelection : public Dialog
 	{
-		protected:
-			String		 caption;
-			GUI::Window	*parentWindow;
+		private:
+			String	 directory;
 		public:
-					 Dialog();
-					~Dialog();
-
-			virtual Int	 ShowDialog() = 0;
-
-			Int		 SetCaption(String);
-			Int		 SetParentWindow(GUI::Window *);
+				 DialogDirSelection();
+				~DialogDirSelection();
+			Int	 ShowDialog();
+			String	 GetDirName();
 	};
 };
 

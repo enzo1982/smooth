@@ -103,6 +103,11 @@ $(OBJECTDIR)/window.o: $(GRAPHICSCLASSESDIR)/window.cpp $(SMOOTHINCLUDEDIR)/grap
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/window.cpp -o $(OBJECTDIR)/window.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/windowbackend.o: $(GRAPHICSCLASSESDIR)/windowbackend.cpp $(SMOOTHINCLUDEDIR)/graphics/windowbackend.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/windowbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/windowbackend.cpp -o $(OBJECTDIR)/windowbackend.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/toolwindow.o: $(INTERNALCLASSESDIR)/toolwindow.cpp $(SMOOTHINCLUDEDIR)/toolwindow.h
 	$(ECHO) -n Compiling $(INTERNALCLASSESDIR)/toolwindow.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(INTERNALCLASSESDIR)/toolwindow.cpp -o $(OBJECTDIR)/toolwindow.o
@@ -223,27 +228,27 @@ $(OBJECTDIR)/mdiwindow.o: $(MDICLASSESDIR)/mdiwindow.cpp $(SMOOTHINCLUDEDIR)/mdi
 	$(COMPILER) $(COMPILER_OPTS) $(MDICLASSESDIR)/mdiwindow.cpp -o $(OBJECTDIR)/mdiwindow.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/menu.o: $(MENUCLASSESDIR)/menu.cpp $(SMOOTHINCLUDEDIR)/menu.h
+$(OBJECTDIR)/menu.o: $(MENUCLASSESDIR)/menu.cpp $(SMOOTHINCLUDEDIR)/menu/menu.h
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/menu.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/menu.cpp -o $(OBJECTDIR)/menu.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/menubar.o: $(MENUCLASSESDIR)/menubar.cpp $(SMOOTHINCLUDEDIR)/menubar.h
+$(OBJECTDIR)/menubar.o: $(MENUCLASSESDIR)/menubar.cpp $(SMOOTHINCLUDEDIR)/menu/menubar.h
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/menubar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/menubar.cpp -o $(OBJECTDIR)/menubar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/menuentry.o: $(MENUCLASSESDIR)/menuentry.cpp
+$(OBJECTDIR)/menuentry.o: $(MENUCLASSESDIR)/menuentry.cpp $(SMOOTHINCLUDEDIR)/menu/menuentry.h
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/menuentry.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/menuentry.cpp -o $(OBJECTDIR)/menuentry.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/popupmenu.o: $(MENUCLASSESDIR)/popupmenu.cpp $(SMOOTHINCLUDEDIR)/popupmenu.h
+$(OBJECTDIR)/popupmenu.o: $(MENUCLASSESDIR)/popupmenu.cpp $(SMOOTHINCLUDEDIR)/menu/popupmenu.h
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/popupmenu.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/popupmenu.cpp -o $(OBJECTDIR)/popupmenu.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/popupview.o: $(MENUCLASSESDIR)/popupview.cpp $(SMOOTHINCLUDEDIR)/popupview.h
+$(OBJECTDIR)/popupview.o: $(MENUCLASSESDIR)/popupview.cpp $(SMOOTHINCLUDEDIR)/menu/popupview.h
 	$(ECHO) -n Compiling $(MENUCLASSESDIR)/popupview.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/popupview.cpp -o $(OBJECTDIR)/popupview.o
 	$(ECHO) done.
@@ -393,29 +398,34 @@ $(OBJECTDIR)/xml_node.o: $(XMLCLASSESDIR)/node.cpp $(SMOOTHINCLUDEDIR)/xml/node.
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/node.cpp -o $(OBJECTDIR)/xml_node.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/colordlg.o: $(DIALOGSDIR)/colordlg.cpp $(SMOOTHINCLUDEDIR)/colordlg.h $(SMOOTHINCLUDEDIR)/color.h
+$(OBJECTDIR)/colordlg.o: $(DIALOGSDIR)/colordlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/colordlg.h $(SMOOTHINCLUDEDIR)/color.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/colordlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/colordlg.cpp -o $(OBJECTDIR)/colordlg.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/dialog.o: $(DIALOGSDIR)/dialog.cpp $(SMOOTHINCLUDEDIR)/dialog.h
+$(OBJECTDIR)/dialog.o: $(DIALOGSDIR)/dialog.cpp $(SMOOTHINCLUDEDIR)/dialogs/dialog.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/dialog.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/dialog.cpp -o $(OBJECTDIR)/dialog.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/dirdlg.o: $(DIALOGSDIR)/dirdlg.cpp $(SMOOTHINCLUDEDIR)/dirdlg.h
+$(OBJECTDIR)/dirdlg.o: $(DIALOGSDIR)/dirdlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/dirdlg.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/dirdlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/dirdlg.cpp -o $(OBJECTDIR)/dirdlg.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/filedlg.o: $(DIALOGSDIR)/filedlg.cpp $(SMOOTHINCLUDEDIR)/filedlg.h
+$(OBJECTDIR)/filedlg.o: $(DIALOGSDIR)/filedlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/filedlg.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/filedlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/filedlg.cpp -o $(OBJECTDIR)/filedlg.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/fontdlg.o: $(DIALOGSDIR)/fontdlg.cpp $(SMOOTHINCLUDEDIR)/fontdlg.h
+$(OBJECTDIR)/fontdlg.o: $(DIALOGSDIR)/fontdlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/fontdlg.h
 	$(ECHO) -n Compiling $(DIALOGSDIR)/fontdlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/fontdlg.cpp -o $(OBJECTDIR)/fontdlg.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/tipodaydlg.o: $(DIALOGSDIR)/tipodaydlg.cpp $(SMOOTHINCLUDEDIR)/dialogs/tipodaydlg.h
+	$(ECHO) -n Compiling $(DIALOGSDIR)/tipodaydlg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSDIR)/tipodaydlg.cpp -o $(OBJECTDIR)/tipodaydlg.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h

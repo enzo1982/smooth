@@ -27,6 +27,7 @@ Int smooth::Main()
 Designer::Designer()
 {
 	dlgcounter = 1;
+	active_dlg = NIL;
 
 	wnd		= new Window(String("smooth Designer v").Append(SMOOTH_VERSION));
 	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);

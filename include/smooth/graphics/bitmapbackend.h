@@ -28,7 +28,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 BITMAP_NONE = 0;
+		const Int	 BITMAP_NULL = 0;
 
 		class BitmapBackend
 		{

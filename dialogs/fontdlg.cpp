@@ -10,8 +10,8 @@
 
 #define MAKEUNICODESTR(x) L##x
 
-#include <smooth/fontdlg.h>
-#include <smooth/graphics/gdi/windowgdi.h>
+#include <smooth/dialogs/fontdlg.h>
+#include <smooth/graphics/window.h>
 
 #include <commdlg.h>
 
@@ -34,8 +34,8 @@ S::Int S::DialogFontSelection::ShowDialog()
 
 	if (parentWindow != NIL)
 	{
-		cfw.hwndOwner = ((GUI::WindowGDI *) parentWindow)->hwnd;
-		cfa.hwndOwner = ((GUI::WindowGDI *) parentWindow)->hwnd;
+		cfw.hwndOwner = parentWindow->hwnd;
+		cfa.hwndOwner = parentWindow->hwnd;
 	}
 	else
 	{

@@ -16,9 +16,9 @@ namespace smooth
 	class DialogFileSelection;
 };
 
-#include "definitions.h"
+#include "../definitions.h"
 #include "dialog.h"
-#include "array.h"
+#include "../array.h"
 
 namespace smooth
 {

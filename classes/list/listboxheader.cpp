@@ -11,7 +11,7 @@
 #include <smooth/listboxheader.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/listbox.h>
-#include <smooth/graphics/gdi/windowgdi.h>
+#include <smooth/graphics/window.h>
 #include <smooth/layer.h>
 #include <smooth/objectproperties.h>
 #include <smooth/metrics.h>
@@ -168,7 +168,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	WindowGDI	*wnd = (WindowGDI *) myContainer->GetContainerWindow();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 

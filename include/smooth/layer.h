@@ -29,7 +29,7 @@ namespace smooth
 		class SMOOTHAPI Layer : public Widget, public Container
 		{
 			protected:
-				Int			 layerColor;
+				UnsignedLong		 layerColor;
 			public:
 				static const Int	 classID;
 
@@ -42,7 +42,9 @@ namespace smooth
 				virtual Int		 Paint(Int);
 				Int			 Process(Int, Int, Int);
 
-				Int			 SetColor(Int);
+				UnsignedLong		 GetColor();
+				Int			 SetColor(UnsignedLong);
+
 				Int			 SetMetrics(Point, Size);
 
 				Surface			*GetDrawSurface();

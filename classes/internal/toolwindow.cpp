@@ -22,7 +22,7 @@
 
 const S::Int	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
 
-S::GUI::ToolWindow::ToolWindow() : WindowGDI("smooth ToolWindow")
+S::GUI::ToolWindow::ToolWindow() : Window("smooth ToolWindow")
 {
 	type				= classID;
 	containerType			= Window::classID;
@@ -81,7 +81,7 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 
 		onPaint.Emit();
 
-		for (Int i = 0; i < nOfObjects; i++)
+		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
 			Object	*object = assocObjects.GetNthEntry(i);
 
@@ -183,7 +183,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 				WINDOWPOS	*wndPos = (LPWINDOWPOS) lParam;
 				Object		*object = NIL;
 
-				for (Int i = 0; i < nOfObjects; i++)
+				for (Int i = 0; i < GetNOfObjects(); i++)
 				{
 					object = assocObjects.GetNthEntry(i);
 
@@ -210,7 +210,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 			break;
 	}
 
-	for (Int j = nOfObjects - 1; j >= 0; j--)
+	for (Int j = GetNOfObjects() - 1; j >= 0; j--)
 	{
 		Object	*object = assocObjects.GetNthEntry(j);
 
@@ -241,7 +241,6 @@ S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
 		if (!object->IsRegistered())
 		{
 			assocObjects.AddEntry(object, object->handle);
-			nOfObjects++;
 
 			object->SetContainer(this);
 			object->SetRegisteredFlag();

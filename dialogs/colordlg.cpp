@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/colordlg.h>
+#include <smooth/dialogs/colordlg.h>
 #include <smooth/application.h>
 #include <smooth/graphics/window.h>
 #include <smooth/i18n.h>
@@ -73,17 +73,18 @@ S::DialogColorSelection::DialogColorSelection()
 	bs.cx = 0;
 	bs.cy = 0;
 
-	dlgwnd = new Window(I18n::Translator::defaultTranslator->TranslateString("Color selection"));
+	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Color selection"));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
+
 	okbtn		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bp, bs);
 	okbtn->onClick.Connect(&DialogColorSelection::ColorDlgOK, this);
 	okbtn->SetOrientation(OR_LOWERRIGHT);
 
 	bp.x = 175;
 
-	cancelbtn = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bp, bs);
+	cancelbtn	= new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bp, bs);
 	cancelbtn->onClick.Connect(&DialogColorSelection::ColorDlgCancel, this);
 	cancelbtn->SetOrientation(OR_LOWERRIGHT);
 
@@ -92,80 +93,80 @@ S::DialogColorSelection::DialogColorSelection()
 	bs.cx = 129;
 	bs.cy = 0;
 
-	hueslider = new Slider(bp, bs, OR_HORZ, &acthue, 0, 255);
+	hueslider	= new Slider(bp, bs, OR_HORZ, &acthue, 0, 255);
 	hueslider->onClick.Connect(&DialogColorSelection::ColorDlgHueSlider, this);
 	hueslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	satslider = new Slider(bp, bs, OR_HORZ, &actsat, 0, 255);
+	satslider	= new Slider(bp, bs, OR_HORZ, &actsat, 0, 255);
 	satslider->onClick.Connect(&DialogColorSelection::ColorDlgSatSlider, this);
 	satslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	valslider = new Slider(bp, bs, OR_HORZ, &actval, 0, 255);
+	valslider	= new Slider(bp, bs, OR_HORZ, &actval, 0, 255);
 	valslider->onClick.Connect(&DialogColorSelection::ColorDlgValSlider, this);
 	valslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	redslider = new Slider(bp, bs, OR_HORZ, &actred, 0, 255);
+	redslider	= new Slider(bp, bs, OR_HORZ, &actred, 0, 255);
 	redslider->onClick.Connect(&DialogColorSelection::ColorDlgRedSlider, this);
 	redslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	greenslider = new Slider(bp, bs, OR_HORZ, &actgreen, 0, 255);
+	greenslider	= new Slider(bp, bs, OR_HORZ, &actgreen, 0, 255);
 	greenslider->onClick.Connect(&DialogColorSelection::ColorDlgGreenSlider, this);
 	greenslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	blueslider = new Slider(bp, bs, OR_HORZ, &actblue, 0, 255);
+	blueslider	= new Slider(bp, bs, OR_HORZ, &actblue, 0, 255);
 	blueslider->onClick.Connect(&DialogColorSelection::ColorDlgBlueSlider, this);
 	blueslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.x = 189;
 	bp.y = 37;
 
-	huetext = new Text(I18n::Translator::defaultTranslator->TranslateString("H"), bp);
+	huetext		= new Text(I18n::Translator::defaultTranslator->TranslateString("H"), bp);
 	huetext->SetOrientation(OR_UPPERRIGHT);
 	huetext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
-	sattext = new Text(I18n::Translator::defaultTranslator->TranslateString("S"), bp);
+	sattext		= new Text(I18n::Translator::defaultTranslator->TranslateString("S"), bp);
 	sattext->SetOrientation(OR_UPPERRIGHT);
 	sattext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
-	valtext = new Text(I18n::Translator::defaultTranslator->TranslateString("V"), bp);
+	valtext		= new Text(I18n::Translator::defaultTranslator->TranslateString("V"), bp);
 	valtext->SetOrientation(OR_UPPERRIGHT);
 	valtext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
 	bp.y += 26;
 
-	redtext = new Text(I18n::Translator::defaultTranslator->TranslateString("R"), bp);
+	redtext		= new Text(I18n::Translator::defaultTranslator->TranslateString("R"), bp);
 	redtext->SetOrientation(OR_UPPERRIGHT);
 	redtext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(255, 0, 0)));
 
 	bp.y += 26;
 
-	greentext = new Text(I18n::Translator::defaultTranslator->TranslateString("G"), bp);
+	greentext	= new Text(I18n::Translator::defaultTranslator->TranslateString("G"), bp);
 	greentext->SetOrientation(OR_UPPERRIGHT);
 	greentext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 160, 0)));
 
 	bp.y += 26;
 
-	bluetext = new Text(I18n::Translator::defaultTranslator->TranslateString("B"), bp);
+	bluetext	= new Text(I18n::Translator::defaultTranslator->TranslateString("B"), bp);
 	bluetext->SetOrientation(OR_UPPERRIGHT);
 	bluetext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, RGB(0, 0, 255)));
 
 	bp.y += 26;
 
-	hextext = new Text(I18n::Translator::defaultTranslator->TranslateString("HTML code"), bp);
+	hextext		= new Text(I18n::Translator::defaultTranslator->TranslateString("HTML code"), bp);
 	hextext->SetOrientation(OR_UPPERRIGHT);
 	hextext->SetFont(Font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, Setup::TextColor));
 
@@ -174,42 +175,42 @@ S::DialogColorSelection::DialogColorSelection()
 	bs.cx = 30;
 	bs.cy = 0;
 
-	hueedit = new EditBox(String::FromInt(acthue), bp, bs, 3);
+	hueedit		= new EditBox(String::FromInt(acthue), bp, bs, 3);
 	hueedit->onClick.Connect(&DialogColorSelection::ColorDlgHueEdit, this);
 	hueedit->SetFlags(EDB_NUMERIC);
 	hueedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	satedit = new EditBox(String::FromInt(actsat), bp, bs, 3);
+	satedit		= new EditBox(String::FromInt(actsat), bp, bs, 3);
 	satedit->onClick.Connect(&DialogColorSelection::ColorDlgSatEdit, this);
 	satedit->SetFlags(EDB_NUMERIC);
 	satedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	valedit = new EditBox(String::FromInt(actval), bp, bs, 3);
+	valedit		= new EditBox(String::FromInt(actval), bp, bs, 3);
 	valedit->onClick.Connect(&DialogColorSelection::ColorDlgValEdit, this);
 	valedit->SetFlags(EDB_NUMERIC);
 	valedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	rededit = new EditBox(String::FromInt(actred), bp, bs, 3);
+	rededit		= new EditBox(String::FromInt(actred), bp, bs, 3);
 	rededit->onClick.Connect(&DialogColorSelection::ColorDlgRedEdit, this);
 	rededit->SetFlags(EDB_NUMERIC);
 	rededit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	greenedit = new EditBox(String::FromInt(actgreen), bp, bs, 3);
+	greenedit	= new EditBox(String::FromInt(actgreen), bp, bs, 3);
 	greenedit->onClick.Connect(&DialogColorSelection::ColorDlgGreenEdit, this);
 	greenedit->SetFlags(EDB_NUMERIC);
 	greenedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	blueedit = new EditBox(String::FromInt(actblue), bp, bs, 3);
+	blueedit	= new EditBox(String::FromInt(actblue), bp, bs, 3);
 	blueedit->onClick.Connect(&DialogColorSelection::ColorDlgBlueEdit, this);
 	blueedit->SetFlags(EDB_NUMERIC);
 	blueedit->SetOrientation(OR_UPPERRIGHT);
@@ -218,7 +219,7 @@ S::DialogColorSelection::DialogColorSelection()
 	bp.y += 26;
 	bs.cx += 40;
 
-	hexedit = new EditBox(hexval, bp, bs, 7);
+	hexedit		= new EditBox(hexval, bp, bs, 7);
 	hexedit->onClick.Connect(&DialogColorSelection::ColorDlgHexEdit, this);
 	hexedit->SetOrientation(OR_UPPERRIGHT);
 
@@ -230,6 +231,7 @@ S::DialogColorSelection::DialogColorSelection()
 	lastval = -1;
 
 	RegisterObject(dlgwnd);
+
 	dlgwnd->RegisterObject(okbtn);
 	dlgwnd->RegisterObject(cancelbtn);
 	dlgwnd->RegisterObject(hueslider);

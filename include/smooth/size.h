@@ -29,8 +29,12 @@ namespace smooth
 #endif
 			Int		 cx;
 			Int		 cy;
+
 					 Size();
 					 Size(Int, Int);
+
+			Size operator	 +(const Size &);
+			Size operator	 -(const Size &);
 	};
 };
 

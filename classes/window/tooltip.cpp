@@ -98,6 +98,8 @@ S::Int S::GUI::Tooltip::Show()
 		timer->Start(timeOut);
 	}
 
+	onShow.Emit();
+
 	return Success;
 }
 
@@ -123,6 +125,8 @@ S::Int S::GUI::Tooltip::Hide()
 
 		toolWindow = NIL;
 	}
+
+	onHide.Emit();
 
 	return Success;
 }

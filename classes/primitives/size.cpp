@@ -22,6 +22,20 @@ S::Size::Size(Int iCX, Int iCY)
 	cy = iCY;
 }
 
+S::Size S::Size::operator +(const Size &size)
+{
+	Size	 retP(cx + size.cx, cy + size.cy);
+
+	return retP;
+}
+
+S::Size S::Size::operator -(const Size &size)
+{
+	Size	 retS(cx - size.cx, cy - size.cy);
+
+	return retS;
+}
+
 #ifdef __WIN32__
 S::Size::operator SIZE()
 {

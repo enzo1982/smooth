@@ -30,7 +30,7 @@ S::GUI::Layer::Layer(String name)
 
 	visible = False;
 
-	layerColor = -1;
+	layerColor = (UnsignedLong) -1;
 
 	possibleContainers.AddEntry(Window::classID);
 	possibleContainers.AddEntry(classID);
@@ -46,9 +46,9 @@ S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
-	if (nOfObjects == 0)		return Success;
+	if (GetNOfObjects() == 0)	return Success;
 
-	for (Int i = nOfObjects - 1; i >= 0; i--)
+	for (Int i = GetNOfObjects() - 1; i >= 0; i--)
 	{
 		Object	*object = assocObjects.GetNthEntry(i);
 
@@ -76,7 +76,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 	Surface	*surface = myContainer->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 
-	if (layerColor != -1)
+	if (layerColor != (UnsignedLong) -1)
 	{
 		Rect	 frame;
 
@@ -90,7 +90,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 		surface->Box(frame, layerColor, FILLED);
 	}
 
-	for (Int i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		Object	*object = assocObjects.GetNthEntry(i);
 
@@ -115,7 +115,7 @@ S::Int S::GUI::Layer::Show()
 
 	Point	 realPos = GetRealPosition();
 
-	if (layerColor != -1 && IsVisible())
+	if (layerColor != (UnsignedLong) -1 && IsVisible())
 	{
 		Surface	*surface = myContainer->GetDrawSurface();
 		Rect	 frame;
@@ -128,7 +128,7 @@ S::Int S::GUI::Layer::Show()
 		surface->Box(frame, layerColor, FILLED);
 	}
 
-	for (Int i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		Object	*object = assocObjects.GetNthEntry(i);
 
@@ -147,6 +147,8 @@ S::Int S::GUI::Layer::Show()
 		}
 	}
 
+	onShow.Emit();
+
 	return Success;
 }
 
@@ -154,7 +156,7 @@ S::Int S::GUI::Layer::Hide()
 {
 	if (!visible) return Success;
 
-	for (Int i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		Object	*object = assocObjects.GetNthEntry(i);
 
@@ -179,7 +181,7 @@ S::Int S::GUI::Layer::Hide()
 
 	if (!registered) return Success;
 
-	if (layerColor != -1 && wasVisible)
+	if (layerColor != (UnsignedLong) -1 && wasVisible)
 	{
 		Point	 realPos = GetRealPosition();
 		Surface	*surface = myContainer->GetDrawSurface();
@@ -193,10 +195,20 @@ S::Int S::GUI::Layer::Hide()
 		surface->Box(frame, Setup::BackgroundColor, FILLED);
 	}
 
+	onHide.Emit();
+
 	return Success;
 }
 
-S::Int S::GUI::Layer::SetColor(Int newColor)
+S::UnsignedLong S::GUI::Layer::GetColor()
+{
+	if ((Long) layerColor == -1)	return Setup::BackgroundColor;
+	else				return layerColor;
+
+	return Success;
+}
+
+S::Int S::GUI::Layer::SetColor(UnsignedLong newColor)
 {
 	layerColor = newColor;
 
@@ -228,7 +240,6 @@ S::Int S::GUI::Layer::RegisterObject(Object *object)
 		if (!object->IsRegistered())
 		{
 			assocObjects.AddEntry(object, object->handle);
-			nOfObjects++;
 
 			object->SetContainer(this);
 			object->SetRegisteredFlag();
@@ -252,12 +263,10 @@ S::Int S::GUI::Layer::UnregisterObject(Object *object)
 
 	if (containerType == &object->possibleContainers)
 	{
-		if (nOfObjects > 0 && object->IsRegistered())
+		if (GetNOfObjects() > 0 && object->IsRegistered())
 		{
 			if (assocObjects.RemoveEntry(object->handle) == True)
 			{
-				nOfObjects--;
-
 				if (object->GetObjectType() == Widget::classID)
 				{
 					((Widget *) object)->onUnregister.Emit(this);

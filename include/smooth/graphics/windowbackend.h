@@ -8,33 +8,37 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_POINT_
-#define _H_OBJSMOOTH_POINT_
+#ifndef _H_OBJSMOOTH_WINDOWBACKEND_
+#define _H_OBJSMOOTH_WINDOWBACKEND_
 
 namespace smooth
 {
-	class Point;
+	namespace GUI
+	{
+		class WindowBackend;
+	};
 };
 
-#include "primitive.h"
+#include "../definitions.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Point : public Primitive
+	namespace GUI
 	{
-		public:
-#ifdef __WIN32__
-			operator	 POINT();
-			Point &operator	 =(const POINT);
-#endif
-			Int		 x;
-			Int		 y;
+		const Int	 WINDOW_NULL = 0;
 
-					 Point();
-					 Point(Int, Int);
+		class WindowBackend
+		{
+			protected:
+				Int		 type;
+			public:
+						 WindowBackend(Void * = NIL);
+				virtual		~WindowBackend();
 
-			Point operator	 +(const Point &);
-			Point operator	 -(const Point &);
+				Int		 GetWindowType();
+
+				virtual Void	*GetSystemWindow();
+		};
 	};
 };
 

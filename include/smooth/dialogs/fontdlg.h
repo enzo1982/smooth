@@ -8,33 +8,31 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_POINT_
-#define _H_OBJSMOOTH_POINT_
+#ifndef _H_OBJSMOOTH_FONTDLG_
+#define _H_OBJSMOOTH_FONTDLG_
 
 namespace smooth
 {
-	class Point;
+	class DialogFontSelection;
 };
 
-#include "primitive.h"
+#include "../definitions.h"
+#include "dialog.h"
+#include "../graphics/font.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Point : public Primitive
+	class SMOOTHAPI DialogFontSelection : public Dialog
 	{
+		private:
+			GUI::Font	 font;
 		public:
-#ifdef __WIN32__
-			operator	 POINT();
-			Point &operator	 =(const POINT);
-#endif
-			Int		 x;
-			Int		 y;
+					 DialogFontSelection();
+					~DialogFontSelection();
 
-					 Point();
-					 Point(Int, Int);
+			Int		 ShowDialog();
 
-			Point operator	 +(const Point &);
-			Point operator	 -(const Point &);
+			GUI::Font	 GetFont();
 	};
 };
 

@@ -20,7 +20,7 @@
 #include <smooth/layer.h>
 #include <smooth/timer.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/gdi/windowgdi.h>
+#include <smooth/graphics/window.h>
 
 #include <imm.h>
 
@@ -157,7 +157,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 	if (!IsRegistered())			return Error;
 	if (!IsActive() || !IsVisible())	return Success;
 
-	WindowGDI	*wnd = (WindowGDI *) myContainer->GetContainerWindow();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
@@ -618,7 +618,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 S::Void S::GUI::EditBox::SetCursor(Int newPos)
 {
-	WindowGDI	*wnd = (WindowGDI *) myContainer->GetContainerWindow();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return;
 

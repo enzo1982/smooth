@@ -17,13 +17,12 @@ namespace smooth
 	{
 		class PopupView;
 		class PopupMenu;
+		class Menu;
 	};
-
-	class Menu;
 };
 
-#include "widget.h"
-#include "timer.h"
+#include "../widget.h"
+#include "../timer.h"
 
 namespace smooth
 {

@@ -291,6 +291,10 @@ SOURCE=..\classes\misc\binary.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\misc\config.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\misc\datetime.cpp
 # End Source File
 # Begin Source File
@@ -461,6 +465,10 @@ SOURCE=..\classes\graphics\surfacebackend.cpp
 
 SOURCE=..\classes\graphics\window.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\windowbackend.cpp
+# End Source File
 # End Group
 # End Group
 # Begin Group "dialogs"
@@ -485,6 +493,10 @@ SOURCE=..\dialogs\filedlg.cpp
 # Begin Source File
 
 SOURCE=..\dialogs\fontdlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\dialogs\tipodaydlg.cpp
 # End Source File
 # End Group
 # Begin Group "miscsources"
@@ -740,6 +752,62 @@ SOURCE=..\include\smooth\graphics\surfacebackend.h
 
 SOURCE=..\include\smooth\graphics\window.h
 # End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\windowbackend.h
+# End Source File
+# End Group
+# Begin Group "dialogsheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\dialogs\colordlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\dialogs\dialog.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\dialogs\dirdlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\dialogs\filedlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\dialogs\fontdlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\dialogs\tipodaydlg.h
+# End Source File
+# End Group
+# Begin Group "menuheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\menu\menu.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\menu\menubar.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\menu\menuentry.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\menu\popupmenu.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\menu\popupview.h
+# End Source File
 # End Group
 # Begin Source File
 
@@ -791,11 +859,11 @@ SOURCE=..\include\smooth\color.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\colordlg.h
+SOURCE=..\include\smooth\combobox.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\combobox.h
+SOURCE=..\include\smooth\config.h
 # End Source File
 # Begin Source File
 
@@ -812,14 +880,6 @@ SOURCE=..\include\smooth\datetime.h
 # Begin Source File
 
 SOURCE=..\include\smooth\definitions.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\dialog.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\dirdlg.h
 # End Source File
 # Begin Source File
 
@@ -840,14 +900,6 @@ SOURCE=..\include\smooth\droparea.h
 # Begin Source File
 
 SOURCE=..\include\smooth\editbox.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\filedlg.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\fontdlg.h
 # End Source File
 # Begin Source File
 
@@ -911,18 +963,6 @@ SOURCE=..\include\smooth\mdiwindow.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\menu.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\menubar.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\menuentry.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\messagebox.h
 # End Source File
 # Begin Source File
@@ -960,14 +1000,6 @@ SOURCE=..\include\smooth\pciio.h
 # Begin Source File
 
 SOURCE=..\include\smooth\point.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\popupmenu.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\popupview.h
 # End Source File
 # Begin Source File
 

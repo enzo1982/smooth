@@ -56,7 +56,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 	Point	 lineStart;
 	Point	 lineEnd;
 
-	for (Int i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		if (i > 0) prev = object;
 
@@ -87,7 +87,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 	frame.right	= frame.left;
 	frame.bottom	= frame.top + METRIC_REGISTEROFFSETY;
 
-	for (Int j = 0; j < nOfObjects; j++)
+	for (Int j = 0; j < GetNOfObjects(); j++)
 	{
 		if (j > 0) prev = object;
 
@@ -236,7 +236,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	frame.right	= realPos.x;
 	frame.bottom	= realPos.y + METRIC_REGISTEROFFSETY;
 
-	for (Int i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		object = (Layer *) assocObjects.GetNthEntry(i);
 
@@ -256,7 +256,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			for (Int i = 0; i < nOfObjects; i++)
+			for (Int i = 0; i < GetNOfObjects(); i++)
 			{
 				object = (Layer *) assocObjects.GetNthEntry(i);
 
@@ -275,7 +275,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 						{
 							surface->StartPaint(Rect(Point(Setup::rightToLeft ? (wnd->GetObjectProperties()->size.cx - (realPos.x + objectProperties->size.cx)) : realPos.x, realPos.y), objectProperties->size));
 
-							for (Int j = 0; j < nOfObjects; j++)
+							for (Int j = 0; j < GetNOfObjects(); j++)
 							{
 								object2 = (Layer *) assocObjects.GetNthEntry(j);
 
@@ -322,11 +322,9 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 S::Void S::GUI::TabWidget::GetSize()
 {
-	Layer	*object;
-
-	for (Int i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		object = (Layer *) assocObjects.GetNthEntry(i);
+		Layer	*object = (Layer *) assocObjects.GetNthEntry(i);
 
 		if (object != NIL)
 		{
@@ -342,11 +340,9 @@ S::Void S::GUI::TabWidget::GetSize()
 
 S::Int S::GUI::TabWidget::SelectTab(Int layerid)
 {
-	Layer	*object;
-
-	for (Int i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		object = (Layer *) assocObjects.GetNthEntry(i);
+		Layer	*object = (Layer *) assocObjects.GetNthEntry(i);
 
 		if (object->handle == layerid)	object->Show();
 		else				object->Hide();
@@ -368,15 +364,13 @@ S::Int S::GUI::TabWidget::RegisterObject(Object *object)
 			sizeSet.AddEntry(False, object->handle);
 			textSize.AddEntry(0, object->handle);
 
-			nOfObjects++;
-
 			object->SetContainer(myContainer->GetContainerObject()->GetContainer());
 			object->SetRegisteredFlag();
 
 			((Widget *) object)->onRegister.Emit(this);
 
-			if (nOfObjects == 1)	((Layer *) object)->Show();
-			else			((Layer *) object)->Hide();
+			if (GetNOfObjects() == 1)	((Layer *) object)->Show();
+			else				((Layer *) object)->Hide();
 
 			return Success;
 		}
@@ -393,7 +387,7 @@ S::Int S::GUI::TabWidget::UnregisterObject(Object *object)
 
 	if (containerType == &object->possibleContainers)
 	{
-		if (nOfObjects > 0 && object->IsRegistered())
+		if (GetNOfObjects() > 0 && object->IsRegistered())
 		{
 			if (((Layer *) object)->IsVisible())
 			{
@@ -408,12 +402,11 @@ S::Int S::GUI::TabWidget::UnregisterObject(Object *object)
 			{
 				sizeSet.RemoveEntry(object->handle);
 				textSize.RemoveEntry(object->handle);
-				nOfObjects--;
 
 				object->UnsetRegisteredFlag();
 				object->SetContainer(NIL);
 
-				if (activateNew && nOfObjects > 0) ((Layer *) assocObjects.GetFirstEntry())->Show();
+				if (activateNew && GetNOfObjects() > 0) ((Layer *) assocObjects.GetFirstEntry())->Show();
 
 				return Success;
 			}

@@ -109,6 +109,8 @@ S::Int S::GUI::Widget::Show()
 
 	if (IsVisible()) Paint(SP_SHOW);
 
+	onShow.Emit();
+
 	return Success;
 }
 
@@ -133,8 +135,15 @@ S::Int S::GUI::Widget::Hide()
 		rect.right	= realPos.x + objectProperties->size.cx;
 		rect.bottom	= realPos.y + objectProperties->size.cy;
 
-		surface->Box(rect, Setup::BackgroundColor, FILLED);
+		UnsignedLong	 bgColor;
+
+		if (myContainer->GetContainerObject()->GetObjectType() == Layer::classID)	bgColor = ((Layer *) myContainer->GetContainerObject())->GetColor();
+		else										bgColor = Setup::BackgroundColor;
+
+		surface->Box(rect, bgColor, FILLED);
 	}
+
+	onHide.Emit();
 
 	return Success;
 }

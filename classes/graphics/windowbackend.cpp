@@ -8,32 +8,23 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_FONTDLG_
-#define _H_OBJSMOOTH_FONTDLG_
+#include <smooth/graphics/windowbackend.h>
 
-namespace smooth
+S::GUI::WindowBackend::WindowBackend(Void *iWindow)
 {
-	class DialogFontSelection;
-};
+	type = WINDOW_NULL;
+}
 
-#include "definitions.h"
-#include "dialog.h"
-#include "graphics/font.h"
-
-namespace smooth
+S::GUI::WindowBackend::~WindowBackend()
 {
-	class SMOOTHAPI DialogFontSelection : public Dialog
-	{
-		private:
-			GUI::Font	 font;
-		public:
-					 DialogFontSelection();
-					~DialogFontSelection();
+}
 
-			Int		 ShowDialog();
+S::Int S::GUI::WindowBackend::GetWindowType()
+{
+	return type;
+}
 
-			GUI::Font	 GetFont();
-	};
-};
-
-#endif
+S::Void *S::GUI::WindowBackend::GetSystemWindow()
+{
+	return NIL;
+}

@@ -8,12 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/popupmenu.h>
+#include <smooth/menu/popupmenu.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
 #include <smooth/objectproperties.h>
-#include <smooth/popupview.h>
+#include <smooth/menu/popupview.h>
 #include <smooth/toolwindow.h>
 #include <smooth/application.h>
 
@@ -95,6 +95,8 @@ S::Int S::GUI::PopupMenu::Show()
 
 	wnd->RegisterObject(toolwnd);
 
+	onShow.Emit();
+
 	LeaveProtectedRegion();
 
 	return Success;
@@ -130,6 +132,8 @@ S::Int S::GUI::PopupMenu::Hide()
 	}
 
 	visible = False;
+
+	onHide.Emit();
 
 	LeaveProtectedRegion();
 

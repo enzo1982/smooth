@@ -400,6 +400,14 @@ Int Test::threadMessageBox(Thread *thread)
 {
 	thread->SetFlags(THREAD_KILLFLAG_WAIT);	// for this thread can quit itself (after closing the MessageBox) it needn't be terminated by smooth (KILLTHREAD_KILL is default)
 
+	DialogTipOfTheDay	*dlg = new DialogTipOfTheDay();
+
+	dlg->AddTip("...that smooth has a \'Tip of the day\' dialog?");
+
+	dlg->ShowDialog();
+
+	DeleteObject(dlg);
+
 	QuickMessage("This MessageBox is running in a separate thread!", "Info", MB_OK, IDI_INFORMATION);
 
 	thread->Stop();

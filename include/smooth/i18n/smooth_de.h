@@ -48,6 +48,10 @@ namespace smooth
 			Append("    <entry id=\"18\" string=\"Save file as\">Datei speichern unter</entry>\n").
 			Append("    <entry id=\"19\" string=\"Select directory\">Verzeichnis auswählen</entry>\n").
 			Append("    <entry id=\"20\" string=\"Select font\">Schriftart auswählen</entry>\n").
+			Append("    <entry id=\"21\" string=\"Tip of the day\">Tipp des Tages</entry>\n").
+			Append("    <entry id=\"22\" string=\"Did you know...\">Wussten Sie schon...</entry>\n").
+			Append("    <entry id=\"23\" string=\"Show tips on startup\">Tipps beim Start anzeigen</entry>\n").
+			Append("    <entry id=\"24\" string=\"Next tip\">Nächster Tipp</entry>\n").
 			Append("  </data>\n").
 			Append("</LangFile>\n");
 	};

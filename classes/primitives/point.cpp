@@ -22,6 +22,20 @@ S::Point::Point(Int iX, Int iY)
 	y = iY;
 }
 
+S::Point S::Point::operator +(const Point &point)
+{
+	Point	 retP(x + point.x, y + point.y);
+
+	return retP;
+}
+
+S::Point S::Point::operator -(const Point &point)
+{
+	Point	 retP(x - point.x, y - point.y);
+
+	return retP;
+}
+
 #ifdef __WIN32__
 S::Point::operator POINT()
 {

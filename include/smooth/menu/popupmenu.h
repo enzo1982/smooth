@@ -8,47 +8,52 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_MENUBAR_
-#define _H_OBJSMOOTH_MENUBAR_
+#ifndef _H_OBJSMOOTH_POPUPMENU_
+#define _H_OBJSMOOTH_POPUPMENU_
+
+#include "../definitions.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
+		class PopupMenu;
+		class Window;
+		class ToolWindow;
+		class PopupView;
 		class Menubar;
 	};
 };
 
-#include "widget.h"
+#include "../widget.h"
 #include "menu.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 MB_GRAYSCALE	= 0;
-		const Int	 MB_COLOR	= 1;
-
-		class SMOOTHAPI Menubar : public Widget, public Menu
+		class SMOOTHAPI PopupMenu : public Widget
 		{
+			friend class SMOOTHAPI PopupView;
+			friend class SMOOTHAPI Menubar;
 			private:
-				Int			 popupHandle;
+				ToolWindow		*toolwnd;
+				PopupView		*popupView;
 
-				String			 backupStatusText;
+				PopupMenu		*prevPopup;
+				PopupMenu		*nextPopup;
 
-				Int			 bitmapSize;
+				Menu			*realMenu;
 			public:
 				static const Int	 classID;
 
-							 Menubar();
-							~Menubar();
+							 PopupMenu(Menu *);
+				 			~PopupMenu();
 
-				virtual Int		 Paint(Int);
 				Int			 Process(Int, Int, Int);
 
-				Int			 SetBitmapSize(Int);
-
-				Void			 PopupProc();
+				Int			 Show();
+				Int			 Hide();
 		};
 	};
 };

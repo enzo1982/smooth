@@ -15,15 +15,10 @@ namespace smooth
 {
 	namespace GUI
 	{
-		class WindowBase;
-		class ToolWindow;
+		class Window;
+		class WindowBackend;
 		class PopupMenu;
-		class Menubar;
-		class Titlebar;
-		class Client;
-		class MDIClient;
 		class Layer;
-		class Divider;
 	};
 };
 
@@ -31,7 +26,7 @@ namespace smooth
 #include "../container.h"
 #include "../rect.h"
 #include "../loop.h"
-#include "../menu.h"
+#include "../menu/menu.h"
 #include "../timer.h"
 #include "bitmap.h"
 
@@ -50,9 +45,18 @@ namespace smooth
 		const Int	 WO_SEPARATOR	= 1;
 		const Int	 WO_NOSEPARATOR	= 2;
 
-		class SMOOTHAPI WindowBase : public Widget, public Container
+		class SMOOTHAPI Window : public Widget, public Container
 		{
+			private:
+				static LRESULT CALLBACK		 WindowProc(HWND, UINT, WPARAM, LPARAM);
+
+				WindowBackend			*backend;
 			protected:
+				HICON				 sysIcon;
+				HDC				 windowDC;
+
+				Int				 origWndStyle;
+
 				Int				 style;
 				Int				 exstyle;
 				Bool				 stay;
@@ -78,7 +82,7 @@ namespace smooth
 				Layer				*mainLayer;
 				Timer				*paintTimer;
 
-				virtual Bool			 Create();
+				Bool				 Create();
 
 				Void				 CalculateOffsets();
 
@@ -86,6 +90,8 @@ namespace smooth
 
 				Void				 PopupProc();
 			public:
+				HWND				 hwnd;
+
 				static const Int		 classID;
 
 				static Int			 nOfActiveWindows;
@@ -93,19 +99,21 @@ namespace smooth
 
 				Bool				 initshow;
 
-								 WindowBase(String title = NIL);
-								~WindowBase();
+								 Window(String = NIL, Void * = NIL);
+								~Window();
 
-				virtual Int			 SetIcon(const Bitmap &);
+				static Window			*GetWindow(HWND);
+
+				Int				 SetIcon(const Bitmap &);
 				Bitmap				&GetIcon();
 
 				Int				 SetApplicationIcon(char *);
 				Int				 SetApplicationIcon(wchar_t *);
 
-				virtual Int			 SetMetrics(Point, Size);
+				Int				 SetMetrics(Point, Size);
 				Void				 SetStyle(Int);
 				Void				 SetExStyle(Int);
-				virtual Int			 SetText(String);
+				Int				 SetText(String);
 
 				Layer				*GetMainLayer();
 
@@ -121,28 +129,28 @@ namespace smooth
 				Int				 SetMinimumSize(Size);
 				Int				 SetMaximumSize(Size);
 
-				virtual Int			 Show();
-				virtual Int			 Hide();
+				Int				 Show();
+				Int				 Hide();
 
-				virtual Int			 Maximize();
-				virtual Int			 Restore();
+				Int				 Maximize();
+				Int				 Restore();
 				Bool				 IsMaximized();
 
-				virtual Int			 Stay();
-				virtual Int			 Close();
+				Int				 Stay();
+				Int				 Close();
 
 				Bool				 IsInUse();
 
-				virtual Int			 Paint(Int);
-				virtual Int			 Process(Int, Int, Int);
+				Int				 Paint(Int);
+				Int				 Process(Int, Int, Int);
 
 				Int				 MouseX();
 				Int				 MouseY();
 
-				virtual Bool			 IsMouseOn(Rect);
+				Bool				 IsMouseOn(Rect);
 
-				virtual Int			 RegisterObject(Object *);
-				virtual Int			 UnregisterObject(Object *);
+				Int				 RegisterObject(Object *);
+				Int				 UnregisterObject(Object *);
 			signals:
 				Signal0<Void>			 onCreate;
 
@@ -158,12 +166,5 @@ namespace smooth
 		};
 	};
 };
-
-#ifdef __WIN32__
-	#include "gdi/windowgdi.h"
-	#define Window WindowGDI
-#else
-	#define Window WindowBase
-#endif
 
 #endif

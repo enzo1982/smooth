@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/menu.h>
+#include <smooth/menu/menu.h>
 #include <smooth/definitions.h>
 #include <smooth/array.h>
 #include <smooth/color.h>
@@ -16,25 +16,30 @@
 #include <smooth/metrics.h>
 #include <smooth/i18n.h>
 
-S::Menu::Menu()
+const S::Int	 S::GUI::Menu::classID = S::Object::RequestClassID();
+
+S::GUI::Menu::Menu()
 {
-	nOfEntries = 0;
+	self = this;
+
+	type		= classID;
+	containerType	= classID;
 
 	sizeset = False;
 	entrysizesset = False;
 }
 
-S::Menu::~Menu()
+S::GUI::Menu::~Menu()
 {
-	Int	 maxCount = nOfEntries;
+	Int	 nOfEntries = entries.GetNOfEntries();
 
-	for (Int i = 0; i < maxCount; i++)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
 		RemoveEntry(entries.GetFirstEntry());
 	}
 }
 
-S::MenuEntry *S::Menu::AddEntry(String text, GUI::Bitmap bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
+S::GUI::MenuEntry *S::GUI::Menu::AddEntry(String text, Bitmap bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
 {
 	Int	 id	= System::RequestGUID();
 	Int	 type	= SM_SEPARATOR;
@@ -66,10 +71,12 @@ S::MenuEntry *S::Menu::AddEntry(String text, GUI::Bitmap bitmap, Menu *popupMenu
 
 	if (entries.AddEntry(newEntry, id) == True)
 	{
-		nOfEntries++;
-
 		sizeset		= False;
 		entrysizesset	= False;
+
+		RegisterObject(newEntry);
+
+		newEntry->Show();
 
 		return newEntry;
 	}
@@ -81,7 +88,7 @@ S::MenuEntry *S::Menu::AddEntry(String text, GUI::Bitmap bitmap, Menu *popupMenu
 	}
 }
 
-S::Int S::Menu::RemoveEntry(MenuEntry *entry)
+S::Int S::GUI::Menu::RemoveEntry(MenuEntry *entry)
 {
 	if (entry == NIL) return Error;
 
@@ -89,9 +96,9 @@ S::Int S::Menu::RemoveEntry(MenuEntry *entry)
 	{
 		entries.RemoveEntry(entry->id);
 
-		Object::DeleteObject(entry);
+		UnregisterObject(entry);
 
-		nOfEntries--;
+		Object::DeleteObject(entry);
 
 		return Success;
 	}
@@ -99,16 +106,16 @@ S::Int S::Menu::RemoveEntry(MenuEntry *entry)
 	return Error;
 }
 
-S::Int S::Menu::RemoveEntry(Int id)
+S::Int S::GUI::Menu::RemoveEntry(Int id)
 {
 	return RemoveEntry(entries.GetEntry(id));
 }
 
-S::Int S::Menu::Clear()
+S::Int S::GUI::Menu::Clear()
 {
-	Int	 maxCount = nOfEntries;
+	Int	 nOfEntries = entries.GetNOfEntries();
 
-	for (Int i = 0; i < maxCount; i++)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
 		RemoveEntry(entries.GetFirstEntry());
 	}
@@ -116,7 +123,7 @@ S::Int S::Menu::Clear()
 	return Success;
 }
 
-S::Void S::Menu::GetSize()
+S::Void S::GUI::Menu::GetSize()
 {
 	if (!entrysizesset)
 	{
@@ -133,14 +140,14 @@ S::Void S::Menu::GetSize()
 	}
 }
 
-S::Int S::Menu::GetSizeX()
+S::Int S::GUI::Menu::GetSizeX()
 {
 	Int	 mSize = 50;
 	Int	 greatest = 0;
 
-	if (nOfEntries == 0) return mSize;
+	if (entries.GetNOfEntries() == 0) return mSize;
 
-	for (Int i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < entries.GetNOfEntries(); i++)
 	{
 		MenuEntry	*entry = entries.GetNthEntry(i);
 
@@ -154,13 +161,13 @@ S::Int S::Menu::GetSizeX()
 	return mSize;
 }
 
-S::Int S::Menu::GetSizeY()
+S::Int S::GUI::Menu::GetSizeY()
 {
 	Int	 mSize = 4;
 
-	if (nOfEntries == 0) return mSize;
+	if (entries.GetNOfEntries() == 0) return mSize;
 
-	for (Int i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < entries.GetNOfEntries(); i++)
 	{
 		MenuEntry	*entry = entries.GetNthEntry(i);
 
@@ -171,14 +178,14 @@ S::Int S::Menu::GetSizeY()
 	return mSize;
 }
 
-S::Void S::Menu::GetMenuEntriesSize()
+S::Void S::GUI::Menu::GetMenuEntriesSize()
 {
-	if (nOfEntries == 0) return;
+	if (entries.GetNOfEntries() == 0) return;
 
-	for (Int i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < entries.GetNOfEntries(); i++)
 	{
 		MenuEntry	*operat = entries.GetNthEntry(i);
-		GUI::Font	 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
+		Font		 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
 
 		if (!operat->sizeset) operat->size = font.GetTextSizeX(operat->text);
 
@@ -186,7 +193,7 @@ S::Void S::Menu::GetMenuEntriesSize()
 	}
 }
 
-S::Int S::Menu::GetNOfEntries()
+S::Int S::GUI::Menu::GetNOfEntries()
 {
-	return nOfEntries;
+	return entries.GetNOfEntries();
 }

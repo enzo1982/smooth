@@ -41,12 +41,10 @@ S::ObjectManager::ObjectManager()
 
 S::ObjectManager::~ObjectManager()
 {
-	for (Int i = 0; i < nOfObjects; i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		delete assocObjects.GetNthEntry(i);
 	}
-
-	nOfObjects = 0;
 
 	if (iAmTheOne) objectManagerExists = False;
 }
@@ -56,7 +54,6 @@ S::Int S::ObjectManager::RegisterObject(Object *object)
 	if (object == NIL) return Error;
 
 	assocObjects.AddEntry(object, object->handle);
-	nOfObjects++;
 
 	return Success;
 }
@@ -67,8 +64,6 @@ S::Int S::ObjectManager::UnregisterObject(Object *object)
 
 	if (assocObjects.RemoveEntry(object->handle) == True)
 	{
-		nOfObjects--;
-
 		return Success;
 	}
 

@@ -84,6 +84,9 @@ namespace smooth
 
 				virtual Bool			 IsTypeCompatible(Int);
 			signals:
+				Signal0<Void>			 onShow;
+				Signal0<Void>			 onHide;
+
 				Signal2<Void, Int, Int>		 onClick;
 
 				Signal1<Void, Container *>	 onRegister;

@@ -18,7 +18,7 @@
 #include <smooth/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/graphics/gdi/windowgdi.h>
+#include <smooth/graphics/window.h>
 
 const S::Int	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
 
@@ -152,7 +152,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	WindowGDI	*wnd = (WindowGDI *) myContainer->GetContainerWindow();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 

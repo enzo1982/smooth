@@ -8,14 +8,14 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/popupview.h>
+#include <smooth/menu/popupview.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
 #include <smooth/optionbox.h>
 #include <smooth/checkbox.h>
 #include <smooth/objectmanager.h>
 #include <smooth/objectproperties.h>
-#include <smooth/popupmenu.h>
+#include <smooth/menu/popupmenu.h>
 #include <smooth/toolwindow.h>
 #include <smooth/graphics/surface.h>
 

@@ -11,12 +11,6 @@
 #ifndef _H_OBJSMOOTH_CONTAINER_
 #define _H_OBJSMOOTH_CONTAINER_
 
-#ifdef __WIN32__
-	#define Window WindowGDI
-#else
-	#define Window WindowBase
-#endif
-
 namespace smooth
 {
 	class Container;
@@ -40,7 +34,6 @@ namespace smooth
 			ContainerType		 containerType;
 			Object			*self;
 
-			Int			 nOfObjects;
 			Array<Object *>		 assocObjects;
 
 			GUI::Surface		*nullSurface;

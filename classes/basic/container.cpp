@@ -17,9 +17,8 @@ const S::Int	 S::Container::classID = S::Object::RequestClassID();
 
 S::Container::Container() : containerType(this)
 {
-	self			= NIL;
-	nOfObjects		= 0;
-	containerType		= classID;
+	self		= NIL;
+	containerType	= classID;
 
 	nullSurface = new GUI::Surface();
 	drawSurface = nullSurface;
@@ -27,9 +26,11 @@ S::Container::Container() : containerType(this)
 
 S::Container::~Container()
 {
+	Int	 nOfObjects = assocObjects.GetNOfEntries();
+
 	for (Int i = 0; i < nOfObjects; i++)
 	{
-		if (UnregisterObject(assocObjects.GetFirstEntry()) == Success) nOfObjects++;
+		UnregisterObject(assocObjects.GetFirstEntry());
 	}
 
 	assocObjects.RemoveAll();
@@ -46,7 +47,6 @@ S::Int S::Container::RegisterObject(Object *object)
 		if (!object->IsRegistered())
 		{
 			assocObjects.AddEntry(object, object->handle);
-			nOfObjects++;
 
 			object->SetContainer(this);
 			object->SetRegisteredFlag();
@@ -68,8 +68,6 @@ S::Int S::Container::UnregisterObject(Object *object)
 		{
 			if (assocObjects.RemoveEntry(object->handle) == True)
 			{
-				nOfObjects--;
-
 				object->UnsetRegisteredFlag();
 				object->SetContainer(NIL);
 
@@ -83,7 +81,7 @@ S::Int S::Container::UnregisterObject(Object *object)
 
 S::Int S::Container::GetNOfObjects()
 {
-	return nOfObjects;
+	return assocObjects.GetNOfEntries();
 }
 
 S::Object *S::Container::GetNthObject(Int n)

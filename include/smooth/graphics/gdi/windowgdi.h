@@ -19,51 +19,23 @@ namespace smooth
 	};
 };
 
-#include "../window.h"
+#include "../windowbackend.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI WindowGDI : public WindowBase
+		const Int	 WINDOW_GDI	= 1;
+
+		class WindowGDI : public WindowBackend
 		{
-			private:
-				static LRESULT CALLBACK		 WindowProc(HWND, UINT, WPARAM, LPARAM);
 			protected:
-				HICON				 sysIcon;
-				HDC				 windowDC;
-
-				Int				 origWndStyle;
-
-				Bool				 Create();
+				HWND	 hwnd;
 			public:
-				HWND				 hwnd;
+					 WindowGDI(Void * = NIL);
+					~WindowGDI();
 
-								 WindowGDI(String title = NIL);
-								~WindowGDI();
-
-				Int				 SetIcon(const Bitmap &);
-
-				Int				 SetApplicationIcon(char *);
-				Int				 SetApplicationIcon(wchar_t *);
-
-				Int				 SetMetrics(Point, Size);
-				Int				 SetText(String);
-
-				Int				 Show();
-				Int				 Hide();
-
-				Int				 Maximize();
-				Int				 Restore();
-
-				Int				 Stay();
-				Int				 Close();
-
-				Int				 Process(Int, Int, Int);
-
-				Bool				 IsMouseOn(Rect);
-
-				static WindowGDI		*GetWindow(HWND);
+				Void	*GetSystemWindow();
 		};
 	};
 };

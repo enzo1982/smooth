@@ -14,7 +14,7 @@
 
 S::GUI::BitmapBackend::BitmapBackend(Void *iBitmap)
 {
-	type	= BITMAP_NONE;
+	type	= BITMAP_NULL;
 
 	size	= Size(0, 0);
 	depth	= 0;
@@ -25,7 +25,7 @@ S::GUI::BitmapBackend::BitmapBackend(Void *iBitmap)
 
 S::GUI::BitmapBackend::BitmapBackend(Int cx, Int cy, Int bpp)
 {
-	type	= BITMAP_NONE;
+	type	= BITMAP_NULL;
 
 	size	= Size(cx, cy);
 	depth	= bpp;
@@ -36,7 +36,7 @@ S::GUI::BitmapBackend::BitmapBackend(Int cx, Int cy, Int bpp)
 
 S::GUI::BitmapBackend::BitmapBackend(const int nil)
 {
-	type	= BITMAP_NONE;
+	type	= BITMAP_NULL;
 
 	size	= Size(0, 0);
 	depth	= 0;
@@ -47,7 +47,7 @@ S::GUI::BitmapBackend::BitmapBackend(const int nil)
 
 S::GUI::BitmapBackend::BitmapBackend(const BitmapBackend &iBitmap)
 {
-	type	= BITMAP_NONE;
+	type	= BITMAP_NULL;
 
 	size	= Size(0, 0);
 	depth	= 0;

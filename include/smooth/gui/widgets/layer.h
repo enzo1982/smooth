@@ -28,8 +28,6 @@ namespace smooth
 	{
 		class SMOOTHAPI Layer : public Container
 		{
-			protected:
-				UnsignedLong		 layerColor;
 			public:
 				static const Int	 classID;
 
@@ -42,12 +40,7 @@ namespace smooth
 				virtual Int		 Paint(Int);
 				Int			 Process(Int, Int, Int);
 
-				UnsignedLong		 GetColor();
-				Int			 SetColor(UnsignedLong);
-
 				Int			 SetMetrics(Point, Size);
-
-				Surface			*GetDrawSurface();
 
 				Int			 RegisterObject(Widget *);
 				Int			 UnregisterObject(Widget *);

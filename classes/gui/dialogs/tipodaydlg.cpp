@@ -99,7 +99,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 
 	layer_inner	= new Layer();
 	layer_inner->SetMetrics(pos, size);
-	layer_inner->SetColor(Setup::TooltipColor);
+	layer_inner->SetBackgroundColor(Setup::TooltipColor);
 
 	RegisterObject(dlgwnd);
 

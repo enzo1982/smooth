@@ -61,7 +61,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 			if (object->GetContainer() == NIL)
 			{
 				object->SetContainer(container->GetContainer());
-				object->SetRegisteredFlag();
+				object->SetRegisteredFlag(True);
 
 				((Widget *) object)->onRegister.Emit(this);
 			}
@@ -244,7 +244,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 			if (object->GetContainer() == NIL)
 			{
 				object->SetContainer(container->GetContainer());
-				object->SetRegisteredFlag();
+				object->SetRegisteredFlag(True);
 
 				((Widget *) object)->onRegister.Emit(this);
 			}
@@ -406,7 +406,7 @@ S::Int S::GUI::TabWidget::UnregisterObject(Widget *object)
 				sizeSet.RemoveEntry(object->GetHandle());
 				textSize.RemoveEntry(object->GetHandle());
 
-				object->UnsetRegisteredFlag();
+				object->SetRegisteredFlag(False);
 				object->SetContainer(NIL);
 
 				if (activateNew && GetNOfObjects() > 0) assocObjects.GetFirstEntry()->Show();

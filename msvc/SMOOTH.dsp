@@ -1778,10 +1778,6 @@ SOURCE=..\include\smooth\setup.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\shlobjmini.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\signals.h
 # End Source File
 # Begin Source File

@@ -70,7 +70,6 @@ namespace smooth
 				Size				 size;
 
 				Size				 textSize;
-				Size				 tooltipSize;
 
 								 Widget();
 				virtual				~Widget();
@@ -80,8 +79,7 @@ namespace smooth
 				Int				 SetContainer(Container *);
 				Container			*GetContainer();
 
-				Void				 SetRegisteredFlag();
-				Void				 UnsetRegisteredFlag();
+				Void				 SetRegisteredFlag(Bool);
 
 				virtual Point			 GetRealPosition();
 

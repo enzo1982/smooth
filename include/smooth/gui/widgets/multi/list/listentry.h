@@ -16,7 +16,6 @@ namespace smooth
 	namespace GUI
 	{
 		class ComboBox;
-		class EditBox;
 		class List;
 		class ListBox;
 		class Tooltip;
@@ -37,25 +36,33 @@ namespace smooth
 		class SMOOTHAPI ListEntry : public Widget
 		{
 			friend class ComboBox;
-			friend class EditBox;
 			friend class List;
 			friend class ListBox;
-			public:
-				Int		 id;
+			private:
+				Bool		 marked;
 
 				Tooltip		*tooltip;
 				System::Timer	*tipTimer;
 
-				Bool		 selected;
-				Rect		 rect;
-
-						 ListEntry(Int);
+				Void		 DrawEntryText(Int);
+			public:
+						 ListEntry(String);
 						~ListEntry();
 
-				Void		 ActivateTooltip();
+				Int		 Paint(Int);
+				Int		 Process(Int, Int, Int);
+
+				Int		 SetMark(Bool);
+				Bool		 IsMarked();
 			signals:
 				Signal0<Void>	 onMouseOver;
 				Signal0<Void>	 onMouseOut;
+			slots:
+				Void		 OnRegister();
+				Void		 OnUnregister();
+
+				Void		 ActivateTooltip();
+				Void		 SelectEntry();
 		};
 	};
 };

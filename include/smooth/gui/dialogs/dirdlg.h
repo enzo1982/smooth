@@ -40,6 +40,7 @@ namespace smooth
 
 					Int	 ShowDialog();
 
+					Int	 SetDirName(String);
 					String	 GetDirName();
 			};
 		};

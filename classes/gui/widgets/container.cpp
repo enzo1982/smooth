@@ -18,6 +18,8 @@ S::GUI::Container::Container() : containerType(this)
 {
 	containerType	= classID;
 
+	backgroundColor	= -1;
+
 	nullSurface	= new GUI::Surface();
 	drawSurface	= nullSurface;
 }
@@ -36,6 +38,20 @@ S::GUI::Container::~Container()
 	delete nullSurface;
 }
 
+S::Int S::GUI::Container::GetBackgroundColor()
+{
+	return backgroundColor;
+}
+
+S::Int S::GUI::Container::SetBackgroundColor(Int nColor)
+{
+	backgroundColor = nColor;
+
+	Paint(SP_PAINT);
+
+	return Success;
+}
+
 S::Int S::GUI::Container::RegisterObject(Widget *widget)
 {
 	if (widget == NIL) return Error;
@@ -47,7 +63,9 @@ S::Int S::GUI::Container::RegisterObject(Widget *widget)
 			assocObjects.AddEntry(widget, widget->GetHandle());
 
 			widget->SetContainer(this);
-			widget->SetRegisteredFlag();
+			widget->SetRegisteredFlag(True);
+
+			widget->onRegister.Emit(this);
 
 			return Success;
 		}
@@ -66,7 +84,9 @@ S::Int S::GUI::Container::UnregisterObject(Widget *widget)
 		{
 			if (assocObjects.RemoveEntry(widget->GetHandle()) == True)
 			{
-				widget->UnsetRegisteredFlag();
+				widget->onUnregister.Emit(this);
+
+				widget->SetRegisteredFlag(False);
 				widget->SetContainer(NIL);
 
 				return Success;
@@ -121,5 +141,6 @@ S::GUI::Window *S::GUI::Container::GetContainerWindow()
 
 S::GUI::Surface *S::GUI::Container::GetDrawSurface()
 {
-	return drawSurface;
+	if (registered)	return container->GetDrawSurface();
+	else		return drawSurface;
 }

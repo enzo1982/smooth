@@ -228,7 +228,7 @@ S::Int S::GUI::ToolWindow::RegisterObject(Widget *object)
 			assocObjects.AddEntry(object, object->GetHandle());
 
 			object->SetContainer(this);
-			object->SetRegisteredFlag();
+			object->SetRegisteredFlag(True);
 
 			switch (object->GetOrientation())
 			{

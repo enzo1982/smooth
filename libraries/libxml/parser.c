@@ -10085,7 +10085,7 @@ xmlCreateIOParserCtxt(xmlSAXHandlerPtr sax, void *user_data,
     }
     if (sax != NULL) {
 #ifdef LIBXML_SAX1_ENABLED
-	if (ctxt->sax != (xmlSAXHandlerPtr) &xmlDefaultSAXHandler)
+	if (ctxt->sax != (xmlSAXHandlerPtr) (void *) &xmlDefaultSAXHandler)
 #endif /* LIBXML_SAX1_ENABLED */
 	    xmlFree(ctxt->sax);
 	ctxt->sax = (xmlSAXHandlerPtr) xmlMalloc(sizeof(xmlSAXHandler));
@@ -11720,7 +11720,7 @@ xmlSAXUserParseFile(xmlSAXHandlerPtr sax, void *user_data,
     ctxt = xmlCreateFileParserCtxt(filename);
     if (ctxt == NULL) return -1;
 #ifdef LIBXML_SAX1_ENABLED
-    if (ctxt->sax != (xmlSAXHandlerPtr) &xmlDefaultSAXHandler)
+    if (ctxt->sax != (xmlSAXHandlerPtr) (void *) &xmlDefaultSAXHandler)
 #endif /* LIBXML_SAX1_ENABLED */
 	xmlFree(ctxt->sax);
     ctxt->sax = sax;

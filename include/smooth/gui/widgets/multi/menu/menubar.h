@@ -46,8 +46,6 @@ namespace smooth
 				Int			 Process(Int, Int, Int);
 
 				Int			 SetBitmapSize(Int);
-
-				Surface			*GetDrawSurface();
 		};
 	};
 };

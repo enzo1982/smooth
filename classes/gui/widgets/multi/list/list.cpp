@@ -11,174 +11,150 @@
 #include <smooth/gui/widgets/multi/list/list.h>
 #include <smooth/misc/i18n.h>
 
+const S::Int	 S::GUI::List::classID = S::Object::RequestClassID();
+
 S::GUI::List::List()
 {
-	referenceList = NIL;
-	addNil = False;
+	type		= classID;
+	containerType	= classID;
+
+	internalOnSelectEntry.SetParentObject(this);
 }
 
 S::GUI::List::~List()
 {
-	referenceList = NIL;
-
-	RemoveAll();
+	Clear();
 }
 
-S::GUI::ListEntry *S::GUI::List::AddEntry(String name, Int id)
+S::GUI::ListEntry *S::GUI::List::AddEntry(String text)
 {
-	if (referenceList != NIL) return NIL;
+	ListEntry	*newEntry = new ListEntry(text);
 
-	ListEntry	*newEntry = new ListEntry(id);
-
-	newEntry->SetText(name);
-
-	if (Array<ListEntry *>::AddEntry(newEntry, id) == True)
+	if (RegisterObject(newEntry) == Success)
 	{
+		Paint(SP_UPDATE);
+
+		newEntry->Show();
+
 		return newEntry;
 	}
 	else
 	{
-		Object::DeleteObject(newEntry);
+		DeleteObject(newEntry);
 
 		return NIL;
 	}
 }
 
-S::Int S::GUI::List::ModifyEntry(Int id, String name)
+S::Int S::GUI::List::RemoveEntry(ListEntry *entry)
 {
-	if (referenceList != NIL) return Error;
+	if (entry == NIL) return Error;
 
-	ListEntry	*entry = GetEntry(id);
-
-	if (entry != NIL)
+	if (UnregisterObject(entry) == Success)
 	{
-		if (entry->GetText() == name) return Break;
+		DeleteObject(entry);
 
-		Bool	 prevClicked = entry->clicked;
-
-		entry->SetText(name);
-
-		entry->clicked = prevClicked;
+		Paint(SP_UPDATE);
 
 		return Success;
 	}
-	else
-	{
-		return Error;
-	}
+
+	return Error;
 }
 
-S::Int S::GUI::List::RemoveEntry(Int id)
+S::Int S::GUI::List::Clear()
 {
-	if (referenceList != NIL) return Error;
+	Int	 nOfEntries = assocObjects.GetNOfEntries();
 
-	ListEntry	*entry = GetEntry(id);
-
-	if (entry != NIL)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
-		Object::DeleteObject(entry);
+		Widget	*widget = assocObjects.GetFirstEntry();
 
-		Array<ListEntry *>::RemoveEntry(id);
-
-		return Success;
-	}
-	else
-	{
-		return Error;
-	}
-}
-
-S::Int S::GUI::List::RemoveAll()
-{
-	if (referenceList != NIL) return Error;
-
-	for (Int i = 0; i < GetNOfEntries(); i++)
-	{
-		Object::DeleteObject(GetNthEntry(i));
+		UnregisterObject(widget);
+		DeleteObject(widget);
 	}
 
-	Array<ListEntry *>::RemoveAll();
+	Paint(SP_UPDATE);
 
 	return Success;
 }
 
+S::Int S::GUI::List::GetNOfEntries()
+{
+	return assocObjects.GetNOfEntries();
+}
+
+S::GUI::ListEntry *S::GUI::List::GetNthEntry(Int n)
+{
+	return (ListEntry *) assocObjects.GetNthEntry(n);
+}
+
+S::Int S::GUI::List::SelectEntry(ListEntry *entry)
+{
+	Int	 retVal = Error;
+
+	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
+	{
+		ListEntry	*widget = (ListEntry *) assocObjects.GetNthEntry(i);
+
+		if (widget == entry)
+		{
+			widget->clicked = True;
+			widget->Paint(SP_PAINT);
+
+			retVal = Success;
+		}
+		else if (widget->clicked)
+		{
+			widget->clicked = False;
+			widget->Paint(SP_PAINT);
+		}
+	}
+
+	return retVal;
+}
+
 S::GUI::ListEntry *S::GUI::List::GetSelectedEntry()
 {
-	if (GetNOfEntries() == 0) return NIL;
-
-	for (Int i = 0; i < GetNOfEntries(); i++)
+	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
 	{
-		ListEntry	*operat = GetNthEntry(i);
+		ListEntry	*widget = (ListEntry *) assocObjects.GetNthEntry(i);
 
-		if (operat->clicked) return operat;
+		if (widget->clicked) return widget;
 	}
 
 	return NIL;
 }
 
-S::Int S::GUI::List::SelectEntry(Int id)
+S::Int S::GUI::List::SelectNthEntry(Int n)
 {
-	if (GetNOfEntries() == 0) return Error;
+	if (n >= assocObjects.GetNOfEntries()) return Error;
 
-	for (Int i = 0; i < GetNOfEntries(); i++)
+	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
 	{
-		ListEntry	*operat = GetNthEntry(i);
+		ListEntry	*widget = (ListEntry *) assocObjects.GetNthEntry(i);
 
-		if (operat->clicked)	operat->clicked = False;
-		if (operat->id == id)	operat->clicked = True;
+		if (i == n)
+		{
+			widget->clicked = True;
+			widget->Paint(SP_PAINT);
+		}
+		else if (widget->clicked)
+		{
+			widget->clicked = False;
+			widget->Paint(SP_PAINT);
+		}
 	}
 
 	return Success;
 }
 
-S::Int S::GUI::List::SetReferenceList(List *nRefList)
+S::Int S::GUI::List::GetSelectedEntryNumber()
 {
-	referenceList = nRefList;
-
-	SynchronizeList();
-
-	return Success;
-}
-
-S::Void S::GUI::List::CheckFlags()
-{
-}
-
-S::Bool S::GUI::List::IsListSane()
-{
-	CheckFlags();
-
-	if (referenceList == NIL) return True;
-	if (GetNOfEntries() != (referenceList->GetNOfEntries() + (addNil ? 1 : 0))) return False;
-
-	for (Int i = 0; i < referenceList->GetNOfEntries(); i++)
+	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
 	{
-		if (referenceList->GetNthEntry(i)->id != GetNthEntry(i + (addNil ? 1 : 0))->id)				return False;
-		else if (referenceList->GetNthEntry(i)->GetText() != GetNthEntry(i + (addNil ? 1 : 0))->GetText())	return False;
+		if (((ListEntry *) assocObjects.GetNthEntry(i))->clicked) return i;
 	}
 
-	return True;
-}
-
-S::Int S::GUI::List::SynchronizeList()
-{
-	if (referenceList == NIL) return Error;
-
-	List	*rList = referenceList;
-
-	referenceList = NIL;
-
-	CheckFlags();
-	RemoveAll();
-
-	if (addNil) AddEntry("", 2147483647);
-
-	for (Int i = 0; i < rList->GetNOfEntries(); i++)
-	{
-		AddEntry(rList->GetNthEntry(i)->GetText(), rList->GetNthEntry(i)->id);
-	}
-
-	referenceList = rList;
-
-	return Success;
+	return -1;
 }

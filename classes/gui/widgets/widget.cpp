@@ -41,8 +41,6 @@ S::GUI::Widget::Widget()
 
 	textSize.cx	= 0;
 	textSize.cy	= 0;
-	tooltipSize.cx	= 0;
-	tooltipSize.cy	= 0;
 
 	checked		= False;
 	clicked		= False;
@@ -79,25 +77,15 @@ S::GUI::Container *S::GUI::Widget::GetContainer()
 	return container;
 }
 
-S::Void S::GUI::Widget::SetRegisteredFlag()
+S::Void S::GUI::Widget::SetRegisteredFlag(Bool flag)
 {
-	registered = True;
-}
-
-S::Void S::GUI::Widget::UnsetRegisteredFlag()
-{
-	registered = False;
+	registered = flag;
 }
 
 S::Void S::GUI::Widget::GetTextSize()
 {
 	textSize.cx = font.GetTextSizeX(text);
 	textSize.cy = font.GetTextSizeY(text);
-
-	Font	 tooltipFont;
-
-	tooltipSize.cx = tooltipFont.GetTextSizeX(tooltipText);
-	tooltipSize.cy = tooltipFont.GetTextSizeY(tooltipText);
 }
 
 S::GUI::Point S::GUI::Widget::GetRealPosition()
@@ -183,12 +171,7 @@ S::Int S::GUI::Widget::Hide()
 		rect.right	= realPos.x + size.cx;
 		rect.bottom	= realPos.y + size.cy;
 
-		UnsignedLong	 bgColor;
-
-		if (container->GetObjectType() == Layer::classID)	bgColor = ((Layer *) container)->GetColor();
-		else							bgColor = Setup::BackgroundColor;
-
-		surface->Box(rect, bgColor, FILLED);
+		surface->Box(rect, container->GetBackgroundColor() == -1 ? Setup::BackgroundColor : container->GetBackgroundColor(), FILLED);
 	}
 
 	onHide.Emit();
@@ -290,8 +273,6 @@ S::String S::GUI::Widget::GetText()
 S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 {
 	tooltipText = nTooltipText;
-
-	GetTextSize();
 
 	return Success;
 }

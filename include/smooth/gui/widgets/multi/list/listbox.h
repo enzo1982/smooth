@@ -21,7 +21,6 @@ namespace smooth
 	};
 };
 
-#include "../../widget.h"
 #include "list.h"
 
 namespace smooth
@@ -33,36 +32,24 @@ namespace smooth
 		const Int	 LF_ALLOWRESELECT	= 2;
 		const Int	 LF_MULTICHECKBOX	= 4;
 		const Int	 LF_HIDEHEADER		= 8;
-		const Int	 LF_ADDNILENTRY		= 16;
 
-		class SMOOTHAPI ListBox : public Widget, public List
+		class SMOOTHAPI ListBox : public List
 		{
 			private:
-				Int			 entryCount;
-
 				Scrollbar		*scrollbar;
 				Int			 scrollbarPos;
 				Int			 lastScrollbarPos;
 
 				ListBoxHeader		*header;
-
-				Void			 ScrollbarProc();
-				Void			 DrawEntryText(String, Rect, Int);
-
-				Void			 CheckFlags();
 			public:
 				static const Int	 classID;
 
 							 ListBox(Point, Size);
 							~ListBox();
 
-				ListEntry		*AddEntry(String, Int = -1);
-				Int			 ModifyEntry(Int, String);
-				Int			 RemoveEntry(Int);
-				Int			 SelectEntry(Int);
-				Int			 RemoveAll();
-
 				Int			 AddTab(String, Int = 0);
+
+				Int			 GetNOfTabs();
 				Int			 GetNthTabOffset(Int);
 				Int			 GetNthTabWidth(Int);
 
@@ -79,6 +66,8 @@ namespace smooth
 
 				Int			 ScrollUp(Int = 1);
 				Int			 ScrollDown(Int = 1);
+			slots:
+				Void			 ScrollbarProc();
 		};
 	};
 };

@@ -1095,7 +1095,7 @@ S::Int S::GUI::Window::RegisterObject(Widget *object)
 			assocObjects.AddEntry(object, object->GetHandle());
 
 			object->SetContainer(this);
-			object->SetRegisteredFlag();
+			object->SetRegisteredFlag(True);
 
 			if (object->GetObjectType() == Titlebar::classID)
 			{
@@ -1140,7 +1140,7 @@ S::Int S::GUI::Window::UnregisterObject(Widget *object)
 				object->onUnregister.Emit(this);
 				object->Hide();
 
-				object->UnsetRegisteredFlag();
+				object->SetRegisteredFlag(False);
 				object->SetContainer(NIL);
 
 				CalculateOffsets();

@@ -1469,6 +1469,9 @@ xmlNewStringInputStream(xmlParserCtxtPtr ctxt, const xmlChar *buffer) {
     return(input);
 }
 
+void
+__xmlLoaderErr(void *ctx, const char *msg, const char *filename);
+
 /**
  * xmlNewInputFromFile:
  * @ctxt:  an XML parser context
@@ -1727,7 +1730,7 @@ xmlFreeParserCtxt(xmlParserCtxtPtr ctxt)
     if (ctxt->extSubSystem != NULL) xmlFree((char *) ctxt->extSubSystem);
 #ifdef LIBXML_SAX1_ENABLED
     if ((ctxt->sax != NULL) &&
-        (ctxt->sax != (xmlSAXHandlerPtr) &xmlDefaultSAXHandler))
+        (ctxt->sax != (xmlSAXHandlerPtr) (void *) &xmlDefaultSAXHandler))
 #else
     if (ctxt->sax != NULL)
 #endif /* LIBXML_SAX1_ENABLED */

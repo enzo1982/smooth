@@ -26,29 +26,29 @@ namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI List : public Array<ListEntry *>
+		class SMOOTHAPI List : public Container
 		{
-			protected:
-				List			*referenceList;
-				Bool			 addNil;
-
-				Bool			 IsListSane();
-				Int			 SynchronizeList();
-
-				virtual Void		 CheckFlags();
 			public:
+				static const Int	 classID;
+
 							 List();
 							~List();
 
-				virtual ListEntry	*AddEntry(String, Int);
-				virtual Int		 ModifyEntry(Int, String);
-				virtual Int		 RemoveEntry(Int);
-				virtual Int		 RemoveAll();
+				ListEntry		*AddEntry(String);
+				Int			 RemoveEntry(ListEntry *);
 
-				virtual Int		 SelectEntry(Int);
+				Int			 Clear();
+
+				Int			 GetNOfEntries();
+				ListEntry		*GetNthEntry(Int);
+
+				Int			 SelectEntry(ListEntry *);
 				ListEntry		*GetSelectedEntry();
 
-				Int			 SetReferenceList(List *);
+				Int			 SelectNthEntry(Int);
+				Int			 GetSelectedEntryNumber();
+			signals:
+				Signal0<Void>		 internalOnSelectEntry;
 		};
 	};
 };

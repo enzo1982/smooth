@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,6 +22,7 @@
 
 #ifdef __WIN32__
 #include <winsock.h>
+#include <shlobj.h>
 #else
 #include <sys/socket.h>
 #include <unistd.h>
@@ -82,6 +83,8 @@ S::Void S::Init()
 
 	codePage = GetACP();
 
+	CoInitialize(NIL);
+
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 #endif
 
@@ -114,6 +117,8 @@ S::Void S::Init()
 S::Void S::Free()
 {
 	if (--initCount) return;
+
+	CoUninitialize();
 
 #ifdef __WIN32__
 	delete I18n::Translator::defaultTranslator;

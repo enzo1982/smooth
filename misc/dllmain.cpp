@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,36 +9,9 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/dllmain.h>
-#include <smooth/shlobjmini.h>
 #include <smooth/gui/application/application.h>
+
 #include <iconv.h>
-
-LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderA)(PBROWSEINFOA) = NIL;
-LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderW)(PBROWSEINFOW) = NIL;
-BOOL		 (WINAPI *ex_SHGetPathFromIDListA)(LPCITEMIDLIST, LPSTR) = NIL;
-BOOL		 (WINAPI *ex_SHGetPathFromIDListW)(LPCITEMIDLIST, LPWSTR) = NIL;
-
-HMODULE		 shellDLL;
-
-void SHLObjMini_Init()
-{
-	shellDLL = LoadLibraryA("shell32.dll");
-
-	ex_SHBrowseForFolderA	= (LPITEMIDLIST (WINAPI *)(PBROWSEINFOA)) GetProcAddress(shellDLL, "SHBrowseForFolderA");
-	ex_SHBrowseForFolderW	= (LPITEMIDLIST (WINAPI *)(PBROWSEINFOW)) GetProcAddress(shellDLL, "SHBrowseForFolderW");
-	ex_SHGetPathFromIDListA	= (BOOL (WINAPI *)(LPCITEMIDLIST, LPSTR)) GetProcAddress(shellDLL, "SHGetPathFromIDListA");
-	ex_SHGetPathFromIDListW	= (BOOL (WINAPI *)(LPCITEMIDLIST, LPWSTR)) GetProcAddress(shellDLL, "SHGetPathFromIDListW");
-}
-
-void SHLObjMini_Deinit()
-{
-	FreeLibrary(shellDLL);
-
-	ex_SHBrowseForFolderA	= NIL;
-	ex_SHBrowseForFolderW	= NIL;
-	ex_SHGetPathFromIDListA	= NIL;
-	ex_SHGetPathFromIDListW	= NIL;
-}
 
 size_t	 (*iconv)(iconv_t, const char **, size_t *, char **, size_t *) = NIL;
 iconv_t	 (*iconv_open)(const char *, const char *) = NIL;

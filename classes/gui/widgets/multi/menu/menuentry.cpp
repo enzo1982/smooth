@@ -41,8 +41,6 @@ S::GUI::MenuEntry::MenuEntry(String iText, Bitmap iBitmap, Menu *iPopup, Bool *i
 
 	popupHandle	= -1;
 
-	onClick.SetParentObject(this);
-
 	possibleContainers.AddEntry(Menu::classID);
 }
 
@@ -331,7 +329,7 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 						}
 					}
 
-					onClick.Emit();
+					onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 					Process(SM_MOUSEMOVE, 0, 0);
 				}
@@ -393,9 +391,14 @@ S::Int S::GUI::MenuEntry::SetShortcut(Int nKey, Int nFlags)
 	scFlags	= nFlags;
 
 	shortcut = new Shortcut(scKey, scFlags);
-	shortcut->onKeyDown.Connect(&onClick);
+	shortcut->onKeyDown.Connect(&MenuEntry::ShortcutProc, this);
 
 	return Success;
+}
+
+S::Void S::GUI::MenuEntry::ShortcutProc()
+{
+	onClick.Emit(0, 0);
 }
 
 S::Int S::GUI::MenuEntry::SetBitmap(const Bitmap &newBitmap)

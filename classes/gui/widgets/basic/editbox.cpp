@@ -121,9 +121,9 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 				if (!active) comboBox->Deactivate();
 
-				for (Int i = 0; i < dropDownList->GetNOfEntries(); i++)
+				for (Int i = 0; i < dropDownList->GetNOfObjects(); i++)
 				{
-					comboBox->AddEntry(dropDownList->GetNthEntry(i)->GetText());
+					comboBox->AddEntry(dropDownList->GetNthObject(i)->GetText());
 				}
 
 				container->RegisterObject(comboBox);
@@ -994,8 +994,6 @@ S::Void S::GUI::EditBox::DropDownListProc()
 	if (comboBox->GetSelectedEntry() == NIL) return;
 
 	ModifyText(comboBox->GetSelectedEntry()->GetText());
-
-	comboBox->GetSelectedEntry()->clicked = False;
 
 	checked = True;
 

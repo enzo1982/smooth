@@ -73,10 +73,9 @@ namespace smooth
 				Int		 SetShortcut(Int, Int);
 
 				Int		 SetBitmap(const Bitmap &);
-			signals:
-				Signal0<Void>	 onClick;
 			slots:
 				Void		 PopupProc();
+				Void		 ShortcutProc();
 		};
 	};
 };

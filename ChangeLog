@@ -1,5 +1,16 @@
 ChangeLog for smooth
 
+xx.xx.05 xx:xx - smooth alpha 0.8.67.0
+
+- listentry.cpp	- ListEntries are now Widgets
+- list.cpp	- List now derives from Container
+		- changed the way entries are handled
+- dirdlg.cpp	- allow to set the initially selected directory with SetDirName
+		- the new style directory selection dialog is used if available
+
+- removed shlobjmini.h
+- removed support for MinGW 1.x
+
 09.01.05 14:00 - smooth alpha 0.8.66.0
 
 - object.cpp	- incorporated object manager functionality into Object

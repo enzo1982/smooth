@@ -38,11 +38,16 @@ namespace smooth
 
 				Surface			*nullSurface;
 				Surface			*drawSurface;
+
+				Int			 backgroundColor;
 			public:
 				static const Int	 classID;
 
 							 Container();
 				virtual			~Container();
+
+				Int			 GetBackgroundColor();
+				Int			 SetBackgroundColor(Int);
 
 				virtual Int		 RegisterObject(Widget *);
 				virtual Int		 UnregisterObject(Widget *);

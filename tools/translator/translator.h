@@ -21,10 +21,10 @@ using namespace smooth::GUI::Dialogs;
 
 typedef struct
 {
-	Int	 listid;
-	Int	 id;
-	String	 original;
-	String	 translation;
+	ListEntry	*entry;
+	Int		 id;
+	String		 original;
+	String		 translation;
 }
 listEntry;
 

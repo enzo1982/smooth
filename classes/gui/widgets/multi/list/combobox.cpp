@@ -24,13 +24,12 @@ const S::Int	 S::GUI::ComboBox::classID = S::Object::RequestClassID();
 S::GUI::ComboBox::ComboBox(Point iPos, Size iSize)
 {
 	type		= classID;
-	entryCount	= -1;
 
-	closeListBox	= False;
-	listBoxOpen	= False;
 	listBox		= NIL;
 	toolWindow	= NIL;
 	layer		= NIL;
+
+	closeListBox	= False;
 
 	possibleContainers.AddEntry(Layer::classID);
 
@@ -45,83 +44,9 @@ S::GUI::ComboBox::ComboBox(Point iPos, Size iSize)
 
 S::GUI::ComboBox::~ComboBox()
 {
-	if (listBoxOpen)
-	{
-		toolWindow->Close();
-
-		Window	*wnd = NIL;
-
-		if (container != NIL) wnd = container->GetContainerWindow();
-
-		if (wnd != NIL) wnd->UnregisterObject(toolWindow);
-
-		toolWindow->UnregisterObject(layer);
-		layer->UnregisterObject(listBox);
-
-		toolWindow->FreeOwner();
-
-		DeleteObject(listBox);
-		DeleteObject(layer);
-		DeleteObject(toolWindow);
-	}
+	CloseListBox();
 
 	if (registered && container != NIL) container->UnregisterObject(this);
-}
-
-S::GUI::ListEntry *S::GUI::ComboBox::AddEntry(String name, Int id)
-{
-	if (id >= 0 && GetEntry(id) != NIL) return NIL;
-
-	if (id == -1) id = ++entryCount;
-
-	ListEntry *newEntry = List::AddEntry(name, id);
-
-	if (entryCount == 0 && newEntry != NIL && !(flags & CB_HOTSPOTONLY)) GetFirstEntry()->clicked = True;
-
-	Paint(SP_PAINT);
-
-	return newEntry;
-}
-
-S::Int S::GUI::ComboBox::ModifyEntry(Int code, String name)
-{
-	if (List::ModifyEntry(code, name) == Success)
-	{
-		Paint(SP_PAINT);
-
-		return Success;
-	}
-	else
-	{
-		return Error;
-	}
-}
-
-S::Int S::GUI::ComboBox::RemoveEntry(Int number)
-{
-	if (List::RemoveEntry(number) == Error) return Error;
-
-	Paint(SP_PAINT);
-
-	return Success;
-}
-
-S::Int S::GUI::ComboBox::RemoveAll()
-{
-	if (List::RemoveAll() == Error) return Error;
-
-	Paint(SP_PAINT);
-
-	return Success;
-}
-
-S::Int S::GUI::ComboBox::SelectEntry(Int id)
-{
-	List::SelectEntry(id);
-
-	Paint(SP_PAINT);
-
-	return Success;
 }
 
 S::Int S::GUI::ComboBox::Paint(Int message)
@@ -129,14 +54,13 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	if (flags & LF_ADDNILENTRY) addNil = True;
+	if (GetSelectedEntry() == NIL && !(flags & CB_HOTSPOTONLY)) ((ListEntry *) GetNthObject(0))->clicked = True;
 
 	Surface		*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
 	Point		 realPos = GetRealPosition();
-	ListEntry	*operat;
 	Rect		 frame;
 	Point		 lineStart;
 	Point		 lineEnd;
@@ -185,11 +109,9 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 	if (!(flags & CB_HOTSPOTONLY))
 	{
-		if (!IsListSane()) SynchronizeList();
-
-		for (Int j = 0; j < GetNOfEntries(); j++)
+		for (Int j = 0; j < GetNOfObjects(); j++)
 		{
-			operat = GetNthEntry(j);
+			ListEntry	*operat = (ListEntry *) GetNthObject(j);
 
 			if (operat->clicked)
 			{
@@ -263,25 +185,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 			if (message == WM_ACTIVATE && toolWindow != NIL) if ((HWND) lParam == (HWND) toolWindow->GetSystemWindow()) break;
 			if (message == WM_KILLFOCUS && toolWindow != NIL) if ((HWND) wParam == (HWND) toolWindow->GetSystemWindow()) break;
 
-			if (listBoxOpen)
+			if (listBox != NIL)
 			{
-				listBoxOpen = False;
-
-				toolWindow->Close();
-
-				wnd->UnregisterObject(toolWindow);
-				toolWindow->UnregisterObject(layer);
-				layer->UnregisterObject(listBox);
-
-				toolWindow->FreeOwner();
-
-				DeleteObject(listBox);
-				DeleteObject(layer);
-				DeleteObject(toolWindow);
-
-				listBox		= NIL;
-				layer		= NIL;
-				toolWindow	= NIL;
+				CloseListBox();
 
 				if (!wnd->IsMouseOn(frame)) wnd->Process(SM_LBUTTONDOWN, 0, 0);
 			}
@@ -289,31 +195,15 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 			break;
 		case SM_LOOSEFOCUS:
 			lbframe.top	= realPos.y + size.cy;
-			lbframe.bottom	= lbframe.top + Math::Min((Int) (15 * GetNOfEntries() + 4), 15 * 5 + 4);
+			lbframe.bottom	= lbframe.top + Math::Min((Int) (15 * GetNOfObjects() + 4), 15 * 5 + 4);
 			lbframe.right	= realPos.x + size.cx - 1;
 			lbframe.left	= realPos.x;
 
 			if (wParam != GetHandle())
 			{
-				if ((wnd->IsMouseOn(frame) && listBoxOpen) || (!wnd->IsMouseOn(frame) && !wnd->IsMouseOn(lbframe) && listBoxOpen))
+				if (listBox != NIL && (wnd->IsMouseOn(frame) || !wnd->IsMouseOn(lbframe)))
 				{
-					listBoxOpen = False;
-
-					toolWindow->Close();
-
-					wnd->UnregisterObject(toolWindow);
-					toolWindow->UnregisterObject(layer);
-					layer->UnregisterObject(listBox);
-
-					toolWindow->FreeOwner();
-
-					DeleteObject(listBox);
-					DeleteObject(layer);
-					DeleteObject(toolWindow);
-
-					listBox		= NIL;
-					layer		= NIL;
-					toolWindow	= NIL;
+					CloseListBox();
 
 					retVal = Break;
 				}
@@ -323,20 +213,18 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDOWN:
 		case SM_LBUTTONDBLCLK:
 			lbframe.top	= realPos.y + size.cy;
-			lbframe.bottom	= lbframe.top + Math::Min((Int) (15 * GetNOfEntries() + 4), 15 * 5 + 4);
+			lbframe.bottom	= lbframe.top + Math::Min((Int) (15 * GetNOfObjects() + 4), 15 * 5 + 4);
 			lbframe.right	= realPos.x + size.cx - 1;
 			lbframe.left	= realPos.x;
 
-			if (wnd->IsMouseOn(frame) && !listBoxOpen)
+			if (wnd->IsMouseOn(frame) && listBox == NIL)
 			{
 				wnd->Process(SM_LOOSEFOCUS, GetHandle(), 0);
-
-				listBoxOpen = True;
 
 				lbp.x = lbframe.left - lay->pos.x;
 				lbp.y = realPos.y + size.cy - lay->pos.y;
 				lbs.cx = size.cx;
-				lbs.cy = Math::Min((Int) (15 * GetNOfEntries() + 4), 15 * 5 + 4);
+				lbs.cy = Math::Min((Int) (15 * GetNOfObjects() + 4), 15 * 5 + 4);
 
 				layer		= new Layer();
 				toolWindow	= new ToolWindow();
@@ -364,13 +252,19 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				toolWindow->SetMetrics(lbp, lbs);
 
-				if (!IsListSane()) SynchronizeList();
-
 				listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
-				listBox->SetReferenceList(this);
 				listBox->AddTab("", 32768);
 
-				if (GetSelectedEntry() != NIL) listBox->SelectEntry(GetSelectedEntry()->id);
+				prevSelectedEntry = GetSelectedEntry();
+
+				for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
+				{
+					ListEntry	*entry = (ListEntry *) assocObjects.GetNthEntry(i);
+
+					entry->SetRegisteredFlag(False);
+
+					listBox->RegisterObject(entry);
+				}
 
 				wnd->RegisterObject(toolWindow);
 				toolWindow->RegisterObject(layer);
@@ -382,10 +276,8 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				retVal = Break;
 			}
-			else if ((wnd->IsMouseOn(frame) && listBoxOpen) || (!wnd->IsMouseOn(frame) && !wnd->IsMouseOn(lbframe) && listBoxOpen))
+			else if (listBox != NIL && (wnd->IsMouseOn(frame) || !wnd->IsMouseOn(lbframe)))
 			{
-				listBoxOpen = False;
-
 				if (checked)
 				{
 					clicked = True;
@@ -410,22 +302,10 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				}
 
 				frame.top	= frame.bottom + 1;
-				frame.bottom	= frame.top + Math::Min((Int) (15 * GetNOfEntries() + 4), 15 * 5 + 4);
+				frame.bottom	= frame.top + Math::Min((Int) (15 * GetNOfObjects() + 4), 15 * 5 + 4);
 				frame.right++;
-
-				wnd->UnregisterObject(toolWindow);
-				toolWindow->UnregisterObject(layer);
-				layer->UnregisterObject(listBox);
-
-				toolWindow->FreeOwner();
-
-				DeleteObject(listBox);
-				DeleteObject(layer);
-				DeleteObject(toolWindow);
-
-				listBox		= NIL;
-				layer		= NIL;
-				toolWindow	= NIL;
+	
+				CloseListBox();
 
 				frame.left	= realPos.x;
 				frame.top	= realPos.y;
@@ -437,103 +317,62 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONUP:
 			if (closeListBox)
 			{
-				if (!(flags & CB_HOTSPOTONLY))
-				{
-					for (Int i = 0; i < GetNOfEntries(); i++)
-					{
-						operat = GetNthEntry(i);
-
-						if (operat->clicked)
-						{
-							frame.left	+= 3;
-							frame.top	+= 3;
-							frame.right	-= 18;
-
-							Font	 nFont = font;
-
-							nFont.SetColor(Setup::ClientColor);
-
-							String	 nText = operat->GetText();
-
-							for (Int k = 0; k < operat->GetText().Length(); k++)
-							{
-								if (operat->GetText()[k] == '\t')	nText[k] = 0;
-								else					nText[k] = operat->GetText()[k];
-							}
-
-							surface->SetText(nText, frame, nFont);
-
-							frame.right	+= 18;
-							frame.left	-= 3;
-							frame.top	-= 3;
-						}
-					}
-				}
-
-				if (GetSelectedEntry() != listBox->GetSelectedEntry()) executeProcs = True;
-
-				if (listBox->GetSelectedEntry() != NIL) SelectEntry(listBox->GetSelectedEntry()->id);
-
-				if (!(flags & CB_HOTSPOTONLY))
-				{
-					for (Int j = 0; j < GetNOfEntries(); j++)
-					{
-						operat = GetNthEntry(j);
-
-						if (operat->clicked)
-						{
-							frame.left	+= 3;
-							frame.top	+= 3;
-							frame.right	-= 18;
-
-							String	 nText = operat->GetText();
-
-							for (Int k = 0; k < operat->GetText().Length(); k++)
-							{
-								if (operat->GetText()[k] == '\t')	nText[k] = 0;
-								else					nText[k] = operat->GetText()[k];
-							}
-
-							surface->SetText(nText, frame, font);
-
-							frame.right	+= 18;
-							frame.left	-= 3;
-							frame.top	-= 3;
-						}
-					}
-				}
-
-				if (listBoxOpen)
-				{
-					listBoxOpen = False;
-
-					toolWindow->Close();
-
-					wnd->UnregisterObject(toolWindow);
-					toolWindow->UnregisterObject(layer);
-					layer->UnregisterObject(listBox);
-
-					toolWindow->FreeOwner();
-
-					DeleteObject(listBox);
-					DeleteObject(layer);
-					DeleteObject(toolWindow);
-
-					listBox		= NIL;
-					layer		= NIL;
-					toolWindow	= NIL;
-				}
+				CloseListBox();
 
 				closeListBox = False;
+
+				if (!(flags & CB_HOTSPOTONLY))
+				{
+					frame.left	+= 3;
+					frame.top	+= 3;
+					frame.right	-= 18;
+
+					String	 nText;
+
+					if (prevSelectedEntry != NIL)
+					{
+						Font	 nFont = font;
+
+						nFont.SetColor(Setup::ClientColor);
+
+						nText = prevSelectedEntry->GetText();
+
+						for (Int k = 0; k < prevSelectedEntry->GetText().Length(); k++)
+						{
+							if (prevSelectedEntry->GetText()[k] == '\t')	nText[k] = 0;
+							else						nText[k] = prevSelectedEntry->GetText()[k];
+						}
+
+						surface->SetText(nText, frame, nFont);
+					}
+
+					ListEntry	*entry = GetSelectedEntry();
+
+					nText = entry->GetText();
+
+					for (Int l = 0; l < entry->GetText().Length(); l++)
+					{
+						if (entry->GetText()[l] == '\t')	nText[l] = 0;
+						else					nText[l] = entry->GetText()[l];
+					}
+
+					surface->SetText(nText, frame, font);
+
+					frame.right	+= 18;
+					frame.left	-= 3;
+					frame.top	-= 3;
+				}
+
+				if (prevSelectedEntry != GetSelectedEntry()) executeProcs = True;
 
 				retVal = Break;
 			}
 
 			if (executeProcs)
 			{
-				for (Int i = 0; i < GetNOfEntries(); i++)
+				for (Int i = 0; i < GetNOfObjects(); i++)
 				{
-					operat = GetNthEntry(i);
+					operat = (ListEntry *) GetNthObject(i);
 
 					if (operat->clicked)
 					{
@@ -620,7 +459,39 @@ S::Void S::GUI::ComboBox::ListBoxProc()
 	}
 }
 
-S::Void S::GUI::ComboBox::CheckFlags()
+S::Void S::GUI::ComboBox::CloseListBox()
 {
-	if (flags & LF_ADDNILENTRY) addNil = True;
+	if (!registered) return;
+
+	Window	*wnd = container->GetContainerWindow();
+
+	if (wnd == NIL) return;
+
+	if (listBox != NIL)
+	{
+		for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
+		{
+			ListEntry	*entry = (ListEntry *) assocObjects.GetNthEntry(i);
+
+			listBox->UnregisterObject(entry);
+
+			entry->SetRegisteredFlag(True);
+			entry->SetContainer(this);
+		}
+
+		toolWindow->FreeOwner();
+		toolWindow->Close();
+
+		wnd->UnregisterObject(toolWindow);
+		toolWindow->UnregisterObject(layer);
+		layer->UnregisterObject(listBox);
+
+		DeleteObject(listBox);
+		DeleteObject(layer);
+		DeleteObject(toolWindow);
+
+		listBox		= NIL;
+		layer		= NIL;
+		toolWindow	= NIL;
+	}
 }

@@ -2636,7 +2636,7 @@ void
 xmlDefaultSAXHandlerInit(void)
 {
 #ifdef LIBXML_SAX1_ENABLED
-    xmlSAXVersion((xmlSAXHandlerPtr) &xmlDefaultSAXHandler, 1);
+    xmlSAXVersion((xmlSAXHandlerPtr) (void *) &xmlDefaultSAXHandler, 1);
 #endif /* LIBXML_SAX1_ENABLED */
 }
 

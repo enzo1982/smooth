@@ -27,8 +27,6 @@ S::GUI::Layer::Layer(String name)
 
 	visible = False;
 
-	layerColor = (UnsignedLong) -1;
-
 	possibleContainers.AddEntry(Window::classID);
 	possibleContainers.AddEntry(classID);
 	possibleContainers.AddEntry(TabWidget::classID);
@@ -66,11 +64,11 @@ S::Int S::GUI::Layer::Paint(Int message)
 
 	if (wnd == NIL) return Success;
 
-	Rect	 updateRect = wnd->GetUpdateRect();
-	Surface	*surface = container->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
+	Rect	 updateRect	= wnd->GetUpdateRect();
+	Surface	*surface	= container->GetDrawSurface();
+	Point	 realPos	= GetRealPosition();
 
-	if (layerColor != (UnsignedLong) -1)
+	if (backgroundColor != -1)
 	{
 		Rect	 frame;
 
@@ -81,7 +79,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 
 		updateRect = frame;
 
-		surface->Box(frame, layerColor, FILLED);
+		surface->Box(frame, backgroundColor, FILLED);
 	}
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
@@ -106,7 +104,7 @@ S::Int S::GUI::Layer::Show()
 
 	Point	 realPos = GetRealPosition();
 
-	if (layerColor != (UnsignedLong) -1 && IsVisible())
+	if (backgroundColor != -1 && IsVisible())
 	{
 		Surface	*surface = container->GetDrawSurface();
 		Rect	 frame;
@@ -116,7 +114,7 @@ S::Int S::GUI::Layer::Show()
 		frame.right	= realPos.x + size.cx;
 		frame.bottom	= realPos.y + size.cy;
 
-		surface->Box(frame, layerColor, FILLED);
+		surface->Box(frame, backgroundColor, FILLED);
 	}
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
@@ -168,7 +166,7 @@ S::Int S::GUI::Layer::Hide()
 
 	if (!registered) return Success;
 
-	if (layerColor != (UnsignedLong) -1 && wasVisible)
+	if (backgroundColor != -1 && wasVisible)
 	{
 		Point	 realPos = GetRealPosition();
 		Surface	*surface = container->GetDrawSurface();
@@ -187,35 +185,11 @@ S::Int S::GUI::Layer::Hide()
 	return Success;
 }
 
-S::UnsignedLong S::GUI::Layer::GetColor()
-{
-	if ((Long) layerColor == -1)	return Setup::BackgroundColor;
-	else				return layerColor;
-
-	return Success;
-}
-
-S::Int S::GUI::Layer::SetColor(UnsignedLong newColor)
-{
-	layerColor = newColor;
-
-	Paint(SP_PAINT);
-
-	return Success;
-}
-
 S::Int S::GUI::Layer::SetMetrics(Point iPos, Size iSize)
 {
 	if (orientation == OR_CENTER) orientation = OR_FREE;
 
 	return Widget::SetMetrics(iPos, iSize);
-}
-
-S::GUI::Surface *S::GUI::Layer::GetDrawSurface()
-{
-	if (!registered) return nullSurface;
-
-	return container->GetDrawSurface();
 }
 
 S::Int S::GUI::Layer::RegisterObject(Widget *object)
@@ -229,7 +203,7 @@ S::Int S::GUI::Layer::RegisterObject(Widget *object)
 			assocObjects.AddEntry(object, object->GetHandle());
 
 			object->SetContainer(this);
-			object->SetRegisteredFlag();
+			object->SetRegisteredFlag(True);
 
 			object->onRegister.Emit(this);
 			object->Show();
@@ -254,7 +228,7 @@ S::Int S::GUI::Layer::UnregisterObject(Widget *object)
 				object->onUnregister.Emit(this);
 				object->Hide();
 
-				object->UnsetRegisteredFlag();
+				object->SetRegisteredFlag(False);
 				object->SetContainer(NIL);
 
 				return Success;

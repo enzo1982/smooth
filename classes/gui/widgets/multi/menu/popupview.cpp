@@ -415,7 +415,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					popup->toolwnd->Hide();
 
 					popup->onClick.Emit(0, 0);
-					entry->onClick.Emit();
+					entry->onClick.Emit(0, 0);
 
 					retVal = Break;
 
@@ -452,7 +452,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						}
 
 						popup->onClick.Emit(0, 0);
-						entry->onClick.Emit();
+						entry->onClick.Emit(0, 0);
 					}
 
 					retVal = Break;
@@ -489,7 +489,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						}
 
 						popup->onClick.Emit(0, 0);
-						entry->onClick.Emit();
+						entry->onClick.Emit(0, 0);
 					}
 
 					retVal = Break;

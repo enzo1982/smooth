@@ -273,7 +273,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Int	 rVal = Success;
+	Int	 retVal = Success;
 
 	EnterProtectedRegion();
 
@@ -283,12 +283,12 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 		if (object == NIL) continue;
 
-		if (object->Process(message, wParam, lParam) == Break) rVal = Break;
+		if (object->Process(message, wParam, lParam) == Break) retVal = Break;
 	}
 
 	LeaveProtectedRegion();
 
-	return rVal;
+	return retVal;
 }
 
 S::Int S::GUI::Menubar::SetBitmapSize(Int nSize)
@@ -299,11 +299,4 @@ S::Int S::GUI::Menubar::SetBitmapSize(Int nSize)
 	size.cy = bitmapSize + 6;
 
 	return Success;
-}
-
-S::GUI::Surface *S::GUI::Menubar::GetDrawSurface()
-{
-	if (!registered) return nullSurface;
-
-	return container->GetDrawSurface();
 }

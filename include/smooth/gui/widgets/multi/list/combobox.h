@@ -22,7 +22,6 @@ namespace smooth
 	};
 };
 
-#include "../../widget.h"
 #include "list.h"
 
 namespace smooth
@@ -32,35 +31,27 @@ namespace smooth
 		const Int	 CB_NORMAL	= 0;
 		const Int	 CB_HOTSPOTONLY	= 1;
 
-		class SMOOTHAPI ComboBox : public Widget, public List
+		class SMOOTHAPI ComboBox : public List
 		{
 			private:
-				Int			 entryCount;
-
 				ToolWindow		*toolWindow;
 				Layer			*layer;
 				ListBox			*listBox;
 
-				Bool			 listBoxOpen;
 				Bool			 closeListBox;
+				ListEntry		*prevSelectedEntry;
 
-				Void			 ListBoxProc();
-
-				Void			 CheckFlags();
+				Void			 CloseListBox();
 			public:
 				static const Int	 classID;
 
 							 ComboBox(Point, Size);
 							~ComboBox();
 
-				ListEntry		*AddEntry(String, Int = -1);
-				Int			 ModifyEntry(Int, String);
-				Int			 RemoveEntry(Int);
-				Int			 SelectEntry(Int);
-				Int			 RemoveAll();
-
 				virtual Int		 Paint(Int);
 				Int			 Process(Int, Int, Int);
+			slots:
+				Void			 ListBoxProc();
 		};
 	};
 };

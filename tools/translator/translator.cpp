@@ -477,7 +477,7 @@ void Translator::SaveFileWithName(String file)
 
 		XML::Node	*xentry = data->AddNode("entry", entry->translation);
 
-		xentry->SetAttribute("id", String::IntToString(entry->id));
+		xentry->SetAttribute("id", String::FromInt(entry->id));
 		xentry->SetAttribute("string", entry->original);
 	}
 
@@ -567,7 +567,7 @@ void Translator::SaveData()
 		{
 			entry = entries.GetNthEntry(5);
 
-			edit_id->SetText(String::IntToString(entry->id));
+			edit_id->SetText(String::FromInt(entry->id));
 			edit_original->SetText(entry->original);
 			edit_translated->SetText(entry->translation);
 		}
@@ -618,7 +618,7 @@ void Translator::SaveData()
 			{
 				entry = entries.GetNthEntry(j);
 
-				edit_id->SetText(String::IntToString(entry->id));
+				edit_id->SetText(String::FromInt(entry->id));
 				edit_original->SetText(entry->original);
 				edit_translated->SetText(entry->translation);
 
@@ -628,7 +628,7 @@ void Translator::SaveData()
 
 		if (entry == NULL)
 		{
-			edit_id->SetText(String::IntToString(edit_id->GetText().ToInt() + 1));
+			edit_id->SetText(String::FromInt(edit_id->GetText().ToInt() + 1));
 			edit_original->SetText("");
 			edit_translated->SetText("");
 		}
@@ -673,7 +673,7 @@ void Translator::SelectEntry()
 		text_original->SetText("Original:");
 		text_translated->SetText("Translation:");
 
-		edit_id->SetText(String::IntToString(entry->id));
+		edit_id->SetText(String::FromInt(entry->id));
 		edit_original->SetText(entry->original);
 		edit_translated->SetText(entry->translation);
 	}
@@ -691,7 +691,7 @@ void Translator::NewEntry()
 	text_original->SetText("Original:");
 	text_translated->SetText("Translation:");
 
-	edit_id->SetText(String::IntToString(max(entry->id, 0) + 1));
+	edit_id->SetText(String::FromInt(max(entry->id, 0) + 1));
 	edit_original->SetText("");
 	edit_translated->SetText("");
 

@@ -31,6 +31,7 @@ namespace smooth
 		{
 			protected:
 				Size		 size;
+				Rect		 paintRect;
 
 				Int		 painting;
 			public:
@@ -39,12 +40,14 @@ namespace smooth
 
 				Size		 GetSize();
 
-				virtual Int	 StartPaint();
+				virtual Int	 PaintRect(Rect);
+
+				virtual Int	 StartPaint(Rect);
 				virtual Int	 EndPaint();
 
+				virtual Int	 SetPixel(Int, Int, Int);
 				virtual Int	 GetPixel(Int, Int);
 
-				virtual Int	 SetPixel(Int, Int, Int);
 				virtual Int	 Line(Point, Point, Int);
 				virtual Int	 Frame(Rect, Int);
 				virtual Int	 Box(Rect, Int, Int);

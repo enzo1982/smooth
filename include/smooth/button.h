@@ -28,8 +28,9 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 BF_NORMAL	= 0;
-		const Int	 BF_NOFRAME	= 1;
+		const Int	 BF_NORMAL		= 0;
+		const Int	 BF_NOFRAME		= 1;
+		const Int	 BF_SHOWHIGHLIGHT	= 2;
 
 		class SMOOTHAPI Button : public Widget
 		{

@@ -196,7 +196,7 @@ PCIOut OpenPCIForOutput(S::String filename)
 
 PCIIn OpenPCIForInput(S::String filename)
 {
-	return new InStream(STREAM_FILE, filename);
+	return new InStream(STREAM_FILE, filename, IS_READONLY);
 }
 
 bool ClosePCI(PCIIn instream)

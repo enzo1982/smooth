@@ -74,7 +74,10 @@ namespace smooth
 			Int			 Length();
 
 			Int			 ToInt();
-			Float			 ToDouble();
+			Float			 ToFloat();
+
+			static String		 FromInt(const Int);
+			static String		 FromFloat(const Float);
 
 			wchar_t &operator	 [](const int);
 			wchar_t &operator	 [](const Int);
@@ -96,9 +99,6 @@ namespace smooth
 			Bool operator		 !=(const char *);
 			Bool operator		 !=(const wchar_t *);
 			Bool operator		 !=(const String &);
-
-			static String		 IntToString(const Int);
-			static String		 DoubleToString(const Float);
 	};
 
 	Int	 ConvertString(const char *, Int, const char *, char *, Int, const char *);

@@ -138,7 +138,7 @@ S::GUI::Window::Window(String title)
 	if (title != NIL)	objectProperties->text = title;
 	else			objectProperties->text = TXT_SMOOTHAPPLICATION;
 
-	className = String(title).Append(String::IntToString(System::RequestGUID()));
+	className = String(title).Append(String::FromInt(System::RequestGUID()));
 
 	value = 0;
 
@@ -783,7 +783,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				updateRect.bottom = objectProperties->size.cy;
 
 				dc = BeginPaint(hwnd, &ps);
+
 				Paint(SP_PAINT);
+
 				EndPaint(hwnd, &ps);
 			}
 			else
@@ -798,7 +800,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 					updateRect.bottom += 5;
 
 					dc = BeginPaint(hwnd, &ps);
-					Paint(SP_PAINT);
+
+					if (Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20)	Paint(SP_PAINT);
+					else																						Paint(SP_UPDATE);
+
 					EndPaint(hwnd, &ps);
 				}
 				else
@@ -952,33 +957,41 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::Window::Paint(Int message)
 {
+	if (!registered)	return Error;
+	if (!created)		return Success;
+	if (!visible)		return Success;
+
 	EnterProtectedRegion();
 
 	Surface	*surface = GetDrawSurface();
 	Object	*object;
-	Widget	*lastWidget = NIL;
-	Point	 doublebar1;
-	Point	 doublebar2;
-	int	 bias = 0;
-	int	 topoffset = 3;
-	int	 rightobjcount = 0;
-	int	 leftobjcount = 0;
-	int	 btmobjcount = 0;
-	int	 topobjcount = 0;
 
-	surface->StartPaint();
-
-	if (updateRect.left < 2)	updateRect.left = 2;
-	if (updateRect.top < 2)		updateRect.top = 2;
-
+	if (updateRect.left < 2)				updateRect.left = 2;
+	if (updateRect.top < 2)					updateRect.top = 2;
 	if (objectProperties->size.cx - updateRect.right < 2)	updateRect.right = objectProperties->size.cx - 2;
 	if (objectProperties->size.cy - updateRect.bottom < 2)	updateRect.bottom = objectProperties->size.cy - 2;
 
-	surface->Box(updateRect, GetSysColor(COLOR_BTNFACE), FILLED);
-
-	if (created && visible)
+	if (message == SP_UPDATE)
 	{
+		surface->PaintRect(updateRect);
+	}
+	else
+	{
+		surface->StartPaint(updateRect);
+
+		surface->Box(updateRect, GetSysColor(COLOR_BTNFACE), FILLED);
+
 		onPaint.Emit();
+
+		Widget	*lastWidget = NIL;
+		Point	 doublebar1;
+		Point	 doublebar2;
+		int	 bias = 0;
+		int	 topoffset = 3;
+		int	 rightobjcount = 0;
+		int	 leftobjcount = 0;
+		int	 btmobjcount = 0;
+		int	 topobjcount = 0;
 
 		for (Int i = 0; i < nOfObjects; i++)
 		{
@@ -1093,9 +1106,9 @@ S::Int S::GUI::Window::Paint(Int message)
 				if (((Widget *) object)->IsVisible() && Affected(object, updateRect)) ((Widget *) object)->Paint(SP_PAINT);
 			}
 		}
-	}
 
-	surface->EndPaint();
+		surface->EndPaint();
+	}
 
 	LeaveProtectedRegion();
 

@@ -145,7 +145,7 @@ Test::Test()
 
 	mainWnd_menubar->AddEntry("File test")->onClick.Connect(&Test::testDlgOpenFile, this);
 	mainWnd_menubar->AddEntry("Directory test")->onClick.Connect(&Test::testDlgSelectDir, this);
-	mainWnd_menubar->AddEntry("&File", NIL, mainWnd_menubar_file);
+	mainWnd_menubar->AddEntry("File", NIL, mainWnd_menubar_file);
 	mainWnd_menubar->AddEntry("Quit")->onClick.Connect(&Test::Close, this);
 
 	mainWnd_menubar2->AddEntry("ECM test");

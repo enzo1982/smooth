@@ -174,7 +174,7 @@ S::Int S::GUI::Button::Paint(Int message)
 				surface->BlitFromBitmap(bitmap, GetBitmapMetrics(bitmap), bmpRect);
 			}
 
-			if (objectProperties->checked)
+			if (objectProperties->checked || (flags & BF_SHOWHIGHLIGHT))
 			{
 				frame.left	= realPos.x + 4;
 				frame.top	= realPos.y + 4;
@@ -206,12 +206,24 @@ S::Int S::GUI::Button::Paint(Int message)
 
 			break;
 		case SP_MOUSEOUT:
-			frame.left	= realPos.x + 4;
-			frame.top	= realPos.y + 4;
-			frame.right	= realPos.x + objectProperties->size.cx - 4;
-			frame.bottom	= realPos.y + objectProperties->size.cy - 4;
+			if (flags & BF_SHOWHIGHLIGHT)
+			{
+				frame.left	= realPos.x + 4;
+				frame.top	= realPos.y + 4;
+				frame.right	= realPos.x + objectProperties->size.cx - 5;
+				frame.bottom	= realPos.y + objectProperties->size.cy - 5;
 
-			surface->Box(frame, Setup::BackgroundColor, OUTLINED);
+				surface->Frame(frame, FRAME_UP);
+			}
+			else
+			{
+				frame.left	= realPos.x + 4;
+				frame.top	= realPos.y + 4;
+				frame.right	= realPos.x + objectProperties->size.cx - 4;
+				frame.bottom	= realPos.y + objectProperties->size.cy - 4;
+
+				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
+			}
 
 			break;
 	}

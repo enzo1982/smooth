@@ -187,7 +187,7 @@ Void BeatClock::Options()
 	pos.y = 32;
 	size.cx = 34;
 
-	if (timeformat == 0)	alarmtext = String::IntToString(alarmbeats);
+	if (timeformat == 0)	alarmtext = String::FromInt(alarmbeats);
 	else			alarmtext = convertSecondsToTimeString(alarmsecs);
 
 	alarm_edit1 = new EditBox(alarmtext, pos, size, EDB_ALPHANUMERIC, 5);
@@ -423,7 +423,7 @@ Void BeatClock::OptionsBeats()
 	display_check1->SetText("Show centibeats");
 	misc_option1->SetText("Show/hide centibeats");
 	alarm_text2->SetText("Internet Beats");
-	alarm_edit1->SetText(String::IntToString(min(999, convertSecondsToBeats(convertTimeStringToSeconds(alarm_edit1->GetText())))));
+	alarm_edit1->SetText(String::FromInt(min(999, convertSecondsToBeats(convertTimeStringToSeconds(alarm_edit1->GetText())))));
 }
 
 Void BeatClock::OptionsSTF()
@@ -670,7 +670,7 @@ Void BeatClock::PaintAll()
 
 			if (alarmoption == 0) isalarm = false;
 
-			SMOOTH::MessageBox(String("It is @").Append(String::IntToString(beats)).Append(" internet beats!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
+			SMOOTH::MessageBox(String("It is @").Append(String::FromInt(beats)).Append(" internet beats!"), "BeatClock alarm", MB_OK, IDI_INFORMATION);
 		}
 
 		if (beats != alarmbeats && alarmexec)
@@ -802,12 +802,12 @@ String BeatClock::convertSecondsToTimeString(Int seconds)
 
 	if (((int) (seconds / 3600)) < 10) rstring.Append("0");
 
-	rstring.Append(String::IntToString(seconds / 3600));
+	rstring.Append(String::FromInt(seconds / 3600));
 	rstring.Append(":");
 
 	if (((int) ((seconds % 3600) / 60)) < 10) rstring.Append("0");
 
-	rstring.Append(String::IntToString((seconds % 3600) / 60));
+	rstring.Append(String::FromInt((seconds % 3600) / 60));
 
 	return rstring;
 }

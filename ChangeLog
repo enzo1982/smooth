@@ -1,6 +1,15 @@
 ChangeLog for smooth
 
-14.03.03 14:00 - smooth alpha 0.8.61.0
+xx.xx.03 xx:xx - smooth alpha 0.8.62.0
+
+- string.cpp		- renamed IntToString to FromInt, DoubleToString to FromFloat
+			- renamed ToDoble to ToFloat
+- window.cpp		- Paint now uses SP_UPDATE
+- surface.cpp		- modified StartPaint and EndPaint methods
+			- added PaintRect method: updates the requested region
+- pciio.cpp		- read-only files can now be opened
+
+16.03.03 07:00 - smooth alpha 0.8.61.0
 
 - math.cpp		- new class: contains static mathematical functions
 - binary.cpp		- new class: contains static binary helper functions
@@ -31,6 +40,7 @@ ChangeLog for smooth
 - editbox.cpp		- support for 'Home' and 'End' keys
 			- support for marking text
 			- support for copy and paste to/from clipboard
+			- fixed other editbox issues
 
 - new namespace: smooth alias S
 - new namespace: smooth::XML

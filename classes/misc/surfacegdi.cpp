@@ -12,37 +12,60 @@
 #include <smooth/stk.h>
 #include <smooth/toolkit.h>
 #include <smooth/color.h>
+#include <smooth/math.h>
 
 S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 {
 	gdi_dc = iDc;
 	real_dc = iDc;
 
-	size.cx	= 0;
-	size.cy	= 0;
+	size.cx	= GetDeviceCaps(gdi_dc, HORZRES);
+	size.cy	= GetDeviceCaps(gdi_dc, VERTRES);
+
+	HBITMAP	 bitmap = CreateBitmap(size.cx, size.cy, GetDeviceCaps(gdi_dc, PLANES), GetDeviceCaps(gdi_dc, BITSPIXEL), NIL);
+
+	BlitToBitmap(Rect(Point(0, 0), size), bitmap, Rect(Point(0, 0), size));
+
+	bmp_dc = CreateCompatibleDC(gdi_dc);
+
+	cDc_bitmap = (HBITMAP) SelectObject(bmp_dc, bitmap);
 }
 
 S::GUI::SurfaceGDI::~SurfaceGDI()
 {
+	HBITMAP	 bitmap = (HBITMAP) SelectObject(bmp_dc, cDc_bitmap);
+
+	DeleteDC(bmp_dc);
+
+	DestroyBitmap(bitmap);
 }
 
-S::Int S::GUI::SurfaceGDI::StartPaint()
+S::Int S::GUI::SurfaceGDI::PaintRect(Rect pRect)
 {
+	if (painting) return Error;
+
+	BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, bmp_dc, pRect.left, pRect.top, SRCCOPY);
+
+	return Success;
+}
+
+S::Int S::GUI::SurfaceGDI::StartPaint(Rect pRect)
+{
+	if (paintRect.left == -1 && paintRect.top == -1 && paintRect.right == -1 && paintRect.bottom == -1)
+	{
+		paintRect = pRect;
+	}
+	else
+	{
+		paintRect.left = (Int) Math::Min(paintRect.left, pRect.left);
+		paintRect.top = (Int) Math::Min(paintRect.top, pRect.top);
+		paintRect.right = (Int) Math::Max(paintRect.right, pRect.right);
+		paintRect.bottom = (Int) Math::Max(paintRect.bottom, pRect.bottom);
+	}
+
 	if (!painting)
 	{
-		HBITMAP	 bitmap = CreateBitmap(GetDeviceCaps(gdi_dc, HORZRES), GetDeviceCaps(gdi_dc, VERTRES), GetDeviceCaps(gdi_dc, PLANES), GetDeviceCaps(gdi_dc, BITSPIXEL), NIL);
-		Rect	 bmpRect;
-
-		bmpRect.left = 0;
-		bmpRect.top = 0;
-		bmpRect.right = GetDeviceCaps(gdi_dc, HORZRES);
-		bmpRect.bottom = GetDeviceCaps(gdi_dc, VERTRES);
-
-		BlitToBitmap(bmpRect, bitmap, bmpRect);
-
 		gdi_dc = CreateCompatibleDC(real_dc);
-
-		cDc_bitmap = (HBITMAP) SelectObject(gdi_dc, bitmap);
 	}
 
 	painting++;
@@ -54,38 +77,35 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 {
 	if (!painting) return Error;
 
-	if (painting == 1)
+	painting--;
+
+	if (painting == 0)
 	{
-		HBITMAP	 bitmap = (HBITMAP) SelectObject(gdi_dc, cDc_bitmap);
-		Rect	 bmpRect;
-
-		bmpRect.left = 0;
-		bmpRect.top = 0;
-		bmpRect.right = GetDeviceCaps(gdi_dc, HORZRES);
-		bmpRect.bottom = GetDeviceCaps(gdi_dc, VERTRES);
-
 		DeleteDC(gdi_dc);
 
 		gdi_dc = real_dc;
 
-		BlitFromBitmap(bitmap, bmpRect, bmpRect);
+		PaintRect(paintRect);
 
-		DestroyBitmap(bitmap);
+		paintRect.left = -1;
+		paintRect.top = -1;
+		paintRect.right = -1;
+		paintRect.bottom = -1;
 	}
-
-	painting--;
 
 	return Success;
 }
 
 HDC S::GUI::SurfaceGDI::GetContext()
 {
-	return gdi_dc;
+	if (painting)	return bmp_dc;
+	else		return gdi_dc;
 }
 
 S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 {
 	::SetPixel(gdi_dc, x, y, color);
+	::SetPixel(bmp_dc, x, y, color);
 
 	return Success;
 }
@@ -104,51 +124,15 @@ S::Int S::GUI::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
 	LineTo(gdi_dc, pos2.x, pos2.y);
 
 	hPen = (HPEN) SelectObject(gdi_dc, hOldPen);
+
+	hOldPen = (HPEN) SelectObject(bmp_dc, hPen);
+
+	MoveToEx(bmp_dc, pos1.x, pos1.y, NIL);
+	LineTo(bmp_dc, pos2.x, pos2.y);
+
+	hPen = (HPEN) SelectObject(bmp_dc, hOldPen);
+
 	DeleteObject(hPen);
-
-	return Success;
-}
-
-S::Int S::GUI::SurfaceGDI::Frame(Rect rect, Int style)
-{
-	Long	 color1 = 0;
-	Long	 color2 = 0;
-	Point	 p1;
-	Point	 p2;
-	Point	 p3;
-	Point	 p4;
-
-	p1.x = rect.left;
-	p1.y = rect.top;
-	p2.x = rect.right;
-	p2.y = rect.top;
-	p3.x = rect.left;
-	p3.y = rect.bottom;
-	p4.x = rect.right;
-	p4.y = rect.bottom;
-
-	switch (style)
-	{
-		case FRAME_UP: // up
-		{
-			color1 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
-			color2 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
-		}
-		break;
-
-		case FRAME_DOWN: // down
-		{
-			color1 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
-			color2 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
-		}
-		break;
-	}
-
-	Line(p1, p2, color1);
-	Line(p1, p3, color1);
-	Line(p2, p4, color2);
-	p4.x++;
-	Line(p3, p4, color2);
 
 	return Success;
 }
@@ -158,8 +142,16 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 	HBRUSH	 brush = CreateSolidBrush(color);
 	RECT	 wRect = rect;
 
-	if (style == FILLED)		FillRect(gdi_dc, &wRect, brush);
-	else if (style == OUTLINED)	FrameRect(gdi_dc, &wRect, brush);
+	if (style == FILLED)
+	{
+		FillRect(gdi_dc, &wRect, brush);
+		FillRect(bmp_dc, &wRect, brush);
+	}
+	else if (style == OUTLINED)
+	{
+		FrameRect(gdi_dc, &wRect, brush);
+		FrameRect(bmp_dc, &wRect, brush);
+	}
 	else
 	{
 		Bool	 dot = False;
@@ -171,6 +163,7 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
+				::SetPixel(bmp_dc, x, y, color);
 				dot = False;
 			}
 			else dot = True;
@@ -183,6 +176,7 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
+				::SetPixel(bmp_dc, x, y, color);
 				dot = False;
 			}
 			else dot = True;
@@ -195,6 +189,7 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
+				::SetPixel(bmp_dc, x, y, color);
 				dot = False;
 			}
 			else dot = True;
@@ -207,6 +202,7 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
+				::SetPixel(bmp_dc, x, y, color);
 				dot = False;
 			}
 			else dot = True;
@@ -224,6 +220,7 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int si
 
 	HFONT	 hfont;
 	HFONT	 holdfont;
+	HFONT	 holdfont2;
 	int	 lines = 1;
 	int	 offset = 0;
 	int	 origoffset;
@@ -234,13 +231,17 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int si
 
 	for (i = 0; i < txtsize; i++) if (string[i] == 10) lines++;
 
-	SetBkMode(gdi_dc, TRANSPARENT);
-	SetTextColor(gdi_dc, color);
-
 	if (Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, flags & TF_ITALIC, flags & TF_UNDERLINE, flags & TF_STRIKEOUT, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
 	else				hfont = CreateFontA(size, 0, 0, 0, weight, flags & TF_ITALIC, flags & TF_UNDERLINE, flags & TF_STRIKEOUT, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
 
+	SetBkMode(gdi_dc, TRANSPARENT);
+	SetBkMode(bmp_dc, TRANSPARENT);
+
+	SetTextColor(gdi_dc, color);
+	SetTextColor(bmp_dc, color);
+
 	holdfont = (HFONT) SelectObject(gdi_dc, hfont);
+	holdfont2 = (HFONT) SelectObject(bmp_dc, hfont);
 
 	for (i = 0; i < lines; i++)
 	{
@@ -272,10 +273,15 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int si
 		if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
 		else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
 
+		if (Setup::enableUnicode)	DrawTextExW(bmp_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
+		else				DrawTextExA(bmp_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
+
 		rect.top += height;
 	}
 
 	SelectObject(gdi_dc, holdfont);
+	SelectObject(bmp_dc, holdfont2);
+
 	DeleteObject(hfont);
 
 	return Success;
@@ -289,10 +295,12 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect des
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
 		BitBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
+		BitBlt(bmp_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
 	}
 	else
 	{
 		StretchBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+		StretchBlt(bmp_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
 	bitmap = (HBITMAP) SelectObject(cdc, backup);

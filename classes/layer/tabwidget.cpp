@@ -221,6 +221,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
 
+	Surface	*surface = wnd->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Int	 retVal = Success;
 	Layer	*object;
@@ -270,6 +271,8 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 						if (wnd->IsMouseOn(frame))
 						{
+							surface->StartPaint(Rect(realPos, objectProperties->size));
+
 							for (Int j = 0; j < nOfObjects; j++)
 							{
 								object2 = (Layer *) assocObjects.GetNthEntry(j);
@@ -288,6 +291,8 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 							object->Show();
 
 							Show();
+
+							surface->EndPaint();
 
 							retVal = Break;
 

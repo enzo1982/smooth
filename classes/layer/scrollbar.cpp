@@ -402,7 +402,11 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 			if (*variable != prevValue)
 			{
+				surface->StartPaint(frame);
+
 				Paint(SP_PAINT);
+
+				surface->EndPaint();
 
 				onClick.Emit();
 			}
@@ -432,7 +436,11 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 			if (*variable != prevValue)
 			{
+				surface->StartPaint(frame);
+
 				Paint(SP_PAINT);
+
+				surface->EndPaint();
 
 				onClick.Emit();
 			}
@@ -545,9 +553,13 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				if (*variable != prevValue)
 				{
+					surface->StartPaint(frame);
+
 					surface->Box(frame3, Setup::BackgroundColor, FILLED);
 
 					Paint(SP_PAINT);
+
+					surface->EndPaint();
 
 					onClick.Emit();
 				}

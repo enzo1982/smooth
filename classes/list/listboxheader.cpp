@@ -323,7 +323,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 						UpdateMetrics();
 
-						surface->StartPaint();
+						surface->StartPaint(Rect(listBox->GetRealPosition(), listBox->GetObjectProperties()->size));
 						listBox->Paint(SP_PAINT);
 						surface->EndPaint();
 					}

@@ -648,7 +648,7 @@ S::Int S::String::ToInt()
 	else		return 0 - n;
 }
 
-S::Float S::String::ToDouble()
+S::Float S::String::ToFloat()
 {
 	if (Length() == 0) return 0;
 
@@ -696,7 +696,7 @@ S::Float S::String::ToDouble()
 	else		return 0 - n;
 }
 
-S::String S::String::IntToString(const Int value)
+S::String S::String::FromInt(const Int value)
 {
 	String	 newString;
 	Int	 sz;
@@ -727,7 +727,7 @@ S::String S::String::IntToString(const Int value)
 	return newString;
 }
 
-S::String S::String::DoubleToString(Float value)
+S::String S::String::FromFloat(Float value)
 {
 	String	 newString;
 	Int	 sz;
@@ -750,7 +750,7 @@ S::String S::String::DoubleToString(Float value)
 			newString[i+1] = (wchar_t) Math::Floor(((Int) (-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
 		}
 
-		afps = IntToString((Int) (-(value - (Int) value) * (Int) Math::Pow(10, 9)));
+		afps = FromInt((Int) (-(value - (Int) value) * (Int) Math::Pow(10, 9)));
 	}
 	else
 	{
@@ -759,7 +759,7 @@ S::String S::String::DoubleToString(Float value)
 			newString[i] = (wchar_t) Math::Floor(((Int) value % (Int) Math::Pow(10, sz - i)) / Math::Pow(10, sz - (i + 1))) + 48;
 		}
 
-		afps = IntToString((Int) ((value - (Int) value) * (Int) Math::Pow(10, 9)));
+		afps = FromInt((Int) ((value - (Int) value) * (Int) Math::Pow(10, 9)));
 	}
 
 	afpslen = afps.Length();

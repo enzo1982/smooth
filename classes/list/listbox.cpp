@@ -453,6 +453,8 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 			{
 				lastScrollbarPos = scrollbarPos;
 
+				surface->StartPaint(frame);
+
 				frame.left++;
 				frame.top = frame.top + 1 + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
 				frame.right--;
@@ -516,6 +518,8 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						operat->rect = Rect(Point(-1, -1), Size(0, 0));
 					}
 				}
+
+				surface->EndPaint();
 
 				retVal = Break;
 			}

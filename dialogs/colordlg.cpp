@@ -198,37 +198,37 @@ S::DialogColorSelection::DialogColorSelection()
 	bs.cx = 30;
 	bs.cy = 0;
 
-	hueedit = new EditBox(String::IntToString(acthue), bp, bs, EDB_NUMERIC, 3);
+	hueedit = new EditBox(String::FromInt(acthue), bp, bs, EDB_NUMERIC, 3);
 	hueedit->onClick.Connect(&DialogColorSelection::ColorDlgHueEdit, this);
 	hueedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	satedit = new EditBox(String::IntToString(actsat), bp, bs, EDB_NUMERIC, 3);
+	satedit = new EditBox(String::FromInt(actsat), bp, bs, EDB_NUMERIC, 3);
 	satedit->onClick.Connect(&DialogColorSelection::ColorDlgSatEdit, this);
 	satedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	valedit = new EditBox(String::IntToString(actval), bp, bs, EDB_NUMERIC, 3);
+	valedit = new EditBox(String::FromInt(actval), bp, bs, EDB_NUMERIC, 3);
 	valedit->onClick.Connect(&DialogColorSelection::ColorDlgValEdit, this);
 	valedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	rededit = new EditBox(String::IntToString(actred), bp, bs, EDB_NUMERIC, 3);
+	rededit = new EditBox(String::FromInt(actred), bp, bs, EDB_NUMERIC, 3);
 	rededit->onClick.Connect(&DialogColorSelection::ColorDlgRedEdit, this);
 	rededit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	greenedit = new EditBox(String::IntToString(actgreen), bp, bs, EDB_NUMERIC, 3);
+	greenedit = new EditBox(String::FromInt(actgreen), bp, bs, EDB_NUMERIC, 3);
 	greenedit->onClick.Connect(&DialogColorSelection::ColorDlgGreenEdit, this);
 	greenedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	blueedit = new EditBox(String::IntToString(actblue), bp, bs, EDB_NUMERIC, 3);
+	blueedit = new EditBox(String::FromInt(actblue), bp, bs, EDB_NUMERIC, 3);
 	blueedit->onClick.Connect(&DialogColorSelection::ColorDlgBlueEdit, this);
 	blueedit->SetOrientation(OR_UPPERRIGHT);
 
@@ -369,12 +369,12 @@ S::Int S::DialogColorSelection::SetColor(Int newColor)
 
 	ColorDlgUpdateHexValue();
 
-	hueedit->SetText(String::IntToString(acthue));
-	satedit->SetText(String::IntToString(actsat));
-	valedit->SetText(String::IntToString(actval));
-	rededit->SetText(String::IntToString(actred));
-	greenedit->SetText(String::IntToString(actgreen));
-	blueedit->SetText(String::IntToString(actblue));
+	hueedit->SetText(String::FromInt(acthue));
+	satedit->SetText(String::FromInt(actsat));
+	valedit->SetText(String::FromInt(actval));
+	rededit->SetText(String::FromInt(actred));
+	greenedit->SetText(String::FromInt(actgreen));
+	blueedit->SetText(String::FromInt(actblue));
 	hexedit->SetText(hexval);
 
 	return Success;
@@ -590,12 +590,12 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 
 				ColorDlgUpdateHexValue();
 
-				hueedit->SetText(String::IntToString(acthue));
-				satedit->SetText(String::IntToString(actsat));
-				valedit->SetText(String::IntToString(actval));
-				rededit->SetText(String::IntToString(actred));
-				greenedit->SetText(String::IntToString(actgreen));
-				blueedit->SetText(String::IntToString(actblue));
+				hueedit->SetText(String::FromInt(acthue));
+				satedit->SetText(String::FromInt(actsat));
+				valedit->SetText(String::FromInt(actval));
+				rededit->SetText(String::FromInt(actred));
+				greenedit->SetText(String::FromInt(actgreen));
+				blueedit->SetText(String::FromInt(actblue));
 				hexedit->SetText(hexval);
 
 				dlgwnd->SetUpdateRect(vsrect);
@@ -647,10 +647,10 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 
 					ColorDlgUpdateHexValue();
 
-					hueedit->SetText(String::IntToString(acthue));
-					rededit->SetText(String::IntToString(actred));
-					greenedit->SetText(String::IntToString(actgreen));
-					blueedit->SetText(String::IntToString(actblue));
+					hueedit->SetText(String::FromInt(acthue));
+					rededit->SetText(String::FromInt(actred));
+					greenedit->SetText(String::FromInt(actgreen));
+					blueedit->SetText(String::FromInt(actblue));
 					hexedit->SetText(hexval);
 
 					surface->Box(ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
@@ -687,11 +687,11 @@ void S::DialogColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int l
 
 					ColorDlgUpdateHexValue();
 
-					valedit->SetText(String::IntToString(actval));
-					satedit->SetText(String::IntToString(actsat));
-					rededit->SetText(String::IntToString(actred));
-					greenedit->SetText(String::IntToString(actgreen));
-					blueedit->SetText(String::IntToString(actblue));
+					valedit->SetText(String::FromInt(actval));
+					satedit->SetText(String::FromInt(actsat));
+					rededit->SetText(String::FromInt(actred));
+					greenedit->SetText(String::FromInt(actgreen));
+					blueedit->SetText(String::FromInt(actblue));
 					hexedit->SetText(hexval);
 
 					surface->Box(ncrect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
@@ -797,10 +797,10 @@ void S::DialogColorSelection::ColorDlgHueSlider()
 
 	if (updatetext)
 	{
-		hueedit->SetText(String::IntToString(acthue));
-		rededit->SetText(String::IntToString(actred));
-		greenedit->SetText(String::IntToString(actgreen));
-		blueedit->SetText(String::IntToString(actblue));
+		hueedit->SetText(String::FromInt(acthue));
+		rededit->SetText(String::FromInt(actred));
+		greenedit->SetText(String::FromInt(actgreen));
+		blueedit->SetText(String::FromInt(actblue));
 	}
 
 	if (updatehextext)
@@ -829,10 +829,10 @@ void S::DialogColorSelection::ColorDlgSatSlider()
 
 	if (updatetext)
 	{
-		satedit->SetText(String::IntToString(actsat));
-		rededit->SetText(String::IntToString(actred));
-		greenedit->SetText(String::IntToString(actgreen));
-		blueedit->SetText(String::IntToString(actblue));
+		satedit->SetText(String::FromInt(actsat));
+		rededit->SetText(String::FromInt(actred));
+		greenedit->SetText(String::FromInt(actgreen));
+		blueedit->SetText(String::FromInt(actblue));
 	}
 
 	if (updatehextext)
@@ -860,10 +860,10 @@ void S::DialogColorSelection::ColorDlgValSlider()
 
 	if (updatetext)
 	{
-		valedit->SetText(String::IntToString(actval));
-		rededit->SetText(String::IntToString(actred));
-		greenedit->SetText(String::IntToString(actgreen));
-		blueedit->SetText(String::IntToString(actblue));
+		valedit->SetText(String::FromInt(actval));
+		rededit->SetText(String::FromInt(actred));
+		greenedit->SetText(String::FromInt(actgreen));
+		blueedit->SetText(String::FromInt(actblue));
 	}
 
 	if (updatehextext)
@@ -889,10 +889,10 @@ void S::DialogColorSelection::ColorDlgRedSlider()
 
 	if (updatetext)
 	{
-		hueedit->SetText(String::IntToString(acthue));
-		satedit->SetText(String::IntToString(actsat));
-		valedit->SetText(String::IntToString(actval));
-		rededit->SetText(String::IntToString(actred));
+		hueedit->SetText(String::FromInt(acthue));
+		satedit->SetText(String::FromInt(actsat));
+		valedit->SetText(String::FromInt(actval));
+		rededit->SetText(String::FromInt(actred));
 	}
 
 	if (updatehextext)
@@ -919,10 +919,10 @@ void S::DialogColorSelection::ColorDlgGreenSlider()
 
 	if (updatetext)
 	{
-		hueedit->SetText(String::IntToString(acthue));
-		satedit->SetText(String::IntToString(actsat));
-		valedit->SetText(String::IntToString(actval));
-		greenedit->SetText(String::IntToString(actgreen));
+		hueedit->SetText(String::FromInt(acthue));
+		satedit->SetText(String::FromInt(actsat));
+		valedit->SetText(String::FromInt(actval));
+		greenedit->SetText(String::FromInt(actgreen));
 	}
 
 	if (updatehextext)
@@ -949,10 +949,10 @@ void S::DialogColorSelection::ColorDlgBlueSlider()
 
 	if (updatetext)
 	{
-		hueedit->SetText(String::IntToString(acthue));
-		satedit->SetText(String::IntToString(actsat));
-		valedit->SetText(String::IntToString(actval));
-		blueedit->SetText(String::IntToString(actblue));
+		hueedit->SetText(String::FromInt(acthue));
+		satedit->SetText(String::FromInt(actsat));
+		valedit->SetText(String::FromInt(actval));
+		blueedit->SetText(String::FromInt(actblue));
 	}
 
 	if (updatehextext)

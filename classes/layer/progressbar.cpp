@@ -140,10 +140,10 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 		switch (textFlag)
 		{
 			case PB_VALUE:
-				objectProperties->text = String::IntToString(Math::Max(value, startValue));
+				objectProperties->text = String::FromInt(Math::Max(value, startValue));
 				break;
 			case PB_PERCENT:
-				if (value > 0)	objectProperties->text = String::IntToString(Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
+				if (value > 0)	objectProperties->text = String::FromInt(Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
 				else		objectProperties->text = "0";
 
 				objectProperties->text.Append("%");
@@ -207,10 +207,10 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 		switch (textFlag)
 		{
 			case PB_VALUE:
-				objectProperties->text = String::IntToString(Math::Max(value, startValue));
+				objectProperties->text = String::FromInt(Math::Max(value, startValue));
 				break;
 			case PB_PERCENT:
-				if (value > 0)	objectProperties->text = String::IntToString(Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
+				if (value > 0)	objectProperties->text = String::FromInt(Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
 				else		objectProperties->text = "0";
 
 				objectProperties->text.Append("%");
@@ -251,7 +251,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 	{	
 		if (newValue > 0 && newValue > value)
 		{
-			for (Int i = realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (value - startValue))) + 1; i < realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (newValue - startValue))) + 1; i++)
+			for (Int i = (Int) Math::Max(realPos.x + 1, realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (value - startValue)))); i < realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (newValue - startValue))) + 1; i++)
 			{
 				lineStart.x = i;
 				lineStart.y = realPos.y + 1;
@@ -327,10 +327,10 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 		switch (textFlag)
 		{
 			case PB_VALUE:
-				objectProperties->text = String::IntToString(Math::Max(value, startValue));
+				objectProperties->text = String::FromInt(Math::Max(value, startValue));
 				break;
 			case PB_PERCENT:
-				if (value > 0)	objectProperties->text = String::IntToString(Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
+				if (value > 0)	objectProperties->text = String::FromInt(Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
 				else		objectProperties->text = "0";
 
 				objectProperties->text.Append("%");

@@ -156,9 +156,33 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	if (max)	buttonColor = Setup::TextColor;
 	else		buttonColor = Setup::GrayTextColor;
 
-	surface->Box(button, buttonColor, OUTLINED);
-	button.top--;
-	surface->Box(button, buttonColor, OUTLINED);
+	if(wnd->maximized)
+	{
+		button.top--;
+		button.left++;
+		button.bottom -= 2;
+		surface->Box(button, buttonColor, OUTLINED);
+		button.top--;
+		surface->Box(button, buttonColor, OUTLINED);
+		button.top += 4;
+		button.bottom += 3;
+		button.left -= 2;
+		button.right -= 2;
+		surface->Box(button, Setup::BackgroundColor, FILLED);
+		surface->Box(button, buttonColor, OUTLINED);
+		button.top--;
+		surface->Box(button, buttonColor, OUTLINED);
+		button.left++;
+		button.top -= 2;
+		button.bottom--;
+		button.right+=2;
+	}
+	else
+	{
+		surface->Box(button, buttonColor, OUTLINED);
+		button.top--;
+		surface->Box(button, buttonColor, OUTLINED);
+	}
 
 	button.left	= button.right + 3;
 	button.right	= button.left + METRIC_TBBUTTONSIZE + 1;

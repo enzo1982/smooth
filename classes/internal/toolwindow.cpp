@@ -21,6 +21,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/surfacegdi.h>
 #include <smooth/layer.h>
+#include <smooth/math.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -99,12 +100,24 @@ HWND S::GUI::ToolWindow::Create()
 S::Int S::GUI::ToolWindow::Paint(Int message)
 {
 	if (!registered)	return Error;
+	if (!created)		return Success;
 	if (!visible)		return Success;
 
+	EnterProtectedRegion();
+
+	Surface	*surface = GetDrawSurface();
 	Object	*object;
 
-	if (created)
+	if (message == SP_UPDATE)
 	{
+		surface->PaintRect(updateRect);
+	}
+	else
+	{
+		surface->Box(updateRect, GetSysColor(COLOR_BTNFACE), FILLED);
+
+		onPaint.Emit();
+
 		for (Int i = 0; i < nOfObjects; i++)
 		{
 			object = assocObjects.GetNthEntry(i);
@@ -115,6 +128,8 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 			}
 		}
 	}
+
+	LeaveProtectedRegion();
 
 	return Success;
 }
@@ -209,7 +224,8 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 					BeginPaint(hwnd, &ps);
 
-					Paint(SP_PAINT);
+					if (Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20)	Paint(SP_PAINT);
+					else																						Paint(SP_UPDATE);
 
 					EndPaint(hwnd, &ps);
 				}

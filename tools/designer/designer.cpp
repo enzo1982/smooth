@@ -53,21 +53,21 @@ Designer::Designer()
 	menu_widgets_add	= new Menu();
 	menu_widgets_add_smooth	= new Menu();
 
-	menubar->AddEntry("&File", NIL, menu_file);
-	menubar->AddEntry("&Dialog", NIL, menu_dialog);
-	menubar->AddEntry("&Widgets", NIL, menu_widgets);
+	menubar->AddEntry("File", NIL, menu_file);
+	menubar->AddEntry("Dialog", NIL, menu_dialog);
+	menubar->AddEntry("Widgets", NIL, menu_widgets);
 
-	menu_file->AddEntry("E&xit")->onClick.Connect(&Designer::Close, this);
+	menu_file->AddEntry("Exit")->onClick.Connect(&Designer::Close, this);
 
-	menu_dialog->AddEntry("&New")->onClick.Connect(&Designer::NewDialog, this);
+	menu_dialog->AddEntry("New")->onClick.Connect(&Designer::NewDialog, this);
 
-	menu_widgets->AddEntry("&Add", NIL, menu_widgets_add);
+	menu_widgets->AddEntry("Add", NIL, menu_widgets_add);
 
-	menu_widgets_add->AddEntry("&smooth controls", NIL, menu_widgets_add_smooth);
+	menu_widgets_add->AddEntry("smooth controls", NIL, menu_widgets_add_smooth);
 
-	menu_widgets_add_smooth->AddEntry("&Button")->onClick.Connect(&Designer::AddButton, this);
-	menu_widgets_add_smooth->AddEntry("&Layer")->onClick.Connect(&Designer::AddLayer, this);
-	menu_widgets_add_smooth->AddEntry("&Menubar")->onClick.Connect(&Designer::AddMenubar, this);
+	menu_widgets_add_smooth->AddEntry("Button")->onClick.Connect(&Designer::AddButton, this);
+	menu_widgets_add_smooth->AddEntry("Layer")->onClick.Connect(&Designer::AddLayer, this);
+	menu_widgets_add_smooth->AddEntry("Menubar")->onClick.Connect(&Designer::AddMenubar, this);
 
 	RegisterObject(wnd);
 
@@ -129,7 +129,7 @@ Bool Designer::ExitProc()
 
 void Designer::NewDialog()
 {
-	Designer_EditComponent	*dlg = new Designer_EditComponent(this, String("Dialog").Append(String::IntToString(dlgcounter++)));
+	Designer_EditComponent	*dlg = new Designer_EditComponent(this, String("Dialog").Append(String::FromInt(dlgcounter++)));
 
 	dlgs.AddEntry(dlg);
 
@@ -145,13 +145,13 @@ void Designer::ReportStatus(Designer_Status stat)
 			active_dlg = stat.dlg;
 			break;
 		case STATUS_EVENT_REPORT_MOUSEPOSITION:
-			statusbar->SetText(String("Mouse: ").Append(String::IntToString(stat.mousex)).Append(", ").Append(String::IntToString(stat.mousey)));
+			statusbar->SetText(String("Mouse: ").Append(String::FromInt(stat.mousex)).Append(", ").Append(String::FromInt(stat.mousey)));
 			break;
 		case STATUS_EVENT_REPORT_WINDOWPOSITION:
-			statusbar->SetText(String("Position: ").Append(String::IntToString(stat.wndposx)).Append(", ").Append(String::IntToString(stat.wndposy)));
+			statusbar->SetText(String("Position: ").Append(String::FromInt(stat.wndposx)).Append(", ").Append(String::FromInt(stat.wndposy)));
 			break;
 		case STATUS_EVENT_REPORT_WINDOWSIZE:
-			statusbar->SetText(String("Size: ").Append(String::IntToString(stat.wndsizex)).Append(", ").Append(String::IntToString(stat.wndsizey)));
+			statusbar->SetText(String("Size: ").Append(String::FromInt(stat.wndsizex)).Append(", ").Append(String::FromInt(stat.wndsizey)));
 			break;
 		case STATUS_EVENT_REPORT_QUIT:
 			wnd->SetText(String("SMOOTH Designer v").Append(SMOOTH_VERSION));

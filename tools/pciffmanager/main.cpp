@@ -34,11 +34,11 @@ PCIFFManager::PCIFFManager()
 
 	menu_file	= new Menu();
 
-	menubar->AddEntry("&File", NIL, menu_file);
+	menubar->AddEntry("File", NIL, menu_file);
 
-	menu_file->AddEntry("&Open")->onClick.Connect(&PCIFFManager::OpenFile, this);
+	menu_file->AddEntry("Open")->onClick.Connect(&PCIFFManager::OpenFile, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("E&xit")->onClick.Connect(&PCIFFManager::Close, this);
+	menu_file->AddEntry("Exit")->onClick.Connect(&PCIFFManager::Close, this);
 
 	RegisterObject(wnd);
 

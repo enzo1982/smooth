@@ -10,7 +10,6 @@ ToDo for smooth
 - redo Menubar::Paint(int)
 - redo the whole menu system
 - use other surfaces than GDI (OpenGL, DirectFB, SDL, DirectX)
-- complete XML parser
 - check large fonts support
 - implement MDI functionality (MDIBar, MDIArea)
 - implement Document Editing Areas

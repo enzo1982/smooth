@@ -1,0 +1,4 @@
+#include <windows.h>
+#include "../include/smooth/resources.h"
+
+IDI_ICON ICON MOVEABLE PURE LOADONCALL DISCARDABLE "resources/binary/icon.ico"

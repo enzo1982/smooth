@@ -688,12 +688,12 @@ $(OBJECTDIR)/libxml_xpointer.o: $(LIBXMLDIR)/xpointer.c
 	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xpointer.c -o $(OBJECTDIR)/libxml_xpointer.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/libiconv_iconv.o: $(LIBICONVDIR)/iconv.c
+$(OBJECTDIR)/libiconv_iconv.o: $(LIBICONVDIR)/iconv.c $(LIBICONVDIR)/config.h
 	$(ECHO) -n Compiling $(LIBICONVDIR)/iconv.c...
 	$(COMPILER) $(COMPILER_OPTS) $(LIBICONVDIR)/iconv.c -o $(OBJECTDIR)/libiconv_iconv.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/libiconv_localcharset.o: $(LIBICONVDIR)/localcharset.c
+$(OBJECTDIR)/libiconv_localcharset.o: $(LIBICONVDIR)/localcharset.c $(LIBICONVDIR)/config.h
 	$(ECHO) -n Compiling $(LIBICONVDIR)/localcharset.c...
 	$(COMPILER) $(COMPILER_OPTS) $(LIBICONVDIR)/localcharset.c -o $(OBJECTDIR)/libiconv_localcharset.o
 	$(ECHO) done.

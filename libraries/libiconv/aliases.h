@@ -139,7 +139,7 @@ static const struct alias aliases[] =
     {"L8", ei_iso8859_14},
     {""}, {""}, {""}, {""},
     {"SHIFT-JIS", ei_sjis},
-#ifdef ENABLE_EXTRA
+#if defined ENABLE_EXTRA || defined ENABLE_GBK
     {"GBK", ei_ces_gbk},
 #else
     {""},
@@ -634,7 +634,7 @@ static const struct alias aliases[] =
     {""}, {""}, {""},
     {"CSISOLATINARABIC", ei_iso8859_6},
     {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-#ifdef ENABLE_EXTRA
+#if defined ENABLE_EXTRA || defined ENABLE_GBK
     {"CP936", ei_ces_gbk},
 #else
     {""},

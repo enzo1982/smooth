@@ -18,7 +18,7 @@
  * Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifdef ENABLE_EXTRA
+#if defined ENABLE_EXTRA || defined ENABLE_GBK
 /*
  * GBK
  */

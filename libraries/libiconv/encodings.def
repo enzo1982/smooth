@@ -729,13 +729,15 @@ DEFENCODING(( "EUC-CN",                 /* glibc */
             euc_cn,
             { euc_cn_mbtowc, NULL },      { euc_cn_wctomb, NULL })
 
-#ifdef ENABLE_EXTRA
+#if defined ENABLE_EXTRA || defined ENABLE_GBK
 DEFENCODING(( "GBK",                    /* JDK 1.1 */
               "CP936",
             ),
             ces_gbk,
             { ces_gbk_mbtowc, NULL },     { ces_gbk_wctomb, NULL })
+#endif
 
+#ifdef ENABLE_EXTRA
 DEFENCODING(( "GB18030",                /* glibc */
             ),
             gb18030,

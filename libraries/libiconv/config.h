@@ -18,7 +18,10 @@
 
 
 /* Define to 1 to enable a few rarely used encodings. */
-#undef ENABLE_EXTRA
+#define ENABLE_EXTRA
+
+/* Define to enable GBK encoding */
+#define ENABLE_GBK
 
 /* Define to a type if <wchar.h> does not define. */
 #undef mbstate_t

@@ -549,7 +549,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 					operat->clicked = False;
 					surface->Frame(operat->rect, FRAME_UP);
 
-					if (operat->popup == NIL && operat->bVar == NIL && operat->iVar == NIL)
+					if ((operat->popup == NIL || operat->onClick.GetNOfConnectedSlots() > 0) && operat->bVar == NIL && operat->iVar == NIL)
 					{
 						operat->checked = False;
 

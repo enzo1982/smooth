@@ -1,7 +1,7 @@
 /*
- * Summary: Old SAX version 1 handler, deprecated
- * Description: DEPRECATED set of SAX version 1 interfaces used to
- *              build the DOM tree.
+ * Summary: SAX2 parser interface used to build the DOM tree
+ * Description: those are the default SAX2 interfaces used by
+ *              the library when building DOM tree.
  *
  * Copy: See Copyright for the status of this software.
  *
@@ -9,8 +9,8 @@
  */
 
 
-#ifndef __XML_SAX_H__
-#define __XML_SAX_H__
+#ifndef __XML_SAX2_H__
+#define __XML_SAX2_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,61 +18,59 @@
 #include <libxml/parser.h>
 #include <libxml/xlink.h>
 
-#ifdef LIBXML_SAX1_ENABLED
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 XMLPUBFUN const xmlChar * XMLCALL
-		getPublicId			(void *ctx);
+		xmlSAX2GetPublicId		(void *ctx);
 XMLPUBFUN const xmlChar * XMLCALL	
-		getSystemId			(void *ctx);
+		xmlSAX2GetSystemId		(void *ctx);
 XMLPUBFUN void XMLCALL		
-		setDocumentLocator		(void *ctx,
+		xmlSAX2SetDocumentLocator	(void *ctx,
 						 xmlSAXLocatorPtr loc);
     
 XMLPUBFUN int XMLCALL		
-		getLineNumber			(void *ctx);
+		xmlSAX2GetLineNumber		(void *ctx);
 XMLPUBFUN int XMLCALL		
-		getColumnNumber			(void *ctx);
+		xmlSAX2GetColumnNumber		(void *ctx);
 
 XMLPUBFUN int XMLCALL		
-		isStandalone			(void *ctx);
+		xmlSAX2IsStandalone		(void *ctx);
 XMLPUBFUN int XMLCALL		
-		hasInternalSubset		(void *ctx);
+		xmlSAX2HasInternalSubset	(void *ctx);
 XMLPUBFUN int XMLCALL		
-		hasExternalSubset		(void *ctx);
+		xmlSAX2HasExternalSubset	(void *ctx);
 
 XMLPUBFUN void XMLCALL		
-		internalSubset			(void *ctx,
+		xmlSAX2InternalSubset		(void *ctx,
 						 const xmlChar *name,
 						 const xmlChar *ExternalID,
 						 const xmlChar *SystemID);
 XMLPUBFUN void XMLCALL		
-		externalSubset			(void *ctx,
+		xmlSAX2ExternalSubset		(void *ctx,
 						 const xmlChar *name,
 						 const xmlChar *ExternalID,
 						 const xmlChar *SystemID);
 XMLPUBFUN xmlEntityPtr XMLCALL	
-		getEntity			(void *ctx,
+		xmlSAX2GetEntity		(void *ctx,
 						 const xmlChar *name);
 XMLPUBFUN xmlEntityPtr XMLCALL	
-		getParameterEntity		(void *ctx,
+		xmlSAX2GetParameterEntity	(void *ctx,
 						 const xmlChar *name);
 XMLPUBFUN xmlParserInputPtr XMLCALL 
-		resolveEntity			(void *ctx,
+		xmlSAX2ResolveEntity		(void *ctx,
 						 const xmlChar *publicId,
 						 const xmlChar *systemId);
 
 XMLPUBFUN void XMLCALL		
-		entityDecl			(void *ctx,
+		xmlSAX2EntityDecl		(void *ctx,
 						 const xmlChar *name,
 						 int type,
 						 const xmlChar *publicId,
 						 const xmlChar *systemId,
 						 xmlChar *content);
 XMLPUBFUN void XMLCALL		
-		attributeDecl			(void *ctx,
+		xmlSAX2AttributeDecl		(void *ctx,
 						 const xmlChar *elem,
 						 const xmlChar *fullname,
 						 int type,
@@ -80,91 +78,95 @@ XMLPUBFUN void XMLCALL
 						 const xmlChar *defaultValue,
 						 xmlEnumerationPtr tree);
 XMLPUBFUN void XMLCALL		
-		elementDecl			(void *ctx,
+		xmlSAX2ElementDecl		(void *ctx,
 						 const xmlChar *name,
 						 int type,
 						 xmlElementContentPtr content);
 XMLPUBFUN void XMLCALL		
-		notationDecl			(void *ctx,
+		xmlSAX2NotationDecl		(void *ctx,
 						 const xmlChar *name,
 						 const xmlChar *publicId,
 						 const xmlChar *systemId);
 XMLPUBFUN void XMLCALL		
-		unparsedEntityDecl		(void *ctx,
+		xmlSAX2UnparsedEntityDecl	(void *ctx,
 						 const xmlChar *name,
 						 const xmlChar *publicId,
 						 const xmlChar *systemId,
 						 const xmlChar *notationName);
 
 XMLPUBFUN void XMLCALL		
-		startDocument			(void *ctx);
+		xmlSAX2StartDocument		(void *ctx);
 XMLPUBFUN void XMLCALL		
-		endDocument			(void *ctx);
+		xmlSAX2EndDocument		(void *ctx);
 XMLPUBFUN void XMLCALL		
-		attribute			(void *ctx,
-						 const xmlChar *fullname,
-						 const xmlChar *value);
-XMLPUBFUN void XMLCALL		
-		startElement			(void *ctx,
+		xmlSAX2StartElement		(void *ctx,
 						 const xmlChar *fullname,
 						 const xmlChar **atts);
 XMLPUBFUN void XMLCALL		
-		endElement			(void *ctx,
+		xmlSAX2EndElement		(void *ctx,
+						 const xmlChar *name);
+XMLPUBFUN void XMLCALL
+		xmlSAX2StartElementNs		(void *ctx,
+						 const xmlChar *localname,
+						 const xmlChar *prefix,
+						 const xmlChar *URI,
+						 int nb_namespaces,
+						 const xmlChar **namespaces,
+						 int nb_attributes,
+						 int nb_defaulted,
+						 const xmlChar **attributes);
+XMLPUBFUN void XMLCALL
+		xmlSAX2EndElementNs		(void *ctx,
+						 const xmlChar *localname,
+						 const xmlChar *prefix,
+						 const xmlChar *URI);
+XMLPUBFUN void XMLCALL		
+		xmlSAX2Reference		(void *ctx,
 						 const xmlChar *name);
 XMLPUBFUN void XMLCALL		
-		reference			(void *ctx,
-						 const xmlChar *name);
-XMLPUBFUN void XMLCALL		
-		characters			(void *ctx,
+		xmlSAX2Characters		(void *ctx,
 						 const xmlChar *ch,
 						 int len);
 XMLPUBFUN void XMLCALL		
-		ignorableWhitespace		(void *ctx,
+		xmlSAX2IgnorableWhitespace	(void *ctx,
 						 const xmlChar *ch,
 						 int len);
 XMLPUBFUN void XMLCALL		
-		processingInstruction		(void *ctx,
+		xmlSAX2ProcessingInstruction	(void *ctx,
 						 const xmlChar *target,
 						 const xmlChar *data);
 XMLPUBFUN void XMLCALL		
-		globalNamespace			(void *ctx,
-						 const xmlChar *href,
-						 const xmlChar *prefix);
-XMLPUBFUN void XMLCALL		
-		setNamespace			(void *ctx,
-						 const xmlChar *name);
-XMLPUBFUN xmlNsPtr XMLCALL	
-		getNamespace			(void *ctx);
-XMLPUBFUN int XMLCALL		
-		checkNamespace			(void *ctx,
-						 xmlChar *nameSpace);
-XMLPUBFUN void XMLCALL		
-		namespaceDecl			(void *ctx,
-						 const xmlChar *href,
-						 const xmlChar *prefix);
-XMLPUBFUN void XMLCALL		
-		comment				(void *ctx,
+		xmlSAX2Comment			(void *ctx,
 						 const xmlChar *value);
 XMLPUBFUN void XMLCALL		
-		cdataBlock			(void *ctx,
+		xmlSAX2CDataBlock		(void *ctx,
 						 const xmlChar *value,
 						 int len);
 
+XMLPUBFUN int XMLCALL
+		xmlSAXDefaultVersion		(int version);
+
+XMLPUBFUN int XMLCALL
+		xmlSAXVersion			(xmlSAXHandler *hdlr,
+						 int version);
 XMLPUBFUN void XMLCALL		
-		initxmlDefaultSAXHandler	(xmlSAXHandlerV1 *hdlr,
+		xmlSAX2InitDefaultSAXHandler    (xmlSAXHandler *hdlr,
 						 int warning);
 #ifdef LIBXML_HTML_ENABLED
 XMLPUBFUN void XMLCALL		
-		inithtmlDefaultSAXHandler	(xmlSAXHandlerV1 *hdlr);
+		xmlSAX2InitHtmlDefaultSAXHandler(xmlSAXHandler *hdlr);
 #endif
 #ifdef LIBXML_DOCB_ENABLED
 XMLPUBFUN void XMLCALL		
-		initdocbDefaultSAXHandler	(xmlSAXHandlerV1 *hdlr);
+		xmlSAX2InitDocbDefaultSAXHandler(xmlSAXHandler *hdlr);
 #endif
+XMLPUBFUN void XMLCALL		
+		xmlDefaultSAXHandlerInit	(void);
+XMLPUBFUN void XMLCALL		
+		htmlDefaultSAXHandlerInit	(void);
+XMLPUBFUN void XMLCALL		
+		docbDefaultSAXHandlerInit	(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* LIBXML_SAX1_ENABLED */
-
-#endif /* __XML_SAX_H__ */
+#endif /* __XML_SAX2_H__ */

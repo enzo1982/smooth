@@ -39,6 +39,7 @@ S::Int		 S::GUI::Window::nOfActiveWindows = 0;
 S::GUI::Window::Window(String title, Void *iWindow)
 {
 	backend = WindowBackend::CreateBackendInstance();
+	backend->onEvent.SetParentObject(this);
 	backend->onEvent.Connect(&Window::Process, this);
 
 	containerType = classID;

@@ -798,9 +798,19 @@ $(OBJECTDIR)/libxml_catalog.o: $(LIBXMLDIR)/catalog.c
 	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/catalog.c -o $(OBJECTDIR)/libxml_catalog.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/libxml_encoding.o: $(LIBXMLDIR)/encoding.cpp
-	$(ECHO) -n Compiling $(LIBXMLDIR)/encoding.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/encoding.cpp -o $(OBJECTDIR)/libxml_encoding.o
+$(OBJECTDIR)/libxml_chvalid.o: $(LIBXMLDIR)/chvalid.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/chvalid.c...
+	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/chvalid.c -o $(OBJECTDIR)/libxml_chvalid.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/libxml_dict.o: $(LIBXMLDIR)/dict.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/dict.c...
+	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/dict.c -o $(OBJECTDIR)/libxml_dict.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/libxml_encoding.o: $(LIBXMLDIR)/encoding.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/encoding.c...
+	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/encoding.c -o $(OBJECTDIR)/libxml_encoding.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_entities.o: $(LIBXMLDIR)/entities.c
@@ -843,6 +853,11 @@ $(OBJECTDIR)/libxml_SAX.o: $(LIBXMLDIR)/SAX.c
 	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/SAX.c -o $(OBJECTDIR)/libxml_SAX.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/libxml_SAX2.o: $(LIBXMLDIR)/SAX2.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/SAX2.c...
+	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/SAX2.c -o $(OBJECTDIR)/libxml_SAX2.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/libxml_threads.o: $(LIBXMLDIR)/threads.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/threads.c...
 	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/threads.c -o $(OBJECTDIR)/libxml_threads.o
@@ -881,6 +896,16 @@ $(OBJECTDIR)/libxml_xmlmemory.o: $(LIBXMLDIR)/xmlmemory.c
 $(OBJECTDIR)/libxml_xmlregexp.o: $(LIBXMLDIR)/xmlregexp.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlregexp.c...
 	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlregexp.c -o $(OBJECTDIR)/libxml_xmlregexp.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/libxml_xmlsave.o: $(LIBXMLDIR)/xmlsave.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlsave.c...
+	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlsave.c -o $(OBJECTDIR)/libxml_xmlsave.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/libxml_xmlstring.o: $(LIBXMLDIR)/xmlstring.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlstring.c...
+	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlstring.c -o $(OBJECTDIR)/libxml_xmlstring.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_xmlunicode.o: $(LIBXMLDIR)/xmlunicode.c

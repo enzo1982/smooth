@@ -53,10 +53,10 @@ S::Void S::Init()
 	Int	 codePage = 1252;
 
 #ifdef __WIN32__
-	if (LoadIconvDLL() == True)	Setup::useIconv = True;
-	else				Setup::useIconv = False;
+	if (LoadIconvDLL() == True)	{ Setup::useIconv = True;  use_iconv = 1; }
+	else				{ Setup::useIconv = False; use_iconv = 0; }
 #else
-	Setup::useIconv = True;
+	{ Setup::useIconv = True; use_iconv = 1; }
 #endif
 
 	Backend::InitBackends();

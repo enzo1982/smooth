@@ -4,6 +4,7 @@ xx.xx.xx xx:xx - smooth alpha 0.8.66.0
 
 - object.cpp	- incorporated object manager functionality into Object
 - xulloader.cpp	- added a XUL loader that can be executed via rundll32
+- window.cpp	- fixed a possible crash
 
 - removed ObjectManager
 

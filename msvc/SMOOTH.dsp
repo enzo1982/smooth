@@ -131,10 +131,6 @@ SOURCE=..\classes\basic\object.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\basic\objectmanager.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\classes\basic\objectproperties.cpp
 # End Source File
 # Begin Source File
@@ -1683,10 +1679,6 @@ SOURCE=..\include\smooth\main.h
 # Begin Source File
 
 SOURCE=..\include\smooth\object.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\objectmanager.h
 # End Source File
 # Begin Source File
 

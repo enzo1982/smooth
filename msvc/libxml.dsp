@@ -89,7 +89,15 @@ SOURCE=..\libraries\libxml\catalog.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\libxml\encoding.cpp
+SOURCE=..\libraries\libxml\chvalid.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\libraries\libxml\dict.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\libraries\libxml\encoding.c
 # End Source File
 # Begin Source File
 
@@ -122,6 +130,10 @@ SOURCE=..\libraries\libxml\parserInternals.c
 # Begin Source File
 
 SOURCE=..\libraries\libxml\SAX.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\libraries\libxml\SAX2.c
 # End Source File
 # Begin Source File
 
@@ -169,6 +181,14 @@ SOURCE=..\libraries\libxml\xmlregexp.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\libraries\libxml\xmlsave.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\libraries\libxml\xmlstring.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\libraries\libxml\xmlunicode.c
 # End Source File
 # Begin Source File
@@ -196,7 +216,15 @@ SOURCE=..\include\libxml\catalog.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\libxml\chvalid.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\libxml\debugXML.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\libxml\dict.h
 # End Source File
 # Begin Source File
 
@@ -252,6 +280,10 @@ SOURCE=..\include\libxml\SAX.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\libxml\SAX2.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\libxml\schemasInternals.h
 # End Source File
 # Begin Source File
@@ -288,6 +320,10 @@ SOURCE=..\include\libxml\xmlerror.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\libxml\xmlexports.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\libxml\xmlIO.h
 # End Source File
 # Begin Source File
@@ -304,11 +340,19 @@ SOURCE=..\include\libxml\xmlregexp.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\libxml\xmlsave.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\libxml\xmlschemas.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\include\libxml\xmlschemastypes.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\libxml\xmlstring.h
 # End Source File
 # Begin Source File
 

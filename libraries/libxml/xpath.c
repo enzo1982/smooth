@@ -52,6 +52,19 @@
 #include <libxml/threads.h>
 #include <libxml/globals.h>
 
+#define TODO 								\
+    xmlGenericError(xmlGenericErrorContext,				\
+	    "Unimplemented block at %s:%d\n",				\
+            __FILE__, __LINE__);
+
+/*
+ * TODO:
+ * There are a few spots where some tests are done which depend upon ascii
+ * data.  These should be enhanced for full UTF8 support (see particularly
+ * any use of the macros IS_ASCII_CHARACTER and IS_ASCII_DIGIT)
+ */
+ 
+#if defined(LIBXML_SCHEMAS_ENABLED) || defined(LIBXML_XPATH_ENABLED)
 /************************************************************************
  * 									*
  * 			Floating point stuff				*
@@ -119,6 +132,8 @@ xmlXPathIsInf(double val) {
     return(trio_isinf(val));
 }
 
+#endif /* SCHEMAS or XPATH */
+#ifdef LIBXML_XPATH_ENABLED
 /**
  * xmlXPathGetSign:
  * @val:  a double value
@@ -135,7 +150,6 @@ xmlXPathGetSign(double val) {
 }
 
 
-#ifdef LIBXML_XPATH_ENABLED
 /*
  * TODO: when compatibility allows remove all "fake node libxslt" strings
  *       the test should just be name[0] = ' '
@@ -161,6 +175,169 @@ static xmlNsPtr xmlXPathXMLNamespace = &xmlXPathXMLNamespaceStruct;
  */
 static int xmlXPathDisableOptimizer = 0;
 #endif
+
+/************************************************************************
+ *									*
+ *			Error handling routines				*
+ *									*
+ ************************************************************************/
+
+/*
+ * The array xmlXPathErrorMessages corresponds to the enum xmlXPathError
+ */
+static const char *xmlXPathErrorMessages[] = {
+    "Ok\n",
+    "Number encoding\n",
+    "Unfinished literal\n",
+    "Start of literal\n",
+    "Expected $ for variable reference\n",
+    "Undefined variable\n",
+    "Invalid predicate\n",
+    "Invalid expression\n",
+    "Missing closing curly brace\n",
+    "Unregistered function\n",
+    "Invalid operand\n",
+    "Invalid type\n",
+    "Invalid number of arguments\n",
+    "Invalid context size\n",
+    "Invalid context position\n",
+    "Memory allocation error\n",
+    "Syntax error\n",
+    "Resource error\n",
+    "Sub resource error\n",
+    "Undefined namespace prefix\n",
+    "Encoding error\n",
+    "Char out of XML range\n",
+    "Invalid or inclomplete context\n"
+};
+
+
+/**
+ * xmlXPathErrMemory:
+ * @ctxt:  an XPath context
+ * @extra:  extra informations
+ *
+ * Handle a redefinition of attribute error
+ */
+static void
+xmlXPathErrMemory(xmlXPathContextPtr ctxt, const char *extra)
+{
+    if (ctxt != NULL) {
+        if (extra) {
+            xmlChar buf[200];
+
+            xmlStrPrintf(buf, 200,
+                         BAD_CAST "Memory allocation failed : %s\n",
+                         extra);
+            ctxt->lastError.message = (char *) xmlStrdup(buf);
+        } else {
+            ctxt->lastError.message = (char *)
+	       xmlStrdup(BAD_CAST "Memory allocation failed\n");
+        }
+        ctxt->lastError.domain = XML_FROM_XPATH;
+        ctxt->lastError.code = XML_ERR_NO_MEMORY;
+	if (ctxt->error != NULL)
+	    ctxt->error(ctxt->userData, &ctxt->lastError);
+    } else {
+        if (extra)
+            __xmlRaiseError(NULL, NULL, NULL,
+                            NULL, NULL, XML_FROM_XPATH,
+                            XML_ERR_NO_MEMORY, XML_ERR_FATAL, NULL, 0,
+                            extra, NULL, NULL, 0, 0,
+                            "Memory allocation failed : %s\n", extra);
+        else
+            __xmlRaiseError(NULL, NULL, NULL,
+                            NULL, NULL, XML_FROM_XPATH,
+                            XML_ERR_NO_MEMORY, XML_ERR_FATAL, NULL, 0,
+                            NULL, NULL, NULL, 0, 0,
+                            "Memory allocation failed\n");
+    }
+}
+
+/**
+ * xmlXPathPErrMemory:
+ * @ctxt:  an XPath parser context
+ * @extra:  extra informations
+ *
+ * Handle a redefinition of attribute error
+ */
+static void
+xmlXPathPErrMemory(xmlXPathParserContextPtr ctxt, const char *extra)
+{
+    ctxt->error = XPATH_MEMORY_ERROR;
+    if (ctxt == NULL)
+	xmlXPathErrMemory(NULL, extra);
+    else
+	xmlXPathErrMemory(ctxt->context, extra);
+}
+
+/**
+ * xmlXPathErr:
+ * @ctxt:  a XPath parser context
+ * @error:  the error code
+ *
+ * Handle a Relax NG Parsing error
+ */
+void
+xmlXPathErr(xmlXPathParserContextPtr ctxt, int error)
+{
+    if (ctxt == NULL) {
+	__xmlRaiseError(NULL, NULL, NULL,
+			NULL, NULL, XML_FROM_XPATH,
+			error + XML_XPATH_EXPRESSION_OK - XPATH_EXPRESSION_OK,
+			XML_ERR_ERROR, NULL, 0,
+			NULL, NULL, NULL, 0, 0,
+			xmlXPathErrorMessages[error]);
+	return;
+    }
+    ctxt->error = error;
+    if (ctxt->context == NULL) {
+	__xmlRaiseError(NULL, NULL, NULL,
+			NULL, NULL, XML_FROM_XPATH,
+			error + XML_XPATH_EXPRESSION_OK - XPATH_EXPRESSION_OK,
+			XML_ERR_ERROR, NULL, 0,
+			(const char *) ctxt->base, NULL, NULL,
+			ctxt->cur - ctxt->base, 0,
+			xmlXPathErrorMessages[error]);
+	return;
+    }
+    ctxt->context->lastError.domain = XML_FROM_XPATH;
+    ctxt->context->lastError.code = error + XML_XPATH_EXPRESSION_OK -
+                           XPATH_EXPRESSION_OK;
+    ctxt->context->lastError.level = XML_ERR_ERROR;
+    ctxt->context->lastError.str1 = (char *) xmlStrdup(ctxt->base);
+    ctxt->context->lastError.int1 = ctxt->cur - ctxt->base;
+    ctxt->context->lastError.node = ctxt->context->debugNode;
+    if (ctxt->context->error != NULL) {
+	ctxt->context->error(ctxt->context->userData,
+	                     &ctxt->context->lastError);
+    } else {
+	__xmlRaiseError(NULL, NULL, NULL,
+			NULL, ctxt->context->debugNode, XML_FROM_XPATH,
+			error + XML_XPATH_EXPRESSION_OK - XPATH_EXPRESSION_OK,
+			XML_ERR_ERROR, NULL, 0,
+			(const char *) ctxt->base, NULL, NULL,
+			ctxt->cur - ctxt->base, 0,
+			xmlXPathErrorMessages[error]);
+    }
+
+}
+
+/**
+ * xmlXPatherror:
+ * @ctxt:  the XPath Parser context
+ * @file:  the file name
+ * @line:  the line number
+ * @no:  the error number
+ *
+ * Formats an error message.
+ */
+void
+xmlXPatherror(xmlXPathParserContextPtr ctxt, const char *file ATTRIBUTE_UNUSED,
+              int line ATTRIBUTE_UNUSED, int no) {
+    xmlXPathErr(ctxt, no);
+}
+
 
 /************************************************************************
  * 									*
@@ -233,9 +410,9 @@ typedef enum {
 typedef struct _xmlXPathStepOp xmlXPathStepOp;
 typedef xmlXPathStepOp *xmlXPathStepOpPtr;
 struct _xmlXPathStepOp {
-    xmlXPathOp op;
-    int ch1;
-    int ch2;
+    xmlXPathOp op;		/* The identifier of the operation */
+    int ch1;			/* First child */
+    int ch2;			/* Second child */
     int value;
     int value2;
     int value3;
@@ -246,11 +423,12 @@ struct _xmlXPathStepOp {
 };
 
 struct _xmlXPathCompExpr {
-    int nbStep;
-    int maxStep;
-    xmlXPathStepOp *steps;        /* ops for computation */
-    int last;
-    xmlChar *expr;
+    int nbStep;			/* Number of steps in this expression */
+    int maxStep;		/* Maximum number of steps allocated */
+    xmlXPathStepOp *steps;	/* ops for computation of this expression */
+    int last;			/* index of last step in expression */
+    xmlChar *expr;		/* the expression being computed */
+    xmlDictPtr dict;		/* the dictionnary to use if any */
 #ifdef DEBUG_EVAL_COUNTS
     int nb;
     xmlChar *string;
@@ -276,8 +454,7 @@ xmlXPathNewCompExpr(void) {
 
     cur = (xmlXPathCompExprPtr) xmlMalloc(sizeof(xmlXPathCompExpr));
     if (cur == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewCompExpr : malloc failed\n");
+        xmlXPathErrMemory(NULL, "allocating component\n");
 	return(NULL);
     }
     memset(cur, 0, sizeof(xmlXPathCompExpr));
@@ -286,8 +463,7 @@ xmlXPathNewCompExpr(void) {
     cur->steps = (xmlXPathStepOp *) xmlMalloc(cur->maxStep *
 	                                   sizeof(xmlXPathStepOp));
     if (cur->steps == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewCompExpr : malloc failed\n");
+        xmlXPathErrMemory(NULL, "allocating steps\n");
 	xmlFree(cur);
 	return(NULL);
     }
@@ -313,16 +489,27 @@ xmlXPathFreeCompExpr(xmlXPathCompExprPtr comp)
 
     if (comp == NULL)
         return;
-    for (i = 0; i < comp->nbStep; i++) {
-        op = &comp->steps[i];
-        if (op->value4 != NULL) {
-            if (op->op == XPATH_OP_VALUE)
-                xmlXPathFreeObject(op->value4);
-            else
-                xmlFree(op->value4);
-        }
-        if (op->value5 != NULL)
-            xmlFree(op->value5);
+    if (comp->dict == NULL) {
+	for (i = 0; i < comp->nbStep; i++) {
+	    op = &comp->steps[i];
+	    if (op->value4 != NULL) {
+		if (op->op == XPATH_OP_VALUE)
+		    xmlXPathFreeObject(op->value4);
+		else
+		    xmlFree(op->value4);
+	    }
+	    if (op->value5 != NULL)
+		xmlFree(op->value5);
+	}
+    } else {
+	for (i = 0; i < comp->nbStep; i++) {
+	    op = &comp->steps[i];
+	    if (op->value4 != NULL) {
+		if (op->op == XPATH_OP_VALUE)
+		    xmlXPathFreeObject(op->value4);
+	    }
+	}
+        xmlDictFree(comp->dict);
     }
     if (comp->steps != NULL) {
         xmlFree(comp->steps);
@@ -351,7 +538,7 @@ xmlXPathFreeCompExpr(xmlXPathCompExprPtr comp)
  * @value4:  the first string value
  * @value5:  the second string value
  *
- * Add an step to an XPath Compiled Expression
+ * Add a step to an XPath Compiled Expression
  *
  * Returns -1 in case of failure, the index otherwise
  */
@@ -367,8 +554,7 @@ xmlXPathCompExprAdd(xmlXPathCompExprPtr comp, int ch1, int ch2,
 		                      comp->maxStep * sizeof(xmlXPathStepOp));
 	if (real == NULL) {
 	    comp->maxStep /= 2;
-	    xmlGenericError(xmlGenericErrorContext,
-		    "xmlXPathCompExprAdd : realloc failed\n");
+	    xmlXPathErrMemory(NULL, "adding step\n");
 	    return(-1);
 	}
 	comp->steps = real;
@@ -380,8 +566,25 @@ xmlXPathCompExprAdd(xmlXPathCompExprPtr comp, int ch1, int ch2,
     comp->steps[comp->nbStep].value = value;
     comp->steps[comp->nbStep].value2 = value2;
     comp->steps[comp->nbStep].value3 = value3;
-    comp->steps[comp->nbStep].value4 = value4;
-    comp->steps[comp->nbStep].value5 = value5;
+    if ((comp->dict != NULL) &&
+        ((op == XPATH_OP_FUNCTION) || (op == XPATH_OP_VARIABLE) ||
+	 (op == XPATH_OP_COLLECT))) {
+        if (value4 != NULL) {
+	    comp->steps[comp->nbStep].value4 = (xmlChar *)
+	        (void *)xmlDictLookup(comp->dict, value4, -1);
+	    xmlFree(value4);
+	} else
+	    comp->steps[comp->nbStep].value4 = NULL;
+        if (value5 != NULL) {
+	    comp->steps[comp->nbStep].value5 = (xmlChar *)
+	        (void *)xmlDictLookup(comp->dict, value5, -1);
+	    xmlFree(value5);
+	} else
+	    comp->steps[comp->nbStep].value5 = NULL;
+    } else {
+	comp->steps[comp->nbStep].value4 = value4;
+	comp->steps[comp->nbStep].value5 = value5;
+    }
     comp->steps[comp->nbStep].cache = NULL;
     return(comp->nbStep++);
 }
@@ -400,7 +603,7 @@ xmlXPathCompSwap(xmlXPathStepOpPtr op) {
 #ifndef LIBXML_THREAD_ENABLED
     /*
      * Since this manipulates possibly shared variables, this is
-     * disable if one detects that the library is used in a multithreaded
+     * disabled if one detects that the library is used in a multithreaded
      * application
      */
     if (xmlXPathDisableOptimizer)
@@ -426,18 +629,14 @@ xmlXPathCompExprAdd(ctxt->comp, -1, -1, (op), (val), (val2), 0 ,NULL ,NULL)
 xmlXPathCompExprAdd(ctxt->comp, (ch), -1, (op), (val), (val2), 0 ,NULL ,NULL)
 
 #define PUSH_BINARY_EXPR(op, ch1, ch2, val, val2) 			\
-xmlXPathCompExprAdd(ctxt->comp, (ch1), (ch2), (op), (val), (val2), 0 ,NULL ,NULL)
+xmlXPathCompExprAdd(ctxt->comp, (ch1), (ch2), (op),			\
+			(val), (val2), 0 ,NULL ,NULL)
 
 /************************************************************************
  *									*
  * 		Debugging related functions				*
  *									*
  ************************************************************************/
-
-#define TODO 								\
-    xmlGenericError(xmlGenericErrorContext,				\
-	    "Unimplemented block at %s:%d\n",				\
-            __FILE__, __LINE__);
 
 #define STRANGE 							\
     xmlGenericError(xmlGenericErrorContext,				\
@@ -575,6 +774,8 @@ void
 xmlXPathDebugDumpObject(FILE *output, xmlXPathObjectPtr cur, int depth) {
     int i;
     char shift[100];
+
+    if (output == NULL) return;
 
     for (i = 0;((i < depth) && (i < 25));i++)
         shift[2 * i] = shift[2 * i + 1] = ' ';
@@ -864,6 +1065,8 @@ xmlXPathDebugDumpCompExpr(FILE *output, xmlXPathCompExprPtr comp,
     int i;
     char shift[100];
 
+    if ((output == NULL) || (comp == NULL)) return;
+
     for (i = 0;((i < depth) && (i < 25));i++)
         shift[2 * i] = shift[2 * i + 1] = ' ';
     shift[2 * i] = shift[2 * i + 1] = 0;
@@ -900,7 +1103,7 @@ valuePop(xmlXPathParserContextPtr ctxt)
 {
     xmlXPathObjectPtr ret;
 
-    if (ctxt->valueNr <= 0)
+    if ((ctxt == NULL) || (ctxt->valueNr <= 0))
         return (0);
     ctxt->valueNr--;
     if (ctxt->valueNr > 0)
@@ -923,16 +1126,19 @@ valuePop(xmlXPathParserContextPtr ctxt)
 extern int
 valuePush(xmlXPathParserContextPtr ctxt, xmlXPathObjectPtr value)
 {
+    if ((ctxt == NULL) || (value == NULL)) return(-1);
     if (ctxt->valueNr >= ctxt->valueMax) {
-        ctxt->valueMax *= 2;
-        ctxt->valueTab =
-            (xmlXPathObjectPtr *) xmlRealloc(ctxt->valueTab,
-                                             ctxt->valueMax *
+        xmlXPathObjectPtr *tmp;
+
+        tmp = (xmlXPathObjectPtr *) xmlRealloc(ctxt->valueTab,
+                                             2 * ctxt->valueMax *
                                              sizeof(ctxt->valueTab[0]));
-        if (ctxt->valueTab == NULL) {
+        if (tmp == NULL) {
             xmlGenericError(xmlGenericErrorContext, "realloc failed !\n");
             return (0);
         }
+        ctxt->valueMax *= 2;
+	ctxt->valueTab = tmp;
     }
     ctxt->valueTab[ctxt->valueNr] = value;
     ctxt->value = value;
@@ -958,7 +1164,10 @@ xmlXPathPopBoolean (xmlXPathParserContextPtr ctxt) {
 	xmlXPathSetError(ctxt, XPATH_INVALID_OPERAND);
 	return(0);
     }
-    ret = xmlXPathCastToBoolean(obj);
+    if (obj->type != XPATH_BOOLEAN)
+	ret = xmlXPathCastToBoolean(obj);
+    else
+        ret = obj->boolval;
     xmlXPathFreeObject(obj);
     return(ret);
 }
@@ -982,7 +1191,10 @@ xmlXPathPopNumber (xmlXPathParserContextPtr ctxt) {
 	xmlXPathSetError(ctxt, XPATH_INVALID_OPERAND);
 	return(0);
     }
-    ret = xmlXPathCastToNumber(obj);
+    if (obj->type != XPATH_NUMBER)
+	ret = xmlXPathCastToNumber(obj);
+    else
+        ret = obj->floatval;
     xmlXPathFreeObject(obj);
     return(ret);
 }
@@ -1006,7 +1218,7 @@ xmlXPathPopString (xmlXPathParserContextPtr ctxt) {
 	xmlXPathSetError(ctxt, XPATH_INVALID_OPERAND);
 	return(NULL);
     }
-    ret = xmlXPathCastToString(obj);
+    ret = xmlXPathCastToString(obj);	/* this does required strdup */
     /* TODO: needs refactoring somewhere else */
     if (obj->stringval == ret)
 	obj->stringval = NULL;
@@ -1028,6 +1240,7 @@ xmlXPathPopNodeSet (xmlXPathParserContextPtr ctxt) {
     xmlXPathObjectPtr obj;
     xmlNodeSetPtr ret;
 
+    if (ctxt == NULL) return(NULL);
     if (ctxt->value == NULL) {
 	xmlXPathSetError(ctxt, XPATH_INVALID_OPERAND);
 	return(NULL);
@@ -1038,9 +1251,11 @@ xmlXPathPopNodeSet (xmlXPathParserContextPtr ctxt) {
     }
     obj = valuePop(ctxt);
     ret = obj->nodesetval;
+#if 0
     /* to fix memory leak of not clearing obj->user */
     if (obj->boolval && obj->user != NULL)
         xmlFreeNodeList((xmlNodePtr) obj->user);
+#endif
     xmlXPathFreeNodeSetList(obj);
     return(ret);
 }
@@ -1059,7 +1274,7 @@ xmlXPathPopExternal (xmlXPathParserContextPtr ctxt) {
     xmlXPathObjectPtr obj;
     void * ret;
 
-    if (ctxt->value == NULL) {
+    if ((ctxt == NULL) || (ctxt->value == NULL)) {
 	xmlXPathSetError(ctxt, XPATH_INVALID_OPERAND);
 	return(NULL);
     }
@@ -1109,7 +1324,7 @@ xmlXPathPopExternal (xmlXPathParserContextPtr ctxt) {
 #define NEXTL(l)  ctxt->cur += l
 
 #define SKIP_BLANKS 							\
-    while (IS_BLANK(*(ctxt->cur))) NEXT
+    while (IS_BLANK_CH(*(ctxt->cur))) NEXT
 
 #define CURRENT (*ctxt->cur)
 #define NEXT ((*ctxt->cur) ?  ctxt->cur++: ctxt->cur)
@@ -1231,7 +1446,7 @@ xmlXPathFormatNumber(double number, char buffer[], int buffersize)
 		;
 	    if (*ptr != '.')
 	        ptr++;
-	    strcpy(ptr, after_fraction);
+	    while ((*ptr++ = *after_fraction++) != 0);
 
 	    /* Finally copy result back to caller */
 	    size = strlen(work) + 1;
@@ -1239,100 +1454,10 @@ xmlXPathFormatNumber(double number, char buffer[], int buffersize)
 		work[buffersize - 1] = 0;
 		size = buffersize;
 	    }
-	    memcpy(buffer, work, size);
+	    memmove(buffer, work, size);
 	}
 	break;
     }
-}
-
-/************************************************************************
- *									*
- *			Error handling routines				*
- *									*
- ************************************************************************/
-
-
-static const char *xmlXPathErrorMessages[] = {
-    "Ok",
-    "Number encoding",
-    "Unfinished literal",
-    "Start of literal",
-    "Expected $ for variable reference",
-    "Undefined variable",
-    "Invalid predicate",
-    "Invalid expression",
-    "Missing closing curly brace",
-    "Unregistered function",
-    "Invalid operand",
-    "Invalid type",
-    "Invalid number of arguments",
-    "Invalid context size",
-    "Invalid context position",
-    "Memory allocation error",
-    "Syntax error",
-    "Resource error",
-    "Sub resource error",
-    "Undefined namespace prefix",
-    "Encoding error",
-    "Char out of XML range"
-};
-
-/**
- * xmlXPatherror:
- * @ctxt:  the XPath Parser context
- * @file:  the file name
- * @line:  the line number
- * @no:  the error number
- *
- * Formats an error message.
- */
-void
-xmlXPatherror(xmlXPathParserContextPtr ctxt, const char *file ATTRIBUTE_UNUSED,
-              int line ATTRIBUTE_UNUSED, int no) {
-    int n;
-    const xmlChar *cur;
-    const xmlChar *base;
-
-    cur = ctxt->cur;
-    base = ctxt->base;
-    if ((cur == NULL) || (base == NULL)) {
-	if ((ctxt->comp != NULL) && (ctxt->comp->expr != NULL)) {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "XPath error %s in %s\n", xmlXPathErrorMessages[no],
-			    ctxt->comp->expr);
-	} else {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "XPath error %s\n", xmlXPathErrorMessages[no]);
-	}
-
-	return;
-    }
-    xmlGenericError(xmlGenericErrorContext,
-	    "XPath error %s\n", xmlXPathErrorMessages[no]);
-
-    while ((cur > base) && ((*cur == '\n') || (*cur == '\r'))) {
-	cur--;
-    }
-    n = 0;
-    while ((n++ < 80) && (cur > base) && (*cur != '\n') && (*cur != '\r'))
-        cur--;
-    if ((*cur == '\n') || (*cur == '\r')) cur++;
-    base = cur;
-    n = 0;
-    while ((*cur != 0) && (*cur != '\n') && (*cur != '\r') && (n < 79)) {
-        xmlGenericError(xmlGenericErrorContext, "%c", (unsigned char) *cur++);
-	n++;
-    }
-    xmlGenericError(xmlGenericErrorContext, "\n");
-    cur = ctxt->cur;
-    while ((*cur == '\n') || (*cur == '\r'))
-	cur--;
-    n = 0;
-    while ((cur != base) && (n++ < 80)) {
-        xmlGenericError(xmlGenericErrorContext, " ");
-        base++;
-    }
-    xmlGenericError(xmlGenericErrorContext,"^\n");
 }
 
 
@@ -1349,10 +1474,10 @@ xmlXPatherror(xmlXPathParserContextPtr ctxt, const char *file ATTRIBUTE_UNUSED,
  * Call this routine to speed up XPath computation on static documents.
  * This stamps all the element nodes with the document order
  * Like for line information, the order is kept in the element->content
- * field, the value stored is actually - the node number (startting at -1)
- * to be able to differenciate from line numbers.
+ * field, the value stored is actually - the node number (starting at -1)
+ * to be able to differentiate from line numbers.
  *
- * Returns the number of element found in the document or -1 in case
+ * Returns the number of elements found in the document or -1 in case
  *    of error.
  */
 long
@@ -1400,12 +1525,13 @@ xmlXPathOrderDocElems(xmlDocPtr doc) {
  * Compare two nodes w.r.t document order
  *
  * Returns -2 in case of error 1 if first point < second point, 0 if
- *         that's the same node, -1 otherwise
+ *         it's the same node, -1 otherwise
  */
 int
 xmlXPathCmpNodes(xmlNodePtr node1, xmlNodePtr node2) {
     int depth1, depth2;
     int attr1 = 0, attr2 = 0;
+    xmlNodePtr attrNode1 = NULL, attrNode2 = NULL;
     xmlNodePtr cur, root;
 
     if ((node1 == NULL) || (node2 == NULL))
@@ -1415,15 +1541,28 @@ xmlXPathCmpNodes(xmlNodePtr node1, xmlNodePtr node2) {
      */
     if (node1->type == XML_ATTRIBUTE_NODE) {
 	attr1 = 1;
+	attrNode1 = node1;
 	node1 = node1->parent;
     }
     if (node2->type == XML_ATTRIBUTE_NODE) {
 	attr2 = 1;
+	attrNode2 = node2;
 	node2 = node2->parent;
     }
     if (node1 == node2) {
-	if (attr1 == attr2)
+	if (attr1 == attr2) {
+	    /* not required, but we keep attributes in order */
+	    if (attr1 != 0) {
+	        cur = attrNode2->prev;
+		while (cur != NULL) {
+		    if (cur == attrNode1)
+		        return (1);
+		    cur = cur->prev;
+		}
+		return (-1);
+	    }
 	    return(0);
+	}
 	if (attr2 == 1)
 	    return(1);
 	return(-1);
@@ -1495,8 +1634,28 @@ xmlXPathCmpNodes(xmlNodePtr node1, xmlNodePtr node2) {
     /*
      * Find who's first.
      */
+    if (node1 == node2->prev)
+	return(1);
     if (node1 == node2->next)
 	return(-1);
+    /*
+     * Speedup using document order if availble.
+     */
+    if ((node1->type == XML_ELEMENT_NODE) &&
+	(node2->type == XML_ELEMENT_NODE) &&
+	(0 > (long) node1->content) &&
+	(0 > (long) node2->content) &&
+	(node1->doc == node2->doc)) {
+	long l1, l2;
+
+	l1 = -((long) node1->content);
+	l2 = -((long) node2->content);
+	if (l1 < l2)
+	    return(1);
+	if (l1 > l2)
+	    return(-1);
+    }
+
     for (cur = node1->next;cur != NULL;cur = cur->next)
 	if (cur == node2)
 	    return(1);
@@ -1562,8 +1721,7 @@ xmlXPathNodeSetDupNs(xmlNodePtr node, xmlNsPtr ns) {
      */
     cur = (xmlNsPtr) xmlMalloc(sizeof(xmlNs));
     if (cur == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNodeSetDupNs : malloc failed\n");
+        xmlXPathErrMemory(NULL, "duplicating namespace\n");
 	return(NULL);
     }
     memset(cur, 0, sizeof(xmlNs));
@@ -1580,9 +1738,9 @@ xmlXPathNodeSetDupNs(xmlNodePtr node, xmlNsPtr ns) {
  * xmlXPathNodeSetFreeNs:
  * @ns:  the XPath namespace node found in a nodeset.
  *
- * Namespace node in libxml don't match the XPath semantic. In a node set
+ * Namespace nodes in libxml don't match the XPath semantic. In a node set
  * the namespace nodes are duplicated and the next pointer is set to the
- * parent node in the XPath semantic. Check if such a node need to be freed
+ * parent node in the XPath semantic. Check if such a node needs to be freed
  */
 void
 xmlXPathNodeSetFreeNs(xmlNsPtr ns) {
@@ -1612,8 +1770,7 @@ xmlXPathNodeSetCreate(xmlNodePtr val) {
 
     ret = (xmlNodeSetPtr) xmlMalloc(sizeof(xmlNodeSet));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNodeSetCreate: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating nodeset\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlNodeSet));
@@ -1621,8 +1778,8 @@ xmlXPathNodeSetCreate(xmlNodePtr val) {
         ret->nodeTab = (xmlNodePtr *) xmlMalloc(XML_NODESET_DEFAULT *
 					     sizeof(xmlNodePtr));
 	if (ret->nodeTab == NULL) {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "xmlXPathNodeSetCreate: out of memory\n");
+	    xmlXPathErrMemory(NULL, "creating nodeset\n");
+	    xmlFree(ret);
 	    return(NULL);
 	}
 	memset(ret->nodeTab, 0 ,
@@ -1652,6 +1809,7 @@ int
 xmlXPathNodeSetContains (xmlNodeSetPtr cur, xmlNodePtr val) {
     int i;
 
+    if ((cur == NULL) || (val == NULL)) return(0);
     if (val->type == XML_NAMESPACE_DECL) {
 	for (i = 0; i < cur->nodeNr; i++) {
 	    if (cur->nodeTab[i]->type == XML_NAMESPACE_DECL) {
@@ -1687,13 +1845,15 @@ void
 xmlXPathNodeSetAddNs(xmlNodeSetPtr cur, xmlNodePtr node, xmlNsPtr ns) {
     int i;
 
-    if ((ns == NULL) || (node == NULL) || (ns->type != XML_NAMESPACE_DECL) ||
+    
+    if ((cur == NULL) || (ns == NULL) || (node == NULL) ||
+        (ns->type != XML_NAMESPACE_DECL) ||
 	(node->type != XML_ELEMENT_NODE))
 	return;
 
-    /* @@ with_ns to check wether namespace nodes should be looked at @@ */
+    /* @@ with_ns to check whether namespace nodes should be looked at @@ */
     /*
-     * check against doublons
+     * prevent duplicates
      */
     for (i = 0;i < cur->nodeNr;i++) {
         if ((cur->nodeTab[i] != NULL) &&
@@ -1710,8 +1870,7 @@ xmlXPathNodeSetAddNs(xmlNodeSetPtr cur, xmlNodePtr node, xmlNsPtr ns) {
         cur->nodeTab = (xmlNodePtr *) xmlMalloc(XML_NODESET_DEFAULT *
 					     sizeof(xmlNodePtr));
 	if (cur->nodeTab == NULL) {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "xmlXPathNodeSetAdd: out of memory\n");
+	    xmlXPathErrMemory(NULL, "growing nodeset\n");
 	    return;
 	}
 	memset(cur->nodeTab, 0 ,
@@ -1724,8 +1883,7 @@ xmlXPathNodeSetAddNs(xmlNodeSetPtr cur, xmlNodePtr node, xmlNsPtr ns) {
 	temp = (xmlNodePtr *) xmlRealloc(cur->nodeTab, cur->nodeMax *
 				      sizeof(xmlNodePtr));
 	if (temp == NULL) {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "xmlXPathNodeSetAdd: out of memory\n");
+	    xmlXPathErrMemory(NULL, "growing nodeset\n");
 	    return;
 	}
 	cur->nodeTab = temp;
@@ -1744,16 +1902,16 @@ void
 xmlXPathNodeSetAdd(xmlNodeSetPtr cur, xmlNodePtr val) {
     int i;
 
-    if (val == NULL) return;
+    if ((cur == NULL) || (val == NULL)) return;
 
 #if 0
     if ((val->type == XML_ELEMENT_NODE) && (val->name[0] == ' '))
 	return;	/* an XSLT fake node */
 #endif
 
-    /* @@ with_ns to check wether namespace nodes should be looked at @@ */
+    /* @@ with_ns to check whether namespace nodes should be looked at @@ */
     /*
-     * check against doublons
+     * prevent duplcates
      */
     for (i = 0;i < cur->nodeNr;i++)
         if (cur->nodeTab[i] == val) return;
@@ -1765,8 +1923,7 @@ xmlXPathNodeSetAdd(xmlNodeSetPtr cur, xmlNodePtr val) {
         cur->nodeTab = (xmlNodePtr *) xmlMalloc(XML_NODESET_DEFAULT *
 					     sizeof(xmlNodePtr));
 	if (cur->nodeTab == NULL) {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "xmlXPathNodeSetAdd: out of memory\n");
+	    xmlXPathErrMemory(NULL, "growing nodeset\n");
 	    return;
 	}
 	memset(cur->nodeTab, 0 ,
@@ -1779,8 +1936,7 @@ xmlXPathNodeSetAdd(xmlNodeSetPtr cur, xmlNodePtr val) {
 	temp = (xmlNodePtr *) xmlRealloc(cur->nodeTab, cur->nodeMax *
 				      sizeof(xmlNodePtr));
 	if (temp == NULL) {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "xmlXPathNodeSetAdd: out of memory\n");
+	    xmlXPathErrMemory(NULL, "growing nodeset\n");
 	    return;
 	}
 	cur->nodeTab = temp;
@@ -1804,14 +1960,14 @@ xmlXPathNodeSetAdd(xmlNodeSetPtr cur, xmlNodePtr val) {
  */
 void
 xmlXPathNodeSetAddUnique(xmlNodeSetPtr cur, xmlNodePtr val) {
-    if (val == NULL) return;
+    if ((cur == NULL) || (val == NULL)) return;
 
 #if 0
     if ((val->type == XML_ELEMENT_NODE) && (val->name[0] == ' '))
 	return;	/* an XSLT fake node */
 #endif
 
-    /* @@ with_ns to check wether namespace nodes should be looked at @@ */
+    /* @@ with_ns to check whether namespace nodes should be looked at @@ */
     /*
      * grow the nodeTab if needed
      */
@@ -1819,8 +1975,7 @@ xmlXPathNodeSetAddUnique(xmlNodeSetPtr cur, xmlNodePtr val) {
         cur->nodeTab = (xmlNodePtr *) xmlMalloc(XML_NODESET_DEFAULT *
 					     sizeof(xmlNodePtr));
 	if (cur->nodeTab == NULL) {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "xmlXPathNodeSetAddUnique: out of memory\n");
+	    xmlXPathErrMemory(NULL, "growing nodeset\n");
 	    return;
 	}
 	memset(cur->nodeTab, 0 ,
@@ -1833,8 +1988,7 @@ xmlXPathNodeSetAddUnique(xmlNodeSetPtr cur, xmlNodePtr val) {
 	temp = (xmlNodePtr *) xmlRealloc(cur->nodeTab, cur->nodeMax *
 				      sizeof(xmlNodePtr));
 	if (temp == NULL) {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "xmlXPathNodeSetAddUnique: out of memory\n");
+	    xmlXPathErrMemory(NULL, "growing nodeset\n");
 	    return;
 	}
 	cur->nodeTab = temp;
@@ -1867,12 +2021,12 @@ xmlXPathNodeSetMerge(xmlNodeSetPtr val1, xmlNodeSetPtr val2) {
 	val1 = xmlXPathNodeSetCreate(NULL);
     }
 
-    /* @@ with_ns to check wether namespace nodes should be looked at @@ */
+    /* @@ with_ns to check whether namespace nodes should be looked at @@ */
     initNr = val1->nodeNr;
 
     for (i = 0;i < val2->nodeNr;i++) {
 	/*
-	 * check against doublons
+	 * check against duplicates
 	 */
 	skip = 0;
 	for (j = 0; j < initNr; j++) {
@@ -1901,8 +2055,7 @@ xmlXPathNodeSetMerge(xmlNodeSetPtr val1, xmlNodeSetPtr val2) {
 	    val1->nodeTab = (xmlNodePtr *) xmlMalloc(XML_NODESET_DEFAULT *
 						    sizeof(xmlNodePtr));
 	    if (val1->nodeTab == NULL) {
-		xmlGenericError(xmlGenericErrorContext,
-				"xmlXPathNodeSetMerge: out of memory\n");
+	        xmlXPathErrMemory(NULL, "merging nodeset\n");
 		return(NULL);
 	    }
 	    memset(val1->nodeTab, 0 ,
@@ -1915,8 +2068,7 @@ xmlXPathNodeSetMerge(xmlNodeSetPtr val1, xmlNodeSetPtr val2) {
 	    temp = (xmlNodePtr *) xmlRealloc(val1->nodeTab, val1->nodeMax *
 					     sizeof(xmlNodePtr));
 	    if (temp == NULL) {
-		xmlGenericError(xmlGenericErrorContext,
-				"xmlXPathNodeSetMerge: out of memory\n");
+	        xmlXPathErrMemory(NULL, "merging nodeset\n");
 		return(NULL);
 	    }
 	    val1->nodeTab = temp;
@@ -1952,7 +2104,7 @@ xmlXPathNodeSetMergeUnique(xmlNodeSetPtr val1, xmlNodeSetPtr val2) {
 	val1 = xmlXPathNodeSetCreate(NULL);
     }
 
-    /* @@ with_ns to check wether namespace nodes should be looked at @@ */
+    /* @@ with_ns to check whether namespace nodes should be looked at @@ */
 
     for (i = 0;i < val2->nodeNr;i++) {
 	/*
@@ -1962,8 +2114,7 @@ xmlXPathNodeSetMergeUnique(xmlNodeSetPtr val1, xmlNodeSetPtr val2) {
 	    val1->nodeTab = (xmlNodePtr *) xmlMalloc(XML_NODESET_DEFAULT *
 						    sizeof(xmlNodePtr));
 	    if (val1->nodeTab == NULL) {
-		xmlGenericError(xmlGenericErrorContext,
-				"xmlXPathNodeSetMerge: out of memory\n");
+	        xmlXPathErrMemory(NULL, "merging nodeset\n");
 		return(NULL);
 	    }
 	    memset(val1->nodeTab, 0 ,
@@ -1976,8 +2127,7 @@ xmlXPathNodeSetMergeUnique(xmlNodeSetPtr val1, xmlNodeSetPtr val2) {
 	    temp = (xmlNodePtr *) xmlRealloc(val1->nodeTab, val1->nodeMax *
 					     sizeof(xmlNodePtr));
 	    if (temp == NULL) {
-		xmlGenericError(xmlGenericErrorContext,
-				"xmlXPathNodeSetMerge: out of memory\n");
+	        xmlXPathErrMemory(NULL, "merging nodeset\n");
 		return(NULL);
 	    }
 	    val1->nodeTab = temp;
@@ -2009,12 +2159,12 @@ xmlXPathNodeSetDel(xmlNodeSetPtr cur, xmlNodePtr val) {
     if (val == NULL) return;
 
     /*
-     * check against doublons
+     * find node in nodeTab
      */
     for (i = 0;i < cur->nodeNr;i++)
         if (cur->nodeTab[i] == val) break;
 
-    if (i >= cur->nodeNr) {
+    if (i >= cur->nodeNr) {	/* not found */
 #ifdef DEBUG
         xmlGenericError(xmlGenericErrorContext, 
 	        "xmlXPathNodeSetDel: Node %s wasn't found in NodeList\n",
@@ -2063,7 +2213,7 @@ xmlXPathFreeNodeSet(xmlNodeSetPtr obj) {
     if (obj->nodeTab != NULL) {
 	int i;
 
-	/* @@ with_ns to check wether namespace nodes should be looked at @@ */
+	/* @@ with_ns to check whether namespace nodes should be looked at @@ */
 	for (i = 0;i < obj->nodeNr;i++)
 	    if ((obj->nodeTab[i] != NULL) &&
 		(obj->nodeTab[i]->type == XML_NAMESPACE_DECL))
@@ -2105,7 +2255,7 @@ xmlXPathFreeValueTree(xmlNodeSetPtr obj) {
 /**
  * xmlGenericErrorContextNodeSet:
  * @output:  a FILE * for the output
- * @obj:  the xmlNodeSetPtr to free
+ * @obj:  the xmlNodeSetPtr to display
  *
  * Quick display of a NodeSet
  */
@@ -2157,15 +2307,14 @@ xmlXPathNewNodeSet(xmlNodePtr val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewNodeSet: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating nodeset\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathObject));
     ret->type = XPATH_NODESET;
     ret->boolval = 0;
     ret->nodesetval = xmlXPathNodeSetCreate(val);
-    /* @@ with_ns to check wether namespace nodes should be looked at @@ */
+    /* @@ with_ns to check whether namespace nodes should be looked at @@ */
     return(ret);
 }
 
@@ -2184,8 +2333,7 @@ xmlXPathNewValueTree(xmlNodePtr val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewNodeSet: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating result value tree\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathObject));
@@ -2238,8 +2386,7 @@ xmlXPathWrapNodeSet(xmlNodeSetPtr val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathWrapNodeSet: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating node set object\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathObject));
@@ -2664,6 +2811,8 @@ xmlXPathRegisterFuncNS(xmlXPathContextPtr ctxt, const xmlChar *name,
 	ctxt->funcHash = xmlHashCreate(0);
     if (ctxt->funcHash == NULL)
 	return(-1);
+    if (f == NULL)
+        return(xmlHashRemoveEntry2(ctxt->funcHash, name, ns_uri, NULL));
     return(xmlHashAddEntry2(ctxt->funcHash, name, ns_uri, (void *) f));
 }
 
@@ -2681,7 +2830,7 @@ xmlXPathRegisterFuncLookup (xmlXPathContextPtr ctxt,
 			    void *funcCtxt) {
     if (ctxt == NULL)
 	return;
-    ctxt->funcLookupFunc = (void *) f;
+    ctxt->funcLookupFunc = f;
     ctxt->funcLookupData = funcCtxt;
 }
 
@@ -2704,7 +2853,7 @@ xmlXPathFunctionLookup(xmlXPathContextPtr ctxt, const xmlChar *name) {
 	xmlXPathFunction ret;
 	xmlXPathFuncLookupFunc f;
 
-	f = (xmlXPathFuncLookupFunc) ctxt->funcLookupFunc;
+	f = ctxt->funcLookupFunc;
 	ret = f(ctxt->funcLookupData, name, NULL);
 	if (ret != NULL)
 	    return(ret);
@@ -2735,7 +2884,7 @@ xmlXPathFunctionLookupNS(xmlXPathContextPtr ctxt, const xmlChar *name,
 	xmlXPathFunction ret;
 	xmlXPathFuncLookupFunc f;
 
-	f = (xmlXPathFuncLookupFunc) ctxt->funcLookupFunc;
+	f = ctxt->funcLookupFunc;
 	ret = f(ctxt->funcLookupData, name, ns_uri);
 	if (ret != NULL)
 	    return(ret);
@@ -2764,7 +2913,7 @@ xmlXPathRegisteredFuncsCleanup(xmlXPathContextPtr ctxt) {
 
 /************************************************************************
  *									*
- *			Routines to handle Variable			*
+ *			Routines to handle Variables			*
  *									*
  ************************************************************************/
 
@@ -2810,6 +2959,9 @@ xmlXPathRegisterVariableNS(xmlXPathContextPtr ctxt, const xmlChar *name,
 	ctxt->varHash = xmlHashCreate(0);
     if (ctxt->varHash == NULL)
 	return(-1);
+    if (value == NULL)
+        return(xmlHashRemoveEntry2(ctxt->varHash, name, ns_uri, 
+	                           (xmlHashDeallocator)xmlXPathFreeObject));
     return(xmlHashUpdateEntry2(ctxt->varHash, name, ns_uri,
 			       (void *) value,
 			       (xmlHashDeallocator)xmlXPathFreeObject));
@@ -2828,7 +2980,7 @@ xmlXPathRegisterVariableLookup(xmlXPathContextPtr ctxt,
 	 xmlXPathVariableLookupFunc f, void *data) {
     if (ctxt == NULL)
 	return;
-    ctxt->varLookupFunc = (void *) f;
+    ctxt->varLookupFunc = f;
     ctxt->varLookupData = data;
 }
 
@@ -2929,6 +3081,9 @@ xmlXPathRegisterNs(xmlXPathContextPtr ctxt, const xmlChar *prefix,
 	ctxt->nsHash = xmlHashCreate(10);
     if (ctxt->nsHash == NULL)
 	return(-1);
+    if (ns_uri == NULL)
+        return(xmlHashRemoveEntry(ctxt->nsHash, prefix,
+	                          (xmlHashDeallocator)xmlFree));
     return(xmlHashUpdateEntry(ctxt->nsHash, prefix, (void *) xmlStrdup(ns_uri),
 			      (xmlHashDeallocator)xmlFree));
 }
@@ -2989,7 +3144,7 @@ xmlXPathRegisteredNsCleanup(xmlXPathContextPtr ctxt) {
  *									*
  ************************************************************************/
 
-/* Allocations are terrible, one need to optimize all this !!! */
+/* Allocations are terrible, one needs to optimize all this !!! */
 
 /**
  * xmlXPathNewFloat:
@@ -3005,8 +3160,7 @@ xmlXPathNewFloat(double val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewFloat: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating float object\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathObject));
@@ -3029,8 +3183,7 @@ xmlXPathNewBoolean(int val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewBoolean: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating boolean object\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathObject));
@@ -3053,8 +3206,7 @@ xmlXPathNewString(const xmlChar *val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewString: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating string object\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathObject));
@@ -3080,8 +3232,7 @@ xmlXPathWrapString (xmlChar *val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathWrapString: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating string object\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathObject));
@@ -3104,8 +3255,7 @@ xmlXPathNewCString(const char *val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewCString: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating string object\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathObject));
@@ -3141,8 +3291,7 @@ xmlXPathWrapExternal (void *val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathWrapExternal: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating user object\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathObject));
@@ -3168,8 +3317,7 @@ xmlXPathObjectCopy(xmlXPathObjectPtr val) {
 
     ret = (xmlXPathObjectPtr) xmlMalloc(sizeof(xmlXPathObject));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathObjectCopy: out of memory\n");
+        xmlXPathErrMemory(NULL, "copying object\n");
 	return(NULL);
     }
     memcpy(ret, val , (size_t) sizeof(xmlXPathObject));
@@ -3183,6 +3331,12 @@ xmlXPathObjectCopy(xmlXPathObjectPtr val) {
 	    ret->stringval = xmlStrdup(val->stringval);
 	    break;
 	case XPATH_XSLT_TREE:
+#if 0
+/*
+  Removed 11 July 2004 - the current handling of xslt tmpRVT nodes means that
+  this previous handling is no longer correct, and can cause some serious
+  problems (ref. bug 145547)
+*/
 	    if ((val->nodesetval != NULL) &&
 		(val->nodesetval->nodeTab != NULL)) {
 		xmlNodePtr cur, tmp;
@@ -3202,11 +3356,13 @@ xmlXPathObjectCopy(xmlXPathObjectPtr val) {
 			cur = cur->next;
 		    }
 		}
+
 		ret->nodesetval = xmlXPathNodeSetCreate((xmlNodePtr) top);
 	    } else
 		ret->nodesetval = xmlXPathNodeSetCreate(NULL);
 	    /* Deallocate the copied tree value */
 	    break;
+#endif
 	case XPATH_NODESET:
 	    ret->nodesetval = xmlXPathNodeSetMerge(NULL, val->nodesetval);
 	    /* Do not deallocate the copied tree value */
@@ -3243,10 +3399,13 @@ xmlXPathFreeObject(xmlXPathObjectPtr obj) {
     if (obj == NULL) return;
     if ((obj->type == XPATH_NODESET) || (obj->type == XPATH_XSLT_TREE)) {
 	if (obj->boolval) {
+#if 0
 	    if (obj->user != NULL) {
                 xmlXPathFreeNodeSet(obj->nodesetval);
 		xmlFreeNodeList((xmlNodePtr) obj->user);
-	    } else if (obj->nodesetval != NULL)
+	    } else
+#endif
+	    if (obj->nodesetval != NULL)
 		xmlXPathFreeValueTree(obj->nodesetval);
 	} else {
 	    if (obj->nodesetval != NULL)
@@ -3720,8 +3879,7 @@ xmlXPathNewContext(xmlDocPtr doc) {
 
     ret = (xmlXPathContextPtr) xmlMalloc(sizeof(xmlXPathContext));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewContext: out of memory\n");
+        xmlXPathErrMemory(NULL, "creating context\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathContext));
@@ -3780,21 +3938,11 @@ xmlXPathFreeContext(xmlXPathContextPtr ctxt) {
 
 
 #define CHECK_CONTEXT(ctxt)						\
-    if (ctxt == NULL) { 						\
-        xmlGenericError(xmlGenericErrorContext,				\
-		"%s:%d Internal error: no context\n",			\
-	        __FILE__, __LINE__);					\
-    }									\
-    else if (ctxt->doc == NULL) { 					\
-        xmlGenericError(xmlGenericErrorContext,				\
-		"%s:%d Internal error: no document\n",			\
-	        __FILE__, __LINE__);					\
-    }									\
-    else if (ctxt->doc->children == NULL) { 				\
-        xmlGenericError(xmlGenericErrorContext,				\
-	        "%s:%d Internal error: document without root\n",	\
-	        __FILE__, __LINE__);					\
-    }									\
+    if ((ctxt == NULL) || (ctxt->doc == NULL) ||			\
+        (ctxt->doc->children == NULL)) { 				\
+	xmlXPatherror(ctxt, __FILE__, __LINE__, XPATH_INVALID_CTXT);	\
+	return(NULL);							\
+    }
 
 
 /**
@@ -3812,8 +3960,7 @@ xmlXPathNewParserContext(const xmlChar *str, xmlXPathContextPtr ctxt) {
 
     ret = (xmlXPathParserContextPtr) xmlMalloc(sizeof(xmlXPathParserContext));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathNewParserContext: out of memory\n");
+        xmlXPathErrMemory(ctxt, "creating parser context\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathParserContext));
@@ -3825,6 +3972,10 @@ xmlXPathNewParserContext(const xmlChar *str, xmlXPathContextPtr ctxt) {
 	xmlFree(ret->valueTab);
 	xmlFree(ret);
 	return(NULL);
+    }
+    if ((ctxt != NULL) && (ctxt->dict != NULL)) {
+        ret->comp->dict = ctxt->dict;
+	xmlDictReference(ret->comp->dict);
     }
 
     return(ret);
@@ -3845,8 +3996,7 @@ xmlXPathCompParserContext(xmlXPathCompExprPtr comp, xmlXPathContextPtr ctxt) {
 
     ret = (xmlXPathParserContextPtr) xmlMalloc(sizeof(xmlXPathParserContext));
     if (ret == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathCompParserContext: out of memory\n");
+        xmlXPathErrMemory(ctxt, "creating evaluation context\n");
 	return(NULL);
     }
     memset(ret, 0 , (size_t) sizeof(xmlXPathParserContext));
@@ -3856,8 +4006,7 @@ xmlXPathCompParserContext(xmlXPathCompExprPtr comp, xmlXPathContextPtr ctxt) {
                      xmlMalloc(10 * sizeof(xmlXPathObjectPtr));
     if (ret->valueTab == NULL) {
 	xmlFree(ret);
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlXPathCompParserContext: out of memory\n");
+	xmlXPathErrMemory(ctxt, "creating evaluation context\n");
 	return(NULL);
     }
     ret->valueNr = 0;
@@ -3966,8 +4115,6 @@ xmlXPathNodeValHash(xmlNodePtr node) {
 		break;
 	}
 	if ((string != NULL) && (string[0] != 0)) {
-	    if (string[0] == 0)
-		return(0);
 	    if (len == 1) {
 		return(ret + (((unsigned int) string[0]) << 8));
 	    }
@@ -4208,6 +4355,7 @@ xmlXPathCompareNodeSets(int inf, int strict,
 
     values2 = (double *) xmlMalloc(ns2->nodeNr * sizeof(double));
     if (values2 == NULL) {
+        xmlXPathErrMemory(NULL, "comparing nodesets\n");
 	xmlXPathFreeObject(arg1);
 	xmlXPathFreeObject(arg2);
 	return(0);
@@ -4316,14 +4464,13 @@ xmlXPathEqualNodeSetString(xmlXPathObjectPtr arg, const xmlChar * str, int neq)
         ((arg->type != XPATH_NODESET) && (arg->type != XPATH_XSLT_TREE)))
         return (0);
     ns = arg->nodesetval;
-    hash = xmlXPathStringHash(str);
-    if (ns == NULL)
+    /*
+     * A NULL nodeset compared with a string is always false
+     * (since there is no node equal, and no node not equal)
+     */
+    if ((ns == NULL) || (ns->nodeNr <= 0) )
         return (0);
-    if (ns->nodeNr <= 0) {
-	if (hash == 0)
-	    return(neq ^ 1);
-        return(neq);
-    }
+    hash = xmlXPathStringHash(str);
     for (i = 0; i < ns->nodeNr; i++) {
         if (xmlXPathNodeValHash(ns->nodeTab[i]) == hash) {
             str2 = xmlNodeGetContent(ns->nodeTab[i]);
@@ -4458,22 +4605,27 @@ xmlXPathEqualNodeSets(xmlXPathObjectPtr arg1, xmlXPathObjectPtr arg2, int neq) {
 		    return(1);
 
     values1 = (xmlChar **) xmlMalloc(ns1->nodeNr * sizeof(xmlChar *));
-    if (values1 == NULL)
+    if (values1 == NULL) {
+        xmlXPathErrMemory(NULL, "comparing nodesets\n");
 	return(0);
+    }
     hashs1 = (unsigned int *) xmlMalloc(ns1->nodeNr * sizeof(unsigned int));
     if (hashs1 == NULL) {
+        xmlXPathErrMemory(NULL, "comparing nodesets\n");
 	xmlFree(values1);
 	return(0);
     }
     memset(values1, 0, ns1->nodeNr * sizeof(xmlChar *));
     values2 = (xmlChar **) xmlMalloc(ns2->nodeNr * sizeof(xmlChar *));
     if (values2 == NULL) {
+        xmlXPathErrMemory(NULL, "comparing nodesets\n");
 	xmlFree(hashs1);
 	xmlFree(values1);
 	return(0);
     }
     hashs2 = (unsigned int *) xmlMalloc(ns2->nodeNr * sizeof(unsigned int));
     if (hashs2 == NULL) {
+        xmlXPathErrMemory(NULL, "comparing nodesets\n");
 	xmlFree(hashs1);
 	xmlFree(values1);
 	xmlFree(values2);
@@ -4589,7 +4741,8 @@ xmlXPathEqualValuesCommon(xmlXPathParserContextPtr ctxt,
 		    /* no break on purpose */
 		case XPATH_NUMBER:
 		    /* Hand check NaN and Infinity equalities */
-		    if (xmlXPathIsNaN(arg1->floatval) || xmlXPathIsNaN(arg2->floatval)) {
+		    if (xmlXPathIsNaN(arg1->floatval) ||
+		    	    xmlXPathIsNaN(arg2->floatval)) {
 		        ret = 0;
 		    } else if (xmlXPathIsInf(arg1->floatval) == 1) {
 		        if (xmlXPathIsInf(arg2->floatval) == 1)
@@ -4649,7 +4802,8 @@ xmlXPathEqualValuesCommon(xmlXPathParserContextPtr ctxt,
 		    xmlXPathNumberFunction(ctxt, 1);
 		    arg1 = valuePop(ctxt);
 		    /* Hand check NaN and Infinity equalities */
-		    if (xmlXPathIsNaN(arg1->floatval) || xmlXPathIsNaN(arg2->floatval)) {
+		    if (xmlXPathIsNaN(arg1->floatval) ||
+		    	    xmlXPathIsNaN(arg2->floatval)) {
 		        ret = 0;
 		    } else if (xmlXPathIsInf(arg1->floatval) == 1) {
 			if (xmlXPathIsInf(arg2->floatval) == 1)
@@ -4714,6 +4868,7 @@ xmlXPathEqualValues(xmlXPathParserContextPtr ctxt) {
     xmlXPathObjectPtr arg1, arg2, argtmp;
     int ret = 0;
 
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(0);
     arg2 = valuePop(ctxt); 
     arg1 = valuePop(ctxt);
     if ((arg1 == NULL) || (arg2 == NULL)) {
@@ -4797,6 +4952,7 @@ xmlXPathNotEqualValues(xmlXPathParserContextPtr ctxt) {
     xmlXPathObjectPtr arg1, arg2, argtmp;
     int ret = 0;
 
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(0);
     arg2 = valuePop(ctxt); 
     arg1 = valuePop(ctxt);
     if ((arg1 == NULL) || (arg2 == NULL)) {
@@ -4896,6 +5052,7 @@ xmlXPathCompareValues(xmlXPathParserContextPtr ctxt, int inf, int strict) {
     int ret = 0, arg1i = 0, arg2i = 0;
     xmlXPathObjectPtr arg1, arg2;
 
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(0);
     arg2 = valuePop(ctxt); 
     arg1 = valuePop(ctxt);
     if ((arg1 == NULL) || (arg2 == NULL)) {
@@ -5007,6 +5164,7 @@ xmlXPathCompareValues(xmlXPathParserContextPtr ctxt, int inf, int strict) {
  */
 void
 xmlXPathValueFlipSign(xmlXPathParserContextPtr ctxt) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return;
     CAST_TO_NUMBER;
     CHECK_TYPE(XPATH_NUMBER);
     if (xmlXPathIsNaN(ctxt->value->floatval))
@@ -5194,6 +5352,7 @@ typedef xmlNodePtr (*xmlXPathTraversalFunction)
  */
 xmlNodePtr
 xmlXPathNextSelf(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (cur == NULL)
         return(ctxt->context->node);
     return(NULL);
@@ -5211,6 +5370,7 @@ xmlXPathNextSelf(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextChild(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (cur == NULL) {
 	if (ctxt->context->node == NULL) return(NULL);
 	switch (ctxt->context->node->type) {
@@ -5262,6 +5422,7 @@ xmlXPathNextChild(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextDescendant(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (cur == NULL) {
 	if (ctxt->context->node == NULL)
 	    return(NULL);
@@ -5324,6 +5485,7 @@ xmlXPathNextDescendant(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextDescendantOrSelf(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (cur == NULL) {
 	if (ctxt->context->node == NULL)
 	    return(NULL);
@@ -5348,6 +5510,7 @@ xmlXPathNextDescendantOrSelf(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextParent(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     /*
      * the parent of an attribute or namespace node is the element
      * to which the attribute or namespace node is attached
@@ -5420,6 +5583,7 @@ xmlXPathNextParent(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextAncestor(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     /*
      * the parent of an attribute or namespace node is the element
      * to which the attribute or namespace node is attached
@@ -5469,7 +5633,7 @@ xmlXPathNextAncestor(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
 		if ((ns->next != NULL) &&
 		    (ns->next->type != XML_NAMESPACE_DECL))
 		    return((xmlNodePtr) ns->next);
-		/* Bad, how did that namespace ended-up there ? */
+		/* Bad, how did that namespace end up here ? */
                 return(NULL);
 	    }
 	}
@@ -5513,7 +5677,7 @@ xmlXPathNextAncestor(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
 	    if ((ns->next != NULL) &&
 	        (ns->next->type != XML_NAMESPACE_DECL))
 	        return((xmlNodePtr) ns->next);
-	    /* Bad, how did that namespace ended-up there ? */
+	    /* Bad, how did that namespace end up here ? */
             return(NULL);
 	}
 	case XML_DOCUMENT_NODE:
@@ -5543,6 +5707,7 @@ xmlXPathNextAncestor(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextAncestorOrSelf(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (cur == NULL)
         return(ctxt->context->node);
     return(xmlXPathNextAncestor(ctxt, cur));
@@ -5561,6 +5726,7 @@ xmlXPathNextAncestorOrSelf(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextFollowingSibling(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if ((ctxt->context->node->type == XML_ATTRIBUTE_NODE) ||
 	(ctxt->context->node->type == XML_NAMESPACE_DECL))
 	return(NULL);
@@ -5585,6 +5751,7 @@ xmlXPathNextFollowingSibling(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextPrecedingSibling(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if ((ctxt->context->node->type == XML_ATTRIBUTE_NODE) ||
 	(ctxt->context->node->type == XML_NAMESPACE_DECL))
 	return(NULL);
@@ -5615,6 +5782,7 @@ xmlXPathNextPrecedingSibling(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextFollowing(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (cur != NULL && cur->children != NULL)
         return cur->children ;
     if (cur == NULL) cur = ctxt->context->node;
@@ -5670,6 +5838,7 @@ xmlXPathIsAncestor(xmlNodePtr ancestor, xmlNodePtr node) {
 xmlNodePtr
 xmlXPathNextPreceding(xmlXPathParserContextPtr ctxt, xmlNodePtr cur)
 {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (cur == NULL)
         cur = ctxt->context->node;
     if (cur == NULL)
@@ -5710,10 +5879,13 @@ static xmlNodePtr
 xmlXPathNextPrecedingInternal(xmlXPathParserContextPtr ctxt,
                               xmlNodePtr cur)
 {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (cur == NULL) {
         cur = ctxt->context->node;
         if (cur == NULL)
             return (NULL);
+	if (cur->type == XML_NAMESPACE_DECL)
+	    cur = (xmlNodePtr)((xmlNsPtr)cur)->next;
         ctxt->ancestor = cur->parent;
     }
     if ((cur->prev != NULL) && (cur->prev->type == XML_DTD_NODE))
@@ -5750,6 +5922,7 @@ xmlXPathNextPrecedingInternal(xmlXPathParserContextPtr ctxt,
  */
 xmlNodePtr
 xmlXPathNextNamespace(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (ctxt->context->node->type != XML_ELEMENT_NODE) return(NULL);
     if (ctxt->context->tmpNsList == NULL && cur != (xmlNodePtr) xmlXPathXMLNamespace) {
         if (ctxt->context->tmpNsList != NULL)
@@ -5786,6 +5959,7 @@ xmlXPathNextNamespace(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 xmlNodePtr
 xmlXPathNextAttribute(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return(NULL);
     if (ctxt->context->node == NULL)
 	return(NULL);
     if (ctxt->context->node->type != XML_ELEMENT_NODE)
@@ -5821,6 +5995,7 @@ xmlXPathNextAttribute(xmlXPathParserContextPtr ctxt, xmlNodePtr cur) {
  */
 void
 xmlXPathRoot(xmlXPathParserContextPtr ctxt) {
+    if ((ctxt == NULL) || (ctxt->context == NULL)) return;
     ctxt->context->node = (xmlNodePtr) ctxt->context->doc;
     valuePush(ctxt, xmlXPathNewNodeSet(ctxt->context->node));
 }
@@ -5948,30 +6123,35 @@ xmlXPathGetElementsByIds (xmlDocPtr doc, const xmlChar *ids) {
 
     ret = xmlXPathNodeSetCreate(NULL);
 
-    while (IS_BLANK(*cur)) cur++;
+    while (IS_BLANK_CH(*cur)) cur++;
     while (*cur != 0) {
-	while ((!IS_BLANK(*cur)) && (*cur != 0))
+	while ((!IS_BLANK_CH(*cur)) && (*cur != 0))
 	    cur++;
 
         ID = xmlStrndup(ids, cur - ids);
 	if (ID != NULL) {
-	    if (xmlValidateNCName(ID, 1) == 0) {
-		attr = xmlGetID(doc, ID);
-		if (attr != NULL) {
-		    if (attr->type == XML_ATTRIBUTE_NODE)
-			elem = attr->parent;
-		    else if (attr->type == XML_ELEMENT_NODE)
-			elem = (xmlNodePtr) attr;
-		    else
-			elem = NULL;
-		    if (elem != NULL)
-			xmlXPathNodeSetAdd(ret, elem);
-		}
+	    /*
+	     * We used to check the fact that the value passed
+	     * was an NCName, but this generated much troubles for
+	     * me and Aleksey Sanin, people blatantly violated that
+	     * constaint, like Visa3D spec.
+	     * if (xmlValidateNCName(ID, 1) == 0)
+	     */
+	    attr = xmlGetID(doc, ID);
+	    if (attr != NULL) {
+		if (attr->type == XML_ATTRIBUTE_NODE)
+		    elem = attr->parent;
+		else if (attr->type == XML_ELEMENT_NODE)
+		    elem = (xmlNodePtr) attr;
+		else
+		    elem = NULL;
+		if (elem != NULL)
+		    xmlXPathNodeSetAdd(ret, elem);
 	    }
 	    xmlFree(ID);
 	}
 
-	while (IS_BLANK(*cur)) cur++;
+	while (IS_BLANK_CH(*cur)) cur++;
 	ids = cur;
     }
     return(ret);
@@ -6052,6 +6232,8 @@ void
 xmlXPathLocalNameFunction(xmlXPathParserContextPtr ctxt, int nargs) {
     xmlXPathObjectPtr cur;
 
+    if (ctxt == NULL) return;
+
     if (nargs == 0) {
 	valuePush(ctxt, xmlXPathNewNodeSet(ctxt->context->node));
 	nargs = 1;
@@ -6106,6 +6288,8 @@ xmlXPathLocalNameFunction(xmlXPathParserContextPtr ctxt, int nargs) {
 void
 xmlXPathNamespaceURIFunction(xmlXPathParserContextPtr ctxt, int nargs) {
     xmlXPathObjectPtr cur;
+
+    if (ctxt == NULL) return;
 
     if (nargs == 0) {
         valuePush(ctxt, xmlXPathNewNodeSet(ctxt->context->node));
@@ -6223,7 +6407,7 @@ xmlXPathNameFunction(xmlXPathParserContextPtr ctxt, int nargs)
  *
  * Implement the string() XPath function
  *    string string(object?)
- * he string function converts an object to a string as follows:
+ * The string function converts an object to a string as follows:
  *    - A node-set is converted to a string by returning the value of
  *      the node in the node-set that is first in document order.
  *      If the node-set is empty, an empty string is returned.
@@ -6256,6 +6440,7 @@ void
 xmlXPathStringFunction(xmlXPathParserContextPtr ctxt, int nargs) {
     xmlXPathObjectPtr cur;
 
+    if (ctxt == NULL) return;
     if (nargs == 0) {
 	valuePush(ctxt,
 		  xmlXPathWrapString(
@@ -6287,6 +6472,8 @@ xmlXPathStringLengthFunction(xmlXPathParserContextPtr ctxt, int nargs) {
     xmlXPathObjectPtr cur;
 
     if (nargs == 0) {
+        if ((ctxt == NULL) || (ctxt->context == NULL))
+	    return;
 	if (ctxt->context->node == NULL) {
 	    valuePush(ctxt, xmlXPathNewFloat(0));
 	} else {
@@ -6320,6 +6507,7 @@ xmlXPathConcatFunction(xmlXPathParserContextPtr ctxt, int nargs) {
     xmlXPathObjectPtr cur, newobj;
     xmlChar *tmp;
 
+    if (ctxt == NULL) return;
     if (nargs < 2) {
 	CHECK_ARITY(2);
     }
@@ -6651,6 +6839,7 @@ xmlXPathNormalizeFunction(xmlXPathParserContextPtr ctxt, int nargs) {
   xmlBufferPtr target;
   xmlChar blank;
   
+  if (ctxt == NULL) return;
   if (nargs == 0) {
     /* Use current context node */
     valuePush(ctxt,
@@ -6669,13 +6858,13 @@ xmlXPathNormalizeFunction(xmlXPathParserContextPtr ctxt, int nargs) {
   if (target && source) {
     
     /* Skip leading whitespaces */
-    while (IS_BLANK(*source))
+    while (IS_BLANK_CH(*source))
       source++;
   
     /* Collapse intermediate whitespaces, and skip trailing whitespaces */
     blank = 0;
     while (*source) {
-      if (IS_BLANK(*source)) {
+      if (IS_BLANK_CH(*source)) {
 	blank = 0x20;
       } else {
 	if (blank) {
@@ -6722,7 +6911,7 @@ xmlXPathTranslateFunction(xmlXPathParserContextPtr ctxt, int nargs) {
     xmlBufferPtr target;
     int offset, max;
     xmlChar ch;
-    xmlChar *point;
+    const xmlChar *point;
     xmlChar *cptr;
 
     CHECK_ARITY(3);
@@ -6783,7 +6972,7 @@ xmlXPathTranslateFunction(xmlXPathParserContextPtr ctxt, int nargs) {
  *
  * Implement the boolean() XPath function
  *    boolean boolean(object)
- * he boolean function converts its argument to a boolean as follows:
+ * The boolean function converts its argument to a boolean as follows:
  *    - a number is true if and only if it is neither positive or
  *      negative zero nor NaN
  *    - a node-set is true if and only if it is non-empty
@@ -6888,6 +7077,7 @@ xmlXPathLangFunction(xmlXPathParserContextPtr ctxt, int nargs) {
         ret = 1;
     }
 not_equal:
+    xmlFree((void *)theLang);
     xmlXPathFreeObject(val);
     valuePush(ctxt, xmlXPathNewBoolean(ret));
 }
@@ -6905,6 +7095,7 @@ xmlXPathNumberFunction(xmlXPathParserContextPtr ctxt, int nargs) {
     xmlXPathObjectPtr cur;
     double res;
 
+    if (ctxt == NULL) return;
     if (nargs == 0) {
 	if (ctxt->context->node == NULL) {
 	    valuePush(ctxt, xmlXPathNewFloat(0.0));
@@ -6947,14 +7138,12 @@ xmlXPathSumFunction(xmlXPathParserContextPtr ctxt, int nargs) {
 	XP_ERROR(XPATH_INVALID_TYPE);
     cur = valuePop(ctxt);
 
-    if ((cur->nodesetval == NULL) || (cur->nodesetval->nodeNr == 0)) {
-	valuePush(ctxt, xmlXPathNewFloat(0.0));
-    } else {
+    if ((cur->nodesetval != NULL) && (cur->nodesetval->nodeNr != 0)) {
 	for (i = 0; i < cur->nodesetval->nodeNr; i++) {
 	    res += xmlXPathCastNodeToNumber(cur->nodesetval->nodeTab[i]);
 	}
-	valuePush(ctxt, xmlXPathNewFloat(res));
     }
+    valuePush(ctxt, xmlXPathNewFloat(res));
     xmlXPathFreeObject(cur);
 }
 
@@ -7069,7 +7258,7 @@ xmlXPathRoundFunction(xmlXPathParserContextPtr ctxt, int nargs) {
  ************************************************************************/
 
 /*
- * a couple of forward declarations since we use a recursive call based
+ * a few forward declarations since we use a recursive call based
  * implementation.
  */
 static void xmlXPathCompileExpr(xmlXPathParserContextPtr ctxt);
@@ -7154,8 +7343,8 @@ xmlXPathCurrentChar(xmlXPathParserContextPtr ctxt, int *len) {
     }
 encoding_error:
     /*
-     * If we detect an UTF8 error that probably mean that the
-     * input encoding didn't get properly advertized in the
+     * If we detect an UTF8 error that probably means that the
+     * input encoding didn't get properly advertised in the
      * declaration header. Report the error and switch the encoding
      * to ISO-Latin-1 (if you don't like this policy, just declare the
      * encoding !)
@@ -7184,6 +7373,7 @@ xmlXPathParseNCName(xmlXPathParserContextPtr ctxt) {
     xmlChar *ret;
     int count = 0;
 
+    if ((ctxt == NULL) || (ctxt->cur == NULL)) return(NULL);
     /*
      * Accelerator for simple ASCII names
      */
@@ -7264,6 +7454,7 @@ xmlXPathParseName(xmlXPathParserContextPtr ctxt) {
     xmlChar *ret;
     int count = 0;
 
+    if ((ctxt == NULL) || (ctxt->cur == NULL)) return(NULL);
     /*
      * Accelerator for simple ASCII names
      */
@@ -7356,13 +7547,18 @@ xmlXPathParseNameComplex(xmlXPathParserContextPtr ctxt, int qualified) {
 
 #define MAX_FRAC 20
 
-static double my_pow10[MAX_FRAC] = {
+/*
+ * These are used as divisors for the fractional part of a number.
+ * Since the table includes 1.0 (representing '0' fractional digits),
+ * it must be dimensioned at MAX_FRAC+1 (bug 133921)
+ */
+static double my_pow10[MAX_FRAC+1] = {
     1.0, 10.0, 100.0, 1000.0, 10000.0,
     100000.0, 1000000.0, 10000000.0, 100000000.0, 1000000000.0,
     10000000000.0, 100000000000.0, 1000000000000.0, 10000000000000.0,
     100000000000000.0,
     1000000000000000.0, 10000000000000000.0, 100000000000000000.0,
-    1000000000000000000.0, 10000000000000000000.0
+    1000000000000000000.0, 10000000000000000000.0, 100000000000000000000.0
 };
 
 /**
@@ -7394,7 +7590,7 @@ xmlXPathStringEvalNumber(const xmlChar *str) {
     double temp;
 #endif
     if (cur == NULL) return(0);
-    while (IS_BLANK(*cur)) cur++;
+    while (IS_BLANK_CH(*cur)) cur++;
     if ((*cur != '.') && ((*cur < '0') || (*cur > '9')) && (*cur != '-')) {
         return(xmlXPathNAN);
     }
@@ -7450,13 +7646,15 @@ xmlXPathStringEvalNumber(const xmlChar *str) {
       if (*cur == '-') {
 	is_exponent_negative = 1;
 	cur++;
+      } else if (*cur == '+') {
+        cur++;
       }
       while ((*cur >= '0') && (*cur <= '9')) {
 	exponent = exponent * 10 + (*cur - '0');
 	cur++;
       }
     }
-    while (IS_BLANK(*cur)) cur++;
+    while (IS_BLANK_CH(*cur)) cur++;
     if (*cur != 0) return(xmlXPathNAN);
     if (isneg) ret = -ret;
     if (is_exponent_negative) exponent = -exponent;
@@ -7530,7 +7728,9 @@ xmlXPathCompNumber(xmlXPathParserContextPtr ctxt)
         if (CUR == '-') {
             is_exponent_negative = 1;
             NEXT;
-        }
+        } else if (CUR == '+') {
+	    NEXT;
+	}
         while ((CUR >= '0') && (CUR <= '9')) {
             exponent = exponent * 10 + (CUR - '0');
             NEXT;
@@ -7562,9 +7762,9 @@ xmlXPathParseLiteral(xmlXPathParserContextPtr ctxt) {
     if (CUR == '"') {
         NEXT;
 	q = CUR_PTR;
-	while ((IS_CHAR((unsigned int) CUR)) && (CUR != '"'))
+	while ((IS_CHAR_CH(CUR)) && (CUR != '"'))
 	    NEXT;
-	if (!IS_CHAR((unsigned int) CUR)) {
+	if (!IS_CHAR_CH(CUR)) {
 	    XP_ERROR0(XPATH_UNFINISHED_LITERAL_ERROR);
 	} else {
 	    ret = xmlStrndup(q, CUR_PTR - q);
@@ -7573,9 +7773,9 @@ xmlXPathParseLiteral(xmlXPathParserContextPtr ctxt) {
     } else if (CUR == '\'') {
         NEXT;
 	q = CUR_PTR;
-	while ((IS_CHAR((unsigned int) CUR)) && (CUR != '\''))
+	while ((IS_CHAR_CH(CUR)) && (CUR != '\''))
 	    NEXT;
-	if (!IS_CHAR((unsigned int) CUR)) {
+	if (!IS_CHAR_CH(CUR)) {
 	    XP_ERROR0(XPATH_UNFINISHED_LITERAL_ERROR);
 	} else {
 	    ret = xmlStrndup(q, CUR_PTR - q);
@@ -7606,9 +7806,9 @@ xmlXPathCompLiteral(xmlXPathParserContextPtr ctxt) {
     if (CUR == '"') {
         NEXT;
 	q = CUR_PTR;
-	while ((IS_CHAR((unsigned int) CUR)) && (CUR != '"'))
+	while ((IS_CHAR_CH(CUR)) && (CUR != '"'))
 	    NEXT;
-	if (!IS_CHAR((unsigned int) CUR)) {
+	if (!IS_CHAR_CH(CUR)) {
 	    XP_ERROR(XPATH_UNFINISHED_LITERAL_ERROR);
 	} else {
 	    ret = xmlStrndup(q, CUR_PTR - q);
@@ -7617,9 +7817,9 @@ xmlXPathCompLiteral(xmlXPathParserContextPtr ctxt) {
     } else if (CUR == '\'') {
         NEXT;
 	q = CUR_PTR;
-	while ((IS_CHAR((unsigned int) CUR)) && (CUR != '\''))
+	while ((IS_CHAR_CH(CUR)) && (CUR != '\''))
 	    NEXT;
-	if (!IS_CHAR((unsigned int) CUR)) {
+	if (!IS_CHAR_CH(CUR)) {
 	    XP_ERROR(XPATH_UNFINISHED_LITERAL_ERROR);
 	} else {
 	    ret = xmlStrndup(q, CUR_PTR - q);
@@ -7641,7 +7841,7 @@ xmlXPathCompLiteral(xmlXPathParserContextPtr ctxt) {
  * Parse a VariableReference, evaluate it and push it on the stack.
  *
  * The variable bindings consist of a mapping from variable names
- * to variable values. The value of a variable is an object, which
+ * to variable values. The value of a variable is an object, which can be
  * of any of the types that are possible for the value of an expression,
  * and may also be of additional types not specified here.
  *
@@ -7785,7 +7985,7 @@ xmlXPathCompPrimaryExpr(xmlXPathParserContextPtr ctxt) {
 	}
 	NEXT;
 	SKIP_BLANKS;
-    } else if (IS_DIGIT(CUR) || (CUR == '.' && IS_DIGIT(NXT(1)))) {
+    } else if (IS_ASCII_DIGIT(CUR) || (CUR == '.' && IS_ASCII_DIGIT(NXT(1)))) {
 	xmlXPathCompNumber(ctxt);
     } else if ((CUR == '\'') || (CUR == '"')) {
 	xmlXPathCompLiteral(ctxt);
@@ -7843,35 +8043,33 @@ xmlXPathCompFilterExpr(xmlXPathParserContextPtr ctxt) {
 
 static xmlChar *
 xmlXPathScanName(xmlXPathParserContextPtr ctxt) {
-    xmlChar buf[XML_MAX_NAMELEN];
-    int len = 0;
+    int len = 0, l;
+    int c;
+    const xmlChar *cur;
+    xmlChar *ret;
 
-    SKIP_BLANKS;
-    if (!IS_LETTER(CUR) && (CUR != '_') &&
-        (CUR != ':')) {
+    cur = ctxt->cur;
+
+    c = CUR_CHAR(l);
+    if ((c == ' ') || (c == '>') || (c == '/') || /* accelerators */
+	(!IS_LETTER(c) && (c != '_') &&
+         (c != ':'))) {
 	return(NULL);
     }
 
-    while ((IS_LETTER(NXT(len))) || (IS_DIGIT(NXT(len))) ||
-           (NXT(len) == '.') || (NXT(len) == '-') ||
-	   (NXT(len) == '_') || (NXT(len) == ':') || 
-	   (IS_COMBINING(NXT(len))) ||
-	   (IS_EXTENDER(NXT(len)))) {
-	buf[len] = NXT(len);
-	len++;
-	if (len >= XML_MAX_NAMELEN) {
-	    xmlGenericError(xmlGenericErrorContext, 
-	       "xmlScanName: reached XML_MAX_NAMELEN limit\n");
-	    while ((IS_LETTER(NXT(len))) || (IS_DIGIT(NXT(len))) ||
-		   (NXT(len) == '.') || (NXT(len) == '-') ||
-		   (NXT(len) == '_') || (NXT(len) == ':') || 
-		   (IS_COMBINING(NXT(len))) ||
-		   (IS_EXTENDER(NXT(len))))
-		 len++;
-	    break;
-	}
+    while ((c != ' ') && (c != '>') && (c != '/') && /* test bigname.xml */
+	   ((IS_LETTER(c)) || (IS_DIGIT(c)) ||
+            (c == '.') || (c == '-') ||
+	    (c == '_') || (c == ':') || 
+	    (IS_COMBINING(c)) ||
+	    (IS_EXTENDER(c)))) {
+	len += l;
+	NEXTL(l);
+	c = CUR_CHAR(l);
     }
-    return(xmlStrndup(buf, len));
+    ret = xmlStrndup(cur, ctxt->cur - cur);
+    ctxt->cur = cur;
+    return(ret);
 }
 
 /**
@@ -7898,8 +8096,10 @@ xmlXPathCompPathExpr(xmlXPathParserContextPtr ctxt) {
     xmlChar *name = NULL; /* we may have to preparse a name to find out */
 
     SKIP_BLANKS;
-    if ((CUR == '$') || (CUR == '(') || (IS_DIGIT(CUR)) ||
-        (CUR == '\'') || (CUR == '"') || (CUR == '.' && IS_DIGIT(NXT(1)))) {
+    if ((CUR == '$') || (CUR == '(') || 
+    	(IS_ASCII_DIGIT(CUR)) ||
+        (CUR == '\'') || (CUR == '"') ||
+	(CUR == '.' && IS_ASCII_DIGIT(NXT(1)))) {
 	lc = 0;
     } else if (CUR == '*') {
 	/* relative or absolute location path */
@@ -7922,7 +8122,7 @@ xmlXPathCompPathExpr(xmlXPathParserContextPtr ctxt) {
 	 *   - a element name
 	 * We do an a priori analysis here rather than having to
 	 * maintain parsed token content through the recursive function
-	 * calls. This looks uglier but makes the code quite easier to
+	 * calls. This looks uglier but makes the code easier to
 	 * read/write/debug.
 	 */
 	SKIP_BLANKS;
@@ -7947,7 +8147,7 @@ xmlXPathCompPathExpr(xmlXPathParserContextPtr ctxt) {
 #endif
 		    lc = 1;
 		    break;
-		} else if (IS_BLANK(NXT(len))) {
+		} else if (IS_BLANK_CH(NXT(len))) {
 		    /* ignore blanks */
 		    ;
 		} else if (NXT(len) == ':') {
@@ -8001,7 +8201,7 @@ xmlXPathCompPathExpr(xmlXPathParserContextPtr ctxt) {
 	    }
 	    xmlFree(name);
 	} else {
-	    /* make sure all cases are covered explicitely */
+	    /* make sure all cases are covered explicitly */
 	    XP_ERROR(XPATH_EXPR_ERROR);
 	}
     } 
@@ -8363,7 +8563,7 @@ xmlXPathCompPredicate(xmlXPathParserContextPtr ctxt, int filter) {
  *		   | 'processing-instruction'
  *		   | 'node'
  *
- * Returns the name found and update @test, @type and @prefix appropriately
+ * Returns the name found and updates @test, @type and @prefix appropriately
  */
 static xmlChar *
 xmlXPathCompNodeTest(xmlXPathParserContextPtr ctxt, xmlXPathTestVal *test,
@@ -8395,7 +8595,7 @@ xmlXPathCompNodeTest(xmlXPathParserContextPtr ctxt, xmlXPathTestVal *test,
 	XP_ERROR0(XPATH_EXPR_ERROR);
     }
 
-    blanks = IS_BLANK(CUR);
+    blanks = IS_BLANK_CH(CUR);
     SKIP_BLANKS;
     if (CUR == '(') {
 	NEXT;
@@ -8683,7 +8883,9 @@ xmlXPathCompStep(xmlXPathParserContextPtr ctxt) {
 	    xmlGenericErrorContextNodeSet(stdout, ctxt->value->nodesetval);
 #endif
 
+#ifdef LIBXML_XPTR_ENABLED
 eval_predicates:
+#endif
 	op1 = ctxt->comp->last;
 	ctxt->comp->last = -1;
 
@@ -8793,7 +8995,7 @@ xmlXPathCompLocationPath(xmlXPathParserContextPtr ctxt) {
 		NEXT;
 		SKIP_BLANKS;
 		if ((CUR != 0 ) &&
-		    ((IS_LETTER(CUR)) || (CUR == '_') || (CUR == '.') ||
+		    ((IS_ASCII_LETTER(CUR)) || (CUR == '_') || (CUR == '.') ||
 		     (CUR == '@') || (CUR == '*')))
 		    xmlXPathCompRelativeLocationPath(ctxt);
 	    }
@@ -8819,11 +9021,11 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op);
  *
  * This is the function implementing a step: based on the current list
  * of nodes, it builds up a new list, looking at all nodes under that
- * axis and selecting them it also do the predicate filtering
+ * axis and selecting them. It also does the predicate filtering
  *
  * Pushes the new NodeSet resulting from the search.
  *
- * Returns the number of node traversed
+ * Returns the number of nodes traversed
  */
 static int
 xmlXPathNodeCollectAndTest(xmlXPathParserContextPtr ctxt,
@@ -9241,7 +9443,7 @@ xmlXPathNodeCollectAndTest(xmlXPathParserContextPtr ctxt,
  *
  * This is the function implementing a step: based on the current list
  * of nodes, it builds up a new list, looking at all nodes under that
- * axis and selecting them it also do the predicate filtering
+ * axis and selecting them. It also does the predicate filtering
  *
  * Pushes the new NodeSet resulting from the search.
  * Returns the number of node traversed
@@ -9758,7 +9960,7 @@ xmlXPathCompOpEvalFirst(xmlXPathParserContextPtr ctxt,
  * Evaluate the Precompiled XPath operation searching only the last
  * element in document order
  *
- * Returns the number of node traversed
+ * Returns the number of nodes traversed
  */
 static int
 xmlXPathCompOpEvalLast(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op,
@@ -9767,6 +9969,10 @@ xmlXPathCompOpEvalLast(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op,
     int total = 0, cur;
     xmlXPathCompExprPtr comp;
     xmlXPathObjectPtr arg1, arg2;
+    xmlNodePtr bak;
+    xmlDocPtr bakd;
+    int pp;
+    int cs;
 
     CHECK_ERROR0;
     comp = ctxt->comp;
@@ -9774,6 +9980,10 @@ xmlXPathCompOpEvalLast(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op,
         case XPATH_OP_END:
             return (0);
         case XPATH_OP_UNION:
+	    bakd = ctxt->context->doc;
+	    bak = ctxt->context->node;
+	    pp = ctxt->context->proximityPosition;
+	    cs = ctxt->context->contextSize;
             total =
                 xmlXPathCompOpEvalLast(ctxt, &comp->steps[op->ch1], last);
 	    CHECK_ERROR0;
@@ -9790,6 +10000,10 @@ xmlXPathCompOpEvalLast(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op,
                                                      nodesetval->nodeNr -
                                                      1];
             }
+	    ctxt->context->doc = bakd;
+	    ctxt->context->node = bak;
+	    ctxt->context->proximityPosition = pp;
+	    ctxt->context->contextSize = cs;
             cur =
                 xmlXPathCompOpEvalLast(ctxt, &comp->steps[op->ch2], last);
 	    CHECK_ERROR0;
@@ -9893,7 +10107,7 @@ xmlXPathCompOpEvalLast(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op,
  * @op:  an XPath compiled operation
  *
  * Evaluate the Precompiled XPath operation
- * Returns the number of node traversed
+ * Returns the number of nodes traversed
  */
 static int
 xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
@@ -10223,16 +10437,21 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
         case XPATH_OP_ARG:
 	    bakd = ctxt->context->doc;
 	    bak = ctxt->context->node;
+	    pp = ctxt->context->proximityPosition;
+	    cs = ctxt->context->contextSize;
             if (op->ch1 != -1)
                 total += xmlXPathCompOpEval(ctxt, &comp->steps[op->ch1]);
-	    ctxt->context->doc = bakd;
+	    ctxt->context->contextSize = cs;
+	    ctxt->context->proximityPosition = pp;
 	    ctxt->context->node = bak;
+	    ctxt->context->doc = bakd;
 	    CHECK_ERROR0;
-            if (op->ch2 != -1)
+            if (op->ch2 != -1) {
                 total += xmlXPathCompOpEval(ctxt, &comp->steps[op->ch2]);
-	    ctxt->context->doc = bakd;
-	    ctxt->context->node = bak;
-	    CHECK_ERROR0;
+	        ctxt->context->doc = bakd;
+	        ctxt->context->node = bak;
+	        CHECK_ERROR0;
+	    }
             return (total);
         case XPATH_OP_PREDICATE:
         case XPATH_OP_FILTER:{
@@ -10241,6 +10460,7 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                 xmlNodeSetPtr newset = NULL;
                 xmlNodeSetPtr oldset;
                 xmlNodePtr oldnode;
+		xmlDocPtr oldDoc;
                 int i;
 
                 /*
@@ -10367,10 +10587,10 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                          * single item in the nodelocset.
                          */
                         ctxt->context->node = oldlocset->locTab[i]->user;
-                        tmp = xmlXPathNewNodeSet(ctxt->context->node);
-                        valuePush(ctxt, tmp);
                         ctxt->context->contextSize = oldlocset->locNr;
                         ctxt->context->proximityPosition = i + 1;
+                        tmp = xmlXPathNewNodeSet(ctxt->context->node);
+                        valuePush(ctxt, tmp);
 
                         if (op->ch2 != -1)
                             total +=
@@ -10425,11 +10645,13 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                 oldset = obj->nodesetval;
 
                 oldnode = ctxt->context->node;
+		oldDoc = ctxt->context->doc;
                 ctxt->context->node = NULL;
 
                 if ((oldset == NULL) || (oldset->nodeNr == 0)) {
                     ctxt->context->contextSize = 0;
                     ctxt->context->proximityPosition = 0;
+/*
                     if (op->ch2 != -1)
                         total +=
                             xmlXPathCompOpEval(ctxt,
@@ -10438,12 +10660,15 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                     res = valuePop(ctxt);
                     if (res != NULL)
                         xmlXPathFreeObject(res);
+*/
                     valuePush(ctxt, obj);
                     ctxt->context->node = oldnode;
                     CHECK_ERROR0;
                 } else {
                     /*
                      * Initialize the new set.
+		     * Also set the xpath document in case things like
+		     * key() evaluation are attempted on the predicate
                      */
                     newset = xmlXPathNodeSetCreate(NULL);
 
@@ -10453,6 +10678,9 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                          * a single item in the nodeset.
                          */
                         ctxt->context->node = oldset->nodeTab[i];
+			if ((oldset->nodeTab[i]->type != XML_NAMESPACE_DECL) &&
+			    (oldset->nodeTab[i]->doc != NULL))
+		            ctxt->context->doc = oldset->nodeTab[i]->doc;
                         tmp = xmlXPathNewNodeSet(ctxt->context->node);
                         valuePush(ctxt, tmp);
                         ctxt->context->contextSize = oldset->nodeNr;
@@ -10465,8 +10693,8 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                         CHECK_ERROR0;
 
                         /*
-                         * The result of the evaluation need to be tested to
-                         * decided whether the filter succeeded or not
+                         * The result of the evaluation needs to be tested to
+                         * decide whether the filter succeeded or not
                          */
                         res = valuePop(ctxt);
                         if (xmlXPathEvaluatePredicateResult(ctxt, res)) {
@@ -10493,6 +10721,8 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                     ctxt->context->node = NULL;
                     ctxt->context->contextSize = -1;
                     ctxt->context->proximityPosition = -1;
+		    /* may want to move this past the '}' later */
+		    ctxt->context->doc = oldDoc;
                     valuePush(ctxt, xmlXPathWrapNodeSet(newset));
                 }
                 ctxt->context->node = oldnode;
@@ -10512,9 +10742,10 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                 xmlXPathObjectPtr range;
                 xmlXPathObjectPtr res, obj;
                 xmlXPathObjectPtr tmp;
-                xmlLocationSetPtr newset = NULL;
+                xmlLocationSetPtr newlocset = NULL;
+		    xmlLocationSetPtr oldlocset;
                 xmlNodeSetPtr oldset;
-                int i;
+                int i, j;
 
                 if (op->ch1 != -1)
                     total +=
@@ -10522,20 +10753,38 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                 if (op->ch2 == -1)
                     return (total);
 
-                CHECK_TYPE0(XPATH_NODESET);
-                obj = valuePop(ctxt);
-                oldset = obj->nodesetval;
-                ctxt->context->node = NULL;
+                if (ctxt->value->type == XPATH_LOCATIONSET) {
+                    /*
+                     * Extract the old locset, and then evaluate the result of the
+                     * expression for all the element in the locset. use it to grow
+                     * up a new locset.
+                     */
+                    CHECK_TYPE0(XPATH_LOCATIONSET);
+                    obj = valuePop(ctxt);
+                    oldlocset = obj->user;
 
-                newset = xmlXPtrLocationSetCreate(NULL);
+                    if ((oldlocset == NULL) || (oldlocset->locNr == 0)) {
+		        ctxt->context->node = NULL;
+                        ctxt->context->contextSize = 0;
+                        ctxt->context->proximityPosition = 0;
+                        total += xmlXPathCompOpEval(ctxt,&comp->steps[op->ch2]);
+                        res = valuePop(ctxt);
+                        if (res != NULL)
+                            xmlXPathFreeObject(res);
+                        valuePush(ctxt, obj);
+                        CHECK_ERROR0;
+                        return (total);
+                    }
+                    newlocset = xmlXPtrLocationSetCreate(NULL);
 
-                if (oldset != NULL) {
-                    for (i = 0; i < oldset->nodeNr; i++) {
+                    for (i = 0; i < oldlocset->locNr; i++) {
                         /*
-                         * Run the evaluation with a node list made of a single item
-                         * in the nodeset.
+                         * Run the evaluation with a node list made of a
+                         * single item in the nodelocset.
                          */
-                        ctxt->context->node = oldset->nodeTab[i];
+                        ctxt->context->node = oldlocset->locTab[i]->user;
+                        ctxt->context->contextSize = oldlocset->locNr;
+                        ctxt->context->proximityPosition = i + 1;
                         tmp = xmlXPathNewNodeSet(ctxt->context->node);
                         valuePush(ctxt, tmp);
 
@@ -10545,16 +10794,26 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                                                    &comp->steps[op->ch2]);
                         CHECK_ERROR0;
 
-                        /*
-                         * The result of the evaluation need to be tested to
-                         * decided whether the filter succeeded or not
-                         */
                         res = valuePop(ctxt);
-                        range =
-                            xmlXPtrNewRangeNodeObject(oldset->nodeTab[i],
-                                                      res);
-                        if (range != NULL) {
-                            xmlXPtrLocationSetAdd(newset, range);
+			if (res->type == XPATH_LOCATIONSET) {
+			    xmlLocationSetPtr rloc = 
+			        (xmlLocationSetPtr)res->user;
+			    for (j=0; j<rloc->locNr; j++) {
+			        range = xmlXPtrNewRange(
+				  oldlocset->locTab[i]->user,
+				  oldlocset->locTab[i]->index,
+				  rloc->locTab[j]->user2,
+				  rloc->locTab[j]->index2);
+				if (range != NULL) {
+				    xmlXPtrLocationSetAdd(newlocset, range);
+				}
+			    }
+			} else {
+			    range = xmlXPtrNewRangeNodeObject(
+				(xmlNodePtr)oldlocset->locTab[i]->user, res);
+                            if (range != NULL) {
+                                xmlXPtrLocationSetAdd(newlocset,range);
+			    }
                         }
 
                         /*
@@ -10569,6 +10828,51 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
 
                         ctxt->context->node = NULL;
                     }
+		} else {	/* Not a location set */
+                    CHECK_TYPE0(XPATH_NODESET);
+                    obj = valuePop(ctxt);
+                    oldset = obj->nodesetval;
+                    ctxt->context->node = NULL;
+
+                    newlocset = xmlXPtrLocationSetCreate(NULL);
+
+                    if (oldset != NULL) {
+                        for (i = 0; i < oldset->nodeNr; i++) {
+                            /*
+                             * Run the evaluation with a node list made of a single item
+                             * in the nodeset.
+                             */
+                            ctxt->context->node = oldset->nodeTab[i];
+                            tmp = xmlXPathNewNodeSet(ctxt->context->node);
+                            valuePush(ctxt, tmp);
+
+                            if (op->ch2 != -1)
+                                total +=
+                                    xmlXPathCompOpEval(ctxt,
+                                                   &comp->steps[op->ch2]);
+                            CHECK_ERROR0;
+
+                            res = valuePop(ctxt);
+                            range =
+                                xmlXPtrNewRangeNodeObject(oldset->nodeTab[i],
+                                                      res);
+                            if (range != NULL) {
+                                xmlXPtrLocationSetAdd(newlocset, range);
+                            }
+
+                            /*
+                             * Cleanup
+                             */
+                            if (res != NULL)
+                                xmlXPathFreeObject(res);
+                            if (ctxt->value == tmp) {
+                                res = valuePop(ctxt);
+                                xmlXPathFreeObject(res);
+                            }
+
+                            ctxt->context->node = NULL;
+                        }
+                    }
                 }
 
                 /*
@@ -10578,7 +10882,7 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
                 ctxt->context->node = NULL;
                 ctxt->context->contextSize = -1;
                 ctxt->context->proximityPosition = -1;
-                valuePush(ctxt, xmlXPtrWrapLocationSet(newset));
+                valuePush(ctxt, xmlXPtrWrapLocationSet(newlocset));
                 return (total);
             }
 #endif /* LIBXML_XPTR_ENABLED */
@@ -10606,6 +10910,7 @@ xmlXPathRunEval(xmlXPathParserContextPtr ctxt) {
 	ctxt->valueTab = (xmlXPathObjectPtr *) 
 			 xmlMalloc(10 * sizeof(xmlXPathObjectPtr));
 	if (ctxt->valueTab == NULL) {
+	    xmlXPathPErrMemory(ctxt, "creating evaluation context\n");
 	    xmlFree(ctxt);
 	}
 	ctxt->valueNr = 0;
@@ -10645,7 +10950,7 @@ xmlXPathRunEval(xmlXPathParserContextPtr ctxt) {
  */
 int
 xmlXPathEvalPredicate(xmlXPathContextPtr ctxt, xmlXPathObjectPtr res) {
-    if (res == NULL) return(0);
+    if ((ctxt == NULL) || (res == NULL)) return(0);
     switch (res->type) {
         case XPATH_BOOLEAN:
 	    return(res->boolval);
@@ -10684,12 +10989,17 @@ xmlXPathEvalPredicate(xmlXPathContextPtr ctxt, xmlXPathObjectPtr res) {
 int
 xmlXPathEvaluatePredicateResult(xmlXPathParserContextPtr ctxt, 
                                 xmlXPathObjectPtr res) {
-    if (res == NULL) return(0);
+    if ((ctxt == NULL) || (res == NULL)) return(0);
     switch (res->type) {
         case XPATH_BOOLEAN:
 	    return(res->boolval);
         case XPATH_NUMBER:
+#if defined(__BORLANDC__) || (defined(_MSC_VER) && (_MSC_VER == 1200))
+	    return((res->floatval == ctxt->context->proximityPosition) &&
+	           (!xmlXPathIsNaN(res->floatval))); /* MSC pbm Mark Vakoc !*/
+#else
 	    return(res->floatval == ctxt->context->proximityPosition);
+#endif
         case XPATH_NODESET:
         case XPATH_XSLT_TREE:
 	    if (res->nodesetval == NULL)
@@ -10698,10 +11008,68 @@ xmlXPathEvaluatePredicateResult(xmlXPathParserContextPtr ctxt,
         case XPATH_STRING:
 	    return((res->stringval != NULL) &&
 	           (xmlStrlen(res->stringval) != 0));
+#ifdef LIBXML_XPTR_ENABLED
+	case XPATH_LOCATIONSET:{
+	    xmlLocationSetPtr ptr = res->user;
+	    if (ptr == NULL)
+	        return(0);
+	    return (ptr->locNr != 0);
+	    }
+#endif
         default:
 	    STRANGE
     }
     return(0);
+}
+
+/**
+ * xmlXPathCtxtCompile:
+ * @ctxt: an XPath context
+ * @str:  the XPath expression
+ *
+ * Compile an XPath expression
+ *
+ * Returns the xmlXPathCompExprPtr resulting from the compilation or NULL.
+ *         the caller has to free the object.
+ */
+xmlXPathCompExprPtr
+xmlXPathCtxtCompile(xmlXPathContextPtr ctxt, const xmlChar *str) {
+    xmlXPathParserContextPtr pctxt;
+    xmlXPathCompExprPtr comp;
+
+    xmlXPathInit();
+
+    pctxt = xmlXPathNewParserContext(str, ctxt);
+    xmlXPathCompileExpr(pctxt);
+
+    if( pctxt->error != XPATH_EXPRESSION_OK )
+    {
+        xmlXPathFreeParserContext(pctxt);
+        return (0);
+    }
+
+    if (*pctxt->cur != 0) {
+	/* 
+	 * aleksey: in some cases this line prints *second* error message
+	 * (see bug #78858) and probably this should be fixed.
+	 * However, we are not sure that all error messages are printed
+	 * out in other places. It's not critical so we leave it as-is for now
+	 */
+	xmlXPatherror(pctxt, __FILE__, __LINE__, XPATH_EXPR_ERROR);
+	comp = NULL;
+    } else {
+	comp = pctxt->comp;
+	pctxt->comp = NULL;
+    }
+    xmlXPathFreeParserContext(pctxt);
+    if (comp != NULL) {
+	comp->expr = xmlStrdup(str);
+#ifdef DEBUG_EVAL_COUNTS
+	comp->string = xmlStrdup(str);
+	comp->nb = 0;
+#endif
+    }
+    return(comp);
 }
 
 /**
@@ -10715,36 +11083,7 @@ xmlXPathEvaluatePredicateResult(xmlXPathParserContextPtr ctxt,
  */
 xmlXPathCompExprPtr
 xmlXPathCompile(const xmlChar *str) {
-    xmlXPathParserContextPtr ctxt;
-    xmlXPathCompExprPtr comp;
-
-    xmlXPathInit();
-
-    ctxt = xmlXPathNewParserContext(str, NULL);
-    xmlXPathCompileExpr(ctxt);
-    
-    if (*ctxt->cur != 0) {
-	/* 
-	 * aleksey: in some cases this line prints *second* error message
-	 * (see bug #78858) and probably this should be fixed.
-	 * However, we are not sure that all error messages are printed
-	 * out in other places. It's not critical so we leave it as-is for now
-	 */
-	xmlXPatherror(ctxt, __FILE__, __LINE__, XPATH_EXPR_ERROR);
-	comp = NULL;
-    } else {
-	comp = ctxt->comp;
-	ctxt->comp = NULL;
-    }
-    xmlXPathFreeParserContext(ctxt);
-    if (comp != NULL) {
-	comp->expr = xmlStrdup(str);
-#ifdef DEBUG_EVAL_COUNTS
-	comp->string = xmlStrdup(str);
-	comp->nb = 0;
-#endif
-    }
-    return(comp);
+    return(xmlXPathCtxtCompile(NULL, str));
 }
 
 /**
@@ -10833,6 +11172,7 @@ xmlXPathCompiledEval(xmlXPathCompExprPtr comp, xmlXPathContextPtr ctx) {
  */
 void
 xmlXPathEvalExpr(xmlXPathParserContextPtr ctxt) {
+    if (ctxt == NULL) return;
     xmlXPathCompileExpr(ctxt);
     CHECK_ERROR;
     xmlXPathRunEval(ctxt);

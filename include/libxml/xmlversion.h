@@ -1,13 +1,16 @@
 /*
- * xmlversion.h : compile-time version informations for the XML parser.
+ * Summary: compile-time version informations
+ * Description: compile-time version informations for the XML library
  *
- * See Copyright for the status of this software.
+ * Copy: See Copyright for the status of this software.
  *
- * daniel@veillard.com
+ * Author: Daniel Veillard
  */
 
 #ifndef __XML_VERSION_H__
 #define __XML_VERSION_H__
+
+#include <libxml/xmlexports.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +21,7 @@ extern "C" {
  * your library and includes mismatch
  */
 #ifndef LIBXML2_COMPILING_MSCCDEF
-extern void xmlCheckVersion(int version);
+XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
 #endif /* LIBXML2_COMPILING_MSCCDEF */
 
 /**
@@ -26,21 +29,28 @@ extern void xmlCheckVersion(int version);
  *
  * the version string like "1.2.3"
  */
-#define LIBXML_DOTTED_VERSION "2.5.10"
+#define LIBXML_DOTTED_VERSION "2.6.16"
 
 /**
  * LIBXML_VERSION:
  *
  * the version number: 1.2.3 value is 1002003
  */
-#define LIBXML_VERSION 20510
+#define LIBXML_VERSION 20616
 
 /**
  * LIBXML_VERSION_STRING:
  *
  * the version number string, 1.2.3 value is "1002003"
  */
-#define LIBXML_VERSION_STRING "20510"
+#define LIBXML_VERSION_STRING "20616"
+
+/**
+ * LIBXML_VERSION_EXTRA:
+ *
+ * extra version information, used to show a CVS compilation
+ */
+#define LIBXML_VERSION_EXTRA "-CVS2257"
 
 /**
  * LIBXML_TEST_VERSION:
@@ -48,7 +58,7 @@ extern void xmlCheckVersion(int version);
  * Macro to check that the libxml version in use is compatible with
  * the version the software has been compiled against
  */
-#define LIBXML_TEST_VERSION xmlCheckVersion(20510);
+#define LIBXML_TEST_VERSION xmlCheckVersion(20616);
 
 #ifndef VMS
 #if 0
@@ -67,6 +77,11 @@ extern void xmlCheckVersion(int version);
 #define WITHOUT_TRIO
 #endif
 #else /* VMS */
+/**
+ * WITH_TRIO:
+ *
+ * defined if the trio support need to be configured in
+ */
 #define WITH_TRIO 1
 #endif /* VMS */
 
@@ -75,10 +90,73 @@ extern void xmlCheckVersion(int version);
  *
  * Whether the thread support is configured in
  */
-#if 1
+#if 0
 #if defined(_REENTRANT) || defined(__MT__) || (_POSIX_C_SOURCE - 0 >= 199506L)
 #define LIBXML_THREAD_ENABLED
 #endif
+#endif
+
+/**
+ * LIBXML_TREE_ENABLED:
+ *
+ * Whether the DOM like tree manipulation API support is configured in
+ */
+#if 1
+#define LIBXML_TREE_ENABLED
+#endif
+
+/**
+ * LIBXML_OUTPUT_ENABLED:
+ *
+ * Whether the serialization/saving support is configured in
+ */
+#if 1
+#define LIBXML_OUTPUT_ENABLED
+#endif
+
+/**
+ * LIBXML_PUSH_ENABLED:
+ *
+ * Whether the push parsing interfaces are configured in
+ */
+#if 0
+#define LIBXML_PUSH_ENABLED
+#endif
+
+/**
+ * LIBXML_READER_ENABLED:
+ *
+ * Whether the xmlReader parsing interface is configured in
+ */
+#if 0
+#define LIBXML_READER_ENABLED
+#endif
+
+/**
+ * LIBXML_PATTERN_ENABLED:
+ *
+ * Whether the xmlPattern node selection interface is configured in
+ */
+#if 0
+#define LIBXML_PATTERN_ENABLED
+#endif
+
+/**
+ * LIBXML_WRITER_ENABLED:
+ *
+ * Whether the xmlWriter saving interface is configured in
+ */
+#if 0
+#define LIBXML_WRITER_ENABLED
+#endif
+
+/**
+ * LIBXML_SAX1_ENABLED:
+ *
+ * Whether the older SAX1 interface is configured in
+ */
+#if 1
+#define LIBXML_SAX1_ENABLED
 #endif
 
 /**
@@ -100,6 +178,15 @@ extern void xmlCheckVersion(int version);
 #endif
 
 /**
+ * LIBXML_VALID_ENABLED:
+ *
+ * Whether the DTD validation support is configured in
+ */
+#if 0
+#define LIBXML_VALID_ENABLED
+#endif
+
+/**
  * LIBXML_HTML_ENABLED:
  *
  * Whether the HTML support is configured in
@@ -109,11 +196,20 @@ extern void xmlCheckVersion(int version);
 #endif
 
 /**
+ * LIBXML_LEGACY_ENABLED:
+ *
+ * Whether the deprecated APIs are compiled in for compatibility
+ */
+#if 0
+#define LIBXML_LEGACY_ENABLED
+#endif
+
+/**
  * LIBXML_C14N_ENABLED:
  *
  * Whether the Canonicalization support is configured in
  */
-#if 1
+#if 0
 #define LIBXML_C14N_ENABLED
 #endif
 
@@ -122,7 +218,7 @@ extern void xmlCheckVersion(int version);
  *
  * Whether the Catalog support is configured in
  */
-#if 1
+#if 0
 #define LIBXML_CATALOG_ENABLED
 #endif
 
@@ -131,7 +227,7 @@ extern void xmlCheckVersion(int version);
  *
  * Whether the SGML Docbook support is configured in
  */
-#if 1
+#if 0
 #define LIBXML_DOCB_ENABLED
 #endif
 
@@ -140,7 +236,7 @@ extern void xmlCheckVersion(int version);
  *
  * Whether XPath is configured in
  */
-#if 1
+#if 0
 #define LIBXML_XPATH_ENABLED
 #endif
 
@@ -149,7 +245,7 @@ extern void xmlCheckVersion(int version);
  *
  * Whether XPointer is configured in
  */
-#if 1
+#if 0
 #define LIBXML_XPTR_ENABLED
 #endif
 
@@ -158,7 +254,7 @@ extern void xmlCheckVersion(int version);
  *
  * Whether XInclude is configured in
  */
-#if 1
+#if 0
 #define LIBXML_XINCLUDE_ENABLED
 #endif
 
@@ -194,12 +290,21 @@ extern void xmlCheckVersion(int version);
  *
  * Whether the memory debugging is configured in
  */
-#if 1
+#if 0
 #define DEBUG_MEMORY_LOCATION
 #endif
 
 /**
- * LIBXML_UNICODE_ENABLED
+ * LIBXML_DEBUG_RUNTIME:
+ *
+ * Whether the runtime debugging is configured in
+ */
+#if 0
+#define LIBXML_DEBUG_RUNTIME
+#endif
+
+/**
+ * LIBXML_UNICODE_ENABLED:
  *
  * Whether the Unicode related interfaces are compiled in
  */
@@ -208,53 +313,30 @@ extern void xmlCheckVersion(int version);
 #endif
 
 /**
- * LIBXML_REGEXP_ENABLED
+ * LIBXML_REGEXP_ENABLED:
  *
  * Whether the regular expressions interfaces are compiled in
  */
-#if 1
+#if 0
 #define LIBXML_REGEXP_ENABLED
 #endif
 
 /**
- * LIBXML_AUTOMATA_ENABLED
+ * LIBXML_AUTOMATA_ENABLED:
  *
  * Whether the automata interfaces are compiled in
  */
-#if 1
+#if 0
 #define LIBXML_AUTOMATA_ENABLED
 #endif
 
 /**
- * LIBXML_SCHEMAS_ENABLED
+ * LIBXML_SCHEMAS_ENABLED:
  *
  * Whether the Schemas validation interfaces are compiled in
  */
-#if 1
+#if 0
 #define LIBXML_SCHEMAS_ENABLED
-#endif
-
-/**
- * LIBXML_DLL_IMPORT:
- *
- * Used on Windows (MS C compiler only) to declare a variable as 
- * imported from the library. This macro should be empty when compiling
- * libxml itself. It should expand to __declspec(dllimport)
- * when the client code includes this header, and that only if the client
- * links dynamically against libxml.
- * For this to work, we need three macros. One tells us which compiler is
- * being used and luckily the compiler defines such a thing: _MSC_VER. The
- * second macro tells us if we are compiling libxml or the client code and
- * we define the macro IN_LIBXML on the compiler's command line for this 
- * purpose. The third macro, LIBXML_STATIC, must be defined by any client 
- * code which links against libxml statically. 
- */
-#ifndef LIBXML_DLL_IMPORT
-#if (defined(_MSC_VER) || defined(__BORLANDC__) || defined(__CYGWIN__)) && !defined(IN_LIBXML) && !defined(LIBXML_STATIC)
-#define LIBXML_DLL_IMPORT __declspec(dllimport)
-#else
-#define LIBXML_DLL_IMPORT
-#endif
 #endif
 
 /**
@@ -267,7 +349,7 @@ extern void xmlCheckVersion(int version);
 #include <ansidecl.h>
 #endif
 #ifndef ATTRIBUTE_UNUSED
-#define ATTRIBUTE_UNUSED
+#define ATTRIBUTE_UNUSED __attribute__((unused))
 #endif
 #else
 #define ATTRIBUTE_UNUSED

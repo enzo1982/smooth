@@ -1,10 +1,11 @@
 /*
- * schemastypes.c : interface of the XML Schema Datatypes
- *             definition and validity checking
+ * Summary: implementation of XML Schema Datatypes
+ * Description: module providing the XML Schema Datatypes implementation
+ *              both definition and validity checking
  *
- * See Copyright for the status of this software.
+ * Copy: See Copyright for the status of this software.
  *
- * Daniel Veillard <veillard@redhat.com>
+ * Author: Daniel Veillard
  */
 
 
@@ -22,30 +23,66 @@
 extern "C" {
 #endif
 
-void		xmlSchemaInitTypes		(void);
-void		xmlSchemaCleanupTypes		(void);
-xmlSchemaTypePtr xmlSchemaGetPredefinedType	(const xmlChar *name,
+XMLPUBFUN void XMLCALL		
+    		xmlSchemaInitTypes		(void);
+XMLPUBFUN void XMLCALL		
+		xmlSchemaCleanupTypes		(void);
+XMLPUBFUN xmlSchemaTypePtr XMLCALL 
+		xmlSchemaGetPredefinedType	(const xmlChar *name,
 						 const xmlChar *ns);
-int		xmlSchemaValidatePredefinedType	(xmlSchemaTypePtr type,
+XMLPUBFUN int XMLCALL		
+		xmlSchemaValidatePredefinedType	(xmlSchemaTypePtr type,
 						 const xmlChar *value,
 						 xmlSchemaValPtr *val);
-int		xmlSchemaValPredefTypeNode	(xmlSchemaTypePtr type,
+XMLPUBFUN int XMLCALL		
+		xmlSchemaValPredefTypeNode	(xmlSchemaTypePtr type,
 						 const xmlChar *value,
 						 xmlSchemaValPtr *val,
 						 xmlNodePtr node);
-int		xmlSchemaValidateFacet		(xmlSchemaTypePtr base,
+XMLPUBFUN int XMLCALL		
+		xmlSchemaValidateFacet		(xmlSchemaTypePtr base,
 						 xmlSchemaFacetPtr facet,
 						 const xmlChar *value,
-						 xmlSchemaValPtr val);
-void		xmlSchemaFreeValue		(xmlSchemaValPtr val);
-xmlSchemaFacetPtr xmlSchemaNewFacet		(void);
-int		xmlSchemaCheckFacet		(xmlSchemaFacetPtr facet,
+						 xmlSchemaValPtr val);	
+XMLPUBFUN void XMLCALL		
+		xmlSchemaFreeValue		(xmlSchemaValPtr val);
+XMLPUBFUN xmlSchemaFacetPtr XMLCALL 
+		xmlSchemaNewFacet		(void);
+XMLPUBFUN int XMLCALL		
+		xmlSchemaCheckFacet		(xmlSchemaFacetPtr facet,
 						 xmlSchemaTypePtr typeDecl,
 						 xmlSchemaParserCtxtPtr ctxt,
 						 const xmlChar *name);
-void		xmlSchemaFreeFacet		(xmlSchemaFacetPtr facet);
-int		xmlSchemaCompareValues		(xmlSchemaValPtr x,
+XMLPUBFUN void XMLCALL		
+		xmlSchemaFreeFacet		(xmlSchemaFacetPtr facet);
+XMLPUBFUN int XMLCALL		
+		xmlSchemaCompareValues		(xmlSchemaValPtr x,
 						 xmlSchemaValPtr y);
+XMLPUBFUN xmlSchemaTypePtr XMLCALL		
+		xmlSchemaGetBuiltInListSimpleTypeItemType(xmlSchemaTypePtr type);
+XMLPUBFUN int XMLCALL
+xmlSchemaValidateListSimpleTypeFacet(xmlSchemaFacetPtr facet,
+				     const xmlChar *value,
+				     unsigned long actualLen,
+				     unsigned long *expectedLen);
+XMLPUBFUN xmlSchemaTypePtr XMLCALL
+xmlSchemaGetBuiltInType(xmlSchemaValType type);
+XMLPUBFUN int XMLCALL
+xmlSchemaIsBuiltInTypeFacet(xmlSchemaTypePtr type, 
+			    int facetType);
+XMLPUBFUN xmlChar * XMLCALL
+xmlSchemaCollapseString(const xmlChar *value);
+XMLPUBFUN unsigned long  XMLCALL
+xmlSchemaGetFacetValueAsULong(xmlSchemaFacetPtr facet);
+XMLPUBFUN int XMLCALL
+xmlSchemaValidateLengthFacet(xmlSchemaTypePtr type, 
+			     xmlSchemaFacetPtr facet,
+			     const xmlChar *value,
+			     xmlSchemaValPtr val,
+			     unsigned long *length) ;
+XMLPUBFUN int XMLCALL
+xmlSchemaValPredefTypeNodeNoNorm(xmlSchemaTypePtr type, const xmlChar *value,
+				 xmlSchemaValPtr *val, xmlNodePtr node);
 
 #ifdef __cplusplus
 }

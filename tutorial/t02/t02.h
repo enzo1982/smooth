@@ -1,5 +1,5 @@
 /*
- * smooth tutorial 1
+ * smooth tutorial 2
  */
 
 #include <smooth.h>

@@ -455,6 +455,10 @@ SOURCE=..\classes\graphics\surface.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\graphics\surfacebackend.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\graphics\window.cpp
 # End Source File
 # End Group
@@ -727,6 +731,10 @@ SOURCE=..\include\smooth\graphics\font.h
 # Begin Source File
 
 SOURCE=..\include\smooth\graphics\surface.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\surfacebackend.h
 # End Source File
 # Begin Source File
 

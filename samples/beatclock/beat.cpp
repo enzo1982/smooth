@@ -536,8 +536,7 @@ Void BeatClock::PaintAll()
 
 	surface->StartPaint(Rect(Point(10, 50), Size(wnd->GetObjectProperties()->size.cx - 20, 50)));
 
-	HDC			 dc = (HDC) surface->GetSystemSurface();
-	RECT			 textrect;
+	Rect			 textRect;
 	SYSTEMTIME		 time;
 	TIME_ZONE_INFORMATION	 tzi;
 	double			 mseconds = 0;
@@ -548,9 +547,7 @@ Void BeatClock::PaintAll()
 	int			 ccbeats = 0;
 	String			 btext = "@";
 	String			 btext2 = "@";
-	HBRUSH			 brush = CreateSolidBrush(Setup::BackgroundColor);
-	HFONT			 hfont;
-	HFONT			 holdfont;
+	Font			 font("Arial", 21, RGB(0, 0, 0), FW_BOLD);
 
 	GetLocalTime(&time);
 	GetTimeZoneInformation(&tzi);
@@ -702,66 +699,43 @@ Void BeatClock::PaintAll()
 	{
 		switch (centi)
 		{
-			case true:
-				textrect.left = (int) ((16 * Setup::FontSize) + 0.5);
-				textrect.top = (int) ((53 * Setup::FontSize) + 0.5);
-				textrect.right = wnd->GetObjectProperties()->size.cx - (int) ((16 * Setup::FontSize) + 0.5);
-				textrect.bottom = textrect.top + (int) ((40 * Setup::FontSize) + 0.5);
-				FillRect(dc, &textrect, brush);
-				if (timeformat == 1) textrect.left = (int) ((25 * Setup::FontSize) + 0.5);
+			case True:
+				textRect.left = (Int) ((16 * Setup::FontSize) + 0.5);
+				textRect.top = (Int) ((53 * Setup::FontSize) + 0.5);
+				textRect.right = wnd->GetObjectProperties()->size.cx - (Int) ((16 * Setup::FontSize) + 0.5);
+				textRect.bottom = textRect.top + (Int) ((40 * Setup::FontSize) + 0.5);
 
-				SetBkMode(dc, TRANSPARENT);
-				SetTextColor(dc, RGB(0, 0, 0));
+				surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
-				if (Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
-				else					hfont = CreateFontA(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
+				if (timeformat == 1) textRect.left = (Int) ((25 * Setup::FontSize) + 0.5);
 
-				holdfont = (HFONT) SelectObject(dc, hfont);
+				surface->SetText(btext, textRect, font);
 
-				if (Setup::enableUnicode)	DrawTextW(dc, btext, -1, &textrect, DT_LEFT);
-				else					DrawTextA(dc, btext, -1, &textrect, DT_LEFT);
-
-				SelectObject(dc, holdfont);
-				::DeleteObject(hfont);
-
-				actbeats = beats;
-				actcbeats = cbeats;
-				actccbeats = ccbeats;
 				break;
-			case false:
+			case False:
 				if (actbeats != beats || (timeformat == 1 && actcbeats != cbeats) || wmpaint)
 				{
-					textrect.left = (int) ((16 * Setup::FontSize) + 0.5);
-					textrect.top = (int) ((53 * Setup::FontSize) + 0.5);
-					textrect.right = wnd->GetObjectProperties()->size.cx - (int) ((16 * Setup::FontSize) + 0.5);
-					textrect.bottom = textrect.top + (int) ((40 * Setup::FontSize) + 0.5);
-					FillRect(dc, &textrect, brush);
-					textrect.left = (int) (44 * Setup::FontSize);
-					if (timeformat == 1) textrect.left = (int) ((45 * Setup::FontSize) + 0.5);
+					textRect.left = (Int) ((16 * Setup::FontSize) + 0.5);
+					textRect.top = (Int) ((53 * Setup::FontSize) + 0.5);
+					textRect.right = wnd->GetObjectProperties()->size.cx - (Int) ((16 * Setup::FontSize) + 0.5);
+					textRect.bottom = textRect.top + (Int) ((40 * Setup::FontSize) + 0.5);
 
-					SetBkMode(dc, TRANSPARENT);
-					SetTextColor(dc, RGB(0, 0, 0));
+					surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
-					if (Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
-					else					hfont = CreateFontA(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
+					textRect.left = (Int) (44 * Setup::FontSize);
 
-					holdfont = (HFONT) SelectObject(dc, hfont);
+					if (timeformat == 1) textRect.left = (Int) ((45 * Setup::FontSize) + 0.5);
 
-
-					if (Setup::enableUnicode)	DrawTextW(dc, btext2, -1, &textrect, DT_LEFT);
-					else					DrawTextA(dc, btext2, -1, &textrect, DT_LEFT);
-
-					SelectObject(dc, holdfont);
-					::DeleteObject(hfont);
+					surface->SetText(btext2, textRect, font);
 				}
-				actbeats = beats;
-				actcbeats = cbeats;
-				actccbeats = ccbeats;
+
 				break;
 		}
-	}
 
-	::DeleteObject(brush);
+		actbeats = beats;
+		actcbeats = cbeats;
+		actccbeats = ccbeats;
+	}
 
 	surface->EndPaint();
 }

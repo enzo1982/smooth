@@ -1,9 +1,9 @@
 /*
- * smooth tutorial 1
+ * smooth tutorial 2
  */
 
 #include <smooth/main.h>
-#include "t01.h"
+#include "t02.h"
 
 Int smooth::Main()
 {

@@ -1,5 +1,5 @@
  /* IOLib-C++, Universal IO Library
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Library General Public
@@ -66,6 +66,7 @@
 	const int	 IOLIB_ERROR_NOTOPEN	= 5;	// the connected stream is not open or no stream is connected
 	const int	 IOLIB_ERROR_OPNOTAVAIL	= 6;	// the requested operation is not available on the connected stream
 	const int	 IOLIB_ERROR_WRONGOS	= 7;	// the requested functionality is not available under the current operating system
+	const int	 IOLIB_ERROR_NODATA	= 8;	// no data is available in the queue
 #endif
 
 #ifndef DEFAULT_PACKAGE_SIZE
@@ -88,7 +89,7 @@ inline unsigned char GetByte(unsigned long number, int byte)
 {
 	if (byte > 3) return false;
 
-	return (unsigned char) ((number >> (8 * byte)) % 256);
+	return (unsigned char) ((number >> (8 * byte)) & 255);
 }
 
 inline bool GetBit(unsigned long number, int bit)

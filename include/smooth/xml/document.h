@@ -46,6 +46,8 @@ namespace smooth
 
 				Int	 LoadFile(String);
 				Int	 SaveFile(String);
+
+				Int	 ParseMemory(Void *, Int);
 		};
 	};
 };

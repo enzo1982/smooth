@@ -50,7 +50,6 @@ S::Int S::GUI::Client::Paint(Int message)
 	Window	*wnd = (Window *) myContainer->GetContainerObject();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	EnterProtectedRegion();
 
@@ -58,8 +57,7 @@ S::Int S::GUI::Client::Paint(Int message)
 	Divider	*db;
 	Rect	 clientFrame;
 	Rect	 client;
-
-	updateRect = wnd->GetUpdateRect();
+	Rect	 updateRect = wnd->GetUpdateRect();
 
 	client.left	= objectProperties->pos.x + 2;
 	client.top	= objectProperties->pos.y + 2;
@@ -97,7 +95,6 @@ S::Int S::GUI::Client::Paint(Int message)
 		updateRect.right += 5;
 		updateRect.bottom += 5;
 
-#ifdef __WIN32__
 		RECT	 iRect = intersectRect;
 		RECT	 uRect = updateRect;
 		RECT	 cRect = client;
@@ -105,7 +102,6 @@ S::Int S::GUI::Client::Paint(Int message)
 		IntersectRect(&iRect, &uRect, &cRect);
 
 		intersectRect = iRect;
-#endif
 
 		surface->Box(intersectRect, Setup::ClientColor, FILLED);
 
@@ -116,21 +112,7 @@ S::Int S::GUI::Client::Paint(Int message)
 
 		surface->Box(clientFrame, Setup::DividerDarkColor, OUTLINED);
 
-		updateRect.left		-= (objectProperties->pos.x + 3);
-		updateRect.top		-= (objectProperties->pos.y + 3);
-		updateRect.right	-= (objectProperties->pos.x + 3);
-		updateRect.bottom	-= (objectProperties->pos.y + 3);
-
-		updateRect.left		= max(0, updateRect.left);
-		updateRect.top		= max(0, updateRect.top);
-		updateRect.right	= min(GetSize().cx - 1, updateRect.right) + 5;
-		updateRect.bottom	= min(GetSize().cy - 1, updateRect.bottom) + 5;
-
 		onPaint.Emit();
-	}
-	else
-	{
-		updateRect = Rect(Point(0, 0), Size(0, 0));
 	}
 
 	LeaveProtectedRegion();
@@ -138,36 +120,7 @@ S::Int S::GUI::Client::Paint(Int message)
 	return Success;
 }
 
-S::Rect S::GUI::Client::GetUpdateRect()
-{
-	return updateRect;
-}
-
 S::Size S::GUI::Client::GetSize()
 {
 	return Size(objectProperties->size.cx - 6, objectProperties->size.cy - 7);
-}
-
-S::Int S::GUI::Client::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
-{
-	Surface	*surface = myContainer->GetDrawSurface();
-
-	destRect.left	+= (objectProperties->pos.x + 3);
-	destRect.top	+= (objectProperties->pos.y + 3);
-	destRect.right	+= (objectProperties->pos.x + 3);
-	destRect.bottom	+= (objectProperties->pos.y + 3);
-
-	return surface->BlitFromBitmap(bitmap, srcRect, destRect);
-}
-
-S::Int S::GUI::Client::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
-{
-	Surface	*surface = myContainer->GetDrawSurface();
-
-	srcRect.left	+= (objectProperties->pos.x + 3);
-	srcRect.top	+= (objectProperties->pos.y + 3);
-	srcRect.right	+= (objectProperties->pos.x + 3);
-	srcRect.bottom	+= (objectProperties->pos.y + 3);
-
-	return surface->BlitToBitmap(srcRect, bitmap, destRect);
 }

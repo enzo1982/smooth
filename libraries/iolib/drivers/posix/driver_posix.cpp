@@ -1,5 +1,5 @@
  /* IOLib-C++, Universal IO Library
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Library General Public
@@ -15,9 +15,6 @@
   * License along with this library; if not, write to the Free
   * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
   * MA 02111-1307, USA */
-
-#ifndef __IOLIB_DRIVER_POSIX_
-#define __IOLIB_DRIVER_POSIX_
 
 #include "driver_posix.h"
 
@@ -112,5 +109,3 @@ int IOLibDriverPOSIX::Flush()
 {
 	return 0;
 }
-
-#endif

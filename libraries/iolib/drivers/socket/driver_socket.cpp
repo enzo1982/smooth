@@ -1,5 +1,5 @@
  /* IOLib-C++, Universal IO Library
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Library General Public
@@ -16,9 +16,6 @@
   * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
   * MA 02111-1307, USA */
 
-#ifndef __IOLIB_DRIVER_SOCKET_
-#define __IOLIB_DRIVER_SOCKET_
-
 #include "driver_socket.h"
 
 int IOLibDriverSocket::initialized = 0;
@@ -28,6 +25,9 @@ IOLibDriverSocket::IOLibDriverSocket(const char *hostName, int port) : IOLibDriv
 	InitNetworking();
 
 	size = -1;
+
+	mode = MODE_SOCKET_BLOCKING;
+	timeout = 0;
 
 	stream = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -68,6 +68,9 @@ IOLibDriverSocket::IOLibDriverSocket(SOCKET iStream) : IOLibDriver()
 
 	stream		= iStream;
 	closeStream	= false;
+	timeout		= 0;
+
+	SetMode(MODE_SOCKET_BLOCKING);
 }
 
 IOLibDriverSocket::~IOLibDriverSocket()
@@ -79,11 +82,33 @@ IOLibDriverSocket::~IOLibDriverSocket()
 
 int IOLibDriverSocket::ReadData(unsigned char *data, int dataSize)
 {
+	if (mode == MODE_SOCKET_BLOCKING && timeout != 0)
+	{
+		TIMEVAL	 tv = {timeout, 0};
+		FD_SET	 sock;
+
+		FD_ZERO(&sock);
+		FD_SET(stream, &sock);
+
+		if (select(0, &sock, 0, 0, &tv) != 1) return 0;
+	}
+
 	return recv(stream, (char *) data, dataSize, 0);
 }
 
 int IOLibDriverSocket::WriteData(unsigned char *data, int dataSize)
 {
+	if (mode == MODE_SOCKET_BLOCKING && timeout != 0)
+	{
+		TIMEVAL	 tv = {timeout, 0};
+		FD_SET	 sock;
+
+		FD_ZERO(&sock);
+		FD_SET(stream, &sock);
+
+		if (select(0, 0, &sock, 0, &tv) != 1) return 0;
+	}
+
 	return send(stream, (char *) data, dataSize, 0);
 }
 
@@ -94,6 +119,37 @@ void IOLibDriverSocket::CloseSocket()
 #else
 	close(stream);
 #endif
+}
+
+bool IOLibDriverSocket::SetMode(int nm)
+{
+	switch (nm)
+	{
+		default:
+			return false;
+		case MODE_SOCKET_BLOCKING:
+		case MODE_SOCKET_NONBLOCKING:
+			mode = nm;
+			break;
+	}
+
+#ifdef __WIN32__
+	if (ioctlsocket(stream, FIONBIO, &mode) != 0)	return false;
+	else						return true;
+#else
+	if (ioctl(stream, FIONBIO, &mode) != 0)	return false;
+	else					return true;
+#endif
+}
+
+bool IOLibDriverSocket::SetTimeout(int nt)
+{
+	if (mode != MODE_SOCKET_BLOCKING)	return false;
+	if (timeout < 0)			return false;
+
+	timeout = nt;
+
+	return true;
 }
 
 bool IOLibDriverSocket::InitNetworking()
@@ -129,5 +185,3 @@ bool IOLibDriverSocket::DeinitNetworking()
 	return true;
 #endif
 }
-
-#endif

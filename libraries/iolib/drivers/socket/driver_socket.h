@@ -1,5 +1,5 @@
  /* IOLib-C++, Universal IO Library
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Library General Public
@@ -31,6 +31,9 @@ class IOLibDriverSOCKET;
 	#include <netdb.h>
 #endif
 
+const unsigned long MODE_SOCKET_BLOCKING	= 0;
+const unsigned long MODE_SOCKET_NONBLOCKING	= 1;
+
 class
 
 #ifdef __WIN32__
@@ -47,6 +50,9 @@ IOLibDriverSocket : public IOLibDriver
 
 		static int	 initialized;
 
+		unsigned long	 mode;
+		int		 timeout;
+
 		void		 CloseSocket();
 
 		static bool	 InitNetworking();
@@ -58,6 +64,9 @@ IOLibDriverSocket : public IOLibDriver
 
 		int		 ReadData(unsigned char *, int);
 		int		 WriteData(unsigned char *, int);
+
+		bool		 SetMode(int);
+		bool		 SetTimeout(int);
 };
 
 #endif

@@ -34,9 +34,11 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 - font.cpp		- new class: abstraction of font metrics
 - fontdlg.cpp		- implemented a font selection dialog
 - background.cpp	- messages are now sent to all threads; fixes some problems with multithreaded applications
+- document.cpp		- added support for parsing XML documents in memory
 
 - introduced a new font management system
 - fixed some PopupMenu issues
+- upgraded to IOLib v4.9.14.0
 - many bugfixes
 
 16.03.03 07:00 - smooth alpha 0.8.61.0

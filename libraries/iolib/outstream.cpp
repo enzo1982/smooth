@@ -1,5 +1,5 @@
  /* IOLib-C++, Universal IO Library
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Library General Public
@@ -15,9 +15,6 @@
   * License along with this library; if not, write to the Free
   * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
   * MA 02111-1307, USA */
-
-#ifndef __IOLIB_OUTSTREAM_
-#define __IOLIB_OUTSTREAM_
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -158,7 +155,7 @@ bool OutStream::Flush()
 
 	if (currentBufferPos <= 0) return true;
 
-	if (pbd) CompletePBD();
+	if (pbdActive) CompletePBD();
 
 	int	 ps		= packageSize;
 	int	 oldcpos	= currentBufferPos;
@@ -255,7 +252,7 @@ bool OutStream::OutputNumber(long number, int bytes)
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 	if (bytes > 4 || bytes < 0)	{ lastError = IOLIB_ERROR_BADPARAM; return false; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	for (int i = 0; i < bytes; i++)
 	{
@@ -283,7 +280,7 @@ bool OutStream::OutputNumberRaw(long number, int bytes)
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 	if (bytes > 4 || bytes < 0)	{ lastError = IOLIB_ERROR_BADPARAM; return false; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	for (int i = bytes - 1; i >= 0; i--)
 	{
@@ -311,7 +308,7 @@ bool OutStream::OutputNumberPDP(long number, int bytes)
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 	if (bytes > 4 || bytes < 0)	{ lastError = IOLIB_ERROR_BADPARAM; return false; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	number <<= 8 * (4 - bytes);
 
@@ -344,30 +341,30 @@ bool OutStream::OutputNumberPBD(long number, int bits)
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 	if (bits > 32 || bits < 0)	{ lastError = IOLIB_ERROR_BADPARAM; return false; }
 
-	if (!pbd) InitPBD();
+	if (!pbdActive) InitPBD();
 
 	unsigned char	 out;
 
 	for (int j = 0; j < bits; j++)
 	{
-		pbdbuffer[pbdlen] = GetBit(number, j);
-		pbdlen++;
+		pbdBuffer[pbdLength] = GetBit(number, j);
+		pbdLength++;
 	}
 
-	while (pbdlen >= 8)
+	while (pbdLength >= 8)
 	{
 		out = 0;
 
 		for (int i = 0; i < 8; i++)
 		{
-			out = out | (pbdbuffer[i] << i);
+			out = out | (pbdBuffer[i] << i);
 		}
 
-		pbdlen = pbdlen - 8;
+		pbdLength = pbdLength - 8;
 
-		for (int j = 0; j < pbdlen; j++)
+		for (int j = 0; j < pbdLength; j++)
 		{
-			pbdbuffer[j] = pbdbuffer[j+8];
+			pbdBuffer[j] = pbdBuffer[j+8];
 		}
 
 		data[currentBufferPos] = out;
@@ -389,7 +386,7 @@ bool OutStream::OutputString(const char *string)
 	if (streamType == STREAM_NONE)		{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 	if (string == NULL)			{ lastError = IOLIB_ERROR_BADPARAM; return false; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	int	 bytesleft = strlen(string);
 	int	 databufferpos = 0;
@@ -419,7 +416,7 @@ bool OutStream::OutputLine(const char *string)
 	if (streamType == STREAM_NONE)		{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 	if (string == NULL)			{ lastError = IOLIB_ERROR_BADPARAM; return false; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	int	 bytesleft = strlen(string);
 	int	 databufferpos = 0;
@@ -456,7 +453,7 @@ bool OutStream::OutputData(const void *pointer, int bytes)
 	if (pointer == NULL)			{ lastError = IOLIB_ERROR_BADPARAM; return false; }
 	if (bytes < 0)				{ lastError = IOLIB_ERROR_BADPARAM; return false; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	int	 bytesleft = bytes;
 	int	 databufferpos = 0;
@@ -483,29 +480,29 @@ bool OutStream::OutputData(const void *pointer, int bytes)
 
 bool OutStream::InitPBD()
 {
-	pbdlen	= 0;
-	pbd	= 1;
+	pbdLength	= 0;
+	pbdActive	= 1;
 
 	return true;
 }
 
 bool OutStream::CompletePBD()
 {
-	if (pbdlen > 0)
+	if (pbdLength > 0)
 	{
 		int	out = 0;
 
 		for (int i = 0; i < 8; i++)
 		{
-			if (i < pbdlen) out = out | (pbdbuffer[i] << i);
+			if (i < pbdLength) out = out | (pbdBuffer[i] << i);
 		}
 
-		holdpbd = true;
+		keepPbd = true;
 		OutputNumber(out, 1);
-		holdpbd = false;
+		keepPbd = false;
 	}
 
-	pbd = 0;
+	pbdActive = 0;
 
 	return true;
 }
@@ -532,7 +529,7 @@ bool OutStream::SetFilter(IOLibFilter *newFilter)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	allowpackset = true;
 
@@ -561,7 +558,7 @@ bool OutStream::RemoveFilter()
 {
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	int	 oldcpos = currentBufferPos;
 
@@ -601,8 +598,6 @@ bool OutStream::RemoveFilter()
 bool OutStream::Close()
 {
 	if (streamType == STREAM_NONE) { lastError = IOLIB_ERROR_NOTOPEN; return false; }
-
-	if (pbd) CompletePBD();
 
 	if (filter != NULL) RemoveFilter();
 
@@ -655,5 +650,3 @@ bool OutStream::RelSeek(long offset)
 
 	return true;
 }
-
-#endif

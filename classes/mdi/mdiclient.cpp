@@ -46,13 +46,16 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
+	Surface	*surface = myContainer->GetDrawSurface();
 	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
+	EnterProtectedRegion();
+
 	Object	*object;
 	Divider	*db;
+	Rect	 clientFrame;
 	Rect	 client;
 	Rect	 updateRect = wnd->GetUpdateRect();
 
@@ -73,25 +76,13 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 
 				if (Binary::IsFlagSet(db->orientation, OR_VERT))
 				{
-					if (Binary::IsFlagSet(db->orientation, OR_LEFT))
-					{
-						if (db->GetObjectProperties()->pos.x >= client.left - 3) client.left = db->GetObjectProperties()->pos.x + 5;
-					}
-					else
-					{
-						if (db->GetObjectProperties()->pos.x <= client.right + 1) client.right = wnd->GetObjectProperties()->size.cx - db->GetObjectProperties()->pos.x - 2;
-					}
+					if (Binary::IsFlagSet(db->orientation, OR_LEFT) && db->GetObjectProperties()->pos.x >= client.left - 3)		client.left = db->GetObjectProperties()->pos.x + 5;
+					else if (!Binary::IsFlagSet(db->orientation, OR_LEFT) && db->GetObjectProperties()->pos.x <= client.right + 1)	client.right = wnd->GetObjectProperties()->size.cx - db->GetObjectProperties()->pos.x - 2;
 				}
 				else if (Binary::IsFlagSet(db->orientation, OR_HORZ))
 				{
-					if (Binary::IsFlagSet(db->orientation, OR_TOP))
-					{
-						if (db->GetObjectProperties()->pos.y >= client.top - 2) client.top = db->GetObjectProperties()->pos.y + 5;
-					}
-					else
-					{
-						if (db->GetObjectProperties()->pos.y <= client.bottom + 1) client.bottom = wnd->GetObjectProperties()->size.cy - db->GetObjectProperties()->pos.y - 2;
-					}
+					if (Binary::IsFlagSet(db->orientation, OR_TOP) && db->GetObjectProperties()->pos.y >= client.top - 2)		client.top = db->GetObjectProperties()->pos.y + 5;
+					else if (!Binary::IsFlagSet(db->orientation, OR_TOP) && db->GetObjectProperties()->pos.y <= client.bottom + 1)	client.bottom = wnd->GetObjectProperties()->size.cy - db->GetObjectProperties()->pos.y - 2;
 				}
 			}
 		}
@@ -101,13 +92,9 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 	{
 		Rect	 intersectRect;
 
-		client.bottom--;
-		client.right--;
-
 		updateRect.right += 5;
 		updateRect.bottom += 5;
 
-#ifdef __WIN32__
 		RECT	 iRect = intersectRect;
 		RECT	 uRect = updateRect;
 		RECT	 cRect = client;
@@ -115,12 +102,18 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 		IntersectRect(&iRect, &uRect, &cRect);
 
 		intersectRect = iRect;
-#endif
 
 		surface->Box(intersectRect, Setup::DividerDarkColor, FILLED);
 
+		clientFrame.left	= client.left;
+		clientFrame.top		= client.top;
+		clientFrame.right	= client.right - 1;
+		clientFrame.bottom	= client.bottom - 1;
+
 		surface->Frame(client, FRAME_DOWN);
 	}
+
+	LeaveProtectedRegion();
 
 	return Success;
 }

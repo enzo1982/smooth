@@ -16,7 +16,7 @@ ChangeLog for smooth
 			- new function: SetEncoding(SMOOTHString)
 
 - upgraded to bzip2 v1.0.2
-- upgraded to IOLib v4.9.14.0
+- upgraded to IOLib v4.9.13.0
 - upgraded to iconv v1.8
 - new translator application to create and edit xml language files
 

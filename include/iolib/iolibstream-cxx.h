@@ -1,5 +1,5 @@
  /* IOLib-C++, Universal IO Library
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Library General Public
@@ -34,40 +34,40 @@ class
 IOLibStream
 {
 	protected:
-		int			 streamType;
-		bool			 crosslinked;
-		bool			 closefile;
+		int		 streamType;
+		bool		 crosslinked;
+		bool		 closefile;
 
-		long			 size;
-		long			 origsize;
+		long		 size;
+		long		 origsize;
 
-		unsigned char		*data;
+		unsigned char	*data;
 
-		int			 packageSize;
-		int			 stdpacksize;
-		int			 origpacksize;
-		bool			 allowpackset;
+		int		 packageSize;
+		int		 stdpacksize;
+		int		 origpacksize;
+		bool		 allowpackset;
 
-		long			 currentFilePos;
-		long			 currentBufferPos;
-		long			 origfilepos;
+		long		 currentFilePos;
+		long		 currentBufferPos;
+		long		 origfilepos;
 
-		bool			 pbd;
-		bool			 holdpbd;
-		int			 pbdlen;
-		bool			 pbdbuffer[128];
+		bool		 pbdActive;
+		bool		 keepPbd;
+		int		 pbdLength;
+		bool		 pbdBuffer[128];
 
-		IOLibDriver		*driver;
-		IOLibFilter		*filter;
+		IOLibDriver	*driver;
+		IOLibFilter	*filter;
 
-		int			 lastError;
+		int		 lastError;
 	public:
-		long			 Size			();
-		long			 GetPos			();
-		int			 GetStreamType		();
-		int			 GetLastError		();
-					 IOLibStream		();
-					~IOLibStream		();
+		long		 Size			();
+		long		 GetPos			();
+		int		 GetStreamType		();
+		int		 GetLastError		();
+				 IOLibStream		();
+				~IOLibStream		();
 };
 
 #endif

@@ -66,6 +66,29 @@ S::Int S::XML::Document::LoadFile(String fileName)
 	return Success;
 }
 
+S::Int S::XML::Document::ParseMemory(Void *buffer, Int size)
+{
+	xmlKeepBlanksDefault(False);
+
+	xmlDocPtr	 doc = xmlParseMemory((char *) buffer, size);
+	xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
+	Node		*root = new Node();
+	String		 inputFormat = String::SetInputFormat("UTF-8");
+
+	root->SetName((char *) xmlRoot->name);
+	root->SetContent((char *) xmlRoot->content);
+
+	SetRootNode(root);
+
+	LoadNode(xmlRoot, rootNode);
+
+	String::SetInputFormat(inputFormat);
+
+	xmlFreeDoc(doc);
+
+	return Success;
+}
+
 S::Int S::XML::Document::LoadNode(xmlNodePtr node, Node *smoothNode)
 {
 	if (node->properties != NIL)

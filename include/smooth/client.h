@@ -20,7 +20,6 @@ namespace smooth
 };
 
 #include "widget.h"
-#include "rect.h"
 
 namespace smooth
 {
@@ -28,20 +27,13 @@ namespace smooth
 	{
 		class SMOOTHAPI Client : public Widget
 		{
-			protected:
-				Rect		 updateRect;
 			public:
 						 Client();
 						~Client();
 
 				virtual Int	 Paint(Int);
 
-				Rect		 GetUpdateRect();
-
 				virtual Size	 GetSize();
-
-				virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
-				virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
 			signals:
 				Signal0<Void>	 onPaint;
 		};

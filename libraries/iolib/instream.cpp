@@ -1,5 +1,5 @@
  /* IOLib-C++, Universal IO Library
-  * Copyright (C) 1998-2002 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Library General Public
@@ -15,9 +15,6 @@
   * License along with this library; if not, write to the Free
   * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
   * MA 02111-1307, USA */
-
-#ifndef __IOLIB_INSTREAM_
-#define __IOLIB_INSTREAM_
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -223,7 +220,7 @@ long InStream::InputNumber(int bytes)	// Intel byte order DCBA
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return -1; }
 	if (bytes > 4 || bytes < 0)	{ lastError = IOLIB_ERROR_BADPARAM; return -1; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	long	 rval = 0;
 
@@ -233,7 +230,8 @@ long InStream::InputNumber(int bytes)	// Intel byte order DCBA
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+			if (!ReadData())	{ lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+			if (packageSize == 0)	{ lastError = IOLIB_ERROR_NODATA; return -1; }
 		}
 
 		rval += data[currentBufferPos] * (1 << (i * 8));
@@ -249,7 +247,7 @@ long InStream::InputNumberRaw(int bytes)	// Raw byte order ABCD
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return -1; }
 	if (bytes > 4 || bytes < 0)	{ lastError = IOLIB_ERROR_BADPARAM; return -1; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	long	 rval = 0;
 
@@ -259,7 +257,8 @@ long InStream::InputNumberRaw(int bytes)	// Raw byte order ABCD
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+			if (!ReadData())	{ lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+			if (packageSize == 0)	{ lastError = IOLIB_ERROR_NODATA; return -1; }
 		}
 
 		rval += data[currentBufferPos] * (1 << (i * 8));
@@ -275,7 +274,7 @@ long InStream::InputNumberPDP(int bytes)	// PDP byte order BADC
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return -1; }
 	if (bytes > 4 || bytes < 0)	{ lastError = IOLIB_ERROR_BADPARAM; return -1; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	long	 rval = 0;
 
@@ -287,7 +286,8 @@ long InStream::InputNumberPDP(int bytes)	// PDP byte order BADC
 
 			while (currentBufferPos >= packageSize)
 			{
-				if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+				if (!ReadData())	{ lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+				if (packageSize == 0)	{ lastError = IOLIB_ERROR_NODATA; return -1; }
 			}
 
 			rval += (data[currentBufferPos] << (((3 - i) ^ 1) * 8)) >> (8 * (4 - bytes));
@@ -304,18 +304,19 @@ long InStream::InputNumberPBD(int bits)
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return -1; }
 	if (bits > 32 || bits < 0)	{ lastError = IOLIB_ERROR_BADPARAM; return -1; }
 
-	if (!pbd) InitPBD();
+	if (!pbdActive) InitPBD();
 
 	unsigned char	 inp;
 	long		 rval = 0;
 
-	while (pbdlen < bits)
+	while (pbdLength < bits)
 	{
 		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+			if (!ReadData())	{ lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+			if (packageSize == 0)	{ lastError = IOLIB_ERROR_NODATA; return -1; }
 		}
 
 		inp = data[currentBufferPos];
@@ -324,21 +325,21 @@ long InStream::InputNumberPBD(int bits)
 
 		for (int i = 0; i < 8; i++)
 		{
-			pbdbuffer[pbdlen] = GetBit(inp, i);
-			pbdlen++;
+			pbdBuffer[pbdLength] = GetBit(inp, i);
+			pbdLength++;
 		}
 	}
 
 	for (int i = 0; i < bits; i++)
 	{
-		rval = rval | (pbdbuffer[i] << i);
+		rval = rval | (pbdBuffer[i] << i);
 	}
 
-	pbdlen = pbdlen - bits;
+	pbdLength = pbdLength - bits;
 
-	for (int j = 0; j < pbdlen; j++)
+	for (int j = 0; j < pbdLength; j++)
 	{
-		pbdbuffer[j] = pbdbuffer[j + bits];
+		pbdBuffer[j] = pbdBuffer[j + bits];
 	}
 
 	return rval;
@@ -349,7 +350,7 @@ char *InStream::InputString(int bytes)
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return NULL; }
 	if (bytes <= 0)			{ lastError = IOLIB_ERROR_BADPARAM; return NULL; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	int	 bytesleft = bytes;
 	int	 databufferpos = 0;
@@ -367,7 +368,8 @@ char *InStream::InputString(int bytes)
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return NULL; }
+			if (!ReadData())	{ lastError = IOLIB_ERROR_UNKNOWN; return NULL; }
+			if (packageSize == 0)	{ lastError = IOLIB_ERROR_NODATA; return NULL; }
 		}
 
 		amount = ((packageSize - currentBufferPos)<(bytesleft))?(packageSize - currentBufferPos):(bytesleft);
@@ -389,7 +391,7 @@ char *InStream::InputLine()
 {
 	if (streamType == STREAM_NONE)		{ lastError = IOLIB_ERROR_NOTOPEN; return NULL; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	long	 inpval;
 	int	 bytes = 0;
@@ -455,7 +457,7 @@ void *InStream::InputData(void *pointer, int bytes)
 	if (pointer == NULL)			{ lastError = IOLIB_ERROR_BADPARAM; return NULL; }
 	if (bytes < 0)				{ lastError = IOLIB_ERROR_BADPARAM; return NULL; }
 
-	if (pbd && !holdpbd) CompletePBD();
+	if (pbdActive && !keepPbd) CompletePBD();
 
 	int	 bytesleft = bytes;
 	int	 databufferpos = 0;
@@ -467,7 +469,8 @@ void *InStream::InputData(void *pointer, int bytes)
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return NULL; }
+			if (!ReadData())	{ lastError = IOLIB_ERROR_UNKNOWN; return NULL; }
+			if (packageSize == 0)	{ lastError = IOLIB_ERROR_NODATA; return NULL; }
 		}
 
 		amount = ((packageSize - currentBufferPos)<(bytesleft))?(packageSize - currentBufferPos):(bytesleft);
@@ -485,16 +488,16 @@ void *InStream::InputData(void *pointer, int bytes)
 
 bool InStream::InitPBD()
 {
-	pbdlen	= 0;
-	pbd	= 1;
+	pbdLength	= 0;
+	pbdActive	= 1;
 
 	return true;
 }
 
 bool InStream::CompletePBD()
 {
-	pbdlen	= 0;
-	pbd	= 0;
+	pbdLength	= 0;
+	pbdActive	= 0;
 
 	return true;
 }
@@ -505,7 +508,7 @@ bool InStream::SetPackageSize(int newPackagesize)
 	if (!allowpackset)		{ lastError = IOLIB_ERROR_OPNOTAVAIL; return false; }
 	if (newPackagesize <= 0)	{ lastError = IOLIB_ERROR_BADPARAM; return false; }
 
-	if (pbd) CompletePBD();
+	if (pbdActive) CompletePBD();
 
 	delete [] data;
 
@@ -573,7 +576,7 @@ bool InStream::Close()
 {
 	if (streamType == STREAM_NONE) { lastError = IOLIB_ERROR_NOTOPEN; return false; }
 
-	if (pbd) CompletePBD();
+	if (pbdActive) CompletePBD();
 
 	if (filter != NULL) RemoveFilter();
 
@@ -601,7 +604,7 @@ bool InStream::Seek(long position)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 
-	if (pbd) CompletePBD();
+	if (pbdActive) CompletePBD();
 
 	driver->Seek(position);
 
@@ -616,7 +619,7 @@ bool InStream::RelSeek(long offset)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 
-	if (pbd) CompletePBD();
+	if (pbdActive) CompletePBD();
 
 	driver->Seek(currentFilePos + offset);
 
@@ -626,5 +629,3 @@ bool InStream::RelSeek(long offset)
 
 	return true;
 }
-
-#endif

@@ -24,9 +24,15 @@ S::Int	 windowXLibTmp = S::GUI::WindowBackend::AddBackend(&CreateWindowXLib);
 
 S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 {
-	type = WINDOW_XLIB;
+	type	= WINDOW_XLIB;
 
-	wnd = NIL;
+	wnd	= NIL;
+	display	= NIL;
+
+	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
+	{
+		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
+	}
 }
 
 S::GUI::WindowXLib::~WindowXLib()
@@ -40,13 +46,6 @@ S::Void *S::GUI::WindowXLib::GetSystemWindow()
 
 S::Int S::GUI::WindowXLib::Open(String title, Point pos, Size size, Int flags)
 {
-	Display	*display = NIL;
-
-	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
-	{
-		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
-	}
-
 	XSetWindowAttributes	 attributes;
 
 	attributes.background_pixel	= BlackPixel(display, 0);
@@ -61,6 +60,9 @@ S::Int S::GUI::WindowXLib::Open(String title, Point pos, Size size, Int flags)
 
 		XFlush(display);
 
+		drawSurface = new Surface((Void *) wnd);
+		drawSurface->SetSize(size);
+
 		return Success;
 	}
 
@@ -69,12 +71,9 @@ S::Int S::GUI::WindowXLib::Open(String title, Point pos, Size size, Int flags)
 
 S::Int S::GUI::WindowXLib::Close()
 {
-	Display	*display = NIL;
+	delete drawSurface;
 
-	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
-	{
-		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
-	}
+	drawSurface = nullSurface;
 
 	XDestroyWindow(display, wnd);
 

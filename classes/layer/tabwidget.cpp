@@ -61,7 +61,13 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 		if (object != NIL)
 		{
-			object->SetContainer(myContainer->GetContainerObject()->GetContainer());
+			if (object->GetContainer() == NIL)
+			{
+				object->SetContainer(myContainer->GetContainerObject()->GetContainer());
+				object->SetRegisteredFlag();
+
+				((Widget *) object)->onRegister.Emit(this);
+			}
 
 			object->GetObjectProperties()->pos.x = realPos.x;
 			object->GetObjectProperties()->pos.y = realPos.y + 19;
@@ -237,16 +243,25 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	{
 		object = (Layer *) assocObjects.GetNthEntry(i);
 
-		object->SetContainer(myContainer->GetContainerObject()->GetContainer());
-
-		object->GetObjectProperties()->pos.x = realPos.x + 2;
-		object->GetObjectProperties()->pos.y = realPos.y + 21;
-		object->GetObjectProperties()->size.cx = objectProperties->size.cx - 3;
-		object->GetObjectProperties()->size.cy = objectProperties->size.cy - 22;
-
-		if (object->IsVisible())
+		if (object != NIL)
 		{
-			if (object->Process(message, wParam, lParam) == Break) return Break;
+			if (object->GetContainer() == NIL)
+			{
+				object->SetContainer(myContainer->GetContainerObject()->GetContainer());
+				object->SetRegisteredFlag();
+
+				((Widget *) object)->onRegister.Emit(this);
+			}
+
+			object->GetObjectProperties()->pos.x = realPos.x + 2;
+			object->GetObjectProperties()->pos.y = realPos.y + 21;
+			object->GetObjectProperties()->size.cx = objectProperties->size.cx - 3;
+			object->GetObjectProperties()->size.cy = objectProperties->size.cy - 22;
+
+			if (object->IsVisible())
+			{
+				if (object->Process(message, wParam, lParam) == Break) return Break;
+			}
 		}
 	}
 
@@ -360,11 +375,6 @@ S::Int S::GUI::TabWidget::RegisterObject(Object *object)
 			assocObjects.AddEntry(object, object->handle);
 			sizeSet.AddEntry(False, object->handle);
 			textSize.AddEntry(0, object->handle);
-
-			object->SetContainer(myContainer->GetContainerObject()->GetContainer());
-			object->SetRegisteredFlag();
-
-			((Widget *) object)->onRegister.Emit(this);
 
 			if (GetNOfObjects() == 1)	((Layer *) object)->Show();
 			else				((Layer *) object)->Hide();

@@ -66,8 +66,8 @@ S::XML::XUL::Window::~Window()
 
 	widgets.RemoveAll();
 
-	if (titlebar != NIL)	DeleteObject(titlebar);
-	if (window != NIL)	DeleteObject(window);
+	if (titlebar != NIL)	Object::DeleteObject(titlebar);
+	if (window != NIL)	Object::DeleteObject(window);
 }
 
 S::GUI::Widget *S::XML::XUL::Window::GetWidget()

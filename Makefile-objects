@@ -123,6 +123,16 @@ $(OBJECTDIR)/surfacegdi.o: $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp $(SMOOTHINCL
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp -o $(OBJECTDIR)/surfacegdi.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/bitmapxlib.o: $(GRAPHICSCLASSESDIR)/xlib/bitmapxlib.cpp $(SMOOTHINCLUDEDIR)/graphics/xlib/bitmapxlib.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/xlib/bitmapxlib.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/xlib/bitmapxlib.cpp -o $(OBJECTDIR)/bitmapxlib.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/surfacexlib.o: $(GRAPHICSCLASSESDIR)/xlib/surfacexlib.cpp $(SMOOTHINCLUDEDIR)/graphics/xlib/surfacexlib.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/xlib/surfacexlib.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/xlib/surfacexlib.cpp -o $(OBJECTDIR)/surfacexlib.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/bitmap.o: $(GRAPHICSCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmap.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmap.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmap.cpp -o $(OBJECTDIR)/bitmap.o
@@ -716,6 +726,11 @@ $(OBJECTDIR)/iolib_driver_socks4.o: $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp
 $(OBJECTDIR)/iolib_driver_socks5.o: $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp $(INCLUDEDIR)/iolib/drivers/driver_socks5.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp -o $(OBJECTDIR)/iolib_driver_socks5.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/iolib_driver_unicode.o: $(IOLIBDIR)/drivers/unicode/driver_unicode.cpp $(INCLUDEDIR)/iolib/drivers/driver_unicode.h
+	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/unicode/driver_unicode.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/unicode/driver_unicode.cpp -o $(OBJECTDIR)/iolib_driver_unicode.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/iolib_driver_zero.o: $(IOLIBDIR)/drivers/zero/driver_zero.cpp $(INCLUDEDIR)/iolib/drivers/driver_zero.h

@@ -142,6 +142,14 @@ SOURCE=..\libraries\iolib\drivers\socks4\driver_socks4.cpp
 SOURCE=..\libraries\iolib\drivers\socks5\driver_socks5.cpp
 # End Source File
 # End Group
+# Begin Group "unicode"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\libraries\iolib\drivers\unicode\driver_unicode.cpp
+# End Source File
+# End Group
 # End Group
 # Begin Group "filters"
 
@@ -212,6 +220,18 @@ SOURCE=..\include\iolib\drivers\driver_posix.h
 # Begin Source File
 
 SOURCE=..\include\iolib\drivers\driver_socket.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\iolib\drivers\driver_socks4.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\iolib\drivers\driver_socks5.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\iolib\drivers\driver_unicode.h
 # End Source File
 # Begin Source File
 

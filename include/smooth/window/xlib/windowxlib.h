@@ -32,6 +32,8 @@ namespace smooth
 
 		class WindowXLib : public WindowBackend
 		{
+			private:
+				Display	*display;
 			protected:
 				Window	 wnd;
 			public:

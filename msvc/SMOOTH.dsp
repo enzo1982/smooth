@@ -645,6 +645,36 @@ SOURCE=..\classes\graphics\gdi\bitmapgdi.cpp
 SOURCE=..\classes\graphics\gdi\surfacegdi.cpp
 # End Source File
 # End Group
+# Begin Group "xlib"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\graphics\xlib\bitmapxlib.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\xlib\surfacexlib.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\classes\graphics\bitmap.cpp
@@ -1037,6 +1067,36 @@ SOURCE=..\include\smooth\graphics\gdi\bitmapgdi.h
 # Begin Source File
 
 SOURCE=..\include\smooth\graphics\gdi\surfacegdi.h
+# End Source File
+# End Group
+# Begin Group "xlibheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\xlib\bitmapxlib.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\xlib\surfacexlib.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File

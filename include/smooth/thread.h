@@ -37,36 +37,33 @@ namespace smooth
 	{
 		friend Void ThreadProcCaller(Thread *);
 		private:
-			Int		 killflag;
-			Int		 waitflag;
-			Int		 status;
+			Int			 killflag;
+			Int			 waitflag;
+			Int			 status;
 
-			LiSAThread	*thread;
-
-			ThreadProcMember;
-			Void		 (*altproc)(Thread *);
-			Void		*instance;
+			LiSAThread		*thread;
 		public:
-			static Int	 counter;
+			static Int		 counter;
 
-					 Thread(ThreadProcParam, Void *);
-					 Thread(Void (*)(Thread *));
-					~Thread();
+						 Thread();
+						~Thread();
 
-			Int		 GetStatus();
+			Int			 GetStatus();
 
-			Int		 Start();
-			Int		 Stop();
+			Int			 Start();
+			Int			 Stop();
 
-			Void		 SetWaitFlag(Int);
-			Int		 GetWaitFlag();
-			Void		 SetKillFlag(Int);
-			Int		 GetKillFlag();
+			Void			 SetWaitFlag(Int);
+			Int			 GetWaitFlag();
+			Void			 SetKillFlag(Int);
+			Int			 GetKillFlag();
+		callbacks:
+			Callback1<Int, Thread *> threadMain;
 	};
 
-	Void ThreadProcCaller(Thread *);
-
 	SMOOTHVAR Int OBJ_THREAD;
+
+	Void ThreadProcCaller(Thread *);
 };
 
 #endif

@@ -28,7 +28,7 @@ using namespace smooth::GUI;
 #undef MessageBox
 #endif
 
-int S::MessageBoxApp::nOfMessageBoxes = 0;
+S::Int S::MessageBoxApp::nOfMessageBoxes = 0;
 
 S::Int S::SMOOTH::MessageBox(String text, String title, Int buttons, char *icon)
 {
@@ -54,14 +54,14 @@ S::Int S::SMOOTH::MessageBox(String text, String title, Int buttons, wchar_t *ic
 	return rVal;
 }
 
-S::MessageBoxApp::MessageBoxApp(String text, String title, int btns, wchar_t *icon)
+S::MessageBoxApp::MessageBoxApp(String text, String title, Int btns, wchar_t *icon)
 {
 	msgicon = icon;
 
 	Create(text, title, btns);
 }
 
-void S::MessageBoxApp::Create(String text, String title, int btns)
+S::Void S::MessageBoxApp::Create(String text, String title, Int btns)
 {
 	msgbox		= new Window(title);
 	titlebar	= new Titlebar(false, false, true);
@@ -148,7 +148,7 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 	msgbox->RegisterObject(lay);
 
 	msgbox->onPaint.Connect(&MessageBoxApp::MessagePaintProc, this);
-	msgbox->SetKillProc(KillProc(&MessageBoxApp::MessageKillProc), this);
+	msgbox->doQuit.Connect(&MessageBoxApp::MessageKillProc, this);
 
 	bpos.y = 14 + buttonHeight;
 	bsize.cy = 0;
@@ -325,7 +325,7 @@ S::MessageBoxApp::~MessageBoxApp()
 	DeleteObject(msgbox);
 }
 
-int S::MessageBoxApp::ShowMessageBox()
+S::Int S::MessageBoxApp::ShowMessageBox()
 {
 	int	 rval;
 
@@ -340,7 +340,7 @@ int S::MessageBoxApp::ShowMessageBox()
 	return rval;
 }
 
-void S::MessageBoxApp::MessagePaintProc()
+S::Void S::MessageBoxApp::MessagePaintProc()
 {
 	HDC	 dc = GetContext(msgbox);
 	Rect	 txtrect;
@@ -389,52 +389,52 @@ void S::MessageBoxApp::MessagePaintProc()
 	FreeContext(msgbox, dc);
 }
 
-bool S::MessageBoxApp::MessageKillProc()
+S::Bool S::MessageBoxApp::MessageKillProc()
 {
 	if (msgbox->value == 0) msgbox->value = IDCLOSE;
 
 	nOfMessageBoxes--;
 
-	return true;
+	return True;
 }
 
-void S::MessageBoxApp::MessageOK()
+S::Void S::MessageBoxApp::MessageOK()
 {
 	msgbox->value = IDOK;
 	msgbox->Close();
 }
 
-void S::MessageBoxApp::MessageCancel()
+S::Void S::MessageBoxApp::MessageCancel()
 {
 	msgbox->value = IDCANCEL;
 	msgbox->Close();
 }
 
-void S::MessageBoxApp::MessageYes()
+S::Void S::MessageBoxApp::MessageYes()
 {
 	msgbox->value = IDYES;
 	msgbox->Close();
 }
 
-void S::MessageBoxApp::MessageNo()
+S::Void S::MessageBoxApp::MessageNo()
 {
 	msgbox->value = IDNO;
 	msgbox->Close();
 }
 
-void S::MessageBoxApp::MessageRetry()
+S::Void S::MessageBoxApp::MessageRetry()
 {
 	msgbox->value = IDRETRY;
 	msgbox->Close();
 }
 
-void S::MessageBoxApp::MessageAbort()
+S::Void S::MessageBoxApp::MessageAbort()
 {
 	msgbox->value = IDABORT;
 	msgbox->Close();
 }
 
-void S::MessageBoxApp::MessageIgnore()
+S::Void S::MessageBoxApp::MessageIgnore()
 {
 	msgbox->value = IDIGNORE;
 	msgbox->Close();

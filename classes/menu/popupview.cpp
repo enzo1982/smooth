@@ -26,11 +26,12 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_POPUPVIEW = S::Object::RequestObjectID();
 
-S::GUI::PopupView::PopupView(PopupMenu *popupMenu)
+S::GUI::PopupView::PopupView(PopupMenu *popupMenu, Menu *iRealMenu)
 {
 	type				= OBJ_POPUPVIEW;
 	objectProperties->orientation	= OR_FREE;
 	myPopup				= popupMenu;
+	realMenu			= iRealMenu;
 
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
@@ -62,19 +63,19 @@ S::Int S::GUI::PopupView::Paint(Int message)
 	Int		 currentXPos = 20;
 	Int		 currentYPos = 3;
 
-	myPopup->GetSize();
+	realMenu->GetSize();
 
 	popupRect.left		= 0;
 	popupRect.top		= 0;
-	popupRect.right		= myPopup->popupsize.cx;
-	popupRect.bottom	= myPopup->popupsize.cy;
+	popupRect.right		= realMenu->popupsize.cx;
+	popupRect.bottom	= realMenu->popupsize.cy;
 
 	Box(dc, popupRect, Setup::BackgroundColor, FILLED);
 	Frame(dc, popupRect, FRAME_UP);
 
-	for (Int i = 0; i < myPopup->nOfEntries; i++)
+	for (Int i = 0; i < realMenu->GetNOfEntries(); i++)
 	{
-		entry = myPopup->entries.GetNthEntry(i);
+		entry = realMenu->entries.GetNthEntry(i);
 
 		if (entry == NIL) continue;
 
@@ -283,13 +284,13 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 	Int	 retVal = Success;
 	Int	 i;
 	HDC	 dc;
-	Rect	*entryRect = new Rect [myPopup->nOfEntries];
+	Rect	*entryRect = new Rect [realMenu->GetNOfEntries()];
 	Rect	 frame;
 	Point	 p1;
 	Point	 p2;
 	Int	 currentX = 3;
 	Int	 currentY = 3;
-	Int	 maxX = myPopup->popupsize.cx - 3;
+	Int	 maxX = realMenu->popupsize.cx - 3;
 
 	String	 newStatus;
 	Bool	 updateStatus = False;
@@ -297,8 +298,8 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 	popupRect.left		= 0;
 	popupRect.top		= 0;
-	popupRect.right		= myPopup->popupsize.cx;
-	popupRect.bottom	= myPopup->popupsize.cy;
+	popupRect.right		= realMenu->popupsize.cx;
+	popupRect.bottom	= realMenu->popupsize.cy;
 
 	switch (message)
 	{
@@ -312,9 +313,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 				myPopup->nextPopup = NIL;
 			}
 
-			for (i = 0; i < myPopup->nOfEntries; i++)
+			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				Menu::Entry	*entry = myPopup->entries.GetNthEntry(i);
+				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -332,17 +333,16 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 				if (entry->checked && (entry->popup != NIL))
 				{
-					myPopup->nextPopup = new PopupMenu();
+					myPopup->nextPopup = new PopupMenu(entry->popup);
 
 					myPopup->nextPopup->prevPopup = myPopup;
-					myPopup->nextPopup->MenuToPopup(entry->popup);
 					myPopup->nextPopup->SetContainer(myContainer);
-					myPopup->nextPopup->GetSize();
+					myPopup->nextPopup->realMenu->GetSize();
 					myPopup->nextPopup->GetObjectProperties()->pos.x = entryRect[i].right - 1;
 					myPopup->nextPopup->GetObjectProperties()->pos.y = entryRect[i].top - 3;
 
-					if (myPopup->nextPopup->GetObjectProperties()->pos.x + myPopup->nextPopup->popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) myPopup->nextPopup->GetObjectProperties()->pos.x = entryRect[i].left + 1 - myPopup->nextPopup->popupsize.cx;
-					if (myPopup->nextPopup->GetObjectProperties()->pos.y + myPopup->nextPopup->popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) myPopup->nextPopup->GetObjectProperties()->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - myPopup->popupsize.cy - 1;
+					if (myPopup->nextPopup->GetObjectProperties()->pos.x + myPopup->nextPopup->realMenu->popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) myPopup->nextPopup->GetObjectProperties()->pos.x = entryRect[i].left + 1 - myPopup->nextPopup->realMenu->popupsize.cx;
+					if (myPopup->nextPopup->GetObjectProperties()->pos.y + myPopup->nextPopup->realMenu->popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) myPopup->nextPopup->GetObjectProperties()->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - realMenu->popupsize.cy - 1;
 
 					wnd->RegisterObject(myPopup->nextPopup);
 
@@ -352,9 +352,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONUP:
-			for (i = 0; i < myPopup->nOfEntries; i++)
+			for (i = 0; i <realMenu->GetNOfEntries(); i++)
 			{
-				Menu::Entry	*entry = myPopup->entries.GetNthEntry(i);
+				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
 
 				if (entry->checked && (entry->onClick.GetNOfConnectedSlots() != 0 && entry->bVar == NIL && entry->iVar == NIL))
 				{
@@ -408,7 +408,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 							if (object != NIL)
 							{
-								if (object->GetObjectType() == OBJ_CHECKBOX) object->Process(SM_CHECKCHECKBOXES, 0, 0);
+								if (object->GetObjectType() == OBJ_CHECKBOX) ((CheckBox *) object)->Process(SM_CHECKCHECKBOXES, 0, 0);
 							}
 						}
 
@@ -448,7 +448,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 							if (object != NIL)
 							{
-								if (object->GetObjectType() == OBJ_OPTIONBOX) object->Process(SM_CHECKOPTIONBOXES, 0, 0);
+								if (object->GetObjectType() == OBJ_OPTIONBOX) ((OptionBox *) object)->Process(SM_CHECKOPTIONBOXES, 0, 0);
 							}
 						}
 
@@ -465,9 +465,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSELEAVE:
 			dc = GetContext(wnd);
 
-			for (i = 0; i < myPopup->nOfEntries; i++)
+			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				Menu::Entry	*entry = myPopup->entries.GetNthEntry(i);
+				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -665,9 +665,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSEMOVE:
 			dc = GetContext(wnd);
 
-			for (i = 0; i < myPopup->nOfEntries; i++)
+			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				Menu::Entry	*entry = myPopup->entries.GetNthEntry(i);
+				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -1063,7 +1063,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		}
 	}
 
-	if (myPopup->nOfEntries > 0) delete [] entryRect;
+	if (realMenu->GetNOfEntries() > 0) delete [] entryRect;
 
 	LeaveProtectedRegion();
 

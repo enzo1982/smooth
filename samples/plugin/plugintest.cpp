@@ -26,8 +26,6 @@ Int smooth::Main()
 
 PlugInTest::PlugInTest()
 {
-	SetText("smooth PlugIn Test");
-
 	Point	 pos;
 	Size	 size;
 

@@ -263,7 +263,7 @@ S::Int S::GUI::Hyperlink::SetText(String newText)
 {
 	if (linkBitmap != NIL) linkBitmap = NIL;
 
-	return Object::SetText(newText);
+	return Widget::SetText(newText);
 }
 
 S::Int S::GUI::Hyperlink::SetURL(String newUrl)

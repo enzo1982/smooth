@@ -66,88 +66,87 @@ namespace smooth
 			friend class	ToolWindow;
 			friend		Int SMOOTHAPI S::Loop();
 			protected:
-				Int		 style;
-				Int		 exstyle;
-				Bool		 modal;
-				Bool		 sysmodal;
-				Bool		 apptopmost;
-				Bool		 stay;
-				Bool		 maximized;
+				Int				 style;
+				Int				 exstyle;
+				Bool				 modal;
+				Bool				 sysmodal;
+				Bool				 apptopmost;
+				Bool				 stay;
+				Bool				 maximized;
 
-				Bool		 created;
-				Bool		 destroyed;
+				Bool				 created;
+				Bool				 destroyed;
 
-				HBITMAP		 icon;
-				HICON		 sysicon;
+				HBITMAP				 icon;
+				HICON				 sysicon;
 
-				Rect		 offset;
-				Rect		 updateRect;
+				Rect				 offset;
+				Rect				 updateRect;
 
-				Size		 minSize;
+				Size				 minSize;
 
-				String		 className;
+				String				 className;
 
-				KillProcMember;
-				Void		*killProcParam;
-				MessageProcMember;
-				Void		*messageProcParam;
+				PopupMenu			*popupMenu;
 
-				PopupMenu	*popupMenu;
+				HDC				 windowDC;
 
-				HDC		 windowDC;
+				Layer				*mainLayer;
 
-				Layer		*mainLayer;
+				HWND				 Create();
+				Void				 CalculateOffsets();
 
-				HWND		 Create();
-				Void		 CalculateOffsets();
+				Bool				 DummyExitProc();
 			public:
-				static Int	 nOfActiveWindows;
-				Int		 value;
+				static Int			 nOfActiveWindows;
+				Int				 value;
 
-				HWND		 hwnd;
-				Bool		 cursorset;
-				Bool		 initshow;
+				HWND				 hwnd;
+				Bool				 cursorset;
+				Bool				 initshow;
 
-						 Window(String title = NIL);
-						~Window();
+								 Window(String title = NIL);
+								~Window();
 
-				Int		 SetMetrics(Point, Size);
-				Void		 SetPositionFlag(HWND);
-				Void		 SetStyle(Int);
-				Void		 SetExStyle(Int);
-				Int		 SetIcon(HBITMAP);
-				Int		 SetApplicationIcon(HICON);
-				Int		 SetApplicationIcon(Int);
-				Int		 SetText(String);
+				Int				 SetMetrics(Point, Size);
+				Void				 SetPositionFlag(HWND);
+				Void				 SetStyle(Int);
+				Void				 SetExStyle(Int);
+				Int				 SetIcon(HBITMAP);
+				Int				 SetApplicationIcon(HICON);
+				Int				 SetApplicationIcon(Int);
+				Int				 SetText(String);
 
-				Int		 SetStatusText(String);
-				String		 GetStatusText();
+				Int				 SetStatusText(String);
+				String				 GetStatusText();
 
-				Void		 SetKillProc(KillProcParam, Void *);
-				Void		 SetMessageProc(MessageProcParam, Void *);
+				Rect				 GetUpdateRect();
+				Int				 SetUpdateRect(Rect);
 
-				Rect		 GetUpdateRect();
-				Int		 SetUpdateRect(Rect);
+				Int				 SetMinimumSize(Size);
 
-				Int		 SetMinimumSize(Size);
+				Int				 Show();
+				Int				 Hide();
 
-				Int		 Show();
-				Int		 Hide();
+				Int				 Close();
 
-				Int		 Close();
+				Int				 Stay();
 
-				Int		 Stay();
+				Bool				 IsMaximized();
 
-				Bool		 IsMaximized();
+				Int				 Paint(Int);
+				Int				 Process(Int, Int, Int);
 
-				Int		 Paint(Int);
-				Int		 Process(Int, Int, Int);
+				Int				 RegisterObject(Object *);
+				Int				 UnregisterObject(Object *);
 
-				Int		 RegisterObject(Object *);
-				Int		 UnregisterObject(Object *);
+				static Window			*GetWindow(HWND);
 			signals:
-				Signal0<>	 onPaint;
-				Signal0<>	 onPeek;
+				Signal0<Void>			 onPaint;
+				Signal0<Void>			 onPeek;
+				Signal3<Void, Int, Int, Int>	 onEvent;
+			callbacks:
+				Callback0<Bool>			 doQuit;
 		};
 	};
 

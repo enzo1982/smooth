@@ -21,6 +21,7 @@ namespace smooth
 		class Window;
 		class ToolWindow;
 		class PopupView;
+		class Menubar;
 	};
 };
 
@@ -35,23 +36,24 @@ namespace smooth
 		const Int	 POPUP_FINISHED	= 1;
 		const Int	 POPUP_PENDING	= 2;
 
-		class SMOOTHAPI PopupMenu : public Widget, public Menu
+		class SMOOTHAPI PopupMenu : public Widget
 		{
 			friend class Window;
 			friend class PopupView;
+			friend class Menubar;
 			private:
 				ToolWindow	*toolwnd;
 				PopupView	*popupView;
 
 				PopupMenu	*prevPopup;
 				PopupMenu	*nextPopup;
+
+				Menu		*realMenu;
 			public:
 				static Int	 status;
 
-						 PopupMenu();
+						 PopupMenu(Menu *);
 				 		~PopupMenu();
-
-				Void		 MenuToPopup(Menu *);
 
 				Int		 Process(Int, Int, Int);
 

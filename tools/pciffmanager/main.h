@@ -25,7 +25,7 @@ class PCIFFManager : public Application
 		Titlebar	*title;
 		Menubar		*menubar;
 		Statusbar	*statusbar;
-		PopupMenu	*menu_file;
+		Menu		*menu_file;
 
 		String		 filename;
 

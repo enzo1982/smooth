@@ -316,8 +316,6 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 			{
 				timer = new Timer();
 
-				wnd->RegisterObject(timer);
-
 				timer->onInterval.Connect(&Scrollbar::TimerProc, this);
 				timer->Start(200);
 
@@ -587,17 +585,9 @@ S::Void S::GUI::Scrollbar::TimerProc()
 	if (!registered)		return;
 	if (!active || !visible)	return;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return;
-	if (wnd->hwnd == NIL) return;
-
 	if (!timerActive && timer != NIL)
 	{
 		timer->Stop();
-
-		wnd->UnregisterObject(timer);
 
 		delete timer;
 

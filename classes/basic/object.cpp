@@ -37,8 +37,6 @@ S::Object::Object()
 	subtype			= 0;
 
 	registered		= False;
-	visible			= False;
-	active			= True;
 
 	deleteObject		= False;
 	inUse			= 0;
@@ -75,112 +73,6 @@ S::Bool S::Object::IsObjectDeleteable()
 	return deleteObject;
 }
 
-S::Int S::Object::Show()
-{
-	if (visible)		return Success;
-
-	visible = True;
-
-	if (!registered)	return Success;
-
-	Paint(SP_PAINT);
-
-	return Success;
-}
-
-S::Int S::Object::Hide()
-{
-	if (!visible)		return Success;
-
-	visible = False;
-
-	if (!registered)	return Success;
-
-	Rect		 rect;
-	Point		 realPos = GetRealPosition();
-	GUI::Surface	*surface = myContainer->GetDrawSurface();
-
-	rect.left	= realPos.x;
-	rect.top	= realPos.y;
-	rect.right	= realPos.x + objectProperties->size.cx + 1;
-	rect.bottom	= realPos.y + objectProperties->size.cy + 1;
-
-	surface->Box(rect, Setup::BackgroundColor, FILLED);
-
-	return Success;
-}
-
-S::Int S::Object::Activate()
-{
-	if (active) return Success;
-
-	Bool	 prevVisible = visible;
-
-	if (registered && visible) Hide();
-
-	active = True;
-
-	if (registered && prevVisible) Show();
-
-	return Success;
-}
-
-S::Int S::Object::Deactivate()
-{
-	if (!active) return Success;
-
-	Bool	 prevVisible = visible;
-
-	if (registered && visible) Hide();
-
-	active = False;
-
-	if (registered && prevVisible) Show();
-
-	return Success;
-}
-
-S::Int S::Object::Paint(Int message)
-{
-	if (!registered)	return Error;
-	if (!visible)		return Success;
-
-	return Success;
-}
-
-S::Int S::Object::Process(Int message, Int wParam, Int lParam)
-{
-	if (!registered)		return Error;
-	if (!active || !visible)	return Success;
-
-	return Success;
-}
-
-S::Int S::Object::SetText(String newText)
-{
-	Bool	 prevVisible = visible;
-
-	if (registered && visible) Hide();
-
-	objectProperties->text = newText;
-
-	GetTextSize();
-
-	objectProperties->checked = False;
-	objectProperties->clicked = False;
-
-	if (registered && prevVisible) Show();
-
-	Process(SM_MOUSEMOVE, 0, 0);
-
-	return Success;
-}
-
-S::String S::Object::GetText()
-{
-	return objectProperties->text;
-}
-
 S::Int S::Object::SetTooltip(String newTooltip)
 {
 	objectProperties->tooltip = newTooltip;
@@ -195,85 +87,9 @@ S::String S::Object::GetTooltip()
 	return objectProperties->tooltip;
 }
 
-S::Int S::Object::SetFont(String newFont, Int newFontSize, Int newFontColor, Int newFontWeight)
-{
-	Bool	 prevVisible = visible;
-
-	if (registered && visible) Hide();
-
-	objectProperties->font = newFont;
-	objectProperties->fontColor = newFontColor;
-
-	HDC		 dc = GetContext(0);
-
-#ifdef __WIN32__
-	objectProperties->fontSize = -MulDiv(newFontSize, GetDeviceCaps(dc, LOGPIXELSY), 72);
-#endif
-
-	FreeContext(0, dc);
-
-	objectProperties->fontWeight = newFontWeight;
-
-	GetTextSize();
-
-	if (registered && prevVisible) Show();
-
-	return Success;
-}
-
-S::Int S::Object::SetOrientation(Int newOrientation)
-{
-	Bool	 prevVisible = visible;
-
-	if (registered && visible) Hide();
-
-	objectProperties->orientation = newOrientation;
-
-	if (registered && prevVisible) Show();
-
-	return Success;
-}
-
-S::Int S::Object::SetPosition(Point newPos)
-{
-	Bool	 prevVisible = visible;
-
-	if (registered && visible) Hide();
-
-	objectProperties->pos = newPos;
-
-	if (registered && prevVisible) Show();
-
-	return Success;
-}
-
-S::Int S::Object::SetMetrics(Point newPos, Size newSize)
-{
-	Bool	 prevVisible = visible;
-
-	if (registered && visible) Hide();
-
-	objectProperties->pos	= newPos;
-	objectProperties->size	= newSize;
-
-	if (registered && prevVisible) Show();
-
-	return Success;
-}
-
 S::Bool S::Object::IsRegistered()
 {
 	return registered;
-}
-
-S::Bool S::Object::IsVisible()
-{
-	return visible;
-}
-
-S::Bool S::Object::IsActive()
-{
-	return active;
 }
 
 S::Point S::Object::GetRealPosition()
@@ -357,6 +173,16 @@ S::Void S::Object::GetTextSize()
 #endif
 
 	FreeContext(0, dc);
+}
+
+S::Object *S::Object::GetObject(Int objectHandle, Int objectType)
+{
+	Object	*object = mainObjectManager->RequestObject(objectHandle);
+
+	if (object == NIL) return NIL;
+
+	if (object->GetObjectType() == objectType)	return object;
+	else						return NIL;
 }
 
 S::Int S::Object::DeleteObject(Object *object)

@@ -28,11 +28,11 @@ class Designer : public Application
 		Menubar				*menubar;
 		Menubar				*iconbar;
 		Statusbar			*statusbar;
-		PopupMenu			*menu_file;
-		PopupMenu			*menu_dialog;
-		PopupMenu			*menu_widgets;
-		PopupMenu			*menu_widgets_add;
-		PopupMenu			*menu_widgets_add_smooth;
+		Menu				*menu_file;
+		Menu				*menu_dialog;
+		Menu				*menu_widgets;
+		Menu				*menu_widgets_add;
+		Menu				*menu_widgets_add_smooth;
 
 		Timer				*timer1;
 

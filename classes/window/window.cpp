@@ -28,6 +28,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/menubar.h>
 #include <smooth/system.h>
+#include <smooth/mdiwindow.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -39,7 +40,7 @@ S::Int	 S::GUI::Window::nOfActiveWindows = 0;
 #ifdef __WIN32__
 LRESULT CALLBACK S::GUI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	Window	*smoothWindow = SMOOTH::GetWindow(window);
+	Window	*smoothWindow = Window::GetWindow(window);
 	Int	 retVal;
 	Int	 originalMessage = message;
 	Int	 param1 = wParam;
@@ -162,11 +163,6 @@ S::GUI::Window::Window(String title)
 	updateRect.right	= updateRect.left + objectProperties->size.cx;
 	updateRect.bottom	= updateRect.top + objectProperties->size.cy;
 
-	killProc		= NIL;
-	killProcParam		= NIL;
-	messageProc		= NIL;
-	messageProcParam	= NIL;
-
 	popupMenu = NIL;
 
 	mainLayer = new Layer();
@@ -177,6 +173,8 @@ S::GUI::Window::Window(String title)
 	minSize.cy = METRIC_TITLEBARHEIGHT + 5;
 
 	hwnd = NIL;
+
+	doQuit.Connect(&Window::DummyExitProc, this);
 }
 
 S::GUI::Window::~Window()
@@ -211,6 +209,11 @@ S::GUI::Window::~Window()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
+S::Bool S::GUI::Window::DummyExitProc()
+{
+	return True;
+}
+
 S::Int S::GUI::Window::SetMetrics(Point newPos, Size newSize)
 {
 	objectProperties->pos.x		= Math::Round(newPos.x * Setup::FontSize);
@@ -235,18 +238,6 @@ S::Void S::GUI::Window::SetPositionFlag(HWND pf)
 #ifdef __WIN32__
 	SetWindowPos(hwnd, pf, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 #endif
-}
-
-S::Void S::GUI::Window::SetKillProc(KillProcParam, Void *procParam)
-{
-	killProc = (KillProcType) newProc;
-	killProcParam = procParam;
-}
-
-S::Void S::GUI::Window::SetMessageProc(MessageProcParam, Void *procParam)
-{
-	messageProc = (MessageProcType) newProc;
-	messageProcParam = procParam;
 }
 
 S::Void S::GUI::Window::SetStyle(Int s)
@@ -361,7 +352,7 @@ S::Int S::GUI::Window::SetStatusText(String newStatus)
 
 		if (object->GetObjectType() == OBJ_STATUSBAR)
 		{
-			object->SetText(newStatus);
+			((Statusbar *) object)->SetText(newStatus);
 
 			return Success;
 		}
@@ -380,7 +371,7 @@ S::String S::GUI::Window::GetStatusText()
 
 		if (object->GetObjectType() == OBJ_STATUSBAR)
 		{
-			return object->GetText();
+			return ((Statusbar *) object)->GetText();
 		}
 	}
 
@@ -568,17 +559,16 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 	Rect	 rect;
 	HWND	 act;
 	Menubar	*menubar = NIL;
-	int	 i;
+	Int	 i;
 
+	Object	*object;
 
 #ifdef __WIN32__
 	PAINTSTRUCT	 ps;
 	WINDOWPOS	*wndpos;
 #endif
 
-	Object	*operat;
-
-	if (!(message == SM_MOUSEMOVE && wParam == 1)) MessageProcCall(messageProc, messageProcParam, message, wParam, lParam);
+	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);
 
 	switch (message)
 	{
@@ -604,7 +594,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				Bool	 deletePopup = True;
 				HWND	 activeWindow = (HWND) wParam;
 
-				if (SMOOTH::GetWindow(activeWindow) != NIL)
+				if (GetWindow(activeWindow) != NIL)
 				{
 					PopupMenu	*popup = popupMenu;
 
@@ -655,7 +645,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			return 0;
 		case WM_CLOSE:
-			if (KillProcCall(killProc, killProcParam))
+			if (doQuit.Call())
 			{
 				delete drawSurface;
 
@@ -674,7 +664,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_DESTROY:
 			destroyed = True;
 
-			if (nOfActiveWindows == 1 && loopActive)
+			if (nOfActiveWindows == 0 && loopActive)
 			{
 				if (Setup::enableUnicode)	SendMessageW(hwnd, WM_QUIT, 0, 0);
 				else				SendMessageA(hwnd, WM_QUIT, 0, 0);
@@ -768,11 +758,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case SM_RBUTTONDOWN:
 			for (i = 0; i < nOfObjects; i++)
 			{
-				operat = assocObjects.GetNthEntry(i);
+				object = assocObjects.GetNthEntry(i);
 
-				if (operat->GetObjectType() == OBJ_MENUBAR)
+				if (object->GetObjectType() == OBJ_MENUBAR)
 				{
-					menubar = (Menubar *) operat;
+					menubar = (Menubar *) object;
 
 					break;
 				}
@@ -793,12 +783,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 					DeleteObject(popup);
 				}
 
-				popup = new PopupMenu();
+				popup = new PopupMenu(menubar);
 
 				popup->GetObjectProperties()->pos.x = MouseX(hwnd, WINDOW);
 				popup->GetObjectProperties()->pos.y = MouseY(hwnd, WINDOW);
-
-				popup->MenuToPopup(menubar);
 
 				RegisterObject(popup);
 
@@ -836,20 +824,20 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				act = GetForegroundWindow();
 
-				if (SMOOTH::GetWindow(act) == 0) SetForegroundWindow(hwnd);
-				else if (SMOOTH::GetWindow(act)->type == OBJ_TOOLWINDOW) break;
-				else if (act != hwnd && SMOOTH::GetWindow(act)->sysmodal == False && SMOOTH::GetWindow(act)->modal == False) SetForegroundWindow(hwnd);
-				else if (act != hwnd && SMOOTH::GetWindow(act)->handle < handle) SetForegroundWindow(hwnd);
+				if (GetWindow(act) == 0) SetForegroundWindow(hwnd);
+				else if (GetWindow(act)->type == OBJ_TOOLWINDOW) break;
+				else if (act != hwnd && GetWindow(act)->sysmodal == False && GetWindow(act)->modal == False) SetForegroundWindow(hwnd);
+				else if (act != hwnd && GetWindow(act)->handle < handle) SetForegroundWindow(hwnd);
 			}
 			else if (modal)
 			{
 				act = GetActiveWindow();
 
-				if (SMOOTH::GetWindow(act) == 0) break;
-				else if (SMOOTH::GetWindow(act)->type == OBJ_TOOLWINDOW) break;
+				if (GetWindow(act) == 0) break;
+				else if (GetWindow(act)->type == OBJ_TOOLWINDOW) break;
 
-				if (act != hwnd && SMOOTH::GetWindow(act)->modal == False && SMOOTH::GetWindow(act)->sysmodal == False) SetActiveWindow(hwnd);
-				else if (act != hwnd && SMOOTH::GetWindow(act)->handle < handle) SetActiveWindow(hwnd);
+				if (act != hwnd && GetWindow(act)->modal == False && GetWindow(act)->sysmodal == False) SetActiveWindow(hwnd);
+				else if (act != hwnd && GetWindow(act)->handle < handle) SetActiveWindow(hwnd);
 			}
 			break;
 		case WM_GETMINMAXINFO:
@@ -870,15 +858,18 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	for (i = nOfObjects - 1; i >= 0; i--)
 	{
-		operat = assocObjects.GetNthEntry(i);
+		object = assocObjects.GetNthEntry(i);
 
-		if (operat == NIL) continue;
+		if (object == NIL) continue;
 
-		if (operat->Process(message, wParam, lParam) == Break)
+		if (object->GetObjectType() == OBJ_WIDGET)
 		{
-			LeaveProtectedRegion();
+			if (((Widget *) object)->Process(message, wParam, lParam) == Break)
+			{
+				LeaveProtectedRegion();
 
-			return 0;
+				return 0;
+			}
 		}
 	}
 
@@ -891,8 +882,8 @@ S::Int S::GUI::Window::Paint(Int message)
 {
 	EnterProtectedRegion();
 
-	Object	*operat;
-	Object	*lastoperat = NIL;
+	Object	*object;
+	Object	*lastobject = NIL;
 	HDC	 dc;
 	Point	 doublebar1;
 	Point	 doublebar2;
@@ -907,21 +898,21 @@ S::Int S::GUI::Window::Paint(Int message)
 	{
 		dc = GetContext(this);
 
-		for (int i = 0; i < nOfObjects; i++)
+		for (Int i = 0; i < nOfObjects; i++)
 		{
-			operat = assocObjects.GetNthEntry(i);
+			object = assocObjects.GetNthEntry(i);
 
-			if (operat->GetObjectProperties()->orientation == OR_TOP)
+			if (object->GetObjectProperties()->orientation == OR_TOP)
 			{
 				topobjcount++;
 
-				lastoperat = operat;
+				lastobject = object;
 
-				if (operat->subtype == WO_SEPARATOR)
+				if (object->subtype == WO_SEPARATOR)
 				{
 					bias = -3;
 
-					topoffset += operat->GetObjectProperties()->size.cy + 3;
+					topoffset += object->GetObjectProperties()->size.cy + 3;
 
 					doublebar1.x = 4;
 					doublebar1.y = topoffset - 2;
@@ -936,18 +927,18 @@ S::Int S::GUI::Window::Paint(Int message)
 				{
 					bias = 0;
 
-					topoffset += operat->GetObjectProperties()->size.cy;
+					topoffset += object->GetObjectProperties()->size.cy;
 				}
 			}
-			else if (operat->GetObjectProperties()->orientation == OR_BOTTOM)
+			else if (object->GetObjectProperties()->orientation == OR_BOTTOM)
 			{
 				btmobjcount++;
 			}
-			else if (operat->GetObjectProperties()->orientation == OR_LEFT)
+			else if (object->GetObjectProperties()->orientation == OR_LEFT)
 			{
 				leftobjcount++;
 			}
-			else if (operat->GetObjectProperties()->orientation == OR_RIGHT)
+			else if (object->GetObjectProperties()->orientation == OR_RIGHT)
 			{
 				rightobjcount++;
 			}
@@ -959,7 +950,7 @@ S::Int S::GUI::Window::Paint(Int message)
 			doublebar1.y = offset.top - 2 + bias;
 			doublebar2.x = objectProperties->size.cx - 4;
 
-			if (topobjcount > 0) if (lastoperat->subtype == WO_NOSEPARATOR) doublebar1.y -= 3;
+			if (topobjcount > 0) if (lastobject->subtype == WO_NOSEPARATOR) doublebar1.y -= 3;
 
 			doublebar2.y = doublebar1.y;
 
@@ -1008,11 +999,14 @@ S::Int S::GUI::Window::Paint(Int message)
 
 		for (int j = 0; j < nOfObjects; j++)
 		{
-			operat = assocObjects.GetNthEntry(j);
+			object = assocObjects.GetNthEntry(j);
 
-			if (operat == NIL) continue;
+			if (object == NIL) continue;
 
-			if (operat->IsVisible() && Affected(operat, updateRect)) operat->Paint(SP_PAINT);
+			if (object->GetObjectType() == OBJ_WIDGET)
+			{
+				if (((Widget *) object)->IsVisible() && Affected(object, updateRect)) ((Widget *) object)->Paint(SP_PAINT);
+			}
 		}
 
 		onPaint.Emit();
@@ -1174,7 +1168,10 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 
 			CalculateOffsets();
 
-			object->Show();
+			if (object->GetObjectType() == OBJ_WIDGET)
+			{
+				((Widget *) object)->Show();
+			}
 
 			return Success;
 		}
@@ -1199,7 +1196,10 @@ S::Int S::GUI::Window::UnregisterObject(Object *object)
 			{
 				nOfObjects--;
 
-				object->Hide();
+				if (object->GetObjectType() == OBJ_WIDGET)
+				{
+					((Widget *) object)->Hide();
+				}
 
 				if (object->GetObjectType() == OBJ_POPUP)
 				{
@@ -1221,4 +1221,24 @@ S::Int S::GUI::Window::UnregisterObject(Object *object)
 	}
 
 	return Error;
+}
+
+S::GUI::Window *S::GUI::Window::GetWindow(HWND hwnd)
+{
+	Window	*window;
+
+	for (int i = 0; i < Object::objectCount; i++)
+	{
+		window = (Window *) mainObjectManager->RequestObject(i);
+
+		if (window != NIL)
+		{
+			if (window->GetObjectType() == OBJ_WINDOW || window->GetObjectType() == OBJ_MDIWINDOW || window->GetObjectType() == OBJ_TOOLWINDOW)
+			{
+				if (window->hwnd == hwnd) return window;
+			}
+		}
+	}
+
+	return NIL;
 }

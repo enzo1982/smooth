@@ -30,15 +30,11 @@ S::Mutex::Mutex()
 
 S::Mutex::~Mutex()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
-
 	LiSAMutexCloseHandle(mutex);
 }
 
 S::Int S::Mutex::Lock()
 {
-	if (!registered) return Error;
-
 	LiSAMutexLock(mutex);
 
 	return Success;
@@ -46,8 +42,6 @@ S::Int S::Mutex::Lock()
 
 S::Int S::Mutex::Release()
 {
-	if (!registered) return Error;
-
 	LiSAMutexRelease(mutex);
 
 	return Success;

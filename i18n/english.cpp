@@ -94,7 +94,6 @@ void S::ActivateEnglishLanguage()
 
 	TXT_SPLASHSCREEN = "Splash screen";
 
-	TXT_SMOOTHBACKGROUNDAPPLICATION = "smooth Background Application";
 	TXT_SMOOTHTOOLWINDOW = "smooth::ToolWindow";
 
 	String::SetInputFormat(inputFormat);

@@ -30,15 +30,11 @@ S::Semaphore::Semaphore()
 
 S::Semaphore::~Semaphore()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
-
 	LiSASemaphoreCloseHandle(semaphore);
 }
 
 S::Int S::Semaphore::Wait()
 {
-	if (!registered) return Error;
-
 	LiSASemaphoreWait(semaphore);
 
 	return Success;
@@ -46,8 +42,6 @@ S::Int S::Semaphore::Wait()
 
 S::Int S::Semaphore::Release()
 {
-	if (!registered) return Error;
-
 	LiSASemaphoreRelease(semaphore);
 
 	return Success;

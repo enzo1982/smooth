@@ -18,43 +18,13 @@
 #include <smooth/object.h>
 #include <smooth/version.h>
 #include <smooth/loop.h>
-#include <smooth/mdiwindow.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
 #include <smooth/divider.h>
 #include <smooth/pciio.h>
+#include <smooth/mdiwindow.h>
 
 S::String S::SMOOTH::StartDirectory = NIL;
-
-S::Object *S::SMOOTH::GetObject(Int objectHandle, Int objectType)
-{
-	Object	*retVal = mainObjectManager->RequestObject(objectHandle);
-
-	if (retVal == NIL) return NIL;
-
-	if (retVal->GetObjectType() == objectType)	return retVal;
-	else						return NIL;
-}
-
-S::GUI::Window *S::SMOOTH::GetWindow(HWND wnd)
-{
-	GUI::Window	*rval;
-
-	for (int i = 0; i < Object::objectCount; i++)
-	{
-		rval = (GUI::Window *) mainObjectManager->RequestObject(i);
-
-		if (rval != (GUI::Window *) NIL)
-		{
-			if (rval->type == OBJ_WINDOW || rval->type == OBJ_MDIWINDOW || rval->type == OBJ_TOOLWINDOW)
-			{
-				if (rval->hwnd == wnd) return rval;
-			}
-		}
-	}
-
-	return NIL;
-}
 
 S::Bool S::SMOOTH::SetStartDirectory(String dir)
 {
@@ -83,7 +53,7 @@ S::Void S::SMOOTH::SendMessage(GUI::Window *window, Int message, Int wParam, Int
 			{
 				if (object->GetObjectType() == OBJ_WINDOW || object->GetObjectType() == OBJ_MDIWINDOW || object->GetObjectType() == OBJ_TOOLWINDOW)
 				{
-					object->Process(message, wParam, lParam);
+					((GUI::Window *) object)->Process(message, wParam, lParam);
 				}
 			}
 		}

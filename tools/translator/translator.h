@@ -34,7 +34,7 @@ class Translator : public Application
 		Titlebar	*title;
 		Menubar		*menubar;
 		Statusbar	*statusbar;
-		PopupMenu	*menu_file;
+		Menu		*menu_file;
 
 		Button		*button_new;
 		Text		*text_id;
@@ -57,7 +57,6 @@ class Translator : public Application
 		Void		 SaveFileWithName(String);
 		Void		 NewFile();
 		Void		 Close();
-		Void		 CloseApp();
 		Void		 CloseFile();
 		Void		 SaveData();
 		Void		 SelectEntry();

@@ -35,28 +35,28 @@ namespace smooth
 	class SMOOTHAPI DialogColorSelection : public Dialog
 	{
 		private:
-			int		 color;
+			Int		 color;
 
-			int		 yoffset;
-			int		 huexoffset;
-			int		 ncxoffset;
-			int		 ocxoffset;
-			int		 crsizex;
-			int		 crsizey;
+			Int		 yoffset;
+			Int		 huexoffset;
+			Int		 ncxoffset;
+			Int		 ocxoffset;
+			Int		 crsizex;
+			Int		 crsizey;
 
-			bool		 huecapt;
-			bool		 vscapt;
+			Bool		 huecapt;
+			Bool		 vscapt;
 
-			bool		 forcehupdate;
-			bool		 forcevsupdate;
-			bool		 preventhupdate;
-			bool		 preventvsupdate;
-			bool		 updatetext;
-			bool		 updatehextext;
+			Bool		 forcehupdate;
+			Bool		 forcevsupdate;
+			Bool		 preventhupdate;
+			Bool		 preventvsupdate;
+			Bool		 updatetext;
+			Bool		 updatehextext;
 
-			int		 lasthue;
-			int		 lastsat;
-			int		 lastval;
+			Int		 lasthue;
+			Int		 lastsat;
+			Int		 lastval;
 
 			Int		 acthue;
 			Int		 actsat;
@@ -65,7 +65,7 @@ namespace smooth
 			Int		 actgreen;
 			Int		 actblue;
 
-			int		 colortable[256][256];
+			Int		 colortable[256][256];
 
 			String		 hexval;
 
@@ -95,28 +95,28 @@ namespace smooth
 			GUI::EditBox	*blueedit;
 			GUI::EditBox	*hexedit;
 
-			void		 ColorDlgUpdateHexValue();
-			void		 ColorDlgHexValueChanged();
+			Void		 ColorDlgUpdateHexValue();
+			Void		 ColorDlgHexValueChanged();
 
-			void		 ColorDlgPaintProc();
-			void		 ColorDlgMessageProc(Int, Int, Int);
-			void		 ColorDlgUpdatePickers();
+			Void		 ColorDlgPaintProc();
+			Void		 ColorDlgMessageProc(Int, Int, Int);
+			Void		 ColorDlgUpdatePickers();
 			Bool		 ColorDlgKillProc();
-			void		 ColorDlgOK();
-			void		 ColorDlgCancel();
-			void		 ColorDlgHueSlider();
-			void		 ColorDlgSatSlider();
-			void		 ColorDlgValSlider();
-			void		 ColorDlgRedSlider();
-			void		 ColorDlgGreenSlider();
-			void		 ColorDlgBlueSlider();
-			void		 ColorDlgHueEdit();
-			void		 ColorDlgSatEdit();
-			void		 ColorDlgValEdit();
-			void		 ColorDlgRedEdit();
-			void		 ColorDlgGreenEdit();
-			void		 ColorDlgBlueEdit();
-			void		 ColorDlgHexEdit();
+			Void		 ColorDlgOK();
+			Void		 ColorDlgCancel();
+			Void		 ColorDlgHueSlider();
+			Void		 ColorDlgSatSlider();
+			Void		 ColorDlgValSlider();
+			Void		 ColorDlgRedSlider();
+			Void		 ColorDlgGreenSlider();
+			Void		 ColorDlgBlueSlider();
+			Void		 ColorDlgHueEdit();
+			Void		 ColorDlgSatEdit();
+			Void		 ColorDlgValEdit();
+			Void		 ColorDlgRedEdit();
+			Void		 ColorDlgGreenEdit();
+			Void		 ColorDlgBlueEdit();
+			Void		 ColorDlgHexEdit();
 		public:
 					 DialogColorSelection();
 					~DialogColorSelection();

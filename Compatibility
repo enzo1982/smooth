@@ -1,7 +1,8 @@
 Status of smooth ports
 ----------------------
 
-MinGW32		all versions	complete support
+MinGW 1.x	all versions	complete support
+MinGW 2.0	in the works	not supported, yet
 MSVC		since 0.8.58.0	complete support
 Linux GCC	in the works	no GUI support (supported: threads, strings, primitives, arrays, xml)
 QNX 6.1 GCC	in the works	no GUI support (supported: threads, strings, primitives, arrays, xml)

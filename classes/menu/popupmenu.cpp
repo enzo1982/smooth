@@ -25,7 +25,7 @@ __declspec (dllexport)
 S::Int	 S::OBJ_POPUP = S::Object::RequestObjectID();
 S::Int	 S::GUI::PopupMenu::status = POPUP_NORMAL;
 
-S::GUI::PopupMenu::PopupMenu()
+S::GUI::PopupMenu::PopupMenu(Menu *menu)
 {
 	type				= OBJ_POPUP;
 	objectProperties->orientation	= OR_FREE;
@@ -37,6 +37,8 @@ S::GUI::PopupMenu::PopupMenu()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 
 	status = POPUP_NORMAL;
+
+	realMenu = menu;
 }
 
 S::GUI::PopupMenu::~PopupMenu()
@@ -62,15 +64,15 @@ S::Int S::GUI::PopupMenu::Show()
 
 	EnterProtectedRegion();
 
-	GetSize();
+	realMenu->GetSize();
 
-	if (objectProperties->pos.x + popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) objectProperties->pos.x = LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x - popupsize.cx - 1;
-	if (objectProperties->pos.y + popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) objectProperties->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - popupsize.cy - 1;
+	if (objectProperties->pos.x + realMenu->popupsize.cx >= LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x) objectProperties->pos.x = LiSAGetDisplaySizeX() - wnd->GetObjectProperties()->pos.x - realMenu->popupsize.cx - 1;
+	if (objectProperties->pos.y + realMenu->popupsize.cy >= LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y) objectProperties->pos.y = LiSAGetDisplaySizeY() - wnd->GetObjectProperties()->pos.y - realMenu->popupsize.cy - 1;
 
 	visible = True;
 
 	toolwnd		= new ToolWindow();
-	popupView	= new PopupView(this);
+	popupView	= new PopupView(this, realMenu);
 
 	toolwnd->SetOwner(this);
 
@@ -78,7 +80,7 @@ S::Int S::GUI::PopupMenu::Show()
 
 	SetMeasurement(SMT_PIXELS);
 
-	toolwnd->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y), Size(popupsize.cx + 1, popupsize.cy + 1));
+	toolwnd->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y), Size(realMenu->popupsize.cx + 1, realMenu->popupsize.cy + 1));
 
 	Setup::FontSize = oldMeasurement;
 
@@ -153,18 +155,4 @@ S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 	LeaveProtectedRegion();
 
 	return retVal;
-}
-
-S::Void S::GUI::PopupMenu::MenuToPopup(Menu *menu)
-{
-	for (Int i = 0; i < menu->entries.GetNOfEntries(); i++)
-	{
-		Menu::Entry	*entry		= menu->entries.GetNthEntry(i);
-		Menu::Entry	*newEntry	= AddEntry(entry->text, entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->orientation);
-
-		newEntry->tooltip = entry->tooltip;
-		newEntry->description = entry->description;
-
-		newEntry->onClick = *(new Signal0<>(entry->onClick));
-	}
 }

@@ -38,7 +38,7 @@ namespace smooth
 						 Entry(Int);
 						~Entry();
 			signals:
-				Signal0<>	 onClick;
+				Signal0<Void>	 onClick;
 		};
 
 		protected:

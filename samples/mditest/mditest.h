@@ -24,7 +24,7 @@ class MDITest : public Application
 		Statusbar	*mainWnd_statusbar;
 		MDIClient	*mainWnd_client;
 		Menubar		*mainWnd_menubar;
-		PopupMenu	*menu_file;
+		Menu		*menu_file;
 	public:
 				 MDITest();
 				~MDITest();

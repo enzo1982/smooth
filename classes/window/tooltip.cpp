@@ -44,8 +44,6 @@ S::GUI::Tooltip::~Tooltip()
 	{
 		timer->Stop();
 
-		if (timer->IsRegistered() && timer->GetContainer() != NIL) timer->GetContainer()->UnregisterObject(timer);
-
 		DeleteObject(timer);
 	}
 
@@ -115,8 +113,6 @@ S::Int S::GUI::Tooltip::Show()
 	{
 		timer = new Timer();
 
-		wnd->RegisterObject(timer);
-
 		timer->onInterval.Connect(&Tooltip::TimerProc, this);
 		timer->Start(timeOut);
 	}
@@ -181,8 +177,6 @@ S::Void S::GUI::Tooltip::TimerProc()
 	Hide();
 
 	timer->Stop();
-
-	if (timer->IsRegistered() && timer->GetContainer() != NIL) timer->GetContainer()->UnregisterObject(timer);
 
 	DeleteObject(timer);
 

@@ -14,11 +14,6 @@
 namespace smooth
 {
 	class Timer;
-
-	namespace GUI
-	{
-		class Window;
-	};
 };
 
 #include "object.h"
@@ -28,7 +23,6 @@ namespace smooth
 	class SMOOTHAPI Timer : public Object
 	{
 		private:
-			GUI::Window	*timerwnd;
 			Int		 timerid;
 		public:
 					 Timer();
@@ -38,14 +32,11 @@ namespace smooth
 			Int		 Stop();
 
 			Int		 GetID();
-
-			Int		 Process(Int, Int, Int);
-
-			Int		 Show();
-			Int		 Hide();
 		signals:
-			Signal0<>	 onInterval;
+			Signal0<Void>	 onInterval;
 	};
+
+	Void WINAPI TimerProc(HWND, unsigned int, unsigned int, unsigned long);
 
 	SMOOTHVAR Int OBJ_TIMER;
 };

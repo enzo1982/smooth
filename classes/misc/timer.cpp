@@ -8,12 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/object.h>
 #include <smooth/timer.h>
-#include <smooth/toolkit.h>
-#include <smooth/stk.h>
-#include <smooth/system.h>
-#include <smooth/objectproperties.h>
+#include <smooth/objectmanager.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -25,96 +21,58 @@ S::Timer::Timer()
 {
 	type = OBJ_TIMER;
 
-	timerid = 0;
-	timerwnd = NIL;
-
-	objectProperties->orientation = OR_FREE;
-
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	timerid = -1;
 }
 
 S::Timer::~Timer()
 {
 	Stop();
-
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
-}
-
-S::Int S::Timer::Show()
-{
-	return Error;
-}
-
-S::Int S::Timer::Hide()
-{
-	return Error;
 }
 
 S::Int S::Timer::Start(Int interval)
 {
-	if (!registered)	return Error;
-	if (timerid != 0)	return Error;
+	if (timerid != -1) return Error;
 
-	timerwnd	= (GUI::Window *) myContainer->GetContainerObject();
-	timerid		= System::RequestGUID();
-
-	if (timerwnd == NIL) return Error;
-
-#ifdef __WIN32__
-	SetTimer(timerwnd->hwnd, timerid, interval, NIL);
+	timerid = SetTimer(NIL, 0, interval, &TimerProc);
 
 	return timerid;
-#else
-	return Error;
-#endif
 }
 
 S::Int S::Timer::Stop()
 {
-	if (!registered)	return Error;
-	if (timerid == 0)	return Error;
+	if (timerid == -1) return Error;
 
-#ifdef __WIN32__
-	KillTimer(timerwnd->hwnd, timerid);
+	KillTimer(NIL, timerid);
 
-	timerid = 0;
+	timerid = -1;
 
 	return Success;
-#else
-	return Error;
-#endif
 }
 
 S::Int S::Timer::GetID()
 {
-	if (!registered)	return Error;
-	if (timerid == 0)	return Error;
+	if (timerid == -1) return Error;
 
 	return timerid;
 }
 
-S::Int S::Timer::Process(Int message, Int wParam, Int lParam)
+S::Void WINAPI S::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
 {
-	if (!registered)	return Error;
-	if (!active)		return Success;
-
-	EnterProtectedRegion();
-
-	Int	 retVal = Success;
-
-	switch (message)
+	for (Int i = 0; i < Object::objectCount; i++)
 	{
-		case SM_TIMER:
-			if (wParam == timerid)
+		Object *object = mainObjectManager->RequestObject(i);
+
+		if (object != NIL)
+		{
+			if (object->GetObjectType() == OBJ_TIMER)
 			{
-				onInterval.Emit();
+				if (((Timer *) object)->GetID() == (signed int) timerid)
+				{
+					((Timer *) object)->onInterval.Emit();
 
-				retVal = Break;
+					return;
+				}
 			}
-			break;
+		}
 	}
-
-	LeaveProtectedRegion();
-
-	return retVal;
 }

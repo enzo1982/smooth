@@ -24,7 +24,7 @@
 
 using namespace smooth::GUI;
 
-int S::SplashScreenApp::nOfSplashScreens = 0;
+S::Int S::SplashScreenApp::nOfSplashScreens = 0;
 
 S::Int S::SMOOTH::SplashScreen(HBITMAP logo, Int time)
 {
@@ -38,7 +38,7 @@ S::Int S::SMOOTH::SplashScreen(HBITMAP logo, Int time)
 	return rVal;
 }
 
-S::SplashScreenApp::SplashScreenApp(HBITMAP logo, int t)
+S::SplashScreenApp::SplashScreenApp(HBITMAP logo, Int t)
 {
 	splashscreen = new Window(TXT_SPLASHSCREEN);
 
@@ -56,7 +56,7 @@ S::SplashScreenApp::SplashScreenApp(HBITMAP logo, int t)
 	splashscreen->RegisterObject(timer);
 
 	splashscreen->onPaint.Connect(&SplashScreenApp::SplashPaintProc, this);
-	splashscreen->SetKillProc(KillProc(&SplashScreenApp::SplashKillProc), this);
+	splashscreen->doQuit.Connect(&SplashScreenApp::SplashKillProc, this);
 
 	splashscreen->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - splashscreen->GetObjectProperties()->size.cx) / 2;
 	splashscreen->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - splashscreen->GetObjectProperties()->size.cy) / 2-40;
@@ -80,7 +80,7 @@ S::SplashScreenApp::~SplashScreenApp()
 	DeleteObject(timer);
 }
 
-int S::SplashScreenApp::ShowSplashScreen()
+S::Int S::SplashScreenApp::ShowSplashScreen()
 {
 	int	 rval;
 
@@ -97,7 +97,7 @@ int S::SplashScreenApp::ShowSplashScreen()
 	return rval;
 }
 
-void S::SplashScreenApp::SplashPaintProc()
+S::Void S::SplashScreenApp::SplashPaintProc()
 {
 	HDC	 dc = GetContext(splashscreen);
 	Rect	 bmprect;
@@ -112,7 +112,7 @@ void S::SplashScreenApp::SplashPaintProc()
 	FreeContext(splashscreen, dc);
 }
 
-bool S::SplashScreenApp::SplashKillProc()
+S::Bool S::SplashScreenApp::SplashKillProc()
 {
 	if (splashscreen->value == 0) splashscreen->value = Success;
 
@@ -120,10 +120,10 @@ bool S::SplashScreenApp::SplashKillProc()
 
 	nOfSplashScreens--;
 
-	return true;
+	return True;
 }
 
-void S::SplashScreenApp::TimerProc()
+S::Void S::SplashScreenApp::TimerProc()
 {
 	if (splashscreen->value == 1)
 	{

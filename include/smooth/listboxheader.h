@@ -41,6 +41,8 @@ namespace smooth
 
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);
+
+				Int		 UpdateMetrics();
 		};
 	};
 

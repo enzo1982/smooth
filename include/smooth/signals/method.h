@@ -13,20 +13,10 @@
 
 namespace smooth
 {
-	class Method;
-};
-
-#include "../definitions.h"
-
-namespace smooth
-{
 	class Method
 	{
 		public:
-			virtual ~Method()
-			{
-			}
-
+			virtual		~Method() {}
 			virtual Method	*Copy() = 0;
 	};
 };

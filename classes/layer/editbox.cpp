@@ -191,8 +191,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				{
 					timer->Stop();
 
-					wnd->UnregisterObject(timer);
-
 					delete timer;
 
 					timer = NIL;
@@ -242,8 +240,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				if (timer != NIL)
 				{
 					timer->Stop();
-
-					wnd->UnregisterObject(timer);
 
 					delete timer;
 
@@ -364,8 +360,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				}
 
 				timer = new Timer();
-
-				wnd->RegisterObject(timer);
 
 				timer->onInterval.Connect(&EditBox::TimerProc, this);
 				timer->Start(500);
@@ -731,15 +725,7 @@ S::Int S::GUI::EditBox::Deactivate()
 	{
 		if (timer != NIL)
 		{
-			Layer	*layer = (Layer *) myContainer->GetContainerObject();
-			Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-			if (wnd == NIL) return Object::Deactivate();
-			if (wnd->hwnd == NIL) return Object::Deactivate();
-
 			timer->Stop();
-
-			wnd->UnregisterObject(timer);
 
 			delete timer;
 
@@ -749,7 +735,7 @@ S::Int S::GUI::EditBox::Deactivate()
 		objectProperties->clicked = False;
 	}
 
-	return Object::Deactivate();
+	return Widget::Deactivate();
 }
 
 S::Int S::GUI::EditBox::SetText(String txt)

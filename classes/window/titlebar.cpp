@@ -99,9 +99,9 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	}
 	else
 	{
-		if (SMOOTH::GetWindow(GetActiveWindow()) != NIL)
+		if (Window::GetWindow(GetActiveWindow()) != NIL)
 		{
-			if (SMOOTH::GetWindow(GetActiveWindow())->type == OBJ_TOOLWINDOW)
+			if (Window::GetWindow(GetActiveWindow())->type == OBJ_TOOLWINDOW)
 			{
 				paintactive = True;
 			}

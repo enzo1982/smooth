@@ -47,6 +47,19 @@ S::Int S::GUI::ListBoxHeader::AddTab(String tabName, Int iTabWidth)
 {
 	tabNames.AddEntry(tabName);
 	tabWidths.AddEntry(iTabWidth);
+
+	return Success;
+}
+
+S::Int S::GUI::ListBoxHeader::UpdateMetrics()
+{
+	objectProperties->pos.x = listBox->GetObjectProperties()->pos.x + 1;
+	objectProperties->pos.y = listBox->GetObjectProperties()->pos.y + 1;
+
+	objectProperties->size.cx = listBox->GetObjectProperties()->size.cx - 3;
+	objectProperties->size.cy = METRIC_LISTBOXENTRYHEIGHT;
+
+	return Success;
 }
 
 S::Int S::GUI::ListBoxHeader::Paint(Int message)

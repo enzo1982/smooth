@@ -189,7 +189,7 @@ S::Int S::Loop()
 
 			if (result)
 			{
-				if (GUI::Window::nOfActiveWindows == 1)
+				if (GUI::Window::nOfActiveWindows == 0)
 				{
 					msg.message = WM_QUIT;
 					break;
@@ -221,7 +221,7 @@ S::Int S::Loop()
 
 			if (!result) break;
 
-			if (GUI::Window::nOfActiveWindows == 1)
+			if (GUI::Window::nOfActiveWindows == 0)
 			{
 				msg.message = WM_QUIT;
 				break;

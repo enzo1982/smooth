@@ -10,28 +10,16 @@
 
 #include <smooth/background.h>
 #include <smooth/objectmanager.h>
-#include <smooth/i18n.h>
 #include <smooth/window.h>
 #include <smooth/timer.h>
-#include <smooth/stk.h>
 
 S::BackgroundApplication	*S::backgroundApplication = NIL;
 
 S::BackgroundApplication::BackgroundApplication()
 {
-	SetText(TXT_SMOOTHBACKGROUNDAPPLICATION);
-
-	backgroundWindow	= new GUI::Window(TXT_SMOOTHBACKGROUNDAPPLICATION);
-	backgroundTimer		= new Timer();
-
-	RegisterObject(backgroundWindow);
-
-	backgroundWindow->RegisterObject(backgroundTimer);
+	backgroundTimer = new Timer();
 
 	backgroundTimer->onInterval.Connect(&BackgroundApplication::TimerProc, this);
-
-	backgroundWindow->Hide();
-
 	backgroundTimer->Start(10);
 }
 
@@ -39,12 +27,6 @@ S::BackgroundApplication::~BackgroundApplication()
 {
 	backgroundTimer->Stop();
 
-	backgroundWindow->Close();
-	backgroundWindow->UnregisterObject(backgroundTimer);
-
-	UnregisterObject(backgroundWindow);
-
-	delete backgroundWindow;
 	delete backgroundTimer;
 }
 
@@ -70,7 +52,7 @@ S::Void S::BackgroundApplication::TimerProc()
 				}
 				else if (object->GetObjectType() == OBJ_WINDOW)
 				{
-					object->Process(SM_MOUSEMOVE, 1, 0);
+					((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
 				}
 			}
 		}

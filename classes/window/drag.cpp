@@ -120,8 +120,8 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 
 							EndPaint(msg.hwnd, &ps);
 
-							SMOOTH::GetWindow(msg.hwnd)->SetUpdateRect(updateRect);
-							SMOOTH::GetWindow(msg.hwnd)->Paint(SP_PAINT);
+							Window::GetWindow(msg.hwnd)->SetUpdateRect(updateRect);
+							Window::GetWindow(msg.hwnd)->Paint(SP_PAINT);
 						}
 						else
 						{

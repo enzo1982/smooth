@@ -18,6 +18,8 @@ namespace smooth
 		class PopupView;
 		class PopupMenu;
 	};
+
+	class Menu;
 };
 
 #include "widget.h"
@@ -32,8 +34,9 @@ namespace smooth
 				String		 backupStatusText;
 			protected:
 				PopupMenu	*myPopup;
+				Menu		*realMenu;
 			public:
-						 PopupView(PopupMenu *);
+						 PopupView(PopupMenu *, Menu *);
 						~PopupView();
 
 				Int		 Process(Int, Int, Int);

@@ -78,11 +78,7 @@ S::GUI::Button::~Button()
 			tooltip = NIL;
 		}
 
-		wnd = (Window *) tipTimer->GetContainer()->GetContainerObject();
-
 		tipTimer->Stop();
-
-		wnd->UnregisterObject(tipTimer);
 
 		DeleteObject(tipTimer);
 
@@ -260,8 +256,6 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 					tipTimer->Stop();
 
-					wnd->UnregisterObject(tipTimer);
-
 					DeleteObject(tipTimer);
 
 					tipTimer = NIL;
@@ -307,8 +301,6 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 					tipTimer->Stop();
 
-					wnd->UnregisterObject(tipTimer);
-
 					DeleteObject(tipTimer);
 
 					tipTimer = NIL;
@@ -326,8 +318,6 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 				if (objectProperties->tooltip != NIL)
 				{
 					tipTimer = new Timer();
-
-					wnd->RegisterObject(tipTimer);
 
 					tipTimer->onInterval.Connect(&Button::ActivateTooltip, this);
 					tipTimer->Start(500);
@@ -354,8 +344,6 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 					}
 
 					tipTimer->Stop();
-
-					wnd->UnregisterObject(tipTimer);
 
 					DeleteObject(tipTimer);
 

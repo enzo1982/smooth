@@ -25,6 +25,7 @@ namespace smooth
 #include "point.h"
 #include "size.h"
 #include "signals.h"
+#include "callbacks.h"
 
 namespace smooth
 {
@@ -45,8 +46,6 @@ namespace smooth
 			ObjectType		 type;
 
 			Bool			 registered;
-			Bool			 visible;
-			Bool			 active;
 
 			ObjectProperties	*objectProperties;
 			Container		*myContainer;
@@ -65,29 +64,10 @@ namespace smooth
 						 Object();
 			virtual			~Object();
 
-			virtual Int		 Show();
-			virtual Int		 Hide();
-
-			virtual Int		 Activate();
-			virtual Int		 Deactivate();
-
-			virtual Int		 Paint(Int);
-			virtual Int		 Process(Int, Int, Int);
-
-			virtual Int		 SetText(String);
-			virtual String		 GetText();
-
 			virtual Int		 SetTooltip(String);
 			virtual String		 GetTooltip();
 
-			virtual Int		 SetFont(String, Int, Int, Int);
-			virtual Int		 SetOrientation(Int);
-			virtual Int		 SetPosition(Point);
-			virtual Int		 SetMetrics(Point, Size);
-
 			Bool			 IsRegistered();
-			Bool			 IsVisible();
-			Bool			 IsActive();
 
 			virtual Point		 GetRealPosition();
 
@@ -105,12 +85,11 @@ namespace smooth
 			Int			 IsObjectInUse();
 			Bool			 IsObjectDeleteable();
 
+			static Object		*GetObject(Int, Int);
 			static Int		 DeleteObject(Object *);
 
 			static Int		 RequestObjectID();
 			static Int		 RequestObjectHandle();
-		signals:
-			Signal0<>		 onClick;
 	};
 
 	SMOOTHVAR Int OBJ_OBJECT;

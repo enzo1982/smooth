@@ -18,6 +18,8 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - array.cpp		- implemented static GetNthEntry method
 - widget.cpp		- new class: base class for GUI objects
 - setup.cpp		- new class: replaces old SMOOTH::Setup
+- object.cpp		- moved many methods to class GUI::Widget
+- timer.cpp		- Timers no longer need to be registered and are now independent of Windows
 
 - new namespace: smooth alias S
 - new namespace: smooth::XML
@@ -25,4 +27,6 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - ported the whole library to the new smooth namespace layout
 - added the pcitools (ras2pci and pci2ras)
 - TestKey now displays Unicode character codes
-- replaced the 'Procs' by a new Signals and Slots mechanism
+- replaced the 'Procs' by a new template based callback mechanism
+- added support for signals and slots
+- Threads, Semaphores and Mutexecs no longer need to be registered

@@ -30,18 +30,18 @@ namespace smooth
 	class SplashScreenApp : public Application
 	{
 		private:
-			static int	 nOfSplashScreens;
-			int		 time;
+			static Int	 nOfSplashScreens;
+			Int		 time;
 			HBITMAP		 bitmap;
 			GUI::Window	*splashscreen;
 			Timer		*timer;
 		public:
-					 SplashScreenApp(HBITMAP, int);
+					 SplashScreenApp(HBITMAP, Int);
 					~SplashScreenApp();
-			void		 SplashPaintProc();
-			bool		 SplashKillProc();
-			int		 ShowSplashScreen();
-			void		 TimerProc();
+			Void		 SplashPaintProc();
+			Bool		 SplashKillProc();
+			Int		 ShowSplashScreen();
+			Void		 TimerProc();
 	};
 };
 

@@ -37,9 +37,6 @@ namespace smooth
 		public:
 			static String		 StartDirectory;
 
-			static Object		*GetObject(Int, Int);
-			static GUI::Window	*GetWindow(HWND);
-
 			static Void		 SetLanguage(Int);
 			static Bool		 SetStartDirectory(String);
 

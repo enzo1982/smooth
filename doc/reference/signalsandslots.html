@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Signals and Slots</title>
+<style type="text/css"><!--
+h3.fn,span.fn { margin-left: 1cm; text-indent: -1cm; }
+a:link { color: #004faf; text-decoration: none }
+a:visited { color: #672967; text-decoration: none }
+body { background: #ffffff; color: black; }
+--></style>
+</head>
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr bgcolor="#E5E5E5">
+<td valign=center>
+ <a href="index.html">
+<font color="#004faf">Home</font></a>
+ | <a href="classes.html">
+<font color="#004faf">All&nbsp;Classes</font></a>
+ | <a href="mainclasses.html">
+<font color="#004faf">Main&nbsp;Classes</font></a>
+ | <a href="annotated.html">
+<font color="#004faf">Annotated</font></a>
+ | <a href="groups.html">
+<font color="#004faf">Grouped&nbsp;Classes</font></a>
+ | <a href="functions.html">
+<font color="#004faf">Functions</font></a>
+</td>
+<td align="right" valign="center"><img src="smoothlogo_small.png" align="right" width="142" height="32" border="0"></td></tr></table><h1 align=center>Signals and Slots</h1>
+
+ 
+<p> Signals and slots are used for communication between objects.  The
+signal/slot mechanism is a core technology of smooth and probably the
+part that differs most from other toolkits. smooth is probably the only
+object oriented toolkit that supports signals and slots without the need
+of an additional preprocessor.
+<p> In GUI programming we often want a change in one widget to be notified
+to another widget. More generally, we want objects of any kind to be
+able to communicate with one another. For example if we were parsing
+an XML file we might want to notify a list view that we're using to
+represent the XML file's structure whenever we encounter a new tag. 
+<p> Older toolkits and older versions of smooth achieve this kind of
+communication using callbacks. A
+callback is a pointer to a function, so if you want a processing
+function to notify you about some event you pass a pointer to another
+function (the callback) to the processing function. The processing
+function then calls the callback when appropriate. Callbacks have two
+fundamental flaws. Firstly they are not type safe. We can never be
+certain that the processing function will call the callback with the
+correct arguments. Secondly the callback is strongly coupled to the
+processing function since the processing function must know which
+callback to call.
+<p> <center><img src="callbacks.png"></center> <blockquote><p align="center"><em> Old-fashioned callbacks impair component programming
+</em></p>
+</blockquote><p> In smooth we have an alternative to the callback technique. We use signals
+and slots. A signal is emitted when a particular event occurs. smooth's
+widgets have many pre-defined signals, but we can always subclass to
+add our own. A slot is a function that is called in reponse to a
+particular signal. smooth's widgets have many pre-defined slots, but it is
+common practice to add your own slots so that you can handle the
+signals that you are interested in. 
+<p> <center><img src="signals-and-slots.png"></center> <blockquote><p align="center"><em> Signals and Slots facilitate true type-safe component programming
+</em></p>
+</blockquote><p> The signals and slots mechanism is type safe: the signature of a
+signal must match the signature of the receiving slot. Since the signatures are compatible, the
+compiler can help us detect type mismatches. Signals and slots are
+loosely coupled: a class which emits a signal neither knows nor cares
+which slots receive the signal. smooth's signals and slots mechanism
+ensures that if you connect a signal to a slot, the slot will be
+called with the signal's parameters at the right time. Signals and
+slots can take up to eight arguments of any type (extending smooth for using signals with more arguments is easy, though). They are
+completely typesafe: no more callback core dumps!
+<p> smooth continues to support callbacks, though, but it implements them in a
+typesafe manner. There are some cases where callbacks are more usefull than
+signals. If you want to be sure that only one function is connected to an event
+or you want to receive a return value from a function, you probably want to
+use callbacks rather than signals.
+<p> All classes in smooth can contain signals and slots.  Signals are emitted by
+objects when they change their state in a way that may be interesting
+to the outside world.  This is all the object does to communicate. It
+does not know or care whether anything is receiving the signals it
+emits. This is true information encapsulation, and ensures that the
+object can be used as a software component.
+<p> Slots can be used for receiving signals, but they are normal member
+functions. A slot does not know if it has any signals connected to
+it. Again, the object does not know about the communication mechanism and
+can be used as a true software component.
+<p> You can connect as many signals as you want to a single slot, and a
+signal can be connected to as many slots as you desire. It is even
+possible to connect a signal directly to another signal.  (This will
+emit the second signal immediately whenever the first is emitted.)
+<p> Together, signals and slots make up a powerful component programming
+mechanism.
+<p> <h2> A Small Example
+</h2>
+<a name="1"></a><p> A minimal C++ class declaration might read:
+<p> <pre>
+    class Foo
+    {
+        public:
+            Foo();
+            int value() const { return val; }
+            void setValue( int );
+        private:
+            int val;
+    };
+</pre>
+ 
+<p> A small smooth class might read:
+<p> <pre>
+    class Foo
+    {
+        public:
+            Foo();
+            int value() const { return val; }
+        slots:
+            void setValue( int );
+        signals:
+            Signal1&lt;int&gt; valueChanged;
+        private:
+            int val;
+    };
+</pre>
+ 
+<p> This class has the same internal state, and public methods to access the
+state, but in addition it has support for component programming using
+signals and slots: this class can tell the outside world that its state
+has changed by emitting a signal, <tt>valueChanged()</tt>, and it has
+a slot which other objects may send signals to.
+<p> Slots are implemented by the application programmer.
+Here is a possible implementation of Foo::setValue():
+<p> <pre>
+    void Foo::setValue( int v )
+    {
+        if ( v != val ) {
+            val = v;
+            valueChanged.Emit(v);
+        }
+    }
+</pre>
+ 
+<p> The line <tt>valueChanged.Emit(v)</tt> emits the signal
+<tt>valueChanged</tt> from the object.  As you can see, you emit a
+signal by using <tt>signal.Emit(arguments)</tt>.
+<p> Here is one way to connect two of these objects together:
+<p> <pre>
+    Foo a, b;
+    a.valueChanged.Connect(&Foo::setValue, &b);
+    b.setValue( 11 ); // a == undefined  b == 11
+    a.setValue( 79 ); // a == 79         b == 79
+    b.value();        
+</pre>
+ 
+<p> Calling <tt>a.setValue(79)</tt> will make <tt>a</tt> emit a <tt>valueChanged()</tt>
+signal, which <tt>b</tt> will receive in its <tt>setValue()</tt> slot,
+i.e. <tt>b.setValue(79)</tt> is called. <tt>b</tt> will then, in turn,
+emit the same <tt>valueChanged()</tt> signal, but since no slot has been
+connected to <tt>b</tt>'s <tt>valueChanged()</tt> signal, nothing happens (the
+signal disappears). 
+<p> Note that the <tt>setValue()</tt> function sets the value and emits
+the signal only if <tt>v != val</tt>. This prevents infinite looping
+in the case of cyclic connections (e.g. if <tt>b.valueChanged()</tt>
+were connected to <tt>a.setValue()</tt>).
+<p> This example illustrates that objects can work together without knowing
+each other, as long as there is someone around to set up a connection
+between them initially.
+<p> <h2> Signals
+</h2>
+<a name="2"></a><p> Signals are emitted by an object when its internal state has changed
+in some way that might be interesting to the object's client or owner.
+<p> A list box, for example, emits both <tt>onHighlightEntry</tt> and
+<tt>onActivate</tt> signals.  Most objects will probably only be
+interested in <tt>onActivate</tt> but some may want to know about
+which item in the list box is currently highlighted.  If the signal is
+interesting to two different objects you just connect the signal to
+slots in both objects.
+<p> When a signal is emitted, the slots connected to it are executed
+immediately, just like a normal function call. The signal/slot
+mechanism is totally independent of any GUI event loop. The
+<tt>Emit()</tt> will return when all slots have returned.
+<p> If several slots are connected to one signal, the slots will be
+executed one after the other, in an arbitrary order, when the signal
+is emitted.
+<p> Signals can never have return types (i.e. Emit() never returns a value).
+<p> <h2> Slots
+</h2>
+<a name="3"></a><p> A slot is called when a signal connected to it is emitted.  Slots are
+normal C++ functions and can be called normally; signals can be connected to any function in smooth,
+even normal C functions.
+<p> Since slots are normal member functions, they have access rights like ordinary member functions.
+<p> You can also define slots to be virtual, which we have found quite
+useful in practice.
+<p> The signals and slots mechanism is efficient, but not quite as fast as
+"real" callbacks. Signals and slots are slightly slower because of the
+increased flexibility they provide, although the difference for real
+applications is insignificant. In general, emitting a signal that is
+connected to some slots, is approximately ten times slower than calling
+the receivers directly, with non-virtual function calls. This is the
+overhead required to locate the connection object, to iterate
+over all connections and to marshall any parameters in a
+generic fashion. While ten non-virtual function calls may sound like a
+lot, it's much less overhead than any 'new' or 'delete' operation, for
+example. As soon as you perform a string, vector or list operation that
+behind the scene requires 'new' or 'delete', the signals and slots
+overhead is only responsible for a very small proportion of the complete
+function call costs. The same is true whenever you do a system call in a
+slot - or indirectly call more than ten functions. The
+simplicity and flexibility of the signals and slots mechanism is well
+worth the overhead, which your users won't even notice.
+<p> 
+<!-- eof -->
+<p><address><hr><div align=center>
+<table width=100% cellspacing=0 border=0><tr>
+<td>Copyright &copy; 2002-2003
+<a href="mailto:robert.kausch@gmx.net">Robert Kausch</a><td><a href="http://www.smooth-project.org">smooth homepage</a>
+<td align=right><div align=right>smooth alpha documentation</div>
+</table></div></address></body>
+</html>

@@ -31,11 +31,11 @@ namespace smooth
 	class MessageBoxApp : public Application
 	{
 		private:
-			static int	 nOfMessageBoxes;
-			int		 lines;
+			static Int	 nOfMessageBoxes;
+			Int		 lines;
 			String		 line[256];
 			wchar_t		*msgicon;
-			int		 buttons;
+			Int		 buttons;
 			GUI::Window	*msgbox;
 			GUI::Titlebar	*titlebar;
 			GUI::Layer	*lay;
@@ -47,21 +47,21 @@ namespace smooth
 			GUI::Button	*retrybutton;
 			GUI::Button	*ignorebutton;
 
-			void		 Create(String, String, int);
+			Void		 Create(String, String, Int);
 		public:
-					 MessageBoxApp(String, String, int, wchar_t *);
+					 MessageBoxApp(String, String, Int, wchar_t *);
 					~MessageBoxApp();
-			void		 MessagePaintProc();
-			bool		 MessageKillProc();
+			Void		 MessagePaintProc();
+			Bool		 MessageKillProc();
 
-			void		 MessageOK();
-			void		 MessageCancel();
-			void		 MessageYes();
-			void		 MessageNo();
-			void		 MessageRetry();
-			void		 MessageAbort();
-			void		 MessageIgnore();
-			int		 ShowMessageBox();
+			Void		 MessageOK();
+			Void		 MessageCancel();
+			Void		 MessageYes();
+			Void		 MessageNo();
+			Void		 MessageRetry();
+			Void		 MessageAbort();
+			Void		 MessageIgnore();
+			Int		 ShowMessageBox();
 	};
 };
 

@@ -13,22 +13,12 @@
 
 namespace smooth
 {
-	class Instance;
-};
-
-#include "method.h"
-
-namespace smooth
-{
 	class Instance
 	{
 		public:
-			virtual ~Instance()
-			{
-			}
-
-			virtual Void		 Call(Method *) = 0;
+			virtual			~Instance() {}
 			virtual Instance	*Copy() = 0;
+			virtual Void		 Call(Method *, ...) = 0;
 	};
 };
 

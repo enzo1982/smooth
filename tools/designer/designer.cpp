@@ -46,12 +46,12 @@ Designer::Designer()
 	timer1		= new Timer();
 	timer1->onInterval.Connect(&Designer::TimerProc, this);
 
-	menu_file	= new PopupMenu();
-	menu_dialog	= new PopupMenu();
+	menu_file	= new Menu();
+	menu_dialog	= new Menu();
 
-	menu_widgets		= new PopupMenu();
-	menu_widgets_add	= new PopupMenu();
-	menu_widgets_add_smooth	= new PopupMenu();
+	menu_widgets		= new Menu();
+	menu_widgets_add	= new Menu();
+	menu_widgets_add_smooth	= new Menu();
 
 	menubar->AddEntry("&File", NIL, menu_file);
 	menubar->AddEntry("&Dialog", NIL, menu_dialog);
@@ -75,12 +75,11 @@ Designer::Designer()
 	wnd->RegisterObject(menubar);
 	wnd->RegisterObject(iconbar);
 	wnd->RegisterObject(statusbar);
-	wnd->RegisterObject(timer1);
 
 	wnd->SetMetrics(Point(50, 50), Size(600, 85));
 	wnd->SetIcon(SI_DEFAULT);
 
-	wnd->SetKillProc(KillProc(&Designer::ExitProc), this);
+	wnd->doQuit.Connect(&Designer::ExitProc, this);
 
 	wnd->Show();
 
@@ -95,7 +94,6 @@ Designer::~Designer()
 	wnd->UnregisterObject(menubar);
 	wnd->UnregisterObject(iconbar);
 	wnd->UnregisterObject(statusbar);
-	wnd->UnregisterObject(timer1);
 
 	UnregisterObject(wnd);
 
@@ -117,7 +115,7 @@ void Designer::Close()
 	wnd->Close();
 }
 
-bool Designer::ExitProc()
+Bool Designer::ExitProc()
 {
 	for (int i = 0; i < dlgs.GetNOfEntries(); i++)
 	{

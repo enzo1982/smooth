@@ -25,14 +25,12 @@ Int smooth::Main()
 
 MDITest::MDITest()
 {
-	SetText("MDITest");
-
 	mainWnd			= new Window("MDITest");
 	mainWnd_titlebar	= new Titlebar(true, true, true);
 	mainWnd_statusbar	= new Statusbar("Ready");
 	mainWnd_client		= new MDIClient();
 	mainWnd_menubar		= new Menubar();
-	menu_file		= new PopupMenu();
+	menu_file		= new Menu();
 
 	menu_file->AddEntry("New")->onClick.Connect(&MDITest::NewMDI, this);
 	menu_file->AddEntry();
@@ -49,7 +47,7 @@ MDITest::MDITest()
 
 	mainWnd->SetMetrics(Point(50, 50), Size(700, 500));
 	mainWnd->SetIcon(SI_DEFAULT);
-	mainWnd->SetKillProc(KillProc(&MDITest::ExitProc), this);
+	mainWnd->doQuit.Connect(&MDITest::ExitProc, this);
 }
 
 MDITest::~MDITest()
@@ -76,10 +74,10 @@ Bool MDITest::ExitProc()
 	switch (id)
 	{
 		case IDYES:
-			return true;
+			return True;
 		default:
 		case IDNO:
-			return false;
+			return False;
 	}
 }
 

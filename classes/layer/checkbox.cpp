@@ -275,7 +275,7 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 					if (object != NIL)
 					{
-						if (object->GetObjectType() == OBJ_CHECKBOX) object->Process(SM_CHECKCHECKBOXES, 0, 0);
+						if (object->GetObjectType() == OBJ_CHECKBOX) ((CheckBox *) object)->Process(SM_CHECKCHECKBOXES, 0, 0);
 					}
 				}
 

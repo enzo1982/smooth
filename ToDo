@@ -10,6 +10,7 @@ ToDo for smooth
 - allow applets in menubars
 - integrate UIML compiler and interpreter
 - redo Menubar::Paint(int)
+- redo the whole menu system
 - use other surfaces than GDI (OpenGL, DirectFB, SDL, DirectX)
 - complete XML parser
 - check large fonts support

@@ -32,7 +32,7 @@ PCIFFManager::PCIFFManager()
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
 
-	menu_file	= new PopupMenu();
+	menu_file	= new Menu();
 
 	menubar->AddEntry("&File", NIL, menu_file);
 

@@ -455,7 +455,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 			{
 				operat = entries.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (SMOOTH::GetObject(popupHandle, OBJ_POPUP) != NIL)) if (SMOOTH::GetObject(popupHandle, OBJ_POPUP)->IsVisible() && !cont) continue;
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL)) if (((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->IsVisible() && !cont) continue;
 
 				if (operat->checked && (operat->type != SM_SEPARATOR))
 				{
@@ -474,11 +474,10 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 					if (operat->clicked && (operat->popup != NIL && operat->orientation == OR_LEFT))
 					{
-						popupMenu = new PopupMenu();
+						popupMenu = new PopupMenu(operat->popup);
 
 						popupHandle = popupMenu->handle;
 
-						popupMenu->MenuToPopup(operat->popup);
 						popupMenu->GetObjectProperties()->pos.x = operat->rect.left - 1;
 						popupMenu->GetObjectProperties()->pos.y = operat->rect.bottom + 2;
 
@@ -488,13 +487,12 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 					}
 					else if (operat->clicked && (operat->popup != NIL && operat->orientation == OR_RIGHT))
 					{
-						popupMenu = new PopupMenu();
+						popupMenu = new PopupMenu(operat->popup);
 
 						popupHandle = popupMenu->handle;
 
-						popupMenu->MenuToPopup(operat->popup);
-						((Menu *) popupMenu)->GetSize();
-						popupMenu->GetObjectProperties()->pos.x = operat->rect.right + 1 - ((Menu *) popupMenu)->popupsize.cx;
+						popupMenu->realMenu->GetSize();
+						popupMenu->GetObjectProperties()->pos.x = operat->rect.right + 1 - popupMenu->realMenu->popupsize.cx;
 						popupMenu->GetObjectProperties()->pos.y = operat->rect.bottom + 2;
 
 						wnd->RegisterObject(popupMenu);
@@ -516,7 +514,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 			{
 				operat = entries.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (SMOOTH::GetObject(popupHandle, OBJ_POPUP) != NIL)) if (SMOOTH::GetObject(popupHandle, OBJ_POPUP)->IsVisible()) continue;
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL)) if (((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->IsVisible()) continue;
 
 				if (operat->type == SM_TEXT && operat->clicked)
 				{
@@ -595,7 +593,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 			{
 				operat = entries.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (SMOOTH::GetObject(popupHandle, OBJ_POPUP) != NIL)) if (SMOOTH::GetObject(popupHandle, OBJ_POPUP)->IsVisible()) continue;
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL)) if (((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->IsVisible()) continue;
 
 				if (operat->type == SM_TEXT)
 				{
@@ -649,7 +647,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 			{
 				operat = entries.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (SMOOTH::GetObject(popupHandle, OBJ_POPUP) != NIL)) if (SMOOTH::GetObject(popupHandle, OBJ_POPUP)->IsVisible()) continue;
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL)) if (((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->IsVisible()) continue;
 
 				if (operat->type == SM_TEXT)
 				{

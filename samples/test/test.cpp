@@ -28,8 +28,6 @@ Int smooth::Main()
 
 Test::Test()
 {
-	SetText("smooth Test");
-
 	checkbox = false;
 	optionboxes = 1;
 	slider1 = 3;
@@ -53,7 +51,7 @@ Test::Test()
 	mainWnd_menubar		= new Menubar();
 	mainWnd_menubar2	= new Menubar();
 	mainWnd_iconbar		= new Menubar();
-	mainWnd_menubar_file	= new PopupMenu();
+	mainWnd_menubar_file	= new Menu();
 	mainWnd_layer		= new Layer();
 	rlayer1			= new Layer("Register");
 	rlayer2			= new Layer("Test");
@@ -203,10 +201,10 @@ mainWnd_iconbar->SetOrientation(OR_LEFT);
 
 	// alle Objekte dort registrieren, wo sie hingehören:
 
-	messageBoxThread = new Thread(ThreadProc(&Test::threadMessageBox), this);
+	messageBoxThread = new Thread();
+	messageBoxThread->threadMain.Connect(&Test::threadMessageBox, this);
 
 	RegisterObject(mainWnd);
-	RegisterObject(messageBoxThread);
 
 	mainWnd->RegisterObject(mainWnd_titlebar);
 	mainWnd->RegisterObject(mainWnd_statusbar);
@@ -250,7 +248,7 @@ mainWnd_iconbar->SetOrientation(OR_LEFT);
 	mainWnd->SetMetrics(Point(100, 50), Size(570, 550));
 	mainWnd->SetIcon(SMOOTH::LoadImage("icons.pci", 0, NIL));
 	mainWnd->SetApplicationIcon(LoadIconA(NULL, MAKEINTRESOURCEA(32517)));
-	mainWnd->SetKillProc(KillProc(&Test::mainWnd_KillProc), this);
+	mainWnd->doQuit.Connect(&Test::mainWnd_KillProc, this);
 
 	secWnd->SetMetrics(Point(480, 130), Size(170, 90));
 	secWnd->SetIcon(SMOOTH::LoadImage("icons.pci", 0, NIL));
@@ -303,7 +301,6 @@ Test::~Test()
 	mainWnd->UnregisterObject(mainWnd_titlebar);
 
 	UnregisterObject(mainWnd);
-	UnregisterObject(messageBoxThread);
 
 	// alle Obbjekte werden aus dem Speicher entfernt:
 	DeleteObject(secWnd_titlebar);
@@ -336,11 +333,12 @@ Test::~Test()
 	DeleteObject(rlayer2);
 	DeleteObject(rlayer3);
 
+	delete mainWnd_menubar_file;
+
 	DeleteObject(mainWnd_layer);
 	DeleteObject(mainWnd_iconbar);
 	DeleteObject(mainWnd_menubar);
 	DeleteObject(mainWnd_menubar2);
-	DeleteObject(mainWnd_menubar_file);
 	DeleteObject(mainWnd_divisionbar);
 	DeleteObject(mainWnd_client);
 	DeleteObject(mainWnd_statusbar);
@@ -389,13 +387,15 @@ void Test::Close()
 //	mainWnd->Close();
 }
 
-void Test::threadMessageBox(Thread *thread)
+Int Test::threadMessageBox(Thread *thread)
 {
 	thread->SetKillFlag(THREAD_KILLFLAG_WAIT);	// for this thread can quit itself (after closing the MessageBox) it needn't be terminated by smooth (KILLTHREAD_KILL is default)
 
 	SMOOTH::MessageBox("This MessageBox is running in a separate thread!", "Info", MB_OK, IDI_INFORMATION);
 
 	thread->Stop();
+
+	return Success;
 }
 
 Void Test::testDlgSelectColor()

@@ -220,8 +220,6 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			{
 				timer = new Timer();
 
-				wnd->RegisterObject(timer);
-
 				timer->onInterval.Connect(&Arrows::TimerProc, this);
 				timer->Start(250);
 
@@ -429,20 +427,12 @@ S::Void S::GUI::Arrows::TimerProc()
 	if (!registered)		return;
 	if (!active || !visible)	return;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
-
-	if (wnd == NIL) return;
-	if (wnd->hwnd == NIL) return;
-
 	Int	 prevValue = *variable;
 	Int	 plus = 1;
 
 	if (!timerActive && timer != NIL)
 	{
 		timer->Stop();
-
-		wnd->UnregisterObject(timer);
 
 		delete timer;
 

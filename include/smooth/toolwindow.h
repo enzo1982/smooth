@@ -31,12 +31,12 @@ namespace smooth
 		class SMOOTHAPI ToolWindow : public Window
 		{
 			private:
-				Object	*owner;
+				Widget	*owner;
 			public:
 					 ToolWindow();
 					~ToolWindow();
 
-				Int	 SetOwner(Object *);
+				Int	 SetOwner(Widget *);
 				Int	 FreeOwner();
 
 				HWND	 Create();

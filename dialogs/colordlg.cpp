@@ -277,8 +277,8 @@ S::DialogColorSelection::DialogColorSelection()
 	dlgwnd->SetMetrics(Point(100, 100), Size(436, 286));
 
 	dlgwnd->onPaint.Connect(&DialogColorSelection::ColorDlgPaintProc, this);
-	dlgwnd->SetMessageProc(MessageProc(&DialogColorSelection::ColorDlgMessageProc), this);
-	dlgwnd->SetKillProc(KillProc(&DialogColorSelection::ColorDlgKillProc), this);
+	dlgwnd->onEvent.Connect(&DialogColorSelection::ColorDlgMessageProc, this);
+	dlgwnd->doQuit.Connect(&DialogColorSelection::ColorDlgKillProc, this);
 }
 
 S::DialogColorSelection::~DialogColorSelection()
@@ -383,7 +383,7 @@ S::Bool S::DialogColorSelection::ColorDlgKillProc()
 {
 	if (dlgwnd->value == 0) dlgwnd->value = color;
 
-	return true;
+	return True;
 }
 
 void S::DialogColorSelection::ColorDlgPaintProc()

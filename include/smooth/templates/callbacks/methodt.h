@@ -8,28 +8,20 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "../../signals/instance.h"
+#include "../../callbacks/method.h"
+
+#ifndef _H_CMETHODT_
+#define _H_CMETHODT_
 
 namespace smooth
 {
-	template <class ct> class Instance0 : public Instance
+	template <class t> class CMethodT : public CMethod
 	{
-		private:
-			ct	*instance;
 		public:
-			Instance0(ct *iInstance)
-			{
-				instance = iInstance;
-			}
-
-			Void Call(Method *method)
-			{
-				(((ct *) instance)->*(((Method0<Void (ct::*)()> *) method)->GetMethod()))();
-			}
-
-			Instance *Copy()
-			{
-				return new Instance0<ct>(instance);
-			}
+			t	 method;
+				 CMethodT(t iMethod)	{ method = iMethod; }
+			CMethod	*Copy()			{ return new CMethodT<t>(method); }
 	};
 };
+
+#endif

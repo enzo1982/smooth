@@ -43,7 +43,7 @@ namespace smooth
 				virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
 				virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
 			signals:
-				Signal0<>	 onPaint;
+				Signal0<Void>	 onPaint;
 		};
 	};
 

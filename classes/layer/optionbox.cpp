@@ -280,7 +280,7 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 						if (object != NIL)
 						{
-							if (object->GetObjectType() == OBJ_OPTIONBOX) object->Process(SM_CHECKOPTIONBOXES, 0, 0);
+							if (object->GetObjectType() == OBJ_OPTIONBOX) ((OptionBox *) object)->Process(SM_CHECKOPTIONBOXES, 0, 0);
 						}
 					}
 

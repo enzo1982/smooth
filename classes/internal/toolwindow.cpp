@@ -45,7 +45,7 @@ S::GUI::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
 	owner				= NIL;
 
 #ifdef __WIN32__
-	style				= WS_BORDER|WS_POPUP;
+	style				= WS_BORDER | WS_POPUP;
 
 	SetExStyle(WS_EX_TOOLWINDOW);
 #endif
@@ -56,7 +56,7 @@ S::GUI::ToolWindow::~ToolWindow()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::GUI::ToolWindow::SetOwner(Object *newOwner)
+S::Int S::GUI::ToolWindow::SetOwner(Widget *newOwner)
 {
 	owner = newOwner;
 
@@ -109,7 +109,10 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 		{
 			object = assocObjects.GetNthEntry(i);
 
-			object->Paint(SP_PAINT);
+			if (object->GetObjectType() == OBJ_WIDGET)
+			{
+				((Widget *) object)->Paint(SP_PAINT);
+			}
 		}
 	}
 
@@ -123,7 +126,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 	EnterProtectedRegion();
 
-	if (!(message == SM_MOUSEMOVE && wParam == 1)) MessageProcCall(messageProc, messageProcParam, message, wParam, lParam);
+	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);
 
 	switch (message)
 	{
@@ -133,7 +136,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 			break;
 #ifdef __WIN32__
 		case WM_CLOSE:
-			if (KillProcCall(killProc, killProcParam))
+			if (doQuit.Call())
 			{
 				delete drawSurface;
 
@@ -152,7 +155,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 		case WM_DESTROY:
 			destroyed = True;
 
-			if (nOfActiveWindows == 1 && loopActive)
+			if (nOfActiveWindows == 0 && loopActive)
 			{
 				if (S::Setup::enableUnicode)	SendMessageW(hwnd, WM_QUIT, 0, 0);
 				else				SendMessageA(hwnd, WM_QUIT, 0, 0);
@@ -256,11 +259,14 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 	{
 		object = assocObjects.GetNthEntry(j);
 
-		if (object->Process(message, wParam, lParam) == Break)
+		if (object->GetObjectType() == OBJ_WIDGET)
 		{
-			LeaveProtectedRegion();
+			if (((Widget *) object)->Process(message, wParam, lParam) == Break)
+			{
+				LeaveProtectedRegion();
 
-			return Break;
+				return Break;
+			}
 		}
 	}
 
@@ -297,7 +303,10 @@ S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
 					break;
 			}
 
-			object->Show();
+			if (object->GetObjectType() == OBJ_WIDGET)
+			{
+				((Widget *) object)->Show();
+			}
 
 			return Success;
 		}
@@ -312,6 +321,6 @@ S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
 
 S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType)
 {
-	if (compType == OBJ_OBJECT || compType == OBJ_WINDOW)	return True;
-	else							return False;
+	if (compType == OBJ_OBJECT || compType == OBJ_WIDGET || compType == OBJ_WINDOW)	return True;
+	else										return False;
 }

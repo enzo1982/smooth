@@ -25,8 +25,6 @@ Int smooth::Main()
 
 TestKey::TestKey()
 {
-	SetText("TestKey");
-
 	Point	 pos;
 
 	pos.x = 85;
@@ -41,7 +39,7 @@ TestKey::TestKey()
 	wnd->RegisterObject(title);
 	wnd->RegisterObject(text);
 
-	wnd->SetMessageProc(MessageProc(&TestKey::EventProc), this);
+	wnd->onEvent.Connect(&TestKey::EventProc, this);
 	wnd->SetMetrics(Point(80, 80), Size(300, 160));
 }
 

@@ -23,28 +23,9 @@ __declspec (dllexport)
 S::Int	 S::OBJ_THREAD = S::Object::RequestObjectID();
 S::Int	 S::Thread::counter = 0;
 
-S::Thread::Thread(ThreadProcParam, Void *procParam)
+S::Thread::Thread()
 {
 	type		= OBJ_THREAD;
-	threadProc	= (ThreadProcType) newProc;
-	altproc		= NIL;
-	instance	= procParam;
-	status		= THREAD_CREATED;
-	thread		= NIL;
-	killflag	= THREAD_KILLFLAG_KILL;
-	waitflag	= THREAD_WAITFLAG_WAIT;
-
-	possibleContainers.AddEntry(OBJ_APPLICATION);
-
-	mainThreadManager->RegisterThread(this);
-}
-
-S::Thread::Thread(Void (*proc)(Thread *))
-{
-	type		= OBJ_THREAD;
-	threadProc	= NIL;
-	altproc		= proc;
-	instance	= NIL;
 	status		= THREAD_CREATED;
 	thread		= NIL;
 	killflag	= THREAD_KILLFLAG_KILL;
@@ -57,8 +38,6 @@ S::Thread::Thread(Void (*proc)(Thread *))
 
 S::Thread::~Thread()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
-
 	if (status == THREAD_CREATED || status == THREAD_STARTME)
 	{
 		status = THREAD_STOPPED;
@@ -90,12 +69,9 @@ S::Int S::Thread::GetStatus()
 
 S::Int S::Thread::Start()
 {
-	if (!registered) return Error;
-
 	if ((status == THREAD_CREATED && !initializing) || status == THREAD_STARTME || waitflag == THREAD_WAITFLAG_START)
 	{
-		if (threadProc != NIL)		thread = LiSAThreadCreate((void (*)(void *)) ThreadProcCaller, this);
-		else if (altproc != NIL)	thread = LiSAThreadCreate((void (*)(void *)) altproc, this);
+		thread = LiSAThreadCreate((void (*)(void *)) ThreadProcCaller, this);
 
 		status = THREAD_RUNNING;
 		counter++;
@@ -116,8 +92,6 @@ S::Int S::Thread::Start()
 
 S::Int S::Thread::Stop()
 {
-	if (!registered) return Error;
-
 	if (status == THREAD_RUNNING || status == THREAD_PAUSED)
 	{
 		if (LiSAThreadSelf() == thread)
@@ -166,5 +140,5 @@ S::Int S::Thread::GetKillFlag()
 
 S::Void S::ThreadProcCaller(Thread *thread)
 {
-	ThreadProcCall(thread->threadProc, thread->instance, thread);
+	thread->threadMain.Call(thread);
 }

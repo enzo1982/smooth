@@ -25,9 +25,9 @@ namespace smooth
 	typedef unsigned long	 UnsignedLong;
 	typedef signed long	 SignedLong;
 
-	typedef __int64		 Int;
-	typedef unsigned __int64 UnsignedInt;
-	typedef signed __int64	 SignedInt;
+	typedef long		 Int;
+	typedef unsigned long	 UnsignedInt;
+	typedef signed long	 SignedInt;
 
 	typedef char		 Int8;
 	typedef unsigned char	 UnsignedInt8;

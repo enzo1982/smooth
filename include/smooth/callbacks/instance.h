@@ -8,28 +8,19 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "../../signals/method.h"
+#ifndef _H_CINSTANCE_
+#define _H_CINSTANCE_
 
 namespace smooth
 {
-	template <class t> class Method0 : public Method
+	template <class rt> class CInstance
 	{
-		private:
-			t	 method;
 		public:
-			Method0(t iMethod)
-			{
-				method = iMethod;
-			}
+			virtual			~CInstance() {}
+			virtual CInstance<rt>	*Copy() = 0;
 
-			t GetMethod()
-			{
-				return method;
-			}
-
-			Method *Copy()
-			{
-				return new Method0<t>(method);
-			}
+			virtual rt		 Call(CMethod *, ...) = 0;
 	};
 };
+
+#endif

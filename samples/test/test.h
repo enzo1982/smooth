@@ -33,7 +33,7 @@ class Test : public Application
 		Menubar		*mainWnd_menubar;
 		Menubar		*mainWnd_menubar2;
 		Menubar		*mainWnd_iconbar;
-		PopupMenu	*mainWnd_menubar_file;
+		Menu		*mainWnd_menubar_file;
 		Layer		*mainWnd_layer;
 		Layer		*rlayer1;
 		Layer		*rlayer2;
@@ -68,7 +68,7 @@ class Test : public Application
 		void		 mainApp_ScrollbarProc();
 		void		 ShowEdb();
 		void		 HideEdb();
-		void		 threadMessageBox(Thread *);
+		Int		 threadMessageBox(Thread *);
 		void		 Close();
 
 		Void		 testDlgSelectColor();

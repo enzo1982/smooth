@@ -171,7 +171,7 @@ S::Int S::GUI::ListBox::AddTab(String tabName, Int iTabWidth)
 		if (visible) myContainer->RegisterObject(header);
 	}
 
-	header->AddTab(tabName, iTabWidth);
+	return header->AddTab(tabName, iTabWidth);
 }
 
 S::Int S::GUI::ListBox::Show()
@@ -196,9 +196,14 @@ S::Int S::GUI::ListBox::Show()
 		scrollbar->Show();
 	}
 
-	if (header != NIL) myContainer->RegisterObject(header);
+	if (header != NIL)
+	{
+		header->UpdateMetrics();
 
-	return Object::Show();
+		myContainer->RegisterObject(header);
+	}
+
+	return Widget::Show();
 }
 
 S::Int S::GUI::ListBox::Hide()
@@ -209,12 +214,12 @@ S::Int S::GUI::ListBox::Hide()
 
 	if (needScrollbar) scrollbar->Hide();
 
-	return Object::Hide();
+	return Widget::Hide();
 }
 
 S::Int S::GUI::ListBox::Activate()
 {
-	Int	 rVal = Object::Activate();
+	Int	 rVal = Widget::Activate();
 
 	if (rVal == Success && header != NIL) header->Activate();
 
@@ -223,7 +228,7 @@ S::Int S::GUI::ListBox::Activate()
 
 S::Int S::GUI::ListBox::Deactivate()
 {
-	Int	 rVal = Object::Deactivate();
+	Int	 rVal = Widget::Deactivate();
 
 	if (rVal == Success && header != NIL) header->Deactivate();
 

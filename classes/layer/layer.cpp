@@ -60,7 +60,10 @@ S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 
 		if (object == NIL) continue;
 
-		if (object->Process(message, wParam, lParam) == Break) return Break;
+		if (object->GetObjectType() == OBJ_WIDGET)
+		{
+			if (((Widget *) object)->Process(message, wParam, lParam) == Break) return Break;
+		}
 	}
 
 	return Success;
@@ -77,8 +80,6 @@ S::Int S::GUI::Layer::Paint(Int message)
 	if (wnd->hwnd == NIL) return Success;
 
 	Rect	 updateRect = wnd->GetUpdateRect();
-	Object	*object;
-
 	if (layerColor != -1)
 	{
 		Rect	 frame;
@@ -96,13 +97,18 @@ S::Int S::GUI::Layer::Paint(Int message)
 		FreeContext(wnd, dc);
 	}
 
+	Object	*object;
+
 	for (Int i = 0; i < nOfObjects; i++)
 	{
 		object = assocObjects.GetNthEntry(i);
 
 		if (object == NIL) continue;
 
-		if (object->IsVisible() && Affected(object, updateRect)) object->Paint(SP_PAINT);
+		if (object->GetObjectType() == OBJ_WIDGET)
+		{
+			if (((Widget *) object)->IsVisible() && Affected(object, updateRect)) ((Widget *) object)->Paint(SP_PAINT);
+		}
 	}
 
 	return Success;
@@ -115,8 +121,6 @@ S::Int S::GUI::Layer::Show()
 	visible = True;
 
 	if (!registered) return Success;
-
-	Object	*object;
 
 	if (layerColor != -1)
 	{
@@ -138,11 +142,19 @@ S::Int S::GUI::Layer::Show()
 		}
 	}
 
+	Object	*object;
+
 	for (Int i = 0; i < nOfObjects; i++)
 	{
 		object = assocObjects.GetNthEntry(i);
 
-		if (object != NIL) object->Show();
+		if (object != NIL)
+		{
+			if (object->GetObjectType() == OBJ_WIDGET)
+			{
+				((Widget *) object)->Show();
+			}
+		}
 	}
 
 	return Success;
@@ -162,7 +174,13 @@ S::Int S::GUI::Layer::Hide()
 	{
 		object = assocObjects.GetNthEntry(i);
 
-		if (object != NIL) object->Hide();
+		if (object != NIL)
+		{
+			if (object->GetObjectType() == OBJ_WIDGET)
+			{
+				((Widget *) object)->Hide();
+			}
+		}
 	}
 
 	if (layerColor != -1)
@@ -201,7 +219,7 @@ S::Int S::GUI::Layer::SetMetrics(Point pos, Size size)
 {
 	objectProperties->orientation = OR_FREE;
 
-	return Object::SetMetrics(pos, size);
+	return Widget::SetMetrics(pos, size);
 }
 
 S::GUI::Surface *S::GUI::Layer::GetDrawSurface()
@@ -225,7 +243,7 @@ S::Int S::GUI::Layer::RegisterObject(Object *object)
 			object->SetContainer(this);
 			object->SetRegisteredFlag();
 
-			if (visible) object->Show();
+			if (visible && object->GetObjectType() == OBJ_WIDGET) ((Widget *) object)->Show();
 
 			return Success;
 		}
@@ -246,7 +264,7 @@ S::Int S::GUI::Layer::UnregisterObject(Object *object)
 			{
 				nOfObjects--;
 
-				if (visible) object->Hide();
+				if (visible && object->GetObjectType() == OBJ_WIDGET) ((Widget *) object)->Hide();
 
 				object->UnsetRegisteredFlag();
 				object->SetContainer(NIL);

@@ -131,6 +131,10 @@ SOURCE=..\classes\basic\objecttype.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\basic\setup.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\basic\system.cpp
 # End Source File
 # Begin Source File
@@ -573,15 +577,31 @@ SOURCE=..\include\smooth\templates\array\value.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\templates\signals\instance0.h
+SOURCE=..\include\smooth\templates\signals\instancen.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\templates\signals\method0.h
+SOURCE=..\include\smooth\templates\signals\methodt.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\templates\signals\signal0.h
+SOURCE=..\include\smooth\templates\signals\signaln.h
+# End Source File
+# End Group
+# Begin Group "callbacks_templates"
+
+# PROP Default_Filter "*.h"
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\callbacks\callbackn.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\callbacks\instancen.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\callbacks\methodt.h
 # End Source File
 # End Group
 # End Group
@@ -637,6 +657,22 @@ SOURCE=..\include\smooth\signals\method.h
 SOURCE=..\include\smooth\signals\signal.h
 # End Source File
 # End Group
+# Begin Group "callbacks"
+
+# PROP Default_Filter "*.h"
+# Begin Source File
+
+SOURCE=..\include\smooth\callbacks\callback.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\callbacks\instance.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\callbacks\method.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\activearea.h
@@ -668,6 +704,10 @@ SOURCE=..\include\smooth\bitmap.h
 # Begin Source File
 
 SOURCE=..\include\smooth\button.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\callbacks.h
 # End Source File
 # Begin Source File
 
@@ -867,6 +907,10 @@ SOURCE=..\include\smooth\semaphore.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\setup.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\shlobjmini.h
 # End Source File
 # Begin Source File
@@ -1030,7 +1074,7 @@ SOURCE=..\resources\resources.rc
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
-# ADD RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "h:\devel\projects\mpsd\src\smooth" /d "__WIN32__" /d "__SMOOTH_DLL__"
+# ADD RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "..\resources" /i ".." /d "__WIN32__" /d "__SMOOTH_DLL__"
 
 !ENDIF 
 

@@ -66,7 +66,7 @@ namespace smooth
 
 				Int		 SetOrientation(Int);
 			signals:
-				Signal0<>	 onClick;
+				Signal0<Void>	 onClick;
 		};
 
 		protected:

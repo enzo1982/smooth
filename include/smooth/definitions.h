@@ -137,50 +137,9 @@ namespace smooth
 #include "array.h"
 #include "setup.h"
 
-#define signals	public
-#define slots	public
-
-#ifdef _MSC_VER
-	#define KillProc(x)	 (S::Bool (S::Object::*)())(x)
-	#define MessageProc(x)	 (S::Void (S::Object::*)(S::Int,S::Int,S::Int))(x)
-	#define ThreadProc(x)	 (S::Void (S::Object::*)(S::Thread *))(x)
-
-	#define KillProcType	 S::Bool(S::Object::*)()
-	#define MessageProcType	 S::Void(S::Object::*)(S::Int,S::Int,S::Int)
-	#define ThreadProcType	 S::Void(S::Object::*)(S::Thread *)
-
-	#define KillProcMember		 S::Bool(S::Object::*killProc)()
-	#define MessageProcMember	 S::Void(S::Object::*messageProc)(S::Int,S::Int,S::Int)
-	#define ThreadProcMember	 S::Void(S::Object::*threadProc)(S::Thread *)
-
-	#define KillProcParam	 S::Bool(S::Object::*newProc)()
-	#define MessageProcParam S::Void(S::Object::*newProc)(S::Int,S::Int,S::Int)
-	#define ThreadProcParam	 S::Void(S::Object::*newProc)(S::Thread *)
-
-	#define KillProcCall(p,c)		 (p==NIL)?(S::True):(((S::Object *) c)->*p)()
-	#define MessageProcCall(p,c,m,w,l)	 if(p!=NIL)(((S::Object *) c)->*p)(m,w,l)
-	#define ThreadProcCall(p,c,t)		 if(p!=NIL)(((S::Object *) c)->*p)(t)
-#else
-	#define KillProc(x)	 (S::Bool(*)())(x)
-	#define MessageProc(x)	 (S::Void(*)(S::Int,S::Int,S::Int))(x)
-	#define ThreadProc(x)	 (S::Void(*)(S::Thread *))(x)
-
-	#define KillProcType	 S::Bool(*)(S::Void *)
-	#define MessageProcType	 S::Void(*)(S::Void *,S::Int,S::Int,S::Int)
-	#define ThreadProcType	 S::Void(*)(S::Void *,S::Thread *)
-
-	#define KillProcMember		 S::Bool(*killProc)(S::Void *)
-	#define MessageProcMember	 S::Void(*messageProc)(S::Void *,S::Int,S::Int,S::Int)
-	#define ThreadProcMember	 S::Void(*threadProc)(S::Void *,S::Thread *)
-
-	#define KillProcParam	 S::Bool(*newProc)()
-	#define MessageProcParam S::Void(*newProc)(S::Int,S::Int,S::Int)
-	#define ThreadProcParam	 S::Void(*newProc)(S::Thread *)
-
-	#define KillProcCall(p,c)		 (p==NIL)?(S::True):p(c)
-	#define MessageProcCall(p,c,m,w,l)	 if(p!=NIL)p(c, m, w, l)
-	#define ThreadProcCall(p,c,t)		 if(p!=NIL)p(c, t)
-#endif
+#define callbacks	public
+#define signals		public
+#define slots		public
 
 const HBITMAP SI_DEFAULT		= (HBITMAP) -1;
 

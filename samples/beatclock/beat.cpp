@@ -25,8 +25,6 @@ Int smooth::Main()
 
 BeatClock::BeatClock()
 {
-	SetText("BeatClock");
-
 	actbeats = -1;
 	actcbeats = -1;
 	actccbeats = -1;
@@ -68,13 +66,12 @@ BeatClock::BeatClock()
 	wnd->RegisterObject(dragcontrol);
 	wnd->RegisterObject(title);
 	wnd->RegisterObject(menubar);
-	wnd->RegisterObject(timer);
 
 	wnd->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
 	wnd->onPaint.Connect(&BeatClock::PaintAll, this);
 	wnd->SetExStyle(WS_EX_TOPMOST|WS_EX_TOOLWINDOW);
 	wnd->SetMetrics(Point(wpx, wpy), Size(164 * Setup::FontSize, 103 * Setup::FontSize));
-	wnd->SetMessageProc(MessageProc(&BeatClock::EventProc), this);
+	wnd->onEvent.Connect(&BeatClock::EventProc, this);
 	wnd->Show();
 
 	timer->Start(50);
@@ -90,7 +87,6 @@ BeatClock::~BeatClock()
 
 	wnd->UnregisterObject(title);
 	wnd->UnregisterObject(menubar);
-	wnd->UnregisterObject(timer);
 	wnd->UnregisterObject(dragcontrol);
 
 	delete wnd;
@@ -309,7 +305,7 @@ Void BeatClock::Options()
 
 	optionsdialog->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
 	optionsdialog->SetMetrics(Point(100, 100), Size(397, 181));
-	optionsdialog->SetKillProc(KillProc(&BeatClock::OptionsKillProc), this);
+	optionsdialog->doQuit.Connect(&BeatClock::OptionsKillProc, this);
 	optionsdialog->SetStyle(SS_MODAL);
 
 	oldtf = timeformat;
@@ -445,7 +441,7 @@ Void BeatClock::OptionsPaint()
 
 Bool BeatClock::OptionsKillProc()
 {
-	return true;
+	return True;
 }
 
 Void BeatClock::toggleAlarmState()

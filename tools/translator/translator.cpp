@@ -97,7 +97,7 @@ Translator::Translator()
 	list_entries->AllowReselect(True);
 	list_entries->AddTab("ID");
 
-	menu_file	= new PopupMenu();
+	menu_file	= new Menu();
 
 	menubar->AddEntry("&File", NIL, menu_file);
 
@@ -108,7 +108,7 @@ Translator::Translator()
 	menu_file->AddEntry("&Save")->onClick.Connect(&Translator::SaveFile, this);
 	menu_file->AddEntry("Save &as")->onClick.Connect(&Translator::SaveFileAs, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("E&xit")->onClick.Connect(&Translator::CloseApp, this);
+	menu_file->AddEntry("E&xit")->onClick.Connect(&Window::Close, wnd);
 
 	text_id->Deactivate();
 	edit_id->Deactivate();
@@ -139,7 +139,7 @@ Translator::Translator()
 
 	wnd->SetMetrics(Point(50, 50), Size(777, 300));
 	wnd->SetIcon(SI_DEFAULT);
-	wnd->SetKillProc(KillProc(&Translator::ExitProc), this);
+	wnd->doQuit.Connect(&Translator::ExitProc, this);
 
 	wnd->Show();
 }
@@ -183,7 +183,7 @@ Translator::~Translator()
 	delete list_entries;
 }
 
-bool Translator::ExitProc()
+Bool Translator::ExitProc()
 {
 	if (filename != "")
 	{
@@ -202,18 +202,18 @@ bool Translator::ExitProc()
 				SaveFile();
 				CloseFile();
 
-				return true;
+				return True;
 			case IDNO:
 				CloseFile();
 
-				return true;
+				return True;
 			case IDCANCEL:
 			case IDCLOSE:
-				return false;
+				return False;
 		}
 	}
 
-	return true;
+	return True;
 }
 
 void Translator::NewFile()
@@ -293,13 +293,6 @@ void Translator::Close()
 	ExitProc();
 }
 
-void Translator::CloseApp()
-{
-	ExitProc();
-
-	wnd->Close();
-}
-
 void Translator::CloseFile()
 {
 	filename = "";
@@ -369,9 +362,9 @@ void Translator::OpenFile()
 
 		XML::Node	*info = doc->GetRootNode()->GetNodeByName("info");
 
-		for (int i = 0; i < info->GetNOfNodes(); i++)
+		for (int k = 0; k < info->GetNOfNodes(); k++)
 		{
-			String		 property = info->GetNthNode(i)->GetAttributeByName("name")->GetContent();
+			String		 property = info->GetNthNode(k)->GetAttributeByName("name")->GetContent();
 			listEntry	*entry = NULL;
 
 			if (property == "program")	entry = entries.GetNthEntry(0);
@@ -382,7 +375,7 @@ void Translator::OpenFile()
 
 			if (entry != NULL)
 			{
-				entry->translation = info->GetNthNode(i)->GetContent();
+				entry->translation = info->GetNthNode(k)->GetContent();
 
 				list_entries->ModifyEntry(entry->listid, String(entry->original).Append(": ").Append(entry->translation));
 			}
@@ -631,11 +624,11 @@ void Translator::SaveData()
 
 		entry = NULL;
 
-		for (int i = 0; i < entries.GetNOfEntries(); i++)
+		for (int j = 0; j < entries.GetNOfEntries(); j++)
 		{
-			if (entries.GetNthEntry(i)->id == edit_id->GetText().ToInt() + 1)
+			if (entries.GetNthEntry(j)->id == edit_id->GetText().ToInt() + 1)
 			{
-				entry = entries.GetNthEntry(i);
+				entry = entries.GetNthEntry(j);
 
 				edit_id->SetText(String::IntToString(entry->id));
 				edit_original->SetText(entry->original);

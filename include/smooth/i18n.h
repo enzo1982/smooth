@@ -59,7 +59,6 @@ namespace smooth
 
 	extern String TXT_SPLASHSCREEN;
 
-	extern String TXT_SMOOTHBACKGROUNDAPPLICATION;
 	extern String TXT_SMOOTHTOOLWINDOW;
 #endif
 

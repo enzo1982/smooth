@@ -39,8 +39,8 @@ Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 
 	wnd->SetMetrics(Point(150, 150), Size(400, 400));
 
-	wnd->SetMessageProc(MessageProc(&Designer_EditComponent::EventProc), this);
-	wnd->SetKillProc(KillProc(&Designer_EditComponent::ExitProc), this);
+	wnd->onEvent.Connect(&Designer_EditComponent::EventProc, this);
+	wnd->doQuit.Connect(&Designer_EditComponent::ExitProc, this);
 }
 
 Designer_EditComponent::~Designer_EditComponent()

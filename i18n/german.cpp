@@ -49,7 +49,6 @@ void S::ActivateGermanLanguage()
 
 	TXT_SPLASHSCREEN = "Splashscreen";
 
-	TXT_SMOOTHBACKGROUNDAPPLICATION = "smooth Hintergrundanwendung";
 	TXT_SMOOTHTOOLWINDOW = "smooth::ToolWindow";
 
 	String::SetInputFormat(inputFormat);

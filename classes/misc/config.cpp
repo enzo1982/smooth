@@ -16,6 +16,8 @@ S::Configuration::Configuration()
 	ownRoot = NIL;
 
 	configFile = NIL;
+
+	activeConfig = "default";
 }
 
 S::Configuration::Configuration(String file, Bool create)
@@ -23,6 +25,8 @@ S::Configuration::Configuration(String file, Bool create)
 	ownRoot = NIL;
 
 	configFile = NIL;
+
+	activeConfig = "default";
 
 	Open(file, create);
 }
@@ -66,7 +70,7 @@ S::Int S::Configuration::Open(String file, Bool create)
 
 			configFile->SetRootNode(ownRoot);
 
-			ownRoot->AddNode("data");
+			ownRoot->AddNode("configuration")->SetAttribute("name", "default");
 
 			fileName = Application::GetApplicationDirectory().Append(file);
 		}
@@ -78,7 +82,7 @@ S::Int S::Configuration::Open(String file, Bool create)
 
 		return Error;
 	}
-	else if (configFile->GetRootNode()->GetNodeByName("data") == NIL)
+	else if (configFile->GetRootNode()->GetNodeByName("configuration") == NIL)
 	{
 		Close();
 
@@ -94,9 +98,9 @@ S::Int S::Configuration::Close()
 	{
 		if (fileName != NIL && configFile->GetRootNode() != NIL)
 		{
-			if (configFile->GetRootNode()->GetNodeByName("data") != NIL)
+			if (configFile->GetRootNode()->GetNodeByName("configuration") != NIL)
 			{
-				if (configFile->GetRootNode()->GetNodeByName("data")->GetNOfNodes() >= 1) configFile->SaveFile(fileName);
+				if (configFile->GetRootNode()->GetNodeByName("configuration")->GetNOfNodes() >= 1) configFile->SaveFile(fileName);
 			}
 		}
 
@@ -117,14 +121,79 @@ S::Int S::Configuration::Close()
 	return Success;
 }
 
+S::Int S::Configuration::SetActiveConfiguration(String nConfig)
+{
+	if (configFile == NIL) return Error;
+
+	XML::Node	*configuration = FindConfigurationNode(nConfig);
+
+	if (configuration == NIL)
+	{
+		configFile->GetRootNode()->AddNode("configuration")->SetAttribute("name", nConfig);
+	}
+
+	activeConfig = nConfig;
+
+	return Success;
+}
+
+S::Int S::Configuration::SetConfigurationName(String nName)
+{
+	if (configFile == NIL) return Error;
+
+	XML::Node	*configuration = FindConfigurationNode(activeConfig);
+
+	if (configuration == NIL) return Error;
+
+	activeConfig = nName;
+
+	configuration->SetAttribute("name", nName);
+
+	return Success;
+}
+
+S::Int S::Configuration::SetParentConfiguration(String nParent)
+{
+	if (configFile == NIL) return Error;
+
+	XML::Node	*configuration = FindConfigurationNode(activeConfig);
+
+	if (configuration == NIL) return Error;
+
+	configuration->SetAttribute("inheriting", nParent);
+
+	return Success;
+}
+
 S::Int S::Configuration::GetIntValue(String section, String name, Int defValue)
 {
 	if (configFile == NIL) return defValue;
 
 	XML::Node	*value = FindValueNode(section, name);
 
-	if (value != NIL)	return value->GetContent().ToInt();
-	else			return defValue;
+	if (value != NIL)
+	{
+		return value->GetContent().ToInt();
+	}
+	else
+	{
+		XML::Node	*configuration = FindConfigurationNode(activeConfig);
+
+		if (configuration->GetAttributeByName("inheriting") != NIL)
+		{
+			String	 oConfig = activeConfig;
+
+			activeConfig = configuration->GetAttributeByName("inheriting")->GetContent();
+
+			Int	 retVal = GetIntValue(section, name, defValue);
+
+			activeConfig = oConfig;
+
+			return retVal;
+		}
+
+		return defValue;
+	}
 }
 
 S::Int S::Configuration::SetIntValue(String section, String name, Int newValue)
@@ -141,7 +210,7 @@ S::Int S::Configuration::SetIntValue(String section, String name, Int newValue)
 	{
 		if (FindSectionNode(section) == NIL)
 		{
-			value = configFile->GetRootNode()->GetNodeByName("data")->AddNode("section");
+			value = FindConfigurationNode(activeConfig)->AddNode("section");
 
 			value->SetAttribute("name", section);
 		}
@@ -160,8 +229,29 @@ S::String S::Configuration::GetStringValue(String section, String name, String d
 
 	XML::Node	*value = FindValueNode(section, name);
 
-	if (value != NIL)	return value->GetContent();
-	else			return defValue;
+	if (value != NIL)
+	{
+		return value->GetContent();
+	}
+	else
+	{
+		XML::Node	*configuration = FindConfigurationNode(activeConfig);
+
+		if (configuration->GetAttributeByName("inheriting") != NIL)
+		{
+			String	 oConfig = activeConfig;
+
+			activeConfig = configuration->GetAttributeByName("inheriting")->GetContent();
+
+			String	 retVal = GetStringValue(section, name, defValue);
+
+			activeConfig = oConfig;
+
+			return retVal;
+		}
+
+		return defValue;
+	}
 }
 
 S::Int S::Configuration::SetStringValue(String section, String name, String newValue)
@@ -178,7 +268,7 @@ S::Int S::Configuration::SetStringValue(String section, String name, String newV
 	{
 		if (FindSectionNode(section) == NIL)
 		{
-			value = configFile->GetRootNode()->GetNodeByName("data")->AddNode("section");
+			value = FindConfigurationNode(activeConfig)->AddNode("section");
 
 			value->SetAttribute("name", section);
 		}
@@ -191,13 +281,38 @@ S::Int S::Configuration::SetStringValue(String section, String name, String newV
 	return Success;
 }
 
+S::XML::Node *S::Configuration::FindConfigurationNode(String configuration)
+{
+	XML::Node	*root = configFile->GetRootNode();
+
+	if (root == NIL) return NIL;
+
+	for (Int i = 0; i < root->GetNOfNodes(); i++)
+	{
+		XML::Node	*node = root->GetNthNode(i);
+
+		if (node->GetName() != "configuration") continue;
+
+		XML::Attribute	*attributeName = node->GetAttributeByName("name");
+
+		if (attributeName != NIL)
+		{
+			if (attributeName->GetContent() == configuration) return node;
+		}
+	}
+
+	return NIL;
+}
+
 S::XML::Node *S::Configuration::FindSectionNode(String section)
 {
-	XML::Node	*data = configFile->GetRootNode()->GetNodeByName("data");
+	XML::Node	*configuration = FindConfigurationNode(activeConfig);
 
-	for (Int i = 0; i < data->GetNOfNodes(); i++)
+	if (configuration == NIL) return NIL;
+
+	for (Int i = 0; i < configuration->GetNOfNodes(); i++)
 	{
-		XML::Node	*node = data->GetNthNode(i);
+		XML::Node	*node = configuration->GetNthNode(i);
 		XML::Attribute	*attributeName = node->GetAttributeByName("name");
 
 		if (attributeName != NIL)

@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="5" FILEVERSION="14" LASTMODIFIED="25.01.2004">
-    <TASK PRIORITY="5" TITLE="0.8.64.0" EXPANDED="1" PERCENTDONE="70" POS="1">
-        <TASK PRIORITY="5" TITLE="smooth::Configure" PERCENTDONE="80" POS="1">
-            <TASK PRIORITY="5" TITLE="Make configurations inheritable" POS="1"/>
-        </TASK>
-        <TASK PRIORITY="5" TITLE="Split Window in frontend and backend parts" PERCENTDONE="80" POS="2"/>
+<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="5" FILEVERSION="15" LASTMODIFIED="25.01.2004">
+    <TASK PRIORITY="5" TITLE="0.8.64.0" PERCENTDONE="80" POS="1">
+        <TASK PRIORITY="5" TITLE="Split Window in frontend and backend parts" PERCENTDONE="80" POS="1"/>
     </TASK>
     <TASK PRIORITY="5" TITLE="0.9" PERCENTDONE="5" POS="2">
         <TASK PRIORITY="5" TITLE="Use more Signals &amp; Slots internally" POS="1"/>

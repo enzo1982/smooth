@@ -26,9 +26,12 @@ namespace smooth
 		private:
 			String		 fileName;
 
+			String		 activeConfig;
+
 			XML::Document	*configFile;
 			XML::Node	*ownRoot;
 
+			XML::Node	*FindConfigurationNode(String);
 			XML::Node	*FindSectionNode(String);
 			XML::Node	*FindValueNode(String, String);
 		public:
@@ -38,6 +41,11 @@ namespace smooth
 
 			Int		 Open(String = "config.xml", Bool = True);
 			Int		 Close();
+
+			Int		 SetActiveConfiguration(String);
+
+			Int		 SetConfigurationName(String);
+			Int		 SetParentConfiguration(String);
 
 			Int		 GetIntValue(String, String, Int = 0);
 			Int		 SetIntValue(String, String, Int);

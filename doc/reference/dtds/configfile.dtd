@@ -9,7 +9,9 @@
 		<!ELEMENT property (#PCDATA)>
 		<!ATTLIST property name PCDATA #REQUIRED>
 
-	<!ELEMENT data (section*)>
+	<!ELEMENT configuration (section*)>
+	<!ATTLIST configuration name PCDATA #REQUIRED>
+	<!ATTLIST configuration inheriting PCDATA #IMPLIED>
 
 		<!ELEMENT section (value*)>
 		<!ATTLIST section name PCDATA #REQUIRED>

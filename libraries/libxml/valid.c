@@ -59,24 +59,27 @@ typedef struct _xmlValidState {
 
 static int
 vstateVPush(xmlValidCtxtPtr ctxt, xmlElementPtr elemDecl, xmlNodePtr node) {
-    if (ctxt->vstateMax == 0) {
+    if ((ctxt->vstateMax == 0) || (ctxt->vstateTab == NULL)) {
 	ctxt->vstateMax = 10;
 	ctxt->vstateTab = (xmlValidState *) xmlMalloc(ctxt->vstateMax *
 		              sizeof(ctxt->vstateTab[0]));
         if (ctxt->vstateTab == NULL) {
-	    VERROR(ctxt->userData, "realloc failed !n");
+	    VERROR(ctxt->userData, "malloc failed !n");
 	    return(-1);
 	}
     }
 
     if (ctxt->vstateNr >= ctxt->vstateMax) {
-	ctxt->vstateMax *= 2;
-        ctxt->vstateTab = (xmlValidState *) xmlRealloc(ctxt->vstateTab,
-	             ctxt->vstateMax * sizeof(ctxt->vstateTab[0]));
-        if (ctxt->vstateTab == NULL) {
+        xmlValidState *tmp;
+
+	tmp = (xmlValidState *) xmlRealloc(ctxt->vstateTab,
+	             2 * ctxt->vstateMax * sizeof(ctxt->vstateTab[0]));
+        if (tmp == NULL) {
 	    VERROR(ctxt->userData, "realloc failed !n");
 	    return(-1);
 	}
+	ctxt->vstateMax *= 2;
+	ctxt->vstateTab = tmp;
     }
     ctxt->vstate = &ctxt->vstateTab[ctxt->vstateNr];
     ctxt->vstateTab[ctxt->vstateNr].elemDecl = elemDecl;
@@ -161,15 +164,28 @@ vstateVPush(xmlValidCtxtPtr ctxt, xmlElementContentPtr cont,
     if (ctxt->vstateNr > MAX_RECURSE) {
 	return(-1);
     }
+    if (ctxt->vstateTab == NULL) {
+	ctxt->vstateMax = 8;
+	ctxt->vstateTab = (xmlValidState *) xmlMalloc(
+		     ctxt->vstateMax * sizeof(ctxt->vstateTab[0]));
+	if (ctxt->vstateTab == NULL) {
+	    xmlGenericError(xmlGenericErrorContext,
+		    "malloc failed !n");
+	    return(-1);
+	}
+    }
     if (ctxt->vstateNr >= ctxt->vstateMax) {
-	ctxt->vstateMax *= 2;
-        ctxt->vstateTab = (xmlValidState *) xmlRealloc(ctxt->vstateTab,
-	             ctxt->vstateMax * sizeof(ctxt->vstateTab[0]));
-        if (ctxt->vstateTab == NULL) {
+        xmlValidState *tmp;
+
+        tmp = (xmlValidState *) xmlRealloc(ctxt->vstateTab,
+	             2 * ctxt->vstateMax * sizeof(ctxt->vstateTab[0]));
+        if (tmp == NULL) {
 	    xmlGenericError(xmlGenericErrorContext,
 		    "realloc failed !n");
 	    return(-1);
 	}
+	ctxt->vstateMax *= 2;
+	ctxt->vstateTab = tmp;
 	ctxt->vstate = &ctxt->vstateTab[0];
     }
     /*
@@ -219,15 +235,15 @@ nodeVPush(xmlValidCtxtPtr ctxt, xmlNodePtr value)
         }
     }
     if (ctxt->nodeNr >= ctxt->nodeMax) {
-        ctxt->nodeMax *= 2;
-        ctxt->nodeTab =
-            (xmlNodePtr *) xmlRealloc(ctxt->nodeTab,
-                                      ctxt->nodeMax *
-                                      sizeof(ctxt->nodeTab[0]));
-        if (ctxt->nodeTab == NULL) {
+        xmlNodePtr *tmp;
+        tmp = (xmlNodePtr *) xmlRealloc(ctxt->nodeTab,
+			      ctxt->nodeMax * 2 * sizeof(ctxt->nodeTab[0]));
+        if (tmp == NULL) {
             xmlGenericError(xmlGenericErrorContext, "realloc failed !\n");
             return (0);
         }
+        ctxt->nodeMax *= 2;
+	ctxt->nodeTab = tmp;
     }
     ctxt->nodeTab[ctxt->nodeNr] = value;
     ctxt->node = value;
@@ -249,39 +265,6 @@ nodeVPop(xmlValidCtxtPtr ctxt)
     ctxt->nodeTab[ctxt->nodeNr] = 0;
     return (ret);
 }
-
-#if 0
-/**
- * xmlFreeValidCtxt:
- * @ctxt:  a validation context
- *
- * Free the memory allocated for a validation context
- */
-void 
-xmlFreeValidCtxt(xmlValidCtxtPtr ctxt) {
-    if (ctxt == NULL)
-	return;
-#ifdef LIBXML_REGEXP_ENABLED
-    while (ctxt->vstateNr >= 0)
-	vstateVPop(ctxt);
-    if (ctxt->vstateNr <= 1) return(-1);
-    ctxt->vstateNr--;
-    elemDecl = ctxt->vstateTab[ctxt->vstateNr].elemDecl;
-    ctxt->vstateTab[ctxt->vstateNr].elemDecl = NULL;
-    ctxt->vstateTab[ctxt->vstateNr].node = NULL;
-    if ((elemDecl != NULL) && (elemDecl->etype == XML_ELEMENT_TYPE_ELEMENT)) {
-	xmlRegFreeExecCtxt(ctxt->vstateTab[ctxt->vstateNr].exec);
-    }
-    ctxt->vstateTab[ctxt->vstateNr].exec = NULL;
-    if (ctxt->vstateNr >= 1)
-	ctxt->vstate = &ctxt->vstateTab[ctxt->vstateNr - 1];
-    else
-	ctxt->vstate = NULL;
-    return(ctxt->vstateNr);
-#else /* ! LIBXML_REGEXP_ENABLED */
-#endif /* LIBXML_REGEXP_ENABLED */
-}
-#endif
 
 #ifdef DEBUG_VALID_ALGO
 static void
@@ -371,7 +354,7 @@ xmlValidPrintNodeList(xmlNodePtr cur) {
 
 static void
 xmlValidDebug(xmlNodePtr cur, xmlElementContentPtr cont) {
-    char expr[1000];
+    char expr[5000];
 
     expr[0] = 0;
     xmlGenericError(xmlGenericErrorContext, "valid: ");
@@ -505,49 +488,40 @@ xmlValidBuildAContentModel(xmlElementContentPtr content,
 	    break;
 	case XML_ELEMENT_CONTENT_ELEMENT: {
 	    xmlAutomataStatePtr oldstate = ctxt->state;
-	    xmlChar *QName = NULL;
-	    const xmlChar *fname = content->name;
-
-	    if (content->prefix != NULL) {
-		int len;
-
-		len = xmlStrlen(content->name) + 
-		      xmlStrlen(content->prefix) + 2;
-		QName = xmlMalloc(len);
-		if (QName == NULL) {
-		    VERROR(ctxt->userData,
-			   "ContentModel %s : alloc failed\n", name);
-		    return(0);
-		}
-		snprintf((char *) QName, len, "%s:%s",
-			 (char *)content->prefix,
-			 (char *)content->name);
-		fname = QName;
+	    xmlChar fn[50];
+	    xmlChar *fullname;
+	    
+	    fullname = xmlBuildQName(content->name, content->prefix, fn, 50);
+	    if (fullname == NULL) {
+		VERROR(ctxt->userData, "Out of memory\n");
+		return(0);
 	    }
 
 	    switch (content->ocur) {
 		case XML_ELEMENT_CONTENT_ONCE:
 		    ctxt->state = xmlAutomataNewTransition(ctxt->am,
-			    ctxt->state, NULL, fname, NULL);
+			    ctxt->state, NULL, fullname, NULL);
 		    break;
 		case XML_ELEMENT_CONTENT_OPT:
 		    ctxt->state = xmlAutomataNewTransition(ctxt->am,
-			    ctxt->state, NULL, fname, NULL);
+			    ctxt->state, NULL, fullname, NULL);
 		    xmlAutomataNewEpsilon(ctxt->am, oldstate, ctxt->state);
 		    break;
 		case XML_ELEMENT_CONTENT_PLUS:
 		    ctxt->state = xmlAutomataNewTransition(ctxt->am,
-			    ctxt->state, NULL, fname, NULL);
+			    ctxt->state, NULL, fullname, NULL);
 		    xmlAutomataNewTransition(ctxt->am, ctxt->state,
-			                     ctxt->state, fname, NULL);
+			                     ctxt->state, fullname, NULL);
 		    break;
 		case XML_ELEMENT_CONTENT_MULT:
 		    xmlAutomataNewTransition(ctxt->am, ctxt->state,
-			                     ctxt->state, fname, NULL);
+			                     ctxt->state, fullname, NULL);
+		    ctxt->state = xmlAutomataNewEpsilon(ctxt->am, ctxt->state,
+			                     NULL);
 		    break;
 	    }
-	    if (QName != NULL)
-		xmlFree(QName);
+	    if ((fullname != fn) && (fullname != content->name))
+		xmlFree(fullname);
 	    break;
 	}
 	case XML_ELEMENT_CONTENT_SEQ: {
@@ -559,6 +533,10 @@ xmlValidBuildAContentModel(xmlElementContentPtr content,
 	     */
 	    oldstate = ctxt->state;
 	    ocur = content->ocur;
+	    if (ocur != XML_ELEMENT_CONTENT_ONCE) {
+		ctxt->state = xmlAutomataNewEpsilon(ctxt->am, oldstate, NULL);
+		oldstate = ctxt->state;
+	    }
 	    do {
 		xmlValidBuildAContentModel(content->c1, ctxt, name);
 		content = content->c2;
@@ -646,7 +624,6 @@ xmlValidBuildAContentModel(xmlElementContentPtr content,
  */
 int
 xmlValidBuildContentModel(xmlValidCtxtPtr ctxt, xmlElementPtr elem) {
-    xmlAutomataStatePtr start;
 
     if ((ctxt == NULL) || (elem == NULL))
 	return(0);
@@ -655,8 +632,13 @@ xmlValidBuildContentModel(xmlValidCtxtPtr ctxt, xmlElementPtr elem) {
     if (elem->etype != XML_ELEMENT_TYPE_ELEMENT)
 	return(1);
     /* TODO: should we rebuild in this case ? */
-    if (elem->contModel != NULL)
+    if (elem->contModel != NULL) {
+	if (!xmlRegexpIsDeterminist(elem->contModel)) {
+	    ctxt->valid = 0;
+	    return(0);
+	}
 	return(1);
+    }
 
     ctxt->am = xmlNewAutomata();
     if (ctxt->am == NULL) {
@@ -664,11 +646,11 @@ xmlValidBuildContentModel(xmlValidCtxtPtr ctxt, xmlElementPtr elem) {
 	       elem->name);
 	return(0);
     }
-    start = ctxt->state = xmlAutomataGetInitState(ctxt->am);
+    ctxt->state = xmlAutomataGetInitState(ctxt->am);
     xmlValidBuildAContentModel(elem->content, ctxt, elem->name);
     xmlAutomataSetFinalState(ctxt->am, ctxt->state);
     elem->contModel = xmlAutomataCompile(ctxt->am);
-    if (!xmlRegexpIsDeterminist(elem->contModel)) {
+    if (xmlRegexpIsDeterminist(elem->contModel) != 1) {
 	char expr[5000];
 	expr[0] = 0;
 	xmlSnprintfElementContent(expr, 5000, elem->content, 1);
@@ -678,6 +660,10 @@ xmlValidBuildContentModel(xmlValidCtxtPtr ctxt, xmlElementPtr elem) {
         xmlRegexpPrint(stderr, elem->contModel);
 #endif
         ctxt->valid = 0;
+	ctxt->state = NULL;
+	xmlFreeAutomata(ctxt->am);
+	ctxt->am = NULL;
+	return(0);
     }
     ctxt->state = NULL;
     xmlFreeAutomata(ctxt->am);
@@ -687,68 +673,41 @@ xmlValidBuildContentModel(xmlValidCtxtPtr ctxt, xmlElementPtr elem) {
 
 #endif /* LIBXML_REGEXP_ENABLED */
 
-/************************************************************************
- *									*
- *			QName handling helper				*
- *									*
- ************************************************************************/
-
-/**
- * xmlSplitQName2:
- * @name:  an XML parser context
- * @prefix:  a xmlChar ** 
- *
- * parse an XML qualified name string
- *
- * [NS 5] QName ::= (Prefix ':')? LocalPart
- *
- * [NS 6] Prefix ::= NCName
- *
- * [NS 7] LocalPart ::= NCName
- *
- * Returns NULL if not a QName, otherwise the local part, and prefix
- *   is updated to get the Prefix if any.
- */
-
-xmlChar *
-xmlSplitQName2(const xmlChar *name, xmlChar **prefix) {
-    int len = 0;
-    xmlChar *ret = NULL;
-
-    *prefix = NULL;
-
-#ifndef XML_XML_NAMESPACE
-    /* xml: prefix is not really a namespace */
-    if ((name[0] == 'x') && (name[1] == 'm') &&
-        (name[2] == 'l') && (name[3] == ':'))
-	return(NULL);
-#endif
-
-    /* nasty but valid */
-    if (name[0] == ':')
-	return(NULL);
-
-    /*
-     * we are not trying to validate but just to cut, and yes it will
-     * work even if this is as set of UTF-8 encoded chars
-     */
-    while ((name[len] != 0) && (name[len] != ':')) 
-	len++;
-    
-    if (name[len] == 0)
-	return(NULL);
-
-    *prefix = xmlStrndup(name, len);
-    ret = xmlStrdup(&name[len + 1]);
-
-    return(ret);
-}
-
 /****************************************************************
  *								*
  *	Util functions for data allocation/deallocation		*
  *								*
  ****************************************************************/
+
+/**
+ * xmlNewValidCtxt:
+ *
+ * Allocate a validation context structure.
+ *
+ * Returns NULL if not, otherwise the new validation context structure
+ */
+xmlValidCtxtPtr
+xmlNewValidCtxt(void) {
+    xmlValidCtxtPtr ret;
+
+    if ((ret = xmlMalloc(sizeof (xmlValidCtxt))) == NULL)
+	return (NULL);
+
+    (void) memset(ret, 0, sizeof (xmlValidCtxt));
+
+    return (ret);
+}
+
+/**
+ * xmlFreeValidCtxt:
+ * @cur:  the validation context to free
+ *
+ * Free a validation context structure.
+ */
+void
+xmlFreeValidCtxt(xmlValidCtxtPtr cur) {
+    xmlFree(cur);
+}
 
 /**
  * xmlNewElementContent:
@@ -987,7 +946,8 @@ xmlSnprintfElementContent(char *buf, int size, xmlElementContentPtr content, int
 		strcat(buf, " ...");
 		return;
 	    }
-	    strcat(buf, (char *) content->name);
+	    if (content->name != NULL)
+		strcat(buf, (char *) content->name);
 	    break;
 	case XML_ELEMENT_CONTENT_SEQ:
 	    if ((content->c1->type == XML_ELEMENT_CONTENT_OR) ||
@@ -1172,6 +1132,10 @@ xmlAddElementDecl(xmlValidCtxtPtr ctxt, xmlDtdPtr dtd, const xmlChar *name,
     if (table == NULL) {
 	xmlGenericError(xmlGenericErrorContext,
 		"xmlAddElementDecl: Table creation failed!\n");
+	if (uqname != NULL)
+	    xmlFree(uqname);
+	if (ns != NULL)
+	    xmlFree(ns);
         return(NULL);
     }
 
@@ -1202,6 +1166,8 @@ xmlAddElementDecl(xmlValidCtxtPtr ctxt, xmlDtdPtr dtd, const xmlChar *name,
 	    VERROR(ctxt->userData, "Redefinition of element %s\n", name);
 	    if (uqname != NULL)
 		xmlFree(uqname);
+            if (ns != NULL)
+	        xmlFree(ns);
 	    return(NULL);
 	}
     } else {
@@ -1209,6 +1175,10 @@ xmlAddElementDecl(xmlValidCtxtPtr ctxt, xmlDtdPtr dtd, const xmlChar *name,
 	if (ret == NULL) {
 	    xmlGenericError(xmlGenericErrorContext,
 		    "xmlAddElementDecl: out of memory\n");
+	    if (uqname != NULL)
+		xmlFree(uqname);
+            if (ns != NULL)
+	        xmlFree(ns);
 	    return(NULL);
 	}
 	memset(ret, 0, sizeof(xmlElement));
@@ -1218,6 +1188,16 @@ xmlAddElementDecl(xmlValidCtxtPtr ctxt, xmlDtdPtr dtd, const xmlChar *name,
 	 * fill the structure.
 	 */
 	ret->name = xmlStrdup(name);
+	if (ret->name == NULL) {
+	    xmlGenericError(xmlGenericErrorContext,
+		    "xmlAddElementDecl: out of memory\n");
+	    if (uqname != NULL)
+		xmlFree(uqname);
+            if (ns != NULL)
+	        xmlFree(ns);
+	    xmlFree(ret);
+	    return(NULL);
+	}
 	ret->prefix = ns;
 
 	/*
@@ -2272,6 +2252,8 @@ xmlAddID(xmlValidCtxtPtr ctxt, xmlDocPtr doc, const xmlChar *value,
 	xmlFreeID(ret);
 	return(NULL);
     }
+    if (attr != NULL)
+	attr->atype = XML_ATTRIBUTE_ID;
     return(ret);
 }
 
@@ -2315,23 +2297,19 @@ xmlIsID(xmlDocPtr doc, xmlNodePtr elem, xmlAttrPtr attr) {
 
 	if (elem == NULL) return(0);
 	if ((elem->ns != NULL) && (elem->ns->prefix != NULL)) {
-	    /*
-	     * TODO: this sucks ... recomputing this every time is stupid
-	     */
-	    int len = xmlStrlen(elem->name) + xmlStrlen(elem->ns->prefix) + 2;
+	    xmlChar fn[50];
 	    xmlChar *fullname;
-
-	    fullname = xmlMalloc(len);
+	    
+	    fullname = xmlBuildQName(elem->name, elem->ns->prefix, fn, 50);
 	    if (fullname == NULL)
 		return(0);
-	    snprintf((char *) fullname, len, "%s:%s", (char *) elem->ns->prefix,
-		     (char *) elem->name);
 	    attrDecl = xmlGetDtdAttrDesc(doc->intSubset, fullname,
 		                         attr->name);
 	    if ((attrDecl == NULL) && (doc->extSubset != NULL))
 		attrDecl = xmlGetDtdAttrDesc(doc->extSubset, fullname,
 					     attr->name);
-	    xmlFree(fullname);
+	    if ((fullname != fn) && (fullname != elem->name))
+		xmlFree(fullname);
 	} else {
 	    attrDecl = xmlGetDtdAttrDesc(doc->intSubset, elem->name,
 		                         attr->name);
@@ -2755,7 +2733,7 @@ xmlGetDtdElementDesc(xmlDtdPtr dtd, const xmlChar *name) {
     xmlElementPtr cur;
     xmlChar *uqname = NULL, *prefix = NULL;
 
-    if (dtd == NULL) return(NULL);
+    if ((dtd == NULL) || (name == NULL)) return(NULL);
     if (dtd->elements == NULL)
 	return(NULL);
     table = (xmlElementTablePtr) dtd->elements;
@@ -2960,7 +2938,7 @@ xmlValidateNotationUse(xmlValidCtxtPtr ctxt, xmlDocPtr doc,
     if ((notaDecl == NULL) && (doc->extSubset != NULL))
 	notaDecl = xmlGetDtdNotationDesc(doc->extSubset, notationName);
 
-    if (notaDecl == NULL) {
+    if ((notaDecl == NULL) && (ctxt != NULL)) {
 	VERROR(ctxt->userData, "NOTATION %s is not declared\n",
 	       notationName);
 	return(0);
@@ -3452,16 +3430,20 @@ xmlValidCtxtNormalizeAttributeValue(xmlValidCtxtPtr ctxt, xmlDocPtr doc,
     if (value == NULL) return(NULL);
 
     if ((elem->ns != NULL) && (elem->ns->prefix != NULL)) {
-	xmlChar qname[500];
-	snprintf((char *) qname, sizeof(qname), "%s:%s",
-		 elem->ns->prefix, elem->name);
-        qname[sizeof(qname) - 1] = 0;
-	attrDecl = xmlGetDtdAttrDesc(doc->intSubset, qname, name);
+	xmlChar fn[50];
+	xmlChar *fullname;
+	
+	fullname = xmlBuildQName(elem->name, elem->ns->prefix, fn, 50);
+	if (fullname == NULL)
+	    return(0);
+	attrDecl = xmlGetDtdAttrDesc(doc->intSubset, fullname, name);
 	if ((attrDecl == NULL) && (doc->extSubset != NULL)) {
-	    attrDecl = xmlGetDtdAttrDesc(doc->extSubset, qname, name);
+	    attrDecl = xmlGetDtdAttrDesc(doc->extSubset, fullname, name);
 	    if (attrDecl != NULL)
 		extsubset = 1;
 	}
+	if ((fullname != fn) && (fullname != elem->name))
+	    xmlFree(fullname);
     }
     if ((attrDecl == NULL) && (doc->intSubset != NULL))
 	attrDecl = xmlGetDtdAttrDesc(doc->intSubset, elem->name, name);
@@ -3533,13 +3515,17 @@ xmlValidNormalizeAttributeValue(xmlDocPtr doc, xmlNodePtr elem,
     if (value == NULL) return(NULL);
 
     if ((elem->ns != NULL) && (elem->ns->prefix != NULL)) {
-	xmlChar qname[500];
-	snprintf((char *) qname, sizeof(qname), "%s:%s",
-		 elem->ns->prefix, elem->name);
-        qname[sizeof(qname) - 1] = 0;
-	attrDecl = xmlGetDtdAttrDesc(doc->intSubset, qname, name);
+	xmlChar fn[50];
+	xmlChar *fullname;
+	
+	fullname = xmlBuildQName(elem->name, elem->ns->prefix, fn, 50);
+	if (fullname == NULL)
+	    return(0);
+	attrDecl = xmlGetDtdAttrDesc(doc->intSubset, fullname, name);
 	if ((attrDecl == NULL) && (doc->extSubset != NULL))
-	    attrDecl = xmlGetDtdAttrDesc(doc->extSubset, qname, name);
+	    attrDecl = xmlGetDtdAttrDesc(doc->extSubset, fullname, name);
+	if ((fullname != fn) && (fullname != elem->name))
+	    xmlFree(fullname);
     }
     attrDecl = xmlGetDtdAttrDesc(doc->intSubset, elem->name, name);
     if ((attrDecl == NULL) && (doc->extSubset != NULL))
@@ -3731,20 +3717,34 @@ xmlValidateElementDecl(xmlValidCtxtPtr ctxt, xmlDocPtr doc,
 		next = cur->c2;
 		while (next != NULL) {
 		    if (next->type == XML_ELEMENT_CONTENT_ELEMENT) {
-		        if (xmlStrEqual(next->name, name)) {
-			    VERROR(ctxt->userData, 
+		        if ((xmlStrEqual(next->name, name)) &&
+			    (xmlStrEqual(next->prefix, cur->prefix))) {
+			    if (cur->prefix == NULL) {
+				VERROR(ctxt->userData, 
 		   "Definition of %s has duplicate references of %s\n",
-				   elem->name, name);
+				       elem->name, name);
+			    } else {
+				VERROR(ctxt->userData, 
+		   "Definition of %s has duplicate references of %s:%s\n",
+				       elem->name, cur->prefix, name);
+			    }
 			    ret = 0;
 			}
 			break;
 		    }
 		    if (next->c1 == NULL) break;
 		    if (next->c1->type != XML_ELEMENT_CONTENT_ELEMENT) break;
-		    if (xmlStrEqual(next->c1->name, name)) {
-			VERROR(ctxt->userData, 
-	       "Definition of %s has duplicate references of %s\n",
-			       elem->name, name);
+		    if ((xmlStrEqual(next->c1->name, name)) &&
+		        (xmlStrEqual(next->c1->prefix, cur->prefix))) {
+			if (cur->prefix == NULL) {
+			    VERROR(ctxt->userData, 
+	       "Definition of %s has duplicate references to %s\n",
+				   elem->name, name);
+			} else {
+			    VERROR(ctxt->userData, 
+	       "Definition of %s has duplicate references to %s:%s\n",
+				   elem->name, cur->prefix, name);
+			}
 			ret = 0;
 		    }
 		    next = next->c2;
@@ -3819,22 +3819,26 @@ xmlValidateOneAttribute(xmlValidCtxtPtr ctxt, xmlDocPtr doc,
     if ((attr == NULL) || (attr->name == NULL)) return(0);
 
     if ((elem->ns != NULL) && (elem->ns->prefix != NULL)) {
-	xmlChar qname[500];
-	snprintf((char *) qname, sizeof(qname), "%s:%s",
-		 elem->ns->prefix, elem->name);
-        qname[sizeof(qname) - 1] = 0;
+	xmlChar fn[50];
+	xmlChar *fullname;
+	
+	fullname = xmlBuildQName(elem->name, elem->ns->prefix, fn, 50);
+	if (fullname == NULL)
+	    return(0);
 	if (attr->ns != NULL) {
-	    attrDecl = xmlGetDtdQAttrDesc(doc->intSubset, qname,
+	    attrDecl = xmlGetDtdQAttrDesc(doc->intSubset, fullname,
 		                          attr->name, attr->ns->prefix);
 	    if ((attrDecl == NULL) && (doc->extSubset != NULL))
-		attrDecl = xmlGetDtdQAttrDesc(doc->extSubset, qname,
+		attrDecl = xmlGetDtdQAttrDesc(doc->extSubset, fullname,
 					      attr->name, attr->ns->prefix);
 	} else {
-	    attrDecl = xmlGetDtdAttrDesc(doc->intSubset, qname, attr->name);
+	    attrDecl = xmlGetDtdAttrDesc(doc->intSubset, fullname, attr->name);
 	    if ((attrDecl == NULL) && (doc->extSubset != NULL))
 		attrDecl = xmlGetDtdAttrDesc(doc->extSubset,
-					     qname, attr->name);
+					     fullname, attr->name);
 	}
+	if ((fullname != fn) && (fullname != elem->name))
+	    xmlFree(fullname);
     }
     if (attrDecl == NULL) {
 	if (attr->ns != NULL) {
@@ -3999,23 +4003,29 @@ xmlNodePtr elem, const xmlChar *prefix, xmlNsPtr ns, const xmlChar *value) {
     if ((ns == NULL) || (ns->href == NULL)) return(0);
 
     if (prefix != NULL) {
-	xmlChar qname[500];
-	snprintf((char *) qname, sizeof(qname), "%s:%s",
-		 prefix, elem->name);
-        qname[sizeof(qname) - 1] = 0;
+	xmlChar fn[50];
+	xmlChar *fullname;
+	
+	fullname = xmlBuildQName(elem->name, prefix, fn, 50);
+	if (fullname == NULL) {
+	    VERROR(ctxt->userData, "Out of memory\n");
+	    return(0);
+	}
 	if (ns->prefix != NULL) {
-	    attrDecl = xmlGetDtdQAttrDesc(doc->intSubset, qname,
+	    attrDecl = xmlGetDtdQAttrDesc(doc->intSubset, fullname,
 		                          ns->prefix, BAD_CAST "xmlns");
 	    if ((attrDecl == NULL) && (doc->extSubset != NULL))
-		attrDecl = xmlGetDtdQAttrDesc(doc->extSubset, qname,
+		attrDecl = xmlGetDtdQAttrDesc(doc->extSubset, fullname,
 					  ns->prefix, BAD_CAST "xmlns");
 	} else {
-	    attrDecl = xmlGetDtdAttrDesc(doc->intSubset, qname,
+	    attrDecl = xmlGetDtdAttrDesc(doc->intSubset, fullname,
 		                         BAD_CAST "xmlns");
 	    if ((attrDecl == NULL) && (doc->extSubset != NULL))
-		attrDecl = xmlGetDtdAttrDesc(doc->extSubset, qname,
+		attrDecl = xmlGetDtdAttrDesc(doc->extSubset, fullname,
 			                 BAD_CAST "xmlns");
 	}
+	if ((fullname != fn) && (fullname != elem->name))
+	    xmlFree(fullname);
     }
     if (attrDecl == NULL) {
 	if (ns->prefix != NULL) {
@@ -4711,10 +4721,13 @@ xmlValidateElementContent(xmlValidCtxtPtr ctxt, xmlNodePtr child,
     if (elemDecl->contModel == NULL)
 	ret = xmlValidBuildContentModel(ctxt, elemDecl);
     if (elemDecl->contModel == NULL) {
-	ret = -1;
+	return(-1);
     } else {
 	xmlRegExecCtxtPtr exec;
 
+	if (!xmlRegexpIsDeterminist(elemDecl->contModel)) {
+	    return(-1);
+	}
 	ctxt->nodeMax = 0;
 	ctxt->nodeNr = 0;
 	ctxt->nodeTab = NULL;
@@ -4746,21 +4759,18 @@ xmlValidateElementContent(xmlValidCtxtPtr ctxt, xmlNodePtr child,
 			goto fail;
 		    case XML_ELEMENT_NODE:
 			if ((cur->ns != NULL) && (cur->ns->prefix != NULL)) {
-			    xmlChar *QName;
-			    int len;
-
-			    len = xmlStrlen(cur->name) + 
-				  xmlStrlen(cur->ns->prefix) + 2;
-			    QName = xmlMalloc(len);
-			    if (QName == NULL) {
+			    xmlChar fn[50];
+			    xmlChar *fullname;
+			    
+			    fullname = xmlBuildQName(cur->name,
+				                     cur->ns->prefix, fn, 50);
+			    if (fullname == NULL) {
 				ret = -1;
 				goto fail;
 			    }
-			    snprintf((char *) QName, len, "%s:%s",
-				     (char *)cur->ns->prefix,
-				     (char *)cur->name);
-                            ret = xmlRegExecPushString(exec, QName, NULL);
-			    xmlFree(QName);
+                            ret = xmlRegExecPushString(exec, fullname, NULL);
+			    if ((fullname != fn) && (fullname != cur->name))
+				xmlFree(fullname);
 			} else {
 			    ret = xmlRegExecPushString(exec, cur->name, NULL);
 			}
@@ -4907,14 +4917,14 @@ fail:
 	    char list[5000];
 
 	    expr[0] = 0;
-	    xmlSnprintfElementContent(expr, 5000, cont, 1);
+	    xmlSnprintfElementContent(&expr[0], 5000, cont, 1);
 	    list[0] = 0;
 #ifndef LIBXML_REGEXP_ENABLED
 	    if (repl != NULL)
-		xmlSnprintfElements(list, 5000, repl, 1);
+		xmlSnprintfElements(&list[0], 5000, repl, 1);
 	    else
 #endif /* LIBXML_REGEXP_ENABLED */
-		xmlSnprintfElements(list, 5000, child, 1);
+		xmlSnprintfElements(&list[0], 5000, child, 1);
 
 	    if (name != NULL) {
 		if (parent != NULL) VECTXT(ctxt, parent);
@@ -5049,24 +5059,55 @@ done:
 static int
 xmlValidateCheckMixed(xmlValidCtxtPtr ctxt  ATTRIBUTE_UNUSED,
 	              xmlElementContentPtr cont, const xmlChar *qname) {
-    while (cont != NULL) {
-	if (cont->type == XML_ELEMENT_CONTENT_ELEMENT) {
-	    if (xmlStrEqual(cont->name, qname))
-		return(1);
-	} else if ((cont->type == XML_ELEMENT_CONTENT_OR) &&
-	   (cont->c1 != NULL) &&
-	   (cont->c1->type == XML_ELEMENT_CONTENT_ELEMENT)){
-	    if (xmlStrEqual(cont->c1->name, qname))
-		return(1);
-	} else if ((cont->type != XML_ELEMENT_CONTENT_OR) ||
-	    (cont->c1 == NULL) ||
-	    (cont->c1->type != XML_ELEMENT_CONTENT_PCDATA)){
-	    /* Internal error !!! */
-	    xmlGenericError(xmlGenericErrorContext,
-		    "Internal: MIXED struct bad\n");
-	    break;
+    const xmlChar *name;
+    int plen;
+    name = xmlSplitQName3(qname, &plen);
+
+    if (name == NULL) {
+	while (cont != NULL) {
+	    if (cont->type == XML_ELEMENT_CONTENT_ELEMENT) {
+		if ((cont->prefix == NULL) && (xmlStrEqual(cont->name, qname)))
+		    return(1);
+	    } else if ((cont->type == XML_ELEMENT_CONTENT_OR) &&
+	       (cont->c1 != NULL) &&
+	       (cont->c1->type == XML_ELEMENT_CONTENT_ELEMENT)){
+		if ((cont->c1->prefix == NULL) &&
+		    (xmlStrEqual(cont->c1->name, qname)))
+		    return(1);
+	    } else if ((cont->type != XML_ELEMENT_CONTENT_OR) ||
+		(cont->c1 == NULL) ||
+		(cont->c1->type != XML_ELEMENT_CONTENT_PCDATA)){
+		/* Internal error !!! */
+		xmlGenericError(xmlGenericErrorContext,
+			"Internal: MIXED struct bad\n");
+		break;
+	    }
+	    cont = cont->c2;
 	}
-	cont = cont->c2;
+    } else {
+	while (cont != NULL) {
+	    if (cont->type == XML_ELEMENT_CONTENT_ELEMENT) {
+		if ((cont->prefix != NULL) &&
+		    (xmlStrncmp(cont->prefix, qname, plen) == 0) &&
+		    (xmlStrEqual(cont->name, name)))
+		    return(1);
+	    } else if ((cont->type == XML_ELEMENT_CONTENT_OR) &&
+	       (cont->c1 != NULL) &&
+	       (cont->c1->type == XML_ELEMENT_CONTENT_ELEMENT)){
+		if ((cont->c1->prefix != NULL) &&
+		    (xmlStrncmp(cont->c1->prefix, qname, plen) == 0) &&
+		    (xmlStrEqual(cont->c1->name, name)))
+		    return(1);
+	    } else if ((cont->type != XML_ELEMENT_CONTENT_OR) ||
+		(cont->c1 == NULL) ||
+		(cont->c1->type != XML_ELEMENT_CONTENT_PCDATA)){
+		/* Internal error !!! */
+		xmlGenericError(xmlGenericErrorContext,
+			"Internal: MIXED struct bad\n");
+		break;
+	    }
+	    cont = cont->c2;
+	}
     }
     return(0);
 }
@@ -5131,6 +5172,7 @@ xmlValidGetElemDecl(xmlValidCtxtPtr ctxt, xmlDocPtr doc,
     return(elemDecl);
 }
 
+#ifdef LIBXML_REGEXP_ENABLED
 /**
  * xmlValidatePushElement:
  * @ctxt:  the validation context
@@ -5149,6 +5191,7 @@ xmlValidatePushElement(xmlValidCtxtPtr ctxt, xmlDocPtr doc,
     xmlElementPtr eDecl;
     int extsubset = 0;
 
+/* printf("PushElem %s\n", qname); */
     if ((ctxt->vstateNr > 0) && (ctxt->vstate != NULL)) {
 	xmlValidStatePtr state = ctxt->vstate;
 	xmlElementPtr elemDecl;
@@ -5236,6 +5279,7 @@ int
 xmlValidatePushCData(xmlValidCtxtPtr ctxt, const xmlChar *data, int len) {
     int ret = 1;
 
+/* printf("CDATA %s %d\n", data, len); */
     if (len <= 0)
 	return(ret);
     if ((ctxt->vstateNr > 0) && (ctxt->vstate != NULL)) {
@@ -5305,9 +5349,11 @@ done:
  */
 int
 xmlValidatePopElement(xmlValidCtxtPtr ctxt, xmlDocPtr doc ATTRIBUTE_UNUSED,
-                      xmlNodePtr elem, const xmlChar *qname ATTRIBUTE_UNUSED) {
+                      xmlNodePtr elem ATTRIBUTE_UNUSED,
+		      const xmlChar *qname ATTRIBUTE_UNUSED) {
     int ret = 1;
 
+/* printf("PopElem %s\n", qname); */
     if ((ctxt->vstateNr > 0) && (ctxt->vstate != NULL)) {
 	xmlValidStatePtr state = ctxt->vstate;
 	xmlElementPtr elemDecl;
@@ -5340,6 +5386,7 @@ xmlValidatePopElement(xmlValidCtxtPtr ctxt, xmlDocPtr doc ATTRIBUTE_UNUSED,
     }
     return(ret);
 }
+#endif /* LIBXML_REGEXP_ENABLED */
 
 /**
  * xmlValidateOneElement:
@@ -5498,18 +5545,23 @@ xmlValidateOneElement(xmlValidCtxtPtr ctxt, xmlDocPtr doc,
 	        if (child->type == XML_ELEMENT_NODE) {
 		    name = child->name;
 		    if ((child->ns != NULL) && (child->ns->prefix != NULL)) {
-			xmlChar qname[500];
-			snprintf((char *) qname, sizeof(qname), "%s:%s",
-				 child->ns->prefix, child->name);
-                        qname[sizeof(qname) - 1] = 0;
+			xmlChar fn[50];
+			xmlChar *fullname;
+			
+			fullname = xmlBuildQName(child->name, child->ns->prefix,
+				                 fn, 50);
+			if (fullname == NULL)
+			    return(0);
 			cont = elemDecl->content;
 			while (cont != NULL) {
 			    if (cont->type == XML_ELEMENT_CONTENT_ELEMENT) {
-				if (xmlStrEqual(cont->name, qname)) break;
+				if (xmlStrEqual(cont->name, fullname))
+				    break;
 			    } else if ((cont->type == XML_ELEMENT_CONTENT_OR) &&
 			       (cont->c1 != NULL) &&
 			       (cont->c1->type == XML_ELEMENT_CONTENT_ELEMENT)){
-				if (xmlStrEqual(cont->c1->name, qname)) break;
+				if (xmlStrEqual(cont->c1->name, fullname))
+				    break;
 			    } else if ((cont->type != XML_ELEMENT_CONTENT_OR) ||
 				(cont->c1 == NULL) ||
 				(cont->c1->type != XML_ELEMENT_CONTENT_PCDATA)){
@@ -5520,6 +5572,8 @@ xmlValidateOneElement(xmlValidCtxtPtr ctxt, xmlDocPtr doc,
 			    }
 			    cont = cont->c2;
 			}
+			if ((fullname != fn) && (fullname != child->name))
+			    xmlFree(fullname);
 			if (cont != NULL)
 			    goto child_ok;
 		    }
@@ -5740,6 +5794,8 @@ found:
 int
 xmlValidateRoot(xmlValidCtxtPtr ctxt, xmlDocPtr doc) {
     xmlNodePtr root;
+    int ret;
+
     if (doc == NULL) return(0);
 
     root = xmlDocGetRootElement(doc);
@@ -5759,11 +5815,18 @@ xmlValidateRoot(xmlValidCtxtPtr ctxt, xmlDocPtr doc) {
 	 */
 	if (!xmlStrEqual(doc->intSubset->name, root->name)) {
 	    if ((root->ns != NULL) && (root->ns->prefix != NULL)) {
-		xmlChar qname[500];
-		snprintf((char *) qname, sizeof(qname), "%s:%s",
-			 root->ns->prefix, root->name);
-		qname[sizeof(qname) - 1] = 0;
-		if (xmlStrEqual(doc->intSubset->name, qname))
+		xmlChar fn[50];
+		xmlChar *fullname;
+		
+		fullname = xmlBuildQName(root->name, root->ns->prefix, fn, 50);
+		if (fullname == NULL) {
+		    VERROR(ctxt->userData, "Out of memory\n");
+		    return(0);
+		}
+		ret = xmlStrEqual(doc->intSubset->name, fullname);
+		if ((fullname != fn) && (fullname != root->name))
+		    xmlFree(fullname);
+		if (ret == 1)
 		    goto name_ok;
 	    } 
 	    if ((xmlStrEqual(doc->intSubset->name, BAD_CAST "HTML")) &&
@@ -5968,6 +6031,7 @@ xmlValidateCheckRefCallback(xmlListPtr ref_list, xmlValidCtxtPtr ctxt,
  *
  * basically it does the following checks described by the XML Rec
  * 
+ * Check all the IDREF/IDREFS attributes definition for validity
  *
  * returns 1 if valid or 0 otherwise
  */

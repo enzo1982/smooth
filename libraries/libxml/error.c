@@ -80,6 +80,7 @@ xmlGenericErrorDefaultFunc(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...) {
  * @handler:  the handler
  * 
  * Set or reset (if NULL) the default handler for generic errors
+ * to the builtin error function.
  */
 void
 initGenericErrorDefaultFunc(xmlGenericErrorFunc * handler)
@@ -148,49 +149,48 @@ xmlParserPrintFileInfo(xmlParserInputPtr input) {
 void
 xmlParserPrintFileContext(xmlParserInputPtr input) {
     const xmlChar *cur, *base;
-    int n;
-    xmlChar  content[81];
+    unsigned int n, col;	/* GCC warns if signed, because compared with sizeof() */
+    xmlChar  content[81]; /* space for 80 chars + line terminator */
     xmlChar *ctnt;
 
     if (input == NULL) return;
     cur = input->cur;
     base = input->base;
     /* skip backwards over any end-of-lines */
-    while ((cur > base) && ((*cur == '\n') || (*cur == '\r'))) {
+    while ((cur > base) && ((*(cur) == '\n') || (*(cur) == '\r'))) {
 	cur--;
     }
     n = 0;
-    /* search backwards for beginning-of-line maximum 80 characters */
-    while ((n++ < 80) && (cur > base) && (*cur != '\n') && (*cur != '\r'))
+    /* search backwards for beginning-of-line (to max buff size) */
+    while ((n++ < (sizeof(content)-1)) && (cur > base) && 
+    	   (*(cur) != '\n') && (*(cur) != '\r'))
         cur--;
-    if ((*cur == '\n') || (*cur == '\r')) cur++;
-	/* search forward for end-of-line maximum 80 characters */
+    if ((*(cur) == '\n') || (*(cur) == '\r')) cur++;
+    /* calculate the error position in terms of the current position */
+    col = input->cur - cur;
+    /* search forward for end-of-line (to max buff size) */
     n = 0;
     ctnt = content;
-    while ((*cur != 0) && (*cur != '\n') && (*cur != '\r') && (n < 79)) {
+    /* copy selected text to our buffer */
+    while ((*cur != 0) && (*(cur) != '\n') && 
+    	   (*(cur) != '\r') && (n < sizeof(content)-1)) {
 		*ctnt++ = *cur++;
 	n++;
     }
     *ctnt = 0;
+    /* print out the selected text */
     xmlGenericError(xmlGenericErrorContext,"%s\n", content);
     /* create blank line with problem pointer */
-    cur = input->cur;
-    while ((cur > base) && ((*cur == '\n') || (*cur == '\r'))) {
-		cur--;
-	}
     n = 0;
     ctnt = content;
-    while ((n++ < 79) && (cur > base) && (*cur != '\n') && (*cur != '\r')) {
-	*ctnt++ = ' ';
-	cur--;
+    /* (leave buffer space for pointer + line terminator) */
+    while ((n<col) && (n++ < sizeof(content)-2) && (*ctnt != 0)) {
+	if (*(ctnt) != '\t')
+	    *(ctnt) = ' ';
+	ctnt++;
     }
-    if (ctnt > content) {
-	*(--ctnt) = '^';
-	*(++ctnt) = 0;
-    } else {
-	*ctnt = '^';
-	*(++ctnt) = 0;
-    }
+    *ctnt++ = '^';
+    *ctnt = 0;
     xmlGenericError(xmlGenericErrorContext,"%s\n", content);
 }
 
@@ -352,7 +352,6 @@ xmlParserValidityError(void *ctx, const char *msg, ...)
     char * str;
     int len = xmlStrlen((const xmlChar *) msg);
     static int had_info = 0;
-    int need_context = 0;
 
     if ((len > 1) && (msg[len - 2] != ':')) {
 	if (ctxt != NULL) {
@@ -365,7 +364,6 @@ xmlParserValidityError(void *ctx, const char *msg, ...)
 	    }
 	}
 	xmlGenericError(xmlGenericErrorContext, "validity error: ");
-	need_context = 1;
 	had_info = 0;
     } else {
 	had_info = 1;

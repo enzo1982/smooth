@@ -11,6 +11,7 @@
 #include <smooth/string.h>
 #include <smooth/math.h>
 #include <smooth/timer.h>
+#include <smooth/stk.h>
 #include <iconv.h>
 #include <string.h>
 #include <iolib-cxx.h>
@@ -930,14 +931,14 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 	if (Setup::useIconv)
 	{
-		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
+		iconv_t		 cd	= ex_iconv_open(outEncoding, inEncoding);
 
 		if ((int) cd == -1) return -1;
 
 		InStream	*in	= new InStream(STREAM_BUFFER, (void *) inBuffer, inBytes);
 		OutStream	*out	= new OutStream(STREAM_BUFFER, (void *) outBuffer, outBytes);
 
-		iconv(cd, NULL, NULL, NULL, NULL);
+		ex_iconv(cd, NULL, NULL, NULL, NULL);
 
 		char		 inBuf[4096 + 4096];
 		size_t		 inBufRest = 0;
@@ -958,7 +959,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 				}
 				else
 				{
-					iconv_close(cd);
+					ex_iconv_close(cd);
 
 					delete in;
 					delete out;
@@ -978,7 +979,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 					char	*outPtr		= outBuf;
 					size_t	 outSize	= sizeof(outBuf);
 
-					if ((signed) iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize) < 0)
+					if ((signed) ex_iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize) < 0)
 					{
 						convError = True;
 
@@ -999,7 +1000,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		char	*outPtr		= outBuf;
 		size_t	 outSize	= sizeof(outBuf);
 
-		iconv(cd, NULL, NULL, &outPtr, &outSize);
+		ex_iconv(cd, NULL, NULL, &outPtr, &outSize);
 
 		if (outPtr != outBuf)
 		{
@@ -1007,13 +1008,71 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 			size += (outPtr - outBuf);
 		}
 
-		iconv_close(cd);
+		ex_iconv_close(cd);
 
 		if (size >= outBytes) size = 0;
 		if (convError) size = -1;
 
 		delete in;
 		delete out;
+	}
+	else if (strcmp(outEncoding, "UTF-16LE") == 0)
+	{
+		Int	 codePage = CP_ACP;
+
+		if (strcmp(inEncoding, "ISO-8859-1") == 0)		codePage = 28591;
+		else if (strcmp(inEncoding, "ISO-8859-2") == 0)		codePage = 28592;
+		else if (strcmp(inEncoding, "ISO-8859-3") == 0)		codePage = 28593;
+		else if (strcmp(inEncoding, "ISO-8859-4") == 0)		codePage = 28594;
+		else if (strcmp(inEncoding, "ISO-8859-5") == 0)		codePage = 28595;
+		else if (strcmp(inEncoding, "ISO-8859-6") == 0)		codePage = 28596;
+		else if (strcmp(inEncoding, "ISO-8859-7") == 0)		codePage = 28597;
+		else if (strcmp(inEncoding, "ISO-8859-8") == 0)		codePage = 28598;
+		else if (strcmp(inEncoding, "ISO-8859-9") == 0)		codePage = 28599;
+		else if (strcmp(inEncoding, "ISO-8859-15") == 0)	codePage = 28605;
+		else if (strcmp(inEncoding, "KOI8-R") == 0)		codePage = 20866;
+		else if (strcmp(inEncoding, "KOI8-RU") == 0)		codePage = 21866;
+		else if (strcmp(inEncoding, "GBK") == 0)		codePage = 936;
+		else if (strcmp(inEncoding, "UTF-7") == 0)		codePage = CP_UTF7;
+		else if (strcmp(inEncoding, "UTF-8") == 0)		codePage = CP_UTF8;
+
+		size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * 2;
+
+		if (size < outBytes && size > 0)
+		{
+			MultiByteToWideChar(codePage, 0, inBuffer, -1, (wchar_t *) outBuffer, size / 2);
+		}
+
+		if (size >= outBytes) size = 0;
+	}
+	else if (strcmp(inEncoding, "UTF-16LE") == 0)
+	{
+		Int	 codePage = CP_ACP;
+
+		if (strcmp(outEncoding, "ISO-8859-1") == 0)		codePage = 28591;
+		else if (strcmp(outEncoding, "ISO-8859-2") == 0)	codePage = 28592;
+		else if (strcmp(outEncoding, "ISO-8859-3") == 0)	codePage = 28593;
+		else if (strcmp(outEncoding, "ISO-8859-4") == 0)	codePage = 28594;
+		else if (strcmp(outEncoding, "ISO-8859-5") == 0)	codePage = 28595;
+		else if (strcmp(outEncoding, "ISO-8859-6") == 0)	codePage = 28596;
+		else if (strcmp(outEncoding, "ISO-8859-7") == 0)	codePage = 28597;
+		else if (strcmp(outEncoding, "ISO-8859-8") == 0)	codePage = 28598;
+		else if (strcmp(outEncoding, "ISO-8859-9") == 0)	codePage = 28599;
+		else if (strcmp(outEncoding, "ISO-8859-15") == 0)	codePage = 28605;
+		else if (strcmp(outEncoding, "KOI8-R") == 0)		codePage = 20866;
+		else if (strcmp(outEncoding, "KOI8-RU") == 0)		codePage = 21866;
+		else if (strcmp(outEncoding, "GBK") == 0)		codePage = 936;
+		else if (strcmp(outEncoding, "UTF-7") == 0)		codePage = CP_UTF7;
+		else if (strcmp(outEncoding, "UTF-8") == 0)		codePage = CP_UTF8;
+
+		size = WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
+
+		if (size < outBytes && size > 0)
+		{
+			WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, outBuffer, size, NIL, NIL);
+		}
+
+		if (size >= outBytes) size = 0;
 	}
 
 	if (delBuffer) delete [] outBuffer;

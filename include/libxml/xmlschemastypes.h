@@ -16,6 +16,7 @@
 #ifdef LIBXML_SCHEMAS_ENABLED
 
 #include <libxml/schemasInternals.h>
+#include <libxml/xmlschemas.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,11 +29,23 @@ xmlSchemaTypePtr xmlSchemaGetPredefinedType	(const xmlChar *name,
 int		xmlSchemaValidatePredefinedType	(xmlSchemaTypePtr type,
 						 const xmlChar *value,
 						 xmlSchemaValPtr *val);
+int		xmlSchemaValPredefTypeNode	(xmlSchemaTypePtr type,
+						 const xmlChar *value,
+						 xmlSchemaValPtr *val,
+						 xmlNodePtr node);
 int		xmlSchemaValidateFacet		(xmlSchemaTypePtr base,
 						 xmlSchemaFacetPtr facet,
 						 const xmlChar *value,
 						 xmlSchemaValPtr val);
 void		xmlSchemaFreeValue		(xmlSchemaValPtr val);
+xmlSchemaFacetPtr xmlSchemaNewFacet		(void);
+int		xmlSchemaCheckFacet		(xmlSchemaFacetPtr facet,
+						 xmlSchemaTypePtr typeDecl,
+						 xmlSchemaParserCtxtPtr ctxt,
+						 const xmlChar *name);
+void		xmlSchemaFreeFacet		(xmlSchemaFacetPtr facet);
+int		xmlSchemaCompareValues		(xmlSchemaValPtr x,
+						 xmlSchemaValPtr y);
 
 #ifdef __cplusplus
 }

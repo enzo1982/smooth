@@ -63,6 +63,9 @@ S::Void S::Init()
 
 	if (hDllInstance == NIL) hDllInstance = hInstance;
 
+	if (LoadIconvDLL() == True)	Setup::useIconv = True;
+	else				Setup::useIconv = False;
+
 	// decide if we want to use unicode:
 	{
 		OSVERSIONINFOA	 vInfo;
@@ -90,8 +93,6 @@ S::Void S::Init()
 	GetColors();
 	SetMetrics();
 	SetMeasurement(SMT_UNITS);
-
-	Setup::useIconv = True;
 
 	SMOOTH::i18n = new I18n::Translator(True);
 
@@ -124,6 +125,8 @@ S::Void S::Free()
 	delete mainObjectManager;
 
 	String::ClearTemporaryBuffers();
+
+	if (Setup::useIconv) FreeIconvDLL();
 
 #ifdef __WIN32__
 	WSACleanup();

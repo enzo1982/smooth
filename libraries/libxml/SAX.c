@@ -232,6 +232,8 @@ externalSubset(void *ctx, const xmlChar *name,
 		ctxt->sax->error(ctxt->userData, 
 		     "externalSubset: out of memory\n");
 	    ctxt->errNo = XML_ERR_NO_MEMORY;
+	    ctxt->instate = XML_PARSER_EOF;
+	    ctxt->disableSAX = 1;
 	    ctxt->input = oldinput;
 	    ctxt->inputNr = oldinputNr;
 	    ctxt->inputMax = oldinputMax;
@@ -247,11 +249,13 @@ externalSubset(void *ctx, const xmlChar *name,
 	/*
 	 * On the fly encoding conversion if needed
 	 */
-	enc = xmlDetectCharEncoding(ctxt->input->cur, 4);
-	xmlSwitchEncoding(ctxt, enc);
+	if (ctxt->input->length >= 4) {
+	    enc = xmlDetectCharEncoding(ctxt->input->cur, 4);
+	    xmlSwitchEncoding(ctxt, enc);
+	}
 
 	if (input->filename == NULL)
-	    input->filename = (char *) xmlStrdup(SystemID);
+	    input->filename = (char *) xmlCanonicPath(SystemID);
 	input->line = 1;
 	input->col = 1;
 	input->base = ctxt->input->cur;
@@ -378,14 +382,26 @@ getEntity(void *ctx, const xmlChar *name)
 	((ctxt->validate) || (ctxt->replaceEntities)) &&
 	(ret->children == NULL) &&
 	(ret->etype == XML_EXTERNAL_GENERAL_PARSED_ENTITY)) {
+	int val;
+
 	/*
 	 * for validation purposes we really need to fetch and
 	 * parse the external entity
 	 */
 	xmlNodePtr children;
 
-        xmlParseCtxtExternalEntity(ctxt, ret->URI, ret->ExternalID, &children);
-	xmlAddChildList((xmlNodePtr) ret, children);
+        val = xmlParseCtxtExternalEntity(ctxt, ret->URI,
+		                         ret->ExternalID, &children);
+	if (val == 0) {
+	    xmlAddChildList((xmlNodePtr) ret, children);
+	} else {
+	    ctxt->sax->error(ctxt, 
+	     "Failure to process entity %s\n", name);
+	    ctxt->wellFormed = 0;
+	    ctxt->valid = 0;
+	    ctxt->validate = 0;
+	    return(NULL);
+	}
 	ret->owner = 1;
     }
     return(ret);
@@ -649,18 +665,6 @@ unparsedEntityDecl(void *ctx, const xmlChar *name,
 	    "SAX.unparsedEntityDecl(%s, %s, %s, %s)\n",
             name, publicId, systemId, notationName);
 #endif
-#if 0
-    Done in xmlValidateDtdFinal now.
-    if (ctxt->validate && ctxt->wellFormed && ctxt->myDoc) {
-	int ret;
-	ret = xmlValidateNotationUse(&ctxt->vctxt, ctxt->myDoc,
-	                                      notationName);
-	if (ret == 0) {
-	    ctxt->wellFormed = 0;
-	    ctxt->valid = 0;
-	}
-    }
-#endif
     if (ctxt->inSubset == 1) {
 	ent = xmlAddDocEntity(ctxt->myDoc, name,
 			XML_EXTERNAL_GENERAL_UNPARSED_ENTITY,
@@ -743,12 +747,25 @@ startDocument(void *ctx)
 	    "SAX.startDocument()\n");
 #endif
     if (ctxt->html) {
-	if (ctxt->myDoc == NULL)
 #ifdef LIBXML_HTML_ENABLED
+	if (ctxt->myDoc == NULL)
 	    ctxt->myDoc = htmlNewDocNoDtD(NULL, NULL);
+	if (ctxt->myDoc == NULL) {
+	    if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
+		ctxt->sax->error(ctxt->userData, 
+		     "SAX.startDocument(): out of memory\n");
+	    ctxt->errNo = XML_ERR_NO_MEMORY;
+	    ctxt->instate = XML_PARSER_EOF;
+	    ctxt->disableSAX = 1;
+	    return;
+	}
 #else
         xmlGenericError(xmlGenericErrorContext,
 		"libxml2 built without HTML support\n");
+	ctxt->errNo = XML_ERR_INTERNAL_ERROR;
+	ctxt->instate = XML_PARSER_EOF;
+	ctxt->disableSAX = 1;
+	return;
 #endif
     } else {
 	doc = ctxt->myDoc = xmlNewDoc(ctxt->version);
@@ -758,11 +775,21 @@ startDocument(void *ctx)
 	    else
 		doc->encoding = NULL;
 	    doc->standalone = ctxt->standalone;
+	} else {
+	    if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
+		ctxt->sax->error(ctxt->userData, 
+		     "SAX.startDocument(): out of memory\n");
+	    ctxt->errNo = XML_ERR_NO_MEMORY;
+	    ctxt->instate = XML_PARSER_EOF;
+	    ctxt->disableSAX = 1;
+	    return;
 	}
     }
     if ((ctxt->myDoc != NULL) && (ctxt->myDoc->URL == NULL) &&
 	(ctxt->input != NULL) && (ctxt->input->filename != NULL)) {
-        ctxt->myDoc->URL = xmlStrdup((const xmlChar *) ctxt->input->filename);
+	ctxt->myDoc->URL = xmlCanonicPath((const xmlChar *) ctxt->input->filename);
+	if (ctxt->myDoc->URL == NULL)
+	    ctxt->myDoc->URL = xmlStrdup((const xmlChar *) ctxt->input->filename);
     }
 }
 
@@ -835,6 +862,33 @@ my_attribute(void *ctx, const xmlChar *fullname, const xmlChar *value,
      * Split the full name into a namespace prefix and the tag name
      */
     name = xmlSplitQName(ctxt, fullname, &ns);
+    if ((name != NULL) && (name[0] == 0)) {
+        if (xmlStrEqual(ns, BAD_CAST "xmlns")) {
+	    if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
+		ctxt->sax->error(ctxt->userData, 
+		     "invalid namespace declaration '%s'\n", fullname);
+	} else {
+	    if ((ctxt->sax != NULL) && (ctxt->sax->warning != NULL))
+		ctxt->sax->warning(ctxt->userData, 
+		     "Avoid attribute ending with ':' like '%s'\n", fullname);
+	}
+	if (ns != NULL)
+	    xmlFree(ns);
+	ns = NULL;
+	xmlFree(name);
+	name = xmlStrdup(fullname);
+    }
+    if (name == NULL) {
+	if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
+	    ctxt->sax->error(ctxt->userData, 
+		 "SAX.startElement(): out of memory\n");
+	ctxt->errNo = XML_ERR_NO_MEMORY;
+	ctxt->instate = XML_PARSER_EOF;
+	ctxt->disableSAX = 1;
+	if (ns != NULL)
+	    xmlFree(ns);
+	return;
+    }
 
     /*
      * Do the last stage of the attribute normalization
@@ -858,27 +912,37 @@ my_attribute(void *ctx, const xmlChar *fullname, const xmlChar *value,
         (name[0] == 'x') && (name[1] == 'm') && (name[2] == 'l') &&
         (name[3] == 'n') && (name[4] == 's') && (name[5] == 0)) {
 	xmlNsPtr nsret;
+	xmlChar *val;
 
-	if (value[0] != 0) {
+        if (!ctxt->replaceEntities) {
+	    ctxt->depth++;
+	    val = xmlStringDecodeEntities(ctxt, value, XML_SUBSTITUTE_REF,
+		                          0,0,0);
+	    ctxt->depth--;
+	} else {
+	    val = (xmlChar *) value;
+	}
+
+	if (val[0] != 0) {
 	    xmlURIPtr uri;
 
-	    uri = xmlParseURI((const char *)value);
+	    uri = xmlParseURI((const char *)val);
 	    if (uri == NULL) {
 		if ((ctxt->sax != NULL) && (ctxt->sax->warning != NULL))
 		    ctxt->sax->warning(ctxt->userData, 
-			 "nmlns: %s not a valid URI\n", value);
+			 "nmlns: %s not a valid URI\n", val);
 	    } else {
 		if (uri->scheme == NULL) {
 		    if ((ctxt->sax != NULL) && (ctxt->sax->warning != NULL))
 			ctxt->sax->warning(ctxt->userData, 
-			     "xmlns: URI %s is not absolute\n", value);
+			     "xmlns: URI %s is not absolute\n", val);
 		}
 		xmlFreeURI(uri);
 	    }
 	}
 
 	/* a default namespace definition */
-	nsret = xmlNewNs(ctxt->node, value, NULL);
+	nsret = xmlNewNs(ctxt->node, val, NULL);
 
 	/*
 	 * Validate also for namespace decls, they are attributes from
@@ -887,27 +951,51 @@ my_attribute(void *ctx, const xmlChar *fullname, const xmlChar *value,
         if (nsret != NULL && ctxt->validate && ctxt->wellFormed &&
 	    ctxt->myDoc && ctxt->myDoc->intSubset)
 	    ctxt->valid &= xmlValidateOneNamespace(&ctxt->vctxt, ctxt->myDoc,
-					   ctxt->node, prefix, nsret, value);
+					   ctxt->node, prefix, nsret, val);
 	if (name != NULL) 
 	    xmlFree(name);
 	if (nval != NULL)
 	    xmlFree(nval);
+	if (val != value)
+	    xmlFree(val);
 	return;
     }
     if ((!ctxt->html) &&
 	(ns != NULL) && (ns[0] == 'x') && (ns[1] == 'm') && (ns[2] == 'l') &&
         (ns[3] == 'n') && (ns[4] == 's') && (ns[5] == 0)) {
 	xmlNsPtr nsret;
+	xmlChar *val;
 
-	if (value[0] == 0) {
+        if (!ctxt->replaceEntities) {
+	    ctxt->depth++;
+	    val = xmlStringDecodeEntities(ctxt, value, XML_SUBSTITUTE_REF,
+		                          0,0,0);
+	    ctxt->depth--;
+	    if (val == NULL) {
+		if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
+		    ctxt->sax->error(ctxt->userData, 
+			 "SAX.startElement(): out of memory\n");
+		ctxt->errNo = XML_ERR_NO_MEMORY;
+		ctxt->instate = XML_PARSER_EOF;
+		ctxt->disableSAX = 1;
+	        xmlFree(ns);
+		if (name != NULL) 
+		    xmlFree(name);
+		return;
+	    }
+	} else {
+	    val = (xmlChar *) value;
+	}
+
+	if (val[0] == 0) {
 	    if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
 		ctxt->sax->error(ctxt->userData, 
 		     "Empty namespace name for prefix %s\n", name);
 	}
-	if ((ctxt->pedantic != 0) && (value[0] != 0)) {
+	if ((ctxt->pedantic != 0) && (val[0] != 0)) {
 	    xmlURIPtr uri;
 
-	    uri = xmlParseURI((const char *)value);
+	    uri = xmlParseURI((const char *)val);
 	    if (uri == NULL) {
 		if ((ctxt->sax != NULL) && (ctxt->sax->warning != NULL))
 		    ctxt->sax->warning(ctxt->userData, 
@@ -923,7 +1011,7 @@ my_attribute(void *ctx, const xmlChar *fullname, const xmlChar *value,
 	}
 
 	/* a standard namespace definition */
-	nsret = xmlNewNs(ctxt->node, value, name);
+	nsret = xmlNewNs(ctxt->node, val, name);
 	xmlFree(ns);
 	/*
 	 * Validate also for namespace decls, they are attributes from
@@ -937,12 +1025,34 @@ my_attribute(void *ctx, const xmlChar *fullname, const xmlChar *value,
 	    xmlFree(name);
 	if (nval != NULL)
 	    xmlFree(nval);
+	if (val != value)
+	    xmlFree(val);
 	return;
     }
 
-    if (ns != NULL)
+    if (ns != NULL) {
+	xmlAttrPtr prop;
 	namespace = xmlSearchNs(ctxt->myDoc, ctxt->node, ns);
-    else {
+
+	prop = ctxt->node->properties;
+	while (prop != NULL) {
+	    if (prop->ns != NULL) {
+		if ((xmlStrEqual(name, prop->name)) &&
+		    ((namespace == prop->ns) ||
+		     (xmlStrEqual(namespace->href, prop->ns->href)))) {
+		    ctxt->errNo = XML_ERR_ATTRIBUTE_REDEFINED;
+		    if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
+			ctxt->sax->error(ctxt->userData,
+			        "Attribute %s in %s redefined\n",
+			                 name, namespace->href);
+		    ctxt->wellFormed = 0;
+		    if (ctxt->recovery == 0) ctxt->disableSAX = 1;
+		    goto error;
+		}
+	    }
+	    prop = prop->next;
+	}
+    } else {
 	namespace = NULL;
     }
 
@@ -1010,8 +1120,9 @@ my_attribute(void *ctx, const xmlChar *fullname, const xmlChar *value,
 	    ctxt->valid &= xmlValidateOneAttribute(&ctxt->vctxt, ctxt->myDoc,
 					       ctxt->node, ret, value);
 	}
-    } else if (((ctxt->replaceEntities == 0) && (ctxt->external != 2)) ||
-	       ((ctxt->replaceEntities != 0) && (ctxt->inSubset == 0))) {
+    } else if (((ctxt->loadsubset & XML_SKIP_IDS) == 0) &&
+	       (((ctxt->replaceEntities == 0) && (ctxt->external != 2)) ||
+	        ((ctxt->replaceEntities != 0) && (ctxt->inSubset == 0)))) {
         /*
 	 * when validating, the ID registration is done at the attribute
 	 * validation level. Otherwise we have to do specific handling here.
@@ -1022,6 +1133,7 @@ my_attribute(void *ctx, const xmlChar *fullname, const xmlChar *value,
 	    xmlAddRef(&ctxt->vctxt, ctxt->myDoc, value, ret);
     }
 
+error:
     if (nval != NULL)
 	xmlFree(nval);
     if (ns != NULL) 
@@ -1150,14 +1262,19 @@ process_external_subset:
 					     attr->elem, attr->name,
 					     attr->prefix);
 		    if ((tst == attr) || (tst == NULL)) {
+		        xmlChar fn[50];
 			xmlChar *fulln;
 
-			if (attr->prefix != NULL) {
-			    fulln = xmlStrdup(attr->prefix);
-			    fulln = xmlStrcat(fulln, BAD_CAST ":");
-			    fulln = xmlStrcat(fulln, attr->name);
-			} else {
-			    fulln = xmlStrdup(attr->name);
+                        fulln = xmlBuildQName(attr->name, attr->prefix, fn, 50);
+			if (fulln == NULL) {
+			    if ((ctxt->sax != NULL) &&
+			        (ctxt->sax->error != NULL))
+				ctxt->sax->error(ctxt->userData, 
+				     "SAX.startElement(): out of memory\n");
+			    ctxt->errNo = XML_ERR_NO_MEMORY;
+			    ctxt->instate = XML_PARSER_EOF;
+			    ctxt->disableSAX = 1;
+			    return;
 			}
 
 			/*
@@ -1176,9 +1293,11 @@ process_external_subset:
 			    }
 			}
 			if (att == NULL) {
-			    attribute(ctxt, fulln, attr->defaultValue);
+			    my_attribute(ctxt, fulln, attr->defaultValue,
+			                 prefix);
 			}
-			xmlFree(fulln);
+			if ((fulln != fn) && (fulln != attr->name))
+			    xmlFree(fulln);
 		    }
 		}
 	    }
@@ -1250,7 +1369,14 @@ startElement(void *ctx, const xmlChar *fullname, const xmlChar **atts)
      *        an attribute at this level.
      */
     ret = xmlNewDocNodeEatName(ctxt->myDoc, NULL, name, NULL);
-    if (ret == NULL) return;
+    if (ret == NULL) {
+        if (prefix != NULL)
+	    xmlFree(prefix);
+	ctxt->errNo = XML_ERR_NO_MEMORY;
+	ctxt->instate = XML_PARSER_EOF;
+	ctxt->disableSAX = 1;
+        return;
+    }
     if (ctxt->myDoc->children == NULL) {
 #ifdef DEBUG_SAX_TREE
 	xmlGenericError(xmlGenericErrorContext, "Setting %s as root\n", name);
@@ -1536,6 +1662,9 @@ characters(void *ctx, const xmlChar *ch, int len)
 		    if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
 			ctxt->sax->error(ctxt->userData, 
 			     "SAX.characters(): out of memory\n");
+		    ctxt->errNo = XML_ERR_NO_MEMORY;
+		    ctxt->instate = XML_PARSER_EOF;
+		    ctxt->disableSAX = 1;
 		    return;
 		}
 		ctxt->nodemem = size;
@@ -1545,7 +1674,14 @@ characters(void *ctx, const xmlChar *ch, int len)
 	    ctxt->nodelen += len;
 	    lastChild->content[ctxt->nodelen] = 0;
 	} else if (coalesceText) {
-	    xmlTextConcat(lastChild, ch, len);
+	    if (xmlTextConcat(lastChild, ch, len)) {
+		if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
+		    ctxt->sax->error(ctxt->userData, 
+			 "SAX.characters(): out of memory\n");
+		ctxt->errNo = XML_ERR_NO_MEMORY;
+		ctxt->instate = XML_PARSER_EOF;
+		ctxt->disableSAX = 1;
+	    }
 	    if (ctxt->node->children != NULL) {
 		ctxt->nodelen = xmlStrlen(lastChild->content);
 		ctxt->nodemem = ctxt->nodelen + 1;
@@ -1553,10 +1689,19 @@ characters(void *ctx, const xmlChar *ch, int len)
 	} else {
 	    /* Mixed content, first time */
 	    lastChild = xmlNewTextLen(ch, len);
-	    xmlAddChild(ctxt->node, lastChild);
-	    if (ctxt->node->children != NULL) {
-		ctxt->nodelen = len;
-		ctxt->nodemem = len + 1;
+	    if (lastChild == NULL) {
+		if ((ctxt->sax != NULL) && (ctxt->sax->error != NULL))
+		    ctxt->sax->error(ctxt->userData, 
+			 "SAX.characters(): out of memory\n");
+		ctxt->errNo = XML_ERR_NO_MEMORY;
+		ctxt->instate = XML_PARSER_EOF;
+		ctxt->disableSAX = 1;
+	    } else {
+		xmlAddChild(ctxt->node, lastChild);
+		if (ctxt->node->children != NULL) {
+		    ctxt->nodelen = len;
+		    ctxt->nodemem = len + 1;
+		}
 	    }
 	}
     }

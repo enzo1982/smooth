@@ -86,12 +86,15 @@ typedef char *(*xmlStrdupFunc)(const char *str);
  * The 4 interfaces used for all memory handling within libxml.
 LIBXML_DLL_IMPORT extern xmlFreeFunc xmlFree;
 LIBXML_DLL_IMPORT extern xmlMallocFunc xmlMalloc;
+LIBXML_DLL_IMPORT extern xmlMallocFunc xmlMallocAtomic;
 LIBXML_DLL_IMPORT extern xmlReallocFunc xmlRealloc;
 LIBXML_DLL_IMPORT extern xmlStrdupFunc xmlMemStrdup;
  */
 
 /*
  * The way to overload the existing functions.
+ * The xmlGc function have an extra entry for atomic block
+ * allocations useful for garbage collected memory allocators
  */
 int     xmlMemSetup	(xmlFreeFunc freeFunc,
 			 xmlMallocFunc mallocFunc,
@@ -101,6 +104,16 @@ int     xmlMemGet	(xmlFreeFunc *freeFunc,
 			 xmlMallocFunc *mallocFunc,
 			 xmlReallocFunc *reallocFunc,
 			 xmlStrdupFunc *strdupFunc);
+int     xmlGcMemSetup	(xmlFreeFunc freeFunc,
+			 xmlMallocFunc mallocFunc,
+			 xmlMallocFunc mallocAtomicFunc,
+			 xmlReallocFunc reallocFunc,
+			 xmlStrdupFunc strdupFunc);
+int     xmlGcMemGet	(xmlFreeFunc *freeFunc,
+			 xmlMallocFunc *mallocFunc,
+			 xmlMallocFunc *mallocAtomicFunc,
+			 xmlReallocFunc *reallocFunc,
+			 xmlStrdupFunc *strdupFunc);
 
 /*
  * Initialization of the memory layer.
@@ -108,7 +121,7 @@ int     xmlMemGet	(xmlFreeFunc *freeFunc,
 int	xmlInitMemory	(void);
 
 /*
- * Those are specific to the XML debug memory wrapper.
+ * These are specific to the XML debug memory wrapper.
  */
 int	xmlMemUsed	(void);
 void	xmlMemDisplay	(FILE *fp);
@@ -118,6 +131,11 @@ void *	xmlMemMalloc	(size_t size);
 void *	xmlMemRealloc	(void *ptr,size_t size);
 void	xmlMemFree	(void *ptr);
 char *	xmlMemoryStrdup	(const char *str);
+void *  xmlMallocLoc	(size_t size, const char *file, int line);
+void *	xmlReallocLoc	(void *ptr, size_t size, const char *file, int line);
+void *	xmlMallocAtomicLoc (size_t size, const char *file, int line);
+char *	xmlMemStrdupLoc	(const char *str, const char *file, int line);
+
 
 #ifdef DEBUG_MEMORY_LOCATION
 /**
@@ -129,6 +147,16 @@ char *	xmlMemoryStrdup	(const char *str);
  * Returns the pointer to the allocated area or NULL in case of error.
  */
 #define xmlMalloc(size) xmlMallocLoc((size), __FILE__, __LINE__)
+/**
+ * xmlMallocAtomic:
+ * @size:  number of bytes to allocate
+ *
+ * Wrapper for the malloc() function used in the XML library for allocation
+ * of block not containing pointers to other areas.
+ *
+ * Returns the pointer to the allocated area or NULL in case of error.
+ */
+#define xmlMallocAtomic(size) xmlMallocAtomicLoc((size), __FILE__, __LINE__)
 /**
  * xmlRealloc:
  * @ptr:  pointer to the existing allocated area
@@ -149,9 +177,6 @@ char *	xmlMemoryStrdup	(const char *str);
  */
 #define xmlMemStrdup(str) xmlMemStrdupLoc((str), __FILE__, __LINE__)
 
-void *	xmlMallocLoc(size_t size, const char *file, int line);
-void *	xmlReallocLoc(void *ptr,size_t size, const char *file, int line);
-char *	xmlMemStrdupLoc(const char *str, const char *file, int line);
 #endif /* DEBUG_MEMORY_LOCATION */
 
 #ifdef __cplusplus

@@ -26,21 +26,21 @@ extern void xmlCheckVersion(int version);
  *
  * the version string like "1.2.3"
  */
-#define LIBXML_DOTTED_VERSION "2.5.1"
+#define LIBXML_DOTTED_VERSION "2.5.10"
 
 /**
  * LIBXML_VERSION:
  *
  * the version number: 1.2.3 value is 1002003
  */
-#define LIBXML_VERSION 20501
+#define LIBXML_VERSION 20510
 
 /**
  * LIBXML_VERSION_STRING:
  *
  * the version number string, 1.2.3 value is "1002003"
  */
-#define LIBXML_VERSION_STRING "20501"
+#define LIBXML_VERSION_STRING "20510"
 
 /**
  * LIBXML_TEST_VERSION:
@@ -48,7 +48,7 @@ extern void xmlCheckVersion(int version);
  * Macro to check that the libxml version in use is compatible with
  * the version the software has been compiled against
  */
-#define LIBXML_TEST_VERSION xmlCheckVersion(20501);
+#define LIBXML_TEST_VERSION xmlCheckVersion(20510);
 
 #ifndef VMS
 #if 0
@@ -76,7 +76,7 @@ extern void xmlCheckVersion(int version);
  * Whether the thread support is configured in
  */
 #if 1
-#if defined(_REENTRANT) || (_POSIX_C_SOURCE - 0 >= 199506L)
+#if defined(_REENTRANT) || defined(__MT__) || (_POSIX_C_SOURCE - 0 >= 199506L)
 #define LIBXML_THREAD_ENABLED
 #endif
 #endif
@@ -172,6 +172,15 @@ extern void xmlCheckVersion(int version);
 #endif
 
 /**
+ * LIBXML_ISO8859X_ENABLED:
+ *
+ * Whether ISO-8859-* support is made available in case iconv is not
+ */
+#if 1
+#define LIBXML_ISO8859X_ENABLED
+#endif
+
+/**
  * LIBXML_DEBUG_ENABLED:
  *
  * Whether Debugging module is configured in
@@ -241,7 +250,7 @@ extern void xmlCheckVersion(int version);
  * code which links against libxml statically. 
  */
 #ifndef LIBXML_DLL_IMPORT
-#if (defined(_MSC_VER) || defined(__CYGWIN__)) && !defined(IN_LIBXML) && !defined(LIBXML_STATIC)
+#if (defined(_MSC_VER) || defined(__BORLANDC__) || defined(__CYGWIN__)) && !defined(IN_LIBXML) && !defined(LIBXML_STATIC)
 #define LIBXML_DLL_IMPORT __declspec(dllimport)
 #else
 #define LIBXML_DLL_IMPORT

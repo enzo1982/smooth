@@ -590,7 +590,7 @@ $(OBJECTDIR)/libxml_catalog.o: $(LIBXMLDIR)/catalog.c
 
 $(OBJECTDIR)/libxml_encoding.o: $(LIBXMLDIR)/encoding.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/encoding.c...
-	$(COMPILER) $(COMPILER_OPTS) -w $(LIBXMLDIR)/encoding.c -o $(OBJECTDIR)/libxml_encoding.o
+	$(COMPILER) $(COMPILER_OPTS) -x c++ -w $(LIBXMLDIR)/encoding.c -o $(OBJECTDIR)/libxml_encoding.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_entities.o: $(LIBXMLDIR)/entities.c

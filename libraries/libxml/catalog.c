@@ -42,11 +42,17 @@
 #include <libxml/globals.h>
 
 #define MAX_DELEGATE	50
+#define MAX_CATAL_DEPTH	50
 
 /**
  * TODO:
  *
  * macro to flag unimplemented blocks
+ * XML_CATALOG_PREFER user env to select between system/public prefered
+ * option. C.f. Richard Tobin <richard@cogsci.ed.ac.uk>
+ *> Just FYI, I am using an environment variable XML_CATALOG_PREFER with
+ *> values "system" and "public".  I have made the default be "system" to
+ *> match yours.
  */
 #define TODO 								\
     xmlGenericError(xmlGenericErrorContext,				\
@@ -110,6 +116,7 @@ struct _xmlCatalogEntry {
     xmlChar *URL;  /* The expanded URL using the base */
     xmlCatalogPrefer prefer;
     int dealloc;
+    int depth;
 };
 
 typedef enum {
@@ -225,6 +232,7 @@ xmlNewCatalogEntry(xmlCatalogEntryType type, const xmlChar *name,
 	ret->URL = NULL;
     ret->prefer = prefer;
     ret->dealloc = 0;
+    ret->depth = 0;
     return(ret);
 }
 
@@ -411,7 +419,7 @@ xmlCatalogDumpEntry(xmlCatalogEntryPtr entry, FILE *out) {
 	case SGML_CATA_DOCTYPE:
 	case SGML_CATA_LINKTYPE:
 	case SGML_CATA_NOTATION:
-	    fprintf(out, "%s", entry->name); break;
+	    fprintf(out, "%s", (const char *) entry->name); break;
 	case SGML_CATA_PUBLIC:
 	case SGML_CATA_SYSTEM:
 	case SGML_CATA_SGMLDECL:
@@ -783,7 +791,7 @@ xmlParseCatalogFile(const char *filename) {
 	return(NULL);
     }
 
-    inputStream->filename = xmlMemStrdup(filename);
+    inputStream->filename = (char *) xmlCanonicPath((const xmlChar *)filename);
     inputStream->buf = buf;
     inputStream->base = inputStream->buf->buffer->content;
     inputStream->cur = inputStream->buf->buffer->content;
@@ -862,7 +870,7 @@ xmlLoadFileContent(const char *filename)
         return (NULL);
     }
 #endif
-    content = xmlMalloc(size + 10);
+    content = xmlMallocAtomic(size + 10);
     if (content == NULL) {
         xmlGenericError(xmlGenericErrorContext,
                         "malloc of %d byte failed\n", size + 10);
@@ -1438,6 +1446,20 @@ xmlCatalogXMLResolve(xmlCatalogEntryPtr catal, const xmlChar *pubID,
     int haveNext = 0;
 
     /*
+     * protection against loops
+     */
+    if (catal->depth > MAX_CATAL_DEPTH) {
+        if (catal->name != NULL)
+	    xmlGenericError(xmlGenericErrorContext,
+		    "Detected recursion in catalog %s\n", catal->name);
+	else
+	    xmlGenericError(xmlGenericErrorContext,
+		    "Detected recursion in catalog\n");
+	return(NULL);
+    }
+    catal->depth++;
+
+    /*
      * First tries steps 2/ 3/ 4/ if a system ID is provided.
      */
     if (sysID != NULL) {
@@ -1452,6 +1474,7 @@ xmlCatalogXMLResolve(xmlCatalogEntryPtr catal, const xmlChar *pubID,
 			if (xmlDebugCatalogs)
 			    xmlGenericError(xmlGenericErrorContext,
 				    "Found system match %s\n", cur->name);
+			catal->depth--;
 			return(xmlStrdup(cur->URL));
 		    }
 		    break;
@@ -1482,6 +1505,7 @@ xmlCatalogXMLResolve(xmlCatalogEntryPtr catal, const xmlChar *pubID,
 	    ret = xmlStrdup(rewrite->URL);
 	    if (ret != NULL)
 		ret = xmlStrcat(ret, &sysID[lenrewrite]);
+	    catal->depth--;
 	    return(ret);
 	}
 	if (haveDelegate) {
@@ -1515,8 +1539,10 @@ xmlCatalogXMLResolve(xmlCatalogEntryPtr catal, const xmlChar *pubID,
 				    "Trying system delegate %s\n", cur->URL);
 			ret = xmlCatalogListXMLResolve(
 				cur->children, NULL, sysID);
-			if (ret != NULL)
+			if (ret != NULL) {
+			    catal->depth--;
 			    return(ret);
+			}
 		    }
 		}
 		cur = cur->next;
@@ -1524,6 +1550,7 @@ xmlCatalogXMLResolve(xmlCatalogEntryPtr catal, const xmlChar *pubID,
 	    /*
 	     * Apply the cut algorithm explained in 4/
 	     */
+	    catal->depth--;
 	    return(XML_CATAL_BREAK);
 	}
     }
@@ -1540,6 +1567,7 @@ xmlCatalogXMLResolve(xmlCatalogEntryPtr catal, const xmlChar *pubID,
 			if (xmlDebugCatalogs)
 			    xmlGenericError(xmlGenericErrorContext,
 				    "Found public match %s\n", cur->name);
+			catal->depth--;
 			return(xmlStrdup(cur->URL));
 		    }
 		    break;
@@ -1590,8 +1618,10 @@ xmlCatalogXMLResolve(xmlCatalogEntryPtr catal, const xmlChar *pubID,
 				    "Trying public delegate %s\n", cur->URL);
 			ret = xmlCatalogListXMLResolve(
 				cur->children, pubID, NULL);
-			if (ret != NULL)
+			if (ret != NULL) {
+			    catal->depth--;
 			    return(ret);
+			}
 		    }
 		}
 		cur = cur->next;
@@ -1599,6 +1629,7 @@ xmlCatalogXMLResolve(xmlCatalogEntryPtr catal, const xmlChar *pubID,
 	    /*
 	     * Apply the cut algorithm explained in 4/
 	     */
+	    catal->depth--;
 	    return(XML_CATAL_BREAK);
 	}
     }
@@ -1611,14 +1642,17 @@ xmlCatalogXMLResolve(xmlCatalogEntryPtr catal, const xmlChar *pubID,
 		}
 		if (cur->children != NULL) {
 		    ret = xmlCatalogListXMLResolve(cur->children, pubID, sysID);
-		    if (ret != NULL)
+		    if (ret != NULL) {
+			catal->depth--;
 			return(ret);
+		    }
 		}
 	    }
 	    cur = cur->next;
 	}
     }
 
+    catal->depth--;
     return(NULL);
 }
 
@@ -1705,7 +1739,8 @@ xmlCatalogXMLResolveURI(xmlCatalogEntryPtr catal, const xmlChar *URI) {
 	 */
 	cur = catal;
 	while (cur != NULL) {
-	    if ((cur->type == XML_CATA_DELEGATE_SYSTEM) &&
+	    if (((cur->type == XML_CATA_DELEGATE_SYSTEM) ||
+	         (cur->type == XML_CATA_DELEGATE_URI)) &&
 		(!xmlStrncmp(URI, cur->name, xmlStrlen(cur->name)))) {
 		for (i = 0;i < nbList;i++)
 		    if (xmlStrEqual(cur->URL, delegates[i]))
@@ -1949,7 +1984,7 @@ xmlParseSGMLCatalogPubid(const xmlChar *cur, xmlChar **id) {
     } else {
 	stop = ' ';
     }
-    buf = (xmlChar *) xmlMalloc(size * sizeof(xmlChar));
+    buf = (xmlChar *) xmlMallocAtomic(size * sizeof(xmlChar));
     if (buf == NULL) {
 	xmlGenericError(xmlGenericErrorContext,
 		"malloc of %d byte failed\n", size);
@@ -2903,8 +2938,10 @@ xmlLoadCatalog(const char *filename)
 
     if (xmlDefaultCatalog == NULL) {
 	catal = xmlLoadACatalog(filename);
-	if (catal == NULL)
+	if (catal == NULL) {
+	    xmlRMutexUnlock(xmlCatalogMutex);
 	    return(-1);
+	}
 
 	xmlDefaultCatalog = catal;
 	xmlRMutexUnlock(xmlCatalogMutex);

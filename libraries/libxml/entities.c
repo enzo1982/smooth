@@ -532,7 +532,7 @@ xmlEncodeEntities(xmlDocPtr doc, const xmlChar *input) {
             ptr = buf;
 	    while (*ptr != 0) *out++ = *ptr++;
 #endif
-	} else if (IS_CHAR(*cur)) {
+	} else if (IS_CHAR((unsigned int) *cur)) {
 	    char buf[10], *ptr;
 
 	    snprintf(buf, sizeof(buf), "&#%d;", *cur);
@@ -632,6 +632,7 @@ xmlEncodeEntitiesReentrant(xmlDocPtr doc, const xmlChar *input) {
 	    *out++ = 'm';
 	    *out++ = 'p';
 	    *out++ = ';';
+#if 0
 	} else if (*cur == '"') {
 	    *out++ = '&';
 	    *out++ = 'q';
@@ -639,7 +640,6 @@ xmlEncodeEntitiesReentrant(xmlDocPtr doc, const xmlChar *input) {
 	    *out++ = 'o';
 	    *out++ = 't';
 	    *out++ = ';';
-#if 0
 	} else if ((*cur == '\'') && (!html)) {
 	    *out++ = '&';
 	    *out++ = 'a';
@@ -649,7 +649,7 @@ xmlEncodeEntitiesReentrant(xmlDocPtr doc, const xmlChar *input) {
 	    *out++ = ';';
 #endif
 	} else if (((*cur >= 0x20) && (*cur < 0x80)) ||
-	    (*cur == '\n') || (*cur == '\r') || (*cur == '\t')) {
+	    (*cur == '\n') || (*cur == '\t') || ((html) && (*cur == '\r'))) {
 	    /*
 	     * default case, just copy !
 	     */
@@ -731,7 +731,7 @@ xmlEncodeEntitiesReentrant(xmlDocPtr doc, const xmlChar *input) {
 		cur += l;
 		continue;
 	    }
-	} else if (IS_CHAR(*cur)) {
+	} else if (IS_CHAR((unsigned int) *cur)) {
 	    char buf[10], *ptr;
 
 	    snprintf(buf, sizeof(buf), "&#%d;", *cur);
@@ -821,6 +821,12 @@ xmlEncodeSpecialChars(xmlDocPtr doc, const xmlChar *input) {
 	    *out++ = 'u';
 	    *out++ = 'o';
 	    *out++ = 't';
+	    *out++ = ';';
+	} else if (*cur == '\r') {
+	    *out++ = '&';
+	    *out++ = '#';
+	    *out++ = '1';
+	    *out++ = '3';
 	    *out++ = ';';
 	} else {
 	    /*

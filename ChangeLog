@@ -9,6 +9,8 @@ xx.xx.03 xx:xx - smooth alpha 0.8.63.0
 
 - added support for right-to-left scripts like Arabic or Hebrew
 - improved stability on Windows 9x/ME
+- upgraded to libxml v2.5.10
+- separated iconv from smooth - it is now only required for using non-latin scripts
 - smaller improvements
 - some bufixes
 

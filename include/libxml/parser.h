@@ -55,7 +55,12 @@ struct _xmlParserInput {
     int length;                       /* length if known */
     int line;                         /* Current line */
     int col;                          /* Current column */
-    int consumed;                     /* How many xmlChars already consumed */
+    /*
+     * NOTE: consumed is only tested for equality in the parser code,
+     *       so even if there is an overflow this should not give troubles
+     *       for parsing very large instances.
+     */
+    unsigned long consumed;           /* How many xmlChars already consumed */
     xmlParserInputDeallocate free;    /* function to deallocate the base */
     const xmlChar *encoding;          /* the encoding string for entity */
     const xmlChar *version;           /* the version string for entity */
@@ -132,6 +137,14 @@ typedef enum {
  * Use it to initialize xmlLoadExtDtdDefaultValue.
  */
 #define XML_COMPLETE_ATTRS	4
+
+/**
+ * XML_SKIP_IDS:
+ *
+ * Bit in the loadsubset context field to tell to not do ID/REFs registration.
+ * Used to initialize xmlLoadExtDtdDefaultValue in some special cases.
+ */
+#define XML_SKIP_IDS		8
 
 /**
  * xmlParserCtxt:
@@ -220,6 +233,7 @@ struct _xmlParserCtxt {
     int                linenumbers;   /* set line number in element content */
     void              *catalogs;       /* document's own catalog */
     int                recovery;      /* run in recovery mode */
+    int                progressive;   /* is this a progressive parsing */
 };
 
 /**
@@ -788,7 +802,7 @@ int		xmlParseCtxtExternalEntity(xmlParserCtxtPtr ctx,
 /*
  * Parser contexts handling.
  */
-void		xmlInitParserCtxt	(xmlParserCtxtPtr ctxt);
+int		xmlInitParserCtxt	(xmlParserCtxtPtr ctxt);
 void		xmlClearParserCtxt	(xmlParserCtxtPtr ctxt);
 void		xmlFreeParserCtxt	(xmlParserCtxtPtr ctxt);
 void		xmlSetupParserForBuffer	(xmlParserCtxtPtr ctxt,

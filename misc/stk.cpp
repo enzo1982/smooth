@@ -24,6 +24,12 @@
 #include <smooth/pciio.h>
 #include <smooth/mdiwindow.h>
 
+HMODULE	 iconvdll = NIL;
+
+size_t	 (*ex_iconv)(iconv_t, const char **, size_t *, char **, size_t *) = NIL;
+iconv_t	 (*ex_iconv_open)(const char *, const char *) = NIL;
+int	 (*ex_iconv_close)(iconv_t) = NIL;
+
 S::I18n::Translator	*S::SMOOTH::i18n = NIL;
 
 S::Void S::SMOOTH::SendMessage(GUI::Window *window, Int message, Int wParam, Int lParam)
@@ -175,4 +181,26 @@ HBITMAP S::DetectTransparentRegions(HBITMAP bmp)
 	FreeContext(0, dc);
 
 	return newbmp;
+}
+
+S::Bool S::LoadIconvDLL()
+{
+	iconvdll = LoadLibraryA(Application::GetApplicationDirectory().Append("iconv.dll"));
+
+	if (iconvdll == NIL) return false;
+
+	ex_iconv	= (size_t (*)(iconv_t, const char **, size_t *, char **, size_t *)) GetProcAddress(iconvdll, "libiconv");
+	ex_iconv_open	= (iconv_t (*)(const char *, const char *)) GetProcAddress(iconvdll, "libiconv_open");
+	ex_iconv_close	= (int (*)(iconv_t)) GetProcAddress(iconvdll, "libiconv_close");
+
+	if (ex_iconv == NULL)		{ FreeLibrary(iconvdll); return false; }
+	if (ex_iconv_open == NULL)	{ FreeLibrary(iconvdll); return false; }
+	if (ex_iconv_close == NULL)	{ FreeLibrary(iconvdll); return false; }
+
+	return true;
+}
+
+S::Void S::FreeIconvDLL()
+{
+	FreeLibrary(iconvdll);
 }

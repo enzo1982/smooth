@@ -539,6 +539,27 @@ LIBXML_DLL_IMPORT extern int xmlDefaultBufferSize; /* default buffer size */
 #endif
 
 /*
+ * Some helper functions
+ */
+int		xmlValidateNCName	(const xmlChar *value,
+					 int space);
+int		xmlValidateQName	(const xmlChar *value,
+					 int space);
+int		xmlValidateName		(const xmlChar *value,
+					 int space);
+int		xmlValidateNMToken	(const xmlChar *value,
+					 int space);
+
+xmlChar *	xmlBuildQName		(const xmlChar *ncname,
+					 const xmlChar *prefix,
+					 xmlChar *memory,
+					 int len);
+xmlChar *	xmlSplitQName2		(const xmlChar *name,
+					 xmlChar **prefix);
+const xmlChar *	xmlSplitQName3		(const xmlChar *name,
+					 int *len);
+
+/*
  * Handling Buffers.
  */
 
@@ -706,7 +727,7 @@ xmlNodePtr	xmlAddNextSibling	(xmlNodePtr cur,
 void		xmlUnlinkNode		(xmlNodePtr cur);
 xmlNodePtr	xmlTextMerge		(xmlNodePtr first,
 					 xmlNodePtr second);
-void		xmlTextConcat		(xmlNodePtr node,
+int		xmlTextConcat		(xmlNodePtr node,
 					 const xmlChar *content,
 					 int len);
 void		xmlFreeNodeList		(xmlNodePtr cur);
@@ -739,6 +760,8 @@ xmlAttrPtr	xmlSetProp		(xmlNodePtr node,
 					 const xmlChar *name,
 					 const xmlChar *value);
 xmlChar *	xmlGetProp		(xmlNodePtr node,
+					 const xmlChar *name);
+xmlChar *	xmlGetNoNsProp		(xmlNodePtr node,
 					 const xmlChar *name);
 xmlAttrPtr	xmlHasProp		(xmlNodePtr node,
 					 const xmlChar *name);

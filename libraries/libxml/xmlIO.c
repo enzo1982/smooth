@@ -121,70 +121,20 @@ static xmlOutputCallback xmlOutputCallbackTable[MAX_OUTPUT_CALLBACK];
 static int xmlOutputCallbackNr = 0;
 static int xmlOutputCallbackInitialized = 0;
 
-/************************************************************************
- *									*
- *		Handling of Windows file paths				*
- *									*
- ************************************************************************/
-
-#define IS_WINDOWS_PATH(p) 					\
-	((p != NULL) &&						\
-	 (((p[0] >= 'a') && (p[0] <= 'z')) ||			\
-	  ((p[0] >= 'A') && (p[0] <= 'Z'))) &&			\
-	 (p[1] == ':') && ((p[2] == '/') || (p[2] == '\\')))
-
 
 /**
  * xmlNormalizeWindowsPath:
- * @path:  a windows path like "C:/foo/bar"
+ * @path: the input file path
  *
- * Normalize a Windows path to make an URL from it
+ * This function is obsolete. Please see xmlURIFromPath in uri.c for
+ * a better solution.
  *
- * Returns a new URI which must be freed by the caller or NULL
- *   in case of error
+ * Returns a canonicalized version of the path
  */
 xmlChar *
 xmlNormalizeWindowsPath(const xmlChar *path)
 {
-    int len, i = 0, j;
-    xmlChar *ret;
-
-    if (path == NULL)
-	return(NULL);
-
-    len = xmlStrlen(path);
-    if (!IS_WINDOWS_PATH(path)) {
-	ret = xmlStrdup(path);
-	if (ret == NULL)
-	    return(NULL);
-	j = 0;
-    } else {
-	ret = xmlMalloc(len + 10);
-	if (ret == NULL)
-	    return(NULL);
-	ret[0] = 'f';
-	ret[1] = 'i';
-	ret[2] = 'l';
-	ret[3] = 'e';
-	ret[4] = ':';
-	ret[5] = '/';
-	ret[6] = '/';
-	ret[7] = '/';
-	j = 8;
-    }
-
-    while (i < len) {
-	/* TODO: UTF8 conversion + URI escaping ??? */
-	if (path[i] == '\\')
-	    ret[j] = '/';
-	else
-	    ret[j] = path[i];
-	i++;
-	j++;
-    }
-    ret[j] = 0;
-
-    return(ret);
+    return xmlCanonicPath(path);
 }
 
 /**
@@ -339,7 +289,7 @@ xmlFileMatch (const char *filename ATTRIBUTE_UNUSED) {
 }
 
 /**
- * xmlFileOpen:
+ * xmlFileOpen_real:
  * @filename:  the URI for matching
  *
  * input from FILE *, supports compressed input
@@ -347,8 +297,8 @@ xmlFileMatch (const char *filename ATTRIBUTE_UNUSED) {
  *
  * Returns an I/O context or NULL in case of error
  */
-void *
-xmlFileOpen (const char *filename) {
+static void *
+xmlFileOpen_real (const char *filename) {
     const char *path = NULL;
     FILE *fd;
 
@@ -358,13 +308,13 @@ xmlFileOpen (const char *filename) {
     }
 
     if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file://localhost/", 17))
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &filename[17];
 #else
 	path = &filename[16];
 #endif
     else if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file:///", 8)) {
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &filename[8];
 #else
 	path = &filename[7];
@@ -377,12 +327,35 @@ xmlFileOpen (const char *filename) {
     if (!xmlCheckFilename(path))
         return(NULL);
 
-#if defined(WIN32) || defined (__CYGWIN__)
+#if defined(WIN32) || defined (__DJGPP__) && !defined (__CYGWIN__)
     fd = fopen(path, "rb");
 #else
     fd = fopen(path, "r");
 #endif /* WIN32 */
     return((void *) fd);
+}
+
+/**
+ * xmlFileOpen:
+ * @filename:  the URI for matching
+ *
+ * Wrapper around xmlFileOpen_real that try it with an unescaped
+ * version of @filename, if this fails fallback to @filename
+ *
+ * Returns a handler or NULL in case or failure
+ */
+void *
+xmlFileOpen (const char *filename) {
+    char *unescaped;
+    void *retval;
+    unescaped = xmlURIUnescapeString(filename, 0, NULL);
+    if (unescaped != NULL) {
+	retval = xmlFileOpen_real(unescaped);
+    } else {
+	retval = xmlFileOpen_real(filename);
+    }
+    xmlFree(unescaped);
+    return retval;
 }
 
 /**
@@ -405,13 +378,13 @@ xmlFileOpenW (const char *filename) {
     }
 
     if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file://localhost/", 17))
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &filename[17];
 #else
 	path = &filename[16];
 #endif
     else if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file:///", 8)) {
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &filename[8];
 #else
 	path = &filename[7];
@@ -422,7 +395,7 @@ xmlFileOpenW (const char *filename) {
     if (path == NULL)
 	return(NULL);
 
-    fd = fopen(path, "w");
+    fd = fopen(path, "wb");
     return((void *) fd);
 }
 
@@ -513,7 +486,7 @@ xmlGzfileMatch (const char *filename ATTRIBUTE_UNUSED) {
 }
 
 /**
- * xmlGzfileOpen:
+ * xmlGzfileOpen_real:
  * @filename:  the URI for matching
  *
  * input from compressed file open
@@ -522,7 +495,7 @@ xmlGzfileMatch (const char *filename ATTRIBUTE_UNUSED) {
  * Returns an I/O context or NULL in case of error
  */
 static void *
-xmlGzfileOpen (const char *filename) {
+xmlGzfileOpen_real (const char *filename) {
     const char *path = NULL;
     gzFile fd;
 
@@ -532,13 +505,13 @@ xmlGzfileOpen (const char *filename) {
     }
 
     if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file://localhost/", 17))
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &filename[17];
 #else
 	path = &filename[16];
 #endif
     else if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file:///", 8)) {
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &filename[8];
 #else
 	path = &filename[7];
@@ -553,6 +526,29 @@ xmlGzfileOpen (const char *filename) {
 
     fd = gzopen(path, "rb");
     return((void *) fd);
+}
+
+/**
+ * xmlGzfileOpen:
+ * @filename:  the URI for matching
+ *
+ * Wrapper around xmlGzfileOpen if the open fais, it will
+ * try to unescape @filename
+ */
+static void *
+xmlGzfileOpen (const char *filename) {
+    char *unescaped;
+    void *retval;
+
+    retval = xmlGzfileOpen_real(filename);
+    if (retval == NULL) {
+	unescaped = xmlURIUnescapeString(filename, 0, NULL);
+	if (unescaped != NULL) {
+	    retval = xmlGzfileOpen_real(unescaped);
+	}
+	xmlFree(unescaped);
+    }
+    return retval;
 }
 
 /**
@@ -578,13 +574,13 @@ xmlGzfileOpenW (const char *filename, int compression) {
     }
 
     if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file://localhost/", 17))
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &filename[17];
 #else
 	path = &filename[16];
 #endif
     else if (!xmlStrncasecmp(BAD_CAST filename, BAD_CAST "file:///", 8)) {
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &filename[8];
 #else
 	path = &filename[7];
@@ -724,19 +720,23 @@ append_reverse_ulong( xmlZMemBuff * buff, unsigned long data ) {
  */
 static void
 xmlFreeZMemBuff( xmlZMemBuffPtr buff ) {
-    
+
+#ifdef DEBUG_HTTP
     int z_err;
+#endif
 
     if ( buff == NULL )
 	return;
 
     xmlFree( buff->zbuff );
-    z_err = deflateEnd( &buff->zctrl );
 #ifdef DEBUG_HTTP
+    z_err = deflateEnd( &buff->zctrl );
     if ( z_err != Z_OK )
 	xmlGenericError( xmlGenericErrorContext,
 			"xmlFreeZMemBuff:  Error releasing zlib context:  %d\n",
 			z_err );
+#else
+    deflateEnd( &buff->zctrl );
 #endif
 
     xmlFree( buff );
@@ -1269,7 +1269,7 @@ xmlIOHTTPCloseWrite( void * context, const char * http_mthd ) {
 	    if ( dump_name != NULL ) {
 		(void)snprintf( buffer, sizeof(buffer), "%s.content", dump_name );
 
-		tst_file = fopen( buffer, "w" );
+		tst_file = fopen( buffer, "wb" );
 		if ( tst_file != NULL ) {
 		    xmlGenericError( xmlGenericErrorContext,
 			"Transmitted content saved in file:  %s\n", buffer );
@@ -1280,7 +1280,7 @@ xmlIOHTTPCloseWrite( void * context, const char * http_mthd ) {
 		}
 
 		(void)snprintf( buffer, sizeof(buffer), "%s.reply", dump_name );
-		tst_file = fopen( buffer, "w" );
+		tst_file = fopen( buffer, "wb" );
 		if ( tst_file != NULL ) {
 		    xmlGenericError( xmlGenericErrorContext,
 			"Reply content saved in file:  %s\n", buffer );
@@ -1719,20 +1719,15 @@ xmlOutputBufferClose(xmlOutputBufferPtr out) {
  * Returns the new parser input or NULL
  */
 xmlParserInputBufferPtr
-xmlParserInputBufferCreateFilename
-(const char *URI, xmlCharEncoding enc) {
+xmlParserInputBufferCreateFilename(const char *URI, xmlCharEncoding enc) {
     xmlParserInputBufferPtr ret;
     int i = 0;
     void *context = NULL;
-    char *unescaped;
-    char *normalized;
 
     if (xmlInputCallbackInitialized == 0)
 	xmlRegisterDefaultInputCallbacks();
 
     if (URI == NULL) return(NULL);
-    normalized = (char *) xmlNormalizeWindowsPath((const xmlChar *)URI);
-    if (normalized == NULL) return(NULL);
 
 #ifdef LIBXML_CATALOG_ENABLED
 #endif
@@ -1740,36 +1735,17 @@ xmlParserInputBufferCreateFilename
     /*
      * Try to find one of the input accept method accepting that scheme
      * Go in reverse to give precedence to user defined handlers.
-     * try with an unescaped version of the URI
-     */
-    unescaped = xmlURIUnescapeString((char *) normalized, 0, NULL);
-    if (unescaped != NULL) {
-	for (i = xmlInputCallbackNr - 1;i >= 0;i--) {
-	    if ((xmlInputCallbackTable[i].matchcallback != NULL) &&
-		(xmlInputCallbackTable[i].matchcallback(unescaped) != 0)) {
-		context = xmlInputCallbackTable[i].opencallback(unescaped);
-		if (context != NULL)
-		    break;
-	    }
-	}
-	xmlFree(unescaped);
-    }
-
-    /*
-     * If this failed try with a non-escaped URI this may be a strange
-     * filename
      */
     if (context == NULL) {
 	for (i = xmlInputCallbackNr - 1;i >= 0;i--) {
 	    if ((xmlInputCallbackTable[i].matchcallback != NULL) &&
 		(xmlInputCallbackTable[i].matchcallback(URI) != 0)) {
-		context = xmlInputCallbackTable[i].opencallback(normalized);
+		context = xmlInputCallbackTable[i].opencallback(URI);
 		if (context != NULL)
 		    break;
 	    }
 	}
     }
-    xmlFree(normalized);
     if (context == NULL) {
 	return(NULL);
     }
@@ -1809,7 +1785,6 @@ xmlOutputBufferCreateFilename(const char *URI,
     int i = 0;
     void *context = NULL;
     char *unescaped;
-    char *normalized;
 
     int is_http_uri = 0;	/*   Can't change if HTTP disabled  */
 
@@ -1817,13 +1792,11 @@ xmlOutputBufferCreateFilename(const char *URI,
 	xmlRegisterDefaultOutputCallbacks();
 
     if (URI == NULL) return(NULL);
-    normalized = (char *) xmlNormalizeWindowsPath((const xmlChar *)URI);
-    if (normalized == NULL) return(NULL);
 
 #ifdef LIBXML_HTTP_ENABLED
     /*  Need to prevent HTTP URI's from falling into zlib short circuit  */
 
-    is_http_uri = xmlIOHTTPMatch( normalized );
+    is_http_uri = xmlIOHTTPMatch( URI );
 #endif
 
 
@@ -1832,7 +1805,7 @@ xmlOutputBufferCreateFilename(const char *URI,
      * Go in reverse to give precedence to user defined handlers.
      * try with an unescaped version of the URI
      */
-    unescaped = xmlURIUnescapeString(normalized, 0, NULL);
+    unescaped = xmlURIUnescapeString(URI, 0, NULL);
     if (unescaped != NULL) {
 #ifdef HAVE_ZLIB_H
 	if ((compression > 0) && (compression <= 9) && (is_http_uri == 0)) {
@@ -1845,7 +1818,6 @@ xmlOutputBufferCreateFilename(const char *URI,
 		    ret->closecallback = xmlGzfileClose;
 		}
 		xmlFree(unescaped);
-		xmlFree(normalized);
 		return(ret);
 	    }
 	}
@@ -1874,7 +1846,7 @@ xmlOutputBufferCreateFilename(const char *URI,
     if (context == NULL) {
 #ifdef HAVE_ZLIB_H
 	if ((compression > 0) && (compression <= 9) && (is_http_uri == 0)) {
-	    context = xmlGzfileOpenW(normalized, compression);
+	    context = xmlGzfileOpenW(URI, compression);
 	    if (context != NULL) {
 		ret = xmlAllocOutputBuffer(encoder);
 		if (ret != NULL) {
@@ -1882,14 +1854,13 @@ xmlOutputBufferCreateFilename(const char *URI,
 		    ret->writecallback = xmlGzfileWrite;
 		    ret->closecallback = xmlGzfileClose;
 		}
-		xmlFree(normalized);
 		return(ret);
 	    }
 	}
 #endif
 	for (i = xmlOutputCallbackNr - 1;i >= 0;i--) {
 	    if ((xmlOutputCallbackTable[i].matchcallback != NULL) &&
-		(xmlOutputCallbackTable[i].matchcallback(normalized) != 0)) {
+		(xmlOutputCallbackTable[i].matchcallback(URI) != 0)) {
 #if defined(LIBXML_HTTP_ENABLED) && defined(HAVE_ZLIB_H)
 		/*  Need to pass compression parameter into HTTP open calls  */
 		if (xmlOutputCallbackTable[i].matchcallback == xmlIOHTTPMatch)
@@ -1902,7 +1873,6 @@ xmlOutputBufferCreateFilename(const char *URI,
 	    }
 	}
     }
-    xmlFree(normalized);
 
     if (context == NULL) {
 	return(NULL);
@@ -2218,7 +2188,7 @@ xmlParserInputBufferGrow(xmlParserInputBufferPtr in, int len) {
     if (needSize > in->buffer->size){
         if (!xmlBufferResize(in->buffer, needSize)){
             xmlGenericError(xmlGenericErrorContext,
-		    "xmlBufferAdd : out of memory!\n");
+		    "xmlParserInputBufferGrow : out of memory!\n");
             return(0);
         }
     }
@@ -2339,7 +2309,7 @@ xmlOutputBufferWrite(xmlOutputBufferPtr out, int len, const char *buf) {
 	     * convert as much as possible to the parser reading buffer.
 	     */
 	    ret = xmlCharEncOutFunc(out->encoder, out->conv, out->buffer);
-	    if (ret < 0) {
+	    if ((ret < 0) && (ret != -3)) {
 		xmlGenericError(xmlGenericErrorContext,
 			"xmlOutputBufferWrite: encoder error\n");
 		return(-1);
@@ -2523,7 +2493,6 @@ xmlParserGetDirectory(const char *filename) {
  *								*
  ****************************************************************/
 
-#ifdef LIBXML_CATALOG_ENABLED
 static int xmlSysIDExists(const char *URL) {
 #ifdef HAVE_STAT
     int ret;
@@ -2534,13 +2503,13 @@ static int xmlSysIDExists(const char *URL) {
 	return(0);
 
     if (!xmlStrncasecmp(BAD_CAST URL, BAD_CAST "file://localhost/", 17))
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &URL[17];
 #else
 	path = &URL[16];
 #endif
     else if (!xmlStrncasecmp(BAD_CAST URL, BAD_CAST "file:///", 8)) {
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &URL[8];
 #else
 	path = &URL[7];
@@ -2553,7 +2522,6 @@ static int xmlSysIDExists(const char *URL) {
 #endif
     return(0);
 }
-#endif
 
 /**
  * xmlDefaultExternalEntityLoader:
@@ -2705,6 +2673,22 @@ xmlGetExternalEntityLoader(void) {
 xmlParserInputPtr
 xmlLoadExternalEntity(const char *URL, const char *ID,
                       xmlParserCtxtPtr ctxt) {
+    if ((URL != NULL) && (xmlSysIDExists(URL) == 0)) {
+	char *canonicFilename;
+	xmlParserInputPtr ret;
+
+	canonicFilename = (char *) xmlCanonicPath((const xmlChar *) URL);
+	if (canonicFilename == NULL) {
+	    if (xmlDefaultSAXHandler.error != NULL) {
+		xmlDefaultSAXHandler.error(NULL, "out of memory\n");
+	    }
+	    return(NULL);
+	}
+
+	ret = xmlCurrentExternalEntityLoader(canonicFilename, ID, ctxt);
+	xmlFree(canonicFilename);
+	return(ret);
+    }
     return(xmlCurrentExternalEntityLoader(URL, ID, ctxt));
 }
 
@@ -2727,13 +2711,13 @@ xmlNoNetExists(const char *URL)
         return (0);
 
     if (!xmlStrncasecmp(BAD_CAST URL, BAD_CAST "file://localhost/", 17))
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
 	path = &URL[17];
 #else
 	path = &URL[16];
 #endif
     else if (!xmlStrncasecmp(BAD_CAST URL, BAD_CAST "file:///", 8)) {
-#if defined (_WIN32) && !defined(__CYGWIN__)
+#if defined (_WIN32) || defined (__DJGPP__) && !defined(__CYGWIN__)
         path = &URL[8];
 #else
         path = &URL[7];

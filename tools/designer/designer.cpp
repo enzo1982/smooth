@@ -28,14 +28,6 @@ Designer::Designer()
 {
 	dlgcounter = 1;
 
-	POINT		 pos;
-	SIZE		 size;
-
-	pos.x = 2;
-	pos.y = 2;
-	size.cx = 389;
-	size.cy = 169;
-
 	wnd		= new Window(String("smooth Designer v").Append(SMOOTH_VERSION));
 	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	menubar		= new Menubar();
@@ -110,7 +102,7 @@ void Designer::Close()
 
 Bool Designer::ExitProc()
 {
-	for (int i = 0; i < dlgs.GetNOfEntries(); i++)
+	for (Int i = 0; i < dlgs.GetNOfEntries(); i++)
 	{
 		delete dlgs.GetNthEntry(i);
 	}
@@ -135,19 +127,25 @@ void Designer::ReportStatus(Designer_Status stat)
 	{
 		case STATUS_EVENT_REPORT_NAME:
 			if (active_dlg != stat.dlg) wnd->SetText(String("smooth Designer v").Append(SMOOTH_VERSION).Append(" - ").Append(stat.currdlgname));
+
 			active_dlg = stat.dlg;
+
 			break;
 		case STATUS_EVENT_REPORT_MOUSEPOSITION:
 			statusbar->SetText(String("Mouse: ").Append(String::FromInt(stat.mousex)).Append(", ").Append(String::FromInt(stat.mousey)));
+
 			break;
 		case STATUS_EVENT_REPORT_WINDOWPOSITION:
 			statusbar->SetText(String("Position: ").Append(String::FromInt(stat.wndposx)).Append(", ").Append(String::FromInt(stat.wndposy)));
+
 			break;
 		case STATUS_EVENT_REPORT_WINDOWSIZE:
 			statusbar->SetText(String("Size: ").Append(String::FromInt(stat.wndsizex)).Append(", ").Append(String::FromInt(stat.wndsizey)));
+
 			break;
 		case STATUS_EVENT_REPORT_QUIT:
 			wnd->SetText(String("smooth Designer v").Append(SMOOTH_VERSION));
+
 			break;
 	}
 
@@ -156,22 +154,22 @@ void Designer::ReportStatus(Designer_Status stat)
 
 void Designer::TimerProc()
 {
-	Designer_EditComponent	*operat;
-	bool			 mouseonwindow = false;
+	Designer_EditComponent	*object;
+	Bool			 mouseOnWindow = False;
 
-	for (int i = 0; i < dlgs.GetNOfEntries(); i++)
+	for (Int i = 0; i < dlgs.GetNOfEntries(); i++)
 	{
-		operat = dlgs.GetNthEntry(i);
+		object = dlgs.GetNthEntry(i);
 
-		if (operat->GetWindow()->MouseX() > 0 && operat->GetWindow()->MouseY() > 0 && operat->GetWindow()->MouseX() < operat->GetWindow()->GetObjectProperties()->size.cx && operat->GetWindow()->MouseY() < operat->GetWindow()->GetObjectProperties()->size.cy)
+		if (object->GetWindow()->MouseX() > 0 && object->GetWindow()->MouseY() > 0 && object->GetWindow()->MouseX() < object->GetWindow()->GetObjectProperties()->size.cx && object->GetWindow()->MouseY() < object->GetWindow()->GetObjectProperties()->size.cy)
 		{
-			mouseonwindow = true;
+			mouseOnWindow = True;
 
 			break;
 		}
 	}
 
-	if (!mouseonwindow && (statusbar->GetText() != "Ready")) statusbar->SetText("Ready");
+	if (!mouseOnWindow && (statusbar->GetText() != "Ready")) statusbar->SetText("Ready");
 }
 
 void Designer::AddButton()

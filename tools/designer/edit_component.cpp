@@ -26,8 +26,8 @@ Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 
 	designer->ReportStatus(status);
 
-	wnd		= new Window(name);
-	title		= new Titlebar();
+	wnd	= new Window(name);
+	title	= new Titlebar();
 
 	objects.AddEntry(wnd);
 	objects.AddEntry(title);

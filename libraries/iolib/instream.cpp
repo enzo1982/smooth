@@ -233,7 +233,12 @@ bool InStream::ReadData()
 		{
 			origfilepos = currentFilePos + packageSize;
 
-			filter->DecodeData(&data, ((packageSize)<(size-currentFilePos)?(packageSize):(size-currentFilePos)), &decsize);
+			if (!filter->DecodeData(&data, ((packageSize)<(size-currentFilePos)?(packageSize):(size-currentFilePos)), &decsize))
+			{
+				packageSize = 0;
+
+				return false;
+			}
 
 			packageSize	= decsize;
 			origsize	= size;
@@ -258,9 +263,12 @@ long InStream::InputNumber(int bytes)	// Intel byte order DCBA
 
 	for (int i = 0; i < bytes; i++)
 	{
-		if (currentFilePos >= size) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
 
-		while (currentBufferPos >= packageSize) ReadData();
+		while (currentBufferPos >= packageSize)
+		{
+			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+		}
 
 		rval += data[currentBufferPos] * (1 << (i * 8));
 		currentBufferPos++;
@@ -281,9 +289,12 @@ long InStream::InputNumberRaw(int bytes)	// Raw byte order ABCD
 
 	for (int i = bytes - 1; i >= 0; i--)
 	{
-		if (currentFilePos >= size) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
 
-		while (currentBufferPos >= packageSize) ReadData();
+		while (currentBufferPos >= packageSize)
+		{
+			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+		}
 
 		rval += data[currentBufferPos] * (1 << (i * 8));
 		currentBufferPos++;
@@ -306,9 +317,12 @@ long InStream::InputNumberPDP(int bytes)	// PDP byte order BADC
 	{
 		if (bytes >= (i ^ 1) + 1)
 		{
-			if (currentFilePos >= size) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+			if (currentFilePos >= (origfilepos + packageSize)) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
 
-			while (currentBufferPos >= packageSize) ReadData();
+			while (currentBufferPos >= packageSize)
+			{
+				if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+			}
 
 			rval += (data[currentBufferPos] << (((3 - i) ^ 1) * 8)) >> (8 * (4 - bytes));
 			currentBufferPos++;
@@ -331,9 +345,12 @@ long InStream::InputNumberPBD(int bits)
 
 	while (pbdlen < bits)
 	{
-		if (currentFilePos >= size) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
 
-		while (currentBufferPos >= packageSize) ReadData();
+		while (currentBufferPos >= packageSize)
+		{
+			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return -1; }
+		}
 
 		inp = data[currentBufferPos];
 		currentBufferPos++;
@@ -375,14 +392,17 @@ char *InStream::InputString(int bytes)
 
 	while (bytesleft)
 	{
-		if (currentFilePos >= size)
+		if (currentFilePos >= (origfilepos + packageSize))
 		{
 			delete [] rval;
 
 			{ lastError = IOLIB_ERROR_UNKNOWN; return NULL; }
 		}
 
-		while (currentBufferPos >= packageSize) ReadData();
+		while (currentBufferPos >= packageSize)
+		{
+			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return NULL; }
+		}
 
 		amount = ((packageSize - currentBufferPos)<(bytesleft))?(packageSize - currentBufferPos):(bytesleft);
 
@@ -477,9 +497,12 @@ void *InStream::InputData(void *pointer, int bytes)
 
 	while (bytesleft)
 	{
-		if (currentFilePos >= size) { lastError = IOLIB_ERROR_UNKNOWN; return NULL; }
+		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IOLIB_ERROR_UNKNOWN; return NULL; }
 
-		while (currentBufferPos >= packageSize) ReadData();
+		while (currentBufferPos >= packageSize)
+		{
+			if (!ReadData()) { lastError = IOLIB_ERROR_UNKNOWN; return NULL; }
+		}
 
 		amount = ((packageSize - currentBufferPos)<(bytesleft))?(packageSize - currentBufferPos):(bytesleft);
 

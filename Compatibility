@@ -12,6 +12,7 @@ Source and binary compatibility between different smooth Versions
 		Compatibility with older versions
 Version		Source		Binary			Comments
 ---------------------------------------------------------------------------------------------------------------------
+0.8.60.0	yes		yes			-
 0.8.59.0	no		no			-
 0.8.58.1	yes		yes			-
 0.8.58.0	no		no			greater restructuring in class SObject and others

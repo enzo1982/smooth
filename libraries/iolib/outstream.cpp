@@ -268,7 +268,12 @@ bool OutStream::WriteData()
 	{
 		driver->Seek(lastfilepos);
 
-		filter->EncodeData(&data, packageSize, &encsize);
+		if (!filter->EncodeData(&data, packageSize, &encsize))
+		{
+			packageSize = 0;
+
+			return false;
+		}
 
 		driver->WriteData(data, encsize);
 		driver->Flush();
@@ -295,7 +300,10 @@ bool OutStream::OutputNumber(long number, int bytes)
 
 	for (int i = 0; i < bytes; i++)
 	{
-		if (currentBufferPos >= packageSize) WriteData();
+		if (currentBufferPos >= packageSize)
+		{
+			if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
+		}
 
 		data[currentBufferPos] = GetByte(number, i);
 		if (currentFilePos == size) size++;
@@ -303,7 +311,10 @@ bool OutStream::OutputNumber(long number, int bytes)
 		currentFilePos++;
 	}
 
-	if (currentBufferPos >= packageSize) WriteData();
+	if (currentBufferPos >= packageSize)
+	{
+		if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
+	}
 
 	return true;
 }
@@ -317,7 +328,10 @@ bool OutStream::OutputNumberRaw(long number, int bytes)
 
 	for (int i = bytes - 1; i >= 0; i--)
 	{
-		if (currentBufferPos >= packageSize) WriteData();
+		if (currentBufferPos >= packageSize)
+		{
+			if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
+		}
 
 		data[currentBufferPos] = GetByte(number, i);
 		if (currentFilePos == size) size++;
@@ -325,7 +339,10 @@ bool OutStream::OutputNumberRaw(long number, int bytes)
 		currentFilePos++;
 	}
 
-	if (currentBufferPos >= packageSize) WriteData();
+	if (currentBufferPos >= packageSize)
+	{
+		if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
+	}
 
 	return true;
 }
@@ -343,7 +360,10 @@ bool OutStream::OutputNumberPDP(long number, int bytes)
 	{
 		if (bytes >= (i ^ 1) + 1)
 		{
-			if (currentBufferPos >= packageSize) WriteData();
+			if (currentBufferPos >= packageSize)
+			{
+				if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
+			}
 
 			data[currentBufferPos] = GetByte(number, (3 - i) ^ 1);
 			if (currentFilePos == size) size++;
@@ -352,7 +372,10 @@ bool OutStream::OutputNumberPDP(long number, int bytes)
 		}
 	}
 
-	if (currentBufferPos >= packageSize) WriteData();
+	if (currentBufferPos >= packageSize)
+	{
+		if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
+	}
 
 	return true;
 }
@@ -392,7 +415,11 @@ bool OutStream::OutputNumberPBD(long number, int bits)
 		if (currentFilePos == size) size++;
 		currentBufferPos++;
 		currentFilePos++;
-		if (currentBufferPos >= packageSize) WriteData();
+
+		if (currentBufferPos >= packageSize)
+		{
+			if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
+		}
 	}
 
 	return true;
@@ -422,7 +449,7 @@ bool OutStream::OutputString(const char *string)
 
 		if (size < currentFilePos) size = currentFilePos;
 
-		WriteData();
+		if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
 	}
 
 	return true;
@@ -452,7 +479,7 @@ bool OutStream::OutputLine(const char *string)
 
 		if (size < currentFilePos) size = currentFilePos;
 
-		WriteData();
+		if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
 	}
 
 #if (defined __WIN32__ || defined MSDOS) && !defined __CYGWIN32__
@@ -489,7 +516,7 @@ bool OutStream::OutputData(const void *pointer, int bytes)
 
 		if (size < currentFilePos) size = currentFilePos;
 
-		WriteData();
+		if (!WriteData()) { lastError = IOLIB_ERROR_UNKNOWN; return false; }
 	}
 
 	return true;

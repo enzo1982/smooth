@@ -1,5 +1,9 @@
 ChangeLog for smooth
 
+xx.xx.02 xx:xx - smooth alpha 0.8.60.0
+
+- upgraded to IOLib v4.9.9.0
+
 20.09.02 23:21 - smooth alpha 0.8.59.0
 
 - groupbox.cpp		- fixed Hide() function

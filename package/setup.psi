@@ -3,7 +3,7 @@ Version=v0.1
 
 [Application]
 Name=SMOOTH
-Version=v0.8.58.0 (Build 265)
+Version=v0.8.60.0 (Build 268)
 
 [Name Font]
 Weight=700
@@ -34,7 +34,7 @@ Reboot=1
 Title=SMOOTH Windowing Toolkit Setup
 Lines=10
 1=Willkommen beim Setup-Programm für das
-2=SMOOTH Windowing Toolkit Version 0.8.58.0.
+2=SMOOTH Windowing Toolkit Version 0.8.60.0.
 3=
 4=
 5=Beenden sie vor der Installation unbedingt alle

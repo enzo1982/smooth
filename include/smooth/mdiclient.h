@@ -28,14 +28,14 @@ namespace smooth
 		class SMOOTHAPI MDIClient : public Widget
 		{
 			public:
-						 MDIClient();
-						~MDIClient();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
+							 MDIClient();
+							~MDIClient();
+
+				virtual Int		 Paint(Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_MDICLIENT;
 };
 
 #endif

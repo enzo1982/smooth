@@ -14,7 +14,7 @@
 S::ContainerType::ContainerType()
 {
 	container	= NIL;
-	type		= OBJ_CONTAINER;
+	type		= Container::classID;
 }
 
 S::ContainerType::ContainerType(const ContainerType &containerType)

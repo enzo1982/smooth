@@ -24,15 +24,11 @@
 #include <smooth/surface.h>
 #include <smooth/listboxheader.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_LISTBOX = S::Object::RequestObjectID();
+const S::Int	 S::GUI::ListBox::classID = S::Object::RequestClassID();
 
 S::GUI::ListBox::ListBox(Point pos, Size size)
 {
-	type		= OBJ_LISTBOX;
+	type		= classID;
 	entryCount	= -1;
 
 	scrollbar		= NIL;
@@ -41,7 +37,7 @@ S::GUI::ListBox::ListBox(Point pos, Size size)
 
 	header			= NIL;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	SetFont(Font(objectProperties->font.GetName(), I18N_SMALLFONTSIZE, Setup::ClientTextColor));
 

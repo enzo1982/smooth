@@ -32,24 +32,24 @@ namespace smooth
 		class SMOOTHAPI Progressbar : public Widget
 		{
 			protected:
-				Int		 value;
+				Int			 value;
 
-				Int		 startValue;
-				Int		 endValue;
+				Int			 startValue;
+				Int			 endValue;
 
-				Int		 textFlag;
+				Int			 textFlag;
 			public:
-						 Progressbar(Point, Size, Int, Int, Int, Int, Int);
-						~Progressbar();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
+							 Progressbar(Point, Size, Int, Int, Int, Int, Int);
+							~Progressbar();
 
-				Int		 SetValue(Int);
-				Int		 GetValue();
+				virtual Int		 Paint(Int);
+
+				Int			 SetValue(Int);
+				Int			 GetValue();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_PROGRESSBAR;
 };
 
 #endif

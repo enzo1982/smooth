@@ -30,37 +30,37 @@ namespace smooth
 		class SMOOTHAPI Scrollbar : public Widget
 		{
 			private:
-				Timer		*timer;
-				Bool		 timerActive;
-				Int		 timerCount;
+				Timer			*timer;
+				Bool			 timerActive;
+				Int			 timerCount;
 
-				Void		 TimerProc();
+				Void			 TimerProc();
 			protected:
-				Bool		 button1Clicked;
-				Bool		 button2Clicked;
-				Bool		 button3Clicked;
-				Bool		 button1Checked;
-				Bool		 button2Checked;
-				Bool		 button3Checked;
+				Bool			 button1Clicked;
+				Bool			 button2Clicked;
+				Bool			 button3Clicked;
+				Bool			 button1Checked;
+				Bool			 button2Checked;
+				Bool			 button3Checked;
 
-				Int		*variable;
+				Int			*variable;
 
-				Int		 startValue;
-				Int 		 endValue;
+				Int			 startValue;
+				Int 			 endValue;
 
-				Int		 mouseBias;
+				Int			 mouseBias;
 			public:
-						 Scrollbar(Point, Size, Int, Int *, Int, Int);
-						~Scrollbar();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 Scrollbar(Point, Size, Int, Int *, Int, Int);
+							~Scrollbar();
 
-				Int		 SetRange(Int, Int);
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
+
+				Int			 SetRange(Int, Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_SCROLLBAR;
 };
 
 #endif

@@ -41,6 +41,8 @@ namespace smooth
 				Bool				 visible;
 				Bool				 active;
 			public:
+				static const Int		 classID;
+
 				Int				 subtype;
 
 								 Widget();
@@ -77,8 +79,6 @@ namespace smooth
 				Signal1<Void, Container *>	 onUnregister;
 		};
 	};
-
-	SMOOTHVAR Int OBJ_WIDGET;
 };
 
 #endif

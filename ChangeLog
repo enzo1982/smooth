@@ -25,6 +25,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 			- added an LF_MULTICHECKBOX flag; support for selecting multiple entries
 - array.cpp		- improved speed of GetNthEntry()
 			- renamed DeleteEntry to RemoveEntry, DeleteAll to RemoveAll
+			- fixed a bug that crashed Array<t> when an entry was inserted in a previously cleaned array
 - list.cpp		- class List now inherits from class Array<ListEntry *>
 			- new method: SetReferenceList(List *), lets the list stay synchronized with the reference
 			- renamed Cleanup() to RemoveAll()
@@ -37,8 +38,6 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 - background.cpp	- messages are now sent to all threads; fixes some problems with multithreaded applications
 - document.cpp		- added support for parsing XML documents in memory
 - popupview.cpp		- popups now open automatically when the mouse is moved on a popup entry
-- class.cpp		- new class: Class; will become the base class for all other smooth classes
-- memory.cpp		- new class: Memory; provides memory management functionality
 
 - introduced a new font management system
 - fixed some PopupMenu issues

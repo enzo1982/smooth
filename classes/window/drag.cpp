@@ -15,18 +15,14 @@
 #include <smooth/stk.h>
 #include <smooth/loop.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_DRAGCONTROL = S::Object::RequestObjectID();
+const S::Int	 S::GUI::DragControl::classID = S::Object::RequestClassID();
 
 S::GUI::DragControl::DragControl()
 {
-	type				= OBJ_DRAGCONTROL;
+	type				= classID;
 	objectProperties->orientation	= OR_CENTER;
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::DragControl::~DragControl()

@@ -23,16 +23,16 @@ namespace smooth
 	class SMOOTHAPI Semaphore : public Object
 	{
 		private:
-			LiSASemaphore	*semaphore;
+			LiSASemaphore		*semaphore;
 		public:
-					 Semaphore();
-					~Semaphore();
+			static const Int	 classID;
 
-			Int		 Wait();
-			Int		 Release();
+						 Semaphore();
+						~Semaphore();
+
+			Int			 Wait();
+			Int			 Release();
 	};
-
-	SMOOTHVAR Int OBJ_SEMAPHORE;
 };
 
 #endif

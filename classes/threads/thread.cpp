@@ -18,20 +18,16 @@
 
 S::Void ThreadProcCaller(S::Thread *);
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_THREAD = S::Object::RequestObjectID();
-S::Int	 S::Thread::counter = 0;
+const S::Int	 S::Thread::classID = S::Object::RequestClassID();
+S::Int		 S::Thread::counter = 0;
 
 S::Thread::Thread()
 {
-	type		= OBJ_THREAD;
+	type		= classID;
 	status		= THREAD_CREATED;
 	thread		= NIL;
 
-	possibleContainers.AddEntry(OBJ_APPLICATION);
+	possibleContainers.AddEntry(Application::classID);
 
 	mainThreadManager->RegisterThread(this);
 }

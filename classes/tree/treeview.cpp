@@ -21,20 +21,16 @@
 #include <smooth/layer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_TREEVIEW = S::Object::RequestObjectID();
+const S::Int	 S::GUI::TreeView::classID = S::Object::RequestClassID();
 
 S::GUI::TreeView::TreeView(String name, Point pos, Size size)
 {
-	type				= OBJ_TREEVIEW;
+	type				= classID;
 	objectProperties->text		= name;
 
 	objectProperties->font.SetColor(Setup::ClientTextColor);
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);

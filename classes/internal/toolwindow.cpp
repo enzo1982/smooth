@@ -23,16 +23,12 @@
 #include <smooth/layer.h>
 #include <smooth/math.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_TOOLWINDOW = S::Object::RequestObjectID();
+const S::Int	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
 
 S::GUI::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
 {
-	type				= OBJ_TOOLWINDOW;
-	containerType			= OBJ_WINDOW;
+	type				= classID;
+	containerType			= Window::classID;
 
 	objectProperties->pos.x		= 0;
 	objectProperties->pos.y		= 0;
@@ -41,7 +37,7 @@ S::GUI::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
 	objectProperties->orientation	= OR_FREE;
 
 	possibleContainers.RemoveAll();
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 
 	owner				= NIL;
 	style				= WS_BORDER | WS_POPUP;
@@ -92,7 +88,7 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 		{
 			Object	*object = assocObjects.GetNthEntry(i);
 
-			if (object->GetObjectType() == OBJ_WIDGET)
+			if (object->GetObjectType() == Widget::classID)
 			{
 				((Widget *) object)->Paint(SP_PAINT);
 			}
@@ -219,7 +215,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 	{
 		Object	*object = assocObjects.GetNthEntry(j);
 
-		if (object->GetObjectType() == OBJ_WIDGET)
+		if (object->GetObjectType() == Widget::classID)
 		{
 			if (((Widget *) object)->Process(message, wParam, lParam) == Break)
 			{
@@ -263,7 +259,7 @@ S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
 					break;
 			}
 
-			if (object->GetObjectType() == OBJ_WIDGET)
+			if (object->GetObjectType() == Widget::classID)
 			{
 				((Widget *) object)->onRegister.Emit(this);
 				((Widget *) object)->Show();
@@ -282,6 +278,6 @@ S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
 
 S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType)
 {
-	if (compType == OBJ_OBJECT || compType == OBJ_WIDGET || compType == OBJ_WINDOW)	return True;
-	else										return False;
+	if (compType == Object::classID || compType == Widget::classID || compType == Window::classID)	return True;
+	else												return False;
 }

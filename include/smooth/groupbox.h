@@ -28,19 +28,19 @@ namespace smooth
 		class SMOOTHAPI GroupBox : public Widget
 		{
 			public:
-						 GroupBox(String, Point, Size);
-						~GroupBox();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
+							 GroupBox(String, Point, Size);
+							~GroupBox();
 
-				Int		 Activate();
-				Int		 Deactivate();
+				virtual Int		 Paint(Int);
 
-				Int		 Hide();
+				Int			 Activate();
+				Int			 Deactivate();
+
+				Int			 Hide();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_GROUPBOX;
 };
 
 #endif

@@ -29,17 +29,17 @@ namespace smooth
 		class SMOOTHAPI TreeView : public Widget, public Tree
 		{
 			private:
-				Int		 PaintTree(Tree *, Int, Rect);
+				Int			 PaintTree(Tree *, Int, Rect);
 			public:
-						 TreeView(String, Point, Size);
-						~TreeView();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 TreeView(String, Point, Size);
+							~TreeView();
+
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_TREEVIEW;
 };
 
 #endif

@@ -51,7 +51,7 @@ S::Void S::SMOOTH::SendMessage(GUI::Window *window, Int message, Int wParam, Int
 
 			if (object != NIL)
 			{
-				if (object->GetObjectType() == OBJ_WINDOW || object->GetObjectType() == OBJ_MDIWINDOW || object->GetObjectType() == OBJ_TOOLWINDOW)
+				if (object->GetObjectType() == GUI::Window::classID || object->GetObjectType() == GUI::MDIWindow::classID || object->GetObjectType() == GUI::ToolWindow::classID)
 				{
 					((GUI::Window *) object)->Process(message, wParam, lParam);
 				}
@@ -65,13 +65,13 @@ S::Bool S::Affected(Object *obj, Rect &urect)
 	Rect	 trect;
 	Point	 realpos = obj->GetObjectProperties()->pos;
 
-	if (obj->GetObjectType() == OBJ_LAYER || obj->GetObjectType() == OBJ_DIVIDER) return true;
+	if (obj->GetObjectType() == GUI::Layer::classID || obj->GetObjectType() == GUI::Divider::classID) return true;
 
 	if (obj->GetObjectProperties()->pos.x == 0 && obj->GetObjectProperties()->pos.y == 0 && obj->GetObjectProperties()->size.cx == 0 && obj->GetObjectProperties()->size.cy == 0) return true;
 
 	if (obj->GetContainer() != NIL)
 	{
-		if (obj->GetContainer()->GetContainerObject()->GetObjectType() == OBJ_LAYER) realpos = obj->GetRealPosition();
+		if (obj->GetContainer()->GetContainerObject()->GetObjectType() == GUI::Layer::classID) realpos = obj->GetRealPosition();
 	}
 
 	trect.left	= realpos.x - 10;

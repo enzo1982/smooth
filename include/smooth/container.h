@@ -40,6 +40,8 @@ namespace smooth
 			GUI::Surface		*nullSurface;
 			GUI::Surface		*drawSurface;
 		public:
+			static const Int	 classID;
+
 						 Container();
 			virtual			~Container();
 
@@ -57,8 +59,6 @@ namespace smooth
 
 			virtual GUI::Surface	*GetDrawSurface();
 	};
-
-	SMOOTHVAR Int OBJ_CONTAINER;
 };
 
 #endif

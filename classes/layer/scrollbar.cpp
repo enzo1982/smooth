@@ -20,15 +20,11 @@
 #include <smooth/timer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_SCROLLBAR = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Scrollbar::classID = S::Object::RequestClassID();
 
 S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd)
 {
-	type		= OBJ_SCROLLBAR;
+	type		= classID;
 	variable	= var;
 	button1Checked	= False;
 	button1Clicked	= False;
@@ -42,7 +38,7 @@ S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int ra
 	timerActive	= False;
 	timer		= NIL;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);

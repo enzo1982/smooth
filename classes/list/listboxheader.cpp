@@ -18,11 +18,7 @@
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_LISTBOXHEADER = S::Object::RequestObjectID();
+const S::Int	 S::GUI::ListBoxHeader::classID = S::Object::RequestClassID();
 
 S::GUI::ListBoxHeader::ListBoxHeader(ListBox *iListBox)
 {
@@ -31,9 +27,9 @@ S::GUI::ListBoxHeader::ListBoxHeader(ListBox *iListBox)
 	moveTab		= -1;
 	innerLoop	= False;
 
-	type		= OBJ_LISTBOXHEADER;
+	type		= classID;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->font.SetWeight(FW_BOLD);
 

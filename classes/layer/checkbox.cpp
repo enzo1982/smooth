@@ -20,22 +20,18 @@
 #include <smooth/layer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_CHECKBOX = S::Object::RequestObjectID();
+const S::Int	 S::GUI::CheckBox::classID = S::Object::RequestClassID();
 
 S::GUI::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var)
 {
-	type				= OBJ_CHECKBOX;
+	type				= classID;
 	objectProperties->text		= text;
 	variable			= var;
 	state				= *variable;
 
 	objectProperties->font.SetColor(Setup::ClientTextColor);
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
@@ -270,7 +266,7 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 					if (object != NIL)
 					{
-						if (object->GetObjectType() == OBJ_CHECKBOX) ((CheckBox *) object)->Process(SM_CHECKCHECKBOXES, 0, 0);
+						if (object->GetObjectType() == classID) ((CheckBox *) object)->Process(SM_CHECKCHECKBOXES, 0, 0);
 					}
 				}
 

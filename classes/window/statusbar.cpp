@@ -14,20 +14,16 @@
 #include <smooth/objectproperties.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_STATUSBAR = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Statusbar::classID = S::Object::RequestClassID();
 
 S::GUI::Statusbar::Statusbar(String status)
 {
-	type				= OBJ_STATUSBAR;
+	type				= classID;
 	objectProperties->text		= status;
 	objectProperties->orientation	= OR_BOTTOM;
 	objectProperties->size.cy	= METRIC_STATUSBARHEIGHT;
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::Statusbar::~Statusbar()

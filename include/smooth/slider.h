@@ -28,28 +28,28 @@ namespace smooth
 		class SMOOTHAPI Slider : public Widget
 		{
 			private:
-				Int		 mouseBias;
-				Int		 prevValue;
+				Int			 mouseBias;
+				Int			 prevValue;
 			protected:
-				Int		*variable;
+				Int			*variable;
 
-				Int		 startValue;
-				Int		 endValue;
+				Int			 startValue;
+				Int			 endValue;
 			public:
-						 Slider(Point, Size, Int, Int *, Int, Int);
-						~Slider();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 Slider(Point, Size, Int, Int *, Int, Int);
+							~Slider();
 
-				Int		 SetRange(Int, Int);
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 
-				Int		 SetValue(Int);
-				Int		 GetValue();
+				Int			 SetRange(Int, Int);
+
+				Int			 SetValue(Int);
+				Int			 GetValue();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_SLIDER;
 };
 
 #endif

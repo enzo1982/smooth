@@ -17,29 +17,25 @@
 #include <smooth/toolkit.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_OBJECT = S::Object::RequestObjectID();
-S::Int	 S::Object::objectCount = 0;
-S::Int	 S::Object::nextID = 0;
+const S::Int	 S::Object::classID = S::Object::RequestClassID();
+S::Int		 S::Object::objectCount = 0;
+S::Int		 S::Object::nextID = 0;
 
 S::Object::Object()
 {
+	type.object		= this;
+	type			= classID;
+
 	objectProperties	= new ObjectProperties();
 
 	handle			= RequestObjectHandle();
 
-	type.object		= this;
-	type			= OBJ_OBJECT;
+	deleteObject		= False;
+	inUse			= 0;
 
 	flags			= 0;
 
 	registered		= False;
-
-	deleteObject		= False;
-	inUse			= 0;
 
 	myContainer		= NIL;
 
@@ -65,26 +61,6 @@ S::Int S::Object::GetFlags()
 	return flags;
 }
 
-S::Int S::Object::EnterProtectedRegion()
-{
-	return ++inUse;
-}
-
-S::Int S::Object::LeaveProtectedRegion()
-{
-	return --inUse;
-}
-
-S::Int S::Object::IsObjectInUse()
-{
-	return inUse;
-}
-
-S::Bool S::Object::IsObjectDeleteable()
-{
-	return deleteObject;
-}
-
 S::Bool S::Object::IsRegistered()
 {
 	return registered;
@@ -96,7 +72,7 @@ S::Point S::Object::GetRealPosition()
 
 	Point		 realPos = objectProperties->pos;
 
-	if (myContainer->GetContainerObject()->GetObjectType() == OBJ_LAYER)
+	if (myContainer->GetContainerObject()->GetObjectType() == GUI::Layer::classID)
 	{
 		GUI::Layer	*layer = (GUI::Layer *) myContainer->GetContainerObject();
 		Point		 layerPos = layer->GetRealPosition();
@@ -142,8 +118,8 @@ S::Point S::Object::GetRealPosition()
 
 S::Bool S::Object::IsTypeCompatible(Int objType)
 {
-	if (objType == OBJ_OBJECT)	return True;
-	else				return False;
+	if (objType == classID)	return True;
+	else			return False;
 }
 
 S::ObjectProperties *S::Object::GetObjectProperties()
@@ -197,6 +173,36 @@ S::Object *S::Object::GetObject(Int objectHandle, Int objectType)
 	else						return NIL;
 }
 
+S::Int S::Object::RequestClassID()
+{
+	return nextID++;
+}
+
+S::Int S::Object::RequestObjectHandle()
+{
+	return 	objectCount++;
+}
+
+S::Int S::Object::EnterProtectedRegion()
+{
+	return ++inUse;
+}
+
+S::Int S::Object::LeaveProtectedRegion()
+{
+	return --inUse;
+}
+
+S::Int S::Object::IsObjectInUse()
+{
+	return inUse;
+}
+
+S::Bool S::Object::IsObjectDeleteable()
+{
+	return deleteObject;
+}
+
 S::Int S::Object::DeleteObject(Object *object)
 {
 	if (object != NIL)
@@ -214,14 +220,4 @@ S::Int S::Object::DeleteObject(Object *object)
 	}
 
 	return Error;
-}
-
-S::Int S::Object::RequestObjectID()
-{
-	return nextID++;
-}
-
-S::Int S::Object::RequestObjectHandle()
-{
-	return 	objectCount++;
 }

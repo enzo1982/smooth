@@ -20,14 +20,16 @@ using namespace smooth::GUI;
 
 class SMOOTH_PLUGIN_API ActiveAreaPlugin : public Widget
 {
+	private:
+		Int			 areaColor;
 	public:
-		Int	 areaColor;
-			 ActiveAreaPlugin(Int, Point, Size);
-			~ActiveAreaPlugin();
-		Int	 Paint(Int);
-		Int	 Process(Int, Int, Int);
-};
+		static const Int	 classID;
 
-SMOOTH_PLUGIN_VAR Int OBJ_ACTIVEAREAPLUGIN;
+					 ActiveAreaPlugin(Int, Point, Size);
+					~ActiveAreaPlugin();
+
+		Int			 Paint(Int);
+		Int			 Process(Int, Int, Int);
+};
 
 #endif

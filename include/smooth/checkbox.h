@@ -28,18 +28,18 @@ namespace smooth
 		class SMOOTHAPI CheckBox : public Widget
 		{
 			protected:
-				Bool		*variable;
-				Bool		 state;
+				Bool			*variable;
+				Bool			 state;
 			public:
-						 CheckBox(String, Point, Size, Bool *);
-						~CheckBox();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 CheckBox(String, Point, Size, Bool *);
+							~CheckBox();
+
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_CHECKBOX;
 };
 
 #endif

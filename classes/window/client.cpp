@@ -22,18 +22,14 @@
 #include <smooth/surface.h>
 #include <smooth/binary.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_CLIENT = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Client::classID = S::Object::RequestClassID();
 
 S::GUI::Client::Client()
 {
-	type				= OBJ_CLIENT;
+	type				= classID;
 	objectProperties->orientation	= OR_CENTER;
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::Client::~Client()
@@ -70,7 +66,7 @@ S::Int S::GUI::Client::Paint(Int message)
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
+			if (object->GetObjectType() == Divider::classID && object->GetContainer() == myContainer)
 			{
 				db = (Divider *) object;
 

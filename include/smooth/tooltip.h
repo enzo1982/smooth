@@ -31,26 +31,26 @@ namespace smooth
 		class SMOOTHAPI Tooltip : public Widget
 		{
 			private:
-				ToolWindow	*toolWindow;
-				Timer		*timer;
+				ToolWindow		*toolWindow;
+				Timer			*timer;
 
-				Void		 TimerProc();
+				Void			 TimerProc();
 			protected:
-				Int		 timeOut;
+				Int			 timeOut;
 			public:
-						 Tooltip();
-						~Tooltip();
+				static const Int	 classID;
 
-				Int		 DrawTooltip();
+							 Tooltip();
+							~Tooltip();
 
-				Int		 Show();
-				Int		 Hide();
+				Int			 DrawTooltip();
 
-				Int		 SetTimeout(Int);
+				Int			 Show();
+				Int			 Hide();
+
+				Int			 SetTimeout(Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_TOOLTIP;
 };
 
 #endif

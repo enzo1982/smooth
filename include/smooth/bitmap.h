@@ -28,19 +28,19 @@ namespace smooth
 		class SMOOTHAPI Bitmap : public Widget
 		{
 			protected:
-				HBITMAP		 bitmap;
+				HBITMAP			 bitmap;
 			public:
-						 Bitmap(HBITMAP, Point, Size);
-						~Bitmap();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
+							 Bitmap(HBITMAP, Point, Size);
+							~Bitmap();
 
-				Int		 SetBitmap(HBITMAP);
-				HBITMAP		 GetBitmap();
+				virtual Int		 Paint(Int);
+
+				Int			 SetBitmap(HBITMAP);
+				HBITMAP			 GetBitmap();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_HBITMAP;
 };
 
 #endif

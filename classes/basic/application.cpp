@@ -12,32 +12,16 @@
 #include <smooth/i18n.h>
 #include <smooth/objectproperties.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_APPLICATION = S::Object::RequestObjectID();
-
-S::Application::Application()
-{
-	self		= this;
-
-	type		= OBJ_APPLICATION;
-	containerType	= OBJ_APPLICATION;
-
-	objectProperties->text		= TXT_SMOOTHAPPLICATION;
-	objectProperties->size.cx	= LiSAGetDisplaySizeX();
-	objectProperties->size.cy	= LiSAGetDisplaySizeY();
-}
+const S::Int	 S::Application::classID = S::Object::RequestClassID();
 
 S::Application::Application(String name)
 {
 	self		= this;
 
-	type		= OBJ_APPLICATION;
-	containerType	= OBJ_APPLICATION;
+	type		= classID;
+	containerType	= classID;
 
-	objectProperties->text		= name;
+	objectProperties->text		= name == NIL ? TXT_SMOOTHAPPLICATION : name;
 	objectProperties->size.cx	= LiSAGetDisplaySizeX();
 	objectProperties->size.cy	= LiSAGetDisplaySizeY();
 }

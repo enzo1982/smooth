@@ -28,14 +28,14 @@ namespace smooth
 		class SMOOTHAPI Text : public Widget
 		{
 			public:
-						 Text(String, Point);
-						~Text();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
+							 Text(String, Point);
+							~Text();
+
+				virtual Int		 Paint(Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_TEXT;
 };
 
 #endif

@@ -28,16 +28,16 @@ namespace smooth
 		class SMOOTHAPI Statusbar : public Widget
 		{
 			public:
-					 Statusbar(String);
-					~Statusbar();
+				static const Int	 classID;
 
-				Int	 Paint(Int);
+							 Statusbar(String);
+							~Statusbar();
 
-				Int	 SetText(String);
+				Int			 Paint(Int);
+
+				Int			 SetText(String);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_STATUSBAR;
 };
 
 #endif

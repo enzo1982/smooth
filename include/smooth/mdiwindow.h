@@ -28,12 +28,12 @@ namespace smooth
 		class SMOOTHAPI MDIWindow : public Window
 		{
 			public:
-				 MDIWindow(String title = NIL);
-				~MDIWindow();
+				static const Int	 classID;
+
+							 MDIWindow(String = NIL);
+							~MDIWindow();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_MDIWINDOW;
 };
 
 #endif

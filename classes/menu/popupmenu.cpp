@@ -19,22 +19,18 @@
 #include <smooth/toolwindow.h>
 #include <smooth/application.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_POPUP = S::Object::RequestObjectID();
+const S::Int	 S::GUI::PopupMenu::classID = S::Object::RequestClassID();
 
 S::GUI::PopupMenu::PopupMenu(Menu *menu)
 {
-	type				= OBJ_POPUP;
+	type				= classID;
 	objectProperties->orientation	= OR_FREE;
 	toolwnd				= NIL;
 	popupView			= NIL;
 	prevPopup			= NIL;
 	nextPopup			= NIL;
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 
 	realMenu = new Menu();
 
@@ -159,7 +155,7 @@ S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 		case WM_KILLFOCUS:
 			if (lParam == -1) break;
 
-			while (wnd->GetContainer()->GetContainerObject()->GetObjectType() != OBJ_APPLICATION) wnd = wnd->GetContainer()->GetContainerWindow();
+			while (wnd->GetContainer()->GetContainerObject()->GetObjectType() != Application::classID) wnd = wnd->GetContainer()->GetContainerWindow();
 
 			wnd->Process(WM_KILLFOCUS, wParam, -1);
 

@@ -33,12 +33,8 @@
 #include <smooth/dllmain.h>
 #include <smooth/resources.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_WINDOW = S::Object::RequestObjectID();
-S::Int	 S::GUI::Window::nOfActiveWindows = 0;
+const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
+S::Int		 S::GUI::Window::nOfActiveWindows = 0;
 
 LRESULT CALLBACK S::GUI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -116,9 +112,9 @@ S::GUI::Window::Window(String title)
 {
 	self = this;
 
-	containerType = OBJ_WINDOW;
+	containerType = classID;
 
-	possibleContainers.AddEntry(OBJ_APPLICATION);
+	possibleContainers.AddEntry(Application::classID);
 
 	style		= WS_THICKFRAME | WS_SYSMENU | WS_POPUP;
 
@@ -128,7 +124,7 @@ S::GUI::Window::Window(String title)
 
 	nOfActiveWindows++;
 
-	type = OBJ_WINDOW;
+	type = classID;
 
 	if (title != NIL)	objectProperties->text = title;
 	else			objectProperties->text = TXT_SMOOTHAPPLICATION;
@@ -153,6 +149,7 @@ S::GUI::Window::Window(String title)
 	objectProperties->size.cy = Math::Round(200 * Setup::FontSize);
 
 	trackMenu = NIL;
+	paintTimer = NIL;
 
 	mainLayer = new Layer();
 
@@ -306,7 +303,7 @@ S::Int S::GUI::Window::SetStatusText(String newStatus)
 
 		if (object == NIL) continue;
 
-		if (object->GetObjectType() == OBJ_STATUSBAR)
+		if (object->GetObjectType() == Statusbar::classID)
 		{
 			((Statusbar *) object)->SetText(newStatus);
 
@@ -325,7 +322,7 @@ S::String S::GUI::Window::GetStatusText()
 
 		if (object == NIL) continue;
 
-		if (object->GetObjectType() == OBJ_STATUSBAR)
+		if (object->GetObjectType() == Statusbar::classID)
 		{
 			return ((Statusbar *) object)->GetText();
 		}
@@ -752,7 +749,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 					if (object != NIL)
 					{
-						if (object->GetObjectType() == OBJ_WINDOW)
+						if (object->GetObjectType() == classID)
 						{
 							if (((GUI::Window *) object)->handle > handle && (((GUI::Window *) object)->flags & WF_MODAL)) SetActiveWindow(((GUI::Window *) object)->hwnd);
 						}
@@ -770,10 +767,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (actWnd == hwnd) break;
 
-				if (GetWindow(actWnd) == NIL)				activate = False;
-				else if (GetWindow(actWnd)->type == OBJ_TOOLWINDOW)	break;
-				else if (GetWindow(actWnd)->handle < handle)		activate = True;
-				else if (GetWindow(actWnd)->handle > handle)		GetWindow(actWnd)->SetFlags(WF_MODAL);
+				if (GetWindow(actWnd) == NIL)					activate = False;
+				else if (GetWindow(actWnd)->type == ToolWindow::classID)	break;
+				else if (GetWindow(actWnd)->handle < handle)			activate = True;
+				else if (GetWindow(actWnd)->handle > handle)			GetWindow(actWnd)->SetFlags(WF_MODAL);
 
 				if (activate && message == WM_ACTIVATEAPP)
 				{
@@ -798,9 +795,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (actWnd == hwnd) break;
 
-				if (GetWindow(actWnd) == NIL)				activate = False;
-				else if (GetWindow(actWnd)->type == OBJ_TOOLWINDOW)	break;
-				else							activate = True;
+				if (GetWindow(actWnd) == NIL)					activate = False;
+				else if (GetWindow(actWnd)->type == ToolWindow::classID)	break;
+				else								activate = True;
 
 				if (activate && message == WM_ACTIVATEAPP)
 				{
@@ -823,10 +820,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (actWnd == hwnd) break;
 
-				if (GetWindow(actWnd) == NIL)				activate = True;
-				else if (GetWindow(actWnd)->type == OBJ_TOOLWINDOW)	activate = False;
-				else if (GetWindow(actWnd)->handle < handle)		activate = True;
-				else if (GetWindow(actWnd)->handle > handle)		GetWindow(actWnd)->SetFlags(WF_SYSTEMMODAL);
+				if (GetWindow(actWnd) == NIL)					activate = True;
+				else if (GetWindow(actWnd)->type == ToolWindow::classID)	activate = False;
+				else if (GetWindow(actWnd)->handle < handle)			activate = True;
+				else if (GetWindow(actWnd)->handle > handle)			GetWindow(actWnd)->SetFlags(WF_SYSTEMMODAL);
 
 				if (activate)
 				{
@@ -860,7 +857,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 		if (object == NIL) continue;
 
-		if (object->GetObjectType() == OBJ_WIDGET)
+		if (object->GetObjectType() == Widget::classID)
 		{
 			if (((Widget *) object)->Process(message, wParam, lParam) == Break)
 			{
@@ -887,7 +884,6 @@ S::Int S::GUI::Window::Paint(Int message)
 	EnterProtectedRegion();
 
 	Surface	*surface = GetDrawSurface();
-	Object	*object;
 
 	if (updateRect.left < 2)				updateRect.left		= 2;
 	if (updateRect.top < 2)					updateRect.top		= 2;
@@ -901,24 +897,23 @@ S::Int S::GUI::Window::Paint(Int message)
 	else
 	{
 		surface->StartPaint(updateRect);
-
 		surface->Box(updateRect, GetSysColor(COLOR_BTNFACE), FILLED);
 
 		Widget	*lastWidget = NIL;
 		Point	 doublebar1;
 		Point	 doublebar2;
-		int	 bias = 0;
-		int	 topoffset = 3;
-		int	 rightobjcount = 0;
-		int	 leftobjcount = 0;
-		int	 btmobjcount = 0;
-		int	 topobjcount = 0;
+		Int	 bias = 0;
+		Int	 topoffset = 3;
+		Int	 rightobjcount = 0;
+		Int	 leftobjcount = 0;
+		Int	 btmobjcount = 0;
+		Int	 topobjcount = 0;
 
 		for (Int i = 0; i < nOfObjects; i++)
 		{
-			object = assocObjects.GetNthEntry(i);
+			Object	*object = assocObjects.GetNthEntry(i);
 
-			if (object->GetObjectType() == OBJ_WIDGET)
+			if (object->GetObjectType() == Widget::classID)
 			{
 				if (object->GetObjectProperties()->orientation == OR_TOP)
 				{
@@ -1016,19 +1011,30 @@ S::Int S::GUI::Window::Paint(Int message)
 			surface->Bar(doublebar1, doublebar2, OR_VERT);
 		}
 
-		for (int j = 0; j < nOfObjects; j++)
+		for (Int j = 0; j < nOfObjects; j++)
 		{
-			object = assocObjects.GetNthEntry(j);
+			Object	*object = assocObjects.GetNthEntry(j);
 
 			if (object == NIL) continue;
 
-			if (object->GetObjectType() == OBJ_WIDGET)
+			if (object->GetObjectType() == Widget::classID)
 			{
-				if (((Widget *) object)->IsVisible() && Affected(object, updateRect)) ((Widget *) object)->Paint(SP_PAINT);
+				if (((Widget *) object)->IsVisible() && Affected(object, updateRect) && object->GetObjectType() != Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
 			}
 		}
 
-		onPaint.Emit();
+		if (flags & WF_DELAYPAINT)
+		{
+			if (paintTimer != NIL) DeleteObject(paintTimer);
+
+			paintTimer = new Timer();
+			paintTimer->onInterval.Connect(&Window::PaintTimer, this);
+			paintTimer->Start(50);
+		}
+		else
+		{
+			PaintTimer();
+		}
 
 		surface->EndPaint();
 	}
@@ -1040,7 +1046,7 @@ S::Int S::GUI::Window::Paint(Int message)
 
 S::Void S::GUI::Window::CalculateOffsets()
 {
-	if (type == OBJ_TOOLWINDOW) return;
+	if (type == ToolWindow::classID) return;
 
 	Object	*operat;
 	Widget	*lastWidget = NIL;
@@ -1193,18 +1199,18 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 			object->SetContainer(this);
 			object->SetRegisteredFlag();
 
-			if (object->GetObjectType() == OBJ_TITLEBAR)
+			if (object->GetObjectType() == Titlebar::classID)
 			{
 				if (!((Titlebar *) object)->max) style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
 			}
-			else if (object->GetObjectType() == OBJ_TOOLWINDOW)
+			else if (object->GetObjectType() == ToolWindow::classID)
 			{
 				((ToolWindow *) object)->Create();
 			}
 
 			CalculateOffsets();
 
-			if (object->GetObjectType() == OBJ_WIDGET)
+			if (object->GetObjectType() == Widget::classID)
 			{
 				((Widget *) object)->onRegister.Emit(this);
 				((Widget *) object)->Show();
@@ -1233,7 +1239,7 @@ S::Int S::GUI::Window::UnregisterObject(Object *object)
 			{
 				nOfObjects--;
 
-				if (object->GetObjectType() == OBJ_WIDGET)
+				if (object->GetObjectType() == Widget::classID)
 				{
 					((Widget *) object)->onUnregister.Emit(this);
 					((Widget *) object)->Hide();
@@ -1266,7 +1272,7 @@ S::GUI::Window *S::GUI::Window::GetWindow(HWND hwnd)
 
 		if (window != NIL)
 		{
-			if (window->GetObjectType() == OBJ_WINDOW || window->GetObjectType() == OBJ_MDIWINDOW || window->GetObjectType() == OBJ_TOOLWINDOW)
+			if (window->GetObjectType() == Window::classID || window->GetObjectType() == MDIWindow::classID || window->GetObjectType() == ToolWindow::classID)
 			{
 				if (window->hwnd == hwnd) return window;
 			}
@@ -1274,4 +1280,38 @@ S::GUI::Window *S::GUI::Window::GetWindow(HWND hwnd)
 	}
 
 	return NIL;
+}
+
+S::Void S::GUI::Window::PaintTimer()
+{
+	if (paintTimer != NIL)
+	{
+		DeleteObject(paintTimer);
+
+		paintTimer = NIL;
+	}
+
+	EnterProtectedRegion();
+
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(updateRect);
+
+	for (Int j = 0; j < nOfObjects; j++)
+	{
+		Object	*object = assocObjects.GetNthEntry(j);
+
+		if (object == NIL) continue;
+
+		if (object->GetObjectType() == Widget::classID)
+		{
+			if (((Widget *) object)->IsVisible() && Affected(object, updateRect) && object->GetObjectType() == Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
+		}
+	}
+
+	onPaint.Emit();
+
+	surface->EndPaint();
+
+	LeaveProtectedRegion();
 }

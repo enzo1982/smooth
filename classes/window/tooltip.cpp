@@ -21,15 +21,11 @@
 #include <smooth/timer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_TOOLTIP = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Tooltip::classID = S::Object::RequestClassID();
 
 S::GUI::Tooltip::Tooltip()
 {
-	type				= OBJ_TOOLTIP;
+	type				= classID;
 	objectProperties->orientation	= OR_FREE;
 	toolWindow			= NIL;
 	timeOut				= 5000;
@@ -37,7 +33,7 @@ S::GUI::Tooltip::Tooltip()
 
 	objectProperties->font.SetColor(Setup::TooltipTextColor);
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::Tooltip::~Tooltip()

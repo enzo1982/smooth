@@ -32,26 +32,26 @@ namespace smooth
 		class SMOOTHAPI PopupView : public Widget
 		{
 			private:
-				String		 backupStatusText;
+				String			 backupStatusText;
 
-				Timer		*openTimer;
-				Timer		*closeTimer;
+				Timer			*openTimer;
+				Timer			*closeTimer;
 
-				Void		 OpenProc();
-				Void		 CloseProc();
+				Void			 OpenProc();
+				Void			 CloseProc();
 			protected:
-				PopupMenu	*myPopup;
-				Menu		*realMenu;
+				PopupMenu		*myPopup;
+				Menu			*realMenu;
 			public:
-						 PopupView(PopupMenu *, Menu *);
-						~PopupView();
+				static const Int	 classID;
 
-				Int		 Process(Int, Int, Int);
-				Int		 Paint(Int);
+							 PopupView(PopupMenu *, Menu *);
+							~PopupView();
+
+				Int			 Process(Int, Int, Int);
+				Int			 Paint(Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_POPUPVIEW;
 };
 
 #endif

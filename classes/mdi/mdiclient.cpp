@@ -22,18 +22,14 @@
 #include <smooth/objectproperties.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_MDICLIENT = S::Object::RequestObjectID();
+const S::Int	 S::GUI::MDIClient::classID = S::Object::RequestClassID();
 
 S::GUI::MDIClient::MDIClient()
 {
-	type				= OBJ_MDICLIENT;
+	type				= classID;
 	objectProperties->orientation	= OR_CENTER;
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::MDIClient::~MDIClient()
@@ -70,7 +66,7 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
+			if (object->GetObjectType() == Divider::classID && object->GetContainer() == myContainer)
 			{
 				db = (Divider *) object;
 

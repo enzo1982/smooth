@@ -24,15 +24,11 @@
 #include <smooth/layer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_COMBOBOX = S::Object::RequestObjectID();
+const S::Int	 S::GUI::ComboBox::classID = S::Object::RequestClassID();
 
 S::GUI::ComboBox::ComboBox(Point pos, Size size)
 {
-	type		= OBJ_COMBOBOX;
+	type		= classID;
 	entryCount	= -1;
 
 	closeListBox	= False;
@@ -41,7 +37,7 @@ S::GUI::ComboBox::ComboBox(Point pos, Size size)
 	toolWindow	= NIL;
 	layer		= NIL;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	SetFont(Font(objectProperties->font.GetName(), I18N_SMALLFONTSIZE, Setup::ClientTextColor));
 

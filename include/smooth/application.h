@@ -24,11 +24,10 @@ namespace smooth
 	class SMOOTHAPI Application : public Object, public Container
 	{
 		public:
-			 Application();
-			 Application(String);
-	};
+			static const Int	 classID;
 
-	SMOOTHVAR Int OBJ_APPLICATION;
+						 Application(String = NIL);
+	};
 };
 
 #endif

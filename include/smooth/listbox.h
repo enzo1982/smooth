@@ -37,47 +37,47 @@ namespace smooth
 		class SMOOTHAPI ListBox : public Widget, public List
 		{
 			private:
-				Int		 entryCount;
+				Int			 entryCount;
 
-				Scrollbar	*scrollbar;
-				Int		 scrollbarPos;
-				Int		 lastScrollbarPos;
+				Scrollbar		*scrollbar;
+				Int			 scrollbarPos;
+				Int			 lastScrollbarPos;
 
-				ListBoxHeader	*header;
+				ListBoxHeader		*header;
 
-				Void		 ScrollbarProc();
-				Void		 DrawEntryText(String, Rect, Int);
+				Void			 ScrollbarProc();
+				Void			 DrawEntryText(String, Rect, Int);
 			public:
-						 ListBox(Point, Size);
-						~ListBox();
+				static const Int	 classID;
 
-				ListEntry	*AddEntry(String, Int = -1);
-				Int		 ModifyEntry(Int, String);
-				Int		 RemoveEntry(Int);
-				Int		 SelectEntry(Int);
-				Int		 RemoveAll();
+							 ListBox(Point, Size);
+							~ListBox();
 
-				Int		 AddTab(String, Int = 0);
-				Int		 GetNthTabOffset(Int);
-				Int		 GetNthTabWidth(Int);
+				ListEntry		*AddEntry(String, Int = -1);
+				Int			 ModifyEntry(Int, String);
+				Int			 RemoveEntry(Int);
+				Int			 SelectEntry(Int);
+				Int			 RemoveAll();
 
-				Int		 ClearTabs();
+				Int			 AddTab(String, Int = 0);
+				Int			 GetNthTabOffset(Int);
+				Int			 GetNthTabWidth(Int);
 
-				virtual Int	 Show();
-				virtual Int	 Hide();
+				Int			 ClearTabs();
 
-				virtual Int	 Activate();
-				virtual Int	 Deactivate();
+				virtual Int		 Show();
+				virtual Int		 Hide();
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+				virtual Int		 Activate();
+				virtual Int		 Deactivate();
 
-				Int		 ScrollUp(Int = 1);
-				Int		 ScrollDown(Int = 1);
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
+
+				Int			 ScrollUp(Int = 1);
+				Int			 ScrollDown(Int = 1);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_LISTBOX;
 };
 
 #endif

@@ -18,18 +18,14 @@
 #include <smooth/objectproperties.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_LAYER = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Layer::classID = S::Object::RequestClassID();
 
 S::GUI::Layer::Layer(String name)
 {
 	self = this;
 
-	type = OBJ_LAYER;
-	containerType = OBJ_LAYER;
+	type		= classID;
+	containerType	= classID;
 
 	objectProperties->text		= name;
 	objectProperties->orientation	= OR_CENTER;
@@ -38,9 +34,9 @@ S::GUI::Layer::Layer(String name)
 
 	layerColor = -1;
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
-	possibleContainers.AddEntry(OBJ_LAYER);
-	possibleContainers.AddEntry(OBJ_TABREGISTER);
+	possibleContainers.AddEntry(Window::classID);
+	possibleContainers.AddEntry(classID);
+	possibleContainers.AddEntry(TabWidget::classID);
 }
 
 S::GUI::Layer::~Layer()
@@ -60,7 +56,7 @@ S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 
 		if (object == NIL) continue;
 
-		if (object->GetObjectType() == OBJ_WIDGET)
+		if (object->GetObjectType() == Widget::classID)
 		{
 			if (((Widget *) object)->Process(message, wParam, lParam) == Break) return Break;
 		}
@@ -102,7 +98,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 
 		if (object == NIL) continue;
 
-		if (object->GetObjectType() == OBJ_WIDGET)
+		if (object->GetObjectType() == Widget::classID)
 		{
 			if (((Widget *) object)->IsVisible() && Affected(object, updateRect)) ((Widget *) object)->Paint(SP_PAINT);
 		}
@@ -140,7 +136,7 @@ S::Int S::GUI::Layer::Show()
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == OBJ_WIDGET)
+			if (object->GetObjectType() == Widget::classID)
 			{
 				if (((Widget *) object)->IsVisible())
 				{
@@ -166,7 +162,7 @@ S::Int S::GUI::Layer::Hide()
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == OBJ_WIDGET)
+			if (object->GetObjectType() == Widget::classID)
 			{
 				if (((Widget *) object)->IsVisible())
 				{
@@ -239,7 +235,7 @@ S::Int S::GUI::Layer::RegisterObject(Object *object)
 			object->SetContainer(this);
 			object->SetRegisteredFlag();
 
-			if (object->GetObjectType() == OBJ_WIDGET)
+			if (object->GetObjectType() == Widget::classID)
 			{
 				((Widget *) object)->onRegister.Emit(this);
 				((Widget *) object)->Show();
@@ -264,7 +260,7 @@ S::Int S::GUI::Layer::UnregisterObject(Object *object)
 			{
 				nOfObjects--;
 
-				if (object->GetObjectType() == OBJ_WIDGET)
+				if (object->GetObjectType() == Widget::classID)
 				{
 					((Widget *) object)->onUnregister.Emit(this);
 					((Widget *) object)->Hide();

@@ -94,6 +94,5 @@
 #include "smooth/droparea.h"
 #include "smooth/fontdlg.h"
 #include "smooth/font.h"
-#include "smooth/memory.h"
 
 #endif

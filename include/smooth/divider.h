@@ -32,19 +32,19 @@ namespace smooth
 			friend class Client;
 			friend class MDIClient;
 			protected:
-				Int		 orientation;
+				Int			 orientation;
 			public:
-						 Divider(Int, Int);
-						~Divider();
+				static const Int	 classID;
 
-				Int		 SetPos(Int);
-				Int		 GetPos();
+							 Divider(Int, Int);
+							~Divider();
 
-				virtual Int	 Paint(Int);
+				Int			 SetPos(Int);
+				Int			 GetPos();
+
+				virtual Int		 Paint(Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_DIVIDER;
 };
 
 #endif

@@ -161,7 +161,7 @@ S::Int S::Loop()
 
 			if (wnd != (GUI::Window *) NIL)
 			{
-				if (wnd->type == OBJ_WINDOW)
+				if (wnd->type == GUI::Window::classID)
 				{
 					if (!wnd->created) wnd->Create();
 					if (!wnd->initshow) wnd->Show();

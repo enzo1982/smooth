@@ -29,34 +29,34 @@ namespace smooth
 		class SMOOTHAPI ListBoxHeader : public Widget
 		{
 			private:
-				ListBox		*listBox;
+				ListBox			*listBox;
 
-				Int		 moveTab;
-				Bool		 innerLoop;
+				Int			 moveTab;
+				Bool			 innerLoop;
 
-				Array<String>	 tabNames;
-				Array<Int>	 tabWidths;
-				Array<Bool>	 tabChecked;
+				Array<String>		 tabNames;
+				Array<Int>		 tabWidths;
+				Array<Bool>		 tabChecked;
 			public:
-						 ListBoxHeader(ListBox *);
-						~ListBoxHeader();
+				static const Int	 classID;
 
-				Int		 AddTab(String, Int);
+							 ListBoxHeader(ListBox *);
+							~ListBoxHeader();
 
-				Int		 ClearTabs();
+				Int			 AddTab(String, Int);
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+				Int			 ClearTabs();
 
-				Int		 GetNOfTabs();
-				Int		 GetNthTabOffset(Int);
-				Int		 GetNthTabWidth(Int);
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 
-				Int		 UpdateMetrics();
+				Int			 GetNOfTabs();
+				Int			 GetNthTabOffset(Int);
+				Int			 GetNthTabWidth(Int);
+
+				Int			 UpdateMetrics();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_LISTBOXHEADER;
 };
 
 #endif

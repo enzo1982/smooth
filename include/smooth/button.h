@@ -35,27 +35,27 @@ namespace smooth
 		class SMOOTHAPI Button : public Widget
 		{
 			private:
-				Tooltip		*tooltip;
-				Timer		*tipTimer;
+				Tooltip			*tooltip;
+				Timer			*tipTimer;
 
-				Int		 backgroundColor;
+				Int			 backgroundColor;
 
-				Void		 ActivateTooltip();
+				Void			 ActivateTooltip();
 			protected:
-				HBITMAP		 bitmap;
-				Size		 bmpSize;
+				HBITMAP			 bitmap;
+				Size			 bmpSize;
 			public:
-						 Button(String, HBITMAP, Point, Size);
-						~Button();
+				static const Int	 classID;
 
-				Int		 SetBackgroundColor(Int);
+							 Button(String, HBITMAP, Point, Size);
+							~Button();
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+				Int			 SetBackgroundColor(Int);
+
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_BUTTON;
 };
 
 #endif

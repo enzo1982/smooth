@@ -28,20 +28,20 @@ namespace smooth
 		class SMOOTHAPI ActiveArea : public Widget
 		{
 			protected:
-				Int		 areaColor;
+				Int			 areaColor;
 			public:
-						 ActiveArea(Int, Point, Size);
-						~ActiveArea();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 ActiveArea(Int, Point, Size);
+							~ActiveArea();
 
-				Int		 SetColor(Int);
-				Int		 GetColor();
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
+
+				Int			 SetColor(Int);
+				Int			 GetColor();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_ACTIVEAREA;
 };
 
 #endif

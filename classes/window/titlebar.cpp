@@ -20,15 +20,11 @@
 #include <smooth/surface.h>
 #include <smooth/application.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_TITLEBAR = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Titlebar::classID = S::Object::RequestClassID();
 
 S::GUI::Titlebar::Titlebar(Int buttons)
 {
-	type				= OBJ_TITLEBAR;
+	type				= classID;
 	paintActive			= True;
 	min				= buttons & TB_MINBUTTON;
 	max				= buttons & TB_MAXBUTTON;
@@ -43,7 +39,7 @@ S::GUI::Titlebar::Titlebar(Int buttons)
 	objectProperties->size.cy	= METRIC_TITLEBARHEIGHT;
 	subtype				= WO_NOSEPARATOR;
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 
 	objectProperties->font.SetWeight(FW_BOLD);
 }
@@ -280,14 +276,14 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			{
 				if (Window::GetWindow(GetActiveWindow()) != NIL)
 				{
-					if (Window::GetWindow(GetActiveWindow())->type == OBJ_TOOLWINDOW)
+					if (Window::GetWindow(GetActiveWindow())->type == ToolWindow::classID)
 					{
 						Window	*rWnd = Window::GetWindow(GetActiveWindow());
 
 						while (True)
 						{
-							if (rWnd->GetContainer()->GetContainerObject()->GetObjectType() != OBJ_APPLICATION)	rWnd = rWnd->GetContainer()->GetContainerWindow();
-							else											break;
+							if (rWnd->GetContainer()->GetContainerObject()->GetObjectType() != Application::classID)	rWnd = rWnd->GetContainer()->GetContainerWindow();
+							else												break;
 						}
 
 						if (rWnd == wnd && !paintActive)

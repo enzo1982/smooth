@@ -29,28 +29,28 @@ namespace smooth
 		class SMOOTHAPI Layer : public Widget, public Container
 		{
 			protected:
-				Int		 layerColor;
+				Int			 layerColor;
 			public:
-						 Layer(String name = NIL);
-						~Layer();
+				static const Int	 classID;
 
-				Int		 Show();
-				Int		 Hide();
+							 Layer(String name = NIL);
+							~Layer();
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+				Int			 Show();
+				Int			 Hide();
 
-				Int		 SetColor(Int);
-				Int		 SetMetrics(Point, Size);
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 
-				Surface		*GetDrawSurface();
+				Int			 SetColor(Int);
+				Int			 SetMetrics(Point, Size);
 
-				Int		 RegisterObject(Object *);
-				Int		 UnregisterObject(Object *);
+				Surface			*GetDrawSurface();
+
+				Int			 RegisterObject(Object *);
+				Int			 UnregisterObject(Object *);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_LAYER;
 };
 
 #endif

@@ -14,7 +14,7 @@
 S::ObjectType::ObjectType()
 {
 	object	= NIL;
-	type	= OBJ_OBJECT;
+	type	= Object::classID;
 }
 
 S::ObjectType::ObjectType(const ObjectType &objectType)

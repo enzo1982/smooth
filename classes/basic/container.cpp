@@ -13,18 +13,14 @@
 #include <smooth/object.h>
 #include <smooth/window.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_CONTAINER = S::Object::RequestObjectID();
+const S::Int	 S::Container::classID = S::Object::RequestClassID();
 
 S::Container::Container()
 {
 	self			= NIL;
 	nOfObjects		= 0;
 	containerType.container	= this;
-	containerType		= OBJ_CONTAINER;
+	containerType		= classID;
 
 	nullSurface = new GUI::Surface();
 	drawSurface = nullSurface;
@@ -98,8 +94,8 @@ S::Object *S::Container::RequestObject(Int objectHandle)
 
 S::Bool S::Container::IsContainerCompatible(Int objType)
 {
-	if (objType == OBJ_CONTAINER)	return True;
-	else				return False;
+	if (objType == classID)	return True;
+	else			return False;
 }
 
 S::ContainerType S::Container::GetContainerType()
@@ -118,7 +114,7 @@ S::GUI::Window *S::Container::GetContainerWindow()
 
 	Object	*object = self;
 
-	while (object->GetObjectType() != OBJ_WINDOW)
+	while (object->GetObjectType() != GUI::Window::classID)
 	{
 		object = object->GetContainer()->GetContainerObject();
 

@@ -13,15 +13,11 @@
 
 S::Void WINAPI TimerProc(HWND, unsigned int, unsigned int, unsigned long);
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_TIMER = S::Object::RequestObjectID();
+const S::Int	 S::Timer::classID = S::Object::RequestClassID();
 
 S::Timer::Timer()
 {
-	type = OBJ_TIMER;
+	type = classID;
 
 	timerid = -1;
 }
@@ -66,7 +62,7 @@ S::Void WINAPI TimerProc(HWND wnd, unsigned int message, unsigned int timerid, u
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == S::OBJ_TIMER)
+			if (object->GetObjectType() == S::Timer::classID)
 			{
 				if (((S::Timer *) object)->GetID() == (signed int) timerid)
 				{

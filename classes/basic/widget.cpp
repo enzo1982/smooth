@@ -15,14 +15,12 @@
 #include <smooth/objectproperties.h>
 #include <smooth/toolkit.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_WIDGET = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
 
 S::GUI::Widget::Widget()
 {
+	type = classID;
+
 	visible	= False;
 	active	= True;
 
@@ -129,7 +127,7 @@ S::Bool S::GUI::Widget::IsVisible()
 	Bool	 isVisible = True;
 	Object	*container = myContainer->GetContainerObject();
 
-	if (container->GetObjectType() == OBJ_WIDGET)
+	if (container->GetObjectType() == classID)
 	{
 		if (!((Widget *) container)->IsVisible()) isVisible = False;
 	}
@@ -238,6 +236,6 @@ S::Int S::GUI::Widget::SetMetrics(Point newPos, Size newSize)
 
 S::Bool S::GUI::Widget::IsTypeCompatible(Int compType)
 {
-	if (compType == OBJ_OBJECT || compType == OBJ_WIDGET)	return True;
+	if (compType == Object::classID || compType == classID)	return True;
 	else							return False;
 }

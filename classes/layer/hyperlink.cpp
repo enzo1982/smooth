@@ -19,33 +19,29 @@
 #include <smooth/layer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_HYPERLINK = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
 
 S::GUI::Hyperlink::Hyperlink()
 {
-	type		= OBJ_HYPERLINK;
+	type		= classID;
 	linkURL		= NIL;
 	linkBitmap	= NIL;
 
 	objectProperties->font.SetUnderline(True);
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 }
 
 S::GUI::Hyperlink::Hyperlink(String text, HBITMAP bitmap, String link, Point pos, Size size)
 {
-	type			= OBJ_HYPERLINK;
+	type			= classID;
 	objectProperties->text	= text;
 	linkURL			= link;
 	linkBitmap		= DetectTransparentRegions(bitmap);
 
 	objectProperties->font.SetUnderline(True);
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);

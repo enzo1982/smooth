@@ -13,19 +13,15 @@
 #include <smooth/stk.h>
 #include <smooth/application.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_MUTEX = S::Object::RequestObjectID();
+const S::Int	 S::Mutex::classID = S::Object::RequestClassID();
 
 S::Mutex::Mutex()
 {
-	type = OBJ_MUTEX;
+	type = classID;
 
 	mutex = LiSAMutexCreate();
 
-	possibleContainers.AddEntry(OBJ_APPLICATION);
+	possibleContainers.AddEntry(Application::classID);
 }
 
 S::Mutex::~Mutex()

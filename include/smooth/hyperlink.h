@@ -28,28 +28,28 @@ namespace smooth
 		class SMOOTHAPI Hyperlink : public Widget
 		{
 			protected:
-				String		 linkURL;
-				HBITMAP		 linkBitmap;
+				String			 linkURL;
+				HBITMAP			 linkBitmap;
 			public:
-						 Hyperlink();
-						 Hyperlink(String, HBITMAP, String, Point, Size size = Size(0, 0));
-						~Hyperlink();
+				static const Int	 classID;
 
-				Int		 Hide();
+							 Hyperlink();
+							 Hyperlink(String, HBITMAP, String, Point, Size size = Size(0, 0));
+							~Hyperlink();
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+				Int			 Hide();
 
-				HBITMAP		 GetBitmap();
-				String		 GetURL();
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 
-				Int		 SetText(String);
-				Int		 SetBitmap(HBITMAP);
-				Int		 SetURL(String);
+				HBITMAP			 GetBitmap();
+				String			 GetURL();
+
+				Int			 SetText(String);
+				Int			 SetBitmap(HBITMAP);
+				Int			 SetURL(String);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_HYPERLINK;
 };
 
 #endif

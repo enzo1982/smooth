@@ -35,32 +35,32 @@ namespace smooth
 		class SMOOTHAPI ComboBox : public Widget, public List
 		{
 			private:
-				Int		 entryCount;
+				Int			 entryCount;
 
-				ToolWindow	*toolWindow;
-				Layer		*layer;
-				ListBox		*listBox;
+				ToolWindow		*toolWindow;
+				Layer			*layer;
+				ListBox			*listBox;
 
-				Bool		 listBoxOpen;
-				Bool		 closeListBox;
+				Bool			 listBoxOpen;
+				Bool			 closeListBox;
 
-				Void		 ListBoxProc();
+				Void			 ListBoxProc();
 			public:
-						 ComboBox(Point, Size);
-						~ComboBox();
+				static const Int	 classID;
 
-				ListEntry	*AddEntry(String, Int = -1);
-				Int		 ModifyEntry(Int, String);
-				Int		 RemoveEntry(Int);
-				Int		 SelectEntry(Int);
-				Int		 RemoveAll();
+							 ComboBox(Point, Size);
+							~ComboBox();
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+				ListEntry		*AddEntry(String, Int = -1);
+				Int			 ModifyEntry(Int, String);
+				Int			 RemoveEntry(Int);
+				Int			 SelectEntry(Int);
+				Int			 RemoveAll();
+
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_COMBOBOX;
 };
 
 #endif

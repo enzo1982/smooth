@@ -23,20 +23,20 @@ namespace smooth
 	class SMOOTHAPI Timer : public Object
 	{
 		private:
-			Int		 timerid;
+			Int			 timerid;
 		public:
-					 Timer();
-					~Timer();
+			static const Int	 classID;
 
-			Int		 Start(Int);
-			Int		 Stop();
+						 Timer();
+						~Timer();
 
-			Int		 GetID();
+			Int			 Start(Int);
+			Int			 Stop();
+
+			Int			 GetID();
 		signals:
-			Signal0<Void>	 onInterval;
+			Signal0<Void>		 onInterval;
 	};
-
-	SMOOTHVAR Int OBJ_TIMER;
 };
 
 #endif

@@ -30,36 +30,36 @@ namespace smooth
 		class SMOOTHAPI Arrows : public Widget
 		{
 			private:
-				Timer		*timer;
-				Bool		 timerActive;
-				Int		 timerCount;
+				Timer			*timer;
+				Bool			 timerActive;
+				Int			 timerCount;
 
-				Void		 TimerProc();
+				Void			 TimerProc();
 			protected:
-				Bool		 arrow1Clicked;
-				Bool		 arrow2Clicked;
-				Bool		 arrow1Checked;
-				Bool		 arrow2Checked;
+				Bool			 arrow1Clicked;
+				Bool			 arrow2Clicked;
+				Bool			 arrow1Checked;
+				Bool			 arrow2Checked;
 
-				Int		*variable;
+				Int			*variable;
 
-				Int		 startValue;
-				Int 		 endValue;
+				Int			 startValue;
+				Int 			 endValue;
 			public:
-						 Arrows(Point, Size, Int, Int *, Int, Int);
-						~Arrows();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 Arrows(Point, Size, Int, Int *, Int, Int);
+							~Arrows();
 
-				Int		 SetRange(Int, Int);
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 
-				Int		 SetValue(Int);
-				Int		 GetValue();
+				Int			 SetRange(Int, Int);
+
+				Int			 SetValue(Int);
+				Int			 GetValue();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_ARROWS;
 };
 
 #endif

@@ -19,18 +19,14 @@
 
 #include <shellapi.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_DROPAREA = S::Object::RequestObjectID();
+const S::Int	 S::GUI::DropArea::classID = S::Object::RequestClassID();
 
 S::GUI::DropArea::DropArea(Point pos, Size size)
 {
-	type				= OBJ_DROPAREA;
+	type				= classID;
 	objectProperties->orientation	= OR_CENTER;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	onRegister.Connect(&DropArea::OnRegister, this);
 
@@ -104,17 +100,27 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 					for (Int i = 0; i < nOfFiles; i++)
 					{
 						Int	 bufferSize = 32768;
-						char	*bufferA = new char [bufferSize];
-						wchar_t	*bufferW = new wchar_t [bufferSize];
 
-						if (Setup::enableUnicode)	DragQueryFileW(hDrop, i, bufferW, bufferSize);
-						else				DragQueryFileA(hDrop, i, bufferA, bufferSize);
+						if (Setup::enableUnicode)
+						{
+							wchar_t	*bufferW = new wchar_t [bufferSize];
 
-						if (Setup::enableUnicode)	onDropFile.Emit(new String(bufferW));
-						else				onDropFile.Emit(new String(bufferA));
+							DragQueryFileW(hDrop, i, bufferW, bufferSize);
 
-						delete [] bufferA;
-						delete [] bufferW;
+							onDropFile.Emit(new String(bufferW));
+
+							delete [] bufferW;
+						}
+						else
+						{
+							char	*bufferA = new char [bufferSize];
+
+							DragQueryFileA(hDrop, i, bufferA, bufferSize);
+
+							onDropFile.Emit(new String(bufferA));
+
+							delete [] bufferA;
+						}
 					}
 
 					DragFinish(hDrop);

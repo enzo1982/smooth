@@ -19,15 +19,11 @@
 #include <smooth/layer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_SLIDER = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Slider::classID = S::Object::RequestClassID();
 
 S::GUI::Slider::Slider(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd)
 {
-	type				= OBJ_SLIDER;
+	type				= classID;
 	subtype				= subType;
 	variable			= var;
 	objectProperties->clicked	= False;
@@ -35,7 +31,7 @@ S::GUI::Slider::Slider(Point pos, Size size, Int subType, Int *var, Int rangeSta
 	endValue			= rangeEnd;
 	prevValue			= 0;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	if (*variable < startValue)	*variable = startValue;
 	else if (*variable > endValue)	*variable = endValue;

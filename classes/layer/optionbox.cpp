@@ -20,15 +20,11 @@
 #include <smooth/layer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_OPTIONBOX = S::Object::RequestObjectID();
+const S::Int	 S::GUI::OptionBox::classID = S::Object::RequestClassID();
 
 S::GUI::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iCode)
 {
-	type				= OBJ_OPTIONBOX;
+	type				= classID;
 	objectProperties->text		= text;
 	variable			= var;
 	code				= iCode;
@@ -38,7 +34,7 @@ S::GUI::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iC
 	if (*variable == code)	state = True;
 	else			state = False;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
@@ -266,7 +262,7 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 						if (object != NIL)
 						{
-							if (object->GetObjectType() == OBJ_OPTIONBOX) ((OptionBox *) object)->Process(SM_CHECKOPTIONBOXES, 0, 0);
+							if (object->GetObjectType() == classID) ((OptionBox *) object)->Process(SM_CHECKOPTIONBOXES, 0, 0);
 						}
 					}
 

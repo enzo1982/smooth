@@ -28,21 +28,21 @@ namespace smooth
 		class SMOOTHAPI OptionBox : public Widget
 		{
 			protected:
-				Int		*variable;
-				Int		 code;
-				Bool		 state;
+				Int			*variable;
+				Int			 code;
+				Bool			 state;
 			public:
-						 OptionBox(String, Point, Size, Int *, Int);
-						~OptionBox();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 OptionBox(String, Point, Size, Int *, Int);
+							~OptionBox();
 
-				Int		 SetText(String);
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
+
+				Int			 SetText(String);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_OPTIONBOX;
 };
 
 #endif

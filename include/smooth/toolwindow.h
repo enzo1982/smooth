@@ -31,24 +31,24 @@ namespace smooth
 		class SMOOTHAPI ToolWindow : public Window
 		{
 			private:
-				Widget	*owner;
+				Widget			*owner;
 			public:
-					 ToolWindow();
-					~ToolWindow();
+				static const Int	 classID;
 
-				Int	 SetOwner(Widget *);
-				Int	 FreeOwner();
+							 ToolWindow();
+							~ToolWindow();
 
-				Int	 Paint(Int);
-				Int	 Process(Int, Int, Int);
+				Int			 SetOwner(Widget *);
+				Int			 FreeOwner();
 
-				Int	 RegisterObject(Object *);
+				Int			 Paint(Int);
+				Int			 Process(Int, Int, Int);
 
-				Bool	 IsTypeCompatible(Int);
+				Int			 RegisterObject(Object *);
+
+				Bool			 IsTypeCompatible(Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_TOOLWINDOW;
 };
 
 #endif

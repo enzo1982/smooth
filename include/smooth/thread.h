@@ -41,6 +41,7 @@ namespace smooth
 			LiSAThread		*thread;
 			Int			 threadID;
 		public:
+			static const Int	 classID;
 			static Int		 counter;
 
 						 Thread();
@@ -54,8 +55,6 @@ namespace smooth
 		callbacks:
 			Callback1<Int, Thread *> threadMain;
 	};
-
-	SMOOTHVAR Int OBJ_THREAD;
 };
 
 #endif

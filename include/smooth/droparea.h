@@ -32,6 +32,8 @@ namespace smooth
 
 				Void			 Init();
 			public:
+				static const Int	 classID;
+
 							 DropArea(Point, Size);
 							~DropArea();
 
@@ -42,8 +44,6 @@ namespace smooth
 				Signal1<Void, String *>	 onDropFile;
 		};
 	};
-
-	SMOOTHVAR Int OBJ_DROPAREA;
 };
 
 #endif

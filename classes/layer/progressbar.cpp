@@ -21,15 +21,11 @@
 #include <smooth/color.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_PROGRESSBAR = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Progressbar::classID = S::Object::RequestClassID();
 
 S::GUI::Progressbar::Progressbar(Point pos, Size size, Int subType, Int iTextFlag, Int rangeStart, Int rangeEnd, Int iValue)
 {
-	type				= OBJ_PROGRESSBAR;
+	type				= classID;
 	subtype				= subType;
 	startValue			= rangeStart;
 	endValue			= rangeEnd;
@@ -38,7 +34,7 @@ S::GUI::Progressbar::Progressbar(Point pos, Size size, Int subType, Int iTextFla
 
 	objectProperties->font.SetColor(Setup::ClientTextColor);
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);

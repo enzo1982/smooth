@@ -29,25 +29,25 @@ namespace smooth
 		class SMOOTHAPI TabWidget : public Widget, public Container
 		{
 			protected:
-				Array<Int>	 textSize;
-				Array<Bool>	 sizeSet;
+				Array<Int>		 textSize;
+				Array<Bool>		 sizeSet;
 
-				Void		 GetSize();
+				Void			 GetSize();
 			public:
-						 TabWidget(Point, Size);
-						~TabWidget();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 TabWidget(Point, Size);
+							~TabWidget();
 
-				Int		 SelectTab(Int);
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 
-				Int		 RegisterObject(Object *);
-				Int		 UnregisterObject(Object *);
+				Int			 SelectTab(Int);
+
+				Int			 RegisterObject(Object *);
+				Int			 UnregisterObject(Object *);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_TABREGISTER;
 };
 
 #endif

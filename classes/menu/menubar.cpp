@@ -20,29 +20,25 @@
 #include <smooth/surface.h>
 #include <smooth/toolwindow.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_MENUBAR = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Menubar::classID = S::Object::RequestClassID();
 
 S::GUI::Menubar::Menubar()
 {
-	type				= OBJ_MENUBAR;
+	type				= classID;
 	objectProperties->orientation	= OR_TOP;
 	objectProperties->size.cx	= METRIC_MENUBARHEIGHT;
 	objectProperties->size.cy	= METRIC_MENUBARHEIGHT;
 	popupHandle			= -1;
 	subtype				= WO_SEPARATOR;
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::Menubar::~Menubar()
 {
 	if (registered && myContainer != NIL)
 	{
-		if (popupHandle != NIL) myContainer->UnregisterObject(GetObject(popupHandle, OBJ_POPUP));
+		if (popupHandle != NIL) myContainer->UnregisterObject(GetObject(popupHandle, PopupMenu::classID));
 
 		myContainer->UnregisterObject(this);
 	}
@@ -458,18 +454,18 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 			{
 				Menu::Entry	*operat = entries.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL))
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 				{
 					Bool	 destroyPopup = True;
 
-					if (Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->handle >= ((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->handle) destroyPopup = False;
+					if (Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->handle >= ((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->handle) destroyPopup = False;
 
 					if (destroyPopup)
 					{
-						((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->Hide();
+						((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->Hide();
 
-						wnd->UnregisterObject(GetObject(popupHandle, OBJ_POPUP));
-						DeleteObject(GetObject(popupHandle, OBJ_POPUP));
+						wnd->UnregisterObject(GetObject(popupHandle, PopupMenu::classID));
+						DeleteObject(GetObject(popupHandle, PopupMenu::classID));
 
 						popupHandle = -1;
 
@@ -485,11 +481,11 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 			{
 				Menu::Entry	*operat = entries.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL))
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 				{
-					((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->Hide();
+					((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->Hide();
 
-					DeleteObject(GetObject(popupHandle, OBJ_POPUP));
+					DeleteObject(GetObject(popupHandle, PopupMenu::classID));
 
 					popupHandle = -1;
 
@@ -555,7 +551,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 			{
 				operat = entries.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL)) if (((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->IsVisible()) continue;
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL)) if (((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->IsVisible()) continue;
 
 				if (operat->type == SM_TEXT && operat->clicked)
 				{
@@ -643,7 +639,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 			{
 				operat = entries.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL)) if (((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->IsVisible()) continue;
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL)) if (((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->IsVisible()) continue;
 
 				if (operat->type == SM_TEXT)
 				{
@@ -764,12 +760,12 @@ S::Void S::GUI::Menubar::PopupProc()
 	{
 		Menu::Entry	*operat = entries.GetNthEntry(i);
 
-		if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL))
+		if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 		{
-			((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->Hide();
+			((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->Hide();
 
-			myContainer->UnregisterObject(GetObject(popupHandle, OBJ_POPUP));
-			DeleteObject(GetObject(popupHandle, OBJ_POPUP));
+			myContainer->UnregisterObject(GetObject(popupHandle, PopupMenu::classID));
+			DeleteObject(GetObject(popupHandle, PopupMenu::classID));
 
 			popupHandle = -1;
 

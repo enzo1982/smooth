@@ -20,23 +20,19 @@
 #include <smooth/layer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_DIVIDER = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Divider::classID = S::Object::RequestClassID();
 
 S::GUI::Divider::Divider(Int pos, Int iOrientation)
 {
-	type				= OBJ_DIVIDER;
+	type				= classID;
 	orientation			= iOrientation;
 	objectProperties->orientation	= OR_FREE;
 
 	if (pos == 0)	pos = Math::Round(120 * Setup::FontSize);
 	else		pos = Math::Round(pos * Setup::FontSize);
 
-	possibleContainers.AddEntry(OBJ_WINDOW);
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Window::classID);
+	possibleContainers.AddEntry(Layer::classID);
 
 	if (Binary::IsFlagSet(orientation, OR_HORZ))		{ objectProperties->pos.x = 0; objectProperties->pos.y = pos; }
 	else if (Binary::IsFlagSet(orientation, OR_VERT))	{ objectProperties->pos.x = pos; objectProperties->pos.y = 0; }
@@ -78,13 +74,13 @@ S::Int S::GUI::Divider::Paint(Int message)
 	Window	*wnd = NIL;
 	Layer	*layer = NIL;
 
-	if (myContainer->GetContainerObject()->GetObjectType() == OBJ_WINDOW)
+	if (myContainer->GetContainerObject()->GetObjectType() == Window::classID)
 	{
 		wnd = (Window *) myContainer->GetContainerObject();
 
 		container = wnd;
 	}
-	else if (myContainer->GetContainerObject()->GetObjectType() == OBJ_LAYER)
+	else if (myContainer->GetContainerObject()->GetObjectType() == Layer::classID)
 	{
 		layer = (Layer *) myContainer->GetContainerObject();
 		wnd = (Window *) layer->GetContainer()->GetContainerObject();
@@ -103,7 +99,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 	if (Binary::IsFlagSet(orientation, OR_HORZ))
 	{
-		if (container->GetObjectType() == OBJ_WINDOW)
+		if (container->GetObjectType() == Window::classID)
 		{
 			doubleBar1.x = 4;
 
@@ -119,7 +115,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 				if (object != NIL)
 				{
-					if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
+					if (object->GetObjectType() == classID && object->GetContainer() == myContainer)
 					{
 						operat = (Divider *) object;
 
@@ -140,7 +136,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 				}
 			}
 		}
-		else if (container->GetObjectType() == OBJ_LAYER)
+		else if (container->GetObjectType() == Layer::classID)
 		{
 			doubleBar1.x = layer->GetRealPosition().x + 4;
 
@@ -156,7 +152,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 				if (object != NIL)
 				{
-					if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
+					if (object->GetObjectType() == classID && object->GetContainer() == myContainer)
 					{
 						operat = (Divider *) object;
 
@@ -185,7 +181,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 	}
 	else if (Binary::IsFlagSet(orientation, OR_VERT))
 	{
-		if (container->GetObjectType() == OBJ_WINDOW)
+		if (container->GetObjectType() == Window::classID)
 		{
 			if (Binary::IsFlagSet(orientation, OR_LEFT))		doubleBar1.x = objectProperties->pos.x;
 			else if	(Binary::IsFlagSet(orientation, OR_RIGHT))	doubleBar1.x = wnd->GetObjectProperties()->size.cx - objectProperties->pos.x;
@@ -200,7 +196,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 				if (object != NIL)
 				{
-					if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
+					if (object->GetObjectType() == classID && object->GetContainer() == myContainer)
 					{
 						operat = (Divider *) object;
 
@@ -221,7 +217,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 				}
 			}
 		}
-		else if (container->GetObjectType() == OBJ_LAYER)
+		else if (container->GetObjectType() == Layer::classID)
 		{
 			if (Binary::IsFlagSet(orientation, OR_LEFT))		doubleBar1.x = layer->GetRealPosition().x + objectProperties->pos.x;
 			else if (Binary::IsFlagSet(orientation, OR_RIGHT))	doubleBar1.x = layer->GetRealPosition().x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
@@ -236,7 +232,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 				if (object != NIL)
 				{
-					if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
+					if (object->GetObjectType() == classID && object->GetContainer() == myContainer)
 					{
 						operat = (Divider *) object;
 

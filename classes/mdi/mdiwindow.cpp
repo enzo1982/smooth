@@ -14,16 +14,12 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_MDIWINDOW = S::Object::RequestObjectID();
+const S::Int	 S::GUI::MDIWindow::classID = S::Object::RequestClassID();
 
 S::GUI::MDIWindow::MDIWindow(String title) : Window(title)
 {
-	type				= OBJ_MDIWINDOW;
-	containerType			= OBJ_WINDOW;
+	type				= classID;
+	containerType			= Window::classID;
 
 	objectProperties->pos.x		= 0;
 	objectProperties->pos.y		= 0;
@@ -32,7 +28,7 @@ S::GUI::MDIWindow::MDIWindow(String title) : Window(title)
 	objectProperties->orientation	= OR_FREE;
 
 	possibleContainers.RemoveAll();
-	possibleContainers.AddEntry(OBJ_WINDOW);
+	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::MDIWindow::~MDIWindow()

@@ -32,21 +32,21 @@ namespace smooth
 		class SMOOTHAPI Menubar : public Widget, public Menu
 		{
 			private:
-				Int		 popupHandle;
+				Int			 popupHandle;
 
-				String		 backupStatusText;
+				String			 backupStatusText;
 			public:
-						 Menubar();
-						~Menubar();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 Menubar();
+							~Menubar();
 
-				Void		 PopupProc();
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
+
+				Void			 PopupProc();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_MENUBAR;
 };
 
 #endif

@@ -32,9 +32,10 @@ namespace smooth
 	class SMOOTHAPI Object
 	{
 		private:
+			static Int		 nextID;
+
 			Bool			 deleteObject;
 			Int			 inUse;
-			static Int		 nextID;
 		protected:
 			ObjectType		 type;
 
@@ -50,6 +51,8 @@ namespace smooth
 			Int			 EnterProtectedRegion();
 			Int			 LeaveProtectedRegion();
 		public:
+			static const Int	 classID;
+
 			Array<Int>		 possibleContainers;
 			static Int		 objectCount;
 
@@ -76,17 +79,16 @@ namespace smooth
 			Void			 SetRegisteredFlag();
 			Void			 UnsetRegisteredFlag();
 
+			static Object		*GetObject(Int, Int);
+
+			static Int		 RequestClassID();
+			static Int		 RequestObjectHandle();
+
 			Int			 IsObjectInUse();
 			Bool			 IsObjectDeleteable();
 
-			static Object		*GetObject(Int, Int);
 			static Int		 DeleteObject(Object *);
-
-			static Int		 RequestObjectID();
-			static Int		 RequestObjectHandle();
 	};
-
-	SMOOTHVAR Int OBJ_OBJECT;
 };
 
 #endif

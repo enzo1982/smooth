@@ -38,25 +38,26 @@ namespace smooth
 			friend class Menubar;
 			friend class Window;
 			private:
-				Bool		 paintActive;
-				Bool		 minchk;
-				Bool		 minclk;
-				Bool		 maxchk;
-				Bool		 maxclk;
-				Bool		 closechk;
-				Bool		 closeclk;
-				Bool		 min;
-				Bool		 max;
-				Bool		 close;
+				Bool			 paintActive;
+				Bool			 minchk;
+				Bool			 minclk;
+				Bool			 maxchk;
+				Bool			 maxclk;
+				Bool			 closechk;
+				Bool			 closeclk;
+				Bool			 min;
+				Bool			 max;
+				Bool			 close;
 			public:
-						 Titlebar(Int = TB_MINBUTTON | TB_MAXBUTTON | TB_CLOSEBUTTON);
-			 			~Titlebar();
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+				static const Int	 classID;
+
+							 Titlebar(Int = TB_MINBUTTON | TB_MAXBUTTON | TB_CLOSEBUTTON);
+			 				~Titlebar();
+
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_TITLEBAR;
 };
 
 #endif

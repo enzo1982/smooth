@@ -20,15 +20,11 @@
 #include <smooth/timer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_ARROWS = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Arrows::classID = S::Object::RequestClassID();
 
 S::GUI::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart, Int rangeEnd)
 {
-	type		= OBJ_ARROWS;
+	type		= classID;
 	subtype		= sType;
 
 	arrow1Checked	= False;
@@ -44,7 +40,7 @@ S::GUI::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart
 	timerActive	= False;
 	timer		= NIL;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);

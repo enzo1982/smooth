@@ -20,20 +20,16 @@ Void smooth::DetachDLL()
 {
 }
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-Int	 OBJ_ACTIVEAREAPLUGIN = Object::RequestObjectID();
+const Int	 ActiveAreaPlugin::classID = Object::RequestClassID();
 
 ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point pos, Size size)
 {
-	type			= OBJ_ACTIVEAREAPLUGIN;
+	type			= classID;
 	areaColor		= color;
 	objectProperties->pos	= pos;
 	objectProperties->size	= size;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x		= Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y		= Math::Round(pos.y * Setup::FontSize);

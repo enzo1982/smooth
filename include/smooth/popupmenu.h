@@ -38,25 +38,25 @@ namespace smooth
 			friend class PopupView;
 			friend class Menubar;
 			private:
-				ToolWindow	*toolwnd;
-				PopupView	*popupView;
+				ToolWindow		*toolwnd;
+				PopupView		*popupView;
 
-				PopupMenu	*prevPopup;
-				PopupMenu	*nextPopup;
+				PopupMenu		*prevPopup;
+				PopupMenu		*nextPopup;
 
-				Menu		*realMenu;
+				Menu			*realMenu;
 			public:
-						 PopupMenu(Menu *);
-				 		~PopupMenu();
+				static const Int	 classID;
 
-				Int		 Process(Int, Int, Int);
+							 PopupMenu(Menu *);
+				 			~PopupMenu();
 
-				Int		 Show();
-				Int		 Hide();
+				Int			 Process(Int, Int, Int);
+
+				Int			 Show();
+				Int			 Hide();
 		};
 	};
-
-	SMOOTHVAR Int OBJ_POPUP;
 };
 
 #endif

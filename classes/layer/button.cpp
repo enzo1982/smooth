@@ -21,22 +21,18 @@
 #include <smooth/layer.h>
 #include <smooth/timer.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_BUTTON = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Button::classID = S::Object::RequestClassID();
 
 S::GUI::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
 {
-	type			= OBJ_BUTTON;
+	type			= classID;
 	objectProperties->text	= text;
 	bitmap			= DetectTransparentRegions(bmp);
 	tipTimer		= NIL;
 	tooltip			= NIL;
 	backgroundColor		= -1;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);

@@ -13,19 +13,15 @@
 #include <smooth/stk.h>
 #include <smooth/application.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_SEMAPHORE = S::Object::RequestObjectID();
+const S::Int	 S::Semaphore::classID = S::Object::RequestClassID();
 
 S::Semaphore::Semaphore()
 {
-	type = OBJ_SEMAPHORE;
+	type = classID;
 
 	semaphore = LiSASemaphoreCreate();
 
-	possibleContainers.AddEntry(OBJ_APPLICATION);
+	possibleContainers.AddEntry(Application::classID);
 }
 
 S::Semaphore::~Semaphore()

@@ -225,8 +225,11 @@ template <class t> S::Int S::Array<t>::InsertEntryAtPos(Int pos, t entry)
 
 	if (pos == 0)
 	{
-		operat->SetNext(firstEntry);
-		firstEntry->SetPrev(operat);
+		if (firstEntry != ARRAY_NULLPOINTER)
+		{
+			operat->SetNext(firstEntry);
+			firstEntry->SetPrev(operat);
+		}
 
 		firstEntry = operat;
 	}

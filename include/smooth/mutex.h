@@ -23,16 +23,16 @@ namespace smooth
 	class SMOOTHAPI Mutex : public Object
 	{
 		private:
-			LiSAMutex	*mutex;
+			LiSAMutex		*mutex;
 		public:
-					 Mutex();
-					~Mutex();
+			static const Int	 classID;
 
-			Int		 Lock();
-			Int		 Release();
+						 Mutex();
+						~Mutex();
+
+			Int			 Lock();
+			Int			 Release();
 	};
-
-	SMOOTHVAR Int OBJ_MUTEX;
 };
 
 #endif

@@ -28,14 +28,14 @@ namespace smooth
 		class SMOOTHAPI DragControl : public Widget
 		{
 			public:
-					 DragControl();
-					~DragControl();
+				static const Int	 classID;
 
-				Int	 Process(Int, Int, Int);
+							 DragControl();
+							~DragControl();
+
+				Int			 Process(Int, Int, Int);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_DRAGCONTROL;
 };
 
 #endif

@@ -36,48 +36,48 @@ namespace smooth
 		class SMOOTHAPI EditBox : public Widget
 		{
 			private:
-				Timer		*timer;
+				Timer			*timer;
 
-				Void		 TimerProc();
+				Void			 TimerProc();
 			protected:
-				Int		 promptPos;
-				Bool		 promptVisible;
-				Int		 markStart;
-				Int		 oMarkStart;
-				Int		 markEnd;
-				Bool		 marking;
-				Int		 maxSize;
-				Int		 invisibleChars;
+				Int			 promptPos;
+				Bool			 promptVisible;
+				Int			 markStart;
+				Int			 oMarkStart;
+				Int			 markEnd;
+				Bool			 marking;
+				Int			 maxSize;
+				Int			 invisibleChars;
 
-				List		*dropDownList;
-				ComboBox	*comboBox;
+				List			*dropDownList;
+				ComboBox		*comboBox;
 
-				Void		 SetCursor(Int);
-				Void		 MarkText(Int, Int);
-				Void		 DeleteSelectedText();
-				Void		 InsertText(String);
+				Void			 SetCursor(Int);
+				Void			 MarkText(Int, Int);
+				Void			 DeleteSelectedText();
+				Void			 InsertText(String);
 
-				Void		 DropDownListProc();
+				Void			 DropDownListProc();
 			public:
-						 EditBox(String, Point, Size, Int);
-						~EditBox();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
+							 EditBox(String, Point, Size, Int);
+							~EditBox();
 
-				Int		 Show();
-				Int		 Hide();
+				virtual Int		 Paint(Int);
+				Int			 Process(Int, Int, Int);
 
-				Int		 Activate();
-				Int		 Deactivate();
+				Int			 Show();
+				Int			 Hide();
 
-				Int		 SetText(String);
+				Int			 Activate();
+				Int			 Deactivate();
 
-				Int		 SetDropDownList(List *);
+				Int			 SetText(String);
+
+				Int			 SetDropDownList(List *);
 		};
 	};
-
-	SMOOTHVAR Int OBJ_EDITBOX;
 };
 
 #endif

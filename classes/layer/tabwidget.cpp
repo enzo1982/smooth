@@ -18,20 +18,16 @@
 #include <smooth/objectproperties.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_TABREGISTER = S::Object::RequestObjectID();
+const S::Int	 S::GUI::TabWidget::classID = S::Object::RequestClassID();
 
 S::GUI::TabWidget::TabWidget(Point pos, Size size)
 {
 	self = this;
 
-	type = OBJ_TABREGISTER;
-	containerType = OBJ_TABREGISTER;
+	type		= classID;
+	containerType	= classID;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);

@@ -28,18 +28,18 @@ namespace smooth
 		class SMOOTHAPI Client : public Widget
 		{
 			public:
-						 Client();
-						~Client();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
+							 Client();
+							~Client();
 
-				virtual Size	 GetSize();
+				virtual Int		 Paint(Int);
+
+				virtual Size		 GetSize();
 			signals:
-				Signal0<Void>	 onPaint;
+				Signal0<Void>		 onPaint;
 		};
 	};
-
-	SMOOTHVAR Int OBJ_CLIENT;
 };
 
 #endif

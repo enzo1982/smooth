@@ -25,15 +25,11 @@
 
 #include <imm.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_EDITBOX = S::Object::RequestObjectID();
+const S::Int	 S::GUI::EditBox::classID = S::Object::RequestClassID();
 
 S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int iMaxSize)
 {
-	type				= OBJ_EDITBOX;
+	type				= classID;
 	objectProperties->text		= text;
 	markStart			= -1;
 	markEnd				= -1;
@@ -48,7 +44,7 @@ S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int iMaxSize)
 
 	objectProperties->font.SetColor(Setup::ClientTextColor);
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	if (maxSize <= 0) maxSize = 32768;
 
@@ -891,6 +887,7 @@ S::Int S::GUI::EditBox::SetText(String txt)
 	}
 
 	objectProperties->text = txt;
+	invisibleChars = 0;
 
 	Paint(SP_PAINT);
 

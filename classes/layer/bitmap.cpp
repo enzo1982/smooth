@@ -19,18 +19,14 @@
 #include <smooth/layer.h>
 #include <smooth/surface.h>
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int	 S::OBJ_HBITMAP = S::Object::RequestObjectID();
+const S::Int	 S::GUI::Bitmap::classID = S::Object::RequestClassID();
 
 S::GUI::Bitmap::Bitmap(HBITMAP bmp, Point pos, Size size)
 {
-	type	= OBJ_HBITMAP;
+	type	= classID;
 	bitmap	= bmp;
 
-	possibleContainers.AddEntry(OBJ_LAYER);
+	possibleContainers.AddEntry(Layer::classID);
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);

@@ -181,8 +181,6 @@ namespace smooth
 	#define ThreadProcCall(p,c,t)		 if(p!=NIL)p(c, t)
 #endif
 
-#define NULLPROC NIL,NIL
-
 const HBITMAP SI_DEFAULT		= (HBITMAP) -1;
 
 const S::Int SM_MOUSEMOVE		= 1024;

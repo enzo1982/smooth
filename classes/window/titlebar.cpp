@@ -95,7 +95,6 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 	Bool	 paintActive = False;
 
-#ifdef __WIN32__
 	if (GetActiveWindow() == wnd->hwnd)
 	{
 		paintActive = True;
@@ -113,7 +112,6 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 	if (paintActive)	surface->Gradient(titleGradient, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 	else			surface->Gradient(titleGradient, Setup::InactiveGradientStartColor, Setup::InactiveGradientEndColor, OR_HORZ);
-#endif
 
 	titleText.left		= titleGradient.left + METRIC_TBTEXTOFFSETX;
 	titleText.top		= titleGradient.top + METRIC_TBTEXTOFFSETY;
@@ -248,7 +246,6 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
-#ifdef __WIN32__
 		case WM_SETFOCUS:
 		case WM_KILLFOCUS:
 		case SM_WINDOWTITLECHANGED:
@@ -392,7 +389,6 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				wnd->Close();
 			}
 			break;
-#endif
 		case SM_MOUSELEAVE:
 			if (minchk && !wnd->IsMouseOn(minButton))
 			{

@@ -34,6 +34,7 @@ S::GUI::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
 	bitmap			= DetectTransparentRegions(bmp);
 	tipTimer		= NIL;
 	tooltip			= NIL;
+	flags			= 0;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -88,6 +89,18 @@ S::GUI::Button::~Button()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
+S::Int S::GUI::Button::SetFlags(Int nFlags)
+{
+	flags = nFlags;
+
+	return Success;
+}
+
+S::Int S::GUI::Button::GetFlags()
+{
+	return flags;
+}
+
 S::Int S::GUI::Button::Paint(Int message)
 {
 	if (!registered)	return Error;
@@ -111,14 +124,14 @@ S::Int S::GUI::Button::Paint(Int message)
 			frame.right	= realPos.x + objectProperties->size.cx - 1;
 			frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-			surface->Frame(frame, FRAME_DOWN);
+			if (!(flags & BF_NOFRAME)) surface->Frame(frame, FRAME_DOWN);
 
 			frame.left++;
 			frame.top++;
 			frame.right--;
 			frame.bottom--;
 
-			surface->Frame(frame, FRAME_UP);
+			if (!(flags & BF_NOFRAME)) surface->Frame(frame, FRAME_UP);
 
 			if (objectProperties->text != NIL)
 			{

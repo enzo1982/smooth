@@ -28,11 +28,16 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Int	 BF_NORMAL	= 0;
+		const Int	 BF_NOFRAME	= 1;
+
 		class SMOOTHAPI Button : public Widget
 		{
 			private:
 				Tooltip		*tooltip;
 				Timer		*tipTimer;
+
+				Int		 flags;
 
 				Void		 ActivateTooltip();
 			protected:
@@ -41,6 +46,9 @@ namespace smooth
 			public:
 						 Button(String, HBITMAP, Point, Size);
 						~Button();
+
+				Int		 SetFlags(Int);
+				Int		 GetFlags();
 
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);

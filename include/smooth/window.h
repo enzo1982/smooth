@@ -81,6 +81,7 @@ namespace smooth
 				Rect				 updateRect;
 
 				Size				 minSize;
+				Size				 maxSize;
 
 				String				 className;
 
@@ -124,6 +125,7 @@ namespace smooth
 				Int				 SetUpdateRect(Rect);
 
 				Int				 SetMinimumSize(Size);
+				Int				 SetMaximumSize(Size);
 
 				Int				 Show();
 				Int				 Hide();

@@ -14,6 +14,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 			- new method: IsMouseOn(Rect)
 			- new methods: MouseX(), MouseY()
 			- new methods: Maximize(), Restore()
+			- new method: SetMaximumSize(Size)
 - stk.cpp		- removed function CloseWindow(Window *)
 			- removed class Setup
 - colordlg.cpp		- color box now updates when the vertical hue selector is moved
@@ -26,6 +27,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - surface.cpp		- new method: Gradient(...), replaces same function in toolkit.cpp
 - input.cpp		- new class: contains mouse and keyboard input functionality
 - droparea.cpp		- new class: receiver for drag & drop files
+- button.cpp		- new methods: SetFlags(Int), GetFlags(), flags: BF_NORMAL, BF_NOFRAME
 
 - new namespace: smooth alias S
 - new namespace: smooth::XML

@@ -489,6 +489,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
+		case SM_MOUSELEAVE:
 			if (!button1Checked && wnd->IsMouseOn(frame1))
 			{
 				button1Checked = True;
@@ -548,12 +549,55 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
+			if (subtype == OR_HORZ)
+			{
+				frame.left -= 20;
+				frame.top -= 100;
+				frame.right += 20;
+				frame.bottom += 100;
+			}
+			else
+			{
+				frame.left -= 100;
+				frame.top -= 20;
+				frame.right += 100;
+				frame.bottom += 20;
+			}
+
+			if (!wnd->IsMouseOn(frame1) && button1Clicked)
+			{
+				Process(SM_LBUTTONUP, 0, 0);
+
+				retVal = Break;
+			}
+
+			if (!wnd->IsMouseOn(frame2) && button2Clicked)
+			{
+				Process(SM_LBUTTONUP, 0, 0);
+
+				retVal = Break;
+			}
+
+			if (!wnd->IsMouseOn(frame) && button3Clicked)
+			{
+				Process(SM_LBUTTONUP, 0, 0);
+
+				retVal = Break;
+			}
+
+			Int	 leftButton;
+
+			if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
+			else					leftButton = VK_LBUTTON;
+
+			GetAsyncKeyState(leftButton);
+
+			if (GetAsyncKeyState(leftButton) == 0 && button3Clicked) Process(SM_LBUTTONUP, 0, 0);
+
 			break;
-#ifdef __WIN32__
 		case WM_KILLFOCUS:
 		case WM_ACTIVATEAPP:
 			return Process(SM_LBUTTONUP, 0, 0);
-#endif
 	}
 
 	return retVal;

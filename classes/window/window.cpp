@@ -173,6 +173,9 @@ S::GUI::Window::Window(String title)
 	minSize.cx = Math::Round(160 * Setup::FontSize);
 	minSize.cy = METRIC_TITLEBARHEIGHT + 5;
 
+	maxSize.cx = 2147483647;
+	maxSize.cy = 2147483647;
+
 	hwnd = NIL;
 
 	doQuit.Connect(&Window::DummyExitProc, this);
@@ -508,6 +511,13 @@ S::Int S::GUI::Window::SetUpdateRect(Rect newUpdateRect)
 S::Int S::GUI::Window::SetMinimumSize(Size newMinSize)
 {
 	minSize = newMinSize;
+
+	return Success;
+}
+
+S::Int S::GUI::Window::SetMaximumSize(Size newMaxSize)
+{
+	maxSize = newMaxSize;
 
 	return Success;
 }
@@ -912,6 +922,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				((LPMINMAXINFO) lParam)->ptMinTrackSize.x = minSize.cx;
 				((LPMINMAXINFO) lParam)->ptMinTrackSize.y = minSize.cy;
+				((LPMINMAXINFO) lParam)->ptMaxTrackSize.x = maxSize.cx;
+				((LPMINMAXINFO) lParam)->ptMaxTrackSize.y = maxSize.cy;
 			}
 			break;
 	}

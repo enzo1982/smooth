@@ -58,7 +58,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 	EnterProtectedRegion();
 
-	Menu::Entry	*operat;
+	MenuEntry	*operat;
 	Rect		 menubar;
 	Rect		 menuentry;
 	Rect		 helpmenuentry;
@@ -439,7 +439,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 	EnterProtectedRegion();
 
 	Surface		*surface = myContainer->GetDrawSurface();
-	Menu::Entry	*operat;
+	MenuEntry	*operat;
 	Rect		 bmprect;
 	Int		 retVal = Success;
 	Int		 i;
@@ -453,7 +453,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 		case WM_KILLFOCUS:
 			for (i = 0; i < nOfEntries; i++)
 			{
-				Menu::Entry	*operat = entries.GetNthEntry(i);
+				MenuEntry	*operat = entries.GetNthEntry(i);
 
 				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 				{
@@ -480,7 +480,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDBLCLK:
 			for (i = 0; i < nOfEntries; i++)
 			{
-				Menu::Entry	*operat = entries.GetNthEntry(i);
+				MenuEntry	*operat = entries.GetNthEntry(i);
 
 				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 				{
@@ -769,7 +769,7 @@ S::Void S::GUI::Menubar::PopupProc()
 {
 	for (Int i = 0; i < nOfEntries; i++)
 	{
-		Menu::Entry	*operat = entries.GetNthEntry(i);
+		MenuEntry	*operat = entries.GetNthEntry(i);
 
 		if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 		{

@@ -23,6 +23,7 @@ namespace smooth
 
 #include "object.h"
 #include "font.h"
+#include "signals.h"
 
 namespace smooth
 {
@@ -43,6 +44,8 @@ namespace smooth
 			protected:
 				Bool				 visible;
 				Bool				 active;
+
+				Void				 GetTextSize();
 			public:
 				static const Int		 classID;
 

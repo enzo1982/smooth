@@ -14,23 +14,38 @@
 #include "method.h"
 #include "instance.h"
 
+#include "../object.h"
+
 namespace smooth
 {
 	class Signal
 	{
 		protected:
-			Array<Method *>		methods;
-			Array<Instance *>	instances;
-			Array<Void (*)()>	functions;
-			Array<Signal *>		sigs;
+			Array<Method *>		 methods;
+			Array<Instance *>	 instances;
+			Array<Void (*)()>	 functions;
+			Array<Signal *>		 sigs;
 
-			Array<Method *>		methods0;
-			Array<Instance *>	instances0;
-			Array<Void (*)()>	functions0;
-			Array<Signal *>		sigs0;
+			Array<Method *>		 methods0;
+			Array<Instance *>	 instances0;
+			Array<Void (*)()>	 functions0;
+			Array<Signal *>		 sigs0;
+
+			Object			*parent;
+
+			Void ProtectParent()
+			{
+				if (parent != NIL) parent->EnterProtectedRegion();
+			}
+
+			Void UnprotectParent()
+			{
+				if (parent != NIL) parent->LeaveProtectedRegion();
+			}
 		public:
 			Signal()
 			{
+				parent = NIL;
 			}
 
 			Signal(const Signal &oSignal)
@@ -66,11 +81,20 @@ namespace smooth
 				{
 					sigs0.AddEntry(Array<Signal *>::GetNthEntry(&oSignal.sigs0, n));
 				}
+
+				parent = oSignal.parent;
 			}
 
 			virtual ~Signal()
 			{
 				DisconnectAll();
+			}
+
+			Int SetParentObject(Object *newParent)
+			{
+				parent = newParent;
+
+				return Success;
 			}
 
 			Int DisconnectAll()

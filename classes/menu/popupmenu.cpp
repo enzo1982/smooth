@@ -36,8 +36,8 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 
 	for (Int i = 0; i < menu->GetNOfEntries(); i++)
 	{
-		Menu::Entry	*entry = menu->entries.GetNthEntry(i);
-		Menu::Entry	*nEntry = realMenu->AddEntry(entry->text, entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->orientation);
+		MenuEntry	*entry = menu->entries.GetNthEntry(i);
+		MenuEntry	*nEntry = realMenu->AddEntry(entry->text, entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->orientation);
 
 		nEntry->SetTooltip(entry->tooltip);
 		nEntry->SetStatusText(entry->description);
@@ -49,6 +49,9 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 S::GUI::PopupMenu::~PopupMenu()
 {
 	if (IsVisible()) Hide();
+
+	if (popupView != NIL) DeleteObject(popupView);
+	if (toolwnd != NIL) DeleteObject(toolwnd);
 
 	if (nextPopup != NIL) DeleteObject(nextPopup);
 

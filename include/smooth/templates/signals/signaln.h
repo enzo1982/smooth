@@ -182,6 +182,8 @@ namespace smooth
 
 			Void Emit(SIGNALS_ARGUMENT_PARAMETER_LIST)
 			{
+				ProtectParent();
+
 				for (Int i = 0; i < methods.GetNOfEntries(); i++)
 				{
 					instances.GetNthEntry(i)->Call(methods.GetNthEntry(i) SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_INV_PARAMETERS);
@@ -211,6 +213,8 @@ namespace smooth
 				{
 					((Signal0<Void> *) sigs0.GetNthEntry(n))->Emit();
 				}
+
+				UnprotectParent();
 			}
 	};
 };

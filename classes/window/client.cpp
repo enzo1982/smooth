@@ -30,6 +30,8 @@ S::GUI::Client::Client()
 	objectProperties->orientation	= OR_CENTER;
 
 	possibleContainers.AddEntry(Window::classID);
+
+	onPaint.SetParentObject(this);
 }
 
 S::GUI::Client::~Client()

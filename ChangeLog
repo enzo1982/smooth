@@ -32,6 +32,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 			- renamed Cleanup() to RemoveAll()
 - signaln.cpp		- slots can now be disconnected from signals
 			- slots taking zero parameters can now be connected to any signal
+			- SetParentObject can be used to specify an object that will automatically be protected on Signal::Emit
 - titlebar.cpp		- hide min/max buttons if both are inactive
 - editbox.cpp		- added support for dropdown lists with default strings
 - font.cpp		- new class: abstraction of font metrics

@@ -8,11 +8,11 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/menu.h>
+#include <smooth/menuentry.h>
 #include <smooth/definitions.h>
 #include <smooth/stk.h>
 
-S::Menu::Entry::Entry(Int newType, Int newID)
+S::MenuEntry::MenuEntry(Int newType, Int newID)
 {
 	type		= newType;
 	id		= newID;
@@ -29,13 +29,15 @@ S::Menu::Entry::Entry(Int newType, Int newID)
 	iVar		= NIL;
 
 	popup		= NIL;
+
+	onClick.SetParentObject(this);
 }
 
-S::Menu::Entry::~Entry()
+S::MenuEntry::~MenuEntry()
 {
 }
 
-S::Int S::Menu::Entry::SetText(String newText)
+S::Int S::MenuEntry::SetText(String newText)
 {
 	if (newText == NIL) type = (type | SM_TEXT) ^ SM_TEXT;
 
@@ -44,21 +46,21 @@ S::Int S::Menu::Entry::SetText(String newText)
 	return Success;
 }
 
-S::Int S::Menu::Entry::SetTooltip(String newTooltip)
+S::Int S::MenuEntry::SetTooltip(String newTooltip)
 {
 	tooltip = newTooltip;
 
 	return Success;
 }
 
-S::Int S::Menu::Entry::SetStatusText(String newDescription)
+S::Int S::MenuEntry::SetStatusText(String newDescription)
 {
 	description = newDescription;
 
 	return Success;
 }
 
-S::Int S::Menu::Entry::SetBitmap(HBITMAP newBitmap)
+S::Int S::MenuEntry::SetBitmap(HBITMAP newBitmap)
 {
 	if (newBitmap == NIL)
 	{
@@ -76,7 +78,7 @@ S::Int S::Menu::Entry::SetBitmap(HBITMAP newBitmap)
 	return Success;
 }
 
-S::Int S::Menu::Entry::SetOrientation(Int newOrientation)
+S::Int S::MenuEntry::SetOrientation(Int newOrientation)
 {
 	if (newOrientation == OR_TOP)		newOrientation = OR_LEFT;
 	else if (newOrientation == OR_BOTTOM)	newOrientation = OR_RIGHT;

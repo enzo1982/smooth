@@ -37,6 +37,8 @@ S::GUI::DropArea::DropArea(Point pos, Size size)
 	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
 	if (size.cy == 0)	objectProperties->size.cy = LiSAGetDisplaySizeY();
 	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+
+	onDropFile.SetParentObject(this);
 }
 
 S::GUI::DropArea::~DropArea()

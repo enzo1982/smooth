@@ -102,15 +102,6 @@ S::Void S::Object::UnsetRegisteredFlag()
 	registered = False;
 }
 
-S::Void S::Object::GetTextSize()
-{
-	objectProperties->textSize.cx = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-	objectProperties->textSize.cy = GetTextSizeY(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
-
-	objectProperties->tooltipSize.cx = GetTextSizeX(objectProperties->tooltip, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
-	objectProperties->tooltipSize.cy = GetTextSizeY(objectProperties->tooltip, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
-}
-
 S::Object *S::Object::GetObject(Int objectHandle, Int objectType)
 {
 	Object	*object = mainObjectManager->RequestObject(objectHandle);

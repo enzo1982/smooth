@@ -164,6 +164,12 @@ S::GUI::Window::Window(String title)
 	hwnd = NIL;
 
 	doQuit.Connect(&Window::DummyExitProc, this);
+
+	onCreate.SetParentObject(this);
+	onPaint.SetParentObject(this);
+	onResize.SetParentObject(this);
+	onPeek.SetParentObject(this);
+	onEvent.SetParentObject(this);
 }
 
 S::GUI::Window::~Window()
@@ -611,8 +617,8 @@ S::Int S::GUI::Window::Close()
 
 	Process(SM_LOOSEFOCUS, 0, 0);
 
-	if (Setup::enableUnicode)	::SendMessageW(hwnd, WM_CLOSE, 0, 0);
-	else				::SendMessageA(hwnd, WM_CLOSE, 0, 0);
+	if (Setup::enableUnicode)	::PostMessageW(hwnd, WM_CLOSE, 0, 0);
+	else				::PostMessageA(hwnd, WM_CLOSE, 0, 0);
 
 	return Success;
 }

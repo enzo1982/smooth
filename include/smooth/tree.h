@@ -18,6 +18,7 @@ namespace smooth
 
 #include "object.h"
 #include "rect.h"
+#include "signals.h"
 
 namespace smooth
 {

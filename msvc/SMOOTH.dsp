@@ -871,6 +871,10 @@ SOURCE=..\include\smooth\menubar.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\menuentry.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\messagebox.h
 # End Source File
 # Begin Source File
@@ -1083,8 +1087,8 @@ SOURCE=..\resources\icon.rc
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-# ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
-# ADD RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth" /i "I:\devel\projects\mpsd\src\smooth\resources" /d "__WIN32__" /d "__SMOOTH_DLL__"
+# ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
+# ADD RSC /l 0x407 /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth" /i "I:\devel\projects\mpsd\src\smooth\resources" /d "__WIN32__" /d "__SMOOTH_DLL__"
 
 !ENDIF 
 
@@ -1109,8 +1113,8 @@ SOURCE=..\resources\resources.rc
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
-# ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
-# ADD RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "..\resources" /i ".." /d "__WIN32__" /d "__SMOOTH_DLL__"
+# ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
+# ADD RSC /l 0x407 /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "..\resources" /i ".." /d "__WIN32__" /d "__SMOOTH_DLL__"
 
 !ENDIF 
 

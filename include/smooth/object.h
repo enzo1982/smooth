@@ -24,29 +24,26 @@ namespace smooth
 #include "objecttype.h"
 #include "point.h"
 #include "size.h"
-#include "signals.h"
 #include "callbacks.h"
 
 namespace smooth
 {
 	class SMOOTHAPI Object
 	{
+		friend class Signal;
 		private:
 			static Int		 nextID;
 
 			Bool			 deleteObject;
 			Int			 inUse;
 		protected:
-			ObjectType		 type;
-
 			Int			 flags;
+			ObjectType		 type;
 
 			Bool			 registered;
 
 			ObjectProperties	*objectProperties;
 			Container		*myContainer;
-
-			Void			 GetTextSize();
 
 			Int			 EnterProtectedRegion();
 			Int			 LeaveProtectedRegion();

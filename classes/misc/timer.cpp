@@ -18,6 +18,8 @@ S::Timer::Timer()
 	type = classID;
 
 	timerid = -1;
+
+	onInterval.SetParentObject(this);
 }
 
 S::Timer::~Timer()

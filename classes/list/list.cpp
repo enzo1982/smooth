@@ -43,7 +43,7 @@ S::ListEntry *S::List::AddEntry(String name, Int id)
 	}
 	else
 	{
-		delete newEntry;
+		Object::DeleteObject(newEntry);
 
 		return NIL;
 	}
@@ -77,7 +77,7 @@ S::Int S::List::RemoveEntry(Int id)
 
 	if (entry != NIL)
 	{
-		delete entry;
+		Object::DeleteObject(entry);
 
 		Array<ListEntry *>::RemoveEntry(id);
 
@@ -95,7 +95,7 @@ S::Int S::List::RemoveAll()
 
 	for (Int i = 0; i < GetNOfEntries(); i++)
 	{
-		delete GetNthEntry(i);
+		Object::DeleteObject(GetNthEntry(i));
 	}
 
 	Array<ListEntry *>::RemoveAll();

@@ -109,7 +109,8 @@ S::Int S::GUI::ListBox::RemoveEntry(Int number)
 
 			myContainer->UnregisterObject(scrollbar);
 
-			delete scrollbar;
+			DeleteObject(scrollbar);
+
 			scrollbar = NIL;
 		}
 		else
@@ -134,7 +135,8 @@ S::Int S::GUI::ListBox::RemoveAll()
 
 		myContainer->UnregisterObject(scrollbar);
 
-		delete scrollbar;
+		DeleteObject(scrollbar);
+
 		scrollbar = NIL;
 	}
 
@@ -357,7 +359,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					layer->UnregisterObject(scrollbar);
 
-					delete scrollbar;
+					DeleteObject(scrollbar);
+
 					scrollbar = NIL;
 				}
 			}

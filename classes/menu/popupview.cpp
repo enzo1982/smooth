@@ -49,7 +49,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 
 	EnterProtectedRegion();
 
-	Menu::Entry	*entry;
+	MenuEntry	*entry;
 	Rect		 popupRect;
 	Point		 p1;
 	Point		 p2;
@@ -315,7 +315,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
+				MenuEntry	*entry = realMenu->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -389,7 +389,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONUP:
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
+				MenuEntry	*entry = realMenu->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -505,7 +505,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSEMOVE:
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
+				MenuEntry	*entry = realMenu->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -728,7 +728,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
+				MenuEntry	*entry = realMenu->entries.GetNthEntry(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{

@@ -8,8 +8,13 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_LISTENTRY_
-#define _H_OBJSMOOTH_LISTENTRY_
+#ifndef _H_OBJSMOOTH_MENUENTRY_
+#define _H_OBJSMOOTH_MENUENTRY_
+
+namespace smooth
+{
+	class Menu;
+};
 
 #include "object.h"
 #include "rect.h"
@@ -17,25 +22,51 @@
 
 namespace smooth
 {
-	class SMOOTHAPI ListEntry : public Object
+	const Int SM_SEPARATOR	= 0;
+	const Int SM_TEXT	= 1;
+	const Int SM_BITMAP	= 2;
+
+	class SMOOTHAPI MenuEntry : public Object
 	{
 		public:
 			Int		 id;
-			String		 name;
+			Int		 type;
+
+			String		 text;
+			String		 tooltip;
+			String		 description;
+
+			HBITMAP		 bitmap;
+			HBITMAP		 graymap;
+
+			Int		 orientation;
 
 			Bool		 checked;
 			Bool		 clicked;
-			Bool		 selected;
+
+			Bool		*bVar;
+			Int		*iVar;
+			Int		 iCode;
+
+			Menu		*popup;
+
 			Int		 size;
+			Bool		 sizeset;
 			Rect		 rect;
 
 			GUI::Font	 font;
 
-					 ListEntry(Int);
-					~ListEntry();
+					 MenuEntry(Int, Int);
+					~MenuEntry();
+
+			Int		 SetText(String);
+			Int		 SetTooltip(String);
+			Int		 SetStatusText(String);
+
+			Int		 SetBitmap(HBITMAP);
+
+			Int		 SetOrientation(Int);
 		signals:
-			Signal0<Void>	 onMouseOver;
-			Signal0<Void>	 onMouseOut;
 			Signal0<Void>	 onClick;
 	};
 };

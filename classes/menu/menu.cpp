@@ -35,7 +35,7 @@ S::Menu::~Menu()
 	}
 }
 
-S::Menu::Entry *S::Menu::AddEntry(String text, HBITMAP bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
+S::MenuEntry *S::Menu::AddEntry(String text, HBITMAP bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
 {
 	Int	 id	= System::RequestGUID();
 	Int	 type	= SM_SEPARATOR;
@@ -43,7 +43,7 @@ S::Menu::Entry *S::Menu::AddEntry(String text, HBITMAP bitmap, Menu *popupMenu, 
 	if (text != NIL)	type = type | SM_TEXT;
 	if (bitmap != NIL)	type = type | SM_BITMAP;
 
-	Menu::Entry	*newEntry = new Menu::Entry(type, id);
+	MenuEntry	*newEntry = new MenuEntry(type, id);
 
 	newEntry->text		= text;
 	newEntry->orientation	= orientation;
@@ -66,13 +66,13 @@ S::Menu::Entry *S::Menu::AddEntry(String text, HBITMAP bitmap, Menu *popupMenu, 
 	}
 	else
 	{
-		delete newEntry;
+		Object::DeleteObject(newEntry);
 
 		return NIL;
 	}
 }
 
-S::Int S::Menu::RemoveEntry(Menu::Entry *entry)
+S::Int S::Menu::RemoveEntry(MenuEntry *entry)
 {
 	if (entry == NIL) return Error;
 
@@ -80,7 +80,7 @@ S::Int S::Menu::RemoveEntry(Menu::Entry *entry)
 	{
 		entries.RemoveEntry(entry->id);
 
-		delete entry;
+		Object::DeleteObject(entry);
 
 		nOfEntries--;
 
@@ -133,7 +133,7 @@ S::Int S::Menu::GetSizeX()
 
 	for (Int i = 0; i < nOfEntries; i++)
 	{
-		Menu::Entry	*entry = entries.GetNthEntry(i);
+		MenuEntry	*entry = entries.GetNthEntry(i);
 
 		if (entry->size > greatest)
 		{
@@ -153,7 +153,7 @@ S::Int S::Menu::GetSizeY()
 
 	for (Int i = 0; i < nOfEntries; i++)
 	{
-		Menu::Entry	*entry = entries.GetNthEntry(i);
+		MenuEntry	*entry = entries.GetNthEntry(i);
 
 		if (entry->type == SM_SEPARATOR)	mSize = mSize + 5;
 		else					mSize = mSize + METRIC_POPUPENTRYSIZE;
@@ -168,7 +168,7 @@ S::Void S::Menu::GetMenuEntriesSize()
 
 	for (Int i = 0; i < nOfEntries; i++)
 	{
-		Menu::Entry	*operat = entries.GetNthEntry(i);
+		MenuEntry	*operat = entries.GetNthEntry(i);
 
 		if (!operat->sizeset) operat->size = GetTextSizeX(operat->text, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
 

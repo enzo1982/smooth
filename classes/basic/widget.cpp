@@ -28,10 +28,23 @@ S::GUI::Widget::Widget()
 	subtype	= 0;
 
 	objectProperties->font.SetColor(Setup::TextColor);
+
+	onClick.SetParentObject(this);
+	onRegister.SetParentObject(this);
+	onUnregister.SetParentObject(this);
 }
 
 S::GUI::Widget::~Widget()
 {
+}
+
+S::Void S::GUI::Widget::GetTextSize()
+{
+	objectProperties->textSize.cx = GetTextSizeX(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+	objectProperties->textSize.cy = GetTextSizeY(objectProperties->text, objectProperties->font.GetName(), objectProperties->font.GetSize(), objectProperties->font.GetWeight());
+
+	objectProperties->tooltipSize.cx = GetTextSizeX(objectProperties->tooltip, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
+	objectProperties->tooltipSize.cy = GetTextSizeY(objectProperties->tooltip, I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, FW_NORMAL);
 }
 
 S::Point S::GUI::Widget::GetRealPosition()
@@ -42,8 +55,8 @@ S::Point S::GUI::Widget::GetRealPosition()
 
 	if (myContainer->GetContainerObject()->GetObjectType() == GUI::Layer::classID)
 	{
-		GUI::Layer	*layer = (GUI::Layer *) myContainer->GetContainerObject();
-		Point		 layerPos = layer->GetRealPosition();
+		Layer	*layer = (Layer *) myContainer->GetContainerObject();
+		Point	 layerPos = layer->GetRealPosition();
 
 		realPos.x = layerPos.x + objectProperties->pos.x;
 		realPos.y = layerPos.y + objectProperties->pos.y;

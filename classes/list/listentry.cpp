@@ -22,6 +22,10 @@ S::ListEntry::ListEntry(Int entryID)
 	size		= -1;
 
 	font.SetColor(Setup::ClientTextColor);
+
+	onClick.SetParentObject(this);
+	onMouseOver.SetParentObject(this);
+	onMouseOut.SetParentObject(this);
 }
 
 S::ListEntry::~ListEntry()

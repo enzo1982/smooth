@@ -1,44 +1,10 @@
-# Makefile for smooth v0.8
+# Makefile for smooth v0.8, Linux
 
-INCLUDEDIR = ./include
-SMOOTHINCLUDEDIR = $(INCLUDEDIR)/smooth
-OBJECTDIR = ./objects
-BINDIR = ./bin
-LIBDIR = ./lib
-OTHERLIBSDIR = ./libraries
-IOLIBDIR = $(OTHERLIBSDIR)/iolib
-LISADIR = $(OTHERLIBSDIR)/lisa
-MISCDIR = ./misc
-CLASSESDIR = ./classes
-WINDOWCLASSESDIR = $(CLASSESDIR)/window
-TREECLASSESDIR = $(CLASSESDIR)/tree
-MENUCLASSESDIR = $(CLASSESDIR)/menu
-LISTCLASSESDIR = $(CLASSESDIR)/list
-LAYERCLASSESDIR = $(CLASSESDIR)/layer
-BASICCLASSESDIR = $(CLASSESDIR)/basic
-MDICLASSESDIR = $(CLASSESDIR)/mdi
-MISCCLASSESDIR = $(CLASSESDIR)/misc
-INTERNALCLASSESDIR = $(CLASSESDIR)/internal
-THREADSCLASSESDIR = $(CLASSESDIR)/threads
-XMLCLASSESDIR = $(CLASSESDIR)/xml
-PRIMITIVESCLASSESDIR = $(CLASSESDIR)/primitives
-GRAPHICSCLASSESDIR = $(CLASSESDIR)/graphics
-DIALOGSCLASSESDIR = $(CLASSESDIR)/dialogs
-SAMPLESDIR = ./samples
-SAMPLE1DIR = $(SAMPLESDIR)/beatclock
-SAMPLE2DIR = $(SAMPLESDIR)/test
-SAMPLE3DIR = $(SAMPLESDIR)/testkey
-SAMPLE4DIR = $(SAMPLESDIR)/plugin
-SAMPLE5DIR = $(SAMPLESDIR)/mditest
-DESIGNERDIR = ./tools/designer
-TRANSLATORDIR = ./tools/translator
-PCIFFMANDIR = ./tools/pciffmanager
-RESOURCEDIR = ./resources
-BINRESDIR = $(RESOURCEDIR)/binary
+include Makefile-common
 
-OBJECTS = $(OBJECTDIR)/application.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectmanager.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/system.o $(OBJECTDIR)/widget.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/bitmapbackend.o $(OBJECTDIR)/font.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/surfacebackend.o $(OBJECTDIR)/window.o $(OBJECTDIR)/windowbackend.o $(OBJECTDIR)/layer.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/popupmenu.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/config.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/mutexposix.o $(OBJECTDIR)/semaphoreposix.o $(OBJECTDIR)/threadposix.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/mutexbackend.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/semaphorebackend.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadbackend.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/divider.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/metrics.o
+OBJECTS = $(OBJECTDIR)/backend.o $(OBJECTDIR)/backendsdl.o $(OBJECTDIR)/application.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectmanager.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/system.o $(OBJECTDIR)/widget.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/bitmapbackend.o $(OBJECTDIR)/font.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/surfacebackend.o $(OBJECTDIR)/window.o $(OBJECTDIR)/windowbackend.o $(OBJECTDIR)/layer.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/popupmenu.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/config.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/mutexposix.o $(OBJECTDIR)/semaphoreposix.o $(OBJECTDIR)/threadposix.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/mutexbackend.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/semaphorebackend.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadbackend.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/divider.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/metrics.o
 
-SAMPLESLIBS = -lsmooth -bzip2 -lxml2 -lpthread -lX11
+SAMPLESLIBS = -lsmooth -bzip2 -lxml2 -lpthread -lX11 -lSDL
 
 DLLNAME = $(LIBDIR)/libsmooth.so
 

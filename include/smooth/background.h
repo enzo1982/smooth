@@ -14,7 +14,11 @@
 namespace smooth
 {
 	class BackgroundApplication;
-	class Timer;
+
+	namespace System
+	{
+		class Timer;
+	};
 
 	namespace GUI
 	{
@@ -30,7 +34,7 @@ namespace smooth
 	{
 		private:
 			GUI::Window	*backgroundWindow;
-			Timer		*backgroundTimer;
+			System::Timer	*backgroundTimer;
 
 			Void		 TimerProc();
 		public:

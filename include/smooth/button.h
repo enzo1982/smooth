@@ -19,7 +19,10 @@ namespace smooth
 		class Tooltip;
 	};
 
-	class Timer;
+	namespace System
+	{
+		class Timer;
+	};
 };
 
 #include "widget.h"
@@ -37,7 +40,7 @@ namespace smooth
 		{
 			private:
 				Tooltip			*tooltip;
-				Timer			*tipTimer;
+				System::Timer		*tipTimer;
 
 				Int			 backgroundColor;
 

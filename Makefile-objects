@@ -1,3 +1,18 @@
+$(OBJECTDIR)/backend.o: $(BACKENDSCLASSESDIR)/backend.cpp $(SMOOTHINCLUDEDIR)/backends/backend.h
+	$(ECHO) -n Compiling $(BACKENDSCLASSESDIR)/backend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/backend.cpp -o $(OBJECTDIR)/backend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/backendwin32.o: $(BACKENDSCLASSESDIR)/win32/backendwin32.cpp $(SMOOTHINCLUDEDIR)/backends/win32/backendwin32.h
+	$(ECHO) -n Compiling $(BACKENDSCLASSESDIR)/win32/backendwin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/win32/backendwin32.cpp -o $(OBJECTDIR)/backendwin32.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/backendsdl.o: $(BACKENDSCLASSESDIR)/sdl/backendsdl.cpp $(SMOOTHINCLUDEDIR)/backends/sdl/backendsdl.h
+	$(ECHO) -n Compiling $(BACKENDSCLASSESDIR)/sdl/backendsdl.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/sdl/backendsdl.cpp -o $(OBJECTDIR)/backendsdl.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/application.o: $(BASICCLASSESDIR)/application.cpp $(SMOOTHINCLUDEDIR)/application.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/application.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/application.cpp -o $(OBJECTDIR)/application.o
@@ -46,11 +61,6 @@ $(OBJECTDIR)/objecttype.o: $(BASICCLASSESDIR)/objecttype.cpp $(SMOOTHINCLUDEDIR)
 $(OBJECTDIR)/setup.o: $(BASICCLASSESDIR)/setup.cpp $(SMOOTHINCLUDEDIR)/setup.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/setup.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/setup.cpp -o $(OBJECTDIR)/setup.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/system.o: $(BASICCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system.h
-	$(ECHO) -n Compiling $(BASICCLASSESDIR)/system.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/system.cpp -o $(OBJECTDIR)/system.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/widget.o: $(BASICCLASSESDIR)/widget.cpp $(SMOOTHINCLUDEDIR)/widget.h
@@ -323,11 +333,6 @@ $(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/string.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string.cpp -o $(OBJECTDIR)/string.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/timer.o: $(MISCCLASSESDIR)/timer.cpp $(SMOOTHINCLUDEDIR)/timer.h
-	$(ECHO) -n Compiling $(MISCCLASSESDIR)/timer.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/timer.cpp -o $(OBJECTDIR)/timer.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/line.o: $(PRIMITIVESCLASSESDIR)/line.cpp $(SMOOTHINCLUDEDIR)/primitives/line.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/line.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/line.cpp -o $(OBJECTDIR)/line.o
@@ -351,6 +356,31 @@ $(OBJECTDIR)/rect.o: $(PRIMITIVESCLASSESDIR)/rect.cpp $(SMOOTHINCLUDEDIR)/primit
 $(OBJECTDIR)/size.o: $(PRIMITIVESCLASSESDIR)/size.cpp $(SMOOTHINCLUDEDIR)/primitives/size.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/size.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/size.cpp -o $(OBJECTDIR)/size.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/timersdl.o: $(SYSTEMCLASSESDIR)/sdl/timersdl.cpp $(SMOOTHINCLUDEDIR)/system/sdl/timersdl.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/sdl/timersdl.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/sdl/timersdl.cpp -o $(OBJECTDIR)/timersdl.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/timerwin32.o: $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp $(SMOOTHINCLUDEDIR)/system/win32/timerwin32.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp -o $(OBJECTDIR)/timerwin32.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/system.o: $(SYSTEMCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system/system.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/system.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/system.cpp -o $(OBJECTDIR)/system.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/timer.o: $(SYSTEMCLASSESDIR)/timer.cpp $(SMOOTHINCLUDEDIR)/system/timer.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/timer.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/timer.cpp -o $(OBJECTDIR)/timer.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/timerbackend.o: $(SYSTEMCLASSESDIR)/timerbackend.cpp $(SMOOTHINCLUDEDIR)/system/timerbackend.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/timerbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/timerbackend.cpp -o $(OBJECTDIR)/timerbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/mutexposix.o: $(THREADSCLASSESDIR)/posix/mutexposix.cpp $(SMOOTHINCLUDEDIR)/threads/posix/mutexposix.h
@@ -508,7 +538,7 @@ $(OBJECTDIR)/pciio.o: $(MISCDIR)/pciio.cpp $(SMOOTHINCLUDEDIR)/pciio.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/pciio.cpp -o $(OBJECTDIR)/pciio.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/resources.o: $(SMOOTHINCLUDEDIR)/resources.h $(RESOURCEDIR)/version.rc $(RESOURCEDIR)/resources.rc
+$(OBJECTDIR)/resources.o: $(SMOOTHINCLUDEDIR)/resources.h $(RESOURCEDIR)/resources.rc
 	$(ECHO) -n Compiling $(RESOURCEDIR)/resources.rc...
 	$(RESCOMP) $(RESCOMP_OPTS) $(RESOURCEDIR)/resources.rc -o $(OBJECTDIR)/resources.o
 	$(ECHO) done.

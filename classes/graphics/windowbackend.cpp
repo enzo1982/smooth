@@ -53,6 +53,11 @@ S::Int S::GUI::WindowBackend::SetTitle(String nTitle)
 	return Success;
 }
 
+S::Int S::GUI::WindowBackend::SetIcon(Bitmap &newIcon)
+{
+	return Success;
+}
+
 S::Int S::GUI::WindowBackend::SetMinimumSize(Size nMinSize)
 {
 	return Success;

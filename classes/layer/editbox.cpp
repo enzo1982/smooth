@@ -18,7 +18,7 @@
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
-#include <smooth/timer.h>
+#include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/window.h>
 
@@ -379,7 +379,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					ImmDestroyContext(hImc);
 				}
 
-				timer = new Timer();
+				timer = new System::Timer();
 
 				timer->onInterval.Connect(&EditBox::TimerProc, this);
 				timer->Start(500);
@@ -713,7 +713,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 		timer = NIL;
 	}
 
-	timer = new Timer();
+	timer = new System::Timer();
 
 	timer->onInterval.Connect(&EditBox::TimerProc, this);
 	timer->Start(500);

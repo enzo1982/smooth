@@ -8,39 +8,40 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_TIMER_
-#define _H_OBJSMOOTH_TIMER_
+#ifndef _H_OBJSMOOTH_TIMERBACKEND_
+#define _H_OBJSMOOTH_TIMERBACKEND_
 
 namespace smooth
 {
-	class Timer;
+	namespace System
+	{
+		class TimerBackend;
+	};
 };
 
-#include "object.h"
-#include "signals.h"
+#include "../definitions.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Timer : public Object
+	namespace System
 	{
-		private:
-			Int			 timerid;
+		const Int	 TIMER_NONE = 0;
 
-#ifdef __WIN32__
-			static Void WINAPI	 TimerProc(HWND, unsigned int, unsigned int, unsigned long);
-#endif
-		public:
-			static const Int	 classID;
+		class TimerBackend
+		{
+			protected:
+				Int		 type;
+			public:
+						 TimerBackend();
+				virtual		~TimerBackend();
 
-						 Timer();
-						~Timer();
+				Int		 GetTimerType();
 
-			Int			 Start(Int);
-			Int			 Stop();
+				virtual Int	 Start(Int);
+				virtual Int	 Stop();
 
-			Int			 GetID();
-		signals:
-			Signal0<Void>		 onInterval;
+				virtual Int	 GetID();
+		};
 	};
 };
 

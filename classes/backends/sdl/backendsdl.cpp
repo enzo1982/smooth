@@ -8,25 +8,26 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/system.h>
-#include <smooth/version.h>
+#include <smooth/backends/sdl/backendsdl.h>
 
-S::Int S::System::nextGUID	= 0;
+#include <SDL/SDL.h>
 
-S::System::System()
+S::Backends::Backend *CreateBackendSDL()
 {
+	return new S::Backends::BackendSDL();
 }
 
-S::System::System(const System &)
+S::Int	 backendSDLTmp = S::Backends::Backend::AddBackend(&CreateBackendSDL);
+
+S::Int S::Backends::BackendSDL::Init()
 {
+	if (SDL_Init(SDL_INIT_TIMER) == 0)	return Success;
+	else					return Error;
 }
 
-S::Int S::System::RequestGUID()
+S::Int S::Backends::BackendSDL::Deinit()
 {
-	return nextGUID++;
-}
+	SDL_Quit();
 
-S::String S::System::GetVersionString()
-{
-	return SMOOTH_VERSION;
+	return Success;
 }

@@ -11,7 +11,7 @@
 #include <smooth/graphics/gdi/windowgdi.h>
 #include <smooth/graphics/window.h>
 #include <smooth/math.h>
-#include <smooth/system.h>
+#include <smooth/system/system.h>
 #include <smooth/loop.h>
 
 S::Array<S::GUI::WindowGDI *>	 S::GUI::WindowGDI::windowBackends;
@@ -99,7 +99,7 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 	hwnd		= NIL;
 	wndclass	= NIL;
 
-	className	= String::FromInt(System::RequestGUID());
+	className	= String::FromInt(System::System::RequestGUID());
 
 	id		= windowBackends.AddEntry(this);
 
@@ -142,14 +142,6 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::GetWindowBackend(HWND hwnd)
 
 S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lParam)
 {
-	RECT	 windowRect;
-	Int	 windowStyle;
-
-	GetWindowRect(hwnd, &windowRect);
-
-	if (Setup::enableUnicode)	windowStyle = GetWindowLongW(hwnd, GWL_STYLE);
-	else				windowStyle = GetWindowLongA(hwnd, GWL_STYLE);
-
 	switch (message)
 	{
 		case WM_SETTINGCHANGE:
@@ -165,18 +157,28 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 			return 0;
 		case WM_GETMINMAXINFO:
-			if (windowStyle & WS_DLGFRAME)
 			{
-				((LPMINMAXINFO) lParam)->ptMaxSize = Point(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
-				((LPMINMAXINFO) lParam)->ptMaxPosition = Point(windowRect.left, windowRect.top);
-			}
-			else
-			{
-				((LPMINMAXINFO) lParam)->ptMinTrackSize.x = minSize.cx;
-				((LPMINMAXINFO) lParam)->ptMinTrackSize.y = minSize.cy;
+				RECT	 windowRect;
+				Int	 windowStyle;
 
-				if (maxSize.cx > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.x = maxSize.cx;
-				if (maxSize.cy > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.y = maxSize.cy;
+				GetWindowRect(hwnd, &windowRect);
+
+				if (Setup::enableUnicode)	windowStyle = GetWindowLongW(hwnd, GWL_STYLE);
+				else				windowStyle = GetWindowLongA(hwnd, GWL_STYLE);
+
+				if (windowStyle & WS_DLGFRAME)
+				{
+					((LPMINMAXINFO) lParam)->ptMaxSize = Point(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
+					((LPMINMAXINFO) lParam)->ptMaxPosition = Point(windowRect.left, windowRect.top);
+				}
+				else
+				{
+					((LPMINMAXINFO) lParam)->ptMinTrackSize.x = minSize.cx;
+					((LPMINMAXINFO) lParam)->ptMinTrackSize.y = minSize.cy;
+
+					if (maxSize.cx > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.x = maxSize.cx;
+					if (maxSize.cy > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.y = maxSize.cy;
+				}
 			}
 
 			return 0;
@@ -296,6 +298,33 @@ S::Int S::GUI::WindowGDI::SetTitle(String nTitle)
 {
 	if (Setup::enableUnicode)	SetWindowTextW(hwnd, nTitle);
 	else				SetWindowTextA(hwnd, nTitle);
+
+	return Success;
+}
+
+S::Int S::GUI::WindowGDI::SetIcon(Bitmap &newIcon)
+{
+	DestroyIcon(sysIcon);
+
+	ICONINFO	 icon;
+	Bitmap		 mask = newIcon;
+
+	for (Int y = 0; y < mask.GetSize().cy; y++)
+	{
+		for (Int x = 0; x < mask.GetSize().cx; x++)
+		{
+			if (mask.GetPixel(x, y) == (unsigned) Setup::BackgroundColor)	mask.SetPixel(x, y, 16777215);
+			else								mask.SetPixel(x, y, 0);
+		}
+	}
+
+	icon.fIcon	= true;
+	icon.xHotspot	= 0;
+	icon.yHotspot	= 0;
+	icon.hbmMask	= (HBITMAP) mask.GetSystemBitmap();
+	icon.hbmColor	= (HBITMAP) newIcon.GetSystemBitmap();
+
+	sysIcon = CreateIconIndirect(&icon);
 
 	return Success;
 }

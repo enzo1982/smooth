@@ -16,7 +16,7 @@
 #include <smooth/i18n.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
-#include <smooth/timer.h>
+#include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Tooltip::classID = S::Object::RequestClassID();
@@ -92,7 +92,7 @@ S::Int S::GUI::Tooltip::Show()
 
 	if (timeOut != 0)
 	{
-		timer = new Timer();
+		timer = new System::Timer();
 
 		timer->onInterval.Connect(&Tooltip::TimerProc, this);
 		timer->Start(timeOut);

@@ -27,6 +27,7 @@ namespace smooth
 		class Titlebar;
 		class Divider;
 		class Layer;
+		class Image;
 	};
 };
 
@@ -47,6 +48,7 @@ namespace smooth
 					Button		*btn_ok;
 					Button		*btn_next;
 					CheckBox	*check_showtips;
+					Image		*img_light;
 					Text		*txt_didyouknow;
 					Text		*txt_tip;
 					Layer		*layer_inner;

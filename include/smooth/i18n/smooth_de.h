@@ -25,7 +25,7 @@ namespace smooth
 			Append("    <property name=\"righttoleft\">false</property>\n").
 			Append("    <property name=\"encoding\">ISO-8859-15</property>\n").
 			Append("    <property name=\"author\">Robert Kausch &lt;robert.kausch@gmx.net&gt;</property>\n").
-			Append("    <property name=\"url\">http://www.smooth-project.org</property>\n").
+			Append("    <property name=\"url\">http://www.smooth-project.org/</property>\n").
 			Append("  </info>\n").
 			Append("  <data>\n").
 			Append("    <entry id=\"1\" string=\"OK\">OK</entry>\n").

@@ -11,8 +11,11 @@
 #ifndef _H_OBJSMOOTH_RESOURCES_
 #define _H_OBJSMOOTH_RESOURCES_
 
-#define IDR_VERSION	1
-#define IDB_ICON	2
-#define IDI_ICON	3
+#define IDR_VERSION	100
+
+#define IDI_ICON	200
+
+#define IDB_ICON	500
+#define IDB_LIGHT	501
 
 #endif

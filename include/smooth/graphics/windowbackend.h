@@ -53,6 +53,7 @@ namespace smooth
 				virtual Int			 Close();
 
 				virtual Int			 SetTitle(String);
+				virtual Int			 SetIcon(Bitmap &);
 
 				virtual Int			 SetMinimumSize(Size);
 				virtual Int			 SetMaximumSize(Size);

@@ -11,14 +11,14 @@
 #include <smooth/background.h>
 #include <smooth/objectmanager.h>
 #include <smooth/graphics/window.h>
-#include <smooth/timer.h>
+#include <smooth/system/timer.h>
 #include <smooth/threads/thread.h>
 
 S::BackgroundApplication	*S::backgroundApplication = NIL;
 
 S::BackgroundApplication::BackgroundApplication()
 {
-	backgroundTimer = new Timer();
+	backgroundTimer = new System::Timer();
 
 	backgroundTimer->onInterval.Connect(&BackgroundApplication::TimerProc, this);
 	backgroundTimer->Start(50);

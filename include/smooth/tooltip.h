@@ -19,7 +19,10 @@ namespace smooth
 		class ToolWindow;
 	};
 
-	class Timer;
+	namespace System
+	{
+		class Timer;
+	};
 };
 
 #include "widget.h"
@@ -32,7 +35,7 @@ namespace smooth
 		{
 			private:
 				ToolWindow		*toolWindow;
-				Timer			*timer;
+				System::Timer		*timer;
 
 				Void			 TimerProc();
 			protected:

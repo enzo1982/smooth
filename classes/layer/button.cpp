@@ -20,7 +20,7 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/window.h>
 #include <smooth/layer.h>
-#include <smooth/timer.h>
+#include <smooth/system/timer.h>
 
 const S::Int	 S::GUI::Button::classID = S::Object::RequestClassID();
 
@@ -65,24 +65,24 @@ S::GUI::Button::~Button()
 
 	if (tipTimer != NIL)
 	{
-		if (tooltip != NIL)
-		{
-			wnd = tooltip->GetContainer()->GetContainerWindow();
-
-			tooltip->Hide();
-
-			wnd->UnregisterObject(tooltip);
-
-			DeleteObject(tooltip);
-
-			tooltip = NIL;
-		}
-
 		tipTimer->Stop();
 
 		DeleteObject(tipTimer);
 
 		tipTimer = NIL;
+	}
+
+	if (tooltip != NIL)
+	{
+		wnd = tooltip->GetContainer()->GetContainerWindow();
+
+		tooltip->Hide();
+
+		wnd->UnregisterObject(tooltip);
+
+		DeleteObject(tooltip);
+
+		tooltip = NIL;
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
@@ -276,22 +276,22 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 				if (tipTimer != NIL)
 				{
-					if (tooltip != NIL)
-					{
-						tooltip->Hide();
-
-						wnd->UnregisterObject(tooltip);
-
-						DeleteObject(tooltip);
-
-						tooltip = NIL;
-					}
-
 					tipTimer->Stop();
 
 					DeleteObject(tipTimer);
 
 					tipTimer = NIL;
+				}
+
+				if (tooltip != NIL)
+				{
+					tooltip->Hide();
+
+					wnd->UnregisterObject(tooltip);
+
+					DeleteObject(tooltip);
+
+					tooltip = NIL;
 				}
 			}
 
@@ -320,7 +320,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 				if (objectProperties->tooltip != NIL)
 				{
-					tipTimer = new Timer();
+					tipTimer = new System::Timer();
 
 					tipTimer->onInterval.Connect(&Button::ActivateTooltip, this);
 					tipTimer->Start(500);
@@ -335,22 +335,22 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 
 				if (tipTimer != NIL)
 				{
-					if (tooltip != NIL)
-					{
-						tooltip->Hide();
-
-						wnd->UnregisterObject(tooltip);
-
-						DeleteObject(tooltip);
-
-						tooltip = NIL;
-					}
-
 					tipTimer->Stop();
 
 					DeleteObject(tipTimer);
 
 					tipTimer = NIL;
+				}
+
+				if (tooltip != NIL)
+				{
+					tooltip->Hide();
+
+					wnd->UnregisterObject(tooltip);
+
+					DeleteObject(tooltip);
+
+					tooltip = NIL;
 				}
 			}
 			else if (objectProperties->checked && wnd->IsMouseOn(frame))
@@ -373,6 +373,12 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 S::Void S::GUI::Button::ActivateTooltip()
 {
 	if (tooltip != NIL) return;
+
+	tipTimer->Stop();
+
+	DeleteObject(tipTimer);
+
+	tipTimer = NIL;
 
 	Window	*wnd = myContainer->GetContainerWindow();
 	Point	 pos;

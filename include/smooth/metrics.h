@@ -11,7 +11,7 @@
 #ifndef _H_OBJSMOOTH_METRICS_
 #define _H_OBJSMOOTH_METRICS_
 
-#include "system.h"
+#include "definitions.h"
 
 namespace smooth
 {

@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 IOLib.lib libbz2.lib lisa.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Build"
+# ADD LINK32 SDL.lib IOLib.lib libbz2.lib lisa.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Build"
 # SUBTRACT LINK32 /verbose /pdb:none /incremental:no /map
 
 !ENDIF 
@@ -136,10 +136,6 @@ SOURCE=..\classes\basic\objecttype.cpp
 # Begin Source File
 
 SOURCE=..\classes\basic\setup.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\basic\system.cpp
 # End Source File
 # Begin Source File
 
@@ -308,10 +304,6 @@ SOURCE=..\classes\misc\math.cpp
 # Begin Source File
 
 SOURCE=..\classes\misc\string.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\timer.cpp
 # End Source File
 # End Group
 # Begin Group "primitives"
@@ -571,6 +563,80 @@ SOURCE=..\classes\dialogs\splashscreen.cpp
 # Begin Source File
 
 SOURCE=..\classes\dialogs\tipodaydlg.cpp
+# End Source File
+# End Group
+# Begin Group "backends"
+
+# PROP Default_Filter ""
+# Begin Group "backendssdl"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\backends\sdl\backendsdl.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "backendswin32"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\backends\win32\backendwin32.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\classes\backends\backend.cpp
+# End Source File
+# End Group
+# Begin Group "system"
+
+# PROP Default_Filter ""
+# Begin Group "sdl"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\system\sdl\timersdl.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "systemwin32"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\system\win32\timerwin32.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\classes\system\system.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\system\timer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\system\timerbackend.cpp
 # End Source File
 # End Group
 # End Group
@@ -971,6 +1037,80 @@ SOURCE=..\include\smooth\threads\thread.h
 SOURCE=..\include\smooth\threads\threadbackend.h
 # End Source File
 # End Group
+# Begin Group "backendsheaders"
+
+# PROP Default_Filter ""
+# Begin Group "backendssdlheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\backends\sdl\backendsdl.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "backendswin32headers"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\backends\win32\backendwin32.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\backends\backend.h
+# End Source File
+# End Group
+# Begin Group "systemheaders"
+
+# PROP Default_Filter ""
+# Begin Group "sdlheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\system\sdl\timersdl.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "systemwin32headers"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\system\win32\timerwin32.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\system\system.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\system\timer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\system\timerbackend.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\activearea.h
@@ -1205,19 +1345,11 @@ SOURCE=..\include\smooth\string.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\system.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\tabwidget.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\include\smooth\text.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\timer.h
 # End Source File
 # Begin Source File
 
@@ -1266,35 +1398,6 @@ SOURCE=..\include\smooth.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
-SOURCE=..\resources\resources\binary\icon.ico
-# End Source File
-# Begin Source File
-
-SOURCE=..\resources\icon.rc
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-# ADD BASE RSC /l 0x407 /i "\devel\projects\private\smooth\resources" /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
-# ADD RSC /l 0x407 /i "\devel\projects\private\smooth\resources" /i "\devel\projects\mpsd\smooth\resources" /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth" /i "I:\devel\projects\mpsd\src\smooth\resources" /d "__WIN32__" /d "__SMOOTH_DLL__"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\resources\iconbmp.rc
-# PROP Exclude_From_Build 1
-# End Source File
-# Begin Source File
-
-SOURCE=..\resources\linkhand.rc
-# PROP Exclude_From_Build 1
-# End Source File
-# Begin Source File
-
 SOURCE=..\resources\resources.rc
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
@@ -1308,11 +1411,6 @@ SOURCE=..\resources\resources.rc
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=..\resources\version.rc
-# PROP Exclude_From_Build 1
 # End Source File
 # End Group
 # End Target

@@ -27,9 +27,6 @@ namespace smooth
 			wchar_t			*wString;
 			Int			 stringSize;
 
-			static char		*origInputFormat;
-			static char		*origOutputFormat;
-
 			static char		*inputFormat;
 			static char		*outputFormat;
 
@@ -53,6 +50,9 @@ namespace smooth
 			static Void		 RelieveTemporaryBuffers();
 
 			Void			 Clean();
+
+			static Bool		 IsANSI(String &);
+			static Bool		 IsUnicode(String &);
 
 			static char		*SetInputFormat(const char *);
 			static char		*SetOutputFormat(const char *);

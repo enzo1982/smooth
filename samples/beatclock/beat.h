@@ -15,6 +15,7 @@
 
 using namespace smooth;
 using namespace smooth::GUI;
+using namespace smooth::System;
 
 class BeatClock : public Application
 {

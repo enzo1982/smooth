@@ -18,7 +18,10 @@ namespace smooth
 		class EditBox;
 	};
 
-	class Timer;
+	namespace System
+	{
+		class Timer;
+	};
 };
 
 #include "widget.h"
@@ -36,7 +39,7 @@ namespace smooth
 		class SMOOTHAPI EditBox : public Widget
 		{
 			private:
-				Timer			*timer;
+				System::Timer		*timer;
 
 				Void			 TimerProc();
 			protected:

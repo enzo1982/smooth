@@ -19,11 +19,8 @@ namespace smooth
 	Int	 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
-char	*S::String::origInputFormat	= "ISO-8859-1";
-char	*S::String::origOutputFormat	= "ISO-8859-1";
-
-char	*S::String::inputFormat		= origInputFormat;
-char	*S::String::outputFormat	= origOutputFormat;
+char	*S::String::inputFormat		= NIL;
+char	*S::String::outputFormat	= NIL;
 
 S::Array<char *>	 S::String::allocatedBuffers;
 
@@ -55,6 +52,8 @@ S::String::String(const char *iString)
 	else
 	{
 		wString = NIL;
+
+		if (inputFormat == NIL) SetInputFormat("ISO-8859-1");
 
 		ImportFrom(inputFormat, iString);
 	}
@@ -169,28 +168,47 @@ S::Int S::String::ComputeCRC32()
 	return ulCRC ^ 0xffffffff;
 }
 
+S::Bool S::String::IsANSI(String &string)
+{
+	return !IsUnicode(string);
+}
+
+S::Bool S::String::IsUnicode(String &string)
+{
+	for (Int i = 0; i < string.Length(); i++)
+	{
+		if (string[i] > 255) return True;
+	}
+
+	return False;
+}
+
 char *S::String::SetInputFormat(const char *iFormat)
 {
+	if (iFormat == NIL) return SetInputFormat("ISO-8859-1");
+
 	char	*previousInputFormat = inputFormat;
 
 	inputFormat = new char [strlen(iFormat) + 1];
 
 	strcpy(inputFormat, iFormat);
 
-	if (previousInputFormat != origInputFormat) allocatedBuffers.AddEntry(previousInputFormat);
+	if (previousInputFormat != NIL) allocatedBuffers.AddEntry(previousInputFormat);
 
 	return previousInputFormat;
 }
 
 char *S::String::SetOutputFormat(const char *oFormat)
 {
+	if (oFormat == NIL) return SetOutputFormat("ISO-8859-1");
+
 	char	*previousOutputFormat = outputFormat;
 
 	outputFormat = new char [strlen(oFormat) + 1];
 
 	strcpy(outputFormat, oFormat);
 
-	if (previousOutputFormat != origOutputFormat) allocatedBuffers.AddEntry(previousOutputFormat);
+	if (previousOutputFormat != NIL) allocatedBuffers.AddEntry(previousOutputFormat);
 
 	return previousOutputFormat;
 }
@@ -198,13 +216,6 @@ char *S::String::SetOutputFormat(const char *oFormat)
 S::Int S::String::ImportFrom(const char *format, const char *str)
 {
 	Clean();
-
-	if (format == NIL)
-	{
-		SetInputFormat("ISO-8859-1");
-
-		format = inputFormat;
-	}
 
 	stringSize = ConvertString(str, strlen(str), format, NIL, 0, "UTF-16LE");
 
@@ -229,14 +240,28 @@ char *S::String::ConvertTo(const char *encoding)
 {
 	if (stringSize == 0) return NIL;
 
-	Int	 bufferSize = ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, encoding) + 1;
+	Int	 bufferSize = ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, encoding);
 
-	if (bufferSize == 0)	bufferSize = ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, "ISO-8859-1") + 1;
-	if (bufferSize == 1)	return "";
+	if (bufferSize == -1)	bufferSize = ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, "ISO-8859-1");
 
-	char	*buffer = new char [bufferSize];
+	char	*buffer = NIL;
 
-	ConvertString((char *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize, encoding);
+	if (bufferSize <= 0)
+	{
+		buffer = new char [Length() + 1];
+
+		ConvertString((char *) wString, stringSize * 2, "UTF-16LE", buffer, Length() + 1, encoding);
+
+		for (Int i = -bufferSize; i < Length(); i++) buffer[i] = '?';
+
+		buffer[Length()] = 0;
+	}
+	else
+	{
+		buffer = new char [bufferSize + 1];
+
+		ConvertString((char *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize + 1, encoding);
+	}
 
 	allocatedBuffers.AddEntry(buffer);
 
@@ -304,6 +329,8 @@ wchar_t &S::String::operator [](Int n)
 
 S::String::operator char *()
 {
+	if (outputFormat == NIL) SetOutputFormat("ISO-8859-1");
+
 	return ConvertTo(outputFormat);
 }
 
@@ -327,6 +354,8 @@ S::String &S::String::operator =(const char *newString)
 	}
 	else
 	{
+		if (inputFormat == NIL) SetInputFormat("ISO-8859-1");
+
 		ImportFrom(inputFormat, newString);
 	}
 
@@ -984,6 +1013,9 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 					if ((signed) iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize) < 0)
 					{
+						out->OutputData((void *) outBuf, outPtr - outBuf);
+						size += (outPtr - outBuf);
+
 						convError = True;
 
 						break;
@@ -1014,7 +1046,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		iconv_close(cd);
 
 		if (size >= outBytes) size = 0;
-		if (convError) size = -1;
+		if (convError) size = -size;
 
 		delete in;
 		delete out;

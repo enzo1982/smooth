@@ -13,7 +13,10 @@
 
 namespace smooth
 {
-	class Timer;
+	namespace System
+	{
+		class Timer;
+	};
 
 	namespace GUI
 	{
@@ -42,8 +45,9 @@ namespace smooth
 
 					Int		 time;
 					Bitmap		 bitmap;
+
 					Window		*splashscreen;
-					Timer		*timer;
+					System::Timer	*timer;
 				slots:
 					Void		 SplashPaintProc();
 					Bool		 SplashKillProc();

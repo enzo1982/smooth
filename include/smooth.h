@@ -56,7 +56,6 @@
 #include "smooth/mdiclient.h"
 #include "smooth/mdiwindow.h"
 #include "smooth/toolwindow.h"
-#include "smooth/timer.h"
 #include "smooth/string.h"
 #include "smooth/tooltip.h"
 #include "smooth/drag.h"
@@ -64,7 +63,6 @@
 #include "smooth/binary.h"
 #include "smooth/math.h"
 #include "smooth/widget.h"
-#include "smooth/system.h"
 #include "smooth/setup.h"
 #include "smooth/input.h"
 #include "smooth/droparea.h"
@@ -81,6 +79,9 @@
 #include "smooth/primitives/size.h"
 #include "smooth/primitives/rect.h"
 #include "smooth/primitives/line.h"
+
+#include "smooth/system/system.h"
+#include "smooth/system/timer.h"
 
 #include "smooth/threads/mutex.h"
 #include "smooth/threads/semaphore.h"

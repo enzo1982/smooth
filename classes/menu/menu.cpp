@@ -12,7 +12,6 @@
 #include <smooth/definitions.h>
 #include <smooth/array.h>
 #include <smooth/color.h>
-#include <smooth/system.h>
 #include <smooth/metrics.h>
 #include <smooth/i18n.h>
 #include <smooth/objectproperties.h>

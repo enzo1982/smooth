@@ -13,7 +13,7 @@
 
 #include "loop.h"
 #include "version.h"
-#include "system.h"
+#include "system/system.h"
 #include "application.h"
 #include "dialogs/messagebox.h"
 
@@ -32,7 +32,7 @@ extern "C"
 
 				Init();
 
-				if (System::GetVersionString() != (String) SMOOTH_VERSION)
+				if (System::System::GetVersionString() != (String) SMOOTH_VERSION)
 				{
 					GUI::Dialogs::QuickMessage("This DLL might not be compatible with the\nSMOOTH library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
 				}

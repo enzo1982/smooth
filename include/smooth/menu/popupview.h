@@ -19,10 +19,14 @@ namespace smooth
 		class PopupMenu;
 		class Menu;
 	};
+
+	namespace System
+	{
+		class Timer;
+	};
 };
 
 #include "../widget.h"
-#include "../timer.h"
 
 namespace smooth
 {
@@ -33,8 +37,8 @@ namespace smooth
 			private:
 				String			 backupStatusText;
 
-				Timer			*openTimer;
-				Timer			*closeTimer;
+				System::Timer		*openTimer;
+				System::Timer		*closeTimer;
 
 				Void			 OpenProc();
 				Void			 CloseProc();

@@ -30,32 +30,32 @@ namespace smooth
 		class SurfaceGDI : public SurfaceBackend
 		{
 			protected:
-				HDC	 gdi_dc;
-				HDC	 bmp_dc;
-				HDC	 real_dc;
+				HDC		 gdi_dc;
+				HDC		 bmp_dc;
+				HDC		 real_dc;
 
-				HBITMAP	 cDc_bitmap;
+				HBITMAP		 cDc_bitmap;
 			public:
-					 SurfaceGDI(Void * = NIL);
-					~SurfaceGDI();
+						 SurfaceGDI(Void * = NIL);
+						~SurfaceGDI();
 
-				Int	 PaintRect(Rect);
+				Int		 PaintRect(Rect);
 
-				Int	 StartPaint(Rect);
-				Int	 EndPaint();
+				Int		 StartPaint(Rect);
+				Int		 EndPaint();
 
-				Void	*GetSystemSurface();
+				Void		*GetSystemSurface();
 
-				Int	 SetPixel(Int, Int, Int);
-				Int	 GetPixel(Int, Int);
+				Int		 SetPixel(Int, Int, Int);
+				Int		 GetPixel(Int, Int);
 
-				Int	 Line(Point, Point, Int);
-				Int	 Box(Rect, Int, Int);
+				Int		 Line(Point, Point, Int);
+				Int		 Box(Rect, Int, Int);
 
-				Int	 SetText(String, Rect, Font, Bool);
+				Int		 SetText(String, Rect, Font, Bool);
 
-				Int	 BlitFromBitmap(const Bitmap &, Rect, Rect);
-				Int	 BlitToBitmap(Rect, const Bitmap &, Rect);
+				Int		 BlitFromBitmap(const Bitmap &, Rect, Rect);
+				Int		 BlitToBitmap(Rect, const Bitmap &, Rect);
 		};
 	};
 };

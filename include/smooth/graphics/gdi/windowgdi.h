@@ -66,6 +66,7 @@ namespace smooth
 				Int				 Close();
 
 				Int				 SetTitle(String);
+				Int				 SetIcon(Bitmap &);
 
 				Int				 SetMinimumSize(Size);
 				Int				 SetMaximumSize(Size);

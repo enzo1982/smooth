@@ -20,6 +20,11 @@ namespace smooth
 		class PopupMenu;
 		class Layer;
 	};
+
+	namespace System
+	{
+		class Timer;
+	};
 };
 
 #include "../widget.h"
@@ -27,7 +32,6 @@ namespace smooth
 #include "../primitives/rect.h"
 #include "../loop.h"
 #include "../menu/menu.h"
-#include "../timer.h"
 #include "bitmap.h"
 
 namespace smooth
@@ -68,7 +72,7 @@ namespace smooth
 				PopupMenu			*trackMenu;
 
 				Layer				*mainLayer;
-				Timer				*paintTimer;
+				System::Timer			*paintTimer;
 
 				Bool				 Create();
 

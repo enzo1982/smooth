@@ -18,6 +18,7 @@
 #include <smooth/menu/popupmenu.h>
 #include <smooth/toolwindow.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/system/timer.h>
 
 const S::Int	 S::GUI::PopupView::classID = S::Object::RequestClassID();
 
@@ -554,7 +555,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 								if (closeTimer == NIL)
 								{
-									closeTimer = new Timer();
+									closeTimer = new System::Timer();
 									closeTimer->onInterval.Connect(&PopupView::CloseProc, this);
 									closeTimer->Start(100);
 								}
@@ -782,7 +783,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 							if (openTimer != NIL) DeleteObject(openTimer);
 
-							openTimer = new Timer();
+							openTimer = new System::Timer();
 							openTimer->onInterval.Connect(&PopupView::OpenProc, this);
 							openTimer->Start(150);
 						}

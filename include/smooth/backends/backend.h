@@ -8,30 +8,37 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_SYSTEM_
-#define _H_SYSTEM_
+#ifndef _H_OBJSMOOTH_BACKEND_
+#define _H_OBJSMOOTH_BACKEND_
 
 namespace smooth
 {
-	class System;
+	namespace Backends
+	{
+		class Backend;
+	};
 };
 
-#include "definitions.h"
-#include "string.h"
+#include "../definitions.h"
 
 namespace smooth
 {
-	class SMOOTHAPI System
+	namespace Backends
 	{
-		private:
-			static Int	 nextGUID;
+		class Backend
+		{
+			private:
+				static Array<Backend *>		*backends;
+				static Array<Backend *(*)()>	*backend_creators;
+			public:
+				static Int			 AddBackend(Backend *(*)());
 
-					 System();
-					 System(const System &);
-		public:
-			static Int	 RequestGUID();
+				static Int			 InitBackends();
+				static Int			 DeinitBackends();
 
-			static String	 GetVersionString();
+				virtual Int			 Init();
+				virtual Int			 Deinit();
+		};
 	};
 };
 

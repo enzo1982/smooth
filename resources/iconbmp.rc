@@ -1,4 +1,0 @@
-#include <windows.h>
-#include "../include/smooth/resources.h"
-
-IDB_ICON BITMAP MOVEABLE PURE LOADONCALL DISCARDABLE "resources/binary/icon.bmp"

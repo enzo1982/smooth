@@ -8,35 +8,32 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/timer.h>
+#include <smooth/system/timer.h>
+#include <smooth/system/win32/timerwin32.h>
 #include <smooth/objectmanager.h>
 
-const S::Int	 S::Timer::classID = S::Object::RequestClassID();
-
-S::Timer::Timer()
+S::System::TimerWin32::TimerWin32()
 {
-	type = classID;
+	type = TIMER_WIN32;
 
 	timerid = -1;
-
-	onInterval.SetParentObject(this);
 }
 
-S::Timer::~Timer()
+S::System::TimerWin32::~TimerWin32()
 {
 	Stop();
 }
 
-S::Int S::Timer::Start(Int interval)
+S::Int S::System::TimerWin32::Start(Int interval)
 {
 	if (timerid != -1) return Error;
 
 	timerid = SetTimer(NIL, 0, interval, &TimerProc);
 
-	return timerid;
+	return Success;
 }
 
-S::Int S::Timer::Stop()
+S::Int S::System::TimerWin32::Stop()
 {
 	if (timerid == -1) return Error;
 
@@ -47,14 +44,14 @@ S::Int S::Timer::Stop()
 	return Success;
 }
 
-S::Int S::Timer::GetID()
+S::Int S::System::TimerWin32::GetID()
 {
 	if (timerid == -1) return Error;
 
 	return timerid;
 }
 
-S::Void WINAPI S::Timer::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
+S::Void WINAPI S::System::TimerWin32::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
 {
 	for (S::Int i = 0; i < S::mainObjectManager->GetNOfObjects(); i++)
 	{
@@ -62,13 +59,11 @@ S::Void WINAPI S::Timer::TimerProc(HWND wnd, unsigned int message, unsigned int 
 
 		if (object != NIL)
 		{
-			if (object->GetObjectType() == S::Timer::classID)
+			if (object->GetObjectType() == Timer::classID)
 			{
-				if (((S::Timer *) object)->GetID() == (signed int) timerid)
+				if (((Timer *) object)->GetID() == (Int) timerid)
 				{
-					((S::Timer *) object)->EnterProtectedRegion();
-					((S::Timer *) object)->onInterval.Emit();
-					((S::Timer *) object)->LeaveProtectedRegion();
+					((Timer *) object)->onInterval.Emit();
 
 					return;
 				}

@@ -13,6 +13,7 @@
 #include <smooth/dllmain.h>
 #include <smooth/resources.h>
 #include <smooth/threads/thread.h>
+#include <smooth/backends/backend.h>
 
 #ifdef __WIN32__
 #include <smooth/i18n.h>
@@ -27,6 +28,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #endif
+
+using namespace smooth::Backends;
 
 #ifdef __WIN32__
 __declspec (dllexport) HINSTANCE	 S::hInstance		= NIL;
@@ -54,12 +57,9 @@ S::Void S::Init()
 	if (LoadIconvDLL() == True)	Setup::useIconv = True;
 	else				Setup::useIconv = False;
 
+	Backend::InitBackends();
+
 #ifdef __WIN32__
-	WORD		 wVersionRequested = MAKEWORD(1,1);
-	WSADATA		 wsaData;
-
-	WSAStartup(wVersionRequested, &wsaData);
-
 	if (hDllInstance == NIL) hDllInstance = hInstance;
 
 	// decide if we want to use unicode:
@@ -130,9 +130,7 @@ S::Void S::Free()
 
 	if (Setup::useIconv) FreeIconvDLL();
 
-#ifdef __WIN32__
-	WSACleanup();
-#endif
+	Backend::DeinitBackends();
 
 	LiSADeinit();
 }
@@ -218,12 +216,6 @@ S::Int S::Loop()
 
 			if (result)
 			{
-				if (GUI::Window::nOfActiveWindows == 0)
-				{
-					msg.message = WM_QUIT;
-					break;
-				}
-
 				TranslateMessage(&msg);
 
 				if (Setup::enableUnicode)	DispatchMessageW(&msg);
@@ -236,6 +228,12 @@ S::Int S::Loop()
 			if (++count == 1000) { count = 0; String::RelieveTemporaryBuffers(); }
 
 			if (peekLoop == 0) break;
+
+			if (GUI::Window::nOfActiveWindows == 0)
+			{
+				msg.message = WM_QUIT;
+				break;
+			}
 		}
 		while (msg.message != WM_QUIT);
 #endif
@@ -252,12 +250,6 @@ S::Int S::Loop()
 
 			if (!result) break;
 
-			if (GUI::Window::nOfActiveWindows == 0)
-			{
-				msg.message = WM_QUIT;
-				break;
-			}
-
 			TranslateMessage(&msg);
 
 			if (Setup::enableUnicode)	DispatchMessageW(&msg);
@@ -266,6 +258,12 @@ S::Int S::Loop()
 			if (++count == 1000) { count = 0; String::RelieveTemporaryBuffers(); }
 
 			if (peekLoop > 0) break;
+
+			if (GUI::Window::nOfActiveWindows == 0)
+			{
+				msg.message = WM_QUIT;
+				break;
+			}
 		}
 #endif
 	}

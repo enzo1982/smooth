@@ -1,43 +1,8 @@
-# Makefile for smooth v0.8
+# Makefile for smooth v0.8, QNX RTOS
 
-INCLUDEDIR = ./include
-SMOOTHINCLUDEDIR = $(INCLUDEDIR)/smooth
-OBJECTDIR = ./objects
-BINDIR = ./bin
-LIBDIR = ./lib
-OTHERLIBSDIR = ./libraries
-IOLIBDIR = $(OTHERLIBSDIR)/iolib
-LIBBZ2DIR = $(OTHERLIBSDIR)/bzlib
-LIBXMLDIR = $(OTHERLIBSDIR)/libxml
-LIBICONVDIR = $(OTHERLIBSDIR)/libiconv
-LISADIR = $(OTHERLIBSDIR)/lisa
-MISCDIR = ./misc
-DIALOGSDIR = ./dialogs
-CLASSESDIR = ./classes
-WINDOWCLASSESDIR = $(CLASSESDIR)/window
-TREECLASSESDIR = $(CLASSESDIR)/tree
-MENUCLASSESDIR = $(CLASSESDIR)/menu
-LISTCLASSESDIR = $(CLASSESDIR)/list
-LAYERCLASSESDIR = $(CLASSESDIR)/layer
-BASICCLASSESDIR = $(CLASSESDIR)/basic
-MDICLASSESDIR = $(CLASSESDIR)/mdi
-MISCCLASSESDIR = $(CLASSESDIR)/misc
-INTERNALCLASSESDIR = $(CLASSESDIR)/internal
-THREADSCLASSESDIR = $(CLASSESDIR)/threads
-XMLCLASSESDIR = $(CLASSESDIR)/xml
-PRIMITIVESCLASSESDIR = $(CLASSESDIR)/primitives
-GRAPHICSCLASSESDIR = $(CLASSESDIR)/graphics
-SAMPLESDIR = ./samples
-SAMPLE1DIR = $(SAMPLESDIR)/beatclock
-SAMPLE2DIR = $(SAMPLESDIR)/test
-SAMPLE3DIR = $(SAMPLESDIR)/testkey
-SAMPLE4DIR = $(SAMPLESDIR)/plugin
-SAMPLE5DIR = $(SAMPLESDIR)/mditest
-DESIGNERDIR = ./tools/designer
-RESOURCEDIR = ./resources
-BINRESDIR = $(RESOURCEDIR)/binary
+include Makefile-common
 
-OBJECTS = $(OBJECTDIR)/application.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectmanager.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/system.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/i18n.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadmanager.o $(OBJECTDIR)/tree.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/color.o $(OBJECTDIR)/pciio.o
+OBJECTS = $(OBJECTDIR)/backend.o $(OBJECTDIR)/application.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectmanager.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/system.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/i18n.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadmanager.o $(OBJECTDIR)/tree.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/color.o $(OBJECTDIR)/pciio.o
 
 SAMPLESLIBS = -lsmooth -lbzip2 -lxml2 -lpthread -liconv
 

@@ -15,7 +15,7 @@
 #include <smooth/metrics.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
-#include <smooth/timer.h>
+#include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/window.h>
 
@@ -203,7 +203,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDBLCLK:
 			if (!timerActive && timer == NIL && (arrow1Checked || arrow2Checked))
 			{
-				timer = new Timer();
+				timer = new System::Timer();
 
 				timer->onInterval.Connect(&Arrows::TimerProc, this);
 				timer->Start(250);

@@ -8,6 +8,7 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - windowgdi.cpp	- new class: WindowGDI; implements Window API for Win32 systems
 - bitmap.cpp	- splitted into a frontend and a system dependent backend part
 - surface.cpp	- splitted into a frontend and a system dependent backend part
+		- made thread safe
 - messagebox.cpp- S::SMOOTH::MessageBox is now S::QuickMessage
 		- renamed MessageBoxApp to MessageDlg
 		- MessageDlg can now show a CheckBox with a message
@@ -19,10 +20,14 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - semaphore.cpp	- splitted into frontend and backend parts
 - thread.cpp	- splitted into frontend and backend parts
 		- revised and improved Thread API
-- string.cpp	- removed IsASCII() and IsUTF8() methods
+- timer.cpp	- splitted into frontend and backend parts
+		- wrote SDL backend for Timers
+- string.cpp	- removed IsUTF8() method as this is handled automatically by ConvertString(...)
+		- new method IsUnicode()
 
 - new namespace GUI::Dialogs contains all dialogs plus MessageBox (now MessageDlg) and SplashScreen
 - new namespace Threads contains everything related to multi threading
+- new namespace System contains classes System and Timer
 - removed ThreadManager
 - removed some Windows API calls
 - removed smooth Toolkit (STK, stk.cpp)
@@ -30,5 +35,5 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - removed threads support from LiSA
 - switched to an XML ToDo list system
 - add DTDs for ConfigFile and LangFile XML file types
-- smaller bugfixes and improvements
+- many smaller bugfixes and improvements
 - fixed Makefile.static

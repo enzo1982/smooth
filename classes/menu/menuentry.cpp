@@ -26,15 +26,15 @@ S::GUI::MenuEntry::MenuEntry(String iText, Bitmap iBitmap, Menu *iPopup, Bool *i
 	if (iText != NIL)	type = type | SM_TEXT;
 	if (iBitmap != NIL)	type = type | SM_BITMAP;
 
-	SetText(iText);
-	SetOrientation(iOrientation);
-
-	if (iBitmap != NIL) SetBitmap(iBitmap);
-
 	popup		= iPopup;
 	bVar		= ibVar;
 	iVar		= iiVar;
 	iCode		= iiCode;
+
+	if (iBitmap != NIL) SetBitmap(iBitmap);
+
+	SetText(iText);
+	SetOrientation(iOrientation);
 
 	scKey		= 0;
 	scFlags		= 0;

@@ -1,45 +1,8 @@
-# Makefile for smooth v0.8
+# Makefile for smooth v0.8, static library, Windows, MinGW32
 
-INCLUDEDIR = ./include
-SMOOTHINCLUDEDIR = $(INCLUDEDIR)/smooth
-OBJECTDIR = ./objects
-BINDIR = ./bin
-LIBDIR = ./lib
-OTHERLIBSDIR = ./libraries
-IOLIBDIR = $(OTHERLIBSDIR)/iolib
-LIBBZ2DIR = $(OTHERLIBSDIR)/bzlib
-LIBXMLDIR = $(OTHERLIBSDIR)/libxml
-LIBICONVDIR = $(OTHERLIBSDIR)/libiconv
-LISADIR = $(OTHERLIBSDIR)/lisa
-MISCDIR = ./misc
-CLASSESDIR = ./classes
-WINDOWCLASSESDIR = $(CLASSESDIR)/window
-TREECLASSESDIR = $(CLASSESDIR)/tree
-MENUCLASSESDIR = $(CLASSESDIR)/menu
-LISTCLASSESDIR = $(CLASSESDIR)/list
-LAYERCLASSESDIR = $(CLASSESDIR)/layer
-BASICCLASSESDIR = $(CLASSESDIR)/basic
-MDICLASSESDIR = $(CLASSESDIR)/mdi
-MISCCLASSESDIR = $(CLASSESDIR)/misc
-INTERNALCLASSESDIR = $(CLASSESDIR)/internal
-THREADSCLASSESDIR = $(CLASSESDIR)/threads
-XMLCLASSESDIR = $(CLASSESDIR)/xml
-PRIMITIVESCLASSESDIR = $(CLASSESDIR)/primitives
-GRAPHICSCLASSESDIR = $(CLASSESDIR)/graphics
-DIALOGSCLASSESDIR = $(CLASSESDIR)/dialogs
-SAMPLESDIR = ./samples
-SAMPLE1DIR = $(SAMPLESDIR)/beatclock
-SAMPLE2DIR = $(SAMPLESDIR)/test
-SAMPLE3DIR = $(SAMPLESDIR)/testkey
-SAMPLE4DIR = $(SAMPLESDIR)/plugin
-SAMPLE5DIR = $(SAMPLESDIR)/mditest
-DESIGNERDIR = ./tools/designer
-TRANSLATORDIR = ./tools/translator
-PCIFFMANDIR = ./tools/pciffmanager
-RESOURCEDIR = ./resources
-BINRESDIR = $(RESOURCEDIR)/binary
+include Makefile-common
 
-OBJECTS = $(OBJECTDIR)/application.o $(OBJECTDIR)/background.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/input.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectmanager.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/system.o $(OBJECTDIR)/widget.o $(OBJECTDIR)/colordlg.o $(OBJECTDIR)/dialog.o $(OBJECTDIR)/dirdlg.o $(OBJECTDIR)/filedlg.o $(OBJECTDIR)/fontdlg.o $(OBJECTDIR)/messagebox.o $(OBJECTDIR)/splashscreen.o $(OBJECTDIR)/tipodaydlg.o $(OBJECTDIR)/bitmapgdi.o $(OBJECTDIR)/surfacegdi.o $(OBJECTDIR)/windowgdi.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/bitmapbackend.o $(OBJECTDIR)/font.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/surfacebackend.o $(OBJECTDIR)/window.o $(OBJECTDIR)/windowbackend.o $(OBJECTDIR)/toolwindow.o $(OBJECTDIR)/activearea.o $(OBJECTDIR)/arrows.o $(OBJECTDIR)/button.o $(OBJECTDIR)/checkbox.o $(OBJECTDIR)/droparea.o $(OBJECTDIR)/editbox.o $(OBJECTDIR)/groupbox.o $(OBJECTDIR)/hyperlink.o $(OBJECTDIR)/image.o $(OBJECTDIR)/layer.o $(OBJECTDIR)/optionbox.o $(OBJECTDIR)/progressbar.o $(OBJECTDIR)/scrollbar.o $(OBJECTDIR)/slider.o $(OBJECTDIR)/tabwidget.o $(OBJECTDIR)/text.o $(OBJECTDIR)/combobox.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listbox.o $(OBJECTDIR)/listboxheader.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/mdiclient.o $(OBJECTDIR)/mdiwindow.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menubar.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/popupmenu.o $(OBJECTDIR)/popupview.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/config.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/i18n.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/mutexwin32.o $(OBJECTDIR)/semaphorewin32.o $(OBJECTDIR)/threadwin32.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/mutexbackend.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/semaphorebackend.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadbackend.o $(OBJECTDIR)/tree.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/treeview.o $(OBJECTDIR)/client.o $(OBJECTDIR)/divider.o $(OBJECTDIR)/drag.o $(OBJECTDIR)/shortcut.o $(OBJECTDIR)/statusbar.o $(OBJECTDIR)/titlebar.o $(OBJECTDIR)/tooltip.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/color.o $(OBJECTDIR)/dllmain.o $(OBJECTDIR)/loop.o $(OBJECTDIR)/metrics.o $(OBJECTDIR)/pciio.o
+OBJECTS = $(OBJECTDIR)/backend.o $(OBJECTDIR)/backendwin32.o $(OBJECTDIR)/application.o $(OBJECTDIR)/background.o $(OBJECTDIR)/container.o $(OBJECTDIR)/containertype.o $(OBJECTDIR)/input.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objectmanager.o $(OBJECTDIR)/objectproperties.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/widget.o $(OBJECTDIR)/colordlg.o $(OBJECTDIR)/dialog.o $(OBJECTDIR)/dirdlg.o $(OBJECTDIR)/filedlg.o $(OBJECTDIR)/fontdlg.o $(OBJECTDIR)/messagebox.o $(OBJECTDIR)/splashscreen.o $(OBJECTDIR)/tipodaydlg.o $(OBJECTDIR)/bitmapgdi.o $(OBJECTDIR)/surfacegdi.o $(OBJECTDIR)/windowgdi.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/bitmapbackend.o $(OBJECTDIR)/font.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/surfacebackend.o $(OBJECTDIR)/window.o $(OBJECTDIR)/windowbackend.o $(OBJECTDIR)/toolwindow.o $(OBJECTDIR)/activearea.o $(OBJECTDIR)/arrows.o $(OBJECTDIR)/button.o $(OBJECTDIR)/checkbox.o $(OBJECTDIR)/droparea.o $(OBJECTDIR)/editbox.o $(OBJECTDIR)/groupbox.o $(OBJECTDIR)/hyperlink.o $(OBJECTDIR)/image.o $(OBJECTDIR)/layer.o $(OBJECTDIR)/optionbox.o $(OBJECTDIR)/progressbar.o $(OBJECTDIR)/scrollbar.o $(OBJECTDIR)/slider.o $(OBJECTDIR)/tabwidget.o $(OBJECTDIR)/text.o $(OBJECTDIR)/combobox.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listbox.o $(OBJECTDIR)/listboxheader.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/mdiclient.o $(OBJECTDIR)/mdiwindow.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menubar.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/popupmenu.o $(OBJECTDIR)/popupview.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/config.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/i18n.o $(OBJECTDIR)/math.o $(OBJECTDIR)/string.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/primitive.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/timerwin32.o $(OBJECTDIR)/system.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/timerbackend.o $(OBJECTDIR)/mutexwin32.o $(OBJECTDIR)/semaphorewin32.o $(OBJECTDIR)/threadwin32.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/mutexbackend.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/semaphorebackend.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/threadbackend.o $(OBJECTDIR)/tree.o $(OBJECTDIR)/treeentry.o $(OBJECTDIR)/treeview.o $(OBJECTDIR)/client.o $(OBJECTDIR)/divider.o $(OBJECTDIR)/drag.o $(OBJECTDIR)/shortcut.o $(OBJECTDIR)/statusbar.o $(OBJECTDIR)/titlebar.o $(OBJECTDIR)/tooltip.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/color.o $(OBJECTDIR)/dllmain.o $(OBJECTDIR)/loop.o $(OBJECTDIR)/metrics.o $(OBJECTDIR)/pciio.o
 RESOURCES = $(OBJECTDIR)/resources.o
 
 SAMPLESLIBS = -lsmooth -lunicows -lwsock32 -limm32 -lstdc++

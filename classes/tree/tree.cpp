@@ -14,6 +14,7 @@
 #include <smooth/i18n.h>
 #include <smooth/metrics.h>
 #include <smooth/graphics/font.h>
+#include <smooth/system/system.h>
 
 S::Tree::Tree()
 {
@@ -35,7 +36,7 @@ S::Tree::~Tree()
 
 S::Tree::Entry *S::Tree::AddEntry(String text, Tree *sub)
 {
-	Int	 id	= System::RequestGUID();
+	Int	 id	= System::System::RequestGUID();
 	Int	 type	= ST_ENTRY;
 
 	if (sub != NIL) type = ST_SUB;

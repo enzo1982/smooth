@@ -24,9 +24,12 @@
 #include <smooth/text.h>
 #include <smooth/checkbox.h>
 #include <smooth/layer.h>
+#include <smooth/image.h>
 
 #include <smooth/string.h>
 #include <smooth/i18n.h>
+#include <smooth/resources.h>
+#include <smooth/dllmain.h>
 
 #include <time.h>
 #include <stdlib.h>
@@ -68,11 +71,22 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 	check_showtips->SetOrientation(OR_LOWERLEFT);
 	check_showtips->SetMetrics(check_showtips->GetObjectProperties()->pos, Size(check_showtips->GetObjectProperties()->textSize.cx + 20, check_showtips->GetObjectProperties()->size.cy));
 
-	pos.x = 7;
+	pos.x = 5;
+	pos.y = 3;
+
+	Bitmap	 bmp = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_LIGHT), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
+
+	bmp.ReplaceColor(RGB(192, 192, 192), Setup::BackgroundColor);
+
+	img_light	= new Image(bmp, pos, Size(32, 32));
+
+	pos.x = 40;
 	pos.y = 7;
 
 	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), pos);
 	txt_didyouknow->SetFont(Font("Verdana", 14, 0, FW_BOLD));
+
+	pos.x = 7;
 
 	txt_tip		= new Text("", pos);
 
@@ -94,6 +108,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 	dlgwnd->RegisterObject(btn_next);
 	dlgwnd->RegisterObject(check_showtips);
 
+	dlgwnd->RegisterObject(img_light);
 	dlgwnd->RegisterObject(txt_didyouknow);
 
 	dlgwnd->GetMainLayer()->RegisterObject(layer_inner);
@@ -118,6 +133,7 @@ S::GUI::Dialogs::TipOfTheDay::~TipOfTheDay()
 	DeleteObject(btn_next);
 	DeleteObject(check_showtips);
 
+	DeleteObject(img_light);
 	DeleteObject(txt_didyouknow);
 
 	DeleteObject(layer_inner);

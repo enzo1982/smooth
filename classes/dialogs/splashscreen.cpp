@@ -13,7 +13,7 @@
 #include <smooth/i18n.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/timer.h>
+#include <smooth/system/timer.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
@@ -25,7 +25,7 @@ S::GUI::Dialogs::SplashScreen::SplashScreen(const GUI::Bitmap &logo, Int t)
 {
 	splashscreen = new Window("Splash screen");
 
-	timer = new Timer();
+	timer = new System::Timer();
 
 	time = t;
 

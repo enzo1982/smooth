@@ -18,7 +18,10 @@ namespace smooth
 		class Arrows;
 	};
 
-	class Timer;
+	namespace System
+	{
+		class Timer;
+	};
 };
 
 #include "widget.h"
@@ -30,7 +33,7 @@ namespace smooth
 		class SMOOTHAPI Arrows : public Widget
 		{
 			private:
-				Timer			*timer;
+				System::Timer		*timer;
 				Bool			 timerActive;
 				Int			 timerCount;
 

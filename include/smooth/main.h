@@ -11,7 +11,7 @@
 #ifndef _H_OBJSMOOTH_WINAPPLICATION_
 #define _H_OBJSMOOTH_WINAPPLICATION_
 
-#include "system.h"
+#include "system/system.h"
 #include "loop.h"
 #include "version.h"
 #include "string.h"
@@ -30,7 +30,7 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdL
 
 	Init();
 
-	if (System::GetVersionString() != (String) SMOOTH_VERSION)
+	if (System::System::GetVersionString() != (String) SMOOTH_VERSION)
 	{
 		if (IDNO == GUI::Dialogs::QuickMessage("This program might not be compatible with the SMOOTH library\ninstalled on your system. Continue execution?", "Warning", MB_YESNO, IDI_QUESTION))
 		{
@@ -54,7 +54,7 @@ int main()
 {
 	Init();
 
-	if (System::GetVersionString() != (String) SMOOTH_VERSION)
+	if (System::System::GetVersionString() != (String) SMOOTH_VERSION)
 	{
 		Free();
 

@@ -56,16 +56,18 @@ S::Int S::Threads::ThreadWin32::Stop()
 {
 	if (thread == NIL) return Error;
 
-	TerminateThread(thread, 0);
+	HANDLE	 self = thread;
+
+	thread = NIL;
+
+	TerminateThread(self, 0);
 
 	if (myThread)
 	{
-		CloseHandle(thread);
+		CloseHandle(self);
 
 		myThread = False;
 	}
-
-	thread = NIL;
 
 	return Success;
 }

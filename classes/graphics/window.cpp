@@ -21,11 +21,10 @@
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 #include <smooth/toolwindow.h>
-#include <smooth/timer.h>
+#include <smooth/system/timer.h>
 #include <smooth/color.h>
 #include <smooth/objectproperties.h>
 #include <smooth/menu/menubar.h>
-#include <smooth/system.h>
 #include <smooth/mdiwindow.h>
 #include <smooth/input.h>
 #include <smooth/resources.h>
@@ -150,18 +149,13 @@ S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 
 	if (newIcon != NIL)
 	{
-		if (newIcon.GetSize().cx != 20 || newIcon.GetSize().cy != 20)
-		{
-			return Error;
-		}
-		else
-		{
-			icon = newIcon;
+		icon = newIcon;
 
-			icon.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+		icon.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
 
-			return Success;
-		}
+		backend->SetIcon(icon);
+
+		return Success;
 	}
 	else
 	{
@@ -506,6 +500,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_CLOSE:
 			if (doQuit.Call())
 			{
+				SetFlags((flags | WF_MODAL) ^ WF_MODAL);
+				SetFlags((flags | WF_SYSTEMMODAL) ^ WF_SYSTEMMODAL);
+				SetFlags((flags | WF_TOPMOST) ^ WF_TOPMOST);
+				SetFlags((flags | WF_APPTOPMOST) ^ WF_APPTOPMOST);
+
 				backend->Close();
 			}
 
@@ -907,7 +906,7 @@ S::Int S::GUI::Window::Paint(Int message)
 				timedUpdateRect.bottom	= (Int) Math::Max(timedUpdateRect.bottom, updateRect.bottom);
 			}
 
-			paintTimer = new Timer();
+			paintTimer = new System::Timer();
 			paintTimer->onInterval.Connect(&Window::PaintTimer, this);
 			paintTimer->Start(50);
 		}
@@ -1049,6 +1048,8 @@ S::Int S::GUI::Window::MouseY()
 S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 {
 	Surface	*surface = GetDrawSurface();
+
+	if (surface->GetSystemSurface() == NIL) return False;
 
 	if (!PtVisible((HDC) surface->GetSystemSurface(), Input::MouseX() - objectProperties->pos.x, Input::MouseY() - objectProperties->pos.y)) return False;
 

@@ -18,6 +18,11 @@ namespace smooth
 		class Surface;
 		class SurfaceBackend;
 	};
+
+	namespace Threads
+	{
+		class Mutex;
+	};
 };
 
 #include "../definitions.h"
@@ -34,6 +39,7 @@ namespace smooth
 		{
 			private:
 				SurfaceBackend	*backend;
+				Threads::Mutex	*mutex;
 			public:
 						 Surface(Void * = NIL);
 						~Surface();

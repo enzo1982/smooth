@@ -12,6 +12,7 @@
 #include <smooth/graphics/surfacebackend.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/color.h>
+#include <smooth/threads/mutex.h>
 
 #ifdef __WIN32__
 #include <smooth/graphics/gdi/surfacegdi.h>
@@ -19,16 +20,29 @@
 
 S::GUI::Surface::Surface(Void *iSurface)
 {
+	if (iSurface == NIL)
+	{
+		mutex = NIL;
+
+		backend = new SurfaceBackend(iSurface);
+	}
+	else
+	{
+		mutex = new Threads::Mutex();
+
 #ifdef __WIN32__
-	backend = new SurfaceGDI(iSurface);
+		backend = new SurfaceGDI(iSurface);
 #else
-	backend = new SurfaceBackend(iSurface);
+		backend = new SurfaceBackend(iSurface);
 #endif
+	}
 }
 
 S::GUI::Surface::~Surface()
 {
 	delete backend;
+
+	if (mutex != NIL) Object::DeleteObject(mutex);
 }
 
 S::Int S::GUI::Surface::GetSurfaceType()
@@ -48,17 +62,35 @@ const S::Size S::GUI::Surface::GetSize()
 
 S::Int S::GUI::Surface::PaintRect(Rect pRect)
 {
-	return backend->PaintRect(pRect);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->PaintRect(pRect);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::StartPaint(Rect pRect)
 {
-	return backend->StartPaint(pRect);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->StartPaint(pRect);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::EndPaint()
 {
-	return backend->EndPaint();
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->EndPaint();
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Void *S::GUI::Surface::GetSystemSurface()
@@ -68,50 +100,110 @@ S::Void *S::GUI::Surface::GetSystemSurface()
 
 S::Int S::GUI::Surface::SetPixel(Int x, Int y, Int color)
 {
-	return backend->SetPixel(x, y, color);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->SetPixel(x, y, color);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::GetPixel(Int x, Int y)
 {
-	return backend->GetPixel(x, y);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->GetPixel(x, y);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::Line(Point pos1, Point pos2, Int color)
 {
-	return backend->Line(pos1, pos2, color);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->Line(pos1, pos2, color);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::Frame(Rect rect, Int style)
 {
-	return backend->Frame(rect, style);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->Frame(rect, style);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::Box(Rect rect, Int color, Int style)
 {
-	return backend->Box(rect, color, style);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->Box(rect, color, style);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::SetText(String string, Rect rect, Font font, Bool shadow)
 {
-	return backend->SetText(string, rect, font, shadow);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->SetText(string, rect, font, shadow);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 {
-	return backend->Gradient(rect, color1, color2, style);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->Gradient(rect, color1, color2, style);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::Bar(Point p1, Point p2, Int orientation)
 {
-	return backend->Bar(p1, p2, orientation);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->Bar(p1, p2, orientation);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::BlitFromBitmap(const Bitmap &bitmap, Rect srcRect, Rect destRect)
 {
-	return backend->BlitFromBitmap(bitmap, srcRect, destRect);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->BlitFromBitmap(bitmap, srcRect, destRect);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }
 
 S::Int S::GUI::Surface::BlitToBitmap(Rect srcRect, const Bitmap &bitmap, Rect destRect)
 {
-	return backend->BlitToBitmap(srcRect, bitmap, destRect);
+	if (mutex != NIL) mutex->Lock();
+
+	Int	 rVal = backend->BlitToBitmap(srcRect, bitmap, destRect);
+
+	if (mutex != NIL) mutex->Release();
+
+	return rVal;
 }

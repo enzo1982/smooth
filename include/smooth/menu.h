@@ -80,7 +80,6 @@ namespace smooth
 			Bool		 entrysizesset;
 			Array<Entry *>	 entries;
 			Size		 popupsize;
-			Int		 lastClicked;
 
 					 Menu();
 					~Menu();
@@ -91,8 +90,6 @@ namespace smooth
 
 			Void		 GetSize();
 			Int		 GetNOfEntries();
-
-			Int		 GetLastClickedEntry();
 
 			Int		 Clear();
 	};

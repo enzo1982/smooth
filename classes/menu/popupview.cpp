@@ -417,7 +417,6 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					popup->toolwnd->Hide();
 
-					myPopup->realMenu->lastClicked = entry->id;
 					popup->onClick.Emit(0, 0);
 					entry->onClick.Emit();
 
@@ -455,7 +454,6 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 							}
 						}
 
-						myPopup->realMenu->lastClicked = entry->id;
 						popup->onClick.Emit(0, 0);
 						entry->onClick.Emit();
 					}
@@ -493,7 +491,6 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 							}
 						}
 
-						myPopup->realMenu->lastClicked = entry->id;
 						popup->onClick.Emit(0, 0);
 						entry->onClick.Emit();
 					}

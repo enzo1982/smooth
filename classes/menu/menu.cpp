@@ -20,7 +20,6 @@
 S::Menu::Menu()
 {
 	nOfEntries = 0;
-	lastClicked = -1;
 
 	sizeset = False;
 	entrysizesset = False;
@@ -180,9 +179,4 @@ S::Void S::Menu::GetMenuEntriesSize()
 S::Int S::Menu::GetNOfEntries()
 {
 	return nOfEntries;
-}
-
-S::Int S::Menu::GetLastClickedEntry()
-{
-	return lastClicked;
 }

@@ -49,8 +49,6 @@ namespace smooth
 
 					instance = NIL;
 					method = NIL;
-
-					break;
 				}
 
 				delete minstance;

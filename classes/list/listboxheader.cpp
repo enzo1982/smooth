@@ -87,13 +87,18 @@ S::Int S::GUI::ListBoxHeader::UpdateMetrics()
 	return Success;
 }
 
+S::Int S::GUI::ListBoxHeader::GetNOfTabs()
+{
+	return tabWidths.GetNOfEntries();
+}
+
 S::Int S::GUI::ListBoxHeader::GetNthTabOffset(Int n)
 {
 	if (n >= tabWidths.GetNOfEntries()) return -1;
 
 	Int	 offset = 0;
 
-	for (Int i = 1; i < n; i++)
+	for (Int i = 0; i < n; i++)
 	{
 		offset += (Int) Math::Abs(tabWidths.GetNthEntry(i));
 	}

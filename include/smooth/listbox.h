@@ -43,6 +43,7 @@ namespace smooth
 				Bool		 allowReselect;
 
 				Void		 ScrollbarProc();
+				Void		 DrawEntryText(String, Rect, Int);
 			public:
 						 ListBox(Point, Size);
 						~ListBox();

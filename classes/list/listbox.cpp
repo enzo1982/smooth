@@ -357,7 +357,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					{
 						frame.left += METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
-						surface->SetText(operat->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						DrawEntryText(operat->text, frame, objectProperties->fontColor);
 						frame.left -= METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
 					}
@@ -463,7 +463,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 						frame.left += METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
-						surface->SetText(operat->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						DrawEntryText(operat->text, frame, objectProperties->fontColor);
 						frame.left -= METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
 
@@ -575,7 +575,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.left++;
 						operat->rect.top++;
-						surface->SetText(operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						DrawEntryText(operat->text, operat->rect, objectProperties->fontColor);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -612,7 +612,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.left++;
 						operat->rect.top++;
-						surface->SetText(operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						DrawEntryText(operat->text, operat->rect, objectProperties->fontColor);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -647,7 +647,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.left++;
 						operat->rect.top++;
-						surface->SetText(operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+						DrawEntryText(operat->text, operat->rect, Setup::GradientTextColor);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -667,6 +667,47 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 	}
 
 	return retVal;
+}
+
+S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
+{
+	Surface	*surface = myContainer->GetDrawSurface();
+
+	if (header != NIL)
+	{
+		for (Int i = 0; i < header->GetNOfTabs(); i++)
+		{
+			String	 nText;
+			Rect	 rRect = rect;
+
+			rRect.left += header->GetNthTabOffset(i);
+
+			Int	 tabCount = 0;
+
+			for (Int p = 0; p < text.Length(); p++)
+			{
+				if (tabCount == i)
+				{
+					for (Int q = p; q < text.Length(); q++)
+					{
+						if (text[q] == '\t') break;
+
+						nText[q - p] = text[q];
+					}
+
+					break;
+				}
+
+				if (text[p] == '\t') tabCount++;
+			}
+
+			surface->SetText(nText, rRect, objectProperties->font, objectProperties->fontSize, color, objectProperties->fontWeight);
+		}
+	}
+	else
+	{
+		surface->SetText(text, rect, objectProperties->font, objectProperties->fontSize, color, objectProperties->fontWeight);
+	}
 }
 
 S::Void S::GUI::ListBox::ScrollbarProc()

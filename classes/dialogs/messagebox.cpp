@@ -21,6 +21,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/window.h>
 #include <smooth/titlebar.h>
+#include <smooth/checkbox.h>
 
 S::Int S::GUI::Dialogs::MessageDlg::nOfMessageBoxes = 0;
 
@@ -48,15 +49,11 @@ S::Int S::GUI::Dialogs::QuickMessage(String text, String title, Int buttons, wch
 	return rVal;
 }
 
-S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wchar_t *icon)
+S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wchar_t *icon, String checkBoxText, Bool *iCVar)
 {
 	msgicon = icon;
+	cVar = iCVar;
 
-	Create(text, title, btns);
-}
-
-S::Void S::GUI::Dialogs::MessageDlg::Create(String text, String title, Int btns)
-{
 	msgbox		= new Window(title);
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	lay		= new Layer();
@@ -239,6 +236,22 @@ S::Void S::GUI::Dialogs::MessageDlg::Create(String text, String title, Int btns)
 			break;
 	}
 
+	if (cVar != NIL)
+	{
+		Point	 pos(13, 46 + buttonHeight);
+		Size	 size(100, 0);
+
+		if (msgicon != NIL) pos.x += GetSystemMetrics(SM_CXICON) + 20;
+
+		checkbox = new CheckBox(checkBoxText, pos, size, cVar);
+		checkbox->SetOrientation(OR_LOWERLEFT);
+		checkbox->SetMetrics(checkbox->GetObjectProperties()->pos, Size(checkbox->GetObjectProperties()->textSize.cx + 20, checkbox->GetObjectProperties()->size.cy));
+
+		msgbox->GetObjectProperties()->size.cy += 22;
+
+		lay->RegisterObject(checkbox);
+	}
+
 	Setup::FontSize = oldmeasurement;
 
 	msgbox->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - msgbox->GetObjectProperties()->size.cx) / 2 + (nOfMessageBoxes - 1) * 25;
@@ -286,6 +299,8 @@ S::GUI::Dialogs::MessageDlg::~MessageDlg()
 	DeleteObject(lay);
 	DeleteObject(titlebar);
 	DeleteObject(msgbox);
+
+	if (cVar != NIL) DeleteObject(checkbox);
 }
 
 S::Int S::GUI::Dialogs::MessageDlg::ShowDialog()

@@ -14,6 +14,11 @@
 #include <memory.h>
 #include <iolib-cxx.h>
 
+namespace smooth
+{
+	Int	 ConvertString(const char *, Int, const char *, char *, Int, const char *);
+};
+
 char	*S::String::origInputFormat	= "ISO-8859-1";
 char	*S::String::origOutputFormat	= "ISO-8859-1";
 
@@ -236,76 +241,6 @@ char *S::String::ConvertTo(const char *encoding)
 	allocatedBuffers.AddEntry(buffer);
 
 	return buffer;
-}
-
-S::Bool S::String::IsASCII(const char *string)
-{
-	for (Int i = 0; i >= 0; i++)
-	{
-		if (((unsigned) string[i]) == 0)	break;
-		if (((unsigned) string[i]) >= 128)	return False;
-	}
-
-	return True;
-}
-
-S::Bool S::String::IsUTF8(const char *string)
-{
-	const char	*t = string;
-	Int		 n = 0;
-
-	while ((n = ParseUTF8(&t)))
-	{
-		if (n == -1) return False;
-	}
-
-	return True;
-}
-
-S::Int S::String::ParseUTF8(const char **ps)
-{
-	unsigned char	*s = (unsigned char *) *ps;
-	Int		 wc = 0;
-	Int		 n = 0;
-
-	if (*s < 0x80)
-	{
-		*ps = (char *) s + 1;
-
-		return *s;
-	}
-	else if (*s < 0xc2)
-	{
-		return -1;
-	}
-	else if (*s < 0xe0)
-	{
-		if ((s[1] & 0xc0) != 0x80) return -1;
-
-		*ps = (char *) s + 2;
-
-		return ((s[0] & 0x1f) << 6) | (s[1] & 0x3f);
-	}
-	else if (*s < 0xf0)	n = 3;
-	else if (*s < 0xf8)	n = 4;
-	else if (*s < 0xfc)	n = 5;
-	else if (*s < 0xfe)	n = 6;
-	else			return -1;
-
-	wc = *s++ & ((1 << (7 - n)) - 1);
-
-	for (Int i = 1; i < n; i++)
-	{
-		if ((*s & 0xc0) != 0x80) return -1;
-
-		wc = (wc << 6) | (*s++ & 0x3f);
-	}
-
-	if (wc < (1 << (5 * n - 4))) return -1;
-
-	*ps = (char *) s;
-
-	return wc;
 }
 
 wchar_t &S::String::operator [](int n)

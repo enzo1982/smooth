@@ -40,8 +40,6 @@ namespace smooth
 
 			static Void		 CRC32_InitTable();
 			static UnsignedLong	 CRC32_Reflect(UnsignedLong, char);
-
-			static Int		 ParseUTF8(const char **);
 		public:
 						 String();
 						 String(const int);
@@ -58,9 +56,6 @@ namespace smooth
 
 			static char		*SetInputFormat(const char *);
 			static char		*SetOutputFormat(const char *);
-
-			static Bool		 IsASCII(const char *);
-			static Bool		 IsUTF8(const char *);
 
 			Int			 ImportFrom(const char *, const char *);
 			char			*ConvertTo(const char *);
@@ -124,8 +119,6 @@ namespace smooth
 			Bool operator		 !=(const wchar_t *);
 			Bool operator		 !=(const String &);
 	};
-
-	Int	 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
 #endif

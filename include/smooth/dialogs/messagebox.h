@@ -24,6 +24,7 @@ namespace smooth
 		class Titlebar;
 		class Layer;
 		class Button;
+		class CheckBox;
 	};
 };
 
@@ -35,17 +36,20 @@ namespace smooth
 	{
 		namespace Dialogs
 		{
-			class MessageDlg : public Dialog
+			class SMOOTHAPI MessageDlg : public Dialog
 			{
 				private:
 					static Int	 nOfMessageBoxes;
+
 					Int		 lines;
 					String		 line[256];
 					wchar_t		*msgicon;
 					Int		 buttons;
+
 					Window		*msgbox;
 					Titlebar	*titlebar;
 					Layer		*lay;
+
 					Button		*okbutton;
 					Button		*yesbutton;
 					Button		*nobutton;
@@ -54,11 +58,10 @@ namespace smooth
 					Button		*retrybutton;
 					Button		*ignorebutton;
 
-					Void		 Create(String, String, Int);
-				public:
-							 MessageDlg(String, String, Int, wchar_t *);
-							~MessageDlg();
+					CheckBox	*checkbox;
 
+					Bool		*cVar;
+				slots:
 					Void		 MessagePaintProc();
 					Bool		 MessageKillProc();
 
@@ -69,6 +72,9 @@ namespace smooth
 					Void		 MessageRetry();
 					Void		 MessageAbort();
 					Void		 MessageIgnore();
+				public:
+							 MessageDlg(String, String, Int, wchar_t *, String = NIL, Bool * = NIL);
+							~MessageDlg();
 
 					Int		 ShowDialog();
 			};

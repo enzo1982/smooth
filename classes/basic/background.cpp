@@ -21,7 +21,7 @@ S::BackgroundApplication::BackgroundApplication()
 	backgroundTimer = new Timer();
 
 	backgroundTimer->onInterval.Connect(&BackgroundApplication::TimerProc, this);
-	backgroundTimer->Start(10);
+	backgroundTimer->Start(50);
 }
 
 S::BackgroundApplication::~BackgroundApplication()
@@ -52,7 +52,7 @@ S::Void S::BackgroundApplication::TimerProc()
 
 			if (object->GetObjectType() == GUI::Window::classID)
 			{
-				((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
+				if (((GUI::Window *) object)->hwnd != NIL) ((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
 			}
 		}
 	}

@@ -619,6 +619,8 @@ S::Int S::GUI::Window::Close()
 
 S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 {
+	if (!created) return Success;
+
 	EnterProtectedRegion();
 
 	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);

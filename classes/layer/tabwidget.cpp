@@ -282,11 +282,15 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 								}
 							}
 
+							wnd->SetUpdateRect(Rect(realPos, objectProperties->size));
+
 							Hide();
 
 							object->Show();
 
 							Show();
+
+							wnd->SetUpdateRect(Rect(Point(-1, -1), Size(0, 0)));
 
 							surface->EndPaint();
 

@@ -84,22 +84,9 @@ S::Int S::GUI::Client::Paint(Int message)
 		}
 	}
 
-	if (DoRectsOverlap(updateRect, client))
+	if (message == SP_SHOW)
 	{
-		Rect	 intersectRect;
-
-		updateRect.right += 5;
-		updateRect.bottom += 5;
-
-		RECT	 iRect = intersectRect;
-		RECT	 uRect = updateRect;
-		RECT	 cRect = client;
-
-		IntersectRect(&iRect, &uRect, &cRect);
-
-		intersectRect = iRect;
-
-		surface->Box(intersectRect, Setup::ClientColor, FILLED);
+		surface->Box(client, Setup::ClientColor, FILLED);
 
 		clientFrame.left	= client.left;
 		clientFrame.top		= client.top;
@@ -109,6 +96,35 @@ S::Int S::GUI::Client::Paint(Int message)
 		surface->Box(clientFrame, Setup::DividerDarkColor, OUTLINED);
 
 		onPaint.Emit();
+	}
+	else
+	{
+		if (DoRectsOverlap(updateRect, client))
+		{
+			Rect	 intersectRect;
+
+			updateRect.right += 5;
+			updateRect.bottom += 5;
+
+			RECT	 iRect = intersectRect;
+			RECT	 uRect = updateRect;
+			RECT	 cRect = client;
+
+			IntersectRect(&iRect, &uRect, &cRect);
+
+			intersectRect = iRect;
+
+			surface->Box(intersectRect, Setup::ClientColor, FILLED);
+
+			clientFrame.left	= client.left;
+			clientFrame.top		= client.top;
+			clientFrame.right	= client.right - 1;
+			clientFrame.bottom	= client.bottom - 1;
+
+			surface->Box(clientFrame, Setup::DividerDarkColor, OUTLINED);
+
+			onPaint.Emit();
+		}
 	}
 
 	LeaveProtectedRegion();

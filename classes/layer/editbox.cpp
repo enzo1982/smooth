@@ -71,8 +71,8 @@ S::GUI::EditBox::~EditBox()
 
 S::Int S::GUI::EditBox::Paint(Int message)
 {
-	if (!registered)	return Error;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Error;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface = myContainer->GetDrawSurface();
 
@@ -154,8 +154,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())			return Error;
+	if (!IsActive() || !IsVisible())	return Success;
 
 	Window	*wnd = myContainer->GetContainerWindow();
 
@@ -975,4 +975,10 @@ S::Void S::GUI::EditBox::TimerProc()
 	else			surface->Line(lineStart, lineEnd, Setup::TextColor);
 
 	promptVisible = !promptVisible;
+}
+
+S::Int S::GUI::EditBox::GetCursorPos()
+{
+	if (objectProperties->clicked)	return promptPos;
+	else				return -1;
 }

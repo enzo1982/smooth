@@ -135,6 +135,9 @@ S::GUI::Window::Window(String title)
 
 	offset = Rect(Point(3, 3), Size(0, 0));
 
+	updateRect = Rect(Point(-1, -1), Size(0, 0));
+	timedUpdateRect = Rect(Point(-1, -1), Size(0, 0));
+
 	icon = NIL;
 
 	if (Setup::enableUnicode)	sysicon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
@@ -399,13 +402,14 @@ S::Int S::GUI::Window::Maximize()
 
 	SetWindowPos(hwnd, 0, workArea.left - 2, workArea.top - 2, workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4, 0);
 
+	if (Setup::enableUnicode)
+	{
+		origwndstyle = GetWindowLongW(hwnd, GWL_STYLE);
+
+		SetWindowLongW(hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+	}
+
 	maximized = True;
-
-	if (Setup::enableUnicode)	origwndstyle = GetWindowLongW(hwnd, GWL_STYLE);
-	else				origwndstyle = GetWindowLongA(hwnd, GWL_STYLE);
-
-	if (Setup::enableUnicode)	SetWindowLongW(hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-	else				SetWindowLongA(hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
 
 	return Success;
 }
@@ -425,8 +429,7 @@ S::Int S::GUI::Window::Restore()
 
 	maximized = False;
 
-	if (Setup::enableUnicode)	SetWindowLongW(hwnd, GWL_STYLE, origwndstyle | WS_VISIBLE);
-	else				SetWindowLongA(hwnd, GWL_STYLE, origwndstyle | WS_VISIBLE);
+	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, origwndstyle | WS_VISIBLE);
 
 	return Success;
 }
@@ -446,7 +449,11 @@ S::Rect S::GUI::Window::GetWindowRect()
 
 S::Rect S::GUI::Window::GetUpdateRect()
 {
-	return updateRect;
+	if (timedUpdateRect.left == -1	&&
+	    timedUpdateRect.top == -1	&&
+	    timedUpdateRect.right == -1	&&
+	    timedUpdateRect.bottom == -1)	return updateRect;
+	else					return timedUpdateRect;
 }
 
 S::Int S::GUI::Window::SetUpdateRect(Rect newUpdateRect)
@@ -707,6 +714,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			return 0;
 		case WM_SYSCOLORCHANGE:
 			GetColors();
+
+			break;
+		case WM_NCPAINT:
+			if (Setup::enableUnicode)	PostMessageW(hwnd, WM_PAINT, 0, 0);
+			else				PostMessageA(hwnd, WM_PAINT, 0, 0);
 
 			break;
 		case WM_PAINT:
@@ -1068,12 +1080,26 @@ S::Int S::GUI::Window::Paint(Int message)
 		{
 			if (paintTimer != NIL) DeleteObject(paintTimer);
 
+			if (timedUpdateRect.left == -1 && timedUpdateRect.top == -1 && timedUpdateRect.right == -1 && timedUpdateRect.bottom == -1)
+			{
+				timedUpdateRect = updateRect;
+			}
+			else
+			{
+				timedUpdateRect.left	= (Int) Math::Min(timedUpdateRect.left, updateRect.left);
+				timedUpdateRect.top	= (Int) Math::Min(timedUpdateRect.top, updateRect.top);
+				timedUpdateRect.right	= (Int) Math::Max(timedUpdateRect.right, updateRect.right);
+				timedUpdateRect.bottom	= (Int) Math::Max(timedUpdateRect.bottom, updateRect.bottom);
+			}
+
 			paintTimer = new Timer();
 			paintTimer->onInterval.Connect(&Window::PaintTimer, this);
 			paintTimer->Start(50);
 		}
 		else if (paintTimer == NIL)
 		{
+			timedUpdateRect = updateRect;
+
 			PaintTimer();
 		}
 
@@ -1336,7 +1362,7 @@ S::Void S::GUI::Window::PaintTimer()
 
 	Surface	*surface = GetDrawSurface();
 
-	surface->StartPaint(updateRect);
+	surface->StartPaint(timedUpdateRect);
 
 	for (Int j = 0; j < nOfObjects; j++)
 	{
@@ -1346,13 +1372,15 @@ S::Void S::GUI::Window::PaintTimer()
 
 		if (object->GetObjectType() == Widget::classID)
 		{
-			if (((Widget *) object)->IsVisible() && Affected((Widget *) object, updateRect) && object->GetObjectType() == Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
+			if (((Widget *) object)->IsVisible() && Affected((Widget *) object, timedUpdateRect) && object->GetObjectType() == Layer::classID) ((Widget *) object)->Paint(SP_PAINT);
 		}
 	}
 
 	onPaint.Emit();
 
 	surface->EndPaint();
+
+	timedUpdateRect = Rect(Point(-1, -1), Size(0, 0));
 
 	LeaveProtectedRegion();
 }

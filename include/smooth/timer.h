@@ -20,8 +20,11 @@ namespace smooth
 
 namespace smooth
 {
+	Void WINAPI TimerProc(HWND, unsigned int, unsigned int, unsigned long);
+
 	class SMOOTHAPI Timer : public Object
 	{
+		friend Void TimerProc(HWND, unsigned int, unsigned int, unsigned long);
 		private:
 			Int			 timerid;
 		public:

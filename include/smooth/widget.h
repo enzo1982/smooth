@@ -33,6 +33,8 @@ namespace smooth
 	const Int SP_MOUSEUP	= 4;
 	const Int SP_UPDATE	= 5;
 	const Int SP_DELAYED	= 6;
+	const Int SP_SHOW	= 7;
+	const Int SP_HIDE	= 8;
 
 	namespace GUI
 	{

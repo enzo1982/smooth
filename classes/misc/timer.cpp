@@ -11,8 +11,6 @@
 #include <smooth/timer.h>
 #include <smooth/objectmanager.h>
 
-S::Void WINAPI TimerProc(HWND, unsigned int, unsigned int, unsigned long);
-
 const S::Int	 S::Timer::classID = S::Object::RequestClassID();
 
 S::Timer::Timer()
@@ -54,7 +52,7 @@ S::Int S::Timer::GetID()
 	return timerid;
 }
 
-S::Void WINAPI TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
+S::Void WINAPI S::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
 {
 	for (S::Int i = 0; i < S::Object::objectCount; i++)
 	{
@@ -66,7 +64,9 @@ S::Void WINAPI TimerProc(HWND wnd, unsigned int message, unsigned int timerid, u
 			{
 				if (((S::Timer *) object)->GetID() == (signed int) timerid)
 				{
+					((S::Timer *) object)->EnterProtectedRegion();
 					((S::Timer *) object)->onInterval.Emit();
+					((S::Timer *) object)->LeaveProtectedRegion();
 
 					return;
 				}

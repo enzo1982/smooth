@@ -76,6 +76,8 @@ namespace smooth
 				Int			 SetText(String);
 
 				Int			 SetDropDownList(List *);
+
+				Int			 GetCursorPos();
 		};
 	};
 };

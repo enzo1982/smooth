@@ -81,6 +81,7 @@ namespace smooth
 
 				Rect				 offset;
 				Rect				 updateRect;
+				Rect				 timedUpdateRect;
 
 				Size				 minSize;
 				Size				 maxSize;

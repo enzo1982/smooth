@@ -46,7 +46,7 @@ S::Int S::DialogFileSelection::ShowDialog()
 		ofnw.lStructSize	= sizeof(OPENFILENAMEW);
 		ofnw.nFilterIndex	= 1;
 		ofnw.lpstrFile		= bufferw;
-		ofnw.nMaxFile		= 32786;
+		ofnw.nMaxFile		= 32768;
 		ofnw.lpstrFileTitle	= NIL;
 		ofnw.lpstrInitialDir	= NIL;
 		ofnw.lpstrTitle		= caption;
@@ -99,7 +99,7 @@ S::Int S::DialogFileSelection::ShowDialog()
 			Int	 pos = 0;
 			String	 dir;
 			String	 file;
-			wchar_t	*buffer2w = new wchar_t [1024];
+			wchar_t	*buffer2w = new wchar_t [32768];
 
 			for (n = 0; n < 32768; n++)
 			{
@@ -113,25 +113,32 @@ S::Int S::DialogFileSelection::ShowDialog()
 				}
 			}
 
-			n++;
-			pos = 0;
-
-			for (; n < 32768; n++)
+			if (flags & SFD_ALLOWMULTISELECT)
 			{
-				buffer2w[pos++] = bufferw[n];
+				n++;
+				pos = 0;
 
-				if (bufferw[n] == 0)
+				for (; n < 32768; n++)
 				{
-					file = file.Copy(dir).Append("\\").Append(buffer2w);
+					buffer2w[pos++] = bufferw[n];
 
-					if (file[file.Length() - 1] == '\\') file[file.Length() - 1] = 0;
+					if (bufferw[n] == 0)
+					{
+						file = file.Copy(dir).Append("\\").Append(buffer2w);
 
-					files.AddEntry(file);
+						if (file[file.Length() - 1] == '\\') file[file.Length() - 1] = 0;
 
-					pos = 0;
+						files.AddEntry(file);
 
-					if (bufferw[n + 1] == 0) break;
+						pos = 0;
+
+						if (bufferw[n + 1] == 0) break;
+					}
 				}
+			}
+			else
+			{
+				files.AddEntry(dir);
 			}
 
 			delete [] buffer2w;
@@ -158,7 +165,7 @@ S::Int S::DialogFileSelection::ShowDialog()
 		ofna.lStructSize	= sizeof(OPENFILENAMEA);
 		ofna.nFilterIndex	= 1;
 		ofna.lpstrFile		= buffera;
-		ofna.nMaxFile		= 32786;
+		ofna.nMaxFile		= 32768;
 		ofna.lpstrFileTitle	= NIL;
 		ofna.lpstrInitialDir	= NIL;
 		ofna.lpstrTitle		= caption;
@@ -211,7 +218,7 @@ S::Int S::DialogFileSelection::ShowDialog()
 			Int	 pos = 0;
 			String	 dir;
 			String	 file;
-			char	*buffer2a = new char [1024];
+			char	*buffer2a = new char [32768];
 
 			for (n = 0; n < 32768; n++)
 			{
@@ -225,25 +232,32 @@ S::Int S::DialogFileSelection::ShowDialog()
 				}
 			}
 
-			n++;
-			pos = 0;
-
-			for (; n < 32768; n++)
+			if (flags & SFD_ALLOWMULTISELECT)
 			{
-				buffer2a[pos++] = buffera[n];
+				n++;
+				pos = 0;
 
-				if (buffera[n] == 0)
+				for (; n < 32768; n++)
 				{
-					file = file.Copy(dir).Append("\\").Append(buffer2a);
+					buffer2a[pos++] = buffera[n];
 
-					if (file[file.Length() - 1] == '\\') file[file.Length() - 1] = 0;
+					if (buffera[n] == 0)
+					{
+						file = file.Copy(dir).Append("\\").Append(buffer2a);
 
-					files.AddEntry(file);
+						if (file[file.Length() - 1] == '\\') file[file.Length() - 1] = 0;
 
-					pos = 0;
+						files.AddEntry(file);
 
-					if (buffera[n + 1] == 0) break;
+						pos = 0;
+
+						if (buffera[n + 1] == 0) break;
+					}
 				}
+			}
+			else
+			{
+				files.AddEntry(dir);
 			}
 
 			delete [] buffer2a;

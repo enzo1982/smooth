@@ -92,7 +92,7 @@ S::Int S::GUI::Widget::Show()
 
 	if (!registered) return Success;
 
-	if (IsVisible()) Paint(SP_PAINT);
+	if (IsVisible()) Paint(SP_SHOW);
 
 	return Success;
 }

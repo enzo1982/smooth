@@ -733,7 +733,7 @@ S::String S::String::FromFloat(Float value)
 	{
 		newString.Append(".");
 
-		for (Int i = 0; i < (9 - afpslen); i++)
+		for (Int i = 0; i < (8 - afpslen); i++)
 		{
 			newString.Append("0");
 		}

@@ -148,6 +148,11 @@ $(OBJECTDIR)/listbox.o: $(LISTCLASSESDIR)/listbox.cpp $(SMOOTHINCLUDEDIR)/listbo
 	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/listbox.cpp -o $(OBJECTDIR)/listbox.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/listboxheader.o: $(LISTCLASSESDIR)/listboxheader.cpp $(SMOOTHINCLUDEDIR)/listboxheader.h
+	$(ECHO) -n Compiling $(LISTCLASSESDIR)/listboxheader.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/listboxheader.cpp -o $(OBJECTDIR)/listboxheader.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/listentry.o: $(LISTCLASSESDIR)/listentry.cpp $(SMOOTHINCLUDEDIR)/list.h
 	$(ECHO) -n Compiling $(LISTCLASSESDIR)/listentry.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(LISTCLASSESDIR)/listentry.cpp -o $(OBJECTDIR)/listentry.o

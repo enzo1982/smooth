@@ -16,6 +16,7 @@ namespace smooth
 	namespace GUI
 	{
 		class ListBox;
+		class ListBoxHeader;
 		class Scrollbar;
 	};
 };
@@ -37,6 +38,8 @@ namespace smooth
 				Int		 scrollbarPos;
 				Int		 lastScrollbarPos;
 
+				ListBoxHeader	*header;
+
 				Bool		 allowReselect;
 
 				Void		 ScrollbarProc();
@@ -50,8 +53,13 @@ namespace smooth
 				Int		 SelectEntry(Int);
 				Void		 Cleanup();
 
+				Int		 AddTab(String, Int = 0);
+
 				virtual Int	 Show();
 				virtual Int	 Hide();
+
+				virtual Int	 Activate();
+				virtual Int	 Deactivate();
 
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);

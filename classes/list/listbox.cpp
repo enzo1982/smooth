@@ -22,6 +22,7 @@
 #include <smooth/scrollbar.h>
 #include <smooth/layer.h>
 #include <smooth/surface.h>
+#include <smooth/listboxheader.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -39,6 +40,8 @@ S::GUI::ListBox::ListBox(Point pos, Size size)
 	scrollbarPos		= 0;
 	lastScrollbarPos	= 0;
 	allowReselect		= False;
+
+	header			= NIL;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -60,6 +63,13 @@ S::GUI::ListBox::~ListBox()
 		if (myContainer != NIL) myContainer->UnregisterObject(scrollbar);
 
 		delete scrollbar;
+	}
+
+	if (header != NIL)
+	{
+		if (myContainer != NIL) myContainer->UnregisterObject(header);
+
+		delete header;
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
@@ -152,6 +162,18 @@ S::Int S::GUI::ListBox::SelectEntry(Int code)
 	return Success;
 }
 
+S::Int S::GUI::ListBox::AddTab(String tabName, Int iTabWidth)
+{
+	if (header == NIL)
+	{
+		header = new ListBoxHeader(this);
+
+		if (visible) myContainer->RegisterObject(header);
+	}
+
+	header->AddTab(tabName, iTabWidth);
+}
+
 S::Int S::GUI::ListBox::Show()
 {
 	if (visible)	return Success;
@@ -167,12 +189,14 @@ S::Int S::GUI::ListBox::Show()
 		SetMeasurement(SMT_PIXELS);
 
 		scrollbar->SetMetrics(sbp, sbs);
-		scrollbar->SetRange(0, nOfEntries - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
+		scrollbar->SetRange(0, (nOfEntries + (header == NIL ? 0 : 1)) - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
 
 		Setup::FontSize = oldMeasurement;
 
 		scrollbar->Show();
 	}
+
+	if (header != NIL) myContainer->RegisterObject(header);
 
 	return Object::Show();
 }
@@ -181,9 +205,29 @@ S::Int S::GUI::ListBox::Hide()
 {
 	if (!visible)	return Success;
 
+	if (header != NIL) myContainer->UnregisterObject(header);
+
 	if (needScrollbar) scrollbar->Hide();
 
 	return Object::Hide();
+}
+
+S::Int S::GUI::ListBox::Activate()
+{
+	Int	 rVal = Object::Activate();
+
+	if (rVal == Success && header != NIL) header->Activate();
+
+	return rVal;
+}
+
+S::Int S::GUI::ListBox::Deactivate()
+{
+	Int	 rVal = Object::Deactivate();
+
+	if (rVal == Success && header != NIL) header->Deactivate();
+
+	return rVal;
 }
 
 S::Int S::GUI::ListBox::Paint(Int message)
@@ -225,13 +269,13 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			maxFrameY = frame.bottom - 1;
 
 			frame.left++;
-			frame.top++;
+			frame.top = frame.top + 1 + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
 			frame.right--;
 			frame.bottom = frame.top + METRIC_LISTBOXENTRYHEIGHT;
 
 			frame.bottom = min(frame.bottom, maxFrameY);
 
-			if (METRIC_LISTBOXENTRYHEIGHT * nOfEntries + 4 > objectProperties->size.cy)
+			if (METRIC_LISTBOXENTRYHEIGHT * (nOfEntries + (header == NIL ? 0 : 1)) + 4 > objectProperties->size.cy)
 			{
 				if (!needScrollbar)
 				{
@@ -246,7 +290,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					SetMeasurement(SMT_PIXELS);
 
-					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, nOfEntries - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, (nOfEntries + (header == NIL ? 0 : 1)) - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
 
 					scrollbar->onClick.Connect(&ListBox::ScrollbarProc, this);
 
@@ -258,7 +302,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 				else
 				{
-					scrollbar->SetRange(0, nOfEntries - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar->SetRange(0, (nOfEntries + (header == NIL ? 0 : 1)) - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
 				}
 
 				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);

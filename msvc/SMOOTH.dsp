@@ -227,6 +227,10 @@ SOURCE=..\classes\list\listbox.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\list\listboxheader.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\list\listentry.cpp
 # End Source File
 # End Group
@@ -760,6 +764,10 @@ SOURCE=..\include\smooth\list.h
 # Begin Source File
 
 SOURCE=..\include\smooth\listbox.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\listboxheader.h
 # End Source File
 # Begin Source File
 

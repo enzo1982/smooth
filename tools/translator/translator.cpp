@@ -95,6 +95,7 @@ Translator::Translator()
 	list_entries	= new ListBox(pos, size);
 	list_entries->onClick.Connect(&Translator::SelectEntry, this);
 	list_entries->AllowReselect(True);
+	list_entries->AddTab("ID");
 
 	menu_file	= new PopupMenu();
 

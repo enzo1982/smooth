@@ -122,8 +122,15 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(String langName, String auth
 
 		Bool	 done = false;
 
-		for (Int i = 0; i < languages.GetNOfEntries(); i++)
+		for (Int i = 0; i <= languages.GetNOfEntries(); i++)
 		{
+			if (i == languages.GetNOfEntries())
+			{
+				languages.AddEntry(iLang);
+
+				break;
+			}
+
 			Language	*lang = languages.GetNthEntry(i);
 
 			for (Int j = 0; j < (Int) Math::Max(iLang->name.Length(), lang->name.Length()); j++)
@@ -140,13 +147,6 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(String langName, String auth
 				{
 					break;
 				}
-			}
-
-			if (i == languages.GetNOfEntries() - 1)
-			{
-				languages.AddEntry(iLang);
-
-				done = True;
 			}
 
 			if (done) break;

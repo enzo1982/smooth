@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 BACKEND_SDL = 3;
 
-		class BackendSDL : public Backend
+		class SMOOTH_STATIC_EXPORT BackendSDL : public Backend
 		{
 			public:
 					 BackendSDL();

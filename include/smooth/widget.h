@@ -67,10 +67,10 @@ namespace smooth
 				Bool				 IsVisible();
 				Bool				 IsActive();
 
-				virtual Int			 SetText(String);
+				virtual Int			 SetText(const String &);
 				virtual String			 GetText();
 
-				virtual Int			 SetTooltip(String);
+				virtual Int			 SetTooltip(const String &);
 				virtual String			 GetTooltip();
 
 				virtual Int			 SetFont(Font);

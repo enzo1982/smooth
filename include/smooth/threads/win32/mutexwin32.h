@@ -29,7 +29,7 @@ namespace smooth
 	{
 		const Int	 MUTEX_WIN32	= 2;
 
-		class MutexWin32 : public MutexBackend
+		class SMOOTH_STATIC_EXPORT MutexWin32 : public MutexBackend
 		{
 			protected:
 				HANDLE	 mutex;

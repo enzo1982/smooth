@@ -8,77 +8,51 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __SMOOTHARRAY_ENTRY_
-#define __SMOOTHARRAY_ENTRY_
+#ifndef __OBJSMOOTH_ARRAY_ENTRY_
+#define __OBJSMOOTH_ARRAY_ENTRY_
 
 #include "entry.h"
 
 template <class t> S::Array_Entry<t>::Array_Entry()
 {
-	gotNext = False;
-	gotPrev = False;
+	Clear();
+
 	nextEntry = ARRAY_NULLPOINTER;
 	prevEntry = ARRAY_NULLPOINTER;
 }
 
 template <class t> S::Array_Entry<t>::~Array_Entry()
 {
+	Clear();
 }
 
-template <class t> S::Bool S::Array_Entry<t>::SetNext(Array_Entry<t> *entry)
+template <class t> S::Bool S::Array_Entry<t>::Fill(t entry)
 {
-	if (entry != ARRAY_NULLPOINTER)
-	{
-		gotNext = True;
-		nextEntry = entry;
-	}
-	else
-	{
-		gotNext = False;
-		nextEntry = ARRAY_NULLPOINTER;
-	}
+	value	= entry;
+	filled	= True;
+
+	if (index == -1) index = 0;
 
 	return True;
 }
 
-template <class t> S::Bool S::Array_Entry<t>::SetPrev(Array_Entry<t> *entry)
+template <class t> S::Bool S::Array_Entry<t>::Clear()
 {
-	if (entry != ARRAY_NULLPOINTER)
-	{
-		gotPrev = True;
-		prevEntry = entry;
-	}
-	else
-	{
-		gotPrev = False;
-		prevEntry = ARRAY_NULLPOINTER;
-	}
+	value	= ARRAY_NULLVALUE;
+	filled	= False;
+
+	index	= -1;
 
 	return True;
 }
 
-template <class t> inline S::Array_Entry<t> *S::Array_Entry<t>::GetNext()
+template <class t> S::Bool S::Array_Entry<t>::SetIndex(Int nIndex)
 {
-	if (gotNext)	return nextEntry;
-	else		return ARRAY_NULLPOINTER;
-}
+	if (!filled) return False;
 
-template <class t> inline S::Array_Entry<t> *S::Array_Entry<t>::GetPrev()
-{
-	if (gotPrev)	return prevEntry;
-	else		return ARRAY_NULLPOINTER;
-}
+	index = nIndex;
 
-template <class t> S::Array_Entry<t> *S::Array_Entry<t>::GetNext(const Array_Entry<t> *entry)
-{
-	if (entry->gotNext)	return entry->nextEntry;
-	else			return ARRAY_NULLPOINTER;
-}
-
-template <class t> S::Array_Entry<t> *S::Array_Entry<t>::GetPrev(const Array_Entry<t> *entry)
-{
-	if (entry->gotPrev)	return entry->prevEntry;
-	else			return ARRAY_NULLPOINTER;
+	return True;
 }
 
 #endif

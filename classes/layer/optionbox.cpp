@@ -293,11 +293,12 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::GUI::OptionBox::SetText(String newText)
+S::Int S::GUI::OptionBox::SetText(const String &newText)
 {
 	if (!registered || !visible)
 	{
 		objectProperties->text = newText;
+
 		return Success;
 	}
 

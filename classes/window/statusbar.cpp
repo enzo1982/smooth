@@ -48,7 +48,7 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	return Success;
 }
 
-S::Int S::GUI::Statusbar::SetText(String newStatus)
+S::Int S::GUI::Statusbar::SetText(const String &newStatus)
 {
 	String	 oldStatus = objectProperties->text;
 

@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 EVENT_WIN32 = 1;
 
-		class EventWin32 : public EventBackend
+		class SMOOTH_STATIC_EXPORT EventWin32 : public EventBackend
 		{
 			public:
 					 EventWin32();

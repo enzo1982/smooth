@@ -8,24 +8,25 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __SMOOTHARRAY_ARRAY_
-#define __SMOOTHARRAY_ARRAY_
+#ifndef __OBJSMOOTH_ARRAY_
+#define __OBJSMOOTH_ARRAY_
 
 #include "array.h"
 #include "entry.h"
 
 template <class t> S::Array<t>::Array()
 {
-	nOfEntries = 0;
-	greatestIndex = -1;
-	outlinedEntry = False;
-	firstEntry = ARRAY_NULLPOINTER;
-	lastEntry = ARRAY_NULLPOINTER;
-	prevEntry = ARRAY_NULLPOINTER;
-	prevDeletedEntry = ARRAY_NULLPOINTER;
+	nOfEntries	= 0;
+	greatestIndex	= -1;
+	outlinedEntry	= False;
 
-	lastN = -1024;
-	lastNthEntry = ARRAY_NULLPOINTER;
+	firstEntry	= ARRAY_NULLPOINTER;
+	lastEntry	= ARRAY_NULLPOINTER;
+	prevEntry	= ARRAY_NULLPOINTER;
+	prevDeletedEntry= ARRAY_NULLPOINTER;
+
+	lastN		= -1024;
+	lastNthEntry	= ARRAY_NULLPOINTER;
 }
 
 template <class t> S::Array<t>::~Array()
@@ -41,34 +42,40 @@ template <class t> S::Bool S::Array<t>::IndexAvailable(Int index)
 
 template <class t> S::Int S::Array<t>::AddEntry(t entry)
 {
-	lastN = -1024;
-	lastNthEntry = ARRAY_NULLPOINTER;
+	lastN		= -1024;
+	lastNthEntry	= ARRAY_NULLPOINTER;
 
 	if (nOfEntries == 0)
 	{
 		outlinedEntry = False;
 
 		firstEntry = new Array_Entry<t>;
+
 		firstEntry->Fill(entry);
 		firstEntry->SetIndex(nOfEntries);
-		lastEntry = firstEntry;
-		greatestIndex = nOfEntries;
+
+		lastEntry	= firstEntry;
+		greatestIndex	= nOfEntries;
 	}
 	else
 	{
 		lastEntry->SetNext(new Array_Entry<t>);
 		lastEntry->GetNext()->SetPrev(lastEntry);
+
 		lastEntry = lastEntry->GetNext();
+
 		lastEntry->Fill(entry);
 
 		if (outlinedEntry)
 		{
 			lastEntry->SetIndex(greatestIndex + 1);
+
 			greatestIndex++;
 		}
 		else
 		{
 			lastEntry->SetIndex(nOfEntries);
+
 			greatestIndex = nOfEntries;
 		}
 	}
@@ -82,51 +89,40 @@ template <class t> S::Int S::Array<t>::AddEntry(t entry)
 
 template <class t> S::Bool S::Array<t>::AddEntry(t entry, Int index)
 {
-	lastN = -1024;
-	lastNthEntry = ARRAY_NULLPOINTER;
+	lastN		= -1024;
+	lastNthEntry	= ARRAY_NULLPOINTER;
 
 	if (index > greatestIndex)
 	{
 		AddEntry(entry);
+
 		prevEntry->SetIndex(index);
 
 		outlinedEntry = True;
-
 		greatestIndex = index;
-
-		return True;
 	}
 	else
 	{
-		if (IndexAvailable(index))
-		{
-			AddEntry(entry);
-			prevEntry->SetIndex(index);
+		if (!IndexAvailable(index)) return False;
 
-			if (outlinedEntry)
-			{
-				greatestIndex--;
-			}
-			else
-			{
-				outlinedEntry = True;
-			}
+		AddEntry(entry);
 
-			return True;
-		}
-		else
-		{
-			return False;
-		}
+		prevEntry->SetIndex(index);
+
+		if (outlinedEntry) greatestIndex--;
+
+		outlinedEntry = True;
 	}
+
+	return True;
 }
 
 template <class t> S::Int S::Array<t>::InsertEntryAfter(Int prev, t entry)
 {
 	if (GetEntry(prev) == ARRAY_NULLVALUE) return -1;
 
-	lastN = -1024;
-	lastNthEntry = ARRAY_NULLPOINTER;
+	lastN		= -1024;
+	lastNthEntry	= ARRAY_NULLPOINTER;
 
 	Array_Entry<t>	*operat = new Array_Entry<t>;
 
@@ -134,14 +130,8 @@ template <class t> S::Int S::Array<t>::InsertEntryAfter(Int prev, t entry)
 	prevEntry->SetNext(operat);
 	operat->SetPrev(prevEntry);
 
-	if (prevEntry == lastEntry)
-	{
-		lastEntry = operat;
-	}
-	else
-	{
-		operat->GetNext()->SetPrev(operat);
-	}
+	if (prevEntry == lastEntry)	lastEntry = operat;
+	else				operat->GetNext()->SetPrev(operat);
 
 	operat->Fill(entry);
 
@@ -161,50 +151,38 @@ template <class t> S::Bool S::Array<t>::InsertEntryAfter(Int prev, t entry, Int 
 {
 	if (GetEntry(prev) == ARRAY_NULLVALUE) return -1;
 
-	lastN = -1024;
-	lastNthEntry = ARRAY_NULLPOINTER;
+	lastN		= -1024;
+	lastNthEntry	= ARRAY_NULLPOINTER;
 
 	if (index > greatestIndex)
 	{
 		InsertEntryAfter(prev, entry);
+
 		prevEntry->SetIndex(index);
 
 		outlinedEntry = True;
-
 		greatestIndex = index;
-
-		return True;
 	}
 	else
 	{
-		if (IndexAvailable(index))
-		{
-			InsertEntryAfter(prev, entry);
-			prevEntry->SetIndex(index);
+		if (!IndexAvailable(index)) return False;
 
-			greatestIndex--;
+		InsertEntryAfter(prev, entry);
 
-			return True;
-		}
-		else
-		{
-			return False;
-		}
+		prevEntry->SetIndex(index);
+
+		greatestIndex--;
 	}
+
+	return True;
 }
 
 template <class t> S::Int S::Array<t>::InsertEntryAtPos(Int pos, t entry)
 {
 	if (nOfEntries < pos) return -1;
 
-	lastN = -1024;
-	lastNthEntry = ARRAY_NULLPOINTER;
-
-	for (Int i = 0; i < pos; i++)
-	{
-		if (i == 0)	GetFirstEntry();
-		else		GetNextEntry();
-	}
+	lastN		= -1024;
+	lastNthEntry	= ARRAY_NULLPOINTER;
 
 	Array_Entry<t>	*operat = new Array_Entry<t>;
 
@@ -220,6 +198,8 @@ template <class t> S::Int S::Array<t>::InsertEntryAtPos(Int pos, t entry)
 	}
 	else
 	{
+		GetNthEntry(pos - 1);
+
 		operat->SetNext(prevEntry->GetNext());
 		prevEntry->SetNext(operat);
 		operat->SetPrev(prevEntry);
@@ -247,8 +227,8 @@ template <class t> S::Bool S::Array<t>::InsertEntryAtPos(Int pos, t entry, Int i
 {
 	if (nOfEntries < pos) return -1;
 
-	lastN = -1024;
-	lastNthEntry = ARRAY_NULLPOINTER;
+	lastN		= -1024;
+	lastNthEntry	= ARRAY_NULLPOINTER;
 
 	if (index > greatestIndex)
 	{
@@ -256,48 +236,40 @@ template <class t> S::Bool S::Array<t>::InsertEntryAtPos(Int pos, t entry, Int i
 		prevEntry->SetIndex(index);
 
 		outlinedEntry = True;
-
 		greatestIndex = index;
-
-		return True;
 	}
 	else
 	{
-		if (IndexAvailable(index))
-		{
-			InsertEntryAtPos(pos, entry);
-			prevEntry->SetIndex(index);
+		if (!IndexAvailable(index)) return False;
 
-			greatestIndex--;
+		InsertEntryAtPos(pos, entry);
+		prevEntry->SetIndex(index);
 
-			return True;
-		}
-		else
-		{
-			return False;
-		}
+		greatestIndex--;
 	}
+
+	return True;
 }
 
 template <class t> S::Bool S::Array<t>::RemoveEntry(Int index)
 {
 	if (nOfEntries == 0) return False;
 
-	lastN = -1024;
-	lastNthEntry = ARRAY_NULLPOINTER;
+	lastN		= -1024;
+	lastNthEntry	= ARRAY_NULLPOINTER;
 
-	Array_Entry<t>	*operat = ARRAY_NULLPOINTER;
-	Array_Entry<t>	*prev = ARRAY_NULLPOINTER;
+	Array_Entry<t>	*operat	= ARRAY_NULLPOINTER;
+	Array_Entry<t>	*prev	= ARRAY_NULLPOINTER;
 
 	if (prevDeletedEntry != ARRAY_NULLPOINTER)
 	{
-		if (prevDeletedEntry->gotNext)
+		if (prevDeletedEntry->GetNext() != ARRAY_NULLPOINTER)
 		{
 			if (prevDeletedEntry->GetNext()->GetIndex() == index)
 			{
 				operat = prevDeletedEntry->GetNext();
 
-				if (!operat->gotNext)
+				if (operat->GetNext() == ARRAY_NULLPOINTER)
 				{
 					prevDeletedEntry->SetNext(ARRAY_NULLPOINTER);
 					lastEntry = prevDeletedEntry;
@@ -310,7 +282,6 @@ template <class t> S::Bool S::Array<t>::RemoveEntry(Int index)
 
 				if (operat == prevEntry) prevEntry = ARRAY_NULLPOINTER;
 
-				operat->Clear();
 				delete operat;
 
 				nOfEntries--;
@@ -320,13 +291,13 @@ template <class t> S::Bool S::Array<t>::RemoveEntry(Int index)
 			}
 		}
 
-		if (prevDeletedEntry->gotPrev)
+		if (prevDeletedEntry->GetPrev() != ARRAY_NULLPOINTER)
 		{
 			if (prevDeletedEntry->GetPrev()->GetIndex() == index)
 			{
 				operat = prevDeletedEntry->GetPrev();
 
-				if (!operat->gotPrev)
+				if (operat->GetPrev() == ARRAY_NULLPOINTER)
 				{
 					prevDeletedEntry->SetPrev(ARRAY_NULLPOINTER);
 					firstEntry = prevDeletedEntry;
@@ -339,7 +310,6 @@ template <class t> S::Bool S::Array<t>::RemoveEntry(Int index)
 
 				if (operat == prevEntry) prevEntry = ARRAY_NULLPOINTER;
 
-				operat->Clear();
 				delete operat;
 
 				nOfEntries--;
@@ -356,10 +326,10 @@ template <class t> S::Bool S::Array<t>::RemoveEntry(Int index)
 		{
 			operat = firstEntry;
 		}
-		else if (operat->gotNext)	
+		else if (operat->GetNext() != ARRAY_NULLPOINTER)	
 		{
-			prev = operat;
-			operat = operat->GetNext();
+			prev	= operat;
+			operat	= operat->GetNext();
 		}
 		else
 		{
@@ -368,29 +338,28 @@ template <class t> S::Bool S::Array<t>::RemoveEntry(Int index)
 
 		if (operat->GetIndex() == index)
 		{
-			if (operat->gotNext && prev != ARRAY_NULLPOINTER)
+			if (operat->GetNext() != ARRAY_NULLPOINTER && prev != ARRAY_NULLPOINTER)
 			{
 				prev->SetNext(operat->GetNext());
 				operat->GetNext()->SetPrev(prev);
 			}
-			else if (operat->gotNext && prev == ARRAY_NULLPOINTER)
+			else if (operat->GetNext() != ARRAY_NULLPOINTER && prev == ARRAY_NULLPOINTER)
 			{
 				firstEntry = operat->GetNext();
 				operat->GetNext()->SetPrev(ARRAY_NULLPOINTER);
 			}
-			else if (!operat->gotNext && prev != ARRAY_NULLPOINTER)
+			else if (operat->GetNext() == ARRAY_NULLPOINTER && prev != ARRAY_NULLPOINTER)
 			{
 				prev->SetNext(ARRAY_NULLPOINTER);
 				lastEntry = prev;
 			}
 
 			if (operat == prevEntry) prevEntry = ARRAY_NULLPOINTER;
-			if (!operat->gotNext && operat == firstEntry) firstEntry = ARRAY_NULLPOINTER;
+			if (operat->GetNext() == ARRAY_NULLPOINTER && operat == firstEntry) firstEntry = ARRAY_NULLPOINTER;
 			if (operat == prevDeletedEntry) prevDeletedEntry = ARRAY_NULLPOINTER;
 
 			prevDeletedEntry = prev;
 
-			operat->Clear();
 			delete operat;
 
 			nOfEntries--;
@@ -407,34 +376,32 @@ template <class t> S::Bool S::Array<t>::RemoveAll()
 {
 	if (nOfEntries == 0) return False;
 
-	while (firstEntry != ARRAY_NULLPOINTER)
-	{
-		RemoveEntry(firstEntry->GetIndex());
-	}
+	while (firstEntry != ARRAY_NULLPOINTER) RemoveEntry(firstEntry->GetIndex());
 
-	nOfEntries		= 0;
-	greatestIndex		= -1;
-	outlinedEntry		= False;
-	firstEntry		= ARRAY_NULLPOINTER;
-	lastEntry		= ARRAY_NULLPOINTER;
-	prevEntry		= ARRAY_NULLPOINTER;
-	prevDeletedEntry	= ARRAY_NULLPOINTER;
+	nOfEntries	= 0;
+	greatestIndex	= -1;
+	outlinedEntry	= False;
 
-	lastN = -1024;
-	lastNthEntry = ARRAY_NULLPOINTER;
+	firstEntry	= ARRAY_NULLPOINTER;
+	lastEntry	= ARRAY_NULLPOINTER;
+	prevEntry	= ARRAY_NULLPOINTER;
+	prevDeletedEntry= ARRAY_NULLPOINTER;
+
+	lastN		= -1024;
+	lastNthEntry	= ARRAY_NULLPOINTER;
 
 	return True;
 }
 
 template <class t> t S::Array<t>::GetEntry(Int index)
 {
-	Array_Entry<t>	*operat = ARRAY_NULLPOINTER;
-
 	if (nOfEntries == 0) return ARRAY_NULLVALUE;
+
+	Array_Entry<t>	*operat = ARRAY_NULLPOINTER;
 
 	if (prevEntry != ARRAY_NULLPOINTER)
 	{
-		if (prevEntry->gotNext)
+		if (prevEntry->GetNext() != ARRAY_NULLPOINTER)
 		{
 			if (prevEntry->GetNext()->GetIndex() == index)
 			{
@@ -444,7 +411,7 @@ template <class t> t S::Array<t>::GetEntry(Int index)
 			}
 		}
 
-		if (prevEntry->gotPrev)
+		if (prevEntry->GetPrev() != ARRAY_NULLPOINTER)
 		{
 			if (prevEntry->GetPrev()->GetIndex() == index)
 			{
@@ -469,8 +436,8 @@ template <class t> t S::Array<t>::GetEntry(Int index)
 				return operat->GetValue();
 			}
 
-			if (operat->gotNext)	operat = operat->GetNext();
-			else			break;
+			if (operat->GetNext() != ARRAY_NULLPOINTER)	operat = operat->GetNext();
+			else						break;
 		}
 	}
 
@@ -479,11 +446,13 @@ template <class t> t S::Array<t>::GetEntry(Int index)
 
 template <class t> S::Bool S::Array<t>::SetEntry(Int index, t entry)
 {
+	if (nOfEntries == 0) return False;
+
 	Array_Entry<t>	*operat = ARRAY_NULLPOINTER;
 
 	if (prevEntry != ARRAY_NULLPOINTER)
 	{
-		if (prevEntry->gotNext)
+		if (prevEntry->GetNext() != ARRAY_NULLPOINTER)
 		{
 			if (prevEntry->GetNext()->GetIndex() == index)
 			{
@@ -495,7 +464,7 @@ template <class t> S::Bool S::Array<t>::SetEntry(Int index, t entry)
 			}
 		}
 
-		if (prevEntry->gotPrev)
+		if (prevEntry->GetPrev() != ARRAY_NULLPOINTER)
 		{
 			if (prevEntry->GetPrev()->GetIndex() == index)
 			{
@@ -523,17 +492,12 @@ template <class t> S::Bool S::Array<t>::SetEntry(Int index, t entry)
 				return True;
 			}
 
-			if (operat->gotNext)	operat = operat->GetNext();
-			else			break;
+			if (operat->GetNext() != ARRAY_NULLPOINTER)	operat = operat->GetNext();
+			else						break;
 		}
 	}
 
 	return False;
-}
-
-template <class t> S::Int S::Array<t>::GetNOfEntries()
-{
-	return nOfEntries;
 }
 
 template <class t> t S::Array<t>::GetFirstEntry()
@@ -564,7 +528,7 @@ template <class t> t S::Array<t>::GetNextEntry()
 
 	if (prevEntry != ARRAY_NULLPOINTER)
 	{
-		if (prevEntry->gotNext)
+		if (prevEntry->GetNext() != ARRAY_NULLPOINTER)
 		{
 			ret = prevEntry->GetNext();
 
@@ -572,7 +536,6 @@ template <class t> t S::Array<t>::GetNextEntry()
 
 			return ret->GetValue();
 		}
-		else	return ARRAY_NULLVALUE;
 	}
 
 	return ARRAY_NULLVALUE;
@@ -584,7 +547,7 @@ template <class t> t S::Array<t>::GetPrevEntry()
 
 	if (prevEntry != ARRAY_NULLPOINTER)
 	{
-		if (prevEntry->gotPrev)
+		if (prevEntry->GetPrev() != ARRAY_NULLPOINTER)
 		{
 			ret = prevEntry->GetPrev();
 
@@ -592,7 +555,6 @@ template <class t> t S::Array<t>::GetPrevEntry()
 
 			return ret->GetValue();
 		}
-		else	return ARRAY_NULLVALUE;
 	}
 
 	return ARRAY_NULLVALUE;
@@ -606,10 +568,7 @@ template <class t> t S::Array<t>::GetNthEntry(Int n)
 
 	if (lastNthEntry == prevEntry)
 	{
-		if (n == lastN)
-		{
-			return prevEntry->GetValue();
-		}
+		if (n == lastN) return prevEntry->GetValue();
 
 		if (n == lastN + 1)
 		{
@@ -634,13 +593,10 @@ template <class t> t S::Array<t>::GetNthEntry(Int n)
 
 	ret = GetFirstEntry();
 
-	for (Int i = 0; i < n; i++)
-	{
-		ret = GetNextEntry();
-	}
+	for (Int i = 0; i < n; i++) ret = GetNextEntry();
 
-	lastN = n;
-	lastNthEntry = prevEntry;
+	lastN		= n;
+	lastNthEntry	= prevEntry;
 
 	return ret;
 }
@@ -651,35 +607,20 @@ template <class t> S::Int S::Array<t>::GetNthEntryIndex(Int n)
 
 	Array_Entry<t>	*entry = firstEntry;
 
-	for (Int i = 0; i < n; i++)
-	{
-		entry = entry->GetNext();
-	}
+	for (Int i = 0; i < n; i++) entry = entry->GetNext();
 
 	return entry->GetIndex();
 }
 
-template <class t> S::Int S::Array<t>::GetNOfEntries(const Array<t> *array)
-{
-	return array->nOfEntries;
-}
-
 template <class t> t S::Array<t>::GetNthEntry(const Array<t> *array, Int n)
 {
-	if (n >= array->nOfEntries) return ARRAY_NULLVALUE;
+	if (n >= array->GetNOfEntries()) return ARRAY_NULLVALUE;
 
 	Array_Entry<t> *pEntry = array->firstEntry;
 
-	t	 ret = Array_Entry<t>::GetValue(pEntry);
+	for (Int i = 0; i < n; i++) pEntry = pEntry->GetNext();
 
-	for (Int i = 0; i < n; i++)
-	{
-		pEntry = Array_Entry<t>::GetNext(pEntry);
-
-		ret = Array_Entry<t>::GetValue(pEntry);
-	}
-
-	return ret;
+	return pEntry->GetValue();
 }
 
 #endif

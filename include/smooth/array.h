@@ -19,11 +19,9 @@
 #define ARRAY_NULLPOINTER	((smooth::Array_Entry<t> *)	0)
 #endif
 
-#include "templates/array/value.h"
 #include "templates/array/entry.h"
 #include "templates/array/array.h"
 
-#include "templates/array/value.cpp"
 #include "templates/array/entry.cpp"
 #include "templates/array/array.cpp"
 

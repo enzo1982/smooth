@@ -69,6 +69,9 @@
 #include "smooth/system/system.h"
 #include "smooth/system/timer.h"
 
+#include "smooth/files/directory.h"
+#include "smooth/files/file.h"
+
 #include "smooth/threads/mutex.h"
 #include "smooth/threads/semaphore.h"
 #include "smooth/threads/thread.h"

@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 TIMER_WIN32 = 1;
 
-		class TimerWin32 : public TimerBackend
+		class SMOOTH_STATIC_EXPORT TimerWin32 : public TimerBackend
 		{
 			private:
 				Int			 timerid;

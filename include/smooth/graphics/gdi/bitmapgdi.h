@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 BITMAP_GDI = 1;
 
-		class BitmapGDI : public BitmapBackend
+		class SMOOTH_STATIC_EXPORT BitmapGDI : public BitmapBackend
 		{
 			private:
 				HBITMAP			 bitmap;

@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 BACKEND_WIN32 = 2;
 
-		class BackendWin32 : public Backend
+		class SMOOTH_STATIC_EXPORT BackendWin32 : public Backend
 		{
 			public:
 					 BackendWin32();

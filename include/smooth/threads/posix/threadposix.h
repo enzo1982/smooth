@@ -29,7 +29,7 @@ namespace smooth
 	{
 		const Int	 THREAD_POSIX	= 1;
 
-		class ThreadPOSIX : public ThreadBackend
+		class SMOOTH_STATIC_EXPORT ThreadPOSIX : public ThreadBackend
 		{
 			protected:
 				pthread_t	*thread;

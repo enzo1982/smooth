@@ -8,35 +8,39 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_STATUSBAR_
-#define _H_OBJSMOOTH_STATUSBAR_
+#ifndef _H_OBJSMOOTH_SIGNAL_
+#define _H_OBJSMOOTH_SIGNAL_
+
+#include "../../object.h"
 
 namespace smooth
 {
-	namespace GUI
+	class Signal
 	{
-		class Statusbar;
-	};
-};
+		protected:
+			Object	*parent;
 
-#include "../widget.h"
+			Void ProtectParent()
+			{
+				if (parent != NIL) parent->EnterProtectedRegion();
+			}
 
-namespace smooth
-{
-	namespace GUI
-	{
-		class SMOOTHAPI Statusbar : public Widget
-		{
-			public:
-				static const Int	 classID;
+			Void UnprotectParent()
+			{
+				if (parent != NIL) parent->LeaveProtectedRegion();
+			}
+		public:
+			Signal()
+			{
+				parent = NIL;
+			}
 
-							 Statusbar(String);
-							~Statusbar();
+			Int SetParentObject(Object *newParent)
+			{
+				parent = newParent;
 
-				Int			 Paint(Int);
-
-				Int			 SetText(const String &);
-		};
+				return Success;
+			}
 	};
 };
 

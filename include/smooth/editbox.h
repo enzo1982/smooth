@@ -89,7 +89,7 @@ namespace smooth
 				Int			 Activate();
 				Int			 Deactivate();
 
-				Int			 SetText(String);
+				Int			 SetText(const String &);
 
 				Int			 SetDropDownList(List *);
 

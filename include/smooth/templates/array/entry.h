@@ -8,32 +8,47 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_SMOOTHARRAY_ENTRY_
-#define _H_SMOOTHARRAY_ENTRY_
+#ifndef _H_OBJSMOOTH_ARRAY_ENTRY_
+#define _H_OBJSMOOTH_ARRAY_ENTRY_
 
-#include "value.h"
+#include "../../definitions.h"
 
 namespace smooth
 {
-	template <class t> class Array_Entry : public Array_Value<t>
+	class Array_Entry_Base
+	{
+		public:
+			virtual	~Array_Entry_Base()
+			{
+			}
+	};
+
+	template <class t> class Array_Entry : public Array_Entry_Base
 	{
 		private:
-			Array_Entry<t>	*nextEntry;
-			Array_Entry<t>	*prevEntry;
-		public:
-			Bool			 gotNext;
-			Bool			 gotPrev;
+			Bool			 filled;
+			t			 value;
+			Int			 index;
 
+			Array_Entry<t>		*nextEntry;
+			Array_Entry<t>		*prevEntry;
+		public:
 						 Array_Entry();
 						~Array_Entry();
 
-			Bool			 SetNext(Array_Entry<t> *);
-			Bool			 SetPrev(Array_Entry<t> *);
-			inline Array_Entry<t>	*GetNext();
-			inline Array_Entry<t>	*GetPrev();
+			Bool			 Fill(t);
+			Bool			 Clear();
 
-			static Array_Entry<t>	*GetNext(const Array_Entry<t> *);
-			static Array_Entry<t>	*GetPrev(const Array_Entry<t> *);
+			t			 GetValue() const			{ return value; }
+
+			Int			 GetIndex() const			{ return index; }
+			Bool			 SetIndex(Int);
+
+			Array_Entry<t>		*GetNext() const			{ return nextEntry; }
+			Bool			 SetNext(Array_Entry<t> *entry)		{ nextEntry = entry; return True; }
+
+			Array_Entry<t>		*GetPrev() const			{ return prevEntry; }
+			Bool			 SetPrev(Array_Entry<t> *entry)		{ prevEntry = entry; return True; }
 	};
 };
 

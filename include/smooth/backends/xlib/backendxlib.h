@@ -29,7 +29,7 @@ namespace smooth
 	{
 		const Int	 BACKEND_XLIB = 1;
 
-		class BackendXLib : public Backend
+		class SMOOTH_STATIC_EXPORT BackendXLib : public Backend
 		{
 			private:
 				Display	*display;

@@ -219,7 +219,7 @@ S::Bool S::GUI::Widget::IsActive()
 	return active;
 }
 
-S::Int S::GUI::Widget::SetText(String newText)
+S::Int S::GUI::Widget::SetText(const String &newText)
 {
 	Bool	 prevVisible = IsVisible();
 
@@ -244,7 +244,7 @@ S::String S::GUI::Widget::GetText()
 	return objectProperties->text;
 }
 
-S::Int S::GUI::Widget::SetTooltip(String newTooltip)
+S::Int S::GUI::Widget::SetTooltip(const String &newTooltip)
 {
 	objectProperties->tooltip = newTooltip;
 

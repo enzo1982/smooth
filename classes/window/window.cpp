@@ -160,15 +160,15 @@ S::GUI::Layer *S::GUI::Window::GetMainLayer()
 	return mainLayer;
 }
 
-S::Int S::GUI::Window::SetText(String title)
+S::Int S::GUI::Window::SetText(const String &newTitle)
 {
-	objectProperties->text = title;
+	objectProperties->text = newTitle;
 
 	if (created)
 	{
 		Process(SM_WINDOWTITLECHANGED, 0, 0);
 
-		backend->SetTitle(title);
+		backend->SetTitle(objectProperties->text);
 	}
 
 	return Success;

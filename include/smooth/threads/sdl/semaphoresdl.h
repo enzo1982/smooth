@@ -30,7 +30,7 @@ namespace smooth
 	{
 		const Int	 SEMAPHORE_SDL	= 3;
 
-		class SemaphoreSDL : public SemaphoreBackend
+		class SMOOTH_STATIC_EXPORT SemaphoreSDL : public SemaphoreBackend
 		{
 			protected:
 				SDL_sem	*semaphore;

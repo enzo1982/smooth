@@ -113,6 +113,16 @@ $(OBJECTDIR)/tipodaydlg.o: $(DIALOGSCLASSESDIR)/tipodaydlg.cpp $(SMOOTHINCLUDEDI
 	$(COMPILER) $(COMPILER_OPTS) $(DIALOGSCLASSESDIR)/tipodaydlg.cpp -o $(OBJECTDIR)/tipodaydlg.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/directory.o: $(FILESCLASSESDIR)/directory.cpp $(SMOOTHINCLUDEDIR)/files/directory.h
+	$(ECHO) -n Compiling $(FILESCLASSESDIR)/directory.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(FILESCLASSESDIR)/directory.cpp -o $(OBJECTDIR)/directory.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/file.o: $(FILESCLASSESDIR)/file.cpp $(SMOOTHINCLUDEDIR)/files/file.h
+	$(ECHO) -n Compiling $(FILESCLASSESDIR)/file.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(FILESCLASSESDIR)/file.cpp -o $(OBJECTDIR)/file.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/bitmapgdi.o: $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/gdi/bitmapgdi.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp -o $(OBJECTDIR)/bitmapgdi.o

@@ -209,7 +209,7 @@ S::String S::GUI::Hyperlink::GetURL()
 	return linkURL;
 }
 
-S::Int S::GUI::Hyperlink::SetText(String newText)
+S::Int S::GUI::Hyperlink::SetText(const String &newText)
 {
 	if (linkBitmap != NIL) linkBitmap = NIL;
 

@@ -40,7 +40,7 @@ namespace smooth
 				virtual Int		 Paint(Int);
 				Int			 Process(Int, Int, Int);
 
-				Int			 SetText(String);
+				Int			 SetText(const String &);
 		};
 	};
 };

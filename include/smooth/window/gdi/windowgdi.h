@@ -28,7 +28,7 @@ namespace smooth
 	{
 		const Int	 WINDOW_GDI	= 1;
 
-		class WindowGDI : public WindowBackend
+		class SMOOTH_STATIC_EXPORT WindowGDI : public WindowBackend
 		{
 			private:
 				static LRESULT CALLBACK		 WindowProc(HWND, UINT, WPARAM, LPARAM);

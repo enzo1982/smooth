@@ -46,7 +46,7 @@ namespace smooth
 				Bitmap			&GetBitmap();
 				String			 GetURL();
 
-				Int			 SetText(String);
+				Int			 SetText(const String &);
 				Int			 SetBitmap(const Bitmap &);
 				Int			 SetURL(String);
 		};

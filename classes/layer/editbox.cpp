@@ -935,7 +935,7 @@ S::Int S::GUI::EditBox::Deactivate()
 	return Widget::Deactivate();
 }
 
-S::Int S::GUI::EditBox::SetText(String txt)
+S::Int S::GUI::EditBox::SetText(const String &txt)
 {
 	scrollbarPos = 0;
 

@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 SURFACE_XLIB	= 2;
 
-		class SurfaceXLib : public SurfaceBackend
+		class SMOOTH_STATIC_EXPORT SurfaceXLib : public SurfaceBackend
 		{
 			private:
 				Display	*display;

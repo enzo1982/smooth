@@ -64,7 +64,7 @@ namespace smooth
 				Int		 Paint(Int);
 				Int		 Process(Int, Int, Int);
 
-				Int		 SetText(String);
+				Int		 SetText(const String &);
 				Int		 SetStatusText(String);
 				Int		 SetShortcut(Int, Int);
 

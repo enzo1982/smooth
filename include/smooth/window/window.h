@@ -98,7 +98,7 @@ namespace smooth
 
 				Int				 SetMetrics(const Point &, const Size &);
 
-				Int				 SetText(String);
+				Int				 SetText(const String &);
 
 				Layer				*GetMainLayer();
 

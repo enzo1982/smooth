@@ -370,13 +370,13 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::GUI::MenuEntry::SetText(String newText)
+S::Int S::GUI::MenuEntry::SetText(const String &newText)
 {
-	if (newText == NIL) type = (type | SM_TEXT) ^ SM_TEXT;
-
 	Widget::SetText(newText);
 
 	CalcSize();
+
+	if (objectProperties->text == NIL) type = (type | SM_TEXT) ^ SM_TEXT;
 
 	return Success;
 }

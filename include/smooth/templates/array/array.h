@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_SMOOTHARRAY_ARRAY_
-#define _H_SMOOTHARRAY_ARRAY_
+#ifndef _H_OBJSMOOTH_ARRAY_
+#define _H_OBJSMOOTH_ARRAY_
 
 #include "entry.h"
 
@@ -57,7 +57,7 @@ namespace smooth
 			t		 GetEntry(Int);
 			Bool		 SetEntry(Int, t);
 
-			Int		 GetNOfEntries();
+			Int		 GetNOfEntries() const		{ return nOfEntries; };
 			t		 GetFirstEntry();
 			t		 GetLastEntry();
 			t		 GetNextEntry();
@@ -65,7 +65,8 @@ namespace smooth
 			t		 GetNthEntry(Int);
 			Int		 GetNthEntryIndex(Int);
 
-			static Int	 GetNOfEntries(const Array<t> *);
+		// static methods for accessing const arrays:
+
 			static t	 GetNthEntry(const Array<t> *, Int);
 	};
 };

@@ -5,11 +5,15 @@ xx.xx.04 xx:xx - smooth alpha 0.8.65.0
 - editbox.cpp	- improved multiline editbox
 - renderer.cpp	- started implementation of a XUL renderer
 - window.cpp	- windows can now be shown minimized initially
+- array.cpp	- improved smooth::Array implementation
+- file.cpp	- new class: File; basic file handling routines
+- directory.cpp	- new class: Directory; basic directory handling routines
+- signal.cpp	- improved signals and slots implementation
 
 - added auto registration for backends (just compile and link any new backends to use them; no need to change existing code)
 - added the fribidi library to support RTL scripts on all systems
 - improved smooth Translator utility
-- removed large fonts support; it will be reimplemented using the same technology which is used for RTL support
+- removed large fonts support; it will be reimplemented later
 - added an SDL threads backend
 - added XLib backends for Bitmaps and Surfaces
 - added an IOLib driver for accessing files with Unicode filenames

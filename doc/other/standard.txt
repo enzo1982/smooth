@@ -1,0 +1,14 @@
+Standard behaviour of some smooth functions
+
+- all objects should use the Object::GetRealPosition method
+  instead of calculating their position on their own
+
+Return values of standard methods in exceptional cases:
+
+		!registered	!visible	!active
+Paint()		Error		Success		n.a.
+Process()	Error		Success		Success
+Show()		Success		Success		Success
+Hide()		Success		Success		Success
+Activate()	Success		Success		Success
+Deactivate()	Success		Success		Success

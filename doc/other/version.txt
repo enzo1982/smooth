@@ -1,0 +1,5 @@
+The version number of a smooth release can be interpreted as follows:
+
+In 'a.b.c.d' the 'a' is the major version number, the 'b' is the minor version number,
+the 'c' is the release number (starting with 1) and the 'd' is the patchlevel (starting with 0).
+So 0.8.13.4 means smooth version 0.8, 13th release, patchlevel 4 of version 0.8.

@@ -1,0 +1,20 @@
+Which files to include in smooth applications?
+
+The include files for smooth are in the 'include'
+directory of the source code distribution.
+
+You will have to include one of the following files:
+	smooth.h	- everywhere
+	smooth/main.h	- for normal applications
+	smooth/dll.h	- for DLLs using smooth
+
+Examples:
+	You have a project (normal app) consisting of three files:
+		main.cpp	- includes smooth.h and smooth/main.h
+		tools.cpp	- includes smooth.h if needed
+		tools.h		- includes smooth.h if needed
+
+	You have a DLL project consisting of the following files:
+		dllmain.cpp	- includes smooth.h and smooth/dll.h
+		tools.cpp	- includes smooth.h if needed
+		tools.h		- includes smooth.h if needed

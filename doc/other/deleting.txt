@@ -1,0 +1,21 @@
+There are two ways to delete a smooth object:
+
+1. by C++ operator 'delete'
+
+	This will delete the object even if some member function is still active.
+	This may lead to a crash of your program.
+
+2. by static method Object::DeleteObject(Object *)
+
+	This is the recommended way. It will delete the object immediately if there
+	are no member functions currently active and will mark it as 'deleteable'
+	else. An Object that is marked as 'deleteable' will be deleted by the cleanup
+	thread when it is free.
+
+You should use the EnterProtectedRegion and LeaveProtectedRegion methods to mark an
+object as being in use. Do it at least when entering/leaving the Process and Paint
+methods.
+
+This stuff is necessary, because an object may call 'unknown' callback-methods that
+might want to delete the calling object. If the calling object was deleted immediately,
+the callback-method would return to the just deleted instance of the calling object.

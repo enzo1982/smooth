@@ -11,6 +11,19 @@
 #ifndef _H_OBJSMOOTH_LISTENTRY_
 #define _H_OBJSMOOTH_LISTENTRY_
 
+namespace smooth
+{
+	namespace GUI
+	{
+		class Tooltip;
+	};
+
+	namespace System
+	{
+		class Timer;
+	};
+};
+
 #include "../../../../basic/object.h"
 #include "../../../../graphics/rect.h"
 #include "../../../../graphics/font.h"
@@ -24,6 +37,10 @@ namespace smooth
 			Int		 id;
 			String		 name;
 
+			String		 tooltipText;
+			GUI::Tooltip	*tooltip;
+			System::Timer	*tipTimer;
+
 			Bool		 checked;
 			Bool		 clicked;
 			Bool		 selected;
@@ -34,6 +51,10 @@ namespace smooth
 
 					 ListEntry(Int);
 					~ListEntry();
+
+			Void		 ActivateTooltip();
+
+			Int		 SetTooltipText(const String &);
 		signals:
 			Signal0<Void>	 onMouseOver;
 			Signal0<Void>	 onMouseOut;

@@ -19,6 +19,8 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/multi/list/listboxheader.h>
+#include <smooth/system/timer.h>
+#include <smooth/gui/widgets/special/tooltip.h>
 
 const S::Int	 S::GUI::ListBox::classID = S::Object::RequestClassID();
 
@@ -797,6 +799,26 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 					onClick.Emit(wnd->MouseX(), wnd->MouseY());
 					operat->onClick.Emit();
 
+					if (operat->tipTimer != NIL)
+					{
+						operat->tipTimer->Stop();
+
+						DeleteObject(operat->tipTimer);
+
+						operat->tipTimer = NIL;
+					}
+
+					if (operat->tooltip != NIL)
+					{
+						operat->tooltip->Hide();
+
+						operat->tooltip->GetContainer()->GetContainerWindow()->UnregisterObject(operat->tooltip);
+
+						DeleteObject(operat->tooltip);
+
+						operat->tooltip = NIL;
+					}
+
 					retVal = Break;
 				}
 			}
@@ -816,6 +838,26 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 					operat->checked = False;
 
 					operat->onMouseOut.Emit();
+
+					if (operat->tipTimer != NIL)
+					{
+						operat->tipTimer->Stop();
+
+						DeleteObject(operat->tipTimer);
+
+						operat->tipTimer = NIL;
+					}
+
+					if (operat->tooltip != NIL)
+					{
+						operat->tooltip->Hide();
+
+						operat->tooltip->GetContainer()->GetContainerWindow()->UnregisterObject(operat->tooltip);
+
+						DeleteObject(operat->tooltip);
+
+						operat->tooltip = NIL;
+					}
 				}
 			}
 
@@ -832,6 +874,22 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 					Paint(SP_MOUSEIN);
 
 					operat->onMouseOver.Emit();
+
+					if (operat->tooltipText != NIL)
+					{
+						operat->tipTimer = new System::Timer();
+
+						operat->tipTimer->onInterval.Connect(&ListEntry::ActivateTooltip, operat);
+						operat->tipTimer->Start(500);
+					}
+				}
+				else if (operat->checked && wnd->IsMouseOn(operat->rect))
+				{
+					if (operat->tipTimer != NIL && wParam == 0)
+					{
+						operat->tipTimer->Stop();
+						operat->tipTimer->Start(500);
+					}
 				}
 			}
 

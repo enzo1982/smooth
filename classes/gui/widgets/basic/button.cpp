@@ -49,8 +49,6 @@ S::GUI::Button::Button(String iText, const Bitmap &bmp, Point iPos, Size iSize)
 
 S::GUI::Button::~Button()
 {
-	Window	*wnd = NIL;
-
 	if (tipTimer != NIL)
 	{
 		tipTimer->Stop();
@@ -62,7 +60,7 @@ S::GUI::Button::~Button()
 
 	if (tooltip != NIL)
 	{
-		wnd = tooltip->GetContainer()->GetContainerWindow();
+		Window	*wnd = tooltip->GetContainer()->GetContainerWindow();
 
 		tooltip->Hide();
 

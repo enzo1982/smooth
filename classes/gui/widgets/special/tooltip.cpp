@@ -69,7 +69,7 @@ S::Int S::GUI::Tooltip::Show()
 
 	wndRect.left	= 0;
 	wndRect.top	= 0;
-	wndRect.bottom	= 16;
+	wndRect.bottom	= font.GetTextSizeY(text) + 4;
 	wndRect.right	= font.GetTextSizeX(text) + 6;
 
 	toolWindow = new ToolWindow();
@@ -134,7 +134,7 @@ S::Int S::GUI::Tooltip::DrawTooltip()
 
 	wndRect.left	= 0;
 	wndRect.top	= 0;
-	wndRect.bottom	= 16;
+	wndRect.bottom	= font.GetTextSizeY(text) + 4;
 	wndRect.right	= font.GetTextSizeX(text) + 6;
 
 	Surface	*surface = toolWindow->GetDrawSurface();

@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.xx.xx xx:xx - smooth alpha 0.8.66.0
+xx.01.05 xx:xx - smooth alpha 0.8.66.0
 
 - object.cpp	- incorporated object manager functionality into Object
 - window.cpp	- fixed a possible crash on window close
@@ -11,74 +11,9 @@ xx.xx.xx xx:xx - smooth alpha 0.8.66.0
 - label.cpp	- new class: XUL::Label
 - desc...ion.cpp- new class: XUL::Description
 - args.cpp	- new class: ArgumentsParser; parser for command line arguments
+- listentry.cpp	- added support for tooltips
+- tooltip.cpp	- added support for multi line text
 
 - removed ObjectManager
 - removed ObjectProperties
 - upgrade to libXML2 version 2.6.16
-
-18.11.04 00:06 - smooth alpha 0.8.65.0
-
-- editbox.cpp	- improved multiline editbox
-- renderer.cpp	- started implementation of an XUL renderer
-- window.cpp	- windows can now be shown minimized initially
-- array.cpp	- improved smooth::Array implementation
-- file.cpp	- new class: File; basic file handling routines
-- directory.cpp	- new class: Directory; basic directory handling routines
-- signal.cpp	- improved signals and slots implementation
-- extended.cpp	- improved Extended<> class
-		- implemented -> and * operators
-- math.cpp	- implemented integer versions of Abs, Pow, Min, Max and Mod
-- form.cpp	- class Primitive renamed to Form
-- container.cpp	- moved into namespace GUI
-		- containers now inherit from Widget
-
-- added auto registration for backends (just compile and link any new backends to use them; no need to change existing code)
-- added the fribidi library to support RTL scripts on all systems
-- improved smooth Translator utility
-- removed large fonts support; it will be reimplemented later
-- added an SDL threads backend
-- added XLib backends for Bitmaps and Surfaces
-- added an IOLib driver for accessing files with Unicode filenames
-
-11.03.04 15:42 - smooth alpha 0.8.64.0
-
-- rect.cpp	- new methods: Bool DoRectsOverlap(Rect, Rect); and Rect OverlapRect(Rect, Rect);
-- widget.cpp	- new method: Bool IsAffected(Rect &); replaces corresponding STK function
-- window.cpp	- splitted into Frontend and Backend parts
-		- fixed crashes on Windows 9x
-- windowgdi.cpp	- new class: WindowGDI; implements Window API for Win32 systems
-- bitmap.cpp	- splitted into a frontend and a system dependent backend part
-- surface.cpp	- splitted into a frontend and a system dependent backend part
-		- made thread safe
-- messagebox.cpp- S::SMOOTH::MessageBox is now S::QuickMessage
-		- renamed MessageBoxApp to MessageDlg
-		- MessageDlg can now show a CheckBox with a message
-- callbackn.cpp	- You can now connect values directly to the Callback, the connected value will be returned without any function being called
-- config.cpp	- new class: Configuration; an interface to XML configuration files
-- tipodaydlg.cpp- new dialog: 'Tip of the Day' dialog window
-- menuentry.cpp	- started redesign of the menu system - MenuEntry is now a Widget
-- mutex.cpp	- splitted into frontend and backend parts
-- semaphore.cpp	- splitted into frontend and backend parts
-- thread.cpp	- splitted into frontend and backend parts
-		- revised and improved Thread API
-- timer.cpp	- splitted into frontend and backend parts
-		- wrote SDL backend for Timers
-- string.cpp	- removed IsUTF8() method as this is handled automatically by ConvertString(...)
-		- new method IsUnicode()
-- array.cpp	- fixed a stack overflow (recursion) in RemoveAll() if an Array has too many entries
-- editbox.cpp	- added signal: onEnter; emitted when the user finishes input with enter/return
-- event.cpp	- new class: implements system events
-- loop.cpp	- generalized event handling
-
-- new namespace GUI::Dialogs contains all dialogs plus MessageBox (now MessageDlg) and SplashScreen
-- new namespace Threads contains everything related to multi threading
-- new namespace System contains classes System and Timer
-- removed ThreadManager
-- removed some Windows API calls
-- removed smooth Toolkit (STK, stk.cpp)
-- removed mpToolkit (toolkit.cpp)
-- removed threads support from LiSA
-- switched to an XML ToDo list system
-- add DTDs for ConfigFile and LangFile XML file types
-- many smaller bugfixes and improvements
-- fixed Makefile.static

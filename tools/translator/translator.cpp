@@ -1,0 +1,722 @@
+ /* The smooth Class Library
+  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the "Artistic License".
+  *
+  * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#include <smooth.h>
+#include <smooth/main.h>
+#include "translator.h"
+
+Int smooth::Main()
+{
+	Translator	*app = new Translator();
+
+	Loop();
+
+	delete app;
+
+	return 0;
+}
+
+Translator::Translator()
+{
+	filename = "";
+
+	Point	 pos;
+	Size	 size;
+
+	wnd		= new Window(String("smooth Translator v").Append(SMOOTH_VERSION));
+	title		= new Titlebar(true, false, true);
+	menubar		= new Menubar();
+	statusbar	= new Statusbar("Ready");
+
+	pos.x = 7;
+	pos.y = 6;
+
+	button_new	= new Button("New", NULL, pos, size, Proc(Translator, this, NewEntry));
+
+	pos.x += 87;
+	pos.y += 4;
+
+	text_id		= new Text("ID:", pos);
+
+	pos.x += 20;
+	pos.y -= 3;
+	size.cx = 37;
+	size.cy = 0;
+
+	edit_id		= new EditBox("", pos, size, EDB_NUMERIC, 5, NULLPROC);
+
+	pos.x += 44;
+	pos.y += 3;
+
+	text_original	= new Text("Original:", pos);
+
+	pos.x += 45;
+	pos.y -= 3;
+	size.cx = 158;
+	size.cy = 0;
+
+	edit_original	= new EditBox("", pos, size, EDB_ALPHANUMERIC, 0, NULLPROC);
+
+	pos.x += 165;
+	pos.y += 3;
+
+	text_translated	= new Text("Translation:", pos);
+
+	pos.x += 62;
+	pos.y -= 3;
+
+	edit_translated	= new EditBox("", pos, size, EDB_ALPHANUMERIC, 0, NULLPROC);
+
+	pos.x += 166;
+	pos.y -= 1;
+	size.cx = 0;
+
+	button_save	= new Button("Save", NULL, pos, size, Proc(Translator, this, SaveData));
+
+	pos.x += 88;
+
+	button_remove	= new Button("Remove", NULL, pos, size, Proc(Translator, this, RemoveEntry));
+
+	pos.x = 7;
+	pos.y += 27;
+	size.cx = 757;
+	size.cy = 189;
+
+	list_entries	= new ListBox(pos, size, Proc(Translator, this, SelectEntry));
+	list_entries->AllowReselect(True);
+
+	menu_file	= new PopupMenu();
+
+	menubar->AddEntry("&File", NIL, NULLPROC, menu_file);
+
+	menu_file->AddEntry("&New", NIL, Proc(Translator, this, NewFile));
+	menu_file->AddEntry("&Close", NIL, Proc(Translator, this, Close));
+	menu_file->AddEntry();
+	menu_file->AddEntry("&Open", NIL, Proc(Translator, this, OpenFile));
+	menu_file->AddEntry("&Save", NIL, Proc(Translator, this, SaveFile));
+	menu_file->AddEntry("Save &as", NIL, Proc(Translator, this, SaveFileAs));
+	menu_file->AddEntry();
+	menu_file->AddEntry("E&xit", NIL, Proc(Window, wnd, Close));
+
+	text_id->Deactivate();
+	edit_id->Deactivate();
+	text_original->Deactivate();
+	edit_original->Deactivate();
+	text_translated->Deactivate();
+	edit_translated->Deactivate();
+	button_save->Deactivate();
+	button_remove->Deactivate();
+	button_new->Deactivate();
+	list_entries->Deactivate();
+
+	RegisterObject(wnd);
+
+	wnd->RegisterObject(text_id);
+	wnd->RegisterObject(edit_id);
+	wnd->RegisterObject(text_original);
+	wnd->RegisterObject(edit_original);
+	wnd->RegisterObject(text_translated);
+	wnd->RegisterObject(edit_translated);
+	wnd->RegisterObject(button_save);
+	wnd->RegisterObject(button_remove);
+	wnd->RegisterObject(button_new);
+	wnd->RegisterObject(list_entries);
+	wnd->RegisterObject(title);
+	wnd->RegisterObject(menubar);
+	wnd->RegisterObject(statusbar);
+
+	wnd->SetMetrics(Point(50, 50), Size(777, 300));
+	wnd->SetIcon(SI_DEFAULT);
+	wnd->SetKillProc(KillProc(Translator, this, ExitProc));
+
+	wnd->Show();
+}
+
+Translator::~Translator()
+{
+	for (int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetFirstEntry();
+
+	entries.DeleteAll();
+
+	wnd->UnregisterObject(text_id);
+	wnd->UnregisterObject(edit_id);
+	wnd->UnregisterObject(text_original);
+	wnd->UnregisterObject(edit_original);
+	wnd->UnregisterObject(text_translated);
+	wnd->UnregisterObject(edit_translated);
+	wnd->UnregisterObject(button_save);
+	wnd->UnregisterObject(button_remove);
+	wnd->UnregisterObject(button_new);
+	wnd->UnregisterObject(list_entries);
+	wnd->UnregisterObject(title);
+	wnd->UnregisterObject(menubar);
+	wnd->UnregisterObject(statusbar);
+
+	UnregisterObject(wnd);
+
+	delete title;
+	delete wnd;
+	delete menubar;
+	delete statusbar;
+	delete menu_file;
+	delete text_id;
+	delete edit_id;
+	delete text_original;
+	delete edit_original;
+	delete text_translated;
+	delete edit_translated;
+	delete button_save;
+	delete button_remove;
+	delete button_new;
+	delete list_entries;
+}
+
+bool Translator::ExitProc()
+{
+	if (filename != "")
+	{
+		String	 file;
+		Int	 lastBs = -1;
+
+		for (int i = 0; i < filename.Length(); i++) if (filename[i] == '\\') lastBs = i;
+
+		for (int j = ++lastBs; j < filename.Length(); j++) file[j - lastBs] = filename[j];
+
+		Int	 id = SMOOTH::MessageBox(String("Do you want to save changes in ").Append(file).Append("?"), "smooth Translator", MB_YESNOCANCEL, IDI_QUESTION);
+
+		switch (id)
+		{
+			case IDYES:
+				SaveFile();
+				CloseFile();
+
+				return true;
+			case IDNO:
+				CloseFile();
+
+				return true;
+			case IDCANCEL:
+			case IDCLOSE:
+				return false;
+		}
+	}
+
+	return true;
+}
+
+void Translator::NewFile()
+{
+	if (!ExitProc()) return;
+
+	filename = "unnamed";
+
+	text_id->Activate();
+	edit_id->Activate();
+	text_original->Activate();
+	edit_original->Activate();
+	text_translated->Activate();
+	edit_translated->Activate();
+	button_save->Activate();
+	button_remove->Activate();
+	button_new->Activate();
+	list_entries->Activate();
+
+	{
+		int		 lid = list_entries->AddEntry("Program:", NULLPROC)->code;
+		listEntry	*entry = new listEntry;
+
+		entry->listid = lid;
+		entry->id = -1;
+		entry->original = "Program";
+		entry->translation = "";
+
+		entries.AddEntry(entry);
+
+		lid = list_entries->AddEntry("Version:", NULLPROC)->code;
+		entry = new listEntry;
+
+		entry->listid = lid;
+		entry->id = -2;
+		entry->original = "Version";
+		entry->translation = "";
+
+		entries.AddEntry(entry);
+
+		lid = list_entries->AddEntry("Language:", NULLPROC)->code;
+		entry = new listEntry;
+
+		entry->listid = lid;
+		entry->id = -3;
+		entry->original = "Language";
+		entry->translation = "";
+
+		entries.AddEntry(entry);
+
+		lid = list_entries->AddEntry("Author:", NULLPROC)->code;
+		entry = new listEntry;
+
+		entry->listid = lid;
+		entry->id = -4;
+		entry->original = "Author";
+		entry->translation = "";
+
+		entries.AddEntry(entry);
+
+		lid = list_entries->AddEntry("URL:", NULLPROC)->code;
+		entry = new listEntry;
+
+		entry->listid = lid;
+		entry->id = -5;
+		entry->original = "URL";
+		entry->translation = "";
+
+		entries.AddEntry(entry);
+	}
+
+	wnd->SetText(wnd->GetText().Append(" - unnamed"));
+}
+
+void Translator::Close()
+{
+	ExitProc();
+}
+
+void Translator::CloseFile()
+{
+	filename = "";
+
+	wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION));
+
+	for (int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetNthEntry(i);
+
+	entries.DeleteAll();
+
+	list_entries->CleanupList();
+
+	text_original->SetText("Original:");
+	text_translated->SetText("Translation:");
+
+	edit_id->SetText("");
+	edit_original->SetText("");
+	edit_translated->SetText("");
+
+	text_id->Deactivate();
+	edit_id->Deactivate();
+	text_original->Deactivate();
+	edit_original->Deactivate();
+	text_translated->Deactivate();
+	edit_translated->Deactivate();
+	button_save->Deactivate();
+	button_remove->Deactivate();
+	button_new->Deactivate();
+	list_entries->Deactivate();
+}
+
+void Translator::OpenFile()
+{
+	if (!ExitProc()) return;
+
+	DialogFileSelection	*dialog = new DialogFileSelection();
+
+	dialog->SetParentWindow(wnd);
+
+	dialog->AddFilter("XML Language Files", "lang_*.xml");
+	dialog->AddFilter("All Files", "*.*");
+
+	if (dialog->ShowDialog() == Success)
+	{
+		filename = dialog->GetFileName();
+
+		String	 file = filename;
+
+		filename = "";
+
+		NewFile();
+
+		filename = file;
+		file = "";
+
+		Int	 lastBs = -1;
+
+		for (int i = 0; i < filename.Length(); i++) if (filename[i] == '\\') lastBs = i;
+
+		for (int j = ++lastBs; j < filename.Length(); j++) file[j - lastBs] = filename[j];
+
+		wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION).Append(" - ").Append(file));
+
+		XML::Document	*doc = new XML::Document();
+
+		doc->LoadFile(filename);
+
+		XML::Node	*info = doc->GetRootNode()->GetNodeByName("info");
+
+		for (int i = 0; i < info->GetNOfNodes(); i++)
+		{
+			String		 property = info->GetNthNode(i)->GetAttributeByName("name")->GetContent();
+			listEntry	*entry = NULL;
+
+			if (property == "program")	entry = entries.GetNthEntry(0);
+			if (property == "version")	entry = entries.GetNthEntry(1);
+			if (property == "language")	entry = entries.GetNthEntry(2);
+			if (property == "author")	entry = entries.GetNthEntry(3);
+			if (property == "url")		entry = entries.GetNthEntry(4);
+
+			if (entry != NULL)
+			{
+				entry->translation = info->GetNthNode(i)->GetContent();
+
+				list_entries->ModifyEntry(entry->listid, String(entry->original).Append(": ").Append(entry->translation), NULLPROC);
+			}
+		}
+
+		XML::Node	*xentry = doc->GetRootNode()->GetNodeByName("entry");
+
+		while (xentry != NIL)
+		{
+			if (xentry->GetName() == "entry")
+			{
+				XML::Node	*property = xentry->GetNodeByName("property");
+				String		 translation;
+				String		 original;
+
+				do
+				{
+					if (property->GetName() == "property")
+					{
+						if (property->GetAttributeByName("name")->GetContent() == "string")
+						{
+							original = property->GetContent();
+						}
+						else if (property->GetAttributeByName("name")->GetContent() == "translation")
+						{
+							translation = property->GetContent();
+						}
+					}
+
+					property = property->GetNextNode();
+				}
+				while (property != NIL);
+
+				listEntry	*entry = new listEntry;
+
+				entry->listid = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append(" - ").Append(original).Append(" - ").Append(translation), NULLPROC)->code;
+				entry->id = xentry->GetAttributeByName("id")->GetContent().ToInt();
+				entry->original = original;
+				entry->translation = translation;
+
+				entries.AddEntry(entry);
+			}
+
+			xentry = xentry->GetNextNode();
+		}
+
+		delete doc;
+	}
+
+	delete dialog;
+}
+
+void Translator::SaveFile()
+{
+	if (filename == "") return;
+
+	if (filename != "unnamed")	SaveFileWithName(filename);
+	else				SaveFileAs();
+}
+
+void Translator::SaveFileAs()
+{
+	if (filename == "") return;
+
+	DialogFileSelection	*dialog = new DialogFileSelection();
+
+	dialog->SetParentWindow(wnd);
+	dialog->SetMode(SFM_SAVE);
+	dialog->SetDefaultExtension("xml");
+
+	dialog->AddFilter("XML Language Files", "lang_*.xml");
+	dialog->AddFilter("All Files", "*.*");
+
+	if (dialog->ShowDialog() == Success)
+	{
+		filename = dialog->GetFileName();
+
+		SaveFileWithName(filename);
+
+		String	 file;
+		Int	 lastBs = -1;
+
+		for (int i = 0; i < filename.Length(); i++) if (filename[i] == '\\') lastBs = i;
+
+		for (int j = ++lastBs; j < filename.Length(); j++) file[j - lastBs] = filename[j];
+
+		wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION).Append(" - ").Append(file));
+	}
+
+	delete dialog;
+}
+
+void Translator::SaveFileWithName(String file)
+{
+	XML::Document	*doc = new XML::Document();
+	XML::Node	*root = new XML::Node();
+
+	root->SetName("LangFile");
+
+	XML::Node	*info = root->AddNode("info", NIL);
+
+	info->AddNode("property", entries.GetNthEntry(0)->translation)->SetAttribute("name", "program");
+	info->AddNode("property", entries.GetNthEntry(1)->translation)->SetAttribute("name", "version");
+	info->AddNode("property", entries.GetNthEntry(2)->translation)->SetAttribute("name", "language");
+	info->AddNode("property", "UTF-8")->SetAttribute("name", "encoding");
+	info->AddNode("property", entries.GetNthEntry(3)->translation)->SetAttribute("name", "author");
+	info->AddNode("property", entries.GetNthEntry(4)->translation)->SetAttribute("name", "url");
+
+	for (int i = 5; i < entries.GetNOfEntries(); i++)
+	{
+		listEntry	*entry = entries.GetNthEntry(i);
+		XML::Node	*xentry = root->AddNode("entry", NIL);
+
+		xentry->SetAttribute("id", String::IntToString(entry->id));
+
+		xentry->AddNode("property", entry->original)->SetAttribute("name", "string");
+		xentry->AddNode("property", entry->translation)->SetAttribute("name", "translation");
+	}
+
+	doc->SetEncoding("UTF-8");
+	doc->SetRootNode(root);
+
+	doc->SaveFile(file);
+
+	delete doc;
+}
+
+void Translator::SaveData()
+{
+	listEntry	*entry = NULL;
+
+	if (edit_original->GetText() == "Program")
+	{
+		entry = entries.GetNthEntry(0);
+
+		entry->translation = edit_translated->GetText();
+
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+
+		entry = entries.GetNthEntry(1);
+
+		edit_original->SetText(entry->original);
+		edit_translated->SetText(entry->translation);
+	}
+	else if (edit_original->GetText() == "Version")
+	{
+		entry = entries.GetNthEntry(1);
+
+		entry->translation = edit_translated->GetText();
+
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+
+		entry = entries.GetNthEntry(2);
+
+		edit_original->SetText(entry->original);
+		edit_translated->SetText(entry->translation);
+	}
+	else if (edit_original->GetText() == "Language")
+	{
+		entry = entries.GetNthEntry(2);
+
+		entry->translation = edit_translated->GetText();
+
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+
+		entry = entries.GetNthEntry(3);
+
+		edit_original->SetText(entry->original);
+		edit_translated->SetText(entry->translation);
+	}
+	else if (edit_original->GetText() == "Author")
+	{
+		entry = entries.GetNthEntry(3);
+
+		entry->translation = edit_translated->GetText();
+
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+
+		entry = entries.GetNthEntry(4);
+
+		edit_original->SetText(entry->original);
+		edit_translated->SetText(entry->translation);
+	}
+	else if (edit_original->GetText() == "URL")
+	{
+		entry = entries.GetNthEntry(4);
+
+		entry->translation = edit_translated->GetText();
+
+		list_entries->ModifyEntry(entry->listid, String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()), NULLPROC);
+
+		text_id->Activate();
+		edit_id->Activate();
+		edit_original->Activate();
+		button_remove->Activate();
+
+		text_original->SetText("Original:");
+		text_translated->SetText("Translation:");
+
+		if (entries.GetNOfEntries() > 5)
+		{
+			entry = entries.GetNthEntry(5);
+
+			edit_id->SetText(String::IntToString(entry->id));
+			edit_original->SetText(entry->original);
+			edit_translated->SetText(entry->translation);
+		}
+		else
+		{
+			edit_id->SetText("1");
+			edit_original->SetText("");
+			edit_translated->SetText("");
+		}
+	}
+	else
+	{
+		for (int i = 0; i < entries.GetNOfEntries(); i++)
+		{
+			if (entries.GetNthEntry(i)->id == edit_id->GetText().ToInt())
+			{
+				entry = entries.GetNthEntry(i);
+
+				entry->id = edit_id->GetText().ToInt();
+				entry->original = edit_original->GetText();
+				entry->translation = edit_translated->GetText();
+
+				list_entries->ModifyEntry(entry->listid, String(edit_id->GetText()).Append(" - ").Append(edit_original->GetText()).Append(" - ").Append(edit_translated->GetText()), NULLPROC);
+
+				break;
+			}
+		}
+
+		if (entry == NULL)
+		{
+			int	 lid = list_entries->AddEntry(String(edit_id->GetText()).Append(" - ").Append(edit_original->GetText()).Append(" - ").Append(edit_translated->GetText()), NULLPROC)->code;
+
+			entry = new listEntry;
+
+			entry->listid = lid;
+			entry->id = edit_id->GetText().ToInt();
+			entry->original = edit_original->GetText();
+			entry->translation = edit_translated->GetText();
+
+			entries.AddEntry(entry);
+		}
+
+		entry = NULL;
+
+		for (int i = 0; i < entries.GetNOfEntries(); i++)
+		{
+			if (entries.GetNthEntry(i)->id == edit_id->GetText().ToInt() + 1)
+			{
+				entry = entries.GetNthEntry(i);
+
+				edit_id->SetText(String::IntToString(entry->id));
+				edit_original->SetText(entry->original);
+				edit_translated->SetText(entry->translation);
+
+				break;
+			}
+		}
+
+		if (entry == NULL)
+		{
+			edit_id->SetText(String::IntToString(edit_id->GetText().ToInt() + 1));
+			edit_original->SetText("");
+			edit_translated->SetText("");
+		}
+	}
+}
+
+void Translator::SelectEntry()
+{
+	int		 lid = list_entries->GetSelectedEntry();
+	listEntry	*entry = NULL;
+
+	for (int i = 0; i < entries.GetNOfEntries(); i++)
+	{
+		entry = entries.GetNthEntry(i);
+
+		if (entry->listid == lid) break;
+	}
+
+	if (entry->id < 0)
+	{
+		edit_id->SetText("");
+		edit_original->SetText(entry->original);
+		edit_translated->SetText(entry->translation);
+
+		text_id->Deactivate();
+		edit_id->Deactivate();
+		edit_original->Deactivate();
+		button_remove->Deactivate();
+
+		text_original->SetText("Field:");
+		text_translated->SetText("Value:");
+	}
+	else
+	{
+		text_id->Activate();
+		edit_id->Activate();
+		edit_original->Activate();
+		button_remove->Activate();
+
+		text_original->SetText("Original:");
+		text_translated->SetText("Translation:");
+
+		edit_id->SetText(String::IntToString(entry->id));
+		edit_original->SetText(entry->original);
+		edit_translated->SetText(entry->translation);
+	}
+}
+
+void Translator::NewEntry()
+{
+	listEntry	*entry = entries.GetLastEntry();
+
+	text_id->Activate();
+	edit_id->Activate();
+	edit_original->Activate();
+	button_remove->Activate();
+
+	text_original->SetText("Original:");
+	text_translated->SetText("Translation:");
+
+	edit_id->SetText(String::IntToString(max(entry->id, 0) + 1));
+	edit_original->SetText("");
+	edit_translated->SetText("");
+}
+
+void Translator::RemoveEntry()
+{
+	int		 lid = list_entries->GetSelectedEntry();
+
+	for (int i = 0; i < entries.GetNOfEntries(); i++)
+	{
+		if (entries.GetNthEntry(i)->listid == lid)
+		{
+			entries.DeleteEntry(entries.GetNthEntryIndex(i));
+
+			break;
+		}
+	}
+
+	list_entries->RemoveEntry(lid);
+
+	edit_original->SetText("");
+	edit_translated->SetText("");
+}

@@ -19,9 +19,7 @@ namespace smooth
 	};
 };
 
-#include "../../../../basic/object.h"
 #include "../../container.h"
-#include "../../../../array.h"
 #include "../../../../graphics/bitmap.h"
 #include "menuentry.h"
 

@@ -16,6 +16,7 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/misc/math.h>
 
 const S::Int	 S::GUI::Tooltip::classID = S::Object::RequestClassID();
 
@@ -72,9 +73,15 @@ S::Int S::GUI::Tooltip::Show()
 	wndRect.bottom	= font.GetTextSizeY(text) + 4;
 	wndRect.right	= font.GetTextSizeX(text) + 6;
 
+	Point	 tPos	= Point(pos.x + wnd->pos.x, pos.y + wnd->pos.y - wndRect.bottom);
+	Size	 tSize	= Size(wndRect.right, wndRect.bottom);
+
+	if (tPos.x + tSize.cx > LiSAGetDisplaySizeX())	tPos.x = pos.x + wnd->pos.x - tSize.cx;
+	if (tPos.y < 0)					tPos.y = pos.y + wnd->pos.y + 1;
+
 	toolWindow = new ToolWindow();
 
-	toolWindow->SetMetrics(Point(pos.x + wnd->pos.x, pos.y + wnd->pos.y - wndRect.bottom), Size(wndRect.right, wndRect.bottom));
+	toolWindow->SetMetrics(tPos, tSize);
 	toolWindow->SetOwner(this);
 	toolWindow->onPaint.Connect(&Tooltip::DrawTooltip, this);
 

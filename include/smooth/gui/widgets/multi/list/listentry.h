@@ -15,6 +15,10 @@ namespace smooth
 {
 	namespace GUI
 	{
+		class ComboBox;
+		class EditBox;
+		class List;
+		class ListBox;
 		class Tooltip;
 	};
 
@@ -24,41 +28,35 @@ namespace smooth
 	};
 };
 
-#include "../../../../basic/object.h"
-#include "../../../../graphics/rect.h"
-#include "../../../../graphics/font.h"
-#include "../../../../signals.h"
+#include "../../widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI ListEntry : public Object
+	namespace GUI
 	{
-		public:
-			Int		 id;
-			String		 name;
+		class SMOOTHAPI ListEntry : public Widget
+		{
+			friend class ComboBox;
+			friend class EditBox;
+			friend class List;
+			friend class ListBox;
+			public:
+				Int		 id;
 
-			String		 tooltipText;
-			GUI::Tooltip	*tooltip;
-			System::Timer	*tipTimer;
+				Tooltip		*tooltip;
+				System::Timer	*tipTimer;
 
-			Bool		 checked;
-			Bool		 clicked;
-			Bool		 selected;
-			Int		 size;
-			GUI::Rect	 rect;
+				Bool		 selected;
+				Rect		 rect;
 
-			GUI::Font	 font;
+						 ListEntry(Int);
+						~ListEntry();
 
-					 ListEntry(Int);
-					~ListEntry();
-
-			Void		 ActivateTooltip();
-
-			Int		 SetTooltipText(const String &);
-		signals:
-			Signal0<Void>	 onMouseOver;
-			Signal0<Void>	 onMouseOut;
-			Signal0<Void>	 onClick;
+				Void		 ActivateTooltip();
+			signals:
+				Signal0<Void>	 onMouseOver;
+				Signal0<Void>	 onMouseOut;
+		};
 	};
 };
 

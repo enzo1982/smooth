@@ -373,7 +373,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 
 		for (Int k = 0; k < max(language->name.Length(), lang->name.Length()); k++)
 		{
-			if (language->name[k] < lang->name[k])
+			if ((language->name[k] < lang->name[k] && !(language->name[k] == '(' && lang->name[k] == '/')) || (language->name[k] == '/' && lang->name[k] == '('))
 			{
 				languages.InsertEntryAtPos(j, language);
 
@@ -381,7 +381,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 
 				break;
 			}
-			else if (language->name[k] > lang->name[k])
+			else if ((language->name[k] > lang->name[k] && !(language->name[k] == '/' && lang->name[k] == '(')) || (language->name[k] == '(' && lang->name[k] == '/'))
 			{
 				break;
 			}

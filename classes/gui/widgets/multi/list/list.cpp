@@ -9,30 +9,28 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/multi/list/list.h>
-#include <smooth/definitions.h>
-#include <smooth/array.h>
 #include <smooth/misc/i18n.h>
 
-S::List::List()
+S::GUI::List::List()
 {
 	referenceList = NIL;
 	addNil = False;
 }
 
-S::List::~List()
+S::GUI::List::~List()
 {
 	referenceList = NIL;
 
 	RemoveAll();
 }
 
-S::ListEntry *S::List::AddEntry(String name, Int id)
+S::GUI::ListEntry *S::GUI::List::AddEntry(String name, Int id)
 {
 	if (referenceList != NIL) return NIL;
 
 	ListEntry	*newEntry = new ListEntry(id);
 
-	newEntry->name = name;
+	newEntry->SetText(name);
 
 	if (Array<ListEntry *>::AddEntry(newEntry, id) == True)
 	{
@@ -46,7 +44,7 @@ S::ListEntry *S::List::AddEntry(String name, Int id)
 	}
 }
 
-S::Int S::List::ModifyEntry(Int id, String name)
+S::Int S::GUI::List::ModifyEntry(Int id, String name)
 {
 	if (referenceList != NIL) return Error;
 
@@ -54,9 +52,13 @@ S::Int S::List::ModifyEntry(Int id, String name)
 
 	if (entry != NIL)
 	{
-		if (entry->name == name) return Break;
+		if (entry->GetText() == name) return Break;
 
-		entry->name = name;
+		Bool	 prevClicked = entry->clicked;
+
+		entry->SetText(name);
+
+		entry->clicked = prevClicked;
 
 		return Success;
 	}
@@ -66,7 +68,7 @@ S::Int S::List::ModifyEntry(Int id, String name)
 	}
 }
 
-S::Int S::List::RemoveEntry(Int id)
+S::Int S::GUI::List::RemoveEntry(Int id)
 {
 	if (referenceList != NIL) return Error;
 
@@ -86,7 +88,7 @@ S::Int S::List::RemoveEntry(Int id)
 	}
 }
 
-S::Int S::List::RemoveAll()
+S::Int S::GUI::List::RemoveAll()
 {
 	if (referenceList != NIL) return Error;
 
@@ -100,7 +102,7 @@ S::Int S::List::RemoveAll()
 	return Success;
 }
 
-S::ListEntry *S::List::GetSelectedEntry()
+S::GUI::ListEntry *S::GUI::List::GetSelectedEntry()
 {
 	if (GetNOfEntries() == 0) return NIL;
 
@@ -114,7 +116,7 @@ S::ListEntry *S::List::GetSelectedEntry()
 	return NIL;
 }
 
-S::Int S::List::SelectEntry(Int id)
+S::Int S::GUI::List::SelectEntry(Int id)
 {
 	if (GetNOfEntries() == 0) return Error;
 
@@ -129,7 +131,7 @@ S::Int S::List::SelectEntry(Int id)
 	return Success;
 }
 
-S::Int S::List::SetReferenceList(List *nRefList)
+S::Int S::GUI::List::SetReferenceList(List *nRefList)
 {
 	referenceList = nRefList;
 
@@ -138,11 +140,11 @@ S::Int S::List::SetReferenceList(List *nRefList)
 	return Success;
 }
 
-S::Void S::List::CheckFlags()
+S::Void S::GUI::List::CheckFlags()
 {
 }
 
-S::Bool S::List::IsListSane()
+S::Bool S::GUI::List::IsListSane()
 {
 	CheckFlags();
 
@@ -151,14 +153,14 @@ S::Bool S::List::IsListSane()
 
 	for (Int i = 0; i < referenceList->GetNOfEntries(); i++)
 	{
-		if (referenceList->GetNthEntry(i)->id != GetNthEntry(i + (addNil ? 1 : 0))->id)			return False;
-		else if (referenceList->GetNthEntry(i)->name != GetNthEntry(i + (addNil ? 1 : 0))->name)	return False;
+		if (referenceList->GetNthEntry(i)->id != GetNthEntry(i + (addNil ? 1 : 0))->id)				return False;
+		else if (referenceList->GetNthEntry(i)->GetText() != GetNthEntry(i + (addNil ? 1 : 0))->GetText())	return False;
 	}
 
 	return True;
 }
 
-S::Int S::List::SynchronizeList()
+S::Int S::GUI::List::SynchronizeList()
 {
 	if (referenceList == NIL) return Error;
 
@@ -173,7 +175,7 @@ S::Int S::List::SynchronizeList()
 
 	for (Int i = 0; i < rList->GetNOfEntries(); i++)
 	{
-		AddEntry(rList->GetNthEntry(i)->name, rList->GetNthEntry(i)->id);
+		AddEntry(rList->GetNthEntry(i)->GetText(), rList->GetNthEntry(i)->id);
 	}
 
 	referenceList = rList;

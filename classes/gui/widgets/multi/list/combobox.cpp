@@ -68,7 +68,7 @@ S::GUI::ComboBox::~ComboBox()
 	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
-S::ListEntry *S::GUI::ComboBox::AddEntry(String name, Int id)
+S::GUI::ListEntry *S::GUI::ComboBox::AddEntry(String name, Int id)
 {
 	if (id >= 0 && GetEntry(id) != NIL) return NIL;
 
@@ -197,12 +197,12 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 				frame.top	+= 3;
 				frame.right	-= 18;
 
-				String	 nText = operat->name;
+				String	 nText = operat->GetText();
 
-				for (Int k = 0; k < operat->name.Length(); k++)
+				for (Int k = 0; k < operat->GetText().Length(); k++)
 				{
-					if (operat->name[k] == '\t')	nText[k] = 0;
-					else				nText[k] = operat->name[k];
+					if (operat->GetText()[k] == '\t')	nText[k] = 0;
+					else					nText[k] = operat->GetText()[k];
 				}
 
 				surface->SetText(nText, frame, font);
@@ -453,12 +453,12 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 							nFont.SetColor(Setup::ClientColor);
 
-							String	 nText = operat->name;
+							String	 nText = operat->GetText();
 
-							for (Int k = 0; k < operat->name.Length(); k++)
+							for (Int k = 0; k < operat->GetText().Length(); k++)
 							{
-								if (operat->name[k] == '\t')	nText[k] = 0;
-								else				nText[k] = operat->name[k];
+								if (operat->GetText()[k] == '\t')	nText[k] = 0;
+								else					nText[k] = operat->GetText()[k];
 							}
 
 							surface->SetText(nText, frame, nFont);
@@ -486,12 +486,12 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 							frame.top	+= 3;
 							frame.right	-= 18;
 
-							String	 nText = operat->name;
+							String	 nText = operat->GetText();
 
-							for (Int k = 0; k < operat->name.Length(); k++)
+							for (Int k = 0; k < operat->GetText().Length(); k++)
 							{
-								if (operat->name[k] == '\t')	nText[k] = 0;
-								else				nText[k] = operat->name[k];
+								if (operat->GetText()[k] == '\t')	nText[k] = 0;
+								else					nText[k] = operat->GetText()[k];
 							}
 
 							surface->SetText(nText, frame, font);
@@ -538,7 +538,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 					if (operat->clicked)
 					{
 						onClick.Emit(wnd->MouseX(), wnd->MouseY());
-						operat->onClick.Emit();
+						operat->onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 						break;
 					}

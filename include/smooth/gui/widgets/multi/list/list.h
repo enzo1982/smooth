@@ -13,38 +13,43 @@
 
 namespace smooth
 {
-	class List;
+	namespace GUI
+	{
+		class List;
+	};
 };
 
-#include "../../../../basic/object.h"
-#include "../../../../array.h"
+#include "../../container.h"
 #include "listentry.h"
 
 namespace smooth
 {
-	class SMOOTHAPI List : public Array<ListEntry *>
+	namespace GUI
 	{
-		protected:
-			List			*referenceList;
-			Bool			 addNil;
+		class SMOOTHAPI List : public Array<ListEntry *>
+		{
+			protected:
+				List			*referenceList;
+				Bool			 addNil;
 
-			Bool			 IsListSane();
-			Int			 SynchronizeList();
+				Bool			 IsListSane();
+				Int			 SynchronizeList();
 
-			virtual Void		 CheckFlags();
-		public:
-						 List();
-						~List();
+				virtual Void		 CheckFlags();
+			public:
+							 List();
+							~List();
 
-			virtual ListEntry	*AddEntry(String, Int);
-			virtual Int		 ModifyEntry(Int, String);
-			virtual Int		 RemoveEntry(Int);
-			virtual Int		 RemoveAll();
+				virtual ListEntry	*AddEntry(String, Int);
+				virtual Int		 ModifyEntry(Int, String);
+				virtual Int		 RemoveEntry(Int);
+				virtual Int		 RemoveAll();
 
-			virtual Int		 SelectEntry(Int);
-			ListEntry		*GetSelectedEntry();
+				virtual Int		 SelectEntry(Int);
+				ListEntry		*GetSelectedEntry();
 
-			Int			 SetReferenceList(List *);
+				Int			 SetReferenceList(List *);
+		};
 	};
 };
 

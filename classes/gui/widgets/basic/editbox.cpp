@@ -123,7 +123,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 				for (Int i = 0; i < dropDownList->GetNOfEntries(); i++)
 				{
-					comboBox->AddEntry(dropDownList->GetNthEntry(i)->name);
+					comboBox->AddEntry(dropDownList->GetNthEntry(i)->GetText());
 				}
 
 				container->RegisterObject(comboBox);
@@ -845,6 +845,24 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 	}
 }
 
+S::Int S::GUI::EditBox::MarkAll()
+{
+	RemoveCursor();
+	SetCursor(text.Length());
+
+	Int	 prevMarkStart = markStart;
+	Int	 prevMarkEnd = markEnd;
+
+	markStart = 0;
+	markEnd = text.Length();
+
+	MarkText(prevMarkStart, prevMarkEnd);
+
+	clicked = True;
+
+	return Success;
+}
+
 S::Void S::GUI::EditBox::DeleteSelectedText()
 {
 	if (markStart == markEnd || markStart < 0 || markEnd < 0) return;
@@ -975,7 +993,7 @@ S::Void S::GUI::EditBox::DropDownListProc()
 {
 	if (comboBox->GetSelectedEntry() == NIL) return;
 
-	ModifyText(comboBox->GetSelectedEntry()->name);
+	ModifyText(comboBox->GetSelectedEntry()->GetText());
 
 	comboBox->GetSelectedEntry()->clicked = False;
 

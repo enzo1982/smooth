@@ -69,7 +69,7 @@ S::GUI::ListBox::~ListBox()
 	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
-S::ListEntry *S::GUI::ListBox::AddEntry(String name, Int id)
+S::GUI::ListEntry *S::GUI::ListBox::AddEntry(String name, Int id)
 {
 	if (id >= 0 && GetEntry(id) != NIL) return NIL;
 
@@ -424,7 +424,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 						frame.top += 2;
 						frame.right -= 2;
 
-						DrawEntryText(operat->name, frame, operat->font.GetColor());
+						DrawEntryText(operat->GetText(), frame, operat->font.GetColor());
 
 						frame.left -= (2 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 						frame.top -= 2;
@@ -526,7 +526,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					operat->rect.left += (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top++;
 					operat->rect.right -= 1;
-					DrawEntryText(operat->name, operat->rect, Setup::GradientTextColor);
+					DrawEntryText(operat->GetText(), operat->rect, Setup::GradientTextColor);
 					operat->rect.left -= (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top--;
 					operat->rect.right += 1;
@@ -609,7 +609,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					operat->rect.left += (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top++;
 					operat->rect.right -= 1;
-					DrawEntryText(operat->name, operat->rect, operat->font.GetColor());
+					DrawEntryText(operat->GetText(), operat->rect, operat->font.GetColor());
 					operat->rect.left -= (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top--;
 					operat->rect.right += 1;
@@ -797,7 +797,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 					operat->clicked = True;
 
 					onClick.Emit(wnd->MouseX(), wnd->MouseY());
-					operat->onClick.Emit();
+					operat->onClick.Emit(wnd->MouseX(), wnd->MouseY());
 
 					if (operat->tipTimer != NIL)
 					{

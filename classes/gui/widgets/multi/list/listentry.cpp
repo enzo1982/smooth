@@ -13,28 +13,22 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/system/timer.h>
 
-S::ListEntry::ListEntry(Int entryID)
+S::GUI::ListEntry::ListEntry(Int entryID)
 {
 	id		= entryID;
 
-	checked		= False;
-	clicked		= False;
-
 	selected	= False;
-
-	size		= -1;
 
 	tipTimer	= NIL;
 	tooltip		= NIL;
 
 	font.SetColor(Setup::ClientTextColor);
 
-	onClick.SetParentObject(this);
 	onMouseOver.SetParentObject(this);
 	onMouseOut.SetParentObject(this);
 }
 
-S::ListEntry::~ListEntry()
+S::GUI::ListEntry::~ListEntry()
 {
 	if (tipTimer != NIL)
 	{
@@ -47,7 +41,7 @@ S::ListEntry::~ListEntry()
 
 	if (tooltip != NIL)
 	{
-		GUI::Window	*wnd = tooltip->GetContainer()->GetContainerWindow();
+		Window	*wnd = tooltip->GetContainer()->GetContainerWindow();
 
 		tooltip->Hide();
 
@@ -59,14 +53,7 @@ S::ListEntry::~ListEntry()
 	}
 }
 
-S::Int S::ListEntry::SetTooltipText(const String &nTooltipText)
-{
-	tooltipText = nTooltipText;
-
-	return Success;
-}
-
-S::Void S::ListEntry::ActivateTooltip()
+S::Void S::GUI::ListEntry::ActivateTooltip()
 {
 	if (tooltip != NIL) return;
 
@@ -75,7 +62,7 @@ S::Void S::ListEntry::ActivateTooltip()
 	DeleteObject(tipTimer);
 
 	tipTimer	= NIL;
-	tooltip		= new GUI::Tooltip();
+	tooltip		= new Tooltip();
 
 	tooltip->SetText(tooltipText);
 	tooltip->SetTimeout(3000);
@@ -84,11 +71,11 @@ S::Void S::ListEntry::ActivateTooltip()
 	{
 		Object	*object = Object::GetNthObject(i);
 
-		if (object->GetObjectType() == GUI::Window::classID)
+		if (object->GetObjectType() == Window::classID)
 		{
-			tooltip->SetMetrics(GUI::Point(((GUI::Window *) object)->MouseX(), ((GUI::Window *) object)->MouseY()), GUI::Size(0, 0));
+			tooltip->SetMetrics(Point(((Window *) object)->MouseX(), ((Window *) object)->MouseY()), Size(0, 0));
 
-			((GUI::Window *) object)->RegisterObject(tooltip);
+			((Window *) object)->RegisterObject(tooltip);
 
 			break;
 		}

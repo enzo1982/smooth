@@ -70,7 +70,7 @@ S::Int S::XML::Document::LoadFile(String fileName)
 	}
 	else
 	{
-		return Error;
+		return Failure;
 	}			
 }
 
@@ -102,7 +102,7 @@ S::Int S::XML::Document::ParseMemory(Void *buffer, Int size)
 	}
 	else
 	{
-		return Error;
+		return Failure;
 	}			
 }
 

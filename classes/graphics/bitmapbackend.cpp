@@ -44,7 +44,7 @@ S::Array<S::GUI::BitmapBackend *(*)(const S::GUI::BitmapBackend &)>	*S::GUI::Bit
 
 S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(Void *))
 {
-	if (backend == NIL) return Error;
+	if (backend == NIL) return Failure;
 
 	if (backend_creators_pV == NIL) backend_creators_pV = new Array<BitmapBackend *(*)(Void *)>;
 
@@ -55,7 +55,7 @@ S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(Void *))
 
 S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(Int, Int, Int))
 {
-	if (backend == NIL) return Error;
+	if (backend == NIL) return Failure;
 
 	if (backend_creators_III == NIL) backend_creators_III = new Array<BitmapBackend *(*)(Int, Int, Int)>;
 
@@ -66,7 +66,7 @@ S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(Int, Int, Int
 
 S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(const int))
 {
-	if (backend == NIL) return Error;
+	if (backend == NIL) return Failure;
 
 	if (backend_creators_cI == NIL) backend_creators_cI = new Array<BitmapBackend *(*)(const int)>;
 
@@ -77,7 +77,7 @@ S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(const int))
 
 S::Int S::GUI::BitmapBackend::AddBackend(BitmapBackend *(*backend)(const BitmapBackend &))
 {
-	if (backend == NIL) return Error;
+	if (backend == NIL) return Failure;
 
 	if (backend_creators_crS == NIL) backend_creators_crS = new Array<BitmapBackend *(*)(const BitmapBackend &)>;
 
@@ -205,7 +205,7 @@ S::Void *S::GUI::BitmapBackend::GetSystemBitmap()
 
 S::Int S::GUI::BitmapBackend::GrayscaleBitmap()
 {
-	if (bytes == NIL) return Error;
+	if (bytes == NIL) return Failure;
 
 	Int	 color = 0;
 
@@ -226,7 +226,7 @@ S::Int S::GUI::BitmapBackend::GrayscaleBitmap()
 
 S::Int S::GUI::BitmapBackend::ReplaceColor(Int color1, Int color2)
 {
-	if (bytes == NIL) return Error;
+	if (bytes == NIL) return Failure;
 
 	for (Int y = 0; y < size.cy; y++)
 	{

@@ -34,7 +34,7 @@ S::System::TimerSDL::~TimerSDL()
 
 S::Int S::System::TimerSDL::Start(Int interval)
 {
-	if (timerid != -1) return Error;
+	if (timerid != -1) return Failure;
 
 	timerid = (Int) SDL_AddTimer(interval, &TimerProc, &timerid);
 
@@ -43,7 +43,7 @@ S::Int S::System::TimerSDL::Start(Int interval)
 
 S::Int S::System::TimerSDL::Stop()
 {
-	if (timerid == -1) return Error;
+	if (timerid == -1) return Failure;
 
 	SDL_RemoveTimer((SDL_TimerID) timerid);
 
@@ -54,7 +54,7 @@ S::Int S::System::TimerSDL::Stop()
 
 S::Int S::System::TimerSDL::GetID()
 {
-	if (timerid == -1) return Error;
+	if (timerid == -1) return Failure;
 
 	return timerid;
 }

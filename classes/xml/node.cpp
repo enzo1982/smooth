@@ -181,7 +181,7 @@ S::Int S::XML::Node::RemoveAttribute(Attribute *attribute)
 {
 	if (attribute == NIL)
 	{
-		return Error;
+		return Failure;
 	}
 	else
 	{
@@ -298,7 +298,7 @@ S::Int S::XML::Node::RemoveNode(Node *node)
 {
 	if (node == NIL)
 	{
-		return Error;
+		return Failure;
 	}
 	else
 	{

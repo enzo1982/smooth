@@ -33,7 +33,7 @@ S::GUI::MDI::Client::~Client()
 
 S::Int S::GUI::MDI::Client::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface		*surface = container->GetDrawSurface();

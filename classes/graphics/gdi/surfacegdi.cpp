@@ -62,7 +62,7 @@ S::GUI::SurfaceGDI::~SurfaceGDI()
 
 S::Int S::GUI::SurfaceGDI::PaintRect(Rect pRect)
 {
-	if (painting) return Error;
+	if (painting) return Failure;
 
 	if (gdi_dc != NIL) BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, bmp_dc, pRect.left, pRect.top, SRCCOPY);
 
@@ -95,7 +95,7 @@ S::Int S::GUI::SurfaceGDI::StartPaint(Rect pRect)
 
 S::Int S::GUI::SurfaceGDI::EndPaint()
 {
-	if (!painting) return Error;
+	if (!painting) return Failure;
 
 	painting--;
 
@@ -256,7 +256,7 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font, Bool sha
 {
 	if (gdi_dc == NIL)	return Success;
 
-	if (string == NIL)	return Error;
+	if (string == NIL)	return Failure;
 	if (shadow)		return SurfaceBackend::SetText(string, rect, font, shadow);
 
 	HFONT	 hfont;

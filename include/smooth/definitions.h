@@ -132,6 +132,13 @@
 #define NIL	(0)
 #endif
 
+#define callbacks	public
+#define signals		public
+#define slots		public
+
+#define abstract
+#define sealed
+
 #include "types/generic.h"
 
 #include "types/bool.h"
@@ -144,16 +151,21 @@ namespace S = smooth;
 namespace smooth
 {
 	const Int Success	= 1;
-	const Int Error		= 0;
+	const Int Failure	= 0;
 	const Int Break		= -1;
 
 	const Bool True		= (Bool) -1;
 	const Bool False	= (Bool) 0;
 };
 
+#include "error/error.h"
+#include "error/success.h"
+
 #include "array.h"
 #include "misc/string.h"
 #include "basic/setup.h"
+
+#include "pointer.h"
 
 namespace smooth
 {
@@ -163,12 +175,6 @@ namespace smooth
 	Void	 AttachDLL();
 	Void	 DetachDLL();
 };
-
-#define callbacks	public
-#define signals		public
-#define slots		public
-
-#define abstract
 
 const S::Int SM_MOUSEMOVE		= 1024;
 const S::Int SM_LBUTTONDOWN		= 1025;

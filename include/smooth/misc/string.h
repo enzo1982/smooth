@@ -8,6 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include "../definitions.h"
+
 #ifndef _H_OBJSMOOTH_STRING_
 #define _H_OBJSMOOTH_STRING_
 
@@ -16,7 +18,6 @@ namespace smooth
 	class String;
 };
 
-#include "../definitions.h"
 #include "../array.h"
 
 namespace smooth

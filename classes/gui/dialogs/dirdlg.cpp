@@ -97,7 +97,7 @@ S::Int S::GUI::Dialogs::DirSelection::ShowDialog()
 	}
 	else
 	{
-		return Error;
+		return Failure;
 	}
 }
 

@@ -61,15 +61,11 @@ S::Int S::GUI::Surface::StartPaint(Rect pRect)
 
 	Int	 rVal = backend->StartPaint(pRect);
 
-	if (mutex != NIL) mutex->Release();
-
 	return rVal;
 }
 
 S::Int S::GUI::Surface::EndPaint()
 {
-	if (mutex != NIL) mutex->Lock();
-
 	Int	 rVal = backend->EndPaint();
 
 	if (mutex != NIL) mutex->Release();

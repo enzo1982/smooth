@@ -52,7 +52,7 @@ S::Int S::Threads::ThreadSDL::Start(Void (*threadProc)(Void *), Void *threadPara
 
 S::Int S::Threads::ThreadSDL::Stop()
 {
-	if (thread == NIL) return Error;
+	if (thread == NIL) return Failure;
 
 	SDL_KillThread(thread);
 

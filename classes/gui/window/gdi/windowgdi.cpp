@@ -268,7 +268,7 @@ S::Int S::GUI::WindowGDI::Open(String title, Point pos, Size size, Int flags)
 		return Success;
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Int S::GUI::WindowGDI::Close()

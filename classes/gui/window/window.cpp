@@ -49,9 +49,9 @@ S::GUI::Window::Window(String title, Void *iWindow)
 	maximized	= False;
 	minimized	= False;
 
-	nOfActiveWindows++;
-
 	type = classID;
+
+	nOfActiveWindows++;
 
 	if (title != NIL)	text = title;
 	else			text = "smooth Application";
@@ -91,10 +91,8 @@ S::GUI::Window::Window(String title, Void *iWindow)
 
 S::GUI::Window::~Window()
 {
-	if (created && !destroyed)
-	{
-		backend->Close();
-	}
+	if (created && !destroyed)	backend->Close();
+	else if (!created)		nOfActiveWindows++;
 
 	UnregisterObject(mainLayer);
 	DeleteObject(mainLayer);
@@ -188,7 +186,7 @@ S::Int S::GUI::Window::SetStatusText(String nStatus)
 		}
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::String S::GUI::Window::GetStatusText()
@@ -750,7 +748,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::Window::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!created)		return Success;
 	if (!visible)		return Success;
 
@@ -1086,7 +1084,7 @@ S::Void S::GUI::Window::PopupProc()
 
 S::Int S::GUI::Window::RegisterObject(Widget *object)
 {
-	if (object == NIL) return Error;
+	if (object == NIL) return Failure;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -1124,12 +1122,12 @@ S::Int S::GUI::Window::RegisterObject(Widget *object)
 		return mainLayer->RegisterObject(object);
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Int S::GUI::Window::UnregisterObject(Widget *object)
 {
-	if (object == NIL) return Error;
+	if (object == NIL) return Failure;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -1154,7 +1152,7 @@ S::Int S::GUI::Window::UnregisterObject(Widget *object)
 		return mainLayer->UnregisterObject(object);
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Void S::GUI::Window::PaintTimer()

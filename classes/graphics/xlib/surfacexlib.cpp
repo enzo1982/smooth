@@ -65,7 +65,7 @@ S::GUI::SurfaceXLib::~SurfaceXLib()
 
 S::Int S::GUI::SurfaceXLib::PaintRect(Rect pRect)
 {
-	if (painting) return Error;
+	if (painting) return Failure;
 
 	if (window != NIL)
 	{
@@ -105,7 +105,7 @@ S::Int S::GUI::SurfaceXLib::StartPaint(Rect pRect)
 
 S::Int S::GUI::SurfaceXLib::EndPaint()
 {
-	if (!painting) return Error;
+	if (!painting) return Failure;
 
 	painting--;
 
@@ -264,7 +264,7 @@ S::Int S::GUI::SurfaceXLib::SetText(String string, Rect rect, Font font, Bool sh
 {
 	if (window == NIL)	return Success;
 
-	if (string == NIL)	return Error;
+	if (string == NIL)	return Failure;
 	if (shadow)		return SurfaceBackend::SetText(string, rect, font, shadow);
 
 	int	 lines = 1;

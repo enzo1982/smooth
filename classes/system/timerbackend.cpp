@@ -21,7 +21,7 @@ S::Array<S::System::TimerBackend *(*)()>	*S::System::TimerBackend::backend_creat
 
 S::Int S::System::TimerBackend::AddBackend(TimerBackend *(*backend)())
 {
-	if (backend == NIL) return Error;
+	if (backend == NIL) return Failure;
 
 	if (backend_creators == NIL) backend_creators = new Array<TimerBackend *(*)()>;
 
@@ -52,12 +52,12 @@ S::Int S::System::TimerBackend::GetTimerType()
 
 S::Int S::System::TimerBackend::Start(Int interval)
 {
-	return Error;
+	return Failure;
 }
 
 S::Int S::System::TimerBackend::Stop()
 {
-	return Error;
+	return Failure;
 }
 
 S::Int S::System::TimerBackend::GetID()

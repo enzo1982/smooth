@@ -52,6 +52,8 @@ namespace smooth
 				Int		 Paint(Int);
 				Int		 Process(Int, Int, Int);
 
+				Int		 SetText(const String &);
+
 				Int		 SetMark(Bool);
 				Bool		 IsMarked();
 			signals:

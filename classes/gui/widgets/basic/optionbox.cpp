@@ -48,7 +48,7 @@ S::GUI::OptionBox::~OptionBox()
 
 S::Int S::GUI::OptionBox::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -178,7 +178,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered) return Error;
+	if (!registered) return Failure;
 	if ((!active && message != SM_CHECKOPTIONBOXES) || !visible) return Success;
 
 	Window	*wnd = container->GetContainerWindow();

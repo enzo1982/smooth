@@ -47,7 +47,7 @@ S::GUI::MenuEntry *S::GUI::Menu::AddEntry(String text, Bitmap bitmap, Menu *popu
 
 S::Int S::GUI::Menu::RemoveEntry(MenuEntry *entry)
 {
-	if (entry == NIL) return Error;
+	if (entry == NIL) return Failure;
 
 	if (UnregisterObject(entry) == Success)
 	{
@@ -56,7 +56,7 @@ S::Int S::GUI::Menu::RemoveEntry(MenuEntry *entry)
 		return Success;
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Int S::GUI::Menu::Clear()

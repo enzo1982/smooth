@@ -31,7 +31,7 @@ S::GUI::Statusbar::~Statusbar()
 
 S::Int S::GUI::Statusbar::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface = container->GetDrawSurface();

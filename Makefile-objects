@@ -38,6 +38,31 @@ $(OBJECTDIR)/setup.o: $(BASICCLASSESDIR)/setup.cpp $(SMOOTHINCLUDEDIR)/basic/set
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/setup.cpp -o $(OBJECTDIR)/setup.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/error_endoffile.o: $(ERRORCLASSESDIR)/fs/endoffile.cpp $(SMOOTHINCLUDEDIR)/error/fs/endoffile.h
+	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/fs/endoffile.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/fs/endoffile.cpp -o $(OBJECTDIR)/error_endoffile.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/error_filenotfound.o: $(ERRORCLASSESDIR)/fs/filenotfound.cpp $(SMOOTHINCLUDEDIR)/error/fs/filenotfound.h
+	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/fs/filenotfound.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/fs/filenotfound.cpp -o $(OBJECTDIR)/error_filenotfound.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/error_permissiondenied.o: $(ERRORCLASSESDIR)/misc/permissiondenied.cpp $(SMOOTHINCLUDEDIR)/error/misc/permissiondenied.h
+	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/misc/permissiondenied.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/misc/permissiondenied.cpp -o $(OBJECTDIR)/error_permissiondenied.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/error.o: $(ERRORCLASSESDIR)/error.cpp $(SMOOTHINCLUDEDIR)/error/error.h
+	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/error.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/error.cpp -o $(OBJECTDIR)/error.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/success.o: $(ERRORCLASSESDIR)/success.cpp $(SMOOTHINCLUDEDIR)/error/success.h
+	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/success.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/success.cpp -o $(OBJECTDIR)/success.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/directory.o: $(FILESCLASSESDIR)/directory.cpp $(SMOOTHINCLUDEDIR)/files/directory.h
 	$(ECHO) -n Compiling $(FILESCLASSESDIR)/directory.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(FILESCLASSESDIR)/directory.cpp -o $(OBJECTDIR)/directory.o

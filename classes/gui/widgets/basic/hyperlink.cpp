@@ -90,7 +90,7 @@ S::Int S::GUI::Hyperlink::Hide()
 
 S::Int S::GUI::Hyperlink::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -137,7 +137,7 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 
 S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
@@ -224,5 +224,5 @@ S::Int S::GUI::Hyperlink::SetURL(String newUrl)
 
 S::Int S::GUI::Hyperlink::SetBitmap(const Bitmap &newBmp)
 {
-	return Error;
+	return Failure;
 }

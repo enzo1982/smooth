@@ -48,18 +48,18 @@ S::GUI::ListEntry *S::GUI::List::AddEntry(String text)
 
 S::Int S::GUI::List::RemoveEntry(ListEntry *entry)
 {
-	if (entry == NIL) return Error;
+	if (entry == NIL) return Failure;
 
 	if (UnregisterObject(entry) == Success)
 	{
 		DeleteObject(entry);
 
-		Paint(SP_UPDATE);
+		Paint(SP_PAINT);
 
 		return Success;
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Int S::GUI::List::Clear()
@@ -74,7 +74,7 @@ S::Int S::GUI::List::Clear()
 		DeleteObject(widget);
 	}
 
-	Paint(SP_UPDATE);
+	Paint(SP_PAINT);
 
 	return Success;
 }
@@ -91,7 +91,7 @@ S::GUI::ListEntry *S::GUI::List::GetNthEntry(Int n)
 
 S::Int S::GUI::List::SelectEntry(ListEntry *entry)
 {
-	Int	 retVal = Error;
+	Int	 retVal = Failure;
 
 	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
 	{
@@ -128,7 +128,7 @@ S::GUI::ListEntry *S::GUI::List::GetSelectedEntry()
 
 S::Int S::GUI::List::SelectNthEntry(Int n)
 {
-	if (n >= assocObjects.GetNOfEntries()) return Error;
+	if (n >= assocObjects.GetNOfEntries()) return Failure;
 
 	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
 	{
@@ -157,4 +157,29 @@ S::Int S::GUI::List::GetSelectedEntryNumber()
 	}
 
 	return -1;
+}
+
+S::Int S::GUI::List::SelectEntry(String entryText)
+{
+	Int	 rVal = Failure;
+
+	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
+	{
+		ListEntry	*widget = (ListEntry *) assocObjects.GetNthEntry(i);
+
+		if (widget->GetText() == entryText)
+		{
+			widget->clicked = True;
+			widget->Paint(SP_PAINT);
+
+			rVal = Success;
+		}
+		else if (widget->clicked)
+		{
+			widget->clicked = False;
+			widget->Paint(SP_PAINT);
+		}
+	}
+
+	return rVal;
 }

@@ -24,7 +24,7 @@ S::Array<S::GUI::SurfaceBackend *(*)(S::Void *)>	*S::GUI::SurfaceBackend::backen
 
 S::Int S::GUI::SurfaceBackend::AddBackend(SurfaceBackend *(*backend)(Void *))
 {
-	if (backend == NIL) return Error;
+	if (backend == NIL) return Failure;
 
 	if (backend_creators == NIL) backend_creators = new Array<SurfaceBackend *(*)(Void *)>;
 

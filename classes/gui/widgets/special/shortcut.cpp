@@ -30,7 +30,7 @@ S::GUI::Shortcut::~Shortcut()
 
 S::Int S::GUI::Shortcut::Process(Int message, Int param1, Int param2)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd = container->GetContainerWindow();

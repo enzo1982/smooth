@@ -21,7 +21,7 @@ S::Array<S::GUI::WindowBackend *(*)()>	*S::GUI::WindowBackend::backend_creators 
 
 S::Int S::GUI::WindowBackend::AddBackend(WindowBackend *(*backend)())
 {
-	if (backend == NIL) return Error;
+	if (backend == NIL) return Failure;
 
 	if (backend_creators == NIL) backend_creators = new Array<WindowBackend *(*)()>;
 

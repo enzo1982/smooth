@@ -39,7 +39,7 @@ S::GUI::Layer::~Layer()
 
 S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 	if (GetNOfObjects() == 0)	return Success;
 
@@ -57,7 +57,7 @@ S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::Layer::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
@@ -194,7 +194,7 @@ S::Int S::GUI::Layer::SetMetrics(Point iPos, Size iSize)
 
 S::Int S::GUI::Layer::RegisterObject(Widget *object)
 {
-	if (object == NIL) return Error;
+	if (object == NIL) return Failure;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -212,12 +212,12 @@ S::Int S::GUI::Layer::RegisterObject(Widget *object)
 		}
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Int S::GUI::Layer::UnregisterObject(Widget *object)
 {
-	if (object == NIL) return Error;
+	if (object == NIL) return Failure;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -236,5 +236,5 @@ S::Int S::GUI::Layer::UnregisterObject(Widget *object)
 		}
 	}
 
-	return Error;
+	return Failure;
 }

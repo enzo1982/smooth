@@ -83,7 +83,7 @@ S::GUI::EditBox::~EditBox()
 
 S::Int S::GUI::EditBox::Paint(Int message)
 {
-	if (!IsRegistered())	return Error;
+	if (!IsRegistered())	return Failure;
 	if (!IsVisible())	return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -196,7 +196,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())			return Error;
+	if (!IsRegistered())			return Failure;
 	if (!IsActive() || !IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();

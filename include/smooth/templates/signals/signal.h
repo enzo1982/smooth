@@ -58,7 +58,7 @@ namespace smooth
 
 			template <class slotReturnTYPE> Int Connect(SIGNALS_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
 			{
-				if ((Signal *) sig == (Signal *) this) return Error;
+				if ((Signal *) sig == (Signal *) this) return Failure;
 
 				slotsN.AddEntry(new SIGNALS_SLOT_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig));
 		
@@ -82,7 +82,7 @@ namespace smooth
 
 			template <class slotReturnTYPE> Int Connect(Signal0<slotReturnTYPE> *sig)
 			{
-				if ((Signal *) sig == (Signal *) this) return Error;
+				if ((Signal *) sig == (Signal *) this) return Failure;
 
 				slots0.AddEntry(new SlotSignal0<slotReturnTYPE>(sig));
 

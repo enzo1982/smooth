@@ -38,7 +38,7 @@ S::GUI::ActiveArea::~ActiveArea()
 
 S::Int S::GUI::ActiveArea::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -74,7 +74,7 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 
 S::Int S::GUI::ActiveArea::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd = container->GetContainerWindow();

@@ -127,7 +127,7 @@ S::Bool S::Directory::Exists()
 
 S::Int S::Directory::Create()
 {
-	if (Exists()) return Error;
+	if (Exists()) return Failure;
 
 	String	 directory = *this;
 
@@ -149,12 +149,12 @@ S::Int S::Directory::Create()
 
 S::Int S::Directory::Copy(String destination)
 {
-	return Error;
+	return Failure;
 }
 
 S::Int S::Directory::Move(String destination)
 {
-	return Error;
+	return Failure;
 }
 
 S::Int S::Directory::Delete()
@@ -164,7 +164,7 @@ S::Int S::Directory::Delete()
 	if (Setup::enableUnicode)	result = RemoveDirectoryW(String(*this));
 	else				result = RemoveDirectoryA(String(*this));
 
-	if (result == False)	return Error;
+	if (result == False)	return Failure;
 	else			return Success;
 }
 
@@ -259,6 +259,6 @@ S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 	if (Setup::enableUnicode)	result = SetCurrentDirectoryW(String(directory));
 	else				result = SetCurrentDirectoryA(String(directory));
 
-	if (result == False)	return Error;
+	if (result == False)	return Failure;
 	else			return Success;
 }

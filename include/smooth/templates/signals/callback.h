@@ -57,7 +57,7 @@ namespace smooth
 
 			Int Connect(SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
 			{
-				if ((Signal *) sig == (Signal *) this) return Error;
+				if ((Signal *) sig == (Signal *) this) return Failure;
 
 				DisconnectAll();
 
@@ -96,7 +96,7 @@ namespace smooth
 
 			Int Connect(SignalR0<returnTYPE> *sig)
 			{
-				if ((Signal *) sig == (Signal *) this) return Error;
+				if ((Signal *) sig == (Signal *) this) return Failure;
 
 				DisconnectAll();
 

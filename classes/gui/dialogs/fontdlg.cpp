@@ -81,7 +81,7 @@ S::Int S::GUI::Dialogs::FontSelection::ShowDialog()
 	}
 	else
 	{
-		retValue = Error;
+		retValue = Failure;
 	}
 
 	return retValue;

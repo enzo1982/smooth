@@ -166,7 +166,7 @@ S::Int S::GUI::ListBox::Deactivate()
 
 S::Int S::GUI::ListBox::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -189,6 +189,21 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			frame.top	= realPos.y;
 			frame.right	= realPos.x + size.cx - 1;
 			frame.bottom	= realPos.y + size.cy - 1;
+
+			if (!(15 * GetNOfObjects() + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16) + 4 > size.cy && !(flags & LF_HIDESCROLLBAR)))
+			{
+				if (scrollbar != NIL)
+				{
+					scrollbarPos = 0;
+					lastScrollbarPos = 0;
+
+					layer->UnregisterObject(scrollbar);
+
+					DeleteObject(scrollbar);
+
+					scrollbar = NIL;
+				}
+			}
 
 			if (message != SP_UPDATE)
 			{
@@ -244,20 +259,6 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 				frame.right -= 17;
 			}
-			else
-			{
-				if (scrollbar != NIL)
-				{
-					scrollbarPos = 0;
-					lastScrollbarPos = 0;
-
-					layer->UnregisterObject(scrollbar);
-
-					DeleteObject(scrollbar);
-
-					scrollbar = NIL;
-				}
-			}
 
 			lastScrollbarPos = scrollbarPos;
 
@@ -303,7 +304,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Int	 retVal = Success;

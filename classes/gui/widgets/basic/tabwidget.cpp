@@ -38,7 +38,7 @@ S::GUI::TabWidget::~TabWidget()
 
 S::Int S::GUI::TabWidget::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -215,7 +215,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
@@ -361,8 +361,8 @@ S::Int S::GUI::TabWidget::SelectTab(Int layerid)
 
 S::Int S::GUI::TabWidget::RegisterObject(Widget *object)
 {
-	if (!registered)	return Error;
-	if (object == NIL)	return Error;
+	if (!registered)	return Failure;
+	if (object == NIL)	return Failure;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -379,12 +379,12 @@ S::Int S::GUI::TabWidget::RegisterObject(Widget *object)
 		}
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Int S::GUI::TabWidget::UnregisterObject(Widget *object)
 {
-	if (object == NIL) return Error;
+	if (object == NIL) return Failure;
 
 	Bool	 activateNew = False;
 
@@ -416,5 +416,5 @@ S::Int S::GUI::TabWidget::UnregisterObject(Widget *object)
 		}
 	}
 
-	return Error;
+	return Failure;
 }

@@ -37,7 +37,7 @@ S::GUI::Image::~Image()
 
 S::Int S::GUI::Image::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface = container->GetDrawSurface();

@@ -60,7 +60,7 @@ S::Int S::Configuration::Open(String file, Bool create)
 		{
 			Close();
 
-			return Error;
+			return Failure;
 		}
 		else
 		{
@@ -80,13 +80,13 @@ S::Int S::Configuration::Open(String file, Bool create)
 	{
 		Close();
 
-		return Error;
+		return Failure;
 	}
 	else if (configFile->GetRootNode()->GetNodeByName("configuration") == NIL)
 	{
 		Close();
 
-		return Error;
+		return Failure;
 	}
 
 	return Success;
@@ -123,7 +123,7 @@ S::Int S::Configuration::Close()
 
 S::Int S::Configuration::SetActiveConfiguration(String nConfig)
 {
-	if (configFile == NIL) return Error;
+	if (configFile == NIL) return Failure;
 
 	XML::Node	*configuration = FindConfigurationNode(nConfig);
 
@@ -139,11 +139,11 @@ S::Int S::Configuration::SetActiveConfiguration(String nConfig)
 
 S::Int S::Configuration::SetConfigurationName(String nName)
 {
-	if (configFile == NIL) return Error;
+	if (configFile == NIL) return Failure;
 
 	XML::Node	*configuration = FindConfigurationNode(activeConfig);
 
-	if (configuration == NIL) return Error;
+	if (configuration == NIL) return Failure;
 
 	activeConfig = nName;
 
@@ -154,11 +154,11 @@ S::Int S::Configuration::SetConfigurationName(String nName)
 
 S::Int S::Configuration::SetParentConfiguration(String nParent)
 {
-	if (configFile == NIL) return Error;
+	if (configFile == NIL) return Failure;
 
 	XML::Node	*configuration = FindConfigurationNode(activeConfig);
 
-	if (configuration == NIL) return Error;
+	if (configuration == NIL) return Failure;
 
 	configuration->SetAttribute("inheriting", nParent);
 
@@ -198,7 +198,7 @@ S::Int S::Configuration::GetIntValue(String section, String name, Int defValue)
 
 S::Int S::Configuration::SetIntValue(String section, String name, Int newValue)
 {
-	if (configFile == NIL) return Error;
+	if (configFile == NIL) return Failure;
 
 	XML::Node	*value = FindValueNode(section, name);
 
@@ -256,7 +256,7 @@ S::String S::Configuration::GetStringValue(String section, String name, String d
 
 S::Int S::Configuration::SetStringValue(String section, String name, String newValue)
 {
-	if (configFile == NIL) return Error;
+	if (configFile == NIL) return Failure;
 
 	XML::Node	*value = FindValueNode(section, name);
 

@@ -57,7 +57,7 @@ S::Int S::GUI::ToolWindow::FreeOwner()
 
 S::Int S::GUI::ToolWindow::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!created)		return Success;
 	if (!visible)		return Success;
 
@@ -94,7 +94,7 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 
 S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	EnterProtectedRegion();
@@ -219,7 +219,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::ToolWindow::RegisterObject(Widget *object)
 {
-	if (object == NIL) return Error;
+	if (object == NIL) return Failure;
 
 	if (containerType == &object->possibleContainers)
 	{
@@ -258,7 +258,7 @@ S::Int S::GUI::ToolWindow::RegisterObject(Widget *object)
 		return mainLayer->RegisterObject(object);
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType)

@@ -45,7 +45,7 @@ S::GUI::CheckBox::~CheckBox()
 
 S::Int S::GUI::CheckBox::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!IsVisible())	return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -188,7 +188,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 
 S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered) return Error;
+	if (!registered) return Failure;
 	if ((!active && message != SM_CHECKCHECKBOXES) || !visible) return Success;
 
 	Window	*wnd = container->GetContainerWindow();

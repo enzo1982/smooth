@@ -75,7 +75,7 @@ S::Int S::Object::GetHandle()
 
 S::Int S::Object::SetName(String nName)
 {
-	if (GetObject(nName) != NIL) return Error;
+	if (GetObject(nName) != NIL) return Failure;
 
 	name = nName;
 
@@ -97,6 +97,16 @@ S::Int S::Object::SetFlags(Int nFlags)
 S::Int S::Object::GetFlags()
 {
 	return flags;
+}
+
+S::String S::Object::ToString()
+{
+	return "an Object";
+}
+
+S::Object::operator S::String()
+{
+	return ToString();
 }
 
 S::Bool S::Object::IsTypeCompatible(Int objType)
@@ -156,5 +166,5 @@ S::Int S::Object::DeleteObject(Object *object)
 		return Success;
 	}
 
-	return Error;
+	return Failure;
 }

@@ -166,17 +166,17 @@ S::Int S::GUI::Dialogs::TipOfTheDay::SetMode(Int nMode, Int nOffset, Bool showOn
 	switch (nMode)
 	{
 		case TIP_ORDERED:
-			mode = nMode;
-			offset = nOffset;
+			mode	= nMode;
+			offset	= nOffset;
 
 			break;
 		case TIP_RANDOM:
-			mode = nMode;
-			offset = 0;
+			mode	= nMode;
+			offset	= 0;
 
 			break;
 		default:
-			return Error;
+			return Failure;
 	}
 
 	showTips = showOnStartup;

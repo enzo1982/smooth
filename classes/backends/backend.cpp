@@ -15,7 +15,7 @@ S::Array<S::Backends::Backend *(*)()>	*S::Backends::Backend::backend_creators = 
 
 S::Int S::Backends::Backend::AddBackend(Backend *(*backend)())
 {
-	if (backend == NIL) return Error;
+	if (backend == NIL) return Failure;
 
 	if (backend_creators == NIL) backend_creators = new Array<Backend *(*)()>;
 

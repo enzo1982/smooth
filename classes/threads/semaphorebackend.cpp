@@ -31,10 +31,10 @@ S::Void *S::Threads::SemaphoreBackend::GetSystemSemaphore()
 
 S::Int S::Threads::SemaphoreBackend::Wait()
 {
-	return Error;
+	return Failure;
 }
 
 S::Int S::Threads::SemaphoreBackend::Release()
 {
-	return Error;
+	return Failure;
 }

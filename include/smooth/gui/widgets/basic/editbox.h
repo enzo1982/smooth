@@ -77,7 +77,7 @@ namespace smooth
 			public:
 				static const Int	 classID;
 
-							 EditBox(String, Point, Size, Int);
+							 EditBox(String, Point, Size, Int = 0);
 							~EditBox();
 
 				virtual Int		 Paint(Int);

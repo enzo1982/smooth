@@ -36,12 +36,12 @@ S::Int S::Threads::ThreadBackend::GetThreadID()
 
 S::Int S::Threads::ThreadBackend::Start(Void (*threadProc)(Void *), Void *threadParam)
 {
-	return Error;
+	return Failure;
 }
 
 S::Int S::Threads::ThreadBackend::Stop()
 {
-	return Error;
+	return Failure;
 }
 
 S::Void S::Threads::ThreadBackend::Exit()

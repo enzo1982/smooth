@@ -40,7 +40,7 @@ S::GUI::GroupBox::~GroupBox()
 
 S::Int S::GUI::GroupBox::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!IsVisible())	return Success;
 
 	Surface	*surface = container->GetDrawSurface();

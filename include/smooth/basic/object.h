@@ -8,15 +8,24 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include "../definitions.h"
+
 #ifndef _H_OBJSMOOTH_OBJECT_
 #define _H_OBJSMOOTH_OBJECT_
 
 namespace smooth
 {
 	class Object;
+
+	template <class t> class Pointer;
+	template <class t> class PointerProxy;
+
+	namespace Threads
+	{
+		class Mutex;
+	};
 };
 
-#include "../definitions.h"
 #include "../misc/string.h"
 #include "../array.h"
 #include "objecttype.h"
@@ -26,6 +35,8 @@ namespace smooth
 	abstract class SMOOTHAPI Object
 	{
 		friend class Signal;
+		friend class Pointer<class t>;
+		friend class PointerProxy<class t>;
 		private:
 			static Int		 nextClassID;
 			static Int		 nextObjectHandle;
@@ -37,6 +48,9 @@ namespace smooth
 
 			Bool			 deleteObject;
 			Int			 isObjectInUse;
+
+			Int			 refCount;
+			Threads::Mutex		*objMutex;
 		protected:
 			ObjectType		 type;
 
@@ -68,6 +82,10 @@ namespace smooth
 
 			Int			 SetFlags(Int);
 			Int			 GetFlags();
+
+			virtual String		 ToString();
+
+			operator		 String();
 
 			ObjectType		 GetObjectType();
 			virtual Bool		 IsTypeCompatible(Int);

@@ -47,6 +47,8 @@ namespace smooth
 
 				Int			 SelectNthEntry(Int);
 				Int			 GetSelectedEntryNumber();
+
+				Int			 SelectEntry(String);
 			signals:
 				Signal0<Void>		 internalOnSelectEntry;
 		};

@@ -26,7 +26,7 @@ S::Int S::XML::XUL::Renderer::LoadXUL(const String &fileName)
 {
 	CloseXUL();
 
-	Int		 rVal	= Error;
+	Int		 rVal	= Failure;
 	Document	*xul	= new Document();
 
 	xul->LoadFile(fileName);
@@ -63,5 +63,5 @@ S::Int S::XML::XUL::Renderer::RenderXUL(Document *xul)
 		return Success;
 	}
 
-	return Error;
+	return Failure;
 }

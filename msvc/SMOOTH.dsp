@@ -932,6 +932,38 @@ SOURCE=..\classes\gui\application\background.cpp
 # End Source File
 # End Group
 # End Group
+# Begin Group "error"
+
+# PROP Default_Filter ""
+# Begin Group "fs"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\error\fs\endoffile.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\error\fs\filenotfound.cpp
+# End Source File
+# End Group
+# Begin Group "miscerror"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\error\misc\permissiondenied.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\classes\error\error.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\error\success.cpp
+# End Source File
+# End Group
 # End Group
 # End Group
 # Begin Group "Header-Dateien"
@@ -1113,6 +1145,18 @@ SOURCE=..\include\smooth\templates\buffer\buffer.cpp
 # Begin Source File
 
 SOURCE=..\include\smooth\templates\buffer\buffer.h
+# End Source File
+# End Group
+# Begin Group "pointer"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\pointer\pointer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\pointer\proxy.h
 # End Source File
 # End Group
 # End Group
@@ -1708,6 +1752,38 @@ SOURCE=..\include\smooth\gui\window\windowbackend.h
 # End Source File
 # End Group
 # End Group
+# Begin Group "errorheaders"
+
+# PROP Default_Filter ""
+# Begin Group "fsheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\error\fs\endoffile.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\error\fs\filenotfound.h
+# End Source File
+# End Group
+# Begin Group "miscerrorheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\error\misc\permissiondenied.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\error\error.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\error\success.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\args.h
@@ -1767,6 +1843,10 @@ SOURCE=..\include\smooth\objecttype.h
 # Begin Source File
 
 SOURCE=..\include\smooth\pciio.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\pointer.h
 # End Source File
 # Begin Source File
 

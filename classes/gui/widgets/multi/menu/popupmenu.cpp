@@ -64,12 +64,12 @@ S::GUI::PopupMenu::~PopupMenu()
 
 S::Int S::GUI::PopupMenu::Show()
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (visible)		return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 
-	if (wnd == NIL) return Error;
+	if (wnd == NIL) return Failure;
 
 	EnterProtectedRegion();
 
@@ -98,12 +98,12 @@ S::Int S::GUI::PopupMenu::Show()
 
 S::Int S::GUI::PopupMenu::Hide()
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 
-	if (wnd == NIL) return Error;
+	if (wnd == NIL) return Failure;
 
 	EnterProtectedRegion();
 
@@ -136,7 +136,7 @@ S::Int S::GUI::PopupMenu::Hide()
 
 S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd = container->GetContainerWindow();

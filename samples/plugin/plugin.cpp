@@ -44,7 +44,7 @@ ActiveAreaPlugin::~ActiveAreaPlugin()
 
 Int ActiveAreaPlugin::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Window	*wnd = container->GetContainerWindow();
@@ -72,7 +72,7 @@ Int ActiveAreaPlugin::Paint(Int message)
 
 Int ActiveAreaPlugin::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd = container->GetContainerWindow();

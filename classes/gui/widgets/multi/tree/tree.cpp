@@ -68,7 +68,7 @@ S::Tree::Entry *S::Tree::AddEntry(String text, Tree *sub)
 
 S::Int S::Tree::RemoveEntry(Tree::Entry *entry)
 {
-	if (entry == NIL) return Error;
+	if (entry == NIL) return Failure;
 
 	if (entries.GetEntry(entry->id) != NIL)
 	{
@@ -81,7 +81,7 @@ S::Int S::Tree::RemoveEntry(Tree::Entry *entry)
 		return Success;
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Int S::Tree::RemoveEntry(Int id)

@@ -31,6 +31,14 @@
 #include "smooth/basic/object.h"
 #include "smooth/basic/setup.h"
 
+#include "smooth/error/error.h"
+#include "smooth/error/success.h"
+
+#include "smooth/error/fs/endoffile.h"
+#include "smooth/error/fs/filenotfound.h"
+
+#include "smooth/error/misc/permissiondenied.h"
+
 #include "smooth/types/bool.h"
 #include "smooth/types/float.h"
 #include "smooth/types/int.h"

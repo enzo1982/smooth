@@ -211,7 +211,7 @@ S::Int S::GUI::Widget::Deactivate()
 
 S::Int S::GUI::Widget::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	return Success;
@@ -219,7 +219,7 @@ S::Int S::GUI::Widget::Paint(Int message)
 
 S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	return Success;

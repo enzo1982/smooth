@@ -54,7 +54,7 @@ S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadPa
 
 S::Int S::Threads::ThreadWin32::Stop()
 {
-	if (thread == NIL) return Error;
+	if (thread == NIL) return Failure;
 
 	HANDLE	 self = thread;
 

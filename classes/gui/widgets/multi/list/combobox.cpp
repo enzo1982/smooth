@@ -51,10 +51,13 @@ S::GUI::ComboBox::~ComboBox()
 
 S::Int S::GUI::ComboBox::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
-	if (GetSelectedEntry() == NIL && !(flags & CB_HOTSPOTONLY)) ((ListEntry *) GetNthObject(0))->clicked = True;
+	if (GetSelectedEntry() == NIL && !(flags & CB_HOTSPOTONLY))
+	{
+		if (GetNthObject(0) != NIL) ((ListEntry *) GetNthObject(0))->clicked = True;
+	}
 
 	Surface		*surface = container->GetDrawSurface();
 
@@ -143,7 +146,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Layer		*lay = (Layer *) container;

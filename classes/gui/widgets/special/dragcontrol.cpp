@@ -32,7 +32,7 @@ S::GUI::DragControl::~DragControl()
 
 S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd = container->GetContainerWindow();

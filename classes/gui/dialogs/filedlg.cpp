@@ -144,7 +144,7 @@ S::Int S::GUI::Dialogs::FileSelection::ShowDialog()
 		}
 		else
 		{
-			retValue = Error;
+			retValue = Failure;
 		}
 
 		delete [] bufferw;
@@ -263,7 +263,7 @@ S::Int S::GUI::Dialogs::FileSelection::ShowDialog()
 		}
 		else
 		{
-			retValue = Error;
+			retValue = Failure;
 		}
 
 		delete [] buffera;

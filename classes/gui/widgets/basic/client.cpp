@@ -35,7 +35,7 @@ S::GUI::Client::~Client()
 
 S::Int S::GUI::Client::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface	= container->GetDrawSurface();

@@ -16,7 +16,33 @@ S::File::File(String iFileName, String iFilePath)
 	fileName = iFileName;
 	filePath = iFilePath;
 
-	if (filePath == NIL) filePath = Directory::GetActiveDirectory();
+	if (fileName != NIL && filePath == NIL)
+	{
+		if (fileName[1] == ':')
+		{
+			filePath = fileName;
+			fileName = NIL;
+		}
+	}
+
+	if (fileName == NIL)
+	{
+		for (Int lastBS = filePath.Length() - 1; lastBS >= 0; lastBS--)
+		{
+			if (filePath[lastBS] == '\\')
+			{
+				for (Int i = lastBS + 1; i < filePath.Length(); i++) fileName[i - lastBS - 1] = filePath[i];
+
+				filePath[lastBS] = 0;
+
+				break;
+			}
+		}
+	}
+	else if (filePath == NIL)
+	{
+		filePath = Directory::GetActiveDirectory();
+	}
 }
 
 S::File::File(const File &iFile)
@@ -69,7 +95,7 @@ S::Int64 S::File::GetFileSize()
 
 S::Int S::File::GetFileTime(FILETIME *cT, FILETIME *aT, FILETIME *wT)
 {
-	if (!Exists()) return Error;
+	if (!Exists()) return Failure;
 
 	HANDLE	 handle;
 
@@ -90,7 +116,7 @@ S::DateTime S::File::GetCreationTime()
 
 	DateTime	 dateTime;
 
-	if (GetFileTime(&fileTime, NIL, NIL) == Error) return dateTime;
+	if (GetFileTime(&fileTime, NIL, NIL) == Failure) return dateTime;
 
 	FileTimeToSystemTime(&fileTime, &time);
 
@@ -107,7 +133,7 @@ S::DateTime S::File::GetAccessTime()
 
 	DateTime	 dateTime;
 
-	if (GetFileTime(NIL, &fileTime, NIL) == Error) return dateTime;
+	if (GetFileTime(NIL, &fileTime, NIL) == Failure) return dateTime;
 
 	FileTimeToSystemTime(&fileTime, &time);
 
@@ -124,7 +150,7 @@ S::DateTime S::File::GetWriteTime()
 
 	DateTime	 dateTime;
 
-	if (GetFileTime(NIL, NIL, &fileTime) == Error) return dateTime;
+	if (GetFileTime(NIL, NIL, &fileTime) == Failure) return dateTime;
 
 	FileTimeToSystemTime(&fileTime, &time);
 
@@ -150,14 +176,14 @@ S::Bool S::File::Exists()
 
 S::Int S::File::Create()
 {
-	if (Exists()) return Error;
+	if (Exists()) return Failure;
 
 	HANDLE	 handle;
 
 	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
 	else				handle = CreateFileA(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
 
-	if (handle == INVALID_HANDLE_VALUE) return Error;
+	if (handle == INVALID_HANDLE_VALUE) return Failure;
 
 	CloseHandle(handle);
 
@@ -166,48 +192,48 @@ S::Int S::File::Create()
 
 S::Int S::File::Copy(String destination)
 {
-	if (!Exists()) return Error;
+	if (!Exists()) return Failure;
 	
 	Bool	 result = False;
 
 	if (Setup::enableUnicode)	result = CopyFileW(String(filePath).Append("\\").Append(fileName), destination, True);
 	else				result = CopyFileA(String(filePath).Append("\\").Append(fileName), destination, True);
 
-	if (result == False)	return Error;
+	if (result == False)	return Failure;
 	else			return Success;
 }
 
 S::Int S::File::Move(String destination)
 {
-	if (!Exists()) return Error;
+	if (!Exists()) return Failure;
 	
 	Bool	 result = False;
 
 	if (Setup::enableUnicode)	result = MoveFileW(String(filePath).Append("\\").Append(fileName), destination);
 	else				result = MoveFileA(String(filePath).Append("\\").Append(fileName), destination);
 
-	if (result == False)	return Error;
+	if (result == False)	return Failure;
 	else			return Success;
 }
 
 S::Int S::File::Delete()
 {
-	if (!Exists()) return Error;
+	if (!Exists()) return Failure;
 
 	Bool	 result = False;
 
 	if (Setup::enableUnicode)	result = DeleteFileW(String(filePath).Append("\\").Append(fileName));
 	else				result = DeleteFileA(String(filePath).Append("\\").Append(fileName));
 
-	if (result == False)	return Error;
+	if (result == False)	return Failure;
 	else			return Success;
 }
 
 S::Int S::File::Truncate()
 {
-	if (!Exists()) return Error;
+	if (!Exists()) return Failure;
 
-	if (Delete() == Error) return Error;
+	if (Delete() == Failure) return Failure;
 
 	return Create();
 }

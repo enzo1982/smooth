@@ -27,7 +27,7 @@ S::Backends::BackendSDL::BackendSDL()
 S::Int S::Backends::BackendSDL::Init()
 {
 	if (SDL_Init(SDL_INIT_TIMER) == 0)	return Success;
-	else					return Error;
+	else					return Failure;
 }
 
 S::Int S::Backends::BackendSDL::Deinit()

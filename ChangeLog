@@ -7,6 +7,10 @@ xx.xx.05 xx:xx - smooth alpha 0.8.67.0
 		- changed the way entries are handled
 - dirdlg.cpp	- allow to set the initially selected directory with SetDirName
 		- the new style directory selection dialog is used if available
+- error.cpp	- added error classes
+- object.cpp	- new function: ToString()
+
+- added a class for smart pointers
 
 - removed shlobjmini.h
 - removed support for MinGW 1.x

@@ -21,7 +21,7 @@ S::Array<S::System::EventBackend *(*)()>	*S::System::EventBackend::backend_creat
 
 S::Int S::System::EventBackend::AddBackend(EventBackend *(*backend)())
 {
-	if (backend == NIL) return Error;
+	if (backend == NIL) return Failure;
 
 	if (backend_creators == NIL) backend_creators = new Array<EventBackend *(*)()>;
 
@@ -52,5 +52,5 @@ S::Int S::System::EventBackend::GetEventType()
 
 S::Int S::System::EventBackend::ProcessNextEvent(Bool block)
 {
-	return Error;
+	return Failure;
 }

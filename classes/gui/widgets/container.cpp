@@ -54,7 +54,7 @@ S::Int S::GUI::Container::SetBackgroundColor(Int nColor)
 
 S::Int S::GUI::Container::RegisterObject(Widget *widget)
 {
-	if (widget == NIL) return Error;
+	if (widget == NIL) return Failure;
 
 	if (containerType == &widget->possibleContainers)
 	{
@@ -71,12 +71,12 @@ S::Int S::GUI::Container::RegisterObject(Widget *widget)
 		}
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Int S::GUI::Container::UnregisterObject(Widget *widget)
 {
-	if (widget == NIL) return Error;
+	if (widget == NIL) return Failure;
 
 	if (containerType == &widget->possibleContainers)
 	{
@@ -94,7 +94,7 @@ S::Int S::GUI::Container::UnregisterObject(Widget *widget)
 		}
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::Int S::GUI::Container::GetNOfObjects()

@@ -67,7 +67,7 @@ S::Int S::GUI::DropArea::Hide()
 
 S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd = container->GetContainerWindow();

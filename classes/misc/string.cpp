@@ -269,7 +269,7 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 	{
 		return ImportFrom("ISO-8859-1", str);
 	}
-	else if (stringSize < 0) return Error;
+	else if (stringSize < 0) return Failure;
 
 	stringSize = stringSize / 2 + 1;
 

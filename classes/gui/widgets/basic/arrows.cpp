@@ -70,7 +70,7 @@ S::GUI::Arrows::~Arrows()
 
 S::Int S::GUI::Arrows::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -180,7 +180,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd = container->GetContainerWindow();

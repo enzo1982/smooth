@@ -78,7 +78,7 @@ S::Int S::Threads::Thread::Start()
 	}
 	else
 	{
-		return Error;
+		return Failure;
 	}
 }
 
@@ -103,7 +103,7 @@ S::Int S::Threads::Thread::Stop()
 	}
 	else
 	{
-		return Error;
+		return Failure;
 	}
 }
 

@@ -54,7 +54,7 @@ S::Int S::Threads::ThreadPOSIX::Start(Void (*threadProc)(Void *), Void *threadPa
 
 S::Int S::Threads::ThreadPOSIX::Stop()
 {
-	if (thread == NIL) return Error;
+	if (thread == NIL) return Failure;
 
 	pthread_cancel(*thread);
 

@@ -335,7 +335,7 @@ S::Int S::I18n::Translator::ActivateLanguage(String magic)
 		}
 	}
 
-	return Error;
+	return Failure;
 }
 
 S::String S::I18n::Translator::TranslateString(String string)

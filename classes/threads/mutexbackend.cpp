@@ -31,10 +31,10 @@ S::Void *S::Threads::MutexBackend::GetSystemMutex()
 
 S::Int S::Threads::MutexBackend::Lock()
 {
-	return Error;
+	return Failure;
 }
 
 S::Int S::Threads::MutexBackend::Release()
 {
-	return Error;
+	return Failure;
 }

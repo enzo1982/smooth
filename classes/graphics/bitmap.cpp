@@ -98,14 +98,14 @@ S::Int S::GUI::Bitmap::ReplaceColor(Int color1, Int color2)
 
 S::Int S::GUI::Bitmap::BlitFromSurface(Surface *surface, Rect srcRect, Rect destRect)
 {
-	if (surface == NIL) return Error;
+	if (surface == NIL) return Failure;
 
 	return surface->BlitToBitmap(srcRect, *this, destRect);
 }
 
 S::Int S::GUI::Bitmap::BlitToSurface(Rect srcRect, Surface *surface, Rect destRect)
 {
-	if (surface == NIL) return Error;
+	if (surface == NIL) return Failure;
 
 	return surface->BlitFromBitmap(*this, srcRect, destRect);
 }

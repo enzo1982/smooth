@@ -64,7 +64,7 @@ S::GUI::ListEntry::~ListEntry()
 
 S::Int S::GUI::ListEntry::Paint(Int message)
 {
-	if (!registered)	return Error;
+	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
@@ -84,7 +84,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 		case SP_UPDATE:
 			if (message != SP_UPDATE)
 			{
-				if (flags & LF_MULTICHECKBOX)
+				if (container->GetFlags() & LF_MULTICHECKBOX)
 				{
 					Rect	 cbRect = frame;
 
@@ -155,7 +155,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				frame.right--;
 				frame.bottom--;
 
-				if (flags & LF_MULTICHECKBOX)
+				if (container->GetFlags() & LF_MULTICHECKBOX)
 				{
 					Rect	 cbRect = frame;
 
@@ -226,7 +226,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				frame.right--;
 				frame.bottom--;
 
-				if (flags & LF_MULTICHECKBOX)
+				if (container->GetFlags() & LF_MULTICHECKBOX)
 				{
 					Rect	 cbRect = frame;
 
@@ -288,7 +288,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 			break;
 		case SP_MOUSEDOWN:
-			if (wnd->IsMouseOn(frame) && (!clicked || (flags & LF_ALLOWRESELECT) || (flags & LF_MULTICHECKBOX)))
+			if (wnd->IsMouseOn(frame) && (!clicked || (container->GetFlags() & LF_ALLOWRESELECT) || (container->GetFlags() & LF_MULTICHECKBOX)))
 			{
 				frame.right++;
 				frame.bottom++;
@@ -296,7 +296,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				frame.right--;
 				frame.bottom--;
 
-				if (flags & LF_MULTICHECKBOX)
+				if (container->GetFlags() & LF_MULTICHECKBOX)
 				{
 					Rect	 cbRect = frame;
 
@@ -367,7 +367,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 S::Int S::GUI::ListEntry::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Error;
+	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*wnd		= container->GetContainerWindow();
@@ -384,7 +384,7 @@ S::Int S::GUI::ListEntry::Process(Int message, Int wParam, Int lParam)
 	{
 		case SM_LBUTTONDOWN:
 		case SM_LBUTTONDBLCLK:
-			if (wnd->IsMouseOn(frame) && (!clicked || (flags & LF_ALLOWRESELECT) || (flags & LF_MULTICHECKBOX)))
+			if (wnd->IsMouseOn(frame) && (!clicked || (container->GetFlags() & LF_ALLOWRESELECT) || (container->GetFlags() & LF_MULTICHECKBOX)))
 			{
 				Rect	 checkRect = frame;
 
@@ -498,7 +498,7 @@ S::Void S::GUI::ListEntry::DrawEntryText(Int color)
 	Point	 realPos	= GetRealPosition();
 	Rect	 frame		= Rect(realPos, size);
 
-	frame.left += (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
+	frame.left += (1 + ((container->GetFlags() & LF_MULTICHECKBOX) ? 12 : 0));
 	frame.top++;
 	frame.right -= 1;
 
@@ -524,7 +524,7 @@ S::Void S::GUI::ListEntry::DrawEntryText(Int color)
 			Rect	 rect = frame;
 
 			rect.left += ((ListBox *) container)->GetNthTabOffset(i);
-			rect.left -= (i >= 1 ? ((flags & LF_MULTICHECKBOX) ? 12 : 0) : 0);
+			rect.left -= (i >= 1 ? ((container->GetFlags() & LF_MULTICHECKBOX) ? 12 : 0) : 0);
 
 			if (((ListBox *) container)->GetNOfTabs() >= i + 2) rect.right = rect.left + (((ListBox *) container)->GetNthTabOffset(i + 1) - ((ListBox *) container)->GetNthTabOffset(i)) - 3;
 
@@ -560,6 +560,8 @@ S::Int S::GUI::ListEntry::SetMark(Bool nMarked)
 {
 	marked = nMarked;
 
+	Paint(SP_PAINT);
+
 	return Success;
 }
 
@@ -576,6 +578,25 @@ S::Void S::GUI::ListEntry::OnRegister()
 S::Void S::GUI::ListEntry::OnUnregister()
 {
 	((List *) container)->internalOnSelectEntry.Disconnect(&ListEntry::SelectEntry, this);
+}
+
+S::Int S::GUI::ListEntry::SetText(const String &newText)
+{
+	Bool	 prevVisible = IsVisible();
+
+	if (registered && prevVisible) Hide();
+
+	text = newText;
+
+	GetTextSize();
+
+	checked = False;
+
+	if (registered && prevVisible) Show();
+
+	Process(SM_MOUSEMOVE, 0, 0);
+
+	return Success;
 }
 
 S::Void S::GUI::ListEntry::SelectEntry()
@@ -597,7 +618,8 @@ S::Void S::GUI::ListEntry::SelectEntry()
 
 S::Void S::GUI::ListEntry::ActivateTooltip()
 {
-	if (tooltip != NIL) return;
+	if (tooltip != NIL)	return;
+	if (tipTimer == NIL)	return;
 
 	tipTimer->Stop();
 

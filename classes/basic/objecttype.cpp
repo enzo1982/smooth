@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/basic/objecttype.h>
 #include <smooth/basic/object.h>
+#include <smooth/basic/objecttype.h>
 
 S::ObjectType::ObjectType(Object *iObject)
 {

@@ -32,7 +32,7 @@ S::System::TimerWin32::~TimerWin32()
 
 S::Int S::System::TimerWin32::Start(Int interval)
 {
-	if (timerid != -1) return Error;
+	if (timerid != -1) return Failure;
 
 	timerid = SetTimer(NIL, 0, interval, &TimerProc);
 
@@ -41,7 +41,7 @@ S::Int S::System::TimerWin32::Start(Int interval)
 
 S::Int S::System::TimerWin32::Stop()
 {
-	if (timerid == -1) return Error;
+	if (timerid == -1) return Failure;
 
 	KillTimer(NIL, timerid);
 
@@ -52,7 +52,7 @@ S::Int S::System::TimerWin32::Stop()
 
 S::Int S::System::TimerWin32::GetID()
 {
-	if (timerid == -1) return Error;
+	if (timerid == -1) return Failure;
 
 	return timerid;
 }

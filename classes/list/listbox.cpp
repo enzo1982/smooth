@@ -248,7 +248,7 @@ S::Int S::ListBox::Paint(Int message)
 
 					SetMeasurement(SMT_PIXELS);
 
-					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, nOfEntries - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT), Proc(ListBox, this, ScrollbarProc));
+					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, nOfEntries - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT), Proc(&ListBox::ScrollbarProc), this);
 
 					SMOOTH::Setup::FontSize = oldMeasurement;
 

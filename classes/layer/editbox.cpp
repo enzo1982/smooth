@@ -369,7 +369,7 @@ S::Int S::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				wnd->RegisterObject(timer);
 
-				timer->SetProc(Proc(EditBox, this, TimerProc));
+				timer->SetProc(Proc(&EditBox::TimerProc), this);
 				timer->Start(500);
 			}
 

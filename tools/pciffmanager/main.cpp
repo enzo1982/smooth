@@ -36,9 +36,9 @@ PCIFFManager::PCIFFManager()
 
 	menubar->AddEntry("&File", NIL, NULLPROC, menu_file);
 
-	menu_file->AddEntry("&Open", NIL, Proc(PCIFFManager, this, OpenFile));
+	menu_file->AddEntry("&Open", NIL, Proc(&PCIFFManager::OpenFile), this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("E&xit", NIL, Proc(Window, wnd, Close));
+	menu_file->AddEntry("E&xit", NIL, Proc(wnd->*(&Window::Close)), wnd);
 
 	RegisterObject(wnd);
 

@@ -34,9 +34,9 @@ MDITest::MDITest()
 	mainWnd_menubar		= new Menubar();
 	menu_file		= new PopupMenu();
 
-	menu_file->AddEntry("New", NIL, Proc(MDITest, this, NewMDI));
+	menu_file->AddEntry("New", NIL, Proc(&MDITest::NewMDI), this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("Exit", NIL, Proc(Window, mainWnd, Close));
+	menu_file->AddEntry("Exit", NIL, Proc(mainWnd->*(&Window::Close)), mainWnd);
 
 	mainWnd_menubar->AddEntry("File", NIL, NULLPROC, menu_file);
 
@@ -49,7 +49,7 @@ MDITest::MDITest()
 
 	mainWnd->SetMetrics(Point(50, 50), Size(700, 500));
 	mainWnd->SetIcon(SI_DEFAULT);
-	mainWnd->SetKillProc(KillProc(MDITest, this, ExitProc));
+	mainWnd->SetKillProc(KillProc(&MDITest::ExitProc), this);
 }
 
 MDITest::~MDITest()

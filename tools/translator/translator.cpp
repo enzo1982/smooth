@@ -38,7 +38,7 @@ Translator::Translator()
 	pos.x = 7;
 	pos.y = 6;
 
-	button_new	= new Button("New", NULL, pos, size, Proc(Translator, this, NewEntry));
+	button_new	= new Button("New", NULL, pos, size, Proc(&Translator::NewEntry), this);
 
 	pos.x += 87;
 	pos.y += 4;
@@ -78,32 +78,32 @@ Translator::Translator()
 	pos.y -= 1;
 	size.cx = 0;
 
-	button_save	= new Button("Save", NULL, pos, size, Proc(Translator, this, SaveData));
+	button_save	= new Button("Save", NULL, pos, size, Proc(&Translator::SaveData), this);
 
 	pos.x += 88;
 
-	button_remove	= new Button("Remove", NULL, pos, size, Proc(Translator, this, RemoveEntry));
+	button_remove	= new Button("Remove", NULL, pos, size, Proc(&Translator::RemoveEntry), this);
 
 	pos.x = 7;
 	pos.y += 27;
 	size.cx = 757;
 	size.cy = 189;
 
-	list_entries	= new ListBox(pos, size, Proc(Translator, this, SelectEntry));
+	list_entries	= new ListBox(pos, size, Proc(&Translator::SelectEntry), this);
 	list_entries->AllowReselect(True);
 
 	menu_file	= new PopupMenu();
 
 	menubar->AddEntry("&File", NIL, NULLPROC, menu_file);
 
-	menu_file->AddEntry("&New", NIL, Proc(Translator, this, NewFile));
-	menu_file->AddEntry("&Close", NIL, Proc(Translator, this, Close));
+	menu_file->AddEntry("&New", NIL, Proc(&Translator::NewFile), this);
+	menu_file->AddEntry("&Close", NIL, Proc(&Translator::Close), this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("&Open", NIL, Proc(Translator, this, OpenFile));
-	menu_file->AddEntry("&Save", NIL, Proc(Translator, this, SaveFile));
-	menu_file->AddEntry("Save &as", NIL, Proc(Translator, this, SaveFileAs));
+	menu_file->AddEntry("&Open", NIL, Proc(&Translator::OpenFile), this);
+	menu_file->AddEntry("&Save", NIL, Proc(&Translator::SaveFile), this);
+	menu_file->AddEntry("Save &as", NIL, Proc(&Translator::SaveFileAs), this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("E&xit", NIL, Proc(Window, wnd, Close));
+	menu_file->AddEntry("E&xit", NIL, Proc(wnd->*(&Window::Close)), wnd);
 
 	text_id->Deactivate();
 	edit_id->Deactivate();
@@ -134,7 +134,7 @@ Translator::Translator()
 
 	wnd->SetMetrics(Point(50, 50), Size(777, 300));
 	wnd->SetIcon(SI_DEFAULT);
-	wnd->SetKillProc(KillProc(Translator, this, ExitProc));
+	wnd->SetKillProc(KillProc(&Translator::ExitProc), this);
 
 	wnd->Show();
 }

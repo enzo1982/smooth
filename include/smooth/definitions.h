@@ -137,19 +137,15 @@ namespace smooth
 #include "array.h"
 
 #ifdef _MSC_VER
-	#define Proc(x,p,y)		 (S::Void (S::Object::*)())p->y,(S::Void *)p
-	#define PaintProc(x,p,y)	 (S::Void (S::Object::*)())p->y,(S::Void *)p
-	#define PeekProc(x,p,y)		 (S::Void (S::Object::*)())p->y,(S::Void *)p
-	#define KillProc(x,p,y)		 (S::Bool (S::Object::*)())p->y,(S::Void *)p
-	#define MessageProc(x,p,y)	 (S::Void (S::Object::*)(S::Int,S::Int,S::Int))p->y,(S::Void *)p
-	#define ThreadProc(x,p,y)	 (S::Void (S::Object::*)(S::Thread *))p->y,(S::Void *)p
+	#define Proc(x)		 (S::Void (S::Object::*)())(x)
+	#define KillProc(x)	 (S::Bool (S::Object::*)())(x)
+	#define MessageProc(x)	 (S::Void (S::Object::*)(S::Int,S::Int,S::Int))(x)
+	#define ThreadProc(x)	 (S::Void (S::Object::*)(S::Thread *))(x)
 
-	#define ProcType		 S::Void(S::Object::*)()
-	#define PaintProcType		 S::Void(S::Object::*)()
-	#define PeekProcType		 S::Void(S::Object::*)()
-	#define KillProcType		 S::Bool(S::Object::*)()
-	#define MessageProcType		 S::Void(S::Object::*)(S::Int,S::Int,S::Int)
-	#define ThreadProcType		 S::Void(S::Object::*)(S::Thread *)
+	#define ProcType	 S::Void(S::Object::*)()
+	#define KillProcType	 S::Bool(S::Object::*)()
+	#define MessageProcType	 S::Void(S::Object::*)(S::Int,S::Int,S::Int)
+	#define ThreadProcType	 S::Void(S::Object::*)(S::Thread *)
 
 	#define ProcMember		 S::Void(S::Object::*proc)()
 	#define PaintProcMember		 S::Void(S::Object::*paintProc)()
@@ -158,33 +154,25 @@ namespace smooth
 	#define MessageProcMember	 S::Void(S::Object::*messageProc)(S::Int,S::Int,S::Int)
 	#define ThreadProcMember	 S::Void(S::Object::*threadProc)(S::Thread *)
 
-	#define ProcParam		 S::Void(S::Object::*newProc)()
-	#define PaintProcParam		 S::Void(S::Object::*newProc)()
-	#define PeekProcParam		 S::Void(S::Object::*newProc)()
-	#define KillProcParam		 S::Bool(S::Object::*newProc)()
-	#define MessageProcParam	 S::Void(S::Object::*newProc)(S::Int,S::Int,S::Int)
-	#define ThreadProcParam		 S::Void(S::Object::*newProc)(S::Thread *)
+	#define ProcParam	 S::Void(S::Object::*newProc)()
+	#define KillProcParam	 S::Bool(S::Object::*newProc)()
+	#define MessageProcParam S::Void(S::Object::*newProc)(S::Int,S::Int,S::Int)
+	#define ThreadProcParam	 S::Void(S::Object::*newProc)(S::Thread *)
 
 	#define ProcCall(p,c)			 if(p!=NIL)(((S::Object *) c)->*p)()
-	#define PaintProcCall(p,c)		 if(p!=NIL)(((S::Object *) c)->*p)()
-	#define PeekProcCall(p,c)		 if(p!=NIL)(((S::Object *) c)->*p)()
 	#define KillProcCall(p,c)		 (p==NIL)?(S::True):(((S::Object *) c)->*p)()
 	#define MessageProcCall(p,c,m,w,l)	 if(p!=NIL)(((S::Object *) c)->*p)(m,w,l)
 	#define ThreadProcCall(p,c,t)		 if(p!=NIL)(((S::Object *) c)->*p)(t)
 #else
-	#define Proc(x,p,y)		 (S::Void(*)())(p->*(&x::y)),(S::Void *)p
-	#define PaintProc(x,p,y)	 (S::Void(*)())(p->*(&x::y)),(S::Void *)p
-	#define PeekProc(x,p,y)		 (S::Void(*)())(p->*(&x::y)),(S::Void *)p
-	#define KillProc(x,p,y)		 (S::Bool(*)())(p->*(&x::y)),(S::Void *)p
-	#define MessageProc(x,p,y)	 (S::Void(*)(S::Int,S::Int,S::Int))(p->*(&x::y)),(S::Void *)p
-	#define ThreadProc(x,p,y)	 (S::Void(*)(S::Thread *))(p->*(&x::y)),(S::Void *)p
+	#define Proc(x)		 (S::Void(*)())(x)
+	#define KillProc(x)	 (S::Bool(*)())(x)
+	#define MessageProc(x)	 (S::Void(*)(S::Int,S::Int,S::Int))(x)
+	#define ThreadProc(x)	 (S::Void(*)(S::Thread *))(x)
 
-	#define ProcType		 S::Void(*)(S::Void *)
-	#define PaintProcType		 S::Void(*)(S::Void *)
-	#define PeekProcType		 S::Void(*)(S::Void *)
-	#define KillProcType		 S::Bool(*)(S::Void *)
-	#define MessageProcType		 S::Void(*)(S::Void *,S::Int,S::Int,S::Int)
-	#define ThreadProcType		 S::Void(*)(S::Void *,S::Thread *)
+	#define ProcType	 S::Void(*)(S::Void *)
+	#define KillProcType	 S::Bool(*)(S::Void *)
+	#define MessageProcType	 S::Void(*)(S::Void *,S::Int,S::Int,S::Int)
+	#define ThreadProcType	 S::Void(*)(S::Void *,S::Thread *)
 
 	#define ProcMember		 S::Void(*proc)(S::Void *)
 	#define PaintProcMember		 S::Void(*paintProc)(S::Void *)
@@ -193,16 +181,12 @@ namespace smooth
 	#define MessageProcMember	 S::Void(*messageProc)(S::Void *,S::Int,S::Int,S::Int)
 	#define ThreadProcMember	 S::Void(*threadProc)(S::Void *,S::Thread *)
 
-	#define ProcParam		 S::Void(*newProc)()
-	#define PaintProcParam		 S::Void(*newProc)()
-	#define PeekProcParam		 S::Void(*newProc)()
-	#define KillProcParam		 S::Bool(*newProc)()
-	#define MessageProcParam	 S::Void(*newProc)(S::Int,S::Int,S::Int)
-	#define ThreadProcParam		 S::Void(*newProc)(S::Thread *)
+	#define ProcParam	 S::Void(*newProc)()
+	#define KillProcParam	 S::Bool(*newProc)()
+	#define MessageProcParam S::Void(*newProc)(S::Int,S::Int,S::Int)
+	#define ThreadProcParam	 S::Void(*newProc)(S::Thread *)
 
 	#define ProcCall(p,c)			 if(p!=NIL)p(c)
-	#define PaintProcCall(p,c)		 if(p!=NIL)p(c)
-	#define PeekProcCall(p,c)		 if(p!=NIL)p(c)
 	#define KillProcCall(p,c)		 (p==NIL)?(S::True):p(c)
 	#define MessageProcCall(p,c,m,w,l)	 if(p!=NIL)p(c, m, w, l)
 	#define ThreadProcCall(p,c,t)		 if(p!=NIL)p(c, t)

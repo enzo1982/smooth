@@ -20,3 +20,4 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - ported the whole library to the new smooth namespace layout
 - added the pcitools (ras2pci and pci2ras)
 - TestKey now displays Unicode character codes
+- changed the way Procs are composed from 'class, instance, method' to '&class::method'

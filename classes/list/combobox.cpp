@@ -310,7 +310,7 @@ S::Int S::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				layer		= new Layer();
 				toolWindow	= new ToolWindow();
-				listBox		= new ListBox(Point(0, 0), lbs, Proc(ComboBox, this, ListBoxProc));
+				listBox		= new ListBox(Point(0, 0), lbs, Proc(&ComboBox::ListBoxProc), this);
 
 				lbp.x = frame.left + wnd->GetObjectProperties()->pos.x;
 				lbp.y = frame.bottom + 1 + wnd->GetObjectProperties()->pos.y;

@@ -44,7 +44,7 @@ Designer::Designer()
 	statusbar	= new Statusbar("Ready");
 
 	timer1		= new Timer();
-	timer1->SetProc(Proc(Designer, this, TimerProc));
+	timer1->SetProc(Proc(&Designer::TimerProc), this);
 
 	menu_file	= new PopupMenu();
 	menu_dialog	= new PopupMenu();
@@ -57,17 +57,17 @@ Designer::Designer()
 	menubar->AddEntry("&Dialog", NIL, NULLPROC, menu_dialog);
 	menubar->AddEntry("&Widgets", NIL, NULLPROC, menu_widgets);
 
-	menu_file->AddEntry("E&xit", NIL, Proc(Designer, this, Close));
+	menu_file->AddEntry("E&xit", NIL, Proc(&Designer::Close), this);
 
-	menu_dialog->AddEntry("&New", NIL, Proc(Designer, this, NewDialog));
+	menu_dialog->AddEntry("&New", NIL, Proc(&Designer::NewDialog), this);
 
 	menu_widgets->AddEntry("&Add", NIL, NULLPROC, menu_widgets_add);
 
 	menu_widgets_add->AddEntry("&smooth controls", NIL, NULLPROC, menu_widgets_add_smooth);
 
-	menu_widgets_add_smooth->AddEntry("&Button", NIL, Proc(Designer, this, AddButton));
-	menu_widgets_add_smooth->AddEntry("&Layer", NIL, Proc(Designer, this, AddLayer));
-	menu_widgets_add_smooth->AddEntry("&Menubar", NIL, Proc(Designer, this, AddMenubar));
+	menu_widgets_add_smooth->AddEntry("&Button", NIL, Proc(&Designer::AddButton), this);
+	menu_widgets_add_smooth->AddEntry("&Layer", NIL, Proc(&Designer::AddLayer), this);
+	menu_widgets_add_smooth->AddEntry("&Menubar", NIL, Proc(&Designer::AddMenubar), this);
 
 	RegisterObject(wnd);
 
@@ -80,7 +80,7 @@ Designer::Designer()
 	wnd->SetMetrics(Point(50, 50), Size(600, 85));
 	wnd->SetIcon(SI_DEFAULT);
 
-	wnd->SetKillProc(KillProc(Designer, this, ExitProc));
+	wnd->SetKillProc(KillProc(&Designer::ExitProc), this);
 
 	wnd->Show();
 

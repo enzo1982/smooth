@@ -51,12 +51,12 @@ BeatClock::BeatClock()
 	timer		= new Timer();
 	dragcontrol	= new DragControl();
 
-	timer->SetProc(Proc(BeatClock, this, PaintTime));
+	timer->SetProc(Proc(&BeatClock::PaintTime), this);
 
-	menubar->AddEntry("Mode", NIL, Proc(BeatClock, this, Mode));
-	menubar->AddEntry("Options", NIL, Proc(BeatClock, this, Options));
+	menubar->AddEntry("Mode", NIL, Proc(&BeatClock::Mode), this);
+	menubar->AddEntry("Options", NIL, Proc(&BeatClock::Options), this);
 	menubar->AddEntry()->SetOrientation(OR_RIGHT);
-	menubar->AddEntry("Info", NIL, Proc(BeatClock, this, Info))->SetOrientation(OR_RIGHT);
+	menubar->AddEntry("Info", NIL, Proc(&BeatClock::Info), this)->SetOrientation(OR_RIGHT);
 
 	RegisterObject(wnd);
 
@@ -66,10 +66,10 @@ BeatClock::BeatClock()
 	wnd->RegisterObject(timer);
 
 	wnd->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
-	wnd->SetPaintProc(Proc(BeatClock, this, PaintAll));
+	wnd->SetPaintProc(Proc(&BeatClock::PaintAll), this);
 	wnd->SetExStyle(WS_EX_TOPMOST|WS_EX_TOOLWINDOW);
 	wnd->SetMetrics(Point(wpx, wpy), Size(164 * SMOOTH::Setup::FontSize, 103 * SMOOTH::Setup::FontSize));
-	wnd->SetMessageProc(MessageProc(BeatClock, this, EventProc));
+	wnd->SetMessageProc(MessageProc(&BeatClock::EventProc), this);
 	wnd->Show();
 
 	timer->Start(50);
@@ -135,25 +135,25 @@ Void BeatClock::Options()
 	size.cx = 100;
 	size.cy = 0;
 
-	display_option1 = new OptionBox("Internet Beats", pos, size, &timeformat, 0, Proc(BeatClock, this, OptionsBeats));
+	display_option1 = new OptionBox("Internet Beats", pos, size, &timeformat, 0, Proc(&BeatClock::OptionsBeats), this);
 
 	pos.y = 49;
 
-	display_option2 = new OptionBox("Standard (STF)", pos, size, &timeformat, 1, Proc(BeatClock, this, OptionsSTF));
+	display_option2 = new OptionBox("Standard (STF)", pos, size, &timeformat, 1, Proc(&BeatClock::OptionsSTF), this);
 
 	pos.x = 126;
 	pos.y = 24;
 
-	if (timeformat == 0)	display_check1 = new CheckBox("Show centibeats", pos, size, &centi, Proc(BeatClock, this, OptionsPaint));
-	else			display_check1 = new CheckBox("Show seconds", pos, size, &centi, Proc(BeatClock, this, OptionsPaint));
+	if (timeformat == 0)	display_check1 = new CheckBox("Show centibeats", pos, size, &centi, Proc(&BeatClock::OptionsPaint), this);
+	else			display_check1 = new CheckBox("Show seconds", pos, size, &centi, Proc(&BeatClock::OptionsPaint), this);
 
 	pos.x = 255;
 
-	display_option3 = new OptionBox("CET", pos, size, &timezone, 0, Proc(BeatClock, this, OptionsPaint));
+	display_option3 = new OptionBox("CET", pos, size, &timezone, 0, Proc(&BeatClock::OptionsPaint), this);
 
 	pos.y = 49;
 
-	display_option4 = new OptionBox("Local time", pos, size, &timezone, 1, Proc(BeatClock, this, OptionsPaint));
+	display_option4 = new OptionBox("Local time", pos, size, &timezone, 1, Proc(&BeatClock::OptionsPaint), this);
 
 	display->RegisterObject(display_group1);
 	display->RegisterObject(display_group2);
@@ -168,7 +168,7 @@ Void BeatClock::Options()
 	pos.x = 7;
 	pos.y = 7;
 
-	alarm_check1 = new CheckBox("Enable alarm", pos, size, &isalarm, Proc(BeatClock, this, toggleAlarmState));
+	alarm_check1 = new CheckBox("Enable alarm", pos, size, &isalarm, Proc(&BeatClock::toggleAlarmState), this);
 
 	pos.y = 35;
 	pos.x = 9;
@@ -266,12 +266,12 @@ Void BeatClock::Options()
 	size.cx = 0;
 	size.cy = 0;
 
-	main_button1 = new Button("OK", NIL, pos, size, Proc(BeatClock, this, OptionsOK));
+	main_button1 = new Button("OK", NIL, pos, size, Proc(&BeatClock::OptionsOK), this);
 	main_button1->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 87;
 
-	main_button2 = new Button("Cancel", NIL, pos, size, Proc(BeatClock, this, OptionsCancel));
+	main_button2 = new Button("Cancel", NIL, pos, size, Proc(&BeatClock::OptionsCancel), this);
 	main_button2->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 7;
@@ -295,7 +295,7 @@ Void BeatClock::Options()
 
 	optionsdialog->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
 	optionsdialog->SetMetrics(Point(100, 100), Size(397, 181));
-	optionsdialog->SetKillProc(KillProc(BeatClock, this, OptionsKillProc));
+	optionsdialog->SetKillProc(KillProc(&BeatClock::OptionsKillProc), this);
 	optionsdialog->SetStyle(SS_MODAL);
 
 	oldtf = timeformat;

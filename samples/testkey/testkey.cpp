@@ -41,7 +41,7 @@ TestKey::TestKey()
 	wnd->RegisterObject(title);
 	wnd->RegisterObject(text);
 
-	wnd->SetMessageProc(MessageProc(TestKey, this, EventProc));
+	wnd->SetMessageProc(MessageProc(&TestKey::EventProc), this);
 	wnd->SetMetrics(Point(80, 80), Size(300, 160));
 }
 

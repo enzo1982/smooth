@@ -320,7 +320,7 @@ S::Int S::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				wnd->RegisterObject(timer);
 
-				timer->SetProc(Proc(Scrollbar, this, TimerProc));
+				timer->SetProc(Proc(&Scrollbar::TimerProc), this);
 				timer->Start(200);
 
 				timerCount = 1;

@@ -247,15 +247,15 @@ S::Void S::Window::SetKillProc(KillProcParam, Void *procParam)
 	killProcParam = procParam;
 }
 
-S::Void S::Window::SetPaintProc(PaintProcParam, Void *procParam)
+S::Void S::Window::SetPaintProc(ProcParam, Void *procParam)
 {
-	paintProc = (PaintProcType) newProc;
+	paintProc = (ProcType) newProc;
 	paintProcParam = procParam;
 }
 
-S::Void S::Window::SetPeekProc(PeekProcParam, Void *procParam)
+S::Void S::Window::SetPeekProc(ProcParam, Void *procParam)
 {
-	peekProc = (PeekProcType) newProc;
+	peekProc = (ProcType) newProc;
 	peekProcParam = procParam;
 
 	if (peekProc != NIL) peekLoop++;
@@ -665,7 +665,7 @@ S::Int S::Window::Process(Int message, Int wParam, Int lParam)
 
 			return 0;
 		case SM_EXECUTEPEEK:
-			PeekProcCall(peekProc, peekProcParam);
+			ProcCall(peekProc, peekProcParam);
 
 			LeaveProtectedRegion();
 
@@ -1031,7 +1031,7 @@ S::Int S::Window::Paint(Int message)
 			if (operat->IsVisible() && Affected(operat, updateRect)) operat->Paint(SP_PAINT);
 		}
 
-		PaintProcCall(paintProc, paintProcParam);
+		ProcCall(paintProc, paintProcParam);
 
 		FreeContext(this, dc);
 	}

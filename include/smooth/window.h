@@ -121,9 +121,9 @@ namespace smooth
 			Int		 SetStatusText(String);
 			String		 GetStatusText();
 
-			Void		 SetPaintProc(PaintProcParam, Void *);
+			Void		 SetPaintProc(ProcParam, Void *);
 			Void		 SetKillProc(KillProcParam, Void *);
-			Void		 SetPeekProc(PeekProcParam, Void *);
+			Void		 SetPeekProc(ProcParam, Void *);
 			Void		 SetMessageProc(MessageProcParam, Void *);
 
 			Rect		 GetUpdateRect();

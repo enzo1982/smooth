@@ -978,7 +978,7 @@ SOURCE=..\resources\resources.rc
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # ADD BASE RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "I:\devel\projects\mpsd\src\smooth\resources"
-# ADD RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "c:\devel\projects\mpsd\src\smooth" /d "__WIN32__" /d "__SMOOTH_DLL__"
+# ADD RSC /l 0x407 /i "\devel\projects\mpsd\src\smooth\resources" /i "h:\devel\projects\mpsd\src\smooth" /d "__WIN32__" /d "__SMOOTH_DLL__"
 
 !ENDIF 
 

@@ -225,7 +225,7 @@ S::Int S::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				wnd->RegisterObject(timer);
 
-				timer->SetProc(Proc(Arrows, this, TimerProc));
+				timer->SetProc(Proc(&Arrows::TimerProc), this);
 				timer->Start(250);
 
 				timerCount = 1;

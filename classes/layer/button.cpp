@@ -331,7 +331,7 @@ S::Int S::Button::Process(Int message, Int wParam, Int lParam)
 
 					wnd->RegisterObject(tipTimer);
 
-					tipTimer->SetProc(Proc(Button, this, ActivateTooltip));
+					tipTimer->SetProc(Proc(&Button::ActivateTooltip), this);
 					tipTimer->Start(500);
 				}
 			}

@@ -145,8 +145,8 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 	msgbox->RegisterObject(titlebar);
 	msgbox->RegisterObject(lay);
 
-	msgbox->SetPaintProc(Proc(MessageBoxApp, this, MessagePaintProc));
-	msgbox->SetKillProc(KillProc(MessageBoxApp, this, MessageKillProc));
+	msgbox->SetPaintProc(Proc(&MessageBoxApp::MessagePaintProc), this);
+	msgbox->SetKillProc(KillProc(&MessageBoxApp::MessageKillProc), this);
 
 	bpos.y = 14 + buttonHeight;
 	bsize.cy = 0;
@@ -163,17 +163,17 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 		case MB_OK:
 			if (msgbox->GetObjectProperties()->size.cx < (buttonWidth + 30)) msgbox->GetObjectProperties()->size.cx = buttonWidth + 30;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - buttonWidth) / 2 - 3;
-			okbutton = new Button(TXT_OK, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageOK));
+			okbutton = new Button(TXT_OK, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageOK), this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(okbutton);
 			break;
 		case MB_OKCANCEL:
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
-			okbutton = new Button(TXT_OK, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageOK));
+			okbutton = new Button(TXT_OK, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageOK), this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageCancel));
+			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageCancel), this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(okbutton);
 			lay->RegisterObject(cancelbutton);
@@ -181,10 +181,10 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 		case MB_YESNO:
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
-			yesbutton = new Button(TXT_YES, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageYes));
+			yesbutton = new Button(TXT_YES, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageYes), this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			nobutton = new Button(TXT_NO, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageNo));
+			nobutton = new Button(TXT_NO, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageNo), this);
 			nobutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(yesbutton);
 			lay->RegisterObject(nobutton);
@@ -192,13 +192,13 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 		case MB_YESNOCANCEL:
 			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
-			yesbutton = new Button(TXT_YES, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageYes));
+			yesbutton = new Button(TXT_YES, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageYes), this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			nobutton = new Button(TXT_NO, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageNo));
+			nobutton = new Button(TXT_NO, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageNo), this);
 			nobutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageCancel));
+			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageCancel), this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(yesbutton);
 			lay->RegisterObject(nobutton);
@@ -207,10 +207,10 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 		case MB_RETRYCANCEL:
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
-			retrybutton = new Button(TXT_RETRY, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageRetry));
+			retrybutton = new Button(TXT_RETRY, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageRetry), this);
 			retrybutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageCancel));
+			cancelbutton = new Button(TXT_CANCEL, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageCancel), this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(retrybutton);
 			lay->RegisterObject(cancelbutton);
@@ -218,13 +218,13 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 		case MB_ABORTRETRYIGNORE:
 			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
-			abortbutton = new Button(TXT_ABORT, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageAbort));
+			abortbutton = new Button(TXT_ABORT, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageAbort), this);
 			abortbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			retrybutton = new Button(TXT_RETRY, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageRetry));
+			retrybutton = new Button(TXT_RETRY, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageRetry), this);
 			retrybutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
-			ignorebutton = new Button(TXT_IGNORE, NIL, bpos, bsize, Proc(MessageBoxApp, this, MessageIgnore));
+			ignorebutton = new Button(TXT_IGNORE, NIL, bpos, bsize, Proc(&MessageBoxApp::MessageIgnore), this);
 			ignorebutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(abortbutton);
 			lay->RegisterObject(retrybutton);

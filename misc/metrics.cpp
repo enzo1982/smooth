@@ -12,6 +12,8 @@
 #include <smooth/definitions.h>
 #include <smooth/stk.h>
 #include <smooth/toolkit.h>
+#include <smooth/messagebox.h>
+#include <smooth/i18n.h>
 
 int	 S::METRIC_TITLEBARHEIGHT;
 int	 S::METRIC_TBBUTTONBOXOFFSETX;
@@ -230,6 +232,8 @@ void S::SetMetrics()
 			METRIC_LISTBOXENTRYHEIGHT = 18;
 			METRIC_LISTBOXTEXTOFFSETXY = 3;
 			METRIC_LISTBOXSBOFFSET = 18;
+
+			SMOOTH::MessageBox("You have selected large fonts in the Windows settings.\nIt is not recommended to use large fonts with smooth applications.\n\nClick OK to continue.", "Information", MB_OK, IDI_INFORMATION);
 
 			break;
 	}

@@ -24,10 +24,6 @@ namespace smooth
 #ifdef __SMOOTH_DLL__
 	Int GetDefaultLanguage();
 
-	extern String TXT_ERROR;
-	extern String TXT_ERROR_OBJECTMANAGEREXISTS;
-	extern String TXT_ERROR_THREADMANAGEREXISTS;
-
 	extern String TXT_OK;
 	extern String TXT_CANCEL;
 	extern String TXT_YES;
@@ -37,7 +33,6 @@ namespace smooth
 	extern String TXT_IGNORE;
 
 	extern String TXT_SMOOTHAPPLICATION;
-	extern String TXT_LAYER;
 
 	extern String TXT_COLORSELECTION;
 	extern String TXT_HTMLCODE;

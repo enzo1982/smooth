@@ -28,7 +28,7 @@ S::ThreadManager::ThreadManager()
 		iAmTheOne = False;
 
 #ifdef __WIN32__
-		SMOOTH::MessageBox(TXT_ERROR_THREADMANAGEREXISTS, TXT_ERROR, MB_OK, IDI_INFORMATION);
+		SMOOTH::MessageBox("ThreadManager already exists! Creation refused!", "Error", MB_OK, IDI_INFORMATION);
 #endif
 
 		delete this;

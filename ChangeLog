@@ -12,6 +12,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 			- added new callback: Menu *getTrackMenu(Int mouseX, Int mouseY)
 			- fixed issues with modal and topmost windows
 			- removed SM_MOUSELEAVE message (functionality is now integrated in Window::IsMouseOn(...))
+			- new signal: onResize(Void)
 - surface.cpp		- modified StartPaint and EndPaint methods
 			- added PaintRect method: updates the requested region
 - pciio.cpp		- read-only files can now be opened

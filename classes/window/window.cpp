@@ -559,6 +559,8 @@ S::Int S::GUI::Window::Close()
 {
 	if (hwnd == NIL) return Error;
 
+	Process(SM_LOOSEFOCUS, 0, 0);
+
 	if (Setup::enableUnicode)	::SendMessageW(hwnd, WM_CLOSE, 0, 0);
 	else				::SendMessageA(hwnd, WM_CLOSE, 0, 0);
 
@@ -736,9 +738,27 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 			break;
+		case WM_ACTIVATE:
+			if (LOWORD(wParam) != WA_INACTIVE && !(flags & WF_SYSTEMMODAL))
+			{
+				for (Int i = 0; i < Object::objectCount; i++)
+				{
+					Object	*object = mainObjectManager->RequestObject(i);
+
+					if (object != NIL)
+					{
+						if (object->GetObjectType() == OBJ_WINDOW)
+						{
+							if (((GUI::Window *) object)->handle > handle && (((GUI::Window *) object)->flags & WF_MODAL)) SetActiveWindow(((GUI::Window *) object)->hwnd);
+						}
+					}
+				}
+			}
+
+			break;
 		case WM_ACTIVATEAPP:
 		case WM_KILLFOCUS:
-			if (flags & WF_MODAL)
+			if (flags & WF_MODAL && (message == WM_ACTIVATEAPP || message == WM_KILLFOCUS))
 			{
 				Bool	 activate = False;
 				HWND	 actWnd = GetActiveWindow();
@@ -766,7 +786,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				else		SetWindowPos(hwnd, message == WM_KILLFOCUS ? HWND_NOTOPMOST : GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 			}
 
-			if (flags & WF_APPTOPMOST && message == WM_ACTIVATEAPP)
+			if (flags & WF_APPTOPMOST && (message == WM_ACTIVATEAPP || message == WM_KILLFOCUS))
 			{
 				Bool	 activate = False;
 				HWND	 actWnd = GetActiveWindow();
@@ -777,7 +797,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				else if (GetWindow(actWnd)->type == OBJ_TOOLWINDOW)	break;
 				else							activate = True;
 
-				if (activate)
+				if (activate && message == WM_ACTIVATEAPP)
 				{
 					if (wParam)	activate = True;
 					else		activate = False;

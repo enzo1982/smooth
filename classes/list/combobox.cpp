@@ -58,7 +58,22 @@ S::GUI::ComboBox::~ComboBox()
 {
 	if (listBoxOpen)
 	{
+		toolWindow->Close();
+
+		Window	*wnd = NIL;
+
+		if (myContainer != NIL) myContainer->GetContainerWindow();
+
+		if (wnd != NIL) wnd->UnregisterObject(toolWindow);
+
+		toolWindow->UnregisterObject(layer);
+		layer->UnregisterObject(listBox);
+
+		toolWindow->FreeOwner();
+
 		DeleteObject(listBox);
+		DeleteObject(layer);
+		DeleteObject(toolWindow);
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
@@ -254,6 +269,8 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 			{
 				listBoxOpen = False;
 
+				toolWindow->Close();
+
 				wnd->UnregisterObject(toolWindow);
 				toolWindow->UnregisterObject(layer);
 				layer->UnregisterObject(listBox);
@@ -283,6 +300,8 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				if ((wnd->IsMouseOn(frame) && listBoxOpen) || (!wnd->IsMouseOn(frame) && !wnd->IsMouseOn(lbframe) && listBoxOpen))
 				{
 					listBoxOpen = False;
+
+					toolWindow->Close();
 
 					wnd->UnregisterObject(toolWindow);
 					toolWindow->UnregisterObject(layer);
@@ -478,6 +497,8 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				if (listBoxOpen)
 				{
 					listBoxOpen = False;
+
+					toolWindow->Close();
 
 					wnd->UnregisterObject(toolWindow);
 					toolWindow->UnregisterObject(layer);

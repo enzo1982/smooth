@@ -54,10 +54,6 @@ S::Void S::ActivateEnglishLanguage()
 
 	String	 inputFormat = String::SetInputFormat("UTF-8");
 
-	TXT_ERROR = "Error";
-	TXT_ERROR_OBJECTMANAGEREXISTS = "ObjectManager already exists! Creation refused!";
-	TXT_ERROR_THREADMANAGEREXISTS = "ThreadManager already exists! Creation refused!";
-
 	TXT_OK = "OK";
 	TXT_CANCEL = "Cancel";
 	TXT_YES = "Yes";
@@ -67,7 +63,6 @@ S::Void S::ActivateEnglishLanguage()
 	TXT_IGNORE = "Ignore";
 
 	TXT_SMOOTHAPPLICATION = "smooth application";
-	TXT_LAYER = "Layer";
 
 	TXT_COLORSELECTION = "Color selection";
 	TXT_HTMLCODE = "HTML code:";

@@ -39,10 +39,6 @@ __declspec (dllexport)
 
 S::String S::I18N_DEFAULTFONT;
 
-S::String S::TXT_ERROR;
-S::String S::TXT_ERROR_OBJECTMANAGEREXISTS;
-S::String S::TXT_ERROR_THREADMANAGEREXISTS;
-
 S::String S::TXT_OK;
 S::String S::TXT_CANCEL;
 S::String S::TXT_YES;
@@ -52,7 +48,6 @@ S::String S::TXT_ABORT;
 S::String S::TXT_IGNORE;
 
 S::String S::TXT_SMOOTHAPPLICATION;
-S::String S::TXT_LAYER;
 
 S::String S::TXT_COLORSELECTION;
 S::String S::TXT_HTMLCODE;

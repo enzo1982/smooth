@@ -15,10 +15,6 @@ S::Void S::ActivateGermanLanguage()
 {
 	String	 inputFormat = String::SetInputFormat("UTF-8");
 
-	TXT_ERROR = "Fehler";
-	TXT_ERROR_OBJECTMANAGEREXISTS = "ObjectManager existiert bereits! Kann keine neue Instanz erzeugen!";
-	TXT_ERROR_THREADMANAGEREXISTS = "ThreadManager existiert bereits! Kann keine neue Instanz erzeugen!";
-
 	TXT_OK = "OK";
 	TXT_CANCEL = "Abbrechen";
 	TXT_YES = "Ja";
@@ -28,7 +24,6 @@ S::Void S::ActivateGermanLanguage()
 	TXT_IGNORE = "Ignorieren";
 
 	TXT_SMOOTHAPPLICATION = "smooth Anwendung";
-	TXT_LAYER = "Layer";
 
 	TXT_COLORSELECTION = "Farbauswahl";
 	TXT_HTMLCODE = "HTML-Code:";

@@ -26,11 +26,25 @@ S::GUI::Widget::Widget()
 	visible	= False;
 	active	= True;
 
+	flags	= 0;
+
 	subtype	= 0;
 }
 
 S::GUI::Widget::~Widget()
 {
+}
+
+S::Int S::GUI::Widget::SetFlags(Int nFlags)
+{
+	flags = nFlags;
+
+	return Success;
+}
+
+S::Int S::GUI::Widget::GetFlags()
+{
+	return flags;
 }
 
 S::Int S::GUI::Widget::Show()

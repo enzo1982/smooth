@@ -41,7 +41,7 @@ namespace smooth
 						 Tooltip();
 						~Tooltip();
 
-				Int		 Process(Int, Int, Int);
+				Int		 DrawTooltip();
 
 				Int		 Show();
 				Int		 Hide();

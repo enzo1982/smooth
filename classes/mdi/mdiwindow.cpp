@@ -31,7 +31,7 @@ S::GUI::MDIWindow::MDIWindow(String title) : Window(title)
 	objectProperties->size.cy	= 100;
 	objectProperties->orientation	= OR_FREE;
 
-	possibleContainers.DeleteAll();
+	possibleContainers.RemoveAll();
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 

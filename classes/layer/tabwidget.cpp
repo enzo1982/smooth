@@ -398,10 +398,10 @@ S::Int S::GUI::TabWidget::UnregisterObject(Object *object)
 
 			((Widget *) object)->onUnregister.Emit(this);
 
-			if (assocObjects.DeleteEntry(object->handle) == True)
+			if (assocObjects.RemoveEntry(object->handle) == True)
 			{
-				sizeSet.DeleteEntry(object->handle);
-				textSize.DeleteEntry(object->handle);
+				sizeSet.RemoveEntry(object->handle);
+				textSize.RemoveEntry(object->handle);
 				nOfObjects--;
 
 				object->UnsetRegisteredFlag();

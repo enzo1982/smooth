@@ -49,13 +49,13 @@ namespace smooth
 
 				for (Int i = 0; i < methods.GetNOfEntries(); i++)
 				{
-					if (*instances.GetNthEntry(i) == *instance && *methods.GetNthEntry(i) == *method)
+					if (*instances.GetNthEntry(i) == instance && *methods.GetNthEntry(i) == method)
 					{
 						delete instances.GetNthEntry(i);
 						delete methods.GetNthEntry(i);
 
-						instances.DeleteEntry(instances.GetNthEntryIndex(i));
-						methods.DeleteEntry(methods.GetNthEntryIndex(i));
+						instances.RemoveEntry(instances.GetNthEntryIndex(i));
+						methods.RemoveEntry(methods.GetNthEntryIndex(i));
 
 						break;
 					}
@@ -73,7 +73,7 @@ namespace smooth
 				{
 					if (functions.GetNthEntry(i) == (Void (*)()) proc)
 					{
-						functions.DeleteEntry(functions.GetNthEntryIndex(i));
+						functions.RemoveEntry(functions.GetNthEntryIndex(i));
 
 						break;
 					}
@@ -88,7 +88,7 @@ namespace smooth
 				{
 					if (sigs.GetNthEntry(i) == sig)
 					{
-						sigs.DeleteEntry(sigs.GetNthEntryIndex(i));
+						sigs.RemoveEntry(sigs.GetNthEntryIndex(i));
 
 						break;
 					}

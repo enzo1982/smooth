@@ -64,13 +64,13 @@ S::GUI::ComboBox::~ComboBox()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::List::Entry *S::GUI::ComboBox::AddEntry(String name)
+S::ListEntry *S::GUI::ComboBox::AddEntry(String name)
 {
 	entryCount++;
 
-	Entry *newEntry = AddListEntry(entryCount, name);
+	ListEntry *newEntry = List::AddEntry(entryCount, name);
 
-	if (entryCount == 0) entries.GetFirstEntry()->clk = True;
+	if (entryCount == 0) GetFirstEntry()->clk = True;
 
 	Paint(SP_PAINT);
 
@@ -79,7 +79,7 @@ S::List::Entry *S::GUI::ComboBox::AddEntry(String name)
 
 S::Int S::GUI::ComboBox::ModifyEntry(Int code, String name)
 {
-	if (ModifyListEntry(code, name) == Success)
+	if (List::ModifyEntry(code, name) == Success)
 	{
 		Paint(SP_PAINT);
 
@@ -93,7 +93,7 @@ S::Int S::GUI::ComboBox::ModifyEntry(Int code, String name)
 
 S::Int S::GUI::ComboBox::RemoveEntry(Int number)
 {
-	RemoveListEntry(number);
+	List::RemoveEntry(number);
 
 	Paint(SP_PAINT);
 
@@ -102,14 +102,14 @@ S::Int S::GUI::ComboBox::RemoveEntry(Int number)
 
 S::Void S::GUI::ComboBox::Cleanup()
 {
-	CleanupList();
+	List::Cleanup();
 
 	Paint(SP_PAINT);
 }
 
-S::Int S::GUI::ComboBox::SelectEntry(Int code)
+S::Int S::GUI::ComboBox::SelectEntry(Int id)
 {
-	SelectListEntry(code);
+	List::SelectEntry(id);
 
 	Paint(SP_PAINT);
 
@@ -123,7 +123,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 	Surface		*surface = myContainer->GetDrawSurface();
 	Point		 realPos = GetRealPosition();
-	List::Entry	*operat;
+	ListEntry	*operat;
 	Rect		 frame;
 	Point		 lineStart;
 	Point		 lineEnd;
@@ -167,9 +167,9 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 		lineEnd.y++;
 	}
 
-	for (Int j = 0; j < nOfEntries; j++)
+	for (Int j = 0; j < GetNOfEntries(); j++)
 	{
-		operat = entries.GetNthEntry(j);
+		operat = GetNthEntry(j);
 
 		if (operat->clk)
 		{
@@ -177,7 +177,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 			frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
 			frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-			surface->SetText(operat->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+			surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 			frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 			frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -201,7 +201,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 	Surface		*surface = myContainer->GetDrawSurface();
 	Point		 realPos = GetRealPosition();
 	Int		 retVal = Success;
-	List::Entry	*operat;
+	ListEntry	*operat;
 	Rect		 frame;
 	Rect		 lbframe;
 	Point		 lbp;
@@ -246,7 +246,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 #endif
 		case SM_LOOSEFOCUS:
 			lbframe.top	= frame.bottom + 1;
-			lbframe.bottom	= lbframe.top + min(METRIC_LISTBOXENTRYHEIGHT * nOfEntries + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
+			lbframe.bottom	= lbframe.top + min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
 			lbframe.right	= frame.right;
 			lbframe.left	= frame.left;
 
@@ -277,7 +277,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 			break;
 		case SM_LBUTTONDOWN:
 			lbframe.top	= frame.bottom + 1;
-			lbframe.bottom	= lbframe.top + min(METRIC_LISTBOXENTRYHEIGHT * nOfEntries + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
+			lbframe.bottom	= lbframe.top + min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
 			lbframe.right	= frame.right;
 			lbframe.left	= frame.left;
 
@@ -290,7 +290,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				lbp.x = frame.left - lay->GetObjectProperties()->pos.x;
 				lbp.y = frame.bottom + 1 - lay->GetObjectProperties()->pos.y;
 				lbs.cx = objectProperties->size.cx;
-				lbs.cy = min(METRIC_LISTBOXENTRYHEIGHT * nOfEntries + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
+				lbs.cy = min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
 
 				oldMeasurement = Setup::FontSize;
 
@@ -321,16 +321,16 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				Setup::FontSize = oldMeasurement;
 
-				listBox->AllowReselect(True);
+				listBox->SetFlags(LF_ALLOWRESELECT);
 
-				for (Int i = 0; i < nOfEntries; i++)
+				for (Int i = 0; i < GetNOfEntries(); i++)
 				{
-					operat = entries.GetNthEntry(i);
+					operat = GetNthEntry(i);
 
-					listBox->AddEntry(operat->text);
+					listBox->AddEntry(operat->name);
 				}
 
-				listBox->SelectEntry(GetSelectedEntry());
+				listBox->SelectEntry(GetSelectedEntry()->id);
 
 				wnd->RegisterObject(toolWindow);
 				toolWindow->RegisterObject(layer);
@@ -366,7 +366,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				}
 
 				frame.top	= frame.bottom + 1;
-				frame.bottom	= frame.top + min(METRIC_LISTBOXENTRYHEIGHT * nOfEntries + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
+				frame.bottom	= frame.top + min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
 				frame.right++;
 
 				wnd->UnregisterObject(toolWindow);
@@ -397,9 +397,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONUP:
 			if (closeListBox)
 			{
-				for (Int i = 0; i < nOfEntries; i++)
+				for (Int i = 0; i < GetNOfEntries(); i++)
 				{
-					operat = entries.GetNthEntry(i);
+					operat = GetNthEntry(i);
 
 					if (operat->clk)
 					{
@@ -407,7 +407,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
 						frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-						surface->SetText(operat->text, frame, objectProperties->font, objectProperties->fontSize, Setup::ClientColor, objectProperties->fontWeight);
+						surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, Setup::ClientColor, objectProperties->fontWeight);
 
 						frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 						frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -417,11 +417,11 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				if (GetSelectedEntry() != listBox->GetSelectedEntry()) executeProcs = True;
 
-				SelectEntry(listBox->GetSelectedEntry());
+				SelectEntry(listBox->GetSelectedEntry()->id);
 
-				for (Int j = 0; j < nOfEntries; j++)
+				for (Int j = 0; j < GetNOfEntries(); j++)
 				{
-					operat = entries.GetNthEntry(j);
+					operat = GetNthEntry(j);
 
 					if (operat->clk)
 					{
@@ -429,7 +429,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
 						frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-						surface->SetText(operat->text, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+						surface->SetText(operat->name, frame, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 						frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 						frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -463,9 +463,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 			if (executeProcs)
 			{
-				for (Int i = 0; i < nOfEntries; i++)
+				for (Int i = 0; i < GetNOfEntries(); i++)
 				{
-					operat = entries.GetNthEntry(i);
+					operat = GetNthEntry(i);
 
 					if (operat->clk)
 					{

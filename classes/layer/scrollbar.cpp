@@ -301,6 +301,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
+		case SM_LBUTTONDBLCLK:
 			if (!timerActive && timer == NIL && (button1Checked || button2Checked))
 			{
 				timer = new Timer();
@@ -446,8 +447,6 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
-		case SM_LBUTTONDBLCLK:
-			return Process(SM_LBUTTONDOWN, 0, 0);
 		case SM_LBUTTONUP:
 			if (timerActive) timerActive = False;
 

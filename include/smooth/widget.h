@@ -39,6 +39,8 @@ namespace smooth
 			protected:
 				Bool				 visible;
 				Bool				 active;
+
+				Int				 flags;
 			public:
 				Int				 subtype;
 
@@ -62,6 +64,9 @@ namespace smooth
 
 				virtual Int			 SetTooltip(String);
 				virtual String			 GetTooltip();
+
+				Int				 SetFlags(Int);
+				Int				 GetFlags();
 
 				virtual Int			 SetFont(String, Int, Int, Int);
 				virtual Int			 SetOrientation(Int);

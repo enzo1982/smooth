@@ -35,11 +35,9 @@ S::GUI::ListBox::ListBox(Point pos, Size size)
 	type		= OBJ_LISTBOX;
 	entryCount	= -1;
 
-	needScrollbar		= False;
 	scrollbar		= NIL;
 	scrollbarPos		= 0;
 	lastScrollbarPos	= 0;
-	allowReselect		= False;
 
 	header			= NIL;
 
@@ -58,7 +56,7 @@ S::GUI::ListBox::ListBox(Point pos, Size size)
 
 S::GUI::ListBox::~ListBox()
 {
-	if (needScrollbar)
+	if (scrollbar != NIL)
 	{
 		if (myContainer != NIL) myContainer->UnregisterObject(scrollbar);
 
@@ -75,18 +73,11 @@ S::GUI::ListBox::~ListBox()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::GUI::ListBox::AllowReselect(Bool value)
-{
-	allowReselect = value;
-
-	return Success;
-}
-
-S::List::Entry *S::GUI::ListBox::AddEntry(String name)
+S::ListEntry *S::GUI::ListBox::AddEntry(String name)
 {
 	entryCount++;
 
-	Entry *newEntry = AddListEntry(entryCount, name);
+	ListEntry *newEntry = List::AddEntry(entryCount, name);
 
 	Paint(SP_UPDATE);
 
@@ -95,7 +86,7 @@ S::List::Entry *S::GUI::ListBox::AddEntry(String name)
 
 S::Int S::GUI::ListBox::ModifyEntry(Int code, String name)
 {
-	if (ModifyListEntry(code, name) == Success)
+	if (List::ModifyEntry(code, name) == Success)
 	{
 		Paint(SP_PAINT);
 
@@ -109,13 +100,11 @@ S::Int S::GUI::ListBox::ModifyEntry(Int code, String name)
 
 S::Int S::GUI::ListBox::RemoveEntry(Int number)
 {
-	RemoveListEntry(number);
+	List::RemoveEntry(number);
 
-	if (needScrollbar)
+	if (scrollbar != NIL)
 	{
-		needScrollbar = False;
-
-		if (METRIC_LISTBOXENTRYHEIGHT * nOfEntries + 4 <= objectProperties->size.cy)
+		if (METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4 <= objectProperties->size.cy)
 		{
 			scrollbarPos = 0;
 			lastScrollbarPos = 0;
@@ -124,7 +113,6 @@ S::Int S::GUI::ListBox::RemoveEntry(Int number)
 		myContainer->UnregisterObject(scrollbar);
 
 		delete scrollbar;
-
 		scrollbar = NIL;
 	}
 
@@ -135,27 +123,25 @@ S::Int S::GUI::ListBox::RemoveEntry(Int number)
 
 S::Void S::GUI::ListBox::Cleanup()
 {
-	CleanupList();
+	List::Cleanup();
 
-	if (needScrollbar)
+	if (scrollbar != NIL)
 	{
-		needScrollbar = False;
 		scrollbarPos = 0;
 		lastScrollbarPos = 0;
 
 		myContainer->UnregisterObject(scrollbar);
 
 		delete scrollbar;
-
 		scrollbar = NIL;
 	}
 
 	Paint(SP_PAINT);
 }
 
-S::Int S::GUI::ListBox::SelectEntry(Int code)
+S::Int S::GUI::ListBox::SelectEntry(Int id)
 {
-	SelectListEntry(code);
+	List::SelectEntry(id);
 
 	Paint(SP_PAINT);
 
@@ -208,7 +194,7 @@ S::Int S::GUI::ListBox::Show()
 {
 	if (visible)	return Success;
 
-	if (needScrollbar)
+	if (scrollbar != NIL)
 	{
 		Layer	*layer = (Layer *) myContainer->GetContainerObject();
 		Point	 realPos = GetRealPosition();
@@ -219,7 +205,7 @@ S::Int S::GUI::ListBox::Show()
 		SetMeasurement(SMT_PIXELS);
 
 		scrollbar->SetMetrics(sbp, sbs);
-		scrollbar->SetRange(0, nOfEntries - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+		scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 
 		Setup::FontSize = oldMeasurement;
 
@@ -242,7 +228,7 @@ S::Int S::GUI::ListBox::Hide()
 
 	if (header != NIL) myContainer->UnregisterObject(header);
 
-	if (needScrollbar) scrollbar->Hide();
+	if (scrollbar != NIL) scrollbar->Hide();
 
 	return Widget::Hide();
 }
@@ -276,7 +262,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 	Layer		*layer = (Layer *) myContainer->GetContainerObject();
 	Point		 realPos = GetRealPosition();
-	List::Entry	*operat;
+	ListEntry	*operat;
 	Rect		 frame;
 	Point		 sbp;
 	Size		 sbs;
@@ -295,14 +281,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			if (message != SP_UPDATE)
 			{
-				if (header != NIL) frame.top += (METRIC_LISTBOXENTRYHEIGHT + 2);
-				if (needScrollbar) frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
+				if (header != NIL)	frame.top += (METRIC_LISTBOXENTRYHEIGHT + 2);
+				if (scrollbar != NIL)	frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
 
 				if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
 				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-				if (header != NIL) frame.top -= (METRIC_LISTBOXENTRYHEIGHT + 2);
-				if (needScrollbar) frame.right += (METRIC_LISTBOXSBOFFSET + 1);
+				if (header != NIL)	frame.top -= (METRIC_LISTBOXENTRYHEIGHT + 2);
+				if (scrollbar != NIL)	frame.right += (METRIC_LISTBOXSBOFFSET + 1);
 
 				surface->Frame(frame, FRAME_DOWN);
 			}
@@ -316,12 +302,10 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			frame.bottom = min(frame.bottom, maxFrameY);
 
-			if (METRIC_LISTBOXENTRYHEIGHT * nOfEntries + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1) + 4 > objectProperties->size.cy)
+			if (METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1) + 4 > objectProperties->size.cy && !(flags & LF_HIDESCROLLBAR))
 			{
-				if (!needScrollbar)
+				if (scrollbar == NIL)
 				{
-					needScrollbar = True;
-
 					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET;
 					sbp.y = frame.top - layer->GetObjectProperties()->pos.y;
 					sbs.cx = METRIC_LISTBOXSBSIZE;
@@ -331,7 +315,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					SetMeasurement(SMT_PIXELS);
 
-					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, nOfEntries - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 
 					scrollbar->onClick.Connect(&ListBox::ScrollbarProc, this);
 
@@ -343,16 +327,15 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 				else
 				{
-					scrollbar->SetRange(0, nOfEntries - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 				}
 
 				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
 			}
 			else
 			{
-				if (needScrollbar)
+				if (scrollbar != NIL)
 				{
-					needScrollbar = False;
 					scrollbarPos = 0;
 					lastScrollbarPos = 0;
 
@@ -365,9 +348,9 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			lastScrollbarPos = scrollbarPos;
 
-			for (int i = 0; i < nOfEntries; i++)
+			for (int i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -379,11 +362,11 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					operat->rect.top++;
 					operat->rect.right--;
 
-					if (i == (nOfEntries - 1) || message != SP_UPDATE)
+					if (i == (GetNOfEntries() - 1) || message != SP_UPDATE)
 					{
 						frame.left += METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
-						DrawEntryText(operat->text, frame, objectProperties->fontColor);
+						DrawEntryText(operat->name, frame, objectProperties->fontColor);
 						frame.left -= METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
 					}
@@ -414,7 +397,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 	LeaveProtectedRegion();
 
-	if (needScrollbar) scrollbar->Paint(SP_PAINT);
+	if (scrollbar != NIL) scrollbar->Paint(SP_PAINT);
 	if (header != NIL) header->Paint(SP_PAINT);
 
 	return Success;
@@ -435,7 +418,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 	Point		 realPos = GetRealPosition();
 	Int		 retVal = Success;
-	List::Entry	*operat;
+	ListEntry	*operat;
 	Rect		 frame;
 	Bool		 change = False;
 	Int		 maxFrameY;
@@ -478,9 +461,9 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.bottom = min(frame.bottom, maxFrameY);
 
-				for (i = 0; i < nOfEntries; i++)
+				for (i = 0; i < GetNOfEntries(); i++)
 				{
-					operat = entries.GetNthEntry(i);
+					operat = GetNthEntry(i);
 
 					if (operat == NIL) break;
 
@@ -494,7 +477,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 						frame.left += METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
-						DrawEntryText(operat->text, frame, objectProperties->fontColor);
+						DrawEntryText(operat->name, frame, objectProperties->fontColor);
 						frame.left -= METRIC_LISTBOXTEXTOFFSETXY;
 						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
 
@@ -526,9 +509,9 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONDOWN:
-			for (i = 0; i < nOfEntries; i++)
+			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -540,9 +523,9 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			for (i = 0; i < nOfEntries; i++)
+			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -561,15 +544,15 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			for (i = 0; i < nOfEntries; i++)
+			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
 				if (wnd->IsMouseOn(operat->rect))
 				{
-					if (!operat->clk || allowReselect)
+					if (!operat->clk || (flags & LF_ALLOWRESELECT))
 					{
 						operat->chk = True;
 						operat->clk = True;
@@ -589,9 +572,9 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSELEAVE:
-			for (i = 0; i < nOfEntries; i++)
+			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -608,7 +591,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.left++;
 						operat->rect.top++;
-						DrawEntryText(operat->text, operat->rect, objectProperties->fontColor);
+						DrawEntryText(operat->name, operat->rect, objectProperties->fontColor);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -626,9 +609,9 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-			for (i = 0; i < nOfEntries; i++)
+			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -645,7 +628,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.left++;
 						operat->rect.top++;
-						DrawEntryText(operat->text, operat->rect, objectProperties->fontColor);
+						DrawEntryText(operat->name, operat->rect, objectProperties->fontColor);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -661,9 +644,9 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			for (i = 0; i < nOfEntries; i++)
+			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -680,7 +663,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.left++;
 						operat->rect.top++;
-						DrawEntryText(operat->text, operat->rect, Setup::GradientTextColor);
+						DrawEntryText(operat->name, operat->rect, Setup::GradientTextColor);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -756,6 +739,30 @@ S::Void S::GUI::ListBox::DrawEntryText(String text, Rect rect, Int color)
 	{
 		surface->SetText(text, rect, objectProperties->font, objectProperties->fontSize, color, objectProperties->fontWeight);
 	}
+}
+
+S::Int S::GUI::ListBox::ScrollUp(Int nLines)
+{
+	scrollbarPos -= nLines;
+	scrollbarPos = (Int) Math::Max(scrollbarPos, 0);
+
+	if (scrollbar != NIL) scrollbar->Paint(SP_PAINT);
+
+	ScrollbarProc();
+
+	return Success;
+}
+
+S::Int S::GUI::ListBox::ScrollDown(Int nLines)
+{
+	scrollbarPos += nLines;
+	scrollbarPos = (Int) Math::Min(scrollbarPos, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+
+	if (scrollbar != NIL) scrollbar->Paint(SP_PAINT);
+
+	ScrollbarProc();
+
+	return Success;
 }
 
 S::Void S::GUI::ListBox::ScrollbarProc()

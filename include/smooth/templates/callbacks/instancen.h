@@ -34,5 +34,11 @@ namespace smooth
 
 				return rVal;
 			}
+
+			Bool operator ==(CInstance<rt> *cInstance)
+			{
+				if (instance == ((CALLBACKS_INSTANCE_CLASS_NAME<ct, rt CALLBACKS_CONDITIONAL_COMMA CALLBACKS_ARGUMENT_TYPES> *) cInstance)->instance)	return True;
+				else																	return False;
+			}
 	};
 };

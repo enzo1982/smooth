@@ -49,7 +49,7 @@ S::ThreadManager::~ThreadManager()
 		delete assocThreads.GetNthEntry(i);
 	}
 
-	assocThreads.DeleteAll();
+	assocThreads.RemoveAll();
 
 	if (iAmTheOne) threadManagerExists = False;
 }
@@ -64,7 +64,7 @@ S::Int S::ThreadManager::RegisterThread(Thread *thread)
 
 S::Int S::ThreadManager::UnregisterThread(Thread *thread)
 {
-	if (assocThreads.DeleteEntry(thread->handle) == True)
+	if (assocThreads.RemoveEntry(thread->handle) == True)
 	{
 		nOfThreads--;
 

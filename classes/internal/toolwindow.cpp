@@ -40,7 +40,7 @@ S::GUI::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
 	objectProperties->size.cy	= 100;
 	objectProperties->orientation	= OR_FREE;
 
-	possibleContainers.DeleteAll();
+	possibleContainers.RemoveAll();
 	possibleContainers.AddEntry(OBJ_WINDOW);
 
 	owner				= NIL;

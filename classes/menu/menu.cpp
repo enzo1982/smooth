@@ -79,7 +79,7 @@ S::Int S::Menu::RemoveEntry(Menu::Entry *entry)
 
 	if (entries.GetEntry(entry->id) != NIL)
 	{
-		entries.DeleteEntry(entry->id);
+		entries.RemoveEntry(entry->id);
 
 		delete entry;
 

@@ -31,7 +31,7 @@ S::Tree::~Tree()
 		delete entries.GetNthEntry(i);
 	}
 
-	entries.DeleteAll();
+	entries.RemoveAll();
 }
 
 S::Tree::Entry *S::Tree::AddEntry(String text, Tree *sub)
@@ -73,7 +73,7 @@ S::Int S::Tree::RemoveEntry(Tree::Entry *entry)
 
 	if (entries.GetEntry(entry->id) != NIL)
 	{
-		entries.DeleteEntry(entry->id);
+		entries.RemoveEntry(entry->id);
 
 		delete entry;
 

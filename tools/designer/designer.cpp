@@ -122,7 +122,7 @@ Bool Designer::ExitProc()
 		delete dlgs.GetNthEntry(i);
 	}
 
-	dlgs.DeleteAll();
+	dlgs.RemoveAll();
 
 	return True;
 }

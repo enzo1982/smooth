@@ -21,6 +21,12 @@ namespace smooth
 			t	 method;
 				 CMethodT(t iMethod)	{ method = iMethod; }
 			CMethod	*Copy()			{ return new CMethodT<t>(method); }
+
+			Bool operator ==(CMethod *cMethod)
+			{
+				if (method == ((CMethodT<t> *) cMethod)->method)	return True;
+				else							return False;
+			}
 	};
 };
 

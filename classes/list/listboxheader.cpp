@@ -56,9 +56,9 @@ S::Int S::GUI::ListBoxHeader::AddTab(String tabName, Int iTabWidth)
 
 S::Int S::GUI::ListBoxHeader::ClearTabs()
 {
-	tabNames.DeleteAll();
-	tabWidths.DeleteAll();
-	tabChecked.DeleteAll();
+	tabNames.RemoveAll();
+	tabWidths.RemoveAll();
+	tabChecked.RemoveAll();
 
 	UpdateMetrics();
 

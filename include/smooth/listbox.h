@@ -28,19 +28,20 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Int	 LF_NORMAL		= 0;
+		const Int	 LF_HIDESCROLLBAR	= 1;
+		const Int	 LF_ALLOWRESELECT	= 2;
+
 		class SMOOTHAPI ListBox : public Widget, public List
 		{
 			private:
 				Int		 entryCount;
 
 				Scrollbar	*scrollbar;
-				Bool		 needScrollbar;
 				Int		 scrollbarPos;
 				Int		 lastScrollbarPos;
 
 				ListBoxHeader	*header;
-
-				Bool		 allowReselect;
 
 				Void		 ScrollbarProc();
 				Void		 DrawEntryText(String, Rect, Int);
@@ -48,7 +49,7 @@ namespace smooth
 						 ListBox(Point, Size);
 						~ListBox();
 
-				Entry		*AddEntry(String);
+				ListEntry	*AddEntry(String);
 				Int		 ModifyEntry(Int, String);
 				Int		 RemoveEntry(Int);
 				Int		 SelectEntry(Int);
@@ -69,7 +70,8 @@ namespace smooth
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);
 
-				Int		 AllowReselect(Bool);
+				Int		 ScrollUp(Int = 1);
+				Int		 ScrollDown(Int = 1);
 		};
 	};
 

@@ -16,8 +16,11 @@ namespace smooth
 	class CMethod
 	{
 		public:
-			virtual		~CMethod() {}
-			virtual CMethod	*Copy() = 0;
+			virtual			~CMethod() {}
+
+			virtual CMethod		*Copy() = 0;
+
+			virtual Bool operator	 ==(CMethod *) = 0;
 	};
 };
 

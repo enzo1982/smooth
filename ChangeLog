@@ -3,11 +3,22 @@ ChangeLog for smooth
 xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 
 - string.cpp		- renamed IntToString to FromInt, DoubleToString to FromFloat
-			- renamed ToDoble to ToFloat
-- window.cpp		- Paint now uses SP_UPDATE
+			- renamed ToDouble to ToFloat
+- window.cpp		- Paint() now uses SP_UPDATE
 - surface.cpp		- modified StartPaint and EndPaint methods
 			- added PaintRect method: updates the requested region
 - pciio.cpp		- read-only files can now be opened
+- button.cpp		- new method: SetBackgroundColor(Int)
+			- a double-click is now handled as two single clicks
+- widget.cpp		- new method: SetFlags(Int), allows to set generic flags for widgets
+- listbox.cpp		- support for hiding the scrollbar
+			- added methods to remote control scrolling
+- array.cpp		- improved speed of GetNthEntry()
+			- renamed DeleteEntry to RemoveEntry, DeleteAll to RemoveAll
+- list.cpp		- class List now inherits from class Array<ListEntry *>
+- signaln.cpp		- slots can now be disconnected from signals
+
+- some bugfixes
 
 16.03.03 07:00 - smooth alpha 0.8.61.0
 

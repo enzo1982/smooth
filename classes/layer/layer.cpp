@@ -254,7 +254,7 @@ S::Int S::GUI::Layer::UnregisterObject(Object *object)
 	{
 		if (nOfObjects > 0 && object->IsRegistered())
 		{
-			if (assocObjects.DeleteEntry(object->handle) == True)
+			if (assocObjects.RemoveEntry(object->handle) == True)
 			{
 				nOfObjects--;
 

@@ -94,7 +94,7 @@ Translator::Translator()
 
 	list_entries	= new ListBox(pos, size);
 	list_entries->onClick.Connect(&Translator::SelectEntry, this);
-	list_entries->AllowReselect(True);
+	list_entries->SetFlags(LF_ALLOWRESELECT);
 	list_entries->AddTab("ID", 30);
 	list_entries->AddTab("String");
 	list_entries->AddTab("Translation");
@@ -150,7 +150,7 @@ Translator::~Translator()
 {
 	for (int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetFirstEntry();
 
-	entries.DeleteAll();
+	entries.RemoveAll();
 
 	wnd->UnregisterObject(text_id);
 	wnd->UnregisterObject(edit_id);
@@ -241,7 +241,7 @@ void Translator::NewFile()
 	list_entries->Activate();
 
 	{
-		int		 lid = list_entries->AddEntry("Program:")->code;
+		int		 lid = list_entries->AddEntry("Program:")->id;
 		listEntry	*entry = new listEntry;
 
 		entry->listid = lid;
@@ -251,7 +251,7 @@ void Translator::NewFile()
 
 		entries.AddEntry(entry);
 
-		lid = list_entries->AddEntry("Version:")->code;
+		lid = list_entries->AddEntry("Version:")->id;
 		entry = new listEntry;
 
 		entry->listid = lid;
@@ -261,7 +261,7 @@ void Translator::NewFile()
 
 		entries.AddEntry(entry);
 
-		lid = list_entries->AddEntry("Language:")->code;
+		lid = list_entries->AddEntry("Language:")->id;
 		entry = new listEntry;
 
 		entry->listid = lid;
@@ -271,7 +271,7 @@ void Translator::NewFile()
 
 		entries.AddEntry(entry);
 
-		lid = list_entries->AddEntry("Author:")->code;
+		lid = list_entries->AddEntry("Author:")->id;
 		entry = new listEntry;
 
 		entry->listid = lid;
@@ -281,7 +281,7 @@ void Translator::NewFile()
 
 		entries.AddEntry(entry);
 
-		lid = list_entries->AddEntry("URL:")->code;
+		lid = list_entries->AddEntry("URL:")->id;
 		entry = new listEntry;
 
 		entry->listid = lid;
@@ -308,9 +308,9 @@ void Translator::CloseFile()
 
 	for (int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetNthEntry(i);
 
-	entries.DeleteAll();
+	entries.RemoveAll();
 
-	list_entries->CleanupList();
+	list_entries->Cleanup();
 
 	text_original->SetText("Original:");
 	text_translated->SetText("Translation:");
@@ -399,7 +399,7 @@ void Translator::OpenFile()
 				entry->id = xentry->GetAttributeByName("id")->GetContent().ToInt();
 				entry->original = xentry->GetAttributeByName("string")->GetContent();
 				entry->translation = xentry->GetContent();
-				entry->listid = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append("\t").Append(entry->original).Append("\t").Append(entry->translation))->code;
+				entry->listid = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append("\t").Append(entry->original).Append("\t").Append(entry->translation))->id;
 
 				entries.AddEntry(entry);
 			}
@@ -580,7 +580,7 @@ void Translator::SaveData()
 	}
 	else
 	{
-		for (int i = 0; i < entries.GetNOfEntries(); i++)
+		for (Int i = 0; i < entries.GetNOfEntries(); i++)
 		{
 			if (entries.GetNthEntry(i)->id == edit_id->GetText().ToInt())
 			{
@@ -598,7 +598,7 @@ void Translator::SaveData()
 
 		if (entry == NULL)
 		{
-			int	 lid = list_entries->AddEntry(String(edit_id->GetText()).Append("\t").Append(edit_original->GetText()).Append("\t").Append(edit_translated->GetText()))->code;
+			Int	 lid = list_entries->AddEntry(String(edit_id->GetText()).Append("\t").Append(edit_original->GetText()).Append("\t").Append(edit_translated->GetText()))->id;
 
 			entry = new listEntry;
 
@@ -639,10 +639,10 @@ void Translator::SaveData()
 
 void Translator::SelectEntry()
 {
-	int		 lid = list_entries->GetSelectedEntry();
+	Int		 lid = list_entries->GetSelectedEntry()->id;
 	listEntry	*entry = NULL;
 
-	for (int i = 0; i < entries.GetNOfEntries(); i++)
+	for (Int i = 0; i < entries.GetNOfEntries(); i++)
 	{
 		entry = entries.GetNthEntry(i);
 
@@ -700,13 +700,13 @@ void Translator::NewEntry()
 
 void Translator::RemoveEntry()
 {
-	Int	 lid = list_entries->GetSelectedEntry();
+	Int	 lid = list_entries->GetSelectedEntry()->id;
 
-	for (int i = 0; i < entries.GetNOfEntries(); i++)
+	for (Int i = 0; i < entries.GetNOfEntries(); i++)
 	{
 		if (entries.GetNthEntry(i)->listid == lid)
 		{
-			entries.DeleteEntry(entries.GetNthEntryIndex(i));
+			entries.RemoveEntry(entries.GetNthEntryIndex(i));
 
 			break;
 		}

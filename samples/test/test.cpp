@@ -59,6 +59,8 @@ Test::Test()
 	mainWnd_layer_button	= new Button("OK", NIL, bp, bs);
 	mainWnd_layer_button->onClick.Connect(&Test::Close, this);
 	mainWnd_layer_button->SetTooltip("Don't click on this button!!!");
+	mainWnd_layer_button->SetBackgroundColor(RGB(255, 0, 0));
+	mainWnd_layer_button->SetFlags(BF_NOFRAME | BF_SHOWHIGHLIGHT);
 	bp.y += 25;
 	mainWnd_layer_check1	= new CheckBox("Checkable", bp, bs, &checkbox);
 	bp.y += 20;

@@ -32,5 +32,11 @@ namespace smooth
 				va_end(ap);
 
 			}
+
+			Bool operator ==(Instance *cInstance)
+			{
+				if (instance == ((SIGNALS_INSTANCE_CLASS_NAME<ct, rt SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) cInstance)->instance)	return True;
+				else																return False;
+			}
 	};
 };

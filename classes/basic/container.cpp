@@ -37,7 +37,7 @@ S::Container::~Container()
 		if (UnregisterObject(assocObjects.GetFirstEntry()) == Success) nOfObjects++;
 	}
 
-	assocObjects.DeleteAll();
+	assocObjects.RemoveAll();
 
 	delete nullSurface;
 }
@@ -71,7 +71,7 @@ S::Int S::Container::UnregisterObject(Object *object)
 	{
 		if (object->IsRegistered())
 		{
-			if (assocObjects.DeleteEntry(object->handle) == True)
+			if (assocObjects.RemoveEntry(object->handle) == True)
 			{
 				nOfObjects--;
 

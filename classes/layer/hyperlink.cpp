@@ -174,7 +174,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 			{
 				if (Setup::enableUnicode)	LiSAOpenURLW(linkURL);
 				else				LiSAOpenURLA(linkURL);
-
+
 				wnd->Process(SM_MOUSEMOVE, 0, 0);
 
 				retVal = Break;

@@ -35,6 +35,9 @@ namespace smooth
 			Array_Entry<t>	*prevEntry;
 			Array_Entry<t>	*prevDeletedEntry;
 
+			Int		 lastN;
+			Array_Entry<t>	*lastNthEntry;
+
 			Bool		 Cleanup(Array_Entry<t> *);
 			Bool		 IndexAvailable(Int);
 		public:
@@ -49,8 +52,8 @@ namespace smooth
 			Int		 InsertEntryAtPos(Int, t);
 			Bool		 InsertEntryAtPos(Int, t, Int);
 
-			Bool		 DeleteEntry(Int);
-			Bool		 DeleteAll();
+			Bool		 RemoveEntry(Int);
+			Bool		 RemoveAll();
 
 			t		 GetEntry(Int);
 			Bool		 SetEntry(Int, t);

@@ -73,7 +73,6 @@ S::Int S::GUI::Tooltip::Show()
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
 
-	Surface	*surface = myContainer->GetDrawSurface();
 	Float	 measurement = Setup::FontSize;
 	Rect	 wndRect;
 
@@ -93,18 +92,11 @@ S::Int S::GUI::Tooltip::Show()
 
 	toolWindow->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y - wndRect.bottom), Size(wndRect.right, wndRect.bottom));
 	toolWindow->SetOwner(this);
+	toolWindow->onPaint.Connect(&Tooltip::DrawTooltip, this);
 
 	wnd->RegisterObject(toolWindow);
 
 	Setup::FontSize = measurement;
-
-	surface->Box(wndRect, Setup::TooltipColor, FILLED);
-	surface->Box(wndRect, RGB(0, 0, 0), OUTLINED);
-
-	wndRect.left	+= 2;
-	wndRect.top	+= 1;
-
-	surface->SetText(objectProperties->text, wndRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 	if (timeOut != 0)
 	{
@@ -144,22 +136,39 @@ S::Int S::GUI::Tooltip::Hide()
 	return Success;
 }
 
-S::Int S::GUI::Tooltip::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Tooltip::DrawTooltip()
 {
-	if (!registered)		return Error;
-	if (!active || !visible)	return Success;
+	if (!visible)		return Success;
+	if (!registered)	return Success;
 
-	Window	*wnd = (Window *) myContainer->GetContainerObject();
-	Int	 retVal = Success;
+	Window	*wnd = (Window *) myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
 
-	switch (message)
-	{
-	}
+	Rect	 wndRect;
 
-	return retVal;
+	wndRect.left	= 0;
+	wndRect.top	= 0;
+	wndRect.bottom	= 16;
+
+	HDC	 dc = GetContext(wnd);
+
+	wndRect.right	= GetTextSizeX(objectProperties->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), FW_NORMAL) + 6;
+
+	FreeContext(wnd, dc);
+
+	Surface	*surface = toolWindow->GetDrawSurface();
+
+	surface->Box(wndRect, Setup::TooltipColor, FILLED);
+	surface->Box(wndRect, RGB(0, 0, 0), OUTLINED);
+
+	wndRect.left	+= 2;
+	wndRect.top	+= 1;
+
+	surface->SetText(objectProperties->text, wndRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
+
+	return Success;
 }
 
 S::Int S::GUI::Tooltip::SetTimeout(Int mSeconds)

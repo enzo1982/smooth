@@ -188,7 +188,7 @@ S::Int S::XML::Node::RemoveAttribute(Attribute *attribute)
 	}
 	else
 	{
-		attributes.DeleteEntry(attribute->GetAttributeID());
+		attributes.RemoveEntry(attribute->GetAttributeID());
 
 		if (attribute->GetNextAttribute() != NIL)
 		{
@@ -305,7 +305,7 @@ S::Int S::XML::Node::RemoveNode(Node *node)
 	}
 	else
 	{
-		subnodes.DeleteEntry(node->GetNodeID());
+		subnodes.RemoveEntry(node->GetNodeID());
 
 		if (node->GetNextNode() != NIL)
 		{

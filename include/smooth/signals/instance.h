@@ -20,6 +20,8 @@ namespace smooth
 
 			virtual Instance	*Copy() = 0;
 			virtual Void		 Call(Method *, ...) = 0;
+
+			virtual Bool operator	 ==(Instance *) = 0;
 	};
 };
 

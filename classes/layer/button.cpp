@@ -34,7 +34,7 @@ S::GUI::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
 	bitmap			= DetectTransparentRegions(bmp);
 	tipTimer		= NIL;
 	tooltip			= NIL;
-	flags			= 0;
+	backgroundColor		= -1;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -89,16 +89,11 @@ S::GUI::Button::~Button()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::GUI::Button::SetFlags(Int nFlags)
+S::Int S::GUI::Button::SetBackgroundColor(Int nColor)
 {
-	flags = nFlags;
+	backgroundColor = nColor;
 
 	return Success;
-}
-
-S::Int S::GUI::Button::GetFlags()
-{
-	return flags;
 }
 
 S::Int S::GUI::Button::Paint(Int message)
@@ -132,6 +127,18 @@ S::Int S::GUI::Button::Paint(Int message)
 			frame.bottom--;
 
 			if (!(flags & BF_NOFRAME)) surface->Frame(frame, FRAME_UP);
+
+			if (backgroundColor >= 0)
+			{
+				Rect	 iFrame = frame;
+
+				iFrame.left	= realPos.x + 4;
+				iFrame.top	= realPos.y + 4;
+				iFrame.right	= realPos.x + objectProperties->size.cx - 4;
+				iFrame.bottom	= realPos.y + objectProperties->size.cy - 4;
+
+				surface->Box(iFrame, backgroundColor, FILLED);
+			}
 
 			if (objectProperties->text != NIL)
 			{
@@ -222,7 +229,7 @@ S::Int S::GUI::Button::Paint(Int message)
 				frame.right	= realPos.x + objectProperties->size.cx - 4;
 				frame.bottom	= realPos.y + objectProperties->size.cy - 4;
 
-				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
+				surface->Box(frame, backgroundColor >= 0 ? backgroundColor : Setup::BackgroundColor, OUTLINED);
 			}
 
 			break;
@@ -256,6 +263,7 @@ S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
+		case SM_LBUTTONDBLCLK:
 			if (objectProperties->checked)
 			{
 				objectProperties->clicked = True;

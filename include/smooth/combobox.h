@@ -46,7 +46,7 @@ namespace smooth
 						 ComboBox(Point, Size);
 						~ComboBox();
 
-				Entry		*AddEntry(String);
+				ListEntry	*AddEntry(String);
 				Int		 ModifyEntry(Int, String);
 				Int		 RemoveEntry(Int);
 				Int		 SelectEntry(Int);

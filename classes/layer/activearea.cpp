@@ -101,6 +101,7 @@ S::Int S::GUI::ActiveArea::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
+		case SM_LBUTTONDBLCLK:
 			if (wnd->IsMouseOn(frame))
 			{
 				onClick.Emit();

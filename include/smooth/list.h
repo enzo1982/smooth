@@ -17,55 +17,30 @@ namespace smooth
 };
 
 #include "object.h"
-#include "rect.h"
+#include "array.h"
+#include "listentry.h"
 
 namespace smooth
 {
-	class SMOOTHAPI List
+	class SMOOTHAPI List : public Array<ListEntry *>
 	{
-		public: class SMOOTHAPI Entry
-		{
-			public:
-				Int		 code;
-				String		 text;
-
-				Bool		 chk;
-				Bool		 clk;
-				Int		 size;
-				Bool		 sizeset;
-				Rect		 rect;
-
-						 Entry(Int);
-						~Entry();
-			signals:
-				Signal0<Void>	 onClick;
-		};
-
 		protected:
-			Bool		 entrysizesset;
-			Int		 nOfEntries;
+			Bool			 entrysizesset;
 
-			Entry		*AddListEntry(Int, String);
-			Int		 ModifyListEntry(Int, String);
-			Int		 RemoveListEntry(Int);
+			virtual ListEntry	*AddEntry(Int, String);
+			virtual Int		 ModifyEntry(Int, String);
+			virtual Int		 RemoveEntry(Int);
 
-			Void		 GetSize();
-			Void		 GetListEntriesSize();
+			Void			 GetSize();
+			Void			 GetListEntriesSize();
 		public:
-			Array<Entry *>	 entries;
+						 List();
+						~List();
 
-					 List();
-					~List();
+			virtual Void		 Cleanup();
 
-			Void		 CleanupList();
-
-			Int		 GetNOfEntries();
-			Int		 GetNthEntry(Int);
-			String		 GetNthEntryName(Int);
-
-			Int		 SelectListEntry(Int);
-			Int		 GetSelectedEntry();
-			String		 GetSelectedEntryName();
+			virtual Int		 SelectEntry(Int);
+			ListEntry		*GetSelectedEntry();
 	};
 };
 

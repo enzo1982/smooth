@@ -8,16 +8,31 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_DESIGNER_TOOLS_
-#define _H_OBJSMOOTH_DESIGNER_TOOLS_
+#ifndef _H_OBJSMOOTH_LISTENTRY_
+#define _H_OBJSMOOTH_LISTENTRY_
 
-#include <smooth.h>
+#include "object.h"
+#include "rect.h"
 
-const S::Int	 WINDOW		= 0;
-const S::Int	 CLIENT		= 1;
-const S::Int	 SCREEN		= 2;
+namespace smooth
+{
+	class SMOOTHAPI ListEntry
+	{
+		public:
+			Int		 id;
+			String		 name;
 
-S::Int MouseX(HWND, S::Int);
-S::Int MouseY(HWND, S::Int);
+			Bool		 chk;
+			Bool		 clk;
+			Int		 size;
+			Bool		 sizeset;
+			Rect		 rect;
+
+					 ListEntry(Int);
+					~ListEntry();
+		signals:
+			Signal0<Void>	 onClick;
+	};
+};
 
 #endif

@@ -16,8 +16,11 @@ namespace smooth
 	class Method
 	{
 		public:
-			virtual		~Method() {}
-			virtual Method	*Copy() = 0;
+			virtual			~Method() {}
+
+			virtual Method		*Copy() = 0;
+
+			virtual Bool operator	 ==(Method *) = 0;
 	};
 };
 

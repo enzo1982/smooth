@@ -57,7 +57,8 @@ Int ActiveAreaPlugin::Paint(Int message)
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
 
-	HDC	 dc = GetWindowDC(wnd->hwnd);
+	Surface	*surface = wnd->GetDrawSurface();
+	HDC	 dc = ((SurfaceGDI *) surface)->GetContext();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame;
 	HBRUSH	 brush = CreateSolidBrush(areaColor);
@@ -128,8 +129,6 @@ Int ActiveAreaPlugin::Paint(Int message)
 	FillRect(dc, &fRect, brush);
 
 	::DeleteObject(brush);
-
-	ReleaseDC(wnd->hwnd, dc);
 
 	return Success;
 }

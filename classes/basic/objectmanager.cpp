@@ -65,7 +65,7 @@ S::Int S::ObjectManager::UnregisterObject(Object *object)
 {
 	if (object == NIL) return Error;
 
-	if (assocObjects.DeleteEntry(object->handle) == True)
+	if (assocObjects.RemoveEntry(object->handle) == True)
 	{
 		nOfObjects--;
 

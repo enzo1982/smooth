@@ -100,8 +100,8 @@ void FreeContext(GUI::Window *wnd, HDC hdc)
 		ReleaseDC((HWND) code, contexts.GetEntry(code));
 		DeleteDC(contexts.GetEntry(code));
 
-		contexts.DeleteEntry(code);
-		contextCounts.DeleteEntry(code);
+		contexts.RemoveEntry(code);
+		contextCounts.RemoveEntry(code);
 	}
 }
 
@@ -122,7 +122,7 @@ void FreeCompatibleContext(HDC cdc)
 {
 	HBITMAP	 bmp = (HBITMAP) SelectObject(cdc, oldBitmaps.GetEntry((int) cdc));
 
-	oldBitmaps.DeleteEntry((int) cdc);
+	oldBitmaps.RemoveEntry((int) cdc);
 
 	DestroyBitmap(bmp);
 	DeleteDC(cdc);

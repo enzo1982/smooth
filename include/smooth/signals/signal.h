@@ -60,10 +60,10 @@ namespace smooth
 					delete methods.GetNthEntry(i);
 				}
 
-				instances.DeleteAll();
-				methods.DeleteAll();
-				functions.DeleteAll();
-				sigs.DeleteAll();
+				instances.RemoveAll();
+				methods.RemoveAll();
+				functions.RemoveAll();
+				sigs.RemoveAll();
 
 				return Success;
 			}

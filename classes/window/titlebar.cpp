@@ -314,6 +314,8 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				{
 					do
 					{
+						if (wnd->IsMaximized()) break;
+
 						MSG	 msg;
 
 						if (peekLoop > 0)

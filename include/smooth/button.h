@@ -38,7 +38,7 @@ namespace smooth
 				Tooltip		*tooltip;
 				Timer		*tipTimer;
 
-				Int		 flags;
+				Int		 backgroundColor;
 
 				Void		 ActivateTooltip();
 			protected:
@@ -48,8 +48,7 @@ namespace smooth
 						 Button(String, HBITMAP, Point, Size);
 						~Button();
 
-				Int		 SetFlags(Int);
-				Int		 GetFlags();
+				Int		 SetBackgroundColor(Int);
 
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);

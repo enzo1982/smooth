@@ -8,17 +8,16 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/list.h>
-#include <smooth/definitions.h>
+#include <smooth/listentry.h>
 
-S::List::Entry::Entry(Int entryCode)
+S::ListEntry::ListEntry(Int entryID)
 {
-	code	= entryCode;
+	id	= entryID;
 
 	chk	= False;
 	clk	= False;
 }
 
-S::List::Entry::~Entry()
+S::ListEntry::~ListEntry()
 {
 }

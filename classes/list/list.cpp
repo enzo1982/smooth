@@ -18,31 +18,22 @@
 
 S::List::List()
 {
-	nOfEntries = 0;
-
 	entrysizesset = False;
 }
 
 S::List::~List()
 {
-	for (Int i = 0; i < nOfEntries; i++)
-	{
-		delete entries.GetNthEntry(i);
-	}
-
-	entries.DeleteAll();
+	Cleanup();
 }
 
-S::List::Entry *S::List::AddListEntry(Int code, String text)
+S::ListEntry *S::List::AddEntry(Int id, String name)
 {
-	List::Entry	*newEntry = new List::Entry(code);
+	ListEntry	*newEntry = new ListEntry(id);
 
-	newEntry->text = text;
+	newEntry->name = name;
 
-	if (entries.AddEntry(newEntry, code) == True)
+	if (Array<ListEntry *>::AddEntry(newEntry, id) == True)
 	{
-		nOfEntries++;
-
 		entrysizesset = False;
 
 		return newEntry;
@@ -55,33 +46,14 @@ S::List::Entry *S::List::AddListEntry(Int code, String text)
 	}
 }
 
-S::Int S::List::ModifyListEntry(Int code, String text)
+S::Int S::List::ModifyEntry(Int id, String name)
 {
-	List::Entry	*entry = entries.GetEntry(code);
+	ListEntry	*entry = GetEntry(id);
 
 	if (entry != NIL)
 	{
-		entry->text = text;
-
-		entrysizesset = False;
-
-		return Success;
-	}
-	else
-	{
-		return Error;
-	}
-}
-
-S::Int S::List::RemoveListEntry(Int code)
-{
-	if (entries.GetEntry(code) != NIL)
-	{
-		delete entries.GetEntry(code);
-
-		entries.DeleteEntry(code);
-
-		nOfEntries--;
+		entry->name	= name;
+		entrysizesset	= False;
 
 		return Success;
 	}
@@ -91,20 +63,30 @@ S::Int S::List::RemoveListEntry(Int code)
 	}
 }
 
-S::Void S::List::CleanupList()
+S::Int S::List::RemoveEntry(Int id)
 {
-	List::Entry	*operat;
-
-	for (Int i = 0; i < nOfEntries; i++)
+	if (GetEntry(id) != NIL)
 	{
-		operat = entries.GetNthEntry(i);
+		delete GetEntry(id);
 
-		delete operat;
+		RemoveEntry(id);
+
+		return Success;
+	}
+	else
+	{
+		return Error;
+	}
+}
+
+S::Void S::List::Cleanup()
+{
+	for (Int i = 0; i < GetNOfEntries(); i++)
+	{
+		delete GetNthEntry(i);
 	}
 
-	entries.DeleteAll();
-
-	nOfEntries = 0;
+	RemoveAll();
 }
 
 S::Void S::List::GetSize()
@@ -118,16 +100,15 @@ S::Void S::List::GetSize()
 
 S::Void S::List::GetListEntriesSize()
 {
-	if (nOfEntries == 0) return;
+	if (GetNOfEntries() == 0) return;
 
-	List::Entry	*operat;
-	HDC		 hdc = GetContext(0);
+	HDC	 hdc = GetContext(0);
 
-	for (Int i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < GetNOfEntries(); i++)
 	{
-		operat = entries.GetNthEntry(i);
+		ListEntry	*operat = GetNthEntry(i);
 
-		if (!operat->sizeset) operat->size = GetTextSizeX(operat->text, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
+		if (!operat->sizeset) operat->size = GetTextSizeX(operat->name, I18N_DEFAULTFONT, -MulDiv(I18N_SMALLFONTSIZE, GetDeviceCaps(hdc, LOGPIXELSY), 72), FW_NORMAL);
 
 		operat->sizeset = True;
 	}
@@ -135,68 +116,31 @@ S::Void S::List::GetListEntriesSize()
 	FreeContext(0, hdc);
 }
 
-S::Int S::List::GetSelectedEntry()
+S::ListEntry *S::List::GetSelectedEntry()
 {
-	if (nOfEntries == 0) return -1;
+	if (GetNOfEntries() == 0) return NIL;
 
-	List::Entry	*operat;
-
-	for (Int i = 0; i < nOfEntries; i++)
+	for (Int i = 0; i < GetNOfEntries(); i++)
 	{
-		operat = entries.GetNthEntry(i);
+		ListEntry	*operat = GetNthEntry(i);
 
-		if (operat->clk) return operat->code;
-	}
-
-	return -1;
-}
-
-S::Int S::List::SelectListEntry(Int code)
-{
-	if (nOfEntries == 0) return Error;
-
-	List::Entry	*operat;
-
-	for (Int i = 0; i < nOfEntries; i++)
-	{
-		operat = entries.GetNthEntry(i);
-
-		if (operat->clk) operat->clk = False;
-
-		if (operat->code == code) operat->clk = True;
-	}
-
-	return Success;
-}
-
-S::String S::List::GetSelectedEntryName()
-{
-	List::Entry	*operat;
-
-	for (Int i = 0; i < nOfEntries; i++)
-	{
-		operat = entries.GetNthEntry(i);
-
-		if (operat->clk) return operat->text;
+		if (operat->clk) return operat;
 	}
 
 	return NIL;
 }
 
-S::Int S::List::GetNOfEntries()
+S::Int S::List::SelectEntry(Int id)
 {
-	return nOfEntries;
-}
+	if (GetNOfEntries() == 0) return Error;
 
-S::Int S::List::GetNthEntry(Int n)
-{
-	return entries.GetNthEntry(n)->code;
-}
+	for (Int i = 0; i < GetNOfEntries(); i++)
+	{
+		ListEntry	*operat = GetNthEntry(i);
 
-S::String S::List::GetNthEntryName(Int n)
-{
-	List::Entry	*operat = entries.GetNthEntry(n);
+		if (operat->clk)	operat->clk = False;
+		if (operat->id == id)	operat->clk = True;
+	}
 
-	if (operat != NIL)	return operat->text;
-	else			return NIL;
+	return Success;
 }

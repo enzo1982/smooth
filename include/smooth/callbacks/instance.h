@@ -17,9 +17,11 @@ namespace smooth
 	{
 		public:
 			virtual			~CInstance() {}
-			virtual CInstance<rt>	*Copy() = 0;
 
+			virtual CInstance<rt>	*Copy() = 0;
 			virtual rt		 Call(CMethod *, ...) = 0;
+
+			virtual Bool operator	 ==(CInstance<rt> *) = 0;
 	};
 };
 

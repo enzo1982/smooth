@@ -42,7 +42,7 @@ namespace smooth
 				CALLBACKS_INSTANCE_CLASS_NAME<ct, rt CALLBACKS_CONDITIONAL_COMMA CALLBACKS_ARGUMENT_TYPES>	*minstance = new CALLBACKS_INSTANCE_CLASS_NAME<ct, rt CALLBACKS_CONDITIONAL_COMMA CALLBACKS_ARGUMENT_TYPES>(inst);
 				CMethodT<rt (ct::*)(CALLBACKS_ARGUMENT_TYPES)>							*mmethod = new CMethodT<rt (ct::*)(CALLBACKS_ARGUMENT_TYPES)>(proc);
 
-				if (*instance == *minstance && *method == *mmethod)
+				if (*instance == minstance && *method == mmethod)
 				{
 					delete instance;
 					delete method;

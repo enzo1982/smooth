@@ -62,8 +62,6 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	Rect		 helpmenuentry;
 	Point		 doublebar1;
 	Point		 doublebar2;
-	Point		 p1;
-	Point		 p2;
 	bool		 firstentry = True;
 	bool		 prevbitmap = False;
 	bool		 prevtext = False;
@@ -121,9 +119,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 		for (i = 0; i < GetNOfEntries(); i++)
 		{
-			operat = entries.GetNthEntry(i);
+			operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-			if (operat->type == SM_SEPARATOR && operat->orientation == OR_LEFT)
+			if (operat->type == SM_SEPARATOR && operat->GetObjectProperties()->orientation == OR_LEFT)
 			{
 				menuentry.left = menuentry.right + METRIC_MBENTRYSPACING - 1;
 
@@ -150,7 +148,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				firstentry = True;
 			}
-			else if (operat->type == SM_TEXT && operat->orientation == OR_LEFT)
+			else if (operat->type == SM_TEXT && operat->GetObjectProperties()->orientation == OR_LEFT)
 			{
 				menuentry.left = menuentry.right + METRIC_MBENTRYSPACING;
 
@@ -165,66 +163,22 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				prevtext = True;
 			}
-			else if (operat->type == SM_BITMAP && operat->orientation == OR_LEFT && operat->popup == NIL)
+			else if (operat->type == SM_BITMAP && operat->GetObjectProperties()->orientation == OR_LEFT)
 			{
 				if (firstentry)	menuentry.left = menuentry.right + METRIC_MBENTRYSPACING;
 				else		menuentry.left = menuentry.right + METRIC_IBENTRYSPACING;
 
 				if (prevtext) menuentry.left += 2;
 
-				menuentry.left--;
-				menuentry.right = menuentry.left + bitmapSize;
-				menuentry.top++;
-				menuentry.bottom++;
-
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), operat->bitmap.GetSize()), menuentry);
-				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), operat->graymap.GetSize()), menuentry);
-
-				menuentry.left++;
-				menuentry.top--;
-				menuentry.bottom--;
-
-				operat->GetObjectProperties()->pos.x	= menuentry.left - 3;
-				operat->GetObjectProperties()->pos.y	= menuentry.top - 1;
-				operat->GetObjectProperties()->size.cx	= menuentry.right + 1 - operat->GetObjectProperties()->pos.x;
-				operat->GetObjectProperties()->size.cy	= menuentry.bottom + 2 - operat->GetObjectProperties()->pos.y;
-
-				prevbitmap = True;
-			}
-			else if (operat->type == SM_BITMAP && operat->orientation == OR_LEFT && operat->popup != NIL)
-			{
-				if (firstentry)	menuentry.left = menuentry.right + METRIC_MBENTRYSPACING;
-				else		menuentry.left = menuentry.right + METRIC_IBENTRYSPACING;
-
-				if (prevtext) menuentry.left += 2;
-
-				menuentry.left--;
-				menuentry.right = menuentry.left + bitmapSize;
-				menuentry.top++;
-				menuentry.bottom++;
-
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), operat->bitmap.GetSize()), menuentry);
-				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), operat->graymap.GetSize()), menuentry);
-
-				menuentry.left++;
-				menuentry.top--;
-				menuentry.bottom--;
-				menuentry.right = menuentry.left + bitmapSize + METRIC_IBARROWSIZEX + 2;
-
-				if (operat->onClick.GetNOfConnectedSlots() > 0) menuentry.right += 2;
-
-				p1.x = menuentry.right - METRIC_IBARROWSIZEX - 1 + (Setup::rightToLeft ? 1 : 0);
-				p2.x = p1.x + METRIC_IBARROWSIZEX;
-				p1.y = menuentry.top + (menuentry.bottom - menuentry.top - METRIC_IBARROWSIZEY) / 2 + 1;
-				p2.y = p1.y;
-
-				for (int y = 0; y < METRIC_IBARROWSIZEY; y++)
+				if (operat->popup == NIL)
 				{
-					p1.x++;
-					p2.x--;
-					p1.y++;
-					p2.y++;
-					surface->Line(p1, p2, Setup::TextColor);
+					menuentry.right = menuentry.left - 1 + bitmapSize;
+				}
+				else
+				{
+					menuentry.right = menuentry.left + bitmapSize + METRIC_IBARROWSIZEX + 2;
+
+					if (operat->onClick.GetNOfConnectedSlots() > 0) menuentry.right += 2;
 				}
 
 				operat->GetObjectProperties()->pos.x	= menuentry.left - 3;
@@ -235,14 +189,14 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				prevbitmap = True;
 			}
 
-			if (operat->orientation == OR_LEFT)
+			if (operat->GetObjectProperties()->orientation == OR_LEFT)
 			{
 				if (operat->type != SM_SEPARATOR)	firstentry = False;
 				if (operat->type != SM_BITMAP)		prevbitmap = False;
 				if (operat->type != SM_TEXT)		prevtext = False;
 			}
 
-			if (operat->checked && !operat->clicked) surface->Frame(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size), FRAME_UP);
+			if (operat->GetObjectProperties()->checked && !operat->GetObjectProperties()->clicked) surface->Frame(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size), FRAME_UP);
 		}
 
 		firstentry = True;
@@ -256,9 +210,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 		for (i = GetNOfEntries() - 1; i >= 0; i--)
 		{
-			operat = entries.GetNthEntry(i);
+			operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-			if (operat->type == SM_SEPARATOR && operat->orientation == OR_RIGHT)
+			if (operat->type == SM_SEPARATOR && operat->GetObjectProperties()->orientation == OR_RIGHT)
 			{
 				helpmenuentry.right = helpmenuentry.left - METRIC_MBENTRYSPACING;
 				helpmenuentry.left = helpmenuentry.right;
@@ -284,7 +238,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				firstentry = True;
 				prevbitmap = True;
 			}
-			else if (operat->type == SM_TEXT  && operat->orientation == OR_RIGHT)
+			else if (operat->type == SM_TEXT  && operat->GetObjectProperties()->orientation == OR_RIGHT)
 			{
 				helpmenuentry.right = helpmenuentry.left - METRIC_MBENTRYSPACING;
 
@@ -298,63 +252,20 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				operat->GetObjectProperties()->size.cx	= helpmenuentry.right + 3 - operat->GetObjectProperties()->pos.x;
 				operat->GetObjectProperties()->size.cy	= helpmenuentry.top + METRIC_MBENTRYHEIGHT - operat->GetObjectProperties()->pos.y;
 			}
-			else if (operat->type == SM_BITMAP && operat->orientation == OR_RIGHT && operat->popup == NIL)
+			else if (operat->type == SM_BITMAP && operat->GetObjectProperties()->orientation == OR_RIGHT)
 			{
 				if (firstentry)	helpmenuentry.right = helpmenuentry.left - METRIC_MBENTRYSPACING + 2;
 				else		helpmenuentry.right = helpmenuentry.left - METRIC_IBENTRYSPACING;
 
 				if (prevbitmap) helpmenuentry.right += 1;
 
-				helpmenuentry.left = helpmenuentry.right - bitmapSize;
-				helpmenuentry.top++;
-				helpmenuentry.bottom++;
-
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), operat->bitmap.GetSize()), helpmenuentry);
-				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), operat->graymap.GetSize()), helpmenuentry);
-
-				helpmenuentry.top--;
-				helpmenuentry.bottom--;
-				helpmenuentry.left++;
-
-				operat->GetObjectProperties()->pos.x	= helpmenuentry.left - 3;
-				operat->GetObjectProperties()->pos.y	= helpmenuentry.top - 1;
-				operat->GetObjectProperties()->size.cx	= helpmenuentry.right + 1 - operat->GetObjectProperties()->pos.x;
-				operat->GetObjectProperties()->size.cy	= helpmenuentry.bottom + 2 - operat->GetObjectProperties()->pos.y;
-
-				prevtext = True;
-			}
-			else if (operat->type == SM_BITMAP && operat->orientation == OR_RIGHT && operat->popup != NIL)
-			{
-				if (firstentry)	helpmenuentry.right = helpmenuentry.left - METRIC_MBENTRYSPACING + 2;
-				else		helpmenuentry.right = helpmenuentry.left - METRIC_IBENTRYSPACING;
-
-				if (prevbitmap) helpmenuentry.right += 1;
-
-				helpmenuentry.right -= (METRIC_IBARROWSIZEX + 3);
-				helpmenuentry.left = helpmenuentry.right - bitmapSize;
-				helpmenuentry.top++;
-				helpmenuentry.bottom++;
-
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), operat->bitmap.GetSize()), helpmenuentry);
-				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), operat->graymap.GetSize()), helpmenuentry);
-
-				helpmenuentry.top--;
-				helpmenuentry.bottom--;
-				helpmenuentry.right += (METRIC_IBARROWSIZEX + 3);
-				helpmenuentry.left = helpmenuentry.right - bitmapSize - METRIC_IBARROWSIZEX - 2;
-
-				p1.x = helpmenuentry.right - METRIC_IBARROWSIZEX - 1 + (Setup::rightToLeft ? 1 : 0);
-				p2.x = p1.x + METRIC_IBARROWSIZEX;
-				p1.y = helpmenuentry.top + (helpmenuentry.bottom - helpmenuentry.top - METRIC_IBARROWSIZEY) / 2 + 1;
-				p2.y = p1.y;
-
-				for (int y = 0; y < METRIC_IBARROWSIZEY; y++)
+				if (operat->popup == NIL)
 				{
-					p1.x++;
-					p2.x--;
-					p1.y++;
-					p2.y++;
-					surface->Line(p1, p2, Setup::TextColor);
+					helpmenuentry.left = helpmenuentry.right - bitmapSize + 1;
+				}
+				else
+				{
+					helpmenuentry.left = helpmenuentry.right - bitmapSize - METRIC_IBARROWSIZEX - 2;
 				}
 
 				operat->GetObjectProperties()->pos.x	= helpmenuentry.left - 3;
@@ -365,7 +276,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				prevtext = True;
 			}
 
-			if (operat->orientation == OR_RIGHT)
+			if (operat->GetObjectProperties()->orientation == OR_RIGHT)
 			{
 				if (operat->type != SM_SEPARATOR)	firstentry = False;
 				if (operat->type != SM_BITMAP)		prevbitmap = False;
@@ -384,7 +295,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 		for (int i = 0; i < GetNOfEntries(); i++)
 		{
-			operat = entries.GetNthEntry(i);
+			operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
 			if (operat->type == SM_BITMAP && operat->popup == NIL)
 			{
@@ -410,7 +321,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				prevbitmap = True;
 			}
 
-			if (operat->orientation == OR_LEFT)
+			if (operat->GetObjectProperties()->orientation == OR_LEFT)
 			{
 				if (operat->type != SM_SEPARATOR)	firstentry = False;
 				if (operat->type != SM_BITMAP)		prevbitmap = False;
@@ -420,9 +331,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 		for (int j = 0; j < GetNOfEntries(); j++)
 		{
-			operat = entries.GetNthEntry(j);
+			operat = (MenuEntry *) assocObjects.GetNthEntry(j);
 
-			if (operat->orientation == OR_RIGHT)
+			if (operat->GetObjectProperties()->orientation == OR_RIGHT)
 			{
 				if (operat->type != SM_SEPARATOR)	firstentry = False;
 				if (operat->type != SM_BITMAP)		prevbitmap = False;
@@ -433,7 +344,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 	for (Int j = 0; j < GetNOfEntries(); j++)
 	{
-		MenuEntry	*object = entries.GetNthEntry(j);
+		MenuEntry	*object = (MenuEntry *) assocObjects.GetNthEntry(j);
 
 		if (object == NIL) continue;
 
@@ -471,9 +382,9 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 		case WM_KILLFOCUS:
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				MenuEntry	*operat = entries.GetNthEntry(i);
+				MenuEntry	*operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
+				if ((operat->popup != NIL) && operat->GetObjectProperties()->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 				{
 					Bool	 destroyPopup = True;
 
@@ -498,9 +409,9 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDBLCLK:
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				MenuEntry	*operat = entries.GetNthEntry(i);
+				MenuEntry	*operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
+				if ((operat->popup != NIL) && operat->GetObjectProperties()->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 				{
 					((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->Hide();
 
@@ -514,26 +425,26 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-				if (operat->checked && (operat->type != SM_SEPARATOR))
+				if (operat->GetObjectProperties()->checked && (operat->type != SM_SEPARATOR))
 				{
 					wnd->Process(SM_LOOSEFOCUS, handle, 0);
 
-					if (!operat->clicked)
+					if (!operat->GetObjectProperties()->clicked)
 					{
-						operat->clicked = True;
+						operat->GetObjectProperties()->clicked = True;
 						surface->Frame(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size), FRAME_DOWN);
 					}
 					else
 					{
-						operat->clicked = False;
+						operat->GetObjectProperties()->clicked = False;
 
 						if (!wnd->IsMouseOn(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size)))	surface->Box(Rect(operat->GetObjectProperties()->pos, Size(operat->GetObjectProperties()->size.cx + 1, operat->GetObjectProperties()->size.cy + 1)), Setup::BackgroundColor, OUTLINED);
 						else													surface->Frame(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size), FRAME_UP);
 					}
 
-					if (operat->clicked && operat->popup != NIL)
+					if (operat->GetObjectProperties()->clicked && operat->popup != NIL)
 					{
 						Rect	 popupFrame = Rect(Point(operat->GetObjectProperties()->pos.x + operat->GetObjectProperties()->size.cx - METRIC_IBARROWSIZEX - 4, operat->GetObjectProperties()->pos.y), Size(METRIC_IBARROWSIZEX + 4, operat->GetObjectProperties()->size.cy));
 
@@ -543,11 +454,11 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 							popupHandle = popupMenu->handle;
 
-							if (operat->orientation == OR_LEFT)
+							if (operat->GetObjectProperties()->orientation == OR_LEFT)
 							{
 								popupMenu->GetObjectProperties()->pos.x = operat->GetObjectProperties()->pos.x - 1;
 							}
-							else if (operat->orientation == OR_RIGHT)
+							else if (operat->GetObjectProperties()->orientation == OR_RIGHT)
 							{
 								popupMenu->realMenu->GetSize();
 								popupMenu->GetObjectProperties()->pos.x = operat->GetObjectProperties()->pos.x + operat->GetObjectProperties()->size.cx + 1 - popupMenu->realMenu->popupsize.cx;
@@ -568,18 +479,18 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONUP:
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL)) if (((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->IsVisible()) continue;
+				if ((operat->popup != NIL) && operat->GetObjectProperties()->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL)) if (((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->IsVisible()) continue;
 
-				if (operat->type == SM_TEXT && operat->clicked)
+				if (operat->type == SM_TEXT && operat->GetObjectProperties()->clicked)
 				{
-					operat->clicked = False;
+					operat->GetObjectProperties()->clicked = False;
 					surface->Frame(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size), FRAME_UP);
 
 					if (operat->popup == NIL && operat->bVar == NIL && operat->iVar == NIL)
 					{
-						operat->checked = False;
+						operat->GetObjectProperties()->checked = False;
 
 						if (operat->description != NIL) wnd->SetStatusText(backupStatusText);
 
@@ -596,14 +507,14 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 					retVal = Break;
 				}
-				else if (operat->type == SM_BITMAP && operat->clicked)
+				else if (operat->type == SM_BITMAP && operat->GetObjectProperties()->clicked)
 				{
-					operat->clicked = False;
+					operat->GetObjectProperties()->clicked = False;
 					surface->Frame(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size), FRAME_UP);
 
 					if ((operat->popup == NIL || operat->onClick.GetNOfConnectedSlots() > 0) && operat->bVar == NIL && operat->iVar == NIL)
 					{
-						operat->checked = False;
+						operat->GetObjectProperties()->checked = False;
 
 						if (operat->description != NIL) wnd->SetStatusText(backupStatusText);
 
@@ -648,15 +559,15 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSEMOVE:
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = entries.GetNthEntry(i);
+				operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL)) if (((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->IsVisible()) continue;
+				if ((operat->popup != NIL) && operat->GetObjectProperties()->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL)) if (((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->IsVisible()) continue;
 
 				if (operat->type == SM_TEXT)
 				{
-					if (wnd->IsMouseOn(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size)) && !operat->checked)
+					if (wnd->IsMouseOn(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size)) && !operat->GetObjectProperties()->checked)
 					{
-						operat->checked = True;
+						operat->GetObjectProperties()->checked = True;
 
 						if (operat->description != NIL)
 						{
@@ -667,10 +578,10 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						surface->Frame(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size), FRAME_UP);
 					}
-					else if (!wnd->IsMouseOn(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size)) && operat->checked)
+					else if (!wnd->IsMouseOn(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size)) && operat->GetObjectProperties()->checked)
 					{
-						operat->checked = False;
-						operat->clicked = False;
+						operat->GetObjectProperties()->checked = False;
+						operat->GetObjectProperties()->clicked = False;
 
 						if (operat->description != NIL) setOldStatus = True;
 
@@ -679,9 +590,9 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 				}
 				else if (operat->type == SM_BITMAP)
 				{
-					if (wnd->IsMouseOn(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size)) && !operat->checked)
+					if (wnd->IsMouseOn(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size)) && !operat->GetObjectProperties()->checked)
 					{
-						operat->checked = True;
+						operat->GetObjectProperties()->checked = True;
 
 						if (operat->description != NIL)
 						{
@@ -707,10 +618,10 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 							surface->Bar(p1, p2, OR_VERT);
 						}
 					}
-					else if (!wnd->IsMouseOn(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size)) && operat->checked)
+					else if (!wnd->IsMouseOn(Rect(operat->GetObjectProperties()->pos, operat->GetObjectProperties()->size)) && operat->GetObjectProperties()->checked)
 					{
-						operat->checked = False;
-						operat->clicked = False;
+						operat->GetObjectProperties()->checked = False;
+						operat->GetObjectProperties()->clicked = False;
 
 						if (operat->description != NIL) setOldStatus = True;
 
@@ -779,9 +690,9 @@ S::Void S::GUI::Menubar::PopupProc()
 {
 	for (Int i = 0; i < GetNOfEntries(); i++)
 	{
-		MenuEntry	*operat = entries.GetNthEntry(i);
+		MenuEntry	*operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-		if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
+		if ((operat->popup != NIL) && operat->GetObjectProperties()->clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
 		{
 			((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->Hide();
 

@@ -1,5 +1,5 @@
-<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="4" FILEVERSION="6" LASTMODIFIED="14.01.2004">
-    <TASK PRIORITY="5" TITLE="smooth::Configure" EXPANDED="1" PERCENTDONE="80" POS="1">
+<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="4" FILEVERSION="7" LASTMODIFIED="18.01.2004">
+    <TASK PRIORITY="5" TITLE="smooth::Configure" PERCENTDONE="80" POS="1">
         <TASK PRIORITY="5" TITLE="Make configurations inheritable" POS="1"/>
     </TASK>
     <TASK PRIORITY="5" TITLE="Use more Signals &amp; Slots internally" POS="2"/>
@@ -12,14 +12,14 @@
         <TASK PRIORITY="5" TITLE="Mirrored window elements" PERCENTDONE="100" DONEDATESTRING="08.01.2004" POS="1" DONEDATE="37994.85221065"/>
         <TASK PRIORITY="5" TITLE="Fix EditBoxes for RTL scripts" POS="2"/>
     </TASK>
-    <TASK PRIORITY="5" TITLE="Menu System" POS="7">
-        <TASK PRIORITY="5" TITLE="Make MenuEntries widgets" POS="1"/>
+    <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="5" POS="7">
+        <TASK PRIORITY="5" TITLE="Make MenuEntries widgets" PERCENTDONE="30" POS="1"/>
         <TASK PRIORITY="5" TITLE="Implement menu shortcuts" POS="2"/>
-        <TASK PRIORITY="5" TITLE="Redo Menubar::Paint()" POS="3"/>
+        <TASK PRIORITY="5" TITLE="Redo Menubar::Paint()" PERCENTDONE="5" POS="3"/>
         <TASK PRIORITY="5" TITLE="ECM" POS="4"/>
         <TASK PRIORITY="5" TITLE="Tear off menus" POS="5"/>
     </TASK>
-    <TASK PRIORITY="5" TITLE="Widgets" POS="8">
+    <TASK PRIORITY="5" TITLE="Widgets" PERCENTDONE="1" POS="8">
         <TASK PRIORITY="5" TITLE="ListBox" POS="1">
             <TASK PRIORITY="5" TITLE="Support editing of ListBox entries" POS="1"/>
             <TASK PRIORITY="5" TITLE="Support Drag &amp; Drop in ListBoxes" EXPANDED="1" POS="2">

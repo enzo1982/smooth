@@ -40,7 +40,6 @@ namespace smooth
 
 				Bool			 sizeset;
 				Bool			 entrysizesset;
-				Array<MenuEntry *>	 entries;
 				Size			 popupsize;
 
 							 Menu();
@@ -48,7 +47,6 @@ namespace smooth
 
 				MenuEntry		*AddEntry(String = NIL, Bitmap = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0, Int = OR_LEFT);
 				Int			 RemoveEntry(MenuEntry *);
-				Int			 RemoveEntry(Int);
 
 				Void			 GetSize();
 				Int			 GetNOfEntries();

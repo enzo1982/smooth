@@ -68,7 +68,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 
 	for (Int i = 0; i < realMenu->GetNOfEntries(); i++)
 	{
-		entry = realMenu->entries.GetNthEntry(i);
+		entry = (MenuEntry *) realMenu->GetNthObject(i);
 
 		if (entry == NIL) continue;
 
@@ -90,7 +90,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 			textRect.top	= popupRect.top + currentYPos;
 			textRect.bottom	= textRect.top + METRIC_POPUPENTRYSIZE;
 
-			surface->SetText(entry->text, textRect, objectProperties->font);
+			surface->SetText(entry->GetText(), textRect, objectProperties->font);
 
 			if (entry->popup != NIL)
 			{
@@ -313,7 +313,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				MenuEntry	*entry = realMenu->entries.GetNthEntry(i);
+				MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -329,7 +329,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					currentY = currentY + 5;
 				}
 
-				if (entry->checked && (entry->popup != NIL))
+				if (entry->GetObjectProperties()->checked && (entry->popup != NIL))
 				{
 					myPopup->nextPopup = new PopupMenu(entry->popup);
 
@@ -387,7 +387,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONUP:
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				MenuEntry	*entry = realMenu->entries.GetNthEntry(i);
+				MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -403,9 +403,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					currentY = currentY + 5;
 				}
 
-				if (entry->checked && wnd->IsMouseOn(entryRect[i]) && (entry->popup == NIL && entry->bVar == NIL && entry->iVar == NIL))
+				if (entry->GetObjectProperties()->checked && wnd->IsMouseOn(entryRect[i]) && (entry->popup == NIL && entry->bVar == NIL && entry->iVar == NIL))
 				{
-					entry->checked = False;
+					entry->GetObjectProperties()->checked = False;
 
 					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
@@ -423,11 +423,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					break;
 				}
 
-				if (entry->checked && wnd->IsMouseOn(entryRect[i]) && (entry->bVar != NIL))
+				if (entry->GetObjectProperties()->checked && wnd->IsMouseOn(entryRect[i]) && (entry->bVar != NIL))
 				{
 					Bool	 valueChanged = False;
 
-					entry->checked = False;
+					entry->GetObjectProperties()->checked = False;
 
 					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
@@ -461,11 +461,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					break;
 				}
 
-				if (entry->checked && wnd->IsMouseOn(entryRect[i]) && (entry->iVar != NIL))
+				if (entry->GetObjectProperties()->checked && wnd->IsMouseOn(entryRect[i]) && (entry->iVar != NIL))
 				{
 					Bool	 valueChanged = False;
 
-					entry->checked = False;
+					entry->GetObjectProperties()->checked = False;
 
 					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
@@ -503,7 +503,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSEMOVE:
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				MenuEntry	*entry = realMenu->entries.GetNthEntry(i);
+				MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -514,7 +514,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					currentY = currentY + METRIC_POPUPENTRYSIZE;
 
-					if (!wnd->IsMouseOn(entryRect[i]) && entry->checked)
+					if (!wnd->IsMouseOn(entryRect[i]) && entry->GetObjectProperties()->checked)
 					{
 						if (entry->description != NIL) setOldStatus = True;
 
@@ -526,7 +526,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 							if (wnd->IsMouseOn(popupRect) || myPopup->nextPopup == NIL)
 							{
-								entry->checked = False;
+								entry->GetObjectProperties()->checked = False;
 
 								entryRect[i].right++;
 								entryRect[i].bottom++;
@@ -535,7 +535,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 								entryRect[i].left = entryRect[i].left + 17;
 
-								surface->SetText(entry->text, entryRect[i], objectProperties->font);
+								surface->SetText(entry->GetText(), entryRect[i], objectProperties->font);
 
 								p1.x = entryRect[i].right - 9;
 								p2.x = p1.x;
@@ -562,7 +562,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						}
 						else
 						{
-							entry->checked = False;
+							entry->GetObjectProperties()->checked = False;
 
 							entryRect[i].right++;
 							entryRect[i].bottom++;
@@ -571,7 +571,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 							entryRect[i].left = entryRect[i].left + 17;
 
-							surface->SetText(entry->text, entryRect[i], objectProperties->font);
+							surface->SetText(entry->GetText(), entryRect[i], objectProperties->font);
 						}
 
 						if (entry->bVar != NIL)
@@ -726,7 +726,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
-				MenuEntry	*entry = realMenu->entries.GetNthEntry(i);
+				MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
 				if (entry->type != SM_SEPARATOR)
 				{
@@ -737,9 +737,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					currentY = currentY + METRIC_POPUPENTRYSIZE;
 
-					if (wnd->IsMouseOn(entryRect[i]) && !entry->checked)
+					if (wnd->IsMouseOn(entryRect[i]) && !entry->GetObjectProperties()->checked)
 					{
-						entry->checked = True;
+						entry->GetObjectProperties()->checked = True;
 
 						if (entry->description != NIL)
 						{
@@ -761,7 +761,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 						font.SetColor(Setup::GradientTextColor);
 
-						surface->SetText(entry->text, entryRect[i], font);
+						surface->SetText(entry->GetText(), entryRect[i], font);
 
 						if (entry->popup != NIL)
 						{

@@ -13,6 +13,7 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - callbackn.cpp	- You can now connect values directly to the Callback, the connected value will be returned without any function being called
 - config.cpp	- new class: Configuration; an interface to XML configuration files
 - tipodaydlg.cpp- new dialog: 'Tip of the Day' dialog window
+- menuentry.cpp	- started redesign of the menu system - MenuEntry is now a Widget
 
 - removed some Windows API calls
 - removed smooth Toolkit (STK, stk.cpp)

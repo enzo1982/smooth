@@ -39,17 +39,10 @@ namespace smooth
 				Int		 id;
 				Int		 type;
 
-				String		 text;
-				String		 tooltip;
 				String		 description;
 
 				Bitmap		 bitmap;
 				Bitmap		 graymap;
-
-				Int		 orientation;
-
-				Bool		 checked;
-				Bool		 clicked;
 
 				Bool		*bVar;
 				Int		*iVar;
@@ -65,21 +58,16 @@ namespace smooth
 
 				Shortcut	*shortcut;
 
-				Font		 font;
-
 						 MenuEntry(Int, Int);
 						~MenuEntry();
 
 				Int		 Paint(Int);
 
 				Int		 SetText(String);
-				Int		 SetTooltip(String);
 				Int		 SetStatusText(String);
 				Int		 SetShortcut(Int, Int);
 
 				Int		 SetBitmap(const Bitmap &);
-
-				Int		 SetOrientation(Int);
 			signals:
 				Signal0<Void>	 onClick;
 		};

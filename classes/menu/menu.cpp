@@ -31,12 +31,7 @@ S::GUI::Menu::Menu()
 
 S::GUI::Menu::~Menu()
 {
-	Int	 nOfEntries = entries.GetNOfEntries();
-
-	for (Int i = 0; i < nOfEntries; i++)
-	{
-		RemoveEntry(entries.GetFirstEntry());
-	}
+	Clear();
 }
 
 S::GUI::MenuEntry *S::GUI::Menu::AddEntry(String text, Bitmap bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
@@ -49,8 +44,8 @@ S::GUI::MenuEntry *S::GUI::Menu::AddEntry(String text, Bitmap bitmap, Menu *popu
 
 	MenuEntry	*newEntry = new MenuEntry(type, id);
 
-	newEntry->text		= text;
-	newEntry->orientation	= orientation;
+	newEntry->SetText(text);
+	newEntry->SetOrientation(orientation);
 
 	if (bitmap != NIL)
 	{
@@ -69,12 +64,10 @@ S::GUI::MenuEntry *S::GUI::Menu::AddEntry(String text, Bitmap bitmap, Menu *popu
 	newEntry->iCode		= iCode;
 	newEntry->sizeset	= False;
 
-	if (entries.AddEntry(newEntry, id) == True)
+	if (RegisterObject(newEntry) == Success)
 	{
 		sizeset		= False;
 		entrysizesset	= False;
-
-		RegisterObject(newEntry);
 
 		newEntry->Show();
 
@@ -92,12 +85,8 @@ S::Int S::GUI::Menu::RemoveEntry(MenuEntry *entry)
 {
 	if (entry == NIL) return Error;
 
-	if (entries.GetEntry(entry->id) != NIL)
+	if (UnregisterObject(entry) == Success)
 	{
-		entries.RemoveEntry(entry->id);
-
-		UnregisterObject(entry);
-
 		Object::DeleteObject(entry);
 
 		return Success;
@@ -106,18 +95,13 @@ S::Int S::GUI::Menu::RemoveEntry(MenuEntry *entry)
 	return Error;
 }
 
-S::Int S::GUI::Menu::RemoveEntry(Int id)
-{
-	return RemoveEntry(entries.GetEntry(id));
-}
-
 S::Int S::GUI::Menu::Clear()
 {
-	Int	 nOfEntries = entries.GetNOfEntries();
+	Int	 nOfEntries = assocObjects.GetNOfEntries();
 
 	for (Int i = 0; i < nOfEntries; i++)
 	{
-		RemoveEntry(entries.GetFirstEntry());
+		RemoveEntry((MenuEntry *) assocObjects.GetFirstEntry());
 	}
 
 	return Success;
@@ -145,11 +129,11 @@ S::Int S::GUI::Menu::GetSizeX()
 	Int	 mSize = 50;
 	Int	 greatest = 0;
 
-	if (entries.GetNOfEntries() == 0) return mSize;
+	if (assocObjects.GetNOfEntries() == 0) return mSize;
 
-	for (Int i = 0; i < entries.GetNOfEntries(); i++)
+	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
 	{
-		MenuEntry	*entry = entries.GetNthEntry(i);
+		MenuEntry	*entry = (MenuEntry *) assocObjects.GetNthEntry(i);
 
 		if (entry->size > greatest)
 		{
@@ -165,11 +149,11 @@ S::Int S::GUI::Menu::GetSizeY()
 {
 	Int	 mSize = 4;
 
-	if (entries.GetNOfEntries() == 0) return mSize;
+	if (assocObjects.GetNOfEntries() == 0) return mSize;
 
-	for (Int i = 0; i < entries.GetNOfEntries(); i++)
+	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
 	{
-		MenuEntry	*entry = entries.GetNthEntry(i);
+		MenuEntry	*entry = (MenuEntry *) assocObjects.GetNthEntry(i);
 
 		if (entry->type == SM_SEPARATOR)	mSize = mSize + 5;
 		else					mSize = mSize + METRIC_POPUPENTRYSIZE;
@@ -180,14 +164,14 @@ S::Int S::GUI::Menu::GetSizeY()
 
 S::Void S::GUI::Menu::GetMenuEntriesSize()
 {
-	if (entries.GetNOfEntries() == 0) return;
+	if (assocObjects.GetNOfEntries() == 0) return;
 
-	for (Int i = 0; i < entries.GetNOfEntries(); i++)
+	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
 	{
-		MenuEntry	*operat = entries.GetNthEntry(i);
+		MenuEntry	*operat = (MenuEntry *) assocObjects.GetNthEntry(i);
 		Font		 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
 
-		if (!operat->sizeset) operat->size = font.GetTextSizeX(operat->text);
+		if (!operat->sizeset) operat->size = font.GetTextSizeX(operat->GetText());
 
 		operat->sizeset = True;
 	}
@@ -195,5 +179,5 @@ S::Void S::GUI::Menu::GetMenuEntriesSize()
 
 S::Int S::GUI::Menu::GetNOfEntries()
 {
-	return entries.GetNOfEntries();
+	return assocObjects.GetNOfEntries();
 }

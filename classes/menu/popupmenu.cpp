@@ -34,10 +34,10 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 
 	for (Int i = 0; i < menu->GetNOfEntries(); i++)
 	{
-		MenuEntry	*entry = menu->entries.GetNthEntry(i);
-		MenuEntry	*nEntry = realMenu->AddEntry(entry->text, entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->orientation);
+		MenuEntry	*entry = (MenuEntry *) menu->GetNthObject(i);
+		MenuEntry	*nEntry = realMenu->AddEntry(entry->GetText(), entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->GetObjectProperties()->orientation);
 
-		nEntry->SetTooltip(entry->tooltip);
+		nEntry->SetTooltip(entry->GetTooltip());
 		nEntry->SetStatusText(entry->description);
 
 		nEntry->onClick.Connect(&entry->onClick);

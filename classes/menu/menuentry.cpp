@@ -13,6 +13,7 @@
 #include <smooth/menu/popupmenu.h>
 #include <smooth/definitions.h>
 #include <smooth/color.h>
+#include <smooth/metrics.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/objectproperties.h>
@@ -21,11 +22,6 @@ S::GUI::MenuEntry::MenuEntry(Int newType, Int newID)
 {
 	type		= newType;
 	id		= newID;
-
-	orientation	= OR_LEFT;
-
-	checked		= False;
-	clicked		= False;
 
 	scKey		= 0;
 	scFlags		= 0;
@@ -36,6 +32,8 @@ S::GUI::MenuEntry::MenuEntry(Int newType, Int newID)
 	iVar		= NIL;
 
 	popup		= NIL;
+
+	objectProperties->orientation = OR_LEFT;
 
 	onClick.SetParentObject(this);
 
@@ -58,7 +56,6 @@ S::Int S::GUI::MenuEntry::Paint(Int message)
 
 	EnterProtectedRegion();
 
-	Rect	 textRect;
 	Point	 realPos = GetRealPosition();
 
 	switch (message)
@@ -67,12 +64,47 @@ S::Int S::GUI::MenuEntry::Paint(Int message)
 		case SP_PAINT:
 			if (type == SM_TEXT)
 			{
+				Rect	 textRect;
+
 				textRect.left	= realPos.x + 3;
 				textRect.top	= realPos.y + 1;
 				textRect.right	= realPos.x + objectProperties->size.cx - 1;
 				textRect.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-				surface->SetText(text, textRect, objectProperties->font);
+				surface->SetText(objectProperties->text, textRect, objectProperties->font);
+			}
+			else if (type == SM_BITMAP)
+			{
+				Rect	 rect;
+
+				rect.left	= realPos.x + 2;
+				rect.top	= realPos.y + 2;
+				rect.right	= realPos.x + bitmap.GetSize().cx + 2;
+				rect.bottom	= realPos.y + bitmap.GetSize().cy + 2;
+
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), rect);
+				else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), rect);
+
+				if (popup != NIL)
+				{
+					Point	 p1;
+					Point	 p2;
+
+					p1.x = realPos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 2 + (Setup::rightToLeft ? 1 : 0);
+					p2.x = p1.x + METRIC_IBARROWSIZEX;
+					p1.y = realPos.y + (objectProperties->size.cy - METRIC_IBARROWSIZEY) / 2;
+					p2.y = p1.y;
+
+					for (Int y = 0; y < METRIC_IBARROWSIZEY; y++)
+					{
+						p1.x++;
+						p2.x--;
+						p1.y++;
+						p2.y++;
+
+						surface->Line(p1, p2, Setup::TextColor);
+					}
+				}
 			}
 
 			break;
@@ -87,16 +119,7 @@ S::Int S::GUI::MenuEntry::SetText(String newText)
 {
 	if (newText == NIL) type = (type | SM_TEXT) ^ SM_TEXT;
 
-	text = newText;
-
-	return Success;
-}
-
-S::Int S::GUI::MenuEntry::SetTooltip(String newTooltip)
-{
-	tooltip = newTooltip;
-
-	return Success;
+	return Widget::SetText(newText);
 }
 
 S::Int S::GUI::MenuEntry::SetStatusText(String newDescription)
@@ -126,16 +149,6 @@ S::Int S::GUI::MenuEntry::SetBitmap(const Bitmap &newBitmap)
 
 	graymap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
 	graymap.GrayscaleBitmap();
-
-	return Success;
-}
-
-S::Int S::GUI::MenuEntry::SetOrientation(Int newOrientation)
-{
-	if (newOrientation == OR_TOP)		newOrientation = OR_LEFT;
-	else if (newOrientation == OR_BOTTOM)	newOrientation = OR_RIGHT;
-
-	orientation = newOrientation;
 
 	return Success;
 }

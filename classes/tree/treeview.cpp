@@ -13,7 +13,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -73,7 +72,7 @@ S::Int S::GUI::TreeView::Paint(Int message)
 		frame.top -= 2;
 	}
 
-	frame.top += (METRIC_TREEVIEWENTRYHEIGHT - 1);
+	frame.top += 15;
 	frame.right--;
 
 	PaintTree(this, 0, frame);
@@ -92,8 +91,8 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 	Int		 ste;
 	Int		 painted = tree->GetNOfEntries();
 
-	frame.left += (METRIC_TREEVIEWENTRYHEIGHT - 1) * (level + 1);
-	frame.bottom = frame.top + METRIC_TREEVIEWENTRYHEIGHT;
+	frame.left += 15 * (level + 1);
+	frame.bottom = frame.top + 16;
 
 	for (Int i = 0; i < tree->GetNOfEntries(); i++)
 	{
@@ -212,13 +211,13 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 			}
 		}
 
-		oframe.top += METRIC_TREEVIEWENTRYHEIGHT;
+		oframe.top += 16;
 
 		if (operat->open)
 		{
 			ste = PaintTree(operat->sub, level + 1, oframe);
 
-			for (Int y = frame.top + (METRIC_TREEVIEWENTRYHEIGHT - 2); y <= frame.bottom + METRIC_TREEVIEWENTRYHEIGHT * ste; y++)
+			for (Int y = frame.top + 14; y <= frame.bottom + 16 * ste; y++)
 			{
 				if (y >= oframe.bottom - 1) break;
 
@@ -231,9 +230,9 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 			painted += ste;
 		}
 
-		oframe.top += METRIC_TREEVIEWENTRYHEIGHT * ste;
-		frame.top += METRIC_TREEVIEWENTRYHEIGHT + METRIC_TREEVIEWENTRYHEIGHT * ste;
-		frame.bottom += METRIC_TREEVIEWENTRYHEIGHT + METRIC_TREEVIEWENTRYHEIGHT * ste;
+		oframe.top += 16 * ste;
+		frame.top += 16 + 16 * ste;
+		frame.bottom += 16 + 16 * ste;
 	}
 
 	return painted;

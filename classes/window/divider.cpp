@@ -11,7 +11,6 @@
 #include <smooth/window/divider.h>
 #include <smooth/objectmanager.h>
 #include <smooth/definitions.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/binary.h>
 #include <smooth/objectproperties.h>

@@ -10,7 +10,6 @@
 
 #include <smooth/menu/popupview.h>
 #include <smooth/definitions.h>
-#include <smooth/metrics.h>
 #include <smooth/optionbox.h>
 #include <smooth/checkbox.h>
 #include <smooth/objectmanager.h>
@@ -89,7 +88,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 			textRect.left	= popupRect.left + currentXPos;
 			textRect.right	= popupRect.right;
 			textRect.top	= popupRect.top + currentYPos;
-			textRect.bottom	= textRect.top + METRIC_POPUPENTRYSIZE;
+			textRect.bottom	= textRect.top + 16;
 
 			surface->SetText(entry->GetText(), textRect, objectProperties->font);
 
@@ -97,7 +96,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 			{
 				p1.x = popupRect.right - 11;
 				p2.x = p1.x;
-				p1.y = popupRect.top + currentYPos + METRIC_POPUPARROWOFFSETY;
+				p1.y = popupRect.top + currentYPos + 3;
 				p2.y = p1.y + 9;
 
 				for (int x = 0; x < 4; x++)
@@ -251,7 +250,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 				}
 			}
 
-			currentYPos = currentYPos + METRIC_POPUPENTRYSIZE;
+			currentYPos = currentYPos + 16;
 		}
 	}
 
@@ -321,9 +320,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					entryRect[i].left	= objectProperties->pos.x + currentX;
 					entryRect[i].right	= objectProperties->pos.x + maxX;
 					entryRect[i].top	= objectProperties->pos.y + currentY;
-					entryRect[i].bottom	= objectProperties->pos.y + currentY + METRIC_POPUPENTRYSIZE - 2;
+					entryRect[i].bottom	= objectProperties->pos.y + currentY + 16 - 2;
 
-					currentY = currentY + METRIC_POPUPENTRYSIZE;
+					currentY = currentY + 16;
 				}
 				else
 				{
@@ -395,9 +394,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					entryRect[i].left	= objectProperties->pos.x + currentX;
 					entryRect[i].right	= objectProperties->pos.x + maxX;
 					entryRect[i].top	= objectProperties->pos.y + currentY;
-					entryRect[i].bottom	= objectProperties->pos.y + currentY + METRIC_POPUPENTRYSIZE - 2;
+					entryRect[i].bottom	= objectProperties->pos.y + currentY + 16 - 2;
 
-					currentY = currentY + METRIC_POPUPENTRYSIZE;
+					currentY = currentY + 16;
 				}
 				else
 				{
@@ -511,9 +510,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					entryRect[i].left	= currentX;
 					entryRect[i].right	= maxX;
 					entryRect[i].top	= currentY;
-					entryRect[i].bottom	= currentY + METRIC_POPUPENTRYSIZE - 2;
+					entryRect[i].bottom	= currentY + 16 - 2;
 
-					currentY = currentY + METRIC_POPUPENTRYSIZE;
+					currentY = currentY + 16;
 
 					if (!wnd->IsMouseOn(entryRect[i]) && entry->GetObjectProperties()->checked)
 					{
@@ -540,7 +539,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 								p1.x = entryRect[i].right - 9;
 								p2.x = p1.x;
-								p1.y = entryRect[i].top + METRIC_POPUPARROWOFFSETY;
+								p1.y = entryRect[i].top + 3;
 								p2.y = p1.y + 9;
 
 								for (Int x = 0; x < 4; x++)
@@ -734,9 +733,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					entryRect[i].left	= currentX;
 					entryRect[i].right	= maxX;
 					entryRect[i].top	= currentY;
-					entryRect[i].bottom	= currentY + METRIC_POPUPENTRYSIZE - 2;
+					entryRect[i].bottom	= currentY + 16 - 2;
 
-					currentY = currentY + METRIC_POPUPENTRYSIZE;
+					currentY = currentY + 16;
 
 					if (wnd->IsMouseOn(entryRect[i]) && !entry->GetObjectProperties()->checked)
 					{
@@ -768,7 +767,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						{
 							p1.x = entryRect[i].right - 9;
 							p2.x = p1.x;
-							p1.y = entryRect[i].top + METRIC_POPUPARROWOFFSETY;
+							p1.y = entryRect[i].top + 3;
 							p2.y = p1.y + 9;
 
 							for (Int x = 0; x < 4; x++)

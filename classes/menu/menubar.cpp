@@ -12,7 +12,6 @@
 #include <smooth/menu/menubar.h>
 #include <smooth/menu/menu.h>
 #include <smooth/loop.h>
-#include <smooth/metrics.h>
 #include <smooth/menu/popupmenu.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
@@ -24,10 +23,10 @@ S::GUI::Menubar::Menubar()
 {
 	type				= classID;
 	objectProperties->orientation	= OR_TOP;
-	objectProperties->size.cx	= METRIC_MENUBARHEIGHT;
-	objectProperties->size.cy	= METRIC_MENUBARHEIGHT;
+	objectProperties->size.cx	= 18;
+	objectProperties->size.cy	= 18;
 	subtype				= WO_SEPARATOR;
-	bitmapSize			= METRIC_IBICONSIZE;
+	bitmapSize			= 12;
 
 	possibleContainers.AddEntry(Window::classID);
 
@@ -89,8 +88,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 		if (wnd->GetIcon() != NIL && objectProperties->orientation == OR_TOP)
 		{
-			p1.x += METRIC_TITLEBARHEIGHT - 2;
-			p2.x += METRIC_TITLEBARHEIGHT - 2;
+			p1.x += 17;
+			p2.x += 17;
 		}
 
 		surface->Bar(p1, p2, OR_VERT);
@@ -103,12 +102,12 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 	if (objectProperties->orientation == OR_TOP || objectProperties->orientation == OR_BOTTOM)
 	{
-		menuentry.top		= menubar.top + METRIC_MBTEXTOFFSETY - 1;
-		menuentry.left		= METRIC_MBTEXTOFFSETX;
+		menuentry.top		= menubar.top + 3;
+		menuentry.left		= 12;
 
-		if (wnd->GetIcon() != NIL && objectProperties->orientation == OR_TOP) menuentry.left = menuentry.left + METRIC_TITLEBARHEIGHT - 2;
+		if (wnd->GetIcon() != NIL && objectProperties->orientation == OR_TOP) menuentry.left += 17;
 
-		menuentry.right		= menuentry.left - METRIC_MBENTRYSPACING;
+		menuentry.right		= menuentry.left - 9;
 		menuentry.bottom	= menuentry.top + bitmapSize;
 
 		for (i = 0; i < assocObjects.GetNOfEntries(); i++)
@@ -119,7 +118,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 			if (operat->type == SM_SEPARATOR)
 			{
-				menuentry.left = menuentry.right + METRIC_MBENTRYSPACING - 1;
+				menuentry.left = menuentry.right + 8;
 
 				if (prevbitmap) menuentry.left -= 2;
 
@@ -131,7 +130,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			}
 			else if (operat->type == SM_TEXT)
 			{
-				menuentry.left = menuentry.right + METRIC_MBENTRYSPACING;
+				menuentry.left = menuentry.right + 9;
 
 				if (prevbitmap) menuentry.left -= 3;
 
@@ -141,8 +140,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			}
 			else if (operat->type == SM_BITMAP)
 			{
-				if (firstentry)	menuentry.left = menuentry.right + METRIC_MBENTRYSPACING;
-				else		menuentry.left = menuentry.right + METRIC_IBENTRYSPACING;
+				if (firstentry)	menuentry.left = menuentry.right + 9;
+				else		menuentry.left = menuentry.right + 6;
 
 				if (prevtext) menuentry.left += 2;
 
@@ -152,7 +151,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				}
 				else
 				{
-					menuentry.right = menuentry.left + bitmapSize + METRIC_IBARROWSIZEX + 2;
+					menuentry.right = menuentry.left + bitmapSize + 9;
 
 					if (operat->onClick.GetNOfConnectedSlots() > 0) menuentry.right += 2;
 				}
@@ -187,7 +186,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 			if (operat->type == SM_SEPARATOR)
 			{
-				helpmenuentry.right = helpmenuentry.left - METRIC_MBENTRYSPACING;
+				helpmenuentry.right = helpmenuentry.left - 9;
 				helpmenuentry.left = helpmenuentry.right;
 
 				operat->GetObjectProperties()->size.cy	= menubar.bottom - menubar.top - 2;
@@ -197,7 +196,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			}
 			else if (operat->type == SM_TEXT)
 			{
-				helpmenuentry.right = helpmenuentry.left - METRIC_MBENTRYSPACING;
+				helpmenuentry.right = helpmenuentry.left - 9;
 
 				if (prevbitmap) helpmenuentry.right += 1;
 				if (prevtext) helpmenuentry.right += 1;
@@ -206,19 +205,13 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			}
 			else if (operat->type == SM_BITMAP)
 			{
-				if (firstentry)	helpmenuentry.right = helpmenuentry.left - METRIC_MBENTRYSPACING + 2;
-				else		helpmenuentry.right = helpmenuentry.left - METRIC_IBENTRYSPACING;
+				if (firstentry)	helpmenuentry.right = helpmenuentry.left - 7;
+				else		helpmenuentry.right = helpmenuentry.left - 6;
 
 				if (prevbitmap) helpmenuentry.right += 1;
 
-				if (operat->popup == NIL)
-				{
-					helpmenuentry.left = helpmenuentry.right - bitmapSize + 1;
-				}
-				else
-				{
-					helpmenuentry.left = helpmenuentry.right - bitmapSize - METRIC_IBARROWSIZEX - 2;
-				}
+				if (operat->popup == NIL)	helpmenuentry.left = helpmenuentry.right - bitmapSize + 1;
+				else				helpmenuentry.left = helpmenuentry.right - bitmapSize - 9;
 
 				prevtext = True;
 			}
@@ -233,10 +226,10 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	}
 	else if (objectProperties->orientation == OR_LEFT || objectProperties->orientation == OR_RIGHT)
 	{
-		menuentry.top		= menubar.top + METRIC_MBTEXTOFFSETX - 8;
-		menuentry.left		= METRIC_MBTEXTOFFSETX - 6;
+		menuentry.top		= menubar.top + 4;
+		menuentry.left		= 6;
 		menuentry.right		= menuentry.left + bitmapSize;
-		menuentry.bottom	= menuentry.top - METRIC_MBENTRYSPACING;
+		menuentry.bottom	= menuentry.top - 9;
 
 		for (int i = 0; i < assocObjects.GetNOfEntries(); i++)
 		{
@@ -244,8 +237,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 			if (operat->type == SM_BITMAP && operat->popup == NIL)
 			{
-				if (firstentry)	menuentry.top = menuentry.bottom + METRIC_MBENTRYSPACING;
-				else		menuentry.top = menuentry.bottom + METRIC_IBENTRYSPACING;
+				if (firstentry)	menuentry.top = menuentry.bottom + 9;
+				else		menuentry.top = menuentry.bottom + 6;
 
 				if (prevtext) menuentry.top += 2;
 

@@ -15,7 +15,6 @@
 #include <smooth/threads/thread.h>
 #include <smooth/backends/backend.h>
 #include <smooth/window/window.h>
-#include <smooth/metrics.h>
 #include <smooth/objectmanager.h>
 #include <smooth/color.h>
 #include <smooth/misc/i18n.h>
@@ -92,9 +91,6 @@ S::Void S::Init()
 	GetColors();
 
 #ifdef __WIN32__
-	SetMetrics();
-	SetMeasurement(SMT_UNITS);
-
 	I18n::Translator::defaultTranslator = new I18n::Translator(True);
 
 	switch (PRIMARYLANGID(GetUserDefaultLangID()))

@@ -10,7 +10,6 @@
 
 #include <smooth/menu/popupmenu.h>
 #include <smooth/definitions.h>
-#include <smooth/metrics.h>
 #include <smooth/loop.h>
 #include <smooth/objectproperties.h>
 #include <smooth/menu/popupview.h>
@@ -86,15 +85,7 @@ S::Int S::GUI::PopupMenu::Show()
 	popupView	= new PopupView(this, realMenu);
 
 	toolwnd->SetOwner(this);
-
-	Float	 oldMeasurement = Setup::FontSize;
-
-	SetMeasurement(SMT_PIXELS);
-
-	toolwnd->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y), Size(popupsize.cx + 1, popupsize.cy + 1));
-
-	Setup::FontSize = oldMeasurement;
-
+	toolwnd->SetMetrics(objectProperties->pos + wnd->GetObjectProperties()->pos, Size(popupsize.cx + 1, popupsize.cy + 1));
 	toolwnd->RegisterObject(popupView);
 
 	wnd->RegisterObject(toolwnd);
@@ -220,7 +211,7 @@ S::Int S::GUI::PopupMenu::GetSizeY()
 		MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
 
 		if (entry->type == SM_SEPARATOR)	mSize = mSize + 5;
-		else					mSize = mSize + METRIC_POPUPENTRYSIZE;
+		else					mSize = mSize + 16;
 	}
 
 	return mSize;

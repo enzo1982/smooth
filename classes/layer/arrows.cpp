@@ -12,7 +12,6 @@
 #include <smooth/arrows.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/metrics.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/system/timer.h>
@@ -41,28 +40,33 @@ S::GUI::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
 	if (subtype == OR_VERT)
 	{
-		if (size.cx == 0)	objectProperties->size.cx = Math::Round(18 * Setup::FontSize);
-		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = Math::Round(24 * Setup::FontSize);
-		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+		if (objectProperties->size.cx == 0) objectProperties->size.cx = 18;
+		if (objectProperties->size.cy == 0) objectProperties->size.cy = 24;
 	}
 	else
 	{
-		if (size.cx == 0)	objectProperties->size.cx = Math::Round(24 * Setup::FontSize);
-		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = Math::Round(18 * Setup::FontSize);
-		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+		if (objectProperties->size.cx == 0) objectProperties->size.cx = 24;
+		if (objectProperties->size.cy == 0) objectProperties->size.cy = 18;
 	}
 }
 
 S::GUI::Arrows::~Arrows()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+
+	if (timer != NIL)
+	{
+		timer->Stop();
+
+		DeleteObject(timer);
+
+		timer = NIL;
+	}
 }
 
 S::Int S::GUI::Arrows::Paint(Int message)

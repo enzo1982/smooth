@@ -45,7 +45,6 @@
 #include "smooth/combobox.h"
 #include "smooth/treeview.h"
 #include "smooth/objectproperties.h"
-#include "smooth/metrics.h"
 #include "smooth/loop.h"
 #include "smooth/version.h"
 #include "smooth/mdiclient.h"

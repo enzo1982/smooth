@@ -13,7 +13,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/i18n.h>
 #include <smooth/objectproperties.h>
@@ -27,8 +26,8 @@ const S::Int	 S::GUI::ListBox::classID = S::Object::RequestClassID();
 
 S::GUI::ListBox::ListBox(Point pos, Size size)
 {
-	type		= classID;
-	entryCount	= -1;
+	type			= classID;
+	entryCount		= -1;
 
 	scrollbar		= NIL;
 	scrollbarPos		= 0;
@@ -40,13 +39,11 @@ S::GUI::ListBox::ListBox(Point pos, Size size)
 
 	SetFont(Font(objectProperties->font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(80 * Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+	if (objectProperties->size.cx == 0) objectProperties->size.cx = 120;
+	if (objectProperties->size.cy == 0) objectProperties->size.cy = 80;
 }
 
 S::GUI::ListBox::~ListBox()
@@ -105,7 +102,7 @@ S::Int S::GUI::ListBox::RemoveEntry(Int number)
 
 	if (scrollbar != NIL)
 	{
-		if (METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4 <= objectProperties->size.cy)
+		if (15 * GetNOfEntries() + 4 <= objectProperties->size.cy)
 		{
 			scrollbarPos = 0;
 			lastScrollbarPos = 0;
@@ -207,16 +204,11 @@ S::Int S::GUI::ListBox::Show()
 	{
 		Layer	*layer = (Layer *) myContainer->GetContainerObject();
 		Point	 realPos = GetRealPosition();
-		Point	 sbp = Point(realPos.x + objectProperties->size.cx - 2 - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET, realPos.y + 1 - layer->GetObjectProperties()->pos.y + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1));
-		Size	 sbs = Size(scrollbar->GetObjectProperties()->size.cx, objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1));
-		Float	 oldMeasurement = Setup::FontSize;
-
-		SetMeasurement(SMT_PIXELS);
+		Point	 sbp = Point(realPos.x + objectProperties->size.cx - layer->GetObjectProperties()->pos.x - 18, realPos.y + 1 - layer->GetObjectProperties()->pos.y + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
+		Size	 sbs = Size(scrollbar->GetObjectProperties()->size.cx, objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
 
 		scrollbar->SetMetrics(sbp, sbs);
-		scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
-
-		Setup::FontSize = oldMeasurement;
+		scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
 
 		scrollbar->Show();
 	}
@@ -278,7 +270,6 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	Point		 sbp;
 	Size		 sbs;
 	Int		 maxFrameY;
-	Float		 oldMeasurement;
 	Int		 i;
 
 	switch (message)
@@ -295,14 +286,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			if (message != SP_UPDATE)
 			{
-				if (header != NIL && !(flags & LF_HIDEHEADER))	frame.top += (METRIC_LISTBOXENTRYHEIGHT + 2);
-				if (scrollbar != NIL)				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
+				if (header != NIL && !(flags & LF_HIDEHEADER))	frame.top += 17;
+				if (scrollbar != NIL)				frame.right -= 17;
 
 				if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
 				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-				if (header != NIL && !(flags & LF_HIDEHEADER))	frame.top -= (METRIC_LISTBOXENTRYHEIGHT + 2);
-				if (scrollbar != NIL)				frame.right += (METRIC_LISTBOXSBOFFSET + 1);
+				if (header != NIL && !(flags & LF_HIDEHEADER))	frame.top -= 17;
+				if (scrollbar != NIL)				frame.right += 17;
 
 				surface->Frame(frame, FRAME_DOWN);
 			}
@@ -310,30 +301,24 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			maxFrameY = frame.bottom - 1;
 
 			frame.left++;
-			frame.top = frame.top + 1 + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
+			frame.top = frame.top + 1 + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
 			frame.right--;
-			frame.bottom = frame.top + METRIC_LISTBOXENTRYHEIGHT;
+			frame.bottom = frame.top + 15;
 
 			frame.bottom = min(frame.bottom, maxFrameY);
 
-			if (METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1) + 4 > objectProperties->size.cy && !(flags & LF_HIDESCROLLBAR))
+			if (15 * GetNOfEntries() + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16) + 4 > objectProperties->size.cy && !(flags & LF_HIDESCROLLBAR))
 			{
 				if (scrollbar == NIL)
 				{
-					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET;
+					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - 16;
 					sbp.y = frame.top - layer->GetObjectProperties()->pos.y;
 					sbs.cx = 0;
-					sbs.cy = objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
+					sbs.cy = objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
 
-					oldMeasurement = Setup::FontSize;
-
-					SetMeasurement(SMT_PIXELS);
-
-					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
 
 					scrollbar->onClick.Connect(&ListBox::ScrollbarProc, this);
-
-					Setup::FontSize = oldMeasurement;
 
 					layer->RegisterObject(scrollbar);
 
@@ -341,17 +326,17 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 				else
 				{
-					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET;
+					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - 16;
 					sbp.y = frame.top - layer->GetObjectProperties()->pos.y;
-					sbs.cy = objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
+					sbs.cy = objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
 
 					scrollbar->GetObjectProperties()->pos = sbp;
 					scrollbar->GetObjectProperties()->size.cy = sbs.cy;
 
-					scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
 				}
 
-				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
+				frame.right -= 17;
 			}
 			else
 			{
@@ -435,12 +420,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 							}
 						}
 
-						frame.left += (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
-						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
+						frame.left += (2 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
+						frame.top += 2;
 						frame.right -= 2;
+
 						DrawEntryText(operat->name, frame, operat->font.GetColor());
-						frame.left -= (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
-						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
+
+						frame.left -= (2 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
+						frame.top -= 2;
 						frame.right += 2;
 					}
 
@@ -453,8 +440,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 						operat->rect.bottom--;
 					}
 
-					frame.top += METRIC_LISTBOXENTRYHEIGHT;
-					frame.bottom += METRIC_LISTBOXENTRYHEIGHT;
+					frame.top += 15;
+					frame.bottom += 15;
 
 					frame.top = (Int) Math::Min(frame.top, maxFrameY);
 					frame.bottom = (Int) Math::Min(frame.bottom, maxFrameY);
@@ -932,7 +919,7 @@ S::Int S::GUI::ListBox::ScrollUp(Int nLines)
 S::Int S::GUI::ListBox::ScrollDown(Int nLines)
 {
 	scrollbarPos += nLines;
-	scrollbarPos = (Int) Math::Min(scrollbarPos, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
+	scrollbarPos = (Int) Math::Min(scrollbarPos, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
 
 	if (scrollbar != NIL) scrollbar->Paint(SP_PAINT);
 

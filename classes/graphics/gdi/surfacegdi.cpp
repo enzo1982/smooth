@@ -14,6 +14,8 @@
 #include <smooth/color.h>
 #include <smooth/misc/math.h>
 
+#include <fribidi.h>
+
 S::GUI::SurfaceBackend *CreateSurfaceGDI(S::Void *iSurface)
 {
 	return new S::GUI::SurfaceGDI(iSurface);
@@ -28,32 +30,41 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iDc)
 	gdi_dc = (HDC) iDc;
 	real_dc = (HDC) iDc;
 
-	size.cx	= GetDeviceCaps(gdi_dc, HORZRES) + 2;
-	size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
+	bmp_dc = NIL;
+	cDc_bitmap = NIL;
 
-	bmp_dc = CreateCompatibleDC(gdi_dc);
+	if (gdi_dc != NIL)
+	{
+		size.cx	= GetDeviceCaps(gdi_dc, HORZRES) + 2;
+		size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 
-	HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
-	Bitmap	 bmpGDI(bitmap);
+		bmp_dc = CreateCompatibleDC(gdi_dc);
 
-	BlitToBitmap(Rect(Point(0, 0), size), bmpGDI, Rect(Point(0, 0), size));
+		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
+		Bitmap	 bmpGDI(bitmap);
 
-	cDc_bitmap = (HBITMAP) SelectObject(bmp_dc, bitmap);
+		BlitToBitmap(Rect(Point(0, 0), size), bmpGDI, Rect(Point(0, 0), size));
+
+		cDc_bitmap = (HBITMAP) SelectObject(bmp_dc, bitmap);
+	}
 }
 
 S::GUI::SurfaceGDI::~SurfaceGDI()
 {
-	HBITMAP	 bitmap = (HBITMAP) SelectObject(bmp_dc, cDc_bitmap);
+	if (bmp_dc != NIL && cDc_bitmap != NIL)
+	{
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(bmp_dc, cDc_bitmap);
 
-	DeleteDC(bmp_dc);
-	::DeleteObject(bitmap);
+		DeleteDC(bmp_dc);
+		::DeleteObject(bitmap);
+	}
 }
 
 S::Int S::GUI::SurfaceGDI::PaintRect(Rect pRect)
 {
 	if (painting) return Error;
 
-	BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, bmp_dc, pRect.left, pRect.top, SRCCOPY);
+	if (gdi_dc != NIL) BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, bmp_dc, pRect.left, pRect.top, SRCCOPY);
 
 	return Success;
 }
@@ -74,7 +85,7 @@ S::Int S::GUI::SurfaceGDI::StartPaint(Rect pRect)
 
 	if (!painting)
 	{
-		gdi_dc = CreateCompatibleDC(real_dc);
+		if (real_dc != NIL) gdi_dc = CreateCompatibleDC(real_dc);
 	}
 
 	painting++;
@@ -90,7 +101,7 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 
 	if (painting == 0)
 	{
-		DeleteDC(gdi_dc);
+		if (gdi_dc != NIL) DeleteDC(gdi_dc);
 
 		gdi_dc = real_dc;
 
@@ -113,6 +124,8 @@ S::Void *S::GUI::SurfaceGDI::GetSystemSurface()
 
 S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 {
+	if (gdi_dc == NIL) return Success;
+
 	::SetPixel(gdi_dc, TranslateX(x), y, color);
 	::SetPixel(bmp_dc, TranslateX(x), y, color);
 
@@ -121,11 +134,15 @@ S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 
 S::Int S::GUI::SurfaceGDI::GetPixel(Int x, Int y)
 {
+	if (gdi_dc == NIL) return 0;
+
 	return ::GetPixel(gdi_dc, TranslateX(x), y);
 }
 
 S::Int S::GUI::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
 {
+	if (gdi_dc == NIL) return Success;
+
 	HPEN	 hPen = CreatePen(PS_SOLID, 1, color);
 	HPEN	 hOldPen = (HPEN) SelectObject(gdi_dc, hPen);
 
@@ -151,6 +168,8 @@ S::Int S::GUI::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
 
 S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 {
+	if (gdi_dc == NIL) return Success;
+
 	rect = TranslateRect(rect);
 
 	HBRUSH	 brush = CreateSolidBrush(color);
@@ -235,6 +254,8 @@ S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 
 S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font, Bool shadow)
 {
+	if (gdi_dc == NIL)	return Success;
+
 	if (string == NIL)	return Error;
 	if (shadow)		return SurfaceBackend::SetText(string, rect, font, shadow);
 
@@ -264,6 +285,8 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font, Bool sha
 
 	for (Int i = 0; i < lines; i++)
 	{
+		Bool	 rtlCharacters = False;
+
 		origoffset = offset;
 
 		for (int j = 0; j <= txtsize; j++)
@@ -284,32 +307,80 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font, Bool sha
 			{
 				offset++;
 				line[j] = string[j + origoffset];
+
+				if (line[j] >= 0x0590 && line[j] <= 0x07BF) rtlCharacters = True;
 			}
 		}
 
 		RECT	 Rect = TranslateRect(rect);
-		Bool	 rtl = False;
 
-		if (Setup::rightToLeft)
+		if (Setup::rightToLeft) Rect.right--;
+
+		if (rtlCharacters && Setup::useIconv)
 		{
-			for (Int j = 0; j < line.Length(); j++)
-			{
-				if (line[j] > 127)
-				{
-					rtl = True;
-					break;
-				}
-			}
+			/*	Reorder the string with fribidi, then
+				ligate using GetCharacterPlacement and
+				display using the glyph indices.
+				This does not work with Kanji.	*/
 
-			Rect.right--;
-			Rect.left--;
+			unsigned long	*visual = new unsigned long [line.Length() + 1];
+			long		 type = FRIBIDI_TYPE_ON;
+
+			fribidi_log2vis((unsigned long *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, NIL, NIL, NIL);
+
+			line.ImportFrom("UCS-4LE", (char *) visual);
+
+			delete [] visual;
+
+			GCP_RESULTSA	 resultsa;
+			GCP_RESULTSW	 resultsw;
+			wchar_t		*glyphs = new wchar_t [line.Length() + 1];
+
+			ZeroMemory(&resultsa, sizeof(resultsa));
+			ZeroMemory(&resultsw, sizeof(resultsw));
+
+			resultsa.lStructSize = sizeof(resultsa);
+			resultsa.lpGlyphs = glyphs;
+			resultsa.nGlyphs = line.Length() + 1;
+
+			resultsw.lStructSize = sizeof(resultsw);
+			resultsw.lpGlyphs = glyphs;
+			resultsw.nGlyphs = line.Length() + 1;
+
+			ZeroMemory(glyphs, 2 * (line.Length() + 1));
+
+			if (Setup::rightToLeft)	SetTextAlign(gdi_dc, TA_RIGHT);
+			else			SetTextAlign(gdi_dc, TA_LEFT);
+
+			if (Setup::rightToLeft)	SetTextAlign(bmp_dc, TA_RIGHT);
+			else			SetTextAlign(bmp_dc, TA_LEFT);
+
+			if (Setup::enableUnicode)	GetCharacterPlacementW(gdi_dc, line, line.Length(), 0, &resultsw, GCP_GLYPHSHAPE | GCP_LIGATE);
+			else				GetCharacterPlacementA(gdi_dc, line, line.Length(), 0, &resultsa, GCP_GLYPHSHAPE | GCP_LIGATE);
+
+			if (Setup::enableUnicode)	ExtTextOutW(gdi_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
+			else				ExtTextOutA(gdi_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+
+			if (Setup::enableUnicode)	ExtTextOutW(bmp_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
+			else				ExtTextOutA(bmp_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+
+			delete [] glyphs;
 		}
+		else
+		{
+			/*	Let Windows do any reordering and ligating.
+				Works with Kanji, but RTL is only supported
+				on XP and later versions of Windows.	*/
 
-		if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtl ? DT_RTLREADING : 0), NIL);
-		else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtl ? DT_RTLREADING : 0), NIL);
+			SetTextAlign(gdi_dc, TA_LEFT);
+			SetTextAlign(bmp_dc, TA_LEFT);
 
-		if (Setup::enableUnicode)	DrawTextExW(bmp_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtl ? DT_RTLREADING : 0), NIL);
-		else				DrawTextExA(bmp_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtl ? DT_RTLREADING : 0), NIL);
+			if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+
+			if (Setup::enableUnicode)	DrawTextExW(bmp_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			else				DrawTextExA(bmp_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+		}
 
 		rect.top += height;
 	}
@@ -324,6 +395,8 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font, Bool sha
 
 S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, Rect srcRect, Rect destRect)
 {
+	if (gdi_dc == NIL) return Success;
+
 	Bitmap	 bitmap = oBitmap;
 
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
@@ -351,6 +424,8 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, Rect srcRect, R
 
 S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, const Bitmap &oBitmap, Rect destRect)
 {
+	if (gdi_dc == NIL) return Success;
+
 	Bitmap	 bitmap = oBitmap;
 
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);

@@ -12,7 +12,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/metrics.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/system/timer.h>
@@ -25,15 +24,19 @@ S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int ra
 {
 	type		= classID;
 	variable	= var;
+
 	button1Checked	= False;
 	button1Clicked	= False;
 	button2Checked	= False;
 	button2Clicked	= False;
 	button3Checked	= False;
 	button3Clicked	= False;
+
 	subtype		= subType;
+
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
+
 	timerActive	= False;
 	timer		= NIL;
 
@@ -61,6 +64,15 @@ S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int ra
 S::GUI::Scrollbar::~Scrollbar()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+
+	if (timer != NIL)
+	{
+		timer->Stop();
+
+		DeleteObject(timer);
+
+		timer = NIL;
+	}
 }
 
 S::Int S::GUI::Scrollbar::Paint(Int message)

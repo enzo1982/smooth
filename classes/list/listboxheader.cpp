@@ -14,7 +14,6 @@
 #include <smooth/window/window.h>
 #include <smooth/layer.h>
 #include <smooth/objectproperties.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/event.h>
 
@@ -69,7 +68,7 @@ S::Int S::GUI::ListBoxHeader::UpdateMetrics()
 	objectProperties->pos.y = listBox->GetObjectProperties()->pos.y + 1;
 
 	objectProperties->size.cx = listBox->GetObjectProperties()->size.cx - 3;
-	objectProperties->size.cy = METRIC_LISTBOXENTRYHEIGHT;
+	objectProperties->size.cy = 15;
 
 	Int	 varSizeTabs = 0;
 	Int	 sumFixedTabSizes = 0;

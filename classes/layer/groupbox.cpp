@@ -11,7 +11,6 @@
 #include <smooth/groupbox.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -67,7 +66,7 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 	surface->Frame(frame, FRAME_UP);
 
 	textRect.left	= frame.left + 9;
-	textRect.top	= frame.top - METRIC_GBTEXTOFFSETY;
+	textRect.top	= frame.top - 7;
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
 	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
@@ -96,7 +95,7 @@ S::Int S::GUI::GroupBox::Activate()
 	Point	 realPos = GetRealPosition();
 
 	textRect.left	= realPos.x + 10;
-	textRect.top	= realPos.y - METRIC_GBTEXTOFFSETY + 1;
+	textRect.top	= realPos.y - 6;
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
 	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
@@ -121,7 +120,7 @@ S::Int S::GUI::GroupBox::Deactivate()
 	Point	 realPos = GetRealPosition();
 
 	textRect.left	= realPos.x + 10;
-	textRect.top	= realPos.y - METRIC_GBTEXTOFFSETY + 1;
+	textRect.top	= realPos.y - 6;
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
 	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
@@ -155,7 +154,7 @@ S::Int S::GUI::GroupBox::Hide()
 		Surface	*surface = myContainer->GetDrawSurface();
 
 		rect.left	= realPos.x + 10;
-		rect.top	= realPos.y - METRIC_GBTEXTOFFSETY + 1;
+		rect.top	= realPos.y - 6;
 		rect.right	= rect.left + objectProperties->textSize.cx + 3;
 		rect.bottom	= rect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 

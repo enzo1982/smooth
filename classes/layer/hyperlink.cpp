@@ -11,7 +11,6 @@
 #include <smooth/hyperlink.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/color.h>
 #include <smooth/objectproperties.h>
@@ -181,7 +180,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 			{
 				if (Setup::enableUnicode)	LiSAOpenURLW(linkURL);
 				else				LiSAOpenURLA(linkURL);
-
+
 				wnd->Process(SM_MOUSEMOVE, 0, 0);
 
 				retVal = Break;

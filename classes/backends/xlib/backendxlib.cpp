@@ -28,6 +28,8 @@ S::Int S::Backends::BackendXLib::Init()
 {
 	display = XOpenDisplay(NIL);
 
+	Setup::FontSize = 1.00;
+
 	return Success;
 }
 

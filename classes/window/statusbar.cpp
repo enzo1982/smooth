@@ -10,7 +10,6 @@
 
 #include <smooth/window/statusbar.h>
 #include <smooth/window/window.h>
-#include <smooth/metrics.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 
@@ -21,7 +20,7 @@ S::GUI::Statusbar::Statusbar(String status)
 	type				= classID;
 	objectProperties->text		= status;
 	objectProperties->orientation	= OR_BOTTOM;
-	objectProperties->size.cy	= METRIC_STATUSBARHEIGHT;
+	objectProperties->size.cy	= 16;
 
 	possibleContainers.AddEntry(Window::classID);
 }
@@ -39,8 +38,8 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	Surface	*surface = myContainer->GetDrawSurface();
 	Rect	 textRect;
 
-	textRect.left	= objectProperties->pos.x + METRIC_SBTEXTOFFSETX;
-	textRect.top	= objectProperties->pos.y + METRIC_SBTEXTOFFSETY;
+	textRect.left	= objectProperties->pos.x + 4;
+	textRect.top	= objectProperties->pos.y + 1;
 	textRect.right	= objectProperties->pos.x + objectProperties->size.cx;
 	textRect.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 
@@ -60,8 +59,8 @@ S::Int S::GUI::Statusbar::SetText(String newStatus)
 	Surface	*surface = myContainer->GetDrawSurface();
 	Rect	 textRect;
 
-	textRect.left	= objectProperties->pos.x + METRIC_SBTEXTOFFSETX;
-	textRect.top	= objectProperties->pos.y + METRIC_SBTEXTOFFSETY;
+	textRect.left	= objectProperties->pos.x + 4;
+	textRect.top	= objectProperties->pos.y + 1;
 	textRect.right	= objectProperties->pos.x + objectProperties->size.cx;
 	textRect.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 

@@ -12,7 +12,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/metrics.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/graphics/surface.h>
@@ -35,19 +34,17 @@ S::GUI::Slider::Slider(Point pos, Size size, Int subType, Int *var, Int rangeSta
 	if (*variable < startValue)	*variable = startValue;
 	else if (*variable > endValue)	*variable = endValue;
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
-	if (size.cx == 0) size.cx = size.cy;
-	if (size.cy == 0) size.cy = size.cx;
+	if (objectProperties->size.cx == 0) objectProperties->size.cx = objectProperties->size.cy;
+	if (objectProperties->size.cy == 0) objectProperties->size.cy = objectProperties->size.cx;
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(100 * Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(100 * Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+	if (objectProperties->size.cx == 0) objectProperties->size.cx = 100;
+	if (objectProperties->size.cy == 0) objectProperties->size.cy = 100;
 
-	if (subType == OR_HORZ)	objectProperties->size.cy = METRIC_SLIDERAREAHEIGHT;
-	else			objectProperties->size.cx = METRIC_SLIDERAREAHEIGHT;
+	if (subType == OR_HORZ)	objectProperties->size.cy = 18;
+	else			objectProperties->size.cx = 18;
 }
 
 S::GUI::Slider::~Slider()
@@ -70,17 +67,17 @@ S::Int S::GUI::Slider::Paint(Int message)
 	{
 		if (subtype == OR_HORZ)
 		{
-			sliderRect.left		= realPos.x + (Int) (((Float) (objectProperties->size.cx - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (prevValue - startValue)));
+			sliderRect.left		= realPos.x + (Int) (((Float) (objectProperties->size.cx - 9)) / ((Float) (endValue - startValue)) * ((Float) (prevValue - startValue)));
 			sliderRect.top		= realPos.y;
-			sliderRect.right	= sliderRect.left + METRIC_SLIDERAREAWIDTH;
-			sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAHEIGHT;
+			sliderRect.right	= sliderRect.left + 9;
+			sliderRect.bottom	= sliderRect.top + 18;
 		}
 		else
 		{
 			sliderRect.left		= realPos.x;
-			sliderRect.top		= realPos.y + (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH) - (Int) (((Float) (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (prevValue - startValue)));
-			sliderRect.right	= sliderRect.left + METRIC_SLIDERAREAHEIGHT;
-			sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAWIDTH + 1;
+			sliderRect.top		= realPos.y + (objectProperties->size.cy - 9) - (Int) (((Float) (objectProperties->size.cy - 9)) / ((Float) (endValue - startValue)) * ((Float) (prevValue - startValue)));
+			sliderRect.right	= sliderRect.left + 18;
+			sliderRect.bottom	= sliderRect.top + 10;
 		}
 
 		surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
@@ -88,9 +85,9 @@ S::Int S::GUI::Slider::Paint(Int message)
 
 	if (subtype == OR_HORZ)
 	{
-		lineStart.x = realPos.x + METRIC_SLIDERAREAOFFSETX;
-		lineStart.y = realPos.y + METRIC_SLIDERAREAOFFSETY;
-		lineEnd.x = realPos.x + objectProperties->size.cx - METRIC_SLIDERAREAOFFSETX;
+		lineStart.x = realPos.x + 4;
+		lineStart.y = realPos.y + 8;
+		lineEnd.x = realPos.x + objectProperties->size.cx - 4;
 		lineEnd.y = lineStart.y;
 
 		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
@@ -102,10 +99,10 @@ S::Int S::GUI::Slider::Paint(Int message)
 
 		surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
 
-		sliderRect.left		= realPos.x + (Int) (((Float) (objectProperties->size.cx - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		sliderRect.left		= realPos.x + (Int) (((Float) (objectProperties->size.cx - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		sliderRect.top		= realPos.y;
-		sliderRect.right	= sliderRect.left + METRIC_SLIDERAREAWIDTH - 1;
-		sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAHEIGHT - 2;
+		sliderRect.right	= sliderRect.left + 8;
+		sliderRect.bottom	= sliderRect.top + 16;
 
 		if (!objectProperties->clicked)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
 		else				surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
@@ -114,10 +111,10 @@ S::Int S::GUI::Slider::Paint(Int message)
 	}
 	else
 	{
-		lineStart.x = realPos.x + METRIC_SLIDERAREAOFFSETY;
-		lineStart.y = realPos.y + METRIC_SLIDERAREAOFFSETX;
+		lineStart.x = realPos.x + 8;
+		lineStart.y = realPos.y + 4;
 		lineEnd.x = lineStart.x;
-		lineEnd.y = realPos.y + objectProperties->size.cy - METRIC_SLIDERAREAOFFSETX;
+		lineEnd.y = realPos.y + objectProperties->size.cy - 4;
 
 		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
@@ -129,9 +126,9 @@ S::Int S::GUI::Slider::Paint(Int message)
 		surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
 
 		sliderRect.left		= realPos.x;
-		sliderRect.top		= realPos.y + (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH) - (Int) (((Float) (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-		sliderRect.right	= sliderRect.left + METRIC_SLIDERAREAHEIGHT - 1;
-		sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAWIDTH;
+		sliderRect.top		= realPos.y + (objectProperties->size.cy - 9) - (Int) (((Float) (objectProperties->size.cy - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		sliderRect.right	= sliderRect.left + 17;
+		sliderRect.bottom	= sliderRect.top + 9;
 
 		if (!objectProperties->clicked)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
 		else				surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
@@ -165,27 +162,27 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 
 	if (subtype == OR_HORZ)
 	{
-		slider.left	= realPos.x + (Int) (((Float) (objectProperties->size.cx - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		slider.left	= realPos.x + (Int) (((Float) (objectProperties->size.cx - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		slider.top	= realPos.y;
-		slider.right	= slider.left + METRIC_SLIDERAREAWIDTH - 1;
-		slider.bottom	= slider.top + METRIC_SLIDERAREAHEIGHT - 2;
+		slider.right	= slider.left + 8;
+		slider.bottom	= slider.top + 16;
 
-		actionArea.left		= realPos.x + METRIC_SLIDERAREAOFFSETX;
+		actionArea.left		= realPos.x + 4;
 		actionArea.top		= realPos.y;
-		actionArea.right	= actionArea.left + objectProperties->size.cx - METRIC_SLIDERAREAWIDTH;
-		actionArea.bottom	= actionArea.top + METRIC_SLIDERAREAHEIGHT - 2;
+		actionArea.right	= actionArea.left + objectProperties->size.cx - 9;
+		actionArea.bottom	= actionArea.top + 16;
 	}
 	else
 	{
 		slider.left	= realPos.x;
-		slider.top	= realPos.y + (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH) - (Int) (((Float) (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-		slider.right	= slider.left + METRIC_SLIDERAREAHEIGHT - 1;
-		slider.bottom	= slider.top + METRIC_SLIDERAREAWIDTH;
+		slider.top	= realPos.y + (objectProperties->size.cy - 9) - (Int) (((Float) (objectProperties->size.cy - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+		slider.right	= slider.left + 17;
+		slider.bottom	= slider.top + 9;
 
 		actionArea.left		= realPos.x;
-		actionArea.top		= realPos.y + METRIC_SLIDERAREAOFFSETX;
-		actionArea.right	= actionArea.left + METRIC_SLIDERAREAHEIGHT - 1;
-		actionArea.bottom	= actionArea.top + objectProperties->size.cy - METRIC_SLIDERAREAWIDTH;
+		actionArea.top		= realPos.y + 4;
+		actionArea.right	= actionArea.left + 17;
+		actionArea.bottom	= actionArea.top + objectProperties->size.cy - 9;
 	}
 
 	switch (message)
@@ -201,8 +198,8 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 				slider.left--;
 				slider.top--;
 
-				if (subtype == OR_HORZ)	mouseBias = (slider.left + METRIC_SLIDERAREAOFFSETX) - wnd->MouseX();
-				else			mouseBias = (slider.top + METRIC_SLIDERAREAOFFSETX) - wnd->MouseY();
+				if (subtype == OR_HORZ)	mouseBias = (slider.left + 4) - wnd->MouseX();
+				else			mouseBias = (slider.top + 4) - wnd->MouseY();
 
 				retVal = Break;
 			}
@@ -240,7 +237,7 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 			{
 				if (subtype == OR_HORZ)
 				{
-					buffer = ((Float) (endValue - startValue)) / (((Float) (objectProperties->size.cx - METRIC_SLIDERAREAWIDTH)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + METRIC_SLIDERAREAOFFSETX))));
+					buffer = ((Float) (endValue - startValue)) / (((Float) (objectProperties->size.cx - 9)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + 4))));
 
 					*variable = startValue + Math::Round(buffer);
 
@@ -249,7 +246,7 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 				}
 				else
 				{
-					buffer = ((Float) (endValue - startValue)) / (((Float) (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + METRIC_SLIDERAREAOFFSETX))));
+					buffer = ((Float) (endValue - startValue)) / (((Float) (objectProperties->size.cy - 9)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + 4))));
 
 					*variable = endValue - Math::Round(buffer);
 

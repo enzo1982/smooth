@@ -593,11 +593,6 @@ $(OBJECTDIR)/loop.o: $(MISCDIR)/loop.cpp $(SMOOTHINCLUDEDIR)/loop.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/loop.cpp -o $(OBJECTDIR)/loop.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/metrics.o: $(MISCDIR)/metrics.cpp $(SMOOTHINCLUDEDIR)/metrics.h
-	$(ECHO) -n Compiling $(MISCDIR)/metrics.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/metrics.cpp -o $(OBJECTDIR)/metrics.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/pciio.o: $(MISCDIR)/pciio.cpp $(SMOOTHINCLUDEDIR)/pciio.h
 	$(ECHO) -n Compiling $(MISCDIR)/pciio.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/pciio.cpp -o $(OBJECTDIR)/pciio.o
@@ -631,6 +626,36 @@ $(OBJECTDIR)/translator_translator.o: $(TRANSLATORDIR)/translator.cpp $(DLLNAME)
 $(OBJECTDIR)/translator_resources.o: $(TRANSLATORDIR)/translator.rc
 	$(ECHO) -n Compiling $(TRANSLATORDIR)/translator.rc...
 	$(RESCOMP) $(RESCOMP_OPTS) $(TRANSLATORDIR)/translator.rc -o $(OBJECTDIR)/translator_resources.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fribidi_fribidi.o: $(FRIBIDIDIR)/fribidi.c
+	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi.c...
+	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi.c -o $(OBJECTDIR)/fribidi_fribidi.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fribidi_char_type.o: $(FRIBIDIDIR)/fribidi_char_type.c
+	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_char_type.c...
+	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_char_type.c -o $(OBJECTDIR)/fribidi_char_type.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fribidi_mem.o: $(FRIBIDIDIR)/fribidi_mem.c
+	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_mem.c...
+	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_mem.c -o $(OBJECTDIR)/fribidi_mem.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fribidi_mirroring.o: $(FRIBIDIDIR)/fribidi_mirroring.c
+	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_mirroring.c...
+	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_mirroring.c -o $(OBJECTDIR)/fribidi_mirroring.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fribidi_types.o: $(FRIBIDIDIR)/fribidi_types.c
+	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_types.c...
+	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_types.c -o $(OBJECTDIR)/fribidi_types.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fribidi_utils.o: $(FRIBIDIDIR)/fribidi_utils.c
+	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_utils.c...
+	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_utils.c -o $(OBJECTDIR)/fribidi_utils.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/iolib_instream.o: $(IOLIBDIR)/instream.cpp $(INCLUDEDIR)/iolib/instream-cxx.h

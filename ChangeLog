@@ -7,7 +7,9 @@ xx.xx.04 xx:xx - smooth alpha 0.8.65.0
 - window.cpp	- windows can now be shown minimized initially
 
 - added auto registration for backends (just compile and link any new backends to use them; no need to change existing code)
+- added the fribidi library to support RTL scripts on all systems
 - improved smooth Translator utility
+- removed large fonts support; it will be reimplemented using the same technology which is used for RTL support
 - added an SDL threads backend
 
 11.03.04 15:42 - smooth alpha 0.8.64.0

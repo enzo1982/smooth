@@ -15,7 +15,6 @@
 #include <smooth/loop.h>
 #include <smooth/button.h>
 #include <smooth/layer.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
@@ -72,7 +71,6 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 	Point	 bpos;
 	Size	 bsize;
 	int	 titlesize = 0;
-	double	 oldmeasurement;
 	Int	 buttonWidth = Math::Round(80 * Setup::FontSize);
 	Int	 buttonHeight = Math::Round(22 * Setup::FontSize);
 
@@ -143,10 +141,6 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 	bpos.y = 14 + buttonHeight;
 	bsize.cy = 0;
 	bsize.cx = 0;
-
-	oldmeasurement = Setup::FontSize;
-
-	SetMeasurement(SMT_PIXELS);
 
 	switch (buttons)
 	{
@@ -251,8 +245,6 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 
 		lay->RegisterObject(checkbox);
 	}
-
-	Setup::FontSize = oldmeasurement;
 
 	msgbox->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - msgbox->GetObjectProperties()->size.cx) / 2 + (nOfMessageBoxes - 1) * 25;
 	msgbox->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - msgbox->GetObjectProperties()->size.cy) / 2 + (nOfMessageBoxes - 1) * 25;

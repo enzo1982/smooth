@@ -19,7 +19,6 @@
 #include <smooth/window/divider.h>
 #include <smooth/layer.h>
 #include <smooth/objectmanager.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/toolwindow.h>
 #include <smooth/system/timer.h>
@@ -592,7 +591,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				objectProperties->size.cx	= wndpos->cx;
 				objectProperties->size.cy	= wndpos->cy;
 
-				drawSurface->SetSize(objectProperties->size);
+				GetDrawSurface()->SetSize(objectProperties->size);
 
 				if (resized)
 				{
@@ -817,7 +816,7 @@ S::Int S::GUI::Window::Paint(Int message)
 						doublebar2.x = objectProperties->size.cx - 4;
 						doublebar2.y = doublebar1.y;
 
-						if (icon != NIL) doublebar1.x += METRIC_TITLEBARHEIGHT - 2;
+						if (icon != NIL) doublebar1.x += 17;
 						if (Setup::rightToLeft) doublebar1.x++;
 
 						surface->Bar(doublebar1, doublebar2, OR_HORZ);

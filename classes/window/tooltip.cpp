@@ -12,7 +12,6 @@
 #include <smooth/window/tooltip.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/i18n.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
@@ -67,7 +66,6 @@ S::Int S::GUI::Tooltip::Show()
 
 	if (wnd == NIL) return Success;
 
-	Float	 measurement = Setup::FontSize;
 	Rect	 wndRect;
 
 	wndRect.left	= 0;
@@ -78,8 +76,6 @@ S::Int S::GUI::Tooltip::Show()
 
 	wndRect.right	= font.GetTextSizeX(objectProperties->text) + 6;
 
-	SetMeasurement(SMT_PIXELS);
-
 	toolWindow = new ToolWindow();
 
 	toolWindow->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y - wndRect.bottom), Size(wndRect.right, wndRect.bottom));
@@ -87,8 +83,6 @@ S::Int S::GUI::Tooltip::Show()
 	toolWindow->onPaint.Connect(&Tooltip::DrawTooltip, this);
 
 	wnd->RegisterObject(toolWindow);
-
-	Setup::FontSize = measurement;
 
 	if (timeOut != 0)
 	{

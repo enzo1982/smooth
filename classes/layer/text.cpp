@@ -11,7 +11,6 @@
 #include <smooth/text.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>

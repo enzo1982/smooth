@@ -13,7 +13,6 @@
 #include <smooth/object.h>
 #include <smooth/window/divider.h>
 #include <smooth/definitions.h>
-#include <smooth/metrics.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
 #include <smooth/objectproperties.h>

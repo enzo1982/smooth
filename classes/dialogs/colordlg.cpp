@@ -20,7 +20,6 @@
 #include <smooth/text.h>
 #include <smooth/editbox.h>
 #include <smooth/misc/string.h>
-#include <smooth/metrics.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>

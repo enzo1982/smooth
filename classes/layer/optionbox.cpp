@@ -12,7 +12,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -35,13 +34,11 @@ S::GUI::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iC
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(16 * Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+	if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
+	if (objectProperties->size.cy == 0) objectProperties->size.cy = 16;
 
 	GetTextSize();
 }
@@ -66,8 +63,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	if (active)	lightColor = Setup::ClientColor;
 	else		lightColor = Setup::BackgroundColor;
 
-	lineStart.x = realPos.x + METRIC_OPTBOXOFFSETXY + 3;
-	lineStart.y = realPos.y + METRIC_OPTBOXOFFSETXY;
+	lineStart.x = realPos.x + 6;
+	lineStart.y = realPos.y + 3;
 	lineEnd.x = lineStart.x + 5;
 	lineEnd.y = lineStart.y;
 
@@ -171,8 +168,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 	}
 
-	textRect.left	= realPos.x + METRIC_OPTBOXOFFSETXY + 14;
-	textRect.top	= realPos.y + METRIC_OPTBOXOFFSETXY - METRIC_OPTBOXTEXTOFFSETY;
+	textRect.left	= realPos.x + 17;
+	textRect.top	= realPos.y + 4;
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 
@@ -309,8 +306,8 @@ S::Int S::GUI::OptionBox::SetText(String newText)
 	Point	 realPos = GetRealPosition();
 	Rect	 textRect;
 
-	textRect.left	= realPos.x + METRIC_OPTBOXOFFSETXY + 14;
-	textRect.top	= realPos.y + METRIC_OPTBOXOFFSETXY - METRIC_OPTBOXTEXTOFFSETY;
+	textRect.left	= realPos.x + 17;
+	textRect.top	= realPos.y + 4;
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 

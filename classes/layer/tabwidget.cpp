@@ -11,7 +11,6 @@
 #include <smooth/tabwidget.h>
 #include <smooth/definitions.h>
 #include <smooth/layer.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
@@ -28,13 +27,11 @@ S::GUI::TabWidget::TabWidget(Point pos, Size size)
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(100 * Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+	if (objectProperties->size.cx == 0) objectProperties->size.cx = 120;
+	if (objectProperties->size.cy == 0) objectProperties->size.cy = 100;
 }
 
 S::GUI::TabWidget::~TabWidget()
@@ -67,9 +64,9 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 			object->SetContainer(myContainer->GetContainerObject()->GetContainer());
 
 			object->GetObjectProperties()->pos.x = realPos.x;
-			object->GetObjectProperties()->pos.y = realPos.y + METRIC_REGISTEROFFSETY;
+			object->GetObjectProperties()->pos.y = realPos.y + 19;
 			object->GetObjectProperties()->size.cx = objectProperties->size.cx;
-			object->GetObjectProperties()->size.cy = objectProperties->size.cy - METRIC_REGISTEROFFSETY;
+			object->GetObjectProperties()->size.cy = objectProperties->size.cy - 19;
 		}
 	}
 
@@ -80,12 +77,12 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 	frame.right	= realPos.x + objectProperties->size.cx;
 	frame.bottom	= realPos.y + objectProperties->size.cy;
 
-	frame.top += METRIC_REGISTEROFFSETY;
+	frame.top += 19;
 	surface->Frame(frame, FRAME_UP);
-	frame.top -= METRIC_REGISTEROFFSETY;
+	frame.top -= 19;
 
 	frame.right	= frame.left;
-	frame.bottom	= frame.top + METRIC_REGISTEROFFSETY;
+	frame.bottom	= frame.top + 19;
 
 	for (Int j = 0; j < GetNOfObjects(); j++)
 	{
@@ -96,14 +93,14 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 		if (object != NIL)
 		{
 			object->GetObjectProperties()->pos.x = realPos.x + 2;
-			object->GetObjectProperties()->pos.y = realPos.y + METRIC_REGISTEROFFSETY + 2;
+			object->GetObjectProperties()->pos.y = realPos.y + 21;
 			object->GetObjectProperties()->size.cx = objectProperties->size.cx - 3;
-			object->GetObjectProperties()->size.cy = objectProperties->size.cy - METRIC_REGISTEROFFSETY - 3;
+			object->GetObjectProperties()->size.cy = objectProperties->size.cy - 22;
 
 			if (object->IsVisible())
 			{
 				frame.left = frame.right;
-				frame.right = frame.left + textSize.GetEntry(object->handle) + 2 * METRIC_REGISTERTEXTOFFSETX - 1;
+				frame.right = frame.left + textSize.GetEntry(object->handle) + 13;
 
 				surface->Frame(frame, FRAME_UP);
 
@@ -130,8 +127,8 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 				if (Setup::rightToLeft) { frame.left--; frame.right--; }
 
-				textrect.left	= frame.left + METRIC_REGISTERTEXTOFFSETX;
-				textrect.top	= frame.top + METRIC_REGISTERTEXTOFFSETY;
+				textrect.left	= frame.left + 7;
+				textrect.top	= frame.top + 2;
 				textrect.right	= textrect.left + textSize.GetEntry(object->handle);
 				textrect.bottom	= textrect.top + 20;
 
@@ -146,7 +143,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 				frame.top++;
 				frame.left = frame.right + 1;
 
-				frame.right = frame.left + textSize.GetEntry(object->handle) + 2 * METRIC_REGISTERTEXTOFFSETX - 3;
+				frame.right = frame.left + textSize.GetEntry(object->handle) + 11;
 
 				if (j > 0) if (prev->IsVisible()) frame.left++;
 
@@ -198,8 +195,8 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 				if (Setup::rightToLeft) { frame.left--; frame.right--; }
 
-				textrect.left	= frame.left + METRIC_REGISTERTEXTOFFSETX - 1;
-				textrect.top	= frame.top + METRIC_REGISTERTEXTOFFSETY;
+				textrect.left	= frame.left + 6;
+				textrect.top	= frame.top + 2;
 				textrect.right	= textrect.left + textSize.GetEntry(object->handle);
 				textrect.bottom	= textrect.top + 20;
 
@@ -234,7 +231,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 	frame.top	= realPos.y;
 	frame.right	= realPos.x;
-	frame.bottom	= realPos.y + METRIC_REGISTEROFFSETY;
+	frame.bottom	= realPos.y + 19;
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -243,9 +240,9 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 		object->SetContainer(myContainer->GetContainerObject()->GetContainer());
 
 		object->GetObjectProperties()->pos.x = realPos.x + 2;
-		object->GetObjectProperties()->pos.y = realPos.y + METRIC_REGISTEROFFSETY + 2;
+		object->GetObjectProperties()->pos.y = realPos.y + 21;
 		object->GetObjectProperties()->size.cx = objectProperties->size.cx - 3;
-		object->GetObjectProperties()->size.cy = objectProperties->size.cy - METRIC_REGISTEROFFSETY - 3;
+		object->GetObjectProperties()->size.cy = objectProperties->size.cy - 22;
 
 		if (object->IsVisible())
 		{
@@ -269,7 +266,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 						if (i == 0) frame.left--;
 
-						frame.right = frame.left + textSize.GetEntry(object->handle) + 2 * METRIC_REGISTERTEXTOFFSETX - 2;
+						frame.right = frame.left + textSize.GetEntry(object->handle) + 12;
 
 						if (wnd->IsMouseOn(frame))
 						{
@@ -310,7 +307,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 					else
 					{
 						frame.left = frame.right;
-						frame.right = frame.left + textSize.GetEntry(object->handle) + 2 * METRIC_REGISTERTEXTOFFSETX - 2;
+						frame.right = frame.left + textSize.GetEntry(object->handle) + 12;
 					}
 				}
 			}

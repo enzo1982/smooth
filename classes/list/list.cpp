@@ -12,7 +12,6 @@
 #include <smooth/definitions.h>
 #include <smooth/array.h>
 #include <smooth/misc/i18n.h>
-#include <smooth/metrics.h>
 
 S::List::List()
 {

@@ -12,7 +12,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -32,13 +31,11 @@ S::GUI::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var)
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(16 * Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+	if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
+	if (objectProperties->size.cy == 0) objectProperties->size.cy = 16;
 
 	GetTextSize();
 }
@@ -62,8 +59,8 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	Int	 shadowColor;
 	Int	 crossColor;
 
-	frame.left	= realPos.x + METRIC_CHECKBOXOFFSETXY;
-	frame.top	= realPos.y + METRIC_CHECKBOXOFFSETXY;
+	frame.left	= realPos.x + 3;
+	frame.top	= realPos.y + 3;
 	frame.right	= frame.left + 10;
 	frame.bottom	= frame.top + 10;
 
@@ -171,7 +168,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	}
 
 	textRect.left	= frame.right + 4;
-	textRect.top	= frame.top - METRIC_CHECKBOXTEXTOFFSETY;
+	textRect.top	= frame.top - 1;
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 

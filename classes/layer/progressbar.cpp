@@ -13,7 +13,6 @@
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
 #include <smooth/misc/math.h>
-#include <smooth/metrics.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/color.h>
@@ -151,7 +150,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 		textSize = objectProperties->font.GetTextSizeX(objectProperties->text);
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
-		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
+		textRect.top	= realPos.y + 2;
 		textRect.bottom	= realPos.y + objectProperties->size.cy - 1;
 		textRect.right	= textRect.left + textSize;
 
@@ -222,7 +221,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 		textSize = objectProperties->font.GetTextSizeX(objectProperties->text);
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
-		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
+		textRect.top	= realPos.y + 2;
 		textRect.bottom	= realPos.y + objectProperties->size.cy - 1;
 		textRect.right	= textRect.left + textSize;
 
@@ -346,7 +345,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 		textSize = objectProperties->font.GetTextSizeX(objectProperties->text);
 
 		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
-		textRect.top	= realPos.y + METRIC_PBTEXTOFFSETY;
+		textRect.top	= realPos.y + 2;
 		textRect.bottom	= realPos.y + objectProperties->size.cy - 1;
 		textRect.right	= textRect.left + textSize;
 

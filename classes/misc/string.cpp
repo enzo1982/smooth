@@ -242,7 +242,28 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 {
 	Clean();
 
-	stringSize = ConvertString(str, strlen(str), format, NIL, 0, "UTF-16LE");
+	Int	 width = 1;
+
+	if	(strncmp(format, "UCS-4", 5)		== 0)	width = 4;
+	else if	(strncmp(format, "UCS-2", 5)		== 0)	width = 2;
+	else if	(strncmp(format, "UTF-32", 6)		== 0)	width = 4;
+	else if	(strncmp(format, "UTF-16", 6)		== 0)	width = 2;
+	else if	(strncmp(format, "CSUCS4", 6)		== 0)	width = 4;
+	else if	(strncmp(format, "ISO-10646-UCS-4", 15)	== 0)	width = 4;
+	else if	(strncmp(format, "ISO-10646-UCS-2", 15)	== 0)	width = 2;
+	else if	(strncmp(format, "UNICODELITTLE", 13)	== 0)	width = 2;
+	else if	(strncmp(format, "UNICODEBIG", 10)	== 0)	width = 2;
+	else if	(strncmp(format, "CSUNICODE", 9)	== 0)	width = 2;
+	else if	(strncmp(format, "UNICODE-1-1", 11)	== 0)	width = 2;
+	else if	(strncmp(format, "CSUNICODE11", 11)	== 0)	width = 2;
+
+	Int	 len = -1;
+
+	if (width == 1)		while (true) { if (((char  *) str)[++len] == 0) { len *= 1; break; } }
+	else if (width == 2)	while (true) { if (((short *) str)[++len] == 0) { len *= 2; break; } }
+	else if (width == 4)	while (true) { if (((long  *) str)[++len] == 0) { len *= 4; break; } }
+
+	stringSize = ConvertString(str, len, format, NIL, 0, "UTF-16LE");
 
 	if ((stringSize < 0) && (strcmp(format, "ISO-8859-1") != 0))
 	{
@@ -254,7 +275,7 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	wString = new wchar_t [stringSize];
 
-	ConvertString(str, strlen(str), format, (char *) wString, stringSize * 2, "UTF-16LE");
+	ConvertString(str, len, format, (char *) wString, stringSize * 2, "UTF-16LE");
 
 	wString[stringSize - 1] = 0;
 

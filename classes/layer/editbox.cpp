@@ -14,7 +14,6 @@
 #include <smooth/misc/i18n.h>
 #include <smooth/misc/binary.h>
 #include <smooth/misc/string.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -51,13 +50,11 @@ S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int iMaxSize)
 
 	if (maxSize <= 0) maxSize = 32768;
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+	if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
+	if (objectProperties->size.cy == 0) objectProperties->size.cy = 19;
 
 	onEnter.SetParentObject(this);
 }
@@ -107,12 +104,12 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			frame.right	= realPos.x + objectProperties->size.cx - 1;
 			frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-			if (scrollbar != NIL) frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
+			if (scrollbar != NIL) frame.right -= 17;
 
 			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
 			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-			if (scrollbar != NIL) frame.right += (METRIC_LISTBOXSBOFFSET + 1);
+			if (scrollbar != NIL) frame.right += 17;
 
 			surface->Frame(frame, FRAME_DOWN);
 
@@ -142,7 +139,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 			textRect.left	= frame.left + 3;
 			textRect.top	= frame.top + 3;
-			textRect.right	= textRect.left + objectProperties->size.cx - 6 - (dropDownList != NIL || scrollbar != NIL ? METRIC_COMBOBOXARROWOFFSETX + 4 : 0);
+			textRect.right	= textRect.left + objectProperties->size.cx - 6 - (dropDownList != NIL || scrollbar != NIL ? 16 : 0);
 			textRect.bottom	= textRect.top + (flags | EDB_MULTILINE ? objectProperties->size.cy - 5 : objectProperties->font.GetLineSizeY(objectProperties->text));
 
 			if ((flags | EDB_MULTILINE) && (objectProperties->font.GetTextSizeY(objectProperties->text) > objectProperties->size.cy - 6) && (scrollbar == NIL))
@@ -219,7 +216,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
+	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : 18);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
 	if (scrollbar != NIL) frame.right -= 18;
@@ -245,7 +242,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				p1.y = frame.top + 2;
 
-				if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+				if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
 
 				promptVisible = False;
 				promptPos = 0;
@@ -282,7 +279,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				p1.y = frame.top + 2;
 
-				if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+				if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
 
 				promptVisible = False;
 				promptPos = 0;
@@ -357,7 +354,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				p1.y = frame.top + 2;
 
-				surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+				surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
 
 				promptVisible = True;
 
@@ -674,7 +671,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
+	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : 18);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
 	if (scrollbar != NIL) frame.right -= 18;
@@ -684,7 +681,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	p1.y = frame.top + 2;
 
-	if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+	if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
 
 	promptPos = newPos;
 
@@ -714,7 +711,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	promptPos = newPos;
 
-	surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+	surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
 
 	{
 		HIMC		 hImc = ImmGetContext((HWND) wnd->GetSystemWindow());
@@ -759,7 +756,7 @@ S::Void S::GUI::EditBox::RemoveCursor()
 
 	p.y += 2;
 
-	surface->Box(Rect(p, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+	surface->Box(Rect(p, Size(1, 15)), 0, INVERT);
 
 	promptVisible = False;
 }
@@ -776,7 +773,7 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
+	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : 18);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
 	if (scrollbar != NIL) frame.right -= 18;
@@ -792,7 +789,7 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 		p1.y = frame.top + 2;
 
-		if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+		if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
 
 		for (int j = prevMarkStart; j < prevMarkEnd; j++) mText[j - prevMarkStart] = objectProperties->text[j];
 
@@ -807,14 +804,14 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 		surface->SetText(mText, frame, objectProperties->font);
 
-		if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+		if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
 	}
 
 	mText = "";
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
+	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : 18);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
 	if (scrollbar != NIL) frame.right -= 18;
@@ -826,7 +823,7 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 		p1.y = frame.top + 2;
 
-		if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+		if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
 
 		for (int j = markStart; j < markEnd; j++) mText[j - markStart] = objectProperties->text[j];
 
@@ -845,7 +842,7 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 		surface->SetText(mText, frame, font);
 
-		if (promptVisible) surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+		if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
 	}
 }
 
@@ -1018,7 +1015,7 @@ S::Void S::GUI::EditBox::TimerProc()
 
 	lineStart.y = frame.top + 2;
 
-	surface->Box(Rect(lineStart, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
+	surface->Box(Rect(lineStart, Size(1, 15)), 0, INVERT);
 
 	promptVisible = !promptVisible;
 }

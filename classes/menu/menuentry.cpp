@@ -13,7 +13,6 @@
 #include <smooth/menu/popupmenu.h>
 #include <smooth/definitions.h>
 #include <smooth/color.h>
-#include <smooth/metrics.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/objectproperties.h>
@@ -117,12 +116,12 @@ S::Int S::GUI::MenuEntry::Paint(Int message)
 					Point	 p1;
 					Point	 p2;
 
-					p1.x = realPos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 2 + (Setup::rightToLeft ? 1 : 0);
-					p2.x = p1.x + METRIC_IBARROWSIZEX;
-					p1.y = realPos.y + (objectProperties->size.cy - METRIC_IBARROWSIZEY) / 2;
+					p1.x = realPos.x + objectProperties->size.cx - 9 + (Setup::rightToLeft ? 1 : 0);
+					p2.x = p1.x + 7;
+					p1.y = realPos.y + (objectProperties->size.cy - 3) / 2;
 					p2.y = p1.y;
 
-					for (Int y = 0; y < METRIC_IBARROWSIZEY; y++)
+					for (Int y = 0; y < 3; y++)
 					{
 						p1.x++;
 						p2.x--;
@@ -184,8 +183,8 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 					if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
 					{
-						Point	 p1 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5 + (Setup::rightToLeft ? 2 : 0), objectProperties->pos.y + 1);
-						Point	 p2 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5 + (Setup::rightToLeft ? 2 : 0), objectProperties->pos.y + objectProperties->size.cy - 1);
+						Point	 p1 = Point(objectProperties->pos.x + objectProperties->size.cx - 12 + (Setup::rightToLeft ? 2 : 0), objectProperties->pos.y + 1);
+						Point	 p2 = Point(objectProperties->pos.x + objectProperties->size.cx - 12 + (Setup::rightToLeft ? 2 : 0), objectProperties->pos.y + objectProperties->size.cy - 1);
 
 						surface->Bar(p1, p2, OR_VERT);
 					}
@@ -214,8 +213,8 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 					if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
 					{
-						Point	 p1 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5 + (Setup::rightToLeft ? 1 : 0), objectProperties->pos.y + 1);
-						Point	 p2 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5 + (Setup::rightToLeft ? 1 : 0), objectProperties->pos.y + objectProperties->size.cy);
+						Point	 p1 = Point(objectProperties->pos.x + objectProperties->size.cx - 12 + (Setup::rightToLeft ? 1 : 0), objectProperties->pos.y + 1);
+						Point	 p2 = Point(objectProperties->pos.x + objectProperties->size.cx - 12 + (Setup::rightToLeft ? 1 : 0), objectProperties->pos.y + objectProperties->size.cy);
 
 						surface->Line(p1, p2, Setup::BackgroundColor);
 
@@ -261,7 +260,7 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 				if (objectProperties->clicked && popup != NIL)
 				{
-					Rect	 popupFrame = Rect(Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 4, objectProperties->pos.y), Size(METRIC_IBARROWSIZEX + 4, objectProperties->size.cy));
+					Rect	 popupFrame = Rect(Point(objectProperties->pos.x + objectProperties->size.cx - 11, objectProperties->pos.y), Size(11, objectProperties->size.cy));
 
 					if (onClick.GetNOfConnectedSlots() == 0 || wnd->IsMouseOn(popupFrame))
 					{
@@ -321,8 +320,8 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 						if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
 						{
-							Point	 p1 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5, objectProperties->pos.y + 1);
-							Point	 p2 = Point(objectProperties->pos.x + objectProperties->size.cx - METRIC_IBARROWSIZEX - 5, objectProperties->pos.y + objectProperties->size.cy);
+							Point	 p1 = Point(objectProperties->pos.x + objectProperties->size.cx - 12, objectProperties->pos.y + 1);
+							Point	 p2 = Point(objectProperties->pos.x + objectProperties->size.cx - 12, objectProperties->pos.y + objectProperties->size.cy);
 
 							surface->Line(p1, p2, Setup::BackgroundColor);
 

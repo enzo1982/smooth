@@ -14,7 +14,6 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
-#include <smooth/metrics.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/i18n.h>
 #include <smooth/objectproperties.h>
@@ -39,13 +38,11 @@ S::GUI::ComboBox::ComboBox(Point pos, Size size)
 
 	SetFont(Font(objectProperties->font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
 
-	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
+	objectProperties->pos	= pos;
+	objectProperties->size	= size;
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+	if (objectProperties->size.cx == 0) objectProperties->size.cx = 80;
+	if (objectProperties->size.cy == 0) objectProperties->size.cy = 19;
 }
 
 S::GUI::ComboBox::~ComboBox()
@@ -162,7 +159,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	frame.top++;
 	frame.bottom--;
 	frame.right--;
-	frame.left = frame.right - METRIC_COMBOBOXOFFSETX;
+	frame.left = frame.right - 16;
 
 	surface->Box(frame, Setup::BackgroundColor, FILLED);
 	surface->Frame(frame, FRAME_UP);
@@ -172,8 +169,8 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	frame.right++;
 	frame.left = realPos.x;
 
-	lineStart.x = frame.right - METRIC_COMBOBOXARROWOFFSETX + (Setup::rightToLeft ? 1 : 0);
-	lineStart.y = frame.top + METRIC_COMBOBOXARROWOFFSETY;
+	lineStart.x = frame.right - 12 + (Setup::rightToLeft ? 1 : 0);
+	lineStart.y = frame.top + 8;
 	lineEnd.x = lineStart.x + 7;
 	lineEnd.y = lineStart.y;
 
@@ -198,9 +195,9 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 			if (operat->clicked)
 			{
-				frame.left	+= METRIC_COMBOBOXTEXTOFFSETXY;
-				frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
-				frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
+				frame.left	+= 3;
+				frame.top	+= 3;
+				frame.right	-= 18;
 
 				String	 text = operat->name;
 
@@ -212,9 +209,9 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 				surface->SetText(text, frame, objectProperties->font);
 
-				frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
-				frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
-				frame.top	-= METRIC_COMBOBOXTEXTOFFSETXY;
+				frame.right	+= 18;
+				frame.left	-= 3;
+				frame.top	-= 3;
 			}
 		}
 	}
@@ -246,7 +243,6 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 	Point		 lbp;
 	Size		 lbs;
 	Bool		 executeProcs = False;
-	Float		 oldMeasurement;
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -258,7 +254,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 		frame.top	+= 3;
 		frame.bottom	-= 3;
 		frame.right	-= 3;
-		frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+		frame.left	= frame.right - 12;
 	}
 
 	switch (message)
@@ -295,7 +291,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 			break;
 		case SM_LOOSEFOCUS:
 			lbframe.top	= realPos.y + objectProperties->size.cy;
-			lbframe.bottom	= lbframe.top + min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
+			lbframe.bottom	= lbframe.top + min(15 * GetNOfEntries() + 4, 15 * 5 + 4);
 			lbframe.right	= realPos.x + objectProperties->size.cx - 1;
 			lbframe.left	= realPos.x;
 
@@ -329,7 +325,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDOWN:
 		case SM_LBUTTONDBLCLK:
 			lbframe.top	= realPos.y + objectProperties->size.cy;
-			lbframe.bottom	= lbframe.top + min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
+			lbframe.bottom	= lbframe.top + min(15 * GetNOfEntries() + 4, 15 * 5 + 4);
 			lbframe.right	= realPos.x + objectProperties->size.cx - 1;
 			lbframe.left	= realPos.x;
 
@@ -342,11 +338,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				lbp.x = lbframe.left - lay->GetObjectProperties()->pos.x;
 				lbp.y = realPos.y + objectProperties->size.cy - lay->GetObjectProperties()->pos.y;
 				lbs.cx = objectProperties->size.cx;
-				lbs.cy = min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
-
-				oldMeasurement = Setup::FontSize;
-
-				SetMeasurement(SMT_PIXELS);
+				lbs.cy = min(15 * GetNOfEntries() + 4, 15 * 5 + 4);
 
 				layer		= new Layer();
 				toolWindow	= new ToolWindow();
@@ -366,15 +358,13 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= 3;
 						frame.bottom	-= 3;
 						frame.right	-= 3;
-						frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+						frame.left	= frame.right - 12;
 					}
 
 					surface->Frame(frame, FRAME_DOWN);
 				}
 
 				toolWindow->SetMetrics(lbp, lbs);
-
-				Setup::FontSize = oldMeasurement;
 
 				if (!IsListSane()) SynchronizeList();
 
@@ -407,7 +397,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= 3;
 						frame.bottom	-= 3;
 						frame.right	-= 3;
-						frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+						frame.left	= frame.right - 12;
 					}
 
 					surface->Frame(frame, FRAME_DOWN);
@@ -422,7 +412,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				}
 
 				frame.top	= frame.bottom + 1;
-				frame.bottom	= frame.top + min(METRIC_LISTBOXENTRYHEIGHT * GetNOfEntries() + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
+				frame.bottom	= frame.top + min(15 * GetNOfEntries() + 4, 15 * 5 + 4);
 				frame.right++;
 
 				wnd->UnregisterObject(toolWindow);
@@ -457,9 +447,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 						if (operat->clicked)
 						{
-							frame.left	+= METRIC_COMBOBOXTEXTOFFSETXY;
-							frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
-							frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
+							frame.left	+= 3;
+							frame.top	+= 3;
+							frame.right	-= 18;
 
 							Font	 font = objectProperties->font;
 
@@ -475,9 +465,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 							surface->SetText(text, frame, font);
 
-							frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
-							frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
-							frame.top	-= METRIC_COMBOBOXTEXTOFFSETXY;
+							frame.right	+= 18;
+							frame.left	-= 3;
+							frame.top	-= 3;
 						}
 					}
 				}
@@ -494,9 +484,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 						if (operat->clicked)
 						{
-							frame.left	+= METRIC_COMBOBOXTEXTOFFSETXY;
-							frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
-							frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
+							frame.left	+= 3;
+							frame.top	+= 3;
+							frame.right	-= 18;
 
 							String	 text = operat->name;
 
@@ -508,9 +498,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 							surface->SetText(text, frame, objectProperties->font);
 
-							frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
-							frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
-							frame.top	-= METRIC_COMBOBOXTEXTOFFSETXY;
+							frame.right	+= 18;
+							frame.left	-= 3;
+							frame.top	-= 3;
 						}
 					}
 				}
@@ -568,7 +558,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= 3;
 						frame.bottom	-= 3;
 						frame.right	-= 3;
-						frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+						frame.left	= frame.right - 12;
 					}
 
 					surface->Frame(frame, FRAME_UP);
@@ -580,7 +570,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= 3;
 						frame.bottom	-= 2;
 						frame.right	-= 2;
-						frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 3;
+						frame.left	= frame.right - 13;
 					}
 
 					surface->Box(frame, Setup::BackgroundColor, OUTLINED);
@@ -594,7 +584,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				frame.top	+= 3;
 				frame.bottom	-= 3;
 				frame.right	-= 3;
-				frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 4;
+				frame.left	= frame.right - 12;
 			}
 
 			if (wnd->IsMouseOn(frame) && !objectProperties->checked)

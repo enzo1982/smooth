@@ -11,7 +11,6 @@
 #include <smooth/window/titlebar.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/metrics.h>
 #include <smooth/window/tooltip.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
@@ -37,7 +36,7 @@ S::GUI::Titlebar::Titlebar(Int buttons)
 	minclk				= False;
 	maxclk				= False;
 	objectProperties->orientation	= OR_TOP;
-	objectProperties->size.cy	= METRIC_TITLEBARHEIGHT;
+	objectProperties->size.cy	= 19;
 	subtype				= WO_NOSEPARATOR;
 
 	possibleContainers.AddEntry(Window::classID);
@@ -80,7 +79,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	titleFrame.right	= titleFrame.left + objectProperties->size.cx - 1;
 	titleFrame.bottom	= titleFrame.top + objectProperties->size.cy - 1;
 
-	if (icon != NIL) titleFrame.left = titleFrame.left + METRIC_TITLEBARHEIGHT - 1;
+	if (icon != NIL) titleFrame.left += 18;
 
 	surface->Frame(titleFrame, FRAME_UP);
 
@@ -92,10 +91,10 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	if (paintActive)	surface->Gradient(titleGradient, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 	else			surface->Gradient(titleGradient, Setup::InactiveGradientStartColor, Setup::InactiveGradientEndColor, OR_HORZ);
 
-	titleText.left		= titleGradient.left + METRIC_TBTEXTOFFSETX;
-	titleText.top		= titleGradient.top + METRIC_TBTEXTOFFSETY;
-	titleText.right		= titleGradient.right - METRIC_TBBUTTONBOXOFFSETX + METRIC_TBBUTTONBOXWIDTH;
-	titleText.bottom	= titleGradient.bottom - METRIC_TBTEXTOFFSETY;
+	titleText.left		= titleGradient.left + 3;
+	titleText.top		= titleGradient.top + 2;
+	titleText.right		= titleGradient.right - 4;
+	titleText.bottom	= titleGradient.bottom - 2;
 
 	if (paintActive)	objectProperties->font.SetColor(Setup::GradientTextColor);
 	else			objectProperties->font.SetColor(Setup::InactiveGradientTextColor);
@@ -104,25 +103,25 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 	if (icon != NIL)
 	{
-		iconRect.left	= titleFrame.left - METRIC_TITLEBARHEIGHT + METRIC_TBICONOFFSET - 2;
+		iconRect.left	= titleFrame.left - 18;
 		iconRect.top	= titleFrame.top + 1;
-		iconRect.right	= iconRect.left + METRIC_TBICONSIZE;
-		iconRect.bottom	= iconRect.top + METRIC_TBICONSIZE;
+		iconRect.right	= iconRect.left + 16;
+		iconRect.bottom	= iconRect.top + 16;
 
 		surface->BlitFromBitmap(icon, Rect(Point(0, 0), icon.GetSize()), iconRect);
 	}
 
-	tButtonRect.left	= titleGradient.right - METRIC_TBBUTTONBOXOFFSETX + 1 + (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 2 * METRIC_TBBUTTONSIZE + 6);
-	tButtonRect.right	= tButtonRect.left + METRIC_TBBUTTONBOXWIDTH - 1 - (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 2 * METRIC_TBBUTTONSIZE + 6);
-	tButtonRect.top		= titleGradient.top + METRIC_TBBUTTONBOXOFFSETY;
-	tButtonRect.bottom	= tButtonRect.top + METRIC_TBBUTTONBOXHEIGHT;
+	tButtonRect.left	= titleGradient.right - 38 + (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 20);
+	tButtonRect.right	= tButtonRect.left + 34 - (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 20);
+	tButtonRect.top		= titleGradient.top + 2;
+	tButtonRect.bottom	= tButtonRect.top + 13;
 
 	surface->Box(tButtonRect, Setup::BackgroundColor, FILLED);
 	surface->Frame(tButtonRect, FRAME_DOWN);
 
-	button.left	= tButtonRect.left + METRIC_TBBUTTONOFFSETX;
-	button.right	= button.left + METRIC_TBBUTTONSIZE;
-	button.bottom	= tButtonRect.top + METRIC_TBBUTTONOFFSETY + METRIC_TBBUTTONSIZE - 1;
+	button.left	= tButtonRect.left + 4;
+	button.right	= button.left + 7;
+	button.bottom	= tButtonRect.top + 11;
 	button.top	= button.bottom - 2;
 
 	if (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON))
@@ -133,10 +132,10 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 		surface->Box(button, buttonColor, FILLED);
 
 		button.left	= button.right + 3;
-		button.right	= button.left + METRIC_TBBUTTONSIZE;
+		button.right	= button.left + 7;
 	}
 
-	button.top	= tButtonRect.top + METRIC_TBBUTTONOFFSETY;
+	button.top	= tButtonRect.top + 5;
 
 	if (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON))
 	{
@@ -173,7 +172,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 		}
 
 		button.left	= button.right + 3;
-		button.right	= button.left + METRIC_TBBUTTONSIZE;
+		button.right	= button.left + 7;
 	}
 
 	button.top--;
@@ -237,30 +236,30 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	titleFrame.right	= titleFrame.left + objectProperties->size.cx - 1;
 	titleFrame.bottom	= titleFrame.top + objectProperties->size.cy;
 
-	if (wnd->GetIcon() != NIL) titleFrame.left = titleFrame.left + METRIC_TITLEBARHEIGHT - 1;
+	if (wnd->GetIcon() != NIL) titleFrame.left += 18;
 
-	tButtonRect.left	= titleFrame.right - METRIC_TBBUTTONBOXOFFSETX + 1;
-	tButtonRect.right	= tButtonRect.left + METRIC_TBBUTTONBOXWIDTH - 1;
-	tButtonRect.top		= titleFrame.top + METRIC_TBBUTTONBOXOFFSETY + 2;
-	tButtonRect.bottom	= tButtonRect.top + METRIC_TBBUTTONBOXHEIGHT;
+	tButtonRect.left	= titleFrame.right - 38;
+	tButtonRect.right	= tButtonRect.left + 34;
+	tButtonRect.top		= titleFrame.top + 4;
+	tButtonRect.bottom	= tButtonRect.top + 13;
 
 	if (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON))
 	{
-		minButton.left		= tButtonRect.left + METRIC_TBBUTTONOFFSETX - 2;
-		minButton.right		= minButton.left + METRIC_TBBUTTONSIZE + 3;
-		minButton.top		= tButtonRect.top + METRIC_TBBUTTONOFFSETY - 4;
-		minButton.bottom	= minButton.top + METRIC_TBBUTTONSIZE + 3;
+		minButton.left		= tButtonRect.left + 2;
+		minButton.right		= minButton.left + 10;
+		minButton.top		= tButtonRect.top + 1;
+		minButton.bottom	= minButton.top + 10;
 
-		maxButton.left		= tButtonRect.left + METRIC_TBBUTTONOFFSETX + METRIC_TBBUTTONSIZE + 1;
-		maxButton.right		= maxButton.left + METRIC_TBBUTTONSIZE + 3;
-		maxButton.top		= tButtonRect.top + METRIC_TBBUTTONOFFSETY - 4;
-		maxButton.bottom	= maxButton.top + METRIC_TBBUTTONSIZE + 3;
+		maxButton.left		= tButtonRect.left + 12;
+		maxButton.right		= maxButton.left + 10;
+		maxButton.top		= tButtonRect.top + 1;
+		maxButton.bottom	= maxButton.top + 10;
 	}
 
-	closeButton.left	= tButtonRect.left + METRIC_TBBUTTONOFFSETX + 2 * METRIC_TBBUTTONSIZE + 4;
-	closeButton.right	= closeButton.left + METRIC_TBBUTTONSIZE + 3;
-	closeButton.top		= tButtonRect.top + METRIC_TBBUTTONOFFSETY - 4;
-	closeButton.bottom	= closeButton.top + METRIC_TBBUTTONSIZE + 3;
+	closeButton.left	= tButtonRect.left + 22;
+	closeButton.right	= closeButton.left + 10;
+	closeButton.top		= tButtonRect.top + 1;
+	closeButton.bottom	= closeButton.top + 10;
 
 	switch (message)
 	{

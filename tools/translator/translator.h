@@ -54,18 +54,22 @@ class Translator : public Application
 
 		Bool			 modified;
 
+		Void			 SaveFileWithName(String);
+		Void			 Close();
+	slots:
+		Void			 NewEntry();
+		Void			 SaveData();
+		Void			 RemoveEntry();
+		Void			 SelectEntry();
+
+		Void			 NewFile();
 		Void			 OpenFile();
+		Void			 CloseFile();
 		Void			 SaveFile();
 		Void			 SaveFileAs();
-		Void			 SaveFileWithName(String);
-		Void			 NewFile();
-		Void			 Close();
-		Void			 CloseFile();
-		Void			 SaveData();
-		Void			 SelectEntry();
-		Void			 NewEntry();
-		Void			 RemoveEntry();
+
 		Bool			 ExitProc();
+		Void			 ResizeProc();
 	public:
 					 Translator();
 					~Translator();

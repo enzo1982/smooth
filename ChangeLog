@@ -1,5 +1,11 @@
 ChangeLog for smooth
 
+xx.xx.04 xx:xx - smooth alpha 0.8.65.0
+
+- editbox.cpp	- improved multiline editbox
+
+- improved smooth Translator utility
+
 11.03.04 15:42 - smooth alpha 0.8.64.0
 
 - rect.cpp	- new methods: Bool DoRectsOverlap(Rect, Rect); and Rect OverlapRect(Rect, Rect);

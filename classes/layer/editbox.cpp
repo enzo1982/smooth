@@ -21,6 +21,7 @@
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/window/window.h>
+#include <smooth/scrollbar.h>
 
 #include <imm.h>
 
@@ -28,19 +29,21 @@ const S::Int	 S::GUI::EditBox::classID = S::Object::RequestClassID();
 
 S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int iMaxSize)
 {
-	type				= classID;
-	objectProperties->text		= text;
-	markStart			= -1;
-	markEnd				= -1;
-	maxSize				= iMaxSize;
-	promptPos			= 0;
-	promptVisible			= False;
-	timer				= NIL;
-	marking				= False;
-	invisibleChars			= 0;
+	type			= classID;
+	objectProperties->text	= text;
+	markStart		= -1;
+	markEnd			= -1;
+	maxSize			= iMaxSize;
+	promptPos		= 0;
+	promptVisible		= False;
+	timer			= NIL;
+	marking			= False;
+	invisibleChars		= 0;
+	scrollbarPos		= 0;
 
-	dropDownList			= NIL;
-	comboBox			= NIL;
+	dropDownList		= NIL;
+	comboBox		= NIL;
+	scrollbar		= NIL;
 
 	objectProperties->font.SetColor(Setup::ClientTextColor);
 
@@ -66,6 +69,13 @@ S::GUI::EditBox::~EditBox()
 		if (myContainer != NIL) myContainer->UnregisterObject(comboBox);
 
 		DeleteObject(comboBox);
+	}
+
+	if (scrollbar != NIL)
+	{
+		if (myContainer != NIL) myContainer->UnregisterObject(scrollbar);
+
+		DeleteObject(scrollbar);
 	}
 
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
@@ -125,8 +135,40 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 			textRect.left	= frame.left + 3;
 			textRect.top	= frame.top + 3;
-			textRect.right	= textRect.left + objectProperties->size.cx - 6 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXARROWOFFSETX + 4);
-			textRect.bottom	= textRect.top + 16;
+			textRect.right	= textRect.left + objectProperties->size.cx - 6 - (dropDownList != NIL || scrollbar != NIL ? METRIC_COMBOBOXARROWOFFSETX + 4 : 0);
+			textRect.bottom	= textRect.top + (flags | EDB_MULTILINE ? objectProperties->size.cy - 5 : objectProperties->font.GetLineSizeY(objectProperties->text));
+
+			if ((flags | EDB_MULTILINE) && (objectProperties->font.GetTextSizeY(objectProperties->text) > objectProperties->size.cy - 6) && (scrollbar == NIL))
+			{
+				Layer	*layer = (Layer *) myContainer->GetContainerObject();
+
+				scrollbarPos = 0;
+
+				scrollbar = new Scrollbar(Point(frame.right - layer->GetObjectProperties()->pos.x - 17, frame.top - layer->GetObjectProperties()->pos.y + 1), Size(0, objectProperties->size.cy - 2), OR_VERT, &scrollbarPos, 0, 100);
+
+				myContainer->RegisterObject(scrollbar);
+
+				scrollbar->Paint(SP_PAINT);
+			}
+			else if ((flags | EDB_MULTILINE) && (objectProperties->font.GetTextSizeY(objectProperties->text) > objectProperties->size.cy - 6) && (scrollbar != NIL))
+			{
+				Layer	*layer = (Layer *) myContainer->GetContainerObject();
+
+				scrollbar->GetObjectProperties()->pos = Point(frame.right - layer->GetObjectProperties()->pos.x - 17, frame.top - layer->GetObjectProperties()->pos.y + 1);
+				scrollbar->GetObjectProperties()->size.cy = objectProperties->size.cy - 2;
+
+				scrollbar->Paint(SP_PAINT);
+			}
+			else if ((flags | EDB_MULTILINE) && (objectProperties->font.GetTextSizeY(objectProperties->text) <= objectProperties->size.cy - 6) && (scrollbar != NIL))
+			{
+				myContainer->UnregisterObject(scrollbar);
+
+				surface->Box(Rect(Point(frame.right - 17, frame.top + 1), Size(18, objectProperties->size.cy - 2)), Setup::ClientColor, FILLED);
+
+				DeleteObject(scrollbar);
+
+				scrollbar = NIL;
+			}
 
 			if (invisibleChars > 0)
 			{
@@ -187,6 +229,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 	frame.top	= realPos.y;
 	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+
+	if (scrollbar != NIL) frame.right -= 18;
 
 	switch (message)
 	{
@@ -651,6 +695,8 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
+	if (scrollbar != NIL) frame.right -= 18;
+
 	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
 	else						p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
 
@@ -781,6 +827,8 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
+	if (scrollbar != NIL) frame.right -= 18;
+
 	Int	 bColor = GetSysColor(COLOR_HIGHLIGHT);
 	Int	 tColor = GetSysColor(COLOR_HIGHLIGHTTEXT);
 	String	 mText;
@@ -796,14 +844,13 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 		for (int j = prevMarkStart; j < prevMarkEnd; j++) mText[j - prevMarkStart] = objectProperties->text[j];
 
-		frame.left = realPos.x + objectProperties->font.GetTextSizeX(visText, prevMarkStart - invisibleChars) + 4;
-		frame.top = realPos.y + 2;
-		frame.right = frame.left + objectProperties->font.GetTextSizeX(mText);
-		frame.bottom = realPos.y + objectProperties->size.cy - 2;
+		frame.left	= realPos.x + objectProperties->font.GetTextSizeX(visText, prevMarkStart - invisibleChars) + 3;
+		frame.top	= realPos.y + 2;
+		frame.right	= frame.left + objectProperties->font.GetTextSizeX(mText);
+		frame.bottom	= frame.top + objectProperties->font.GetLineSizeY(mText) + 3;
 
 		surface->Box(frame, Setup::ClientColor, FILLED);
 
-		frame.left--;
 		frame.top++;
 
 		surface->SetText(mText, frame, objectProperties->font);
@@ -818,6 +865,8 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 	frame.right	= realPos.x + objectProperties->size.cx - 1 - (dropDownList == NIL ? 0 : METRIC_COMBOBOXOFFSETX + 2);
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
+	if (scrollbar != NIL) frame.right -= 18;
+
 	if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
 	{
 		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
@@ -829,14 +878,13 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 		for (int j = markStart; j < markEnd; j++) mText[j - markStart] = objectProperties->text[j];
 
-		frame.left = realPos.x + objectProperties->font.GetTextSizeX(visText, markStart - invisibleChars) + 4;
-		frame.top = realPos.y + 2;
-		frame.right = frame.left + objectProperties->font.GetTextSizeX(mText);
-		frame.bottom = realPos.y + objectProperties->size.cy - 2;
+		frame.left	= realPos.x + objectProperties->font.GetTextSizeX(visText, markStart - invisibleChars) + 3;
+		frame.top	= realPos.y + 2;
+		frame.right	= frame.left + objectProperties->font.GetTextSizeX(mText);
+		frame.bottom	= frame.top + objectProperties->font.GetLineSizeY(mText) + 3;
 
 		surface->Box(frame, bColor, FILLED);
 
-		frame.left--;
 		frame.top++;
 
 		Font	 font = objectProperties->font;
@@ -1013,6 +1061,8 @@ S::Void S::GUI::EditBox::TimerProc()
 	frame.top	= realPos.y;
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+
+	if (scrollbar != NIL) frame.right -= 18;
 
 	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	lineStart.x = frame.left + 3 + objectProperties->font.GetTextSizeX(visText, promptPos - invisibleChars);
 	else						lineStart.x = frame.left + 3 + objectProperties->font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);

@@ -19,6 +19,7 @@ Source and binary compatibility between different smooth Versions
 		Compatibility with older versions
 Version		Source		Binary			Comments
 ---------------------------------------------------------------------------------------------------------------------
+0.8.65.0	yes		no			-
 0.8.64.0	no		no			major API changes to improve Linux/Unix compatibility
 0.8.63.0	no		no			replaced class picture with smooth::GUI::Bitmap
 0.8.62.0	no		no			major changes again

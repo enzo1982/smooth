@@ -31,65 +31,12 @@ Translator::Translator()
 	Size	 size;
 
 	wnd		= new Window(String("smooth Translator v").Append(SMOOTH_VERSION));
-	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
+	title		= new Titlebar();
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
 
 	pos.x = 7;
-	pos.y = 6;
-
-	button_new	= new Button("New", NIL, pos, size);
-	button_new->onClick.Connect(&Translator::NewEntry, this);
-
-	pos.x += 87;
-	pos.y += 4;
-
-	text_id		= new Text("ID:", pos);
-
-	pos.x += 20;
-	pos.y -= 3;
-	size.cx = 37;
-	size.cy = 0;
-
-	edit_id		= new EditBox("", pos, size, 5);
-	edit_id->SetFlags(EDB_NUMERIC);
-
-	pos.x += 44;
-	pos.y += 3;
-
-	text_original	= new Text("Original:", pos);
-
-	pos.x += 45;
-	pos.y -= 3;
-	size.cx = 158;
-	size.cy = 0;
-
-	edit_original	= new EditBox("", pos, size, 0);
-
-	pos.x += 165;
-	pos.y += 3;
-
-	text_translated	= new Text("Translation:", pos);
-
-	pos.x += 62;
-	pos.y -= 3;
-
-	edit_translated	= new EditBox("", pos, size, 0);
-
-	pos.x += 166;
-	pos.y -= 1;
-	size.cx = 0;
-
-	button_save	= new Button("Save", NIL, pos, size);
-	button_save->onClick.Connect(&Translator::SaveData, this);
-
-	pos.x += 88;
-
-	button_remove	= new Button("Remove", NIL, pos, size);
-	button_remove->onClick.Connect(&Translator::RemoveEntry, this);
-
-	pos.x = 7;
-	pos.y += 27;
+	pos.y = 7;
 	size.cx = 757;
 	size.cy = 189;
 
@@ -99,6 +46,73 @@ Translator::Translator()
 	list_entries->AddTab("ID", 30);
 	list_entries->AddTab("String");
 	list_entries->AddTab("Translation");
+
+	pos.x = 7;
+	pos.y = 164;
+	size.cx = 0;
+	size.cy = 0;
+
+	button_new	= new Button("New", NIL, pos, size);
+	button_new->onClick.Connect(&Translator::NewEntry, this);
+	button_new->SetOrientation(OR_LOWERLEFT);
+
+	pos.x += 87;
+	pos.y -= 4;
+
+	text_id		= new Text("ID:", pos);
+	text_id->SetOrientation(OR_LOWERLEFT);
+
+	pos.x += 62;
+	pos.y += 3;
+	size.cx = 37;
+	size.cy = 0;
+
+	edit_id		= new EditBox("", pos, size, 5);
+	edit_id->SetFlags(EDB_NUMERIC);
+	edit_id->SetOrientation(OR_LOWERLEFT);
+
+	pos.x = 175;
+	pos.y += 1;
+	size.cx = 0;
+	size.cy = 0;
+
+	button_save	= new Button("Save", NIL, pos, size);
+	button_save->onClick.Connect(&Translator::SaveData, this);
+	button_save->SetOrientation(OR_LOWERRIGHT);
+
+	pos.x -= 88;
+
+	button_remove	= new Button("Remove", NIL, pos, size);
+	button_remove->onClick.Connect(&Translator::RemoveEntry, this);
+	button_remove->SetOrientation(OR_LOWERRIGHT);
+
+	pos.x = 94;
+	pos.y -= 31;
+
+	text_original	= new Text("Original:", pos);
+	text_original->SetOrientation(OR_LOWERLEFT);
+
+	pos.x += 62;
+	pos.y += 3;
+	size.cx = 777 - pos.x - 13;
+	size.cy = 60;
+
+	edit_original	= new EditBox("", pos, size, 0);
+	edit_original->SetFlags(EDB_MULTILINE);
+	edit_original->SetOrientation(OR_LOWERLEFT);
+
+	pos.x -= 62;
+	pos.y -= edit_original->GetObjectProperties()->size.cy + 11;
+
+	text_translated	= new Text("Translation:", pos);
+	text_translated->SetOrientation(OR_LOWERLEFT);
+
+	pos.x += 62;
+	pos.y += 3;
+
+	edit_translated	= new EditBox("", pos, size, 0);
+	edit_translated->SetFlags(EDB_MULTILINE);
+	edit_translated->SetOrientation(OR_LOWERLEFT);
 
 	menu_file	= new Menu();
 
@@ -140,9 +154,13 @@ Translator::Translator()
 	wnd->RegisterObject(menubar);
 	wnd->RegisterObject(statusbar);
 
-	wnd->SetMetrics(Point(50, 50), Size(777, 300));
+	wnd->SetMetrics(Point(50, 50), Size(700, 400));
+	wnd->SetMinimumSize(Size(400, 350));
 	wnd->SetIcon(SI_DEFAULT);
 	wnd->doQuit.Connect(&Translator::ExitProc, this);
+	wnd->onResize.Connect(&Translator::ResizeProc, this);
+
+	ResizeProc();
 
 	wnd->Show();
 }
@@ -206,6 +224,21 @@ Bool Translator::ExitProc()
 	}
 
 	return True;
+}
+
+Void Translator::ResizeProc()
+{
+	list_entries->GetObjectProperties()->size = Size(wnd->GetObjectProperties()->size.cx - 20, wnd->GetObjectProperties()->size.cy - 247);
+
+	wnd->GetDrawSurface()->StartPaint(Rect(list_entries->GetObjectProperties()->pos, list_entries->GetObjectProperties()->size));
+
+	list_entries->Hide();
+	list_entries->Show();
+
+	wnd->GetDrawSurface()->EndPaint();
+
+	edit_original->GetObjectProperties()->size = Size(wnd->GetObjectProperties()->size.cx - 169, edit_original->GetObjectProperties()->size.cy);
+	edit_translated->GetObjectProperties()->size = Size(wnd->GetObjectProperties()->size.cx - 169, edit_translated->GetObjectProperties()->size.cy);
 }
 
 void Translator::NewFile()
@@ -279,6 +312,10 @@ void Translator::NewFile()
 	}
 
 	wnd->SetText(wnd->GetText().Append(" - unnamed"));
+
+	list_entries->SelectEntry(list_entries->GetFirstEntry()->id);
+
+	SelectEntry();
 }
 
 void Translator::Close()
@@ -394,6 +431,10 @@ void Translator::OpenFile()
 		}
 
 		delete doc;
+
+		list_entries->SelectEntry(list_entries->GetFirstEntry()->id);
+
+		SelectEntry();
 	}
 
 	delete dialog;

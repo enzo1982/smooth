@@ -16,6 +16,7 @@ namespace smooth
 	namespace GUI
 	{
 		class EditBox;
+		class Scrollbar;
 	};
 
 	namespace System
@@ -35,6 +36,7 @@ namespace smooth
 		const Int EDB_ALPHANUMERIC	= 0;
 		const Int EDB_NUMERIC		= 1;
 		const Int EDB_ASTERISK		= 2;
+		const Int EDB_MULTILINE		= 4;
 
 		class SMOOTHAPI EditBox : public Widget
 		{
@@ -51,9 +53,11 @@ namespace smooth
 				Bool			 marking;
 				Int			 maxSize;
 				Int			 invisibleChars;
+				Int			 scrollbarPos;
 
 				List			*dropDownList;
 				ComboBox		*comboBox;
+				Scrollbar		*scrollbar;
 
 				Void			 SetCursor(Int);
 				Void			 RemoveCursor();

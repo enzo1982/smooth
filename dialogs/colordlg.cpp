@@ -28,7 +28,7 @@
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/gdi/bitmapgdi.h>
+#include <smooth/graphics/bitmap.h>
 
 #include <picture.h>
 
@@ -468,11 +468,7 @@ void S::DialogColorSelection::ColorDlgPaintProc()
 			}
 		}
 
-		BitmapGDI	*bmpGDI = new BitmapGDI(pic->GetBitmap());
-
-		surface->BlitFromBitmap(bmpGDI, rect, irect);
-
-		delete bmpGDI;
+		surface->BlitFromBitmap(Bitmap(pic->GetBitmap()), rect, irect);
 	}
 
 	forcevsupdate = true;

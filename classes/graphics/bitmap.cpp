@@ -11,49 +11,72 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/color.h>
 
-S::GUI::Bitmap::Bitmap()
+S::GUI::BitmapBase::BitmapBase()
 {
-	type	= BITMAP_NONE;
+	type		= -1;
 
-	size	= Size(0, 0);
-	depth	= 0;
+	size		= Size(0, 0);
+	depth		= 0;
 
-	bytes	= NIL;
-	align	= 0;
+	bytes		= NIL;
+	align		= 0;
 }
 
-S::GUI::Bitmap::~Bitmap()
+S::GUI::BitmapBase::BitmapBase(const int nil)
+{
+	type		= -1;
+
+	size		= Size(0, 0);
+	depth		= 0;
+
+	bytes		= NIL;
+	align		= 0;
+}
+
+S::GUI::BitmapBase::BitmapBase(const BitmapBase &iBitmap)
+{
+	type		= -1;
+
+	size		= iBitmap.size;
+	depth		= iBitmap.depth;
+
+	bytes		= iBitmap.bytes;
+	align		= iBitmap.align;
+}
+
+S::GUI::BitmapBase::~BitmapBase()
 {
 }
 
-S::Int S::GUI::Bitmap::GetBitmapType()
+S::Int S::GUI::BitmapBase::GetBitmapType()
 {
 	return type;
 }
 
-S::Size S::GUI::Bitmap::GetSize()
+S::Size S::GUI::BitmapBase::GetSize()
 {
 	return size;
 }
 
-S::Int S::GUI::Bitmap::GetDepth()
+S::Int S::GUI::BitmapBase::GetDepth()
 {
 	return depth;
 }
 
-S::UnsignedByte *S::GUI::Bitmap::GetBytes()
+S::UnsignedByte *S::GUI::BitmapBase::GetBytes()
 {
 	return bytes;
 }
 
-S::Int S::GUI::Bitmap::GetLineAlignment()
+S::Int S::GUI::BitmapBase::GetLineAlignment()
 {
 	return align;
 }
 
-S::Bool S::GUI::Bitmap::SetPixel(Int x, Int y, UnsignedLong color)
+S::Bool S::GUI::BitmapBase::SetPixel(Int x, Int y, UnsignedLong color)
 {
-	if (y >= size.cy || x >= size.cx) return False;
+	if (bytes == NIL)			return False;
+	if (y >= size.cy || x >= size.cx)	return False;
 
 	Bool	 done = False;
 	Int	 offset = 0;
@@ -75,9 +98,10 @@ S::Bool S::GUI::Bitmap::SetPixel(Int x, Int y, UnsignedLong color)
 	return done;
 }
 
-S::UnsignedLong S::GUI::Bitmap::GetPixel(Int x, Int y)
+S::UnsignedLong S::GUI::BitmapBase::GetPixel(Int x, Int y)
 {
-	if (y >= size.cy || x >= size.cx) return 0;
+	if (bytes == NIL)			return 0;
+	if (y >= size.cy || x >= size.cx)	return 0;
 
 	UnsignedLong	 color = 0;
 	Int		 offset = 0;

@@ -18,7 +18,7 @@
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/gdi/bitmapgdi.h>
+#include <smooth/graphics/bitmap.h>
 
 const S::Int	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
 
@@ -139,11 +139,9 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 		textRect.right	= textRect.left + objectProperties->size.cx;
 		textRect.bottom	= textRect.top + objectProperties->size.cy;
 
-		BitmapGDI	*bmpGDI = new BitmapGDI(linkBitmap);
+		Bitmap	 bmp(linkBitmap);
 
-		surface->BlitFromBitmap(bmpGDI, Rect(Point(0, 0), Size(GetBitmapSizeX(linkBitmap), GetBitmapSizeY(linkBitmap))), textRect);
-
-		delete bmpGDI;
+		surface->BlitFromBitmap(bmp, Rect(Point(0, 0), Size(GetBitmapSizeX(linkBitmap), GetBitmapSizeY(linkBitmap))), textRect);
 	}
 
 	return Success;

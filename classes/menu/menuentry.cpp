@@ -11,15 +11,12 @@
 #include <smooth/menuentry.h>
 #include <smooth/definitions.h>
 #include <smooth/stk.h>
-#include <smooth/graphics/gdi/bitmapgdi.h>
+#include <smooth/graphics/bitmap.h>
 
 S::MenuEntry::MenuEntry(Int newType, Int newID)
 {
 	type		= newType;
 	id		= newID;
-
-	bitmap		= NIL;
-	graymap		= NIL;
 
 	orientation	= OR_LEFT;
 
@@ -42,9 +39,6 @@ S::MenuEntry::MenuEntry(Int newType, Int newID)
 S::MenuEntry::~MenuEntry()
 {
 	if (shortcut != NIL) DeleteObject(shortcut);
-
-	if (bitmap != NIL) delete bitmap;
-	if (graymap != NIL) delete graymap;
 }
 
 S::Int S::MenuEntry::SetText(String newText)
@@ -81,23 +75,12 @@ S::Int S::MenuEntry::SetShortcut(Int nKey, Int nFlags)
 	return Success;
 }
 
-S::Int S::MenuEntry::SetBitmap(GUI::Bitmap *newBitmap)
+S::Int S::MenuEntry::SetBitmap(const Bitmap &newBitmap)
 {
-	if (newBitmap == NIL)
-	{
-		type = (type | SM_BITMAP) ^ SM_BITMAP;
+	Bitmap	 bmp = newBitmap;
 
-		if (bitmap != NIL) delete bitmap;
-		if (graymap != NIL) delete graymap;
-
-		bitmap = NIL;
-		graymap = NIL;
-	}
-	else
-	{
-		bitmap = new GUI::BitmapGDI(DetectTransparentRegions(((GUI::BitmapGDI *) newBitmap)->GetBitmap()));
-		graymap = new GUI::BitmapGDI(DetectTransparentRegions(GrayscaleBitmap(((GUI::BitmapGDI *) newBitmap)->GetBitmap())));
-	}
+	bitmap	= Bitmap(DetectTransparentRegions(bmp.GetBitmap()));
+	graymap	= Bitmap(DetectTransparentRegions(GrayscaleBitmap(bmp.GetBitmap())));
 
 	return Success;
 }

@@ -156,8 +156,15 @@ Test::Test()
 
 //mainWnd_menubar2->SetOrientation(OR_BOTTOM);
 
-//	mainWnd_iconbar->AddEntry(NIL, SMOOTH::LoadImage("icons.pci", 1, NIL));//mainWnd_menubar_file);
-//	mainWnd_iconbar->AddEntry(NIL, SMOOTH::LoadImage("icons.pci", 2, NIL))->onClick.Connect(&Test::mainApp_InfoProc, this);
+	Bitmap	 bmp;
+
+	bmp.SetBitmap(SMOOTH::LoadImage("icons.pci", 1, NIL));
+
+	mainWnd_iconbar->AddEntry(NIL, bmp);//mainWnd_menubar_file);
+
+	bmp.SetBitmap(SMOOTH::LoadImage("icons.pci", 2, NIL));
+
+	mainWnd_iconbar->AddEntry(NIL, bmp)->onClick.Connect(&Test::mainApp_InfoProc, this);
 
 mainWnd_iconbar->SetOrientation(OR_LEFT);
 

@@ -29,17 +29,17 @@ namespace smooth
 		class SMOOTHAPI Image : public Widget
 		{
 			protected:
-				Bitmap			*bitmap;
+				Bitmap			 bitmap;
 			public:
 				static const Int	 classID;
 
-							 Image(Bitmap *, Point = Point(0, 0), Size = Size(0, 0));
+							 Image(Bitmap &, Point = Point(0, 0), Size = Size(0, 0));
 							~Image();
 
 				virtual Int		 Paint(Int);
 
-				Int			 SetBitmap(Bitmap *);
-				Bitmap			*GetBitmap();
+				Int			 SetBitmap(const Bitmap &);
+				Bitmap			&GetBitmap();
 		};
 	};
 };

@@ -22,7 +22,7 @@
 #include <smooth/timer.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/gdi/bitmapgdi.h>
+#include <smooth/graphics/bitmap.h>
 
 using namespace smooth::GUI;
 
@@ -105,11 +105,7 @@ S::Void S::SplashScreenApp::SplashPaintProc()
 	bmprect.right = GetBitmapSizeX(bitmap);
 	bmprect.bottom = GetBitmapSizeY(bitmap);
 
-	BitmapGDI	*bmpGDI = new BitmapGDI(bitmap);
-
-	surface->BlitFromBitmap(bmpGDI, Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmprect);
-
-	delete bmpGDI;
+	surface->BlitFromBitmap(Bitmap(bitmap), Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmprect);
 }
 
 S::Bool S::SplashScreenApp::SplashKillProc()

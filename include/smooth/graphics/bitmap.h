@@ -15,7 +15,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		class Bitmap;
+		class BitmapBase;
 	};
 };
 
@@ -26,34 +26,49 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 BITMAP_NONE = 0;
-
-		class SMOOTHAPI Bitmap
+		class SMOOTHAPI BitmapBase
 		{
 			protected:
-				Int		 type;
+				Int				 type;
 
-				Size		 size;
-				Int		 depth;
+				Size				 size;
+				Int				 depth;
 
-				UnsignedByte	*bytes;
-				Int		 align;
+				UnsignedByte			*bytes;
+				Int				 align;
 			public:
-						 Bitmap();
-						~Bitmap();
+								 BitmapBase();
+								 BitmapBase(const int);
+								 BitmapBase(const BitmapBase &);
 
-				Int		 GetBitmapType();
+				virtual				~BitmapBase();
 
-				Size		 GetSize();
-				Int		 GetDepth();
+				Int				 GetBitmapType();
 
-				UnsignedByte	*GetBytes();
-				Int		 GetLineAlignment();
+				Size				 GetSize();
+				Int				 GetDepth();
 
-				Bool		 SetPixel(Int, Int, UnsignedLong);
-				UnsignedLong	 GetPixel(Int, Int);
+				UnsignedByte			*GetBytes();
+				Int				 GetLineAlignment();
+
+				virtual Bool			 SetPixel(Int, Int, UnsignedLong);
+				virtual UnsignedLong		 GetPixel(Int, Int);
+
+//				virtual BitmapBase &operator	 =(const int) = 0;
+//				virtual BitmapBase &operator	 =(const BitmapBase &) = 0;
+
+//				virtual Bool operator		 ==(const int) = 0;
+//				virtual Bool operator		 !=(const int) = 0;
 		};
 	};
 };
+
+#ifdef __WIN32__
+	#include "gdi/bitmapgdi.h"
+	#define Bitmap S::GUI::BitmapGDI
+#else
+	#include "none/bitmapnone.h"
+	#define Bitmap S::GUI::BitmapNone
+#endif
 
 #endif

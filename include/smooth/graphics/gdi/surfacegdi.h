@@ -54,8 +54,8 @@ namespace smooth
 
 				Int	 SetText(String, Rect, Font);
 
-				Int	 BlitFromBitmap(Bitmap *, Rect, Rect);
-				Int	 BlitToBitmap(Rect, Bitmap *, Rect);
+				Int	 BlitFromBitmap(const Bitmap &, Rect, Rect);
+				Int	 BlitToBitmap(Rect, const Bitmap &, Rect);
 		};
 	};
 };

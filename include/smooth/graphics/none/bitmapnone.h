@@ -8,14 +8,14 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_BITMAPGDI_
-#define _H_OBJSMOOTH_BITMAPGDI_
+#ifndef _H_OBJSMOOTH_BITMAPNONE_
+#define _H_OBJSMOOTH_BITMAPNONE_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class BitmapGDI;
+		class BitmapNone;
 	};
 };
 
@@ -25,21 +25,16 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 BITMAP_GDI = 1;
+		const Int	 BITMAP_NONE = 0;
 
-		class SMOOTHAPI BitmapGDI : public BitmapBase
+		class SMOOTHAPI BitmapNone : public BitmapBase
 		{
-			private:
-				HBITMAP			 bitmap;
 			public:
-							 BitmapGDI(HBITMAP = NIL);
-							 BitmapGDI(const int);
-							 BitmapGDI(const BitmapGDI &);
+							 BitmapNone();
+							 BitmapNone(const int);
+							 BitmapNone(const BitmapNone &);
 
-							~BitmapGDI();
-
-				Bool			 SetBitmap(HBITMAP);
-				HBITMAP			 GetBitmap();
+							~BitmapNone();
 
 				BitmapBase &operator	 =(const int);
 				BitmapBase &operator	 =(const BitmapBase &);

@@ -71,8 +71,8 @@ namespace smooth
 				Int		 Gradient(Rect, Int, Int, Int);
 				Int		 Bar(Point, Point, Int);
 
-				virtual Int	 BlitFromBitmap(Bitmap *, Rect, Rect);
-				virtual Int	 BlitToBitmap(Rect, Bitmap *, Rect);
+				virtual Int	 BlitFromBitmap(const Bitmap &, Rect, Rect);
+				virtual Int	 BlitToBitmap(Rect, const Bitmap &, Rect);
 		};
 
 		const Int	 FRAME_UP	= 0;

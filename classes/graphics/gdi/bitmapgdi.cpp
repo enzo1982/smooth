@@ -17,6 +17,20 @@ S::GUI::BitmapGDI::BitmapGDI(HBITMAP iBitmap)
 	SetBitmap(iBitmap);
 }
 
+S::GUI::BitmapGDI::BitmapGDI(const int nil)
+{
+	type = BITMAP_GDI;
+
+	SetBitmap(NIL);
+}
+
+S::GUI::BitmapGDI::BitmapGDI(const BitmapGDI &iBitmap)
+{
+	type = BITMAP_GDI;
+
+	SetBitmap(iBitmap.bitmap);
+}
+
 S::GUI::BitmapGDI::~BitmapGDI()
 {
 	SetBitmap(NIL);
@@ -26,13 +40,13 @@ S::Bool S::GUI::BitmapGDI::SetBitmap(HBITMAP nBitmap)
 {
 	if (nBitmap == NIL)
 	{
-		bitmap	= NIL;
+		bitmap		= NIL;
 
-		size	= Size(0, 0);
-		depth	= 0;
+		size		= Size(0, 0);
+		depth		= 0;
 
-		bytes	= NIL;
-		align	= 0;
+		bytes		= NIL;
+		align		= 0;
 	}
 	else
 	{
@@ -41,13 +55,13 @@ S::Bool S::GUI::BitmapGDI::SetBitmap(HBITMAP nBitmap)
 		ZeroMemory(&bmp, sizeof(bmp));
 		GetObjectA(nBitmap, sizeof(bmp), &bmp);
 
-		bitmap	= nBitmap;
+		bitmap		= nBitmap;
 
-		size	= Size(bmp.bmWidth, bmp.bmHeight);
-		depth	= bmp.bmBitsPixel;
+		size		= Size(bmp.bmWidth, bmp.bmHeight);
+		depth		= bmp.bmBitsPixel;
 
-		bytes	= (UnsignedByte *) bmp.bmBits;
-		align	= bmp.bmWidthBytes;
+		bytes		= (UnsignedByte *) bmp.bmBits;
+		align		= bmp.bmWidthBytes;
 	}
 
 	return True;
@@ -56,4 +70,30 @@ S::Bool S::GUI::BitmapGDI::SetBitmap(HBITMAP nBitmap)
 HBITMAP S::GUI::BitmapGDI::GetBitmap()
 {
 	return bitmap;
+}
+
+S::GUI::BitmapBase &S::GUI::BitmapGDI::operator =(const int nil)
+{
+	SetBitmap(NIL);
+
+	return *this;
+}
+
+S::GUI::BitmapBase &S::GUI::BitmapGDI::operator =(const BitmapBase &newBitmap)
+{
+	SetBitmap(((BitmapGDI *) &newBitmap)->bitmap);
+
+	return *this;
+}
+
+S::Bool S::GUI::BitmapGDI::operator ==(const int nil)
+{
+	if (bitmap == NIL)	return True;
+	else			return False;
+}
+
+S::Bool S::GUI::BitmapGDI::operator !=(const int nil)
+{
+	if (bitmap == NIL)	return False;
+	else			return True;
 }

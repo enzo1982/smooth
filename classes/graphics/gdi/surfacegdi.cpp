@@ -27,13 +27,12 @@ S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 
 	bmp_dc = CreateCompatibleDC(gdi_dc);
 
-	BitmapGDI	*bitmap = new BitmapGDI(CreateCompatibleBitmap(gdi_dc, size.cx, size.cy));
+	HBITMAP		 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
+	BitmapGDI	 bmpGDI(bitmap);
 
-	BlitToBitmap(Rect(Point(0, 0), size), bitmap, Rect(Point(0, 0), size));
+	BlitToBitmap(Rect(Point(0, 0), size), bmpGDI, Rect(Point(0, 0), size));
 
-	cDc_bitmap = (HBITMAP) SelectObject(bmp_dc, bitmap->GetBitmap());
-
-	delete bitmap;
+	cDc_bitmap = (HBITMAP) SelectObject(bmp_dc, bitmap);
 }
 
 S::GUI::SurfaceGDI::~SurfaceGDI()
@@ -316,12 +315,14 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font)
 	return Success;
 }
 
-S::Int S::GUI::SurfaceGDI::BlitFromBitmap(Bitmap *bitmap, Rect srcRect, Rect destRect)
+S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, Rect srcRect, Rect destRect)
 {
-	if (bitmap->GetBitmapType() != BITMAP_GDI) return Error;
+	BitmapGDI	 bitmap = oBitmap;
+
+	if (bitmap.GetBitmapType() != BITMAP_GDI) return Error;
 
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
-	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, ((BitmapGDI *) bitmap)->GetBitmap());
+	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetBitmap());
 
 	destRect = TranslateRect(destRect);
 
@@ -336,19 +337,21 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(Bitmap *bitmap, Rect srcRect, Rect des
 		StretchBlt(bmp_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
-	((BitmapGDI *) bitmap)->SetBitmap((HBITMAP) SelectObject(cdc, backup));
+	bitmap.SetBitmap((HBITMAP) SelectObject(cdc, backup));
 
 	DeleteDC(cdc);
 
 	return Success;
 }
 
-S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, Bitmap *bitmap, Rect destRect)
+S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, const Bitmap &oBitmap, Rect destRect)
 {
-	if (bitmap->GetBitmapType() != BITMAP_GDI) return Error;
+	BitmapGDI	 bitmap = oBitmap;
+
+	if (bitmap.GetBitmapType() != BITMAP_GDI) return Error;
 
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
-	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, ((BitmapGDI *) bitmap)->GetBitmap());
+	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetBitmap());
 
 	srcRect = TranslateRect(srcRect);
 
@@ -361,7 +364,7 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, Bitmap *bitmap, Rect destR
 		StretchBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, gdi_dc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
-	((BitmapGDI *) bitmap)->SetBitmap((HBITMAP) SelectObject(cdc, backup));
+	bitmap.SetBitmap((HBITMAP) SelectObject(cdc, backup));
 
 	DeleteDC(cdc);
 

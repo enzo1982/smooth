@@ -18,7 +18,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/gdi/bitmapgdi.h>
+#include <smooth/graphics/bitmap.h>
 #include <smooth/layer.h>
 #include <smooth/timer.h>
 
@@ -178,11 +178,9 @@ S::Int S::GUI::Button::Paint(Int message)
 					bmpRect.bottom	= bmpRect.top + bmpSize.cy;
 				}
 
-				BitmapGDI	*bmpGDI = new BitmapGDI(bitmap);
+				Bitmap	 bmp(bitmap);
 	
-				surface->BlitFromBitmap(bmpGDI, Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmpRect);
-
-				delete bmpGDI;
+				surface->BlitFromBitmap(bmp, Rect(Point(0, 0), Size(GetBitmapSizeX(bitmap), GetBitmapSizeY(bitmap))), bmpRect);
 			}
 
 			if (objectProperties->checked || (flags & BF_SHOWHIGHLIGHT))

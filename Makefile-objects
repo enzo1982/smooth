@@ -68,6 +68,11 @@ $(OBJECTDIR)/surfacegdi.o: $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp $(SMOOTHINCL
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp -o $(OBJECTDIR)/surfacegdi.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/bitmapnone.o: $(GRAPHICSCLASSESDIR)/none/bitmapnone.cpp $(SMOOTHINCLUDEDIR)/graphics/none/bitmapnone.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/none/bitmapnone.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/none/bitmapnone.cpp -o $(OBJECTDIR)/bitmapnone.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/bitmap.o: $(GRAPHICSCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmap.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmap.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmap.cpp -o $(OBJECTDIR)/bitmap.o

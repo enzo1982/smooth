@@ -62,6 +62,12 @@ namespace smooth
 				String			 GetNthLanguageEncoding(Int);
 				String			 GetNthLanguageURL(Int);
 
+				String			 GetActiveLanguageName();
+				String			 GetActiveLanguageID();
+				String			 GetActiveLanguageAuthor();
+				String			 GetActiveLanguageEncoding();
+				String			 GetActiveLanguageURL();
+
 				Int			 ActivateLanguage(String);
 				String			 TranslateString(String);
 		};

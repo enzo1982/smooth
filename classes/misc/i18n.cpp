@@ -264,6 +264,31 @@ S::String S::I18n::Translator::GetNthLanguageURL(Int index)
 	return languages.GetNthEntry(index)->url;
 }
 
+S::String S::I18n::Translator::GetActiveLanguageName()
+{
+	return activeLanguage->name;
+}
+
+S::String S::I18n::Translator::GetActiveLanguageID()
+{
+	return activeLanguage->magic;
+}
+
+S::String S::I18n::Translator::GetActiveLanguageAuthor()
+{
+	return activeLanguage->author;
+}
+
+S::String S::I18n::Translator::GetActiveLanguageEncoding()
+{
+	return activeLanguage->encoding;
+}
+
+S::String S::I18n::Translator::GetActiveLanguageURL()
+{
+	return activeLanguage->url;
+}
+
 S::Int S::I18n::Translator::ActivateLanguage(String magic)
 {
 	for (int i = 0; i < languages.GetNOfEntries(); i++)

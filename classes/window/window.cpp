@@ -804,9 +804,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_ACTIVATE:
 			if (LOWORD(wParam) != WA_INACTIVE && !(flags & WF_SYSTEMMODAL))
 			{
-				for (Int i = 0; i < Object::objectCount; i++)
+				for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 				{
-					Object	*object = mainObjectManager->RequestObject(i);
+					Object	*object = mainObjectManager->GetNthObject(i);
 
 					if (object != NIL)
 					{
@@ -1343,9 +1343,9 @@ S::GUI::Window *S::GUI::Window::GetWindow(HWND hwnd)
 {
 	if (hwnd == NIL) return NIL;
 
-	for (Int i = 0; i < Object::objectCount; i++)
+	for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 	{
-		Window	*window = (Window *) mainObjectManager->RequestObject(i);
+		Window	*window = (Window *) mainObjectManager->GetNthObject(i);
 
 		if (window != NIL)
 		{

@@ -444,9 +444,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					if (valueChanged)
 					{
-						for (int j = 0; j < Object::objectCount; j++)
+						for (int j = 0; j < mainObjectManager->GetNOfObjects(); j++)
 						{
-							Object	*object = mainObjectManager->RequestObject(j);
+							Object	*object = mainObjectManager->GetNthObject(j);
 
 							if (object != NIL)
 							{
@@ -481,9 +481,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					if (valueChanged)
 					{
-						for (int j = 0; j < Object::objectCount; j++)
+						for (int j = 0; j < mainObjectManager->GetNOfObjects(); j++)
 						{
-							Object	*object = mainObjectManager->RequestObject(j);
+							Object	*object = mainObjectManager->GetNthObject(j);
 
 							if (object != NIL)
 							{

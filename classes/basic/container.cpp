@@ -87,6 +87,11 @@ S::Int S::Container::GetNOfObjects()
 	return nOfObjects;
 }
 
+S::Object *S::Container::GetNthObject(Int n)
+{
+	return assocObjects.GetNthEntry(n);
+}
+
 S::Object *S::Container::RequestObject(Int objectHandle)
 {
 	return assocObjects.GetEntry(objectHandle);

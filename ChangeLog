@@ -43,6 +43,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 - menubar.cpp		- iconbars now support bigger icons
 - shortcut.cpp		- new class: provides support for keyboard shortcuts
 
+- fixed programs slow down when running for a longer time
 - UnregisterObject() is no longer required unless you are removing an Object before the program quits
 - introduced a new font management system
 - fixed some PopupMenu issues

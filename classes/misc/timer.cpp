@@ -56,9 +56,9 @@ S::Int S::Timer::GetID()
 
 S::Void WINAPI S::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
 {
-	for (S::Int i = 0; i < S::Object::objectCount; i++)
+	for (S::Int i = 0; i < S::mainObjectManager->GetNOfObjects(); i++)
 	{
-		S::Object *object = S::mainObjectManager->RequestObject(i);
+		S::Object *object = S::mainObjectManager->GetNthObject(i);
 
 		if (object != NIL)
 		{

@@ -62,9 +62,9 @@ S::Int S::GUI::Client::Paint(Int message)
 	client.right	= objectProperties->size.cx + objectProperties->pos.x - 1;
 	client.bottom	= objectProperties->size.cy + objectProperties->pos.y - 2;
 
-	for (Int i = Object::objectCount - 1; i >= 0; i--)
+	for (Int i = mainObjectManager->GetNOfObjects() - 1; i >= 0; i--)
 	{
-		object = mainObjectManager->RequestObject(i);
+		object = mainObjectManager->GetNthObject(i);
 
 		if (object != NIL)
 		{

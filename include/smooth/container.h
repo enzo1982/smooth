@@ -49,6 +49,7 @@ namespace smooth
 			virtual Int		 UnregisterObject(Object *);
 
 			Int			 GetNOfObjects();
+			Object			*GetNthObject(Int);
 			Object			*RequestObject(Int);
 
 			virtual Bool		 IsContainerCompatible(Int);

@@ -256,9 +256,9 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 					Paint(SP_PAINT);
 
-					for (Int i = 0; i < Object::objectCount; i++)
+					for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 					{
-						object = mainObjectManager->RequestObject(i);
+						object = mainObjectManager->GetNthObject(i);
 
 						if (object != NIL)
 						{

@@ -158,9 +158,9 @@ S::Int S::Loop()
 		initializing = false;
 		loopActive = true;
 
-		for (int i = 0; i < Object::objectCount; i++)
+		for (int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 		{
-			wnd = (GUI::Window *) mainObjectManager->RequestObject(i);
+			wnd = (GUI::Window *) mainObjectManager->GetNthObject(i);
 
 			if (wnd != (GUI::Window *) NIL)
 			{

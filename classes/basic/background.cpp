@@ -32,9 +32,9 @@ S::BackgroundApplication::~BackgroundApplication()
 }
 S::Void S::BackgroundApplication::TimerProc()
 {
-	for (Int i = 0; i < Object::objectCount; i++)
+	for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 	{
-		Object	*object = mainObjectManager->RequestObject(i);
+		Object	*object = mainObjectManager->GetNthObject(i);
 
 		if (object != NIL)
 		{

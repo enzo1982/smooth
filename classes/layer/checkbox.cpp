@@ -260,9 +260,9 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 				Process(SM_MOUSEMOVE, 0, 0);
 
-				for (Int i = 0; i < objectCount; i++)
+				for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 				{
-					object = mainObjectManager->RequestObject(i);
+					object = mainObjectManager->GetNthObject(i);
 
 					if (object != NIL)
 					{

@@ -109,9 +109,9 @@ S::Int S::GUI::Divider::Paint(Int message)
 			doubleBar2.x = wnd->GetObjectProperties()->size.cx - 4;
 			doubleBar2.y = doubleBar1.y;
 
-			for (Int i = Object::objectCount - 1; i >= 0; i--)
+			for (Int i = mainObjectManager->GetNOfObjects() - 1; i >= 0; i--)
 			{
-				object = mainObjectManager->RequestObject(i);
+				object = mainObjectManager->GetNthObject(i);
 
 				if (object != NIL)
 				{
@@ -146,9 +146,9 @@ S::Int S::GUI::Divider::Paint(Int message)
 			doubleBar2.x = layer->GetRealPosition().x + layer->GetObjectProperties()->size.cx - 4;
 			doubleBar2.y = doubleBar1.y;
 
-			for (Int i = Object::objectCount - 1; i >= 0; i--)
+			for (Int i = mainObjectManager->GetNOfObjects() - 1; i >= 0; i--)
 			{
-				object = mainObjectManager->RequestObject(i);
+				object = mainObjectManager->GetNthObject(i);
 
 				if (object != NIL)
 				{
@@ -190,9 +190,9 @@ S::Int S::GUI::Divider::Paint(Int message)
 			doubleBar2.x = doubleBar1.x;
 			doubleBar2.y = wnd->GetObjectProperties()->size.cy - wnd->offset.bottom - 2;
 
-			for (Int i = Object::objectCount - 1; i >= 0; i--)
+			for (Int i = mainObjectManager->GetNOfObjects() - 1; i >= 0; i--)
 			{
-				object = mainObjectManager->RequestObject(i);
+				object = mainObjectManager->GetNthObject(i);
 
 				if (object != NIL)
 				{
@@ -226,9 +226,9 @@ S::Int S::GUI::Divider::Paint(Int message)
 			doubleBar2.x = doubleBar1.x;
 			doubleBar2.y = layer->GetRealPosition().y + layer->GetObjectProperties()->size.cy - 4;
 
-			for (Int i = Object::objectCount - 1; i >= 0; i--)
+			for (Int i = mainObjectManager->GetNOfObjects() - 1; i >= 0; i--)
 			{
-				object = mainObjectManager->RequestObject(i);
+				object = mainObjectManager->GetNthObject(i);
 
 				if (object != NIL)
 				{

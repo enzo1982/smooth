@@ -32,9 +32,9 @@ S::Void S::SMOOTH::SendMessage(GUI::Window *window, Int message, Int wParam, Int
 	}
 	else
 	{
-		for (Int i = 0; i < Object::objectCount; i++)
+		for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 		{
-			Object	*object = mainObjectManager->RequestObject(i);
+			Object	*object = mainObjectManager->GetNthObject(i);
 
 			if (object != NIL)
 			{

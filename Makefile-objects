@@ -8,6 +8,11 @@ $(OBJECTDIR)/background.o: $(BASICCLASSESDIR)/background.cpp $(SMOOTHINCLUDEDIR)
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/background.cpp -o $(OBJECTDIR)/background.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/class.o: $(BASICCLASSESDIR)/class.cpp $(SMOOTHINCLUDEDIR)/class.h
+	$(ECHO) -n Compiling $(BASICCLASSESDIR)/class.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/class.cpp -o $(OBJECTDIR)/class.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/container.o: $(BASICCLASSESDIR)/container.cpp $(SMOOTHINCLUDEDIR)/container.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/container.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/container.cpp -o $(OBJECTDIR)/container.o
@@ -21,6 +26,11 @@ $(OBJECTDIR)/containertype.o: $(BASICCLASSESDIR)/containertype.cpp $(SMOOTHINCLU
 $(OBJECTDIR)/input.o: $(BASICCLASSESDIR)/input.cpp $(SMOOTHINCLUDEDIR)/input.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/input.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/input.cpp -o $(OBJECTDIR)/input.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/memory.o: $(BASICCLASSESDIR)/memory.cpp $(SMOOTHINCLUDEDIR)/memory.h
+	$(ECHO) -n Compiling $(BASICCLASSESDIR)/memory.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/memory.cpp -o $(OBJECTDIR)/memory.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/object.o: $(BASICCLASSESDIR)/object.cpp $(SMOOTHINCLUDEDIR)/object.h

@@ -108,6 +108,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 				comboBox->SetOrientation(objectProperties->orientation);
 				comboBox->onClick.Connect(&EditBox::DropDownListProc, this);
 
+				if (!active) comboBox->Deactivate();
+
 				for (Int i = 0; i < dropDownList->GetNOfEntries(); i++)
 				{
 					comboBox->AddEntry(dropDownList->GetNthEntry(i)->name);
@@ -119,6 +121,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			{
 				comboBox->GetObjectProperties()->pos = objectProperties->pos;
 				comboBox->GetObjectProperties()->size = objectProperties->size;
+
+				if (!active) comboBox->Deactivate();
 			}
 
 			textRect.left	= frame.left + 3;

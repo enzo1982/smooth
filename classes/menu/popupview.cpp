@@ -33,6 +33,8 @@ S::GUI::PopupView::PopupView(PopupMenu *popupMenu, Menu *iRealMenu)
 	objectProperties->orientation	= OR_FREE;
 	myPopup				= popupMenu;
 	realMenu			= iRealMenu;
+	openTimer			= NIL;
+	closeTimer			= NIL;
 
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
@@ -312,13 +314,8 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
-		case SM_LBUTTONDOWN:
-			if (myPopup->nextPopup != NIL)
-			{
-				DeleteObject(myPopup->nextPopup);
-
-				myPopup->nextPopup = NIL;
-			}
+		case SM_OPENPOPUP:
+			Process(SM_CLOSEPOPUP, 0, 0);
 
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
@@ -358,12 +355,47 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+		case SM_CLOSEPOPUP:
+			if (myPopup->nextPopup != NIL)
+			{
+				if (closeTimer != NIL)
+				{
+					DeleteObject(closeTimer);
+
+					closeTimer = NIL;
+				}
+
+				DeleteObject(myPopup->nextPopup);
+
+				myPopup->nextPopup = NIL;
+			}
+			break;
+		case SM_LBUTTONDOWN:
+		case SM_LBUTTONDBLCLK:
+			if (myPopup->nextPopup != NIL)
+			{
+				Process(SM_CLOSEPOPUP, 0, 0);
+
+				if (openTimer != NIL) Process(SM_OPENPOPUP, 0, 0);
+
+				retVal = Break;
+			}
+			else
+			{
+				if (openTimer != NIL) DeleteObject(openTimer);
+
+				openTimer = NIL;
+
+				Process(SM_OPENPOPUP, 0, 0);
+			}
+
+			break;
 		case SM_LBUTTONUP:
 			for (i = 0; i < realMenu->GetNOfEntries(); i++)
 			{
 				Menu::Entry	*entry = realMenu->entries.GetNthEntry(i);
 
-				if (entry->checked && (entry->popup == NIL && entry->bVar == NIL && entry->iVar == NIL))
+				if (entry->checked && wnd->IsMouseOn(entryRect[i]) && (entry->popup == NIL && entry->bVar == NIL && entry->iVar == NIL))
 				{
 					entry->checked = False;
 
@@ -384,7 +416,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					break;
 				}
 
-				if (entry->checked && (entry->bVar != NIL))
+				if (entry->checked && wnd->IsMouseOn(entryRect[i]) && (entry->bVar != NIL))
 				{
 					Bool	 valueChanged = False;
 
@@ -423,7 +455,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					break;
 				}
 
-				if (entry->checked && (entry->iVar != NIL))
+				if (entry->checked && wnd->IsMouseOn(entryRect[i]) && (entry->iVar != NIL))
 				{
 					Bool	 valueChanged = False;
 
@@ -519,6 +551,12 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 								surface->Line(p1, p2, Setup::GradientTextColor);
 							}
+
+							if (openTimer != NIL) DeleteObject(openTimer);
+
+							openTimer = new Timer();
+							openTimer->onInterval.Connect(&PopupView::OpenProc, this);
+							openTimer->Start(150);
 						}
 
 						if (entry->bVar != NIL)
@@ -664,35 +702,62 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					}
 					else if (!wnd->IsMouseOn(entryRect[i]) && entry->checked)
 					{
-						entry->checked = False;
-
 						if (entry->description != NIL) setOldStatus = True;
-
-						entryRect[i].right++;
-						entryRect[i].bottom++;
-
-						surface->Box(entryRect[i], Setup::BackgroundColor, FILLED);
-
-						entryRect[i].left = entryRect[i].left + 17;
-
-						surface->SetText(entry->text, entryRect[i], objectProperties->font);
 
 						if (entry->popup != NIL)
 						{
-							p1.x = entryRect[i].right - 9;
-							p2.x = p1.x;
-							p1.y = entryRect[i].top + METRIC_POPUPARROWOFFSETY;
-							p2.y = p1.y + 9;
+							if (openTimer != NIL) DeleteObject(openTimer);
 
-							for (Int x = 0; x < 4; x++)
+							openTimer = NIL;
+
+							if (wnd->IsMouseOn(popupRect) || myPopup->nextPopup == NIL)
 							{
-								p1.x++;
-								p2.x++;
-								p1.y++;
-								p2.y--;
+								entry->checked = False;
 
-								surface->Line(p1, p2, Setup::TextColor);
+								entryRect[i].right++;
+								entryRect[i].bottom++;
+
+								surface->Box(entryRect[i], Setup::BackgroundColor, FILLED);
+
+								entryRect[i].left = entryRect[i].left + 17;
+
+								surface->SetText(entry->text, entryRect[i], objectProperties->font);
+
+								p1.x = entryRect[i].right - 9;
+								p2.x = p1.x;
+								p1.y = entryRect[i].top + METRIC_POPUPARROWOFFSETY;
+								p2.y = p1.y + 9;
+
+								for (Int x = 0; x < 4; x++)
+								{
+									p1.x++;
+									p2.x++;
+									p1.y++;
+									p2.y--;
+
+									surface->Line(p1, p2, Setup::TextColor);
+								}
+
+								if (closeTimer == NIL)
+								{
+									closeTimer = new Timer();
+									closeTimer->onInterval.Connect(&PopupView::CloseProc, this);
+									closeTimer->Start(150);
+								}
 							}
+						}
+						else
+						{
+							entry->checked = False;
+
+							entryRect[i].right++;
+							entryRect[i].bottom++;
+
+							surface->Box(entryRect[i], Setup::BackgroundColor, FILLED);
+
+							entryRect[i].left = entryRect[i].left + 17;
+
+							surface->SetText(entry->text, entryRect[i], objectProperties->font);
 						}
 
 						if (entry->bVar != NIL)
@@ -869,4 +934,38 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 	LeaveProtectedRegion();
 
 	return retVal;
+}
+
+S::Void S::GUI::PopupView::OpenProc()
+{
+	if (myPopup->nextPopup != NIL)
+	{
+		DeleteObject(openTimer);
+
+		openTimer = NIL;
+	}
+	else
+	{
+		Process(SM_OPENPOPUP, 0, 0);
+	}
+}
+
+S::Void S::GUI::PopupView::CloseProc()
+{
+	DeleteObject(closeTimer);
+
+	closeTimer = NIL;
+
+	Window	*wnd = myContainer->GetContainerWindow();
+	Rect	 popupRect;
+
+	popupRect.left		= 0;
+	popupRect.top		= 0;
+	popupRect.right		= realMenu->popupsize.cx;
+	popupRect.bottom	= realMenu->popupsize.cy;
+
+	if (wnd->IsMouseOn(popupRect) && myPopup->nextPopup != NIL)
+	{
+		Process(SM_CLOSEPOPUP, 0, 0);
+	}
 }

@@ -36,6 +36,9 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 - fontdlg.cpp		- implemented a font selection dialog
 - background.cpp	- messages are now sent to all threads; fixes some problems with multithreaded applications
 - document.cpp		- added support for parsing XML documents in memory
+- popupview.cpp		- popups now open automatically when the mouse is moved on a popup entry
+- class.cpp		- new class: Class; will become the base class for all other smooth classes
+- memory.cpp		- new class: Memory; provides memory management functionality
 
 - introduced a new font management system
 - fixed some PopupMenu issues

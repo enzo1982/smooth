@@ -162,6 +162,8 @@ const S::Int SM_CHECKOPTIONBOXES	= 1536;
 const S::Int SM_CHECKPOPUPS		= 1537;
 const S::Int SM_LOOSEFOCUS		= 1538;
 const S::Int SM_TIMER			= 1539;
+const S::Int SM_OPENPOPUP		= 1540;
+const S::Int SM_CLOSEPOPUP		= 1541;
 
 const S::Int OR_UPPERLEFT		= 0;
 const S::Int OR_UPPERRIGHT		= 1;

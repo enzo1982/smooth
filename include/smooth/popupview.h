@@ -23,6 +23,7 @@ namespace smooth
 };
 
 #include "widget.h"
+#include "timer.h"
 
 namespace smooth
 {
@@ -32,6 +33,12 @@ namespace smooth
 		{
 			private:
 				String		 backupStatusText;
+
+				Timer		*openTimer;
+				Timer		*closeTimer;
+
+				Void		 OpenProc();
+				Void		 CloseProc();
 			protected:
 				PopupMenu	*myPopup;
 				Menu		*realMenu;

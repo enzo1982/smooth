@@ -19,8 +19,8 @@ S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 	gdi_dc = iDc;
 	real_dc = iDc;
 
-	size.cx	= GetDeviceCaps(gdi_dc, HORZRES);
-	size.cy	= GetDeviceCaps(gdi_dc, VERTRES);
+	size.cx	= GetDeviceCaps(gdi_dc, HORZRES) + 2;
+	size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 
 	HBITMAP	 bitmap = CreateBitmap(size.cx, size.cy, GetDeviceCaps(gdi_dc, PLANES), GetDeviceCaps(gdi_dc, BITSPIXEL), NIL);
 

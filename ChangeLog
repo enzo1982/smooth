@@ -1,14 +1,27 @@
 ChangeLog for smooth
 
-xx.xx.04 xx:xx - smooth alpha 0.8.65.0
+xx.xx.xx xx:xx - smooth alpha 0.8.66.0
+
+- object.cpp	- incorporated object manager functionality into Object
+- xulloader.cpp	- added a XUL loader that can be executed via rundll32
+
+- removed ObjectManager
+
+18.11.04 00:06 - smooth alpha 0.8.65.0
 
 - editbox.cpp	- improved multiline editbox
-- renderer.cpp	- started implementation of a XUL renderer
+- renderer.cpp	- started implementation of an XUL renderer
 - window.cpp	- windows can now be shown minimized initially
 - array.cpp	- improved smooth::Array implementation
 - file.cpp	- new class: File; basic file handling routines
 - directory.cpp	- new class: Directory; basic directory handling routines
 - signal.cpp	- improved signals and slots implementation
+- extended.cpp	- improved Extended<> class
+		- implemented -> and * operators
+- math.cpp	- implemented integer versions of Abs, Pow, Min, Max and Mod
+- form.cpp	- class Primitive renamed to Form
+- container.cpp	- moved into namespace GUI
+		- containers now inherit from Widget
 
 - added auto registration for backends (just compile and link any new backends to use them; no need to change existing code)
 - added the fribidi library to support RTL scripts on all systems

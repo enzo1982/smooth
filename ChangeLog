@@ -7,6 +7,7 @@ xx.xx.xx xx:xx - smooth alpha 0.8.66.0
 - window.cpp	- fixed a possible crash
 
 - removed ObjectManager
+- upgrade to libXML2 version 2.6.16
 
 18.11.04 00:06 - smooth alpha 0.8.65.0
 

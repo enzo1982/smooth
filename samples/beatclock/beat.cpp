@@ -73,7 +73,7 @@ BeatClock::BeatClock()
 	wnd->SetIcon(SMOOTH::LoadImage("beat.pci", 0, NIL));
 	wnd->onPaint.Connect(&BeatClock::PaintAll, this);
 	wnd->SetExStyle(WS_EX_TOPMOST|WS_EX_TOOLWINDOW);
-	wnd->SetMetrics(Point(wpx, wpy), Size(164 * SMOOTH::Setup::FontSize, 103 * SMOOTH::Setup::FontSize));
+	wnd->SetMetrics(Point(wpx, wpy), Size(164 * Setup::FontSize, 103 * Setup::FontSize));
 	wnd->SetMessageProc(MessageProc(&BeatClock::EventProc), this);
 	wnd->Show();
 
@@ -549,7 +549,7 @@ Void BeatClock::PaintAll()
 	int			 ccbeats = 0;
 	String			 btext = "@";
 	String			 btext2 = "@";
-	HBRUSH			 brush = CreateSolidBrush(SMOOTH::Setup::BackgroundColor);
+	HBRUSH			 brush = CreateSolidBrush(Setup::BackgroundColor);
 	HFONT			 hfont;
 	HFONT			 holdfont;
 
@@ -704,22 +704,22 @@ Void BeatClock::PaintAll()
 		switch (centi)
 		{
 			case true:
-				textrect.left = (int) ((16 * SMOOTH::Setup::FontSize) + 0.5);
-				textrect.top = (int) ((53 * SMOOTH::Setup::FontSize) + 0.5);
-				textrect.right = wnd->GetObjectProperties()->size.cx - (int) ((16 * SMOOTH::Setup::FontSize) + 0.5);
-				textrect.bottom = textrect.top + (int) ((40 * SMOOTH::Setup::FontSize) + 0.5);
+				textrect.left = (int) ((16 * Setup::FontSize) + 0.5);
+				textrect.top = (int) ((53 * Setup::FontSize) + 0.5);
+				textrect.right = wnd->GetObjectProperties()->size.cx - (int) ((16 * Setup::FontSize) + 0.5);
+				textrect.bottom = textrect.top + (int) ((40 * Setup::FontSize) + 0.5);
 				FillRect(dc, &textrect, brush);
-				if (timeformat == 1) textrect.left = (int) ((25 * SMOOTH::Setup::FontSize) + 0.5);
+				if (timeformat == 1) textrect.left = (int) ((25 * Setup::FontSize) + 0.5);
 
 				SetBkMode(dc, TRANSPARENT);
 				SetTextColor(dc, RGB(0, 0, 0));
 
-				if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
+				if (Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
 				else					hfont = CreateFontA(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
 
 				holdfont = (HFONT) SelectObject(dc, hfont);
 
-				if (SMOOTH::Setup::enableUnicode)	DrawTextW(dc, btext, -1, &textrect, DT_LEFT);
+				if (Setup::enableUnicode)	DrawTextW(dc, btext, -1, &textrect, DT_LEFT);
 				else					DrawTextA(dc, btext, -1, &textrect, DT_LEFT);
 
 				SelectObject(dc, holdfont);
@@ -732,24 +732,24 @@ Void BeatClock::PaintAll()
 			case false:
 				if (actbeats != beats || (timeformat == 1 && actcbeats != cbeats) || wmpaint)
 				{
-					textrect.left = (int) ((16 * SMOOTH::Setup::FontSize) + 0.5);
-					textrect.top = (int) ((53 * SMOOTH::Setup::FontSize) + 0.5);
-					textrect.right = wnd->GetObjectProperties()->size.cx - (int) ((16 * SMOOTH::Setup::FontSize) + 0.5);
-					textrect.bottom = textrect.top + (int) ((40 * SMOOTH::Setup::FontSize) + 0.5);
+					textrect.left = (int) ((16 * Setup::FontSize) + 0.5);
+					textrect.top = (int) ((53 * Setup::FontSize) + 0.5);
+					textrect.right = wnd->GetObjectProperties()->size.cx - (int) ((16 * Setup::FontSize) + 0.5);
+					textrect.bottom = textrect.top + (int) ((40 * Setup::FontSize) + 0.5);
 					FillRect(dc, &textrect, brush);
-					textrect.left = (int) (44 * SMOOTH::Setup::FontSize);
-					if (timeformat == 1) textrect.left = (int) ((45 * SMOOTH::Setup::FontSize) + 0.5);
+					textrect.left = (int) (44 * Setup::FontSize);
+					if (timeformat == 1) textrect.left = (int) ((45 * Setup::FontSize) + 0.5);
 
 					SetBkMode(dc, TRANSPARENT);
 					SetTextColor(dc, RGB(0, 0, 0));
 
-					if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
+					if (Setup::enableUnicode)	hfont = CreateFontW(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
 					else					hfont = CreateFontA(-MulDiv(21, GetDeviceCaps(dc, LOGPIXELSY), 72), 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, String("Arial"));
 
 					holdfont = (HFONT) SelectObject(dc, hfont);
 
 
-					if (SMOOTH::Setup::enableUnicode)	DrawTextW(dc, btext2, -1, &textrect, DT_LEFT);
+					if (Setup::enableUnicode)	DrawTextW(dc, btext2, -1, &textrect, DT_LEFT);
 					else					DrawTextA(dc, btext2, -1, &textrect, DT_LEFT);
 
 					SelectObject(dc, holdfont);

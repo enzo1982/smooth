@@ -42,15 +42,15 @@ S::GUI::ListBox::ListBox(Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	SetFont(objectProperties->font, I18N_SMALLFONTSIZE, SMOOTH::Setup::ClientTextColor, objectProperties->fontWeight);
+	SetFont(objectProperties->font, I18N_SMALLFONTSIZE, Setup::ClientTextColor, objectProperties->fontWeight);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(80 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 }
 
 S::GUI::ListBox::~ListBox()
@@ -162,14 +162,14 @@ S::Int S::GUI::ListBox::Show()
 		Point	 realPos = GetRealPosition();
 		Point	 sbp = Point(realPos.x + objectProperties->size.cx - 2 - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET, realPos.y + 1 - layer->GetObjectProperties()->pos.y);
 		Size	 sbs = Size(METRIC_LISTBOXSBSIZE, objectProperties->size.cy - 1);
-		Float	 oldMeasurement = SMOOTH::Setup::FontSize;
+		Float	 oldMeasurement = Setup::FontSize;
 
 		SetMeasurement(SMT_PIXELS);
 
 		scrollbar->SetMetrics(sbp, sbs);
 		scrollbar->SetRange(0, nOfEntries - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
 
-		SMOOTH::Setup::FontSize = oldMeasurement;
+		Setup::FontSize = oldMeasurement;
 
 		scrollbar->Show();
 	}
@@ -216,8 +216,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			if (message != SP_UPDATE)
 			{
-				if (active)	surface->Box(frame, SMOOTH::Setup::ClientColor, FILLED);
-				else		surface->Box(frame, SMOOTH::Setup::BackgroundColor, FILLED);
+				if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 				surface->Frame(frame, FRAME_DOWN);
 			}
@@ -242,7 +242,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					sbs.cx = METRIC_LISTBOXSBSIZE;
 					sbs.cy = objectProperties->size.cy - 1;
 
-					oldMeasurement = SMOOTH::Setup::FontSize;
+					oldMeasurement = Setup::FontSize;
 
 					SetMeasurement(SMT_PIXELS);
 
@@ -250,7 +250,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					scrollbar->onClick.Connect(&ListBox::ScrollbarProc, this);
 
-					SMOOTH::Setup::FontSize = oldMeasurement;
+					Setup::FontSize = oldMeasurement;
 
 					layer->RegisterObject(scrollbar);
 
@@ -307,7 +307,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					{
 						operat->rect.right++;
 						operat->rect.bottom++;
-						surface->Box(operat->rect, SMOOTH::Setup::ClientTextColor, OUTLINEDOTS);
+						surface->Box(operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 						operat->rect.right--;
 						operat->rect.bottom--;
 					}
@@ -375,7 +375,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
 
-				Box(dc, frame, SMOOTH::Setup::ClientColor, FILLED);
+				Box(dc, frame, Setup::ClientColor, FILLED);
 
 				frame.left	= realPos.x;
 				frame.top	= realPos.y;
@@ -415,7 +415,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						{
 							operat->rect.right++;
 							operat->rect.bottom++;
-							Box(dc, operat->rect, SMOOTH::Setup::ClientTextColor, OUTLINEDOTS);
+							Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 							operat->rect.right--;
 							operat->rect.bottom--;
 						}
@@ -469,7 +469,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						operat->clk = False;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::ClientColor, OUTLINED);
+						Box(dc, operat->rect, Setup::ClientColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 					}
@@ -490,7 +490,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						operat->clk = True;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::ClientTextColor, OUTLINEDOTS);
+						Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
@@ -521,7 +521,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						operat->chk = False;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::ClientColor, FILLED);
+						Box(dc, operat->rect, Setup::ClientColor, FILLED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
@@ -535,7 +535,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						{
 							operat->rect.right++;
 							operat->rect.bottom++;
-							Box(dc, operat->rect, SMOOTH::Setup::ClientTextColor, OUTLINEDOTS);
+							Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 							operat->rect.right--;
 							operat->rect.bottom--;
 						}
@@ -562,7 +562,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						operat->chk = False;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::ClientColor, FILLED);
+						Box(dc, operat->rect, Setup::ClientColor, FILLED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
@@ -576,7 +576,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						{
 							operat->rect.right++;
 							operat->rect.bottom++;
-							Box(dc, operat->rect, SMOOTH::Setup::ClientTextColor, OUTLINEDOTS);
+							Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 							operat->rect.right--;
 							operat->rect.bottom--;
 						}
@@ -597,13 +597,13 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						operat->chk = True;
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Gradient(dc, operat->rect, SMOOTH::Setup::GradientStartColor, SMOOTH::Setup::GradientEndColor, GRADIENT_LR);
+						Gradient(dc, operat->rect, Setup::GradientStartColor, Setup::GradientEndColor, GRADIENT_LR);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
 						operat->rect.left++;
 						operat->rect.top++;
-						::SetText(dc, operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GradientTextColor, objectProperties->fontWeight);
+						::SetText(dc, operat->text, operat->rect, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
 						operat->rect.left--;
 						operat->rect.top--;
 
@@ -611,7 +611,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 						{
 							operat->rect.right++;
 							operat->rect.bottom++;
-							Box(dc, operat->rect, SMOOTH::Setup::ClientTextColor, OUTLINEDOTS);
+							Box(dc, operat->rect, Setup::ClientTextColor, OUTLINEDOTS);
 							operat->rect.right--;
 							operat->rect.bottom--;
 						}

@@ -38,6 +38,11 @@ $(OBJECTDIR)/objecttype.o: $(BASICCLASSESDIR)/objecttype.cpp $(SMOOTHINCLUDEDIR)
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/objecttype.cpp -o $(OBJECTDIR)/objecttype.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/setup.o: $(BASICCLASSESDIR)/setup.cpp $(SMOOTHINCLUDEDIR)/setup.h
+	$(ECHO) -n Compiling $(BASICCLASSESDIR)/setup.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/setup.cpp -o $(OBJECTDIR)/setup.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/system.o: $(BASICCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/system.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/system.cpp -o $(OBJECTDIR)/system.o

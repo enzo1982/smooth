@@ -61,13 +61,13 @@ S::Int S::DialogDirSelection::ShowDialog()
 	infoa.lParam = 0;
 	infoa.iImage = 0;
 
-	if (SMOOTH::Setup::enableUnicode)	SHGetPathFromIDListW(SHBrowseForFolderW(&infow), bufferw);
-	else					SHGetPathFromIDListA(SHBrowseForFolderA(&infoa), buffera);
+	if (Setup::enableUnicode)	SHGetPathFromIDListW(SHBrowseForFolderW(&infow), bufferw);
+	else				SHGetPathFromIDListA(SHBrowseForFolderA(&infoa), buffera);
 
 	directory = NIL;
 
-	if (SMOOTH::Setup::enableUnicode && (bufferw != NIL && bufferw[0] != 0))	directory = bufferw;
-	else if (buffera != NIL && buffera[0] != 0)					directory = buffera;
+	if (Setup::enableUnicode && (bufferw != NIL && bufferw[0] != 0))	directory = bufferw;
+	else if (buffera != NIL && buffera[0] != 0)				directory = buffera;
 
 	delete [] bufferw;
 	delete [] buffera;

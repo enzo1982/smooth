@@ -37,13 +37,13 @@ S::GUI::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(22 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(22 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 
 	if (bitmap == NIL)
 	{
@@ -52,8 +52,8 @@ S::GUI::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
 	}
 	else
 	{
-		bmpSize.cx = Math::Round(GetBitmapSizeX(bitmap) * SMOOTH::Setup::FontSize);
-		bmpSize.cy = Math::Round(GetBitmapSizeY(bitmap) * SMOOTH::Setup::FontSize);
+		bmpSize.cx = Math::Round(GetBitmapSizeX(bitmap) * Setup::FontSize);
+		bmpSize.cy = Math::Round(GetBitmapSizeY(bitmap) * Setup::FontSize);
 	}
 
 	GetTextSize();
@@ -142,7 +142,7 @@ S::Int S::GUI::Button::Paint(Int message)
 				}
 
 				if (active)	surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-				else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GrayTextColor, objectProperties->fontWeight);
+				else		surface->SetText(objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
 			}
 
 			if (bitmap != NIL)
@@ -202,7 +202,7 @@ S::Int S::GUI::Button::Paint(Int message)
 			frame.right	= realPos.x + objectProperties->size.cx - 4;
 			frame.bottom	= realPos.y + objectProperties->size.cy - 4;
 
-			surface->Box(frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+			surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 
 			break;
 	}

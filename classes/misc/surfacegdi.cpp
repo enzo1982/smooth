@@ -72,15 +72,15 @@ S::Int S::GUI::SurfaceGDI::Frame(Rect rect, Int style)
 	{
 		case FRAME_UP: // up
 		{
-			color1 = RGB(min(GetRed(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetGreen(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetBlue(SMOOTH::Setup::BackgroundColor) + 64, 255));
-			color2 = RGB(max(GetRed(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetGreen(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetBlue(SMOOTH::Setup::BackgroundColor) - 64, 0));
+			color1 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
+			color2 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
 		}
 		break;
 
 		case FRAME_DOWN: // down
 		{
-			color1 = RGB(max(GetRed(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetGreen(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetBlue(SMOOTH::Setup::BackgroundColor) - 64, 0));
-			color2 = RGB(min(GetRed(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetGreen(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetBlue(SMOOTH::Setup::BackgroundColor) + 64, 255));
+			color1 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
+			color2 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
 		}
 		break;
 	}
@@ -176,8 +176,8 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int si
 	SetBkMode(gdi_dc, TRANSPARENT);
 	SetTextColor(gdi_dc, color);
 
-	if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
-	else					hfont = CreateFontA(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	if (Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	else				hfont = CreateFontA(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
 
 	holdfont = (HFONT) SelectObject(gdi_dc, hfont);
 
@@ -208,8 +208,8 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int si
 
 		RECT	 Rect = rect;
 
-		if (SMOOTH::Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS, NIL);
-		else					DrawTextExA(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS, NIL);
+		if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS, NIL);
+		else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS, NIL);
 
 		rect.top += height;
 	}

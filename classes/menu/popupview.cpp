@@ -69,7 +69,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 	popupRect.right		= myPopup->popupsize.cx;
 	popupRect.bottom	= myPopup->popupsize.cy;
 
-	Box(dc, popupRect, SMOOTH::Setup::BackgroundColor, FILLED);
+	Box(dc, popupRect, Setup::BackgroundColor, FILLED);
 	Frame(dc, popupRect, FRAME_UP);
 
 	for (Int i = 0; i < myPopup->nOfEntries; i++)
@@ -111,7 +111,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 					p2.x++;
 					p1.y++;
 					p2.y--;
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 				}
 			}
 
@@ -129,84 +129,84 @@ S::Int S::GUI::PopupView::Paint(Int message)
 					p2.x = frame.right;
 					p2.y = frame.bottom;
 
-					Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 					p1.x = frame.left + 4;
 					p1.y = frame.top + 3;
 					p2.x = frame.right;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 					p1.x = frame.left + 3;
 					p1.y = frame.top + 4;
 					p2.x = frame.right - 1;
 					p2.y = frame.bottom;
 
-					Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 					p1.x = frame.right - 1;
 					p1.y = frame.top + 3;
 					p2.x = frame.left + 2;
 					p2.y = frame.bottom;
 
-					Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 					p1.x = frame.right - 1;
 					p1.y = frame.top + 4;
 					p2.x = frame.left + 3;
 					p2.y = frame.bottom;
 
-					Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 					p1.x = frame.right - 2;
 					p1.y = frame.top + 3;
 					p2.x = frame.left + 2;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 					p1.x = frame.left + 2;
 					p1.y = frame.top + 2;
 					p2.x = frame.right - 1;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 					p1.x = frame.left + 3;
 					p1.y = frame.top + 2;
 					p2.x = frame.right - 1;
 					p2.y = frame.bottom - 2;
 
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 					p1.x = frame.left + 2;
 					p1.y = frame.top + 3;
 					p2.x = frame.right - 2;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 					p1.x = frame.right - 2;
 					p1.y = frame.top + 2;
 					p2.x = frame.left + 1;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 					p1.x = frame.right - 2;
 					p1.y = frame.top + 3;
 					p2.x = frame.left + 2;
 					p2.y = frame.bottom - 1;
 
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 					p1.x = frame.right - 3;
 					p1.y = frame.top + 2;
 					p2.x = frame.left + 1;
 					p2.y = frame.bottom - 2;
 
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 				}
 			}
 
@@ -224,7 +224,7 @@ S::Int S::GUI::PopupView::Paint(Int message)
 					p2.x--;
 					p2.y -= 7;
 
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 					p1.x--;
 					p2.x++;
@@ -234,25 +234,25 @@ S::Int S::GUI::PopupView::Paint(Int message)
 						p1.y++;
 						p2.y++;
 
-						Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+						Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 					}
 
-					PaintPixel(dc, Point(p2.x, p2.y - 1), SMOOTH::Setup::DividerDarkColor);
-					PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
+					PaintPixel(dc, Point(p2.x, p2.y - 1), Setup::DividerDarkColor);
+					PaintPixel(dc, p2, Setup::DividerDarkColor);
 
 					p1.x++;
 					p1.y++;
 					p2.y++;
 
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
-					PaintPixel(dc, Point(p2.x - 1, p2.y), SMOOTH::Setup::DividerDarkColor);
-					PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+					PaintPixel(dc, Point(p2.x - 1, p2.y), Setup::DividerDarkColor);
+					PaintPixel(dc, p2, Setup::DividerDarkColor);
 
 					p1.x++;
 					p1.y++;
 					p2.y++;
 
-					Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 				}
 			}
 
@@ -487,7 +487,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						entryRect[i].right++;
 						entryRect[i].bottom++;
 
-						Box(dc, entryRect[i], SMOOTH::Setup::BackgroundColor, FILLED);
+						Box(dc, entryRect[i], Setup::BackgroundColor, FILLED);
 
 						entryRect[i].left = entryRect[i].left + 17;
 
@@ -507,7 +507,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p1.y++;
 								p2.y--;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 							}
 						}
 
@@ -525,84 +525,84 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x = frame.right;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 4;
 								p1.y = frame.top + 3;
 								p2.x = frame.right;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 4;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 4;
 								p2.x = frame.left + 3;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.right - 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 							}
 						}
 
@@ -620,7 +620,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x--;
 								p2.y -= 7;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x--;
 								p2.x++;
@@ -630,25 +630,25 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 									p1.y++;
 									p2.y++;
 
-									Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+									Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 								}
 
-								PaintPixel(dc, Point(p2.x, p2.y - 1), SMOOTH::Setup::DividerDarkColor);
-								PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
+								PaintPixel(dc, Point(p2.x, p2.y - 1), Setup::DividerDarkColor);
+								PaintPixel(dc, p2, Setup::DividerDarkColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
-								PaintPixel(dc, Point(p2.x - 1, p2.y), SMOOTH::Setup::DividerDarkColor);
-								PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								PaintPixel(dc, Point(p2.x - 1, p2.y), Setup::DividerDarkColor);
+								PaintPixel(dc, p2, Setup::DividerDarkColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 							}
 						}
 					}
@@ -692,11 +692,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						entryRect[i].right++;
 						entryRect[i].bottom++;
 
-						Gradient(dc, entryRect[i], SMOOTH::Setup::GradientStartColor, SMOOTH::Setup::GradientEndColor, GRADIENT_LR);
+						Gradient(dc, entryRect[i], Setup::GradientStartColor, Setup::GradientEndColor, GRADIENT_LR);
 
 						entryRect[i].left = entryRect[i].left + 17;
 
-						::SetText(dc, entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GradientTextColor, objectProperties->fontWeight);
+						::SetText(dc, entry->text, entryRect[i], objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
 
 						if (entry->popup != NIL)
 						{
@@ -712,7 +712,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p1.y++;
 								p2.y--;
 
-								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
 							}
 						}
 
@@ -730,84 +730,84 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x = frame.right;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 4;
 								p1.y = frame.top + 3;
 								p2.x = frame.right;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 4;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 4;
 								p2.x = frame.left + 3;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.right - 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
 							}
 						}
 
@@ -825,7 +825,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x--;
 								p2.y -= 7;
 
-								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
 
 								p1.x--;
 								p2.x++;
@@ -835,25 +835,25 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 									p1.y++;
 									p2.y++;
 
-									Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
+									Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
 								}
 
-								PaintPixel(dc, Point(p2.x, p2.y - 1), SMOOTH::Setup::InactiveGradientTextColor);
-								PaintPixel(dc, p2, SMOOTH::Setup::InactiveGradientTextColor);
+								PaintPixel(dc, Point(p2.x, p2.y - 1), Setup::InactiveGradientTextColor);
+								PaintPixel(dc, p2, Setup::InactiveGradientTextColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, SMOOTH::Setup::GradientTextColor, PS_SOLID, 1);
-								PaintPixel(dc, Point(p2.x - 1, p2.y), SMOOTH::Setup::InactiveGradientTextColor);
-								PaintPixel(dc, p2, SMOOTH::Setup::InactiveGradientTextColor);
+								Line(dc, p1, p2, Setup::GradientTextColor, PS_SOLID, 1);
+								PaintPixel(dc, Point(p2.x - 1, p2.y), Setup::InactiveGradientTextColor);
+								PaintPixel(dc, p2, Setup::InactiveGradientTextColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, SMOOTH::Setup::InactiveGradientTextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::InactiveGradientTextColor, PS_SOLID, 1);
 							}
 						}
 					}
@@ -866,7 +866,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						entryRect[i].right++;
 						entryRect[i].bottom++;
 
-						Box(dc, entryRect[i], SMOOTH::Setup::BackgroundColor, FILLED);
+						Box(dc, entryRect[i], Setup::BackgroundColor, FILLED);
 
 						entryRect[i].left = entryRect[i].left + 17;
 
@@ -886,7 +886,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p1.y++;
 								p2.y--;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 							}
 						}
 
@@ -904,84 +904,84 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x = frame.right;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 4;
 								p1.y = frame.top + 3;
 								p2.x = frame.right;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 4;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 1;
 								p1.y = frame.top + 4;
 								p2.x = frame.left + 3;
 								p2.y = frame.bottom;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.right - 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.left + 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.right - 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 2;
 								p1.y = frame.top + 3;
 								p2.x = frame.left + 2;
 								p2.y = frame.bottom - 1;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x = frame.right - 3;
 								p1.y = frame.top + 2;
 								p2.x = frame.left + 1;
 								p2.y = frame.bottom - 2;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 							}
 						}
 
@@ -999,7 +999,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 								p2.x--;
 								p2.y -= 7;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 								p1.x--;
 								p2.x++;
@@ -1009,25 +1009,25 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 									p1.y++;
 									p2.y++;
 
-									Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+									Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 								}
 
-								PaintPixel(dc, Point(p2.x, p2.y - 1), SMOOTH::Setup::DividerDarkColor);
-								PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
+								PaintPixel(dc, Point(p2.x, p2.y - 1), Setup::DividerDarkColor);
+								PaintPixel(dc, p2, Setup::DividerDarkColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
-								PaintPixel(dc, Point(p2.x - 1, p2.y), SMOOTH::Setup::DividerDarkColor);
-								PaintPixel(dc, p2, SMOOTH::Setup::DividerDarkColor);
+								Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
+								PaintPixel(dc, Point(p2.x - 1, p2.y), Setup::DividerDarkColor);
+								PaintPixel(dc, p2, Setup::DividerDarkColor);
 
 								p1.x++;
 								p1.y++;
 								p2.y++;
 
-								Line(dc, p1, p2, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+								Line(dc, p1, p2, Setup::DividerDarkColor, PS_SOLID, 1);
 							}
 						}
 					}

@@ -30,13 +30,13 @@ S::GUI::ActiveArea::ActiveArea(Int color, Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(20 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(20 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 }
 
 S::GUI::ActiveArea::~ActiveArea()

@@ -213,7 +213,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 					p2.x--;
 					p1.y++;
 					p2.y++;
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 				}
 
 				operat->rect.left	= menuentry.left - 3;
@@ -338,7 +338,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 					p2.x--;
 					p1.y++;
 					p2.y++;
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 				}
 
 				operat->rect.left	= helpmenuentry.left - 3;
@@ -531,7 +531,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::BackgroundColor, OUTLINED);
+						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
@@ -559,7 +559,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::BackgroundColor, OUTLINED);
+						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 
@@ -608,7 +608,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::BackgroundColor, OUTLINED);
+						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 					}
@@ -624,7 +624,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::BackgroundColor, OUTLINED);
+						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 						bmprect = operat->rect;
@@ -675,7 +675,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::BackgroundColor, OUTLINED);
+						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 					}
@@ -710,7 +710,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						operat->rect.right++;
 						operat->rect.bottom++;
-						Box(dc, operat->rect, SMOOTH::Setup::BackgroundColor, OUTLINED);
+						Box(dc, operat->rect, Setup::BackgroundColor, OUTLINED);
 						operat->rect.right--;
 						operat->rect.bottom--;
 						bmprect = operat->rect;

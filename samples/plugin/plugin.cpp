@@ -35,10 +35,10 @@ ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x		= Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y		= Math::Round(pos.y * SMOOTH::Setup::FontSize);
-	objectProperties->size.cx	= Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	objectProperties->size.cy	= Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x		= Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y		= Math::Round(pos.y * Setup::FontSize);
+	objectProperties->size.cx	= Math::Round(size.cx * Setup::FontSize);
+	objectProperties->size.cy	= Math::Round(size.cy * Setup::FontSize);
 }
 
 ActiveAreaPlugin::~ActiveAreaPlugin()
@@ -82,7 +82,7 @@ Int ActiveAreaPlugin::Paint(Int message)
 	p4.x = frame.right;
 	p4.y = frame.bottom;
 
-	hpen = CreatePen(PS_SOLID, 1, RGB(max((SMOOTH::Setup::BackgroundColor & 255) - 64, 0), max(((SMOOTH::Setup::BackgroundColor >> 8) & 255) - 64, 0), max(((SMOOTH::Setup::BackgroundColor >> 16) & 255) - 64, 0)));
+	hpen = CreatePen(PS_SOLID, 1, RGB(max((Setup::BackgroundColor & 255) - 64, 0), max(((Setup::BackgroundColor >> 8) & 255) - 64, 0), max(((Setup::BackgroundColor >> 16) & 255) - 64, 0)));
 	holdpen = (HPEN) SelectObject(dc, hpen);
 
 	MoveToEx(dc, p1.x, p1.y, NIL);
@@ -91,7 +91,7 @@ Int ActiveAreaPlugin::Paint(Int message)
 	SelectObject(dc, holdpen);
 	::DeleteObject(hpen);
 
-	hpen = CreatePen(PS_SOLID, 1, RGB(max((SMOOTH::Setup::BackgroundColor & 255) - 64, 0), max(((SMOOTH::Setup::BackgroundColor >> 8) & 255) - 64, 0), max(((SMOOTH::Setup::BackgroundColor >> 16) & 255) - 64, 0)));
+	hpen = CreatePen(PS_SOLID, 1, RGB(max((Setup::BackgroundColor & 255) - 64, 0), max(((Setup::BackgroundColor >> 8) & 255) - 64, 0), max(((Setup::BackgroundColor >> 16) & 255) - 64, 0)));
 	holdpen = (HPEN) SelectObject(dc, hpen);
 
 	MoveToEx(dc, p1.x, p1.y, NIL);
@@ -100,7 +100,7 @@ Int ActiveAreaPlugin::Paint(Int message)
 	SelectObject(dc, holdpen);
 	::DeleteObject(hpen);
 
-	hpen = CreatePen(PS_SOLID, 1, RGB(min((SMOOTH::Setup::BackgroundColor & 255) + 64, 255), min(((SMOOTH::Setup::BackgroundColor >> 8) & 255) + 64, 255), min(((SMOOTH::Setup::BackgroundColor >> 16) & 255) + 64, 255)));
+	hpen = CreatePen(PS_SOLID, 1, RGB(min((Setup::BackgroundColor & 255) + 64, 255), min(((Setup::BackgroundColor >> 8) & 255) + 64, 255), min(((Setup::BackgroundColor >> 16) & 255) + 64, 255)));
 	holdpen = (HPEN) SelectObject(dc, hpen);
 
 	MoveToEx(dc, p2.x, p2.y, NIL);
@@ -109,7 +109,7 @@ Int ActiveAreaPlugin::Paint(Int message)
 	SelectObject(dc, holdpen);
 	::DeleteObject(hpen);
 
-	hpen = CreatePen(PS_SOLID, 1, RGB(min((SMOOTH::Setup::BackgroundColor & 255) + 64, 255), min(((SMOOTH::Setup::BackgroundColor >> 8) & 255) + 64, 255), min(((SMOOTH::Setup::BackgroundColor >> 16) & 255) + 64, 255)));
+	hpen = CreatePen(PS_SOLID, 1, RGB(min((Setup::BackgroundColor & 255) + 64, 255), min(((Setup::BackgroundColor >> 8) & 255) + 64, 255), min(((Setup::BackgroundColor >> 16) & 255) + 64, 255)));
 	holdpen = (HPEN) SelectObject(dc, hpen);
 
 	p4.x++;

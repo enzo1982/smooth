@@ -42,7 +42,7 @@ S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMa
 	markStart			= 0;
 	markEnd				= 0;
 	leftCut				= 0;
-	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
+	objectProperties->fontColor	= Setup::ClientTextColor;
 	subtype				= subType;
 	maxSize				= iMaxSize;
 	currLine			= 0;
@@ -65,13 +65,13 @@ S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMa
 
 	if (maxSize <= 0) maxSize = 32768;
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 }
 
 S::GUI::EditBox::~EditBox()
@@ -101,8 +101,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			frame.right	= realPos.x + objectProperties->size.cx - 1;
 			frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-			if (active)	surface->Box(frame, SMOOTH::Setup::ClientColor, FILLED);
-			else		surface->Box(frame, SMOOTH::Setup::BackgroundColor, FILLED);
+			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 			surface->Frame(frame, FRAME_DOWN);
 
@@ -116,7 +116,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			for (Int i = 0; i < nOfLines; i++)
 			{
 				if (active)	surface->SetText(GetLine(i), textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-				else		surface->SetText(GetLine(i), textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::TextColor, objectProperties->fontWeight);
+				else		surface->SetText(GetLine(i), textRect, objectProperties->font, objectProperties->fontSize, Setup::TextColor, objectProperties->fontWeight);
 
 				textRect.top += METRIC_EDITBOXLINEHEIGHT;
 
@@ -182,7 +182,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				p2.x = p1.x;
 				p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-				Line(dc, p1, p2, SMOOTH::Setup::ClientColor, PS_SOLID, 1);
+				Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
 
 				promptPos = 0;
 				linePromptPos = 0;
@@ -221,7 +221,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				p2.x = p1.x;
 				p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-				Line(dc, p1, p2, SMOOTH::Setup::ClientColor, PS_SOLID, 1);
+				Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
 
 				promptPos = 0;
 				linePromptPos = 0;
@@ -303,7 +303,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				p2.x = p1.x;
 				p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-				Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+				Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 				promptVisible = True;
 
@@ -317,7 +317,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 					ImmSetCompositionWindow(hImc, &info);
 
-					if (SMOOTH::Setup::enableUnicode)
+					if (Setup::enableUnicode)
 					{
 						LOGFONTW	 font;
 
@@ -453,7 +453,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						p2.x = p1.x;
 						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-						Line(dc, p1, p2, SMOOTH::Setup::ClientColor, PS_SOLID, 1);
+						Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
 
 						if (!Binary::IsFlagSet(subtype, EDB_MULTILINE))
 						{
@@ -466,7 +466,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 						p2.x = p1.x;
 
-						Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+						Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 						{
 							HIMC		 hImc = ImmGetContext(wnd->hwnd);
@@ -494,7 +494,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						p2.x = p1.x;
 						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-						Line(dc, p1, p2, SMOOTH::Setup::ClientColor, PS_SOLID, 1);
+						Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
 
 						if (!Binary::IsFlagSet(subtype, EDB_MULTILINE))
 						{
@@ -507,7 +507,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 						p2.x = p1.x;
 
-						Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+						Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 						{
 							HIMC		 hImc = ImmGetContext(wnd->hwnd);
@@ -556,7 +556,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						p2.x = p1.x;
 						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-						Line(dc, p1, p2, SMOOTH::Setup::ClientColor, PS_SOLID, 1);
+						Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
 
 						if (wParam == VK_BACK)
 						{
@@ -606,7 +606,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						p2.x = p1.x;
 						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-						Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+						Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 						{
 							HIMC		 hImc = ImmGetContext(wnd->hwnd);
@@ -666,7 +666,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					p2.x = p1.x;
 					p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-					Line(dc, p1, p2, SMOOTH::Setup::ClientColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::ClientColor, PS_SOLID, 1);
 
 					promptPos++;
 					linePromptPos++;
@@ -688,7 +688,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					p2.x = p1.x;
 					p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
 
-					Line(dc, p1, p2, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+					Line(dc, p1, p2, Setup::TextColor, PS_SOLID, 1);
 
 					{
 						HIMC		 hImc = ImmGetContext(wnd->hwnd);
@@ -870,8 +870,8 @@ S::Void S::GUI::EditBox::TimerProc()
 	lineEnd.x = lineStart.x;
 	lineEnd.y = lineStart.y + METRIC_EDITBOXLINEHEIGHT;
 
-	if (promptVisible)	Line(dc, lineStart, lineEnd, SMOOTH::Setup::ClientColor, PS_SOLID, 1);
-	else			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+	if (promptVisible)	Line(dc, lineStart, lineEnd, Setup::ClientColor, PS_SOLID, 1);
+	else			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
 
 	promptVisible = !promptVisible;
 

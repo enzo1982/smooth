@@ -30,18 +30,18 @@ S::GUI::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var)
 	type				= OBJ_CHECKBOX;
 	objectProperties->text		= text;
 	variable			= var;
-	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
+	objectProperties->fontColor	= Setup::ClientTextColor;
 	state				= *variable;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(16 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(16 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 
 	GetTextSize();
 }
@@ -76,20 +76,20 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	frame.right	= frame.left + 10;
 	frame.bottom	= frame.top + 10;
 
-	if (active)	Box(dc, frame, SMOOTH::Setup::ClientColor, FILLED);
-	else		Box(dc, frame, SMOOTH::Setup::BackgroundColor, FILLED);
+	if (active)	Box(dc, frame, Setup::ClientColor, FILLED);
+	else		Box(dc, frame, Setup::BackgroundColor, FILLED);
 
 	Frame(dc, frame, FRAME_DOWN);
 
 	if (active)
 	{
-		shadowColor = SMOOTH::Setup::DividerDarkColor;
-		crossColor = SMOOTH::Setup::ClientTextColor;
+		shadowColor = Setup::DividerDarkColor;
+		crossColor = Setup::ClientTextColor;
 	}
 	else
 	{
-		shadowColor = SMOOTH::Setup::DividerDarkColor;
-		crossColor = SMOOTH::Setup::GrayTextColor;
+		shadowColor = Setup::DividerDarkColor;
+		crossColor = Setup::GrayTextColor;
 	}
 
 	if (*variable == True)
@@ -185,7 +185,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	textRect.bottom	= textRect.top + 20;
 
 	if (active)	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-	else		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GrayTextColor, objectProperties->fontWeight);
+	else		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
 
 	if (objectProperties->checked) Frame(dc, frame, FRAME_UP);
 
@@ -255,7 +255,7 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 				frame.right++;
 				frame.bottom++;
 
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 
 				frame.right--;
 				frame.bottom--;
@@ -297,7 +297,7 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 			}
@@ -320,7 +320,7 @@ S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 			}

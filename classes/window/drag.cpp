@@ -91,13 +91,13 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 				{
 					if (peekLoop > 0)
 					{
-						if (SMOOTH::Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-						else					PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
+						if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
+						else				PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
 					}
 					else
 					{
-						if (SMOOTH::Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
-						else					GetMessageA(&msg, NIL, 0, 0);
+						if (Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
+						else				GetMessageA(&msg, NIL, 0, 0);
 					}
 
 					if (msg.message == WM_PAINT)
@@ -132,14 +132,14 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 					{
 						TranslateMessage(&msg);
 
-						if (SMOOTH::Setup::enableUnicode)	DispatchMessageW(&msg);
-						else					DispatchMessageA(&msg);
+						if (Setup::enableUnicode)	DispatchMessageW(&msg);
+						else				DispatchMessageA(&msg);
 					}
 
 					if (peekLoop > 0)
 					{
-						if (SMOOTH::Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
-						else					PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
+						if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
+						else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 					}
 
 					{

@@ -35,32 +35,6 @@ namespace smooth
 	class SMOOTHAPI SMOOTH
 	{
 		public:
-			class SMOOTHAPI Setup
-			{
-				public:
-					static Int	 BackgroundColor;
-					static Int	 ClientColor;
-					static Int	 ClientTextColor;
-					static Int	 LightGrayColor;
-					static Int	 DividerLightColor;
-					static Int	 DividerDarkColor;
-					static Int	 TextColor;
-					static Int	 GrayTextColor;
-					static Int	 ShadowColor;
-					static Int	 GradientStartColor;
-					static Int	 GradientEndColor;
-					static Int	 GradientTextColor;
-					static Int	 InactiveGradientStartColor;
-					static Int	 InactiveGradientEndColor;
-					static Int	 InactiveGradientTextColor;
-					static Int	 TooltipColor;
-					static Int	 TooltipTextColor;
-
-					static Bool	 enableUnicode;
-
-					static Float	 FontSize;
-			};
-
 			static String		 StartDirectory;
 
 			static Object		*GetObject(Int, Int);

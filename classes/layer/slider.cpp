@@ -39,16 +39,16 @@ S::GUI::Slider::Slider(Point pos, Size size, Int subType, Int *var, Int rangeSta
 	if (*variable < startValue)	*variable = startValue;
 	else if (*variable > endValue)	*variable = endValue;
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
 	if (size.cx == 0) size.cx = size.cy;
 	if (size.cy == 0) size.cy = size.cx;
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(100 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(100 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(100 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(100 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 
 	if (subType == OR_HORZ)	objectProperties->size.cy = METRIC_SLIDERAREAHEIGHT;
 	else			objectProperties->size.cx = METRIC_SLIDERAREAHEIGHT;
@@ -93,7 +93,7 @@ S::Int S::GUI::Slider::Paint(Int message)
 			sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAWIDTH + 1;
 		}
 
-		Box(dc, sliderRect, SMOOTH::Setup::BackgroundColor, FILLED);
+		Box(dc, sliderRect, Setup::BackgroundColor, FILLED);
 	}
 
 	if (subtype == OR_HORZ)
@@ -103,22 +103,22 @@ S::Int S::GUI::Slider::Paint(Int message)
 		lineEnd.x = realPos.x + objectProperties->size.cx - METRIC_SLIDERAREAOFFSETX;
 		lineEnd.y = lineStart.y;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
 
 		lineStart.y++;
 		lineEnd.y++;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerLightColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
 
-		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y - 1), SMOOTH::Setup::DividerLightColor);
+		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y - 1), Setup::DividerLightColor);
 
 		sliderRect.left		= realPos.x + (Int) (((Float) (objectProperties->size.cx - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		sliderRect.top		= realPos.y;
 		sliderRect.right	= sliderRect.left + METRIC_SLIDERAREAWIDTH - 1;
 		sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAHEIGHT - 2;
 
-		if (!objectProperties->clicked)	Box(dc, sliderRect, SMOOTH::Setup::BackgroundColor, FILLED);
-		else				Box(dc, sliderRect, SMOOTH::Setup::LightGrayColor, FILLED);
+		if (!objectProperties->clicked)	Box(dc, sliderRect, Setup::BackgroundColor, FILLED);
+		else				Box(dc, sliderRect, Setup::LightGrayColor, FILLED);
 
 		Frame(dc, sliderRect, FRAME_UP);
 	}
@@ -129,22 +129,22 @@ S::Int S::GUI::Slider::Paint(Int message)
 		lineEnd.x = lineStart.x;
 		lineEnd.y = realPos.y + objectProperties->size.cy - METRIC_SLIDERAREAOFFSETX;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
 
 		lineStart.x++;
 		lineEnd.x++;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerLightColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
 
-		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y - 1), SMOOTH::Setup::DividerLightColor);
+		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y - 1), Setup::DividerLightColor);
 
 		sliderRect.left		= realPos.x;
 		sliderRect.top		= realPos.y + (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH) - (Int) (((Float) (objectProperties->size.cy - METRIC_SLIDERAREAWIDTH)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		sliderRect.right	= sliderRect.left + METRIC_SLIDERAREAHEIGHT - 1;
 		sliderRect.bottom	= sliderRect.top + METRIC_SLIDERAREAWIDTH;
 
-		if (!objectProperties->clicked)	Box(dc, sliderRect, SMOOTH::Setup::BackgroundColor, FILLED);
-		else				Box(dc, sliderRect, SMOOTH::Setup::LightGrayColor, FILLED);
+		if (!objectProperties->clicked)	Box(dc, sliderRect, Setup::BackgroundColor, FILLED);
+		else				Box(dc, sliderRect, Setup::LightGrayColor, FILLED);
 
 		Frame(dc, sliderRect, FRAME_UP);
 	}
@@ -213,7 +213,7 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 
 				slider.left++;
 				slider.top++;
-				Box(dc, slider, SMOOTH::Setup::LightGrayColor, FILLED);
+				Box(dc, slider, Setup::LightGrayColor, FILLED);
 				slider.left--;
 				slider.top--;
 
@@ -247,7 +247,7 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 
 				slider.left++;
 				slider.top++;
-				Box(dc, slider, SMOOTH::Setup::BackgroundColor, FILLED);
+				Box(dc, slider, Setup::BackgroundColor, FILLED);
 				slider.left--;
 				slider.top--;
 
@@ -285,7 +285,7 @@ S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 				{
 					slider.right++;
 					slider.bottom++;
-					Box(dc, slider, SMOOTH::Setup::BackgroundColor, FILLED);
+					Box(dc, slider, Setup::BackgroundColor, FILLED);
 					slider.right--;
 					slider.bottom--;
 

@@ -32,13 +32,13 @@ S::GUI::TabWidget::TabWidget(Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(100 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(100 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 }
 
 S::GUI::TabWidget::~TabWidget()
@@ -117,24 +117,24 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 				Frame(dc, frame, FRAME_UP);
 
-				PaintPixel(dc, Point(frame.left, frame.bottom), SMOOTH::Setup::DividerLightColor);
+				PaintPixel(dc, Point(frame.left, frame.bottom), Setup::DividerLightColor);
 
-				PaintPixel(dc, Point(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, Point(frame.left + 1, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, Point(frame.left, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, Point(frame.left + 1, frame.top + 1), SMOOTH::Setup::DividerLightColor);
+				PaintPixel(dc, Point(frame.left, frame.top), Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.left + 1, frame.top), Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.left, frame.top + 1), Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.left + 1, frame.top + 1), Setup::DividerLightColor);
 
-				PaintPixel(dc, Point(frame.right, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, Point(frame.right - 1, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, Point(frame.right, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, Point(frame.right - 1, frame.top + 1), SMOOTH::Setup::DividerDarkColor);
+				PaintPixel(dc, Point(frame.right, frame.top), Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right - 1, frame.top), Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right, frame.top + 1), Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right - 1, frame.top + 1), Setup::DividerDarkColor);
 
 				lineStart.x = frame.left + 1;
 				lineStart.y = frame.bottom;
 				lineEnd.x = frame.right;
 				lineEnd.y = lineStart.y;
 
-				Line(dc, lineStart, lineEnd, SMOOTH::Setup::BackgroundColor, PS_SOLID, 1);
+				Line(dc, lineStart, lineEnd, Setup::BackgroundColor, PS_SOLID, 1);
 
 				textrect.left	= frame.left + METRIC_REGISTERTEXTOFFSETX;
 				textrect.top	= frame.top + METRIC_REGISTERTEXTOFFSETY;
@@ -158,24 +158,24 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 				Frame(dc, frame, FRAME_UP);
 
-				PaintPixel(dc, Point(frame.right, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, Point(frame.right - 1, frame.top), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, Point(frame.right, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-				PaintPixel(dc, Point(frame.right - 1, frame.top + 1), SMOOTH::Setup::DividerDarkColor);
+				PaintPixel(dc, Point(frame.right, frame.top), Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right - 1, frame.top), Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right, frame.top + 1), Setup::BackgroundColor);
+				PaintPixel(dc, Point(frame.right - 1, frame.top + 1), Setup::DividerDarkColor);
 
 				lineStart.x = frame.left;
 				lineStart.y = frame.bottom;
 				lineEnd.x = frame.right + 1;
 				lineEnd.y = lineStart.y;
 
-				Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerLightColor, PS_SOLID, 1);
+				Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
 
 				if (j == 0)
 				{
-					PaintPixel(dc, Point(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, Point(frame.left + 1, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, Point(frame.left, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, Point(frame.left + 1, frame.top + 1), SMOOTH::Setup::DividerLightColor);
+					PaintPixel(dc, Point(frame.left, frame.top), Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left + 1, frame.top), Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left, frame.top + 1), Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left + 1, frame.top + 1), Setup::DividerLightColor);
 				}
 
 				if (j > 0) if (prev->IsVisible())
@@ -185,19 +185,19 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 					lineEnd.x = lineStart.x;
 					lineEnd.y = frame.bottom;
 
-					Line(dc, lineStart, lineEnd, SMOOTH::Setup::BackgroundColor, PS_SOLID, 1);
+					Line(dc, lineStart, lineEnd, Setup::BackgroundColor, PS_SOLID, 1);
 
-					PaintPixel(dc, Point(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, Point(frame.left, frame.top + 1), SMOOTH::Setup::DividerLightColor);
+					PaintPixel(dc, Point(frame.left, frame.top), Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left, frame.top + 1), Setup::DividerLightColor);
 
 					frame.left--;
 				}
 				else
 				{
-					PaintPixel(dc, Point(frame.left, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, Point(frame.left + 1, frame.top), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, Point(frame.left, frame.top + 1), SMOOTH::Setup::BackgroundColor);
-					PaintPixel(dc, Point(frame.left + 1, frame.top + 1), SMOOTH::Setup::DividerLightColor);
+					PaintPixel(dc, Point(frame.left, frame.top), Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left + 1, frame.top), Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left, frame.top + 1), Setup::BackgroundColor);
+					PaintPixel(dc, Point(frame.left + 1, frame.top + 1), Setup::DividerLightColor);
 				}
 
 				textrect.left	= frame.left + METRIC_REGISTERTEXTOFFSETX - 1;

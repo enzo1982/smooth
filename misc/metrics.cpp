@@ -258,16 +258,16 @@ void S::SetMeasurement(int type)
 			{
 				default:
 				case 96:
-					SMOOTH::Setup::FontSize = 1.00;
+					Setup::FontSize = 1.00;
 					break;
 				case 120:
-					SMOOTH::Setup::FontSize = 1.25;
+					Setup::FontSize = 1.25;
 					break;
 			}
 			break;
 		default:
 		case SMT_PIXELS:
-			SMOOTH::Setup::FontSize = 1.00;
+			Setup::FontSize = 1.00;
 			break;
 	}
 }

@@ -43,22 +43,22 @@ S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int ra
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
 	if (subtype == OR_VERT)
 	{
-		if (size.cx == 0)	objectProperties->size.cx = Math::Round(18 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = Math::Round(120 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+		if (size.cx == 0)	objectProperties->size.cx = Math::Round(18 * Setup::FontSize);
+		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+		if (size.cy == 0)	objectProperties->size.cy = Math::Round(120 * Setup::FontSize);
+		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 	}
 	else
 	{
-		if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = Math::Round(18 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+		if (size.cx == 0)	objectProperties->size.cx = Math::Round(120 * Setup::FontSize);
+		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+		if (size.cy == 0)	objectProperties->size.cy = Math::Round(18 * Setup::FontSize);
+		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 	}
 }
 
@@ -127,11 +127,11 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 		frame3.bottom	= frame3.top + (frame.right - frame.left);
 	}
 
-	if (!button1Clicked && !button2Clicked) Box(dc, frame, SMOOTH::Setup::LightGrayColor, FILLED);
+	if (!button1Clicked && !button2Clicked) Box(dc, frame, Setup::LightGrayColor, FILLED);
 
 	if (!button3Clicked)
 	{
-		Box(dc, frame3, SMOOTH::Setup::BackgroundColor, FILLED);
+		Box(dc, frame3, Setup::BackgroundColor, FILLED);
 	}
 	else
 	{
@@ -139,7 +139,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 		frame3.right--;
 		frame3.left++;
 		frame3.top++;
-		Box(dc, frame3, SMOOTH::Setup::LightGrayColor, FILLED);
+		Box(dc, frame3, Setup::LightGrayColor, FILLED);
 		frame3.bottom++;
 		frame3.right++;
 		frame3.left--;
@@ -154,8 +154,8 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 	if (button1Clicked || button2Clicked) return Success;
 
-	Box(dc, frame1, SMOOTH::Setup::BackgroundColor, FILLED);
-	Box(dc, frame2, SMOOTH::Setup::BackgroundColor, FILLED);
+	Box(dc, frame1, Setup::BackgroundColor, FILLED);
+	Box(dc, frame2, Setup::BackgroundColor, FILLED);
 
 	frame1.bottom--;
 	frame1.right--;
@@ -177,7 +177,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int i = 0; i < 4; i++)
 		{
-			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
 			lineStart.x++;
 			lineStart.y--;
 			lineEnd.x++;
@@ -191,7 +191,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
 			lineStart.x++;
 			lineStart.y++;
 			lineEnd.x++;
@@ -207,7 +207,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int i = 0; i < 4; i++)
 		{
-			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
 			lineStart.x--;
 			lineStart.y++;
 			lineEnd.x++;
@@ -221,7 +221,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
 			lineStart.x++;
 			lineStart.y++;
 			lineEnd.x--;
@@ -340,7 +340,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				{
 					onClick.Emit();
 
-					Box(dc, frame3, SMOOTH::Setup::LightGrayColor, FILLED);
+					Box(dc, frame3, Setup::LightGrayColor, FILLED);
 
 					Paint(SP_PAINT);
 				}
@@ -362,7 +362,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				{
 					onClick.Emit();
 
-					Box(dc, frame3, SMOOTH::Setup::LightGrayColor, FILLED);
+					Box(dc, frame3, Setup::LightGrayColor, FILLED);
 
 					Paint(SP_PAINT);
 				}
@@ -378,7 +378,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				frame3.top++;
 				frame3.right--;
 				frame3.bottom--;
-				Box(dc, frame3, SMOOTH::Setup::LightGrayColor, FILLED);
+				Box(dc, frame3, Setup::LightGrayColor, FILLED);
 				frame3.left--;
 				frame3.top--;
 				frame3.right++;
@@ -463,7 +463,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame1, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame1, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -478,7 +478,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame2, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame2, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -495,7 +495,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 				frame3.top++;
 				frame3.right--;
 				frame3.bottom--;
-				Box(dc, frame3, SMOOTH::Setup::BackgroundColor, FILLED);
+				Box(dc, frame3, Setup::BackgroundColor, FILLED);
 				frame3.left--;
 				frame3.top--;
 				frame3.right++;
@@ -525,7 +525,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				frame1.right++;
 				frame1.bottom++;
-				Box(dc, frame1, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame1, Setup::BackgroundColor, OUTLINED);
 				frame1.right--;
 				frame1.bottom--;
 			}
@@ -544,7 +544,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				frame2.right++;
 				frame2.bottom++;
-				Box(dc, frame2, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame2, Setup::BackgroundColor, OUTLINED);
 				frame2.right--;
 				frame2.bottom--;
 			}
@@ -561,7 +561,7 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 				if (*variable != prevValue)
 				{
-					Box(dc, frame3, SMOOTH::Setup::BackgroundColor, FILLED);
+					Box(dc, frame3, Setup::BackgroundColor, FILLED);
 
 					Paint(SP_PAINT);
 

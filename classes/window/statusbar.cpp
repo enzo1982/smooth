@@ -84,7 +84,7 @@ S::Int S::GUI::Statusbar::SetText(String newStatus)
 	textRect.right	= objectProperties->pos.x + objectProperties->size.cx;
 	textRect.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 
-	::SetText(dc, oldStatus, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::BackgroundColor, objectProperties->fontWeight);
+	::SetText(dc, oldStatus, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
 	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
 
 	FreeContext(wnd, dc);

@@ -28,6 +28,33 @@ namespace smooth
 				return Success;
 			}
 
+			template <class ct> int Disconnect(Void (ct::*proc)(), ct *inst)
+			{
+				Instance0<ct>		*instance = new Instance0<ct>(inst);
+				Method0<Void (ct::*)()>	*method = new Method0<Void (ct::*)()>(proc);
+
+				for (Int i = 0; i < nOfMethods; i++)
+				{
+					if (*instances.GetNthEntry(i) == *instance && *methods.GetNthEntry(i) == *method)
+					{
+						delete instances.GetNthEntry(i);
+						delete methods.GetNthEntry(i);
+
+						instances.DeleteEntry(instances.GetNthEntryIndex(i));
+						methods.DeleteEntry(methods.GetNthEntryIndex(i));
+
+						nOfMethods--;
+
+						break;
+					}
+				}
+
+				delete instance;
+				delete method;
+
+				return Success;
+			}
+
 			Void Emit()
 			{
 				for (Int i = 0; i < nOfMethods; i++)

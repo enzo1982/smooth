@@ -104,9 +104,9 @@ LRESULT CALLBACK S::GUI::WindowProc(HWND window, UINT message, WPARAM wParam, LP
 	if (smoothWindow != NIL)	retVal = smoothWindow->Process(message, param1, param2);
 	else				retVal = -1;
 
-	if (retVal != -1)			return retVal;
-	else if (SMOOTH::Setup::enableUnicode)	return DefWindowProcW(window, originalMessage, wParam, lParam);
-	else					return DefWindowProcA(window, originalMessage, wParam, lParam);
+	if (retVal != -1)		return retVal;
+	else if (Setup::enableUnicode)	return DefWindowProcW(window, originalMessage, wParam, lParam);
+	else				return DefWindowProcA(window, originalMessage, wParam, lParam);
 }
 #endif
 
@@ -154,8 +154,8 @@ S::GUI::Window::Window(String title)
 	cursorset	= False;
 	initshow	= False;
 
-	objectProperties->size.cx = Math::Round(200 * SMOOTH::Setup::FontSize);
-	objectProperties->size.cy = Math::Round(200 * SMOOTH::Setup::FontSize);
+	objectProperties->size.cx = Math::Round(200 * Setup::FontSize);
+	objectProperties->size.cy = Math::Round(200 * Setup::FontSize);
 
 	updateRect.left		= 0;
 	updateRect.top		= 0;
@@ -173,7 +173,7 @@ S::GUI::Window::Window(String title)
 
 	RegisterObject(mainLayer);
 
-	minSize.cx = Math::Round(160 * SMOOTH::Setup::FontSize);
+	minSize.cx = Math::Round(160 * Setup::FontSize);
 	minSize.cy = METRIC_TITLEBARHEIGHT + 5;
 
 	hwnd = NIL;
@@ -202,8 +202,8 @@ S::GUI::Window::~Window()
 
 	if (created)
 	{
-		if (SMOOTH::Setup::enableUnicode)	UnregisterClassW(className, hInstance);
-		else					UnregisterClassA(className, hInstance);
+		if (Setup::enableUnicode)	UnregisterClassW(className, hInstance);
+		else				UnregisterClassA(className, hInstance);
 	}
 
 	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop--;
@@ -213,10 +213,10 @@ S::GUI::Window::~Window()
 
 S::Int S::GUI::Window::SetMetrics(Point newPos, Size newSize)
 {
-	objectProperties->pos.x		= Math::Round(newPos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y		= Math::Round(newPos.y * SMOOTH::Setup::FontSize);
-	objectProperties->size.cx	= Math::Round(newSize.cx * SMOOTH::Setup::FontSize);
-	objectProperties->size.cy	= Math::Round(newSize.cy * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x		= Math::Round(newPos.x * Setup::FontSize);
+	objectProperties->pos.y		= Math::Round(newPos.y * Setup::FontSize);
+	objectProperties->size.cx	= Math::Round(newSize.cx * Setup::FontSize);
+	objectProperties->size.cy	= Math::Round(newSize.cy * Setup::FontSize);
 
 	updateRect.left		= 0;
 	updateRect.top		= 0;
@@ -342,8 +342,8 @@ S::Int S::GUI::Window::SetText(String title)
 	if (!created) return Success;
 
 #ifdef __WIN32__
-	if (SMOOTH::Setup::enableUnicode)	SetWindowTextW(hwnd, title);
-	else					SetWindowTextA(hwnd, title);
+	if (Setup::enableUnicode)	SetWindowTextW(hwnd, title);
+	else				SetWindowTextA(hwnd, title);
 #endif
 
 	SMOOTH::SendMessage(this, SM_WINDOWTITLECHANGED, 0, 0);
@@ -496,11 +496,11 @@ S::Int S::GUI::Window::Stay()
 	stay	= True;
 
 #ifdef __WIN32__
-	if (SMOOTH::Setup::enableUnicode)	SendMessageW(hwnd, WM_KILLFOCUS, 0, 0);
-	else					SendMessageA(hwnd, WM_KILLFOCUS, 0, 0);
+	if (Setup::enableUnicode)	SendMessageW(hwnd, WM_KILLFOCUS, 0, 0);
+	else				SendMessageA(hwnd, WM_KILLFOCUS, 0, 0);
 
-	if (SMOOTH::Setup::enableUnicode)	SendMessageW(hwnd, WM_ACTIVATEAPP, 1, 0);
-	else					SendMessageA(hwnd, WM_ACTIVATEAPP, 1, 0);
+	if (Setup::enableUnicode)	SendMessageW(hwnd, WM_ACTIVATEAPP, 1, 0);
+	else				SendMessageA(hwnd, WM_ACTIVATEAPP, 1, 0);
 #endif
 
 	while (!destroyed)
@@ -508,28 +508,28 @@ S::Int S::GUI::Window::Stay()
 		if (peekLoop > 0)
 		{
 #ifdef __WIN32__
-			if (SMOOTH::Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-			else					PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
+			if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
+			else				PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
 
 			TranslateMessage(&msg);
 
-			if (SMOOTH::Setup::enableUnicode)	DispatchMessageW(&msg);
-			else					DispatchMessageA(&msg);
+			if (Setup::enableUnicode)	DispatchMessageW(&msg);
+			else				DispatchMessageA(&msg);
 
-			if (SMOOTH::Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
-			else					PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
+			if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
+			else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 #endif
 		}
 		else
 		{
 #ifdef __WIN32__
-			if (SMOOTH::Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
-			else					GetMessageA(&msg, NIL, 0, 0);
+			if (Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
+			else				GetMessageA(&msg, NIL, 0, 0);
 
 			TranslateMessage(&msg);
 
-			if (SMOOTH::Setup::enableUnicode)	DispatchMessageW(&msg);
-			else					DispatchMessageA(&msg);
+			if (Setup::enableUnicode)	DispatchMessageW(&msg);
+			else				DispatchMessageA(&msg);
 #endif
 		}
 	}
@@ -545,8 +545,8 @@ S::Int S::GUI::Window::Close()
 {
 	if (hwnd == NIL) return Error;
 
-	if (SMOOTH::Setup::enableUnicode)	::SendMessageW(hwnd, WM_CLOSE, 0, 0);
-	else					::SendMessageA(hwnd, WM_CLOSE, 0, 0);
+	if (Setup::enableUnicode)	::SendMessageW(hwnd, WM_CLOSE, 0, 0);
+	else				::SendMessageA(hwnd, WM_CLOSE, 0, 0);
 
 	return Success;
 }
@@ -676,8 +676,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			if (nOfActiveWindows == 1 && loopActive)
 			{
-				if (SMOOTH::Setup::enableUnicode)	SendMessageW(hwnd, WM_QUIT, 0, 0);
-				else					SendMessageA(hwnd, WM_QUIT, 0, 0);
+				if (Setup::enableUnicode)	SendMessageW(hwnd, WM_QUIT, 0, 0);
+				else				SendMessageA(hwnd, WM_QUIT, 0, 0);
 			}
 			else
 			{
@@ -700,8 +700,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_SETTINGCHANGE:
 			if ((wParam == SPI_SETWORKAREA) && maximized)
 			{
-				if (SMOOTH::Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-				else					SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
+				if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
+				else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
 
 				SetWindowPos(hwnd, 0, rect.left-2, rect.top-2, rect.right-rect.left+4, rect.bottom-rect.top+4, 0);
 			}

@@ -117,7 +117,7 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 		intersectRect = iRect;
 #endif
 
-		Box(dc, intersectRect, SMOOTH::Setup::DividerDarkColor, FILLED);
+		Box(dc, intersectRect, Setup::DividerDarkColor, FILLED);
 
 		Frame(dc, client, FRAME_DOWN);
 	}

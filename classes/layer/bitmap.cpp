@@ -31,18 +31,18 @@ S::GUI::Bitmap::Bitmap(HBITMAP bmp, Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
 	if (size.cx == 0 && size.cy == 0)
 	{
-		objectProperties->size.cx = Math::Round(GetBitmapSizeX(bitmap) * SMOOTH::Setup::FontSize);
-		objectProperties->size.cy = Math::Round(GetBitmapSizeY(bitmap) * SMOOTH::Setup::FontSize);
+		objectProperties->size.cx = Math::Round(GetBitmapSizeX(bitmap) * Setup::FontSize);
+		objectProperties->size.cy = Math::Round(GetBitmapSizeY(bitmap) * Setup::FontSize);
 	}
 	else
 	{
-		objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-		objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+		objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+		objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 	}
 }
 
@@ -88,8 +88,8 @@ S::Int S::GUI::Bitmap::SetBitmap(HBITMAP newBmp)
 
 	if (objectProperties->size.cx == 0 && objectProperties->size.cy == 0)
 	{
-		objectProperties->size.cx = Math::Round(GetBitmapSizeX(bitmap) * SMOOTH::Setup::FontSize);
-		objectProperties->size.cy = Math::Round(GetBitmapSizeY(bitmap) * SMOOTH::Setup::FontSize);
+		objectProperties->size.cx = Math::Round(GetBitmapSizeX(bitmap) * Setup::FontSize);
+		objectProperties->size.cy = Math::Round(GetBitmapSizeY(bitmap) * Setup::FontSize);
 	}
 
 	if (prevVisible) Show();

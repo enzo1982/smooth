@@ -39,7 +39,7 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdL
 		}
 	}
 
-	if (SMOOTH::Setup::enableUnicode)
+	if (Setup::enableUnicode)
 	{
 		wchar_t	*buffer = new wchar_t [MAX_PATH];
 
@@ -71,7 +71,7 @@ int main()
 {
 	Init();
 
-	if (System::GetVersionString() != (SMOOTHString) SMOOTH_VERSION)
+	if (System::GetVersionString() != (String) SMOOTH_VERSION)
 	{
 		Free();
 

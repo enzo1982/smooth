@@ -31,7 +31,7 @@ S::GUI::Tooltip::Tooltip()
 	type				= OBJ_TOOLTIP;
 	objectProperties->orientation	= OR_FREE;
 	toolWindow			= NIL;
-	objectProperties->fontColor	= SMOOTH::Setup::TooltipTextColor;
+	objectProperties->fontColor	= Setup::TooltipTextColor;
 	timeOut				= 5000;
 	timer				= NIL;
 
@@ -74,7 +74,7 @@ S::Int S::GUI::Tooltip::Show()
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
 
-	Float	 measurement = SMOOTH::Setup::FontSize;
+	Float	 measurement = Setup::FontSize;
 	Rect	 wndRect;
 	HDC	 dc = GetContext(NIL);
 
@@ -97,11 +97,11 @@ S::Int S::GUI::Tooltip::Show()
 
 	wnd->RegisterObject(toolWindow);
 
-	SMOOTH::Setup::FontSize = measurement;
+	Setup::FontSize = measurement;
 
 	dc = GetContext(toolWindow);
 
-	Box(dc, wndRect, SMOOTH::Setup::TooltipColor, FILLED);
+	Box(dc, wndRect, Setup::TooltipColor, FILLED);
 	Box(dc, wndRect, RGB(0, 0, 0), OUTLINED);
 
 	wndRect.left	+= 2;

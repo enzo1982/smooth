@@ -37,7 +37,7 @@ S::ObjectProperties::ObjectProperties()
 	clicked		= False;
 
 	font		= I18N_DEFAULTFONT;
-	fontColor	= SMOOTH::Setup::TextColor;
+	fontColor	= Setup::TextColor;
 
 #ifdef __WIN32__
 	fontSize	= -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72);

@@ -88,5 +88,7 @@
 #include "smooth/binary.h"
 #include "smooth/math.h"
 #include "smooth/widget.h"
+#include "smooth/system.h"
+#include "smooth/setup.h"
 
 #endif

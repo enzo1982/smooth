@@ -108,8 +108,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 		}
 	}
 
-	if (paintactive)	Gradient(dc, titleGradient, SMOOTH::Setup::GradientStartColor, SMOOTH::Setup::GradientEndColor, GRADIENT_LR);
-	else			Gradient(dc, titleGradient, SMOOTH::Setup::InactiveGradientStartColor, SMOOTH::Setup::InactiveGradientEndColor, GRADIENT_LR);
+	if (paintactive)	Gradient(dc, titleGradient, Setup::GradientStartColor, Setup::GradientEndColor, GRADIENT_LR);
+	else			Gradient(dc, titleGradient, Setup::InactiveGradientStartColor, Setup::InactiveGradientEndColor, GRADIENT_LR);
 #endif
 
 	titleText.left		= titleGradient.left + METRIC_TBTEXTOFFSETX;
@@ -117,8 +117,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	titleText.right		= titleGradient.right - METRIC_TBBUTTONBOXOFFSETX + METRIC_TBBUTTONBOXWIDTH;
 	titleText.bottom	= titleGradient.bottom - METRIC_TBTEXTOFFSETY;
 
-	if (paintactive)	::SetText(dc, objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GradientTextColor, objectProperties->fontWeight);
-	else			::SetText(dc, objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::InactiveGradientTextColor, objectProperties->fontWeight);
+	if (paintactive)	::SetText(dc, objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, Setup::GradientTextColor, objectProperties->fontWeight);
+	else			::SetText(dc, objectProperties->text, titleText, objectProperties->font, objectProperties->fontSize, Setup::InactiveGradientTextColor, objectProperties->fontWeight);
 
 	if (icon != NIL)
 	{
@@ -135,7 +135,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	tButtonRect.top		= titleGradient.top + METRIC_TBBUTTONBOXOFFSETY;
 	tButtonRect.bottom	= tButtonRect.top + METRIC_TBBUTTONBOXHEIGHT;
 
-	Box(dc, tButtonRect, SMOOTH::Setup::BackgroundColor, FILLED);
+	Box(dc, tButtonRect, Setup::BackgroundColor, FILLED);
 	Frame(dc, tButtonRect, FRAME_DOWN);
 
 	button.left	= tButtonRect.left + METRIC_TBBUTTONOFFSETX;
@@ -143,8 +143,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	button.bottom	= tButtonRect.top + METRIC_TBBUTTONOFFSETY + METRIC_TBBUTTONSIZE - 1;
 	button.top	= button.bottom - 2;
 
-	if (min)	buttonColor = SMOOTH::Setup::TextColor;
-	else		buttonColor = SMOOTH::Setup::GrayTextColor;
+	if (min)	buttonColor = Setup::TextColor;
+	else		buttonColor = Setup::GrayTextColor;
 
 	Box(dc, button, buttonColor, FILLED);
 
@@ -152,8 +152,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	button.right	= button.left + METRIC_TBBUTTONSIZE;
 	button.top	= tButtonRect.top + METRIC_TBBUTTONOFFSETY;
 
-	if (max)	buttonColor = SMOOTH::Setup::TextColor;
-	else		buttonColor = SMOOTH::Setup::GrayTextColor;
+	if (max)	buttonColor = Setup::TextColor;
+	else		buttonColor = Setup::GrayTextColor;
 
 	Box(dc, button, buttonColor, OUTLINED);
 	button.top--;
@@ -166,8 +166,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	end.x		= button.right-1;
 	end.y		= button.bottom;
 
-	if (close)	buttonColor = SMOOTH::Setup::TextColor;
-	else		buttonColor = SMOOTH::Setup::GrayTextColor;
+	if (close)	buttonColor = Setup::TextColor;
+	else		buttonColor = Setup::GrayTextColor;
 
 	Line(dc, start, end, buttonColor, PS_SOLID, 1);
 
@@ -268,16 +268,16 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 					SetWindowPos(wnd->hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right-nonmaxrect.left, nonmaxrect.bottom-nonmaxrect.top, 0);
 					wnd->maximized = False;
 
-					if (SMOOTH::Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, origwndstyle);
-					else					SetWindowLongA(wnd->hwnd, GWL_STYLE, origwndstyle);
+					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, origwndstyle);
+					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, origwndstyle);
 				}
 				else
 				{
 					{
 						RECT	 rect;
 
-						if (SMOOTH::Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-						else					SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
+						if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
+						else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
 
 						workArea = rect;
 
@@ -289,11 +289,11 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 					SetWindowPos(wnd->hwnd, 0, workArea.left - 2, workArea.top - 2, workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4, 0);
 					wnd->maximized = True;
 
-					if (SMOOTH::Setup::enableUnicode)	origwndstyle = GetWindowLongW(wnd->hwnd, GWL_STYLE);
-					else					origwndstyle = GetWindowLongA(wnd->hwnd, GWL_STYLE);
+					if (Setup::enableUnicode)	origwndstyle = GetWindowLongW(wnd->hwnd, GWL_STYLE);
+					else				origwndstyle = GetWindowLongA(wnd->hwnd, GWL_STYLE);
 
-					if (SMOOTH::Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-					else					SetWindowLongA(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
 				}
 
 				retVal = Break;
@@ -327,24 +327,24 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 					{
 						if (peekLoop > 0)
 						{
-							if (SMOOTH::Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-							else					PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
+							if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
+							else				PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
 						}
 						else
 						{
-							if (SMOOTH::Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
-							else					GetMessageA(&msg, NIL, 0, 0);
+							if (Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
+							else				GetMessageA(&msg, NIL, 0, 0);
 						}
 
 						TranslateMessage(&msg);
 
-						if (SMOOTH::Setup::enableUnicode)	DispatchMessageW(&msg);
-						else					DispatchMessageA(&msg);
+						if (Setup::enableUnicode)	DispatchMessageW(&msg);
+						else				DispatchMessageA(&msg);
 
 						if (peekLoop > 0)
 						{
-							if (SMOOTH::Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
-							else					PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
+							if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
+							else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 						}
 
 						{
@@ -420,16 +420,16 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 					SetWindowPos(wnd->hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right-nonmaxrect.left, nonmaxrect.bottom-nonmaxrect.top, 0);
 					wnd->maximized = False;
 
-					if (SMOOTH::Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, origwndstyle);
-					else					SetWindowLongA(wnd->hwnd, GWL_STYLE, origwndstyle);
+					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, origwndstyle);
+					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, origwndstyle);
 				}
 				else
 				{
 					{
 						RECT rect;
 
-						if (SMOOTH::Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-						else					SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
+						if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
+						else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
 
 						workArea = rect;
 
@@ -441,11 +441,11 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 					SetWindowPos(wnd->hwnd, 0, workArea.left-2, workArea.top-2, workArea.right-workArea.left+4, workArea.bottom-workArea.top+4, 0);
 					wnd->maximized = True;
 
-					if (SMOOTH::Setup::enableUnicode)	origwndstyle = GetWindowLongW(wnd->hwnd, GWL_STYLE);
-					else					origwndstyle = GetWindowLongA(wnd->hwnd, GWL_STYLE);
+					if (Setup::enableUnicode)	origwndstyle = GetWindowLongW(wnd->hwnd, GWL_STYLE);
+					else				origwndstyle = GetWindowLongA(wnd->hwnd, GWL_STYLE);
 
-					if (SMOOTH::Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, (origwndstyle^WS_THICKFRAME)|WS_DLGFRAME);
-					else					SetWindowLongA(wnd->hwnd, GWL_STYLE, (origwndstyle^WS_THICKFRAME)|WS_DLGFRAME);
+					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, (origwndstyle^WS_THICKFRAME)|WS_DLGFRAME);
+					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, (origwndstyle^WS_THICKFRAME)|WS_DLGFRAME);
 				}
 			}
 			if (closeclk)
@@ -464,7 +464,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
-				Box(dc, minButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, minButton, Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
 			}
@@ -474,7 +474,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
-				Box(dc, maxButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, maxButton, Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
 			}
@@ -484,7 +484,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
-				Box(dc, closeButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, closeButton, Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
 			}
@@ -501,7 +501,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
-				Box(dc, minButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, minButton, Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
 			}
@@ -511,7 +511,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
-				Box(dc, maxButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, maxButton, Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
 			}
@@ -521,7 +521,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
-				Box(dc, closeButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, closeButton, Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
 			}
@@ -532,14 +532,14 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
-				Box(dc, maxButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, maxButton, Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
 				closechk	= False;
 				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
-				Box(dc, closeButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, closeButton, Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
 				minchk		= True;
@@ -551,14 +551,14 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
-				Box(dc, minButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, minButton, Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
 				closechk	= False;
 				closeclk	= False;
 				closeButton.right++;
 				closeButton.bottom++;
-				Box(dc, closeButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, closeButton, Setup::BackgroundColor, OUTLINED);
 				closeButton.right--;
 				closeButton.bottom--;
 				maxchk		= True;
@@ -570,14 +570,14 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				minclk		= False;
 				minButton.right++;
 				minButton.bottom++;
-				Box(dc, minButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, minButton, Setup::BackgroundColor, OUTLINED);
 				minButton.right--;
 				minButton.bottom--;
 				maxchk		= False;
 				maxclk		= False;
 				maxButton.right++;
 				maxButton.bottom++;
-				Box(dc, maxButton, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, maxButton, Setup::BackgroundColor, OUTLINED);
 				maxButton.right--;
 				maxButton.bottom--;
 				closechk	= True;

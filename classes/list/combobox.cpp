@@ -42,15 +42,15 @@ S::GUI::ComboBox::ComboBox(Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	SetFont(objectProperties->font, I18N_SMALLFONTSIZE, SMOOTH::Setup::ClientTextColor, objectProperties->fontWeight);
+	SetFont(objectProperties->font, I18N_SMALLFONTSIZE, Setup::ClientTextColor, objectProperties->fontWeight);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 }
 
 S::GUI::ComboBox::~ComboBox()
@@ -138,8 +138,8 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	if (active)	Box(dc, frame, SMOOTH::Setup::ClientColor, FILLED);
-	else		Box(dc, frame, SMOOTH::Setup::BackgroundColor, FILLED);
+	if (active)	Box(dc, frame, Setup::ClientColor, FILLED);
+	else		Box(dc, frame, Setup::BackgroundColor, FILLED);
 
 	Frame(dc, frame, FRAME_DOWN);
 
@@ -148,7 +148,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	frame.right--;
 	frame.left = frame.right - METRIC_COMBOBOXOFFSETX;
 
-	Box(dc, frame, SMOOTH::Setup::BackgroundColor, FILLED);
+	Box(dc, frame, Setup::BackgroundColor, FILLED);
 	Frame(dc, frame, FRAME_UP);
 
 	frame.top--;
@@ -163,8 +163,8 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 	for (Int i = 0; i < 4; i++)
 	{
-		if (active)	Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
-		else		Line(dc, lineStart, lineEnd, SMOOTH::Setup::GrayTextColor, PS_SOLID, 1);
+		if (active)	Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
+		else		Line(dc, lineStart, lineEnd, Setup::GrayTextColor, PS_SOLID, 1);
 
 		lineStart.x++;
 		lineStart.y++;
@@ -302,7 +302,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				lbs.cx = objectProperties->size.cx;
 				lbs.cy = min(METRIC_LISTBOXENTRYHEIGHT * nOfEntries + 4, METRIC_LISTBOXENTRYHEIGHT * 5 + 4);
 
-				oldMeasurement = SMOOTH::Setup::FontSize;
+				oldMeasurement = Setup::FontSize;
 
 				SetMeasurement(SMT_PIXELS);
 
@@ -329,7 +329,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				toolWindow->SetMetrics(lbp, lbs);
 
-				SMOOTH::Setup::FontSize = oldMeasurement;
+				Setup::FontSize = oldMeasurement;
 
 				listBox->AllowReselect(True);
 
@@ -421,7 +421,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
 						frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-						::SetText(dc, operat->text, frame, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::ClientColor, objectProperties->fontWeight);
+						::SetText(dc, operat->text, frame, objectProperties->font, objectProperties->fontSize, Setup::ClientColor, objectProperties->fontWeight);
 
 						frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 						frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -511,7 +511,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 					frame.right	-= 2;
 					frame.left	= frame.right - METRIC_COMBOBOXOFFSETX + 3;
 
-					Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+					Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 				}
 			}
 
@@ -531,7 +531,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				frame.right++;
 				frame.bottom++;
 
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 
 				objectProperties->checked = False;
 				objectProperties->clicked = False;
@@ -559,7 +559,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				frame.right++;
 				frame.bottom++;
 
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 
 				objectProperties->checked = False;
 				objectProperties->clicked = False;

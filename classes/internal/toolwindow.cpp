@@ -154,8 +154,8 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 			if (nOfActiveWindows == 1 && loopActive)
 			{
-				if (S::SMOOTH::Setup::enableUnicode)	SendMessageW(hwnd, WM_QUIT, 0, 0);
-				else					SendMessageA(hwnd, WM_QUIT, 0, 0);
+				if (S::Setup::enableUnicode)	SendMessageW(hwnd, WM_QUIT, 0, 0);
+				else				SendMessageA(hwnd, WM_QUIT, 0, 0);
 			}
 			else
 			{

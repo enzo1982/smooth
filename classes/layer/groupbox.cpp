@@ -32,13 +32,13 @@ S::GUI::GroupBox::GroupBox(String text, Point pos, Size size)
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(80 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 
 	GetTextSize();
 }
@@ -83,12 +83,12 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
 	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
-	Box(dc, textRect, SMOOTH::Setup::BackgroundColor, FILLED);
+	Box(dc, textRect, Setup::BackgroundColor, FILLED);
 
 	textRect.left++;
 
 	if (active)	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, objectProperties->fontColor, objectProperties->fontWeight);
-	else		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GrayTextColor, objectProperties->fontWeight);
+	else		::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
 
 	FreeContext(wnd, dc);
 
@@ -117,7 +117,7 @@ S::Int S::GUI::GroupBox::Activate()
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
 	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
-	Box(dc, textRect, SMOOTH::Setup::BackgroundColor, FILLED);
+	Box(dc, textRect, Setup::BackgroundColor, FILLED);
 
 	textRect.left++;
 
@@ -150,11 +150,11 @@ S::Int S::GUI::GroupBox::Deactivate()
 	textRect.right	= textRect.left + objectProperties->textSize.cx + 3;
 	textRect.bottom	= textRect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
-	Box(dc, textRect, SMOOTH::Setup::BackgroundColor, FILLED);
+	Box(dc, textRect, Setup::BackgroundColor, FILLED);
 
 	textRect.left++;
 
-	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::GrayTextColor, objectProperties->fontWeight);
+	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::GrayTextColor, objectProperties->fontWeight);
 
 	FreeContext(wnd, dc);
 
@@ -178,14 +178,14 @@ S::Int S::GUI::GroupBox::Hide()
 	rect.right	= rect.left + objectProperties->textSize.cx + 3;
 	rect.bottom	= rect.top + Math::Round(objectProperties->textSize.cy * 1.2);
 
-	surface->Box(rect, SMOOTH::Setup::BackgroundColor, FILLED);
+	surface->Box(rect, Setup::BackgroundColor, FILLED);
 
 	rect.left	= realPos.x;
 	rect.top	= realPos.y;
 	rect.right	= realPos.x + objectProperties->size.cx + 1;
 	rect.bottom	= realPos.y + objectProperties->size.cy + 1;
 
-	surface->Box(rect, SMOOTH::Setup::BackgroundColor, FILLED);
+	surface->Box(rect, Setup::BackgroundColor, FILLED);
 
 	return Success;
 }

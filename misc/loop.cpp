@@ -68,8 +68,8 @@ S::Void S::Init()
 
 	GetVersionExA(&vInfo);
 
-	if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)	SMOOTH::Setup::enableUnicode = True;
-	else							SMOOTH::Setup::enableUnicode = False;
+	if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)	Setup::enableUnicode = True;
+	else							Setup::enableUnicode = False;
 
 	DEFAULTICON = LoadBitmapA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON));
 	SMOOTHICON = LoadIconA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON));
@@ -113,22 +113,22 @@ S::Void S::Free()
 S::Void S::GetColors()
 {
 #ifdef __WIN32__
-	SMOOTH::Setup::BackgroundColor			= GetSysColor(COLOR_3DFACE);
-	SMOOTH::Setup::ClientColor			= GetSysColor(COLOR_WINDOW);
-	SMOOTH::Setup::ClientTextColor			= GetSysColor(COLOR_WINDOWTEXT);
-	SMOOTH::Setup::TextColor			= GetSysColor(COLOR_BTNTEXT);
-	SMOOTH::Setup::GrayTextColor			= GetSysColor(COLOR_GRAYTEXT);
-	SMOOTH::Setup::GradientStartColor		= GetSysColor(COLOR_ACTIVECAPTION);
-	SMOOTH::Setup::GradientEndColor			= GetSysColor(27);
-	SMOOTH::Setup::GradientTextColor		= GetSysColor(COLOR_CAPTIONTEXT);
-	SMOOTH::Setup::InactiveGradientStartColor	= GetSysColor(COLOR_INACTIVECAPTION);
-	SMOOTH::Setup::InactiveGradientEndColor		= GetSysColor(28);
-	SMOOTH::Setup::InactiveGradientTextColor	= GetSysColor(COLOR_INACTIVECAPTIONTEXT);
-	SMOOTH::Setup::DividerLightColor		= GetSysColor(COLOR_3DHIGHLIGHT);
-	SMOOTH::Setup::DividerDarkColor			= GetSysColor(COLOR_3DSHADOW);
-	SMOOTH::Setup::LightGrayColor			= GetSysColor(COLOR_3DHIGHLIGHT);
-	SMOOTH::Setup::TooltipColor			= GetSysColor(COLOR_INFOBK);
-	SMOOTH::Setup::TooltipTextColor			= GetSysColor(COLOR_INFOTEXT);
+	Setup::BackgroundColor			= GetSysColor(COLOR_3DFACE);
+	Setup::ClientColor			= GetSysColor(COLOR_WINDOW);
+	Setup::ClientTextColor			= GetSysColor(COLOR_WINDOWTEXT);
+	Setup::TextColor			= GetSysColor(COLOR_BTNTEXT);
+	Setup::GrayTextColor			= GetSysColor(COLOR_GRAYTEXT);
+	Setup::GradientStartColor		= GetSysColor(COLOR_ACTIVECAPTION);
+	Setup::GradientEndColor			= GetSysColor(27);
+	Setup::GradientTextColor		= GetSysColor(COLOR_CAPTIONTEXT);
+	Setup::InactiveGradientStartColor	= GetSysColor(COLOR_INACTIVECAPTION);
+	Setup::InactiveGradientEndColor		= GetSysColor(28);
+	Setup::InactiveGradientTextColor	= GetSysColor(COLOR_INACTIVECAPTIONTEXT);
+	Setup::DividerLightColor		= GetSysColor(COLOR_3DHIGHLIGHT);
+	Setup::DividerDarkColor			= GetSysColor(COLOR_3DSHADOW);
+	Setup::LightGrayColor			= GetSysColor(COLOR_3DHIGHLIGHT);
+	Setup::TooltipColor			= GetSysColor(COLOR_INFOBK);
+	Setup::TooltipTextColor			= GetSysColor(COLOR_INFOTEXT);
 #endif
 }
 
@@ -184,8 +184,8 @@ S::Int S::Loop()
 		{
 			bool	 result;
 
-			if (SMOOTH::Setup::enableUnicode)	result = PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-			else					result = PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
+			if (Setup::enableUnicode)	result = PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
+			else				result = PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
 
 			if (result)
 			{
@@ -197,12 +197,12 @@ S::Int S::Loop()
 
 				TranslateMessage(&msg);
 
-				if (SMOOTH::Setup::enableUnicode)	DispatchMessageW(&msg);
-				else					DispatchMessageA(&msg);
+				if (Setup::enableUnicode)	DispatchMessageW(&msg);
+				else				DispatchMessageA(&msg);
 			}
 
-			if (SMOOTH::Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
-			else					PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
+			if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
+			else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 
 			if (peekLoop == 0) break;
 		}
@@ -216,8 +216,8 @@ S::Int S::Loop()
 		{
 			bool	 result;
 
-			if (SMOOTH::Setup::enableUnicode)	result = GetMessageW(&msg, NIL, 0, 0);
-			else					result = GetMessageA(&msg, NIL, 0, 0);
+			if (Setup::enableUnicode)	result = GetMessageW(&msg, NIL, 0, 0);
+			else				result = GetMessageA(&msg, NIL, 0, 0);
 
 			if (!result) break;
 
@@ -229,8 +229,8 @@ S::Int S::Loop()
 
 			TranslateMessage(&msg);
 
-			if (SMOOTH::Setup::enableUnicode)	DispatchMessageW(&msg);
-			else					DispatchMessageA(&msg);
+			if (Setup::enableUnicode)	DispatchMessageW(&msg);
+			else				DispatchMessageA(&msg);
 
 			if (peekLoop > 0) break;
 		}

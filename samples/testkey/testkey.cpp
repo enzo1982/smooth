@@ -71,7 +71,7 @@ Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 		GetKeyboardState((UnsignedByte *) &keys);
 		ToAscii(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (UnsignedShort *) &asciiCode, 0);
 
-		if (SMOOTH::Setup::enableUnicode) ToUnicode(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (wchar_t *) &unicode, 1, 0);
+		if (Setup::enableUnicode) ToUnicode(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (wchar_t *) &unicode, 1, 0);
 
 		scanCode	= GetBits(lParam, 16, 23);
 		vkCode		= wParam;

@@ -43,20 +43,20 @@ S::GUI::Hyperlink::Hyperlink(String text, HBITMAP bitmap, String link, Point pos
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
 	if (linkBitmap != NIL)
 	{
 		if (size.cx == 0 && size.cy == 0)
 		{
-			objectProperties->size.cx = Math::Round(GetBitmapSizeX(linkBitmap) * SMOOTH::Setup::FontSize);
-			objectProperties->size.cy = Math::Round(GetBitmapSizeY(linkBitmap) * SMOOTH::Setup::FontSize);
+			objectProperties->size.cx = Math::Round(GetBitmapSizeX(linkBitmap) * Setup::FontSize);
+			objectProperties->size.cy = Math::Round(GetBitmapSizeY(linkBitmap) * Setup::FontSize);
 		}
 		else
 		{
-			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 		}
 	}
 	else
@@ -92,7 +92,7 @@ S::Int S::GUI::Hyperlink::Hide()
 	rect.right	= realPos.x + objectProperties->size.cx + 1;
 	rect.bottom	= realPos.y + objectProperties->size.cy + 1;
 
-	surface->Box(rect, SMOOTH::Setup::BackgroundColor, FILLED);
+	surface->Box(rect, Setup::BackgroundColor, FILLED);
 
 	return Success;
 }
@@ -102,8 +102,8 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
-	Layer	*layer = (Layer *) myContainer->GetContainerObject();
-	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
+	Layer	*layer	= (Layer *) myContainer->GetContainerObject();
+	Window	*wnd	= (Window *) layer->GetContainer()->GetContainerObject();
 
 	if (wnd == NIL) return Success;
 	if (wnd->hwnd == NIL) return Success;
@@ -142,13 +142,13 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 				break;
 		}
 
-		if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
-		else					hfont = CreateFontA(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
+		if (Setup::enableUnicode)	hfont = CreateFontW(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
+		else				hfont = CreateFontA(objectProperties->fontSize, 0, 0, 0, objectProperties->fontWeight, 0, True, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, objectProperties->font);
 
 		holdfont = (HFONT) SelectObject(dc, hfont);
 
-		if (SMOOTH::Setup::enableUnicode)	DrawTextW(dc, objectProperties->text, -1, &trect, DT_LEFT);
-		else					DrawTextA(dc, objectProperties->text, -1, &trect, DT_LEFT);
+		if (Setup::enableUnicode)	DrawTextW(dc, objectProperties->text, -1, &trect, DT_LEFT);
+		else				DrawTextA(dc, objectProperties->text, -1, &trect, DT_LEFT);
 
 		SelectObject(dc, holdfont);
 		::DeleteObject(hfont);
@@ -201,8 +201,8 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDOWN:
 			if (objectProperties->checked)
 			{
-				if (SMOOTH::Setup::enableUnicode)	LiSAOpenURLW(linkURL);
-				else					LiSAOpenURLA(linkURL);
+				if (Setup::enableUnicode)	LiSAOpenURLW(linkURL);
+				else				LiSAOpenURLA(linkURL);
 
 				wnd->Process(SM_MOUSEMOVE, 0, 0);
 

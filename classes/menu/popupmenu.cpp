@@ -74,13 +74,13 @@ S::Int S::GUI::PopupMenu::Show()
 
 	toolwnd->SetOwner(this);
 
-	Float	 oldMeasurement = SMOOTH::Setup::FontSize;
+	Float	 oldMeasurement = Setup::FontSize;
 
 	SetMeasurement(SMT_PIXELS);
 
 	toolwnd->SetMetrics(Point(objectProperties->pos.x + wnd->GetObjectProperties()->pos.x, objectProperties->pos.y + wnd->GetObjectProperties()->pos.y), Size(popupsize.cx + 1, popupsize.cy + 1));
 
-	SMOOTH::Setup::FontSize = oldMeasurement;
+	Setup::FontSize = oldMeasurement;
 
 	toolwnd->RegisterObject(popupView);
 

@@ -45,8 +45,8 @@ void S::ActivateEnglishLanguage()
 
 	int		 result;
 
-	if (SMOOTH::Setup::enableUnicode)	result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
-	else					result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);
+	if (Setup::enableUnicode)	result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
+	else				result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);
 
 	if (result == 0)	I18N_DEFAULTFONT = "Microsoft Sans Serif";
 	else			I18N_DEFAULTFONT = "MS Sans Serif";

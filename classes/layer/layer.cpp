@@ -179,7 +179,7 @@ S::Int S::GUI::Layer::Hide()
 			frame.right	= objectProperties->pos.x + objectProperties->size.cx;
 			frame.bottom	= objectProperties->pos.y + objectProperties->size.cy;
 
-			Box(dc, frame, SMOOTH::Setup::BackgroundColor, FILLED);
+			Box(dc, frame, Setup::BackgroundColor, FILLED);
 
 			FreeContext(wnd, dc);
 		}

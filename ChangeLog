@@ -12,10 +12,12 @@ xx.xx.03 xx:xx - smooth alpha 0.8.61.0
 - window.cpp		- Windows now create a Layer automatically, so you can register Layer objects at a Window object
 			- new method: Close()
 - stk.cpp		- removed function CloseWindow(Window *)
+			- removed class Setup
 - colordlg.cpp		- color box now updates when the vertical hue selector is moved
 - system.cpp		- new class: includes basic functionality like GUIDs
 - array.cpp		- implemented static GetNthEntry method
 - widget.cpp		- new class: base class for GUI objects
+- setup.cpp		- new class: replaces old SMOOTH::Setup
 
 - new namespace: smooth alias S
 - new namespace: smooth::XML

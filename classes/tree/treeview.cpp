@@ -30,17 +30,17 @@ S::GUI::TreeView::TreeView(String name, Point pos, Size size)
 {
 	type				= OBJ_TREEVIEW;
 	objectProperties->text		= name;
-	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
+	objectProperties->fontColor	= Setup::ClientTextColor;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(100 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(120 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(100 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(120 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 }
 
 S::GUI::TreeView::~TreeView()
@@ -68,7 +68,7 @@ S::Int S::GUI::TreeView::Paint(Int message)
 	frame.right	= realPos.x + objectProperties->size.cx - 1;
 	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
 
-	Box(dc, frame, SMOOTH::Setup::ClientColor, FILLED);
+	Box(dc, frame, Setup::ClientColor, FILLED);
 	Frame(dc, frame, FRAME_DOWN);
 
 	if (objectProperties->text != NIL)
@@ -143,7 +143,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 
 				if ((frame.top - y) & 1)
 				{
-					PaintPixel(dc, Point(frame.left - 6, y), SMOOTH::Setup::GrayTextColor);
+					PaintPixel(dc, Point(frame.left - 6, y), Setup::GrayTextColor);
 				}
 
 				if (y == frame.top + 9)
@@ -152,7 +152,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 					{
 						if (((frame.left - 5) - x) & 1)
 						{
-							PaintPixel(dc, Point(x, y), SMOOTH::Setup::GrayTextColor);
+							PaintPixel(dc, Point(x, y), Setup::GrayTextColor);
 						}
 					}
 				}
@@ -172,30 +172,30 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 			p2.x = p1.x + 8;
 			p2.y = p1.y;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, SMOOTH::Setup::GrayTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::GrayTextColor, PS_SOLID, 1);
 
 			p1.y = p1.y + 8;
 			p2.y = p1.y;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, SMOOTH::Setup::GrayTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::GrayTextColor, PS_SOLID, 1);
 
 			p1.y = frame.top + 5;
 			p2.y = min(p2.y + 1, oframe.bottom - 1);
 			p2.x = p1.x;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, SMOOTH::Setup::GrayTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::GrayTextColor, PS_SOLID, 1);
 
 			p1.x = p1.x + 8;
 			p2.x = p1.x;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, SMOOTH::Setup::GrayTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::GrayTextColor, PS_SOLID, 1);
 
 			p1.x = rect.left + 2;
 			p1.y = rect.top + 4;
 			p2.x = rect.right - 2;
 			p2.y = p1.y;
 
-			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, SMOOTH::Setup::ClientTextColor, PS_SOLID, 1);
+			if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::ClientTextColor, PS_SOLID, 1);
 
 			if (!operat->open)
 			{
@@ -204,7 +204,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 				p2.x = p1.x;
 				p2.y = min(rect.bottom - 2, oframe.bottom - 1);
 
-				if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, SMOOTH::Setup::ClientTextColor, PS_SOLID, 1);
+				if (p1.y < oframe.bottom - 1) Line(dc, p1, p2, Setup::ClientTextColor, PS_SOLID, 1);
 			}
 
 			for (Int y = frame.top - 2; y <= frame.top + 9; y++)
@@ -213,7 +213,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 
 				if (((frame.top - y) & 1) && (y < frame.top + 7))
 				{
-					PaintPixel(dc, Point(frame.left - 6, y), SMOOTH::Setup::GrayTextColor);
+					PaintPixel(dc, Point(frame.left - 6, y), Setup::GrayTextColor);
 				}
 
 				if (y == frame.top + 9)
@@ -222,7 +222,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 					{
 						if (((frame.left - 5) - x) & 1)
 						{
-							PaintPixel(dc, Point(x, y), SMOOTH::Setup::GrayTextColor);
+							PaintPixel(dc, Point(x, y), Setup::GrayTextColor);
 						}
 					}
 				}
@@ -241,7 +241,7 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 
 				if ((frame.top - y) & 1)
 				{
-					PaintPixel(dc, Point(frame.left - 6, y), SMOOTH::Setup::GrayTextColor);
+					PaintPixel(dc, Point(frame.left - 6, y), Setup::GrayTextColor);
 				}
 			}
 

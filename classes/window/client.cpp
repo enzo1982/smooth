@@ -107,14 +107,14 @@ S::Int S::GUI::Client::Paint(Int message)
 		intersectRect = iRect;
 #endif
 
-		surface->Box(intersectRect, SMOOTH::Setup::ClientColor, FILLED);
+		surface->Box(intersectRect, Setup::ClientColor, FILLED);
 
 		clientFrame.left	= client.left;
 		clientFrame.top		= client.top;
 		clientFrame.right	= client.right - 1;
 		clientFrame.bottom	= client.bottom - 1;
 
-		surface->Box(clientFrame, SMOOTH::Setup::DividerDarkColor, OUTLINED);
+		surface->Box(clientFrame, Setup::DividerDarkColor, OUTLINED);
 
 		updateRect.left		-= (objectProperties->pos.x + 3);
 		updateRect.top		-= (objectProperties->pos.y + 3);

@@ -105,7 +105,7 @@ S::Int S::Object::Hide()
 	rect.right	= realPos.x + objectProperties->size.cx + 1;
 	rect.bottom	= realPos.y + objectProperties->size.cy + 1;
 
-	surface->Box(rect, SMOOTH::Setup::BackgroundColor, FILLED);
+	surface->Box(rect, Setup::BackgroundColor, FILLED);
 
 	return Success;
 }

@@ -446,15 +446,15 @@ void Frame(HDC hdc, Rect rect, int style)
 	{
 		case FRAME_UP: // up
 		{
-			color1 = RGB(min(GetRed(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetGreen(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetBlue(SMOOTH::Setup::BackgroundColor) + 64, 255));
-			color2 = RGB(max(GetRed(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetGreen(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetBlue(SMOOTH::Setup::BackgroundColor) - 64, 0));
+			color1 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
+			color2 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
 		}
 		break;
 
 		case FRAME_DOWN: // down
 		{
-			color1 = RGB(max(GetRed(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetGreen(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetBlue(SMOOTH::Setup::BackgroundColor) - 64, 0));
-			color2 = RGB(min(GetRed(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetGreen(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetBlue(SMOOTH::Setup::BackgroundColor) + 64, 255));
+			color1 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
+			color2 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
 		}
 		break;
 	}
@@ -608,12 +608,12 @@ void Box(HDC hdc, Rect rect, int color, int style)
 void HBar(HDC hdc, Point p1, Point p2)
 {
 #ifdef __WIN32__
-	Line(hdc, p1, p2, RGB(max(GetRed(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetGreen(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetBlue(SMOOTH::Setup::BackgroundColor) - 64, 0)), PS_SOLID, 1);
-	SetPixel(hdc, p2.x, p2.y, RGB(min(GetRed(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetGreen(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetBlue(SMOOTH::Setup::BackgroundColor) + 64, 255)));
+	Line(hdc, p1, p2, RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0)), PS_SOLID, 1);
+	SetPixel(hdc, p2.x, p2.y, RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255)));
 	p1.y++;
 	p2.y++;
 	p2.x++;
-	Line(hdc, p1, p2, RGB(min(GetRed(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetGreen(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetBlue(SMOOTH::Setup::BackgroundColor) + 64, 255)), PS_SOLID, 1);
+	Line(hdc, p1, p2, RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255)), PS_SOLID, 1);
 #endif
 }
 
@@ -621,10 +621,10 @@ void VBar(HDC hdc, Point p1, Point p2)
 {
 #ifdef __WIN32__
 	p2.y++;
-	Line(hdc, p1, p2, RGB(max(GetRed(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetGreen(SMOOTH::Setup::BackgroundColor) - 64, 0), max(GetBlue(SMOOTH::Setup::BackgroundColor) - 64, 0)), PS_SOLID, 1);
+	Line(hdc, p1, p2, RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0)), PS_SOLID, 1);
 	p1.x++;
 	p2.x++;
-	Line(hdc, p1, p2, RGB(min(GetRed(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetGreen(SMOOTH::Setup::BackgroundColor) + 64, 255), min(GetBlue(SMOOTH::Setup::BackgroundColor) + 64, 255)), PS_SOLID, 1);
+	Line(hdc, p1, p2, RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255)), PS_SOLID, 1);
 #endif
 }
 
@@ -678,7 +678,7 @@ void SetShadowedText(HDC hdc, String string, Rect rect, String font, int size, i
 	rect.right += 2;
 	rect.bottom += 2;
 
-	SetText(hdc, string, rect, font, size, RGB(((double) GetRed(SMOOTH::Setup::BackgroundColor))/3*2, ((double) GetGreen(SMOOTH::Setup::BackgroundColor))/3*2, ((double) GetBlue(SMOOTH::Setup::BackgroundColor))/3*2), weight);
+	SetText(hdc, string, rect, font, size, RGB(((double) GetRed(Setup::BackgroundColor))/3*2, ((double) GetGreen(Setup::BackgroundColor))/3*2, ((double) GetBlue(Setup::BackgroundColor))/3*2), weight);
 
 	rect.left -= 2;
 	rect.top -= 2;
@@ -709,8 +709,8 @@ void SetText(HDC hdc, String string, Rect rect, String font, int size, int color
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, color);
 
-	if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
-	else					hfont = CreateFontA(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	if (Setup::enableUnicode)	hfont = CreateFontW(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	else				hfont = CreateFontA(size, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
 
 	holdfont = (HFONT) SelectObject(hdc, hfont);
 
@@ -741,8 +741,8 @@ void SetText(HDC hdc, String string, Rect rect, String font, int size, int color
 
 		RECT	 Rect = rect;
 
-		if (SMOOTH::Setup::enableUnicode)	DrawTextW(hdc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
-		else					DrawTextA(hdc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
+		if (Setup::enableUnicode)	DrawTextW(hdc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
+		else				DrawTextA(hdc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
 
 		rect.top += height;
 	}
@@ -905,15 +905,15 @@ int GetLineSizeX(HDC hdc, String text, int nofchars, String font, int size, int 
 
 	cdc = CreateCompatibleDC(hdc);
 
-	if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
-	else					hfont = CreateFontA(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	if (Setup::enableUnicode)	hfont = CreateFontW(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	else				hfont = CreateFontA(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
 
 	holdfont = (HFONT) SelectObject(cdc, hfont);
 
 	SIZE	 ts = tsize;
 
-	if (SMOOTH::Setup::enableUnicode)	GetTextExtentPoint32W(cdc, filtered, nofchars-bias, &ts);
-	else					GetTextExtentPoint32A(cdc, filtered, nofchars-bias, &ts);
+	if (Setup::enableUnicode)	GetTextExtentPoint32W(cdc, filtered, nofchars-bias, &ts);
+	else				GetTextExtentPoint32A(cdc, filtered, nofchars-bias, &ts);
 
 	tsize = ts;
 
@@ -930,8 +930,8 @@ int GetLineSizeX(HDC hdc, String text, int nofchars, String font, int size, int 
 
 	RECT	 Rect = rect;
 
-	if (SMOOTH::Setup::enableUnicode)	DrawTextW(cdc, filtered, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
-	else					DrawTextA(cdc, filtered, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
+	if (Setup::enableUnicode)	DrawTextW(cdc, filtered, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
+	else				DrawTextA(cdc, filtered, -1, &Rect, DT_LEFT | DT_EXPANDTABS);
 
 	rect = Rect;
 
@@ -992,15 +992,15 @@ int GetLineSizeY(HDC hdc, String text, String font, int size, int weight)
 
 	cdc = CreateCompatibleDC(hdc);
 
-	if (SMOOTH::Setup::enableUnicode)	hfont = CreateFontW(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
-	else					hfont = CreateFontA(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	if (Setup::enableUnicode)	hfont = CreateFontW(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
+	else				hfont = CreateFontA(txsize, 0, 0, 0, weight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font);
 
 	holdfont = (HFONT) SelectObject(cdc, hfont);
 
 	SIZE	 ts = tsize;
 
-	if (SMOOTH::Setup::enableUnicode)	GetTextExtentPoint32W(cdc, text, nofchars, &ts);
-	else					GetTextExtentPoint32A(cdc, text, nofchars, &ts);
+	if (Setup::enableUnicode)	GetTextExtentPoint32W(cdc, text, nofchars, &ts);
+	else				GetTextExtentPoint32A(cdc, text, nofchars, &ts);
 
 	tsize = ts;
 
@@ -1156,11 +1156,11 @@ HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon
 	wndclassa.lpszClassName	= className;
 	wndclassa.hIconSm	= icon;
 
-	if (SMOOTH::Setup::enableUnicode)	RegisterClassExW(&wndclassw);
-	else					RegisterClassExA(&wndclassa);
+	if (Setup::enableUnicode)	RegisterClassExW(&wndclassw);
+	else				RegisterClassExA(&wndclassa);
 
-	if (SMOOTH::Setup::enableUnicode)	hwnd = CreateWindowExW(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
-	else					hwnd = CreateWindowExA(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
+	if (Setup::enableUnicode)	hwnd = CreateWindowExW(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
+	else				hwnd = CreateWindowExA(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
 
 	return hwnd;
 

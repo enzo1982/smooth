@@ -113,13 +113,13 @@ S::Int S::DialogFileSelection::ShowDialog()
 		ofnw.Flags |= OFN_FILEMUSTEXIST;
 		ofna.Flags |= OFN_FILEMUSTEXIST;
 
-		if (SMOOTH::Setup::enableUnicode)	result = GetOpenFileNameW(&ofnw);
-		else					result = GetOpenFileNameA(&ofna);
+		if (Setup::enableUnicode)	result = GetOpenFileNameW(&ofnw);
+		else				result = GetOpenFileNameA(&ofna);
 	}
 	else
 	{
-		if (SMOOTH::Setup::enableUnicode)	result = GetSaveFileNameW(&ofnw);
-		else					result = GetSaveFileNameA(&ofna);
+		if (Setup::enableUnicode)	result = GetSaveFileNameW(&ofnw);
+		else				result = GetSaveFileNameA(&ofna);
 	}
 
 	if (result)
@@ -131,7 +131,7 @@ S::Int S::DialogFileSelection::ShowDialog()
 		wchar_t	*buffer2w = new wchar_t [1024];
 		char	*buffer2a = new char [1024];
 
-		if (SMOOTH::Setup::enableUnicode)
+		if (Setup::enableUnicode)
 		{
 			for (n = 0; n < 32768; n++)
 			{

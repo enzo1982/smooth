@@ -24,28 +24,6 @@
 #include <smooth/divider.h>
 #include <smooth/pciio.h>
 
-S::Int S::SMOOTH::Setup::BackgroundColor = RGB(192, 192, 192);
-S::Int S::SMOOTH::Setup::ClientColor = RGB(255, 255, 255);
-S::Int S::SMOOTH::Setup::ClientTextColor = RGB(0, 0, 0);
-S::Int S::SMOOTH::Setup::LightGrayColor;
-S::Int S::SMOOTH::Setup::DividerLightColor;
-S::Int S::SMOOTH::Setup::DividerDarkColor;
-S::Int S::SMOOTH::Setup::TextColor = RGB(0, 0, 0);
-S::Int S::SMOOTH::Setup::GrayTextColor = RGB(128, 128, 128);
-S::Int S::SMOOTH::Setup::ShadowColor;
-S::Int S::SMOOTH::Setup::GradientStartColor;
-S::Int S::SMOOTH::Setup::GradientEndColor;
-S::Int S::SMOOTH::Setup::GradientTextColor = RGB(255, 255, 255);
-S::Int S::SMOOTH::Setup::InactiveGradientStartColor;
-S::Int S::SMOOTH::Setup::InactiveGradientEndColor;
-S::Int S::SMOOTH::Setup::InactiveGradientTextColor;
-S::Int S::SMOOTH::Setup::TooltipColor;
-S::Int S::SMOOTH::Setup::TooltipTextColor;
-
-S::Bool S::SMOOTH::Setup::enableUnicode = S::False;
-
-S::Float S::SMOOTH::Setup::FontSize = 1.00;
-
 S::String S::SMOOTH::StartDirectory = NIL;
 
 S::Object *S::SMOOTH::GetObject(Int objectHandle, Int objectType)
@@ -222,7 +200,7 @@ HBITMAP S::DetectTransparentRegions(HBITMAP bmp)
 	{
 		for (int x = 0; x < isy; x++)
 		{
-			if (GetPixel(cdc, Point(x, y)) == RGB(192, 192, 192)) PaintPixel(cdc, Point(x, y), SMOOTH::Setup::BackgroundColor);
+			if (GetPixel(cdc, Point(x, y)) == RGB(192, 192, 192)) PaintPixel(cdc, Point(x, y), Setup::BackgroundColor);
 		}
 	}
 

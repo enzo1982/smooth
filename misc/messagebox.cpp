@@ -83,8 +83,8 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 	Size	 bsize;
 	int	 titlesize = 0;
 	double	 oldmeasurement;
-	Int	 buttonWidth = Math::Round(80 * SMOOTH::Setup::FontSize);
-	Int	 buttonHeight = Math::Round(22 * SMOOTH::Setup::FontSize);
+	Int	 buttonWidth = Math::Round(80 * Setup::FontSize);
+	Int	 buttonHeight = Math::Round(22 * Setup::FontSize);
 
 	lines = 1;
 	msgbox->GetObjectProperties()->size.cx = 0;
@@ -154,7 +154,7 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 	bsize.cy = 0;
 	bsize.cx = 0;
 
-	oldmeasurement = SMOOTH::Setup::FontSize;
+	oldmeasurement = Setup::FontSize;
 
 	SetMeasurement(SMT_PIXELS);
 
@@ -248,7 +248,7 @@ void S::MessageBoxApp::Create(String text, String title, int btns)
 #endif
 	}
 
-	SMOOTH::Setup::FontSize = oldmeasurement;
+	Setup::FontSize = oldmeasurement;
 
 	msgbox->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - msgbox->GetObjectProperties()->size.cx) / 2 + (nOfMessageBoxes - 1) * 25;
 	msgbox->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - msgbox->GetObjectProperties()->size.cy) / 2 + (nOfMessageBoxes - 1) * 25;
@@ -362,13 +362,13 @@ void S::MessageBoxApp::MessagePaintProc()
 
 		if (msgicon == MAKEINTRESOURCEW(32512) || msgicon == MAKEINTRESOURCEW(32516) || msgicon == MAKEINTRESOURCEW(32515) || msgicon == MAKEINTRESOURCEW(32513) || msgicon == MAKEINTRESOURCEW(32514) || msgicon == MAKEINTRESOURCEW(32517))
 		{
-			if (SMOOTH::Setup::enableUnicode)	icon = LoadIconW(NIL, msgicon);
-			else					icon = LoadIconA(NIL, (char *) msgicon);
+			if (Setup::enableUnicode)	icon = LoadIconW(NIL, msgicon);
+			else				icon = LoadIconA(NIL, (char *) msgicon);
 		}
 		else
 		{
-			if (SMOOTH::Setup::enableUnicode)	icon = LoadIconW(hInstance, msgicon);
-			else					icon = LoadIconA(hInstance, (char *) msgicon);
+			if (Setup::enableUnicode)	icon = LoadIconW(hInstance, msgicon);
+			else				icon = LoadIconA(hInstance, (char *) msgicon);
 		}
 
 		DrawIcon(dc, 17, 47, icon);
@@ -379,7 +379,7 @@ void S::MessageBoxApp::MessagePaintProc()
 	for (int i = 0; i < lines; i++)
 	{
 #ifdef __WIN32__
-		::SetText(dc, line[i], txtrect, I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), SMOOTH::Setup::TextColor, FW_NORMAL);
+		::SetText(dc, line[i], txtrect, I18N_DEFAULTFONT, -MulDiv(I18N_DEFAULTFONTSIZE, GetDeviceCaps(dc, LOGPIXELSY), 72), Setup::TextColor, FW_NORMAL);
 #endif
 
 		txtrect.top += 16;

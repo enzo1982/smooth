@@ -31,20 +31,20 @@ S::GUI::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iC
 	objectProperties->text		= text;
 	variable			= var;
 	code				= iCode;
-	objectProperties->fontColor	= SMOOTH::Setup::ClientTextColor;
+	objectProperties->fontColor	= Setup::ClientTextColor;
 
 	if (*variable == code)	state = True;
 	else			state = False;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
-	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-	if (size.cy == 0)	objectProperties->size.cy = Math::Round(16 * SMOOTH::Setup::FontSize);
-	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+	if (size.cx == 0)	objectProperties->size.cx = Math::Round(80 * Setup::FontSize);
+	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+	if (size.cy == 0)	objectProperties->size.cy = Math::Round(16 * Setup::FontSize);
+	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 
 	GetTextSize();
 }
@@ -72,15 +72,15 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	Point	 lineEnd;
 	Int	 lightColor;
 
-	if (active)	lightColor = SMOOTH::Setup::ClientColor;
-	else		lightColor = SMOOTH::Setup::BackgroundColor;
+	if (active)	lightColor = Setup::ClientColor;
+	else		lightColor = Setup::BackgroundColor;
 
 	lineStart.x = realPos.x + METRIC_OPTBOXOFFSETXY + 3;
 	lineStart.y = realPos.y + METRIC_OPTBOXOFFSETXY;
 	lineEnd.x = lineStart.x + 5;
 	lineEnd.y = lineStart.y;
 
-	Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+	Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
 
 	lineStart.x--;
 	lineStart.y++;
@@ -88,7 +88,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
 
-	PaintPixel(dc, lineStart, SMOOTH::Setup::DividerDarkColor);
+	PaintPixel(dc, lineStart, Setup::DividerDarkColor);
 
 	lineStart.x--;
 	lineStart.y++;
@@ -97,8 +97,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
 
-	PaintPixel(dc, lineStart, SMOOTH::Setup::DividerDarkColor);
-	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
+	PaintPixel(dc, lineStart, Setup::DividerDarkColor);
+	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerLightColor);
 
 	lineStart.x--;
 	lineEnd.x++;
@@ -110,8 +110,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 		Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
 
-		PaintPixel(dc, lineStart, SMOOTH::Setup::DividerDarkColor);
-		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
+		PaintPixel(dc, lineStart, Setup::DividerDarkColor);
+		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerLightColor);
 	}
 
 	lineStart.x++;
@@ -121,8 +121,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
 
-	PaintPixel(dc, lineStart, SMOOTH::Setup::DividerLightColor);
-	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
+	PaintPixel(dc, lineStart, Setup::DividerLightColor);
+	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerLightColor);
 
 	lineStart.x++;
 	lineStart.y++;
@@ -131,15 +131,15 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 	Line(dc, lineStart, lineEnd, lightColor, PS_SOLID, 1);
 
-	PaintPixel(dc, lineStart, SMOOTH::Setup::DividerLightColor);
-	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerLightColor);
+	PaintPixel(dc, lineStart, Setup::DividerLightColor);
+	PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerLightColor);
 
 	lineStart.x++;
 	lineStart.y++;
 	lineEnd.x--;
 	lineEnd.y++;
 
-	Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerLightColor, PS_SOLID, 1);
+	Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
 
 	if (*variable == code)
 	{
@@ -148,7 +148,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 		lineEnd.x--;
 		lineEnd.y -= 7;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::ClientTextColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::ClientTextColor, PS_SOLID, 1);
 
 		lineStart.x--;
 		lineEnd.x++;
@@ -158,26 +158,26 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 			lineStart.y++;
 			lineEnd.y++;
 
-			Line(dc, lineStart, lineEnd, SMOOTH::Setup::ClientTextColor, PS_SOLID, 1);
+			Line(dc, lineStart, lineEnd, Setup::ClientTextColor, PS_SOLID, 1);
 		}
 
-		PaintPixel(dc, Point(lineEnd.x, lineEnd.y - 1), SMOOTH::Setup::DividerDarkColor);
-		PaintPixel(dc, lineEnd, SMOOTH::Setup::DividerDarkColor);
+		PaintPixel(dc, Point(lineEnd.x, lineEnd.y - 1), Setup::DividerDarkColor);
+		PaintPixel(dc, lineEnd, Setup::DividerDarkColor);
 
 		lineStart.x++;
 		lineStart.y++;
 		lineEnd.y++;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::ClientTextColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::ClientTextColor, PS_SOLID, 1);
 
-		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), SMOOTH::Setup::DividerDarkColor);
-		PaintPixel(dc, lineEnd, SMOOTH::Setup::DividerDarkColor);
+		PaintPixel(dc, Point(lineEnd.x - 1, lineEnd.y), Setup::DividerDarkColor);
+		PaintPixel(dc, lineEnd, Setup::DividerDarkColor);
 
 		lineStart.x++;
 		lineStart.y++;
 		lineEnd.y++;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
 	}
 
 	textRect.left	= realPos.x + METRIC_OPTBOXOFFSETXY + 14;
@@ -260,7 +260,7 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -303,7 +303,7 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 			}
@@ -326,7 +326,7 @@ S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 			}
@@ -362,7 +362,7 @@ S::Int S::GUI::OptionBox::SetText(String newText)
 	textRect.right	= textRect.left + objectProperties->size.cx;
 	textRect.bottom	= textRect.top + 20;
 
-	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, SMOOTH::Setup::BackgroundColor, objectProperties->fontWeight);
+	::SetText(dc, objectProperties->text, textRect, objectProperties->font, objectProperties->fontSize, Setup::BackgroundColor, objectProperties->fontWeight);
 
 	objectProperties->text = newText;
 

@@ -32,12 +32,12 @@ extern "C"
 
 				Init();
 
-				if (System::GetVersionString() != (S::String) SMOOTH_VERSION)
+				if (System::GetVersionString() != (String) SMOOTH_VERSION)
 				{
 					SMOOTH::MessageBox("This DLL might not be compatible with the\nSMOOTH library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
 				}
 
-				if (SMOOTH::Setup::enableUnicode)
+				if (Setup::enableUnicode)
 				{
 					wchar_t	*buffer = new wchar_t [MAX_PATH];
 

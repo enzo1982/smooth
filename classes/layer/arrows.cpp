@@ -45,22 +45,22 @@ S::GUI::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
-	objectProperties->pos.x = Math::Round(pos.x * SMOOTH::Setup::FontSize);
-	objectProperties->pos.y = Math::Round(pos.y * SMOOTH::Setup::FontSize);
+	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
+	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);
 
 	if (subtype == OR_VERT)
 	{
-		if (size.cx == 0)	objectProperties->size.cx = Math::Round(18 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = Math::Round(24 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+		if (size.cx == 0)	objectProperties->size.cx = Math::Round(18 * Setup::FontSize);
+		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+		if (size.cy == 0)	objectProperties->size.cy = Math::Round(24 * Setup::FontSize);
+		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 	}
 	else
 	{
-		if (size.cx == 0)	objectProperties->size.cx = Math::Round(24 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cx = Math::Round(size.cx * SMOOTH::Setup::FontSize);
-		if (size.cy == 0)	objectProperties->size.cy = Math::Round(18 * SMOOTH::Setup::FontSize);
-		else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
+		if (size.cx == 0)	objectProperties->size.cx = Math::Round(24 * Setup::FontSize);
+		else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
+		if (size.cy == 0)	objectProperties->size.cy = Math::Round(18 * Setup::FontSize);
+		else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
 	}
 }
 
@@ -100,12 +100,12 @@ S::Int S::GUI::Arrows::Paint(Int message)
 		lineEnd.x = lineStart.x;
 		lineEnd.y = frame.bottom;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
 
 		lineStart.x++;
 		lineEnd.x++;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerLightColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
 
 		lineStart.x = (frame.left + (frame.left + frame.right) / 2) / 2 - 1;
 		lineStart.y = (frame.bottom + frame.top) / 2;
@@ -114,7 +114,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		for (Int i = 0; i < 4; i++)
 		{
-			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
 
 			lineStart.x++;
 			lineStart.y--;
@@ -129,7 +129,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
 
 			lineStart.x++;
 			lineStart.y++;
@@ -144,12 +144,12 @@ S::Int S::GUI::Arrows::Paint(Int message)
 		lineEnd.x = frame.right;
 		lineEnd.y = lineStart.y;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerDarkColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::DividerDarkColor, PS_SOLID, 1);
 
 		lineStart.y++;
 		lineEnd.y++;
 
-		Line(dc, lineStart, lineEnd, SMOOTH::Setup::DividerLightColor, PS_SOLID, 1);
+		Line(dc, lineStart, lineEnd, Setup::DividerLightColor, PS_SOLID, 1);
 
 		lineStart.x = (frame.right + frame.left) / 2;
 		lineStart.y = (frame.top + (frame.top+frame.bottom) / 2) / 2 - 1;
@@ -158,7 +158,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		for (Int k = 0; k < 4; k++)
 		{
-			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
 
 			lineStart.x--;
 			lineStart.y++;
@@ -173,7 +173,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		for (Int l = 0; l < 4; l++)
 		{
-			Line(dc, lineStart, lineEnd, SMOOTH::Setup::TextColor, PS_SOLID, 1);
+			Line(dc, lineStart, lineEnd, Setup::TextColor, PS_SOLID, 1);
 
 			lineStart.x++;
 			lineStart.y++;
@@ -288,7 +288,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -306,7 +306,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				frame.right++;
 				frame.bottom++;
-				Box(dc, frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, frame, Setup::BackgroundColor, OUTLINED);
 				frame.right--;
 				frame.bottom--;
 
@@ -339,7 +339,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				arrow1Frame.right++;
 				arrow1Frame.bottom++;
-				Box(dc, arrow1Frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, arrow1Frame, Setup::BackgroundColor, OUTLINED);
 				arrow1Frame.right--;
 				arrow1Frame.bottom--;
 			}
@@ -352,7 +352,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				arrow2Frame.right++;
 				arrow2Frame.bottom++;
-				Box(dc, arrow2Frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, arrow2Frame, Setup::BackgroundColor, OUTLINED);
 				arrow2Frame.right--;
 				arrow2Frame.bottom--;
 			}
@@ -387,7 +387,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				arrow1Frame.right++;
 				arrow1Frame.bottom++;
-				Box(dc, arrow1Frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, arrow1Frame, Setup::BackgroundColor, OUTLINED);
 				arrow1Frame.right--;
 				arrow1Frame.bottom--;
 			}
@@ -406,7 +406,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 				arrow2Frame.right++;
 				arrow2Frame.bottom++;
-				Box(dc, arrow2Frame, SMOOTH::Setup::BackgroundColor, OUTLINED);
+				Box(dc, arrow2Frame, Setup::BackgroundColor, OUTLINED);
 				arrow2Frame.right--;
 				arrow2Frame.bottom--;
 			}

@@ -29,7 +29,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_COMBOBOX = S::Object::RequestObjectID();
 
-S::ComboBox::ComboBox(Point pos, Size size)
+S::GUI::ComboBox::ComboBox(Point pos, Size size)
 {
 	type		= OBJ_COMBOBOX;
 	entryCount	= -1;
@@ -53,7 +53,7 @@ S::ComboBox::ComboBox(Point pos, Size size)
 	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-S::ComboBox::~ComboBox()
+S::GUI::ComboBox::~ComboBox()
 {
 	if (listBoxOpen)
 	{
@@ -63,7 +63,7 @@ S::ComboBox::~ComboBox()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::List::Entry *S::ComboBox::AddEntry(String name)
+S::List::Entry *S::GUI::ComboBox::AddEntry(String name)
 {
 	entryCount++;
 
@@ -76,7 +76,7 @@ S::List::Entry *S::ComboBox::AddEntry(String name)
 	return newEntry;
 }
 
-S::Int S::ComboBox::ModifyEntry(Int code, String name)
+S::Int S::GUI::ComboBox::ModifyEntry(Int code, String name)
 {
 	if (ModifyListEntry(code, name) == Success)
 	{
@@ -90,7 +90,7 @@ S::Int S::ComboBox::ModifyEntry(Int code, String name)
 	}
 }
 
-S::Int S::ComboBox::RemoveEntry(Int number)
+S::Int S::GUI::ComboBox::RemoveEntry(Int number)
 {
 	RemoveListEntry(number);
 
@@ -99,14 +99,14 @@ S::Int S::ComboBox::RemoveEntry(Int number)
 	return Success;
 }
 
-S::Void S::ComboBox::Cleanup()
+S::Void S::GUI::ComboBox::Cleanup()
 {
 	CleanupList();
 
 	Paint(SP_PAINT);
 }
 
-S::Int S::ComboBox::SelectEntry(Int code)
+S::Int S::GUI::ComboBox::SelectEntry(Int code)
 {
 	SelectListEntry(code);
 
@@ -115,7 +115,7 @@ S::Int S::ComboBox::SelectEntry(Int code)
 	return Success;
 }
 
-S::Int S::ComboBox::Paint(Int message)
+S::Int S::GUI::ComboBox::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -195,7 +195,7 @@ S::Int S::ComboBox::Paint(Int message)
 	return Success;
 }
 
-S::Int S::ComboBox::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -588,7 +588,7 @@ S::Int S::ComboBox::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::ComboBox::ListBoxProc()
+S::Void S::GUI::ComboBox::ListBoxProc()
 {
 	Process(SM_CHECKCOMBOBOXES, 0, 0);
 }

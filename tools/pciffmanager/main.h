@@ -16,6 +16,7 @@ class PCIFFManager;
 #include <smooth.h>
 
 using namespace smooth;
+using namespace smooth::GUI;
 
 class PCIFFManager : public Application
 {

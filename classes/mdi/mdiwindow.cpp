@@ -20,7 +20,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_MDIWINDOW = S::Object::RequestObjectID();
 
-S::MDIWindow::MDIWindow(String title) : Window(title)
+S::GUI::MDIWindow::MDIWindow(String title) : Window(title)
 {
 	type				= OBJ_MDIWINDOW;
 	containerType			= OBJ_WINDOW;
@@ -35,7 +35,7 @@ S::MDIWindow::MDIWindow(String title) : Window(title)
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-S::MDIWindow::~MDIWindow()
+S::GUI::MDIWindow::~MDIWindow()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }

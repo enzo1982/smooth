@@ -13,34 +13,40 @@
 
 namespace smooth
 {
-	class Progressbar;
+	namespace GUI
+	{
+		class Progressbar;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	const Int PB_NOTEXT	= 0;
-	const Int PB_VALUE	= 1;
-	const Int PB_PERCENT	= 2;
-
-	class SMOOTHAPI Progressbar : public Object
+	namespace GUI
 	{
-		protected:
-			Int		 value;
+		const Int PB_NOTEXT	= 0;
+		const Int PB_VALUE	= 1;
+		const Int PB_PERCENT	= 2;
 
-			Int		 startValue;
-			Int		 endValue;
+		class SMOOTHAPI Progressbar : public Widget
+		{
+			protected:
+				Int		 value;
 
-			Int		 textFlag;
-		public:
-					 Progressbar(Point, Size, Int, Int, Int, Int, Int);
-					~Progressbar();
+				Int		 startValue;
+				Int		 endValue;
 
-			virtual Int	 Paint(Int);
+				Int		 textFlag;
+			public:
+						 Progressbar(Point, Size, Int, Int, Int, Int, Int);
+						~Progressbar();
 
-			Int		 SetValue(Int);
-			Int		 GetValue();
+				virtual Int	 Paint(Int);
+
+				Int		 SetValue(Int);
+				Int		 GetValue();
+		};
 	};
 
 	SMOOTHVAR Int OBJ_PROGRESSBAR;

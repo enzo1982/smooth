@@ -25,7 +25,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_GROUPBOX = S::Object::RequestObjectID();
 
-S::GroupBox::GroupBox(String text, Point pos, Size size)
+S::GUI::GroupBox::GroupBox(String text, Point pos, Size size)
 {
 	type			= OBJ_GROUPBOX;
 	objectProperties->text	= text;
@@ -43,12 +43,12 @@ S::GroupBox::GroupBox(String text, Point pos, Size size)
 	GetTextSize();
 }
 
-S::GroupBox::~GroupBox()
+S::GUI::GroupBox::~GroupBox()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::GroupBox::Paint(Int message)
+S::Int S::GUI::GroupBox::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -95,7 +95,7 @@ S::Int S::GroupBox::Paint(Int message)
 	return Success;
 }
 
-S::Int S::GroupBox::Activate()
+S::Int S::GUI::GroupBox::Activate()
 {
 	active = True;
 
@@ -128,7 +128,7 @@ S::Int S::GroupBox::Activate()
 	return Success;
 }
 
-S::Int S::GroupBox::Deactivate()
+S::Int S::GUI::GroupBox::Deactivate()
 {
 	active = False;
 
@@ -161,7 +161,7 @@ S::Int S::GroupBox::Deactivate()
 	return Success;
 }
 
-S::Int S::GroupBox::Hide()
+S::Int S::GUI::GroupBox::Hide()
 {
 	if (!visible)		return Success;
 

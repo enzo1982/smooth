@@ -58,15 +58,15 @@ S::Object *S::SMOOTH::GetObject(Int objectHandle, Int objectType)
 	else						return NIL;
 }
 
-S::Window *S::SMOOTH::GetWindow(HWND wnd)
+S::GUI::Window *S::SMOOTH::GetWindow(HWND wnd)
 {
-	Window	*rval;
+	GUI::Window	*rval;
 
 	for (int i = 0; i < Object::objectCount; i++)
 	{
-		rval = (Window *) mainObjectManager->RequestObject(i);
+		rval = (GUI::Window *) mainObjectManager->RequestObject(i);
 
-		if (rval != (Window *) NIL)
+		if (rval != (GUI::Window *) NIL)
 		{
 			if (rval->type == OBJ_WINDOW || rval->type == OBJ_MDIWINDOW || rval->type == OBJ_TOOLWINDOW)
 			{
@@ -89,7 +89,7 @@ S::Bool S::SMOOTH::SetStartDirectory(String dir)
 	return Success;
 }
 
-S::Void S::SMOOTH::SendMessage(Window *window, Int message, Int wParam, Int lParam)
+S::Void S::SMOOTH::SendMessage(GUI::Window *window, Int message, Int wParam, Int lParam)
 {
 	if (window != NIL)
 	{

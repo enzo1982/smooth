@@ -13,45 +13,51 @@
 
 namespace smooth
 {
-	class ListBox;
-	class Scrollbar;
+	namespace GUI
+	{
+		class ListBox;
+		class Scrollbar;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "list.h"
 
 namespace smooth
 {
-	class SMOOTHAPI ListBox : public Object, public List
+	namespace GUI
 	{
-		private:
-			Int		 entryCount;
+		class SMOOTHAPI ListBox : public Widget, public List
+		{
+			private:
+				Int		 entryCount;
 
-			Scrollbar	*scrollbar;
-			Bool		 needScrollbar;
-			Int		 scrollbarPos;
-			Int		 lastScrollbarPos;
+				Scrollbar	*scrollbar;
+				Bool		 needScrollbar;
+				Int		 scrollbarPos;
+				Int		 lastScrollbarPos;
 
-			Bool		 allowReselect;
+				Bool		 allowReselect;
 
-			Void		 ScrollbarProc();
-		public:
-					 ListBox(Point, Size);
-					~ListBox();
+				Void		 ScrollbarProc();
+			public:
+						 ListBox(Point, Size);
+						~ListBox();
 
-			Entry		*AddEntry(String);
-			Int		 ModifyEntry(Int, String);
-			Int		 RemoveEntry(Int);
-			Int		 SelectEntry(Int);
-			Void		 Cleanup();
+				Entry		*AddEntry(String);
+				Int		 ModifyEntry(Int, String);
+				Int		 RemoveEntry(Int);
+				Int		 SelectEntry(Int);
+				Void		 Cleanup();
 
-			virtual Int	 Show();
-			virtual Int	 Hide();
+				virtual Int	 Show();
+				virtual Int	 Hide();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
-			Int		 AllowReselect(Bool);
+				Int		 AllowReselect(Bool);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_LISTBOX;

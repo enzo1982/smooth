@@ -27,7 +27,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_BUTTON = S::Object::RequestObjectID();
 
-S::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
+S::GUI::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
 {
 	type			= OBJ_BUTTON;
 	objectProperties->text	= text;
@@ -59,7 +59,7 @@ S::Button::Button(String text, HBITMAP bmp, Point pos, Size size)
 	GetTextSize();
 }
 
-S::Button::~Button()
+S::GUI::Button::~Button()
 {
 	Window	*wnd = NIL;
 
@@ -92,7 +92,7 @@ S::Button::~Button()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Button::Paint(Int message)
+S::Int S::GUI::Button::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -212,7 +212,7 @@ S::Int S::Button::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Button::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Button::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -379,7 +379,7 @@ S::Int S::Button::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::Button::ActivateTooltip()
+S::Void S::GUI::Button::ActivateTooltip()
 {
 	if (tooltip != NIL) return;
 

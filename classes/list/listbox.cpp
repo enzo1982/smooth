@@ -29,7 +29,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_LISTBOX = S::Object::RequestObjectID();
 
-S::ListBox::ListBox(Point pos, Size size)
+S::GUI::ListBox::ListBox(Point pos, Size size)
 {
 	type		= OBJ_LISTBOX;
 	entryCount	= -1;
@@ -53,7 +53,7 @@ S::ListBox::ListBox(Point pos, Size size)
 	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-S::ListBox::~ListBox()
+S::GUI::ListBox::~ListBox()
 {
 	if (needScrollbar)
 	{
@@ -65,14 +65,14 @@ S::ListBox::~ListBox()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::ListBox::AllowReselect(Bool value)
+S::Int S::GUI::ListBox::AllowReselect(Bool value)
 {
 	allowReselect = value;
 
 	return Success;
 }
 
-S::List::Entry *S::ListBox::AddEntry(String name)
+S::List::Entry *S::GUI::ListBox::AddEntry(String name)
 {
 	entryCount++;
 
@@ -83,7 +83,7 @@ S::List::Entry *S::ListBox::AddEntry(String name)
 	return newEntry;
 }
 
-S::Int S::ListBox::ModifyEntry(Int code, String name)
+S::Int S::GUI::ListBox::ModifyEntry(Int code, String name)
 {
 	if (ModifyListEntry(code, name) == Success)
 	{
@@ -97,7 +97,7 @@ S::Int S::ListBox::ModifyEntry(Int code, String name)
 	}
 }
 
-S::Int S::ListBox::RemoveEntry(Int number)
+S::Int S::GUI::ListBox::RemoveEntry(Int number)
 {
 	RemoveListEntry(number);
 
@@ -123,7 +123,7 @@ S::Int S::ListBox::RemoveEntry(Int number)
 	return Success;
 }
 
-S::Void S::ListBox::Cleanup()
+S::Void S::GUI::ListBox::Cleanup()
 {
 	CleanupList();
 
@@ -143,7 +143,7 @@ S::Void S::ListBox::Cleanup()
 	Paint(SP_PAINT);
 }
 
-S::Int S::ListBox::SelectEntry(Int code)
+S::Int S::GUI::ListBox::SelectEntry(Int code)
 {
 	SelectListEntry(code);
 
@@ -152,7 +152,7 @@ S::Int S::ListBox::SelectEntry(Int code)
 	return Success;
 }
 
-S::Int S::ListBox::Show()
+S::Int S::GUI::ListBox::Show()
 {
 	if (visible)	return Success;
 
@@ -177,7 +177,7 @@ S::Int S::ListBox::Show()
 	return Object::Show();
 }
 
-S::Int S::ListBox::Hide()
+S::Int S::GUI::ListBox::Hide()
 {
 	if (!visible)	return Success;
 
@@ -186,7 +186,7 @@ S::Int S::ListBox::Hide()
 	return Object::Hide();
 }
 
-S::Int S::ListBox::Paint(Int message)
+S::Int S::GUI::ListBox::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -334,7 +334,7 @@ S::Int S::ListBox::Paint(Int message)
 	return Success;
 }
 
-S::Int S::ListBox::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -627,7 +627,7 @@ S::Int S::ListBox::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::ListBox::ScrollbarProc()
+S::Void S::GUI::ListBox::ScrollbarProc()
 {
 	Process(SM_CHECKLISTBOXES, 0, 0);
 }

@@ -23,7 +23,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_LAYER = S::Object::RequestObjectID();
 
-S::Layer::Layer(String name)
+S::GUI::Layer::Layer(String name)
 {
 	self = this;
 
@@ -41,12 +41,12 @@ S::Layer::Layer(String name)
 	possibleContainers.AddEntry(OBJ_TABREGISTER);
 }
 
-S::Layer::~Layer()
+S::GUI::Layer::~Layer()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Layer::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -66,7 +66,7 @@ S::Int S::Layer::Process(Int message, Int wParam, Int lParam)
 	return Success;
 }
 
-S::Int S::Layer::Paint(Int message)
+S::Int S::GUI::Layer::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -108,7 +108,7 @@ S::Int S::Layer::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Layer::Show()
+S::Int S::GUI::Layer::Show()
 {
 	if (visible) return Success;
 
@@ -148,7 +148,7 @@ S::Int S::Layer::Show()
 	return Success;
 }
 
-S::Int S::Layer::Hide()
+S::Int S::GUI::Layer::Hide()
 {
 	if (!visible) return Success;
 
@@ -188,7 +188,7 @@ S::Int S::Layer::Hide()
 	return Success;
 }
 
-S::Int S::Layer::SetColor(Int newColor)
+S::Int S::GUI::Layer::SetColor(Int newColor)
 {
 	layerColor = newColor;
 
@@ -197,21 +197,21 @@ S::Int S::Layer::SetColor(Int newColor)
 	return Success;
 }
 
-S::Int S::Layer::SetMetrics(Point pos, Size size)
+S::Int S::GUI::Layer::SetMetrics(Point pos, Size size)
 {
 	objectProperties->orientation = OR_FREE;
 
 	return Object::SetMetrics(pos, size);
 }
 
-S::Surface *S::Layer::GetDrawSurface()
+S::GUI::Surface *S::GUI::Layer::GetDrawSurface()
 {
 	if (!registered) return nullSurface;
 
 	return myContainer->GetDrawSurface();
 }
 
-S::Int S::Layer::RegisterObject(Object *object)
+S::Int S::GUI::Layer::RegisterObject(Object *object)
 {
 	if (object == NIL) return Error;
 
@@ -234,7 +234,7 @@ S::Int S::Layer::RegisterObject(Object *object)
 	return Error;
 }
 
-S::Int S::Layer::UnregisterObject(Object *object)
+S::Int S::GUI::Layer::UnregisterObject(Object *object)
 {
 	if (object == NIL) return Error;
 

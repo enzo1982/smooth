@@ -13,20 +13,26 @@
 
 namespace smooth
 {
-	class Text;
+	namespace GUI
+	{
+		class Text;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Text : public Object
+	namespace GUI
 	{
-		public:
-					 Text(String, Point);
-					~Text();
+		class SMOOTHAPI Text : public Widget
+		{
+			public:
+						 Text(String, Point);
+						~Text();
 
-			virtual Int	 Paint(Int);
+				virtual Int	 Paint(Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_TEXT;

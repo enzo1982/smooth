@@ -26,7 +26,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_POPUPVIEW = S::Object::RequestObjectID();
 
-S::PopupView::PopupView(PopupMenu *popupMenu)
+S::GUI::PopupView::PopupView(PopupMenu *popupMenu)
 {
 	type				= OBJ_POPUPVIEW;
 	objectProperties->orientation	= OR_FREE;
@@ -35,12 +35,12 @@ S::PopupView::PopupView(PopupMenu *popupMenu)
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-S::PopupView::~PopupView()
+S::GUI::PopupView::~PopupView()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::PopupView::Paint(Int message)
+S::Int S::GUI::PopupView::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -267,7 +267,7 @@ S::Int S::PopupView::Paint(Int message)
 	return Success;
 }
 
-S::Int S::PopupView::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;

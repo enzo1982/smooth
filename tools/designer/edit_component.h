@@ -18,6 +18,7 @@ class Designer_EditComponent;
 #include "status.h"
 
 using namespace smooth;
+using namespace smooth::GUI;
 
 class Designer_EditComponent : public Application
 {

@@ -13,25 +13,31 @@
 
 namespace smooth
 {
-	class GroupBox;
+	namespace GUI
+	{
+		class GroupBox;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI GroupBox : public Object
+	namespace GUI
 	{
-		public:
-					 GroupBox(String, Point, Size);
-					~GroupBox();
+		class SMOOTHAPI GroupBox : public Widget
+		{
+			public:
+						 GroupBox(String, Point, Size);
+						~GroupBox();
 
-			virtual Int	 Paint(Int);
+				virtual Int	 Paint(Int);
 
-			Int		 Activate();
-			Int		 Deactivate();
+				Int		 Activate();
+				Int		 Deactivate();
 
-			Int		 Hide();
+				Int		 Hide();
+		};
 	};
 
 	SMOOTHVAR Int OBJ_GROUPBOX;

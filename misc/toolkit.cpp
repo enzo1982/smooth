@@ -313,7 +313,7 @@ Rect GetBitmapMetrics(HBITMAP bmp)
 	return rect;
 }
 
-HDC GetContext(Window *wnd)
+HDC GetContext(GUI::Window *wnd)
 {
 #if defined __WIN32__
 	int	 code = 0;
@@ -356,7 +356,7 @@ HDC GetContext(Window *wnd)
 #endif
 }
 
-void FreeContext(Window *wnd, HDC hdc)
+void FreeContext(GUI::Window *wnd, HDC hdc)
 {
 #if defined __WIN32__
 	int	 code = 0;
@@ -1132,7 +1132,7 @@ HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon
 
 	wndclassw.cbSize	= sizeof(wndclassw);
 	wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-	wndclassw.lpfnWndProc	= WindowProc;
+	wndclassw.lpfnWndProc	= GUI::WindowProc;
 	wndclassw.cbClsExtra	= 0;
 	wndclassw.cbWndExtra	= 0;
 	wndclassw.hInstance	= hInstance;
@@ -1145,7 +1145,7 @@ HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon
 
 	wndclassa.cbSize	= sizeof(wndclassa);
 	wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-	wndclassa.lpfnWndProc	= WindowProc;
+	wndclassa.lpfnWndProc	= GUI::WindowProc;
 	wndclassa.cbClsExtra	= 0;
 	wndclassa.cbWndExtra	= 0;
 	wndclassa.hInstance	= hInstance;

@@ -25,7 +25,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_HYPERLINK = S::Object::RequestObjectID();
 
-S::Hyperlink::Hyperlink()
+S::GUI::Hyperlink::Hyperlink()
 {
 	type		= OBJ_HYPERLINK;
 	linkURL		= NIL;
@@ -34,7 +34,7 @@ S::Hyperlink::Hyperlink()
 	possibleContainers.AddEntry(OBJ_LAYER);
 }
 
-S::Hyperlink::Hyperlink(String text, HBITMAP bitmap, String link, Point pos, Size size)
+S::GUI::Hyperlink::Hyperlink(String text, HBITMAP bitmap, String link, Point pos, Size size)
 {
 	type			= OBJ_HYPERLINK;
 	objectProperties->text	= text;
@@ -68,12 +68,12 @@ S::Hyperlink::Hyperlink(String text, HBITMAP bitmap, String link, Point pos, Siz
 	}
 }
 
-S::Hyperlink::~Hyperlink()
+S::GUI::Hyperlink::~Hyperlink()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Hyperlink::Hide()
+S::Int S::GUI::Hyperlink::Hide()
 {
 	if (!visible) return Success;
 
@@ -97,7 +97,7 @@ S::Int S::Hyperlink::Hide()
 	return Success;
 }
 
-S::Int S::Hyperlink::Paint(Int message)
+S::Int S::GUI::Hyperlink::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -167,7 +167,7 @@ S::Int S::Hyperlink::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Hyperlink::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -248,32 +248,32 @@ S::Int S::Hyperlink::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-HBITMAP S::Hyperlink::GetBitmap()
+HBITMAP S::GUI::Hyperlink::GetBitmap()
 {
 	if (linkBitmap != NIL)	return linkBitmap;
 	else			return NIL;
 }
 
-S::String S::Hyperlink::GetURL()
+S::String S::GUI::Hyperlink::GetURL()
 {
 	return linkURL;
 }
 
-S::Int S::Hyperlink::SetText(String newText)
+S::Int S::GUI::Hyperlink::SetText(String newText)
 {
 	if (linkBitmap != NIL) linkBitmap = NIL;
 
 	return Object::SetText(newText);
 }
 
-S::Int S::Hyperlink::SetURL(String newUrl)
+S::Int S::GUI::Hyperlink::SetURL(String newUrl)
 {
 	linkURL = newUrl;
 
 	return Success;
 }
 
-S::Int S::Hyperlink::SetBitmap(HBITMAP newBmp)
+S::Int S::GUI::Hyperlink::SetBitmap(HBITMAP newBmp)
 {
 	return Error;
 }

@@ -14,13 +14,17 @@
 namespace smooth
 {
 	class DialogColorSelection;
-	class Window;
-	class Button;
-	class EditBox;
-	class Text;
-	class Slider;
-	class Titlebar;
-	class Divider;
+
+	namespace GUI
+	{
+		class Window;
+		class Button;
+		class EditBox;
+		class Text;
+		class Slider;
+		class Titlebar;
+		class Divider;
+	};
 };
 
 #include "definitions.h"
@@ -65,31 +69,31 @@ namespace smooth
 
 			String		 hexval;
 
-			Window		*dlgwnd;
-			Titlebar	*titlebar;
-			Divider		*divbar;
-			Button		*okbtn;
-			Button		*cancelbtn;
-			Slider		*hueslider;
-			Slider		*satslider;
-			Slider		*valslider;
-			Slider		*redslider;
-			Slider		*greenslider;
-			Slider		*blueslider;
-			Text		*huetext;
-			Text		*sattext;
-			Text		*valtext;
-			Text		*redtext;
-			Text		*greentext;
-			Text		*bluetext;
-			Text		*hextext;
-			EditBox		*hueedit;
-			EditBox		*satedit;
-			EditBox		*valedit;
-			EditBox		*rededit;
-			EditBox		*greenedit;
-			EditBox		*blueedit;
-			EditBox		*hexedit;
+			GUI::Window	*dlgwnd;
+			GUI::Titlebar	*titlebar;
+			GUI::Divider	*divbar;
+			GUI::Button	*okbtn;
+			GUI::Button	*cancelbtn;
+			GUI::Slider	*hueslider;
+			GUI::Slider	*satslider;
+			GUI::Slider	*valslider;
+			GUI::Slider	*redslider;
+			GUI::Slider	*greenslider;
+			GUI::Slider	*blueslider;
+			GUI::Text	*huetext;
+			GUI::Text	*sattext;
+			GUI::Text	*valtext;
+			GUI::Text	*redtext;
+			GUI::Text	*greentext;
+			GUI::Text	*bluetext;
+			GUI::Text	*hextext;
+			GUI::EditBox	*hueedit;
+			GUI::EditBox	*satedit;
+			GUI::EditBox	*valedit;
+			GUI::EditBox	*rededit;
+			GUI::EditBox	*greenedit;
+			GUI::EditBox	*blueedit;
+			GUI::EditBox	*hexedit;
 
 			void		 ColorDlgUpdateHexValue();
 			void		 ColorDlgHexValueChanged();

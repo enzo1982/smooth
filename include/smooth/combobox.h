@@ -13,42 +13,48 @@
 
 namespace smooth
 {
-	class ComboBox;
-	class Layer;
-	class ToolWindow;
-	class ListBox;
+	namespace GUI
+	{
+		class ComboBox;
+		class Layer;
+		class ToolWindow;
+		class ListBox;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "list.h"
 
 namespace smooth
 {
-	class SMOOTHAPI ComboBox : public Object, public List
+	namespace GUI
 	{
-		private:
-			Int		 entryCount;
+		class SMOOTHAPI ComboBox : public Widget, public List
+		{
+			private:
+				Int		 entryCount;
 
-			ToolWindow	*toolWindow;
-			Layer		*layer;
-			ListBox		*listBox;
+				ToolWindow	*toolWindow;
+				Layer		*layer;
+				ListBox		*listBox;
 
-			Bool		 listBoxOpen;
-			Bool		 closeListBox;
+				Bool		 listBoxOpen;
+				Bool		 closeListBox;
 
-			Void		 ListBoxProc();
-		public:
-					 ComboBox(Point, Size);
-					~ComboBox();
+				Void		 ListBoxProc();
+			public:
+						 ComboBox(Point, Size);
+						~ComboBox();
 
-			Entry		*AddEntry(String);
-			Int		 ModifyEntry(Int, String);
-			Int		 RemoveEntry(Int);
-			Int		 SelectEntry(Int);
-			Void		 Cleanup();
+				Entry		*AddEntry(String);
+				Int		 ModifyEntry(Int, String);
+				Int		 RemoveEntry(Int);
+				Int		 SelectEntry(Int);
+				Void		 Cleanup();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_COMBOBOX;

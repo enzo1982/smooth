@@ -25,7 +25,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_OPTIONBOX = S::Object::RequestObjectID();
 
-S::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iCode)
+S::GUI::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iCode)
 {
 	type				= OBJ_OPTIONBOX;
 	objectProperties->text		= text;
@@ -49,12 +49,12 @@ S::OptionBox::OptionBox(String text, Point pos, Size size, Int *var, Int iCode)
 	GetTextSize();
 }
 
-S::OptionBox::~OptionBox()
+S::GUI::OptionBox::~OptionBox()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::OptionBox::Paint(Int message)
+S::Int S::GUI::OptionBox::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -192,7 +192,7 @@ S::Int S::OptionBox::Paint(Int message)
 	return Success;
 }
 
-S::Int S::OptionBox::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered) return Error;
 	if ((!active && message != SM_CHECKOPTIONBOXES) || !visible) return Success;
@@ -339,7 +339,7 @@ S::Int S::OptionBox::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::OptionBox::SetText(String newText)
+S::Int S::GUI::OptionBox::SetText(String newText)
 {
 	if (!registered || !visible)
 	{

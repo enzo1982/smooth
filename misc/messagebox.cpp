@@ -22,6 +22,8 @@
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
 
+using namespace smooth::GUI;
+
 #if defined MessageBox
 #undef MessageBox
 #endif

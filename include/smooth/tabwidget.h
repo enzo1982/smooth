@@ -13,32 +13,38 @@
 
 namespace smooth
 {
-	class TabWidget;
+	namespace GUI
+	{
+		class TabWidget;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "container.h"
 
 namespace smooth
 {
-	class SMOOTHAPI TabWidget : public Object, public Container
+	namespace GUI
 	{
-		protected:
-			Array<Int>	 textSize;
-			Array<Bool>	 sizeSet;
+		class SMOOTHAPI TabWidget : public Widget, public Container
+		{
+			protected:
+				Array<Int>	 textSize;
+				Array<Bool>	 sizeSet;
 
-			Void		 GetSize();
-		public:
-					 TabWidget(Point, Size);
-					~TabWidget();
+				Void		 GetSize();
+			public:
+						 TabWidget(Point, Size);
+						~TabWidget();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
-			Int		 SelectTab(Int);
+				Int		 SelectTab(Int);
 
-			Int		 RegisterObject(Object *);
-			Int		 UnregisterObject(Object *);
+				Int		 RegisterObject(Object *);
+				Int		 UnregisterObject(Object *);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_TABREGISTER;

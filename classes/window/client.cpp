@@ -28,7 +28,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_CLIENT = S::Object::RequestObjectID();
 
-S::Client::Client()
+S::GUI::Client::Client()
 {
 	type				= OBJ_CLIENT;
 	objectProperties->orientation	= OR_CENTER;
@@ -36,12 +36,12 @@ S::Client::Client()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-S::Client::~Client()
+S::GUI::Client::~Client()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Client::Paint(Int message)
+S::Int S::GUI::Client::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -138,17 +138,17 @@ S::Int S::Client::Paint(Int message)
 	return Success;
 }
 
-S::Rect S::Client::GetUpdateRect()
+S::Rect S::GUI::Client::GetUpdateRect()
 {
 	return updateRect;
 }
 
-S::Size S::Client::GetSize()
+S::Size S::GUI::Client::GetSize()
 {
 	return Size(objectProperties->size.cx - 6, objectProperties->size.cy - 7);
 }
 
-S::Int S::Client::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
+S::Int S::GUI::Client::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
 {
 	Surface	*surface = myContainer->GetDrawSurface();
 
@@ -160,7 +160,7 @@ S::Int S::Client::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
 	return surface->BlitFromBitmap(bitmap, srcRect, destRect);
 }
 
-S::Int S::Client::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
+S::Int S::GUI::Client::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
 {
 	Surface	*surface = myContainer->GetDrawSurface();
 

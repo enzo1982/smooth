@@ -13,7 +13,11 @@
 
 namespace smooth
 {
-	class ToolWindow;
+	namespace GUI
+	{
+		class ToolWindow;
+	};
+
 	class Object;
 };
 
@@ -22,25 +26,28 @@ namespace smooth
 
 namespace smooth
 {
-	class SMOOTHAPI ToolWindow : public Window
+	namespace GUI
 	{
-		private:
-			Object	*owner;
-		public:
-				 ToolWindow();
-				~ToolWindow();
+		class SMOOTHAPI ToolWindow : public Window
+		{
+			private:
+				Object	*owner;
+			public:
+					 ToolWindow();
+					~ToolWindow();
 
-			Int	 SetOwner(Object *);
-			Int	 FreeOwner();
+				Int	 SetOwner(Object *);
+				Int	 FreeOwner();
 
-			HWND	 Create();
+				HWND	 Create();
 
-			Int	 Paint(Int);
-			Int	 Process(Int, Int, Int);
+				Int	 Paint(Int);
+				Int	 Process(Int, Int, Int);
 
-			Int	 RegisterObject(Object *);
+				Int	 RegisterObject(Object *);
 
-			Bool	 IsTypeCompatible(Int);
+				Bool	 IsTypeCompatible(Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_TOOLWINDOW;

@@ -25,7 +25,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_TEXT = S::Object::RequestObjectID();
 
-S::Text::Text(String text, Point pos)
+S::GUI::Text::Text(String text, Point pos)
 {
 	type = OBJ_TEXT;
 
@@ -39,12 +39,12 @@ S::Text::Text(String text, Point pos)
 	GetTextSize();
 }
 
-S::Text::~Text()
+S::GUI::Text::~Text()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Text::Paint(Int message)
+S::Int S::GUI::Text::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;

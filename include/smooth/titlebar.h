@@ -13,37 +13,43 @@
 
 namespace smooth
 {
-	class Titlebar;
-	class Menubar;
-	class Window;
+	namespace GUI
+	{
+		class Titlebar;
+		class Menubar;
+		class Window;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "rect.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Titlebar : public Object
+	namespace GUI
 	{
-		friend class Menubar;
-		friend class Window;
-		private:
-			Bool		 minchk;
-			Bool		 minclk;
-			Bool		 maxchk;
-			Bool		 maxclk;
-			Bool		 closechk;
-			Bool		 closeclk;
-			Rect		 nonmaxrect;
-			Bool		 min;
-			Bool		 max;
-			Bool		 close;
-			Int		 origwndstyle;
-		public:
-					 Titlebar(Bool, Bool, Bool);
-			 		~Titlebar();
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+		class SMOOTHAPI Titlebar : public Widget
+		{
+			friend class Menubar;
+			friend class Window;
+			private:
+				Bool		 minchk;
+				Bool		 minclk;
+				Bool		 maxchk;
+				Bool		 maxclk;
+				Bool		 closechk;
+				Bool		 closeclk;
+				Rect		 nonmaxrect;
+				Bool		 min;
+				Bool		 max;
+				Bool		 close;
+				Int		 origwndstyle;
+			public:
+						 Titlebar(Bool, Bool, Bool);
+			 			~Titlebar();
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_TITLEBAR;

@@ -13,25 +13,31 @@
 
 namespace smooth
 {
-	class Bitmap;
+	namespace GUI
+	{
+		class Bitmap;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Bitmap : public Object
+	namespace GUI
 	{
-		protected:
-			HBITMAP		 bitmap;
-		public:
-					 Bitmap(HBITMAP, Point, Size);
-					~Bitmap();
+		class SMOOTHAPI Bitmap : public Widget
+		{
+			protected:
+				HBITMAP		 bitmap;
+			public:
+						 Bitmap(HBITMAP, Point, Size);
+						~Bitmap();
 
-			virtual Int	 Paint(Int);
+				virtual Int	 Paint(Int);
 
-			Int		 SetBitmap(HBITMAP);
-			HBITMAP		 GetBitmap();
+				Int		 SetBitmap(HBITMAP);
+				HBITMAP		 GetBitmap();
+		};
 	};
 
 	SMOOTHVAR Int OBJ_HBITMAP;

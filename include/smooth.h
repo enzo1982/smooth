@@ -87,5 +87,6 @@
 #include "smooth/colordlg.h"
 #include "smooth/binary.h"
 #include "smooth/math.h"
+#include "smooth/widget.h"
 
 #endif

@@ -13,18 +13,24 @@
 
 namespace smooth
 {
-	class MDIWindow;
+	namespace GUI
+	{
+		class MDIWindow;
+	};
 };
 
 #include "window.h"
 
 namespace smooth
 {
-	class SMOOTHAPI MDIWindow : public Window
+	namespace GUI
 	{
-		public:
-			 MDIWindow(String title = NIL);
-			~MDIWindow();
+		class SMOOTHAPI MDIWindow : public Window
+		{
+			public:
+				 MDIWindow(String title = NIL);
+				~MDIWindow();
+		};
 	};
 
 	SMOOTHVAR Int OBJ_MDIWINDOW;

@@ -13,26 +13,32 @@
 
 namespace smooth
 {
-	class PopupView;
-	class PopupMenu;
+	namespace GUI
+	{
+		class PopupView;
+		class PopupMenu;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI PopupView : public Object
+	namespace GUI
 	{
-		private:
-			String		 backupStatusText;
-		protected:
-			PopupMenu	*myPopup;
-		public:
-					 PopupView(PopupMenu *);
-					~PopupView();
+		class SMOOTHAPI PopupView : public Widget
+		{
+			private:
+				String		 backupStatusText;
+			protected:
+				PopupMenu	*myPopup;
+			public:
+						 PopupView(PopupMenu *);
+						~PopupView();
 
-			Int		 Process(Int, Int, Int);
-			Int		 Paint(Int);
+				Int		 Process(Int, Int, Int);
+				Int		 Paint(Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_POPUPVIEW;

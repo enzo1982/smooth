@@ -23,9 +23,9 @@ __declspec (dllexport)
 #endif
 
 S::Int	 S::OBJ_POPUP = S::Object::RequestObjectID();
-S::Int	 S::PopupMenu::status = POPUP_NORMAL;
+S::Int	 S::GUI::PopupMenu::status = POPUP_NORMAL;
 
-S::PopupMenu::PopupMenu()
+S::GUI::PopupMenu::PopupMenu()
 {
 	type				= OBJ_POPUP;
 	objectProperties->orientation	= OR_FREE;
@@ -39,7 +39,7 @@ S::PopupMenu::PopupMenu()
 	status = POPUP_NORMAL;
 }
 
-S::PopupMenu::~PopupMenu()
+S::GUI::PopupMenu::~PopupMenu()
 {
 	if (visible) Hide();
 
@@ -50,7 +50,7 @@ S::PopupMenu::~PopupMenu()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::PopupMenu::Show()
+S::Int S::GUI::PopupMenu::Show()
 {
 	if (!registered)	return Error;
 	if (visible)		return Success;
@@ -91,7 +91,7 @@ S::Int S::PopupMenu::Show()
 	return Success;
 }
 
-S::Int S::PopupMenu::Hide()
+S::Int S::GUI::PopupMenu::Hide()
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -126,7 +126,7 @@ S::Int S::PopupMenu::Hide()
 	return Success;
 }
 
-S::Int S::PopupMenu::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -155,7 +155,7 @@ S::Int S::PopupMenu::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::PopupMenu::MenuToPopup(Menu *menu)
+S::Void S::GUI::PopupMenu::MenuToPopup(Menu *menu)
 {
 	for (Int i = 0; i < menu->entries.GetNOfEntries(); i++)
 	{

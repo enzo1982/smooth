@@ -14,10 +14,14 @@
 namespace smooth
 {
 	class MessageBoxApp;
-	class Window;
-	class Titlebar;
-	class Layer;
-	class Button;
+
+	namespace GUI
+	{
+		class Window;
+		class Titlebar;
+		class Layer;
+		class Button;
+	};
 };
 
 #include "application.h"
@@ -32,16 +36,16 @@ namespace smooth
 			String		 line[256];
 			wchar_t		*msgicon;
 			int		 buttons;
-			Window		*msgbox;
-			Titlebar	*titlebar;
-			Layer		*lay;
-			Button		*okbutton;
-			Button		*yesbutton;
-			Button		*nobutton;
-			Button		*abortbutton;
-			Button		*cancelbutton;
-			Button		*retrybutton;
-			Button		*ignorebutton;
+			GUI::Window	*msgbox;
+			GUI::Titlebar	*titlebar;
+			GUI::Layer	*lay;
+			GUI::Button	*okbutton;
+			GUI::Button	*yesbutton;
+			GUI::Button	*nobutton;
+			GUI::Button	*abortbutton;
+			GUI::Button	*cancelbutton;
+			GUI::Button	*retrybutton;
+			GUI::Button	*ignorebutton;
 
 			void		 Create(String, String, int);
 		public:

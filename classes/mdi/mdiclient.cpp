@@ -27,7 +27,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_MDICLIENT = S::Object::RequestObjectID();
 
-S::MDIClient::MDIClient()
+S::GUI::MDIClient::MDIClient()
 {
 	type				= OBJ_MDICLIENT;
 	objectProperties->orientation	= OR_CENTER;
@@ -35,12 +35,12 @@ S::MDIClient::MDIClient()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-S::MDIClient::~MDIClient()
+S::GUI::MDIClient::~MDIClient()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::MDIClient::Paint(Int message)
+S::Int S::GUI::MDIClient::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;

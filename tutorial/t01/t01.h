@@ -5,6 +5,7 @@
 #include <smooth.h>
 
 using namespace smooth;
+using namespace smooth::GUI;
 
 class Hello : public Application
 {

@@ -13,32 +13,38 @@
 
 namespace smooth
 {
-	class Menubar;
+	namespace GUI
+	{
+		class Menubar;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "menu.h"
 
 namespace smooth
 {
-	const Int	 MB_GRAYSCALE	= 0;
-	const Int	 MB_COLOR	= 1;
-
-	class SMOOTHAPI Menubar : public Object, public Menu
+	namespace GUI
 	{
-		private:
-			Int		 popupHandle;
-			Int		 style;
+		const Int	 MB_GRAYSCALE	= 0;
+		const Int	 MB_COLOR	= 1;
 
-			String		 backupStatusText;
-		public:
-					 Menubar();
-					~Menubar();
+		class SMOOTHAPI Menubar : public Widget, public Menu
+		{
+			private:
+				Int		 popupHandle;
+				Int		 style;
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				String		 backupStatusText;
+			public:
+						 Menubar();
+						~Menubar();
 
-			Int		 SetStyle(Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
+
+				Int		 SetStyle(Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_MENUBAR;

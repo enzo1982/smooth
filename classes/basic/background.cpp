@@ -21,7 +21,7 @@ S::BackgroundApplication::BackgroundApplication()
 {
 	SetText(TXT_SMOOTHBACKGROUNDAPPLICATION);
 
-	backgroundWindow	= new Window(TXT_SMOOTHBACKGROUNDAPPLICATION);
+	backgroundWindow	= new GUI::Window(TXT_SMOOTHBACKGROUNDAPPLICATION);
 	backgroundTimer		= new Timer();
 
 	RegisterObject(backgroundWindow);

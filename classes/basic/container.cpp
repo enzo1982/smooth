@@ -25,7 +25,7 @@ S::Container::Container()
 	containerType.container	= this;
 	containerType		= OBJ_CONTAINER;
 
-	nullSurface = new Surface();
+	nullSurface = new GUI::Surface();
 	drawSurface = nullSurface;
 }
 
@@ -111,7 +111,7 @@ S::Object *S::Container::GetContainerObject()
 	return self;
 }
 
-S::Surface *S::Container::GetDrawSurface()
+S::GUI::Surface *S::Container::GetDrawSurface()
 {
 	return drawSurface;
 }

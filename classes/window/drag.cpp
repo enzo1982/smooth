@@ -21,7 +21,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_DRAGCONTROL = S::Object::RequestObjectID();
 
-S::DragControl::DragControl()
+S::GUI::DragControl::DragControl()
 {
 	type				= OBJ_DRAGCONTROL;
 	objectProperties->orientation	= OR_CENTER;
@@ -29,12 +29,12 @@ S::DragControl::DragControl()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-S::DragControl::~DragControl()
+S::GUI::DragControl::~DragControl()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::DragControl::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;

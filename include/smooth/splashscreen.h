@@ -14,8 +14,12 @@
 namespace smooth
 {
 	class SplashScreenApp;
-	class Window;
 	class Timer;
+
+	namespace GUI
+	{
+		class Window;
+	};
 };
 
 #include "definitions.h"
@@ -29,7 +33,7 @@ namespace smooth
 			static int	 nOfSplashScreens;
 			int		 time;
 			HBITMAP		 bitmap;
-			Window		*splashscreen;
+			GUI::Window	*splashscreen;
 			Timer		*timer;
 		public:
 					 SplashScreenApp(HBITMAP, int);

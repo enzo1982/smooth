@@ -13,34 +13,40 @@
 
 namespace smooth
 {
-	class Hyperlink;
+	namespace GUI
+	{
+		class Hyperlink;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Hyperlink : public Object
+	namespace GUI
 	{
-		protected:
-			String		 linkURL;
-			HBITMAP		 linkBitmap;
-		public:
-					 Hyperlink();
-					 Hyperlink(String, HBITMAP, String, Point, Size size = Size(0, 0));
-					~Hyperlink();
+		class SMOOTHAPI Hyperlink : public Widget
+		{
+			protected:
+				String		 linkURL;
+				HBITMAP		 linkBitmap;
+			public:
+						 Hyperlink();
+						 Hyperlink(String, HBITMAP, String, Point, Size size = Size(0, 0));
+						~Hyperlink();
 
-			Int		 Hide();
+				Int		 Hide();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
-			HBITMAP		 GetBitmap();
-			String		 GetURL();
+				HBITMAP		 GetBitmap();
+				String		 GetURL();
 
-			Int		 SetText(String);
-			Int		 SetBitmap(HBITMAP);
-			Int		 SetURL(String);
+				Int		 SetText(String);
+				Int		 SetBitmap(HBITMAP);
+				Int		 SetURL(String);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_HYPERLINK;

@@ -96,9 +96,9 @@ S::Int S::Object::Hide()
 
 	if (!registered)	return Success;
 
-	Rect	 rect;
-	Point	 realPos = GetRealPosition();
-	Surface	*surface = myContainer->GetDrawSurface();
+	Rect		 rect;
+	Point		 realPos = GetRealPosition();
+	GUI::Surface	*surface = myContainer->GetDrawSurface();
 
 	rect.left	= realPos.x;
 	rect.top	= realPos.y;
@@ -280,10 +280,10 @@ S::Point S::Object::GetRealPosition()
 {
 	if (!registered) return objectProperties->pos;
 
-	Layer	*layer = NIL;
-	Point	 realPos = objectProperties->pos;
+	GUI::Layer	*layer = NIL;
+	Point		 realPos = objectProperties->pos;
 
-	if (myContainer->GetContainerObject()->GetObjectType() == OBJ_LAYER)	layer = (Layer *) myContainer->GetContainerObject();
+	if (myContainer->GetContainerObject()->GetObjectType() == OBJ_LAYER)	layer = (GUI::Layer *) myContainer->GetContainerObject();
 	else									return realPos;
 
 	realPos.x = layer->GetObjectProperties()->pos.x + objectProperties->pos.x;

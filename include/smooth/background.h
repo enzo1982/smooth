@@ -14,8 +14,12 @@
 namespace smooth
 {
 	class BackgroundApplication;
-	class Window;
 	class Timer;
+
+	namespace GUI
+	{
+		class Window;
+	};
 };
 
 #include "application.h"
@@ -25,13 +29,13 @@ namespace smooth
 	class BackgroundApplication : public Application
 	{
 		private:
-			Window	*backgroundWindow;
-			Timer	*backgroundTimer;
+			GUI::Window	*backgroundWindow;
+			Timer		*backgroundTimer;
 
-			Void	 TimerProc();
+			Void		 TimerProc();
 		public:
-				 BackgroundApplication();
-				~BackgroundApplication();
+					 BackgroundApplication();
+					~BackgroundApplication();
 	};
 
 	extern BackgroundApplication	*backgroundApplication;

@@ -43,6 +43,11 @@ $(OBJECTDIR)/system.o: $(BASICCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system.
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/system.cpp -o $(OBJECTDIR)/system.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/widget.o: $(BASICCLASSESDIR)/widget.cpp $(SMOOTHINCLUDEDIR)/widget.h
+	$(ECHO) -n Compiling $(BASICCLASSESDIR)/widget.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/widget.cpp -o $(OBJECTDIR)/widget.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/toolwindow.o: $(INTERNALCLASSESDIR)/toolwindow.cpp $(SMOOTHINCLUDEDIR)/toolwindow.h
 	$(ECHO) -n Compiling $(INTERNALCLASSESDIR)/toolwindow.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(INTERNALCLASSESDIR)/toolwindow.cpp -o $(OBJECTDIR)/toolwindow.o

@@ -13,26 +13,32 @@
 
 namespace smooth
 {
-	class Divider;
-	class Client;
-	class MDIClient;
+	namespace GUI
+	{
+		class Divider;
+		class Client;
+		class MDIClient;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Divider : public Object
+	namespace GUI
 	{
-		friend class Client;
-		friend class MDIClient;
-		protected:
-			Int		 orientation;
-		public:
-					 Divider(Int, Int);
-					~Divider();
+		class SMOOTHAPI Divider : public Widget
+		{
+			friend class Client;
+			friend class MDIClient;
+			protected:
+				Int		 orientation;
+			public:
+						 Divider(Int, Int);
+						~Divider();
 
-			virtual Int	 Paint(Int);
+				virtual Int	 Paint(Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_DIVIDER;

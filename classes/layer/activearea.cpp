@@ -23,7 +23,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_ACTIVEAREA = S::Object::RequestObjectID();
 
-S::ActiveArea::ActiveArea(Int color, Point pos, Size size)
+S::GUI::ActiveArea::ActiveArea(Int color, Point pos, Size size)
 {
 	type		= OBJ_ACTIVEAREA;
 	areaColor	= color;
@@ -39,12 +39,12 @@ S::ActiveArea::ActiveArea(Int color, Point pos, Size size)
 	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-S::ActiveArea::~ActiveArea()
+S::GUI::ActiveArea::~ActiveArea()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::ActiveArea::Paint(Int message)
+S::Int S::GUI::ActiveArea::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -80,7 +80,7 @@ S::Int S::ActiveArea::Paint(Int message)
 	return Success;
 }
 
-S::Int S::ActiveArea::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::ActiveArea::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -116,7 +116,7 @@ S::Int S::ActiveArea::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::ActiveArea::SetColor(Int newColor)
+S::Int S::GUI::ActiveArea::SetColor(Int newColor)
 {
 	areaColor = newColor;
 
@@ -128,7 +128,7 @@ S::Int S::ActiveArea::SetColor(Int newColor)
 	return Success;
 }
 
-S::Int S::ActiveArea::GetColor()
+S::Int S::GUI::ActiveArea::GetColor()
 {
 	return areaColor;
 }

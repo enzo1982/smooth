@@ -33,7 +33,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_EDITBOX = S::Object::RequestObjectID();
 
-S::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMaxSize)
+S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMaxSize)
 {
 	type				= OBJ_EDITBOX;
 	objectProperties->text		= text;
@@ -74,12 +74,12 @@ S::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMaxSize
 	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-S::EditBox::~EditBox()
+S::GUI::EditBox::~EditBox()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::EditBox::Paint(Int message)
+S::Int S::GUI::EditBox::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -131,7 +131,7 @@ S::Int S::EditBox::Paint(Int message)
 	return Success;
 }
 
-S::Int S::EditBox::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -716,7 +716,7 @@ S::Int S::EditBox::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::EditBox::Deactivate()
+S::Int S::GUI::EditBox::Deactivate()
 {
 	if (!active) return Success;
 
@@ -752,7 +752,7 @@ S::Int S::EditBox::Deactivate()
 	return Object::Deactivate();
 }
 
-S::Int S::EditBox::SetText(String txt)
+S::Int S::GUI::EditBox::SetText(String txt)
 {
 	objectProperties->text = txt;
 
@@ -781,7 +781,7 @@ S::Int S::EditBox::SetText(String txt)
 	return Success;
 }
 
-S::Int S::EditBox::CountLines()
+S::Int S::GUI::EditBox::CountLines()
 {
 	Int	 retVal = 1;
 	String	 currLine;
@@ -821,7 +821,7 @@ S::Int S::EditBox::CountLines()
 	return retVal;
 }
 
-S::String S::EditBox::GetLine(Int number)
+S::String S::GUI::EditBox::GetLine(Int number)
 {
 	if (number >= nOfLines) return NIL;
 
@@ -839,7 +839,7 @@ S::String S::EditBox::GetLine(Int number)
 	}
 }
 
-S::Void S::EditBox::TimerProc()
+S::Void S::GUI::EditBox::TimerProc()
 {
 	if (!registered)		return;
 	if (!active || !visible)	return;

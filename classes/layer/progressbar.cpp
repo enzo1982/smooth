@@ -25,7 +25,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_PROGRESSBAR = S::Object::RequestObjectID();
 
-S::Progressbar::Progressbar(Point pos, Size size, Int subType, Int iTextFlag, Int rangeStart, Int rangeEnd, Int iValue)
+S::GUI::Progressbar::Progressbar(Point pos, Size size, Int subType, Int iTextFlag, Int rangeStart, Int rangeEnd, Int iValue)
 {
 	type				= OBJ_PROGRESSBAR;
 	subtype				= subType;
@@ -56,12 +56,12 @@ S::Progressbar::Progressbar(Point pos, Size size, Int subType, Int iTextFlag, In
 	}
 }
 
-S::Progressbar::~Progressbar()
+S::GUI::Progressbar::~Progressbar()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Progressbar::Paint(Int message)
+S::Int S::GUI::Progressbar::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -177,7 +177,7 @@ S::Int S::Progressbar::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Progressbar::SetValue(Int newValue)
+S::Int S::GUI::Progressbar::SetValue(Int newValue)
 {
 	newValue = (Int) Math::Min(endValue, Math::Max(startValue, newValue));
 
@@ -372,7 +372,7 @@ S::Int S::Progressbar::SetValue(Int newValue)
 	return Success;
 }
 
-S::Int S::Progressbar::GetValue()
+S::Int S::GUI::Progressbar::GetValue()
 {
 	return value;
 }

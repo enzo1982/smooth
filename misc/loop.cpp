@@ -138,13 +138,13 @@ S::Int S::Loop()
 	MSG		 msg;
 #endif
 
-	Window	*wnd;
-	Thread	*thread;
+	GUI::Window	*wnd;
+	Thread		*thread;
 
 	if (!loopActive)
 	{
 #ifdef __WIN32__
-		if (Window::nOfActiveWindows == 0) PostQuitMessage(0);
+		if (GUI::Window::nOfActiveWindows == 0) PostQuitMessage(0);
 #endif
 
 		initializing = false;
@@ -152,9 +152,9 @@ S::Int S::Loop()
 
 		for (int i = 0; i < Object::objectCount; i++)
 		{
-			wnd = (Window *) mainObjectManager->RequestObject(i);
+			wnd = (GUI::Window *) mainObjectManager->RequestObject(i);
 
-			if (wnd != (Window *) NIL)
+			if (wnd != (GUI::Window *) NIL)
 			{
 				if (wnd->type == OBJ_WINDOW)
 				{
@@ -189,7 +189,7 @@ S::Int S::Loop()
 
 			if (result)
 			{
-				if (Window::nOfActiveWindows == 1)
+				if (GUI::Window::nOfActiveWindows == 1)
 				{
 					msg.message = WM_QUIT;
 					break;
@@ -221,7 +221,7 @@ S::Int S::Loop()
 
 			if (!result) break;
 
-			if (Window::nOfActiveWindows == 1)
+			if (GUI::Window::nOfActiveWindows == 1)
 			{
 				msg.message = WM_QUIT;
 				break;

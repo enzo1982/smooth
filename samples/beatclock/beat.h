@@ -14,6 +14,7 @@
 #include <smooth.h>
 
 using namespace smooth;
+using namespace smooth::GUI;
 
 class BeatClock : public Application
 {

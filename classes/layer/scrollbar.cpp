@@ -25,7 +25,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_SCROLLBAR = S::Object::RequestObjectID();
 
-S::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd)
+S::GUI::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd)
 {
 	type		= OBJ_SCROLLBAR;
 	variable	= var;
@@ -62,12 +62,12 @@ S::Scrollbar::Scrollbar(Point pos, Size size, Int subType, Int *var, Int rangeSt
 	}
 }
 
-S::Scrollbar::~Scrollbar()
+S::GUI::Scrollbar::~Scrollbar()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Scrollbar::Paint(Int message)
+S::Int S::GUI::Scrollbar::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -234,7 +234,7 @@ S::Int S::Scrollbar::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Scrollbar::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -582,7 +582,7 @@ S::Int S::Scrollbar::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::Scrollbar::TimerProc()
+S::Void S::GUI::Scrollbar::TimerProc()
 {
 	if (!registered)		return;
 	if (!active || !visible)	return;
@@ -620,7 +620,7 @@ S::Void S::Scrollbar::TimerProc()
 	timerCount++;
 }
 
-S::Int S::Scrollbar::SetRange(Int rangeStart, Int rangeEnd)
+S::Int S::GUI::Scrollbar::SetRange(Int rangeStart, Int rangeEnd)
 {
 	Int	 prevStartValue	= startValue;
 	Int	 prevEndValue	= endValue;

@@ -12,7 +12,7 @@
 #include <smooth/stk.h>
 #include <smooth/toolkit.h>
 
-S::SurfaceGDI::SurfaceGDI(HDC iDc)
+S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
 {
 	gdi_dc = iDc;
 
@@ -20,23 +20,23 @@ S::SurfaceGDI::SurfaceGDI(HDC iDc)
 	size.cy	= 0;
 }
 
-S::SurfaceGDI::~SurfaceGDI()
+S::GUI::SurfaceGDI::~SurfaceGDI()
 {
 }
 
-S::Int S::SurfaceGDI::SetPixel(Int x, Int y, Int color)
+S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 {
 	::SetPixel(gdi_dc, x, y, color);
 
 	return Success;
 }
 
-S::Int S::SurfaceGDI::GetPixel(Int x, Int y)
+S::Int S::GUI::SurfaceGDI::GetPixel(Int x, Int y)
 {
 	return ::GetPixel(gdi_dc, x, y);
 }
 
-S::Int S::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
+S::Int S::GUI::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
 {
 	HPEN	 hPen = CreatePen(PS_SOLID, 1, color);
 	HPEN	 hOldPen = (HPEN) SelectObject(gdi_dc, hPen);
@@ -50,7 +50,7 @@ S::Int S::SurfaceGDI::Line(Point pos1, Point pos2, Int color)
 	return Success;
 }
 
-S::Int S::SurfaceGDI::Frame(Rect rect, Int style)
+S::Int S::GUI::SurfaceGDI::Frame(Rect rect, Int style)
 {
 	Long	 color1 = 0;
 	Long	 color2 = 0;
@@ -94,7 +94,7 @@ S::Int S::SurfaceGDI::Frame(Rect rect, Int style)
 	return Success;
 }
 
-S::Int S::SurfaceGDI::Box(Rect rect, Int color, Int style)
+S::Int S::GUI::SurfaceGDI::Box(Rect rect, Int color, Int style)
 {
 	HBRUSH	 brush = CreateSolidBrush(color);
 	RECT	 wRect = rect;
@@ -159,7 +159,7 @@ S::Int S::SurfaceGDI::Box(Rect rect, Int color, Int style)
 	return Success;
 }
 
-S::Int S::SurfaceGDI::SetText(String string, Rect rect, String font, Int size, Int color, Int weight)
+S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, String font, Int size, Int color, Int weight)
 {
 	HFONT	 hfont;
 	HFONT	 holdfont;
@@ -220,7 +220,7 @@ S::Int S::SurfaceGDI::SetText(String string, Rect rect, String font, Int size, I
 	return Success;
 }
 
-S::Int S::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
+S::Int S::GUI::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
 {
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);
@@ -235,7 +235,7 @@ S::Int S::SurfaceGDI::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect
 	return Success;
 }
 
-S::Int S::SurfaceGDI::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
+S::Int S::GUI::SurfaceGDI::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
 {
 	HDC	 cdc = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap);

@@ -16,6 +16,7 @@ class Translator;
 #include <smooth.h>
 
 using namespace smooth;
+using namespace smooth::GUI;
 
 typedef struct
 {

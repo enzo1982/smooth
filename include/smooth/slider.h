@@ -13,34 +13,40 @@
 
 namespace smooth
 {
-	class Slider;
+	namespace GUI
+	{
+		class Slider;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Slider : public Object
+	namespace GUI
 	{
-		private:
-			Int		 mouseBias;
-			Int		 prevValue;
-		protected:
-			Int		*variable;
+		class SMOOTHAPI Slider : public Widget
+		{
+			private:
+				Int		 mouseBias;
+				Int		 prevValue;
+			protected:
+				Int		*variable;
 
-			Int		 startValue;
-			Int		 endValue;
-		public:
-					 Slider(Point, Size, Int, Int *, Int, Int);
-					~Slider();
+				Int		 startValue;
+				Int		 endValue;
+			public:
+						 Slider(Point, Size, Int, Int *, Int, Int);
+						~Slider();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
-			Int		 SetRange(Int, Int);
+				Int		 SetRange(Int, Int);
 
-			Int		 SetValue(Int);
-			Int		 GetValue();
+				Int		 SetValue(Int);
+				Int		 GetValue();
+		};
 	};
 
 	SMOOTHVAR Int OBJ_SLIDER;

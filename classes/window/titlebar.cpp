@@ -24,7 +24,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_TITLEBAR = S::Object::RequestObjectID();
 
-S::Titlebar::Titlebar(Bool minButton, Bool maxButton, Bool closeButton)
+S::GUI::Titlebar::Titlebar(Bool minButton, Bool maxButton, Bool closeButton)
 {
 	type				= OBJ_TITLEBAR;
 	min				= minButton;
@@ -47,12 +47,12 @@ S::Titlebar::Titlebar(Bool minButton, Bool maxButton, Bool closeButton)
 #endif
 }
 
-S::Titlebar::~Titlebar()
+S::GUI::Titlebar::~Titlebar()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Titlebar::Paint(Int message)
+S::Int S::GUI::Titlebar::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -193,7 +193,7 @@ S::Int S::Titlebar::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Titlebar::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;

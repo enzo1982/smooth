@@ -23,7 +23,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_STATUSBAR = S::Object::RequestObjectID();
 
-S::Statusbar::Statusbar(String status)
+S::GUI::Statusbar::Statusbar(String status)
 {
 	type				= OBJ_STATUSBAR;
 	objectProperties->text		= status;
@@ -33,12 +33,12 @@ S::Statusbar::Statusbar(String status)
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-S::Statusbar::~Statusbar()
+S::GUI::Statusbar::~Statusbar()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Statusbar::Paint(Int message)
+S::Int S::GUI::Statusbar::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -63,7 +63,7 @@ S::Int S::Statusbar::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Statusbar::SetText(String newStatus)
+S::Int S::GUI::Statusbar::SetText(String newStatus)
 {
 	String	 oldStatus = objectProperties->text;
 

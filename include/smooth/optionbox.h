@@ -13,27 +13,33 @@
 
 namespace smooth
 {
-	class OptionBox;
+	namespace GUI
+	{
+		class OptionBox;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI OptionBox : public Object
+	namespace GUI
 	{
-		protected:
-			Int		*variable;
-			Int		 code;
-			Bool		 state;
-		public:
-					 OptionBox(String, Point, Size, Int *, Int);
-					~OptionBox();
+		class SMOOTHAPI OptionBox : public Widget
+		{
+			protected:
+				Int		*variable;
+				Int		 code;
+				Bool		 state;
+			public:
+						 OptionBox(String, Point, Size, Int *, Int);
+						~OptionBox();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
-			Int		 SetText(String);
+				Int		 SetText(String);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_OPTIONBOX;

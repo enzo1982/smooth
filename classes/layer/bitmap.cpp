@@ -24,7 +24,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_HBITMAP = S::Object::RequestObjectID();
 
-S::Bitmap::Bitmap(HBITMAP bmp, Point pos, Size size)
+S::GUI::Bitmap::Bitmap(HBITMAP bmp, Point pos, Size size)
 {
 	type	= OBJ_HBITMAP;
 	bitmap	= bmp;
@@ -46,12 +46,12 @@ S::Bitmap::Bitmap(HBITMAP bmp, Point pos, Size size)
 	}
 }
 
-S::Bitmap::~Bitmap()
+S::GUI::Bitmap::~Bitmap()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Bitmap::Paint(Int message)
+S::Int S::GUI::Bitmap::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -78,7 +78,7 @@ S::Int S::Bitmap::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Bitmap::SetBitmap(HBITMAP newBmp)
+S::Int S::GUI::Bitmap::SetBitmap(HBITMAP newBmp)
 {
 	Bool	 prevVisible = visible;
 
@@ -97,7 +97,7 @@ S::Int S::Bitmap::SetBitmap(HBITMAP newBmp)
 	return Success;
 }
 
-HBITMAP S::Bitmap::GetBitmap()
+HBITMAP S::GUI::Bitmap::GetBitmap()
 {
 	return bitmap;
 }

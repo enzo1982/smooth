@@ -15,7 +15,11 @@ namespace smooth
 {
 	class Container;
 	class Object;
-	class Surface;
+
+	namespace GUI
+	{
+		class Surface;
+	};
 };
 
 #include "array.h"
@@ -26,30 +30,30 @@ namespace smooth
 	class SMOOTHAPI Container
 	{
 		protected:
-			ContainerType	 containerType;
-			Object		*self;
+			ContainerType		 containerType;
+			Object			*self;
 
-			Int		 nOfObjects;
-			Array<Object *>	 assocObjects;
+			Int			 nOfObjects;
+			Array<Object *>		 assocObjects;
 
-			Surface		*nullSurface;
-			Surface		*drawSurface;
+			GUI::Surface		*nullSurface;
+			GUI::Surface		*drawSurface;
 		public:
-					 Container();
-			virtual		~Container();
+						 Container();
+			virtual			~Container();
 
-			virtual Int	 RegisterObject(Object *);
-			virtual Int	 UnregisterObject(Object *);
+			virtual Int		 RegisterObject(Object *);
+			virtual Int		 UnregisterObject(Object *);
 
-			Int		 GetNOfObjects();
-			Object		*RequestObject(Int);
+			Int			 GetNOfObjects();
+			Object			*RequestObject(Int);
 
-			virtual Bool	 IsContainerCompatible(Int);
-			ContainerType	 GetContainerType();
+			virtual Bool		 IsContainerCompatible(Int);
+			ContainerType		 GetContainerType();
 
-			Object		*GetContainerObject();
+			Object			*GetContainerObject();
 
-			virtual Surface	*GetDrawSurface();
+			virtual GUI::Surface	*GetDrawSurface();
 	};
 
 	SMOOTHVAR Int OBJ_CONTAINER;

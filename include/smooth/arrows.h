@@ -13,43 +13,50 @@
 
 namespace smooth
 {
-	class Arrows;
+	namespace GUI
+	{
+		class Arrows;
+	};
+
 	class Timer;
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Arrows : public Object
+	namespace GUI
 	{
-		private:
-			Timer		*timer;
-			Bool		 timerActive;
-			Int		 timerCount;
+		class SMOOTHAPI Arrows : public Widget
+		{
+			private:
+				Timer		*timer;
+				Bool		 timerActive;
+				Int		 timerCount;
 
-			Void		 TimerProc();
-		protected:
-			Bool		 arrow1Clicked;
-			Bool		 arrow2Clicked;
-			Bool		 arrow1Checked;
-			Bool		 arrow2Checked;
+				Void		 TimerProc();
+			protected:
+				Bool		 arrow1Clicked;
+				Bool		 arrow2Clicked;
+				Bool		 arrow1Checked;
+				Bool		 arrow2Checked;
 
-			Int		*variable;
+				Int		*variable;
 
-			Int		 startValue;
-			Int 		 endValue;
-		public:
-					 Arrows(Point, Size, Int, Int *, Int, Int);
-					~Arrows();
+				Int		 startValue;
+				Int 		 endValue;
+			public:
+						 Arrows(Point, Size, Int, Int *, Int, Int);
+						~Arrows();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
-			Int		 SetRange(Int, Int);
+				Int		 SetRange(Int, Int);
 
-			Int		 SetValue(Int);
-			Int		 GetValue();
+				Int		 SetValue(Int);
+				Int		 GetValue();
+		};
 	};
 
 	SMOOTHVAR Int OBJ_ARROWS;

@@ -26,7 +26,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_TREEVIEW = S::Object::RequestObjectID();
 
-S::TreeView::TreeView(String name, Point pos, Size size)
+S::GUI::TreeView::TreeView(String name, Point pos, Size size)
 {
 	type				= OBJ_TREEVIEW;
 	objectProperties->text		= name;
@@ -43,12 +43,12 @@ S::TreeView::TreeView(String name, Point pos, Size size)
 	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-S::TreeView::~TreeView()
+S::GUI::TreeView::~TreeView()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::TreeView::Paint(Int message)
+S::Int S::GUI::TreeView::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -92,7 +92,7 @@ S::Int S::TreeView::Paint(Int message)
 	return Success;
 }
 
-S::Int S::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
+S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 {
 	Layer	*layer = (Layer *) myContainer->GetContainerObject();
 	Window	*wnd = (Window *) layer->GetContainer()->GetContainerObject();
@@ -258,7 +258,7 @@ S::Int S::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 	return painted;
 }
 
-S::Int S::TreeView::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::TreeView::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;

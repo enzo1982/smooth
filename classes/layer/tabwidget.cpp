@@ -23,7 +23,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_TABREGISTER = S::Object::RequestObjectID();
 
-S::TabWidget::TabWidget(Point pos, Size size)
+S::GUI::TabWidget::TabWidget(Point pos, Size size)
 {
 	self = this;
 
@@ -41,12 +41,12 @@ S::TabWidget::TabWidget(Point pos, Size size)
 	else			objectProperties->size.cy = Math::Round(size.cy * SMOOTH::Setup::FontSize);
 }
 
-S::TabWidget::~TabWidget()
+S::GUI::TabWidget::~TabWidget()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::TabWidget::Paint(Int message)
+S::Int S::GUI::TabWidget::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -217,7 +217,7 @@ S::Int S::TabWidget::Paint(Int message)
 	return Success;
 }
 
-S::Int S::TabWidget::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -316,7 +316,7 @@ S::Int S::TabWidget::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::TabWidget::GetSize()
+S::Void S::GUI::TabWidget::GetSize()
 {
 	HDC	 dc = GetContext(NIL);
 	Layer	*object;
@@ -339,7 +339,7 @@ S::Void S::TabWidget::GetSize()
 	FreeContext(NIL, dc);
 }
 
-S::Int S::TabWidget::SelectTab(Int layerid)
+S::Int S::GUI::TabWidget::SelectTab(Int layerid)
 {
 	Layer	*object;
 
@@ -354,7 +354,7 @@ S::Int S::TabWidget::SelectTab(Int layerid)
 	return Success;
 }
 
-S::Int S::TabWidget::RegisterObject(Object *object)
+S::Int S::GUI::TabWidget::RegisterObject(Object *object)
 {
 	if (!registered)	return Error;
 	if (object == NIL)	return Error;
@@ -382,7 +382,7 @@ S::Int S::TabWidget::RegisterObject(Object *object)
 	return Error;
 }
 
-S::Int S::TabWidget::UnregisterObject(Object *object)
+S::Int S::GUI::TabWidget::UnregisterObject(Object *object)
 {
 	if (object == NIL) return Error;
 

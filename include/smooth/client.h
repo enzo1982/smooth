@@ -13,32 +13,38 @@
 
 namespace smooth
 {
-	class Client;
+	namespace GUI
+	{
+		class Client;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "rect.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Client : public Object
+	namespace GUI
 	{
-		protected:
-			Rect		 updateRect;
-		public:
-					 Client();
-					~Client();
+		class SMOOTHAPI Client : public Widget
+		{
+			protected:
+				Rect		 updateRect;
+			public:
+						 Client();
+						~Client();
 
-			virtual Int	 Paint(Int);
+				virtual Int	 Paint(Int);
 
-			Rect		 GetUpdateRect();
+				Rect		 GetUpdateRect();
 
-			virtual Size	 GetSize();
+				virtual Size	 GetSize();
 
-			virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
-			virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
-		signals:
-			Signal0<>	 onPaint;
+				virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
+				virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+			signals:
+				Signal0<>	 onPaint;
+		};
 	};
 
 	SMOOTHVAR Int OBJ_CLIENT;

@@ -15,43 +15,49 @@
 
 namespace smooth
 {
-	const Int	 POPUP_NORMAL	= 0;
-	const Int	 POPUP_FINISHED	= 1;
-	const Int	 POPUP_PENDING	= 2;
-
-	class PopupMenu;
-	class Window;
-	class ToolWindow;
-	class PopupView;
+	namespace GUI
+	{
+		class PopupMenu;
+		class Window;
+		class ToolWindow;
+		class PopupView;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "menu.h"
 
 namespace smooth
 {
-	class SMOOTHAPI PopupMenu : public Object, public Menu
+	namespace GUI
 	{
-		friend class Window;
-		friend class PopupView;
-		private:
-			ToolWindow	*toolwnd;
-			PopupView	*popupView;
+		const Int	 POPUP_NORMAL	= 0;
+		const Int	 POPUP_FINISHED	= 1;
+		const Int	 POPUP_PENDING	= 2;
 
-			PopupMenu	*prevPopup;
-			PopupMenu	*nextPopup;
-		public:
-			static Int	 status;
+		class SMOOTHAPI PopupMenu : public Widget, public Menu
+		{
+			friend class Window;
+			friend class PopupView;
+			private:
+				ToolWindow	*toolwnd;
+				PopupView	*popupView;
 
-					 PopupMenu();
-			 		~PopupMenu();
+				PopupMenu	*prevPopup;
+				PopupMenu	*nextPopup;
+			public:
+				static Int	 status;
 
-			Void		 MenuToPopup(Menu *);
+						 PopupMenu();
+				 		~PopupMenu();
 
-			Int		 Process(Int, Int, Int);
+				Void		 MenuToPopup(Menu *);
 
-			Int		 Show();
-			Int		 Hide();
+				Int		 Process(Int, Int, Int);
+
+				Int		 Show();
+				Int		 Hide();
+		};
 	};
 
 	SMOOTHVAR Int OBJ_POPUP;

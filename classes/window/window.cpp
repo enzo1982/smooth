@@ -34,10 +34,10 @@ __declspec (dllexport)
 #endif
 
 S::Int	 S::OBJ_WINDOW = S::Object::RequestObjectID();
-S::Int	 S::Window::nOfActiveWindows = 0;
+S::Int	 S::GUI::Window::nOfActiveWindows = 0;
 
 #ifdef __WIN32__
-LRESULT CALLBACK S::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK S::GUI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	Window	*smoothWindow = SMOOTH::GetWindow(window);
 	Int	 retVal;
@@ -110,7 +110,7 @@ LRESULT CALLBACK S::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM 
 }
 #endif
 
-S::Window::Window(String title)
+S::GUI::Window::Window(String title)
 {
 	self = this;
 
@@ -179,7 +179,7 @@ S::Window::Window(String title)
 	hwnd = NIL;
 }
 
-S::Window::~Window()
+S::GUI::Window::~Window()
 {
 	UnregisterObject(mainLayer);
 	DeleteObject(mainLayer);
@@ -211,7 +211,7 @@ S::Window::~Window()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Window::SetMetrics(Point newPos, Size newSize)
+S::Int S::GUI::Window::SetMetrics(Point newPos, Size newSize)
 {
 	objectProperties->pos.x		= Math::Round(newPos.x * SMOOTH::Setup::FontSize);
 	objectProperties->pos.y		= Math::Round(newPos.y * SMOOTH::Setup::FontSize);
@@ -230,26 +230,26 @@ S::Int S::Window::SetMetrics(Point newPos, Size newSize)
 	return Success;
 }
 
-S::Void S::Window::SetPositionFlag(HWND pf)
+S::Void S::GUI::Window::SetPositionFlag(HWND pf)
 {
 #ifdef __WIN32__
 	SetWindowPos(hwnd, pf, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 #endif
 }
 
-S::Void S::Window::SetKillProc(KillProcParam, Void *procParam)
+S::Void S::GUI::Window::SetKillProc(KillProcParam, Void *procParam)
 {
 	killProc = (KillProcType) newProc;
 	killProcParam = procParam;
 }
 
-S::Void S::Window::SetMessageProc(MessageProcParam, Void *procParam)
+S::Void S::GUI::Window::SetMessageProc(MessageProcParam, Void *procParam)
 {
 	messageProc = (MessageProcType) newProc;
 	messageProcParam = procParam;
 }
 
-S::Void S::Window::SetStyle(Int s)
+S::Void S::GUI::Window::SetStyle(Int s)
 {
 	switch (s)
 	{
@@ -281,12 +281,12 @@ S::Void S::Window::SetStyle(Int s)
 	}
 }
 
-S::Void S::Window::SetExStyle(Int es)
+S::Void S::GUI::Window::SetExStyle(Int es)
 {
 	if (!created) exstyle = exstyle | es;
 }
 
-S::Int S::Window::SetIcon(HBITMAP newicon)
+S::Int S::GUI::Window::SetIcon(HBITMAP newicon)
 {
 #ifdef __WIN32__
 	if (newicon == SI_DEFAULT) newicon = DEFAULTICON;
@@ -313,7 +313,7 @@ S::Int S::Window::SetIcon(HBITMAP newicon)
 	}
 }
 
-S::Int S::Window::SetApplicationIcon(HICON newicon)
+S::Int S::GUI::Window::SetApplicationIcon(HICON newicon)
 {
 #ifdef __WIN32__
 	sysicon = newicon;
@@ -324,7 +324,7 @@ S::Int S::Window::SetApplicationIcon(HICON newicon)
 #endif
 }
 
-S::Int S::Window::SetApplicationIcon(Int newicon)
+S::Int S::GUI::Window::SetApplicationIcon(Int newicon)
 {
 #ifdef __WIN32__
 	HICON	 ic = LoadIconA(hInstance, MAKEINTRESOURCEA(newicon));
@@ -335,7 +335,7 @@ S::Int S::Window::SetApplicationIcon(Int newicon)
 	return Success;
 }
 
-S::Int S::Window::SetText(String title)
+S::Int S::GUI::Window::SetText(String title)
 {
 	objectProperties->text = title;
 
@@ -351,7 +351,7 @@ S::Int S::Window::SetText(String title)
 	return Success;
 }
 
-S::Int S::Window::SetStatusText(String newStatus)
+S::Int S::GUI::Window::SetStatusText(String newStatus)
 {
 	for (Int i = 0; i < nOfObjects; i++)
 	{
@@ -370,7 +370,7 @@ S::Int S::Window::SetStatusText(String newStatus)
 	return Error;
 }
 
-S::String S::Window::GetStatusText()
+S::String S::GUI::Window::GetStatusText()
 {
 	for (Int i = 0; i < nOfObjects; i++)
 	{
@@ -387,7 +387,7 @@ S::String S::Window::GetStatusText()
 	return NIL;
 }
 
-S::Int S::Window::Show()
+S::Int S::GUI::Window::Show()
 {
 	if (!created) Create();
 
@@ -408,7 +408,7 @@ S::Int S::Window::Show()
 	return Success;
 }
 
-S::Int S::Window::Hide()
+S::Int S::GUI::Window::Hide()
 {
 	if (!created) Create();
 
@@ -423,33 +423,33 @@ S::Int S::Window::Hide()
 	return Success;
 }
 
-S::Bool S::Window::IsMaximized()
+S::Bool S::GUI::Window::IsMaximized()
 {
 	if (!created) return False;
 
 	return maximized;
 }
 
-S::Rect S::Window::GetUpdateRect()
+S::Rect S::GUI::Window::GetUpdateRect()
 {
 	return updateRect;
 }
 
-S::Int S::Window::SetUpdateRect(Rect newUpdateRect)
+S::Int S::GUI::Window::SetUpdateRect(Rect newUpdateRect)
 {
 	updateRect = newUpdateRect;
 
 	return Success;
 }
 
-S::Int S::Window::SetMinimumSize(Size newMinSize)
+S::Int S::GUI::Window::SetMinimumSize(Size newMinSize)
 {
 	minSize = newMinSize;
 
 	return Success;
 }
 
-HWND S::Window::Create()
+HWND S::GUI::Window::Create()
 {
 	if (registered)
 	{
@@ -479,7 +479,7 @@ HWND S::Window::Create()
 	return NIL;
 }
 
-S::Int S::Window::Stay()
+S::Int S::GUI::Window::Stay()
 {
 	if (!registered) return value;
 
@@ -541,7 +541,7 @@ S::Int S::Window::Stay()
 	return value;
 }
 
-S::Int S::Window::Close()
+S::Int S::GUI::Window::Close()
 {
 	if (hwnd == NIL) return Error;
 
@@ -551,7 +551,7 @@ S::Int S::Window::Close()
 	return Success;
 }
 
-S::Int S::Window::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 {
 	EnterProtectedRegion();
 
@@ -887,7 +887,7 @@ S::Int S::Window::Process(Int message, Int wParam, Int lParam)
 	return -1;
 }
 
-S::Int S::Window::Paint(Int message)
+S::Int S::GUI::Window::Paint(Int message)
 {
 	EnterProtectedRegion();
 
@@ -1025,7 +1025,7 @@ S::Int S::Window::Paint(Int message)
 	return Success;
 }
 
-S::Void S::Window::CalculateOffsets()
+S::Void S::GUI::Window::CalculateOffsets()
 {
 	if (type == OBJ_TOOLWINDOW) return;
 
@@ -1134,7 +1134,7 @@ S::Void S::Window::CalculateOffsets()
 	}
 }
 
-S::Int S::Window::RegisterObject(Object *object)
+S::Int S::GUI::Window::RegisterObject(Object *object)
 {
 	if (object == NIL) return Error;
 
@@ -1187,7 +1187,7 @@ S::Int S::Window::RegisterObject(Object *object)
 	return Error;
 }
 
-S::Int S::Window::UnregisterObject(Object *object)
+S::Int S::GUI::Window::UnregisterObject(Object *object)
 {
 	if (object == NIL) return Error;
 

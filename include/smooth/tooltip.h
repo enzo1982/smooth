@@ -13,34 +13,41 @@
 
 namespace smooth
 {
-	class Tooltip;
+	namespace GUI
+	{
+		class Tooltip;
+		class ToolWindow;
+	};
+
 	class Timer;
-	class ToolWindow;
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Tooltip : public Object
+	namespace GUI
 	{
-		private:
-			ToolWindow	*toolWindow;
-			Timer		*timer;
+		class SMOOTHAPI Tooltip : public Widget
+		{
+			private:
+				ToolWindow	*toolWindow;
+				Timer		*timer;
 
-			Void		 TimerProc();
-		protected:
-			Int		 timeOut;
-		public:
-					 Tooltip();
-					~Tooltip();
+				Void		 TimerProc();
+			protected:
+				Int		 timeOut;
+			public:
+						 Tooltip();
+						~Tooltip();
 
-			Int		 Process(Int, Int, Int);
+				Int		 Process(Int, Int, Int);
 
-			Int		 Show();
-			Int		 Hide();
+				Int		 Show();
+				Int		 Hide();
 
-			Int		 SetTimeout(Int);
+				Int		 SetTimeout(Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_TOOLTIP;

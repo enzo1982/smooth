@@ -10,57 +10,57 @@
 
 #include <smooth/surface.h>
 
-S::Surface::Surface()
+S::GUI::Surface::Surface()
 {
 	size.cx	= 0;
 	size.cy	= 0;
 }
 
-S::Surface::~Surface()
+S::GUI::Surface::~Surface()
 {
 }
 
-S::Size S::Surface::GetSize()
+S::Size S::GUI::Surface::GetSize()
 {
 	return size;
 }
 
-S::Int S::Surface::SetPixel(Int x, Int y, Int color)
+S::Int S::GUI::Surface::SetPixel(Int x, Int y, Int color)
 {
 	return Success;
 }
 
-S::Int S::Surface::GetPixel(Int x, Int y)
+S::Int S::GUI::Surface::GetPixel(Int x, Int y)
 {
 	return 0;
 }
 
-S::Int S::Surface::Line(Point pos1, Point pos2, Int color)
+S::Int S::GUI::Surface::Line(Point pos1, Point pos2, Int color)
 {
 	return Success;
 }
 
-S::Int S::Surface::Frame(Rect rect, Int style)
+S::Int S::GUI::Surface::Frame(Rect rect, Int style)
 {
 	return Success;
 }
 
-S::Int S::Surface::Box(Rect rect, Int color, Int style)
+S::Int S::GUI::Surface::Box(Rect rect, Int color, Int style)
 {
 	return Success;
 }
 
-S::Int S::Surface::SetText(String string, Rect rect, String font, Int size, Int color, Int weight)
+S::Int S::GUI::Surface::SetText(String string, Rect rect, String font, Int size, Int color, Int weight)
 {
 	return Success;
 }
 
-S::Int S::Surface::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
+S::Int S::GUI::Surface::BlitFromBitmap(HBITMAP bitmap, Rect srcRect, Rect destRect)
 {
 	return Success;
 }
 
-S::Int S::Surface::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
+S::Int S::GUI::Surface::BlitToBitmap(Rect srcRect, HBITMAP bitmap, Rect destRect)
 {
 	return Success;
 }

@@ -13,31 +13,38 @@
 
 namespace smooth
 {
-	class Button;
-	class Tooltip;
+	namespace GUI
+	{
+		class Button;
+		class Tooltip;
+	};
+
 	class Timer;
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Button : public Object
+	namespace GUI
 	{
-		private:
-			Tooltip		*tooltip;
-			Timer		*tipTimer;
+		class SMOOTHAPI Button : public Widget
+		{
+			private:
+				Tooltip		*tooltip;
+				Timer		*tipTimer;
 
-			Void		 ActivateTooltip();
-		protected:
-			HBITMAP		 bitmap;
-			Size		 bmpSize;
-		public:
-					 Button(String, HBITMAP, Point, Size);
-					~Button();
+				Void		 ActivateTooltip();
+			protected:
+				HBITMAP		 bitmap;
+				Size		 bmpSize;
+			public:
+						 Button(String, HBITMAP, Point, Size);
+						~Button();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_BUTTON;

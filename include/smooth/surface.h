@@ -13,7 +13,10 @@
 
 namespace smooth
 {
-	class Surface;
+	namespace GUI
+	{
+		class Surface;
+	};
 };
 
 #include "definitions.h"
@@ -22,27 +25,30 @@ namespace smooth
 
 namespace smooth
 {
-	class SMOOTHAPI Surface
+	namespace GUI
 	{
-		protected:
-			Size		 size;
-		public:
-					 Surface();
-			virtual		~Surface();
+		class SMOOTHAPI Surface
+		{
+			protected:
+				Size		 size;
+			public:
+						 Surface();
+				virtual		~Surface();
 
-			Size		 GetSize();
+				Size		 GetSize();
 
-			virtual Int	 GetPixel(Int, Int);
+				virtual Int	 GetPixel(Int, Int);
 
-			virtual Int	 SetPixel(Int, Int, Int);
-			virtual Int	 Line(Point, Point, Int);
-			virtual Int	 Frame(Rect, Int);
-			virtual Int	 Box(Rect, Int, Int);
+				virtual Int	 SetPixel(Int, Int, Int);
+				virtual Int	 Line(Point, Point, Int);
+				virtual Int	 Frame(Rect, Int);
+				virtual Int	 Box(Rect, Int, Int);
 
-			virtual Int	 SetText(String, Rect, String, Int, Int, Int);
+				virtual Int	 SetText(String, Rect, String, Int, Int, Int);
 
-			virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
-			virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+				virtual Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
+				virtual Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+		};
 	};
 };
 

@@ -13,44 +13,51 @@
 
 namespace smooth
 {
-	class Scrollbar;
+	namespace GUI
+	{
+		class Scrollbar;
+	};
+
 	class Timer;
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Scrollbar : public Object
+	namespace GUI
 	{
-		private:
-			Timer		*timer;
-			Bool		 timerActive;
-			Int		 timerCount;
+		class SMOOTHAPI Scrollbar : public Widget
+		{
+			private:
+				Timer		*timer;
+				Bool		 timerActive;
+				Int		 timerCount;
 
-			Void		 TimerProc();
-		protected:
-			Bool		 button1Clicked;
-			Bool		 button2Clicked;
-			Bool		 button3Clicked;
-			Bool		 button1Checked;
-			Bool		 button2Checked;
-			Bool		 button3Checked;
+				Void		 TimerProc();
+			protected:
+				Bool		 button1Clicked;
+				Bool		 button2Clicked;
+				Bool		 button3Clicked;
+				Bool		 button1Checked;
+				Bool		 button2Checked;
+				Bool		 button3Checked;
 
-			Int		*variable;
+				Int		*variable;
 
-			Int		 startValue;
-			Int 		 endValue;
+				Int		 startValue;
+				Int 		 endValue;
 
-			Int		 mouseBias;
-		public:
-					 Scrollbar(Point, Size, Int, Int *, Int, Int);
-					~Scrollbar();
+				Int		 mouseBias;
+			public:
+						 Scrollbar(Point, Size, Int, Int *, Int, Int);
+						~Scrollbar();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
-			Int		 SetRange(Int, Int);
+				Int		 SetRange(Int, Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_SCROLLBAR;

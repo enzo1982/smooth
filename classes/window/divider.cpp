@@ -25,7 +25,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_DIVIDER = S::Object::RequestObjectID();
 
-S::Divider::Divider(Int pos, Int iOrientation)
+S::GUI::Divider::Divider(Int pos, Int iOrientation)
 {
 	type				= OBJ_DIVIDER;
 	orientation			= iOrientation;
@@ -41,12 +41,12 @@ S::Divider::Divider(Int pos, Int iOrientation)
 	else if (Binary::IsFlagSet(orientation, OR_VERT))	{ objectProperties->pos.x = pos; objectProperties->pos.y = 0; }
 }
 
-S::Divider::~Divider()
+S::GUI::Divider::~Divider()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Divider::Paint(Int message)
+S::Int S::GUI::Divider::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -99,7 +99,7 @@ S::Int S::Divider::Paint(Int message)
 				{
 					if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
 					{
-						operat = (S::Divider *) object;
+						operat = (Divider *) object;
 
 						if (afterMe && Binary::IsFlagSet(operat->orientation, OR_VERT))
 						{
@@ -136,7 +136,7 @@ S::Int S::Divider::Paint(Int message)
 				{
 					if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
 					{
-						operat = (S::Divider *) object;
+						operat = (Divider *) object;
 
 						if (afterMe && Binary::IsFlagSet(operat->orientation, OR_VERT))
 						{
@@ -180,7 +180,7 @@ S::Int S::Divider::Paint(Int message)
 				{
 					if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
 					{
-						operat = (S::Divider *) object;
+						operat = (Divider *) object;
 
 						if (afterMe && Binary::IsFlagSet(operat->orientation, OR_HORZ))
 						{
@@ -216,7 +216,7 @@ S::Int S::Divider::Paint(Int message)
 				{
 					if (object->GetObjectType() == OBJ_DIVIDER && object->GetContainer() == myContainer)
 					{
-						operat = (S::Divider *) object;
+						operat = (Divider *) object;
 
 						if (afterMe && Binary::IsFlagSet(operat->orientation, OR_HORZ))
 						{

@@ -13,20 +13,26 @@
 
 namespace smooth
 {
-	class MDIClient;
+	namespace GUI
+	{
+		class MDIClient;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI MDIClient : public Object
+	namespace GUI
 	{
-		public:
-					 MDIClient();
-					~MDIClient();
+		class SMOOTHAPI MDIClient : public Widget
+		{
+			public:
+						 MDIClient();
+						~MDIClient();
 
-			virtual Int	 Paint(Int);
+				virtual Int	 Paint(Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_MDICLIENT;

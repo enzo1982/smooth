@@ -18,6 +18,7 @@ class Designer;
 #include "status.h"
 
 using namespace smooth;
+using namespace smooth::GUI;
 
 class Designer : public Application
 {

@@ -30,7 +30,7 @@ namespace smooth
 		{
 			public:
 				Int		 type;
-				Int		 code;
+				Int		 id;
 				Bool		 last;
 
 				String		 text;

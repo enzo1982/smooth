@@ -28,7 +28,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_TOOLWINDOW = S::Object::RequestObjectID();
 
-S::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
+S::GUI::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
 {
 	type				= OBJ_TOOLWINDOW;
 	containerType			= OBJ_WINDOW;
@@ -51,26 +51,26 @@ S::ToolWindow::ToolWindow() : Window(TXT_SMOOTHTOOLWINDOW)
 #endif
 }
 
-S::ToolWindow::~ToolWindow()
+S::GUI::ToolWindow::~ToolWindow()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::ToolWindow::SetOwner(Object *newOwner)
+S::Int S::GUI::ToolWindow::SetOwner(Object *newOwner)
 {
 	owner = newOwner;
 
 	return Success;
 }
 
-S::Int S::ToolWindow::FreeOwner()
+S::Int S::GUI::ToolWindow::FreeOwner()
 {
 	owner = NIL;
 
 	return Success;
 }
 
-HWND S::ToolWindow::Create()
+HWND S::GUI::ToolWindow::Create()
 {
 	if (registered && !created)
 	{
@@ -96,7 +96,7 @@ HWND S::ToolWindow::Create()
 	return NIL;
 }
 
-S::Int S::ToolWindow::Paint(Int message)
+S::Int S::GUI::ToolWindow::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -116,7 +116,7 @@ S::Int S::ToolWindow::Paint(Int message)
 	return Success;
 }
 
-S::Int S::ToolWindow::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -271,7 +271,7 @@ S::Int S::ToolWindow::Process(Int message, Int wParam, Int lParam)
 	return Success;
 }
 
-S::Int S::ToolWindow::RegisterObject(Object *object)
+S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
 {
 	if (object == NIL) return Error;
 
@@ -310,7 +310,7 @@ S::Int S::ToolWindow::RegisterObject(Object *object)
 	return Error;
 }
 
-S::Bool S::ToolWindow::IsTypeCompatible(Int compType)
+S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType)
 {
 	if (compType == OBJ_OBJECT || compType == OBJ_WINDOW)	return True;
 	else							return False;

@@ -13,135 +13,142 @@
 
 namespace smooth
 {
-	class Window;
-	class ToolWindow;
-	class PopupMenu;
-	class Menubar;
-	class Titlebar;
-	class Client;
-	class MDIClient;
-	class Layer;
-	class Divider;
+	namespace GUI
+	{
+		class Window;
+		class ToolWindow;
+		class PopupMenu;
+		class Menubar;
+		class Titlebar;
+		class Client;
+		class MDIClient;
+		class Layer;
+		class Divider;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "container.h"
 #include "rect.h"
+#include "loop.h"
 
 namespace smooth
 {
-	const Int SS_MODAL		= 1;
-	const Int SS_SYSMODAL		= 2;
-	const Int SS_APPTOPMOST		= 3;
-	const Int SS_NORESIZE		= 4;
+	namespace GUI
+	{
+		const Int SS_MODAL		= 1;
+		const Int SS_SYSMODAL		= 2;
+		const Int SS_APPTOPMOST		= 3;
+		const Int SS_NORESIZE		= 4;
 
-	const Int WO_SEPARATOR		= 1;
-	const Int WO_NOSEPARATOR	= 2;
+		const Int WO_SEPARATOR		= 1;
+		const Int WO_NOSEPARATOR	= 2;
 
 #ifdef __SMOOTH_DLL__
 #ifdef __WIN32__
-	LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
+		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 #endif
 #endif
 
-	class SMOOTHAPI Window : public Object, public Container
-	{
+		class SMOOTHAPI Window : public Widget, public Container
+		{
 #ifdef __WIN32__
-		friend		LRESULT CALLBACK	 WindowProc(HWND, UINT, WPARAM, LPARAM);
+			friend		LRESULT CALLBACK	 WindowProc(HWND, UINT, WPARAM, LPARAM);
 #endif
 
-		friend class	SMOOTH;
-		friend class	Menubar;
-		friend class	Client;
-		friend class	MDIClient;
-		friend class	Divider;
-		friend class	Titlebar;
-		friend class	Layer;
-		friend class	ToolWindow;
-		friend		Int SMOOTHAPI Loop();
-		protected:
-			Int		 style;
-			Int		 exstyle;
-			Bool		 modal;
-			Bool		 sysmodal;
-			Bool		 apptopmost;
-			Bool		 stay;
-			Bool		 maximized;
+			friend class	S::SMOOTH;
+			friend class	Menubar;
+			friend class	Client;
+			friend class	MDIClient;
+			friend class	Divider;
+			friend class	Titlebar;
+			friend class	Layer;
+			friend class	ToolWindow;
+			friend		Int SMOOTHAPI S::Loop();
+			protected:
+				Int		 style;
+				Int		 exstyle;
+				Bool		 modal;
+				Bool		 sysmodal;
+				Bool		 apptopmost;
+				Bool		 stay;
+				Bool		 maximized;
 
-			Bool		 created;
-			Bool		 destroyed;
+				Bool		 created;
+				Bool		 destroyed;
 
-			HBITMAP		 icon;
-			HICON		 sysicon;
+				HBITMAP		 icon;
+				HICON		 sysicon;
 
-			Rect		 offset;
-			Rect		 updateRect;
+				Rect		 offset;
+				Rect		 updateRect;
 
-			Size		 minSize;
+				Size		 minSize;
 
-			String		 className;
+				String		 className;
 
-			KillProcMember;
-			Void		*killProcParam;
-			MessageProcMember;
-			Void		*messageProcParam;
+				KillProcMember;
+				Void		*killProcParam;
+				MessageProcMember;
+				Void		*messageProcParam;
 
-			PopupMenu	*popupMenu;
+				PopupMenu	*popupMenu;
 
-			HDC		 windowDC;
+				HDC		 windowDC;
 
-			Layer		*mainLayer;
+				Layer		*mainLayer;
 
-			HWND		 Create();
-			Void		 CalculateOffsets();
-		public:
-			static Int	 nOfActiveWindows;
-			Int		 value;
+				HWND		 Create();
+				Void		 CalculateOffsets();
+			public:
+				static Int	 nOfActiveWindows;
+				Int		 value;
 
-			HWND		 hwnd;
-			Bool		 cursorset;
-			Bool		 initshow;
+				HWND		 hwnd;
+				Bool		 cursorset;
+				Bool		 initshow;
 
-					 Window(String title = NIL);
-					~Window();
+						 Window(String title = NIL);
+						~Window();
 
-			Int		 SetMetrics(Point, Size);
-			Void		 SetPositionFlag(HWND);
-			Void		 SetStyle(Int);
-			Void		 SetExStyle(Int);
-			Int		 SetIcon(HBITMAP);
-			Int		 SetApplicationIcon(HICON);
-			Int		 SetApplicationIcon(Int);
-			Int		 SetText(String);
+				Int		 SetMetrics(Point, Size);
+				Void		 SetPositionFlag(HWND);
+				Void		 SetStyle(Int);
+				Void		 SetExStyle(Int);
+				Int		 SetIcon(HBITMAP);
+				Int		 SetApplicationIcon(HICON);
+				Int		 SetApplicationIcon(Int);
+				Int		 SetText(String);
 
-			Int		 SetStatusText(String);
-			String		 GetStatusText();
+				Int		 SetStatusText(String);
+				String		 GetStatusText();
 
-			Void		 SetKillProc(KillProcParam, Void *);
-			Void		 SetMessageProc(MessageProcParam, Void *);
+				Void		 SetKillProc(KillProcParam, Void *);
+				Void		 SetMessageProc(MessageProcParam, Void *);
 
-			Rect		 GetUpdateRect();
-			Int		 SetUpdateRect(Rect);
+				Rect		 GetUpdateRect();
+				Int		 SetUpdateRect(Rect);
 
-			Int		 SetMinimumSize(Size);
+				Int		 SetMinimumSize(Size);
 
-			Int		 Show();
-			Int		 Hide();
+				Int		 Show();
+				Int		 Hide();
 
-			Int		 Close();
+				Int		 Close();
 
-			Int		 Stay();
+				Int		 Stay();
 
-			Bool		 IsMaximized();
+				Bool		 IsMaximized();
 
-			Int		 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				Int		 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
-			Int		 RegisterObject(Object *);
-			Int		 UnregisterObject(Object *);
-		signals:
-			Signal0<>	 onPaint;
-			Signal0<>	 onPeek;
+				Int		 RegisterObject(Object *);
+				Int		 UnregisterObject(Object *);
+			signals:
+				Signal0<>	 onPaint;
+				Signal0<>	 onPeek;
+		};
 	};
 
 	SMOOTHVAR Int OBJ_WINDOW;

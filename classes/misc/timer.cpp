@@ -55,7 +55,7 @@ S::Int S::Timer::Start(Int interval)
 	if (!registered)	return Error;
 	if (timerid != 0)	return Error;
 
-	timerwnd	= (Window *) myContainer->GetContainerObject();
+	timerwnd	= (GUI::Window *) myContainer->GetContainerObject();
 	timerid		= System::RequestGUID();
 
 	if (timerwnd == NIL) return Error;

@@ -27,7 +27,7 @@ S::Int S::Dialog::SetCaption(String newCaption)
 	return Success;
 }
 
-S::Int S::Dialog::SetParentWindow(Window *newParent)
+S::Int S::Dialog::SetParentWindow(GUI::Window *newParent)
 {
 	parentWindow = newParent;
 

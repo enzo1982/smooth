@@ -14,8 +14,12 @@
 namespace smooth
 {
 	class SMOOTH;
-	class Window;
 	class Object;
+
+	namespace GUI
+	{
+		class Window;
+	};
 };
 
 #include "definitions.h"
@@ -57,21 +61,21 @@ namespace smooth
 					static Float	 FontSize;
 			};
 
-			static String	 StartDirectory;
+			static String		 StartDirectory;
 
-			static Object	*GetObject(Int, Int);
-			static Window	*GetWindow(HWND);
+			static Object		*GetObject(Int, Int);
+			static GUI::Window	*GetWindow(HWND);
 
-			static Void	 SetLanguage(Int);
-			static Bool	 SetStartDirectory(String);
+			static Void		 SetLanguage(Int);
+			static Bool		 SetStartDirectory(String);
 
-			static HBITMAP	 LoadImage(String, Int, String);
+			static HBITMAP		 LoadImage(String, Int, String);
 
-			static Void	 SendMessage(Window *, Int, Int, Int);
+			static Void		 SendMessage(GUI::Window *, Int, Int, Int);
 
-			static Int	 MessageBox(String, String, Int, char *);
-			static Int	 MessageBox(String, String, Int, wchar_t *);
-			static Int	 SplashScreen(HBITMAP, Int);
+			static Int		 MessageBox(String, String, Int, char *);
+			static Int		 MessageBox(String, String, Int, wchar_t *);
+			static Int		 SplashScreen(HBITMAP, Int);
 	};
 
 #ifdef __SMOOTH_DLL__

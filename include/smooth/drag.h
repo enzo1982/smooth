@@ -13,20 +13,26 @@
 
 namespace smooth
 {
-	class DragControl;
+	namespace GUI
+	{
+		class DragControl;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI DragControl : public Object
+	namespace GUI
 	{
-		public:
-				 DragControl();
-				~DragControl();
+		class SMOOTHAPI DragControl : public Widget
+		{
+			public:
+					 DragControl();
+					~DragControl();
 
-			Int	 Process(Int, Int, Int);
+				Int	 Process(Int, Int, Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_DRAGCONTROL;

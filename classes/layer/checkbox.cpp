@@ -25,7 +25,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_CHECKBOX = S::Object::RequestObjectID();
 
-S::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var)
+S::GUI::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var)
 {
 	type				= OBJ_CHECKBOX;
 	objectProperties->text		= text;
@@ -46,12 +46,12 @@ S::CheckBox::CheckBox(String text, Point pos, Size size, Bool *var)
 	GetTextSize();
 }
 
-S::CheckBox::~CheckBox()
+S::GUI::CheckBox::~CheckBox()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::CheckBox::Paint(Int message)
+S::Int S::GUI::CheckBox::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -194,7 +194,7 @@ S::Int S::CheckBox::Paint(Int message)
 	return Success;
 }
 
-S::Int S::CheckBox::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered) return Error;
 	if ((!active && message != SM_CHECKCHECKBOXES) || !visible) return Success;

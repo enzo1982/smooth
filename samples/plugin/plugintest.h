@@ -15,6 +15,7 @@
 #include "plugin.h"
 
 using namespace smooth;
+using namespace smooth::GUI;
 
 class PlugInTest : public Application
 {

@@ -13,22 +13,28 @@
 
 namespace smooth
 {
-	class Statusbar;
+	namespace GUI
+	{
+		class Statusbar;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Statusbar : public Object
+	namespace GUI
 	{
-		public:
-				 Statusbar(String);
-				~Statusbar();
+		class SMOOTHAPI Statusbar : public Widget
+		{
+			public:
+					 Statusbar(String);
+					~Statusbar();
 
-			Int	 Paint(Int);
+				Int	 Paint(Int);
 
-			Int	 SetText(String);
+				Int	 SetText(String);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_STATUSBAR;

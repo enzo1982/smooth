@@ -22,6 +22,8 @@
 #include <smooth/timer.h>
 #include <smooth/objectproperties.h>
 
+using namespace smooth::GUI;
+
 int S::SplashScreenApp::nOfSplashScreens = 0;
 
 S::Int S::SMOOTH::SplashScreen(HBITMAP logo, Int time)

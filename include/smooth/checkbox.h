@@ -13,24 +13,30 @@
 
 namespace smooth
 {
-	class CheckBox;
+	namespace GUI
+	{
+		class CheckBox;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 
 namespace smooth
 {
-	class SMOOTHAPI CheckBox : public Object
+	namespace GUI
 	{
-		protected:
-			Bool		*variable;
-			Bool		 state;
-		public:
-					 CheckBox(String, Point, Size, Bool *);
-					~CheckBox();
+		class SMOOTHAPI CheckBox : public Widget
+		{
+			protected:
+				Bool		*variable;
+				Bool		 state;
+			public:
+						 CheckBox(String, Point, Size, Bool *);
+						~CheckBox();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_CHECKBOX;

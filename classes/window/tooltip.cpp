@@ -26,7 +26,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_TOOLTIP = S::Object::RequestObjectID();
 
-S::Tooltip::Tooltip()
+S::GUI::Tooltip::Tooltip()
 {
 	type				= OBJ_TOOLTIP;
 	objectProperties->orientation	= OR_FREE;
@@ -38,7 +38,7 @@ S::Tooltip::Tooltip()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-S::Tooltip::~Tooltip()
+S::GUI::Tooltip::~Tooltip()
 {
 	if (timer != NIL)
 	{
@@ -61,7 +61,7 @@ S::Tooltip::~Tooltip()
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Tooltip::Show()
+S::Int S::GUI::Tooltip::Show()
 {
 	if (visible) return Success;
 
@@ -124,7 +124,7 @@ S::Int S::Tooltip::Show()
 	return Success;
 }
 
-S::Int S::Tooltip::Hide()
+S::Int S::GUI::Tooltip::Hide()
 {
 	if (!visible) return Success;
 
@@ -151,7 +151,7 @@ S::Int S::Tooltip::Hide()
 	return Success;
 }
 
-S::Int S::Tooltip::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Tooltip::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -169,14 +169,14 @@ S::Int S::Tooltip::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::Tooltip::SetTimeout(Int mSeconds)
+S::Int S::GUI::Tooltip::SetTimeout(Int mSeconds)
 {
 	timeOut = mSeconds;
 
 	return Success;
 }
 
-S::Void S::Tooltip::TimerProc()
+S::Void S::GUI::Tooltip::TimerProc()
 {
 	Hide();
 

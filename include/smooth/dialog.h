@@ -14,7 +14,11 @@
 namespace smooth
 {
 	class Dialog;
-	class Window;
+
+	namespace GUI
+	{
+		class Window;
+	};
 };
 
 #include "definitions.h"
@@ -26,7 +30,7 @@ namespace smooth
 	{
 		protected:
 			String		 caption;
-			Window		*parentWindow;
+			GUI::Window	*parentWindow;
 		public:
 					 Dialog();
 					~Dialog();
@@ -34,7 +38,7 @@ namespace smooth
 			virtual Int	 ShowDialog() = 0;
 
 			Int		 SetCaption(String);
-			Int		 SetParentWindow(Window *);
+			Int		 SetParentWindow(GUI::Window *);
 	};
 };
 

@@ -14,7 +14,11 @@
 namespace smooth
 {
 	class Timer;
-	class Window;
+
+	namespace GUI
+	{
+		class Window;
+	};
 };
 
 #include "object.h"
@@ -24,7 +28,7 @@ namespace smooth
 	class SMOOTHAPI Timer : public Object
 	{
 		private:
-			Window		*timerwnd;
+			GUI::Window	*timerwnd;
 			Int		 timerid;
 		public:
 					 Timer();

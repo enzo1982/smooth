@@ -30,6 +30,8 @@
 
 #include <picture.h>
 
+using namespace smooth::GUI;
+
 S::DialogColorSelection::DialogColorSelection()
 {
 	for (int y = 0; y < 256; y++)

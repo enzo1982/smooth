@@ -13,35 +13,41 @@
 
 namespace smooth
 {
-	class Layer;
+	namespace GUI
+	{
+		class Layer;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "container.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Layer : public Object, public Container
+	namespace GUI
 	{
-		protected:
-			Int		 layerColor;
-		public:
-					 Layer(String name = NIL);
-					~Layer();
+		class SMOOTHAPI Layer : public Widget, public Container
+		{
+			protected:
+				Int		 layerColor;
+			public:
+						 Layer(String name = NIL);
+						~Layer();
 
-			Int		 Show();
-			Int		 Hide();
+				Int		 Show();
+				Int		 Hide();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
-			Int		 SetColor(Int);
-			Int		 SetMetrics(Point, Size);
+				Int		 SetColor(Int);
+				Int		 SetMetrics(Point, Size);
 
-			Surface		*GetDrawSurface();
+				Surface		*GetDrawSurface();
 
-			Int		 RegisterObject(Object *);
-			Int		 UnregisterObject(Object *);
+				Int		 RegisterObject(Object *);
+				Int		 UnregisterObject(Object *);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_LAYER;

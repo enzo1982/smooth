@@ -8,40 +8,36 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_ACTIVEAREA_
-#define _H_OBJSMOOTH_ACTIVEAREA_
+#ifndef _H_OBJSMOOTH_WIDGET_
+#define _H_OBJSMOOTH_WIDGET_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class ActiveArea;
+		class Widget;
 	};
+
+	class SMOOTH;
 };
 
-#include "widget.h"
+#include "object.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI ActiveArea : public Widget
+		class SMOOTHAPI Widget : public Object
 		{
-			protected:
-				Int		 areaColor;
 			public:
-						 ActiveArea(Int, Point, Size);
-						~ActiveArea();
-
-				virtual Int	 Paint(Int);
-				Int		 Process(Int, Int, Int);
-
-				Int		 SetColor(Int);
-				Int		 GetColor();
+						 Widget();
+				virtual		~Widget();
+			signals:
+				Signal0<>	 onClick;
 		};
 	};
 
-	SMOOTHVAR Int OBJ_ACTIVEAREA;
+	SMOOTHVAR Int OBJ_WIDGET;
 };
 
 #endif

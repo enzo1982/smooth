@@ -8,26 +8,18 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_ACTIVEAREAPLUGIN_
-#define _H_ACTIVEAREAPLUGIN_
+#include <smooth/widget.h>
 
-class ActiveAreaPlugin;
-
-#include <smooth.h>
-
-using namespace smooth;
-using namespace smooth::GUI;
-
-class SMOOTH_PLUGIN_API ActiveAreaPlugin : public Widget
-{
-	public:
-		Int	 areaColor;
-			 ActiveAreaPlugin(Int, Point, Size);
-			~ActiveAreaPlugin();
-		Int	 Paint(Int);
-		Int	 Process(Int, Int, Int);
-};
-
-SMOOTH_PLUGIN_VAR Int OBJ_ACTIVEAREAPLUGIN;
-
+#ifdef __WIN32__
+__declspec (dllexport)
 #endif
+
+S::Int	 S::OBJ_WIDGET = S::Object::RequestObjectID();
+
+S::GUI::Widget::Widget()
+{
+}
+
+S::GUI::Widget::~Widget()
+{
+}

@@ -13,32 +13,38 @@
 
 namespace smooth
 {
-	class SurfaceGDI;
+	namespace GUI
+	{
+		class SurfaceGDI;
+	};
 };
 
 #include "surface.h"
 
 namespace smooth
 {
-	class SMOOTHAPI SurfaceGDI : public Surface
+	namespace GUI
 	{
-		protected:
-			HDC	 gdi_dc;
-		public:
-				 SurfaceGDI(HDC);
-				~SurfaceGDI();
+		class SMOOTHAPI SurfaceGDI : public Surface
+		{
+			protected:
+				HDC	 gdi_dc;
+			public:
+					 SurfaceGDI(HDC);
+					~SurfaceGDI();
 
-			Int	 GetPixel(Int, Int);
+				Int	 GetPixel(Int, Int);
 
-			Int	 SetPixel(Int, Int, Int);
-			Int	 Line(Point, Point, Int);
-			Int	 Frame(Rect, Int);
-			Int	 Box(Rect, Int, Int);
+				Int	 SetPixel(Int, Int, Int);
+				Int	 Line(Point, Point, Int);
+				Int	 Frame(Rect, Int);
+				Int	 Box(Rect, Int, Int);
 
-			Int	 SetText(String, Rect, String, Int, Int, Int);
+				Int	 SetText(String, Rect, String, Int, Int, Int);
 
-			Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
-			Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+				Int	 BlitFromBitmap(HBITMAP, Rect, Rect);
+				Int	 BlitToBitmap(Rect, HBITMAP, Rect);
+		};
 	};
 };
 

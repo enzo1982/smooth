@@ -25,7 +25,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_ARROWS = S::Object::RequestObjectID();
 
-S::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart, Int rangeEnd)
+S::GUI::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart, Int rangeEnd)
 {
 	type		= OBJ_ARROWS;
 	subtype		= sType;
@@ -64,12 +64,12 @@ S::Arrows::Arrows(Point pos, Size size, Int sType, Int *var, Int rangeStart, Int
 	}
 }
 
-S::Arrows::~Arrows()
+S::GUI::Arrows::~Arrows()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Arrows::Paint(Int message)
+S::Int S::GUI::Arrows::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -187,7 +187,7 @@ S::Int S::Arrows::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Arrows::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -424,7 +424,7 @@ S::Int S::Arrows::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::Arrows::TimerProc()
+S::Void S::GUI::Arrows::TimerProc()
 {
 	if (!registered)		return;
 	if (!active || !visible)	return;
@@ -485,7 +485,7 @@ S::Void S::Arrows::TimerProc()
 	timerCount++;
 }
 
-S::Int S::Arrows::SetRange(Int rangeStart, Int rangeEnd)
+S::Int S::GUI::Arrows::SetRange(Int rangeStart, Int rangeEnd)
 {
 	Int	 prevStartValue	= startValue;
 	Int	 prevEndValue	= endValue;
@@ -501,7 +501,7 @@ S::Int S::Arrows::SetRange(Int rangeStart, Int rangeEnd)
 	return Success;
 }
 
-S::Int S::Arrows::SetValue(Int newValue)
+S::Int S::GUI::Arrows::SetValue(Int newValue)
 {
 	if (newValue < startValue)	newValue = startValue;
 	if (newValue > endValue)	newValue = endValue;
@@ -515,7 +515,7 @@ S::Int S::Arrows::SetValue(Int newValue)
 	return Success;
 }
 
-S::Int S::Arrows::GetValue()
+S::Int S::GUI::Arrows::GetValue()
 {
 	return *variable;
 }

@@ -133,6 +133,10 @@ SOURCE=..\classes\basic\objecttype.cpp
 
 SOURCE=..\classes\basic\system.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\classes\basic\widget.cpp
+# End Source File
 # End Group
 # Begin Group "internal"
 
@@ -940,6 +944,10 @@ SOURCE=..\include\smooth\treeview.h
 # Begin Source File
 
 SOURCE=..\include\smooth\version.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\widget.h
 # End Source File
 # Begin Source File
 

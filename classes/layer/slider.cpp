@@ -24,7 +24,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_SLIDER = S::Object::RequestObjectID();
 
-S::Slider::Slider(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd)
+S::GUI::Slider::Slider(Point pos, Size size, Int subType, Int *var, Int rangeStart, Int rangeEnd)
 {
 	type				= OBJ_SLIDER;
 	subtype				= subType;
@@ -54,12 +54,12 @@ S::Slider::Slider(Point pos, Size size, Int subType, Int *var, Int rangeStart, I
 	else			objectProperties->size.cx = METRIC_SLIDERAREAHEIGHT;
 }
 
-S::Slider::~Slider()
+S::GUI::Slider::~Slider()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Slider::Paint(Int message)
+S::Int S::GUI::Slider::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -156,7 +156,7 @@ S::Int S::Slider::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Slider::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -303,7 +303,7 @@ S::Int S::Slider::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::Slider::SetRange(Int rangeStart, Int rangeEnd)
+S::Int S::GUI::Slider::SetRange(Int rangeStart, Int rangeEnd)
 {
 	Int	 prevStartValue	= startValue;
 	Int	 prevEndValue	= endValue;
@@ -318,7 +318,7 @@ S::Int S::Slider::SetRange(Int rangeStart, Int rangeEnd)
 	return Success;
 }
 
-S::Int S::Slider::SetValue(Int newValue)
+S::Int S::GUI::Slider::SetValue(Int newValue)
 {
 	if (newValue < startValue)	newValue = startValue;
 	if (newValue > endValue)	newValue = endValue;
@@ -338,7 +338,7 @@ S::Int S::Slider::SetValue(Int newValue)
 	return Success;
 }
 
-S::Int S::Slider::GetValue()
+S::Int S::GUI::Slider::GetValue()
 {
 	return *variable;
 }

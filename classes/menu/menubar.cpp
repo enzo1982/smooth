@@ -24,7 +24,7 @@ __declspec (dllexport)
 
 S::Int	 S::OBJ_MENUBAR = S::Object::RequestObjectID();
 
-S::Menubar::Menubar()
+S::GUI::Menubar::Menubar()
 {
 	type				= OBJ_MENUBAR;
 	objectProperties->orientation	= OR_TOP;
@@ -37,12 +37,12 @@ S::Menubar::Menubar()
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
 
-S::Menubar::~Menubar()
+S::GUI::Menubar::~Menubar()
 {
 	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
 }
 
-S::Int S::Menubar::Paint(Int message)
+S::Int S::GUI::Menubar::Paint(Int message)
 {
 	if (!registered)	return Error;
 	if (!visible)		return Success;
@@ -422,7 +422,7 @@ S::Int S::Menubar::Paint(Int message)
 	return Success;
 }
 
-S::Int S::Menubar::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 {
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
@@ -744,7 +744,7 @@ S::Int S::Menubar::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::Menubar::SetStyle(Int newstyle)
+S::Int S::GUI::Menubar::SetStyle(Int newstyle)
 {
 	if (newstyle == MB_GRAYSCALE || newstyle == MB_COLOR)
 	{

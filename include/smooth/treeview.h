@@ -13,24 +13,30 @@
 
 namespace smooth
 {
-	class TreeView;
+	namespace GUI
+	{
+		class TreeView;
+	};
 };
 
-#include "object.h"
+#include "widget.h"
 #include "tree.h"
 
 namespace smooth
 {
-	class SMOOTHAPI TreeView : public Object, public Tree
+	namespace GUI
 	{
-		private:
-			Int		 PaintTree(Tree *, Int, Rect);
-		public:
-					 TreeView(String, Point, Size);
-					~TreeView();
+		class SMOOTHAPI TreeView : public Widget, public Tree
+		{
+			private:
+				Int		 PaintTree(Tree *, Int, Rect);
+			public:
+						 TreeView(String, Point, Size);
+						~TreeView();
 
-			virtual Int	 Paint(Int);
-			Int		 Process(Int, Int, Int);
+				virtual Int	 Paint(Int);
+				Int		 Process(Int, Int, Int);
+		};
 	};
 
 	SMOOTHVAR Int OBJ_TREEVIEW;

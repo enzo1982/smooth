@@ -147,7 +147,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 		if (max)	buttonColor = Setup::TextColor;
 		else		buttonColor = Setup::GrayTextColor;
 
-		if(wnd->maximized)
+		if (wnd->maximized)
 		{
 			button.top--;
 			button.left++;
@@ -271,7 +271,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 		case WM_SETFOCUS:
 		case WM_KILLFOCUS:
 		case SM_WINDOWTITLECHANGED:
-			if (GetActiveWindow() == wnd->hwnd && !paintActive)
+			if (GetActiveWindow() == wnd->hwnd && (!paintActive || message == SM_WINDOWTITLECHANGED))
 			{
 				paintActive	= True;
 				paint		= True;

@@ -653,6 +653,7 @@ S::Int S::GUI::Scrollbar::SetRange(Int rangeStart, Int rangeEnd)
 {
 	Int	 prevStartValue	= startValue;
 	Int	 prevEndValue	= endValue;
+	Int	 prevValue	= *variable;
 
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
@@ -660,7 +661,7 @@ S::Int S::GUI::Scrollbar::SetRange(Int rangeStart, Int rangeEnd)
 	*variable	= (Int) (((Float) (*variable) - prevStartValue) * ((Float) (endValue - startValue) / (prevEndValue - prevStartValue)) + startValue);
 	*variable	= (Int) Math::Max(rangeStart, Math::Min(rangeEnd, *variable));
 
-	Paint(SP_PAINT);
+	if (prevValue != 0) Paint(SP_PAINT);
 
 	onClick.Emit(0, 0);
 

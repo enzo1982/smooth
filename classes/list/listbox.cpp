@@ -450,7 +450,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 			}
 
-			if (header != NIL && !(flags & LF_HIDEHEADER)) header->Paint(SP_PAINT);
+			if (header != NIL && !(flags & LF_HIDEHEADER) && message != SP_UPDATE) header->Paint(SP_PAINT);
 
 			break;
 		case SP_MOUSEIN:

@@ -40,7 +40,12 @@ S::GUI::Menubar::Menubar()
 
 S::GUI::Menubar::~Menubar()
 {
-	if (registered && myContainer != NIL) myContainer->UnregisterObject(this);
+	if (registered && myContainer != NIL)
+	{
+		if (popupHandle != NIL) myContainer->UnregisterObject(GetObject(popupHandle, OBJ_POPUP));
+
+		myContainer->UnregisterObject(this);
+	}
 }
 
 S::Int S::GUI::Menubar::Paint(Int message)
@@ -51,7 +56,6 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	Window		*wnd = (Window *) myContainer->GetContainerObject();
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Surface		*surface = myContainer->GetDrawSurface();
 
@@ -464,6 +468,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 					{
 						((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->Hide();
 
+						wnd->UnregisterObject(GetObject(popupHandle, OBJ_POPUP));
 						DeleteObject(GetObject(popupHandle, OBJ_POPUP));
 
 						popupHandle = -1;
@@ -763,6 +768,7 @@ S::Void S::GUI::Menubar::PopupProc()
 		{
 			((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->Hide();
 
+			myContainer->UnregisterObject(GetObject(popupHandle, OBJ_POPUP));
 			DeleteObject(GetObject(popupHandle, OBJ_POPUP));
 
 			popupHandle = -1;

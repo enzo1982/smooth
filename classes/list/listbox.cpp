@@ -340,6 +340,13 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 				else
 				{
+					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET;
+					sbp.y = frame.top - layer->GetObjectProperties()->pos.y;
+					sbs.cy = objectProperties->size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
+
+					scrollbar->GetObjectProperties()->pos = sbp;
+					scrollbar->GetObjectProperties()->size.cy = sbs.cy;
+
 					scrollbar->SetRange(0, GetNOfEntries() - (int) ((objectProperties->size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 				}
 
@@ -450,7 +457,11 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 			}
 
-			if (header != NIL && !(flags & LF_HIDEHEADER) && message != SP_UPDATE) header->Paint(SP_PAINT);
+			if (header != NIL && !(flags & LF_HIDEHEADER) && message != SP_UPDATE)
+			{
+		 		header->UpdateMetrics();
+				header->Paint(SP_PAINT);
+			}
 
 			break;
 		case SP_MOUSEIN:
@@ -458,13 +469,9 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			{
 				operat = GetNthEntry(i);
 
-				if (operat == NIL) break;
+				if (operat == NIL) continue;
 
-				Window	*wnd = myContainer->GetContainerWindow();
-
-				if (wnd == NIL) break;
-
-				if (wnd->IsMouseOn(operat->rect) && !operat->checked)
+				if (operat->checked)
 				{
 					operat->rect.right++;
 					operat->rect.bottom++;
@@ -541,13 +548,9 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			{
 				operat = GetNthEntry(i);
 
-				if (operat == NIL) break;
+				if (operat == NIL) continue;
 
-				Window	*wnd = myContainer->GetContainerWindow();
-
-				if (wnd == NIL) break;
-
-				if (!wnd->IsMouseOn(operat->rect) && operat->checked)
+				if (operat->checked)
 				{
 					operat->rect.right++;
 					operat->rect.bottom++;
@@ -811,9 +814,9 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 				if (wnd->IsMouseOn(operat->rect) && !operat->checked)
 				{
-					Paint(SP_MOUSEIN);
-
 					operat->checked = True;
+
+					Paint(SP_MOUSEIN);
 
 					operat->onMouseOver.Emit();
 				}

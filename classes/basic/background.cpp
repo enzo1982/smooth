@@ -10,6 +10,8 @@
 
 #include <smooth/background.h>
 #include <smooth/threadmanager.h>
+#include <smooth/objectmanager.h>
+#include <smooth/window.h>
 #include <smooth/timer.h>
 
 S::BackgroundApplication	*S::backgroundApplication = NIL;
@@ -28,9 +30,6 @@ S::BackgroundApplication::~BackgroundApplication()
 
 	delete backgroundTimer;
 }
-#include <smooth/objectmanager.h>
-#include <smooth/window.h>
-
 S::Void S::BackgroundApplication::TimerProc()
 {
 	for (Int i = 0; i < Object::objectCount; i++)
@@ -59,6 +58,7 @@ S::Void S::BackgroundApplication::TimerProc()
 
  	for (Int j = 0; j < mainThreadManager->GetNOfThreads(); j++)
 	{
-		PostThreadMessage(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+		if (Setup::enableUnicode)	PostThreadMessageW(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+		else				PostThreadMessageA(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
 	}
 }

@@ -39,7 +39,7 @@ S::Void S::ActivateEnglishLanguage()
 	fontInfoW.lfFaceName[0] = 0;
 	fontInfoW.lfPitchAndFamily = 0;
 
-	int		 result;
+	int	 result;
 
 	if (Setup::enableUnicode)	result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
 	else				result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);

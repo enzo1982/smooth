@@ -72,11 +72,7 @@ S::Void S::Init()
 	if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)	Setup::enableUnicode = True;
 	else							Setup::enableUnicode = False;
 
-	CPINFOEXA	 cpInfo;
-
-	GetCPInfoExA(CP_ACP, 0, &cpInfo);
-
-	codePage = cpInfo.CodePage;
+	codePage = GetACP();
 
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 #endif

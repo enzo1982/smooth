@@ -96,7 +96,10 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 				if (pos.x > realPos.x && pos.x < (realPos.x + objectProperties->size.cx) && pos.y > realPos.y && pos.y < (realPos.y + objectProperties->size.cy))
 				{
-					Int	 nOfFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+					Int	 nOfFiles;
+
+					if (Setup::enableUnicode)	nOfFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0);
+					else				nOfFiles = DragQueryFileA(hDrop, 0xFFFFFFFF, NULL, 0);
 
 					for (Int i = 0; i < nOfFiles; i++)
 					{

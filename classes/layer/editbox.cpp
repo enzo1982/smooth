@@ -115,6 +115,11 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 				myContainer->RegisterObject(comboBox);
 			}
+			else if (dropDownList != NIL)
+			{
+				comboBox->GetObjectProperties()->pos = objectProperties->pos;
+				comboBox->GetObjectProperties()->size = objectProperties->size;
+			}
 
 			textRect.left	= frame.left + 3;
 			textRect.top	= frame.top + 3;
@@ -908,6 +913,7 @@ S::Void S::GUI::EditBox::DropDownListProc()
 	objectProperties->checked = True;
 
 	Process(SM_LBUTTONDOWN, 0, 0);
+	SetCursor(objectProperties->text.Length());
 
 	markStart = 0;
 	markEnd = objectProperties->text.Length();

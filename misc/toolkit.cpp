@@ -15,6 +15,7 @@
 #include <smooth/window.h>
 #include <smooth/stk.h>
 #include <smooth/array.h>
+#include <smooth/shlobjmini.h>
 
 #include <picture.h>
 #include <iolib-cxx.h>
@@ -37,6 +38,28 @@ Array<int>	 contextCounts;
 Display	*default_display = XOpenDisplay(NIL);
 #endif
 #endif
+
+LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderA)(PBROWSEINFOA);
+LPITEMIDLIST	 (WINAPI *ex_SHBrowseForFolderW)(PBROWSEINFOW);
+BOOL		 (WINAPI *ex_SHGetPathFromIDListA)(LPCITEMIDLIST, LPSTR);
+BOOL		 (WINAPI *ex_SHGetPathFromIDListW)(LPCITEMIDLIST, LPWSTR);
+
+HMODULE	 shelldll;
+
+void SHLObjMini_Init()
+{
+	shelldll = LoadLibraryA("shell32.dll");
+
+	ex_SHBrowseForFolderA = (LPITEMIDLIST (WINAPI *)(PBROWSEINFOA)) GetProcAddress(shelldll, "SHBrowseForFolderA");
+	ex_SHBrowseForFolderW = (LPITEMIDLIST (WINAPI *)(PBROWSEINFOW)) GetProcAddress(shelldll, "SHBrowseForFolderW");
+	ex_SHGetPathFromIDListA = (BOOL (WINAPI *)(LPCITEMIDLIST, LPSTR)) GetProcAddress(shelldll, "SHGetPathFromIDListA");
+	ex_SHGetPathFromIDListW = (BOOL (WINAPI *)(LPCITEMIDLIST, LPWSTR)) GetProcAddress(shelldll, "SHGetPathFromIDListW");
+}
+
+void SHLObjMini_Deinit()
+{
+	FreeLibrary(shelldll);
+}
 
 int GetBitmapSizeX(HBITMAP bmp)
 {
@@ -341,41 +364,50 @@ bool BlitFromBitmap(Rect srcrect, HBITMAP bitmap, Rect destrect, HDC dc)
 
 HWND CreateSimpleWindow(Rect wndrect, String title, String className, HICON icon, int style, int exstyle)
 {
-	WNDCLASSEXW	 wndclassw;
-	WNDCLASSEXA	 wndclassa;
-	HWND		 hwnd;
+	HWND	 hwnd;
 
-	wndclassw.cbSize	= sizeof(wndclassw);
-	wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
-	wndclassw.lpfnWndProc	= GUI::WindowProc;
-	wndclassw.cbClsExtra	= 0;
-	wndclassw.cbWndExtra	= 0;
-	wndclassw.hInstance	= hInstance;
-	wndclassw.hIcon		= icon;
-	wndclassw.hCursor	= (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	wndclassw.hbrBackground	= NIL;
-	wndclassw.lpszMenuName	= NIL;
-	wndclassw.lpszClassName	= className;
-	wndclassw.hIconSm	= icon;
+	if (Setup::enableUnicode)
+	{
+		WNDCLASSEXW	 wndclassw;
 
-	wndclassa.cbSize	= sizeof(wndclassa);
-	wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
-	wndclassa.lpfnWndProc	= GUI::WindowProc;
-	wndclassa.cbClsExtra	= 0;
-	wndclassa.cbWndExtra	= 0;
-	wndclassa.hInstance	= hInstance;
-	wndclassa.hIcon		= icon;
-	wndclassa.hCursor	= (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	wndclassa.hbrBackground	= NIL;
-	wndclassa.lpszMenuName	= NIL;
-	wndclassa.lpszClassName	= className;
-	wndclassa.hIconSm	= icon;
+		wndclassw.cbSize	= sizeof(wndclassw);
+		wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
+		wndclassw.lpfnWndProc	= GUI::WindowProc;
+		wndclassw.cbClsExtra	= 0;
+		wndclassw.cbWndExtra	= 0;
+		wndclassw.hInstance	= hInstance;
+		wndclassw.hIcon		= icon;
+		wndclassw.hCursor	= (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+		wndclassw.hbrBackground	= NIL;
+		wndclassw.lpszMenuName	= NIL;
+		wndclassw.lpszClassName	= className;
+		wndclassw.hIconSm	= icon;
 
-	if (Setup::enableUnicode)	RegisterClassExW(&wndclassw);
-	else				RegisterClassExA(&wndclassa);
+		RegisterClassExW(&wndclassw);
 
-	if (Setup::enableUnicode)	hwnd = CreateWindowExW(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
-	else				hwnd = CreateWindowExA(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
+		hwnd = CreateWindowExW(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
+	}
+	else
+	{
+		WNDCLASSEXA	 wndclassa;
+
+		wndclassa.cbSize	= sizeof(wndclassa);
+		wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
+		wndclassa.lpfnWndProc	= GUI::WindowProc;
+		wndclassa.cbClsExtra	= 0;
+		wndclassa.cbWndExtra	= 0;
+		wndclassa.hInstance	= hInstance;
+		wndclassa.hIcon		= icon;
+		wndclassa.hCursor	= (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+		wndclassa.hbrBackground	= NIL;
+		wndclassa.lpszMenuName	= NIL;
+		wndclassa.lpszClassName	= className;
+		wndclassa.hIconSm	= icon;
+
+		RegisterClassExA(&wndclassa);
+
+		hwnd = CreateWindowExA(exstyle, className, title, style, wndrect.left, wndrect.top, wndrect.right - wndrect.left, wndrect.bottom - wndrect.top, NIL, NIL, hInstance, NIL);
+	}
 
 	return hwnd;
 }

@@ -394,7 +394,8 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEWHEEL:
-			SystemParametersInfo(104, NIL, &scrolllines, NIL);
+			if (Setup::enableUnicode)	SystemParametersInfoW(104, NIL, &scrolllines, NIL);
+			else				SystemParametersInfoA(104, NIL, &scrolllines, NIL);
 
 			if (scrolllines <= 0) scrolllines = 3;
 
@@ -418,7 +419,8 @@ S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_KEYDOWN:
-			SystemParametersInfo(104, NIL, &scrolllines, NIL);
+			if (Setup::enableUnicode)	SystemParametersInfoW(104, NIL, &scrolllines, NIL);
+			else				SystemParametersInfoA(104, NIL, &scrolllines, NIL);
 
 			if (scrolllines <= 0) scrolllines = 3;
 

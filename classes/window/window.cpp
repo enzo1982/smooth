@@ -142,7 +142,7 @@ S::GUI::Window::Window(String title)
 	icon = NIL;
 
 	if (Setup::enableUnicode)	sysicon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-	else				sysicon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+	else				sysicon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
 	created		= False;
 	visible		= False;
@@ -160,9 +160,6 @@ S::GUI::Window::Window(String title)
 
 	minSize.cx = Math::Round(160 * Setup::FontSize);
 	minSize.cy = METRIC_TITLEBARHEIGHT + 5;
-
-	maxSize.cx = 32768;
-	maxSize.cy = 32768;
 
 	hwnd = NIL;
 
@@ -209,14 +206,19 @@ S::Bool S::GUI::Window::DummyExitProc()
 
 S::Int S::GUI::Window::SetMetrics(Point newPos, Size newSize)
 {
-	objectProperties->pos.x		= Math::Round(newPos.x * Setup::FontSize);
-	objectProperties->pos.y		= Math::Round(newPos.y * Setup::FontSize);
-	objectProperties->size.cx	= Math::Round(newSize.cx * Setup::FontSize);
-	objectProperties->size.cy	= Math::Round(newSize.cy * Setup::FontSize);
-
 	updateRect = Rect();
 
-	if (created) SetWindowPos(hwnd, 0, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, SWP_NOZORDER);
+	if (!created)
+	{
+		objectProperties->pos.x		= Math::Round(newPos.x * Setup::FontSize);
+		objectProperties->pos.y		= Math::Round(newPos.y * Setup::FontSize);
+		objectProperties->size.cx	= Math::Round(newSize.cx * Setup::FontSize);
+		objectProperties->size.cy	= Math::Round(newSize.cy * Setup::FontSize);
+	}
+	else
+	{
+		SetWindowPos(hwnd, 0, Math::Round(newPos.x * Setup::FontSize), Math::Round(newPos.y * Setup::FontSize), Math::Round(newSize.cx * Setup::FontSize), Math::Round(newSize.cy * Setup::FontSize), SWP_NOZORDER);
+	}
 
 	return Success;
 }
@@ -331,12 +333,18 @@ S::Int S::GUI::Window::Show()
 {
 	if (!created) Create();
 
-	ShowWindow(hwnd, SW_SHOW);
-
 	if (maximized && !initshow)
 	{
+		ShowWindow(hwnd, SW_HIDE);
+
 		maximized = False;
 		Maximize();
+
+		ShowWindow(hwnd, SW_SHOW);
+	}
+	else
+	{
+		ShowWindow(hwnd, SW_SHOW);
 	}
 
 	initshow	= True;
@@ -384,9 +392,7 @@ S::Int S::GUI::Window::Maximize()
 
 		workArea = rect;
 
-		::GetWindowRect(hwnd, &rect);
-
-		nonmaxrect = rect;
+		nonmaxrect = Rect(objectProperties->pos, objectProperties->size);
 	}
 
 	SetWindowPos(hwnd, 0, workArea.left - 2, workArea.top - 2, workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4, 0);
@@ -413,12 +419,12 @@ S::Int S::GUI::Window::Restore()
 		return Success;
 	}
 
-	SetWindowPos(hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right - nonmaxrect.left, nonmaxrect.bottom - nonmaxrect.top, 0);
+	SetWindowPos(hwnd, 0, nonmaxrect.left, nonmaxrect.top, (Int) Math::Max(minSize.cx, nonmaxrect.right - nonmaxrect.left), (Int) Math::Max(minSize.cy, nonmaxrect.bottom - nonmaxrect.top), 0);
 
 	maximized = False;
 
-	if (Setup::enableUnicode)	SetWindowLongW(hwnd, GWL_STYLE, origwndstyle);
-	else				SetWindowLongA(hwnd, GWL_STYLE, origwndstyle);
+	if (Setup::enableUnicode)	SetWindowLongW(hwnd, GWL_STYLE, origwndstyle | WS_VISIBLE);
+	else				SetWindowLongA(hwnd, GWL_STYLE, origwndstyle | WS_VISIBLE);
 
 	return Success;
 }
@@ -688,18 +694,24 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_WINDOWPOSCHANGED:
 			{
 				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
+				Bool		 resized = (objectProperties->size.cx != wndpos->cx || objectProperties->size.cy != wndpos->cy);
 
 				objectProperties->pos.x		= wndpos->x;
 				objectProperties->pos.y		= wndpos->y;
 				objectProperties->size.cx	= wndpos->cx;
 				objectProperties->size.cy	= wndpos->cy;
 
-				updateRect.left = 0;
-				updateRect.top = 0;
-				updateRect.right = updateRect.left + objectProperties->size.cx;
-				updateRect.bottom = updateRect.top + objectProperties->size.cy;
+				if (resized)
+				{
+					updateRect.left = 0;
+					updateRect.top = 0;
+					updateRect.right = updateRect.left + objectProperties->size.cx;
+					updateRect.bottom = updateRect.top + objectProperties->size.cy;
 
-				CalculateOffsets();
+					CalculateOffsets();
+
+					onResize.Emit();
+				}
 			}
 
 			break;
@@ -810,8 +822,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				((LPMINMAXINFO) lParam)->ptMinTrackSize.x = minSize.cx;
 				((LPMINMAXINFO) lParam)->ptMinTrackSize.y = minSize.cy;
-				((LPMINMAXINFO) lParam)->ptMaxTrackSize.x = maxSize.cx;
-				((LPMINMAXINFO) lParam)->ptMaxTrackSize.y = maxSize.cy;
+
+				if (maxSize.cx > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.x = maxSize.cx;
+				if (maxSize.cy > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.y = maxSize.cy;
 			}
 			break;
 	}

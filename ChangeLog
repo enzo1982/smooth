@@ -39,6 +39,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 - introduced a new font management system
 - fixed some PopupMenu issues
 - upgraded to IOLib v4.9.14.0
+- added support for Windows 95
 - many bugfixes
 
 16.03.03 07:00 - smooth alpha 0.8.61.0

@@ -26,51 +26,62 @@ S::DialogDirSelection::~DialogDirSelection()
 
 S::Int S::DialogDirSelection::ShowDialog()
 {
-	BROWSEINFOW	 infow;
-	BROWSEINFOA	 infoa;
-	wchar_t		*bufferw = new wchar_t [32768];
-	char		*buffera = new char [32768];
+	SHLObjMini_Init();
 
-	for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
-	for (Int j = 0; j < 32768; j++) buffera[j] = 0;
- 
-	if (parentWindow != NIL)
+	if (Setup::enableUnicode && ex_SHGetPathFromIDListW != NIL && ex_SHBrowseForFolderW != NIL)
 	{
-		infow.hwndOwner = parentWindow->hwnd;
-		infoa.hwndOwner = parentWindow->hwnd;
+		BROWSEINFOW	 infow;
+		wchar_t		*bufferw = new wchar_t [32768];
+
+		for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
+
+		if (parentWindow != NIL)	infow.hwndOwner = parentWindow->hwnd;
+		else				infow.hwndOwner = NIL;
+
+		infow.pidlRoot = NIL;
+		infow.pszDisplayName = bufferw;
+		infow.lpszTitle = caption;
+		infow.ulFlags = BIF_RETURNONLYFSDIRS;
+		infow.lpfn = NIL;
+		infow.lParam = 0;
+		infow.iImage = 0;
+
+		ex_SHGetPathFromIDListW(ex_SHBrowseForFolderW(&infow), bufferw);
+
+		directory = NIL;
+
+		if (bufferw != NIL && bufferw[0] != 0) directory = bufferw;
+
+		delete [] bufferw;
 	}
 	else
 	{
-		infow.hwndOwner = NIL;
-		infoa.hwndOwner = NIL;
+		BROWSEINFOA	 infoa;
+		char		*buffera = new char [32768];
+
+		for (Int i = 0; i < 32768; i++) buffera[i] = 0;
+
+		if (parentWindow != NIL)	infoa.hwndOwner = parentWindow->hwnd;
+		else				infoa.hwndOwner = NIL;
+
+		infoa.pidlRoot = NIL;
+		infoa.pszDisplayName = buffera;
+		infoa.lpszTitle = caption;
+		infoa.ulFlags = BIF_RETURNONLYFSDIRS;
+		infoa.lpfn = NIL;
+		infoa.lParam = 0;
+		infoa.iImage = 0;
+
+		ex_SHGetPathFromIDListA(ex_SHBrowseForFolderA(&infoa), buffera);
+
+		directory = NIL;
+
+		if (buffera != NIL && buffera[0] != 0) directory = buffera;
+
+		delete [] buffera;
 	}
 
-	infow.pidlRoot = NIL;
-	infow.pszDisplayName = bufferw;
-	infow.lpszTitle = caption;
-	infow.ulFlags = BIF_RETURNONLYFSDIRS;
-	infow.lpfn = NIL;
-	infow.lParam = 0;
-	infow.iImage = 0;
-
-	infoa.pidlRoot = NIL;
-	infoa.pszDisplayName = buffera;
-	infoa.lpszTitle = caption;
-	infoa.ulFlags = BIF_RETURNONLYFSDIRS;
-	infoa.lpfn = NIL;
-	infoa.lParam = 0;
-	infoa.iImage = 0;
-
-	if (Setup::enableUnicode)	SHGetPathFromIDListW(SHBrowseForFolderW(&infow), bufferw);
-	else				SHGetPathFromIDListA(SHBrowseForFolderA(&infoa), buffera);
-
-	directory = NIL;
-
-	if (Setup::enableUnicode && (bufferw != NIL && bufferw[0] != 0))	directory = bufferw;
-	else if (buffera != NIL && buffera[0] != 0)				directory = buffera;
-
-	delete [] bufferw;
-	delete [] buffera;
+	SHLObjMini_Deinit();
 
 	if (directory != NIL)
 	{

@@ -154,6 +154,7 @@ namespace smooth
 				Signal0<Void>			 onCreate;
 
 				Signal0<Void>			 onPaint;
+				Signal0<Void>			 onResize;
 				Signal0<Void>			 onPeek;
 				Signal3<Void, Int, Int, Int>	 onEvent;
 			callbacks:

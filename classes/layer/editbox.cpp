@@ -44,6 +44,7 @@ S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int subType, Int iMa
 	promptPos			= 0;
 	timer				= NIL;
 	marking				= False;
+	invisibleChars			= 0;
 
 	possibleContainers.AddEntry(OBJ_LAYER);
 
@@ -122,10 +123,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 	Int	 nOfChars = objectProperties->text.Length();
 	Point	 p1;
 	Point	 p2;
-	String	 newtext;
-	Int	 newpos;
-	Int	 i;
-	Int	 prevPromptPos;
+	Int	 newpos = 0;
 	Int	 leftButton = 0;
 
 	frame.left	= realPos.x;
@@ -413,54 +411,23 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					}
 				}
 
-				Int	 oPromptPos = promptPos;
-
 				if (markEnd < oMarkStart)
 				{
 					markStart = markEnd;
 					markEnd = oMarkStart;
-					promptPos = markStart;
+					newpos = markStart;
 				}
 				else
 				{
 					markStart = oMarkStart;
-					promptPos = markEnd;
+					newpos = markEnd;
 				}
 
 				if (prevMarkStart != markStart || prevMarkEnd != markEnd)
 				{
-					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, oPromptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-					else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', oPromptPos), oPromptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-					p1.y = frame.top + 2;
-					p2.x = p1.x;
-					p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
-
-					surface->Line(p1, p2, Setup::ClientColor);
+					SetCursor(newpos);
 
 					MarkText(prevMarkStart, prevMarkEnd);
-
-					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-					else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-					p2.x = p1.x;
-
-					surface->Line(p1, p2, Setup::TextColor);
-
-					{
-						HIMC		 hImc = ImmGetContext(wnd->hwnd);
-						COMPOSITIONFORM	 info;
-
-						info.dwStyle = CFS_POINT;
-						info.ptCurrentPos.x = p1.x - 3;
-						info.ptCurrentPos.y = p1.y - 2;
-
-						ImmSetCompositionWindow(hImc, &info);
-
-						ImmDestroyContext(hImc);
-					}
-
-					promptVisible = True;
 				}
 			}
 
@@ -494,41 +461,12 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						if (wParam == VK_RIGHT && promptPos >= nOfChars)break;
 						if (wParam == VK_END && promptPos >= nOfChars)	break;
 
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+						if (wParam == VK_LEFT)	newpos = promptPos - 1;
+						if (wParam == VK_RIGHT)	newpos = promptPos + 1;
+						if (wParam == VK_HOME)	newpos = 0;
+						if (wParam == VK_END)	newpos = nOfChars;
 
-						p1.y = frame.top + 2;
-						p2.x = p1.x;
-						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
-
-						surface->Line(p1, p2, Setup::ClientColor);
-
-						if (wParam == VK_LEFT)	promptPos--;
-						if (wParam == VK_RIGHT)	promptPos++;
-						if (wParam == VK_HOME)	promptPos = 0;
-						if (wParam == VK_END)	promptPos = nOfChars;
-
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-						p2.x = p1.x;
-
-						surface->Line(p1, p2, Setup::TextColor);
-
-						{
-							HIMC		 hImc = ImmGetContext(wnd->hwnd);
-							COMPOSITIONFORM	 info;
-
-							info.dwStyle = CFS_POINT;
-							info.ptCurrentPos.x = p1.x - 3;
-							info.ptCurrentPos.y = p1.y - 2;
-
-							ImmSetCompositionWindow(hImc, &info);
-
-							ImmDestroyContext(hImc);
-						}
-
-						promptVisible = True;
+						SetCursor(newpos);
 
 						break;
 					case VK_RETURN:
@@ -537,84 +475,25 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						break;
 					case VK_BACK:
 					case VK_DELETE:
-						if (markStart != markEnd)
-						{
-							DeleteSelectedText();
+						if (markStart != markEnd) { DeleteSelectedText(); break; }
 
-							break;
-						}
-
-						if (promptPos == 0 && wParam == VK_BACK) break;
-						if (promptPos == nOfChars && wParam == VK_DELETE) break;
-
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-						p1.y = frame.top + 2;
-						p2.x = p1.x;
-						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
-
-						surface->Line(p1, p2, Setup::ClientColor);
+						if (promptPos == 0 && wParam == VK_BACK)		break;
+						if (promptPos == nOfChars && wParam == VK_DELETE)	break;
 
 						if (wParam == VK_BACK)
 						{
-							for (i = 0; i < promptPos - 1; i++)
-							{
-								newtext[i] = objectProperties->text[i];
-							}
+							markStart = promptPos - 1;
+							markEnd = promptPos;
 
-							for (i = promptPos - 1; i < nOfChars; i++)
-							{
-								newtext[i] = objectProperties->text[i + 1];
-							}
+							DeleteSelectedText();
 						}
 						else
 						{
-							for (i = 0; i < promptPos; i++)
-							{
-								newtext[i] = objectProperties->text[i];
-							}
+							markStart = promptPos;
+							markEnd = promptPos + 1;
 
-							for (i = promptPos; i < nOfChars; i++)
-							{
-								newtext[i] = objectProperties->text[i + 1];
-							}
+							DeleteSelectedText();
 						}
-
-						if (wParam == VK_BACK)
-						{
-							promptPos--;
-						}
-
-						prevPromptPos = promptPos;
-
-						SetText(newtext);
-
-						promptPos = prevPromptPos;
-
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-						p1.y = frame.top + 2;
-						p2.x = p1.x;
-						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
-
-						surface->Line(p1, p2, Setup::TextColor);
-
-						{
-							HIMC		 hImc = ImmGetContext(wnd->hwnd);
-							COMPOSITIONFORM	 info;
-
-							info.dwStyle = CFS_POINT;
-							info.ptCurrentPos.x = p1.x - 3;
-							info.ptCurrentPos.y = p1.y - 2;
-
-							ImmSetCompositionWindow(hImc, &info);
-
-							ImmDestroyContext(hImc);
-						}
-
-						promptVisible = True;
 
 						break;
 					default:
@@ -686,61 +565,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					{
 						if (Binary::IsFlagSet(subtype, EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) break;
 
-						for (i = 0; i < promptPos; i++)
-						{
-							newtext[i] = objectProperties->text[i];
-						}
-
-						for (i = promptPos; i < promptPos + insertText.Length(); i++)
-						{
-							newtext[i] = insertText[i - promptPos];
-						}
-
-						for (i = promptPos; i <= nOfChars; i++)
-						{
-							newtext[i + insertText.Length()] = objectProperties->text[i];
-						}
-
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-						p1.y = frame.top + 2;
-						p2.x = p1.x;
-						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
-
-						surface->Line(p1, p2, Setup::ClientColor);
-
-						promptPos += insertText.Length();
-
-						prevPromptPos = promptPos;
-
-						SetText(newtext);
-
-						promptPos = prevPromptPos;
-
-						if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-						else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-						p1.y = frame.top + 2;
-						p2.x = p1.x;
-						p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
-
-						surface->Line(p1, p2, Setup::TextColor);
-
-						{
-							HIMC		 hImc = ImmGetContext(wnd->hwnd);
-							COMPOSITIONFORM	 info;
-
-							info.dwStyle = CFS_POINT;
-							info.ptCurrentPos.x = p1.x - 3;
-							info.ptCurrentPos.y = p1.y - 2;
-
-							ImmSetCompositionWindow(hImc, &info);
-
-							ImmDestroyContext(hImc);
-						}
-
-						promptVisible = True;
+						InsertText(insertText);
 					}
 				}
 
@@ -748,65 +573,15 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				if (wParam >= 32)
 				{
-					if (markStart != markEnd)
-					{
-						DeleteSelectedText();
-					}
+					DeleteSelectedText();
 
 					if (Binary::IsFlagSet(subtype, EDB_NUMERIC) && (wParam < '0' || wParam > '9') && wParam != 45 && wParam != '.') break;
 
-					for (i = 0; i < promptPos; i++)
-					{
-						newtext[i] = objectProperties->text[i];
-					}
+					String	 insertText;
 
-					newtext[(int) promptPos] = wParam;
+					insertText[0] = wParam;
 
-					for (i = promptPos; i <= nOfChars; i++)
-					{
-						newtext[i+1] = objectProperties->text[i];
-					}
-
-					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-					else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-					p1.y = frame.top + 2;
-					p2.x = p1.x;
-					p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
-
-					surface->Line(p1, p2, Setup::ClientColor);
-
-					promptPos++;
-
-					prevPromptPos = promptPos;
-
-					SetText(newtext);
-
-					promptPos = prevPromptPos;
-
-					if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-					else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-					p1.y = frame.top + 2;
-					p2.x = p1.x;
-					p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
-
-					surface->Line(p1, p2, Setup::TextColor);
-
-					{
-						HIMC		 hImc = ImmGetContext(wnd->hwnd);
-						COMPOSITIONFORM	 info;
-
-						info.dwStyle = CFS_POINT;
-						info.ptCurrentPos.x = p1.x - 3;
-						info.ptCurrentPos.y = p1.y - 2;
-
-						ImmSetCompositionWindow(hImc, &info);
-
-						ImmDestroyContext(hImc);
-					}
-
-					promptVisible = True;
+					InsertText(insertText);
 				}
 			}
 
@@ -814,6 +589,57 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 	}
 
 	return retVal;
+}
+
+S::Void S::GUI::EditBox::SetCursor(Int newPos)
+{
+	Window	*wnd = myContainer->GetContainerWindow();
+
+	if (wnd == NIL) return;
+
+	Surface	*surface = myContainer->GetDrawSurface();
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
+	Point	 p1;
+	Point	 p2;
+
+	frame.left	= realPos.x;
+	frame.top	= realPos.y;
+	frame.right	= realPos.x + objectProperties->size.cx - 1;
+	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+
+	if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+
+	p1.y = frame.top + 2;
+	p2.x = p1.x;
+	p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
+
+	surface->Line(p1, p2, Setup::ClientColor);
+
+	promptPos = newPos;
+
+	if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+
+	p2.x = p1.x;
+
+	surface->Line(p1, p2, Setup::TextColor);
+
+	{
+		HIMC		 hImc = ImmGetContext(wnd->hwnd);
+		COMPOSITIONFORM	 info;
+
+		info.dwStyle = CFS_POINT;
+		info.ptCurrentPos.x = p1.x - 3;
+		info.ptCurrentPos.y = p1.y - 2;
+
+		ImmSetCompositionWindow(hImc, &info);
+
+		ImmDestroyContext(hImc);
+	}
+
+	promptVisible = True;
 }
 
 S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
@@ -882,77 +708,35 @@ S::Void S::GUI::EditBox::DeleteSelectedText()
 
 	MarkText(bMarkStart, bMarkEnd);
 
-	Window	*wnd = myContainer->GetContainerWindow();
-
-	if (wnd == NIL) return;
-
-	Surface	*surface = myContainer->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Rect	 frame;
-	Int	 i = 0;
 	Int	 nOfChars = objectProperties->text.Length();
-	Point	 p1;
-	Point	 p2;
-	String	 newtext;
-	Int	 prevPromptPos;
+	String	 newText;
+	Int	 prevPromptPos = promptPos;
 
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	for (Int i = 0; i < bMarkStart; i++)		newText[i] = objectProperties->text[i];
+	for (Int j = bMarkEnd; j <= nOfChars; j++)	newText[j - (bMarkEnd - bMarkStart)] = objectProperties->text[j];
 
-	for (i = 0; i < bMarkStart; i++)
-	{
-		newtext[i] = objectProperties->text[i];
-	}
-
-	for (i = bMarkEnd; i <= nOfChars; i++)
-	{
-		newtext[i - (bMarkEnd - bMarkStart)] = objectProperties->text[i];
-	}
-
-
-
-	if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-	else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-
-	p1.y = frame.top + 2;
-	p2.x = p1.x;
-	p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
-
-	surface->Line(p1, p2, Setup::ClientColor);
-
-	promptPos = bMarkStart;
-
-	prevPromptPos = promptPos;
-
-	SetText(newtext);
+	SetText(newText);
 
 	promptPos = prevPromptPos;
 
-	if (!Binary::IsFlagSet(subtype, EDB_ASTERISK))	p1.x = frame.left + 3 + GetTextSizeX(objectProperties->text, promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
-	else						p1.x = frame.left + 3 + GetTextSizeX(String().FillN('*', promptPos), promptPos, objectProperties->font, objectProperties->fontSize, objectProperties->fontWeight);
+	SetCursor(bMarkStart);
+}
 
-	p1.y = frame.top + 2;
-	p2.x = p1.x;
-	p2.y = p1.y + METRIC_EDITBOXLINEHEIGHT;
+S::Void S::GUI::EditBox::InsertText(String insertText)
+{
+	Int	 nOfChars = objectProperties->text.Length();
+	String	 newText;
+	Int	 prevPromptPos = promptPos;
 
-	surface->Line(p1, p2, Setup::TextColor);
+	for (Int i = 0; i < promptPos; i++)					newText[i] = objectProperties->text[i];
+	for (Int j = promptPos; j < promptPos + insertText.Length(); j++)	newText[j] = insertText[j - promptPos];
+	for (Int k = promptPos; k <= nOfChars; k++)				newText[k + insertText.Length()] = objectProperties->text[k];
 
-	{
-		HIMC		 hImc = ImmGetContext(wnd->hwnd);
-		COMPOSITIONFORM	 info;
+	SetText(newText);
 
-		info.dwStyle = CFS_POINT;
-		info.ptCurrentPos.x = p1.x - 3;
-		info.ptCurrentPos.y = p1.y - 2;
+	promptPos = prevPromptPos;
 
-		ImmSetCompositionWindow(hImc, &info);
-
-		ImmDestroyContext(hImc);
-	}
-
-	promptVisible = True;
+	SetCursor(promptPos + insertText.Length());
 }
 
 S::Int S::GUI::EditBox::Deactivate()

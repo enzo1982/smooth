@@ -46,9 +46,12 @@ namespace smooth
 				Bool		 marking;
 				Bool		 isAsterisk;
 				Int		 maxSize;
+				Int		 invisibleChars;
 
+				Void		 SetCursor(Int);
 				Void		 MarkText(Int, Int);
 				Void		 DeleteSelectedText();
+				Void		 InsertText(String);
 			public:
 						 EditBox(String, Point, Size, Int, Int);
 						~EditBox();

@@ -928,3 +928,8 @@ S::Void S::GUI::ListBox::ScrollbarProc()
 		surface->EndPaint();
 	}
 }
+
+S::Void S::GUI::ListBox::CheckFlags()
+{
+	if (flags & LF_ADDNILENTRY) addNil = True;
+}

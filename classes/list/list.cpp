@@ -19,6 +19,7 @@
 S::List::List()
 {
 	referenceList = NIL;
+	addNil = False;
 }
 
 S::List::~List()
@@ -56,6 +57,8 @@ S::Int S::List::ModifyEntry(Int id, String name)
 
 	if (entry != NIL)
 	{
+		if (entry->name == name) return Break;
+
 		entry->name = name;
 
 		return Success;
@@ -138,15 +141,21 @@ S::Int S::List::SetReferenceList(List *nRefList)
 	return Success;
 }
 
+S::Void S::List::CheckFlags()
+{
+}
+
 S::Bool S::List::IsListSane()
 {
+	CheckFlags();
+
 	if (referenceList == NIL) return True;
-	if (GetNOfEntries() != referenceList->GetNOfEntries()) return False;
+	if (GetNOfEntries() != (referenceList->GetNOfEntries() + (addNil ? 1 : 0))) return False;
 
 	for (Int i = 0; i < referenceList->GetNOfEntries(); i++)
 	{
-		if (referenceList->GetNthEntry(i)->id != GetNthEntry(i)->id)		return False;
-		else if (referenceList->GetNthEntry(i)->name != GetNthEntry(i)->name)	return False;
+		if (referenceList->GetNthEntry(i)->id != GetNthEntry(i + (addNil ? 1 : 0))->id)			return False;
+		else if (referenceList->GetNthEntry(i)->name != GetNthEntry(i + (addNil ? 1 : 0))->name)	return False;
 	}
 
 	return True;
@@ -160,7 +169,10 @@ S::Int S::List::SynchronizeList()
 
 	referenceList = NIL;
 
+	CheckFlags();
 	RemoveAll();
+
+	if (addNil) AddEntry("", 2147483647);
 
 	for (Int i = 0; i < rList->GetNOfEntries(); i++)
 	{

@@ -24,19 +24,6 @@
 #include <smooth/pciio.h>
 #include <smooth/mdiwindow.h>
 
-S::String S::SMOOTH::StartDirectory = NIL;
-
-S::Bool S::SMOOTH::SetStartDirectory(String dir)
-{
-	int	 len = dir.Length() - 1;
-
-	if (dir[len] != '\\') dir[++len] = '\\';
-
-	SMOOTH::StartDirectory = dir;
-
-	return Success;
-}
-
 S::Void S::SMOOTH::SendMessage(GUI::Window *window, Int message, Int wParam, Int lParam)
 {
 	if (window != NIL)
@@ -88,19 +75,25 @@ HBITMAP S::SMOOTH::LoadImage(String file, Int id, String name)
 {
 	HBITMAP	 bmp;
 	PCIIn	 pci = OpenPCIForInput((char *) file);
-	String	 startdir = SMOOTH::StartDirectory;
 
 	if (pci->GetLastError() != IOLIB_ERROR_OK)
 	{
 		ClosePCI(pci);
 
-		pci = OpenPCIForInput((char *) startdir.Append(file));
+		pci = OpenPCIForInput((char *) Application::GetStartupDirectory().Append(file));
 
 		if (pci->GetLastError() != IOLIB_ERROR_OK)
 		{
 			ClosePCI(pci);
 
-			return NIL;
+			pci = OpenPCIForInput((char *) Application::GetApplicationDirectory().Append(file));
+
+			if (pci->GetLastError() != IOLIB_ERROR_OK)
+			{
+				ClosePCI(pci);
+
+				return NIL;
+			}
 		}
 	}
 

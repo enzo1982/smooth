@@ -35,10 +35,7 @@ namespace smooth
 	class SMOOTHAPI SMOOTH
 	{
 		public:
-			static String		 StartDirectory;
-
 			static Void		 SetLanguage(Int);
-			static Bool		 SetStartDirectory(String);
 
 #ifdef __WIN32__
 			static HBITMAP		 LoadImage(String, Int, String);

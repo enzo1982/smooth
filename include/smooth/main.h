@@ -16,6 +16,7 @@
 #include "loop.h"
 #include "version.h"
 #include "string.h"
+#include "application.h"
 
 using namespace smooth;
 
@@ -39,26 +40,8 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdL
 		}
 	}
 
-	if (Setup::enableUnicode)
-	{
-		wchar_t	*buffer = new wchar_t [MAX_PATH];
-
-		GetCurrentDirectoryW(MAX_PATH, buffer);
-
-		SMOOTH::SetStartDirectory(buffer);
-
-		delete [] buffer;
-	}
-	else
-	{
-		char	*buffer = new char [MAX_PATH];
-
-		GetCurrentDirectoryA(MAX_PATH, buffer);
-
-		SMOOTH::SetStartDirectory(buffer);
-
-		delete [] buffer;
-	}
+	Application::GetStartupDirectory();
+	Application::GetApplicationDirectory();
 
 	Int	 retValue = Main();
 

@@ -685,7 +685,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 					BeginPaint(hwnd, &ps);
 
-					if (Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20)	Paint(SP_PAINT);
+					if (Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20)	Paint(SP_DELAYED);
 					else																						Paint(SP_UPDATE);
 
 					EndPaint(hwnd, &ps);
@@ -1023,7 +1023,7 @@ S::Int S::GUI::Window::Paint(Int message)
 			}
 		}
 
-		if (flags & WF_DELAYPAINT)
+		if ((message == SP_DELAYED) && (flags & WF_DELAYPAINT))
 		{
 			if (paintTimer != NIL) DeleteObject(paintTimer);
 
@@ -1031,7 +1031,7 @@ S::Int S::GUI::Window::Paint(Int message)
 			paintTimer->onInterval.Connect(&Window::PaintTimer, this);
 			paintTimer->Start(50);
 		}
-		else
+		else if (paintTimer == NIL)
 		{
 			PaintTimer();
 		}

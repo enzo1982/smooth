@@ -45,6 +45,8 @@ namespace smooth
 				Bool			 closeListBox;
 
 				Void			 ListBoxProc();
+
+				Void			 CheckFlags();
 			public:
 				static const Int	 classID;
 

@@ -23,10 +23,16 @@ namespace smooth
 {
 	class SMOOTHAPI Application : public Object, public Container
 	{
+		private:
+			static String		 startupDirectory;
+			static String		 applicationDirectory;
 		public:
 			static const Int	 classID;
 
 						 Application(String = NIL);
+
+			static String		 GetStartupDirectory();
+			static String		 GetApplicationDirectory();
 	};
 };
 

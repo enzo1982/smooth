@@ -33,6 +33,7 @@ namespace smooth
 		const Int	 LF_ALLOWRESELECT	= 2;
 		const Int	 LF_MULTICHECKBOX	= 4;
 		const Int	 LF_HIDEHEADER		= 8;
+		const Int	 LF_ADDNILENTRY		= 16;
 
 		class SMOOTHAPI ListBox : public Widget, public List
 		{
@@ -47,6 +48,8 @@ namespace smooth
 
 				Void			 ScrollbarProc();
 				Void			 DrawEntryText(String, Rect, Int);
+
+				Void			 CheckFlags();
 			public:
 				static const Int	 classID;
 

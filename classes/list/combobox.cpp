@@ -136,6 +136,8 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	if (!registered)	return Error;
 	if (!visible)		return Success;
 
+	if (flags & LF_ADDNILENTRY) addNil = True;
+
 	Surface		*surface = myContainer->GetDrawSurface();
 
 	EnterProtectedRegion();
@@ -202,7 +204,15 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 				frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
 				frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-				surface->SetText(operat->name, frame, objectProperties->font);
+				String	 text = operat->name;
+
+				for (Int k = 0; k < operat->name.Length(); k++)
+				{
+					if (operat->name[k] == '\t')	text[k] = 0;
+					else				text[k] = operat->name[k];
+				}
+
+				surface->SetText(text, frame, objectProperties->font);
 
 				frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 				frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -370,8 +380,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				if (!IsListSane()) SynchronizeList();
 
-				listBox->SetFlags(LF_ALLOWRESELECT);
+				listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
 				listBox->SetReferenceList(this);
+				listBox->AddTab("", 32768);
 
 				if (GetSelectedEntry() != NIL) listBox->SelectEntry(GetSelectedEntry()->id);
 
@@ -456,7 +467,15 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 							font.SetColor(Setup::ClientColor);
 
-							surface->SetText(operat->name, frame, font);
+							String	 text = operat->name;
+
+							for (Int k = 0; k < operat->name.Length(); k++)
+							{
+								if (operat->name[k] == '\t')	text[k] = 0;
+								else				text[k] = operat->name[k];
+							}
+
+							surface->SetText(text, frame, font);
 
 							frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 							frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -481,7 +500,15 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 							frame.top	+= METRIC_COMBOBOXTEXTOFFSETXY;
 							frame.right	-= (METRIC_COMBOBOXOFFSETX + 2);
 
-							surface->SetText(operat->name, frame, objectProperties->font);
+							String	 text = operat->name;
+
+							for (Int k = 0; k < operat->name.Length(); k++)
+							{
+								if (operat->name[k] == '\t')	text[k] = 0;
+								else				text[k] = operat->name[k];
+							}
+
+							surface->SetText(text, frame, objectProperties->font);
 
 							frame.right	+= (METRIC_COMBOBOXOFFSETX + 2);
 							frame.left	-= METRIC_COMBOBOXTEXTOFFSETXY;
@@ -605,4 +632,9 @@ S::Void S::GUI::ComboBox::ListBoxProc()
 				
 		toolWindow->SetOwner(this);
 	}
+}
+
+S::Void S::GUI::ComboBox::CheckFlags()
+{
+	if (flags & LF_ADDNILENTRY) addNil = True;
 }

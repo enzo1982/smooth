@@ -16,6 +16,7 @@
 #include "stk.h"
 #include "system.h"
 #include "messagebox.h"
+#include "application.h"
 
 using namespace smooth;
 
@@ -37,26 +38,8 @@ extern "C"
 					SMOOTH::MessageBox("This DLL might not be compatible with the\nSMOOTH library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
 				}
 
-				if (Setup::enableUnicode)
-				{
-					wchar_t	*buffer = new wchar_t [MAX_PATH];
-
-					GetCurrentDirectoryW(MAX_PATH, buffer);
-
-					SMOOTH::SetStartDirectory(buffer);
-
-					delete [] buffer;
-				}
-				else
-				{
-					char	*buffer = new char [MAX_PATH];
-
-					GetCurrentDirectoryA(MAX_PATH, buffer);
-
-					SMOOTH::SetStartDirectory(buffer);
-
-					delete [] buffer;
-				}
+				Application::GetStartupDirectory();
+				Application::GetApplicationDirectory();
 
 				AttachDLL();
 

@@ -26,9 +26,12 @@ namespace smooth
 	{
 		protected:
 			List			*referenceList;
+			Bool			 addNil;
 
 			Bool			 IsListSane();
 			Int			 SynchronizeList();
+
+			virtual Void		 CheckFlags();
 		public:
 						 List();
 						~List();

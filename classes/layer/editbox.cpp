@@ -714,6 +714,20 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 		ImmDestroyContext(hImc);
 	}
 
+	if (timer != NIL)
+	{
+		timer->Stop();
+
+		delete timer;
+
+		timer = NIL;
+	}
+
+	timer = new Timer();
+
+	timer->onInterval.Connect(&EditBox::TimerProc, this);
+	timer->Start(500);
+
 	promptVisible = True;
 }
 

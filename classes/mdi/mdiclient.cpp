@@ -1,8 +1,8 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the "Artistic License".
+  * modify it under the terms of "The Artistic License, Version 2.0".
   *
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
@@ -70,15 +70,15 @@ S::Int S::GUI::MDIClient::Paint(Int message)
 			{
 				db = (Divider *) object;
 
-				if (Binary::IsFlagSet(db->orientation, OR_VERT))
+				if (Binary::IsFlagSet(db->GetFlags(), OR_VERT))
 				{
-					if (Binary::IsFlagSet(db->orientation, OR_LEFT) && db->GetObjectProperties()->pos.x >= client.left - 3)		client.left = db->GetObjectProperties()->pos.x + 5;
-					else if (!Binary::IsFlagSet(db->orientation, OR_LEFT) && db->GetObjectProperties()->pos.x <= client.right + 1)	client.right = wnd->GetObjectProperties()->size.cx - db->GetObjectProperties()->pos.x - 2;
+					if (Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && db->GetObjectProperties()->pos.x >= client.left - 3)		client.left = db->GetObjectProperties()->pos.x + 5;
+					else if (!Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && db->GetObjectProperties()->pos.x <= client.right + 1)	client.right = wnd->GetObjectProperties()->size.cx - db->GetObjectProperties()->pos.x - 2;
 				}
-				else if (Binary::IsFlagSet(db->orientation, OR_HORZ))
+				else if (Binary::IsFlagSet(db->GetFlags(), OR_HORZ))
 				{
-					if (Binary::IsFlagSet(db->orientation, OR_TOP) && db->GetObjectProperties()->pos.y >= client.top - 2)		client.top = db->GetObjectProperties()->pos.y + 5;
-					else if (!Binary::IsFlagSet(db->orientation, OR_TOP) && db->GetObjectProperties()->pos.y <= client.bottom + 1)	client.bottom = wnd->GetObjectProperties()->size.cy - db->GetObjectProperties()->pos.y - 2;
+					if (Binary::IsFlagSet(db->GetFlags(), OR_TOP) && db->GetObjectProperties()->pos.y >= client.top - 2)		client.top = db->GetObjectProperties()->pos.y + 5;
+					else if (!Binary::IsFlagSet(db->GetFlags(), OR_TOP) && db->GetObjectProperties()->pos.y <= client.bottom + 1)	client.bottom = wnd->GetObjectProperties()->size.cy - db->GetObjectProperties()->pos.y - 2;
 				}
 			}
 		}

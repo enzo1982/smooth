@@ -1,8 +1,8 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the "Artistic License".
+  * modify it under the terms of "The Artistic License, Version 2.0".
   *
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
@@ -54,7 +54,7 @@ S::Int S::Timer::GetID()
 	return timerid;
 }
 
-S::Void WINAPI S::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
+S::Void WINAPI S::Timer::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
 {
 	for (S::Int i = 0; i < S::mainObjectManager->GetNOfObjects(); i++)
 	{

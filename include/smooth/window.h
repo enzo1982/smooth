@@ -1,8 +1,8 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the "Artistic License".
+  * modify it under the terms of "The Artistic License, Version 2.0".
   *
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
@@ -49,22 +49,16 @@ namespace smooth
 		const Int	 WO_SEPARATOR	= 1;
 		const Int	 WO_NOSEPARATOR	= 2;
 
-#ifdef __SMOOTH_DLL__
-		LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-#endif
-
 		class SMOOTHAPI Window : public Widget, public Container
 		{
-			friend LRESULT CALLBACK	WindowProc(HWND, UINT, WPARAM, LPARAM);
 			friend class SMOOTHAPI S::SMOOTH;
 			friend class SMOOTHAPI Menubar;
-			friend class SMOOTHAPI Client;
-			friend class SMOOTHAPI MDIClient;
 			friend class SMOOTHAPI Divider;
 			friend class SMOOTHAPI Titlebar;
 			friend class SMOOTHAPI Layer;
-			friend class SMOOTHAPI ToolWindow;
 			friend Int SMOOTHAPI S::Loop();
+			private:
+				static LRESULT CALLBACK		 WindowProc(HWND, UINT, WPARAM, LPARAM);
 			protected:
 				Int				 style;
 				Int				 exstyle;

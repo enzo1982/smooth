@@ -1,8 +1,8 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the "Artistic License".
+  * modify it under the terms of "The Artistic License, Version 2.0".
   *
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
@@ -30,7 +30,7 @@ TestKey::TestKey()
 	pos.x = 85;
 	pos.y = 28;
 
-	wnd	= new Window("TestKey - by Robert Kausch 2000-2003");
+	wnd	= new Window("TestKey - by Robert Kausch 2000-2004");
 	title	= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	text	= new Text("ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000", pos);
 

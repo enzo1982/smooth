@@ -1,8 +1,8 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the "Artistic License".
+  * modify it under the terms of "The Artistic License, Version 2.0".
   *
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
@@ -36,7 +36,7 @@
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
 S::Int		 S::GUI::Window::nOfActiveWindows = 0;
 
-LRESULT CALLBACK S::GUI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK S::GUI::Window::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	Window	*smoothWindow = Window::GetWindow(window);
 	Int	 retVal;
@@ -497,7 +497,7 @@ HWND S::GUI::Window::Create()
 
 			wndclassw.cbSize	= sizeof(wndclassw);
 			wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
-			wndclassw.lpfnWndProc	= GUI::WindowProc;
+			wndclassw.lpfnWndProc	= WindowProc;
 			wndclassw.cbClsExtra	= 0;
 			wndclassw.cbWndExtra	= 0;
 			wndclassw.hInstance	= hInstance;
@@ -518,7 +518,7 @@ HWND S::GUI::Window::Create()
 
 			wndclassa.cbSize	= sizeof(wndclassa);
 			wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
-			wndclassa.lpfnWndProc	= GUI::WindowProc;
+			wndclassa.lpfnWndProc	= WindowProc;
 			wndclassa.cbClsExtra	= 0;
 			wndclassa.cbWndExtra	= 0;
 			wndclassa.hInstance	= hInstance;

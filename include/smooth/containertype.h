@@ -1,8 +1,8 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the "Artistic License".
+  * modify it under the terms of "The Artistic License, Version 2.0".
   *
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
@@ -23,12 +23,11 @@ namespace smooth
 {
 	class SMOOTHAPI ContainerType
 	{
-		friend class SMOOTHAPI Container;
 		private:
 			Int		 type;
 			Container	*container;
 		public:
-					 ContainerType();
+					 ContainerType(Container *);
 					 ContainerType(const ContainerType &);
 
 			operator	 Int();

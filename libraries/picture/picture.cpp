@@ -1,14 +1,14 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the "Artistic License".
+  * modify it under the terms of "The Artistic License, Version 2.0".
   *
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-// this class is to be deprecated by smooth::Bitmap in the near future
+// this class will be obsoleted by smooth::Bitmap in the near future
 
 #include <smooth/definitions.h>
 #include <picture.h>
@@ -127,7 +127,7 @@ bool picture::BlitToDC(HDC dc, RECT *rcTrg, RECT *rcSrc)
 	RECT rc = { 0, 0, width, height }; 
 	SIZE szS;
 	SIZE szT;
-
+
 	if (bmPic)
 	{
 		if (!rcSrc) rcSrc = &rc;

@@ -1,8 +1,8 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2003 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the "Artistic License".
+  * modify it under the terms of "The Artistic License, Version 2.0".
   *
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
@@ -15,11 +15,10 @@
 
 const S::Int	 S::Container::classID = S::Object::RequestClassID();
 
-S::Container::Container()
+S::Container::Container() : containerType(this)
 {
 	self			= NIL;
 	nOfObjects		= 0;
-	containerType.container	= this;
 	containerType		= classID;
 
 	nullSurface = new GUI::Surface();

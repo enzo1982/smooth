@@ -7,12 +7,14 @@ xx.xx.03 xx:xx - smooth alpha 0.8.63.0
 - i18n.cpp		- new class: Translator; implements the i18n system known from BonkEnc
 - extended.cpp		- new template: provides support for data driven code execution (Extended Data Types, EDT)
 
+- removed many friend declarations
 - added support for right-to-left scripts like Arabic or Hebrew
 - improved stability on Windows 9x/ME
 - upgraded to libxml v2.5.10
 - separated iconv from smooth - it is now only required for using non-latin scripts
 - smaller improvements
 - some bufixes
+- license changed to 'The Artistic License, Version 2.0'
 
 03.07.03 17:13 - smooth alpha 0.8.62.0
 

@@ -11,13 +11,12 @@
 #include <smooth/toolwindow.h>
 #include <smooth/graphics/window.h>
 #include <smooth/object.h>
-#include <smooth/divider.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
 #include <smooth/i18n.h>
 #include <smooth/objectproperties.h>
-#include <smooth/graphics/gdi/surfacegdi.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/layer.h>
 #include <smooth/math.h>
 

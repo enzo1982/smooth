@@ -93,6 +93,11 @@ $(OBJECTDIR)/surface.o: $(GRAPHICSCLASSESDIR)/surface.cpp $(SMOOTHINCLUDEDIR)/gr
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/surface.cpp -o $(OBJECTDIR)/surface.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/surfacebackend.o: $(GRAPHICSCLASSESDIR)/surfacebackend.cpp $(SMOOTHINCLUDEDIR)/graphics/surfacebackend.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/surfacebackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/surfacebackend.cpp -o $(OBJECTDIR)/surfacebackend.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/window.o: $(GRAPHICSCLASSESDIR)/window.cpp $(SMOOTHINCLUDEDIR)/graphics/window.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/window.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/window.cpp -o $(OBJECTDIR)/window.o

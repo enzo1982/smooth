@@ -23,7 +23,7 @@
 #include <smooth/toolwindow.h>
 #include <smooth/timer.h>
 #include <smooth/color.h>
-#include <smooth/graphics/gdi/surfacegdi.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/objectproperties.h>
 #include <smooth/menubar.h>
 #include <smooth/system.h>
@@ -367,7 +367,7 @@ S::Bool S::GUI::WindowGDI::Create()
 
 			windowDC = GetWindowDC(hwnd);
 
-			drawSurface = new SurfaceGDI(windowDC);
+			drawSurface = new Surface(windowDC);
 			drawSurface->SetSize(objectProperties->size);
 
 			onCreate.Emit();
@@ -721,9 +721,7 @@ S::Bool S::GUI::WindowGDI::IsMouseOn(Rect rect)
 {
 	Surface	*surface = GetDrawSurface();
 
-	if (surface->GetSurfaceType() != SURFACE_GDI) return False;
-
-	if (!PtVisible(((SurfaceGDI *) surface)->GetContext(), Input::MouseX() - objectProperties->pos.x, Input::MouseY() - objectProperties->pos.y)) return False;
+	if (!PtVisible((HDC) surface->GetContext(), Input::MouseX() - objectProperties->pos.x, Input::MouseY() - objectProperties->pos.y)) return False;
 
 	if ((MouseX() >= rect.left) && (MouseX() <= rect.right) && (MouseY() >= rect.top) && (MouseY() <= rect.bottom))	return True;
 	else														return False;

@@ -536,7 +536,7 @@ Void BeatClock::PaintAll()
 
 	surface->StartPaint(Rect(Point(10, 50), Size(wnd->GetObjectProperties()->size.cx - 20, 50)));
 
-	HDC			 dc = ((SurfaceGDI *) surface)->GetContext();
+	HDC			 dc = (HDC) surface->GetContext();
 	RECT			 textrect;
 	SYSTEMTIME		 time;
 	TIME_ZONE_INFORMATION	 tzi;

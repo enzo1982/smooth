@@ -9,16 +9,17 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/gdi/surfacegdi.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/color.h>
 #include <smooth/math.h>
 
-S::GUI::SurfaceGDI::SurfaceGDI(HDC iDc)
+S::GUI::SurfaceGDI::SurfaceGDI(Void *iDc)
 {
 	type = SURFACE_GDI;
 
-	gdi_dc = iDc;
-	real_dc = iDc;
+	gdi_dc = (HDC) iDc;
+	real_dc = (HDC) iDc;
 
 	size.cx	= GetDeviceCaps(gdi_dc, HORZRES) + 2;
 	size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
@@ -97,7 +98,7 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 	return Success;
 }
 
-HDC S::GUI::SurfaceGDI::GetContext()
+S::Void *S::GUI::SurfaceGDI::GetContext()
 {
 	if (painting)	return bmp_dc;
 	else		return gdi_dc;

@@ -19,7 +19,7 @@ namespace smooth
 	};
 };
 
-#include "../surface.h"
+#include "../surfacebackend.h"
 
 namespace smooth
 {
@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 SURFACE_GDI	= 1;
 
-		class SMOOTHAPI SurfaceGDI : public Surface
+		class SurfaceGDI : public SurfaceBackend
 		{
 			protected:
 				HDC	 gdi_dc;
@@ -36,7 +36,7 @@ namespace smooth
 
 				HBITMAP	 cDc_bitmap;
 			public:
-					 SurfaceGDI(HDC);
+					 SurfaceGDI(Void * = NIL);
 					~SurfaceGDI();
 
 				Int	 PaintRect(Rect);
@@ -44,7 +44,7 @@ namespace smooth
 				Int	 StartPaint(Rect);
 				Int	 EndPaint();
 
-				HDC	 GetContext();
+				Void	*GetContext();
 
 				Int	 SetPixel(Int, Int, Int);
 				Int	 GetPixel(Int, Int);

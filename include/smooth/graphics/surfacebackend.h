@@ -8,14 +8,13 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_SURFACE_
-#define _H_OBJSMOOTH_SURFACE_
+#ifndef _H_OBJSMOOTH_SURFACEBACKEND_
+#define _H_OBJSMOOTH_SURFACEBACKEND_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class Surface;
 		class SurfaceBackend;
 	};
 };
@@ -30,49 +29,53 @@ namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI Surface
+		const Int	 SURFACE_NULL = 0;
+
+		class SurfaceBackend
 		{
-			private:
-				SurfaceBackend	*backend;
+			protected:
+				Int		 type;
+
+				Size		 size;
+				Rect		 paintRect;
+
+				Int		 painting;
+
+				Int		 TranslateX(Int);
+				Point		 TranslatePoint(Point);
+				Rect		 TranslateRect(Rect);
 			public:
-						 Surface(Void * = NIL);
-						~Surface();
+						 SurfaceBackend(Void * = NIL);
+				virtual		~SurfaceBackend();
 
 				Int		 GetSurfaceType();
 
 				Int		 SetSize(Size);
 				Size		 GetSize();
 
-				Int		 PaintRect(Rect);
+				virtual Int	 PaintRect(Rect);
 
-				Int		 StartPaint(Rect);
-				Int		 EndPaint();
+				virtual Int	 StartPaint(Rect);
+				virtual Int	 EndPaint();
 
-				Void		*GetContext();
+				virtual Void	*GetContext();
 
-				Int		 SetPixel(Int, Int, Int);
-				Int		 GetPixel(Int, Int);
+				virtual Int	 SetPixel(Int, Int, Int);
+				virtual Int	 GetPixel(Int, Int);
 
-				Int		 Line(Point, Point, Int);
-				Int		 Frame(Rect, Int);
-				Int		 Box(Rect, Int, Int);
+				virtual Int	 Line(Point, Point, Int);
+				virtual Int	 Frame(Rect, Int);
+				virtual Int	 Box(Rect, Int, Int);
 
-				Int		 SetText(String, Rect, Font);
+				virtual Int	 SetText(String, Rect, Font);
 				Int		 SetShadowedText(String, Rect, Font);
 
 				Int		 Gradient(Rect, Int, Int, Int);
 				Int		 Bar(Point, Point, Int);
 
-				Int		 BlitFromBitmap(const Bitmap &, Rect, Rect);
-				Int		 BlitToBitmap(Rect, const Bitmap &, Rect);
+				virtual Int	 BlitFromBitmap(const Bitmap &, Rect, Rect);
+				virtual Int	 BlitToBitmap(Rect, const Bitmap &, Rect);
 		};
-
-		const Int	 FRAME_UP	= 0;
-		const Int	 FRAME_DOWN	= 1;
-		const Int	 FILLED		= 0;
-		const Int	 OUTLINED	= 1;
-		const Int	 OUTLINEDOTS	= 2;
-		const Int	 INVERT		= 3;
 	};
 };
 

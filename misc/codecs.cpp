@@ -173,8 +173,8 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 			{
 				out->OutputNumberPBD(0, 1);
 
-				ProbeComp(0, ior.sizex, line, lastline, ior.sizex, ctsize);
-				ProbeCompNVRLE(0, ior.sizex, line, lastline, ior.sizex, ctsize);
+				ProbeComp(0, ior.sizex, line, lastline, ior.sizex, ctsize, false, bits, bitssaa);
+				ProbeComp(0, ior.sizex, line, lastline, ior.sizex, ctsize, true, bitsnrle, bitssaanrle);
 
 				if (bitssaa < bits)
 				{
@@ -1045,7 +1045,7 @@ int GetPaletteEntry(int color)
 	return -1;
 }
 
-int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize)
+int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool nvRLE, int &rBits, int &rBitsSAA)
 {
 	int	 lastcol;
 	int	 pcirle;
@@ -1174,7 +1174,7 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize)
 				comp++;
 			}
 		}
-		else if (line[x] == prevline[x])
+		else if (line[x] == prevline[x] && !nvRLE)
 		{
 			pcirle = GetVRLE(line, prevline, sx, x, 8);
 			if (pcirle >= 2)
@@ -1203,148 +1203,8 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize)
 
 	for (int j = 0; j < 388; j++) palette[j] = oldpalette[j];
 
-	bits = comp;
-	bitssaa = comp + compsaa;
-
-	return 0;
-}
-
-int ProbeCompNVRLE(int s, int e, int line[], int prevline[], int sx, int ctsize)
-{
-	int	 lastcol;
-	int	 pcirle;
-	int	 allinpal = 0;
-	int	 gallinpal = 0;
-	int	 bits = 0;
-	int	 mod04 = 0;
-	int	 mod16 = 0;
-	int	 comp = 0;
-	int	 compsaa = 0;
-	int	 saa = 0;
-
-	int	 oldpalette[388];
-	int	 oldpalentries = palentries;
-
-	for (int i = 0; i < 388; i++) oldpalette[i] = palette[i];
-
-	for (int x = s; x < e; x++)
-	{
-		saa = 0;
-
-		if (x == 0)	lastcol = 0;
-		else		lastcol = line[x-1];
-
-		if ((x % 16) == mod16)
-		{
-			gallinpal = 1;
-			for (int x2 = 0; x2 < 16; x2++)
-			{
-				if ((x+x2) < sx) if (GetPaletteEntry(line[x+x2]) == -1 )	{ gallinpal = 0; break; }
-			}
-			comp++;
-		}
-		if (((x % 4) == mod04) && !gallinpal)
-		{
-			allinpal = 1;
-			for (int x2 = 0; x2 < 4; x2++)
-			{
-				if ((x+x2) < sx) if (GetPaletteEntry(line[x+x2]) == -1 )	{ allinpal = 0; break; }
-			}
-			comp++;
-		}
-
-		if ((GetPaletteEntry(line[x]) == -1))
-		{
-			if (GetDelta(line, prevline, x, ctsize))
-			{
-				comp += 9;
-			}
-			else
-			{
-				comp += 26;
-			}
-			if (palentries < 338)
-			{
-				palette[palentries] = line[x];
-				palentries++;
-			}
-			else
-			{
-				RotatePalette(line[x]);
-			}
-		}
-		else
-		{
-			if (!allinpal && !gallinpal) comp++;
-
-			compsaa++;
-
-			if (GetSAA(line, prevline, x)) saa = 1;
-
-			if ((palentries-1)-GetPaletteEntry(line[x]) < 2)
-			{
-				comp += 2;
-				if (saa) compsaa -= 2;
-			}
-			else
-			{
-				if ((palentries-1)-GetPaletteEntry(line[x]) < 18)
-				{
-					bits = GetMinimumBits(palentries-2);
-					if (bits > 4) bits = 4;
-					comp += (bits + 2);
-					if (saa) compsaa -= (bits + 2);
-				}
-				else
-				{
-					if ((palentries-1)-GetPaletteEntry(line[x]) < 82)
-					{
-						bits = GetMinimumBits(palentries-18);
-						if (bits > 6) bits = 6;
-						comp += (bits + 3);
-						if (saa) compsaa -= (bits + 3);
-					}
-					else
-					{
-						comp += (GetMinimumBits(palentries-83)+3);
-						if (saa) compsaa -= (GetMinimumBits(palentries-83)+3);
-					}
-				}
-			}
-			RotatePaletteEntry(GetPaletteEntry(line[x]));
-		}
-
-		if (line[x] == lastcol)
-		{
-			pcirle = GetRLE(line, sx, x, 8);
-			if (pcirle >= 2)
-			{
-				if (pcirle > 9)
-				{
-					comp += 10;
-				}
-				else
-				{
-					comp += 5;
-				}
-				x = x + pcirle;
-				allinpal = 0;
-				gallinpal = 0;
-				mod04 = (x + 1) %  4;
-				mod16 = (x + 1) % 16;
-			}
-			else
-			{
-				comp++;
-			}
-		}
-	}
-	palentries = oldpalentries;
-
-	for (int j = 0; j < 388; j++) palette[j] = oldpalette[j];
-
-	bitsnrle = comp;
-	bitssaanrle = comp + compsaa;
+	rBits = comp;
+	rBitsSAA = comp + compsaa;
 
 	return 0;
 }

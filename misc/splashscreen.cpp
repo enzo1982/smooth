@@ -13,10 +13,6 @@
 #include <smooth/i18n.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/button.h>
-#include <smooth/titlebar.h>
-#include <smooth/layer.h>
-#include <smooth/metrics.h>
 #include <smooth/timer.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>

@@ -18,7 +18,7 @@
 #include <smooth/metrics.h>
 #include <smooth/math.h>
 #include <smooth/objectproperties.h>
-#include <smooth/graphics/gdi/surfacegdi.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/graphics/window.h>
 #include <smooth/titlebar.h>
 
@@ -306,7 +306,7 @@ S::Int S::MessageDialog::ShowDialog()
 S::Void S::MessageDialog::MessagePaintProc()
 {
 	Surface	*surface = msgbox->GetDrawSurface();
-	HDC	 dc = ((SurfaceGDI *) surface)->GetContext();
+	HDC	 dc = (HDC) surface->GetContext();
 	Rect	 txtrect;
 
 	txtrect.left = 17;

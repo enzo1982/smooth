@@ -23,6 +23,9 @@ char	*S::String::outputFormat	= origOutputFormat;
 
 S::Array<char *>	 S::String::allocatedBuffers;
 
+S::Int	 S::String::crc32_table[256];
+S::Bool	 S::String::crc32_initialized = False;
+
 S::String::String()
 {
 	wString = NIL;
@@ -101,12 +104,65 @@ S::Void S::String::ClearTemporaryBuffers()
 	allocatedBuffers.RemoveAll();
 }
 
+S::Void S::String::RelieveTemporaryBuffers()
+{
+	for (Int i = 0; i < allocatedBuffers.GetNOfEntries() - 1000; i++)
+	{
+		delete [] allocatedBuffers.GetFirstEntry();
+
+		allocatedBuffers.RemoveEntry(allocatedBuffers.GetNthEntryIndex(0));
+	}
+}
+
 S::Void S::String::Clean()
 {
 	if (wString != NIL) delete [] wString;
 
 	wString = NIL;
 	stringSize = 0;
+}
+
+S::Void S::String::CRC32_InitTable()
+{
+	UnsignedLong	 ulPolynomial = 0x04c11db7;
+
+	for (Int i = 0; i <= 0xFF; i++)
+	{
+		crc32_table[i] = CRC32_Reflect(i, 8) << 24;
+
+		for (Int j = 0; j < 8; j++) crc32_table[i] = (crc32_table[i] << 1) ^ (crc32_table[i] & (1 << 31) ? ulPolynomial : 0);
+
+		crc32_table[i] = CRC32_Reflect(crc32_table[i], 32);
+	}
+
+	crc32_initialized = True;
+}
+
+S::UnsignedLong S::String::CRC32_Reflect(UnsignedLong ref, char ch)
+{
+	UnsignedLong	 value(0);
+
+	for (Int i = 1; i < (ch + 1); i++)
+	{
+		if (ref & 1) value |= 1 << (ch - i);
+
+		ref >>= 1;
+	}
+
+	return value;
+}
+
+S::Int S::String::ComputeCRC32()
+{
+	if (!crc32_initialized) CRC32_InitTable();
+
+	UnsignedLong	 ulCRC(0xffffffff);
+	Int		 len = Length();
+	unsigned char	*buffer = (unsigned char *) (char *) *this;
+
+	while (len--) ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer++];
+
+	return ulCRC ^ 0xffffffff;
 }
 
 char *S::String::SetInputFormat(const char *iFormat)
@@ -450,6 +506,101 @@ S::String &S::String::Append(const String &str)
 	*this = composed;
 
 	delete [] composed;
+
+	return *this;
+}
+
+S::String &S::String::Replace(const char *str1, const char *str2)
+{
+	String	 str3 = str1;
+	String	 str4 = str2;
+
+	return Replace(str3, str4);
+}
+
+S::String &S::String::Replace(const wchar_t *str1, const wchar_t *str2)
+{
+	String	 str3 = str1;
+	String	 str4 = str2;
+
+	return Replace(str3, str4);
+}
+
+S::String &S::String::Replace(const char *str1, const String &str2)
+{
+	String	 str3 = str1;
+
+	return Replace(str3, str2);
+}
+
+S::String &S::String::Replace(const wchar_t *str1, const String &str2)
+{
+	String	 str3 = str1;
+
+	return Replace(str3, str2);
+}
+
+S::String &S::String::Replace(const String &str1, const String &str2)
+{
+	String	 bStr1(str1);
+	String	 bStr2(str2);
+
+	if (bStr1 == NIL) return *this;
+
+	for (Int i = 0; i <= Length() - bStr1.Length(); i++)
+	{
+		Bool	 foundString = True;
+
+		for (Int j = 0; j < bStr1.Length(); j++)
+		{
+			if (wString[i + j] != bStr1[j])
+			{
+				foundString = False;
+				break;
+			}
+		}
+
+		if (foundString)
+		{
+			if (bStr1.Length() == bStr2.Length())
+			{
+				for (Int k = 0; k < bStr2.Length(); k++) wString[i + k] = bStr2[k];
+
+				i += bStr2.Length() - 1;
+			}
+			else if (bStr1.Length() > bStr2.Length())
+			{
+				for (Int k = 0; k < bStr2.Length(); k++) wString[i + k] = bStr2[k];
+
+				for (Int l = bStr2.Length(); l < Length() - i - (bStr1.Length() - bStr2.Length()); l++) wString[i + l] = wString[i + l + (bStr1.Length() - bStr2.Length())];
+
+				wString[Length() - (bStr1.Length() - bStr2.Length())] = 0;
+
+				i += bStr2.Length() - 1;
+			}
+			else
+			{
+				Int	 length = Length();
+				wchar_t	*backup = new wchar_t [length + 1];
+
+				memcpy((void *) backup, (void *) wString, (length + 1) * 2);
+
+				delete [] wString;
+
+				wString = new wchar_t [length + 1 + (bStr2.Length() - bStr1.Length())];
+
+				memcpy((void *) wString, (void *) backup, i * 2);
+
+				for (Int k = 0; k < bStr2.Length(); k++) wString[i + k] = bStr2[k];
+
+				for (Int l = 0; l < length - i - bStr1.Length() + 1; l++) wString[i + bStr2.Length() + l] = backup[i + bStr1.Length() + l];
+
+				delete [] backup;
+
+				i += bStr2.Length() - 1;
+			}
+		}
+	}
 
 	return *this;
 }

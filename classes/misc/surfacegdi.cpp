@@ -278,21 +278,29 @@ S::Int S::GUI::SurfaceGDI::SetText(String string, Rect rect, Font font)
 			}
 		}
 
-		if (Setup::rightToLeft) rect.right = rect.left + GetTextSizeX(line, font.GetName(), font.GetSize(), font.GetWeight());
-
 		RECT	 Rect = TranslateRect(rect);
+		Bool	 rtl = False;
 
 		if (Setup::rightToLeft)
 		{
-			Rect.left--;
+			for (Int j = 0; j < line.Length(); j++)
+			{
+				if (line[j] > 127)
+				{
+					rtl = True;
+					break;
+				}
+			}
+
 			Rect.right--;
+			Rect.left--;
 		}
 
-		if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
-		else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
+		if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtl ? DT_RTLREADING : 0), NIL);
+		else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtl ? DT_RTLREADING : 0), NIL);
 
-		if (Setup::enableUnicode)	DrawTextExW(bmp_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
-		else				DrawTextExA(bmp_dc, line, -1, &Rect, DT_LEFT | DT_EXPANDTABS | DT_NOPREFIX, NIL);
+		if (Setup::enableUnicode)	DrawTextExW(bmp_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtl ? DT_RTLREADING : 0), NIL);
+		else				DrawTextExA(bmp_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtl ? DT_RTLREADING : 0), NIL);
 
 		rect.top += height;
 	}

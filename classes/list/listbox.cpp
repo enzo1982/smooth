@@ -434,9 +434,11 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 						frame.left += (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 						frame.top += METRIC_LISTBOXTEXTOFFSETXY;
+						frame.right -= 2;
 						DrawEntryText(operat->name, frame, operat->font.GetColor());
 						frame.left -= (METRIC_LISTBOXTEXTOFFSETXY + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 						frame.top -= METRIC_LISTBOXTEXTOFFSETXY;
+						frame.right += 2;
 					}
 
 					if (operat->clicked && frame.top < frame.bottom)
@@ -533,9 +535,11 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					operat->rect.left += (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top++;
+					operat->rect.right -= 1;
 					DrawEntryText(operat->name, operat->rect, Setup::GradientTextColor);
 					operat->rect.left -= (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top--;
+					operat->rect.right += 1;
 
 					if (operat->clicked)
 					{
@@ -614,9 +618,11 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					operat->rect.left += (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top++;
+					operat->rect.right -= 1;
 					DrawEntryText(operat->name, operat->rect, operat->font.GetColor());
 					operat->rect.left -= (1 + ((flags & LF_MULTICHECKBOX) ? 12 : 0));
 					operat->rect.top--;
+					operat->rect.right += 1;
 
 					if (operat->clicked)
 					{

@@ -36,6 +36,12 @@ namespace smooth
 
 			static Array<char *>	 allocatedBuffers;
 
+			static Int		 crc32_table[256];
+			static Bool		 crc32_initialized;
+
+			static Void		 CRC32_InitTable();
+			static UnsignedLong	 CRC32_Reflect(UnsignedLong, char);
+
 			Void			 ImportFormat(const char *, const char *);
 		public:
 						 String();
@@ -47,6 +53,7 @@ namespace smooth
 						~String();
 
 			static Void		 ClearTemporaryBuffers();
+			static Void		 RelieveTemporaryBuffers();
 
 			Void			 Clean();
 
@@ -54,10 +61,17 @@ namespace smooth
 			static char		*SetOutputFormat(const char *);
 
 			char			*ConvertTo(const char *);
+			Int			 ComputeCRC32();
 
 			String			&Append(const char *);
 			String			&Append(const wchar_t *);
 			String			&Append(const String &);
+
+			String			&Replace(const char *, const char *);
+			String			&Replace(const wchar_t *, const wchar_t *);
+			String			&Replace(const char *, const String &);
+			String			&Replace(const wchar_t *, const String &);
+			String			&Replace(const String &, const String &);
 
 			String			&Copy(const char *);
 			String			&Copy(const wchar_t *);

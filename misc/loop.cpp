@@ -214,7 +214,7 @@ S::Int S::Loop()
 			if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
 			else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 
-			if (++count == 1000) { count = 0; String::ClearTemporaryBuffers(); }
+			if (++count == 1000) { count = 0; String::RelieveTemporaryBuffers(); }
 
 			if (peekLoop == 0) break;
 		}
@@ -244,7 +244,7 @@ S::Int S::Loop()
 			if (Setup::enableUnicode)	DispatchMessageW(&msg);
 			else				DispatchMessageA(&msg);
 
-			if (++count == 1000) { count = 0; String::ClearTemporaryBuffers(); }
+			if (++count == 1000) { count = 0; String::RelieveTemporaryBuffers(); }
 
 			if (peekLoop > 0) break;
 		}

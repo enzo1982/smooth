@@ -2,7 +2,11 @@ ChangeLog for smooth
 
 xx.xx.03 xx:xx - smooth alpha 0.8.63.0
 
+- string.cpp		- new method: Replace(const String &, const String &); search for the first string and replace with the second
+			- new method: ComputeCRC32(); get the CRC32 hash sum of the string
+
 - added support for right-to-left scripts like Arabic or Hebrew
+- improved stability on Windows 9x/ME
 - smaller improvements
 - some bufixes
 

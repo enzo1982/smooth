@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/size.h>
+#include <smooth/primitives/size.h>
 
 S::Size::Size()
 {
@@ -36,6 +36,18 @@ S::Size S::Size::operator -(const Size &size)
 	return retS;
 }
 
+S::Bool S::Size::operator ==(const Size &size)
+{
+	if (cx == size.cx && cy == size.cy)	return True;
+	else					return False;
+}
+
+S::Bool S::Size::operator !=(const Size &size)
+{
+	if (cx != size.cx || cy != size.cy)	return True;
+	else					return False;
+}
+
 #ifdef __WIN32__
 S::Size::operator SIZE()
 {
@@ -47,7 +59,7 @@ S::Size::operator SIZE()
 	return size;
 }
 
-S::Size &S::Size::operator =(const SIZE size)
+S::Size &S::Size::operator =(const SIZE &size)
 {
 	cx = size.cx;
 	cy = size.cy;

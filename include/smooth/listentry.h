@@ -12,7 +12,7 @@
 #define _H_OBJSMOOTH_LISTENTRY_
 
 #include "object.h"
-#include "rect.h"
+#include "primitives/rect.h"
 #include "graphics/font.h"
 
 namespace smooth

@@ -24,7 +24,7 @@ namespace smooth
 #include "object.h"
 #include "graphics/font.h"
 #include "signals.h"
-#include "rect.h"
+#include "primitives/rect.h"
 
 namespace smooth
 {
@@ -80,7 +80,7 @@ namespace smooth
 				virtual Int			 SetPosition(Point);
 				virtual Int			 SetMetrics(Point, Size);
 
-				virtual Bool			 IsAffected(Rect &);
+				virtual Bool			 IsAffected(const Rect &);
 
 				virtual Bool			 IsTypeCompatible(Int);
 			signals:

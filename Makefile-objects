@@ -328,27 +328,27 @@ $(OBJECTDIR)/timer.o: $(MISCCLASSESDIR)/timer.cpp $(SMOOTHINCLUDEDIR)/timer.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/timer.cpp -o $(OBJECTDIR)/timer.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/line.o: $(PRIMITIVESCLASSESDIR)/line.cpp $(SMOOTHINCLUDEDIR)/line.h
+$(OBJECTDIR)/line.o: $(PRIMITIVESCLASSESDIR)/line.cpp $(SMOOTHINCLUDEDIR)/primitives/line.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/line.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/line.cpp -o $(OBJECTDIR)/line.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/point.o: $(PRIMITIVESCLASSESDIR)/point.cpp $(SMOOTHINCLUDEDIR)/point.h
+$(OBJECTDIR)/point.o: $(PRIMITIVESCLASSESDIR)/point.cpp $(SMOOTHINCLUDEDIR)/primitives/point.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/point.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/point.cpp -o $(OBJECTDIR)/point.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/primitive.o: $(PRIMITIVESCLASSESDIR)/primitive.cpp $(SMOOTHINCLUDEDIR)/primitive.h
+$(OBJECTDIR)/primitive.o: $(PRIMITIVESCLASSESDIR)/primitive.cpp $(SMOOTHINCLUDEDIR)/primitives/primitive.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/primitive.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/primitive.cpp -o $(OBJECTDIR)/primitive.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/rect.o: $(PRIMITIVESCLASSESDIR)/rect.cpp $(SMOOTHINCLUDEDIR)/rect.h
+$(OBJECTDIR)/rect.o: $(PRIMITIVESCLASSESDIR)/rect.cpp $(SMOOTHINCLUDEDIR)/primitives/rect.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/rect.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/rect.cpp -o $(OBJECTDIR)/rect.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/size.o: $(PRIMITIVESCLASSESDIR)/size.cpp $(SMOOTHINCLUDEDIR)/size.h
+$(OBJECTDIR)/size.o: $(PRIMITIVESCLASSESDIR)/size.cpp $(SMOOTHINCLUDEDIR)/primitives/size.h
 	$(ECHO) -n Compiling $(PRIMITIVESCLASSESDIR)/size.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(PRIMITIVESCLASSESDIR)/size.cpp -o $(OBJECTDIR)/size.o
 	$(ECHO) done.

@@ -27,7 +27,7 @@ namespace smooth
 		public:
 #ifdef __WIN32__
 			operator	 RECT();
-			Rect &operator	 =(const RECT);
+			Rect &operator	 =(const RECT &);
 #endif
 			Int		 left;
 			Int		 top;
@@ -35,10 +35,13 @@ namespace smooth
 			Int		 bottom;
 
 					 Rect();
-					 Rect(Point, Size);
+					 Rect(const Point &, const Size &);
 
-			static Bool	 DoRectsOverlap(Rect, Rect);
-			static Rect	 OverlapRect(Rect, Rect);
+			Bool operator	 ==(const Rect &);
+			Bool operator	 !=(const Rect &);
+
+			static Bool	 DoRectsOverlap(const Rect &, const Rect &);
+			static Rect	 OverlapRect(const Rect &, const Rect&);
 	};
 };
 

@@ -13,6 +13,10 @@
 
 #include "extended.h"
 
+template <class t> S::Extended<t>::Extended()
+{
+}
+
 template <class t> S::Extended<t>::Extended(const t &iValue)
 {
 	beforeWrite.Emit(iValue);

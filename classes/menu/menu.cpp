@@ -15,6 +15,7 @@
 #include <smooth/system.h>
 #include <smooth/metrics.h>
 #include <smooth/i18n.h>
+#include <smooth/objectproperties.h>
 
 const S::Int	 S::GUI::Menu::classID = S::Object::RequestClassID();
 
@@ -26,7 +27,6 @@ S::GUI::Menu::Menu()
 	containerType	= classID;
 
 	sizeset = False;
-	entrysizesset = False;
 }
 
 S::GUI::Menu::~Menu()
@@ -36,37 +36,11 @@ S::GUI::Menu::~Menu()
 
 S::GUI::MenuEntry *S::GUI::Menu::AddEntry(String text, Bitmap bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode, Int orientation)
 {
-	Int	 type	= SM_SEPARATOR;
-
-	if (text != NIL)	type = type | SM_TEXT;
-	if (bitmap != NIL)	type = type | SM_BITMAP;
-
-	MenuEntry	*newEntry = new MenuEntry(type);
-
-	newEntry->SetText(text);
-	newEntry->SetOrientation(orientation);
-
-	if (bitmap != NIL)
-	{
-		newEntry->bitmap	= bitmap;
-		newEntry->graymap	= bitmap;
-
-		newEntry->bitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
-
-		newEntry->graymap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
-		newEntry->graymap.GrayscaleBitmap();
-	}
-
-	newEntry->popup		= popupMenu;
-	newEntry->bVar		= bVar;
-	newEntry->iVar		= iVar;
-	newEntry->iCode		= iCode;
-	newEntry->sizeset	= False;
+	MenuEntry	*newEntry = new MenuEntry(text, bitmap, popupMenu, bVar, iVar, iCode, orientation);
 
 	if (RegisterObject(newEntry) == Success)
 	{
-		sizeset		= False;
-		entrysizesset	= False;
+		sizeset = False;
 
 		newEntry->Show();
 
@@ -108,12 +82,6 @@ S::Int S::GUI::Menu::Clear()
 
 S::Void S::GUI::Menu::GetSize()
 {
-	if (!entrysizesset)
-	{
-		GetMenuEntriesSize();
-
-		entrysizesset = True;
-	}
 	if (!sizeset)
 	{
 		popupsize.cx = GetSizeX();
@@ -134,10 +102,10 @@ S::Int S::GUI::Menu::GetSizeX()
 	{
 		MenuEntry	*entry = (MenuEntry *) assocObjects.GetNthEntry(i);
 
-		if (entry->size > greatest)
+		if (entry->GetObjectProperties()->textSize.cx > greatest)
 		{
-			mSize		= 50 + entry->size;
-			greatest	= entry->size;
+			mSize		= 50 + entry->GetObjectProperties()->textSize.cx;
+			greatest	= entry->GetObjectProperties()->textSize.cx;
 		}
 	}
 
@@ -159,21 +127,6 @@ S::Int S::GUI::Menu::GetSizeY()
 	}
 
 	return mSize;
-}
-
-S::Void S::GUI::Menu::GetMenuEntriesSize()
-{
-	if (assocObjects.GetNOfEntries() == 0) return;
-
-	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
-	{
-		MenuEntry	*operat = (MenuEntry *) assocObjects.GetNthEntry(i);
-		Font		 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
-
-		if (!operat->sizeset) operat->size = font.GetTextSizeX(operat->GetText());
-
-		operat->sizeset = True;
-	}
 }
 
 S::Int S::GUI::Menu::GetNOfEntries()

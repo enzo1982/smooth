@@ -12,6 +12,8 @@
 #include <time.h>
 #include "edit_component.h"
 
+using namespace smooth::GUI::Dialogs;
+
 Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 {
 	designer = des;

@@ -12,6 +12,8 @@
 #include <smooth/main.h>
 #include "beat.h"
 
+using namespace smooth::GUI::Dialogs;
+
 Int smooth::Main()
 {
 	BeatClock	*app = new BeatClock();

@@ -62,7 +62,7 @@ S::Int S::GUI::SurfaceBackend::SetSize(Size nSize)
 	return Success;
 }
 
-S::Size S::GUI::SurfaceBackend::GetSize()
+const S::Size S::GUI::SurfaceBackend::GetSize()
 {
 	return size;
 }

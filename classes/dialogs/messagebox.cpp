@@ -22,14 +22,12 @@
 #include <smooth/graphics/window.h>
 #include <smooth/titlebar.h>
 
-using namespace smooth::GUI;
+S::Int S::GUI::Dialogs::MessageDlg::nOfMessageBoxes = 0;
 
-S::Int S::MessageDialog::nOfMessageBoxes = 0;
-
-S::Int S::QuickMessage(String text, String title, Int buttons, char *icon)
+S::Int S::GUI::Dialogs::QuickMessage(String text, String title, Int buttons, char *icon)
 {
 	Int		 rVal;
-	MessageDialog	*app = new MessageDialog(text, title, buttons, (wchar_t *) icon);
+	MessageDlg	*app = new MessageDlg(text, title, buttons, (wchar_t *) icon);
 
 	rVal = app->ShowDialog();
 
@@ -38,10 +36,10 @@ S::Int S::QuickMessage(String text, String title, Int buttons, char *icon)
 	return rVal;
 }
 
-S::Int S::QuickMessage(String text, String title, Int buttons, wchar_t *icon)
+S::Int S::GUI::Dialogs::QuickMessage(String text, String title, Int buttons, wchar_t *icon)
 {
 	Int		 rVal;
-	MessageDialog	*app = new MessageDialog(text, title, buttons, icon);
+	MessageDlg	*app = new MessageDlg(text, title, buttons, icon);
 
 	rVal = app->ShowDialog();
 
@@ -50,14 +48,14 @@ S::Int S::QuickMessage(String text, String title, Int buttons, wchar_t *icon)
 	return rVal;
 }
 
-S::MessageDialog::MessageDialog(String text, String title, Int btns, wchar_t *icon)
+S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wchar_t *icon)
 {
 	msgicon = icon;
 
 	Create(text, title, btns);
 }
 
-S::Void S::MessageDialog::Create(String text, String title, Int btns)
+S::Void S::GUI::Dialogs::MessageDlg::Create(String text, String title, Int btns)
 {
 	msgbox		= new Window(title);
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
@@ -142,8 +140,8 @@ S::Void S::MessageDialog::Create(String text, String title, Int btns)
 	msgbox->RegisterObject(titlebar);
 	msgbox->RegisterObject(lay);
 
-	msgbox->onPaint.Connect(&MessageDialog::MessagePaintProc, this);
-	msgbox->doQuit.Connect(&MessageDialog::MessageKillProc, this);
+	msgbox->onPaint.Connect(&MessageDlg::MessagePaintProc, this);
+	msgbox->doQuit.Connect(&MessageDlg::MessageKillProc, this);
 
 	bpos.y = 14 + buttonHeight;
 	bsize.cy = 0;
@@ -160,7 +158,7 @@ S::Void S::MessageDialog::Create(String text, String title, Int btns)
 			if (msgbox->GetObjectProperties()->size.cx < (buttonWidth + 30)) msgbox->GetObjectProperties()->size.cx = buttonWidth + 30;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - buttonWidth) / 2 - 3;
 			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bpos, bsize);
-			okbutton->onClick.Connect(&MessageDialog::MessageOK, this);
+			okbutton->onClick.Connect(&MessageDlg::MessageOK, this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(okbutton);
 			break;
@@ -168,11 +166,11 @@ S::Void S::MessageDialog::Create(String text, String title, Int btns)
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
 			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bpos, bsize);
-			okbutton->onClick.Connect(&MessageDialog::MessageOK, this);
+			okbutton->onClick.Connect(&MessageDlg::MessageOK, this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
 			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bpos, bsize);
-			cancelbutton->onClick.Connect(&MessageDialog::MessageCancel, this);
+			cancelbutton->onClick.Connect(&MessageDlg::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(okbutton);
 			lay->RegisterObject(cancelbutton);
@@ -181,11 +179,11 @@ S::Void S::MessageDialog::Create(String text, String title, Int btns)
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
 			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, bpos, bsize);
-			yesbutton->onClick.Connect(&MessageDialog::MessageYes, this);
+			yesbutton->onClick.Connect(&MessageDlg::MessageYes, this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
 			nobutton = new Button(I18n::Translator::defaultTranslator->TranslateString("No"), NIL, bpos, bsize);
-			nobutton->onClick.Connect(&MessageDialog::MessageNo, this);
+			nobutton->onClick.Connect(&MessageDlg::MessageNo, this);
 			nobutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(yesbutton);
 			lay->RegisterObject(nobutton);
@@ -194,15 +192,15 @@ S::Void S::MessageDialog::Create(String text, String title, Int btns)
 			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
 			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, bpos, bsize);
-			yesbutton->onClick.Connect(&MessageDialog::MessageYes, this);
+			yesbutton->onClick.Connect(&MessageDlg::MessageYes, this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
 			nobutton = new Button(I18n::Translator::defaultTranslator->TranslateString("No"), NIL, bpos, bsize);
-			nobutton->onClick.Connect(&MessageDialog::MessageNo, this);
+			nobutton->onClick.Connect(&MessageDlg::MessageNo, this);
 			nobutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
 			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bpos, bsize);
-			cancelbutton->onClick.Connect(&MessageDialog::MessageCancel, this);
+			cancelbutton->onClick.Connect(&MessageDlg::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(yesbutton);
 			lay->RegisterObject(nobutton);
@@ -212,11 +210,11 @@ S::Void S::MessageDialog::Create(String text, String title, Int btns)
 			if (msgbox->GetObjectProperties()->size.cx < (2 * buttonWidth + 39)) msgbox->GetObjectProperties()->size.cx = 2 * buttonWidth + 39;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (2 * buttonWidth + 9)) / 2 - 3;
 			retrybutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Retry"), NIL, bpos, bsize);
-			retrybutton->onClick.Connect(&MessageDialog::MessageRetry, this);
+			retrybutton->onClick.Connect(&MessageDlg::MessageRetry, this);
 			retrybutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
 			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bpos, bsize);
-			cancelbutton->onClick.Connect(&MessageDialog::MessageCancel, this);
+			cancelbutton->onClick.Connect(&MessageDlg::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(retrybutton);
 			lay->RegisterObject(cancelbutton);
@@ -225,15 +223,15 @@ S::Void S::MessageDialog::Create(String text, String title, Int btns)
 			if (msgbox->GetObjectProperties()->size.cx < (3 * buttonWidth + 48)) msgbox->GetObjectProperties()->size.cx = 3 * buttonWidth + 48;
 			bpos.x = (msgbox->GetObjectProperties()->size.cx - (3 * buttonWidth + 18)) / 2 - 3;
 			abortbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Abort"), NIL, bpos, bsize);
-			abortbutton->onClick.Connect(&MessageDialog::MessageAbort, this);
+			abortbutton->onClick.Connect(&MessageDlg::MessageAbort, this);
 			abortbutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
 			retrybutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Retry"), NIL, bpos, bsize);
-			retrybutton->onClick.Connect(&MessageDialog::MessageRetry, this);
+			retrybutton->onClick.Connect(&MessageDlg::MessageRetry, this);
 			retrybutton->SetOrientation(OR_LOWERLEFT);
 			bpos.x += buttonWidth + 9;
 			ignorebutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Ignore"), NIL, bpos, bsize);
-			ignorebutton->onClick.Connect(&MessageDialog::MessageIgnore, this);
+			ignorebutton->onClick.Connect(&MessageDlg::MessageIgnore, this);
 			ignorebutton->SetOrientation(OR_LOWERLEFT);
 			lay->RegisterObject(abortbutton);
 			lay->RegisterObject(retrybutton);
@@ -247,7 +245,7 @@ S::Void S::MessageDialog::Create(String text, String title, Int btns)
 	msgbox->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - msgbox->GetObjectProperties()->size.cy) / 2 + (nOfMessageBoxes - 1) * 25;
 }
 
-S::MessageDialog::~MessageDialog()
+S::GUI::Dialogs::MessageDlg::~MessageDlg()
 {
 	switch (buttons)
 	{
@@ -290,20 +288,16 @@ S::MessageDialog::~MessageDialog()
 	DeleteObject(msgbox);
 }
 
-S::Int S::MessageDialog::ShowDialog()
+S::Int S::GUI::Dialogs::MessageDlg::ShowDialog()
 {
-	int	 rval;
-
 	nOfMessageBoxes++;
 
 	MessageBeep(MB_ICONASTERISK);
 
-	rval = msgbox->Stay();
-
-	return rval;
+	return msgbox->Stay();
 }
 
-S::Void S::MessageDialog::MessagePaintProc()
+S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 {
 	Surface	*surface = msgbox->GetDrawSurface();
 	HDC	 dc = (HDC) surface->GetSystemSurface();
@@ -346,7 +340,7 @@ S::Void S::MessageDialog::MessagePaintProc()
 	}
 }
 
-S::Bool S::MessageDialog::MessageKillProc()
+S::Bool S::GUI::Dialogs::MessageDlg::MessageKillProc()
 {
 	if (msgbox->value == 0) msgbox->value = IDCLOSE;
 
@@ -355,43 +349,43 @@ S::Bool S::MessageDialog::MessageKillProc()
 	return True;
 }
 
-S::Void S::MessageDialog::MessageOK()
+S::Void S::GUI::Dialogs::MessageDlg::MessageOK()
 {
 	msgbox->value = IDOK;
 	msgbox->Close();
 }
 
-S::Void S::MessageDialog::MessageCancel()
+S::Void S::GUI::Dialogs::MessageDlg::MessageCancel()
 {
 	msgbox->value = IDCANCEL;
 	msgbox->Close();
 }
 
-S::Void S::MessageDialog::MessageYes()
+S::Void S::GUI::Dialogs::MessageDlg::MessageYes()
 {
 	msgbox->value = IDYES;
 	msgbox->Close();
 }
 
-S::Void S::MessageDialog::MessageNo()
+S::Void S::GUI::Dialogs::MessageDlg::MessageNo()
 {
 	msgbox->value = IDNO;
 	msgbox->Close();
 }
 
-S::Void S::MessageDialog::MessageRetry()
+S::Void S::GUI::Dialogs::MessageDlg::MessageRetry()
 {
 	msgbox->value = IDRETRY;
 	msgbox->Close();
 }
 
-S::Void S::MessageDialog::MessageAbort()
+S::Void S::GUI::Dialogs::MessageDlg::MessageAbort()
 {
 	msgbox->value = IDABORT;
 	msgbox->Close();
 }
 
-S::Void S::MessageDialog::MessageIgnore()
+S::Void S::GUI::Dialogs::MessageDlg::MessageIgnore()
 {
 	msgbox->value = IDIGNORE;
 	msgbox->Close();

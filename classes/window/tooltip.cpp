@@ -74,7 +74,7 @@ S::Int S::GUI::Tooltip::Show()
 	wndRect.top	= 0;
 	wndRect.bottom	= 16;
 
-	Font	 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
+	Font	 font;
 
 	wndRect.right	= font.GetTextSizeX(objectProperties->text) + 6;
 
@@ -146,7 +146,7 @@ S::Int S::GUI::Tooltip::DrawTooltip()
 	wndRect.top	= 0;
 	wndRect.bottom	= 16;
 
-	Font	 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
+	Font	 font;
 
 	wndRect.right	= font.GetTextSizeX(objectProperties->text) + 6;
 

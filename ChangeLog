@@ -4,12 +4,12 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 
 - rect.cpp	- new methods: Bool DoRectsOverlap(Rect, Rect); and Rect OverlapRect(Rect, Rect);
 - widget.cpp	- new method: Bool IsAffected(Rect &); replaces corresponding STK function
-- window.cpp	- renamed Window to WindowBase; it is now a common base class for different system dependend implementations
+- window.cpp	- splitted into Frontend and Backend parts
 - windowgdi.cpp	- new class: WindowGDI; implements Window API for Win32 systems
 - bitmap.cpp	- splitted into a frontend and a system dependent backend part
 - surface.cpp	- splitted into a frontend and a system dependent backend part
 - messagebox.cpp- S::SMOOTH::MessageBox is now S::QuickMessage
-		- renamed MessageBoxApp to MessageDialog
+		- renamed MessageBoxApp to MessageDlg
 - callbackn.cpp	- You can now connect values directly to the Callback, the connected value will be returned without any function being called
 - config.cpp	- new class: Configuration; an interface to XML configuration files
 - tipodaydlg.cpp- new dialog: 'Tip of the Day' dialog window

@@ -37,7 +37,7 @@ S::GUI::ComboBox::ComboBox(Point pos, Size size)
 
 	possibleContainers.AddEntry(Layer::classID);
 
-	SetFont(Font(objectProperties->font.GetName(), I18N_SMALLFONTSIZE, Setup::ClientTextColor));
+	SetFont(Font(objectProperties->font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
 
 	objectProperties->pos.x = Math::Round(pos.x * Setup::FontSize);
 	objectProperties->pos.y = Math::Round(pos.y * Setup::FontSize);

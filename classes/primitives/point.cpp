@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/point.h>
+#include <smooth/primitives/point.h>
 
 S::Point::Point()
 {
@@ -36,6 +36,18 @@ S::Point S::Point::operator -(const Point &point)
 	return retP;
 }
 
+S::Bool S::Point::operator ==(const Point &point)
+{
+	if (x == point.x && y == point.y)	return True;
+	else					return False;
+}
+
+S::Bool S::Point::operator !=(const Point &point)
+{
+	if (x != point.x || y != point.y)	return True;
+	else					return False;
+}
+
 #ifdef __WIN32__
 S::Point::operator POINT()
 {
@@ -47,7 +59,7 @@ S::Point::operator POINT()
 	return point;
 }
 
-S::Point &S::Point::operator =(const POINT point)
+S::Point &S::Point::operator =(const POINT &point)
 {
 	x = point.x;
 	y = point.y;

@@ -8,33 +8,35 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_SIZE_
-#define _H_OBJSMOOTH_SIZE_
+#ifndef _H_OBJSMOOTH_PRIMITIVE_
+#define _H_OBJSMOOTH_PRIMITIVE_
 
 namespace smooth
 {
-	class Size;
+	class Primitive;
+
+	namespace GUI
+	{
+		class Surface;
+	};
 };
 
-#include "primitive.h"
+#include "../definitions.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Size : public Primitive
+	class SMOOTHAPI Primitive
 	{
+		protected:
+			UnsignedLong	 color;
 		public:
-#ifdef __WIN32__
-			operator	 SIZE();
-			Size &operator	 =(const SIZE);
-#endif
-			Int		 cx;
-			Int		 cy;
+					 Primitive();
+			virtual		~Primitive();
 
-					 Size();
-					 Size(Int, Int);
+			Int		 SetColor(UnsignedLong);
+			UnsignedLong	 GetColor();
 
-			Size operator	 +(const Size &);
-			Size operator	 -(const Size &);
+			virtual Int	 Draw(GUI::Surface *);
 	};
 };
 

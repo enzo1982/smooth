@@ -20,6 +20,7 @@ namespace smooth
 		private:
 			t			 var;
 		public:
+						 Extended();
 						 Extended(const t &);
 
 			t &operator		 =(t);

@@ -73,7 +73,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 		}
 	}
 
-	GetSize();
+	GetLayersSize();
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
@@ -230,7 +230,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	Layer	*object2;
 	Rect	 frame;
 
-	GetSize();
+	GetLayersSize();
 
 	frame.top	= realPos.y;
 	frame.right	= realPos.x;
@@ -320,7 +320,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::GUI::TabWidget::GetSize()
+S::Void S::GUI::TabWidget::GetLayersSize()
 {
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{

@@ -34,12 +34,10 @@ namespace smooth
 			protected:
 				Int			 GetSizeY();
 				Int			 GetSizeX();
-				Void			 GetMenuEntriesSize();
 			public:
 				static const Int	 classID;
 
 				Bool			 sizeset;
-				Bool			 entrysizesset;
 				Size			 popupsize;
 
 							 Menu();

@@ -66,7 +66,7 @@ S::Int S::GUI::Bitmap::GetBitmapType()
 	return backend->GetBitmapType();
 }
 
-S::Size S::GUI::Bitmap::GetSize()
+const S::Size S::GUI::Bitmap::GetSize()
 {
 	return backend->GetSize();
 }

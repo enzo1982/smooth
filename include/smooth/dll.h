@@ -34,7 +34,7 @@ extern "C"
 
 				if (System::GetVersionString() != (String) SMOOTH_VERSION)
 				{
-					QuickMessage("This DLL might not be compatible with the\nSMOOTH library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
+					GUI::Dialogs::QuickMessage("This DLL might not be compatible with the\nSMOOTH library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
 				}
 
 				Application::GetStartupDirectory();

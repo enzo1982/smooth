@@ -25,7 +25,7 @@ namespace smooth
 		public:
 #ifdef __WIN32__
 			operator	 POINT();
-			Point &operator	 =(const POINT);
+			Point &operator	 =(const POINT &);
 #endif
 			Int		 x;
 			Int		 y;
@@ -35,6 +35,9 @@ namespace smooth
 
 			Point operator	 +(const Point &);
 			Point operator	 -(const Point &);
+
+			Bool operator	 ==(const Point &);
+			Bool operator	 !=(const Point &);
 	};
 };
 

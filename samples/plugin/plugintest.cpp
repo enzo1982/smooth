@@ -13,6 +13,8 @@
 #include "plugin.h"
 #include "plugintest.h"
 
+using namespace smooth::GUI::Dialogs;
+
 Int smooth::Main()
 {
 	PlugInTest	*app = new PlugInTest();

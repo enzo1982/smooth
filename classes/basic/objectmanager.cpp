@@ -26,7 +26,7 @@ S::ObjectManager::ObjectManager()
 		iAmTheOne = False;
 
 #ifdef __WIN32__
-		QuickMessage("ObjectManager already exists! Creation refused!", "Error", MB_OK, IDI_INFORMATION);
+		GUI::Dialogs::QuickMessage("ObjectManager already exists! Creation refused!", "Error", MB_OK, IDI_INFORMATION);
 #endif
 
 		delete this;

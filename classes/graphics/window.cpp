@@ -352,6 +352,34 @@ S::String S::GUI::Window::GetStatusText()
 	return NIL;
 }
 
+S::Int S::GUI::Window::SetDefaultStatusText(String newStatus)
+{
+	defaultStatus = newStatus;
+
+	RestoreDefaultStatusText();
+
+	return Success;
+}
+
+S::Int S::GUI::Window::RestoreDefaultStatusText()
+{
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Object *object = assocObjects.GetNthEntry(i);
+
+		if (object == NIL) continue;
+
+		if (object->GetObjectType() == Statusbar::classID)
+		{
+			((Statusbar *) object)->SetText(defaultStatus);
+
+			break;
+		}
+	}
+
+	return Success;
+}
+
 S::Int S::GUI::Window::Show()
 {
 	if (!created) Create();
@@ -1308,6 +1336,10 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 			if (object->GetObjectType() == Titlebar::classID)
 			{
 				if (!Binary::IsFlagSet(object->GetFlags(), TB_MAXBUTTON)) flags = flags | WF_NORESIZE;
+			}
+			else if (object->GetObjectType() == Statusbar::classID)
+			{
+				SetDefaultStatusText(object->GetObjectProperties()->text);
 			}
 			else if (object->GetObjectType() == ToolWindow::classID)
 			{

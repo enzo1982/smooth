@@ -226,7 +226,7 @@ S::Void S::SetMetrics()
 			METRIC_LISTBOXSBOFFSET = 18;
 
 #ifdef __WIN32__
-			QuickMessage("You have selected large fonts in the Windows settings.\nIt is not recommended to use large fonts with smooth applications.\n\nClick OK to continue.", "Information", MB_OK, IDI_INFORMATION);
+			GUI::Dialogs::QuickMessage("You have selected large fonts in the Windows settings.\nIt is not recommended to use large fonts with smooth applications.\n\nClick OK to continue.", "Information", MB_OK, IDI_INFORMATION);
 
 #endif
 

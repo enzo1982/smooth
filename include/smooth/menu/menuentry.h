@@ -20,7 +20,7 @@ namespace smooth
 };
 
 #include "../object.h"
-#include "../rect.h"
+#include "../primitives/rect.h"
 #include "../graphics/font.h"
 #include "../graphics/bitmap.h"
 #include "../shortcut.h"
@@ -35,6 +35,10 @@ namespace smooth
 
 		class SMOOTHAPI MenuEntry : public Widget
 		{
+			private:
+				Int		 popupHandle;
+
+				Int		 CalcSize();
 			public:
 				Int		 type;
 
@@ -49,18 +53,16 @@ namespace smooth
 
 				Menu		*popup;
 
-				Int		 size;
-				Bool		 sizeset;
-
 				Int		 scKey;
 				Int		 scFlags;
 
 				Shortcut	*shortcut;
 
-						 MenuEntry(Int);
+						 MenuEntry(String, Bitmap, Menu *, Bool *, Int *, Int, Int);
 						~MenuEntry();
 
 				Int		 Paint(Int);
+				Int		 Process(Int, Int, Int);
 
 				Int		 SetText(String);
 				Int		 SetStatusText(String);
@@ -69,6 +71,8 @@ namespace smooth
 				Int		 SetBitmap(const Bitmap &);
 			signals:
 				Signal0<Void>	 onClick;
+			slots:
+				Void		 PopupProc();
 		};
 	};
 };

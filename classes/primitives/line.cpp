@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/line.h>
+#include <smooth/primitives/line.h>
 
 S::Line::Line()
 {
@@ -18,10 +18,22 @@ S::Line::Line()
 	ey = 0;
 }
 
-S::Line::Line(Point iStart, Point iEnd)
+S::Line::Line(const Point &iStart, const Point &iEnd)
 {
 	sx = iStart.x;
 	sy = iStart.y;
 	ex = iEnd.x;
 	ey = iEnd.y;
+}
+
+S::Bool S::Line::operator ==(const Line &line)
+{
+	if (sx == line.sx && sy == line.sy && ex == line.ex && ey == line.ey)	return True;
+	else									return False;
+}
+
+S::Bool S::Line::operator !=(const Line &line)
+{
+	if (sx != line.sx || sy != line.sy || ex != line.ex || ey != line.ey)	return True;
+	else									return False;
 }

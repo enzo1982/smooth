@@ -13,10 +13,13 @@
 
 namespace smooth
 {
-	class MessageBoxApp;
-
 	namespace GUI
 	{
+		namespace Dialogs
+		{
+			class MessageDlg;
+		}
+
 		class Window;
 		class Titlebar;
 		class Layer;
@@ -24,50 +27,56 @@ namespace smooth
 	};
 };
 
-#include "../application.h"
+#include "dialog.h"
 
 namespace smooth
 {
-	class MessageDialog : public Application
+	namespace GUI
 	{
-		private:
-			static Int	 nOfMessageBoxes;
-			Int		 lines;
-			String		 line[256];
-			wchar_t		*msgicon;
-			Int		 buttons;
-			GUI::Window	*msgbox;
-			GUI::Titlebar	*titlebar;
-			GUI::Layer	*lay;
-			GUI::Button	*okbutton;
-			GUI::Button	*yesbutton;
-			GUI::Button	*nobutton;
-			GUI::Button	*abortbutton;
-			GUI::Button	*cancelbutton;
-			GUI::Button	*retrybutton;
-			GUI::Button	*ignorebutton;
+		namespace Dialogs
+		{
+			class MessageDlg : public Dialog
+			{
+				private:
+					static Int	 nOfMessageBoxes;
+					Int		 lines;
+					String		 line[256];
+					wchar_t		*msgicon;
+					Int		 buttons;
+					Window		*msgbox;
+					Titlebar	*titlebar;
+					Layer		*lay;
+					Button		*okbutton;
+					Button		*yesbutton;
+					Button		*nobutton;
+					Button		*abortbutton;
+					Button		*cancelbutton;
+					Button		*retrybutton;
+					Button		*ignorebutton;
 
-			Void		 Create(String, String, Int);
-		public:
-					 MessageDialog(String, String, Int, wchar_t *);
-					~MessageDialog();
+					Void		 Create(String, String, Int);
+				public:
+							 MessageDlg(String, String, Int, wchar_t *);
+							~MessageDlg();
 
-			Void		 MessagePaintProc();
-			Bool		 MessageKillProc();
+					Void		 MessagePaintProc();
+					Bool		 MessageKillProc();
 
-			Void		 MessageOK();
-			Void		 MessageCancel();
-			Void		 MessageYes();
-			Void		 MessageNo();
-			Void		 MessageRetry();
-			Void		 MessageAbort();
-			Void		 MessageIgnore();
+					Void		 MessageOK();
+					Void		 MessageCancel();
+					Void		 MessageYes();
+					Void		 MessageNo();
+					Void		 MessageRetry();
+					Void		 MessageAbort();
+					Void		 MessageIgnore();
 
-			Int		 ShowDialog();
-	};
+					Int		 ShowDialog();
+			};
 
-	SMOOTHAPI Int	 QuickMessage(String, String, Int, char *);
-	SMOOTHAPI Int	 QuickMessage(String, String, Int, wchar_t *);
+			SMOOTHAPI Int	 QuickMessage(String, String, Int, char *);
+			SMOOTHAPI Int	 QuickMessage(String, String, Int, wchar_t *);
+		}
+	}
 };
 
 #endif

@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/rect.h>
+#include <smooth/primitives/rect.h>
 #include <smooth/math.h>
 
 S::Rect::Rect()
@@ -19,12 +19,25 @@ S::Rect::Rect()
 	bottom	= 0;
 }
 
-S::Rect::Rect(Point iPos, Size iSize)
+S::Rect::Rect(const Point &iPos, const Size &iSize)
 {
 	left	= iPos.x;
 	top	= iPos.y;
 	right	= left + iSize.cx;
 	bottom	= top + iSize.cy;
+}
+
+
+S::Bool S::Rect::operator ==(const Rect &rect)
+{
+	if (left == rect.left && top == rect.top && right == rect.right && bottom == rect.bottom)	return True;
+	else												return False;
+}
+
+S::Bool S::Rect::operator !=(const Rect &rect)
+{
+	if (left != rect.left || top != rect.top || right != rect.right || bottom != rect.bottom)	return True;
+	else												return False;
 }
 
 #ifdef __WIN32__
@@ -40,7 +53,7 @@ S::Rect::operator RECT()
 	return rect;
 }
 
-S::Rect &S::Rect::operator =(const RECT rect)
+S::Rect &S::Rect::operator =(const RECT &rect)
 {
 	left	= rect.left;
 	top	= rect.top;
@@ -52,7 +65,7 @@ S::Rect &S::Rect::operator =(const RECT rect)
 #endif
 
 
-S::Bool S::Rect::DoRectsOverlap(Rect rect1, Rect rect2)
+S::Bool S::Rect::DoRectsOverlap(const Rect &rect1, const Rect &rect2)
 {
 	if ((rect1.left < rect2.right) && (rect1.right > rect2.left) && (rect1.top < rect2.bottom) && (rect1.bottom > rect2.top))
 	{
@@ -64,7 +77,7 @@ S::Bool S::Rect::DoRectsOverlap(Rect rect1, Rect rect2)
 	}
 }
 
-S::Rect S::Rect::OverlapRect(Rect rect1, Rect rect2)
+S::Rect S::Rect::OverlapRect(const Rect &rect1, const Rect &rect2)
 {
 	Rect	 oRect;
 

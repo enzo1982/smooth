@@ -33,11 +33,9 @@ namespace smooth
 		class SMOOTHAPI Menubar : public Menu
 		{
 			private:
-				Int			 popupHandle;
-
-				String			 backupStatusText;
-
 				Int			 bitmapSize;
+			slots:
+				Void			 OnRegister();
 			public:
 				static const Int	 classID;
 
@@ -50,8 +48,6 @@ namespace smooth
 				Int			 SetBitmapSize(Int);
 
 				Surface			*GetDrawSurface();
-
-				Void			 PopupProc();
 		};
 	};
 };

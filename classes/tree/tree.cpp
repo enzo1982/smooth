@@ -96,6 +96,7 @@ S::Void S::Tree::GetSize()
 		GetTreeEntriesSize();
 		entrysizesset = True;
 	}
+
 	if (!sizeset)
 	{
 		subsize.cx = GetSizeX();
@@ -139,7 +140,7 @@ S::Void S::Tree::GetTreeEntriesSize()
 	for (Int i = 0; i < nOfEntries; i++)
 	{
 		Tree::Entry	*operat = entries.GetNthEntry(i);
-		GUI::Font	 font(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
+		GUI::Font	 font;
 
 		if (!operat->sizeset) operat->size = font.GetTextSizeX(operat->text);
 

@@ -8,26 +8,32 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_PRIMITIVE_
-#define _H_OBJSMOOTH_PRIMITIVE_
+#ifndef _H_OBJSMOOTH_LINE_
+#define _H_OBJSMOOTH_LINE_
 
 namespace smooth
 {
-	class Primitive;
-	class Drawable;
+	class Line;
 };
 
-#include "definitions.h"
+#include "primitive.h"
+#include "point.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Primitive
+	class SMOOTHAPI Line : public Primitive
 	{
 		public:
-					 Primitive();
-			virtual		~Primitive();
+			Int		 sx;
+			Int		 sy;
+			Int		 ex;
+			Int		 ey;
 
-			virtual Int	 Draw(Drawable *);
+					 Line();
+					 Line(const Point &, const Point &);
+
+			Bool operator	 ==(const Line &);
+			Bool operator	 !=(const Line &);
 	};
 };
 

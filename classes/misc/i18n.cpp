@@ -27,12 +27,6 @@ S::Int S::I18N_DEFAULTFONTSIZE;
 __declspec (dllexport)
 #endif
 
-S::Int S::I18N_SMALLFONTSIZE;
-
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
 S::String S::I18N_DEFAULTFONT;
 
 int CALLBACK EnumFontProcA(ENUMLOGFONTEXA *lpelfe, NEWTEXTMETRICEXA *lpntme, int fontType, LPARAM lParam)
@@ -76,7 +70,6 @@ S::I18n::Language::Language()
 		ReleaseDC(0, dc);
 
 		I18N_DEFAULTFONTSIZE = 8;
-		I18N_SMALLFONTSIZE = 8;
 	}
 }
 

@@ -22,7 +22,7 @@ namespace smooth
 };
 
 #include "widget.h"
-#include "rect.h"
+#include "primitives/rect.h"
 
 namespace smooth
 {

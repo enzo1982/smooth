@@ -32,7 +32,7 @@ namespace smooth
 				Array<Int>		 textSize;
 				Array<Bool>		 sizeSet;
 
-				Void			 GetSize();
+				Void			 GetLayersSize();
 			public:
 				static const Int	 classID;
 

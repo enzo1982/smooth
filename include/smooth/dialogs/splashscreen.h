@@ -13,39 +13,50 @@
 
 namespace smooth
 {
-	class SplashScreenApp;
 	class Timer;
 
 	namespace GUI
 	{
+		namespace Dialogs
+		{
+			class SplashScreenApp;
+		};
+
 		class Window;
 	};
 };
 
-#include "../definitions.h"
-#include "../application.h"
+#include "dialog.h"
 #include "../graphics/bitmap.h"
 
 namespace smooth
 {
-	class SplashScreenApp : public Application
+	namespace GUI
 	{
-		private:
-			static Int	 nOfSplashScreens;
-			Int		 time;
-			GUI::Bitmap	 bitmap;
-			GUI::Window	*splashscreen;
-			Timer		*timer;
-		public:
-					 SplashScreenApp(const GUI::Bitmap &, Int);
-					~SplashScreenApp();
-			Void		 SplashPaintProc();
-			Bool		 SplashKillProc();
-			Int		 ShowSplashScreen();
-			Void		 TimerProc();
-	};
+		namespace Dialogs
+		{
+			class SplashScreen : public Application
+			{
+				private:
+					static Int	 nOfSplashScreens;
 
-	SMOOTHAPI Int	 SplashScreen(const GUI::Bitmap &, Int);
+					Int		 time;
+					Bitmap		 bitmap;
+					Window		*splashscreen;
+					Timer		*timer;
+				slots:
+					Void		 SplashPaintProc();
+					Bool		 SplashKillProc();
+
+					Void		 TimerProc();
+				public:
+							 SplashScreen(const Bitmap &, Int);
+							~SplashScreen();
+
+					Int		 ShowDialog();
+			};
+		};
+	};
 };
 
 #endif

@@ -19,23 +19,9 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/window.h>
 
-using namespace smooth::GUI;
+S::Int S::GUI::Dialogs::SplashScreen::nOfSplashScreens = 0;
 
-S::Int S::SplashScreenApp::nOfSplashScreens = 0;
-
-S::Int S::SplashScreen(const GUI::Bitmap &logo, Int time)
-{
-	Int		 rVal;
-	SplashScreenApp	*app = new SplashScreenApp(logo, time);
-
-	rVal = app->ShowSplashScreen();
-
-	Object::DeleteObject(app);
-
-	return rVal;
-}
-
-S::SplashScreenApp::SplashScreenApp(const GUI::Bitmap &logo, Int t)
+S::GUI::Dialogs::SplashScreen::SplashScreen(const GUI::Bitmap &logo, Int t)
 {
 	splashscreen = new Window("Splash screen");
 
@@ -52,18 +38,18 @@ S::SplashScreenApp::SplashScreenApp(const GUI::Bitmap &logo, Int t)
 
 	splashscreen->RegisterObject(timer);
 
-	splashscreen->onPaint.Connect(&SplashScreenApp::SplashPaintProc, this);
-	splashscreen->doQuit.Connect(&SplashScreenApp::SplashKillProc, this);
+	splashscreen->onPaint.Connect(&SplashScreen::SplashPaintProc, this);
+	splashscreen->doQuit.Connect(&SplashScreen::SplashKillProc, this);
 
 	splashscreen->GetObjectProperties()->pos.x = (LiSAGetDisplaySizeX() - splashscreen->GetObjectProperties()->size.cx) / 2;
 	splashscreen->GetObjectProperties()->pos.y = (LiSAGetDisplaySizeY() - splashscreen->GetObjectProperties()->size.cy) / 2-40;
 
 	splashscreen->SetFlags(WF_NORESIZE | WF_TOPMOST);
 
-	timer->onInterval.Connect(&SplashScreenApp::TimerProc, this);
+	timer->onInterval.Connect(&SplashScreen::TimerProc, this);
 }
 
-S::SplashScreenApp::~SplashScreenApp()
+S::GUI::Dialogs::SplashScreen::~SplashScreen()
 {
 	splashscreen->UnregisterObject(timer);
 
@@ -73,10 +59,8 @@ S::SplashScreenApp::~SplashScreenApp()
 	DeleteObject(timer);
 }
 
-S::Int S::SplashScreenApp::ShowSplashScreen()
+S::Int S::GUI::Dialogs::SplashScreen::ShowDialog()
 {
-	Int	 rVal;
-
 	nOfSplashScreens++;
 
 	splashscreen->Show();
@@ -85,12 +69,10 @@ S::Int S::SplashScreenApp::ShowSplashScreen()
 
 	splashscreen->value = 1;
 
-	rVal = splashscreen->Stay();
-
-	return rVal;
+	return splashscreen->Stay();
 }
 
-S::Void S::SplashScreenApp::SplashPaintProc()
+S::Void S::GUI::Dialogs::SplashScreen::SplashPaintProc()
 {
 	Surface	*surface = splashscreen->GetDrawSurface();
 	Rect	 bmpRect;
@@ -103,7 +85,7 @@ S::Void S::SplashScreenApp::SplashPaintProc()
 	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 }
 
-S::Bool S::SplashScreenApp::SplashKillProc()
+S::Bool S::GUI::Dialogs::SplashScreen::SplashKillProc()
 {
 	if (splashscreen->value == 0) splashscreen->value = Success;
 
@@ -114,7 +96,7 @@ S::Bool S::SplashScreenApp::SplashKillProc()
 	return True;
 }
 
-S::Void S::SplashScreenApp::TimerProc()
+S::Void S::GUI::Dialogs::SplashScreen::TimerProc()
 {
 	if (splashscreen->value == 1)
 	{

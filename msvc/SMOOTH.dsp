@@ -424,10 +424,6 @@ SOURCE=..\classes\threads\thread.cpp
 
 SOURCE=..\classes\threads\threadbackend.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\classes\threads\threadmanager.cpp
-# End Source File
 # End Group
 # Begin Group "tree"
 
@@ -973,10 +969,6 @@ SOURCE=..\include\smooth\threads\thread.h
 # Begin Source File
 
 SOURCE=..\include\smooth\threads\threadbackend.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\threads\threadmanager.h
 # End Source File
 # End Group
 # Begin Source File

@@ -8,28 +8,36 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_LINE_
-#define _H_OBJSMOOTH_LINE_
+#ifndef _H_OBJSMOOTH_SIZE_
+#define _H_OBJSMOOTH_SIZE_
 
 namespace smooth
 {
-	class Line;
+	class Size;
 };
 
 #include "primitive.h"
-#include "point.h"
 
 namespace smooth
 {
-	class SMOOTHAPI Line : public Primitive
+	class SMOOTHAPI Size : public Primitive
 	{
 		public:
-			Int	 sx;
-			Int	 sy;
-			Int	 ex;
-			Int	 ey;
-				 Line();
-				 Line(Point, Point);
+#ifdef __WIN32__
+			operator	 SIZE();
+			Size &operator	 =(const SIZE &);
+#endif
+			Int		 cx;
+			Int		 cy;
+
+					 Size();
+					 Size(Int, Int);
+
+			Size operator	 +(const Size &);
+			Size operator	 -(const Size &);
+
+			Bool operator	 ==(const Size &);
+			Bool operator	 !=(const Size &);
 	};
 };
 

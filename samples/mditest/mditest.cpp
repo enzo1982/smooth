@@ -12,6 +12,8 @@
 #include <smooth/main.h>
 #include "mditest.h"
 
+using namespace smooth::GUI::Dialogs;
+
 Int smooth::Main()
 {
 	MDITest	*app = new MDITest();

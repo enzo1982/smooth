@@ -24,7 +24,7 @@ namespace smooth
 
 #include "../widget.h"
 #include "../container.h"
-#include "../rect.h"
+#include "../primitives/rect.h"
 #include "../loop.h"
 #include "../menu/menu.h"
 #include "../timer.h"
@@ -77,6 +77,8 @@ namespace smooth
 
 				String				 className;
 
+				String				 defaultStatus;
+
 				PopupMenu			*trackMenu;
 
 				Layer				*mainLayer;
@@ -109,6 +111,7 @@ namespace smooth
 				Int				 SetApplicationIcon(wchar_t *);
 
 				Int				 SetMetrics(Point, Size);
+
 				Void				 SetStyle(Int);
 				Void				 SetExStyle(Int);
 				Int				 SetText(String);
@@ -117,6 +120,9 @@ namespace smooth
 
 				Int				 SetStatusText(String);
 				String				 GetStatusText();
+
+				Int				 SetDefaultStatusText(String);
+				Int				 RestoreDefaultStatusText();
 
 				Rect				 GetWindowRect();
 				Rect				 GetClientRect();

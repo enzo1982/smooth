@@ -20,10 +20,6 @@ S::GUI::MDIWindow::MDIWindow(String title) : Window(title)
 	type				= classID;
 	containerType			= Window::classID;
 
-	objectProperties->pos.x		= 0;
-	objectProperties->pos.y		= 0;
-	objectProperties->size.cx	= 100;
-	objectProperties->size.cy	= 100;
 	objectProperties->orientation	= OR_FREE;
 
 	possibleContainers.RemoveAll();

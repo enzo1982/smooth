@@ -59,10 +59,6 @@
 #include "smooth/timer.h"
 #include "smooth/string.h"
 #include "smooth/tooltip.h"
-#include "smooth/point.h"
-#include "smooth/size.h"
-#include "smooth/rect.h"
-#include "smooth/line.h"
 #include "smooth/drag.h"
 #include "smooth/datetime.h"
 #include "smooth/binary.h"
@@ -80,6 +76,11 @@
 #include "smooth/types/float.h"
 #include "smooth/types/int.h"
 #include "smooth/types/void.h"
+
+#include "smooth/primitives/point.h"
+#include "smooth/primitives/size.h"
+#include "smooth/primitives/rect.h"
+#include "smooth/primitives/line.h"
 
 #include "smooth/threads/mutex.h"
 #include "smooth/threads/semaphore.h"

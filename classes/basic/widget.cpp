@@ -10,7 +10,7 @@
 
 #include <smooth/widget.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/rect.h>
+#include <smooth/primitives/rect.h>
 #include <smooth/container.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
@@ -43,7 +43,7 @@ S::Void S::GUI::Widget::GetTextSize()
 	objectProperties->textSize.cx = objectProperties->font.GetTextSizeX(objectProperties->text);
 	objectProperties->textSize.cy = objectProperties->font.GetTextSizeY(objectProperties->text);
 
-	Font	 tooltipFont(I18N_DEFAULTFONT, I18N_SMALLFONTSIZE, 0, FW_NORMAL);
+	Font	 tooltipFont;
 
 	objectProperties->tooltipSize.cx = tooltipFont.GetTextSizeX(objectProperties->tooltip);
 	objectProperties->tooltipSize.cy = tooltipFont.GetTextSizeY(objectProperties->tooltip);
@@ -309,7 +309,7 @@ S::Int S::GUI::Widget::SetMetrics(Point newPos, Size newSize)
 	return Success;
 }
 
-S::Bool S::GUI::Widget::IsAffected(Rect &uRect)
+S::Bool S::GUI::Widget::IsAffected(const Rect &uRect)
 {
 	Rect	 tRect;
 	Point	 realpos = objectProperties->pos;

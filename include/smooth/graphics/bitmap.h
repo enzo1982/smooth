@@ -22,8 +22,8 @@ namespace smooth
 };
 
 #include "../definitions.h"
-#include "../size.h"
-#include "../rect.h"
+#include "../primitives/size.h"
+#include "../primitives/rect.h"
 #include "../string.h"
 
 namespace smooth
@@ -44,7 +44,7 @@ namespace smooth
 
 				Int			 GetBitmapType();
 
-				Size			 GetSize();
+				const Size		 GetSize();
 				Int			 GetDepth();
 
 				UnsignedByte		*GetBytes();

@@ -22,8 +22,6 @@ namespace smooth
 #include "string.h"
 #include "array.h"
 #include "objecttype.h"
-#include "point.h"
-#include "size.h"
 #include "callbacks.h"
 
 namespace smooth

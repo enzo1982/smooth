@@ -21,7 +21,7 @@ namespace smooth
 };
 
 #include "../definitions.h"
-#include "../rect.h"
+#include "../primitives/rect.h"
 #include "../string.h"
 #include "font.h"
 #include "bitmap.h"
@@ -41,7 +41,7 @@ namespace smooth
 				Int		 GetSurfaceType();
 
 				Int		 SetSize(Size);
-				Size		 GetSize();
+				const Size	 GetSize();
 
 				Int		 PaintRect(Rect);
 

@@ -13,6 +13,15 @@
 
 #include "extended.h"
 
+template <class t> S::Extended<t>::Extended(const t &iValue)
+{
+	beforeWrite.Emit(iValue);
+
+	var = iValue;
+
+	onWrite.Emit(iValue);
+}
+
 template <class t> t &S::Extended<t>::operator =(t nValue)
 {
 	beforeWrite.Emit(nValue);

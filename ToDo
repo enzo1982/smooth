@@ -4,7 +4,7 @@ ToDo for smooth
 - implement menu shortcuts
 - implement a technique to smoothly check the values of widgets like optionboxes or checkboxes
 - mark text in editboxes
-- complete standard dialogs
+- implement font dialog
 - complete editbox widget
 - complete treeview widget
 - allow applets in menubars

@@ -8,10 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/i18n/smooth_de.h>
 #include <smooth/application.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 
 #ifdef __WIN32__
 #include <direct.h>

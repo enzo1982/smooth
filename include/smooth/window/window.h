@@ -32,7 +32,7 @@ namespace smooth
 #include "../primitives/rect.h"
 #include "../loop.h"
 #include "../menu/menu.h"
-#include "bitmap.h"
+#include "../graphics/bitmap.h"
 
 namespace smooth
 {

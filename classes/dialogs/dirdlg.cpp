@@ -9,9 +9,9 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/dialogs/dirdlg.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/shlobjmini.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 
 S::GUI::Dialogs::DirSelection::DirSelection()
 {

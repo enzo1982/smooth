@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/primitives/rect.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 
 S::Rect::Rect()
 {

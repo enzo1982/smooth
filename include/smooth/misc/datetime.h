@@ -16,7 +16,7 @@ namespace smooth
 	class DateTime;
 };
 
-#include "definitions.h"
+#include "../definitions.h"
 
 namespace smooth
 {

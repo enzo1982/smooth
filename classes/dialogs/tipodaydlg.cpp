@@ -14,11 +14,11 @@
 #include <smooth/application.h>
 #include <smooth/objectproperties.h>
 
-#include <smooth/graphics/window.h>
 #include <smooth/graphics/surface.h>
 
-#include <smooth/titlebar.h>
-#include <smooth/divider.h>
+#include <smooth/window/titlebar.h>
+#include <smooth/window/divider.h>
+#include <smooth/window/window.h>
 
 #include <smooth/button.h>
 #include <smooth/text.h>
@@ -26,8 +26,9 @@
 #include <smooth/layer.h>
 #include <smooth/image.h>
 
-#include <smooth/string.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/string.h>
+#include <smooth/misc/i18n.h>
+
 #include <smooth/resources.h>
 #include <smooth/dllmain.h>
 

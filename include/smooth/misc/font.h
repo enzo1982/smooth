@@ -20,7 +20,7 @@ namespace smooth
 };
 
 #include "../widget.h"
-#include "../i18n.h"
+#include "i18n.h"
 
 namespace smooth
 {

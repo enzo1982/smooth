@@ -24,7 +24,7 @@ namespace smooth
 #include "../definitions.h"
 #include "../primitives/size.h"
 #include "../primitives/rect.h"
-#include "../string.h"
+#include "../misc/string.h"
 
 namespace smooth
 {

@@ -12,7 +12,7 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 #include <smooth/metrics.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>

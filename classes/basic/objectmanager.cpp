@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/objectmanager.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/dialogs/messagebox.h>
 
 #ifdef __WIN32__

@@ -8,18 +8,18 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/graphics/window.h>
-#include <smooth/i18n.h>
+#include <smooth/window/window.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/titlebar.h>
-#include <smooth/statusbar.h>
+#include <smooth/window/titlebar.h>
+#include <smooth/window/statusbar.h>
 #include <smooth/menu/popupmenu.h>
-#include <smooth/divider.h>
+#include <smooth/window/divider.h>
 #include <smooth/layer.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 #include <smooth/toolwindow.h>
 #include <smooth/system/timer.h>
 #include <smooth/color.h>
@@ -28,14 +28,15 @@
 #include <smooth/mdiwindow.h>
 #include <smooth/input.h>
 #include <smooth/resources.h>
-#include <smooth/binary.h>
+#include <smooth/misc/binary.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/dllmain.h>
+#include <smooth/system/event.h>
 
 #ifdef __WIN32__
-#include <smooth/graphics/gdi/windowgdi.h>
+#include <smooth/window/gdi/windowgdi.h>
 #else
-#include <smooth/graphics/windowbackend.h>
+#include <smooth/window/xlib/windowxlib.h>
 #endif
 
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
@@ -46,7 +47,7 @@ S::GUI::Window::Window(String title, Void *iWindow)
 #ifdef __WIN32__
 	backend = new WindowGDI(iWindow);
 #else
-	backend = new WindowBackend(iWindow);
+	backend = new WindowXLib(iWindow);
 #endif
 
 	backend->onEvent.Connect(&Window::Process, this);
@@ -414,9 +415,6 @@ S::Int S::GUI::Window::Stay()
 {
 	if (!registered) return value;
 
-#ifdef __WIN32__
-	MSG	 msg;
-
 	SetFlags(flags | WF_MODAL);
 
 	if (!created)	Create();
@@ -424,39 +422,25 @@ S::Int S::GUI::Window::Stay()
 
 	stay	= True;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_KILLFOCUS, 0, 0);
 	else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_KILLFOCUS, 0, 0);
 
 	if (Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_ACTIVATEAPP, 1, 0);
 	else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_ACTIVATEAPP, 1, 0);
+#endif
+
+	System::EventProcessor	*event = new System::EventProcessor();
 
 	while (!destroyed)
 	{
-		if (peekLoop > 0)
-		{
-			if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-			else				PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
-
-			TranslateMessage(&msg);
-
-			if (Setup::enableUnicode)	DispatchMessageW(&msg);
-			else				DispatchMessageA(&msg);
-
-			if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
-			else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
-		}
-		else
-		{
-			if (Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
-			else				GetMessageA(&msg, NIL, 0, 0);
-
-			TranslateMessage(&msg);
-
-			if (Setup::enableUnicode)	DispatchMessageW(&msg);
-			else				DispatchMessageA(&msg);
-		}
+		if (peekLoop > 0)	event->ProcessNextEvent(False);
+		else			event->ProcessNextEvent(True);
 	}
 
+	delete event;
+
+#ifdef __WIN32__
 	if (nOfActiveWindows == 0 && !initializing) PostQuitMessage(0);
 #endif
 

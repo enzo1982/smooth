@@ -12,13 +12,13 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
-#include <smooth/math.h>
-#include <smooth/tooltip.h>
+#include <smooth/misc/math.h>
+#include <smooth/window/tooltip.h>
 #include <smooth/color.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 #include <smooth/layer.h>
 #include <smooth/system/timer.h>
 

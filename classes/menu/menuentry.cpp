@@ -17,7 +17,7 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/objectproperties.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 
 S::GUI::MenuEntry::MenuEntry(String iText, Bitmap iBitmap, Menu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode, Int iOrientation)
 {

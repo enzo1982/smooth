@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="5" FILEVERSION="15" LASTMODIFIED="25.01.2004">
-    <TASK PRIORITY="5" TITLE="0.8.64.0" PERCENTDONE="80" POS="1">
-        <TASK PRIORITY="5" TITLE="Split Window in frontend and backend parts" PERCENTDONE="80" POS="1"/>
+<TODOLIST PROJECTNAME="smooth Class Library" FILEFORMAT="5" FILEVERSION="17" LASTMODIFIED="11.03.2004">
+    <TASK PRIORITY="5" TITLE="0.8.65.0" PERCENTDONE="5" POS="1">
+        <TASK PRIORITY="5" TITLE="Implement Linux backends" PERCENTDONE="5" POS="1"/>
+        <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="10" POS="2">
+            <TASK PRIORITY="5" TITLE="Make MenuEntries widgets" PERCENTDONE="50" POS="1"/>
+            <TASK PRIORITY="5" TITLE="Implement menu shortcuts" POS="2"/>
+        </TASK>
     </TASK>
     <TASK PRIORITY="5" TITLE="0.9" PERCENTDONE="5" POS="2">
         <TASK PRIORITY="5" TITLE="Use more Signals &amp; Slots internally" POS="1"/>
-        <TASK PRIORITY="5" TITLE="Implement other backends than GDI (like Xlib, SDL, Qt)" POS="2"/>
-        <TASK PRIORITY="5" TITLE="Check large fonts support" POS="3"/>
-        <TASK PRIORITY="5" TITLE="Support RTL scripts" PERCENTDONE="50" POS="4">
+        <TASK PRIORITY="5" TITLE="Check large fonts support" POS="2"/>
+        <TASK PRIORITY="5" TITLE="Support RTL scripts" PERCENTDONE="50" POS="3">
             <TASK PRIORITY="5" TITLE="Mirrored window elements" PERCENTDONE="100" DONEDATESTRING="08.01.2004" POS="1" DONEDATE="37994.85221065"/>
             <TASK PRIORITY="5" TITLE="Fix EditBoxes for RTL scripts" POS="2"/>
         </TASK>
-        <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="10" POS="5">
-            <TASK PRIORITY="5" TITLE="Make MenuEntries widgets" PERCENTDONE="50" POS="1"/>
-            <TASK PRIORITY="5" TITLE="Implement menu shortcuts" POS="2"/>
-            <TASK PRIORITY="5" TITLE="Redo Menubar::Paint()" PERCENTDONE="5" POS="3"/>
-            <TASK PRIORITY="5" TITLE="ECM" POS="4"/>
-            <TASK PRIORITY="5" TITLE="Tear off menus" POS="5"/>
+        <TASK PRIORITY="5" TITLE="Menu System" PERCENTDONE="10" POS="4">
+            <TASK PRIORITY="5" TITLE="Redo Menubar::Paint()" PERCENTDONE="5" POS="1"/>
+            <TASK PRIORITY="5" TITLE="ECM" POS="2"/>
+            <TASK PRIORITY="5" TITLE="Tear off menus" POS="3"/>
         </TASK>
-        <TASK PRIORITY="5" TITLE="Widgets" PERCENTDONE="1" POS="6">
+        <TASK PRIORITY="5" TITLE="Widgets" PERCENTDONE="1" POS="5">
             <TASK PRIORITY="5" TITLE="ListBox" POS="1">
                 <TASK PRIORITY="5" TITLE="Support editing of ListBox entries" POS="1"/>
                 <TASK PRIORITY="5" TITLE="Support Drag &amp; Drop in ListBoxes" EXPANDED="1" POS="2">

@@ -12,10 +12,10 @@
 #include <smooth/definitions.h>
 #include <smooth/layer.h>
 #include <smooth/metrics.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 
 const S::Int	 S::GUI::TabWidget::classID = S::Object::RequestClassID();
 

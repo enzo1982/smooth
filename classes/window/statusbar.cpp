@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/statusbar.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/statusbar.h>
+#include <smooth/window/window.h>
 #include <smooth/metrics.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>

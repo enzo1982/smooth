@@ -8,36 +8,33 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_CLIENT_
-#define _H_OBJSMOOTH_CLIENT_
+#ifndef _H_OBJSMOOTH_EVENTPROCESSOR_
+#define _H_OBJSMOOTH_EVENTPROCESSOR_
 
 namespace smooth
 {
-	namespace GUI
+	namespace System
 	{
-		class Client;
+		class EventProcessor;
+		class EventBackend;
 	};
 };
 
-#include "widget.h"
+#include "../definitions.h"
 
 namespace smooth
 {
-	namespace GUI
+	namespace System
 	{
-		class SMOOTHAPI Client : public Widget
+		class SMOOTHAPI EventProcessor
 		{
+			private:
+				EventBackend	*backend;
 			public:
-				static const Int	 classID;
+						 EventProcessor();
+						~EventProcessor();
 
-							 Client();
-							~Client();
-
-				virtual Int		 Paint(Int);
-
-				virtual Size		 GetSize();
-			signals:
-				Signal0<Void>		 onPaint;
+				Int		 ProcessNextEvent(Bool);
 		};
 	};
 };

@@ -13,6 +13,11 @@ $(OBJECTDIR)/backendsdl.o: $(BACKENDSCLASSESDIR)/sdl/backendsdl.cpp $(SMOOTHINCL
 	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/sdl/backendsdl.cpp -o $(OBJECTDIR)/backendsdl.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/backendxlib.o: $(BACKENDSCLASSESDIR)/xlib/backendxlib.cpp $(SMOOTHINCLUDEDIR)/backends/xlib/backendxlib.h
+	$(ECHO) -n Compiling $(BACKENDSCLASSESDIR)/xlib/backendxlib.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/xlib/backendxlib.cpp -o $(OBJECTDIR)/backendxlib.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/application.o: $(BASICCLASSESDIR)/application.cpp $(SMOOTHINCLUDEDIR)/application.h
 	$(ECHO) -n Compiling $(BASICCLASSESDIR)/application.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/application.cpp -o $(OBJECTDIR)/application.o
@@ -118,11 +123,6 @@ $(OBJECTDIR)/surfacegdi.o: $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp $(SMOOTHINCL
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp -o $(OBJECTDIR)/surfacegdi.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/windowgdi.o: $(GRAPHICSCLASSESDIR)/gdi/windowgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/gdi/windowgdi.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/gdi/windowgdi.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/windowgdi.cpp -o $(OBJECTDIR)/windowgdi.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/bitmap.o: $(GRAPHICSCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmap.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmap.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmap.cpp -o $(OBJECTDIR)/bitmap.o
@@ -133,11 +133,6 @@ $(OBJECTDIR)/bitmapbackend.o: $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp $(SMOOTHIN
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp -o $(OBJECTDIR)/bitmapbackend.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/font.o: $(GRAPHICSCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/graphics/font.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/font.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/surface.o: $(GRAPHICSCLASSESDIR)/surface.cpp $(SMOOTHINCLUDEDIR)/graphics/surface.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/surface.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/surface.cpp -o $(OBJECTDIR)/surface.o
@@ -146,16 +141,6 @@ $(OBJECTDIR)/surface.o: $(GRAPHICSCLASSESDIR)/surface.cpp $(SMOOTHINCLUDEDIR)/gr
 $(OBJECTDIR)/surfacebackend.o: $(GRAPHICSCLASSESDIR)/surfacebackend.cpp $(SMOOTHINCLUDEDIR)/graphics/surfacebackend.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/surfacebackend.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/surfacebackend.cpp -o $(OBJECTDIR)/surfacebackend.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/window.o: $(GRAPHICSCLASSESDIR)/window.cpp $(SMOOTHINCLUDEDIR)/graphics/window.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/window.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/window.cpp -o $(OBJECTDIR)/window.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/windowbackend.o: $(GRAPHICSCLASSESDIR)/windowbackend.cpp $(SMOOTHINCLUDEDIR)/graphics/windowbackend.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/windowbackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/windowbackend.cpp -o $(OBJECTDIR)/windowbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/toolwindow.o: $(INTERNALCLASSESDIR)/toolwindow.cpp $(SMOOTHINCLUDEDIR)/toolwindow.h
@@ -303,32 +288,37 @@ $(OBJECTDIR)/popupview.o: $(MENUCLASSESDIR)/popupview.cpp $(SMOOTHINCLUDEDIR)/me
 	$(COMPILER) $(COMPILER_OPTS) $(MENUCLASSESDIR)/popupview.cpp -o $(OBJECTDIR)/popupview.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/binary.o: $(MISCCLASSESDIR)/binary.cpp $(SMOOTHINCLUDEDIR)/binary.h
+$(OBJECTDIR)/binary.o: $(MISCCLASSESDIR)/binary.cpp $(SMOOTHINCLUDEDIR)/misc/binary.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/binary.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/binary.cpp -o $(OBJECTDIR)/binary.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/config.o: $(MISCCLASSESDIR)/config.cpp $(SMOOTHINCLUDEDIR)/config.h
+$(OBJECTDIR)/config.o: $(MISCCLASSESDIR)/config.cpp $(SMOOTHINCLUDEDIR)/misc/config.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/config.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/config.cpp -o $(OBJECTDIR)/config.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/datetime.o: $(MISCCLASSESDIR)/datetime.cpp $(SMOOTHINCLUDEDIR)/datetime.h
+$(OBJECTDIR)/datetime.o: $(MISCCLASSESDIR)/datetime.cpp $(SMOOTHINCLUDEDIR)/misc/datetime.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/datetime.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/datetime.cpp -o $(OBJECTDIR)/datetime.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/i18n.o: $(MISCCLASSESDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/i18n.h
+$(OBJECTDIR)/font.o: $(MISCCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/misc/font.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/font.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/i18n.o: $(MISCCLASSESDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/misc/i18n.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/i18n.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/i18n.cpp -o $(OBJECTDIR)/i18n.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/math.h
+$(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/misc/math.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/math.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/math.cpp -o $(OBJECTDIR)/math.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/string.h
+$(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/misc/string.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/string.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string.cpp -o $(OBJECTDIR)/string.o
 	$(ECHO) done.
@@ -363,9 +353,24 @@ $(OBJECTDIR)/timersdl.o: $(SYSTEMCLASSESDIR)/sdl/timersdl.cpp $(SMOOTHINCLUDEDIR
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/sdl/timersdl.cpp -o $(OBJECTDIR)/timersdl.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/eventwin32.o: $(SYSTEMCLASSESDIR)/win32/eventwin32.cpp $(SMOOTHINCLUDEDIR)/system/win32/eventwin32.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/win32/eventwin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/win32/eventwin32.cpp -o $(OBJECTDIR)/eventwin32.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/timerwin32.o: $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp $(SMOOTHINCLUDEDIR)/system/win32/timerwin32.h
 	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp -o $(OBJECTDIR)/timerwin32.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/event.o: $(SYSTEMCLASSESDIR)/event.cpp $(SMOOTHINCLUDEDIR)/system/event.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/event.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/event.cpp -o $(OBJECTDIR)/event.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/eventbackend.o: $(SYSTEMCLASSESDIR)/eventbackend.cpp $(SMOOTHINCLUDEDIR)/system/eventbackend.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/eventbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/eventbackend.cpp -o $(OBJECTDIR)/eventbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/system.o: $(SYSTEMCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system/system.h
@@ -458,39 +463,59 @@ $(OBJECTDIR)/treeview.o: $(TREECLASSESDIR)/treeview.cpp $(SMOOTHINCLUDEDIR)/tree
 	$(COMPILER) $(COMPILER_OPTS) $(TREECLASSESDIR)/treeview.cpp -o $(OBJECTDIR)/treeview.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/client.o: $(WINDOWCLASSESDIR)/client.cpp $(SMOOTHINCLUDEDIR)/client.h
+$(OBJECTDIR)/windowgdi.o: $(WINDOWCLASSESDIR)/gdi/windowgdi.cpp $(SMOOTHINCLUDEDIR)/window/gdi/windowgdi.h
+	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/gdi/windowgdi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/gdi/windowgdi.cpp -o $(OBJECTDIR)/windowgdi.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/windowxlib.o: $(WINDOWCLASSESDIR)/xlib/windowxlib.cpp $(SMOOTHINCLUDEDIR)/window/xlib/windowxlib.h
+	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/xlib/windowxlib.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/xlib/windowxlib.cpp -o $(OBJECTDIR)/windowxlib.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/client.o: $(WINDOWCLASSESDIR)/client.cpp $(SMOOTHINCLUDEDIR)/window/client.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/client.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/client.cpp -o $(OBJECTDIR)/client.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/divider.o: $(WINDOWCLASSESDIR)/divider.cpp $(SMOOTHINCLUDEDIR)/divider.h
+$(OBJECTDIR)/divider.o: $(WINDOWCLASSESDIR)/divider.cpp $(SMOOTHINCLUDEDIR)/window/divider.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/divider.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/divider.cpp -o $(OBJECTDIR)/divider.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/drag.o: $(WINDOWCLASSESDIR)/drag.cpp $(SMOOTHINCLUDEDIR)/drag.h
+$(OBJECTDIR)/drag.o: $(WINDOWCLASSESDIR)/drag.cpp $(SMOOTHINCLUDEDIR)/window/drag.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/drag.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/drag.cpp -o $(OBJECTDIR)/drag.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/shortcut.o: $(WINDOWCLASSESDIR)/shortcut.cpp $(SMOOTHINCLUDEDIR)/shortcut.h
+$(OBJECTDIR)/shortcut.o: $(WINDOWCLASSESDIR)/shortcut.cpp $(SMOOTHINCLUDEDIR)/window/shortcut.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/shortcut.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/shortcut.cpp -o $(OBJECTDIR)/shortcut.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/statusbar.o: $(WINDOWCLASSESDIR)/statusbar.cpp $(SMOOTHINCLUDEDIR)/statusbar.h
+$(OBJECTDIR)/statusbar.o: $(WINDOWCLASSESDIR)/statusbar.cpp $(SMOOTHINCLUDEDIR)/window/statusbar.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/statusbar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/statusbar.cpp -o $(OBJECTDIR)/statusbar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/titlebar.o: $(WINDOWCLASSESDIR)/titlebar.cpp $(SMOOTHINCLUDEDIR)/titlebar.h
+$(OBJECTDIR)/titlebar.o: $(WINDOWCLASSESDIR)/titlebar.cpp $(SMOOTHINCLUDEDIR)/window/titlebar.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/titlebar.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/titlebar.cpp -o $(OBJECTDIR)/titlebar.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/tooltip.o: $(WINDOWCLASSESDIR)/tooltip.cpp $(SMOOTHINCLUDEDIR)/tooltip.h
+$(OBJECTDIR)/tooltip.o: $(WINDOWCLASSESDIR)/tooltip.cpp $(SMOOTHINCLUDEDIR)/window/tooltip.h
 	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/tooltip.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/tooltip.cpp -o $(OBJECTDIR)/tooltip.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/window.o: $(WINDOWCLASSESDIR)/window.cpp $(SMOOTHINCLUDEDIR)/window/window.h
+	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/window.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/window.cpp -o $(OBJECTDIR)/window.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/windowbackend.o: $(WINDOWCLASSESDIR)/windowbackend.cpp $(SMOOTHINCLUDEDIR)/window/windowbackend.h
+	$(ECHO) -n Compiling $(WINDOWCLASSESDIR)/windowbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(WINDOWCLASSESDIR)/windowbackend.cpp -o $(OBJECTDIR)/windowbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/xml_attribute.o: $(XMLCLASSESDIR)/attribute.cpp $(SMOOTHINCLUDEDIR)/xml/attribute.h

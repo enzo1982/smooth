@@ -8,34 +8,38 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_STATUSBAR_
-#define _H_OBJSMOOTH_STATUSBAR_
+#ifndef _H_OBJSMOOTH_BACKENDXLIB_
+#define _H_OBJSMOOTH_BACKENDXLIB_
 
 namespace smooth
 {
-	namespace GUI
+	namespace Backends
 	{
-		class Statusbar;
+		class BackendXLib;
 	};
 };
 
-#include "widget.h"
+#include "../backend.h"
+
+#include <X11/Xlib.h>
 
 namespace smooth
 {
-	namespace GUI
+	namespace Backends
 	{
-		class SMOOTHAPI Statusbar : public Widget
+		const Int	 BACKEND_XLIB = 1;
+
+		class BackendXLib : public Backend
 		{
+			private:
+				Display	*display;
 			public:
-				static const Int	 classID;
+					 BackendXLib();
 
-							 Statusbar(String);
-							~Statusbar();
+				Int	 Init();
+				Int	 Deinit();
 
-				Int			 Paint(Int);
-
-				Int			 SetText(String);
+				Display	*GetDisplay();
 		};
 	};
 };

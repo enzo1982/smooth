@@ -14,13 +14,13 @@
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>
-#include <smooth/math.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/math.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/objectproperties.h>
 #include <smooth/scrollbar.h>
 #include <smooth/layer.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 #include <smooth/listboxheader.h>
 
 const S::Int	 S::GUI::ListBox::classID = S::Object::RequestClassID();

@@ -9,17 +9,17 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/toolwindow.h>
-#include <smooth/graphics/window.h>
-#include <smooth/graphics/windowbackend.h>
+#include <smooth/window/window.h>
+#include <smooth/window/windowbackend.h>
 #include <smooth/object.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/layer.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 #include <smooth/color.h>
 
 const S::Int	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();

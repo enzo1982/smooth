@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_SYSTEM_
-#define _H_SYSTEM_
+#ifndef _H_OBJSMOOTH_SYSTEM_
+#define _H_OBJSMOOTH_SYSTEM_
 
 namespace smooth
 {
@@ -20,7 +20,7 @@ namespace smooth
 };
 
 #include "../definitions.h"
-#include "../string.h"
+#include "../misc/string.h"
 
 namespace smooth
 {

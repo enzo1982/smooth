@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/graphics/windowbackend.h>
+#include <smooth/window/windowbackend.h>
 
 S::GUI::WindowBackend::WindowBackend(Void *iWindow)
 {

@@ -16,8 +16,8 @@ namespace smooth
 	class String;
 };
 
-#include "definitions.h"
-#include "array.h"
+#include "../definitions.h"
+#include "../array.h"
 
 namespace smooth
 {

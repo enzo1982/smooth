@@ -19,6 +19,11 @@ S::Backends::Backend *CreateBackendWin32()
 
 S::Int	 backendWin32Tmp = S::Backends::Backend::AddBackend(&CreateBackendWin32);
 
+S::Backends::BackendWin32::BackendWin32()
+{
+	type = BACKEND_WIN32;
+}
+
 S::Int S::Backends::BackendWin32::Init()
 {
 	WORD	 wVersionRequested = MAKEWORD(1,1);

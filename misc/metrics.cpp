@@ -11,7 +11,7 @@
 #include <smooth/metrics.h>
 #include <smooth/definitions.h>
 #include <smooth/dialogs/messagebox.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 
 S::Int	 S::METRIC_TITLEBARHEIGHT;
 S::Int	 S::METRIC_TBBUTTONBOXOFFSETX;

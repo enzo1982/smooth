@@ -8,9 +8,9 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/graphics/gdi/windowgdi.h>
-#include <smooth/graphics/window.h>
-#include <smooth/math.h>
+#include <smooth/window/gdi/windowgdi.h>
+#include <smooth/window/window.h>
+#include <smooth/misc/math.h>
 #include <smooth/system/system.h>
 #include <smooth/loop.h>
 

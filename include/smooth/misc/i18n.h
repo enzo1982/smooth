@@ -12,7 +12,7 @@
 #define _H_OBJSMOOTH_I18N_
 
 #include "string.h"
-#include "xml/document.h"
+#include "../xml/document.h"
 
 namespace smooth
 {

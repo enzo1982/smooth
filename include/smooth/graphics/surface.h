@@ -27,8 +27,8 @@ namespace smooth
 
 #include "../definitions.h"
 #include "../primitives/rect.h"
-#include "../string.h"
-#include "font.h"
+#include "../misc/string.h"
+#include "../misc/font.h"
 #include "bitmap.h"
 
 namespace smooth

@@ -25,9 +25,13 @@ namespace smooth
 {
 	namespace Backends
 	{
+		const Int	 BACKEND_WIN32 = 2;
+
 		class BackendWin32 : public Backend
 		{
 			public:
+					 BackendWin32();
+
 				Int	 Init();
 				Int	 Deinit();
 		};

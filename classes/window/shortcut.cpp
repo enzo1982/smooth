@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/shortcut.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/shortcut.h>
+#include <smooth/window/window.h>
 
 const S::Int	 S::GUI::Shortcut::classID = S::Object::RequestClassID();
 

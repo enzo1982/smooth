@@ -8,19 +8,20 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/titlebar.h>
+#include <smooth/window/titlebar.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
-#include <smooth/tooltip.h>
+#include <smooth/window/tooltip.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/application.h>
-#include <smooth/binary.h>
+#include <smooth/misc/binary.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 #include <smooth/input.h>
+#include <smooth/system/event.h>
 
 const S::Int	 S::GUI::Titlebar::classID = S::Object::RequestClassID();
 
@@ -341,33 +342,14 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 
 				if (!wnd->IsMaximized())
 				{
+					System::EventProcessor	*event = new System::EventProcessor();
+
 					do
 					{
 						if (wnd->IsMaximized()) break;
 
-						MSG	 msg;
-
-						if (peekLoop > 0)
-						{
-							if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-							else				PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
-						}
-						else
-						{
-							if (Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
-							else				GetMessageA(&msg, NIL, 0, 0);
-						}
-
-						TranslateMessage(&msg);
-
-						if (Setup::enableUnicode)	DispatchMessageW(&msg);
-						else				DispatchMessageA(&msg);
-
-						if (peekLoop > 0)
-						{
-							if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
-							else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
-						}
+						if (peekLoop > 0)	event->ProcessNextEvent(False);
+						else			event->ProcessNextEvent(True);
 
 						SetWindowPos((HWND) wnd->GetSystemWindow(), 0, Input::MouseX() - cpwp.cx, Input::MouseY() - cpwp.cy, wnd->GetObjectProperties()->size.cx, wnd->GetObjectProperties()->size.cy, 0);
 
@@ -379,6 +361,8 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 						wnd->GetObjectProperties()->size.cy	= wndRect.bottom - wndRect.top;
 					}
 					while (GetAsyncKeyState(leftButton) != 0);
+
+					delete event;
 				}
 #endif
 

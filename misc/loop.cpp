@@ -14,15 +14,15 @@
 #include <smooth/resources.h>
 #include <smooth/threads/thread.h>
 #include <smooth/backends/backend.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 #include <smooth/metrics.h>
 #include <smooth/objectmanager.h>
 #include <smooth/color.h>
+#include <smooth/misc/i18n.h>
+#include <smooth/background.h>
+#include <smooth/system/event.h>
 
 #ifdef __WIN32__
-#include <smooth/i18n.h>
-#include <smooth/background.h>
-
 #include <winsock.h>
 #else
 #include <sys/socket.h>
@@ -85,9 +85,9 @@ S::Void S::Init()
 	codePage = GetACP();
 
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+#endif
 
 	mainObjectManager	= new ObjectManager();
-#endif
 
 	GetColors();
 
@@ -126,9 +126,11 @@ S::Void S::Free()
 	delete I18n::Translator::defaultTranslator;
 
 	delete backgroundApplication;
+#endif
 
 	delete mainObjectManager;
 
+#ifdef __WIN32__
 	if (Setup::useIconv) FreeIconvDLL();
 #endif
 
@@ -161,10 +163,6 @@ S::Void S::GetColors()
 
 S::Int S::Loop()
 {
-#ifdef __WIN32__
-	MSG		 msg;
-#endif
-
 	if (!loopActive)
 	{
 #ifdef __WIN32__
@@ -203,95 +201,38 @@ S::Int S::Loop()
 		}
 	}
 
-	if (peekLoop > 0)
+	System::EventProcessor	*event = new System::EventProcessor();
+	Bool			 quit = False;
+
+	while (!quit)
 	{
-#ifdef __WIN32__
-		do
+		Int	 result = Success;
+
+		if (peekLoop > 0)	result = event->ProcessNextEvent(False);
+		else			result = event->ProcessNextEvent(True);
+
+		if (result == Break)			quit = True;
+		if (GUI::Window::nOfActiveWindows == 0)	quit = True;
+	}
+
+	delete event;
+
+	loopActive = false;
+
+	for (int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
+	{
+		Object	*object = mainObjectManager->GetNthObject(i);
+
+		if (object != NIL)
 		{
-			bool	 result;
-
-			if (Setup::enableUnicode)	result = PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-			else				result = PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
-
-			if (result)
+			if (object->GetObjectType() == Threads::Thread::classID)
 			{
-				TranslateMessage(&msg);
-
-				if (Setup::enableUnicode)	DispatchMessageW(&msg);
-				else				DispatchMessageA(&msg);
-			}
-
-			if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
-			else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
-
-			if (peekLoop == 0) break;
-
-			if (GUI::Window::nOfActiveWindows == 0)
-			{
-				msg.message = WM_QUIT;
-				break;
+				if (!(((Threads::Thread *) object)->GetFlags() & Threads::THREAD_KILLFLAG_WAIT)) ((Threads::Thread *) object)->Stop();
 			}
 		}
-		while (msg.message != WM_QUIT);
-#endif
-	}
-	else
-	{
-#ifdef __WIN32__
-		while (true)
-		{
-			bool	 result;
-
-			if (Setup::enableUnicode)	result = GetMessageW(&msg, NIL, 0, 0);
-			else				result = GetMessageA(&msg, NIL, 0, 0);
-
-			if (!result) break;
-
-			TranslateMessage(&msg);
-
-			if (Setup::enableUnicode)	DispatchMessageW(&msg);
-			else				DispatchMessageA(&msg);
-
-			if (peekLoop > 0) break;
-
-			if (GUI::Window::nOfActiveWindows == 0)
-			{
-				msg.message = WM_QUIT;
-				break;
-			}
-		}
-#endif
 	}
 
-#ifdef __WIN32__
-	if (msg.message != WM_QUIT)
-	{
-		return Loop();	// respawn if only peekstate has changed
-	}
-	else
-	{
-#endif
-		loopActive = false;
+	while (Threads::Thread::GetNOfRunningThreads() > 0) LiSASleep(10);
 
-		for (int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
-		{
-			Object	*object = mainObjectManager->GetNthObject(i);
-
-			if (object != NIL)
-			{
-				if (object->GetObjectType() == Threads::Thread::classID)
-				{
-					if (!(((Threads::Thread *) object)->GetFlags() & Threads::THREAD_KILLFLAG_WAIT)) ((Threads::Thread *) object)->Stop();
-				}
-			}
-		}
-
-		while (Threads::Thread::GetNOfRunningThreads() > 0) LiSASleep(10);
-
-#ifdef __WIN32__
-		return msg.wParam;
-	}
-#else
-	return 0;
-#endif
+	return Success;
 }

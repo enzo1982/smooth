@@ -19,7 +19,7 @@ namespace smooth
 	};
 };
 
-#include "graphics/window.h"
+#include "window/window.h"
 
 namespace smooth
 {

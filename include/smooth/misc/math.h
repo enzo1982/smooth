@@ -16,7 +16,7 @@ namespace smooth
 	class Math;
 };
 
-#include "definitions.h"
+#include "../definitions.h"
 
 namespace smooth
 {

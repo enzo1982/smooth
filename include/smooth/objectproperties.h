@@ -19,7 +19,7 @@ namespace smooth
 #include "definitions.h"
 #include "primitives/point.h"
 #include "primitives/size.h"
-#include "graphics/font.h"
+#include "misc/font.h"
 
 namespace smooth
 {

@@ -14,7 +14,7 @@
 #include <smooth/container.h>
 #include <smooth/objectproperties.h>
 #include <smooth/layer.h>
-#include <smooth/divider.h>
+#include <smooth/window/divider.h>
 
 const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
 

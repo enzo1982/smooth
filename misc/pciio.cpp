@@ -12,9 +12,9 @@
 #include <smooth/color.h>
 #include <smooth/pciio.h>
 #include <smooth/codecs.h>
+#include <smooth/misc/string.h>
 
 #include <iolib-cxx.h>
-#include <smooth/string.h>
 
 S::String	 cfNames[10];
 S::String	 cpNames[5];

@@ -10,7 +10,7 @@
 
 #include <smooth/background.h>
 #include <smooth/objectmanager.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 #include <smooth/system/timer.h>
 #include <smooth/threads/thread.h>
 
@@ -59,8 +59,10 @@ S::Void S::BackgroundApplication::TimerProc()
 			{
 				if (((Threads::Thread *) object)->GetStatus() == Threads::THREAD_RUNNING)
 				{
+#ifdef __WIN32__
 					if (Setup::enableUnicode)	PostThreadMessageW(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
 					else				PostThreadMessageA(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+#endif
 				}
 			}
 		}

@@ -10,7 +10,7 @@
 
 #include <smooth/color.h>
 #include <smooth/definitions.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 
 using namespace smooth;
 

@@ -8,12 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/graphics/window.h>
-#include <smooth/tooltip.h>
+#include <smooth/window/window.h>
+#include <smooth/window/tooltip.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/metrics.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
 #include <smooth/system/timer.h>

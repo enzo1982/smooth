@@ -11,7 +11,7 @@
 #include <smooth/container.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/object.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 
 const S::Int	 S::Container::classID = S::Object::RequestClassID();
 

@@ -8,8 +8,9 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/string.h>
-#include <smooth/math.h>
+#include <smooth/misc/string.h>
+#include <smooth/misc/math.h>
+
 #include <iconv.h>
 #include <memory.h>
 #include <iolib-cxx.h>

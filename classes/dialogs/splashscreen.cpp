@@ -10,14 +10,14 @@
 
 #include <smooth/dialogs/splashscreen.h>
 #include <smooth/array.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/system/timer.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 
 S::Int S::GUI::Dialogs::SplashScreen::nOfSplashScreens = 0;
 

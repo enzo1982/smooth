@@ -8,50 +8,32 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_TOOLTIP_
-#define _H_OBJSMOOTH_TOOLTIP_
+#ifndef _H_OBJSMOOTH_DRAGCONTROL_
+#define _H_OBJSMOOTH_DRAGCONTROL_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class Tooltip;
-		class ToolWindow;
-	};
-
-	namespace System
-	{
-		class Timer;
+		class DragControl;
 	};
 };
 
-#include "widget.h"
+#include "../widget.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI Tooltip : public Widget
+		class SMOOTHAPI DragControl : public Widget
 		{
-			private:
-				ToolWindow		*toolWindow;
-				System::Timer		*timer;
-
-				Void			 TimerProc();
-			protected:
-				Int			 timeOut;
 			public:
 				static const Int	 classID;
 
-							 Tooltip();
-							~Tooltip();
+							 DragControl();
+							~DragControl();
 
-				Int			 DrawTooltip();
-
-				Int			 Show();
-				Int			 Hide();
-
-				Int			 SetTimeout(Int);
+				Int			 Process(Int, Int, Int);
 		};
 	};
 };

@@ -12,7 +12,7 @@
 #include <smooth/codecs.h>
 #include <smooth/color.h>
 #include <smooth/pciio.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 #include <iolib/filters/filter_bzip2.h>
 
 using namespace smooth;

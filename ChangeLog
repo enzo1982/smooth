@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.xx.04 xx:xx - smooth alpha 0.8.64.0
+11.03.04 15:42 - smooth alpha 0.8.64.0
 
 - rect.cpp	- new methods: Bool DoRectsOverlap(Rect, Rect); and Rect OverlapRect(Rect, Rect);
 - widget.cpp	- new method: Bool IsAffected(Rect &); replaces corresponding STK function
@@ -27,6 +27,8 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 		- new method IsUnicode()
 - array.cpp	- fixed a stack overflow (recursion) in RemoveAll() if an Array has too many entries
 - editbox.cpp	- added signal: onEnter; emitted when the user finishes input with enter/return
+- event.cpp	- new class: implements system events
+- loop.cpp	- generalized event handling
 
 - new namespace GUI::Dialogs contains all dialogs plus MessageBox (now MessageDlg) and SplashScreen
 - new namespace Threads contains everything related to multi threading

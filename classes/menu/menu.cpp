@@ -13,7 +13,7 @@
 #include <smooth/array.h>
 #include <smooth/color.h>
 #include <smooth/metrics.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/objectproperties.h>
 
 const S::Int	 S::GUI::Menu::classID = S::Object::RequestClassID();

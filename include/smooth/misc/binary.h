@@ -16,7 +16,7 @@ namespace smooth
 	class Binary;
 };
 
-#include "definitions.h"
+#include "../definitions.h"
 
 namespace smooth
 {

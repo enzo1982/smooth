@@ -25,9 +25,13 @@ namespace smooth
 {
 	namespace Backends
 	{
+		const Int	 BACKEND_SDL = 3;
+
 		class BackendSDL : public Backend
 		{
 			public:
+					 BackendSDL();
+
 				Int	 Init();
 				Int	 Deinit();
 		};

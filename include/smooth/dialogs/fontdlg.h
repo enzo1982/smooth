@@ -23,7 +23,7 @@ namespace smooth
 };
 
 #include "dialog.h"
-#include "../graphics/font.h"
+#include "../misc/font.h"
 
 namespace smooth
 {

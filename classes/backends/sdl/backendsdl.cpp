@@ -19,6 +19,11 @@ S::Backends::Backend *CreateBackendSDL()
 
 S::Int	 backendSDLTmp = S::Backends::Backend::AddBackend(&CreateBackendSDL);
 
+S::Backends::BackendSDL::BackendSDL()
+{
+	type = BACKEND_SDL;
+}
+
 S::Int S::Backends::BackendSDL::Init()
 {
 	if (SDL_Init(SDL_INIT_TIMER) == 0)	return Success;

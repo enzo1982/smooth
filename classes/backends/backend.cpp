@@ -24,6 +24,16 @@ S::Int S::Backends::Backend::AddBackend(Backend *(*backend)())
 	return Success;
 }
 
+S::Int S::Backends::Backend::GetNOfBackends()
+{
+	return backends->GetNOfEntries();
+}
+
+S::Backends::Backend *S::Backends::Backend::GetNthBackend(Int n)
+{
+	return backends->GetNthEntry(n);
+}
+
 S::Int S::Backends::Backend::InitBackends()
 {
 	if (backends == NIL)		backends = new Array<Backend *>;
@@ -59,6 +69,11 @@ S::Int S::Backends::Backend::DeinitBackends()
 	return Success;
 }
 
+S::Backends::Backend::Backend()
+{
+	type = BACKEND_NONE;
+}
+
 S::Int S::Backends::Backend::Init()
 {
 	return Success;
@@ -67,4 +82,9 @@ S::Int S::Backends::Backend::Init()
 S::Int S::Backends::Backend::Deinit()
 {
 	return Success;
+}
+
+S::Int S::Backends::Backend::GetBackendType()
+{
+	return type;
 }

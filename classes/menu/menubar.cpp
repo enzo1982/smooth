@@ -282,6 +282,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
+	Int	 rVal = Success;
+
 	EnterProtectedRegion();
 
 	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
@@ -290,12 +292,12 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 		if (object == NIL) continue;
 
-		object->Process(message, wParam, lParam);
+		if (object->Process(message, wParam, lParam) == Break) rVal = Break;
 	}
 
 	LeaveProtectedRegion();
 
-	return Success;
+	return rVal;
 }
 
 S::Int S::GUI::Menubar::SetBitmapSize(Int nSize)

@@ -8,17 +8,17 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/client.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/client.h>
+#include <smooth/window/window.h>
 #include <smooth/object.h>
-#include <smooth/divider.h>
+#include <smooth/window/divider.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/binary.h>
+#include <smooth/misc/binary.h>
 
 const S::Int	 S::GUI::Client::classID = S::Object::RequestClassID();
 

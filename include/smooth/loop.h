@@ -12,7 +12,7 @@
 #define _H_OBJSMOOTH_LOOP_
 
 #include "definitions.h"
-#include "string.h"
+#include "misc/string.h"
 
 namespace smooth
 {

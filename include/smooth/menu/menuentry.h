@@ -21,9 +21,9 @@ namespace smooth
 
 #include "../object.h"
 #include "../primitives/rect.h"
-#include "../graphics/font.h"
+#include "../misc/font.h"
 #include "../graphics/bitmap.h"
-#include "../shortcut.h"
+#include "../window/shortcut.h"
 
 namespace smooth
 {

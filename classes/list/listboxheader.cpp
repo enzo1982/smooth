@@ -11,11 +11,12 @@
 #include <smooth/listboxheader.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/listbox.h>
-#include <smooth/graphics/window.h>
+#include <smooth/window/window.h>
 #include <smooth/layer.h>
 #include <smooth/objectproperties.h>
 #include <smooth/metrics.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
+#include <smooth/system/event.h>
 
 const S::Int	 S::GUI::ListBoxHeader::classID = S::Object::RequestClassID();
 
@@ -264,31 +265,12 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 				innerLoop = True;
 
+				System::EventProcessor	*event = new System::EventProcessor();
+
 				do
 				{
-					MSG	 msg;
-
-					if (peekLoop > 0)
-					{
-						if (Setup::enableUnicode)	PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-						else				PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
-					}
-					else
-					{
-						if (Setup::enableUnicode)	GetMessageW(&msg, NIL, 0, 0);
-						else				GetMessageA(&msg, NIL, 0, 0);
-					}
-
-					TranslateMessage(&msg);
-
-					if (Setup::enableUnicode)	DispatchMessageW(&msg);
-					else				DispatchMessageA(&msg);
-
-					if (peekLoop > 0)
-					{
-						if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
-						else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
-					}
+					if (peekLoop > 0)	event->ProcessNextEvent(False);
+					else			event->ProcessNextEvent(True);
 
 					Int	 mx = wnd->MouseX();
 					Int	 bias = omx - mx;
@@ -308,6 +290,8 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					}
 				}
 				while (GetAsyncKeyState(leftButton) != 0);
+
+				delete event;
 
 				innerLoop = False;
 			}

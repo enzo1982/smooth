@@ -15,8 +15,8 @@
 #include <smooth/loop.h>
 #include <smooth/objectmanager.h>
 #include <smooth/metrics.h>
-#include <smooth/math.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/math.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/objectproperties.h>
 #include <smooth/toolwindow.h>
 #include <smooth/layer.h>

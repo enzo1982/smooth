@@ -20,11 +20,11 @@ namespace smooth
 };
 
 #include "../definitions.h"
-#include "../string.h"
+#include "../misc/string.h"
 #include "../primitives/point.h"
 #include "../primitives/size.h"
 #include "../callbacks.h"
-#include "surface.h"
+#include "../graphics/surface.h"
 
 namespace smooth
 {

@@ -22,7 +22,7 @@ namespace smooth
 };
 
 #include "definitions.h"
-#include "graphics/window.h"
+#include "window/window.h"
 
 namespace smooth
 {

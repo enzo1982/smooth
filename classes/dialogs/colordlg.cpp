@@ -10,23 +10,23 @@
 
 #include <smooth/dialogs/colordlg.h>
 #include <smooth/application.h>
-#include <smooth/graphics/window.h>
-#include <smooth/i18n.h>
+#include <smooth/window/window.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/color.h>
 #include <smooth/button.h>
 #include <smooth/definitions.h>
-#include <smooth/divider.h>
+#include <smooth/window/divider.h>
 #include <smooth/slider.h>
 #include <smooth/text.h>
 #include <smooth/editbox.h>
-#include <smooth/string.h>
+#include <smooth/misc/string.h>
 #include <smooth/metrics.h>
 #include <smooth/loop.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/titlebar.h>
+#include <smooth/window/titlebar.h>
 
 S::GUI::Dialogs::ColorSelection::ColorSelection()
 {

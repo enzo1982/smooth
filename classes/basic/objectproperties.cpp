@@ -10,7 +10,7 @@
 
 #include <smooth/object.h>
 #include <smooth/objectproperties.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 
 S::ObjectProperties::ObjectProperties()
 {

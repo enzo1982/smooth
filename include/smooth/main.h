@@ -14,7 +14,7 @@
 #include "system/system.h"
 #include "loop.h"
 #include "version.h"
-#include "string.h"
+#include "misc/string.h"
 #include "application.h"
 #include "dialogs/messagebox.h"
 

@@ -8,37 +8,32 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_DIVIDER_
-#define _H_OBJSMOOTH_DIVIDER_
+#ifndef _H_OBJSMOOTH_EVENTWIN32_
+#define _H_OBJSMOOTH_EVENTWIN32_
 
 namespace smooth
 {
-	namespace GUI
+	namespace System
 	{
-		class Divider;
-		class Client;
-		class MDIClient;
+		class EventWin32;
 	};
 };
 
-#include "widget.h"
+#include "../eventbackend.h"
 
 namespace smooth
 {
-	namespace GUI
+	namespace System
 	{
-		class SMOOTHAPI Divider : public Widget
+		const Int	 EVENT_WIN32 = 1;
+
+		class EventWin32 : public EventBackend
 		{
 			public:
-				static const Int	 classID;
+					 EventWin32();
+					~EventWin32();
 
-							 Divider(Int, Int);
-							~Divider();
-
-				Int			 SetPos(Int);
-				Int			 GetPos();
-
-				virtual Int		 Paint(Int);
+				Int	 ProcessNextEvent(Bool);
 		};
 	};
 };

@@ -295,6 +295,10 @@ SOURCE=..\classes\misc\datetime.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\misc\font.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\misc\i18n.cpp
 # End Source File
 # Begin Source File
@@ -436,6 +440,31 @@ SOURCE=..\classes\tree\treeview.cpp
 # Begin Group "window"
 
 # PROP Default_Filter "*.cpp"
+# Begin Group "windowgdi"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\window\gdi\windowgdi.cpp
+# End Source File
+# End Group
+# Begin Group "windowxlib"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\window\xlib\windowxlib.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\classes\window\client.cpp
@@ -463,6 +492,14 @@ SOURCE=..\classes\window\titlebar.cpp
 # Begin Source File
 
 SOURCE=..\classes\window\tooltip.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\window\window.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\window\windowbackend.cpp
 # End Source File
 # End Group
 # Begin Group "xml"
@@ -495,10 +532,6 @@ SOURCE=..\classes\graphics\gdi\bitmapgdi.cpp
 
 SOURCE=..\classes\graphics\gdi\surfacegdi.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\gdi\windowgdi.cpp
-# End Source File
 # End Group
 # Begin Source File
 
@@ -510,23 +543,11 @@ SOURCE=..\classes\graphics\bitmapbackend.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\graphics\font.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\classes\graphics\surface.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\surfacebackend.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\window.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\windowbackend.cpp
 # End Source File
 # End Group
 # Begin Group "dialogs"
@@ -593,6 +614,23 @@ SOURCE=..\classes\backends\sdl\backendsdl.cpp
 SOURCE=..\classes\backends\win32\backendwin32.cpp
 # End Source File
 # End Group
+# Begin Group "backendsxlib"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\backends\xlib\backendxlib.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\classes\backends\backend.cpp
@@ -623,9 +661,21 @@ SOURCE=..\classes\system\sdl\timersdl.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\classes\system\win32\eventwin32.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\system\win32\timerwin32.cpp
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\classes\system\event.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\system\eventbackend.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=..\classes\system\system.cpp
@@ -856,10 +906,6 @@ SOURCE=..\include\smooth\graphics\gdi\bitmapgdi.h
 
 SOURCE=..\include\smooth\graphics\gdi\surfacegdi.h
 # End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\gdi\windowgdi.h
-# End Source File
 # End Group
 # Begin Source File
 
@@ -871,23 +917,11 @@ SOURCE=..\include\smooth\graphics\bitmapbackend.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\graphics\font.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\graphics\surface.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\include\smooth\graphics\surfacebackend.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\window.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\windowbackend.h
 # End Source File
 # End Group
 # Begin Group "dialogsheaders"
@@ -1065,6 +1099,23 @@ SOURCE=..\include\smooth\backends\sdl\backendsdl.h
 SOURCE=..\include\smooth\backends\win32\backendwin32.h
 # End Source File
 # End Group
+# Begin Group "backendsxlibheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\backends\xlib\backendxlib.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\backends\backend.h
@@ -1095,9 +1146,21 @@ SOURCE=..\include\smooth\system\sdl\timersdl.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\include\smooth\system\win32\eventwin32.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\system\win32\timerwin32.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\system\event.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\system\eventbackend.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\include\smooth\system\system.h
@@ -1109,6 +1172,103 @@ SOURCE=..\include\smooth\system\timer.h
 # Begin Source File
 
 SOURCE=..\include\smooth\system\timerbackend.h
+# End Source File
+# End Group
+# Begin Group "mischeaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\misc\binary.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\misc\config.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\misc\datetime.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\misc\font.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\misc\i18n.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\misc\math.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\misc\string.h
+# End Source File
+# End Group
+# Begin Group "windowheaders"
+
+# PROP Default_Filter ""
+# Begin Group "windowgdiheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\window\gdi\windowgdi.h
+# End Source File
+# End Group
+# Begin Group "windowxlibheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\window\xlib\windowxlib.h
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\window\client.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\window\divider.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\window\drag.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\window\shortcut.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\window\statusbar.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\window\titlebar.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\window\tooltip.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\window\window.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\window\windowbackend.h
 # End Source File
 # End Group
 # Begin Source File
@@ -1133,10 +1293,6 @@ SOURCE=..\include\smooth\background.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\binary.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\button.h
 # End Source File
 # Begin Source File
@@ -1146,10 +1302,6 @@ SOURCE=..\include\smooth\callbacks.h
 # Begin Source File
 
 SOURCE=..\include\smooth\checkbox.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\client.h
 # End Source File
 # Begin Source File
 
@@ -1165,10 +1317,6 @@ SOURCE=..\include\smooth\combobox.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\config.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\container.h
 # End Source File
 # Begin Source File
@@ -1177,23 +1325,11 @@ SOURCE=..\include\smooth\containertype.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\datetime.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\definitions.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\divider.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\dllmain.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\drag.h
 # End Source File
 # Begin Source File
 
@@ -1210,10 +1346,6 @@ SOURCE=..\include\smooth\groupbox.h
 # Begin Source File
 
 SOURCE=..\include\smooth\hyperlink.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n.h
 # End Source File
 # Begin Source File
 
@@ -1250,10 +1382,6 @@ SOURCE=..\include\smooth\listentry.h
 # Begin Source File
 
 SOURCE=..\include\smooth\loop.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\math.h
 # End Source File
 # Begin Source File
 
@@ -1325,10 +1453,6 @@ SOURCE=..\include\smooth\shlobjmini.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\shortcut.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\signals.h
 # End Source File
 # Begin Source File
@@ -1337,27 +1461,11 @@ SOURCE=..\include\smooth\slider.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\statusbar.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\string.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\tabwidget.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\include\smooth\text.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\titlebar.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\tooltip.h
 # End Source File
 # Begin Source File
 

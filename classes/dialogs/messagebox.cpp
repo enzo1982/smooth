@@ -10,17 +10,17 @@
 
 #include <smooth/dialogs/messagebox.h>
 #include <smooth/array.h>
-#include <smooth/i18n.h>
+#include <smooth/misc/i18n.h>
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/button.h>
 #include <smooth/layer.h>
 #include <smooth/metrics.h>
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 #include <smooth/objectproperties.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/window.h>
-#include <smooth/titlebar.h>
+#include <smooth/window/window.h>
+#include <smooth/window/titlebar.h>
 #include <smooth/checkbox.h>
 
 S::Int S::GUI::Dialogs::MessageDlg::nOfMessageBoxes = 0;

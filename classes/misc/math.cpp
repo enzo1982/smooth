@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/math.h>
+#include <smooth/misc/math.h>
 #include <math.h>
 
 const S::Float S::Math::Pi	= 3.14159265358979323846;

@@ -12,7 +12,7 @@
 #define _H_OBJSMOOTH_PCIIO_
 
 #include "definitions.h"
-#include "string.h"
+#include "misc/string.h"
 #include "graphics/bitmap.h"
 
 #include <iolib-cxx.h>

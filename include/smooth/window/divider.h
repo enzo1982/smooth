@@ -8,49 +8,37 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_TITLEBAR_
-#define _H_OBJSMOOTH_TITLEBAR_
+#ifndef _H_OBJSMOOTH_DIVIDER_
+#define _H_OBJSMOOTH_DIVIDER_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class Titlebar;
-		class Menubar;
-		class Window;
+		class Divider;
+		class Client;
+		class MDIClient;
 	};
 };
 
-#include "widget.h"
-#include "primitives/rect.h"
+#include "../widget.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 TB_NONE	= 0;
-		const Int	 TB_MINBUTTON	= 1;
-		const Int	 TB_MAXBUTTON	= 2;
-		const Int	 TB_CLOSEBUTTON	= 4;
-
-		class SMOOTHAPI Titlebar : public Widget
+		class SMOOTHAPI Divider : public Widget
 		{
-			private:
-				Bool			 paintActive;
-				Bool			 minchk;
-				Bool			 minclk;
-				Bool			 maxchk;
-				Bool			 maxclk;
-				Bool			 closechk;
-				Bool			 closeclk;
 			public:
 				static const Int	 classID;
 
-							 Titlebar(Int = TB_MINBUTTON | TB_MAXBUTTON | TB_CLOSEBUTTON);
-			 				~Titlebar();
+							 Divider(Int, Int);
+							~Divider();
+
+				Int			 SetPos(Int);
+				Int			 GetPos();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
 		};
 	};
 };

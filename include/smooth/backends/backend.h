@@ -25,19 +25,30 @@ namespace smooth
 {
 	namespace Backends
 	{
+		const Int	 BACKEND_NONE = 0;
+
 		class Backend
 		{
 			private:
 				static Array<Backend *>		*backends;
 				static Array<Backend *(*)()>	*backend_creators;
+			protected:
+				Int				 type;
 			public:
 				static Int			 AddBackend(Backend *(*)());
+
+				static Int			 GetNOfBackends();
+				static Backend			*GetNthBackend(Int);
 
 				static Int			 InitBackends();
 				static Int			 DeinitBackends();
 
+								 Backend();
+
 				virtual Int			 Init();
 				virtual Int			 Deinit();
+
+				Int				 GetBackendType();
 		};
 	};
 };

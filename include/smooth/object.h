@@ -19,7 +19,7 @@ namespace smooth
 };
 
 #include "definitions.h"
-#include "string.h"
+#include "misc/string.h"
 #include "array.h"
 #include "objecttype.h"
 #include "callbacks.h"

@@ -33,7 +33,6 @@ namespace smooth
 		{
 			private:
 				Int		 popupHandle;
-				Int		 style;
 
 				String		 backupStatusText;
 			public:
@@ -43,7 +42,7 @@ namespace smooth
 				virtual Int	 Paint(Int);
 				Int		 Process(Int, Int, Int);
 
-				Int		 SetStyle(Int);
+				Void		 PopupProc();
 		};
 	};
 

@@ -93,7 +93,6 @@ S::Int S::GUI::Divider::Paint(Int message)
 	}
 
 	if (wnd == NIL) return Success;
-	if (wnd->hwnd == NIL) return Success;
 
 	Surface	*surface = myContainer->GetDrawSurface();
 	Object	*object;
@@ -143,12 +142,12 @@ S::Int S::GUI::Divider::Paint(Int message)
 		}
 		else if (container->GetObjectType() == OBJ_LAYER)
 		{
-			doubleBar1.x = layer->GetObjectProperties()->pos.x + 4;
+			doubleBar1.x = layer->GetRealPosition().x + 4;
 
-			if (Binary::IsFlagSet(orientation, OR_TOP))		doubleBar1.y = layer->GetObjectProperties()->pos.y + objectProperties->pos.y;
-			else if	(Binary::IsFlagSet(orientation, OR_BOTTOM))	doubleBar1.y = layer->GetObjectProperties()->pos.y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
+			if (Binary::IsFlagSet(orientation, OR_TOP))		doubleBar1.y = layer->GetRealPosition().y + objectProperties->pos.y;
+			else if	(Binary::IsFlagSet(orientation, OR_BOTTOM))	doubleBar1.y = layer->GetRealPosition().y + layer->GetObjectProperties()->size.cy - objectProperties->pos.y;
 
-			doubleBar2.x = layer->GetObjectProperties()->pos.x + layer->GetObjectProperties()->size.cx - 4;
+			doubleBar2.x = layer->GetRealPosition().x + layer->GetObjectProperties()->size.cx - 4;
 			doubleBar2.y = doubleBar1.y;
 
 			for (Int i = Object::objectCount - 1; i >= 0; i--)
@@ -165,11 +164,11 @@ S::Int S::GUI::Divider::Paint(Int message)
 						{
 							if (Binary::IsFlagSet(operat->orientation, OR_LEFT))
 							{
-								if (layer->GetObjectProperties()->pos.x + operat->GetObjectProperties()->pos.x >= doubleBar1.x-2) doubleBar1.x = layer->GetObjectProperties()->pos.x + operat->GetObjectProperties()->pos.x + 3;
+								if (layer->GetRealPosition().x + operat->GetObjectProperties()->pos.x >= doubleBar1.x-2) doubleBar1.x = layer->GetRealPosition().x + operat->GetObjectProperties()->pos.x + 3;
 							}
 							else
 							{
-								if (layer->GetObjectProperties()->pos.x + layer->GetObjectProperties()->size.cx - operat->GetObjectProperties()->pos.x <= doubleBar2.x+1) doubleBar2.x = layer->GetObjectProperties()->pos.x + layer->GetObjectProperties()->size.cx - operat->GetObjectProperties()->pos.x - 2;
+								if (layer->GetRealPosition().x + layer->GetObjectProperties()->size.cx - operat->GetObjectProperties()->pos.x <= doubleBar2.x+1) doubleBar2.x = layer->GetRealPosition().x + layer->GetObjectProperties()->size.cx - operat->GetObjectProperties()->pos.x - 2;
 							}
 						}
 
@@ -224,12 +223,12 @@ S::Int S::GUI::Divider::Paint(Int message)
 		}
 		else if (container->GetObjectType() == OBJ_LAYER)
 		{
-			if (Binary::IsFlagSet(orientation, OR_LEFT))		doubleBar1.x = layer->GetObjectProperties()->pos.x + objectProperties->pos.x;
-			else if (Binary::IsFlagSet(orientation, OR_RIGHT))	doubleBar1.x = layer->GetObjectProperties()->pos.x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
+			if (Binary::IsFlagSet(orientation, OR_LEFT))		doubleBar1.x = layer->GetRealPosition().x + objectProperties->pos.x;
+			else if (Binary::IsFlagSet(orientation, OR_RIGHT))	doubleBar1.x = layer->GetRealPosition().x + layer->GetObjectProperties()->size.cx - objectProperties->pos.x;
 
-			doubleBar1.y = layer->GetObjectProperties()->pos.y + 4;
+			doubleBar1.y = layer->GetRealPosition().y + 4;
 			doubleBar2.x = doubleBar1.x;
-			doubleBar2.y = layer->GetObjectProperties()->pos.y + layer->GetObjectProperties()->size.cy - 4;
+			doubleBar2.y = layer->GetRealPosition().y + layer->GetObjectProperties()->size.cy - 4;
 
 			for (Int i = Object::objectCount - 1; i >= 0; i--)
 			{
@@ -245,11 +244,11 @@ S::Int S::GUI::Divider::Paint(Int message)
 						{
 							if (Binary::IsFlagSet(operat->orientation, OR_TOP))
 							{
-								if (layer->GetObjectProperties()->pos.y + operat->GetObjectProperties()->pos.y >= doubleBar1.y-2) doubleBar1.y = layer->GetObjectProperties()->pos.y + operat->GetObjectProperties()->pos.y + 3;
+								if (layer->GetRealPosition().y + operat->GetObjectProperties()->pos.y >= doubleBar1.y-2) doubleBar1.y = layer->GetRealPosition().y + operat->GetObjectProperties()->pos.y + 3;
 							}
 							else
 							{
-								if (layer->GetObjectProperties()->pos.y + layer->GetObjectProperties()->size.cy - operat->GetObjectProperties()->pos.y <= doubleBar2.y+1) doubleBar2.y = layer->GetObjectProperties()->pos.y + layer->GetObjectProperties()->size.cy - operat->GetObjectProperties()->pos.y - 2;
+								if (layer->GetRealPosition().y + layer->GetObjectProperties()->size.cy - operat->GetObjectProperties()->pos.y <= doubleBar2.y+1) doubleBar2.y = layer->GetRealPosition().y + layer->GetObjectProperties()->size.cy - operat->GetObjectProperties()->pos.y - 2;
 							}
 						}
 

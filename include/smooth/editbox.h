@@ -46,7 +46,6 @@ namespace smooth
 				Int		 oMarkStart;
 				Int		 markEnd;
 				Bool		 marking;
-				Bool		 isAsterisk;
 				Int		 maxSize;
 				Int		 invisibleChars;
 
@@ -60,7 +59,7 @@ namespace smooth
 
 				Void		 DropDownListProc();
 			public:
-						 EditBox(String, Point, Size, Int, Int);
+						 EditBox(String, Point, Size, Int);
 						~EditBox();
 
 				virtual Int	 Paint(Int);

@@ -18,6 +18,7 @@
 #include <smooth/stk.h>
 #include <smooth/objectproperties.h>
 #include <smooth/surface.h>
+#include <smooth/toolwindow.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
@@ -33,7 +34,6 @@ S::GUI::Menubar::Menubar()
 	objectProperties->size.cy	= METRIC_MENUBARHEIGHT;
 	popupHandle			= -1;
 	subtype				= WO_SEPARATOR;
-	style				= MB_GRAYSCALE;
 
 	possibleContainers.AddEntry(OBJ_WINDOW);
 }
@@ -170,8 +170,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.top++;
 				menuentry.bottom++;
 
-				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
-				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
 
 				menuentry.left++;
 				menuentry.top--;
@@ -196,8 +196,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.top++;
 				menuentry.bottom++;
 
-				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
-				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
 
 				menuentry.left++;
 				menuentry.top--;
@@ -299,8 +299,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.top++;
 				helpmenuentry.bottom++;
 
-				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), helpmenuentry);
-				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), helpmenuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), helpmenuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), helpmenuentry);
 
 				helpmenuentry.top--;
 				helpmenuentry.bottom--;
@@ -325,8 +325,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.top++;
 				helpmenuentry.bottom++;
 
-				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), helpmenuentry);
-				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), helpmenuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), helpmenuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), helpmenuentry);
 
 				helpmenuentry.top--;
 				helpmenuentry.bottom--;
@@ -387,8 +387,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				menuentry.top++;
 
-				if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
-				else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), menuentry);
+				else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), menuentry);
 
 				menuentry.top--;
 
@@ -441,9 +441,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 	Menu::Entry	*operat;
 	Rect		 bmprect;
 	Int		 retVal = Success;
-	bool		 cont = False;
 	Int		 i;
-	PopupMenu	*popupMenu = NIL;
 
 	String		 newStatus;
 	Bool		 updateStatus = False;
@@ -451,13 +449,52 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
+		case WM_KILLFOCUS:
+			for (i = 0; i < nOfEntries; i++)
+			{
+				Menu::Entry	*operat = entries.GetNthEntry(i);
+
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL))
+				{
+					Bool	 destroyPopup = True;
+
+					if (Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->handle >= ((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->handle) destroyPopup = False;
+
+					if (destroyPopup)
+					{
+						((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->Hide();
+
+						DeleteObject(GetObject(popupHandle, OBJ_POPUP));
+
+						popupHandle = -1;
+
+						break;
+					}
+				}
+			}
+
+			break;
 		case SM_LBUTTONDOWN:
 		case SM_LBUTTONDBLCLK:
 			for (i = 0; i < nOfEntries; i++)
 			{
-				operat = entries.GetNthEntry(i);
+				Menu::Entry	*operat = entries.GetNthEntry(i);
 
-				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL)) if (((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->IsVisible() && !cont) continue;
+				if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL))
+				{
+					((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->Hide();
+
+					DeleteObject(GetObject(popupHandle, OBJ_POPUP));
+
+					popupHandle = -1;
+
+					break;
+				}
+			}
+
+			for (i = 0; i < nOfEntries; i++)
+			{
+				operat = entries.GetNthEntry(i);
 
 				if (operat->checked && (operat->type != SM_SEPARATOR))
 				{
@@ -482,7 +519,7 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 
 						if (operat->onClick.GetNOfConnectedSlots() == 0 || wnd->IsMouseOn(popupFrame))
 						{
-							popupMenu = new PopupMenu(operat->popup);
+							PopupMenu *popupMenu = new PopupMenu(operat->popup);
 
 							popupHandle = popupMenu->handle;
 
@@ -497,10 +534,9 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 							}
 
 							popupMenu->GetObjectProperties()->pos.y = operat->rect.bottom + 2;
+							popupMenu->onClick.Connect(&Menubar::PopupProc, this);
 
 							wnd->RegisterObject(popupMenu);
-
-							cont = True;
 						}
 					}
 
@@ -567,8 +603,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
 						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
 
-						if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
-						else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
+						if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
+						else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
 
 						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
 						{
@@ -681,8 +717,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
 						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
 
-						if (style == MB_GRAYSCALE)	surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
-						else				surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
+						if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
+						else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
 
 						if (operat->onClick.GetNOfConnectedSlots() > 0 && operat->popup != NIL)
 						{
@@ -717,16 +753,21 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::GUI::Menubar::SetStyle(Int newstyle)
+S::Void S::GUI::Menubar::PopupProc()
 {
-	if (newstyle == MB_GRAYSCALE || newstyle == MB_COLOR)
+	for (Int i = 0; i < nOfEntries; i++)
 	{
-		style = newstyle;
+		Menu::Entry	*operat = entries.GetNthEntry(i);
 
-		return Success;
-	}
-	else
-	{
-		return Error;
+		if ((operat->popup != NIL) && operat->clicked && (GetObject(popupHandle, OBJ_POPUP) != NIL))
+		{
+			((PopupMenu *) GetObject(popupHandle, OBJ_POPUP))->Hide();
+
+			DeleteObject(GetObject(popupHandle, OBJ_POPUP));
+
+			popupHandle = -1;
+
+			break;
+		}
 	}
 }

@@ -85,7 +85,7 @@ namespace smooth
 
 				String				 className;
 
-				PopupMenu			*popupMenu;
+				PopupMenu			*trackMenu;
 
 				HDC				 windowDC;
 
@@ -95,6 +95,8 @@ namespace smooth
 				Void				 CalculateOffsets();
 
 				Bool				 DummyExitProc();
+
+				Void				 PopupProc();
 			public:
 				static Int			 nOfActiveWindows;
 				Int				 value;

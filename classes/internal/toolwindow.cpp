@@ -77,7 +77,6 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 	EnterProtectedRegion();
 
 	Surface	*surface = GetDrawSurface();
-	Object	*object;
 
 	if (message == SP_UPDATE)
 	{
@@ -91,7 +90,7 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 
 		for (Int i = 0; i < nOfObjects; i++)
 		{
-			object = assocObjects.GetNthEntry(i);
+			Object	*object = assocObjects.GetNthEntry(i);
 
 			if (object->GetObjectType() == OBJ_WIDGET)
 			{
@@ -216,11 +215,9 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 			break;
 	}
 
-	Object	*object = NIL;
-
 	for (Int j = nOfObjects - 1; j >= 0; j--)
 	{
-		object = assocObjects.GetNthEntry(j);
+		Object	*object = assocObjects.GetNthEntry(j);
 
 		if (object->GetObjectType() == OBJ_WIDGET)
 		{

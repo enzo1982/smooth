@@ -117,7 +117,7 @@ Test::Test()
 	bp.y = 20;
 	bs.cx = 150;
 	bs.cy = 0;
-	rlayer2_editbox1	= new EditBox("Hello to all testers!", bp, bs, EDB_ALPHANUMERIC, 0);
+	rlayer2_editbox1	= new EditBox("Hello to all testers!", bp, bs, 0);
 	rlayer2_editbox1->SetDropDownList(mainWnd_layer_list2);
 	bp.y = 40;
 	bs.cx = 60;

@@ -177,45 +177,51 @@ S::DialogColorSelection::DialogColorSelection()
 	bs.cx = 30;
 	bs.cy = 0;
 
-	hueedit = new EditBox(String::FromInt(acthue), bp, bs, EDB_NUMERIC, 3);
+	hueedit = new EditBox(String::FromInt(acthue), bp, bs, 3);
 	hueedit->onClick.Connect(&DialogColorSelection::ColorDlgHueEdit, this);
+	hueedit->SetFlags(EDB_NUMERIC);
 	hueedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	satedit = new EditBox(String::FromInt(actsat), bp, bs, EDB_NUMERIC, 3);
+	satedit = new EditBox(String::FromInt(actsat), bp, bs, 3);
 	satedit->onClick.Connect(&DialogColorSelection::ColorDlgSatEdit, this);
+	satedit->SetFlags(EDB_NUMERIC);
 	satedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	valedit = new EditBox(String::FromInt(actval), bp, bs, EDB_NUMERIC, 3);
+	valedit = new EditBox(String::FromInt(actval), bp, bs, 3);
 	valedit->onClick.Connect(&DialogColorSelection::ColorDlgValEdit, this);
+	valedit->SetFlags(EDB_NUMERIC);
 	valedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	rededit = new EditBox(String::FromInt(actred), bp, bs, EDB_NUMERIC, 3);
+	rededit = new EditBox(String::FromInt(actred), bp, bs, 3);
 	rededit->onClick.Connect(&DialogColorSelection::ColorDlgRedEdit, this);
+	rededit->SetFlags(EDB_NUMERIC);
 	rededit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	greenedit = new EditBox(String::FromInt(actgreen), bp, bs, EDB_NUMERIC, 3);
+	greenedit = new EditBox(String::FromInt(actgreen), bp, bs, 3);
 	greenedit->onClick.Connect(&DialogColorSelection::ColorDlgGreenEdit, this);
+	greenedit->SetFlags(EDB_NUMERIC);
 	greenedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
-	blueedit = new EditBox(String::FromInt(actblue), bp, bs, EDB_NUMERIC, 3);
+	blueedit = new EditBox(String::FromInt(actblue), bp, bs, 3);
 	blueedit->onClick.Connect(&DialogColorSelection::ColorDlgBlueEdit, this);
+	blueedit->SetFlags(EDB_NUMERIC);
 	blueedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.x += 40;
 	bp.y += 26;
 	bs.cx += 40;
 
-	hexedit = new EditBox(hexval, bp, bs, EDB_ALPHANUMERIC, 7);
+	hexedit = new EditBox(hexval, bp, bs, 7);
 	hexedit->onClick.Connect(&DialogColorSelection::ColorDlgHexEdit, this);
 	hexedit->SetOrientation(OR_UPPERRIGHT);
 

@@ -126,6 +126,9 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	if (!visible)		return Success;
 
 	Surface		*surface = myContainer->GetDrawSurface();
+
+	EnterProtectedRegion();
+
 	Point		 realPos = GetRealPosition();
 	ListEntry	*operat;
 	Rect		 frame;
@@ -197,6 +200,8 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 		}
 	}
 
+	LeaveProtectedRegion();
+
 	return Success;
 }
 
@@ -211,6 +216,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 	if (wnd == NIL) return Success;
 
 	Surface		*surface = myContainer->GetDrawSurface();
+
+	EnterProtectedRegion();
+
 	Point		 realPos = GetRealPosition();
 	Int		 retVal = Success;
 	ListEntry	*operat;
@@ -411,10 +419,6 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				frame.top	= realPos.y;
 				frame.right	= realPos.x + objectProperties->size.cx - 1;
 				frame.bottom	= realPos.y + objectProperties->size.cy - 1;
-
-				if (!wnd->IsMouseOn(frame) && !wnd->IsMouseOn(lbframe)) wnd->Process(SM_LBUTTONDOWN, 0, 0);
-
-				retVal = Break;
 			}
 
 			break;
@@ -569,23 +573,19 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
-		case SM_CHECKCOMBOBOXES:
-			if (listBox != NIL)
-			{
-				closeListBox = True;
-				
-				toolWindow->SetOwner(this);
-
-				retVal = Break;
-			}
-
-			break;
 	}
+
+	LeaveProtectedRegion();
 
 	return retVal;
 }
 
 S::Void S::GUI::ComboBox::ListBoxProc()
 {
-	Process(SM_CHECKCOMBOBOXES, 0, 0);
+	if (listBox != NIL)
+	{
+		closeListBox = True;
+				
+		toolWindow->SetOwner(this);
+	}
 }

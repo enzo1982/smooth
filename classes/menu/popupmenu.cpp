@@ -17,13 +17,13 @@
 #include <smooth/objectproperties.h>
 #include <smooth/popupview.h>
 #include <smooth/toolwindow.h>
+#include <smooth/application.h>
 
 #ifdef __WIN32__
 __declspec (dllexport)
 #endif
 
 S::Int	 S::OBJ_POPUP = S::Object::RequestObjectID();
-S::Int	 S::GUI::PopupMenu::status = POPUP_NORMAL;
 
 S::GUI::PopupMenu::PopupMenu(Menu *menu)
 {
@@ -35,8 +35,6 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 	nextPopup			= NIL;
 
 	possibleContainers.AddEntry(OBJ_WINDOW);
-
-	status = POPUP_NORMAL;
 
 	realMenu = new Menu();
 
@@ -54,7 +52,7 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 
 S::GUI::PopupMenu::~PopupMenu()
 {
-	if (visible) Hide();
+	if (IsVisible()) Hide();
 
 	if (nextPopup != NIL) DeleteObject(nextPopup);
 
@@ -158,11 +156,13 @@ S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
-		case WM_ACTIVATE:
-			if (LOWORD(wParam) == WA_INACTIVE && ((HWND) lParam) != wnd->hwnd)
-			{
-				wnd->Process(WM_KILLFOCUS, lParam, 0);
-			}
+		case WM_KILLFOCUS:
+			if (lParam == -1) break;
+
+			while (wnd->GetContainer()->GetContainerObject()->GetObjectType() != OBJ_APPLICATION) wnd = wnd->GetContainer()->GetContainerWindow();
+
+			wnd->Process(WM_KILLFOCUS, wParam, -1);
+
 			break;
 	}
 

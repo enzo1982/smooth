@@ -152,7 +152,7 @@ S::GUI::Window::Window(String title)
 	objectProperties->size.cx = Math::Round(200 * Setup::FontSize);
 	objectProperties->size.cy = Math::Round(200 * Setup::FontSize);
 
-	popupMenu = NIL;
+	trackMenu = NIL;
 
 	mainLayer = new Layer();
 
@@ -174,13 +174,10 @@ S::GUI::Window::~Window()
 	UnregisterObject(mainLayer);
 	DeleteObject(mainLayer);
 
-	if (popupMenu != NIL)
+	if (trackMenu != NIL)
 	{
-		PopupMenu	*popup = popupMenu;
-
-		UnregisterObject(popup);
-
-		DeleteObject(popup);
+		UnregisterObject(trackMenu);
+		DeleteObject(trackMenu);
 	}
 
 	if (created && !destroyed)
@@ -566,82 +563,21 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 {
 	EnterProtectedRegion();
 
-	if (popupMenu != NIL && PopupMenu::status == POPUP_FINISHED)
-	{
-		PopupMenu	*popup = popupMenu;
-
-		UnregisterObject(popup);
-
-		DeleteObject(popup);
-	}
-
-	Rect	 rect;
-	Menu	*trackMenu = NIL;
-	Int	 i;
-
-	Object	*object;
-
 	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);
 
-	switch (message)
+	if (trackMenu != NIL && (message == SM_LBUTTONDOWN || message == SM_RBUTTONDOWN || message == WM_KILLFOCUS))
 	{
-		case WM_ACTIVATEAPP:
-			if (wParam != 0) break;
-		case SM_LBUTTONDOWN:
-		case SM_RBUTTONDOWN:
-		case SM_CHECKPOPUPS:
-			if (popupMenu != NIL)
-			{
-				PopupMenu	*popup = popupMenu;
+		Bool	 destroyPopup = True;
 
-				UnregisterObject(popup);
+		if (message == WM_KILLFOCUS && Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->handle >= trackMenu->handle) destroyPopup = False;
 
-				DeleteObject(popup);
-			}
+		if (destroyPopup)
+		{
+			UnregisterObject(trackMenu);
+			DeleteObject(trackMenu);
 
-			break;
-		case WM_SETFOCUS:
-		case WM_KILLFOCUS:
-			if (popupMenu != NIL)
-			{
-				Bool	 deletePopup = True;
-				HWND	 activeWindow = (HWND) wParam;
-
-				if (GetWindow(activeWindow) != NIL)
-				{
-					PopupMenu	*popup = popupMenu;
-
-					do
-					{
-						if (activeWindow == popup->toolwnd->hwnd)
-						{
-							deletePopup = False;
-
-							break;
-						}
-						else if (popup->nextPopup != NIL)
-						{
-							popup = popup->nextPopup;
-						}
-						else
-						{
-							break;
-						}
-					}
-					while (True);
-				}
-
-				if (deletePopup)
-				{
-					PopupMenu	*popup = popupMenu;
-
-					UnregisterObject(popup);
-
-					DeleteObject(popup);
-				}
-			}
-
-			break;
+			trackMenu = NIL;
+		}
 	}
 
 	switch (message)
@@ -707,10 +643,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_SETTINGCHANGE:
 			if ((wParam == SPI_SETWORKAREA) && maximized)
 			{
+				RECT	 rect;
+
 				if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
 				else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
 
-				SetWindowPos(hwnd, 0, rect.left-2, rect.top-2, rect.right-rect.left+4, rect.bottom-rect.top+4, 0);
+				SetWindowPos(hwnd, 0, rect.left - 2, rect.top - 2, rect.right - rect.left + 4, rect.bottom - rect.top + 4, 0);
 			}
 
 			LeaveProtectedRegion();
@@ -766,37 +704,25 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_RBUTTONDOWN:
-			trackMenu = getTrackMenu.Call(MouseX(), MouseY());
-
-			if (trackMenu != NIL)
 			{
-				PopupMenu	*popup = NIL;
+				Menu	*track = getTrackMenu.Call(MouseX(), MouseY());
 
-				Process(SM_LOOSEFOCUS, handle, 0);
-
-				if (popupMenu != NIL)
+				if (track != NIL)
 				{
-					PopupMenu	*popup = popupMenu;
+					trackMenu = new PopupMenu(track);
 
-					UnregisterObject(popup);
+					trackMenu->GetObjectProperties()->pos.x = MouseX();
+					trackMenu->GetObjectProperties()->pos.y = MouseY();
 
-					DeleteObject(popup);
+					trackMenu->onClick.Connect(&Window::PopupProc, this);
+
+					RegisterObject(trackMenu);
+
+					LeaveProtectedRegion();
+
+					return 0;
 				}
-
-				popup = new PopupMenu(trackMenu);
-
-				popup->GetObjectProperties()->pos.x = MouseX();
-				popup->GetObjectProperties()->pos.y = MouseY();
-
-				RegisterObject(popup);
-
-				LeaveProtectedRegion();
-
-				return 0;
 			}
-			break;
-		case WM_ACTIVATE:
-			if ((LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE) && popupMenu == NIL && PopupMenu::status != POPUP_PENDING) SMOOTH::SendMessage(NIL, SM_CHECKPOPUPS, 0, 0);
 			break;
 		case WM_ACTIVATEAPP:
 		case WM_KILLFOCUS:
@@ -890,9 +816,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			break;
 	}
 
-	for (i = nOfObjects - 1; i >= 0; i--)
+	for (Int i = nOfObjects - 1; i >= 0; i--)
 	{
-		object = assocObjects.GetNthEntry(i);
+		Object	*object = assocObjects.GetNthEntry(i);
 
 		if (object == NIL) continue;
 
@@ -1203,6 +1129,18 @@ S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 	else														return False;
 }
 
+S::Void S::GUI::Window::PopupProc()
+{
+	if (trackMenu != NIL)
+	{
+		trackMenu->Hide();
+
+		DeleteObject(trackMenu);
+
+		trackMenu = NIL;
+	}
+}
+
 S::Int S::GUI::Window::RegisterObject(Object *object)
 {
 	if (object == NIL) return Error;
@@ -1219,24 +1157,11 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 
 			if (object->GetObjectType() == OBJ_TITLEBAR)
 			{
-				if (!((Titlebar *) object)->max)	style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
+				if (!((Titlebar *) object)->max) style = (style ^ WS_THICKFRAME) | WS_DLGFRAME;
 			}
 			else if (object->GetObjectType() == OBJ_TOOLWINDOW)
 			{
 				((ToolWindow *) object)->Create();
-			}
-			else if (object->GetObjectType() == OBJ_POPUP)
-			{
-				if (popupMenu != NIL)
-				{
-					PopupMenu	*popup = popupMenu;
-
-					UnregisterObject(popup);
-
-					DeleteObject(popup);
-				}
-
-				popupMenu = (PopupMenu *) object;
 			}
 
 			CalculateOffsets();
@@ -1274,11 +1199,6 @@ S::Int S::GUI::Window::UnregisterObject(Object *object)
 				{
 					((Widget *) object)->onUnregister.Emit(this);
 					((Widget *) object)->Hide();
-				}
-
-				if (object->GetObjectType() == OBJ_POPUP)
-				{
-					popupMenu = NIL;
 				}
 
 				object->UnsetRegisteredFlag();

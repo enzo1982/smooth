@@ -129,9 +129,17 @@ S::Void S::String::ImportFormat(const char *str, const char *format)
 		format = inputFormat;
 	}
 
-	stringSize = ConvertString(str, strlen(str), format, NIL, 0, "UTF-16LE") / 2 + 1;
+	stringSize = ConvertString(str, strlen(str), format, NIL, 0, "UTF-16LE");
 
-	if (stringSize == 0) return;
+	if ((stringSize < 0) && (strcmp(format, "ISO-8859-1") != 0))
+	{
+		ImportFormat(str, "ISO-8859-1");
+
+		return;
+	}
+	else if (stringSize < 0) return;
+
+	stringSize = stringSize / 2 + 1;
 
 	wString = new wchar_t [stringSize];
 
@@ -291,12 +299,15 @@ S::String &S::String::operator =(const String &newString)
 S::Bool S::String::operator ==(const int nil)
 {
 	if (wString == NIL)	return True;
+	if (wString[0] == 0)	return True;
 	else			return False;
 }
 
 S::Bool S::String::operator ==(const char *str)
 {
 	if (wString == NIL && str == NIL)	return True;
+	if (wString == NIL && str != NIL)	if (str[0] == 0) return True;
+	if (wString != NIL && str == NIL)	if (wString[0] == 0) return True;
 	if (wString == NIL || str == NIL)	return False;
 
 	if (!Compare(str))	return True;
@@ -306,6 +317,8 @@ S::Bool S::String::operator ==(const char *str)
 S::Bool S::String::operator ==(const wchar_t *str)
 {
 	if (wString == NIL && str == NIL)	return True;
+	if (wString == NIL && str != NIL)	if (str[0] == 0) return True;
+	if (wString != NIL && str == NIL)	if (wString[0] == 0) return True;
 	if (wString == NIL || str == NIL)	return False;
 
 	if (!Compare(str))	return True;
@@ -315,6 +328,8 @@ S::Bool S::String::operator ==(const wchar_t *str)
 S::Bool S::String::operator ==(const String &str)
 {
 	if (wString == NIL && str.wString == NIL)	return True;
+	if (wString == NIL && str.wString != NIL)	if (str.wString[0] == 0) return True;
+	if (wString != NIL && str.wString == NIL)	if (wString[0] == 0) return True;
 	if (wString == NIL || str.wString == NIL)	return False;
 
 	if (!Compare(str))	return True;
@@ -324,12 +339,15 @@ S::Bool S::String::operator ==(const String &str)
 S::Bool S::String::operator !=(const int nil)
 {
 	if (wString == NIL)	return False;
+	if (wString[0] == 0)	return False;
 	else			return True;
 }
 
 S::Bool S::String::operator !=(const char *str)
 {
 	if (wString == NIL && str == NIL)	return False;
+	if (wString == NIL && str != NIL)	if (str[0] == 0) return False;
+	if (wString != NIL && str == NIL)	if (wString[0] == 0) return False;
 	if (wString == NIL || str == NIL)	return True;
 
 	if (Compare(str) != 0)	return True;
@@ -339,6 +357,8 @@ S::Bool S::String::operator !=(const char *str)
 S::Bool S::String::operator !=(const wchar_t *str)
 {
 	if (wString == NIL && str == NIL)	return False;
+	if (wString == NIL && str != NIL)	if (str[0] == 0) return False;
+	if (wString != NIL && str == NIL)	if (wString[0] == 0) return False;
 	if (wString == NIL || str == NIL)	return True;
 
 	if (Compare(str) != 0)	return True;
@@ -348,6 +368,8 @@ S::Bool S::String::operator !=(const wchar_t *str)
 S::Bool S::String::operator !=(const String &str)
 {
 	if (wString == NIL && str.wString == NULL)	return False;
+	if (wString == NIL && str.wString != NIL)	if (str.wString[0] == 0) return False;
+	if (wString != NIL && str.wString == NIL)	if (wString[0] == 0) return False;
 	if (wString == NIL || str.wString == NULL)	return True;
 
 	if (Compare(str) != 0)	return True;
@@ -748,6 +770,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	char		 inBuf[4096 + 4096];
 	size_t		 inBufRest = 0;
 	char		 outBuf[4096];
+	Bool		 convError = False;
 
 	for (;;)
 	{
@@ -783,7 +806,12 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 				char	*outPtr		= outBuf;
 				size_t	 outSize	= sizeof(outBuf);
 
-				iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize);
+				if ((signed) iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize) < 0)
+				{
+					convError = True;
+
+					break;
+				}
 
 				if (outPtr != outBuf)
 				{
@@ -791,6 +819,8 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 					size += (outPtr - outBuf);
 				}
 			}
+
+			if (convError) break;
 		}
 	}
 
@@ -808,6 +838,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	iconv_close(cd);
 
 	if (size >= outBytes) size = 0;
+	if (convError) size = -1;
 
 	delete in;
 	delete out;

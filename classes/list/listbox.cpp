@@ -719,48 +719,23 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Error;
 	if (!active || !visible)	return Success;
 
-	Window		*wnd = myContainer->GetContainerWindow();
+	Window	*wnd = myContainer->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface		*surface = myContainer->GetDrawSurface();
-
 	EnterProtectedRegion();
 
-	Point		 realPos = GetRealPosition();
-	Int		 retVal = Success;
-	ListEntry	*operat;
-	Rect		 frame;
-	Bool		 change = False;
-	Int		 i;
-
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + objectProperties->size.cx - 1;
-	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+	Int	 retVal = Success;
+	Bool	 change = False;
+	Int	 i;
 
 	switch (message)
 	{
-		case SM_CHECKLISTBOXES:
-			if (scrollbarPos != lastScrollbarPos)
-			{
-				lastScrollbarPos = scrollbarPos;
-
-				surface->StartPaint(frame);
-
-				Paint(SP_PAINT);
-
-				surface->EndPaint();
-
-				retVal = Break;
-			}
-
-			break;
 		case SM_LBUTTONDOWN:
 		case SM_LBUTTONDBLCLK:
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = GetNthEntry(i);
+				ListEntry	*operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -774,7 +749,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = GetNthEntry(i);
+				ListEntry	*operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -789,7 +764,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = GetNthEntry(i);
+				ListEntry	*operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -814,7 +789,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSEMOVE:
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = GetNthEntry(i);
+				ListEntry	*operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -830,7 +805,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 
 			for (i = 0; i < GetNOfEntries(); i++)
 			{
-				operat = GetNthEntry(i);
+				ListEntry	*operat = GetNthEntry(i);
 
 				if (operat == NIL) break;
 
@@ -936,5 +911,21 @@ S::Int S::GUI::ListBox::ScrollDown(Int nLines)
 
 S::Void S::GUI::ListBox::ScrollbarProc()
 {
-	Process(SM_CHECKLISTBOXES, 0, 0);
+	Surface	*surface = myContainer->GetDrawSurface();
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
+
+	frame.left	= realPos.x;
+	frame.top	= realPos.y;
+	frame.right	= realPos.x + objectProperties->size.cx - 1;
+	frame.bottom	= realPos.y + objectProperties->size.cy - 1;
+
+	if (scrollbarPos != lastScrollbarPos)
+	{
+		lastScrollbarPos = scrollbarPos;
+
+		surface->StartPaint(frame);
+		Paint(SP_PAINT);
+		surface->EndPaint();
+	}
 }

@@ -57,8 +57,8 @@ S::Void S::BackgroundApplication::TimerProc()
 		}
 	}
 
- 	for (Int i = 0; i < mainThreadManager->GetNOfThreads(); i++)
+ 	for (Int j = 0; j < mainThreadManager->GetNOfThreads(); j++)
 	{
-		PostThreadMessage(mainThreadManager->GetNthThread(i)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+		PostThreadMessage(mainThreadManager->GetNthThread(j)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
 	}
 }

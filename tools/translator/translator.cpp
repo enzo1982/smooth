@@ -51,7 +51,8 @@ Translator::Translator()
 	size.cx = 37;
 	size.cy = 0;
 
-	edit_id		= new EditBox("", pos, size, EDB_NUMERIC, 5);
+	edit_id		= new EditBox("", pos, size, 5);
+	edit_id->SetFlags(EDB_NUMERIC);
 
 	pos.x += 44;
 	pos.y += 3;
@@ -63,7 +64,7 @@ Translator::Translator()
 	size.cx = 158;
 	size.cy = 0;
 
-	edit_original	= new EditBox("", pos, size, EDB_ALPHANUMERIC, 0);
+	edit_original	= new EditBox("", pos, size, 0);
 
 	pos.x += 165;
 	pos.y += 3;
@@ -73,7 +74,7 @@ Translator::Translator()
 	pos.x += 62;
 	pos.y -= 3;
 
-	edit_translated	= new EditBox("", pos, size, EDB_ALPHANUMERIC, 0);
+	edit_translated	= new EditBox("", pos, size, 0);
 
 	pos.x += 166;
 	pos.y -= 1;

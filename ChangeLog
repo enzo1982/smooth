@@ -7,6 +7,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 			- new method: SetOutputFormat(const char *);
 			- string only uses unicode internally now
 			- default input format is now ISO-8859-1 again
+			- String no longer hangs when input doesn't match input format
 - window.cpp		- Paint() now uses SP_UPDATE
 			- added new callback: Menu *getTrackMenu(Int mouseX, Int mouseY)
 			- fixed issues with modal and topmost windows
@@ -35,6 +36,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 - background.cpp	- messages are now sent to all threads; fixes some problems with multithreaded applications
 
 - introduced a new font management system
+- fixed some PopupMenu issues
 - many bugfixes
 
 16.03.03 07:00 - smooth alpha 0.8.61.0

@@ -276,6 +276,12 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 	EnterProtectedRegion();
 
+	PopupMenu *iPopup = myPopup;
+
+	iPopup->EnterProtectedRegion();
+
+	while (iPopup->prevPopup != NIL) { iPopup = iPopup->prevPopup; iPopup->EnterProtectedRegion(); }
+
 	Rect	 popupRect;
 	Int	 retVal = Success;
 	Int	 i;
@@ -309,8 +315,6 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDOWN:
 			if (myPopup->nextPopup != NIL)
 			{
-				myPopup->nextPopup->Hide();
-
 				DeleteObject(myPopup->nextPopup);
 
 				myPopup->nextPopup = NIL;
@@ -365,17 +369,14 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
-					PopupMenu::status = POPUP_PENDING;
-
 					PopupMenu *popup = myPopup;
 
 					while (popup->prevPopup != NIL) popup = popup->prevPopup;
 
 					popup->toolwnd->Hide();
 
-					PopupMenu::status = POPUP_FINISHED;
-
 					myPopup->realMenu->lastClicked = entry->id;
+					popup->onClick.Emit(0, 0);
 					entry->onClick.Emit();
 
 					retVal = Break;
@@ -391,15 +392,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
-					PopupMenu::status = POPUP_PENDING;
-
 					PopupMenu *popup = myPopup;
 
 					while (popup->prevPopup != NIL) popup = popup->prevPopup;
 
 					popup->toolwnd->Hide();
-
-					PopupMenu::status = POPUP_FINISHED;
 
 					if (*(entry->bVar) == False)	{ *(entry->bVar) = True; valueChanged = True; }
 					else				{ *(entry->bVar) = False; valueChanged = True; }
@@ -417,6 +414,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						}
 
 						myPopup->realMenu->lastClicked = entry->id;
+						popup->onClick.Emit(0, 0);
 						entry->onClick.Emit();
 					}
 
@@ -433,15 +431,11 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
 
-					PopupMenu::status = POPUP_PENDING;
-
 					PopupMenu *popup = myPopup;
 
 					while (popup->prevPopup != NIL) popup = popup->prevPopup;
 
 					popup->toolwnd->Hide();
-
-					PopupMenu::status = POPUP_FINISHED;
 
 					if (*(entry->iVar) != entry->iCode) { *(entry->iVar) = entry->iCode; valueChanged = True; }
 
@@ -458,6 +452,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 						}
 
 						myPopup->realMenu->lastClicked = entry->id;
+						popup->onClick.Emit(0, 0);
 						entry->onClick.Emit();
 					}
 
@@ -864,6 +859,12 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 	}
 
 	if (realMenu->GetNOfEntries() > 0) delete [] entryRect;
+
+	iPopup = myPopup;
+
+	iPopup->LeaveProtectedRegion();
+
+	while (iPopup->prevPopup != NIL) { iPopup = iPopup->prevPopup; iPopup->LeaveProtectedRegion(); }
 
 	LeaveProtectedRegion();
 

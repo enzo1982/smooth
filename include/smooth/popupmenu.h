@@ -32,10 +32,6 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 POPUP_NORMAL	= 0;
-		const Int	 POPUP_FINISHED	= 1;
-		const Int	 POPUP_PENDING	= 2;
-
 		class SMOOTHAPI PopupMenu : public Widget
 		{
 			friend class Window;
@@ -50,8 +46,6 @@ namespace smooth
 
 				Menu		*realMenu;
 			public:
-				static Int	 status;
-
 						 PopupMenu(Menu *);
 				 		~PopupMenu();
 

@@ -190,7 +190,7 @@ Void BeatClock::Options()
 	if (timeformat == 0)	alarmtext = String::FromInt(alarmbeats);
 	else			alarmtext = convertSecondsToTimeString(alarmsecs);
 
-	alarm_edit1 = new EditBox(alarmtext, pos, size, EDB_ALPHANUMERIC, 5);
+	alarm_edit1 = new EditBox(alarmtext, pos, size, 5);
 
 	pos.y = 35;
 	pos.x = 94;

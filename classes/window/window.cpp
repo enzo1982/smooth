@@ -458,6 +458,8 @@ HWND S::GUI::Window::Create()
 
 			drawSurface = new SurfaceGDI(windowDC);
 
+			onCreate.Emit();
+
 			return hwnd;
 		}
 		else
@@ -1186,6 +1188,7 @@ S::Int S::GUI::Window::RegisterObject(Object *object)
 
 			if (object->GetObjectType() == OBJ_WIDGET)
 			{
+				((Widget *) object)->onRegister.Emit(this);
 				((Widget *) object)->Show();
 			}
 
@@ -1214,6 +1217,7 @@ S::Int S::GUI::Window::UnregisterObject(Object *object)
 
 				if (object->GetObjectType() == OBJ_WIDGET)
 				{
+					((Widget *) object)->onUnregister.Emit(this);
 					((Widget *) object)->Hide();
 				}
 

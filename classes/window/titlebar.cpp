@@ -415,7 +415,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 
 				if (wnd->maximized)
 				{
-					SetWindowPos(wnd->hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right-nonmaxrect.left, nonmaxrect.bottom-nonmaxrect.top, 0);
+					SetWindowPos(wnd->hwnd, 0, nonmaxrect.left, nonmaxrect.top, nonmaxrect.right - nonmaxrect.left, nonmaxrect.bottom - nonmaxrect.top, 0);
 					wnd->maximized = False;
 
 					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, origwndstyle);
@@ -436,14 +436,14 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 						nonmaxrect = rect;
 					}
 
-					SetWindowPos(wnd->hwnd, 0, workArea.left-2, workArea.top-2, workArea.right-workArea.left+4, workArea.bottom-workArea.top+4, 0);
+					SetWindowPos(wnd->hwnd, 0, workArea.left - 2, workArea.top - 2, workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4, 0);
 					wnd->maximized = True;
 
 					if (Setup::enableUnicode)	origwndstyle = GetWindowLongW(wnd->hwnd, GWL_STYLE);
 					else				origwndstyle = GetWindowLongA(wnd->hwnd, GWL_STYLE);
 
-					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, (origwndstyle^WS_THICKFRAME)|WS_DLGFRAME);
-					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, (origwndstyle^WS_THICKFRAME)|WS_DLGFRAME);
+					if (Setup::enableUnicode)	SetWindowLongW(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+					else				SetWindowLongA(wnd->hwnd, GWL_STYLE, (origwndstyle ^ WS_THICKFRAME) | WS_DLGFRAME);
 				}
 			}
 			if (closeclk)

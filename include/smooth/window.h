@@ -160,6 +160,8 @@ namespace smooth
 
 				static Window			*GetWindow(HWND);
 			signals:
+				Signal0<Void>			 onCreate;
+
 				Signal0<Void>			 onPaint;
 				Signal0<Void>			 onPeek;
 				Signal3<Void, Int, Int, Int>	 onEvent;

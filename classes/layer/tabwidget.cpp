@@ -365,6 +365,8 @@ S::Int S::GUI::TabWidget::RegisterObject(Object *object)
 			object->SetContainer(myContainer->GetContainerObject()->GetContainer());
 			object->SetRegisteredFlag();
 
+			((Widget *) object)->onRegister.Emit(this);
+
 			if (nOfObjects == 1)	((Layer *) object)->Show();
 			else			((Layer *) object)->Hide();
 
@@ -391,6 +393,8 @@ S::Int S::GUI::TabWidget::UnregisterObject(Object *object)
 
 				activateNew = True;
 			}
+
+			((Widget *) object)->onUnregister.Emit(this);
 
 			if (assocObjects.DeleteEntry(object->handle) == True)
 			{

@@ -17,6 +17,7 @@ namespace smooth
 	{
 		public:
 			virtual			~Instance() {}
+
 			virtual Instance	*Copy() = 0;
 			virtual Void		 Call(Method *, ...) = 0;
 	};

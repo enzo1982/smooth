@@ -91,5 +91,6 @@
 #include "smooth/system.h"
 #include "smooth/setup.h"
 #include "smooth/input.h"
+#include "smooth/droparea.h"
 
 #endif

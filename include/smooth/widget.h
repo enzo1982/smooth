@@ -37,40 +37,43 @@ namespace smooth
 		class SMOOTHAPI Widget : public Object
 		{
 			protected:
-				Bool		 visible;
-				Bool		 active;
+				Bool				 visible;
+				Bool				 active;
 			public:
-				Int		 subtype;
+				Int				 subtype;
 
-						 Widget();
-				virtual		~Widget();
+								 Widget();
+				virtual				~Widget();
 
-				virtual Int	 Show();
-				virtual Int	 Hide();
+				virtual Int			 Show();
+				virtual Int			 Hide();
 
-				virtual Int	 Activate();
-				virtual Int	 Deactivate();
+				virtual Int			 Activate();
+				virtual Int			 Deactivate();
 
-				virtual Int	 Paint(Int);
-				virtual Int	 Process(Int, Int, Int);
+				virtual Int			 Paint(Int);
+				virtual Int			 Process(Int, Int, Int);
 
-				Bool		 IsVisible();
-				Bool		 IsActive();
+				Bool				 IsVisible();
+				Bool				 IsActive();
 
-				virtual Int	 SetText(String);
-				virtual String	 GetText();
+				virtual Int			 SetText(String);
+				virtual String			 GetText();
 
-				virtual Int	 SetTooltip(String);
-				virtual String	 GetTooltip();
+				virtual Int			 SetTooltip(String);
+				virtual String			 GetTooltip();
 
-				virtual Int	 SetFont(String, Int, Int, Int);
-				virtual Int	 SetOrientation(Int);
-				virtual Int	 SetPosition(Point);
-				virtual Int	 SetMetrics(Point, Size);
+				virtual Int			 SetFont(String, Int, Int, Int);
+				virtual Int			 SetOrientation(Int);
+				virtual Int			 SetPosition(Point);
+				virtual Int			 SetMetrics(Point, Size);
 
-				virtual Bool	 IsTypeCompatible(Int);
+				virtual Bool			 IsTypeCompatible(Int);
 			signals:
-				Signal0<Void>	 onClick;
+				Signal0<Void>			 onClick;
+
+				Signal1<Void, Container *>	 onRegister;
+				Signal1<Void, Container *>	 onUnregister;
 		};
 	};
 

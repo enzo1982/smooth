@@ -233,9 +233,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				toolWindow->FreeOwner();
 
-				delete listBox;
-				delete layer;
-				delete toolWindow;
+				DeleteObject(listBox);
+				DeleteObject(layer);
+				DeleteObject(toolWindow);
 
 				listBox		= NIL;
 				layer		= NIL;
@@ -262,9 +262,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 					toolWindow->FreeOwner();
 
-					delete listBox;
-					delete layer;
-					delete toolWindow;
+					DeleteObject(listBox);
+					DeleteObject(layer);
+					DeleteObject(toolWindow);
 
 					listBox		= NIL;
 					layer		= NIL;
@@ -375,9 +375,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 				toolWindow->FreeOwner();
 
-				delete listBox;
-				delete layer;
-				delete toolWindow;
+				DeleteObject(listBox);
+				DeleteObject(layer);
+				DeleteObject(toolWindow);
 
 				listBox		= NIL;
 				layer		= NIL;
@@ -447,9 +447,9 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 					toolWindow->FreeOwner();
 
-					delete listBox;
-					delete layer;
-					delete toolWindow;
+					DeleteObject(listBox);
+					DeleteObject(layer);
+					DeleteObject(toolWindow);
 
 					listBox		= NIL;
 					layer		= NIL;

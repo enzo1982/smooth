@@ -305,6 +305,7 @@ S::Int S::GUI::ToolWindow::RegisterObject(Object *object)
 
 			if (object->GetObjectType() == OBJ_WIDGET)
 			{
+				((Widget *) object)->onRegister.Emit(this);
 				((Widget *) object)->Show();
 			}
 

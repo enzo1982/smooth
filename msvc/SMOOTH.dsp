@@ -175,6 +175,10 @@ SOURCE=..\classes\layer\checkbox.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\layer\droparea.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\layer\editbox.cpp
 # End Source File
 # Begin Source File
@@ -768,6 +772,10 @@ SOURCE=..\include\smooth\dllmain.h
 # Begin Source File
 
 SOURCE=..\include\smooth\drag.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\droparea.h
 # End Source File
 # Begin Source File
 

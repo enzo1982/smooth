@@ -228,7 +228,11 @@ S::Int S::GUI::Layer::RegisterObject(Object *object)
 			object->SetContainer(this);
 			object->SetRegisteredFlag();
 
-			if (visible && object->GetObjectType() == OBJ_WIDGET) ((Widget *) object)->Show();
+			if (object->GetObjectType() == OBJ_WIDGET)
+			{
+				((Widget *) object)->onRegister.Emit(this);
+				if (visible) ((Widget *) object)->Show();
+			}
 
 			return Success;
 		}
@@ -249,7 +253,11 @@ S::Int S::GUI::Layer::UnregisterObject(Object *object)
 			{
 				nOfObjects--;
 
-				if (visible && object->GetObjectType() == OBJ_WIDGET) ((Widget *) object)->Hide();
+				if (object->GetObjectType() == OBJ_WIDGET)
+				{
+					if (visible) ((Widget *) object)->onUnregister.Emit(this);
+					((Widget *) object)->Hide();
+				}
 
 				object->UnsetRegisteredFlag();
 				object->SetContainer(NIL);

@@ -212,8 +212,7 @@ bool InStream::ReadData()
 		currentBufferPos = 0;
 	}
 
-	if (packageSize == 0)	return ReadData();
-	else			return true;
+	return true;
 }
 
 long InStream::InputNumber(int bytes)	// Intel byte order DCBA
@@ -530,7 +529,6 @@ bool InStream::SetFilter(IOLibFilter *newFilter)
 	filter = newFilter;
 
 	filter->SetDriver(driver);
-	filter->Activate();
 
 	allowpackset = true;
 
@@ -548,6 +546,8 @@ bool InStream::SetFilter(IOLibFilter *newFilter)
 	}
 
 	Seek(currentFilePos);
+
+	filter->Activate();
 
 	while (currentBufferPos >= packageSize)
 	{

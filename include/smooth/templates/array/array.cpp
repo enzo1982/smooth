@@ -427,9 +427,16 @@ template <class t> S::Bool S::Array<t>::RemoveAll()
 
 	Cleanup(firstEntry);
 
-	firstEntry = ARRAY_NULLPOINTER;
-
 	nOfEntries = 0;
+	greatestIndex = -1;
+	outlinedEntry = False;
+	firstEntry = ARRAY_NULLPOINTER;
+	lastEntry = ARRAY_NULLPOINTER;
+	prevEntry = ARRAY_NULLPOINTER;
+	prevDeletedEntry = ARRAY_NULLPOINTER;
+
+	lastN = -1024;
+	lastNthEntry = ARRAY_NULLPOINTER;
 
 	return True;
 }

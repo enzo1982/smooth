@@ -38,12 +38,10 @@ namespace smooth
 	extern int	 METRIC_MBENTRYSPACING;
 	extern int	 METRIC_MBENTRYHEIGHT;
 
-	extern int	 METRIC_ICONBARHEIGHT;
 	extern int	 METRIC_IBICONOFFSETX;
 	extern int	 METRIC_IBICONOFFSETY;
 	extern int	 METRIC_IBICONSIZE;
 	extern int	 METRIC_IBENTRYSPACING;
-	extern int	 METRIC_IBARROWOFFSETY;
 	extern int	 METRIC_IBARROWSIZEX;
 	extern int	 METRIC_IBARROWSIZEY;
 

@@ -35,6 +35,8 @@ namespace smooth
 				Int			 popupHandle;
 
 				String			 backupStatusText;
+
+				Int			 bitmapSize;
 			public:
 				static const Int	 classID;
 
@@ -43,6 +45,8 @@ namespace smooth
 
 				virtual Int		 Paint(Int);
 				Int			 Process(Int, Int, Int);
+
+				Int			 SetBitmapSize(Int);
 
 				Void			 PopupProc();
 		};

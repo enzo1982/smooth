@@ -38,6 +38,7 @@ xx.xx.03 xx:xx - smooth alpha 0.8.62.0
 - background.cpp	- messages are now sent to all threads; fixes some problems with multithreaded applications
 - document.cpp		- added support for parsing XML documents in memory
 - popupview.cpp		- popups now open automatically when the mouse is moved on a popup entry
+- menubar.cpp		- iconbars now support bigger icons
 
 - UnregisterObject() is no longer required unless you are removing an Object before the program quits
 - introduced a new font management system

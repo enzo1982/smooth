@@ -30,6 +30,7 @@ S::GUI::Menubar::Menubar()
 	objectProperties->size.cy	= METRIC_MENUBARHEIGHT;
 	popupHandle			= -1;
 	subtype				= WO_SEPARATOR;
+	bitmapSize			= METRIC_IBICONSIZE;
 
 	possibleContainers.AddEntry(Window::classID);
 }
@@ -110,7 +111,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		if (wnd->icon != NIL && objectProperties->orientation == OR_TOP) menuentry.left = menuentry.left + METRIC_TITLEBARHEIGHT - 2;
 
 		menuentry.right		= menuentry.left - METRIC_MBENTRYSPACING;
-		menuentry.bottom	= menuentry.top + METRIC_IBICONSIZE;
+		menuentry.bottom	= menuentry.top + bitmapSize;
 
 		GetSize();
 
@@ -166,7 +167,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				if (prevtext) menuentry.left += 2;
 
 				menuentry.left--;
-				menuentry.right = menuentry.left + METRIC_IBICONSIZE;
+				menuentry.right = menuentry.left + bitmapSize;
 				menuentry.top++;
 				menuentry.bottom++;
 
@@ -192,7 +193,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				if (prevtext) menuentry.left += 2;
 
 				menuentry.left--;
-				menuentry.right = menuentry.left + METRIC_IBICONSIZE;
+				menuentry.right = menuentry.left + bitmapSize;
 				menuentry.top++;
 				menuentry.bottom++;
 
@@ -202,13 +203,13 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				menuentry.left++;
 				menuentry.top--;
 				menuentry.bottom--;
-				menuentry.right = menuentry.left + METRIC_IBICONSIZE + METRIC_IBARROWSIZEX + 2;
+				menuentry.right = menuentry.left + bitmapSize + METRIC_IBARROWSIZEX + 2;
 
 				if (operat->onClick.GetNOfConnectedSlots() > 0) menuentry.right += 2;
 
 				p1.x = menuentry.right - METRIC_IBARROWSIZEX - 1;
 				p2.x = p1.x + METRIC_IBARROWSIZEX;
-				p1.y = menuentry.top + METRIC_IBARROWOFFSETY + 1;
+				p1.y = menuentry.top + (menuentry.bottom - menuentry.top - METRIC_IBARROWSIZEY) / 2 + 1;
 				p2.y = p1.y;
 
 				for (int y = 0; y < METRIC_IBARROWSIZEY; y++)
@@ -295,7 +296,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				if (prevbitmap) helpmenuentry.right += 1;
 
-				helpmenuentry.left = helpmenuentry.right - METRIC_IBICONSIZE;
+				helpmenuentry.left = helpmenuentry.right - bitmapSize;
 				helpmenuentry.top++;
 				helpmenuentry.bottom++;
 
@@ -321,7 +322,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				if (prevbitmap) helpmenuentry.right += 1;
 
 				helpmenuentry.right -= (METRIC_IBARROWSIZEX + 3);
-				helpmenuentry.left = helpmenuentry.right - METRIC_IBICONSIZE;
+				helpmenuentry.left = helpmenuentry.right - bitmapSize;
 				helpmenuentry.top++;
 				helpmenuentry.bottom++;
 
@@ -331,11 +332,11 @@ S::Int S::GUI::Menubar::Paint(Int message)
 				helpmenuentry.top--;
 				helpmenuentry.bottom--;
 				helpmenuentry.right += (METRIC_IBARROWSIZEX + 3);
-				helpmenuentry.left = helpmenuentry.right - METRIC_IBICONSIZE - METRIC_IBARROWSIZEX - 2;
+				helpmenuentry.left = helpmenuentry.right - bitmapSize - METRIC_IBARROWSIZEX - 2;
 
 				p1.x = helpmenuentry.right - METRIC_IBARROWSIZEX - 1;
 				p2.x = p1.x + METRIC_IBARROWSIZEX;
-				p1.y = helpmenuentry.top + METRIC_IBARROWOFFSETY + 1;
+				p1.y = helpmenuentry.top + (helpmenuentry.bottom - helpmenuentry.top - METRIC_IBARROWSIZEY) / 2 + 1;
 				p2.y = p1.y;
 
 				for (int y = 0; y < METRIC_IBARROWSIZEY; y++)
@@ -367,7 +368,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	{
 		menuentry.top		= menubar.top + METRIC_MBTEXTOFFSETX - 8;
 		menuentry.left		= METRIC_MBTEXTOFFSETX - 6;
-		menuentry.right		= menuentry.left + METRIC_IBICONSIZE;
+		menuentry.right		= menuentry.left + bitmapSize;
 		menuentry.bottom	= menuentry.top - METRIC_MBENTRYSPACING;
 
 		GetSize();
@@ -383,7 +384,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				if (prevtext) menuentry.top += 2;
 
-				menuentry.bottom = menuentry.top + METRIC_IBICONSIZE + 1;
+				menuentry.bottom = menuentry.top + bitmapSize + 1;
 
 				menuentry.top++;
 
@@ -601,8 +602,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect = operat->rect;
 						bmprect.left	+= 2;
 						bmprect.top	+= 2;
-						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
-						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
+						bmprect.right	= bmprect.left + bitmapSize;
+						bmprect.bottom	= bmprect.top + bitmapSize;
 
 						if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
 						else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
@@ -686,8 +687,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect = operat->rect;
 						bmprect.left	+= 2;
 						bmprect.top	+= 2;
-						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
-						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
+						bmprect.right	= bmprect.left + bitmapSize;
+						bmprect.bottom	= bmprect.top + bitmapSize;
 
 						surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
 						surface->Frame(operat->rect, FRAME_UP);
@@ -715,8 +716,8 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 						bmprect = operat->rect;
 						bmprect.left	+= 2;
 						bmprect.top	+= 2;
-						bmprect.right	= bmprect.left + METRIC_IBICONSIZE;
-						bmprect.bottom	= bmprect.top + METRIC_IBICONSIZE;
+						bmprect.right	= bmprect.left + bitmapSize;
+						bmprect.bottom	= bmprect.top + bitmapSize;
 
 						if (flags & MB_COLOR)	surface->BlitFromBitmap(operat->bitmap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->bitmap), GetBitmapSizeY(operat->bitmap))), bmprect);
 						else			surface->BlitFromBitmap(operat->graymap, Rect(Point(0, 0), Size(GetBitmapSizeX(operat->graymap), GetBitmapSizeY(operat->graymap))), bmprect);
@@ -752,6 +753,16 @@ S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 	LeaveProtectedRegion();
 
 	return retVal;
+}
+
+S::Int S::GUI::Menubar::SetBitmapSize(Int nSize)
+{
+	bitmapSize = nSize;
+
+	objectProperties->size.cx = bitmapSize + 6;
+	objectProperties->size.cy = bitmapSize + 6;
+
+	return Success;
 }
 
 S::Void S::GUI::Menubar::PopupProc()

@@ -696,7 +696,7 @@ S::String S::String::FromFloat(Float value)
 			newString[i + 1] = (wchar_t) Math::Floor(((Int) (-value) % (Int) Math::Pow(10, sz - i - 1)) / Math::Pow(10, sz - (i + 1) - 1)) + 48;
 		}
 
-		afps = FromInt((Int) (-(value - (Int) value) * (Int) Math::Pow(10, 9)));
+		afps = FromInt((Int) (-(value - (Int) value) * (Int) Math::Pow(10, 8)));
 	}
 	else
 	{
@@ -705,7 +705,7 @@ S::String S::String::FromFloat(Float value)
 			newString[i] = (wchar_t) Math::Floor(((Int) value % (Int) Math::Pow(10, sz - i)) / Math::Pow(10, sz - (i + 1))) + 48;
 		}
 
-		afps = FromInt((Int) ((value - (Int) value) * (Int) Math::Pow(10, 9)));
+		afps = FromInt((Int) ((value - (Int) value) * (Int) Math::Pow(10, 8)));
 	}
 
 	afpslen = afps.Length();

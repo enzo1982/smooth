@@ -83,6 +83,8 @@ namespace smooth
 				Int			 SetDropDownList(List *);
 
 				Int			 GetCursorPos();
+			signals:
+				Signal0<Void>		 onEnter;
 		};
 	};
 };

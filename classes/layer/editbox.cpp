@@ -55,6 +55,8 @@ S::GUI::EditBox::EditBox(String text, Point pos, Size size, Int iMaxSize)
 	else			objectProperties->size.cx = Math::Round(size.cx * Setup::FontSize);
 	if (size.cy == 0)	objectProperties->size.cy = Math::Round(19 * Setup::FontSize);
 	else			objectProperties->size.cy = Math::Round(size.cy * Setup::FontSize);
+
+	onEnter.SetParentObject(this);
 }
 
 S::GUI::EditBox::~EditBox()
@@ -497,7 +499,12 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 						break;
 					case VK_RETURN:
-						if (objectProperties->clicked) Process(SM_LBUTTONDOWN, 0, 1);
+						if (objectProperties->clicked)
+						{
+							Process(SM_LBUTTONDOWN, 0, 1);
+
+							onEnter.Emit();
+						}
 
 						break;
 					case VK_BACK:

@@ -29,7 +29,11 @@ S::GUI::Widget::Widget()
 
 	objectProperties->font.SetColor(Setup::TextColor);
 
+	onShow.SetParentObject(this);
+	onHide.SetParentObject(this);
+
 	onClick.SetParentObject(this);
+
 	onRegister.SetParentObject(this);
 	onUnregister.SetParentObject(this);
 }

@@ -26,6 +26,7 @@ xx.xx.04 xx:xx - smooth alpha 0.8.64.0
 - string.cpp	- removed IsUTF8() method as this is handled automatically by ConvertString(...)
 		- new method IsUnicode()
 - array.cpp	- fixed a stack overflow (recursion) in RemoveAll() if an Array has too many entries
+- editbox.cpp	- added signal: onEnter; emitted when the user finishes input with enter/return
 
 - new namespace GUI::Dialogs contains all dialogs plus MessageBox (now MessageDlg) and SplashScreen
 - new namespace Threads contains everything related to multi threading

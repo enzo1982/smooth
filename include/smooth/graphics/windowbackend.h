@@ -20,6 +20,11 @@ namespace smooth
 };
 
 #include "../definitions.h"
+#include "../string.h"
+#include "../primitives/point.h"
+#include "../primitives/size.h"
+#include "../callbacks.h"
+#include "surface.h"
 
 namespace smooth
 {
@@ -30,14 +35,39 @@ namespace smooth
 		class WindowBackend
 		{
 			protected:
-				Int		 type;
+				Int				 type;
+
+				Surface				*nullSurface;
+				Surface				*drawSurface;
 			public:
-						 WindowBackend(Void * = NIL);
-				virtual		~WindowBackend();
+								 WindowBackend(Void * = NIL);
+				virtual				~WindowBackend();
 
-				Int		 GetWindowType();
+				Int				 GetWindowType();
 
-				virtual Void	*GetSystemWindow();
+				virtual Void			*GetSystemWindow();
+
+				virtual Surface			*GetDrawSurface();
+
+				virtual Int			 Open(String, Point, Size, Int);
+				virtual Int			 Close();
+
+				virtual Int			 SetTitle(String);
+
+				virtual Int			 SetMinimumSize(Size);
+				virtual Int			 SetMaximumSize(Size);
+
+				virtual Int			 Show();
+				virtual Int			 Hide();
+
+				virtual Int			 SetMetrics(const Point &, const Size &);
+
+				virtual Int			 Minimize();
+
+				virtual Int			 Maximize();
+				virtual Int			 Restore();
+			signals:
+				Callback3<Int, Int, Int, Int>	 onEvent;
 		};
 	};
 };

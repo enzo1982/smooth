@@ -39,7 +39,7 @@ S::Int S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
 
-		if (parentWindow != NIL)	ofnw.hwndOwner = parentWindow->hwnd;
+		if (parentWindow != NIL)	ofnw.hwndOwner = (HWND) parentWindow->GetSystemWindow();
 		else				ofnw.hwndOwner = NIL;
 
 		ofnw.lStructSize	= sizeof(OPENFILENAMEW);
@@ -158,7 +158,7 @@ S::Int S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		for (Int j = 0; j < 32768; j++) buffera[j] = 0;
 
-		if (parentWindow != NIL)	ofna.hwndOwner = parentWindow->hwnd;
+		if (parentWindow != NIL)	ofna.hwndOwner = (HWND) parentWindow->GetSystemWindow();
 		else				ofna.hwndOwner = NIL;
 
 		ofna.lStructSize	= sizeof(OPENFILENAMEA);

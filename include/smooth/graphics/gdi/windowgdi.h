@@ -20,6 +20,7 @@ namespace smooth
 };
 
 #include "../windowbackend.h"
+#include "../../primitives/rect.h"
 
 namespace smooth
 {
@@ -29,13 +30,55 @@ namespace smooth
 
 		class WindowGDI : public WindowBackend
 		{
-			protected:
-				HWND	 hwnd;
-			public:
-					 WindowGDI(Void * = NIL);
-					~WindowGDI();
+			private:
+				static LRESULT CALLBACK		 WindowProc(HWND, UINT, WPARAM, LPARAM);
 
-				Void	*GetSystemWindow();
+				static Array<WindowGDI *>	 windowBackends;
+
+				static WindowGDI		*GetWindowBackend(HWND);
+
+				Int				 ProcessSystemMessages(Int, Int, Int);
+			protected:
+				Int				 id;
+
+				HWND				 hwnd;
+				HDC				 windowDC;
+
+				Void				*wndclass;
+				String				 className;
+
+				HICON				 sysIcon;
+
+				Int				 origWndStyle;
+				Rect				 nonMaxRect;
+
+				Size				 minSize;
+				Size				 maxSize;
+
+				Bool				 maximized;
+			public:
+								 WindowGDI(Void * = NIL);
+								~WindowGDI();
+
+				Void				*GetSystemWindow();
+
+				Int				 Open(String, Point, Size, Int);
+				Int				 Close();
+
+				Int				 SetTitle(String);
+
+				Int				 SetMinimumSize(Size);
+				Int				 SetMaximumSize(Size);
+
+				Int				 Show();
+				Int				 Hide();
+
+				Int				 SetMetrics(const Point &, const Size &);
+
+				Int				 Minimize();
+
+				Int				 Maximize();
+				Int				 Restore();
 		};
 	};
 };

@@ -40,78 +40,6 @@
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
 S::Int		 S::GUI::Window::nOfActiveWindows = 0;
 
-LRESULT CALLBACK S::GUI::Window::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	Window	*smoothWindow = Window::GetWindow(window);
-	Int	 retVal;
-	Int	 originalMessage = message;
-	Int	 param1 = wParam;
-	Int	 param2 = lParam;
-
-	switch (message)
-	{
-		case WM_MOUSEMOVE:
-		case WM_NCMOUSEMOVE:
-			message = SM_MOUSEMOVE;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_MOUSEWHEEL:
-			message = SM_MOUSEWHEEL;
-			param1 = (short) HIWORD(wParam);
-			param2 = 0;
-			break;
-		case WM_LBUTTONDOWN:
-		case WM_NCLBUTTONDOWN:
-			message = SM_LBUTTONDOWN;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_LBUTTONUP:
-		case WM_NCLBUTTONUP:
-			message = SM_LBUTTONUP;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_RBUTTONDOWN:
-		case WM_NCRBUTTONDOWN:
-			message = SM_RBUTTONDOWN;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_RBUTTONUP:
-		case WM_NCRBUTTONUP:
-			message = SM_RBUTTONUP;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_LBUTTONDBLCLK:
-		case WM_NCLBUTTONDBLCLK:
-			message = SM_LBUTTONDBLCLK;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_RBUTTONDBLCLK:
-		case WM_NCRBUTTONDBLCLK:
-			message = SM_RBUTTONDBLCLK;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_TIMER:
-			message = SM_TIMER;
-			param1 = wParam;
-			param2 = 0;
-			break;
-	}
-
-	if (smoothWindow != NIL)	retVal = smoothWindow->Process(message, param1, param2);
-	else				retVal = -1;
-
-	if (retVal != -1)		return retVal;
-	else if (Setup::enableUnicode)	return DefWindowProcW(window, originalMessage, wParam, lParam);
-	else				return DefWindowProcA(window, originalMessage, wParam, lParam);
-}
-
 S::GUI::Window::Window(String title, Void *iWindow)
 {
 #ifdef __WIN32__
@@ -120,13 +48,14 @@ S::GUI::Window::Window(String title, Void *iWindow)
 	backend = new WindowBackend(iWindow);
 #endif
 
+	backend->onEvent.Connect(&Window::Process, this);
+
 	self = this;
 
 	containerType = classID;
 
 	possibleContainers.AddEntry(Application::classID);
 
-	exstyle		= 0;
 	stay		= False;
 	maximized	= False;
 
@@ -161,9 +90,6 @@ S::GUI::Window::Window(String title, Void *iWindow)
 
 	RegisterObject(mainLayer);
 
-	minSize.cx = Math::Round(160 * Setup::FontSize);
-	minSize.cy = METRIC_TITLEBARHEIGHT + 5;
-
 	doQuit.Connect(True);
 
 	onCreate.SetParentObject(this);
@@ -171,33 +97,13 @@ S::GUI::Window::Window(String title, Void *iWindow)
 	onResize.SetParentObject(this);
 	onPeek.SetParentObject(this);
 	onEvent.SetParentObject(this);
-
-	style		= WS_THICKFRAME | WS_SYSMENU | WS_POPUP;
-	className	= String(title).Append(String::FromInt(System::RequestGUID()));
-
-	if (Setup::enableUnicode)	sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-	else				sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-
-	hwnd = NIL;
 }
 
 S::GUI::Window::~Window()
 {
 	if (created && !destroyed)
 	{
-		delete drawSurface;
-
-		drawSurface = nullSurface;
-
-		ReleaseDC(hwnd, windowDC);
-
-		DestroyWindow(hwnd);
-	}
-
-	if (created)
-	{
-		if (Setup::enableUnicode)	UnregisterClassW(className, hInstance);
-		else				UnregisterClassA(className, hInstance);
+		backend->Close();
 	}
 
 	UnregisterObject(mainLayer);
@@ -216,28 +122,18 @@ S::GUI::Window::~Window()
 	delete backend;
 }
 
-S::Int S::GUI::Window::SetMetrics(Point newPos, Size newSize)
+S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	updateRect = Rect();
 
-	objectProperties->pos.x		= Math::Round(newPos.x * Setup::FontSize);
-	objectProperties->pos.y		= Math::Round(newPos.y * Setup::FontSize);
-	objectProperties->size.cx	= Math::Round(newSize.cx * Setup::FontSize);
-	objectProperties->size.cy	= Math::Round(newSize.cy * Setup::FontSize);
+	objectProperties->pos.x		= Math::Round(nPos.x * Setup::FontSize);
+	objectProperties->pos.y		= Math::Round(nPos.y * Setup::FontSize);
+	objectProperties->size.cx	= Math::Round(nSize.cx * Setup::FontSize);
+	objectProperties->size.cy	= Math::Round(nSize.cy * Setup::FontSize);
 
-	if (created) SetWindowPos(hwnd, 0, Math::Round(newPos.x * Setup::FontSize), Math::Round(newPos.y * Setup::FontSize), Math::Round(newSize.cx * Setup::FontSize), Math::Round(newSize.cy * Setup::FontSize), SWP_NOZORDER);
+	if (created) backend->SetMetrics(objectProperties->pos, objectProperties->size);
 
 	return Success;
-}
-
-S::Void S::GUI::Window::SetStyle(Int s)
-{
-	if (!created) style = style | s;
-}
-
-S::Void S::GUI::Window::SetExStyle(Int es)
-{
-	if (!created) exstyle = exstyle | es;
 }
 
 S::GUI::Bitmap &S::GUI::Window::GetIcon()
@@ -273,29 +169,6 @@ S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 	}
 }
 
-S::Int S::GUI::Window::SetApplicationIcon(char *newIcon)
-{
-	return SetApplicationIcon((wchar_t *) newIcon);
-}
-
-S::Int S::GUI::Window::SetApplicationIcon(wchar_t *newIcon)
-{
-	if (newIcon == NIL) { sysIcon = NIL; return Success; }
-
-	if (newIcon == MAKEINTRESOURCEW(32512) || newIcon == MAKEINTRESOURCEW(32516) || newIcon == MAKEINTRESOURCEW(32515) || newIcon == MAKEINTRESOURCEW(32513) || newIcon == MAKEINTRESOURCEW(32514) || newIcon == MAKEINTRESOURCEW(32517))
-	{
-		if (Setup::enableUnicode)	sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(newIcon), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-		else				sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(newIcon), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-	}
-	else
-	{
-		if (Setup::enableUnicode)	sysIcon = (HICON) LoadImageW(hInstance, MAKEINTRESOURCEW(newIcon), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-		else				sysIcon = (HICON) LoadImageA(hInstance, MAKEINTRESOURCEA(newIcon), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-	}
-
-	return Success;
-}
-
 S::GUI::Layer *S::GUI::Window::GetMainLayer()
 {
 	return mainLayer;
@@ -309,8 +182,7 @@ S::Int S::GUI::Window::SetText(String title)
 	{
 		Process(SM_WINDOWTITLECHANGED, 0, 0);
 
-		if (Setup::enableUnicode)	SetWindowTextW(hwnd, title);
-		else				SetWindowTextA(hwnd, title);
+		backend->SetTitle(title);
 	}
 
 	return Success;
@@ -386,17 +258,13 @@ S::Int S::GUI::Window::Show()
 
 	if (maximized && !initshow)
 	{
-		ShowWindow(hwnd, SW_HIDE);
+		backend->Hide();
 
 		maximized = False;
 		Maximize();
+	}
 
-		ShowWindow(hwnd, SW_SHOW);
-	}
-	else
-	{
-		ShowWindow(hwnd, SW_SHOW);
-	}
+	backend->Show();
 
 	initshow	= True;
 	visible		= True;
@@ -410,7 +278,7 @@ S::Int S::GUI::Window::Hide()
 {
 	if (!created) Create();
 
-	ShowWindow(hwnd, SW_HIDE);
+	backend->Hide();
 
 	if (maximized && !initshow)
 	{
@@ -426,6 +294,11 @@ S::Int S::GUI::Window::Hide()
 	return Success;
 }
 
+S::Int S::GUI::Window::Minimize()
+{
+	return backend->Minimize();
+}
+
 S::Int S::GUI::Window::Maximize()
 {
 	if (maximized) return Success;
@@ -437,27 +310,7 @@ S::Int S::GUI::Window::Maximize()
 		return Success;
 	}
 
-	Rect	 workArea;
-
-	{
-		RECT rect;
-
-		if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-		else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
-
-		workArea = rect;
-
-		nonmaxrect = Rect(objectProperties->pos, objectProperties->size);
-	}
-
-	SetWindowPos(hwnd, 0, workArea.left - 2, workArea.top - 2, workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4, 0);
-
-	if (Setup::enableUnicode)
-	{
-		origWndStyle = GetWindowLongW(hwnd, GWL_STYLE);
-
-		SetWindowLongW(hwnd, GWL_STYLE, (origWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-	}
+	backend->Maximize();
 
 	maximized = True;
 
@@ -475,26 +328,21 @@ S::Int S::GUI::Window::Restore()
 		return Success;
 	}
 
-	SetWindowPos(hwnd, 0, nonmaxrect.left, nonmaxrect.top, (Int) Math::Max(minSize.cx, nonmaxrect.right - nonmaxrect.left), (Int) Math::Max(minSize.cy, nonmaxrect.bottom - nonmaxrect.top), 0);
+	backend->Restore();
 
 	maximized = False;
-
-	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, origWndStyle | WS_VISIBLE);
 
 	return Success;
 }
 
 S::Bool S::GUI::Window::IsMaximized()
 {
-	if (!created) return False;
-
 	return maximized;
 }
 
 S::Rect S::GUI::Window::GetWindowRect()
 {
-	if (maximized)	return nonmaxrect;
-	else		return Rect(objectProperties->pos, objectProperties->size);
+	return Rect(objectProperties->pos, objectProperties->size);
 }
 
 S::Rect S::GUI::Window::GetClientRect()
@@ -520,14 +368,14 @@ S::Int S::GUI::Window::SetUpdateRect(Rect newUpdateRect)
 
 S::Int S::GUI::Window::SetMinimumSize(Size newMinSize)
 {
-	minSize = newMinSize;
+	backend->SetMinimumSize(newMinSize);
 
 	return Success;
 }
 
 S::Int S::GUI::Window::SetMaximumSize(Size newMaxSize)
 {
-	maxSize = newMaxSize;
+	backend->SetMaximumSize(newMaxSize);
 
 	return Success;
 }
@@ -536,64 +384,12 @@ S::Bool S::GUI::Window::Create()
 {
 	if (registered && !created)
 	{
-		if (flags & WF_NORESIZE)	style	= (style ^ WS_THICKFRAME) | WS_DLGFRAME;
-		if (flags & WF_TOPMOST)		exstyle	= exstyle | WS_EX_TOPMOST;
-		if (flags & WF_NOTASKBUTTON)	exstyle = exstyle | WS_EX_TOOLWINDOW;
-
-		if (Setup::enableUnicode)
-		{
-			WNDCLASSEXW	 wndclassw;
-
-			wndclassw.cbSize	= sizeof(wndclassw);
-			wndclassw.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
-			wndclassw.lpfnWndProc	= WindowProc;
-			wndclassw.cbClsExtra	= 0;
-			wndclassw.cbWndExtra	= 0;
-			wndclassw.hInstance	= hInstance;
-			wndclassw.hIcon		= sysIcon;
-			wndclassw.hCursor	= (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-			wndclassw.hbrBackground	= NIL;
-			wndclassw.lpszMenuName	= NIL;
-			wndclassw.lpszClassName	= className;
-			wndclassw.hIconSm	= sysIcon;
-
-			RegisterClassExW(&wndclassw);
-
-			hwnd = CreateWindowExW(exstyle, className, objectProperties->text, style, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, NIL, NIL, hInstance, NIL);
-		}
-		else
-		{
-			WNDCLASSEXA	 wndclassa;
-
-			wndclassa.cbSize	= sizeof(wndclassa);
-			wndclassa.style		= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((exstyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
-			wndclassa.lpfnWndProc	= WindowProc;
-			wndclassa.cbClsExtra	= 0;
-			wndclassa.cbWndExtra	= 0;
-			wndclassa.hInstance	= hInstance;
-			wndclassa.hIcon		= sysIcon;
-			wndclassa.hCursor	= (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-			wndclassa.hbrBackground	= NIL;
-			wndclassa.lpszMenuName	= NIL;
-			wndclassa.lpszClassName	= className;
-			wndclassa.hIconSm	= sysIcon;
-
-			RegisterClassExA(&wndclassa);
-
-			hwnd = CreateWindowExA(exstyle, className, objectProperties->text, style, objectProperties->pos.x, objectProperties->pos.y, objectProperties->size.cx, objectProperties->size.cy, NIL, NIL, hInstance, NIL);
-		}
-
-		if (hwnd != NIL)
+		if (backend->Open(objectProperties->text, objectProperties->pos, objectProperties->size, flags) == Success)
 		{
 			created = True;
 			visible = False;
 
 			CalculateOffsets();
-
-			windowDC = GetWindowDC(hwnd);
-
-			drawSurface = new Surface(windowDC);
-			drawSurface->SetSize(objectProperties->size);
 
 			onCreate.Emit();
 
@@ -623,11 +419,11 @@ S::Int S::GUI::Window::Stay()
 
 	stay	= True;
 
-	if (Setup::enableUnicode)	::SendMessageW(hwnd, WM_KILLFOCUS, 0, 0);
-	else				::SendMessageA(hwnd, WM_KILLFOCUS, 0, 0);
+	if (Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_KILLFOCUS, 0, 0);
+	else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_KILLFOCUS, 0, 0);
 
-	if (Setup::enableUnicode)	::SendMessageW(hwnd, WM_ACTIVATEAPP, 1, 0);
-	else				::SendMessageA(hwnd, WM_ACTIVATEAPP, 1, 0);
+	if (Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_ACTIVATEAPP, 1, 0);
+	else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_ACTIVATEAPP, 1, 0);
 
 	while (!destroyed)
 	{
@@ -663,12 +459,10 @@ S::Int S::GUI::Window::Stay()
 
 S::Int S::GUI::Window::Close()
 {
-	if (hwnd == NIL) return Error;
-
 	Process(SM_LOOSEFOCUS, 0, 0);
 
-	if (Setup::enableUnicode)	::PostMessageW(hwnd, WM_CLOSE, 0, 0);
-	else				::PostMessageA(hwnd, WM_CLOSE, 0, 0);
+	if (Setup::enableUnicode)	::PostMessageW((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
+	else				::PostMessageA((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
 
 	return Success;
 }
@@ -703,27 +497,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
-		case WM_NCDESTROY:
-			LeaveProtectedRegion();
-
-			return 0;
 		case WM_CLOSE:
 			if (doQuit.Call())
 			{
-				SetFlags((flags | WF_MODAL) ^ WF_MODAL);
-				SetFlags((flags | WF_SYSTEMMODAL) ^ WF_SYSTEMMODAL);
-				SetFlags((flags | WF_TOPMOST) ^ WF_TOPMOST);
-				SetFlags((flags | WF_APPTOPMOST) ^ WF_APPTOPMOST);
-
-				delete drawSurface;
-
-				drawSurface = nullSurface;
-
-				ReleaseDC(hwnd, windowDC);
-
-				DestroyWindow(hwnd);
-
-				hwnd = NIL;
+				backend->Close();
 			}
 
 			LeaveProtectedRegion();
@@ -734,8 +511,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			if (nOfActiveWindows == 0 && loopActive)
 			{
-				if (Setup::enableUnicode)	::SendMessageW(hwnd, WM_QUIT, 0, 0);
-				else				::SendMessageA(hwnd, WM_QUIT, 0, 0);
+				if (Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_QUIT, 0, 0);
+				else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_QUIT, 0, 0);
 			}
 			else
 			{
@@ -755,27 +532,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			PostQuitMessage(0);
 
 			return 0;
-		case WM_SETTINGCHANGE:
-			if ((wParam == SPI_SETWORKAREA) && maximized)
-			{
-				RECT	 rect;
-
-				if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-				else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
-
-				SetWindowPos(hwnd, 0, rect.left - 2, rect.top - 2, rect.right - rect.left + 4, rect.bottom - rect.top + 4, 0);
-			}
-
-			LeaveProtectedRegion();
-
-			return 0;
 		case WM_SYSCOLORCHANGE:
 			GetColors();
-
-			break;
-		case WM_NCPAINT:
-			if (Setup::enableUnicode)	PostMessageW(hwnd, WM_PAINT, 0, 0);
-			else				PostMessageA(hwnd, WM_PAINT, 0, 0);
 
 			break;
 		case WM_PAINT:
@@ -784,7 +542,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				updateRect = uRect;
 
-				if (::GetUpdateRect(hwnd, &uRect, 0))
+				if (::GetUpdateRect((HWND) backend->GetSystemWindow(), &uRect, 0))
 				{
 					updateRect = uRect;
 
@@ -793,12 +551,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 					PAINTSTRUCT	 ps;
 
-					BeginPaint(hwnd, &ps);
+					BeginPaint((HWND) backend->GetSystemWindow(), &ps);
 
 					if (Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20)	Paint(SP_DELAYED);
 					else																						Paint(SP_UPDATE);
 
-					EndPaint(hwnd, &ps);
+					EndPaint((HWND) backend->GetSystemWindow(), &ps);
 				}
 			}
 
@@ -842,7 +600,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 					{
 						if (object->GetObjectType() == classID)
 						{
-							if (object->handle > handle && (object->GetFlags() & WF_MODAL)) SetActiveWindow(((Window *) object)->hwnd);
+							if (object->handle > handle && (object->GetFlags() & WF_MODAL)) SetActiveWindow((HWND) ((Window *) object)->GetSystemWindow());
 						}
 					}
 				}
@@ -856,7 +614,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				Bool	 activate = False;
 				HWND	 actWnd = GetActiveWindow();
 
-				if (actWnd == hwnd) break;
+				if (actWnd == (HWND) backend->GetSystemWindow()) break;
 
 				if (GetWindow(actWnd) == NIL)					activate = False;
 				else if (GetWindow(actWnd)->type == ToolWindow::classID)	break;
@@ -871,12 +629,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (activate && message == WM_KILLFOCUS)
 				{
-					if (GetWindow(SetActiveWindow(hwnd)) != NIL)	activate = True;
-					else						activate = False;
+					if (GetWindow(SetActiveWindow((HWND) backend->GetSystemWindow())) != NIL)	activate = True;
+					else										activate = False;
 				}
 
-				if (activate)	SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-				else		SetWindowPos(hwnd, message == WM_KILLFOCUS ? HWND_NOTOPMOST : GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+				if (activate)	SetWindowPos((HWND) backend->GetSystemWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+				else		SetWindowPos((HWND) backend->GetSystemWindow(), message == WM_KILLFOCUS ? HWND_NOTOPMOST : GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 			}
 
 			if (flags & WF_APPTOPMOST && (message == WM_ACTIVATEAPP || message == WM_KILLFOCUS))
@@ -884,7 +642,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				Bool	 activate = False;
 				HWND	 actWnd = GetActiveWindow();
 
-				if (actWnd == hwnd) break;
+				if (actWnd == (HWND) backend->GetSystemWindow()) break;
 
 				if (GetWindow(actWnd) == NIL)					activate = False;
 				else if (GetWindow(actWnd)->type == ToolWindow::classID)	break;
@@ -896,11 +654,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 					else		activate = False;
 				}
 
-				if (activate) SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+				if (activate) SetWindowPos((HWND) backend->GetSystemWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 				else
 				{
-					SetWindowPos(hwnd, GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
-					SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+					SetWindowPos((HWND) backend->GetSystemWindow(), GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+					SetWindowPos((HWND) backend->GetSystemWindow(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 				}
 			}
 
@@ -909,7 +667,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				Bool	 activate = False;
 				HWND	 actWnd = GetForegroundWindow();
 
-				if (actWnd == hwnd) break;
+				if (actWnd == (HWND) backend->GetSystemWindow()) break;
 
 				if (GetWindow(actWnd) == NIL)					activate = True;
 				else if (GetWindow(actWnd)->type == ToolWindow::classID)	activate = False;
@@ -918,27 +676,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (activate)
 				{
-					SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-					SetForegroundWindow(hwnd);
+					SetWindowPos((HWND) backend->GetSystemWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+					SetForegroundWindow((HWND) backend->GetSystemWindow());
 				}
 			}
 
-			break;
-		case WM_GETMINMAXINFO:
-			if (style & WS_DLGFRAME)
-			{
-				((LPMINMAXINFO) lParam)->ptMaxSize.x = objectProperties->size.cx;
-				((LPMINMAXINFO) lParam)->ptMaxSize.y = objectProperties->size.cy;
-				((LPMINMAXINFO) lParam)->ptMaxPosition = objectProperties->pos;
-			}
-			else
-			{
-				((LPMINMAXINFO) lParam)->ptMinTrackSize.x = minSize.cx;
-				((LPMINMAXINFO) lParam)->ptMinTrackSize.y = minSize.cy;
-
-				if (maxSize.cx > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.x = maxSize.cx;
-				if (maxSize.cy > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.y = maxSize.cy;
-			}
 			break;
 		case SM_EXECUTEPEEK:
 			onPeek.Emit();
@@ -1308,6 +1050,16 @@ S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 	else														return False;
 }
 
+S::GUI::Surface *S::GUI::Window::GetDrawSurface()
+{
+	return backend->GetDrawSurface();
+}
+
+S::Void *S::GUI::Window::GetSystemWindow()
+{
+	return backend->GetSystemWindow();
+}
+
 S::Void S::GUI::Window::PopupProc()
 {
 	if (trackMenu != NIL)
@@ -1435,9 +1187,9 @@ S::Void S::GUI::Window::PaintTimer()
 	LeaveProtectedRegion();
 }
 
-S::GUI::Window *S::GUI::Window::GetWindow(HWND hwnd)
+S::GUI::Window *S::GUI::Window::GetWindow(Void *sysWindow)
 {
-	if (hwnd == NIL) return NIL;
+	if (sysWindow == NIL) return NIL;
 
 	for (Int i = 0; i < mainObjectManager->GetNOfObjects(); i++)
 	{
@@ -1447,7 +1199,7 @@ S::GUI::Window *S::GUI::Window::GetWindow(HWND hwnd)
 		{
 			if (window->GetObjectType() == Window::classID || window->GetObjectType() == MDIWindow::classID || window->GetObjectType() == ToolWindow::classID)
 			{
-				if (((Window *) window)->hwnd == hwnd) return (Window *) window;
+				if (((Window *) window)->GetSystemWindow() == sysWindow) return (Window *) window;
 			}
 		}
 	}

@@ -266,8 +266,8 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 		case WM_ACTIVATE:
 		case WM_ACTIVATEAPP:
 		case WM_KILLFOCUS:
-			if (message == WM_ACTIVATE && toolWindow != NIL) if (((HWND) lParam) == toolWindow->hwnd) break;
-			if (message == WM_KILLFOCUS && toolWindow != NIL) if (((HWND) wParam) == toolWindow->hwnd) break;
+			if (message == WM_ACTIVATE && toolWindow != NIL) if ((HWND) lParam == (HWND) toolWindow->GetSystemWindow()) break;
+			if (message == WM_KILLFOCUS && toolWindow != NIL) if ((HWND) wParam == (HWND) toolWindow->GetSystemWindow()) break;
 
 			if (listBoxOpen)
 			{

@@ -54,7 +54,7 @@ S::Void S::GUI::DropArea::Init()
 {
 	Window	*wnd = (Window *) myContainer->GetContainerWindow();
 
-	DragAcceptFiles(wnd->hwnd, True);
+	DragAcceptFiles((HWND) wnd->GetSystemWindow(), True);
 }
 
 S::Int S::GUI::DropArea::Hide()

@@ -34,8 +34,8 @@ S::Int S::GUI::Dialogs::FontSelection::ShowDialog()
 
 	if (parentWindow != NIL)
 	{
-		cfw.hwndOwner = parentWindow->hwnd;
-		cfa.hwndOwner = parentWindow->hwnd;
+		cfw.hwndOwner = (HWND) parentWindow->GetSystemWindow();
+		cfa.hwndOwner = (HWND) parentWindow->GetSystemWindow();
 	}
 	else
 	{

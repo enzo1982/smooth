@@ -34,7 +34,7 @@ S::Int S::GUI::Dialogs::DirSelection::ShowDialog()
 
 		for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
 
-		if (parentWindow != NIL)	infow.hwndOwner = parentWindow->hwnd;
+		if (parentWindow != NIL)	infow.hwndOwner = (HWND) parentWindow->GetSystemWindow();
 		else				infow.hwndOwner = NIL;
 
 		infow.pidlRoot = NIL;
@@ -60,7 +60,7 @@ S::Int S::GUI::Dialogs::DirSelection::ShowDialog()
 
 		for (Int i = 0; i < 32768; i++) buffera[i] = 0;
 
-		if (parentWindow != NIL)	infoa.hwndOwner = parentWindow->hwnd;
+		if (parentWindow != NIL)	infoa.hwndOwner = (HWND) parentWindow->GetSystemWindow();
 		else				infoa.hwndOwner = NIL;
 
 		infoa.pidlRoot = NIL;

@@ -10,6 +10,7 @@
 
 #include <smooth/toolwindow.h>
 #include <smooth/graphics/window.h>
+#include <smooth/graphics/windowbackend.h>
 #include <smooth/object.h>
 #include <smooth/definitions.h>
 #include <smooth/metrics.h>
@@ -29,13 +30,12 @@ S::GUI::ToolWindow::ToolWindow() : Window("smooth ToolWindow")
 
 	objectProperties->orientation	= OR_FREE;
 
+	owner				= NIL;
+
 	possibleContainers.RemoveAll();
 	possibleContainers.AddEntry(Window::classID);
 
-	owner				= NIL;
-	style				= WS_BORDER | WS_POPUP;
-
-	SetFlags(WF_TOPMOST | WF_NOTASKBUTTON);
+	SetFlags(WF_TOPMOST | WF_NOTASKBUTTON | WF_THINBORDER);
 }
 
 S::GUI::ToolWindow::~ToolWindow()
@@ -107,15 +107,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 		case WM_CLOSE:
 			if (doQuit.Call())
 			{
-				delete drawSurface;
-
-				drawSurface = nullSurface;
-
-				ReleaseDC(hwnd, windowDC);
-
-				DestroyWindow(hwnd);
-
-				hwnd = NIL;
+				backend->Close();
 			}
 
 			LeaveProtectedRegion();
@@ -126,8 +118,8 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 			if (nOfActiveWindows == 0 && loopActive)
 			{
-				if (S::Setup::enableUnicode)	::SendMessageW(hwnd, WM_QUIT, 0, 0);
-				else				::SendMessageA(hwnd, WM_QUIT, 0, 0);
+				if (S::Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_QUIT, 0, 0);
+				else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_QUIT, 0, 0);
 			}
 			else
 			{
@@ -153,7 +145,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 				updateRect = uRect;
 
-				if (::GetUpdateRect(hwnd, &uRect, 0))
+				if (::GetUpdateRect((HWND) backend->GetSystemWindow(), &uRect, 0))
 				{
 					updateRect = uRect;
 
@@ -162,12 +154,12 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 					PAINTSTRUCT	 ps;
 
-					BeginPaint(hwnd, &ps);
+					BeginPaint((HWND) backend->GetSystemWindow(), &ps);
 
 					if (Math::Abs((updateRect.right - updateRect.left) - objectProperties->size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - objectProperties->size.cy) < 20)	Paint(SP_PAINT);
 					else																						Paint(SP_UPDATE);
 
-					EndPaint(hwnd, &ps);
+					EndPaint((HWND) backend->GetSystemWindow(), &ps);
 				}
 			}
 

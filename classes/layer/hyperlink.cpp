@@ -192,7 +192,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 			{
 				objectProperties->checked = True;
 
-				LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_HAND);
+				LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_HAND);
 
 				Paint(SP_MOUSEIN);
 			}
@@ -200,7 +200,7 @@ S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 			{
 				objectProperties->checked = False;
 
-				LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_ARROW);
+				LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_ARROW);
 
 				Paint(SP_MOUSEOUT);
 			}

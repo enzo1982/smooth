@@ -250,7 +250,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				promptPos = 0;
 
 				{
-					HIMC		 hImc = ImmGetContext(wnd->hwnd);
+					HIMC		 hImc = ImmGetContext((HWND) wnd->GetSystemWindow());
 					COMPOSITIONFORM	 info;
 
 					info.dwStyle = CFS_POINT;
@@ -324,7 +324,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				promptVisible = True;
 
 				{
-					HIMC		 hImc = ImmGetContext(wnd->hwnd);
+					HIMC		 hImc = ImmGetContext((HWND) wnd->GetSystemWindow());
 					COMPOSITIONFORM	 info;
 
 					info.dwStyle = CFS_POINT;
@@ -398,13 +398,13 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 		case SM_MOUSEMOVE:
 			if (!objectProperties->checked && wnd->IsMouseOn(frame))
 			{
-				LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_TEXTEDIT);
+				LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_TEXTEDIT);
 
 				objectProperties->checked = True;
 			}
 			else if (objectProperties->checked && !wnd->IsMouseOn(frame))
 			{
-				LiSASetMouseCursor(wnd->hwnd, LiSA_MOUSE_ARROW);
+				LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_ARROW);
 
 				objectProperties->checked = False;
 			}
@@ -551,7 +551,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						if (Setup::enableUnicode)	wcscpy(bWmText, mText);
 						else				strcpy(bAmText, mText);
 
-						OpenClipboard(wnd->hwnd);
+						OpenClipboard((HWND) wnd->GetSystemWindow());
 
 						if (Setup::enableUnicode)	SetClipboardData(CF_UNICODETEXT, (HANDLE) bWmText);
 						else				SetClipboardData(CF_TEXT, (HANDLE) bAmText);
@@ -573,7 +573,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 					String	 insertText;
 
-					OpenClipboard(wnd->hwnd);
+					OpenClipboard((HWND) wnd->GetSystemWindow());
 
 					if (Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT))
 					{
@@ -692,7 +692,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 	surface->Box(Rect(p1, Size(1, METRIC_EDITBOXLINEHEIGHT)), 0, INVERT);
 
 	{
-		HIMC		 hImc = ImmGetContext(wnd->hwnd);
+		HIMC		 hImc = ImmGetContext((HWND) wnd->GetSystemWindow());
 		COMPOSITIONFORM	 info;
 
 		info.dwStyle = CFS_POINT;

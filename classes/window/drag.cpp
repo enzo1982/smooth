@@ -13,6 +13,7 @@
 #include <smooth/definitions.h>
 #include <smooth/objectproperties.h>
 #include <smooth/loop.h>
+#include <smooth/input.h>
 
 const S::Int	 S::GUI::DragControl::classID = S::Object::RequestClassID();
 
@@ -53,19 +54,10 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 			if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
 			else					leftButton = VK_LBUTTON;
 
-			{
-				POINT	 mp;
-				RECT	 wr;
+			wRect = wnd->GetWindowRect();
 
-				GetCursorPos(&mp);
-				GetWindowRect(wnd->hwnd, &wr);
-
-				mPos = mp;
-				wRect = wr;
-			}
-
-			cpwp.cx = mPos.x - wRect.left;
-			cpwp.cy = mPos.y - wRect.top;
+			cpwp.cx = Input::MouseX() - wRect.left;
+			cpwp.cy = Input::MouseY() - wRect.top;
 
 			if (!wnd->IsMaximized())
 			{
@@ -95,21 +87,9 @@ S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)
 						else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
 					}
 
-					POINT	 mp;
+					SetWindowPos((HWND) wnd->GetSystemWindow(), 0, Input::MouseX() - cpwp.cx, Input::MouseY() - cpwp.cy, wnd->GetObjectProperties()->size.cx, wnd->GetObjectProperties()->size.cy, 0);
 
-					GetCursorPos(&mp);
-
-					Point	 m;
-					m = mp;
-
-					SetWindowPos(wnd->hwnd, 0, m.x - cpwp.cx, m.y - cpwp.cy, wnd->GetObjectProperties()->size.cx, wnd->GetObjectProperties()->size.cy, 0);
-
-					RECT wRect;
-
-					GetWindowRect(wnd->hwnd, &wRect);
-
-					Rect	 wndRect;
-					wndRect = wRect;
+					Rect	 wndRect = wnd->GetWindowRect();
 
 					wnd->GetObjectProperties()->pos.x	= wndRect.left;
 					wnd->GetObjectProperties()->pos.y	= wndRect.top;

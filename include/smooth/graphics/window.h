@@ -41,27 +41,18 @@ namespace smooth
 		const Int	 WF_NORESIZE		= 16;
 		const Int	 WF_NOTASKBUTTON	= 32;
 		const Int	 WF_DELAYPAINT		= 64;
+		const Int	 WF_THINBORDER		= 128;
 
 		const Int	 WO_SEPARATOR	= 1;
 		const Int	 WO_NOSEPARATOR	= 2;
 
 		class SMOOTHAPI Window : public Widget, public Container
 		{
-			private:
-				static LRESULT CALLBACK		 WindowProc(HWND, UINT, WPARAM, LPARAM);
-
-				WindowBackend			*backend;
 			protected:
-				HICON				 sysIcon;
-				HDC				 windowDC;
+				WindowBackend			*backend;
 
-				Int				 origWndStyle;
-
-				Int				 style;
-				Int				 exstyle;
-				Bool				 stay;
+				Int				 stay;
 				Bool				 maximized;
-				Rect				 nonmaxrect;
 
 				Bool				 created;
 				Bool				 destroyed;
@@ -71,11 +62,6 @@ namespace smooth
 				Rect				 innerOffset;
 				Rect				 updateRect;
 				Rect				 timedUpdateRect;
-
-				Size				 minSize;
-				Size				 maxSize;
-
-				String				 className;
 
 				String				 defaultStatus;
 
@@ -90,8 +76,6 @@ namespace smooth
 
 				Void				 PopupProc();
 			public:
-				HWND				 hwnd;
-
 				static const Int		 classID;
 
 				static Int			 nOfActiveWindows;
@@ -102,18 +86,11 @@ namespace smooth
 								 Window(String = NIL, Void * = NIL);
 								~Window();
 
-				static Window			*GetWindow(HWND);
-
 				Int				 SetIcon(const Bitmap &);
 				Bitmap				&GetIcon();
 
-				Int				 SetApplicationIcon(char *);
-				Int				 SetApplicationIcon(wchar_t *);
+				Int				 SetMetrics(const Point &, const Size &);
 
-				Int				 SetMetrics(Point, Size);
-
-				Void				 SetStyle(Int);
-				Void				 SetExStyle(Int);
 				Int				 SetText(String);
 
 				Layer				*GetMainLayer();
@@ -136,8 +113,11 @@ namespace smooth
 				Int				 Show();
 				Int				 Hide();
 
+				Int				 Minimize();
+
 				Int				 Maximize();
 				Int				 Restore();
+
 				Bool				 IsMaximized();
 
 				Int				 Stay();
@@ -152,6 +132,11 @@ namespace smooth
 				Int				 MouseY();
 
 				Bool				 IsMouseOn(Rect);
+
+				Surface				*GetDrawSurface();
+				Void				*GetSystemWindow();
+
+				static Window			*GetWindow(Void *);
 
 				Int				 RegisterObject(Object *);
 				Int				 UnregisterObject(Object *);

@@ -255,7 +255,6 @@ mainWnd_iconbar->SetOrientation(OR_LEFT);
 	// jetzt werden einige Fensterparameter festgelegt und die Fenster werden erzeugt:
 	mainWnd->SetMetrics(Point(100, 50), Size(570, 550));
 	mainWnd->SetIcon(Bitmap::LoadBitmap("icons.pci", 0, NIL));
-	mainWnd->SetApplicationIcon(MAKEINTRESOURCEW(32517));
 	mainWnd->getTrackMenu.Connect(&Test::GetTrackMenu, this);
 	mainWnd->doQuit.Connect(&Test::mainWnd_KillProc, this);
 

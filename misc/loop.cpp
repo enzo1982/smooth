@@ -14,14 +14,14 @@
 #include <smooth/resources.h>
 #include <smooth/threads/thread.h>
 #include <smooth/backends/backend.h>
+#include <smooth/graphics/window.h>
+#include <smooth/metrics.h>
+#include <smooth/objectmanager.h>
+#include <smooth/color.h>
 
 #ifdef __WIN32__
 #include <smooth/i18n.h>
-#include <smooth/graphics/window.h>
-#include <smooth/metrics.h>
 #include <smooth/background.h>
-#include <smooth/objectmanager.h>
-#include <smooth/color.h>
 
 #include <winsock.h>
 #else
@@ -54,8 +54,12 @@ S::Void S::Init()
 
 	Int	 codePage = 1252;
 
+#ifdef __WIN32__
 	if (LoadIconvDLL() == True)	Setup::useIconv = True;
 	else				Setup::useIconv = False;
+#else
+	Setup::useIconv = True;
+#endif
 
 	Backend::InitBackends();
 
@@ -124,11 +128,9 @@ S::Void S::Free()
 	delete backgroundApplication;
 
 	delete mainObjectManager;
-#endif
-
-	String::ClearTemporaryBuffers();
 
 	if (Setup::useIconv) FreeIconvDLL();
+#endif
 
 	Backend::DeinitBackends();
 
@@ -161,7 +163,6 @@ S::Int S::Loop()
 {
 #ifdef __WIN32__
 	MSG		 msg;
-	Int		 count = 0;
 #endif
 
 	if (!loopActive)
@@ -207,8 +208,6 @@ S::Int S::Loop()
 #ifdef __WIN32__
 		do
 		{
-			String::ClearTemporaryBuffers();
-
 			bool	 result;
 
 			if (Setup::enableUnicode)	result = PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
@@ -224,8 +223,6 @@ S::Int S::Loop()
 
 			if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
 			else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
-
-			if (++count == 1000) { count = 0; String::RelieveTemporaryBuffers(); }
 
 			if (peekLoop == 0) break;
 
@@ -254,8 +251,6 @@ S::Int S::Loop()
 
 			if (Setup::enableUnicode)	DispatchMessageW(&msg);
 			else				DispatchMessageA(&msg);
-
-			if (++count == 1000) { count = 0; String::RelieveTemporaryBuffers(); }
 
 			if (peekLoop > 0) break;
 

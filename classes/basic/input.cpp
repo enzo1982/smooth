@@ -20,18 +20,26 @@ S::Input::Input(const Input &)
 
 S::Int S::Input::MouseX()
 {
+#ifdef __WIN32__
 	POINT	 point;
 
 	GetCursorPos(&point);
 
 	return point.x;
+#else
+	return 0;
+#endif
 }
 
 S::Int S::Input::MouseY()
 {
+#ifdef __WIN32__
 	POINT	 point;
 
 	GetCursorPos(&point);
 
 	return point.y;
+#else
+	return 0;
+#endif
 }

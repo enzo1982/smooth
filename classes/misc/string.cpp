@@ -22,6 +22,8 @@ namespace smooth
 char	*S::String::inputFormat		= NIL;
 char	*S::String::outputFormat	= NIL;
 
+S::Int	 S::String::nOfStrings		= 0;
+
 S::Array<char *>	 S::String::allocatedBuffers;
 
 S::Int	 S::String::crc32_table[256];
@@ -29,6 +31,8 @@ S::Bool	 S::String::crc32_initialized = False;
 
 S::String::String()
 {
+	nOfStrings++;
+
 	wString = NIL;
 
 	Clean();
@@ -36,6 +40,8 @@ S::String::String()
 
 S::String::String(const int nil)
 {
+	nOfStrings++;
+
 	wString = NIL;
 
 	Clean();
@@ -43,6 +49,8 @@ S::String::String(const int nil)
 
 S::String::String(const char *iString)
 {
+	nOfStrings++;
+
 	if (iString == NIL)
 	{
 		wString = NIL;
@@ -61,6 +69,8 @@ S::String::String(const char *iString)
 
 S::String::String(const wchar_t *iString)
 {
+	nOfStrings++;
+
 	if (iString == NIL)
 	{
 		wString = NIL;
@@ -79,6 +89,8 @@ S::String::String(const wchar_t *iString)
 
 S::String::String(const String &iString)
 {
+	nOfStrings++;
+
 	if (iString.wString == NIL)
 	{
 		wString = NIL;
@@ -98,18 +110,20 @@ S::String::String(const String &iString)
 S::String::~String()
 {
 	Clean();
+
+	if (--nOfStrings == 0)
+	{
+		for (Int i = 0; i < allocatedBuffers.GetNOfEntries(); i++) delete [] allocatedBuffers.GetNthEntry(i);
+
+		allocatedBuffers.RemoveAll();
+	}
 }
 
-S::Void S::String::ClearTemporaryBuffers()
+S::Void S::String::DeleteTemporaryBuffers()
 {
-	for (Int i = 0; i < allocatedBuffers.GetNOfEntries(); i++) delete [] allocatedBuffers.GetNthEntry(i);
+	Int	 nOfEntries = allocatedBuffers.GetNOfEntries();
 
-	allocatedBuffers.RemoveAll();
-}
-
-S::Void S::String::RelieveTemporaryBuffers()
-{
-	for (Int i = 0; i < allocatedBuffers.GetNOfEntries() - 1000; i++)
+	for (Int i = 0; i < nOfEntries - 512; i++)
 	{
 		delete [] allocatedBuffers.GetFirstEntry();
 
@@ -193,7 +207,12 @@ char *S::String::SetInputFormat(const char *iFormat)
 
 	strcpy(inputFormat, iFormat);
 
-	if (previousInputFormat != NIL) allocatedBuffers.AddEntry(previousInputFormat);
+	if (previousInputFormat != NIL)
+	{
+		if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
+
+		allocatedBuffers.AddEntry(previousInputFormat);
+	}
 
 	return previousInputFormat;
 }
@@ -208,7 +227,12 @@ char *S::String::SetOutputFormat(const char *oFormat)
 
 	strcpy(outputFormat, oFormat);
 
-	if (previousOutputFormat != NIL) allocatedBuffers.AddEntry(previousOutputFormat);
+	if (previousOutputFormat != NIL)
+	{
+		if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
+
+		allocatedBuffers.AddEntry(previousOutputFormat);
+	}
 
 	return previousOutputFormat;
 }
@@ -262,6 +286,8 @@ char *S::String::ConvertTo(const char *encoding)
 
 		ConvertString((char *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize + 1, encoding);
 	}
+
+	if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
 
 	allocatedBuffers.AddEntry(buffer);
 

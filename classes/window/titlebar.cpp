@@ -263,6 +263,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
+#ifdef __WIN32__
 		case WM_SETFOCUS:
 		case WM_KILLFOCUS:
 		case SM_WINDOWTITLECHANGED:
@@ -312,6 +313,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			if (paint) Paint(SP_PAINT);
 
 			break;
+#endif
 		case SM_LBUTTONDBLCLK:
 			if (Binary::IsFlagSet(flags, TB_MAXBUTTON) && wnd->IsMouseOn(titleFrame) && !wnd->IsMouseOn(tButtonRect))
 			{
@@ -326,6 +328,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			{
 				wnd->Process(SM_LOOSEFOCUS, 0, 0);
 
+#ifdef __WIN32__
 				Int	 leftButton;
 
 				if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
@@ -377,6 +380,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 					}
 					while (GetAsyncKeyState(leftButton) != 0);
 				}
+#endif
 
 				retVal = Break;
 			}

@@ -11,6 +11,8 @@
 #ifndef _H_OBJSMOOTH_DLLMAIN_
 #define _H_OBJSMOOTH_DLLMAIN_
 
+#ifdef __WIN32__
+
 #include "definitions.h"
 
 namespace smooth
@@ -19,7 +21,6 @@ namespace smooth
 	Void	 FreeIconvDLL();
 };
 
-#ifdef __WIN32__
 extern HINSTANCE	 hDllInstance;
 
 #ifndef __SMOOTH_STATIC__

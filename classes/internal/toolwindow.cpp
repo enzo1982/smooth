@@ -20,6 +20,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/layer.h>
 #include <smooth/math.h>
+#include <smooth/color.h>
 
 const S::Int	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
 
@@ -73,7 +74,13 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 	}
 	else
 	{
-		surface->Box(updateRect, GetSysColor(COLOR_BTNFACE), FILLED);
+		Int	 color = CombineColor(192, 192, 192);
+
+#ifdef __WIN32__
+		color = GetSysColor(COLOR_BTNFACE);
+#endif
+
+		surface->Box(updateRect, color, FILLED);
 
 		onPaint.Emit();
 
@@ -102,6 +109,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);
 
+#ifdef __WIN32__
 	switch (message)
 	{
 		case WM_CLOSE:
@@ -197,6 +205,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 			break;
 	}
+#endif
 
 	for (Int j = GetNOfObjects() - 1; j >= 0; j--)
 	{

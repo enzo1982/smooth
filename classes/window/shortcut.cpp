@@ -41,6 +41,7 @@ S::Int S::GUI::Shortcut::Process(Int message, Int param1, Int param2)
 
 	switch (message)
 	{
+#ifdef __WIN32__
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 			if (param1 == key)
@@ -60,6 +61,7 @@ S::Int S::GUI::Shortcut::Process(Int message, Int param1, Int param2)
 			}
 
 			break;
+#endif
 	}
 
 	return retVal;

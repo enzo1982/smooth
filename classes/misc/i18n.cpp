@@ -12,8 +12,14 @@
 #include <smooth/i18n/smooth_de.h>
 #include <smooth/application.h>
 #include <smooth/math.h>
+
+#ifdef __WIN32__
 #include <direct.h>
 #include <io.h>
+#else
+#include <glob.h>
+#include <unistd.h>
+#endif
 
 S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
 
@@ -29,6 +35,7 @@ __declspec (dllexport)
 
 S::String S::I18N_DEFAULTFONT;
 
+#ifdef __WIN32__
 int CALLBACK EnumFontProcA(ENUMLOGFONTEXA *lpelfe, NEWTEXTMETRICEXA *lpntme, int fontType, LPARAM lParam)
 {
 	if (S::String(lpelfe->elfLogFont.lfFaceName) == "Microsoft Sans Serif")	return 0;
@@ -41,36 +48,41 @@ int CALLBACK EnumFontProcW(ENUMLOGFONTEXW *lpelfe, NEWTEXTMETRICEXW *lpntme, int
 	else									return 1;
 }
 
+#endif
+
 S::I18n::Language::Language()
 {
 	rightToLeft = False;
 
 	// get the default font
-	{
-		HDC		 dc = GetWindowDC(0);
-		LOGFONTA	 fontInfoA;
-		LOGFONTW	 fontInfoW;
 
-		fontInfoA.lfCharSet = DEFAULT_CHARSET;
-		fontInfoA.lfFaceName[0] = 0;
-		fontInfoA.lfPitchAndFamily = 0;
+#ifdef __WIN32__
+	HDC		 dc = GetWindowDC(0);
+	LOGFONTA	 fontInfoA;
+	LOGFONTW	 fontInfoW;
 
-		fontInfoW.lfCharSet = DEFAULT_CHARSET;
-		fontInfoW.lfFaceName[0] = 0;
-		fontInfoW.lfPitchAndFamily = 0;
+	fontInfoA.lfCharSet = DEFAULT_CHARSET;
+	fontInfoA.lfFaceName[0] = 0;
+	fontInfoA.lfPitchAndFamily = 0;
 
-		int	 result;
+	fontInfoW.lfCharSet = DEFAULT_CHARSET;
+	fontInfoW.lfFaceName[0] = 0;
+	fontInfoW.lfPitchAndFamily = 0;
 
-		if (Setup::enableUnicode)	result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
-		else				result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);
+	int	 result;
 
-		if (result == 0)	I18N_DEFAULTFONT = "Microsoft Sans Serif";
-		else			I18N_DEFAULTFONT = "MS Sans Serif";
+	if (Setup::enableUnicode)	result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
+	else				result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);
 
-		ReleaseDC(0, dc);
+	if (result == 0)	I18N_DEFAULTFONT = "Microsoft Sans Serif";
+	else			I18N_DEFAULTFONT = "MS Sans Serif";
 
-		I18N_DEFAULTFONTSIZE = 8;
-	}
+	ReleaseDC(0, dc);
+#else
+	I18N_DEFAULTFONT = "Helvetica";
+#endif
+
+	I18N_DEFAULTFONTSIZE = 8;
 }
 
 S::I18n::Language::~Language()
@@ -177,10 +189,12 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 	if (!internal)
 	{
 		String		 dir = Application::GetApplicationDirectory().Append("lang\\");
-		_finddata_t	 fileData;
-		int		 handle;
 
 		chdir(dir);
+
+#ifdef __WIN32__
+		_finddata_t	 fileData;
+		int		 handle;
 
 		if ((handle = _findfirst("*_*.xml", &fileData)) != -1)
 		{
@@ -201,6 +215,30 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 		}
 
 		_findclose(handle);
+#else
+		glob_t	*fileData = new glob_t;
+
+		if (glob("*_*.xml", GLOB_NOSORT, NIL, fileData) == 0)
+		{
+			for (Int i = 0; i < fileData->gl_pathc; i++)
+			{
+				doc = new XML::Document();
+				language = new Language();
+
+				doc->LoadFile(fileData->gl_pathv[i]);
+
+				language->magic = fileData->gl_pathv[i];
+
+				LoadDoc(doc, language);
+
+				delete doc;
+			}
+		}
+
+		globfree(fileData);
+
+		delete fileData;
+#endif
 
 		chdir(Application::GetApplicationDirectory());
 	}

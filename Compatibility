@@ -18,6 +18,7 @@ Source and binary compatibility between different smooth Versions
 		Compatibility with older versions
 Version		Source		Binary			Comments
 ---------------------------------------------------------------------------------------------------------------------
+0.8.63.0	yes		yes			-
 0.8.62.0	no		no			major changes again
 0.8.61.0	no		no			major API changes
 0.8.60.0	yes		no			-

@@ -118,6 +118,8 @@ S::GUI::Window *S::Container::GetContainerWindow()
 
 	while (object->GetObjectType() != GUI::Window::classID)
 	{
+		if (object->GetContainer() == NIL) return NIL;
+
 		object = object->GetContainer()->GetContainerObject();
 
 		if (object == NIL) return NIL;

@@ -28,6 +28,8 @@ S::MenuEntry::MenuEntry(Int newType, Int newID)
 	scKey		= 0;
 	scFlags		= 0;
 
+	shortcut	= NIL;
+
 	bVar		= NIL;
 	iVar		= NIL;
 
@@ -38,6 +40,7 @@ S::MenuEntry::MenuEntry(Int newType, Int newID)
 
 S::MenuEntry::~MenuEntry()
 {
+	if (shortcut != NIL) DeleteObject(shortcut);
 }
 
 S::Int S::MenuEntry::SetText(String newText)
@@ -67,6 +70,9 @@ S::Int S::MenuEntry::SetShortcut(Int nKey, Int nFlags)
 {
 	scKey	= nKey;
 	scFlags	= nFlags;
+
+	shortcut = new GUI::Shortcut(scKey, scFlags);
+	shortcut->onKeyDown.Connect(&onClick);
 
 	return Success;
 }

@@ -15,7 +15,7 @@ namespace smooth
 {
 	namespace I18n
 	{
-		const char *smooth_de = 
+		const String smooth_de = 
 			String("<?xml version=\"1.0\" encoding=\"ISO-8859-15\"?>\n").
 			Append("<LangFile>\n").
 			Append("  <info>\n").

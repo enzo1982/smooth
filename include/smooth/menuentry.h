@@ -19,6 +19,7 @@ namespace smooth
 #include "object.h"
 #include "rect.h"
 #include "font.h"
+#include "shortcut.h"
 
 namespace smooth
 {
@@ -56,6 +57,8 @@ namespace smooth
 
 			Int		 scKey;
 			Int		 scFlags;
+
+			GUI::Shortcut	*shortcut;
 
 			GUI::Font	 font;
 

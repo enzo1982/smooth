@@ -48,6 +48,7 @@ namespace smooth
 
 			static Bool	 enableUnicode;
 			static Bool	 rightToLeft;
+			static Bool	 useIconv;
 
 			static Float	 FontSize;
 	};

@@ -30,6 +30,7 @@ S::Int S::Setup::TooltipTextColor;
 
 S::Bool S::Setup::enableUnicode = S::False;
 S::Bool S::Setup::rightToLeft = S::False;
+S::Bool S::Setup::useIconv = S::False;
 
 S::Float S::Setup::FontSize = 1.00;
 

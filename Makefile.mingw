@@ -52,6 +52,11 @@ LIBNAME = $(LIBDIR)/libsmooth.a
 EXPNAME = $(LIBDIR)/smooth.exp
 DEFNAME = $(LIBDIR)/smooth.def
 
+ICONVDLL = $(BINDIR)/iconv.dll
+ICONVLIB = $(LIBDIR)/libiconv.a
+ICONVEXP = $(LIBDIR)/iconv.exp
+ICONVDEF = $(LIBDIR)/iconv.def
+
 LIBIOLIB = $(LIBDIR)/libiolib.a
 LIBPICTURE = $(LIBDIR)/libpicture.a
 LIBBZ2 = $(LIBDIR)/libbz2.a
@@ -185,9 +190,16 @@ $(LIBXML): $(LIBXMLOBJECTS)
 	$(ECHO) done.
 
 $(LIBICONV): $(LIBICONVOBJECTS)
-	$(ECHO) -n Linking $(LIBICONV)...
-	$(AR) r $(LIBICONV) $(LIBICONVOBJECTS)
+	$(ECHO) Linking $(ICONVDLL)...
+	$(LINKER) $(LIBICONVOBJECTS) -L$(LIBDIR) -mwindows --output-lib $(ICONVLIB) --output-exp $(ICONVEXP) --output-def $(ICONVDEF) -o $(ICONVDLL)
+	$(STRIP) $(STRIP_OPTS) $(ICONVDLL)
+	$(STRIP) $(LIBSTRIP_OPTS) $(ICONVDLL)
+	$(PACKER) $(PACKER_OPTS) $(ICONVDLL) > NULL
 	$(ECHO) done.
+
+#	$(ECHO) -n Linking $(LIBICONV)...
+#	$(AR) r $(LIBICONV) $(LIBICONVOBJECTS)
+#	$(ECHO) done.
 
 $(LIBLISA): $(LISAOBJECTS)
 	$(ECHO) -n Linking $(LIBLISA)...

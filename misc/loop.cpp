@@ -90,6 +90,9 @@ S::Void S::Init()
 	GetColors();
 	SetMetrics();
 	SetMeasurement(SMT_UNITS);
+
+	Setup::useIconv = True;
+
 	SMOOTH::i18n = new I18n::Translator(True);
 
 	switch (PRIMARYLANGID(GetUserDefaultLangID()))

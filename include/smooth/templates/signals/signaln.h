@@ -60,7 +60,7 @@ namespace smooth
 
 			Int Connect(Signal0<Void> *sig)
 			{
-				if (sig == this) return Error;
+				if ((Signal *) sig == (Signal *) this) return Error;
 
 				sigs0.AddEntry(sig);
 

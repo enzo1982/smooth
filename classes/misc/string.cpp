@@ -917,6 +917,7 @@ S::String S::String::FromFloat(Float value)
 S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncoding, char *outBuffer, Int outBytes, const char *outEncoding)
 {
 	Bool	 delBuffer = False;
+	Int	 size = 0;
 
 	if (outBuffer == NIL)
 	{
@@ -927,91 +928,93 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 	for (Int i = 0; i < outBytes; i++) outBuffer[i] = 0;
 
-	iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
-
-	if ((int) cd == -1) return -1;
-
-	InStream	*in	= new InStream(STREAM_BUFFER, (void *) inBuffer, inBytes);
-	OutStream	*out	= new OutStream(STREAM_BUFFER, (void *) outBuffer, outBytes);
-	Int		 size	= 0;
-
-	iconv(cd, NULL, NULL, NULL, NULL);
-
-	char		 inBuf[4096 + 4096];
-	size_t		 inBufRest = 0;
-	char		 outBuf[4096];
-	Bool		 convError = False;
-
-	for (;;)
+	if (Setup::useIconv)
 	{
-		size_t	 inBufSize = min(in->Size() - in->GetPos(), 4096);
+		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
 
-		in->InputData((void *) (inBuf + 4096), inBufSize);
+		if ((int) cd == -1) return -1;
 
-		if (inBufSize == 0)
+		InStream	*in	= new InStream(STREAM_BUFFER, (void *) inBuffer, inBytes);
+		OutStream	*out	= new OutStream(STREAM_BUFFER, (void *) outBuffer, outBytes);
+
+		iconv(cd, NULL, NULL, NULL, NULL);
+
+		char		 inBuf[4096 + 4096];
+		size_t		 inBufRest = 0;
+		char		 outBuf[4096];
+		Bool		 convError = False;
+
+		for (;;)
 		{
-			if (inBufRest == 0)
+			size_t	 inBufSize = min(in->Size() - in->GetPos(), 4096);
+
+			in->InputData((void *) (inBuf + 4096), inBufSize);
+
+			if (inBufSize == 0)
 			{
-				break;
+				if (inBufRest == 0)
+				{
+					break;
+				}
+				else
+				{
+					iconv_close(cd);
+
+					delete in;
+					delete out;
+
+					return 0;
+				}
 			}
 			else
 			{
-				iconv_close(cd);
+				const char	*inPtr	= inBuf + 4096 - inBufRest;
+				size_t		 inSize	= inBufRest + inBufSize;
 
-				delete in;
-				delete out;
+				inBufRest = 0;
 
-				return 0;
+				while (inSize > 0)
+				{
+					char	*outPtr		= outBuf;
+					size_t	 outSize	= sizeof(outBuf);
+
+					if ((signed) iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize) < 0)
+					{
+						convError = True;
+
+						break;
+					}
+
+					if (outPtr != outBuf)
+					{
+						out->OutputData((void *) outBuf, outPtr - outBuf);
+						size += (outPtr - outBuf);
+					}
+				}
+
+				if (convError) break;
 			}
 		}
-		else
+
+		char	*outPtr		= outBuf;
+		size_t	 outSize	= sizeof(outBuf);
+
+		iconv(cd, NULL, NULL, &outPtr, &outSize);
+
+		if (outPtr != outBuf)
 		{
-			const char	*inPtr	= inBuf + 4096 - inBufRest;
-			size_t		 inSize	= inBufRest + inBufSize;
-
-			inBufRest = 0;
-
-			while (inSize > 0)
-			{
-				char	*outPtr		= outBuf;
-				size_t	 outSize	= sizeof(outBuf);
-
-				if ((signed) iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize) < 0)
-				{
-					convError = True;
-
-					break;
-				}
-
-				if (outPtr != outBuf)
-				{
-					out->OutputData((void *) outBuf, outPtr - outBuf);
-					size += (outPtr - outBuf);
-				}
-			}
-
-			if (convError) break;
+			out->OutputData((void *) outBuf, outPtr - outBuf);
+			size += (outPtr - outBuf);
 		}
+
+		iconv_close(cd);
+
+		if (size >= outBytes) size = 0;
+		if (convError) size = -1;
+
+		delete in;
+		delete out;
 	}
-
-	char	*outPtr		= outBuf;
-	size_t	 outSize	= sizeof(outBuf);
-
-	iconv(cd, NULL, NULL, &outPtr, &outSize);
-
-	if (outPtr != outBuf)
-	{
-		out->OutputData((void *) outBuf, outPtr - outBuf);
-		size += (outPtr - outBuf);
-	}
-
-	iconv_close(cd);
-
-	if (size >= outBytes) size = 0;
-	if (convError) size = -1;
-
-	delete in;
-	delete out;
 
 	if (delBuffer) delete [] outBuffer;
 

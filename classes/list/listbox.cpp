@@ -182,14 +182,14 @@ S::Int S::GUI::ListBox::Show()
 	{
 		Layer	*layer = (Layer *) myContainer->GetContainerObject();
 		Point	 realPos = GetRealPosition();
-		Point	 sbp = Point(realPos.x + objectProperties->size.cx - 2 - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET, realPos.y + 1 - layer->GetObjectProperties()->pos.y);
-		Size	 sbs = Size(METRIC_LISTBOXSBSIZE, objectProperties->size.cy - 1);
+		Point	 sbp = Point(realPos.x + objectProperties->size.cx - 2 - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET, realPos.y + 1 - layer->GetObjectProperties()->pos.y + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1));
+		Size	 sbs = Size(METRIC_LISTBOXSBSIZE, objectProperties->size.cy - 1 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1));
 		Float	 oldMeasurement = Setup::FontSize;
 
 		SetMeasurement(SMT_PIXELS);
 
 		scrollbar->SetMetrics(sbp, sbs);
-		scrollbar->SetRange(0, (nOfEntries + (header == NIL ? 0 : 1)) - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
+		scrollbar->SetRange(0, nOfEntries - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 
 		Setup::FontSize = oldMeasurement;
 
@@ -275,7 +275,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			frame.bottom = min(frame.bottom, maxFrameY);
 
-			if (METRIC_LISTBOXENTRYHEIGHT * (nOfEntries + (header == NIL ? 0 : 1)) + 4 > objectProperties->size.cy)
+			if (METRIC_LISTBOXENTRYHEIGHT * nOfEntries + 4 > objectProperties->size.cy)
 			{
 				if (!needScrollbar)
 				{
@@ -284,13 +284,13 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					sbp.x = frame.right - layer->GetObjectProperties()->pos.x - METRIC_LISTBOXSBOFFSET;
 					sbp.y = frame.top - layer->GetObjectProperties()->pos.y;
 					sbs.cx = METRIC_LISTBOXSBSIZE;
-					sbs.cy = objectProperties->size.cy - 1;
+					sbs.cy = objectProperties->size.cy - 1 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
 
 					oldMeasurement = Setup::FontSize;
 
 					SetMeasurement(SMT_PIXELS);
 
-					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, (nOfEntries + (header == NIL ? 0 : 1)) - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar = new Scrollbar(sbp, sbs, OR_VERT, &scrollbarPos, 0, nOfEntries - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 
 					scrollbar->onClick.Connect(&ListBox::ScrollbarProc, this);
 
@@ -302,7 +302,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 				else
 				{
-					scrollbar->SetRange(0, (nOfEntries + (header == NIL ? 0 : 1)) - (int) ((objectProperties->size.cy - 4) / METRIC_LISTBOXENTRYHEIGHT));
+					scrollbar->SetRange(0, nOfEntries - (int) ((objectProperties->size.cy - 4 - (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1)) / METRIC_LISTBOXENTRYHEIGHT));
 				}
 
 				frame.right -= (METRIC_LISTBOXSBOFFSET + 1);
@@ -374,6 +374,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	LeaveProtectedRegion();
 
 	if (needScrollbar) scrollbar->Paint(SP_PAINT);
+	if (header != NIL) header->Paint(SP_PAINT);
 
 	return Success;
 }
@@ -413,7 +414,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 				lastScrollbarPos = scrollbarPos;
 
 				frame.left++;
-				frame.top++;
+				frame.top = frame.top + 1 + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
 				frame.right--;
 				frame.bottom--;
 
@@ -429,7 +430,7 @@ S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 				maxFrameY = frame.bottom - 1;
 
 				frame.left++;
-				frame.top++;
+				frame.top	= frame.top + 1 + (header == NIL ? 0 : METRIC_LISTBOXENTRYHEIGHT + 1);
 				frame.right	-= (METRIC_LISTBOXSBOFFSET + 2);
 				frame.bottom	= frame.top + METRIC_LISTBOXENTRYHEIGHT;
 

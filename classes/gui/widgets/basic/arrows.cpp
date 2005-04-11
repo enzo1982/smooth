@@ -44,20 +44,18 @@ S::GUI::Arrows::Arrows(Point iPos, Size iSize, Int sType, Int *var, Int rangeSta
 
 	if (subtype == OR_VERT)
 	{
-		if (size.cx == 0) size.cx = 18;
+		if (size.cx == 0) size.cx = 17;
 		if (size.cy == 0) size.cy = 24;
 	}
 	else
 	{
 		if (size.cx == 0) size.cx = 24;
-		if (size.cy == 0) size.cy = 18;
+		if (size.cy == 0) size.cy = 17;
 	}
 }
 
 S::GUI::Arrows::~Arrows()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
-
 	if (timer != NIL)
 	{
 		timer->Stop();
@@ -73,25 +71,19 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
-	Surface	*surface = container->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Rect	 frame;
+	Surface	*surface	= container->GetDrawSurface();
+	Rect	 frame		= Rect(GetRealPosition(), size);
 	Point	 lineStart;
 	Point	 lineEnd;
-
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1;
-	frame.bottom	= realPos.y + size.cy - 1;
 
 	surface->Frame(frame, FRAME_UP);
 
 	if (subtype == OR_HORZ)
 	{
-		lineStart.x = (frame.left + frame.right) / 2;
+		lineStart.x = (frame.left + frame.right) / 2 - 1;
 		lineStart.y = frame.top + 1;
 		lineEnd.x = lineStart.x;
-		lineEnd.y = frame.bottom;
+		lineEnd.y = frame.bottom - 1;
 
 		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
@@ -100,7 +92,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
 
-		lineStart.x = (frame.left + (frame.left + frame.right) / 2) / 2 - 1;
+		lineStart.x = (frame.left + (frame.left + frame.right) / 2) / 2 - 2;
 		lineStart.y = (frame.bottom + frame.top) / 2;
 		lineEnd.x = lineStart.x;
 		lineEnd.y = lineStart.y + 1;
@@ -115,7 +107,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 			lineEnd.y++;
 		}
 
-		lineStart.x = (frame.right + (frame.left + frame.right) / 2) / 2 - 1;
+		lineStart.x = (frame.right + (frame.left + frame.right) / 2) / 2 - 2;
 		lineStart.y = (frame.bottom + frame.top) / 2 - 3;
 		lineEnd.x = lineStart.x;
 		lineEnd.y = lineStart.y + 7;
@@ -133,8 +125,8 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	else if (subtype == OR_VERT)
 	{
 		lineStart.x = frame.left + 1;
-		lineStart.y = (frame.top + frame.bottom) / 2;
-		lineEnd.x = frame.right;
+		lineStart.y = (frame.top + frame.bottom) / 2 - 1;
+		lineEnd.x = frame.right - 1;
 		lineEnd.y = lineStart.y;
 
 		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
@@ -145,7 +137,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
 
 		lineStart.x = (frame.right + frame.left) / 2 + (Setup::rightToLeft ? 1 : 0);
-		lineStart.y = (frame.top + (frame.top+frame.bottom) / 2) / 2 - 1;
+		lineStart.y = (frame.top + (frame.top + frame.bottom) / 2) / 2 - 2;
 		lineEnd.x = lineStart.x + 1;
 		lineEnd.y = lineStart.y;
 
@@ -160,7 +152,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 		}
 
 		lineStart.x = (frame.right + frame.left) / 2 - 3 + (Setup::rightToLeft ? 1 : 0);
-		lineStart.y = (frame.bottom + (frame.top + frame.bottom) / 2) / 2 - 1;
+		lineStart.y = (frame.bottom + (frame.top + frame.bottom) / 2) / 2 - 2;
 		lineEnd.x = lineStart.x + 7;
 		lineEnd.y = lineStart.y;
 
@@ -197,8 +189,8 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x + 2;
 	frame.top	= realPos.y + 2;
-	frame.right	= realPos.x + size.cx - 3;
-	frame.bottom	= realPos.y + size.cy - 3;
+	frame.right	= realPos.x + size.cx - 2;
+	frame.bottom	= realPos.y + size.cy - 2;
 
 	switch (message)
 	{
@@ -219,8 +211,8 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			{
 				arrow1Clicked = True;
 
-				if (subtype == OR_VERT)	frame.bottom = realPos.y + size.cy / 2 - 3;
-				else			frame.right = realPos.x + size.cx / 2 - 3;
+				if (subtype == OR_VERT)	frame.bottom = realPos.y + size.cy / 2 - 2;
+				else			frame.right = realPos.x + size.cx / 2 - 2;
 
 				surface->Frame(frame, FRAME_DOWN);
 
@@ -263,14 +255,10 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				arrow1Clicked = False;
 				arrow1Checked = False;
 
-				if (subtype == OR_VERT)	frame.bottom = realPos.y + size.cy / 2 - 3;
-				else			frame.right = realPos.x + size.cx / 2 - 3;
+				if (subtype == OR_VERT)	frame.bottom = realPos.y + size.cy / 2 - 2;
+				else			frame.right = realPos.x + size.cx / 2 - 2;
 
-				frame.right++;
-				frame.bottom++;
 				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
-				frame.right--;
-				frame.bottom--;
 
 				Process(SM_MOUSEMOVE, 0, 0);
 
@@ -284,11 +272,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				if (subtype == OR_VERT)	frame.top = realPos.y + size.cy / 2 + 2;
 				else			frame.left = realPos.x + size.cx / 2 + 2;
 
-				frame.right++;
-				frame.bottom++;
 				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
-				frame.right--;
-				frame.bottom--;
 
 				Process(SM_MOUSEMOVE, 0, 0);
 
@@ -300,8 +284,8 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 			arrow1Frame = frame;
 			arrow2Frame = frame;
 
-			if (subtype == OR_VERT)	arrow1Frame.bottom = realPos.y + size.cy / 2 - 3;
-			else			arrow1Frame.right = realPos.x + size.cx / 2 - 3;
+			if (subtype == OR_VERT)	arrow1Frame.bottom = realPos.y + size.cy / 2 - 2;
+			else			arrow1Frame.right = realPos.x + size.cx / 2 - 2;
 
 			if (subtype == OR_VERT)	arrow2Frame.top = realPos.y + size.cy / 2 + 2;
 			else			arrow2Frame.left = realPos.x + size.cx / 2 + 2;
@@ -319,11 +303,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				arrow1Checked = False;
 				arrow1Clicked = False;
 
-				arrow1Frame.right++;
-				arrow1Frame.bottom++;
 				surface->Box(arrow1Frame, Setup::BackgroundColor, OUTLINED);
-				arrow1Frame.right--;
-				arrow1Frame.bottom--;
 			}
 			else if (!arrow2Checked && wnd->IsMouseOn(arrow2Frame))
 			{
@@ -338,11 +318,7 @@ S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
 				arrow2Checked = False;
 				arrow2Clicked = False;
 
-				arrow2Frame.right++;
-				arrow2Frame.bottom++;
 				surface->Box(arrow2Frame, Setup::BackgroundColor, OUTLINED);
-				arrow2Frame.right--;
-				arrow2Frame.bottom--;
 			}
 
 			break;

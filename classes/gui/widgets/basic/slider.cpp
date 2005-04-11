@@ -48,7 +48,6 @@ S::GUI::Slider::Slider(Point iPos, Size iSize, Int subType, Int *var, Int rangeS
 
 S::GUI::Slider::~Slider()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Slider::Paint(Int message)
@@ -100,8 +99,8 @@ S::Int S::GUI::Slider::Paint(Int message)
 
 		sliderRect.left		= realPos.x + (Int) (((Float) (size.cx - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
 		sliderRect.top		= realPos.y;
-		sliderRect.right	= sliderRect.left + 8;
-		sliderRect.bottom	= sliderRect.top + 16;
+		sliderRect.right	= sliderRect.left + 9;
+		sliderRect.bottom	= sliderRect.top + 17;
 
 		if (!clicked)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
 		else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
@@ -126,8 +125,8 @@ S::Int S::GUI::Slider::Paint(Int message)
 
 		sliderRect.left		= realPos.x;
 		sliderRect.top		= realPos.y + (size.cy - 9) - (Int) (((Float) (size.cy - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-		sliderRect.right	= sliderRect.left + 17;
-		sliderRect.bottom	= sliderRect.top + 9;
+		sliderRect.right	= sliderRect.left + 18;
+		sliderRect.bottom	= sliderRect.top + 10;
 
 		if (!clicked)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
 		else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);

@@ -35,7 +35,6 @@ S::GUI::Divider::Divider(Int position, Int iOrientation)
 
 S::GUI::Divider::~Divider()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Divider::SetPos(Int position)
@@ -68,6 +67,8 @@ S::Int S::GUI::Divider::Paint(Int message)
 	Window	*wnd = container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
+
+	if (message != SP_PAINT) return Success;
 
 	Surface	*surface = container->GetDrawSurface();
 	Object	*object;

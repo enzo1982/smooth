@@ -26,7 +26,6 @@ S::GUI::Statusbar::Statusbar(String status)
 
 S::GUI::Statusbar::~Statusbar()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Statusbar::Paint(Int message)
@@ -49,13 +48,11 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 
 S::Int S::GUI::Statusbar::SetText(const String &newStatus)
 {
-	String	 oldStatus = text;
-
 	text = newStatus;
 
 	if (!registered || !visible) return Success;
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface	= container->GetDrawSurface();
 	Rect	 textRect;
 
 	textRect.left	= pos.x + 4;
@@ -63,11 +60,8 @@ S::Int S::GUI::Statusbar::SetText(const String &newStatus)
 	textRect.right	= pos.x + size.cx;
 	textRect.bottom	= pos.y + size.cy;
 
-	Font	 nFont = font;
+	surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
-	nFont.SetColor(Setup::BackgroundColor);
-
-	surface->SetText(oldStatus, textRect, nFont);
 	surface->SetText(text, textRect, font);
 
 	return Success;

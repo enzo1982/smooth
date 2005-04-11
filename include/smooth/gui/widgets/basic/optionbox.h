@@ -27,6 +27,8 @@ namespace smooth
 	{
 		class SMOOTHAPI OptionBox : public Widget
 		{
+			private:
+				Void			 OnLeftButtonClick();
 			protected:
 				Int			*variable;
 				Int			 code;
@@ -39,8 +41,6 @@ namespace smooth
 
 				virtual Int		 Paint(Int);
 				Int			 Process(Int, Int, Int);
-
-				Int			 SetText(const String &);
 		};
 	};
 };

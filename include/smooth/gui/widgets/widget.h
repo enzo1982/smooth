@@ -17,6 +17,13 @@ namespace smooth
 	{
 		class Widget;
 		class Container;
+
+		class Tooltip;
+	};
+
+	namespace System
+	{
+		class Timer;
 	};
 };
 
@@ -41,6 +48,12 @@ namespace smooth
 	{
 		class SMOOTHAPI Widget : public Object
 		{
+			private:
+				Tooltip				*tooltip;
+				System::Timer			*tipTimer;
+
+				Void				 ActivateTooltip();
+				Void				 DeactivateTooltip();
 			protected:
 				Bool				 visible;
 				Bool				 active;
@@ -48,10 +61,17 @@ namespace smooth
 				Bool				 clicked;
 				Bool				 checked;
 
+				Bool				 mouseOver;
+
+				Bool				 leftButtonDown;
+				Bool				 rightButtonDown;
+
 				Int				 orientation;
 
 				String				 text;
 				String				 tooltipText;
+
+				Int				 borderWidth;
 
 				Font				 font;
 
@@ -116,6 +136,19 @@ namespace smooth
 			signals:
 				Signal0<Void>			 onShow;
 				Signal0<Void>			 onHide;
+
+				Signal0<Void>			 onMouseOver;
+				Signal0<Void>			 onMouseOut;
+
+				Signal1<Void, Point>		 onLeftButtonDown;
+				Signal1<Void, Point>		 onLeftButtonUp;
+				Signal1<Void, Point>		 onLeftButtonClick;
+				Signal1<Void, Point>		 onLeftButtonDoubleClick;
+
+				Signal1<Void, Point>		 onRightButtonDown;
+				Signal1<Void, Point>		 onRightButtonUp;
+				Signal1<Void, Point>		 onRightButtonClick;
+				Signal1<Void, Point>		 onRightButtonDoubleClick;
 
 				Signal2<Void, Int, Int>		 onClick;
 

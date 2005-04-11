@@ -1,9 +1,11 @@
 #include "ras.h"
-#include <iostream.h>
+#include <iostream>
 
 #include <smooth/pciio.h>
 
-void main()
+using namespace std;
+
+int main()
 {
 	char rfn[1024];
 	char pfn[1024];
@@ -45,4 +47,6 @@ void main()
 	delete pio;
 
 	cout << "done.\n";
+
+	return 0;
 }

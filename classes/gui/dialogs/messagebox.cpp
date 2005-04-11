@@ -238,7 +238,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(String text, String title, Int btns, wch
 
 		checkbox = new CheckBox(checkBoxText, pos, size, cVar);
 		checkbox->SetOrientation(OR_LOWERLEFT);
-		checkbox->SetMetrics(checkbox->pos, Size(checkbox->textSize.cx + 20, checkbox->size.cy));
+		checkbox->SetMetrics(checkbox->pos, Size(checkbox->textSize.cx + 21, checkbox->size.cy));
 
 		msgbox->size.cy += 22;
 

@@ -29,11 +29,12 @@ S::GUI::ActiveArea::ActiveArea(Int color, Point iPos, Size iSize)
 
 	if (size.cx == 0) size.cx = 80;
 	if (size.cy == 0) size.cy = 20;
+
+	borderWidth	= 1;
 }
 
 S::GUI::ActiveArea::~ActiveArea()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::ActiveArea::Paint(Int message)
@@ -41,28 +42,18 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface	= container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	Rect	 frame;
-	Point	 realPos = GetRealPosition();
+	Rect	 frame		= Rect(GetRealPosition(), size);
 
 	switch (message)
 	{
 		default:
 		case SP_PAINT:
-			frame.left	= realPos.x;
-			frame.top	= realPos.y;
-			frame.right	= realPos.x + size.cx - 1;
-			frame.bottom	= realPos.y + size.cy - 1;
-
-			surface->Frame(frame, FRAME_DOWN);
-
-			frame.left++;
-			frame.top++;
-
 			surface->Box(frame, areaColor, FILLED);
+			surface->Frame(frame, FRAME_DOWN);
 
 			break;
 	}
@@ -70,41 +61,6 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 	LeaveProtectedRegion();
 
 	return Success;
-}
-
-S::Int S::GUI::ActiveArea::Process(Int message, Int wParam, Int lParam)
-{
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
-
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
-
-	Int	 retVal = Success;
-	Point	 realPos = GetRealPosition();
-	Rect	 frame;
-
-	frame.left	= realPos.x + 1;
-	frame.top	= realPos.y + 1;
-	frame.right	= realPos.x + size.cx - 2;
-	frame.bottom	= realPos.y + size.cy - 2;
-
-	switch (message)
-	{
-		case SM_LBUTTONDOWN:
-		case SM_LBUTTONDBLCLK:
-			if (wnd->IsMouseOn(frame))
-			{
-				onClick.Emit(wnd->MouseX(), wnd->MouseY());
-
-				retVal = Break;
-			}
-
-			break;
-	}
-
-	return retVal;
 }
 
 S::Int S::GUI::ActiveArea::SetColor(Int newColor)

@@ -33,7 +33,6 @@ S::GUI::Menubar::Menubar()
 
 S::GUI::Menubar::~Menubar()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Void S::GUI::Menubar::OnRegister()

@@ -71,7 +71,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 
 	check_showtips	= new CheckBox(I18n::Translator::defaultTranslator->TranslateString("Show tips on startup"), pos, size, &showTips);
 	check_showtips->SetOrientation(OR_LOWERLEFT);
-	check_showtips->SetMetrics(check_showtips->pos, Size(check_showtips->textSize.cx + 20, check_showtips->size.cy));
+	check_showtips->SetMetrics(check_showtips->pos, Size(check_showtips->textSize.cx + 21, check_showtips->size.cy));
 
 	pos.x = 5;
 	pos.y = 3;

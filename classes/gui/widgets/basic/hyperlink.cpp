@@ -61,7 +61,6 @@ S::GUI::Hyperlink::Hyperlink(String iText, const Bitmap &bitmap, String link, Po
 
 S::GUI::Hyperlink::~Hyperlink()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Hyperlink::Hide()

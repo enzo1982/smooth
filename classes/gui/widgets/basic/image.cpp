@@ -32,7 +32,6 @@ S::GUI::Image::Image(Bitmap &bmp, Point iPos, Size iSize)
 
 S::GUI::Image::~Image()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Image::Paint(Int message)
@@ -40,14 +39,8 @@ S::Int S::GUI::Image::Paint(Int message)
 	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
-	Surface	*surface = container->GetDrawSurface();
-	Rect	 bmpRect;
-	Point	 realPos = GetRealPosition();
-
-	bmpRect.left	= realPos.x;
-	bmpRect.top	= realPos.y;
-	bmpRect.right	= realPos.x + size.cx;
-	bmpRect.bottom	= realPos.y + size.cy;
+	Surface	*surface	= container->GetDrawSurface();
+	Rect	 bmpRect	= Rect(GetRealPosition(), size);
 
 	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), size), bmpRect);
 

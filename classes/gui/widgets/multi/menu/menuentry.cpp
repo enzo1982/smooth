@@ -113,7 +113,7 @@ S::Int S::GUI::MenuEntry::Paint(Int message)
 					Point	 p1;
 					Point	 p2;
 
-					p1.x = realPos.x + size.cx - 9 + (Setup::rightToLeft ? 1 : 0);
+					p1.x = realPos.x + size.cx - 10 + (Setup::rightToLeft ? 1 : 0);
 					p2.x = p1.x + 7;
 					p1.y = realPos.y + (size.cy - 3) / 2;
 					p2.y = p1.y;
@@ -180,8 +180,8 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 					if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
 					{
-						Point	 p1 = Point(pos.x + size.cx - 12 + (Setup::rightToLeft ? 2 : 0), pos.y + 1);
-						Point	 p2 = Point(pos.x + size.cx - 12 + (Setup::rightToLeft ? 2 : 0), pos.y + size.cy - 1);
+						Point	 p1 = Point(pos.x + size.cx - 13 + (Setup::rightToLeft ? 2 : 0), pos.y + 1);
+						Point	 p2 = Point(pos.x + size.cx - 13 + (Setup::rightToLeft ? 2 : 0), pos.y + size.cy - 2);
 
 						surface->Bar(p1, p2, OR_VERT);
 					}
@@ -194,7 +194,7 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 				if (description != NIL && wnd->GetStatusText() == description) wnd->RestoreDefaultStatusText();
 
-				surface->Box(Rect(pos, Size(size.cx + 1, size.cy + 1)), Setup::BackgroundColor, OUTLINED);
+				surface->Box(Rect(pos, size), Setup::BackgroundColor, OUTLINED);
 
 				if (type == SM_BITMAP)
 				{
@@ -210,8 +210,8 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 					if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
 					{
-						Point	 p1 = Point(pos.x + size.cx - 12 + (Setup::rightToLeft ? 1 : 0), pos.y + 1);
-						Point	 p2 = Point(pos.x + size.cx - 12 + (Setup::rightToLeft ? 1 : 0), pos.y + size.cy);
+						Point	 p1 = Point(pos.x + size.cx - 13 + (Setup::rightToLeft ? 1 : 0), pos.y + 1);
+						Point	 p2 = Point(pos.x + size.cx - 13 + (Setup::rightToLeft ? 1 : 0), pos.y + size.cy - 1);
 
 						surface->Line(p1, p2, Setup::BackgroundColor);
 
@@ -275,7 +275,7 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 							popupMenu->pos.x = pos.x + size.cx + 1 - popupMenu->popupsize.cx;
 						}
 
-						popupMenu->pos.y = pos.y + size.cy + 2;
+						popupMenu->pos.y = pos.y + size.cy + 1;
 						popupMenu->onClick.Connect(&MenuEntry::PopupProc, this);
 
 						wnd->RegisterObject(popupMenu);
@@ -301,7 +301,7 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 					if (description != NIL && wnd->GetStatusText() == description) wnd->RestoreDefaultStatusText();
 
-					surface->Box(Rect(pos, Size(size.cx + 1, size.cy + 1)), Setup::BackgroundColor, OUTLINED);
+					surface->Box(Rect(pos, size), Setup::BackgroundColor, OUTLINED);
 
 					if (type == SM_BITMAP)
 					{
@@ -317,8 +317,8 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 						if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
 						{
-							Point	 p1 = Point(pos.x + size.cx - 12, pos.y + 1);
-							Point	 p2 = Point(pos.x + size.cx - 12, pos.y + size.cy);
+							Point	 p1 = Point(pos.x + size.cx - 13, pos.y + 1);
+							Point	 p2 = Point(pos.x + size.cx - 13, pos.y + size.cy - 1);
 
 							surface->Line(p1, p2, Setup::BackgroundColor);
 
@@ -420,13 +420,13 @@ S::Int S::GUI::MenuEntry::CalcSize()
 {
 	if (type == SM_TEXT)
 	{
-		size.cx = textSize.cx + 6;
-		size.cy = textSize.cy + 3;
+		size.cx = textSize.cx + 7;
+		size.cy = textSize.cy + 4;
 	}
 	else if (type == SM_BITMAP)
 	{
-		size.cx = bitmap.GetSize().cx + 3 + (popup != NIL ? 10 + (onClick.GetNOfConnectedSlots() > 0 ? 2 : 0) : 0);
-		size.cy = bitmap.GetSize().cy + 3;
+		size.cx = bitmap.GetSize().cx + 4 + (popup != NIL ? 10 + (onClick.GetNOfConnectedSlots() > 0 ? 2 : 0) : 0);
+		size.cy = bitmap.GetSize().cy + 4;
 	}
 
 	return Success;

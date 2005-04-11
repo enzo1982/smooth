@@ -35,7 +35,6 @@ S::GUI::GroupBox::GroupBox(String iText, Point iPos, Size iSize)
 
 S::GUI::GroupBox::~GroupBox()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::GroupBox::Paint(Int message)
@@ -43,15 +42,8 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 	if (!registered)	return Failure;
 	if (!IsVisible())	return Success;
 
-	Surface	*surface = container->GetDrawSurface();
-	Rect	 textRect;
-	Point	 realPos = GetRealPosition();
-	Rect	 frame;
-
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1;
-	frame.bottom	= realPos.y + size.cy - 1;
+	Surface	*surface	= container->GetDrawSurface();
+	Rect	 frame		= Rect(GetRealPosition(), size);
 
 	surface->Frame(frame, FRAME_DOWN);
 
@@ -61,6 +53,8 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 	frame.bottom--;
 
 	surface->Frame(frame, FRAME_UP);
+
+	Rect	 textRect;
 
 	textRect.left	= frame.left + 9;
 	textRect.top	= frame.top - 7;

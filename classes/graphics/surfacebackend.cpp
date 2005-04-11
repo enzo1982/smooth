@@ -139,44 +139,34 @@ S::Int S::GUI::SurfaceBackend::Line(Point pos1, Point pos2, Int color)
 
 S::Int S::GUI::SurfaceBackend::Frame(Rect rect, Int style)
 {
-	Long	 color1 = 0;
-	Long	 color2 = 0;
-	Point	 p1;
-	Point	 p2;
-	Point	 p3;
-	Point	 p4;
-
 	if (Setup::rightToLeft)
 	{
 		rect = TranslateRect(rect);
+
 		rect.left--;
 		rect.right--;
 	}
 
-	p1.x = rect.left;
-	p1.y = rect.top;
-	p2.x = rect.right;
-	p2.y = rect.top;
-	p3.x = rect.left;
-	p3.y = rect.bottom;
-	p4.x = rect.right;
-	p4.y = rect.bottom;
+	Point	 p1 = Point(rect.left, rect.top);
+	Point	 p2 = Point(rect.right - 1, rect.top);
+	Point	 p3 = Point(rect.left, rect.bottom - 1);
+	Point	 p4 = Point(rect.right - 1, rect.bottom - 1);
+
+	Long	 color1 = 0;
+	Long	 color2 = 0;
 
 	switch (style)
 	{
-		case FRAME_UP: // up
-		{
+		case FRAME_UP:
 			color1 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
 			color2 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
-		}
-		break;
 
-		case FRAME_DOWN: // down
-		{
+			break;
+		case FRAME_DOWN:
 			color1 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
 			color2 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
-		}
-		break;
+
+			break;
 	}
 
 	Bool	 preRTL = Setup::rightToLeft;
@@ -186,8 +176,9 @@ S::Int S::GUI::SurfaceBackend::Frame(Rect rect, Int style)
 	Line(p1, p2, color1);
 	Line(p1, p3, color1);
 	Line(p2, p4, color2);
-	p4.x++;
 	Line(p3, p4, color2);
+
+	SetPixel(p4.x, p4.y, color2);
 
 	Setup::rightToLeft = preRTL;
 

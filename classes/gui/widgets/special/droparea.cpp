@@ -39,7 +39,6 @@ S::GUI::DropArea::DropArea(Point iPos, Size iSize)
 
 S::GUI::DropArea::~DropArea()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Void S::GUI::DropArea::OnRegister(Container *container)

@@ -34,7 +34,6 @@ S::GUI::Layer::Layer(String name)
 
 S::GUI::Layer::~Layer()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)

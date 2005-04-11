@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -207,7 +207,7 @@ Void BeatClock::Options()
 	pos.x = 172;
 	size.cx = 0;
 
-	alarm_option1 = new OptionBox("only once", pos, size, &alarmoption, 0);
+	alarm_option1 = new OptionBox("once", pos, size, &alarmoption, 0);
 
 	pos.y += 25;
 
@@ -263,7 +263,7 @@ Void BeatClock::Options()
 	pos.x = 6;
 	pos.y = 5;
 
-	info_text1 = new Text("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2004\nGive it to all your friends!", pos);
+	info_text1 = new Text("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2005\nGive it to all your friends!", pos);
 
 	pos.x = 222;
 
@@ -747,7 +747,7 @@ Void BeatClock::PaintAll()
 
 Void BeatClock::Info()
 {
-	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2004\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
+	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2005\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
 }
 
 Int BeatClock::GetDayOfWeek(Int day, Int month, Int year)

@@ -33,7 +33,6 @@ S::GUI::TabWidget::TabWidget(Point iPos, Size iSize)
 
 S::GUI::TabWidget::~TabWidget()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::TabWidget::Paint(Int message)
@@ -41,10 +40,10 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
-	Surface	*surface = container->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Layer	*object = NIL;
-	Layer	*prev = NIL;
+	Surface	*surface	= container->GetDrawSurface();
+	Point	 realPos	= GetRealPosition();
+	Layer	*object		= NIL;
+	Layer	*prev		= NIL;
 	Rect	 frame;
 	Rect	 textrect;
 	Point	 lineStart;
@@ -75,10 +74,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 	GetLayersSize();
 
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx;
-	frame.bottom	= realPos.y + size.cy;
+	frame = Rect(GetRealPosition(), size);
 
 	frame.top += 19;
 	surface->Frame(frame, FRAME_UP);
@@ -103,9 +99,14 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 			if (object->IsVisible())
 			{
 				frame.left = frame.right;
-				frame.right = frame.left + textSize.GetEntry(object->GetHandle()) + 13;
+				frame.right = frame.left + textSize.GetEntry(object->GetHandle()) + 14;
+
+				frame.bottom++;
 
 				surface->Frame(frame, FRAME_UP);
+
+				frame.right--;
+				frame.bottom--;
 
 				if (Setup::rightToLeft) { frame.left++; frame.right++; }
 
@@ -146,11 +147,16 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 				frame.top++;
 				frame.left = frame.right + 1;
 
-				frame.right = frame.left + textSize.GetEntry(object->GetHandle()) + 11;
+				frame.right = frame.left + textSize.GetEntry(object->GetHandle()) + 12;
 
 				if (j > 0) if (prev->IsVisible()) frame.left++;
 
+				frame.bottom++;
+
 				surface->Frame(frame, FRAME_UP);
+
+				frame.right--;
+				frame.bottom--;
 
 				if (Setup::rightToLeft) { frame.left++; frame.right++; }
 
@@ -218,13 +224,13 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = container->GetContainerWindow();
+	Window	*wnd		= container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface	*surface = wnd->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Int	 retVal = Success;
+	Surface	*surface	= wnd->GetDrawSurface();
+	Point	 realPos	= GetRealPosition();
+	Int	 retVal		= Success;
 	Layer	*object;
 	Layer	*object2;
 	Rect	 frame;

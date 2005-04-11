@@ -16,12 +16,6 @@ namespace smooth
 	namespace GUI
 	{
 		class Button;
-		class Tooltip;
-	};
-
-	namespace System
-	{
-		class Timer;
 	};
 };
 
@@ -39,12 +33,7 @@ namespace smooth
 		class SMOOTHAPI Button : public Widget
 		{
 			private:
-				Tooltip			*tooltip;
-				System::Timer		*tipTimer;
-
 				Int			 backgroundColor;
-
-				Void			 ActivateTooltip();
 			protected:
 				Bitmap			 bitmap;
 				Size			 bmpSize;
@@ -57,7 +46,6 @@ namespace smooth
 				Int			 SetBackgroundColor(Int);
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
 		};
 	};
 };

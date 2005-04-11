@@ -37,7 +37,6 @@ S::GUI::TreeView::TreeView(String name, Point iPos, Size iSize)
 
 S::GUI::TreeView::~TreeView()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::TreeView::Paint(Int message)
@@ -45,14 +44,8 @@ S::Int S::GUI::TreeView::Paint(Int message)
 	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
-	Surface	*surface = container->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Rect	 frame;
-
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1;
-	frame.bottom	= realPos.y + size.cy - 1;
+	Surface	*surface	= container->GetDrawSurface();
+	Rect	 frame		= Rect(GetRealPosition(), size);
 
 	surface->Box(frame, Setup::ClientColor, FILLED);
 	surface->Frame(frame, FRAME_DOWN);

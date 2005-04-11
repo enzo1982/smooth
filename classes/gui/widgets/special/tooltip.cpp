@@ -50,8 +50,6 @@ S::GUI::Tooltip::~Tooltip()
 
 		DeleteObject(toolWindow);
 	}
-
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Tooltip::Show()

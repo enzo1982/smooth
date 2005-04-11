@@ -25,7 +25,6 @@ S::GUI::Shortcut::Shortcut(Int iKey, Int iFlags, Int iParam)
 
 S::GUI::Shortcut::~Shortcut()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Shortcut::Process(Int message, Int param1, Int param2)

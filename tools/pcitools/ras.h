@@ -87,6 +87,8 @@ HBITMAP LoadRAS(char *file)
 				{
 					SetPixel(hdc, x, y, In.InputNumberRaw(3));
 				}
+
+				if ((3 * sizex) & 1 == 1) In.InputNumber(1);
 			}
 
 			hbmp = (HBITMAP) SelectObject(hdc, oldbmp);

@@ -38,7 +38,6 @@ S::GUI::ToolWindow::ToolWindow() : Window("smooth ToolWindow")
 
 S::GUI::ToolWindow::~ToolWindow()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::ToolWindow::SetOwner(Widget *newOwner)

@@ -33,6 +33,7 @@ namespace smooth
 		{
 			protected:
 				Int			 value;
+				Int			 prevValue;
 
 				Int			 startValue;
 				Int			 endValue;

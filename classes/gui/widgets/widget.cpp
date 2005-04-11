@@ -14,6 +14,9 @@
 #include <smooth/gui/widgets/container.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/gui/widgets/basic/divider.h>
+#include <smooth/gui/widgets/special/tooltip.h>
+#include <smooth/gui/window/window.h>
+#include <smooth/system/timer.h>
 
 const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
 
@@ -34,6 +37,8 @@ S::GUI::Widget::Widget()
 	size.cx		= 100;
 	size.cy		= 100;
 
+	borderWidth	= 0;
+
 	orientation	= OR_UPPERLEFT;
 
 	text		= NIL;
@@ -44,6 +49,14 @@ S::GUI::Widget::Widget()
 
 	checked		= False;
 	clicked		= False;
+
+	mouseOver	= False;
+
+	leftButtonDown	= False;
+	rightButtonDown	= False;
+
+	tipTimer	= NIL;
+	tooltip		= NIL;
 
 	font.SetColor(Setup::TextColor);
 
@@ -58,6 +71,9 @@ S::GUI::Widget::Widget()
 
 S::GUI::Widget::~Widget()
 {
+	DeactivateTooltip();
+
+	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Bool S::GUI::Widget::IsRegistered()
@@ -162,14 +178,8 @@ S::Int S::GUI::Widget::Hide()
 
 	if (wasVisible)
 	{
-		Rect	 rect;
-		Point	 realPos = GetRealPosition();
-		Surface	*surface = container->GetDrawSurface();
-
-		rect.left	= realPos.x;
-		rect.top	= realPos.y;
-		rect.right	= realPos.x + size.cx;
-		rect.bottom	= realPos.y + size.cy;
+		Rect	 rect		= Rect(GetRealPosition(), size);
+		Surface	*surface	= container->GetDrawSurface();
 
 		surface->Box(rect, container->GetBackgroundColor() == -1 ? Setup::BackgroundColor : container->GetBackgroundColor(), FILLED);
 	}
@@ -222,7 +232,137 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
+	Window	*window	= container->GetContainerWindow();
+
+	if (window == NIL) return Success;
+
+	EnterProtectedRegion();
+
+	Rect	 frame	= Rect(GetRealPosition() + Point(borderWidth, borderWidth), size - Size(2 * borderWidth, 2 * borderWidth));
+
+	switch (message)
+	{
+		case SM_MOUSEMOVE:
+			if (!mouseOver && window->IsMouseOn(frame))
+			{
+				mouseOver = True;
+
+				Paint(SP_MOUSEIN);
+
+				onMouseOver.Emit();
+
+				if (tooltipText != NIL)
+				{
+					tipTimer = new System::Timer();
+
+					tipTimer->onInterval.Connect(&Widget::ActivateTooltip, this);
+					tipTimer->Start(500);
+				}
+			}
+			else if (mouseOver && !window->IsMouseOn(frame))
+			{
+				mouseOver = False;
+
+				leftButtonDown = False;
+				leftButtonDown = False;
+
+				Paint(SP_MOUSEOUT);
+
+				onMouseOut.Emit();
+
+				DeactivateTooltip();
+			}
+			else if (mouseOver && window->IsMouseOn(frame))
+			{
+				if (tipTimer != NIL && wParam == 0)
+				{
+					tipTimer->Stop();
+					tipTimer->Start(500);
+				}
+			}
+
+			break;
+		case SM_LBUTTONDBLCLK:
+			if (mouseOver)
+			{
+				onLeftButtonDoubleClick.Emit(Point(window->MouseX(), window->MouseY()));
+			}
+		case SM_LBUTTONDOWN:
+			if (mouseOver)
+			{
+				leftButtonDown = True;
+
+				Paint(SP_MOUSEDOWN);
+
+				onLeftButtonDown.Emit(Point(window->MouseX(), window->MouseY()));
+
+				DeactivateTooltip();
+			}
+
+			break;
+		case SM_LBUTTONUP:
+			if (leftButtonDown)
+			{
+				leftButtonDown = False;
+
+				Paint(SP_MOUSEUP);
+
+				onLeftButtonUp.Emit(Point(window->MouseX(), window->MouseY()));
+				onLeftButtonClick.Emit(Point(window->MouseX(), window->MouseY()));
+
+				onClick.Emit(window->MouseX(), window->MouseY());
+			}
+
+			break;
+	}
+
+	LeaveProtectedRegion();
+
 	return Success;
+}
+
+S::Void S::GUI::Widget::ActivateTooltip()
+{
+	if (tooltip != NIL) return;
+
+	tipTimer->Stop();
+
+	DeleteObject(tipTimer);
+
+	tipTimer = NIL;
+
+	Window	*window	= container->GetContainerWindow();
+
+	tooltip = new Tooltip();
+
+	tooltip->SetText(tooltipText);
+	tooltip->SetMetrics(Point(window->MouseX(), window->MouseY()), Size(0, 0));
+	tooltip->SetTimeout(3000);
+
+	window->RegisterObject(tooltip);
+}
+
+S::Void S::GUI::Widget::DeactivateTooltip()
+{
+	if (tipTimer != NIL)
+	{
+		tipTimer->Stop();
+
+		DeleteObject(tipTimer);
+
+		tipTimer = NIL;
+	}
+
+	if (tooltip != NIL)
+	{
+		tooltip->Hide();
+
+		tooltip->GetContainer()->UnregisterObject(tooltip);
+
+		DeleteObject(tooltip);
+
+		tooltip = NIL;
+	}
 }
 
 S::Bool S::GUI::Widget::IsVisible()

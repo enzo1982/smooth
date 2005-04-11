@@ -105,8 +105,6 @@ S::GUI::Window::~Window()
 
 	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop--;
 
-	if (registered && container != NIL) container->UnregisterObject(this);
-
 	delete backend;
 }
 
@@ -1056,7 +1054,7 @@ S::Bool S::GUI::Window::IsMouseOn(Rect rect)
 	if (!PtVisible((HDC) surface->GetSystemSurface(), Input::MouseX() - pos.x, Input::MouseY() - pos.y)) return False;
 #endif
 
-	if ((MouseX() >= rect.left) && (MouseX() <= rect.right) && (MouseY() >= rect.top) && (MouseY() <= rect.bottom))	return True;
+	if ((MouseX() >= rect.left) && (MouseX() < rect.right) && (MouseY() >= rect.top) && (MouseY() < rect.bottom))	return True;
 	else														return False;
 }
 

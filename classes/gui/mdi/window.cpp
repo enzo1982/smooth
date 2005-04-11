@@ -27,5 +27,4 @@ S::GUI::MDI::Window::Window(String title) : GUI::Window(title)
 
 S::GUI::MDI::Window::~Window()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }

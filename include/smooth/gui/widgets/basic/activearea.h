@@ -36,7 +36,6 @@ namespace smooth
 							~ActiveArea();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
 
 				Int			 SetColor(Int);
 				Int			 GetColor();

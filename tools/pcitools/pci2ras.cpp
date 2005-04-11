@@ -1,9 +1,11 @@
 #include "ras.h"
-#include <iostream.h>
+#include <iostream>
 
 #include <smooth/pciio.h>
 
-void main()
+using namespace std;
+
+int main()
 {
 	char rfn[1024];
 	char pfn[1024];
@@ -19,7 +21,7 @@ void main()
 
 	ReadPCI(pci, *pio);
 
-	bmp = pio->GetBitmap();
+	bmp = (HBITMAP) pio->GetBitmap().GetSystemBitmap();
 
 	ClosePCI(pci);
 
@@ -33,4 +35,6 @@ void main()
 	SaveRAS(bmp, rfn);
 
 	cout << "done.\n";
+
+	return 0;
 }

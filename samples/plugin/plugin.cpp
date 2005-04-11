@@ -47,25 +47,15 @@ Int ActiveAreaPlugin::Paint(Int message)
 	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
-	Window	*wnd = container->GetContainerWindow();
+	Window	*window		= container->GetContainerWindow();
 
-	if (wnd == NIL) return Success;
+	if (window == NIL) return Success;
 
-	Surface	*surface = wnd->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Rect	 frame;
-
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1;
-	frame.bottom	= realPos.y + size.cy - 1;
-
-	surface->Frame(frame, FRAME_DOWN);
-
-	frame.left++;
-	frame.top++;
+	Surface	*surface	= window->GetDrawSurface();
+	Rect	 frame		= Rect(GetRealPosition(), size);
 
 	surface->Box(frame, areaColor, FILLED);
+	surface->Frame(frame, FRAME_DOWN);
 
 	return Success;
 }
@@ -75,19 +65,19 @@ Int ActiveAreaPlugin::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
-	Window	*wnd = container->GetContainerWindow();
+	Window	*window		= container->GetContainerWindow();
 
-	if (wnd == NIL) return Success;
+	if (window == NIL) return Success;
 
-	Point	 realPos = GetRealPosition();
-	Int	 retVal = Success;
+	Point	 realPos	= GetRealPosition();
+	Int	 retVal		= Success;
 
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			if ((wnd->MouseX() > realPos.x) && (wnd->MouseX() < (realPos.x + size.cx - 1)) && (wnd->MouseY() > realPos.y) && (wnd->MouseY() < (realPos.y + size.cy - 1)))
+			if ((window->MouseX() > realPos.x) && (window->MouseX() < (realPos.x + size.cx - 1)) && (window->MouseY() > realPos.y) && (window->MouseY() < (realPos.y + size.cy - 1)))
 			{
-				onClick.Emit(wnd->MouseX(), wnd->MouseY());
+				onClick.Emit(window->MouseX(), window->MouseY());
 
 				retVal = Break;
 			}

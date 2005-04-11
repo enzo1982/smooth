@@ -45,8 +45,6 @@ S::GUI::ComboBox::ComboBox(Point iPos, Size iSize)
 S::GUI::ComboBox::~ComboBox()
 {
 	CloseListBox();
-
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::ComboBox::Paint(Int message)
@@ -59,19 +57,14 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 		if (GetNthObject(0) != NIL) ((ListEntry *) GetNthObject(0))->clicked = True;
 	}
 
-	Surface		*surface = container->GetDrawSurface();
+	Surface		*surface	= container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	Point		 realPos = GetRealPosition();
-	Rect		 frame;
+	Point		 realPos	= GetRealPosition();
+	Rect		 frame		= Rect(GetRealPosition(), size);
 	Point		 lineStart;
 	Point		 lineEnd;
-
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1;
-	frame.bottom	= realPos.y + size.cy - 1;
 
 	if (!(flags & CB_HOTSPOTONLY))
 	{
@@ -84,7 +77,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	frame.top++;
 	frame.bottom--;
 	frame.right--;
-	frame.left = frame.right - 16;
+	frame.left = frame.right - 17;
 
 	surface->Box(frame, Setup::BackgroundColor, FILLED);
 	surface->Frame(frame, FRAME_UP);
@@ -94,7 +87,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	frame.right++;
 	frame.left = realPos.x;
 
-	lineStart.x = frame.right - 12 + (Setup::rightToLeft ? 1 : 0);
+	lineStart.x = frame.right - 13 + (Setup::rightToLeft ? 1 : 0);
 	lineStart.y = frame.top + 8;
 	lineEnd.x = lineStart.x + 7;
 	lineEnd.y = lineStart.y;
@@ -149,35 +142,30 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 	if (!registered)		return Failure;
 	if (!active || !visible)	return Success;
 
-	Layer		*lay = (Layer *) container;
-	Window		*wnd = container->GetContainerWindow();
+	Layer		*lay		= (Layer *) container;
+	Window		*wnd		= container->GetContainerWindow();
 
 	if (wnd == NIL) return Success;
 
-	Surface		*surface = container->GetDrawSurface();
+	Surface		*surface	= container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	Point		 realPos = GetRealPosition();
-	Int		 retVal = Success;
+	Point		 realPos	= GetRealPosition();
+	Int		 retVal		= Success;
 	ListEntry	*operat;
-	Rect		 frame;
+	Rect		 frame		= Rect(GetRealPosition(), size);
 	Rect		 lbframe;
 	Point		 lbp;
 	Size		 lbs;
-	Bool		 executeProcs = False;
-
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1;
-	frame.bottom	= realPos.y + size.cy - 1;
+	Bool		 executeProcs	= False;
 
 	if (flags & CB_HOTSPOTONLY)
 	{
 		frame.top	+= 3;
 		frame.bottom	-= 3;
 		frame.right	-= 3;
-		frame.left	= frame.right - 12;
+		frame.left	= frame.right - 13;
 	}
 
 	switch (message)
@@ -247,7 +235,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= 3;
 						frame.bottom	-= 3;
 						frame.right	-= 3;
-						frame.left	= frame.right - 12;
+						frame.left	= frame.right - 13;
 					}
 
 					surface->Frame(frame, FRAME_DOWN);
@@ -290,7 +278,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= 3;
 						frame.bottom	-= 3;
 						frame.right	-= 3;
-						frame.left	= frame.right - 12;
+						frame.left	= frame.right - 13;
 					}
 
 					surface->Frame(frame, FRAME_DOWN);
@@ -309,11 +297,6 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				frame.right++;
 	
 				CloseListBox();
-
-				frame.left	= realPos.x;
-				frame.top	= realPos.y;
-				frame.right	= realPos.x + size.cx - 1;
-				frame.bottom	= realPos.y + size.cy - 1;
 			}
 
 			break;
@@ -398,7 +381,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 						frame.top	+= 3;
 						frame.bottom	-= 3;
 						frame.right	-= 3;
-						frame.left	= frame.right - 12;
+						frame.left	= frame.right - 13;
 					}
 
 					surface->Frame(frame, FRAME_UP);
@@ -408,8 +391,8 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 					if (!(flags & CB_HOTSPOTONLY))
 					{
 						frame.top	+= 3;
-						frame.bottom	-= 2;
-						frame.right	-= 2;
+						frame.bottom	-= 3;
+						frame.right	-= 3;
 						frame.left	= frame.right - 13;
 					}
 
@@ -424,7 +407,7 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 				frame.top	+= 3;
 				frame.bottom	-= 3;
 				frame.right	-= 3;
-				frame.left	= frame.right - 12;
+				frame.left	= frame.right - 13;
 			}
 
 			if (wnd->IsMouseOn(frame) && !checked)
@@ -435,9 +418,6 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 			}
 			else if (!wnd->IsMouseOn(frame) && checked)
 			{
-				frame.right++;
-				frame.bottom++;
-
 				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 
 				checked = False;

@@ -58,8 +58,6 @@ S::GUI::PopupMenu::~PopupMenu()
 	if (prevPopup != NIL) prevPopup->nextPopup = NIL;
 
 	delete realMenu;
-
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::PopupMenu::Show()

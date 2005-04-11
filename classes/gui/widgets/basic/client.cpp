@@ -30,7 +30,6 @@ S::GUI::Client::Client()
 
 S::GUI::Client::~Client()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Client::Paint(Int message)

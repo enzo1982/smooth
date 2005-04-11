@@ -27,7 +27,6 @@ S::GUI::DragControl::DragControl()
 
 S::GUI::DragControl::~DragControl()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::DragControl::Process(Int message, Int wParam, Int lParam)

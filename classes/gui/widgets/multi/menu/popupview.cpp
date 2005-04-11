@@ -34,7 +34,6 @@ S::GUI::PopupView::PopupView(PopupMenu *popupMenu, Menu *iRealMenu)
 
 S::GUI::PopupView::~PopupView()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::PopupView::Paint(Int message)
@@ -59,11 +58,14 @@ S::Int S::GUI::PopupView::Paint(Int message)
 
 	popupRect.left		= 0;
 	popupRect.top		= 0;
-	popupRect.right		= myPopup->popupsize.cx;
-	popupRect.bottom	= myPopup->popupsize.cy;
+	popupRect.right		= myPopup->popupsize.cx + 1;
+	popupRect.bottom	= myPopup->popupsize.cy + 1;
 
 	surface->Box(popupRect, Setup::BackgroundColor, FILLED);
 	surface->Frame(popupRect, FRAME_UP);
+
+	popupRect.right--;
+	popupRect.bottom--;
 
 	for (Int i = 0; i < realMenu->GetNOfObjects(); i++)
 	{

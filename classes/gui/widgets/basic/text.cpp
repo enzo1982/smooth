@@ -31,7 +31,6 @@ S::GUI::Text::Text(String iText, Point iPos)
 
 S::GUI::Text::~Text()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Text::Paint(Int message)

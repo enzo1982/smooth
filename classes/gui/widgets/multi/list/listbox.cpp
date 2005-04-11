@@ -66,8 +66,6 @@ S::GUI::ListBox::~ListBox()
 
 		header = NIL;
 	}
-
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::ListBox::AddTab(String tabName, Int iTabWidth)
@@ -112,10 +110,9 @@ S::Int S::GUI::ListBox::Show()
 
 	if (scrollbar != NIL)
 	{
-		Layer	*layer = (Layer *) container;
-		Point	 realPos = GetRealPosition();
-		Point	 sbp = Point(realPos.x + size.cx - layer->pos.x - 18, realPos.y + 1 - layer->pos.y + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
-		Size	 sbs = Size(scrollbar->size.cx, size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
+		Point	 realPos	= GetRealPosition();
+		Point	 sbp		= Point(realPos.x + size.cx - container->pos.x - 18, realPos.y + 1 - container->pos.y + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
+		Size	 sbs		= Size(scrollbar->size.cx, size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16));
 
 		scrollbar->SetMetrics(sbp, sbs);
 		scrollbar->SetRange(0, GetNOfObjects() - (int) ((size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
@@ -169,27 +166,22 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface	= container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	Layer	*layer = (Layer *) container;
-	Point	 realPos = GetRealPosition();
-	Rect	 frame;
+	Rect	 frame		= Rect(GetRealPosition(), size);
 	Point	 sbp;
 	Size	 sbs;
 	Int	 maxFrameY;
+
+	surface->StartPaint(frame);
 
 	switch (message)
 	{
 		default:
 		case SP_PAINT:
 		case SP_UPDATE:
-			frame.left	= realPos.x;
-			frame.top	= realPos.y;
-			frame.right	= realPos.x + size.cx - 1;
-			frame.bottom	= realPos.y + size.cy - 1;
-
 			if (!(15 * GetNOfObjects() + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16) + 4 > size.cy && !(flags & LF_HIDESCROLLBAR)))
 			{
 				if (scrollbar != NIL)
@@ -197,7 +189,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					scrollbarPos = 0;
 					lastScrollbarPos = 0;
 
-					layer->UnregisterObject(scrollbar);
+					container->UnregisterObject(scrollbar);
 
 					DeleteObject(scrollbar);
 
@@ -219,21 +211,21 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				surface->Frame(frame, FRAME_DOWN);
 			}
 
-			maxFrameY = frame.bottom - 1;
+			maxFrameY = frame.bottom - 2;
 
 			frame.left++;
 			frame.top = frame.top + 1 + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
 			frame.right--;
 			frame.bottom = frame.top + 15;
 
-			frame.bottom = min(frame.bottom, maxFrameY);
+			frame.bottom = Math::Min(frame.bottom, maxFrameY);
 
 			if (15 * GetNOfObjects() + (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16) + 4 > size.cy && !(flags & LF_HIDESCROLLBAR))
 			{
 				if (scrollbar == NIL)
 				{
-					sbp.x = frame.right - layer->pos.x - 16;
-					sbp.y = frame.top - layer->pos.y;
+					sbp.x = frame.right - container->pos.x - 17;
+					sbp.y = frame.top - container->pos.y;
 					sbs.cx = 0;
 					sbs.cy = size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
 
@@ -241,14 +233,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					scrollbar->onClick.Connect(&ListBox::ScrollbarProc, this);
 
-					layer->RegisterObject(scrollbar);
+					container->RegisterObject(scrollbar);
 
 					scrollbar->Paint(SP_PAINT);
 				}
 				else
 				{
-					sbp.x = frame.right - layer->pos.x - 16;
-					sbp.y = frame.top - layer->pos.y;
+					sbp.x = frame.right - container->pos.x - 17;
+					sbp.y = frame.top - container->pos.y;
 					sbs.cy = size.cy - 2 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16);
 
 					scrollbar->pos = sbp;
@@ -257,7 +249,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					scrollbar->SetRange(0, GetNOfObjects() - (Int) ((size.cy - 4 - (header == NIL || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
 				}
 
-				frame.right -= 17;
+				frame.right -= 18;
 			}
 
 			lastScrollbarPos = scrollbarPos;
@@ -296,6 +288,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			break;
 	}
+
+	surface->EndPaint();
 
 	LeaveProtectedRegion();
 
@@ -351,21 +345,10 @@ S::Int S::GUI::ListBox::ScrollDown(Int nLines)
 
 S::Void S::GUI::ListBox::ScrollbarProc()
 {
-	Surface	*surface = container->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Rect	 frame;
-
-	frame.left	= realPos.x;
-	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1;
-	frame.bottom	= realPos.y + size.cy - 1;
-
 	if (scrollbarPos != lastScrollbarPos)
 	{
 		lastScrollbarPos = scrollbarPos;
 
-		surface->StartPaint(frame);
 		Paint(SP_PAINT);
-		surface->EndPaint();
 	}
 }

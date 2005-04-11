@@ -45,7 +45,6 @@ S::GUI::Titlebar::Titlebar(Int buttons)
 
 S::GUI::Titlebar::~Titlebar()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::Titlebar::Paint(Int message)
@@ -75,8 +74,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 	titleFrame.left		= pos.x;
 	titleFrame.top		= pos.y;
-	titleFrame.right	= titleFrame.left + size.cx - 1;
-	titleFrame.bottom	= titleFrame.top + size.cy - 1;
+	titleFrame.right	= titleFrame.left + size.cx;
+	titleFrame.bottom	= titleFrame.top + size.cy;
 
 	if (icon != NIL) titleFrame.left += 18;
 
@@ -84,8 +83,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 	titleGradient.left	= titleFrame.left + 1;
 	titleGradient.top	= titleFrame.top + 1;
-	titleGradient.right	= titleFrame.right;
-	titleGradient.bottom	= titleFrame.bottom;
+	titleGradient.right	= titleFrame.right - 1;
+	titleGradient.bottom	= titleFrame.bottom - 1;
 
 	if (paintActive)	surface->Gradient(titleGradient, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 	else			surface->Gradient(titleGradient, Setup::InactiveGradientStartColor, Setup::InactiveGradientEndColor, OR_HORZ);
@@ -111,9 +110,9 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	}
 
 	tButtonRect.left	= titleGradient.right - 38 + (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 20);
-	tButtonRect.right	= tButtonRect.left + 34 - (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 20);
+	tButtonRect.right	= tButtonRect.left + 35 - (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 20);
 	tButtonRect.top		= titleGradient.top + 2;
-	tButtonRect.bottom	= tButtonRect.top + 13;
+	tButtonRect.bottom	= tButtonRect.top + 14;
 
 	surface->Box(tButtonRect, Setup::BackgroundColor, FILLED);
 	surface->Frame(tButtonRect, FRAME_DOWN);
@@ -186,19 +185,32 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	surface->Line(start, end, buttonColor);
 
 	start.x++;
-	end.x++;
+	end.y--;
+
+	surface->Line(start, end, buttonColor);
+
+	start.x--;
+	start.y++;
+	end.x--;
+	end.y++;
 
 	surface->Line(start, end, buttonColor);
 
 	start.y		= button.bottom - 1;
 	end.y		= button.top - 1;
-	start.x--;
-	end.x--;
+	end.x++;
 
 	surface->Line(start, end, buttonColor);
 
 	start.x++;
-	end.x++;
+	end.y++;
+
+	surface->Line(start, end, buttonColor);
+
+	start.x--;
+	start.y--;
+	end.x--;
+	end.y--;
 
 	surface->Line(start, end, buttonColor);
 
@@ -238,27 +250,27 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	if (wnd->GetIcon() != NIL) titleFrame.left += 18;
 
 	tButtonRect.left	= titleFrame.right - 38;
-	tButtonRect.right	= tButtonRect.left + 34;
+	tButtonRect.right	= tButtonRect.left + 35;
 	tButtonRect.top		= titleFrame.top + 4;
-	tButtonRect.bottom	= tButtonRect.top + 13;
+	tButtonRect.bottom	= tButtonRect.top + 14;
 
 	if (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON))
 	{
 		minButton.left		= tButtonRect.left + 2;
-		minButton.right		= minButton.left + 10;
+		minButton.right		= minButton.left + 11;
 		minButton.top		= tButtonRect.top + 1;
-		minButton.bottom	= minButton.top + 10;
+		minButton.bottom	= minButton.top + 11;
 
 		maxButton.left		= tButtonRect.left + 12;
-		maxButton.right		= maxButton.left + 10;
+		maxButton.right		= maxButton.left + 11;
 		maxButton.top		= tButtonRect.top + 1;
-		maxButton.bottom	= maxButton.top + 10;
+		maxButton.bottom	= maxButton.top + 11;
 	}
 
 	closeButton.left	= tButtonRect.left + 22;
-	closeButton.right	= closeButton.left + 10;
+	closeButton.right	= closeButton.left + 11;
 	closeButton.top		= tButtonRect.top + 1;
-	closeButton.bottom	= closeButton.top + 10;
+	closeButton.bottom	= closeButton.top + 11;
 
 	switch (message)
 	{
@@ -415,88 +427,70 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			{
 				minchk		= False;
 				minclk		= False;
-				minButton.right++;
-				minButton.bottom++;
+
 				surface->Box(minButton, Setup::BackgroundColor, OUTLINED);
-				minButton.right--;
-				minButton.bottom--;
 			}
 			if (Binary::IsFlagSet(flags, TB_MAXBUTTON) && maxchk && !wnd->IsMouseOn(maxButton))
 			{
 				maxchk		= False;
 				maxclk		= False;
-				maxButton.right++;
-				maxButton.bottom++;
+
 				surface->Box(maxButton, Setup::BackgroundColor, OUTLINED);
-				maxButton.right--;
-				maxButton.bottom--;
 			}
 			if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON) && closechk && !wnd->IsMouseOn(closeButton))
 			{
 				closechk	= False;
 				closeclk	= False;
-				closeButton.right++;
-				closeButton.bottom++;
+
 				surface->Box(closeButton, Setup::BackgroundColor, OUTLINED);
-				closeButton.right--;
-				closeButton.bottom--;
 			}
 
 			if (Binary::IsFlagSet(flags, TB_MINBUTTON) && !minchk && wnd->IsMouseOn(minButton))
 			{
 				maxchk		= False;
 				maxclk		= False;
-				maxButton.right++;
-				maxButton.bottom++;
+
 				surface->Box(maxButton, Setup::BackgroundColor, OUTLINED);
-				maxButton.right--;
-				maxButton.bottom--;
+
 				closechk	= False;
 				closeclk	= False;
-				closeButton.right++;
-				closeButton.bottom++;
+
 				surface->Box(closeButton, Setup::BackgroundColor, OUTLINED);
-				closeButton.right--;
-				closeButton.bottom--;
+
 				minchk		= True;
+
 				surface->Frame(minButton, FRAME_UP);
 			}
 			if (Binary::IsFlagSet(flags, TB_MAXBUTTON) && !maxchk && wnd->IsMouseOn(maxButton))
 			{
 				minchk		= False;
 				minclk		= False;
-				minButton.right++;
-				minButton.bottom++;
+
 				surface->Box(minButton, Setup::BackgroundColor, OUTLINED);
-				minButton.right--;
-				minButton.bottom--;
+
 				closechk	= False;
 				closeclk	= False;
-				closeButton.right++;
-				closeButton.bottom++;
+
 				surface->Box(closeButton, Setup::BackgroundColor, OUTLINED);
-				closeButton.right--;
-				closeButton.bottom--;
+
 				maxchk		= True;
+
 				surface->Frame(maxButton, FRAME_UP);
 			}
 			if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON) && !closechk && wnd->IsMouseOn(closeButton))
 			{
 				minchk		= False;
 				minclk		= False;
-				minButton.right++;
-				minButton.bottom++;
+
 				surface->Box(minButton, Setup::BackgroundColor, OUTLINED);
-				minButton.right--;
-				minButton.bottom--;
+
 				maxchk		= False;
 				maxclk		= False;
-				maxButton.right++;
-				maxButton.bottom++;
+
 				surface->Box(maxButton, Setup::BackgroundColor, OUTLINED);
-				maxButton.right--;
-				maxButton.bottom--;
+
 				closechk	= True;
+
 				surface->Frame(closeButton, FRAME_UP);
 			}
 

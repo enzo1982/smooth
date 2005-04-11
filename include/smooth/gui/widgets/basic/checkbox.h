@@ -27,6 +27,8 @@ namespace smooth
 	{
 		class SMOOTHAPI CheckBox : public Widget
 		{
+			private:
+				Void			 OnLeftButtonClick();
 			protected:
 				Bool			*variable;
 				Bool			 state;

@@ -77,8 +77,6 @@ S::GUI::EditBox::~EditBox()
 
 		scrollbar = NIL;
 	}
-
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::EditBox::Paint(Int message)
@@ -86,23 +84,18 @@ S::Int S::GUI::EditBox::Paint(Int message)
 	if (!IsRegistered())	return Failure;
 	if (!IsVisible())	return Success;
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface	= container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	Rect	 frame;
 	Rect	 textRect;
-	Point	 realPos = GetRealPosition();
+	Point	 realPos	= GetRealPosition();
+	Rect	 frame		= Rect(GetRealPosition(), size);
 
 	switch (message)
 	{
 		default:
 		case SP_PAINT:
-			frame.left	= realPos.x;
-			frame.top	= realPos.y;
-			frame.right	= realPos.x + size.cx - 1;
-			frame.bottom	= realPos.y + size.cy - 1;
-
 			if (scrollbar != NIL) frame.right -= 17;
 
 			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
@@ -147,7 +140,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 				scrollbarPos = 0;
 
-				scrollbar = new Scrollbar(Point(frame.right - layer->pos.x - 17, frame.top - layer->pos.y + 1), Size(0, size.cy - 2), OR_VERT, &scrollbarPos, 0, GetNOfInvisibleLines());
+				scrollbar = new Scrollbar(Point(frame.right - layer->pos.x - 18, frame.top - layer->pos.y + 1), Size(0, size.cy - 2), OR_VERT, &scrollbarPos, 0, GetNOfInvisibleLines());
 				scrollbar->onClick.Connect(&EditBox::ScrollbarProc, this);
 
 				container->RegisterObject(scrollbar);
@@ -158,7 +151,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			{
 				Layer	*layer = (Layer *) container;
 
-				scrollbar->pos = Point(frame.right - layer->pos.x - 17, frame.top - layer->pos.y + 1);
+				scrollbar->pos = Point(frame.right - layer->pos.x - 18, frame.top - layer->pos.y + 1);
 				scrollbar->size.cy = size.cy - 2;
 
 				scrollbar->SetRange(0, GetNOfInvisibleLines());
@@ -169,7 +162,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			{
 				container->UnregisterObject(scrollbar);
 
-				surface->Box(Rect(Point(frame.right - 17, frame.top + 1), Size(18, size.cy - 2)), Setup::ClientColor, FILLED);
+				surface->Box(Rect(Point(frame.right - 18, frame.top + 1), Size(18, size.cy - 2)), Setup::ClientColor, FILLED);
 
 				DeleteObject(scrollbar);
 
@@ -215,8 +208,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1 - (dropDownList == NIL ? 0 : 18);
-	frame.bottom	= realPos.y + size.cy - 1;
+	frame.right	= realPos.x + size.cx - (dropDownList == NIL ? 0 : 18);
+	frame.bottom	= realPos.y + size.cy;
 
 	if (scrollbar != NIL) frame.right -= 18;
 
@@ -670,8 +663,8 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1 - (dropDownList == NIL ? 0 : 18);
-	frame.bottom	= realPos.y + size.cy - 1;
+	frame.right	= realPos.x + size.cx - (dropDownList == NIL ? 0 : 18);
+	frame.bottom	= realPos.y + size.cy;
 
 	if (scrollbar != NIL) frame.right -= 18;
 
@@ -772,8 +765,8 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1 - (dropDownList == NIL ? 0 : 18);
-	frame.bottom	= realPos.y + size.cy - 1;
+	frame.right	= realPos.x + size.cx - (dropDownList == NIL ? 0 : 18);
+	frame.bottom	= realPos.y + size.cy;
 
 	if (scrollbar != NIL) frame.right -= 18;
 
@@ -810,8 +803,8 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1 - (dropDownList == NIL ? 0 : 18);
-	frame.bottom	= realPos.y + size.cy - 1;
+	frame.right	= realPos.x + size.cx - (dropDownList == NIL ? 0 : 18);
+	frame.bottom	= realPos.y + size.cy;
 
 	if (scrollbar != NIL) frame.right -= 18;
 
@@ -1020,8 +1013,8 @@ S::Void S::GUI::EditBox::TimerProc()
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1;
-	frame.bottom	= realPos.y + size.cy - 1;
+	frame.right	= realPos.x + size.cx;
+	frame.bottom	= realPos.y + size.cy;
 
 	if (scrollbar != NIL) frame.right -= 18;
 
@@ -1043,8 +1036,8 @@ S::Void S::GUI::EditBox::ScrollbarProc()
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - 1;
-	frame.bottom	= realPos.y + size.cy - 1;
+	frame.right	= realPos.x + size.cx;
+	frame.bottom	= realPos.y + size.cy;
 
 	surface->StartPaint(frame);
 	Paint(SP_PAINT);

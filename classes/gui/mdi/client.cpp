@@ -28,7 +28,6 @@ S::GUI::MDI::Client::Client()
 
 S::GUI::MDI::Client::~Client()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 S::Int S::GUI::MDI::Client::Paint(Int message)

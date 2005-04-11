@@ -9,6 +9,9 @@ xx.xx.05 xx:xx - smooth alpha 0.8.67.0
 		- the new style directory selection dialog is used if available
 - error.cpp	- added error classes
 - object.cpp	- new function: ToString()
+- widget.cpp	- all widgets can have tooltips now
+		- implemented a universal Process(...) method to replace most others
+- surface.cpp	- fixed frames being painted too large
 
 - added a class for smart pointers
 

@@ -20,6 +20,7 @@ namespace smooth
 };
 
 #include "../widget.h"
+#include "../../../graphics/bitmap.h"
 
 namespace smooth
 {
@@ -31,6 +32,10 @@ namespace smooth
 
 		class SMOOTHAPI Progressbar : public Widget
 		{
+			private:
+				Bitmap			 gradient;
+
+				Void			 CreateGradient(Size);
 			protected:
 				Int			 value;
 				Int			 prevValue;
@@ -46,6 +51,8 @@ namespace smooth
 							~Progressbar();
 
 				virtual Int		 Paint(Int);
+
+				Int			 SetMetrics(Point, Size);
 
 				Int			 SetValue(Int);
 				Int			 GetValue();

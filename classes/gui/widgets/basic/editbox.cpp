@@ -92,6 +92,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 	Point	 realPos	= GetRealPosition();
 	Rect	 frame		= Rect(GetRealPosition(), size);
 
+	surface->StartPaint(frame);
+
 	switch (message)
 	{
 		default:
@@ -181,6 +183,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 			break;
 	}
+
+	surface->EndPaint();
 
 	LeaveProtectedRegion();
 

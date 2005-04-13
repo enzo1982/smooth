@@ -9,8 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/progressbar.h>
-#include <smooth/definitions.h>
-#include <smooth/loop.h>
 #include <smooth/misc/math.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/color.h>
@@ -25,8 +23,8 @@ S::GUI::Progressbar::Progressbar(Point iPos, Size iSize, Int subType, Int iTextF
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
 	textFlag	= iTextFlag;
-	prevValue	= (Int) Math::Min(endValue, Math::Max(startValue, iValue));
-	value		= (Int) Math::Min(endValue, Math::Max(startValue, iValue));
+
+	SetValue(iValue);
 
 	font.SetColor(Setup::ClientTextColor);
 
@@ -45,6 +43,8 @@ S::GUI::Progressbar::Progressbar(Point iPos, Size iSize, Int subType, Int iTextF
 		if (size.cx == 0) size.cx = 19;
 		if (size.cy == 0) size.cy = 80;
 	}
+
+	CreateGradient(size);
 }
 
 S::GUI::Progressbar::~Progressbar()
@@ -58,70 +58,28 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 
 	Surface	*surface	= container->GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
-	Rect	 frame		= Rect(GetRealPosition(), size);
-
-	Int	 rs		= GetRed(Setup::GradientStartColor);
-	Int	 gs		= GetGreen(Setup::GradientStartColor);
-	Int	 bs		= GetBlue(Setup::GradientStartColor);
-	Float	 rp		= ((Float) (GetRed(Setup::GradientEndColor) - rs)) / (size.cx - 2);
-	Float	 gp		= ((Float) (GetGreen(Setup::GradientEndColor) - gs)) / (size.cx - 2);
-	Float	 bp		= ((Float) (GetBlue(Setup::GradientEndColor) - bs)) / (size.cx - 2);
-
-	value = (Int) Math::Min(endValue, Math::Max(startValue, value));
+	Rect	 frame		= Rect(realPos, size);
 
 	if (value == prevValue && message == SP_UPDATE) return Success;
 
 	surface->StartPaint(frame);
 
-	if (message != SP_UPDATE || value == 0)
-	{
-		if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
-		else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+	if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+	else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-		surface->Frame(frame, FRAME_DOWN);
-	}
-
-	frame.left++;
-	frame.top++;
-	frame.right--;
-	frame.bottom--;
+	surface->Frame(frame, FRAME_DOWN);
 
 	if (value > 0)
 	{
-		Int	 minI = (Int) (((subtype == OR_HORZ ? size.cx : size.cy) - 2) / ((Float) (endValue - startValue) / (Float) (prevValue - startValue)));
-		Int	 maxI = (Int) (((subtype == OR_HORZ ? size.cx : size.cy) - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+		frame.left++;
+		frame.top++;
+		frame.right--;
+		frame.bottom--;
 
-		if (minI < maxI || message != SP_UPDATE)
-		{
-			for (Int i = (message == SP_UPDATE) ? minI : 0; i < maxI; i++)
-			{
-				Point	 lineStart	= (subtype == OR_HORZ) ? Point(frame.left + i, frame.top)    : Point(frame.left + i, frame.top);
-				Point	 lineEnd	= (subtype == OR_HORZ) ? Point(frame.left + i, frame.bottom) : Point(frame.left + i, frame.bottom);
-				Int	 color		= Setup::GradientStartColor;
+		if (subtype == OR_HORZ)	frame.right = frame.left   + (Int) ((size.cx - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+		else			frame.top   = frame.bottom - (Int) ((size.cy - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
 
-				if (i > 0) color = CombineColor((Int) (rs + rp * i), (Int) (gs + gp * i), (Int) (bs + bp * i));
-
-				surface->Line(lineStart, lineEnd, color);
-			}
-		}
-		else if (maxI < minI)
-		{
-			Rect	 eFrame = frame;
-
-			if (subtype == OR_HORZ)
-			{
-				eFrame.left += maxI;
-				eFrame.right = eFrame.left + minI;
-			}
-			else
-			{
-				eFrame.bottom -= maxI;
-				eFrame.top = eFrame.bottom - minI;
-			}
-
-			if (active)	surface->Box(eFrame, Setup::ClientColor, FILLED);
-			else		surface->Box(eFrame, Setup::BackgroundColor, FILLED);
-		}
+		gradient.BlitToSurface(Rect(Point(0, 0), Size(frame.right - frame.left, frame.bottom - frame.top)), surface, frame);
 	}
 
 	if (subtype == OR_HORZ && textFlag != PB_NOTEXT)
@@ -140,44 +98,32 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 		}
 
 		Int	 textSize	= font.GetTextSizeX(text);
-		Rect	 textRect;
-
-		textRect.left	= (frame.right + frame.left) / 2 - textSize / 2;
-		textRect.top	= realPos.y + 2;
-		textRect.bottom	= realPos.y + size.cy - 1;
-		textRect.right	= textRect.left + textSize;
-
-		Int	 maxI = (Int) ((size.cx - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
-
-		for (Int i = textRect.left - frame.left - 5; i < textRect.right - frame.left + 5; i++)
-		{
-			Point	 lineStart	= Point(frame.left + i, frame.top);
-			Point	 lineEnd	= Point(frame.left + i, frame.bottom);
-			Int	 color		= Setup::GradientStartColor;
-
-			if (i < maxI)	color = CombineColor((Int) (rs + rp * i), (Int) (gs + gp * i), (Int) (bs + bp * i));
-			else		color = Setup::ClientColor;
-
-			surface->Line(lineStart, lineEnd, color);
-		}
+		Rect	 textRect	= Rect(Point(realPos.x + (size.cx / 2) - (textSize / 2), realPos.y + 2), Size(textSize, size.cy - 3));
 
 		surface->SetText(text, textRect, font);
 
-		if (value > 0)	textRect.right = realPos.x + (Int) ((frame.right - frame.left) / ((Float) (endValue - startValue) / (Float) (value - startValue))) + 1;
-		else		textRect.right = 0;
+		if (value > 0)
+		{
+			textRect.right = realPos.x + (Int) ((size.cx - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
 
-		Font	 nFont = font;
+			Font	 nFont = font;
 
-		nFont.SetColor(Setup::GradientTextColor);
+			nFont.SetColor(Setup::GradientTextColor);
 
-		surface->SetText(text, textRect, nFont);
+			surface->SetText(text, textRect, nFont);
+		}
 	}
-
-	prevValue = value;
 
 	surface->EndPaint();
 
 	return Success;
+}
+
+S::Int S::GUI::Progressbar::SetMetrics(Point nPos, Size nSize)
+{
+	CreateGradient(nSize);
+
+	return Widget::SetMetrics(nPos, nSize);
 }
 
 S::Int S::GUI::Progressbar::SetValue(Int newValue)
@@ -186,10 +132,39 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 
 	Paint(SP_UPDATE);
 
+	prevValue = value;
+
 	return Success;
 }
 
 S::Int S::GUI::Progressbar::GetValue()
 {
 	return value;
+}
+
+S::Void S::GUI::Progressbar::CreateGradient(Size gSize)
+{
+	gradient.CreateBitmap(gSize.cx - 2, gSize.cy - 2, 32);
+
+	Int	 rs	= GetRed(Setup::GradientStartColor);
+	Int	 gs	= GetGreen(Setup::GradientStartColor);
+	Int	 bs	= GetBlue(Setup::GradientStartColor);
+	Float	 rp	= ((Float) (GetRed(Setup::GradientEndColor) - rs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
+	Float	 gp	= ((Float) (GetGreen(Setup::GradientEndColor) - gs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
+	Float	 bp	= ((Float) (GetBlue(Setup::GradientEndColor) - bs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
+
+	if (subtype == OR_HORZ)
+	{
+		for (Int x = 0; x < gSize.cx - 2; x++)
+		{
+			for (Int y = 0; y < gSize.cy - 2; y++) gradient.SetPixel(x, y, CombineColor((Int) (rs + rp * x), (Int) (gs + gp * x), (Int) (bs + bp * x)));
+		}
+	}
+	else
+	{
+		for (Int y = 0; y < gSize.cy - 2; y++)
+		{
+			for (Int x = 0; x < gSize.cx - 2; x++) gradient.SetPixel(x, gSize.cy - 3 - y, CombineColor((Int) (rs + rp * y), (Int) (gs + gp * y), (Int) (bs + bp * y)));
+		}
+	}
 }

@@ -46,8 +46,6 @@ namespace smooth
 			public:
 				Int		 type;
 
-				String		 description;
-
 				Bitmap		 bitmap;
 				Bitmap		 graymap;
 
@@ -69,13 +67,14 @@ namespace smooth
 				Int		 Process(Int, Int, Int);
 
 				Int		 SetText(const String &);
-				Int		 SetStatusText(String);
 				Int		 SetShortcut(Int, Int);
 
 				Int		 SetBitmap(const Bitmap &);
 			slots:
-				Void		 PopupProc();
 				Void		 ShortcutProc();
+
+				Void		 OpenPopupMenu();
+				Void		 ClosePopupMenu();
 		};
 	};
 };

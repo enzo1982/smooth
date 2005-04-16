@@ -74,7 +74,7 @@ S::Int S::GUI::Tooltip::Show()
 	Point	 tPos	= Point(pos.x + wnd->pos.x, pos.y + wnd->pos.y - wndRect.bottom);
 	Size	 tSize	= Size(wndRect.right, wndRect.bottom);
 
-	if (tPos.x + tSize.cx > LiSAGetDisplaySizeX())	tPos.x = pos.x + wnd->pos.x - tSize.cx;
+	if (tPos.x + tSize.cx > LiSAGetDisplaySizeX())	tPos.x = Math::Max(10, pos.x + wnd->pos.x - tSize.cx);
 	if (tPos.y < 0)					tPos.y = pos.y + wnd->pos.y + 1;
 
 	toolWindow = new ToolWindow();

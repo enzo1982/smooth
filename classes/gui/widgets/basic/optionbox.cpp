@@ -59,6 +59,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	Point	 lineEnd;
 
 	Int	 lightColor;
+	Int	 i;
 
 	switch (message)
 	{
@@ -94,7 +95,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 			lineStart.x--;
 			lineEnd.x++;
 
-			for (Int i = 0; i < 5; i++)
+			for (i = 0; i < 5; i++)
 			{
 				lineStart.y++;
 				lineEnd.y++;
@@ -144,7 +145,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 				lineStart.x--;
 				lineEnd.x++;
 
-				for (Int i = 0; i < 3; i++)
+				for (i = 0; i < 3; i++)
 				{
 					lineStart.y++;
 					lineEnd.y++;

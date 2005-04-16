@@ -36,7 +36,7 @@ S::GUI::PopupMenu::PopupMenu(Menu *menu)
 		MenuEntry	*nEntry = realMenu->AddEntry(entry->GetText(), entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->GetOrientation());
 
 		nEntry->SetTooltipText(entry->GetTooltipText());
-		nEntry->SetStatusText(entry->description);
+		nEntry->SetStatusText(entry->GetStatusText());
 
 		nEntry->onClick.Connect(&entry->onClick);
  	}

@@ -51,12 +51,10 @@ namespace smooth
 			private:
 				Tooltip				*tooltip;
 				System::Timer			*tipTimer;
-
-				Void				 ActivateTooltip();
-				Void				 DeactivateTooltip();
 			protected:
 				Bool				 visible;
 				Bool				 active;
+				Bool				 focussed;
 
 				Bool				 clicked;
 				Bool				 checked;
@@ -70,6 +68,7 @@ namespace smooth
 
 				String				 text;
 				String				 tooltipText;
+				String				 statusText;
 
 				Int				 borderWidth;
 
@@ -79,6 +78,9 @@ namespace smooth
 				Container			*container;
 
 				Void				 GetTextSize();
+
+				Void				 ActivateTooltip();
+				Void				 DeactivateTooltip();
 			public:
 				static const Int		 classID;
 
@@ -121,6 +123,9 @@ namespace smooth
 				virtual Int			 SetTooltipText(const String &);
 				virtual String			 GetTooltipText();
 
+				virtual Int			 SetStatusText(const String &);
+				virtual String			 GetStatusText();
+
 				virtual Int			 SetFont(Font);
 				virtual Font			 GetFont();
 
@@ -151,6 +156,11 @@ namespace smooth
 				Signal1<Void, Point>		 onRightButtonDoubleClick;
 
 				Signal2<Void, Int, Int>		 onClick;
+
+				Signal0<Void>			 onGetFocus;
+				Signal0<Void>			 onLoseFocus;
+
+				Signal0<Void>			 onClickInFocus;
 
 				Signal1<Void, Container *>	 onRegister;
 				Signal1<Void, Container *>	 onUnregister;

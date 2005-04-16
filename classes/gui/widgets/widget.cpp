@@ -16,6 +16,7 @@
 #include <smooth/gui/widgets/basic/divider.h>
 #include <smooth/gui/widgets/special/tooltip.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/gui/window/toolwindow.h>
 #include <smooth/system/timer.h>
 
 const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
@@ -29,6 +30,7 @@ S::GUI::Widget::Widget()
 
 	visible		= False;
 	active		= True;
+	focussed	= False;
 
 	subtype		= 0;
 
@@ -63,7 +65,25 @@ S::GUI::Widget::Widget()
 	onShow.SetParentObject(this);
 	onHide.SetParentObject(this);
 
+	onMouseOver.SetParentObject(this);
+	onMouseOut.SetParentObject(this);
+
+	onLeftButtonDown.SetParentObject(this);
+	onLeftButtonUp.SetParentObject(this);
+	onLeftButtonClick.SetParentObject(this);
+	onLeftButtonDoubleClick.SetParentObject(this);
+
+	onRightButtonDown.SetParentObject(this);
+	onRightButtonUp.SetParentObject(this);
+	onRightButtonClick.SetParentObject(this);
+	onRightButtonDoubleClick.SetParentObject(this);
+
 	onClick.SetParentObject(this);
+
+	onGetFocus.SetParentObject(this);
+	onLoseFocus.SetParentObject(this);
+
+	onClickInFocus.SetParentObject(this);
 
 	onRegister.SetParentObject(this);
 	onUnregister.SetParentObject(this);
@@ -247,9 +267,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			{
 				mouseOver = True;
 
-				Paint(SP_MOUSEIN);
-
-				onMouseOver.Emit();
+				if (statusText != NIL) window->SetStatusText(statusText);
 
 				if (tooltipText != NIL)
 				{
@@ -258,6 +276,10 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 					tipTimer->onInterval.Connect(&Widget::ActivateTooltip, this);
 					tipTimer->Start(500);
 				}
+
+				Paint(SP_MOUSEIN);
+
+				onMouseOver.Emit();
 			}
 			else if (mouseOver && !window->IsMouseOn(frame))
 			{
@@ -266,11 +288,13 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				leftButtonDown = False;
 				leftButtonDown = False;
 
+				if (statusText != NIL && window->GetStatusText() == statusText) window->RestoreDefaultStatusText();
+
+				DeactivateTooltip();
+
 				Paint(SP_MOUSEOUT);
 
 				onMouseOut.Emit();
-
-				DeactivateTooltip();
 			}
 			else if (mouseOver && window->IsMouseOn(frame))
 			{
@@ -282,21 +306,39 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
-		case SM_LBUTTONDBLCLK:
-			if (mouseOver)
-			{
-				onLeftButtonDoubleClick.Emit(Point(window->MouseX(), window->MouseY()));
-			}
 		case SM_LBUTTONDOWN:
+		case SM_LBUTTONDBLCLK:
 			if (mouseOver)
 			{
 				leftButtonDown = True;
 
+				DeactivateTooltip();
+
 				Paint(SP_MOUSEDOWN);
+
+				if (!focussed)
+				{
+					focussed = True;
+
+					onGetFocus.Emit();
+				}
+				else
+				{
+					onClickInFocus.Emit();
+				}
 
 				onLeftButtonDown.Emit(Point(window->MouseX(), window->MouseY()));
 
-				DeactivateTooltip();
+				if (message == SM_LBUTTONDBLCLK) onLeftButtonDoubleClick.Emit(Point(window->MouseX(), window->MouseY()));
+			}
+			else
+			{
+				if (focussed)
+				{
+					focussed = False;
+
+					onLoseFocus.Emit();
+				}
 			}
 
 			break;
@@ -314,6 +356,24 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+#ifdef __WIN32__
+		case WM_KILLFOCUS:
+			if (Window::GetWindow((HWND) wParam) != NIL)
+			{
+				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID || Window::GetWindow((HWND) wParam) == window) break;
+			}
+
+			DeactivateTooltip();
+
+			if (focussed)
+			{
+				focussed = False;
+
+				onLoseFocus.Emit();
+			}
+
+			break;
+#endif
 	}
 
 	LeaveProtectedRegion();
@@ -420,6 +480,18 @@ S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 S::String S::GUI::Widget::GetTooltipText()
 {
 	return tooltipText;
+}
+
+S::Int S::GUI::Widget::SetStatusText(const String &nStatusText)
+{
+	statusText = nStatusText;
+
+	return Success;
+}
+
+S::String S::GUI::Widget::GetStatusText()
+{
+	return statusText;
 }
 
 S::Int S::GUI::Widget::SetFont(Font nFont)

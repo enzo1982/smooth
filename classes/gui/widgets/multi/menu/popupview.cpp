@@ -408,7 +408,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 				{
 					entry->checked = False;
 
-					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
+					if (entry->GetStatusText() != NIL) rWnd->SetStatusText(backupStatusText);
 
 					PopupMenu *popup = myPopup;
 
@@ -430,7 +430,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					entry->checked = False;
 
-					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
+					if (entry->GetStatusText() != NIL) rWnd->SetStatusText(backupStatusText);
 
 					PopupMenu *popup = myPopup;
 
@@ -468,7 +468,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					entry->checked = False;
 
-					if (entry->description != NIL) rWnd->SetStatusText(backupStatusText);
+					if (entry->GetStatusText() != NIL) rWnd->SetStatusText(backupStatusText);
 
 					PopupMenu *popup = myPopup;
 
@@ -517,7 +517,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					if (!wnd->IsMouseOn(entryRect[i]) && entry->checked)
 					{
-						if (entry->description != NIL) setOldStatus = True;
+						if (entry->GetStatusText() != NIL) setOldStatus = True;
 
 						if (entry->popup != NIL)
 						{
@@ -742,9 +742,9 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					{
 						entry->checked = True;
 
-						if (entry->description != NIL)
+						if (entry->GetStatusText() != NIL)
 						{
-							newStatus = entry->description;
+							newStatus = entry->GetStatusText();
 
 							updateStatus = True;
 						}

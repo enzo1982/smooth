@@ -42,6 +42,10 @@ S::GUI::MenuEntry::MenuEntry(String iText, Bitmap iBitmap, Menu *iPopup, Bool *i
 	popupHandle	= -1;
 
 	possibleContainers.AddEntry(Menu::classID);
+
+	onGetFocus.Connect(&MenuEntry::OpenPopupMenu, this);
+	onLoseFocus.Connect(&MenuEntry::ClosePopupMenu, this);
+	onClickInFocus.Connect(&MenuEntry::ClosePopupMenu, this);
 }
 
 S::GUI::MenuEntry::~MenuEntry()
@@ -61,11 +65,13 @@ S::Int S::GUI::MenuEntry::Paint(Int message)
 	if (!registered)	return Failure;
 	if (!visible)		return Success;
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface	= container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	Point	 realPos = GetRealPosition();
+	Point	 realPos	= GetRealPosition();
+	Rect	 frame		= Rect(GetRealPosition(), size);
+	Rect	 bmpRect	= Rect(GetRealPosition() + Point(2, 2), bitmap.GetSize());
 
 	CalcSize();
 
@@ -87,26 +93,14 @@ S::Int S::GUI::MenuEntry::Paint(Int message)
 			}
 			else if (type == SM_TEXT)
 			{
-				Rect	 textRect;
-
-				textRect.left	= realPos.x + 3;
-				textRect.top	= realPos.y + 1;
-				textRect.right	= realPos.x + size.cx - 1;
-				textRect.bottom	= realPos.y + size.cy - 1;
+				Rect	 textRect = Rect(realPos + Point(3, 1), size - Size(4, 2));
 
 				surface->SetText(text, textRect, font);
 			}
 			else if (type == SM_BITMAP)
 			{
-				Rect	 rect;
-
-				rect.left	= realPos.x + 2;
-				rect.top	= realPos.y + 2;
-				rect.right	= realPos.x + bitmap.GetSize().cx + 2;
-				rect.bottom	= realPos.y + bitmap.GetSize().cy + 2;
-
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), rect);
-				else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), rect);
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+				else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmpRect);
 
 				if (popup != NIL)
 				{
@@ -131,6 +125,55 @@ S::Int S::GUI::MenuEntry::Paint(Int message)
 			}
 
 			break;
+		case SP_MOUSEIN:
+		case SP_MOUSEUP:
+			if (focussed && popup != NIL) break;
+
+			surface->Frame(frame, FRAME_UP);
+
+			if (type == SM_BITMAP)
+			{
+				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+
+				if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
+				{
+					Point	 p1 = Point(realPos.x + size.cx - 13 + (Setup::rightToLeft ? 2 : 0), realPos.y + 1);
+					Point	 p2 = Point(realPos.x + size.cx - 13 + (Setup::rightToLeft ? 2 : 0), realPos.y + size.cy - 2);
+
+					surface->Bar(p1, p2, OR_VERT);
+				}
+			}
+
+			break;
+		case SP_MOUSEDOWN:
+			surface->Frame(Rect(pos, size), FRAME_DOWN);
+
+			break;
+		case SP_MOUSEOUT:
+			if (focussed && popup != NIL) break;
+
+			surface->Box(frame, Setup::BackgroundColor, OUTLINED);
+
+			if (type == SM_BITMAP)
+			{
+				if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+				else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmpRect);
+
+				if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
+				{
+					Point	 p1 = Point(realPos.x + size.cx - 13 + (Setup::rightToLeft ? 1 : 0), realPos.y + 1);
+					Point	 p2 = Point(realPos.x + size.cx - 13 + (Setup::rightToLeft ? 1 : 0), realPos.y + size.cy - 1);
+
+					surface->Line(p1, p2, Setup::BackgroundColor);
+
+					p1.x++;
+					p2.x++;
+
+					surface->Line(p1, p2, Setup::BackgroundColor);
+				}
+			}
+
+			break;
 	}
 
 	LeaveProtectedRegion();
@@ -145,221 +188,60 @@ S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 
 	if (type == SM_SEPARATOR)	return Success;
 
-	Window	*wnd = container->GetContainerWindow();
+	Window	*window = container->GetContainerWindow();
 
-	if (wnd == NIL) return Success;
+	if (window == NIL) return Success;
 
 	EnterProtectedRegion();
 
-	Surface	*surface = container->GetDrawSurface();
 	Int	 retVal = Success;
 
-	switch (message)
+	if (type == SM_BITMAP && onClick.GetNOfConnectedSlots() > 0 && popup != NIL && (message == SM_LBUTTONDOWN || message == SM_LBUTTONDBLCLK))
 	{
-		case SM_MOUSEMOVE:
-			if ((popup != NIL) && clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL)) if (((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->IsVisible()) break;
-
-			if (wnd->IsMouseOn(Rect(pos, size)) && !checked)
+			if (mouseOver)
 			{
-				checked = True;
+				leftButtonDown = True;
 
-				if (description != NIL) wnd->SetStatusText(description);
+				DeactivateTooltip();
 
-				surface->Frame(Rect(pos, size), FRAME_UP);
+				Paint(SP_MOUSEDOWN);
 
-				if (type == SM_BITMAP)
+				if (focussed)
 				{
-					Rect	 bmprect = Rect(pos, size);
+					leftButtonDown = False;
 
-					bmprect.left	+= 2;
-					bmprect.top	+= 2;
-					bmprect.right	= bmprect.left + bitmap.GetSize().cx;
-					bmprect.bottom	= bmprect.top + bitmap.GetSize().cy;
-
-					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmprect);
-
-					if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
-					{
-						Point	 p1 = Point(pos.x + size.cx - 13 + (Setup::rightToLeft ? 2 : 0), pos.y + 1);
-						Point	 p2 = Point(pos.x + size.cx - 13 + (Setup::rightToLeft ? 2 : 0), pos.y + size.cy - 2);
-
-						surface->Bar(p1, p2, OR_VERT);
-					}
+					onClickInFocus.Emit();
 				}
-			}
-			else if (!wnd->IsMouseOn(Rect(pos, size)) && checked)
-			{
-				checked = False;
-				clicked = False;
-
-				if (description != NIL && wnd->GetStatusText() == description) wnd->RestoreDefaultStatusText();
-
-				surface->Box(Rect(pos, size), Setup::BackgroundColor, OUTLINED);
-
-				if (type == SM_BITMAP)
-				{
-					Rect	 bmprect = Rect(pos, size);
-
-					bmprect.left	+= 2;
-					bmprect.top	+= 2;
-					bmprect.right	= bmprect.left + bitmap.GetSize().cx;
-					bmprect.bottom	= bmprect.top + bitmap.GetSize().cy;
-
-					if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmprect);
-					else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmprect);
-
-					if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
-					{
-						Point	 p1 = Point(pos.x + size.cx - 13 + (Setup::rightToLeft ? 1 : 0), pos.y + 1);
-						Point	 p2 = Point(pos.x + size.cx - 13 + (Setup::rightToLeft ? 1 : 0), pos.y + size.cy - 1);
-
-						surface->Line(p1, p2, Setup::BackgroundColor);
-
-						p1.x++;
-						p2.x++;
-
-						surface->Line(p1, p2, Setup::BackgroundColor);
-					}
-				}
-			}
-
-			break;
-		case SM_LBUTTONDOWN:
-		case SM_LBUTTONDBLCLK:
-			if ((popup != NIL) && clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
-			{
-				((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->Hide();
-
-				DeleteObject(GetObject(popupHandle, PopupMenu::classID));
-
-				popupHandle = -1;
-
-				break;
-			}
-
-			if (checked)
-			{
-				wnd->Process(SM_LOOSEFOCUS, GetHandle(), 0);
-
-				if (!clicked)
-				{
-					clicked = True;
-
-					surface->Frame(Rect(pos, size), FRAME_DOWN);
-				}
-				else
-				{
-					clicked = False;
-
-					if (!wnd->IsMouseOn(Rect(pos, size)))	surface->Box(Rect(pos, Size(size.cx + 1, size.cy + 1)), Setup::BackgroundColor, OUTLINED);
-					else					surface->Frame(Rect(pos, size), FRAME_UP);
-				}
-
-				if (clicked && popup != NIL)
+				else if (popup != NIL)
 				{
 					Rect	 popupFrame = Rect(Point(pos.x + size.cx - 11, pos.y), Size(11, size.cy));
 
-					if (onClick.GetNOfConnectedSlots() == 0 || wnd->IsMouseOn(popupFrame))
+					if (onClick.GetNOfConnectedSlots() == 0 || window->IsMouseOn(popupFrame))
 					{
-						PopupMenu *popupMenu = new PopupMenu(popup);
+						focussed = True;
+						leftButtonDown = False;
 
-						popupHandle = popupMenu->GetHandle();
-
-						if (orientation == OR_LEFT)
-						{
-							popupMenu->pos.x = pos.x - 1;
-						}
-						else if (orientation == OR_RIGHT)
-						{
-							popupMenu->GetSize();
-							popupMenu->pos.x = pos.x + size.cx + 1 - popupMenu->popupsize.cx;
-						}
-
-						popupMenu->pos.y = pos.y + size.cy + 1;
-						popupMenu->onClick.Connect(&MenuEntry::PopupProc, this);
-
-						wnd->RegisterObject(popupMenu);
+						OpenPopupMenu();
 					}
 				}
 
-				retVal = Break;
+				onLeftButtonDown.Emit(Point(window->MouseX(), window->MouseY()));
+
+				if (message == SM_LBUTTONDBLCLK) onLeftButtonDoubleClick.Emit(Point(window->MouseX(), window->MouseY()));
 			}
-
-			break;
-		case SM_LBUTTONUP:
-			if ((popup != NIL) && clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL)) if (((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->IsVisible()) break;
-
-			if (clicked)
+			else
 			{
-				clicked = False;
-
-				surface->Frame(Rect(pos, size), FRAME_UP);
-
-				if ((popup == NIL || onClick.GetNOfConnectedSlots() > 0) && bVar == NIL && iVar == NIL)
+				if (focussed)
 				{
-					checked = False;
+					focussed = False;
 
-					if (description != NIL && wnd->GetStatusText() == description) wnd->RestoreDefaultStatusText();
-
-					surface->Box(Rect(pos, size), Setup::BackgroundColor, OUTLINED);
-
-					if (type == SM_BITMAP)
-					{
-						Rect	 bmprect = Rect(pos, size);
-
-						bmprect.left	+= 2;
-						bmprect.top	+= 2;
-						bmprect.right	= bmprect.left + bitmap.GetSize().cx;
-						bmprect.bottom	= bmprect.top + bitmap.GetSize().cy;
-
-						if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmprect);
-						else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmprect);
-
-						if (onClick.GetNOfConnectedSlots() > 0 && popup != NIL)
-						{
-							Point	 p1 = Point(pos.x + size.cx - 13, pos.y + 1);
-							Point	 p2 = Point(pos.x + size.cx - 13, pos.y + size.cy - 1);
-
-							surface->Line(p1, p2, Setup::BackgroundColor);
-
-							p1.x++;
-							p2.x++;
-
-							surface->Line(p1, p2, Setup::BackgroundColor);
-						}
-					}
-
-					onClick.Emit(wnd->MouseX(), wnd->MouseY());
-
-					Process(SM_MOUSEMOVE, 0, 0);
-				}
-
-				retVal = Break;
-			}
-
-			break;
-#ifdef __WIN32__
-		case WM_KILLFOCUS:
-			if ((popup != NIL) && clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
-			{
-				Bool	 destroyPopup = True;
-
-				if (Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->GetHandle() >= ((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->GetHandle()) destroyPopup = False;
-
-				if (destroyPopup)
-				{
-					((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->Hide();
-
-					wnd->UnregisterObject((Widget *) GetObject(popupHandle, PopupMenu::classID));
-
-					DeleteObject(GetObject(popupHandle, PopupMenu::classID));
-
-					popupHandle = -1;
+					onLoseFocus.Emit();
 				}
 			}
-
-			break;
-#endif
+	}
+	else
+	{
+		retVal = Widget::Process(message, wParam, lParam);
 	}
 
 	LeaveProtectedRegion();
@@ -374,13 +256,6 @@ S::Int S::GUI::MenuEntry::SetText(const String &newText)
 	CalcSize();
 
 	if (text == NIL) type = (type | SM_TEXT) ^ SM_TEXT;
-
-	return Success;
-}
-
-S::Int S::GUI::MenuEntry::SetStatusText(String newDescription)
-{
-	description = newDescription;
 
 	return Success;
 }
@@ -432,16 +307,60 @@ S::Int S::GUI::MenuEntry::CalcSize()
 	return Success;
 }
 
-S::Void S::GUI::MenuEntry::PopupProc()
+S::Void S::GUI::MenuEntry::OpenPopupMenu()
 {
-	if ((popup != NIL) && clicked && (GetObject(popupHandle, PopupMenu::classID) != NIL))
+	if (popup == NIL) return;
+
+	Window	*window		= container->GetContainerWindow();
+
+	if (window == NIL) return;
+
+	Rect	 popupFrame	= Rect(Point(pos.x + size.cx - 11, pos.y), Size(11, size.cy));
+
+	if (onClick.GetNOfConnectedSlots() == 0 || window->IsMouseOn(popupFrame))
 	{
-		((PopupMenu *) GetObject(popupHandle, PopupMenu::classID))->Hide();
+		PopupMenu *popupMenu = new PopupMenu(popup);
+
+		popupHandle = popupMenu->GetHandle();
+
+		if (orientation == OR_LEFT)
+		{
+			popupMenu->pos.x = pos.x - 1;
+		}
+		else if (orientation == OR_RIGHT)
+		{
+			popupMenu->GetSize();
+			popupMenu->pos.x = pos.x + size.cx + 1 - popupMenu->popupsize.cx;
+		}
+
+		popupMenu->pos.y = pos.y + size.cy + 1;
+		popupMenu->onClick.Connect(&MenuEntry::ClosePopupMenu, this);
+
+		window->RegisterObject(popupMenu);
+	}
+}
+
+S::Void S::GUI::MenuEntry::ClosePopupMenu()
+{
+	if (popup == NIL) return;
+
+	Window	*window = container->GetContainerWindow();
+
+	if (window == NIL) return;
+
+	if (GetObject(popupHandle, PopupMenu::classID) != NIL)
+	{
+		((Widget *) GetObject(popupHandle, PopupMenu::classID))->Hide();
 
 		container->UnregisterObject((Widget *) GetObject(popupHandle, PopupMenu::classID));
 
 		DeleteObject(GetObject(popupHandle, PopupMenu::classID));
 
 		popupHandle = -1;
+
+		focussed = False;
+
+		if (window->IsMouseOn(Rect(GetRealPosition(), size)))	Paint(SP_MOUSEIN);
+		else							Paint(SP_MOUSEOUT);
 	}
 }

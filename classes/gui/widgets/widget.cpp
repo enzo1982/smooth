@@ -17,6 +17,7 @@
 #include <smooth/gui/widgets/special/tooltip.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/window/toolwindow.h>
+#include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
 
 const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
@@ -396,7 +397,7 @@ S::Void S::GUI::Widget::ActivateTooltip()
 	tooltip = new Tooltip();
 
 	tooltip->SetText(tooltipText);
-	tooltip->SetMetrics(Point(window->MouseX(), window->MouseY()), Size(0, 0));
+	tooltip->SetMetrics(Point(window->MouseX() - Math::Round(0.2 * tooltip->textSize.cx), window->MouseY() - 1), Size(0, 0));
 	tooltip->SetTimeout(3000);
 
 	window->RegisterObject(tooltip);

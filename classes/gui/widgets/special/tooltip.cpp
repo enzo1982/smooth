@@ -71,11 +71,11 @@ S::Int S::GUI::Tooltip::Show()
 	wndRect.bottom	= font.GetTextSizeY(text) + 4;
 	wndRect.right	= font.GetTextSizeX(text) + 6;
 
-	Point	 tPos	= Point(pos.x + wnd->pos.x, pos.y + wnd->pos.y - wndRect.bottom);
+	Point	 tPos	= Point(Math::Max(2, pos.x + wnd->pos.x), pos.y + wnd->pos.y - wndRect.bottom);
 	Size	 tSize	= Size(wndRect.right, wndRect.bottom);
 
-	if (tPos.x + tSize.cx > LiSAGetDisplaySizeX())	tPos.x = Math::Max(10, pos.x + wnd->pos.x - tSize.cx);
-	if (tPos.y < 0)					tPos.y = pos.y + wnd->pos.y + 1;
+	if (tPos.x + tSize.cx > LiSAGetDisplaySizeX() - 2)	tPos.x = Math::Max(10, pos.x + wnd->pos.x - tSize.cx);
+	if (tPos.y < 0)						tPos.y = pos.y + wnd->pos.y + 1;
 
 	toolWindow = new ToolWindow();
 

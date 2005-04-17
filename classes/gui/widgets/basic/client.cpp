@@ -82,29 +82,32 @@ S::Int S::GUI::Client::Paint(Int message)
 		}
 	}
 
-	if (message == SP_SHOW)
+	switch (message)
 	{
-		surface->Box(client, Setup::ClientColor, FILLED);
+		case SP_PAINT:
+		case SP_UPDATE:
+			if (Rect::DoRectsOverlap(updateRect, client))
+			{
+				updateRect.right += 5;
+				updateRect.bottom += 5;
 
-		clientFrame.left	= client.left;
-		clientFrame.top		= client.top;
-		clientFrame.right	= client.right - 1;
-		clientFrame.bottom	= client.bottom - 1;
+				Rect	 intersectRect = Rect::OverlapRect(updateRect, client);
 
-		surface->Box(clientFrame, Setup::DividerDarkColor, OUTLINED);
+				surface->Box(intersectRect, Setup::ClientColor, FILLED);
 
-		onPaint.Emit();
-	}
-	else
-	{
-		if (Rect::DoRectsOverlap(updateRect, client))
-		{
-			updateRect.right += 5;
-			updateRect.bottom += 5;
+				clientFrame.left	= client.left;
+				clientFrame.top		= client.top;
+				clientFrame.right	= client.right - 1;
+				clientFrame.bottom	= client.bottom - 1;
 
-			Rect	 intersectRect = Rect::OverlapRect(updateRect, client);
+				surface->Box(clientFrame, Setup::DividerDarkColor, OUTLINED);
 
-			surface->Box(intersectRect, Setup::ClientColor, FILLED);
+				onPaint.Emit();
+			}
+
+			break;
+		case SP_SHOW:
+			surface->Box(client, Setup::ClientColor, FILLED);
 
 			clientFrame.left	= client.left;
 			clientFrame.top		= client.top;
@@ -114,7 +117,8 @@ S::Int S::GUI::Client::Paint(Int message)
 			surface->Box(clientFrame, Setup::DividerDarkColor, OUTLINED);
 
 			onPaint.Emit();
-		}
+
+			break;
 	}
 
 	LeaveProtectedRegion();

@@ -132,15 +132,21 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 						}
 					}
 				}
-
-				DrawEntryText(font.GetColor());
 			}
 
-			if (clicked && frame.top < frame.bottom)
+			if (frame.top < frame.bottom)
 			{
 				frame.right++;
 				frame.bottom++;
-				surface->Box(frame, Setup::ClientTextColor, OUTLINEDOTS);
+
+				if (clicked)	surface->Box(frame, Setup::ClientTextColor, OUTLINEDOTS);
+				else		surface->Box(frame, Setup::ClientColor, OUTLINED);
+
+				if (checked)	surface->Gradient(frame, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
+
+				if (checked)	DrawEntryText(Setup::GradientTextColor);
+				else		DrawEntryText(font.GetColor());
+
 				frame.right--;
 				frame.bottom--;
 			}
@@ -421,8 +427,6 @@ S::Int S::GUI::ListEntry::Process(Int message, Int wParam, Int lParam)
 
 					tooltip = NIL;
 				}
-
-				retVal = Break;
 			}
 
 			break;

@@ -12,6 +12,7 @@ xx.xx.05 xx:xx - smooth alpha 0.8.67.0
 - widget.cpp	- all widgets can have tooltips now
 		- implemented a universal Process(...) method to replace most others
 - surface.cpp	- fixed frames being painted too large
+- editbox.cpp	- fixed copying text to clipboard (now using GlobalAlloc instead of new)
 
 - added a class for smart pointers
 

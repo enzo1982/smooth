@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,8 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/editbox.h>
-#include <smooth/definitions.h>
-#include <smooth/loop.h>
 #include <smooth/misc/i18n.h>
 #include <smooth/misc/binary.h>
 #include <smooth/misc/string.h>
@@ -578,19 +576,26 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 						for (int j = markStart; j < markEnd; j++) mText[j - markStart] = text[j];
 
-						char	*bAmText = NIL;
-						wchar_t	*bWmText = NIL;
-
-						if (Setup::enableUnicode)	bWmText = new wchar_t [mText.Length() + 1];
-						else				bAmText = new char [mText.Length() + 1];
-
-						if (Setup::enableUnicode)	wcscpy(bWmText, mText);
-						else				strcpy(bAmText, mText);
-
 						OpenClipboard((HWND) wnd->GetSystemWindow());
 
-						if (Setup::enableUnicode)	SetClipboardData(CF_UNICODETEXT, (HANDLE) bWmText);
-						else				SetClipboardData(CF_TEXT, (HANDLE) bAmText);
+						HGLOBAL	 memory = NIL;
+
+						if (Setup::enableUnicode)
+						{
+							memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, 2 * (mText.Length() + 1));
+
+							wcscpy((wchar_t *) GlobalLock(memory), mText);
+
+							SetClipboardData(CF_UNICODETEXT, memory);
+						}
+						else
+						{
+							memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, mText.Length() + 1);
+
+							strcpy((char *) GlobalLock(memory), mText);
+
+							SetClipboardData(CF_TEXT, memory);
+						}
 
 						CloseClipboard();
 					}

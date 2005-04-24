@@ -191,8 +191,8 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())			return Failure;
-	if (!IsActive() || !IsVisible())	return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 
@@ -526,6 +526,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 						break;
 					case VK_RETURN:
+						if (!active) break;
+
 						if (clicked)
 						{
 							Process(SM_LBUTTONDOWN, 0, 1);
@@ -536,6 +538,8 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 						break;
 					case VK_BACK:
 					case VK_DELETE:
+						if (!active) break;
+
 						if (markStart != markEnd) { DeleteSelectedText(); break; }
 
 						if (promptPos == 0 && wParam == VK_BACK)		break;
@@ -601,14 +605,14 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					}
 				}
 
-				if (wParam == 24 && !(lParam & (1 << 30)))
+				if (wParam == 24 && !(lParam & (1 << 30)) && active)
 				{
 					Process(WM_CHAR, 3, 0);
 
 					DeleteSelectedText();
 				}
 
-				if (wParam == 22)
+				if (wParam == 22 && active)
 				{
 					DeleteSelectedText();
 
@@ -637,7 +641,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				if (nOfChars == maxSize && markStart == markEnd) break;
 
-				if (wParam >= 32)
+				if (wParam >= 32 && active)
 				{
 					DeleteSelectedText();
 
@@ -799,7 +803,8 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 		frame.right	= frame.left + font.GetTextSizeX(mText);
 		frame.bottom	= frame.top + font.GetLineSizeY(mText) + 3;
 
-		surface->Box(frame, Setup::ClientColor, FILLED);
+		if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+		else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 		frame.top++;
 

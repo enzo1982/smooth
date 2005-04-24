@@ -360,6 +360,8 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 					closeTimer = NIL;
 				}
 
+				myPopup->nextPopup->Process(SM_CLOSEPOPUP, 0, 0);
+
 				DeleteObject(myPopup->nextPopup);
 
 				myPopup->nextPopup = NIL;
@@ -372,8 +374,6 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 				Process(SM_CLOSEPOPUP, 0, 0);
 
 				if (openTimer != NIL) Process(SM_OPENPOPUP, 0, 0);
-
-				retVal = Break;
 			}
 			else
 			{

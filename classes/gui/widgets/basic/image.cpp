@@ -9,8 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/image.h>
-#include <smooth/definitions.h>
-#include <smooth/loop.h>
 #include <smooth/misc/math.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
@@ -42,7 +40,14 @@ S::Int S::GUI::Image::Paint(Int message)
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 bmpRect	= Rect(GetRealPosition(), size);
 
-	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), size), bmpRect);
+	switch (message)
+	{
+		case SP_PAINT:
+		case SP_UPDATE:
+			surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), size), bmpRect);
+
+			break;
+	}
 
 	return Success;
 }

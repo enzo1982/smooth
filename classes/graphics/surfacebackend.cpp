@@ -139,13 +139,7 @@ S::Int S::GUI::SurfaceBackend::Line(Point pos1, Point pos2, Int color)
 
 S::Int S::GUI::SurfaceBackend::Frame(Rect rect, Int style)
 {
-	if (Setup::rightToLeft)
-	{
-		rect = TranslateRect(rect);
-
-		rect.left--;
-		rect.right--;
-	}
+	if (Setup::rightToLeft) rect = TranslateRect(rect);
 
 	Point	 p1 = Point(rect.left, rect.top);
 	Point	 p2 = Point(rect.right - 1, rect.top);

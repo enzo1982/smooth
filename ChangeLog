@@ -14,6 +14,8 @@ xx.xx.05 xx:xx - smooth alpha 0.8.67.0
 - surface.cpp	- fixed frames being painted too large
 - editbox.cpp	- fixed copying text to clipboard (now using GlobalAlloc instead of new)
 		- allowed copying from inactive editboxes
+- checkbox.cpp	- replaced SM_CHECKCHECKBOXES with a static signal
+- optionbox.cpp	- replaced SM_CHECKOPTIONBOXES with a static signal
 
 - added a class for smart pointers
 

@@ -188,8 +188,6 @@ const S::Int SM_SHOWTOOLTIP		= 1032;
 const S::Int SM_MOUSEWHEEL		= 1033;
 
 const S::Int SM_EXECUTEPEEK		= 1534;
-const S::Int SM_CHECKCHECKBOXES		= 1535;
-const S::Int SM_CHECKOPTIONBOXES	= 1536;
 const S::Int SM_CHECKPOPUPS		= 1537;
 const S::Int SM_LOOSEFOCUS		= 1538;
 const S::Int SM_TIMER			= 1539;

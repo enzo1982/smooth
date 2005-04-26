@@ -443,15 +443,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					if (valueChanged)
 					{
-						for (int j = 0; j < Object::GetNOfObjects(); j++)
-						{
-							Object	*object = Object::GetNthObject(j);
-
-							if (object != NIL)
-							{
-								if (object->GetObjectType() == CheckBox::classID) ((CheckBox *) object)->Process(SM_CHECKCHECKBOXES, 0, 0);
-							}
-						}
+						CheckBox::internalCheckValues.Emit();
 
 						popup->onClick.Emit(0, 0);
 						entry->onClick.Emit(0, 0);
@@ -480,15 +472,7 @@ S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 
 					if (valueChanged)
 					{
-						for (int j = 0; j < Object::GetNOfObjects(); j++)
-						{
-							Object	*object = Object::GetNthObject(j);
-
-							if (object != NIL)
-							{
-								if (object->GetObjectType() == OptionBox::classID) ((OptionBox *) object)->Process(SM_CHECKOPTIONBOXES, 0, 0);
-							}
-						}
+						OptionBox::internalCheckValues.Emit();
 
 						popup->onClick.Emit(0, 0);
 						entry->onClick.Emit(0, 0);

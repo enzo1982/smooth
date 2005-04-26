@@ -16,7 +16,9 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
-const S::Int	 S::GUI::OptionBox::classID = S::Object::RequestClassID();
+const S::Int		 S::GUI::OptionBox::classID = S::Object::RequestClassID();
+
+S::Signal0<S::Void>	 S::GUI::OptionBox::internalCheckValues;
 
 S::GUI::OptionBox::OptionBox(String iText, Point iPos, Size iSize, Int *var, Int iCode)
 {
@@ -41,10 +43,13 @@ S::GUI::OptionBox::OptionBox(String iText, Point iPos, Size iSize, Int *var, Int
 	GetTextSize();
 
 	onLeftButtonClick.Connect(&OptionBox::OnLeftButtonClick, this);
+
+	internalCheckValues.Connect(&OptionBox::InternalCheckValues, this);
 }
 
 S::GUI::OptionBox::~OptionBox()
 {
+	internalCheckValues.Disconnect(&OptionBox::InternalCheckValues, this);
 }
 
 S::Int S::GUI::OptionBox::Paint(Int message)
@@ -207,39 +212,16 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	return Success;
 }
 
-S::Int S::GUI::OptionBox::Process(Int message, Int wParam, Int lParam)
-{
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
-
-	switch (message)
-	{
-		case SM_CHECKOPTIONBOXES:
-			state = (*variable == code ? True : False);
-
-			Paint(SP_UPDATE);
-
-			break;
-	}
-
-	return Widget::Process(message, wParam, lParam);
-}
-
 S::Void S::GUI::OptionBox::OnLeftButtonClick()
 {
 	*variable = code;
 
-	state = True;
+	internalCheckValues.Emit();
+}
+
+S::Void S::GUI::OptionBox::InternalCheckValues()
+{
+	state = (*variable == code ? True : False);
 
 	Paint(SP_UPDATE);
-
-	for (Int i = 0; i < Object::GetNOfObjects(); i++)
-	{
-		Object	*object = Object::GetNthObject(i);
-
-		if (object != NIL)
-		{
-			if (object->GetObjectType() == classID) ((OptionBox *) object)->Process(SM_CHECKOPTIONBOXES, 0, 0);
-		}
-	}
 }

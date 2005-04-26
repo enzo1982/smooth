@@ -14,7 +14,9 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
-const S::Int	 S::GUI::CheckBox::classID = S::Object::RequestClassID();
+const S::Int		 S::GUI::CheckBox::classID = S::Object::RequestClassID();
+
+S::Signal0<S::Void>	 S::GUI::CheckBox::internalCheckValues;
 
 S::GUI::CheckBox::CheckBox(String iText, Point iPos, Size iSize, Bool *iVariable)
 {
@@ -36,10 +38,13 @@ S::GUI::CheckBox::CheckBox(String iText, Point iPos, Size iSize, Bool *iVariable
 	GetTextSize();
 
 	onLeftButtonClick.Connect(&CheckBox::OnLeftButtonClick, this);
+
+	internalCheckValues.Connect(&CheckBox::InternalCheckValues, this);
 }
 
 S::GUI::CheckBox::~CheckBox()
 {
+	internalCheckValues.Disconnect(&CheckBox::InternalCheckValues, this);
 }
 
 S::Int S::GUI::CheckBox::Paint(Int message)
@@ -201,43 +206,20 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	return Success;
 }
 
-S::Int S::GUI::CheckBox::Process(Int message, Int wParam, Int lParam)
-{
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
-
-	switch (message)
-	{
-		case SM_CHECKCHECKBOXES:
-			if (state != *variable)
-			{
-				state = *variable;
-
-				Paint(SP_UPDATE);
-			}
-
-			break;
-	}
-
-	return Widget::Process(message, wParam, lParam);
-}
-
 S::Void S::GUI::CheckBox::OnLeftButtonClick()
 {
 	if (*variable == False)	*variable = True;
 	else			*variable = False;
 
-	state = *variable;
+	internalCheckValues.Emit();
+}
 
-	Paint(SP_UPDATE);
-
-	for (Int i = 0; i < Object::GetNOfObjects(); i++)
+S::Void S::GUI::CheckBox::InternalCheckValues()
+{
+	if (state != *variable)
 	{
-		Object	*object = Object::GetNthObject(i);
+		state = *variable;
 
-		if (object != NIL)
-		{
-			if (object->GetObjectType() == classID) ((CheckBox *) object)->Process(SM_CHECKCHECKBOXES, 0, 0);
-		}
+		Paint(SP_UPDATE);
 	}
 }

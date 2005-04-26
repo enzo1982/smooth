@@ -174,9 +174,9 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	}
 
 	button.top--;
-	start.x		= button.left;
+	start.x		= button.left + (Setup::rightToLeft ? 1 : 0);
 	start.y		= button.top;
-	end.x		= button.right;
+	end.x		= button.right + (Setup::rightToLeft ? 1 : 0);
 	end.y		= button.bottom;
 
 	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON))	buttonColor = Setup::TextColor;

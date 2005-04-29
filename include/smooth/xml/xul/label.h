@@ -27,12 +27,8 @@ namespace smooth
 	{
 		class Text;
 	};
-
-	class Object;
 };
 
-#include "../../definitions.h"
-#include "../../misc/string.h"
 #include "widget.h"
 
 namespace smooth

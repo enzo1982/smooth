@@ -30,12 +30,8 @@ namespace smooth
 		class Window;
 		class Menubar;
 	};
-
-	class Object;
 };
 
-#include "../../definitions.h"
-#include "../../misc/string.h"
 #include "widget.h"
 
 namespace smooth

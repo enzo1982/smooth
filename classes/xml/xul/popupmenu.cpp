@@ -12,13 +12,12 @@
 #include <smooth/xml/node.h>
 #include <smooth/gui/widgets/multi/menu/menu.h>
 
-S::XML::XUL::PopupMenu::PopupMenu(Node *node)
+S::XML::XUL::PopupMenu::PopupMenu(Node *node) : Widget(node)
 {
 	menu = NIL;
 
 	if (node != NIL)
 	{
-		id	= GetXMLAttributeValue(node, "id");
 		name	= GetXMLAttributeValue(node, "label");
 
 		if (node->GetNthNode(0)->GetName() == "menupopup")

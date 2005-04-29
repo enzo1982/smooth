@@ -37,4 +37,5 @@
   <description>
     This is a longer text inside a description tag.
   </description>
+  <textbox id="editBox" value="Type some text!"/>
 </window>

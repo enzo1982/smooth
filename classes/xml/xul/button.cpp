@@ -12,14 +12,12 @@
 #include <smooth/xml/node.h>
 #include <smooth/gui/widgets/basic/button.h>
 
-S::XML::XUL::Button::Button(Node *node)
+S::XML::XUL::Button::Button(Node *node) : Widget(node)
 {
 	button = NIL;
 
 	if (node != NIL)
 	{
-		id = GetXMLAttributeValue(node, "id");
-
 		button = new GUI::Button(GetXMLAttributeValue(node, "label"), NIL, GUI::Point(0, 0), GUI::Size(0, 0));
 
 		if (GetXMLAttributeValue(node, "disabled") == "true") button->Deactivate();

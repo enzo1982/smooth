@@ -1,36 +1,41 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 
-<window
-    id="findfile-window"
-    title="Find Files"
-    screenX="100"
-    screenY="100"
-    width="400"
-    height="250"
-    orient="horizontal"
-    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-<toolbox flex="1">
-  <menubar id="sample-menubar">
-    <menu id="file-menu" label="File">
-      <menupopup id="file-popup">
-        <menuitem label="New"/>
-        <menuitem label="Open"/>
-        <menuitem label="Save"/>
-        <menuseparator/>
-        <menuitem label="Exit"/>
-      </menupopup>
-    </menu>
-    <menu id="edit-menu" label="Edit">
-      <menupopup id="edit-popup">
-        <menuitem label="Undo"/>
-        <menuitem label="Redo"/>
-      </menupopup>
-    </menu>
-  </menubar>
-  <toolbar id="nav-toolbar">
-    <toolbarbutton label="Back"/>
-    <toolbarbutton label="Forward"/>
-  </toolbar>
-</toolbox>
+<window id="findfile-window"
+	title="Find Files"
+	screenX="100"
+	screenY="100"
+	width="400"
+	height="250"
+	orient="horizontal"
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <toolbox flex="1">
+    <menubar id="sample-menubar">
+      <menu id="file-menu" label="File">
+        <menupopup id="file-popup">
+          <menuitem label="New"/>
+          <menuitem label="Open"/>
+          <menuitem label="Save"/>
+          <menuseparator/>
+          <menuitem label="Exit"/>
+        </menupopup>
+      </menu>
+      <menu id="edit-menu" label="Edit">
+        <menupopup id="edit-popup">
+          <menuitem label="Undo"/>
+          <menuitem label="Redo"/>
+        </menupopup>
+      </menu>
+    </menubar>
+    <toolbar id="nav-toolbar">
+      <toolbarbutton label="Back"/>
+      <toolbarbutton label="Forward"/>
+    </toolbar>
+  </toolbox>
+  <button id="okButton" label="OK" disabled="true"/>
+  <label value="This is just plain text."/>
+  <description>
+    This is a longer text inside a description tag.
+  </description>
+  <textbox id="editBox" value="Type some text!"/>
 </window>

@@ -13,14 +13,12 @@
 #include <smooth/xml/node.h>
 #include <smooth/gui/widgets/multi/menu/menubar.h>
 
-S::XML::XUL::Menubar::Menubar(Node *node)
+S::XML::XUL::Menubar::Menubar(Node *node) : Widget(node)
 {
 	menubar = NIL;
 
 	if (node != NIL)
 	{
-		id = GetXMLAttributeValue(node, "id");
-
 		menubar = new GUI::Menubar();
 
 		for (Int i = 0; i < node->GetNOfNodes(); i++)

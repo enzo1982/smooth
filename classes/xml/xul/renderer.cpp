@@ -12,7 +12,7 @@
 #include <smooth/xml/xul/window.h>
 #include <smooth/xml/document.h>
 
-S::XML::XUL::Renderer::Renderer()
+S::XML::XUL::Renderer::Renderer() : Widget(NIL)
 {
 	window = NIL;
 }

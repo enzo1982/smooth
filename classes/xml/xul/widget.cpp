@@ -12,8 +12,12 @@
 #include <smooth/xml/node.h>
 #include <smooth/gui/widgets/widget.h>
 
-S::XML::XUL::Widget::Widget()
+S::XML::XUL::Widget::Widget(Node *node)
 {
+	if (node != NIL)
+	{
+		id = GetXMLAttributeValue(node, "id");
+	}
 }
 
 S::XML::XUL::Widget::~Widget()

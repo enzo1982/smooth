@@ -45,7 +45,7 @@ namespace smooth
 
 					String			 GetXMLAttributeValue(Node *, const String &);
 				public:
-								 Widget();
+								 Widget(Node *);
 					virtual			~Widget();
 
 					virtual GUI::Widget	*GetWidget();

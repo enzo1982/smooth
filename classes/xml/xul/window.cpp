@@ -10,22 +10,18 @@
 
 #include <smooth/xml/xul/window.h>
 #include <smooth/xml/xul/menubar.h>
-#include <smooth/xml/xul/button.h>
-#include <smooth/xml/xul/label.h>
-#include <smooth/xml/xul/description.h>
+#include <smooth/xml/xul/box.h>
 #include <smooth/xml/node.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/basic/titlebar.h>
 
-S::XML::XUL::Window::Window(Node *node)
+S::XML::XUL::Window::Window(Node *node) : Widget(node)
 {
 	titlebar	= NIL;
 	window		= NIL;
 
 	if (node != NIL)
 	{
-		id = GetXMLAttributeValue(node, "id");
-
 		window = new GUI::Window(GetXMLAttributeValue(node, "title"));
 		window->SetMetrics(GUI::Point(GetXMLAttributeValue(node, "screenX").ToInt(), GetXMLAttributeValue(node, "screenY").ToInt()), GUI::Size(GetXMLAttributeValue(node, "width").ToInt(), GetXMLAttributeValue(node, "height").ToInt()));
 
@@ -59,31 +55,13 @@ S::XML::XUL::Window::Window(Node *node)
 					}
 				}
 			}
-			else if (nNode->GetName() == "button")
-			{
-				XUL::Button	*button = new XUL::Button(nNode);
-
-				window->RegisterObject(button->GetWidget());
-
-				widgets.AddEntry(button);
-			}
-			else if (nNode->GetName() == "label")
-			{
-				XUL::Label	*label = new XUL::Label(nNode);
-
-				window->RegisterObject(label->GetWidget());
-
-				widgets.AddEntry(label);
-			}
-			else if (nNode->GetName() == "description")
-			{
-				XUL::Description	*description = new XUL::Description(nNode);
-
-				window->RegisterObject(description->GetWidget());
-
-				widgets.AddEntry(description);
-			}
 		}
+
+		XUL::Box	*box = new XUL::Box(node, GetXMLAttributeValue(node, "orient") == "horizontal");
+
+		window->RegisterObject(box->GetWidget());
+
+		widgets.AddEntry(box);
 	}
 }
 

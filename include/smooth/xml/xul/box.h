@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_XULWINDOW_
-#define _H_OBJSMOOTH_XULWINDOW_
+#ifndef _H_OBJSMOOTH_XULBOX_
+#define _H_OBJSMOOTH_XULBOX_
 
 namespace smooth
 {
@@ -17,7 +17,7 @@ namespace smooth
 	{
 		namespace XUL
 		{
-			class Window;
+			class Box;
 		};
 
 		class Node;
@@ -25,8 +25,7 @@ namespace smooth
 
 	namespace GUI
 	{
-		class Window;
-		class Titlebar;
+		class Layer;
 	};
 };
 
@@ -38,16 +37,17 @@ namespace smooth
 	{
 		namespace XUL
 		{
-			class Window : public Widget
+			class Box : public Widget
 			{
 				private:
-					GUI::Window	*window;
-					GUI::Titlebar	*titlebar;
+					GUI::Layer	*layer;
 
 					Array<Widget *>	 widgets;
+
+					Int		 orientation;
 				public:
-							 Window(Node *);
-							~Window();
+							 Box(Node *, Int = -1);
+							~Box();
 
 					GUI::Widget	*GetWidget();
 			};

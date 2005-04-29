@@ -578,6 +578,11 @@ $(OBJECTDIR)/threadbackend.o: $(THREADSCLASSESDIR)/threadbackend.cpp $(SMOOTHINC
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/threadbackend.cpp -o $(OBJECTDIR)/threadbackend.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/xul_box.o: $(XMLCLASSESDIR)/xul/box.cpp $(SMOOTHINCLUDEDIR)/xml/xul/box.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/box.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/box.cpp -o $(OBJECTDIR)/xul_box.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/xul_button.o: $(XMLCLASSESDIR)/xul/button.cpp $(SMOOTHINCLUDEDIR)/xml/xul/button.h
 	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/button.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/button.cpp -o $(OBJECTDIR)/xul_button.o
@@ -606,6 +611,11 @@ $(OBJECTDIR)/xul_popupmenu.o: $(XMLCLASSESDIR)/xul/popupmenu.cpp $(SMOOTHINCLUDE
 $(OBJECTDIR)/xul_renderer.o: $(XMLCLASSESDIR)/xul/renderer.cpp $(SMOOTHINCLUDEDIR)/xml/xul/renderer.h
 	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/renderer.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/renderer.cpp -o $(OBJECTDIR)/xul_renderer.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/xul_textbox.o: $(XMLCLASSESDIR)/xul/textbox.cpp $(SMOOTHINCLUDEDIR)/xml/xul/textbox.h
+	$(ECHO) -n Compiling $(XMLCLASSESDIR)/xul/textbox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(XMLCLASSESDIR)/xul/textbox.cpp -o $(OBJECTDIR)/xul_textbox.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/xul_widget.o: $(XMLCLASSESDIR)/xul/widget.cpp $(SMOOTHINCLUDEDIR)/xml/xul/widget.h

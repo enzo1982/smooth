@@ -51,8 +51,8 @@ S::Int S::GUI::Text::Paint(Int message)
 
 	switch (message)
 	{
-		default:
 		case SP_PAINT:
+		case SP_UPDATE:
 			textRect.left	= realPos.x;
 			textRect.top	= realPos.y;
 			textRect.right	= textRect.left + textSize.cx;

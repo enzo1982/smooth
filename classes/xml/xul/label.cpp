@@ -12,14 +12,12 @@
 #include <smooth/xml/node.h>
 #include <smooth/gui/widgets/basic/text.h>
 
-S::XML::XUL::Label::Label(Node *node)
+S::XML::XUL::Label::Label(Node *node) : Widget(node)
 {
 	text = NIL;
 
 	if (node != NIL)
 	{
-		id = GetXMLAttributeValue(node, "id");
-
 		text = new GUI::Text(GetXMLAttributeValue(node, "value"), GUI::Point(0, 0));
 	}
 }

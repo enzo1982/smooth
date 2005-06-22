@@ -49,7 +49,7 @@ S::GUI::CheckBox::~CheckBox()
 
 S::Int S::GUI::CheckBox::Paint(Int message)
 {
-	if (!registered)	return Failure;
+	if (!IsRegistered())	return Failure;
 	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();

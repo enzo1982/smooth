@@ -64,8 +64,8 @@ S::GUI::ListEntry::~ListEntry()
 
 S::Int S::GUI::ListEntry::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 	Window	*wnd		= container->GetContainerWindow();
@@ -373,8 +373,8 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 S::Int S::GUI::ListEntry::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Window	*wnd		= container->GetContainerWindow();
 
@@ -588,7 +588,7 @@ S::Int S::GUI::ListEntry::SetText(const String &newText)
 {
 	Bool	 prevVisible = IsVisible();
 
-	if (registered && prevVisible) Hide();
+	if (IsRegistered() && prevVisible) Hide();
 
 	text = newText;
 
@@ -596,7 +596,7 @@ S::Int S::GUI::ListEntry::SetText(const String &newText)
 
 	checked = False;
 
-	if (registered && prevVisible) Show();
+	if (IsRegistered() && prevVisible) Show();
 
 	Process(SM_MOUSEMOVE, 0, 0);
 

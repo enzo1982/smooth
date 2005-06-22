@@ -54,11 +54,11 @@ S::GUI::Tooltip::~Tooltip()
 
 S::Int S::GUI::Tooltip::Show()
 {
-	if (visible) return Success;
+	if (IsVisible()) return Success;
 
 	visible = True;
 
-	if (!registered) return Success;
+	if (!IsRegistered()) return Success;
 
 	Window	*wnd = (Window *) container->GetContainerWindow();
 
@@ -104,7 +104,7 @@ S::Int S::GUI::Tooltip::Hide()
 
 	visible = False;
 
-	if (!registered) return Success;
+	if (!IsRegistered()) return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 
@@ -128,8 +128,8 @@ S::Int S::GUI::Tooltip::Hide()
 
 S::Int S::GUI::Tooltip::DrawTooltip()
 {
-	if (!visible)		return Success;
-	if (!registered)	return Success;
+	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Success;
 
 	Window	*wnd = (Window *) container->GetContainerWindow();
 

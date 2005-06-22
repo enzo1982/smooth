@@ -21,7 +21,7 @@ S::GUI::Application::Application(String name)
 	type		= classID;
 	containerType	= classID;
 
-	visible		= true;
+	Show();
 
 	text		= name == NIL ? String("smooth Application") : name;
 	size		= Size(LiSAGetDisplaySizeX(), LiSAGetDisplaySizeY());

@@ -8,14 +8,15 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_EDITBOX_
-#define _H_OBJSMOOTH_EDITBOX_
+#ifndef _H_OBJSMOOTH_MULTIEDIT_
+#define _H_OBJSMOOTH_MULTIEDIT_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class EditBox;
+		class MultiEdit;
+		class Scrollbar;
 	};
 
 	namespace System
@@ -25,23 +26,20 @@ namespace smooth
 };
 
 #include "../widget.h"
-#include "../multi/list/list.h"
-#include "../multi/list/combobox.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		const Int EDB_ALPHANUMERIC	= 0;
-		const Int EDB_NUMERIC		= 1;
-		const Int EDB_ASTERISK		= 2;
-
-		class SMOOTHAPI EditBox : public Widget
+		class SMOOTHAPI MultiEdit : public Widget
 		{
 			private:
 				System::Timer		*timer;
 			slots:
 				Void			 TimerProc();
+
+				Int			 GetNOfLines();
+				Int			 GetNOfInvisibleLines();
 
 				String			 GetVisibleText();
 			protected:
@@ -53,9 +51,9 @@ namespace smooth
 				Bool			 marking;
 				Int			 maxSize;
 				Int			 invisibleChars;
+				Int			 scrollbarPos;
 
-				List			*dropDownList;
-				ComboBox		*comboBox;
+				Scrollbar		*scrollbar;
 
 				Void			 SetCursor(Int);
 				Void			 RemoveCursor();
@@ -63,32 +61,25 @@ namespace smooth
 				Void			 MarkText(Int, Int);
 				Void			 DeleteSelectedText();
 				Void			 InsertText(String);
+				Int			 ModifyText(String);
 			slots:
-				Void			 DropDownListProc();
+				Void			 ScrollbarProc();
 			public:
 				static const Int	 classID;
 
-							 EditBox(String, Point, Size, Int = 0);
-							~EditBox();
+							 MultiEdit(String, Point, Size, Int = 0);
+							~MultiEdit();
 
 				virtual Int		 Paint(Int);
 				Int			 Process(Int, Int, Int);
 
-				Int			 Show();
-				Int			 Hide();
-
-				Int			 Activate();
 				Int			 Deactivate();
 
 				Int			 SetText(const String &);
 
-				Int			 SetDropDownList(List *);
-
 				Int			 GetCursorPos();
 
 				Int			 MarkAll();
-			signals:
-				Signal0<Void>		 onEnter;
 		};
 	};
 };

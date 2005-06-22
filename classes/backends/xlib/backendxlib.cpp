@@ -24,6 +24,10 @@ S::Backends::BackendXLib::BackendXLib()
 	type = BACKEND_XLIB;
 }
 
+S::Backends::BackendXLib::~BackendXLib()
+{
+}
+
 S::Int S::Backends::BackendXLib::Init()
 {
 	display = XOpenDisplay(NIL);

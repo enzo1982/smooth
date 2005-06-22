@@ -25,7 +25,6 @@
 	#endif
 
 	#include <windows.h>
-	#include <wtypes.h>
 	#include <wchar.h>
 
 	#if defined __SMOOTH_DLL__

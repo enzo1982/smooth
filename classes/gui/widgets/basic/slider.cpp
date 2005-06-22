@@ -52,8 +52,8 @@ S::GUI::Slider::~Slider()
 
 S::Int S::GUI::Slider::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
@@ -141,8 +141,8 @@ S::Int S::GUI::Slider::Paint(Int message)
 
 S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 
@@ -295,13 +295,13 @@ S::Int S::GUI::Slider::SetValue(Int newValue)
 
 	if (*variable == newValue) return Success;
 
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (registered && visible) Hide();
+	if (IsRegistered() && prevVisible) Hide();
 
 	*variable = newValue;
 
-	if (registered && prevVisible) Show();
+	if (IsRegistered() && prevVisible) Show();
 
 	onClick.Emit(0, 0);
 

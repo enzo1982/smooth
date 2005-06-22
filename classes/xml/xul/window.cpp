@@ -57,7 +57,7 @@ S::XML::XUL::Window::Window(Node *node) : Widget(node)
 			}
 		}
 
-		XUL::Box	*box = new XUL::Box(node, GetXMLAttributeValue(node, "orient") == "horizontal");
+		XUL::Box	*box = new XUL::Box(node);
 
 		window->RegisterObject(box->GetWidget());
 

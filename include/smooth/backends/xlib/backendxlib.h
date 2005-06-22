@@ -35,6 +35,7 @@ namespace smooth
 				Display	*display;
 			public:
 					 BackendXLib();
+				virtual	~BackendXLib();
 
 				Int	 Init();
 				Int	 Deinit();

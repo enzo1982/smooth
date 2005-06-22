@@ -34,8 +34,8 @@ namespace smooth
 	{
 		class SMOOTHAPI PopupMenu : public Widget
 		{
-			friend class SMOOTHAPI PopupView;
-			friend class SMOOTHAPI MenuEntry;
+			friend class PopupView;
+			friend class MenuEntry;
 			private:
 				ToolWindow		*toolwnd;
 				PopupView		*popupView;

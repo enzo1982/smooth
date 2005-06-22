@@ -21,7 +21,7 @@ S::XML::XUL::TextBox::TextBox(Node *node) : Widget(node)
 		editBox = new GUI::EditBox(GetXMLAttributeValue(node, "value"), GUI::Point(0, 0), GUI::Size(0, 0), GetXMLAttributeValue(node, "maxlength").ToInt());
 
 		if (GetXMLAttributeValue(node, "disabled") == "true")	editBox->Deactivate();
-		if (GetXMLAttributeValue(node, "multiline") == "true")	editBox->SetFlags(editBox->GetFlags() | GUI::EDB_MULTILINE);
+//		if (GetXMLAttributeValue(node, "multiline") == "true")	editBox->SetFlags(editBox->GetFlags() | GUI::EDB_MULTILINE);
 		if (GetXMLAttributeValue(node, "type") == "password")	editBox->SetFlags(editBox->GetFlags() | GUI::EDB_ASTERISK);
 	}
 }

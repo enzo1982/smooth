@@ -17,6 +17,8 @@ S::XML::XUL::Widget::Widget(Node *node)
 	if (node != NIL)
 	{
 		id = GetXMLAttributeValue(node, "id");
+
+		orient = (GetXMLAttributeValue(node, "orient") == "vertical") ? VERTICAL : HORIZONTAL;
 	}
 }
 

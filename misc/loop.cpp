@@ -21,10 +21,9 @@
 #include <smooth/system/event.h>
 
 #ifdef __WIN32__
-#include <winsock.h>
+#include <wtypes.h>
 #include <shlobj.h>
 #else
-#include <sys/socket.h>
 #include <unistd.h>
 #endif
 

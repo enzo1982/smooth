@@ -37,8 +37,8 @@ S::GUI::TabWidget::~TabWidget()
 
 S::Int S::GUI::TabWidget::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
@@ -221,8 +221,8 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Window	*wnd		= container->GetContainerWindow();
 
@@ -367,7 +367,7 @@ S::Int S::GUI::TabWidget::SelectTab(Int layerid)
 
 S::Int S::GUI::TabWidget::RegisterObject(Widget *object)
 {
-	if (!registered)	return Failure;
+	if (!IsRegistered())	return Failure;
 	if (object == NIL)	return Failure;
 
 	if (containerType == &object->possibleContainers)

@@ -65,32 +65,15 @@ S::GUI::Hyperlink::~Hyperlink()
 
 S::Int S::GUI::Hyperlink::Hide()
 {
-	if (!visible) return Success;
-
-	visible = False;
-
-	if (!registered) return Success;
-
-	Surface	*surface = container->GetDrawSurface();
-	Rect	 rect;
-	Point	 realPos = GetRealPosition();
-
 	if (linkBitmap == NIL) size = textSize;
 
-	rect.left	= realPos.x;
-	rect.top	= realPos.y;
-	rect.right	= realPos.x + size.cx + 1;
-	rect.bottom	= realPos.y + size.cy + 1;
-
-	surface->Box(rect, Setup::BackgroundColor, FILLED);
-
-	return Success;
+	return Widget::Hide();
 }
 
 S::Int S::GUI::Hyperlink::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface = container->GetDrawSurface();
 	Rect	 textRect;
@@ -136,8 +119,8 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 
 S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 

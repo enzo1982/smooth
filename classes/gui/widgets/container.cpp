@@ -141,6 +141,6 @@ S::GUI::Window *S::GUI::Container::GetContainerWindow()
 
 S::GUI::Surface *S::GUI::Container::GetDrawSurface()
 {
-	if (registered)	return container->GetDrawSurface();
-	else		return drawSurface;
+	if (IsRegistered())	return container->GetDrawSurface();
+	else			return drawSurface;
 }

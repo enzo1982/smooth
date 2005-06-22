@@ -17,10 +17,14 @@ xx.xx.05 xx:xx - smooth alpha 0.8.67.0
 - checkbox.cpp	- replaced SM_CHECKCHECKBOXES with a static signal
 - optionbox.cpp	- replaced SM_CHECKOPTIONBOXES with a static signal
 - textbox.cpp	- new class: XUL::TextBox
-- box.cpp	- new class: XUL::Box (implements <hbox/> and <vbox/>)
+- box.cpp	- new class: XUL::Box; implements <box/>, <hbox/> and <vbox/>
+- groupbox.cpp	- GroupBoxes are now Layers
+- editbox.cpp	- removed multi line support
+- multiedit.cpp	- new class: MultiEdit; implements a multi line edit box
 
 - added a class for smart pointers
 - improved XUL support
+- replaced "smooth Test" with a more serious test application
 
 - removed shlobjmini.h
 - removed support for MinGW 1.x

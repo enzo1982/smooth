@@ -60,7 +60,7 @@ S::GUI::ListBox::~ListBox()
 
 	if (header != NIL)
 	{
-		if (registered && container != NIL && !(flags & LF_HIDEHEADER)) container->UnregisterObject(header);
+		if (IsRegistered() && container != NIL && !(flags & LF_HIDEHEADER)) container->UnregisterObject(header);
 
 		DeleteObject(header);
 
@@ -74,7 +74,7 @@ S::Int S::GUI::ListBox::AddTab(String tabName, Int iTabWidth)
 	{
 		header = new ListBoxHeader(this);
 
-		if (visible && !(flags & LF_HIDEHEADER)) container->RegisterObject(header);
+		if (IsVisible() && !(flags & LF_HIDEHEADER)) container->RegisterObject(header);
 	}
 
 	return header->AddTab(tabName, iTabWidth);
@@ -106,7 +106,7 @@ S::Int S::GUI::ListBox::GetNthTabWidth(Int n)
 
 S::Int S::GUI::ListBox::Show()
 {
-	if (visible)	return Success;
+	if (IsVisible()) return Success;
 
 	if (scrollbar != NIL)
 	{
@@ -132,8 +132,6 @@ S::Int S::GUI::ListBox::Show()
 
 S::Int S::GUI::ListBox::Hide()
 {
-	if (!visible)	return Success;
-
 	if (header != NIL && !(flags & LF_HIDEHEADER)) container->UnregisterObject(header);
 
 	if (scrollbar != NIL) scrollbar->Hide();
@@ -163,8 +161,8 @@ S::Int S::GUI::ListBox::Deactivate()
 
 S::Int S::GUI::ListBox::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 
@@ -298,8 +296,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 S::Int S::GUI::ListBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Int	 retVal = Success;
 

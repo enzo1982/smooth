@@ -38,8 +38,8 @@ S::GUI::PopupView::~PopupView()
 
 S::Int S::GUI::PopupView::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface		*surface = container->GetDrawSurface();
 
@@ -262,8 +262,8 @@ S::Int S::GUI::PopupView::Paint(Int message)
 
 S::Int S::GUI::PopupView::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 
@@ -968,7 +968,7 @@ S::Void S::GUI::PopupView::CloseProc()
 
 	closeTimer = NIL;
 
-	if (!registered) return;
+	if (!IsRegistered()) return;
 
 	Window	*wnd = container->GetContainerWindow();
 	Rect	 popupRect;

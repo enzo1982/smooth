@@ -12,6 +12,7 @@
 #include <smooth/misc/i18n.h>
 #include <smooth/gui/window/window.h>
 
+#include <wtypes.h>
 #include <shlobj.h>
 
 int CALLBACK	 BrowseCallbackProc(HWND, UINT, LPARAM, LPARAM);

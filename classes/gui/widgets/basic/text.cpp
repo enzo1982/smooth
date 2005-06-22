@@ -35,8 +35,8 @@ S::GUI::Text::~Text()
 
 S::Int S::GUI::Text::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface = container->GetDrawSurface();
 
@@ -53,6 +53,7 @@ S::Int S::GUI::Text::Paint(Int message)
 	{
 		case SP_PAINT:
 		case SP_UPDATE:
+		case SP_SHOW:
 			textRect.left	= realPos.x;
 			textRect.top	= realPos.y;
 			textRect.right	= textRect.left + textSize.cx;

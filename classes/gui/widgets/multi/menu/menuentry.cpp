@@ -52,7 +52,7 @@ S::GUI::MenuEntry::~MenuEntry()
 {
 	if (shortcut != NIL) DeleteObject(shortcut);
 
-	if (registered && container != NIL)
+	if (IsRegistered() && container != NIL)
 	{
 		if (popupHandle != NIL) container->UnregisterObject((Widget *) GetObject(popupHandle, PopupMenu::classID));
 
@@ -62,8 +62,8 @@ S::GUI::MenuEntry::~MenuEntry()
 
 S::Int S::GUI::MenuEntry::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 
@@ -183,8 +183,8 @@ S::Int S::GUI::MenuEntry::Paint(Int message)
 
 S::Int S::GUI::MenuEntry::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	if (type == SM_SEPARATOR)	return Success;
 

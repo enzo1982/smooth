@@ -49,8 +49,8 @@ S::GUI::ComboBox::~ComboBox()
 
 S::Int S::GUI::ComboBox::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	if (GetSelectedEntry() == NIL && !(flags & CB_HOTSPOTONLY))
 	{
@@ -139,8 +139,8 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Layer		*lay		= (Layer *) container;
 	Window		*wnd		= container->GetContainerWindow();
@@ -444,7 +444,7 @@ S::Void S::GUI::ComboBox::ListBoxProc()
 
 S::Void S::GUI::ComboBox::CloseListBox()
 {
-	if (!registered) return;
+	if (!IsRegistered()) return;
 
 	Window	*wnd = container->GetContainerWindow();
 

@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/gui/widgets/basic/editbox.h>
+#include <smooth/gui/widgets/basic/multiedit.h>
 #include <smooth/misc/i18n.h>
 #include <smooth/misc/binary.h>
 #include <smooth/misc/string.h>
@@ -17,12 +17,13 @@
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/gui/widgets/basic/scrollbar.h>
 
 #include <imm.h>
 
-const S::Int	 S::GUI::EditBox::classID = S::Object::RequestClassID();
+const S::Int	 S::GUI::MultiEdit::classID = S::Object::RequestClassID();
 
-S::GUI::EditBox::EditBox(String iText, Point iPos, Size iSize, Int iMaxSize)
+S::GUI::MultiEdit::MultiEdit(String iText, Point iPos, Size iSize, Int iMaxSize)
 {
 	type		= classID;
 	text		= iText;
@@ -34,9 +35,9 @@ S::GUI::EditBox::EditBox(String iText, Point iPos, Size iSize, Int iMaxSize)
 	timer		= NIL;
 	marking		= False;
 	invisibleChars	= 0;
+	scrollbarPos	= 0;
 
-	dropDownList	= NIL;
-	comboBox	= NIL;
+	scrollbar	= NIL;
 
 	font.SetColor(Setup::ClientTextColor);
 
@@ -49,23 +50,21 @@ S::GUI::EditBox::EditBox(String iText, Point iPos, Size iSize, Int iMaxSize)
 
 	if (size.cx == 0) size.cx = 80;
 	if (size.cy == 0) size.cy = 19;
-
-	onEnter.SetParentObject(this);
 }
 
-S::GUI::EditBox::~EditBox()
+S::GUI::MultiEdit::~MultiEdit()
 {
-	if (comboBox != NIL)
+	if (scrollbar != NIL)
 	{
-		if (container != NIL) container->UnregisterObject(comboBox);
+		if (container != NIL) container->UnregisterObject(scrollbar);
 
-		DeleteObject(comboBox);
+		DeleteObject(scrollbar);
 
-		comboBox = NIL;
+		scrollbar = NIL;
 	}
 }
 
-S::Int S::GUI::EditBox::Paint(Int message)
+S::Int S::GUI::MultiEdit::Paint(Int message)
 {
 	if (!IsRegistered())	return Failure;
 	if (!IsVisible())	return Success;
@@ -84,39 +83,55 @@ S::Int S::GUI::EditBox::Paint(Int message)
 	{
 		default:
 		case SP_PAINT:
+			if (scrollbar != NIL) frame.right -= 17;
+
 			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
 			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
+			if (scrollbar != NIL) frame.right += 17;
+
 			surface->Frame(frame, FRAME_DOWN);
-
-			if (dropDownList != NIL && comboBox == NIL)
-			{
-				comboBox = new ComboBox(pos, size);
-				comboBox->SetFlags(CB_HOTSPOTONLY);
-				comboBox->SetOrientation(orientation);
-				comboBox->onClick.Connect(&EditBox::DropDownListProc, this);
-
-				if (!active) comboBox->Deactivate();
-
-				for (Int i = 0; i < dropDownList->GetNOfObjects(); i++)
-				{
-					comboBox->AddEntry(dropDownList->GetNthObject(i)->GetText());
-				}
-
-				container->RegisterObject(comboBox);
-			}
-			else if (dropDownList != NIL)
-			{
-				comboBox->pos = pos;
-				comboBox->size = size;
-
-				if (!active) comboBox->Deactivate();
-			}
 
 			textRect.left	= frame.left + 3;
 			textRect.top	= frame.top + 3;
-			textRect.right	= textRect.left + size.cx - 6 - (dropDownList != NIL ? 16 : 0);
+			textRect.right	= textRect.left + size.cx - 6 - (scrollbar != NIL ? 16 : 0);
 			textRect.bottom	= textRect.top + size.cy - 5;
+
+			if ((font.GetTextSizeY(text) > size.cy - 6) && (scrollbar == NIL))
+			{
+				Layer	*layer = (Layer *) container;
+
+				scrollbarPos = 0;
+
+				scrollbar = new Scrollbar(Point(frame.right - layer->pos.x - 18, frame.top - layer->pos.y + 1), Size(0, size.cy - 2), OR_VERT, &scrollbarPos, 0, GetNOfInvisibleLines());
+				scrollbar->onClick.Connect(&MultiEdit::ScrollbarProc, this);
+
+				container->RegisterObject(scrollbar);
+
+				scrollbar->Paint(SP_PAINT);
+			}
+			else if ((font.GetTextSizeY(text) > size.cy - 6) && (scrollbar != NIL))
+			{
+				Layer	*layer = (Layer *) container;
+
+				scrollbar->pos = Point(frame.right - layer->pos.x - 18, frame.top - layer->pos.y + 1);
+				scrollbar->size.cy = size.cy - 2;
+
+				scrollbar->SetRange(0, GetNOfInvisibleLines());
+
+				scrollbar->Paint(SP_PAINT);
+			}
+			else if ((font.GetTextSizeY(text) <= size.cy - 6) && (scrollbar != NIL))
+			{
+				container->UnregisterObject(scrollbar);
+
+				surface->Box(Rect(Point(frame.right - 18, frame.top + 1), Size(18, size.cy - 2)), Setup::ClientColor, FILLED);
+
+				DeleteObject(scrollbar);
+
+				scrollbar = NIL;
+				scrollbarPos = 0;
+			}
 
 			Font	 nFont = font;
 			String	 visText = GetVisibleText();
@@ -124,8 +139,6 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			if (!active) nFont.SetColor(Setup::TextColor);
 
 			surface->SetText(visText, textRect, nFont);
-
-			if (comboBox != NIL) comboBox->Paint(SP_PAINT);
 
 			break;
 	}
@@ -137,7 +150,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 	return Success;
 }
 
-S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
+S::Int S::GUI::MultiEdit::Process(Int message, Int wParam, Int lParam)
 {
 	if (!IsRegistered())	return Failure;
 	if (!IsVisible())	return Success;
@@ -158,8 +171,10 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - (dropDownList == NIL ? 0 : 18);
+	frame.right	= realPos.x + size.cx;
 	frame.bottom	= realPos.y + size.cy;
+
+	if (scrollbar != NIL) frame.right -= 18;
 
 	switch (message)
 	{
@@ -177,9 +192,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				clicked = False;
 				checked = False;
 
-				if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-				else						p1.x = frame.left + 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
-
+				p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 				p1.y = frame.top + 2;
 
 				if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
@@ -214,9 +227,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				clicked = False;
 				checked = False;
 
-				if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-				else						p1.x = frame.left + 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
-
+				p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 				p1.y = frame.top + 2;
 
 				if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
@@ -262,8 +273,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				for (Int i = 0; i <= text.Length() - invisibleChars + 1; i++)
 				{
-					if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	newpos = frame.left + 3 + font.GetTextSizeX(visText, i);
-					else						newpos = frame.left + 3 + font.GetTextSizeX(String().FillN('*', i), i);
+					newpos = frame.left + 3 + font.GetTextSizeX(visText, i);
 
 					if (i > 0 && wnd->MouseX() < (p1.x + newpos) / 2)
 					{
@@ -289,9 +299,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				MarkText(prevMarkStart, prevMarkEnd);
 
-				if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-				else						p1.x = frame.left + 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
-
+				p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 				p1.y = frame.top + 2;
 
 				surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
@@ -356,7 +364,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				timer = new System::Timer();
 
-				timer->onInterval.Connect(&EditBox::TimerProc, this);
+				timer->onInterval.Connect(&MultiEdit::TimerProc, this);
 				timer->Start(500);
 			}
 
@@ -398,8 +406,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 				for (Int i = 0; i <= text.Length() - invisibleChars + 1; i++)
 				{
-					if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	newpos = frame.left + 3 + font.GetTextSizeX(visText, i);
-					else						newpos = frame.left + 3 + font.GetTextSizeX(String().FillN('*', i), i);
+					newpos = frame.left + 3 + font.GetTextSizeX(visText, i);
 
 					if (i > 0 && wnd->MouseX() < (p1.x + newpos) / 2)
 					{
@@ -474,12 +481,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 					case VK_RETURN:
 						if (!active) break;
 
-						if (clicked)
-						{
-							Process(SM_LBUTTONDOWN, 0, 1);
-
-							onEnter.Emit();
-						}
+						if (clicked) Process(SM_LBUTTONDOWN, 0, 1);
 
 						break;
 					case VK_BACK:
@@ -577,12 +579,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 
 					CloseClipboard();
 
-					if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
-					{
-						if (Binary::IsFlagSet(flags, EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) break;
-
-						InsertText(insertText);
-					}
+					if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize) InsertText(insertText);
 				}
 
 				if (nOfChars == maxSize && markStart == markEnd) break;
@@ -590,8 +587,6 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 				if (wParam >= 32 && active)
 				{
 					DeleteSelectedText();
-
-					if (Binary::IsFlagSet(flags, EDB_NUMERIC) && (wParam < '0' || wParam > '9') && wParam != 45 && wParam != '.') break;
 
 					String	 insertText;
 
@@ -607,7 +602,7 @@ S::Int S::GUI::EditBox::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Void S::GUI::EditBox::SetCursor(Int newPos)
+S::Void S::GUI::MultiEdit::SetCursor(Int newPos)
 {
 	Window	*wnd = container->GetContainerWindow();
 
@@ -622,12 +617,12 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - (dropDownList == NIL ? 0 : 18);
+	frame.right	= realPos.x + size.cx;
 	frame.bottom	= realPos.y + size.cy;
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-	else						p1.x = frame.left + 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
+	if (scrollbar != NIL) frame.right -= 18;
 
+	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 	p1.y = frame.top + 2;
 
 	if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
@@ -638,8 +633,7 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	visText = GetVisibleText();
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-	else						p1.x = frame.left + 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
+	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 
 	while (p1.x >= (frame.right - 1))
 	{
@@ -652,11 +646,10 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 			visText[i] = text[i + invisibleChars];
 		}
 
-		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-		else						p1.x = frame.left + 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
+		p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 	}
 
-	if (invisibleChars != oInvisChars) SetText(text);
+	if (invisibleChars != oInvisChars) ModifyText(text);
 
 	promptPos = newPos;
 
@@ -686,13 +679,13 @@ S::Void S::GUI::EditBox::SetCursor(Int newPos)
 
 	timer = new System::Timer();
 
-	timer->onInterval.Connect(&EditBox::TimerProc, this);
+	timer->onInterval.Connect(&MultiEdit::TimerProc, this);
 	timer->Start(500);
 
 	promptVisible = True;
 }
 
-S::Void S::GUI::EditBox::RemoveCursor()
+S::Void S::GUI::MultiEdit::RemoveCursor()
 {
 	if (!promptVisible) return;
 
@@ -700,9 +693,7 @@ S::Void S::GUI::EditBox::RemoveCursor()
 	Point	 p = GetRealPosition();
 	String	 visText = GetVisibleText();
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p.x += 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-	else						p.x += 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
-
+	p.x += 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 	p.y += 2;
 
 	surface->Box(Rect(p, Size(1, 15)), 0, INVERT);
@@ -710,7 +701,7 @@ S::Void S::GUI::EditBox::RemoveCursor()
 	promptVisible = False;
 }
 
-S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
+S::Void S::GUI::MultiEdit::MarkText(Int prevMarkStart, Int prevMarkEnd)
 {
 	if (prevMarkStart == markStart && prevMarkEnd == markEnd) return;
 
@@ -722,8 +713,10 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - (dropDownList == NIL ? 0 : 18);
+	frame.right	= realPos.x + size.cx;
 	frame.bottom	= realPos.y + size.cy;
+
+	if (scrollbar != NIL) frame.right -= 18;
 
 	Int	 bColor = GetSysColor(COLOR_HIGHLIGHT);
 	Int	 tColor = GetSysColor(COLOR_HIGHLIGHTTEXT);
@@ -731,9 +724,7 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	if (prevMarkStart != prevMarkEnd && prevMarkStart >= 0 && prevMarkEnd >= 0)
 	{
-		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-		else						p1.x = frame.left + 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
-
+		p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 		p1.y = frame.top + 2;
 
 		if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
@@ -759,14 +750,14 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 
 	frame.left	= realPos.x;
 	frame.top	= realPos.y;
-	frame.right	= realPos.x + size.cx - (dropDownList == NIL ? 0 : 18);
+	frame.right	= realPos.x + size.cx;
 	frame.bottom	= realPos.y + size.cy;
+
+	if (scrollbar != NIL) frame.right -= 18;
 
 	if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
 	{
-		if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-		else						p1.x = frame.left + 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
-
+		p1.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 		p1.y = frame.top + 2;
 
 		if (promptVisible) surface->Box(Rect(p1, Size(1, 15)), 0, INVERT);
@@ -792,7 +783,7 @@ S::Void S::GUI::EditBox::MarkText(Int prevMarkStart, Int prevMarkEnd)
 	}
 }
 
-S::Int S::GUI::EditBox::MarkAll()
+S::Int S::GUI::MultiEdit::MarkAll()
 {
 	RemoveCursor();
 	SetCursor(text.Length());
@@ -810,7 +801,7 @@ S::Int S::GUI::EditBox::MarkAll()
 	return Success;
 }
 
-S::Void S::GUI::EditBox::DeleteSelectedText()
+S::Void S::GUI::MultiEdit::DeleteSelectedText()
 {
 	if (markStart == markEnd || markStart < 0 || markEnd < 0) return;
 
@@ -829,14 +820,14 @@ S::Void S::GUI::EditBox::DeleteSelectedText()
 	for (Int i = 0; i < bMarkStart; i++)		newText[i] = text[i];
 	for (Int j = bMarkEnd; j <= nOfChars; j++)	newText[j - (bMarkEnd - bMarkStart)] = text[j];
 
-	SetText(newText);
+	ModifyText(newText);
 
 	promptPos = prevPromptPos;
 
 	SetCursor(bMarkStart);
 }
 
-S::Void S::GUI::EditBox::InsertText(String insertText)
+S::Void S::GUI::MultiEdit::InsertText(String insertText)
 {
 	Int	 nOfChars = text.Length();
 	String	 newText;
@@ -846,39 +837,14 @@ S::Void S::GUI::EditBox::InsertText(String insertText)
 	for (Int j = promptPos; j < promptPos + insertText.Length(); j++)	newText[j] = insertText[j - promptPos];
 	for (Int k = promptPos; k <= nOfChars; k++)				newText[k + insertText.Length()] = text[k];
 
-	SetText(newText);
+	ModifyText(newText);
 
 	promptPos = prevPromptPos;
 
 	SetCursor(promptPos + insertText.Length());
 }
 
-S::Int S::GUI::EditBox::Show()
-{
-	if (comboBox != NIL)
-	{
-		comboBox->SetMetrics(pos, size);
-		comboBox->Show();
-	}
-
-	return Widget::Show();
-}
-
-S::Int S::GUI::EditBox::Hide()
-{
-	if (comboBox != NIL) comboBox->Hide();
-
-	return Widget::Hide();
-}
-
-S::Int S::GUI::EditBox::Activate()
-{
-	if (comboBox != NIL) comboBox->Activate();
-
-	return Widget::Activate();
-}
-
-S::Int S::GUI::EditBox::Deactivate()
+S::Int S::GUI::MultiEdit::Deactivate()
 {
 	if (clicked)
 	{
@@ -894,12 +860,17 @@ S::Int S::GUI::EditBox::Deactivate()
 		clicked = False;
 	}
 
-	if (comboBox != NIL) comboBox->Deactivate();
-
 	return Widget::Deactivate();
 }
 
-S::Int S::GUI::EditBox::SetText(const String &txt)
+S::Int S::GUI::MultiEdit::SetText(const String &txt)
+{
+	scrollbarPos = 0;
+
+	return ModifyText(txt);
+}
+
+S::Int S::GUI::MultiEdit::ModifyText(String txt)
 {
 	RemoveCursor();
 
@@ -922,32 +893,7 @@ S::Int S::GUI::EditBox::SetText(const String &txt)
 	return Success;
 }
 
-S::Int S::GUI::EditBox::SetDropDownList(List *nDropDownList)
-{
-	dropDownList = nDropDownList;
-
-	return Success;
-}
-
-S::Void S::GUI::EditBox::DropDownListProc()
-{
-	if (comboBox->GetSelectedEntry() == NIL) return;
-
-	SetText(comboBox->GetSelectedEntry()->GetText());
-
-	checked = True;
-
-	Process(SM_LBUTTONDOWN, 0, 0);
-	SetCursor(text.Length());
-
-	markStart = 0;
-	markEnd = text.Length();
-
-	MarkText(0, 0);
-	SetCursor(text.Length());
-}
-
-S::Void S::GUI::EditBox::TimerProc()
+S::Void S::GUI::MultiEdit::TimerProc()
 {
 	if (!IsRegistered())		return;
 	if (!active || !IsVisible())	return;
@@ -963,9 +909,9 @@ S::Void S::GUI::EditBox::TimerProc()
 	frame.right	= realPos.x + size.cx;
 	frame.bottom	= realPos.y + size.cy;
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	lineStart.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
-	else						lineStart.x = frame.left + 3 + font.GetTextSizeX(String().FillN('*', promptPos - invisibleChars), promptPos - invisibleChars);
+	if (scrollbar != NIL) frame.right -= 18;
 
+	lineStart.x = frame.left + 3 + font.GetTextSizeX(visText, promptPos - invisibleChars);
 	lineStart.y = frame.top + 2;
 
 	surface->Box(Rect(lineStart, Size(1, 15)), 0, INVERT);
@@ -973,13 +919,46 @@ S::Void S::GUI::EditBox::TimerProc()
 	promptVisible = !promptVisible;
 }
 
-S::Int S::GUI::EditBox::GetCursorPos()
+S::Void S::GUI::MultiEdit::ScrollbarProc()
+{
+	Surface	*surface = container->GetDrawSurface();
+	Point	 realPos = GetRealPosition();
+	Rect	 frame;
+
+	frame.left	= realPos.x;
+	frame.top	= realPos.y;
+	frame.right	= realPos.x + size.cx;
+	frame.bottom	= realPos.y + size.cy;
+
+	surface->StartPaint(frame);
+	Paint(SP_PAINT);
+	surface->EndPaint();
+}
+
+S::Int S::GUI::MultiEdit::GetCursorPos()
 {
 	if (clicked)	return promptPos;
 	else		return -1;
 }
 
-S::String S::GUI::EditBox::GetVisibleText()
+S::Int S::GUI::MultiEdit::GetNOfLines()
+{
+	Int	 lines = 1;
+
+	for (Int i = 0; i < text.Length(); i++)
+	{
+		if (text[i] == '\n') lines++;
+	}
+
+	return lines;
+}
+
+S::Int S::GUI::MultiEdit::GetNOfInvisibleLines()
+{
+	return 1 + GetNOfLines() - Math::Floor((size.cy - 6) / (font.GetLineSizeY(text) + 1));
+}
+
+S::String S::GUI::MultiEdit::GetVisibleText()
 {
 	String	 visibleText = text;
 
@@ -990,6 +969,26 @@ S::String S::GUI::EditBox::GetVisibleText()
 		for (Int i = 0; i < text.Length() - invisibleChars; i++)
 		{
 			visibleText[i] = text[i + invisibleChars];
+		}
+	}
+
+	if (scrollbar != NIL)
+	{
+		visibleText = "";
+
+		Int	 invisibleLines = scrollbarPos;
+		Int	 i;
+
+		for (i = 0; i < text.Length(); i++)
+		{
+			if (text[i] == '\n') { invisibleLines--; i++; }
+
+			if (invisibleLines == 0) break;
+		}
+
+		for (Int j = 0; j < text.Length() - i; j++)
+		{
+			visibleText[j] = text[j + i];
 		}
 	}
 

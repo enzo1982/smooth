@@ -44,6 +44,7 @@ namespace smooth
 				static Int			 DeinitBackends();
 
 								 Backend();
+				virtual				~Backend();
 
 				virtual Int			 Init();
 				virtual Int			 Deinit();

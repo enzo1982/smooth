@@ -17,7 +17,7 @@
 #include <smooth/xml/node.h>
 #include <smooth/gui/widgets/layer.h>
 
-S::XML::XUL::Box::Box(Node *node, Int iOrientation) : Widget(node)
+S::XML::XUL::Box::Box(Node *node) : Widget(node)
 {
 	layer = NIL;
 
@@ -25,15 +25,8 @@ S::XML::XUL::Box::Box(Node *node, Int iOrientation) : Widget(node)
 	{
 		layer = new GUI::Layer();
 
-		if (iOrientation != -1)
-		{
-			orientation = iOrientation;
-		}
-		else
-		{
-			if (node->GetName() == "vbox")	orientation = 0;
-			else				orientation = 1;
-		}
+		if (node->GetName() == "hbox")		orient = HORIZONTAL;
+		else if (node->GetName() == "vbox")	orient = VERTICAL;
 
 		for (Int i = 0; i < node->GetNOfNodes(); i++)
 		{

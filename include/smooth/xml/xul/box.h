@@ -43,10 +43,8 @@ namespace smooth
 					GUI::Layer	*layer;
 
 					Array<Widget *>	 widgets;
-
-					Int		 orientation;
 				public:
-							 Box(Node *, Int = -1);
+							 Box(Node *);
 							~Box();
 
 					GUI::Widget	*GetWidget();

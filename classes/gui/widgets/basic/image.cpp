@@ -34,8 +34,8 @@ S::GUI::Image::~Image()
 
 S::Int S::GUI::Image::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 bmpRect	= Rect(GetRealPosition(), size);
@@ -44,6 +44,7 @@ S::Int S::GUI::Image::Paint(Int message)
 	{
 		case SP_PAINT:
 		case SP_UPDATE:
+		case SP_SHOW:
 			surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), size), bmpRect);
 
 			break;
@@ -54,9 +55,9 @@ S::Int S::GUI::Image::Paint(Int message)
 
 S::Int S::GUI::Image::SetBitmap(const Bitmap &newBmp)
 {
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (visible) Hide();
+	if (prevVisible) Hide();
 
 	bitmap = newBmp;
 

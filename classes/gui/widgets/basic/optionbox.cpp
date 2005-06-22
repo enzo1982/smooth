@@ -54,8 +54,8 @@ S::GUI::OptionBox::~OptionBox()
 
 S::Int S::GUI::OptionBox::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), size);

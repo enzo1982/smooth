@@ -24,7 +24,7 @@ class IOLibDriverSOCKET;
 #include <iolib/iolibdriver-cxx.h>
 
 #if defined __WIN32__ && !defined __CYGWIN32__
-	#include <winsock.h>
+	#include <winsock2.h>
 #else
 	#include <netinet/in.h>
 	#include <sys/socket.h>

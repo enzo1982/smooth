@@ -22,6 +22,7 @@ S::GUI::GroupBox::GroupBox(String iText, Point iPos, Size iSize)
 	type	= classID;
 	text	= iText;
 
+	possibleContainers.RemoveAll();
 	possibleContainers.AddEntry(Layer::classID);
 
 	pos	= iPos;
@@ -39,7 +40,7 @@ S::GUI::GroupBox::~GroupBox()
 
 S::Int S::GUI::GroupBox::Paint(Int message)
 {
-	if (!registered)	return Failure;
+	if (!IsRegistered())	return Failure;
 	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
@@ -78,7 +79,7 @@ S::Int S::GUI::GroupBox::Activate()
 {
 	active = True;
 
-	if (!registered)	return Success;
+	if (!IsRegistered())	return Success;
 	if (!IsVisible())	return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -103,7 +104,7 @@ S::Int S::GUI::GroupBox::Deactivate()
 {
 	active = False;
 
-	if (!registered)	return Success;
+	if (!IsRegistered())	return Success;
 	if (!IsVisible())	return Success;
 
 	Surface	*surface = container->GetDrawSurface();
@@ -130,34 +131,12 @@ S::Int S::GUI::GroupBox::Deactivate()
 
 S::Int S::GUI::GroupBox::Hide()
 {
-	if (!visible) return Success;
-
-	Bool	 wasVisible = IsVisible();
-
-	visible = False;
-
-	if (!registered) return Success;
-
-	if (wasVisible)
+	if (IsRegistered() && IsVisible())
 	{
-		Rect	 rect;
-		Point	 realPos = GetRealPosition();
 		Surface	*surface = container->GetDrawSurface();
 
-		rect.left	= realPos.x + 10;
-		rect.top	= realPos.y - 6;
-		rect.right	= rect.left + textSize.cx + 3;
-		rect.bottom	= rect.top + Math::Round(textSize.cy * 1.2);
-
-		surface->Box(rect, Setup::BackgroundColor, FILLED);
-
-		rect.left	= realPos.x;
-		rect.top	= realPos.y;
-		rect.right	= realPos.x + size.cx + 1;
-		rect.bottom	= realPos.y + size.cy + 1;
-
-		surface->Box(rect, Setup::BackgroundColor, FILLED);
+		surface->Box(Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 2, (Int) (textSize.cy * 1.2))), Setup::BackgroundColor, FILLED);
 	}
 
-	return Success;
+	return Layer::Hide();
 }

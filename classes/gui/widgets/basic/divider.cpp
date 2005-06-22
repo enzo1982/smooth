@@ -39,14 +39,14 @@ S::GUI::Divider::~Divider()
 
 S::Int S::GUI::Divider::SetPos(Int position)
 {
-	Bool	 prevVisible = visible;
+	Bool	 prevVisible = IsVisible();
 
-	if (registered && visible) Hide();
+	if (IsRegistered() && IsVisible()) Hide();
 
 	if (Binary::IsFlagSet(flags, OR_HORZ))		pos.y = position;
 	else if (Binary::IsFlagSet(flags, OR_VERT))	pos.x = position;
 
-	if (registered && prevVisible) Show();
+	if (IsRegistered() && prevVisible) Show();
 
 	return Success;
 }
@@ -61,8 +61,8 @@ S::Int S::GUI::Divider::GetPos()
 
 S::Int S::GUI::Divider::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 

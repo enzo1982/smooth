@@ -38,8 +38,8 @@ S::GUI::Layer::~Layer()
 
 S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 	if (GetNOfObjects() == 0)	return Success;
 
 	for (Int i = GetNOfObjects() - 1; i >= 0; i--)
@@ -56,7 +56,7 @@ S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::Layer::Paint(Int message)
 {
-	if (!registered)	return Failure;
+	if (!IsRegistered())	return Failure;
 	if (!IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
@@ -95,23 +95,16 @@ S::Int S::GUI::Layer::Paint(Int message)
 
 S::Int S::GUI::Layer::Show()
 {
-	if (visible) return Success;
+	if (IsVisible()) return Success;
 
 	visible = True;
 
-	if (!registered) return Success;
-
-	Point	 realPos = GetRealPosition();
+	if (!IsRegistered()) return Success;
 
 	if (backgroundColor != -1 && IsVisible())
 	{
-		Surface	*surface = container->GetDrawSurface();
-		Rect	 frame;
-
-		frame.left	= realPos.x;
-		frame.top	= realPos.y;
-		frame.right	= realPos.x + size.cx;
-		frame.bottom	= realPos.y + size.cy;
+		Surface	*surface	= container->GetDrawSurface();
+		Rect	 frame		= Rect(GetRealPosition(), size);
 
 		surface->Box(frame, backgroundColor, FILLED);
 	}
@@ -163,18 +156,12 @@ S::Int S::GUI::Layer::Hide()
 
 	visible = False;
 
-	if (!registered) return Success;
+	if (!IsRegistered()) return Success;
 
 	if (backgroundColor != -1 && wasVisible)
 	{
-		Point	 realPos = GetRealPosition();
-		Surface	*surface = container->GetDrawSurface();
-		Rect	 frame;
-
-		frame.left	= realPos.x;
-		frame.top	= realPos.y;
-		frame.right	= realPos.x + size.cx;
-		frame.bottom	= realPos.y + size.cy;
+		Surface	*surface	= container->GetDrawSurface();
+		Rect	 frame		= Rect(GetRealPosition(), size);
 
 		surface->Box(frame, Setup::BackgroundColor, FILLED);
 	}

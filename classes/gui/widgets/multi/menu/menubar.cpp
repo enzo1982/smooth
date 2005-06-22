@@ -47,8 +47,8 @@ S::Void S::GUI::Menubar::OnRegister()
 
 S::Int S::GUI::Menubar::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Window		*wnd = container->GetContainerWindow();
 
@@ -269,8 +269,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Int	 retVal = Success;
 

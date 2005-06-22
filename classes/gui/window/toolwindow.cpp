@@ -56,9 +56,9 @@ S::Int S::GUI::ToolWindow::FreeOwner()
 
 S::Int S::GUI::ToolWindow::Paint(Int message)
 {
-	if (!registered)	return Failure;
+	if (!IsRegistered())	return Failure;
 	if (!created)		return Success;
-	if (!visible)		return Success;
+	if (!IsVisible())	return Success;
 
 	EnterProtectedRegion();
 
@@ -93,8 +93,8 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 
 S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	EnterProtectedRegion();
 

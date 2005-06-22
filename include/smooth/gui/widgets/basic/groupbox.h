@@ -19,13 +19,13 @@ namespace smooth
 	};
 };
 
-#include "../widget.h"
+#include "../layer.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI GroupBox : public Widget
+		class SMOOTHAPI GroupBox : public Layer
 		{
 			public:
 				static const Int	 classID;

@@ -10,7 +10,7 @@
 
 #include <smooth/backends/win32/backendwin32.h>
 
-#include <winsock.h>
+#include <winsock2.h>
 
 S::Backends::Backend *CreateBackendWin32()
 {
@@ -24,9 +24,13 @@ S::Backends::BackendWin32::BackendWin32()
 	type = BACKEND_WIN32;
 }
 
+S::Backends::BackendWin32::~BackendWin32()
+{
+}
+
 S::Int S::Backends::BackendWin32::Init()
 {
-	WORD	 wVersionRequested = MAKEWORD(1,1);
+	WORD	 wVersionRequested = MAKEWORD(2,2);
 	WSADATA	 wsaData;
 
 	WSAStartup(wVersionRequested, &wsaData);

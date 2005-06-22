@@ -41,8 +41,8 @@ S::GUI::TreeView::~TreeView()
 
 S::Int S::GUI::TreeView::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), size);
@@ -229,8 +229,8 @@ S::Int S::GUI::TreeView::PaintTree(Tree *tree, Int level, Rect frame)
 
 S::Int S::GUI::TreeView::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 

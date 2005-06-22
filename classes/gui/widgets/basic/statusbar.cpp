@@ -30,8 +30,8 @@ S::GUI::Statusbar::~Statusbar()
 
 S::Int S::GUI::Statusbar::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface = container->GetDrawSurface();
 	Rect	 textRect;
@@ -50,7 +50,7 @@ S::Int S::GUI::Statusbar::SetText(const String &newStatus)
 {
 	text = newStatus;
 
-	if (!registered || !visible) return Success;
+	if (!IsRegistered() || !IsVisible()) return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 textRect;

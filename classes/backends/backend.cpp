@@ -74,6 +74,10 @@ S::Backends::Backend::Backend()
 	type = BACKEND_NONE;
 }
 
+S::Backends::Backend::~Backend()
+{
+}
+
 S::Int S::Backends::Backend::Init()
 {
 	return Success;

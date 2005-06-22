@@ -31,6 +31,7 @@ namespace smooth
 		{
 			public:
 					 BackendSDL();
+				virtual	~BackendSDL();
 
 				Int	 Init();
 				Int	 Deinit();

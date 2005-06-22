@@ -39,8 +39,8 @@ S::GUI::ActiveArea::~ActiveArea()
 
 S::Int S::GUI::ActiveArea::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 
@@ -66,9 +66,6 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 S::Int S::GUI::ActiveArea::SetColor(Int newColor)
 {
 	areaColor = newColor;
-
-	if (!registered)	return Success;
-	if (!visible)		return Success;
 
 	Paint(SP_PAINT);
 

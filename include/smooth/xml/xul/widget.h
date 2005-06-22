@@ -43,12 +43,17 @@ namespace smooth
 				protected:
 					String			 id;
 
+					Int			 orient;
+
 					String			 GetXMLAttributeValue(Node *, const String &);
 				public:
 								 Widget(Node *);
 					virtual			~Widget();
 
 					virtual GUI::Widget	*GetWidget();
+
+					static const Int	 HORIZONTAL	= 0;
+					static const Int	 VERTICAL	= 1;
 			};
 		};
 	};

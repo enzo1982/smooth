@@ -258,6 +258,11 @@ $(OBJECTDIR)/image.o: $(GUICLASSESDIR)/widgets/basic/image.cpp $(SMOOTHINCLUDEDI
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/image.cpp -o $(OBJECTDIR)/image.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/multiedit.o: $(GUICLASSESDIR)/widgets/basic/multiedit.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/multiedit.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/multiedit.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/multiedit.cpp -o $(OBJECTDIR)/multiedit.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/optionbox.o: $(GUICLASSESDIR)/widgets/basic/optionbox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/basic/optionbox.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/basic/optionbox.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/optionbox.cpp -o $(OBJECTDIR)/optionbox.o
@@ -775,17 +780,17 @@ $(OBJECTDIR)/iolib_driver_posix.o: $(IOLIBDIR)/drivers/posix/driver_posix.cpp $(
 
 $(OBJECTDIR)/iolib_driver_socket.o: $(IOLIBDIR)/drivers/socket/driver_socket.cpp $(INCLUDEDIR)/iolib/drivers/driver_socket.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socket/driver_socket.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socket/driver_socket.cpp -o $(OBJECTDIR)/iolib_driver_socket.o
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socket/driver_socket.cpp -o $(OBJECTDIR)/iolib_driver_socket.o -DNO_INIT_SOCKETS
 	$(ECHO) done.
 
 $(OBJECTDIR)/iolib_driver_socks4.o: $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp $(INCLUDEDIR)/iolib/drivers/driver_socks4.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp -o $(OBJECTDIR)/iolib_driver_socks4.o
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp -o $(OBJECTDIR)/iolib_driver_socks4.o -DNO_INIT_SOCKETS
 	$(ECHO) done.
 
 $(OBJECTDIR)/iolib_driver_socks5.o: $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp $(INCLUDEDIR)/iolib/drivers/driver_socks5.h
 	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp -o $(OBJECTDIR)/iolib_driver_socks5.o
+	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp -o $(OBJECTDIR)/iolib_driver_socks5.o -DNO_INIT_SOCKETS
 	$(ECHO) done.
 
 $(OBJECTDIR)/iolib_driver_unicode.o: $(IOLIBDIR)/drivers/unicode/driver_unicode.cpp $(INCLUDEDIR)/iolib/drivers/driver_unicode.h

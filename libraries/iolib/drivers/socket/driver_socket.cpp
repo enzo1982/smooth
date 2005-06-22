@@ -156,15 +156,13 @@ bool IOLibDriverSocket::SetTimeout(int nt)
 
 bool IOLibDriverSocket::InitNetworking()
 {
-#if defined __WIN32__ && !defined __CYGWIN32__
-	WORD	 wVersionRequested = MAKEWORD(1,1);
+#if defined __WIN32__ && !defined __CYGWIN32__ && !defined NO_INIT_SOCKETS
+	WORD	 wVersionRequested = MAKEWORD(2,2);
 	WSADATA	 wsaData;
 
 	if (initialized == 0)
 	{
-		WSAStartup(wVersionRequested, &wsaData);
-
-		if (wsaData.wVersion != wVersionRequested) return false;
+		if (WSAStartup(wVersionRequested, &wsaData) != 0) return false;
 	}
 
 	initialized++;
@@ -177,7 +175,7 @@ bool IOLibDriverSocket::InitNetworking()
 
 bool IOLibDriverSocket::DeinitNetworking()
 {
-#if defined __WIN32__ && !defined __CYGWIN32__
+#if defined __WIN32__ && !defined __CYGWIN32__ && !defined NO_INIT_SOCKETS
 	initialized--;
 
 	if (initialized == 0) WSACleanup();

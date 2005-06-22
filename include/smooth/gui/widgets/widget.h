@@ -51,6 +51,8 @@ namespace smooth
 			private:
 				Tooltip				*tooltip;
 				System::Timer			*tipTimer;
+
+				Bool				 registered;
 			protected:
 				Bool				 visible;
 				Bool				 active;
@@ -74,7 +76,6 @@ namespace smooth
 
 				Font				 font;
 
-				Bool				 registered;
 				Container			*container;
 
 				Void				 GetTextSize();

@@ -367,8 +367,8 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 
 	rect.left	= huexoffset;
 	rect.top	= yoffset;
-	rect.right	= rect.left + 17;
-	rect.bottom	= rect.top + hssize + 1;
+	rect.right	= rect.left + 18;
+	rect.bottom	= rect.top + hssize + 2;
 
 	if (Rect::DoRectsOverlap(rect, urect))
 	{
@@ -388,32 +388,23 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 	}
 
 	rect.left	= 7;
-	rect.right	= rect.left + hssize + 1;
+	rect.right	= rect.left + hssize + 2;
 
 	surface->Frame(rect, FRAME_DOWN);
 
 	rect.left = ncxoffset;
 	rect.top = yoffset;
-	rect.right = rect.left + crsizex;
-	rect.bottom = rect.top + crsizey;
-
-	surface->Frame(rect, FRAME_DOWN);
-
-	rect.left++;
-	rect.top++;
+	rect.right = rect.left + crsizex + 1;
+	rect.bottom = rect.top + crsizey + 1;
 
 	surface->Box(rect, ConvertColor(HSV, RGB, RGB(acthue, actsat, actval)), FILLED);
-
-	rect.left = ocxoffset;
-	rect.right = rect.left + crsizex;
-	rect.top--;
-
 	surface->Frame(rect, FRAME_DOWN);
 
-	rect.left++;
-	rect.top++;
+	rect.left = ocxoffset;
+	rect.right = rect.left + crsizex + 1;
 
 	surface->Box(rect, color, FILLED);
+	surface->Frame(rect, FRAME_DOWN);
 
 	rect.left	= 3;
 	rect.top	= yoffset - 4;

@@ -31,6 +31,7 @@ namespace smooth
 		{
 			public:
 					 BackendWin32();
+				virtual	~BackendWin32();
 
 				Int	 Init();
 				Int	 Deinit();

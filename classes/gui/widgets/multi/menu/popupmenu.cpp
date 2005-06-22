@@ -62,8 +62,8 @@ S::GUI::PopupMenu::~PopupMenu()
 
 S::Int S::GUI::PopupMenu::Show()
 {
-	if (!registered)	return Failure;
-	if (visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 
@@ -96,8 +96,7 @@ S::Int S::GUI::PopupMenu::Show()
 
 S::Int S::GUI::PopupMenu::Hide()
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
 
 	Window	*wnd = container->GetContainerWindow();
 
@@ -106,6 +105,8 @@ S::Int S::GUI::PopupMenu::Hide()
 	EnterProtectedRegion();
 
 	if (nextPopup != NIL) nextPopup->Hide();
+
+	visible = False;
 
 	if (toolwnd != NIL)
 	{
@@ -123,8 +124,6 @@ S::Int S::GUI::PopupMenu::Hide()
 		toolwnd = NIL;
 	}
 
-	visible = False;
-
 	onHide.Emit();
 
 	LeaveProtectedRegion();
@@ -134,8 +133,8 @@ S::Int S::GUI::PopupMenu::Hide()
 
 S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 

@@ -49,8 +49,8 @@ S::GUI::Titlebar::~Titlebar()
 
 S::Int S::GUI::Titlebar::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface	*surface	= container->GetDrawSurface();
 	Window	*wnd		= container->GetContainerWindow();
@@ -221,8 +221,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Failure;
+	if (!active || !IsVisible())	return Success;
 
 	Window	*wnd = container->GetContainerWindow();
 

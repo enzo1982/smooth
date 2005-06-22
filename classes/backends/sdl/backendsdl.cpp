@@ -24,6 +24,10 @@ S::Backends::BackendSDL::BackendSDL()
 	type = BACKEND_SDL;
 }
 
+S::Backends::BackendSDL::~BackendSDL()
+{
+}
+
 S::Int S::Backends::BackendSDL::Init()
 {
 	if (SDL_Init(SDL_INIT_TIMER) == 0)	return Success;

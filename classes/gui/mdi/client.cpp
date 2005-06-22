@@ -32,8 +32,8 @@ S::GUI::MDI::Client::~Client()
 
 S::Int S::GUI::MDI::Client::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Surface		*surface = container->GetDrawSurface();
 	GUI::Window	*wnd = container->GetContainerWindow();

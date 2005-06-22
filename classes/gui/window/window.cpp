@@ -402,7 +402,7 @@ S::Int S::GUI::Window::SetMaximumSize(Size newMaxSize)
 
 S::Bool S::GUI::Window::Create()
 {
-	if (registered && !created)
+	if (IsRegistered() && !created)
 	{
 		if (backend->Open(text, pos, size, flags) == Success)
 		{
@@ -428,7 +428,7 @@ S::Bool S::GUI::Window::Create()
 
 S::Int S::GUI::Window::Stay()
 {
-	if (!registered) return value;
+	if (!IsRegistered()) return value;
 
 	SetFlags(flags | WF_MODAL);
 
@@ -746,9 +746,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::Window::Paint(Int message)
 {
-	if (!registered)	return Failure;
+	if (!IsRegistered())	return Failure;
 	if (!created)		return Success;
-	if (!visible)		return Success;
+	if (!IsVisible())	return Success;
 
 	if ((updateRect.right - updateRect.left == 0) || (updateRect.bottom - updateRect.top == 0)) return Success;
 

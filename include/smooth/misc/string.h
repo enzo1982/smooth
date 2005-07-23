@@ -26,7 +26,7 @@ namespace smooth
 	{
 		private:
 			wchar_t			*wString;
-			Int			 stringSize;
+			mutable Int		 stringSize;
 
 			static char		*inputFormat;
 			static char		*outputFormat;
@@ -60,7 +60,7 @@ namespace smooth
 			static char		*SetOutputFormat(const char *);
 
 			Int			 ImportFrom(const char *, const char *);
-			char			*ConvertTo(const char *);
+			char			*ConvertTo(const char *) const;
 
 			Int			 ComputeCRC32();
 
@@ -93,7 +93,7 @@ namespace smooth
 			String			&Fill(const Int);
 			String			&FillN(const Int, const Int);
 
-			Int			 Length();
+			Int			 Length() const;
 
 			Int			 ToInt();
 			Float			 ToFloat();
@@ -104,8 +104,8 @@ namespace smooth
 			wchar_t &operator	 [](const int);
 			wchar_t &operator	 [](const Int);
 
-			operator		 char *();
-			operator		 wchar_t *();
+			operator		 char *() const;
+			operator		 wchar_t *() const;
 
 			String &operator	 =(const int);
 			String &operator	 =(const char *);

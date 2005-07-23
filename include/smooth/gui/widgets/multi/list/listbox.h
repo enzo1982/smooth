@@ -68,6 +68,9 @@ namespace smooth
 				Int			 ScrollDown(Int = 1);
 			slots:
 				Void			 ScrollbarProc();
+
+				Void			 OnRegister(Container *);
+				Void			 OnUnregister(Container *);
 		};
 	};
 };

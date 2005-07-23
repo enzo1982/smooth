@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,9 @@
 #include <smooth/xml/xul/renderer.h>
 #include <smooth/xml/node.h>
 #include <smooth/gui/widgets/widget.h>
+
+const S::Int S::XML::XUL::Widget::HORIZONTAL	= 0;
+const S::Int S::XML::XUL::Widget::VERTICAL	= 1;
 
 S::XML::XUL::Widget::Widget(Node *node)
 {

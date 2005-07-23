@@ -282,7 +282,7 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 	return Success;
 }
 
-char *S::String::ConvertTo(const char *encoding)
+char *S::String::ConvertTo(const char *encoding) const
 {
 	if (stringSize == 0) return NIL;
 
@@ -375,14 +375,14 @@ wchar_t &S::String::operator [](Int n)
 	return (*this)[(int) n];
 }
 
-S::String::operator char *()
+S::String::operator char *() const
 {
 	if (outputFormat == NIL) SetOutputFormat("ISO-8859-1");
 
 	return ConvertTo(outputFormat);
 }
 
-S::String::operator wchar_t *()
+S::String::operator wchar_t *() const
 {
 	return wString;
 }
@@ -532,7 +532,7 @@ S::Bool S::String::operator !=(const String &str)
 	else			return False;
 }
 
-S::Int S::String::Length()
+S::Int S::String::Length() const
 {
 	if (stringSize == 0) return 0;
 

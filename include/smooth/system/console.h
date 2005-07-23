@@ -8,40 +8,36 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_DROPAREA_
-#define _H_OBJSMOOTH_DROPAREA_
+#ifndef _H_OBJSMOOTH_CONSOLE_
+#define _H_OBJSMOOTH_CONSOLE_
 
 namespace smooth
 {
-	namespace GUI
+	namespace System
 	{
-		class DropArea;
+		class Console;
 	};
 };
 
-#include "../widget.h"
+#include "../definitions.h"
+#include "../misc/string.h"
 
 namespace smooth
 {
-	namespace GUI
+	namespace System
 	{
-		class SMOOTHAPI DropArea : public Widget
+		class SMOOTHAPI Console
 		{
 			private:
-				Void				 Init();
+						 Console();
+						 Console(const Console &);
 			public:
-				static const Int		 classID;
+				static Int	 SetTitle(const String &);
 
-								 DropArea(Point, Size);
-								~DropArea();
+				static Int	 OutputString(const String &);
+				static Int	 OutputLine(const String &);
 
-				virtual Int			 Hide();
-
-				virtual Int			 Process(Int, Int, Int);
-			signals:
-				Signal1<Void, const String &>	 onDropFile;
-			slots:
-				Void				 OnRegister(Container *);
+				static Void	 WaitForKey();
 		};
 	};
 };

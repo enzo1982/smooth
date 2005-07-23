@@ -21,6 +21,7 @@ xx.xx.05 xx:xx - smooth alpha 0.8.67.0
 - groupbox.cpp	- GroupBoxes are now Layers
 - editbox.cpp	- removed multi line support
 - multiedit.cpp	- new class: MultiEdit; implements a multi line edit box
+- console.cpp	- new class: System::Console; implements a simple console API
 
 - added a class for smart pointers
 - improved XUL support

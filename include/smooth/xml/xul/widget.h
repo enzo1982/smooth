@@ -52,8 +52,8 @@ namespace smooth
 
 					virtual GUI::Widget	*GetWidget();
 
-					static const Int	 HORIZONTAL	= 0;
-					static const Int	 VERTICAL	= 1;
+					static const Int	 HORIZONTAL;
+					static const Int	 VERTICAL;
 			};
 		};
 	};

@@ -483,6 +483,11 @@ $(OBJECTDIR)/timerwin32.o: $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp $(SMOOTHINCL
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp -o $(OBJECTDIR)/timerwin32.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/console.o: $(SYSTEMCLASSESDIR)/console.cpp $(SMOOTHINCLUDEDIR)/system/console.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/console.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/console.cpp -o $(OBJECTDIR)/console.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/event.o: $(SYSTEMCLASSESDIR)/event.cpp $(SMOOTHINCLUDEDIR)/system/event.h
 	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/event.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/event.cpp -o $(OBJECTDIR)/event.o

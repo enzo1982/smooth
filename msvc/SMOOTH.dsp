@@ -294,6 +294,10 @@ SOURCE=..\classes\files\file.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\classes\xml\xul\box.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\xml\xul\button.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
@@ -369,6 +373,10 @@ SOURCE=..\classes\xml\xul\renderer.cpp
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\xml\xul\textbox.cpp
 # End Source File
 # Begin Source File
 
@@ -572,6 +580,10 @@ SOURCE=..\classes\system\win32\eventwin32.cpp
 SOURCE=..\classes\system\win32\timerwin32.cpp
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\classes\system\console.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=..\classes\system\event.cpp
@@ -1305,6 +1317,10 @@ SOURCE=..\include\smooth\system\win32\timerwin32.h
 # End Group
 # Begin Source File
 
+SOURCE=..\include\smooth\system\console.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\system\event.h
 # End Source File
 # Begin Source File
@@ -1332,6 +1348,10 @@ SOURCE=..\include\smooth\system\timerbackend.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\include\smooth\xml\xul\box.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\xml\xul\button.h
 # End Source File
 # Begin Source File
@@ -1353,6 +1373,10 @@ SOURCE=..\include\smooth\xml\xul\popupmenu.h
 # Begin Source File
 
 SOURCE=..\include\smooth\xml\xul\renderer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\xml\xul\textbox.h
 # End Source File
 # Begin Source File
 

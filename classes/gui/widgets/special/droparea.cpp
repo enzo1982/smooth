@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -104,7 +104,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 							DragQueryFileW(hDrop, i, bufferW, bufferSize);
 
-							onDropFile.Emit(new String(bufferW));
+							onDropFile.Emit(String(bufferW));
 
 							delete [] bufferW;
 						}
@@ -114,7 +114,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 							DragQueryFileA(hDrop, i, bufferA, bufferSize);
 
-							onDropFile.Emit(new String(bufferA));
+							onDropFile.Emit(String(bufferA));
 
 							delete [] bufferA;
 						}

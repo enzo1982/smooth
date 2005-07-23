@@ -44,6 +44,7 @@
 #include "smooth/types/int.h"
 #include "smooth/types/void.h"
 
+#include "smooth/system/console.h"
 #include "smooth/system/system.h"
 #include "smooth/system/timer.h"
 

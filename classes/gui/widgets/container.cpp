@@ -38,12 +38,12 @@ S::GUI::Container::~Container()
 	delete nullSurface;
 }
 
-S::Int S::GUI::Container::GetBackgroundColor()
+S::GUI::Color S::GUI::Container::GetBackgroundColor()
 {
 	return backgroundColor;
 }
 
-S::Int S::GUI::Container::SetBackgroundColor(Int nColor)
+S::Int S::GUI::Container::SetBackgroundColor(const Color &nColor)
 {
 	backgroundColor = nColor;
 

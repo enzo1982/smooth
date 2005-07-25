@@ -52,7 +52,7 @@ S::Int S::XML::Document::LoadFile(String fileName)
 	{
 		xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
 		Node		*root = new Node();
-		String		 inputFormat = String::SetInputFormat("UTF-8");
+		char		*inputFormat = String::SetInputFormat("UTF-8");
 
 		root->SetName((char *) xmlRoot->name);
 		root->SetContent((char *) xmlRoot->content);
@@ -84,7 +84,7 @@ S::Int S::XML::Document::ParseMemory(Void *buffer, Int size)
 	{
 		xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
 		Node		*root = new Node();
-		String		 inputFormat = String::SetInputFormat("UTF-8");
+		char		*inputFormat = String::SetInputFormat("UTF-8");
 
 		root->SetName((char *) xmlRoot->name);
 		root->SetContent((char *) xmlRoot->content);

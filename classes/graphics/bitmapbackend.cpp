@@ -10,7 +10,7 @@
 
 #include <smooth/graphics/bitmapbackend.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 
 S::GUI::BitmapBackend *CreateBitmapBackend_pV(S::Void *iBitmap)
 {
@@ -207,15 +207,15 @@ S::Int S::GUI::BitmapBackend::GrayscaleBitmap()
 {
 	if (bytes == NIL) return Failure;
 
-	Int	 color = 0;
+	Color	 color;
 
 	for (Int y = 0; y < size.cy; y++)
 	{
 		for (Int x = 0; x < size.cx; x++)
 		{
 			color = GetPixel(x, y);
-			color = (GetRed(color) + GetGreen(color) + GetBlue(color)) / 3;
-			color = CombineColor(color, color, color);
+			color = (color.GetRed() + color.GetGreen() + color.GetBlue()) / 3;
+			color = Color(color, color, color);
 
 			SetPixel(x, y, color);
 		}
@@ -252,9 +252,9 @@ S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, UnsignedLong color)
 		case 24:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + x * 3;
 
-			bytes[offset + 0] = GetBlue(color);
-			bytes[offset + 1] = GetGreen(color);
-			bytes[offset + 2] = GetRed(color);
+			bytes[offset + 0] = Color(color).GetBlue();
+			bytes[offset + 1] = Color(color).GetGreen();
+			bytes[offset + 2] = Color(color).GetRed();
 
 			done = True;
 
@@ -262,9 +262,9 @@ S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, UnsignedLong color)
 		case 32:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + x * 4;
 
-			bytes[offset + 0] = GetBlue(color);
-			bytes[offset + 1] = GetGreen(color);
-			bytes[offset + 2] = GetRed(color);
+			bytes[offset + 0] = Color(color).GetBlue();
+			bytes[offset + 1] = Color(color).GetGreen();
+			bytes[offset + 2] = Color(color).GetRed();
 
 			done = True;
 
@@ -287,13 +287,13 @@ S::UnsignedLong S::GUI::BitmapBackend::GetPixel(Int x, Int y)
 		case 24:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + x * 3;
 
-			color = CombineColor(bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]);
+			color = Color(bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]);
 
 			break;
 		case 32:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + x * 4;
 
-			color = CombineColor(bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]);
+			color = Color(bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]);
 
 			break;
 	}

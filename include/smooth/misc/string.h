@@ -68,6 +68,10 @@ namespace smooth
 			String			&Append(const wchar_t *);
 			String			&Append(const String &);
 
+			Int			 Find(const char *);
+			Int			 Find(const wchar_t *);
+			Int			 Find(const String &);
+
 			String			&Replace(const char *, const char *);
 			String			&Replace(const wchar_t *, const wchar_t *);
 			String			&Replace(const char *, const String &);
@@ -100,6 +104,9 @@ namespace smooth
 
 			static String		 FromInt(const Int);
 			static String		 FromFloat(const Float);
+
+			String			 ToLower();
+			String			 ToUpper();
 
 			wchar_t &operator	 [](const int);
 			wchar_t &operator	 [](const Int);

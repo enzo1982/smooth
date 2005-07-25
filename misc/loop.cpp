@@ -15,7 +15,7 @@
 #include <smooth/threads/thread.h>
 #include <smooth/backends/backend.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 #include <smooth/misc/i18n.h>
 #include <smooth/gui/application/background.h>
 #include <smooth/system/event.h>
@@ -146,9 +146,9 @@ S::Void S::GetColors()
 	Setup::InactiveGradientStartColor	= GetSysColor(COLOR_INACTIVECAPTION);
 	Setup::InactiveGradientEndColor		= GetSysColor(28);
 	Setup::InactiveGradientTextColor	= GetSysColor(COLOR_INACTIVECAPTIONTEXT);
-	Setup::DividerLightColor		= RGB(GetRed(Setup::BackgroundColor) + (255 - GetRed(Setup::BackgroundColor)) * 0.6, GetGreen(Setup::BackgroundColor) + (255 - GetGreen(Setup::BackgroundColor)) * 0.6, GetBlue(Setup::BackgroundColor) + (255 - GetBlue(Setup::BackgroundColor)) * 0.6);
+	Setup::DividerLightColor		= RGB(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
 	Setup::DividerDarkColor			= GetSysColor(COLOR_3DSHADOW);
-	Setup::LightGrayColor			= RGB(GetRed(Setup::BackgroundColor) + (255 - GetRed(Setup::BackgroundColor)) * 0.6, GetGreen(Setup::BackgroundColor) + (255 - GetGreen(Setup::BackgroundColor)) * 0.6, GetBlue(Setup::BackgroundColor) + (255 - GetBlue(Setup::BackgroundColor)) * 0.6);
+	Setup::LightGrayColor			= RGB(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
 	Setup::TooltipColor			= GetSysColor(COLOR_INFOBK);
 	Setup::TooltipTextColor			= GetSysColor(COLOR_INFOTEXT);
 #endif

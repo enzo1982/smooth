@@ -103,6 +103,11 @@ $(OBJECTDIR)/bitmapbackend.o: $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp $(SMOOTHIN
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp -o $(OBJECTDIR)/bitmapbackend.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/color.o: $(GRAPHICSCLASSESDIR)/color.cpp $(SMOOTHINCLUDEDIR)/graphics/color.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/color.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/color.cpp -o $(OBJECTDIR)/color.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/font.o: $(GRAPHICSCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/graphics/font.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/font.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
@@ -158,7 +163,7 @@ $(OBJECTDIR)/xulloader.o: $(GUICLASSESDIR)/application/xulloader.cpp $(SMOOTHINC
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/application/xulloader.cpp -o $(OBJECTDIR)/xulloader.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/colordlg.o: $(GUICLASSESDIR)/dialogs/colordlg.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/colordlg.h $(SMOOTHINCLUDEDIR)/color.h
+$(OBJECTDIR)/colordlg.o: $(GUICLASSESDIR)/dialogs/colordlg.cpp $(SMOOTHINCLUDEDIR)/gui/dialogs/colordlg.h $(SMOOTHINCLUDEDIR)/graphics/color.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/dialogs/colordlg.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/dialogs/colordlg.cpp -o $(OBJECTDIR)/colordlg.o
 	$(ECHO) done.
@@ -656,11 +661,6 @@ $(OBJECTDIR)/xml_node.o: $(XMLCLASSESDIR)/node.cpp $(SMOOTHINCLUDEDIR)/xml/node.
 $(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h
 	$(ECHO) -n Compiling $(MISCDIR)/codecs.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/codecs.cpp -o $(OBJECTDIR)/codecs.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/color.o: $(MISCDIR)/color.cpp $(SMOOTHINCLUDEDIR)/color.h
-	$(ECHO) -n Compiling $(MISCDIR)/color.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/color.cpp -o $(OBJECTDIR)/color.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/dllmain.o: $(MISCDIR)/dllmain.cpp $(SMOOTHINCLUDEDIR)/dllmain.h

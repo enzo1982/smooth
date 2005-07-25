@@ -11,7 +11,6 @@
 #include <smooth/gui/widgets/multi/menu/menu.h>
 #include <smooth/definitions.h>
 #include <smooth/array.h>
-#include <smooth/color.h>
 #include <smooth/misc/i18n.h>
 
 const S::Int	 S::GUI::Menu::classID = S::Object::RequestClassID();

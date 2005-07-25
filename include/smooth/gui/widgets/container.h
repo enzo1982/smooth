@@ -24,6 +24,7 @@ namespace smooth
 
 #include "containertype.h"
 #include "widget.h"
+#include "../../graphics/color.h"
 
 namespace smooth
 {
@@ -39,15 +40,15 @@ namespace smooth
 				Surface			*nullSurface;
 				Surface			*drawSurface;
 
-				Int			 backgroundColor;
+				Color			 backgroundColor;
 			public:
 				static const Int	 classID;
 
 							 Container();
 				virtual			~Container();
 
-				Int			 GetBackgroundColor();
-				Int			 SetBackgroundColor(Int);
+				Color			 GetBackgroundColor();
+				Int			 SetBackgroundColor(const Color &);
 
 				virtual Int		 RegisterObject(Widget *);
 				virtual Int		 UnregisterObject(Widget *);

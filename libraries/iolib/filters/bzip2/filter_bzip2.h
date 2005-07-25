@@ -31,12 +31,14 @@ class
 
 IOLibFilterBZip2 : public IOLibFilter
 {
+	private:
+		unsigned char	*buffer;
 	public:
-			 IOLibFilterBZip2();
-			~IOLibFilterBZip2();
+				 IOLibFilterBZip2();
+				~IOLibFilterBZip2();
 
-		int	 WriteData(unsigned char *, int);
-		int	 ReadData(unsigned char **, int);
+		int		 WriteData(unsigned char *, int);
+		int		 ReadData(unsigned char **, int);
 };
 
 #endif

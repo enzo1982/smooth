@@ -12,7 +12,7 @@
 #include <smooth/gui/widgets/multi/menu/menubar.h>
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/definitions.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
@@ -281,10 +281,10 @@ S::Int S::GUI::MenuEntry::SetBitmap(const Bitmap &newBitmap)
 	bitmap	= newBitmap;
 	graymap	= newBitmap;
 
-	bitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+	bitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
 	graymap.GrayscaleBitmap();
-	graymap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+	graymap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
 	CalcSize();
 

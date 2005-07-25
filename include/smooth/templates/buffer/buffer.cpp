@@ -99,6 +99,11 @@ template <class t> t &S::Buffer<t>::operator [](Int n)
 	return (*this)[(int) n];
 }
 
+template <class t> t *S::Buffer<t>::operator +(const int offset)
+{
+	return memory + offset;
+}
+
 template <class t> S::Buffer<t>::operator t *()
 {
 	return memory;

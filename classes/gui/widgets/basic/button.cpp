@@ -10,7 +10,6 @@
 
 #include <smooth/gui/widgets/basic/button.h>
 #include <smooth/misc/math.h>
-#include <smooth/color.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/gui/window/window.h>
@@ -25,7 +24,7 @@ S::GUI::Button::Button(String iText, const Bitmap &iBitmap, Point iPos, Size iSi
 	bitmap		= iBitmap;
 	backgroundColor	= -1;
 
-	bitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+	bitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
 	possibleContainers.AddEntry(Layer::classID);
 

@@ -79,7 +79,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 				}
 				else
 				{
-					shadowColor	= Setup::DividerDarkColor;
+					shadowColor	= Color::Average(Setup::DividerDarkColor, Setup::BackgroundColor);
 					crossColor	= Setup::GrayTextColor;
 				}
 

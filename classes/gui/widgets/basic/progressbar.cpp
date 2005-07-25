@@ -11,7 +11,7 @@
 #include <smooth/gui/widgets/basic/progressbar.h>
 #include <smooth/misc/math.h>
 #include <smooth/gui/widgets/layer.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Progressbar::classID = S::Object::RequestClassID();
@@ -146,25 +146,25 @@ S::Void S::GUI::Progressbar::CreateGradient(Size gSize)
 {
 	gradient.CreateBitmap(gSize.cx - 2, gSize.cy - 2, 32);
 
-	Int	 rs	= GetRed(Setup::GradientStartColor);
-	Int	 gs	= GetGreen(Setup::GradientStartColor);
-	Int	 bs	= GetBlue(Setup::GradientStartColor);
-	Float	 rp	= ((Float) (GetRed(Setup::GradientEndColor) - rs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
-	Float	 gp	= ((Float) (GetGreen(Setup::GradientEndColor) - gs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
-	Float	 bp	= ((Float) (GetBlue(Setup::GradientEndColor) - bs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
+	Int	 rs	= Setup::GradientStartColor.GetRed();
+	Int	 gs	= Setup::GradientStartColor.GetGreen();
+	Int	 bs	= Setup::GradientStartColor.GetBlue();
+	Float	 rp	= ((Float) (Setup::GradientEndColor.GetRed() - rs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
+	Float	 gp	= ((Float) (Setup::GradientEndColor.GetGreen() - gs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
+	Float	 bp	= ((Float) (Setup::GradientEndColor.GetBlue() - bs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
 
 	if (subtype == OR_HORZ)
 	{
 		for (Int x = 0; x < gSize.cx - 2; x++)
 		{
-			for (Int y = 0; y < gSize.cy - 2; y++) gradient.SetPixel(x, y, CombineColor((Int) (rs + rp * x), (Int) (gs + gp * x), (Int) (bs + bp * x)));
+			for (Int y = 0; y < gSize.cy - 2; y++) gradient.SetPixel(x, y, Color((Int) (rs + rp * x), (Int) (gs + gp * x), (Int) (bs + bp * x)));
 		}
 	}
 	else
 	{
 		for (Int y = 0; y < gSize.cy - 2; y++)
 		{
-			for (Int x = 0; x < gSize.cx - 2; x++) gradient.SetPixel(x, gSize.cy - 3 - y, CombineColor((Int) (rs + rp * y), (Int) (gs + gp * y), (Int) (bs + bp * y)));
+			for (Int x = 0; x < gSize.cx - 2; x++) gradient.SetPixel(x, gSize.cy - 3 - y, Color((Int) (rs + rp * y), (Int) (gs + gp * y), (Int) (bs + bp * y)));
 		}
 	}
 }

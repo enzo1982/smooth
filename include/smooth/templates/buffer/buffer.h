@@ -38,6 +38,8 @@ namespace smooth
 			t &operator	 [](const int);
 			t &operator	 [](const Int);
 
+			t *operator	 +(const int);
+
 			operator	 t *();
 	};
 };

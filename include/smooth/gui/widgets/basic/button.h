@@ -21,6 +21,7 @@ namespace smooth
 
 #include "../widget.h"
 #include "../../../graphics/bitmap.h"
+#include "../../../graphics/color.h"
 
 namespace smooth
 {
@@ -33,7 +34,7 @@ namespace smooth
 		class SMOOTHAPI Button : public Widget
 		{
 			private:
-				Int			 backgroundColor;
+				Color			 backgroundColor;
 			protected:
 				Bitmap			 bitmap;
 				Size			 bmpSize;

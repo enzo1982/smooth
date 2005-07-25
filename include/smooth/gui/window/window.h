@@ -92,7 +92,7 @@ namespace smooth
 				Bool				 initshow;
 
 								 Window(String = NIL, Void * = NIL);
-								~Window();
+				virtual				~Window();
 
 				Int				 SetIcon(const Bitmap &);
 				Bitmap				&GetIcon();
@@ -119,8 +119,8 @@ namespace smooth
 				Int				 SetMinimumSize(Size);
 				Int				 SetMaximumSize(Size);
 
-				Int				 Show();
-				Int				 Hide();
+				virtual Int			 Show();
+				virtual Int			 Hide();
 
 				Int				 Maximize();
 				Int				 Minimize();
@@ -135,8 +135,8 @@ namespace smooth
 
 				Bool				 IsInUse();
 
-				Int				 Paint(Int);
-				Int				 Process(Int, Int, Int);
+				virtual Int			 Paint(Int);
+				virtual Int			 Process(Int, Int, Int);
 
 				Int				 MouseX();
 				Int				 MouseY();
@@ -148,8 +148,8 @@ namespace smooth
 
 				static Window			*GetWindow(Void *);
 
-				Int				 RegisterObject(Widget *);
-				Int				 UnregisterObject(Widget *);
+				virtual Int			 RegisterObject(Widget *);
+				virtual Int			 UnregisterObject(Widget *);
 			signals:
 				Signal0<Void>			 onCreate;
 

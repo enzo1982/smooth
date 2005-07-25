@@ -9,12 +9,15 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/definitions.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 #include <smooth/pciio.h>
 #include <smooth/codecs.h>
 #include <smooth/misc/string.h>
 
 #include <iolib-cxx.h>
+
+using namespace smooth;
+using namespace smooth::GUI;
 
 S::String	 cfNames[10];
 S::String	 cpNames[5];

@@ -33,6 +33,7 @@ IOLibFilterXOR : public IOLibFilter
 {
 	private:
 		int	 modifier;
+		int	 value;
 	public:
 			 IOLibFilterXOR();
 			~IOLibFilterXOR();

@@ -100,10 +100,6 @@ SOURCE=..\misc\codecs.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\misc\color.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\misc\dllmain.cpp
 # End Source File
 # Begin Source File
@@ -240,6 +236,10 @@ SOURCE=..\classes\graphics\bitmap.cpp
 # Begin Source File
 
 SOURCE=..\classes\graphics\bitmapbackend.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\color.cpp
 # End Source File
 # Begin Source File
 
@@ -1221,6 +1221,10 @@ SOURCE=..\include\smooth\graphics\bitmapbackend.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\graphics\color.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\graphics\font.h
 # End Source File
 # Begin Source File
@@ -1823,10 +1827,6 @@ SOURCE=..\include\smooth\callbacks.h
 # Begin Source File
 
 SOURCE=..\include\smooth\codecs.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\color.h
 # End Source File
 # Begin Source File
 

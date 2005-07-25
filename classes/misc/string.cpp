@@ -80,11 +80,13 @@ S::String::String(const wchar_t *iString)
 	}
 	else
 	{
-		stringSize = wcslen(iString) + 1;
+		Int	 size = wcslen(iString) + 1;
 
-		wString = new wchar_t [stringSize];
+		wString = new wchar_t [size];
 
-		wcscpy(wString, iString);
+		wcsncpy(wString, iString, size);
+
+		stringSize = size;
 	}
 }
 
@@ -100,11 +102,11 @@ S::String::String(const String &iString)
 	}
 	else
 	{
+		wString = new wchar_t [iString.stringSize];
+
+		wcsncpy(wString, iString.wString, iString.stringSize);
+
 		stringSize = iString.stringSize;
-
-		wString = new wchar_t [stringSize];
-
-		wcsncpy(wString, iString.wString, stringSize);
 	}
 }
 
@@ -134,10 +136,11 @@ S::Void S::String::DeleteTemporaryBuffers()
 
 S::Void S::String::Clean()
 {
+	stringSize = 0;
+
 	if (wString != NIL) delete [] wString;
 
 	wString = NIL;
-	stringSize = 0;
 }
 
 S::Void S::String::CRC32_InitTable()
@@ -175,8 +178,8 @@ S::Int S::String::ComputeCRC32()
 	if (!crc32_initialized) CRC32_InitTable();
 
 	UnsignedLong	 ulCRC(0xffffffff);
-	Int		 len = Length();
-	unsigned char	*buffer = (unsigned char *) (char *) *this;
+	Int		 len = Length() * sizeof(wchar_t);
+	unsigned char	*buffer = (unsigned char *) wString;
 
 	while (len--) ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer++];
 
@@ -263,21 +266,23 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 	else if (width == 2)	while (true) { if (((short *) str)[++len] == 0) { len *= 2; break; } }
 	else if (width == 4)	while (true) { if (((long  *) str)[++len] == 0) { len *= 4; break; } }
 
-	stringSize = ConvertString(str, len, format, NIL, 0, "UTF-16LE");
+	Int	 size = ConvertString(str, len, format, NIL, 0, "UTF-16LE");
 
-	if ((stringSize < 0) && (strcmp(format, "ISO-8859-1") != 0))
+	if ((size < 0) && (strcmp(format, "ISO-8859-1") != 0))
 	{
 		return ImportFrom("ISO-8859-1", str);
 	}
-	else if (stringSize < 0) return Failure;
+	else if (size < 0) return Failure;
 
-	stringSize = stringSize / 2 + 1;
+	size = size / 2 + 1;
 
-	wString = new wchar_t [stringSize];
+	wString = new wchar_t [size];
 
-	ConvertString(str, len, format, (char *) wString, stringSize * 2, "UTF-16LE");
+	ConvertString(str, len, format, (char *) wString, size * 2, "UTF-16LE");
 
-	wString[stringSize - 1] = 0;
+	wString[size - 1] = 0;
+
+	stringSize = size;
 
 	return Success;
 }
@@ -420,11 +425,13 @@ S::String &S::String::operator =(const wchar_t *newString)
 	{
 		Clean();
 
-		stringSize = wcslen(newString) + 1;
+		Int	 size = wcslen(newString) + 1;
 
-		wString = new wchar_t [stringSize];
+		wString = new wchar_t [size];
 
-		wcscpy(wString, newString);
+		wcsncpy(wString, newString, size);
+
+		stringSize = size;
 	}
 
 	return *this;
@@ -442,11 +449,11 @@ S::String &S::String::operator =(const String &newString)
 
 		Clean();
 
+		wString = new wchar_t [backup.stringSize];
+
+		wcsncpy(wString, backup.wString, backup.stringSize);
+
 		stringSize = backup.stringSize;
-
-		wString = new wchar_t [stringSize];
-
-		wcsncpy(wString, backup.wString, stringSize);
 	}
 
 	return *this;
@@ -536,13 +543,13 @@ S::Int S::String::Length() const
 {
 	if (stringSize == 0) return 0;
 
-	stringSize = 1;
+	stringSize = 0;
 
 	for (Int i = 0; i >= 0; i++)
 	{
-		if (wString[i] == 0) break;
-
 		stringSize++;
+
+		if (wString[i] == 0) break;
 	}
 
 	return stringSize - 1;
@@ -589,6 +596,43 @@ S::String &S::String::Append(const String &str)
 	delete [] composed;
 
 	return *this;
+}
+
+S::Int S::String::Find(const char *str)
+{
+	String 	 str2 = str;
+
+	return Find(str2);
+}
+
+S::Int S::String::Find(const wchar_t *str)
+{
+	String 	 str2 = str;
+
+	return Find(str2);
+}
+
+S::Int S::String::Find(const String &str)
+{
+	String	 bStr(str);
+
+	for (Int i = 0; i <= Length() - bStr.Length(); i++)
+	{
+		Bool	 foundString = True;
+
+		for (Int j = 0; j < bStr.Length(); j++)
+		{
+			if (wString[i + j] != bStr[j])
+			{
+				foundString = False;
+				break;
+			}
+		}
+
+		if (foundString) return i;
+	}
+
+	return -1;
 }
 
 S::String &S::String::Replace(const char *str1, const char *str2)
@@ -787,7 +831,7 @@ S::Int S::String::CompareN(const String &str, Int n)
 {
 	if (Length() < n) return 1;
 
-	for (int i = 0; i < n; i++)
+	for (Int i = 0; i < n; i++)
 	{
 		if (wString[i] != str.wString[i]) return 1;
 	}
@@ -993,6 +1037,24 @@ S::String S::String::FromFloat(Float value)
 	}
 
 	return newString;
+}
+
+S::String S::String::ToLower()
+{
+	String	 retVal;
+
+	for (Int i = 0; i < Length(); i++) retVal[i] = towlower((*this)[i]);
+
+	return retVal;
+}
+
+S::String S::String::ToUpper()
+{
+	String	 retVal;
+
+	for (Int i = 0; i < Length(); i++) retVal[i] = towupper((*this)[i]);
+
+	return retVal;
 }
 
 S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncoding, char *outBuffer, Int outBytes, const char *outEncoding)

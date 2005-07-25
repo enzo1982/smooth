@@ -21,8 +21,10 @@
 
 IOLibFilterXOR::IOLibFilterXOR()
 {
-	packageSize = 4;
-	modifier = 0;
+	packageSize	= 4;
+
+	value		= 0;
+	modifier	= 0;
 }
 
 IOLibFilterXOR::~IOLibFilterXOR()
@@ -31,29 +33,18 @@ IOLibFilterXOR::~IOLibFilterXOR()
 
 int IOLibFilterXOR::WriteData(unsigned char *data, int size)
 {
-	unsigned int value;
-
-	value = data[3] + 256 * data[2] + 65536 * data[1] + 16777216 * data[0];
-
-	value ^= modifier;
+	value = (data[3] + 256 * data[2] + 65536 * data[1] + 16777216 * data[0]) ^ modifier;
 
 	return driver->WriteData((unsigned char *) &value, size);
 }
 
 int IOLibFilterXOR::ReadData(unsigned char **data, int size)
 {
-	unsigned int value;
-
 	driver->ReadData((unsigned char *) &value, size);
 
 	value ^= modifier;
 
-	*data = new unsigned char [size];
-
-	(*data)[3] = value % 256;
-	(*data)[2] = value % 16777216 % 65536 / 256;
-	(*data)[1] = value % 16777216 / 65536;
-	(*data)[0] = value / 16777216;
+	*data = (unsigned char *) &value;
 
 	return size;
 }

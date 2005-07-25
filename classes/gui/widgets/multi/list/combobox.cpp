@@ -444,11 +444,9 @@ S::Void S::GUI::ComboBox::ListBoxProc()
 
 S::Void S::GUI::ComboBox::CloseListBox()
 {
-	if (!IsRegistered()) return;
+	Window	*wnd = NIL;
 
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return;
+	if (IsRegistered()) wnd = container->GetContainerWindow();
 
 	if (listBox != NIL)
 	{
@@ -465,7 +463,8 @@ S::Void S::GUI::ComboBox::CloseListBox()
 		toolWindow->FreeOwner();
 		toolWindow->Close();
 
-		wnd->UnregisterObject(toolWindow);
+		if (wnd != NIL) wnd->UnregisterObject(toolWindow);
+
 		toolWindow->UnregisterObject(layer);
 		layer->UnregisterObject(listBox);
 

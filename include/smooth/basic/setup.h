@@ -17,40 +17,41 @@ namespace smooth
 };
 
 #include "../definitions.h"
+#include "../graphics/color.h"
 
 namespace smooth
 {
 	class SMOOTHAPI Setup
 	{
 		private:
-					 Setup();
-					 Setup(const Setup &);
+						 Setup();
+						 Setup(const Setup &);
 		public:
-					 Setup(const Setup *);
+						 Setup(const Setup *);
 
-			static Int	 BackgroundColor;
-			static Int	 ClientColor;
-			static Int	 ClientTextColor;
-			static Int	 LightGrayColor;
-			static Int	 DividerLightColor;
-			static Int	 DividerDarkColor;
-			static Int	 TextColor;
-			static Int	 GrayTextColor;
-			static Int	 ShadowColor;
-			static Int	 GradientStartColor;
-			static Int	 GradientEndColor;
-			static Int	 GradientTextColor;
-			static Int	 InactiveGradientStartColor;
-			static Int	 InactiveGradientEndColor;
-			static Int	 InactiveGradientTextColor;
-			static Int	 TooltipColor;
-			static Int	 TooltipTextColor;
+			static GUI::Color	 BackgroundColor;
+			static GUI::Color	 ClientColor;
+			static GUI::Color	 ClientTextColor;
+			static GUI::Color	 LightGrayColor;
+			static GUI::Color	 DividerLightColor;
+			static GUI::Color	 DividerDarkColor;
+			static GUI::Color	 TextColor;
+			static GUI::Color	 GrayTextColor;
+			static GUI::Color	 ShadowColor;
+			static GUI::Color	 GradientStartColor;
+			static GUI::Color	 GradientEndColor;
+			static GUI::Color	 GradientTextColor;
+			static GUI::Color	 InactiveGradientStartColor;
+			static GUI::Color	 InactiveGradientEndColor;
+			static GUI::Color	 InactiveGradientTextColor;
+			static GUI::Color	 TooltipColor;
+			static GUI::Color	 TooltipTextColor;
 
-			static Bool	 enableUnicode;
-			static Bool	 rightToLeft;
-			static Bool	 useIconv;
+			static Bool		 enableUnicode;
+			static Bool		 rightToLeft;
+			static Bool		 useIconv;
 
-			static Float	 FontSize;
+			static Float		 FontSize;
 	};
 };
 

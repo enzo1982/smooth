@@ -9,25 +9,25 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/basic/setup.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 
-S::Int S::Setup::BackgroundColor = CombineColor(192, 192, 192);
-S::Int S::Setup::ClientColor = CombineColor(255, 255, 255);
-S::Int S::Setup::ClientTextColor = CombineColor(0, 0, 0);
-S::Int S::Setup::LightGrayColor;
-S::Int S::Setup::DividerLightColor;
-S::Int S::Setup::DividerDarkColor;
-S::Int S::Setup::TextColor = CombineColor(0, 0, 0);
-S::Int S::Setup::GrayTextColor = CombineColor(128, 128, 128);
-S::Int S::Setup::ShadowColor;
-S::Int S::Setup::GradientStartColor;
-S::Int S::Setup::GradientEndColor;
-S::Int S::Setup::GradientTextColor = CombineColor(255, 255, 255);
-S::Int S::Setup::InactiveGradientStartColor;
-S::Int S::Setup::InactiveGradientEndColor;
-S::Int S::Setup::InactiveGradientTextColor;
-S::Int S::Setup::TooltipColor;
-S::Int S::Setup::TooltipTextColor;
+S::GUI::Color S::Setup::BackgroundColor(192, 192, 192);
+S::GUI::Color S::Setup::ClientColor(255, 255, 255);
+S::GUI::Color S::Setup::ClientTextColor(0, 0, 0);
+S::GUI::Color S::Setup::LightGrayColor;
+S::GUI::Color S::Setup::DividerLightColor;
+S::GUI::Color S::Setup::DividerDarkColor;
+S::GUI::Color S::Setup::TextColor(0, 0, 0);
+S::GUI::Color S::Setup::GrayTextColor(128, 128, 128);
+S::GUI::Color S::Setup::ShadowColor;
+S::GUI::Color S::Setup::GradientStartColor;
+S::GUI::Color S::Setup::GradientEndColor;
+S::GUI::Color S::Setup::GradientTextColor(255, 255, 255);
+S::GUI::Color S::Setup::InactiveGradientStartColor;
+S::GUI::Color S::Setup::InactiveGradientEndColor;
+S::GUI::Color S::Setup::InactiveGradientTextColor;
+S::GUI::Color S::Setup::TooltipColor;
+S::GUI::Color S::Setup::TooltipTextColor;
 
 S::Bool S::Setup::enableUnicode = S::False;
 S::Bool S::Setup::rightToLeft = S::False;

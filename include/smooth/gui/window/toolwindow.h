@@ -36,7 +36,7 @@ namespace smooth
 				static const Int	 classID;
 
 							 ToolWindow();
-							~ToolWindow();
+				virtual			~ToolWindow();
 
 				Int			 SetOwner(Widget *);
 				Int			 FreeOwner();

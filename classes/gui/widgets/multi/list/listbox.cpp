@@ -80,9 +80,7 @@ S::Int S::GUI::ListBox::AddTab(String tabName, Int iTabWidth)
 	{
 		header = new ListBoxHeader(this);
 
-		if (!IsVisible() || (flags & LF_HIDEHEADER)) header->Hide();
-
-		if (container != NIL) container->RegisterObject(header);
+		if (container != NIL && !(flags & LF_HIDEHEADER)) container->RegisterObject(header);
 	}
 
 	return header->AddTab(tabName, iTabWidth);
@@ -361,10 +359,10 @@ S::Void S::GUI::ListBox::ScrollbarProc()
 
 S::Void S::GUI::ListBox::OnRegister(Container *container)
 {
-	if (header != NIL) container->RegisterObject(header);
+	if (header != NIL && !(flags & LF_HIDEHEADER)) container->RegisterObject(header);
 }
 
 S::Void S::GUI::ListBox::OnUnregister(Container *container)
 {
-	if (header != NIL) container->UnregisterObject(header);
+	if (header != NIL && !(flags & LF_HIDEHEADER)) container->UnregisterObject(header);
 }

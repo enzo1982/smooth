@@ -12,7 +12,7 @@
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/misc/math.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
@@ -38,7 +38,7 @@ S::GUI::Hyperlink::Hyperlink(String iText, const Bitmap &bitmap, String link, Po
 	linkURL		= link;
 	linkBitmap	= bitmap;
 
-	linkBitmap.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+	linkBitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
 	font.SetUnderline(True);
 

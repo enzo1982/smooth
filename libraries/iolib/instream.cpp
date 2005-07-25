@@ -173,12 +173,10 @@ bool InStream::ReadData()
 		size		= origsize;
 		currentFilePos	= origfilepos;
 
-		delete [] data;
-
-		data = NULL;
-
 		if (filter == NULL)
 		{
+			delete [] data;
+
 			data = new unsigned char [packageSize];
 
 			driver->Seek(currentFilePos);
@@ -510,9 +508,12 @@ bool InStream::SetPackageSize(int newPackagesize)
 
 	if (pbdActive) CompletePBD();
 
-	delete [] data;
+	if (filter == NULL)
+	{
+		delete [] data;
 
-	data = new unsigned char [newPackagesize];
+		data = new unsigned char [newPackagesize];
+	}
 
 	packageSize = newPackagesize;
 	stdpacksize = packageSize;
@@ -526,24 +527,22 @@ bool InStream::SetFilter(IOLibFilter *newFilter)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IOLIB_ERROR_NOTOPEN; return false; }
 
-	filter = newFilter;
-
-	filter->SetDriver(driver);
+	if (filter != NULL) RemoveFilter();
 
 	allowpackset = true;
 
-	if (filter->packageSize > 0)
-	{
-		SetPackageSize(filter->packageSize);
+	if (newFilter->packageSize > 0)		SetPackageSize(newFilter->packageSize);
+	else if (newFilter->packageSize == -1)	SetPackageSize(size - currentFilePos);
 
-		allowpackset = false;
-	}
-	else if (filter->packageSize == -1)
-	{
-		SetPackageSize(size - currentFilePos);
+	allowpackset = false;
 
-		allowpackset = false;
-	}
+	delete [] data;
+
+	data = NULL;
+
+	filter = newFilter;
+
+	filter->SetDriver(driver);
 
 	Seek(currentFilePos);
 
@@ -566,6 +565,8 @@ bool InStream::RemoveFilter()
 	filter = NULL;
 
 	allowpackset = true;
+
+	data = new unsigned char [origpacksize];
 
 	SetPackageSize(origpacksize);
 

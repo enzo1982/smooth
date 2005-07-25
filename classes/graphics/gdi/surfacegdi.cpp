@@ -11,7 +11,7 @@
 #include <smooth/graphics/gdi/surfacegdi.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
 
 #include <fribidi.h>

@@ -17,7 +17,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/misc/math.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 
 const S::Int	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
 
@@ -70,7 +70,7 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 	}
 	else
 	{
-		Int	 color = CombineColor(192, 192, 192);
+		Int	 color = Color(192, 192, 192);
 
 #ifdef __WIN32__
 		color = GetSysColor(COLOR_BTNFACE);
@@ -93,31 +93,29 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 
 S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!created) return Success;
 
 	EnterProtectedRegion();
 
 	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);
 
+	Int	 rVal = -1;
+
 #ifdef __WIN32__
 	switch (message)
 	{
 		case WM_CLOSE:
-			if (doQuit.Call())
-			{
-				backend->Close();
-			}
+			if (doQuit.Call()) backend->Close();
 
-			LeaveProtectedRegion();
+			rVal = 0;
 
-			return 0;
+			break;
 		case WM_DESTROY:
 			destroyed = True;
 
 			if (nOfActiveWindows == 0 && loopActive)
 			{
-				if (S::Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_QUIT, 0, 0);
+				if (Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_QUIT, 0, 0);
 				else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_QUIT, 0, 0);
 			}
 			else
@@ -125,9 +123,9 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 				nOfActiveWindows--;
 			}
 
-			LeaveProtectedRegion();
+			rVal = 0;
 
-			return 0;
+			break;
 		case WM_QUIT:
 			destroyed = True;
 
@@ -162,9 +160,9 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			LeaveProtectedRegion();
+			rVal = 0;
 
-			return 0;
+			break;
 		case WM_WINDOWPOSCHANGED:
 			{
 				WINDOWPOS	*wndPos = (LPWINDOWPOS) lParam;
@@ -197,15 +195,20 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 	}
 #endif
 
-	for (Int j = GetNOfObjects() - 1; j >= 0; j--)
+	if (rVal == -1)
 	{
-		Widget	*object = assocObjects.GetNthEntry(j);
-
-		if (object->Process(message, wParam, lParam) == Break)
+		for (Int i = GetNOfObjects() - 1; i >= 0; i--)
 		{
-			LeaveProtectedRegion();
+			Widget	*object = assocObjects.GetNthEntry(i);
 
-			return Break;
+			if (object == NIL) continue;
+
+			if (object->Process(message, wParam, lParam) == Break)
+			{
+				rVal = 0;
+
+				break;
+			}
 		}
 	}
 
@@ -213,7 +216,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 	if (owner != NIL) owner->Process(message, wParam, lParam);
 	
-	return Success;
+	return rVal == -1 ? Success : Break;
 }
 
 S::Int S::GUI::ToolWindow::RegisterObject(Widget *object)

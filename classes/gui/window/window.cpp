@@ -22,7 +22,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/system/timer.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 #include <smooth/gui/widgets/multi/menu/menubar.h>
 #include <smooth/gui/mdi/window.h>
 #include <smooth/basic/input.h>
@@ -137,7 +137,7 @@ S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 	{
 		icon = newIcon;
 
-		icon.ReplaceColor(CombineColor(192, 192, 192), Setup::BackgroundColor);
+		icon.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
 		backend->SetIcon(icon);
 

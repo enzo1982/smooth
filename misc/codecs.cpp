@@ -10,12 +10,13 @@
 
 #include <smooth/definitions.h>
 #include <smooth/codecs.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 #include <smooth/pciio.h>
 #include <smooth/misc/math.h>
 #include <iolib/filters/filter_bzip2.h>
 
 using namespace smooth;
+using namespace smooth::GUI;
 
 int	*lastline;
 int	 palette[388];
@@ -143,7 +144,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 
 	for (x = 0; x < ior.sizex; x++)
 	{
-		line[x] = DownsampleColor(ConvertColor(RGB, ior.colorspace, ior.bmp.GetPixel(x, y)), ior.bpcc);
+		line[x] = Color::DownsampleColor(Color::ConvertColor(ior.bmp.GetPixel(x, y), RGB, ior.colorspace), ior.bpcc);
 	}
 
 	switch (ior.compression)
@@ -583,7 +584,7 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 
 	for (x = 0; x < ior.sizex; x++)
 	{
-		ior.bmp.SetPixel(x, y, ConvertColor(ior.colorspace, RGB, UpsampleColor(line[x], ior.bpcc)));
+		ior.bmp.SetPixel(x, y, Color::ConvertColor(Color::UpsampleColor(line[x], ior.bpcc), ior.colorspace, RGB));
 	}
 
 	delete [] line;
@@ -675,9 +676,9 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 
 			break;
 		case 3:
-			redbias = GetRed(line[x])-(GetRed(pixb1)+GetRed(prevline[x]))/2;
-			greenbias = GetGreen(line[x])-(GetGreen(pixb1)+GetGreen(prevline[x]))/2;
-			bluebias = GetBlue(line[x])-(GetBlue(pixb1)+GetBlue(prevline[x]))/2;
+			redbias = Color(line[x]).GetRed()-(Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
+			greenbias = Color(line[x]).GetGreen()-(Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
+			bluebias = Color(line[x]).GetBlue()-(Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
 
 			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))))
 			{
@@ -686,10 +687,10 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 
 			break;
 		case 4:
-			redbias = GetRed(line[x])-(GetRed(pixb1)+GetRed(prevline[x]))/2;
-			greenbias = GetGreen(line[x])-(GetGreen(pixb1)+GetGreen(prevline[x]))/2;
-			bluebias = GetBlue(line[x])-(GetBlue(pixb1)+GetBlue(prevline[x]))/2;
-			alphabias = GetAlpha(line[x])-(GetAlpha(pixb1)+GetAlpha(prevline[x]))/2;
+			redbias = Color(line[x]).GetRed()-(Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
+			greenbias = Color(line[x]).GetGreen()-(Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
+			bluebias = Color(line[x]).GetBlue()-(Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
+			alphabias = Color(line[x]).GetAlpha()-(Color(pixb1).GetAlpha()+Color(prevline[x]).GetAlpha())/2;
 
 			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))) && ((alphabias > -Math::Pow(2l, 5)) && (alphabias <= Math::Pow(2l, 5))))
 			{
@@ -734,9 +735,9 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 
 			break;
 		case 3:
-			redbias = GetRed(line[x])-(GetRed(pixb1)+GetRed(prevline[x]))/2;
-			greenbias = GetGreen(line[x])-(GetGreen(pixb1)+GetGreen(prevline[x]))/2;
-			bluebias = GetBlue(line[x])-(GetBlue(pixb1)+GetBlue(prevline[x]))/2;
+			redbias = Color(line[x]).GetRed()-(Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
+			greenbias = Color(line[x]).GetGreen()-(Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
+			bluebias = Color(line[x]).GetBlue()-(Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
 
 			if (((redbias > -Math::Pow(2l, 2)) && (redbias <= Math::Pow(2l, 2))) && ((greenbias > -Math::Pow(2l, 2)) && (greenbias <= Math::Pow(2l, 2))) && ((bluebias > -Math::Pow(2l, 2)) && (bluebias <= Math::Pow(2l, 2))))
 			{
@@ -792,10 +793,10 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 
 			break;
 		case 4:
-			redbias = GetRed(line[x])-(GetRed(pixb1)+GetRed(prevline[x]))/2;
-			greenbias = GetGreen(line[x])-(GetGreen(pixb1)+GetGreen(prevline[x]))/2;
-			bluebias = GetBlue(line[x])-(GetBlue(pixb1)+GetBlue(prevline[x]))/2;
-			alphabias = GetAlpha(line[x])-(GetAlpha(pixb1)+GetAlpha(prevline[x]))/2;
+			redbias = Color(line[x]).GetRed()-(Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
+			greenbias = Color(line[x]).GetGreen()-(Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
+			bluebias = Color(line[x]).GetBlue()-(Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
+			alphabias = Color(line[x]).GetAlpha()-(Color(pixb1).GetAlpha()+Color(prevline[x]).GetAlpha())/2;
 
 			if (((redbias > -Math::Pow(2l, 2)) && (redbias <= Math::Pow(2l, 2))) && ((greenbias > -Math::Pow(2l, 2)) && (greenbias <= Math::Pow(2l, 2))) && ((bluebias > -Math::Pow(2l, 2)) && (bluebias <= Math::Pow(2l, 2))) && ((alphabias > -Math::Pow(2l, 2)) && (alphabias <= Math::Pow(2l, 2))))
 			{
@@ -900,9 +901,9 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 
 			return gray+bias;
 		case 3:
-			red = (GetRed(pixb1)+GetRed(prevline[x]))/2;
-			green = (GetGreen(pixb1)+GetGreen(prevline[x]))/2;
-			blue = (GetBlue(pixb1)+GetBlue(prevline[x]))/2;
+			red = (Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
+			green = (Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
+			blue = (Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
 
 			md = in->InputNumberPBD(2) + 2;
 
@@ -933,10 +934,10 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 
 			return RGB(red+redbias, green+greenbias, blue+bluebias);
 		case 4:
-			red = (GetRed(pixb1)+GetRed(prevline[x]))/2;
-			green = (GetGreen(pixb1)+GetGreen(prevline[x]))/2;
-			blue = (GetBlue(pixb1)+GetBlue(prevline[x]))/2;
-			alpha = (GetAlpha(pixb1)+GetAlpha(prevline[x]))/2;
+			red = (Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
+			green = (Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
+			blue = (Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
+			alpha = (Color(pixb1).GetAlpha()+Color(prevline[x]).GetAlpha())/2;
 
 			md = in->InputNumberPBD(2) + 2;
 
@@ -973,7 +974,7 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 				alphabias = 0-in->InputNumberPBD(md);
 			}
 
-			return CombineColor(red+redbias, green+greenbias, blue+bluebias, alpha+alphabias);
+			return Color(red+redbias, green+greenbias, blue+bluebias, alpha+alphabias);
 	}
 
 	return 1;

@@ -23,10 +23,13 @@
 IOLibFilterBZip2::IOLibFilterBZip2()
 {
 	packageSize = -1;
+
+	buffer = NULL;
 }
 
 IOLibFilterBZip2::~IOLibFilterBZip2()
 {
+	if (buffer != NULL) delete [] buffer;
 }
 
 int IOLibFilterBZip2::WriteData(unsigned char *data, int size)
@@ -55,13 +58,17 @@ int IOLibFilterBZip2::ReadData(unsigned char **data, int size)
 
 	unsigned char	*src = new unsigned char [size];
 
-	*data = new unsigned char [outsize];
+	if (buffer != NULL) delete [] buffer;
+
+	buffer = new unsigned char [outsize];
 
 	driver->ReadData(src, size);
 
-	BZ2_bzBuffToBuffDecompress((char *) *data, (unsigned int *) &outsize, (char *) src, size, 0, 0);
+	BZ2_bzBuffToBuffDecompress((char *) buffer, (unsigned int *) &outsize, (char *) src, size, 0, 0);
 
 	delete [] src;
+
+	*data = buffer;
 
 	return outsize;
 }

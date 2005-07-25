@@ -11,7 +11,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/surfacebackend.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 #include <smooth/threads/mutex.h>
 
 S::GUI::Surface::Surface(Void *iSurface)

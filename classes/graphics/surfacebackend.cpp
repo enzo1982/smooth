@@ -11,7 +11,7 @@
 #include <smooth/graphics/surfacebackend.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/color.h>
+#include <smooth/graphics/color.h>
 
 S::GUI::SurfaceBackend *CreateSurfaceBackend(S::Void *iSurface)
 {
@@ -152,13 +152,13 @@ S::Int S::GUI::SurfaceBackend::Frame(Rect rect, Int style)
 	switch (style)
 	{
 		case FRAME_UP:
-			color1 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
-			color2 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
+			color1 = RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255));
+			color2 = RGB(max(Setup::BackgroundColor.GetRed() - 64, 0), max(Setup::BackgroundColor.GetGreen() - 64, 0), max(Setup::BackgroundColor.GetBlue() - 64, 0));
 
 			break;
 		case FRAME_DOWN:
-			color1 = RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0));
-			color2 = RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255));
+			color1 = RGB(max(Setup::BackgroundColor.GetRed() - 64, 0), max(Setup::BackgroundColor.GetGreen() - 64, 0), max(Setup::BackgroundColor.GetBlue() - 64, 0));
+			color2 = RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255));
 
 			break;
 	}
@@ -195,7 +195,7 @@ S::Int S::GUI::SurfaceBackend::SetText(String string, Rect rect, Font font, Bool
 
 		Int	 fontColor = font.GetColor();
 
-		font.SetColor(CombineColor((Int) ((Float) GetRed(Setup::BackgroundColor) / 3 * 2), (Int) ((Float) GetGreen(Setup::BackgroundColor) / 3 * 2), (Int) ((Float) GetBlue(Setup::BackgroundColor) / 3 * 2)));
+		font.SetColor(Color((Int) ((Float) Setup::BackgroundColor.GetRed() / 3 * 2), (Int) ((Float) Setup::BackgroundColor.GetGreen() / 3 * 2), (Int) ((Float) Setup::BackgroundColor.GetBlue() / 3 * 2)));
 
 		SetText(string, rect, font, False);
 
@@ -214,12 +214,12 @@ S::Int S::GUI::SurfaceBackend::SetText(String string, Rect rect, Font font, Bool
 
 S::Int S::GUI::SurfaceBackend::Gradient(Rect rect, Int color1, Int color2, Int style)
 {
-	Float	 red1	= GetRed(color1);
-	Float	 green1	= GetGreen(color1);
-	Float	 blue1	= GetBlue(color1);
-	Float	 red2	= GetRed(color2);
-	Float	 green2	= GetGreen(color2);
-	Float	 blue2	= GetBlue(color2);
+	Float	 red1	= Color(color1).GetRed();
+	Float	 green1	= Color(color1).GetGreen();
+	Float	 blue1	= Color(color1).GetBlue();
+	Float	 red2	= Color(color2).GetRed();
+	Float	 green2	= Color(color2).GetGreen();
+	Float	 blue2	= Color(color2).GetBlue();
 	Int	 xmax	= rect.right - rect.left;
 	Int	 ymax	= rect.bottom - rect.top;
 	Bitmap	 bmp(rect.right - rect.left, rect.bottom - rect.top, 24);
@@ -240,7 +240,7 @@ S::Int S::GUI::SurfaceBackend::Gradient(Rect rect, Int color1, Int color2, Int s
 					green1	= green1 + biasg;
 					blue1	= blue1 + biasb;
 
-					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, CombineColor((Int) red1, (Int) green1, (Int) blue1));
+					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, Color((Int) red1, (Int) green1, (Int) blue1));
 				}
 			}
 			else
@@ -251,7 +251,7 @@ S::Int S::GUI::SurfaceBackend::Gradient(Rect rect, Int color1, Int color2, Int s
 					green1	= green1 + biasg;
 					blue1	= blue1 + biasb;
 
-					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, CombineColor((Int) red1, (Int) green1, (Int) blue1));
+					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, Color((Int) red1, (Int) green1, (Int) blue1));
 				}
 			}
 		}
@@ -269,7 +269,7 @@ S::Int S::GUI::SurfaceBackend::Gradient(Rect rect, Int color1, Int color2, Int s
 				green1	= green1 + biasg;
 				blue1	= blue1 + biasb;
 
-				for (Int x = 0; x < xmax; x++) bmp.SetPixel(x, y, CombineColor((Int) red1, (Int) green1, (Int) blue1));
+				for (Int x = 0; x < xmax; x++) bmp.SetPixel(x, y, Color((Int) red1, (Int) green1, (Int) blue1));
 			}
 		}
 		break;
@@ -308,20 +308,20 @@ S::Int S::GUI::SurfaceBackend::Bar(Point p1, Point p2, Int orientation)
 
 	if (orientation == OR_HORZ)
 	{
-		Line(p1, p2, RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0)));
-		SetPixel(p2.x, p2.y, RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255)));
+		Line(p1, p2, RGB(max(Setup::BackgroundColor.GetRed() - 64, 0), max(Setup::BackgroundColor.GetGreen() - 64, 0), max(Setup::BackgroundColor.GetBlue() - 64, 0)));
+		SetPixel(p2.x, p2.y, RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255)));
 		p1.y++;
 		p2.y++;
 		p2.x++;
-		Line(p1, p2, RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255)));
+		Line(p1, p2, RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255)));
 	}
 	else if (orientation == OR_VERT)
 	{
 		p2.y++;
-		Line(p1, p2, RGB(max(GetRed(Setup::BackgroundColor) - 64, 0), max(GetGreen(Setup::BackgroundColor) - 64, 0), max(GetBlue(Setup::BackgroundColor) - 64, 0)));
+		Line(p1, p2, RGB(max(Setup::BackgroundColor.GetRed() - 64, 0), max(Setup::BackgroundColor.GetGreen() - 64, 0), max(Setup::BackgroundColor.GetBlue() - 64, 0)));
 		p1.x++;
 		p2.x++;
-		Line(p1, p2, RGB(min(GetRed(Setup::BackgroundColor) + 64, 255), min(GetGreen(Setup::BackgroundColor) + 64, 255), min(GetBlue(Setup::BackgroundColor) + 64, 255)));
+		Line(p1, p2, RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255)));
 	}
 
 	Setup::rightToLeft = preRTL;

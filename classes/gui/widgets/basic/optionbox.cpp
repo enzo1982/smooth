@@ -140,12 +140,26 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 			if (*variable == code)
 			{
+				Int	 shadowColor	= 0;
+				Int	 dotColor	= 0;
+
+				if (active)
+				{
+					shadowColor	= Setup::DividerDarkColor;
+					dotColor	= Setup::ClientTextColor;
+				}
+				else
+				{
+					shadowColor	= Color::Average(Setup::DividerDarkColor, Setup::BackgroundColor);
+					dotColor	= Setup::GrayTextColor;
+				}
+
 				lineStart.x++;
 				lineStart.y -= 7;
 				lineEnd.x--;
 				lineEnd.y -= 7;
 
-				surface->Line(lineStart, lineEnd, Setup::ClientTextColor);
+				surface->Line(lineStart, lineEnd, dotColor);
 
 				lineStart.x--;
 				lineEnd.x++;
@@ -155,26 +169,26 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 					lineStart.y++;
 					lineEnd.y++;
 
-					surface->Line(lineStart, lineEnd, Setup::ClientTextColor);
+					surface->Line(lineStart, lineEnd, dotColor);
 				}
 
-				surface->SetPixel(lineEnd.x, lineEnd.y - 1, Setup::DividerDarkColor);
-				surface->SetPixel(lineEnd.x, lineEnd.y, Setup::DividerDarkColor);
+				surface->SetPixel(lineEnd.x, lineEnd.y - 1, shadowColor);
+				surface->SetPixel(lineEnd.x, lineEnd.y, shadowColor);
 
 				lineStart.x++;
 				lineStart.y++;
 				lineEnd.y++;
 
-				surface->Line(lineStart, lineEnd, Setup::ClientTextColor);
+				surface->Line(lineStart, lineEnd, dotColor);
 
-				surface->SetPixel(lineEnd.x - 1, lineEnd.y, Setup::DividerDarkColor);
-				surface->SetPixel(lineEnd.x, lineEnd.y, Setup::DividerDarkColor);
+				surface->SetPixel(lineEnd.x - 1, lineEnd.y, shadowColor);
+				surface->SetPixel(lineEnd.x, lineEnd.y, shadowColor);
 
 				lineStart.x++;
 				lineStart.y++;
 				lineEnd.y++;
 
-				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
+				surface->Line(lineStart, lineEnd, shadowColor);
 			}
 
 			if (message != SP_UPDATE)

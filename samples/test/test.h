@@ -15,6 +15,7 @@
 
 using namespace smooth;
 using namespace smooth::GUI;
+using namespace smooth::GUI::Dialogs;
 
 class Test : public Application
 {
@@ -30,6 +31,8 @@ class Test : public Application
 	public:
 				 Test();
 				~Test();
+	slots:
+		Void		 ColorDlg();
 };
 
 #endif

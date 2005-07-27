@@ -14,24 +14,27 @@
 S::GUI::Color::Color()
 {
 	color = 0;
+	colorSpace = RGBA;
 }
 
 S::GUI::Color::Color(const Color &iColor)
 {
 	color = iColor.color;
+	colorSpace = iColor.colorSpace;
 }
 
-S::GUI::Color::Color(Int iColor)
+S::GUI::Color::Color(Int iColor, Int iColorSpace)
 {
 	color = iColor;
+	colorSpace = iColorSpace;
 }
 
-S::GUI::Color::Color(Int r, Int g, Int b, Int a)
+S::GUI::Color::Color(Int r, Int g, Int b, Int c)
 {
-	SetColor(r, g, b, a);
+	SetColor(r, g, b, c);
 }
 
-S::GUI::Color S::GUI::Color::ConvertColor(Long col, Int cs1, Int cs2)
+S::GUI::Color S::GUI::Color::ConvertTo(Int cs)
 {
 	double	p1 = 0;
 	double	p2 = 0;
@@ -51,17 +54,17 @@ S::GUI::Color S::GUI::Color::ConvertColor(Long col, Int cs1, Int cs2)
 	double	max;
 	double	delta;
 
-	switch (cs1)
+	switch (colorSpace)
 	{
-		case RGB:
-			switch (cs2)
+		case RGBA:
+			switch (cs)
 			{
-				case RGB:
-					return Color(col);
+				case RGBA:
+					return *this;
 				case HSV:
-					r = Color(col).GetRed();
-					g = Color(col).GetGreen();
-					b = Color(col).GetBlue();
+					r = GetRed();
+					g = GetGreen();
+					b = GetBlue();
 
 					if (r > g)
 					{
@@ -107,23 +110,23 @@ S::GUI::Color S::GUI::Color::ConvertColor(Long col, Int cs1, Int cs2)
 
 					return Color((int) p1, (int) p2, (int) p3);
 				case YUV:
-					p1 = (Color(col).GetRed() + Color(col).GetGreen() + Color(col).GetBlue()) / 3;
-					p2 = Color(col).GetBlue();
-					p3 = Color(col).GetRed();
+					p1 = (GetRed() + GetGreen() + GetBlue()) / 3;
+					p2 = GetBlue();
+					p3 = GetRed();
 
 					p1 = Math::Round(p1);
 
 					return Color((int) p1, (int) p2, (int) p3);
 				case CMY:
-					p1 = 255 - Color(col).GetRed();
-					p2 = 255 - Color(col).GetGreen();
-					p3 = 255 - Color(col).GetBlue();
+					p1 = 255 - GetRed();
+					p2 = 255 - GetGreen();
+					p3 = 255 - GetBlue();
 
 					return Color((int) p1, (int) p2, (int) p3);
 				case CMYK:
-					r = Color(col).GetRed();
-					g = Color(col).GetGreen();
-					b = Color(col).GetBlue();
+					r = GetRed();
+					g = GetGreen();
+					b = GetBlue();
 
 					if (r > g)
 					{
@@ -142,19 +145,19 @@ S::GUI::Color S::GUI::Color::ConvertColor(Long col, Int cs1, Int cs2)
 
 					return Color((Int) p1, (Int) p2, (Int) p3, (Int) p4);
 				case GRAY:
-					return Color((Color(col).GetRed() + Color(col).GetGreen() + Color(col).GetBlue()) / 3);
+					return Color((GetRed() + GetGreen() + GetBlue()) / 3);
 				default:
 					break;
 			}
 
 			break;
 		case HSV:
-			switch (cs2)
+			switch (cs)
 			{
-				case RGB:
-					h = ((double) Color(col).GetRed()) / 255 * 360;
-					s = ((double) Color(col).GetGreen()) / 255;
-					v = Color(col).GetBlue();
+				case RGBA:
+					h = ((double) GetRed()) / 255 * 360;
+					s = ((double) GetGreen()) / 255;
+					v = GetBlue();
 
 					if (s == 0)
 					{
@@ -217,108 +220,108 @@ S::GUI::Color S::GUI::Color::ConvertColor(Long col, Int cs1, Int cs2)
 
 					return Color((int) p1, (int) p2, (int) p3);
 				case HSV:
-					return Color(col);
+					return *this;
 				case YUV:
-					return ConvertColor(RGB, YUV, ConvertColor(HSV, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(YUV);
 				case CMY:
-					return ConvertColor(RGB, CMY, ConvertColor(HSV, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(CMY);
 				case CMYK:
-					return ConvertColor(RGB, CMYK, ConvertColor(HSV, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(CMYK);
 				case GRAY:
-					return ConvertColor(RGB, GRAY, ConvertColor(HSV, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(GRAY);
 				default:
 					break;
 			}
 		case YUV:
-			switch (cs2)
+			switch (cs)
 			{
-				case RGB:
-					p1 = Color(col).GetBlue();
-					p3 = Color(col).GetGreen();
-					p2 = 3 * Color(col).GetRed() - p1 - p3;
+				case RGBA:
+					p1 = GetBlue();
+					p3 = GetGreen();
+					p2 = 3 * GetRed() - p1 - p3;
 
 					if (p2 < 0) p2 = 0;
 
 					return Color((int) p1, (int) p2, (int) p3);
 				case HSV:
-					return ConvertColor(RGB, HSV, ConvertColor(YUV, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(HSV);
 				case YUV:
-					return Color(col);
+					return *this;
 				case CMY:
-					return ConvertColor(RGB, CMY, ConvertColor(YUV, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(CMY);
 				case CMYK:
-					return ConvertColor(RGB, CMYK, ConvertColor(YUV, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(CMYK);
 				case GRAY:
-					return ConvertColor(RGB, GRAY, ConvertColor(YUV, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(GRAY);
 				default:
 					break;
 			}
 
 			break;
 		case CMY:
-			switch (cs2)
+			switch (cs)
 			{
-				case RGB:
-					p1 = 255 - Color(col).GetRed();
-					p2 = 255 - Color(col).GetGreen();
-					p3 = 255 - Color(col).GetBlue();
+				case RGBA:
+					p1 = 255 - GetRed();
+					p2 = 255 - GetGreen();
+					p3 = 255 - GetBlue();
 
 					return Color((int) p1, (int) p2, (int) p3);
 				case HSV:
-					return ConvertColor(RGB, HSV, ConvertColor(CMY, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(HSV);
 				case YUV:
-					return ConvertColor(RGB, YUV, ConvertColor(CMY, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(YUV);
 				case CMY:
-					return Color(col);
+					return *this;
 				case CMYK:
-					return ConvertColor(RGB, CMYK, ConvertColor(CMY, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(CMYK);
 				case GRAY:
-					return ConvertColor(RGB, GRAY, ConvertColor(CMY, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(GRAY);
 				default:
 					break;
 			}
 
 			break;
 		case CMYK:
-			switch (cs2)
+			switch (cs)
 			{
-				case RGB:
-					p4 = Color(col).GetAlpha();
-					p1 = 255 - Color(col).GetRed() - p4;
-					p2 = 255 - Color(col).GetGreen() - p4;
-					p3 = 255 - Color(col).GetBlue() - p4;
+				case RGBA:
+					p4 = GetAlpha();
+					p1 = 255 - GetRed() - p4;
+					p2 = 255 - GetGreen() - p4;
+					p3 = 255 - GetBlue() - p4;
 
 					return Color((int) p1, (int) p2, (int) p3);
 				case HSV:
-					return ConvertColor(RGB, HSV, ConvertColor(CMYK, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(HSV);
 				case YUV:
-					return ConvertColor(RGB, YUV, ConvertColor(CMYK, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(YUV);
 				case CMY:
-					return ConvertColor(RGB, CMY, ConvertColor(CMYK, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(CMY);
 				case CMYK:
-					return Color(col);
+					return *this;
 				case GRAY:
-					return ConvertColor(RGB, GRAY, ConvertColor(CMYK, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(GRAY);
 				default:
 					break;
 			}
 
 			break;
 		case GRAY:
-			switch (cs2)
+			switch (cs)
 			{
-				case RGB:
-					return Color(col, col, col);
+				case RGBA:
+					return Color(color, color, color);
 				case HSV:
-					return ConvertColor(RGB, HSV, ConvertColor(GRAY, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(HSV);
 				case YUV:
-					return ConvertColor(RGB, YUV, ConvertColor(GRAY, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(YUV);
 				case CMY:
-					return ConvertColor(RGB, CMY, ConvertColor(GRAY, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(CMY);
 				case CMYK:
-					return ConvertColor(RGB, CMYK, ConvertColor(GRAY, RGB, col));
+					return ConvertTo(RGBA).ConvertTo(CMYK);
 				case GRAY:
-					return Color(col);
+					return *this;
 				default:
 					break;
 			}
@@ -328,44 +331,35 @@ S::GUI::Color S::GUI::Color::ConvertColor(Long col, Int cs1, Int cs2)
 			break;
 	}
 
-	return Color(col);
+	return *this;
 }
 
-S::GUI::Color S::GUI::Color::Average(Color c1, Color c2)
+S::GUI::Color S::GUI::Color::Downsample(Int bpcc)
 {
-	return Color((c1.GetRed() + c2.GetRed()) / 2, (c1.GetGreen() + c2.GetGreen()) / 2, (c1.GetBlue() + c2.GetBlue()) / 2, (c1.GetAlpha() + c2.GetAlpha()) / 2);
-}
+	if (bpcc == 8) return *this;
 
-S::GUI::Color S::GUI::Color::DownsampleColor(Long col, Int bpcc)
-{
-	if (bpcc == 8) return Color(col);
-
-	int first = Color(col).GetRed();
-	int second = Color(col).GetGreen();
-	int third = Color(col).GetBlue();
-	int fourth = Color(col).GetAlpha();
+	int first = GetRed();
+	int second = GetGreen();
+	int third = GetBlue();
 
 	first >>= (8 - bpcc);
 	second >>= (8 - bpcc);
 	third >>= (8 - bpcc);
-	fourth >>= (8 - bpcc);
 
-	return Color((Long) (first + Math::Pow(2, bpcc) * second + Math::Pow(4, bpcc) * third + Math::Pow(8, bpcc) * fourth));
+	return Color((Long) (first + Math::Pow(2, bpcc) * second + Math::Pow(4, bpcc) * third), colorSpace);
 }
 
-S::GUI::Color S::GUI::Color::UpsampleColor(Long col, Int bpcc)
+S::GUI::Color S::GUI::Color::Upsample(Int bpcc)
 {
-	if (bpcc == 8) return Color(col);
+	if (bpcc == 8) return *this;
 
-	int first = col & (int) (Math::Pow(2, bpcc) - 1);
-	int second = (col >> bpcc) & (int) (Math::Pow(2, bpcc) - 1);
-	int third = (col >> (2 * bpcc)) & (int) (Math::Pow(2, bpcc) - 1);
-	int fourth = (col >> (3 * bpcc)) & (int) (Math::Pow(2, bpcc) - 1);
+	int first = color & (int) (Math::Pow(2, bpcc) - 1);
+	int second = (color >> bpcc) & (int) (Math::Pow(2, bpcc) - 1);
+	int third = (color >> (2 * bpcc)) & (int) (Math::Pow(2, bpcc) - 1);
 
 	first = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) first);
 	second = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) second);
 	third = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) third);
-	fourth = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) fourth);
 
-	return Color(first, second, third, fourth);
+	return Color(first, second, third, colorSpace);
 }

@@ -150,7 +150,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 				}
 				else
 				{
-					shadowColor	= Color::Average(Setup::DividerDarkColor, Setup::BackgroundColor);
+					shadowColor	= Setup::DividerDarkColor.Average(Setup::BackgroundColor);
 					dotColor	= Setup::GrayTextColor;
 				}
 

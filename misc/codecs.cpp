@@ -121,7 +121,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 
 	switch (ior.colorspace)
 	{
-		case RGB:
+		case RGBA:
 		case YUV:
 		case HSV:
 		case CMY:
@@ -144,7 +144,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 
 	for (x = 0; x < ior.sizex; x++)
 	{
-		line[x] = Color::DownsampleColor(Color::ConvertColor(ior.bmp.GetPixel(x, y), RGB, ior.colorspace), ior.bpcc);
+		line[x] = Color(ior.bmp.GetPixel(x, y)).ConvertTo(ior.colorspace).Downsample(ior.bpcc);
 	}
 
 	switch (ior.compression)
@@ -392,7 +392,7 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 
 	switch (ior.colorspace)
 	{
-		case RGB:
+		case RGBA:
 		case YUV:
 		case HSV:
 		case CMY:
@@ -584,7 +584,7 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 
 	for (x = 0; x < ior.sizex; x++)
 	{
-		ior.bmp.SetPixel(x, y, Color::ConvertColor(Color::UpsampleColor(line[x], ior.bpcc), ior.colorspace, RGB));
+		ior.bmp.SetPixel(x, y, Color(line[x], ior.colorspace).Upsample(ior.bpcc).ConvertTo(RGBA));
 	}
 
 	delete [] line;

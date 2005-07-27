@@ -39,7 +39,7 @@ Test::Test()
 	menu_dialogs->AddEntry("File chooser...");
 	menu_dialogs->AddEntry("Directory chooser...");
 	menu_dialogs->AddEntry();
-	menu_dialogs->AddEntry("Color selector...");
+	menu_dialogs->AddEntry("Color selector...")->onClick.Connect(&Test::ColorDlg, this);
 
 	mainWnd_menubar->AddEntry("File", NIL, menu_file);
 	mainWnd_menubar->AddEntry("Dialogs", NIL, menu_dialogs);
@@ -63,4 +63,14 @@ Test::~Test()
 	DeleteObject(mainWnd_statusbar);
 	DeleteObject(mainWnd_titlebar);
 	DeleteObject(mainWnd);
+}
+
+Void Test::ColorDlg()
+{
+	ColorSelection	*dialog = new ColorSelection();
+
+	dialog->SetParentWindow(mainWnd);
+	dialog->ShowDialog();
+
+	DeleteObject(dialog);
 }

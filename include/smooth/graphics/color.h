@@ -25,44 +25,42 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 RGB		= 0;	// Red, Green, Blue
-		const Int	 HSV		= 1;	// Hue, Saturation, Value
-		const Int	 YUV		= 2;	// Value, Blue, Red
-		const Int	 CMY		= 3;	// Cyan, Magenta, Yellow (subtractive)
-		const Int	 CMYK		= 4;	// Cyan, Magenta, Yellow, Black
-		const Int	 CIELAB		= 5;	// Lightness, Red/Green, Yellow/Blue
-		const Int	 COLORFORGE	= 6;	// Saturation, Red->Green, (Red->Green)->Blue
-		const Int	 GRAY		= 7;	// Black
-		const Int 	 HIFI		= 8;	// High fidelity images (Cyan, Magenty, Yellow, Red, Green, Blue, Black)
-		const Int	 ACMY		= 9;	// Cyan, Magenta, Yellow (additive)
+		const Int	 RGBA	= 0;	// Red, Green, Blue, Alpha
+		const Int	 HSV	= 1;	// Hue, Saturation, Value
+		const Int	 YUV	= 2;	// Value, Blue, Red
+		const Int	 CMY	= 3;	// Cyan, Magenta, Yellow (subtractive)
+		const Int	 CMYK	= 4;	// Cyan, Magenta, Yellow, Black
+		const Int	 GRAY	= 5;	// Black
 
 		class SMOOTHAPI Color
 		{
 			protected:
+				Int		 colorSpace;
 				Long		 color;
 			public:
 						 Color();
 						 Color(const Color &);
-						 Color(Long);
-						 Color(Int, Int, Int, Int = 0);
+						 Color(Long, Int = RGBA);
+						 Color(Int, Int, Int, Int = RGBA);
 
 				Int		 GetRed()					{ return color & 255; }
 				Int		 GetGreen()					{ return (color >> 8) & 255; }
 				Int		 GetBlue()					{ return (color >> 16) & 255; }
 				Int		 GetAlpha()					{ return (color >> 24) & 255; }
 
-				Void		 SetColor(Long nColor)				{ color = nColor; }
-				Void		 SetColor(Int r, Int g, Int b, Int a = 0)	{ color = r + g * 256 + b * 65536 + a * 16777216; }
+				Void		 SetColor(Long nColor, Int nColorSpace = RGBA)	{ color = nColor; colorSpace = nColorSpace; }
+				Void		 SetColor(Int r, Int g, Int b, Int c = RGBA)	{ color = r + g * 256 + b * 65536; colorSpace = c; }
+
+				Color		 ConvertTo(Int);
+				Color		 Grayscale()					{ return Color(ConvertTo(GRAY), ConvertTo(GRAY), ConvertTo(GRAY)); }
+
+				Color		 Average(Color color2)				{ return Color((GetRed() + color2.GetRed()) / 2, (GetGreen() + color2.GetGreen()) / 2, (GetBlue() + color2.GetBlue()) / 2, (GetAlpha() + color2.GetAlpha()) / 2); }
+
+				Color		 Downsample(Int);
+				Color		 Upsample(Int);
 
 				Color &operator	 =(const Long nColor)				{ SetColor(nColor); return *this; }
 				operator	 Long() const					{ return color; }
-
-				static Color	 ConvertColor(Long, Int, Int);
-
-				static Color	 Average(Color, Color);
-
-				static Color	 DownsampleColor(Long, Int);
-				static Color	 UpsampleColor(Long, Int);
 		};
 	};
 };

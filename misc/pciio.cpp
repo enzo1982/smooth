@@ -24,16 +24,12 @@ S::String	 cpNames[5];
 
 PCIIO::PCIIO(const S::GUI::Bitmap &b)
 {
-	cfNames[RGB]		= "RGB";
+	cfNames[RGBA]		= "RGB";
 	cfNames[HSV]		= "HSV";
 	cfNames[YUV]		= "YUV";
 	cfNames[CMY]		= "CMY";
 	cfNames[CMYK]		= "CMK";
-	cfNames[CIELAB]		= "LAB";
-	cfNames[COLORFORGE]	= "FRG";
 	cfNames[GRAY]		= "GRY";
-	cfNames[HIFI]		= "HFI";
-	cfNames[ACMY]		= "ACM";
 
 	cpNames[RAW]		= "RAW";
 	cpNames[PCI]		= "PCI";
@@ -44,7 +40,7 @@ PCIIO::PCIIO(const S::GUI::Bitmap &b)
 	majorversion = PCIMajorVersion;
 	minorversion = PCIMinorVersion;
 	compression = RAW;
-	colorspace = RGB;
+	colorspace = RGBA;
 	quality = 100;
 	description = NIL;
 
@@ -64,16 +60,12 @@ PCIIO::PCIIO(const S::GUI::Bitmap &b)
 
 PCIIO::PCIIO()
 {
-	cfNames[RGB]		= "RGB";
+	cfNames[RGBA]		= "RGB";
 	cfNames[HSV]		= "HSV";
 	cfNames[YUV]		= "YUV";
 	cfNames[CMY]		= "CMY";
 	cfNames[CMYK]		= "CMK";
-	cfNames[CIELAB]		= "LAB";
-	cfNames[COLORFORGE]	= "FRG";
 	cfNames[GRAY]		= "GRY";
-	cfNames[HIFI]		= "HFI";
-	cfNames[ACMY]		= "ACM";
 
 	cpNames[RAW]		= "RAW";
 	cpNames[PCI]		= "PCI";

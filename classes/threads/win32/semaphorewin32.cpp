@@ -10,6 +10,13 @@
 
 #include <smooth/threads/win32/semaphorewin32.h>
 
+S::Threads::SemaphoreBackend *CreateSemaphoreWin32(S::Void *iSemaphore)
+{
+	return new S::Threads::SemaphoreWin32(iSemaphore);
+}
+
+S::Int	 semaphoreWin32Tmp = S::Threads::SemaphoreBackend::AddBackend(&CreateSemaphoreWin32);
+
 S::Threads::SemaphoreWin32::SemaphoreWin32(Void *iSemaphore)
 {
 	type = SEMAPHORE_WIN32;

@@ -10,6 +10,13 @@
 
 #include <smooth/threads/sdl/semaphoresdl.h>
 
+S::Threads::SemaphoreBackend *CreateSemaphoreSDL(S::Void *iSemaphore)
+{
+	return new S::Threads::SemaphoreSDL(iSemaphore);
+}
+
+S::Int	 semaphoreSDLTmp = S::Threads::SemaphoreBackend::AddBackend(&CreateSemaphoreSDL);
+
 S::Threads::SemaphoreSDL::SemaphoreSDL(Void *iSemaphore)
 {
 	type = SEMAPHORE_SDL;

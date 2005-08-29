@@ -10,6 +10,13 @@
 
 #include <smooth/threads/posix/mutexposix.h>
 
+S::Threads::MutexBackend *CreateMutexPOSIX(S::Void *iMutex)
+{
+	return new S::Threads::MutexPOSIX(iMutex);
+}
+
+S::Int	 mutexPOSIXTmp = S::Threads::MutexBackend::AddBackend(&CreateMutexPOSIX);
+
 S::Threads::MutexPOSIX::MutexPOSIX(Void *iMutex)
 {
 	type = MUTEX_POSIX;

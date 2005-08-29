@@ -10,6 +10,13 @@
 
 #include <smooth/threads/sdl/threadsdl.h>
 
+S::Threads::ThreadBackend *CreateThreadSDL(S::Void *iThread)
+{
+	return new S::Threads::ThreadSDL(iThread);
+}
+
+S::Int	 threadSDLTmp = S::Threads::ThreadBackend::AddBackend(&CreateThreadSDL);
+
 S::Threads::ThreadSDL::ThreadSDL(Void *iThread)
 {
 	type = THREAD_SDL;

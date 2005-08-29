@@ -9,22 +9,13 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/threads/semaphore.h>
-
-#ifdef __WIN32__
-#include <smooth/threads/win32/semaphorewin32.h>
-#else
-#include <smooth/threads/posix/semaphoreposix.h>
-#endif
+#include <smooth/threads/semaphorebackend.h>
 
 const S::Int	 S::Threads::Semaphore::classID = S::Object::RequestClassID();
 
 S::Threads::Semaphore::Semaphore(Void *iSemaphore)
 {
-#ifdef __WIN32__
-	backend = new SemaphoreWin32(iSemaphore);
-#else
-	backend = new SemaphorePOSIX(iSemaphore);
-#endif
+	backend = SemaphoreBackend::CreateBackendInstance(iSemaphore);
 
 	type = classID;
 }

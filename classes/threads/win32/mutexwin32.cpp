@@ -10,6 +10,13 @@
 
 #include <smooth/threads/win32/mutexwin32.h>
 
+S::Threads::MutexBackend *CreateMutexWin32(S::Void *iMutex)
+{
+	return new S::Threads::MutexWin32(iMutex);
+}
+
+S::Int	 mutexWin32Tmp = S::Threads::MutexBackend::AddBackend(&CreateMutexWin32);
+
 S::Threads::MutexWin32::MutexWin32(Void *iMutex)
 {
 	type = MUTEX_WIN32;

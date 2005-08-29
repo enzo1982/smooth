@@ -97,8 +97,7 @@ Translator::Translator()
 	size.cx = 777 - pos.x - 13;
 	size.cy = 60;
 
-	edit_original	= new EditBox("", pos, size, 0);
-	edit_original->SetFlags(EDB_MULTILINE);
+	edit_original	= new MultiEdit("", pos, size, 0);
 	edit_original->SetOrientation(OR_LOWERLEFT);
 
 	pos.x -= 62;
@@ -110,8 +109,7 @@ Translator::Translator()
 	pos.x += 62;
 	pos.y += 3;
 
-	edit_translated	= new EditBox("", pos, size, 0);
-	edit_translated->SetFlags(EDB_MULTILINE);
+	edit_translated	= new MultiEdit("", pos, size, 0);
 	edit_translated->SetOrientation(OR_LOWERLEFT);
 
 	menu_file	= new Menu();

@@ -29,18 +29,24 @@ namespace smooth
 
 		class MutexBackend
 		{
+			private:
+				static Array<MutexBackend *(*)(Void *)>	*backend_creators;
 			protected:
-				Int		 type;
+				Int					 type;
 			public:
-						 MutexBackend(Void * = NIL);
-				virtual		~MutexBackend();
+				static Int				 AddBackend(MutexBackend *(*)(Void *));
 
-				Int		 GetMutexType();
+				static MutexBackend			*CreateBackendInstance(Void * = NIL);
 
-				virtual Void	*GetSystemMutex();
+									 MutexBackend(Void * = NIL);
+				virtual					~MutexBackend();
 
-				virtual Int	 Lock();
-				virtual Int	 Release();
+				Int					 GetMutexType();
+
+				virtual Void				*GetSystemMutex();
+
+				virtual Int				 Lock();
+				virtual Int				 Release();
 		};
 	};
 };

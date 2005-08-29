@@ -10,6 +10,32 @@
 
 #include <smooth/threads/mutexbackend.h>
 
+S::Threads::MutexBackend *CreateMutexBackend(S::Void *iMutex)
+{
+	return new S::Threads::MutexBackend(iMutex);
+}
+
+S::Int	 mutexBackendTmp = S::Threads::MutexBackend::AddBackend(&CreateMutexBackend);
+
+S::Array<S::Threads::MutexBackend *(*)(S::Void *)>	*S::Threads::MutexBackend::backend_creators = NIL;
+
+S::Int S::Threads::MutexBackend::AddBackend(MutexBackend *(*backend)(Void *))
+{
+	if (backend == NIL) return Failure;
+
+	if (backend_creators == NIL) backend_creators = new Array<MutexBackend *(*)(Void *)>;
+
+	backend_creators->AddEntry(backend);
+
+	return Success;
+}
+
+S::Threads::MutexBackend *S::Threads::MutexBackend::CreateBackendInstance(Void *iMutex)
+{
+	if (backend_creators->GetFirstEntry() != &CreateMutexBackend)	return backend_creators->GetFirstEntry()(iMutex);
+	else								return backend_creators->GetLastEntry()(iMutex);
+}
+
 S::Threads::MutexBackend::MutexBackend(Void *iMutex)
 {
 	type = MUTEX_NONE;

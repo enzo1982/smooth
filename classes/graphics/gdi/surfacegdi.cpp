@@ -64,13 +64,18 @@ S::Int S::GUI::SurfaceGDI::PaintRect(Rect pRect)
 {
 	if (painting) return Failure;
 
-	if (gdi_dc != NIL) BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, bmp_dc, pRect.left, pRect.top, SRCCOPY);
+	if (gdi_dc != NIL)
+	{
+		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, bmp_dc, pRect.left, pRect.top, SRCCOPY);
+	}
 
 	return Success;
 }
 
 S::Int S::GUI::SurfaceGDI::StartPaint(Rect pRect)
 {
+	pRect = TranslateRect(pRect);
+
 	if (paintRect.left == -1 && paintRect.top == -1 && paintRect.right == -1 && paintRect.bottom == -1)
 	{
 		paintRect = pRect;

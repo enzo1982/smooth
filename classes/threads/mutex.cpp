@@ -9,22 +9,13 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/threads/mutex.h>
-
-#ifdef __WIN32__
-#include <smooth/threads/win32/mutexwin32.h>
-#else
-#include <smooth/threads/posix/mutexposix.h>
-#endif
+#include <smooth/threads/mutexbackend.h>
 
 const S::Int	 S::Threads::Mutex::classID = S::Object::RequestClassID();
 
 S::Threads::Mutex::Mutex(Void *iMutex)
 {
-#ifdef __WIN32__
-	backend = new MutexWin32(iMutex);
-#else
-	backend = new MutexPOSIX(iMutex);
-#endif
+	backend = MutexBackend::CreateBackendInstance(iMutex);
 
 	type = classID;
 }

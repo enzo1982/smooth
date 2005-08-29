@@ -10,6 +10,32 @@
 
 #include <smooth/threads/threadbackend.h>
 
+S::Threads::ThreadBackend *CreateThreadBackend(S::Void *iThread)
+{
+	return new S::Threads::ThreadBackend(iThread);
+}
+
+S::Int	 threadBackendTmp = S::Threads::ThreadBackend::AddBackend(&CreateThreadBackend);
+
+S::Array<S::Threads::ThreadBackend *(*)(S::Void *)>	*S::Threads::ThreadBackend::backend_creators = NIL;
+
+S::Int S::Threads::ThreadBackend::AddBackend(ThreadBackend *(*backend)(Void *))
+{
+	if (backend == NIL) return Failure;
+
+	if (backend_creators == NIL) backend_creators = new Array<ThreadBackend *(*)(Void *)>;
+
+	backend_creators->AddEntry(backend);
+
+	return Success;
+}
+
+S::Threads::ThreadBackend *S::Threads::ThreadBackend::CreateBackendInstance(Void *iThread)
+{
+	if (backend_creators->GetFirstEntry() != &CreateThreadBackend)	return backend_creators->GetFirstEntry()(iThread);
+	else								return backend_creators->GetLastEntry()(iThread);
+}
+
 S::Threads::ThreadBackend::ThreadBackend(Void *iThread)
 {
 	type = THREAD_NONE;

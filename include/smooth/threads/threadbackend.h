@@ -29,23 +29,29 @@ namespace smooth
 
 		class ThreadBackend
 		{
+			private:
+				static Array<ThreadBackend *(*)(Void *)>	*backend_creators;
 			protected:
-				Int		 type;
+				Int						 type;
 			public:
-						 ThreadBackend(Void * = NIL);
-				virtual		~ThreadBackend();
+				static Int					 AddBackend(ThreadBackend *(*)(Void *));
 
-				Int		 GetThreadType();
+				static ThreadBackend				*CreateBackendInstance(Void * = NIL);
 
-				virtual Void	*GetSystemThread();
+										 ThreadBackend(Void * = NIL);
+				virtual						~ThreadBackend();
 
-				virtual Int	 GetThreadID();
+				Int						 GetThreadType();
 
-				virtual Int	 Start(Void (*)(Void *), Void *);
-				virtual Int	 Stop();
+				virtual Void					*GetSystemThread();
 
-				virtual Void	 Exit();
-				virtual Void	*Self();
+				virtual Int					 GetThreadID();
+
+				virtual Int					 Start(Void (*)(Void *), Void *);
+				virtual Int					 Stop();
+
+				virtual Void					 Exit();
+				virtual Void					*Self();
 		};
 	};
 };

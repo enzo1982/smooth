@@ -39,13 +39,12 @@ ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point iPos, Size iSize)
 
 ActiveAreaPlugin::~ActiveAreaPlugin()
 {
-	if (registered && container != NIL) container->UnregisterObject(this);
 }
 
 Int ActiveAreaPlugin::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!IsRegistered())	return Failure;
+	if (!IsVisible())	return Success;
 
 	Window	*window		= container->GetContainerWindow();
 
@@ -62,7 +61,7 @@ Int ActiveAreaPlugin::Paint(Int message)
 
 Int ActiveAreaPlugin::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
+	if (!IsRegistered())		return Failure;
 	if (!active || !visible)	return Success;
 
 	Window	*window		= container->GetContainerWindow();

@@ -81,6 +81,8 @@ S::Int S::GUI::SurfaceXLib::PaintRect(Rect pRect)
 
 S::Int S::GUI::SurfaceXLib::StartPaint(Rect pRect)
 {
+	pRect = TranslateRect(pRect);
+
 	if (paintRect.left == -1 && paintRect.top == -1 && paintRect.right == -1 && paintRect.bottom == -1)
 	{
 		paintRect = pRect;

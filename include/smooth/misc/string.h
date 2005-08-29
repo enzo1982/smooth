@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,6 +16,11 @@
 namespace smooth
 {
 	class String;
+
+	namespace Threads
+	{
+		class MutexBackend;
+	};
 };
 
 #include "../array.h"
@@ -25,6 +30,8 @@ namespace smooth
 	class SMOOTHAPI String
 	{
 		private:
+			Threads::MutexBackend	*mutex;
+
 			wchar_t			*wString;
 			mutable Int		 stringSize;
 

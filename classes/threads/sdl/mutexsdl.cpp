@@ -10,6 +10,13 @@
 
 #include <smooth/threads/sdl/mutexsdl.h>
 
+S::Threads::MutexBackend *CreateMutexSDL(S::Void *iMutex)
+{
+	return new S::Threads::MutexSDL(iMutex);
+}
+
+S::Int	 mutexSDLTmp = S::Threads::MutexBackend::AddBackend(&CreateMutexSDL);
+
 S::Threads::MutexSDL::MutexSDL(Void *iMutex)
 {
 	type = MUTEX_SDL;

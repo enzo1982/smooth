@@ -9,13 +9,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/threads/thread.h>
+#include <smooth/threads/threadbackend.h>
 #include <smooth/loop.h>
-
-#ifdef __WIN32__
-#include <smooth/threads/win32/threadwin32.h>
-#else
-#include <smooth/threads/posix/threadposix.h>
-#endif
 
 S::Void ThreadProcCaller(S::Threads::Thread *);
 
@@ -23,11 +18,7 @@ const S::Int	 S::Threads::Thread::classID = S::Object::RequestClassID();
 
 S::Threads::Thread::Thread(Void *iThread)
 {
-#ifdef __WIN32__
-	backend = new ThreadWin32(iThread);
-#else
-	backend = new ThreadPOSIX(iThread);
-#endif
+	backend = ThreadBackend::CreateBackendInstance(iThread);
 
 	type	= classID;
 	status	= THREAD_CREATED;

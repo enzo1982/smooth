@@ -29,18 +29,24 @@ namespace smooth
 
 		class SemaphoreBackend
 		{
+			private:
+				static Array<SemaphoreBackend *(*)(Void *)>	*backend_creators;
 			protected:
-				Int		 type;
+				Int						 type;
 			public:
-						 SemaphoreBackend(Void * = NIL);
-				virtual		~SemaphoreBackend();
+				static Int					 AddBackend(SemaphoreBackend *(*)(Void *));
 
-				Int		 GetSemaphoreType();
+				static SemaphoreBackend				*CreateBackendInstance(Void * = NIL);
 
-				virtual Void	*GetSystemSemaphore();
+										 SemaphoreBackend(Void * = NIL);
+				virtual						~SemaphoreBackend();
 
-				virtual Int	 Wait();
-				virtual Int	 Release();
+				Int						 GetSemaphoreType();
+
+				virtual Void					*GetSystemSemaphore();
+
+				virtual Int					 Wait();
+				virtual Int					 Release();
 		};
 	};
 };

@@ -10,6 +10,13 @@
 
 #include <smooth/threads/win32/threadwin32.h>
 
+S::Threads::ThreadBackend *CreateThreadWin32(S::Void *iThread)
+{
+	return new S::Threads::ThreadWin32(iThread);
+}
+
+S::Int	 threadWin32Tmp = S::Threads::ThreadBackend::AddBackend(&CreateThreadWin32);
+
 S::Threads::ThreadWin32::ThreadWin32(Void *iThread)
 {
 	type = THREAD_WIN32;

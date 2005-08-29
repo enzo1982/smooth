@@ -41,9 +41,9 @@ class Translator : public Application
 		Text			*text_id;
 		EditBox			*edit_id;
 		Text			*text_original;
-		EditBox			*edit_original;
+		MultiEdit		*edit_original;
 		Text			*text_translated;
-		EditBox			*edit_translated;
+		MultiEdit		*edit_translated;
 		Button			*button_save;
 		Button			*button_remove;
 		ListBox			*list_entries;

@@ -98,6 +98,7 @@
 #include "smooth/gui/widgets/basic/groupbox.h"
 #include "smooth/gui/widgets/basic/hyperlink.h"
 #include "smooth/gui/widgets/basic/image.h"
+#include "smooth/gui/widgets/basic/multiedit.h"
 #include "smooth/gui/widgets/basic/optionbox.h"
 #include "smooth/gui/widgets/basic/progressbar.h"
 #include "smooth/gui/widgets/basic/scrollbar.h"

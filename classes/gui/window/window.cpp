@@ -767,7 +767,14 @@ S::Int S::GUI::Window::Paint(Int message)
 	}
 	else
 	{
+		Bool	 preRTL = Setup::rightToLeft;
+
+		Setup::rightToLeft = False;
+
 		surface->StartPaint(updateRect);
+
+		Setup::rightToLeft = preRTL;
+
 		surface->Box(updateRect, Setup::BackgroundColor, FILLED);
 
 		Widget	*lastWidget = NIL;
@@ -1166,7 +1173,13 @@ S::Void S::GUI::Window::PaintTimer()
 
 	Surface	*surface = GetDrawSurface();
 
+	Bool	 preRTL = Setup::rightToLeft;
+
+	Setup::rightToLeft = False;
+
 	surface->StartPaint(timedUpdateRect);
+
+	Setup::rightToLeft = preRTL;
 
 	for (Int j = 0; j < GetNOfObjects(); j++)
 	{

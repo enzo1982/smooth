@@ -10,6 +10,13 @@
 
 #include <smooth/threads/posix/semaphoreposix.h>
 
+S::Threads::SemaphoreBackend *CreateSemaphorePOSIX(S::Void *iSemaphore)
+{
+	return new S::Threads::SemaphorePOSIX(iSemaphore);
+}
+
+S::Int	 semaphorePOSIXTmp = S::Threads::SemaphoreBackend::AddBackend(&CreateSemaphorePOSIX);
+
 S::Threads::SemaphorePOSIX::SemaphorePOSIX(Void *iSemaphore)
 {
 	type = SEMAPHORE_POSIX;

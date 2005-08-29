@@ -19,6 +19,7 @@
 #ifndef _H_IOLIB_OUTSTREAM_
 #define _H_IOLIB_OUTSTREAM_
 
+class InStream;
 class OutStream;
 
 #include "iolib-cxx.h"

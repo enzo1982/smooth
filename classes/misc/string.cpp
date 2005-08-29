@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,6 +14,12 @@
 #include <iconv.h>
 #include <memory.h>
 #include <iolib-cxx.h>
+
+#ifdef __WIN32__
+#include <smooth/threads/win32/mutexwin32.h>
+#else
+#include <smooth/threads/posix/mutexposix.h>
+#endif
 
 namespace smooth
 {
@@ -32,24 +38,52 @@ S::Bool	 S::String::crc32_initialized = False;
 
 S::String::String()
 {
+#ifdef __WIN32__
+	mutex = new Threads::MutexWin32(NIL);
+#else
+	mutex = new Threads::MutexPOSIX(NIL);
+#endif
+
+	mutex->Lock();
+
 	nOfStrings++;
 
 	wString = NIL;
 
 	Clean();
+
+	mutex->Release();
 }
 
 S::String::String(const int nil)
 {
+#ifdef __WIN32__
+	mutex = new Threads::MutexWin32(NIL);
+#else
+	mutex = new Threads::MutexPOSIX(NIL);
+#endif
+
+	mutex->Lock();
+
 	nOfStrings++;
 
 	wString = NIL;
 
 	Clean();
+
+	mutex->Release();
 }
 
 S::String::String(const char *iString)
 {
+#ifdef __WIN32__
+	mutex = new Threads::MutexWin32(NIL);
+#else
+	mutex = new Threads::MutexPOSIX(NIL);
+#endif
+
+	mutex->Lock();
+
 	nOfStrings++;
 
 	if (iString == NIL)
@@ -66,10 +100,20 @@ S::String::String(const char *iString)
 
 		ImportFrom(inputFormat, iString);
 	}
+
+	mutex->Release();
 }
 
 S::String::String(const wchar_t *iString)
 {
+#ifdef __WIN32__
+	mutex = new Threads::MutexWin32(NIL);
+#else
+	mutex = new Threads::MutexPOSIX(NIL);
+#endif
+
+	mutex->Lock();
+
 	nOfStrings++;
 
 	if (iString == NIL)
@@ -88,10 +132,20 @@ S::String::String(const wchar_t *iString)
 
 		stringSize = size;
 	}
+
+	mutex->Release();
 }
 
 S::String::String(const String &iString)
 {
+#ifdef __WIN32__
+	mutex = new Threads::MutexWin32(NIL);
+#else
+	mutex = new Threads::MutexPOSIX(NIL);
+#endif
+
+	mutex->Lock();
+
 	nOfStrings++;
 
 	if (iString.wString == NIL)
@@ -108,10 +162,14 @@ S::String::String(const String &iString)
 
 		stringSize = iString.stringSize;
 	}
+
+	mutex->Release();
 }
 
 S::String::~String()
 {
+	mutex->Lock();
+
 	Clean();
 
 	if (--nOfStrings == 0)
@@ -120,6 +178,10 @@ S::String::~String()
 
 		allocatedBuffers.RemoveAll();
 	}
+
+	mutex->Release();
+
+	delete mutex;
 }
 
 S::Void S::String::DeleteTemporaryBuffers()
@@ -136,11 +198,15 @@ S::Void S::String::DeleteTemporaryBuffers()
 
 S::Void S::String::Clean()
 {
+	mutex->Lock();
+
 	stringSize = 0;
 
 	if (wString != NIL) delete [] wString;
 
 	wString = NIL;
+
+	mutex->Release();
 }
 
 S::Void S::String::CRC32_InitTable()
@@ -177,11 +243,15 @@ S::Int S::String::ComputeCRC32()
 {
 	if (!crc32_initialized) CRC32_InitTable();
 
+	mutex->Lock();
+
 	UnsignedLong	 ulCRC(0xffffffff);
 	Int		 len = Length() * sizeof(wchar_t);
 	unsigned char	*buffer = (unsigned char *) wString;
 
 	while (len--) ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer++];
+
+	mutex->Release();
 
 	return ulCRC ^ 0xffffffff;
 }
@@ -276,6 +346,8 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	size = size / 2 + 1;
 
+	mutex->Lock();
+
 	wString = new wchar_t [size];
 
 	ConvertString(str, len, format, (char *) wString, size * 2, "UTF-16LE");
@@ -283,6 +355,8 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 	wString[size - 1] = 0;
 
 	stringSize = size;
+
+	mutex->Release();
 
 	return Success;
 }
@@ -327,6 +401,8 @@ wchar_t &S::String::operator [](int n)
 
 	if (n >= stringSize - 1)
 	{
+		mutex->Lock();
+
 		if (stringSize > 0)
 		{
 			wBuffer = new wchar_t [stringSize];
@@ -370,6 +446,8 @@ wchar_t &S::String::operator [](int n)
 		}
 
 		wString[n] = 0;
+
+		mutex->Release();
 	}
 
 	return wString[n];
@@ -423,15 +501,19 @@ S::String &S::String::operator =(const wchar_t *newString)
 	}
 	else
 	{
-		Clean();
-
 		Int	 size = wcslen(newString) + 1;
+
+		mutex->Lock();
+
+		Clean();
 
 		wString = new wchar_t [size];
 
 		wcsncpy(wString, newString, size);
 
 		stringSize = size;
+
+		mutex->Release();
 	}
 
 	return *this;
@@ -447,6 +529,8 @@ S::String &S::String::operator =(const String &newString)
 	{
 		String	 backup(newString);
 
+		mutex->Lock();
+
 		Clean();
 
 		wString = new wchar_t [backup.stringSize];
@@ -454,6 +538,8 @@ S::String &S::String::operator =(const String &newString)
 		wcsncpy(wString, backup.wString, backup.stringSize);
 
 		stringSize = backup.stringSize;
+
+		mutex->Release();
 	}
 
 	return *this;
@@ -543,6 +629,8 @@ S::Int S::String::Length() const
 {
 	if (stringSize == 0) return 0;
 
+	mutex->Lock();
+
 	stringSize = 0;
 
 	for (Int i = 0; i >= 0; i++)
@@ -551,6 +639,8 @@ S::Int S::String::Length() const
 
 		if (wString[i] == 0) break;
 	}
+
+	mutex->Release();
 
 	return stringSize - 1;
 }
@@ -576,6 +666,8 @@ S::String &S::String::Append(const String &str)
 
 	wchar_t	*composed = new wchar_t [len1 + len2 + 1];
 
+	mutex->Lock();
+
 	for (Int i = 0; i < (len1 + len2 + 1); i++)
 	{
 		composed[i] = 0;
@@ -592,6 +684,8 @@ S::String &S::String::Append(const String &str)
 	}
 
 	*this = composed;
+
+	mutex->Release();
 
 	delete [] composed;
 
@@ -616,6 +710,8 @@ S::Int S::String::Find(const String &str)
 {
 	String	 bStr(str);
 
+	mutex->Lock();
+
 	for (Int i = 0; i <= Length() - bStr.Length(); i++)
 	{
 		Bool	 foundString = True;
@@ -629,8 +725,10 @@ S::Int S::String::Find(const String &str)
 			}
 		}
 
-		if (foundString) return i;
+		if (foundString) { mutex->Release(); return i; }
 	}
+
+	mutex->Release();
 
 	return -1;
 }
@@ -671,6 +769,8 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 	String	 bStr2(str2);
 
 	if (bStr1 == NIL) return *this;
+
+	mutex->Lock();
 
 	for (Int i = 0; i <= Length() - bStr1.Length(); i++)
 	{
@@ -727,6 +827,8 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 		}
 	}
 
+	mutex->Release();
+
 	return *this;
 }
 
@@ -769,12 +871,16 @@ S::String &S::String::CopyN(const String &str, const Int n)
 {
 	String	 backup(str);
 
+	mutex->Lock();
+
 	Clean();
 
 	for (Int i = n - 1; i >= 0; i--)
 	{
 		(*this)[i] = backup[i];
 	}
+
+	mutex->Release();
 
 	return *this;
 }
@@ -804,10 +910,14 @@ S::Int S::String::Compare(const String &str)
 	}
 	else
 	{
+		mutex->Lock();
+
 		for (Int i = 0; i <= len1; i++)
 		{
-			if (wString[i] != str.wString[i]) return 1;
+			if (wString[i] != str.wString[i]) { mutex->Release(); return 1; }
 		}
+
+		mutex->Release();
 	}
 
 	return 0;
@@ -831,32 +941,44 @@ S::Int S::String::CompareN(const String &str, Int n)
 {
 	if (Length() < n) return 1;
 
+	mutex->Lock();
+
 	for (Int i = 0; i < n; i++)
 	{
-		if (wString[i] != str.wString[i]) return 1;
+		if (wString[i] != str.wString[i]) { mutex->Release(); return 1; }
 	}
+
+	mutex->Release();
 
 	return 0;
 }
 
 S::String &S::String::Fill(const Int value)
 {
+	mutex->Lock();
+
 	for (Int i = 0; i < Length(); i++)
 	{
 		(*this)[i] = value;
 	}
+
+	mutex->Release();
 
 	return *this;
 }
 
 S::String &S::String::FillN(const Int value, const Int count)
 {
+	mutex->Lock();
+
 	Clean();
 
 	for (Int i = count - 1; i >= 0; i--)
 	{
 		(*this)[i] = value;
 	}
+
+	mutex->Release();
 
 	return *this;
 }
@@ -869,6 +991,8 @@ S::Int S::String::ToInt()
 	Int	 first = 0;
 	Int	 n = 0;
 	Int	 size = Length();
+
+	mutex->Lock();
 
 	for (Int i = size - 1; i >= 0; i--)
 	{
@@ -887,6 +1011,8 @@ S::Int S::String::ToInt()
 		n += (Int) Math::Pow(10l, size - (j - first) - 1) * (wString[j] - 48);
 	}
 
+	mutex->Release();
+
 	if (!neg)	return n;
 	else		return 0 - n;
 }
@@ -901,6 +1027,8 @@ S::Float S::String::ToFloat()
 	Int	 size = Length();
 	Int	 afpsize = 0;
 	Int	 firstafp = 0;
+
+	mutex->Lock();
 
 	for (Int i = size - 1; i >= 0; i--)
 	{
@@ -934,6 +1062,8 @@ S::Float S::String::ToFloat()
 	{
 		n += (Float) Math::Pow(10l, 0 - (k - firstafp) - 1) * (wString[k] - 48);
 	}
+
+	mutex->Release();
 
 	if (!neg)	return n;
 	else		return 0 - n;
@@ -1043,7 +1173,11 @@ S::String S::String::ToLower()
 {
 	String	 retVal;
 
+	mutex->Lock();
+
 	for (Int i = 0; i < Length(); i++) retVal[i] = towlower((*this)[i]);
+
+	mutex->Release();
 
 	return retVal;
 }
@@ -1052,7 +1186,11 @@ S::String S::String::ToUpper()
 {
 	String	 retVal;
 
+	mutex->Lock();
+
 	for (Int i = 0; i < Length(); i++) retVal[i] = towupper((*this)[i]);
+
+	mutex->Release();
 
 	return retVal;
 }

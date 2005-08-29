@@ -10,6 +10,13 @@
 
 #include <smooth/threads/posix/threadposix.h>
 
+S::Threads::ThreadBackend *CreateThreadPOSIX(S::Void *iThread)
+{
+	return new S::Threads::ThreadPOSIX(iThread);
+}
+
+S::Int	 threadPOSIXTmp = S::Threads::ThreadBackend::AddBackend(&CreateThreadPOSIX);
+
 S::Threads::ThreadPOSIX::ThreadPOSIX(Void *iThread)
 {
 	type = THREAD_POSIX;

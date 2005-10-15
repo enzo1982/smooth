@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,18 +9,16 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/activearea.h>
-#include <smooth/definitions.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/misc/math.h>
 #include <smooth/gui/widgets/layer.h>
 
 const S::Int	 S::GUI::ActiveArea::classID = S::Object::RequestClassID();
 
-S::GUI::ActiveArea::ActiveArea(Int color, Point iPos, Size iSize)
+S::GUI::ActiveArea::ActiveArea(const Color &iColor, const Point &iPos, const Size &iSize)
 {
 	type		= classID;
-	areaColor	= color;
+	areaColor	= iColor;
 
 	possibleContainers.AddEntry(Layer::classID);
 
@@ -63,16 +61,16 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 	return Success;
 }
 
-S::Int S::GUI::ActiveArea::SetColor(Int newColor)
+S::Int S::GUI::ActiveArea::SetColor(const Color &nColor)
 {
-	areaColor = newColor;
+	areaColor = nColor;
 
 	Paint(SP_PAINT);
 
 	return Success;
 }
 
-S::Int S::GUI::ActiveArea::GetColor()
+S::GUI::Color S::GUI::ActiveArea::GetColor()
 {
 	return areaColor;
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,6 +20,7 @@ namespace smooth
 };
 
 #include "../widget.h"
+#include "../../../graphics/color.h"
 
 namespace smooth
 {
@@ -28,17 +29,17 @@ namespace smooth
 		class SMOOTHAPI ActiveArea : public Widget
 		{
 			protected:
-				Int			 areaColor;
+				Color			 areaColor;
 			public:
 				static const Int	 classID;
 
-							 ActiveArea(Int, Point, Size);
+							 ActiveArea(const Color &, const Point &, const Size &);
 							~ActiveArea();
 
 				virtual Int		 Paint(Int);
 
-				Int			 SetColor(Int);
-				Int			 GetColor();
+				Int			 SetColor(const Color &);
+				Color			 GetColor();
 		};
 	};
 };

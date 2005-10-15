@@ -403,6 +403,11 @@ $(OBJECTDIR)/containertype.o: $(GUICLASSESDIR)/widgets/containertype.cpp $(SMOOT
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/containertype.cpp -o $(OBJECTDIR)/containertype.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/hotspot.o: $(GUICLASSESDIR)/widgets/hotspot.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/hotspot.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/hotspot.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/hotspot.cpp -o $(OBJECTDIR)/hotspot.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/layer.o: $(GUICLASSESDIR)/widgets/layer.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/layer.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/layer.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/layer.cpp -o $(OBJECTDIR)/layer.o
@@ -1008,14 +1013,14 @@ $(SAMPLE3DIR)/testkey.o: $(SAMPLE3DIR)/testkey.cpp $(DLLNAME)
 	$(COMPILER) $(EXECOMPILER_OPTS) $(SAMPLE3DIR)/testkey.cpp -o $(SAMPLE3DIR)/testkey.o
 	$(ECHO) done.
 
-$(SAMPLE4DIR)/plugintest.o: $(SAMPLE4DIR)/plugintest.cpp $(DLLNAME) $(SAMPLE4DLL)
-	$(ECHO) -n Compiling $(SAMPLE4DIR)/plugintest.cpp...
-	$(COMPILER) $(EXECOMPILER_OPTS) $(SAMPLE4DIR)/plugintest.cpp -o $(SAMPLE4DIR)/plugintest.o
+$(SAMPLE4DIR)/widgettest.o: $(SAMPLE4DIR)/widgettest.cpp $(DLLNAME) $(SAMPLE4DLL)
+	$(ECHO) -n Compiling $(SAMPLE4DIR)/widgettest.cpp...
+	$(COMPILER) $(EXECOMPILER_OPTS) $(SAMPLE4DIR)/widgettest.cpp -o $(SAMPLE4DIR)/widgettest.o
 	$(ECHO) done.
 
-$(SAMPLE4DIR)/plugin.o: $(SAMPLE4DIR)/plugin.cpp $(DLLNAME)
-	$(ECHO) -n Compiling $(SAMPLE4DIR)/plugin.cpp...
-	$(COMPILER) $(EXECOMPILER_OPTS) -D__SMOOTH_PLUGIN_DLL__ $(SAMPLE4DIR)/plugin.cpp -o $(SAMPLE4DIR)/plugin.o
+$(SAMPLE4DIR)/myactivearea.o: $(SAMPLE4DIR)/myactivearea.cpp $(DLLNAME)
+	$(ECHO) -n Compiling $(SAMPLE4DIR)/myactivearea.cpp...
+	$(COMPILER) $(EXECOMPILER_OPTS) -D__SMOOTH_PLUGIN_DLL__ $(SAMPLE4DIR)/myactivearea.cpp -o $(SAMPLE4DIR)/myactivearea.o
 	$(ECHO) done.
 
 $(SAMPLE5DIR)/mditest.o: $(SAMPLE5DIR)/mditest.cpp $(DLLNAME)

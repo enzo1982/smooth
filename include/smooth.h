@@ -85,6 +85,7 @@
 #include "smooth/gui/mdi/window.h"
 
 #include "smooth/gui/widgets/container.h"
+#include "smooth/gui/widgets/hotspot.h"
 #include "smooth/gui/widgets/layer.h"
 #include "smooth/gui/widgets/widget.h"
 

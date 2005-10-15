@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,14 +10,14 @@
 
 #include <smooth.h>
 #include <smooth/main.h>
-#include "plugin.h"
-#include "plugintest.h"
+#include "myactivearea.h"
+#include "widgettest.h"
 
 using namespace smooth::GUI::Dialogs;
 
 Int smooth::Main()
 {
-	PlugInTest	*app = new PlugInTest();
+	WidgetTest	*app = new WidgetTest();
 
 	Loop();
 
@@ -26,7 +26,7 @@ Int smooth::Main()
 	return 0;
 }
 
-PlugInTest::PlugInTest()
+WidgetTest::WidgetTest()
 {
 	Point	 pos;
 	Size	 size;
@@ -36,11 +36,11 @@ PlugInTest::PlugInTest()
 	size.cx	= 50;
 	size.cy	= 30;
 
-	wnd		= new Window("smooth plug-in test");
+	wnd		= new Window("smooth widget test");
 	layer		= new Layer();
 	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
-	activearea	= new ActiveAreaPlugin(RGB(255, 255, 128), pos, size);
-	activearea->onClick.Connect(&PlugInTest::activeAreaProc, this);
+	activearea	= new MyActiveArea(RGB(255, 255, 128), pos, size);
+	activearea->onClick.Connect(&WidgetTest::activeAreaProc, this);
 	
 	RegisterObject(wnd);
 
@@ -52,7 +52,7 @@ PlugInTest::PlugInTest()
 	wnd->SetMetrics(Point(200, 150), Size(250, 100));
 }
 
-PlugInTest::~PlugInTest()
+WidgetTest::~WidgetTest()
 {
 	layer->UnregisterObject(activearea);
 
@@ -67,7 +67,7 @@ PlugInTest::~PlugInTest()
 	delete layer;
 }
 
-Void PlugInTest::activeAreaProc()
+Void WidgetTest::activeAreaProc()
 {
-	QuickMessage("This is a smooth plug-in!", "Info", MB_OK, IDI_INFORMATION);
+	QuickMessage("This is a custom smooth widget!", "Info", MB_OK, IDI_INFORMATION);
 }

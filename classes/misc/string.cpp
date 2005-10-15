@@ -1299,6 +1299,17 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		delete in;
 		delete out;
 	}
+	else if ((strcmp(inEncoding, "UTF-16LE") == 0 && strcmp(outEncoding, "UTF-16BE") == 0) || (strcmp(inEncoding, "UTF-16BE") == 0 && strcmp(outEncoding, "UTF-16LE") == 0))
+	{
+		size = inBytes - 2;
+
+		if (size < outBytes && size > 0)
+		{
+			for (Int i = 0; i < size / 2; i++) ((wchar_t *) outBuffer)[i] = ((((wchar_t *) inBuffer)[i] & 255) << 8) | (((wchar_t *) inBuffer)[i] >> 8);
+		}
+
+		if (size >= outBytes) size = 0;
+	}
 #ifdef __WIN32__
 	else if (strcmp(outEncoding, "UTF-16LE") == 0)
 	{

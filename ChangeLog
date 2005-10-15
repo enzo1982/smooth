@@ -24,6 +24,7 @@ xx.xx.05 xx:xx - smooth alpha 0.8.67.0
 - console.cpp	- new class: System::Console; implements a simple console API
 - string.cpp	- added method: Find(String); returns the position of the given string (or -1)
 		- added methods: ToLower(), ToUpper()
+		- added native support for UTF-16BE encoding
 - color.cpp	- new class: Color; replaces old color.cpp
 
 - added a class for smart pointers

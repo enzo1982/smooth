@@ -8,42 +8,30 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_LAYER_
-#define _H_OBJSMOOTH_LAYER_
+#ifndef _H_OBJSMOOTH_HOTSPOT_
+#define _H_OBJSMOOTH_HOTSPOT_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class Layer;
+		class Hotspot;
 	};
 };
 
 #include "widget.h"
-#include "container.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI Layer : public Container
+		class SMOOTHAPI Hotspot : public Widget
 		{
 			public:
 				static const Int	 classID;
 
-							 Layer(String name = NIL);
-							~Layer();
-
-				Int			 Show();
-				Int			 Hide();
-
-				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
-
-				Int			 SetMetrics(Point, Size);
-
-				Int			 RegisterObject(Widget *);
-				Int			 UnregisterObject(Widget *);
+							 Hotspot(const Point &, const Size &);
+				virtual			~Hotspot();
 		};
 	};
 };

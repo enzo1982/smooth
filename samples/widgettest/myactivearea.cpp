@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,7 @@
 
 #include <smooth.h>
 #include <smooth/dll.h>
-#include "plugin.h"
+#include "myactivearea.h"
 
 Void smooth::AttachDLL()
 {
@@ -20,9 +20,9 @@ Void smooth::DetachDLL()
 {
 }
 
-const Int	 ActiveAreaPlugin::classID = Object::RequestClassID();
+const Int	 MyActiveArea::classID = Object::RequestClassID();
 
-ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point iPos, Size iSize)
+MyActiveArea::MyActiveArea(Int color, Point iPos, Size iSize)
 {
 	type		= classID;
 	areaColor	= color;
@@ -37,11 +37,11 @@ ActiveAreaPlugin::ActiveAreaPlugin(Int color, Point iPos, Size iSize)
 	size.cy	= Math::Round(size.cy * Setup::FontSize);
 }
 
-ActiveAreaPlugin::~ActiveAreaPlugin()
+MyActiveArea::~MyActiveArea()
 {
 }
 
-Int ActiveAreaPlugin::Paint(Int message)
+Int MyActiveArea::Paint(Int message)
 {
 	if (!IsRegistered())	return Failure;
 	if (!IsVisible())	return Success;
@@ -59,7 +59,7 @@ Int ActiveAreaPlugin::Paint(Int message)
 	return Success;
 }
 
-Int ActiveAreaPlugin::Process(Int message, Int wParam, Int lParam)
+Int MyActiveArea::Process(Int message, Int wParam, Int lParam)
 {
 	if (!IsRegistered())		return Failure;
 	if (!active || !visible)	return Success;

@@ -8,30 +8,20 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/graphics/form.h>
+#include <smooth/gui/widgets/hotspot.h>
 
-S::GUI::Form::Form()
+const S::Int	 S::GUI::Hotspot::classID = S::Object::RequestClassID();
+
+S::GUI::Hotspot::Hotspot(const Point &iPos, const Size &iSize)
 {
-	color = 0;
+	type		= classID;
+
+	possibleContainers.AddEntry(Widget::classID);
+
+	pos		= iPos;
+	size		= iSize;
 }
 
-S::GUI::Form::~Form()
+S::GUI::Hotspot::~Hotspot()
 {
-}
-
-S::Int S::GUI::Form::SetColor(UnsignedLong nColor)
-{
-	color = nColor;
-
-	return Success;
-}
-
-S::UnsignedLong S::GUI::Form::GetColor()
-{
-	return color;
-}
-
-S::Int S::GUI::Form::Draw(Surface *surface)
-{
-	return Success;
 }

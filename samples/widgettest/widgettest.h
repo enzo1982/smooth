@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,26 +8,26 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_PLUGINTEST_
-#define _H_PLUGINTEST_
+#ifndef _H_WIDGETTEST_
+#define _H_WIDGETTEST_
 
 #include <smooth.h>
-#include "plugin.h"
+#include "myactivearea.h"
 
 using namespace smooth;
 using namespace smooth::GUI;
 
-class PlugInTest : public Application
+class WidgetTest : public Application
 {
 	private:
-		Window			*wnd;
-		Layer			*layer;
-		Titlebar		*title;
-		ActiveAreaPlugin	*activearea;
+		Window		*wnd;
+		Layer		*layer;
+		Titlebar	*title;
+		MyActiveArea	*activearea;
 	public:
-					 PlugInTest();
-					~PlugInTest();
-		Void			 activeAreaProc();
+				 WidgetTest();
+				~WidgetTest();
+		Void		 activeAreaProc();
 };
 
 #endif

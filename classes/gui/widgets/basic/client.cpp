@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,8 +11,6 @@
 #include <smooth/gui/widgets/basic/client.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/basic/divider.h>
-#include <smooth/definitions.h>
-#include <smooth/loop.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/binary.h>
 

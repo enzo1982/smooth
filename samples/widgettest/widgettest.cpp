@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -36,11 +36,11 @@ WidgetTest::WidgetTest()
 	size.cx	= 50;
 	size.cy	= 30;
 
-	wnd		= new Window("smooth widget test");
+	wnd		= new Window("smooth widget test", Point(200, 150), Size(250, 100));
 	layer		= new Layer();
 	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	activearea	= new MyActiveArea(RGB(255, 255, 128), pos, size);
-	activearea->onClick.Connect(&WidgetTest::activeAreaProc, this);
+	activearea->onAction.Connect(&WidgetTest::activeAreaProc, this);
 	
 	RegisterObject(wnd);
 
@@ -48,8 +48,6 @@ WidgetTest::WidgetTest()
 	wnd->RegisterObject(layer);
 
 	layer->RegisterObject(activearea);
-
-	wnd->SetMetrics(Point(200, 150), Size(250, 100));
 }
 
 WidgetTest::~WidgetTest()

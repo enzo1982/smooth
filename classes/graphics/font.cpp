@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,7 @@
 #include <smooth/graphics/font.h>
 #include <smooth/misc/math.h>
 
-S::GUI::Font::Font(String iFontName, Int iFontSize, Int iFontColor, Int iFontWeight, Bool iFontItalic, Bool iFontUnderline, Bool iFontStrikeOut)
+S::GUI::Font::Font(const String &iFontName, Int iFontSize, Int iFontColor, Int iFontWeight, Bool iFontItalic, Bool iFontUnderline, Bool iFontStrikeOut)
 {
 	fontName	= iFontName;
 	fontSize	= iFontSize;
@@ -50,7 +50,7 @@ S::GUI::Font &S::GUI::Font::operator =(const Font &newFont)
 	return *this;
 }
 
-S::Bool S::GUI::Font::operator ==(const Font &font)
+S::Bool S::GUI::Font::operator ==(const Font &font) const
 {
 	if (fontName == font.fontName		&&
 	    fontSize == font.fontSize		&&
@@ -62,7 +62,7 @@ S::Bool S::GUI::Font::operator ==(const Font &font)
 	else						return False;
 }
 
-S::Bool S::GUI::Font::operator !=(const Font &font)
+S::Bool S::GUI::Font::operator !=(const Font &font) const
 {
 	if (fontName != font.fontName		||
 	    fontSize != font.fontSize		||
@@ -74,98 +74,98 @@ S::Bool S::GUI::Font::operator !=(const Font &font)
 	else						return False;
 }
 
-S::Int S::GUI::Font::SetName(String newFontName)
+S::Int S::GUI::Font::SetName(const String &newFontName)
 {
 	fontName = newFontName;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Font::SetSize(Int newFontSize)
 {
 	fontSize = newFontSize;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Font::SetColor(Int newFontColor)
 {
 	fontColor = newFontColor;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Font::SetWeight(Int newFontWeight)
 {
 	fontWeight = newFontWeight;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Font::SetItalic(Bool newFontItalic)
 {
 	fontItalic = newFontItalic;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Font::SetUnderline(Bool newFontUnderline)
 {
 	fontUnderline = newFontUnderline;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Font::SetStrikeOut(Bool newFontStrikeOut)
 {
 	fontStrikeOut = newFontStrikeOut;
 
-	return Success;
+	return Success();
 }
 
-S::String S::GUI::Font::GetName()
+const S::String &S::GUI::Font::GetName() const
 {
 	return fontName;
 }
 
-S::Int S::GUI::Font::GetSize()
+S::Int S::GUI::Font::GetSize() const
 {
 	return fontSize;
 }
 
-S::Int S::GUI::Font::GetColor()
+S::Int S::GUI::Font::GetColor() const
 {
 	return fontColor;
 }
 
-S::Int S::GUI::Font::GetWeight()
+S::Int S::GUI::Font::GetWeight() const
 {
 	return fontWeight;
 }
 
-S::Bool S::GUI::Font::GetItalic()
+S::Bool S::GUI::Font::GetItalic() const
 {
 	return fontItalic;
 }
 
-S::Bool S::GUI::Font::GetUnderline()
+S::Bool S::GUI::Font::GetUnderline() const
 {
 	return fontUnderline;
 }
 
-S::Bool S::GUI::Font::GetStrikeOut()
+S::Bool S::GUI::Font::GetStrikeOut() const
 {
 	return fontStrikeOut;
 }
 
-S::Int S::GUI::Font::GetTextSizeX(String text)
+S::Int S::GUI::Font::GetTextSizeX(const String &text) const
 {
 	if (text == NIL) return 0;
 
 	return GetTextSizeX(text, text.Length());
 }
 
-S::Int S::GUI::Font::GetTextSizeX(String text, Int nOfChars)
+S::Int S::GUI::Font::GetTextSizeX(const String &text, Int nOfChars) const
 {
 	if (text == NIL)	return 0;
 	if (nOfChars == 0)	return 0;
@@ -208,7 +208,7 @@ S::Int S::GUI::Font::GetTextSizeX(String text, Int nOfChars)
 	return sizex;
 }
 
-S::Int S::GUI::Font::GetLineSizeX(String text, Int nOfChars)
+S::Int S::GUI::Font::GetLineSizeX(const String &text, Int nOfChars) const
 {
 	if (text == NIL)	return 0;
 	if (nOfChars == 0)	return 0;
@@ -242,7 +242,7 @@ S::Int S::GUI::Font::GetLineSizeX(String text, Int nOfChars)
 #endif
 }
 
-S::Int S::GUI::Font::GetTextSizeY(String text)
+S::Int S::GUI::Font::GetTextSizeY(const String &text) const
 {
 	if (text == NIL) return 0;
 
@@ -257,7 +257,7 @@ S::Int S::GUI::Font::GetTextSizeY(String text)
 	return (lines * GetLineSizeY(text)) + (lines - 1) * 3;
 }
 
-S::Int S::GUI::Font::GetLineSizeY(String text)
+S::Int S::GUI::Font::GetLineSizeY(const String &text) const
 {
 	if (text == NIL) return 0;
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,18 +10,13 @@
 
 #include <smooth/gui/widgets/basic/text.h>
 #include <smooth/misc/math.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Text::classID = S::Object::RequestClassID();
 
-S::GUI::Text::Text(String iText, Point iPos)
+S::GUI::Text::Text(const String &iText, const Point &iPos) : Widget(iPos, Size())
 {
 	type	= classID;
-
-	possibleContainers.AddEntry(Layer::classID);
-
-	pos	= iPos;
 	text	= iText;
 
 	GetTextSize();
@@ -33,38 +28,28 @@ S::GUI::Text::~Text()
 
 S::Int S::GUI::Text::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
-
-	Surface	*surface = container->GetDrawSurface();
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
 
 	EnterProtectedRegion();
 
-	Rect	 textRect;
-	Point	 realPos	= GetRealPosition();
-	Font	 nFont		= font;
+	Surface	*surface = container->GetDrawSurface();
+	Font	 nFont	 = font;
 
-	size.cx = textSize.cx;
-	size.cy = textSize.cy + 1;
+	SetSize(textSize + Size(0, 1));
 
 	switch (message)
 	{
-		case SP_PAINT:
-		case SP_UPDATE:
 		case SP_SHOW:
-			textRect.left	= realPos.x;
-			textRect.top	= realPos.y;
-			textRect.right	= textRect.left + textSize.cx;
-			textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
-
+		case SP_PAINT:
 			if (!active) nFont.SetColor(Setup::GrayTextColor);
 
-			surface->SetText(text, textRect, nFont);
+			surface->SetText(text, Rect(GetRealPosition(), Size(textSize.cx, Math::Round(textSize.cy * 1.2))), nFont);
 
 			break;
 	}
 
 	LeaveProtectedRegion();
 
-	return Success;
+	return Success();
 }

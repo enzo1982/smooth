@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,7 +28,7 @@ Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 
 	designer->ReportStatus(status);
 
-	wnd	= new Window(name);
+	wnd	= new Window(name, Point(150, 150), Size(400, 400));
 	title	= new Titlebar();
 
 	objects.AddEntry(wnd);
@@ -37,8 +37,6 @@ Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 	RegisterObject(wnd);
 
 	wnd->RegisterObject(title);
-
-	wnd->SetMetrics(Point(150, 150), Size(400, 400));
 
 	wnd->onEvent.Connect(&Designer_EditComponent::EventProc, this);
 	wnd->doQuit.Connect(&Designer_EditComponent::ExitProc, this);
@@ -129,10 +127,10 @@ Window *Designer_EditComponent::GetWindow()
 
 Widget *Designer_EditComponent::AddObject(Int objid)
 {
-	Widget		*newobj;
-	Container	*registrar;
-	Point		 pos;
-	Size		 size;
+	Widget	*newobj;
+	Widget	*registrar;
+	Point	 pos;
+	Size	 size;
 
 	switch (objid)
 	{

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,35 +30,24 @@ namespace smooth
 		class SMOOTHAPI Attribute
 		{
 			private:
-				Attribute	*nextAttribute;
-				Attribute	*prevAttribute;
+				static Array<String>	 attributeNames;
 
-				Node		*parentNode;
+				Int			 attributeID;
 
-				Int		 attributeID;
-				String		 name;
-				String		 content;
+				Int			 nameIndex;
+				String			 content;
 			public:
-						 Attribute();
-						~Attribute();
+							 Attribute(const String &, const String &);
+							~Attribute();
 
-				Node		*GetParentNode();
-				Int		 SetParentNode(Node *);
+				Int			 GetAttributeID();
+				Int			 SetAttributeID(Int);
 
-				Int		 GetAttributeID();
-				Int		 SetAttributeID(Int);
+				String			 GetName();
+				Int			 SetName(const String &);
 
-				Attribute	*GetNextAttribute();
-				Attribute	*GetPrevAttribute();
-
-				Int		 SetNextAttribute(Attribute *);
-				Int		 SetPrevAttribute(Attribute *);
-
-				String		 GetName();
-				Int		 SetName(String);
-
-				String		 GetContent();
-				Int		 SetContent(String);
+				const String		&GetContent();
+				Int			 SetContent(const String &);
 		};
 	};
 };

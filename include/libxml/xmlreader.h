@@ -15,6 +15,7 @@
 #include <libxml/xmlIO.h>
 #ifdef LIBXML_SCHEMAS_ENABLED
 #include <libxml/relaxng.h>
+#include <libxml/xmlschemas.h>
 #endif
 
 #ifdef LIBXML_READER_ENABLED
@@ -243,12 +244,21 @@ XMLPUBFUN int XMLCALL
 						 int prop);
 XMLPUBFUN xmlNodePtr XMLCALL	
 		    xmlTextReaderCurrentNode	(xmlTextReaderPtr reader);
+
+XMLPUBFUN int XMLCALL
+            xmlTextReaderGetParserLineNumber(xmlTextReaderPtr reader);
+
+XMLPUBFUN int XMLCALL
+            xmlTextReaderGetParserColumnNumber(xmlTextReaderPtr reader);
+
 XMLPUBFUN xmlNodePtr XMLCALL	
 		    xmlTextReaderPreserve	(xmlTextReaderPtr reader);
+#ifdef LIBXML_PATTERN_ENABLED
 XMLPUBFUN int XMLCALL	
 		    xmlTextReaderPreservePattern(xmlTextReaderPtr reader,
 		    				 const xmlChar *pattern,
 						 const xmlChar **namespaces);
+#endif /* LIBXML_PATTERN_ENABLED */
 XMLPUBFUN xmlDocPtr XMLCALL	
 		    xmlTextReaderCurrentDoc	(xmlTextReaderPtr reader);
 XMLPUBFUN xmlNodePtr XMLCALL	
@@ -266,11 +276,24 @@ XMLPUBFUN int XMLCALL
 XMLPUBFUN int XMLCALL		
 		    xmlTextReaderRelaxNGSetSchema(xmlTextReaderPtr reader,
 						 xmlRelaxNGPtr schema);
+XMLPUBFUN int XMLCALL
+		    xmlTextReaderSchemaValidate	(xmlTextReaderPtr reader,
+		    				 const char *xsd);
+XMLPUBFUN int XMLCALL		
+		    xmlTextReaderSetSchema	(xmlTextReaderPtr reader,
+		    				 xmlSchemaPtr schema);
 #endif
 XMLPUBFUN const xmlChar * XMLCALL
 		    xmlTextReaderConstXmlVersion(xmlTextReaderPtr reader);
 XMLPUBFUN int XMLCALL
 		    xmlTextReaderStandalone     (xmlTextReaderPtr reader);
+
+
+/*
+ * Index lookup
+ */
+XMLPUBFUN long XMLCALL
+		xmlTextReaderByteConsumed	(xmlTextReaderPtr reader);
 
 /*
  * New more complete APIs for simpler creation and reuse of readers

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,14 +41,14 @@ namespace smooth
 			class Menubar : public Widget
 			{
 				private:
-					GUI::Menubar		*menubar;
+					GUI::Menubar			*menubar;
 
-					Array<PopupMenu *>	 entries;
+					Array<PopupMenu *, Void *>	 entries;
 				public:
-								 Menubar(Node *);
-								~Menubar();
+									 Menubar(Node *);
+					virtual				~Menubar();
 
-					GUI::Widget		*GetWidget();
+					GUI::Widget			*GetWidget();
 			};
 		};
 	};

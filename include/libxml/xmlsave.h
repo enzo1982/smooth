@@ -20,6 +20,20 @@
 extern "C" {
 #endif
 
+/**
+ * xmlSaveOption:
+ *
+ * This is the set of XML save options that can be passed down
+ * to the xmlSaveToFd() and similar calls.
+ */
+typedef enum {
+    XML_SAVE_FORMAT     = 1<<0,	/* format save output */
+    XML_SAVE_NO_DECL    = 1<<1,	/* drop the xml declaration */
+    XML_SAVE_NO_EMPTY	= 1<<2, /* no empty tags */
+    XML_SAVE_NO_XHTML	= 1<<3  /* disable XHTML1 specific rules */
+} xmlSaveOption;
+
+
 typedef struct _xmlSaveCtxt xmlSaveCtxt;
 typedef xmlSaveCtxt *xmlSaveCtxtPtr;
 

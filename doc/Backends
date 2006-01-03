@@ -9,5 +9,5 @@ n.a.	= not applicable
 	Generic	Threads	Timers	Events	Windows	Bitmaps	Surfaces
 Win32	X	X	X	X	X	X	X
 Xlib	X	n.a.	-	-	P	-	-
-SDL	X	X	X	-	-	-	-
+SDL	X	X	X	-	n.a.	-	-
 POSIX	U	X	-	-	n.a.	n.a.	n.a.

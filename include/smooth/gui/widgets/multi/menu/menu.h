@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,23 +19,20 @@ namespace smooth
 	};
 };
 
-#include "../../container.h"
-#include "../../../../graphics/bitmap.h"
 #include "menuentry.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI Menu : public Container
+		abstract class SMOOTHAPI Menu : public Widget
 		{
 			public:
 				static const Int	 classID;
 
 							 Menu();
-							~Menu();
+				virtual			~Menu();
 
-				MenuEntry		*AddEntry(String = NIL, Bitmap = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0, Int = OR_LEFT);
 				Int			 RemoveEntry(MenuEntry *);
 
 				Int			 Clear();

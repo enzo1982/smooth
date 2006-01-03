@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,6 +16,7 @@ namespace smooth
 	namespace GUI
 	{
 		class Slider;
+		class Hotspot;
 	};
 };
 
@@ -28,26 +29,40 @@ namespace smooth
 		class SMOOTHAPI Slider : public Widget
 		{
 			private:
+				Int			 dummyVariable;
+
 				Int			 mouseBias;
-				Int			 prevValue;
+				Bool			 dragging;
+
+				Void			 UpdateHotspotPositions();
 			protected:
 				Int			*variable;
 
 				Int			 startValue;
 				Int			 endValue;
+
+				Hotspot			*clickHotspot;
+				Hotspot			*dragHotspot;
 			public:
 				static const Int	 classID;
 
-							 Slider(Point, Size, Int, Int *, Int, Int);
-							~Slider();
+							 Slider(const Point &, const Size &, Int, Int * = NIL, Int = 0, Int = 100);
+				virtual			~Slider();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
-
+			accessors:
 				Int			 SetRange(Int, Int);
 
 				Int			 SetValue(Int);
 				Int			 GetValue();
+			signals:
+				Signal1<Void, Int>	 onValueChange;
+			slots:
+				Void			 OnMouseClick(const Point &);
+
+				Void			 OnMouseDragStart(const Point &);
+				Void			 OnMouseDrag(const Point &);
+				Void			 OnMouseDragEnd(const Point &);
 		};
 	};
 };

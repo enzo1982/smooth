@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,49 +9,63 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/slider.h>
+#include <smooth/gui/widgets/hotspot/hotspot.h>
 #include <smooth/misc/math.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::Slider::classID = S::Object::RequestClassID();
 
-S::GUI::Slider::Slider(Point iPos, Size iSize, Int subType, Int *var, Int rangeStart, Int rangeEnd)
+S::GUI::Slider::Slider(const Point &iPos, const Size &iSize, Int sType, Int *var, Int rangeStart, Int rangeEnd) : Widget(iPos, iSize)
 {
 	type		= classID;
-	subtype		= subType;
-	variable	= var;
-	clicked		= False;
+	subtype		= sType;
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
-	prevValue	= 0;
 
-	possibleContainers.AddEntry(Layer::classID);
+	dummyVariable	= 0;
 
-	if (*variable < startValue)	*variable = startValue;
-	else if (*variable > endValue)	*variable = endValue;
+	if (var == NIL)	variable = &dummyVariable;
+	else		variable = var;
 
-	pos		= iPos;
-	size		= iSize;
+	if (GetWidth() == 0 && subtype == OR_HORZ) SetWidth(100);
+	if (GetHeight() == 0 && subtype == OR_VERT) SetHeight(100);
 
-	if (size.cx == 0) size.cx = size.cy;
-	if (size.cy == 0) size.cy = size.cx;
+	if (subtype == OR_HORZ)	SetHeight(18);
+	else			SetWidth(18);
 
-	if (size.cx == 0) size.cx = 100;
-	if (size.cy == 0) size.cy = 100;
+	onValueChange.SetParentObject(this);
+	onValueChange.Connect(&onAction);
 
-	if (subType == OR_HORZ)	size.cy = 18;
-	else			size.cx = 18;
+	clickHotspot	= new Hotspot(subtype == OR_HORZ ? Point(4, 1) : Point(1, 4), GetSize() - (subtype == OR_HORZ ? Size(8, 2) : Size(2, 8)));
+	dragHotspot	= new Hotspot(Point(), Size());
+
+	dragging	= False;
+
+	clickHotspot->onLeftButtonClick.Connect(&Slider::OnMouseClick, this);
+
+	dragHotspot->onMouseDragStart.Connect(&Slider::OnMouseDragStart, this);
+	dragHotspot->onMouseDrag.Connect(&Slider::OnMouseDrag, this);
+	dragHotspot->onMouseDragEnd.Connect(&Slider::OnMouseDragEnd, this);
+
+	RegisterObject(clickHotspot);
+	RegisterObject(dragHotspot);
+
+	SetValue(*variable);
 }
 
 S::GUI::Slider::~Slider()
 {
+	DeleteObject(clickHotspot);
+	DeleteObject(dragHotspot);
 }
 
 S::Int S::GUI::Slider::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
+
+	EnterProtectedRegion();
 
 	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
@@ -59,254 +73,144 @@ S::Int S::GUI::Slider::Paint(Int message)
 	Point	 lineEnd;
 	Rect	 sliderRect;
 
-	if (prevValue != *variable)
-	{
-		if (subtype == OR_HORZ)
-		{
-			sliderRect.left		= realPos.x + (Int) (((Float) (size.cx - 9)) / ((Float) (endValue - startValue)) * ((Float) (prevValue - startValue)));
-			sliderRect.top		= realPos.y;
-			sliderRect.right	= sliderRect.left + 9;
-			sliderRect.bottom	= sliderRect.top + 18;
-		}
-		else
-		{
-			sliderRect.left		= realPos.x;
-			sliderRect.top		= realPos.y + (size.cy - 9) - (Int) (((Float) (size.cy - 9)) / ((Float) (endValue - startValue)) * ((Float) (prevValue - startValue)));
-			sliderRect.right	= sliderRect.left + 18;
-			sliderRect.bottom	= sliderRect.top + 10;
-		}
-
-		surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
-	}
-
-	if (subtype == OR_HORZ)
-	{
-		lineStart.x = realPos.x + 4;
-		lineStart.y = realPos.y + 8;
-		lineEnd.x = realPos.x + size.cx - 4;
-		lineEnd.y = lineStart.y;
-
-		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
-
-		lineStart.y++;
-		lineEnd.y++;
-
-		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
-
-		surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
-
-		sliderRect.left		= realPos.x + (Int) (((Float) (size.cx - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-		sliderRect.top		= realPos.y;
-		sliderRect.right	= sliderRect.left + 9;
-		sliderRect.bottom	= sliderRect.top + 17;
-
-		if (!clicked)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
-		else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
-
-		surface->Frame(sliderRect, FRAME_UP);
-	}
-	else
-	{
-		lineStart.x = realPos.x + 8;
-		lineStart.y = realPos.y + 4;
-		lineEnd.x = lineStart.x;
-		lineEnd.y = realPos.y + size.cy - 4;
-
-		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
-
-		lineStart.x++;
-		lineEnd.x++;
-
-		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
-
-		surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
-
-		sliderRect.left		= realPos.x;
-		sliderRect.top		= realPos.y + (size.cy - 9) - (Int) (((Float) (size.cy - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-		sliderRect.right	= sliderRect.left + 18;
-		sliderRect.bottom	= sliderRect.top + 10;
-
-		if (!clicked)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
-		else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
-
-		surface->Frame(sliderRect, FRAME_UP);
-	}
-
-	prevValue = *variable;
-
-	return Success;
-}
-
-S::Int S::GUI::Slider::Process(Int message, Int wParam, Int lParam)
-{
-	if (!IsRegistered())		return Failure;
-	if (!active || !IsVisible())	return Success;
-
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
-
-	Surface	*surface = container->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Int	 retVal = Success;
-	Rect	 slider;
-	Rect	 actionArea;
-	Int	 oldValue = *variable;
-	Float	 buffer;
-
-	if (prevValue != *variable) Paint(SP_PAINT);
-
-	if (subtype == OR_HORZ)
-	{
-		slider.left	= realPos.x + (Int) (((Float) (size.cx - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-		slider.top	= realPos.y;
-		slider.right	= slider.left + 8;
-		slider.bottom	= slider.top + 16;
-
-		actionArea.left		= realPos.x + 4;
-		actionArea.top		= realPos.y;
-		actionArea.right	= actionArea.left + size.cx - 9;
-		actionArea.bottom	= actionArea.top + 16;
-	}
-	else
-	{
-		slider.left	= realPos.x;
-		slider.top	= realPos.y + (size.cy - 9) - (Int) (((Float) (size.cy - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-		slider.right	= slider.left + 17;
-		slider.bottom	= slider.top + 9;
-
-		actionArea.left		= realPos.x;
-		actionArea.top		= realPos.y + 4;
-		actionArea.right	= actionArea.left + 17;
-		actionArea.bottom	= actionArea.top + size.cy - 9;
-	}
-
 	switch (message)
 	{
-		case SM_LBUTTONDOWN:
-			if (wnd->IsMouseOn(slider) && !clicked)
+		case SP_SHOW:
+		case SP_PAINT:
+			surface->Box(Rect(realPos, GetSize()), Setup::BackgroundColor, FILLED);
+
+			if (subtype == OR_HORZ)
 			{
-				clicked = True;
+				lineStart.x = realPos.x + 4;
+				lineStart.y = realPos.y + 8;
+				lineEnd.x = realPos.x + GetWidth() - 4;
+				lineEnd.y = lineStart.y;
 
-				slider.left++;
-				slider.top++;
-				surface->Box(slider, Setup::LightGrayColor, FILLED);
-				slider.left--;
-				slider.top--;
+				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
-				if (subtype == OR_HORZ)	mouseBias = (slider.left + 4) - wnd->MouseX();
-				else			mouseBias = (slider.top + 4) - wnd->MouseY();
+				lineStart.y++;
+				lineEnd.y++;
 
-				retVal = Break;
+				surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
+
+				surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
+
+				sliderRect.left		= realPos.x + (Int) (((Float) (GetWidth() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+				sliderRect.top		= realPos.y;
+				sliderRect.right	= sliderRect.left + 9;
+				sliderRect.bottom	= sliderRect.top + 17;
+
+				if (!dragging)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
+				else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
+
+				surface->Frame(sliderRect, FRAME_UP);
 			}
-			else if (wnd->IsMouseOn(actionArea) && !clicked)
+			else
 			{
-				mouseBias = 0;
+				lineStart.x = realPos.x + 8;
+				lineStart.y = realPos.y + 4;
+				lineEnd.x = lineStart.x;
+				lineEnd.y = realPos.y + GetHeight() - 4;
 
-				clicked = True;
-				Process(SM_MOUSEMOVE, 0, 0);
-				clicked = False;
+				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
-				Paint(SP_PAINT);
+				lineStart.x++;
+				lineEnd.x++;
 
-				retVal = Break;
-			}
+				surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
 
-			break;
-		case SM_LBUTTONUP:
-			if (clicked)
-			{
-				clicked = False;
+				surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
 
-				slider.left++;
-				slider.top++;
-				surface->Box(slider, Setup::BackgroundColor, FILLED);
-				slider.left--;
-				slider.top--;
+				sliderRect.left		= realPos.x;
+				sliderRect.top		= realPos.y + (GetHeight() - 9) - (Int) (((Float) (GetHeight() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
+				sliderRect.right	= sliderRect.left + 18;
+				sliderRect.bottom	= sliderRect.top + 10;
 
-				retVal = Break;
-			}
+				if (!dragging)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
+				else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
 
-			break;
-		case SM_MOUSEMOVE:
-			if (clicked)
-			{
-				if (subtype == OR_HORZ)
-				{
-					buffer = ((Float) (endValue - startValue)) / (((Float) (size.cx - 9)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + 4))));
-
-					*variable = startValue + Math::Round(buffer);
-
-					if (*variable < startValue)	*variable = startValue;
-					if (*variable > endValue)	*variable = endValue;
-				}
-				else
-				{
-					buffer = ((Float) (endValue - startValue)) / (((Float) (size.cy - 9)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + 4))));
-
-					*variable = endValue - Math::Round(buffer);
-
-					if (*variable < startValue)	*variable = startValue;
-					if (*variable > endValue)	*variable = endValue;
-				}
-
-				if (*variable != oldValue)
-				{
-					slider.right++;
-					slider.bottom++;
-					surface->Box(slider, Setup::BackgroundColor, FILLED);
-					slider.right--;
-					slider.bottom--;
-
-					Paint(SP_PAINT);
-
-					onClick.Emit(wnd->MouseX(), wnd->MouseY());
-				}
+				surface->Frame(sliderRect, FRAME_UP);
 			}
 
 			break;
 	}
 
-	return retVal;
+	LeaveProtectedRegion();
+
+	return Success();
 }
 
 S::Int S::GUI::Slider::SetRange(Int rangeStart, Int rangeEnd)
 {
-	Int	 prevStartValue	= startValue;
-	Int	 prevEndValue	= endValue;
-
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
 
-	*variable	= (Int) (((Float) (*variable) - prevStartValue) * ((Float) (endValue - startValue) / (prevEndValue - prevStartValue)) + startValue);
-	*variable	= (Int) Math::Max(rangeStart, Math::Min(rangeEnd, *variable));
-
 	SetValue(*variable);
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Slider::SetValue(Int newValue)
 {
-	if (newValue < startValue)	newValue = startValue;
-	if (newValue > endValue)	newValue = endValue;
+	Int	 prevValue	= *variable;
 
-	if (*variable == newValue) return Success;
+	*variable = Math::Min(Math::Max(newValue, startValue), endValue);
 
-	Bool	 prevVisible = IsVisible();
+	Paint(SP_PAINT);
 
-	if (IsRegistered() && prevVisible) Hide();
+	UpdateHotspotPositions();
 
-	*variable = newValue;
+	if (*variable != prevValue) onValueChange.Emit(*variable);
 
-	if (IsRegistered() && prevVisible) Show();
-
-	onClick.Emit(0, 0);
-
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Slider::GetValue()
 {
 	return *variable;
+}
+
+S::Void S::GUI::Slider::OnMouseClick(const Point &mousePos)
+{
+	Int	 value = 0;
+
+	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - 9) / ((Float) (mousePos.x - (GetRealPosition().x + 4)))));
+	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - 9) / ((Float) (mousePos.y - (GetRealPosition().y + 4)))));
+
+	if (!dragging)
+	{
+		if (subtype == OR_HORZ)	SetValue(startValue + value);
+		else			SetValue(endValue - value);
+	}
+}
+
+S::Void S::GUI::Slider::OnMouseDragStart(const Point &mousePos)
+{
+	if (subtype == OR_HORZ)	mouseBias = (GetRealPosition().x + (Int) (((Float) (GetWidth() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))) + 4) - mousePos.x;
+	else			mouseBias = (GetRealPosition().y + (GetHeight() - 9) - (Int) (((Float) (GetHeight() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))) + 4) - mousePos.y;
+
+	dragging = True;
+}
+
+S::Void S::GUI::Slider::OnMouseDrag(const Point &mousePos)
+{
+	Int	 value = 0;
+
+	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - 9) / ((Float) (mousePos.x + mouseBias - (GetRealPosition().x + 4)))));
+	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - 9) / ((Float) (mousePos.y + mouseBias - (GetRealPosition().y + 4)))));
+
+	if (subtype == OR_HORZ)	SetValue(startValue + value);
+	else			SetValue(endValue - value);
+}
+
+S::Void S::GUI::Slider::OnMouseDragEnd(const Point &mousePos)
+{
+	dragging = False;
+
+	Paint(SP_PAINT);
+}
+
+S::Void S::GUI::Slider::UpdateHotspotPositions()
+{
+	dragHotspot->SetMetrics(subtype == OR_HORZ ? Point((Int) (((Float) (GetWidth() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, (GetHeight() - 9) - (Int) (((Float) (GetHeight() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)))), subtype == OR_HORZ ? Size(8, 16) : Size(16, 8));
 }

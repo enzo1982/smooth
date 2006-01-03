@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,597 +9,179 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/scrollbar.h>
+#include <smooth/gui/widgets/hotspot/hotspot.h>
 #include <smooth/misc/math.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::Scrollbar::classID = S::Object::RequestClassID();
 
-S::GUI::Scrollbar::Scrollbar(Point iPos, Size iSize, Int subType, Int *var, Int rangeStart, Int rangeEnd)
+S::GUI::Scrollbar::Scrollbar(const Point &iPos, const Size &iSize, Int sType, Int *var, Int rangeStart, Int rangeEnd) : Arrows(iPos, iSize, sType, var, rangeStart, rangeEnd)
 {
 	type		= classID;
-	variable	= var;
 
-	button1Checked	= False;
-	button1Clicked	= False;
-	button2Checked	= False;
-	button2Clicked	= False;
-	button3Checked	= False;
-	button3Clicked	= False;
+	if (GetWidth() == 0) SetWidth(subtype == OR_VERT ? 17 : 120);
+	if (GetHeight() == 0) SetHeight(subtype == OR_VERT ? 120 : 17);
 
-	subtype		= subType;
+	clickHotspot	= new Hotspot(Point(), Size());
+	dragHotspot	= new Hotspot(Point(), Size());
 
-	startValue	= rangeStart;
-	endValue	= rangeEnd;
+	dragging	= False;
 
-	timerActive	= False;
-	timer		= NIL;
+	clickHotspot->onLeftButtonClick.Connect(&Scrollbar::OnMouseClick, this);
 
-	possibleContainers.AddEntry(Layer::classID);
+	dragHotspot->onMouseDragStart.Connect(&Scrollbar::OnMouseDragStart, this);
+	dragHotspot->onMouseDrag.Connect(&Scrollbar::OnMouseDrag, this);
+	dragHotspot->onMouseDragEnd.Connect(&Scrollbar::OnMouseDragEnd, this);
 
-	pos		= iPos;
-	size		= iSize;
+	dragHotspot->onMouseWheel.Connect(&Scrollbar::OnMouseWheel, this);
 
-	if (subtype == OR_VERT)
-	{
-		if (size.cx == 0) size.cx = 17;
-		if (size.cy == 0) size.cy = 120;
-	}
-	else
-	{
-		if (size.cx == 0) size.cx = 120;
-		if (size.cy == 0) size.cy = 17;
-	}
+	RegisterObject(clickHotspot);
+	RegisterObject(dragHotspot);
+
+	UpdateHotspotPositions();
+
+	onValueChange.Connect(&Scrollbar::OnValueChange, this);
 }
 
 S::GUI::Scrollbar::~Scrollbar()
 {
-	if (timer != NIL)
-	{
-		timer->Stop();
-
-		DeleteObject(timer);
-
-		timer = NIL;
-	}
+	DeleteObject(clickHotspot);
+	DeleteObject(dragHotspot);
 }
 
 S::Int S::GUI::Scrollbar::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
 
-	Surface	*surface	= container->GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), size);
-	Rect	 frame1;
-	Rect	 frame2;
-	Rect	 frame3;
-	Point	 lineStart;
-	Point	 lineEnd;
-
-	if (subtype == OR_HORZ)
-	{
-		frame1.left	= frame.left;
-		frame1.top	= frame.top;
-		frame1.right	= frame.left + (frame.bottom - frame.top);
-		frame1.bottom	= frame.bottom;
-
-		frame2.left	= frame.right - (frame.bottom - frame.top);
-		frame2.top	= frame.top;
-		frame2.right	= frame.right;
-		frame2.bottom	= frame.bottom;
-
-		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-		frame3.top	= frame.top;
-		frame3.right	= frame3.left + (frame.bottom - frame.top);
-		frame3.bottom	= frame.bottom;
-	}
-	else
-	{
-		frame1.left	= frame.left;
-		frame1.top	= frame.top;
-		frame1.right	= frame.right;
-		frame1.bottom	= frame.top + (frame.right - frame.left);
-
-		frame2.left	= frame.left;
-		frame2.top	= frame.bottom - (frame.right - frame.left);
-		frame2.right	= frame.right;
-		frame2.bottom	= frame.bottom;
-
-		frame3.left	= frame.left;
-		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) size.cy - 3 * (frame.right - frame.left)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-		frame3.right	= frame.right;
-		frame3.bottom	= frame3.top + (frame.right - frame.left);
-	}
-
-	if (!button1Clicked && !button2Clicked) surface->Box(frame, Setup::LightGrayColor, FILLED);
-
-	if (!button3Clicked)	surface->Box(frame3, Setup::BackgroundColor, FILLED);
-	else			surface->Box(frame3, Setup::LightGrayColor, FILLED);
-
-	surface->Frame(frame3, FRAME_UP);
-
-	if (button1Clicked || button2Clicked) return Success;
-
-	surface->Box(frame1, Setup::BackgroundColor, FILLED);
-	surface->Box(frame2, Setup::BackgroundColor, FILLED);
-
-	surface->Frame(frame1, FRAME_UP);
-	surface->Frame(frame2, FRAME_UP);
-
-	Int	 arrowColor = 0;
-
-	if (active)	arrowColor = Setup::TextColor;
-	else		arrowColor = Setup::GrayTextColor;
-
-	if (subtype == OR_HORZ)
-	{
-		lineStart.x = frame.left + (frame.bottom - frame.top) / 2 - 2;
-		lineStart.y = (frame.bottom + frame.top) / 2;
-		lineEnd.x = lineStart.x;
-		lineEnd.y = lineStart.y + 1;
-
-		for (Int i = 0; i < 4; i++)
-		{
-			surface->Line(lineStart, lineEnd, arrowColor);
-			lineStart.x++;
-			lineStart.y--;
-			lineEnd.x++;
-			lineEnd.y++;
-		}
-
-		lineStart.x = frame.right - (frame.bottom - frame.top) / 2 - 2;
-		lineStart.y = (frame.bottom + frame.top) / 2 - 3;
-		lineEnd.x = lineStart.x;
-		lineEnd.y = lineStart.y + 7;
-
-		for (Int j = 0; j < 4; j++)
-		{
-			surface->Line(lineStart, lineEnd, arrowColor);
-			lineStart.x++;
-			lineStart.y++;
-			lineEnd.x++;
-			lineEnd.y--;
-		}
-	}
-	else if (subtype == OR_VERT)
-	{
-		lineStart.x = (frame.right + frame.left) / 2 + (Setup::rightToLeft ? 1 : 0);
-		lineStart.y = (frame.top + (frame.right - frame.left) / 2) - 2;
-		lineEnd.x = lineStart.x + 1;
-		lineEnd.y = lineStart.y;
-
-		for (Int i = 0; i < 4; i++)
-		{
-			surface->Line(lineStart, lineEnd, arrowColor);
-			lineStart.x--;
-			lineStart.y++;
-			lineEnd.x++;
-			lineEnd.y++;
-		}
-
-		lineStart.x = (frame.right + frame.left) / 2 - 3 + (Setup::rightToLeft ? 1 : 0);
-		lineStart.y = (frame.bottom - (frame.right - frame.left) / 2) - 2;
-		lineEnd.x = lineStart.x + 7;
-		lineEnd.y = lineStart.y;
-
-		for (Int j = 0; j < 4; j++)
-		{
-			surface->Line(lineStart, lineEnd, arrowColor);
-			lineStart.x++;
-			lineStart.y++;
-			lineEnd.x--;
-			lineEnd.y++;
-		}
-	}
-
-	return Success;
-}
-
-S::Int S::GUI::Scrollbar::Process(Int message, Int wParam, Int lParam)
-{
-	if (!IsRegistered())		return Failure;
-	if (!active || !IsVisible())	return Success;
-
-	Window	*wnd		= container->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
+	EnterProtectedRegion();
 
 	Surface	*surface	= container->GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
-	Int	 retVal		= Success;
-	Rect	 frame		= Rect(GetRealPosition(), size);
-	Rect	 frame1;
-	Rect	 frame2;
-	Rect	 frame3;
-	Rect	 actionArea;
-	Int	 prevValue	= *variable;
-	Float	 buffer;
-	UINT	 scrolllines;
+	Rect	 arrow1Frame	= Rect(realPos + Point(subtype == OR_HORZ ? GetWidth() - GetHeight() : 0, subtype == OR_VERT ? GetHeight() - GetWidth() : 0), subtype == OR_HORZ ? Size(GetHeight(), GetHeight()) : Size(GetWidth(), GetWidth()));
+	Rect	 arrow2Frame	= Rect(realPos + Point(0, 0), subtype == OR_HORZ ? Size(GetHeight(), GetHeight()) : Size(GetWidth(), GetWidth()));
+	Int	 arrowColor	= Setup::TextColor;
 
-	if (subtype == OR_HORZ)
-	{
-		frame1.left	= frame.left + 2;
-		frame1.top	= frame.top + 2;
-		frame1.right	= frame.left + (frame.bottom - frame.top) - 2;
-		frame1.bottom	= frame.bottom - 2;
-
-		frame2.left	= frame.right - (frame.bottom - frame.top) + 2;
-		frame2.top	= frame.top + 2;
-		frame2.right	= frame.right - 2;
-		frame2.bottom	= frame.bottom - 2;
-
-		frame3.left	= frame.left + (frame.bottom - frame.top) + (Int) (((Float) size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))) + 1;
-		frame3.top	= frame.top + 1;
-		frame3.right	= frame3.left + (frame.bottom - frame.top) - 2;
-		frame3.bottom	= frame.bottom - 1;
-
-		actionArea.left		= frame.left + (frame.bottom - frame.top);
-		actionArea.top		= frame.top;
-		actionArea.right	= frame.right - (frame.bottom - frame.top);
-		actionArea.bottom	= frame.bottom;
-	}
-	else
-	{
-		frame1.left	= frame.left + 2;
-		frame1.top	= frame.top + 2;
-		frame1.right	= frame.right - 2;
-		frame1.bottom	= frame.top + (frame.right - frame.left) - 2;
-
-		frame2.left	= frame.left + 2;
-		frame2.top	= frame.bottom - (frame.right - frame.left) + 2;
-		frame2.right	= frame.right - 2;
-		frame2.bottom	= frame.bottom - 2;
-
-		frame3.left	= frame.left + 1;
-		frame3.top	= frame.top + (frame.right - frame.left) + (Int) (((Float) size.cy - 3 * (frame.right - frame.left)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))) + 1;
-		frame3.right	= frame.right - 1;
-		frame3.bottom	= frame3.top + (frame.right - frame.left) - 2;
-
-		actionArea.left		= frame.left;
-		actionArea.top		= frame.top + (frame.right - frame.left);
-		actionArea.right	= frame.right;
-		actionArea.bottom	= frame.bottom - (frame.right - frame.left);
-	}
+	if (!active) arrowColor = Setup::GrayTextColor;
 
 	switch (message)
 	{
-		case SM_LBUTTONDOWN:
-		case SM_LBUTTONDBLCLK:
-			if (!timerActive && timer == NIL && (button1Checked || button2Checked))
-			{
-				timer = new System::Timer();
-
-				timer->onInterval.Connect(&Scrollbar::TimerProc, this);
-				timer->Start(200);
-
-				timerCount = 1;
-				timerActive = True;
-			}
-
-			if (button1Checked)
-			{
-				if (!button1Clicked) surface->Frame(frame1, FRAME_DOWN);
-
-				button1Clicked = True;
-
-				(*variable)--;
-
-				if (*variable < startValue)	*variable = startValue;
-				else if (*variable > endValue)	*variable = endValue;
-
-				if (*variable != prevValue)
-				{
-					onClick.Emit(wnd->MouseX(), wnd->MouseY());
-
-					surface->Box(Rect(Point(frame3.left - 1, frame3.top - 1), Size(frame3.right - frame3.left + 2, frame3.bottom - frame3.top + 2)), Setup::LightGrayColor, FILLED);
-
-					Paint(SP_PAINT);
-				}
-
-				retVal = Break;
-			}
-			else if (button2Checked)
-			{
-				if (!button2Clicked) surface->Frame(frame2, FRAME_DOWN);
-
-				button2Clicked = True;
-
-				(*variable)++;
-
-				if (*variable < startValue)	*variable = startValue;
-				else if (*variable > endValue)	*variable = endValue;
-
-				if (*variable != prevValue)
-				{
-					onClick.Emit(wnd->MouseX(), wnd->MouseY());
-
-					surface->Box(Rect(Point(frame3.left - 1, frame3.top - 1), Size(frame3.right - frame3.left + 2, frame3.bottom - frame3.top + 2)), Setup::LightGrayColor, FILLED);
-
-					Paint(SP_PAINT);
-				}
-
-				retVal = Break;
-			}
-
-			if (wnd->IsMouseOn(frame3) && !button3Clicked)
-			{
-				button3Clicked = True;
-
-				surface->Box(frame3, Setup::LightGrayColor, FILLED);
-
-				if (subtype == OR_HORZ)	mouseBias = (frame3.left + (frame.bottom - frame.top) / 2) - wnd->MouseX();
-				else			mouseBias = (frame3.top + (frame.right - frame.left) / 2) - wnd->MouseY();
-
-				retVal = Break;
-			}
-			else if (wnd->IsMouseOn(actionArea) && !button3Clicked)
-			{
-				mouseBias = 0;
-
-				button3Clicked = True;
-				Process(SM_MOUSEMOVE, 0, 0);
-				button3Clicked = False;
-
-				Paint(SP_PAINT);
-
-				retVal = Break;
-			}
-
-			break;
-		case SM_MOUSEWHEEL:
-			if (Setup::enableUnicode)	SystemParametersInfoW(104, NIL, &scrolllines, NIL);
-			else				SystemParametersInfoA(104, NIL, &scrolllines, NIL);
-
-			if (scrolllines <= 0) scrolllines = 3;
-
-			*variable -= (wParam / 120 * scrolllines);
-
-			if (*variable < startValue)	*variable = startValue;
-			if (*variable > endValue)	*variable = endValue;
-
-			if (*variable != prevValue)
-			{
-				surface->StartPaint(frame);
-
-				Paint(SP_PAINT);
-
-				surface->EndPaint();
-
-				onClick.Emit(0, 0);
-			}
-
-			retVal = Break;
-
-			break;
-		case WM_KEYDOWN:
-			if (Setup::enableUnicode)	SystemParametersInfoW(104, NIL, &scrolllines, NIL);
-			else				SystemParametersInfoA(104, NIL, &scrolllines, NIL);
-
-			if (scrolllines <= 0) scrolllines = 3;
-
-			switch (wParam)
-			{
-				case VK_PRIOR:
-					*variable -= scrolllines;
-					retVal = Break;
-					break;
-				case VK_NEXT:
-					*variable += scrolllines;
-					retVal = Break;
-					break;
-			}
-
-			if (*variable < startValue)	*variable = startValue;
-			if (*variable > endValue)	*variable = endValue;
-
-			if (*variable != prevValue)
-			{
-				surface->StartPaint(frame);
-
-				Paint(SP_PAINT);
-
-				surface->EndPaint();
-
-				onClick.Emit(0, 0);
-			}
-
-			break;
-		case SM_LBUTTONUP:
-			if (timerActive) timerActive = False;
-
-			if (button1Clicked)
-			{
-				button1Clicked = False;
-				button1Checked = False;
-
-				surface->Box(frame1, Setup::BackgroundColor, OUTLINED);
-
-				Process(SM_MOUSEMOVE, 0, 0);
-
-				retVal = Break;
-			}
-			else if (button2Clicked)
-			{
-				button2Clicked = False;
-				button2Checked = False;
-
-				surface->Box(frame2, Setup::BackgroundColor, OUTLINED);
-
-				Process(SM_MOUSEMOVE, 0, 0);
-
-				retVal = Break;
-			}
-
-			if (button3Clicked)
-			{
-				button3Clicked = False;
-
-				surface->Box(frame3, Setup::BackgroundColor, FILLED);
-
-				retVal = Break;
-			}
-
-			break;
-		case SM_MOUSEMOVE:
-			if (!button1Checked && wnd->IsMouseOn(frame1))
-			{
-				button1Checked = True;
-
-				surface->Frame(frame1, FRAME_UP);
-			}
-			else if (button1Checked && !wnd->IsMouseOn(frame1))
-			{
-				if (timerActive) timerActive = False;
-
-				button1Checked = False;
-				button1Clicked = False;
-
-				surface->Box(frame1, Setup::BackgroundColor, OUTLINED);
-			}
-			else if (!button2Checked && wnd->IsMouseOn(frame2))
-			{
-				button2Checked = True;
-
-				surface->Frame(frame2, FRAME_UP);
-			}
-			else if (button2Checked && !wnd->IsMouseOn(frame2))
-			{
-				if (timerActive) timerActive = False;
-
-				button2Checked = False;
-				button2Clicked = False;
-
-				surface->Box(frame2, Setup::BackgroundColor, OUTLINED);
-			}
-
-			if (button3Clicked)
-			{
-				if (subtype == OR_HORZ)	buffer = ((Float) (endValue - startValue)) / (((Float) size.cx - 3 * (frame.bottom - frame.top)) / ((Float) (wnd->MouseX() + mouseBias - (realPos.x + (frame.bottom - frame.top) + (frame.bottom - frame.top) / 2))));
-				else			buffer = ((Float) (endValue - startValue)) / (((Float) size.cy - 3 * (frame.right - frame.left)) / ((Float) (wnd->MouseY() + mouseBias - (realPos.y + (frame.right - frame.left) + (frame.right - frame.left) / 2))));
-
-				*variable = startValue + Math::Round(buffer);
-
-				if (*variable < startValue)	*variable = startValue;
-				if (*variable > endValue)	*variable = endValue;
-
-				if (*variable != prevValue)
-				{
-					surface->StartPaint(frame);
-
-					surface->Box(frame3, Setup::BackgroundColor, FILLED);
-
-					Paint(SP_PAINT);
-
-					surface->EndPaint();
-
-					onClick.Emit(wnd->MouseX(), wnd->MouseY());
-				}
-			}
+		case SP_SHOW:
+		case SP_PAINT:
+			OnValueChange(*variable);
+
+			surface->Frame(arrow1Frame, FRAME_UP);
+			surface->Frame(arrow2Frame, FRAME_UP);
 
 			if (subtype == OR_HORZ)
 			{
-				frame.left -= 20;
-				frame.top -= 100;
-				frame.right += 20;
-				frame.bottom += 100;
+				for (Int i = 0; i < 4; i++)
+				{
+					Point	 lineStart	= Point(realPos.x + GetHeight() / 2 - 2 + i, realPos.y + GetHeight() / 2 - i);
+					Point	 lineEnd	= lineStart + Point(0, 2 * i + 1);
+
+					surface->Line(lineStart, lineEnd, arrowColor);
+				}
+
+				for (Int j = 0; j < 4; j++)
+				{
+					Point	 lineStart	= Point(realPos.x + GetWidth() - GetHeight() / 2 - 2 + j, realPos.y + GetHeight() / 2 - 3 + j);
+					Point	 lineEnd	= lineStart + Point(0, 7 - 2 * j);
+
+					surface->Line(lineStart, lineEnd, arrowColor);
+				}
 			}
-			else
+			else if (subtype == OR_VERT)
 			{
-				frame.left -= 100;
-				frame.top -= 20;
-				frame.right += 100;
-				frame.bottom += 20;
+				for (Int i = 0; i < 4; i++)
+				{
+					Point	 lineStart	= Point(realPos.x + GetWidth() / 2 + (Setup::rightToLeft ? 1 : 0) - i, (realPos.y + GetWidth() / 2) - 2 + i);
+					Point	 lineEnd	= lineStart + Point(2 * i + 1, 0);
+
+					surface->Line(lineStart, lineEnd, arrowColor);
+				}
+
+				for (Int j = 0; j < 4; j++)
+				{
+					Point	 lineStart	= Point(realPos.x + GetWidth() / 2 - 3 + (Setup::rightToLeft ? 1 : 0) + j, (realPos.y + GetHeight() - GetWidth() / 2) - 2 + j);
+					Point	 lineEnd	= lineStart + Point(7 - 2 * j, 0);
+
+					surface->Line(lineStart, lineEnd, arrowColor);
+				}
 			}
-
-			if (!wnd->IsMouseOn(frame1) && button1Clicked)
-			{
-				Process(SM_LBUTTONUP, 0, 0);
-
-				retVal = Break;
-			}
-
-			if (!wnd->IsMouseOn(frame2) && button2Clicked)
-			{
-				Process(SM_LBUTTONUP, 0, 0);
-
-				retVal = Break;
-			}
-
-			if (!wnd->IsMouseOn(frame) && button3Clicked)
-			{
-				Process(SM_LBUTTONUP, 0, 0);
-
-				retVal = Break;
-			}
-
-			Int	 leftButton;
-
-			if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
-			else					leftButton = VK_LBUTTON;
-
-			GetAsyncKeyState(leftButton);
-
-			if (GetAsyncKeyState(leftButton) == 0 && button3Clicked) Process(SM_LBUTTONUP, 0, 0);
 
 			break;
-		case WM_KILLFOCUS:
-		case WM_ACTIVATEAPP:
-			return Process(SM_LBUTTONUP, 0, 0);
 	}
 
-	return retVal;
+	LeaveProtectedRegion();
+
+	return Success();
 }
 
-S::Void S::GUI::Scrollbar::TimerProc()
+S::Void S::GUI::Scrollbar::OnMouseClick(const Point &mousePos)
 {
-	if (!IsRegistered())		return;
-	if (!active || !IsVisible())	return;
+	Int	 value = 0;
 
-	if (!timerActive && timer != NIL)
-	{
-		timer->Stop();
+	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - 3 * GetHeight()) / ((Float) (mousePos.x - (GetRealPosition().x + 1.5 * GetHeight())))));
+	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - 3 * GetWidth()) / ((Float) (mousePos.y - (GetRealPosition().y + 1.5 * GetWidth())))));
 
-		DeleteObject(timer);
-
-		timer = NIL;
-
-		return;
-	}
-
-	if (timerCount == 1)
-	{
-		timer->Stop();
-		timer->Start(10);
-	}
-
-	if (button1Clicked || button2Clicked)
-	{
-		Process(SM_LBUTTONDOWN, 0, 0);
-	}
-
-	timerCount++;
+	if (!dragging) SetValue(startValue + value);
 }
 
-S::Int S::GUI::Scrollbar::SetRange(Int rangeStart, Int rangeEnd)
+S::Void S::GUI::Scrollbar::OnMouseWheel(Int value)
 {
-	if (rangeStart == startValue && rangeEnd == endValue) return Success;
+	SetValue(*variable - value);
+}
 
-	Int	 prevStartValue	= startValue;
-	Int	 prevEndValue	= endValue;
-	Int	 prevValue	= *variable;
+S::Void S::GUI::Scrollbar::OnMouseDragStart(const Point &mousePos)
+{
+	if (subtype == OR_HORZ)	mouseBias = (GetRealPosition().x + dragHotspot->GetX() + GetHeight() / 2) - mousePos.x;
+	else			mouseBias = (GetRealPosition().y + dragHotspot->GetY() + GetWidth() / 2) - mousePos.y;
 
-	startValue	= rangeStart;
-	endValue	= rangeEnd;
+	dragging = True;
+}
 
-	*variable	= (Int) (((Float) (*variable) - prevStartValue) * ((Float) (endValue - startValue) / (prevEndValue - prevStartValue)) + startValue);
-	*variable	= (Int) Math::Max(rangeStart, Math::Min(rangeEnd, *variable));
+S::Void S::GUI::Scrollbar::OnMouseDrag(const Point &mousePos)
+{
+	Int	 value = 0;
 
-	if (prevValue != 0) Paint(SP_PAINT);
+	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - 3 * GetHeight()) / ((Float) (mousePos.x + mouseBias - (GetRealPosition().x + 1.5 * GetHeight())))));
+	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - 3 * GetWidth()) / ((Float) (mousePos.y + mouseBias - (GetRealPosition().y + 1.5 * GetWidth())))));
 
-	onClick.Emit(0, 0);
+	SetValue(startValue + value);
+}
 
-	return Success;
+S::Void S::GUI::Scrollbar::OnMouseDragEnd(const Point &mousePos)
+{
+	dragging = False;
+
+	OnValueChange(*variable);
+}
+
+S::Void S::GUI::Scrollbar::OnValueChange(Int value)
+{
+	UpdateHotspotPositions();
+
+	if (!IsRegistered() || !IsVisible()) return;
+
+	Surface	*surface	= container->GetDrawSurface();
+	Rect	 backFrame	= Rect(GetRealPosition() + (subtype == OR_HORZ ? Point(GetHeight(), 0) : Point(0, GetWidth())), GetSize() - (subtype == OR_HORZ ? Size(2 * GetHeight(), 0) : Size(0, 2 * GetWidth())));
+	Rect	 sliderFrame	= Rect(GetRealPosition() + (subtype == OR_HORZ ? Point(GetHeight() + (Int) (((Float) GetWidth() - 3 * GetHeight()) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, GetWidth() + (Int) (((Float) GetHeight() - 3 * GetWidth()) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))))), subtype == OR_HORZ ? Size(GetHeight(), GetHeight()) : Size(GetWidth(), GetWidth()));
+
+	surface->Box(backFrame, Setup::LightGrayColor, FILLED);
+
+	if (!dragging) surface->Box(sliderFrame, Setup::BackgroundColor, FILLED);
+
+	surface->Frame(sliderFrame, FRAME_UP);
+}
+
+S::Void S::GUI::Scrollbar::UpdateHotspotPositions()
+{
+	arrow1Hotspot->SetMetrics(Point(2 + (subtype == OR_HORZ ? GetWidth() - GetHeight() : 0), 2 + (subtype == OR_VERT ? GetHeight() - GetWidth() : 0)), (subtype == OR_HORZ ? Size(GetHeight(), GetHeight()) : Size(GetWidth(), GetWidth())) - Size(4, 4));
+	arrow2Hotspot->SetMetrics(Point(2, 2), (subtype == OR_HORZ ? Size(GetHeight(), GetHeight()) : Size(GetWidth(), GetWidth())) - Size(4, 4));
+
+	clickHotspot->SetMetrics(subtype == OR_HORZ ? Point(GetHeight(), 0) : Point(0, GetWidth()), GetSize() - (subtype == OR_HORZ ? Size(2 * GetHeight(), 0) : Size(0, 2 * GetWidth())));
+	dragHotspot->SetMetrics(subtype == OR_HORZ ? Point(GetHeight() + (Int) (((Float) GetWidth() - 3 * GetHeight()) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, GetWidth() + (Int) (((Float) GetHeight() - 3 * GetWidth()) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)))), subtype == OR_HORZ ? Size(GetHeight(), GetHeight()) : Size(GetWidth(), GetWidth()));
 }

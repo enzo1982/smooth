@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,62 +12,32 @@
 #define _H_OBJSMOOTH_ARRAY_
 
 #include "entry.h"
+#include "backend.h"
 
 namespace smooth
 {
-	class Array_Base
+	template <class t, class s = t> class Array : public Array_Backend<s>
 	{
 		public:
-			virtual	~Array_Base()
-			{
-			}
-	};
+						 Array()							{ }
+			virtual			~Array()							{ }
 
-	template <class t> class Array : public Array_Base
-	{
-		private:
-			Int		 nOfEntries;
-			Int		 greatestIndex;
-			Bool		 outlinedEntry;
+			Int			 AddEntry(const t &value)					{ return Array_Backend<s>::AddEntry((s) value); }
+			Bool			 AddEntry(const t &value, Int index)				{ return Array_Backend<s>::AddEntry((s) value, index); }
 
-			Array_Entry<t>	*firstEntry;
-			Array_Entry<t>	*lastEntry;
-			Array_Entry<t>	*prevEntry;
-			Array_Entry<t>	*prevDeletedEntry;
+			Int			 InsertEntryAfter(Int index, const t &value)			{ return Array_Backend<s>::InsertEntryAfter(index, (s) value); }
+			Bool			 InsertEntryAfter(Int index, const t &value, Int nIndex)	{ return Array_Backend<s>::InsertEntryAfter(index, (s) value, nIndex); }
+			Int			 InsertEntryAtPos(Int pos, const t &value)			{ return Array_Backend<s>::InsertEntryAtPos(pos, (s) value); }
+			Bool			 InsertEntryAtPos(Int pos, const t &value, Int nIndex)		{ return Array_Backend<s>::InsertEntryAtPos(pos, (s) value, nIndex); }
 
-			Int		 lastN;
-			Array_Entry<t>	*lastNthEntry;
+			t			 GetEntry(Int index) const					{ return (t) Array_Backend<s>::GetEntry(index); }
+			Bool			 SetEntry(Int index, const t &value)				{ return Array_Backend<s>::SetEntry(index, (s) value); }
 
-			Bool		 IndexAvailable(Int);
-		public:
-					 Array();
-					~Array();
-
-			Int		 AddEntry(t);
-			Bool		 AddEntry(t, Int);
-
-			Int		 InsertEntryAfter(Int, t);
-			Bool		 InsertEntryAfter(Int, t, Int);
-			Int		 InsertEntryAtPos(Int, t);
-			Bool		 InsertEntryAtPos(Int, t, Int);
-
-			Bool		 RemoveEntry(Int);
-			Bool		 RemoveAll();
-
-			t		 GetEntry(Int);
-			Bool		 SetEntry(Int, t);
-
-			Int		 GetNOfEntries() const		{ return nOfEntries; };
-			t		 GetFirstEntry();
-			t		 GetLastEntry();
-			t		 GetNextEntry();
-			t		 GetPrevEntry();
-			t		 GetNthEntry(Int);
-			Int		 GetNthEntryIndex(Int);
-
-		// static methods for accessing const arrays:
-
-			static t	 GetNthEntry(const Array<t> *, Int);
+			t			 GetFirstEntry() const						{ return (t) Array_Backend<s>::GetFirstEntry(); }
+			t			 GetLastEntry() const						{ return (t) Array_Backend<s>::GetLastEntry(); }
+			t			 GetNextEntry() const						{ return (t) Array_Backend<s>::GetNextEntry(); }
+			t			 GetPrevEntry() const						{ return (t) Array_Backend<s>::GetPrevEntry(); }
+			t			 GetNthEntry(Int n) const					{ return (t) Array_Backend<s>::GetNthEntry(n); }
 	};
 };
 

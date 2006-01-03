@@ -473,8 +473,7 @@ xmlNextChar(xmlParserCtxtPtr ctxt)
              *   the single character #xA.
              */
             if (*(ctxt->input->cur) == '\n') {
-                ctxt->input->line++;
-                ctxt->input->col = 1;
+                ctxt->input->line++; ctxt->input->col = 1;
             } else
                 ctxt->input->col++;
 
@@ -551,8 +550,7 @@ xmlNextChar(xmlParserCtxtPtr ctxt)
          */
 
         if (*(ctxt->input->cur) == '\n') {
-            ctxt->input->line++;
-            ctxt->input->col = 1;
+            ctxt->input->line++; ctxt->input->col = 1;
         } else
             ctxt->input->col++;
         ctxt->input->cur++;
@@ -730,7 +728,7 @@ encoding_error:
     {
         char buffer[150];
 
-	snprintf(buffer, 149, "Bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n",
+	snprintf(&buffer[0], 149, "Bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n",
 			ctxt->input->cur[0], ctxt->input->cur[1],
 			ctxt->input->cur[2], ctxt->input->cur[3]);
 	__xmlErrEncoding(ctxt, XML_ERR_INVALID_CHAR,
@@ -1145,7 +1143,8 @@ xmlSwitchInputEncoding(xmlParserCtxtPtr ctxt, xmlParserInputPtr input,
              * UTF-16
              */
             if ((handler->name != NULL) &&
-                (!strcmp(handler->name, "UTF-16LE")) &&
+                (!strcmp(handler->name, "UTF-16LE") ||
+                 !strcmp(handler->name, "UTF-16")) &&
                 (input->cur[0] == 0xFF) && (input->cur[1] == 0xFE)) {
                 input->cur += 2;
             }
@@ -1268,9 +1267,11 @@ xmlSwitchInputEncoding(xmlParserCtxtPtr ctxt, xmlParserInputPtr input,
 int
 xmlSwitchToEncoding(xmlParserCtxtPtr ctxt, xmlCharEncodingHandlerPtr handler) 
 {
+    int ret = 0;
+
     if (handler != NULL) {
         if (ctxt->input != NULL) {
-	    xmlSwitchInputEncoding(ctxt, ctxt->input, handler);
+	    ret = xmlSwitchInputEncoding(ctxt, ctxt->input, handler);
 	} else {
 	    xmlErrInternal(ctxt, "xmlSwitchToEncoding : no input\n",
 	                   NULL);
@@ -1282,7 +1283,7 @@ xmlSwitchToEncoding(xmlParserCtxtPtr ctxt, xmlCharEncodingHandlerPtr handler)
 	ctxt->charset = XML_CHAR_ENCODING_UTF8;
     } else 
 	return(-1);
-    return(0);
+    return(ret);
 }
 
 /************************************************************************
@@ -1468,9 +1469,6 @@ xmlNewStringInputStream(xmlParserCtxtPtr ctxt, const xmlChar *buffer) {
     input->end = &buffer[input->length];
     return(input);
 }
-
-void
-__xmlLoaderErr(void *ctx, const char *msg, const char *filename);
 
 /**
  * xmlNewInputFromFile:
@@ -1730,7 +1728,7 @@ xmlFreeParserCtxt(xmlParserCtxtPtr ctxt)
     if (ctxt->extSubSystem != NULL) xmlFree((char *) ctxt->extSubSystem);
 #ifdef LIBXML_SAX1_ENABLED
     if ((ctxt->sax != NULL) &&
-        (ctxt->sax != (xmlSAXHandlerPtr) (void *) &xmlDefaultSAXHandler))
+        (ctxt->sax != (xmlSAXHandlerPtr) &xmlDefaultSAXHandler))
 #else
     if (ctxt->sax != NULL)
 #endif /* LIBXML_SAX1_ENABLED */
@@ -1796,7 +1794,7 @@ xmlFreeParserCtxt(xmlParserCtxtPtr ctxt)
  */
 
 xmlParserCtxtPtr
-xmlNewParserCtxt()
+xmlNewParserCtxt(void)
 {
     xmlParserCtxtPtr ctxt;
 

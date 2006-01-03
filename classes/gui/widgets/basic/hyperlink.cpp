@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,26 +9,15 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/hyperlink.h>
+#include <smooth/gui/widgets/hotspot/hotspot.h>
+#include <smooth/gui/window/window.h>
 #include <smooth/graphics/color.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
 
-S::GUI::Hyperlink::Hyperlink()
-{
-	type		= classID;
-	linkURL		= NIL;
-	linkBitmap	= NIL;
-
-	font.SetUnderline(True);
-
-	possibleContainers.AddEntry(Layer::classID);
-}
-
-S::GUI::Hyperlink::Hyperlink(String iText, const Bitmap &bitmap, String link, Point iPos, Size iSize)
+S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const String &link, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
 	type		= classID;
 	text		= iText;
@@ -38,170 +27,125 @@ S::GUI::Hyperlink::Hyperlink(String iText, const Bitmap &bitmap, String link, Po
 	linkBitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
 	font.SetUnderline(True);
-
-	possibleContainers.AddEntry(Layer::classID);
-
-	pos	= iPos;
-	size	= iSize;
+	font.SetColor(Color(0, 0, 255));
 
 	if (linkBitmap != NIL)
 	{
-		if (size.cx == 0 && size.cy == 0) size = linkBitmap.GetSize();
+		if (GetSize() == Size(0, 0)) SetSize(linkBitmap.GetSize());
 	}
 	else
 	{
 		GetTextSize();
 
-		size = textSize;
+		SetSize(textSize);
 	}
+
+	hotspot	= new Hotspot(Point(0, 0), GetSize());
+
+	hotspot->onMouseOver.Connect(&Hyperlink::OnMouseOver, this);
+	hotspot->onMouseOut.Connect(&Hyperlink::OnMouseOut, this);
+	hotspot->onLeftButtonClick.Connect(&Hyperlink::OnClickLink, this);
+
+	RegisterObject(hotspot);
 }
 
 S::GUI::Hyperlink::~Hyperlink()
 {
-}
-
-S::Int S::GUI::Hyperlink::Hide()
-{
-	if (linkBitmap == NIL) size = textSize;
-
-	return Widget::Hide();
+	DeleteObject(hotspot);
 }
 
 S::Int S::GUI::Hyperlink::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
+
+	EnterProtectedRegion();
 
 	Surface	*surface = container->GetDrawSurface();
-	Rect	 textRect;
-	Point	 realPos = GetRealPosition();
-	Int	 textColor;
-
-	textRect.left	= realPos.x;
-	textRect.top	= realPos.y;
-
-	if (linkBitmap == NIL)
-	{
-		textRect.right	= textRect.left + textSize.cx;
-		textRect.bottom	= textRect.top + textSize.cy + 1;
-
-		switch (message)
-		{
-			default:
-			case SP_PAINT:
-			case SP_MOUSEOUT:
-				textColor = RGB(0, 0, 255);
-				break;
-			case SP_MOUSEIN:
-				textColor = RGB(0, 128, 255);
-				break;
-		}
-
-		Font	 nFont = font;
-
-		nFont.SetColor(textColor);
-
-		surface->SetText(text, textRect, nFont);
-	}
-	else
-	{
-		textRect.right	= textRect.left + size.cx;
-		textRect.bottom	= textRect.top + size.cy;
-
-		surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), textRect);
-	}
-
-	return Success;
-}
-
-S::Int S::GUI::Hyperlink::Process(Int message, Int wParam, Int lParam)
-{
-	if (!IsRegistered())		return Failure;
-	if (!active || !IsVisible())	return Success;
-
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
-
-	Rect	 textRect;
-	Point	 realPos = GetRealPosition();
-	Int	 retVal = Success;
-
-	textRect.left	= realPos.x;
-	textRect.top	= realPos.y;
-
-	if (linkBitmap == NIL)
-	{
-		textRect.right	= textRect.left + textSize.cx;
-		textRect.bottom	= textRect.top + textSize.cy + 1;
-	}
-	else
-	{
-		textRect.right	= textRect.left + size.cx - 1;
-		textRect.bottom	= textRect.top + size.cy - 1;
-	}
 
 	switch (message)
 	{
-		case SM_LBUTTONDOWN:
-			if (checked)
-			{
-				if (Setup::enableUnicode)	LiSAOpenURLW(linkURL);
-				else				LiSAOpenURLA(linkURL);
-
-				wnd->Process(SM_MOUSEMOVE, 0, 0);
+		case SP_SHOW:
+		case SP_PAINT:
+			if (linkBitmap == NIL)	surface->SetText(text, Rect(GetRealPosition(), textSize + Size(0, 1)), font);
+			else			surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), Rect(GetRealPosition(), GetSize()));
 
-				retVal = Break;
-			}
-			break;
-		case SM_MOUSEMOVE:
-			if (wnd->IsMouseOn(textRect) && !checked)
-			{
-				checked = True;
-
-				LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_HAND);
-
-				Paint(SP_MOUSEIN);
-			}
-			else if (!wnd->IsMouseOn(textRect) && checked)
-			{
-				checked = False;
-
-				LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_ARROW);
-
-				Paint(SP_MOUSEOUT);
-			}
 			break;
 	}
 
-	return retVal;
+	LeaveProtectedRegion();
+
+	return Success();
 }
 
-S::GUI::Bitmap &S::GUI::Hyperlink::GetBitmap()
+S::Void S::GUI::Hyperlink::OnMouseOver()
 {
-	return linkBitmap;
+	LiSASetMouseCursor((HWND) container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_HAND);
+
+	if (linkBitmap == NIL)
+	{
+		Surface	*surface  = container->GetDrawSurface();
+		Rect	 textRect = Rect(GetRealPosition(), textSize + Size(0, 1));
+		Font	 nFont	  = font;
+
+		nFont.SetColor(Color(0, 128, 255));
+
+		surface->SetText(text, textRect, nFont);
+	}
 }
 
-S::String S::GUI::Hyperlink::GetURL()
+S::Void S::GUI::Hyperlink::OnMouseOut()
 {
-	return linkURL;
+	LiSASetMouseCursor((HWND) container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
+
+	if (linkBitmap == NIL)
+	{
+		Surface	*surface  = container->GetDrawSurface();
+		Rect	 textRect = Rect(GetRealPosition(), textSize + Size(0, 1));
+
+		surface->SetText(text, textRect, font);
+	}
+}
+
+S::Void S::GUI::Hyperlink::OnClickLink()
+{
+	if (Setup::enableUnicode)	LiSAOpenURLW(linkURL);
+	else				LiSAOpenURLA(linkURL);
+
+	onAction.Emit();
 }
 
 S::Int S::GUI::Hyperlink::SetText(const String &newText)
 {
 	if (linkBitmap != NIL) linkBitmap = NIL;
 
-	return Widget::SetText(newText);
-}
+	Widget::SetText(newText);
 
-S::Int S::GUI::Hyperlink::SetURL(String newUrl)
-{
-	linkURL = newUrl;
+	SetSize(textSize);
 
-	return Success;
+	hotspot->SetSize(GetSize());
+
+	return Success();
 }
 
 S::Int S::GUI::Hyperlink::SetBitmap(const Bitmap &newBmp)
 {
-	return Failure;
+	return Error();
+}
+
+const S::GUI::Bitmap &S::GUI::Hyperlink::GetBitmap()
+{
+	return linkBitmap;
+}
+
+S::Int S::GUI::Hyperlink::SetURL(const String &newUrl)
+{
+	linkURL = newUrl;
+
+	return Success();
+}
+
+const S::String &S::GUI::Hyperlink::GetURL()
+{
+	return linkURL;
 }

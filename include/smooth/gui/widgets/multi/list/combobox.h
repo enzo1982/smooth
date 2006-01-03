@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,9 +16,9 @@ namespace smooth
 	namespace GUI
 	{
 		class ComboBox;
-		class Layer;
 		class ToolWindow;
 		class ListBox;
+		class Hotspot;
 	};
 };
 
@@ -35,23 +35,27 @@ namespace smooth
 		{
 			private:
 				ToolWindow		*toolWindow;
-				Layer			*layer;
 				ListBox			*listBox;
 
-				Bool			 closeListBox;
 				ListEntry		*prevSelectedEntry;
 
 				Void			 CloseListBox();
+			protected:
+				Hotspot			*hotspot;
+				Hotspot			*buttonHotspot;
 			public:
 				static const Int	 classID;
 
-							 ComboBox(Point, Size);
-							~ComboBox();
+							 ComboBox(const Point &, const Size &);
+				virtual			~ComboBox();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
 			slots:
-				Void			 ListBoxProc();
+				Void			 ToggleListBox();
+
+				Void			 OnSelectEntry(ListEntry *);
+
+				Void			 OnChangeSize(const Size &);
 		};
 	};
 };

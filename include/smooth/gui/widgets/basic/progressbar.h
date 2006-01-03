@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,24 +35,21 @@ namespace smooth
 			private:
 				Bitmap			 gradient;
 
-				Void			 CreateGradient(Size);
+				Void			 CreateGradient(const Size &);
 			protected:
 				Int			 value;
-				Int			 prevValue;
 
 				Int			 startValue;
 				Int			 endValue;
-
-				Int			 textFlag;
 			public:
 				static const Int	 classID;
 
-							 Progressbar(Point, Size, Int, Int, Int, Int, Int);
-							~Progressbar();
+							 Progressbar(const Point &, const Size &, Int = OR_HORZ, Int = PB_PERCENT, Int = 0, Int = 100, Int = 0);
+				virtual			~Progressbar();
 
 				virtual Int		 Paint(Int);
-
-				Int			 SetMetrics(Point, Size);
+			accessors:
+				Int			 SetMetrics(const Point &, const Size &);
 
 				Int			 SetValue(Int);
 				Int			 GetValue();

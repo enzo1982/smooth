@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,48 +8,52 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/misc/math.h>
 #include <smooth/gui/widgets/basic/arrows.h>
-#include <smooth/gui/widgets/layer.h>
+#include <smooth/gui/widgets/hotspot/simplebutton.h>
+#include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::Arrows::classID = S::Object::RequestClassID();
 
-S::GUI::Arrows::Arrows(Point iPos, Size iSize, Int sType, Int *var, Int rangeStart, Int rangeEnd)
+S::GUI::Arrows::Arrows(const Point &iPos, const Size &iSize, Int sType, Int *var, Int rangeStart, Int rangeEnd) : Widget(iPos, iSize)
 {
 	type		= classID;
 	subtype		= sType;
 
-	arrow1Checked	= False;
-	arrow1Clicked	= False;
-	arrow2Checked	= False;
-	arrow2Clicked	= False;
-
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
 
-	variable	= var;
+	dummyVariable	= 0;
 
-	timerActive	= False;
+	if (var == NIL)	variable = &dummyVariable;
+	else		variable = var;
+
+	SetValue(*variable);
+
 	timer		= NIL;
+	timerCount	= 0;
+	timerDirection	= 1;
 
-	possibleContainers.AddEntry(Layer::classID);
+	if (GetWidth() == 0) SetWidth(subtype == OR_VERT ? 17 : 24);
+	if (GetHeight() == 0) SetHeight(subtype == OR_VERT ? 24 : 17);
 
-	pos		= iPos;
-	size		= iSize;
+	onValueChange.SetParentObject(this);
+	onValueChange.Connect(&onAction);
 
-	if (subtype == OR_VERT)
-	{
-		if (size.cx == 0) size.cx = 17;
-		if (size.cy == 0) size.cy = 24;
-	}
-	else
-	{
-		if (size.cx == 0) size.cx = 24;
-		if (size.cy == 0) size.cy = 17;
-	}
+	arrow1Hotspot	= new HotspotSimpleButton(Point(2 + (subtype == OR_HORZ ? GetWidth() / 2 : 0), 2), GetSize() - Size(4 + (subtype == OR_HORZ ? GetWidth() / 2 : 0), 4 + (subtype == OR_HORZ ? 0 : GetHeight() / 2)));
+	arrow2Hotspot	= new HotspotSimpleButton(Point(2, 2 + (subtype == OR_VERT ? GetHeight() / 2 : 0)), GetSize() - Size(4 + (subtype == OR_HORZ ? GetWidth() / 2 : 0), 4 + (subtype == OR_HORZ ? 0 : GetHeight() / 2)));
+
+	arrow1Hotspot->onLeftButtonDown.Connect(&Arrows::OnMouseDownPlus, this);
+	arrow2Hotspot->onLeftButtonDown.Connect(&Arrows::OnMouseDownMinus, this);
+
+	arrow1Hotspot->onLeftButtonUp.Connect(&Arrows::OnMouseRelease, this);
+	arrow2Hotspot->onLeftButtonUp.Connect(&Arrows::OnMouseRelease, this);
+
+	RegisterObject(arrow1Hotspot);
+	RegisterObject(arrow2Hotspot);
+
+	onChangeSize.Connect(&Arrows::OnChangeSize, this);
 }
 
 S::GUI::Arrows::~Arrows()
@@ -62,357 +66,179 @@ S::GUI::Arrows::~Arrows()
 
 		timer = NIL;
 	}
+
+	DeleteObject(arrow1Hotspot);
+	DeleteObject(arrow2Hotspot);
 }
 
 S::Int S::GUI::Arrows::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
+
+	EnterProtectedRegion();
 
 	Surface	*surface	= container->GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), size);
-	Point	 lineStart;
-	Point	 lineEnd;
+	Rect	 frame		= Rect(GetRealPosition(), GetSize());
+	Int	 arrowColor	= Setup::TextColor;
 
-	surface->Frame(frame, FRAME_UP);
-
-	if (subtype == OR_HORZ)
-	{
-		lineStart.x = (frame.left + frame.right) / 2 - 1;
-		lineStart.y = frame.top + 1;
-		lineEnd.x = lineStart.x;
-		lineEnd.y = frame.bottom - 1;
-
-		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
-
-		lineStart.x++;
-		lineEnd.x++;
-
-		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
-
-		lineStart.x = (frame.left + (frame.left + frame.right) / 2) / 2 - 2;
-		lineStart.y = (frame.bottom + frame.top) / 2;
-		lineEnd.x = lineStart.x;
-		lineEnd.y = lineStart.y + 1;
-
-		for (Int i = 0; i < 4; i++)
-		{
-			surface->Line(lineStart, lineEnd, Setup::TextColor);
-
-			lineStart.x++;
-			lineStart.y--;
-			lineEnd.x++;
-			lineEnd.y++;
-		}
-
-		lineStart.x = (frame.right + (frame.left + frame.right) / 2) / 2 - 2;
-		lineStart.y = (frame.bottom + frame.top) / 2 - 3;
-		lineEnd.x = lineStart.x;
-		lineEnd.y = lineStart.y + 7;
-
-		for (Int j = 0; j < 4; j++)
-		{
-			surface->Line(lineStart, lineEnd, Setup::TextColor);
-
-			lineStart.x++;
-			lineStart.y++;
-			lineEnd.x++;
-			lineEnd.y--;
-		}
-	}
-	else if (subtype == OR_VERT)
-	{
-		lineStart.x = frame.left + 1;
-		lineStart.y = (frame.top + frame.bottom) / 2 - 1;
-		lineEnd.x = frame.right - 1;
-		lineEnd.y = lineStart.y;
-
-		surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
-
-		lineStart.y++;
-		lineEnd.y++;
-
-		surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
-
-		lineStart.x = (frame.right + frame.left) / 2 + (Setup::rightToLeft ? 1 : 0);
-		lineStart.y = (frame.top + (frame.top + frame.bottom) / 2) / 2 - 2;
-		lineEnd.x = lineStart.x + 1;
-		lineEnd.y = lineStart.y;
-
-		for (Int k = 0; k < 4; k++)
-		{
-			surface->Line(lineStart, lineEnd, Setup::TextColor);
-
-			lineStart.x--;
-			lineStart.y++;
-			lineEnd.x++;
-			lineEnd.y++;
-		}
-
-		lineStart.x = (frame.right + frame.left) / 2 - 3 + (Setup::rightToLeft ? 1 : 0);
-		lineStart.y = (frame.bottom + (frame.top + frame.bottom) / 2) / 2 - 2;
-		lineEnd.x = lineStart.x + 7;
-		lineEnd.y = lineStart.y;
-
-		for (Int l = 0; l < 4; l++)
-		{
-			surface->Line(lineStart, lineEnd, Setup::TextColor);
-
-			lineStart.x++;
-			lineStart.y++;
-			lineEnd.x--;
-			lineEnd.y++;
-		}
-	}
-
-	return Success;
-}
-
-S::Int S::GUI::Arrows::Process(Int message, Int wParam, Int lParam)
-{
-	if (!IsRegistered())		return Failure;
-	if (!active || !IsVisible())	return Success;
-
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
-
-	Surface	*surface = container->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Int	 retVal = Success;
-	Rect	 frame;
-	Rect	 arrow1Frame;
-	Rect	 arrow2Frame;
-	Int	 prevValue = *variable;
-
-	frame.left	= realPos.x + 2;
-	frame.top	= realPos.y + 2;
-	frame.right	= realPos.x + size.cx - 2;
-	frame.bottom	= realPos.y + size.cy - 2;
+	if (!active) arrowColor = Setup::GrayTextColor;
 
 	switch (message)
 	{
-		case SM_LBUTTONDOWN:
-		case SM_LBUTTONDBLCLK:
-			if (!timerActive && timer == NIL && (arrow1Checked || arrow2Checked))
+		case SP_SHOW:
+		case SP_PAINT:
+			surface->Frame(frame, FRAME_UP);
+
+			if (subtype == OR_HORZ)
 			{
-				timer = new System::Timer();
+				Point	 lineStart	= Point((frame.left + frame.right) / 2 - 1, frame.top + 1);
+				Point	 lineEnd	= Point(lineStart.x, frame.bottom - 1);
 
-				timer->onInterval.Connect(&Arrows::TimerProc, this);
-				timer->Start(250);
+				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
+				surface->Line(lineStart + Point(1, 0), lineEnd + Point(1, 0), Setup::DividerLightColor);
 
-				timerCount = 1;
-				timerActive = True;
+				for (Int i = 0; i < 4; i++)
+				{
+					lineStart	= Point((frame.left + GetWidth() / 4) - 2 + i, frame.top + GetHeight() / 2 - i);
+					lineEnd		= lineStart + Point(0, 2 * i + 1);
+
+					surface->Line(lineStart, lineEnd, arrowColor);
+				}
+
+				for (Int j = 0; j < 4; j++)
+				{
+					lineStart	= Point((frame.right - GetWidth() / 4) - 2 + j, frame.top + GetHeight() / 2 - 3 + j);
+					lineEnd		= lineStart + Point(0, 7 - 2 * j);
+
+					surface->Line(lineStart, lineEnd, arrowColor);
+				}
 			}
-
-			if (arrow1Checked)
+			else if (subtype == OR_VERT)
 			{
-				arrow1Clicked = True;
+				Point	 lineStart	= Point(frame.left + 1, (frame.top + frame.bottom) / 2 - 1);
+				Point	 lineEnd	= Point(frame.right - 1, lineStart.y);
 
-				if (subtype == OR_VERT)	frame.bottom = realPos.y + size.cy / 2 - 2;
-				else			frame.right = realPos.x + size.cx / 2 - 2;
+				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
+				surface->Line(lineStart + Point(0, 1), lineEnd + Point(0, 1), Setup::DividerLightColor);
 
-				surface->Frame(frame, FRAME_DOWN);
+				for (Int i = 0; i < 4; i++)
+				{
+					lineStart	= Point(frame.left + GetWidth() / 2 + (Setup::rightToLeft ? 1 : 0) - i, (frame.top + GetHeight() / 4) - 2 + i);
+					lineEnd		= lineStart + Point(2 * i + 1, 0);
 
-				if (subtype == OR_HORZ)	(*variable)--;
-				else			(*variable)++;
+					surface->Line(lineStart, lineEnd, arrowColor);
+				}
 
-				if (*variable < startValue)	*variable = startValue;
-				else if (*variable > endValue)	*variable = endValue;
+				for (Int j = 0; j < 4; j++)
+				{
+					lineStart	= Point(frame.left + GetWidth() / 2 - 3 + (Setup::rightToLeft ? 1 : 0) + j, (frame.bottom - GetHeight() / 4) - 2 + j);
+					lineEnd		= lineStart + Point(7 - 2 * j, 0);
 
-				if (*variable != prevValue) onClick.Emit(wnd->MouseX(), wnd->MouseY());
-
-				retVal = Break;
-			}
-			else if (arrow2Checked)
-			{
-				arrow2Clicked = True;
-
-				if (subtype == OR_VERT)	frame.top = realPos.y + size.cy / 2 + 2;
-				else			frame.left = realPos.x + size.cx / 2 + 2;
-
-				surface->Frame(frame, FRAME_DOWN);
-
-				if (subtype == OR_HORZ)	(*variable)++;
-				else			(*variable)--;
-
-				if (*variable < startValue)	*variable = startValue;
-				else if (*variable > endValue)	*variable = endValue;
-
-				if (*variable != prevValue) onClick.Emit(wnd->MouseX(), wnd->MouseY());
-
-				retVal = Break;
-			}
-
-			break;
-		case SM_LBUTTONUP:
-			if (timerActive) timerActive = False;
-
-			if (arrow1Clicked)
-			{
-				arrow1Clicked = False;
-				arrow1Checked = False;
-
-				if (subtype == OR_VERT)	frame.bottom = realPos.y + size.cy / 2 - 2;
-				else			frame.right = realPos.x + size.cx / 2 - 2;
-
-				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
-
-				Process(SM_MOUSEMOVE, 0, 0);
-
-				retVal = Break;
-			}
-			else if (arrow2Clicked)
-			{
-				arrow2Clicked = False;
-				arrow2Checked = False;
-
-				if (subtype == OR_VERT)	frame.top = realPos.y + size.cy / 2 + 2;
-				else			frame.left = realPos.x + size.cx / 2 + 2;
-
-				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
-
-				Process(SM_MOUSEMOVE, 0, 0);
-
-				retVal = Break;
+					surface->Line(lineStart, lineEnd, arrowColor);
+				}
 			}
 
 			break;
-		case SM_MOUSEMOVE:
-			arrow1Frame = frame;
-			arrow2Frame = frame;
-
-			if (subtype == OR_VERT)	arrow1Frame.bottom = realPos.y + size.cy / 2 - 2;
-			else			arrow1Frame.right = realPos.x + size.cx / 2 - 2;
-
-			if (subtype == OR_VERT)	arrow2Frame.top = realPos.y + size.cy / 2 + 2;
-			else			arrow2Frame.left = realPos.x + size.cx / 2 + 2;
-
-			if (!arrow1Checked && wnd->IsMouseOn(arrow1Frame))
-			{
-				arrow1Checked = True;
-
-				surface->Frame(arrow1Frame, FRAME_UP);
-			}
-			else if (arrow1Checked && !wnd->IsMouseOn(arrow1Frame))
-			{
-				if (timerActive) timerActive = False;
-
-				arrow1Checked = False;
-				arrow1Clicked = False;
-
-				surface->Box(arrow1Frame, Setup::BackgroundColor, OUTLINED);
-			}
-			else if (!arrow2Checked && wnd->IsMouseOn(arrow2Frame))
-			{
-				arrow2Checked = True;
-
-				surface->Frame(arrow2Frame, FRAME_UP);
-			}
-			else if (arrow2Checked && !wnd->IsMouseOn(arrow2Frame))
-			{
-				if (timerActive) timerActive = False;
-
-				arrow2Checked = False;
-				arrow2Clicked = False;
-
-				surface->Box(arrow2Frame, Setup::BackgroundColor, OUTLINED);
-			}
-
-			break;
-		case WM_KILLFOCUS:
-		case WM_ACTIVATEAPP:
-			return Process(SM_LBUTTONUP, 0, 0);
 	}
 
-	return retVal;
+	LeaveProtectedRegion();
+
+	return Success();
 }
 
-S::Void S::GUI::Arrows::TimerProc()
+S::Void S::GUI::Arrows::OnMouseDownPlus()
 {
-	if (!IsRegistered())		return;
-	if (!active || !IsVisible())	return;
+	if (timer == NIL)
+	{
+		timer = new System::Timer();
 
-	Int	 prevValue = *variable;
-	Int	 plus = 1;
+		timer->onInterval.Connect(&Arrows::OnTimer, this);
+		timer->Start(0);
 
-	if (!timerActive && timer != NIL)
+		timerCount	= 0;
+		timerDirection	= 1;
+	}
+}
+
+S::Void S::GUI::Arrows::OnMouseDownMinus()
+{
+	if (timer == NIL)
+	{
+		timer = new System::Timer();
+
+		timer->onInterval.Connect(&Arrows::OnTimer, this);
+		timer->Start(0);
+
+		timerCount	= 0;
+		timerDirection	= -1;
+	}
+}
+
+S::Void S::GUI::Arrows::OnMouseRelease()
+{
+	if (timer != NIL)
 	{
 		timer->Stop();
 
 		DeleteObject(timer);
 
 		timer = NIL;
-
-		return;
 	}
+}
 
-	if (timerCount == 1)
-	{
-		timer->Stop();
-		timer->Start(100);
-	}
+S::Void S::GUI::Arrows::OnTimer()
+{
+	if (timerCount == 0) { timer->Stop(); timer->Start(250); }
+	if (timerCount == 1) { timer->Stop(); timer->Start(100); }
+
+	Int	 prevValue	= *variable;
+	Int	 difference	= timerDirection * 1;
 
 	for (Int n = 1; n < 10; n++)
 	{
-		if (timerCount >= 20 * n && *variable % (Int) Math::Pow(10, n) == 0)
-		{
-			plus = (Int) Math::Pow(10, n);
-		}
+		if (timerCount >= 10 * n && *variable % (Int) Math::Pow(10, n) == 0) difference = timerDirection * (Int) Math::Pow(10, n);
 	}
 
-	if (arrow1Clicked)
-	{
-		if (subtype == OR_HORZ)	(*variable) -= plus;
-		else			(*variable) += plus;
-	}
-	else if (arrow2Clicked)
-	{
-		if (subtype == OR_HORZ)	(*variable) += plus;
-		else			(*variable) -= plus;
-	}
+	*variable = Math::Min(Math::Max(*variable + difference, startValue), endValue);
 
-
-	if (*variable < startValue)	*variable = startValue;
-	else if (*variable > endValue)	*variable = endValue;
-
-	if (*variable != prevValue) onClick.Emit(0, 0);
+	if (*variable != prevValue) onValueChange.Emit(*variable);
 
 	timerCount++;
 }
 
 S::Int S::GUI::Arrows::SetRange(Int rangeStart, Int rangeEnd)
 {
-	Int	 prevStartValue	= startValue;
-	Int	 prevEndValue	= endValue;
-	Int	 prevValue	= *variable;
+	if (startValue == rangeStart && endValue == rangeEnd) return Success();
 
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
 
-	*variable	= (Int) (((Float) (*variable) - prevStartValue) * ((Float) (endValue - startValue) / (prevEndValue - prevStartValue)) + startValue);
-	*variable	= (Int) Math::Max(rangeStart, Math::Min(rangeEnd, *variable));
+	SetValue(*variable);
 
-	if (*variable != prevValue) onClick.Emit(0, 0);
+	onValueChange.Emit(*variable);
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Arrows::SetValue(Int newValue)
 {
-	if (newValue < startValue)	newValue = startValue;
-	if (newValue > endValue)	newValue = endValue;
+	Int	 prevValue	= *variable;
 
-	if (*variable == newValue) return Success;
+	*variable = Math::Min(Math::Max(newValue, startValue), endValue);
 
-	*variable = newValue;
+	if (*variable != prevValue) onValueChange.Emit(*variable);
 
-	onClick.Emit(0, 0);
-
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Arrows::GetValue()
 {
 	return *variable;
+}
+
+S::Void S::GUI::Arrows::OnChangeSize(const Size &nSize)
+{
+	arrow1Hotspot->SetSize(nSize - Size(4 + (subtype == OR_HORZ ? GetWidth() / 2 : 0), 4 + (subtype == OR_HORZ ? 0 : GetHeight() / 2)));
+	arrow2Hotspot->SetSize(nSize - Size(4 + (subtype == OR_HORZ ? GetWidth() / 2 : 0), 4 + (subtype == OR_HORZ ? 0 : GetHeight() / 2)));
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,17 +28,17 @@
 #include <smooth/gui/widgets/layer.h>
 
 #include <smooth/misc/string.h>
-#include <smooth/misc/i18n.h>
+#include <smooth/i18n/i18n.h>
 
 #include <smooth/resources.h>
-#include <smooth/dllmain.h>
+#include <smooth/backends/win32/backendwin32.h>
 
 #include <time.h>
 #include <stdlib.h>
 
-S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
+S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 {
-	showTips = True;
+	showTips = iShowTips;
 
 	mode = TIP_ORDERED;
 	offset = 0;
@@ -46,7 +46,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 	Point	 pos;
 	Size	 size;
 
-	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"));
+	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"), Point(Int((LiSAGetDisplaySizeX() - 350) / 2), Int((LiSAGetDisplaySizeY() - 300) / 2) - 50), Size(350, 300));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
@@ -55,13 +55,13 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 	pos.y = 29;
 
 	btn_ok		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, pos, size);
-	btn_ok->onClick.Connect(&TipOfTheDay::ButtonOK, this);
+	btn_ok->onAction.Connect(&TipOfTheDay::ButtonOK, this);
 	btn_ok->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 175;
 
 	btn_next	= new Button(I18n::Translator::defaultTranslator->TranslateString("Next tip"), NIL, pos, size);
-	btn_next->onClick.Connect(&TipOfTheDay::ButtonNext, this);
+	btn_next->onAction.Connect(&TipOfTheDay::ButtonNext, this);
 	btn_next->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 7;
@@ -69,9 +69,9 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 
 	size.cx = 150;
 
-	check_showtips	= new CheckBox(I18n::Translator::defaultTranslator->TranslateString("Show tips on startup"), pos, size, &showTips);
+	check_showtips	= new CheckBox(I18n::Translator::defaultTranslator->TranslateString("Show tips on startup"), pos, size, showTips);
 	check_showtips->SetOrientation(OR_LOWERLEFT);
-	check_showtips->SetMetrics(check_showtips->pos, Size(check_showtips->textSize.cx + 21, check_showtips->size.cy));
+	check_showtips->SetWidth(check_showtips->textSize.cx + 21);
 
 	pos.x = 5;
 	pos.y = 3;
@@ -117,10 +117,6 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay()
 
 	layer_inner->RegisterObject(txt_tip);
 
-	dlgwnd->value = 0;
-
-	dlgwnd->SetMetrics(Point(Int((LiSAGetDisplaySizeX() - 350) / 2), Int((LiSAGetDisplaySizeY() - 300) / 2) - 50), Size(350, 300));
-
 	dlgwnd->onPaint.Connect(&TipOfTheDay::Paint, this);
 }
 
@@ -143,22 +139,23 @@ S::GUI::Dialogs::TipOfTheDay::~TipOfTheDay()
 	DeleteObject(txt_tip);
 }
 
-S::Int S::GUI::Dialogs::TipOfTheDay::ShowDialog()
+const Error &S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 {
 	if (caption != NIL) dlgwnd->SetText(caption);
 
 	ButtonNext();
 
 	dlgwnd->Show();
+	dlgwnd->Stay();
 
-	return dlgwnd->Stay();
+	return error;
 }
 
 S::Int S::GUI::Dialogs::TipOfTheDay::AddTip(const String &tip)
 {
 	tips.AddEntry(tip);
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Dialogs::TipOfTheDay::SetMode(Int nMode, Int nOffset, Bool showOnStartup)
@@ -176,12 +173,12 @@ S::Int S::GUI::Dialogs::TipOfTheDay::SetMode(Int nMode, Int nOffset, Bool showOn
 
 			break;
 		default:
-			return Failure;
+			return Error();
 	}
 
-	showTips = showOnStartup;
+	*showTips = showOnStartup;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Dialogs::TipOfTheDay::GetOffset()
@@ -191,8 +188,6 @@ S::Int S::GUI::Dialogs::TipOfTheDay::GetOffset()
 
 S::Void S::GUI::Dialogs::TipOfTheDay::ButtonOK()
 {
-	dlgwnd->value = showTips;
-
 	dlgwnd->Close();
 }
 
@@ -222,5 +217,5 @@ S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 
 S::Void S::GUI::Dialogs::TipOfTheDay::Paint()
 {
-	dlgwnd->GetDrawSurface()->Box(Rect(Point(7, 38) + dlgwnd->GetMainLayer()->pos, Size(330, 184)), 0, OUTLINED);
+	dlgwnd->GetDrawSurface()->Box(Rect(Point(7, 38) + dlgwnd->GetMainLayer()->GetPosition(), Size(330, 184)), 0, OUTLINED);
 }

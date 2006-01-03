@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,7 +26,7 @@ S::Int S::XML::XUL::Renderer::LoadXUL(const String &fileName)
 {
 	CloseXUL();
 
-	Int		 rVal	= Failure;
+	Int		 rVal	= Error();
 	Document	*xul	= new Document();
 
 	xul->LoadFile(fileName);
@@ -44,7 +44,7 @@ S::Int S::XML::XUL::Renderer::CloseXUL()
 
 	window = NIL;
 
-	return Success;
+	return Success();
 }
 
 S::GUI::Widget *S::XML::XUL::Renderer::GetWidget()
@@ -60,8 +60,8 @@ S::Int S::XML::XUL::Renderer::RenderXUL(Document *xul)
 	{
 		window = new XUL::Window(xul->GetRootNode());
 
-		return Success;
+		return Success();
 	}
 
-	return Failure;
+	return Error();
 }

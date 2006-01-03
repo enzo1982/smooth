@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -43,7 +43,7 @@ namespace smooth
 
 				slotN = new SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst);
 
-				return Success;
+				return Success();
 			}
 
 			Int Connect(returnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
@@ -52,18 +52,18 @@ namespace smooth
 
 				slotN = new SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc);
 
-				return Success;
+				return Success();
 			}
 
 			Int Connect(SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
 			{
-				if ((Signal *) sig == (Signal *) this) return Failure;
+				if ((Signal *) sig == (Signal *) this) return Error();
 
 				DisconnectAll();
 
 				slotN = new SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig);
 		
-				return Success;
+				return Success();
 			}
 
 			Int Connect(const returnTYPE value)
@@ -72,7 +72,7 @@ namespace smooth
 
 				slot0 = new SlotRValue0<returnTYPE>(value);
 
-				return Success;
+				return Success();
 			}
 
 #ifndef SIGNALS_SIGNAL_ZERO
@@ -82,7 +82,7 @@ namespace smooth
 
 				slot0 = new SlotRClass0<oClassTYPE, returnTYPE>(proc, inst);
 
-				return Success;
+				return Success();
 			}
 
 			Int Connect(returnTYPE (*proc)())
@@ -91,18 +91,18 @@ namespace smooth
 
 				slot0 = new SlotRGlobal0<returnTYPE>(proc);
 
-				return Success;
+				return Success();
 			}
 
 			Int Connect(SignalR0<returnTYPE> *sig)
 			{
-				if ((Signal *) sig == (Signal *) this) return Failure;
+				if ((Signal *) sig == (Signal *) this) return Error();
 
 				DisconnectAll();
 
 				slot0 = new SlotRSignal0<returnTYPE>(sig);
 
-				return Success;
+				return Success();
 			}
 #endif
 
@@ -110,28 +110,28 @@ namespace smooth
 			{
 				if ((*slotN) == SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst)) DisconnectAll();
 
-				return Success;
+				return Success();
 			}
 
 			Int Disconnect(returnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
 			{
 				if ((*slotN) == SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc)) DisconnectAll();
 
-				return Success;
+				return Success();
 			}
 
 			Int Disconnect(SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
 			{
 				if ((*slotN) == SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig)) DisconnectAll();
 
-				return Success;
+				return Success();
 			}
 
 			Int Disconnect(const returnTYPE value)
 			{
 				if ((*slot0) == SlotRValue0<returnTYPE>(value)) DisconnectAll();
 
-				return Success;
+				return Success();
 			}
 
 #ifndef SIGNALS_SIGNAL_ZERO
@@ -139,21 +139,21 @@ namespace smooth
 			{
 				if ((*slot0) == SlotRClass0<oClassTYPE, returnTYPE>(proc, inst)) DisconnectAll();
 
-				return Success;
+				return Success();
 			}
 
 			Int Disconnect(returnTYPE (*proc)())
 			{
 				if ((*slot0) == SlotRGlobal0<returnTYPE>(proc)) DisconnectAll();
 
-				return Success;
+				return Success();
 			}
 
 			Int Disconnect(SignalR0<returnTYPE> *sig)
 			{
 				if ((*slot0) == SlotRSignal0<returnTYPE>(sig)) DisconnectAll();
 
-				return Success;
+				return Success();
 			}
 #endif
 
@@ -162,7 +162,7 @@ namespace smooth
 				if (slotN != NIL) { delete slotN; slotN = NIL; }
 				if (slot0 != NIL) { delete slot0; slot0 = NIL; }
 
-				return Success;
+				return Success();
 			}
 
 			returnTYPE Call(SIGNALS_ARGUMENT_PARAMETER_LIST)
@@ -183,6 +183,8 @@ namespace smooth
 			{
 				if (slotN != NIL)	return slotN->Emit(SIGNALS_ARGUMENT_PARAMETERS);
 				if (slot0 != NIL)	return slot0->Emit();
+
+				return NIL;
 			}
 
 			Int GetNOfConnectedSlots()

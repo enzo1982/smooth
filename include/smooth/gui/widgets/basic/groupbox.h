@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,15 +30,15 @@ namespace smooth
 			public:
 				static const Int	 classID;
 
-							 GroupBox(String, Point, Size);
-							~GroupBox();
+							 GroupBox(const String &, const Point &, const Size &);
+				virtual			~GroupBox();
 
 				virtual Int		 Paint(Int);
 
-				Int			 Activate();
-				Int			 Deactivate();
+				virtual Int		 Activate();
+				virtual Int		 Deactivate();
 
-				Int			 Hide();
+				virtual Int		 Hide();
 		};
 	};
 };

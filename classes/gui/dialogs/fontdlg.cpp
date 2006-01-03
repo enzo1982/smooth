@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,14 +23,13 @@ S::GUI::Dialogs::FontSelection::~FontSelection()
 {
 }
 
-S::Int S::GUI::Dialogs::FontSelection::ShowDialog()
+const Error &S::GUI::Dialogs::FontSelection::ShowDialog()
 {
 	static CHOOSEFONTW	 cfw;
 	static CHOOSEFONTA	 cfa;
 	LOGFONTW		 lfw;
 	LOGFONTA		 lfa;
 	bool			 result;
-	Int			 retValue = Success;
 
 	if (parentWindow != NIL)
 	{
@@ -81,13 +80,13 @@ S::Int S::GUI::Dialogs::FontSelection::ShowDialog()
 	}
 	else
 	{
-		retValue = Failure;
+		error = Error();
 	}
 
-	return retValue;
+	return error;
 }
 
-S::GUI::Font S::GUI::Dialogs::FontSelection::GetFont()
+const S::GUI::Font &S::GUI::Dialogs::FontSelection::GetFont()
 {
 	return font;
 }

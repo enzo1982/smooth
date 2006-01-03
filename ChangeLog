@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.xx.05 xx:xx - smooth alpha 0.8.67.0
+xx.xx.06 xx:xx - smooth alpha 0.8.67.0
 
 - listentry.cpp	- ListEntries are now Widgets
 - list.cpp	- List now derives from Container
@@ -20,34 +20,32 @@ xx.xx.05 xx:xx - smooth alpha 0.8.67.0
 - box.cpp	- new class: XUL::Box; implements <box/>, <hbox/> and <vbox/>
 - groupbox.cpp	- GroupBoxes are now Layers
 - editbox.cpp	- removed multi line support
+		- now using Cursor widget
 - multiedit.cpp	- new class: MultiEdit; implements a multi line edit box
 - console.cpp	- new class: System::Console; implements a simple console API
 - string.cpp	- added method: Find(String); returns the position of the given string (or -1)
 		- added methods: ToLower(), ToUpper()
 		- added native support for UTF-16BE encoding
+		- simplified iconv usage (with great speedups)
 - color.cpp	- new class: Color; replaces old color.cpp
+- array.cpp	- some optimizations to increase speed
+		- code cleaned up
+- d..loader.cpp	- new class: DynamicLoader; dynamic module loader
+- hotspot.cpp	- new class: Hotspot; simple widget to handle user action
 
 - added a class for smart pointers
+- added a class for nonblocking function calls
+- removed useless tree widget implementation (will be replaced by a new one later)
 - improved XUL support
+- simplified XML API
 - replaced "smooth Test" with a more serious test application
+- replaced IOLib with a native smooth IO interface
+- replaced the old Container system with a new "every widget is a container" system
+- cleaned most code, reduced codesize (source and binary)
 
 - removed shlobjmini.h
 - removed support for MinGW 1.x
-
-09.01.05 14:00 - smooth alpha 0.8.66.0
-
-- object.cpp	- incorporated object manager functionality into Object
-- window.cpp	- fixed a possible crash on window close
-- widget.cpp	- added attributes from former ObjectProperties
-		- only widgets can be registered at container objects now
-- xulloader.cpp	- added a XUL loader that can be executed via rundll32
-- button.cpp	- new class: XUL::Button
-- label.cpp	- new class: XUL::Label
-- desc...ion.cpp- new class: XUL::Description
-- args.cpp	- new class: ArgumentsParser; parser for command line arguments
-- listentry.cpp	- added support for tooltips
-- tooltip.cpp	- added support for multi line text
-
-- removed ObjectManager
-- removed ObjectProperties
+- replaced fribidi with fribidi2
 - upgrade to libXML2 version 2.6.16
+- moved to the xmlTextReader and xmlTextWriter APIs of libxml
+- now using precompiled headers in the build process

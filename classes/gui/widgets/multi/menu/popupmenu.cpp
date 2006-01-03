@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,206 +9,166 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
-#include <smooth/definitions.h>
-#include <smooth/loop.h>
-#include <smooth/gui/widgets/multi/menu/popupview.h>
-#include <smooth/gui/window/toolwindow.h>
+#include <smooth/gui/widgets/multi/menu/popupmenuentry.h>
+#include <smooth/gui/widgets/multi/menu/menubarentry.h>
 #include <smooth/gui/application/application.h>
+#include <smooth/gui/window/toolwindow.h>
+#include <smooth/graphics/surface.h>
+#include <smooth/misc/math.h>
 
 const S::Int	 S::GUI::PopupMenu::classID = S::Object::RequestClassID();
 
-S::GUI::PopupMenu::PopupMenu(Menu *menu)
+S::Signal0<S::Void>	 S::GUI::PopupMenu::internalClosePopups;
+
+S::GUI::PopupMenu::PopupMenu()
 {
 	type		= classID;
 	orientation	= OR_FREE;
-	toolwnd		= NIL;
-	popupView	= NIL;
 	prevPopup	= NIL;
 	nextPopup	= NIL;
 
-	possibleContainers.AddEntry(Window::classID);
+	toolWindow	= NIL;
 
-	realMenu = new Menu();
-
-	for (Int i = 0; i < menu->GetNOfObjects(); i++)
-	{
-		MenuEntry	*entry = (MenuEntry *) menu->GetNthObject(i);
-		MenuEntry	*nEntry = realMenu->AddEntry(entry->GetText(), entry->bitmap, entry->popup, entry->bVar, entry->iVar, entry->iCode, entry->GetOrientation());
-
-		nEntry->SetTooltipText(entry->GetTooltipText());
-		nEntry->SetStatusText(entry->GetStatusText());
-
-		nEntry->onClick.Connect(&entry->onClick);
- 	}
-
-	sizeset = False;
-
-	GetSize();
+	internalClosePopups.Connect(&PopupMenu::InternalClosePopups, this);
 }
 
 S::GUI::PopupMenu::~PopupMenu()
 {
 	if (IsVisible()) Hide();
 
-	if (popupView != NIL) DeleteObject(popupView);
-	if (toolwnd != NIL) DeleteObject(toolwnd);
-
 	if (nextPopup != NIL) DeleteObject(nextPopup);
 
 	if (prevPopup != NIL) prevPopup->nextPopup = NIL;
 
-	delete realMenu;
+	if (toolWindow != NIL)
+	{
+		toolWindow->FreeOwner();
+
+		if (toolWindow->IsRegistered() && toolWindow->GetContainer() != NIL) toolWindow->GetContainer()->UnregisterObject(toolWindow);
+
+		DeleteObject(toolWindow);
+	}
+
+	internalClosePopups.Disconnect(&PopupMenu::InternalClosePopups, this);
+}
+
+S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap &bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
+{
+	MenuEntry	*newEntry = new PopupMenuEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
+
+	RegisterObject(newEntry);
+
+	SetSize(Size(50, 5));
+
+	Int	 nextYPos = 3;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+
+		SetWidth(Math::Max(GetWidth(), 6 + entry->GetWidth()));
+		SetHeight(GetHeight() + 5 + (entry->GetText() != NIL ? 11 : 0));
+
+		entry->SetPosition(Point(3, nextYPos));
+
+		nextYPos += entry->GetHeight() + 1;
+	}
+
+	for (Int j = 0; j < GetNOfObjects(); j++)
+	{
+		MenuEntry	*entry = (MenuEntry *) GetNthObject(j);
+
+		entry->SetWidth(GetWidth() - 6);
+	}
+
+	return newEntry;
 }
 
 S::Int S::GUI::PopupMenu::Show()
 {
-	if (!IsRegistered())	return Failure;
-	if (IsVisible())	return Success;
-
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return Failure;
-
-	EnterProtectedRegion();
-
-	GetSize();
-
-	if (pos.x + popupsize.cx >= LiSAGetDisplaySizeX() - wnd->pos.x) pos.x = LiSAGetDisplaySizeX() - wnd->pos.x - popupsize.cx - 1;
-	if (pos.y + popupsize.cy >= LiSAGetDisplaySizeY() - wnd->pos.y) pos.y = LiSAGetDisplaySizeY() - wnd->pos.y - popupsize.cy - 1;
+	if (IsVisible()) return Success();
 
 	visible = True;
 
-	toolwnd		= new ToolWindow();
-	popupView	= new PopupView(this, realMenu);
+	if (!IsRegistered()) return Success();
 
-	toolwnd->SetOwner(this);
-	toolwnd->SetMetrics(pos + wnd->pos, Size(popupsize.cx + 1, popupsize.cy + 1));
-	toolwnd->RegisterObject(popupView);
+	Window	*wnd = (Window *) container->GetContainerWindow();
 
-	wnd->RegisterObject(toolwnd);
+	if (wnd == NIL) return Success();
+
+	Point	 tPos	 = GetPosition() + wnd->GetPosition();
+	Size	 tSize	 = GetSize();
+
+	toolWindow = new ToolWindow(tPos, tSize);
+	toolWindow->SetOwner(this);
+	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
+
+	wnd->RegisterObject(toolWindow);
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+
+		entry->SetRegisteredFlag(False);
+
+		toolWindow->RegisterObject(entry);
+	}
 
 	onShow.Emit();
 
-	LeaveProtectedRegion();
-
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::PopupMenu::Hide()
 {
-	if (!IsRegistered())	return Failure;
-
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return Failure;
-
-	EnterProtectedRegion();
-
-	if (nextPopup != NIL) nextPopup->Hide();
+	if (!visible) return Success();
 
 	visible = False;
 
-	if (toolwnd != NIL)
+	if (!IsRegistered()) return Success();
+
+	Window	*wnd = container->GetContainerWindow();
+
+	if (wnd == NIL) return Success();
+
+	if (toolWindow != NIL)
 	{
-		toolwnd->FreeOwner();
-		toolwnd->Close();
+		for (Int i = 0; i < GetNOfObjects(); i++)
+		{
+			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
 
-		wnd->UnregisterObject(toolwnd);
+			toolWindow->UnregisterObject(entry);
 
-		toolwnd->UnregisterObject(popupView);
+			entry->SetRegisteredFlag(True);
+			entry->SetContainer(this);
+		}
 
-		DeleteObject(popupView);
-		DeleteObject(toolwnd);
+		toolWindow->FreeOwner();
 
-		popupView = NIL;
-		toolwnd = NIL;
+		wnd->UnregisterObject(toolWindow);
+
+		DeleteObject(toolWindow);
+
+		toolWindow = NIL;
 	}
 
 	onHide.Emit();
 
-	LeaveProtectedRegion();
-
-	return Success;
+	return Success();
 }
 
-S::Int S::GUI::PopupMenu::Process(Int message, Int wParam, Int lParam)
+S::Void S::GUI::PopupMenu::InternalClosePopups()
 {
-	if (!IsRegistered())		return Failure;
-	if (!active || !IsVisible())	return Success;
+	if (container == NIL) return;
 
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
-
-	EnterProtectedRegion();
-
-	Int	 retVal = Success;
-
-	switch (message)
-	{
-#ifdef __WIN32__
-		case WM_KILLFOCUS:
-			if (lParam == -1) break;
-
-			while (wnd->GetContainer()->GetObjectType() != Application::classID) wnd = wnd->GetContainer()->GetContainerWindow();
-
-			wnd->Process(WM_KILLFOCUS, wParam, -1);
-
-			break;
-#endif
-	}
-
-	LeaveProtectedRegion();
-
-	return retVal;
+	if (container->GetObjectType() == MenubarEntry::classID) ((MenubarEntry *) container)->TogglePopupMenu();
+	else							 Hide();
 }
 
-
-S::Void S::GUI::PopupMenu::GetSize()
+S::Void S::GUI::PopupMenu::OnToolWindowPaint()
 {
-	if (!sizeset)
-	{
-		popupsize.cx = GetSizeX();
-		popupsize.cy = GetSizeY();
+	Surface	*surface = toolWindow->GetDrawSurface();
+	Rect	 frame = Rect(Point(0, 0), GetSize());
 
-		sizeset = True;
-	}
-}
-
-S::Int S::GUI::PopupMenu::GetSizeX()
-{
-	Int	 mSize = 50;
-	Int	 greatest = 0;
-
-	if (realMenu->GetNOfObjects() == 0) return mSize;
-
-	for (Int i = 0; i < realMenu->GetNOfObjects(); i++)
-	{
-		MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
-
-		if (entry->textSize.cx > greatest)
-		{
-			mSize		= 50 + entry->textSize.cx;
-			greatest	= entry->textSize.cx;
-		}
-	}
-
-	return mSize;
-}
-
-S::Int S::GUI::PopupMenu::GetSizeY()
-{
-	Int	 mSize = 4;
-
-	if (realMenu->GetNOfObjects() == 0) return mSize;
-
-	for (Int i = 0; i < realMenu->GetNOfObjects(); i++)
-	{
-		MenuEntry	*entry = (MenuEntry *) realMenu->GetNthObject(i);
-
-		if (entry->type == SM_SEPARATOR)	mSize = mSize + 5;
-		else					mSize = mSize + 16;
-	}
-
-	return mSize;
+	surface->Frame(frame, FRAME_UP);
 }

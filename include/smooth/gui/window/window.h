@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,12 +28,11 @@ namespace smooth
 };
 
 #include "../widgets/widget.h"
-#include "../widgets/container.h"
-#include "../../graphics/rect.h"
+#include "../../graphics/forms/rect.h"
 #include "../../loop.h"
 #include "../widgets/multi/menu/menu.h"
 #include "../../graphics/bitmap.h"
-#include "../../callbacks.h"
+#include "../../templates/callbacks.h"
 
 namespace smooth
 {
@@ -51,7 +50,7 @@ namespace smooth
 		const Int	 WO_SEPARATOR	= 1;
 		const Int	 WO_NOSEPARATOR	= 2;
 
-		class SMOOTHAPI Window : public Container
+		class SMOOTHAPI Window : public Widget
 		{
 			protected:
 				WindowBackend			*backend;
@@ -87,11 +86,10 @@ namespace smooth
 				static const Int		 classID;
 
 				static Int			 nOfActiveWindows;
-				Int				 value;
 
 				Bool				 initshow;
 
-								 Window(String = NIL, Void * = NIL);
+								 Window(const String &, const Point &, const Size &, Void * = NIL);
 				virtual				~Window();
 
 				Int				 SetIcon(const Bitmap &);
@@ -103,21 +101,23 @@ namespace smooth
 
 				Layer				*GetMainLayer();
 
-				Int				 SetStatusText(String);
-				String				 GetStatusText();
+				Int				 SetStatusText(const String &);
+				const String			&GetStatusText();
 
-				Int				 SetDefaultStatusText(String);
+				Int				 SetDefaultStatusText(const String &);
 				Int				 RestoreDefaultStatusText();
 
+				virtual Point			 GetRealPosition();
+
 				Rect				 GetWindowRect();
-				Rect				 GetClientRect();
+				const Rect			&GetClientRect();
 				Rect				 GetRestoredWindowRect();
 
-				Rect				 GetUpdateRect();
-				Int				 SetUpdateRect(Rect);
+				const Rect			&GetUpdateRect();
+				Int				 SetUpdateRect(const Rect &);
 
-				Int				 SetMinimumSize(Size);
-				Int				 SetMaximumSize(Size);
+				Int				 SetMinimumSize(const Size &);
+				Int				 SetMaximumSize(const Size &);
 
 				virtual Int			 Show();
 				virtual Int			 Hide();
@@ -141,9 +141,9 @@ namespace smooth
 				Int				 MouseX();
 				Int				 MouseY();
 
-				Bool				 IsMouseOn(Rect);
+				Bool				 IsMouseOn(const Rect &);
 
-				Surface				*GetDrawSurface();
+				virtual Surface			*GetDrawSurface();
 				Void				*GetSystemWindow();
 
 				static Window			*GetWindow(Void *);
@@ -158,7 +158,7 @@ namespace smooth
 				Signal0<Void>			 onPeek;
 				Signal3<Void, Int, Int, Int>	 onEvent;
 			callbacks:
-				Callback2<Menu *, Int, Int>	 getTrackMenu;
+				Callback2<PopupMenu *, Int, Int> getTrackMenu;
 				Callback0<Bool>			 doQuit;
 			slots:
 				Void				 PaintTimer();

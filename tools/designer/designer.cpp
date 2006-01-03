@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,7 +29,7 @@ Designer::Designer()
 	dlgcounter = 1;
 	active_dlg = NIL;
 
-	wnd		= new Window(String("smooth Designer v").Append(SMOOTH_VERSION));
+	wnd		= new Window(String("smooth Designer v").Append(SMOOTH_VERSION), Point(50, 50), Size(600, 85));
 	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	iconbar		= new Menubar();
@@ -38,28 +38,28 @@ Designer::Designer()
 	timer1		= new Timer();
 	timer1->onInterval.Connect(&Designer::TimerProc, this);
 
-	menu_file	= new Menu();
-	menu_dialog	= new Menu();
+	menu_file	= new PopupMenu();
+	menu_dialog	= new PopupMenu();
 
-	menu_widgets		= new Menu();
-	menu_widgets_add	= new Menu();
-	menu_widgets_add_smooth	= new Menu();
+	menu_widgets		= new PopupMenu();
+	menu_widgets_add	= new PopupMenu();
+	menu_widgets_add_smooth	= new PopupMenu();
 
 	menubar->AddEntry("File", NIL, menu_file);
 	menubar->AddEntry("Dialog", NIL, menu_dialog);
 	menubar->AddEntry("Widgets", NIL, menu_widgets);
 
-	menu_file->AddEntry("Exit")->onClick.Connect(&Designer::Close, this);
+	menu_file->AddEntry("Exit")->onAction.Connect(&Designer::Close, this);
 
-	menu_dialog->AddEntry("New")->onClick.Connect(&Designer::NewDialog, this);
+	menu_dialog->AddEntry("New")->onAction.Connect(&Designer::NewDialog, this);
 
 	menu_widgets->AddEntry("Add", NIL, menu_widgets_add);
 
 	menu_widgets_add->AddEntry("smooth controls", NIL, menu_widgets_add_smooth);
 
-	menu_widgets_add_smooth->AddEntry("Button")->onClick.Connect(&Designer::AddButton, this);
-	menu_widgets_add_smooth->AddEntry("Layer")->onClick.Connect(&Designer::AddLayer, this);
-	menu_widgets_add_smooth->AddEntry("Menubar")->onClick.Connect(&Designer::AddMenubar, this);
+	menu_widgets_add_smooth->AddEntry("Button")->onAction.Connect(&Designer::AddButton, this);
+	menu_widgets_add_smooth->AddEntry("Layer")->onAction.Connect(&Designer::AddLayer, this);
+	menu_widgets_add_smooth->AddEntry("Menubar")->onAction.Connect(&Designer::AddMenubar, this);
 
 	RegisterObject(wnd);
 
@@ -68,8 +68,7 @@ Designer::Designer()
 	wnd->RegisterObject(iconbar);
 	wnd->RegisterObject(statusbar);
 
-	wnd->SetMetrics(Point(50, 50), Size(600, 85));
-	wnd->SetIcon(SI_DEFAULT);
+	wnd->SetIcon(NIL);
 
 	wnd->doQuit.Connect(&Designer::ExitProc, this);
 
@@ -162,7 +161,7 @@ void Designer::TimerProc()
 	{
 		object = dlgs.GetNthEntry(i);
 
-		if (object->GetWindow()->MouseX() > 0 && object->GetWindow()->MouseY() > 0 && object->GetWindow()->MouseX() < object->GetWindow()->size.cx && object->GetWindow()->MouseY() < object->GetWindow()->size.cy)
+		if (object->GetWindow()->MouseX() > 0 && object->GetWindow()->MouseY() > 0 && object->GetWindow()->MouseX() < object->GetWindow()->GetWidth() && object->GetWindow()->MouseY() < object->GetWindow()->GetHeight())
 		{
 			mouseOnWindow = True;
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,7 +20,7 @@ namespace smooth
 };
 
 #include "../definitions.h"
-#include "../misc/i18n.h"
+#include "../i18n/i18n.h"
 
 namespace smooth
 {
@@ -42,15 +42,15 @@ namespace smooth
 				Bool		 fontUnderline;
 				Bool		 fontStrikeOut;
 			public:
-						 Font(String = I18N_DEFAULTFONT, Int = I18N_DEFAULTFONTSIZE, Int = 0, Int = FW_NORMAL, Bool = 0, Bool = 0, Bool = 0);
+						 Font(const String & = I18N_DEFAULTFONT, Int = I18N_DEFAULTFONTSIZE, Int = 0, Int = FW_NORMAL, Bool = 0, Bool = 0, Bool = 0);
 						 Font(const Font &);
-						~Font();
+				virtual		~Font();
 
 				Font &operator	 =(const Font &);
-				Bool operator	 ==(const Font &);
-				Bool operator	 !=(const Font &);
+				Bool operator	 ==(const Font &) const;
+				Bool operator	 !=(const Font &) const;
 
-				Int		 SetName(String);
+				Int		 SetName(const String &);
 				Int		 SetSize(Int);
 				Int		 SetColor(Int);
 				Int		 SetWeight(Int);
@@ -58,20 +58,20 @@ namespace smooth
 				Int		 SetUnderline(Bool);
 				Int		 SetStrikeOut(Bool);
 
-				String		 GetName();
-				Int		 GetSize();
-				Int		 GetColor();
-				Int		 GetWeight();
-				Bool		 GetItalic();
-				Bool		 GetUnderline();
-				Bool		 GetStrikeOut();
+				const String	&GetName() const;
+				Int		 GetSize() const;
+				Int		 GetColor() const;
+				Int		 GetWeight() const;
+				Bool		 GetItalic() const;
+				Bool		 GetUnderline() const;
+				Bool		 GetStrikeOut() const;
 
-				Int		 GetLineSizeX(String, Int);
-				Int		 GetLineSizeY(String);
+				Int		 GetLineSizeX(const String &, Int) const;
+				Int		 GetLineSizeY(const String &) const;
 
-				Int		 GetTextSizeX(String, Int);
-				Int		 GetTextSizeX(String);
-				Int		 GetTextSizeY(String);
+				Int		 GetTextSizeX(const String &, Int) const;
+				Int		 GetTextSizeX(const String &) const;
+				Int		 GetTextSizeY(const String &) const;
 		};
 	};
 };

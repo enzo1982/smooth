@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,37 +16,35 @@ namespace smooth
 	namespace GUI
 	{
 		class Button;
+		class Hotspot;
 	};
 };
 
 #include "../widget.h"
 #include "../../../graphics/bitmap.h"
-#include "../../../graphics/color.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 BF_NORMAL		= 0;
-		const Int	 BF_NOFRAME		= 1;
-		const Int	 BF_SHOWHIGHLIGHT	= 2;
+		const Int	 BF_NORMAL	= 0;
+		const Int	 BF_NOFRAME	= 1;
 
 		class SMOOTHAPI Button : public Widget
 		{
-			private:
-				Color			 backgroundColor;
 			protected:
 				Bitmap			 bitmap;
-				Size			 bmpSize;
+
+				Hotspot			*hotspot;
 			public:
 				static const Int	 classID;
 
-							 Button(String, const Bitmap &, Point, Size);
-							~Button();
-
-				Int			 SetBackgroundColor(Int);
+							 Button(const String &, const Bitmap &, const Point &, const Size &);
+				virtual			~Button();
 
 				virtual Int		 Paint(Int);
+			slots:
+				Void			 OnChangeSize(const Size &);
 		};
 	};
 };

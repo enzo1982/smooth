@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,27 +31,27 @@ namespace smooth
 			XML::Document	*configFile;
 			XML::Node	*ownRoot;
 
-			XML::Node	*FindConfigurationNode(String);
-			XML::Node	*FindSectionNode(String);
-			XML::Node	*FindValueNode(String, String);
+			XML::Node	*FindConfigurationNode(const String &);
+			XML::Node	*FindSectionNode(const String &);
+			XML::Node	*FindValueNode(const String &, const String &);
 		public:
 					 Configuration();
-					 Configuration(String, Bool = True);
+					 Configuration(const String &, Bool = True);
 					~Configuration();
 
-			Int		 Open(String = "config.xml", Bool = True);
+			Int		 Open(const String & = "config.xml", Bool = True);
 			Int		 Close();
 
-			Int		 SetActiveConfiguration(String);
+			Int		 SetActiveConfiguration(const String &);
 
-			Int		 SetConfigurationName(String);
-			Int		 SetParentConfiguration(String);
+			Int		 SetConfigurationName(const String &);
+			Int		 SetParentConfiguration(const String &);
 
-			Int		 GetIntValue(String, String, Int = 0);
-			Int		 SetIntValue(String, String, Int);
+			Int		 GetIntValue(const String &, const String &, Int = 0);
+			Int		 SetIntValue(const String &, const String &, Int);
 
-			String		 GetStringValue(String, String, String = NIL);
-			Int		 SetStringValue(String, String, String);
+			String		 GetStringValue(const String &, const String &, const String & = NIL);
+			Int		 SetStringValue(const String &, const String &, const String &);
 	};
 };
 

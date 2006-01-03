@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,24 +10,19 @@
 
 #include <smooth/gui/widgets/basic/groupbox.h>
 #include <smooth/misc/math.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::GroupBox::classID = S::Object::RequestClassID();
 
-S::GUI::GroupBox::GroupBox(String iText, Point iPos, Size iSize)
+S::GUI::GroupBox::GroupBox(const String &iText, const Point &iPos, const Size &iSize) : Layer(iText)
 {
-	type	= classID;
-	text	= iText;
+	type		= classID;
+	orientation	= OR_UPPERLEFT;
 
-	possibleContainers.RemoveAll();
-	possibleContainers.AddEntry(Layer::classID);
+	SetMetrics(iPos, iSize);
 
-	pos	= iPos;
-	size	= iSize;
-
-	if (size.cx == 0) size.cx = 80;
-	if (size.cy == 0) size.cy = 80;
+	if (GetWidth() == 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(80);
 
 	GetTextSize();
 }
@@ -38,93 +33,75 @@ S::GUI::GroupBox::~GroupBox()
 
 S::Int S::GUI::GroupBox::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
+
+	EnterProtectedRegion();
 
 	Surface	*surface	= container->GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), size);
+	Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
-	surface->Frame(frame, FRAME_DOWN);
+	switch (message)
+	{
+		case SP_SHOW:
+		case SP_PAINT:
+			surface->Frame(frame, FRAME_DOWN);
+			surface->Frame(frame + Point(1, 1) - Size(2, 2), FRAME_UP);
 
-	frame.left++;
-	frame.top++;
-	frame.right--;
-	frame.bottom--;
+			Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
 
-	surface->Frame(frame, FRAME_UP);
+			surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
-	Rect	 textRect;
+			Font	 nFont		= font;
 
-	textRect.left	= frame.left + 9;
-	textRect.top	= frame.top - 7;
-	textRect.right	= textRect.left + textSize.cx + 3;
-	textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
+			if (!active) nFont.SetColor(Setup::GrayTextColor);
 
-	surface->Box(textRect, Setup::BackgroundColor, FILLED);
+			surface->SetText(text, textRect + Point(1, 0), nFont);
 
-	textRect.left++;
+			break;
+	}
 
-	Font	 nFont = font;
+	LeaveProtectedRegion();
 
-	if (!active) nFont.SetColor(Setup::GrayTextColor);
-
-	surface->SetText(text, textRect, nFont);
-
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::GroupBox::Activate()
 {
 	active = True;
 
-	if (!IsRegistered())	return Success;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Success();
+	if (!IsVisible())	return Success();
 
-	Surface	*surface = container->GetDrawSurface();
-	Rect	 textRect;
-	Point	 realPos = GetRealPosition();
-
-	textRect.left	= realPos.x + 10;
-	textRect.top	= realPos.y - 6;
-	textRect.right	= textRect.left + textSize.cx + 3;
-	textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
+	Surface	*surface	= container->GetDrawSurface();
+	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
 
 	surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
-	textRect.left++;
+	surface->SetText(text, textRect + Point(1, 0), font);
 
-	surface->SetText(text, textRect, font);
-
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::GroupBox::Deactivate()
 {
 	active = False;
 
-	if (!IsRegistered())	return Success;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Success();
+	if (!IsVisible())	return Success();
 
-	Surface	*surface = container->GetDrawSurface();
-	Rect	 textRect;
-	Point	 realPos = GetRealPosition();
-
-	textRect.left	= realPos.x + 10;
-	textRect.top	= realPos.y - 6;
-	textRect.right	= textRect.left + textSize.cx + 3;
-	textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
+	Surface	*surface	= container->GetDrawSurface();
+	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
 
 	surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
-	textRect.left++;
-
-	Font	 nFont = font;
+	Font	 nFont		= font;
 
 	nFont.SetColor(Setup::GrayTextColor);
 
-	surface->SetText(text, textRect, nFont);
+	surface->SetText(text, textRect + Point(1, 0), nFont);
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::GroupBox::Hide()

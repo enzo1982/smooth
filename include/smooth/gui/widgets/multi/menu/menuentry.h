@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,36 +15,26 @@ namespace smooth
 {
 	namespace GUI
 	{
+		class MenuEntry;
 		class Menu;
-		class Menubar;
-		class PopupView;
+
+		class Shortcut;
 	};
 };
 
-#include "../../../../basic/object.h"
-#include "../../../../graphics/rect.h"
-#include "../../../../graphics/font.h"
+#include "../../widget.h"
 #include "../../../../graphics/bitmap.h"
-#include "../../special/shortcut.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		const Int SM_SEPARATOR	= 0;
-		const Int SM_TEXT	= 1;
-		const Int SM_BITMAP	= 2;
-
 		class SMOOTHAPI MenuEntry : public Widget
 		{
-			friend class Menubar;
-			friend class PopupView;
 			private:
-				Int		 popupHandle;
-
-				Int		 CalcSize();
-			public:
-				Int		 type;
+				Shortcut	*shortcut;
+			protected:
+				Menu		*popup;
 
 				Bitmap		 bitmap;
 				Bitmap		 graymap;
@@ -52,29 +42,14 @@ namespace smooth
 				Bool		*bVar;
 				Int		*iVar;
 				Int		 iCode;
-
-				Menu		*popup;
-
-				Int		 scKey;
-				Int		 scFlags;
-
-				Shortcut	*shortcut;
-
-						 MenuEntry(String, Bitmap, Menu *, Bool *, Int *, Int, Int);
-						~MenuEntry();
-
-				Int		 Paint(Int);
-				Int		 Process(Int, Int, Int);
-
-				Int		 SetText(const String &);
+			public:
+						 MenuEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
+				virtual		~MenuEntry();
+			accessors:
 				Int		 SetShortcut(Int, Int);
 
 				Int		 SetBitmap(const Bitmap &);
-			slots:
-				Void		 ShortcutProc();
-
-				Void		 OpenPopupMenu();
-				Void		 ClosePopupMenu();
+				const Bitmap	&GetBitmap();
 		};
 	};
 };

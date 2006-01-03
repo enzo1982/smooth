@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -127,13 +127,13 @@ S::Bool S::Directory::Exists()
 
 S::Int S::Directory::Create()
 {
-	if (Exists()) return Failure;
+	if (Exists()) return Error();
 
 	String	 directory = *this;
 
 	for (Int i = 5; i <= directory.Length(); i++)
 	{
-		if (directory[i] == '\\' || directory[i] == 0)
+		if (directory[i] == '\\' || directory[i] == '/' || directory[i] == 0)
 		{
 			String	 path = directory;
 
@@ -144,17 +144,17 @@ S::Int S::Directory::Create()
 		}
 	}
 
-	return Success;
+	return Success();
 }
 
 S::Int S::Directory::Copy(String destination)
 {
-	return Failure;
+	return Error();
 }
 
 S::Int S::Directory::Move(String destination)
 {
-	return Failure;
+	return Error();
 }
 
 S::Int S::Directory::Delete()
@@ -164,8 +164,8 @@ S::Int S::Directory::Delete()
 	if (Setup::enableUnicode)	result = RemoveDirectoryW(String(*this));
 	else				result = RemoveDirectoryA(String(*this));
 
-	if (result == False)	return Failure;
-	else			return Success;
+	if (result == False)	return Error();
+	else			return Success();
 }
 
 S::Int S::Directory::Empty()
@@ -233,7 +233,7 @@ S::Int S::Directory::Empty()
 	if (Setup::enableUnicode)	SetCurrentDirectoryW(String(backupDir));
 	else				SetCurrentDirectoryA(String(backupDir));
 
-	return Success;
+	return Success();
 }
 
 S::Directory S::Directory::GetActiveDirectory()
@@ -259,6 +259,6 @@ S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 	if (Setup::enableUnicode)	result = SetCurrentDirectoryW(String(directory));
 	else				result = SetCurrentDirectoryA(String(directory));
 
-	if (result == False)	return Failure;
-	else			return Success;
+	if (result == False)	return Error();
+	else			return Success();
 }

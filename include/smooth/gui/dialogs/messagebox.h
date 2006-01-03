@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -58,6 +58,8 @@ namespace smooth
 					Button		*retrybutton;
 					Button		*ignorebutton;
 
+					Int		 buttonCode;
+
 					CheckBox	*checkbox;
 
 					Bool		*cVar;
@@ -73,14 +75,16 @@ namespace smooth
 					Void		 MessageAbort();
 					Void		 MessageIgnore();
 				public:
-							 MessageDlg(String, String, Int, wchar_t *, String = NIL, Bool * = NIL);
-							~MessageDlg();
+							 MessageDlg(const String &, const String &, Int, wchar_t *, const String & = NIL, Bool * = NIL);
+					virtual		~MessageDlg();
 
-					Int		 ShowDialog();
+					const Error	&ShowDialog();
+				accessors:
+					Int		 GetButtonCode();
 			};
 
-			SMOOTHAPI Int	 QuickMessage(String, String, Int, char *);
-			SMOOTHAPI Int	 QuickMessage(String, String, Int, wchar_t *);
+			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, char *);
+			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, wchar_t *);
 		}
 	}
 };

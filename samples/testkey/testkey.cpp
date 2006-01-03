@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,7 +30,7 @@ TestKey::TestKey()
 	pos.x = 85;
 	pos.y = 28;
 
-	wnd	= new Window("TestKey - by Robert Kausch 2000-2004");
+	wnd	= new Window("TestKey - by Robert Kausch 2000-2006", Point(80, 80), Size(300, 160));
 	title	= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	text	= new Text("ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000", pos);
 
@@ -40,7 +40,6 @@ TestKey::TestKey()
 	wnd->RegisterObject(text);
 
 	wnd->onEvent.Connect(&TestKey::EventProc, this);
-	wnd->SetMetrics(Point(80, 80), Size(300, 160));
 }
 
 TestKey::~TestKey()

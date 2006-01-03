@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,11 +34,11 @@ int WINAPI S::GUI::LoadXUL(HWND shWnd, HINSTANCE shInstance, LPSTR sszCmdLine, i
 	return 0;
 }
 
-S::GUI::XULLoader::XULLoader(String xulFile)
+S::GUI::XULLoader::XULLoader(const String &xulFile)
 {
 	xulRenderer = new XML::XUL::Renderer();
 
-	if (xulRenderer->LoadXUL(xulFile) == Success) RegisterObject(xulRenderer->GetWidget());
+	if (xulRenderer->LoadXUL(xulFile) == Success()) RegisterObject(xulRenderer->GetWidget());
 }
 
 S::GUI::XULLoader::~XULLoader()

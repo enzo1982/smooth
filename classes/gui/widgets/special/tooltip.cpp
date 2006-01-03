@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,11 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/special/tooltip.h>
-#include <smooth/definitions.h>
-#include <smooth/loop.h>
-#include <smooth/misc/i18n.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
@@ -20,7 +16,7 @@
 
 const S::Int	 S::GUI::Tooltip::classID = S::Object::RequestClassID();
 
-S::GUI::Tooltip::Tooltip()
+S::GUI::Tooltip::Tooltip() : Widget(Point(), Size())
 {
 	type		= classID;
 	orientation	= OR_FREE;
@@ -29,8 +25,6 @@ S::GUI::Tooltip::Tooltip()
 	timer		= NIL;
 
 	font.SetColor(Setup::TooltipTextColor);
-
-	possibleContainers.AddEntry(Window::classID);
 }
 
 S::GUI::Tooltip::~Tooltip()
@@ -54,35 +48,27 @@ S::GUI::Tooltip::~Tooltip()
 
 S::Int S::GUI::Tooltip::Show()
 {
-	if (IsVisible()) return Success;
+	if (IsVisible()) return Success();
 
 	visible = True;
 
-	if (!IsRegistered()) return Success;
+	if (!IsRegistered()) return Success();
 
 	Window	*wnd = (Window *) container->GetContainerWindow();
 
-	if (wnd == NIL) return Success;
+	if (wnd == NIL) return Success();
 
-	Rect	 wndRect;
+	Rect	 wndRect = Rect(Point(0, 0), Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4));
+	Point	 tPos	 = Point(Math::Max(2, GetX() + wnd->GetX()), GetY() + wnd->GetY() - wndRect.bottom);
+	Size	 tSize	 = Size(wndRect.right, wndRect.bottom);
 
-	wndRect.left	= 0;
-	wndRect.top	= 0;
-	wndRect.bottom	= font.GetTextSizeY(text) + 4;
-	wndRect.right	= font.GetTextSizeX(text) + 6;
+	if (tPos.x + tSize.cx > LiSAGetDisplaySizeX() - 2 && !Setup::rightToLeft)				tPos.x = Math::Max(10, GetX() + wnd->GetX() - tSize.cx);
+	if (wnd->GetWidth() - ((tPos.x - wnd->GetX()) + tSize.cx) + wnd->GetX() < 2 && Setup::rightToLeft)	tPos.x = Math::Max(10, GetX() + wnd->GetX() - tSize.cx);
+	if (tPos.y < 0)												tPos.y = GetY() + wnd->GetY() + 1;
 
-	Point	 tPos	= Point(Math::Max(2, pos.x + wnd->pos.x), pos.y + wnd->pos.y - wndRect.bottom);
-	Size	 tSize	= Size(wndRect.right, wndRect.bottom);
-
-	if (tPos.x + tSize.cx > LiSAGetDisplaySizeX() - 2 && !Setup::rightToLeft)			tPos.x = Math::Max(10, pos.x + wnd->pos.x - tSize.cx);
-	if (wnd->size.cx - ((tPos.x - wnd->pos.x) + tSize.cx) + wnd->pos.x < 2 && Setup::rightToLeft)	tPos.x = Math::Max(10, pos.x + wnd->pos.x - tSize.cx);
-	if (tPos.y < 0)											tPos.y = pos.y + wnd->pos.y + 1;
-
-	toolWindow = new ToolWindow();
-
-	toolWindow->SetMetrics(tPos, tSize);
+	toolWindow = new ToolWindow(tPos, tSize);
 	toolWindow->SetOwner(this);
-	toolWindow->onPaint.Connect(&Tooltip::DrawTooltip, this);
+	toolWindow->onPaint.Connect(&Tooltip::OnToolWindowPaint, this);
 
 	wnd->RegisterObject(toolWindow);
 
@@ -90,26 +76,26 @@ S::Int S::GUI::Tooltip::Show()
 	{
 		timer = new System::Timer();
 
-		timer->onInterval.Connect(&Tooltip::TimerProc, this);
+		timer->onInterval.Connect(&Tooltip::OnTimer, this);
 		timer->Start(timeOut);
 	}
 
 	onShow.Emit();
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Tooltip::Hide()
 {
-	if (!visible) return Success;
+	if (!visible) return Success();
 
 	visible = False;
 
-	if (!IsRegistered()) return Success;
+	if (!IsRegistered()) return Success();
 
 	Window	*wnd = container->GetContainerWindow();
 
-	if (wnd == NIL) return Success;
+	if (wnd == NIL) return Success();
 
 	if (toolWindow != NIL)
 	{
@@ -124,46 +110,33 @@ S::Int S::GUI::Tooltip::Hide()
 
 	onHide.Emit();
 
-	return Success;
+	return Success();
 }
 
-S::Int S::GUI::Tooltip::DrawTooltip()
+S::Void S::GUI::Tooltip::OnToolWindowPaint()
 {
-	if (!IsVisible())	return Success;
-	if (!IsRegistered())	return Success;
+	if (!IsRegistered() || !IsVisible()) return;
 
-	Window	*wnd = (Window *) container->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
-
-	Rect	 wndRect;
-
-	wndRect.left	= 0;
-	wndRect.top	= 0;
-	wndRect.bottom	= font.GetTextSizeY(text) + 4;
-	wndRect.right	= font.GetTextSizeX(text) + 6;
-
+	Rect	 wndRect = Rect(Point(0, 0), Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4));
 	Surface	*surface = toolWindow->GetDrawSurface();
 
 	surface->Box(wndRect, Setup::TooltipColor, FILLED);
-	surface->Box(wndRect, RGB(0, 0, 0), OUTLINED);
+	surface->Box(wndRect, Color(0, 0, 0), OUTLINED);
 
 	wndRect.left	+= 2;
 	wndRect.top	+= 1;
 
 	surface->SetText(text, wndRect, font);
-
-	return Success;
 }
 
 S::Int S::GUI::Tooltip::SetTimeout(Int mSeconds)
 {
 	timeOut = mSeconds;
 
-	return Success;
+	return Success();
 }
 
-S::Void S::GUI::Tooltip::TimerProc()
+S::Void S::GUI::Tooltip::OnTimer()
 {
 	Hide();
 

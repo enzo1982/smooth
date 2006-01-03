@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,57 +11,44 @@
 #ifndef _H_OBJSMOOTH_POPUPMENU_
 #define _H_OBJSMOOTH_POPUPMENU_
 
-#include "../../../../definitions.h"
-
 namespace smooth
 {
 	namespace GUI
 	{
 		class PopupMenu;
-		class Window;
 		class ToolWindow;
-		class PopupView;
-		class Menubar;
 	};
 };
 
-#include "../../widget.h"
 #include "menu.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI PopupMenu : public Widget
+		class SMOOTHAPI PopupMenu : public Menu
 		{
-			friend class PopupView;
-			friend class MenuEntry;
 			private:
-				ToolWindow		*toolwnd;
-				PopupView		*popupView;
-
 				PopupMenu		*prevPopup;
 				PopupMenu		*nextPopup;
 
-				Menu			*realMenu;
-
-				Int			 GetSizeY();
-				Int			 GetSizeX();
+				ToolWindow		*toolWindow;
 			public:
 				static const Int	 classID;
 
-				Bool			 sizeset;
-				Size			 popupsize;
+							 PopupMenu();
+				virtual			~PopupMenu();
 
-							 PopupMenu(Menu *);
-				 			~PopupMenu();
+				virtual Int		 Show();
+				virtual Int		 Hide();
 
-				Int			 Process(Int, Int, Int);
+				MenuEntry		*AddEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0);
+			signals:
+				static Signal0<Void>	 internalClosePopups;
+			slots:
+				Void			 InternalClosePopups();
 
-				Int			 Show();
-				Int			 Hide();
-
-				Void			 GetSize();
+				Void			 OnToolWindowPaint();
 		};
 	};
 };

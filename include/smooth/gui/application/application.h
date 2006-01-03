@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,13 +19,13 @@ namespace smooth
 	};
 };
 
-#include "../widgets/container.h"
+#include "../widgets/widget.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		abstract class SMOOTHAPI Application : public Container
+		abstract class SMOOTHAPI Application : public Widget
 		{
 			private:
 				static String		 startupDirectory;
@@ -33,7 +33,7 @@ namespace smooth
 			public:
 				static const Int	 classID;
 
-							 Application(String = NIL);
+							 Application(const String & = NIL);
 
 				static String		 GetStartupDirectory();
 				static String		 GetApplicationDirectory();

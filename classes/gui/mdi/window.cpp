@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,20 +9,12 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/mdi/window.h>
-#include <smooth/gui/window/window.h>
-#include <smooth/definitions.h>
 
 const S::Int	 S::GUI::MDI::Window::classID = S::Object::RequestClassID();
 
-S::GUI::MDI::Window::Window(String title) : GUI::Window(title)
+S::GUI::MDI::Window::Window(const String &title, const Point &iPos, const Size &iSize) : GUI::Window(title, iPos, iSize)
 {
-	type		= classID;
-	containerType	= GUI::Window::classID;
-
-	orientation	= OR_FREE;
-
-	possibleContainers.RemoveAll();
-	possibleContainers.AddEntry(GUI::Window::classID);
+	type = classID;
 }
 
 S::GUI::MDI::Window::~Window()

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,7 +25,7 @@ namespace smooth
 
 	namespace GUI
 	{
-		class Menu;
+		class PopupMenu;
 	};
 };
 
@@ -40,18 +40,18 @@ namespace smooth
 			class PopupMenu : public Widget
 			{
 				private:
-					GUI::Menu		*menu;
+					GUI::PopupMenu			*menu;
 
-					Array<PopupMenu *>	 entries;
+					Array<PopupMenu *, Void *>	 entries;
 
-					String			 name;
+					String				 name;
 				public:
-								 PopupMenu(Node *);
-								~PopupMenu();
+									 PopupMenu(Node *);
+					virtual				~PopupMenu();
 
-					GUI::Widget		*GetWidget();
+					GUI::Widget			*GetWidget();
 
-					String			 GetName();
+					String				 GetName();
 			};
 		};
 	};

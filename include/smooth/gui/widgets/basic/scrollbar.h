@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,51 +17,40 @@ namespace smooth
 	{
 		class Scrollbar;
 	};
-
-	namespace System
-	{
-		class Timer;
-	};
 };
 
-#include "../widget.h"
+#include "arrows.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI Scrollbar : public Widget
+		class SMOOTHAPI Scrollbar : public Arrows
 		{
 			private:
-				System::Timer		*timer;
-				Bool			 timerActive;
-				Int			 timerCount;
-
-				Void			 TimerProc();
-			protected:
-				Bool			 button1Clicked;
-				Bool			 button2Clicked;
-				Bool			 button3Clicked;
-				Bool			 button1Checked;
-				Bool			 button2Checked;
-				Bool			 button3Checked;
-
-				Int			*variable;
-
-				Int			 startValue;
-				Int 			 endValue;
-
 				Int			 mouseBias;
+				Bool			 dragging;
+
+				Void			 UpdateHotspotPositions();
+			protected:
+				Hotspot			*clickHotspot;
+				Hotspot			*dragHotspot;
 			public:
 				static const Int	 classID;
 
-							 Scrollbar(Point, Size, Int, Int *, Int, Int);
-							~Scrollbar();
+							 Scrollbar(const Point &, const Size &, Int = OR_HORZ, Int * = NIL, Int = 0, Int = 100);
+				virtual			~Scrollbar();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
+			slots:
+				Void			 OnMouseClick(const Point &);
+				Void			 OnMouseWheel(Int);
 
-				Int			 SetRange(Int, Int);
+				Void			 OnMouseDragStart(const Point &);
+				Void			 OnMouseDrag(const Point &);
+				Void			 OnMouseDragEnd(const Point &);
+
+				Void			 OnValueChange(Int);
 		};
 	};
 };

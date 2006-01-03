@@ -26,7 +26,7 @@ int main()
 	cin >> im_id;
 	cout << "Available compression formats:\n0 = uncompressed\n1 = PCI\n2 = JPEG (not implemented yet)\n3 = RLE\n4 = BZIP2\n\nCompression format:";
 	cin >> compression;
-	cout << "Available color formats:\n0 = RGB (3 channels)\n1 = HSV (3 channels)\n2 = YUV (3 channels)\n3 = CMY (3 channels)\n4 = CMYK (4 channels)\n5 = CieLab\n6 = ColorForge\n7 = Greyscale (1 channel)\n8 = High Fidelity (7 channels)\n9 = ACMY (3 channels)\n\nColor format:";
+	cout << "Available color formats:\n0 = RGB (3 channels)\n1 = HSV (3 channels)\n2 = YUV (3 channels)\n3 = CMY (3 channels)\n4 = CMYK (4 channels)\n5 = Greyscale (1 channel)\n\nColor format:";
 	cin >> color;
 	cout << "Bits per channel:";
 	cin >> bpc;

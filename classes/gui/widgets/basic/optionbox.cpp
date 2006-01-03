@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,8 +9,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/optionbox.h>
+#include <smooth/gui/widgets/hotspot/simplebutton.h>
 #include <smooth/misc/math.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
@@ -18,7 +18,7 @@ const S::Int		 S::GUI::OptionBox::classID = S::Object::RequestClassID();
 
 S::Signal0<S::Void>	 S::GUI::OptionBox::internalCheckValues;
 
-S::GUI::OptionBox::OptionBox(String iText, Point iPos, Size iSize, Int *var, Int iCode)
+S::GUI::OptionBox::OptionBox(const String &iText, const Point &iPos, const Size &iSize, Int *var, Int iCode) : Widget(iPos, iSize)
 {
 	type		= classID;
 	text		= iText;
@@ -30,33 +30,38 @@ S::GUI::OptionBox::OptionBox(String iText, Point iPos, Size iSize, Int *var, Int
 	if (*variable == code)	state = True;
 	else			state = False;
 
-	possibleContainers.AddEntry(Layer::classID);
-
-	pos		= iPos;
-	size		= iSize;
-
-	if (size.cx == 0) size.cx = 80;
-	if (size.cy == 0) size.cy = 17;
+	if (GetWidth() == 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(17);
 
 	GetTextSize();
 
-	onLeftButtonClick.Connect(&OptionBox::OnLeftButtonClick, this);
-
 	internalCheckValues.Connect(&OptionBox::InternalCheckValues, this);
+
+	hotspot	= new HotspotSimpleButton(Point(0, 0), GetSize());
+	hotspot->onLeftButtonClick.Connect(&OptionBox::OnLeftButtonClick, this);
+	hotspot->onLeftButtonClick.Connect(&onAction);
+
+	onChangeSize.Connect(&HotspotSimpleButton::SetSize, hotspot);
+
+	RegisterObject(hotspot);
 }
 
 S::GUI::OptionBox::~OptionBox()
 {
+	DeleteObject(hotspot);
+
 	internalCheckValues.Disconnect(&OptionBox::InternalCheckValues, this);
 }
 
 S::Int S::GUI::OptionBox::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
+
+	EnterProtectedRegion();
 
 	Surface	*surface	= container->GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), size);
+	Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
 	Point	 lineStart;
 	Point	 lineEnd;
@@ -66,9 +71,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 	switch (message)
 	{
-		default:
+		case SP_SHOW:
 		case SP_PAINT:
-		case SP_UPDATE:
 			if (active)	lightColor = Setup::ClientColor;
 			else		lightColor = Setup::BackgroundColor;
 
@@ -138,90 +142,43 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 			if (*variable == code)
 			{
-				Int	 shadowColor	= 0;
-				Int	 dotColor	= 0;
+				Point	 point = Point(frame.left + 7, frame.top + 7);
 
-				if (active)
+				for (Int i = 0; i < 2; i++)
 				{
-					shadowColor	= Setup::DividerDarkColor;
-					dotColor	= Setup::ClientTextColor;
+					Int	 color = active ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
+
+					if (i == 1)
+					{
+						color = active ? Setup::ClientTextColor : Setup::GrayTextColor;
+
+						point -= Point(i, i);
+					}
+
+					surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, FILLED);
+					surface->Box(Rect(point + Point(0, 1), Size(5, 3)), color, FILLED);
 				}
-				else
-				{
-					shadowColor	= Setup::DividerDarkColor.Average(Setup::BackgroundColor);
-					dotColor	= Setup::GrayTextColor;
-				}
-
-				lineStart.x++;
-				lineStart.y -= 7;
-				lineEnd.x--;
-				lineEnd.y -= 7;
-
-				surface->Line(lineStart, lineEnd, dotColor);
-
-				lineStart.x--;
-				lineEnd.x++;
-
-				for (i = 0; i < 3; i++)
-				{
-					lineStart.y++;
-					lineEnd.y++;
-
-					surface->Line(lineStart, lineEnd, dotColor);
-				}
-
-				surface->SetPixel(lineEnd.x, lineEnd.y - 1, shadowColor);
-				surface->SetPixel(lineEnd.x, lineEnd.y, shadowColor);
-
-				lineStart.x++;
-				lineStart.y++;
-				lineEnd.y++;
-
-				surface->Line(lineStart, lineEnd, dotColor);
-
-				surface->SetPixel(lineEnd.x - 1, lineEnd.y, shadowColor);
-				surface->SetPixel(lineEnd.x, lineEnd.y, shadowColor);
-
-				lineStart.x++;
-				lineStart.y++;
-				lineEnd.y++;
-
-				surface->Line(lineStart, lineEnd, shadowColor);
 			}
 
-			if (message != SP_UPDATE)
-			{
-				Rect	 textRect;
+			Rect	 textRect;
 
-				textRect.left	= frame.left + 17;
-				textRect.top	= frame.top + 2;
-				textRect.right	= textRect.left + size.cx;
-				textRect.bottom	= textRect.top + 20;
+			textRect.left	= frame.left + 17;
+			textRect.top	= frame.top + 2;
+			textRect.right	= textRect.left + GetWidth();
+			textRect.bottom	= textRect.top + 20;
 
-				Font	 nFont = font;
+			Font	 nFont = font;
 
-				if (!active) nFont.SetColor(Setup::GrayTextColor);
+			if (!active) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->SetText(text, textRect, nFont);
-			}
-
-			break;
-		case SP_MOUSEUP:
-		case SP_MOUSEIN:
-			surface->Frame(frame, FRAME_UP);
-
-			break;
-		case SP_MOUSEOUT:
-			surface->Box(frame, Setup::BackgroundColor, OUTLINED);
-
-			break;
-		case SP_MOUSEDOWN:
-			surface->Frame(frame, FRAME_DOWN);
+			surface->SetText(text, textRect, nFont);
 
 			break;
 	}
 
-	return Success;
+	LeaveProtectedRegion();
+
+	return Success();
 }
 
 S::Void S::GUI::OptionBox::OnLeftButtonClick()
@@ -235,5 +192,5 @@ S::Void S::GUI::OptionBox::InternalCheckValues()
 {
 	state = (*variable == code ? True : False);
 
-	Paint(SP_UPDATE);
+	Paint(SP_PAINT);
 }

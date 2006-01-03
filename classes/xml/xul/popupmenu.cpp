@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,7 @@
 
 #include <smooth/xml/xul/popupmenu.h>
 #include <smooth/xml/node.h>
-#include <smooth/gui/widgets/multi/menu/menu.h>
+#include <smooth/gui/widgets/multi/menu/popupmenu.h>
 
 S::XML::XUL::PopupMenu::PopupMenu(Node *node) : Widget(node)
 {
@@ -24,7 +24,7 @@ S::XML::XUL::PopupMenu::PopupMenu(Node *node) : Widget(node)
 		{
 			node = node->GetNthNode(0);
 
-			menu = new GUI::Menu();
+			menu = new GUI::PopupMenu();
 
 			for (Int i = 0; i < node->GetNOfNodes(); i++)
 			{

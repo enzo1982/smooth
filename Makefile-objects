@@ -1,3 +1,10 @@
+$(OBJECTDIR)/smooth.h.gch: $(INCLUDEDIR)/smooth.h
+	$(ECHO) -n Compiling $(INCLUDEDIR)/smooth.h...
+	$(COPIER) $(COPIER_OPTS) $(INCLUDEDIR)/smooth.h $(OBJECTDIR)/smooth.h
+	$(COMPILER) $(COMPILER_OPTS) -c $(INCLUDEDIR)/smooth.h -o $(OBJECTDIR)/smooth.h.gch
+	$(REMOVER) $(REMOVER_OPTS) $(OBJECTDIR)/smooth.h
+	$(ECHO) done.
+
 $(OBJECTDIR)/backendwin32.o: $(BACKENDSCLASSESDIR)/win32/backendwin32.cpp $(SMOOTHINCLUDEDIR)/backends/win32/backendwin32.h
 	$(ECHO) -n Compiling $(BACKENDSCLASSESDIR)/win32/backendwin32.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(BACKENDSCLASSESDIR)/win32/backendwin32.cpp -o $(OBJECTDIR)/backendwin32.o
@@ -38,27 +45,27 @@ $(OBJECTDIR)/setup.o: $(BASICCLASSESDIR)/setup.cpp $(SMOOTHINCLUDEDIR)/basic/set
 	$(COMPILER) $(COMPILER_OPTS) $(BASICCLASSESDIR)/setup.cpp -o $(OBJECTDIR)/setup.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/error_endoffile.o: $(ERRORCLASSESDIR)/fs/endoffile.cpp $(SMOOTHINCLUDEDIR)/error/fs/endoffile.h
+$(OBJECTDIR)/error_endoffile.o: $(ERRORCLASSESDIR)/fs/endoffile.cpp $(SMOOTHINCLUDEDIR)/errors/fs/endoffile.h
 	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/fs/endoffile.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/fs/endoffile.cpp -o $(OBJECTDIR)/error_endoffile.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/error_filenotfound.o: $(ERRORCLASSESDIR)/fs/filenotfound.cpp $(SMOOTHINCLUDEDIR)/error/fs/filenotfound.h
+$(OBJECTDIR)/error_filenotfound.o: $(ERRORCLASSESDIR)/fs/filenotfound.cpp $(SMOOTHINCLUDEDIR)/errors/fs/filenotfound.h
 	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/fs/filenotfound.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/fs/filenotfound.cpp -o $(OBJECTDIR)/error_filenotfound.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/error_permissiondenied.o: $(ERRORCLASSESDIR)/misc/permissiondenied.cpp $(SMOOTHINCLUDEDIR)/error/misc/permissiondenied.h
+$(OBJECTDIR)/error_permissiondenied.o: $(ERRORCLASSESDIR)/misc/permissiondenied.cpp $(SMOOTHINCLUDEDIR)/errors/misc/permissiondenied.h
 	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/misc/permissiondenied.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/misc/permissiondenied.cpp -o $(OBJECTDIR)/error_permissiondenied.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/error.o: $(ERRORCLASSESDIR)/error.cpp $(SMOOTHINCLUDEDIR)/error/error.h
+$(OBJECTDIR)/error.o: $(ERRORCLASSESDIR)/error.cpp $(SMOOTHINCLUDEDIR)/errors/error.h
 	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/error.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/error.cpp -o $(OBJECTDIR)/error.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/success.o: $(ERRORCLASSESDIR)/success.cpp $(SMOOTHINCLUDEDIR)/error/success.h
+$(OBJECTDIR)/success.o: $(ERRORCLASSESDIR)/success.cpp $(SMOOTHINCLUDEDIR)/errors/success.h
 	$(ECHO) -n Compiling $(ERRORCLASSESDIR)/success.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(ERRORCLASSESDIR)/success.cpp -o $(OBJECTDIR)/success.o
 	$(ECHO) done.
@@ -73,34 +80,74 @@ $(OBJECTDIR)/file.o: $(FILESCLASSESDIR)/file.cpp $(SMOOTHINCLUDEDIR)/files/file.
 	$(COMPILER) $(COMPILER_OPTS) $(FILESCLASSESDIR)/file.cpp -o $(OBJECTDIR)/file.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/bitmapgdi.o: $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/gdi/bitmapgdi.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/bitmapgdi.cpp -o $(OBJECTDIR)/bitmapgdi.o
+$(OBJECTDIR)/bitmapgdi.o: $(GRAPHICSCLASSESDIR)/backends/gdi/bitmapgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/gdi/bitmapgdi.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/gdi/bitmapgdi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/gdi/bitmapgdi.cpp -o $(OBJECTDIR)/bitmapgdi.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/surfacegdi.o: $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp $(SMOOTHINCLUDEDIR)/graphics/gdi/surfacegdi.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/gdi/surfacegdi.cpp -o $(OBJECTDIR)/surfacegdi.o
+$(OBJECTDIR)/surfacegdi.o: $(GRAPHICSCLASSESDIR)/backends/gdi/surfacegdi.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/gdi/surfacegdi.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/gdi/surfacegdi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/gdi/surfacegdi.cpp -o $(OBJECTDIR)/surfacegdi.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/bitmapxlib.o: $(GRAPHICSCLASSESDIR)/xlib/bitmapxlib.cpp $(SMOOTHINCLUDEDIR)/graphics/xlib/bitmapxlib.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/xlib/bitmapxlib.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/xlib/bitmapxlib.cpp -o $(OBJECTDIR)/bitmapxlib.o
+$(OBJECTDIR)/bitmapxlib.o: $(GRAPHICSCLASSESDIR)/backends/xlib/bitmapxlib.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/xlib/bitmapxlib.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/xlib/bitmapxlib.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/xlib/bitmapxlib.cpp -o $(OBJECTDIR)/bitmapxlib.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/surfacexlib.o: $(GRAPHICSCLASSESDIR)/xlib/surfacexlib.cpp $(SMOOTHINCLUDEDIR)/graphics/xlib/surfacexlib.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/xlib/surfacexlib.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/xlib/surfacexlib.cpp -o $(OBJECTDIR)/surfacexlib.o
+$(OBJECTDIR)/surfacexlib.o: $(GRAPHICSCLASSESDIR)/backends/xlib/surfacexlib.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/xlib/surfacexlib.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/xlib/surfacexlib.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/xlib/surfacexlib.cpp -o $(OBJECTDIR)/surfacexlib.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/bitmapbackend.o: $(GRAPHICSCLASSESDIR)/backends/bitmapbackend.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/bitmapbackend.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/bitmapbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/bitmapbackend.cpp -o $(OBJECTDIR)/bitmapbackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/surfacebackend.o: $(GRAPHICSCLASSESDIR)/backends/surfacebackend.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/surfacebackend.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/surfacebackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/surfacebackend.cpp -o $(OBJECTDIR)/surfacebackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/form.o: $(GRAPHICSCLASSESDIR)/forms/form.cpp $(SMOOTHINCLUDEDIR)/graphics/forms/form.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/forms/form.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/forms/form.cpp -o $(OBJECTDIR)/form.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/line.o: $(GRAPHICSCLASSESDIR)/forms/line.cpp $(SMOOTHINCLUDEDIR)/graphics/forms/line.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/forms/line.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/forms/line.cpp -o $(OBJECTDIR)/line.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/point.o: $(GRAPHICSCLASSESDIR)/forms/point.cpp $(SMOOTHINCLUDEDIR)/graphics/forms/point.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/forms/point.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/forms/point.cpp -o $(OBJECTDIR)/point.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/rect.o: $(GRAPHICSCLASSESDIR)/forms/rect.cpp $(SMOOTHINCLUDEDIR)/graphics/forms/rect.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/forms/rect.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/forms/rect.cpp -o $(OBJECTDIR)/rect.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/size.o: $(GRAPHICSCLASSESDIR)/forms/size.cpp $(SMOOTHINCLUDEDIR)/graphics/forms/size.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/forms/size.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/forms/size.cpp -o $(OBJECTDIR)/size.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/imageloader.o: $(GRAPHICSCLASSESDIR)/imageloader/imageloader.cpp $(SMOOTHINCLUDEDIR)/graphics/imageloader/imageloader.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/imageloader/imageloader.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/imageloader/imageloader.cpp -o $(OBJECTDIR)/imageloader.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/imageloader_pci.o: $(GRAPHICSCLASSESDIR)/imageloader/pci.cpp $(SMOOTHINCLUDEDIR)/graphics/imageloader/pci.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/imageloader/pci.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/imageloader/pci.cpp -o $(OBJECTDIR)/imageloader_pci.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/bitmap.o: $(GRAPHICSCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmap.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmap.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmap.cpp -o $(OBJECTDIR)/bitmap.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/bitmapbackend.o: $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmapbackend.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmapbackend.cpp -o $(OBJECTDIR)/bitmapbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/color.o: $(GRAPHICSCLASSESDIR)/color.cpp $(SMOOTHINCLUDEDIR)/graphics/color.h
@@ -113,39 +160,9 @@ $(OBJECTDIR)/font.o: $(GRAPHICSCLASSESDIR)/font.cpp $(SMOOTHINCLUDEDIR)/graphics
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/font.cpp -o $(OBJECTDIR)/font.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/form.o: $(GRAPHICSCLASSESDIR)/form.cpp $(SMOOTHINCLUDEDIR)/graphics/form.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/form.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/form.cpp -o $(OBJECTDIR)/form.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/line.o: $(GRAPHICSCLASSESDIR)/line.cpp $(SMOOTHINCLUDEDIR)/graphics/line.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/line.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/line.cpp -o $(OBJECTDIR)/line.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/point.o: $(GRAPHICSCLASSESDIR)/point.cpp $(SMOOTHINCLUDEDIR)/graphics/point.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/point.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/point.cpp -o $(OBJECTDIR)/point.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/rect.o: $(GRAPHICSCLASSESDIR)/rect.cpp $(SMOOTHINCLUDEDIR)/graphics/rect.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/rect.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/rect.cpp -o $(OBJECTDIR)/rect.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/size.o: $(GRAPHICSCLASSESDIR)/size.cpp $(SMOOTHINCLUDEDIR)/graphics/size.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/size.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/size.cpp -o $(OBJECTDIR)/size.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/surface.o: $(GRAPHICSCLASSESDIR)/surface.cpp $(SMOOTHINCLUDEDIR)/graphics/surface.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/surface.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/surface.cpp -o $(OBJECTDIR)/surface.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/surfacebackend.o: $(GRAPHICSCLASSESDIR)/surfacebackend.cpp $(SMOOTHINCLUDEDIR)/graphics/surfacebackend.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/surfacebackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/surfacebackend.cpp -o $(OBJECTDIR)/surfacebackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/application.o: $(GUICLASSESDIR)/application/application.cpp $(SMOOTHINCLUDEDIR)/gui/application/application.h
@@ -308,6 +325,16 @@ $(OBJECTDIR)/titlebar.o: $(GUICLASSESDIR)/widgets/basic/titlebar.cpp $(SMOOTHINC
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/basic/titlebar.cpp -o $(OBJECTDIR)/titlebar.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/hotspot.o: $(GUICLASSESDIR)/widgets/hotspot/hotspot.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/hotspot/hotspot.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/hotspot/hotspot.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/hotspot/hotspot.cpp -o $(OBJECTDIR)/hotspot.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/simplebutton.o: $(GUICLASSESDIR)/widgets/hotspot/simplebutton.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/hotspot/simplebutton.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/hotspot/simplebutton.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/hotspot/simplebutton.cpp -o $(OBJECTDIR)/simplebutton.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/combobox.o: $(GUICLASSESDIR)/widgets/multi/list/combobox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/list/combobox.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/list/combobox.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/list/combobox.cpp -o $(OBJECTDIR)/combobox.o
@@ -343,6 +370,11 @@ $(OBJECTDIR)/menubar.o: $(GUICLASSESDIR)/widgets/multi/menu/menubar.cpp $(SMOOTH
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/menubar.cpp -o $(OBJECTDIR)/menubar.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/menubarentry.o: $(GUICLASSESDIR)/widgets/multi/menu/menubarentry.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/menubarentry.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/menubarentry.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/menubarentry.cpp -o $(OBJECTDIR)/menubarentry.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/menuentry.o: $(GUICLASSESDIR)/widgets/multi/menu/menuentry.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/menuentry.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/menuentry.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/menuentry.cpp -o $(OBJECTDIR)/menuentry.o
@@ -353,24 +385,14 @@ $(OBJECTDIR)/popupmenu.o: $(GUICLASSESDIR)/widgets/multi/menu/popupmenu.cpp $(SM
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupmenu.cpp -o $(OBJECTDIR)/popupmenu.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/popupview.o: $(GUICLASSESDIR)/widgets/multi/menu/popupview.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/popupview.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/popupview.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupview.cpp -o $(OBJECTDIR)/popupview.o
+$(OBJECTDIR)/popupmenuentry.o: $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentry.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/popupmenuentry.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentry.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentry.cpp -o $(OBJECTDIR)/popupmenuentry.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/tree.o: $(GUICLASSESDIR)/widgets/multi/tree/tree.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/tree/tree.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/tree/tree.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/tree/tree.cpp -o $(OBJECTDIR)/tree.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/treeentry.o: $(GUICLASSESDIR)/widgets/multi/tree/treeentry.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/tree/tree.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/tree/treeentry.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/tree/treeentry.cpp -o $(OBJECTDIR)/treeentry.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/treeview.o: $(GUICLASSESDIR)/widgets/multi/tree/treeview.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/tree/treeview.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/tree/treeview.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/tree/treeview.cpp -o $(OBJECTDIR)/treeview.o
+$(OBJECTDIR)/cursor.o: $(GUICLASSESDIR)/widgets/special/cursor.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/special/cursor.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/special/cursor.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/special/cursor.cpp -o $(OBJECTDIR)/cursor.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/dragcontrol.o: $(GUICLASSESDIR)/widgets/special/dragcontrol.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/special/dragcontrol.h
@@ -393,21 +415,6 @@ $(OBJECTDIR)/tooltip.o: $(GUICLASSESDIR)/widgets/special/tooltip.cpp $(SMOOTHINC
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/special/tooltip.cpp -o $(OBJECTDIR)/tooltip.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/container.o: $(GUICLASSESDIR)/widgets/container.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/container.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/container.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/container.cpp -o $(OBJECTDIR)/container.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/containertype.o: $(GUICLASSESDIR)/widgets/containertype.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/containertype.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/containertype.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/containertype.cpp -o $(OBJECTDIR)/containertype.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/hotspot.o: $(GUICLASSESDIR)/widgets/hotspot.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/hotspot.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/hotspot.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/hotspot.cpp -o $(OBJECTDIR)/hotspot.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/layer.o: $(GUICLASSESDIR)/widgets/layer.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/layer.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/layer.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/layer.cpp -o $(OBJECTDIR)/layer.o
@@ -418,14 +425,19 @@ $(OBJECTDIR)/widget.o: $(GUICLASSESDIR)/widgets/widget.cpp $(SMOOTHINCLUDEDIR)/g
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/widget.cpp -o $(OBJECTDIR)/widget.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/windowgdi.o: $(GUICLASSESDIR)/window/gdi/windowgdi.cpp $(SMOOTHINCLUDEDIR)/gui/window/gdi/windowgdi.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/gdi/windowgdi.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/gdi/windowgdi.cpp -o $(OBJECTDIR)/windowgdi.o
+$(OBJECTDIR)/windowgdi.o: $(GUICLASSESDIR)/window/backends/gdi/windowgdi.cpp $(SMOOTHINCLUDEDIR)/gui/window/backends/gdi/windowgdi.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/backends/gdi/windowgdi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/backends/gdi/windowgdi.cpp -o $(OBJECTDIR)/windowgdi.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/windowxlib.o: $(GUICLASSESDIR)/window/xlib/windowxlib.cpp $(SMOOTHINCLUDEDIR)/gui/window/xlib/windowxlib.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/xlib/windowxlib.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/xlib/windowxlib.cpp -o $(OBJECTDIR)/windowxlib.o
+$(OBJECTDIR)/windowxlib.o: $(GUICLASSESDIR)/window/backends/xlib/windowxlib.cpp $(SMOOTHINCLUDEDIR)/gui/window/backends/xlib/windowxlib.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/backends/xlib/windowxlib.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/backends/xlib/windowxlib.cpp -o $(OBJECTDIR)/windowxlib.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/windowbackend.o: $(GUICLASSESDIR)/window/backends/windowbackend.cpp $(SMOOTHINCLUDEDIR)/gui/window/backends/windowbackend.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/backends/windowbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/backends/windowbackend.cpp -o $(OBJECTDIR)/windowbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/toolwindow.o: $(GUICLASSESDIR)/window/toolwindow.cpp $(SMOOTHINCLUDEDIR)/gui/window/toolwindow.h
@@ -438,9 +450,84 @@ $(OBJECTDIR)/window.o: $(GUICLASSESDIR)/window/window.cpp $(SMOOTHINCLUDEDIR)/gu
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/window.cpp -o $(OBJECTDIR)/window.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/windowbackend.o: $(GUICLASSESDIR)/window/windowbackend.cpp $(SMOOTHINCLUDEDIR)/gui/window/windowbackend.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/window/windowbackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/windowbackend.cpp -o $(OBJECTDIR)/windowbackend.o
+$(OBJECTDIR)/i18n.o: $(I18NCLASSESDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/i18n/i18n.h
+	$(ECHO) -n Compiling $(I18NCLASSESDIR)/i18n.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/i18n.cpp -o $(OBJECTDIR)/i18n.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/driver_ansi.o: $(IOCLASSESDIR)/drivers/driver_ansi.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_ansi.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_ansi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_ansi.cpp -o $(OBJECTDIR)/driver_ansi.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/driver_memory.o: $(IOCLASSESDIR)/drivers/driver_memory.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_memory.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_memory.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_memory.cpp -o $(OBJECTDIR)/driver_memory.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/driver_posix.o: $(IOCLASSESDIR)/drivers/driver_posix.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_posix.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_posix.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_posix.cpp -o $(OBJECTDIR)/driver_posix.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/driver_socket.o: $(IOCLASSESDIR)/drivers/driver_socket.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_socket.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_socket.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_socket.cpp -o $(OBJECTDIR)/driver_socket.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/driver_socks4.o: $(IOCLASSESDIR)/drivers/driver_socks4.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_socks4.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_socks4.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_socks4.cpp -o $(OBJECTDIR)/driver_socks4.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/driver_socks5.o: $(IOCLASSESDIR)/drivers/driver_socks5.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_socks5.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_socks5.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_socks5.cpp -o $(OBJECTDIR)/driver_socks5.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/driver_win32.o: $(IOCLASSESDIR)/drivers/driver_win32.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_win32.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_win32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_win32.cpp -o $(OBJECTDIR)/driver_win32.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/driver_zero.o: $(IOCLASSESDIR)/drivers/driver_zero.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_zero.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_zero.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_zero.cpp -o $(OBJECTDIR)/driver_zero.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/filter_bzip2.o: $(IOCLASSESDIR)/filters/filter_bzip2.cpp $(SMOOTHINCLUDEDIR)/io/filters/filter_bzip2.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/filters/filter_bzip2.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/filters/filter_bzip2.cpp -o $(OBJECTDIR)/filter_bzip2.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/filter_xor.o: $(IOCLASSESDIR)/filters/filter_xor.cpp $(SMOOTHINCLUDEDIR)/io/filters/filter_xor.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/filters/filter_xor.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/filters/filter_xor.cpp -o $(OBJECTDIR)/filter_xor.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/driver.o: $(IOCLASSESDIR)/driver.cpp $(SMOOTHINCLUDEDIR)/io/driver.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/driver.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/driver.cpp -o $(OBJECTDIR)/driver.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/filter.o: $(IOCLASSESDIR)/filter.cpp $(SMOOTHINCLUDEDIR)/io/filter.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/filter.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/filter.cpp -o $(OBJECTDIR)/filter.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/instream.o: $(IOCLASSESDIR)/instream.cpp $(SMOOTHINCLUDEDIR)/io/instream.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/instream.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/instream.cpp -o $(OBJECTDIR)/instream.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/outstream.o: $(IOCLASSESDIR)/outstream.cpp $(SMOOTHINCLUDEDIR)/io/outstream.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/outstream.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/outstream.cpp -o $(OBJECTDIR)/outstream.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/stream.o: $(IOCLASSESDIR)/stream.cpp $(SMOOTHINCLUDEDIR)/io/stream.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/stream.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/stream.cpp -o $(OBJECTDIR)/stream.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/args.o: $(MISCCLASSESDIR)/args.cpp $(SMOOTHINCLUDEDIR)/misc/args.h
@@ -463,11 +550,6 @@ $(OBJECTDIR)/datetime.o: $(MISCCLASSESDIR)/datetime.cpp $(SMOOTHINCLUDEDIR)/misc
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/datetime.cpp -o $(OBJECTDIR)/datetime.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/i18n.o: $(MISCCLASSESDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/misc/i18n.h
-	$(ECHO) -n Compiling $(MISCCLASSESDIR)/i18n.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/i18n.cpp -o $(OBJECTDIR)/i18n.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/misc/math.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/math.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/math.cpp -o $(OBJECTDIR)/math.o
@@ -478,19 +560,29 @@ $(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/misc/str
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string.cpp -o $(OBJECTDIR)/string.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/timersdl.o: $(SYSTEMCLASSESDIR)/sdl/timersdl.cpp $(SMOOTHINCLUDEDIR)/system/sdl/timersdl.h
-	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/sdl/timersdl.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/sdl/timersdl.cpp -o $(OBJECTDIR)/timersdl.o
+$(OBJECTDIR)/timersdl.o: $(SYSTEMCLASSESDIR)/backends/sdl/timersdl.cpp $(SMOOTHINCLUDEDIR)/system/backends/sdl/timersdl.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/backends/sdl/timersdl.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/sdl/timersdl.cpp -o $(OBJECTDIR)/timersdl.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/eventwin32.o: $(SYSTEMCLASSESDIR)/win32/eventwin32.cpp $(SMOOTHINCLUDEDIR)/system/win32/eventwin32.h
-	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/win32/eventwin32.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/win32/eventwin32.cpp -o $(OBJECTDIR)/eventwin32.o
+$(OBJECTDIR)/eventwin32.o: $(SYSTEMCLASSESDIR)/backends/win32/eventwin32.cpp $(SMOOTHINCLUDEDIR)/system/backends/win32/eventwin32.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/backends/win32/eventwin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/win32/eventwin32.cpp -o $(OBJECTDIR)/eventwin32.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/timerwin32.o: $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp $(SMOOTHINCLUDEDIR)/system/win32/timerwin32.h
-	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/win32/timerwin32.cpp -o $(OBJECTDIR)/timerwin32.o
+$(OBJECTDIR)/timerwin32.o: $(SYSTEMCLASSESDIR)/backends/win32/timerwin32.cpp $(SMOOTHINCLUDEDIR)/system/backends/win32/timerwin32.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/backends/win32/timerwin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/win32/timerwin32.cpp -o $(OBJECTDIR)/timerwin32.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/eventbackend.o: $(SYSTEMCLASSESDIR)/backends/eventbackend.cpp $(SMOOTHINCLUDEDIR)/system/backends/eventbackend.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/backends/eventbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/eventbackend.cpp -o $(OBJECTDIR)/eventbackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/timerbackend.o: $(SYSTEMCLASSESDIR)/backends/timerbackend.cpp $(SMOOTHINCLUDEDIR)/system/backends/timerbackend.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/backends/timerbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/timerbackend.cpp -o $(OBJECTDIR)/timerbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/console.o: $(SYSTEMCLASSESDIR)/console.cpp $(SMOOTHINCLUDEDIR)/system/console.h
@@ -498,14 +590,14 @@ $(OBJECTDIR)/console.o: $(SYSTEMCLASSESDIR)/console.cpp $(SMOOTHINCLUDEDIR)/syst
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/console.cpp -o $(OBJECTDIR)/console.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/dynamicloader.o: $(SYSTEMCLASSESDIR)/dynamicloader.cpp $(SMOOTHINCLUDEDIR)/system/dynamicloader.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/dynamicloader.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/dynamicloader.cpp -o $(OBJECTDIR)/dynamicloader.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/event.o: $(SYSTEMCLASSESDIR)/event.cpp $(SMOOTHINCLUDEDIR)/system/event.h
 	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/event.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/event.cpp -o $(OBJECTDIR)/event.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/eventbackend.o: $(SYSTEMCLASSESDIR)/eventbackend.cpp $(SMOOTHINCLUDEDIR)/system/eventbackend.h
-	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/eventbackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/eventbackend.cpp -o $(OBJECTDIR)/eventbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/system.o: $(SYSTEMCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system/system.h
@@ -518,54 +610,64 @@ $(OBJECTDIR)/timer.o: $(SYSTEMCLASSESDIR)/timer.cpp $(SMOOTHINCLUDEDIR)/system/t
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/timer.cpp -o $(OBJECTDIR)/timer.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/timerbackend.o: $(SYSTEMCLASSESDIR)/timerbackend.cpp $(SMOOTHINCLUDEDIR)/system/timerbackend.h
-	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/timerbackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/timerbackend.cpp -o $(OBJECTDIR)/timerbackend.o
+$(OBJECTDIR)/mutexposix.o: $(THREADSCLASSESDIR)/backends/posix/mutexposix.cpp $(SMOOTHINCLUDEDIR)/threads/backends/posix/mutexposix.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/posix/mutexposix.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/posix/mutexposix.cpp -o $(OBJECTDIR)/mutexposix.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mutexposix.o: $(THREADSCLASSESDIR)/posix/mutexposix.cpp $(SMOOTHINCLUDEDIR)/threads/posix/mutexposix.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/posix/mutexposix.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/posix/mutexposix.cpp -o $(OBJECTDIR)/mutexposix.o
+$(OBJECTDIR)/semaphoreposix.o: $(THREADSCLASSESDIR)/backends/posix/semaphoreposix.cpp $(SMOOTHINCLUDEDIR)/threads/backends/posix/semaphoreposix.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/posix/semaphoreposix.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/posix/semaphoreposix.cpp -o $(OBJECTDIR)/semaphoreposix.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/semaphoreposix.o: $(THREADSCLASSESDIR)/posix/semaphoreposix.cpp $(SMOOTHINCLUDEDIR)/threads/posix/semaphoreposix.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/posix/semaphoreposix.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/posix/semaphoreposix.cpp -o $(OBJECTDIR)/semaphoreposix.o
+$(OBJECTDIR)/threadposix.o: $(THREADSCLASSESDIR)/backends/posix/threadposix.cpp $(SMOOTHINCLUDEDIR)/threads/backends/posix/threadposix.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/posix/threadposix.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/posix/threadposix.cpp -o $(OBJECTDIR)/threadposix.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/threadposix.o: $(THREADSCLASSESDIR)/posix/threadposix.cpp $(SMOOTHINCLUDEDIR)/threads/posix/threadposix.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/posix/threadposix.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/posix/threadposix.cpp -o $(OBJECTDIR)/threadposix.o
+$(OBJECTDIR)/mutexsdl.o: $(THREADSCLASSESDIR)/backends/sdl/mutexsdl.cpp $(SMOOTHINCLUDEDIR)/threads/backends/sdl/mutexsdl.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/sdl/mutexsdl.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/sdl/mutexsdl.cpp -o $(OBJECTDIR)/mutexsdl.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mutexsdl.o: $(THREADSCLASSESDIR)/sdl/mutexsdl.cpp $(SMOOTHINCLUDEDIR)/threads/sdl/mutexsdl.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/sdl/mutexsdl.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/sdl/mutexsdl.cpp -o $(OBJECTDIR)/mutexsdl.o
+$(OBJECTDIR)/semaphoresdl.o: $(THREADSCLASSESDIR)/backends/sdl/semaphoresdl.cpp $(SMOOTHINCLUDEDIR)/threads/backends/sdl/semaphoresdl.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/sdl/semaphoresdl.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/sdl/semaphoresdl.cpp -o $(OBJECTDIR)/semaphoresdl.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/semaphoresdl.o: $(THREADSCLASSESDIR)/sdl/semaphoresdl.cpp $(SMOOTHINCLUDEDIR)/threads/sdl/semaphoresdl.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/sdl/semaphoresdl.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/sdl/semaphoresdl.cpp -o $(OBJECTDIR)/semaphoresdl.o
+$(OBJECTDIR)/threadsdl.o: $(THREADSCLASSESDIR)/backends/sdl/threadsdl.cpp $(SMOOTHINCLUDEDIR)/threads/backends/sdl/threadsdl.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/sdl/threadsdl.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/sdl/threadsdl.cpp -o $(OBJECTDIR)/threadsdl.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/threadsdl.o: $(THREADSCLASSESDIR)/sdl/threadsdl.cpp $(SMOOTHINCLUDEDIR)/threads/sdl/threadsdl.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/sdl/threadsdl.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/sdl/threadsdl.cpp -o $(OBJECTDIR)/threadsdl.o
+$(OBJECTDIR)/mutexwin32.o: $(THREADSCLASSESDIR)/backends/win32/mutexwin32.cpp $(SMOOTHINCLUDEDIR)/threads/backends/win32/mutexwin32.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/win32/mutexwin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/win32/mutexwin32.cpp -o $(OBJECTDIR)/mutexwin32.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mutexwin32.o: $(THREADSCLASSESDIR)/win32/mutexwin32.cpp $(SMOOTHINCLUDEDIR)/threads/win32/mutexwin32.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/win32/mutexwin32.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/win32/mutexwin32.cpp -o $(OBJECTDIR)/mutexwin32.o
+$(OBJECTDIR)/semaphorewin32.o: $(THREADSCLASSESDIR)/backends/win32/semaphorewin32.cpp $(SMOOTHINCLUDEDIR)/threads/backends/win32/semaphorewin32.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/win32/semaphorewin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/win32/semaphorewin32.cpp -o $(OBJECTDIR)/semaphorewin32.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/semaphorewin32.o: $(THREADSCLASSESDIR)/win32/semaphorewin32.cpp $(SMOOTHINCLUDEDIR)/threads/win32/semaphorewin32.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/win32/semaphorewin32.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/win32/semaphorewin32.cpp -o $(OBJECTDIR)/semaphorewin32.o
+$(OBJECTDIR)/threadwin32.o: $(THREADSCLASSESDIR)/backends/win32/threadwin32.cpp $(SMOOTHINCLUDEDIR)/threads/backends/win32/threadwin32.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/win32/threadwin32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/win32/threadwin32.cpp -o $(OBJECTDIR)/threadwin32.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/threadwin32.o: $(THREADSCLASSESDIR)/win32/threadwin32.cpp $(SMOOTHINCLUDEDIR)/threads/win32/threadwin32.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/win32/threadwin32.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/win32/threadwin32.cpp -o $(OBJECTDIR)/threadwin32.o
+$(OBJECTDIR)/mutexbackend.o: $(THREADSCLASSESDIR)/backends/mutexbackend.cpp $(SMOOTHINCLUDEDIR)/threads/backends/mutexbackend.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/mutexbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/mutexbackend.cpp -o $(OBJECTDIR)/mutexbackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/semaphorebackend.o: $(THREADSCLASSESDIR)/backends/semaphorebackend.cpp $(SMOOTHINCLUDEDIR)/threads/backends/semaphorebackend.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/semaphorebackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/semaphorebackend.cpp -o $(OBJECTDIR)/semaphorebackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/threadbackend.o: $(THREADSCLASSESDIR)/backends/threadbackend.cpp $(SMOOTHINCLUDEDIR)/threads/backends/threadbackend.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/backends/threadbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/backends/threadbackend.cpp -o $(OBJECTDIR)/threadbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/mutex.o: $(THREADSCLASSESDIR)/mutex.cpp $(SMOOTHINCLUDEDIR)/threads/mutex.h
@@ -573,29 +675,14 @@ $(OBJECTDIR)/mutex.o: $(THREADSCLASSESDIR)/mutex.cpp $(SMOOTHINCLUDEDIR)/threads
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/mutex.cpp -o $(OBJECTDIR)/mutex.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/mutexbackend.o: $(THREADSCLASSESDIR)/mutexbackend.cpp $(SMOOTHINCLUDEDIR)/threads/mutexbackend.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/mutexbackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/mutexbackend.cpp -o $(OBJECTDIR)/mutexbackend.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/semaphore.o: $(THREADSCLASSESDIR)/semaphore.cpp $(SMOOTHINCLUDEDIR)/threads/semaphore.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/semaphore.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/semaphore.cpp -o $(OBJECTDIR)/semaphore.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/semaphorebackend.o: $(THREADSCLASSESDIR)/semaphorebackend.cpp $(SMOOTHINCLUDEDIR)/threads/semaphorebackend.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/semaphorebackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/semaphorebackend.cpp -o $(OBJECTDIR)/semaphorebackend.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/thread.o: $(THREADSCLASSESDIR)/thread.cpp $(SMOOTHINCLUDEDIR)/threads/thread.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/thread.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/thread.cpp -o $(OBJECTDIR)/thread.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/threadbackend.o: $(THREADSCLASSESDIR)/threadbackend.cpp $(SMOOTHINCLUDEDIR)/threads/threadbackend.h
-	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/threadbackend.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/threadbackend.cpp -o $(OBJECTDIR)/threadbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/xul_box.o: $(XMLCLASSESDIR)/xul/box.cpp $(SMOOTHINCLUDEDIR)/xml/xul/box.h
@@ -668,11 +755,6 @@ $(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/codecs.cpp -o $(OBJECTDIR)/codecs.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/dllmain.o: $(MISCDIR)/dllmain.cpp $(SMOOTHINCLUDEDIR)/dllmain.h
-	$(ECHO) -n Compiling $(MISCDIR)/dllmain.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/dllmain.cpp -o $(OBJECTDIR)/dllmain.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/loop.o: $(MISCDIR)/loop.cpp $(SMOOTHINCLUDEDIR)/loop.h
 	$(ECHO) -n Compiling $(MISCDIR)/loop.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/loop.cpp -o $(OBJECTDIR)/loop.o
@@ -681,6 +763,11 @@ $(OBJECTDIR)/loop.o: $(MISCDIR)/loop.cpp $(SMOOTHINCLUDEDIR)/loop.h
 $(OBJECTDIR)/pciio.o: $(MISCDIR)/pciio.cpp $(SMOOTHINCLUDEDIR)/pciio.h
 	$(ECHO) -n Compiling $(MISCDIR)/pciio.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/pciio.cpp -o $(OBJECTDIR)/pciio.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/templates.o: $(MISCDIR)/templates.cpp
+	$(ECHO) -n Compiling $(MISCDIR)/templates.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/templates.cpp -o $(OBJECTDIR)/templates.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/resources.o: $(SMOOTHINCLUDEDIR)/resources.h $(RESOURCEDIR)/resources.rc
@@ -713,289 +800,199 @@ $(OBJECTDIR)/translator_resources.o: $(TRANSLATORDIR)/translator.rc
 	$(RESCOMP) $(RESCOMP_OPTS) $(TRANSLATORDIR)/translator.rc -o $(OBJECTDIR)/translator_resources.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/fribidi_fribidi.o: $(FRIBIDIDIR)/fribidi.c
-	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi.c...
-	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi.c -o $(OBJECTDIR)/fribidi_fribidi.o
+$(OBJECTDIR)/fribidi2_fribidi.o: $(FRIBIDI2DIR)/fribidi.c
+	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi.c -o $(OBJECTDIR)/fribidi2_fribidi.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/fribidi_char_type.o: $(FRIBIDIDIR)/fribidi_char_type.c
-	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_char_type.c...
-	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_char_type.c -o $(OBJECTDIR)/fribidi_char_type.o
+$(OBJECTDIR)/fribidi2_fribidi-bidi.o: $(FRIBIDI2DIR)/fribidi-bidi.c
+	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-bidi.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-bidi.c -o $(OBJECTDIR)/fribidi2_fribidi-bidi.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/fribidi_mem.o: $(FRIBIDIDIR)/fribidi_mem.c
-	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_mem.c...
-	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_mem.c -o $(OBJECTDIR)/fribidi_mem.o
+$(OBJECTDIR)/fribidi2_fribidi-bidi-types.o: $(FRIBIDI2DIR)/fribidi-bidi-types.c
+	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-bidi-types.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-bidi-types.c -o $(OBJECTDIR)/fribidi2_fribidi-bidi-types.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/fribidi_mirroring.o: $(FRIBIDIDIR)/fribidi_mirroring.c
-	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_mirroring.c...
-	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_mirroring.c -o $(OBJECTDIR)/fribidi_mirroring.o
+$(OBJECTDIR)/fribidi2_fribidi-env.o: $(FRIBIDI2DIR)/fribidi-env.c
+	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-env.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-env.c -o $(OBJECTDIR)/fribidi2_fribidi-env.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/fribidi_types.o: $(FRIBIDIDIR)/fribidi_types.c
-	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_types.c...
-	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_types.c -o $(OBJECTDIR)/fribidi_types.o
+$(OBJECTDIR)/fribidi2_fribidi-joining.o: $(FRIBIDI2DIR)/fribidi-joining.c
+	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-joining.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-joining.c -o $(OBJECTDIR)/fribidi2_fribidi-joining.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/fribidi_utils.o: $(FRIBIDIDIR)/fribidi_utils.c
-	$(ECHO) -n Compiling $(FRIBIDIDIR)/fribidi_utils.c...
-	$(COMPILER) $(COMPILER_OPTS) $(FRIBIDIDIR)/fribidi_utils.c -o $(OBJECTDIR)/fribidi_utils.o
+$(OBJECTDIR)/fribidi2_fribidi-joining-types.o: $(FRIBIDI2DIR)/fribidi-joining-types.c
+	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-joining-types.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-joining-types.c -o $(OBJECTDIR)/fribidi2_fribidi-joining-types.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/iolib_instream.o: $(IOLIBDIR)/instream.cpp $(INCLUDEDIR)/iolib/instream-cxx.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/instream.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/instream.cpp -o $(OBJECTDIR)/iolib_instream.o
+$(OBJECTDIR)/fribidi2_fribidi-mem.o: $(FRIBIDI2DIR)/fribidi-mem.c
+	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-mem.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-mem.c -o $(OBJECTDIR)/fribidi2_fribidi-mem.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/iolib_iolib.o: $(IOLIBDIR)/iolib.cpp $(INCLUDEDIR)/iolib-cxx.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/iolib.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/iolib.cpp -o $(OBJECTDIR)/iolib_iolib.o
+$(OBJECTDIR)/fribidi2_fribidi-mirroring.o: $(FRIBIDI2DIR)/fribidi-mirroring.c
+	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-mirroring.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-mirroring.c -o $(OBJECTDIR)/fribidi2_fribidi-mirroring.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/iolib_iolibdriver.o: $(IOLIBDIR)/iolibdriver.cpp $(INCLUDEDIR)/iolib/iolibdriver-cxx.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/iolibdriver.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/iolibdriver.cpp -o $(OBJECTDIR)/iolib_iolibdriver.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_iolibfilter.o: $(IOLIBDIR)/iolibfilter.cpp $(INCLUDEDIR)/iolib/iolibfilter-cxx.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/iolibfilter.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/iolibfilter.cpp -o $(OBJECTDIR)/iolib_iolibfilter.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_iolibstream.o: $(IOLIBDIR)/iolibstream.cpp $(INCLUDEDIR)/iolib/iolibstream-cxx.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/iolibstream.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/iolibstream.cpp -o $(OBJECTDIR)/iolib_iolibstream.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_outstream.o: $(IOLIBDIR)/outstream.cpp $(INCLUDEDIR)/iolib/outstream-cxx.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/outstream.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/outstream.cpp -o $(OBJECTDIR)/iolib_outstream.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_driver_ansi.o: $(IOLIBDIR)/drivers/ansi/driver_ansi.cpp $(INCLUDEDIR)/iolib/drivers/driver_ansi.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/ansi/driver_ansi.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/ansi/driver_ansi.cpp -o $(OBJECTDIR)/iolib_driver_ansi.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_driver_memory.o: $(IOLIBDIR)/drivers/memory/driver_memory.cpp $(INCLUDEDIR)/iolib/drivers/driver_memory.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/memory/driver_memory.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/memory/driver_memory.cpp -o $(OBJECTDIR)/iolib_driver_memory.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_driver_posix.o: $(IOLIBDIR)/drivers/posix/driver_posix.cpp $(INCLUDEDIR)/iolib/drivers/driver_posix.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/posix/driver_posix.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/posix/driver_posix.cpp -o $(OBJECTDIR)/iolib_driver_posix.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_driver_socket.o: $(IOLIBDIR)/drivers/socket/driver_socket.cpp $(INCLUDEDIR)/iolib/drivers/driver_socket.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socket/driver_socket.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socket/driver_socket.cpp -o $(OBJECTDIR)/iolib_driver_socket.o -DNO_INIT_SOCKETS
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_driver_socks4.o: $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp $(INCLUDEDIR)/iolib/drivers/driver_socks4.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socks4/driver_socks4.cpp -o $(OBJECTDIR)/iolib_driver_socks4.o -DNO_INIT_SOCKETS
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_driver_socks5.o: $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp $(INCLUDEDIR)/iolib/drivers/driver_socks5.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/socks5/driver_socks5.cpp -o $(OBJECTDIR)/iolib_driver_socks5.o -DNO_INIT_SOCKETS
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_driver_unicode.o: $(IOLIBDIR)/drivers/unicode/driver_unicode.cpp $(INCLUDEDIR)/iolib/drivers/driver_unicode.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/unicode/driver_unicode.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/unicode/driver_unicode.cpp -o $(OBJECTDIR)/iolib_driver_unicode.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_driver_zero.o: $(IOLIBDIR)/drivers/zero/driver_zero.cpp $(INCLUDEDIR)/iolib/drivers/driver_zero.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/drivers/zero/driver_zero.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/drivers/zero/driver_zero.cpp -o $(OBJECTDIR)/iolib_driver_zero.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_filter_bzip2.o: $(IOLIBDIR)/filters/bzip2/filter_bzip2.cpp $(INCLUDEDIR)/iolib/filters/filter_bzip2.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/filters/bzip2/filter_bzip2.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/filters/bzip2/filter_bzip2.cpp -o $(OBJECTDIR)/iolib_filter_bzip2.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/iolib_filter_xor.o: $(IOLIBDIR)/filters/xor/filter_xor.cpp $(INCLUDEDIR)/iolib/filters/filter_xor.h
-	$(ECHO) -n Compiling $(IOLIBDIR)/filters/xor/filter_xor.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(IOLIBDIR)/filters/xor/filter_xor.cpp -o $(OBJECTDIR)/iolib_filter_xor.o
+$(OBJECTDIR)/fribidi2_fribidi-run.o: $(FRIBIDI2DIR)/fribidi-run.c
+	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-run.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-run.c -o $(OBJECTDIR)/fribidi2_fribidi-run.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libbz2_blocksort.o: $(LIBBZ2DIR)/blocksort.c
 	$(ECHO) -n Compiling $(LIBBZ2DIR)/blocksort.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBBZ2DIR)/blocksort.c -o $(OBJECTDIR)/libbz2_blocksort.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/blocksort.c -o $(OBJECTDIR)/libbz2_blocksort.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libbz2_bzlib.o: $(LIBBZ2DIR)/bzlib.c
 	$(ECHO) -n Compiling $(LIBBZ2DIR)/bzlib.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBBZ2DIR)/bzlib.c -o $(OBJECTDIR)/libbz2_bzlib.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/bzlib.c -o $(OBJECTDIR)/libbz2_bzlib.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libbz2_compress.o: $(LIBBZ2DIR)/compress.c
 	$(ECHO) -n Compiling $(LIBBZ2DIR)/compress.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBBZ2DIR)/compress.c -o $(OBJECTDIR)/libbz2_compress.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/compress.c -o $(OBJECTDIR)/libbz2_compress.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libbz2_crctable.o: $(LIBBZ2DIR)/crctable.c
 	$(ECHO) -n Compiling $(LIBBZ2DIR)/crctable.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBBZ2DIR)/crctable.c -o $(OBJECTDIR)/libbz2_crctable.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/crctable.c -o $(OBJECTDIR)/libbz2_crctable.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libbz2_decompress.o: $(LIBBZ2DIR)/decompress.c
 	$(ECHO) -n Compiling $(LIBBZ2DIR)/decompress.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBBZ2DIR)/decompress.c -o $(OBJECTDIR)/libbz2_decompress.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/decompress.c -o $(OBJECTDIR)/libbz2_decompress.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libbz2_huffman.o: $(LIBBZ2DIR)/huffman.c
 	$(ECHO) -n Compiling $(LIBBZ2DIR)/huffman.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBBZ2DIR)/huffman.c -o $(OBJECTDIR)/libbz2_huffman.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/huffman.c -o $(OBJECTDIR)/libbz2_huffman.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libbz2_randtable.o: $(LIBBZ2DIR)/randtable.c
 	$(ECHO) -n Compiling $(LIBBZ2DIR)/randtable.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBBZ2DIR)/randtable.c -o $(OBJECTDIR)/libbz2_randtable.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_catalog.o: $(LIBXMLDIR)/catalog.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/catalog.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/catalog.c -o $(OBJECTDIR)/libxml_catalog.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/randtable.c -o $(OBJECTDIR)/libbz2_randtable.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_chvalid.o: $(LIBXMLDIR)/chvalid.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/chvalid.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/chvalid.c -o $(OBJECTDIR)/libxml_chvalid.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/chvalid.c -o $(OBJECTDIR)/libxml_chvalid.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_dict.o: $(LIBXMLDIR)/dict.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/dict.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/dict.c -o $(OBJECTDIR)/libxml_dict.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/dict.c -o $(OBJECTDIR)/libxml_dict.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_encoding.o: $(LIBXMLDIR)/encoding.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/encoding.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/encoding.c -o $(OBJECTDIR)/libxml_encoding.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/encoding.c -o $(OBJECTDIR)/libxml_encoding.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_entities.o: $(LIBXMLDIR)/entities.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/entities.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/entities.c -o $(OBJECTDIR)/libxml_entities.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/entities.c -o $(OBJECTDIR)/libxml_entities.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_error.o: $(LIBXMLDIR)/error.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/error.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/error.c -o $(OBJECTDIR)/libxml_error.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/error.c -o $(OBJECTDIR)/libxml_error.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_globals.o: $(LIBXMLDIR)/globals.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/globals.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/globals.c -o $(OBJECTDIR)/libxml_globals.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/globals.c -o $(OBJECTDIR)/libxml_globals.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_hash.o: $(LIBXMLDIR)/hash.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/hash.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/hash.c -o $(OBJECTDIR)/libxml_hash.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/hash.c -o $(OBJECTDIR)/libxml_hash.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_list.o: $(LIBXMLDIR)/list.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/list.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/list.c -o $(OBJECTDIR)/libxml_list.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/list.c -o $(OBJECTDIR)/libxml_list.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_parser.o: $(LIBXMLDIR)/parser.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/parser.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/parser.c -o $(OBJECTDIR)/libxml_parser.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/parser.c -o $(OBJECTDIR)/libxml_parser.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_parserInternals.o: $(LIBXMLDIR)/parserInternals.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/parserInternals.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/parserInternals.c -o $(OBJECTDIR)/libxml_parserInternals.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_SAX.o: $(LIBXMLDIR)/SAX.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/SAX.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/SAX.c -o $(OBJECTDIR)/libxml_SAX.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/parserInternals.c -o $(OBJECTDIR)/libxml_parserInternals.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_SAX2.o: $(LIBXMLDIR)/SAX2.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/SAX2.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/SAX2.c -o $(OBJECTDIR)/libxml_SAX2.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/SAX2.c -o $(OBJECTDIR)/libxml_SAX2.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_threads.o: $(LIBXMLDIR)/threads.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/threads.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/threads.c -o $(OBJECTDIR)/libxml_threads.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/threads.c -o $(OBJECTDIR)/libxml_threads.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_tree.o: $(LIBXMLDIR)/tree.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/tree.c...
-	$(COMPILER) $(COMPILER_OPTS) -w $(LIBXMLDIR)/tree.c -o $(OBJECTDIR)/libxml_tree.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) -w $(LIBXMLDIR)/tree.c -o $(OBJECTDIR)/libxml_tree.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_uri.o: $(LIBXMLDIR)/uri.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/uri.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/uri.c -o $(OBJECTDIR)/libxml_uri.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/uri.c -o $(OBJECTDIR)/libxml_uri.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_valid.o: $(LIBXMLDIR)/valid.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/valid.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/valid.c -o $(OBJECTDIR)/libxml_valid.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_xlink.o: $(LIBXMLDIR)/xlink.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xlink.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xlink.c -o $(OBJECTDIR)/libxml_xlink.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/valid.c -o $(OBJECTDIR)/libxml_valid.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_xmlIO.o: $(LIBXMLDIR)/xmlIO.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlIO.c...
-	$(COMPILER) $(COMPILER_OPTS) -w $(LIBXMLDIR)/xmlIO.c -o $(OBJECTDIR)/libxml_xmlIO.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) -w $(LIBXMLDIR)/xmlIO.c -o $(OBJECTDIR)/libxml_xmlIO.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_xmlmemory.o: $(LIBXMLDIR)/xmlmemory.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlmemory.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlmemory.c -o $(OBJECTDIR)/libxml_xmlmemory.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlmemory.c -o $(OBJECTDIR)/libxml_xmlmemory.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/libxml_xmlregexp.o: $(LIBXMLDIR)/xmlregexp.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlregexp.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlregexp.c -o $(OBJECTDIR)/libxml_xmlregexp.o
+$(OBJECTDIR)/libxml_xmlreader.o: $(LIBXMLDIR)/xmlreader.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlreader.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlreader.c -o $(OBJECTDIR)/libxml_xmlreader.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_xmlsave.o: $(LIBXMLDIR)/xmlsave.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlsave.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlsave.c -o $(OBJECTDIR)/libxml_xmlsave.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlsave.c -o $(OBJECTDIR)/libxml_xmlsave.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libxml_xmlstring.o: $(LIBXMLDIR)/xmlstring.c
 	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlstring.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlstring.c -o $(OBJECTDIR)/libxml_xmlstring.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlstring.c -o $(OBJECTDIR)/libxml_xmlstring.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/libxml_xmlunicode.o: $(LIBXMLDIR)/xmlunicode.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlunicode.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xmlunicode.c -o $(OBJECTDIR)/libxml_xmlunicode.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_xpath.o: $(LIBXMLDIR)/xpath.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xpath.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xpath.c -o $(OBJECTDIR)/libxml_xpath.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_xpointer.o: $(LIBXMLDIR)/xpointer.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xpointer.c...
-	$(COMPILER) $(COMPILER_OPTS) $(LIBXMLDIR)/xpointer.c -o $(OBJECTDIR)/libxml_xpointer.o
+$(OBJECTDIR)/libxml_xmlwriter.o: $(LIBXMLDIR)/xmlwriter.c
+	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlwriter.c...
+	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlwriter.c -o $(OBJECTDIR)/libxml_xmlwriter.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libiconv_iconv.o: $(LIBICONVDIR)/iconv.c $(LIBICONVDIR)/config.h
 	$(ECHO) -n Compiling $(LIBICONVDIR)/iconv.c...
-	$(COMPILER) $(COMPILER_OPTS) -D_ICONVDLL_ $(LIBICONVDIR)/iconv.c -o $(OBJECTDIR)/libiconv_iconv.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) -D_ICONVDLL_ $(LIBICONVDIR)/iconv.c -o $(OBJECTDIR)/libiconv_iconv.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/libiconv_localcharset.o: $(LIBICONVDIR)/localcharset.c $(LIBICONVDIR)/config.h
 	$(ECHO) -n Compiling $(LIBICONVDIR)/localcharset.c...
-	$(COMPILER) $(COMPILER_OPTS) -D_ICONVDLL_ $(LIBICONVDIR)/localcharset.c -o $(OBJECTDIR)/libiconv_localcharset.o
+	$(C_COMPILER) $(C_COMPILER_OPTS) -D_ICONVDLL_ $(LIBICONVDIR)/localcharset.c -o $(OBJECTDIR)/libiconv_localcharset.o
 	$(ECHO) done.
 
 $(SAMPLE1DIR)/beat.o: $(SAMPLE1DIR)/beat.cpp $(DLLNAME)

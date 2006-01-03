@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,8 +9,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/checkbox.h>
+#include <smooth/gui/widgets/hotspot/simplebutton.h>
 #include <smooth/misc/math.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
@@ -18,7 +18,7 @@ const S::Int		 S::GUI::CheckBox::classID = S::Object::RequestClassID();
 
 S::Signal0<S::Void>	 S::GUI::CheckBox::internalCheckValues;
 
-S::GUI::CheckBox::CheckBox(String iText, Point iPos, Size iSize, Bool *iVariable)
+S::GUI::CheckBox::CheckBox(const String &iText, const Point &iPos, const Size &iSize, Bool *iVariable) : Widget(iPos, iSize)
 {
 	type		= classID;
 	text		= iText;
@@ -27,41 +27,43 @@ S::GUI::CheckBox::CheckBox(String iText, Point iPos, Size iSize, Bool *iVariable
 
 	font.SetColor(Setup::ClientTextColor);
 
-	possibleContainers.AddEntry(Layer::classID);
-
-	pos		= iPos;
-	size		= iSize;
-
-	if (size.cx == 0) size.cx = 80;
-	if (size.cy == 0) size.cy = 17;
+	if (GetWidth() == 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(17);
 
 	GetTextSize();
 
-	onLeftButtonClick.Connect(&CheckBox::OnLeftButtonClick, this);
-
 	internalCheckValues.Connect(&CheckBox::InternalCheckValues, this);
+
+	hotspot	= new HotspotSimpleButton(Point(0, 0), GetSize());
+	hotspot->onLeftButtonClick.Connect(&CheckBox::OnLeftButtonClick, this);
+	hotspot->onLeftButtonClick.Connect(&onAction);
+
+	onChangeSize.Connect(&HotspotSimpleButton::SetSize, hotspot);
+
+	RegisterObject(hotspot);
 }
 
 S::GUI::CheckBox::~CheckBox()
 {
+	DeleteObject(hotspot);
+
 	internalCheckValues.Disconnect(&CheckBox::InternalCheckValues, this);
 }
 
 S::Int S::GUI::CheckBox::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
+
+	EnterProtectedRegion();
 
 	Surface	*surface	= container->GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), size);
+	Rect	 frame		= Rect(GetRealPosition() + Point(3, 3), Size(11, 11));
 	
 	switch (message)
 	{
-		default:
+		case SP_SHOW:
 		case SP_PAINT:
-		case SP_UPDATE:
-			frame = Rect(GetRealPosition() + Point(3, 3), Size(11, 11));
-
 			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
 			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
@@ -69,141 +71,49 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 
 			if (*variable == True)
 			{
-				Int	 shadowColor	= 0;
-				Int	 crossColor	= 0;
+				Point p1 = Point(frame.left + 3, frame.top + 3);
+				Point p2 = Point(frame.left + 10, frame.bottom - 1);
 
-				if (active)
+				for (Int i = 0; i < 2; i++)
 				{
-					shadowColor	= Setup::DividerDarkColor;
-					crossColor	= Setup::ClientTextColor;
+					Int	 color = active ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
+
+					if (i == 1)
+					{
+						color = active ? Setup::ClientTextColor : Setup::GrayTextColor;
+
+						p1 -= Point(i, i);
+						p2 -= Point(i, i);
+					}
+
+					surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), color);
+					surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), color);
+					surface->Line(p1 + Point(0, 1), p2 + Point(-1, 0), color);
+					surface->Line(p1 + Point(6, 0), p2 + Point(-8, 0), color);
+					surface->Line(p1 + Point(6, 1), p2 + Point(-7, 0), color);
+					surface->Line(p1 + Point(5, 0), p2 + Point(-8, -1), color);
 				}
-				else
-				{
-					shadowColor	= Setup::DividerDarkColor.Average(Setup::BackgroundColor);
-					crossColor	= Setup::GrayTextColor;
-				}
-
-				Point	 lineStart;
-				Point	 lineEnd;
-
-				lineStart.x	= frame.left + 3 - (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 3;
-				lineEnd.x	= frame.right - 1 - (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 1;
-
-				surface->Line(lineStart, lineEnd, shadowColor);
-
-				lineStart.x	= frame.left + 4 - (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 3;
-				lineEnd.x	= frame.right - 1 - (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 2;
-
-				surface->Line(lineStart, lineEnd, shadowColor);
-
-				lineStart.x	= frame.left + 3 - (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 4;
-				lineEnd.x	= frame.right - 2 - (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 1;
-
-				surface->Line(lineStart, lineEnd, shadowColor);
-
-				lineStart.x	= frame.right - 2 - (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 3;
-				lineEnd.x	= frame.left + 2 - (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 1;
-
-				surface->Line(lineStart, lineEnd, shadowColor);
-
-				lineStart.x	= frame.right - 2 - (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 4;
-				lineEnd.x	= frame.left + 3 - (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 1;
-
-				surface->Line(lineStart, lineEnd, shadowColor);
-
-				lineStart.x	= frame.right - 3 - (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 3;
-				lineEnd.x	= frame.left + 2 - (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 2;
-
-				surface->Line(lineStart, lineEnd, shadowColor);
-
-				lineStart.x	= frame.left + 2 + (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 2;
-				lineEnd.x	= frame.right - 2 + (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 2;
-
-				surface->Line(lineStart, lineEnd, crossColor);
-
-				lineStart.x	= frame.left + 3 + (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 2;
-				lineEnd.x	= frame.right - 2 + (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 3;
-
-				surface->Line(lineStart, lineEnd, crossColor);
-
-				lineStart.x	= frame.left + 2 + (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 3;
-				lineEnd.x	= frame.right - 3 + (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 2;
-
-				surface->Line(lineStart, lineEnd, crossColor);
-
-				lineStart.x	= frame.right - 3 + (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 2;
-				lineEnd.x	= frame.left + 1 + (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 2;
-
-				surface->Line(lineStart, lineEnd, crossColor);
-
-				lineStart.x	= frame.right - 3 + (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 3;
-				lineEnd.x	= frame.left + 2 + (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 2;
-
-				surface->Line(lineStart, lineEnd, crossColor);
-
-				lineStart.x	= frame.right - 4 + (Setup::rightToLeft ? 1 : 0);
-				lineStart.y	= frame.top + 2;
-				lineEnd.x	= frame.left + 1 + (Setup::rightToLeft ? 1 : 0);
-				lineEnd.y	= frame.bottom - 3;
-
-				surface->Line(lineStart, lineEnd, crossColor);
 			}
 
-			if (message != SP_UPDATE)
-			{
-				Rect	 textRect;
+			Rect	 textRect;
 
-				textRect.left	= frame.right + 3;
-				textRect.top	= frame.top - 1;
-				textRect.right	= textRect.left + size.cx;
-				textRect.bottom	= textRect.top + 20;
+			textRect.left	= frame.right + 3;
+			textRect.top	= frame.top - 1;
+			textRect.right	= textRect.left + GetWidth();
+			textRect.bottom	= textRect.top + 20;
 
-				Font	 nFont = font;
+			Font	 nFont = font;
 
-				if (!active) nFont.SetColor(Setup::GrayTextColor);
+			if (!active) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->SetText(text, textRect, nFont);
-			}
-
-			break;
-		case SP_MOUSEUP:
-		case SP_MOUSEIN:
-			surface->Frame(frame, FRAME_UP);
-
-			break;
-		case SP_MOUSEOUT:
-			surface->Box(frame, Setup::BackgroundColor, OUTLINED);
-
-			break;
-		case SP_MOUSEDOWN:
-			surface->Frame(frame, FRAME_DOWN);
+			surface->SetText(text, textRect, nFont);
 
 			break;
 	}
 
-	return Success;
+	LeaveProtectedRegion();
+
+	return Success();
 }
 
 S::Void S::GUI::CheckBox::OnLeftButtonClick()
@@ -220,6 +130,6 @@ S::Void S::GUI::CheckBox::InternalCheckValues()
 	{
 		state = *variable;
 
-		Paint(SP_UPDATE);
+		Paint(SP_PAINT);
 	}
 }

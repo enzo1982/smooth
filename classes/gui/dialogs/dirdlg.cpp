@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/dialogs/dirdlg.h>
-#include <smooth/misc/i18n.h>
+#include <smooth/i18n/i18n.h>
 #include <smooth/gui/window/window.h>
 
 #include <wtypes.h>
@@ -27,7 +27,7 @@ S::GUI::Dialogs::DirSelection::~DirSelection()
 {
 }
 
-S::Int S::GUI::Dialogs::DirSelection::ShowDialog()
+const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 {
 	if (Setup::enableUnicode)
 	{
@@ -93,23 +93,23 @@ S::Int S::GUI::Dialogs::DirSelection::ShowDialog()
 	if (directory != NIL)
 	{
 		if (directory[directory.Length() - 1] != '\\') directory[directory.Length()] = '\\';
-	
-		return Success;
 	}
 	else
 	{
-		return Failure;
+		error = Error();
 	}
+
+	return error;
 }
 
-S::Int S::GUI::Dialogs::DirSelection::SetDirName(String nDirectory)
+S::Int S::GUI::Dialogs::DirSelection::SetDirName(const String &nDirectory)
 {
 	directory = nDirectory;
 
-	return Success;
+	return Success();
 }
 
-S::String S::GUI::Dialogs::DirSelection::GetDirName()
+const S::String &S::GUI::Dialogs::DirSelection::GetDirName()
 {
 	return directory;
 }

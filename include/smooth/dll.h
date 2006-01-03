@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,7 +41,7 @@ extern "C"
 				GUI::Application::GetStartupDirectory();
 				GUI::Application::GetApplicationDirectory();
 
-				AttachDLL();
+				AttachDLL(shInstance);
 
 				break;
 			case DLL_PROCESS_DETACH:

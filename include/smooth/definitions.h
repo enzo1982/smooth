@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -100,7 +100,6 @@
 	#define SMOOTH_PLUGIN_API
 	#define SMOOTH_PLUGIN_VAR extern
 
-	#undef Success
 	#undef True
 	#undef False
 	#undef Bool
@@ -134,6 +133,7 @@
 #define callbacks	public
 #define signals		public
 #define slots		public
+#define accessors	public
 
 #define abstract
 #define sealed
@@ -149,29 +149,29 @@ namespace S = smooth;
 
 namespace smooth
 {
-	const Int Success	= 1;
-	const Int Failure	= 0;
 	const Int Break		= -1;
 
 	const Bool True		= (Bool) -1;
 	const Bool False	= (Bool) 0;
 };
 
-#include "error/error.h"
-#include "error/success.h"
+#include "errors/error.h"
+#include "errors/success.h"
 
-#include "array.h"
+#include "templates/array.h"
 #include "misc/string.h"
 #include "basic/setup.h"
 
-#include "pointer.h"
+#include "templates/pointer.h"
+
+using namespace smooth::Errors;
 
 namespace smooth
 {
 	Int	 Main();
-	Int	 Main(Array<String> &);
+	Int	 Main(const Array<String> &);
 
-	Void	 AttachDLL();
+	Void	 AttachDLL(Void *);
 	Void	 DetachDLL();
 };
 
@@ -187,16 +187,7 @@ const S::Int SM_SHOWTOOLTIP		= 1032;
 const S::Int SM_MOUSEWHEEL		= 1033;
 
 const S::Int SM_EXECUTEPEEK		= 1534;
-const S::Int SM_CHECKPOPUPS		= 1537;
-const S::Int SM_LOOSEFOCUS		= 1538;
-const S::Int SM_TIMER			= 1539;
-const S::Int SM_OPENPOPUP		= 1540;
-const S::Int SM_CLOSEPOPUP		= 1541;
-
-const S::Int OR_UPPERLEFT		= 0;
-const S::Int OR_UPPERRIGHT		= 1;
-const S::Int OR_LOWERLEFT		= 2;
-const S::Int OR_LOWERRIGHT		= 3;
+const S::Int SM_TIMER			= 1535;
 
 const S::Int OR_HORZ			= 1;
 const S::Int OR_VERT			= 2;
@@ -209,5 +200,10 @@ const S::Int OR_RIGHT			= 32;
 
 const S::Int OR_CENTER			= 64;
 const S::Int OR_FREE			= 128;
+
+const S::Int OR_UPPERLEFT		= 20;
+const S::Int OR_UPPERRIGHT		= 36;
+const S::Int OR_LOWERLEFT		= 12;
+const S::Int OR_LOWERRIGHT		= 40;
 
 #endif

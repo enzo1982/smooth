@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,37 +10,30 @@
 
 #include <smooth/gui/widgets/widget.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/rect.h>
-#include <smooth/gui/widgets/container.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/gui/widgets/basic/divider.h>
 #include <smooth/gui/widgets/special/tooltip.h>
-#include <smooth/gui/window/window.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
 
 const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
 
-S::GUI::Widget::Widget()
+S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 {
 	type		= classID;
 
 	registered	= False;
 	container	= NIL;
 
-	visible		= False;
+	visible		= True;
 	active		= True;
 	focussed	= False;
 
 	subtype		= 0;
 
-	pos.x		= 0;
-	pos.y		= 0;
-	size.cx		= 100;
-	size.cy		= 100;
-
-	borderWidth	= 0;
+	pos		= iPos;
+	size		= iSize;
 
 	orientation	= OR_UPPERLEFT;
 
@@ -50,21 +43,30 @@ S::GUI::Widget::Widget()
 	textSize.cx	= 0;
 	textSize.cy	= 0;
 
-	checked		= False;
-	clicked		= False;
-
 	mouseOver	= False;
 
 	leftButtonDown	= False;
 	rightButtonDown	= False;
+
+	mouseDragging	= False;
 
 	tipTimer	= NIL;
 	tooltip		= NIL;
 
 	font.SetColor(Setup::TextColor);
 
+	backgroundColor	= -1;
+
+	nullSurface	= new GUI::Surface();
+	drawSurface	= nullSurface;
+
+	hitTest.Connect(&Widget::DefaultHitTest, this);
+
 	onShow.SetParentObject(this);
 	onHide.SetParentObject(this);
+
+	onChangePosition.SetParentObject(this);
+	onChangeSize.SetParentObject(this);
 
 	onMouseOver.SetParentObject(this);
 	onMouseOut.SetParentObject(this);
@@ -79,7 +81,13 @@ S::GUI::Widget::Widget()
 	onRightButtonClick.SetParentObject(this);
 	onRightButtonDoubleClick.SetParentObject(this);
 
-	onClick.SetParentObject(this);
+	onMouseDragStart.SetParentObject(this);
+	onMouseDrag.SetParentObject(this);
+	onMouseDragEnd.SetParentObject(this);
+
+	onMouseWheel.SetParentObject(this);
+
+	onAction.SetParentObject(this);
 
 	onGetFocus.SetParentObject(this);
 	onLoseFocus.SetParentObject(this);
@@ -94,7 +102,92 @@ S::GUI::Widget::~Widget()
 {
 	DeactivateTooltip();
 
+	while (widgets.GetNOfEntries()) UnregisterObject(widgets.GetFirstEntry());
+
+	widgets.RemoveAll();
+
 	if (registered && container != NIL) container->UnregisterObject(this);
+
+	delete nullSurface;
+}
+
+S::Int S::GUI::Widget::RegisterObject(Widget *widget)
+{
+	if (widget == NIL) return Error();
+
+	if (!widget->IsRegistered())
+	{
+		widgets.AddEntry(widget, widget->GetHandle());
+
+		widget->SetContainer(this);
+		widget->SetRegisteredFlag(True);
+
+		widget->onRegister.Emit(this);
+
+		if (widget->visible)
+		{
+			widget->visible = False;
+
+			widget->Show();
+		}
+
+		return Success();
+	}
+
+	return Error();
+}
+
+S::Int S::GUI::Widget::UnregisterObject(Widget *widget)
+{
+	if (widget == NIL) return Error();
+
+	if (widget->IsRegistered())
+	{
+		if (widgets.RemoveEntry(widget->GetHandle()) == True)
+		{
+			widget->Hide();
+			widget->onUnregister.Emit(this);
+
+			widget->SetRegisteredFlag(False);
+			widget->SetContainer(NIL);
+
+			widget->visible = True;
+
+			return Success();
+		}
+	}
+
+	return Error();
+}
+
+S::Int S::GUI::Widget::GetNOfObjects()
+{
+	return widgets.GetNOfEntries();
+}
+
+S::GUI::Widget *S::GUI::Widget::GetNthObject(Int n)
+{
+	return widgets.GetNthEntry(n);
+}
+
+S::GUI::Window *S::GUI::Widget::GetContainerWindow()
+{
+	Widget	*widget = this;
+
+	while (widget->GetObjectType() != Window::classID)
+	{
+		if (widget->GetContainer() == NIL) return NIL;
+
+		widget = widget->GetContainer();
+	}
+
+	return (Window *) widget;
+}
+
+S::GUI::Surface *S::GUI::Widget::GetDrawSurface()
+{
+	if (IsRegistered())	return container->GetDrawSurface();
+	else			return drawSurface;
 }
 
 S::Bool S::GUI::Widget::IsRegistered()
@@ -102,14 +195,14 @@ S::Bool S::GUI::Widget::IsRegistered()
 	return registered;
 }
 
-S::Int S::GUI::Widget::SetContainer(Container *newContainer)
+S::Int S::GUI::Widget::SetContainer(Widget *newContainer)
 {
 	container = newContainer;
 
-	return Success;
+	return Success();
 }
 
-S::GUI::Container *S::GUI::Widget::GetContainer()
+S::GUI::Widget *S::GUI::Widget::GetContainer()
 {
 	return container;
 }
@@ -129,90 +222,84 @@ S::GUI::Point S::GUI::Widget::GetRealPosition()
 {
 	if (!registered) return pos;
 
-	Point	 realPos = pos;
+	Point	 realPos	= pos;
+	Point	 containerPos	= container->GetRealPosition();
 
-	if (container->GetObjectType() == GUI::Layer::classID)
+	realPos.x = containerPos.x + pos.x;
+	realPos.y = containerPos.y + pos.y;
+
+	if (orientation == OR_UPPERRIGHT)
 	{
-		Point	 layerPos = container->GetRealPosition();
-
-		realPos.x = layerPos.x + pos.x;
-		realPos.y = layerPos.y + pos.y;
-
-		if (orientation == OR_UPPERRIGHT)
-		{
-			realPos.x = layerPos.x + container->size.cx - pos.x;
-		}
-		else if (orientation == OR_LOWERLEFT)
-		{
-			realPos.y = layerPos.y + container->size.cy - pos.y;
-		}
-		else if (orientation == OR_LOWERRIGHT)
-		{
-			realPos.x = layerPos.x + container->size.cx - pos.x;
-			realPos.y = layerPos.y + container->size.cy - pos.y;
-		}
+		realPos.x = containerPos.x + container->size.cx - pos.x;
 	}
-	else
+	else if (orientation == OR_LOWERLEFT)
 	{
-		if (orientation == OR_UPPERRIGHT)
-		{
-			realPos.x = container->size.cx - pos.x;
-		}
-		else if (orientation == OR_LOWERLEFT)
-		{
-			realPos.y = container->size.cy - pos.y;
-		}
-		else if (orientation == OR_LOWERRIGHT)
-		{
-			realPos.x = container->size.cx - pos.x;
-			realPos.y = container->size.cy - pos.y;
-		}
+		realPos.y = containerPos.y + container->size.cy - pos.y;
+	}
+	else if (orientation == OR_LOWERRIGHT)
+	{
+		realPos.x = containerPos.x + container->size.cx - pos.x;
+		realPos.y = containerPos.y + container->size.cy - pos.y;
 	}
 
 	return realPos;
 }
 
+const S::GUI::Color &S::GUI::Widget::GetBackgroundColor()
+{
+	return backgroundColor;
+}
+
+S::Int S::GUI::Widget::SetBackgroundColor(const Color &nColor)
+{
+	backgroundColor = nColor;
+
+	Paint(SP_PAINT);
+
+	return Success();
+}
+
 S::Int S::GUI::Widget::Show()
 {
-	if (visible) return Success;
+	if (visible) return Success();
 
 	visible = True;
 
-	if (!registered) return Success;
+	if (!registered) return Success();
 
 	if (IsVisible()) Paint(SP_SHOW);
 
 	onShow.Emit();
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Widget::Hide()
 {
-	if (!visible) return Success;
+	if (!visible) return Success();
 
 	Bool	 wasVisible = IsVisible();
 
 	visible = False;
 
-	if (!registered) return Success;
+	if (!registered) return Success();
 
 	if (wasVisible)
 	{
 		Rect	 rect		= Rect(GetRealPosition(), size);
 		Surface	*surface	= container->GetDrawSurface();
 
-		surface->Box(rect, container->GetBackgroundColor() == -1 ? Setup::BackgroundColor : container->GetBackgroundColor(), FILLED);
+		surface->Box(rect, Setup::BackgroundColor, FILLED);
 	}
 
 	onHide.Emit();
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Widget::Activate()
 {
-	if (active) return Success;
+	if (active) return Success();
 
 	Bool	 prevVisible = IsVisible();
 
@@ -222,12 +309,12 @@ S::Int S::GUI::Widget::Activate()
 
 	if (registered && prevVisible) Show();
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Widget::Deactivate()
 {
-	if (!active) return Success;
+	if (!active) return Success();
 
 	Bool	 prevVisible = IsVisible();
 
@@ -237,34 +324,59 @@ S::Int S::GUI::Widget::Deactivate()
 
 	if (registered && prevVisible) Show();
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Widget::Paint(Int message)
 {
-	if (!registered)	return Failure;
-	if (!visible)		return Success;
+	if (!registered)	return Error();
+	if (!visible)		return Success();
 
-	return Success;
+	switch (message)
+	{
+		case SP_SHOW:
+		case SP_PAINT:
+			for (Int i = 0; i < GetNOfObjects(); i++)
+			{
+				Widget	*object = GetNthObject(i);
+
+				if (object->IsVisible()) object->Paint(message);
+			}
+
+			break;
+	}
+
+	return Success();
 }
 
 S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 {
-	if (!registered)		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
 
 	Window	*window	= container->GetContainerWindow();
 
-	if (window == NIL) return Success;
+	if (window == NIL) return Success();
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*object = GetNthObject(i);
+
+		if (object->Process(message, wParam, lParam) == Break) return Break;
+	}
+
+	if (!IsActive())	return Success();
 
 	EnterProtectedRegion();
 
-	Rect	 frame	= Rect(GetRealPosition() + Point(borderWidth, borderWidth), size - Size(2 * borderWidth, 2 * borderWidth));
+	Point	 realPosition	= GetRealPosition();
+	Rect	 frame		= Rect(realPosition, size);
+	Point	 mousePos	= Point(window->MouseX(), window->MouseY());
 
 	switch (message)
 	{
 		case SM_MOUSEMOVE:
-			if (!mouseOver && window->IsMouseOn(frame))
+			if (!mouseOver && window->IsMouseOn(frame) && hitTest.Call(mousePos - realPosition))
 			{
 				mouseOver = True;
 
@@ -282,12 +394,12 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 				onMouseOver.Emit();
 			}
-			else if (mouseOver && !window->IsMouseOn(frame))
+			else if (mouseOver && !(window->IsMouseOn(frame) && hitTest.Call(mousePos - realPosition)))
 			{
 				mouseOver = False;
 
 				leftButtonDown = False;
-				leftButtonDown = False;
+				rightButtonDown = False;
 
 				if (statusText != NIL && window->GetStatusText() == statusText) window->RestoreDefaultStatusText();
 
@@ -297,7 +409,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 				onMouseOut.Emit();
 			}
-			else if (mouseOver && window->IsMouseOn(frame))
+			else if (mouseOver && window->IsMouseOn(frame) && hitTest.Call(mousePos - realPosition))
 			{
 				if (tipTimer != NIL && wParam == 0)
 				{
@@ -306,9 +418,13 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
+			if (mouseDragging)
+			{
+				onMouseDrag.Emit(mousePos);
+			}
+
 			break;
 		case SM_LBUTTONDOWN:
-		case SM_LBUTTONDBLCLK:
 			if (mouseOver)
 			{
 				leftButtonDown = True;
@@ -328,9 +444,14 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 					onClickInFocus.Emit();
 				}
 
-				onLeftButtonDown.Emit(Point(window->MouseX(), window->MouseY()));
+				onLeftButtonDown.Emit(mousePos);
 
-				if (message == SM_LBUTTONDBLCLK) onLeftButtonDoubleClick.Emit(Point(window->MouseX(), window->MouseY()));
+				if (!mouseDragging)
+				{
+					mouseDragging = True;
+
+					onMouseDragStart.Emit(mousePos);
+				}
 			}
 			else
 			{
@@ -343,6 +464,18 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+		case SM_LBUTTONDBLCLK:
+			if (mouseOver)
+			{
+				leftButtonDown = True;
+
+				Paint(SP_MOUSEDOWN);
+
+				onLeftButtonDown.Emit(mousePos);
+				onLeftButtonDoubleClick.Emit(mousePos);
+			}
+
+			break;
 		case SM_LBUTTONUP:
 			if (leftButtonDown)
 			{
@@ -350,10 +483,28 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 				Paint(SP_MOUSEUP);
 
-				onLeftButtonUp.Emit(Point(window->MouseX(), window->MouseY()));
-				onLeftButtonClick.Emit(Point(window->MouseX(), window->MouseY()));
+				onLeftButtonUp.Emit(mousePos);
+				onLeftButtonClick.Emit(mousePos);
+			}
 
-				onClick.Emit(window->MouseX(), window->MouseY());
+			if (mouseDragging)
+			{
+				mouseDragging = False;
+
+				onMouseDragEnd.Emit(mousePos);
+			}
+
+			break;
+		case SM_MOUSEWHEEL:
+			{
+				Int	 scrollLines = 0;
+
+				if (Setup::enableUnicode)	SystemParametersInfoW(104, NIL, (UINT *) &scrollLines, NIL);
+				else				SystemParametersInfoA(104, NIL, (UINT *) &scrollLines, NIL);
+
+				if (scrollLines <= 0) scrollLines = 3;
+
+				onMouseWheel.Emit(wParam / 120 * scrollLines);
 			}
 
 			break;
@@ -379,7 +530,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 	LeaveProtectedRegion();
 
-	return Success;
+	return Success();
 }
 
 S::Void S::GUI::Widget::ActivateTooltip()
@@ -431,23 +582,21 @@ S::Bool S::GUI::Widget::IsVisible()
 	if (!registered)	return visible;
 	if (!visible)		return False;
 
-	Bool	 isVisible = True;
-
-	if (container->GetObjectType() == classID)
-	{
-		if (!container->IsVisible()) isVisible = False;
-	}
-
-	return isVisible;
+	return container->IsVisible();
 }
 
 S::Bool S::GUI::Widget::IsActive()
 {
-	return active;
+	if (!registered)	return active;
+	if (!active)		return False;
+
+	return container->IsActive();
 }
 
 S::Int S::GUI::Widget::SetText(const String &newText)
 {
+	if (text == newText) return Success();
+
 	Bool	 prevVisible = IsVisible();
 
 	if (registered && prevVisible) Hide();
@@ -456,17 +605,14 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 
 	GetTextSize();
 
-	checked = False;
-	clicked = False;
-
 	if (registered && prevVisible) Show();
 
 	Process(SM_MOUSEMOVE, 0, 0);
 
-	return Success;
+	return Success();
 }
 
-S::String S::GUI::Widget::GetText()
+const S::String &S::GUI::Widget::GetText()
 {
 	return text;
 }
@@ -475,10 +621,10 @@ S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 {
 	tooltipText = nTooltipText;
 
-	return Success;
+	return Success();
 }
 
-S::String S::GUI::Widget::GetTooltipText()
+const S::String &S::GUI::Widget::GetTooltipText()
 {
 	return tooltipText;
 }
@@ -487,15 +633,15 @@ S::Int S::GUI::Widget::SetStatusText(const String &nStatusText)
 {
 	statusText = nStatusText;
 
-	return Success;
+	return Success();
 }
 
-S::String S::GUI::Widget::GetStatusText()
+const S::String &S::GUI::Widget::GetStatusText()
 {
 	return statusText;
 }
 
-S::Int S::GUI::Widget::SetFont(Font nFont)
+S::Int S::GUI::Widget::SetFont(const Font &nFont)
 {
 	Bool	 prevVisible = IsVisible();
 
@@ -507,10 +653,10 @@ S::Int S::GUI::Widget::SetFont(Font nFont)
 
 	if (registered && prevVisible) Show();
 
-	return Success;
+	return Success();
 }
 
-S::GUI::Font S::GUI::Widget::GetFont()
+const S::GUI::Font &S::GUI::Widget::GetFont()
 {
 	return font;
 }
@@ -525,7 +671,7 @@ S::Int S::GUI::Widget::SetOrientation(Int nOrientation)
 
 	if (registered && prevVisible) Show();
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Widget::GetOrientation()
@@ -533,59 +679,95 @@ S::Int S::GUI::Widget::GetOrientation()
 	return orientation;
 }
 
-S::Int S::GUI::Widget::SetPosition(Point nPos)
+S::Int S::GUI::Widget::SetX(Int nX)
 {
-	Bool	 prevVisible = IsVisible();
-
-	if (registered && prevVisible) Hide();
-
-	pos	= nPos;
-
-	if (registered && prevVisible) Show();
-
-	return Success;
+	return SetMetrics(Point(nX, pos.y), size);
 }
 
-S::Int S::GUI::Widget::SetMetrics(Point nPos, Size nSize)
+S::Int S::GUI::Widget::GetX()
 {
+	return pos.x;
+}
+
+S::Int S::GUI::Widget::SetY(Int nY)
+{
+	return SetMetrics(Point(pos.x, nY), size);
+}
+
+S::Int S::GUI::Widget::GetY()
+{
+	return pos.y;
+}
+
+S::Int S::GUI::Widget::SetWidth(Int nWidth)
+{
+	return SetMetrics(pos, Size(nWidth, size.cy));
+}
+
+S::Int S::GUI::Widget::GetWidth()
+{
+	return size.cx;
+}
+
+S::Int S::GUI::Widget::SetHeight(Int nHeight)
+{
+	return SetMetrics(pos, Size(size.cx, nHeight));
+}
+
+S::Int S::GUI::Widget::GetHeight()
+{
+	return size.cy;
+}
+
+S::Int S::GUI::Widget::SetPosition(const Point &nPos)
+{
+	return SetMetrics(nPos, size);
+}
+
+const S::GUI::Point &S::GUI::Widget::GetPosition()
+{
+	return pos;
+}
+
+S::Int S::GUI::Widget::SetSize(const Size &nSize)
+{
+	return SetMetrics(pos, nSize);
+}
+
+const S::GUI::Size &S::GUI::Widget::GetSize()
+{
+	return size;
+}
+
+S::Int S::GUI::Widget::SetMetrics(const Point &nPos, const Size &nSize)
+{
+	if (nPos.x == pos.x && nPos.y == pos.y && nSize.cx == size.cx && nSize.cy == size.cy) return Success();
+
 	Bool	 prevVisible = IsVisible();
 
 	if (registered && prevVisible) Hide();
 
-	pos	= nPos;
-	size	= nSize;
+	if (nPos.x   != pos.x   || nPos.y   != pos.y  )	{ pos  = nPos;  onChangePosition.Emit(pos); }
+	if (nSize.cx != size.cx || nSize.cy != size.cy)	{ size = nSize; onChangeSize.Emit(size);    }
 
 	if (registered && prevVisible) Show();
 
-	return Success;
+	return Success();
 }
 
 S::Bool S::GUI::Widget::IsAffected(const Rect &uRect)
 {
-	Rect	 tRect;
-	Point	 realpos = pos;
+	Point	 realPos = GetRealPosition();
+	Rect	 tRect	 = Rect(realPos - Point(10, 10), size + Size(20, 20));
 
 	if (type == GUI::Layer::classID || type == GUI::Divider::classID) return True;
-
-	if (pos.x == 0 && pos.y == 0 && size.cx == 0 && size.cy == 0) return True;
-
-	if (container != NIL)
-	{
-		if (container->GetObjectType() == GUI::Layer::classID) realpos = GetRealPosition();
-	}
-
-	tRect.left	= realpos.x - 10;
-	tRect.top	= realpos.y - 10;
-	tRect.right	= realpos.x + size.cx + 10;
-	tRect.bottom	= realpos.y + size.cy + 10;
 
 	if (!Rect::DoRectsOverlap(uRect, tRect)) return False;
 
 	return True;
 }
 
-S::Bool S::GUI::Widget::IsTypeCompatible(Int compType)
+S::Bool S::GUI::Widget::DefaultHitTest(const Point &mousePos)
 {
-	if (compType == Object::classID || compType == classID)	return True;
-	else							return False;
+	return (mousePos.x >= 0 && mousePos.y >= 0 && mousePos.x <= size.cx - 1 && mousePos.y <= size.cy - 1);
 }

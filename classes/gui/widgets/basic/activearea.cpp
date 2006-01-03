@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,46 +9,46 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/activearea.h>
+#include <smooth/gui/widgets/hotspot/hotspot.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/gui/window/window.h>
-#include <smooth/gui/widgets/layer.h>
 
 const S::Int	 S::GUI::ActiveArea::classID = S::Object::RequestClassID();
 
-S::GUI::ActiveArea::ActiveArea(const Color &iColor, const Point &iPos, const Size &iSize)
+S::GUI::ActiveArea::ActiveArea(const Color &iColor, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
 	type		= classID;
 	areaColor	= iColor;
 
-	possibleContainers.AddEntry(Layer::classID);
+	if (GetWidth() == 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(20);
 
-	pos		= iPos;
-	size		= iSize;
+	hotspot	= new Hotspot(Point(1, 1), GetSize() - Size(2, 2));
 
-	if (size.cx == 0) size.cx = 80;
-	if (size.cy == 0) size.cy = 20;
+	hotspot->onLeftButtonClick.Connect(&onAction);
 
-	borderWidth	= 1;
+	RegisterObject(hotspot);
+
+	onChangeSize.Connect(&ActiveArea::OnChangeSize, this);
 }
 
 S::GUI::ActiveArea::~ActiveArea()
 {
+	DeleteObject(hotspot);
 }
 
 S::Int S::GUI::ActiveArea::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
-
-	Surface	*surface	= container->GetDrawSurface();
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
 
 	EnterProtectedRegion();
 
-	Rect	 frame		= Rect(GetRealPosition(), size);
+	Surface	*surface = container->GetDrawSurface();
+	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
 	switch (message)
 	{
-		default:
+		case SP_SHOW:
 		case SP_PAINT:
 			surface->Box(frame, areaColor, FILLED);
 			surface->Frame(frame, FRAME_DOWN);
@@ -58,7 +58,7 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 
 	LeaveProtectedRegion();
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::ActiveArea::SetColor(const Color &nColor)
@@ -67,10 +67,15 @@ S::Int S::GUI::ActiveArea::SetColor(const Color &nColor)
 
 	Paint(SP_PAINT);
 
-	return Success;
+	return Success();
 }
 
 S::GUI::Color S::GUI::ActiveArea::GetColor()
 {
 	return areaColor;
+}
+
+S::Void S::GUI::ActiveArea::OnChangeSize(const Size &nSize)
+{
+	hotspot->SetSize(nSize - Size(2, 2));
 }

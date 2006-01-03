@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,7 +38,7 @@ namespace smooth
 	{
 		namespace Dialogs
 		{
-			class SplashScreen : public Application
+			class SplashScreen : public Dialog
 			{
 				private:
 					static Int	 nOfSplashScreens;
@@ -55,9 +55,9 @@ namespace smooth
 					Void		 TimerProc();
 				public:
 							 SplashScreen(const Bitmap &, Int);
-							~SplashScreen();
+					virtual		~SplashScreen();
 
-					Int		 ShowDialog();
+					const Error	&ShowDialog();
 			};
 		};
 	};

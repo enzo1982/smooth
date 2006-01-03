@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,89 +9,73 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/button.h>
-#include <smooth/misc/math.h>
+#include <smooth/gui/widgets/hotspot/simplebutton.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
-#include <smooth/gui/window/window.h>
-#include <smooth/gui/widgets/layer.h>
+#include <smooth/misc/math.h>
 
 const S::Int	 S::GUI::Button::classID = S::Object::RequestClassID();
 
-S::GUI::Button::Button(String iText, const Bitmap &iBitmap, Point iPos, Size iSize)
+S::GUI::Button::Button(const String &iText, const Bitmap &iBitmap, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
-	type		= classID;
-	text		= iText;
-	bitmap		= iBitmap;
-	backgroundColor	= -1;
+	type	= classID;
+	text	= iText;
+	bitmap	= iBitmap;
 
 	bitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
-	possibleContainers.AddEntry(Layer::classID);
-
-	pos		= iPos;
-	size		= iSize;
-
-	if (size.cx == 0) size.cx = 80;
-	if (size.cy == 0) size.cy = 22;
-
-	if (bitmap == NIL)	bmpSize = Size(0, 0);
-	else			bmpSize = bitmap.GetSize();
-
-	borderWidth	= 4;
+	if (GetWidth() == 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(22);
 
 	GetTextSize();
+
+	hotspot	= new HotspotSimpleButton(flags & BF_NOFRAME ? Point() : Point(4, 4), GetSize() - (flags & BF_NOFRAME ? Size() : Size(8, 8)));
+
+	hotspot->onLeftButtonClick.Connect(&onAction);
+
+	RegisterObject(hotspot);
+
+	onChangeSize.Connect(&Button::OnChangeSize, this);
 }
 
 S::GUI::Button::~Button()
 {
+	DeleteObject(hotspot);
 }
 
 S::Int S::GUI::Button::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
-
-	Surface	*surface	= container->GetDrawSurface();
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
 
 	EnterProtectedRegion();
 
-	Rect	 frame		= Rect(GetRealPosition(), size);
-	Rect	 highlightFrame	= Rect(GetRealPosition() + Point(4, 4), size - Size(8, 8));
+	Surface	*surface = container->GetDrawSurface();
+	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
 	switch (message)
 	{
-		default:
+		case SP_SHOW:
 		case SP_PAINT:
 			if (!(flags & BF_NOFRAME))
 			{
 				surface->Frame(frame, FRAME_DOWN);
-				surface->Frame(Rect(GetRealPosition() + Point(1, 1), size - Size(2, 2)), FRAME_UP);
+				surface->Frame(Rect(GetRealPosition() + Point(1, 1), GetSize() - Size(2, 2)), FRAME_UP);
+			}
 
-				if (backgroundColor >= 0) surface->Box(frame, backgroundColor, FILLED);
-			}
-			else
-			{
-				if (backgroundColor >= 0) surface->Box(highlightFrame, backgroundColor, FILLED);
-			}
+			if (GetBackgroundColor() >= 0) surface->Box(frame, GetBackgroundColor(), FILLED);
 
 			if (text != NIL)
 			{
 				Rect	 textRect;
 
-				if (bitmap != NIL)
-				{
-					textRect.left	= frame.left + ((size.cx - textSize.cx - bmpSize.cx - 7) / 2) + bmpSize.cx + 7;
-					textRect.top	= frame.top + ((size.cy - textSize.cy) / 2) - 1;
-					textRect.right	= textRect.left + textSize.cx + 1;
-					textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
-				}
-				else
-				{
-					textRect.left	= frame.left + ((size.cx - textSize.cx) / 2);
-					textRect.top	= frame.top + ((size.cy - textSize.cy) / 2) - 1;
-					textRect.right	= textRect.left + textSize.cx + 1;
-					textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
-				}
+				textRect.left	= frame.left + ((GetWidth() - textSize.cx) / 2);
+
+				if (bitmap != NIL) textRect.left = frame.left + ((GetWidth() - textSize.cx - bitmap.GetSize().cx - 7) / 2) + bitmap.GetSize().cx + 7;
+
+				textRect.top	= frame.top + ((GetHeight() - textSize.cy) / 2) - 1;
+				textRect.right	= textRect.left + textSize.cx + 1;
+				textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
 
 				Font	 nFont = font;
 
@@ -104,51 +88,26 @@ S::Int S::GUI::Button::Paint(Int message)
 			{
 				Rect	 bmpRect;
 
-				if (text != NIL)
-				{
-					bmpRect.left	= frame.left + (frame.right - frame.left - bmpSize.cx - textSize.cx - 7) / 2;
-					bmpRect.top	= frame.top + (frame.bottom - frame.top - bmpSize.cy) / 2;
-					bmpRect.right	= bmpRect.left + bmpSize.cx;
-					bmpRect.bottom	= bmpRect.top + bmpSize.cy;
-				}
-				else
-				{
-					bmpRect.left	= frame.left + (frame.right - frame.left - bmpSize.cx) / 2;
-					bmpRect.top	= frame.top + (frame.bottom - frame.top - bmpSize.cy) / 2;
-					bmpRect.right	= bmpRect.left + bmpSize.cx;
-					bmpRect.bottom	= bmpRect.top + bmpSize.cy;
-				}
-	
+				bmpRect.left	= frame.left + (frame.right - frame.left - bitmap.GetSize().cx) / 2;
+
+				if (text != NIL) bmpRect.left = frame.left + (frame.right - frame.left - bitmap.GetSize().cx - textSize.cx - 7) / 2;
+
+				bmpRect.top	= frame.top + (frame.bottom - frame.top - bitmap.GetSize().cy) / 2;
+				bmpRect.right	= bmpRect.left + bitmap.GetSize().cx;
+				bmpRect.bottom	= bmpRect.top + bitmap.GetSize().cy;
+
 				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 			}
-
-			if (flags & BF_SHOWHIGHLIGHT) surface->Frame(highlightFrame, FRAME_UP);
-
-			break;
-		case SP_MOUSEIN:
-		case SP_MOUSEUP:
-			surface->Frame(highlightFrame, FRAME_UP);
-
-			break;
-		case SP_MOUSEDOWN:
-			surface->Frame(highlightFrame, FRAME_DOWN);
-
-			break;
-		case SP_MOUSEOUT:
-			if (flags & BF_SHOWHIGHLIGHT)	surface->Frame(highlightFrame, FRAME_UP);
-			else				surface->Box(highlightFrame, backgroundColor >= 0 ? backgroundColor : Setup::BackgroundColor, OUTLINED);
 
 			break;
 	}
 
 	LeaveProtectedRegion();
 
-	return Success;
+	return Success();
 }
 
-S::Int S::GUI::Button::SetBackgroundColor(Int nColor)
+S::Void S::GUI::Button::OnChangeSize(const Size &nSize)
 {
-	backgroundColor = nColor;
-
-	return Success;
+	hotspot->SetSize(nSize - (flags & BF_NOFRAME ? Size() : Size(8, 8)));
 }

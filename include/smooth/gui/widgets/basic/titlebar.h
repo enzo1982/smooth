@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,13 +16,11 @@ namespace smooth
 	namespace GUI
 	{
 		class Titlebar;
-		class Menubar;
-		class Window;
+		class Hotspot;
 	};
 };
 
 #include "../widget.h"
-#include "../../../graphics/rect.h"
 
 namespace smooth
 {
@@ -37,20 +35,31 @@ namespace smooth
 		{
 			private:
 				Bool			 paintActive;
-				Bool			 minchk;
-				Bool			 minclk;
-				Bool			 maxchk;
-				Bool			 maxclk;
-				Bool			 closechk;
-				Bool			 closeclk;
+				Point			 startMousePos;
+			protected:
+				Hotspot			*minHotspot;
+				Hotspot			*maxHotspot;
+				Hotspot			*closeHotspot;
+
+				Hotspot			*dragHotspot;
 			public:
 				static const Int	 classID;
 
 							 Titlebar(Int = TB_MINBUTTON | TB_MAXBUTTON | TB_CLOSEBUTTON);
-			 				~Titlebar();
+			 	virtual			~Titlebar();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
+				virtual Int		 Process(Int, Int, Int);
+			slots:
+				Void			 OnMouseDragStart(const Point &);
+				Void			 OnMouseDrag(const Point &);
+
+				Void			 OnMinButtonClick();
+				Void			 OnMaxButtonClick();
+				Void			 OnCloseButtonClick();
+
+				Bool			 ButtonHitTest(const Point &);
+				Bool			 DragHitTest(const Point &);
 		};
 	};
 };

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,40 +15,29 @@
 
 namespace smooth
 {
-	class Array_Entry_Base
-	{
-		public:
-			virtual	~Array_Entry_Base()
-			{
-			}
-	};
-
-	template <class t> class Array_Entry : public Array_Entry_Base
+	template <class s> class Array_Entry
 	{
 		private:
-			Bool			 filled;
-			t			 value;
+			s			 value;
 			Int			 index;
 
-			Array_Entry<t>		*nextEntry;
-			Array_Entry<t>		*prevEntry;
+			Array_Entry<s>		*nextEntry;
+			Array_Entry<s>		*prevEntry;
 		public:
-						 Array_Entry();
-						~Array_Entry();
+						 Array_Entry(const s &iValue)		{ value = iValue; index = 0; nextEntry = ARRAY_NULLPOINTER; prevEntry = ARRAY_NULLPOINTER; }
+			virtual			~Array_Entry()				{ }
+		accessors:
+			inline const s		&GetValue() const			{ return value; }
+			Bool			 SetValue(const s &nValue)		{ value = nValue; return True; }
 
-			Bool			 Fill(t);
-			Bool			 Clear();
+			inline Int		 GetIndex() const			{ return index; }
+			Bool			 SetIndex(Int nIndex)			{ index = nIndex; return True; }
 
-			t			 GetValue() const			{ return value; }
+			inline Array_Entry<s>	*GetNext() const			{ return nextEntry; }
+			Bool			 SetNext(Array_Entry<s> *entry)		{ nextEntry = entry; return True; }
 
-			Int			 GetIndex() const			{ return index; }
-			Bool			 SetIndex(Int);
-
-			Array_Entry<t>		*GetNext() const			{ return nextEntry; }
-			Bool			 SetNext(Array_Entry<t> *entry)		{ nextEntry = entry; return True; }
-
-			Array_Entry<t>		*GetPrev() const			{ return prevEntry; }
-			Bool			 SetPrev(Array_Entry<t> *entry)		{ prevEntry = entry; return True; }
+			inline Array_Entry<s>	*GetPrev() const			{ return prevEntry; }
+			Bool			 SetPrev(Array_Entry<s> *entry)		{ prevEntry = entry; return True; }
 	};
 };
 

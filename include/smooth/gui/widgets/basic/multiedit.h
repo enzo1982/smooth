@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,11 +17,7 @@ namespace smooth
 	{
 		class MultiEdit;
 		class Scrollbar;
-	};
-
-	namespace System
-	{
-		class Timer;
+		class Cursor;
 	};
 };
 
@@ -33,53 +29,35 @@ namespace smooth
 	{
 		class SMOOTHAPI MultiEdit : public Widget
 		{
-			private:
-				System::Timer		*timer;
-			slots:
-				Void			 TimerProc();
-
-				Int			 GetNOfLines();
-				Int			 GetNOfInvisibleLines();
-
-				String			 GetVisibleText();
 			protected:
-				Int			 promptPos;
-				Bool			 promptVisible;
-				Int			 markStart;
-				Int			 oMarkStart;
-				Int			 markEnd;
-				Bool			 marking;
-				Int			 maxSize;
-				Int			 invisibleChars;
-				Int			 scrollbarPos;
+				Cursor			*cursor;
 
 				Scrollbar		*scrollbar;
-
-				Void			 SetCursor(Int);
-				Void			 RemoveCursor();
-
-				Void			 MarkText(Int, Int);
-				Void			 DeleteSelectedText();
-				Void			 InsertText(String);
-				Int			 ModifyText(String);
-			slots:
-				Void			 ScrollbarProc();
+				Int			 scrollbarPos;
 			public:
 				static const Int	 classID;
 
-							 MultiEdit(String, Point, Size, Int = 0);
-							~MultiEdit();
+							 MultiEdit(const String &, const Point &, const Size &, Int = 0);
+				virtual			~MultiEdit();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
 
-				Int			 Deactivate();
+				virtual Int		 Activate();
+				virtual Int		 Deactivate();
 
-				Int			 SetText(const String &);
+				virtual Int		 SetText(const String &);
+				virtual const String	&GetText();
 
 				Int			 GetCursorPos();
 
 				Int			 MarkAll();
+			slots:
+				Void			 ScrollbarProc();
+
+				Void			 OnChangeSize(const Size &);
+
+				Int			 GetNOfLines();
+				Int			 GetNOfInvisibleLines();
 		};
 	};
 };

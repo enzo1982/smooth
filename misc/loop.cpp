@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,19 +10,20 @@
 
 #include <smooth/definitions.h>
 #include <smooth/loop.h>
-#include <smooth/dllmain.h>
 #include <smooth/resources.h>
 #include <smooth/threads/thread.h>
 #include <smooth/backends/backend.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/color.h>
-#include <smooth/misc/i18n.h>
+#include <smooth/i18n/i18n.h>
 #include <smooth/gui/application/background.h>
 #include <smooth/system/event.h>
 
 #ifdef __WIN32__
 #include <wtypes.h>
 #include <shlobj.h>
+
+#include <smooth/backends/win32/backendwin32.h>
 #else
 #include <unistd.h>
 #endif
@@ -89,9 +90,10 @@ S::Void S::Init()
 
 	GetColors();
 
-#ifdef __WIN32__
-	I18n::Translator::defaultTranslator = new I18n::Translator(True);
+	I18n::Translator::defaultTranslator = new I18n::Translator("smooth", True);
+	I18n::Translator::defaultTranslator->SetInternalLanguageInfo("English", "Robert Kausch", "http://www.smooth-project.org/", False);
 
+#ifdef __WIN32__
 	switch (PRIMARYLANGID(GetUserDefaultLangID()))
 	{
 		default:
@@ -101,8 +103,10 @@ S::Void S::Init()
 		case LANG_GERMAN:
 			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_de");
 			break;
+		case LANG_ITALIAN:
+			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_it");
+			break;
 	}
-
 #endif
 
 	String::SetInputFormat("ISO-8859-1");
@@ -199,7 +203,7 @@ S::Int S::Loop()
 
 	while (!quit)
 	{
-		Int	 result = Success;
+		Int	 result = Success();
 
 		if (peekLoop > 0)	result = event->ProcessNextEvent(False);
 		else			result = event->ProcessNextEvent(True);
@@ -227,5 +231,5 @@ S::Int S::Loop()
 
 	while (Threads::Thread::GetNOfRunningThreads() > 0) LiSASleep(10);
 
-	return Success;
+	return Success();
 }

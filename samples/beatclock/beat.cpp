@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -48,7 +48,7 @@ BeatClock::BeatClock()
 
 	InputValues();
 
-	wnd		= new Window("BeatClock");
+	wnd		= new Window("BeatClock", Point(wpx, wpy), Size(Math::Round(164 * Setup::FontSize), Math::Round(103 * Setup::FontSize)));
 	title		= new Titlebar(TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	timer		= new Timer();
@@ -58,12 +58,12 @@ BeatClock::BeatClock()
 
 	MenuEntry	*entry;
 
-	menubar->AddEntry("Mode")->onClick.Connect(&BeatClock::Mode, this);
-	menubar->AddEntry("Options")->onClick.Connect(&BeatClock::Options, this);
+	menubar->AddEntry("Mode")->onAction.Connect(&BeatClock::Mode, this);
+	menubar->AddEntry("Options")->onAction.Connect(&BeatClock::Options, this);
 	menubar->AddEntry()->SetOrientation(OR_RIGHT);
 
 	entry = menubar->AddEntry("Info");
-	entry->onClick.Connect(&BeatClock::Info, this);
+	entry->onAction.Connect(&BeatClock::Info, this);
 	entry->SetOrientation(OR_RIGHT);
 
 	RegisterObject(wnd);
@@ -72,10 +72,9 @@ BeatClock::BeatClock()
 	wnd->RegisterObject(title);
 	wnd->RegisterObject(menubar);
 
-	wnd->SetIcon(Bitmap::LoadBitmap("beat.pci", 0, NIL));
+	wnd->SetIcon(ImageLoader::Load("beat.pci:0"));
 	wnd->onPaint.Connect(&BeatClock::PaintAll, this);
 	wnd->SetFlags(WF_TOPMOST | WF_NOTASKBUTTON);
-	wnd->SetMetrics(Point(wpx, wpy), Size(Math::Round(164 * Setup::FontSize), Math::Round(103 * Setup::FontSize)));
 	wnd->onEvent.Connect(&BeatClock::EventProc, this);
 	wnd->Show();
 
@@ -112,7 +111,7 @@ Void BeatClock::EventProc(Int message, Int wParam, Int lParam)
 
 Void BeatClock::Options()
 {
-	optionsdialog	= new Window("BeatClock Options");
+	optionsdialog	= new Window("BeatClock Options", Point(100, 100), Size(397, 181));
 	display		= new Layer("Display");
 	alarm		= new Layer("Alarm");
 	misc		= new Layer("Misc");
@@ -142,12 +141,12 @@ Void BeatClock::Options()
 	size.cy = 0;
 
 	display_option1 = new OptionBox("Internet Beats", pos, size, &timeformat, 0);
-	display_option1->onClick.Connect(&BeatClock::OptionsBeats, this);
+	display_option1->onAction.Connect(&BeatClock::OptionsBeats, this);
 
 	pos.y = 49;
 
 	display_option2 = new OptionBox("Standard (STF)", pos, size, &timeformat, 1);
-	display_option2->onClick.Connect(&BeatClock::OptionsSTF, this);
+	display_option2->onAction.Connect(&BeatClock::OptionsSTF, this);
 
 	pos.x = 126;
 	pos.y = 24;
@@ -155,17 +154,17 @@ Void BeatClock::Options()
 	if (timeformat == 0)	display_check1 = new CheckBox("Show centibeats", pos, size, &centi);
 	else			display_check1 = new CheckBox("Show seconds", pos, size, &centi);
 
-	display_check1->onClick.Connect(&BeatClock::OptionsPaint, this);
+	display_check1->onAction.Connect(&BeatClock::OptionsPaint, this);
 
 	pos.x = 255;
 
 	display_option3 = new OptionBox("CET", pos, size, &timezone, 0);
-	display_option3->onClick.Connect(&BeatClock::OptionsPaint, this);
+	display_option3->onAction.Connect(&BeatClock::OptionsPaint, this);
 
 	pos.y = 49;
 
 	display_option4 = new OptionBox("Local time", pos, size, &timezone, 1);
-	display_option4->onClick.Connect(&BeatClock::OptionsPaint, this);
+	display_option4->onAction.Connect(&BeatClock::OptionsPaint, this);
 
 	display->RegisterObject(display_group1);
 	display->RegisterObject(display_group2);
@@ -181,7 +180,7 @@ Void BeatClock::Options()
 	pos.y = 7;
 
 	alarm_check1 = new CheckBox("Enable alarm", pos, size, &isalarm);
-	alarm_check1->onClick.Connect(&BeatClock::toggleAlarmState, this);
+	alarm_check1->onAction.Connect(&BeatClock::toggleAlarmState, this);
 
 	pos.y = 35;
 	pos.x = 9;
@@ -263,7 +262,7 @@ Void BeatClock::Options()
 	pos.x = 6;
 	pos.y = 5;
 
-	info_text1 = new Text("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2005\nGive it to all your friends!", pos);
+	info_text1 = new Text("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2006\nGive it to all your friends!", pos);
 
 	pos.x = 222;
 
@@ -280,13 +279,13 @@ Void BeatClock::Options()
 	size.cy = 0;
 
 	main_button1 = new Button("OK", NIL, pos, size);
-	main_button1->onClick.Connect(&BeatClock::OptionsOK, this);
+	main_button1->onAction.Connect(&BeatClock::OptionsOK, this);
 	main_button1->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 87;
 
 	main_button2 = new Button("Cancel", NIL, pos, size);
-	main_button2->onClick.Connect(&BeatClock::OptionsCancel, this);
+	main_button2->onAction.Connect(&BeatClock::OptionsCancel, this);
 	main_button2->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 7;
@@ -308,8 +307,7 @@ Void BeatClock::Options()
 	main_reg1->RegisterObject(alarm);
 	main_reg1->RegisterObject(info);
 
-	optionsdialog->SetIcon(Bitmap::LoadBitmap("beat.pci", 0, NIL));
-	optionsdialog->SetMetrics(Point(100, 100), Size(397, 181));
+	optionsdialog->SetIcon(ImageLoader::Load("beat.pci:0"));
 	optionsdialog->doQuit.Connect(&BeatClock::OptionsKillProc, this);
 
 	oldtf = timeformat;
@@ -539,7 +537,7 @@ Void BeatClock::PaintAll()
 {
 	Surface			*surface = wnd->GetDrawSurface();
 
-	surface->StartPaint(Rect(Point(10, 50), Size(wnd->size.cx - 20, 50)));
+	surface->StartPaint(Rect(Point(10, 50), Size(wnd->GetWidth() - 20, 50)));
 
 	Rect			 textRect;
 	SYSTEMTIME		 time;
@@ -707,7 +705,7 @@ Void BeatClock::PaintAll()
 			case True:
 				textRect.left = (Int) ((16 * Setup::FontSize) + 0.5);
 				textRect.top = (Int) ((53 * Setup::FontSize) + 0.5);
-				textRect.right = wnd->size.cx - (Int) ((16 * Setup::FontSize) + 0.5);
+				textRect.right = wnd->GetWidth() - (Int) ((16 * Setup::FontSize) + 0.5);
 				textRect.bottom = textRect.top + (Int) ((40 * Setup::FontSize) + 0.5);
 
 				surface->Box(textRect, Setup::BackgroundColor, FILLED);
@@ -722,7 +720,7 @@ Void BeatClock::PaintAll()
 				{
 					textRect.left = (Int) ((16 * Setup::FontSize) + 0.5);
 					textRect.top = (Int) ((53 * Setup::FontSize) + 0.5);
-					textRect.right = wnd->size.cx - (Int) ((16 * Setup::FontSize) + 0.5);
+					textRect.right = wnd->GetWidth() - (Int) ((16 * Setup::FontSize) + 0.5);
 					textRect.bottom = textRect.top + (Int) ((40 * Setup::FontSize) + 0.5);
 
 					surface->Box(textRect, Setup::BackgroundColor, FILLED);
@@ -747,7 +745,7 @@ Void BeatClock::PaintAll()
 
 Void BeatClock::Info()
 {
-	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2005\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
+	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2006\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
 }
 
 Int BeatClock::GetDayOfWeek(Int day, Int month, Int year)

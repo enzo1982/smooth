@@ -20,16 +20,14 @@ Int smooth::Main()
 
 Hello::Hello()
 {
-	mainWnd	= new Window();
+	mainWnd	= new Window("Hello world!", Point(100, 100), Size(200, 100));
 	title	= new Titlebar(TB_CLOSEBUTTON);
-	hello	= new Button("Hello, World!", NIL, Point(20, 15), Size(160, 40));
+	hello	= new Button("Hello world!", NIL, Point(20, 15), Size(160, 40));
 
 	mainWnd->RegisterObject(hello);
 	mainWnd->RegisterObject(title);
 
 	RegisterObject(mainWnd);
-
-	mainWnd->SetMetrics(Point(100, 100), Size(200, 100));
 }
 
 Hello::~Hello()

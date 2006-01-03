@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,41 +10,27 @@
 
 #include <smooth/gui/widgets/basic/progressbar.h>
 #include <smooth/misc/math.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Progressbar::classID = S::Object::RequestClassID();
 
-S::GUI::Progressbar::Progressbar(Point iPos, Size iSize, Int subType, Int iTextFlag, Int rangeStart, Int rangeEnd, Int iValue)
+S::GUI::Progressbar::Progressbar(const Point &iPos, const Size &iSize, Int sType, Int iTextFlag, Int rangeStart, Int rangeEnd, Int iValue) : Widget(iPos, iSize)
 {
 	type		= classID;
-	subtype		= subType;
+	subtype		= sType;
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
-	textFlag	= iTextFlag;
 
+	SetFlags(iTextFlag);
 	SetValue(iValue);
 
 	font.SetColor(Setup::ClientTextColor);
 
-	possibleContainers.AddEntry(Layer::classID);
+	if (GetWidth() == 0) SetWidth(subtype == OR_VERT ? 19 : 80);
+	if (GetHeight() == 0) SetHeight(subtype == OR_VERT ? 80 : 19);
 
-	pos		= iPos;
-	size		= iSize;
-
-	if (subtype == OR_HORZ)
-	{
-		if (size.cx == 0) size.cx = 80;
-		if (size.cy == 0) size.cy = 19;
-	}
-	else
-	{
-		if (size.cx == 0) size.cx = 19;
-		if (size.cy == 0) size.cy = 80;
-	}
-
-	CreateGradient(size);
+	CreateGradient(GetSize());
 }
 
 S::GUI::Progressbar::~Progressbar()
@@ -53,73 +39,81 @@ S::GUI::Progressbar::~Progressbar()
 
 S::Int S::GUI::Progressbar::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
+
+	EnterProtectedRegion();
 
 	Surface	*surface	= container->GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
-	Rect	 frame		= Rect(realPos, size);
+	Rect	 frame		= Rect(realPos, GetSize());
 
-	if (value == prevValue && message == SP_UPDATE) return Success;
-
-	surface->StartPaint(frame);
-
-	if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
-	else		surface->Box(frame, Setup::BackgroundColor, FILLED);
-
-	surface->Frame(frame, FRAME_DOWN);
-
-	if (value > 0)
+	switch (message)
 	{
-		frame.left++;
-		frame.top++;
-		frame.right--;
-		frame.bottom--;
+		case SP_SHOW:
+		case SP_PAINT:
+			surface->StartPaint(frame);
 
-		if (subtype == OR_HORZ)	frame.right = frame.left   + (Int) ((size.cx - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
-		else			frame.top   = frame.bottom - (Int) ((size.cy - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-		gradient.BlitToSurface(Rect(Point(0, 0), Size(frame.right - frame.left, frame.bottom - frame.top)), surface, frame);
+			surface->Frame(frame, FRAME_DOWN);
+
+			if (value > 0)
+			{
+				frame = frame + Point(1, 1) - Size(2, 2);
+
+				if (subtype == OR_HORZ)	frame.right = frame.left   + (Int) ((GetWidth() - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+				else			frame.top   = frame.bottom - (Int) ((GetHeight() - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+
+				gradient.BlitToSurface(Rect(Point(0, 0), Size(frame.right - frame.left, frame.bottom - frame.top)), surface, frame);
+			}
+
+			if (subtype == OR_HORZ)
+			{
+				switch (GetFlags())
+				{
+					case PB_NOTEXT:
+						break;
+					case PB_VALUE:
+						text = String::FromInt((Int) Math::Max(value, startValue));
+						break;
+					case PB_PERCENT:
+						if (value > 0)	text = String::FromInt((Int) Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
+						else		text = "0";
+
+						text.Append("%");
+						break;
+				}
+
+				Int	 textSize	= font.GetTextSizeX(text);
+				Rect	 textRect	= Rect(Point(realPos.x + (GetWidth() / 2) - (textSize / 2), realPos.y + 2), Size(textSize, GetHeight() - 3));
+
+				surface->SetText(text, textRect, font);
+
+				if (value > 0)
+				{
+					textRect.right = realPos.x + (Int) ((GetWidth() - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+
+					Font	 nFont = font;
+
+					nFont.SetColor(Setup::GradientTextColor);
+
+					surface->SetText(text, textRect, nFont);
+				}
+			}
+
+			surface->EndPaint();
+
+			break;
 	}
 
-	if (subtype == OR_HORZ && textFlag != PB_NOTEXT)
-	{
-		switch (textFlag)
-		{
-			case PB_VALUE:
-				text = String::FromInt((Int) Math::Max(value, startValue));
-				break;
-			case PB_PERCENT:
-				if (value > 0)	text = String::FromInt((Int) Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
-				else		text = "0";
+	LeaveProtectedRegion();
 
-				text.Append("%");
-				break;
-		}
-
-		Int	 textSize	= font.GetTextSizeX(text);
-		Rect	 textRect	= Rect(Point(realPos.x + (size.cx / 2) - (textSize / 2), realPos.y + 2), Size(textSize, size.cy - 3));
-
-		surface->SetText(text, textRect, font);
-
-		if (value > 0)
-		{
-			textRect.right = realPos.x + (Int) ((size.cx - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
-
-			Font	 nFont = font;
-
-			nFont.SetColor(Setup::GradientTextColor);
-
-			surface->SetText(text, textRect, nFont);
-		}
-	}
-
-	surface->EndPaint();
-
-	return Success;
+	return Success();
 }
 
-S::Int S::GUI::Progressbar::SetMetrics(Point nPos, Size nSize)
+S::Int S::GUI::Progressbar::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	CreateGradient(nSize);
 
@@ -128,13 +122,13 @@ S::Int S::GUI::Progressbar::SetMetrics(Point nPos, Size nSize)
 
 S::Int S::GUI::Progressbar::SetValue(Int newValue)
 {
+	Int	 prevValue = value;
+
 	value = (Int) Math::Min(endValue, Math::Max(startValue, newValue));
 
-	Paint(SP_UPDATE);
+	if (prevValue != value) Paint(SP_PAINT);
 
-	prevValue = value;
-
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Progressbar::GetValue()
@@ -142,7 +136,7 @@ S::Int S::GUI::Progressbar::GetValue()
 	return value;
 }
 
-S::Void S::GUI::Progressbar::CreateGradient(Size gSize)
+S::Void S::GUI::Progressbar::CreateGradient(const Size &gSize)
 {
 	gradient.CreateBitmap(gSize.cx - 2, gSize.cy - 2, 32);
 

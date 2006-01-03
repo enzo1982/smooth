@@ -60,6 +60,7 @@ struct _xmlDictStrings {
  */
 struct _xmlDict {
     int ref_counter;
+    xmlRMutexPtr mutex;
 
     struct _xmlDictEntry *dict;
     int size;
@@ -68,6 +69,50 @@ struct _xmlDict {
 
     struct _xmlDict *subdict;
 };
+
+/*
+ * A mutex for modifying the reference counter for shared
+ * dictionaries.
+ */
+static xmlRMutexPtr xmlDictMutex = NULL;
+
+/*
+ * Whether the dictionary mutex was initialized.
+ */
+static int xmlDictInitialized = 0;
+
+/**
+ * xmlInitializeDict:
+ *
+ * Do the dictionary mutex initialization.
+ * this function is not thread safe, initialization should
+ * preferably be done once at startup
+ */
+static int xmlInitializeDict(void) {
+    if (xmlDictInitialized)
+        return(1);
+
+    if ((xmlDictMutex = xmlNewRMutex()) == NULL)
+        return(0);
+
+    xmlDictInitialized = 1;
+    return(1);
+}
+
+/**
+ * xmlDictCleanup:
+ *
+ * Free the dictionary mutex.
+ */
+void
+xmlDictCleanup(void) {
+    if (!xmlDictInitialized)
+        return;
+
+    xmlFreeRMutex(xmlDictMutex);
+
+    xmlDictInitialized = 0;
+}
 
 /*
  * xmlDictAddString:
@@ -277,7 +322,11 @@ xmlDictComputeQKey(const xmlChar *prefix, const xmlChar *name, int len)
 xmlDictPtr
 xmlDictCreate(void) {
     xmlDictPtr dict;
-  
+
+    if (!xmlDictInitialized)
+        if (!xmlInitializeDict())
+            return(NULL);
+ 
     dict = xmlMalloc(sizeof(xmlDict));
     if (dict) {
         dict->ref_counter = 1;
@@ -288,8 +337,11 @@ xmlDictCreate(void) {
 	dict->strings = NULL;
 	dict->subdict = NULL;
         if (dict->dict) {
-  	    memset(dict->dict, 0, MIN_DICT_SIZE * sizeof(xmlDictEntry));
-  	    return(dict);
+            if ((dict->mutex = xmlNewRMutex()) != NULL) {
+                memset(dict->dict, 0, MIN_DICT_SIZE * sizeof(xmlDictEntry));
+                return(dict);
+            }
+            xmlFree(dict->dict);
         }
         xmlFree(dict);
     }
@@ -328,8 +380,14 @@ xmlDictCreateSub(xmlDictPtr sub) {
  */
 int
 xmlDictReference(xmlDictPtr dict) {
+    if (!xmlDictInitialized)
+        if (!xmlInitializeDict())
+            return(-1);
+
     if (dict == NULL) return -1;
+    xmlRMutexLock(xmlDictMutex);
     dict->ref_counter++;
+    xmlRMutexUnlock(xmlDictMutex);
     return(0);
 }
 
@@ -445,9 +503,19 @@ xmlDictFree(xmlDictPtr dict) {
     if (dict == NULL)
 	return;
 
+    if (!xmlDictInitialized)
+        if (!xmlInitializeDict())
+            return;
+
     /* decrement the counter, it may be shared by a parser and docs */
+    xmlRMutexLock(xmlDictMutex);
     dict->ref_counter--;
-    if (dict->ref_counter > 0) return;
+    if (dict->ref_counter > 0) {
+        xmlRMutexUnlock(xmlDictMutex);
+        return;
+    }
+
+    xmlRMutexUnlock(xmlDictMutex);
 
     if (dict->subdict != NULL) {
         xmlDictFree(dict->subdict);
@@ -477,6 +545,7 @@ xmlDictFree(xmlDictPtr dict) {
 	xmlFree(pool);
 	pool = nextp;
     }
+    xmlFreeRMutex(dict->mutex);
     xmlFree(dict);
 }
 
@@ -486,7 +555,7 @@ xmlDictFree(xmlDictPtr dict) {
  * @name: the name of the userdata
  * @len: the length of the name, if -1 it is recomputed
  *
- * Add the @name to the hash @dict if not present.
+ * Add the @name to the dictionnary @dict if not present.
  *
  * Returns the internal copy of the name or NULL in case of internal error
  */
@@ -597,6 +666,98 @@ xmlDictLookup(xmlDictPtr dict, const xmlChar *name, int len) {
     /* Note that entry may have been freed at this point by xmlDictGrow */
 
     return(ret);
+}
+
+/**
+ * xmlDictExists:
+ * @dict: the dictionnary
+ * @name: the name of the userdata
+ * @len: the length of the name, if -1 it is recomputed
+ *
+ * Check if the @name exists in the dictionnary @dict.
+ *
+ * Returns the internal copy of the name or NULL if not found.
+ */
+const xmlChar *
+xmlDictExists(xmlDictPtr dict, const xmlChar *name, int len) {
+    unsigned long key, okey, nbi = 0;
+    xmlDictEntryPtr insert;
+
+    if ((dict == NULL) || (name == NULL))
+	return(NULL);
+
+    if (len < 0)
+        len = xmlStrlen(name);
+
+    /*
+     * Check for duplicate and insertion location.
+     */
+    okey = xmlDictComputeKey(name, len);
+    key = okey % dict->size;
+    if (dict->dict[key].valid == 0) {
+	insert = NULL;
+    } else {
+	for (insert = &(dict->dict[key]); insert->next != NULL;
+	     insert = insert->next) {
+#ifdef __GNUC__
+	    if (insert->len == len) {
+		if (!memcmp(insert->name, name, len))
+		    return(insert->name);
+	    }
+#else
+	    if ((insert->len == len) &&
+	        (!xmlStrncmp(insert->name, name, len)))
+		return(insert->name);
+#endif
+	    nbi++;
+	}
+#ifdef __GNUC__
+	if (insert->len == len) {
+	    if (!memcmp(insert->name, name, len))
+		return(insert->name);
+	}
+#else
+	if ((insert->len == len) &&
+	    (!xmlStrncmp(insert->name, name, len)))
+	    return(insert->name);
+#endif
+    }
+
+    if (dict->subdict) {
+	key = okey % dict->subdict->size;
+	if (dict->subdict->dict[key].valid != 0) {
+	    xmlDictEntryPtr tmp;
+
+	    for (tmp = &(dict->subdict->dict[key]); tmp->next != NULL;
+		 tmp = tmp->next) {
+#ifdef __GNUC__
+		if (tmp->len == len) {
+		    if (!memcmp(tmp->name, name, len))
+			return(tmp->name);
+		}
+#else
+		if ((tmp->len == len) &&
+		    (!xmlStrncmp(tmp->name, name, len)))
+		    return(tmp->name);
+#endif
+		nbi++;
+	    }
+#ifdef __GNUC__
+	    if (tmp->len == len) {
+		if (!memcmp(tmp->name, name, len))
+		    return(tmp->name);
+	    }
+#else
+	    if ((tmp->len == len) &&
+		(!xmlStrncmp(tmp->name, name, len)))
+		return(tmp->name);
+#endif
+	}
+	key = okey % dict->size;
+    }
+
+    /* not found */
+    return(NULL);
 }
 
 /**

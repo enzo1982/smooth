@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,14 +34,14 @@ S::Int S::Backends::BackendXLib::Init()
 
 	Setup::FontSize = 1.00;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::Backends::BackendXLib::Deinit()
 {
 	XCloseDisplay(display);
 
-	return Success;
+	return Success();
 }
 
 Display *S::Backends::BackendXLib::GetDisplay()

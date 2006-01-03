@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -7,8 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#define MAKEUNICODESTR(x) L##x
 
 #include <smooth/gui/dialogs/filedlg.h>
 #include <smooth/gui/window/window.h>
@@ -25,10 +23,9 @@ S::GUI::Dialogs::FileSelection::~FileSelection()
 {
 }
 
-S::Int S::GUI::Dialogs::FileSelection::ShowDialog()
+const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
 	bool	 result;
-	Int	 retValue = Success;
 	Int	 bpos = 0;
 
 	if (Setup::enableUnicode)
@@ -144,7 +141,7 @@ S::Int S::GUI::Dialogs::FileSelection::ShowDialog()
 		}
 		else
 		{
-			retValue = Failure;
+			error = Error();
 		}
 
 		delete [] bufferw;
@@ -263,43 +260,43 @@ S::Int S::GUI::Dialogs::FileSelection::ShowDialog()
 		}
 		else
 		{
-			retValue = Failure;
+			error = Error();
 		}
 
 		delete [] buffera;
 		delete [] filtera;
 	}
 
-	return retValue;
+	return error;
 }
 
-S::Int S::GUI::Dialogs::FileSelection::AddFilter(String name, String filter)
+S::Int S::GUI::Dialogs::FileSelection::AddFilter(const String &name, const String &filter)
 {
 	filterNames.AddEntry(name);
 	filters.AddEntry(filter);
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Dialogs::FileSelection::SetFlags(Int newFlags)
 {
 	flags |= newFlags;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Dialogs::FileSelection::SetMode(Int newMode)
 {
 	mode = newMode;
 
-	return Success;
+	return Success();
 }
 
-S::Int S::GUI::Dialogs::FileSelection::SetDefaultExtension(String newDefExt)
+S::Int S::GUI::Dialogs::FileSelection::SetDefaultExtension(const String &newDefExt)
 {
 	defExt = newDefExt;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Dialogs::FileSelection::GetNumberOfFiles()

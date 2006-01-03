@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,7 +16,6 @@ namespace smooth
 	namespace GUI
 	{
 		class ListBoxHeader;
-		class ListBox;
 	};
 };
 
@@ -29,30 +28,30 @@ namespace smooth
 		class SMOOTHAPI ListBoxHeader : public Widget
 		{
 			private:
-				ListBox			*listBox;
-
 				Int			 moveTab;
 				Bool			 innerLoop;
 
 				Array<String>		 tabNames;
 				Array<Int>		 tabWidths;
+				Array<Int>		 tabOrientations;
 				Array<Bool>		 tabChecked;
 			public:
 				static const Int	 classID;
 
-							 ListBoxHeader(ListBox *);
-							~ListBoxHeader();
-
-				Int			 AddTab(String, Int);
-
-				Int			 ClearTabs();
+							 ListBoxHeader(const Point &, const Size &);
+				virtual			~ListBoxHeader();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
+				virtual Int		 Process(Int, Int, Int);
+
+				Int			 AddTab(const String &, Int, Int);
 
 				Int			 GetNOfTabs();
 				Int			 GetNthTabOffset(Int);
 				Int			 GetNthTabWidth(Int);
+				Int			 GetNthTabOrientation(Int);
+
+				Int			 RemoveAllTabs();
 
 				Int			 UpdateMetrics();
 		};

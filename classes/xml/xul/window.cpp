@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,8 +22,7 @@ S::XML::XUL::Window::Window(Node *node) : Widget(node)
 
 	if (node != NIL)
 	{
-		window = new GUI::Window(GetXMLAttributeValue(node, "title"));
-		window->SetMetrics(GUI::Point(GetXMLAttributeValue(node, "screenX").ToInt(), GetXMLAttributeValue(node, "screenY").ToInt()), GUI::Size(GetXMLAttributeValue(node, "width").ToInt(), GetXMLAttributeValue(node, "height").ToInt()));
+		window = new GUI::Window(GetXMLAttributeValue(node, "title"), GUI::Point(GetXMLAttributeValue(node, "screenX").ToInt(), GetXMLAttributeValue(node, "screenY").ToInt()), GUI::Size(GetXMLAttributeValue(node, "width").ToInt(), GetXMLAttributeValue(node, "height").ToInt()));
 
 		if (GetXMLAttributeValue(node, "hidechrome") != "true" && GetXMLAttributeValue(node, "hidechrome") != "1")
 		{

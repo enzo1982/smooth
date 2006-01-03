@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,7 +12,7 @@
 #include <smooth/dll.h>
 #include "myactivearea.h"
 
-Void smooth::AttachDLL()
+Void smooth::AttachDLL(Void *)
 {
 }
 
@@ -22,19 +22,10 @@ Void smooth::DetachDLL()
 
 const Int	 MyActiveArea::classID = Object::RequestClassID();
 
-MyActiveArea::MyActiveArea(Int color, Point iPos, Size iSize)
+MyActiveArea::MyActiveArea(Int color, Point iPos, Size iSize) : Widget(iPos, iSize)
 {
 	type		= classID;
 	areaColor	= color;
-	pos		= iPos;
-	size		= iSize;
-
-	possibleContainers.AddEntry(Layer::classID);
-
-	pos.x	= Math::Round(pos.x * Setup::FontSize);
-	pos.y	= Math::Round(pos.y * Setup::FontSize);
-	size.cx	= Math::Round(size.cx * Setup::FontSize);
-	size.cy	= Math::Round(size.cy * Setup::FontSize);
 }
 
 MyActiveArea::~MyActiveArea()
@@ -43,40 +34,40 @@ MyActiveArea::~MyActiveArea()
 
 Int MyActiveArea::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
 
 	Window	*window		= container->GetContainerWindow();
 
-	if (window == NIL) return Success;
+	if (window == NIL) return Success();
 
 	Surface	*surface	= window->GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), size);
+	Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
 	surface->Box(frame, areaColor, FILLED);
 	surface->Frame(frame, FRAME_DOWN);
 
-	return Success;
+	return Success();
 }
 
 Int MyActiveArea::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())		return Failure;
-	if (!active || !visible)	return Success;
+	if (!IsRegistered())		return Error();
+	if (!active || !visible)	return Success();
 
 	Window	*window		= container->GetContainerWindow();
 
-	if (window == NIL) return Success;
+	if (window == NIL) return Success();
 
 	Point	 realPos	= GetRealPosition();
-	Int	 retVal		= Success;
+	Int	 retVal		= Success();
 
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			if ((window->MouseX() > realPos.x) && (window->MouseX() < (realPos.x + size.cx - 1)) && (window->MouseY() > realPos.y) && (window->MouseY() < (realPos.y + size.cy - 1)))
+			if ((window->MouseX() > realPos.x) && (window->MouseX() < (realPos.x + GetWidth() - 1)) && (window->MouseY() > realPos.y) && (window->MouseY() < (realPos.y + GetHeight() - 1)))
 			{
-				onClick.Emit(window->MouseX(), window->MouseY());
+				onAction.Emit();
 
 				retVal = Break;
 			}

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,32 +10,20 @@
 
 #include <smooth/xml/attribute.h>
 
-S::XML::Attribute::Attribute()
+S::Array<S::String> S::XML::Attribute::attributeNames;
+
+S::XML::Attribute::Attribute(const String &iName, const String &iContent)
 {
-	nextAttribute	= NIL;
-	prevAttribute	= NIL;
-
-	parentNode	= NIL;
-
 	attributeID	= -1;
-	name		= NIL;
-	content		= NIL;
+
+	nameIndex	= iName.ComputeCRC32();
+	content		= iContent;
+
+	if (attributeNames.GetEntry(nameIndex) == NIL) attributeNames.AddEntry(iName, nameIndex);
 }
 
 S::XML::Attribute::~Attribute()
 {
-}
-
-S::XML::Node *S::XML::Attribute::GetParentNode()
-{
-	return parentNode;
-}
-
-S::Int S::XML::Attribute::SetParentNode(Node *newParentNode)
-{
-	parentNode = newParentNode;
-
-	return Success;
 }
 
 S::Int S::XML::Attribute::GetAttributeID()
@@ -47,53 +35,31 @@ S::Int S::XML::Attribute::SetAttributeID(Int newID)
 {
 	attributeID = newID;
 
-	return Success;
-}
-
-S::XML::Attribute *S::XML::Attribute::GetNextAttribute()
-{
-	return nextAttribute;
-}
-
-S::XML::Attribute *S::XML::Attribute::GetPrevAttribute()
-{
-	return prevAttribute;
-}
-
-S::Int S::XML::Attribute::SetNextAttribute(Attribute *newAttribute)
-{
-	nextAttribute = newAttribute;
-
-	return Success;
-}
-
-S::Int S::XML::Attribute::SetPrevAttribute(Attribute *newAttribute)
-{
-	prevAttribute = newAttribute;
-
-	return Success;
+	return Success();
 }
 
 S::String S::XML::Attribute::GetName()
 {
-	return name;
+	return attributeNames.GetEntry(nameIndex);
 }
 
-S::Int S::XML::Attribute::SetName(String newName)
+S::Int S::XML::Attribute::SetName(const String &newName)
 {
-	name = newName;
+	nameIndex = newName.ComputeCRC32();
 
-	return Success;
+	if (attributeNames.GetEntry(nameIndex) == NIL) attributeNames.AddEntry(newName, nameIndex);
+
+	return Success();
 }
 
-S::String S::XML::Attribute::GetContent()
+const S::String &S::XML::Attribute::GetContent()
 {
 	return content;
 }
 
-S::Int S::XML::Attribute::SetContent(String newContent)
+S::Int S::XML::Attribute::SetContent(const String &newContent)
 {
 	content = newContent;
 
-	return Success;
+	return Success();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,118 +23,132 @@ namespace smooth
 	};
 };
 
-#include "../array.h"
+#include "../templates/array.h"
 
 namespace smooth
 {
 	class SMOOTHAPI String
 	{
 		private:
-			Threads::MutexBackend	*mutex;
+			mutable Threads::MutexBackend	*mutex;
 
-			wchar_t			*wString;
-			mutable Int		 stringSize;
+			Void				 LockBuffers() const;
+			Void				 UnlockBuffers() const;
 
-			static char		*inputFormat;
-			static char		*outputFormat;
+			wchar_t				*wString;
+			mutable Int			 stringSize;
 
-			static Int		 nOfStrings;
+			static char			*inputFormat;
+			static char			*outputFormat;
 
-			static Array<char *>	 allocatedBuffers;
+			static Int			 nOfStrings;
 
-			static Int		 crc32_table[256];
-			static Bool		 crc32_initialized;
+			static Array<char *>		 allocatedBuffers;
 
-			static Void		 CRC32_InitTable();
-			static UnsignedLong	 CRC32_Reflect(UnsignedLong, char);
+			static Int			 crc32_table[256];
+			static Bool			 crc32_initialized;
 
-			static Void		 DeleteTemporaryBuffers();
+			static Void			 CRC32_InitTable();
+			static UnsignedLong		 CRC32_Reflect(UnsignedLong, char);
+
+			static Void			 DeleteTemporaryBuffers();
 		public:
-						 String();
-						 String(const int);
-						 String(const char *);
-						 String(const wchar_t *);
-						 String(const String &);
+							 String();
+							 String(const int);
+							 String(const char *);
+							 String(const wchar_t *);
+							 String(const String &);
 
-						~String();
+							~String();
 
-			Void			 Clean();
+			Void				 Clean();
 
-			static Bool		 IsANSI(String &);
-			static Bool		 IsUnicode(String &);
+			static Bool			 IsANSI(const String &);
+			static Bool			 IsUnicode(const String &);
 
-			static char		*SetInputFormat(const char *);
-			static char		*SetOutputFormat(const char *);
+			static char			*SetInputFormat(const char *);
+			static char			*SetOutputFormat(const char *);
 
-			Int			 ImportFrom(const char *, const char *);
-			char			*ConvertTo(const char *) const;
+			Int				 ImportFrom(const char *, const char *);
+			char				*ConvertTo(const char *) const;
 
-			Int			 ComputeCRC32();
+			Int				 ComputeCRC32() const;
 
-			String			&Append(const char *);
-			String			&Append(const wchar_t *);
-			String			&Append(const String &);
+			String				&Append(const char *);
+			String				&Append(const wchar_t *);
+			String				&Append(const String &);
 
-			Int			 Find(const char *);
-			Int			 Find(const wchar_t *);
-			Int			 Find(const String &);
+			Int				 Find(const char *) const;
+			Int				 Find(const wchar_t *) const;
+			Int				 Find(const String &) const;
 
-			String			&Replace(const char *, const char *);
-			String			&Replace(const wchar_t *, const wchar_t *);
-			String			&Replace(const char *, const String &);
-			String			&Replace(const wchar_t *, const String &);
-			String			&Replace(const String &, const String &);
+			String				&Replace(const char *, const char *);
+			String				&Replace(const wchar_t *, const wchar_t *);
+			String				&Replace(const char *, const String &);
+			String				&Replace(const wchar_t *, const String &);
+			String				&Replace(const String &, const String &);
 
-			String			&Copy(const char *);
-			String			&Copy(const wchar_t *);
-			String			&Copy(const String &);
+			String				&Copy(const char *);
+			String				&Copy(const wchar_t *);
+			String				&Copy(const String &);
 
-			String			&CopyN(const char *, const Int);
-			String			&CopyN(const wchar_t *, const Int);
-			String			&CopyN(const String &, const Int);
+			String				&CopyN(const char *, const Int);
+			String				&CopyN(const wchar_t *, const Int);
+			String				&CopyN(const String &, const Int);
 
-			Int			 Compare(const char *);
-			Int			 Compare(const wchar_t *);
-			Int			 Compare(const String &);
+			Int				 Compare(const char *) const;
+			Int				 Compare(const wchar_t *) const;
+			Int				 Compare(const String &) const;
 
-			Int			 CompareN(const char *, const Int);
-			Int			 CompareN(const wchar_t *, const Int);
-			Int			 CompareN(const String &, const Int);
+			Int				 CompareN(const char *, const Int) const;
+			Int				 CompareN(const wchar_t *, const Int) const;
+			Int				 CompareN(const String &, const Int) const;
 
-			String			&Fill(const Int);
-			String			&FillN(const Int, const Int);
+			Bool				 StartsWith(const char *) const;
+			Bool				 StartsWith(const wchar_t *) const;
+			Bool				 StartsWith(const String &) const;
 
-			Int			 Length() const;
+			Bool				 EndsWith(const char *) const;
+			Bool				 EndsWith(const wchar_t *) const;
+			Bool				 EndsWith(const String &) const;
 
-			Int			 ToInt();
-			Float			 ToFloat();
+			String				&Fill(const Int);
+			String				&FillN(const Int, const Int);
 
-			static String		 FromInt(const Int);
-			static String		 FromFloat(const Float);
+			Int				 Length() const;
 
-			String			 ToLower();
-			String			 ToUpper();
+			Int				 ToInt() const;
+			Float				 ToFloat() const;
 
-			wchar_t &operator	 [](const int);
-			wchar_t &operator	 [](const Int);
+			static String			 FromInt(const Int);
+			static String			 FromFloat(const Float);
 
-			operator		 char *() const;
-			operator		 wchar_t *() const;
+			String				 ToLower() const;
+			String				 ToUpper() const;
 
-			String &operator	 =(const int);
-			String &operator	 =(const char *);
-			String &operator	 =(const wchar_t *);
-			String &operator	 =(const String &);
+			wchar_t &operator		 [](const int);
+			wchar_t &operator		 [](const Int);
 
-			Bool operator		 ==(const int);
-			Bool operator		 ==(const char *);
-			Bool operator		 ==(const wchar_t *);
-			Bool operator		 ==(const String &);
+			wchar_t operator		 [](const int) const;
+			wchar_t operator		 [](const Int) const;
 
-			Bool operator		 !=(const int);
-			Bool operator		 !=(const char *);
-			Bool operator		 !=(const wchar_t *);
-			Bool operator		 !=(const String &);
+			operator			 char *() const;
+			operator			 wchar_t *() const;
+
+			String &operator		 =(const int);
+			String &operator		 =(const char *);
+			String &operator		 =(const wchar_t *);
+			String &operator		 =(const String &);
+
+			Bool operator			 ==(const int) const;
+			Bool operator			 ==(const char *) const;
+			Bool operator			 ==(const wchar_t *) const;
+			Bool operator			 ==(const String &) const;
+
+			Bool operator			 !=(const int) const;
+			Bool operator			 !=(const char *) const;
+			Bool operator			 !=(const wchar_t *) const;
+			Bool operator			 !=(const String &) const;
 	};
 };
 

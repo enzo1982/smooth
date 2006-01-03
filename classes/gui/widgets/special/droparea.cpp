@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,31 +8,20 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/gui/window/window.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/gui/widgets/special/droparea.h>
-#include <smooth/definitions.h>
-#include <smooth/loop.h>
-#include <smooth/misc/math.h>
+#include <smooth/gui/window/window.h>
 
 #include <shellapi.h>
 
 const S::Int	 S::GUI::DropArea::classID = S::Object::RequestClassID();
 
-S::GUI::DropArea::DropArea(Point iPos, Size iSize)
+S::GUI::DropArea::DropArea(const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
 	type		= classID;
-	orientation	= OR_CENTER;
+	orientation	= OR_FREE;
+	initialized	= False;
 
-	possibleContainers.AddEntry(Layer::classID);
-
-	onRegister.Connect(&DropArea::OnRegister, this);
-
-	pos		= iPos;
-	size		= iSize;
-
-	if (size.cx == 0) size.cx = LiSAGetDisplaySizeX();
-	if (size.cy == 0) size.cy = LiSAGetDisplaySizeY();
+	if (GetSize() == Size(0, 0)) SetSize(Size(4096, 4096));
 
 	onDropFile.SetParentObject(this);
 }
@@ -41,40 +30,29 @@ S::GUI::DropArea::~DropArea()
 {
 }
 
-S::Void S::GUI::DropArea::OnRegister(Container *container)
-{
-	container->GetContainerWindow()->onCreate.Connect(&DropArea::Init, this);
-}
-
-S::Void S::GUI::DropArea::Init()
-{
-	Window	*wnd = (Window *) container->GetContainerWindow();
-
-	DragAcceptFiles((HWND) wnd->GetSystemWindow(), True);
-}
-
 S::Int S::GUI::DropArea::Hide()
 {
-	if (!visible)		return Success;
-
 	visible = False;
 
-	if (!IsRegistered())	return Success;
-
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())		return Failure;
-	if (!active || !IsVisible())	return Success;
+	if (!IsRegistered())			return Error();
+	if (!IsActive() || !IsVisible())	return Success();
 
-	Window	*wnd = container->GetContainerWindow();
+	if (!initialized)
+	{
+		DragAcceptFiles((HWND) container->GetContainerWindow()->GetSystemWindow(), True);
 
-	if (wnd == NIL) return Success;
+		initialized = True;
+	}
 
-	Int	 retVal = Success;
+	Int	 retVal = Success();
 	Point	 realPos = GetRealPosition();
+
+	EnterProtectedRegion();
 
 	switch (message)
 	{
@@ -87,7 +65,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 				Point	 pos(pPos.x, pPos.y);
 
-				if (pos.x > realPos.x && pos.x < (realPos.x + size.cx) && pos.y > realPos.y && pos.y < (realPos.y + size.cy))
+				if (pos.x > realPos.x && pos.x < (realPos.x + GetWidth()) && pos.y > realPos.y && pos.y < (realPos.y + GetHeight()))
 				{
 					Int	 nOfFiles;
 
@@ -128,6 +106,8 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 			break;
 	}
+
+	LeaveProtectedRegion();
 
 	return retVal;
 }

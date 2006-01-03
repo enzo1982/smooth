@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,9 +16,11 @@ namespace smooth
 	namespace GUI
 	{
 		class Widget;
-		class Container;
 
+		class Window;
 		class Tooltip;
+
+		class Surface;
 	};
 
 	namespace System
@@ -29,8 +31,9 @@ namespace smooth
 
 #include "../../basic/object.h"
 #include "../../graphics/font.h"
-#include "../../signals.h"
-#include "../../graphics/rect.h"
+#include "../../templates/signals.h"
+#include "../../templates/callbacks.h"
+#include "../../graphics/forms/rect.h"
 
 namespace smooth
 {
@@ -49,22 +52,31 @@ namespace smooth
 		class SMOOTHAPI Widget : public Object
 		{
 			private:
+				Array<Widget *, Void *>		 widgets;
+
+				Surface				*nullSurface;
+				Surface				*drawSurface;
+
+				Color				 backgroundColor;
+
 				Tooltip				*tooltip;
 				System::Timer			*tipTimer;
 
 				Bool				 registered;
+
+				Point				 pos;
+				Size				 size;
 			protected:
 				Bool				 visible;
 				Bool				 active;
 				Bool				 focussed;
 
-				Bool				 clicked;
-				Bool				 checked;
-
 				Bool				 mouseOver;
 
 				Bool				 leftButtonDown;
 				Bool				 rightButtonDown;
+
+				Bool				 mouseDragging;
 
 				Int				 orientation;
 
@@ -72,11 +84,9 @@ namespace smooth
 				String				 tooltipText;
 				String				 statusText;
 
-				Int				 borderWidth;
-
 				Font				 font;
 
-				Container			*container;
+				Widget				*container;
 
 				Void				 GetTextSize();
 
@@ -85,26 +95,33 @@ namespace smooth
 			public:
 				static const Int		 classID;
 
-				Array<Int>			 possibleContainers;
-
 				Int				 subtype;
-
-				Point				 pos;
-				Size				 size;
 
 				Size				 textSize;
 
-								 Widget();
+								 Widget(const Point &, const Size &);
 				virtual				~Widget();
 
-				Bool				 IsRegistered();
+				Int				 GetNOfObjects();
+				Widget				*GetNthObject(Int);
 
-				Int				 SetContainer(Container *);
-				Container			*GetContainer();
+				virtual Int			 RegisterObject(Widget *);
+				virtual Int			 UnregisterObject(Widget *);
+
+				Window				*GetContainerWindow();
+				virtual Surface			*GetDrawSurface();
+
+				Int				 SetContainer(Widget *);
+				Widget				*GetContainer();
+
+				Bool				 IsRegistered();
 
 				Void				 SetRegisteredFlag(Bool);
 
 				virtual Point			 GetRealPosition();
+
+				Int				 SetBackgroundColor(const Color &);
+				const Color			&GetBackgroundColor();
 
 				virtual Int			 Show();
 				virtual Int			 Hide();
@@ -114,57 +131,82 @@ namespace smooth
 
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
-
+			accessors:
 				Bool				 IsVisible();
 				Bool				 IsActive();
 
 				virtual Int			 SetText(const String &);
-				virtual String			 GetText();
+				virtual const String		&GetText();
 
 				virtual Int			 SetTooltipText(const String &);
-				virtual String			 GetTooltipText();
+				virtual const String		&GetTooltipText();
 
 				virtual Int			 SetStatusText(const String &);
-				virtual String			 GetStatusText();
+				virtual const String		&GetStatusText();
 
-				virtual Int			 SetFont(Font);
-				virtual Font			 GetFont();
+				virtual Int			 SetFont(const Font &);
+				virtual const Font		&GetFont();
 
 				virtual Int			 SetOrientation(Int);
 				virtual Int			 GetOrientation();
 
-				virtual Int			 SetPosition(Point);
-				virtual Int			 SetMetrics(Point, Size);
+				Int				 SetX(Int);
+				Int				 GetX();
+				Int				 SetY(Int);
+				Int				 GetY();
+
+				Int				 SetWidth(Int);
+				Int				 GetWidth();
+				Int				 SetHeight(Int);
+				Int				 GetHeight();
+
+				Int				 SetPosition(const Point &);
+				const Point			&GetPosition();
+				Int				 SetSize(const Size &);
+				const Size			&GetSize();
+
+				virtual Int			 SetMetrics(const Point &, const Size &);
 
 				virtual Bool			 IsAffected(const Rect &);
-
-				virtual Bool			 IsTypeCompatible(Int);
+			callbacks:
+				Callback1<Bool, const Point &>	 hitTest;
 			signals:
 				Signal0<Void>			 onShow;
 				Signal0<Void>			 onHide;
 
+				Signal1<Void, const Point &>	 onChangePosition;
+				Signal1<Void, const Size &>	 onChangeSize;
+
 				Signal0<Void>			 onMouseOver;
 				Signal0<Void>			 onMouseOut;
 
-				Signal1<Void, Point>		 onLeftButtonDown;
-				Signal1<Void, Point>		 onLeftButtonUp;
-				Signal1<Void, Point>		 onLeftButtonClick;
-				Signal1<Void, Point>		 onLeftButtonDoubleClick;
+				Signal1<Void, const Point &>	 onLeftButtonDown;
+				Signal1<Void, const Point &>	 onLeftButtonUp;
+				Signal1<Void, const Point &>	 onLeftButtonClick;
+				Signal1<Void, const Point &>	 onLeftButtonDoubleClick;
 
-				Signal1<Void, Point>		 onRightButtonDown;
-				Signal1<Void, Point>		 onRightButtonUp;
-				Signal1<Void, Point>		 onRightButtonClick;
-				Signal1<Void, Point>		 onRightButtonDoubleClick;
+				Signal1<Void, const Point &>	 onRightButtonDown;
+				Signal1<Void, const Point &>	 onRightButtonUp;
+				Signal1<Void, const Point &>	 onRightButtonClick;
+				Signal1<Void, const Point &>	 onRightButtonDoubleClick;
 
-				Signal2<Void, Int, Int>		 onClick;
+				Signal1<Void, const Point &>	 onMouseDragStart;
+				Signal1<Void, const Point &>	 onMouseDrag;
+				Signal1<Void, const Point &>	 onMouseDragEnd;
+
+				Signal1<Void, Int>		 onMouseWheel;
+
+				Signal0<Void>			 onAction;
 
 				Signal0<Void>			 onGetFocus;
 				Signal0<Void>			 onLoseFocus;
 
 				Signal0<Void>			 onClickInFocus;
 
-				Signal1<Void, Container *>	 onRegister;
-				Signal1<Void, Container *>	 onUnregister;
+				Signal1<Void, Widget *>		 onRegister;
+				Signal1<Void, Widget *>		 onUnregister;
+			slots:
+				Bool				 DefaultHitTest(const Point &);
 		};
 	};
 };

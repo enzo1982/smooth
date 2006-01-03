@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,17 +10,19 @@
 
 #include <smooth/xml/node.h>
 
-S::XML::Node::Node()
+S::Array<S::String> S::XML::Node::elementNames;
+
+S::XML::Node::Node(const String &iName, const String &iContent)
 {
-	nextNode	= NIL;
-	prevNode	= NIL;
-
-	parentDoc	= NIL;
-	parentNode	= NIL;
-
 	nodeID		= -1;
-	name		= NIL;
-	content		= NIL;
+
+	nameIndex	= iName.ComputeCRC32();
+	content		= iContent;
+
+	attributes	= NIL;
+	subnodes	= NIL;
+
+	if (elementNames.GetEntry(nameIndex) == NIL) elementNames.AddEntry(iName, nameIndex);
 }
 
 S::XML::Node::~Node()
@@ -30,30 +32,9 @@ S::XML::Node::~Node()
 
 	for (Int i = 0; i < nOfAttributes; i++)	RemoveAttribute(GetNthAttribute(0));
 	for (Int j = 0; j < nOfNodes; j++)	RemoveNode(GetNthNode(0));
-}
 
-S::XML::Document *S::XML::Node::GetParentDocument()
-{
-	return parentDoc;
-}
-
-S::Int S::XML::Node::SetParentDocument(S::XML::Document *newParentDoc)
-{
-	parentDoc = newParentDoc;
-
-	return Success;
-}
-
-S::XML::Node *S::XML::Node::GetParentNode()
-{
-	return parentNode;
-}
-
-S::Int S::XML::Node::SetParentNode(Node *newParentNode)
-{
-	parentNode = newParentNode;
-
-	return Success;
+	if (attributes != NIL)	delete attributes;
+	if (subnodes != NIL)	delete subnodes;
 }
 
 S::Int S::XML::Node::GetNodeID()
@@ -65,109 +46,74 @@ S::Int S::XML::Node::SetNodeID(Int newID)
 {
 	nodeID = newID;
 
-	return Success;
+	return Success();
 }
 
-S::XML::Node *S::XML::Node::GetNextNode()
+const S::String S::XML::Node::GetName()
 {
-	return nextNode;
+	return elementNames.GetEntry(nameIndex);
 }
 
-S::XML::Node *S::XML::Node::GetPrevNode()
+S::Int S::XML::Node::SetName(const String &newName)
 {
-	return prevNode;
+	nameIndex = newName.ComputeCRC32();
+
+	if (elementNames.GetEntry(nameIndex) == NIL) elementNames.AddEntry(newName, nameIndex);
+
+	return Success();
 }
 
-S::Int S::XML::Node::SetNextNode(Node *newNode)
-{
-	nextNode = newNode;
-
-	return Success;
-}
-
-S::Int S::XML::Node::SetPrevNode(Node *newNode)
-{
-	prevNode = newNode;
-
-	return Success;
-}
-
-S::String S::XML::Node::GetName()
-{
-	return name;
-}
-
-S::Int S::XML::Node::SetName(String newName)
-{
-	name = newName;
-
-	return Success;
-}
-
-S::String S::XML::Node::GetContent()
+const S::String &S::XML::Node::GetContent()
 {
 	return content;
 }
 
-S::Int S::XML::Node::SetContent(String newContent)
+S::Int S::XML::Node::SetContent(const String &newContent)
 {
 	content = newContent;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::XML::Node::GetNOfAttributes()
 {
-	return attributes.GetNOfEntries();
+	if (attributes == NIL) return 0;
+
+	return attributes->GetNOfEntries();
 }
 
 S::XML::Attribute *S::XML::Node::GetNthAttribute(Int attributeNumber)
 {
 	if (attributeNumber >= GetNOfAttributes()) return NIL;
 
-	return attributes.GetNthEntry(attributeNumber);
+	return attributes->GetNthEntry(attributeNumber);
 }
 
-S::XML::Attribute *S::XML::Node::GetAttributeByName(String attributeName)
+S::XML::Attribute *S::XML::Node::GetAttributeByName(const String &attributeName)
 {
-	if (GetNOfAttributes() == 0) return NIL;
+	Int	 nOfAttributes = GetNOfAttributes();
 
-	Attribute	*attribute	= GetNthAttribute(0);
-	Int		 nOfAttributes	= GetNOfAttributes();
-
-	for (Int i = 1; i < nOfAttributes; i++)
+	for (Int i = 0; i < nOfAttributes; i++)
 	{
+		Attribute	*attribute = GetNthAttribute(i);
+
 		if (attribute->GetName() == attributeName) return attribute;
-
-		attribute = attribute->GetNextAttribute();
 	}
-
-	if (attribute->GetName() == attributeName) return attribute;
 
 	return NIL;
 }
 
-S::XML::Attribute *S::XML::Node::SetAttribute(String attributeName, String attributeContent)
+S::XML::Attribute *S::XML::Node::SetAttribute(const String &attributeName, const String &attributeContent)
 {
 	Attribute	*attribute = GetAttributeByName(attributeName);
 
 	if (attribute == NIL)
 	{
-		attribute = new Attribute();
+		attribute = new Attribute(attributeName, attributeContent);
 
-		attribute->SetParentNode(this);
+		if (attributes == NIL) attributes = new Array<Attribute *, Void *>();
 
-		attribute->SetName(attributeName);
-		attribute->SetContent(attributeContent);
-
-		if (GetNOfAttributes() > 0)
-		{
-			GetNthAttribute(GetNOfAttributes() - 1)->SetNextAttribute(attribute);
-
-			attribute->SetPrevAttribute(GetNthAttribute(GetNOfAttributes() - 1));
-		}
-
-		attribute->SetAttributeID(attributes.AddEntry(attribute));
+		attribute->SetAttributeID(attributes->AddEntry(attribute));
 	}
 	else
 	{
@@ -179,152 +125,71 @@ S::XML::Attribute *S::XML::Node::SetAttribute(String attributeName, String attri
 
 S::Int S::XML::Node::RemoveAttribute(Attribute *attribute)
 {
-	if (attribute == NIL)
-	{
-		return Failure;
-	}
-	else
-	{
-		attributes.RemoveEntry(attribute->GetAttributeID());
+	if (attribute == NIL) return Error();
 
-		if (attribute->GetNextAttribute() != NIL)
-		{
-			attribute->GetNextAttribute()->SetPrevAttribute(NIL);
+	attributes->RemoveEntry(attribute->GetAttributeID());
 
-			if (attribute->GetPrevAttribute() != NIL) attribute->GetNextAttribute()->SetPrevAttribute(attribute->GetPrevAttribute());
-		}
+	delete attribute;
 
-		if (attribute->GetPrevAttribute() != NIL)
-		{
-			attribute->GetPrevAttribute()->SetNextAttribute(NIL);
-
-			if (attribute->GetNextAttribute() != NIL) attribute->GetPrevAttribute()->SetNextAttribute(attribute->GetNextAttribute());
-		}
-
-		delete attribute;
-	}
-
-	return Success;
+	return Success();
 }
 
-S::Int S::XML::Node::RemoveAttributeByName(String attributeName)
+S::Int S::XML::Node::RemoveAttributeByName(const String &attributeName)
 {
 	return RemoveAttribute(GetAttributeByName(attributeName));
 }
 
 S::Int S::XML::Node::GetNOfNodes()
 {
-	return subnodes.GetNOfEntries();
+	if (subnodes == NIL) return 0;
+
+	return subnodes->GetNOfEntries();
 }
 
 S::XML::Node *S::XML::Node::GetNthNode(Int nodeNumber)
 {
 	if (nodeNumber >= GetNOfNodes()) return NIL;
 
-	return subnodes.GetNthEntry(nodeNumber);
+	return subnodes->GetNthEntry(nodeNumber);
 }
 
-S::XML::Node *S::XML::Node::GetNodeByName(String nodeName)
+S::XML::Node *S::XML::Node::GetNodeByName(const String &nodeName)
 {
-	if (GetNOfNodes() == 0) return NIL;
+	Int	 nOfNodes = GetNOfNodes();
 
-	Node	*node		= GetNthNode(0);
-	Int	 nOfNodes	= GetNOfNodes();
-
-	for (Int i = 1; i < nOfNodes; i++)
+	for (Int i = 0; i < nOfNodes; i++)
 	{
+		Node	*node = GetNthNode(i);
+
 		if (node->GetName() == nodeName) return node;
-
-		node = node->GetNextNode();
 	}
-
-	if (node->GetName() == nodeName) return node;
 
 	return NIL;
 }
 
-S::XML::Node *S::XML::Node::AddNode(String nodeName, String nodeContent)
+S::XML::Node *S::XML::Node::AddNode(const String &iName, const String &iContent)
 {
-	Node	*node = new Node();
+	Node	*node = new Node(iName, iContent);
 
-	node->SetParentNode(this);
+	if (subnodes == NIL) subnodes = new Array<Node *, Void *>();
 
-	node->SetName(nodeName);
-	node->SetContent(nodeContent);
-
-	if (GetNOfNodes() > 0)
-	{
-		GetNthNode(GetNOfNodes() - 1)->SetNextNode(node);
-
-		node->SetPrevNode(GetNthNode(GetNOfNodes() - 1));
-	}
-
-	node->SetNodeID(subnodes.AddEntry(node));
-
-	return node;
-}
-
-S::XML::Node *S::XML::Node::SetNode(String nodeName, String nodeContent)
-{
-	Node	*node = GetNodeByName(nodeName);
-
-	if (node == NIL)
-	{
-		node = new Node();
-
-		node->SetParentNode(this);
-
-		node->SetName(nodeName);
-		node->SetContent(nodeContent);
-
-		if (GetNOfNodes() > 0)
-		{
-			GetNthNode(GetNOfNodes() - 1)->SetNextNode(node);
-
-			node->SetPrevNode(GetNthNode(GetNOfNodes() - 1));
-		}
-
-		node->SetNodeID(subnodes.AddEntry(node));
-	}
-	else
-	{
-		node->SetContent(nodeContent);
-	}
+	node->SetNodeID(subnodes->AddEntry(node));
 
 	return node;
 }
 
 S::Int S::XML::Node::RemoveNode(Node *node)
 {
-	if (node == NIL)
-	{
-		return Failure;
-	}
-	else
-	{
-		subnodes.RemoveEntry(node->GetNodeID());
+	if (node == NIL) return Error();
 
-		if (node->GetNextNode() != NIL)
-		{
-			node->GetNextNode()->SetPrevNode(NIL);
+	subnodes->RemoveEntry(node->GetNodeID());
 
-			if (node->GetPrevNode() != NIL) node->GetNextNode()->SetPrevNode(node->GetPrevNode());
-		}
+	delete node;
 
-		if (node->GetPrevNode() != NIL)
-		{
-			node->GetPrevNode()->SetNextNode(NIL);
-
-			if (node->GetNextNode() != NIL) node->GetPrevNode()->SetNextNode(node->GetNextNode());
-		}
-
-		delete node;
-	}
-
-	return Success;
+	return Success();
 }
 
-S::Int S::XML::Node::RemoveNodeByName(String nodeName)
+S::Int S::XML::Node::RemoveNodeByName(const String &nodeName)
 {
 	return RemoveNode(GetNodeByName(nodeName));
 }

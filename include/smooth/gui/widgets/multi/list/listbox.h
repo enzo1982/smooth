@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,12 +16,12 @@ namespace smooth
 	namespace GUI
 	{
 		class ListBox;
-		class ListBoxHeader;
 		class Scrollbar;
 	};
 };
 
 #include "list.h"
+#include "listboxheader.h"
 
 namespace smooth
 {
@@ -38,39 +38,29 @@ namespace smooth
 			private:
 				Scrollbar		*scrollbar;
 				Int			 scrollbarPos;
-				Int			 lastScrollbarPos;
 
 				ListBoxHeader		*header;
+
+				Int			 visibleEntriesChecksum;
 			public:
 				static const Int	 classID;
 
-							 ListBox(Point, Size);
-							~ListBox();
+							 ListBox(const Point &, const Size &);
+				virtual			~ListBox();
 
-				Int			 AddTab(String, Int = 0);
+				Int			 AddTab(const String &tabName, Int tabWidth = 0, Int tabOrientation = OR_LEFT)	{ return header->AddTab(tabName, tabWidth, tabOrientation); }
 
-				Int			 GetNOfTabs();
-				Int			 GetNthTabOffset(Int);
-				Int			 GetNthTabWidth(Int);
+				Int			 GetNOfTabs()									{ return header->GetNOfTabs(); }
+				Int			 GetNthTabOffset(Int n)								{ return header->GetNthTabOffset(n); }
+				Int			 GetNthTabWidth(Int n)								{ return header->GetNthTabWidth(n); }
+				Int			 GetNthTabOrientation(Int n)							{ return header->GetNthTabOrientation(n); }
 
-				Int			 ClearTabs();
-
-				virtual Int		 Show();
-				virtual Int		 Hide();
-
-				virtual Int		 Activate();
-				virtual Int		 Deactivate();
+				Int			 RemoveAllTabs()								{ return header->RemoveAllTabs(); }
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
-
-				Int			 ScrollUp(Int = 1);
-				Int			 ScrollDown(Int = 1);
 			slots:
-				Void			 ScrollbarProc();
-
-				Void			 OnRegister(Container *);
-				Void			 OnUnregister(Container *);
+				Void			 OnScrollbarValueChange();
+				Void			 OnChangeSize(const Size &);
 		};
 	};
 };

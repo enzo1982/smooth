@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/surface.h>
-#include <smooth/graphics/surfacebackend.h>
+#include <smooth/graphics/backends/surfacebackend.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
 #include <smooth/threads/mutex.h>
@@ -34,17 +34,17 @@ S::Int S::GUI::Surface::GetSurfaceType()
 	return backend->GetSurfaceType();
 }
 
-S::Int S::GUI::Surface::SetSize(Size nSize)
+S::Int S::GUI::Surface::SetSize(const Size &nSize)
 {
 	return backend->SetSize(nSize);
 }
 
-const S::GUI::Size S::GUI::Surface::GetSize()
+const S::GUI::Size &S::GUI::Surface::GetSize()
 {
 	return backend->GetSize();
 }
 
-S::Int S::GUI::Surface::PaintRect(Rect pRect)
+S::Int S::GUI::Surface::PaintRect(const Rect &pRect)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -55,7 +55,7 @@ S::Int S::GUI::Surface::PaintRect(Rect pRect)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::StartPaint(Rect pRect)
+S::Int S::GUI::Surface::StartPaint(const Rect &pRect)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -100,7 +100,7 @@ S::Int S::GUI::Surface::GetPixel(Int x, Int y)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::Line(Point pos1, Point pos2, Int color)
+S::Int S::GUI::Surface::Line(const Point &pos1, const Point &pos2, Int color)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -111,7 +111,7 @@ S::Int S::GUI::Surface::Line(Point pos1, Point pos2, Int color)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::Frame(Rect rect, Int style)
+S::Int S::GUI::Surface::Frame(const Rect &rect, Int style)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -122,7 +122,7 @@ S::Int S::GUI::Surface::Frame(Rect rect, Int style)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::Box(Rect rect, Int color, Int style)
+S::Int S::GUI::Surface::Box(const Rect &rect, Int color, Int style)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -133,7 +133,7 @@ S::Int S::GUI::Surface::Box(Rect rect, Int color, Int style)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::SetText(String string, Rect rect, Font font, Bool shadow)
+S::Int S::GUI::Surface::SetText(const String &string, const Rect &rect, const Font &font, Bool shadow)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -144,7 +144,7 @@ S::Int S::GUI::Surface::SetText(String string, Rect rect, Font font, Bool shadow
 	return rVal;
 }
 
-S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
+S::Int S::GUI::Surface::Gradient(const Rect &rect, Int color1, Int color2, Int style)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -155,7 +155,7 @@ S::Int S::GUI::Surface::Gradient(Rect rect, Int color1, Int color2, Int style)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::Bar(Point p1, Point p2, Int orientation)
+S::Int S::GUI::Surface::Bar(const Point &p1, const Point &p2, Int orientation)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -166,7 +166,7 @@ S::Int S::GUI::Surface::Bar(Point p1, Point p2, Int orientation)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::BlitFromBitmap(const Bitmap &bitmap, Rect srcRect, Rect destRect)
+S::Int S::GUI::Surface::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcRect, const Rect &destRect)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -177,7 +177,7 @@ S::Int S::GUI::Surface::BlitFromBitmap(const Bitmap &bitmap, Rect srcRect, Rect 
 	return rVal;
 }
 
-S::Int S::GUI::Surface::BlitToBitmap(Rect srcRect, const Bitmap &bitmap, Rect destRect)
+S::Int S::GUI::Surface::BlitToBitmap(const Rect &srcRect, const Bitmap &bitmap, const Rect &destRect)
 {
 	if (mutex != NIL) mutex->Lock();
 

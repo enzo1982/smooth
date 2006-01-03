@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,7 +23,8 @@ namespace smooth
 #include "../misc/string.h"
 #include "node.h"
 
-#include <libxml/parser.h>
+#include <libxml/xmlreader.h>
+#include <libxml/xmlwriter.h>
 
 namespace smooth
 {
@@ -33,11 +34,12 @@ namespace smooth
 		{
 			private:
 				String	 encoding;
+
 				Node	*rootNode;
 				Bool	 ownRoot;
 
-				Int	 LoadNode(xmlNodePtr, Node *);
-				Int	 SaveNode(Node *, xmlNodePtr);
+				Int	 LoadNode(xmlTextReaderPtr, Node *);
+				Int	 SaveNode(xmlTextWriterPtr, Node *);
 			public:
 					 Document();
 					~Document();
@@ -45,12 +47,12 @@ namespace smooth
 				Node	*GetRootNode();
 				Int	 SetRootNode(Node *);
 
-				Int	 SetEncoding(String);
+				Int	 SetEncoding(const String &);
 
-				Int	 LoadFile(String);
-				Int	 SaveFile(String);
+				Int	 LoadFile(const String &);
+				Int	 SaveFile(const String &);
 
-				Int	 ParseMemory(Void *, Int);
+				Int	 ParseMemory(const Void *, Int);
 		};
 	};
 };

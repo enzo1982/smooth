@@ -1206,7 +1206,7 @@ xmlCreateZMemBuff( int compression ) {
     }
 
     /*  Set the header data.  The CRC will be needed for the trailer  */
-    buff->crc = crc32( 0L, Z_NULL, 0 );
+    buff->crc = crc32( 0L, NULL, 0 );
     hdr_lgth = snprintf( (char *)buff->zbuff, buff->size,
 			"%c%c%c%c%c%c%c%c%c%c",
 			GZ_MAGIC1, GZ_MAGIC2, Z_DEFLATED, 
@@ -2250,9 +2250,9 @@ __xmlOutputBufferCreateFilename(const char *URI,
 
     puri = xmlParseURI(URI);
     if (puri != NULL) {
+#ifdef HAVE_ZLIB_H
         if ((puri->scheme != NULL) &&
 	    (!xmlStrEqual(BAD_CAST puri->scheme, BAD_CAST "file")))
-#ifdef HAVE_ZLIB_H
 	    is_file_uri = 0;
 #endif
 	/*
@@ -3084,7 +3084,7 @@ xmlOutputBufferWriteEscape(xmlOutputBufferPtr out, const xmlChar *str,
 	    }
 	    ret = escaping(out->buffer->content + out->buffer->use ,
 	                   &chunk, str, &cons);
-	    if (ret < 0)
+	    if ((ret < 0) || (chunk == 0)) /* chunk==0 => nothing done */
 	        return(-1);
 	    out->buffer->use += chunk;
 	    out->buffer->content[out->buffer->use] = 0;
@@ -3105,7 +3105,7 @@ xmlOutputBufferWriteEscape(xmlOutputBufferPtr out, const xmlChar *str,
 	} else {
 	    ret = escaping(out->buffer->content + out->buffer->use ,
 	                   &chunk, str, &cons);
-	    if (ret < 0)
+	    if ((ret < 0) || (chunk == 0)) /* chunk==0 => nothing done */
 	        return(-1);
 	    out->buffer->use += chunk;
 	    out->buffer->content[out->buffer->use] = 0;
@@ -3533,7 +3533,6 @@ xmlGetExternalEntityLoader(void) {
  *
  * Load an external entity, note that the use of this function for
  * unparsed entities may generate problems
- * TODO: a more generic External entity API must be designed
  *
  * Returns the xmlParserInputPtr or NULL
  */

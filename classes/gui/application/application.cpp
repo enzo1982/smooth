@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,22 +9,20 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/application/application.h>
-#include <smooth/misc/i18n.h>
+#include <smooth/i18n/i18n.h>
 
 const S::Int	 S::GUI::Application::classID = S::Object::RequestClassID();
 
 S::String	 S::GUI::Application::startupDirectory;
 S::String	 S::GUI::Application::applicationDirectory;
 
-S::GUI::Application::Application(String name)
+S::GUI::Application::Application(const String &name) : Widget(Point(0, 0), Size(LiSAGetDisplaySizeX(), LiSAGetDisplaySizeY()))
 {
-	type		= classID;
-	containerType	= classID;
+	type	= classID;
 
 	Show();
 
-	text		= name == NIL ? String("smooth Application") : name;
-	size		= Size(LiSAGetDisplaySizeX(), LiSAGetDisplaySizeY());
+	text	= name == NIL ? String("smooth Application") : name;
 }
 
 S::String S::GUI::Application::GetStartupDirectory()

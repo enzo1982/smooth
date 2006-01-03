@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,16 +9,15 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/multi/list/list.h>
-#include <smooth/misc/i18n.h>
 
 const S::Int	 S::GUI::List::classID = S::Object::RequestClassID();
 
-S::GUI::List::List()
+S::GUI::List::List() : Widget(Point(), Size())
 {
-	type		= classID;
-	containerType	= classID;
+	type	= classID;
 
-	internalOnSelectEntry.SetParentObject(this);
+	onSelectEntry.SetParentObject(this);
+	onMarkEntry.SetParentObject(this);
 }
 
 S::GUI::List::~List()
@@ -26,49 +25,49 @@ S::GUI::List::~List()
 	Clear();
 }
 
-S::GUI::ListEntry *S::GUI::List::AddEntry(String text)
+S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text)
 {
 	ListEntry	*newEntry = new ListEntry(text);
 
-	if (RegisterObject(newEntry) == Success)
-	{
-		Paint(SP_UPDATE);
+	newEntry->Hide();
 
-		newEntry->Show();
-
-		return newEntry;
-	}
-	else
+	if (RegisterObject(newEntry) != Success())
 	{
 		DeleteObject(newEntry);
 
 		return NIL;
 	}
+
+	Paint(SP_UPDATE);
+
+	return newEntry;
 }
 
 S::Int S::GUI::List::RemoveEntry(ListEntry *entry)
 {
-	if (entry == NIL) return Failure;
+	if (entry == NIL) return Error();
 
-	if (UnregisterObject(entry) == Success)
+	if (UnregisterObject(entry) == Success())
 	{
 		DeleteObject(entry);
 
-		Paint(SP_PAINT);
+		Paint(SP_UPDATE);
 
-		return Success;
+		return Success();
 	}
 
-	return Failure;
+	return Error();
 }
 
 S::Int S::GUI::List::Clear()
 {
-	Int	 nOfEntries = assocObjects.GetNOfEntries();
+	Int	 nonListEntry = 0;
 
-	for (Int i = 0; i < nOfEntries; i++)
+	while (GetNOfObjects() - nonListEntry)
 	{
-		Widget	*widget = assocObjects.GetFirstEntry();
+		if (GetNthObject(nonListEntry)->GetObjectType() != ListEntry::classID) { nonListEntry++; continue; }
+
+		Widget	*widget = GetNthObject(nonListEntry);
 
 		UnregisterObject(widget);
 		DeleteObject(widget);
@@ -76,51 +75,66 @@ S::Int S::GUI::List::Clear()
 
 	Paint(SP_PAINT);
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::List::GetNOfEntries()
 {
-	return assocObjects.GetNOfEntries();
+	Int	n = 0;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+
+		n++;
+	}
+
+	return n;
 }
 
 S::GUI::ListEntry *S::GUI::List::GetNthEntry(Int n)
 {
-	return (ListEntry *) assocObjects.GetNthEntry(n);
+	Int	m = 0;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+
+		if (m == n) return (ListEntry *) GetNthObject(i);
+		else	    m++;
+	}
+
+	return NIL;
 }
 
 S::Int S::GUI::List::SelectEntry(ListEntry *entry)
 {
-	Int	 retVal = Failure;
-
-	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		ListEntry	*widget = (ListEntry *) assocObjects.GetNthEntry(i);
+		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+
+		ListEntry	*widget = (ListEntry *) GetNthObject(i);
 
 		if (widget == entry)
 		{
-			widget->clicked = True;
-			widget->Paint(SP_PAINT);
+			widget->Select();
 
-			retVal = Success;
-		}
-		else if (widget->clicked)
-		{
-			widget->clicked = False;
-			widget->Paint(SP_PAINT);
+			return Success();
 		}
 	}
 
-	return retVal;
+	return Error();
 }
 
 S::GUI::ListEntry *S::GUI::List::GetSelectedEntry()
 {
-	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		ListEntry	*widget = (ListEntry *) assocObjects.GetNthEntry(i);
+		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
 
-		if (widget->clicked) return widget;
+		ListEntry	*widget = (ListEntry *) GetNthObject(i);
+
+		if (widget->IsSelected()) return widget;
 	}
 
 	return NIL;
@@ -128,58 +142,44 @@ S::GUI::ListEntry *S::GUI::List::GetSelectedEntry()
 
 S::Int S::GUI::List::SelectNthEntry(Int n)
 {
-	if (n >= assocObjects.GetNOfEntries()) return Failure;
+	if (n >= GetNOfObjects()) return Error();
 
-	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
-	{
-		ListEntry	*widget = (ListEntry *) assocObjects.GetNthEntry(i);
+	GetNthEntry(n)->Select();
 
-		if (i == n)
-		{
-			widget->clicked = True;
-			widget->Paint(SP_PAINT);
-		}
-		else if (widget->clicked)
-		{
-			widget->clicked = False;
-			widget->Paint(SP_PAINT);
-		}
-	}
-
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::List::GetSelectedEntryNumber()
 {
-	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
+	Int	n = 0;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		if (((ListEntry *) assocObjects.GetNthEntry(i))->clicked) return i;
+		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+
+		if (((ListEntry *) GetNthObject(i))->IsSelected()) return n;
+
+		n++;
 	}
 
 	return -1;
 }
 
-S::Int S::GUI::List::SelectEntry(String entryText)
+S::Int S::GUI::List::SelectEntry(const String &entryText)
 {
-	Int	 rVal = Failure;
-
-	for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		ListEntry	*widget = (ListEntry *) assocObjects.GetNthEntry(i);
+		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
 
-		if (widget->GetText() == entryText)
-		{
-			widget->clicked = True;
-			widget->Paint(SP_PAINT);
+		ListEntry	*entry = (ListEntry *) GetNthObject(i);
 
-			rVal = Success;
-		}
-		else if (widget->clicked)
+		if (entry->GetText() == entryText)
 		{
-			widget->clicked = False;
-			widget->Paint(SP_PAINT);
+			entry->Select();
+
+			return Success();
 		}
 	}
 
-	return rVal;
+	return Error();
 }

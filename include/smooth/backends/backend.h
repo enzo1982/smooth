@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,26 +30,26 @@ namespace smooth
 		class Backend
 		{
 			private:
-				static Array<Backend *>		*backends;
-				static Array<Backend *(*)()>	*backend_creators;
+				static Array<Backend *, Void *>		*backends;
+				static Array<Backend *(*)(), Void *>	*backend_creators;
 			protected:
-				Int				 type;
+				Int					 type;
 			public:
-				static Int			 AddBackend(Backend *(*)());
+				static Int				 AddBackend(Backend *(*)());
 
-				static Int			 GetNOfBackends();
-				static Backend			*GetNthBackend(Int);
+				static Int				 GetNOfBackends();
+				static Backend				*GetNthBackend(Int);
 
-				static Int			 InitBackends();
-				static Int			 DeinitBackends();
+				static Int				 InitBackends();
+				static Int				 DeinitBackends();
 
-								 Backend();
-				virtual				~Backend();
+									 Backend();
+				virtual					~Backend();
 
-				virtual Int			 Init();
-				virtual Int			 Deinit();
+				virtual Int				 Init();
+				virtual Int				 Deinit();
 
-				Int				 GetBackendType();
+				Int					 GetBackendType();
 		};
 	};
 };

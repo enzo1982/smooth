@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,6 +16,7 @@ namespace smooth
 	namespace GUI
 	{
 		class Hyperlink;
+		class Hotspot;
 	};
 };
 
@@ -31,24 +32,27 @@ namespace smooth
 			protected:
 				String			 linkURL;
 				Bitmap			 linkBitmap;
+
+				Hotspot			*hotspot;
 			public:
 				static const Int	 classID;
 
-							 Hyperlink();
-							 Hyperlink(String, const Bitmap &, String, Point, Size size = Size(0, 0));
-							~Hyperlink();
-
-				Int			 Hide();
+							 Hyperlink(const String &, const Bitmap &, const String &, const Point &, const Size & = Size(0, 0));
+				virtual			~Hyperlink();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
-
-				Bitmap			&GetBitmap();
-				String			 GetURL();
-
+			accessors:
 				Int			 SetText(const String &);
+
 				Int			 SetBitmap(const Bitmap &);
-				Int			 SetURL(String);
+				const Bitmap		&GetBitmap();
+
+				Int			 SetURL(const String &);
+				const String		&GetURL();
+			slots:
+				Void			 OnMouseOver();
+				Void			 OnMouseOut();
+				Void			 OnClickLink();
 		};
 	};
 };

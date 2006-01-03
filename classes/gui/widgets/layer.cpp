@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,107 +11,43 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/definitions.h>
-#include <smooth/misc/i18n.h>
+#include <smooth/i18n/i18n.h>
 #include <smooth/gui/widgets/basic/tabwidget.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::Layer::classID = S::Object::RequestClassID();
 
-S::GUI::Layer::Layer(String name)
+S::GUI::Layer::Layer(String name) : Widget(Point(), Size())
 {
 	type		= classID;
-	containerType	= classID;
 
 	text		= name;
 	orientation	= OR_CENTER;
-
-	visible = False;
-
-	possibleContainers.AddEntry(Window::classID);
-	possibleContainers.AddEntry(classID);
-	possibleContainers.AddEntry(TabWidget::classID);
 }
 
 S::GUI::Layer::~Layer()
 {
 }
 
-S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
-{
-	if (!IsRegistered())		return Failure;
-	if (!active || !IsVisible())	return Success;
-	if (GetNOfObjects() == 0)	return Success;
-
-	for (Int i = GetNOfObjects() - 1; i >= 0; i--)
-	{
-		Widget	*object = assocObjects.GetNthEntry(i);
-
-		if (object == NIL) continue;
-
-		if (object->Process(message, wParam, lParam) == Break) return Break;
-	}
-
-	return Success;
-}
-
-S::Int S::GUI::Layer::Paint(Int message)
-{
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
-
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
-
-	Rect	 updateRect	= wnd->GetUpdateRect();
-	Surface	*surface	= container->GetDrawSurface();
-	Point	 realPos	= GetRealPosition();
-
-	if (backgroundColor != -1)
-	{
-		Rect	 frame;
-
-		frame.left	= realPos.x;
-		frame.top	= realPos.y;
-		frame.right	= realPos.x + size.cx;
-		frame.bottom	= realPos.y + size.cy;
-
-		updateRect = frame;
-
-		surface->Box(frame, backgroundColor, FILLED);
-	}
-
-	for (Int i = 0; i < GetNOfObjects(); i++)
-	{
-		Widget	*object = assocObjects.GetNthEntry(i);
-
-		if (object == NIL) continue;
-
-		if (object->IsVisible() && object->IsAffected(updateRect)) object->Paint(SP_PAINT);
-	}
-
-	return Success;
-}
-
 S::Int S::GUI::Layer::Show()
 {
-	if (IsVisible()) return Success;
+	if (visible) return Success();
 
 	visible = True;
 
-	if (!IsRegistered()) return Success;
+	if (!IsRegistered()) return Success();
 
-	if (backgroundColor != -1 && IsVisible())
+	if (GetBackgroundColor() != -1 && IsVisible())
 	{
 		Surface	*surface	= container->GetDrawSurface();
-		Rect	 frame		= Rect(GetRealPosition(), size);
+		Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
-		surface->Box(frame, backgroundColor, FILLED);
+		surface->Box(frame, GetBackgroundColor(), FILLED);
 	}
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		Widget	*object = assocObjects.GetNthEntry(i);
+		Widget	*object = GetNthObject(i);
 
 		if (object != NIL)
 		{
@@ -128,16 +64,16 @@ S::Int S::GUI::Layer::Show()
 
 	onShow.Emit();
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::Layer::Hide()
 {
-	if (!visible) return Success;
+	if (!visible) return Success();
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		Widget	*object = assocObjects.GetNthEntry(i);
+		Widget	*object = GetNthObject(i);
 
 		if (object != NIL)
 		{
@@ -156,19 +92,69 @@ S::Int S::GUI::Layer::Hide()
 
 	visible = False;
 
-	if (!IsRegistered()) return Success;
+	if (!IsRegistered()) return Success();
 
-	if (backgroundColor != -1 && wasVisible)
+	if (GetBackgroundColor() != -1 && wasVisible)
 	{
 		Surface	*surface	= container->GetDrawSurface();
-		Rect	 frame		= Rect(GetRealPosition(), size);
+		Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
 		surface->Box(frame, Setup::BackgroundColor, FILLED);
 	}
 
 	onHide.Emit();
 
-	return Success;
+	return Success();
+}
+
+S::Int S::GUI::Layer::Paint(Int message)
+{
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
+
+	Window	*wnd = container->GetContainerWindow();
+
+	if (wnd == NIL) return Success();
+
+	Rect	 updateRect	= wnd->GetUpdateRect();
+	Surface	*surface	= container->GetDrawSurface();
+
+	if (GetBackgroundColor() != -1)
+	{
+		Rect	 frame = Rect(GetRealPosition(), GetSize());
+
+		updateRect = frame;
+
+		surface->Box(frame, GetBackgroundColor(), FILLED);
+	}
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*object = GetNthObject(i);
+
+		if (object == NIL) continue;
+
+		if (object->IsVisible() && object->IsAffected(updateRect)) object->Paint(SP_PAINT);
+	}
+
+	return Success();
+}
+
+S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
+{
+	if (!IsRegistered())			return Error();
+	if (!IsActive() || !IsVisible())	return Success();
+
+	for (Int i = GetNOfObjects() - 1; i >= 0; i--)
+	{
+		Widget	*object = GetNthObject(i);
+
+		if (object == NIL) continue;
+
+		if (object->Process(message, wParam, lParam) == Break) return Break;
+	}
+
+	return Success();
 }
 
 S::Int S::GUI::Layer::SetMetrics(Point iPos, Size iSize)
@@ -176,51 +162,4 @@ S::Int S::GUI::Layer::SetMetrics(Point iPos, Size iSize)
 	if (orientation == OR_CENTER) orientation = OR_FREE;
 
 	return Widget::SetMetrics(iPos, iSize);
-}
-
-S::Int S::GUI::Layer::RegisterObject(Widget *object)
-{
-	if (object == NIL) return Failure;
-
-	if (containerType == &object->possibleContainers)
-	{
-		if (!object->IsRegistered())
-		{
-			assocObjects.AddEntry(object, object->GetHandle());
-
-			object->SetContainer(this);
-			object->SetRegisteredFlag(True);
-
-			object->onRegister.Emit(this);
-			object->Show();
-
-			return Success;
-		}
-	}
-
-	return Failure;
-}
-
-S::Int S::GUI::Layer::UnregisterObject(Widget *object)
-{
-	if (object == NIL) return Failure;
-
-	if (containerType == &object->possibleContainers)
-	{
-		if (GetNOfObjects() > 0 && object->IsRegistered())
-		{
-			if (assocObjects.RemoveEntry(object->GetHandle()) == True)
-			{
-				object->onUnregister.Emit(this);
-				object->Hide();
-
-				object->SetRegisteredFlag(False);
-				object->SetContainer(NIL);
-
-				return Success;
-			}
-		}
-	}
-
-	return Failure;
 }

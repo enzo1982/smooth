@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,14 +9,14 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/basic/object.h>
-#include <smooth/misc/i18n.h>
+#include <smooth/i18n/i18n.h>
 
 const S::Int		 S::Object::classID		= S::Object::RequestClassID();
 
 S::Int			 S::Object::nextClassID		= 0;
 S::Int			 S::Object::nextObjectHandle	= 0;
 
-S::Array<S::Object *>	 S::Object::objects;
+S::Array<S::Object *, S::Void *>	 S::Object::objects;
 
 S::Object::Object() : type(this)
 {
@@ -58,7 +58,7 @@ S::Object *S::Object::GetObject(Int objectHandle, Int objectType)
 	else						return NIL;
 }
 
-S::Object *S::Object::GetObject(String objectName)
+S::Object *S::Object::GetObject(const String &objectName)
 {
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -73,16 +73,16 @@ S::Int S::Object::GetHandle()
 	return handle;
 }
 
-S::Int S::Object::SetName(String nName)
+S::Int S::Object::SetName(const String &nName)
 {
-	if (GetObject(nName) != NIL) return Failure;
+	if (GetObject(nName) != NIL) return Error();
 
 	name = nName;
 
-	return Success;
+	return Success();
 }
 
-S::String S::Object::GetName()
+const S::String &S::Object::GetName()
 {
 	return name;
 }
@@ -91,7 +91,7 @@ S::Int S::Object::SetFlags(Int nFlags)
 {
 	flags = nFlags;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::Object::GetFlags()
@@ -115,7 +115,7 @@ S::Bool S::Object::IsTypeCompatible(Int objType)
 	else			return False;
 }
 
-S::ObjectType S::Object::GetObjectType()
+const S::ObjectType &S::Object::GetObjectType()
 {
 	return type;
 }
@@ -158,13 +158,13 @@ S::Int S::Object::DeleteObject(Object *object)
 		{
 			delete object;
 
-			return Success;
+			return Success();
 		}
 
 		object->deleteObject = True;
 
-		return Success;
+		return Success();
 	}
 
-	return Failure;
+	return Error();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,14 +16,14 @@ namespace smooth
 	namespace I18n
 	{
 		const String smooth_de = 
-			String("<?xml version=\"1.0\" encoding=\"ISO-8859-15\"?>\n").
+			String("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n").
 			Append("<LangFile>\n").
 			Append("  <info>\n").
 			Append("    <property name=\"program\">smooth</property>\n").
 			Append("    <property name=\"version\">0.8</property>\n").
-			Append("    <property name=\"language\">Deutsch</property>\n").
+			Append("    <property name=\"language\">German / Deutsch</property>\n").
 			Append("    <property name=\"righttoleft\">false</property>\n").
-			Append("    <property name=\"encoding\">ISO-8859-15</property>\n").
+			Append("    <property name=\"encoding\">ISO-8859-1</property>\n").
 			Append("    <property name=\"author\">Robert Kausch &lt;robert.kausch@gmx.net&gt;</property>\n").
 			Append("    <property name=\"url\">http://www.smooth-project.org/</property>\n").
 			Append("  </info>\n").

@@ -325,6 +325,7 @@ xmlReallocLoc(void *ptr,size_t size, const char * file, int line)
 
     p = CLIENT_2_HDR(ptr);
     number = p->mh_number;
+    if (xmlMemStopAtBlock == number) xmlMallocBreakpoint();
     if (p->mh_tag != MEMTAG) {
        Mem_Tag_Err(p);
 	 goto error;
@@ -429,6 +430,7 @@ xmlMemFree(void *ptr)
         Mem_Tag_Err(p);
         goto error;
     }
+    if (xmlMemStopAtBlock == p->mh_number) xmlMallocBreakpoint();
     p->mh_tag = ~MEMTAG;
     memset(target, -1, p->mh_size);
     xmlMutexLock(xmlMemMutex);
@@ -640,7 +642,18 @@ xmlMemDisplay(FILE *fp)
     time_t currentTime;
     char buf[500];
     struct tm * tstruct;
+#endif
+#endif
+    FILE *old_fp = fp;
 
+    if (fp == NULL) {
+	fp = fopen(".memorylist", "w");
+	if (fp == NULL)
+	    return;
+    }
+
+#ifdef MEM_LIST
+#if defined(HAVE_LOCALTIME) && defined(HAVE_STRFTIME)
     currentTime = time(NULL);
     tstruct = localtime(&currentTime);
     strftime(buf, sizeof(buf) - 1, "%I:%M:%S %p", tstruct);
@@ -666,6 +679,8 @@ xmlMemDisplay(FILE *fp)
            default:
 	        fprintf(fp,"Unknown memory block, may be corrupted");
 		xmlMutexUnlock(xmlMemMutex);
+		if (old_fp == NULL)
+		    fclose(fp);
 		return;
         }
 	if (p->mh_file != NULL) fprintf(fp,"%s(%u)", p->mh_file, p->mh_line);
@@ -684,6 +699,8 @@ xmlMemDisplay(FILE *fp)
 #else
     fprintf(fp,"Memory list not compiled (MEM_LIST not defined !)\n");
 #endif
+    if (old_fp == NULL)
+	fclose(fp);
 }
 
 #ifdef MEM_LIST
@@ -863,7 +880,8 @@ xmlInitMemory(void)
 /**
  * xmlCleanupMemory:
  *
- * Free up all the memory associated with memorys
+ * Free up all the memory allocated by the library for its own
+ * use. This should not be called by user level code.
  */
 void
 xmlCleanupMemory(void) {
@@ -1019,4 +1037,3 @@ xmlGcMemGet(xmlFreeFunc *freeFunc, xmlMallocFunc *mallocFunc,
     if (strdupFunc != NULL) *strdupFunc = xmlMemStrdup;
     return(0);
 }
-

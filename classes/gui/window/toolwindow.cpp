@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,28 +10,21 @@
 
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/gui/window/windowbackend.h>
-#include <smooth/definitions.h>
-#include <smooth/loop.h>
-#include <smooth/misc/i18n.h>
+#include <smooth/gui/window/backends/windowbackend.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/misc/math.h>
 #include <smooth/graphics/color.h>
 
 const S::Int	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
 
-S::GUI::ToolWindow::ToolWindow() : Window("smooth ToolWindow")
+S::GUI::ToolWindow::ToolWindow(const Point &iPos, const Size &iSize) : Window("smooth ToolWindow", iPos, iSize)
 {
 	type		= classID;
-	containerType	= Window::classID;
-
 	orientation	= OR_FREE;
-
 	owner		= NIL;
+	visible		= True;
 
-	possibleContainers.RemoveAll();
-	possibleContainers.AddEntry(Window::classID);
+	innerOffset = Rect(Point(0, 0), Size(0, 0));
 
 	SetFlags(WF_TOPMOST | WF_NOTASKBUTTON | WF_THINBORDER);
 }
@@ -44,21 +37,21 @@ S::Int S::GUI::ToolWindow::SetOwner(Widget *newOwner)
 {
 	owner = newOwner;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::ToolWindow::FreeOwner()
 {
 	owner = NIL;
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::ToolWindow::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!created)		return Success;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!created)		return Success();
+	if (!IsVisible())	return Success();
 
 	EnterProtectedRegion();
 
@@ -82,18 +75,18 @@ S::Int S::GUI::ToolWindow::Paint(Int message)
 
 		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
-			assocObjects.GetNthEntry(i)->Paint(SP_PAINT);
+			GetNthObject(i)->Paint(SP_PAINT);
 		}
 	}
 
 	LeaveProtectedRegion();
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 {
-	if (!created) return Success;
+	if (!created) return Success();
 
 	EnterProtectedRegion();
 
@@ -153,8 +146,8 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 					BeginPaint((HWND) backend->GetSystemWindow(), &ps);
 
-					if (Math::Abs((updateRect.right - updateRect.left) - size.cx) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - size.cy) < 20)	Paint(SP_PAINT);
-					else																	Paint(SP_UPDATE);
+					if (Math::Abs((updateRect.right - updateRect.left) - GetWidth()) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - GetHeight()) < 20)	Paint(SP_PAINT);
+					else																		Paint(SP_UPDATE);
 
 					EndPaint((HWND) backend->GetSystemWindow(), &ps);
 				}
@@ -169,27 +162,20 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 				for (Int i = 0; i < GetNOfObjects(); i++)
 				{
-					Widget	*object = assocObjects.GetNthEntry(i);
+					Widget	*object = GetNthObject(i);
 
 					if (object->GetOrientation() == OR_CENTER)
 					{
-						object->size.cx = wndPos->cx;
-						object->size.cy = wndPos->cy;
+						object->SetSize(Size(wndPos->cx, wndPos->cy));
 					}
 				}
 
-				pos.x	= wndPos->x;
-				pos.y	= wndPos->y;
-				size.cx	= wndPos->cx;
-				size.cy	= wndPos->cy;
+				SetMetrics(Point(wndPos->x, wndPos->y), Size(wndPos->cx, wndPos->cy));
 
-				drawSurface->SetSize(size);
+				GetDrawSurface()->SetSize(GetSize());
 			}
 
-			updateRect.left		= 0;
-			updateRect.top		= 0;
-			updateRect.right	= updateRect.left + size.cx;
-			updateRect.bottom	= updateRect.top + size.cy;
+			updateRect = Rect(Point(0, 0), GetSize());
 
 			break;
 	}
@@ -199,7 +185,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 	{
 		for (Int i = GetNOfObjects() - 1; i >= 0; i--)
 		{
-			Widget	*object = assocObjects.GetNthEntry(i);
+			Widget	*object = GetNthObject(i);
 
 			if (object == NIL) continue;
 
@@ -216,51 +202,7 @@ S::Int S::GUI::ToolWindow::Process(Int message, Int wParam, Int lParam)
 
 	if (owner != NIL) owner->Process(message, wParam, lParam);
 	
-	return rVal == -1 ? Success : Break;
-}
-
-S::Int S::GUI::ToolWindow::RegisterObject(Widget *object)
-{
-	if (object == NIL) return Failure;
-
-	if (containerType == &object->possibleContainers)
-	{
-		if (!object->IsRegistered())
-		{
-			assocObjects.AddEntry(object, object->GetHandle());
-
-			object->SetContainer(this);
-			object->SetRegisteredFlag(True);
-
-			switch (object->GetOrientation())
-			{
-				case OR_CENTER:
-					object->pos.x	= 0;
-					object->pos.y	= 0;
-					object->size.cy	= size.cy;
-					object->size.cx	= size.cx;
-
-					break;
-			}
-
-			if (object->GetObjectType() == ToolWindow::classID)
-			{
-				if (Setup::rightToLeft)	object->pos.x = size.cx - ((object->pos.x - pos.x) + object->size.cx) + pos.x;
-				((ToolWindow *) object)->Create();
-			}
-
-			object->onRegister.Emit(this);
-			object->Show();
-
-			return Success;
-		}
-	}
-	else
-	{
-		return mainLayer->RegisterObject(object);
-	}
-
-	return Failure;
+	return rVal == -1 ? Success() : Break;
 }
 
 S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType)

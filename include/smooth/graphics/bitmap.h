@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,8 +23,8 @@ namespace smooth
 
 #include "../definitions.h"
 #include "../misc/string.h"
-#include "size.h"
-#include "rect.h"
+#include "forms/size.h"
+#include "forms/rect.h"
 
 namespace smooth
 {
@@ -39,12 +39,11 @@ namespace smooth
 							 Bitmap(Int, Int, Int);
 							 Bitmap(const int);
 							 Bitmap(const Bitmap &);
-
-							~Bitmap();
+				virtual			~Bitmap();
 
 				Int			 GetBitmapType();
 
-				const Size		 GetSize();
+				const Size		&GetSize();
 				Int			 GetDepth();
 
 				UnsignedByte		*GetBytes();
@@ -54,13 +53,13 @@ namespace smooth
 				Bool			 DeleteBitmap();
 
 				Bool			 SetSystemBitmap(Void *);
-				Void			*GetSystemBitmap();
+				Void			*GetSystemBitmap() const;
 
 				Int			 GrayscaleBitmap();
 				Int			 ReplaceColor(Int, Int);
 
-				Int			 BlitFromSurface(Surface *, Rect, Rect);
-				Int			 BlitToSurface(Rect, Surface *, Rect);
+				Int			 BlitFromSurface(Surface *, const Rect &, const Rect &);
+				Int			 BlitToSurface(const Rect &, Surface *, const Rect &);
 
 				Bool			 SetPixel(Int, Int, UnsignedLong);
 				UnsignedLong		 GetPixel(Int, Int);
@@ -68,13 +67,9 @@ namespace smooth
 				Bitmap &operator	 =(const int);
 				Bitmap &operator	 =(const Bitmap &);
 
-				Bool operator		 ==(const int);
-				Bool operator		 !=(const int);
-
-				static Bitmap		 LoadBitmap(String, Int, String);
+				Bool operator		 ==(const int) const;
+				Bool operator		 !=(const int) const;
 		};
-
-		SMOOTHVAR S::GUI::Bitmap SI_DEFAULT;
 	};
 };
 

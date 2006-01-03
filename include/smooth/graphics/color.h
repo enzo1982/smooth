@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -43,21 +43,21 @@ namespace smooth
 						 Color(Long, Int = RGBA);
 						 Color(Int, Int, Int, Int = RGBA);
 
-				Int		 GetRed()					{ return color & 255; }
-				Int		 GetGreen()					{ return (color >> 8) & 255; }
-				Int		 GetBlue()					{ return (color >> 16) & 255; }
-				Int		 GetAlpha()					{ return (color >> 24) & 255; }
+				Int		 GetRed() const					{ return color & 255; }
+				Int		 GetGreen() const				{ return (color >> 8) & 255; }
+				Int		 GetBlue() const				{ return (color >> 16) & 255; }
+				Int		 GetAlpha() const				{ return (color >> 24) & 255; }
 
 				Void		 SetColor(Long nColor, Int nColorSpace = RGBA)	{ color = nColor; colorSpace = nColorSpace; }
 				Void		 SetColor(Int r, Int g, Int b, Int c = RGBA)	{ color = r + g * 256 + b * 65536; colorSpace = c; }
 
-				Color		 ConvertTo(Int);
-				Color		 Grayscale()					{ return Color(ConvertTo(GRAY), ConvertTo(GRAY), ConvertTo(GRAY)); }
+				Color		 ConvertTo(Int) const;
+				Color		 Grayscale() const				{ return Color(ConvertTo(GRAY), ConvertTo(GRAY), ConvertTo(GRAY)); }
 
-				Color		 Average(Color color2)				{ return Color((GetRed() + color2.GetRed()) / 2, (GetGreen() + color2.GetGreen()) / 2, (GetBlue() + color2.GetBlue()) / 2, (GetAlpha() + color2.GetAlpha()) / 2); }
+				Color		 Average(const Color &color2) const		{ return Color((GetRed() + color2.GetRed()) / 2, (GetGreen() + color2.GetGreen()) / 2, (GetBlue() + color2.GetBlue()) / 2, (GetAlpha() + color2.GetAlpha()) / 2); }
 
-				Color		 Downsample(Int);
-				Color		 Upsample(Int);
+				Color		 Downsample(Int) const;
+				Color		 Upsample(Int) const;
 
 				Color &operator	 =(const Long nColor)				{ SetColor(nColor); return *this; }
 				operator	 Long() const					{ return color; }

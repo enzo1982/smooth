@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,20 +10,23 @@
 
 #include <smooth/misc/string.h>
 #include <smooth/misc/math.h>
+#include <smooth/templates/buffer.h>
+#include <smooth/threads/thread.h>
 
 #include <iconv.h>
 #include <memory.h>
-#include <iolib-cxx.h>
 
 #ifdef __WIN32__
-#include <smooth/threads/win32/mutexwin32.h>
+#include <smooth/threads/backends/win32/mutexwin32.h>
 #else
-#include <smooth/threads/posix/mutexposix.h>
+#include <smooth/threads/backends/posix/mutexposix.h>
 #endif
 
 namespace smooth
 {
-	Int	 ConvertString(const char *, Int, const char *, char *, Int, const char *);
+	Buffer<char>	 csBuffer;
+
+	Int		 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
 char	*S::String::inputFormat		= NIL;
@@ -38,13 +41,9 @@ S::Bool	 S::String::crc32_initialized = False;
 
 S::String::String()
 {
-#ifdef __WIN32__
-	mutex = new Threads::MutexWin32(NIL);
-#else
-	mutex = new Threads::MutexPOSIX(NIL);
-#endif
+	mutex = NIL;
 
-	mutex->Lock();
+	LockBuffers();
 
 	nOfStrings++;
 
@@ -52,18 +51,14 @@ S::String::String()
 
 	Clean();
 
-	mutex->Release();
+	UnlockBuffers();
 }
 
 S::String::String(const int nil)
 {
-#ifdef __WIN32__
-	mutex = new Threads::MutexWin32(NIL);
-#else
-	mutex = new Threads::MutexPOSIX(NIL);
-#endif
+	mutex = NIL;
 
-	mutex->Lock();
+	LockBuffers();
 
 	nOfStrings++;
 
@@ -71,18 +66,14 @@ S::String::String(const int nil)
 
 	Clean();
 
-	mutex->Release();
+	UnlockBuffers();
 }
 
 S::String::String(const char *iString)
 {
-#ifdef __WIN32__
-	mutex = new Threads::MutexWin32(NIL);
-#else
-	mutex = new Threads::MutexPOSIX(NIL);
-#endif
+	mutex = NIL;
 
-	mutex->Lock();
+	LockBuffers();
 
 	nOfStrings++;
 
@@ -101,18 +92,14 @@ S::String::String(const char *iString)
 		ImportFrom(inputFormat, iString);
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 }
 
 S::String::String(const wchar_t *iString)
 {
-#ifdef __WIN32__
-	mutex = new Threads::MutexWin32(NIL);
-#else
-	mutex = new Threads::MutexPOSIX(NIL);
-#endif
+	mutex = NIL;
 
-	mutex->Lock();
+	LockBuffers();
 
 	nOfStrings++;
 
@@ -133,18 +120,14 @@ S::String::String(const wchar_t *iString)
 		stringSize = size;
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 }
 
 S::String::String(const String &iString)
 {
-#ifdef __WIN32__
-	mutex = new Threads::MutexWin32(NIL);
-#else
-	mutex = new Threads::MutexPOSIX(NIL);
-#endif
+	mutex = NIL;
 
-	mutex->Lock();
+	LockBuffers();
 
 	nOfStrings++;
 
@@ -163,12 +146,12 @@ S::String::String(const String &iString)
 		stringSize = iString.stringSize;
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 }
 
 S::String::~String()
 {
-	mutex->Lock();
+	LockBuffers();
 
 	Clean();
 
@@ -179,9 +162,31 @@ S::String::~String()
 		allocatedBuffers.RemoveAll();
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
-	delete mutex;
+	if (mutex != NIL) delete mutex;
+}
+
+S::Void S::String::LockBuffers() const
+{
+	if (Threads::Thread::GetNOfRunningThreads() > 0)
+	{
+		if (mutex == NIL)
+		{
+#ifdef __WIN32__
+			mutex = new Threads::MutexWin32(NIL);
+#else
+			mutex = new Threads::MutexPOSIX(NIL);
+#endif
+		}
+
+		mutex->Lock();
+	}
+}
+
+S::Void S::String::UnlockBuffers() const
+{
+	if (Threads::Thread::GetNOfRunningThreads() > 0) mutex->Release();
 }
 
 S::Void S::String::DeleteTemporaryBuffers()
@@ -198,7 +203,7 @@ S::Void S::String::DeleteTemporaryBuffers()
 
 S::Void S::String::Clean()
 {
-	mutex->Lock();
+	LockBuffers();
 
 	stringSize = 0;
 
@@ -206,7 +211,7 @@ S::Void S::String::Clean()
 
 	wString = NIL;
 
-	mutex->Release();
+	UnlockBuffers();
 }
 
 S::Void S::String::CRC32_InitTable()
@@ -239,11 +244,11 @@ S::UnsignedLong S::String::CRC32_Reflect(UnsignedLong ref, char ch)
 	return value;
 }
 
-S::Int S::String::ComputeCRC32()
+S::Int S::String::ComputeCRC32() const
 {
 	if (!crc32_initialized) CRC32_InitTable();
 
-	mutex->Lock();
+	LockBuffers();
 
 	UnsignedLong	 ulCRC(0xffffffff);
 	Int		 len = Length() * sizeof(wchar_t);
@@ -251,17 +256,17 @@ S::Int S::String::ComputeCRC32()
 
 	while (len--) ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer++];
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return ulCRC ^ 0xffffffff;
 }
 
-S::Bool S::String::IsANSI(String &string)
+S::Bool S::String::IsANSI(const String &string)
 {
 	return !IsUnicode(string);
 }
 
-S::Bool S::String::IsUnicode(String &string)
+S::Bool S::String::IsUnicode(const String &string)
 {
 	for (Int i = 0; i < string.Length(); i++)
 	{
@@ -342,11 +347,11 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 	{
 		return ImportFrom("ISO-8859-1", str);
 	}
-	else if (size < 0) return Failure;
+	else if (size < 0) return Error();
 
 	size = size / 2 + 1;
 
-	mutex->Lock();
+	LockBuffers();
 
 	wString = new wchar_t [size];
 
@@ -356,9 +361,9 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	stringSize = size;
 
-	mutex->Release();
+	UnlockBuffers();
 
-	return Success;
+	return Success();
 }
 
 char *S::String::ConvertTo(const char *encoding) const
@@ -401,7 +406,7 @@ wchar_t &S::String::operator [](int n)
 
 	if (n >= stringSize - 1)
 	{
-		mutex->Lock();
+		LockBuffers();
 
 		if (stringSize > 0)
 		{
@@ -447,13 +452,25 @@ wchar_t &S::String::operator [](int n)
 
 		wString[n] = 0;
 
-		mutex->Release();
+		UnlockBuffers();
 	}
 
 	return wString[n];
 }
 
 wchar_t &S::String::operator [](Int n)
+{
+	return (*this)[(int) n];
+}
+
+wchar_t S::String::operator [](int n) const
+{
+	if (n >= stringSize - 1) return 0;
+
+	return wString[n];
+}
+
+wchar_t S::String::operator [](Int n) const
 {
 	return (*this)[(int) n];
 }
@@ -503,7 +520,7 @@ S::String &S::String::operator =(const wchar_t *newString)
 	{
 		Int	 size = wcslen(newString) + 1;
 
-		mutex->Lock();
+		LockBuffers();
 
 		Clean();
 
@@ -513,7 +530,7 @@ S::String &S::String::operator =(const wchar_t *newString)
 
 		stringSize = size;
 
-		mutex->Release();
+		UnlockBuffers();
 	}
 
 	return *this;
@@ -529,7 +546,7 @@ S::String &S::String::operator =(const String &newString)
 	{
 		String	 backup(newString);
 
-		mutex->Lock();
+		LockBuffers();
 
 		Clean();
 
@@ -539,20 +556,20 @@ S::String &S::String::operator =(const String &newString)
 
 		stringSize = backup.stringSize;
 
-		mutex->Release();
+		UnlockBuffers();
 	}
 
 	return *this;
 }
 
-S::Bool S::String::operator ==(const int nil)
+S::Bool S::String::operator ==(const int nil) const
 {
 	if (wString == NIL)	return True;
 	if (wString[0] == 0)	return True;
 	else			return False;
 }
 
-S::Bool S::String::operator ==(const char *str)
+S::Bool S::String::operator ==(const char *str) const
 {
 	if (wString == NIL && str == NIL)	return True;
 	if (wString == NIL && str != NIL)	if (str[0] == 0) return True;
@@ -563,7 +580,7 @@ S::Bool S::String::operator ==(const char *str)
 	else			return False;
 }
 
-S::Bool S::String::operator ==(const wchar_t *str)
+S::Bool S::String::operator ==(const wchar_t *str) const
 {
 	if (wString == NIL && str == NIL)	return True;
 	if (wString == NIL && str != NIL)	if (str[0] == 0) return True;
@@ -574,7 +591,7 @@ S::Bool S::String::operator ==(const wchar_t *str)
 	else			return False;
 }
 
-S::Bool S::String::operator ==(const String &str)
+S::Bool S::String::operator ==(const String &str) const
 {
 	if (wString == NIL && str.wString == NIL)	return True;
 	if (wString == NIL && str.wString != NIL)	if (str.wString[0] == 0) return True;
@@ -585,14 +602,14 @@ S::Bool S::String::operator ==(const String &str)
 	else			return False;
 }
 
-S::Bool S::String::operator !=(const int nil)
+S::Bool S::String::operator !=(const int nil) const
 {
 	if (wString == NIL)	return False;
 	if (wString[0] == 0)	return False;
 	else			return True;
 }
 
-S::Bool S::String::operator !=(const char *str)
+S::Bool S::String::operator !=(const char *str) const
 {
 	if (wString == NIL && str == NIL)	return False;
 	if (wString == NIL && str != NIL)	if (str[0] == 0) return False;
@@ -603,7 +620,7 @@ S::Bool S::String::operator !=(const char *str)
 	else			return False;
 }
 
-S::Bool S::String::operator !=(const wchar_t *str)
+S::Bool S::String::operator !=(const wchar_t *str) const
 {
 	if (wString == NIL && str == NIL)	return False;
 	if (wString == NIL && str != NIL)	if (str[0] == 0) return False;
@@ -614,7 +631,7 @@ S::Bool S::String::operator !=(const wchar_t *str)
 	else			return False;
 }
 
-S::Bool S::String::operator !=(const String &str)
+S::Bool S::String::operator !=(const String &str) const
 {
 	if (wString == NIL && str.wString == NULL)	return False;
 	if (wString == NIL && str.wString != NIL)	if (str.wString[0] == 0) return False;
@@ -629,7 +646,7 @@ S::Int S::String::Length() const
 {
 	if (stringSize == 0) return 0;
 
-	mutex->Lock();
+	LockBuffers();
 
 	stringSize = 0;
 
@@ -640,7 +657,7 @@ S::Int S::String::Length() const
 		if (wString[i] == 0) break;
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return stringSize - 1;
 }
@@ -662,11 +679,11 @@ S::String &S::String::Append(const wchar_t *str)
 S::String &S::String::Append(const String &str)
 {
 	Int	 len1 = Length();
-	Int	 len2 = String(str).Length();
+	Int	 len2 = str.Length();
 
 	wchar_t	*composed = new wchar_t [len1 + len2 + 1];
 
-	mutex->Lock();
+	LockBuffers();
 
 	for (Int i = 0; i < (len1 + len2 + 1); i++)
 	{
@@ -685,32 +702,32 @@ S::String &S::String::Append(const String &str)
 
 	*this = composed;
 
-	mutex->Release();
+	UnlockBuffers();
 
 	delete [] composed;
 
 	return *this;
 }
 
-S::Int S::String::Find(const char *str)
+S::Int S::String::Find(const char *str) const
 {
 	String 	 str2 = str;
 
 	return Find(str2);
 }
 
-S::Int S::String::Find(const wchar_t *str)
+S::Int S::String::Find(const wchar_t *str) const
 {
 	String 	 str2 = str;
 
 	return Find(str2);
 }
 
-S::Int S::String::Find(const String &str)
+S::Int S::String::Find(const String &str) const
 {
 	String	 bStr(str);
 
-	mutex->Lock();
+	LockBuffers();
 
 	for (Int i = 0; i <= Length() - bStr.Length(); i++)
 	{
@@ -725,10 +742,10 @@ S::Int S::String::Find(const String &str)
 			}
 		}
 
-		if (foundString) { mutex->Release(); return i; }
+		if (foundString) { UnlockBuffers(); return i; }
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return -1;
 }
@@ -770,7 +787,7 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 
 	if (bStr1 == NIL) return *this;
 
-	mutex->Lock();
+	LockBuffers();
 
 	for (Int i = 0; i <= Length() - bStr1.Length(); i++)
 	{
@@ -827,7 +844,7 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 		}
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return *this;
 }
@@ -871,7 +888,7 @@ S::String &S::String::CopyN(const String &str, const Int n)
 {
 	String	 backup(str);
 
-	mutex->Lock();
+	LockBuffers();
 
 	Clean();
 
@@ -880,29 +897,29 @@ S::String &S::String::CopyN(const String &str, const Int n)
 		(*this)[i] = backup[i];
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return *this;
 }
 
-S::Int S::String::Compare(const char *str)
+S::Int S::String::Compare(const char *str) const
 {
 	String 	 str2 = str;
 
 	return Compare(str2);
 }
 
-S::Int S::String::Compare(const wchar_t *str)
+S::Int S::String::Compare(const wchar_t *str) const
 {
 	String 	 str2 = str;
 
 	return Compare(str2);
 }
 
-S::Int S::String::Compare(const String &str)
+S::Int S::String::Compare(const String &str) const
 {
 	Int	 len1 = Length();
-	Int	 len2 = String(str).Length();
+	Int	 len2 = str.Length();
 
 	if (len1 != len2)
 	{
@@ -910,66 +927,138 @@ S::Int S::String::Compare(const String &str)
 	}
 	else
 	{
-		mutex->Lock();
+		LockBuffers();
 
-		for (Int i = 0; i <= len1; i++)
+		for (Int i = 0; i < len1; i++)
 		{
-			if (wString[i] != str.wString[i]) { mutex->Release(); return 1; }
+			if (wString[i] != str.wString[i]) { UnlockBuffers(); return 1; }
 		}
 
-		mutex->Release();
+		UnlockBuffers();
 	}
 
 	return 0;
 }
 
-S::Int S::String::CompareN(const char *str, Int n)
+S::Int S::String::CompareN(const char *str, Int n) const
 {
 	String 	 str2 = str;
 
 	return CompareN(str2, n);
 }
 
-S::Int S::String::CompareN(const wchar_t *str, Int n)
+S::Int S::String::CompareN(const wchar_t *str, Int n) const
 {
 	String 	 str2 = str;
 
 	return CompareN(str2, n);
 }
 
-S::Int S::String::CompareN(const String &str, Int n)
+S::Int S::String::CompareN(const String &str, Int n) const
 {
 	if (Length() < n) return 1;
 
-	mutex->Lock();
+	LockBuffers();
 
 	for (Int i = 0; i < n; i++)
 	{
-		if (wString[i] != str.wString[i]) { mutex->Release(); return 1; }
+		if (wString[i] != str.wString[i]) { UnlockBuffers(); return 1; }
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return 0;
+}
+
+S::Bool S::String::StartsWith(const char *str) const
+{
+	String 	 str2 = str;
+
+	return StartsWith(str2);
+}
+
+S::Bool S::String::StartsWith(const wchar_t *str) const
+{
+	String 	 str2 = str;
+
+	return StartsWith(str2);
+}
+
+S::Bool S::String::StartsWith(const String &str) const
+{
+	Int	 len1 = Length();
+	Int	 len2 = str.Length();
+
+	if (len1 >= len2)
+	{
+		LockBuffers();
+
+		for (Int i = 0; i < len2; i++)
+		{
+			if (wString[i] != str.wString[i]) { UnlockBuffers(); return False; }
+		}
+
+		UnlockBuffers();
+
+		return True;
+	}
+
+	return False;
+}
+
+S::Bool S::String::EndsWith(const char *str) const
+{
+	String 	 str2 = str;
+
+	return EndsWith(str2);
+}
+
+S::Bool S::String::EndsWith(const wchar_t *str) const
+{
+	String 	 str2 = str;
+
+	return EndsWith(str2);
+}
+
+S::Bool S::String::EndsWith(const String &str) const
+{
+	Int	 len1 = Length();
+	Int	 len2 = str.Length();
+
+	if (len1 >= len2)
+	{
+		LockBuffers();
+
+		for (Int i = 0; i < len2; i++)
+		{
+			if (wString[len1 - len2 + i] != str.wString[i]) { UnlockBuffers(); return False; }
+		}
+
+		UnlockBuffers();
+
+		return True;
+	}
+
+	return False;
 }
 
 S::String &S::String::Fill(const Int value)
 {
-	mutex->Lock();
+	LockBuffers();
 
 	for (Int i = 0; i < Length(); i++)
 	{
 		(*this)[i] = value;
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return *this;
 }
 
 S::String &S::String::FillN(const Int value, const Int count)
 {
-	mutex->Lock();
+	LockBuffers();
 
 	Clean();
 
@@ -978,12 +1067,12 @@ S::String &S::String::FillN(const Int value, const Int count)
 		(*this)[i] = value;
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return *this;
 }
 
-S::Int S::String::ToInt()
+S::Int S::String::ToInt() const
 {
 	if (Length() == 0) return 0;
 
@@ -992,7 +1081,7 @@ S::Int S::String::ToInt()
 	Int	 n = 0;
 	Int	 size = Length();
 
-	mutex->Lock();
+	LockBuffers();
 
 	for (Int i = size - 1; i >= 0; i--)
 	{
@@ -1011,13 +1100,13 @@ S::Int S::String::ToInt()
 		n += (Int) Math::Pow(10l, size - (j - first) - 1) * (wString[j] - 48);
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
 	if (!neg)	return n;
 	else		return 0 - n;
 }
 
-S::Float S::String::ToFloat()
+S::Float S::String::ToFloat() const
 {
 	if (Length() == 0) return 0;
 
@@ -1028,7 +1117,7 @@ S::Float S::String::ToFloat()
 	Int	 afpsize = 0;
 	Int	 firstafp = 0;
 
-	mutex->Lock();
+	LockBuffers();
 
 	for (Int i = size - 1; i >= 0; i--)
 	{
@@ -1063,7 +1152,7 @@ S::Float S::String::ToFloat()
 		n += (Float) Math::Pow(10l, 0 - (k - firstafp) - 1) * (wString[k] - 48);
 	}
 
-	mutex->Release();
+	UnlockBuffers();
 
 	if (!neg)	return n;
 	else		return 0 - n;
@@ -1169,135 +1258,66 @@ S::String S::String::FromFloat(Float value)
 	return newString;
 }
 
-S::String S::String::ToLower()
+S::String S::String::ToLower() const
 {
 	String	 retVal;
 
-	mutex->Lock();
+	LockBuffers();
 
 	for (Int i = 0; i < Length(); i++) retVal[i] = towlower((*this)[i]);
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return retVal;
 }
 
-S::String S::String::ToUpper()
+S::String S::String::ToUpper() const
 {
 	String	 retVal;
 
-	mutex->Lock();
+	LockBuffers();
 
 	for (Int i = 0; i < Length(); i++) retVal[i] = towupper((*this)[i]);
 
-	mutex->Release();
+	UnlockBuffers();
 
 	return retVal;
 }
 
 S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncoding, char *outBuffer, Int outBytes, const char *outEncoding)
 {
-	Bool	 delBuffer = False;
 	Int	 size = 0;
 
 	if (outBuffer == NIL)
 	{
-		delBuffer	= True;
-		outBytes	= inBytes * 8;
-		outBuffer	= new char [outBytes];
-	}
+		csBuffer.Resize(inBytes * 8);
+		csBuffer.Zero();
 
-	for (Int i = 0; i < outBytes; i++) outBuffer[i] = 0;
+		outBytes	= csBuffer.Size();
+		outBuffer	= csBuffer;
+	}
 
 	if (Setup::useIconv)
 	{
 		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
 
-		if ((int) cd == -1) return -1;
+		if ((Int) cd == -1) return -1;
 
-		InStream	*in	= new InStream(STREAM_BUFFER, (void *) inBuffer, inBytes);
-		OutStream	*out	= new OutStream(STREAM_BUFFER, (void *) outBuffer, outBytes);
+		size_t		 inBytesLeft	= inBytes;
+		size_t		 outBytesLeft	= outBytes;
+		const char     **inPointer	= &inBuffer;
+		char	       **outPointer	= &outBuffer;
 
-		iconv(cd, NULL, NULL, NULL, NULL);
-
-		char		 inBuf[4096 + 4096];
-		size_t		 inBufRest = 0;
-		char		 outBuf[4096];
-		Bool		 convError = False;
-
-		for (;;)
+		while (inBytesLeft)
 		{
-			size_t	 inBufSize = min(in->Size() - in->GetPos(), 4096);
-
-			in->InputData((void *) (inBuf + 4096), inBufSize);
-
-			if (inBufSize == 0)
-			{
-				if (inBufRest == 0)
-				{
-					break;
-				}
-				else
-				{
-					iconv_close(cd);
-
-					delete in;
-					delete out;
-
-					return 0;
-				}
-			}
-			else
-			{
-				const char	*inPtr	= inBuf + 4096 - inBufRest;
-				size_t		 inSize	= inBufRest + inBufSize;
-
-				inBufRest = 0;
-
-				while (inSize > 0)
-				{
-					char	*outPtr		= outBuf;
-					size_t	 outSize	= sizeof(outBuf);
-
-					if ((signed) iconv(cd, (const char **) &inPtr, &inSize, &outPtr, &outSize) < 0)
-					{
-						out->OutputData((void *) outBuf, outPtr - outBuf);
-						size += (outPtr - outBuf);
-
-						convError = True;
-
-						break;
-					}
-
-					if (outPtr != outBuf)
-					{
-						out->OutputData((void *) outBuf, outPtr - outBuf);
-						size += (outPtr - outBuf);
-					}
-				}
-
-				if (convError) break;
-			}
-		}
-
-		char	*outPtr		= outBuf;
-		size_t	 outSize	= sizeof(outBuf);
-
-		iconv(cd, NULL, NULL, &outPtr, &outSize);
-
-		if (outPtr != outBuf)
-		{
-			out->OutputData((void *) outBuf, outPtr - outBuf);
-			size += (outPtr - outBuf);
+			if (iconv(cd, inPointer, &inBytesLeft, outPointer, &outBytesLeft) == (size_t) -1) break;
 		}
 
 		iconv_close(cd);
 
-		if (size >= outBytes) size = 0;
-		if (convError) size = -size;
+		size = !outBytesLeft ? 0 : outBytes - outBytesLeft;
 
-		delete in;
-		delete out;
+		if (inBytesLeft) size *= -1;
 	}
 	else if ((strcmp(inEncoding, "UTF-16LE") == 0 && strcmp(outEncoding, "UTF-16BE") == 0) || (strcmp(inEncoding, "UTF-16BE") == 0 && strcmp(outEncoding, "UTF-16LE") == 0))
 	{
@@ -1315,7 +1335,9 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	{
 		Int	 codePage = CP_ACP;
 
-		if (strcmp(inEncoding, "ISO-8859-1") == 0)		codePage = 28591;
+		if (strcmp(inEncoding, "UTF-8") == 0)			codePage = CP_UTF8;
+		else if (strcmp(inEncoding, "UTF-7") == 0)		codePage = CP_UTF7;
+		else if (strcmp(inEncoding, "ISO-8859-1") == 0)		codePage = 28591;
 		else if (strcmp(inEncoding, "ISO-8859-2") == 0)		codePage = 28592;
 		else if (strcmp(inEncoding, "ISO-8859-3") == 0)		codePage = 28593;
 		else if (strcmp(inEncoding, "ISO-8859-4") == 0)		codePage = 28594;
@@ -1328,8 +1350,6 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		else if (strcmp(inEncoding, "KOI8-R") == 0)		codePage = 20866;
 		else if (strcmp(inEncoding, "KOI8-RU") == 0)		codePage = 21866;
 		else if (strcmp(inEncoding, "GBK") == 0)		codePage = 936;
-		else if (strcmp(inEncoding, "UTF-7") == 0)		codePage = CP_UTF7;
-		else if (strcmp(inEncoding, "UTF-8") == 0)		codePage = CP_UTF8;
 
 		size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * 2;
 
@@ -1344,7 +1364,9 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	{
 		Int	 codePage = CP_ACP;
 
-		if (strcmp(outEncoding, "ISO-8859-1") == 0)		codePage = 28591;
+		if (strcmp(outEncoding, "UTF-8") == 0)			codePage = CP_UTF8;
+		else if (strcmp(outEncoding, "UTF-7") == 0)		codePage = CP_UTF7;
+		else if (strcmp(outEncoding, "ISO-8859-1") == 0)	codePage = 28591;
 		else if (strcmp(outEncoding, "ISO-8859-2") == 0)	codePage = 28592;
 		else if (strcmp(outEncoding, "ISO-8859-3") == 0)	codePage = 28593;
 		else if (strcmp(outEncoding, "ISO-8859-4") == 0)	codePage = 28594;
@@ -1357,8 +1379,6 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		else if (strcmp(outEncoding, "KOI8-R") == 0)		codePage = 20866;
 		else if (strcmp(outEncoding, "KOI8-RU") == 0)		codePage = 21866;
 		else if (strcmp(outEncoding, "GBK") == 0)		codePage = 936;
-		else if (strcmp(outEncoding, "UTF-7") == 0)		codePage = CP_UTF7;
-		else if (strcmp(outEncoding, "UTF-8") == 0)		codePage = CP_UTF8;
 
 		size = WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
 
@@ -1370,8 +1390,6 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		if (size >= outBytes) size = 0;
 	}
 #endif
-
-	if (delBuffer) delete [] outBuffer;
 
 	return size;
 }

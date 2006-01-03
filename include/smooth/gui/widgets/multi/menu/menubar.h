@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,11 +16,9 @@ namespace smooth
 	namespace GUI
 	{
 		class Menubar;
-		class Surface;
 	};
 };
 
-#include "../../widget.h"
 #include "menu.h"
 
 namespace smooth
@@ -32,20 +30,15 @@ namespace smooth
 
 		class SMOOTHAPI Menubar : public Menu
 		{
-			private:
-				Int			 bitmapSize;
-			slots:
-				Void			 OnRegister();
 			public:
 				static const Int	 classID;
 
 							 Menubar();
-							~Menubar();
+				virtual			~Menubar();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
 
-				Int			 SetBitmapSize(Int);
+				MenuEntry		*AddEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0);
 		};
 	};
 };

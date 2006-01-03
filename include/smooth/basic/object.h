@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,8 +26,6 @@ namespace smooth
 	};
 };
 
-#include "../misc/string.h"
-#include "../array.h"
 #include "objecttype.h"
 
 namespace smooth
@@ -38,60 +36,60 @@ namespace smooth
 		friend class Pointer<class t>;
 		friend class PointerProxy<class t>;
 		private:
-			static Int		 nextClassID;
-			static Int		 nextObjectHandle;
+			static Int			 nextClassID;
+			static Int			 nextObjectHandle;
 
-			static Array<Object *>	 objects;
+			static Array<Object *, Void *>	 objects;
 
-			Int			 handle;
-			String			 name;
+			Int				 handle;
+			String				 name;
 
-			Bool			 deleteObject;
-			Int			 isObjectInUse;
+			Bool				 deleteObject;
+			Int				 isObjectInUse;
 
-			Int			 refCount;
-			Threads::Mutex		*objMutex;
+			Int				 refCount;
+			Threads::Mutex			*objMutex;
 		protected:
-			ObjectType		 type;
+			ObjectType			 type;
 
-			Int			 flags;
+			Int				 flags;
 
-			Int			 EnterProtectedRegion();
-			Int			 LeaveProtectedRegion();
+			Int				 EnterProtectedRegion();
+			Int				 LeaveProtectedRegion();
 		public:
-			static const Int	 classID;
+			static const Int		 classID;
 
-			static Int		 RequestClassID();
-			static Int		 RequestObjectHandle();
+			static Int			 RequestClassID();
+			static Int			 RequestObjectHandle();
 
-			static Int		 GetNOfObjects();
-			static Object		*GetNthObject(Int);
+			static Int			 GetNOfObjects();
+			static Object			*GetNthObject(Int);
 
-			static Object		*GetObject(Int, Int = Object::classID);
-			static Object		*GetObject(String);
+			static Object			*GetObject(Int, Int = Object::classID);
+			static Object			*GetObject(const String &);
 
-			static Int		 DeleteObject(Object *);
+			static Int			 DeleteObject(Object *);
 
-						 Object();
-			virtual			~Object();
+							 Object();
+			virtual				~Object();
 
-			Int			 GetHandle();
+			Int				 GetHandle();
 
-			Int			 SetName(String);
-			String			 GetName();
+			Int				 SetName(const String &);
+			const String			&GetName();
 
-			Int			 SetFlags(Int);
-			Int			 GetFlags();
+			Int				 SetFlags(Int);
+			Int				 GetFlags();
 
-			virtual String		 ToString();
+			virtual String			 ToString();
 
-			operator		 String();
+			operator			 String();
 
-			ObjectType		 GetObjectType();
-			virtual Bool		 IsTypeCompatible(Int);
+			const ObjectType		&GetObjectType();
+			virtual Bool			 IsTypeCompatible(Int);
 
-			Bool			 IsObjectInUse();
-			Bool			 IsObjectDeletable();
+			Bool				 IsObjectInUse();
+			Bool				 IsObjectDeletable();
 	};
 };
 

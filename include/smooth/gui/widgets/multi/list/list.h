@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,38 +19,38 @@ namespace smooth
 	};
 };
 
-#include "../../container.h"
 #include "listentry.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI List : public Container
+		class SMOOTHAPI List : public Widget
 		{
 			public:
-				static const Int	 classID;
+				static const Int		 classID;
 
-							 List();
-							~List();
+								 List();
+				virtual				~List();
 
-				ListEntry		*AddEntry(String);
-				Int			 RemoveEntry(ListEntry *);
+				ListEntry			*AddEntry(const String &);
+				Int				 RemoveEntry(ListEntry *);
 
-				Int			 Clear();
+				Int				 Clear();
 
-				Int			 GetNOfEntries();
-				ListEntry		*GetNthEntry(Int);
+				Int				 GetNOfEntries();
+				ListEntry			*GetNthEntry(Int);
 
-				Int			 SelectEntry(ListEntry *);
-				ListEntry		*GetSelectedEntry();
+				Int				 SelectEntry(ListEntry *);
+				ListEntry			*GetSelectedEntry();
 
-				Int			 SelectNthEntry(Int);
-				Int			 GetSelectedEntryNumber();
+				Int				 SelectNthEntry(Int);
+				Int				 GetSelectedEntryNumber();
 
-				Int			 SelectEntry(String);
+				Int				 SelectEntry(const String &);
 			signals:
-				Signal0<Void>		 internalOnSelectEntry;
+				Signal1<Void, ListEntry *>	 onSelectEntry;
+				Signal1<Void, ListEntry *>	 onMarkEntry;
 		};
 	};
 };

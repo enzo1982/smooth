@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,8 +21,20 @@ namespace smooth
 
 #include "../backend.h"
 
+extern HINSTANCE	 hDllInstance;
+
+#ifndef __SMOOTH_STATIC__
+extern "C"
+{
+	BOOL WINAPI DllMain(HINSTANCE, DWORD, LPVOID);
+}
+#endif
+
 namespace smooth
 {
+	Bool	 LoadIconvDLL();
+	Void	 FreeIconvDLL();
+
 	namespace Backends
 	{
 		const Int	 BACKEND_WIN32 = 2;

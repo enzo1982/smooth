@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,7 +13,7 @@
 #include <smooth/graphics/color.h>
 #include <smooth/pciio.h>
 #include <smooth/misc/math.h>
-#include <iolib/filters/filter_bzip2.h>
+#include <smooth/io/filters/filter_bzip2.h>
 
 using namespace smooth;
 using namespace smooth::GUI;
@@ -28,7 +28,7 @@ int	 bitssaanrle = 0;
 
 bool CompressPCI(PCIOut out, PCIIO &ior)
 {
-	IOLibFilterBZip2	*filter = NULL;
+	IO::FilterBZip2	*filter = NULL;
 
 	palentries = 0;
 	bits = 0;
@@ -42,9 +42,9 @@ bool CompressPCI(PCIOut out, PCIIO &ior)
 
 	if (ior.compression == BZIP2)
 	{
-		filter = new IOLibFilterBZip2();
+		filter = new IO::FilterBZip2();
 
-		out->SetFilter(filter);
+		out->AddFilter(filter);
 	}
 
 	for (int y = 0; y < ior.sizey; y++)
@@ -54,7 +54,7 @@ bool CompressPCI(PCIOut out, PCIIO &ior)
 
 	if (ior.compression == BZIP2)
 	{
-		out->RemoveFilter();
+		out->RemoveFilter(filter);
 
 		delete filter;
 	}
@@ -66,7 +66,7 @@ bool CompressPCI(PCIOut out, PCIIO &ior)
 
 bool DecompressPCI(PCIIn in, PCIIO &ior)
 {
-	IOLibFilterBZip2	*filter = NULL;
+	IO::FilterBZip2	*filter = NULL;
 
 	palentries = 0;
 	bits = 0;
@@ -80,9 +80,9 @@ bool DecompressPCI(PCIIn in, PCIIO &ior)
 
 	if (ior.compression == BZIP2)
 	{
-		filter = new IOLibFilterBZip2();
+		filter = new IO::FilterBZip2();
 
-		in->SetFilter(filter);
+		in->AddFilter(filter);
 	}
 
 	for (int y = 0; y < ior.sizey; y++)
@@ -92,7 +92,7 @@ bool DecompressPCI(PCIIn in, PCIIO &ior)
 
 	if (ior.compression == BZIP2)
 	{
-		in->RemoveFilter();
+		in->RemoveFilter(filter);
 
 		delete filter;
 	}

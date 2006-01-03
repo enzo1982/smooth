@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,20 +28,18 @@ namespace smooth
 		class SMOOTHAPI DropArea : public Widget
 		{
 			private:
-				Void				 Init();
+				Bool				 initialized;
 			public:
 				static const Int		 classID;
 
-								 DropArea(Point, Size);
-								~DropArea();
+								 DropArea(const Point &, const Size &);
+				virtual				~DropArea();
 
 				virtual Int			 Hide();
 
 				virtual Int			 Process(Int, Int, Int);
 			signals:
 				Signal1<Void, const String &>	 onDropFile;
-			slots:
-				Void				 OnRegister(Container *);
 		};
 	};
 };

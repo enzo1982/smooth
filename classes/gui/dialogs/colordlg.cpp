@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,7 @@
 #include <smooth/gui/dialogs/colordlg.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/misc/i18n.h>
+#include <smooth/i18n/i18n.h>
 #include <smooth/graphics/color.h>
 #include <smooth/gui/widgets/basic/button.h>
 #include <smooth/definitions.h>
@@ -69,19 +69,19 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	bs.cx = 0;
 	bs.cy = 0;
 
-	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Color selection"));
+	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Color selection"), Point(100, 100), Size(436, 286));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
 
 	okbtn		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bp, bs);
-	okbtn->onClick.Connect(&ColorSelection::ColorDlgOK, this);
+	okbtn->onAction.Connect(&ColorSelection::ColorDlgOK, this);
 	okbtn->SetOrientation(OR_LOWERRIGHT);
 
 	bp.x = 175;
 
 	cancelbtn	= new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bp, bs);
-	cancelbtn->onClick.Connect(&ColorSelection::ColorDlgCancel, this);
+	cancelbtn->onAction.Connect(&ColorSelection::ColorDlgCancel, this);
 	cancelbtn->SetOrientation(OR_LOWERRIGHT);
 
 	bp.x = 174;
@@ -90,37 +90,37 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	bs.cy = 0;
 
 	hueslider	= new Slider(bp, bs, OR_HORZ, &acthue, 0, 255);
-	hueslider->onClick.Connect(&ColorSelection::ColorDlgHueSlider, this);
+	hueslider->onValueChange.Connect(&ColorSelection::ColorDlgHueSlider, this);
 	hueslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	satslider	= new Slider(bp, bs, OR_HORZ, &actsat, 0, 255);
-	satslider->onClick.Connect(&ColorSelection::ColorDlgSatSlider, this);
+	satslider->onValueChange.Connect(&ColorSelection::ColorDlgSatSlider, this);
 	satslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	valslider	= new Slider(bp, bs, OR_HORZ, &actval, 0, 255);
-	valslider->onClick.Connect(&ColorSelection::ColorDlgValSlider, this);
+	valslider->onValueChange.Connect(&ColorSelection::ColorDlgValSlider, this);
 	valslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	redslider	= new Slider(bp, bs, OR_HORZ, &actred, 0, 255);
-	redslider->onClick.Connect(&ColorSelection::ColorDlgRedSlider, this);
+	redslider->onValueChange.Connect(&ColorSelection::ColorDlgRedSlider, this);
 	redslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	greenslider	= new Slider(bp, bs, OR_HORZ, &actgreen, 0, 255);
-	greenslider->onClick.Connect(&ColorSelection::ColorDlgGreenSlider, this);
+	greenslider->onValueChange.Connect(&ColorSelection::ColorDlgGreenSlider, this);
 	greenslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	blueslider	= new Slider(bp, bs, OR_HORZ, &actblue, 0, 255);
-	blueslider->onClick.Connect(&ColorSelection::ColorDlgBlueSlider, this);
+	blueslider->onValueChange.Connect(&ColorSelection::ColorDlgBlueSlider, this);
 	blueslider->SetOrientation(OR_UPPERRIGHT);
 
 	bp.x = 189;
@@ -172,42 +172,42 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	bs.cy = 0;
 
 	hueedit		= new EditBox(String::FromInt(acthue), bp, bs, 3);
-	hueedit->onClick.Connect(&ColorSelection::ColorDlgHueEdit, this);
+	hueedit->onInput.Connect(&ColorSelection::ColorDlgHueEdit, this);
 	hueedit->SetFlags(EDB_NUMERIC);
 	hueedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	satedit		= new EditBox(String::FromInt(actsat), bp, bs, 3);
-	satedit->onClick.Connect(&ColorSelection::ColorDlgSatEdit, this);
+	satedit->onInput.Connect(&ColorSelection::ColorDlgSatEdit, this);
 	satedit->SetFlags(EDB_NUMERIC);
 	satedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	valedit		= new EditBox(String::FromInt(actval), bp, bs, 3);
-	valedit->onClick.Connect(&ColorSelection::ColorDlgValEdit, this);
+	valedit->onInput.Connect(&ColorSelection::ColorDlgValEdit, this);
 	valedit->SetFlags(EDB_NUMERIC);
 	valedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	rededit		= new EditBox(String::FromInt(actred), bp, bs, 3);
-	rededit->onClick.Connect(&ColorSelection::ColorDlgRedEdit, this);
+	rededit->onInput.Connect(&ColorSelection::ColorDlgRedEdit, this);
 	rededit->SetFlags(EDB_NUMERIC);
 	rededit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	greenedit	= new EditBox(String::FromInt(actgreen), bp, bs, 3);
-	greenedit->onClick.Connect(&ColorSelection::ColorDlgGreenEdit, this);
+	greenedit->onInput.Connect(&ColorSelection::ColorDlgGreenEdit, this);
 	greenedit->SetFlags(EDB_NUMERIC);
 	greenedit->SetOrientation(OR_UPPERRIGHT);
 
 	bp.y += 26;
 
 	blueedit	= new EditBox(String::FromInt(actblue), bp, bs, 3);
-	blueedit->onClick.Connect(&ColorSelection::ColorDlgBlueEdit, this);
+	blueedit->onInput.Connect(&ColorSelection::ColorDlgBlueEdit, this);
 	blueedit->SetFlags(EDB_NUMERIC);
 	blueedit->SetOrientation(OR_UPPERRIGHT);
 
@@ -216,7 +216,7 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	bs.cx += 40;
 
 	hexedit		= new EditBox(hexval, bp, bs, 7);
-	hexedit->onClick.Connect(&ColorSelection::ColorDlgHexEdit, this);
+	hexedit->onInput.Connect(&ColorSelection::ColorDlgHexEdit, this);
 	hexedit->SetOrientation(OR_UPPERRIGHT);
 
 	huecapt = false;
@@ -253,13 +253,8 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	dlgwnd->RegisterObject(titlebar);
 	dlgwnd->RegisterObject(divbar);
 
-	dlgwnd->value = 0;
-
-	dlgwnd->SetMetrics(Point(100, 100), Size(436, 286));
-
 	dlgwnd->onPaint.Connect(&ColorSelection::ColorDlgPaintProc, this);
 	dlgwnd->onEvent.Connect(&ColorSelection::ColorDlgMessageProc, this);
-	dlgwnd->doQuit.Connect(&ColorSelection::ColorDlgKillProc, this);
 }
 
 S::GUI::Dialogs::ColorSelection::~ColorSelection()
@@ -291,18 +286,18 @@ S::GUI::Dialogs::ColorSelection::~ColorSelection()
 	DeleteObject(hexedit);
 }
 
-S::Int S::GUI::Dialogs::ColorSelection::ShowDialog()
+const Error &S::GUI::Dialogs::ColorSelection::ShowDialog()
 {
-	if (parentWindow != NIL)	dlgwnd->SetMetrics(Point(parentWindow->pos.x + 25, parentWindow->pos.y + 25), Size(436, 286));
+	if (parentWindow != NIL)	dlgwnd->SetMetrics(parentWindow->GetPosition() + Point(25, 25), Size(436, 286));
 	if (caption != NIL)		dlgwnd->SetText(caption);
 
 	dlgwnd->Show();
 
 	ColorDlgUpdatePickers();
 
-	color = dlgwnd->Stay();
+	dlgwnd->Stay();
 
-	return color;
+	return error;
 }
 
 S::Int S::GUI::Dialogs::ColorSelection::GetColor()
@@ -331,14 +326,7 @@ S::Int S::GUI::Dialogs::ColorSelection::SetColor(Int newColor)
 	blueedit->SetText(String::FromInt(actblue));
 	hexedit->SetText(hexval);
 
-	return Success;
-}
-
-S::Bool S::GUI::Dialogs::ColorSelection::ColorDlgKillProc()
-{
-	if (dlgwnd->value == 0) dlgwnd->value = color;
-
-	return True;
+	return Success();
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
@@ -714,13 +702,13 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgOK()
 {
-	dlgwnd->value = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA);
+	color = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA);
+
 	dlgwnd->Close();
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgCancel()
 {
-	dlgwnd->value = color;
 	dlgwnd->Close();
 }
 

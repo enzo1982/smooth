@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,18 +10,18 @@
 
 #include <smooth/backends/backend.h>
 
-S::Array<S::Backends::Backend *>	*S::Backends::Backend::backends = NIL;
-S::Array<S::Backends::Backend *(*)()>	*S::Backends::Backend::backend_creators = NIL;
+S::Array<S::Backends::Backend *, S::Void *>		*S::Backends::Backend::backends = NIL;
+S::Array<S::Backends::Backend *(*)(), S::Void *>	*S::Backends::Backend::backend_creators = NIL;
 
 S::Int S::Backends::Backend::AddBackend(Backend *(*backend)())
 {
-	if (backend == NIL) return Failure;
+	if (backend == NIL) return Error();
 
-	if (backend_creators == NIL) backend_creators = new Array<Backend *(*)()>;
+	if (backend_creators == NIL) backend_creators = new Array<Backend *(*)(), Void *>;
 
 	backend_creators->AddEntry(backend);
 
-	return Success;
+	return Success();
 }
 
 S::Int S::Backends::Backend::GetNOfBackends()
@@ -36,8 +36,8 @@ S::Backends::Backend *S::Backends::Backend::GetNthBackend(Int n)
 
 S::Int S::Backends::Backend::InitBackends()
 {
-	if (backends == NIL)		backends = new Array<Backend *>;
-	if (backend_creators == NIL)	backend_creators = new Array<Backend *(*)()>;
+	if (backends == NIL)		backends = new Array<Backend *, Void *>;
+	if (backend_creators == NIL)	backend_creators = new Array<Backend *(*)(), Void *>;
 
 	for (Int i = 0; i < backend_creators->GetNOfEntries(); i++)
 	{
@@ -49,7 +49,7 @@ S::Int S::Backends::Backend::InitBackends()
 		backends->GetNthEntry(j)->Init();
 	}
 
-	return Success;
+	return Success();
 }
 
 S::Int S::Backends::Backend::DeinitBackends()
@@ -66,7 +66,7 @@ S::Int S::Backends::Backend::DeinitBackends()
 	delete backends;
 	delete backend_creators;
 
-	return Success;
+	return Success();
 }
 
 S::Backends::Backend::Backend()
@@ -80,12 +80,12 @@ S::Backends::Backend::~Backend()
 
 S::Int S::Backends::Backend::Init()
 {
-	return Success;
+	return Success();
 }
 
 S::Int S::Backends::Backend::Deinit()
 {
-	return Success;
+	return Success();
 }
 
 S::Int S::Backends::Backend::GetBackendType()

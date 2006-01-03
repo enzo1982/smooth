@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,7 +20,7 @@ S::Configuration::Configuration()
 	activeConfig = "default";
 }
 
-S::Configuration::Configuration(String file, Bool create)
+S::Configuration::Configuration(const String &file, Bool create)
 {
 	ownRoot = NIL;
 
@@ -36,21 +36,21 @@ S::Configuration::~Configuration()
 	if (configFile != NIL) Close();
 }
 
-S::Int S::Configuration::Open(String file, Bool create)
+S::Int S::Configuration::Open(const String &file, Bool create)
 {
 	if (configFile != NIL) Close();
 
 	configFile = new XML::Document();
 
-	if (configFile->LoadFile(file) == Success)
+	if (configFile->LoadFile(file) == Success())
 	{
 		fileName = file;
 	}
-	else if (configFile->LoadFile(GUI::Application::GetStartupDirectory().Append(file)) == Success)
+	else if (configFile->LoadFile(GUI::Application::GetStartupDirectory().Append(file)) == Success())
 	{
 		fileName = GUI::Application::GetStartupDirectory().Append(file);
 	}
-	else if (configFile->LoadFile(GUI::Application::GetApplicationDirectory().Append(file)) == Success)
+	else if (configFile->LoadFile(GUI::Application::GetApplicationDirectory().Append(file)) == Success())
 	{
 		fileName = GUI::Application::GetApplicationDirectory().Append(file);
 	}
@@ -60,13 +60,11 @@ S::Int S::Configuration::Open(String file, Bool create)
 		{
 			Close();
 
-			return Failure;
+			return Error();
 		}
 		else
 		{
-			ownRoot = new XML::Node();
-
-			ownRoot->SetName("ConfigFile");
+			ownRoot = new XML::Node("ConfigFile");
 
 			configFile->SetRootNode(ownRoot);
 
@@ -80,16 +78,16 @@ S::Int S::Configuration::Open(String file, Bool create)
 	{
 		Close();
 
-		return Failure;
+		return Error();
 	}
 	else if (configFile->GetRootNode()->GetNodeByName("configuration") == NIL)
 	{
 		Close();
 
-		return Failure;
+		return Error();
 	}
 
-	return Success;
+	return Success();
 }
 
 S::Int S::Configuration::Close()
@@ -118,12 +116,12 @@ S::Int S::Configuration::Close()
 		ownRoot = NIL;
 	}
 
-	return Success;
+	return Success();
 }
 
-S::Int S::Configuration::SetActiveConfiguration(String nConfig)
+S::Int S::Configuration::SetActiveConfiguration(const String &nConfig)
 {
-	if (configFile == NIL) return Failure;
+	if (configFile == NIL) return Error();
 
 	XML::Node	*configuration = FindConfigurationNode(nConfig);
 
@@ -134,38 +132,38 @@ S::Int S::Configuration::SetActiveConfiguration(String nConfig)
 
 	activeConfig = nConfig;
 
-	return Success;
+	return Success();
 }
 
-S::Int S::Configuration::SetConfigurationName(String nName)
+S::Int S::Configuration::SetConfigurationName(const String &nName)
 {
-	if (configFile == NIL) return Failure;
+	if (configFile == NIL) return Error();
 
 	XML::Node	*configuration = FindConfigurationNode(activeConfig);
 
-	if (configuration == NIL) return Failure;
+	if (configuration == NIL) return Error();
 
 	activeConfig = nName;
 
 	configuration->SetAttribute("name", nName);
 
-	return Success;
+	return Success();
 }
 
-S::Int S::Configuration::SetParentConfiguration(String nParent)
+S::Int S::Configuration::SetParentConfiguration(const String &nParent)
 {
-	if (configFile == NIL) return Failure;
+	if (configFile == NIL) return Error();
 
 	XML::Node	*configuration = FindConfigurationNode(activeConfig);
 
-	if (configuration == NIL) return Failure;
+	if (configuration == NIL) return Error();
 
 	configuration->SetAttribute("inheriting", nParent);
 
-	return Success;
+	return Success();
 }
 
-S::Int S::Configuration::GetIntValue(String section, String name, Int defValue)
+S::Int S::Configuration::GetIntValue(const String &section, const String &name, Int defValue)
 {
 	if (configFile == NIL) return defValue;
 
@@ -196,9 +194,9 @@ S::Int S::Configuration::GetIntValue(String section, String name, Int defValue)
 	}
 }
 
-S::Int S::Configuration::SetIntValue(String section, String name, Int newValue)
+S::Int S::Configuration::SetIntValue(const String &section, const String &name, Int newValue)
 {
-	if (configFile == NIL) return Failure;
+	if (configFile == NIL) return Error();
 
 	XML::Node	*value = FindValueNode(section, name);
 
@@ -220,10 +218,10 @@ S::Int S::Configuration::SetIntValue(String section, String name, Int newValue)
 		value->SetAttribute("name", name);
 	}
 
-	return Success;
+	return Success();
 }
 
-S::String S::Configuration::GetStringValue(String section, String name, String defValue)
+S::String S::Configuration::GetStringValue(const String &section, const String &name, const String &defValue)
 {
 	if (configFile == NIL) return defValue;
 
@@ -254,9 +252,9 @@ S::String S::Configuration::GetStringValue(String section, String name, String d
 	}
 }
 
-S::Int S::Configuration::SetStringValue(String section, String name, String newValue)
+S::Int S::Configuration::SetStringValue(const String &section, const String &name, const String &newValue)
 {
-	if (configFile == NIL) return Failure;
+	if (configFile == NIL) return Error();
 
 	XML::Node	*value = FindValueNode(section, name);
 
@@ -278,10 +276,10 @@ S::Int S::Configuration::SetStringValue(String section, String name, String newV
 		value->SetAttribute("name", name);
 	}
 
-	return Success;
+	return Success();
 }
 
-S::XML::Node *S::Configuration::FindConfigurationNode(String configuration)
+S::XML::Node *S::Configuration::FindConfigurationNode(const String &configuration)
 {
 	XML::Node	*root = configFile->GetRootNode();
 
@@ -304,7 +302,7 @@ S::XML::Node *S::Configuration::FindConfigurationNode(String configuration)
 	return NIL;
 }
 
-S::XML::Node *S::Configuration::FindSectionNode(String section)
+S::XML::Node *S::Configuration::FindSectionNode(const String &section)
 {
 	XML::Node	*configuration = FindConfigurationNode(activeConfig);
 
@@ -324,7 +322,7 @@ S::XML::Node *S::Configuration::FindSectionNode(String section)
 	return NIL;
 }
 
-S::XML::Node *S::Configuration::FindValueNode(String sect, String name)
+S::XML::Node *S::Configuration::FindValueNode(const String &sect, const String &name)
 {
 	XML::Node	*section = FindSectionNode(sect);
 

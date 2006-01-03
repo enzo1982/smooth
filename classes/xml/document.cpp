@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,146 +32,138 @@ S::Int S::XML::Document::SetRootNode(Node *newRootNode)
 	rootNode = newRootNode;
 	ownRoot = False;
 
-	return Success;
+	return Success();
 }
 
-S::Int S::XML::Document::SetEncoding(String newEncoding)
+S::Int S::XML::Document::SetEncoding(const String &newEncoding)
 {
 	encoding = newEncoding;
 
-	return Success;
+	return Success();
 }
 
-S::Int S::XML::Document::LoadFile(String fileName)
+S::Int S::XML::Document::LoadFile(const String &fileName)
 {
-	xmlKeepBlanksDefault(False);
+	xmlTextReaderPtr reader = xmlNewTextReaderFilename(fileName);
 
-	xmlDocPtr doc = xmlParseFile(fileName);
+	if (reader == NIL) { return Error(); }
 
-	if (doc != NIL)
+	Int	 ret = 1;
+
+	while ((ret = xmlTextReaderRead(reader)) == 1)
 	{
-		xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
-		Node		*root = new Node();
-		char		*inputFormat = String::SetInputFormat("UTF-8");
-
-		root->SetName((char *) xmlRoot->name);
-		root->SetContent((char *) xmlRoot->content);
-
-		rootNode = root;
-		ownRoot = True;
-
-		LoadNode(xmlRoot, rootNode);
-
-		String::SetInputFormat(inputFormat);
-
-		xmlFreeDoc(doc);
-
-		return Success;
-	}
-	else
-	{
-		return Failure;
-	}			
-}
-
-S::Int S::XML::Document::ParseMemory(Void *buffer, Int size)
-{
-	xmlKeepBlanksDefault(False);
-
-	xmlDocPtr doc = xmlParseMemory((char *) buffer, size);
-
-	if (doc != NIL)
-	{
-		xmlNodePtr	 xmlRoot = xmlDocGetRootElement(doc);
-		Node		*root = new Node();
-		char		*inputFormat = String::SetInputFormat("UTF-8");
-
-		root->SetName((char *) xmlRoot->name);
-		root->SetContent((char *) xmlRoot->content);
-
-		rootNode = root;
-		ownRoot = True;
-
-		LoadNode(xmlRoot, rootNode);
-
-		String::SetInputFormat(inputFormat);
-
-		xmlFreeDoc(doc);
-
-		return Success;
-	}
-	else
-	{
-		return Failure;
-	}			
-}
-
-S::Int S::XML::Document::LoadNode(xmlNodePtr node, Node *smoothNode)
-{
-	if (node->properties != NIL)
-	{
-		xmlAttr		*xmlAttribute = node->properties;
-
-		do
+		if (xmlTextReaderNodeType(reader) == XML_ELEMENT_NODE)
 		{
-			smoothNode->SetAttribute((char *) xmlAttribute->name, (char *) xmlAttribute->children->content);
+			char	*inputFormat = String::SetInputFormat("UTF-8");
 
-			xmlAttribute = xmlAttribute->next;
+			rootNode = new Node(NIL);
+			ownRoot = True;
+
+			LoadNode(reader, rootNode);
+
+			String::SetInputFormat(inputFormat);
+
+			break;
 		}
-		while (xmlAttribute != NIL);
 	}
 
-	if (node->children != NIL)
-	{
-		xmlNodePtr	 xmlNode = node->children;
+	xmlFreeTextReader(reader);
 
-		do
+	if (ret >= 0)	return Success();
+	else		return Error();
+}
+
+S::Int S::XML::Document::ParseMemory(const Void *memory, Int size)
+{
+	xmlParserInputBufferPtr	 buffer = xmlParserInputBufferCreateMem((char *) memory, size, XML_CHAR_ENCODING_NONE);
+
+	if (buffer == NIL) { return Error(); }
+
+	xmlTextReaderPtr	 reader = xmlNewTextReader(buffer, NIL);
+
+	if (reader == NIL) { xmlFreeParserInputBuffer(buffer); return Error(); }
+
+	Int	 ret = 1;
+
+	while ((ret = xmlTextReaderRead(reader)) == 1)
+	{
+		if (xmlTextReaderNodeType(reader) == XML_ELEMENT_NODE)
 		{
-			if (xmlNode->type == XML_TEXT_NODE)	smoothNode->SetContent((char *) xmlNode->content);
-			else					LoadNode(xmlNode, smoothNode->AddNode((char *) xmlNode->name, (char *) xmlNode->content));
+			char	*inputFormat = String::SetInputFormat("UTF-8");
 
-			xmlNode = xmlNode->next;
+			rootNode = new Node(NIL);
+			ownRoot = True;
+
+			LoadNode(reader, rootNode);
+
+			String::SetInputFormat(inputFormat);
+
+			break;
 		}
-		while (xmlNode != NIL);
 	}
 
-	return Success;
+	xmlFreeTextReader(reader);
+	xmlFreeParserInputBuffer(buffer);
+
+	if (ret >= 0)	return Success();
+	else		return Error();
 }
 
-S::Int S::XML::Document::SaveFile(String fileName)
+S::Int S::XML::Document::LoadNode(xmlTextReaderPtr reader, Node *node)
 {
-	xmlDocPtr	 doc = xmlNewDoc((xmlChar *) "1.0");
+	node->SetName((const char *) xmlTextReaderConstName(reader));
 
-	if (rootNode != NIL)
+	if (xmlTextReaderHasAttributes(reader))
 	{
-		doc->children = xmlNewDocNode(doc, NIL, (xmlChar *) rootNode->GetName().ConvertTo("UTF-8"), (xmlChar *) rootNode->GetContent().ConvertTo("UTF-8"));
+		while (xmlTextReaderMoveToNextAttribute(reader)) node->SetAttribute((const char *) xmlTextReaderConstName(reader), (const char *) xmlTextReaderConstValue(reader));
 
-		SaveNode(rootNode, doc->children);
+		xmlTextReaderMoveToElement(reader);
 	}
 
-	xmlSaveFormatFileEnc(fileName, doc, encoding, True);
+	if (!xmlTextReaderIsEmptyElement(reader))
+	{
+		Int	 nodeType = xmlTextReaderNodeType(reader);
 
-	xmlFreeDoc(doc);
+		xmlTextReaderRead(reader);
 
-	return Success;
+		while ((nodeType = xmlTextReaderNodeType(reader)) != XML_ELEMENT_DECL)
+		{
+			if (nodeType == XML_ELEMENT_NODE)	LoadNode(reader, node->AddNode(NIL));
+			else if (nodeType == XML_TEXT_NODE)	node->SetContent((const char *) xmlTextReaderConstValue(reader));
+
+			xmlTextReaderRead(reader);
+		}
+	}
+
+	return Success();
 }
 
-S::Int S::XML::Document::SaveNode(Node *node, xmlNodePtr parent)
+S::Int S::XML::Document::SaveFile(const String &fileName)
 {
-	for (Int i = 0; i < node->GetNOfAttributes(); i++)
-	{
-		Attribute	*attribute = node->GetNthAttribute(i);
+	xmlTextWriterPtr	 writer = xmlNewTextWriterFilename(fileName, 0);
 
-		xmlSetProp(parent, (xmlChar *) attribute->GetName().ConvertTo("UTF-8"), (xmlChar *) attribute->GetContent().ConvertTo("UTF-8"));
-	}
+	xmlTextWriterSetIndent(writer, 1);
+	xmlTextWriterStartDocument(writer, "1.0", encoding, NIL);
 
-	for (Int j = 0; j < node->GetNOfNodes(); j++)
-	{
-		Node		*subNode = node->GetNthNode(j);
-		xmlNodePtr	 xmlNode = xmlNewChild(parent, NIL, (xmlChar *) subNode->GetName().ConvertTo("UTF-8"), (xmlChar *) subNode->GetContent().ConvertTo("UTF-8"));
+	if (rootNode != NIL) SaveNode(writer, rootNode);
 
-		SaveNode(subNode, xmlNode);
-	}
+	xmlTextWriterEndDocument(writer);
+	xmlFreeTextWriter(writer);
 
-	return Success;
+	return Success();
+}
+
+S::Int S::XML::Document::SaveNode(xmlTextWriterPtr writer, Node *node)
+{
+	xmlTextWriterStartElement(writer, (xmlChar *) node->GetName().ConvertTo("UTF-8"));
+
+	for (Int i = 0; i < node->GetNOfAttributes(); i++) xmlTextWriterWriteAttribute(writer, (xmlChar *) node->GetNthAttribute(i)->GetName().ConvertTo("UTF-8"), (xmlChar *) node->GetNthAttribute(i)->GetContent().ConvertTo("UTF-8"));
+
+	xmlTextWriterWriteString(writer, (xmlChar *) node->GetContent().ConvertTo("UTF-8"));
+
+	for (Int j = 0; j < node->GetNOfNodes(); j++) SaveNode(writer, node->GetNthNode(j));
+
+	xmlTextWriterEndElement(writer);
+
+	return Success();
 }

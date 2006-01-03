@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,7 +26,7 @@ namespace smooth
 };
 
 #include "../definitions.h"
-#include "rect.h"
+#include "forms/rect.h"
 #include "../misc/string.h"
 #include "font.h"
 #include "bitmap.h"
@@ -42,16 +42,16 @@ namespace smooth
 				Threads::Mutex	*mutex;
 			public:
 						 Surface(Void * = NIL);
-						~Surface();
+				virtual		~Surface();
 
 				Int		 GetSurfaceType();
 
-				Int		 SetSize(Size);
-				const Size	 GetSize();
+				Int		 SetSize(const Size &);
+				const Size	&GetSize();
 
-				Int		 PaintRect(Rect);
+				Int		 PaintRect(const Rect &);
 
-				Int		 StartPaint(Rect);
+				Int		 StartPaint(const Rect &);
 				Int		 EndPaint();
 
 				Void		*GetSystemSurface();
@@ -59,17 +59,17 @@ namespace smooth
 				Int		 SetPixel(Int, Int, Int);
 				Int		 GetPixel(Int, Int);
 
-				Int		 Line(Point, Point, Int);
-				Int		 Frame(Rect, Int);
-				Int		 Box(Rect, Int, Int);
+				Int		 Line(const Point &, const Point &, Int);
+				Int		 Frame(const Rect &, Int);
+				Int		 Box(const Rect &, Int, Int);
 
-				Int		 SetText(String, Rect, Font, Bool = False);
+				Int		 SetText(const String &, const Rect &, const Font &, Bool = False);
 
-				Int		 Gradient(Rect, Int, Int, Int);
-				Int		 Bar(Point, Point, Int);
+				Int		 Gradient(const Rect &, Int, Int, Int);
+				Int		 Bar(const Point &, const Point &, Int);
 
-				Int		 BlitFromBitmap(const Bitmap &, Rect, Rect);
-				Int		 BlitToBitmap(Rect, const Bitmap &, Rect);
+				Int		 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
+				Int		 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
 		};
 
 		const Int	 FRAME_UP	= 0;

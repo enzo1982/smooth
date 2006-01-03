@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,6 +16,7 @@ namespace smooth
 	namespace GUI
 	{
 		class ActiveArea;
+		class Hotspot;
 	};
 };
 
@@ -30,16 +31,20 @@ namespace smooth
 		{
 			protected:
 				Color			 areaColor;
+
+				Hotspot			*hotspot;
 			public:
 				static const Int	 classID;
 
 							 ActiveArea(const Color &, const Point &, const Size &);
-							~ActiveArea();
+				virtual			~ActiveArea();
 
 				virtual Int		 Paint(Int);
-
+			accessors:
 				Int			 SetColor(const Color &);
 				Color			 GetColor();
+			slots:
+				Void			 OnChangeSize(const Size &);
 		};
 	};
 };

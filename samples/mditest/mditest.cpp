@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,16 +27,16 @@ Int smooth::Main()
 
 MDITest::MDITest()
 {
-	mainWnd			= new Window("MDITest");
+	mainWnd			= new Window("MDITest", Point(50, 50), Size(700, 500));
 	mainWnd_titlebar	= new Titlebar();
 	mainWnd_statusbar	= new Statusbar("Ready");
 	mainWnd_client		= new MDI::Client();
 	mainWnd_menubar		= new Menubar();
-	menu_file		= new Menu();
+	menu_file		= new PopupMenu();
 
-	menu_file->AddEntry("New")->onClick.Connect(&MDITest::NewMDI, this);
+	menu_file->AddEntry("New")->onAction.Connect(&MDITest::NewMDI, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("Exit")->onClick.Connect(&MDITest::Close, this);
+	menu_file->AddEntry("Exit")->onAction.Connect(&MDITest::Close, this);
 
 	mainWnd_menubar->AddEntry("File", NIL, menu_file);
 
@@ -47,8 +47,7 @@ MDITest::MDITest()
 	mainWnd->RegisterObject(mainWnd_client);
 	mainWnd->RegisterObject(mainWnd_menubar);
 
-	mainWnd->SetMetrics(Point(50, 50), Size(700, 500));
-	mainWnd->SetIcon(SI_DEFAULT);
+	mainWnd->SetIcon(NIL);
 	mainWnd->doQuit.Connect(&MDITest::ExitProc, this);
 }
 

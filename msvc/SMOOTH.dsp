@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 fribidi.lib IOLib.lib libbz2.lib lisa.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Build"
+# ADD LINK32 fribidi.lib libbz2.lib lisa.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Build"
 # SUBTRACT LINK32 /verbose /pdb:none /incremental:no /map
 
 !ENDIF 
@@ -91,26 +91,6 @@ LINK32=link.exe
 # Begin Group "Quellcodedateien"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
-# Begin Group "misc"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\misc\codecs.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\misc\dllmain.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\misc\loop.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\misc\pciio.cpp
-# End Source File
-# End Group
 # Begin Group "classes"
 
 # PROP Default_Filter "*.cpp"
@@ -187,55 +167,99 @@ SOURCE=..\classes\backends\backend.cpp
 # Begin Group "graphics"
 
 # PROP Default_Filter ""
-# Begin Group "graphicsxlib"
+# Begin Group "graphicsbackends"
 
 # PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\classes\graphics\xlib\bitmapxlib.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\xlib\surfacexlib.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# End Group
 # Begin Group "graphicsgdi"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\graphics\gdi\bitmapgdi.cpp
+SOURCE=..\classes\graphics\backends\gdi\bitmapgdi.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\graphics\gdi\surfacegdi.cpp
+SOURCE=..\classes\graphics\backends\gdi\surfacegdi.cpp
+# End Source File
+# End Group
+# Begin Group "graphicsxlib"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\graphics\backends\xlib\bitmapxlib.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\backends\xlib\surfacexlib.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\classes\graphics\backends\bitmapbackend.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\backends\surfacebackend.cpp
+# End Source File
+# End Group
+# Begin Group "forms"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\graphics\forms\form.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\forms\line.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\forms\point.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\forms\rect.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\forms\size.cpp
+# End Source File
+# End Group
+# Begin Group "imageloader"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\graphics\imageloader\imageloader.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\graphics\imageloader\pci.cpp
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\graphics\bitmap.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\bitmapbackend.cpp
 # End Source File
 # Begin Source File
 
@@ -247,31 +271,7 @@ SOURCE=..\classes\graphics\font.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\graphics\form.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\line.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\point.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\rect.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\size.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\classes\graphics\surface.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\graphics\surfacebackend.cpp
 # End Source File
 # End Group
 # Begin Group "files"
@@ -421,12 +421,15 @@ SOURCE=..\classes\xml\node.cpp
 # Begin Group "threads"
 
 # PROP Default_Filter ""
+# Begin Group "threadsbackends"
+
+# PROP Default_Filter ""
 # Begin Group "threadsposix"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\threads\posix\mutexposix.cpp
+SOURCE=..\classes\threads\backends\posix\mutexposix.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -439,7 +442,7 @@ SOURCE=..\classes\threads\posix\mutexposix.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\threads\posix\semaphoreposix.cpp
+SOURCE=..\classes\threads\backends\posix\semaphoreposix.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -452,7 +455,7 @@ SOURCE=..\classes\threads\posix\semaphoreposix.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\threads\posix\threadposix.cpp
+SOURCE=..\classes\threads\backends\posix\threadposix.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -469,7 +472,7 @@ SOURCE=..\classes\threads\posix\threadposix.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\threads\sdl\mutexsdl.cpp
+SOURCE=..\classes\threads\backends\sdl\mutexsdl.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -482,7 +485,7 @@ SOURCE=..\classes\threads\sdl\mutexsdl.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\threads\sdl\semaphoresdl.cpp
+SOURCE=..\classes\threads\backends\sdl\semaphoresdl.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -495,7 +498,7 @@ SOURCE=..\classes\threads\sdl\semaphoresdl.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\threads\sdl\threadsdl.cpp
+SOURCE=..\classes\threads\backends\sdl\threadsdl.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -512,15 +515,28 @@ SOURCE=..\classes\threads\sdl\threadsdl.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\threads\win32\mutexwin32.cpp
+SOURCE=..\classes\threads\backends\win32\mutexwin32.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\threads\win32\semaphorewin32.cpp
+SOURCE=..\classes\threads\backends\win32\semaphorewin32.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\threads\win32\threadwin32.cpp
+SOURCE=..\classes\threads\backends\win32\threadwin32.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\classes\threads\backends\mutexbackend.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\backends\semaphorebackend.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\threads\backends\threadbackend.cpp
 # End Source File
 # End Group
 # Begin Source File
@@ -529,26 +545,17 @@ SOURCE=..\classes\threads\mutex.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\threads\mutexbackend.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\classes\threads\semaphore.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\threads\semaphorebackend.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\thread.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\classes\threads\threadbackend.cpp
-# End Source File
 # End Group
 # Begin Group "system"
+
+# PROP Default_Filter ""
+# Begin Group "systembackends"
 
 # PROP Default_Filter ""
 # Begin Group "systemsdl"
@@ -556,7 +563,7 @@ SOURCE=..\classes\threads\threadbackend.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\system\sdl\timersdl.cpp
+SOURCE=..\classes\system\backends\sdl\timersdl.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -573,11 +580,20 @@ SOURCE=..\classes\system\sdl\timersdl.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\system\win32\eventwin32.cpp
+SOURCE=..\classes\system\backends\win32\eventwin32.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\system\win32\timerwin32.cpp
+SOURCE=..\classes\system\backends\win32\timerwin32.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\classes\system\backends\eventbackend.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\system\backends\timerbackend.cpp
 # End Source File
 # End Group
 # Begin Source File
@@ -586,11 +602,11 @@ SOURCE=..\classes\system\console.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\system\event.cpp
+SOURCE=..\classes\system\dynamicloader.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\system\eventbackend.cpp
+SOURCE=..\classes\system\event.cpp
 # End Source File
 # Begin Source File
 
@@ -599,42 +615,6 @@ SOURCE=..\classes\system\system.cpp
 # Begin Source File
 
 SOURCE=..\classes\system\timer.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\system\timerbackend.cpp
-# End Source File
-# End Group
-# Begin Group "miscclasses"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\classes\misc\args.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\binary.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\config.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\datetime.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\i18n.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\math.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\misc\string.cpp
 # End Source File
 # End Group
 # Begin Group "gui"
@@ -724,6 +704,10 @@ SOURCE=..\classes\gui\widgets\basic\image.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\gui\widgets\basic\multiedit.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\gui\widgets\basic\optionbox.cpp
 # End Source File
 # Begin Source File
@@ -795,6 +779,10 @@ SOURCE=..\classes\gui\widgets\multi\menu\menubar.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\gui\widgets\multi\menu\menubarentry.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\gui\widgets\multi\menu\menuentry.cpp
 # End Source File
 # Begin Source File
@@ -803,29 +791,17 @@ SOURCE=..\classes\gui\widgets\multi\menu\popupmenu.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\gui\widgets\multi\menu\popupview.cpp
-# End Source File
-# End Group
-# Begin Group "tree"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\classes\gui\widgets\multi\tree\tree.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\gui\widgets\multi\tree\treeentry.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\gui\widgets\multi\tree\treeview.cpp
+SOURCE=..\classes\gui\widgets\multi\menu\popupmenuentry.cpp
 # End Source File
 # End Group
 # End Group
 # Begin Group "special"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\gui\widgets\special\cursor.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\special\dragcontrol.cpp
@@ -843,14 +819,18 @@ SOURCE=..\classes\gui\widgets\special\shortcut.cpp
 SOURCE=..\classes\gui\widgets\special\tooltip.cpp
 # End Source File
 # End Group
+# Begin Group "hotspot"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\gui\widgets\container.cpp
+SOURCE=..\classes\gui\widgets\hotspot\hotspot.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\gui\widgets\containertype.cpp
+SOURCE=..\classes\gui\widgets\hotspot\simplebutton.cpp
 # End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\layer.cpp
@@ -863,20 +843,15 @@ SOURCE=..\classes\gui\widgets\widget.cpp
 # Begin Group "window"
 
 # PROP Default_Filter ""
-# Begin Group "windowgdi"
+# Begin Group "windowbackends"
 
 # PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\classes\gui\window\gdi\windowgdi.cpp
-# End Source File
-# End Group
 # Begin Group "windowxlib"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\gui\window\xlib\windowxlib.cpp
+SOURCE=..\classes\gui\window\backends\xlib\windowxlib.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -888,6 +863,19 @@ SOURCE=..\classes\gui\window\xlib\windowxlib.cpp
 
 # End Source File
 # End Group
+# Begin Group "windowgdi"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\gui\window\backends\gdi\windowgdi.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\classes\gui\window\backends\windowbackend.cpp
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\classes\gui\window\toolwindow.cpp
@@ -895,10 +883,6 @@ SOURCE=..\classes\gui\window\toolwindow.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\window\window.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\classes\gui\window\windowbackend.cpp
 # End Source File
 # End Group
 # Begin Group "mdi"
@@ -944,7 +928,115 @@ SOURCE=..\classes\gui\application\background.cpp
 # End Source File
 # End Group
 # End Group
-# Begin Group "error"
+# Begin Group "io"
+
+# PROP Default_Filter ""
+# Begin Group "drivers"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\io\drivers\driver_ansi.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\drivers\driver_memory.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\drivers\driver_posix.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\drivers\driver_socket.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\drivers\driver_socks4.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\drivers\driver_socks5.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\drivers\driver_win32.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\drivers\driver_zero.cpp
+# End Source File
+# End Group
+# Begin Group "filters"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\io\filters\filter_bzip2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\filters\filter_xor.cpp
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\classes\io\driver.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\filter.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\instream.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\outstream.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\io\stream.cpp
+# End Source File
+# End Group
+# Begin Group "misc"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\misc\args.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\misc\binary.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\misc\config.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\misc\datetime.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\misc\math.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\misc\string.cpp
+# End Source File
+# End Group
+# Begin Group "i18n"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\classes\i18n\i18n.cpp
+# End Source File
+# End Group
+# Begin Group "errors"
 
 # PROP Default_Filter ""
 # Begin Group "fs"
@@ -952,30 +1044,50 @@ SOURCE=..\classes\gui\application\background.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\error\fs\endoffile.cpp
+SOURCE=..\classes\errors\fs\endoffile.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\error\fs\filenotfound.cpp
+SOURCE=..\classes\errors\fs\filenotfound.cpp
 # End Source File
 # End Group
-# Begin Group "miscerror"
+# Begin Group "miscerrors"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\classes\error\misc\permissiondenied.cpp
+SOURCE=..\classes\errors\misc\permissiondenied.cpp
 # End Source File
 # End Group
 # Begin Source File
 
-SOURCE=..\classes\error\error.cpp
+SOURCE=..\classes\errors\error.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\classes\error\success.cpp
+SOURCE=..\classes\errors\success.cpp
 # End Source File
 # End Group
+# End Group
+# Begin Group "miscsources"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\misc\codecs.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\misc\loop.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\misc\pciio.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\misc\templates.cpp
+# End Source File
 # End Group
 # End Group
 # Begin Group "Header-Dateien"
@@ -1024,24 +1136,11 @@ SOURCE=..\include\smooth\backends\backend.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\templates\array\array.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\templates\array\array.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\templates\array\entry.cpp
+SOURCE=..\include\smooth\templates\array\backend.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
@@ -1051,6 +1150,10 @@ SOURCE=..\include\smooth\templates\array\entry.cpp
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\array\backend.h
 # End Source File
 # Begin Source File
 
@@ -1171,6 +1274,54 @@ SOURCE=..\include\smooth\templates\pointer\pointer.h
 SOURCE=..\include\smooth\templates\pointer\proxy.h
 # End Source File
 # End Group
+# Begin Group "nonblocking"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\nonblocking\nonblocking.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\array.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\buffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\callbacks.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\extended.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\nonblocking.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\pointer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\signals.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\signalsr.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slots.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\slotsr.h
+# End Source File
 # End Group
 # Begin Group "filesheaders"
 
@@ -1187,16 +1338,43 @@ SOURCE=..\include\smooth\files\file.h
 # Begin Group "graphicsheaders"
 
 # PROP Default_Filter ""
+# Begin Group "formsheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\forms\form.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\forms\line.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\forms\point.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\forms\rect.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\forms\size.h
+# End Source File
+# End Group
+# Begin Group "graphicsbackendsheaders"
+
+# PROP Default_Filter ""
 # Begin Group "graphicsgdiheaders"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\graphics\gdi\bitmapgdi.h
+SOURCE=..\include\smooth\graphics\backends\gdi\bitmapgdi.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\graphics\gdi\surfacegdi.h
+SOURCE=..\include\smooth\graphics\backends\gdi\surfacegdi.h
 # End Source File
 # End Group
 # Begin Group "graphicsxlibheaders"
@@ -1204,20 +1382,37 @@ SOURCE=..\include\smooth\graphics\gdi\surfacegdi.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\graphics\xlib\bitmapxlib.h
+SOURCE=..\include\smooth\graphics\backends\xlib\bitmapxlib.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\graphics\xlib\surfacexlib.h
+SOURCE=..\include\smooth\graphics\backends\xlib\surfacexlib.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\backends\bitmapbackend.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\backends\surfacebackend.h
+# End Source File
+# End Group
+# Begin Group "imageloaderheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\imageloader\imageloader.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\graphics\imageloader\pci.h
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\graphics\bitmap.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\bitmapbackend.h
 # End Source File
 # Begin Source File
 
@@ -1229,39 +1424,7 @@ SOURCE=..\include\smooth\graphics\font.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\graphics\form.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\line.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\point.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\rect.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\size.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\graphics\surface.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\graphics\surfacebackend.h
-# End Source File
-# End Group
-# Begin Group "i18n"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\include\smooth\i18n\smooth_de.h
 # End Source File
 # End Group
 # Begin Group "mischeaders"
@@ -1285,10 +1448,6 @@ SOURCE=..\include\smooth\misc\datetime.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\misc\i18n.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\misc\math.h
 # End Source File
 # Begin Source File
@@ -1299,24 +1458,36 @@ SOURCE=..\include\smooth\misc\string.h
 # Begin Group "systemheaders"
 
 # PROP Default_Filter ""
-# Begin Group "systemsdlheaders"
+# Begin Group "systembackendsheaders"
 
 # PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\include\smooth\system\sdl\timersdl.h
-# End Source File
-# End Group
 # Begin Group "systemwin32headers"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\system\win32\eventwin32.h
+SOURCE=..\include\smooth\system\backends\win32\eventwin32.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\system\win32\timerwin32.h
+SOURCE=..\include\smooth\system\backends\win32\timerwin32.h
+# End Source File
+# End Group
+# Begin Group "systemsdlheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\system\backends\sdl\timersdl.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\system\backends\eventbackend.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\system\backends\timerbackend.h
 # End Source File
 # End Group
 # Begin Source File
@@ -1325,11 +1496,11 @@ SOURCE=..\include\smooth\system\console.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\system\event.h
+SOURCE=..\include\smooth\system\dynamicloader.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\system\eventbackend.h
+SOURCE=..\include\smooth\system\event.h
 # End Source File
 # Begin Source File
 
@@ -1338,10 +1509,6 @@ SOURCE=..\include\smooth\system\system.h
 # Begin Source File
 
 SOURCE=..\include\smooth\system\timer.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\system\timerbackend.h
 # End Source File
 # End Group
 # Begin Group "xmlheaders"
@@ -1431,20 +1598,23 @@ SOURCE=..\include\smooth\types\void.h
 # Begin Group "threadsheaders"
 
 # PROP Default_Filter ""
-# Begin Group "threadsposixheaders"
+# Begin Group "threadsbackendsheaders"
+
+# PROP Default_Filter ""
+# Begin Group "threadswin32headers"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\posix\mutexposix.h
+SOURCE=..\include\smooth\threads\backends\win32\mutexwin32.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\posix\semaphoreposix.h
+SOURCE=..\include\smooth\threads\backends\win32\semaphorewin32.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\posix\threadposix.h
+SOURCE=..\include\smooth\threads\backends\win32\threadwin32.h
 # End Source File
 # End Group
 # Begin Group "threadssdlheaders"
@@ -1452,31 +1622,44 @@ SOURCE=..\include\smooth\threads\posix\threadposix.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\sdl\mutexsdl.h
+SOURCE=..\include\smooth\threads\backends\sdl\mutexsdl.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\sdl\semaphoresdl.h
+SOURCE=..\include\smooth\threads\backends\sdl\semaphoresdl.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\sdl\threadsdl.h
+SOURCE=..\include\smooth\threads\backends\sdl\threadsdl.h
 # End Source File
 # End Group
-# Begin Group "threadswin32headers"
+# Begin Group "threadsposixheaders"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\win32\mutexwin32.h
+SOURCE=..\include\smooth\threads\backends\posix\mutexposix.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\win32\semaphorewin32.h
+SOURCE=..\include\smooth\threads\backends\posix\semaphoreposix.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\win32\threadwin32.h
+SOURCE=..\include\smooth\threads\backends\posix\threadposix.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\backends\mutexbackend.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\backends\semaphorebackend.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\threads\backends\threadbackend.h
 # End Source File
 # End Group
 # Begin Source File
@@ -1485,23 +1668,11 @@ SOURCE=..\include\smooth\threads\mutex.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\mutexbackend.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\threads\semaphore.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\threads\semaphorebackend.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\threads\thread.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\threads\threadbackend.h
 # End Source File
 # End Group
 # Begin Group "guiheaders"
@@ -1615,6 +1786,10 @@ SOURCE=..\include\smooth\gui\widgets\basic\image.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\gui\widgets\basic\multiedit.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\gui\widgets\basic\optionbox.h
 # End Source File
 # Begin Source File
@@ -1686,6 +1861,10 @@ SOURCE=..\include\smooth\gui\widgets\multi\menu\menubar.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\include\smooth\gui\widgets\multi\menu\menubarentry.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\smooth\gui\widgets\multi\menu\menuentry.h
 # End Source File
 # Begin Source File
@@ -1694,25 +1873,17 @@ SOURCE=..\include\smooth\gui\widgets\multi\menu\popupmenu.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\gui\widgets\multi\menu\popupview.h
-# End Source File
-# End Group
-# Begin Group "treeheaders"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\include\smooth\gui\widgets\multi\tree\tree.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\gui\widgets\multi\tree\treeview.h
+SOURCE=..\include\smooth\gui\widgets\multi\menu\popupmenuentry.h
 # End Source File
 # End Group
 # End Group
 # Begin Group "widgetsspecialheaders"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\gui\widgets\special\cursor.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\include\smooth\gui\widgets\special\dragcontrol.h
@@ -1730,14 +1901,18 @@ SOURCE=..\include\smooth\gui\widgets\special\shortcut.h
 SOURCE=..\include\smooth\gui\widgets\special\tooltip.h
 # End Source File
 # End Group
+# Begin Group "hotspotheaders"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\gui\widgets\container.h
+SOURCE=..\include\smooth\gui\widgets\hotspot\hotspot.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\gui\widgets\containertype.h
+SOURCE=..\include\smooth\gui\widgets\hotspot\simplebutton.h
 # End Source File
+# End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\gui\widgets\layer.h
@@ -1750,12 +1925,15 @@ SOURCE=..\include\smooth\gui\widgets\widget.h
 # Begin Group "windowheaders"
 
 # PROP Default_Filter ""
+# Begin Group "windowbackendsheaders"
+
+# PROP Default_Filter ""
 # Begin Group "windowgdiheaders"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\gui\window\gdi\windowgdi.h
+SOURCE=..\include\smooth\gui\window\backends\gdi\windowgdi.h
 # End Source File
 # End Group
 # Begin Group "windowxlibheaders"
@@ -1763,7 +1941,12 @@ SOURCE=..\include\smooth\gui\window\gdi\windowgdi.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\gui\window\xlib\windowxlib.h
+SOURCE=..\include\smooth\gui\window\backends\xlib\windowxlib.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\gui\window\backends\windowbackend.h
 # End Source File
 # End Group
 # Begin Source File
@@ -1774,55 +1957,155 @@ SOURCE=..\include\smooth\gui\window\toolwindow.h
 
 SOURCE=..\include\smooth\gui\window\window.h
 # End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\gui\window\windowbackend.h
-# End Source File
 # End Group
 # End Group
-# Begin Group "errorheaders"
+# Begin Group "ioheaders"
 
 # PROP Default_Filter ""
-# Begin Group "fsheaders"
+# Begin Group "driversheaders"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\error\fs\endoffile.h
+SOURCE=..\include\smooth\io\drivers\driver_ansi.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\error\fs\filenotfound.h
+SOURCE=..\include\smooth\io\drivers\driver_memory.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\drivers\driver_posix.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\drivers\driver_socket.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\drivers\driver_socks4.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\drivers\driver_socks5.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\drivers\driver_win32.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\drivers\driver_zero.h
 # End Source File
 # End Group
-# Begin Group "miscerrorheaders"
+# Begin Group "filtersheaders"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\include\smooth\error\misc\permissiondenied.h
+SOURCE=..\include\smooth\io\filters\filter_bzip2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\filters\filter_xor.h
 # End Source File
 # End Group
 # Begin Source File
 
-SOURCE=..\include\smooth\error\error.h
+SOURCE=..\include\smooth\io\driver.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\error\success.h
+SOURCE=..\include\smooth\io\filter.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\instream.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\io.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\outstream.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\stream.h
+# End Source File
+# End Group
+# Begin Group "basicheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\basic\input.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\basic\object.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\basic\objecttype.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\basic\setup.h
+# End Source File
+# End Group
+# Begin Group "i18nheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\i18n\i18n.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\i18n\smooth_de.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\i18n\smooth_it.h
+# End Source File
+# End Group
+# Begin Group "errorsheaders"
+
+# PROP Default_Filter ""
+# Begin Group "fserrorsheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\errors\fs\endoffile.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\errors\fs\filenotfound.h
+# End Source File
+# End Group
+# Begin Group "miscerrorsheaders"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\include\smooth\errors\misc\permissiondenied.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\include\smooth\errors\error.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\errors\success.h
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\include\smooth\args.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\array.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\callbacks.h
 # End Source File
 # Begin Source File
 
@@ -1838,18 +2121,6 @@ SOURCE=..\include\smooth\dll.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\dllmain.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\extended.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\input.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\loop.h
 # End Source File
 # Begin Source File
@@ -1858,43 +2129,11 @@ SOURCE=..\include\smooth\main.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\object.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\objecttype.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\pciio.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\smooth\pointer.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\smooth\resources.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\setup.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\signals.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\signalsr.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\slots.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\smooth\slotsr.h
 # End Source File
 # Begin Source File
 
@@ -1919,8 +2158,8 @@ SOURCE=..\resources\resources.rc
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
-# ADD BASE RSC /l 0x407 /i "\devel\projects\private\smooth\resources"
-# ADD RSC /l 0x407 /i "\devel\projects\private\smooth\resources" /i "..\resources" /i ".." /d "__WIN32__" /d "__SMOOTH_DLL__"
+# ADD BASE RSC /l 0x407 /i "\devel\projects\private\smooth\resources" /i "\devel\projects\private\smooth-hotspots\resources"
+# ADD RSC /l 0x407 /i "\devel\projects\private\smooth\resources" /i "\devel\projects\private\smooth-hotspots\resources" /i "..\resources" /i ".." /d "__WIN32__" /d "__SMOOTH_DLL__"
 
 !ENDIF 
 

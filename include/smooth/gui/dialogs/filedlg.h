@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,7 +23,6 @@ namespace smooth
 };
 
 #include "dialog.h"
-#include "../../array.h"
 
 namespace smooth
 {
@@ -53,15 +52,15 @@ namespace smooth
 					String		 defExt;
 				public:
 							 FileSelection();
-							~FileSelection();
+					virtual		~FileSelection();
 
-					Int		 ShowDialog();
+					const Error	&ShowDialog();
 
 					Int		 SetMode(Int);
 					Int		 SetFlags(Int);
-					Int		 SetDefaultExtension(String);
+					Int		 SetDefaultExtension(const String &);
 
-					Int		 AddFilter(String, String);
+					Int		 AddFilter(const String &, const String &);
 
 					Int		 GetNumberOfFiles();
 					String		 GetFileName();

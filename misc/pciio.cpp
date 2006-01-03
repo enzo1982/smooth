@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,8 +13,6 @@
 #include <smooth/pciio.h>
 #include <smooth/codecs.h>
 #include <smooth/misc/string.h>
-
-#include <iolib-cxx.h>
 
 using namespace smooth;
 using namespace smooth::GUI;
@@ -139,17 +137,17 @@ S::GUI::Bitmap &PCIIO::GetBitmap()
 
 PCIOut CreatePCI(S::String filename)
 {
-	return new OutStream(STREAM_FILE, filename, OS_OVERWRITE);
+	return new IO::OutStream(IO::STREAM_FILE, filename, IO::OS_OVERWRITE);
 }
 
 PCIOut OpenPCIForOutput(S::String filename)
 {
-	return new OutStream(STREAM_FILE, filename, OS_APPEND);
+	return new IO::OutStream(IO::STREAM_FILE, filename, IO::OS_APPEND);
 }
 
 PCIIn OpenPCIForInput(S::String filename)
 {
-	return new InStream(STREAM_FILE, filename, IS_READONLY);
+	return new IO::InStream(IO::STREAM_FILE, filename, IO::IS_READONLY);
 }
 
 bool ClosePCI(PCIIn instream)
@@ -172,7 +170,7 @@ bool ClosePCI(PCIOut outstream)
 
 bool WritePCI(PCIOut outstream, PCIIO &ior)
 {
-	if (outstream->GetLastError() != IOLIB_ERROR_OK) return false;
+	if (outstream->GetLastError() != IO::IO_ERROR_OK) return false;
 
 	if (outstream->GetPos() == 0) WritePCIFTAG(outstream, ior);
 
@@ -190,7 +188,7 @@ bool WritePCI(PCIOut outstream, PCIIO &ior)
 
 bool ReadPCI(PCIIn instream, PCIIO &ior)
 {
-	if (instream->GetLastError() != IOLIB_ERROR_OK) return false;
+	if (instream->GetLastError() != IO::IO_ERROR_OK) return false;
 
 	if (ior.imagename != NIL) FindImageID(instream, ior);
 
@@ -223,12 +221,8 @@ bool ReadPCIFTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		char	*tag = in->InputString(4);
-
-		if (S::String(tag).Compare("PCIF") == 0)
+		if (in->InputString(4).Compare("PCIF") == 0)
 		{
-			delete [] tag;
-
 			ior.majorversion = in->InputNumber(1);
 			ior.minorversion = in->InputNumber(1);
 
@@ -238,8 +232,6 @@ bool ReadPCIFTAG(PCIIn in, PCIIO &ior)
 		}
 		else
 		{
-			delete [] tag;
-
 			in->RelSeek(6);
 
 			in->RelSeek(in->InputNumber(4) - 14);
@@ -266,12 +258,8 @@ bool ReadIMAGTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		char	*tag = in->InputString(4);
-
-		if (S::String(tag).Compare("IMAG") == 0)
+		if (in->InputString(4).Compare("IMAG") == 0)
 		{
-			delete [] tag;
-
 			in->RelSeek(2);
 
 			if (in->InputNumber(4) == ior.imageid)
@@ -286,8 +274,6 @@ bool ReadIMAGTAG(PCIIn in, PCIIO &ior)
 		}
 		else
 		{
-			delete [] tag;
-
 			in->RelSeek(6);
 
 			in->RelSeek(in->InputNumber(4) - 14);
@@ -318,12 +304,8 @@ bool ReadRESOTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		char	*tag = in->InputString(4);
-
-		if (S::String(tag).Compare("RESO") == 0)
+		if (in->InputString(4).Compare("RESO") == 0)
 		{
-			delete [] tag;
-
 			in->RelSeek(2);
 
 			if (in->InputNumber(4) == ior.imageid)
@@ -346,8 +328,6 @@ bool ReadRESOTAG(PCIIn in, PCIIO &ior)
 		}
 		else
 		{
-			delete [] tag;
-
 			in->RelSeek(6);
 
 			in->RelSeek(in->InputNumber(4) - 14);
@@ -384,12 +364,8 @@ bool ReadFORMTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		char	*tag = in->InputString(4);
-
-		if (S::String(tag).Compare("FORM") == 0)
+		if (in->InputString(4).Compare("FORM") == 0)
 		{
-			delete [] tag;
-
 			in->RelSeek(2);
 
 			if (in->InputNumber(4) == ior.imageid)
@@ -397,11 +373,7 @@ bool ReadFORMTAG(PCIIn in, PCIIO &ior)
 				if (in->InputNumber(4) > 20)	return false;
 				else
 				{
-					char	*cfn = in->InputString(3);
-
-					cfName = cfn;
-
-					delete [] cfn;
+					cfName = in->InputString(3);
 
 					ior.bpcc = in->InputNumber(1);
 					ior.compression = in->InputNumber(1);
@@ -423,8 +395,6 @@ bool ReadFORMTAG(PCIIn in, PCIIO &ior)
 		}
 		else
 		{
-			delete [] tag;
-
 			in->RelSeek(6);
 
 			in->RelSeek(in->InputNumber(4) - 14);
@@ -452,21 +422,13 @@ bool ReadDESCTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		char	*tag = in->InputString(4);
-
-		if (S::String(tag).Compare("DESC") == 0)
+		if (in->InputString(4).Compare("DESC") == 0)
 		{
-			delete [] tag;
-
 			in->RelSeek(2);
 
 			if (in->InputNumber(4) == ior.imageid)
 			{
-				char	*desc = in->InputString(in->InputNumber(4) - 14);
-
-				ior.description = desc;
-
-				delete [] desc;
+				ior.description = in->InputString(in->InputNumber(4) - 14);
 
 				return true;
 			}
@@ -477,8 +439,6 @@ bool ReadDESCTAG(PCIIn in, PCIIO &ior)
 		}
 		else
 		{
-			delete [] tag;
-
 			in->RelSeek(6);
 
 			in->RelSeek(in->InputNumber(4) - 14);
@@ -506,21 +466,13 @@ bool ReadNAMETAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		char	*tag = in->InputString(4);
-
-		if (S::String(tag).Compare("NAME") == 0)
+		if (in->InputString(4).Compare("NAME") == 0)
 		{
-			delete [] tag;
-
 			in->RelSeek(2);
 
 			if (in->InputNumber(4) == ior.imageid)
 			{
-				char	*iname = in->InputString(in->InputNumber(4) - 14);
-
-				ior.imagename = iname;
-
-				delete [] iname;
+				ior.imagename = in->InputString(in->InputNumber(4) - 14);
 
 				return true;
 			}
@@ -531,8 +483,6 @@ bool ReadNAMETAG(PCIIn in, PCIIO &ior)
 		}
 		else
 		{
-			delete [] tag;
-
 			in->RelSeek(6);
 
 			in->RelSeek(in->InputNumber(4) - 14);
@@ -578,12 +528,8 @@ bool ReadDATATAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		char	*tag = in->InputString(4);
-
-		if (S::String(tag).Compare("DATA") == 0)
+		if (in->InputString(4).Compare("DATA") == 0)
 		{
-			delete [] tag;
-
 			in->RelSeek(2);
 
 			if (in->InputNumber(4) == ior.imageid)
@@ -603,8 +549,6 @@ bool ReadDATATAG(PCIIn in, PCIIO &ior)
 		}
 		else
 		{
-			delete [] tag;
-
 			in->RelSeek(6);
 
 			in->RelSeek(in->InputNumber(4) - 14);
@@ -622,35 +566,21 @@ bool FindImageID(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		char	*tag = in->InputString(4);
-
-		if (S::String(tag).Compare("NAME") == 0)
+		if (in->InputString(4).Compare("NAME") == 0)
 		{
-			delete [] tag;
-
 			in->RelSeek(2);
 
 			imageid = in->InputNumber(4);
 
-			char	*iname = in->InputString(in->InputNumber(4) - 14);
-
-			if (S::String(iname).Compare(ior.imagename) == 0)
+			if (in->InputString(in->InputNumber(4) - 14).Compare(ior.imagename) == 0)
 			{
-				delete [] iname;
-
 				ior.imageid = imageid;
 
 				return true;
 			}
-			else
-			{
-				delete [] iname;
-			}
 		}
 		else
 		{
-			delete [] tag;
-
 			in->RelSeek(6);
 
 			in->RelSeek(in->InputNumber(4) - 14);

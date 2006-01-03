@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,7 +21,7 @@ namespace smooth
 };
 
 #include "../basic/object.h"
-#include "../callbacks.h"
+#include "../templates/callbacks.h"
 
 namespace smooth
 {
@@ -45,6 +45,10 @@ namespace smooth
 				Int			 status;
 
 				ThreadBackend		*backend;
+
+				static Int		 nOfRunningThreads;
+
+				static Void		 MainCaller(Thread *);
 			public:
 				static const Int	 classID;
 
@@ -57,7 +61,7 @@ namespace smooth
 				Int			 Start();
 				Int			 Stop();
 
-				static Int		 GetNOfRunningThreads();
+				inline static Int	 GetNOfRunningThreads() { return nOfRunningThreads; }
 			callbacks:
 				Callback1<Int, Thread *> threadMain;
 		};

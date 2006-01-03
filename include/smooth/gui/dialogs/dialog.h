@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,7 +24,6 @@ namespace smooth
 	};
 };
 
-#include "../../definitions.h"
 #include "../application/application.h"
 
 namespace smooth
@@ -33,19 +32,23 @@ namespace smooth
 	{
 		namespace Dialogs
 		{
-			class SMOOTHAPI Dialog : public Application
+			abstract class SMOOTHAPI Dialog : public Application
 			{
 				protected:
-					String		 caption;
-					Window		*parentWindow;
+					String			 caption;
+					Window			*parentWindow;
+
+					Error			 error;
 				public:
-							 Dialog();
-							~Dialog();
+								 Dialog();
+					virtual			~Dialog();
 
-					virtual Int	 ShowDialog() = 0;
+					virtual const Error	&ShowDialog() = 0;
+				accessors:
+					Int			 SetCaption(const String &);
+					Int			 SetParentWindow(Window *);
 
-					Int		 SetCaption(String);
-					Int		 SetParentWindow(Window *);
+					const Error		&GetErrorStatus();
 			};
 		};
 	};

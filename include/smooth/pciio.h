@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,13 +15,14 @@
 #include "misc/string.h"
 #include "graphics/bitmap.h"
 
-#include <iolib-cxx.h>
+#include "io/instream.h"
+#include "io/outstream.h"
 
 #define PCIMajorVersion		1
 #define PCIMinorVersion		2
 
-#define PCIOut	OutStream	*
-#define PCIIn	InStream	*
+#define PCIOut	S::IO::OutStream	*
+#define PCIIn	S::IO::InStream		*
 
 // tag identifiers
 

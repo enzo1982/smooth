@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,18 +27,18 @@ PCIFFManager::PCIFFManager()
 {
 	filename = "";
 
-	wnd		= new Window(String("smooth PCIFF Manager v").Append(SMOOTH_VERSION));
+	wnd		= new Window(String("smooth PCIFF Manager v").Append(SMOOTH_VERSION), Point(50, 50), Size(600, 200));
 	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
 
-	menu_file	= new Menu();
+	menu_file	= new PopupMenu();
 
 	menubar->AddEntry("File", NIL, menu_file);
 
-	menu_file->AddEntry("Open")->onClick.Connect(&PCIFFManager::OpenFile, this);
+	menu_file->AddEntry("Open")->onAction.Connect(&PCIFFManager::OpenFile, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("Exit")->onClick.Connect(&PCIFFManager::Close, this);
+	menu_file->AddEntry("Exit")->onAction.Connect(&PCIFFManager::Close, this);
 
 	RegisterObject(wnd);
 
@@ -46,8 +46,7 @@ PCIFFManager::PCIFFManager()
 	wnd->RegisterObject(menubar);
 	wnd->RegisterObject(statusbar);
 
-	wnd->SetMetrics(Point(50, 50), Size(600, 200));
-	wnd->SetIcon(SI_DEFAULT);
+	wnd->SetIcon(NIL);
 
 	wnd->Show();
 }
@@ -76,7 +75,7 @@ Void PCIFFManager::OpenFile()
 	dialog->AddFilter("PCI Image Files", "*.pci");
 	dialog->AddFilter("All Files", "*.*");
 
-	if (dialog->ShowDialog() == Success)
+	if (dialog->ShowDialog() == Success())
 	{
 		filename = dialog->GetFileName();
 

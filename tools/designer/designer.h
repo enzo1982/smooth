@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,11 +29,11 @@ class Designer : public Application
 		Menubar				*menubar;
 		Menubar				*iconbar;
 		Statusbar			*statusbar;
-		Menu				*menu_file;
-		Menu				*menu_dialog;
-		Menu				*menu_widgets;
-		Menu				*menu_widgets_add;
-		Menu				*menu_widgets_add_smooth;
+		PopupMenu			*menu_file;
+		PopupMenu			*menu_dialog;
+		PopupMenu			*menu_widgets;
+		PopupMenu			*menu_widgets_add;
+		PopupMenu			*menu_widgets_add_smooth;
 
 		Timer				*timer1;
 

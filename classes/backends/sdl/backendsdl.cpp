@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,13 +30,13 @@ S::Backends::BackendSDL::~BackendSDL()
 
 S::Int S::Backends::BackendSDL::Init()
 {
-	if (SDL_Init(SDL_INIT_TIMER) == 0)	return Success;
-	else					return Failure;
+	if (SDL_Init(SDL_INIT_EVERYTHING) == 0)	return Success();
+	else					return Error();
 }
 
 S::Int S::Backends::BackendSDL::Deinit()
 {
 	SDL_Quit();
 
-	return Success;
+	return Success();
 }

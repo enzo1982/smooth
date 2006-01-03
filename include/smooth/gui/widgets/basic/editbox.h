@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,17 +16,14 @@ namespace smooth
 	namespace GUI
 	{
 		class EditBox;
-	};
-
-	namespace System
-	{
-		class Timer;
+		class Cursor;
+		class List;
+		class ListEntry;
+		class ComboBox;
 	};
 };
 
 #include "../widget.h"
-#include "../multi/list/list.h"
-#include "../multi/list/combobox.h"
 
 namespace smooth
 {
@@ -38,57 +35,40 @@ namespace smooth
 
 		class SMOOTHAPI EditBox : public Widget
 		{
-			private:
-				System::Timer		*timer;
-			slots:
-				Void			 TimerProc();
-
-				String			 GetVisibleText();
 			protected:
-				Int			 promptPos;
-				Bool			 promptVisible;
-				Int			 markStart;
-				Int			 oMarkStart;
-				Int			 markEnd;
-				Bool			 marking;
-				Int			 maxSize;
-				Int			 invisibleChars;
+				Cursor				*cursor;
 
-				List			*dropDownList;
-				ComboBox		*comboBox;
-
-				Void			 SetCursor(Int);
-				Void			 RemoveCursor();
-
-				Void			 MarkText(Int, Int);
-				Void			 DeleteSelectedText();
-				Void			 InsertText(String);
-			slots:
-				Void			 DropDownListProc();
+				List				*dropDownList;
+				ComboBox			*comboBox;
 			public:
-				static const Int	 classID;
+				static const Int		 classID;
 
-							 EditBox(String, Point, Size, Int = 0);
-							~EditBox();
+								 EditBox(const String &, const Point &, const Size &, Int = 0);
+				virtual				~EditBox();
 
-				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
+				virtual Int			 Paint(Int);
 
-				Int			 Show();
-				Int			 Hide();
+				virtual Int			 Show();
+				virtual Int			 Hide();
 
-				Int			 Activate();
-				Int			 Deactivate();
+				virtual Int			 Activate();
+				virtual Int			 Deactivate();
 
-				Int			 SetText(const String &);
+				virtual Int			 SetText(const String &);
+				virtual const String		&GetText();
 
-				Int			 SetDropDownList(List *);
+				Int				 SetDropDownList(List *);
 
-				Int			 GetCursorPos();
+				Int				 GetCursorPos();
 
-				Int			 MarkAll();
+				Int				 MarkAll();
 			signals:
-				Signal0<Void>		 onEnter;
+				Signal1<Void, const String &>	 onInput;
+				Signal1<Void, const String &>	 onEnter;
+			slots:
+				Void				 OnSelectListEntry(ListEntry *);
+
+				Void				 OnChangeSize(const Size &);
 		};
 	};
 };

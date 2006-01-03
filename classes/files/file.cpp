@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -95,7 +95,7 @@ S::Int64 S::File::GetFileSize()
 
 S::Int S::File::GetFileTime(FILETIME *cT, FILETIME *aT, FILETIME *wT)
 {
-	if (!Exists()) return Failure;
+	if (!Exists()) return Error();
 
 	HANDLE	 handle;
 
@@ -106,7 +106,7 @@ S::Int S::File::GetFileTime(FILETIME *cT, FILETIME *aT, FILETIME *wT)
 
 	CloseHandle(handle);
 
-	return Success;
+	return Success();
 }
 
 S::DateTime S::File::GetCreationTime()
@@ -116,7 +116,7 @@ S::DateTime S::File::GetCreationTime()
 
 	DateTime	 dateTime;
 
-	if (GetFileTime(&fileTime, NIL, NIL) == Failure) return dateTime;
+	if (GetFileTime(&fileTime, NIL, NIL) == Error()) return dateTime;
 
 	FileTimeToSystemTime(&fileTime, &time);
 
@@ -133,7 +133,7 @@ S::DateTime S::File::GetAccessTime()
 
 	DateTime	 dateTime;
 
-	if (GetFileTime(NIL, &fileTime, NIL) == Failure) return dateTime;
+	if (GetFileTime(NIL, &fileTime, NIL) == Error()) return dateTime;
 
 	FileTimeToSystemTime(&fileTime, &time);
 
@@ -150,7 +150,7 @@ S::DateTime S::File::GetWriteTime()
 
 	DateTime	 dateTime;
 
-	if (GetFileTime(NIL, NIL, &fileTime) == Failure) return dateTime;
+	if (GetFileTime(NIL, NIL, &fileTime) == Error()) return dateTime;
 
 	FileTimeToSystemTime(&fileTime, &time);
 
@@ -176,64 +176,64 @@ S::Bool S::File::Exists()
 
 S::Int S::File::Create()
 {
-	if (Exists()) return Failure;
+	if (Exists()) return Error();
 
 	HANDLE	 handle;
 
 	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
 	else				handle = CreateFileA(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
 
-	if (handle == INVALID_HANDLE_VALUE) return Failure;
+	if (handle == INVALID_HANDLE_VALUE) return Error();
 
 	CloseHandle(handle);
 
-	return Success;
+	return Success();
 }
 
 S::Int S::File::Copy(String destination)
 {
-	if (!Exists()) return Failure;
+	if (!Exists()) return Error();
 	
 	Bool	 result = False;
 
 	if (Setup::enableUnicode)	result = CopyFileW(String(filePath).Append("\\").Append(fileName), destination, True);
 	else				result = CopyFileA(String(filePath).Append("\\").Append(fileName), destination, True);
 
-	if (result == False)	return Failure;
-	else			return Success;
+	if (result == False)	return Error();
+	else			return Success();
 }
 
 S::Int S::File::Move(String destination)
 {
-	if (!Exists()) return Failure;
+	if (!Exists()) return Error();
 	
 	Bool	 result = False;
 
 	if (Setup::enableUnicode)	result = MoveFileW(String(filePath).Append("\\").Append(fileName), destination);
 	else				result = MoveFileA(String(filePath).Append("\\").Append(fileName), destination);
 
-	if (result == False)	return Failure;
-	else			return Success;
+	if (result == False)	return Error();
+	else			return Success();
 }
 
 S::Int S::File::Delete()
 {
-	if (!Exists()) return Failure;
+	if (!Exists()) return Error();
 
 	Bool	 result = False;
 
 	if (Setup::enableUnicode)	result = DeleteFileW(String(filePath).Append("\\").Append(fileName));
 	else				result = DeleteFileA(String(filePath).Append("\\").Append(fileName));
 
-	if (result == False)	return Failure;
-	else			return Success;
+	if (result == False)	return Error();
+	else			return Success();
 }
 
 S::Int S::File::Truncate()
 {
-	if (!Exists()) return Failure;
+	if (!Exists()) return Error();
 
-	if (Delete() == Failure) return Failure;
+	if (Delete() == Error()) return Error();
 
 	return Create();
 }

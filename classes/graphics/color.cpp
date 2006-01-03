@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,7 +34,7 @@ S::GUI::Color::Color(Int r, Int g, Int b, Int c)
 	SetColor(r, g, b, c);
 }
 
-S::GUI::Color S::GUI::Color::ConvertTo(Int cs)
+S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 {
 	double	p1 = 0;
 	double	p2 = 0;
@@ -334,7 +334,7 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs)
 	return *this;
 }
 
-S::GUI::Color S::GUI::Color::Downsample(Int bpcc)
+S::GUI::Color S::GUI::Color::Downsample(Int bpcc) const
 {
 	if (bpcc == 8) return *this;
 
@@ -349,7 +349,7 @@ S::GUI::Color S::GUI::Color::Downsample(Int bpcc)
 	return Color((Long) (first + Math::Pow(2, bpcc) * second + Math::Pow(4, bpcc) * third), colorSpace);
 }
 
-S::GUI::Color S::GUI::Color::Upsample(Int bpcc)
+S::GUI::Color S::GUI::Color::Upsample(Int bpcc) const
 {
 	if (bpcc == 8) return *this;
 

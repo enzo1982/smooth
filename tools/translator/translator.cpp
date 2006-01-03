@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,7 +30,7 @@ Translator::Translator()
 	Point	 pos;
 	Size	 size;
 
-	wnd		= new Window(String("smooth Translator v").Append(SMOOTH_VERSION));
+	wnd		= new Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 402));
 	title		= new Titlebar();
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
@@ -38,10 +38,10 @@ Translator::Translator()
 	pos.x = 7;
 	pos.y = 7;
 	size.cx = 757;
-	size.cy = 189;
+	size.cy = 191;
 
 	list_entries	= new ListBox(pos, size);
-	list_entries->onClick.Connect(&Translator::SelectEntry, this);
+	list_entries->onSelectEntry.Connect(&Translator::SelectEntry, this);
 	list_entries->SetFlags(LF_ALLOWRESELECT);
 	list_entries->AddTab("ID", 30);
 	list_entries->AddTab("String");
@@ -53,7 +53,7 @@ Translator::Translator()
 	size.cy = 0;
 
 	button_new	= new Button("New", NIL, pos, size);
-	button_new->onClick.Connect(&Translator::NewEntry, this);
+	button_new->onAction.Connect(&Translator::NewEntry, this);
 	button_new->SetOrientation(OR_LOWERLEFT);
 
 	pos.x += 87;
@@ -77,13 +77,13 @@ Translator::Translator()
 	size.cy = 0;
 
 	button_save	= new Button("Save", NIL, pos, size);
-	button_save->onClick.Connect(&Translator::SaveData, this);
+	button_save->onAction.Connect(&Translator::SaveData, this);
 	button_save->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x -= 88;
 
 	button_remove	= new Button("Remove", NIL, pos, size);
-	button_remove->onClick.Connect(&Translator::RemoveEntry, this);
+	button_remove->onAction.Connect(&Translator::RemoveEntry, this);
 	button_remove->SetOrientation(OR_LOWERRIGHT);
 
 	pos.x = 94;
@@ -101,7 +101,7 @@ Translator::Translator()
 	edit_original->SetOrientation(OR_LOWERLEFT);
 
 	pos.x -= 62;
-	pos.y -= edit_original->size.cy + 11;
+	pos.y -= edit_original->GetHeight() + 11;
 
 	text_translated	= new Text("Translation:", pos);
 	text_translated->SetOrientation(OR_LOWERLEFT);
@@ -112,18 +112,18 @@ Translator::Translator()
 	edit_translated	= new MultiEdit("", pos, size, 0);
 	edit_translated->SetOrientation(OR_LOWERLEFT);
 
-	menu_file	= new Menu();
+	menu_file	= new PopupMenu();
 
 	menubar->AddEntry("File", NIL, menu_file);
 
-	menu_file->AddEntry("New")->onClick.Connect(&Translator::NewFile, this);
-	menu_file->AddEntry("Close")->onClick.Connect(&Translator::Close, this);
+	menu_file->AddEntry("New")->onAction.Connect(&Translator::NewFile, this);
+	menu_file->AddEntry("Close")->onAction.Connect(&Translator::Close, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("Open")->onClick.Connect(&Translator::OpenFile, this);
-	menu_file->AddEntry("Save")->onClick.Connect(&Translator::SaveFile, this);
-	menu_file->AddEntry("Save as")->onClick.Connect(&Translator::SaveFileAs, this);
+	menu_file->AddEntry("Open")->onAction.Connect(&Translator::OpenFile, this);
+	menu_file->AddEntry("Save")->onAction.Connect(&Translator::SaveFile, this);
+	menu_file->AddEntry("Save as")->onAction.Connect(&Translator::SaveFileAs, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("Exit")->onClick.Connect(&Window::Close, wnd);
+	menu_file->AddEntry("Exit")->onAction.Connect(&Window::Close, wnd);
 
 	text_id->Deactivate();
 	edit_id->Deactivate();
@@ -152,9 +152,8 @@ Translator::Translator()
 	wnd->RegisterObject(menubar);
 	wnd->RegisterObject(statusbar);
 
-	wnd->SetMetrics(Point(50, 50), Size(700, 400));
 	wnd->SetMinimumSize(Size(400, 350));
-	wnd->SetIcon(SI_DEFAULT);
+	wnd->SetIcon(NIL);
 	wnd->doQuit.Connect(&Translator::ExitProc, this);
 	wnd->onResize.Connect(&Translator::ResizeProc, this);
 
@@ -226,17 +225,14 @@ Bool Translator::ExitProc()
 
 Void Translator::ResizeProc()
 {
-	list_entries->size = Size(wnd->size.cx - 20, wnd->size.cy - 247);
+	wnd->GetDrawSurface()->StartPaint(Rect(list_entries->GetPosition(), list_entries->GetSize()));
 
-	wnd->GetDrawSurface()->StartPaint(Rect(list_entries->pos, list_entries->size));
-
-	list_entries->Hide();
-	list_entries->Show();
+	list_entries->SetSize(Size(wnd->GetWidth() - 20, wnd->GetHeight() - 247));
 
 	wnd->GetDrawSurface()->EndPaint();
 
-	edit_original->size = Size(wnd->size.cx - 169, edit_original->size.cy);
-	edit_translated->size = Size(wnd->size.cx - 169, edit_translated->size.cy);
+	edit_original->SetSize(Size(wnd->GetWidth() - 169, edit_original->GetHeight()));
+	edit_translated->SetSize(Size(wnd->GetWidth() - 169, edit_translated->GetHeight()));
 }
 
 void Translator::NewFile()
@@ -287,8 +283,17 @@ void Translator::NewFile()
 
 		entry = new listEntry;
 
-		entry->entry = list_entries->AddEntry("Author:");
+		entry->entry = list_entries->AddEntry("RightToLeft:");
 		entry->id = -4;
+		entry->original = "RightToLeft";
+		entry->translation = "";
+
+		entries.AddEntry(entry);
+
+		entry = new listEntry;
+
+		entry->entry = list_entries->AddEntry("Author:");
+		entry->id = -5;
 		entry->original = "Author";
 		entry->translation = "";
 
@@ -297,14 +302,14 @@ void Translator::NewFile()
 		entry = new listEntry;
 
 		entry->entry = list_entries->AddEntry("URL:");
-		entry->id = -5;
+		entry->id = -6;
 		entry->original = "URL";
 		entry->translation = "";
 
 		entries.AddEntry(entry);
 	}
 
-	wnd->SetText(wnd->GetText().Append(" - unnamed"));
+	wnd->SetText(String(wnd->GetText()).Append(" - unnamed"));
 
 	list_entries->SelectNthEntry(0);
 
@@ -358,7 +363,7 @@ void Translator::OpenFile()
 	dialog->AddFilter("XML Language Files", "*.xml");
 	dialog->AddFilter("All Files", "*.*");
 
-	if (dialog->ShowDialog() == Success)
+	if (dialog->ShowDialog() == Success())
 	{
 		filename = dialog->GetFileName();
 
@@ -385,7 +390,7 @@ void Translator::OpenFile()
 
 		XML::Node	*info = doc->GetRootNode()->GetNodeByName("info");
 
-		for (int k = 0; k < info->GetNOfNodes(); k++)
+		for (Int k = 0; k < info->GetNOfNodes(); k++)
 		{
 			String		 property = info->GetNthNode(k)->GetAttributeByName("name")->GetContent();
 			listEntry	*entry = NULL;
@@ -393,8 +398,9 @@ void Translator::OpenFile()
 			if (property == "program")	entry = entries.GetNthEntry(0);
 			if (property == "version")	entry = entries.GetNthEntry(1);
 			if (property == "language")	entry = entries.GetNthEntry(2);
-			if (property == "author")	entry = entries.GetNthEntry(3);
-			if (property == "url")		entry = entries.GetNthEntry(4);
+			if (property == "righttoleft")	entry = entries.GetNthEntry(3);
+			if (property == "author")	entry = entries.GetNthEntry(4);
+			if (property == "url")		entry = entries.GetNthEntry(5);
 
 			if (entry != NULL)
 			{
@@ -404,10 +410,12 @@ void Translator::OpenFile()
 			}
 		}
 
-		XML::Node	*xentry = doc->GetRootNode()->GetNodeByName("data")->GetNodeByName("entry");
+		XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
 
-		while (xentry != NIL)
+		for (Int l = 0; l < data->GetNOfNodes(); l++)
 		{
+			XML::Node	*xentry = data->GetNthNode(l);
+
 			if (xentry->GetName() == "entry")
 			{
 				listEntry	*entry = new listEntry;
@@ -419,8 +427,6 @@ void Translator::OpenFile()
 
 				entries.AddEntry(entry);
 			}
-
-			xentry = xentry->GetNextNode();
 		}
 
 		delete doc;
@@ -454,7 +460,7 @@ void Translator::SaveFileAs()
 	dialog->AddFilter("XML Language Files", "*.xml");
 	dialog->AddFilter("All Files", "*.*");
 
-	if (dialog->ShowDialog() == Success)
+	if (dialog->ShowDialog() == Success())
 	{
 		filename = dialog->GetFileName();
 
@@ -476,25 +482,22 @@ void Translator::SaveFileAs()
 void Translator::SaveFileWithName(String file)
 {
 	XML::Document	*doc = new XML::Document();
-	XML::Node	*root = new XML::Node();
-
-	root->SetName("LangFile");
-
-	XML::Node	*info = root->AddNode("info", NIL);
+	XML::Node	*root = new XML::Node("LangFile");
+	XML::Node	*info = root->AddNode("info");
 
 	info->AddNode("property", entries.GetNthEntry(0)->translation)->SetAttribute("name", "program");
 	info->AddNode("property", entries.GetNthEntry(1)->translation)->SetAttribute("name", "version");
 	info->AddNode("property", entries.GetNthEntry(2)->translation)->SetAttribute("name", "language");
+	info->AddNode("property", entries.GetNthEntry(3)->translation)->SetAttribute("name", "righttoleft");
 	info->AddNode("property", "UTF-8")->SetAttribute("name", "encoding");
-	info->AddNode("property", entries.GetNthEntry(3)->translation)->SetAttribute("name", "author");
-	info->AddNode("property", entries.GetNthEntry(4)->translation)->SetAttribute("name", "url");
+	info->AddNode("property", entries.GetNthEntry(4)->translation)->SetAttribute("name", "author");
+	info->AddNode("property", entries.GetNthEntry(5)->translation)->SetAttribute("name", "url");
 
-	XML::Node	*data = root->AddNode("data", NIL);
+	XML::Node	*data = root->AddNode("data");
 
-	for (int i = 5; i < entries.GetNOfEntries(); i++)
+	for (Int i = 6; i < entries.GetNOfEntries(); i++)
 	{
 		listEntry	*entry = entries.GetNthEntry(i);
-
 		XML::Node	*xentry = data->AddNode("entry", entry->translation);
 
 		xentry->SetAttribute("id", String::FromInt(entry->id));
@@ -555,7 +558,7 @@ void Translator::SaveData()
 		edit_original->SetText(entry->original);
 		edit_translated->SetText(entry->translation);
 	}
-	else if (edit_original->GetText() == "Author")
+	else if (edit_original->GetText() == "RightToLeft")
 	{
 		entry = entries.GetNthEntry(3);
 
@@ -568,9 +571,22 @@ void Translator::SaveData()
 		edit_original->SetText(entry->original);
 		edit_translated->SetText(entry->translation);
 	}
-	else if (edit_original->GetText() == "URL")
+	else if (edit_original->GetText() == "Author")
 	{
 		entry = entries.GetNthEntry(4);
+
+		entry->translation = edit_translated->GetText();
+
+		entry->entry->SetText(String(edit_original->GetText()).Append(": ").Append(edit_translated->GetText()));
+
+		entry = entries.GetNthEntry(5);
+
+		edit_original->SetText(entry->original);
+		edit_translated->SetText(entry->translation);
+	}
+	else if (edit_original->GetText() == "URL")
+	{
+		entry = entries.GetNthEntry(5);
 
 		entry->translation = edit_translated->GetText();
 
@@ -584,9 +600,9 @@ void Translator::SaveData()
 		text_original->SetText("Original:");
 		text_translated->SetText("Translation:");
 
-		if (entries.GetNOfEntries() > 5)
+		if (entries.GetNOfEntries() > 6)
 		{
-			entry = entries.GetNthEntry(5);
+			entry = entries.GetNthEntry(6);
 
 			edit_id->SetText(String::FromInt(entry->id));
 			edit_original->SetText(entry->original);

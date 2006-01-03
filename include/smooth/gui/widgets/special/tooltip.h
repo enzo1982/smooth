@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -36,22 +36,22 @@ namespace smooth
 			private:
 				ToolWindow		*toolWindow;
 				System::Timer		*timer;
-
-				Void			 TimerProc();
 			protected:
 				Int			 timeOut;
 			public:
 				static const Int	 classID;
 
 							 Tooltip();
-							~Tooltip();
+				virtual			~Tooltip();
 
-				Int			 DrawTooltip();
-
-				Int			 Show();
-				Int			 Hide();
-
+				virtual Int		 Show();
+				virtual Int		 Hide();
+			accessors:
 				Int			 SetTimeout(Int);
+			slots:
+				Void			 OnToolWindowPaint();
+
+				Void			 OnTimer();
 		};
 	};
 };

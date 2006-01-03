@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -53,16 +53,16 @@ namespace smooth
 					Text		*txt_tip;
 					Layer		*layer_inner;
 
-					Bool		 showTips;
+					Bool		*showTips;
 
 					Array<String>	 tips;
 					Int		 mode;
 					Int		 offset;
 				public:
-							 TipOfTheDay();
-							~TipOfTheDay();
+							 TipOfTheDay(Bool *);
+					virtual		~TipOfTheDay();
 
-					Int		 ShowDialog();
+					const Error	&ShowDialog();
 
 					Int		 AddTip(const String &);
 					Int		 SetMode(Int, Int = 0, Bool = True);

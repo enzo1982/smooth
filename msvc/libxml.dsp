@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "libxml___Win32_Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../include" /D "WIN32" /D "__WIN32__" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "__SMOOTH_DLL__" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../include" /D "WIN32" /D "__WIN32__" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "__SMOOTH_DLL__" /D "LIBXML_STATIC" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -83,10 +83,6 @@ LIB32=link.exe -lib
 # Begin Group "Quellcodedateien"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
-# Begin Source File
-
-SOURCE=..\libraries\libxml\catalog.c
-# End Source File
 # Begin Source File
 
 SOURCE=..\libraries\libxml\chvalid.c
@@ -129,10 +125,6 @@ SOURCE=..\libraries\libxml\parserInternals.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\libxml\SAX.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\libraries\libxml\SAX2.c
 # End Source File
 # Begin Source File
@@ -145,27 +137,11 @@ SOURCE=..\libraries\libxml\tree.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\libxml\triodef.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\libraries\libxml\trionan.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\libraries\libxml\trionan.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\libraries\libxml\uri.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\libraries\libxml\valid.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\libraries\libxml\xlink.c
 # End Source File
 # Begin Source File
 
@@ -177,7 +153,7 @@ SOURCE=..\libraries\libxml\xmlmemory.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\libxml\xmlregexp.c
+SOURCE=..\libraries\libxml\xmlreader.c
 # End Source File
 # Begin Source File
 
@@ -189,15 +165,7 @@ SOURCE=..\libraries\libxml\xmlstring.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\libxml\xmlunicode.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\libraries\libxml\xpath.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\libraries\libxml\xpointer.c
+SOURCE=..\libraries\libxml\xmlwriter.c
 # End Source File
 # End Group
 # Begin Group "Header-Dateien"
@@ -206,14 +174,6 @@ SOURCE=..\libraries\libxml\xpointer.c
 # Begin Group "libxml"
 
 # PROP Default_Filter "*.h"
-# Begin Source File
-
-SOURCE=..\include\libxml\c14n.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\libxml\catalog.h
-# End Source File
 # Begin Source File
 
 SOURCE=..\include\libxml\chvalid.h
@@ -225,10 +185,6 @@ SOURCE=..\include\libxml\debugXML.h
 # Begin Source File
 
 SOURCE=..\include\libxml\dict.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\libxml\DOCBparser.h
 # End Source File
 # Begin Source File
 
@@ -284,10 +240,6 @@ SOURCE=..\include\libxml\SAX2.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\libxml\schemasInternals.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\libxml\threads.h
 # End Source File
 # Begin Source File
@@ -301,10 +253,6 @@ SOURCE=..\include\libxml\uri.h
 # Begin Source File
 
 SOURCE=..\include\libxml\valid.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\libxml\xinclude.h
 # End Source File
 # Begin Source File
 
@@ -344,19 +292,7 @@ SOURCE=..\include\libxml\xmlsave.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\libxml\xmlschemas.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\libxml\xmlschemastypes.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\libxml\xmlstring.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\libxml\xmlunicode.h
 # End Source File
 # Begin Source File
 
@@ -364,15 +300,7 @@ SOURCE=..\include\libxml\xmlversion.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\libxml\xpath.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\libxml\xpathInternals.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\include\libxml\xpointer.h
+SOURCE=..\include\libxml\xmlwriter.h
 # End Source File
 # End Group
 # Begin Source File

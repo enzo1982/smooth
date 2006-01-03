@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,58 +31,45 @@ namespace smooth
 		class SMOOTHAPI Node
 		{
 			private:
-				Node			*nextNode;
-				Node			*prevNode;
+				static Array<String>		 elementNames;
 
-				Document		*parentDoc;
-				Node			*parentNode;
-				Array<Attribute *>	 attributes;
-				Array<Node *>		 subnodes;
+				Array<Attribute *, Void *>	*attributes;
+				Array<Node *, Void *>		*subnodes;
 
-				Int			 nodeID;
-				String			 name;
-				String			 content;
+				Int				 nodeID;
+
+				Int				 nameIndex;
+				String				 content;
 			public:
-							 Node();
-							~Node();
+								 Node(const String &, const String & = NIL);
+								~Node();
 
-				Document		*GetParentDocument();
-				Int			 SetParentDocument(Document *);
+				Int				 GetNodeID();
+				Int				 SetNodeID(Int);
 
-				Node			*GetParentNode();
-				Int			 SetParentNode(Node *);
+				const String			 GetName();
+				Int				 SetName(const String &);
 
-				Int			 GetNodeID();
-				Int			 SetNodeID(Int);
+				const String			&GetContent();
+				Int				 SetContent(const String &);
 
-				Node			*GetNextNode();
-				Node			*GetPrevNode();
+/* Functions for attribute access */
+				Int				 GetNOfAttributes();
+				Attribute			*GetNthAttribute(Int);
+				Attribute			*GetAttributeByName(const String &);
 
-				Int			 SetNextNode(Node *);
-				Int			 SetPrevNode(Node *);
+				Attribute			*SetAttribute(const String &, const String &);
+				Int				 RemoveAttribute(Attribute *);
+				Int				 RemoveAttributeByName(const String &);
 
-				String			 GetName();
-				Int			 SetName(String);
+/* Functions for subnode access */
+				Int				 GetNOfNodes();
+				Node				*GetNthNode(Int);
+				Node				*GetNodeByName(const String &);
 
-				String			 GetContent();
-				Int			 SetContent(String);
-
-				Int			 GetNOfAttributes();
-				Attribute		*GetNthAttribute(Int);
-				Attribute		*GetAttributeByName(String);
-
-				Attribute		*SetAttribute(String, String);
-				Int			 RemoveAttribute(Attribute *);
-				Int			 RemoveAttributeByName(String);
-
-				Int			 GetNOfNodes();
-				Node			*GetNthNode(Int);
-				Node			*GetNodeByName(String);
-
-				Node			*AddNode(String, String = NIL);
-				Node			*SetNode(String, String = NIL);
-				Int			 RemoveNode(Node *);
-				Int			 RemoveNodeByName(String);
+				Node				*AddNode(const String &, const String & = NIL);
+				Int				 RemoveNode(Node *);
+				Int				 RemoveNodeByName(const String &);
 		};
 	};
 };

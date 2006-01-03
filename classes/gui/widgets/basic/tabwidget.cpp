@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,18 +15,12 @@
 
 const S::Int	 S::GUI::TabWidget::classID = S::Object::RequestClassID();
 
-S::GUI::TabWidget::TabWidget(Point iPos, Size iSize)
+S::GUI::TabWidget::TabWidget(const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
-	type		= classID;
-	containerType	= classID;
+	type	= classID;
 
-	possibleContainers.AddEntry(Layer::classID);
-
-	pos		= iPos;
-	size		= iSize;
-
-	if (size.cx == 0) size.cx = 120;
-	if (size.cy == 0) size.cy = 100;
+	if (GetWidth() == 0) SetWidth(120);
+	if (GetHeight() == 0) SetHeight(100);
 }
 
 S::GUI::TabWidget::~TabWidget()
@@ -35,8 +29,8 @@ S::GUI::TabWidget::~TabWidget()
 
 S::Int S::GUI::TabWidget::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
 
 	Surface	*surface	= container->GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
@@ -51,7 +45,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 	{
 		if (i > 0) prev = object;
 
-		object = (Layer *) assocObjects.GetNthEntry(i);
+		object = (Layer *) GetNthObject(i);
 
 		if (object != NIL)
 		{
@@ -60,19 +54,14 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 				object->SetContainer(container->GetContainer());
 				object->SetRegisteredFlag(True);
 
-				((Widget *) object)->onRegister.Emit(this);
+				object->onRegister.Emit(this);
 			}
-
-			object->pos.x = realPos.x;
-			object->pos.y = realPos.y + 19;
-			object->size.cx = size.cx;
-			object->size.cy = size.cy - 19;
 		}
 	}
 
 	GetLayersSize();
 
-	frame = Rect(GetRealPosition(), size);
+	frame = Rect(GetRealPosition(), GetSize());
 
 	frame.top += 19;
 	surface->Frame(frame, FRAME_UP);
@@ -85,14 +74,11 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 	{
 		if (j > 0) prev = object;
 
-		object = (Layer *) assocObjects.GetNthEntry(j);
+		object = (Layer *) GetNthObject(j);
 
 		if (object != NIL)
 		{
-			object->pos.x = realPos.x + 2;
-			object->pos.y = realPos.y + 21;
-			object->size.cx = size.cx - 3;
-			object->size.cy = size.cy - 22;
+			object->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));
 
 			if (object->IsVisible())
 			{
@@ -214,21 +200,21 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 		}
 	}
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())		return Failure;
-	if (!active || !IsVisible())	return Success;
+	if (!IsRegistered())		return Error();
+	if (!active || !IsVisible())	return Success();
 
 	Window	*wnd		= container->GetContainerWindow();
 
-	if (wnd == NIL) return Success;
+	if (wnd == NIL) return Success();
 
 	Surface	*surface	= wnd->GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
-	Int	 retVal		= Success;
+	Int	 retVal		= Success();
 	Layer	*object;
 	Layer	*object2;
 	Rect	 frame;
@@ -241,7 +227,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		object = (Layer *) assocObjects.GetNthEntry(i);
+		object = (Layer *) GetNthObject(i);
 
 		if (object != NIL)
 		{
@@ -250,13 +236,10 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 				object->SetContainer(container->GetContainer());
 				object->SetRegisteredFlag(True);
 
-				((Widget *) object)->onRegister.Emit(this);
+				object->onRegister.Emit(this);
 			}
 
-			object->pos.x = realPos.x + 2;
-			object->pos.y = realPos.y + 21;
-			object->size.cx = size.cx - 3;
-			object->size.cy = size.cy - 22;
+			object->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));
 
 			if (object->IsVisible())
 			{
@@ -270,7 +253,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDOWN:
 			for (Int i = 0; i < GetNOfObjects(); i++)
 			{
-				object = (Layer *) assocObjects.GetNthEntry(i);
+				object = (Layer *) GetNthObject(i);
 
 				if (object != NIL)
 				{
@@ -285,11 +268,11 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 						if (wnd->IsMouseOn(frame))
 						{
-							surface->StartPaint(Rect(Point(Setup::rightToLeft ? (wnd->size.cx - (realPos.x + size.cx)) : realPos.x, realPos.y), size));
+							surface->StartPaint(Rect(Point(Setup::rightToLeft ? (wnd->GetWidth() - (realPos.x + GetWidth())) : realPos.x, realPos.y), GetSize()));
 
 							for (Int j = 0; j < GetNOfObjects(); j++)
 							{
-								object2 = (Layer *) assocObjects.GetNthEntry(j);
+								object2 = (Layer *) GetNthObject(j);
 
 								if (object2 != NIL)
 								{
@@ -300,7 +283,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 								}
 							}
 
-							wnd->SetUpdateRect(Rect(Point(Setup::rightToLeft ? (wnd->size.cx - (realPos.x + size.cx)) : realPos.x, realPos.y), size));
+							wnd->SetUpdateRect(Rect(Point(Setup::rightToLeft ? (wnd->GetWidth() - (realPos.x + GetWidth())) : realPos.x, realPos.y), GetSize()));
 
 							Hide();
 
@@ -336,7 +319,7 @@ S::Void S::GUI::TabWidget::GetLayersSize()
 {
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		Layer	*object = (Layer *) assocObjects.GetNthEntry(i);
+		Layer	*object = (Layer *) GetNthObject(i);
 
 		if (object != NIL)
 		{
@@ -354,71 +337,46 @@ S::Int S::GUI::TabWidget::SelectTab(Int layerid)
 {
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		Layer	*object = (Layer *) assocObjects.GetNthEntry(i);
+		Layer	*object = (Layer *) GetNthObject(i);
 
 		if (object->GetHandle() == layerid)	object->Show();
 		else					object->Hide();
 	}
 
-	return Success;
+	return Success();
 }
 
 S::Int S::GUI::TabWidget::RegisterObject(Widget *object)
 {
-	if (!IsRegistered())	return Failure;
-	if (object == NIL)	return Failure;
-
-	if (containerType == &object->possibleContainers)
+	if (Widget::RegisterObject(object) == Success())
 	{
-		if (!object->IsRegistered())
-		{
-			assocObjects.AddEntry(object, object->GetHandle());
-			sizeSet.AddEntry(False, object->GetHandle());
-			textSize.AddEntry(0, object->GetHandle());
+		sizeSet.AddEntry(False, object->GetHandle());
+		textSize.AddEntry(0, object->GetHandle());
 
-			if (GetNOfObjects() == 1)	object->Show();
-			else				object->Hide();
+		if (GetNOfObjects() == 1) object->Show();
+		else			  object->Hide();
 
-			return Success;
-		}
+		return Success();
 	}
 
-	return Failure;
+	return Error();
 }
 
 S::Int S::GUI::TabWidget::UnregisterObject(Widget *object)
 {
-	if (object == NIL) return Failure;
+	if (object == NIL) return Error();
 
-	Bool	 activateNew = False;
+	Bool	 wasVisible = object->IsVisible();
 
-	if (containerType == &object->possibleContainers)
+	if (Widget::UnregisterObject(object) == Success())
 	{
-		if (GetNOfObjects() > 0 && object->IsRegistered())
-		{
-			if (object->IsVisible())
-			{
-				object->Hide();
+		sizeSet.RemoveEntry(object->GetHandle());
+		textSize.RemoveEntry(object->GetHandle());
 
-				activateNew = True;
-			}
+		if (wasVisible && GetNOfObjects() > 0) GetNthObject(0)->Show();
 
-			object->onUnregister.Emit(this);
-
-			if (assocObjects.RemoveEntry(object->GetHandle()) == True)
-			{
-				sizeSet.RemoveEntry(object->GetHandle());
-				textSize.RemoveEntry(object->GetHandle());
-
-				object->SetRegisteredFlag(False);
-				object->SetContainer(NIL);
-
-				if (activateNew && GetNOfObjects() > 0) assocObjects.GetFirstEntry()->Show();
-
-				return Success;
-			}
-		}
+		return Success();
 	}
 
-	return Failure;
+	return Error();
 }

@@ -29,28 +29,28 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
  *
  * the version string like "1.2.3"
  */
-#define LIBXML_DOTTED_VERSION "2.6.16"
+#define LIBXML_DOTTED_VERSION "2.6.22"
 
 /**
  * LIBXML_VERSION:
  *
  * the version number: 1.2.3 value is 1002003
  */
-#define LIBXML_VERSION 20616
+#define LIBXML_VERSION 20622
 
 /**
  * LIBXML_VERSION_STRING:
  *
  * the version number string, 1.2.3 value is "1002003"
  */
-#define LIBXML_VERSION_STRING "20616"
+#define LIBXML_VERSION_STRING "20622"
 
 /**
  * LIBXML_VERSION_EXTRA:
  *
  * extra version information, used to show a CVS compilation
  */
-#define LIBXML_VERSION_EXTRA "-CVS2257"
+#define LIBXML_VERSION_EXTRA "-CVS2634"
 
 /**
  * LIBXML_TEST_VERSION:
@@ -58,7 +58,7 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
  * Macro to check that the libxml version in use is compatible with
  * the version the software has been compiled against
  */
-#define LIBXML_TEST_VERSION xmlCheckVersion(20616);
+#define LIBXML_TEST_VERSION xmlCheckVersion(20622);
 
 #ifndef VMS
 #if 0
@@ -101,7 +101,7 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
  *
  * Whether the DOM like tree manipulation API support is configured in
  */
-#if 1
+#if 0
 #define LIBXML_TREE_ENABLED
 #endif
 
@@ -119,7 +119,7 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
  *
  * Whether the push parsing interfaces are configured in
  */
-#if 0
+#if 1
 #define LIBXML_PUSH_ENABLED
 #endif
 
@@ -128,7 +128,7 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
  *
  * Whether the xmlReader parsing interface is configured in
  */
-#if 0
+#if 1
 #define LIBXML_READER_ENABLED
 #endif
 
@@ -146,7 +146,7 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
  *
  * Whether the xmlWriter saving interface is configured in
  */
-#if 0
+#if 1
 #define LIBXML_WRITER_ENABLED
 #endif
 
@@ -155,7 +155,7 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
  *
  * Whether the older SAX1 interface is configured in
  */
-#if 1
+#if 0
 #define LIBXML_SAX1_ENABLED
 #endif
 
@@ -272,7 +272,7 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
  *
  * Whether ISO-8859-* support is made available in case iconv is not
  */
-#if 1
+#if 0
 #define LIBXML_ISO8859X_ENABLED
 #endif
 
@@ -308,7 +308,7 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
  *
  * Whether the Unicode related interfaces are compiled in
  */
-#if 1
+#if 0
 #define LIBXML_UNICODE_ENABLED
 #endif
 
@@ -331,12 +331,45 @@ XMLPUBFUN void XMLCALL xmlCheckVersion(int version);
 #endif
 
 /**
+ * LIBXML_EXPR_ENABLED:
+ *
+ * Whether the formal expressions interfaces are compiled in
+ */
+#if 0
+#define LIBXML_EXPR_ENABLED
+#endif
+
+/**
  * LIBXML_SCHEMAS_ENABLED:
  *
  * Whether the Schemas validation interfaces are compiled in
  */
 #if 0
 #define LIBXML_SCHEMAS_ENABLED
+#endif
+
+/**
+ * LIBXML_SCHEMATRON_ENABLED:
+ *
+ * Whether the Schematron validation interfaces are compiled in
+ */
+#if 0
+#define LIBXML_SCHEMATRON_ENABLED
+#endif
+
+/**
+ * LIBXML_MODULES_ENABLED:
+ *
+ * Whether the module interfaces are compiled in
+ */
+#if 0
+#define LIBXML_MODULES_ENABLED
+/**
+ * LIBXML_MODULE_EXTENSION:
+ *
+ * the string suffix used by dynamic modules (usually shared libraries)
+ */
+#define LIBXML_MODULE_EXTENSION ".so" 
 #endif
 
 /**

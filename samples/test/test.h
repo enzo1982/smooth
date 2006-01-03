@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,15 +24,63 @@ class Test : public Application
 		Titlebar	*mainWnd_titlebar;
 		Statusbar	*mainWnd_statusbar;
 
+		Divider		*mainWnd_divider1;
+		Divider		*mainWnd_divider2;
+
+		Client		*mainWnd_client;
+
 		Menubar		*mainWnd_menubar;
 
-		Menu		*menu_file;
-		Menu		*menu_dialogs;
+		PopupMenu	*menu_file;
+		PopupMenu	*menu_dialogs;
+		PopupMenu	*menu_menus;
+
+		PopupMenu	*menu_2ndlevel;
+
+		Text		*text_arrows;
+		Arrows		*widget_arrows;
+		Text		*text_arrows_value;
+
+		Text		*text_activearea;
+		ActiveArea	*widget_activearea;
+
+		Text		*text_button;
+		Button		*widget_button;
+
+		Text		*text_hyperlink;
+		Hyperlink	*widget_hyperlink;
+
+		Text		*text_scrollbar;
+		Scrollbar	*widget_scrollbar;
+		Text		*text_scrollbar_value;
+
+		Text		*text_progressbar;
+		Progressbar	*widget_progressbar;
+
+		Text		*text_checkbox;
+		CheckBox	*widget_checkbox;
+		Bool		 checkbox_var;
+
+		Text		*text_optionbox;
+		OptionBox	*widget_optionbox1;
+		OptionBox	*widget_optionbox2;
+		Int		 optionbox_var;
+
+		Text		*text_slider;
+		Slider		*widget_slider;
+
+		Text		*text_editbox;
+		EditBox		*widget_editbox;
 	public:
 				 Test();
-				~Test();
+		virtual		~Test();
 	slots:
 		Void		 ColorDlg();
+
+		Void		 OnArrowsValueChange(Int);
+		Void		 OnScrollbarValueChange(Int);
+
+		Void		 OnWidgetAction();
 };
 
 #endif

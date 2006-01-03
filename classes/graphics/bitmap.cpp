@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2005 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,12 +9,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/bitmap.h>
-#include <smooth/graphics/bitmapbackend.h>
+#include <smooth/graphics/backends/bitmapbackend.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/gui/application/application.h>
-#include <smooth/pciio.h>
-
-S::GUI::Bitmap	 S::GUI::SI_DEFAULT = S::GUI::Bitmap();
 
 S::GUI::Bitmap::Bitmap(Void *iBitmap)
 {
@@ -46,7 +42,7 @@ S::Int S::GUI::Bitmap::GetBitmapType()
 	return backend->GetBitmapType();
 }
 
-const S::GUI::Size S::GUI::Bitmap::GetSize()
+const S::GUI::Size &S::GUI::Bitmap::GetSize()
 {
 	return backend->GetSize();
 }
@@ -81,7 +77,7 @@ S::Bool S::GUI::Bitmap::SetSystemBitmap(Void *nBitmap)
 	return backend->SetSystemBitmap(nBitmap);
 }
 
-S::Void *S::GUI::Bitmap::GetSystemBitmap()
+S::Void *S::GUI::Bitmap::GetSystemBitmap() const
 {
 	return backend->GetSystemBitmap();
 }
@@ -96,16 +92,16 @@ S::Int S::GUI::Bitmap::ReplaceColor(Int color1, Int color2)
 	return backend->ReplaceColor(color1, color2);
 }
 
-S::Int S::GUI::Bitmap::BlitFromSurface(Surface *surface, Rect srcRect, Rect destRect)
+S::Int S::GUI::Bitmap::BlitFromSurface(Surface *surface, const Rect &srcRect, const Rect &destRect)
 {
-	if (surface == NIL) return Failure;
+	if (surface == NIL) return Error();
 
 	return surface->BlitToBitmap(srcRect, *this, destRect);
 }
 
-S::Int S::GUI::Bitmap::BlitToSurface(Rect srcRect, Surface *surface, Rect destRect)
+S::Int S::GUI::Bitmap::BlitToSurface(const Rect &srcRect, Surface *surface, const Rect &destRect)
 {
-	if (surface == NIL) return Failure;
+	if (surface == NIL) return Error();
 
 	return surface->BlitFromBitmap(*this, srcRect, destRect);
 }
@@ -134,54 +130,12 @@ S::GUI::Bitmap &S::GUI::Bitmap::operator =(const Bitmap &newBitmap)
 	return *this;
 }
 
-S::Bool S::GUI::Bitmap::operator ==(const int nil)
+S::Bool S::GUI::Bitmap::operator ==(const int nil) const
 {
 	return (*backend == nil);
 }
 
-S::Bool S::GUI::Bitmap::operator !=(const int nil)
+S::Bool S::GUI::Bitmap::operator !=(const int nil) const
 {
 	return (*backend != nil);
-}
-
-S::GUI::Bitmap S::GUI::Bitmap::LoadBitmap(String file, Int id, String name)
-{
-	GUI::Bitmap	 bmp;
-	PCIIn		 pci = OpenPCIForInput(file);
-
-	if (pci->GetLastError() != IOLIB_ERROR_OK)
-	{
-		ClosePCI(pci);
-
-		pci = OpenPCIForInput(Application::GetStartupDirectory().Append(file));
-
-		if (pci->GetLastError() != IOLIB_ERROR_OK)
-		{
-			ClosePCI(pci);
-
-			pci = OpenPCIForInput(Application::GetApplicationDirectory().Append(file));
-
-			if (pci->GetLastError() != IOLIB_ERROR_OK)
-			{
-				ClosePCI(pci);
-
-				return NIL;
-			}
-		}
-	}
-
-	PCIIO	*pio = new PCIIO();
-
-	if (id >= 0)		pio->SelectImage(id);
-	else if (name != NIL)	pio->SelectImage(name);
-
-	ReadPCI(pci, *pio);
-
-	ClosePCI(pci);
-
-	bmp = pio->GetBitmap();
-
-	delete pio;
-
-	return bmp;
 }

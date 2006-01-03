@@ -63,8 +63,8 @@ LIB32=link.exe -lib
 # PROP Output_Dir "Build"
 # PROP Intermediate_Dir "fribidi___Win32_Debug"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ  /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ  /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "../libraries/fribidi2" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -85,27 +85,39 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi.c
+SOURCE="..\libraries\fribidi2\fribidi-bidi-types.c"
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi_char_type.c
+SOURCE="..\libraries\fribidi2\fribidi-bidi.c"
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi_mem.c
+SOURCE="..\libraries\fribidi2\fribidi-env.c"
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi_mirroring.c
+SOURCE="..\libraries\fribidi2\fribidi-joining-types.c"
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi_types.c
+SOURCE="..\libraries\fribidi2\fribidi-joining.c"
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi_utils.c
+SOURCE="..\libraries\fribidi2\fribidi-mem.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-mirroring.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-run.c"
+# End Source File
+# Begin Source File
+
+SOURCE=..\libraries\fribidi2\fribidi.c
 # End Source File
 # End Group
 # Begin Group "Header-Dateien"
@@ -113,27 +125,95 @@ SOURCE=..\libraries\fribidi\fribidi_utils.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi.h
+SOURCE="..\libraries\fribidi2\bidi-types.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi_config.h
+SOURCE=..\libraries\fribidi2\common.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi_mem.h
+SOURCE=..\libraries\fribidi2\debug.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi_types.h
+SOURCE=..\libraries\fribidi2\env.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\fribidi_unicode.h
+SOURCE="..\libraries\fribidi2\fribidi-begindecls.h"
 # End Source File
 # Begin Source File
 
-SOURCE=..\libraries\fribidi\packtab.h
+SOURCE="..\libraries\fribidi2\fribidi-bidi-types-list.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-bidi-types.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-bidi.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-common.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-config.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-enddecls.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-env.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-joining-types-list.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-joining-types.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-joining.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-mirroring.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-types.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-unicode-version.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\fribidi-unicode.h"
+# End Source File
+# Begin Source File
+
+SOURCE=..\libraries\fribidi2\fribidi.h
+# End Source File
+# Begin Source File
+
+SOURCE="..\libraries\fribidi2\joining-types.h"
+# End Source File
+# Begin Source File
+
+SOURCE=..\libraries\fribidi2\mem.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\libraries\fribidi2\run.h
 # End Source File
 # End Group
 # End Target

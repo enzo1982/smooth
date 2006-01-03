@@ -64,15 +64,40 @@ static int xmlCharEncodingAliasesMax = 0;
 #if 0
 #define DEBUG_ENCODING  /* Define this to get encoding traces */
 #endif
-#endif
-
+#else
 #ifdef LIBXML_ISO8859X_ENABLED
 static void xmlRegisterCharEncodingHandlersISO8859x (void);
 #endif
-
+#endif
 
 static int xmlLittleEndian = 1;
 
+/**
+ * xmlEncodingErrMemory:
+ * @extra:  extra informations
+ *
+ * Handle an out of memory condition
+ */
+static void
+xmlEncodingErrMemory(const char *extra)
+{
+    __xmlSimpleError(XML_FROM_I18N, XML_ERR_NO_MEMORY, NULL, NULL, extra);
+}
+
+/**
+ * xmlErrEncoding:
+ * @error:  the error number
+ * @msg:  the error message
+ *
+ * n encoding error
+ */
+static void
+xmlEncodingErr(xmlParserErrors error, const char *msg, const char *val)
+{
+    __xmlRaiseError(NULL, NULL, NULL, NULL, NULL,
+                    XML_FROM_I18N, error, XML_ERR_FATAL,
+                    NULL, 0, val, NULL, NULL, 0, 0, msg, val);
+}
 
 /************************************************************************
  *									*
@@ -226,7 +251,7 @@ UTF8Toascii(unsigned char* out, int *outlen,
  *
  * Take a block of ISO Latin 1 chars in and try to convert it to an UTF-8
  * block of chars out.
- * Returns 0 if success, or -1 otherwise
+ * Returns the number of bytes written if success, or -1 otherwise
  * The value of @inlen after return is the number of octets consumed
  *     if the return value is positive, else unpredictable.
  * The value of @outlen after return is the number of octets consumed.
@@ -314,7 +339,8 @@ UTF8ToUTF8(unsigned char* out, int *outlen,
  * Take a block of UTF-8 chars in and try to convert it to an ISO Latin 1
  * block of chars out.
  *
- * Returns 0 if success, -2 if the transcoding fails, or -1 otherwise
+ * Returns the number of bytes written if success, -2 if the transcoding fails,
+           or -1 otherwise
  * The value of @inlen after return is the number of octets consumed
  *     if the return value is positive, else unpredictable.
  * The value of @outlen after return is the number of octets consumed.
@@ -1241,7 +1267,7 @@ xmlNewCharEncodingHandler(const char *name,
     const char *alias;
     char upper[500];
     int i;
-    char *up = 0;
+    char *up = NULL;
 
     /*
      * Do the alias resolution
@@ -1254,8 +1280,8 @@ xmlNewCharEncodingHandler(const char *name,
      * Keep only the uppercase version of the encoding.
      */
     if (name == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlNewCharEncodingHandler : no name !\n");
+        xmlEncodingErr(XML_I18N_NO_NAME,
+		       "xmlNewCharEncodingHandler : no name !\n", NULL);
 	return(NULL);
     }
     for (i = 0;i < 499;i++) {
@@ -1265,8 +1291,7 @@ xmlNewCharEncodingHandler(const char *name,
     upper[i] = 0;
     up = xmlMemStrdup(upper);
     if (up == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlNewCharEncodingHandler : out of memory !\n");
+        xmlEncodingErrMemory("xmlNewCharEncodingHandler : out of memory !\n");
 	return(NULL);
     }
 
@@ -1277,8 +1302,7 @@ xmlNewCharEncodingHandler(const char *name,
               xmlMalloc(sizeof(xmlCharEncodingHandler));
     if (handler == NULL) {
         xmlFree(up);
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlNewCharEncodingHandler : out of memory !\n");
+        xmlEncodingErrMemory("xmlNewCharEncodingHandler : out of memory !\n");
 	return(NULL);
     }
     handler->input = input;
@@ -1321,12 +1345,13 @@ xmlInitCharEncodingHandlers(void) {
 
     if (*ptr == 0x12) xmlLittleEndian = 0;
     else if (*ptr == 0x34) xmlLittleEndian = 1;
-    else xmlGenericError(xmlGenericErrorContext,
-	    "Odd problem at endianness detection\n");
+    else {
+        xmlEncodingErr(XML_ERR_INTERNAL_ERROR,
+	               "Odd problem at endianness detection\n", NULL);
+    }
 
     if (handlers == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlInitCharEncodingHandlers : out of memory !\n");
+        xmlEncodingErrMemory("xmlInitCharEncodingHandlers : out of memory !\n");
 	return;
     }
     xmlNewCharEncodingHandler("UTF-8", UTF8ToUTF8, UTF8ToUTF8);
@@ -1352,10 +1377,12 @@ xmlInitCharEncodingHandlers(void) {
     xmlNewCharEncodingHandler("ASCII", asciiToUTF8, NULL);
     xmlNewCharEncodingHandler("US-ASCII", asciiToUTF8, NULL);
 #endif /* LIBXML_OUTPUT_ENABLED */
-
+#ifndef LIBXML_ICONV_ENABLED
 #ifdef LIBXML_ISO8859X_ENABLED
     xmlRegisterCharEncodingHandlersISO8859x ();
 #endif
+#endif
+
 }
 
 /**
@@ -1394,16 +1421,15 @@ void
 xmlRegisterCharEncodingHandler(xmlCharEncodingHandlerPtr handler) {
     if (handlers == NULL) xmlInitCharEncodingHandlers();
     if (handler == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlRegisterCharEncodingHandler: NULL handler !\n");
+        xmlEncodingErr(XML_I18N_NO_HANDLER,
+		"xmlRegisterCharEncodingHandler: NULL handler !\n", NULL);
 	return;
     }
 
     if (nbCharEncodingHandler >= MAX_ENCODING_HANDLERS) {
-        xmlGenericError(xmlGenericErrorContext, 
-	"xmlRegisterCharEncodingHandler: Too many handler registered\n");
-        xmlGenericError(xmlGenericErrorContext,
-		"\tincrease MAX_ENCODING_HANDLERS : %s\n", __FILE__);
+        xmlEncodingErr(XML_I18N_EXCESS_HANDLER,
+	"xmlRegisterCharEncodingHandler: Too many handler registered, see %s\n",
+	               "MAX_ENCODING_HANDLERS");
 	return;
     }
     handlers[nbCharEncodingHandler++] = handler;
@@ -1590,7 +1616,7 @@ xmlFindCharEncodingHandler(const char *name) {
 	}
 
 #ifdef LIBXML_ICONV_ENABLED
-    if (use_iconv) {
+if (use_iconv) {
     /* check whether iconv can handle this */
     icv_in = iconv_open("UTF-8", name);
     icv_out = iconv_open(name, "UTF-8");
@@ -1613,9 +1639,9 @@ xmlFindCharEncodingHandler(const char *name) {
 #endif
 	    return enc;
     } else if ((icv_in != (iconv_t) -1) || icv_out != (iconv_t) -1) {
-	    xmlGenericError(xmlGenericErrorContext,
+	    xmlEncodingErr(XML_ERR_INTERNAL_ERROR,
 		    "iconv : problems with filters for '%s'\n", name);
-    } }
+    }}
 #endif /* LIBXML_ICONV_ENABLED */
 
 #ifdef DEBUG_ENCODING
@@ -1678,7 +1704,7 @@ xmlIconvWrapper(iconv_t cd, unsigned char *out, int *outlen,
     }
     icv_inlen = *inlen;
     icv_outlen = *outlen;
-    ret = iconv(cd, &icv_in, &icv_inlen, &icv_out, &icv_outlen);
+    ret = iconv(cd, (char **) &icv_in, &icv_inlen, &icv_out, &icv_outlen);
     if (in != NULL) {
         *inlen -= icv_inlen;
         *outlen -= icv_outlen;
@@ -1763,7 +1789,7 @@ xmlCharEncFirstLine(xmlCharEncodingHandler *handler, xmlBufferPtr out,
 	out->content[out->use] = 0;
     }
 #ifdef LIBXML_ICONV_ENABLED
-    else if (handler->iconv_in != NULL) {
+    else if (handler->iconv_in != NULL && use_iconv) {
 	ret = xmlIconvWrapper(handler->iconv_in, &out->content[out->use],
 	                      &written, in->content, &toconv);
 	xmlBufferShrink(in, toconv);
@@ -1847,7 +1873,7 @@ xmlCharEncInFunc(xmlCharEncodingHandler * handler, xmlBufferPtr out,
         out->content[out->use] = 0;
     }
 #ifdef LIBXML_ICONV_ENABLED
-    else if (handler->iconv_in != NULL) {
+    else if (handler->iconv_in != NULL && use_iconv) {
         ret = xmlIconvWrapper(handler->iconv_in, &out->content[out->use],
                               &written, in->content, &toconv);
         xmlBufferShrink(in, toconv);
@@ -1879,20 +1905,24 @@ xmlCharEncInFunc(xmlCharEncodingHandler * handler, xmlBufferPtr out,
                             toconv, written, in->use);
 #endif
             break;
-        case -2:
-            xmlGenericError(xmlGenericErrorContext,
-                            "input conversion failed due to input error\n");
-            xmlGenericError(xmlGenericErrorContext,
-                            "Bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n",
-                            in->content[0], in->content[1],
-                            in->content[2], in->content[3]);
+        case -2: {
+            char buf[50];
+
+	    snprintf(&buf[0], 49, "0x%02X 0x%02X 0x%02X 0x%02X", 
+		     in->content[0], in->content[1],
+		     in->content[2], in->content[3]);
+	    buf[49] = 0;
+	    xmlEncodingErr(XML_I18N_CONV_FAILED,
+		    "input conversion failed due to input error, bytes %s\n",
+		           buf);
+        }
     }
     /*
      * Ignore when input buffer is not on a boundary
      */
     if (ret == -3)
         ret = 0;
-    return (written);
+    return (written? written : ret);
 }
 
 /**
@@ -1946,7 +1976,7 @@ retry:
 	    }
 	}
 #ifdef LIBXML_ICONV_ENABLED
-	else if (handler->iconv_out != NULL) {
+	else if (handler->iconv_out != NULL && use_iconv) {
 	    ret = xmlIconvWrapper(handler->iconv_out, &out->content[out->use],
 				  &written, NULL, &toconv);
 	    out->use += written;
@@ -1979,7 +2009,7 @@ retry:
 	out->content[out->use] = 0;
     }
 #ifdef LIBXML_ICONV_ENABLED
-    else if (handler->iconv_out != NULL) {
+    else if (handler->iconv_out != NULL && use_iconv) {
 	ret = xmlIconvWrapper(handler->iconv_out, &out->content[out->use],
 	                      &written, in->content, &toconv);
 	xmlBufferShrink(in, toconv);
@@ -1998,8 +2028,8 @@ retry:
     }
 #endif /* LIBXML_ICONV_ENABLED */
     else {
-	xmlGenericError(xmlGenericErrorContext,
-		"xmlCharEncOutFunc: no output function !\n");
+	xmlEncodingErr(XML_I18N_NO_OUTPUT,
+		       "xmlCharEncOutFunc: no output function !\n", NULL);
 	return(-1);
     }
 
@@ -2050,18 +2080,21 @@ retry:
 		 * and continue the transcoding phase, hoping the error
 		 * did not mangle the encoder state.
 		 */
-		snprintf((char *) charref, sizeof(charref), "&#%d;", cur);
+		snprintf((char *) &charref[0], sizeof(charref), "&#%d;", cur);
 		xmlBufferShrink(in, len);
 		xmlBufferAddHead(in, charref, -1);
 
 		goto retry;
 	    } else {
-		xmlGenericError(xmlGenericErrorContext,
-			"output conversion failed due to conv error\n");
-		xmlGenericError(xmlGenericErrorContext,
-			"Bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n",
-			in->content[0], in->content[1],
-			in->content[2], in->content[3]);
+		char buf[50];
+
+		snprintf(&buf[0], 49, "0x%02X 0x%02X 0x%02X 0x%02X", 
+			 in->content[0], in->content[1],
+			 in->content[2], in->content[3]);
+		buf[49] = 0;
+		xmlEncodingErr(XML_I18N_CONV_FAILED,
+		    "output conversion failed due to conv error, bytes %s\n",
+			       buf);
 		in->content[0] = ' ';
 	    }
 	    break;
@@ -2088,7 +2121,7 @@ xmlCharEncCloseFunc(xmlCharEncodingHandler *handler) {
      * Iconv handlers can be used only once, free the whole block.
      * and the associated icon resources.
      */
-    if ((handler->iconv_out != NULL) || (handler->iconv_in != NULL)) {
+    if (((handler->iconv_out != NULL) || (handler->iconv_in != NULL)) && use_iconv) {
 	if (handler->name != NULL)
 	    xmlFree(handler->name);
 	handler->name = NULL;
@@ -2147,7 +2180,7 @@ xmlByteConsumed(xmlParserCtxtPtr ctxt) {
 	 * the raw consumed value, this is not a cheap operation
 	 */
         if (in->end - in->cur > 0) {
-	    static unsigned char convbuf[32000];
+	    unsigned char convbuf[32000];
 	    const unsigned char *cur = (const unsigned char *)in->cur;
 	    int toconv = in->end - in->cur, written = 32000;
 
@@ -2164,7 +2197,7 @@ xmlByteConsumed(xmlParserCtxtPtr ctxt) {
 		    cur += toconv;
 		} while (ret == -2);
 #ifdef LIBXML_ICONV_ENABLED
-	    } else if (handler->iconv_out != NULL) {
+	    } else if (handler->iconv_out != NULL && use_iconv) {
 	        do {
 		    toconv = in->end - cur;
 		    written = 32000;
@@ -2192,6 +2225,7 @@ xmlByteConsumed(xmlParserCtxtPtr ctxt) {
     return(in->consumed + (in->cur - in->base));
 }
 
+#ifndef LIBXML_ICONV_ENABLED
 #ifdef LIBXML_ISO8859X_ENABLED
 
 /**
@@ -3258,4 +3292,5 @@ xmlRegisterCharEncodingHandlersISO8859x (void) {
     xmlNewCharEncodingHandler ("ISO-8859-16", ISO8859_16ToUTF8, UTF8ToISO8859_16);
 }
 
+#endif
 #endif

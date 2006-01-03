@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,12 +9,12 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/threads/thread.h>
-#include <smooth/threads/threadbackend.h>
+#include <smooth/threads/backends/threadbackend.h>
 #include <smooth/loop.h>
 
-S::Void ThreadProcCaller(S::Threads::Thread *);
-
 const S::Int	 S::Threads::Thread::classID = S::Object::RequestClassID();
+
+S::Int		 S::Threads::Thread::nOfRunningThreads = 0;
 
 S::Threads::Thread::Thread(Void *iThread)
 {
@@ -34,6 +34,8 @@ S::Threads::Thread::~Thread()
 	if (status != THREAD_STOPPED)
 	{
 		status = THREAD_STOPPED;
+
+		nOfRunningThreads--;
 
 		backend->Stop();
 	}
@@ -55,22 +57,22 @@ S::Int S::Threads::Thread::Start()
 {
 	if ((status == THREAD_CREATED && !initializing) || status == THREAD_STARTME || (flags & THREAD_WAITFLAG_START))
 	{
-		backend->Start((Void (*)(Void *)) ThreadProcCaller, this);
+		nOfRunningThreads++;
 
 		status = THREAD_RUNNING;
 
-		return Success;
+		backend->Start((Void (*)(Void *)) MainCaller, this);
+
+		return Success();
 	}
 	else if (status == THREAD_CREATED && initializing)
 	{
 		status = THREAD_STARTME;
 
-		return Success;
+		return Success();
 	}
-	else
-	{
-		return Failure;
-	}
+
+	return Error();
 }
 
 S::Int S::Threads::Thread::Stop()
@@ -81,46 +83,29 @@ S::Int S::Threads::Thread::Stop()
 		{
 			status = THREAD_STOPPED_SELF;
 
+			nOfRunningThreads--;
+
 			backend->Exit();
 
-			return Success;
+			return Success();
 		}
 
 		status = THREAD_STOPPED;
 
+		nOfRunningThreads--;
+
 		backend->Stop();
 
-		return Success;
+		return Success();
 	}
-	else
-	{
-		return Failure;
-	}
+
+	return Error();
 }
 
-S::Int S::Threads::Thread::GetNOfRunningThreads()
-{
-	Int	 n = 0;
-
-	for (Int i = 0; i < Object::GetNOfObjects(); i++)
-	{
-		Object	*object = Object::GetNthObject(i);
-
-		if (object != NIL)
-		{
-			if (object->GetObjectType() == classID)
-			{
-				if (((Thread *) object)->GetStatus() == THREAD_RUNNING) n++;
-			}
-		}
-	}
-
-	return n;
-}
-
-S::Void ThreadProcCaller(S::Threads::Thread *thread)
+S::Void S::Threads::Thread::MainCaller(Thread *thread)
 {
 	thread->threadMain.Call(thread);
+	thread->status = THREAD_STOPPED;
 
-	thread->Stop();
+	nOfRunningThreads--;
 }

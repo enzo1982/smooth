@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -63,21 +63,21 @@ template <class t> S::Int S::Buffer<t>::Resize(Int nSize)
 		size		= nSize;
 	}
 
-	return Success;
+	return Success();
 }
 
 template <class t> S::Int S::Buffer<t>::Zero()
 {
-	if (memory == NIL) return Success;
+	if (memory == NIL) return Success();
 
 	memset(memory, 0, size * sizeof(t));
 
-	return Success;
+	return Success();
 }
 
 template <class t> S::Int S::Buffer<t>::Free()
 {
-	if (memory == NIL) return Success;
+	if (memory == NIL) return Success();
 
 	delete [] memory;
 
@@ -86,7 +86,7 @@ template <class t> S::Int S::Buffer<t>::Free()
 	size		= 0;
 	allocated	= 0;
 
-	return Success;
+	return Success();
 }
 
 template <class t> t &S::Buffer<t>::operator [](int n)

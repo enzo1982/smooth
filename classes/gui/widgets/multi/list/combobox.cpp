@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,418 +10,117 @@
 
 #include <smooth/gui/widgets/multi/list/combobox.h>
 #include <smooth/gui/widgets/multi/list/listbox.h>
-#include <smooth/gui/widgets/multi/list/list.h>
-#include <smooth/definitions.h>
-#include <smooth/loop.h>
+#include <smooth/gui/widgets/hotspot/simplebutton.h>
 #include <smooth/misc/math.h>
-#include <smooth/misc/i18n.h>
 #include <smooth/gui/window/toolwindow.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/graphics/surface.h>
 
 const S::Int	 S::GUI::ComboBox::classID = S::Object::RequestClassID();
 
-S::GUI::ComboBox::ComboBox(Point iPos, Size iSize)
+S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 {
 	type		= classID;
 
 	listBox		= NIL;
 	toolWindow	= NIL;
-	layer		= NIL;
-
-	closeListBox	= False;
-
-	possibleContainers.AddEntry(Layer::classID);
 
 	SetFont(Font(font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
 
-	pos		= iPos;
-	size		= iSize;
+	SetMetrics(iPos, iSize);
 
-	if (size.cx == 0) size.cx = 80;
-	if (size.cy == 0) size.cy = 19;
+	if (GetWidth() == 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(19);
+
+	hotspot		= new Hotspot(Point(1, 1), GetSize() - Size(19, 2));
+
+	hotspot->onLeftButtonClick.Connect(&ComboBox::ToggleListBox, this);
+	hotspot->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
+
+	buttonHotspot	= new HotspotSimpleButton(Point(16, 3), Size(13, GetHeight() - 6));
+	buttonHotspot->SetOrientation(OR_UPPERRIGHT);
+
+	buttonHotspot->onLeftButtonClick.Connect(&ComboBox::ToggleListBox, this);
+	buttonHotspot->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
+
+	RegisterObject(hotspot);
+	RegisterObject(buttonHotspot);
+
+	onChangeSize.Connect(&ComboBox::OnChangeSize, this);
 }
 
 S::GUI::ComboBox::~ComboBox()
 {
+	DeleteObject(hotspot);
+	DeleteObject(buttonHotspot);
+
 	CloseListBox();
 }
 
 S::Int S::GUI::ComboBox::Paint(Int message)
 {
-	if (!IsRegistered())	return Failure;
-	if (!IsVisible())	return Success;
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
 
 	if (GetSelectedEntry() == NIL && !(flags & CB_HOTSPOTONLY))
 	{
-		if (GetNthObject(0) != NIL) ((ListEntry *) GetNthObject(0))->clicked = True;
+		if (GetNthEntry(0) != NIL) ((ListEntry *) GetNthEntry(0))->Select();
 	}
-
-	Surface		*surface	= container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	Point		 realPos	= GetRealPosition();
-	Rect		 frame		= Rect(GetRealPosition(), size);
+	Surface		*surface	= container->GetDrawSurface();
+	Rect		 frame		= Rect(GetRealPosition(), GetSize());
 	Point		 lineStart;
 	Point		 lineEnd;
 
-	if (!(flags & CB_HOTSPOTONLY))
-	{
-		if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
-		else		surface->Box(frame, Setup::BackgroundColor, FILLED);
-
-		surface->Frame(frame, FRAME_DOWN);
-	}
-
-	frame.top++;
-	frame.bottom--;
-	frame.right--;
-	frame.left = frame.right - 17;
-
-	surface->Box(frame, Setup::BackgroundColor, FILLED);
-	surface->Frame(frame, FRAME_UP);
-
-	frame.top--;
-	frame.bottom++;
-	frame.right++;
-	frame.left = realPos.x;
-
-	lineStart.x = frame.right - 13 + (Setup::rightToLeft ? 1 : 0);
-	lineStart.y = frame.top + 8;
-	lineEnd.x = lineStart.x + 7;
-	lineEnd.y = lineStart.y;
-
-	for (Int i = 0; i < 4; i++)
-	{
-		if (active)	surface->Line(lineStart, lineEnd, Setup::TextColor);
-		else		surface->Line(lineStart, lineEnd, Setup::GrayTextColor);
-
-		lineStart.x++;
-		lineStart.y++;
-		lineEnd.x--;
-		lineEnd.y++;
-	}
-
-	if (!(flags & CB_HOTSPOTONLY))
-	{
-		for (Int j = 0; j < GetNOfObjects(); j++)
-		{
-			ListEntry	*operat = (ListEntry *) GetNthObject(j);
-
-			if (operat->clicked)
-			{
-				frame.left	+= 3;
-				frame.top	+= 3;
-				frame.right	-= 18;
-
-				String	 nText = operat->GetText();
-
-				for (Int k = 0; k < operat->GetText().Length(); k++)
-				{
-					if (operat->GetText()[k] == '\t')	nText[k] = 0;
-					else					nText[k] = operat->GetText()[k];
-				}
-
-				surface->SetText(nText, frame, font);
-
-				frame.right	+= 18;
-				frame.left	-= 3;
-				frame.top	-= 3;
-			}
-		}
-	}
-
-	LeaveProtectedRegion();
-
-	return Success;
-}
-
-S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
-{
-	if (!IsRegistered())		return Failure;
-	if (!active || !IsVisible())	return Success;
-
-	Layer		*lay		= (Layer *) container;
-	Window		*wnd		= container->GetContainerWindow();
-
-	if (wnd == NIL) return Success;
-
-	Surface		*surface	= container->GetDrawSurface();
-
-	EnterProtectedRegion();
-
-	Point		 realPos	= GetRealPosition();
-	Int		 retVal		= Success;
-	ListEntry	*operat;
-	Rect		 frame		= Rect(GetRealPosition(), size);
-	Rect		 lbframe;
-	Point		 lbp;
-	Size		 lbs;
-	Bool		 executeProcs	= False;
-
-	if (flags & CB_HOTSPOTONLY)
-	{
-		frame.top	+= 3;
-		frame.bottom	-= 3;
-		frame.right	-= 3;
-		frame.left	= frame.right - 13;
-	}
-
 	switch (message)
 	{
-		case WM_ACTIVATE:
-		case WM_ACTIVATEAPP:
-		case WM_KILLFOCUS:
-			if (message == WM_ACTIVATE && toolWindow != NIL) if ((HWND) lParam == (HWND) toolWindow->GetSystemWindow()) break;
-			if (message == WM_KILLFOCUS && toolWindow != NIL) if ((HWND) wParam == (HWND) toolWindow->GetSystemWindow()) break;
-
-			if (listBox != NIL)
-			{
-				CloseListBox();
-
-				if (!wnd->IsMouseOn(frame)) wnd->Process(SM_LBUTTONDOWN, 0, 0);
-			}
-
-			break;
-		case SM_LOOSEFOCUS:
-			lbframe.top	= realPos.y + size.cy;
-			lbframe.bottom	= lbframe.top + Math::Min((Int) (15 * GetNOfObjects() + 4), 15 * 5 + 4);
-			lbframe.right	= realPos.x + size.cx - 1;
-			lbframe.left	= realPos.x;
-
-			if (wParam != GetHandle())
-			{
-				if (listBox != NIL && (wnd->IsMouseOn(frame) || !wnd->IsMouseOn(lbframe)))
-				{
-					CloseListBox();
-
-					retVal = Break;
-				}
-			}
-
-			break;
-		case SM_LBUTTONDOWN:
-		case SM_LBUTTONDBLCLK:
-			lbframe.top	= realPos.y + size.cy;
-			lbframe.bottom	= lbframe.top + Math::Min((Int) (15 * GetNOfObjects() + 4), 15 * 5 + 4);
-			lbframe.right	= realPos.x + size.cx - 1;
-			lbframe.left	= realPos.x;
-
-			if (wnd->IsMouseOn(frame) && listBox == NIL)
-			{
-				wnd->Process(SM_LOOSEFOCUS, GetHandle(), 0);
-
-				lbp.x = lbframe.left - lay->pos.x;
-				lbp.y = realPos.y + size.cy - lay->pos.y;
-				lbs.cx = size.cx;
-				lbs.cy = Math::Min((Int) (15 * GetNOfObjects() + 4), 15 * 5 + 4);
-
-				layer		= new Layer();
-				toolWindow	= new ToolWindow();
-				listBox		= new ListBox(Point(0, 0), lbs);
-
-				listBox->onClick.Connect(&ComboBox::ListBoxProc, this);
-
-				lbp.x = lbframe.left + wnd->pos.x;
-				lbp.y = realPos.y + size.cy + wnd->pos.y;
-
-				if (checked)
-				{
-					clicked = True;
-
-					if (!(flags & CB_HOTSPOTONLY))
-					{
-						frame.top	+= 3;
-						frame.bottom	-= 3;
-						frame.right	-= 3;
-						frame.left	= frame.right - 13;
-					}
-
-					surface->Frame(frame, FRAME_DOWN);
-				}
-
-				toolWindow->SetMetrics(lbp, lbs);
-
-				listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
-				listBox->AddTab("", 32768);
-
-				prevSelectedEntry = GetSelectedEntry();
-
-				for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
-				{
-					ListEntry	*entry = (ListEntry *) assocObjects.GetNthEntry(i);
-
-					entry->SetRegisteredFlag(False);
-
-					listBox->RegisterObject(entry);
-				}
-
-				wnd->RegisterObject(toolWindow);
-				toolWindow->RegisterObject(layer);
-				layer->RegisterObject(listBox);
-
-				toolWindow->Show();
-
-				listBox->Paint(SP_PAINT);
-
-				retVal = Break;
-			}
-			else if (listBox != NIL && (wnd->IsMouseOn(frame) || !wnd->IsMouseOn(lbframe)))
-			{
-				if (checked)
-				{
-					clicked = True;
-
-					if (!(flags & CB_HOTSPOTONLY))
-					{
-						frame.top	+= 3;
-						frame.bottom	-= 3;
-						frame.right	-= 3;
-						frame.left	= frame.right - 13;
-					}
-
-					surface->Frame(frame, FRAME_DOWN);
-
-					if (!(flags & CB_HOTSPOTONLY))
-					{
-						frame.top	-= 3;
-						frame.bottom	+= 3;
-						frame.right	+= 3;
-						frame.left	= realPos.x;
-					}
-				}
-
-				frame.top	= frame.bottom + 1;
-				frame.bottom	= frame.top + Math::Min((Int) (15 * GetNOfObjects() + 4), 15 * 5 + 4);
-				frame.right++;
-	
-				CloseListBox();
-			}
-
-			break;
-		case SM_LBUTTONUP:
-			if (closeListBox)
-			{
-				CloseListBox();
-
-				closeListBox = False;
-
-				if (!(flags & CB_HOTSPOTONLY))
-				{
-					frame.left	+= 3;
-					frame.top	+= 3;
-					frame.right	-= 18;
-
-					String	 nText;
-
-					if (prevSelectedEntry != NIL)
-					{
-						Font	 nFont = font;
-
-						nFont.SetColor(Setup::ClientColor);
-
-						nText = prevSelectedEntry->GetText();
-
-						for (Int k = 0; k < prevSelectedEntry->GetText().Length(); k++)
-						{
-							if (prevSelectedEntry->GetText()[k] == '\t')	nText[k] = 0;
-							else						nText[k] = prevSelectedEntry->GetText()[k];
-						}
-
-						surface->SetText(nText, frame, nFont);
-					}
-
-					ListEntry	*entry = GetSelectedEntry();
-
-					nText = entry->GetText();
-
-					for (Int l = 0; l < entry->GetText().Length(); l++)
-					{
-						if (entry->GetText()[l] == '\t')	nText[l] = 0;
-						else					nText[l] = entry->GetText()[l];
-					}
-
-					surface->SetText(nText, frame, font);
-
-					frame.right	+= 18;
-					frame.left	-= 3;
-					frame.top	-= 3;
-				}
-
-				if (prevSelectedEntry != GetSelectedEntry()) executeProcs = True;
-
-				retVal = Break;
-			}
-
-			if (executeProcs)
-			{
-				for (Int i = 0; i < GetNOfObjects(); i++)
-				{
-					operat = (ListEntry *) GetNthObject(i);
-
-					if (operat->clicked)
-					{
-						onClick.Emit(wnd->MouseX(), wnd->MouseY());
-						operat->onClick.Emit(wnd->MouseX(), wnd->MouseY());
-
-						break;
-					}
-				}
-			}
-
-			if (clicked)
-			{
-				clicked = False;
-
-				if (checked)
-				{
-					if (!(flags & CB_HOTSPOTONLY))
-					{
-						frame.top	+= 3;
-						frame.bottom	-= 3;
-						frame.right	-= 3;
-						frame.left	= frame.right - 13;
-					}
-
-					surface->Frame(frame, FRAME_UP);
-				}
-				else
-				{
-					if (!(flags & CB_HOTSPOTONLY))
-					{
-						frame.top	+= 3;
-						frame.bottom	-= 3;
-						frame.right	-= 3;
-						frame.left	= frame.right - 13;
-					}
-
-					surface->Box(frame, Setup::BackgroundColor, OUTLINED);
-				}
-			}
-
-			break;
-		case SM_MOUSEMOVE:
+		case SP_SHOW:
+		case SP_PAINT:
 			if (!(flags & CB_HOTSPOTONLY))
 			{
-				frame.top	+= 3;
-				frame.bottom	-= 3;
-				frame.right	-= 3;
-				frame.left	= frame.right - 13;
+				if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+
+				surface->Frame(frame, FRAME_DOWN);
 			}
 
-			if (wnd->IsMouseOn(frame) && !checked)
-			{
-				surface->Frame(frame, FRAME_UP);
+			surface->Box(frame + Point(GetWidth() - 18, 1) - Size(GetWidth() - 17, 2), Setup::BackgroundColor, FILLED);
+			surface->Frame(frame + Point(GetWidth() - 18, 1) - Size(GetWidth() - 17, 2), FRAME_UP);
 
-				checked = True;
+			lineStart	= Point(frame.right - 13 + (Setup::rightToLeft ? 1 : 0), frame.top + 8);
+			lineEnd		= lineStart + Point(7, 0);
+
+			for (Int i = 0; i < 4; i++)
+			{
+				if (active)	surface->Line(lineStart, lineEnd, Setup::TextColor);
+				else		surface->Line(lineStart, lineEnd, Setup::GrayTextColor);
+
+				lineStart += Point(1, 1);
+				lineEnd += Point(-1, 1);
 			}
-			else if (!wnd->IsMouseOn(frame) && checked)
-			{
-				surface->Box(frame, Setup::BackgroundColor, OUTLINED);
 
-				checked = False;
-				clicked = False;
+			if (!(flags & CB_HOTSPOTONLY))
+			{
+				for (Int j = 0; j < GetNOfObjects(); j++)
+				{
+					if (GetNthObject(j)->GetObjectType() != ListEntry::classID) continue;
+
+					ListEntry	*operat = (ListEntry *) GetNthObject(j);
+
+					if (operat->IsSelected())
+					{
+						String	 nText = operat->GetText();
+
+						for (Int k = 0; k < operat->GetText().Length(); k++)
+						{
+							if (operat->GetText()[k] == '\t')	nText[k] = 0;
+							else					nText[k] = operat->GetText()[k];
+						}
+
+						surface->SetText(nText, frame + Point(3, 3) - Size(21, 0), font);
+					}
+				}
 			}
 
 			break;
@@ -429,51 +128,96 @@ S::Int S::GUI::ComboBox::Process(Int message, Int wParam, Int lParam)
 
 	LeaveProtectedRegion();
 
-	return retVal;
+	return Success();
 }
 
-S::Void S::GUI::ComboBox::ListBoxProc()
+S::Void S::GUI::ComboBox::OnSelectEntry(ListEntry *entry)
 {
 	if (listBox != NIL)
 	{
-		closeListBox = True;
-				
-		toolWindow->SetOwner(this);
+		CloseListBox();
+
+		if (prevSelectedEntry != entry)
+		{
+			Paint(SP_PAINT);
+
+			if (flags & CB_HOTSPOTONLY) entry->Deselect();
+
+			onSelectEntry.Emit(entry);
+		}
 	}
 }
 
-S::Void S::GUI::ComboBox::CloseListBox()
+S::Void S::GUI::ComboBox::ToggleListBox()
 {
-	Window	*wnd = NIL;
-
-	if (IsRegistered()) wnd = container->GetContainerWindow();
-
-	if (listBox != NIL)
+	if (listBox == NIL)
 	{
-		for (Int i = 0; i < assocObjects.GetNOfEntries(); i++)
+		listBox		= new ListBox(Point(0, 0), Size(GetWidth(), 15 * Math::Min(GetNOfEntries(), 5) + 4));
+		listBox->onSelectEntry.Connect(&ComboBox::OnSelectEntry, this);
+
+		toolWindow	= new ToolWindow(container->GetContainerWindow()->GetPosition() + GetRealPosition() + Point(0, GetHeight()), Size(GetWidth(), 15 * Math::Min(GetNOfObjects(), 5) + 4));
+
+		listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
+		listBox->AddTab("", 32768);
+
+		prevSelectedEntry = GetSelectedEntry();
+
+		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
-			ListEntry	*entry = (ListEntry *) assocObjects.GetNthEntry(i);
+			if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+
+			ListEntry	*entry = (ListEntry *) GetNthObject(i);
+
+			entry->SetRegisteredFlag(False);
+
+			listBox->RegisterObject(entry);
+
+			entry->Activate();
+		}
+
+		toolWindow->RegisterObject(listBox);
+
+		RegisterObject(toolWindow);
+	}
+	else if (listBox != NIL)
+	{
+		for (Int i = 0; i < GetNOfObjects(); i++)
+		{
+			if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+
+			ListEntry	*entry = (ListEntry *) GetNthObject(i);
 
 			listBox->UnregisterObject(entry);
 
 			entry->SetRegisteredFlag(True);
 			entry->SetContainer(this);
+
+			entry->Deactivate();
 		}
 
 		toolWindow->FreeOwner();
 		toolWindow->Close();
 
-		if (wnd != NIL) wnd->UnregisterObject(toolWindow);
+		UnregisterObject(toolWindow);
 
-		toolWindow->UnregisterObject(layer);
-		layer->UnregisterObject(listBox);
+		toolWindow->UnregisterObject(listBox);
 
 		DeleteObject(listBox);
-		DeleteObject(layer);
 		DeleteObject(toolWindow);
 
 		listBox		= NIL;
-		layer		= NIL;
 		toolWindow	= NIL;
 	}
+}
+
+S::Void S::GUI::ComboBox::CloseListBox()
+{
+	if (listBox != NIL) ToggleListBox();
+}
+
+S::Void S::GUI::ComboBox::OnChangeSize(const Size &nSize)
+{
+	hotspot->SetSize(nSize - Size(19, 2));
+
+	buttonHotspot->SetHeight(nSize.cy - 6);
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,15 +15,8 @@ namespace smooth
 {
 	namespace GUI
 	{
-		class ComboBox;
-		class List;
-		class ListBox;
-		class Tooltip;
-	};
-
-	namespace System
-	{
-		class Timer;
+		class ListEntry;
+		class Hotspot;
 	};
 };
 
@@ -35,36 +28,33 @@ namespace smooth
 	{
 		class SMOOTHAPI ListEntry : public Widget
 		{
-			friend class ComboBox;
-			friend class List;
-			friend class ListBox;
 			private:
-				Bool		 marked;
-
-				Tooltip		*tooltip;
-				System::Timer	*tipTimer;
-
-				Void		 DrawEntryText(Int);
+				Bool				 marked;
+				Bool				 selected;
+			protected:
+				Hotspot				*hotspot;
+				Hotspot				*markHotspot;
 			public:
-						 ListEntry(String);
-						~ListEntry();
+								 ListEntry(const String &);
+				virtual				~ListEntry();
 
-				Int		 Paint(Int);
-				Int		 Process(Int, Int, Int);
+				virtual Int			 Hide();
 
-				Int		 SetText(const String &);
+				virtual Int			 Paint(Int);
+			accessors:
+				Int				 SetMark(Bool);
+				Bool				 IsMarked();
 
-				Int		 SetMark(Bool);
-				Bool		 IsMarked();
+				Int				 Select();
+				Int				 Deselect();
+				Bool				 IsSelected();
 			signals:
-				Signal0<Void>	 onMouseOver;
-				Signal0<Void>	 onMouseOut;
+				static Signal2<Void, Int, Int>	 internalOnSelectEntry;
 			slots:
-				Void		 OnRegister();
-				Void		 OnUnregister();
+				Void				 OnToggleMark();
+				Void				 OnSelectEntry();
 
-				Void		 ActivateTooltip();
-				Void		 SelectEntry();
+				Void				 OnSelectOtherEntry(Int, Int);
 		};
 	};
 };

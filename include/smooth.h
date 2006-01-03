@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2004 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,27 +17,33 @@
 
 #define __SMOOTH__
 
-#include "iolib-cxx.h"
-
 #include "smooth/definitions.h"
 #include "smooth/loop.h"
 #include "smooth/version.h"
 
-#include "smooth/array.h"
-#include "smooth/buffer.h"
-#include "smooth/extended.h"
+#include "smooth/templates/array.h"
+#include "smooth/templates/buffer.h"
+#include "smooth/templates/extended.h"
+#include "smooth/templates/nonblocking.h"
+#include "smooth/templates/pointer.h"
+
+#include "smooth/templates/callbacks.h"
+#include "smooth/templates/signals.h"
+#include "smooth/templates/signalsr.h"
+#include "smooth/templates/slots.h"
+#include "smooth/templates/slotsr.h"
 
 #include "smooth/basic/input.h"
 #include "smooth/basic/object.h"
 #include "smooth/basic/setup.h"
 
-#include "smooth/error/error.h"
-#include "smooth/error/success.h"
+#include "smooth/errors/error.h"
+#include "smooth/errors/success.h"
 
-#include "smooth/error/fs/endoffile.h"
-#include "smooth/error/fs/filenotfound.h"
+#include "smooth/errors/fs/endoffile.h"
+#include "smooth/errors/fs/filenotfound.h"
 
-#include "smooth/error/misc/permissiondenied.h"
+#include "smooth/errors/misc/permissiondenied.h"
 
 #include "smooth/types/bool.h"
 #include "smooth/types/float.h"
@@ -45,28 +51,37 @@
 #include "smooth/types/void.h"
 
 #include "smooth/system/console.h"
+#include "smooth/system/dynamicloader.h"
 #include "smooth/system/system.h"
 #include "smooth/system/timer.h"
 
 #include "smooth/files/directory.h"
 #include "smooth/files/file.h"
 
+#include "smooth/io/instream.h"
+#include "smooth/io/outstream.h"
+
 #include "smooth/threads/mutex.h"
 #include "smooth/threads/semaphore.h"
 #include "smooth/threads/thread.h"
 
+#include "smooth/graphics/forms/line.h"
+#include "smooth/graphics/forms/point.h"
+#include "smooth/graphics/forms/rect.h"
+#include "smooth/graphics/forms/size.h"
+
 #include "smooth/graphics/bitmap.h"
+#include "smooth/graphics/color.h"
 #include "smooth/graphics/font.h"
-#include "smooth/graphics/line.h"
-#include "smooth/graphics/point.h"
-#include "smooth/graphics/rect.h"
-#include "smooth/graphics/size.h"
 #include "smooth/graphics/surface.h"
+
+#include "smooth/graphics/imageloader/imageloader.h"
+
+#include "smooth/i18n/i18n.h"
 
 #include "smooth/misc/binary.h"
 #include "smooth/misc/config.h"
 #include "smooth/misc/datetime.h"
-#include "smooth/misc/i18n.h"
 #include "smooth/misc/math.h"
 #include "smooth/misc/string.h"
 
@@ -84,8 +99,6 @@
 #include "smooth/gui/mdi/client.h"
 #include "smooth/gui/mdi/window.h"
 
-#include "smooth/gui/widgets/container.h"
-#include "smooth/gui/widgets/hotspot.h"
 #include "smooth/gui/widgets/layer.h"
 #include "smooth/gui/widgets/widget.h"
 
@@ -109,6 +122,9 @@
 #include "smooth/gui/widgets/basic/text.h"
 #include "smooth/gui/widgets/basic/titlebar.h"
 
+#include "smooth/gui/widgets/hotspot/hotspot.h"
+#include "smooth/gui/widgets/hotspot/simplebutton.h"
+
 #include "smooth/gui/widgets/multi/list/list.h"
 #include "smooth/gui/widgets/multi/list/listbox.h"
 #include "smooth/gui/widgets/multi/list/combobox.h"
@@ -117,9 +133,7 @@
 #include "smooth/gui/widgets/multi/menu/menubar.h"
 #include "smooth/gui/widgets/multi/menu/popupmenu.h"
 
-#include "smooth/gui/widgets/multi/tree/tree.h"
-#include "smooth/gui/widgets/multi/tree/treeview.h"
-
+#include "smooth/gui/widgets/special/cursor.h"
 #include "smooth/gui/widgets/special/dragcontrol.h"
 #include "smooth/gui/widgets/special/droparea.h"
 #include "smooth/gui/widgets/special/shortcut.h"

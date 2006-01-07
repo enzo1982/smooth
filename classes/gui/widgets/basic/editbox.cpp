@@ -32,7 +32,7 @@ S::GUI::EditBox::EditBox(const String &iText, const Point &iPos, const Size &iSi
 
 	cursor = new Cursor(Point(3, 2), GetSize() - Size(6, 4));
 	cursor->SetMaxSize(maxSize);
-	cursor->SetBackgroundColor(Color(255, 255, 255));
+	cursor->SetBackgroundColor(Setup::ClientColor);
 	cursor->SetFont(font);
 	cursor->SetText(iText);
 	cursor->onInput.Connect(&onInput);
@@ -80,8 +80,6 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 				OnChangeSize(GetSize());
 
-				if (!active) comboBox->Deactivate();
-
 				for (Int i = 0; i < dropDownList->GetNOfObjects(); i++)
 				{
 					comboBox->AddEntry(dropDownList->GetNthObject(i)->GetText());
@@ -92,8 +90,6 @@ S::Int S::GUI::EditBox::Paint(Int message)
 			else if (dropDownList != NIL)
 			{
 				comboBox->SetSize(GetSize());
-
-				if (!active) comboBox->Deactivate();
 			}
 
 			break;
@@ -109,24 +105,8 @@ S::Int S::GUI::EditBox::MarkAll()
 	return cursor->MarkAll();
 }
 
-S::Int S::GUI::EditBox::Show()
-{
-	if (comboBox != NIL) comboBox->Show();
-
-	return Widget::Show();
-}
-
-S::Int S::GUI::EditBox::Hide()
-{
-	if (comboBox != NIL) comboBox->Hide();
-
-	return Widget::Hide();
-}
-
 S::Int S::GUI::EditBox::Activate()
 {
-	if (comboBox != NIL) comboBox->Activate();
-
 	cursor->SetBackgroundColor(Setup::ClientColor);
 
 	return Widget::Activate();
@@ -134,8 +114,6 @@ S::Int S::GUI::EditBox::Activate()
 
 S::Int S::GUI::EditBox::Deactivate()
 {
-	if (comboBox != NIL) comboBox->Deactivate();
-
 	cursor->SetBackgroundColor(Setup::BackgroundColor);
 
 	return Widget::Deactivate();

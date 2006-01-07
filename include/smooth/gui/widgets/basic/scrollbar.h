@@ -50,7 +50,7 @@ namespace smooth
 				Void			 OnMouseDrag(const Point &);
 				Void			 OnMouseDragEnd(const Point &);
 
-				Void			 OnValueChange(Int);
+				Void			 OnValueChange();
 		};
 	};
 };

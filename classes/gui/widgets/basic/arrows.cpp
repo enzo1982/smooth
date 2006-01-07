@@ -38,6 +38,8 @@ S::GUI::Arrows::Arrows(const Point &iPos, const Size &iSize, Int sType, Int *var
 	if (GetWidth() == 0) SetWidth(subtype == OR_VERT ? 17 : 24);
 	if (GetHeight() == 0) SetHeight(subtype == OR_VERT ? 24 : 17);
 
+	onRangeChange.SetParentObject(this);
+
 	onValueChange.SetParentObject(this);
 	onValueChange.Connect(&onAction);
 
@@ -216,7 +218,7 @@ S::Int S::GUI::Arrows::SetRange(Int rangeStart, Int rangeEnd)
 
 	SetValue(*variable);
 
-	onValueChange.Emit(*variable);
+	onRangeChange.Emit(startValue, endValue);
 
 	return Success();
 }

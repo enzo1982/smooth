@@ -36,8 +36,10 @@ namespace smooth
 				virtual		~MenubarEntry();
 
 				virtual Int	 Paint(Int);
+				virtual Int	 Process(Int, Int, Int);
 			slots:
-				Void		 TogglePopupMenu();
+				Void		 OpenPopupMenu();
+				Void		 ClosePopupMenu();
 		};
 	};
 };

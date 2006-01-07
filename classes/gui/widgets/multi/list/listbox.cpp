@@ -35,15 +35,21 @@ S::GUI::ListBox::ListBox(const Point &iPos, const Size &iSize)
 
 	onChangeSize.Connect(&ListBox::OnChangeSize, this);
 
-	header = new ListBoxHeader(Point(1, 1), Size(GetWidth() - 2, 16));
+	scrollbar = new Scrollbar(Point(), Size(), OR_VERT, &scrollbarPos, 0, 1);
+	scrollbar->SetOrientation(OR_UPPERRIGHT);
+	scrollbar->onValueChange.Connect(&ListBox::OnScrollbarValueChange, this);
+	scrollbar->Hide();
 
+	header = new ListBoxHeader(Point(1, 1), Size(GetWidth() - 2, 16));
+	header->Hide();
+
+	RegisterObject(scrollbar);
 	RegisterObject(header);
 }
 
 S::GUI::ListBox::~ListBox()
 {
-	if (scrollbar != NIL) DeleteObject(scrollbar);
-
+	DeleteObject(scrollbar);
 	DeleteObject(header);
 }
 
@@ -65,43 +71,27 @@ S::Int S::GUI::ListBox::Paint(Int message)
 		case SP_PAINT:
 			surface->StartPaint(frame);
 
-			if (flags & LF_HIDEHEADER) header->Hide();
+			if (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER))	header->Show();
+			else							header->Hide();
 
-			if (!(15 * GetNOfEntries() + (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16) + 4 > GetHeight() && !(flags & LF_HIDESCROLLBAR)))
+			if (15 * GetNOfEntries() + (header->IsVisible() ? 16 : 0) + 4 > GetHeight() && !(flags & LF_HIDESCROLLBAR))
 			{
-				if (scrollbar != NIL)
-				{
-					scrollbarPos = 0;
-
-					DeleteObject(scrollbar);
-
-					scrollbar = NIL;
-				}
+				scrollbar->SetMetrics(Point(18, 1 + (header->IsVisible() ? 16 : 0)), Size(scrollbar->GetWidth(), GetHeight() - 2 - (header->IsVisible() ? 16 : 0)));
+				scrollbar->SetRange(0, GetNOfEntries() - (int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / 15));
+				scrollbar->Show();
+			}
+			else
+			{
+				scrollbar->Hide();
 			}
 
-			if (active)	surface->Box(frame + Point(0, (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER)) ? 17 : 0) - Size(scrollbar != NIL ? 18 : 0, (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER)) ? 17 : 0), Setup::ClientColor, FILLED);
-			else		surface->Box(frame + Point(0, (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER)) ? 17 : 0) - Size(scrollbar != NIL ? 18 : 0, (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER)) ? 17 : 0), Setup::BackgroundColor, FILLED);
+			if (active)	surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::ClientColor, FILLED);
+			else		surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::BackgroundColor, FILLED);
 
 			surface->Frame(frame, FRAME_DOWN);
 
-			if (15 * GetNOfEntries() + (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16) + 4 > GetHeight() && !(flags & LF_HIDESCROLLBAR))
 			{
-				if (scrollbar == NIL)
-				{
-					scrollbar = new Scrollbar(Point(18, 1 + (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16)), Size(0, GetHeight() - 2 - (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16)), OR_VERT, &scrollbarPos, 0, GetNOfEntries() - (Int) ((GetHeight() - 4 - (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
-					scrollbar->SetOrientation(OR_UPPERRIGHT);
-					scrollbar->onValueChange.Connect(&ListBox::OnScrollbarValueChange, this);
-
-					RegisterObject(scrollbar);
-				}
-				else
-				{
-					scrollbar->SetRange(0, GetNOfEntries() - (int) ((GetHeight() - 4 - (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
-				}
-			}
-
-			{
-				frame.top = 1 + (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16);
+				frame.top = 1 + (header->IsVisible() ? 16 : 0);
 
 				for (Int i = 0, n = 0; i < GetNOfObjects(); i++)
 				{
@@ -111,7 +101,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					if (n++ >= scrollbarPos && frame.top + 15 <= GetHeight() - 3)
 					{
-						operat->SetMetrics(Point(2, frame.top + 1), Size(GetWidth() - 4 - (scrollbar != NIL ? 17 : 0), operat->GetHeight()));
+						operat->SetMetrics(Point(2, frame.top + 1), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), operat->GetHeight()));
 						operat->Show();
 
 						visibleEntries.Append(operat->GetName());
@@ -133,20 +123,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			break;
 		case SP_UPDATE:
-			if (15 * GetNOfEntries() + (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16) + 4 > GetHeight() && !(flags & LF_HIDESCROLLBAR))
+			if (15 * GetNOfEntries() + (header->IsVisible() ? 16 : 0) + 4 > GetHeight() && !(flags & LF_HIDESCROLLBAR))
 			{
-				if (scrollbar == NIL)
-				{
-					Paint(SP_PAINT);
-				}
-				else
-				{
-					scrollbar->SetRange(0, GetNOfEntries() - (int) ((GetHeight() - 4 - (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
-				}
+				if (!scrollbar->IsVisible())	Paint(SP_PAINT);
+				else 				scrollbar->SetRange(0, GetNOfEntries() - (int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / 15));
 			}
 
 			{
-				frame.top = 1 + (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16);
+				frame.top = 1 + (header->IsVisible() ? 16 : 0);
 
 				for (Int i = 0, n = 0; i < GetNOfObjects(); i++)
 				{
@@ -180,10 +164,10 @@ S::Void S::GUI::ListBox::OnScrollbarValueChange()
 
 S::Void S::GUI::ListBox::OnChangeSize(const Size &nSize)
 {
-	if (scrollbar != NIL)
+	if (scrollbar->IsVisible())
 	{
-		scrollbar->SetHeight(nSize.cy - 2 - (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16));
-		scrollbar->SetRange(0, GetNOfEntries() - (int) ((nSize.cy - 4 - (GetNOfTabs() == 0 || (flags & LF_HIDEHEADER) ? 0 : 16)) / 15));
+		scrollbar->SetHeight(nSize.cy - 2 - (header->IsVisible() ? 16 : 0));
+		scrollbar->SetRange(0, GetNOfEntries() - (int) ((nSize.cy - 4 - (header->IsVisible() ? 16 : 0)) / 15));
 	}
 
 	header->SetWidth(nSize.cx - 2);

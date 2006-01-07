@@ -94,5 +94,5 @@ S::Int S::GUI::Client::Paint(Int message)
 
 S::GUI::Size S::GUI::Client::GetSize()
 {
-	return GetSize() - Size(6, 7);
+	return Widget::GetSize() - Size(6, 7);
 }

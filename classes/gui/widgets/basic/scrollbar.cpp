@@ -42,6 +42,7 @@ S::GUI::Scrollbar::Scrollbar(const Point &iPos, const Size &iSize, Int sType, In
 
 	UpdateHotspotPositions();
 
+	onRangeChange.Connect(&Scrollbar::OnValueChange, this);
 	onValueChange.Connect(&Scrollbar::OnValueChange, this);
 }
 
@@ -70,7 +71,10 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			OnValueChange(*variable);
+			OnValueChange();
+
+			surface->Box(arrow1Frame, Setup::BackgroundColor, FILLED);
+			surface->Box(arrow2Frame, Setup::BackgroundColor, FILLED);
 
 			surface->Frame(arrow1Frame, FRAME_UP);
 			surface->Frame(arrow2Frame, FRAME_UP);
@@ -157,10 +161,10 @@ S::Void S::GUI::Scrollbar::OnMouseDragEnd(const Point &mousePos)
 {
 	dragging = False;
 
-	OnValueChange(*variable);
+	OnValueChange();
 }
 
-S::Void S::GUI::Scrollbar::OnValueChange(Int value)
+S::Void S::GUI::Scrollbar::OnValueChange()
 {
 	UpdateHotspotPositions();
 

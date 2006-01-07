@@ -48,9 +48,6 @@ namespace smooth
 
 				virtual Int			 Paint(Int);
 
-				virtual Int			 Show();
-				virtual Int			 Hide();
-
 				virtual Int			 Activate();
 				virtual Int			 Deactivate();
 

@@ -60,6 +60,7 @@ namespace smooth
 				Int			 SetValue(Int);
 				Int			 GetValue();
 			signals:
+				Signal2<Void, Int, Int>	 onRangeChange;
 				Signal1<Void, Int>	 onValueChange;
 			slots:
 				Void			 OnChangeSize(const Size &);

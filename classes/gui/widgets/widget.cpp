@@ -514,7 +514,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			{
 				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID || Window::GetWindow((HWND) wParam) == window) break;
 			}
-
+		case WM_ACTIVATEAPP:
 			DeactivateTooltip();
 
 			if (focussed)

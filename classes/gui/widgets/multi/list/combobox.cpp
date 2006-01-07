@@ -66,6 +66,9 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 		if (GetNthEntry(0) != NIL) ((ListEntry *) GetNthEntry(0))->Select();
 	}
 
+	if (flags & CB_HOTSPOTONLY)	hotspot->Deactivate();
+	else				hotspot->Activate();
+
 	EnterProtectedRegion();
 
 	Surface		*surface	= container->GetDrawSurface();
@@ -79,7 +82,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 		case SP_PAINT:
 			if (!(flags & CB_HOTSPOTONLY))
 			{
-				if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+				if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
 				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 				surface->Frame(frame, FRAME_DOWN);
@@ -93,7 +96,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 			for (Int i = 0; i < 4; i++)
 			{
-				if (active)	surface->Line(lineStart, lineEnd, Setup::TextColor);
+				if (IsActive())	surface->Line(lineStart, lineEnd, Setup::TextColor);
 				else		surface->Line(lineStart, lineEnd, Setup::GrayTextColor);
 
 				lineStart += Point(1, 1);
@@ -155,7 +158,7 @@ S::Void S::GUI::ComboBox::ToggleListBox()
 		listBox		= new ListBox(Point(0, 0), Size(GetWidth(), 15 * Math::Min(GetNOfEntries(), 5) + 4));
 		listBox->onSelectEntry.Connect(&ComboBox::OnSelectEntry, this);
 
-		toolWindow	= new ToolWindow(container->GetContainerWindow()->GetPosition() + GetRealPosition() + Point(0, GetHeight()), Size(GetWidth(), 15 * Math::Min(GetNOfObjects(), 5) + 4));
+		toolWindow	= new ToolWindow(container->GetContainerWindow()->GetPosition() + GetRealPosition() + Point(0, GetHeight()), Size(GetWidth(), 15 * Math::Min(GetNOfEntries(), 5) + 4));
 
 		listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
 		listBox->AddTab("", 32768);

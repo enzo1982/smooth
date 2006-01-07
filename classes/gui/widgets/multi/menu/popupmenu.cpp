@@ -161,7 +161,7 @@ S::Void S::GUI::PopupMenu::InternalClosePopups()
 {
 	if (container == NIL) return;
 
-	if (container->GetObjectType() == MenubarEntry::classID) ((MenubarEntry *) container)->TogglePopupMenu();
+	if (container->GetObjectType() == MenubarEntry::classID) ((MenubarEntry *) container)->ClosePopupMenu();
 	else							 Hide();
 }
 

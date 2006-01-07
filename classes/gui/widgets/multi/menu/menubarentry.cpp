@@ -10,8 +10,9 @@
 
 #include <smooth/gui/widgets/multi/menu/menubarentry.h>
 #include <smooth/gui/widgets/multi/menu/menubar.h>
+#include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/widgets/hotspot/simplebutton.h>
-#include <smooth/gui/window/window.h>
+#include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 
@@ -27,7 +28,7 @@ S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, M
 	{
 		hotspot	= new HotspotSimpleButton(Point(), GetSize());
 
-		hotspot->onLeftButtonDown.Connect(&MenubarEntry::TogglePopupMenu, this);
+		hotspot->onLeftButtonDown.Connect(&MenubarEntry::OpenPopupMenu, this);
 		hotspot->onLeftButtonClick.Connect(&onAction);
 
 		RegisterObject(hotspot);
@@ -150,21 +151,56 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 	return Success();
 }
 
-S::Void S::GUI::MenubarEntry::TogglePopupMenu()
+S::Int S::GUI::MenubarEntry::Process(Int message, Int wParam, Int lParam)
+{
+	if (!IsRegistered())			return Error();
+	if (!IsVisible() || !IsActive())	return Success();
+
+	Window	*window	= container->GetContainerWindow();
+
+	EnterProtectedRegion();
+
+	switch (message)
+	{
+		case WM_KILLFOCUS:
+			if (Window::GetWindow((HWND) wParam) != NIL)
+			{
+				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID || Window::GetWindow((HWND) wParam) == window) break;
+			}
+		case WM_ACTIVATEAPP:
+			ClosePopupMenu();
+
+			break;
+	}
+
+	LeaveProtectedRegion();
+
+	return Widget::Process(message, wParam, lParam);
+}
+
+S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 {
 	if (popup == NIL) return;
 
 	Window	*window		= container->GetContainerWindow();
 	Rect	 popupFrame	= Rect(GetRealPosition() + Point(GetX() + GetWidth() - 11, GetY()), Size(11, GetHeight()));
 
-	if (popup->GetContainer() == this)
+	if (onAction.GetNOfConnectedSlots() == 0 || window->IsMouseOn(popupFrame))
 	{
-		UnregisterObject(popup);
-	}
-	else if (onAction.GetNOfConnectedSlots() == 0 || window->IsMouseOn(popupFrame))
-	{
+		PopupMenu::internalClosePopups.Emit();
+
 		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : GetWidth() + 2 - popup->GetWidth(), GetHeight() + 1));
 
 		RegisterObject(popup);
+	}
+}
+
+S::Void S::GUI::MenubarEntry::ClosePopupMenu()
+{
+	if (popup == NIL) return;
+
+	if (popup->GetContainer() == this)
+	{
+		UnregisterObject(popup);
 	}
 }

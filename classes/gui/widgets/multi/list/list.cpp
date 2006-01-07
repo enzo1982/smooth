@@ -142,7 +142,7 @@ S::GUI::ListEntry *S::GUI::List::GetSelectedEntry()
 
 S::Int S::GUI::List::SelectNthEntry(Int n)
 {
-	if (n >= GetNOfObjects()) return Error();
+	if (n >= GetNOfEntries()) return Error();
 
 	GetNthEntry(n)->Select();
 

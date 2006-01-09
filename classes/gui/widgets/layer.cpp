@@ -17,7 +17,7 @@
 
 const S::Int	 S::GUI::Layer::classID = S::Object::RequestClassID();
 
-S::GUI::Layer::Layer(String name) : Widget(Point(), Size())
+S::GUI::Layer::Layer(const String &name) : Widget(Point(), Size())
 {
 	type		= classID;
 
@@ -112,52 +112,24 @@ S::Int S::GUI::Layer::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Window	*wnd = container->GetContainerWindow();
+	Window	*window = container->GetContainerWindow();
 
-	if (wnd == NIL) return Success();
+	if (window == NIL) return Success();
 
-	Rect	 updateRect	= wnd->GetUpdateRect();
+	Rect	 updateRect	= window->GetUpdateRect();
 	Surface	*surface	= container->GetDrawSurface();
 
 	if (GetBackgroundColor() != -1)
 	{
 		Rect	 frame = Rect(GetRealPosition(), GetSize());
 
-		updateRect = frame;
-
-		surface->Box(frame, GetBackgroundColor(), FILLED);
+		surface->Box(Rect::OverlapRect(frame, updateRect), GetBackgroundColor(), FILLED);
 	}
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
-	{
-		Widget	*object = GetNthObject(i);
-
-		if (object == NIL) continue;
-
-		if (object->IsVisible() && object->IsAffected(updateRect)) object->Paint(SP_PAINT);
-	}
-
-	return Success();
+	return Widget::Paint(message);
 }
 
-S::Int S::GUI::Layer::Process(Int message, Int wParam, Int lParam)
-{
-	if (!IsRegistered())			return Error();
-	if (!IsActive() || !IsVisible())	return Success();
-
-	for (Int i = GetNOfObjects() - 1; i >= 0; i--)
-	{
-		Widget	*object = GetNthObject(i);
-
-		if (object == NIL) continue;
-
-		if (object->Process(message, wParam, lParam) == Break) return Break;
-	}
-
-	return Success();
-}
-
-S::Int S::GUI::Layer::SetMetrics(Point iPos, Size iSize)
+S::Int S::GUI::Layer::SetMetrics(const Point &iPos, const Size &iSize)
 {
 	if (orientation == OR_CENTER) orientation = OR_FREE;
 

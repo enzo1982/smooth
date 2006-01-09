@@ -80,9 +80,9 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 				OnChangeSize(GetSize());
 
-				for (Int i = 0; i < dropDownList->GetNOfObjects(); i++)
+				for (Int i = 0; i < dropDownList->GetNOfEntries(); i++)
 				{
-					comboBox->AddEntry(dropDownList->GetNthObject(i)->GetText());
+					comboBox->AddEntry(dropDownList->GetNthEntry(i)->GetText());
 				}
 
 				RegisterObject(comboBox);

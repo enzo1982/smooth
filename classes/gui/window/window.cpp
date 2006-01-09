@@ -561,18 +561,23 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
 				Bool		 resized = (GetWidth() != wndpos->cx || GetHeight() != wndpos->cy);
+				Surface		*surface = GetDrawSurface();
 
 				SetMetrics(Point(wndpos->x, wndpos->y), Size(wndpos->cx, wndpos->cy));
 
-				GetDrawSurface()->SetSize(GetSize());
+				surface->SetSize(GetSize());
 
 				if (resized)
 				{
-					updateRect = Rect(Point(0, 0), GetSize());
+					updateRect = Rect(Point(2, 2), GetSize() - Size(4, 4));
 
 					CalculateOffsets();
 
+					surface->StartPaint(updateRect);
+
 					onResize.Emit();
+
+					surface->EndPaint();
 				}
 			}
 
@@ -913,32 +918,30 @@ S::Int S::GUI::Window::Paint(Int message)
 
 S::Void S::GUI::Window::CalculateOffsets()
 {
-	Widget	*operat;
-	Widget	*lastWidget = NIL;
-	Int	 rightobjcount = 0;
-	Int	 leftobjcount = 0;
-	Int	 btmobjcount = 0;
-	Int	 topobjcount = 0;
-	Int	 i;
+	Widget	*lastWidget	= NIL;
+	Int	 rightobjcount	= 0;
+	Int	 leftobjcount	= 0;
+	Int	 btmobjcount	= 0;
+	Int	 topobjcount	= 0;
 
 	if (GetObjectType() == ToolWindow::classID)	innerOffset = Rect(Point(0, 0), Size(0, 0));
 	else						innerOffset = Rect(Point(3, 3), Size(0, 0));
 
-	for (i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		operat = GetNthObject(i);
+		Widget	*widget = GetNthObject(i);
 
-		if (operat->GetOrientation() == OR_TOP)
+		if (widget->GetOrientation() == OR_TOP)
 		{
 			topobjcount++;
 
-			lastWidget = operat;
+			lastWidget = widget;
 
-			operat->SetMetrics(Point(innerOffset.left, innerOffset.top), Size(GetWidth() - innerOffset.left - innerOffset.right, operat->GetHeight()));
+			widget->SetMetrics(Point(innerOffset.left, innerOffset.top), Size(GetWidth() - innerOffset.left - innerOffset.right, widget->GetHeight()));
 
-			innerOffset.top += operat->GetHeight();
+			innerOffset.top += widget->GetHeight();
 
-			if (operat->subtype == WO_SEPARATOR) innerOffset.top += 3;
+			if (widget->subtype == WO_SEPARATOR) innerOffset.top += 3;
 		}
 	}
 
@@ -949,61 +952,62 @@ S::Void S::GUI::Window::CalculateOffsets()
 		if (lastWidget->subtype == WO_NOSEPARATOR) innerOffset.top += 3;
 	}
 
-	for (i = 0; i < GetNOfObjects(); i++)
+	for (Int j = 0; j < GetNOfObjects(); j++)
 	{
-		operat = GetNthObject(i);
+		Widget	*widget = GetNthObject(j);
 
-		if (operat->GetOrientation() == OR_BOTTOM)
+		if (widget->GetOrientation() == OR_BOTTOM)
 		{
 			btmobjcount++;
 
-			operat->SetMetrics(Point(innerOffset.left, GetHeight() - innerOffset.bottom - operat->GetHeight()), Size(GetWidth() - innerOffset.left - innerOffset.right, operat->GetHeight()));
+			widget->SetMetrics(Point(innerOffset.left, GetHeight() - innerOffset.bottom - widget->GetHeight()), Size(GetWidth() - innerOffset.left - innerOffset.right, widget->GetHeight()));
 
-			innerOffset.bottom += operat->GetHeight();
+			innerOffset.bottom += widget->GetHeight();
 		}
 	}
 
 	if (btmobjcount > 0) innerOffset.bottom += 4;
 
-	for (i = 0; i < GetNOfObjects(); i++)
+	for (Int k = 0; k < GetNOfObjects(); k++)
 	{
-		operat = GetNthObject(i);
+		Widget	*widget = GetNthObject(k);
 
-		if (operat->GetOrientation() == OR_LEFT)
+		if (widget->GetOrientation() == OR_LEFT)
 		{
 			leftobjcount++;
 
-			operat->SetMetrics(Point(innerOffset.left, innerOffset.top), Size(operat->GetWidth(), GetHeight() - innerOffset.top - innerOffset.bottom));
+			widget->SetMetrics(Point(innerOffset.left, innerOffset.top), Size(widget->GetWidth(), GetHeight() - innerOffset.top - innerOffset.bottom));
 
-			innerOffset.left += operat->GetWidth();
+			innerOffset.left += widget->GetWidth();
 		}
 	}
 
 	if (leftobjcount > 0) innerOffset.left += 3;
 
-	for (i = 0; i < GetNOfObjects(); i++)
+	for (Int l = 0; l < GetNOfObjects(); l++)
 	{
-		operat = GetNthObject(i);
+		Widget	*widget = GetNthObject(l);
 
-		if (operat->GetOrientation() == OR_RIGHT)
+		if (widget->GetOrientation() == OR_RIGHT)
 		{
 			rightobjcount++;
 
-			operat->SetMetrics(Point(GetWidth() - innerOffset.right - operat->GetWidth(), innerOffset.top), Size(operat->GetWidth(), GetHeight() - innerOffset.top - innerOffset.bottom));
+			widget->SetMetrics(Point(GetWidth() - innerOffset.right - widget->GetWidth(), innerOffset.top), Size(widget->GetWidth(), GetHeight() - innerOffset.top - innerOffset.bottom));
 
-			innerOffset.right += operat->GetWidth();
+			innerOffset.right += widget->GetWidth();
 		}
 	}
 
 	if (rightobjcount > 0) innerOffset.right += 3;
 
-	for (i = 0; i < GetNOfObjects(); i++)
+	for (Int m = 0; m < GetNOfObjects(); m++)
 	{
-		operat = GetNthObject(i);
+		Widget	*widget = GetNthObject(m);
 
-		if (operat->GetOrientation() == OR_CENTER)
+		if (widget->GetOrientation() == OR_CENTER)
 		{
-			operat->SetMetrics(Point(innerOffset.left, innerOffset.top), Size(GetWidth() - innerOffset.left - innerOffset.right, GetHeight() - innerOffset.top - innerOffset.bottom));
+			widget->SetMetrics(Point(innerOffset.left, innerOffset.top), Size(GetWidth() - innerOffset.left - innerOffset.right, GetHeight() - innerOffset.top - innerOffset.bottom));
+			widget->SetOrientation(OR_CENTER);
 		}
 	}
 }

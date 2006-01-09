@@ -30,16 +30,15 @@ namespace smooth
 			public:
 				static const Int	 classID;
 
-							 Layer(String name = NIL);
-							~Layer();
+							 Layer(const String &name = NIL);
+				virtual			~Layer();
 
-				Int			 Show();
-				Int			 Hide();
+				virtual Int		 Show();
+				virtual Int		 Hide();
 
 				virtual Int		 Paint(Int);
-				Int			 Process(Int, Int, Int);
 
-				Int			 SetMetrics(Point, Size);
+				virtual Int		 SetMetrics(const Point &, const Size &);
 		};
 	};
 };

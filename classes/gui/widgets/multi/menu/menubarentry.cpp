@@ -183,7 +183,7 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 	if (popup == NIL) return;
 
 	Window	*window		= container->GetContainerWindow();
-	Rect	 popupFrame	= Rect(GetRealPosition() + Point(GetX() + GetWidth() - 11, GetY()), Size(11, GetHeight()));
+	Rect	 popupFrame	= Rect(GetRealPosition() + Point(GetWidth() - 11, 0), Size(11, GetHeight()));
 
 	if (onAction.GetNOfConnectedSlots() == 0 || window->IsMouseOn(popupFrame))
 	{

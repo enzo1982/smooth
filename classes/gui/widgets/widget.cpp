@@ -332,15 +332,21 @@ S::Int S::GUI::Widget::Paint(Int message)
 	if (!registered)	return Error();
 	if (!visible)		return Success();
 
+	Window	*window = container->GetContainerWindow();
+
+	if (window == NIL) return Success();
+
+	Rect	 updateRect	= window->GetUpdateRect();
+
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
 			for (Int i = 0; i < GetNOfObjects(); i++)
 			{
-				Widget	*object = GetNthObject(i);
+				Widget	*widget = GetNthObject(i);
 
-				if (object->IsVisible()) object->Paint(message);
+				if (widget->IsAffected(updateRect)) widget->Paint(message);
 			}
 
 			break;

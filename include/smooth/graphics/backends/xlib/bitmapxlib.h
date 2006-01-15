@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 BITMAP_XLIB = 2;
 
-		class SMOOTH_STATIC_EXPORT BitmapXLib : public BitmapBackend
+		class BitmapXLib : public BitmapBackend
 		{
 			private:
 				Display			*display;

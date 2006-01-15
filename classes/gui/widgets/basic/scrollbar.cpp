@@ -65,7 +65,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 	Rect	 arrow2Frame	= Rect(realPos + Point(0, 0), subtype == OR_HORZ ? Size(GetHeight(), GetHeight()) : Size(GetWidth(), GetWidth()));
 	Int	 arrowColor	= Setup::TextColor;
 
-	if (!active) arrowColor = Setup::GrayTextColor;
+	if (!IsActive()) arrowColor = Setup::GrayTextColor;
 
 	switch (message)
 	{
@@ -136,7 +136,7 @@ S::Void S::GUI::Scrollbar::OnMouseClick(const Point &mousePos)
 
 S::Void S::GUI::Scrollbar::OnMouseWheel(Int value)
 {
-	SetValue(*variable - value);
+	if (IsMouseOver() || container->IsMouseOver()) SetValue(*variable - value);
 }
 
 S::Void S::GUI::Scrollbar::OnMouseDragStart(const Point &mousePos)

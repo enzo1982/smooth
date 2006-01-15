@@ -42,7 +42,7 @@ S::Int S::GUI::Text::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (!active) nFont.SetColor(Setup::GrayTextColor);
+			if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
 			surface->SetText(text, Rect(GetRealPosition(), Size(textSize.cx, Math::Round(textSize.cy * 1.2))), nFont);
 

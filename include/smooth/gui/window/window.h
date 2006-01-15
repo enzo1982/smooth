@@ -20,11 +20,6 @@ namespace smooth
 		class PopupMenu;
 		class Layer;
 	};
-
-	namespace System
-	{
-		class Timer;
-	};
 };
 
 #include "../widgets/widget.h"
@@ -44,8 +39,7 @@ namespace smooth
 		const Int	 WF_APPTOPMOST		= 8;
 		const Int	 WF_NORESIZE		= 16;
 		const Int	 WF_NOTASKBUTTON	= 32;
-		const Int	 WF_DELAYPAINT		= 64;
-		const Int	 WF_THINBORDER		= 128;
+		const Int	 WF_THINBORDER		= 64;
 
 		const Int	 WO_SEPARATOR	= 1;
 		const Int	 WO_NOSEPARATOR	= 2;
@@ -62,22 +56,20 @@ namespace smooth
 				Bool				 created;
 				Bool				 destroyed;
 
-				Bool				 firstPaint;
-
 				Bitmap				 icon;
 
 				Rect				 innerOffset;
+
+				Int				 frameWidth;
 				Rect				 updateRect;
-				Rect				 timedUpdateRect;
 
 				String				 defaultStatus;
 
 				PopupMenu			*trackMenu;
 
 				Layer				*mainLayer;
-				System::Timer			*paintTimer;
 
-				Bool				 Create();
+				virtual Bool			 Create();
 
 				Void				 CalculateOffsets();
 
@@ -160,8 +152,6 @@ namespace smooth
 			callbacks:
 				Callback2<PopupMenu *, Int, Int> getTrackMenu;
 				Callback0<Bool>			 doQuit;
-			slots:
-				Void				 PaintTimer();
 		};
 	};
 };

@@ -205,12 +205,10 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())		return Error();
-	if (!active || !IsVisible())	return Success();
+	if (!IsRegistered())			return Error();
+	if (!IsActive() || !IsVisible())	return Success();
 
 	Window	*wnd		= container->GetContainerWindow();
-
-	if (wnd == NIL) return Success();
 
 	Surface	*surface	= wnd->GetDrawSurface();
 	Point	 realPos	= GetRealPosition();

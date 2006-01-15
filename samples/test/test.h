@@ -71,6 +71,11 @@ class Test : public Application
 
 		Text		*text_editbox;
 		EditBox		*widget_editbox;
+
+		Button		*button_show;
+		Button		*button_hide;
+		Button		*button_activate;
+		Button		*button_deactivate;
 	public:
 				 Test();
 		virtual		~Test();

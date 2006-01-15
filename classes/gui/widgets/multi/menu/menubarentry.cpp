@@ -12,13 +12,17 @@
 #include <smooth/gui/widgets/multi/menu/menubar.h>
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/widgets/hotspot/simplebutton.h>
-#include <smooth/gui/window/toolwindow.h>
+#include <smooth/gui/window/window.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 
+const S::Int	 S::GUI::MenubarEntry::classID = S::Object::RequestClassID();
+
 S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, Menu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : MenuEntry(iText, iBitmap, iPopup, ibVar, iiVar, iiCode)
 {
-	if (text == NIL && bitmap == NIL)	SetSize(Size(7, 15));
+	type		= classID;
+
+	if (text == NIL && bitmap == NIL)	SetSize(Size(4, 15));
 	else if (text != NIL && bitmap == NIL)	SetSize(Size(textSize.cx + 7, 16));
 	else if (text == NIL && bitmap != NIL)	SetSize(bitmap.GetSize() + Size(4 + (popup != NIL ? 12 : 0), 4));
 
@@ -59,15 +63,34 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 		case SP_PAINT:
 			if (text == NIL && bitmap == NIL)
 			{
-				Point	 p1 = Point(realPos.x + 4 + (Setup::rightToLeft ? 2 : 0), realPos.y);
-				Point	 p2 = Point(p1.x, p1.y + GetHeight());
+				if (orientation == OR_LEFT || orientation == OR_RIGHT)
+				{
+					SetWidth(4);
 
-				surface->Bar(p1, p2, OR_VERT);
+					Point	 p1 = Point(realPos.x, realPos.y);
+					Point	 p2 = Point(p1.x, p1.y + GetHeight());
 
-				p1.x += 2;
-				p2.x += 2;
+					surface->Bar(p1, p2, OR_VERT);
 
-				surface->Bar(p1, p2, OR_VERT);
+					p1.x += 2;
+					p2.x += 2;
+
+					surface->Bar(p1, p2, OR_VERT);
+				}
+				else if (orientation == OR_TOP || orientation == OR_BOTTOM)
+				{
+					SetHeight(4);
+
+					Point	 p1 = Point(realPos.x, realPos.y);
+					Point	 p2 = Point(p1.x + GetWidth() - 1, p1.y);
+
+					surface->Bar(p1, p2, OR_HORZ);
+
+					p1.y += 2;
+					p2.y += 2;
+
+					surface->Bar(p1, p2, OR_HORZ);
+				}
 			}
 			else if (text != NIL && bitmap == NIL)
 			{
@@ -113,8 +136,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 				if (onAction.GetNOfConnectedSlots() > 0 && popup != NIL)
 				{
-					Point	 p1 = Point(realPos.x + GetWidth() - 13 + (Setup::rightToLeft ? 2 : 0), realPos.y + 1);
-					Point	 p2 = Point(realPos.x + GetWidth() - 13 + (Setup::rightToLeft ? 2 : 0), realPos.y + GetHeight() - 2);
+					Point	 p1 = Point(realPos.x + GetWidth() - 13, realPos.y + 1);
+					Point	 p2 = Point(realPos.x + GetWidth() - 13, realPos.y + GetHeight() - 2);
 
 					surface->Bar(p1, p2, OR_VERT);
 				}
@@ -149,33 +172,6 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 	LeaveProtectedRegion();
 
 	return Success();
-}
-
-S::Int S::GUI::MenubarEntry::Process(Int message, Int wParam, Int lParam)
-{
-	if (!IsRegistered())			return Error();
-	if (!IsVisible() || !IsActive())	return Success();
-
-	Window	*window	= container->GetContainerWindow();
-
-	EnterProtectedRegion();
-
-	switch (message)
-	{
-		case WM_KILLFOCUS:
-			if (Window::GetWindow((HWND) wParam) != NIL)
-			{
-				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID || Window::GetWindow((HWND) wParam) == window) break;
-			}
-		case WM_ACTIVATEAPP:
-			ClosePopupMenu();
-
-			break;
-	}
-
-	LeaveProtectedRegion();
-
-	return Widget::Process(message, wParam, lParam);
 }
 
 S::Void S::GUI::MenubarEntry::OpenPopupMenu()

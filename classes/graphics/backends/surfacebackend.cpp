@@ -13,6 +13,10 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
 
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	#include <smooth/graphics/backends/gdi/surfacegdi.h>
+#endif
+
 S::GUI::SurfaceBackend *CreateSurfaceBackend(S::Void *iSurface)
 {
 	return new S::GUI::SurfaceBackend(iSurface);
@@ -41,6 +45,12 @@ S::GUI::SurfaceBackend *S::GUI::SurfaceBackend::CreateBackendInstance(Void *iSur
 
 S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface)
 {
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	volatile Bool	 null = 0;
+
+	if (null) SurfaceGDI();
+#endif
+
 	type = SURFACE_NONE;
 
 	size.cx	= 0;
@@ -286,10 +296,10 @@ S::Int S::GUI::SurfaceBackend::Bar(const Point &iP1, const Point &iP2, Int orien
 	Point	 p1 = TranslatePoint(iP1);
 	Point	 p2 = TranslatePoint(iP2);
 
-	if (Setup::rightToLeft && orientation == OR_HORZ)
+	if (Setup::rightToLeft)
 	{
-		p1 = TranslatePoint(iP2);
-		p2 = TranslatePoint(iP1);
+		if (orientation == OR_HORZ) { p1 = TranslatePoint(iP2);	p2 = TranslatePoint(iP1); }
+		if (orientation == OR_VERT) { p1 -= Point(2, 0);	p2 -= Point(2, 0); }
 	}
 
 	Bool	 preRTL = Setup::rightToLeft;
@@ -299,10 +309,8 @@ S::Int S::GUI::SurfaceBackend::Bar(const Point &iP1, const Point &iP2, Int orien
 	if (orientation == OR_HORZ)
 	{
 		Line(p1, p2, RGB(max(Setup::BackgroundColor.GetRed() - 64, 0), max(Setup::BackgroundColor.GetGreen() - 64, 0), max(Setup::BackgroundColor.GetBlue() - 64, 0)));
-		SetPixel(p2.x, p2.y, RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255)));
 		p1.y++;
 		p2.y++;
-		p2.x++;
 		Line(p1, p2, RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255)));
 	}
 	else if (orientation == OR_VERT)

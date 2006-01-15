@@ -33,7 +33,7 @@ S::Int S::GUI::Divider::SetPos(Int nPosition)
 {
 	Bool	 prevVisible = IsVisible();
 
-	if (IsRegistered() && IsVisible()) Hide();
+	if (IsRegistered() && prevVisible) Hide();
 
 	position = nPosition;
 
@@ -157,8 +157,6 @@ S::Int S::GUI::Divider::Paint(Int message)
 				}
 			}
 
-			SetSize(Size(2, doubleBar2.y - doubleBar1.y + 4));
-
 			surface->Bar(doubleBar1, doubleBar2, Binary::IsFlagSet(flags, OR_VERT) ? OR_VERT : OR_HORZ);
 
 			break;
@@ -167,4 +165,9 @@ S::Int S::GUI::Divider::Paint(Int message)
 	LeaveProtectedRegion();
 
 	return Success();
+}
+
+S::Bool S::GUI::Divider::IsAffected(const Rect &uRect)
+{
+	return True;
 }

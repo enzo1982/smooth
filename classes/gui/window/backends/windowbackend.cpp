@@ -10,6 +10,10 @@
 
 #include <smooth/gui/window/backends/windowbackend.h>
 
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	#include <smooth/gui/window/backends/gdi/windowgdi.h>
+#endif
+
 S::GUI::WindowBackend *CreateWindowBackend()
 {
 	return new S::GUI::WindowBackend();
@@ -38,6 +42,12 @@ S::GUI::WindowBackend *S::GUI::WindowBackend::CreateBackendInstance()
 
 S::GUI::WindowBackend::WindowBackend(Void *iWindow)
 {
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	volatile Bool	 null = 0;
+
+	if (null) WindowGDI();
+#endif
+
 	type = WINDOW_NONE;
 
 	nullSurface = new Surface();

@@ -30,7 +30,7 @@ namespace smooth
 	{
 		const Int	 WINDOW_XLIB	= 2;
 
-		class SMOOTH_STATIC_EXPORT WindowXLib : public WindowBackend
+		class WindowXLib : public WindowBackend
 		{
 			private:
 				Display	*display;

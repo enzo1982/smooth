@@ -67,30 +67,10 @@ S::Int S::GUI::EditBox::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+			if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
 			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 			surface->Frame(frame, FRAME_DOWN);
-
-			if (dropDownList != NIL && comboBox == NIL)
-			{
-				comboBox = new ComboBox(Point(), Size());
-				comboBox->SetFlags(CB_HOTSPOTONLY);
-				comboBox->onSelectEntry.Connect(&EditBox::OnSelectListEntry, this);
-
-				OnChangeSize(GetSize());
-
-				for (Int i = 0; i < dropDownList->GetNOfEntries(); i++)
-				{
-					comboBox->AddEntry(dropDownList->GetNthEntry(i)->GetText());
-				}
-
-				RegisterObject(comboBox);
-			}
-			else if (dropDownList != NIL)
-			{
-				comboBox->SetSize(GetSize());
-			}
 
 			break;
 	}
@@ -131,7 +111,25 @@ const S::String &S::GUI::EditBox::GetText()
 
 S::Int S::GUI::EditBox::SetDropDownList(List *nDropDownList)
 {
+	if (comboBox != NIL) DeleteObject(comboBox);
+
 	dropDownList = nDropDownList;
+
+	if (dropDownList != NIL)
+	{
+		comboBox = new ComboBox(Point(), Size());
+		comboBox->SetFlags(CB_HOTSPOTONLY);
+		comboBox->onSelectEntry.Connect(&EditBox::OnSelectListEntry, this);
+
+		for (Int i = 0; i < dropDownList->GetNOfEntries(); i++)
+		{
+			comboBox->AddEntry(dropDownList->GetNthEntry(i)->GetText());
+		}
+
+		RegisterObject(comboBox);
+
+		OnChangeSize(GetSize());
+	}
 
 	return Success();
 }

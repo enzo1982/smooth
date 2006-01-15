@@ -30,7 +30,7 @@ namespace smooth
 	{
 		const Int	 MUTEX_SDL	= 3;
 
-		class SMOOTH_STATIC_EXPORT MutexSDL : public MutexBackend
+		class MutexSDL : public MutexBackend
 		{
 			protected:
 				SDL_mutex	*mutex;

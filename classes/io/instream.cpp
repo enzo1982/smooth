@@ -348,30 +348,37 @@ S::String S::IO::InStream::InputString(Int bytes)
 	int	 bytesleft = bytes;
 	int	 databufferpos = 0;
 	int	 amount = 0;
+	char	*buffer = new char [bytes + 1];
 	String	 rval;
 
 	while (bytesleft)
 	{
 		if (currentFilePos >= (origfilepos + packageSize))
 		{
-			{ lastError = IO_ERROR_UNKNOWN; return NIL; }
+			{ lastError = IO_ERROR_UNKNOWN; delete [] buffer; return NIL; }
 		}
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return NIL; }
-			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return NIL; }
+			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; delete [] buffer; return NIL; }
+			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; delete [] buffer; return NIL; }
 		}
 
 		amount = ((packageSize - currentBufferPos)<(bytesleft))?(packageSize - currentBufferPos):(bytesleft);
 
-		for (Int i = 0; i < amount; i++) rval[databufferpos + i] = ((char *) (data + currentBufferPos))[i];
+		for (Int i = 0; i < amount; i++) buffer[databufferpos + i] = ((char *) (data + currentBufferPos))[i];
 
 		bytesleft -= amount;
 		databufferpos += amount;
 		currentBufferPos += amount;
 		currentFilePos += amount;
 	}
+
+	buffer[bytes] = 0;
+
+	rval = buffer;
+
+	delete [] buffer;
 
 	return rval;
 }
@@ -398,7 +405,8 @@ S::String S::IO::InStream::InputLine()
 			{
 				linebuffer1[bytes] = 0;
 
-				for (int k = 0; k <= bytes; k++) rval[k] = linebuffer1[k];
+				rval = linebuffer1;
+
 				delete [] linebuffer1;
 
 				return rval;
@@ -407,6 +415,7 @@ S::String S::IO::InStream::InputLine()
 			if (inpval != 13 && inpval != 10)
 			{
 				linebuffer1[bytes] = (char) inpval;
+
 				bytes++;
 			}
 			else
@@ -415,7 +424,8 @@ S::String S::IO::InStream::InputLine()
 
 				linebuffer1[bytes] = 0;
 
-				for (int k = 0; k <= bytes; k++) rval[k] = linebuffer1[k];
+				rval = linebuffer1;
+
 				delete [] linebuffer1;
 
 				return rval;

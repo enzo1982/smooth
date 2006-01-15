@@ -32,24 +32,26 @@ namespace smooth
 		class SMOOTHAPI MenuEntry : public Widget
 		{
 			private:
-				Shortcut	*shortcut;
+				Shortcut		*shortcut;
 			protected:
-				Menu		*popup;
+				Menu			*popup;
 
-				Bitmap		 bitmap;
-				Bitmap		 graymap;
+				Bitmap			 bitmap;
+				Bitmap			 graymap;
 
-				Bool		*bVar;
-				Int		*iVar;
-				Int		 iCode;
+				Bool			*bVar;
+				Int			*iVar;
+				Int			 iCode;
 			public:
-						 MenuEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
-				virtual		~MenuEntry();
-			accessors:
-				Int		 SetShortcut(Int, Int);
+				static const Int	 classID;
 
-				Int		 SetBitmap(const Bitmap &);
-				const Bitmap	&GetBitmap();
+							 MenuEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
+				virtual			~MenuEntry();
+			accessors:
+				Int			 SetShortcut(Int, Int);
+
+				Int			 SetBitmap(const Bitmap &);
+				const Bitmap		&GetBitmap();
 		};
 	};
 };

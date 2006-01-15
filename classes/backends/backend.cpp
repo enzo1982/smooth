@@ -10,6 +10,10 @@
 
 #include <smooth/backends/backend.h>
 
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	#include <smooth/backends/win32/backendwin32.h>
+#endif
+
 S::Array<S::Backends::Backend *, S::Void *>		*S::Backends::Backend::backends = NIL;
 S::Array<S::Backends::Backend *(*)(), S::Void *>	*S::Backends::Backend::backend_creators = NIL;
 
@@ -71,6 +75,12 @@ S::Int S::Backends::Backend::DeinitBackends()
 
 S::Backends::Backend::Backend()
 {
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	volatile Bool	 null = 0;
+
+	if (null) BackendWin32();
+#endif
+
 	type = BACKEND_NONE;
 }
 

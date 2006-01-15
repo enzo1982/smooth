@@ -27,19 +27,13 @@ namespace smooth
 	{
 		class SMOOTHAPI ToolWindow : public Window
 		{
-			private:
-				Widget			*owner;
+			protected:
+				virtual Bool		 Create();
 			public:
 				static const Int	 classID;
 
 							 ToolWindow(const Point &, const Size &);
 				virtual			~ToolWindow();
-
-				Int			 SetOwner(Widget *);
-				Int			 FreeOwner();
-
-				virtual Int		 Paint(Int);
-				virtual Int		 Process(Int, Int, Int);
 
 				virtual Bool		 IsTypeCompatible(Int);
 		};

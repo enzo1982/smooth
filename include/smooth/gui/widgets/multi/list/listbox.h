@@ -48,16 +48,16 @@ namespace smooth
 							 ListBox(const Point &, const Size &);
 				virtual			~ListBox();
 
+				virtual Int		 Paint(Int);
+
 				Int			 AddTab(const String &tabName, Int tabWidth = 0, Int tabOrientation = OR_LEFT)	{ return header->AddTab(tabName, tabWidth, tabOrientation); }
 
+				Int			 RemoveAllTabs()								{ return header->RemoveAllTabs(); }
+			accessors:
 				Int			 GetNOfTabs()									{ return header->GetNOfTabs(); }
 				Int			 GetNthTabOffset(Int n)								{ return header->GetNthTabOffset(n); }
 				Int			 GetNthTabWidth(Int n)								{ return header->GetNthTabWidth(n); }
 				Int			 GetNthTabOrientation(Int n)							{ return header->GetNthTabOrientation(n); }
-
-				Int			 RemoveAllTabs()								{ return header->RemoveAllTabs(); }
-
-				virtual Int		 Paint(Int);
 			slots:
 				Void			 OnScrollbarValueChange();
 				Void			 OnChangeSize(const Size &);

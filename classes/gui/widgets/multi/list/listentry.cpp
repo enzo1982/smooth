@@ -17,8 +17,12 @@
 
 S::Signal2<S::Void, S::Int, S::Int>	 S::GUI::ListEntry::internalOnSelectEntry;
 
+const S::Int	 S::GUI::ListEntry::classID = S::Object::RequestClassID();
+
 S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 15))
 {
+	type		= classID;
+
 	selected	= False;
 	marked		= False;
 	text		= iText;

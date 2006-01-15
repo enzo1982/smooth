@@ -387,7 +387,7 @@ S::Bool S::IO::OutStream::OutputString(const String &string)
 	{
 		amount = ((packageSize - currentBufferPos)<(bytesleft))?(packageSize - currentBufferPos):(bytesleft);
 
-		for (Int i = 0; i < amount; i++) ((char *) (data + currentBufferPos))[i] = string[databufferpos + i];
+		for (Int i = 0; i < amount; i++) ((char *) (data + currentBufferPos))[i] = ((char *) string)[databufferpos + i];
 
 		bytesleft -= amount;
 		databufferpos += amount;

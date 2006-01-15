@@ -10,6 +10,10 @@
 
 #include <smooth/system/backends/eventbackend.h>
 
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	#include <smooth/system/backends/win32/eventwin32.h>
+#endif
+
 S::System::EventBackend *CreateEventBackend()
 {
 	return new S::System::EventBackend();
@@ -38,6 +42,12 @@ S::System::EventBackend *S::System::EventBackend::CreateBackendInstance()
 
 S::System::EventBackend::EventBackend()
 {
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	volatile Bool	 null = 0;
+
+	if (null) EventWin32();
+#endif
+
 	type = EVENT_NONE;
 }
 

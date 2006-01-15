@@ -69,8 +69,6 @@ S::Int S::GUI::Slider::Paint(Int message)
 
 	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
-	Point	 lineStart;
-	Point	 lineEnd;
 	Rect	 sliderRect;
 
 	switch (message)
@@ -79,58 +77,16 @@ S::Int S::GUI::Slider::Paint(Int message)
 		case SP_PAINT:
 			surface->Box(Rect(realPos, GetSize()), Setup::BackgroundColor, FILLED);
 
-			if (subtype == OR_HORZ)
-			{
-				lineStart.x = realPos.x + 4;
-				lineStart.y = realPos.y + 8;
-				lineEnd.x = realPos.x + GetWidth() - 4;
-				lineEnd.y = lineStart.y;
+			if (subtype == OR_HORZ)	surface->Bar(realPos + Point(4, 8), realPos + Point(GetWidth() - 4, 8), OR_HORZ);
+			else			surface->Bar(realPos + Point(8, 4), realPos + Point(8, GetHeight() - 4), OR_VERT);
 
-				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
+			if (subtype == OR_HORZ)	sliderRect = Rect(realPos + Point((Int) (((Float) (GetWidth() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0), Size(9, 17));
+			else			sliderRect = Rect(realPos + Point(0, (GetHeight() - 10) - (Int) (((Float) (GetHeight() - 10)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)))), Size(18, 10));
 
-				lineStart.y++;
-				lineEnd.y++;
+			if (!dragging)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
+			else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
 
-				surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
-
-				surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
-
-				sliderRect.left		= realPos.x + (Int) (((Float) (GetWidth() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-				sliderRect.top		= realPos.y;
-				sliderRect.right	= sliderRect.left + 9;
-				sliderRect.bottom	= sliderRect.top + 17;
-
-				if (!dragging)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
-				else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
-
-				surface->Frame(sliderRect, FRAME_UP);
-			}
-			else
-			{
-				lineStart.x = realPos.x + 8;
-				lineStart.y = realPos.y + 4;
-				lineEnd.x = lineStart.x;
-				lineEnd.y = realPos.y + GetHeight() - 4;
-
-				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
-
-				lineStart.x++;
-				lineEnd.x++;
-
-				surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
-
-				surface->SetPixel(lineEnd.x - 1, lineEnd.y - 1, Setup::DividerLightColor);
-
-				sliderRect.left		= realPos.x;
-				sliderRect.top		= realPos.y + (GetHeight() - 9) - (Int) (((Float) (GetHeight() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)));
-				sliderRect.right	= sliderRect.left + 18;
-				sliderRect.bottom	= sliderRect.top + 10;
-
-				if (!dragging)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
-				else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
-
-				surface->Frame(sliderRect, FRAME_UP);
-			}
+			surface->Frame(sliderRect, FRAME_UP);
 
 			break;
 	}

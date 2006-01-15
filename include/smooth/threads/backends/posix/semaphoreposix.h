@@ -29,7 +29,7 @@ namespace smooth
 	{
 		const Int	 SEMAPHORE_POSIX	= 1;
 
-		class SMOOTH_STATIC_EXPORT SemaphorePOSIX : public SemaphoreBackend
+		class SemaphorePOSIX : public SemaphoreBackend
 		{
 			protected:
 				sem_t	*semaphore;

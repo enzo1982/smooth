@@ -29,7 +29,7 @@ namespace smooth
 	{
 		const Int	 THREAD_WIN32	= 2;
 
-		class SMOOTH_STATIC_EXPORT ThreadWin32 : public ThreadBackend
+		class ThreadWin32 : public ThreadBackend
 		{
 			protected:
 				HANDLE	 thread;

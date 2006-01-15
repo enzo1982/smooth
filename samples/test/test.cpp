@@ -105,6 +105,20 @@ Test::Test()
 	widget_editbox		= new EditBox("MyEditBox", Point(310, 10), Size(100, 19));
 	widget_editbox->SetBackgroundColor(Color(255, 255, 255));
 
+	Widget	*selected_widget = widget_editbox;
+
+	button_show		= new Button("Show", NIL, Point(350, 185), Size(70, 22));
+	button_show->onAction.Connect(&Widget::Show, selected_widget);
+
+	button_hide		= new Button("Hide", NIL, Point(422, 185), Size(70, 22));
+	button_hide->onAction.Connect(&Widget::Hide, selected_widget);
+
+	button_activate		= new Button("Activate", NIL, Point(350, 209), Size(70, 22));
+	button_activate->onAction.Connect(&Widget::Activate, selected_widget);
+
+	button_deactivate	= new Button("Deactivate", NIL, Point(422, 209), Size(70, 22));
+	button_deactivate->onAction.Connect(&Widget::Deactivate, selected_widget);
+
 	RegisterObject(mainWnd);
 
 	mainWnd->RegisterObject(mainWnd_titlebar);
@@ -149,6 +163,11 @@ Test::Test()
 	mainWnd->RegisterObject(text_editbox);
 	mainWnd->RegisterObject(widget_editbox);
 
+	mainWnd->RegisterObject(button_show);
+	mainWnd->RegisterObject(button_hide);
+	mainWnd->RegisterObject(button_activate);
+	mainWnd->RegisterObject(button_deactivate);
+
 	mainWnd->SetIcon(NIL);
 }
 
@@ -186,6 +205,11 @@ Test::~Test()
 
 	DeleteObject(text_editbox);
 	DeleteObject(widget_editbox);
+
+	DeleteObject(button_show);
+	DeleteObject(button_hide);
+	DeleteObject(button_activate);
+	DeleteObject(button_deactivate);
 
 	DeleteObject(menu_file);
 	DeleteObject(menu_dialogs);

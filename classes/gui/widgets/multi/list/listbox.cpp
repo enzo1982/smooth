@@ -65,19 +65,30 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 	String	 visibleEntries;
 
+	if (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER))	header->Show();
+	else							header->Hide();
+
+	Int	 entriesHeight	= (header->IsVisible() ? 16 : 0) + 4;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+
+		entriesHeight += GetNthObject(i)->GetHeight();
+
+		if (entriesHeight > GetHeight()) break;
+	}
+
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
 			surface->StartPaint(frame);
 
-			if (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER))	header->Show();
-			else							header->Hide();
-
-			if (15 * GetNOfEntries() + (header->IsVisible() ? 16 : 0) + 4 > GetHeight() && !(flags & LF_HIDESCROLLBAR))
+			if (entriesHeight > GetHeight() && !(flags & LF_HIDESCROLLBAR))
 			{
 				scrollbar->SetMetrics(Point(18, 1 + (header->IsVisible() ? 16 : 0)), Size(scrollbar->GetWidth(), GetHeight() - 2 - (header->IsVisible() ? 16 : 0)));
-				scrollbar->SetRange(0, GetNOfEntries() - (int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / 15));
+				scrollbar->SetRange(0, GetNOfEntries() - (int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / GetNthEntry(0)->GetHeight()));
 				scrollbar->Show();
 			}
 			else
@@ -85,7 +96,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				scrollbar->Hide();
 			}
 
-			if (active)	surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::ClientColor, FILLED);
+			if (IsActive())	surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::ClientColor, FILLED);
 			else		surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::BackgroundColor, FILLED);
 
 			surface->Frame(frame, FRAME_DOWN);
@@ -99,14 +110,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					ListEntry	*operat = (ListEntry *) GetNthObject(i);
 
-					if (n++ >= scrollbarPos && frame.top + 15 <= GetHeight() - 3)
+					if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
 					{
 						operat->SetMetrics(Point(2, frame.top + 1), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), operat->GetHeight()));
 						operat->Show();
 
 						visibleEntries.Append(operat->GetName());
 
-						frame.top = Math::Min((Int) (frame.top + 15), GetHeight() - 3);
+						frame.top = Math::Min((Int) (frame.top + operat->GetHeight()), GetHeight() - 3);
 					}
 					else
 					{
@@ -123,10 +134,10 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			break;
 		case SP_UPDATE:
-			if (15 * GetNOfEntries() + (header->IsVisible() ? 16 : 0) + 4 > GetHeight() && !(flags & LF_HIDESCROLLBAR))
+			if (entriesHeight > GetHeight() && !(flags & LF_HIDESCROLLBAR))
 			{
 				if (!scrollbar->IsVisible())	Paint(SP_PAINT);
-				else 				scrollbar->SetRange(0, GetNOfEntries() - (int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / 15));
+				else 				scrollbar->SetRange(0, GetNOfEntries() - (int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / GetNthEntry(0)->GetHeight()));
 			}
 
 			{
@@ -138,11 +149,11 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 					ListEntry	*operat = (ListEntry *) GetNthObject(i);
 
-					if (n++ >= scrollbarPos && frame.top + 15 <= GetHeight() - 3)
+					if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
 					{
 						visibleEntries.Append(operat->GetName());
 
-						frame.top = Math::Min((Int) (frame.top + 15), GetHeight() - 3);
+						frame.top = Math::Min((Int) (frame.top + operat->GetHeight()), GetHeight() - 3);
 					}
 				}
 
@@ -167,9 +178,8 @@ S::Void S::GUI::ListBox::OnChangeSize(const Size &nSize)
 	if (scrollbar->IsVisible())
 	{
 		scrollbar->SetHeight(nSize.cy - 2 - (header->IsVisible() ? 16 : 0));
-		scrollbar->SetRange(0, GetNOfEntries() - (int) ((nSize.cy - 4 - (header->IsVisible() ? 16 : 0)) / 15));
+		scrollbar->SetRange(0, GetNOfEntries() - (int) ((nSize.cy - 4 - (header->IsVisible() ? 16 : 0)) / GetNthEntry(0)->GetHeight()));
 	}
 
 	header->SetWidth(nSize.cx - 2);
-	header->UpdateMetrics();
 }

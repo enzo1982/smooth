@@ -50,22 +50,23 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 	if (orientation == OR_TOP || orientation == OR_BOTTOM)
 	{
-		Int	 nextXPosLeft	= GetX() + 3 + (window->GetIcon() != NIL ? 17 : 0);
+		Int	 nextXPosLeft	= GetX() + 4 + (window->GetIcon() != NIL ? 17 : 0);
 		Int	 nextXPosRight	= GetX() + GetWidth() - 4;
+		Int	 highestEntry	= 0;
 
 		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
 			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
 
+			if (entry->GetOrientation() == OR_TOP) entry->SetOrientation(OR_LEFT);
+
 			if (entry->GetOrientation() == OR_LEFT)
 			{
-				if (entry->GetText() == NIL && entry->GetBitmap() == NIL) nextXPosLeft--;
-
 				entry->SetPosition(Point(nextXPosLeft, 2));
 
 				nextXPosLeft += entry->GetWidth() + 2;
 
-				if (GetHeight() < entry->GetHeight() + 2) SetHeight(entry->GetHeight() + 2);
+				if (highestEntry < entry->GetHeight()) highestEntry = entry->GetHeight();
 			}
 		}
 
@@ -73,17 +74,19 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		{
 			MenuEntry	*entry = (MenuEntry *) GetNthObject(j);
 
+			if (entry->GetOrientation() == OR_BOTTOM) entry->SetOrientation(OR_RIGHT);
+
 			if (entry->GetOrientation() == OR_RIGHT)
 			{
 				entry->SetPosition(Point(nextXPosRight - entry->GetWidth(), 2));
 
 				nextXPosRight -= entry->GetWidth() + 2;
 
-				if (entry->GetText() == NIL && entry->GetBitmap() == NIL) nextXPosRight++;
-
-				if (GetHeight() < entry->GetHeight() + 2) SetHeight(entry->GetHeight() + 2);
+				if (highestEntry < entry->GetHeight()) highestEntry = entry->GetHeight();
 			}
 		}
+
+		SetHeight(highestEntry + 2);
 
 		for (Int k = 0; k < GetNOfObjects(); k++)
 		{
@@ -94,7 +97,49 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	}
 	else if (orientation == OR_LEFT || orientation == OR_RIGHT)
 	{
-		// TODO: Implement vertical Menubar
+		Int	 nextYPos	= 1;
+		Int	 widestEntry	= 0;
+
+		for (Int i = 0; i < GetNOfObjects(); i++)
+		{
+			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+
+			if (entry->GetOrientation() == OR_LEFT) entry->SetOrientation(OR_TOP);
+
+			if (entry->GetOrientation() == OR_TOP)
+			{
+				entry->SetPosition(Point(1, nextYPos));
+
+				nextYPos += entry->GetHeight() + 2;
+
+				if (widestEntry < entry->GetWidth()) widestEntry = entry->GetWidth();
+			}
+		}
+
+		for (Int j = 0; j < GetNOfObjects(); j++)
+		{
+			MenuEntry	*entry = (MenuEntry *) GetNthObject(j);
+
+			if (entry->GetOrientation() == OR_RIGHT) entry->SetOrientation(OR_BOTTOM);
+
+			if (entry->GetOrientation() == OR_BOTTOM)
+			{
+				entry->SetPosition(Point(1, nextYPos));
+
+				nextYPos += entry->GetHeight() + 2;
+
+				if (widestEntry < entry->GetWidth()) widestEntry = entry->GetWidth();
+			}
+		}
+
+		SetWidth(widestEntry + 3);
+
+		for (Int k = 0; k < GetNOfObjects(); k++)
+		{
+			MenuEntry	*entry = (MenuEntry *) GetNthObject(k);
+
+			if (entry->GetText() == NIL && entry->GetBitmap() == NIL) entry->SetWidth(GetWidth() - 3);
+		}
 	}
 
 	Surface	*surface = container->GetDrawSurface();
@@ -108,7 +153,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			{
 				if (orientation == OR_BOTTOM) { menubar.top--; menubar.bottom--; }
 
-				Point	 p1 = Point(menubar.left + 1 + (Setup::rightToLeft ? 2 : 0), menubar.top + 2);
+				Point	 p1 = Point(menubar.left + 1, menubar.top + 2);
 				Point	 p2 = Point(p1.x, menubar.bottom);
 
 				if (window->GetIcon() != NIL && orientation == OR_TOP)

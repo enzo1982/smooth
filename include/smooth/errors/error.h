@@ -39,7 +39,7 @@ namespace smooth
 
 				virtual String		 ToString();
 
-				virtual operator	 Bool() const;
+				virtual operator	 Int() const;
 
 				virtual Bool operator	 ==(const Error &) const;
 				virtual Bool operator	 !=(const Error &) const;

@@ -11,8 +11,12 @@
 #include <smooth/gui/widgets/multi/menu/menuentry.h>
 #include <smooth/gui/widgets/special/shortcut.h>
 
+const S::Int	 S::GUI::MenuEntry::classID = S::Object::RequestClassID();
+
 S::GUI::MenuEntry::MenuEntry(const String &iText, const Bitmap &iBitmap, Menu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : Widget(Point(), Size())
 {
+	type		= classID;
+
 	popup		= iPopup;
 	bVar		= ibVar;
 	iVar		= iiVar;

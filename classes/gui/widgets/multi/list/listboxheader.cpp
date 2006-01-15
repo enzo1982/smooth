@@ -24,6 +24,8 @@ S::GUI::ListBoxHeader::ListBoxHeader(const Point &iPos, const Size &iSize) : Wid
 	type		= classID;
 
 	font.SetWeight(FW_BOLD);
+
+	onChangeSize.Connect(&ListBoxHeader::OnChangeSize, this);
 }
 
 S::GUI::ListBoxHeader::~ListBoxHeader()
@@ -37,7 +39,7 @@ S::Int S::GUI::ListBoxHeader::AddTab(const String &iTabName, Int iTabWidth, Int 
 	tabOrientations.AddEntry(iTabOrientation);
 	tabChecked.AddEntry(False);
 
-	UpdateMetrics();
+	OnChangeSize(GetSize());
 
 	return Success();
 }
@@ -49,26 +51,7 @@ S::Int S::GUI::ListBoxHeader::RemoveAllTabs()
 	tabOrientations.RemoveAll();
 	tabChecked.RemoveAll();
 
-	UpdateMetrics();
-
-	return Success();
-}
-
-S::Int S::GUI::ListBoxHeader::UpdateMetrics()
-{
-	Int	 varSizeTabs = 0;
-	Int	 sumFixedTabSizes = 0;
-
-	for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
-	{
-		if (tabWidths.GetNthEntry(i) <= 0)	varSizeTabs++;
-		else					sumFixedTabSizes += tabWidths.GetNthEntry(i);
-	}
-
-	for (Int j = 0; j < tabWidths.GetNOfEntries(); j++)
-	{
-		if (tabWidths.GetNthEntry(j) <= 0) tabWidths.SetEntry(tabWidths.GetNthEntryIndex(j), -Math::Max(0, (GetWidth() - sumFixedTabSizes) / varSizeTabs));
-	}
+	OnChangeSize(GetSize());
 
 	return Success();
 }
@@ -259,7 +242,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 						omx = mx;
 
-						UpdateMetrics();
+						OnChangeSize(GetSize());
 
 						container->Paint(SP_PAINT);
 					}
@@ -277,4 +260,21 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 	LeaveProtectedRegion();
 
 	return retVal;
+}
+
+S::Void S::GUI::ListBoxHeader::OnChangeSize(const Size &nSize)
+{
+	Int	 varSizeTabs = 0;
+	Int	 sumFixedTabSizes = 0;
+
+	for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
+	{
+		if (tabWidths.GetNthEntry(i) <= 0)	varSizeTabs++;
+		else					sumFixedTabSizes += tabWidths.GetNthEntry(i);
+	}
+
+	for (Int j = 0; j < tabWidths.GetNOfEntries(); j++)
+	{
+		if (tabWidths.GetNthEntry(j) <= 0) tabWidths.SetEntry(tabWidths.GetNthEntryIndex(j), -Math::Max(0, (GetWidth() - sumFixedTabSizes) / varSizeTabs));
+	}
 }

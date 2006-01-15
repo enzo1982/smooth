@@ -169,7 +169,7 @@ S::Int S::Loop()
 		initializing = false;
 		loopActive = true;
 
-		for (int i = 0; i < Object::GetNOfObjects(); i++)
+		for (Int i = 0; i < Object::GetNOfObjects(); i++)
 		{
 			Object	*object = Object::GetNthObject(i);
 
@@ -184,7 +184,7 @@ S::Int S::Loop()
 
 		// start waiting threads here
 
-		for (int j = 0; j < Object::GetNOfObjects(); j++)
+		for (Int j = 0; j < Object::GetNOfObjects(); j++)
 		{
 			Object	*object = Object::GetNthObject(j);
 

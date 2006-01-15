@@ -30,7 +30,7 @@ namespace smooth
 	{
 		const Int	 THREAD_SDL	= 3;
 
-		class SMOOTH_STATIC_EXPORT ThreadSDL : public ThreadBackend
+		class ThreadSDL : public ThreadBackend
 		{
 			protected:
 				SDL_Thread	*thread;

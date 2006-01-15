@@ -42,8 +42,6 @@ S::GUI::PopupMenu::~PopupMenu()
 
 	if (toolWindow != NIL)
 	{
-		toolWindow->FreeOwner();
-
 		if (toolWindow->IsRegistered() && toolWindow->GetContainer() != NIL) toolWindow->GetContainer()->UnregisterObject(toolWindow);
 
 		DeleteObject(toolWindow);
@@ -92,22 +90,17 @@ S::Int S::GUI::PopupMenu::Show()
 
 	if (!IsRegistered()) return Success();
 
-	Window	*wnd = (Window *) container->GetContainerWindow();
-
-	if (wnd == NIL) return Success();
-
-	Point	 tPos	 = GetPosition() + wnd->GetPosition();
-	Size	 tSize	 = GetSize();
-
-	toolWindow = new ToolWindow(tPos, tSize);
-	toolWindow->SetOwner(this);
+	toolWindow = new ToolWindow(GetPosition(), GetSize());
 	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
+	toolWindow->onLoseFocus.Connect(&PopupMenu::InternalClosePopups, this);
 
-	wnd->RegisterObject(toolWindow);
+	RegisterObject(toolWindow);
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+
+		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
 		entry->SetRegisteredFlag(False);
 
@@ -127,15 +120,13 @@ S::Int S::GUI::PopupMenu::Hide()
 
 	if (!IsRegistered()) return Success();
 
-	Window	*wnd = container->GetContainerWindow();
-
-	if (wnd == NIL) return Success();
-
 	if (toolWindow != NIL)
 	{
 		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
 			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+
+			if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
 			toolWindow->UnregisterObject(entry);
 
@@ -143,9 +134,7 @@ S::Int S::GUI::PopupMenu::Hide()
 			entry->SetContainer(this);
 		}
 
-		toolWindow->FreeOwner();
-
-		wnd->UnregisterObject(toolWindow);
+		UnregisterObject(toolWindow);
 
 		DeleteObject(toolWindow);
 

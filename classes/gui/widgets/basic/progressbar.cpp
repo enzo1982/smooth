@@ -54,7 +54,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 		case SP_PAINT:
 			surface->StartPaint(frame);
 
-			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+			if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
 			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 			surface->Frame(frame, FRAME_DOWN);

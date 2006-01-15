@@ -32,6 +32,7 @@ xx.xx.06 xx:xx - smooth alpha 0.8.67.0
 		- code cleaned up
 - d..loader.cpp	- new class: DynamicLoader; dynamic module loader
 - hotspot.cpp	- new class: Hotspot; simple widget to handle user action
+- scrollbar.cpp - improved scrolling with mouse wheel
 
 - added a class for smart pointers
 - added a class for nonblocking function calls

@@ -10,6 +10,10 @@
 
 #include <smooth/system/backends/timerbackend.h>
 
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	#include <smooth/system/backends/win32/timerwin32.h>
+#endif
+
 S::System::TimerBackend *CreateTimerBackend()
 {
 	return new S::System::TimerBackend();
@@ -38,6 +42,12 @@ S::System::TimerBackend *S::System::TimerBackend::CreateBackendInstance()
 
 S::System::TimerBackend::TimerBackend()
 {
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	volatile Bool	 null = 0;
+
+	if (null) TimerWin32();
+#endif
+
 	type = TIMER_NONE;
 }
 

@@ -42,6 +42,8 @@ namespace smooth
 				virtual			~Shortcut();
 
 				virtual Int		 Process(Int, Int, Int);
+
+				virtual String		 ToString();
 			accessors:
 				Int			 SetShortcut(Int, Int, Int = 0);
 

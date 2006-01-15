@@ -46,14 +46,14 @@ namespace smooth
 
 				Int			 AddTab(const String &, Int, Int);
 
+				Int			 RemoveAllTabs();
+			accessors:
 				Int			 GetNOfTabs();
 				Int			 GetNthTabOffset(Int);
 				Int			 GetNthTabWidth(Int);
 				Int			 GetNthTabOrientation(Int);
-
-				Int			 RemoveAllTabs();
-
-				Int			 UpdateMetrics();
+			slots:
+				Void			 OnChangeSize(const Size &);
 		};
 	};
 };

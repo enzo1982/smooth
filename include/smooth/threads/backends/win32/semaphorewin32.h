@@ -29,7 +29,7 @@ namespace smooth
 	{
 		const Int	 SEMAPHORE_WIN32	= 2;
 
-		class SMOOTH_STATIC_EXPORT SemaphoreWin32 : public SemaphoreBackend
+		class SemaphoreWin32 : public SemaphoreBackend
 		{
 			protected:
 				HANDLE	 semaphore;

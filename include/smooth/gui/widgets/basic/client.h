@@ -31,11 +31,9 @@ namespace smooth
 				static const Int	 classID;
 
 							 Client();
-							~Client();
+				virtual			~Client();
 
 				virtual Int		 Paint(Int);
-
-				virtual Size		 GetSize();
 			signals:
 				Signal0<Void>		 onPaint;
 		};

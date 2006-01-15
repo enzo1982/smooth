@@ -31,8 +31,6 @@ namespace smooth
 						 Success();
 
 				virtual String	 ToString();
-
-				operator	 Bool() const;
 		};
 	};
 };

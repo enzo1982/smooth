@@ -10,6 +10,10 @@
 
 #include <smooth/threads/backends/semaphorebackend.h>
 
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	#include <smooth/threads/backends/win32/semaphorewin32.h>
+#endif
+
 S::Threads::SemaphoreBackend *CreateSemaphoreBackend(S::Void *iSemaphore)
 {
 	return new S::Threads::SemaphoreBackend(iSemaphore);
@@ -38,6 +42,12 @@ S::Threads::SemaphoreBackend *S::Threads::SemaphoreBackend::CreateBackendInstanc
 
 S::Threads::SemaphoreBackend::SemaphoreBackend(Void *iSemaphore)
 {
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	volatile Bool	 null = 0;
+
+	if (null) SemaphoreWin32();
+#endif
+
 	type = SEMAPHORE_NONE;
 }
 

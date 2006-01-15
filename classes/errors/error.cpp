@@ -29,9 +29,9 @@ S::String S::Errors::Error::ToString()
 	return "Unknown error";
 }
 
-S::Errors::Error::operator S::Bool() const
+S::Errors::Error::operator S::Int() const
 {
-	return False;
+	return code;
 }
 
 S::Bool S::Errors::Error::operator ==(const Error &error) const

@@ -15,11 +15,6 @@ S::Errors::Success::Success()
 	code = 0;
 }
 
-S::Errors::Success::operator S::Bool() const
-{
-	return True;
-}
-
 S::String S::Errors::Success::ToString()
 {
 	return "Operation successful";

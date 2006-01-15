@@ -79,7 +79,7 @@ S::Int S::GUI::Button::Paint(Int message)
 
 				Font	 nFont = font;
 
-				if (!active) nFont.SetColor(Setup::GrayTextColor);
+				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
 				surface->SetText(text, textRect, nFont);
 			}

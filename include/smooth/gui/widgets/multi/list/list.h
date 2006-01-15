@@ -36,8 +36,8 @@ namespace smooth
 				ListEntry			*AddEntry(const String &);
 				Int				 RemoveEntry(ListEntry *);
 
-				Int				 Clear();
-
+				Int				 RemoveAllEntries();
+			accessors:
 				Int				 GetNOfEntries();
 				ListEntry			*GetNthEntry(Int);
 

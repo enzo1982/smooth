@@ -54,7 +54,7 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 
 			Font	 nFont		= font;
 
-			if (!active) nFont.SetColor(Setup::GrayTextColor);
+			if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
 			surface->SetText(text, textRect + Point(1, 0), nFont);
 

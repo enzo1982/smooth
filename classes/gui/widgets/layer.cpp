@@ -112,18 +112,21 @@ S::Int S::GUI::Layer::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Window	*window = container->GetContainerWindow();
-
-	if (window == NIL) return Success();
-
-	Rect	 updateRect	= window->GetUpdateRect();
 	Surface	*surface	= container->GetDrawSurface();
+	Rect	 updateRect	= container->GetContainerWindow()->GetUpdateRect();
 
-	if (GetBackgroundColor() != -1)
+	switch (message)
 	{
-		Rect	 frame = Rect(GetRealPosition(), GetSize());
+		case SP_SHOW:
+		case SP_PAINT:
+			if (GetBackgroundColor() != -1)
+			{
+				Rect	 frame = Rect(GetRealPosition(), GetSize());
 
-		surface->Box(Rect::OverlapRect(frame, updateRect), GetBackgroundColor(), FILLED);
+				surface->Box(Rect::OverlapRect(frame, updateRect), GetBackgroundColor(), FILLED);
+			}
+
+			break;
 	}
 
 	return Widget::Paint(message);

@@ -36,6 +36,8 @@ namespace smooth
 				virtual			~Divider();
 
 				virtual Int		 Paint(Int);
+
+				virtual Bool		 IsAffected(const Rect &);
 			accessors:
 				Int			 SetPos(Int);
 				Int			 GetPos();

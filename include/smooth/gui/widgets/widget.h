@@ -43,9 +43,8 @@ namespace smooth
 	const Int SP_MOUSEDOWN	= 3;
 	const Int SP_MOUSEUP	= 4;
 	const Int SP_UPDATE	= 5;
-	const Int SP_DELAYED	= 6;
-	const Int SP_SHOW	= 7;
-	const Int SP_HIDE	= 8;
+	const Int SP_SHOW	= 6;
+	const Int SP_HIDE	= 7;
 
 	namespace GUI
 	{
@@ -114,8 +113,6 @@ namespace smooth
 				Int				 SetContainer(Widget *);
 				Widget				*GetContainer();
 
-				Bool				 IsRegistered();
-
 				Void				 SetRegisteredFlag(Bool);
 
 				virtual Point			 GetRealPosition();
@@ -132,8 +129,11 @@ namespace smooth
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
 			accessors:
+				Bool				 IsRegistered();
 				Bool				 IsVisible();
 				Bool				 IsActive();
+
+				Bool				 IsMouseOver();
 
 				virtual Int			 SetText(const String &);
 				virtual const String		&GetText();

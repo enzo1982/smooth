@@ -12,6 +12,10 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/color.h>
 
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	#include <smooth/graphics/backends/gdi/bitmapgdi.h>
+#endif
+
 S::GUI::BitmapBackend *CreateBitmapBackend_pV(S::Void *iBitmap)
 {
 	return new S::GUI::BitmapBackend(iBitmap);
@@ -112,6 +116,12 @@ S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(const Bitmap
 
 S::GUI::BitmapBackend::BitmapBackend(Void *iBitmap)
 {
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	volatile Bool	 null = 0;
+
+	if (null) BitmapGDI();
+#endif
+
 	type	= BITMAP_NONE;
 
 	size	= Size(0, 0);

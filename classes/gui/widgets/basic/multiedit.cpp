@@ -65,7 +65,7 @@ S::Int S::GUI::MultiEdit::Paint(Int message)
 		case SP_PAINT:
 			if (scrollbar != NIL) frame.right -= 17;
 
-			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+			if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
 			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 			if (scrollbar != NIL) frame.right += 17;

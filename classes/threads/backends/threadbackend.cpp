@@ -10,6 +10,10 @@
 
 #include <smooth/threads/backends/threadbackend.h>
 
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	#include <smooth/threads/backends/win32/threadwin32.h>
+#endif
+
 S::Threads::ThreadBackend *CreateThreadBackend(S::Void *iThread)
 {
 	return new S::Threads::ThreadBackend(iThread);
@@ -38,6 +42,12 @@ S::Threads::ThreadBackend *S::Threads::ThreadBackend::CreateBackendInstance(Void
 
 S::Threads::ThreadBackend::ThreadBackend(Void *iThread)
 {
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	volatile Bool	 null = 0;
+
+	if (null) ThreadWin32();
+#endif
+
 	type = THREAD_NONE;
 }
 

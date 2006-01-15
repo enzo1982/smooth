@@ -41,5 +41,5 @@ S::Void S::GUI::DragControl::OnMouseDrag(const Point &mousePos)
 {
 	Window	*window	= container->GetContainerWindow();
 
-	if (!window->IsMaximized()) window->SetPosition(window->GetPosition() - (startMousePos - mousePos));
+	if (!window->IsMaximized()) window->SetPosition(window->GetPosition() - (Point((Setup::rightToLeft ? window->GetWidth() - startMousePos.x : startMousePos.x), startMousePos.y) - Point((Setup::rightToLeft ? window->GetWidth() - mousePos.x : mousePos.x), mousePos.y)));
 }

@@ -35,6 +35,8 @@ namespace smooth
 				Hotspot				*hotspot;
 				Hotspot				*markHotspot;
 			public:
+				static const Int		 classID;
+
 								 ListEntry(const String &);
 				virtual				~ListEntry();
 

@@ -11,7 +11,6 @@
 #include <smooth/gui/widgets/widget.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/widgets/layer.h>
-#include <smooth/gui/widgets/basic/divider.h>
 #include <smooth/gui/widgets/special/tooltip.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/misc/math.h>
@@ -190,11 +189,6 @@ S::GUI::Surface *S::GUI::Widget::GetDrawSurface()
 	else			return drawSurface;
 }
 
-S::Bool S::GUI::Widget::IsRegistered()
-{
-	return registered;
-}
-
 S::Int S::GUI::Widget::SetContainer(Widget *newContainer)
 {
 	container = newContainer;
@@ -332,12 +326,6 @@ S::Int S::GUI::Widget::Paint(Int message)
 	if (!registered)	return Error();
 	if (!visible)		return Success();
 
-	Window	*window = container->GetContainerWindow();
-
-	if (window == NIL) return Success();
-
-	Rect	 updateRect	= window->GetUpdateRect();
-
 	switch (message)
 	{
 		case SP_SHOW:
@@ -346,7 +334,7 @@ S::Int S::GUI::Widget::Paint(Int message)
 			{
 				Widget	*widget = GetNthObject(i);
 
-				if (widget->IsAffected(updateRect)) widget->Paint(message);
+				widget->Paint(message);
 			}
 
 			break;
@@ -583,6 +571,11 @@ S::Void S::GUI::Widget::DeactivateTooltip()
 	}
 }
 
+S::Bool S::GUI::Widget::IsRegistered()
+{
+	return registered;
+}
+
 S::Bool S::GUI::Widget::IsVisible()
 {
 	if (!registered)	return visible;
@@ -597,6 +590,11 @@ S::Bool S::GUI::Widget::IsActive()
 	if (!active)		return False;
 
 	return container->IsActive();
+}
+
+S::Bool S::GUI::Widget::IsMouseOver()
+{
+	return mouseOver;
 }
 
 S::Int S::GUI::Widget::SetText(const String &newText)
@@ -763,14 +761,7 @@ S::Int S::GUI::Widget::SetMetrics(const Point &nPos, const Size &nSize)
 
 S::Bool S::GUI::Widget::IsAffected(const Rect &uRect)
 {
-	Point	 realPos = GetRealPosition();
-	Rect	 tRect	 = Rect(realPos - Point(10, 10), size + Size(20, 20));
-
-	if (type == GUI::Layer::classID || type == GUI::Divider::classID) return True;
-
-	if (!Rect::DoRectsOverlap(uRect, tRect)) return False;
-
-	return True;
+	return Rect::DoRectsOverlap(uRect, Rect(GetRealPosition() - Point(10, 10), size + Size(20, 20)));
 }
 
 S::Bool S::GUI::Widget::DefaultHitTest(const Point &mousePos)

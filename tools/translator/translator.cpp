@@ -331,7 +331,7 @@ void Translator::CloseFile()
 
 	entries.RemoveAll();
 
-	list_entries->Clear();
+	list_entries->RemoveAllEntries();
 
 	text_original->SetText("Original:");
 	text_translated->SetText("Translation:");

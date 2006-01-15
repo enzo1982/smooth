@@ -91,10 +91,10 @@ LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM
 	{
 		retVal = smoothWindow->ProcessSystemMessages(message, wParam, lParam);
 
-		if (retVal == -1) retVal = smoothWindow->onEvent.Call(message, param1, param2);
+		if (retVal == Success()) retVal = smoothWindow->onEvent.Call(message, param1, param2);
 	}
 
-	if (retVal != -1)		return retVal;
+	if (retVal == Break)		return 0;
 	else if (Setup::enableUnicode)	return DefWindowProcW(window, originalMessage, wParam, lParam);
 	else				return DefWindowProcA(window, originalMessage, wParam, lParam);
 }
@@ -164,7 +164,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 				SetMetrics(Point(rect.left - 2, rect.top - 2), Size(rect.right - rect.left + 4, rect.bottom - rect.top + 4));
 			}
 
-			return 0;
+			return Break;
 		case WM_GETMINMAXINFO:
 			{
 				RECT	 windowRect;
@@ -190,15 +190,10 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 				}
 			}
 
-			return 0;
-		case WM_NCPAINT:
-			if (Setup::enableUnicode)	PostMessageW(hwnd, WM_PAINT, 0, 0);
-			else				PostMessageA(hwnd, WM_PAINT, 0, 0);
-
-			return -1;
+			return Break;
 	}
 
-	return -1;
+	return Success();
 }
 
 S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size &size, Int flags)

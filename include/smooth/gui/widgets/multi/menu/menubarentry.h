@@ -30,16 +30,17 @@ namespace smooth
 		class SMOOTHAPI MenubarEntry : public MenuEntry
 		{
 			protected:
-				Hotspot		*hotspot;
+				Hotspot			*hotspot;
 			public:
-						 MenubarEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
-				virtual		~MenubarEntry();
+				static const Int	 classID;
 
-				virtual Int	 Paint(Int);
-				virtual Int	 Process(Int, Int, Int);
+							 MenubarEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
+				virtual			~MenubarEntry();
+
+				virtual Int		 Paint(Int);
 			slots:
-				Void		 OpenPopupMenu();
-				Void		 ClosePopupMenu();
+				Void			 OpenPopupMenu();
+				Void			 ClosePopupMenu();
 		};
 	};
 };

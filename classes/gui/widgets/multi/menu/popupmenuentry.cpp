@@ -16,8 +16,12 @@
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 
+const S::Int	 S::GUI::PopupMenuEntry::classID = S::Object::RequestClassID();
+
 S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitmap, Menu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : MenuEntry(iText, iBitmap, iPopup, ibVar, iiVar, iiCode)
 {
+	type		= classID;
+
 	if (text == NIL && bitmap == NIL)	SetSize(Size(15, 4));
 	else if (text != NIL && bitmap == NIL)	SetSize(Size(textSize.cx + 44, 15));
 

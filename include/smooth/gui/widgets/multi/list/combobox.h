@@ -38,8 +38,6 @@ namespace smooth
 				ListBox			*listBox;
 
 				ListEntry		*prevSelectedEntry;
-
-				Void			 CloseListBox();
 			protected:
 				Hotspot			*hotspot;
 				Hotspot			*buttonHotspot;
@@ -51,10 +49,10 @@ namespace smooth
 
 				virtual Int		 Paint(Int);
 			slots:
-				Void			 ToggleListBox();
+				Void			 OpenListBox();
+				Void			 CloseListBox();
 
 				Void			 OnSelectEntry(ListEntry *);
-
 				Void			 OnChangeSize(const Size &);
 		};
 	};

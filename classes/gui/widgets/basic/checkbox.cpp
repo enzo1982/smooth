@@ -64,26 +64,26 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (active)	surface->Box(frame, Setup::ClientColor, FILLED);
+			if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
 			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 			surface->Frame(frame, FRAME_DOWN);
 
 			if (*variable == True)
 			{
-				Point p1 = Point(frame.left + 3, frame.top + 3);
-				Point p2 = Point(frame.left + 10, frame.bottom - 1);
+				Point p1 = Point(frame.left + 3 - (Setup::rightToLeft ? 1 : 0), frame.top + 3);
+				Point p2 = Point(frame.left + 10 - (Setup::rightToLeft ? 1 : 0), frame.bottom - 1);
 
 				for (Int i = 0; i < 2; i++)
 				{
-					Int	 color = active ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
+					Int	 color = IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
 
 					if (i == 1)
 					{
-						color = active ? Setup::ClientTextColor : Setup::GrayTextColor;
+						color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
 
-						p1 -= Point(i, i);
-						p2 -= Point(i, i);
+						p1 -= Point((Setup::rightToLeft ? -i : i), i);
+						p2 -= Point((Setup::rightToLeft ? -i : i), i);
 					}
 
 					surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), color);
@@ -104,7 +104,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 
 			Font	 nFont = font;
 
-			if (!active) nFont.SetColor(Setup::GrayTextColor);
+			if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
 			surface->SetText(text, textRect, nFont);
 

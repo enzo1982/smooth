@@ -22,7 +22,7 @@ S::GUI::List::List() : Widget(Point(), Size())
 
 S::GUI::List::~List()
 {
-	Clear();
+	RemoveAllEntries();
 }
 
 S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text)
@@ -59,7 +59,7 @@ S::Int S::GUI::List::RemoveEntry(ListEntry *entry)
 	return Error();
 }
 
-S::Int S::GUI::List::Clear()
+S::Int S::GUI::List::RemoveAllEntries()
 {
 	Int	 nonListEntry = 0;
 

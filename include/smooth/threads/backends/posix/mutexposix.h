@@ -29,7 +29,7 @@ namespace smooth
 	{
 		const Int	 MUTEX_POSIX	= 1;
 
-		class SMOOTH_STATIC_EXPORT MutexPOSIX : public MutexBackend
+		class MutexPOSIX : public MutexBackend
 		{
 			protected:
 				pthread_mutex_t	*mutex;

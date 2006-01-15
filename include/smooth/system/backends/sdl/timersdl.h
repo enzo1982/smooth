@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 TIMER_SDL = 2;
 
-		class SMOOTH_STATIC_EXPORT TimerSDL : public TimerBackend
+		class TimerSDL : public TimerBackend
 		{
 			private:
 				Int			 timerid;

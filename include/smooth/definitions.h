@@ -30,13 +30,9 @@
 	#if defined __SMOOTH_DLL__
 		#define SMOOTHAPI __declspec (dllexport)
 		#define SMOOTHVAR extern __declspec (dllexport)
-
-		#define SMOOTH_STATIC_EXPORT
 	#elif defined __SMOOTH_PLUGIN_DLL__ && defined __SMOOTH_STATIC__
 		#define SMOOTHAPI
 		#define SMOOTHVAR extern
-
-		#define SMOOTH_STATIC_EXPORT
 
 		#define SMOOTH_PLUGIN_API __declspec (dllexport)
 		#define SMOOTH_PLUGIN_VAR extern __declspec (dllexport)
@@ -46,8 +42,6 @@
 		#define SMOOTHAPI
 		#define SMOOTHVAR extern
 
-		#define SMOOTH_STATIC_EXPORT __declspec (dllexport)
-
 		#define SMOOTH_PLUGIN_API __declspec (dllimport)
 		#define SMOOTH_PLUGIN_VAR __declspec (dllimport)
 
@@ -56,15 +50,11 @@
 		#define SMOOTHAPI __declspec (dllimport)
 		#define SMOOTHVAR __declspec (dllimport)
 
-		#define SMOOTH_STATIC_EXPORT
-
 		#define SMOOTH_PLUGIN_API __declspec (dllexport)
 		#define SMOOTH_PLUGIN_VAR extern __declspec (dllexport)
 	#else
 		#define SMOOTHAPI __declspec (dllimport)
 		#define SMOOTHVAR __declspec (dllimport)
-
-		#define SMOOTH_STATIC_EXPORT
 
 		#define SMOOTH_PLUGIN_API __declspec (dllimport)
 		#define SMOOTH_PLUGIN_VAR __declspec (dllimport)
@@ -81,8 +71,6 @@
 	#define SMOOTHAPI
 	#define SMOOTHVAR extern
 
-	#define SMOOTH_STATIC_EXPORT
-
 	#define SMOOTH_PLUGIN_API
 	#define SMOOTH_PLUGIN_VAR extern
 
@@ -94,8 +82,6 @@
 
 	#define SMOOTHAPI
 	#define SMOOTHVAR extern
-
-	#define SMOOTH_STATIC_EXPORT
 
 	#define SMOOTH_PLUGIN_API
 	#define SMOOTH_PLUGIN_VAR extern
@@ -149,7 +135,7 @@ namespace S = smooth;
 
 namespace smooth
 {
-	const Int Break		= -1;
+	const Int Break		= 1;
 
 	const Bool True		= (Bool) -1;
 	const Bool False	= (Bool) 0;

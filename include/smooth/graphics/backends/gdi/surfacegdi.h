@@ -27,7 +27,7 @@ namespace smooth
 	{
 		const Int	 SURFACE_GDI	= 1;
 
-		class SMOOTH_STATIC_EXPORT SurfaceGDI : public SurfaceBackend
+		class SurfaceGDI : public SurfaceBackend
 		{
 			protected:
 				HDC		 gdi_dc;

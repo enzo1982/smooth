@@ -10,6 +10,10 @@
 
 #include <smooth/threads/backends/mutexbackend.h>
 
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	#include <smooth/threads/backends/win32/mutexwin32.h>
+#endif
+
 S::Threads::MutexBackend *CreateMutexBackend(S::Void *iMutex)
 {
 	return new S::Threads::MutexBackend(iMutex);
@@ -38,6 +42,12 @@ S::Threads::MutexBackend *S::Threads::MutexBackend::CreateBackendInstance(Void *
 
 S::Threads::MutexBackend::MutexBackend(Void *iMutex)
 {
+#if defined __WIN32__ && defined __SMOOTH_STATIC__
+	volatile Bool	 null = 0;
+
+	if (null) MutexWin32();
+#endif
+
 	type = MUTEX_NONE;
 }
 

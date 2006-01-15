@@ -33,13 +33,13 @@ S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 
 	hotspot		= new Hotspot(Point(1, 1), GetSize() - Size(19, 2));
 
-	hotspot->onLeftButtonClick.Connect(&ComboBox::ToggleListBox, this);
+	hotspot->onLeftButtonDown.Connect(&ComboBox::OpenListBox, this);
 	hotspot->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
 	buttonHotspot	= new HotspotSimpleButton(Point(16, 3), Size(13, GetHeight() - 6));
 	buttonHotspot->SetOrientation(OR_UPPERRIGHT);
 
-	buttonHotspot->onLeftButtonClick.Connect(&ComboBox::ToggleListBox, this);
+	buttonHotspot->onLeftButtonDown.Connect(&ComboBox::OpenListBox, this);
 	buttonHotspot->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
 	RegisterObject(hotspot);
@@ -151,14 +151,15 @@ S::Void S::GUI::ComboBox::OnSelectEntry(ListEntry *entry)
 	}
 }
 
-S::Void S::GUI::ComboBox::ToggleListBox()
+S::Void S::GUI::ComboBox::OpenListBox()
 {
 	if (listBox == NIL)
 	{
 		listBox		= new ListBox(Point(0, 0), Size(GetWidth(), 15 * Math::Min(GetNOfEntries(), 5) + 4));
 		listBox->onSelectEntry.Connect(&ComboBox::OnSelectEntry, this);
 
-		toolWindow	= new ToolWindow(container->GetContainerWindow()->GetPosition() + GetRealPosition() + Point(0, GetHeight()), Size(GetWidth(), 15 * Math::Min(GetNOfEntries(), 5) + 4));
+		toolWindow	= new ToolWindow(GetRealPosition() + Point(0, GetHeight()), Size(GetWidth(), 15 * Math::Min(GetNOfEntries(), 5) + 4));
+		toolWindow->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
 		listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
 		listBox->AddTab("", 32768);
@@ -182,7 +183,11 @@ S::Void S::GUI::ComboBox::ToggleListBox()
 
 		RegisterObject(toolWindow);
 	}
-	else if (listBox != NIL)
+}
+
+S::Void S::GUI::ComboBox::CloseListBox()
+{
+	if (listBox != NIL)
 	{
 		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
@@ -198,24 +203,20 @@ S::Void S::GUI::ComboBox::ToggleListBox()
 			entry->Deactivate();
 		}
 
-		toolWindow->FreeOwner();
+		toolWindow->UnregisterObject(listBox);
+
+		DeleteObject(listBox);
+
+		listBox		= NIL;
+
 		toolWindow->Close();
 
 		UnregisterObject(toolWindow);
 
-		toolWindow->UnregisterObject(listBox);
-
-		DeleteObject(listBox);
 		DeleteObject(toolWindow);
 
-		listBox		= NIL;
 		toolWindow	= NIL;
 	}
-}
-
-S::Void S::GUI::ComboBox::CloseListBox()
-{
-	if (listBox != NIL) ToggleListBox();
 }
 
 S::Void S::GUI::ComboBox::OnChangeSize(const Size &nSize)

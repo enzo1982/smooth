@@ -27,21 +27,25 @@ S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, M
 	else if (text == NIL && bitmap != NIL)	SetSize(bitmap.GetSize() + Size(4 + (popup != NIL ? 12 : 0), 4));
 
 	hotspot = NIL;
+	actionHotspot = NIL;
 
 	if (text != NIL || bitmap != NIL)
 	{
 		hotspot	= new HotspotSimpleButton(Point(), GetSize());
-
 		hotspot->onLeftButtonDown.Connect(&MenubarEntry::OpenPopupMenu, this);
-		hotspot->onLeftButtonClick.Connect(&onAction);
+
+		actionHotspot = new Hotspot(Point(), GetSize() - Size((text == NIL && bitmap != NIL && popup != NIL ? 12 : 0), 0));
+		actionHotspot->onLeftButtonClick.Connect(&onAction);
 
 		RegisterObject(hotspot);
+		RegisterObject(actionHotspot);
 	}
 }
 
 S::GUI::MenubarEntry::~MenubarEntry()
 {
 	if (hotspot != NIL) DeleteObject(hotspot);
+	if (actionHotspot != NIL) DeleteObject(actionHotspot);
 }
 
 S::Int S::GUI::MenubarEntry::Paint(Int message)
@@ -82,7 +86,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 					SetHeight(4);
 
 					Point	 p1 = Point(realPos.x, realPos.y);
-					Point	 p2 = Point(p1.x + GetWidth() - 1, p1.y);
+					Point	 p2 = Point(p1.x + GetWidth(), p1.y);
 
 					surface->Bar(p1, p2, OR_HORZ);
 

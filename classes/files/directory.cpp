@@ -10,7 +10,7 @@
 
 #include <smooth/files/directory.h>
 
-S::Directory::Directory(String iDirName, String iDirPath)
+S::Directory::Directory(const String &iDirName, const String &iDirPath)
 {
 	dirName = iDirName;
 	dirPath = iDirPath;
@@ -26,6 +26,8 @@ S::Directory::Directory(String iDirName, String iDirPath)
 
 	if (dirName == NIL)
 	{
+		if (dirPath[dirPath.Length() - 1] == '\\') dirPath[dirPath.Length() - 1] = 0;
+
 		for (Int lastBS = dirPath.Length() - 1; lastBS >= 0; lastBS--)
 		{
 			if (dirPath[lastBS] == '\\')
@@ -63,24 +65,87 @@ S::Directory::operator S::String() const
 	return String(dirPath).Append("\\").Append(dirName);
 }
 
-S::String S::Directory::GetDirectoryName()
+const S::String &S::Directory::GetDirectoryName()
 {
 	return dirName;
 }
 
-S::String S::Directory::GetDirectoryPath()
+const S::String &S::Directory::GetDirectoryPath()
 {
 	return dirPath;
 }
 
-S::Array<S::File> &S::Directory::GetFiles()
+const S::Array<S::File> &S::Directory::GetFiles()
 {
-	return files;
+	return GetFilesByPattern("*.*");
 }
 
-S::Array<S::Directory> &S::Directory::GetDirectories()
+const S::Array<S::Directory> &S::Directory::GetDirectories()
 {
+	directories.RemoveAll();
+
+	HANDLE		 handle;
+	WIN32_FIND_DATAW findDataW;
+	WIN32_FIND_DATAA findDataA;
+
+	if (Setup::enableUnicode)	handle = FindFirstFileW(String(*this).Append("\\*.*"), &findDataW);
+	else				handle = FindFirstFileA(String(*this).Append("\\*.*"), &findDataA);
+
+	Bool	 success = (handle != INVALID_HANDLE_VALUE);
+
+	while (success)
+	{
+		if (Setup::enableUnicode)
+		{
+			if ((findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataW.cFileName) != "." && String(findDataW.cFileName) != "..") directories.AddEntry(Directory(findDataW.cFileName, *this));
+
+			success = FindNextFileW(handle, &findDataW);
+		}
+		else
+		{
+			if ((findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataA.cFileName) != "." && String(findDataA.cFileName) != "..") directories.AddEntry(Directory(findDataA.cFileName, *this));
+
+			success = FindNextFileA(handle, &findDataA);
+		}
+	}
+
+	FindClose(handle);
+
 	return directories;
+}
+
+const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern)
+{
+	files.RemoveAll();
+
+	HANDLE		 handle;
+	WIN32_FIND_DATAW findDataW;
+	WIN32_FIND_DATAA findDataA;
+
+	if (Setup::enableUnicode)	handle = FindFirstFileW(String(*this).Append("\\").Append(pattern), &findDataW);
+	else				handle = FindFirstFileA(String(*this).Append("\\").Append(pattern), &findDataA);
+
+	Bool	 success = (handle != INVALID_HANDLE_VALUE);
+
+	while (success)
+	{
+		if (Setup::enableUnicode)
+		{
+			if (!(findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) files.AddEntry(File(findDataW.cFileName, *this));
+
+			success = FindNextFileW(handle, &findDataW);
+		}
+		else
+		{
+			if (!(findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) files.AddEntry(File(findDataA.cFileName, *this));
+
+			success = FindNextFileA(handle, &findDataA);
+		}
+	}
+
+	FindClose(handle);
+
+	return files;
 }
 
 S::DateTime S::Directory::GetCreateTime()
@@ -122,6 +187,15 @@ S::Bool S::Directory::Exists()
 
 	FindClose(handle);
 
+	if (Setup::enableUnicode)
+	{
+		if (!(findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return False;
+	}
+	else
+	{
+		if (!(findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return False;
+	}
+
 	return True;
 }
 
@@ -147,12 +221,12 @@ S::Int S::Directory::Create()
 	return Success();
 }
 
-S::Int S::Directory::Copy(String destination)
+S::Int S::Directory::Copy(const String &destination)
 {
 	return Error();
 }
 
-S::Int S::Directory::Move(String destination)
+S::Int S::Directory::Move(const String &destination)
 {
 	return Error();
 }

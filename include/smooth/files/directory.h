@@ -29,17 +29,19 @@ namespace smooth
 			Array<Directory>	 directories;
 			Array<File>		 files;
 		public:
-						 Directory(String, String = NIL);
+						 Directory(const String &, const String & = NIL);
 						 Directory(const int = NIL);
 						 Directory(const Directory &);
 
 						~Directory();
 
-			String			 GetDirectoryName();
-			String			 GetDirectoryPath();
+			const String		&GetDirectoryName();
+			const String		&GetDirectoryPath();
 
-			Array<File>		&GetFiles();
-			Array<Directory>	&GetDirectories();
+			const Array<File>	&GetFiles();
+			const Array<Directory>	&GetDirectories();
+
+			const Array<File>	&GetFilesByPattern(const String &);
 
 			DateTime		 GetCreateTime();
 
@@ -47,8 +49,8 @@ namespace smooth
 
 			Int			 Create();
 
-			Int			 Copy(String);
-			Int			 Move(String);
+			Int			 Copy(const String &);
+			Int			 Move(const String &);
 
 			Int			 Delete();
 			Int			 Empty();

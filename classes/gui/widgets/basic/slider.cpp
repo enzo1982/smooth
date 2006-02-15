@@ -51,6 +51,8 @@ S::GUI::Slider::Slider(const Point &iPos, const Size &iSize, Int sType, Int *var
 	RegisterObject(clickHotspot);
 	RegisterObject(dragHotspot);
 
+	onChangeSize.Connect(&Slider::UpdateHotspotPositions, this);
+
 	SetValue(*variable);
 }
 
@@ -168,5 +170,6 @@ S::Void S::GUI::Slider::OnMouseDragEnd(const Point &mousePos)
 
 S::Void S::GUI::Slider::UpdateHotspotPositions()
 {
+	clickHotspot->SetSize(GetSize() - (subtype == OR_HORZ ? Size(8, 2) : Size(2, 8)));
 	dragHotspot->SetMetrics(subtype == OR_HORZ ? Point((Int) (((Float) (GetWidth() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, (GetHeight() - 9) - (Int) (((Float) (GetHeight() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)))), subtype == OR_HORZ ? Size(8, 16) : Size(16, 8));
 }

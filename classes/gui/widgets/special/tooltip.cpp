@@ -49,13 +49,22 @@ S::Int S::GUI::Tooltip::Show()
 
 	Window	*window	 = container->GetContainerWindow();
 	Size	 tSize	 = Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4);
-	Point	 tPos	 = Point(Math::Max(2, GetX() + window->GetX()), GetY() + window->GetY() - tSize.cy + 1);
+	Point	 tPos	 = Point(GetX(), GetY() - tSize.cy + 1);
 
-	if (tPos.x + tSize.cx > LiSAGetDisplaySizeX() - 2 && !Setup::rightToLeft)					tPos.x = Math::Max(2, LiSAGetDisplaySizeX() - 2 - tSize.cx);
-	if (window->GetWidth() - ((tPos.x - window->GetX()) + tSize.cx) + window->GetX() < 2 && Setup::rightToLeft)	tPos.x = Math::Max(2, GetX() + window->GetX() - tSize.cx);
-	if (tPos.y < 2)													tPos.y = GetY() + window->GetY() + 2;
+	if (tPos.y + window->GetY() < 2) tPos.y = GetY() + 2;
 
-	toolWindow = new ToolWindow(tPos - window->GetPosition(), tSize);
+	if (!Setup::rightToLeft)
+	{
+		if (tPos.x + window->GetX() + tSize.cx > LiSAGetDisplaySizeX() - 2)	tPos.x = -window->GetX() + LiSAGetDisplaySizeX() - 2 - tSize.cx;
+		if (tPos.x + window->GetX() < 2)					tPos.x = -window->GetX() + 2;
+	}
+	else
+	{
+		if (window->GetWidth() - tPos.x + window->GetX() > LiSAGetDisplaySizeX() - 2)	tPos.x = -LiSAGetDisplaySizeX() + 2 + window->GetWidth() + window->GetX();
+		if (window->GetWidth() - tPos.x - tSize.cx + window->GetX() < 2)		tPos.x = -2 + window->GetWidth() + window->GetX() - tSize.cx;
+	}
+
+	toolWindow = new ToolWindow(tPos, tSize);
 	toolWindow->onPaint.Connect(&Tooltip::OnToolWindowPaint, this);
 
 	RegisterObject(toolWindow);

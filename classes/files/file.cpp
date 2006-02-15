@@ -11,7 +11,7 @@
 #include <smooth/files/file.h>
 #include <smooth/files/directory.h>
 
-S::File::File(String iFileName, String iFilePath)
+S::File::File(const String &iFileName, const String &iFilePath)
 {
 	fileName = iFileName;
 	filePath = iFilePath;
@@ -64,12 +64,12 @@ S::File::operator S::String() const
 	return String(filePath).Append("\\").Append(fileName);
 }
 
-S::String S::File::GetFileName()
+const S::String &S::File::GetFileName()
 {
 	return fileName;
 }
 
-S::String S::File::GetFilePath()
+const S::String &S::File::GetFilePath()
 {
 	return filePath;
 }
@@ -190,7 +190,7 @@ S::Int S::File::Create()
 	return Success();
 }
 
-S::Int S::File::Copy(String destination)
+S::Int S::File::Copy(const String &destination)
 {
 	if (!Exists()) return Error();
 	
@@ -203,7 +203,7 @@ S::Int S::File::Copy(String destination)
 	else			return Success();
 }
 
-S::Int S::File::Move(String destination)
+S::Int S::File::Move(const String &destination)
 {
 	if (!Exists()) return Error();
 	

@@ -65,7 +65,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 			if (text == NIL && bitmap == NIL)
 			{
 				Point	 p1 = Point(frame.left - 1, frame.top + 1);
-				Point	 p2 = Point(frame.right, frame.top + 1);
+				Point	 p2 = Point(frame.right + 1, frame.top + 1);
 
 				surface->Bar(p1, p2, OR_HORZ);
 			}

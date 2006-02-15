@@ -75,7 +75,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 				if (container->GetObjectType() == Window::classID)
 				{
 					doubleBar1.y = wnd->GetClientRect().top;
-					doubleBar2.y = wnd->GetHeight() - wnd->GetClientRect().bottom - 2;
+					doubleBar2.y = wnd->GetClientRect().bottom;
 
 				}
 				else
@@ -123,8 +123,16 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 				doubleBar2.y = doubleBar1.y;
 
-				doubleBar1.x = container->GetRealPosition().x + 4;
-				doubleBar2.x = container->GetRealPosition().x + container->GetWidth() - 4;
+				if (container->GetObjectType() == Window::classID)
+				{
+					doubleBar1.x = wnd->GetClientRect().left + 1;
+					doubleBar2.x = wnd->GetClientRect().right - 1;
+				}
+				else
+				{
+					doubleBar1.x = container->GetRealPosition().x + 4;
+					doubleBar2.x = container->GetRealPosition().x + container->GetWidth() - 4;
+				}
 
 				for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
 				{

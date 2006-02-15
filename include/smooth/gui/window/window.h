@@ -23,11 +23,8 @@ namespace smooth
 };
 
 #include "../widgets/widget.h"
-#include "../../graphics/forms/rect.h"
 #include "../../loop.h"
-#include "../widgets/multi/menu/menu.h"
 #include "../../graphics/bitmap.h"
-#include "../../templates/callbacks.h"
 
 namespace smooth
 {
@@ -102,7 +99,7 @@ namespace smooth
 				virtual Point			 GetRealPosition();
 
 				Rect				 GetWindowRect();
-				const Rect			&GetClientRect();
+				Rect				 GetClientRect();
 				Rect				 GetRestoredWindowRect();
 
 				const Rect			&GetUpdateRect();

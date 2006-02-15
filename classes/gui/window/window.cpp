@@ -352,9 +352,9 @@ S::GUI::Rect S::GUI::Window::GetWindowRect()
 	return Rect(GetPosition(), GetSize());
 }
 
-const S::GUI::Rect &S::GUI::Window::GetClientRect()
+S::GUI::Rect S::GUI::Window::GetClientRect()
 {
-	return innerOffset;
+	return Rect(Point(innerOffset.left, innerOffset.top), GetSize() - Size(innerOffset.left + innerOffset.right, innerOffset.top + innerOffset.bottom));
 }
 
 S::GUI::Rect S::GUI::Window::GetRestoredWindowRect()

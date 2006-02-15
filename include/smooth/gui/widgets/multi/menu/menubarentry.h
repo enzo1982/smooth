@@ -31,6 +31,7 @@ namespace smooth
 		{
 			protected:
 				Hotspot			*hotspot;
+				Hotspot			*actionHotspot;
 			public:
 				static const Int	 classID;
 

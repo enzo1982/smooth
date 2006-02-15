@@ -30,14 +30,14 @@ namespace smooth
 
 			Int		 GetFileTime(FILETIME *, FILETIME *, FILETIME *);
 		public:
-					 File(String, String = NIL);
+					 File(const String &, const String & = NIL);
 					 File(const int = NIL);
 					 File(const File &);
 
 					~File();
 
-			String		 GetFileName();
-			String		 GetFilePath();
+			const String	&GetFileName();
+			const String	&GetFilePath();
 
 			Int64		 GetFileSize();
 
@@ -49,8 +49,8 @@ namespace smooth
 
 			Int		 Create();
 
-			Int		 Copy(String);
-			Int		 Move(String);
+			Int		 Copy(const String &);
+			Int		 Move(const String &);
 
 			Int		 Delete();
 			Int		 Truncate();

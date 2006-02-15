@@ -203,6 +203,8 @@ S::Bool S::IO::InStream::ReadData()
 		}
 
 		currentBufferPos = 0;
+
+		if (packageSize == 0) return ReadData();
 	}
 
 	return true;

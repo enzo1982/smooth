@@ -431,8 +431,8 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 
 	ShowCursor(False);
 
-	Int	 bMarkStart	= markStart;
-	Int	 bMarkEnd	= markEnd;
+	Int	 bMarkStart	= Math::Min(markStart, markEnd);
+	Int	 bMarkEnd	= Math::Max(markStart, markEnd);
 
 	MarkText(-1, -1);
 

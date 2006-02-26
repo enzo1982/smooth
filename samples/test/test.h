@@ -72,6 +72,9 @@ class Test : public Application
 		Text		*text_editbox;
 		EditBox		*widget_editbox;
 
+		Text		*text_combobox;
+		ComboBox	*widget_combobox;
+
 		Button		*button_show;
 		Button		*button_hide;
 		Button		*button_activate;

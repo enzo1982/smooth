@@ -22,15 +22,9 @@ namespace smooth
 
 		class Node;
 	};
-
-	namespace GUI
-	{
-		class Widget;
-	};
 };
 
-#include "../../definitions.h"
-#include "../../misc/string.h"
+#include "../../gui/widgets/widget.h"
 
 namespace smooth
 {
@@ -45,12 +39,40 @@ namespace smooth
 
 					Int			 orient;
 
+					Int			 left;
+					Int			 top;
+
+					Int			 width;
+					Int			 height;
+
+					Int			 minwidth;
+					Int			 minheight;
+
+					Int			 maxwidth;
+					Int			 maxheight;
+
+					Int			 flex;
+
+					Int			 defaultWidth;
+					Int			 defaultHeight;
+
+					String			 statustext;
+					String			 tooltiptext;
+
 					String			 GetXMLAttributeValue(Node *, const String &);
 				public:
 								 Widget(Node *);
 					virtual			~Widget();
 
 					virtual GUI::Widget	*GetWidget();
+
+					Int			 SetMetrics(const GUI::Point &, const GUI::Size &);
+
+					Int			 GetWidth();
+					Int			 GetHeight();
+
+					Int			 GetDefaultWidth();
+					Int			 GetDefaultHeight();
 
 					static const Int	 HORIZONTAL;
 					static const Int	 VERTICAL;

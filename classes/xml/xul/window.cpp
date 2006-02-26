@@ -22,7 +22,7 @@ S::XML::XUL::Window::Window(Node *node) : Widget(node)
 
 	if (node != NIL)
 	{
-		window = new GUI::Window(GetXMLAttributeValue(node, "title"), GUI::Point(GetXMLAttributeValue(node, "screenX").ToInt(), GetXMLAttributeValue(node, "screenY").ToInt()), GUI::Size(GetXMLAttributeValue(node, "width").ToInt(), GetXMLAttributeValue(node, "height").ToInt()));
+		window = new GUI::Window(GetXMLAttributeValue(node, "title"), GUI::Point(GetXMLAttributeValue(node, "screenX").ToInt(), GetXMLAttributeValue(node, "screenY").ToInt()), GUI::Size(width, height));
 
 		if (GetXMLAttributeValue(node, "hidechrome") != "true" && GetXMLAttributeValue(node, "hidechrome") != "1")
 		{

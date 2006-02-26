@@ -34,6 +34,7 @@ S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size 
 	cursor = new Cursor(Point(3, 2), GetSize() - Size(6, 4));
 	cursor->SetMaxSize(maxSize);
 	cursor->SetBackgroundColor(Color(255, 255, 255));
+	cursor->SetFlags(CF_MULTILINE);
 	cursor->SetFont(font);
 	cursor->SetText(iText);
 

@@ -47,12 +47,21 @@ S::Int S::GUI::Hotspot::Activate()
 {
 	active = True;
 
+	Paint(SP_MOUSEOUT);
+
 	return Success();
 }
 
 S::Int S::GUI::Hotspot::Deactivate()
 {
 	active = False;
+
+	mouseOver	= False;
+
+	leftButtonDown	= False;
+	rightButtonDown	= False;
+
+	mouseDragging	= False;
 
 	return Success();
 }

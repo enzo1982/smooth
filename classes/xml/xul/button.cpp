@@ -16,6 +16,9 @@ S::XML::XUL::Button::Button(Node *node) : Widget(node)
 {
 	button = NIL;
 
+	defaultWidth = 80;
+	defaultHeight = 22;
+
 	if (node != NIL)
 	{
 		button = new GUI::Button(GetXMLAttributeValue(node, "label"), NIL, GUI::Point(0, 0), GUI::Size(0, 0));

@@ -27,6 +27,7 @@ namespace smooth
 	{
 		const Int	 MB_GRAYSCALE	= 0;
 		const Int	 MB_COLOR	= 1;
+		const Int	 MB_POPUPOPEN	= 2;
 
 		class SMOOTHAPI Menubar : public Menu
 		{

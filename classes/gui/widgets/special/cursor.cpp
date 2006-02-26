@@ -50,7 +50,8 @@ S::Int S::GUI::Cursor::Paint(Int message)
 	EnterProtectedRegion();
 
 	Surface	*surface = container->GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+	Point	 realPos = GetRealPosition();
+	Rect	 frame	 = Rect(realPos, GetSize());
 
 	switch (message)
 	{
@@ -59,7 +60,57 @@ S::Int S::GUI::Cursor::Paint(Int message)
 			surface->StartPaint(frame);
 
 			surface->Box(frame, GetBackgroundColor(), FILLED);
-			surface->SetText(text, frame + Point(-visibleOffset, 1) + Size(visibleOffset, -2), font);
+
+			{
+				String	 line;
+				Int	 lineNumber = 0;
+				Int	 lineStart = 0;
+
+				for (Int i = 0; i <= text.Length(); i++)
+				{
+					line[i - lineStart] = text[i];
+
+					if (text[i] == '\n' || text[i] == 0)
+					{
+						line[i - lineStart] = 0;
+
+						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + lineNumber * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
+						else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + lineNumber * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
+
+						if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
+						{
+							Int	 lineMarkStart = Math::Max(0, Math::Min(markStart, markEnd) - lineStart);
+							Int	 lineMarkEnd = Math::Min(line.Length(), Math::Max(markStart, markEnd) - lineStart);
+
+							if (lineMarkStart < line.Length() && lineMarkEnd > 0)
+							{
+								Int	 bColor	 = GetSysColor(COLOR_HIGHLIGHT);
+								Int	 tColor	 = GetSysColor(COLOR_HIGHLIGHTTEXT);
+
+								String	 mText;
+								String	 wText = line;
+
+								if (Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) wText.FillN('*', wText.Length());
+
+								for (Int j = lineMarkStart; j < lineMarkEnd; j++) mText[j - lineMarkStart] = wText[j];
+
+								Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText, lineMarkStart) - visibleOffset, lineNumber * (font.GetTextSizeY("*") + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY("*") + 3));
+
+								surface->Box(markRect, bColor, FILLED);
+
+								Font	 nFont = font;
+
+								nFont.SetColor(tColor);
+
+								surface->SetText(mText, markRect + Point(0, 1) - Size(0, 2), nFont);
+							}
+						}
+
+						lineStart = i + 1;
+						lineNumber++;
+					}
+				}
+			}
 
 			surface->EndPaint();
 
@@ -84,12 +135,11 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Window	*window		= container->GetContainerWindow();
+	Window	*window	= container->GetContainerWindow();
 
 	if (window == NIL) return Success();
 
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
-	Int	 nOfChars	= text.Length();
+	Rect	 frame	= Rect(GetRealPosition(), GetSize());
 
 	switch (message)
 	{
@@ -98,18 +148,46 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			{
 				Int	 newPromptPos = 0;
 
+				String	 wText = text;
+				Int	 wPromptPos = 0;
+				Int	 line = 0;
+
+				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
+				{
+					line = (window->MouseY() - frame.top) / (font.GetTextSizeY("*") + 3);
+
+					Int	 lineCount = 0;
+
+					for (Int i = 0; i <= text.Length(); i++)
+					{
+						if (text[i] == '\n' || text[i] == 0)
+						{
+							wText[i - wPromptPos] = 0;
+
+							if (lineCount == line) break;
+
+							wPromptPos = i;
+							lineCount++;
+						}
+
+						wText[i - wPromptPos] = text[i];
+					}
+				}
+
 				Int	 newPos	 = 0;
 				Int	 lastPos = 0;
 
-				for (Int i = 0; i <= nOfChars; i++)
+				for (Int i = 0; i <= wText.Length(); i++)
 				{
-					if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(text, i) - visibleOffset;
-					else						newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
+					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText, i) - visibleOffset;
+					else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
 
 					if (i > 0 && window->MouseX() < (lastPos + newPos) / 2)  { newPromptPos	= i - 1; break; }
-					else if (i == nOfChars)					   newPromptPos	= nOfChars;
+					else if (i == wText.Length())				   newPromptPos	= wText.Length();
 					else							   lastPos	= newPos;
 				}
+
+				newPromptPos += wPromptPos;
 
 				marking = True;
 
@@ -166,18 +244,46 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			{
 				Int	 newMarkEnd = 0;
 
+				String	 wText = text;
+				Int	 wPromptPos = 0;
+				Int	 line = 0;
+
+				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
+				{
+					line = (window->MouseY() - frame.top) / (font.GetTextSizeY("*") + 3);
+
+					Int	 lineCount = 0;
+
+					for (Int i = 0; i <= text.Length(); i++)
+					{
+						if (text[i] == '\n' || text[i] == 0)
+						{
+							wText[i - wPromptPos] = 0;
+
+							if (lineCount == line) break;
+
+							wPromptPos = i;
+							lineCount++;
+						}
+
+						wText[i - wPromptPos] = text[i];
+					}
+				}
+
 				Int	 newPos	 = 0;
 				Int	 lastPos = 0;
 
-				for (Int i = 0; i <= nOfChars; i++)
+				for (Int i = 0; i <= wText.Length(); i++)
 				{
-					if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(text, i) - visibleOffset;
-					else						newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
+					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText, i) - visibleOffset;
+					else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
 
 					if (i > 0 && window->MouseX() < (lastPos + newPos) / 2)  { newMarkEnd	= i - 1; break; }
-					else if (i == nOfChars)					   newMarkEnd	= nOfChars;
+					else if (i == wText.Length())				   newMarkEnd	= wText.Length();
 					else							   lastPos	= newPos;
 				}
+
+				newMarkEnd += wPromptPos;
 
 				MarkText(markStart, newMarkEnd);
 
@@ -198,23 +304,86 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 					case VK_END:
 						MarkText(-1, -1);
 
-						if (wParam == VK_LEFT && promptPos == 0)	 break;
-						if (wParam == VK_HOME && promptPos == 0)	 break;
-						if (wParam == VK_RIGHT && promptPos >= nOfChars) break;
-						if (wParam == VK_END && promptPos >= nOfChars)	 break;
+						if (wParam == VK_LEFT && promptPos == 0)	      break;
+						if (wParam == VK_HOME && promptPos == 0)	      break;
+						if (wParam == VK_RIGHT && promptPos >= text.Length()) break;
+						if (wParam == VK_END && promptPos >= text.Length())   break;
 
 						if (wParam == VK_LEFT)	newPos = promptPos - 1;
 						if (wParam == VK_RIGHT)	newPos = promptPos + 1;
 						if (wParam == VK_HOME)	newPos = 0;
-						if (wParam == VK_END)	newPos = nOfChars;
+						if (wParam == VK_END)	newPos = text.Length();
 
 						SetCursorPos(newPos);
+
+						break;
+					case VK_UP:
+					case VK_DOWN:
+						if (!Binary::IsFlagSet(GetFlags(), CF_MULTILINE)) break;
+
+						{
+							Int	 linePos = promptPos;
+							Int	 newPos = promptPos;
+
+							Int	 i = 0;
+
+							for (i = promptPos - 1; i >= 0; i--)
+							{
+								if (text[i] == '\n') { linePos -= (i + 1); break; }
+							}
+
+							if (wParam == VK_UP)
+							{
+								if (i == 0) newPos = 0;
+
+								for (Int j = i - 1; j >= 0; j--)
+								{
+									if (text[j] == '\n' || j == 0) { newPos = Math::Min(i, j + linePos + (j == 0 ? 0 : 1)); break; }
+								}
+							}
+							else
+							{
+								for (Int j = promptPos; j < text.Length(); j++)
+								{
+									if (text[j] == '\n')
+									{
+										for (Int k = j + 1; k <= j + 1 + linePos; k++)
+										{
+											newPos = k;
+
+											if (text[k] == '\n' || text[k] == 0) break;
+										}
+
+										break;
+									}
+								}
+							}
+
+							SetCursorPos(newPos);
+						}
 
 						break;
 					case VK_RETURN:
 						if (!IsActive()) break;
 
-						onEnter.Emit(text);
+						if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
+						{
+							DeleteSelectedText();
+
+							String	 insertText;
+
+							insertText[0] = '\n';
+
+							InsertText(insertText);
+						}
+						else
+						{
+							focussed = False;
+
+							onLoseFocus.Emit();
+
+							onEnter.Emit(text);
+						}
 
 						break;
 					case VK_BACK:
@@ -224,7 +393,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 						if (markStart != markEnd) { DeleteSelectedText(); break; }
 
 						if (promptPos == 0 && wParam == VK_BACK)		break;
-						if (promptPos == nOfChars && wParam == VK_DELETE)	break;
+						if (promptPos == text.Length() && wParam == VK_DELETE)	break;
 
 						if (wParam == VK_BACK)
 						{
@@ -239,8 +408,6 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 						DeleteSelectedText();
 
-						break;
-					default:
 						break;
 				}
 			}
@@ -310,19 +477,19 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 					if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
 					{
-						if (Binary::IsFlagSet(flags, EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) break;
+						if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) break;
 
 						InsertText(insertText);
 					}
 				}
 
-				if (nOfChars == maxSize && markStart == markEnd) break;
+				if (text.Length() == maxSize && markStart == markEnd) break;
 
 				if (wParam >= 32 && IsActive())
 				{
 					DeleteSelectedText();
 
-					if (Binary::IsFlagSet(flags, EDB_NUMERIC) && (wParam < '0' || wParam > '9') && wParam != 45 && wParam != '.') break;
+					if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (wParam < '0' || wParam > '9') && wParam != 45 && wParam != '.') break;
 
 					String	 insertText;
 
@@ -361,10 +528,37 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 	Surface	*surface = container->GetDrawSurface();
 	Point	 point	 = GetRealPosition();
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	point.x += font.GetTextSizeX(text, promptPos) - visibleOffset;
-	else						point.x += font.GetTextSizeX(String().FillN('*', promptPos), promptPos) - visibleOffset;
+	String	 wText = text;
+	Int	 wPromptPos = promptPos;
+	Int	 line = 0;
 
-	surface->Box(Rect(point, Size(1, GetHeight())), 0, INVERT);
+	if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
+	{
+		for (Int i = promptPos - 1; i >= 0; i--)
+		{
+			if (text[i] == '\n')
+			{
+				for (Int j = i + 1; j < promptPos; j++) wText[j - i - 1] = text[j];
+
+				wText[promptPos - i - 1] = 0;
+				wPromptPos = promptPos - i - 1;
+
+				break;
+			}
+		}
+
+		for (Int j = promptPos - 1; j >= 0; j--)
+		{
+			if (text[j] == '\n') line++;
+		}
+	}
+
+	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	point.x += font.GetTextSizeX(wText, wPromptPos) - visibleOffset;
+	else								point.x += font.GetTextSizeX(String().FillN('*', wPromptPos), wPromptPos) - visibleOffset;
+
+	point.y += (font.GetTextSizeY("*") + 3) * line;
+
+	surface->Box(Rect(point, Size(1, font.GetTextSizeY("*") + 3)), 0, INVERT);
 
 	promptVisible = visible;
 }
@@ -375,43 +569,10 @@ S::Void S::GUI::Cursor::MarkText(Int newMarkStart, Int newMarkEnd)
 
 	ShowCursor(False);
 
-	Surface	*surface = container->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-
-	Int	 bColor	 = GetSysColor(COLOR_HIGHLIGHT);
-	Int	 tColor	 = GetSysColor(COLOR_HIGHLIGHTTEXT);
-
-	if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
-	{
-		String	 mText;
-
-		for (Int i = Math::Min(markStart, markEnd); i < Math::Max(markStart, markEnd); i++) mText[i - Math::Min(markStart, markEnd)] = text[i];
-
-		Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(text, Math::Min(markStart, markEnd)) - visibleOffset, 0), Size(font.GetTextSizeX(mText), GetHeight()));
-
-		surface->Box(markRect, GetBackgroundColor(), FILLED);
-		surface->SetText(mText, markRect + Point(0, 1) - Size(0, 2), font);
-	}
-
 	markStart	= newMarkStart;
 	markEnd		= newMarkEnd;
 
-	if (newMarkStart != newMarkEnd && newMarkStart >= 0 && newMarkEnd >= 0)
-	{
-		String	 mText;
-
-		for (Int i = Math::Min(markStart, markEnd); i < Math::Max(markStart, markEnd); i++) mText[i - Math::Min(markStart, markEnd)] = text[i];
-
-		Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(text, Math::Min(markStart, markEnd)) - visibleOffset, 0), Size(font.GetTextSizeX(mText), GetHeight()));
-
-		surface->Box(markRect, bColor, FILLED);
-
-		Font	 nFont = font;
-
-		nFont.SetColor(tColor);
-
-		surface->SetText(mText, markRect + Point(0, 1) - Size(0, 2), nFont);
-	}
+	Paint(SP_PAINT);
 }
 
 S::Int S::GUI::Cursor::MarkAll()
@@ -436,11 +597,10 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 
 	MarkText(-1, -1);
 
-	Int	 nOfChars = text.Length();
 	String	 newText;
 
 	for (Int i = 0; i < bMarkStart; i++)		newText[i] = text[i];
-	for (Int j = bMarkEnd; j <= nOfChars; j++)	newText[j - (bMarkEnd - bMarkStart)] = text[j];
+	for (Int j = bMarkEnd; j <= text.Length(); j++)	newText[j - (bMarkEnd - bMarkStart)] = text[j];
 
 	SetText(newText);
 
@@ -453,12 +613,11 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 {
 	ShowCursor(False);
 
-	Int	 nOfChars = text.Length();
 	String	 newText;
 
 	for (Int i = 0; i < promptPos; i++)					newText[i] = text[i];
 	for (Int j = promptPos; j < promptPos + insertText.Length(); j++)	newText[j] = insertText[j - promptPos];
-	for (Int k = promptPos; k <= nOfChars; k++)				newText[k + insertText.Length()] = text[k];
+	for (Int k = promptPos; k <= text.Length(); k++)			newText[k + insertText.Length()] = text[k];
 
 	SetText(newText);
 
@@ -497,8 +656,43 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	promptPos = newPos;
 
-	if (!Binary::IsFlagSet(flags, EDB_ASTERISK))	p1.x += font.GetTextSizeX(text, promptPos) - visibleOffset;
-	else						p1.x += font.GetTextSizeX(String().FillN('*', promptPos), promptPos) - visibleOffset;
+	String	 wText = text;
+	Int	 wPromptPos = promptPos;
+	Int	 line = 0;
+
+	if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
+	{
+		for (Int i = promptPos - 1; i >= 0; i--)
+		{
+			if (text[i] == '\n')
+			{
+				for (Int j = i + 1; j < promptPos; j++) wText[j - i - 1] = text[j];
+
+				wText[promptPos - i - 1] = 0;
+				wPromptPos = promptPos - i - 1;
+
+				break;
+			}
+		}
+
+		for (Int j = promptPos - 1; j >= 0; j--)
+		{
+			if (text[j] == '\n') line++;
+		}
+	}
+
+	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	p1.x += font.GetTextSizeX(wText, wPromptPos) - visibleOffset;
+	else								p1.x += font.GetTextSizeX(String().FillN('*', wPromptPos), wPromptPos) - visibleOffset;
+
+	while (p1.x > frame.right || p1.x < frame.left)
+	{
+		if (p1.x > frame.right)     { visibleOffset +=  5; p1.x -=  5; }
+		else if (p1.x < frame.left) { visibleOffset -= 20; p1.x += 20; }
+	}
+
+	if (visibleOffset < 0) { p1.x -= visibleOffset; visibleOffset = 0; }
+
+	p1.y += (font.GetTextSizeY("*") + 3) * line;
 
 	{
 		HIMC		 hImc = ImmGetContext((HWND) wnd->GetSystemWindow());
@@ -562,6 +756,8 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	timer->onInterval.Connect(&Cursor::OnTimer, this);
 	timer->Start(500);
+
+	Paint(SP_PAINT);
 
 	ShowCursor(True);
 

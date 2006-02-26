@@ -33,7 +33,7 @@ S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitma
 	{
 		hotspot	= new Hotspot(Point(), GetSize());
 
-		hotspot->onLeftButtonDown.Connect(&PopupMenuEntry::TogglePopupMenu, this);
+		hotspot->onLeftButtonDown.Connect(&PopupMenuEntry::OpenPopupMenu, this);
 		hotspot->onLeftButtonClick.Connect(&PopupMenuEntry::OnClickEntry, this);
 
 		RegisterObject(hotspot);
@@ -229,7 +229,7 @@ S::Int S::GUI::PopupMenuEntry::Hide()
 {
 	if (popup != NIL)
 	{
-		if (popup->GetContainer() == this) TogglePopupMenu();
+		if (popup->GetContainer() == this) ClosePopupMenu();
 	}
 
 	visible = False;
@@ -247,18 +247,25 @@ S::Void S::GUI::PopupMenuEntry::OnClickEntry()
 	onAction.Emit();
 }
 
-S::Void S::GUI::PopupMenuEntry::TogglePopupMenu()
+S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
+{
+	if (popup == NIL) return;
+
+	popup->SetPosition(GetRealPosition() + Point(GetWidth() + 1, -3));
+
+	hotspot->Deactivate();
+
+	RegisterObject(popup);
+}
+
+S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 {
 	if (popup == NIL) return;
 
 	if (popup->GetContainer() == this)
 	{
 		UnregisterObject(popup);
-	}
-	else
-	{
-		popup->SetPosition(GetRealPosition() + Point(GetWidth() + 1, -3));
 
-		RegisterObject(popup);
+		hotspot->Activate();
 	}
 }

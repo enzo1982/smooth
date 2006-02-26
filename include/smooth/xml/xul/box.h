@@ -43,6 +43,8 @@ namespace smooth
 					GUI::Layer		*layer;
 
 					Array<Widget *, Void *>	 widgets;
+
+					Void			 CalculateChildMetrics();
 				public:
 								 Box(Node *);
 					virtual			~Box();

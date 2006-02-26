@@ -28,8 +28,6 @@ S::GUI::PopupMenu::PopupMenu()
 	nextPopup	= NIL;
 
 	toolWindow	= NIL;
-
-	internalClosePopups.Connect(&PopupMenu::InternalClosePopups, this);
 }
 
 S::GUI::PopupMenu::~PopupMenu()
@@ -46,8 +44,6 @@ S::GUI::PopupMenu::~PopupMenu()
 
 		DeleteObject(toolWindow);
 	}
-
-	internalClosePopups.Disconnect(&PopupMenu::InternalClosePopups, this);
 }
 
 S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap &bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
@@ -94,8 +90,6 @@ S::Int S::GUI::PopupMenu::Show()
 	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
 	toolWindow->onLoseFocus.Connect(&PopupMenu::InternalClosePopups, this);
 
-	RegisterObject(toolWindow);
-
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
@@ -105,7 +99,13 @@ S::Int S::GUI::PopupMenu::Show()
 		entry->SetRegisteredFlag(False);
 
 		toolWindow->RegisterObject(entry);
+
+		entry->Activate();
 	}
+
+	RegisterObject(toolWindow);
+
+	internalClosePopups.Connect(&PopupMenu::InternalClosePopups, this);
 
 	onShow.Emit();
 
@@ -122,6 +122,12 @@ S::Int S::GUI::PopupMenu::Hide()
 
 	if (toolWindow != NIL)
 	{
+		internalClosePopups.Disconnect(&PopupMenu::InternalClosePopups, this);
+
+		toolWindow->onLoseFocus.Disconnect(&PopupMenu::InternalClosePopups, this);
+
+		UnregisterObject(toolWindow);
+
 		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
 			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
@@ -132,9 +138,9 @@ S::Int S::GUI::PopupMenu::Hide()
 
 			entry->SetRegisteredFlag(True);
 			entry->SetContainer(this);
-		}
 
-		UnregisterObject(toolWindow);
+			entry->Deactivate();
+		}
 
 		DeleteObject(toolWindow);
 
@@ -150,8 +156,8 @@ S::Void S::GUI::PopupMenu::InternalClosePopups()
 {
 	if (container == NIL) return;
 
-	if (container->GetObjectType() == MenubarEntry::classID) ((MenubarEntry *) container)->ClosePopupMenu();
-	else							 Hide();
+	if (container->GetObjectType() == MenubarEntry::classID)	((MenubarEntry *) container)->ClosePopupMenu();
+	else if (container->GetObjectType() == PopupMenuEntry::classID)	((PopupMenuEntry *) container)->ClosePopupMenu();
 }
 
 S::Void S::GUI::PopupMenu::OnToolWindowPaint()

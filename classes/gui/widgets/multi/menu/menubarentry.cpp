@@ -15,6 +15,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/misc/binary.h>
 
 const S::Int	 S::GUI::MenubarEntry::classID = S::Object::RequestClassID();
 
@@ -32,6 +33,7 @@ S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, M
 	if (text != NIL || bitmap != NIL)
 	{
 		hotspot	= new HotspotSimpleButton(Point(), GetSize());
+		hotspot->onMouseOver.Connect(&MenubarEntry::OnMouseOver, this);
 		hotspot->onLeftButtonDown.Connect(&MenubarEntry::OpenPopupMenu, this);
 
 		actionHotspot = new Hotspot(Point(), GetSize() - Size((text == NIL && bitmap != NIL && popup != NIL ? 12 : 0), 0));
@@ -178,6 +180,16 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 	return Success();
 }
 
+S::Void S::GUI::MenubarEntry::OnMouseOver()
+{
+	if (Binary::IsFlagSet(container->GetFlags(), MB_POPUPOPEN))
+	{
+		hotspot->Paint(SP_MOUSEDOWN);
+
+		OpenPopupMenu();
+	}
+}
+
 S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 {
 	if (popup == NIL) return;
@@ -189,7 +201,11 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 	{
 		PopupMenu::internalClosePopups.Emit();
 
+		container->SetFlags(container->GetFlags() | MB_POPUPOPEN);
+
 		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : GetWidth() + 2 - popup->GetWidth(), GetHeight() + 1));
+
+		hotspot->Deactivate();
 
 		RegisterObject(popup);
 	}
@@ -201,6 +217,10 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 
 	if (popup->GetContainer() == this)
 	{
+		container->SetFlags(container->GetFlags() & !MB_POPUPOPEN);
+
 		UnregisterObject(popup);
+
+		hotspot->Activate();
 	}
 }

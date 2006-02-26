@@ -44,7 +44,8 @@ namespace smooth
 			slots:
 				Void			 OnClickEntry();
 
-				Void			 TogglePopupMenu();
+				Void			 OpenPopupMenu();
+				Void			 ClosePopupMenu();
 		};
 	};
 };

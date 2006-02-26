@@ -15,6 +15,7 @@
 #include <smooth/xml/xul/box.h>
 #include <smooth/xml/xul/description.h>
 #include <smooth/xml/node.h>
+#include <smooth/misc/math.h>
 #include <smooth/gui/widgets/layer.h>
 
 S::XML::XUL::Box::Box(Node *node) : Widget(node)
@@ -30,49 +31,52 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 
 		for (Int i = 0; i < node->GetNOfNodes(); i++)
 		{
-			Node	*nNode = node->GetNthNode(i);
+			Node		*nNode	= node->GetNthNode(i);
+			XUL::Widget	*widget	= NIL;
 
 			if (nNode->GetName() == "hbox" || nNode->GetName() == "vbox")
 			{
-				XUL::Box	*box = new XUL::Box(nNode);
+				widget = new XUL::Box(nNode);
 
-				layer->RegisterObject(box->GetWidget());
+				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(box);
+				widgets.AddEntry(widget);
 			}
 			else if (nNode->GetName() == "button")
 			{
-				XUL::Button	*button = new XUL::Button(nNode);
+				widget = new XUL::Button(nNode);
 
-				layer->RegisterObject(button->GetWidget());
+				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(button);
+				widgets.AddEntry(widget);
 			}
 			else if (nNode->GetName() == "textbox")
 			{
-				XUL::TextBox	*textBox = new XUL::TextBox(nNode);
+				widget = new XUL::TextBox(nNode);
 
-				layer->RegisterObject(textBox->GetWidget());
+				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(textBox);
+				widgets.AddEntry(widget);
 			}
 			else if (nNode->GetName() == "label")
 			{
-				XUL::Label	*label = new XUL::Label(nNode);
+				widget = new XUL::Label(nNode);
 
-				layer->RegisterObject(label->GetWidget());
+				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(label);
+				widgets.AddEntry(widget);
 			}
 			else if (nNode->GetName() == "description")
 			{
-				XUL::Description	*description = new XUL::Description(nNode);
+				widget = new XUL::Description(nNode);
 
-				layer->RegisterObject(description->GetWidget());
+				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(description);
+				widgets.AddEntry(widget);
 			}
 		}
+
+		CalculateChildMetrics();
 	}
 }
 
@@ -88,4 +92,35 @@ S::XML::XUL::Box::~Box()
 S::GUI::Widget *S::XML::XUL::Box::GetWidget()
 {
 	return layer;
+}
+
+S::Void	 S::XML::XUL::Box::CalculateChildMetrics()
+{
+	Int	 xOffset = 0;
+	Int	 yOffset = 0;
+
+	Int	 maxWidth = 0;
+	Int	 maxHeight = 0;
+
+	Int	 elementWidth = width / widgets.GetNOfEntries();
+	Int	 elementHeight = height / widgets.GetNOfEntries();
+
+	for (Int i = 0; i < widgets.GetNOfEntries(); i++)
+	{
+		XUL::Widget	*widget = widgets.GetNthEntry(i);
+
+		maxWidth = Math::Max(maxWidth, widget->GetWidth());
+		maxHeight = Math::Max(maxHeight, widget->GetHeight());
+
+		Int	 usedElementWidth = widget->GetWidth();
+		Int	 usedElementHeight = widget->GetHeight();
+
+		if (usedElementWidth == 0) usedElementWidth = (orient == HORIZONTAL) ? elementWidth : widget->GetDefaultWidth();
+		if (usedElementHeight == 0) usedElementHeight = (orient == VERTICAL) ? elementHeight : widget->GetDefaultHeight();
+
+		widget->SetMetrics(GUI::Point(xOffset, yOffset), GUI::Size(usedElementWidth, usedElementHeight));
+
+		if (orient == HORIZONTAL)	xOffset += usedElementWidth;
+		else if (orient == VERTICAL)	yOffset += usedElementHeight;
+	}
 }

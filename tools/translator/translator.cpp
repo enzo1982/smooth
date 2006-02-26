@@ -10,11 +10,12 @@
 
 #include <smooth.h>
 #include <smooth/main.h>
+#include <smooth/args.h>
 #include "translator.h"
 
-Int smooth::Main()
+Int smooth::Main(const Array<String> &args)
 {
-	Translator	*app = new Translator();
+	Translator	*app = new Translator(args.GetNthEntry(0));
 
 	Loop();
 
@@ -23,7 +24,7 @@ Int smooth::Main()
 	return 0;
 }
 
-Translator::Translator()
+Translator::Translator(const String &openFile)
 {
 	filename = "";
 
@@ -159,6 +160,8 @@ Translator::Translator()
 
 	ResizeProc();
 
+	if (openFile != NIL) OpenFileName(openFile);
+
 	wnd->Show();
 }
 
@@ -254,9 +257,14 @@ void Translator::NewFile()
 	list_entries->Activate();
 
 	{
+		Font	 entryFont;
+
+		entryFont.SetColor(Color(0, 0, 255));
+
 		listEntry	*entry = new listEntry;
 
 		entry->entry = list_entries->AddEntry("Program:");
+		entry->entry->SetFont(entryFont);
 		entry->id = -1;
 		entry->original = "Program";
 		entry->translation = "";
@@ -266,6 +274,7 @@ void Translator::NewFile()
 		entry = new listEntry;
 
 		entry->entry = list_entries->AddEntry("Version:");
+		entry->entry->SetFont(entryFont);
 		entry->id = -2;
 		entry->original = "Version";
 		entry->translation = "";
@@ -275,6 +284,7 @@ void Translator::NewFile()
 		entry = new listEntry;
 
 		entry->entry = list_entries->AddEntry("Language:");
+		entry->entry->SetFont(entryFont);
 		entry->id = -3;
 		entry->original = "Language";
 		entry->translation = "";
@@ -284,6 +294,7 @@ void Translator::NewFile()
 		entry = new listEntry;
 
 		entry->entry = list_entries->AddEntry("RightToLeft:");
+		entry->entry->SetFont(entryFont);
 		entry->id = -4;
 		entry->original = "RightToLeft";
 		entry->translation = "";
@@ -293,6 +304,7 @@ void Translator::NewFile()
 		entry = new listEntry;
 
 		entry->entry = list_entries->AddEntry("Author:");
+		entry->entry->SetFont(entryFont);
 		entry->id = -5;
 		entry->original = "Author";
 		entry->translation = "";
@@ -302,6 +314,7 @@ void Translator::NewFile()
 		entry = new listEntry;
 
 		entry->entry = list_entries->AddEntry("URL:");
+		entry->entry->SetFont(entryFont);
 		entry->id = -6;
 		entry->original = "URL";
 		entry->translation = "";
@@ -365,85 +378,94 @@ void Translator::OpenFile()
 
 	if (dialog->ShowDialog() == Success())
 	{
-		filename = dialog->GetFileName();
+		OpenFileName(dialog->GetFileName());
+	}
+}
 
-		String	 file = filename;
+void Translator::OpenFileName(const String &openFile)
+{
+	filename = openFile;
 
-		filename = "";
+	String	 file = filename;
 
-		NewFile();
+	filename = "";
 
-		filename = file;
-		file = "";
+	NewFile();
 
-		Int	 lastBs = -1;
+	filename = file;
+	file = "";
 
-		for (int i = 0; i < filename.Length(); i++) if (filename[i] == '\\') lastBs = i;
+	Int	 lastBs = -1;
 
-		for (int j = ++lastBs; j < filename.Length(); j++) file[j - lastBs] = filename[j];
+	for (int i = 0; i < filename.Length(); i++) if (filename[i] == '\\') lastBs = i;
 
-		wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION).Append(" - ").Append(file));
+	for (int j = ++lastBs; j < filename.Length(); j++) file[j - lastBs] = filename[j];
 
-		XML::Document	*doc = new XML::Document();
+	wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION).Append(" - ").Append(file));
 
-		doc->LoadFile(filename);
+	XML::Document	*doc = new XML::Document();
 
-		XML::Node	*info = doc->GetRootNode()->GetNodeByName("info");
+	doc->LoadFile(filename);
 
-		for (Int k = 0; k < info->GetNOfNodes(); k++)
+	XML::Node	*info = doc->GetRootNode()->GetNodeByName("info");
+
+	for (Int k = 0; k < info->GetNOfNodes(); k++)
+	{
+		String		 property = info->GetNthNode(k)->GetAttributeByName("name")->GetContent();
+		listEntry	*entry = NULL;
+
+		if (property == "program")	entry = entries.GetNthEntry(0);
+		if (property == "version")	entry = entries.GetNthEntry(1);
+		if (property == "language")	entry = entries.GetNthEntry(2);
+		if (property == "righttoleft")	entry = entries.GetNthEntry(3);
+		if (property == "author")	entry = entries.GetNthEntry(4);
+		if (property == "url")		entry = entries.GetNthEntry(5);
+
+		if (entry != NULL)
 		{
-			String		 property = info->GetNthNode(k)->GetAttributeByName("name")->GetContent();
-			listEntry	*entry = NULL;
+			entry->translation = info->GetNthNode(k)->GetContent();
 
-			if (property == "program")	entry = entries.GetNthEntry(0);
-			if (property == "version")	entry = entries.GetNthEntry(1);
-			if (property == "language")	entry = entries.GetNthEntry(2);
-			if (property == "righttoleft")	entry = entries.GetNthEntry(3);
-			if (property == "author")	entry = entries.GetNthEntry(4);
-			if (property == "url")		entry = entries.GetNthEntry(5);
-
-			if (entry != NULL)
-			{
-				entry->translation = info->GetNthNode(k)->GetContent();
-
-				entry->entry->SetText(String(entry->original).Append(": ").Append(entry->translation));
-			}
+			entry->entry->SetText(String(entry->original).Append(": ").Append(entry->translation));
 		}
-
-		XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
-
-		for (Int l = 0; l < data->GetNOfNodes(); l++)
-		{
-			XML::Node	*xentry = data->GetNthNode(l);
-
-			if (xentry->GetName() == "entry")
-			{
-				listEntry	*entry = new listEntry;
-
-				entry->id = xentry->GetAttributeByName("id")->GetContent().ToInt();
-				entry->original = xentry->GetAttributeByName("string")->GetContent();
-				entry->translation = xentry->GetContent();
-				entry->entry = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append("\t").Append(entry->original).Append("\t").Append(entry->translation));
-
-				entries.AddEntry(entry);
-			}
-		}
-
-		delete doc;
-
-		list_entries->SelectNthEntry(0);
-
-		SelectEntry();
 	}
 
-	delete dialog;
+	XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
+
+	for (Int l = 0; l < data->GetNOfNodes(); l++)
+	{
+		XML::Node	*xentry = data->GetNthNode(l);
+
+		if (xentry->GetName() == "entry")
+		{
+			Font	 redFont;
+
+			redFont.SetColor(Color(255, 0, 0));
+
+			listEntry	*entry = new listEntry;
+
+			entry->id = xentry->GetAttributeByName("id")->GetContent().ToInt();
+			entry->original = xentry->GetAttributeByName("string")->GetContent();
+			entry->translation = xentry->GetContent();
+			entry->entry = list_entries->AddEntry(String(xentry->GetAttributeByName("id")->GetContent()).Append("\t").Append(entry->original).Append("\t").Append(entry->translation));
+
+			if (entry->translation == NIL) entry->entry->SetFont(redFont);
+
+			entries.AddEntry(entry);
+		}
+	}
+
+	delete doc;
+
+	list_entries->SelectNthEntry(0);
+
+	SelectEntry();
 }
 
 void Translator::SaveFile()
 {
 	if (filename == "") return;
 
-	if (filename != "unnamed")	SaveFileWithName(filename);
+	if (filename != "unnamed")	SaveFileName(filename);
 	else				SaveFileAs();
 }
 
@@ -464,7 +486,7 @@ void Translator::SaveFileAs()
 	{
 		filename = dialog->GetFileName();
 
-		SaveFileWithName(filename);
+		SaveFileName(filename);
 
 		String	 file;
 		Int	 lastBs = -1;
@@ -479,7 +501,7 @@ void Translator::SaveFileAs()
 	delete dialog;
 }
 
-void Translator::SaveFileWithName(String file)
+void Translator::SaveFileName(const String &file)
 {
 	XML::Document	*doc = new XML::Document();
 	XML::Node	*root = new XML::Node("LangFile");
@@ -644,6 +666,14 @@ void Translator::SaveData()
 
 			entries.AddEntry(entry);
 		}
+
+		Font	 redFont;
+		Font	 blackFont;
+
+		redFont.SetColor(Color(255, 0, 0));
+
+		if (entry->translation == NIL)	entry->entry->SetFont(redFont);
+		else				entry->entry->SetFont(blackFont);
 
 		entry = NULL;
 

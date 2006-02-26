@@ -30,6 +30,8 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Int	 CF_MULTILINE	= 1;
+
 		class SMOOTHAPI Cursor : public Widget
 		{
 			private:

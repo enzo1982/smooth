@@ -54,7 +54,9 @@ class Translator : public Application
 
 		Bool			 modified;
 
-		Void			 SaveFileWithName(String);
+		Void			 OpenFileName(const String &);
+		Void			 SaveFileName(const String &);
+
 		Void			 Close();
 	slots:
 		Void			 NewEntry();
@@ -71,7 +73,7 @@ class Translator : public Application
 		Bool			 ExitProc();
 		Void			 ResizeProc();
 	public:
-					 Translator();
+					 Translator(const String &);
 					~Translator();
 };
 

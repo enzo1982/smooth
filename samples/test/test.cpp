@@ -103,7 +103,13 @@ Test::Test()
 
 	text_editbox		= new Text("EditBox:", Point(250, 10));
 	widget_editbox		= new EditBox("MyEditBox", Point(310, 10), Size(100, 19));
-	widget_editbox->SetBackgroundColor(Color(255, 255, 255));
+
+	text_combobox		= new Text("ComboBox:", Point(250, 35));
+	widget_combobox		= new ComboBox(Point(310, 35), Size(100, 19));
+	widget_combobox->AddEntry("Red");
+	widget_combobox->AddEntry("Green");
+	widget_combobox->AddEntry("Blue");
+	widget_combobox->AddEntry("Yellow");
 
 	Widget	*selected_widget = widget_editbox;
 
@@ -163,6 +169,9 @@ Test::Test()
 	mainWnd->RegisterObject(text_editbox);
 	mainWnd->RegisterObject(widget_editbox);
 
+	mainWnd->RegisterObject(text_combobox);
+	mainWnd->RegisterObject(widget_combobox);
+
 	mainWnd->RegisterObject(button_show);
 	mainWnd->RegisterObject(button_hide);
 	mainWnd->RegisterObject(button_activate);
@@ -205,6 +214,9 @@ Test::~Test()
 
 	DeleteObject(text_editbox);
 	DeleteObject(widget_editbox);
+
+	DeleteObject(text_combobox);
+	DeleteObject(widget_combobox);
 
 	DeleteObject(button_show);
 	DeleteObject(button_hide);

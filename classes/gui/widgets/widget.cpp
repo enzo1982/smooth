@@ -316,6 +316,18 @@ S::Int S::GUI::Widget::Deactivate()
 
 	active = False;
 
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*widget = GetNthObject(i);
+
+		widget->mouseOver	= False;
+
+		widget->leftButtonDown	= False;
+		widget->rightButtonDown	= False;
+
+		widget->mouseDragging	= False;
+	}
+
 	if (registered && prevVisible) Show();
 
 	return Success();

@@ -40,6 +40,8 @@ namespace smooth
 
 				virtual Int		 Paint(Int);
 			slots:
+				Void			 OnMouseOver();
+
 				Void			 OpenPopupMenu();
 				Void			 ClosePopupMenu();
 		};

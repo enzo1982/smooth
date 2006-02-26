@@ -14,6 +14,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
+#include <smooth/misc/binary.h>
 
 S::Signal2<S::Void, S::Int, S::Int>	 S::GUI::ListEntry::internalOnSelectEntry;
 
@@ -217,7 +218,7 @@ S::Void S::GUI::ListEntry::OnToggleMark()
 
 S::Void S::GUI::ListEntry::OnSelectEntry()
 {
-	if (!selected) Select();
+	if (!selected || Binary::IsFlagSet(container->GetFlags(), LF_ALLOWRESELECT)) Select();
 }
 
 S::Void S::GUI::ListEntry::OnSelectOtherEntry(Int containerHandle, Int handle)

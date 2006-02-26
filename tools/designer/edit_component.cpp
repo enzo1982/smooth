@@ -20,6 +20,8 @@ Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 
 	status.dlg = this;
 	status.currdlgname = name;
+	status.mousex = 0;
+	status.mousey = 0;
 	status.wndposx = 150;
 	status.wndposy = 150;
 	status.wndsizex = 400;

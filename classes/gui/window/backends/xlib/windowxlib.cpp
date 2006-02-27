@@ -71,7 +71,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 S::Int S::GUI::WindowXLib::Close()
 {
-	delete drawSurface;
+	if (drawSurface != nullSurface) delete drawSurface;
 
 	drawSurface = nullSurface;
 

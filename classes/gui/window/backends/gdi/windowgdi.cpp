@@ -268,7 +268,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 S::Int S::GUI::WindowGDI::Close()
 {
-	delete drawSurface;
+	if (drawSurface != nullSurface) delete drawSurface;
 
 	drawSurface = nullSurface;
 

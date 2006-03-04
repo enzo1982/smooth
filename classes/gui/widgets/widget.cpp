@@ -303,6 +303,8 @@ S::Int S::GUI::Widget::Activate()
 
 	if (registered && prevVisible) Show();
 
+	onActivate.Emit();
+
 	return Success();
 }
 
@@ -329,6 +331,8 @@ S::Int S::GUI::Widget::Deactivate()
 	}
 
 	if (registered && prevVisible) Show();
+
+	onDeactivate.Emit();
 
 	return Success();
 }
@@ -503,10 +507,10 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			break;
 		case SM_MOUSEWHEEL:
 			{
-				Int	 scrollLines = 0;
+				UnsignedInt	 scrollLines = 0;
 
-				if (Setup::enableUnicode)	SystemParametersInfoW(104, NIL, (UINT *) &scrollLines, NIL);
-				else				SystemParametersInfoA(104, NIL, (UINT *) &scrollLines, NIL);
+				if (Setup::enableUnicode)	SystemParametersInfoW(104, NIL, &scrollLines, NIL);
+				else				SystemParametersInfoA(104, NIL, &scrollLines, NIL);
 
 				if (scrollLines <= 0) scrollLines = 3;
 
@@ -518,7 +522,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 		case WM_KILLFOCUS:
 			if (Window::GetWindow((HWND) wParam) != NIL)
 			{
-				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID || Window::GetWindow((HWND) wParam) == window) break;
+				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetHandle() >= window->GetHandle()) break;
 			}
 		case WM_ACTIVATEAPP:
 			DeactivateTooltip();
@@ -581,32 +585,6 @@ S::Void S::GUI::Widget::DeactivateTooltip()
 
 		tooltip = NIL;
 	}
-}
-
-S::Bool S::GUI::Widget::IsRegistered()
-{
-	return registered;
-}
-
-S::Bool S::GUI::Widget::IsVisible()
-{
-	if (!registered)	return visible;
-	if (!visible)		return False;
-
-	return container->IsVisible();
-}
-
-S::Bool S::GUI::Widget::IsActive()
-{
-	if (!registered)	return active;
-	if (!active)		return False;
-
-	return container->IsActive();
-}
-
-S::Bool S::GUI::Widget::IsMouseOver()
-{
-	return mouseOver;
 }
 
 S::Int S::GUI::Widget::SetText(const String &newText)
@@ -693,66 +671,6 @@ S::Int S::GUI::Widget::SetOrientation(Int nOrientation)
 S::Int S::GUI::Widget::GetOrientation()
 {
 	return orientation;
-}
-
-S::Int S::GUI::Widget::SetX(Int nX)
-{
-	return SetMetrics(Point(nX, pos.y), size);
-}
-
-S::Int S::GUI::Widget::GetX()
-{
-	return pos.x;
-}
-
-S::Int S::GUI::Widget::SetY(Int nY)
-{
-	return SetMetrics(Point(pos.x, nY), size);
-}
-
-S::Int S::GUI::Widget::GetY()
-{
-	return pos.y;
-}
-
-S::Int S::GUI::Widget::SetWidth(Int nWidth)
-{
-	return SetMetrics(pos, Size(nWidth, size.cy));
-}
-
-S::Int S::GUI::Widget::GetWidth()
-{
-	return size.cx;
-}
-
-S::Int S::GUI::Widget::SetHeight(Int nHeight)
-{
-	return SetMetrics(pos, Size(size.cx, nHeight));
-}
-
-S::Int S::GUI::Widget::GetHeight()
-{
-	return size.cy;
-}
-
-S::Int S::GUI::Widget::SetPosition(const Point &nPos)
-{
-	return SetMetrics(nPos, size);
-}
-
-const S::GUI::Point &S::GUI::Widget::GetPosition()
-{
-	return pos;
-}
-
-S::Int S::GUI::Widget::SetSize(const Size &nSize)
-{
-	return SetMetrics(pos, nSize);
-}
-
-const S::GUI::Size &S::GUI::Widget::GetSize()
-{
-	return size;
 }
 
 S::Int S::GUI::Widget::SetMetrics(const Point &nPos, const Size &nSize)

@@ -54,8 +54,8 @@ namespace smooth
 
 			Int				 flags;
 
-			Int				 EnterProtectedRegion();
-			Int				 LeaveProtectedRegion();
+			Int				 EnterProtectedRegion()		{ return ++isObjectInUse; }
+			Int				 LeaveProtectedRegion()		{ return --isObjectInUse; }
 		public:
 			static const Int		 classID;
 
@@ -88,8 +88,8 @@ namespace smooth
 			const ObjectType		&GetObjectType();
 			virtual Bool			 IsTypeCompatible(Int);
 
-			Bool				 IsObjectInUse();
-			Bool				 IsObjectDeletable();
+			Bool				 IsObjectInUse() const		{ return isObjectInUse > 0; }
+			Bool				 IsObjectDeletable() const	{ return deleteObject; }
 	};
 };
 

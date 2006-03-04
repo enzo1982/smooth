@@ -58,7 +58,7 @@ Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 {
 	Byte		 newText[77]	= "ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000";
 	UnsignedByte	 asciiCode	= 0;
-	Int		 unicode	= 0;
+	wchar_t		 unicode	= 0;
 	Int		 scanCode	= 0;
 	Int		 vkCode		= 0;
 	Byte		 keys[256];
@@ -68,7 +68,7 @@ Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 		GetKeyboardState((UnsignedByte *) &keys);
 		ToAscii(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (UnsignedShort *) &asciiCode, 0);
 
-		if (Setup::enableUnicode) ToUnicode(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (wchar_t *) &unicode, 1, 0);
+		if (Setup::enableUnicode) ToUnicode(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, &unicode, 1, 0);
 
 		scanCode	= GetBits(lParam, 16, 23);
 		vkCode		= wParam;

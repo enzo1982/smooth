@@ -47,6 +47,6 @@ xx.xx.06 xx:xx - smooth alpha 0.8.67.0
 - removed shlobjmini.h
 - removed support for MinGW 1.x
 - replaced fribidi with fribidi2
-- upgrade to libXML2 version 2.6.16
+- upgrade to libXML2 version 2.6.22
 - moved to the xmlTextReader and xmlTextWriter APIs of libxml
 - now using precompiled headers in the build process

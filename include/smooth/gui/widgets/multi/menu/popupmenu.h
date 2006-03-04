@@ -29,26 +29,28 @@ namespace smooth
 		class SMOOTHAPI PopupMenu : public Menu
 		{
 			private:
-				PopupMenu		*prevPopup;
-				PopupMenu		*nextPopup;
+				ToolWindow			*toolWindow;
 
-				ToolWindow		*toolWindow;
+				Bool				 hasNext;
 			public:
-				static const Int	 classID;
+				static const Int		 classID;
 
-							 PopupMenu();
-				virtual			~PopupMenu();
+								 PopupMenu();
+				virtual				~PopupMenu();
 
-				virtual Int		 Show();
-				virtual Int		 Hide();
+				virtual Int			 Show();
+				virtual Int			 Hide();
 
-				MenuEntry		*AddEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0);
+				MenuEntry			*AddEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0);
+			accessors:
+				Void				 SetHasNext(Bool nHasNext)	{ hasNext = nHasNext; }
 			signals:
-				static Signal0<Void>	 internalClosePopups;
-			slots:
-				Void			 InternalClosePopups();
+				static Signal1<Void, Int>	 internalOnOpenPopupMenu;
 
-				Void			 OnToolWindowPaint();
+				Signal0<Void>			 internalRequestClose;
+			slots:
+				Void				 OnOpenPopupMenu(Int);
+				Void				 OnToolWindowPaint();
 		};
 	};
 };

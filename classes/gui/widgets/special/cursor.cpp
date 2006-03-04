@@ -31,10 +31,14 @@ S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSiz
 	timer		= NIL;
 	marking		= False;
 	visibleOffset	= 0;
+	scrollPos	= 0;
+	maxScrollPos	= 0;
 
 	onLoseFocus.Connect(&Cursor::OnLoseFocus, this);
 
 	onInput.SetParentObject(this);
+	onEnter.SetParentObject(this);
+	onScroll.SetParentObject(this);
 }
 
 S::GUI::Cursor::~Cursor()
@@ -62,6 +66,17 @@ S::Int S::GUI::Cursor::Paint(Int message)
 			surface->Box(frame, GetBackgroundColor(), FILLED);
 
 			{
+				Int	 nMaxScrollPos = Math::Max(0, Math::Ceil((Float) (font.GetTextSizeY(text) - GetHeight()) / (font.GetTextSizeY("*") + 3)));
+
+				if (nMaxScrollPos != maxScrollPos)
+				{
+					maxScrollPos = nMaxScrollPos;
+
+					if (maxScrollPos == 0) scrollPos = 0;
+
+					onScroll.Emit(scrollPos, maxScrollPos);
+				}
+
 				String	 line;
 				Int	 lineNumber = 0;
 				Int	 lineStart = 0;
@@ -74,35 +89,38 @@ S::Int S::GUI::Cursor::Paint(Int message)
 					{
 						line[i - lineStart] = 0;
 
-						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + lineNumber * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
-						else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + lineNumber * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
-
-						if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
+						if (lineNumber >= scrollPos)
 						{
-							Int	 lineMarkStart = Math::Max(0, Math::Min(markStart, markEnd) - lineStart);
-							Int	 lineMarkEnd = Math::Min(line.Length(), Math::Max(markStart, markEnd) - lineStart);
+							if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
+							else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
 
-							if (lineMarkStart < line.Length() && lineMarkEnd > 0)
+							if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
 							{
-								Int	 bColor	 = GetSysColor(COLOR_HIGHLIGHT);
-								Int	 tColor	 = GetSysColor(COLOR_HIGHLIGHTTEXT);
+								Int	 lineMarkStart = Math::Max(0, Math::Min(markStart, markEnd) - lineStart);
+								Int	 lineMarkEnd = Math::Min(line.Length(), Math::Max(markStart, markEnd) - lineStart);
 
-								String	 mText;
-								String	 wText = line;
+								if (lineMarkStart < line.Length() && lineMarkEnd > 0)
+								{
+									Int	 bColor	 = GetSysColor(COLOR_HIGHLIGHT);
+									Int	 tColor	 = GetSysColor(COLOR_HIGHLIGHTTEXT);
 
-								if (Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) wText.FillN('*', wText.Length());
+									String	 mText;
+									String	 wText = line;
 
-								for (Int j = lineMarkStart; j < lineMarkEnd; j++) mText[j - lineMarkStart] = wText[j];
+									if (Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) wText.FillN('*', wText.Length());
 
-								Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText, lineMarkStart) - visibleOffset, lineNumber * (font.GetTextSizeY("*") + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY("*") + 3));
+									for (Int j = lineMarkStart; j < lineMarkEnd; j++) mText[j - lineMarkStart] = wText[j];
 
-								surface->Box(markRect, bColor, FILLED);
+									Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText, lineMarkStart) - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY("*") + 3));
 
-								Font	 nFont = font;
+									surface->Box(markRect, bColor, FILLED);
 
-								nFont.SetColor(tColor);
+									Font	 nFont = font;
 
-								surface->SetText(mText, markRect + Point(0, 1) - Size(0, 2), nFont);
+									nFont.SetColor(tColor);
+
+									surface->SetText(mText, markRect + Point(0, 1) - Size(0, 2), nFont);
+								}
 							}
 						}
 
@@ -164,7 +182,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 						{
 							wText[i - wPromptPos] = 0;
 
-							if (lineCount == line) break;
+							if (lineCount - scrollPos == line) break;
 
 							wPromptPos = i;
 							lineCount++;
@@ -252,6 +270,8 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 				{
 					line = (window->MouseY() - frame.top) / (font.GetTextSizeY("*") + 3);
 
+					if (window->MouseY() - frame.top < 0) line--;
+
 					Int	 lineCount = 0;
 
 					for (Int i = 0; i <= text.Length(); i++)
@@ -260,7 +280,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 						{
 							wText[i - wPromptPos] = 0;
 
-							if (lineCount == line) break;
+							if (lineCount - scrollPos == line) break;
 
 							wPromptPos = i;
 							lineCount++;
@@ -268,26 +288,31 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 						wText[i - wPromptPos] = text[i];
 					}
+
+					if (lineCount - scrollPos != line) wPromptPos = -1;
 				}
 
-				Int	 newPos	 = 0;
-				Int	 lastPos = 0;
-
-				for (Int i = 0; i <= wText.Length(); i++)
+				if (wPromptPos >= 0)
 				{
-					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText, i) - visibleOffset;
-					else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
+					Int	 newPos	 = 0;
+					Int	 lastPos = 0;
 
-					if (i > 0 && window->MouseX() < (lastPos + newPos) / 2)  { newMarkEnd	= i - 1; break; }
-					else if (i == wText.Length())				   newMarkEnd	= wText.Length();
-					else							   lastPos	= newPos;
+					for (Int i = 0; i <= wText.Length(); i++)
+					{
+						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText, i) - visibleOffset;
+						else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
+
+						if (i > 0 && window->MouseX() < (lastPos + newPos) / 2)  { newMarkEnd	= i - 1; break; }
+						else if (i == wText.Length())				   newMarkEnd	= wText.Length();
+						else							   lastPos	= newPos;
+					}
+
+					newMarkEnd += wPromptPos;
+
+					MarkText(markStart, newMarkEnd);
+
+					SetCursorPos(newMarkEnd);
 				}
-
-				newMarkEnd += wPromptPos;
-
-				MarkText(markStart, newMarkEnd);
-
-				SetCursorPos(newMarkEnd);
 			}
 
 			break;
@@ -422,7 +447,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 					{
 						String	 mText;
 
-						for (int j = markStart; j < markEnd; j++) mText[j - markStart] = text[j];
+						for (int j = Math::Min(markStart, markEnd); j < Math::Max(markStart, markEnd); j++) mText[j - Math::Min(markStart, markEnd)] = text[j];
 
 						OpenClipboard((HWND) window->GetSystemWindow());
 
@@ -556,11 +581,14 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	point.x += font.GetTextSizeX(wText, wPromptPos) - visibleOffset;
 	else								point.x += font.GetTextSizeX(String().FillN('*', wPromptPos), wPromptPos) - visibleOffset;
 
-	point.y += (font.GetTextSizeY("*") + 3) * line;
+	point.y += (font.GetTextSizeY("*") + 3) * (line - scrollPos);
 
-	surface->Box(Rect(point, Size(1, font.GetTextSizeY("*") + 3)), 0, INVERT);
+	if (!(line - scrollPos < 0 || (font.GetTextSizeY("*") + 3) * (line - scrollPos + 1) > GetHeight()))
+	{
+		surface->Box(Rect(point, Size(1, font.GetTextSizeY("*") + 3)), 0, INVERT);
 
-	promptVisible = visible;
+		promptVisible = visible;
+	}
 }
 
 S::Void S::GUI::Cursor::MarkText(Int newMarkStart, Int newMarkEnd)
@@ -619,11 +647,30 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 	for (Int j = promptPos; j < promptPos + insertText.Length(); j++)	newText[j] = insertText[j - promptPos];
 	for (Int k = promptPos; k <= text.Length(); k++)			newText[k + insertText.Length()] = text[k];
 
+	Surface	*surface = container->GetDrawSurface();
+
+	surface->StartPaint(Rect(GetRealPosition(), GetSize()));
+
 	SetText(newText);
+
+	surface->EndPaint();
 
 	SetCursorPos(promptPos + insertText.Length());
 
 	onInput.Emit(newText);
+}
+
+S::Int S::GUI::Cursor::Scroll(Int nScrollPos)
+{
+	ShowCursor(False);
+
+	scrollPos = Math::Max(0, Math::Min(nScrollPos, maxScrollPos));
+
+	Paint(SP_PAINT);
+
+	onScroll.Emit(scrollPos, maxScrollPos);
+
+	return Success();
 }
 
 S::Void S::GUI::Cursor::OnTimer()
@@ -692,7 +739,19 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	if (visibleOffset < 0) { p1.x -= visibleOffset; visibleOffset = 0; }
 
-	p1.y += (font.GetTextSizeY("*") + 3) * line;
+	p1.y += (font.GetTextSizeY("*") + 3) * (line - scrollPos);
+
+	if (line - scrollPos < 0 || (font.GetTextSizeY("*") + 3) * (line - scrollPos + 1) > GetHeight())
+	{
+		while (line - scrollPos < 0)						    scrollPos--;
+		while ((font.GetTextSizeY("*") + 3) * (line - scrollPos + 1) > GetHeight()) scrollPos++;
+
+		onScroll.Emit(scrollPos, maxScrollPos);
+
+		Sleep(100);
+
+		return Success();
+	}
 
 	{
 		HIMC		 hImc = ImmGetContext((HWND) wnd->GetSystemWindow());
@@ -776,4 +835,9 @@ S::Int S::GUI::Cursor::SetMaxSize(Int newMaxSize)
 	else			maxSize = newMaxSize;
 
 	return Success();
+}
+
+S::Int S::GUI::Cursor::GetMaxSize()
+{
+	return maxSize;
 }

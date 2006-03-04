@@ -28,7 +28,7 @@ S::GUI::Menubar::~Menubar()
 {
 }
 
-S::GUI::MenuEntry *S::GUI::Menubar::AddEntry(const String &text, const Bitmap &bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
+S::GUI::MenuEntry *S::GUI::Menubar::AddEntry(const String &text, const Bitmap &bitmap, PopupMenu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
 {
 	MenuEntry	*newEntry = new MenubarEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
 

@@ -35,7 +35,7 @@ namespace smooth
 			public:
 				static const Int	 classID;
 
-							 MenubarEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
+							 MenubarEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
 				virtual			~MenubarEntry();
 
 				virtual Int		 Paint(Int);

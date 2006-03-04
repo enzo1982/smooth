@@ -39,7 +39,7 @@ namespace smooth
 
 				virtual Int		 Paint(Int);
 
-				MenuEntry		*AddEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0);
+				MenuEntry		*AddEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0);
 		};
 	};
 };

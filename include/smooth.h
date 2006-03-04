@@ -131,6 +131,7 @@
 
 #include "smooth/gui/widgets/multi/menu/menu.h"
 #include "smooth/gui/widgets/multi/menu/menubar.h"
+#include "smooth/gui/widgets/multi/menu/micromenu.h"
 #include "smooth/gui/widgets/multi/menu/popupmenu.h"
 
 #include "smooth/gui/widgets/special/cursor.h"

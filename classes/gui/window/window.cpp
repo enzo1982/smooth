@@ -81,7 +81,7 @@ S::GUI::Window::~Window()
 	UnregisterObject(mainLayer);
 	DeleteObject(mainLayer);
 
-	if (trackMenu != NIL) UnregisterObject(trackMenu);
+	if (trackMenu != NIL) ClosePopupMenu();
 
 	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop--;
 
@@ -483,12 +483,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 		if (message == WM_KILLFOCUS && Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->GetHandle() >= trackMenu->GetHandle()) destroyPopup = False;
 
-		if (destroyPopup)
-		{
-			UnregisterObject(trackMenu);
-
-			trackMenu = NIL;
-		}
+		if (destroyPopup) ClosePopupMenu();
 	}
 
 	switch (message)
@@ -601,7 +596,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_KILLFOCUS:
 			if (Window::GetWindow((HWND) wParam) != NIL)
 			{
-				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetHandle() > GetHandle()) break;
+				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetHandle() >= GetHandle()) break;
 			}
 
 			if (focussed)
@@ -692,19 +687,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_RBUTTONDOWN:
-			{
-				trackMenu = getTrackMenu.Call(MouseX(), MouseY());
+			OpenPopupMenu();
 
-				if (trackMenu != NIL)
-				{
-					trackMenu->SetPosition(Point(MouseX(), MouseY()));
-					trackMenu->onAction.Connect(&Window::PopupProc, this);
-
-					RegisterObject(trackMenu);
-
-					rVal = Break;
-				}
-			}
+			if (trackMenu != NIL) rVal = Break;
 
 			break;
 	}
@@ -1002,11 +987,24 @@ S::Void *S::GUI::Window::GetSystemWindow()
 	return backend->GetSystemWindow();
 }
 
-S::Void S::GUI::Window::PopupProc()
+S::Void S::GUI::Window::OpenPopupMenu()
+{
+	trackMenu = getTrackMenu.Call(MouseX(), MouseY());
+
+	if (trackMenu != NIL)
+	{
+		trackMenu->SetPosition(Point(MouseX(), MouseY()));
+		trackMenu->internalRequestClose.Connect(&Window::ClosePopupMenu, this);
+
+		RegisterObject(trackMenu);
+	}
+}
+
+S::Void S::GUI::Window::ClosePopupMenu()
 {
 	if (trackMenu != NIL)
 	{
-		trackMenu->Hide();
+		trackMenu->internalRequestClose.Disconnect(&Window::ClosePopupMenu, this);
 
 		UnregisterObject(trackMenu);
 

@@ -29,7 +29,7 @@ S::XML::XUL::Menubar::Menubar(Node *node) : Widget(node)
 			{
 				XUL::PopupMenu	*menu = new XUL::PopupMenu(mNode);
 
-				menubar->AddEntry(menu->GetName(), NIL, (GUI::Menu *) menu->GetWidget());
+				menubar->AddEntry(menu->GetName(), NIL, (GUI::PopupMenu *) menu->GetWidget());
 
 				entries.AddEntry(menu);
 			}

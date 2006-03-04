@@ -52,7 +52,8 @@ namespace smooth
 
 				Int			 MarkAll();
 			slots:
-				Void			 ScrollbarProc();
+				Void			 OnScroll();
+				Void			 OnCursorScroll(Int, Int);
 
 				Void			 OnChangeSize(const Size &);
 

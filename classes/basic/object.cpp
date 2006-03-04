@@ -11,10 +11,10 @@
 #include <smooth/basic/object.h>
 #include <smooth/i18n/i18n.h>
 
-const S::Int		 S::Object::classID		= S::Object::RequestClassID();
+const S::Int	 S::Object::classID		= S::Object::RequestClassID();
 
-S::Int			 S::Object::nextClassID		= 0;
-S::Int			 S::Object::nextObjectHandle	= 0;
+S::Int		 S::Object::nextClassID		= 0;
+S::Int		 S::Object::nextObjectHandle	= 0;
 
 S::Array<S::Object *, S::Void *>	 S::Object::objects;
 
@@ -128,26 +128,6 @@ S::Int S::Object::RequestClassID()
 S::Int S::Object::RequestObjectHandle()
 {
 	return 	nextObjectHandle++;
-}
-
-S::Int S::Object::EnterProtectedRegion()
-{
-	return ++isObjectInUse;
-}
-
-S::Int S::Object::LeaveProtectedRegion()
-{
-	return --isObjectInUse;
-}
-
-S::Bool S::Object::IsObjectInUse()
-{
-	return isObjectInUse > 0;
-}
-
-S::Bool S::Object::IsObjectDeletable()
-{
-	return deleteObject;
 }
 
 S::Int S::Object::DeleteObject(Object *object)

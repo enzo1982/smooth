@@ -13,7 +13,7 @@
 
 const S::Int	 S::GUI::MenuEntry::classID = S::Object::RequestClassID();
 
-S::GUI::MenuEntry::MenuEntry(const String &iText, const Bitmap &iBitmap, Menu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : Widget(Point(), Size())
+S::GUI::MenuEntry::MenuEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : Widget(Point(), Size())
 {
 	type		= classID;
 

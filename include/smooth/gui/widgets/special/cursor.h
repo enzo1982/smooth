@@ -45,6 +45,9 @@ namespace smooth
 				Int				 markEnd;
 
 				Int				 visibleOffset;
+
+				Int				 scrollPos;
+				Int				 maxScrollPos;
 			protected:
 				Int				 maxSize;
 
@@ -63,15 +66,20 @@ namespace smooth
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
 
+				Int				 MarkAll();
+
+				Int				 Scroll(Int);
+			accessors:
 				Int				 SetCursorPos(Int);
 				Int				 GetCursorPos();
 
 				Int				 SetMaxSize(Int);
-
-				Int				 MarkAll();
+				Int				 GetMaxSize();
 			signals:
 				Signal1<Void, const String &>	 onInput;
 				Signal1<Void, const String &>	 onEnter;
+
+				Signal2<Void, Int, Int>		 onScroll;
 			slots:
 				Void				 OnTimer();
 

@@ -8,37 +8,50 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_MENU_
-#define _H_OBJSMOOTH_MENU_
+#ifndef _H_OBJSMOOTH_MICROMENU_
+#define _H_OBJSMOOTH_MICROMENU_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class Menu;
-
+		class MicroMenu;
 		class PopupMenu;
+
+		class Hotspot;
 	};
 };
 
-#include "menuentry.h"
+#include "menu.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		abstract class SMOOTHAPI Menu : public Widget
+		class SMOOTHAPI MicroMenu : public Menu
 		{
+			protected:
+				Hotspot			*hotspot;
+
+				PopupMenu		*popup;
 			public:
 				static const Int	 classID;
 
-							 Menu();
-				virtual			~Menu();
+							 MicroMenu(const Point &, const Size &, Int);
+				virtual			~MicroMenu();
 
-				virtual MenuEntry	*AddEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0) = 0;
+				virtual Int		 Paint(Int);
+
+				MenuEntry		*AddEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0);
 				virtual Int		 RemoveEntry(MenuEntry *);
 
 				virtual Int		 Clear();
+			signals:
+				Signal0<Void>		 onOpenPopupMenu;
+				Signal0<Void>		 onClosePopupMenu;
+			slots:
+				Void			 OpenPopupMenu();
+				Void			 ClosePopupMenu();
 		};
 	};
 };

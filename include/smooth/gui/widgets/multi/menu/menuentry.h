@@ -18,6 +18,7 @@ namespace smooth
 		class MenuEntry;
 		class Menu;
 
+		class PopupMenu;
 		class Shortcut;
 	};
 };
@@ -34,7 +35,7 @@ namespace smooth
 			private:
 				Shortcut		*shortcut;
 			protected:
-				Menu			*popup;
+				PopupMenu		*popup;
 
 				Bitmap			 bitmap;
 				Bitmap			 graymap;
@@ -45,7 +46,7 @@ namespace smooth
 			public:
 				static const Int	 classID;
 
-							 MenuEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
+							 MenuEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
 				virtual			~MenuEntry();
 			accessors:
 				Int			 SetShortcut(Int, Int);

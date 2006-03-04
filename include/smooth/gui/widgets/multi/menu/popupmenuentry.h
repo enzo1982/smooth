@@ -17,6 +17,7 @@ namespace smooth
 	{
 		class PopupMenuEntry;
 
+		class PopupMenu;
 		class Hotspot;
 	};
 };
@@ -31,18 +32,23 @@ namespace smooth
 		{
 			protected:
 				Hotspot			*hotspot;
+
+				PopupMenu		*owner;
 			public:
 				static const Int	 classID;
 
-							 PopupMenuEntry(const String & = NIL, const Bitmap & = NIL, Menu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
+							 PopupMenuEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
 				virtual			~PopupMenuEntry();
 
 				virtual Int		 Paint(Int);
 
 				virtual Int		 Show();
 				virtual Int		 Hide();
+			accessors:
+				Void			 SetOwner(PopupMenu *nOwner)	{ owner = nOwner; }
 			slots:
 				Void			 OnClickEntry();
+				Void			 OnChangeSize(const Size &);
 
 				Void			 OpenPopupMenu();
 				Void			 ClosePopupMenu();

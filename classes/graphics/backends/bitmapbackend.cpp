@@ -185,7 +185,7 @@ S::Int S::GUI::BitmapBackend::GetDepth()
 
 S::UnsignedByte *S::GUI::BitmapBackend::GetBytes()
 {
-	return bytes;
+	return (UnsignedByte *) bytes;
 }
 
 S::Int S::GUI::BitmapBackend::GetLineAlignment()
@@ -254,17 +254,18 @@ S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, UnsignedLong color)
 	if (bytes == NIL)			return False;
 	if (y >= size.cy || x >= size.cx)	return False;
 
-	Bool	 done = False;
-	Int	 offset = 0;
+	UnsignedByte	*data = ((UnsignedByte *) bytes);
+	Bool		 done = False;
+	Int		 offset = 0;
 
 	switch (depth)
 	{
 		case 24:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + x * 3;
 
-			bytes[offset + 0] = Color(color).GetBlue();
-			bytes[offset + 1] = Color(color).GetGreen();
-			bytes[offset + 2] = Color(color).GetRed();
+			data[offset + 0] = Color(color).GetBlue();
+			data[offset + 1] = Color(color).GetGreen();
+			data[offset + 2] = Color(color).GetRed();
 
 			done = True;
 
@@ -272,9 +273,9 @@ S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, UnsignedLong color)
 		case 32:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + x * 4;
 
-			bytes[offset + 0] = Color(color).GetBlue();
-			bytes[offset + 1] = Color(color).GetGreen();
-			bytes[offset + 2] = Color(color).GetRed();
+			data[offset + 0] = Color(color).GetBlue();
+			data[offset + 1] = Color(color).GetGreen();
+			data[offset + 2] = Color(color).GetRed();
 
 			done = True;
 
@@ -289,6 +290,7 @@ S::UnsignedLong S::GUI::BitmapBackend::GetPixel(Int x, Int y)
 	if (bytes == NIL)			return 0;
 	if (y >= size.cy || x >= size.cx)	return 0;
 
+	UnsignedByte	*data = ((UnsignedByte *) bytes);
 	UnsignedLong	 color = 0;
 	Int		 offset = 0;
 
@@ -297,13 +299,13 @@ S::UnsignedLong S::GUI::BitmapBackend::GetPixel(Int x, Int y)
 		case 24:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + x * 3;
 
-			color = Color(bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]);
+			color = Color(data[offset + 2], data[offset + 1], data[offset + 0]);
 
 			break;
 		case 32:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + x * 4;
 
-			color = Color(bytes[offset + 2], bytes[offset + 1], bytes[offset + 0]);
+			color = Color(data[offset + 2], data[offset + 1], data[offset + 0]);
 
 			break;
 	}

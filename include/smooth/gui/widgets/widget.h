@@ -129,11 +129,11 @@ namespace smooth
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
 			accessors:
-				Bool				 IsRegistered();
-				Bool				 IsVisible();
-				Bool				 IsActive();
+				Bool				 IsRegistered() const		{ return registered; }
+				Bool				 IsVisible() const		{ if (!registered) return visible; if (!visible) return False; return container->IsVisible(); }
+				Bool				 IsActive() const		{ if (!registered) return active; if (!active) return False; return container->IsActive(); }
 
-				Bool				 IsMouseOver();
+				Bool				 IsMouseOver() const		{ return mouseOver; }
 
 				virtual Int			 SetText(const String &);
 				virtual const String		&GetText();
@@ -150,20 +150,23 @@ namespace smooth
 				virtual Int			 SetOrientation(Int);
 				virtual Int			 GetOrientation();
 
-				Int				 SetX(Int);
-				Int				 GetX();
-				Int				 SetY(Int);
-				Int				 GetY();
+				Int				 SetX(Int nX)			{ return SetMetrics(Point(nX, pos.y), size); }
+				Int				 GetX() const			{ return pos.x; }
 
-				Int				 SetWidth(Int);
-				Int				 GetWidth();
-				Int				 SetHeight(Int);
-				Int				 GetHeight();
+				Int				 SetY(Int nY)			{ return SetMetrics(Point(pos.x, nY), size); }
+				Int				 GetY() const			{ return pos.y; }
 
-				Int				 SetPosition(const Point &);
-				const Point			&GetPosition();
-				Int				 SetSize(const Size &);
-				const Size			&GetSize();
+				Int				 SetWidth(Int nWidth)		{ return SetMetrics(pos, Size(nWidth, size.cy)); }
+				Int				 GetWidth() const		{ return size.cx; }
+
+				Int				 SetHeight(Int nHeight)		{ return SetMetrics(pos, Size(size.cx, nHeight)); }
+				Int				 GetHeight() const		{ return size.cy; }
+
+				Int				 SetPosition(const Point &nPos)	{ return SetMetrics(nPos, size); }
+				const Point			&GetPosition() const		{ return pos; }
+
+				Int				 SetSize(const Size &nSize)	{ return SetMetrics(pos, nSize); }
+				const Size			&GetSize() const		{ return size; }
 
 				virtual Int			 SetMetrics(const Point &, const Size &);
 
@@ -173,6 +176,9 @@ namespace smooth
 			signals:
 				Signal0<Void>			 onShow;
 				Signal0<Void>			 onHide;
+
+				Signal0<Void>			 onActivate;
+				Signal0<Void>			 onDeactivate;
 
 				Signal1<Void, const Point &>	 onChangePosition;
 				Signal1<Void, const Size &>	 onChangeSize;

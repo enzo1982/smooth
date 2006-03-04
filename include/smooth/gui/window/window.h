@@ -69,8 +69,6 @@ namespace smooth
 				virtual Bool			 Create();
 
 				Void				 CalculateOffsets();
-
-				Void				 PopupProc();
 			public:
 				static const Int		 classID;
 
@@ -149,6 +147,9 @@ namespace smooth
 			callbacks:
 				Callback2<PopupMenu *, Int, Int> getTrackMenu;
 				Callback0<Bool>			 doQuit;
+			slots:
+				Void				 OpenPopupMenu();
+				Void				 ClosePopupMenu();
 		};
 	};
 };

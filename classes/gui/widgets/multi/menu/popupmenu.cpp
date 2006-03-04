@@ -18,37 +18,33 @@
 
 const S::Int	 S::GUI::PopupMenu::classID = S::Object::RequestClassID();
 
-S::Signal0<S::Void>	 S::GUI::PopupMenu::internalClosePopups;
+S::Signal1<S::Void, S::Int>	 S::GUI::PopupMenu::internalOnOpenPopupMenu;
 
 S::GUI::PopupMenu::PopupMenu()
 {
 	type		= classID;
 	orientation	= OR_FREE;
-	prevPopup	= NIL;
-	nextPopup	= NIL;
+
+	hasNext		= False;
 
 	toolWindow	= NIL;
+
+	internalRequestClose.SetParentObject(this);
+
+	internalOnOpenPopupMenu.Connect(&PopupMenu::OnOpenPopupMenu, this);
 }
 
 S::GUI::PopupMenu::~PopupMenu()
 {
-	if (IsVisible()) Hide();
-
-	if (nextPopup != NIL) DeleteObject(nextPopup);
-
-	if (prevPopup != NIL) prevPopup->nextPopup = NIL;
-
-	if (toolWindow != NIL)
-	{
-		if (toolWindow->IsRegistered() && toolWindow->GetContainer() != NIL) toolWindow->GetContainer()->UnregisterObject(toolWindow);
-
-		DeleteObject(toolWindow);
-	}
+	internalOnOpenPopupMenu.Disconnect(&PopupMenu::OnOpenPopupMenu, this);
 }
 
-S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap &bitmap, Menu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
+S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap &bitmap, PopupMenu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
 {
-	MenuEntry	*newEntry = new PopupMenuEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
+	PopupMenuEntry	*newEntry = new PopupMenuEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
+
+	newEntry->onAction.Connect(&internalRequestClose);
+	newEntry->SetOwner(this);
 
 	RegisterObject(newEntry);
 
@@ -86,9 +82,11 @@ S::Int S::GUI::PopupMenu::Show()
 
 	if (!IsRegistered()) return Success();
 
+	hasNext = False;
+
 	toolWindow = new ToolWindow(GetPosition(), GetSize());
 	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
-	toolWindow->onLoseFocus.Connect(&PopupMenu::InternalClosePopups, this);
+	toolWindow->onLoseFocus.Connect(&internalRequestClose);
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -103,9 +101,9 @@ S::Int S::GUI::PopupMenu::Show()
 		entry->Activate();
 	}
 
-	RegisterObject(toolWindow);
+	internalOnOpenPopupMenu.Emit(GetHandle());
 
-	internalClosePopups.Connect(&PopupMenu::InternalClosePopups, this);
+	RegisterObject(toolWindow);
 
 	onShow.Emit();
 
@@ -122,10 +120,6 @@ S::Int S::GUI::PopupMenu::Hide()
 
 	if (toolWindow != NIL)
 	{
-		internalClosePopups.Disconnect(&PopupMenu::InternalClosePopups, this);
-
-		toolWindow->onLoseFocus.Disconnect(&PopupMenu::InternalClosePopups, this);
-
 		UnregisterObject(toolWindow);
 
 		for (Int i = 0; i < GetNOfObjects(); i++)
@@ -152,12 +146,11 @@ S::Int S::GUI::PopupMenu::Hide()
 	return Success();
 }
 
-S::Void S::GUI::PopupMenu::InternalClosePopups()
+S::Void S::GUI::PopupMenu::OnOpenPopupMenu(Int handle)
 {
-	if (container == NIL) return;
+	if (hasNext) return;
 
-	if (container->GetObjectType() == MenubarEntry::classID)	((MenubarEntry *) container)->ClosePopupMenu();
-	else if (container->GetObjectType() == PopupMenuEntry::classID)	((PopupMenuEntry *) container)->ClosePopupMenu();
+	if (handle != GetHandle()) internalRequestClose.Emit();
 }
 
 S::Void S::GUI::PopupMenu::OnToolWindowPaint()

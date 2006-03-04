@@ -43,7 +43,7 @@ namespace smooth
 				Size								 size;
 				Int								 depth;
 
-				UnsignedByte							*bytes;
+				Void								*bytes;
 				Int								 align;
 			public:
 				static Int							 AddBackend(BitmapBackend *(*)(Void *));

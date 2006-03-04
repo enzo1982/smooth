@@ -42,7 +42,7 @@ S::XML::XUL::PopupMenu::PopupMenu(Node *node) : Widget(node)
 				{
 					XUL::PopupMenu	*popup = new XUL::PopupMenu(entry);
 
-					menu->AddEntry(popup->GetName(), NIL, (GUI::Menu *) popup->GetWidget());
+					menu->AddEntry(popup->GetName(), NIL, (GUI::PopupMenu *) popup->GetWidget());
 
 					entries.AddEntry(popup);
 				}

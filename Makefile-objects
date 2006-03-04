@@ -380,6 +380,11 @@ $(OBJECTDIR)/menuentry.o: $(GUICLASSESDIR)/widgets/multi/menu/menuentry.cpp $(SM
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/menuentry.cpp -o $(OBJECTDIR)/menuentry.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/micromenu.o: $(GUICLASSESDIR)/widgets/multi/menu/micromenu.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/micromenu.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/micromenu.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/micromenu.cpp -o $(OBJECTDIR)/micromenu.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/popupmenu.o: $(GUICLASSESDIR)/widgets/multi/menu/popupmenu.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/popupmenu.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/popupmenu.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupmenu.cpp -o $(OBJECTDIR)/popupmenu.o

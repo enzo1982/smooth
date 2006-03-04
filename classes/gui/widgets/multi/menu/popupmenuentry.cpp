@@ -18,7 +18,7 @@
 
 const S::Int	 S::GUI::PopupMenuEntry::classID = S::Object::RequestClassID();
 
-S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitmap, Menu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : MenuEntry(iText, iBitmap, iPopup, ibVar, iiVar, iiCode)
+S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : MenuEntry(iText, iBitmap, iPopup, ibVar, iiVar, iiCode)
 {
 	type		= classID;
 
@@ -37,6 +37,8 @@ S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitma
 		hotspot->onLeftButtonClick.Connect(&PopupMenuEntry::OnClickEntry, this);
 
 		RegisterObject(hotspot);
+
+		onChangeSize.Connect(&PopupMenuEntry::OnChangeSize, this);
 	}
 }
 
@@ -239,21 +241,28 @@ S::Int S::GUI::PopupMenuEntry::Hide()
 
 S::Void S::GUI::PopupMenuEntry::OnClickEntry()
 {
-	if (popup == NIL) PopupMenu::internalClosePopups.Emit();
-
 	if (bVar != NIL) { *bVar = !*bVar; CheckBox::internalCheckValues.Emit(); }
 	if (iVar != NIL) { *iVar = iCode; OptionBox::internalCheckValues.Emit(); }
 
 	onAction.Emit();
 }
 
+S::Void S::GUI::PopupMenuEntry::OnChangeSize(const Size &nSize)
+{
+	hotspot->SetSize(nSize);
+}
+
 S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 {
 	if (popup == NIL) return;
 
-	popup->SetPosition(GetRealPosition() + Point(GetWidth() + 1, -3));
-
 	hotspot->Deactivate();
+
+	popup->SetPosition(GetRealPosition() + Point(GetWidth() + 1, -3));
+	popup->internalRequestClose.Connect(&onAction);
+	popup->internalRequestClose.Connect(&PopupMenuEntry::ClosePopupMenu, this);
+
+	owner->SetHasNext(True);
 
 	RegisterObject(popup);
 }
@@ -265,6 +274,11 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 	if (popup->GetContainer() == this)
 	{
 		UnregisterObject(popup);
+
+		owner->SetHasNext(False);
+
+		popup->internalRequestClose.Disconnect(&onAction);
+		popup->internalRequestClose.Disconnect(&PopupMenuEntry::ClosePopupMenu, this);
 
 		hotspot->Activate();
 	}

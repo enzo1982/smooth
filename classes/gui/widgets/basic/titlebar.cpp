@@ -189,18 +189,19 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 			{
 				paintActive = False;
 
-				if (Window::GetWindow(GetActiveWindow()) != NIL)
+				Widget	*remoteParent = Window::GetWindow(GetActiveWindow());
+
+				if (remoteParent != NIL)
 				{
-					if (Window::GetWindow(GetActiveWindow())->GetObjectType() == ToolWindow::classID)
+					if (remoteParent->GetObjectType() == ToolWindow::classID)
 					{
-						Window	*remoteParent = Window::GetWindow(GetActiveWindow());
-
-						while (remoteParent->GetContainer()->GetObjectType() != Application::classID)
+						do
 						{
-							remoteParent = remoteParent->GetContainer()->GetContainerWindow();
-						}
+							remoteParent = remoteParent->GetContainer();
 
-						if (remoteParent == window) paintActive = True;
+							if (remoteParent == window) { paintActive = True; break; }
+						}
+						while (remoteParent != NIL);
 					}
 				}
 			}

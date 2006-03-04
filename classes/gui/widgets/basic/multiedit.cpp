@@ -32,6 +32,7 @@ S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size 
 	if (GetHeight() == 0) SetHeight(19);
 
 	cursor = new Cursor(Point(3, 2), GetSize() - Size(6, 4));
+	cursor->onScroll.Connect(&MultiEdit::OnCursorScroll, this);
 	cursor->SetMaxSize(maxSize);
 	cursor->SetBackgroundColor(Color(255, 255, 255));
 	cursor->SetFlags(CF_MULTILINE);
@@ -64,50 +65,14 @@ S::Int S::GUI::MultiEdit::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (scrollbar != NIL) frame.right -= 17;
+			surface->StartPaint(frame);
 
 			if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
 			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-			if (scrollbar != NIL) frame.right += 17;
-
 			surface->Frame(frame, FRAME_DOWN);
 
-			if ((font.GetTextSizeY(text) > GetHeight() - 6) && (scrollbar == NIL))
-			{
-				Layer	*layer = (Layer *) container;
-
-				scrollbarPos = 0;
-
-				scrollbar = new Scrollbar(Point(frame.right - layer->GetX() - 18, frame.top - layer->GetY() + 1), Size(0, GetHeight() - 2), OR_VERT, &scrollbarPos, 0, GetNOfInvisibleLines());
-				scrollbar->onValueChange.Connect(&MultiEdit::ScrollbarProc, this);
-
-				container->RegisterObject(scrollbar);
-
-				scrollbar->Paint(SP_PAINT);
-			}
-			else if ((font.GetTextSizeY(text) > GetHeight() - 6) && (scrollbar != NIL))
-			{
-				Layer	*layer = (Layer *) container;
-
-				scrollbar->SetPosition(Point(frame.right - layer->GetX() - 18, frame.top - layer->GetY() + 1));
-				scrollbar->SetHeight(GetHeight() - 2);
-
-				scrollbar->SetRange(0, GetNOfInvisibleLines());
-
-				scrollbar->Paint(SP_PAINT);
-			}
-			else if ((font.GetTextSizeY(text) <= GetHeight() - 6) && (scrollbar != NIL))
-			{
-				container->UnregisterObject(scrollbar);
-
-				surface->Box(Rect(Point(frame.right - 18, frame.top + 1), Size(18, GetHeight() - 2)), Setup::ClientColor, FILLED);
-
-				DeleteObject(scrollbar);
-
-				scrollbar = NIL;
-				scrollbarPos = 0;
-			}
+			surface->EndPaint();
 
 			break;
 	}
@@ -167,9 +132,40 @@ const S::String &S::GUI::MultiEdit::GetText()
 	return cursor->GetText();
 }
 
-S::Void S::GUI::MultiEdit::ScrollbarProc()
+S::Void S::GUI::MultiEdit::OnScroll()
 {
-	Paint(SP_PAINT);
+	cursor->Scroll(scrollbarPos);
+}
+
+S::Void S::GUI::MultiEdit::OnCursorScroll(Int scrollPos, Int maxScrollPos)
+{
+	if (maxScrollPos == NIL && scrollbar != NIL)
+	{
+		DeleteObject(scrollbar);
+
+		scrollbar = NIL;
+
+		cursor->SetWidth(cursor->GetWidth() + 17);
+
+		Paint(SP_PAINT);
+	}
+	else if (scrollbar == NIL)
+	{
+		cursor->SetWidth(cursor->GetWidth() - 17);
+
+		scrollbar = new Scrollbar(Point(18, 1), Size(0, GetHeight() - 2), OR_VERT, &scrollbarPos, 0, maxScrollPos);
+		scrollbar->onValueChange.Connect(&MultiEdit::OnScroll, this);
+		scrollbar->SetOrientation(OR_UPPERRIGHT);
+
+		RegisterObject(scrollbar);
+
+		Paint(SP_PAINT);
+	}
+	else
+	{
+		scrollbar->SetRange(0, maxScrollPos);
+		scrollbar->SetValue(scrollPos);
+	}
 }
 
 S::Int S::GUI::MultiEdit::GetCursorPos()
@@ -179,5 +175,5 @@ S::Int S::GUI::MultiEdit::GetCursorPos()
 
 S::Void S::GUI::MultiEdit::OnChangeSize(const Size &nSize)
 {
-	cursor->SetSize(nSize - Size(6, 4));
+	cursor->SetSize(nSize - Size(6 + (scrollbar != NIL ? 17 : 0), 4));
 }

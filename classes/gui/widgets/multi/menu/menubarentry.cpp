@@ -19,7 +19,7 @@
 
 const S::Int	 S::GUI::MenubarEntry::classID = S::Object::RequestClassID();
 
-S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, Menu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : MenuEntry(iText, iBitmap, iPopup, ibVar, iiVar, iiCode)
+S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : MenuEntry(iText, iBitmap, iPopup, ibVar, iiVar, iiCode)
 {
 	type		= classID;
 
@@ -182,7 +182,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 S::Void S::GUI::MenubarEntry::OnMouseOver()
 {
-	if (Binary::IsFlagSet(container->GetFlags(), MB_POPUPOPEN))
+	if (Binary::IsFlagSet(container->GetFlags(), MB_POPUPOPEN) && text != NIL && bitmap == NIL)
 	{
 		hotspot->Paint(SP_MOUSEDOWN);
 
@@ -199,15 +199,14 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 
 	if (onAction.GetNOfConnectedSlots() == 0 || window->IsMouseOn(popupFrame))
 	{
-		PopupMenu::internalClosePopups.Emit();
-
-		container->SetFlags(container->GetFlags() | MB_POPUPOPEN);
-
-		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : GetWidth() + 2 - popup->GetWidth(), GetHeight() + 1));
-
 		hotspot->Deactivate();
 
+		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : GetWidth() + 2 - popup->GetWidth(), GetHeight() + 1));
+		popup->internalRequestClose.Connect(&MenubarEntry::ClosePopupMenu, this);
+
 		RegisterObject(popup);
+
+		container->SetFlags(container->GetFlags() | MB_POPUPOPEN);
 	}
 }
 
@@ -220,6 +219,8 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 		container->SetFlags(container->GetFlags() & !MB_POPUPOPEN);
 
 		UnregisterObject(popup);
+
+		popup->internalRequestClose.Disconnect(&MenubarEntry::ClosePopupMenu, this);
 
 		hotspot->Activate();
 	}

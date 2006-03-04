@@ -49,6 +49,8 @@ S::Int S::GUI::Hotspot::Activate()
 
 	Paint(SP_MOUSEOUT);
 
+	onActivate.Emit();
+
 	return Success();
 }
 
@@ -62,6 +64,8 @@ S::Int S::GUI::Hotspot::Deactivate()
 	rightButtonDown	= False;
 
 	mouseDragging	= False;
+
+	onDeactivate.Emit();
 
 	return Success();
 }

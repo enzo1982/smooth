@@ -787,6 +787,10 @@ SOURCE=..\classes\gui\widgets\multi\menu\menuentry.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\gui\widgets\multi\menu\micromenu.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\gui\widgets\multi\menu\popupmenu.cpp
 # End Source File
 # Begin Source File
@@ -1866,6 +1870,10 @@ SOURCE=..\include\smooth\gui\widgets\multi\menu\menubarentry.h
 # Begin Source File
 
 SOURCE=..\include\smooth\gui\widgets\multi\menu\menuentry.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\gui\widgets\multi\menu\micromenu.h
 # End Source File
 # Begin Source File
 

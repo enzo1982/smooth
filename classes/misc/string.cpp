@@ -1260,11 +1260,50 @@ S::String S::String::FromFloat(Float value)
 
 S::String S::String::ToLower() const
 {
-	String	 retVal;
+	String	 retVal = *this;
 
 	LockBuffers();
 
-	for (Int i = 0; i < Length(); i++) retVal[i] = towlower((*this)[i]);
+	for (Int i = 0; i < Length(); i++)
+	{
+		if	((*this)[i] >= 0x0041 && (*this)[i] <= 0x005A)				retVal[i] = (*this)[i] + 0x0020; // Latin alphabet
+		else if	((*this)[i] >= 0x00C0 && (*this)[i] <= 0x00D6)				retVal[i] = (*this)[i] + 0x0020; // Latin special letters
+		else if	((*this)[i] >= 0x00D8 && (*this)[i] <= 0x00DE)				retVal[i] = (*this)[i] + 0x0020; // Latin special letters
+		else if	((*this)[i] >= 0x0100 && (*this)[i] <= 0x0136 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x0139 && (*this)[i] <= 0x0147 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x014A && (*this)[i] <= 0x0176 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x0179 && (*this)[i] <= 0x017D &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x0182 && (*this)[i] <= 0x0184 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01A0 && (*this)[i] <= 0x01A4 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01B3 && (*this)[i] <= 0x01B5 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01CD && (*this)[i] <= 0x01DB &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01DE && (*this)[i] <= 0x01EE && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01F8 && (*this)[i] <= 0x0232 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x1E00 && (*this)[i] <= 0x1E94 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x1EA0 && (*this)[i] <= 0x1EF8 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Latin special letters
+		else if	((*this)[i] == 0x0178)							retVal[i] =		 0x00FF; // Latin special letter
+		else if	((*this)[i] == 0x0187)							retVal[i] =		 0x0188; // Latin special letter
+		else if	((*this)[i] == 0x018B)							retVal[i] =		 0x018C; // Latin special letter
+		else if	((*this)[i] == 0x018F)							retVal[i] =		 0x0259; // Latin special letter
+		else if	((*this)[i] == 0x0191)							retVal[i] =		 0x0192; // Latin special letter
+		else if	((*this)[i] == 0x0198)							retVal[i] =		 0x0199; // Latin special letter
+		else if	((*this)[i] == 0x01AC)							retVal[i] =		 0x01AD; // Latin special letter
+		else if	((*this)[i] == 0x01AF)							retVal[i] =		 0x01B0; // Latin special letter
+		else if	((*this)[i] == 0x01B8)							retVal[i] =		 0x01B9; // Latin special letter
+		else if	((*this)[i] == 0x01F4)							retVal[i] =		 0x01F5; // Latin special letter
+		else if	((*this)[i] >= 0x0391 && (*this)[i] <= 0x03AB)				retVal[i] = (*this)[i] + 0x0020; // Greek alphabet
+		else if	((*this)[i] >= 0x0388 && (*this)[i] <= 0x038A)				retVal[i] = (*this)[i] + 0x0025; // Greek special letters
+		else if	((*this)[i] >= 0x038E && (*this)[i] <= 0x038F)				retVal[i] = (*this)[i] + 0x003F; // Greek special letters
+		else if	((*this)[i] >= 0x03DA && (*this)[i] <= 0x03E0 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Greek special letters
+		else if	((*this)[i] == 0x0386)							retVal[i] =		 0x03AC; // Greek special letter
+		else if	((*this)[i] == 0x038C)							retVal[i] =		 0x03CC; // Greek special letter
+		else if	((*this)[i] >= 0x0410 && (*this)[i] <= 0x042F)				retVal[i] = (*this)[i] + 0x0020; // Cyrillic alphabet
+		else if	((*this)[i] >= 0x0400 && (*this)[i] <= 0x040F)				retVal[i] = (*this)[i] + 0x0050; // Cyrillic special letters
+		else if	((*this)[i] >= 0x0460 && (*this)[i] <= 0x0480 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Cyrillic special letters
+		else if	((*this)[i] >= 0x048C && (*this)[i] <= 0x04BE && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Cyrillic special letters
+		else if	((*this)[i] >= 0x04C1 && (*this)[i] <= 0x04CB &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Cyrillic special letters
+		else if	((*this)[i] >= 0x04D0 && (*this)[i] <= 0x04F8 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Cyrillic special letters
+	}
 
 	UnlockBuffers();
 
@@ -1273,11 +1312,50 @@ S::String S::String::ToLower() const
 
 S::String S::String::ToUpper() const
 {
-	String	 retVal;
+	String	 retVal = *this;
 
 	LockBuffers();
 
-	for (Int i = 0; i < Length(); i++) retVal[i] = towupper((*this)[i]);
+	for (Int i = 0; i < Length(); i++)
+	{
+		if	((*this)[i] >= 0x0061 && (*this)[i] <= 0x007A)				retVal[i] = (*this)[i] - 0x0020; // Latin alphabet
+		else if	((*this)[i] >= 0x00E0 && (*this)[i] <= 0x00F6)				retVal[i] = (*this)[i] - 0x0020; // Latin special letters
+		else if	((*this)[i] >= 0x00F8 && (*this)[i] <= 0x00FE)				retVal[i] = (*this)[i] - 0x0020; // Latin special letters
+		else if	((*this)[i] >= 0x0101 && (*this)[i] <= 0x0137 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x013A && (*this)[i] <= 0x0148 && !((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x014B && (*this)[i] <= 0x0177 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x017A && (*this)[i] <= 0x017E && !((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x0183 && (*this)[i] <= 0x0185 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01A1 && (*this)[i] <= 0x01A5 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01B4 && (*this)[i] <= 0x01B6 && !((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01CE && (*this)[i] <= 0x01DC && !((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01DF && (*this)[i] <= 0x01EF &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x01F9 && (*this)[i] <= 0x0233 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x1E01 && (*this)[i] <= 0x1E95 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] >= 0x1EA1 && (*this)[i] <= 0x1EF9 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Latin special letters
+		else if	((*this)[i] == 0x00FF)							retVal[i] =		 0x0178; // Latin special letter
+		else if	((*this)[i] == 0x0188)							retVal[i] =		 0x0187; // Latin special letter
+		else if	((*this)[i] == 0x018C)							retVal[i] =		 0x018B; // Latin special letter
+		else if	((*this)[i] == 0x0259)							retVal[i] =		 0x018F; // Latin special letter
+		else if	((*this)[i] == 0x0192)							retVal[i] =		 0x0191; // Latin special letter
+		else if	((*this)[i] == 0x0199)							retVal[i] =		 0x0198; // Latin special letter
+		else if	((*this)[i] == 0x01AD)							retVal[i] =		 0x01AC; // Latin special letter
+		else if	((*this)[i] == 0x01B0)							retVal[i] =		 0x01AF; // Latin special letter
+		else if	((*this)[i] == 0x01B9)							retVal[i] =		 0x01B8; // Latin special letter
+		else if	((*this)[i] == 0x01F5)							retVal[i] =		 0x01F4; // Latin special letter
+		else if	((*this)[i] >= 0x03B1 && (*this)[i] <= 0x03CB)				retVal[i] = (*this)[i] - 0x0020; // Greek alphabet
+		else if	((*this)[i] >= 0x03AD && (*this)[i] <= 0x03AF)				retVal[i] = (*this)[i] - 0x0025; // Greek special letters
+		else if	((*this)[i] >= 0x03CD && (*this)[i] <= 0x03CE)				retVal[i] = (*this)[i] - 0x003F; // Greek special letters
+		else if	((*this)[i] >= 0x03DB && (*this)[i] <= 0x03E1 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Greek special letters
+		else if	((*this)[i] == 0x03AC)							retVal[i] =		 0x0386; // Greek special letter
+		else if	((*this)[i] == 0x03CC)							retVal[i] =		 0x038C; // Greek special letter
+		else if	((*this)[i] >= 0x0430 && (*this)[i] <= 0x044F)				retVal[i] = (*this)[i] - 0x0020; // Cyrillic alphabet
+		else if	((*this)[i] >= 0x0450 && (*this)[i] <= 0x045F)				retVal[i] = (*this)[i] - 0x0050; // Cyrillic special letters
+		else if	((*this)[i] >= 0x0461 && (*this)[i] <= 0x0481 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Cyrillic special letters
+		else if	((*this)[i] >= 0x048D && (*this)[i] <= 0x04BF &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Cyrillic special letters
+		else if	((*this)[i] >= 0x04C2 && (*this)[i] <= 0x04CC && !((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Cyrillic special letters
+		else if	((*this)[i] >= 0x04D1 && (*this)[i] <= 0x04F9 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Cyrillic special letters
+	}
 
 	UnlockBuffers();
 

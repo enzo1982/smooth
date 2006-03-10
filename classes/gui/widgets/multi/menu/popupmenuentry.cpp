@@ -244,6 +244,8 @@ S::Void S::GUI::PopupMenuEntry::OnClickEntry()
 	if (bVar != NIL) { *bVar = !*bVar; CheckBox::internalCheckValues.Emit(); }
 	if (iVar != NIL) { *iVar = iCode; OptionBox::internalCheckValues.Emit(); }
 
+	owner->internalRequestClose.Emit();
+
 	onAction.Emit();
 }
 
@@ -258,8 +260,15 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 
 	hotspot->Deactivate();
 
-	popup->SetPosition(GetRealPosition() + Point(GetWidth() + 1, -3));
-	popup->internalRequestClose.Connect(&onAction);
+	Widget	*window		= container->GetContainerWindow();
+	Point	 realPos	= GetRealPosition();
+	Point	 popupPos	= realPos + Point(GetWidth(), -3);
+
+	if (window->GetX() + popupPos.x + popup->GetWidth() >= LiSAGetDisplaySizeX()) popupPos.x = realPos.x - popup->GetWidth();
+	if (window->GetY() + popupPos.y + popup->GetHeight() >= LiSAGetDisplaySizeY()) popupPos.y = realPos.y - popup->GetHeight() + GetHeight() + 3;
+
+	popup->SetPosition(popupPos);
+	popup->internalRequestClose.Connect(&owner->internalRequestClose);
 	popup->internalRequestClose.Connect(&PopupMenuEntry::ClosePopupMenu, this);
 
 	owner->SetHasNext(True);
@@ -277,7 +286,7 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 
 		owner->SetHasNext(False);
 
-		popup->internalRequestClose.Disconnect(&onAction);
+		popup->internalRequestClose.Disconnect(&owner->internalRequestClose);
 		popup->internalRequestClose.Disconnect(&PopupMenuEntry::ClosePopupMenu, this);
 
 		hotspot->Activate();

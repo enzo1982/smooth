@@ -43,7 +43,6 @@ S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap 
 {
 	PopupMenuEntry	*newEntry = new PopupMenuEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
 
-	newEntry->onAction.Connect(&internalRequestClose);
 	newEntry->SetOwner(this);
 
 	RegisterObject(newEntry);

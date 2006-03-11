@@ -38,8 +38,11 @@ S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size 
 	cursor->SetFlags(CF_MULTILINE);
 	cursor->SetFont(font);
 	cursor->SetText(iText);
+	cursor->onInput.Connect(&onInput);
 
 	RegisterObject(cursor);
+
+	onInput.SetParentObject(this);
 
 	onChangeSize.Connect(&MultiEdit::OnChangeSize, this);
 }

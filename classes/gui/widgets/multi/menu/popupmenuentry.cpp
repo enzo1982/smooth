@@ -13,6 +13,7 @@
 #include <smooth/gui/widgets/hotspot/hotspot.h>
 #include <smooth/gui/widgets/basic/checkbox.h>
 #include <smooth/gui/widgets/basic/optionbox.h>
+#include <smooth/gui/window/window.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 

@@ -30,35 +30,37 @@ namespace smooth
 		class SMOOTHAPI MultiEdit : public Widget
 		{
 			protected:
-				Cursor			*cursor;
+				Cursor				*cursor;
 
-				Scrollbar		*scrollbar;
-				Int			 scrollbarPos;
+				Scrollbar			*scrollbar;
+				Int				 scrollbarPos;
 			public:
-				static const Int	 classID;
+				static const Int		 classID;
 
-							 MultiEdit(const String &, const Point &, const Size &, Int = 0);
-				virtual			~MultiEdit();
+								 MultiEdit(const String &, const Point &, const Size &, Int = 0);
+				virtual				~MultiEdit();
 
-				virtual Int		 Paint(Int);
+				virtual Int			 Paint(Int);
 
-				virtual Int		 Activate();
-				virtual Int		 Deactivate();
+				virtual Int			 Activate();
+				virtual Int			 Deactivate();
 
-				virtual Int		 SetText(const String &);
-				virtual const String	&GetText();
+				virtual Int			 SetText(const String &);
+				virtual const String		&GetText();
 
-				Int			 GetCursorPos();
+				Int				 GetCursorPos();
 
-				Int			 MarkAll();
+				Int				 MarkAll();
+			signals:
+				Signal1<Void, const String &>	 onInput;
 			slots:
-				Void			 OnScroll();
-				Void			 OnCursorScroll(Int, Int);
+				Void				 OnScroll();
+				Void				 OnCursorScroll(Int, Int);
 
-				Void			 OnChangeSize(const Size &);
+				Void				 OnChangeSize(const Size &);
 
-				Int			 GetNOfLines();
-				Int			 GetNOfInvisibleLines();
+				Int				 GetNOfLines();
+				Int				 GetNOfInvisibleLines();
 		};
 	};
 };

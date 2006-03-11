@@ -9,7 +9,9 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/multi/menu/micromenu.h>
+#include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/widgets/hotspot/simplebutton.h>
+#include <smooth/gui/window/window.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
 
@@ -114,7 +116,14 @@ S::Void S::GUI::MicroMenu::OpenPopupMenu()
 {
 	hotspot->Deactivate();
 
-	popup->SetPosition(GetRealPosition() + Point(subtype == OR_HORZ ? GetWidth() : 0, subtype == OR_VERT ? GetHeight() : 0));
+	Widget	*window		= container->GetContainerWindow();
+	Point	 realPos	= GetRealPosition();
+	Point	 popupPos	= realPos + Point(subtype == OR_HORZ ? GetWidth() : 0, subtype == OR_VERT ? GetHeight() : 0);
+
+	if (window->GetX() + popupPos.x + popup->GetWidth() >= LiSAGetDisplaySizeX()) popupPos.x = realPos.x - popup->GetWidth() + (subtype == OR_VERT ? GetWidth() : 0);
+	if (window->GetY() + popupPos.y + popup->GetHeight() >= LiSAGetDisplaySizeY()) popupPos.y = realPos.y - popup->GetHeight() + (subtype == OR_HORZ ? GetHeight() : 0);
+
+	popup->SetPosition(popupPos);
 	popup->internalRequestClose.Connect(&MicroMenu::ClosePopupMenu, this);
 
 	onOpenPopupMenu.Emit();

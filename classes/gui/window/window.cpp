@@ -583,6 +583,18 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
+			if (LOWORD(wParam) == WA_INACTIVE && focussed)
+			{
+				if (Window::GetWindow((HWND) lParam) != NIL)
+				{
+					if (Window::GetWindow((HWND) lParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) lParam)->GetHandle() >= GetHandle()) break;
+				}
+
+				focussed = False;
+
+				onLoseFocus.Emit();
+			}
+
 			break;
 		case WM_SETFOCUS:
 			if (!focussed)
@@ -594,13 +606,13 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_KILLFOCUS:
-			if (Window::GetWindow((HWND) wParam) != NIL)
-			{
-				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetHandle() >= GetHandle()) break;
-			}
-
 			if (focussed)
 			{
+				if (Window::GetWindow((HWND) wParam) != NIL)
+				{
+					if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetHandle() >= GetHandle()) break;
+				}
+
 				focussed = False;
 
 				onLoseFocus.Emit();

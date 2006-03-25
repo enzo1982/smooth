@@ -127,7 +127,7 @@ S::Int S::Object::RequestClassID()
 
 S::Int S::Object::RequestObjectHandle()
 {
-	return 	nextObjectHandle++;
+	return nextObjectHandle++;
 }
 
 S::Int S::Object::DeleteObject(Object *object)

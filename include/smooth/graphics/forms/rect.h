@@ -39,8 +39,8 @@ namespace smooth
 				Int		 right;
 				Int		 bottom;
 
-						 Rect();
-						 Rect(const Point &, const Size &);
+						 Rect()						{ left = 0; top = 0; right = 0; bottom = 0; }
+						 Rect(const Point &iPos, const Size &iSize)	{ left = iPos.x; top = iPos.y; right = left + iSize.cx; bottom = top + iSize.cy; }
 
 				Rect operator	 +(const Point &) const;
 				Rect operator	 -(const Point &) const;
@@ -55,7 +55,7 @@ namespace smooth
 				Bool operator	 !=(const Rect &) const;
 
 				static Bool	 DoRectsOverlap(const Rect &, const Rect &);
-				static Rect	 OverlapRect(const Rect &, const Rect&);
+				static Rect	 OverlapRect(const Rect &, const Rect &);
 		};
 	};
 };

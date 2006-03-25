@@ -19,7 +19,7 @@ S::GUI::Menu::Menu() : Widget(Point(), Size())
 
 S::GUI::Menu::~Menu()
 {
-	Clear();
+	RemoveAllEntries();
 }
 
 S::Int S::GUI::Menu::RemoveEntry(MenuEntry *entry)
@@ -36,9 +36,48 @@ S::Int S::GUI::Menu::RemoveEntry(MenuEntry *entry)
 	return Error();
 }
 
-S::Int S::GUI::Menu::Clear()
+S::Int S::GUI::Menu::RemoveAllEntries()
 {
-	while (GetNOfObjects()) RemoveEntry((MenuEntry *) GetNthObject(0));
+	Int	 nonMenuEntry = 0;
+
+	while (GetNOfObjects() - nonMenuEntry)
+	{
+		if (GetNthObject(nonMenuEntry)->GetObjectType() != MenuEntry::classID) { nonMenuEntry++; continue; }
+
+		Widget	*widget = GetNthObject(nonMenuEntry);
+
+		UnregisterObject(widget);
+		DeleteObject(widget);
+	}
 
 	return Success();
+}
+
+S::Int S::GUI::Menu::GetNOfEntries()
+{
+	Int	n = 0;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		if (GetNthObject(i)->GetObjectType() != MenuEntry::classID) continue;
+
+		n++;
+	}
+
+	return n;
+}
+
+S::GUI::MenuEntry *S::GUI::Menu::GetNthEntry(Int n)
+{
+	Int	m = 0;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		if (GetNthObject(i)->GetObjectType() != MenuEntry::classID) continue;
+
+		if (m == n) return (MenuEntry *) GetNthObject(i);
+		else	    m++;
+	}
+
+	return NIL;
 }

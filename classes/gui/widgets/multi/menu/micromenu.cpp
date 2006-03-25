@@ -56,9 +56,9 @@ S::Int S::GUI::MicroMenu::RemoveEntry(MenuEntry *entry)
 	return popup->RemoveEntry(entry);
 }
 
-S::Int S::GUI::MicroMenu::Clear()
+S::Int S::GUI::MicroMenu::RemoveAllEntries()
 {
-	return popup->Clear();
+	return popup->RemoveAllEntries();
 }
 
 S::Int S::GUI::MicroMenu::Paint(Int message)

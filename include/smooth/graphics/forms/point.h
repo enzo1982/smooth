@@ -35,8 +35,8 @@ namespace smooth
 				Int		 x;
 				Int		 y;
 
-						 Point();
-						 Point(Int, Int);
+						 Point()		{ x = 0; y = 0; }
+						 Point(Int iX, Int iY)	{ x = iX; y = iY; }
 
 				Point operator	 +(const Point &) const;
 				Point operator	 -(const Point &) const;

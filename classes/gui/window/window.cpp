@@ -43,7 +43,7 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 
 	type = classID;
 
-	nOfActiveWindows++;
+	order = 0;
 
 	if (title != NIL)	text = title;
 	else			text = "smooth Application";
@@ -75,8 +75,7 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 
 S::GUI::Window::~Window()
 {
-	if (created && !destroyed)	backend->Close();
-	else if (!created)		nOfActiveWindows++;
+	if (created && !destroyed) backend->Close();
 
 	UnregisterObject(mainLayer);
 	DeleteObject(mainLayer);
@@ -90,7 +89,7 @@ S::GUI::Window::~Window()
 
 S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 {
-	if (created) backend->SetMetrics(nPos, nSize);
+	if (created && visible) backend->SetMetrics(nPos, nSize);
 
 	Bool	 resized = (GetWidth() != nSize.cx || GetHeight() != nSize.cy);
 	Bool	 prevVisible = visible;
@@ -222,7 +221,11 @@ S::Int S::GUI::Window::RestoreDefaultStatusText()
 
 S::Int S::GUI::Window::Show()
 {
+	order = Object::RequestObjectHandle();
+
 	if (!created) Create();
+
+	backend->SetMetrics(GetPosition(), GetSize());
 
 	if (maximized && !initshow)
 	{
@@ -395,6 +398,8 @@ S::Bool S::GUI::Window::Create()
 	{
 		if (backend->Open(text, GetPosition(), GetSize(), flags) == Success())
 		{
+			if (GetObjectType() != ToolWindow::classID) nOfActiveWindows++;
+
 			created = True;
 			visible = False;
 
@@ -477,15 +482,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 	Int	 rVal = Success();
 
 #ifdef __WIN32__
-	if (trackMenu != NIL && (message == SM_LBUTTONDOWN || message == SM_RBUTTONDOWN || message == WM_KILLFOCUS))
-	{
-		Bool	 destroyPopup = True;
-
-		if (message == WM_KILLFOCUS && Window::GetWindow((HWND) wParam) != NIL) if (Window::GetWindow((HWND) wParam)->GetHandle() >= trackMenu->GetHandle()) destroyPopup = False;
-
-		if (destroyPopup) ClosePopupMenu();
-	}
-
 	switch (message)
 	{
 		case WM_CLOSE:
@@ -504,7 +500,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			}
 			else
 			{
-				nOfActiveWindows--;
+				if (GetObjectType() != ToolWindow::classID) nOfActiveWindows--;
 			}
 
 			rVal = Break;
@@ -513,7 +509,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_QUIT:
 			destroyed = True;
 
-			nOfActiveWindows--;
+			if (GetObjectType() != ToolWindow::classID) nOfActiveWindows--;
 
 			LeaveProtectedRegion();
 
@@ -555,7 +551,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
 
-				SetMetrics(Point(wndpos->x, wndpos->y), Size(wndpos->cx, wndpos->cy));
+				Window::SetMetrics(Point(wndpos->x, wndpos->y), Size(wndpos->cx, wndpos->cy));
 			}
 
 			break;
@@ -572,7 +568,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 					if (object == NIL) continue;
 
-					if (object->GetObjectType() == classID && object->GetHandle() > GetHandle() && (object->GetFlags() & WF_MODAL))
+					if (object->GetObjectType() == classID && ((Window *) object)->GetOrder() > GetOrder() && (object->GetFlags() & WF_MODAL))
 					{
 						SetActiveWindow((HWND) ((Window *) object)->GetSystemWindow());
 
@@ -587,7 +583,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				if (Window::GetWindow((HWND) lParam) != NIL)
 				{
-					if (Window::GetWindow((HWND) lParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) lParam)->GetHandle() >= GetHandle()) break;
+					if (Window::GetWindow((HWND) lParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) lParam)->GetOrder() >= GetOrder()) break;
 				}
 
 				focussed = False;
@@ -610,7 +606,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				if (Window::GetWindow((HWND) wParam) != NIL)
 				{
-					if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetHandle() >= GetHandle()) break;
+					if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetOrder() >= GetOrder()) break;
 				}
 
 				focussed = False;
@@ -628,8 +624,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (GetWindow(actWnd) == NIL)					activate = False;
 				else if (GetWindow(actWnd)->type == ToolWindow::classID)	break;
-				else if (GetWindow(actWnd)->GetHandle() < GetHandle())		activate = True;
-				else if (GetWindow(actWnd)->GetHandle() > GetHandle())		GetWindow(actWnd)->SetFlags(WF_MODAL);
+				else if (GetWindow(actWnd)->GetOrder() < GetOrder())		activate = True;
+				else if (GetWindow(actWnd)->GetOrder() > GetOrder())		GetWindow(actWnd)->SetFlags(WF_MODAL);
 
 				if (activate && message == WM_ACTIVATEAPP)
 				{
@@ -681,8 +677,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (GetWindow(actWnd) == NIL)					activate = True;
 				else if (GetWindow(actWnd)->type == ToolWindow::classID)	activate = False;
-				else if (GetWindow(actWnd)->GetHandle() < GetHandle())		activate = True;
-				else if (GetWindow(actWnd)->GetHandle() > GetHandle())		GetWindow(actWnd)->SetFlags(WF_SYSTEMMODAL);
+				else if (GetWindow(actWnd)->GetOrder() < GetOrder())		activate = True;
+				else if (GetWindow(actWnd)->GetOrder() > GetOrder())		GetWindow(actWnd)->SetFlags(WF_SYSTEMMODAL);
 
 				if (activate)
 				{

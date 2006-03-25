@@ -10,11 +10,6 @@
 
 #include <smooth/errors/success.h>
 
-S::Errors::Success::Success()
-{
-	code = 0;
-}
-
 S::String S::Errors::Success::ToString()
 {
 	return "Operation successful";

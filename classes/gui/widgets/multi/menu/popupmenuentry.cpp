@@ -293,3 +293,9 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 		hotspot->Activate();
 	}
 }
+
+S::Bool S::GUI::PopupMenuEntry::IsTypeCompatible(Int compType)
+{
+	if (compType == Object::classID || compType == Widget::classID || compType == MenuEntry::classID)	return True;
+	else													return False;
+}

@@ -34,8 +34,8 @@ namespace smooth
 				Int		 ex;
 				Int		 ey;
 
-						 Line();
-						 Line(const Point &, const Point &);
+						 Line()						{ sx = 0; sy = 0; ex = 0; ey = 0; }
+						 Line(const Point &iStart, const Point &iEnd)	{ sx = iStart.x; sy = iStart.y; ex = iEnd.x; ey = iEnd.y; }
 
 				Bool operator	 ==(const Line &) const;
 				Bool operator	 !=(const Line &) const;

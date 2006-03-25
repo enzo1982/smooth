@@ -31,11 +31,11 @@ namespace smooth
 			protected:
 				UnsignedLong	 color;
 			public:
-						 Form();
-				virtual		~Form();
+						 Form()				{ color = 0; }
+				virtual		~Form()				{ }
 
-				Int		 SetColor(UnsignedLong);
-				UnsignedLong	 GetColor();
+				Int		 SetColor(UnsignedLong nColor)	{ color = nColor; return Success(); }
+				UnsignedLong	 GetColor() const		{ return color; }
 
 				virtual Int	 Draw(GUI::Surface *);
 		};

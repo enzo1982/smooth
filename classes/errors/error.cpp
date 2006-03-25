@@ -10,28 +10,9 @@
 
 #include <smooth/errors/error.h>
 
-S::Errors::Error::Error()
-{
-	code = -1;
-}
-
-S::Errors::Error::Error(const Error &oError)
-{
-	code = oError.code;
-}
-
-S::Errors::Error::~Error()
-{
-}
-
 S::String S::Errors::Error::ToString()
 {
 	return "Unknown error";
-}
-
-S::Errors::Error::operator S::Int() const
-{
-	return code;
 }
 
 S::Bool S::Errors::Error::operator ==(const Error &error) const

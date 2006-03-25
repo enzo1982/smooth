@@ -522,7 +522,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 		case WM_KILLFOCUS:
 			if (Window::GetWindow((HWND) wParam) != NIL)
 			{
-				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetHandle() >= window->GetHandle()) break;
+				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetOrder() >= window->GetOrder()) break;
 			}
 		case WM_ACTIVATEAPP:
 			DeactivateTooltip();

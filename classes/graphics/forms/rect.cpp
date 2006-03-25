@@ -11,22 +11,6 @@
 #include <smooth/graphics/forms/rect.h>
 #include <smooth/misc/math.h>
 
-S::GUI::Rect::Rect()
-{
-	left	= 0;
-	top	= 0;
-	right	= 0;
-	bottom	= 0;
-}
-
-S::GUI::Rect::Rect(const Point &iPos, const Size &iSize)
-{
-	left	= iPos.x;
-	top	= iPos.y;
-	right	= left + iSize.cx;
-	bottom	= top + iSize.cy;
-}
-
 S::GUI::Rect S::GUI::Rect::operator +(const Point &point) const
 {
 	Rect	 retR(Point(left, top) + point, Size(right - left, bottom - top));
@@ -108,14 +92,8 @@ S::GUI::Rect &S::GUI::Rect::operator =(const RECT &rect)
 
 S::Bool S::GUI::Rect::DoRectsOverlap(const Rect &rect1, const Rect &rect2)
 {
-	if ((rect1.left < rect2.right) && (rect1.right > rect2.left) && (rect1.top < rect2.bottom) && (rect1.bottom > rect2.top))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	if ((rect1.left < rect2.right) && (rect1.right > rect2.left) && (rect1.top < rect2.bottom) && (rect1.bottom > rect2.top)) return true;
+	else															  return false;
 }
 
 S::GUI::Rect S::GUI::Rect::OverlapRect(const Rect &rect1, const Rect &rect2)

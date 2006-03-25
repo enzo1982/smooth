@@ -33,8 +33,11 @@ S::GUI::Bitmap S::GUI::ImageLoader::Load(const String &fileName)
 
 	delete loader;
 
-	if (bitmap == NIL) bitmap = Load(Application::GetStartupDirectory().Append(fileName));
-	if (bitmap == NIL) bitmap = Load(Application::GetApplicationDirectory().Append(fileName));
+	if (!fileName.StartsWith(Application::GetStartupDirectory()) && !fileName.StartsWith(Application::GetApplicationDirectory()))
+	{
+		if (bitmap == NIL) bitmap = Load(Application::GetStartupDirectory().Append(fileName));
+		if (bitmap == NIL) bitmap = Load(Application::GetApplicationDirectory().Append(fileName));
+	}
 
 	return bitmap;
 }

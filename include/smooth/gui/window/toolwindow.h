@@ -35,6 +35,8 @@ namespace smooth
 							 ToolWindow(const Point &, const Size &);
 				virtual			~ToolWindow();
 
+				virtual Int		 SetMetrics(const Point &, const Size &);
+
 				virtual Bool		 IsTypeCompatible(Int);
 		};
 	};

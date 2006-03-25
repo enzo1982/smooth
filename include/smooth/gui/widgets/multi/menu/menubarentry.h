@@ -39,6 +39,8 @@ namespace smooth
 				virtual			~MenubarEntry();
 
 				virtual Int		 Paint(Int);
+
+				Bool			 IsTypeCompatible(Int);
 			slots:
 				Void			 OnMouseOver();
 

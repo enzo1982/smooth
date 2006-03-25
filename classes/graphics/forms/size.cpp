@@ -11,18 +11,6 @@
 #include <smooth/graphics/forms/size.h>
 #include <smooth/misc/math.h>
 
-S::GUI::Size::Size()
-{
-	cx = 0;
-	cy = 0;
-}
-
-S::GUI::Size::Size(Int iCX, Int iCY)
-{
-	cx = iCX;
-	cy = iCY;
-}
-
 S::GUI::Size S::GUI::Size::operator +(const Size &size) const
 {
 	Size	 retS(cx + size.cx, cy + size.cy);

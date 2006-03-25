@@ -320,6 +320,8 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 {
 	Clean();
 
+	if (str == NIL) return Success();
+
 	Int	 width = 1;
 
 	if	(strncmp(format, "UCS-4", 5)		== 0)	width = 4;
@@ -1426,8 +1428,13 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		else if (strcmp(inEncoding, "ISO-8859-9") == 0)		codePage = 28599;
 		else if (strcmp(inEncoding, "ISO-8859-15") == 0)	codePage = 28605;
 		else if (strcmp(inEncoding, "KOI8-R") == 0)		codePage = 20866;
-		else if (strcmp(inEncoding, "KOI8-RU") == 0)		codePage = 21866;
+		else if (strcmp(inEncoding, "KOI8-U") == 0)		codePage = 21866;
+		else if (strcmp(inEncoding, "SHIFT-JIS") == 0)		codePage = 932;
 		else if (strcmp(inEncoding, "GBK") == 0)		codePage = 936;
+		else if (strcmp(inEncoding, "BIG-5") == 0)		codePage = 950;
+		else if (strcmp(inEncoding, "ISO-2022-JP") == 0)	codePage = 50220;
+		else if (strcmp(inEncoding, "ISO-2022-KR") == 0)	codePage = 50225;
+		else if (strcmp(inEncoding, "ISO-2022-CN") == 0)	codePage = 50227;
 
 		size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * 2;
 
@@ -1455,8 +1462,13 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		else if (strcmp(outEncoding, "ISO-8859-9") == 0)	codePage = 28599;
 		else if (strcmp(outEncoding, "ISO-8859-15") == 0)	codePage = 28605;
 		else if (strcmp(outEncoding, "KOI8-R") == 0)		codePage = 20866;
-		else if (strcmp(outEncoding, "KOI8-RU") == 0)		codePage = 21866;
+		else if (strcmp(outEncoding, "KOI8-U") == 0)		codePage = 21866;
+		else if (strcmp(outEncoding, "SHIFT-JIS") == 0)		codePage = 932;
 		else if (strcmp(outEncoding, "GBK") == 0)		codePage = 936;
+		else if (strcmp(outEncoding, "BIG-5") == 0)		codePage = 950;
+		else if (strcmp(outEncoding, "ISO-2022-JP") == 0)	codePage = 50220;
+		else if (strcmp(outEncoding, "ISO-2022-KR") == 0)	codePage = 50225;
+		else if (strcmp(outEncoding, "ISO-2022-CN") == 0)	codePage = 50227;
 
 		size = WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
 

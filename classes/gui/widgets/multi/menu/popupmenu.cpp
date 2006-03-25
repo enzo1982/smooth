@@ -27,7 +27,12 @@ S::GUI::PopupMenu::PopupMenu()
 
 	hasNext		= False;
 
-	toolWindow	= NIL;
+	toolWindow = new ToolWindow(GetPosition(), GetSize());
+	toolWindow->Hide();
+	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
+	toolWindow->onLoseFocus.Connect(&internalRequestClose);
+
+	RegisterObject(toolWindow);
 
 	internalRequestClose.SetParentObject(this);
 
@@ -36,6 +41,8 @@ S::GUI::PopupMenu::PopupMenu()
 
 S::GUI::PopupMenu::~PopupMenu()
 {
+	if (toolWindow != NIL) DeleteObject(toolWindow);
+
 	internalOnOpenPopupMenu.Disconnect(&PopupMenu::OnOpenPopupMenu, this);
 }
 
@@ -55,6 +62,8 @@ S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap 
 	{
 		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
 
+		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
+
 		SetWidth(Math::Max(GetWidth(), 6 + entry->GetWidth()));
 		SetHeight(GetHeight() + 5 + (entry->GetText() != NIL ? 11 : 0));
 
@@ -66,6 +75,8 @@ S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap 
 	for (Int j = 0; j < GetNOfObjects(); j++)
 	{
 		MenuEntry	*entry = (MenuEntry *) GetNthObject(j);
+
+		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
 		entry->SetWidth(GetWidth() - 6);
 	}
@@ -83,10 +94,6 @@ S::Int S::GUI::PopupMenu::Show()
 
 	hasNext = False;
 
-	toolWindow = new ToolWindow(GetPosition(), GetSize());
-	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
-	toolWindow->onLoseFocus.Connect(&internalRequestClose);
-
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
@@ -102,7 +109,8 @@ S::Int S::GUI::PopupMenu::Show()
 
 	internalOnOpenPopupMenu.Emit(GetHandle());
 
-	RegisterObject(toolWindow);
+	toolWindow->SetMetrics(GetPosition(), GetSize());
+	toolWindow->Show();
 
 	onShow.Emit();
 
@@ -117,27 +125,20 @@ S::Int S::GUI::PopupMenu::Hide()
 
 	if (!IsRegistered()) return Success();
 
-	if (toolWindow != NIL)
+	toolWindow->Hide();
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		UnregisterObject(toolWindow);
+		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
 
-		for (Int i = 0; i < GetNOfObjects(); i++)
-		{
-			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
-			if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
+		toolWindow->UnregisterObject(entry);
 
-			toolWindow->UnregisterObject(entry);
+		entry->SetRegisteredFlag(True);
+		entry->SetContainer(this);
 
-			entry->SetRegisteredFlag(True);
-			entry->SetContainer(this);
-
-			entry->Deactivate();
-		}
-
-		DeleteObject(toolWindow);
-
-		toolWindow = NIL;
+		entry->Deactivate();
 	}
 
 	onHide.Emit();

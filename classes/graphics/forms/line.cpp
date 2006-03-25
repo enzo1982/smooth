@@ -10,22 +10,6 @@
 
 #include <smooth/graphics/forms/line.h>
 
-S::GUI::Line::Line()
-{
-	sx = 0;
-	sy = 0;
-	ex = 0;
-	ey = 0;
-}
-
-S::GUI::Line::Line(const Point &iStart, const Point &iEnd)
-{
-	sx = iStart.x;
-	sy = iStart.y;
-	ex = iEnd.x;
-	ey = iEnd.y;
-}
-
 S::Bool S::GUI::Line::operator ==(const Line &line) const
 {
 	if (sx == line.sx && sy == line.sy && ex == line.ex && ey == line.ey)	return True;

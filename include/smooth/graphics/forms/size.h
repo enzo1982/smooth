@@ -35,8 +35,8 @@ namespace smooth
 				Int		 cx;
 				Int		 cy;
 
-						 Size();
-						 Size(Int, Int);
+						 Size()			{ cx = 0; cy = 0; }
+						 Size(Int iCX, Int iCY)	{ cx = iCX; cy = iCY; }
 
 				Size operator	 +(const Size &) const;
 				Size operator	 -(const Size &) const;

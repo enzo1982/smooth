@@ -162,10 +162,6 @@ S::Int S::Loop()
 {
 	if (!loopActive)
 	{
-#ifdef __WIN32__
-		if (GUI::Window::nOfActiveWindows == 0) PostQuitMessage(0);
-#endif
-
 		initializing = false;
 		loopActive = true;
 
@@ -197,6 +193,10 @@ S::Int S::Loop()
 			}
 		}
 	}
+
+#ifdef __WIN32__
+	if (GUI::Window::nOfActiveWindows == 0) PostQuitMessage(0);
+#endif
 
 	System::EventProcessor	*event = new System::EventProcessor();
 	Bool			 quit = False;

@@ -94,6 +94,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			else
 			{
 				scrollbar->Hide();
+
+				scrollbarPos = 0;
 			}
 
 			if (IsActive())	surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::ClientColor, FILLED);

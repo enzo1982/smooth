@@ -65,7 +65,6 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 	switch (message)
 	{
-		default:
 		case SP_PAINT:
 			if (text == NIL && bitmap == NIL)
 			{
@@ -134,7 +133,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 			break;
 		case SP_MOUSEIN:
 		case SP_MOUSEUP:
-			if (focussed && popup != NIL) break;
+			if (focussed && popup != NIL) if (popup->GetContainer() == this) break;
 
 			if (bitmap != NIL)
 			{
@@ -151,7 +150,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 			break;
 		case SP_MOUSEOUT:
-			if (focussed && popup != NIL) break;
+			if (focussed && popup != NIL) if (popup->GetContainer() == this) break;
 
 			if (bitmap != NIL)
 			{
@@ -222,6 +221,17 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 
 		popup->internalRequestClose.Disconnect(&MenubarEntry::ClosePopupMenu, this);
 
+		Window	*window	= container->GetContainerWindow();
+		Rect	 frame	= Rect(GetRealPosition(), GetSize());
+
+		if (!window->IsMouseOn(frame)) Paint(SP_MOUSEOUT);
+
 		hotspot->Activate();
 	}
+}
+
+S::Bool S::GUI::MenubarEntry::IsTypeCompatible(Int compType)
+{
+	if (compType == Object::classID || compType == Widget::classID || compType == MenuEntry::classID)	return True;
+	else													return False;
 }

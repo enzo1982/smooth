@@ -28,7 +28,7 @@ namespace smooth
 		class SMOOTHAPI Success : public Error
 		{
 			public:
-						 Success();
+						 Success()	{ code = 0; }
 
 				virtual String	 ToString();
 		};

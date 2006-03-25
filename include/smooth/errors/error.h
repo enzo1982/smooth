@@ -32,14 +32,14 @@ namespace smooth
 			protected:
 				Int			 code;
 			public:
-							 Error();
-							 Error(const Error &);
+							 Error()			{ code = -1; }
+							 Error(const Error &oError)	{ code = oError.code; }
 
-				virtual			~Error();
+				virtual			~Error()			{ }
 
 				virtual String		 ToString();
 
-				virtual operator	 Int() const;
+				operator		 Int() const			{ return code; }
 
 				virtual Bool operator	 ==(const Error &) const;
 				virtual Bool operator	 !=(const Error &) const;

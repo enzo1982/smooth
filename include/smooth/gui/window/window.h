@@ -43,6 +43,8 @@ namespace smooth
 
 		class SMOOTHAPI Window : public Widget
 		{
+			private:
+				Int				 order;
 			protected:
 				WindowBackend			*backend;
 
@@ -79,10 +81,12 @@ namespace smooth
 								 Window(const String &, const Point &, const Size &, Void * = NIL);
 				virtual				~Window();
 
+				Int				 GetOrder()			 { return order; }
+
 				Int				 SetIcon(const Bitmap &);
 				Bitmap				&GetIcon();
 
-				Int				 SetMetrics(const Point &, const Size &);
+				virtual Int			 SetMetrics(const Point &, const Size &);
 
 				Int				 SetText(const String &);
 

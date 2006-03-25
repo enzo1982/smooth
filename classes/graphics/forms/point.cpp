@@ -11,18 +11,6 @@
 #include <smooth/graphics/forms/point.h>
 #include <smooth/misc/math.h>
 
-S::GUI::Point::Point()
-{
-	x = 0;
-	y = 0;
-}
-
-S::GUI::Point::Point(Int iX, Int iY)
-{
-	x = iX;
-	y = iY;
-}
-
 S::GUI::Point S::GUI::Point::operator +(const Point &point) const
 {
 	Point	 retP(x + point.x, y + point.y);

@@ -29,16 +29,38 @@ S::GUI::ToolWindow::~ToolWindow()
 
 S::Bool S::GUI::ToolWindow::Create()
 {
-	Window	*containerWindow = container->GetContainerWindow();
-
-	if (containerWindow != NIL)
+	if (IsRegistered())
 	{
-		if (Setup::rightToLeft) SetPosition(Point(containerWindow->GetWidth() - (GetX() + GetWidth()), GetY()));
+		Window	*containerWindow = container->GetContainerWindow();
 
-		SetPosition(GetPosition() + containerWindow->GetPosition());
+		if (containerWindow != NIL)
+		{
+			if (Setup::rightToLeft) Window::SetMetrics(Point(containerWindow->GetWidth() - (GetX() + GetWidth()), GetY()), GetSize());
+
+			Window::SetMetrics(GetPosition() + containerWindow->GetPosition(), GetSize());
+		}
 	}
 
 	return Window::Create();
+}
+
+S::Int S::GUI::ToolWindow::SetMetrics(const Point &nPos, const Size &nSize)
+{
+	Point	 position = nPos;
+
+	if (IsRegistered() && created)
+	{
+		Window	*containerWindow = container->GetContainerWindow();
+
+		if (containerWindow != NIL)
+		{
+			if (Setup::rightToLeft) position.x = containerWindow->GetWidth() - (nPos.x + nSize.cx);
+
+			position += containerWindow->GetPosition();
+		}
+	}
+
+	return Window::SetMetrics(position, nSize);
 }
 
 S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType)

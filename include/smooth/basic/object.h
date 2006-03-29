@@ -45,7 +45,7 @@ namespace smooth
 			String				 name;
 
 			Bool				 deleteObject;
-			Int				 isObjectInUse;
+			mutable Int			 isObjectInUse;
 
 			Int				 refCount;
 			Threads::Mutex			*objMutex;
@@ -54,8 +54,8 @@ namespace smooth
 
 			Int				 flags;
 
-			Int				 EnterProtectedRegion()		{ return ++isObjectInUse; }
-			Int				 LeaveProtectedRegion()		{ return --isObjectInUse; }
+			Int				 EnterProtectedRegion() const	{ return ++isObjectInUse; }
+			Int				 LeaveProtectedRegion() const	{ return --isObjectInUse; }
 		public:
 			static const Int		 classID;
 
@@ -73,20 +73,20 @@ namespace smooth
 							 Object();
 			virtual				~Object();
 
-			Int				 GetHandle();
+			Int				 GetHandle() const		{ return handle; }
 
 			Int				 SetName(const String &);
-			const String			&GetName();
+			const String			&GetName() const		{ return name; }
 
-			Int				 SetFlags(Int);
-			Int				 GetFlags();
+			Int				 SetFlags(Int nFlags)		{ flags = nFlags; return Errors::Success(); }
+			Int				 GetFlags() const		{ return flags; }
 
-			virtual String			 ToString();
+			virtual String			 ToString() const		{ return "an Object"; }
 
-			operator			 String();
+			operator			 String() const			{ return ToString(); }
 
-			const ObjectType		&GetObjectType();
-			virtual Bool			 IsTypeCompatible(Int);
+			const ObjectType		&GetObjectType() const		{ return type; }
+			virtual Bool			 IsTypeCompatible(Int) const;
 
 			Bool				 IsObjectInUse() const		{ return isObjectInUse > 0; }
 			Bool				 IsObjectDeletable() const	{ return deleteObject; }

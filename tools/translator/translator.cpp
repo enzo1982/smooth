@@ -120,9 +120,9 @@ Translator::Translator(const String &openFile)
 	menu_file->AddEntry("New")->onAction.Connect(&Translator::NewFile, this);
 	menu_file->AddEntry("Close")->onAction.Connect(&Translator::Close, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("Open")->onAction.Connect(&Translator::OpenFile, this);
+	menu_file->AddEntry("Open...")->onAction.Connect(&Translator::OpenFile, this);
 	menu_file->AddEntry("Save")->onAction.Connect(&Translator::SaveFile, this);
-	menu_file->AddEntry("Save as")->onAction.Connect(&Translator::SaveFileAs, this);
+	menu_file->AddEntry("Save as...")->onAction.Connect(&Translator::SaveFileAs, this);
 	menu_file->AddEntry();
 	menu_file->AddEntry("Exit")->onAction.Connect(&Window::Close, wnd);
 

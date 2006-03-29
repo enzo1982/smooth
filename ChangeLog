@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.xx.06 xx:xx - smooth alpha 0.8.67.0
+29.03.06 13:23 - smooth alpha 0.8.67.0
 
 - listentry.cpp	- ListEntries are now Widgets
 - list.cpp	- List now derives from Container

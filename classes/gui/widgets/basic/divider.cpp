@@ -52,8 +52,6 @@ S::Int S::GUI::Divider::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
 	Window	*wnd	 = container->GetContainerWindow();
 	Surface	*surface = container->GetDrawSurface();
 	Point	 doubleBar1;
@@ -169,8 +167,6 @@ S::Int S::GUI::Divider::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

@@ -37,7 +37,7 @@ namespace smooth
 
 				virtual Int		 SetMetrics(const Point &, const Size &);
 
-				virtual Bool		 IsTypeCompatible(Int);
+				virtual Bool		 IsTypeCompatible(Int) const;
 		};
 	};
 };

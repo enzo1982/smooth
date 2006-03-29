@@ -41,22 +41,20 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface = container->GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			surface->Box(frame, areaColor, FILLED);
-			surface->Frame(frame, FRAME_DOWN);
+			{
+				Surface	*surface = container->GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+
+				surface->Box(frame, areaColor, FILLED);
+				surface->Frame(frame, FRAME_DOWN);
+			}
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

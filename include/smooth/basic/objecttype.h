@@ -30,8 +30,8 @@ namespace smooth
 					 ObjectType(Object *);
 					 ObjectType(const ObjectType &);
 
-			operator	 Int() const;
-			Int operator	 =(Int);
+			operator	 Int() const		{ return type; }
+			Int operator	 =(Int newType)		{ type = newType; return type; }
 
 			Bool operator	 ==(Int) const;
 			Bool operator	 !=(Int) const;

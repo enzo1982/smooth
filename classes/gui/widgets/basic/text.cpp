@@ -31,25 +31,23 @@ S::Int S::GUI::Text::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface = container->GetDrawSurface();
-	Font	 nFont	 = font;
-
 	SetSize(textSize + Size(0, 1));
 
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+			{
+				Surface	*surface = container->GetDrawSurface();
+				Font	 nFont	 = font;
 
-			surface->SetText(text, Rect(GetRealPosition(), Size(textSize.cx, Math::Round(textSize.cy * 1.2))), nFont);
+				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+
+				surface->SetText(text, Rect(GetRealPosition(), Size(textSize.cx, Math::Round(textSize.cy * 1.2))), nFont);
+			}
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

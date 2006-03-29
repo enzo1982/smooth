@@ -49,27 +49,3 @@ S::Bool S::IO::Stream::SetDefaultPackageSize(Int nDefaultPackageSize)
 
 	return false;
 }
-
-S::Int S::IO::Stream::GetStreamType()
-{
-	return streamType;
-}
-
-S::Int64 S::IO::Stream::Size()
-{
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
-
-	return size;
-}
-
-S::Int64 S::IO::Stream::GetPos()
-{
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
-
-	return currentFilePos;
-}
-
-S::Int S::IO::Stream::GetLastError()
-{
-	return lastError;
-}

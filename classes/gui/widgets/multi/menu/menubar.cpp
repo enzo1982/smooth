@@ -44,8 +44,6 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
 	Window	*window = container->GetContainerWindow();
 
 	if (orientation == OR_TOP || orientation == OR_BOTTOM)
@@ -172,8 +170,6 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Widget::Paint(message);
 }

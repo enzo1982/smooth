@@ -59,15 +59,15 @@ namespace smooth
 				Driver			*driver;
 				Array<Filter *, Void *>	 filters;
 
-				Int			 lastError;
+				mutable Int		 lastError;
 			public:
 				static Bool		 SetDefaultPackageSize	(Int);
 
-				Int64			 Size			();
+				Int64			 Size() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return size; }
+				Int64			 GetPos() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return currentFilePos; }
 
-				Int64			 GetPos			();
-				Int			 GetStreamType		();
-				Int			 GetLastError		();
+				Int			 GetStreamType() const	{ return streamType; }
+				Int			 GetLastError() const	{ return lastError; }
 
 							 Stream			();
 							~Stream			();

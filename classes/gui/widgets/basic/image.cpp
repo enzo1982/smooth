@@ -29,21 +29,19 @@ S::Int S::GUI::Image::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface	= container->GetDrawSurface();
-	Rect	 bmpRect	= Rect(GetRealPosition(), GetSize());
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), GetSize()), bmpRect);
+			{
+				Surface	*surface = container->GetDrawSurface();
+				Rect	 bmpRect = Rect(GetRealPosition(), GetSize());
+
+				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), GetSize()), bmpRect);
+			}
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

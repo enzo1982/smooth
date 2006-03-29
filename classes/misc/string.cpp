@@ -1435,6 +1435,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		else if (strcmp(inEncoding, "ISO-2022-JP") == 0)	codePage = 50220;
 		else if (strcmp(inEncoding, "ISO-2022-KR") == 0)	codePage = 50225;
 		else if (strcmp(inEncoding, "ISO-2022-CN") == 0)	codePage = 50227;
+		else if (inEncoding[0] == 'C' && inEncoding[1] == 'P')	codePage = String(inEncoding + 2).ToInt();
 
 		size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * 2;
 
@@ -1469,6 +1470,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		else if (strcmp(outEncoding, "ISO-2022-JP") == 0)	codePage = 50220;
 		else if (strcmp(outEncoding, "ISO-2022-KR") == 0)	codePage = 50225;
 		else if (strcmp(outEncoding, "ISO-2022-CN") == 0)	codePage = 50227;
+		else if (outEncoding[0] == 'C' && outEncoding[1] == 'P')codePage = String(outEncoding + 2).ToInt();
 
 		size = WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
 

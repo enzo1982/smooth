@@ -112,18 +112,20 @@ S::Int S::GUI::Layer::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Surface	*surface	= container->GetDrawSurface();
-	Rect	 updateRect	= container->GetContainerWindow()->GetUpdateRect();
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (GetBackgroundColor() != -1)
 			{
-				Rect	 frame = Rect(GetRealPosition(), GetSize());
+				Surface	*surface	= container->GetDrawSurface();
+				Rect	 updateRect	= container->GetContainerWindow()->GetUpdateRect();
 
-				surface->Box(Rect::OverlapRect(frame, updateRect), GetBackgroundColor(), FILLED);
+				if (GetBackgroundColor() != -1)
+				{
+					Rect	 frame = Rect(GetRealPosition(), GetSize());
+
+					surface->Box(Rect::OverlapRect(frame, updateRect), GetBackgroundColor(), FILLED);
+				}
 			}
 
 			break;

@@ -45,7 +45,7 @@ namespace smooth
 				virtual Int		 Show();
 				virtual Int		 Hide();
 
-				Bool			 IsTypeCompatible(Int);
+				Bool			 IsTypeCompatible(Int) const;
 			accessors:
 				Void			 SetOwner(PopupMenu *nOwner)	{ owner = nOwner; }
 			slots:

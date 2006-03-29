@@ -78,8 +78,6 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), GetSize());
 	Int	 arrowColor	= Setup::TextColor;
@@ -143,8 +141,6 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

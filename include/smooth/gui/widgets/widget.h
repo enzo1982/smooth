@@ -70,6 +70,8 @@ namespace smooth
 				Bool				 active;
 				Bool				 focussed;
 
+				Bool				 alwaysActive;
+
 				Bool				 mouseOver;
 
 				Bool				 leftButtonDown;
@@ -131,7 +133,10 @@ namespace smooth
 			accessors:
 				Bool				 IsRegistered() const		{ return registered; }
 				Bool				 IsVisible() const		{ if (!registered) return visible; if (!visible) return False; return container->IsVisible(); }
-				Bool				 IsActive() const		{ if (!registered) return active; if (!active) return False; return container->IsActive(); }
+				Bool				 IsActive() const		{ if (!registered) return active; if (!active) return False; if (alwaysActive) return True; return container->IsActive(); }
+
+				Int				 SetAlwaysActive(Bool nValue)	{ alwaysActive = nValue; return Success(); }
+				Bool				 IsAlwaysActive() const		{ return alwaysActive; }
 
 				Bool				 IsMouseOver() const		{ return mouseOver; }
 

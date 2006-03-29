@@ -58,15 +58,13 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
 	String	 visibleEntries;
 
-	if (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER))	header->Show();
-	else							header->Hide();
+	if (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER)) header->Show();
+	else						  header->Hide();
 
 	Int	 entriesHeight	= (header->IsVisible() ? 16 : 0) + 4;
 
@@ -164,8 +162,6 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

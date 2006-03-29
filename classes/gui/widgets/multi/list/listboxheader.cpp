@@ -90,43 +90,41 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface	= container->GetDrawSurface();
-	Point	 realPos	= GetRealPosition();
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			surface->Box(frame, Setup::BackgroundColor, FILLED);
-			surface->Frame(frame, FRAME_UP);
-
-			for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
 			{
-				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)) + 1, realPos.x + GetWidth());
+				Surface	*surface = container->GetDrawSurface();
+				Point	 realPos = GetRealPosition();
+				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
 				surface->Box(frame, Setup::BackgroundColor, FILLED);
 				surface->Frame(frame, FRAME_UP);
 
-				frame.left += 3;
-				frame.top += 1;
+				for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
+				{
+					frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)) + 1, realPos.x + GetWidth());
 
-				Font	 nFont = font;
+					surface->Box(frame, Setup::BackgroundColor, FILLED);
+					surface->Frame(frame, FRAME_UP);
 
-				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+					frame.left += 3;
+					frame.top += 1;
 
-				surface->SetText(tabNames.GetNthEntry(i), frame, nFont);
+					Font	 nFont = font;
 
-				frame.top -= 1;
-				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) - 2);
+					if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+
+					surface->SetText(tabNames.GetNthEntry(i), frame, nFont);
+
+					frame.top -= 1;
+					frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) - 2);
+				}
 			}
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

@@ -20,12 +20,12 @@ namespace smooth
 		protected:
 			Object	*parent;
 
-			Void ProtectParent()
+			Void ProtectParent() const
 			{
 				if (parent != NIL) parent->EnterProtectedRegion();
 			}
 
-			Void UnprotectParent()
+			Void UnprotectParent() const
 			{
 				if (parent != NIL) parent->LeaveProtectedRegion();
 			}

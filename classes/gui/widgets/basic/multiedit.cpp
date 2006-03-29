@@ -59,28 +59,22 @@ S::Int S::GUI::MultiEdit::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface	= container->GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			surface->StartPaint(frame);
+			{
+				Surface	*surface = container->GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
-			if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
-			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+				if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
+				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
 
-			surface->Frame(frame, FRAME_DOWN);
-
-			surface->EndPaint();
+				surface->Frame(frame, FRAME_DOWN);
+			}
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Widget::Paint(message);
 }
@@ -159,6 +153,7 @@ S::Void S::GUI::MultiEdit::OnCursorScroll(Int scrollPos, Int maxScrollPos)
 		scrollbar = new Scrollbar(Point(18, 1), Size(0, GetHeight() - 2), OR_VERT, &scrollbarPos, 0, maxScrollPos);
 		scrollbar->onValueChange.Connect(&MultiEdit::OnScroll, this);
 		scrollbar->SetOrientation(OR_UPPERRIGHT);
+		scrollbar->SetAlwaysActive(True);
 
 		RegisterObject(scrollbar);
 

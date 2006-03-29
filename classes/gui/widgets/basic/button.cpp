@@ -48,61 +48,59 @@ S::Int S::GUI::Button::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface = container->GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (!(flags & BF_NOFRAME))
 			{
-				surface->Frame(frame, FRAME_DOWN);
-				surface->Frame(Rect(GetRealPosition() + Point(1, 1), GetSize() - Size(2, 2)), FRAME_UP);
-			}
+				Surface	*surface = container->GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
-			if (GetBackgroundColor() >= 0) surface->Box(frame, GetBackgroundColor(), FILLED);
+				if (!(flags & BF_NOFRAME))
+				{
+					surface->Frame(frame, FRAME_DOWN);
+					surface->Frame(Rect(GetRealPosition() + Point(1, 1), GetSize() - Size(2, 2)), FRAME_UP);
+				}
 
-			if (text != NIL)
-			{
-				Rect	 textRect;
+				if (GetBackgroundColor() >= 0) surface->Box(frame, GetBackgroundColor(), FILLED);
 
-				textRect.left	= frame.left + ((GetWidth() - textSize.cx) / 2);
+				if (text != NIL)
+				{
+					Rect	 textRect;
 
-				if (bitmap != NIL) textRect.left = frame.left + ((GetWidth() - textSize.cx - bitmap.GetSize().cx - 7) / 2) + bitmap.GetSize().cx + 7;
+					textRect.left	= frame.left + ((GetWidth() - textSize.cx) / 2);
 
-				textRect.top	= frame.top + ((GetHeight() - textSize.cy) / 2) - 1;
-				textRect.right	= textRect.left + textSize.cx + 1;
-				textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
+					if (bitmap != NIL) textRect.left = frame.left + ((GetWidth() - textSize.cx - bitmap.GetSize().cx - 7) / 2) + bitmap.GetSize().cx + 7;
 
-				Font	 nFont = font;
+					textRect.top	= frame.top + ((GetHeight() - textSize.cy) / 2) - 1;
+					textRect.right	= textRect.left + textSize.cx + 1;
+					textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
 
-				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+					Font	 nFont = font;
 
-				surface->SetText(text, textRect, nFont);
-			}
+					if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
-			if (bitmap != NIL)
-			{
-				Rect	 bmpRect;
+					surface->SetText(text, textRect, nFont);
+				}
 
-				bmpRect.left	= frame.left + (frame.right - frame.left - bitmap.GetSize().cx) / 2;
+				if (bitmap != NIL)
+				{
+					Rect	 bmpRect;
 
-				if (text != NIL) bmpRect.left = frame.left + (frame.right - frame.left - bitmap.GetSize().cx - textSize.cx - 7) / 2;
+					bmpRect.left	= frame.left + (frame.right - frame.left - bitmap.GetSize().cx) / 2;
 
-				bmpRect.top	= frame.top + (frame.bottom - frame.top - bitmap.GetSize().cy) / 2;
-				bmpRect.right	= bmpRect.left + bitmap.GetSize().cx;
-				bmpRect.bottom	= bmpRect.top + bitmap.GetSize().cy;
+					if (text != NIL) bmpRect.left = frame.left + (frame.right - frame.left - bitmap.GetSize().cx - textSize.cx - 7) / 2;
 
-				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+					bmpRect.top	= frame.top + (frame.bottom - frame.top - bitmap.GetSize().cy) / 2;
+					bmpRect.right	= bmpRect.left + bitmap.GetSize().cx;
+					bmpRect.bottom	= bmpRect.top + bitmap.GetSize().cy;
+
+					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+				}
 			}
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

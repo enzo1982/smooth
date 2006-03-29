@@ -69,8 +69,6 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	if (flags & CB_HOTSPOTONLY)	hotspot->Deactivate();
 	else				hotspot->Activate();
 
-	EnterProtectedRegion();
-
 	Surface		*surface	= container->GetDrawSurface();
 	Rect		 frame		= Rect(GetRealPosition(), GetSize());
 	Point		 lineStart;
@@ -128,8 +126,6 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

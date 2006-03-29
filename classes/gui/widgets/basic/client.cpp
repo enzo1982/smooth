@@ -33,8 +33,6 @@ S::Int S::GUI::Client::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
 	Surface	*surface = container->GetDrawSurface();
 	Rect	 client	 = Rect(GetRealPosition() + Point(2, 2), GetSize() - Size(3, 4));
 
@@ -86,8 +84,6 @@ S::Int S::GUI::Client::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

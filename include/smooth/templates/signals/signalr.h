@@ -229,7 +229,7 @@ namespace smooth
 				return Success();
 			}
 
-			returnTYPE Emit(SIGNALS_ARGUMENT_PARAMETER_LIST)
+			returnTYPE Emit(SIGNALS_ARGUMENT_PARAMETER_LIST) const
 			{
 				returnTYPE	 returnValue = (returnTYPE) NIL;
 
@@ -243,7 +243,7 @@ namespace smooth
 				return returnValue;
 			}
 
-			returnTYPE EmitUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST)
+			returnTYPE EmitUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST) const
 			{
 				Bool	 last = False;
 
@@ -264,7 +264,7 @@ namespace smooth
 				}
 			}
 
-			Int GetNOfConnectedSlots()
+			Int GetNOfConnectedSlots() const
 			{
 				return slotsN.GetNOfEntries() + slots0.GetNOfEntries();
 			}

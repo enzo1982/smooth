@@ -66,8 +66,6 @@ S::Int S::GUI::MicroMenu::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
 	Surface	*surface = container->GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
@@ -106,8 +104,6 @@ S::Int S::GUI::MicroMenu::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

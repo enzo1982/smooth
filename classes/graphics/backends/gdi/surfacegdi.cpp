@@ -30,33 +30,34 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iDc)
 	gdi_dc = (HDC) iDc;
 	real_dc = (HDC) iDc;
 
-	bmp_dc = NIL;
-	cDc_bitmap = NIL;
-
 	if (gdi_dc != NIL)
 	{
 		size.cx	= GetDeviceCaps(gdi_dc, HORZRES) + 2;
 		size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 
-		bmp_dc = CreateCompatibleDC(gdi_dc);
+		HDC	 bmp_dc = CreateCompatibleDC(gdi_dc);
 
 		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
 		Bitmap	 bmpGDI(bitmap);
 
 		BlitToBitmap(Rect(Point(0, 0), size), bmpGDI, Rect(Point(0, 0), size));
 
-		cDc_bitmap = (HBITMAP) SelectObject(bmp_dc, bitmap);
+		cDc_contexts.AddEntry(bmp_dc);
+		cDc_bitmaps.AddEntry((HBITMAP) SelectObject(bmp_dc, bitmap));
+		cDc_rects.AddEntry(new Rect(Point(0, 0), size));
 	}
 }
 
 S::GUI::SurfaceGDI::~SurfaceGDI()
 {
-	if (bmp_dc != NIL && cDc_bitmap != NIL)
+	if (gdi_dc != NIL)
 	{
-		HBITMAP	 bitmap = (HBITMAP) SelectObject(bmp_dc, cDc_bitmap);
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetFirstEntry(), cDc_bitmaps.GetFirstEntry());
 
-		DeleteDC(bmp_dc);
+		DeleteDC(cDc_contexts.GetFirstEntry());
 		::DeleteObject(bitmap);
+
+		delete cDc_rects.GetFirstEntry();
 	}
 }
 
@@ -66,7 +67,7 @@ S::Int S::GUI::SurfaceGDI::PaintRect(const Rect &pRect)
 
 	if (gdi_dc != NIL)
 	{
-		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, bmp_dc, pRect.left, pRect.top, SRCCOPY);
+		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, cDc_contexts.GetFirstEntry(), pRect.left, pRect.top, SRCCOPY);
 	}
 
 	return Success();
@@ -74,19 +75,21 @@ S::Int S::GUI::SurfaceGDI::PaintRect(const Rect &pRect)
 
 S::Int S::GUI::SurfaceGDI::StartPaint(const Rect &iPRect)
 {
-	Rect	 pRect = TranslateRect(iPRect);
+	if (gdi_dc == NIL) return Success();
 
-	if (paintRect.left == -1 && paintRect.top == -1 && paintRect.right == -1 && paintRect.bottom == -1)
-	{
-		paintRect = pRect;
-	}
-	else
-	{
-		paintRect.left = (Int) Math::Min(paintRect.left, pRect.left);
-		paintRect.top = (Int) Math::Min(paintRect.top, pRect.top);
-		paintRect.right = (Int) Math::Max(paintRect.right, pRect.right);
-		paintRect.bottom = (Int) Math::Max(paintRect.bottom, pRect.bottom);
-	}
+	Rect	 pRect = TranslateRect(iPRect);
+	Rect	 oRect = *(cDc_rects.GetLastEntry());
+
+	HDC	 bmp_dc = CreateCompatibleDC(cDc_contexts.GetFirstEntry());
+	HBITMAP	 bitmap = CreateCompatibleBitmap(cDc_contexts.GetFirstEntry(), size.cx, size.cy);
+
+	cDc_bitmaps.AddEntry((HBITMAP) SelectObject(bmp_dc, bitmap));
+
+	if (pRect.left >= oRect.left && pRect.top >= oRect.top && pRect.right <= oRect.right && pRect.bottom <= oRect.bottom)	BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, cDc_contexts.GetLastEntry(), pRect.left, pRect.top, SRCCOPY);
+	else															BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, cDc_contexts.GetFirstEntry(), pRect.left, pRect.top, SRCCOPY);
+
+	cDc_contexts.AddEntry(bmp_dc);
+	cDc_rects.AddEntry(new Rect(pRect));
 
 	if (!painting)
 	{
@@ -104,26 +107,36 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 
 	painting--;
 
+	Rect	 iRect = Rect::OverlapRect(*(cDc_rects.GetLastEntry()), *(cDc_rects.GetNthEntry(cDc_rects.GetNOfEntries() - 2)));
+
+	BitBlt(cDc_contexts.GetNthEntry(cDc_contexts.GetNOfEntries() - 2), iRect.left, iRect.top, iRect.right - iRect.left, iRect.bottom - iRect.top, cDc_contexts.GetLastEntry(), iRect.left, iRect.top, SRCCOPY);
+
 	if (painting == 0)
 	{
 		if (gdi_dc != NIL) DeleteDC(gdi_dc);
 
 		gdi_dc = real_dc;
 
-		PaintRect(paintRect);
-
-		paintRect.left = -1;
-		paintRect.top = -1;
-		paintRect.right = -1;
-		paintRect.bottom = -1;
+		PaintRect(iRect);
 	}
+
+	HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetLastEntry(), cDc_bitmaps.GetLastEntry());
+
+	DeleteDC(cDc_contexts.GetLastEntry());
+	::DeleteObject(bitmap);
+
+	delete cDc_rects.GetLastEntry();
+
+	cDc_contexts.RemoveEntry(cDc_contexts.GetNthEntryIndex(cDc_contexts.GetNOfEntries() - 1));
+	cDc_bitmaps.RemoveEntry(cDc_bitmaps.GetNthEntryIndex(cDc_bitmaps.GetNOfEntries() - 1));
+	cDc_rects.RemoveEntry(cDc_rects.GetNthEntryIndex(cDc_rects.GetNOfEntries() - 1));
 
 	return Success();
 }
 
 S::Void *S::GUI::SurfaceGDI::GetSystemSurface()
 {
-	if (painting)	return bmp_dc;
+	if (painting)	return cDc_contexts.GetLastEntry();
 	else		return gdi_dc;
 }
 
@@ -132,7 +145,7 @@ S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 	if (gdi_dc == NIL) return Success();
 
 	::SetPixel(gdi_dc, TranslateX(x), TranslateY(y), color);
-	::SetPixel(bmp_dc, TranslateX(x), TranslateY(y), color);
+	::SetPixel(cDc_contexts.GetLastEntry(), TranslateX(x), TranslateY(y), color);
 
 	return Success();
 }
@@ -159,12 +172,12 @@ S::Int S::GUI::SurfaceGDI::Line(const Point &iPos1, const Point &iPos2, Int colo
 
 	hPen = (HPEN) SelectObject(gdi_dc, hOldPen);
 
-	hOldPen = (HPEN) SelectObject(bmp_dc, hPen);
+	hOldPen = (HPEN) SelectObject(cDc_contexts.GetLastEntry(), hPen);
 
-	MoveToEx(bmp_dc, pos1.x, pos1.y, NIL);
-	LineTo(bmp_dc, pos2.x, pos2.y);
+	MoveToEx(cDc_contexts.GetLastEntry(), pos1.x, pos1.y, NIL);
+	LineTo(cDc_contexts.GetLastEntry(), pos2.x, pos2.y);
 
-	hPen = (HPEN) SelectObject(bmp_dc, hOldPen);
+	hPen = (HPEN) SelectObject(cDc_contexts.GetLastEntry(), hOldPen);
 
 	::DeleteObject(hPen);
 
@@ -183,17 +196,17 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style)
 	if (style == FILLED)
 	{
 		FillRect(gdi_dc, &wRect, brush);
-		FillRect(bmp_dc, &wRect, brush);
+		FillRect(cDc_contexts.GetLastEntry(), &wRect, brush);
 	}
 	else if (style == OUTLINED)
 	{
 		FrameRect(gdi_dc, &wRect, brush);
-		FrameRect(bmp_dc, &wRect, brush);
+		FrameRect(cDc_contexts.GetLastEntry(), &wRect, brush);
 	}
 	else if (style == INVERT)
 	{
 		InvertRect(gdi_dc, &wRect);
-		InvertRect(bmp_dc, &wRect);
+		InvertRect(cDc_contexts.GetLastEntry(), &wRect);
 	}
 	else if (style == OUTLINEDOTS)
 	{
@@ -206,7 +219,7 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style)
 			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(bmp_dc, x, y, color);
+				::SetPixel(cDc_contexts.GetLastEntry(), x, y, color);
 				dot = False;
 			}
 			else dot = True;
@@ -219,7 +232,7 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style)
 			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(bmp_dc, x, y, color);
+				::SetPixel(cDc_contexts.GetLastEntry(), x, y, color);
 				dot = False;
 			}
 			else dot = True;
@@ -232,7 +245,7 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style)
 			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(bmp_dc, x, y, color);
+				::SetPixel(cDc_contexts.GetLastEntry(), x, y, color);
 				dot = False;
 			}
 			else dot = True;
@@ -245,7 +258,7 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style)
 			if (dot == True)
 			{
 				::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(bmp_dc, x, y, color);
+				::SetPixel(cDc_contexts.GetLastEntry(), x, y, color);
 				dot = False;
 			}
 			else dot = True;
@@ -281,13 +294,13 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	else				hfont = CreateFontA(-MulDiv(font.GetSize(), GetDeviceCaps(gdi_dc, LOGPIXELSY), 72), 0, 0, 0, font.GetWeight(), font.GetItalic(), font.GetUnderline(), font.GetStrikeOut(), ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 
 	SetBkMode(gdi_dc, TRANSPARENT);
-	SetBkMode(bmp_dc, TRANSPARENT);
+	SetBkMode(cDc_contexts.GetLastEntry(), TRANSPARENT);
 
 	SetTextColor(gdi_dc, font.GetColor());
-	SetTextColor(bmp_dc, font.GetColor());
+	SetTextColor(cDc_contexts.GetLastEntry(), font.GetColor());
 
 	holdfont = (HFONT) SelectObject(gdi_dc, hfont);
-	holdfont2 = (HFONT) SelectObject(bmp_dc, hfont);
+	holdfont2 = (HFONT) SelectObject(cDc_contexts.GetLastEntry(), hfont);
 
 	for (Int i = 0; i < lines; i++)
 	{
@@ -295,7 +308,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 		origoffset = offset;
 
-		for (int j = 0; j <= txtsize; j++)
+		for (Int j = 0; j <= txtsize; j++)
 		{
 			if (j + origoffset == txtsize)
 			{
@@ -358,8 +371,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			if (Setup::rightToLeft)	SetTextAlign(gdi_dc, TA_RIGHT);
 			else			SetTextAlign(gdi_dc, TA_LEFT);
 
-			if (Setup::rightToLeft)	SetTextAlign(bmp_dc, TA_RIGHT);
-			else			SetTextAlign(bmp_dc, TA_LEFT);
+			if (Setup::rightToLeft)	SetTextAlign(cDc_contexts.GetLastEntry(), TA_RIGHT);
+			else			SetTextAlign(cDc_contexts.GetLastEntry(), TA_LEFT);
 
 			if (Setup::enableUnicode)	GetCharacterPlacementW(gdi_dc, line, line.Length(), 0, &resultsw, 0);
 			else				GetCharacterPlacementA(gdi_dc, line, line.Length(), 0, &resultsa, 0);
@@ -370,8 +383,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			if (Setup::enableUnicode)	ExtTextOutW(gdi_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
 			else				ExtTextOutA(gdi_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
 
-			if (Setup::enableUnicode)	ExtTextOutW(bmp_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-			else				ExtTextOutA(bmp_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+			if (Setup::enableUnicode)	ExtTextOutW(cDc_contexts.GetLastEntry(), (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
+			else				ExtTextOutA(cDc_contexts.GetLastEntry(), (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
 
 			delete [] glyphs;
 		}
@@ -382,20 +395,20 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 				on XP and later versions of Windows.	*/
 
 			SetTextAlign(gdi_dc, TA_LEFT);
-			SetTextAlign(bmp_dc, TA_LEFT);
+			SetTextAlign(cDc_contexts.GetLastEntry(), TA_LEFT);
 
 			if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 			else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 
-			if (Setup::enableUnicode)	DrawTextExW(bmp_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-			else				DrawTextExA(bmp_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			if (Setup::enableUnicode)	DrawTextExW(cDc_contexts.GetLastEntry(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			else				DrawTextExA(cDc_contexts.GetLastEntry(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 		}
 
 		rect.top += height;
 	}
 
 	SelectObject(gdi_dc, holdfont);
-	SelectObject(bmp_dc, holdfont2);
+	SelectObject(cDc_contexts.GetLastEntry(), holdfont2);
 
 	::DeleteObject(hfont);
 
@@ -414,12 +427,12 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, const Rect &src
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
 		BitBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
-		BitBlt(bmp_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
+		BitBlt(cDc_contexts.GetLastEntry(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
 	}
 	else
 	{
 		StretchBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
-		StretchBlt(bmp_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+		StretchBlt(cDc_contexts.GetLastEntry(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
 	SelectObject(cdc, backup);

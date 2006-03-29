@@ -30,21 +30,19 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface = container->GetDrawSurface();
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			surface->Box(Rect(GetRealPosition(), GetSize()), Setup::BackgroundColor, FILLED);
-			surface->SetText(text, Rect(GetRealPosition() + Point(4, 1), GetSize() - Size(8, 2)), font);
+			{
+				Surface	*surface = container->GetDrawSurface();
+
+				surface->Box(Rect(GetRealPosition(), GetSize()), Setup::BackgroundColor, FILLED);
+				surface->SetText(text, Rect(GetRealPosition() + Point(4, 1), GetSize() - Size(8, 2)), font);
+			}
 
 			break;
 	};
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

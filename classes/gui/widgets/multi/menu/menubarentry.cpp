@@ -55,13 +55,10 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Surface	*surface	= container->GetDrawSurface();
-
-	EnterProtectedRegion();
-
-	Point	 realPos	= GetRealPosition();
-	Rect	 frame		= Rect(realPos, GetSize());
-	Rect	 bmpRect	= Rect(realPos + Point(2, 2), bitmap.GetSize());
+	Surface	*surface = container->GetDrawSurface();
+	Point	 realPos = GetRealPosition();
+	Rect	 frame	 = Rect(realPos, GetSize());
+	Rect	 bmpRect = Rect(realPos + Point(2, 2), bitmap.GetSize());
 
 	switch (message)
 	{
@@ -174,8 +171,6 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 			break;
 	}
 
-	LeaveProtectedRegion();
-
 	return Success();
 }
 
@@ -230,7 +225,7 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 	}
 }
 
-S::Bool S::GUI::MenubarEntry::IsTypeCompatible(Int compType)
+S::Bool S::GUI::MenubarEntry::IsTypeCompatible(Int compType) const
 {
 	if (compType == Object::classID || compType == Widget::classID || compType == MenuEntry::classID)	return True;
 	else													return False;

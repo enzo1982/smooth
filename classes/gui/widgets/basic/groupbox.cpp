@@ -36,32 +36,30 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface	= container->GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			surface->Frame(frame, FRAME_DOWN);
-			surface->Frame(frame + Point(1, 1) - Size(2, 2), FRAME_UP);
+			{
+				Surface	*surface = container->GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
-			Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
+				surface->Frame(frame, FRAME_DOWN);
+				surface->Frame(frame + Point(1, 1) - Size(2, 2), FRAME_UP);
 
-			surface->Box(textRect, Setup::BackgroundColor, FILLED);
+				Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
 
-			Font	 nFont		= font;
+				surface->Box(textRect, Setup::BackgroundColor, FILLED);
 
-			if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+				Font	 nFont		= font;
 
-			surface->SetText(text, textRect + Point(1, 0), nFont);
+				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+
+				surface->SetText(text, textRect + Point(1, 0), nFont);
+			}
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

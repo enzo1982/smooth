@@ -58,24 +58,22 @@ S::Int S::GUI::EditBox::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface = container->GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
-			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+			{
+				Surface	*surface = container->GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
-			surface->Frame(frame, FRAME_DOWN);
+				if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
+				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+
+				surface->Frame(frame, FRAME_DOWN);
+			}
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Widget::Paint(message);
 }

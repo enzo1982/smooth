@@ -58,8 +58,6 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
@@ -67,7 +65,6 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	Point	 lineEnd;
 
 	Int	 lightColor;
-	Int	 i;
 
 	switch (message)
 	{
@@ -104,7 +101,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 			lineStart.x--;
 			lineEnd.x++;
 
-			for (i = 0; i < 5; i++)
+			for (Int i = 0; i < 5; i++)
 			{
 				lineStart.y++;
 				lineEnd.y++;
@@ -146,15 +143,15 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 			{
 				Point	 point = Point(frame.left + 7 - (Setup::rightToLeft ? 2 : 0), frame.top + 7);
 
-				for (Int i = 0; i < 2; i++)
+				for (Int j = 0; j < 2; j++)
 				{
 					Int	 color = IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
 
-					if (i == 1)
+					if (j == 1)
 					{
 						color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
 
-						point -= Point((Setup::rightToLeft ? -i : i), i);
+						point -= Point((Setup::rightToLeft ? -j : j), j);
 					}
 
 					surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, FILLED);
@@ -170,8 +167,6 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

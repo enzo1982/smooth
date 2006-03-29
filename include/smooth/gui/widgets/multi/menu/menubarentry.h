@@ -40,7 +40,7 @@ namespace smooth
 
 				virtual Int		 Paint(Int);
 
-				Bool			 IsTypeCompatible(Int);
+				Bool			 IsTypeCompatible(Int) const;
 			slots:
 				Void			 OnMouseOver();
 

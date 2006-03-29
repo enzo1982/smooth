@@ -51,20 +51,10 @@ S::Int S::GUI::Cursor::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface = container->GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Rect	 frame	 = Rect(realPos, GetSize());
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			surface->StartPaint(frame);
-
-			surface->Box(frame, GetBackgroundColor(), FILLED);
-
 			{
 				Int	 nMaxScrollPos = Math::Max(0, Math::Ceil((Float) (font.GetTextSizeY(text) - GetHeight()) / (font.GetTextSizeY("*") + 3)));
 
@@ -76,6 +66,14 @@ S::Int S::GUI::Cursor::Paint(Int message)
 
 					onScroll.Emit(scrollPos, maxScrollPos);
 				}
+
+				Surface	*surface = container->GetDrawSurface();
+				Point	 realPos = GetRealPosition();
+				Rect	 frame	 = Rect(realPos, GetSize());
+
+				surface->StartPaint(frame);
+
+				surface->Box(frame, GetBackgroundColor(), FILLED);
 
 				String	 line;
 				Int	 lineNumber = 0;
@@ -128,9 +126,9 @@ S::Int S::GUI::Cursor::Paint(Int message)
 						lineNumber++;
 					}
 				}
-			}
 
-			surface->EndPaint();
+				surface->EndPaint();
+			}
 
 			break;
 		case SP_MOUSEIN:
@@ -142,8 +140,6 @@ S::Int S::GUI::Cursor::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }
@@ -649,7 +645,7 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 
 	Surface	*surface = container->GetDrawSurface();
 
-	surface->StartPaint(Rect(GetRealPosition(), GetSize()));
+	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
 
 	SetText(newText);
 

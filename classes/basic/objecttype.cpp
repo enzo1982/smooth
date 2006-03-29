@@ -23,18 +23,6 @@ S::ObjectType::ObjectType(const ObjectType &objectType)
 	type	= objectType.type;
 }
 
-S::ObjectType::operator S::Int() const
-{
-	return type;
-}
-
-S::Int S::ObjectType::operator =(Int newType)
-{
-	type = newType;
-
-	return type;
-}
-
 S::Bool S::ObjectType::operator ==(Int objType) const
 {
 	if (type == objType)				return True;

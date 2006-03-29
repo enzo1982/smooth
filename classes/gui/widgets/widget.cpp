@@ -12,6 +12,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/gui/widgets/special/tooltip.h>
+#include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
@@ -525,8 +526,6 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetOrder() >= window->GetOrder()) break;
 			}
 		case WM_ACTIVATEAPP:
-			DeactivateTooltip();
-
 			if (focussed)
 			{
 				focussed = False;
@@ -561,6 +560,8 @@ S::Void S::GUI::Widget::ActivateTooltip()
 	tooltip->SetMetrics(Point(window->MouseX() - Math::Round(0.2 * tooltip->textSize.cx), window->MouseY() - 1), Size(0, 0));
 	tooltip->SetTimeout(3000);
 
+	PopupMenu::internalOnOpenPopupMenu.Connect(&Widget::DeactivateTooltip, this);
+
 	window->RegisterObject(tooltip);
 }
 
@@ -578,8 +579,6 @@ S::Void S::GUI::Widget::DeactivateTooltip()
 	if (tooltip != NIL)
 	{
 		tooltip->Hide();
-
-		tooltip->GetContainer()->UnregisterObject(tooltip);
 
 		DeleteObject(tooltip);
 

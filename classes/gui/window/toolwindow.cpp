@@ -63,7 +63,7 @@ S::Int S::GUI::ToolWindow::SetMetrics(const Point &nPos, const Size &nSize)
 	return Window::SetMetrics(position, nSize);
 }
 
-S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType)
+S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType) const
 {
 	if (compType == Object::classID || compType == Widget::classID || compType == Window::classID)	return True;
 	else												return False;

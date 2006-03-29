@@ -31,10 +31,11 @@ namespace smooth
 		{
 			protected:
 				HDC		 gdi_dc;
-				HDC		 bmp_dc;
 				HDC		 real_dc;
 
-				HBITMAP		 cDc_bitmap;
+				Array<HDC>	 cDc_contexts;
+				Array<HBITMAP>	 cDc_bitmaps;
+				Array<Rect *>	 cDc_rects;
 			public:
 						 SurfaceGDI(Void * = NIL);
 						~SurfaceGDI();

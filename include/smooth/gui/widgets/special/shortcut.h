@@ -43,7 +43,7 @@ namespace smooth
 
 				virtual Int		 Process(Int, Int, Int);
 
-				virtual String		 ToString();
+				virtual String		 ToString() const;
 			accessors:
 				Int			 SetShortcut(Int, Int, Int = 0);
 

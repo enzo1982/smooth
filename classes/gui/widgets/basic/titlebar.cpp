@@ -72,8 +72,6 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	Surface	*surface = container->GetDrawSurface();
 	Window	*window	 = container->GetContainerWindow();
 
-	EnterProtectedRegion();
-
 	Rect	 titleFrame	= Rect(GetPosition(), GetSize());
 	Rect	 buttonRect	= Rect(Point(titleFrame.right - 39 + (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 20), titleFrame.top + 3), Size(35 - (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 20), 14));
 	Rect	 button;
@@ -162,8 +160,6 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

@@ -42,8 +42,6 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
 	Surface	*surface	= container->GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
 	Rect	 frame		= Rect(realPos, GetSize());
@@ -107,8 +105,6 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

@@ -205,7 +205,7 @@ namespace smooth
 				return Success();
 			}
 
-			Void Emit(SIGNALS_ARGUMENT_PARAMETER_LIST)
+			Void Emit(SIGNALS_ARGUMENT_PARAMETER_LIST) const
 			{
 				ProtectParent();
 
@@ -215,13 +215,13 @@ namespace smooth
 				UnprotectParent();
 			}
 
-			Void EmitUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST)
+			Void EmitUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST) const
 			{
 				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
 				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	((SlotBase0<Void> *) slots0.GetNthEntry(j))->Emit();
 			}
 
-			Int GetNOfConnectedSlots()
+			Int GetNOfConnectedSlots() const
 			{
 				return slotsN.GetNOfEntries() + slots0.GetNOfEntries();
 			}

@@ -59,21 +59,19 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	EnterProtectedRegion();
-
-	Surface	*surface = container->GetDrawSurface();
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (linkBitmap == NIL)	surface->SetText(text, Rect(GetRealPosition(), textSize + Size(0, 1)), font);
-			else			surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), Rect(GetRealPosition(), GetSize()));
+			{
+				Surface	*surface = container->GetDrawSurface();
+
+				if (linkBitmap == NIL)	surface->SetText(text, Rect(GetRealPosition(), textSize + Size(0, 1)), font);
+				else			surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), Rect(GetRealPosition(), GetSize()));
+			}
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return Success();
 }

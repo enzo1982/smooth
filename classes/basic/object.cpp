@@ -68,11 +68,6 @@ S::Object *S::Object::GetObject(const String &objectName)
 	return NIL;
 }
 
-S::Int S::Object::GetHandle()
-{
-	return handle;
-}
-
 S::Int S::Object::SetName(const String &nName)
 {
 	if (GetObject(nName) != NIL) return Error();
@@ -82,42 +77,10 @@ S::Int S::Object::SetName(const String &nName)
 	return Success();
 }
 
-const S::String &S::Object::GetName()
-{
-	return name;
-}
-
-S::Int S::Object::SetFlags(Int nFlags)
-{
-	flags = nFlags;
-
-	return Success();
-}
-
-S::Int S::Object::GetFlags()
-{
-	return flags;
-}
-
-S::String S::Object::ToString()
-{
-	return "an Object";
-}
-
-S::Object::operator S::String()
-{
-	return ToString();
-}
-
-S::Bool S::Object::IsTypeCompatible(Int objType)
+S::Bool S::Object::IsTypeCompatible(Int objType) const
 {
 	if (objType == classID)	return True;
 	else			return False;
-}
-
-const S::ObjectType &S::Object::GetObjectType()
-{
-	return type;
 }
 
 S::Int S::Object::RequestClassID()

@@ -80,7 +80,7 @@ S::Int S::GUI::Shortcut::GetKey()
 	return key;
 }
 
-S::String S::GUI::Shortcut::ToString()
+S::String S::GUI::Shortcut::ToString() const
 {
 	String	 keyString;
 

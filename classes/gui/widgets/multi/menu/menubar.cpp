@@ -173,4 +173,3 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 	return Widget::Paint(message);
 }
-

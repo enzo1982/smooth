@@ -71,6 +71,7 @@ namespace smooth
 				Bool				 focussed;
 
 				Bool				 alwaysActive;
+				Bool				 tabstopCapable;
 
 				Bool				 mouseOver;
 
@@ -117,6 +118,9 @@ namespace smooth
 
 				Void				 SetRegisteredFlag(Bool);
 
+				Widget				*GetPreviousTabstopWidget(Int);
+				Widget				*GetNextTabstopWidget(Int);
+
 				virtual Point			 GetRealPosition();
 
 				Int				 SetBackgroundColor(const Color &);
@@ -137,6 +141,9 @@ namespace smooth
 
 				Int				 SetAlwaysActive(Bool nValue)	{ alwaysActive = nValue; return Success(); }
 				Bool				 IsAlwaysActive() const		{ return alwaysActive; }
+
+				Int				 SetTabstopCapable(Bool nValue)	{ tabstopCapable = nValue; return Success(); }
+				Bool				 IsTabstopCapable() const	{ return tabstopCapable; }
 
 				Bool				 IsMouseOver() const		{ return mouseOver; }
 
@@ -210,6 +217,7 @@ namespace smooth
 				Signal0<Void>			 onAction;
 
 				Signal0<Void>			 onGetFocus;
+				Signal0<Void>			 onGetFocusByKeyboard;
 				Signal0<Void>			 onLoseFocus;
 
 				Signal0<Void>			 onClickInFocus;

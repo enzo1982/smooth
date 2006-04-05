@@ -62,6 +62,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 	switch (message)
 	{
+		case SP_SHOW:
 		case SP_PAINT:
 			if (text == NIL && bitmap == NIL)
 			{

@@ -619,6 +619,10 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 	Int	 bMarkStart	= Math::Min(markStart, markEnd);
 	Int	 bMarkEnd	= Math::Max(markStart, markEnd);
 
+	Surface	*surface = container->GetDrawSurface();
+
+	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+
 	MarkText(-1, -1);
 
 	String	 newText;
@@ -627,6 +631,8 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 	for (Int j = bMarkEnd; j <= text.Length(); j++)	newText[j - (bMarkEnd - bMarkStart)] = text[j];
 
 	SetText(newText);
+
+	surface->EndPaint();
 
 	SetCursorPos(bMarkStart);
 

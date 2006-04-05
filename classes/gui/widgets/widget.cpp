@@ -207,6 +207,42 @@ S::Void S::GUI::Widget::SetRegisteredFlag(Bool flag)
 	registered = flag;
 }
 
+S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle)
+{
+	Widget	*lastTabstopObject = NIL;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*widget = GetNthObject(i);
+
+		if (widget->GetHandle() == widgetHandle) return lastTabstopObject;
+
+		if (widget->IsTabstopCapable()) lastTabstopObject = widget;
+	}
+
+	return NIL;
+}
+
+S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle)
+{
+	Bool	 found = False;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*widget = GetNthObject(i);
+
+		if (widget->GetHandle() == widgetHandle)
+		{
+			found = True;
+			continue;
+		}
+
+		if (found && widget->IsTabstopCapable()) return widget;
+	}
+
+	return NIL;
+}
+
 S::Void S::GUI::Widget::GetTextSize()
 {
 	textSize.cx = font.GetTextSizeX(text);
@@ -284,7 +320,8 @@ S::Int S::GUI::Widget::Hide()
 		Rect	 rect		= Rect(GetRealPosition(), size);
 		Surface	*surface	= container->GetDrawSurface();
 
-		surface->Box(rect, Setup::BackgroundColor, FILLED);
+		if (container->GetBackgroundColor() != -1)	surface->Box(rect, container->GetBackgroundColor(), FILLED);
+		else						surface->Box(rect, Setup::BackgroundColor, FILLED);
 	}
 
 	onHide.Emit();
@@ -520,6 +557,21 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 			break;
 #ifdef __WIN32__
+		case WM_KEYDOWN:
+			if (focussed)
+			{
+				switch (wParam)
+				{
+					case VK_TAB:
+						focussed = False;
+
+						onLoseFocus.Emit();
+
+						break;
+				}
+			}
+
+			break;
 		case WM_KILLFOCUS:
 			if (Window::GetWindow((HWND) wParam) != NIL)
 			{

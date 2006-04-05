@@ -92,6 +92,8 @@ namespace smooth
 
 				Void				 GetTextSize();
 
+				Void				 SetFocusByKeyboard();
+
 				Void				 ActivateTooltip();
 				Void				 DeactivateTooltip();
 			public:

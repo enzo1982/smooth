@@ -211,6 +211,8 @@ S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle)
 {
 	Widget	*lastTabstopObject = NIL;
 
+	if (registered && widgetHandle != 0) lastTabstopObject = container->GetPreviousTabstopWidget(GetHandle());
+
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		Widget	*widget = GetNthObject(i);
@@ -218,7 +220,10 @@ S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle)
 		if (widget->GetHandle() == widgetHandle) return lastTabstopObject;
 
 		if (widget->IsTabstopCapable()) lastTabstopObject = widget;
+		else if (widget->GetPreviousTabstopWidget(0) != NIL) lastTabstopObject = widget->GetPreviousTabstopWidget(0);
 	}
+
+	if (widgetHandle == 0) return lastTabstopObject;
 
 	return NIL;
 }
@@ -226,6 +231,8 @@ S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle)
 S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle)
 {
 	Bool	 found = False;
+
+	if (widgetHandle == 0) found = True;
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -238,7 +245,10 @@ S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle)
 		}
 
 		if (found && widget->IsTabstopCapable()) return widget;
+		else if (found && widget->GetNextTabstopWidget(0) != NIL) return widget->GetNextTabstopWidget(0);
 	}
+
+	if (registered && widgetHandle != 0) return container->GetNextTabstopWidget(GetHandle());
 
 	return NIL;
 }
@@ -420,6 +430,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 	Point	 realPosition	= GetRealPosition();
 	Rect	 frame		= Rect(realPosition, size);
 	Point	 mousePos	= Point(window->MouseX(), window->MouseY());
+	Int	 returnValue	= Success();
 
 	switch (message)
 	{
@@ -558,7 +569,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			break;
 #ifdef __WIN32__
 		case WM_KEYDOWN:
-			if (focussed)
+			if (focussed && tabstopCapable)
 			{
 				switch (wParam)
 				{
@@ -566,6 +577,21 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 						focussed = False;
 
 						onLoseFocus.Emit();
+
+						BYTE	 state[256];
+
+						GetKeyboardState(state);
+
+						if (state[VK_SHIFT] & 128)
+						{
+							if (container->GetPreviousTabstopWidget(GetHandle()) != NIL) container->GetPreviousTabstopWidget(GetHandle())->SetFocusByKeyboard();
+						}
+						else
+						{
+							if (container->GetNextTabstopWidget(GetHandle()) != NIL) container->GetNextTabstopWidget(GetHandle())->SetFocusByKeyboard();
+						}
+
+						returnValue = Break;
 
 						break;
 				}
@@ -591,7 +617,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 	LeaveProtectedRegion();
 
-	return Success();
+	return returnValue;
 }
 
 S::Void S::GUI::Widget::ActivateTooltip()
@@ -635,6 +661,17 @@ S::Void S::GUI::Widget::DeactivateTooltip()
 		DeleteObject(tooltip);
 
 		tooltip = NIL;
+	}
+}
+
+S::Void S::GUI::Widget::SetFocusByKeyboard()
+{
+	if (!focussed)
+	{
+		focussed = True;
+
+		onGetFocus.Emit();
+		onGetFocusByKeyboard.Emit();
 	}
 }
 

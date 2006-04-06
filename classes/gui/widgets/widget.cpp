@@ -50,6 +50,9 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 
 	mouseDragging	= False;
 
+	alwaysActive	= False;
+	tabstopCapable	= False;
+
 	tipTimer	= NIL;
 	tooltip		= NIL;
 
@@ -219,7 +222,7 @@ S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle)
 
 		if (widget->GetHandle() == widgetHandle) return lastTabstopObject;
 
-		if (widget->IsTabstopCapable()) lastTabstopObject = widget;
+		if (widget->IsTabstopCapable() && widget->IsActive()) lastTabstopObject = widget;
 		else if (widget->GetPreviousTabstopWidget(0) != NIL) lastTabstopObject = widget->GetPreviousTabstopWidget(0);
 	}
 
@@ -244,7 +247,7 @@ S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle)
 			continue;
 		}
 
-		if (found && widget->IsTabstopCapable()) return widget;
+		if (found && widget->IsTabstopCapable() && widget->IsActive()) return widget;
 		else if (found && widget->GetNextTabstopWidget(0) != NIL) return widget->GetNextTabstopWidget(0);
 	}
 
@@ -574,24 +577,27 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				switch (wParam)
 				{
 					case VK_TAB:
-						focussed = False;
-
-						onLoseFocus.Emit();
-
-						BYTE	 state[256];
-
-						GetKeyboardState(state);
-
-						if (state[VK_SHIFT] & 128)
 						{
-							if (container->GetPreviousTabstopWidget(GetHandle()) != NIL) container->GetPreviousTabstopWidget(GetHandle())->SetFocusByKeyboard();
-						}
-						else
-						{
-							if (container->GetNextTabstopWidget(GetHandle()) != NIL) container->GetNextTabstopWidget(GetHandle())->SetFocusByKeyboard();
-						}
+							BYTE	 state[256];
 
-						returnValue = Break;
+							GetKeyboardState(state);
+
+							Widget	*widget = NIL;
+
+							if (state[VK_SHIFT] & 128) widget = container->GetPreviousTabstopWidget(GetHandle());
+							else			   widget = container->GetNextTabstopWidget(GetHandle());
+
+							if (widget != NIL)
+							{
+								focussed = False;
+
+								onLoseFocus.Emit();
+
+								widget->SetFocusByKeyboard();
+							}
+
+							returnValue = Break;
+						}
 
 						break;
 				}

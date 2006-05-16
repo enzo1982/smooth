@@ -103,8 +103,8 @@ S::String S::GUI::Shortcut::ToString() const
 	else if (key == VK_INSERT)		keyString = I18n::Translator::defaultTranslator->TranslateString("Ins");
 	else if (key == VK_DELETE)		keyString = I18n::Translator::defaultTranslator->TranslateString("Del");
 
-	return	(Binary::IsFlagSet(flags, SC_CTRL) ? I18n::Translator::defaultTranslator->TranslateString("Ctrl").Append(" + ") : String())
-         .Append(Binary::IsFlagSet(flags, SC_ALT) ? I18n::Translator::defaultTranslator->TranslateString("Alt").Append(" + ") : String())
-	 .Append(Binary::IsFlagSet(flags, SC_SHIFT) ? I18n::Translator::defaultTranslator->TranslateString("Shift").Append(" + ") : String())
+	return	(Binary::IsFlagSet(flags, SC_CTRL) ? I18n::Translator::defaultTranslator->TranslateString("Ctrl").Append("+") : String())
+         .Append(Binary::IsFlagSet(flags, SC_ALT) ? I18n::Translator::defaultTranslator->TranslateString("Alt").Append("+") : String())
+	 .Append(Binary::IsFlagSet(flags, SC_SHIFT) ? I18n::Translator::defaultTranslator->TranslateString("Shift").Append("+") : String())
 	 .Append(keyString);
 }

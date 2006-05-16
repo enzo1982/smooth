@@ -32,8 +32,9 @@ namespace smooth
 		{
 			protected:
 				Hotspot			*hotspot;
-
 				PopupMenu		*owner;
+
+				Int			 shortcutOffset;
 			public:
 				static const Int	 classID;
 
@@ -44,6 +45,11 @@ namespace smooth
 
 				virtual Int		 Show();
 				virtual Int		 Hide();
+
+				Size			 GetMinimumSize();
+
+				Int			 GetShortcutTextSize();
+				Void			 SetShortcutOffset(Int);
 
 				Bool			 IsTypeCompatible(Int) const;
 			accessors:

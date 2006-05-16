@@ -32,13 +32,13 @@ namespace smooth
 	{
 		class SMOOTHAPI MenuEntry : public Widget
 		{
-			private:
-				Shortcut		*shortcut;
 			protected:
 				PopupMenu		*popup;
 
 				Bitmap			 bitmap;
 				Bitmap			 graymap;
+
+				Shortcut		*shortcut;
 
 				Bool			*bVar;
 				Int			*iVar;

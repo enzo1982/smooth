@@ -27,11 +27,6 @@ namespace smooth
 	{
 		class SMOOTHAPI TabWidget : public Widget
 		{
-			protected:
-				Array<Int>		 textSize;
-				Array<Bool>		 sizeSet;
-
-				Void			 GetLayersSize();
 			public:
 				static const Int	 classID;
 
@@ -45,6 +40,8 @@ namespace smooth
 				virtual Int		 UnregisterObject(Widget *);
 
 				Int			 SelectTab(Int);
+			slots:
+				Void			 OnChangeSize(const Size &);
 		};
 	};
 };

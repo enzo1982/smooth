@@ -54,17 +54,27 @@ S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap 
 
 	RegisterObject(newEntry);
 
+	return newEntry;
+}
+
+S::Int S::GUI::PopupMenu::Show()
+{
+	if (IsVisible()) return Success();
+
 	SetSize(Size(50, 5));
 
-	Int	 nextYPos = 3;
+	Int	 nextYPos		= 3;
+	Int	 maxShortcutTextSize	= 0;
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(i);
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
-		SetWidth(Math::Max(GetWidth(), 6 + entry->GetWidth()));
+		maxShortcutTextSize = Math::Max(maxShortcutTextSize, entry->GetShortcutTextSize());
+
+		SetWidth(Math::Max(GetWidth(), 6 + entry->GetMinimumSize().cx));
 		SetHeight(GetHeight() + 5 + (entry->GetText() != NIL ? 11 : 0));
 
 		entry->SetPosition(Point(3, nextYPos));
@@ -74,19 +84,13 @@ S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap 
 
 	for (Int j = 0; j < GetNOfObjects(); j++)
 	{
-		MenuEntry	*entry = (MenuEntry *) GetNthObject(j);
+		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(j);
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
 		entry->SetWidth(GetWidth() - 6);
+		entry->SetShortcutOffset(maxShortcutTextSize + 21);
 	}
-
-	return newEntry;
-}
-
-S::Int S::GUI::PopupMenu::Show()
-{
-	if (IsVisible()) return Success();
 
 	visible = True;
 
@@ -94,9 +98,9 @@ S::Int S::GUI::PopupMenu::Show()
 
 	hasNext = False;
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int k = 0; k < GetNOfObjects(); k++)
 	{
-		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(k);
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 

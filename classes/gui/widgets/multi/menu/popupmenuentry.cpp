@@ -11,6 +11,7 @@
 #include <smooth/gui/widgets/multi/menu/popupmenuentry.h>
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/widgets/hotspot/hotspot.h>
+#include <smooth/gui/widgets/special/shortcut.h>
 #include <smooth/gui/widgets/basic/checkbox.h>
 #include <smooth/gui/widgets/basic/optionbox.h>
 #include <smooth/gui/window/window.h>
@@ -22,13 +23,12 @@ const S::Int	 S::GUI::PopupMenuEntry::classID = S::Object::RequestClassID();
 S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : MenuEntry(iText, iBitmap, iPopup, ibVar, iiVar, iiCode)
 {
 	type		= classID;
+	orientation	= OR_UPPERLEFT;
+	hotspot		= NIL;
 
-	if (text == NIL && bitmap == NIL)	SetSize(Size(15, 4));
-	else if (text != NIL && bitmap == NIL)	SetSize(Size(textSize.cx + 44, 15));
+	shortcutOffset	= 0;
 
-	orientation = OR_UPPERLEFT;
-
-	hotspot = NIL;
+	SetSize(GetMinimumSize());
 
 	if (text != NIL)
 	{
@@ -72,10 +72,17 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 			}
 			else if (text != NIL && bitmap == NIL)
 			{
-				Rect	 textRect = Rect(realPos + Point(18, 0), GetSize() - Size(4, 2));
+				Rect	 textRect = Rect(realPos + Point(18, 0), GetSize() - Size(22, 2));
 
 				surface->Box(frame, Setup::BackgroundColor, FILLED);
 				surface->SetText(text, textRect, font);
+
+				if (shortcut != NIL)
+				{
+					textRect.left = textRect.right - shortcutOffset;
+
+					surface->SetText(shortcut->ToString(), textRect, font);
+				}
 
 				if (popup != NIL)
 				{
@@ -142,13 +149,20 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 		case SP_MOUSEIN:
 			if (text != NIL && bitmap == NIL)
 			{
-				Rect	 textRect	= Rect(realPos + Point(18, 0), GetSize() - Size(4, 2));
+				Rect	 textRect	= Rect(realPos + Point(18, 0), GetSize() - Size(22, 2));
 				Font	 nFont		= font;
 
 				nFont.SetColor(Setup::GradientTextColor);
 
 				surface->Gradient(frame, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 				surface->SetText(text, textRect, nFont);
+
+				if (shortcut != NIL)
+				{
+					textRect.left = textRect.right - shortcutOffset;
+
+					surface->SetText(shortcut->ToString(), textRect, nFont);
+				}
 
 				if (popup != NIL)
 				{
@@ -234,6 +248,26 @@ S::Int S::GUI::PopupMenuEntry::Hide()
 	visible = False;
 
 	return Success();
+}
+
+S::GUI::Size S::GUI::PopupMenuEntry::GetMinimumSize()
+{
+	if (text != NIL && shortcut == NIL) return Size(textSize.cx + 44, 15);
+	if (text != NIL && shortcut != NIL) return Size(textSize.cx + font.GetTextSizeX(shortcut->ToString()) + 59, 15);
+
+	return Size(15, 4);
+}
+
+S::Int S::GUI::PopupMenuEntry::GetShortcutTextSize()
+{
+	if (shortcut == NIL) return 0;
+
+	return font.GetTextSizeX(shortcut->ToString());
+}
+
+S::Void S::GUI::PopupMenuEntry::SetShortcutOffset(Int nShortcutOffset)
+{
+	shortcutOffset = nShortcutOffset;
 }
 
 S::Void S::GUI::PopupMenuEntry::OnClickEntry()

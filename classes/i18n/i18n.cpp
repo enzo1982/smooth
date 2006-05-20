@@ -301,6 +301,11 @@ S::String S::I18n::Translator::GetNthLanguageURL(Int index)
 	return languages.GetNthEntry(index)->url;
 }
 
+S::Bool S::I18n::Translator::IsNthLanguageRightToLeft(Int index)
+{
+	return languages.GetNthEntry(index)->rightToLeft;
+}
+
 const S::String &S::I18n::Translator::GetActiveLanguageName()
 {
 	return activeLanguage->name;
@@ -326,6 +331,11 @@ const S::String &S::I18n::Translator::GetActiveLanguageURL()
 	return activeLanguage->url;
 }
 
+S::Bool S::I18n::Translator::IsActiveLanguageRightToLeft()
+{
+	return activeLanguage->rightToLeft;
+}
+
 S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 {
 	for (int i = 0; i < languages.GetNOfEntries(); i++)
@@ -333,8 +343,6 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 		if (languages.GetNthEntry(i)->magic == magic)
 		{
 			activeLanguage = languages.GetNthEntry(i);
-
-			Setup::rightToLeft = activeLanguage->rightToLeft;
 
 			return Success();
 		}

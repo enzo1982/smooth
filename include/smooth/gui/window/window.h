@@ -38,8 +38,12 @@ namespace smooth
 		const Int	 WF_NOTASKBUTTON	= 32;
 		const Int	 WF_THINBORDER		= 64;
 
-		const Int	 WO_SEPARATOR	= 1;
-		const Int	 WO_NOSEPARATOR	= 2;
+		const Int	 WO_SEPARATOR		= 1;
+		const Int	 WO_NOSEPARATOR		= 2;
+
+		const Int	 LD_DEFAULT		= 0;
+		const Int	 LD_LEFTTORIGHT		= 1;
+		const Int	 LD_RIGHTTOLEFT		= 2;
 
 		class SMOOTHAPI Window : public Widget
 		{
@@ -64,6 +68,8 @@ namespace smooth
 
 				String				 defaultStatus;
 
+				Int				 layoutDirection;
+
 				PopupMenu			*trackMenu;
 
 				Layer				*mainLayer;
@@ -81,7 +87,7 @@ namespace smooth
 								 Window(const String &, const Point &, const Size &, Void * = NIL);
 				virtual				~Window();
 
-				Int				 GetOrder()			 { return order; }
+				Int				 GetOrder()				 { return order; }
 
 				Int				 SetIcon(const Bitmap &);
 				Bitmap				&GetIcon();
@@ -90,13 +96,16 @@ namespace smooth
 
 				Int				 SetText(const String &);
 
-				Layer				*GetMainLayer();
+				Layer				*GetMainLayer() const;
 
 				Int				 SetStatusText(const String &);
 				const String			&GetStatusText();
 
 				Int				 SetDefaultStatusText(const String &);
 				Int				 RestoreDefaultStatusText();
+
+				Int				 SetRightToLeft(Bool);
+				virtual Bool			 IsRightToLeft() const;
 
 				virtual Point			 GetRealPosition();
 
@@ -118,13 +127,13 @@ namespace smooth
 
 				Int				 Restore();
 
-				Bool				 IsMaximized();
-				Bool				 IsMinimized();
+				Bool				 IsMaximized() const;
+				Bool				 IsMinimized() const;
 
 				Int				 Stay();
 				Int				 Close();
 
-				Bool				 IsInUse();
+				Bool				 IsInUse() const;
 
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);

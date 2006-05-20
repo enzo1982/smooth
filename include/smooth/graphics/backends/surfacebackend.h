@@ -41,6 +41,8 @@ namespace smooth
 				Size							 size;
 				Rect							 paintRect;
 
+				Bool							 rightToLeft;
+
 				Int							 painting;
 
 				Int							 TranslateX(Int);
@@ -59,6 +61,8 @@ namespace smooth
 
 				Int							 SetSize(const Size &);
 				const Size						&GetSize();
+
+				Int							 SetRightToLeft(Bool);
 
 				virtual Int						 PaintRect(const Rect &);
 

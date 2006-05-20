@@ -91,7 +91,7 @@ S::Int S::GUI::MicroMenu::Paint(Int message)
 			{
 				for (Int i = 0; i < 3; i++)
 				{
-					Point	 lineStart	= Point(frame.left + GetWidth() / 2 - 2 + (Setup::rightToLeft ? 1 : 0) + i, frame.top + GetHeight() / 2 - 1 + i);
+					Point	 lineStart	= Point(frame.left + GetWidth() / 2 - 2 + (IsRightToLeft() ? 1 : 0) + i, frame.top + GetHeight() / 2 - 1 + i);
 					Point	 lineEnd	= lineStart + Point(5 - 2 * i, 0);
 
 					surface->Line(lineStart, lineEnd, Color(0, 0, 0));

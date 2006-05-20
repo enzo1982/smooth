@@ -35,7 +35,7 @@ S::Bool S::GUI::ToolWindow::Create()
 
 		if (containerWindow != NIL)
 		{
-			if (Setup::rightToLeft) Window::SetMetrics(Point(containerWindow->GetWidth() - (GetX() + GetWidth()), GetY()), GetSize());
+			if (IsRightToLeft()) Window::SetMetrics(Point(containerWindow->GetWidth() - (GetX() + GetWidth()), GetY()), GetSize());
 
 			Window::SetMetrics(GetPosition() + containerWindow->GetPosition(), GetSize());
 		}
@@ -54,13 +54,25 @@ S::Int S::GUI::ToolWindow::SetMetrics(const Point &nPos, const Size &nSize)
 
 		if (containerWindow != NIL)
 		{
-			if (Setup::rightToLeft) position.x = containerWindow->GetWidth() - (nPos.x + nSize.cx);
+			if (IsRightToLeft()) position.x = containerWindow->GetWidth() - (nPos.x + nSize.cx);
 
 			position += containerWindow->GetPosition();
 		}
 	}
 
 	return Window::SetMetrics(position, nSize);
+}
+
+S::Bool S::GUI::ToolWindow::IsRightToLeft() const
+{
+	if (IsRegistered() && layoutDirection == LD_DEFAULT)
+	{
+		Window	*containerWindow = container->GetContainerWindow();
+
+		if (containerWindow != NIL) return containerWindow->IsRightToLeft();
+	}
+
+	return Window::IsRightToLeft();
 }
 
 S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType) const

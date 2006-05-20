@@ -73,7 +73,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 			if (IsActive())	lightColor = Setup::ClientColor;
 			else		lightColor = Setup::BackgroundColor;
 
-			lineStart	= GetRealPosition() + Point(6 + (Setup::rightToLeft ? 1 : 0), 3);
+			lineStart	= GetRealPosition() + Point(6 + (IsRightToLeft() ? 1 : 0), 3);
 			lineEnd		= lineStart + Point(5, 0);
 
 			surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
@@ -85,8 +85,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 			surface->Line(lineStart, lineEnd, lightColor);
 
-			surface->SetPixel(lineStart.x, lineStart.y, (Setup::rightToLeft ? Setup::DividerLightColor : Setup::DividerDarkColor));
-			surface->SetPixel(lineEnd.x - 1, lineEnd.y, (Setup::rightToLeft ? Setup::DividerDarkColor : Setup::DividerLightColor));
+			surface->SetPixel(lineStart.x, lineStart.y, (IsRightToLeft() ? Setup::DividerLightColor : Setup::DividerDarkColor));
+			surface->SetPixel(lineEnd.x - 1, lineEnd.y, (IsRightToLeft() ? Setup::DividerDarkColor : Setup::DividerLightColor));
 
 			lineStart.x--;
 			lineStart.y++;
@@ -95,8 +95,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 			surface->Line(lineStart, lineEnd, lightColor);
 
-			surface->SetPixel(lineStart.x, lineStart.y, (Setup::rightToLeft ? Setup::DividerLightColor : Setup::DividerDarkColor));
-			surface->SetPixel(lineEnd.x - 1, lineEnd.y, (Setup::rightToLeft ? Setup::DividerDarkColor : Setup::DividerLightColor));
+			surface->SetPixel(lineStart.x, lineStart.y, (IsRightToLeft() ? Setup::DividerLightColor : Setup::DividerDarkColor));
+			surface->SetPixel(lineEnd.x - 1, lineEnd.y, (IsRightToLeft() ? Setup::DividerDarkColor : Setup::DividerLightColor));
 
 			lineStart.x--;
 			lineEnd.x++;
@@ -108,8 +108,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 				surface->Line(lineStart, lineEnd, lightColor);
 
-				surface->SetPixel(lineStart.x, lineStart.y, (Setup::rightToLeft ? Setup::DividerLightColor : Setup::DividerDarkColor));
-				surface->SetPixel(lineEnd.x - 1, lineEnd.y, (Setup::rightToLeft ? Setup::DividerDarkColor : Setup::DividerLightColor));
+				surface->SetPixel(lineStart.x, lineStart.y, (IsRightToLeft() ? Setup::DividerLightColor : Setup::DividerDarkColor));
+				surface->SetPixel(lineEnd.x - 1, lineEnd.y, (IsRightToLeft() ? Setup::DividerDarkColor : Setup::DividerLightColor));
 			}
 
 			lineStart.x++;
@@ -141,7 +141,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 			if (*variable == code)
 			{
-				Point	 point = Point(frame.left + 7 - (Setup::rightToLeft ? 2 : 0), frame.top + 7);
+				Point	 point = Point(frame.left + 7 - (IsRightToLeft() ? 2 : 0), frame.top + 7);
 
 				for (Int j = 0; j < 2; j++)
 				{
@@ -151,7 +151,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 					{
 						color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
 
-						point -= Point((Setup::rightToLeft ? -j : j), j);
+						point -= Point((IsRightToLeft() ? -j : j), j);
 					}
 
 					surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, FILLED);

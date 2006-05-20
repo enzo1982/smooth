@@ -103,7 +103,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 			{
 				for (Int i = 0; i < 4 - (smallHotspots ? 1 : 0); i++)
 				{
-					Point	 lineStart	= Point(realPos.x + GetWidth() / 2 + (Setup::rightToLeft ? 1 : 0) - i, (realPos.y + (hotspotSize + 4) / 2) - 2 + i);
+					Point	 lineStart	= Point(realPos.x + GetWidth() / 2 + (IsRightToLeft() ? 1 : 0) - i, (realPos.y + (hotspotSize + 4) / 2) - 2 + i);
 					Point	 lineEnd	= lineStart + Point(2 * i + 1, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
@@ -111,7 +111,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 				for (Int j = 0 + (smallHotspots ? 1 : 0); j < 4; j++)
 				{
-					Point	 lineStart	= Point(realPos.x + GetWidth() / 2 - 3 + (Setup::rightToLeft ? 1 : 0) + j, (realPos.y + GetHeight() - (hotspotSize + 4) / 2) - 2 + j);
+					Point	 lineStart	= Point(realPos.x + GetWidth() / 2 - 3 + (IsRightToLeft() ? 1 : 0) + j, (realPos.y + GetHeight() - (hotspotSize + 4) / 2) - 2 + j);
 					Point	 lineEnd	= lineStart + Point(7 - 2 * j, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);

@@ -109,6 +109,8 @@ S::Void S::Init()
 	}
 #endif
 
+	Setup::rightToLeft = I18n::Translator::defaultTranslator->IsActiveLanguageRightToLeft();
+
 	String::SetInputFormat("ISO-8859-1");
 	String::SetOutputFormat(String("CP").Append(String::FromInt(codePage)));
 

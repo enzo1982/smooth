@@ -783,6 +783,18 @@ S::Int S::GUI::Widget::SetMetrics(const Point &nPos, const Size &nSize)
 	return Success();
 }
 
+S::Bool S::GUI::Widget::IsRightToLeft() const
+{
+	if (IsRegistered())
+	{
+		Window	*containerWindow = container->GetContainerWindow();
+
+		if (containerWindow != NIL) return containerWindow->IsRightToLeft();
+	}
+
+	return Setup::rightToLeft;
+}
+
 S::Bool S::GUI::Widget::IsAffected(const Rect &uRect)
 {
 	return Rect::DoRectsOverlap(uRect, Rect(GetRealPosition() - Point(10, 10), size + Size(20, 20)));

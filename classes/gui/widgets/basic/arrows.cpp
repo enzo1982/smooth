@@ -10,6 +10,7 @@
 
 #include <smooth/gui/widgets/basic/arrows.h>
 #include <smooth/gui/widgets/hotspot/simplebutton.h>
+#include <smooth/gui/window/window.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
@@ -124,7 +125,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 				for (Int i = 0; i < 4; i++)
 				{
-					lineStart	= Point(frame.left + GetWidth() / 2 + (Setup::rightToLeft ? 1 : 0) - i, (frame.top + GetHeight() / 4) - 2 + i);
+					lineStart	= Point(frame.left + GetWidth() / 2 + (IsRightToLeft() ? 1 : 0) - i, (frame.top + GetHeight() / 4) - 2 + i);
 					lineEnd		= lineStart + Point(2 * i + 1, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
@@ -132,7 +133,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 
 				for (Int j = 0; j < 4; j++)
 				{
-					lineStart	= Point(frame.left + GetWidth() / 2 - 3 + (Setup::rightToLeft ? 1 : 0) + j, (frame.bottom - GetHeight() / 4) - 2 + j);
+					lineStart	= Point(frame.left + GetWidth() / 2 - 3 + (IsRightToLeft() ? 1 : 0) + j, (frame.bottom - GetHeight() / 4) - 2 + j);
 					lineEnd		= lineStart + Point(7 - 2 * j, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);

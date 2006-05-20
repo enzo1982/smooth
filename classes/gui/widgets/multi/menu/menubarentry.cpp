@@ -111,7 +111,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 					Point	 p1;
 					Point	 p2;
 
-					p1.x = realPos.x + GetWidth() - 10 + (Setup::rightToLeft ? 1 : 0);
+					p1.x = realPos.x + GetWidth() - 10 + (IsRightToLeft() ? 1 : 0);
 					p2.x = p1.x + 7;
 					p1.y = realPos.y + (GetHeight() - 3) / 2;
 					p2.y = p1.y;
@@ -157,8 +157,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 				if (onAction.GetNOfConnectedSlots() > 0 && popup != NIL)
 				{
-					Point	 p1 = Point(realPos.x + GetWidth() - 13 + (Setup::rightToLeft ? 1 : 0), realPos.y + 1);
-					Point	 p2 = Point(realPos.x + GetWidth() - 13 + (Setup::rightToLeft ? 1 : 0), realPos.y + GetHeight() - 1);
+					Point	 p1 = Point(realPos.x + GetWidth() - 13 + (IsRightToLeft() ? 1 : 0), realPos.y + 1);
+					Point	 p2 = Point(realPos.x + GetWidth() - 13 + (IsRightToLeft() ? 1 : 0), realPos.y + GetHeight() - 1);
 
 					surface->Line(p1, p2, Setup::BackgroundColor);
 
@@ -196,10 +196,10 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 	{
 		hotspot->Deactivate();
 
+		RegisterObject(popup);
+
 		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : GetWidth() + 2 - popup->GetWidth(), GetHeight() + 1));
 		popup->internalRequestClose.Connect(&MenubarEntry::ClosePopupMenu, this);
-
-		RegisterObject(popup);
 
 		container->SetFlags(container->GetFlags() | MB_POPUPOPEN);
 	}

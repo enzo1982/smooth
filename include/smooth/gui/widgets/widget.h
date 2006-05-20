@@ -185,6 +185,7 @@ namespace smooth
 				virtual Int			 SetMetrics(const Point &, const Size &);
 
 				virtual Bool			 IsAffected(const Rect &);
+				virtual Bool			 IsRightToLeft() const;
 			callbacks:
 				Callback1<Bool, const Point &>	 hitTest;
 			signals:

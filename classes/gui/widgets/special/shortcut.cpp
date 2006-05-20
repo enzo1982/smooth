@@ -13,12 +13,15 @@
 
 const S::Int	 S::GUI::Shortcut::classID = S::Object::RequestClassID();
 
-S::GUI::Shortcut::Shortcut(Int iKey, Int iFlags, Int iParam) : Widget(Point(), Size())
+S::GUI::Shortcut::Shortcut(Int iFlags, Int iKey, Widget *iRef, Int iParam) : Widget(Point(), Size())
 {
-	type	= classID;
-	key	= iKey;
-	flags	= iFlags;
-	param	= iParam;
+	type		= classID;
+	orientation	= OR_FREE;
+
+	key		= iKey;
+	flags		= iFlags;
+	param		= iParam;
+	ref		= iRef;
 
 	onKeyDown.SetParentObject(this);
 }
@@ -29,8 +32,10 @@ S::GUI::Shortcut::~Shortcut()
 
 S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())			return Error();
-	if (!IsActive() || !IsVisible())	return Success();
+	if (!IsRegistered())	return Error();
+	if (!IsActive())	return Success();
+
+	if (ref != NIL && !ref->IsActive())	return Success();
 
 	Int	 retVal = Success();
 
@@ -66,11 +71,12 @@ S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 	return retVal;
 }
 
-S::Int S::GUI::Shortcut::SetShortcut(Int nKey, Int nFlags, Int nParam)
+S::Int S::GUI::Shortcut::SetShortcut(Int nFlags, Int nKey, Widget *nRef, Int nParam)
 {
 	key	= nKey;
 	flags	= nFlags;
 	param	= nParam;
+	ref	= nRef;
 
 	return Success();
 }

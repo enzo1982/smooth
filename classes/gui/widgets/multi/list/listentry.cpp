@@ -100,8 +100,8 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 						if (marked && cbRect.top <= cbRect.bottom - 3)
 						{
-							Point	 p1 = Point(cbRect.left + 2 + (Setup::rightToLeft ? 1 : 0), cbRect.top + 2);
-							Point	 p2 = Point(cbRect.right - 2 + (Setup::rightToLeft ? 1 : 0), cbRect.bottom - 2);
+							Point	 p1 = Point(cbRect.left + 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
+							Point	 p2 = Point(cbRect.right - 2 + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
 
 							surface->Line(p1, p2, Setup::ClientTextColor);
 							surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), Setup::GrayTextColor);

@@ -45,6 +45,8 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 
 	order = 0;
 
+	layoutDirection = LD_DEFAULT;
+
 	if (title != NIL)	text = title;
 	else			text = "smooth Application";
 
@@ -139,7 +141,7 @@ S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 	return Success();
 }
 
-S::GUI::Layer *S::GUI::Window::GetMainLayer()
+S::GUI::Layer *S::GUI::Window::GetMainLayer() const
 {
 	return mainLayer;
 }
@@ -217,6 +219,18 @@ S::Int S::GUI::Window::RestoreDefaultStatusText()
 	}
 
 	return Success();
+}
+
+S::Int S::GUI::Window::SetRightToLeft(Bool nRightToLeft)
+{
+	layoutDirection = (nRightToLeft ? LD_RIGHTTOLEFT : LD_LEFTTORIGHT);
+
+	return Success();
+}
+
+S::Bool S::GUI::Window::IsRightToLeft() const
+{
+	return ((layoutDirection == LD_DEFAULT) ? Setup::rightToLeft : (layoutDirection == LD_RIGHTTOLEFT));
 }
 
 S::Int S::GUI::Window::Show()
@@ -335,12 +349,12 @@ S::Int S::GUI::Window::Restore()
 	return Success();
 }
 
-S::Bool S::GUI::Window::IsMaximized()
+S::Bool S::GUI::Window::IsMaximized() const
 {
 	return maximized;
 }
 
-S::Bool S::GUI::Window::IsMinimized()
+S::Bool S::GUI::Window::IsMinimized() const
 {
 	return minimized;
 }
@@ -466,7 +480,7 @@ S::Int S::GUI::Window::Close()
 	return Success();
 }
 
-S::Bool S::GUI::Window::IsInUse()
+S::Bool S::GUI::Window::IsInUse() const
 {
 	return (created && !destroyed);
 }
@@ -737,6 +751,8 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	Surface	*surface = GetDrawSurface();
 
+	surface->SetRightToLeft(IsRightToLeft());
+
 	if (updateRect.left < frameWidth)			updateRect.left		= frameWidth;
 	if (updateRect.top < frameWidth)			updateRect.top		= frameWidth;
 	if (GetWidth() - updateRect.right < frameWidth)		updateRect.right	= GetWidth() - frameWidth;
@@ -748,13 +764,13 @@ S::Int S::GUI::Window::Paint(Int message)
 	}
 	else
 	{
-		Bool	 preRTL = Setup::rightToLeft;
+		Bool	 preRTL = IsRightToLeft();
 
-		Setup::rightToLeft = False;
+		SetRightToLeft(False);
 
 		surface->StartPaint(updateRect);
 
-		Setup::rightToLeft = preRTL;
+		SetRightToLeft(preRTL);
 
 		surface->Box(updateRect, Setup::BackgroundColor, FILLED);
 
@@ -962,7 +978,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 S::Int S::GUI::Window::MouseX()
 {
-	if (Setup::rightToLeft)	return GetWidth() - (Input::MouseX() - GetX()) - 1;
+	if (IsRightToLeft())	return GetWidth() - (Input::MouseX() - GetX()) - 1;
 	else			return Input::MouseX() - GetX();
 }
 

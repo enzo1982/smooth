@@ -35,17 +35,19 @@ namespace smooth
 			protected:
 				Int			 key;
 				Int			 param;
+
+				Widget			*ref;
 			public:
 				static const Int	 classID;
 
-							 Shortcut(Int, Int, Int = 0);
+							 Shortcut(Int, Int, Widget * = NIL, Int = 0);
 				virtual			~Shortcut();
 
 				virtual Int		 Process(Int, Int, Int);
 
 				virtual String		 ToString() const;
 			accessors:
-				Int			 SetShortcut(Int, Int, Int = 0);
+				Int			 SetShortcut(Int, Int, Widget * = NIL, Int = 0);
 
 				Int			 GetKey();
 			signals:

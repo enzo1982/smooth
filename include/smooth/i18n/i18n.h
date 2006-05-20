@@ -61,12 +61,14 @@ namespace smooth
 				String				 GetNthLanguageAuthor(Int);
 				String				 GetNthLanguageEncoding(Int);
 				String				 GetNthLanguageURL(Int);
+				Bool				 IsNthLanguageRightToLeft(Int);
 
 				const String			&GetActiveLanguageName();
 				const String			&GetActiveLanguageID();
 				const String			&GetActiveLanguageAuthor();
 				const String			&GetActiveLanguageEncoding();
 				const String			&GetActiveLanguageURL();
+				Bool				 IsActiveLanguageRightToLeft();
 
 				Int				 ActivateLanguage(const String &);
 				String				 TranslateString(const String &);

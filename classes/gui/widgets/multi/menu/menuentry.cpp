@@ -10,6 +10,7 @@
 
 #include <smooth/gui/widgets/multi/menu/menuentry.h>
 #include <smooth/gui/widgets/special/shortcut.h>
+#include <smooth/gui/window/window.h>
 
 const S::Int	 S::GUI::MenuEntry::classID = S::Object::RequestClassID();
 
@@ -34,12 +35,12 @@ S::GUI::MenuEntry::~MenuEntry()
 	if (shortcut != NIL) DeleteObject(shortcut);
 }
 
-S::Int S::GUI::MenuEntry::SetShortcut(Int scKey, Int scFlags)
+S::Int S::GUI::MenuEntry::SetShortcut(Int scFlags, Int scKey, Window *window)
 {
-	shortcut = new Shortcut(scKey, scFlags);
+	shortcut = new Shortcut(scFlags, scKey, this);
 	shortcut->onKeyDown.Connect(&onAction);
 
-	RegisterObject(shortcut);
+	window->RegisterObject(shortcut);
 
 	return Success();
 }

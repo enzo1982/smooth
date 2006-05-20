@@ -44,6 +44,11 @@ const S::GUI::Size &S::GUI::Surface::GetSize()
 	return backend->GetSize();
 }
 
+S::Int S::GUI::Surface::SetRightToLeft(Bool nRightToLeft)
+{
+	return backend->SetRightToLeft(nRightToLeft);
+}
+
 S::Int S::GUI::Surface::PaintRect(const Rect &pRect)
 {
 	if (mutex != NIL) mutex->Lock();

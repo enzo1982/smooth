@@ -70,8 +70,8 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 
 				if (*variable == True)
 				{
-					Point p1 = Point(frame.left + 3 - (Setup::rightToLeft ? 1 : 0), frame.top + 3);
-					Point p2 = Point(frame.left + 10 - (Setup::rightToLeft ? 1 : 0), frame.bottom - 1);
+					Point p1 = Point(frame.left + 3 - (IsRightToLeft() ? 1 : 0), frame.top + 3);
+					Point p2 = Point(frame.left + 10 - (IsRightToLeft() ? 1 : 0), frame.bottom - 1);
 
 					for (Int i = 0; i < 2; i++)
 					{
@@ -81,8 +81,8 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 						{
 							color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
 
-							p1 -= Point((Setup::rightToLeft ? -i : i), i);
-							p2 -= Point((Setup::rightToLeft ? -i : i), i);
+							p1 -= Point((IsRightToLeft() ? -i : i), i);
+							p2 -= Point((IsRightToLeft() ? -i : i), i);
 						}
 
 						surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), color);

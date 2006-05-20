@@ -53,7 +53,7 @@ S::Int S::GUI::Tooltip::Show()
 
 	if (tPos.y + window->GetY() < 2) tPos.y = GetY() + 2;
 
-	if (!Setup::rightToLeft)
+	if (!IsRightToLeft())
 	{
 		if (tPos.x + window->GetX() + tSize.cx > LiSAGetDisplaySizeX() - 2)	tPos.x = -window->GetX() + LiSAGetDisplaySizeX() - 2 - tSize.cx;
 		if (tPos.x + window->GetX() < 2)					tPos.x = -window->GetX() + 2;

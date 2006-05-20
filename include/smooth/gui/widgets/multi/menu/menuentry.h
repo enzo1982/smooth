@@ -20,6 +20,7 @@ namespace smooth
 
 		class PopupMenu;
 		class Shortcut;
+		class Window;
 	};
 };
 
@@ -49,7 +50,7 @@ namespace smooth
 							 MenuEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
 				virtual			~MenuEntry();
 			accessors:
-				Int			 SetShortcut(Int, Int);
+				Int			 SetShortcut(Int, Int, Window *);
 
 				Int			 SetBitmap(const Bitmap &);
 				const Bitmap		&GetBitmap();

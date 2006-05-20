@@ -49,6 +49,8 @@ namespace smooth
 				Int		 SetSize(const Size &);
 				const Size	&GetSize();
 
+				Int		 SetRightToLeft(Bool);
+
 				Int		 PaintRect(const Rect &);
 
 				Int		 StartPaint(const Rect &);

@@ -333,7 +333,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 		RECT	 Rect = TranslateRect(rect);
 
-		if (Setup::rightToLeft) Rect.right--;
+		if (rightToLeft) Rect.right--;
 
 		if (rtlCharacters && Setup::useIconv)
 		{
@@ -368,23 +368,23 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 			ZeroMemory(glyphs, 2 * (line.Length() + 1));
 
-			if (Setup::rightToLeft)	SetTextAlign(gdi_dc, TA_RIGHT);
+			if (rightToLeft)	SetTextAlign(gdi_dc, TA_RIGHT);
 			else			SetTextAlign(gdi_dc, TA_LEFT);
 
-			if (Setup::rightToLeft)	SetTextAlign(cDc_contexts.GetLastEntry(), TA_RIGHT);
+			if (rightToLeft)	SetTextAlign(cDc_contexts.GetLastEntry(), TA_RIGHT);
 			else			SetTextAlign(cDc_contexts.GetLastEntry(), TA_LEFT);
 
 			if (Setup::enableUnicode)	GetCharacterPlacementW(gdi_dc, line, line.Length(), 0, &resultsw, 0);
 			else				GetCharacterPlacementA(gdi_dc, line, line.Length(), 0, &resultsa, 0);
 
-			if (Setup::rightToLeft) Rect.left -= 10;
+			if (rightToLeft) Rect.left -= 10;
 			else			Rect.right += 10;
 
-			if (Setup::enableUnicode)	ExtTextOutW(gdi_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-			else				ExtTextOutA(gdi_dc, (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+			if (Setup::enableUnicode)	ExtTextOutW(gdi_dc, (rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
+			else				ExtTextOutA(gdi_dc, (rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
 
-			if (Setup::enableUnicode)	ExtTextOutW(cDc_contexts.GetLastEntry(), (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-			else				ExtTextOutA(cDc_contexts.GetLastEntry(), (Setup::rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+			if (Setup::enableUnicode)	ExtTextOutW(cDc_contexts.GetLastEntry(), (rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
+			else				ExtTextOutA(cDc_contexts.GetLastEntry(), (rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
 
 			delete [] glyphs;
 		}
@@ -397,11 +397,11 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			SetTextAlign(gdi_dc, TA_LEFT);
 			SetTextAlign(cDc_contexts.GetLastEntry(), TA_LEFT);
 
-			if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-			else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 
-			if (Setup::enableUnicode)	DrawTextExW(cDc_contexts.GetLastEntry(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-			else				DrawTextExA(cDc_contexts.GetLastEntry(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (Setup::rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			if (Setup::enableUnicode)	DrawTextExW(cDc_contexts.GetLastEntry(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			else				DrawTextExA(cDc_contexts.GetLastEntry(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 		}
 
 		rect.top += height;

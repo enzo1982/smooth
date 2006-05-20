@@ -89,7 +89,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 			surface->Box(frame + Point(GetWidth() - 18, 1) - Size(GetWidth() - 17, 2), Setup::BackgroundColor, FILLED);
 			surface->Frame(frame + Point(GetWidth() - 18, 1) - Size(GetWidth() - 17, 2), FRAME_UP);
 
-			lineStart	= Point(frame.right - 13 + (Setup::rightToLeft ? 1 : 0), frame.top + 8);
+			lineStart	= Point(frame.right - 13 + (IsRightToLeft() ? 1 : 0), frame.top + 8);
 			lineEnd		= lineStart + Point(7, 0);
 
 			for (Int i = 0; i < 4; i++)

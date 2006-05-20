@@ -141,8 +141,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 				button.right	= button.left + 7;
 			}
 
-			start	= Point(button.left + (Setup::rightToLeft ? 1 : 0), button.top - 1);
-			end	= Point(button.right + (Setup::rightToLeft ? 1 : 0), button.bottom);
+			start	= Point(button.left + (IsRightToLeft() ? 1 : 0), button.top - 1);
+			end	= Point(button.right + (IsRightToLeft() ? 1 : 0), button.bottom);
 
 			if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON))	buttonColor = Setup::TextColor;
 			else						buttonColor = Setup::GrayTextColor;
@@ -220,7 +220,7 @@ S::Void S::GUI::Titlebar::OnMouseDrag(const Point &mousePos)
 {
 	Window	*window	= container->GetContainerWindow();
 
-	if (!window->IsMaximized()) window->SetPosition(window->GetPosition() - (Point((Setup::rightToLeft ? window->GetWidth() - startMousePos.x : startMousePos.x), startMousePos.y) - Point((Setup::rightToLeft ? window->GetWidth() - mousePos.x : mousePos.x), mousePos.y)));
+	if (!window->IsMaximized()) window->SetPosition(window->GetPosition() - (Point((IsRightToLeft() ? window->GetWidth() - startMousePos.x : startMousePos.x), startMousePos.y) - Point((IsRightToLeft() ? window->GetWidth() - mousePos.x : mousePos.x), mousePos.y)));
 }
 
 S::Void S::GUI::Titlebar::OnMinButtonClick()

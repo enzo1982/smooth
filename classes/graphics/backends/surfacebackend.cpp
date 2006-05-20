@@ -61,6 +61,8 @@ S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface)
 	paintRect.right = -1;
 	paintRect.bottom = -1;
 
+	rightToLeft = False;
+
 	painting = 0;
 }
 
@@ -70,8 +72,8 @@ S::GUI::SurfaceBackend::~SurfaceBackend()
 
 S::Int S::GUI::SurfaceBackend::TranslateX(Int x)
 {
-	if (Setup::rightToLeft)	return size.cx - x;
-	else			return x;
+	if (rightToLeft) return size.cx - x;
+	else		 return x;
 }
 
 S::Int S::GUI::SurfaceBackend::TranslateY(Int y)
@@ -81,14 +83,14 @@ S::Int S::GUI::SurfaceBackend::TranslateY(Int y)
 
 S::GUI::Point S::GUI::SurfaceBackend::TranslatePoint(const Point &p)
 {
-	if (Setup::rightToLeft)	return Point(size.cx - p.x, p.y);
-	else			return p;
+	if (rightToLeft) return Point(size.cx - p.x, p.y);
+	else		 return p;
 }
 
 S::GUI::Rect S::GUI::SurfaceBackend::TranslateRect(const Rect &r)
 {
-	if (Setup::rightToLeft)	return Rect(Point(size.cx - r.right, r.top), Size(r.right - r.left, r.bottom - r.top));
-	else			return Rect(Point(r.left, r.top), Size(r.right - r.left, r.bottom - r.top));
+	if (rightToLeft) return Rect(Point(size.cx - r.right, r.top), Size(r.right - r.left, r.bottom - r.top));
+	else		 return Rect(Point(r.left, r.top), Size(r.right - r.left, r.bottom - r.top));
 }
 
 S::Int S::GUI::SurfaceBackend::GetSurfaceType()
@@ -106,6 +108,13 @@ S::Int S::GUI::SurfaceBackend::SetSize(const Size &nSize)
 const S::GUI::Size &S::GUI::SurfaceBackend::GetSize()
 {
 	return size;
+}
+
+S::Int S::GUI::SurfaceBackend::SetRightToLeft(Bool nRightToLeft)
+{
+	rightToLeft = nRightToLeft;
+
+	return Success();
 }
 
 S::Int S::GUI::SurfaceBackend::PaintRect(const Rect &pRect)
@@ -173,9 +182,9 @@ S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Int style)
 			break;
 	}
 
-	Bool	 preRTL = Setup::rightToLeft;
+	Bool	 preRTL = rightToLeft;
 
-	Setup::rightToLeft = False;
+	rightToLeft = False;
 
 	Line(p1, p2, color1);
 	Line(p1, p3, color1);
@@ -184,7 +193,7 @@ S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Int style)
 
 	SetPixel(p4.x, p4.y, color2);
 
-	Setup::rightToLeft = preRTL;
+	rightToLeft = preRTL;
 
 	return Success();
 }
@@ -236,7 +245,7 @@ S::Int S::GUI::SurfaceBackend::Gradient(const Rect &rect, Int color1, Int color2
 			Float	 biasg = (green2 - green1) / xmax;
 			Float	 biasb = (blue2 - blue1) / xmax;
 
-			if (Setup::rightToLeft)
+			if (rightToLeft)
 			{
 				for (Int x = xmax - 1; x >= 0; x--)
 				{
@@ -296,15 +305,15 @@ S::Int S::GUI::SurfaceBackend::Bar(const Point &iP1, const Point &iP2, Int orien
 	Point	 p1 = TranslatePoint(iP1);
 	Point	 p2 = TranslatePoint(iP2);
 
-	if (Setup::rightToLeft)
+	if (rightToLeft)
 	{
 		if (orientation == OR_HORZ) { p1 = TranslatePoint(iP2);	p2 = TranslatePoint(iP1); }
 		if (orientation == OR_VERT) { p1 -= Point(2, 0);	p2 -= Point(2, 0); }
 	}
 
-	Bool	 preRTL = Setup::rightToLeft;
+	Bool	 preRTL = rightToLeft;
 
-	Setup::rightToLeft = False;
+	rightToLeft = False;
 
 	if (orientation == OR_HORZ)
 	{
@@ -322,7 +331,7 @@ S::Int S::GUI::SurfaceBackend::Bar(const Point &iP1, const Point &iP2, Int orien
 		Line(p1, p2, RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255)));
 	}
 
-	Setup::rightToLeft = preRTL;
+	rightToLeft = preRTL;
 
 	return Success();
 }

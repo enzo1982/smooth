@@ -74,6 +74,9 @@ namespace smooth
 
 			Int				 ComputeCRC32() const;
 
+			String				 EncodeBase64() const;
+			String				 DecodeBase64() const;
+
 			String				&Append(const char *);
 			String				&Append(const wchar_t *);
 			String				&Append(const String &);

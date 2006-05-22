@@ -465,6 +465,11 @@ $(OBJECTDIR)/driver_ansi.o: $(IOCLASSESDIR)/drivers/driver_ansi.cpp $(SMOOTHINCL
 	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_ansi.cpp -o $(OBJECTDIR)/driver_ansi.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/driver_https.o: $(IOCLASSESDIR)/drivers/driver_https.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_https.h
+	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_https.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_https.cpp -o $(OBJECTDIR)/driver_https.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/driver_memory.o: $(IOCLASSESDIR)/drivers/driver_memory.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_memory.h
 	$(ECHO) -n Compiling $(IOCLASSESDIR)/drivers/driver_memory.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/drivers/driver_memory.cpp -o $(OBJECTDIR)/driver_memory.o

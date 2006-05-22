@@ -261,6 +261,26 @@ S::Int S::String::ComputeCRC32() const
 	return ulCRC ^ 0xffffffff;
 }
 
+S::String S::String::EncodeBase64() const
+{
+	Buffer<char>	 buffer(Length() * 4);
+
+	strcpy(buffer, ConvertTo("UTF-8"));
+
+	return buffer.EncodeBase64(strlen(buffer));
+}
+
+S::String S::String::DecodeBase64() const
+{
+	Buffer<char>	 buffer;
+	String		 string;
+
+	buffer.DecodeBase64(*this);
+	string.ImportFrom("UTF-8", buffer);
+
+	return string;
+}
+
 S::Bool S::String::IsANSI(const String &string)
 {
 	return !IsUnicode(string);

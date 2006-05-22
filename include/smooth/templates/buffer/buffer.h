@@ -41,6 +41,9 @@ namespace smooth
 			t *operator	 +(const int);
 
 			operator	 t *();
+
+			String		 EncodeBase64(Int);
+			Int		 DecodeBase64(const String &);
 	};
 };
 

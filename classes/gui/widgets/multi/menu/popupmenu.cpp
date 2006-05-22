@@ -66,15 +66,22 @@ S::Int S::GUI::PopupMenu::Show()
 	Int	 nextYPos		= 3;
 	Int	 maxShortcutTextSize	= 0;
 
+	for (Int l = 0; l < GetNOfObjects(); l++)
+	{
+		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(l);
+
+		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
+
+		maxShortcutTextSize = Math::Max(maxShortcutTextSize, entry->GetShortcutTextSize());
+	}
+
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
 		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(i);
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
-		maxShortcutTextSize = Math::Max(maxShortcutTextSize, entry->GetShortcutTextSize());
-
-		SetWidth(Math::Max(GetWidth(), 6 + entry->GetMinimumSize().cx));
+		SetWidth(Math::Max(GetWidth(), 6 + entry->GetMinimumSize().cx - (entry->GetShortcutTextSize() > 0 ? entry->GetShortcutTextSize() - maxShortcutTextSize : 0)));
 		SetHeight(GetHeight() + 5 + (entry->GetText() != NIL ? 11 : 0));
 
 		entry->SetPosition(Point(3, nextYPos));
@@ -107,8 +114,6 @@ S::Int S::GUI::PopupMenu::Show()
 		entry->SetRegisteredFlag(False);
 
 		toolWindow->RegisterObject(entry);
-
-		entry->Activate();
 	}
 
 	internalOnOpenPopupMenu.Emit(GetHandle());
@@ -141,8 +146,6 @@ S::Int S::GUI::PopupMenu::Hide()
 
 		entry->SetRegisteredFlag(True);
 		entry->SetContainer(this);
-
-		entry->Deactivate();
 	}
 
 	onHide.Emit();

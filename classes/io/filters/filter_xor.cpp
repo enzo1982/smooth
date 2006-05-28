@@ -14,8 +14,6 @@
 S::IO::FilterXOR::FilterXOR()
 {
 	packageSize	= 4;
-
-	value		= 0;
 	modifier	= 0;
 }
 
@@ -23,20 +21,25 @@ S::IO::FilterXOR::~FilterXOR()
 {
 }
 
-S::Int S::IO::FilterXOR::WriteData(UnsignedByte *data, Int size)
+S::Int S::IO::FilterXOR::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
-	value = (data[3] + 256 * data[2] + 65536 * data[1] + 16777216 * data[0]) ^ modifier;
+	Int	 value = (data[3] + 256 * data[2] + 65536 * data[1] + 16777216 * data[0]) ^ modifier;
 
 	return driver->WriteData((unsigned char *) &value, size);
 }
 
-S::Int S::IO::FilterXOR::ReadData(UnsignedByte **data, Int size)
+S::Int S::IO::FilterXOR::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
-	driver->ReadData((unsigned char *) &value, size);
+	data.Resize(size);
 
-	value ^= modifier;
+	driver->ReadData(data, size);
 
-	*data = (unsigned char *) &value;
+	Int	 value = (data[3] + 256 * data[2] + 65536 * data[1] + 16777216 * data[0]) ^ modifier;
+
+	data[0] = (value >> 24) & 255;
+	data[1] = (value >> 16) & 255;
+	data[2] = (value >>  8) & 255;
+	data[3] =  value	& 255;
 
 	return size;
 }

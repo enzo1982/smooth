@@ -12,9 +12,11 @@
 #define __OBJSMOOTH_BUFFER_
 
 #include "buffer.h"
+#include "../../misc/memory.h"
 
 template <class t> S::Buffer<t>::Buffer()
 {
+	memory_manager	= NIL;
 	memory		= NIL;
 
 	size		= 0;
@@ -23,7 +25,8 @@ template <class t> S::Buffer<t>::Buffer()
 
 template <class t> S::Buffer<t>::Buffer(Int iSize)
 {
-	memory		= new t [iSize];
+	memory_manager	= new Memory(iSize * sizeof(t));
+	memory		= (t *) (void *) *memory_manager;
 
 	size		= iSize;
 	allocated	= iSize;
@@ -31,6 +34,7 @@ template <class t> S::Buffer<t>::Buffer(Int iSize)
 
 template <class t> S::Buffer<t>::Buffer(const Buffer<t> &oBuffer)
 {
+	memory_manager	= oBuffer.memory_manager;
 	memory		= oBuffer.memory;
 
 	size		= oBuffer.size;
@@ -49,11 +53,12 @@ template <class t> S::Int S::Buffer<t>::Size()
 
 template <class t> S::Int S::Buffer<t>::Resize(Int nSize)
 {
-	if (nSize > allocated) Free();
-
-	if (memory == NIL)
+	if (nSize > allocated)
 	{
-		memory		= new t [nSize];
+		if (memory != NIL) memory_manager->Resize(nSize * sizeof(t));
+		else		   memory_manager = new Memory(nSize * sizeof(t));
+
+		memory		= (t *) (void *) *memory_manager;
 
 		size		= nSize;
 		allocated	= nSize;
@@ -79,8 +84,9 @@ template <class t> S::Int S::Buffer<t>::Free()
 {
 	if (memory == NIL) return Success();
 
-	delete [] memory;
+	delete memory_manager;
 
+	memory_manager	= NIL;
 	memory		= NIL;
 
 	size		= 0;

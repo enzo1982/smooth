@@ -30,13 +30,12 @@ namespace smooth
 		{
 			private:
 				Int	 modifier;
-				Int	 value;
 			public:
 					 FilterXOR();
 					~FilterXOR();
 
-				Int	 WriteData(UnsignedByte *, Int);
-				Int	 ReadData(UnsignedByte **, Int);
+				Int	 WriteData(Buffer<UnsignedByte> &, Int);
+				Int	 ReadData(Buffer<UnsignedByte> &, Int);
 
 				Void	 SetModifier(Int);
 		};

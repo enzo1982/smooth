@@ -28,14 +28,12 @@ namespace smooth
 	{
 		class SMOOTHAPI FilterBZip2 : public Filter
 		{
-			private:
-				UnsignedByte	*buffer;
 			public:
-						 FilterBZip2();
-						~FilterBZip2();
+					 FilterBZip2();
+					~FilterBZip2();
 
-				Int		 WriteData(UnsignedByte *, Int);
-				Int		 ReadData(UnsignedByte **, Int);
+				Int	 WriteData(Buffer<UnsignedByte> &, Int);
+				Int	 ReadData(Buffer<UnsignedByte> &, Int);
 		};
 	};
 };

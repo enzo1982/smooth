@@ -40,16 +40,16 @@ S::Bool S::IO::Filter::Deactivate()
 	return true;
 }
 
-S::Int S::IO::Filter::WriteData(UnsignedByte *data, Int size)
+S::Int S::IO::Filter::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	return driver->WriteData(data, size);
 }
 
-S::Int S::IO::Filter::ReadData(UnsignedByte **data, Int size)
+S::Int S::IO::Filter::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	if (size > (driver->GetSize() - driver->GetPos())) size = driver->GetSize() - driver->GetPos();
 
-	*data = new UnsignedByte [size];
+	data.Resize(size);
 
-	return driver->ReadData(*data, size);
+	return driver->ReadData(data, size);
 }

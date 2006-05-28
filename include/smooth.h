@@ -83,6 +83,7 @@
 #include "smooth/misc/config.h"
 #include "smooth/misc/datetime.h"
 #include "smooth/misc/math.h"
+#include "smooth/misc/memory.h"
 #include "smooth/misc/string.h"
 
 #include "smooth/gui/application/application.h"

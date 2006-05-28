@@ -21,7 +21,6 @@ S::IO::Stream::Stream()
 	pbdActive		= false;
 	keepPbd			= false;
 	pbdLength		= 0;
-	data			= NULL;
 	closefile		= true;
 	crosslinked		= false;
 	driver			= NULL;

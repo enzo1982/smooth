@@ -4,6 +4,7 @@ xx.xx.06 xx:xx - smooth aplha 0.8.67.0
 
 - shortcut.cpp	- Added support for menu shortcuts
 - buffer.cpp	- Added Base 64 encoder and decoder
+- memory.cpp	- New class for memory management to prevent bad memory frees using Buffer
 - d...https.cpp	- Added an IO driver for HTTPS proxy connections
 
 - some smaller bug fixes

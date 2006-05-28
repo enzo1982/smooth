@@ -944,6 +944,10 @@ SOURCE=..\classes\io\drivers\driver_ansi.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\io\drivers\driver_https.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\io\drivers\driver_memory.cpp
 # End Source File
 # Begin Source File
@@ -1026,6 +1030,10 @@ SOURCE=..\classes\misc\datetime.cpp
 # Begin Source File
 
 SOURCE=..\classes\misc\math.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\classes\misc\memory.cpp
 # End Source File
 # Begin Source File
 
@@ -1453,6 +1461,10 @@ SOURCE=..\include\smooth\misc\datetime.h
 # Begin Source File
 
 SOURCE=..\include\smooth\misc\math.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\misc\memory.h
 # End Source File
 # Begin Source File
 
@@ -1976,6 +1988,10 @@ SOURCE=..\include\smooth\gui\window\window.h
 # Begin Source File
 
 SOURCE=..\include\smooth\io\drivers\driver_ansi.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\io\drivers\driver_https.h
 # End Source File
 # Begin Source File
 

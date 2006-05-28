@@ -50,12 +50,13 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
+		case SP_UPDATE:
 			surface->StartPaint(frame);
 
-			if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
-			else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+			if (IsActive())	surface->Box(frame + Point(1, 1) - Size(2, 2), Setup::ClientColor, FILLED);
+			else		surface->Box(frame + Point(1, 1) - Size(2, 2), Setup::BackgroundColor, FILLED);
 
-			surface->Frame(frame, FRAME_DOWN);
+			if (message != SP_UPDATE) surface->Frame(frame, FRAME_DOWN);
 
 			if (value > 0)
 			{
@@ -122,7 +123,7 @@ S::Int S::GUI::Progressbar::SetValue(Int newValue)
 
 	value = (Int) Math::Min(endValue, Math::Max(startValue, newValue));
 
-	if (prevValue != value) Paint(SP_PAINT);
+	if (prevValue != value) Paint(SP_UPDATE);
 
 	return Success();
 }

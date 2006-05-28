@@ -8,48 +8,29 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_BUFFER_
-#define _H_OBJSMOOTH_BUFFER_
+#ifndef _H_OBJSMOOTH_MEMORY_
+#define _H_OBJSMOOTH_MEMORY_
 
 namespace smooth
 {
 	class Memory;
 };
 
-#include "../../definitions.h"
+#include "../definitions.h"
 
 namespace smooth
 {
-	template <class t> class Buffer
+	class SMOOTHAPI Memory
 	{
 		private:
-			Memory		*memory_manager;
-			t		*memory;
-
-			Int		 size;
-			Int		 allocated;
+			UnsignedByte	*memory;
 		public:
-					 Buffer();
-					 Buffer(Int);
-					 Buffer(const Buffer<t> &);
+					 Memory(Int);
+					~Memory();
 
-					~Buffer();
+			Bool		 Resize(Int);
 
-			Int		 Size();
-			Int		 Resize(Int);
-
-			Int		 Zero();
-			Int		 Free();
-
-			t &operator	 [](const int);
-			t &operator	 [](const Int);
-
-			t *operator	 +(const int);
-
-			operator	 t *();
-
-			String		 EncodeBase64(Int);
-			Int		 DecodeBase64(const String &);
+			operator	 void *();
 	};
 };
 

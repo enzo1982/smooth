@@ -21,103 +21,79 @@
 
 S::IO::InStream::InStream(Int type, Driver *iDriver)
 {
-	if (type == STREAM_DRIVER)
-	{
-		driver = iDriver;
+	if (type != STREAM_DRIVER)		   { lastError = IO_ERROR_BADPARAM;	 return; }
 
-		if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); return; }
+	driver = iDriver;
 
-		streamType	= STREAM_DRIVER;
-		size		= driver->GetSize();
-		currentBufferPos= defaultPackageSize;
-		origsize	= size;
-		data		= new unsigned char [packageSize];
-		closefile	= false;
+	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); return; }
 
-		return;
-	}
-	else
-	{
-		{ lastError = IO_ERROR_BADPARAM; return; }
-	}
+	streamType	= STREAM_DRIVER;
+	size		= driver->GetSize();
+	currentBufferPos= defaultPackageSize;
+	origsize	= size;
+	closefile	= false;
+
+	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, const String &filename, Int mode)
 {
-	if (type == STREAM_FILE)
-	{
-		driver = new DriverPOSIX(filename, mode);
+	if (type != STREAM_FILE)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-		if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
+	driver = new DriverPOSIX(filename, mode);
 
-		streamType	= STREAM_DRIVER;
-		size		= driver->GetSize();
-		currentBufferPos= defaultPackageSize;
-		origsize	= size;
-		data		= new unsigned char [packageSize];
+	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
-		return;
-	}
-	else
-	{
-		{ lastError = IO_ERROR_BADPARAM; return; }
-	}
+	streamType	= STREAM_DRIVER;
+	size		= driver->GetSize();
+	currentBufferPos= defaultPackageSize;
+	origsize	= size;
+
+	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, FILE *openfile)
 {
-	if (type == STREAM_ANSI)
-	{
-		driver = new DriverANSI(openfile);
+	if (type != STREAM_ANSI)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-		if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
+	driver = new DriverANSI(openfile);
 
-		streamType	= STREAM_DRIVER;
-		size		= driver->GetSize();
-		currentFilePos	= driver->GetPos();
-		currentBufferPos= defaultPackageSize;
-		origsize	= size;
-		packageSize	= 1;
-		stdpacksize	= packageSize;
-		origpacksize	= packageSize;
-		data		= new unsigned char [packageSize];
+	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
-		return;
-	}
-	else
-	{
-		{ lastError = IO_ERROR_BADPARAM; return; }
-	}
+	streamType	= STREAM_DRIVER;
+	size		= driver->GetSize();
+	currentFilePos	= driver->GetPos();
+	currentBufferPos= defaultPackageSize;
+	origsize	= size;
+	packageSize	= 1;
+	stdpacksize	= packageSize;
+	origpacksize	= packageSize;
+
+	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, Void *inbuffer, Long bufsize)
 {
-	if (type == STREAM_BUFFER)
-	{
-		driver = new DriverMemory(inbuffer, bufsize);
+	if (type != STREAM_BUFFER)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-		if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
+	driver = new DriverMemory(inbuffer, bufsize);
 
-		streamType	= STREAM_DRIVER;
-		size		= driver->GetSize();
-		packageSize	= 1;
-		stdpacksize	= packageSize;
-		origpacksize	= packageSize;
-		currentBufferPos= packageSize;
-		origsize	= size;
-		data		= new unsigned char [packageSize];
+	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
-		return;
-	}
-	else
-	{
-		{ lastError = IO_ERROR_BADPARAM; return; }
-	}
+	streamType	= STREAM_DRIVER;
+	size		= driver->GetSize();
+	packageSize	= 1;
+	stdpacksize	= packageSize;
+	origpacksize	= packageSize;
+	currentBufferPos= packageSize;
+	origsize	= size;
+
+	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, OutStream *out)
 {
-	if (type != STREAM_STREAM)				{ lastError = IO_ERROR_BADPARAM; return; }
+	if (type != STREAM_STREAM)				{ lastError = IO_ERROR_BADPARAM;   return; }
 	if (out->streamType == STREAM_NONE || out->crosslinked)	{ lastError = IO_ERROR_OPNOTAVAIL; return; }
 
 	streamType = STREAM_STREAM;
@@ -136,12 +112,11 @@ S::IO::InStream::InStream(Int type, OutStream *out)
 		packageSize	= 1;
 		stdpacksize	= packageSize;
 		origpacksize	= packageSize;
-		data		= new unsigned char [packageSize];
 		currentBufferPos= packageSize;
 		size		= outStream->size;
 		origsize	= size;
 
-		return;
+		dataBuffer.Resize(packageSize);
 	}
 }
 
@@ -170,19 +145,17 @@ S::Bool S::IO::InStream::ReadData()
 
 		if (filters.GetNOfEntries() == 0)
 		{
-			delete [] data;
-
-			data = new unsigned char [packageSize];
+			dataBuffer.Resize(packageSize);
 
 			driver->Seek(currentFilePos);
 
-			if (size != -1)	decsize = driver->ReadData(data, ((packageSize)<(size-currentFilePos)?(packageSize):(size-currentFilePos)));
-			else		decsize = driver->ReadData(data, packageSize);
+			if (size != -1)	decsize = driver->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
+			else		decsize = driver->ReadData(dataBuffer, packageSize);
 		}
 		else
 		{
-			if (size != -1)	decsize = filters.GetFirstEntry()->ReadData(&data, ((packageSize)<(size-currentFilePos)?(packageSize):(size-currentFilePos)));
-			else		decsize = filters.GetFirstEntry()->ReadData(&data, packageSize);
+			if (size != -1)	decsize = filters.GetFirstEntry()->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
+			else		decsize = filters.GetFirstEntry()->ReadData(dataBuffer, packageSize);
 		}
 
 		if (packageSize <= size-currentFilePos || filters.GetNOfEntries() > 0 || size == -1)
@@ -229,7 +202,7 @@ S::Long S::IO::InStream::InputNumber(Int bytes)	// Intel byte order DCBA
 			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return -1; }
 		}
 
-		rval += data[currentBufferPos] * (1 << (i * 8));
+		rval += dataBuffer[currentBufferPos] * (1 << (i * 8));
 		currentBufferPos++;
 		currentFilePos++;
 	}
@@ -256,7 +229,7 @@ S::Long S::IO::InStream::InputNumberRaw(Int bytes)	// Raw byte order ABCD
 			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return -1; }
 		}
 
-		rval += data[currentBufferPos] * (1 << (i * 8));
+		rval += dataBuffer[currentBufferPos] * (1 << (i * 8));
 		currentBufferPos++;
 		currentFilePos++;
 	}
@@ -285,7 +258,7 @@ S::Long S::IO::InStream::InputNumberPDP(Int bytes)	// PDP byte order BADC
 				if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return -1; }
 			}
 
-			rval += (data[currentBufferPos] << (((3 - i) ^ 1) * 8)) >> (8 * (4 - bytes));
+			rval += (dataBuffer[currentBufferPos] << (((3 - i) ^ 1) * 8)) >> (8 * (4 - bytes));
 			currentBufferPos++;
 			currentFilePos++;
 		}
@@ -314,7 +287,7 @@ S::Long S::IO::InStream::InputNumberPBD(Int bits)
 			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return -1; }
 		}
 
-		inp = data[currentBufferPos];
+		inp = dataBuffer[currentBufferPos];
 		currentBufferPos++;
 		currentFilePos++;
 
@@ -350,25 +323,25 @@ S::String S::IO::InStream::InputString(Int bytes)
 	int	 bytesleft = bytes;
 	int	 databufferpos = 0;
 	int	 amount = 0;
-	char	*buffer = new char [bytes + 1];
-	String	 rval;
+
+	backBuffer.Resize(bytes + 1);
 
 	while (bytesleft)
 	{
 		if (currentFilePos >= (origfilepos + packageSize))
 		{
-			{ lastError = IO_ERROR_UNKNOWN; delete [] buffer; return NIL; }
+			{ lastError = IO_ERROR_UNKNOWN; return NIL; }
 		}
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; delete [] buffer; return NIL; }
-			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; delete [] buffer; return NIL; }
+			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return NIL; }
+			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return NIL; }
 		}
 
-		amount = ((packageSize - currentBufferPos)<(bytesleft))?(packageSize - currentBufferPos):(bytesleft);
+		amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
-		for (Int i = 0; i < amount; i++) buffer[databufferpos + i] = ((char *) (data + currentBufferPos))[i];
+		for (Int i = 0; i < amount; i++) backBuffer[databufferpos + i] = ((char *) (((UnsignedByte *) dataBuffer) + currentBufferPos))[i];
 
 		bytesleft -= amount;
 		databufferpos += amount;
@@ -376,13 +349,9 @@ S::String S::IO::InStream::InputString(Int bytes)
 		currentFilePos += amount;
 	}
 
-	buffer[bytes] = 0;
+	backBuffer[bytes] = 0;
 
-	rval = buffer;
-
-	delete [] buffer;
-
-	return rval;
+	return String((char *) (UnsignedByte *) backBuffer);
 }
 
 S::String S::IO::InStream::InputLine()
@@ -393,9 +362,8 @@ S::String S::IO::InStream::InputLine()
 
 	long	 inpval;
 	int	 bytes = 0;
-	String	 rval;
-	char	*linebuffer1 = new char [1024];
-	char	*linebuffer2;
+
+	backBuffer.Resize(1024);
 
 	for (int j = 0; j >= 0; j++)
 	{
@@ -405,46 +373,32 @@ S::String S::IO::InStream::InputLine()
 
 			if (inpval == -1)
 			{
-				linebuffer1[bytes] = 0;
+				backBuffer[bytes] = 0;
 
-				rval = linebuffer1;
-
-				delete [] linebuffer1;
-
-				return rval;
+				return String((char *) (UnsignedByte *) backBuffer);
 			}
 
 			if (inpval != 13 && inpval != 10)
 			{
-				linebuffer1[bytes] = (char) inpval;
-
-				bytes++;
+				backBuffer[bytes++] = (char) inpval;
 			}
 			else
 			{
 				if (inpval == 13) InputNumber(1);
 
-				linebuffer1[bytes] = 0;
+				backBuffer[bytes] = 0;
 
-				rval = linebuffer1;
-
-				delete [] linebuffer1;
-
-				return rval;
+				return String((char *) (UnsignedByte *) backBuffer);
 			}
 		}
 
-		linebuffer2 = new char [bytes];
+		Buffer<UnsignedByte>	 backBuffer2(bytes);
 
-		for (int l = 0; l < bytes; l++) linebuffer2[l] = linebuffer1[l];
+		memcpy(backBuffer2, backBuffer, bytes);
 
-		delete [] linebuffer1;
+		backBuffer.Resize(bytes + 1024);
 
-		linebuffer1 = new char [bytes + 1024];
-
-		for (int k = 0; k < bytes; k++) linebuffer1[k] = linebuffer2[k];
-
-		delete [] linebuffer2;
+		memcpy(backBuffer, backBuffer2, bytes);
 	}
 
 	return NIL; // never reached
@@ -474,7 +428,7 @@ S::Void *S::IO::InStream::InputData(Void *pointer, Int bytes)
 
 		amount = ((packageSize - currentBufferPos)<(bytesleft))?(packageSize - currentBufferPos):(bytesleft);
 
-		memcpy((void *) ((unsigned char *) pointer + databufferpos), (void *) (data + currentBufferPos), amount);
+		memcpy((void *) ((unsigned char *) pointer + databufferpos), (void *) (((UnsignedByte *) dataBuffer) + currentBufferPos), amount);
 
 		bytesleft -= amount;
 		databufferpos += amount;
@@ -501,22 +455,17 @@ S::Bool S::IO::InStream::CompletePBD()
 	return true;
 }
 
-S::Bool S::IO::InStream::SetPackageSize(Int newPackagesize)
+S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
 	if (!allowpackset)		{ lastError = IO_ERROR_OPNOTAVAIL; return false; }
-	if (newPackagesize <= 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (newPackageSize <= 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
 
 	if (pbdActive) CompletePBD();
 
-	if (filters.GetNOfEntries() == 0)
-	{
-		delete [] data;
+	if (filters.GetNOfEntries() == 0) dataBuffer.Resize(newPackageSize);
 
-		data = new unsigned char [newPackagesize];
-	}
-
-	packageSize = newPackagesize;
+	packageSize = newPackageSize;
 	stdpacksize = packageSize;
 
 	Seek(currentFilePos);
@@ -540,10 +489,6 @@ S::Bool S::IO::InStream::AddFilter(Filter *newFilter)
 	else if (newFilter->GetPackageSize() == -1)	SetPackageSize(size - currentFilePos);
 
 	allowpackset = false;
-
-	delete [] data;
-
-	data = NULL;
 
 	filters.AddEntry(newFilter);
 
@@ -571,8 +516,6 @@ S::Bool S::IO::InStream::RemoveFilter(Filter *oldFilter)
 
 	allowpackset = true;
 
-	data = new unsigned char [origpacksize];
-
 	SetPackageSize(origpacksize);
 
 	return true;
@@ -598,9 +541,6 @@ S::Bool S::IO::InStream::Close()
 
 	if (closefile) delete driver;
 
-	delete [] data;
-	data = NULL;
-
 	streamType = STREAM_NONE;
 
 	return true;
@@ -614,9 +554,9 @@ S::Bool S::IO::InStream::Seek(Int64 position)
 
 	driver->Seek(position);
 
-	currentFilePos		= position;
-	currentBufferPos	= packageSize;
-	origfilepos		= position;
+	currentFilePos	 = position;
+	currentBufferPos = packageSize;
+	origfilepos	 = position;
 
 	return true;
 }
@@ -629,9 +569,9 @@ S::Bool S::IO::InStream::RelSeek(Int64 offset)
 
 	driver->Seek(currentFilePos + offset);
 
-	currentFilePos		+= offset;
-	currentBufferPos	= packageSize;
-	origfilepos		= currentFilePos;
+	currentFilePos	 += offset;
+	currentBufferPos = packageSize;
+	origfilepos	 = currentFilePos;
 
 	return true;
 }

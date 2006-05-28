@@ -15,21 +15,18 @@
 S::IO::FilterBZip2::FilterBZip2()
 {
 	packageSize = -1;
-
-	buffer = NIL;
 }
 
 S::IO::FilterBZip2::~FilterBZip2()
 {
-	if (buffer != NIL) delete [] buffer;
 }
 
-S::Int S::IO::FilterBZip2::WriteData(UnsignedByte *data, Int size)
+S::Int S::IO::FilterBZip2::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
 	int		 outsize = size + size / 100 + 1000;
 	unsigned char	*dest = new unsigned char [outsize];
 
-	BZ2_bzBuffToBuffCompress((char *) dest, (unsigned int *) &outsize, (char *) data, size, 5, 0, 0);
+	BZ2_bzBuffToBuffCompress((char *) dest, (unsigned int *) &outsize, (char *) (UnsignedByte *) data, size, 5, 0, 0);
 
 	driver->WriteData(dest, outsize);
 
@@ -38,7 +35,7 @@ S::Int S::IO::FilterBZip2::WriteData(UnsignedByte *data, Int size)
 	return outsize;
 }
 
-S::Int S::IO::FilterBZip2::ReadData(UnsignedByte **data, Int size)
+S::Int S::IO::FilterBZip2::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
 	// try to guess the size of the uncompressed data
 
@@ -50,17 +47,13 @@ S::Int S::IO::FilterBZip2::ReadData(UnsignedByte **data, Int size)
 
 	unsigned char	*src = new unsigned char [size];
 
-	if (buffer != NIL) delete [] buffer;
-
-	buffer = new unsigned char [outsize];
-
 	driver->ReadData(src, size);
 
-	BZ2_bzBuffToBuffDecompress((char *) buffer, (unsigned int *) &outsize, (char *) src, size, 0, 0);
+	data.Resize(outsize);
+
+	BZ2_bzBuffToBuffDecompress((char *) (UnsignedByte *) data, (unsigned int *) &outsize, (char *) src, size, 0, 0);
 
 	delete [] src;
-
-	*data = buffer;
 
 	return outsize;
 }

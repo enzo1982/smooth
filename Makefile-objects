@@ -565,6 +565,11 @@ $(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/misc/math.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/math.cpp -o $(OBJECTDIR)/math.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/memory.o: $(MISCCLASSESDIR)/memory.cpp $(SMOOTHINCLUDEDIR)/misc/memory.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/memory.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/memory.cpp -o $(OBJECTDIR)/memory.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/misc/string.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/string.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string.cpp -o $(OBJECTDIR)/string.o

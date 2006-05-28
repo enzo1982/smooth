@@ -21,6 +21,7 @@ namespace smooth
 };
 
 #include "../definitions.h"
+#include "../templates/buffer.h"
 #include "io.h"
 
 namespace smooth
@@ -44,8 +45,8 @@ namespace smooth
 				virtual Bool	 Activate();
 				virtual Bool	 Deactivate();
 
-				virtual Int	 WriteData(UnsignedByte *, Int);
-				virtual Int	 ReadData(UnsignedByte **, Int);
+				virtual Int	 WriteData(Buffer<UnsignedByte> &, Int);
+				virtual Int	 ReadData(Buffer<UnsignedByte> &, Int);
 		};
 	};
 };

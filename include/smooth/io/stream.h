@@ -22,6 +22,7 @@ namespace smooth
 };
 
 #include "../definitions.h"
+#include "../templates/buffer.h"
 #include "io.h"
 
 namespace smooth
@@ -40,7 +41,8 @@ namespace smooth
 				Int64			 size;
 				Int64			 origsize;
 
-				UnsignedByte		*data;
+				Buffer<UnsignedByte>	 dataBuffer;
+				Buffer<UnsignedByte>	 backBuffer;
 
 				Int			 packageSize;
 				Int			 stdpacksize;

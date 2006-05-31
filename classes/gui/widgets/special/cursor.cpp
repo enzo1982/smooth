@@ -407,6 +407,8 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 							onLoseFocus.Emit();
 
 							onEnter.Emit(text);
+
+							return Break;
 						}
 
 						break;

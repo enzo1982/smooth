@@ -137,9 +137,9 @@ namespace smooth
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
 			accessors:
-				Bool				 IsRegistered() const		{ return registered; }
-				Bool				 IsVisible() const		{ if (!registered) return visible; if (!visible) return False; return container->IsVisible(); }
-				Bool				 IsActive() const		{ if (!registered) return active; if (!active) return False; if (alwaysActive) return True; return container->IsActive(); }
+				virtual Bool			 IsRegistered() const		{ return registered; }
+				virtual Bool			 IsVisible() const		{ if (!registered) return visible; if (!visible) return False; return container->IsVisible(); }
+				virtual Bool			 IsActive() const		{ if (!registered) return active; if (!active) return False; if (alwaysActive) return True; return container->IsActive(); }
 
 				Int				 SetAlwaysActive(Bool nValue)	{ alwaysActive = nValue; return Success(); }
 				Bool				 IsAlwaysActive() const		{ return alwaysActive; }

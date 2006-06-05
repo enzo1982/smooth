@@ -349,16 +349,6 @@ S::Int S::GUI::Window::Restore()
 	return Success();
 }
 
-S::Bool S::GUI::Window::IsMaximized() const
-{
-	return maximized;
-}
-
-S::Bool S::GUI::Window::IsMinimized() const
-{
-	return minimized;
-}
-
 S::GUI::Point S::GUI::Window::GetRealPosition()
 {
 	return Point(0, 0);

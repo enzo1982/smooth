@@ -127,8 +127,10 @@ namespace smooth
 
 				Int				 Restore();
 
-				Bool				 IsMaximized() const;
-				Bool				 IsMinimized() const;
+				Bool				 IsMaximized() const			{ return maximized; }
+				Bool				 IsMinimized() const			{ return minimized; }
+
+				Bool				 IsVisible() const			{ if (IsMinimized()) return False; return Widget::IsVisible(); }
 
 				Int				 Stay();
 				Int				 Close();

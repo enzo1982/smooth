@@ -73,15 +73,18 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 			else if (text != NIL && bitmap == NIL)
 			{
 				Rect	 textRect = Rect(realPos + Point(18, 0), GetSize() - Size(22, 2));
+				Font	 nFont = font;
+
+				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
 				surface->Box(frame, Setup::BackgroundColor, FILLED);
-				surface->SetText(text, textRect, font);
+				surface->SetText(text, textRect, nFont);
 
 				if (shortcut != NIL)
 				{
 					textRect.left = textRect.right - shortcutOffset;
 
-					surface->SetText(shortcut->ToString(), textRect, font);
+					surface->SetText(shortcut->ToString(), textRect, nFont);
 				}
 
 				if (popup != NIL)
@@ -105,7 +108,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 							if (i == 1)
 							{
-								color = Setup::TextColor;
+								if (IsActive())	color = Setup::TextColor;
+								else		color = Setup::GrayTextColor;
 
 								p1 -= Point(i, i);
 								p2 -= Point(i, i);
@@ -133,7 +137,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 							if (i == 1)
 							{
-								color = Setup::TextColor;
+								if (IsActive())	color = Setup::TextColor;
+								else		color = Setup::GrayTextColor;
 
 								point -= Point(i, i);
 							}

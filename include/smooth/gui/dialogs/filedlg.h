@@ -47,9 +47,12 @@ namespace smooth
 					Array<String>	 filterNames;
 					Array<String>	 filters;
 					Array<String>	 files;
+
 					Int		 flags;
 					Int		 mode;
+
 					String		 defExt;
+					String		 defFile;
 				public:
 							 FileSelection();
 					virtual		~FileSelection();
@@ -62,8 +65,10 @@ namespace smooth
 
 					Int		 AddFilter(const String &, const String &);
 
-					Int		 GetNumberOfFiles();
+					Int		 SetFileName(const String &);
 					String		 GetFileName();
+
+					Int		 GetNumberOfFiles();
 					String		 GetNthFileName(Int);
 			};
 		};

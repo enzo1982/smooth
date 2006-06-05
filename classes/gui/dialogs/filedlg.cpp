@@ -34,7 +34,8 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		wchar_t			*filterw = new wchar_t [32768];
 		wchar_t			*bufferw = new wchar_t [32768];
 
-		for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
+		for (Int i = 0; i < 32768; i++)		   bufferw[i] = 0;
+		for (Int n = 0; n < defFile.Length(); n++) bufferw[n] = defFile[n];
 
 		if (parentWindow != NIL)	ofnw.hwndOwner = (HWND) parentWindow->GetSystemWindow();
 		else				ofnw.hwndOwner = NIL;
@@ -153,7 +154,8 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		char			*filtera = new char [32768];
 		char			*buffera = new char [32768];
 
-		for (Int j = 0; j < 32768; j++) buffera[j] = 0;
+		for (Int j = 0; j < 32768; j++)		   buffera[j] = 0;
+		for (Int n = 0; n < defFile.Length(); n++) buffera[n] = defFile[n];
 
 		if (parentWindow != NIL)	ofna.hwndOwner = (HWND) parentWindow->GetSystemWindow();
 		else				ofna.hwndOwner = NIL;
@@ -302,6 +304,13 @@ S::Int S::GUI::Dialogs::FileSelection::SetDefaultExtension(const String &newDefE
 S::Int S::GUI::Dialogs::FileSelection::GetNumberOfFiles()
 {
 	return files.GetNOfEntries();
+}
+
+S::Int S::GUI::Dialogs::FileSelection::SetFileName(const String &newDefFile)
+{
+	defFile = newDefFile;
+
+	return Success();
 }
 
 S::String S::GUI::Dialogs::FileSelection::GetFileName()

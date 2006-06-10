@@ -30,6 +30,7 @@
 
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
 S::Int		 S::GUI::Window::nOfActiveWindows = 0;
+S::GUI::Window	*S::GUI::Window::activeWindow = NIL;
 
 S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize, Void *iWindow) : Widget(iPos, iSize)
 {
@@ -240,6 +241,8 @@ S::Int S::GUI::Window::Show()
 	if (!created) Create();
 
 	backend->SetMetrics(GetPosition(), GetSize());
+
+	onResize.Emit();
 
 	if (maximized && !initshow)
 	{
@@ -564,6 +567,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_ACTIVATE:
+			if (LOWORD(wParam) == WA_INACTIVE && lParam != 0) activeWindow = GetWindow((HWND) lParam);
+
 			if (LOWORD(wParam) != WA_INACTIVE && !(flags & WF_SYSTEMMODAL))
 			{
 				for (Int i = 0; i < Object::GetNOfObjects(); i++)
@@ -585,9 +590,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			if (LOWORD(wParam) == WA_INACTIVE && focussed)
 			{
-				if (Window::GetWindow((HWND) lParam) != NIL)
+				if (GetWindow((HWND) lParam) != NIL)
 				{
-					if (Window::GetWindow((HWND) lParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) lParam)->GetOrder() >= GetOrder()) break;
+					if (GetWindow((HWND) lParam)->GetObjectType() == ToolWindow::classID && GetWindow((HWND) lParam)->GetOrder() >= GetOrder()) break;
 				}
 
 				focussed = False;
@@ -622,7 +627,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			if (flags & WF_MODAL)
 			{
 				Bool	 activate = False;
-				HWND	 actWnd = GetActiveWindow();
+				HWND	 actWnd = ::GetActiveWindow();
 
 				if (actWnd == (HWND) backend->GetSystemWindow()) break;
 
@@ -650,7 +655,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			if (flags & WF_APPTOPMOST)
 			{
 				Bool	 activate = False;
-				HWND	 actWnd = GetActiveWindow();
+				HWND	 actWnd = ::GetActiveWindow();
 
 				if (actWnd == (HWND) backend->GetSystemWindow()) break;
 
@@ -1007,6 +1012,8 @@ S::Void S::GUI::Window::OpenPopupMenu()
 
 	if (trackMenu != NIL)
 	{
+		trackMenu->CalculateSize();
+
 		trackMenu->SetPosition(Point(MouseX(), MouseY()));
 		trackMenu->internalRequestClose.Connect(&Window::ClosePopupMenu, this);
 

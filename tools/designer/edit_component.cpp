@@ -139,16 +139,23 @@ Widget *Designer_EditComponent::AddObject(Int objid)
 		case SMOOTH_BUTTON:
 			registrar = wnd;
 
-			pos.x = 100;
-			pos.y = 100;
-			size.cx = 0;
-			size.cy = 0;
+			pos.x	  = 100;
+			pos.y	  = 100;
+			size.cx	  = 0;
+			size.cy	  = 0;
 
-			newobj = new Button("Button", NIL, pos, size);
+			newobj	  = new Button("Button", NIL, pos, size);
+
+			break;
+		case SMOOTH_LAYER:
+			registrar = wnd;
+			newobj	  = new Layer("Layer");
+
 			break;
 		case SMOOTH_MENUBAR:
 			registrar = wnd;
-			newobj = new Menubar();
+			newobj	  = new Menubar();
+
 			break;
 		default:
 			QuickMessage("Unknown object ID!", "Error", MB_OK, IDI_HAND);

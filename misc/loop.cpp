@@ -51,8 +51,6 @@ S::Void S::Init()
 
 	LiSAInit();
 
-	Int	 codePage = 1252;
-
 #ifdef __WIN32__
 	if (LoadIconvDLL() == True)	{ Setup::useIconv = True;  use_iconv = 1; }
 	else				{ Setup::useIconv = False; use_iconv = 0; }
@@ -81,8 +79,6 @@ S::Void S::Init()
 		FreeLibrary(hUnicows);
 	}
 
-	codePage = GetACP();
-
 	CoInitialize(NIL);
 
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
@@ -92,6 +88,8 @@ S::Void S::Init()
 
 	I18n::Translator::defaultTranslator = new I18n::Translator("smooth", True);
 	I18n::Translator::defaultTranslator->SetInternalLanguageInfo("English", "Robert Kausch", "http://www.smooth-project.org/", False);
+
+	Int	 codePage = 1252;
 
 #ifdef __WIN32__
 	switch (PRIMARYLANGID(GetUserDefaultLangID()))
@@ -107,6 +105,8 @@ S::Void S::Init()
 			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_it");
 			break;
 	}
+
+	codePage = GetACP();
 #endif
 
 	Setup::rightToLeft = I18n::Translator::defaultTranslator->IsActiveLanguageRightToLeft();

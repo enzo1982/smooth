@@ -74,6 +74,8 @@ namespace smooth
 
 				Layer				*mainLayer;
 
+				static Window			*activeWindow;
+
 				virtual Bool			 Create();
 
 				Void				 CalculateOffsets();
@@ -149,6 +151,7 @@ namespace smooth
 				Void				*GetSystemWindow();
 
 				static Window			*GetWindow(Void *);
+				static Window			*GetActiveWindow()			{ return activeWindow; }
 
 				virtual Int			 RegisterObject(Widget *);
 				virtual Int			 UnregisterObject(Widget *);

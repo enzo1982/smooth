@@ -277,10 +277,11 @@ S::Void S::GUI::PopupMenuEntry::SetShortcutOffset(Int nShortcutOffset)
 
 S::Void S::GUI::PopupMenuEntry::OnClickEntry()
 {
+	owner->SetClosedByClick(True);
+	owner->internalRequestClose.Emit();
+
 	if (bVar != NIL) { *bVar = !*bVar; CheckBox::internalCheckValues.Emit(); }
 	if (iVar != NIL) { *iVar = iCode; OptionBox::internalCheckValues.Emit(); }
-
-	owner->internalRequestClose.Emit();
 
 	onAction.Emit();
 }
@@ -300,11 +301,12 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 	Point	 realPos	= GetRealPosition();
 	Point	 popupPos	= realPos + Point(GetWidth(), -3);
 
+	popup->CalculateSize();
+
 	if (window->GetX() + popupPos.x + popup->GetWidth() >= LiSAGetDisplaySizeX()) popupPos.x = realPos.x - popup->GetWidth();
 	if (window->GetY() + popupPos.y + popup->GetHeight() >= LiSAGetDisplaySizeY()) popupPos.y = realPos.y - popup->GetHeight() + GetHeight() + 3;
 
 	popup->SetPosition(popupPos);
-	popup->internalRequestClose.Connect(&owner->internalRequestClose);
 	popup->internalRequestClose.Connect(&PopupMenuEntry::ClosePopupMenu, this);
 
 	owner->SetHasNext(True);
@@ -318,14 +320,24 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 
 	if (popup->GetContainer() == this)
 	{
+		popup->internalRequestClose.Disconnect(&PopupMenuEntry::ClosePopupMenu, this);
+
 		UnregisterObject(popup);
 
 		owner->SetHasNext(False);
 
-		popup->internalRequestClose.Disconnect(&owner->internalRequestClose);
-		popup->internalRequestClose.Disconnect(&PopupMenuEntry::ClosePopupMenu, this);
-
 		hotspot->Activate();
+
+		if (popup->IsClosedByClick())
+		{
+			owner->SetClosedByClick(True);
+			owner->internalRequestClose.Emit();
+		}
+		else
+		{
+			if (Window::GetActiveWindow() != container->GetContainerWindow()) owner->internalRequestClose.Emit();
+			else								  SetActiveWindow((HWND) container->GetContainerWindow()->GetSystemWindow());
+		}
 	}
 }
 

@@ -201,8 +201,8 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 	Int	 style		= WS_THICKFRAME | WS_SYSMENU | WS_POPUP;
 	Int	 extStyle	= 0;
 
-	if (flags & WF_NORESIZE)	style		= (style ^ WS_THICKFRAME) | WS_DLGFRAME;
-	if (flags & WF_THINBORDER)	style		= (style ^ WS_THICKFRAME ^ WS_SYSMENU) | WS_BORDER;
+	if (flags & WF_NORESIZE)	style		= (style & ~WS_THICKFRAME) | WS_DLGFRAME;
+	if (flags & WF_THINBORDER)	style		= (style & ~WS_THICKFRAME & ~WS_SYSMENU);
 	if (flags & WF_TOPMOST)		extStyle	= extStyle | WS_EX_TOPMOST;
 	if (flags & WF_NOTASKBUTTON)	extStyle	= extStyle | WS_EX_TOOLWINDOW;
 
@@ -213,7 +213,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 		WNDCLASSEXW	*wndclassw = (WNDCLASSEXW *) wndclass;
 
 		wndclassw->cbSize	= sizeof(WNDCLASSEXW);
-		wndclassw->style	= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((extStyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
+		wndclassw->style	= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
 		wndclassw->lpfnWndProc	= WindowProc;
 		wndclassw->cbClsExtra	= 0;
 		wndclassw->cbWndExtra	= 0;

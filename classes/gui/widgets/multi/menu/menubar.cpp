@@ -35,6 +35,7 @@ S::GUI::MenuEntry *S::GUI::Menubar::AddEntry(const String &text, const Bitmap &b
 	RegisterObject(newEntry);
 
 	if (GetHeight() < newEntry->GetHeight() + 2) SetHeight(newEntry->GetHeight() + 2);
+	if (GetWidth() < newEntry->GetWidth() + 3) SetWidth(newEntry->GetWidth() + 3);
 
 	return newEntry;
 }

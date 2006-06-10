@@ -44,7 +44,16 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 	if (!initialized)
 	{
-		DragAcceptFiles((HWND) container->GetContainerWindow()->GetSystemWindow(), True);
+		// Enable Drag & Drop only on the Windows NT family for now, due to problems on Windows 9x
+		{
+			OSVERSIONINFOA	 vInfo;
+
+			vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+			GetVersionExA(&vInfo);
+
+			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) DragAcceptFiles((HWND) container->GetContainerWindow()->GetSystemWindow(), True);
+		}
 
 		initialized = True;
 	}

@@ -172,17 +172,23 @@ void Designer::TimerProc()
 	if (!mouseOnWindow && (statusbar->GetText() != "Ready")) statusbar->SetText("Ready");
 }
 
-void Designer::AddButton()
+Void Designer::AddButton()
 {
+	if (active_dlg == NIL) return;
+
 	active_dlg->AddObject(SMOOTH_BUTTON);
 }
 
-void Designer::AddLayer()
+Void Designer::AddLayer()
 {
+	if (active_dlg == NIL) return;
+
 	active_dlg->AddObject(SMOOTH_LAYER);
 }
 
-void Designer::AddMenubar()
+Void Designer::AddMenubar()
 {
+	if (active_dlg == NIL) return;
+
 	active_dlg->AddObject(SMOOTH_MENUBAR);
 }

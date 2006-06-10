@@ -196,10 +196,12 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 	{
 		hotspot->Deactivate();
 
-		RegisterObject(popup);
+		popup->CalculateSize();
 
 		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : GetWidth() + 2 - popup->GetWidth(), GetHeight() + 1));
 		popup->internalRequestClose.Connect(&MenubarEntry::ClosePopupMenu, this);
+
+		RegisterObject(popup);
 
 		container->SetFlags(container->GetFlags() | MB_POPUPOPEN);
 	}
@@ -211,7 +213,7 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 
 	if (popup->GetContainer() == this)
 	{
-		container->SetFlags(container->GetFlags() & !MB_POPUPOPEN);
+		container->SetFlags(container->GetFlags() & ~MB_POPUPOPEN);
 
 		UnregisterObject(popup);
 

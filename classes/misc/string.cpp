@@ -1459,12 +1459,11 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * 2;
 
-		if (size < outBytes && size > 0)
-		{
-			MultiByteToWideChar(codePage, 0, inBuffer, -1, (wchar_t *) outBuffer, size / 2);
-		}
+		// Codepage not installed? Let's try CP_ACP!
+		if (size == 0 && GetLastError() == ERROR_INVALID_PARAMETER) size = MultiByteToWideChar(codePage = CP_ACP, 0, inBuffer, -1, NIL, 0) * 2;
 
-		if (size >= outBytes) size = 0;
+		if (size < outBytes && size > 0) MultiByteToWideChar(codePage, 0, inBuffer, -1, (wchar_t *) outBuffer, size / 2);
+		else if (size >= outBytes)	 size = 0;
 	}
 	else if (strcmp(inEncoding, "UTF-16LE") == 0)
 	{
@@ -1494,12 +1493,11 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		size = WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
 
-		if (size < outBytes && size > 0)
-		{
-			WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, outBuffer, size, NIL, NIL);
-		}
+		// Codepage not installed? Let's try CP_ACP!
+		if (size == 0 && GetLastError() == ERROR_INVALID_PARAMETER) size = WideCharToMultiByte(codePage = CP_ACP, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
 
-		if (size >= outBytes) size = 0;
+		if (size < outBytes && size > 0) WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, outBuffer, size, NIL, NIL);
+		else if (size >= outBytes)	 size = 0;
 	}
 #endif
 

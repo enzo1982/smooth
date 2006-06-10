@@ -779,19 +779,20 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		{
 			LOGFONTW	 lFont;
 
-			lFont.lfHeight = -MulDiv(font.GetSize(), GetDeviceCaps((HDC) surface->GetSystemSurface(), LOGPIXELSY), 72);
-			lFont.lfWidth = 0;
-			lFont.lfEscapement = 0;
-			lFont.lfOrientation = 0;
-			lFont.lfWeight = font.GetWeight();
-			lFont.lfItalic = false;
-			lFont.lfUnderline = false;
-			lFont.lfStrikeOut = false;
-			lFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
-			lFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-			lFont.lfCharSet = DEFAULT_CHARSET;
-			lFont.lfQuality = DEFAULT_QUALITY;
-			lFont.lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
+			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps((HDC) surface->GetSystemSurface(), LOGPIXELSY));
+			lFont.lfWidth		= 0;
+			lFont.lfEscapement	= 0;
+			lFont.lfOrientation	= 0;
+			lFont.lfWeight		= font.GetWeight();
+			lFont.lfItalic		= false;
+			lFont.lfUnderline	= false;
+			lFont.lfStrikeOut	= false;
+			lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
+			lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
+			lFont.lfCharSet		= DEFAULT_CHARSET;
+			lFont.lfQuality		= DEFAULT_QUALITY;
+			lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
+
 			wcscpy(lFont.lfFaceName, font.GetName());
 
 			ImmSetCompositionFontW(hImc, &lFont);
@@ -800,19 +801,20 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		{
 			LOGFONTA	 lFont;
 
-			lFont.lfHeight = -MulDiv(font.GetSize(), GetDeviceCaps((HDC) surface->GetSystemSurface(), LOGPIXELSY), 72);
-			lFont.lfWidth = 0;
-			lFont.lfEscapement = 0;
-			lFont.lfOrientation = 0;
-			lFont.lfWeight = font.GetWeight();
-			lFont.lfItalic = false;
-			lFont.lfUnderline = false;
-			lFont.lfStrikeOut = false;
-			lFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
-			lFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-			lFont.lfCharSet = DEFAULT_CHARSET;
-			lFont.lfQuality = DEFAULT_QUALITY;
-			lFont.lfPitchAndFamily = DEFAULT_PITCH | FF_ROMAN;
+			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps((HDC) surface->GetSystemSurface(), LOGPIXELSY));
+			lFont.lfWidth		= 0;
+			lFont.lfEscapement	= 0;
+			lFont.lfOrientation	= 0;
+			lFont.lfWeight		= font.GetWeight();
+			lFont.lfItalic		= false;
+			lFont.lfUnderline	= false;
+			lFont.lfStrikeOut	= false;
+			lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
+			lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
+			lFont.lfCharSet		= DEFAULT_CHARSET;
+			lFont.lfQuality		= DEFAULT_QUALITY;
+			lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
+
 			strcpy(lFont.lfFaceName, font.GetName());
 
 			ImmSetCompositionFontA(hImc, &lFont);

@@ -216,7 +216,7 @@ S::Int S::GUI::Font::GetLineSizeX(const String &text, Int nOfChars) const
 #ifdef __WIN32__
 	HDC	 ddc	= GetWindowDC(0);
 	HDC	 cdc	= CreateCompatibleDC(ddc);
-	Int	 size	= -MulDiv(fontSize, GetDeviceCaps(cdc, LOGPIXELSY), 72);
+	Int	 size	= -Math::Round(fontSize * 128.0 / GetDeviceCaps(cdc, LOGPIXELSY));
 	HFONT	 hFont;
 	HFONT	 hOldFont;
 
@@ -264,7 +264,7 @@ S::Int S::GUI::Font::GetLineSizeY(const String &text) const
 #ifdef __WIN32__
 	HDC	 ddc	= GetWindowDC(0);
 	HDC	 cdc	= CreateCompatibleDC(ddc);
-	Int	 size	= -MulDiv(fontSize, GetDeviceCaps(cdc, LOGPIXELSY), 72);
+	Int	 size	= -Math::Round(fontSize * 128.0 / GetDeviceCaps(cdc, LOGPIXELSY));
 	HFONT	 hFont;
 	HFONT	 hOldFont;
 

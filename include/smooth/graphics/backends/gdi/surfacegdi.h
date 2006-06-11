@@ -30,14 +30,13 @@ namespace smooth
 		class SurfaceGDI : public SurfaceBackend
 		{
 			protected:
-				HDC		 gdi_dc;
-				HDC		 real_dc;
+				HWND		 window;
 
 				Array<HDC>	 cDc_contexts;
 				Array<HBITMAP>	 cDc_bitmaps;
 				Array<Rect *>	 cDc_rects;
 			public:
-						 SurfaceGDI(Void * = NIL);
+						 SurfaceGDI(Void * = NIL, const Size & = Size());
 						~SurfaceGDI();
 
 				Int		 PaintRect(const Rect &);

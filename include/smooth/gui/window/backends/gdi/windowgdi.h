@@ -42,7 +42,6 @@ namespace smooth
 				Int					 id;
 
 				HWND					 hwnd;
-				HDC					 windowDC;
 
 				Void					*wndclass;
 				String					 className;

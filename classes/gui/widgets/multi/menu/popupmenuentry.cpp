@@ -335,8 +335,8 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 		}
 		else
 		{
-			if (Window::GetActiveWindow() != container->GetContainerWindow()) owner->internalRequestClose.Emit();
-			else								  SetActiveWindow((HWND) container->GetContainerWindow()->GetSystemWindow());
+			if (!container->GetContainerWindow()->IsMouseOn(Rect(Point(), container->GetSize()))) owner->internalRequestClose.Emit();
+			else										      SetActiveWindow((HWND) container->GetContainerWindow()->GetSystemWindow());
 		}
 	}
 }

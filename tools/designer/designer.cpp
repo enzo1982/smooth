@@ -161,7 +161,9 @@ void Designer::TimerProc()
 	{
 		object = dlgs.GetNthEntry(i);
 
-		if (object->GetWindow()->MouseX() > 0 && object->GetWindow()->MouseY() > 0 && object->GetWindow()->MouseX() < object->GetWindow()->GetWidth() && object->GetWindow()->MouseY() < object->GetWindow()->GetHeight())
+		Point	 mousePos = object->GetWindow()->GetMousePosition();
+
+		if (mousePos.x > 0 && mousePos.y > 0 && mousePos.x < object->GetWindow()->GetWidth() && mousePos.y < object->GetWindow()->GetHeight())
 		{
 			mouseOnWindow = True;
 

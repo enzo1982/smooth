@@ -17,17 +17,19 @@ namespace smooth
 };
 
 #include "../definitions.h"
+#include "../graphics/forms/point.h"
 
 namespace smooth
 {
 	class SMOOTHAPI Input
 	{
 		private:
-					 Input();
-					 Input(const Input &);
+			static GUI::Point	 mousePosition;
+
+						 Input();
+						 Input(const Input &);
 		public:
-			static Int	 MouseX();
-			static Int	 MouseY();
+			static const GUI::Point	&GetMousePosition();
 	};
 };
 

@@ -30,7 +30,6 @@
 
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
 S::Int		 S::GUI::Window::nOfActiveWindows = 0;
-S::GUI::Window	*S::GUI::Window::activeWindow = NIL;
 
 S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize, Void *iWindow) : Widget(iPos, iSize)
 {
@@ -567,8 +566,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_ACTIVATE:
-			if (LOWORD(wParam) == WA_INACTIVE && lParam != 0) activeWindow = GetWindow((HWND) lParam);
-
 			if (LOWORD(wParam) != WA_INACTIVE && !(flags & WF_SYSTEMMODAL))
 			{
 				for (Int i = 0; i < Object::GetNOfObjects(); i++)
@@ -590,9 +587,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			if (LOWORD(wParam) == WA_INACTIVE && focussed)
 			{
-				if (GetWindow((HWND) lParam) != NIL)
+				const Window	*window = GetWindow((HWND) lParam);
+
+				if (window != NIL)
 				{
-					if (GetWindow((HWND) lParam)->GetObjectType() == ToolWindow::classID && GetWindow((HWND) lParam)->GetOrder() >= GetOrder()) break;
+					if (window->GetObjectType() == ToolWindow::classID && window->GetOrder() >= GetOrder()) break;
 				}
 
 				focussed = False;
@@ -613,9 +612,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_KILLFOCUS:
 			if (focussed)
 			{
-				if (Window::GetWindow((HWND) wParam) != NIL)
+				const Window	*window = Window::GetWindow((HWND) wParam);
+
+				if (window != NIL)
 				{
-					if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetOrder() >= GetOrder()) break;
+					if (window->GetObjectType() == ToolWindow::classID && window->GetOrder() >= GetOrder()) break;
 				}
 
 				focussed = False;
@@ -631,10 +632,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (actWnd == (HWND) backend->GetSystemWindow()) break;
 
-				if (GetWindow(actWnd) == NIL)					activate = False;
-				else if (GetWindow(actWnd)->type == ToolWindow::classID)	break;
-				else if (GetWindow(actWnd)->GetOrder() < GetOrder())		activate = True;
-				else if (GetWindow(actWnd)->GetOrder() > GetOrder())		GetWindow(actWnd)->SetFlags(WF_MODAL);
+				Window	*window = GetWindow(actWnd);
+
+				if (window == NIL)				activate = False;
+				else if (window->type == ToolWindow::classID)	break;
+				else if (window->GetOrder() < GetOrder())	activate = True;
+				else if (window->GetOrder() > GetOrder())	window->SetFlags(WF_MODAL);
 
 				if (activate && message == WM_ACTIVATEAPP)
 				{
@@ -659,9 +662,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (actWnd == (HWND) backend->GetSystemWindow()) break;
 
-				if (GetWindow(actWnd) == NIL)					activate = False;
-				else if (GetWindow(actWnd)->type == ToolWindow::classID)	break;
-				else								activate = True;
+				const Window	*window = GetWindow(actWnd);
+
+				if (window == NIL)				activate = False;
+				else if (window->type == ToolWindow::classID)	break;
+				else						activate = True;
 
 				if (activate && message == WM_ACTIVATEAPP)
 				{
@@ -684,10 +689,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (actWnd == (HWND) backend->GetSystemWindow()) break;
 
-				if (GetWindow(actWnd) == NIL)					activate = True;
-				else if (GetWindow(actWnd)->type == ToolWindow::classID)	activate = False;
-				else if (GetWindow(actWnd)->GetOrder() < GetOrder())		activate = True;
-				else if (GetWindow(actWnd)->GetOrder() > GetOrder())		GetWindow(actWnd)->SetFlags(WF_SYSTEMMODAL);
+				Window	*window = GetWindow(actWnd);
+
+				if (window == NIL)				activate = True;
+				else if (window->type == ToolWindow::classID)	activate = False;
+				else if (window->GetOrder() < GetOrder())	activate = True;
+				else if (window->GetOrder() > GetOrder())	window->SetFlags(WF_SYSTEMMODAL);
 
 				if (activate)
 				{
@@ -865,9 +872,9 @@ S::Int S::GUI::Window::Paint(Int message)
 			if (widget->IsAffected(updateRect) && widget->GetObjectType() == Layer::classID) widget->Paint(SP_PAINT);
 		}
 
-		onPaint.Emit();
-
 		surface->EndPaint();
+
+		onPaint.Emit();
 	}
 
 	LeaveProtectedRegion();
@@ -971,15 +978,12 @@ S::Void S::GUI::Window::CalculateOffsets()
 	}
 }
 
-S::Int S::GUI::Window::MouseX()
+S::GUI::Point S::GUI::Window::GetMousePosition()
 {
-	if (IsRightToLeft())	return GetWidth() - (Input::MouseX() - GetX()) - 1;
-	else			return Input::MouseX() - GetX();
-}
+	Point	 position = Input::GetMousePosition();
 
-S::Int S::GUI::Window::MouseY()
-{
-	return Input::MouseY() - GetY();
+	if (IsRightToLeft())	return Point(GetWidth() - (position.x - GetX()) - 1, position.y - GetY());
+	else			return Point(position.x - GetX(), position.y - GetY());
 }
 
 S::Bool S::GUI::Window::IsMouseOn(const Rect &rect)
@@ -989,11 +993,20 @@ S::Bool S::GUI::Window::IsMouseOn(const Rect &rect)
 	if (surface->GetSystemSurface() == NIL) return False;
 
 #ifdef __WIN32__
-	if (!PtVisible((HDC) surface->GetSystemSurface(), Input::MouseX() - GetX(), Input::MouseY() - GetY())) return False;
+	Point	 position = Input::GetMousePosition();
+	HWND	 window = (HWND) surface->GetSystemSurface();
+	HDC	 dc = GetWindowDC(window);
+	Bool	 pointVisible = PtVisible(dc, position.x - GetX(), position.y - GetY());
+
+	ReleaseDC(window, dc);
+
+	if (!pointVisible) return False;
 #endif
 
-	if ((MouseX() >= rect.left) && (MouseX() < rect.right) && (MouseY() >= rect.top) && (MouseY() < rect.bottom))	return True;
-	else														return False;
+	Point	 mousePos = GetMousePosition();
+
+	if ((mousePos.x >= rect.left) && (mousePos.x < rect.right) && (mousePos.y >= rect.top) && (mousePos.y < rect.bottom))	return True;
+	else															return False;
 }
 
 S::GUI::Surface *S::GUI::Window::GetDrawSurface()
@@ -1008,13 +1021,15 @@ S::Void *S::GUI::Window::GetSystemWindow()
 
 S::Void S::GUI::Window::OpenPopupMenu()
 {
-	trackMenu = getTrackMenu.Call(MouseX(), MouseY());
+	Point	 position = GetMousePosition();
+
+	trackMenu = getTrackMenu.Call(position.x, position.y);
 
 	if (trackMenu != NIL)
 	{
 		trackMenu->CalculateSize();
 
-		trackMenu->SetPosition(Point(MouseX(), MouseY()));
+		trackMenu->SetPosition(position);
 		trackMenu->internalRequestClose.Connect(&Window::ClosePopupMenu, this);
 
 		RegisterObject(trackMenu);
@@ -1076,11 +1091,13 @@ S::GUI::Window *S::GUI::Window::GetWindow(Void *sysWindow)
 
 	for (Int i = 0; i < Object::GetNOfObjects(); i++)
 	{
-		Object	*window = Object::GetNthObject(i);
+		Object			*window = Object::GetNthObject(i);
 
 		if (window == NIL) continue;
 
-		if (window->GetObjectType() == Window::classID || window->GetObjectType() == MDI::Window::classID || window->GetObjectType() == ToolWindow::classID)
+		const ObjectType	&objType = window->GetObjectType();
+
+		if (objType == Window::classID || objType == MDI::Window::classID || objType == ToolWindow::classID)
 		{
 			if (((Window *) window)->GetSystemWindow() == sysWindow) return (Window *) window;
 		}

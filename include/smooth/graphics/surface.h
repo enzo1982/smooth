@@ -41,7 +41,7 @@ namespace smooth
 				SurfaceBackend	*backend;
 				Threads::Mutex	*mutex;
 			public:
-						 Surface(Void * = NIL);
+						 Surface(Void * = NIL, const Size & = Size());
 				virtual		~Surface();
 
 				Int		 GetSurfaceType();

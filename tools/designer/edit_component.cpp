@@ -59,15 +59,20 @@ Void Designer_EditComponent::EventProc(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_MOUSEMOVE:
-			if ((status.mousex != wnd->MouseX() || status.mousey != wnd->MouseY()) && !(status.event == STATUS_EVENT_REPORT_WINDOWPOSITION && (clock() - status.ticks) < 100))
 			{
-				status.mousex = wnd->MouseX();
-				status.mousey = wnd->MouseY();
+				Point	 mousePos = wnd->GetMousePosition();
 
-				status.event = STATUS_EVENT_REPORT_MOUSEPOSITION;
+				if ((status.mousex != mousePos.x || status.mousey != mousePos.y) && !(status.event == STATUS_EVENT_REPORT_WINDOWPOSITION && (clock() - status.ticks) < 100))
+				{
+					status.mousex = mousePos.x;
+					status.mousey = mousePos.y;
 
-				designer->ReportStatus(status);
+					status.event = STATUS_EVENT_REPORT_MOUSEPOSITION;
+
+					designer->ReportStatus(status);
+				}
 			}
+
 			break;
 		case WM_WINDOWPOSCHANGED:
 			wndpos = (LPWINDOWPOS) lParam;
@@ -90,6 +95,7 @@ Void Designer_EditComponent::EventProc(Int message, Int wParam, Int lParam)
 			}
 
 			designer->ReportStatus(status);
+
 			break;
 		case SM_LBUTTONDOWN:
 		case SM_RBUTTONDOWN:

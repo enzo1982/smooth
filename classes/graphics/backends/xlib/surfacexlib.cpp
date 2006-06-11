@@ -15,14 +15,14 @@
 #include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
 
-S::GUI::SurfaceBackend *CreateSurfaceXLib(S::Void *iSurface)
+S::GUI::SurfaceBackend *CreateSurfaceXLib(S::Void *iSurface, const S::GUI::Size &)
 {
 	return new S::GUI::SurfaceXLib(iSurface);
 }
 
 S::Int	 surfaceXLibTmp = S::GUI::SurfaceBackend::AddBackend(&CreateSurfaceXLib);
 
-S::GUI::SurfaceXLib::SurfaceXLib(Void *iDc)
+S::GUI::SurfaceXLib::SurfaceXLib(Void *iDc, const Size &maxSize)
 {
 	type	= SURFACE_XLIB;
 
@@ -128,8 +128,7 @@ S::Int S::GUI::SurfaceXLib::EndPaint()
 
 S::Void *S::GUI::SurfaceXLib::GetSystemSurface()
 {
-	if (painting)	return (Void *) bitmap;
-	else		return (Void *) window;
+	return (Void *) window;
 }
 
 S::Int S::GUI::SurfaceXLib::SetPixel(Int x, Int y, Int color)

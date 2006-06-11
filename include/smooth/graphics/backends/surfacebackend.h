@@ -34,57 +34,57 @@ namespace smooth
 		class SurfaceBackend
 		{
 			private:
-				static Array<SurfaceBackend *(*)(Void *), Void *>	*backend_creators;
+				static Array<SurfaceBackend *(*)(Void *, const Size &), Void *>	*backend_creators;
 			protected:
-				Int							 type;
+				Int								 type;
 
-				Size							 size;
-				Rect							 paintRect;
+				Size								 size;
+				Rect								 paintRect;
 
-				Bool							 rightToLeft;
+				Bool								 rightToLeft;
 
-				Int							 painting;
+				Int								 painting;
 
-				Int							 TranslateX(Int);
-				Int							 TranslateY(Int);
-				Point							 TranslatePoint(const Point &);
-				Rect							 TranslateRect(const Rect &);
+				Int								 TranslateX(Int);
+				Int								 TranslateY(Int);
+				Point								 TranslatePoint(const Point &);
+				Rect								 TranslateRect(const Rect &);
 			public:
-				static Int						 AddBackend(SurfaceBackend *(*)(Void *));
+				static Int							 AddBackend(SurfaceBackend *(*)(Void *, const Size &));
 
-				static SurfaceBackend					*CreateBackendInstance(Void * = NIL);
+				static SurfaceBackend						*CreateBackendInstance(Void * = NIL, const Size & = Size());
 
-											 SurfaceBackend(Void * = NIL);
-				virtual							~SurfaceBackend();
+												 SurfaceBackend(Void * = NIL, const Size & = Size());
+				virtual								~SurfaceBackend();
 
-				Int							 GetSurfaceType();
+				Int								 GetSurfaceType();
 
-				Int							 SetSize(const Size &);
-				const Size						&GetSize();
+				Int								 SetSize(const Size &);
+				const Size							&GetSize();
 
-				Int							 SetRightToLeft(Bool);
+				Int								 SetRightToLeft(Bool);
 
-				virtual Int						 PaintRect(const Rect &);
+				virtual Int							 PaintRect(const Rect &);
 
-				virtual Int						 StartPaint(const Rect &);
-				virtual Int						 EndPaint();
+				virtual Int							 StartPaint(const Rect &);
+				virtual Int							 EndPaint();
 
-				virtual Void						*GetSystemSurface();
+				virtual Void							*GetSystemSurface();
 
-				virtual Int						 SetPixel(Int, Int, Int);
-				virtual Int						 GetPixel(Int, Int);
+				virtual Int							 SetPixel(Int, Int, Int);
+				virtual Int							 GetPixel(Int, Int);
 
-				virtual Int						 Line(const Point &, const Point &, Int);
-				virtual Int						 Frame(const Rect &, Int);
-				virtual Int						 Box(const Rect &, Int, Int);
+				virtual Int							 Line(const Point &, const Point &, Int);
+				virtual Int							 Frame(const Rect &, Int);
+				virtual Int							 Box(const Rect &, Int, Int);
 
-				virtual Int						 SetText(const String &, const Rect &, const Font &, Bool);
+				virtual Int							 SetText(const String &, const Rect &, const Font &, Bool);
 
-				Int							 Gradient(const Rect &, Int, Int, Int);
-				Int							 Bar(const Point &, const Point &, Int);
+				Int								 Gradient(const Rect &, Int, Int, Int);
+				Int								 Bar(const Point &, const Point &, Int);
 
-				virtual Int						 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
-				virtual Int						 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
+				virtual Int							 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
+				virtual Int							 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
 		};
 	};
 };

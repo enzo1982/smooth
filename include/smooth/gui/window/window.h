@@ -74,8 +74,6 @@ namespace smooth
 
 				Layer				*mainLayer;
 
-				static Window			*activeWindow;
-
 				virtual Bool			 Create();
 
 				Void				 CalculateOffsets();
@@ -89,7 +87,7 @@ namespace smooth
 								 Window(const String &, const Point &, const Size &, Void * = NIL);
 				virtual				~Window();
 
-				Int				 GetOrder()				 { return order; }
+				Int				 GetOrder() const			 { return order; }
 
 				Int				 SetIcon(const Bitmap &);
 				Bitmap				&GetIcon();
@@ -142,8 +140,7 @@ namespace smooth
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
 
-				Int				 MouseX();
-				Int				 MouseY();
+				Point				 GetMousePosition();
 
 				Bool				 IsMouseOn(const Rect &);
 
@@ -151,7 +148,6 @@ namespace smooth
 				Void				*GetSystemWindow();
 
 				static Window			*GetWindow(Void *);
-				static Window			*GetActiveWindow()			{ return activeWindow; }
 
 				virtual Int			 RegisterObject(Widget *);
 				virtual Int			 UnregisterObject(Widget *);

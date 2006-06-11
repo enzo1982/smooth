@@ -134,80 +134,81 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 	if (!IsRegistered())			return Error();
 	if (!IsActive() || !IsVisible())	return Success();
 
-	Window	*wnd		= container->GetContainerWindow();
-	Surface	*surface	= container->GetDrawSurface();
+	Window	*window	 = container->GetContainerWindow();
+	Surface	*surface = container->GetDrawSurface();
 
 	EnterProtectedRegion();
 
-	Point	 realPos	= GetRealPosition();
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
-	Int	 retVal		= Success();
-	Int	 i		= 0;
+	Point	 realPos = GetRealPosition();
+	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+	Int	 retVal	 = Success();
 
 	switch (message)
 	{
 		case SM_MOUSEMOVE:
 			if (innerLoop) break;
 
-			frame.left = realPos.x - 2;
-
-			for (i = 0; i < tabWidths.GetNOfEntries() - 1; i++)
 			{
-				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) + 1);
-				frame.right = frame.left + 4;
+				frame.left = realPos.x - 2;
 
-				if (wnd->IsMouseOn(frame))
+				for (Int i = 0; i < tabWidths.GetNOfEntries() - 1; i++)
 				{
-					if (moveTab != i)
-					{
-						moveTab = i;
+					frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) + 1);
+					frame.right = frame.left + 4;
 
-						LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_HSIZE);
+					if (window->IsMouseOn(frame))
+					{
+						if (moveTab != i)
+						{
+							moveTab = i;
+
+							LiSASetMouseCursor((HWND) window->GetSystemWindow(), LiSA_MOUSE_HSIZE);
+						}
+					}
+					else if (moveTab == i)
+					{
+						moveTab = -1;
+
+						LiSASetMouseCursor((HWND) window->GetSystemWindow(), LiSA_MOUSE_ARROW);
 					}
 				}
-				else if (moveTab == i)
+
+				frame.left = realPos.x;
+				frame.bottom--;
+
+				for (Int j = 0; j < tabWidths.GetNOfEntries(); j++)
 				{
-					moveTab = -1;
+					frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(j)), realPos.x + GetWidth() - 1);
 
-					LiSASetMouseCursor((HWND) wnd->GetSystemWindow(), LiSA_MOUSE_ARROW);
+					frame.left++;
+					frame.top++;
+
+					if (window->IsMouseOn(frame) && !tabChecked.GetNthEntry(j) && moveTab == -1)
+					{
+						surface->Box(frame, Setup::LightGrayColor, FILLED);
+
+						frame.left += 2;
+						surface->SetText(tabNames.GetNthEntry(j), frame, font);
+						frame.left -= 2;
+
+						tabChecked.SetEntry(tabChecked.GetNthEntryIndex(j), True);
+					}
+					else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNthEntry(j))
+					{
+						surface->Box(frame, Setup::BackgroundColor, FILLED);
+
+						frame.left += 2;
+						surface->SetText(tabNames.GetNthEntry(j), frame, font);
+						frame.left -= 2;
+
+						tabChecked.SetEntry(tabChecked.GetNthEntryIndex(j), False);
+					}
+
+					frame.left--;
+					frame.top--;
+
+					frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(j)) + 1);
 				}
-			}
-
-			frame.left = realPos.x;
-			frame.bottom--;
-
-			for (i = 0; i < tabWidths.GetNOfEntries(); i++)
-			{
-				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)), realPos.x + GetWidth() - 1);
-
-				frame.left++;
-				frame.top++;
-
-				if (wnd->IsMouseOn(frame) && !tabChecked.GetNthEntry(i) && moveTab == -1)
-				{
-					surface->Box(frame, Setup::LightGrayColor, FILLED);
-
-					frame.left += 2;
-					surface->SetText(tabNames.GetNthEntry(i), frame, font);
-					frame.left -= 2;
-
-					tabChecked.SetEntry(tabChecked.GetNthEntryIndex(i), True);
-				}
-				else if ((!wnd->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNthEntry(i))
-				{
-					surface->Box(frame, Setup::BackgroundColor, FILLED);
-
-					frame.left += 2;
-					surface->SetText(tabNames.GetNthEntry(i), frame, font);
-					frame.left -= 2;
-
-					tabChecked.SetEntry(tabChecked.GetNthEntryIndex(i), False);
-				}
-
-				frame.left--;
-				frame.top--;
-
-				frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) + 1);
 			}
 
 			break;
@@ -219,7 +220,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 				if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
 				else					leftButton = VK_LBUTTON;
 
-				Int	 omx = wnd->MouseX();
+				Int	 omx = window->GetMousePosition().x;
 
 				innerLoop = True;
 
@@ -230,7 +231,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					if (peekLoop > 0)	event->ProcessNextEvent(False);
 					else			event->ProcessNextEvent(True);
 
-					Int	 mx = wnd->MouseX();
+					Int	 mx = window->GetMousePosition().x;
 					Int	 bias = omx - mx;
 
 					if (bias != 0)

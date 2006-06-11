@@ -37,7 +37,7 @@ namespace smooth
 
 				Pixmap	 bitmap;
 			public:
-					 SurfaceXLib(Void * = NIL);
+					 SurfaceXLib(Void * = NIL, const Size & = Size());
 					~SurfaceXLib();
 
 				Int	 PaintRect(const Rect &);

@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/window/backends/gdi/windowgdi.h>
+#include <smooth/backends/win32/backendwin32.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
@@ -217,7 +218,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 		wndclassw->lpfnWndProc	= WindowProc;
 		wndclassw->cbClsExtra	= 0;
 		wndclassw->cbWndExtra	= 0;
-		wndclassw->hInstance	= hInstance;
+		wndclassw->hInstance	= hDllInstance;
 		wndclassw->hIcon	= sysIcon;
 		wndclassw->hCursor	= (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 		wndclassw->hbrBackground= NIL;
@@ -227,7 +228,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		RegisterClassExW(wndclassw);
 
-		hwnd = CreateWindowExW(extStyle, className, title, style, pos.x, pos.y, size.cx, size.cy, NIL, NIL, hInstance, NIL);
+		hwnd = CreateWindowExW(extStyle, className, title, style, pos.x, pos.y, size.cx, size.cy, NIL, NIL, hDllInstance, NIL);
 	}
 	else
 	{
@@ -236,11 +237,11 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 		WNDCLASSEXA	*wndclassa = (WNDCLASSEXA *) wndclass;
 
 		wndclassa->cbSize	= sizeof(WNDCLASSEXA);
-		wndclassa->style	= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | ((extStyle & WS_EX_TOOLWINDOW) && ((unsigned int) style == (WS_BORDER | WS_POPUP)) ? CS_SAVEBITS : 0);
+		wndclassa->style	= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
 		wndclassa->lpfnWndProc	= WindowProc;
 		wndclassa->cbClsExtra	= 0;
 		wndclassa->cbWndExtra	= 0;
-		wndclassa->hInstance	= hInstance;
+		wndclassa->hInstance	= hDllInstance;
 		wndclassa->hIcon	= sysIcon;
 		wndclassa->hCursor	= (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 		wndclassa->hbrBackground= NIL;
@@ -250,14 +251,14 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		RegisterClassExA(wndclassa);
 
-		hwnd = CreateWindowExA(extStyle, className, title, style, pos.x, pos.y, size.cx, size.cy, NIL, NIL, hInstance, NIL);
+		hwnd = CreateWindowExA(extStyle, className, title, style, pos.x, pos.y, size.cx, size.cy, NIL, NIL, hDllInstance, NIL);
 	}
 
 	if (hwnd != NIL)
 	{
-		windowDC = GetWindowDC(hwnd);
+		if (flags & WF_THINBORDER || flags & WF_NORESIZE) drawSurface = new Surface(hwnd, size);
+		else						  drawSurface = new Surface(hwnd);
 
-		drawSurface = new Surface(windowDC);
 		drawSurface->SetSize(size);
 
 		return Success();
@@ -272,19 +273,17 @@ S::Int S::GUI::WindowGDI::Close()
 
 	drawSurface = nullSurface;
 
-	ReleaseDC(hwnd, windowDC);
-
 	DestroyWindow(hwnd);
 
 	if (Setup::enableUnicode)
 	{
-		UnregisterClassW(className, hInstance);
+		UnregisterClassW(className, hDllInstance);
 
 		delete (WNDCLASSEXW *) wndclass;
 	}
 	else
 	{
-		UnregisterClassA(className, hInstance);
+		UnregisterClassA(className, hDllInstance);
 
 		delete (WNDCLASSEXA *) wndclass;
 	}

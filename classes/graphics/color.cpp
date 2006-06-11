@@ -11,29 +11,6 @@
 #include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
 
-S::GUI::Color::Color()
-{
-	color = 0;
-	colorSpace = RGBA;
-}
-
-S::GUI::Color::Color(const Color &iColor)
-{
-	color = iColor.color;
-	colorSpace = iColor.colorSpace;
-}
-
-S::GUI::Color::Color(Int iColor, Int iColorSpace)
-{
-	color = iColor;
-	colorSpace = iColorSpace;
-}
-
-S::GUI::Color::Color(Int r, Int g, Int b, Int c)
-{
-	SetColor(r, g, b, c);
-}
-
 S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 {
 	double	p1 = 0;

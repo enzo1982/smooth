@@ -17,33 +17,33 @@
 	#include <smooth/graphics/backends/gdi/surfacegdi.h>
 #endif
 
-S::GUI::SurfaceBackend *CreateSurfaceBackend(S::Void *iSurface)
+S::GUI::SurfaceBackend *CreateSurfaceBackend(S::Void *iSurface, const S::GUI::Size &maxSize)
 {
-	return new S::GUI::SurfaceBackend(iSurface);
+	return new S::GUI::SurfaceBackend(iSurface, maxSize);
 }
 
 S::Int	 surfaceBackendTmp = S::GUI::SurfaceBackend::AddBackend(&CreateSurfaceBackend);
 
-S::Array<S::GUI::SurfaceBackend *(*)(S::Void *), S::Void *>	*S::GUI::SurfaceBackend::backend_creators = NIL;
+S::Array<S::GUI::SurfaceBackend *(*)(S::Void *, const S::GUI::Size &), S::Void *>	*S::GUI::SurfaceBackend::backend_creators = NIL;
 
-S::Int S::GUI::SurfaceBackend::AddBackend(SurfaceBackend *(*backend)(Void *))
+S::Int S::GUI::SurfaceBackend::AddBackend(SurfaceBackend *(*backend)(Void *, const Size &))
 {
 	if (backend == NIL) return Error();
 
-	if (backend_creators == NIL) backend_creators = new Array<SurfaceBackend *(*)(Void *), Void *>;
+	if (backend_creators == NIL) backend_creators = new Array<SurfaceBackend *(*)(Void *, const Size &), Void *>;
 
 	backend_creators->AddEntry(backend);
 
 	return Success();
 }
 
-S::GUI::SurfaceBackend *S::GUI::SurfaceBackend::CreateBackendInstance(Void *iSurface)
+S::GUI::SurfaceBackend *S::GUI::SurfaceBackend::CreateBackendInstance(Void *iSurface, const Size &maxSize)
 {
-	if (backend_creators->GetFirstEntry() != &CreateSurfaceBackend)	return backend_creators->GetFirstEntry()(iSurface);
-	else								return backend_creators->GetLastEntry()(iSurface);
+	if (backend_creators->GetFirstEntry() != &CreateSurfaceBackend)	return backend_creators->GetFirstEntry()(iSurface, maxSize);
+	else								return backend_creators->GetLastEntry()(iSurface, maxSize);
 }
 
-S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface)
+S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface, const Size &maxSize)
 {
 #if defined __WIN32__ && defined __SMOOTH_STATIC__
 	volatile Bool	 null = 0;

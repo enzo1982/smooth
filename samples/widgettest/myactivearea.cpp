@@ -65,11 +65,15 @@ Int MyActiveArea::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			if ((window->MouseX() > realPos.x) && (window->MouseX() < (realPos.x + GetWidth() - 1)) && (window->MouseY() > realPos.y) && (window->MouseY() < (realPos.y + GetHeight() - 1)))
 			{
-				onAction.Emit();
+				Point	 mousePos = window->GetMousePosition();
 
-				retVal = Break;
+				if ((mousePos.x > realPos.x) && (mousePos.x < (realPos.x + GetWidth() - 1)) && (mousePos.y > realPos.y) && (mousePos.y < (realPos.y + GetHeight() - 1)))
+				{
+					onAction.Emit();
+
+					retVal = Break;
+				}
 			}
 
 			break;

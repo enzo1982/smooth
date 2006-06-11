@@ -38,10 +38,10 @@ namespace smooth
 				Int		 colorSpace;
 				Long		 color;
 			public:
-						 Color();
-						 Color(const Color &);
-						 Color(Long, Int = RGBA);
-						 Color(Int, Int, Int, Int = RGBA);
+						 Color()					{ color = 0; colorSpace = RGBA; }
+						 Color(const Color &iColor)			{ color = iColor.color; colorSpace = iColor.colorSpace; }
+						 Color(Long iColor, Int iColorSpace = RGBA)	{ color = iColor; colorSpace = iColorSpace; }
+						 Color(Int r, Int g, Int b, Int c = RGBA)	{ SetColor(r, g, b, c); }
 
 				Int		 GetRed() const					{ return color & 255; }
 				Int		 GetGreen() const				{ return (color >> 8) & 255; }

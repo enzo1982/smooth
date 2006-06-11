@@ -263,9 +263,9 @@ S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, UnsignedLong color)
 		case 24:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + x * 3;
 
-			data[offset + 0] = Color(color).GetBlue();
-			data[offset + 1] = Color(color).GetGreen();
-			data[offset + 2] = Color(color).GetRed();
+			data[offset + 0] = (color >> 16) & 255;
+			data[offset + 1] = (color >> 8) & 255;
+			data[offset + 2] = color & 255;
 
 			done = True;
 
@@ -273,9 +273,9 @@ S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, UnsignedLong color)
 		case 32:
 			offset = (size.cy - ++y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + x * 4;
 
-			data[offset + 0] = Color(color).GetBlue();
-			data[offset + 1] = Color(color).GetGreen();
-			data[offset + 2] = Color(color).GetRed();
+			data[offset + 0] = (color >> 16) & 255;
+			data[offset + 1] = (color >> 8) & 255;
+			data[offset + 2] = color & 255;
 
 			done = True;
 

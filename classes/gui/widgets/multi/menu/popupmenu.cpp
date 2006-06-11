@@ -28,10 +28,11 @@ S::GUI::PopupMenu::PopupMenu()
 	hasNext		= False;
 	closedByClick	= False;
 
-	toolWindow = new ToolWindow(GetPosition(), GetSize());
-	toolWindow->Hide();
+	toolWindow = new ToolWindow(Point(), Size());
 	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
 	toolWindow->onLoseFocus.Connect(&internalRequestClose);
+
+	toolWindow->Hide();
 
 	RegisterObject(toolWindow);
 
@@ -42,7 +43,7 @@ S::GUI::PopupMenu::PopupMenu()
 
 S::GUI::PopupMenu::~PopupMenu()
 {
-	if (toolWindow != NIL) DeleteObject(toolWindow);
+	DeleteObject(toolWindow);
 
 	internalOnOpenPopupMenu.Disconnect(&PopupMenu::OnOpenPopupMenu, this);
 }
@@ -80,10 +81,10 @@ S::Int S::GUI::PopupMenu::Show()
 		toolWindow->RegisterObject(entry);
 	}
 
-	internalOnOpenPopupMenu.Emit(GetHandle());
-
 	toolWindow->SetMetrics(GetPosition(), GetSize());
 	toolWindow->Show();
+
+	internalOnOpenPopupMenu.Emit(GetHandle());
 
 	onShow.Emit();
 
@@ -167,6 +168,8 @@ S::Void S::GUI::PopupMenu::OnOpenPopupMenu(Int handle)
 
 S::Void S::GUI::PopupMenu::OnToolWindowPaint()
 {
+	if (toolWindow == NIL) return;
+
 	Surface	*surface = toolWindow->GetDrawSurface();
 	Rect	 frame = Rect(Point(0, 0), GetSize());
 

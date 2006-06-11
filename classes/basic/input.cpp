@@ -10,6 +10,8 @@
 
 #include <smooth/basic/input.h>
 
+S::GUI::Point	 S::Input::mousePosition = S::GUI::Point();
+
 S::Input::Input()
 {
 }
@@ -18,27 +20,17 @@ S::Input::Input(const Input &)
 {
 }
 
-S::Int S::Input::MouseX()
+const S::GUI::Point &S::Input::GetMousePosition()
 {
 #ifdef __WIN32__
 	POINT	 point;
 
 	GetCursorPos(&point);
 
-	return point.x;
-#else
-	return 0;
-#endif
-}
+	mousePosition.x = point.x;
+	mousePosition.y = point.y;
 
-S::Int S::Input::MouseY()
-{
-#ifdef __WIN32__
-	POINT	 point;
-
-	GetCursorPos(&point);
-
-	return point.y;
+	return mousePosition;
 #else
 	return 0;
 #endif

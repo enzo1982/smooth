@@ -299,7 +299,6 @@ const Error &S::GUI::Dialogs::MessageDlg::ShowDialog()
 S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 {
 	Surface	*surface = msgbox->GetDrawSurface();
-	HDC	 dc = (HDC) surface->GetSystemSurface();
 	Rect	 txtrect;
 
 	txtrect.left = 17;
@@ -327,7 +326,12 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 			else				icon = (HICON) LoadImageA(hInstance, (char *) msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 		}
 
+		HWND	 window	= (HWND) surface->GetSystemSurface();
+		HDC	 dc	= GetWindowDC(window);
+
 		DrawIcon(dc, msgbox->IsRightToLeft() ? msgbox->GetWidth() - 17 - GetSystemMetrics(SM_CXICON) : 17, 47, icon);
+
+		ReleaseDC(window, dc);
 	}
 
 	for (int i = 0; i < lines; i++)

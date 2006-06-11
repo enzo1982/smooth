@@ -14,12 +14,12 @@
 #include <smooth/graphics/color.h>
 #include <smooth/threads/mutex.h>
 
-S::GUI::Surface::Surface(Void *iSurface)
+S::GUI::Surface::Surface(Void *iSurface, const Size &maxSize)
 {
 	if (iSurface == NIL)	mutex = NIL;
 	else			mutex = new Threads::Mutex();
 
-	backend = SurfaceBackend::CreateBackendInstance(iSurface);
+	backend = SurfaceBackend::CreateBackendInstance(iSurface, maxSize);
 }
 
 S::GUI::Surface::~Surface()

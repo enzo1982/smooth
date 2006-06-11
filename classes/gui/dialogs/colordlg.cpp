@@ -552,7 +552,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					break;
 				}
 
-				newhue = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
+				newhue = 255 - Math::Round(max(min(dlgwnd->GetMousePosition().y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
 
 				if (newhue != acthue)
 				{
@@ -590,8 +590,10 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					break;
 				}
 
-				newval = Math::Round(max(min(dlgwnd->MouseX() - 8, hssize - 1), 0) * (256.0 / 205.0));
-				newsat = 255 - Math::Round(max(min(dlgwnd->MouseY() - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
+				Point	 mousePos = dlgwnd->GetMousePosition();
+
+				newval = Math::Round(max(min(mousePos.x - 8, hssize - 1), 0) * (256.0 / 205.0));
+				newsat = 255 - Math::Round(max(min(mousePos.y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
 
 				if ((newval != actval) || (newsat != actsat))
 				{

@@ -171,7 +171,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 				{
-					line = (window->MouseY() - frame.top) / (font.GetTextSizeY("*") + 3);
+					line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY("*") + 3);
 
 					Int	 lineCount = 0;
 
@@ -199,9 +199,9 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText, i) - visibleOffset;
 					else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
 
-					if (i > 0 && window->MouseX() < (lastPos + newPos) / 2)  { newPromptPos	= i - 1; break; }
-					else if (i == wText.Length())				   newPromptPos	= wText.Length();
-					else							   lastPos	= newPos;
+					if (i > 0 && window->GetMousePosition().x < (lastPos + newPos) / 2) { newPromptPos	= i - 1; break; }
+					else if (i == wText.Length())					      newPromptPos	= wText.Length();
+					else								      lastPos		= newPos;
 				}
 
 				newPromptPos += wPromptPos;
@@ -267,9 +267,9 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 				{
-					line = (window->MouseY() - frame.top) / (font.GetTextSizeY("*") + 3);
+					line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY("*") + 3);
 
-					if (window->MouseY() - frame.top < 0) line--;
+					if (window->GetMousePosition().y - frame.top < 0) line--;
 
 					Int	 lineCount = 0;
 
@@ -301,9 +301,9 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText, i) - visibleOffset;
 						else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
 
-						if (i > 0 && window->MouseX() < (lastPos + newPos) / 2)  { newMarkEnd	= i - 1; break; }
-						else if (i == wText.Length())				   newMarkEnd	= wText.Length();
-						else							   lastPos	= newPos;
+						if (i > 0 && window->GetMousePosition().x < (lastPos + newPos) / 2) { newMarkEnd	= i - 1; break; }
+						else if (i == wText.Length())					      newMarkEnd	= wText.Length();
+						else								      lastPos		= newPos;
 					}
 
 					newMarkEnd += wPromptPos;
@@ -766,6 +766,9 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 	}
 
 	{
+		HWND	 hwnd	= (HWND) surface->GetSystemSurface();
+		HDC	 dc	= GetWindowDC(hwnd);
+
 		HIMC		 hImc = ImmGetContext((HWND) wnd->GetSystemWindow());
 		COMPOSITIONFORM	 info;
 
@@ -779,7 +782,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		{
 			LOGFONTW	 lFont;
 
-			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps((HDC) surface->GetSystemSurface(), LOGPIXELSY));
+			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(dc, LOGPIXELSY));
 			lFont.lfWidth		= 0;
 			lFont.lfEscapement	= 0;
 			lFont.lfOrientation	= 0;
@@ -801,7 +804,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		{
 			LOGFONTA	 lFont;
 
-			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps((HDC) surface->GetSystemSurface(), LOGPIXELSY));
+			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(dc, LOGPIXELSY));
 			lFont.lfWidth		= 0;
 			lFont.lfEscapement	= 0;
 			lFont.lfOrientation	= 0;
@@ -821,6 +824,8 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		}
 
 		ImmDestroyContext(hImc);
+
+		ReleaseDC(hwnd, dc);
 	}
 
 	if (timer != NIL) DeleteObject(timer);

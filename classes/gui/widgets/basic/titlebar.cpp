@@ -170,6 +170,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 	if (!IsActive() || !IsVisible())	return Success();
 
 	Window	*window = container->GetContainerWindow();
+	Bool	 prevPaintActive = paintActive;
 
 	switch (message)
 	{
@@ -202,7 +203,7 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			Paint(SP_PAINT);
+			if (message == SM_WINDOWTITLECHANGED || paintActive != prevPaintActive) Paint(SP_PAINT);
 
 			break;
 #endif

@@ -432,7 +432,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 	Point	 realPosition	= GetRealPosition();
 	Rect	 frame		= Rect(realPosition, size);
-	Point	 mousePos	= Point(window->MouseX(), window->MouseY());
+	Point	 mousePos	= window->GetMousePosition();
 	Int	 returnValue	= Success();
 
 	switch (message)
@@ -641,7 +641,7 @@ S::Void S::GUI::Widget::ActivateTooltip()
 	tooltip = new Tooltip();
 
 	tooltip->SetText(tooltipText);
-	tooltip->SetMetrics(Point(window->MouseX() - Math::Round(0.2 * tooltip->textSize.cx), window->MouseY() - 1), Size(0, 0));
+	tooltip->SetMetrics(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1), Size(0, 0));
 	tooltip->SetTimeout(3000);
 
 	PopupMenu::internalOnOpenPopupMenu.Connect(&Widget::DeactivateTooltip, this);

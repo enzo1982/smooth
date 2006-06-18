@@ -105,12 +105,12 @@ void PCIIO::SetRLEBits(int b)
 	rlebits = b;
 }
 
-void PCIIO::SetDescription(S::String d)
+void PCIIO::SetDescription(const S::String &d)
 {
 	description = d;
 }
 
-void PCIIO::SelectImage(S::String name)
+void PCIIO::SelectImage(const S::String &name)
 {
 	imagename = name;
 }
@@ -125,7 +125,7 @@ void PCIIO::SetImageID(int id)
 	imageid = id;
 }
 
-void PCIIO::SetImageName(S::String name)
+void PCIIO::SetImageName(const S::String &name)
 {
 	imagename = name;
 }
@@ -135,17 +135,17 @@ S::GUI::Bitmap &PCIIO::GetBitmap()
 	return bmp;
 }
 
-PCIOut CreatePCI(S::String filename)
+PCIOut CreatePCI(const S::String &filename)
 {
 	return new IO::OutStream(IO::STREAM_FILE, filename, IO::OS_OVERWRITE);
 }
 
-PCIOut OpenPCIForOutput(S::String filename)
+PCIOut OpenPCIForOutput(const S::String &filename)
 {
 	return new IO::OutStream(IO::STREAM_FILE, filename, IO::OS_APPEND);
 }
 
-PCIIn OpenPCIForInput(S::String filename)
+PCIIn OpenPCIForInput(const S::String &filename)
 {
 	return new IO::InStream(IO::STREAM_FILE, filename, IO::IS_READONLY);
 }

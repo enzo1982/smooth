@@ -39,6 +39,9 @@ namespace smooth
 						 SurfaceGDI(Void * = NIL, const Size & = Size());
 						~SurfaceGDI();
 
+				Int		 SetSize(const Size &);
+				const Size	&GetSize();
+
 				Int		 PaintRect(const Rect &);
 
 				Int		 StartPaint(const Rect &);

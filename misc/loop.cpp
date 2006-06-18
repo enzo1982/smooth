@@ -51,13 +51,6 @@ S::Void S::Init()
 
 	LiSAInit();
 
-#ifdef __WIN32__
-	if (LoadIconvDLL() == True)	{ Setup::useIconv = True;  use_iconv = 1; }
-	else				{ Setup::useIconv = False; use_iconv = 0; }
-#else
-	{ Setup::useIconv = True; use_iconv = 1; }
-#endif
-
 	Backend::InitBackends();
 
 #ifdef __WIN32__
@@ -82,6 +75,11 @@ S::Void S::Init()
 	CoInitialize(NIL);
 
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+
+	if (LoadIconvDLL() == True)	{ Setup::useIconv = True;  use_iconv = 1; }
+	else				{ Setup::useIconv = False; use_iconv = 0; }
+#else
+	{ Setup::useIconv = True; use_iconv = 1; }
 #endif
 
 	GetColors();

@@ -44,9 +44,6 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iWindow, const Size &maxSize)
 		HDC	 bmp_dc = CreateCompatibleDC(gdi_dc);
 
 		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
-		Bitmap	 bmpGDI(bitmap);
-
-		BlitToBitmap(Rect(Point(0, 0), size), bmpGDI, Rect(Point(0, 0), size));
 
 		cDc_contexts.AddEntry(bmp_dc);
 		cDc_bitmaps.AddEntry((HBITMAP) SelectObject(bmp_dc, bitmap));
@@ -67,6 +64,41 @@ S::GUI::SurfaceGDI::~SurfaceGDI()
 
 		delete cDc_rects.GetFirstEntry();
 	}
+}
+
+S::Int S::GUI::SurfaceGDI::SetSize(const Size &nSize)
+{
+	if (size.cx >= nSize.cx && size.cy >= nSize.cy) return Success();
+
+	size = nSize;
+
+	if (window != NIL && !painting)
+	{
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetFirstEntry(), cDc_bitmaps.GetFirstEntry());
+
+		::DeleteObject(bitmap);
+
+		delete cDc_rects.GetFirstEntry();
+
+		cDc_bitmaps.RemoveAll();
+		cDc_rects.RemoveAll();
+
+		HDC	 gdi_dc = GetWindowDC(window);
+
+		bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
+
+		cDc_bitmaps.AddEntry((HBITMAP) SelectObject(cDc_contexts.GetFirstEntry(), bitmap));
+		cDc_rects.AddEntry(new Rect(Point(0, 0), size));
+
+		ReleaseDC(window, gdi_dc);
+	}
+
+	return Success();
+}
+
+const S::GUI::Size &S::GUI::SurfaceGDI::GetSize()
+{
+	return size;
 }
 
 S::Int S::GUI::SurfaceGDI::PaintRect(const Rect &pRect)

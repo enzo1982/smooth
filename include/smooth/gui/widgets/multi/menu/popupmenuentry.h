@@ -20,6 +20,11 @@ namespace smooth
 		class PopupMenu;
 		class Hotspot;
 	};
+
+	namespace System
+	{
+		class Timer;
+	};
 };
 
 #include "menuentry.h"
@@ -33,6 +38,8 @@ namespace smooth
 			protected:
 				Hotspot			*hotspot;
 				PopupMenu		*owner;
+
+				System::Timer		*timer;
 
 				Int			 shortcutOffset;
 			public:
@@ -55,6 +62,9 @@ namespace smooth
 			accessors:
 				Void			 SetOwner(PopupMenu *nOwner)	{ owner = nOwner; }
 			slots:
+				Void			 OnMouseOver();
+				Void			 OnMouseOut();
+
 				Void			 OnClickEntry();
 				Void			 OnChangeSize(const Size &);
 

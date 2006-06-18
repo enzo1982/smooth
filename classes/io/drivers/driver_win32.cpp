@@ -18,21 +18,21 @@ S::IO::DriverWin32::DriverWin32(const String &fileName, Int mode) : Driver()
 			lastError = IO_ERROR_BADPARAM;
 			return;
 		case 0:				// open a file for appending data
-			if (Setup::enableUnicode)	stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			else				stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (Setup::enableUnicode)	stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			else				stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			Seek(GetSize());
 			break;
 		case 1:				// create or overwrite a file
-			if (Setup::enableUnicode)	stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			else				stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (Setup::enableUnicode)	stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			else				stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			break;
 		case 2:				// open a file for reading data
-			if (Setup::enableUnicode)	stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			else				stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (Setup::enableUnicode)	stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			else				stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 			break;
 		case 3:				// open a file in read only mode
-			if (Setup::enableUnicode)	stream = CreateFileW(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-			else				stream = CreateFileA(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (Setup::enableUnicode)	stream = CreateFileW(fileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			else				stream = CreateFileA(fileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 			break;
 	}
 
@@ -78,23 +78,23 @@ S::Int S::IO::DriverWin32::WriteData(UnsignedByte *data, Int dataSize)
 S::Int64 S::IO::DriverWin32::Seek(Int64 newPos)
 {
 	Int32	 hi32 = newPos >> 32;
-	Int32	 lo32 = SetFilePointer(stream, newPos, &hi32, FILE_BEGIN);
+	Int64	 lo32 = SetFilePointer(stream, newPos, &hi32, FILE_BEGIN);
 
-	return ((Int64) hi32) << 32 | lo32;
+	return (Int64) hi32 << 32 | lo32;
 }
 
 S::Int64 S::IO::DriverWin32::GetSize()
 {
 	Int32	 hi32 = 0;
-	Int32	 lo32 = GetFileSize(stream, (UnsignedLong *) &hi32);
+	Int64	 lo32 = GetFileSize(stream, (UnsignedLong *) &hi32);
 
-	return ((Int64) hi32) << 32 | lo32;
+	return (Int64) hi32 << 32 | lo32;
 }
 
 S::Int64 S::IO::DriverWin32::GetPos()
 {
 	Int32	 hi32 = 0;
-	Int32	 lo32 = SetFilePointer(stream, 0, &hi32, FILE_CURRENT);
+	Int64	 lo32 = SetFilePointer(stream, 0, &hi32, FILE_CURRENT);
 
-	return ((Int64) hi32) << 32 | lo32;
+	return (Int64) hi32 << 32 | lo32;
 }

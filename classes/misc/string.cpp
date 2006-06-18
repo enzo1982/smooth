@@ -1094,13 +1094,13 @@ S::String &S::String::FillN(const Int value, const Int count)
 	return *this;
 }
 
-S::Int S::String::ToInt() const
+S::Int64 S::String::ToInt() const
 {
 	if (Length() == 0) return 0;
 
 	Bool	 neg = False;
 	Int	 first = 0;
-	Int	 n = 0;
+	Int64	 n = 0;
 	Int	 size = Length();
 
 	LockBuffers();
@@ -1119,7 +1119,7 @@ S::Int S::String::ToInt() const
 
 	for (Int j = first; j < (first + size); j++)
 	{
-		n += (Int) Math::Pow(10l, size - (j - first) - 1) * (wString[j] - 48);
+		n += (Int64) Math::Pow(10l, size - (j - first) - 1) * (wString[j] - 48);
 	}
 
 	UnlockBuffers();
@@ -1180,7 +1180,7 @@ S::Float S::String::ToFloat() const
 	else		return 0 - n;
 }
 
-S::String S::String::FromInt(const Int value)
+S::String S::String::FromInt(const Int64 value)
 {
 	String	 newString;
 	Int	 sz;
@@ -1195,14 +1195,14 @@ S::String S::String::FromInt(const Int value)
 
 		for (Int i = 0; i < sz-1; i++)
 		{
-			newString[i + 1] = (wchar_t) Math::Floor(((-value) % Math::Pow(10l, sz - i - 1)) / Math::Pow(10l, sz - (i + 1) - 1)) + 48;
+			newString[i + 1] = (wchar_t) Math::Floor(((-value) % Math::Pow((Int64) 10, (Int64) sz - i - 1)) / Math::Pow((Int64) 10, (Int64) sz - (i + 1) - 1)) + 48;
 		}
 	}
 	else
 	{
 		for (Int i = 0; i < sz; i++)
 		{
-			newString[i] = (wchar_t) Math::Floor((value % Math::Pow(10, sz - i)) / Math::Pow(10l, sz - (i + 1))) + 48;
+			newString[i] = (wchar_t) Math::Floor((value % Math::Pow((Int64) 10, (Int64) sz - i)) / Math::Pow((Int64) 10, (Int64) sz - (i + 1))) + 48;
 		}
 	}
 

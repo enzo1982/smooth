@@ -14,6 +14,7 @@
 
 #include <smooth/io/drivers/driver_ansi.h>
 #include <smooth/io/drivers/driver_posix.h>
+#include <smooth/io/drivers/driver_win32.h>
 #include <smooth/io/drivers/driver_memory.h>
 
 #include <stdio.h>
@@ -40,7 +41,11 @@ S::IO::InStream::InStream(Int type, const String &filename, Int mode)
 {
 	if (type != STREAM_FILE)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
+#ifdef __WIN32__
+	driver = new DriverWin32(filename, mode);
+#else
 	driver = new DriverPOSIX(filename, mode);
+#endif
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 

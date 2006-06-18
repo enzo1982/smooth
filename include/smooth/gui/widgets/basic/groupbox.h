@@ -38,6 +38,7 @@ namespace smooth
 				virtual Int		 Activate();
 				virtual Int		 Deactivate();
 
+				virtual Int		 Show();
 				virtual Int		 Hide();
 		};
 	};

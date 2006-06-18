@@ -10,6 +10,7 @@
 
 #include <smooth/gui/widgets/multi/menu/popupmenuentry.h>
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
+#include <smooth/gui/widgets/multi/menu/menubar.h>
 #include <smooth/gui/widgets/hotspot/hotspot.h>
 #include <smooth/gui/widgets/special/shortcut.h>
 #include <smooth/gui/widgets/basic/checkbox.h>
@@ -17,6 +18,8 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/misc/binary.h>
+#include <smooth/system/timer.h>
 
 const S::Int	 S::GUI::PopupMenuEntry::classID = S::Object::RequestClassID();
 
@@ -25,6 +28,7 @@ S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitma
 	type		= classID;
 	orientation	= OR_UPPERLEFT;
 	hotspot		= NIL;
+	timer		= NIL;
 
 	shortcutOffset	= 0;
 
@@ -34,6 +38,8 @@ S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitma
 	{
 		hotspot	= new Hotspot(Point(), GetSize());
 
+		hotspot->onMouseOver.Connect(&PopupMenuEntry::OnMouseOver, this);
+		hotspot->onMouseOut.Connect(&PopupMenuEntry::OnMouseOut, this);
 		hotspot->onLeftButtonDown.Connect(&PopupMenuEntry::OpenPopupMenu, this);
 		hotspot->onLeftButtonClick.Connect(&PopupMenuEntry::OnClickEntry, this);
 
@@ -46,6 +52,13 @@ S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitma
 S::GUI::PopupMenuEntry::~PopupMenuEntry()
 {
 	if (hotspot != NIL) DeleteObject(hotspot);
+
+	if (timer != NIL)
+	{
+		DeleteObject(timer);
+
+		timer = NIL;
+	}
 }
 
 S::Int S::GUI::PopupMenuEntry::Paint(Int message)
@@ -275,6 +288,36 @@ S::Void S::GUI::PopupMenuEntry::SetShortcutOffset(Int nShortcutOffset)
 	shortcutOffset = nShortcutOffset;
 }
 
+S::Void S::GUI::PopupMenuEntry::OnMouseOver()
+{
+	if (popup == NIL || IsMouseOver()) return;
+
+	if (Binary::IsFlagSet(owner->GetFlags(), MB_POPUPOPEN))
+	{
+		SetActiveWindow((HWND) container->GetContainerWindow()->GetSystemWindow());
+		OpenPopupMenu();
+	}
+	else
+	{
+		if (timer != NIL) DeleteObject(timer);
+
+		timer = new System::Timer();
+
+		timer->onInterval.Connect(&PopupMenuEntry::OpenPopupMenu, this);
+		timer->Start(500);
+	}
+}
+
+S::Void S::GUI::PopupMenuEntry::OnMouseOut()
+{
+	if (timer != NIL)
+	{
+		DeleteObject(timer);
+
+		timer = NIL;
+	}
+}
+
 S::Void S::GUI::PopupMenuEntry::OnClickEntry()
 {
 	owner->SetClosedByClick(True);
@@ -295,6 +338,13 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 {
 	if (popup == NIL) return;
 
+	if (timer != NIL)
+	{
+		DeleteObject(timer);
+
+		timer = NIL;
+	}
+
 	hotspot->Deactivate();
 
 	Widget	*window		= container->GetContainerWindow();
@@ -309,7 +359,7 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 	popup->SetPosition(popupPos);
 	popup->internalRequestClose.Connect(&PopupMenuEntry::ClosePopupMenu, this);
 
-	owner->SetHasNext(True);
+	owner->SetFlags(owner->GetFlags() | MB_POPUPOPEN);
 
 	RegisterObject(popup);
 }
@@ -320,11 +370,11 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 
 	if (popup->GetContainer() == this)
 	{
+		owner->SetFlags(owner->GetFlags() & ~MB_POPUPOPEN);
+
 		popup->internalRequestClose.Disconnect(&PopupMenuEntry::ClosePopupMenu, this);
 
 		UnregisterObject(popup);
-
-		owner->SetHasNext(False);
 
 		hotspot->Activate();
 

@@ -47,9 +47,9 @@ S::Float S::Math::Atan2(Float fy, Float fx)
 	return atan2(fy, fx);
 }
 
-S::Int S::Math::Ceil(Float f)
+S::Int64 S::Math::Ceil(Float f)
 {
-	return (Int) ceil(f);
+	return (Int64) ceil(f);
 }
 
 S::Float S::Math::Cos(Float f)
@@ -67,9 +67,9 @@ S::Float S::Math::Exp(Float f)
 	return exp(f);
 }
 
-S::Int S::Math::Floor(Float f)
+S::Int64 S::Math::Floor(Float f)
 {
-	return (Int) floor(f);
+	return (Int64) floor(f);
 }
 
 S::Float S::Math::Log(Float f)
@@ -107,12 +107,12 @@ S::Float S::Math::Pow(Float fn, Float fe)
 	return pow(fn, fe);
 }
 
-S::Int S::Math::Round(Float f)
+S::Int64 S::Math::Round(Float f)
 {
-	return (Int) (f + 0.5);
+	return (Int64) (f + 0.5);
 }
 
-S::Int S::Math::Sign(Float f)
+S::Int64 S::Math::Sign(Float f)
 {
 	return (f == 0 ? 0 : (f < 0 ? -1 : 1));
 }
@@ -162,9 +162,38 @@ S::Int S::Math::Mod(Int id, Int ib)
 	return id % ib;
 }
 
-S::Int S::Math::Pow(Int in, Int ie)
+S::Int64 S::Math::Pow(Int in, Int ie)
 {
-	Int	 value = 1;
+	Int64	 value = 1;
+
+	for (Int i = 0; i < ie; i++) value *= in;
+
+	return value;
+}
+
+S::Int64 S::Math::Abs(Int64 i)
+{
+	return i * Sign(i);
+}
+
+S::Int64 S::Math::Min(Int64 i1, Int64 i2)
+{
+	return (i1 < i2 ? i1 : i2);
+}
+
+S::Int64 S::Math::Max(Int64 i1, Int64 i2)
+{
+	return (i1 > i2 ? i1 : i2);
+}
+
+S::Int64 S::Math::Mod(Int64 id, Int64 ib)
+{
+	return id % ib;
+}
+
+S::Int64 S::Math::Pow(Int64 in, Int64 ie)
+{
+	Int64	 value = 1;
 
 	for (Int i = 0; i < ie; i++) value *= in;
 

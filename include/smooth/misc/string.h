@@ -120,10 +120,10 @@ namespace smooth
 
 			Int				 Length() const;
 
-			Int				 ToInt() const;
+			Int64				 ToInt() const;
 			Float				 ToFloat() const;
 
-			static String			 FromInt(const Int);
+			static String			 FromInt(const Int64);
 			static String			 FromFloat(const Float);
 
 			String				 ToLower() const;

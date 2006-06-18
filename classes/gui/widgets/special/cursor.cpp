@@ -79,19 +79,24 @@ S::Int S::GUI::Cursor::Paint(Int message)
 				surface->Box(frame, GetBackgroundColor(), FILLED);
 
 				String	 line;
-				Int	 lineNumber = 0;
-				Int	 lineStart = 0;
+				Bool	 fillLineIndices = (lineIndices.GetNOfEntries() == 0);
+				Int	 lineNumber = (fillLineIndices ? 0 : scrollPos);
+				Int	 lineStart = (fillLineIndices ? 0 : lineIndices.GetNthEntry(scrollPos));
 
-				for (Int i = 0; i <= text.Length(); i++)
+				lineIndices.AddEntry(0);
+
+				for (Int i = (fillLineIndices ? 0 : lineIndices.GetNthEntry(scrollPos)); i <= text.Length(); i++)
 				{
-					line[i - lineStart] = text[i];
-
-					if (text[i] == '\n' || text[i] == 0)
+					if (lineNumber >= scrollPos)
 					{
-						line[i - lineStart] = 0;
+						line[i - lineStart] = text[i];
 
-						if (lineNumber >= scrollPos)
+						if (text[i] == '\n' || text[i] == 0)
 						{
+							line[i - lineStart] = 0;
+
+							if ((lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3) >= frame.bottom - frame.top && !fillLineIndices) break;
+
 							if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
 							else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
 
@@ -123,10 +128,22 @@ S::Int S::GUI::Cursor::Paint(Int message)
 									surface->SetText(mText, markRect + Point(0, 1) - Size(0, 2), nFont);
 								}
 							}
-						}
 
-						lineStart = i + 1;
-						lineNumber++;
+							lineStart = i + 1;
+							lineNumber++;
+
+							lineIndices.AddEntry(lineStart);
+						}
+					}
+					else
+					{
+						if (text[i] == '\n' || text[i] == 0)
+						{
+							lineStart = i + 1;
+							lineNumber++;
+
+							lineIndices.AddEntry(lineStart);
+						}
 					}
 				}
 
@@ -590,6 +607,13 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 
 		promptVisible = visible;
 	}
+}
+
+S::Int S::GUI::Cursor::SetText(const String &newText)
+{
+	lineIndices.RemoveAll();
+
+	return Widget::SetText(newText);
 }
 
 S::Void S::GUI::Cursor::MarkText(Int newMarkStart, Int newMarkEnd)

@@ -34,11 +34,11 @@ namespace smooth
 			static Float		 Asin(Float);
 			static Float		 Atan(Float);
 			static Float		 Atan2(Float, Float);
-			static Int		 Ceil(Float);
+			static Int64		 Ceil(Float);
 			static Float		 Cos(Float);
 			static Float		 Cosh(Float);
 			static Float		 Exp(Float);
-			static Int		 Floor(Float);
+			static Int64		 Floor(Float);
 			static Float		 Log(Float);
 			static Float		 Log10(Float);
 			static Float		 Log2(Float);
@@ -46,8 +46,8 @@ namespace smooth
 			static Float		 Max(Float, Float);
 			static Float		 Mod(Float, Float);
 			static Float		 Pow(Float, Float);
-			static Int		 Round(Float);
-			static Int		 Sign(Float);
+			static Int64		 Round(Float);
+			static Int64		 Sign(Float);
 			static Float		 Sin(Float);
 			static Float		 Sinh(Float);
 			static Float		 Sqrt(Float);
@@ -58,7 +58,13 @@ namespace smooth
 			static Int		 Min(Int, Int);
 			static Int		 Max(Int, Int);
 			static Int		 Mod(Int, Int);
-			static Int		 Pow(Int, Int);
+			static Int64		 Pow(Int, Int);
+
+			static Int64		 Abs(Int64);
+			static Int64		 Min(Int64, Int64);
+			static Int64		 Max(Int64, Int64);
+			static Int64		 Mod(Int64, Int64);
+			static Int64		 Pow(Int64, Int64);
 	};
 };
 

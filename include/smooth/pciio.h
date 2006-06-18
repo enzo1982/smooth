@@ -97,20 +97,20 @@ class SMOOTHAPI PCIIO
 		void		 SetColorspace(int);
 		void		 SetBitsPerChannel(int);
 		void		 SetQuality(int);
-		void		 SetDescription(S::String);
+		void		 SetDescription(const S::String &);
 		void		 SetRLEBits(int);
 		void		 SelectImage(int);
-		void		 SelectImage(S::String);
+		void		 SelectImage(const S::String &);
 		void		 SetImageID(int);
-		void		 SetImageName(S::String);
+		void		 SetImageName(const S::String &);
 		S::GUI::Bitmap	&GetBitmap();
 };
 
-SMOOTHAPI PCIOut	 CreatePCI(S::String);		// creates a new PCI file
-SMOOTHAPI PCIOut	 OpenPCIForOutput(S::String);	// opens a PCI file
-SMOOTHAPI PCIIn		 OpenPCIForInput(S::String);	// opens a PCI file
-SMOOTHAPI bool		 ClosePCI(PCIIn);		// closes a PCI file
-SMOOTHAPI bool		 ClosePCI(PCIOut);		// closes a PCI file
+SMOOTHAPI PCIOut	 CreatePCI(const S::String &);		// creates a new PCI file
+SMOOTHAPI PCIOut	 OpenPCIForOutput(const S::String &);	// opens a PCI file
+SMOOTHAPI PCIIn		 OpenPCIForInput(const S::String &);	// opens a PCI file
+SMOOTHAPI bool		 ClosePCI(PCIIn);			// closes a PCI file
+SMOOTHAPI bool		 ClosePCI(PCIOut);			// closes a PCI file
 SMOOTHAPI bool		 WritePCI(PCIOut, PCIIO &);
 SMOOTHAPI bool		 ReadPCI(PCIIn, PCIIO &);
 

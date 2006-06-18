@@ -10,6 +10,7 @@
 
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/widgets/multi/menu/popupmenuentry.h>
+#include <smooth/gui/widgets/multi/menu/menubar.h>
 #include <smooth/gui/widgets/multi/menu/menubarentry.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/gui/window/toolwindow.h>
@@ -25,7 +26,6 @@ S::GUI::PopupMenu::PopupMenu()
 	type		= classID;
 	orientation	= OR_FREE;
 
-	hasNext		= False;
 	closedByClick	= False;
 
 	toolWindow = new ToolWindow(Point(), Size());
@@ -67,7 +67,8 @@ S::Int S::GUI::PopupMenu::Show()
 
 	if (!IsRegistered()) return Success();
 
-	hasNext = False;
+	SetFlags(GetFlags() & ~MB_POPUPOPEN);
+
 	closedByClick = False;
 
 	for (Int k = 0; k < GetNOfObjects(); k++)
@@ -161,7 +162,7 @@ S::Void S::GUI::PopupMenu::CalculateSize()
 
 S::Void S::GUI::PopupMenu::OnOpenPopupMenu(Int handle)
 {
-	if (hasNext) return;
+	if (GetFlags() & MB_POPUPOPEN) return;
 
 	if (handle != GetHandle()) internalRequestClose.Emit();
 }

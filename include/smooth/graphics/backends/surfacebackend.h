@@ -59,8 +59,8 @@ namespace smooth
 
 				Int								 GetSurfaceType();
 
-				Int								 SetSize(const Size &);
-				const Size							&GetSize();
+				virtual Int							 SetSize(const Size &);
+				virtual const Size						&GetSize();
 
 				Int								 SetRightToLeft(Bool);
 

@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.06.06 xx:xx - smooth aplha 0.8.68.0
+18.06.06 15:10 - smooth aplha 0.8.68.0
 
 - shortcut.cpp	- Added support for menu shortcuts
 - buffer.cpp	- Added Base 64 encoder and decoder

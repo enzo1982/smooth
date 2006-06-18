@@ -30,17 +30,20 @@ S::String S::GUI::Application::GetStartupDirectory()
 	if (startupDirectory != NIL) return startupDirectory;
 
 #ifdef __WIN32__
+	Int	 length = 0;
+
 	if (Setup::enableUnicode)
 	{
 		wchar_t	*buffer = new wchar_t [MAX_PATH];
 
-		GetCurrentDirectoryW(MAX_PATH, buffer);
+		length = GetCurrentDirectoryW(MAX_PATH, buffer);
 
 		startupDirectory = buffer;
 
 		delete [] buffer;
 	}
-	else
+
+	if (!Setup::enableUnicode || length == 0)
 	{
 		char	*buffer = new char [MAX_PATH];
 
@@ -66,18 +69,20 @@ S::String S::GUI::Application::GetApplicationDirectory()
 #ifdef __WIN32__
 	String	 path;
 	Int	 lastBs = 0;
+	Int	 length = 0;
 
 	if (Setup::enableUnicode)
 	{
 		wchar_t	*buffer = new wchar_t [MAX_PATH];
 
-		GetModuleFileNameW(NIL, buffer, MAX_PATH);
+		length = GetModuleFileNameW(NIL, buffer, MAX_PATH);
 
 		path = buffer;
 
 		delete [] buffer;
 	}
-	else
+
+	if (!Setup::enableUnicode || length == 0)
 	{
 		char	*buffer = new char [MAX_PATH];
 

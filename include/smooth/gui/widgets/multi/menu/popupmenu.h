@@ -31,7 +31,6 @@ namespace smooth
 			private:
 				ToolWindow			*toolWindow;
 
-				Bool				 hasNext;
 				Bool				 closedByClick;
 			public:
 				static const Int		 classID;
@@ -46,8 +45,6 @@ namespace smooth
 
 				Void				 CalculateSize();
 			accessors:
-				Void				 SetHasNext(Bool nHasNext)		{ hasNext = nHasNext; }
-
 				Bool				 IsClosedByClick()			{ return closedByClick; }
 				Void				 SetClosedByClick(Bool nClosedByClick)	{ closedByClick = nClosedByClick; }
 			signals:

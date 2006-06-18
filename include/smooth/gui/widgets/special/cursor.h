@@ -48,6 +48,8 @@ namespace smooth
 
 				Int				 scrollPos;
 				Int				 maxScrollPos;
+
+				Array<Int>			 lineIndices;
 			protected:
 				Int				 maxSize;
 
@@ -75,6 +77,8 @@ namespace smooth
 
 				Int				 SetMaxSize(Int);
 				Int				 GetMaxSize();
+
+				virtual Int			 SetText(const String &);
 			signals:
 				Signal1<Void, const String &>	 onInput;
 				Signal1<Void, const String &>	 onEnter;

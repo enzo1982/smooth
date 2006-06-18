@@ -102,13 +102,22 @@ S::Int S::GUI::GroupBox::Deactivate()
 	return Success();
 }
 
+S::Int S::GUI::GroupBox::Show()
+{
+	Int	 retVal = Layer::Show();
+
+	Paint(SP_SHOW);
+
+	return retVal;
+}
+
 S::Int S::GUI::GroupBox::Hide()
 {
 	if (IsRegistered() && IsVisible())
 	{
 		Surface	*surface = container->GetDrawSurface();
 
-		surface->Box(Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 2, (Int) (textSize.cy * 1.2))), Setup::BackgroundColor, FILLED);
+		surface->Box(Rect(GetRealPosition() - Point(0, 6), GetSize() + Size(0, 6)), Setup::BackgroundColor, FILLED);
 	}
 
 	return Layer::Hide();

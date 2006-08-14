@@ -228,7 +228,15 @@ S::Int S::Directory::Copy(const String &destination)
 
 S::Int S::Directory::Move(const String &destination)
 {
-	return Error();
+	if (!Exists()) return Error();
+
+	Bool	 result = False;
+
+	if (Setup::enableUnicode)	result = MoveFileW(String(dirPath).Append("\\").Append(dirName), destination);
+	else				result = MoveFileA(String(dirPath).Append("\\").Append(dirName), destination);
+
+	if (result == False)	return Error();
+	else			return Success();
 }
 
 S::Int S::Directory::Delete()

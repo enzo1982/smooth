@@ -27,6 +27,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/backends/win32/backendwin32.h>
 #include <smooth/system/event.h>
+#include <smooth/system/multimonitor.h>
 
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
 S::Int		 S::GUI::Window::nOfActiveWindows = 0;
@@ -402,6 +403,13 @@ S::Bool S::GUI::Window::Create()
 {
 	if (IsRegistered() && !created)
 	{
+		if (GetPosition().x >= 0 && GetPosition().y >= 0 && GetPosition().x < LiSAGetDisplaySizeX() && GetPosition().y < LiSAGetDisplaySizeY())
+		{
+			Rect	 monitorRect = System::MultiMonitor::GetActiveMonitorMetrics();
+
+			SetPosition(Point(monitorRect.left, monitorRect.top) + GetPosition());
+		}
+
 		if (backend->Open(text, GetPosition(), GetSize(), flags) == Success())
 		{
 			if (GetObjectType() != ToolWindow::classID) nOfActiveWindows++;
@@ -768,11 +776,9 @@ S::Int S::GUI::Window::Paint(Int message)
 	{
 		Bool	 preRTL = IsRightToLeft();
 
-		SetRightToLeft(False);
-
+		surface->SetRightToLeft(False);
 		surface->StartPaint(updateRect);
-
-		SetRightToLeft(preRTL);
+		surface->SetRightToLeft(preRTL);
 
 		surface->Box(updateRect, Setup::BackgroundColor, FILLED);
 

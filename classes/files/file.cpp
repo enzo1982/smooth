@@ -206,7 +206,7 @@ S::Int S::File::Copy(const String &destination)
 S::Int S::File::Move(const String &destination)
 {
 	if (!Exists()) return Error();
-	
+
 	Bool	 result = False;
 
 	if (Setup::enableUnicode)	result = MoveFileW(String(filePath).Append("\\").Append(fileName), destination);

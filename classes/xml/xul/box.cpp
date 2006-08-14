@@ -96,6 +96,8 @@ S::GUI::Widget *S::XML::XUL::Box::GetWidget()
 
 S::Void	 S::XML::XUL::Box::CalculateChildMetrics()
 {
+	if (widgets.GetNOfEntries() == 0) return;
+
 	Int	 xOffset = 0;
 	Int	 yOffset = 0;
 

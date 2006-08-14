@@ -170,7 +170,7 @@ S::Void S::GUI::ComboBox::OpenListBox()
 
 			entry->SetRegisteredFlag(False);
 
-			listBox->RegisterObject(entry);
+			listBox->AddEntry(entry);
 
 			entry->Activate();
 		}
@@ -185,13 +185,13 @@ S::Void S::GUI::ComboBox::CloseListBox()
 {
 	if (listBox != NIL)
 	{
+		listBox->RemoveAllEntries();
+
 		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
 			if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
 
 			ListEntry	*entry = (ListEntry *) GetNthObject(i);
-
-			listBox->UnregisterObject(entry);
 
 			entry->SetRegisteredFlag(True);
 			entry->SetContainer(this);

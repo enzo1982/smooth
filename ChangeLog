@@ -1,5 +1,9 @@
 ChangeLog for smooth
 
+xx.xx.06 xx:xx - smooth alpha 0.8.69.0
+
+- added multi monitor support
+
 18.06.06 15:10 - smooth aplha 0.8.68.0
 
 - shortcut.cpp	- Added support for menu shortcuts

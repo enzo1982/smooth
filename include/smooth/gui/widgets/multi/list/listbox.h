@@ -32,6 +32,7 @@ namespace smooth
 		const Int	 LF_ALLOWRESELECT	= 2;
 		const Int	 LF_MULTICHECKBOX	= 4;
 		const Int	 LF_HIDEHEADER		= 8;
+		const Int	 LF_ALLOWREORDER	= 16;
 
 		class SMOOTHAPI ListBox : public List
 		{
@@ -53,6 +54,8 @@ namespace smooth
 				Int			 AddTab(const String &tabName, Int tabWidth = 0, Int tabOrientation = OR_LEFT)	{ return header->AddTab(tabName, tabWidth, tabOrientation); }
 
 				Int			 RemoveAllTabs()								{ return header->RemoveAllTabs(); }
+
+				Int			 DragSelectedEntry();
 			accessors:
 				Int			 GetNOfTabs()									{ return header->GetNOfTabs(); }
 				Int			 GetNthTabOffset(Int n)								{ return header->GetNthTabOffset(n); }

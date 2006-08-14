@@ -50,6 +50,8 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iWindow, const Size &maxSize)
 		cDc_rects.AddEntry(new Rect(Point(0, 0), size));
 
 		ReleaseDC(window, gdi_dc);
+
+		allocSize = size;
 	}
 }
 
@@ -68,9 +70,9 @@ S::GUI::SurfaceGDI::~SurfaceGDI()
 
 S::Int S::GUI::SurfaceGDI::SetSize(const Size &nSize)
 {
-	if (size.cx >= nSize.cx && size.cy >= nSize.cy) return Success();
-
 	size = nSize;
+
+	if (allocSize.cx >= nSize.cx && allocSize.cy >= nSize.cy) return Success();
 
 	if (window != NIL && !painting)
 	{
@@ -92,6 +94,8 @@ S::Int S::GUI::SurfaceGDI::SetSize(const Size &nSize)
 
 		ReleaseDC(window, gdi_dc);
 	}
+
+	allocSize = nSize;
 
 	return Success();
 }

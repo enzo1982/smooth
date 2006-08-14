@@ -31,6 +31,8 @@ namespace smooth
 			private:
 				Bool				 marked;
 				Bool				 selected;
+
+				Bool				 dragNotified;
 			protected:
 				Hotspot				*hotspot;
 				Hotspot				*markHotspot;
@@ -53,6 +55,8 @@ namespace smooth
 			signals:
 				static Signal2<Void, Int, Int>	 internalOnSelectEntry;
 			slots:
+				Void				 InitDrag();
+
 				Void				 OnToggleMark();
 				Void				 OnSelectEntry();
 

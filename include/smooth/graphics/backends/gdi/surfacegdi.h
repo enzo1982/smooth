@@ -32,6 +32,8 @@ namespace smooth
 			protected:
 				HWND		 window;
 
+				Size		 allocSize;
+
 				Array<HDC>	 cDc_contexts;
 				Array<HBITMAP>	 cDc_bitmaps;
 				Array<Rect *>	 cDc_rects;

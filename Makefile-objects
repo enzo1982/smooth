@@ -615,6 +615,11 @@ $(OBJECTDIR)/event.o: $(SYSTEMCLASSESDIR)/event.cpp $(SMOOTHINCLUDEDIR)/system/e
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/event.cpp -o $(OBJECTDIR)/event.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/multimonitor.o: $(SYSTEMCLASSESDIR)/multimonitor.cpp $(SMOOTHINCLUDEDIR)/system/multimonitor.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/multimonitor.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/multimonitor.cpp -o $(OBJECTDIR)/multimonitor.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/system.o: $(SYSTEMCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system/system.h
 	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/system.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/system.cpp -o $(OBJECTDIR)/system.o

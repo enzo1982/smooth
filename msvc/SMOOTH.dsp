@@ -610,6 +610,19 @@ SOURCE=..\classes\system\event.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\classes\system\multimonitor.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# ADD CPP /D WINVER=0x0500
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\classes\system\system.cpp
 # End Source File
 # Begin Source File
@@ -1091,6 +1104,13 @@ SOURCE=..\misc\codecs.cpp
 # Begin Source File
 
 SOURCE=..\misc\loop.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -1517,6 +1537,10 @@ SOURCE=..\include\smooth\system\dynamicloader.h
 # Begin Source File
 
 SOURCE=..\include\smooth\system\event.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\system\multimonitor.h
 # End Source File
 # Begin Source File
 

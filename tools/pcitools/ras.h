@@ -1,7 +1,8 @@
 // Load raster images
 
-#include <iolib-cxx.h>
-#include <windows.h>
+#include <smooth.h>
+
+using namespace smooth::IO;
 
 HBITMAP LoadRAS(char *);
 int SaveRAS(HBITMAP, char *);

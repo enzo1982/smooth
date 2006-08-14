@@ -13,6 +13,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
+#include <smooth/system/multimonitor.h>
 #include <smooth/loop.h>
 
 S::GUI::WindowBackend *CreateWindowGDI()
@@ -380,15 +381,10 @@ S::Int S::GUI::WindowGDI::Minimize()
 
 S::Int S::GUI::WindowGDI::Maximize()
 {
-	Rect	 workArea;
+	Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
 
 	{
-		RECT rect;
-
-		if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-		else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
-
-		workArea = rect;
+		RECT	 rect;
 
 		GetWindowRect(hwnd, &rect);
 

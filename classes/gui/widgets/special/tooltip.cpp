@@ -11,6 +11,7 @@
 #include <smooth/gui/widgets/special/tooltip.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/system/timer.h>
+#include <smooth/system/multimonitor.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
 
@@ -50,18 +51,19 @@ S::Int S::GUI::Tooltip::Show()
 	Window	*window	 = container->GetContainerWindow();
 	Size	 tSize	 = Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4);
 	Point	 tPos	 = Point(GetX(), GetY() - tSize.cy + 1);
+	Rect	 vScreen = System::MultiMonitor::GetVirtualScreenMetrics();
 
-	if (tPos.y + window->GetY() < 2) tPos.y = GetY() + 2;
+	if (tPos.y + window->GetY() < vScreen.top + 2) tPos.y = GetY() + vScreen.top + 2;
 
 	if (!IsRightToLeft())
 	{
-		if (tPos.x + window->GetX() + tSize.cx > LiSAGetDisplaySizeX() - 2)	tPos.x = -window->GetX() + LiSAGetDisplaySizeX() - 2 - tSize.cx;
-		if (tPos.x + window->GetX() < 2)					tPos.x = -window->GetX() + 2;
+		if (tPos.x + window->GetX() + tSize.cx > vScreen.right - 2) tPos.x = -window->GetX() + vScreen.right - 2 - tSize.cx;
+		if (tPos.x + window->GetX()	       < vScreen.left  + 2) tPos.x = -window->GetX() + vScreen.left + 2;
 	}
 	else
 	{
-		if (window->GetWidth() - tPos.x + window->GetX() > LiSAGetDisplaySizeX() - 2)	tPos.x = -LiSAGetDisplaySizeX() + 2 + window->GetWidth() + window->GetX();
-		if (window->GetWidth() - tPos.x - tSize.cx + window->GetX() < 2)		tPos.x = -2 + window->GetWidth() + window->GetX() - tSize.cx;
+		if (window->GetWidth() - tPos.x + window->GetX()	    > vScreen.right - 2) tPos.x = -vScreen.right + 2 + window->GetWidth() + window->GetX();
+		if (window->GetWidth() - tPos.x - tSize.cx + window->GetX() < vScreen.left  + 2) tPos.x = -(vScreen.left + 2) + window->GetWidth() + window->GetX() - tSize.cx;
 	}
 
 	toolWindow = new ToolWindow(tPos, tSize);

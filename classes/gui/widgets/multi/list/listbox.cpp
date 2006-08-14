@@ -166,6 +166,13 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	return Success();
 }
 
+S::Int S::GUI::ListBox::DragSelectedEntry()
+{
+	if (!(flags & LF_ALLOWREORDER) || !leftButtonDown) return Error();
+
+	return Success();
+}
+
 S::Void S::GUI::ListBox::OnScrollbarValueChange()
 {
 	Paint(SP_PAINT);

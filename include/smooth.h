@@ -52,6 +52,7 @@
 
 #include "smooth/system/console.h"
 #include "smooth/system/dynamicloader.h"
+#include "smooth/system/multimonitor.h"
 #include "smooth/system/system.h"
 #include "smooth/system/timer.h"
 

@@ -27,6 +27,9 @@ namespace smooth
 	{
 		class SMOOTHAPI List : public Widget
 		{
+			private:
+				Array<Bool>			 createdEntry;
+				Array<Int>			 elementOrder;
 			public:
 				static const Int		 classID;
 
@@ -34,9 +37,13 @@ namespace smooth
 				virtual				~List();
 
 				ListEntry			*AddEntry(const String &);
+
+				Int				 AddEntry(ListEntry *);
 				Int				 RemoveEntry(ListEntry *);
 
 				Int				 RemoveAllEntries();
+
+				Int				 SwitchEntries(Int, Int);
 			accessors:
 				Int				 GetNOfEntries();
 				ListEntry			*GetNthEntry(Int);

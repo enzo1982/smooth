@@ -18,6 +18,7 @@
 #include <smooth/i18n/i18n.h>
 #include <smooth/gui/application/background.h>
 #include <smooth/system/event.h>
+#include <smooth/system/multimonitor.h>
 
 #ifdef __WIN32__
 #include <wtypes.h>
@@ -52,6 +53,8 @@ S::Void S::Init()
 	LiSAInit();
 
 	Backend::InitBackends();
+
+	System::MultiMonitor::Initialize();
 
 #ifdef __WIN32__
 	if (hDllInstance == NIL) hDllInstance = hInstance;
@@ -130,6 +133,8 @@ S::Void S::Free()
 
 	if (Setup::useIconv) FreeIconvDLL();
 #endif
+
+	System::MultiMonitor::Free();
 
 	Backend::DeinitBackends();
 

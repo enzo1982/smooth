@@ -12,6 +12,8 @@
 
 S::IO::DriverWin32::DriverWin32(const String &fileName, Int mode) : Driver()
 {
+	closeStream = False;
+
 	switch (mode)
 	{
 		default:

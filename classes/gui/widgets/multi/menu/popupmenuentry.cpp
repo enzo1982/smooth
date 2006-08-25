@@ -320,6 +320,8 @@ S::Void S::GUI::PopupMenuEntry::OnMouseOut()
 
 S::Void S::GUI::PopupMenuEntry::OnClickEntry()
 {
+	EnterProtectedRegion();
+
 	owner->SetClosedByClick(True);
 	owner->internalRequestClose.Emit();
 
@@ -327,6 +329,8 @@ S::Void S::GUI::PopupMenuEntry::OnClickEntry()
 	if (iVar != NIL) { *iVar = iCode; OptionBox::internalCheckValues.Emit(); }
 
 	onAction.Emit();
+
+	LeaveProtectedRegion();
 }
 
 S::Void S::GUI::PopupMenuEntry::OnChangeSize(const Size &nSize)
@@ -338,6 +342,10 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 {
 	if (popup == NIL) return;
 
+	Widget	*window		= container->GetContainerWindow();
+
+	if (window == NIL) return;
+
 	if (timer != NIL)
 	{
 		DeleteObject(timer);
@@ -347,7 +355,6 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 
 	hotspot->Deactivate();
 
-	Widget	*window		= container->GetContainerWindow();
 	Point	 realPos	= GetRealPosition();
 	Point	 popupPos	= realPos + Point(GetWidth(), -3);
 

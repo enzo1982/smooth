@@ -44,6 +44,7 @@ S::GUI::EditBox::EditBox(const String &iText, const Point &iPos, const Size &iSi
 	onEnter.SetParentObject(this);
 
 	onChangeSize.Connect(&EditBox::OnChangeSize, this);
+	onLoseFocus.Connect(&cursor->onLoseFocus);
 }
 
 S::GUI::EditBox::~EditBox()

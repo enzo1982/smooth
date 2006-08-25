@@ -106,8 +106,8 @@ namespace smooth
 								 Widget(const Point &, const Size &);
 				virtual				~Widget();
 
-				Int				 GetNOfObjects();
-				Widget				*GetNthObject(Int);
+				Int				 GetNOfObjects() const;
+				Widget				*GetNthObject(Int) const;
 
 				virtual Int			 RegisterObject(Widget *);
 				virtual Int			 UnregisterObject(Widget *);

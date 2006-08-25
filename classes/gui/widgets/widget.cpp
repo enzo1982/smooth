@@ -163,12 +163,12 @@ S::Int S::GUI::Widget::UnregisterObject(Widget *widget)
 	return Error();
 }
 
-S::Int S::GUI::Widget::GetNOfObjects()
+S::Int S::GUI::Widget::GetNOfObjects() const
 {
 	return widgets.GetNOfEntries();
 }
 
-S::GUI::Widget *S::GUI::Widget::GetNthObject(Int n)
+S::GUI::Widget *S::GUI::Widget::GetNthObject(Int n) const
 {
 	return widgets.GetNthEntry(n);
 }
@@ -330,6 +330,13 @@ S::Int S::GUI::Widget::Hide()
 
 	if (wasVisible)
 	{
+		if (focussed)
+		{
+			focussed = False;
+
+			onLoseFocus.Emit();
+		}
+
 		Rect	 rect		= Rect(GetRealPosition(), size);
 		Surface	*surface	= container->GetDrawSurface();
 
@@ -686,7 +693,9 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 	if (text == newText) return Success();
 
 	Bool	 prevVisible = IsVisible();
+	Bool	 prevFocussed = focussed;
 
+	if (registered && prevFocussed) focussed = False;
 	if (registered && prevVisible) Hide();
 
 	text = newText;
@@ -694,6 +703,7 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 	GetTextSize();
 
 	if (registered && prevVisible) Show();
+	if (registered && prevFocussed) focussed = True;
 
 	Process(SM_MOUSEMOVE, 0, 0);
 

@@ -82,34 +82,25 @@ S::Int S::GUI::Divider::Paint(Int message)
 					doubleBar2.y = container->GetRealPosition().y + container->GetHeight() - 4;
 				}
 
-				for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
+				for (Int i = container->GetNOfObjects() - 1; i >= 0; i--)
 				{
-					Object	*object = Object::GetNthObject(i);
+					if (container->GetNthObject(i)->GetObjectType() != classID) continue;
 
-					if (object != NIL)
+					Divider	*divider = (Divider *) container->GetNthObject(i);
+
+					if (afterMe && !Binary::IsFlagSet(divider->flags, OR_VERT))
 					{
-						if (object->GetObjectType() == classID)
+						if (Binary::IsFlagSet(divider->flags, OR_BOTTOM))
 						{
-							if (((Widget *) object)->GetContainer() == container)
-							{
-								Divider	*operat = (Divider *) object;
-
-								if (afterMe && !Binary::IsFlagSet(operat->flags, OR_VERT))
-								{
-									if (Binary::IsFlagSet(operat->flags, OR_BOTTOM))
-									{
-										if (container->GetRealPosition().y + container->GetHeight() - operat->position <= doubleBar2.y + 1) doubleBar2.y = container->GetRealPosition().y + container->GetHeight() - operat->position - 2;
-									}
-									else
-									{
-										if (container->GetRealPosition().y + operat->position >= doubleBar1.y - 2) doubleBar1.y = container->GetRealPosition().y + operat->position + 3;
-									}
-								}
-
-								if (operat == this) afterMe = True;
-							}
+							if (container->GetRealPosition().y + container->GetHeight() - divider->position <= doubleBar2.y + 1) doubleBar2.y = container->GetRealPosition().y + container->GetHeight() - divider->position - 2;
+						}
+						else
+						{
+							if (container->GetRealPosition().y + divider->position >= doubleBar1.y - 2) doubleBar1.y = container->GetRealPosition().y + divider->position + 3;
 						}
 					}
+
+					if (divider == this) afterMe = True;
 				}
 			}
 			else
@@ -132,34 +123,25 @@ S::Int S::GUI::Divider::Paint(Int message)
 					doubleBar2.x = container->GetRealPosition().x + container->GetWidth() - 4;
 				}
 
-				for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
+				for (Int i = container->GetNOfObjects() - 1; i >= 0; i--)
 				{
-					Object	*object = Object::GetNthObject(i);
+					if (container->GetNthObject(i)->GetObjectType() != classID) continue;
 
-					if (object != NIL)
+					Divider	*divider = (Divider *) container->GetNthObject(i);
+
+					if (afterMe && Binary::IsFlagSet(divider->flags, OR_VERT))
 					{
-						if (object->GetObjectType() == classID)
+						if (Binary::IsFlagSet(divider->flags, OR_RIGHT))
 						{
-							if (((Widget *) object)->GetContainer() == container)
-							{
-								Divider	*operat = (Divider *) object;
-
-								if (afterMe && Binary::IsFlagSet(operat->flags, OR_VERT))
-								{
-									if (Binary::IsFlagSet(operat->flags, OR_RIGHT))
-									{
-										if (container->GetRealPosition().x + container->GetWidth() - operat->position <= doubleBar2.x + 1) doubleBar2.x = container->GetRealPosition().x + container->GetWidth() - operat->position - 2;
-									}
-									else
-									{
-										if (container->GetRealPosition().x + operat->position >= doubleBar1.x - 2) doubleBar1.x = container->GetRealPosition().x + operat->position + 3;
-									}
-								}
-
-								if (operat == this) afterMe = True;
-							}
+							if (container->GetRealPosition().x + container->GetWidth() - divider->position <= doubleBar2.x + 1) doubleBar2.x = container->GetRealPosition().x + container->GetWidth() - divider->position - 2;
+						}
+						else
+						{
+							if (container->GetRealPosition().x + divider->position >= doubleBar1.x - 2) doubleBar1.x = container->GetRealPosition().x + divider->position + 3;
 						}
 					}
+
+					if (divider == this) afterMe = True;
 				}
 			}
 

@@ -45,6 +45,7 @@ S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size 
 	onInput.SetParentObject(this);
 
 	onChangeSize.Connect(&MultiEdit::OnChangeSize, this);
+	onLoseFocus.Connect(&cursor->onLoseFocus);
 }
 
 S::GUI::MultiEdit::~MultiEdit()

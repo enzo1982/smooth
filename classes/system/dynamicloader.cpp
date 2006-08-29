@@ -43,7 +43,7 @@ S::System::DynamicLoader::~DynamicLoader()
 #endif
 }
 
-S::Void *S::System::DynamicLoader::GetFunctionAddress(const String &functionName)
+S::Void *S::System::DynamicLoader::GetFunctionAddress(const String &functionName) const
 {
 	if (handle == NIL) return NIL;
 
@@ -54,7 +54,7 @@ S::Void *S::System::DynamicLoader::GetFunctionAddress(const String &functionName
 #endif
 }
 
-S::Void *S::System::DynamicLoader::GetSystemModuleHandle()
+S::Void *S::System::DynamicLoader::GetSystemModuleHandle() const
 {
 	return handle;
 }

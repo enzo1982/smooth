@@ -27,7 +27,7 @@ S::XML::XUL::Description::~Description()
 	if (text != NIL) Object::DeleteObject(text);
 }
 
-S::GUI::Widget *S::XML::XUL::Description::GetWidget()
+S::GUI::Widget *S::XML::XUL::Description::GetWidget() const
 {
 	return text;
 }

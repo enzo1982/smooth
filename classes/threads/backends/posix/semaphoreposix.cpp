@@ -46,7 +46,7 @@ S::Threads::SemaphorePOSIX::~SemaphorePOSIX()
 	}
 }
 
-S::Void *S::Threads::SemaphorePOSIX::GetSystemSemaphore()
+S::Void *S::Threads::SemaphorePOSIX::GetSystemSemaphore() const
 {
 	return (Void *) semaphore;
 }

@@ -36,9 +36,9 @@ namespace smooth
 							 Mutex(Void * = NIL);
 							~Mutex();
 
-				Int			 GetMutexType();
+				Int			 GetMutexType() const;
 
-				Void			*GetSystemMutex();
+				Void			*GetSystemMutex() const;
 
 				Int			 Lock();
 				Int			 Release();

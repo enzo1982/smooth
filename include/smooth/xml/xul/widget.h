@@ -59,20 +59,20 @@ namespace smooth
 					String			 statustext;
 					String			 tooltiptext;
 
-					String			 GetXMLAttributeValue(Node *, const String &);
+					String			 GetXMLAttributeValue(Node *, const String &) const;
 				public:
 								 Widget(Node *);
 					virtual			~Widget();
 
-					virtual GUI::Widget	*GetWidget();
+					virtual GUI::Widget	*GetWidget() const;
 
 					Int			 SetMetrics(const GUI::Point &, const GUI::Size &);
 
-					Int			 GetWidth();
-					Int			 GetHeight();
+					Int			 GetWidth() const		{ return width; }
+					Int			 GetHeight() const		{ return height; }
 
-					Int			 GetDefaultWidth();
-					Int			 GetDefaultHeight();
+					Int			 GetDefaultWidth() const	{ return defaultWidth; }
+					Int			 GetDefaultHeight() const	{ return defaultHeight; }
 
 					static const Int	 HORIZONTAL;
 					static const Int	 VERTICAL;

@@ -90,7 +90,7 @@ namespace smooth
 
 				Widget				*container;
 
-				Void				 GetTextSize();
+				Void				 ComputeTextSize();
 
 				Void				 SetFocusByKeyboard();
 
@@ -113,20 +113,20 @@ namespace smooth
 				virtual Int			 UnregisterObject(Widget *);
 
 				Window				*GetContainerWindow();
-				virtual Surface			*GetDrawSurface();
+				virtual Surface			*GetDrawSurface() const;
 
 				Int				 SetContainer(Widget *);
-				Widget				*GetContainer();
+				Widget				*GetContainer() const;
 
 				Void				 SetRegisteredFlag(Bool);
 
-				Widget				*GetPreviousTabstopWidget(Int);
-				Widget				*GetNextTabstopWidget(Int);
+				Widget				*GetPreviousTabstopWidget(Int) const;
+				Widget				*GetNextTabstopWidget(Int) const;
 
-				virtual Point			 GetRealPosition();
+				virtual Point			 GetRealPosition() const;
 
 				Int				 SetBackgroundColor(const Color &);
-				const Color			&GetBackgroundColor();
+				const Color			&GetBackgroundColor() const;
 
 				virtual Int			 Show();
 				virtual Int			 Hide();
@@ -150,19 +150,19 @@ namespace smooth
 				Bool				 IsMouseOver() const		{ return mouseOver; }
 
 				virtual Int			 SetText(const String &);
-				virtual const String		&GetText();
+				virtual const String		&GetText() const;
 
 				virtual Int			 SetTooltipText(const String &);
-				virtual const String		&GetTooltipText();
+				virtual const String		&GetTooltipText() const;
 
 				virtual Int			 SetStatusText(const String &);
-				virtual const String		&GetStatusText();
+				virtual const String		&GetStatusText() const;
 
 				virtual Int			 SetFont(const Font &);
-				virtual const Font		&GetFont();
+				virtual const Font		&GetFont() const;
 
 				virtual Int			 SetOrientation(Int);
-				virtual Int			 GetOrientation();
+				virtual Int			 GetOrientation() const;
 
 				Int				 SetX(Int nX)			{ return SetMetrics(Point(nX, pos.y), size); }
 				Int				 GetX() const			{ return pos.x; }
@@ -184,7 +184,7 @@ namespace smooth
 
 				virtual Int			 SetMetrics(const Point &, const Size &);
 
-				virtual Bool			 IsAffected(const Rect &);
+				virtual Bool			 IsAffected(const Rect &) const;
 				virtual Bool			 IsRightToLeft() const;
 			callbacks:
 				Callback1<Bool, const Point &>	 hitTest;

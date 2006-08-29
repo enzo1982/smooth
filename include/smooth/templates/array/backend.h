@@ -18,6 +18,8 @@ namespace smooth
 	template <class s> class Array_Backend
 	{
 		private:
+			static s		 nullValue;
+
 			Int			 nOfEntries;
 			Int			 greatestIndex;
 			Bool			 outlinedEntry;
@@ -48,15 +50,15 @@ namespace smooth
 			Bool			 RemoveEntry(Int);
 			Bool			 RemoveAll();
 
-			s			 GetEntry(Int) const;
+			const s			&GetEntry(Int) const;
 			Bool			 SetEntry(Int, const s &);
 
 			inline Int		 GetNOfEntries() const		{ return nOfEntries; };
-			s			 GetFirstEntry() const;
-			s			 GetLastEntry() const;
-			s			 GetNextEntry() const;
-			s			 GetPrevEntry() const;
-			s			 GetNthEntry(Int) const;
+			const s			&GetFirstEntry() const;
+			const s			&GetLastEntry() const;
+			const s			&GetNextEntry() const;
+			const s			&GetPrevEntry() const;
+			const s			&GetNthEntry(Int) const;
 			Int			 GetNthEntryIndex(Int) const;
 	};
 };

@@ -45,14 +45,14 @@ namespace smooth
 
 				Int				 SwitchEntries(Int, Int);
 			accessors:
-				Int				 GetNOfEntries();
-				ListEntry			*GetNthEntry(Int);
+				Int				 GetNOfEntries() const;
+				ListEntry			*GetNthEntry(Int) const;
 
 				Int				 SelectEntry(ListEntry *);
-				ListEntry			*GetSelectedEntry();
+				ListEntry			*GetSelectedEntry() const;
 
 				Int				 SelectNthEntry(Int);
-				Int				 GetSelectedEntryNumber();
+				Int				 GetSelectedEntryNumber() const;
 
 				Int				 SelectEntry(const String &);
 			signals:

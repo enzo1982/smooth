@@ -104,11 +104,9 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			{
 				frame.top = 1 + (header->IsVisible() ? 16 : 0);
 
-				for (Int i = 0, n = 0; i < GetNOfObjects(); i++)
+				for (Int i = 0, n = 0; i < GetNOfEntries(); i++)
 				{
-					if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
-
-					ListEntry	*operat = (ListEntry *) GetNthObject(i);
+					ListEntry	*operat = GetNthEntry(i);
 
 					if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
 					{
@@ -143,11 +141,9 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			{
 				frame.top = 1 + (header->IsVisible() ? 16 : 0);
 
-				for (Int i = 0, n = 0; i < GetNOfObjects(); i++)
+				for (Int i = 0, n = 0; i < GetNOfEntries(); i++)
 				{
-					if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
-
-					ListEntry	*operat = (ListEntry *) GetNthObject(i);
+					ListEntry	*operat = GetNthEntry(i);
 
 					if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
 					{
@@ -156,9 +152,9 @@ S::Int S::GUI::ListBox::Paint(Int message)
 						frame.top = Math::Min((Int) (frame.top + operat->GetHeight()), GetHeight() - 3);
 					}
 				}
-
-				if (visibleEntriesChecksum != visibleEntries.ComputeCRC32()) Paint(SP_PAINT);
 			}
+
+			if (visibleEntriesChecksum != visibleEntries.ComputeCRC32()) Paint(SP_PAINT);
 
 			break;
 	}
@@ -166,9 +162,29 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	return Success();
 }
 
-S::Int S::GUI::ListBox::DragSelectedEntry()
+S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 {
-	if (!(flags & LF_ALLOWREORDER) || !leftButtonDown) return Error();
+	if (!(flags & LF_ALLOWREORDER)) return Error();
+
+	Int	 selectedEntryNumber = GetSelectedEntryNumber();
+	Int	 exchangedEntryNumber = selectedEntryNumber;
+
+	if (upDown && selectedEntryNumber != 0)				exchangedEntryNumber = selectedEntryNumber - 1;
+	else if (!upDown && selectedEntryNumber != GetNOfEntries() - 1)	exchangedEntryNumber = selectedEntryNumber + 1;
+
+	Int	 oldSbPos = scrollbarPos;
+
+	if (exchangedEntryNumber < scrollbarPos)			scrollbarPos--;
+	else if (!GetNthEntry(exchangedEntryNumber)->IsVisible())	scrollbarPos++;
+
+	if (selectedEntryNumber != exchangedEntryNumber)
+	{
+		SwitchEntries(selectedEntryNumber, exchangedEntryNumber);
+
+		Paint(SP_PAINT);
+
+		if (scrollbarPos != oldSbPos) Sleep(100);
+	}
 
 	return Success();
 }

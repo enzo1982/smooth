@@ -39,7 +39,7 @@ S::Int S::System::Timer::Stop()
 	return backend->Stop();
 }
 
-S::Int S::System::Timer::GetID()
+S::Int S::System::Timer::GetID() const
 {
 	return backend->GetID();
 }

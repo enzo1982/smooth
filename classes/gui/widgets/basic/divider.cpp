@@ -153,7 +153,7 @@ S::Int S::GUI::Divider::Paint(Int message)
 	return Success();
 }
 
-S::Bool S::GUI::Divider::IsAffected(const Rect &uRect)
+S::Bool S::GUI::Divider::IsAffected(const Rect &uRect) const
 {
 	return True;
 }

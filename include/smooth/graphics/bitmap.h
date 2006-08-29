@@ -41,13 +41,13 @@ namespace smooth
 							 Bitmap(const Bitmap &);
 				virtual			~Bitmap();
 
-				Int			 GetBitmapType();
+				Int			 GetBitmapType() const;
 
-				const Size		&GetSize();
-				Int			 GetDepth();
+				const Size		&GetSize() const;
+				Int			 GetDepth() const;
 
-				UnsignedByte		*GetBytes();
-				Int			 GetLineAlignment();
+				UnsignedByte		*GetBytes() const;
+				Int			 GetLineAlignment() const;
 
 				Bool			 CreateBitmap(Int, Int, Int);
 				Bool			 DeleteBitmap();
@@ -62,7 +62,7 @@ namespace smooth
 				Int			 BlitToSurface(const Rect &, Surface *, const Rect &);
 
 				Bool			 SetPixel(Int, Int, UnsignedLong);
-				UnsignedLong		 GetPixel(Int, Int);
+				UnsignedLong		 GetPixel(Int, Int) const;
 
 				Bitmap &operator	 =(const int);
 				Bitmap &operator	 =(const Bitmap &);

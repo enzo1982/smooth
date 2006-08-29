@@ -38,7 +38,7 @@ S::Threads::MutexWin32::~MutexWin32()
 	if (myMutex) CloseHandle(mutex);
 }
 
-S::Void *S::Threads::MutexWin32::GetSystemMutex()
+S::Void *S::Threads::MutexWin32::GetSystemMutex() const
 {
 	return (Void *) mutex;
 }

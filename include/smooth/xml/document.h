@@ -44,7 +44,7 @@ namespace smooth
 					 Document();
 					~Document();
 
-				Node	*GetRootNode();
+				Node	*GetRootNode() const;
 				Int	 SetRootNode(Node *);
 
 				Int	 SetEncoding(const String &);

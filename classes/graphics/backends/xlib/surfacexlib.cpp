@@ -126,7 +126,7 @@ S::Int S::GUI::SurfaceXLib::EndPaint()
 	return Success();
 }
 
-S::Void *S::GUI::SurfaceXLib::GetSystemSurface()
+S::Void *S::GUI::SurfaceXLib::GetSystemSurface() const
 {
 	return (Void *) window;
 }
@@ -149,7 +149,7 @@ S::Int S::GUI::SurfaceXLib::SetPixel(Int x, Int y, Int color)
 	return Success();
 }
 
-S::Int S::GUI::SurfaceXLib::GetPixel(Int x, Int y)
+S::Int S::GUI::SurfaceXLib::GetPixel(Int x, Int y) const
 {
 	if (window == NIL) return 0;
 

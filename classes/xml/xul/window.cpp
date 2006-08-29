@@ -74,7 +74,7 @@ S::XML::XUL::Window::~Window()
 	if (window != NIL)	Object::DeleteObject(window);
 }
 
-S::GUI::Widget *S::XML::XUL::Window::GetWidget()
+S::GUI::Widget *S::XML::XUL::Window::GetWidget() const
 {
 	return window;
 }

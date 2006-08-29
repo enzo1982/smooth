@@ -43,12 +43,12 @@ S::Threads::Thread::~Thread()
 	delete backend;
 }
 
-S::Int S::Threads::Thread::GetStatus()
+S::Int S::Threads::Thread::GetStatus() const
 {
 	return status;
 }
 
-S::Int S::Threads::Thread::GetThreadID()
+S::Int S::Threads::Thread::GetThreadID() const
 {
 	return backend->GetThreadID();
 }

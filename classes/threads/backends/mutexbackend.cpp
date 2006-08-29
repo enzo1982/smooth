@@ -55,12 +55,12 @@ S::Threads::MutexBackend::~MutexBackend()
 {
 }
 
-S::Int S::Threads::MutexBackend::GetMutexType()
+S::Int S::Threads::MutexBackend::GetMutexType() const
 {
 	return type;
 }
 
-S::Void *S::Threads::MutexBackend::GetSystemMutex()
+S::Void *S::Threads::MutexBackend::GetSystemMutex() const
 {
 	return NIL;
 }

@@ -10,7 +10,7 @@
 
 #include <smooth/errors/success.h>
 
-S::String S::Errors::Success::ToString()
+S::String S::Errors::Success::ToString() const
 {
 	return "Operation successful";
 }

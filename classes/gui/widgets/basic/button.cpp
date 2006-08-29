@@ -27,7 +27,7 @@ S::GUI::Button::Button(const String &iText, const Bitmap &iBitmap, const Point &
 	if (GetWidth() == 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(22);
 
-	GetTextSize();
+	ComputeTextSize();
 
 	hotspot	= new HotspotSimpleButton(flags & BF_NOFRAME ? Point() : Point(4, 4), GetSize() - (flags & BF_NOFRAME ? Size() : Size(8, 8)));
 

@@ -63,13 +63,13 @@ namespace smooth
 
 				virtual								~BitmapBackend();
 
-				Int								 GetBitmapType();
+				Int								 GetBitmapType() const;
 
-				const Size							&GetSize();
-				Int								 GetDepth();
+				const Size							&GetSize() const;
+				Int								 GetDepth() const;
 
-				UnsignedByte							*GetBytes();
-				Int								 GetLineAlignment();
+				UnsignedByte							*GetBytes() const;
+				Int								 GetLineAlignment() const;
 
 				virtual Bool							 CreateBitmap(Int, Int, Int);
 				virtual Bool							 DeleteBitmap();
@@ -81,7 +81,7 @@ namespace smooth
 				virtual Int							 ReplaceColor(Int, Int);
 
 				virtual Bool							 SetPixel(Int, Int, UnsignedLong);
-				virtual UnsignedLong						 GetPixel(Int, Int);
+				virtual UnsignedLong						 GetPixel(Int, Int) const;
 
 				virtual BitmapBackend &operator					 =(const int);
 				virtual BitmapBackend &operator					 =(const BitmapBackend &);

@@ -39,15 +39,15 @@ namespace smooth
 						 ThreadSDL(Void * = NIL);
 						~ThreadSDL();
 
-				Void		*GetSystemThread();
+				Void		*GetSystemThread() const;
 
-				Int		 GetThreadID();
+				Int		 GetThreadID() const;
 
 				Int		 Start(Void (*)(Void *), Void *);
 				Int		 Stop();
 
 				Void		 Exit();
-				Void		*Self();
+				Void		*Self() const;
 		};
 	};
 };

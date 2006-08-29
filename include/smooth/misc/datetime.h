@@ -32,18 +32,18 @@ namespace smooth
 			Bool	 SetYMD(Int, Int, Int);
 			Bool	 SetHMS(Int, Int, Int);
 
-			Int	 GetYear();
-			Int	 GetMonth();
-			Int	 GetDay();
+			Int	 GetYear() const;
+			Int	 GetMonth() const;
+			Int	 GetDay() const;
 
 			Bool	 SetYear(Int);
 			Bool	 SetMonth(Int);
 			Bool	 SetDay(Int);
 
-			Int	 GetHour();
-			Int	 GetMinute();
-			Int	 GetSecond();
-			Int	 GetMSecond();
+			Int	 GetHour() const;
+			Int	 GetMinute() const;
+			Int	 GetSecond() const;
+			Int	 GetMSecond() const;
 
 			Bool	 SetHour(Int);
 			Bool	 SetMinute(Int);

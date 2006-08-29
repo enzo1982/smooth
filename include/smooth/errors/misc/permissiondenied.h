@@ -30,7 +30,7 @@ namespace smooth
 			public:
 						 PermissionDenied();
 
-				virtual String	 ToString();
+				virtual String	 ToString() const;
 		};
 	};
 };

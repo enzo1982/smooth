@@ -49,7 +49,7 @@ namespace smooth
 								 Window(Node *);
 					virtual			~Window();
 
-					GUI::Widget		*GetWidget();
+					GUI::Widget		*GetWidget() const;
 			};
 		};
 	};

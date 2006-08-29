@@ -19,7 +19,7 @@ S::GUI::Text::Text(const String &iText, const Point &iPos) : Widget(iPos, Size()
 	type	= classID;
 	text	= iText;
 
-	GetTextSize();
+	ComputeTextSize();
 }
 
 S::GUI::Text::~Text()

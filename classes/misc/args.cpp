@@ -41,7 +41,7 @@ S::ArgumentsParser::~ArgumentsParser()
 {
 }
 
-const S::Array<S::String> &S::ArgumentsParser::GetArguments()
+const S::Array<S::String> &S::ArgumentsParser::GetArguments() const
 {
 	return args;
 }

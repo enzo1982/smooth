@@ -37,7 +37,7 @@ namespace smooth
 
 				virtual Int		 Paint(Int);
 
-				virtual Bool		 IsAffected(const Rect &);
+				virtual Bool		 IsAffected(const Rect &) const;
 			accessors:
 				Int			 SetPos(Int);
 				Int			 GetPos();

@@ -55,7 +55,7 @@ S::System::EventBackend::~EventBackend()
 {
 }
 
-S::Int S::System::EventBackend::GetEventType()
+S::Int S::System::EventBackend::GetEventType() const
 {
 	return type;
 }

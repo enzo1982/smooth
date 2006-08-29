@@ -55,8 +55,8 @@ namespace smooth
 							 Thread(Void * = NIL);
 							~Thread();
 
-				Int			 GetStatus();
-				Int			 GetThreadID();
+				Int			 GetStatus() const;
+				Int			 GetThreadID() const;
 
 				Int			 Start();
 				Int			 Stop();

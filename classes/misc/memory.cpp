@@ -29,7 +29,7 @@ S::Bool S::Memory::Resize(Int size)
 	return True;
 }
 
-S::Memory::operator void *()
+S::Memory::operator void *() const
 {
 	return memory;
 }

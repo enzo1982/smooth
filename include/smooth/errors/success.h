@@ -32,7 +32,7 @@ namespace smooth
 			public:
 						 Success()	{ code = 0; }
 
-				virtual String	 ToString();
+				virtual String	 ToString() const;
 		};
 	};
 };

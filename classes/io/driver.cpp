@@ -25,7 +25,7 @@ S::IO::Driver::~Driver()
 {
 }
 
-S::Int S::IO::Driver::GetLastError()
+S::Int S::IO::Driver::GetLastError() const
 {
 	return lastError;
 }
@@ -53,12 +53,12 @@ S::Int64 S::IO::Driver::Seek(Int64 newPos)
 	return position;
 }
 
-S::Int64 S::IO::Driver::GetSize()
+S::Int64 S::IO::Driver::GetSize() const
 {
 	return size;
 }
 
-S::Int64 S::IO::Driver::GetPos()
+S::Int64 S::IO::Driver::GetPos() const
 {
 	return position;
 }
@@ -68,7 +68,7 @@ S::Bool S::IO::Driver::Flush()
 	return True;
 }
 
-const S::String &S::IO::Driver::GetStreamID()
+const S::String &S::IO::Driver::GetStreamID() const
 {
 	return streamID;
 }

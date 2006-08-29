@@ -41,7 +41,7 @@ namespace smooth
 										 EventBackend();
 				virtual						~EventBackend();
 
-				Int						 GetEventType();
+				Int						 GetEventType() const;
 
 				virtual Int					 ProcessNextEvent(Bool);
 		};

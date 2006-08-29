@@ -60,7 +60,7 @@ S::Int S::GUI::MenuEntry::SetBitmap(const Bitmap &newBitmap)
 	return Success();
 }
 
-const S::GUI::Bitmap &S::GUI::MenuEntry::GetBitmap()
+const S::GUI::Bitmap &S::GUI::MenuEntry::GetBitmap() const
 {
 	return bitmap;
 }

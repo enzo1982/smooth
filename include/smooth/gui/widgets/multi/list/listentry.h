@@ -31,8 +31,6 @@ namespace smooth
 			private:
 				Bool				 marked;
 				Bool				 selected;
-
-				Bool				 dragNotified;
 			protected:
 				Hotspot				*hotspot;
 				Hotspot				*markHotspot;

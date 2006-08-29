@@ -49,7 +49,7 @@ namespace smooth
 				virtual Int				 Init();
 				virtual Int				 Deinit();
 
-				Int					 GetBackendType();
+				Int					 GetBackendType() const;
 		};
 	};
 };

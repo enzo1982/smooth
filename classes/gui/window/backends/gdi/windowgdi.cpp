@@ -129,7 +129,7 @@ S::GUI::WindowGDI::~WindowGDI()
 	windowBackends.RemoveEntry(id);
 }
 
-S::Void *S::GUI::WindowGDI::GetSystemWindow()
+S::Void *S::GUI::WindowGDI::GetSystemWindow() const
 {
 	return (Void *) hwnd;
 }
@@ -358,7 +358,7 @@ S::Int S::GUI::WindowGDI::Hide()
 	return Success();
 }
 
-S::GUI::Rect S::GUI::WindowGDI::GetRestoredWindowRect()
+S::GUI::Rect S::GUI::WindowGDI::GetRestoredWindowRect() const
 {
 	return nonMaxRect;
 }

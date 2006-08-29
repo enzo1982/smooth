@@ -39,7 +39,7 @@ namespace smooth
 						 MutexSDL(Void * = NIL);
 						~MutexSDL();
 
-				Void		*GetSystemMutex();
+				Void		*GetSystemMutex() const;
 
 				Int		 Lock();
 				Int		 Release();

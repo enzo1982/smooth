@@ -53,9 +53,9 @@ namespace smooth
 				virtual Int		 Show();
 				virtual Int		 Hide();
 
-				Size			 GetMinimumSize();
+				Size			 GetMinimumSize() const;
 
-				Int			 GetShortcutTextSize();
+				Int			 GetShortcutTextSize() const;
 				Void			 SetShortcutOffset(Int);
 
 				Bool			 IsTypeCompatible(Int) const;

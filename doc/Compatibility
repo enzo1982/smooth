@@ -21,6 +21,7 @@ Source and binary compatibility between different smooth Versions
 		Compatibility with older versions
 Version		Source		Binary			Comments
 ---------------------------------------------------------------------------------------------------------------------
+0.8.69.0	no		no			constified lots of methods
 0.8.68.0	no		no			lots of API changes
 0.8.67.0	no		no			changes to the List interfaces
 0.8.66.0	no		no			removed class ObjectProperties

@@ -26,7 +26,7 @@ S::XML::Attribute::~Attribute()
 {
 }
 
-S::Int S::XML::Attribute::GetAttributeID()
+S::Int S::XML::Attribute::GetAttributeID() const
 {
 	return attributeID;
 }
@@ -38,7 +38,7 @@ S::Int S::XML::Attribute::SetAttributeID(Int newID)
 	return Success();
 }
 
-S::String S::XML::Attribute::GetName()
+const S::String &S::XML::Attribute::GetName() const
 {
 	return attributeNames.GetEntry(nameIndex);
 }
@@ -52,7 +52,7 @@ S::Int S::XML::Attribute::SetName(const String &newName)
 	return Success();
 }
 
-const S::String &S::XML::Attribute::GetContent()
+const S::String &S::XML::Attribute::GetContent() const
 {
 	return content;
 }

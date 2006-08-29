@@ -60,12 +60,12 @@ S::XML::XUL::PopupMenu::~PopupMenu()
 	if (menu != NIL) delete menu;
 }
 
-S::String S::XML::XUL::PopupMenu::GetName()
+const S::String &S::XML::XUL::PopupMenu::GetName() const
 {
 	return name;
 }
 
-S::GUI::Widget *S::XML::XUL::PopupMenu::GetWidget()
+S::GUI::Widget *S::XML::XUL::PopupMenu::GetWidget() const
 {
 	return menu;
 }

@@ -41,9 +41,9 @@ namespace smooth
 										 MutexBackend(Void * = NIL);
 				virtual						~MutexBackend();
 
-				Int						 GetMutexType();
+				Int						 GetMutexType() const;
 
-				virtual Void					*GetSystemMutex();
+				virtual Void					*GetSystemMutex() const;
 
 				virtual Int					 Lock();
 				virtual Int					 Release();

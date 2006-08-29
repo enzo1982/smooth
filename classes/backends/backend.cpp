@@ -98,7 +98,7 @@ S::Int S::Backends::Backend::Deinit()
 	return Success();
 }
 
-S::Int S::Backends::Backend::GetBackendType()
+S::Int S::Backends::Backend::GetBackendType() const
 {
 	return type;
 }

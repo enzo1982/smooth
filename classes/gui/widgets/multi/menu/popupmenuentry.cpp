@@ -268,7 +268,7 @@ S::Int S::GUI::PopupMenuEntry::Hide()
 	return Success();
 }
 
-S::GUI::Size S::GUI::PopupMenuEntry::GetMinimumSize()
+S::GUI::Size S::GUI::PopupMenuEntry::GetMinimumSize() const
 {
 	if (text != NIL && shortcut == NIL) return Size(textSize.cx + 44, 15);
 	if (text != NIL && shortcut != NIL) return Size(textSize.cx + font.GetTextSizeX(shortcut->ToString()) + 59, 15);
@@ -276,7 +276,7 @@ S::GUI::Size S::GUI::PopupMenuEntry::GetMinimumSize()
 	return Size(15, 4);
 }
 
-S::Int S::GUI::PopupMenuEntry::GetShortcutTextSize()
+S::Int S::GUI::PopupMenuEntry::GetShortcutTextSize() const
 {
 	if (shortcut == NIL) return 0;
 

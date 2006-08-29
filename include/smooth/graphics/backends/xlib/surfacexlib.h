@@ -45,10 +45,10 @@ namespace smooth
 				Int	 StartPaint(const Rect &);
 				Int	 EndPaint();
 
-				Void	*GetSystemSurface();
+				Void	*GetSystemSurface() const;
 
 				Int	 SetPixel(Int, Int, Int);
-				Int	 GetPixel(Int, Int);
+				Int	 GetPixel(Int, Int) const;
 
 				Int	 Line(const Point &, const Point &, Int);
 				Int	 Box(const Rect &, Int, Int);

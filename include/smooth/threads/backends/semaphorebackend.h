@@ -41,9 +41,9 @@ namespace smooth
 											 SemaphoreBackend(Void * = NIL);
 				virtual							~SemaphoreBackend();
 
-				Int							 GetSemaphoreType();
+				Int							 GetSemaphoreType() const;
 
-				virtual Void						*GetSystemSemaphore();
+				virtual Void						*GetSystemSemaphore() const;
 
 				virtual Int						 Wait();
 				virtual Int						 Release();

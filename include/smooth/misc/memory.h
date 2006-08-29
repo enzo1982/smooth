@@ -30,7 +30,7 @@ namespace smooth
 
 			Bool		 Resize(Int);
 
-			operator	 void *();
+			operator	 void *() const;
 	};
 };
 

@@ -85,7 +85,7 @@ S::Int64 S::IO::DriverWin32::Seek(Int64 newPos)
 	return (Int64) hi32 << 32 | lo32;
 }
 
-S::Int64 S::IO::DriverWin32::GetSize()
+S::Int64 S::IO::DriverWin32::GetSize() const
 {
 	Int32	 hi32 = 0;
 	Int64	 lo32 = GetFileSize(stream, (UnsignedLong *) &hi32);
@@ -93,7 +93,7 @@ S::Int64 S::IO::DriverWin32::GetSize()
 	return (Int64) hi32 << 32 | lo32;
 }
 
-S::Int64 S::IO::DriverWin32::GetPos()
+S::Int64 S::IO::DriverWin32::GetPos() const
 {
 	Int32	 hi32 = 0;
 	Int64	 lo32 = SetFilePointer(stream, 0, &hi32, FILE_CURRENT);

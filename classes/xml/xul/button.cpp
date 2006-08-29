@@ -32,7 +32,7 @@ S::XML::XUL::Button::~Button()
 	if (button != NIL) Object::DeleteObject(button);
 }
 
-S::GUI::Widget *S::XML::XUL::Button::GetWidget()
+S::GUI::Widget *S::XML::XUL::Button::GetWidget() const
 {
 	return button;
 }

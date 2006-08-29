@@ -80,7 +80,7 @@ S::Int64 S::IO::DriverPOSIX::Seek(Int64 newPos)
 	return _lseeki64(stream, newPos, SEEK_SET);
 }
 
-S::Int64 S::IO::DriverPOSIX::GetSize()
+S::Int64 S::IO::DriverPOSIX::GetSize() const
 {
 	Int64	 oldPos = GetPos();
 	Int64	 size = _lseeki64(stream, 0, SEEK_END);
@@ -90,7 +90,7 @@ S::Int64 S::IO::DriverPOSIX::GetSize()
 	return size;
 }
 
-S::Int64 S::IO::DriverPOSIX::GetPos()
+S::Int64 S::IO::DriverPOSIX::GetPos() const
 {
 	return _lseeki64(stream, 0, SEEK_CUR);
 }

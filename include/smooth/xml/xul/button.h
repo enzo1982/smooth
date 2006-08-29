@@ -45,7 +45,7 @@ namespace smooth
 							 Button(Node *);
 					virtual		~Button();
 
-					GUI::Widget	*GetWidget();
+					GUI::Widget	*GetWidget() const;
 			};
 		};
 	};

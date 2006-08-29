@@ -55,17 +55,17 @@ S::Threads::ThreadBackend::~ThreadBackend()
 {
 }
 
-S::Int S::Threads::ThreadBackend::GetThreadType()
+S::Int S::Threads::ThreadBackend::GetThreadType() const
 {
 	return type;
 }
 
-S::Void *S::Threads::ThreadBackend::GetSystemThread()
+S::Void *S::Threads::ThreadBackend::GetSystemThread() const
 {
 	return NIL;
 }
 
-S::Int S::Threads::ThreadBackend::GetThreadID()
+S::Int S::Threads::ThreadBackend::GetThreadID() const
 {
 	return -1;
 }
@@ -84,7 +84,7 @@ S::Void S::Threads::ThreadBackend::Exit()
 {
 }
 
-S::Void *S::Threads::ThreadBackend::Self()
+S::Void *S::Threads::ThreadBackend::Self() const
 {
 	return NIL;
 }

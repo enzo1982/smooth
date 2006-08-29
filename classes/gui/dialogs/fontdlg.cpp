@@ -86,7 +86,7 @@ const Error &S::GUI::Dialogs::FontSelection::ShowDialog()
 	return error;
 }
 
-const S::GUI::Font &S::GUI::Dialogs::FontSelection::GetFont()
+const S::GUI::Font &S::GUI::Dialogs::FontSelection::GetFont() const
 {
 	return font;
 }

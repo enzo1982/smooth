@@ -15,7 +15,7 @@ S::Errors::FileNotFound::FileNotFound()
 	code = -101;
 }
 
-S::String S::Errors::FileNotFound::ToString()
+S::String S::Errors::FileNotFound::ToString() const
 {
 	return "File not found";
 }

@@ -52,7 +52,7 @@ namespace smooth
 				virtual Int			 Deactivate();
 
 				virtual Int			 SetText(const String &);
-				virtual const String		&GetText();
+				virtual const String		&GetText() const;
 
 				Int				 SetDropDownList(List *);
 

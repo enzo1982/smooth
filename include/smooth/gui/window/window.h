@@ -90,7 +90,7 @@ namespace smooth
 				Int				 GetOrder() const			 { return order; }
 
 				Int				 SetIcon(const Bitmap &);
-				Bitmap				&GetIcon();
+				const Bitmap			&GetIcon() const;
 
 				virtual Int			 SetMetrics(const Point &, const Size &);
 
@@ -99,7 +99,7 @@ namespace smooth
 				Layer				*GetMainLayer() const;
 
 				Int				 SetStatusText(const String &);
-				const String			&GetStatusText();
+				const String			&GetStatusText() const;
 
 				Int				 SetDefaultStatusText(const String &);
 				Int				 RestoreDefaultStatusText();
@@ -107,13 +107,13 @@ namespace smooth
 				Int				 SetRightToLeft(Bool);
 				virtual Bool			 IsRightToLeft() const;
 
-				virtual Point			 GetRealPosition();
+				virtual Point			 GetRealPosition() const;
 
-				Rect				 GetWindowRect();
-				Rect				 GetClientRect();
-				Rect				 GetRestoredWindowRect();
+				Rect				 GetWindowRect() const;
+				Rect				 GetClientRect() const;
+				Rect				 GetRestoredWindowRect() const;
 
-				const Rect			&GetUpdateRect();
+				const Rect			&GetUpdateRect() const;
 				Int				 SetUpdateRect(const Rect &);
 
 				Int				 SetMinimumSize(const Size &);
@@ -140,12 +140,12 @@ namespace smooth
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
 
-				Point				 GetMousePosition();
+				Point				 GetMousePosition() const;
 
-				Bool				 IsMouseOn(const Rect &);
+				Bool				 IsMouseOn(const Rect &) const;
 
-				virtual Surface			*GetDrawSurface();
-				Void				*GetSystemWindow();
+				virtual Surface			*GetDrawSurface() const;
+				Void				*GetSystemWindow() const;
 
 				static Window			*GetWindow(Void *);
 

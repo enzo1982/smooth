@@ -117,7 +117,7 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 	return Success();
 }
 
-S::GUI::Bitmap &S::GUI::Window::GetIcon()
+const S::GUI::Bitmap &S::GUI::Window::GetIcon() const
 {
 	return icon;
 }
@@ -180,7 +180,7 @@ S::Int S::GUI::Window::SetStatusText(const String &nStatus)
 	return Error();
 }
 
-const S::String &S::GUI::Window::GetStatusText()
+const S::String &S::GUI::Window::GetStatusText() const
 {
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -352,28 +352,28 @@ S::Int S::GUI::Window::Restore()
 	return Success();
 }
 
-S::GUI::Point S::GUI::Window::GetRealPosition()
+S::GUI::Point S::GUI::Window::GetRealPosition() const
 {
 	return Point(0, 0);
 }
 
-S::GUI::Rect S::GUI::Window::GetWindowRect()
+S::GUI::Rect S::GUI::Window::GetWindowRect() const
 {
 	return Rect(GetPosition(), GetSize());
 }
 
-S::GUI::Rect S::GUI::Window::GetClientRect()
+S::GUI::Rect S::GUI::Window::GetClientRect() const
 {
 	return Rect(Point(innerOffset.left, innerOffset.top), GetSize() - Size(innerOffset.left + innerOffset.right, innerOffset.top + innerOffset.bottom));
 }
 
-S::GUI::Rect S::GUI::Window::GetRestoredWindowRect()
+S::GUI::Rect S::GUI::Window::GetRestoredWindowRect() const
 {
 	if (IsMaximized())	return backend->GetRestoredWindowRect();
 	else			return GetWindowRect();
 }
 
-const S::GUI::Rect &S::GUI::Window::GetUpdateRect()
+const S::GUI::Rect &S::GUI::Window::GetUpdateRect() const
 {
 	return updateRect;
 }
@@ -984,7 +984,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 	}
 }
 
-S::GUI::Point S::GUI::Window::GetMousePosition()
+S::GUI::Point S::GUI::Window::GetMousePosition() const
 {
 	Point	 position = Input::GetMousePosition();
 
@@ -992,7 +992,7 @@ S::GUI::Point S::GUI::Window::GetMousePosition()
 	else			return Point(position.x - GetX(), position.y - GetY());
 }
 
-S::Bool S::GUI::Window::IsMouseOn(const Rect &rect)
+S::Bool S::GUI::Window::IsMouseOn(const Rect &rect) const
 {
 	Surface	*surface = GetDrawSurface();
 
@@ -1015,12 +1015,12 @@ S::Bool S::GUI::Window::IsMouseOn(const Rect &rect)
 	else															return False;
 }
 
-S::GUI::Surface *S::GUI::Window::GetDrawSurface()
+S::GUI::Surface *S::GUI::Window::GetDrawSurface() const
 {
 	return backend->GetDrawSurface();
 }
 
-S::Void *S::GUI::Window::GetSystemWindow()
+S::Void *S::GUI::Window::GetSystemWindow() const
 {
 	return backend->GetSystemWindow();
 }

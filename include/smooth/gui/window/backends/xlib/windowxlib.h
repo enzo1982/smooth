@@ -40,7 +40,7 @@ namespace smooth
 					 WindowXLib(Void * = NIL);
 					~WindowXLib();
 
-				Void	*GetSystemWindow();
+				Void	*GetSystemWindow() const;
 
 				Int	 Open(const String &, const Point &, const Size &, Int);
 				Int	 Close();

@@ -10,7 +10,7 @@
 
 #include <smooth/errors/error.h>
 
-S::String S::Errors::Error::ToString()
+S::String S::Errors::Error::ToString() const
 {
 	return "Unknown error";
 }

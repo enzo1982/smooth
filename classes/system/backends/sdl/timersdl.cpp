@@ -52,7 +52,7 @@ S::Int S::System::TimerSDL::Stop()
 	return Success();
 }
 
-S::Int S::System::TimerSDL::GetID()
+S::Int S::System::TimerSDL::GetID() const
 {
 	if (timerid == -1) return Error();
 

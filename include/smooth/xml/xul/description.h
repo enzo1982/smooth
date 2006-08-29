@@ -45,7 +45,7 @@ namespace smooth
 							 Description(Node *);
 					virtual		~Description();
 
-					GUI::Widget	*GetWidget();
+					GUI::Widget	*GetWidget() const;
 			};
 		};
 	};

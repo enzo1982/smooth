@@ -53,7 +53,7 @@ S::Int S::GUI::Menu::RemoveAllEntries()
 	return Success();
 }
 
-S::Int S::GUI::Menu::GetNOfEntries()
+S::Int S::GUI::Menu::GetNOfEntries() const
 {
 	Int	n = 0;
 
@@ -67,7 +67,7 @@ S::Int S::GUI::Menu::GetNOfEntries()
 	return n;
 }
 
-S::GUI::MenuEntry *S::GUI::Menu::GetNthEntry(Int n)
+S::GUI::MenuEntry *S::GUI::Menu::GetNthEntry(Int n) const
 {
 	Int	m = 0;
 

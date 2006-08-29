@@ -38,7 +38,7 @@ namespace smooth
 						 Filter();
 				virtual		~Filter();
 
-				Int		 GetPackageSize();
+				Int		 GetPackageSize() const;
 
 				Void		 SetDriver(Driver *);
 

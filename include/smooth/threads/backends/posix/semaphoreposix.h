@@ -38,7 +38,7 @@ namespace smooth
 					 SemaphorePOSIX(Void * = NIL);
 					~SemaphorePOSIX();
 
-				Void	*GetSystemSemaphore();
+				Void	*GetSystemSemaphore() const;
 
 				Int	 Wait();
 				Int	 Release();

@@ -45,7 +45,7 @@ namespace smooth
 
 				Void				 CalculateSize();
 			accessors:
-				Bool				 IsClosedByClick()			{ return closedByClick; }
+				Bool				 IsClosedByClick() const		{ return closedByClick; }
 				Void				 SetClosedByClick(Bool nClosedByClick)	{ closedByClick = nClosedByClick; }
 			signals:
 				static Signal1<Void, Int>	 internalOnOpenPopupMenu;

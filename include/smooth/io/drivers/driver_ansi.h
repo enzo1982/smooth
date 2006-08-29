@@ -41,8 +41,8 @@ namespace smooth
 
 				Int64	 Seek(Int64);
 
-				Int64	 GetSize();
-				Int64	 GetPos();
+				Int64	 GetSize() const;
+				Int64	 GetPos() const;
 		};
 	};
 };

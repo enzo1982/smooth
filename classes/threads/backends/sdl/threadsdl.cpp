@@ -38,12 +38,12 @@ S::Threads::ThreadSDL::~ThreadSDL()
 	if (myThread) Stop();
 }
 
-S::Void *S::Threads::ThreadSDL::GetSystemThread()
+S::Void *S::Threads::ThreadSDL::GetSystemThread() const
 {
 	return (Void *) SDL_GetThreadID(thread);
 }
 
-S::Int S::Threads::ThreadSDL::GetThreadID()
+S::Int S::Threads::ThreadSDL::GetThreadID() const
 {
 	return (Int) SDL_GetThreadID(thread);
 }
@@ -81,7 +81,7 @@ S::Void S::Threads::ThreadSDL::Exit()
 	SDL_KillThread(self);
 }
 
-S::Void *S::Threads::ThreadSDL::Self()
+S::Void *S::Threads::ThreadSDL::Self() const
 {
 	return (Void *) SDL_ThreadID();
 }

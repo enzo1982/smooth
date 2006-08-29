@@ -38,7 +38,7 @@ S::Threads::SemaphoreSDL::~SemaphoreSDL()
 	if (mySemaphore) SDL_DestroySemaphore(semaphore);
 }
 
-S::Void *S::Threads::SemaphoreSDL::GetSystemSemaphore()
+S::Void *S::Threads::SemaphoreSDL::GetSystemSemaphore() const
 {
 	return (Void *) semaphore;
 }

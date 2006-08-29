@@ -78,7 +78,7 @@ S::Int64 S::IO::DriverANSI::Seek(Int64 newPos)
 	return fseek(stream, newPos, SEEK_SET);
 }
 
-S::Int64 S::IO::DriverANSI::GetSize()
+S::Int64 S::IO::DriverANSI::GetSize() const
 {
 	Int64	 oldPos = GetPos();
 
@@ -91,7 +91,7 @@ S::Int64 S::IO::DriverANSI::GetSize()
 	return size;
 }
 
-S::Int64 S::IO::DriverANSI::GetPos()
+S::Int64 S::IO::DriverANSI::GetPos() const
 {
 	return ftell(stream);
 }

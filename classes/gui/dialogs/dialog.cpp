@@ -36,7 +36,7 @@ S::Int S::GUI::Dialogs::Dialog::SetParentWindow(Window *newParent)
 	return Success();
 }
 
-const Error &S::GUI::Dialogs::Dialog::GetErrorStatus()
+const Error &S::GUI::Dialogs::Dialog::GetErrorStatus() const
 {
 	return error;
 }

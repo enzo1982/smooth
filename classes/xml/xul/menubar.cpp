@@ -50,7 +50,7 @@ S::XML::XUL::Menubar::~Menubar()
 	if (menubar != NIL) Object::DeleteObject(menubar);
 }
 
-S::GUI::Widget *S::XML::XUL::Menubar::GetWidget()
+S::GUI::Widget *S::XML::XUL::Menubar::GetWidget() const
 {
 	return menubar;
 }

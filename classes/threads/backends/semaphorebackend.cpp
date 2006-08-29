@@ -55,12 +55,12 @@ S::Threads::SemaphoreBackend::~SemaphoreBackend()
 {
 }
 
-S::Int S::Threads::SemaphoreBackend::GetSemaphoreType()
+S::Int S::Threads::SemaphoreBackend::GetSemaphoreType() const
 {
 	return type;
 }
 
-S::Void *S::Threads::SemaphoreBackend::GetSystemSemaphore()
+S::Void *S::Threads::SemaphoreBackend::GetSystemSemaphore() const
 {
 	return NIL;
 }

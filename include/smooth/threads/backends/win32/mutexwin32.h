@@ -38,7 +38,7 @@ namespace smooth
 					 MutexWin32(Void * = NIL);
 					~MutexWin32();
 
-				Void	*GetSystemMutex();
+				Void	*GetSystemMutex() const;
 
 				Int	 Lock();
 				Int	 Release();

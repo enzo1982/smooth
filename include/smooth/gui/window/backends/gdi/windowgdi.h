@@ -60,7 +60,7 @@ namespace smooth
 									 WindowGDI(Void * = NIL);
 									~WindowGDI();
 
-				Void					*GetSystemWindow();
+				Void					*GetSystemWindow() const;
 
 				Int					 Open(const String &, const Point &, const Size &, Int);
 				Int					 Close();
@@ -74,7 +74,7 @@ namespace smooth
 				Int					 Show();
 				Int					 Hide();
 
-				Rect					 GetRestoredWindowRect();
+				Rect					 GetRestoredWindowRect() const;
 
 				Int					 SetMetrics(const Point &, const Size &);
 

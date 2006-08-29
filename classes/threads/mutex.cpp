@@ -25,12 +25,12 @@ S::Threads::Mutex::~Mutex()
 	delete backend;
 }
 
-S::Int S::Threads::Mutex::GetMutexType()
+S::Int S::Threads::Mutex::GetMutexType() const
 {
 	return backend->GetMutexType();
 }
 
-S::Void *S::Threads::Mutex::GetSystemMutex()
+S::Void *S::Threads::Mutex::GetSystemMutex() const
 {
 	return backend->GetSystemMutex();
 }

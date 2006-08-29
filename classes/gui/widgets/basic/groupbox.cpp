@@ -24,7 +24,7 @@ S::GUI::GroupBox::GroupBox(const String &iText, const Point &iPos, const Size &i
 	if (GetWidth() == 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(80);
 
-	GetTextSize();
+	ComputeTextSize();
 }
 
 S::GUI::GroupBox::~GroupBox()

@@ -24,17 +24,17 @@ namespace smooth
 	class SMOOTHAPI ObjectType
 	{
 		private:
-			Int		 type;
-			Object		*object;
+			Int			 type;
+			Object			*object;
 		public:
-					 ObjectType(Object *);
-					 ObjectType(const ObjectType &);
+						 ObjectType(Object *);
+						 ObjectType(const ObjectType &);
 
-			operator	 Int() const		{ return type; }
-			Int operator	 =(Int newType)		{ type = newType; return type; }
+			operator		 Int() const		{ return type; }
+			Int operator		 =(Int newType)		{ type = newType; return type; }
 
-			Bool operator	 ==(Int) const;
-			Bool operator	 !=(Int) const;
+			Bool operator		 ==(Int) const;
+			inline Bool operator	 !=(Int objType) const	{ return !(*this == objType); }
 	};
 };
 

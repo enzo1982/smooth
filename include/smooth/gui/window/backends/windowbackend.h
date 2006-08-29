@@ -50,9 +50,9 @@ namespace smooth
 
 				Int						 GetWindowType();
 
-				virtual Void					*GetSystemWindow();
+				virtual Void					*GetSystemWindow() const;
 
-				virtual Surface					*GetDrawSurface();
+				virtual Surface					*GetDrawSurface() const;
 
 				virtual Int					 Open(const String &, const Point &, const Size &, Int);
 				virtual Int					 Close();
@@ -66,7 +66,7 @@ namespace smooth
 				virtual Int					 Show();
 				virtual Int					 Hide();
 
-				virtual Rect					 GetRestoredWindowRect();
+				virtual Rect					 GetRestoredWindowRect() const;
 
 				virtual Int					 SetMetrics(const Point &, const Size &);
 

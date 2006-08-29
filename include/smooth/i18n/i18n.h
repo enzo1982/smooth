@@ -54,24 +54,24 @@ namespace smooth
 
 				Int				 SetInternalLanguageInfo(const String &, const String &, const String &, Bool);
 
-				Int				 GetNOfLanguages();
+				Int				 GetNOfLanguages() const;
 
-				String				 GetNthLanguageName(Int);
-				String				 GetNthLanguageID(Int);
-				String				 GetNthLanguageAuthor(Int);
-				String				 GetNthLanguageEncoding(Int);
-				String				 GetNthLanguageURL(Int);
-				Bool				 IsNthLanguageRightToLeft(Int);
+				const String			&GetNthLanguageName(Int) const;
+				const String			&GetNthLanguageID(Int) const;
+				const String			&GetNthLanguageAuthor(Int) const;
+				const String			&GetNthLanguageEncoding(Int) const;
+				const String			&GetNthLanguageURL(Int) const;
+				Bool				 IsNthLanguageRightToLeft(Int) const;
 
-				const String			&GetActiveLanguageName();
-				const String			&GetActiveLanguageID();
-				const String			&GetActiveLanguageAuthor();
-				const String			&GetActiveLanguageEncoding();
-				const String			&GetActiveLanguageURL();
-				Bool				 IsActiveLanguageRightToLeft();
+				const String			&GetActiveLanguageName() const;
+				const String			&GetActiveLanguageID() const;
+				const String			&GetActiveLanguageAuthor() const;
+				const String			&GetActiveLanguageEncoding() const;
+				const String			&GetActiveLanguageURL() const;
+				Bool				 IsActiveLanguageRightToLeft() const;
 
 				Int				 ActivateLanguage(const String &);
-				String				 TranslateString(const String &);
+				const String			&TranslateString(const String &);
 
 				static Translator		*defaultTranslator;
 		};

@@ -37,7 +37,7 @@ namespace smooth
 
 				virtual			~Error()			{ }
 
-				virtual String		 ToString();
+				virtual String		 ToString() const;
 
 				operator		 Int() const			{ return code; }
 

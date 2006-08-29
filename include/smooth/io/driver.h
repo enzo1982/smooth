@@ -39,7 +39,7 @@ namespace smooth
 							 Driver();
 				virtual			~Driver();
 
-				Int			 GetLastError();
+				Int			 GetLastError() const;
 
 				virtual Int		 ReadData(UnsignedByte *, Int);
 				virtual Int		 WriteData(UnsignedByte *, Int);
@@ -47,10 +47,10 @@ namespace smooth
 				virtual Int64		 Seek(Int64);
 				virtual Bool		 Flush();
 
-				virtual Int64		 GetSize();
-				virtual Int64		 GetPos();
+				virtual Int64		 GetSize() const;
+				virtual Int64		 GetPos() const;
 
-				virtual const String	&GetStreamID();
+				virtual const String	&GetStreamID() const;
 		};
 	};
 };

@@ -22,7 +22,7 @@ S::XML::Document::~Document()
 	if (rootNode != NIL && ownRoot) delete rootNode;
 }
 
-S::XML::Node *S::XML::Document::GetRootNode()
+S::XML::Node *S::XML::Document::GetRootNode() const
 {
 	return rootNode;
 }

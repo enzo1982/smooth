@@ -40,8 +40,8 @@ namespace smooth
 
 				virtual Int		 RemoveAllEntries();
 			accessors:
-				Int			 GetNOfEntries();
-				MenuEntry		*GetNthEntry(Int);
+				Int			 GetNOfEntries() const;
+				MenuEntry		*GetNthEntry(Int) const;
 		};
 	};
 };

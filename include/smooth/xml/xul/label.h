@@ -45,7 +45,7 @@ namespace smooth
 							 Label(Node *);
 					virtual		~Label();
 
-					GUI::Widget	*GetWidget();
+					GUI::Widget	*GetWidget() const;
 			};
 		};
 	};

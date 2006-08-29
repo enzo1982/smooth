@@ -53,7 +53,7 @@ namespace smooth
 					Int		 LoadXUL(const String &);
 					Int		 CloseXUL();
 
-					GUI::Widget	*GetWidget();
+					GUI::Widget	*GetWidget() const;
 			};
 		};
 	};

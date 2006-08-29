@@ -29,7 +29,7 @@ S::GUI::Surface::~Surface()
 	if (mutex != NIL) Object::DeleteObject(mutex);
 }
 
-S::Int S::GUI::Surface::GetSurfaceType()
+S::Int S::GUI::Surface::GetSurfaceType() const
 {
 	return backend->GetSurfaceType();
 }
@@ -39,7 +39,7 @@ S::Int S::GUI::Surface::SetSize(const Size &nSize)
 	return backend->SetSize(nSize);
 }
 
-const S::GUI::Size &S::GUI::Surface::GetSize()
+const S::GUI::Size &S::GUI::Surface::GetSize() const
 {
 	return backend->GetSize();
 }
@@ -78,7 +78,7 @@ S::Int S::GUI::Surface::EndPaint()
 	return rVal;
 }
 
-S::Void *S::GUI::Surface::GetSystemSurface()
+S::Void *S::GUI::Surface::GetSystemSurface() const
 {
 	return backend->GetSystemSurface();
 }
@@ -94,7 +94,7 @@ S::Int S::GUI::Surface::SetPixel(Int x, Int y, Int color)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::GetPixel(Int x, Int y)
+S::Int S::GUI::Surface::GetPixel(Int x, Int y) const
 {
 	if (mutex != NIL) mutex->Lock();
 

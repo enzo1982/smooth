@@ -38,7 +38,7 @@ namespace smooth
 					 SemaphoreWin32(Void * = NIL);
 					~SemaphoreWin32();
 
-				Void	*GetSystemSemaphore();
+				Void	*GetSystemSemaphore() const;
 
 				Int	 Wait();
 				Int	 Release();

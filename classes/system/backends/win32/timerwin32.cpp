@@ -50,7 +50,7 @@ S::Int S::System::TimerWin32::Stop()
 	return Success();
 }
 
-S::Int S::System::TimerWin32::GetID()
+S::Int S::System::TimerWin32::GetID() const
 {
 	if (timerid == -1) return Error();
 

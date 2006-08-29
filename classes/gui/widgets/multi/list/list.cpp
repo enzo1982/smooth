@@ -126,12 +126,12 @@ S::Int S::GUI::List::SwitchEntries(Int entry1n, Int entry2n)
 	return Success();
 }
 
-S::Int S::GUI::List::GetNOfEntries()
+S::Int S::GUI::List::GetNOfEntries() const
 {
 	return elementOrder.GetNOfEntries();
 }
 
-S::GUI::ListEntry *S::GUI::List::GetNthEntry(Int n)
+S::GUI::ListEntry *S::GUI::List::GetNthEntry(Int n) const
 {
 	Int	 handle = elementOrder.GetNthEntry(n);
 
@@ -162,7 +162,7 @@ S::Int S::GUI::List::SelectEntry(ListEntry *entry)
 	return Error();
 }
 
-S::GUI::ListEntry *S::GUI::List::GetSelectedEntry()
+S::GUI::ListEntry *S::GUI::List::GetSelectedEntry() const
 {
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -185,7 +185,7 @@ S::Int S::GUI::List::SelectNthEntry(Int n)
 	return Success();
 }
 
-S::Int S::GUI::List::GetSelectedEntryNumber()
+S::Int S::GUI::List::GetSelectedEntryNumber() const
 {
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{

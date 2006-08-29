@@ -46,7 +46,7 @@ S::Threads::MutexPOSIX::~MutexPOSIX()
 	}
 }
 
-S::Void *S::Threads::MutexPOSIX::GetSystemMutex()
+S::Void *S::Threads::MutexPOSIX::GetSystemMutex() const
 {
 	return (Void *) mutex;
 }

@@ -40,7 +40,7 @@ namespace smooth
 				Int			 Start(Int);
 				Int			 Stop();
 			accessors:
-				Int			 GetID();
+				Int			 GetID() const;
 			signals:
 				Signal0<Void>		 onInterval;
 		};

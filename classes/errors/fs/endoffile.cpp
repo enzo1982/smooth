@@ -15,7 +15,7 @@ S::Errors::EndOfFile::EndOfFile()
 	code = -100;
 }
 
-S::String S::Errors::EndOfFile::ToString()
+S::String S::Errors::EndOfFile::ToString() const
 {
 	return "End of file";
 }

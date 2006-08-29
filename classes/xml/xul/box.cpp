@@ -89,7 +89,7 @@ S::XML::XUL::Box::~Box()
 	if (layer != NIL) Object::DeleteObject(layer);
 }
 
-S::GUI::Widget *S::XML::XUL::Box::GetWidget()
+S::GUI::Widget *S::XML::XUL::Box::GetWidget() const
 {
 	return layer;
 }

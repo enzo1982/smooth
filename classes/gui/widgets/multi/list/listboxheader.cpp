@@ -56,12 +56,12 @@ S::Int S::GUI::ListBoxHeader::RemoveAllTabs()
 	return Success();
 }
 
-S::Int S::GUI::ListBoxHeader::GetNOfTabs()
+S::Int S::GUI::ListBoxHeader::GetNOfTabs() const
 {
 	return tabWidths.GetNOfEntries();
 }
 
-S::Int S::GUI::ListBoxHeader::GetNthTabOffset(Int n)
+S::Int S::GUI::ListBoxHeader::GetNthTabOffset(Int n) const
 {
 	if (n >= tabWidths.GetNOfEntries()) return -1;
 
@@ -75,12 +75,12 @@ S::Int S::GUI::ListBoxHeader::GetNthTabOffset(Int n)
 	return offset;
 }
 
-S::Int S::GUI::ListBoxHeader::GetNthTabWidth(Int n)
+S::Int S::GUI::ListBoxHeader::GetNthTabWidth(Int n) const
 {
 	return (Int) Math::Abs(tabWidths.GetNthEntry(n));
 }
 
-S::Int S::GUI::ListBoxHeader::GetNthTabOrientation(Int n)
+S::Int S::GUI::ListBoxHeader::GetNthTabOrientation(Int n) const
 {
 	return (Int) Math::Abs(tabOrientations.GetNthEntry(n));
 }

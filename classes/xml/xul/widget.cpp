@@ -49,7 +49,7 @@ S::XML::XUL::Widget::~Widget()
 {
 }
 
-S::GUI::Widget *S::XML::XUL::Widget::GetWidget()
+S::GUI::Widget *S::XML::XUL::Widget::GetWidget() const
 {
 	return NIL;
 }
@@ -59,27 +59,7 @@ S::Int S::XML::XUL::Widget::SetMetrics(const GUI::Point &pos, const GUI::Size &s
 	return GetWidget()->SetMetrics(pos, size);
 }
 
-S::Int S::XML::XUL::Widget::GetWidth()
-{
-	return width;
-}
-
-S::Int S::XML::XUL::Widget::GetHeight()
-{
-	return height;
-}
-
-S::Int S::XML::XUL::Widget::GetDefaultWidth()
-{
-	return defaultWidth;
-}
-
-S::Int S::XML::XUL::Widget::GetDefaultHeight()
-{
-	return defaultHeight;
-}
-
-S::String S::XML::XUL::Widget::GetXMLAttributeValue(Node *node, const String &attribute)
+S::String S::XML::XUL::Widget::GetXMLAttributeValue(Node *node, const String &attribute) const
 {
 	if (node != NIL)
 	{

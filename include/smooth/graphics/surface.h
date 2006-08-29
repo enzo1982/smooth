@@ -44,10 +44,10 @@ namespace smooth
 						 Surface(Void * = NIL, const Size & = Size());
 				virtual		~Surface();
 
-				Int		 GetSurfaceType();
+				Int		 GetSurfaceType() const;
 
 				Int		 SetSize(const Size &);
-				const Size	&GetSize();
+				const Size	&GetSize() const;
 
 				Int		 SetRightToLeft(Bool);
 
@@ -56,10 +56,10 @@ namespace smooth
 				Int		 StartPaint(const Rect &);
 				Int		 EndPaint();
 
-				Void		*GetSystemSurface();
+				Void		*GetSystemSurface() const;
 
 				Int		 SetPixel(Int, Int, Int);
-				Int		 GetPixel(Int, Int);
+				Int		 GetPixel(Int, Int) const;
 
 				Int		 Line(const Point &, const Point &, Int);
 				Int		 Frame(const Rect &, Int);

@@ -32,7 +32,7 @@ S::XML::XUL::TextBox::~TextBox()
 	if (editBox != NIL) Object::DeleteObject(editBox);
 }
 
-S::GUI::Widget *S::XML::XUL::TextBox::GetWidget()
+S::GUI::Widget *S::XML::XUL::TextBox::GetWidget() const
 {
 	return editBox;
 }

@@ -40,13 +40,13 @@ namespace smooth
 							 Attribute(const String &, const String &);
 							~Attribute();
 
-				Int			 GetAttributeID();
+				Int			 GetAttributeID() const;
 				Int			 SetAttributeID(Int);
 
-				String			 GetName();
+				const String		&GetName() const;
 				Int			 SetName(const String &);
 
-				const String		&GetContent();
+				const String		&GetContent() const;
 				Int			 SetContent(const String &);
 		};
 	};

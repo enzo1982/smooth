@@ -125,7 +125,7 @@ S::Int S::GUI::MultiEdit::SetText(const String &newText)
 	return Paint(SP_PAINT);
 }
 
-const S::String &S::GUI::MultiEdit::GetText()
+const S::String &S::GUI::MultiEdit::GetText() const
 {
 	return cursor->GetText();
 }

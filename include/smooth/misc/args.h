@@ -28,7 +28,7 @@ namespace smooth
 						 ArgumentsParser(const String &);
 						~ArgumentsParser();
 
-			const Array<String>	&GetArguments();
+			const Array<String>	&GetArguments() const;
 	};
 };
 

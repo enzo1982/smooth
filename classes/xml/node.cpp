@@ -37,7 +37,7 @@ S::XML::Node::~Node()
 	if (subnodes != NIL)	delete subnodes;
 }
 
-S::Int S::XML::Node::GetNodeID()
+S::Int S::XML::Node::GetNodeID() const
 {
 	return nodeID;
 }
@@ -49,7 +49,7 @@ S::Int S::XML::Node::SetNodeID(Int newID)
 	return Success();
 }
 
-const S::String S::XML::Node::GetName()
+const S::String &S::XML::Node::GetName() const
 {
 	return elementNames.GetEntry(nameIndex);
 }
@@ -63,7 +63,7 @@ S::Int S::XML::Node::SetName(const String &newName)
 	return Success();
 }
 
-const S::String &S::XML::Node::GetContent()
+const S::String &S::XML::Node::GetContent() const
 {
 	return content;
 }
@@ -75,21 +75,21 @@ S::Int S::XML::Node::SetContent(const String &newContent)
 	return Success();
 }
 
-S::Int S::XML::Node::GetNOfAttributes()
+S::Int S::XML::Node::GetNOfAttributes() const
 {
 	if (attributes == NIL) return 0;
 
 	return attributes->GetNOfEntries();
 }
 
-S::XML::Attribute *S::XML::Node::GetNthAttribute(Int attributeNumber)
+S::XML::Attribute *S::XML::Node::GetNthAttribute(Int attributeNumber) const
 {
 	if (attributeNumber >= GetNOfAttributes()) return NIL;
 
 	return attributes->GetNthEntry(attributeNumber);
 }
 
-S::XML::Attribute *S::XML::Node::GetAttributeByName(const String &attributeName)
+S::XML::Attribute *S::XML::Node::GetAttributeByName(const String &attributeName) const
 {
 	Int	 nOfAttributes = GetNOfAttributes();
 
@@ -139,21 +139,21 @@ S::Int S::XML::Node::RemoveAttributeByName(const String &attributeName)
 	return RemoveAttribute(GetAttributeByName(attributeName));
 }
 
-S::Int S::XML::Node::GetNOfNodes()
+S::Int S::XML::Node::GetNOfNodes() const
 {
 	if (subnodes == NIL) return 0;
 
 	return subnodes->GetNOfEntries();
 }
 
-S::XML::Node *S::XML::Node::GetNthNode(Int nodeNumber)
+S::XML::Node *S::XML::Node::GetNthNode(Int nodeNumber) const
 {
 	if (nodeNumber >= GetNOfNodes()) return NIL;
 
 	return subnodes->GetNthEntry(nodeNumber);
 }
 
-S::XML::Node *S::XML::Node::GetNodeByName(const String &nodeName)
+S::XML::Node *S::XML::Node::GetNodeByName(const String &nodeName) const
 {
 	Int	 nOfNodes = GetNOfNodes();
 

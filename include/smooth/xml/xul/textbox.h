@@ -45,7 +45,7 @@ namespace smooth
 							 TextBox(Node *);
 					virtual		~TextBox();
 
-					GUI::Widget	*GetWidget();
+					GUI::Widget	*GetWidget() const;
 			};
 		};
 	};

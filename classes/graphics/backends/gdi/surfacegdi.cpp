@@ -100,7 +100,7 @@ S::Int S::GUI::SurfaceGDI::SetSize(const Size &nSize)
 	return Success();
 }
 
-const S::GUI::Size &S::GUI::SurfaceGDI::GetSize()
+const S::GUI::Size &S::GUI::SurfaceGDI::GetSize() const
 {
 	return size;
 }
@@ -170,7 +170,7 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 	return Success();
 }
 
-S::Void *S::GUI::SurfaceGDI::GetSystemSurface()
+S::Void *S::GUI::SurfaceGDI::GetSystemSurface() const
 {
 	return (Void *) window;
 }
@@ -193,7 +193,7 @@ S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDI::GetPixel(Int x, Int y)
+S::Int S::GUI::SurfaceGDI::GetPixel(Int x, Int y) const
 {
 	if (window == NIL) return 0;
 

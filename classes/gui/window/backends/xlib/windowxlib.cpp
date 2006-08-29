@@ -39,7 +39,7 @@ S::GUI::WindowXLib::~WindowXLib()
 {
 }
 
-S::Void *S::GUI::WindowXLib::GetSystemWindow()
+S::Void *S::GUI::WindowXLib::GetSystemWindow() const
 {
 	return (Void *) wnd;
 }

@@ -44,28 +44,28 @@ namespace smooth
 								 Node(const String &, const String & = NIL);
 								~Node();
 
-				Int				 GetNodeID();
+				Int				 GetNodeID() const;
 				Int				 SetNodeID(Int);
 
-				const String			 GetName();
+				const String			&GetName() const;
 				Int				 SetName(const String &);
 
-				const String			&GetContent();
+				const String			&GetContent() const;
 				Int				 SetContent(const String &);
 
 /* Functions for attribute access */
-				Int				 GetNOfAttributes();
-				Attribute			*GetNthAttribute(Int);
-				Attribute			*GetAttributeByName(const String &);
+				Int				 GetNOfAttributes() const;
+				Attribute			*GetNthAttribute(Int) const;
+				Attribute			*GetAttributeByName(const String &) const;
 
 				Attribute			*SetAttribute(const String &, const String &);
 				Int				 RemoveAttribute(Attribute *);
 				Int				 RemoveAttributeByName(const String &);
 
 /* Functions for subnode access */
-				Int				 GetNOfNodes();
-				Node				*GetNthNode(Int);
-				Node				*GetNodeByName(const String &);
+				Int				 GetNOfNodes() const;
+				Node				*GetNthNode(Int) const;
+				Node				*GetNodeByName(const String &) const;
 
 				Node				*AddNode(const String &, const String & = NIL);
 				Int				 RemoveNode(Node *);

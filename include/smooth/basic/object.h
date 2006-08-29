@@ -54,8 +54,8 @@ namespace smooth
 
 			Int				 flags;
 
-			Int				 EnterProtectedRegion() const	{ return ++isObjectInUse; }
-			Int				 LeaveProtectedRegion() const	{ return --isObjectInUse; }
+			Int				 EnterProtectedRegion() const		{ return ++isObjectInUse; }
+			Int				 LeaveProtectedRegion() const		{ return --isObjectInUse; }
 		public:
 			static const Int		 classID;
 
@@ -73,23 +73,23 @@ namespace smooth
 							 Object();
 			virtual				~Object();
 
-			Int				 GetHandle() const		{ return handle; }
+			Int				 GetHandle() const			{ return handle; }
 
 			Int				 SetName(const String &);
-			const String			&GetName() const		{ return name; }
+			const String			&GetName() const			{ return name; }
 
-			Int				 SetFlags(Int nFlags)		{ flags = nFlags; return Errors::Success(); }
-			Int				 GetFlags() const		{ return flags; }
+			Int				 SetFlags(Int nFlags)			{ flags = nFlags; return Errors::Success(); }
+			Int				 GetFlags() const			{ return flags; }
 
-			virtual String			 ToString() const		{ return "an Object"; }
+			virtual String			 ToString() const			{ return "an Object"; }
 
-			operator			 String() const			{ return ToString(); }
+			operator			 String() const				{ return ToString(); }
 
-			const ObjectType		&GetObjectType() const		{ return type; }
-			virtual Bool			 IsTypeCompatible(Int) const;
+			const ObjectType		&GetObjectType() const			{ return type; }
+			virtual inline Bool		 IsTypeCompatible(Int objType) const	{ return (objType == classID); }
 
-			Bool				 IsObjectInUse() const		{ return isObjectInUse > 0; }
-			Bool				 IsObjectDeletable() const	{ return deleteObject; }
+			Bool				 IsObjectInUse() const			{ return isObjectInUse > 0; }
+			Bool				 IsObjectDeletable() const		{ return deleteObject; }
 	};
 };
 

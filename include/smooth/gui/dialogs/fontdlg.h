@@ -41,7 +41,7 @@ namespace smooth
 
 					const Error	&ShowDialog();
 				accessors:
-					const Font	&GetFont();
+					const Font	&GetFont() const;
 			};
 		};
 	};

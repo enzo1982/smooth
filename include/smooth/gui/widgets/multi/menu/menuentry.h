@@ -53,7 +53,7 @@ namespace smooth
 				Int			 SetShortcut(Int, Int, Window *);
 
 				Int			 SetBitmap(const Bitmap &);
-				const Bitmap		&GetBitmap();
+				const Bitmap		&GetBitmap() const;
 		};
 	};
 };

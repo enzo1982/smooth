@@ -271,67 +271,67 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 	return Success();
 }
 
-S::Int S::I18n::Translator::GetNOfLanguages()
+S::Int S::I18n::Translator::GetNOfLanguages() const
 {
 	return languages.GetNOfEntries();
 }
 
-S::String S::I18n::Translator::GetNthLanguageName(Int index)
+const S::String &S::I18n::Translator::GetNthLanguageName(Int index) const
 {
 	return languages.GetNthEntry(index)->name;
 }
 
-S::String S::I18n::Translator::GetNthLanguageID(Int index)
+const S::String &S::I18n::Translator::GetNthLanguageID(Int index) const
 {
 	return languages.GetNthEntry(index)->magic;
 }
 
-S::String S::I18n::Translator::GetNthLanguageAuthor(Int index)
+const S::String &S::I18n::Translator::GetNthLanguageAuthor(Int index) const
 {
 	return languages.GetNthEntry(index)->author;
 }
 
-S::String S::I18n::Translator::GetNthLanguageEncoding(Int index)
+const S::String &S::I18n::Translator::GetNthLanguageEncoding(Int index) const
 {
 	return languages.GetNthEntry(index)->encoding;
 }
 
-S::String S::I18n::Translator::GetNthLanguageURL(Int index)
+const S::String &S::I18n::Translator::GetNthLanguageURL(Int index) const
 {
 	return languages.GetNthEntry(index)->url;
 }
 
-S::Bool S::I18n::Translator::IsNthLanguageRightToLeft(Int index)
+S::Bool S::I18n::Translator::IsNthLanguageRightToLeft(Int index) const
 {
 	return languages.GetNthEntry(index)->rightToLeft;
 }
 
-const S::String &S::I18n::Translator::GetActiveLanguageName()
+const S::String &S::I18n::Translator::GetActiveLanguageName() const
 {
 	return activeLanguage->name;
 }
 
-const S::String &S::I18n::Translator::GetActiveLanguageID()
+const S::String &S::I18n::Translator::GetActiveLanguageID() const
 {
 	return activeLanguage->magic;
 }
 
-const S::String &S::I18n::Translator::GetActiveLanguageAuthor()
+const S::String &S::I18n::Translator::GetActiveLanguageAuthor() const
 {
 	return activeLanguage->author;
 }
 
-const S::String &S::I18n::Translator::GetActiveLanguageEncoding()
+const S::String &S::I18n::Translator::GetActiveLanguageEncoding() const
 {
 	return activeLanguage->encoding;
 }
 
-const S::String &S::I18n::Translator::GetActiveLanguageURL()
+const S::String &S::I18n::Translator::GetActiveLanguageURL() const
 {
 	return activeLanguage->url;
 }
 
-S::Bool S::I18n::Translator::IsActiveLanguageRightToLeft()
+S::Bool S::I18n::Translator::IsActiveLanguageRightToLeft() const
 {
 	return activeLanguage->rightToLeft;
 }
@@ -351,9 +351,9 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 	return Error();
 }
 
-S::String S::I18n::Translator::TranslateString(const String &string)
+const S::String &S::I18n::Translator::TranslateString(const String &string)
 {
-	String	 translation = activeLanguage->strings.GetEntry(string.ComputeCRC32());
+	const String	&translation = activeLanguage->strings.GetEntry(string.ComputeCRC32());
 
 	if (translation == NIL)	return string;
 	else			return translation;

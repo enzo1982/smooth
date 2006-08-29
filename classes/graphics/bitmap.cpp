@@ -37,27 +37,27 @@ S::GUI::Bitmap::~Bitmap()
 	delete backend;
 }
 
-S::Int S::GUI::Bitmap::GetBitmapType()
+S::Int S::GUI::Bitmap::GetBitmapType() const
 {
 	return backend->GetBitmapType();
 }
 
-const S::GUI::Size &S::GUI::Bitmap::GetSize()
+const S::GUI::Size &S::GUI::Bitmap::GetSize() const
 {
 	return backend->GetSize();
 }
 
-S::Int S::GUI::Bitmap::GetDepth()
+S::Int S::GUI::Bitmap::GetDepth() const
 {
 	return backend->GetDepth();
 }
 
-S::UnsignedByte *S::GUI::Bitmap::GetBytes()
+S::UnsignedByte *S::GUI::Bitmap::GetBytes() const
 {
 	return backend->GetBytes();
 }
 
-S::Int S::GUI::Bitmap::GetLineAlignment()
+S::Int S::GUI::Bitmap::GetLineAlignment() const
 {
 	return backend->GetLineAlignment();
 }
@@ -111,7 +111,7 @@ S::Bool S::GUI::Bitmap::SetPixel(Int x, Int y, UnsignedLong color)
 	return backend->SetPixel(x, y, color);
 }
 
-S::UnsignedLong S::GUI::Bitmap::GetPixel(Int x, Int y)
+S::UnsignedLong S::GUI::Bitmap::GetPixel(Int x, Int y) const
 {
 	return backend->GetPixel(x, y);
 }

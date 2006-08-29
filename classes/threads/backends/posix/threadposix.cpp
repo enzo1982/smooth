@@ -38,12 +38,12 @@ S::Threads::ThreadPOSIX::~ThreadPOSIX()
 	if (myThread) Stop();
 }
 
-S::Void *S::Threads::ThreadPOSIX::GetSystemThread()
+S::Void *S::Threads::ThreadPOSIX::GetSystemThread() const
 {
 	return (Void *) thread;
 }
 
-S::Int S::Threads::ThreadPOSIX::GetThreadID()
+S::Int S::Threads::ThreadPOSIX::GetThreadID() const
 {
 	return thread - (pthread_t *) NIL;
 }
@@ -88,7 +88,7 @@ S::Void S::Threads::ThreadPOSIX::Exit()
 	pthread_exit(0);
 }
 
-S::Void *S::Threads::ThreadPOSIX::Self()
+S::Void *S::Threads::ThreadPOSIX::Self() const
 {
 	pthread_t	 *thisThread = NULL;
 	

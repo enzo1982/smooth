@@ -55,12 +55,12 @@ namespace smooth
 
 				Int			 RemoveAllTabs()								{ return header->RemoveAllTabs(); }
 
-				Int			 DragSelectedEntry();
+				Int			 DragSelectedEntry(Bool);
 			accessors:
-				Int			 GetNOfTabs()									{ return header->GetNOfTabs(); }
-				Int			 GetNthTabOffset(Int n)								{ return header->GetNthTabOffset(n); }
-				Int			 GetNthTabWidth(Int n)								{ return header->GetNthTabWidth(n); }
-				Int			 GetNthTabOrientation(Int n)							{ return header->GetNthTabOrientation(n); }
+				Int			 GetNOfTabs() const								{ return header->GetNOfTabs(); }
+				Int			 GetNthTabOffset(Int n)	const							{ return header->GetNthTabOffset(n); }
+				Int			 GetNthTabWidth(Int n) const							{ return header->GetNthTabWidth(n); }
+				Int			 GetNthTabOrientation(Int n) const						{ return header->GetNthTabOrientation(n); }
 			slots:
 				Void			 OnScrollbarValueChange();
 				Void			 OnChangeSize(const Size &);

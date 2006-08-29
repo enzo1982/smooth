@@ -38,7 +38,7 @@ S::Threads::SemaphoreWin32::~SemaphoreWin32()
 	if (mySemaphore) CloseHandle(semaphore);
 }
 
-S::Void *S::Threads::SemaphoreWin32::GetSystemSemaphore()
+S::Void *S::Threads::SemaphoreWin32::GetSystemSemaphore() const
 {
 	return (Void *) semaphore;
 }

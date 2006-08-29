@@ -39,9 +39,9 @@ namespace smooth
 							 DynamicLoader(const String &);
 				virtual			~DynamicLoader();
 
-				Void		        *GetFunctionAddress(const String &);
+				Void		        *GetFunctionAddress(const String &) const;
 			accessors:
-				Void			*GetSystemModuleHandle();
+				Void			*GetSystemModuleHandle() const;
 		};
 	};
 };

@@ -77,12 +77,6 @@ S::Int S::Object::SetName(const String &nName)
 	return Success();
 }
 
-S::Bool S::Object::IsTypeCompatible(Int objType) const
-{
-	if (objType == classID)	return True;
-	else			return False;
-}
-
 S::Int S::Object::RequestClassID()
 {
 	return nextClassID++;

@@ -25,12 +25,5 @@ S::ObjectType::ObjectType(const ObjectType &objectType)
 
 S::Bool S::ObjectType::operator ==(Int objType) const
 {
-	if (type == objType)				return True;
-	else if (object->IsTypeCompatible(objType))	return True;
-	else						return False;
-}
-
-S::Bool S::ObjectType::operator !=(Int objType) const
-{
-	return !(*this == objType);
+	return (type == objType) ? True : object->IsTypeCompatible(objType);
 }

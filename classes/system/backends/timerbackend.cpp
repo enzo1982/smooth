@@ -55,7 +55,7 @@ S::System::TimerBackend::~TimerBackend()
 {
 }
 
-S::Int S::System::TimerBackend::GetTimerType()
+S::Int S::System::TimerBackend::GetTimerType() const
 {
 	return type;
 }
@@ -70,7 +70,7 @@ S::Int S::System::TimerBackend::Stop()
 	return Error();
 }
 
-S::Int S::System::TimerBackend::GetID()
+S::Int S::System::TimerBackend::GetID() const
 {
 	return -1;
 }

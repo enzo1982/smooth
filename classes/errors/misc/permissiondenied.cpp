@@ -15,7 +15,7 @@ S::Errors::PermissionDenied::PermissionDenied()
 	code = -2;
 }
 
-S::String S::Errors::PermissionDenied::ToString()
+S::String S::Errors::PermissionDenied::ToString() const
 {
 	return "Permission denied";
 }

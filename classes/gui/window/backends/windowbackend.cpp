@@ -64,12 +64,12 @@ S::Int S::GUI::WindowBackend::GetWindowType()
 	return type;
 }
 
-S::Void *S::GUI::WindowBackend::GetSystemWindow()
+S::Void *S::GUI::WindowBackend::GetSystemWindow() const
 {
 	return NIL;
 }
 
-S::GUI::Surface *S::GUI::WindowBackend::GetDrawSurface()
+S::GUI::Surface *S::GUI::WindowBackend::GetDrawSurface() const
 {
 	return drawSurface;
 }
@@ -114,7 +114,7 @@ S::Int S::GUI::WindowBackend::Hide()
 	return Success();
 }
 
-S::GUI::Rect S::GUI::WindowBackend::GetRestoredWindowRect()
+S::GUI::Rect S::GUI::WindowBackend::GetRestoredWindowRect() const
 {
 	return Rect();
 }

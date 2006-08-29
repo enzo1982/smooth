@@ -25,12 +25,12 @@ S::Threads::Semaphore::~Semaphore()
 	delete backend;
 }
 
-S::Int S::Threads::Semaphore::GetSemaphoreType()
+S::Int S::Threads::Semaphore::GetSemaphoreType() const
 {
 	return backend->GetSemaphoreType();
 }
 
-S::Void *S::Threads::Semaphore::GetSystemSemaphore()
+S::Void *S::Threads::Semaphore::GetSystemSemaphore() const
 {
 	return backend->GetSystemSemaphore();
 }

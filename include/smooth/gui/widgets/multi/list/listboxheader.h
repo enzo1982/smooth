@@ -48,10 +48,10 @@ namespace smooth
 
 				Int			 RemoveAllTabs();
 			accessors:
-				Int			 GetNOfTabs();
-				Int			 GetNthTabOffset(Int);
-				Int			 GetNthTabWidth(Int);
-				Int			 GetNthTabOrientation(Int);
+				Int			 GetNOfTabs() const;
+				Int			 GetNthTabOffset(Int) const;
+				Int			 GetNthTabWidth(Int) const;
+				Int			 GetNthTabOrientation(Int) const;
 			slots:
 				Void			 OnChangeSize(const Size &);
 		};

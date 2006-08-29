@@ -103,7 +103,7 @@ S::Int S::GUI::EditBox::SetText(const String &newText)
 	return cursor->SetText(newText);
 }
 
-const S::String &S::GUI::EditBox::GetText()
+const S::String &S::GUI::EditBox::GetText() const
 {
 	return cursor->GetText();
 }

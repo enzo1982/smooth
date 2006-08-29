@@ -38,7 +38,7 @@ S::Threads::MutexSDL::~MutexSDL()
 	if (myMutex) SDL_DestroyMutex(mutex);
 }
 
-S::Void *S::Threads::MutexSDL::GetSystemMutex()
+S::Void *S::Threads::MutexSDL::GetSystemMutex() const
 {
 	return (Void *) mutex;
 }

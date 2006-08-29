@@ -41,17 +41,17 @@ namespace smooth
 											 ThreadBackend(Void * = NIL);
 				virtual							~ThreadBackend();
 
-				Int							 GetThreadType();
+				Int							 GetThreadType() const;
 
-				virtual Void						*GetSystemThread();
+				virtual Void						*GetSystemThread() const;
 
-				virtual Int						 GetThreadID();
+				virtual Int						 GetThreadID() const;
 
 				virtual Int						 Start(Void (*)(Void *), Void *);
 				virtual Int						 Stop();
 
 				virtual Void						 Exit();
-				virtual Void						*Self();
+				virtual Void						*Self() const;
 		};
 	};
 };

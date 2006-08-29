@@ -49,7 +49,7 @@ namespace smooth
 								 Box(Node *);
 					virtual			~Box();
 
-					GUI::Widget		*GetWidget();
+					GUI::Widget		*GetWidget() const;
 			};
 		};
 	};

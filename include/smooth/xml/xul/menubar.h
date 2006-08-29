@@ -48,7 +48,7 @@ namespace smooth
 									 Menubar(Node *);
 					virtual				~Menubar();
 
-					GUI::Widget			*GetWidget();
+					GUI::Widget			*GetWidget() const;
 			};
 		};
 	};

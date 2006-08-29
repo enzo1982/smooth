@@ -70,30 +70,30 @@ S::GUI::SurfaceBackend::~SurfaceBackend()
 {
 }
 
-S::Int S::GUI::SurfaceBackend::TranslateX(Int x)
+S::Int S::GUI::SurfaceBackend::TranslateX(Int x) const
 {
 	if (rightToLeft) return size.cx - x;
 	else		 return x;
 }
 
-S::Int S::GUI::SurfaceBackend::TranslateY(Int y)
+S::Int S::GUI::SurfaceBackend::TranslateY(Int y) const
 {
 	return y;
 }
 
-S::GUI::Point S::GUI::SurfaceBackend::TranslatePoint(const Point &p)
+S::GUI::Point S::GUI::SurfaceBackend::TranslatePoint(const Point &p) const
 {
 	if (rightToLeft) return Point(size.cx - p.x, p.y);
 	else		 return p;
 }
 
-S::GUI::Rect S::GUI::SurfaceBackend::TranslateRect(const Rect &r)
+S::GUI::Rect S::GUI::SurfaceBackend::TranslateRect(const Rect &r) const
 {
 	if (rightToLeft) return Rect(Point(size.cx - r.right, r.top), Size(r.right - r.left, r.bottom - r.top));
 	else		 return Rect(Point(r.left, r.top), Size(r.right - r.left, r.bottom - r.top));
 }
 
-S::Int S::GUI::SurfaceBackend::GetSurfaceType()
+S::Int S::GUI::SurfaceBackend::GetSurfaceType() const
 {
 	return type;
 }
@@ -105,7 +105,7 @@ S::Int S::GUI::SurfaceBackend::SetSize(const Size &nSize)
 	return Success();
 }
 
-const S::GUI::Size &S::GUI::SurfaceBackend::GetSize()
+const S::GUI::Size &S::GUI::SurfaceBackend::GetSize() const
 {
 	return size;
 }
@@ -136,7 +136,7 @@ S::Int S::GUI::SurfaceBackend::EndPaint()
 	return Success();
 }
 
-S::Void *S::GUI::SurfaceBackend::GetSystemSurface()
+S::Void *S::GUI::SurfaceBackend::GetSystemSurface() const
 {
 	return NIL;
 }
@@ -146,7 +146,7 @@ S::Int S::GUI::SurfaceBackend::SetPixel(Int x, Int y, Int color)
 	return Success();
 }
 
-S::Int S::GUI::SurfaceBackend::GetPixel(Int x, Int y)
+S::Int S::GUI::SurfaceBackend::GetPixel(Int x, Int y) const
 {
 	return 0;
 }

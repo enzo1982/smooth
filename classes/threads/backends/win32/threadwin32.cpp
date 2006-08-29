@@ -40,12 +40,12 @@ S::Threads::ThreadWin32::~ThreadWin32()
 	if (myThread) Stop();
 }
 
-S::Void *S::Threads::ThreadWin32::GetSystemThread()
+S::Void *S::Threads::ThreadWin32::GetSystemThread() const
 {
 	return (Void *) threadID;
 }
 
-S::Int S::Threads::ThreadWin32::GetThreadID()
+S::Int S::Threads::ThreadWin32::GetThreadID() const
 {
 	return threadID;
 }
@@ -90,7 +90,7 @@ S::Void S::Threads::ThreadWin32::Exit()
 	ExitThread(0);
 }
 
-S::Void *S::Threads::ThreadWin32::Self()
+S::Void *S::Threads::ThreadWin32::Self() const
 {
 	return (Void *) GetCurrentThreadId();
 }

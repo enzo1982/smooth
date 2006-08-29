@@ -30,7 +30,7 @@ namespace smooth
 			public:
 						 EndOfFile();
 
-				virtual String	 ToString();
+				virtual String	 ToString() const;
 		};
 	};
 };

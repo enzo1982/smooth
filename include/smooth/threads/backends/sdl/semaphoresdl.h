@@ -39,7 +39,7 @@ namespace smooth
 					 SemaphoreSDL(Void * = NIL);
 					~SemaphoreSDL();
 
-				Void	*GetSystemSemaphore();
+				Void	*GetSystemSemaphore() const;
 
 				Int	 Wait();
 				Int	 Release();

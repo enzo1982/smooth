@@ -48,7 +48,7 @@ namespace smooth
 					Int			 SetCaption(const String &);
 					Int			 SetParentWindow(Window *);
 
-					const Error		&GetErrorStatus();
+					const Error		&GetErrorStatus() const;
 			};
 		};
 	};

@@ -41,12 +41,12 @@ namespace smooth
 										 TimerBackend();
 				virtual						~TimerBackend();
 
-				Int						 GetTimerType();
+				Int						 GetTimerType() const;
 
 				virtual Int					 Start(Int);
 				virtual Int					 Stop();
 
-				virtual Int					 GetID();
+				virtual Int					 GetID() const;
 		};
 	};
 };

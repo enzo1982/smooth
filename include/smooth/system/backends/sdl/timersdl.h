@@ -40,7 +40,7 @@ namespace smooth
 				Int			 Start(Int);
 				Int			 Stop();
 
-				Int			 GetID();
+				Int			 GetID() const;
 		};
 	};
 };

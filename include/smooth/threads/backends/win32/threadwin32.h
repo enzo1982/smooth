@@ -39,15 +39,15 @@ namespace smooth
 					 ThreadWin32(Void * = NIL);
 					~ThreadWin32();
 
-				Void	*GetSystemThread();
+				Void	*GetSystemThread() const;
 
-				Int	 GetThreadID();
+				Int	 GetThreadID() const;
 
 				Int	 Start(Void (*)(Void *), Void *);
 				Int	 Stop();
 
 				Void	 Exit();
-				Void	*Self();
+				Void	*Self() const;
 		};
 	};
 };

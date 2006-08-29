@@ -47,7 +47,7 @@ S::Int S::XML::XUL::Renderer::CloseXUL()
 	return Success();
 }
 
-S::GUI::Widget *S::XML::XUL::Renderer::GetWidget()
+S::GUI::Widget *S::XML::XUL::Renderer::GetWidget() const
 {
 	if (window == NIL) return NIL;
 

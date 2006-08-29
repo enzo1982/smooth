@@ -35,7 +35,7 @@ S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const St
 	}
 	else
 	{
-		GetTextSize();
+		ComputeTextSize();
 
 		SetSize(textSize);
 	}

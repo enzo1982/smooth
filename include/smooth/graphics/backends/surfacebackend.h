@@ -45,10 +45,10 @@ namespace smooth
 
 				Int								 painting;
 
-				Int								 TranslateX(Int);
-				Int								 TranslateY(Int);
-				Point								 TranslatePoint(const Point &);
-				Rect								 TranslateRect(const Rect &);
+				Int								 TranslateX(Int) const;
+				Int								 TranslateY(Int) const;
+				Point								 TranslatePoint(const Point &) const;
+				Rect								 TranslateRect(const Rect &) const;
 			public:
 				static Int							 AddBackend(SurfaceBackend *(*)(Void *, const Size &));
 
@@ -57,10 +57,10 @@ namespace smooth
 												 SurfaceBackend(Void * = NIL, const Size & = Size());
 				virtual								~SurfaceBackend();
 
-				Int								 GetSurfaceType();
+				Int								 GetSurfaceType() const;
 
 				virtual Int							 SetSize(const Size &);
-				virtual const Size						&GetSize();
+				virtual const Size						&GetSize() const;
 
 				Int								 SetRightToLeft(Bool);
 
@@ -69,10 +69,10 @@ namespace smooth
 				virtual Int							 StartPaint(const Rect &);
 				virtual Int							 EndPaint();
 
-				virtual Void							*GetSystemSurface();
+				virtual Void							*GetSystemSurface() const;
 
 				virtual Int							 SetPixel(Int, Int, Int);
-				virtual Int							 GetPixel(Int, Int);
+				virtual Int							 GetPixel(Int, Int) const;
 
 				virtual Int							 Line(const Point &, const Point &, Int);
 				virtual Int							 Frame(const Rect &, Int);

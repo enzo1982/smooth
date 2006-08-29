@@ -47,17 +47,17 @@ S::Bool S::DateTime::SetHMS(Int hour, Int min, Int sec)
 	return True;
 }
 
-S::Int S::DateTime::GetYear()
+S::Int S::DateTime::GetYear() const
 {
 	return (Int) ((Float) days / (12 * 31));
 }
 
-S::Int S::DateTime::GetMonth()
+S::Int S::DateTime::GetMonth() const
 {
 	return (Int) ((Float) (days % (12 * 31)) / 31);
 }
 
-S::Int S::DateTime::GetDay()
+S::Int S::DateTime::GetDay() const
 {
 	return days % (12 * 31) % 31;
 }
@@ -89,22 +89,22 @@ S::Bool S::DateTime::SetDay(Int day)
 	return True;
 }
 
-S::Int S::DateTime::GetHour()
+S::Int S::DateTime::GetHour() const
 {
 	return (Int) ((Float) mseconds / (60 * 60 * 1000));
 }
 
-S::Int S::DateTime::GetMinute()
+S::Int S::DateTime::GetMinute() const
 {
 	return (Int) ((Float) (mseconds % (60 * 60 * 1000)) / (60 * 1000));
 }
 
-S::Int S::DateTime::GetSecond()
+S::Int S::DateTime::GetSecond() const
 {
 	return (Int) ((Float) (mseconds % (60 * 60 * 1000) % (60 * 1000)) / 1000);
 }
 
-S::Int S::DateTime::GetMSecond()
+S::Int S::DateTime::GetMSecond() const
 {
 	return mseconds % (60 * 60 * 1000) % (60 * 1000) % 1000;
 }

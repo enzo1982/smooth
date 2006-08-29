@@ -187,7 +187,7 @@ S::GUI::Window *S::GUI::Widget::GetContainerWindow()
 	return (Window *) widget;
 }
 
-S::GUI::Surface *S::GUI::Widget::GetDrawSurface()
+S::GUI::Surface *S::GUI::Widget::GetDrawSurface() const
 {
 	if (IsRegistered())	return container->GetDrawSurface();
 	else			return drawSurface;
@@ -200,7 +200,7 @@ S::Int S::GUI::Widget::SetContainer(Widget *newContainer)
 	return Success();
 }
 
-S::GUI::Widget *S::GUI::Widget::GetContainer()
+S::GUI::Widget *S::GUI::Widget::GetContainer() const
 {
 	return container;
 }
@@ -210,7 +210,7 @@ S::Void S::GUI::Widget::SetRegisteredFlag(Bool flag)
 	registered = flag;
 }
 
-S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle)
+S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle) const
 {
 	Widget	*lastTabstopObject = NIL;
 
@@ -231,7 +231,7 @@ S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle)
 	return NIL;
 }
 
-S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle)
+S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle) const
 {
 	Bool	 found = False;
 
@@ -256,13 +256,13 @@ S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle)
 	return NIL;
 }
 
-S::Void S::GUI::Widget::GetTextSize()
+S::Void S::GUI::Widget::ComputeTextSize()
 {
 	textSize.cx = font.GetTextSizeX(text);
 	textSize.cy = font.GetTextSizeY(text);
 }
 
-S::GUI::Point S::GUI::Widget::GetRealPosition()
+S::GUI::Point S::GUI::Widget::GetRealPosition() const
 {
 	if (!registered) return pos;
 
@@ -289,7 +289,7 @@ S::GUI::Point S::GUI::Widget::GetRealPosition()
 	return realPos;
 }
 
-const S::GUI::Color &S::GUI::Widget::GetBackgroundColor()
+const S::GUI::Color &S::GUI::Widget::GetBackgroundColor() const
 {
 	return backgroundColor;
 }
@@ -612,9 +612,13 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_KILLFOCUS:
-			if (Window::GetWindow((HWND) wParam) != NIL)
 			{
-				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID && Window::GetWindow((HWND) wParam)->GetOrder() >= window->GetOrder()) break;
+				Window	*windowGetFocus = Window::GetWindow((HWND) wParam);
+
+				if (windowGetFocus != NIL)
+				{
+					if (windowGetFocus->GetObjectType() == ToolWindow::classID && windowGetFocus->GetOrder() >= window->GetOrder()) break;
+				}
 			}
 		case WM_ACTIVATEAPP:
 			if (focussed)
@@ -700,7 +704,7 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 
 	text = newText;
 
-	GetTextSize();
+	ComputeTextSize();
 
 	if (registered && prevVisible) Show();
 	if (registered && prevFocussed) focussed = True;
@@ -710,7 +714,7 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 	return Success();
 }
 
-const S::String &S::GUI::Widget::GetText()
+const S::String &S::GUI::Widget::GetText() const
 {
 	return text;
 }
@@ -722,7 +726,7 @@ S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 	return Success();
 }
 
-const S::String &S::GUI::Widget::GetTooltipText()
+const S::String &S::GUI::Widget::GetTooltipText() const
 {
 	return tooltipText;
 }
@@ -734,7 +738,7 @@ S::Int S::GUI::Widget::SetStatusText(const String &nStatusText)
 	return Success();
 }
 
-const S::String &S::GUI::Widget::GetStatusText()
+const S::String &S::GUI::Widget::GetStatusText() const
 {
 	return statusText;
 }
@@ -747,14 +751,14 @@ S::Int S::GUI::Widget::SetFont(const Font &nFont)
 
 	font = nFont;
 
-	GetTextSize();
+	ComputeTextSize();
 
 	if (registered && prevVisible) Show();
 
 	return Success();
 }
 
-const S::GUI::Font &S::GUI::Widget::GetFont()
+const S::GUI::Font &S::GUI::Widget::GetFont() const
 {
 	return font;
 }
@@ -772,7 +776,7 @@ S::Int S::GUI::Widget::SetOrientation(Int nOrientation)
 	return Success();
 }
 
-S::Int S::GUI::Widget::GetOrientation()
+S::Int S::GUI::Widget::GetOrientation() const
 {
 	return orientation;
 }
@@ -805,7 +809,7 @@ S::Bool S::GUI::Widget::IsRightToLeft() const
 	return Setup::rightToLeft;
 }
 
-S::Bool S::GUI::Widget::IsAffected(const Rect &uRect)
+S::Bool S::GUI::Widget::IsAffected(const Rect &uRect) const
 {
 	return Rect::DoRectsOverlap(uRect, Rect(GetRealPosition() - Point(10, 10), size + Size(20, 20)));
 }

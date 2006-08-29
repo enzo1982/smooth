@@ -49,9 +49,9 @@ namespace smooth
 									 PopupMenu(Node *);
 					virtual				~PopupMenu();
 
-					GUI::Widget			*GetWidget();
+					GUI::Widget			*GetWidget() const;
 
-					String				 GetName();
+					const String			&GetName() const;
 			};
 		};
 	};

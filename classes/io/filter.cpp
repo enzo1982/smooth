@@ -20,7 +20,7 @@ S::IO::Filter::~Filter()
 {
 }
 
-S::Int S::IO::Filter::GetPackageSize()
+S::Int S::IO::Filter::GetPackageSize() const
 {
 	return packageSize;
 }

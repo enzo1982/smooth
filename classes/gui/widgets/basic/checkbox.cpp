@@ -30,7 +30,7 @@ S::GUI::CheckBox::CheckBox(const String &iText, const Point &iPos, const Size &i
 	if (GetWidth() == 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(17);
 
-	GetTextSize();
+	ComputeTextSize();
 
 	internalCheckValues.Connect(&CheckBox::InternalCheckValues, this);
 

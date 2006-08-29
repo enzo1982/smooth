@@ -28,8 +28,6 @@ S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 15
 	marked		= False;
 	text		= iText;
 
-	dragNotified	= False;
-
 	font.SetColor(Setup::ClientTextColor);
 
 	hotspot		= new Hotspot(Point(), GetSize());
@@ -213,11 +211,9 @@ S::Bool S::GUI::ListEntry::IsSelected()
 
 S::Void S::GUI::ListEntry::InitDrag()
 {
-	if (!mouseOver && !dragNotified && container->GetObjectType() == ListBox::classID)
+	if (!mouseOver && container->GetObjectType() == ListBox::classID)
 	{
-		dragNotified = True;
-
-		((ListBox *) container)->DragSelectedEntry();
+		((ListBox *) container)->DragSelectedEntry(container->GetContainerWindow()->GetMousePosition().y < GetRealPosition().y ? True : False);
 	}
 }
 
@@ -230,8 +226,6 @@ S::Void S::GUI::ListEntry::OnToggleMark()
 
 S::Void S::GUI::ListEntry::OnSelectEntry()
 {
-	dragNotified = False;
-
 	if (!selected || Binary::IsFlagSet(container->GetFlags(), LF_ALLOWRESELECT)) Select();
 }
 

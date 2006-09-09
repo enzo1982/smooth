@@ -70,7 +70,10 @@ S::Int S::Configuration::Open(const String &file, Bool create)
 
 			ownRoot->AddNode("configuration")->SetAttribute("name", "default");
 
-			fileName = GUI::Application::GetApplicationDirectory().Append(file);
+			if (file[1] == ':' ||
+			    file[0] == '/' ||
+			    file[0] == '\\')	fileName = file;
+			else			fileName = GUI::Application::GetApplicationDirectory().Append(file);
 		}
 	}
 

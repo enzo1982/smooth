@@ -78,6 +78,7 @@ namespace smooth
 				virtual Void							*GetSystemBitmap() const;
 
 				virtual Int							 GrayscaleBitmap();
+				virtual Int							 InvertColors();
 				virtual Int							 ReplaceColor(Int, Int);
 
 				virtual Bool							 SetPixel(Int, Int, UnsignedLong);

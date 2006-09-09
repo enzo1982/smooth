@@ -69,7 +69,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 	Surface	*surface = container->GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame	 = Rect(realPos, GetSize());
-	Rect	 bmpRect = Rect(realPos + Point(2, 2), bitmap.GetSize());
+	Rect	 bmpRect = Rect(realPos + Point(2, 1), bitmap.GetSize());
 
 	switch (message)
 	{
@@ -83,7 +83,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 				surface->Bar(p1, p2, OR_HORZ);
 			}
-			else if (text != NIL && bitmap == NIL)
+			else if (text != NIL || bitmap != NIL)
 			{
 				Rect	 textRect = Rect(realPos + Point(18, 0), GetSize() - Size(22, 2));
 				Font	 nFont = font;
@@ -92,6 +92,11 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 				surface->Box(frame, Setup::BackgroundColor, FILLED);
 				surface->SetText(text, textRect, nFont);
+
+				if (bitmap != NIL && bVar == NIL && iVar == NIL)
+				{
+					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+				}
 
 				if (shortcut != NIL)
 				{
@@ -165,7 +170,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 			break;
 		case SP_MOUSEIN:
-			if (text != NIL && bitmap == NIL)
+			if (text != NIL || bitmap != NIL)
 			{
 				Rect	 textRect	= Rect(realPos + Point(18, 0), GetSize() - Size(22, 2));
 				Font	 nFont		= font;
@@ -174,6 +179,13 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 				surface->Gradient(frame, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 				surface->SetText(text, textRect, nFont);
+
+				if (bitmap != NIL && bVar == NIL && iVar == NIL)
+				{
+					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+
+					surface->Frame(bmpRect, FRAME_DOWN);
+				}
 
 				if (shortcut != NIL)
 				{

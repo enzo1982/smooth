@@ -12,6 +12,7 @@
 #define _H_NONBLOCKING_
 
 #include "slots.h"
+#include "nonblocking/nonblocking.h"
 
 #define NONBLOCKING_NONBLOCKING_CLASS_NAME	NonBlocking0
 #define NONBLOCKING_SLOT_BASE_CLASS_NAME	SlotBase0
@@ -26,7 +27,7 @@
 #define NONBLOCKING_ARGUMENT_PARAMETER_LIST
 #define NONBLOCKING_ARGUMENT_PARAMETERS
 
-#include "nonblocking/nonblocking.h"
+#include "nonblocking/nonblockingn.h"
 
 #undef NONBLOCKING_NONBLOCKING_CLASS_NAME
 #undef NONBLOCKING_SLOT_BASE_CLASS_NAME
@@ -54,7 +55,7 @@
 #define NONBLOCKING_ARGUMENT_PARAMETER_LIST	pt1 p1
 #define NONBLOCKING_ARGUMENT_PARAMETERS		p1
 
-#include "nonblocking/nonblocking.h"
+#include "nonblocking/nonblockingn.h"
 
 #undef NONBLOCKING_NONBLOCKING_CLASS_NAME
 #undef NONBLOCKING_SLOT_BASE_CLASS_NAME
@@ -82,7 +83,7 @@
 #define NONBLOCKING_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2
 #define NONBLOCKING_ARGUMENT_PARAMETERS		p1, p2
 
-#include "nonblocking/nonblocking.h"
+#include "nonblocking/nonblockingn.h"
 
 #undef NONBLOCKING_NONBLOCKING_CLASS_NAME
 #undef NONBLOCKING_SLOT_BASE_CLASS_NAME
@@ -110,7 +111,7 @@
 #define NONBLOCKING_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3
 #define NONBLOCKING_ARGUMENT_PARAMETERS		p1, p2, p3
 
-#include "nonblocking/nonblocking.h"
+#include "nonblocking/nonblockingn.h"
 
 #undef NONBLOCKING_NONBLOCKING_CLASS_NAME
 #undef NONBLOCKING_SLOT_BASE_CLASS_NAME
@@ -138,7 +139,7 @@
 #define NONBLOCKING_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4
 #define NONBLOCKING_ARGUMENT_PARAMETERS		p1, p2, p3, p4
 
-#include "nonblocking/nonblocking.h"
+#include "nonblocking/nonblockingn.h"
 
 #undef NONBLOCKING_NONBLOCKING_CLASS_NAME
 #undef NONBLOCKING_SLOT_BASE_CLASS_NAME
@@ -166,7 +167,7 @@
 #define NONBLOCKING_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4, pt5 p5
 #define NONBLOCKING_ARGUMENT_PARAMETERS		p1, p2, p3, p4, p5
 
-#include "nonblocking/nonblocking.h"
+#include "nonblocking/nonblockingn.h"
 
 #undef NONBLOCKING_NONBLOCKING_CLASS_NAME
 #undef NONBLOCKING_SLOT_BASE_CLASS_NAME
@@ -194,7 +195,7 @@
 #define NONBLOCKING_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4, pt5 p5, pt6 p6
 #define NONBLOCKING_ARGUMENT_PARAMETERS		p1, p2, p3, p4, p5, p6
 
-#include "nonblocking/nonblocking.h"
+#include "nonblocking/nonblockingn.h"
 
 #undef NONBLOCKING_NONBLOCKING_CLASS_NAME
 #undef NONBLOCKING_SLOT_BASE_CLASS_NAME
@@ -222,7 +223,7 @@
 #define NONBLOCKING_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4, pt5 p5, pt6 p6, pt7 p7
 #define NONBLOCKING_ARGUMENT_PARAMETERS		p1, p2, p3, p4, p5, p6, p7
 
-#include "nonblocking/nonblocking.h"
+#include "nonblocking/nonblockingn.h"
 
 #undef NONBLOCKING_NONBLOCKING_CLASS_NAME
 #undef NONBLOCKING_SLOT_BASE_CLASS_NAME
@@ -250,7 +251,7 @@
 #define NONBLOCKING_ARGUMENT_PARAMETER_LIST	pt1 p1, pt2 p2, pt3 p3, pt4 p4, pt5 p5, pt6 p6, pt7 p7, pt8 p8
 #define NONBLOCKING_ARGUMENT_PARAMETERS		p1, p2, p3, p4, p5, p6, p7, p8
 
-#include "nonblocking/nonblocking.h"
+#include "nonblocking/nonblockingn.h"
 
 #undef NONBLOCKING_NONBLOCKING_CLASS_NAME
 #undef NONBLOCKING_SLOT_BASE_CLASS_NAME

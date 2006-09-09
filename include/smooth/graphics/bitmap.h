@@ -56,6 +56,7 @@ namespace smooth
 				Void			*GetSystemBitmap() const;
 
 				Int			 GrayscaleBitmap();
+				Int			 InvertColors();
 				Int			 ReplaceColor(Int, Int);
 
 				Int			 BlitFromSurface(Surface *, const Rect &, const Rect &);

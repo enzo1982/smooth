@@ -34,7 +34,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 			Node		*nNode	= node->GetNthNode(i);
 			XUL::Widget	*widget	= NIL;
 
-			if (nNode->GetName() == "hbox" || nNode->GetName() == "vbox")
+			if (nNode->GetName() == "box" || nNode->GetName() == "hbox" || nNode->GetName() == "vbox")
 			{
 				widget = new XUL::Box(nNode);
 

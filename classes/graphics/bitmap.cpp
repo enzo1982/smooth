@@ -87,6 +87,11 @@ S::Int S::GUI::Bitmap::GrayscaleBitmap()
 	return backend->GrayscaleBitmap();
 }
 
+S::Int S::GUI::Bitmap::InvertColors()
+{
+	return backend->InvertColors();
+}
+
 S::Int S::GUI::Bitmap::ReplaceColor(Int color1, Int color2)
 {
 	return backend->ReplaceColor(color1, color2);

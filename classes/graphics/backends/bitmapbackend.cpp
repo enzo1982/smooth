@@ -234,6 +234,26 @@ S::Int S::GUI::BitmapBackend::GrayscaleBitmap()
 	return Success();
 }
 
+S::Int S::GUI::BitmapBackend::InvertColors()
+{
+	if (bytes == NIL) return Error();
+
+	Color	 color;
+
+	for (Int y = 0; y < size.cy; y++)
+	{
+		for (Int x = 0; x < size.cx; x++)
+		{
+			color = GetPixel(x, y);
+			color = Color(255 - color.GetRed(), 255 - color.GetGreen(), 255 - color.GetBlue());
+
+			SetPixel(x, y, color);
+		}
+	}
+
+	return Success();
+}
+
 S::Int S::GUI::BitmapBackend::ReplaceColor(Int color1, Int color2)
 {
 	if (bytes == NIL) return Error();

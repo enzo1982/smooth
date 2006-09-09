@@ -8,64 +8,23 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#ifndef _H_OBJSMOOTH_NONBLOCKING_
+#define _H_OBJSMOOTH_NONBLOCKING_
+
 #include "../../threads/thread.h"
 
 namespace smooth
 {
-
-	template <NONBLOCKING_ARGUMENT_LIST NONBLOCKING_CONDITIONAL_COMMA class dummyTYPE = Void> class NONBLOCKING_NONBLOCKING_CLASS_NAME
+	class NonBlocking
 	{
-		protected:
-			NONBLOCKING_SLOT_BASE_CLASS_NAME<Void NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES>	*slotN;
-			Threads::Thread											*thread;
-
-			NONBLOCKING_ARGUMENT_DECLARATIONS
 		public:
-			template <class classTYPE, class oClassTYPE, class slotReturnTYPE> NONBLOCKING_NONBLOCKING_CLASS_NAME(slotReturnTYPE (classTYPE::*proc)(NONBLOCKING_ARGUMENT_TYPES), oClassTYPE *inst)
+			static Int WaitForRunningCalls()
 			{
-				slotN	= new NONBLOCKING_SLOT_CLASS_CLASS_NAME<oClassTYPE, slotReturnTYPE NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES>(proc, inst);
-				thread	= NIL;
-			}
-
-			template <class slotReturnTYPE> NONBLOCKING_NONBLOCKING_CLASS_NAME(slotReturnTYPE (*proc)(NONBLOCKING_ARGUMENT_TYPES))
-			{
-				slotN	= new NONBLOCKING_SLOT_GLOBAL_CLASS_NAME<slotReturnTYPE NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES>(proc);
-				thread	= NIL;
-			}
-
-			template <class slotReturnTYPE> NONBLOCKING_NONBLOCKING_CLASS_NAME(NONBLOCKING_NONBLOCKING_CLASS_NAME<slotReturnTYPE NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES> *sig)
-			{
-				slotN	= new NONBLOCKING_SLOT_SIGNAL_CLASS_NAME<slotReturnTYPE NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES>(sig);
-				thread	= NIL;
-			}
-
-			virtual ~NONBLOCKING_NONBLOCKING_CLASS_NAME()
-			{
-				if (thread == NIL) delete slotN;
-			}
-
-
-			Void Call(NONBLOCKING_ARGUMENT_PARAMETER_LIST)
-			{
-				NONBLOCKING_ARGUMENT_ASSIGNMENTS
-
-				thread = new Threads::Thread();
-
-				thread->SetFlags(Threads::THREAD_WAITFLAG_START);
-
-				thread->threadMain.Connect(&NONBLOCKING_NONBLOCKING_CLASS_NAME::Thread, this);
-
-				thread->Start();
-			}
-
-			Int Thread(Threads::Thread *thread)
-			{
-				slotN->Emit(NONBLOCKING_ARGUMENT_PARAMETERS);
-
-				delete slotN;
-				delete thread;
+				while (Threads::Thread::GetNOfRunningThreads() > 0) Sleep(10);
 
 				return Success();
 			}
 	};
 };
+
+#endif

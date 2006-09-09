@@ -181,6 +181,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 				{
 					out->OutputNumberPBD(1, 1);
 					dosaa = 1;
+
 					if (bitssaa < bitssaanrle)
 					{
 						out->OutputNumberPBD(1, 1);
@@ -196,6 +197,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 				{
 					out->OutputNumberPBD(0, 1);
 					dosaa = 0;
+
 					if (bits < bitsnrle)
 					{
 						out->OutputNumberPBD(1, 1);
@@ -216,20 +218,25 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 					if ((x % 16) == mod16)
 					{
 						gallinpal = 1;
+
 						for (int x2 = 0; x2 < 16; x2++)
 						{
-							if ((x+x2) < ior.sizex) if (GetPaletteEntry(line[x+x2]) == -1 )	{ gallinpal = 0; break; }
+							if ((x+x2) < ior.sizex && GetPaletteEntry(line[x+x2]) == -1) { gallinpal = 0; break; }
 						}
+
 						if (gallinpal == 1)	out->OutputNumberPBD(1, 1);
 						else			out->OutputNumberPBD(0, 1);
 					}
+
 					if (((x % 4) == mod04) && !gallinpal)
 					{
 						allinpal = 1;
+
 						for (int x2 = 0; x2 < 4; x2++)
 						{
-							if ((x+x2) < ior.sizex) if (GetPaletteEntry(line[x+x2]) == -1 )	{ allinpal = 0; break; }
+							if ((x+x2) < ior.sizex && GetPaletteEntry(line[x+x2]) == -1) { allinpal = 0; break; }
 						}
+
 						if (allinpal == 1)	out->OutputNumberPBD(1, 1);
 						else			out->OutputNumberPBD(0, 1);
 					}
@@ -237,6 +244,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 					if ((GetPaletteEntry(line[x]) == -1))
 					{
 						out->OutputNumberPBD(0, 1);
+
 						if (GetDelta(line, lastline, x, ctsize))
 						{
 							out->OutputNumberPBD(1, 1);
@@ -247,6 +255,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 							out->OutputNumberPBD(0, 1);
 							out->OutputNumberPBD(line[x], ctsize*ior.bpcc);
 						}
+
 						if (palentries < maxpalentries)
 						{
 							palette[palentries] = line[x];
@@ -260,6 +269,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 					else
 					{
 						if (!allinpal && !gallinpal) out->OutputNumberPBD(1, 1);
+
 						if (GetSAA(line, lastline, x) && dosaa)
 						{
 							out->OutputNumberPBD(1, 1);
@@ -267,6 +277,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 						else
 						{
 							if (dosaa) out->OutputNumberPBD(0, 1);
+
 							if ((palentries-1)-GetPaletteEntry(line[x]) < 2)
 							{
 								out->OutputNumberPBD(1, 1);
@@ -275,6 +286,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 							else
 							{
 								out->OutputNumberPBD(0, 1);
+
 								if ((palentries-1)-GetPaletteEntry(line[x]) < 18)
 								{
 									out->OutputNumberPBD(1, 1);
@@ -285,6 +297,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 								else
 								{
 									out->OutputNumberPBD(0, 1);
+
 									if ((palentries-1)-GetPaletteEntry(line[x]) < 82)
 									{
 										out->OutputNumberPBD(1, 1);
@@ -300,12 +313,14 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 								}
 							}
 						}
+
 						RotatePaletteEntry(GetPaletteEntry(line[x]));
 					}
 
 					if (line[x] == lastcol)
 					{
 						pcirle = GetRLE(line, ior.sizex, x, 8);
+
 						if (pcirle >= 2)
 						{
 							out->OutputNumberPBD(1, 1);
@@ -333,6 +348,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 					else if ((line[x] == lastline[x]) && dorle)
 					{
 						pcirle = GetVRLE(line, lastline, ior.sizex, x, 8);
+
 						if (pcirle >= 2)
 						{
 							out->OutputNumberPBD(1, 1);
@@ -359,7 +375,9 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 					}
 				}
 			}
+
 			for (x = 0; x < ior.sizex; x++) lastline[x] = line[x];
+
 			break;
 		default:
 			break;
@@ -455,14 +473,14 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 					{
 						gallinpal = in->InputNumberPBD(1);
 					}
+
 					if (((x % 4) == mod04) && !gallinpal)
 					{
 						allinpal = in->InputNumberPBD(1);
 					}
 
 					if (allinpal || gallinpal)	inpal = 1;
-					else
-				inpal = in->InputNumberPBD(1);
+					else				inpal = in->InputNumberPBD(1);
 
 					if (inpal == 0)
 					{
@@ -523,6 +541,7 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 								}
 							}
 						}
+
 						RotatePaletteEntry(GetPaletteEntry(col));
 					}
 
@@ -540,10 +559,12 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 							{
 								pcirle = in->InputNumberPBD(3) + 2;
 							}
+
 							for (int i = x + 1; i <= x + pcirle; i++)
 							{
 								line[i] = line[x];
 							}
+
 							x = x + pcirle;
 							allinpal = 0;
 							gallinpal = 0;
@@ -563,10 +584,12 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 							{
 								pcirle = in->InputNumberPBD(3) + 2;
 							}
+
 							for (int i = x + 1; i <= x + pcirle; i++)
 							{
 								line[i] = lastline[i];
 							}
+
 							x = x + pcirle;
 							allinpal = 0;
 							gallinpal = 0;
@@ -576,7 +599,9 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 					}
 				}
 			}
+
 			for (x = 0; x < ior.sizex; x++) lastline[x] = line[x];
+
 			break;
 		default:
 			break;

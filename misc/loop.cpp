@@ -40,6 +40,11 @@ __declspec (dllexport) int		 S::iCmdShow		= 0;
 __declspec (dllexport) HICON	 S::SMOOTHICON = NIL;
 #endif
 
+namespace smooth
+{
+	SMOOTHAPI S::Array<S::Void *> threadSlots;
+};
+
 bool	 S::loopActive		= false;
 int	 S::peekLoop		= 0;
 bool	 S::initializing	= true;
@@ -233,6 +238,9 @@ S::Int S::Loop()
 			}
 		}
 	}
+
+	/* This is the same as NonBlocking::WaitForRunningCalls(),
+	   so we don't need to call that.			   */
 
 	while (Threads::Thread::GetNOfRunningThreads() > 0) LiSASleep(10);
 

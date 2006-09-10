@@ -265,6 +265,8 @@ S::Int S::GUI::PopupMenuEntry::Show()
 {
 	visible = True;
 
+	if (hotspot != NIL) hotspot->Show();
+
 	return Success();
 }
 
@@ -276,6 +278,8 @@ S::Int S::GUI::PopupMenuEntry::Hide()
 	}
 
 	visible = False;
+
+	if (hotspot != NIL) hotspot->Hide();
 
 	return Success();
 }

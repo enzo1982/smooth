@@ -1104,13 +1104,6 @@ SOURCE=..\misc\codecs.cpp
 # Begin Source File
 
 SOURCE=..\misc\loop.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -1312,6 +1305,10 @@ SOURCE=..\include\smooth\templates\pointer\proxy.h
 # Begin Source File
 
 SOURCE=..\include\smooth\templates\nonblocking\nonblocking.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\smooth\templates\nonblocking\nonblockingn.h
 # End Source File
 # End Group
 # Begin Source File

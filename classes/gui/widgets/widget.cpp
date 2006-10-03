@@ -673,6 +673,8 @@ S::Void S::GUI::Widget::DeactivateTooltip()
 
 	if (tooltip != NIL)
 	{
+		PopupMenu::internalOnOpenPopupMenu.Disconnect(&Widget::DeactivateTooltip, this);
+
 		tooltip->Hide();
 
 		DeleteObject(tooltip);

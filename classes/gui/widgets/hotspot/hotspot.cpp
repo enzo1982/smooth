@@ -43,8 +43,6 @@ S::Int S::GUI::Hotspot::Hide()
 	leftButtonDown	= False;
 	rightButtonDown	= False;
 
-	mouseDragging	= False;
-
 	onHide.Emit();
 
 	return Success();

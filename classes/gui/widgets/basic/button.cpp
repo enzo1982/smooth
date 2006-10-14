@@ -109,3 +109,22 @@ S::Void S::GUI::Button::OnChangeSize(const Size &nSize)
 {
 	hotspot->SetSize(nSize - (flags & BF_NOFRAME ? Size() : Size(8, 8)));
 }
+
+const S::GUI::Bitmap &S::GUI::Button::GetBitmap()
+{
+	return bitmap;
+}
+
+S::Int S::GUI::Button::SetBitmap(const Bitmap &nBitmap)
+{
+	Bool	 prevVisible = IsVisible();
+
+	if (IsRegistered() && prevVisible) Hide();
+
+	bitmap = nBitmap;
+	bitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+
+	if (IsRegistered() && prevVisible) Show();
+
+	return Success();
+}

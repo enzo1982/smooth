@@ -43,6 +43,9 @@ namespace smooth
 				virtual			~Button();
 
 				virtual Int		 Paint(Int);
+			accessors:
+				const Bitmap		&GetBitmap();
+				Int			 SetBitmap(const Bitmap &);
 			slots:
 				Void			 OnChangeSize(const Size &);
 		};

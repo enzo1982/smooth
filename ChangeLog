@@ -4,6 +4,7 @@ xx.xx.06 xx:xx - smooth alpha 0.8.69.0
 
 - bitmap.cpp	- Added a method for inverting the colors of a bitmap
 - popupmenu.cpp	- Added support for images in popup menu entries
+- slider.cpp	- Added support for changing the slider grip size
 
 - added multi monitor support
 - fixed nonblocking function calls support

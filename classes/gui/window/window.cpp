@@ -443,22 +443,14 @@ S::Int S::GUI::Window::Stay()
 	if (!created)	Create();
 	if (!visible)	Show();
 
-	stay	= True;
-
-#ifdef __WIN32__
-	if (Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_KILLFOCUS, 0, 0);
-	else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_KILLFOCUS, 0, 0);
-
-	if (Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_ACTIVATEAPP, 1, 0);
-	else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_ACTIVATEAPP, 1, 0);
-#endif
+	stay = True;
 
 	System::EventProcessor	*event = new System::EventProcessor();
 
 	while (!destroyed)
 	{
-		if (peekLoop > 0)	event->ProcessNextEvent(False);
-		else			event->ProcessNextEvent(True);
+		if (peekLoop > 0) event->ProcessNextEvent(False);
+		else		  event->ProcessNextEvent(True);
 	}
 
 	delete event;
@@ -473,8 +465,8 @@ S::Int S::GUI::Window::Stay()
 S::Int S::GUI::Window::Close()
 {
 #ifdef __WIN32__
-	if (Setup::enableUnicode)	::PostMessageW((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
-	else				::PostMessageA((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
+	if (Setup::enableUnicode) PostMessageW((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
+	else			  PostMessageA((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
 #endif
 
 	return Success();

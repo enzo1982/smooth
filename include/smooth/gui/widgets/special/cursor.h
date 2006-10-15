@@ -87,6 +87,7 @@ namespace smooth
 			slots:
 				Void				 OnTimer();
 
+				Void				 OnGetFocus();
 				Void				 OnGetFocusByKeyboard();
 				Void				 OnLoseFocus();
 		};

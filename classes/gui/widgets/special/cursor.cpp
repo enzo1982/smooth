@@ -36,6 +36,7 @@ S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSiz
 
 	SetTabstopCapable(True);
 
+	onGetFocus.Connect(&Cursor::OnGetFocus, this);
 	onGetFocusByKeyboard.Connect(&Cursor::OnGetFocusByKeyboard, this);
 	onLoseFocus.Connect(&Cursor::OnLoseFocus, this);
 
@@ -707,6 +708,11 @@ S::Int S::GUI::Cursor::Scroll(Int nScrollPos)
 S::Void S::GUI::Cursor::OnTimer()
 {
 	ShowCursor(!promptVisible);
+}
+
+S::Void S::GUI::Cursor::OnGetFocus()
+{
+	SetCursorPos(promptPos);
 }
 
 S::Void S::GUI::Cursor::OnGetFocusByKeyboard()

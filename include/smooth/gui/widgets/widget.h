@@ -149,6 +149,9 @@ namespace smooth
 
 				Bool				 IsMouseOver() const		{ return mouseOver; }
 
+				Int				 SetFocus();
+				Bool				 IsFocussed() const		{ return focussed; }
+
 				virtual Int			 SetText(const String &);
 				virtual const String		&GetText() const;
 

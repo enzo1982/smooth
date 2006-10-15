@@ -237,7 +237,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 		lay->RegisterObject(checkbox);
 	}
 
-	msgbox->SetPosition(Point((LiSAGetDisplaySizeX() - msgbox->GetWidth()) / 2, (LiSAGetDisplaySizeY() - msgbox->GetHeight()) / 2) + Point((nOfMessageBoxes - 1) * 25, (nOfMessageBoxes - 1) * 25));
+	msgbox->SetPosition(Point((LiSAGetDisplaySizeX() - msgbox->GetWidth()) / 2, (LiSAGetDisplaySizeY() - msgbox->GetHeight()) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
 }
 
 S::GUI::Dialogs::MessageDlg::~MessageDlg()

@@ -49,6 +49,8 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 
 S::Int S::GUI::Statusbar::SetText(const String &newStatus)
 {
+	if (text == newStatus) return Success();
+
 	text = newStatus;
 
 	Paint(SP_PAINT);

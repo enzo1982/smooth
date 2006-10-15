@@ -34,6 +34,8 @@ namespace smooth
 				Int			 mouseBias;
 				Bool			 dragging;
 
+				Int			 gripSize;
+
 				Void			 UpdateHotspotPositions();
 			protected:
 				Int			*variable;
@@ -55,6 +57,9 @@ namespace smooth
 
 				Int			 SetValue(Int);
 				Int			 GetValue();
+
+				Int			 SetGripSize(Int);
+				Int			 GetGripSize();
 			signals:
 				Signal1<Void, Int>	 onValueChange;
 			slots:

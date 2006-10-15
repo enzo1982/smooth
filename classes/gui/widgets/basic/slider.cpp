@@ -24,6 +24,7 @@ S::GUI::Slider::Slider(const Point &iPos, const Size &iSize, Int sType, Int *var
 	endValue	= rangeEnd;
 
 	dummyVariable	= 0;
+	gripSize	= 9;
 
 	if (var == NIL)	variable = &dummyVariable;
 	else		variable = var;
@@ -80,8 +81,8 @@ S::Int S::GUI::Slider::Paint(Int message)
 			if (subtype == OR_HORZ)	surface->Bar(realPos + Point(4, 8), realPos + Point(GetWidth() - 4, 8), OR_HORZ);
 			else			surface->Bar(realPos + Point(8, 4), realPos + Point(8, GetHeight() - 4), OR_VERT);
 
-			if (subtype == OR_HORZ)	sliderRect = Rect(realPos + Point((Int) (((Float) (GetWidth() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0), Size(9, 17));
-			else			sliderRect = Rect(realPos + Point(0, (GetHeight() - 10) - (Int) (((Float) (GetHeight() - 10)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)))), Size(18, 10));
+			if (subtype == OR_HORZ)	sliderRect = Rect(realPos + Point((Int) (((Float) (GetWidth() - gripSize)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0), Size(gripSize, 17));
+			else			sliderRect = Rect(realPos + Point(0, (GetHeight() - gripSize - 1) - (Int) (((Float) (GetHeight() - gripSize - 1)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)))), Size(18, gripSize + 1));
 
 			if (!dragging)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
 			else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
@@ -124,12 +125,28 @@ S::Int S::GUI::Slider::GetValue()
 	return *variable;
 }
 
+S::Int S::GUI::Slider::SetGripSize(Int newGripSize)
+{
+	gripSize = newGripSize;
+
+	Paint(SP_PAINT);
+
+	UpdateHotspotPositions();
+
+	return Success();
+}
+
+S::Int S::GUI::Slider::GetGripSize()
+{
+	return gripSize;
+}
+
 S::Void S::GUI::Slider::OnMouseClick(const Point &mousePos)
 {
 	Int	 value = 0;
 
-	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - 9) / ((Float) (mousePos.x - (GetRealPosition().x + 4)))));
-	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - 9) / ((Float) (mousePos.y - (GetRealPosition().y + 4)))));
+	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - gripSize) / ((Float) (mousePos.x - (GetRealPosition().x + gripSize / 2)))));
+	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - gripSize) / ((Float) (mousePos.y - (GetRealPosition().y + gripSize / 2)))));
 
 	if (!dragging)
 	{
@@ -140,8 +157,8 @@ S::Void S::GUI::Slider::OnMouseClick(const Point &mousePos)
 
 S::Void S::GUI::Slider::OnMouseDragStart(const Point &mousePos)
 {
-	if (subtype == OR_HORZ)	mouseBias = (GetRealPosition().x + (Int) (((Float) (GetWidth() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))) + 4) - mousePos.x;
-	else			mouseBias = (GetRealPosition().y + (GetHeight() - 9) - (Int) (((Float) (GetHeight() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))) + 4) - mousePos.y;
+	if (subtype == OR_HORZ)	mouseBias = (GetRealPosition().x + (Int) (((Float) (GetWidth() - gripSize)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))) + gripSize / 2) - mousePos.x;
+	else			mouseBias = (GetRealPosition().y + (GetHeight() - gripSize) - (Int) (((Float) (GetHeight() - gripSize)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))) + gripSize / 2) - mousePos.y;
 
 	dragging = True;
 }
@@ -150,8 +167,8 @@ S::Void S::GUI::Slider::OnMouseDrag(const Point &mousePos)
 {
 	Int	 value = 0;
 
-	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - 9) / ((Float) (mousePos.x + mouseBias - (GetRealPosition().x + 4)))));
-	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - 9) / ((Float) (mousePos.y + mouseBias - (GetRealPosition().y + 4)))));
+	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - gripSize) / ((Float) (mousePos.x + mouseBias - (GetRealPosition().x + gripSize / 2)))));
+	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - gripSize) / ((Float) (mousePos.y + mouseBias - (GetRealPosition().y + gripSize / 2)))));
 
 	if (subtype == OR_HORZ)	SetValue(startValue + value);
 	else			SetValue(endValue - value);
@@ -167,5 +184,5 @@ S::Void S::GUI::Slider::OnMouseDragEnd(const Point &mousePos)
 S::Void S::GUI::Slider::UpdateHotspotPositions()
 {
 	clickHotspot->SetSize(GetSize() - (subtype == OR_HORZ ? Size(8, 2) : Size(2, 8)));
-	dragHotspot->SetMetrics(subtype == OR_HORZ ? Point((Int) (((Float) (GetWidth() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, (GetHeight() - 9) - (Int) (((Float) (GetHeight() - 9)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)))), subtype == OR_HORZ ? Size(8, 16) : Size(16, 8));
+	dragHotspot->SetMetrics(subtype == OR_HORZ ? Point((Int) (((Float) (GetWidth() - gripSize)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, (GetHeight() - gripSize) - (Int) (((Float) (GetHeight() - gripSize)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)))), subtype == OR_HORZ ? Size(gripSize - 1, 16) : Size(16, gripSize - 1));
 }

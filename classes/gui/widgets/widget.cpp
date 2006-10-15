@@ -683,6 +683,20 @@ S::Void S::GUI::Widget::DeactivateTooltip()
 	}
 }
 
+S::Int S::GUI::Widget::SetFocus()
+{
+	if (!focussed)
+	{
+		focussed = True;
+
+		onGetFocus.Emit();
+
+		if (GetNOfObjects() > 0) GetNthObject(0)->SetFocus();
+	}
+
+	return Success();
+}
+
 S::Void S::GUI::Widget::SetFocusByKeyboard()
 {
 	if (!focussed)

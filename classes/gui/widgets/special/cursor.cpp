@@ -631,8 +631,6 @@ S::Void S::GUI::Cursor::MarkText(Int newMarkStart, Int newMarkEnd)
 
 S::Int S::GUI::Cursor::MarkAll()
 {
-	focussed = True;
-
 	MarkText(0, text.Length());
 
 	SetCursorPos(text.Length());
@@ -736,6 +734,8 @@ S::Void S::GUI::Cursor::OnLoseFocus()
 
 S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 {
+	focussed = True;
+
 	ShowCursor(False);
 
 	Window	*wnd	 = container->GetContainerWindow();

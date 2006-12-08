@@ -56,6 +56,7 @@ namespace smooth
 
 				Int				 SetDropDownList(List *);
 
+				Int				 SetCursorPos(Int);
 				Int				 GetCursorPos();
 
 				Int				 MarkAll();

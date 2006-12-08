@@ -7,7 +7,7 @@
 	screenY="100"
 	width="400"
 	height="250"
-	orient="horizontal"
+	orient="vertical"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <toolbox flex="1">
     <menubar id="sample-menubar">
@@ -32,10 +32,12 @@
       <toolbarbutton label="Forward"/>
     </toolbar>
   </toolbox>
-  <button id="okButton" label="OK" disabled="true"/>
-  <label value="This is just plain text."/>
-  <description>
-    This is a longer text inside a description tag.
-  </description>
-  <textbox id="editBox" value="Type some text!"/>
+  <hbox>
+    <button id="okButton" label="OK" disabled="true"/>
+    <label value="This is just plain text."/>
+    <description>
+      This is a longer text inside a description tag.
+    </description>
+    <textbox id="editBox" value="Type some text!"/>
+  </hbox>
 </window>

@@ -1,4 +1,4 @@
- /* The smooth Class Library
+/* The smooth Class Library
   * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
@@ -114,6 +114,11 @@ namespace smooth
 			Bool				 EndsWith(const char *) const;
 			Bool				 EndsWith(const wchar_t *) const;
 			Bool				 EndsWith(const String &) const;
+
+			String				 SubString(Int, Int) const;
+
+			String				 Head(Int) const;
+			String				 Tail(Int) const;
 
 			String				&Fill(const Int);
 			String				&FillN(const Int, const Int);

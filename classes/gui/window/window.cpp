@@ -1019,6 +1019,8 @@ S::Void *S::GUI::Window::GetSystemWindow() const
 
 S::Void S::GUI::Window::OpenPopupMenu()
 {
+	if (trackMenu != NIL) ClosePopupMenu();
+
 	Point	 position = GetMousePosition();
 
 	trackMenu = getTrackMenu.Call(position.x, position.y);

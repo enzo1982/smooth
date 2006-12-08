@@ -39,10 +39,11 @@ RSC=rc.exe
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
-# PROP Intermediate_Dir "Release"
+# PROP Intermediate_Dir "smooth___Win32_Release"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SMOOTH_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SMOOTH_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /MT /W1 /GX /O2 /I "../include" /D "WIN32" /D "__WIN32__" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "__SMOOTH_DLL__" /D "UNICODE" /D "_UNICODE" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
@@ -52,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
+# ADD LINK32 fribidi.lib libbz2.lib lisa.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /machine:I386 /nodefaultlib /libpath:"Release"
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
@@ -63,7 +64,7 @@ LINK32=link.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Build"
+# PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "smooth___Win32_Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
@@ -79,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 fribidi.lib libbz2.lib lisa.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Build"
+# ADD LINK32 fribidi.lib libbz2.lib lisa.lib libxml.lib iconv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib imm32.lib libc.lib oldnames.lib /nologo /dll /debug /machine:I386 /nodefaultlib /pdbtype:sept /libpath:"Debug"
 # SUBTRACT LINK32 /verbose /pdb:none /incremental:no /map
 
 !ENDIF 
@@ -100,18 +101,54 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\classes\basic\input.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\basic\object.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\basic\objecttype.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\basic\setup.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "backends"
@@ -123,15 +160,7 @@ SOURCE=..\classes\basic\setup.cpp
 # Begin Source File
 
 SOURCE=..\classes\backends\sdl\backendsdl.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Group "backendswin32"
@@ -140,6 +169,15 @@ SOURCE=..\classes\backends\sdl\backendsdl.cpp
 # Begin Source File
 
 SOURCE=..\classes\backends\win32\backendwin32.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "backendsxlib"
@@ -148,20 +186,21 @@ SOURCE=..\classes\backends\win32\backendwin32.cpp
 # Begin Source File
 
 SOURCE=..\classes\backends\xlib\backendxlib.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\backends\backend.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "graphics"
@@ -176,10 +215,28 @@ SOURCE=..\classes\backends\backend.cpp
 # Begin Source File
 
 SOURCE=..\classes\graphics\backends\gdi\bitmapgdi.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\backends\gdi\surfacegdi.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "graphicsxlib"
@@ -188,37 +245,39 @@ SOURCE=..\classes\graphics\backends\gdi\surfacegdi.cpp
 # Begin Source File
 
 SOURCE=..\classes\graphics\backends\xlib\bitmapxlib.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\backends\xlib\surfacexlib.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\graphics\backends\bitmapbackend.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\backends\surfacebackend.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "forms"
@@ -227,22 +286,67 @@ SOURCE=..\classes\graphics\backends\surfacebackend.cpp
 # Begin Source File
 
 SOURCE=..\classes\graphics\forms\form.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\forms\line.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\forms\point.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\forms\rect.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\forms\size.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "imageloader"
@@ -251,27 +355,81 @@ SOURCE=..\classes\graphics\forms\size.cpp
 # Begin Source File
 
 SOURCE=..\classes\graphics\imageloader\imageloader.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\imageloader\pci.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\graphics\bitmap.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\color.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\font.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\graphics\surface.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "files"
@@ -280,10 +438,28 @@ SOURCE=..\classes\graphics\surface.cpp
 # Begin Source File
 
 SOURCE=..\classes\files\directory.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\files\file.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "xml"
@@ -295,12 +471,27 @@ SOURCE=..\classes\files\file.cpp
 # Begin Source File
 
 SOURCE=..\classes\xml\xul\box.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_XUL"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\xml\xul\button.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
+
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
@@ -315,6 +506,9 @@ SOURCE=..\classes\xml\xul\description.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
+
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Intermediate_Dir "smooth___Win32_Debug_XUL"
@@ -327,6 +521,9 @@ SOURCE=..\classes\xml\xul\description.cpp
 SOURCE=..\classes\xml\xul\label.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
+
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
@@ -341,6 +538,9 @@ SOURCE=..\classes\xml\xul\menubar.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
+
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Intermediate_Dir "smooth___Win32_Debug_XUL"
@@ -353,6 +553,9 @@ SOURCE=..\classes\xml\xul\menubar.cpp
 SOURCE=..\classes\xml\xul\popupmenu.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
+
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
@@ -367,6 +570,9 @@ SOURCE=..\classes\xml\xul\renderer.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
+
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Intermediate_Dir "smooth___Win32_Debug_XUL"
@@ -377,12 +583,27 @@ SOURCE=..\classes\xml\xul\renderer.cpp
 # Begin Source File
 
 SOURCE=..\classes\xml\xul\textbox.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+# PROP Intermediate_Dir "smooth___Win32_Debug_XUL"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\xml\xul\widget.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
+
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
@@ -397,6 +618,9 @@ SOURCE=..\classes\xml\xul\window.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
 
+# PROP Intermediate_Dir "smooth___Win32_Release_XUL"
+# ADD CPP /D "__WIN32__"
+
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
 # PROP Intermediate_Dir "smooth___Win32_Debug_XUL"
@@ -408,14 +632,41 @@ SOURCE=..\classes\xml\xul\window.cpp
 # Begin Source File
 
 SOURCE=..\classes\xml\attribute.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\xml\document.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\xml\node.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "threads"
@@ -430,41 +681,17 @@ SOURCE=..\classes\xml\node.cpp
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\posix\mutexposix.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\posix\semaphoreposix.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\posix\threadposix.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Group "threadssdl"
@@ -473,41 +700,17 @@ SOURCE=..\classes\threads\backends\posix\threadposix.cpp
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\sdl\mutexsdl.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\sdl\semaphoresdl.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\sdl\threadsdl.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Group "threadswin32"
@@ -516,40 +719,121 @@ SOURCE=..\classes\threads\backends\sdl\threadsdl.cpp
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\win32\mutexwin32.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\win32\semaphorewin32.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\win32\threadwin32.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\mutexbackend.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\semaphorebackend.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\backends\threadbackend.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\threads\mutex.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\semaphore.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\threads\thread.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "system"
@@ -564,15 +848,7 @@ SOURCE=..\classes\threads\thread.cpp
 # Begin Source File
 
 SOURCE=..\classes\system\backends\sdl\timersdl.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Group "systemwin32"
@@ -581,38 +857,103 @@ SOURCE=..\classes\system\backends\sdl\timersdl.cpp
 # Begin Source File
 
 SOURCE=..\classes\system\backends\win32\eventwin32.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\system\backends\win32\timerwin32.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\system\backends\eventbackend.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\system\backends\timerbackend.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\system\console.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\system\dynamicloader.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\system\event.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\system\multimonitor.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D WINVER=0x0500
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
@@ -624,10 +965,28 @@ SOURCE=..\classes\system\multimonitor.cpp
 # Begin Source File
 
 SOURCE=..\classes\system\system.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\system\timer.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "gui"
@@ -639,34 +998,106 @@ SOURCE=..\classes\system\timer.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\dialogs\colordlg.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /Od /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\dialogs\dialog.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\dialogs\dirdlg.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\dialogs\filedlg.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\dialogs\fontdlg.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\dialogs\messagebox.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\dialogs\splashscreen.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\dialogs\tipodaydlg.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "widgets"
@@ -678,78 +1109,249 @@ SOURCE=..\classes\gui\dialogs\tipodaydlg.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\activearea.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\arrows.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\button.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\checkbox.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\client.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\divider.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\editbox.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\groupbox.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\hyperlink.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\image.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\multiedit.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\optionbox.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\progressbar.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\scrollbar.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\slider.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\statusbar.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\tabwidget.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\text.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\basic\titlebar.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "multi"
@@ -761,22 +1363,67 @@ SOURCE=..\classes\gui\widgets\basic\titlebar.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\list\combobox.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\list\list.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\list\listbox.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\list\listboxheader.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\list\listentry.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "menu"
@@ -785,30 +1432,93 @@ SOURCE=..\classes\gui\widgets\multi\list\listentry.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\menu\menu.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\menu\menubar.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\menu\menubarentry.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\menu\menuentry.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\menu\micromenu.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\menu\popupmenu.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\multi\menu\popupmenuentry.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # End Group
@@ -818,22 +1528,67 @@ SOURCE=..\classes\gui\widgets\multi\menu\popupmenuentry.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\special\cursor.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\special\dragcontrol.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\special\droparea.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\special\shortcut.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\special\tooltip.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "hotspot"
@@ -842,19 +1597,55 @@ SOURCE=..\classes\gui\widgets\special\tooltip.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\hotspot\hotspot.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\hotspot\simplebutton.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\layer.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\widgets\widget.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "window"
@@ -869,15 +1660,7 @@ SOURCE=..\classes\gui\widgets\widget.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\window\backends\xlib\windowxlib.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Group "windowgdi"
@@ -886,20 +1669,56 @@ SOURCE=..\classes\gui\window\backends\xlib\windowxlib.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\window\backends\gdi\windowgdi.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\gui\window\backends\windowbackend.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\gui\window\toolwindow.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\window\window.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "mdi"
@@ -910,6 +1729,9 @@ SOURCE=..\classes\gui\window\window.cpp
 SOURCE=..\classes\gui\mdi\client.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
+
+# PROP Intermediate_Dir "smooth___Win32_Release_MDI"
+# ADD CPP /D "__WIN32__"
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
@@ -923,6 +1745,9 @@ SOURCE=..\classes\gui\mdi\client.cpp
 SOURCE=..\classes\gui\mdi\window.cpp
 
 !IF  "$(CFG)" == "smooth - Win32 Release"
+
+# PROP Intermediate_Dir "smooth___Win32_Release_MDI"
+# ADD CPP /D "__WIN32__"
 
 !ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
 
@@ -938,10 +1763,28 @@ SOURCE=..\classes\gui\mdi\window.cpp
 # Begin Source File
 
 SOURCE=..\classes\gui\application\application.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\gui\application\background.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # End Group
@@ -954,38 +1797,119 @@ SOURCE=..\classes\gui\application\background.cpp
 # Begin Source File
 
 SOURCE=..\classes\io\drivers\driver_ansi.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\drivers\driver_https.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\drivers\driver_memory.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\drivers\driver_posix.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\drivers\driver_socket.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\drivers\driver_socks4.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\drivers\driver_socks5.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\drivers\driver_win32.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\drivers\driver_zero.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "filters"
@@ -994,31 +1918,94 @@ SOURCE=..\classes\io\drivers\driver_zero.cpp
 # Begin Source File
 
 SOURCE=..\classes\io\filters\filter_bzip2.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\filters\filter_xor.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\io\driver.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\filter.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\instream.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\outstream.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\io\stream.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "misc"
@@ -1027,30 +2014,93 @@ SOURCE=..\classes\io\stream.cpp
 # Begin Source File
 
 SOURCE=..\classes\misc\args.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\misc\binary.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\misc\config.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\misc\datetime.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\misc\math.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\misc\memory.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\misc\string.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "i18n"
@@ -1059,6 +2109,15 @@ SOURCE=..\classes\misc\string.cpp
 # Begin Source File
 
 SOURCE=..\classes\i18n\i18n.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "errors"
@@ -1070,10 +2129,28 @@ SOURCE=..\classes\i18n\i18n.cpp
 # Begin Source File
 
 SOURCE=..\classes\errors\fs\endoffile.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\errors\fs\filenotfound.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "miscerrors"
@@ -1082,15 +2159,42 @@ SOURCE=..\classes\errors\fs\filenotfound.cpp
 # Begin Source File
 
 SOURCE=..\classes\errors\misc\permissiondenied.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\classes\errors\error.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\classes\errors\success.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # End Group
@@ -1100,18 +2204,54 @@ SOURCE=..\classes\errors\success.cpp
 # Begin Source File
 
 SOURCE=..\misc\codecs.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\misc\loop.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\misc\pciio.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\misc\templates.cpp
+
+!IF  "$(CFG)" == "smooth - Win32 Release"
+
+# ADD CPP /D "__WIN32__"
+
+!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # End Group
@@ -1166,15 +2306,7 @@ SOURCE=..\include\smooth\templates\array\array.h
 # Begin Source File
 
 SOURCE=..\include\smooth\templates\array\backend.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -1191,15 +2323,7 @@ SOURCE=..\include\smooth\templates\array\entry.h
 # Begin Source File
 
 SOURCE=..\include\smooth\templates\extended\extended.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -1272,15 +2396,7 @@ SOURCE=..\include\smooth\templates\slots\slotr_value.h
 # Begin Source File
 
 SOURCE=..\include\smooth\templates\buffer\buffer.cpp
-
-!IF  "$(CFG)" == "smooth - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "smooth - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 

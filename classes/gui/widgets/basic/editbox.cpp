@@ -141,6 +141,11 @@ S::Void S::GUI::EditBox::OnSelectListEntry(ListEntry *entry)
 	onInput.Emit(cursor->GetText());
 }
 
+S::Int S::GUI::EditBox::SetCursorPos(Int nPos)
+{
+	return cursor->SetCursorPos(nPos);
+}
+
 S::Int S::GUI::EditBox::GetCursorPos()
 {
 	return cursor->GetCursorPos();

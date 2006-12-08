@@ -1,4 +1,4 @@
- /* The smooth Class Library
+/* The smooth Class Library
   * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
@@ -1062,6 +1062,25 @@ S::Bool S::String::EndsWith(const String &str) const
 	}
 
 	return False;
+}
+
+S::String S::String::SubString(Int start, Int number) const
+{
+	String	 subString;
+
+	for (Int i = 0; i < number; i++) subString[i] = (*this)[start + i];
+
+	return subString;
+}
+
+S::String S::String::Head(Int n) const
+{
+	return SubString(0, n);
+}
+
+S::String S::String::Tail(Int n) const
+{
+	return SubString(Length() - n, n);
 }
 
 S::String &S::String::Fill(const Int value)

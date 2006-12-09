@@ -11,26 +11,32 @@
 #include <smooth/graphics/font.h>
 #include <smooth/misc/math.h>
 
-S::GUI::Font::Font(const String &iFontName, Int iFontSize, Int iFontColor, Int iFontWeight, Bool iFontItalic, Bool iFontUnderline, Bool iFontStrikeOut)
+S::String S::GUI::Font::Default		= "default";
+S::Int	  S::GUI::Font::DefaultSize	= 8;
+
+S::Int	  S::GUI::Font::Normal		= 0;
+S::Int	  S::GUI::Font::Bold		= 1;
+
+S::Int	  S::GUI::Font::Italic		= 2;
+S::Int	  S::GUI::Font::Underline	= 4;
+S::Int	  S::GUI::Font::StrikeOut	= 8;
+
+S::GUI::Font::Font(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, Int iFontColor)
 {
-	fontName	= iFontName;
-	fontSize	= iFontSize;
-	fontColor	= iFontColor;
-	fontWeight	= iFontWeight;
-	fontItalic	= iFontItalic;
-	fontUnderline	= iFontUnderline;
-	fontStrikeOut	= iFontStrikeOut;
+	fontName   = iFontName;
+	fontSize   = iFontSize;
+	fontColor  = iFontColor;
+	fontWeight = iFontWeight;
+	fontStyle  = iFontStyle;
 }
 
 S::GUI::Font::Font(const Font &iFont)
 {
-	fontName	= iFont.fontName;
-	fontSize	= iFont.fontSize;
-	fontColor	= iFont.fontColor;
-	fontWeight	= iFont.fontWeight;
-	fontItalic	= iFont.fontItalic;
-	fontUnderline	= iFont.fontUnderline;
-	fontStrikeOut	= iFont.fontStrikeOut;
+	fontName   = iFont.fontName;
+	fontSize   = iFont.fontSize;
+	fontColor  = iFont.fontColor;
+	fontWeight = iFont.fontWeight;
+	fontStyle  = iFont.fontStyle;
 }
 
 S::GUI::Font::~Font()
@@ -39,39 +45,28 @@ S::GUI::Font::~Font()
 
 S::GUI::Font &S::GUI::Font::operator =(const Font &newFont)
 {
-	fontName	= newFont.fontName;
-	fontSize	= newFont.fontSize;
-	fontColor	= newFont.fontColor;
-	fontWeight	= newFont.fontWeight;
-	fontItalic	= newFont.fontItalic;
-	fontUnderline	= newFont.fontUnderline;
-	fontStrikeOut	= newFont.fontStrikeOut;
+	fontName   = newFont.fontName;
+	fontSize   = newFont.fontSize;
+	fontColor  = newFont.fontColor;
+	fontWeight = newFont.fontWeight;
+	fontStyle  = newFont.fontStyle;
 
 	return *this;
 }
 
 S::Bool S::GUI::Font::operator ==(const Font &font) const
 {
-	if (fontName == font.fontName		&&
-	    fontSize == font.fontSize		&&
-	    fontColor == font.fontColor		&&
-	    fontWeight == font.fontWeight	&&
-	    fontItalic == font.fontItalic	&&
-	    fontUnderline == font.fontUnderline	&&
-	    fontStrikeOut == font.fontStrikeOut)	return True;
-	else						return False;
+	if (fontName   == font.fontName	  &&
+	    fontSize   == font.fontSize	  &&
+	    fontColor  == font.fontColor  &&
+	    fontWeight == font.fontWeight &&
+	    fontStyle  == font.fontStyle) return True;
+	else				  return False;
 }
 
 S::Bool S::GUI::Font::operator !=(const Font &font) const
 {
-	if (fontName != font.fontName		||
-	    fontSize != font.fontSize		||
-	    fontColor != font.fontColor		||
-	    fontWeight != font.fontWeight	||
-	    fontItalic != font.fontItalic	||
-	    fontUnderline != font.fontUnderline	||
-	    fontStrikeOut != font.fontStrikeOut)	return True;
-	else						return False;
+	return !(*this == font);
 }
 
 S::Int S::GUI::Font::SetName(const String &newFontName)
@@ -102,23 +97,9 @@ S::Int S::GUI::Font::SetWeight(Int newFontWeight)
 	return Success();
 }
 
-S::Int S::GUI::Font::SetItalic(Bool newFontItalic)
+S::Int S::GUI::Font::SetStyle(Int newFontStyle)
 {
-	fontItalic = newFontItalic;
-
-	return Success();
-}
-
-S::Int S::GUI::Font::SetUnderline(Bool newFontUnderline)
-{
-	fontUnderline = newFontUnderline;
-
-	return Success();
-}
-
-S::Int S::GUI::Font::SetStrikeOut(Bool newFontStrikeOut)
-{
-	fontStrikeOut = newFontStrikeOut;
+	fontStyle = newFontStyle;
 
 	return Success();
 }
@@ -143,19 +124,9 @@ S::Int S::GUI::Font::GetWeight() const
 	return fontWeight;
 }
 
-S::Bool S::GUI::Font::GetItalic() const
+S::Int S::GUI::Font::GetStyle() const
 {
-	return fontItalic;
-}
-
-S::Bool S::GUI::Font::GetUnderline() const
-{
-	return fontUnderline;
-}
-
-S::Bool S::GUI::Font::GetStrikeOut() const
-{
-	return fontStrikeOut;
+	return fontStyle;
 }
 
 S::Int S::GUI::Font::GetTextSizeX(const String &text) const
@@ -220,8 +191,8 @@ S::Int S::GUI::Font::GetLineSizeX(const String &text, Int nOfChars) const
 	HFONT	 hFont;
 	HFONT	 hOldFont;
 
-	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
-	else				hFont = CreateFontA(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, (fontWeight == Font::Bold) ? FW_BOLD : FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	else				hFont = CreateFontA(size, 0, 0, 0, (fontWeight == Font::Bold) ? FW_BOLD : FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
 
 	hOldFont = (HFONT) SelectObject(cdc, hFont);
 
@@ -268,8 +239,8 @@ S::Int S::GUI::Font::GetLineSizeY(const String &text) const
 	HFONT	 hFont;
 	HFONT	 hOldFont;
 
-	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
-	else				hFont = CreateFontA(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, (fontWeight == Font::Bold) ? FW_BOLD : FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	else				hFont = CreateFontA(size, 0, 0, 0, (fontWeight == Font::Bold) ? FW_BOLD : FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
 
 	hOldFont = (HFONT) SelectObject(cdc, hFont);
 

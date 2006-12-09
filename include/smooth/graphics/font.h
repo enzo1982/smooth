@@ -24,11 +24,6 @@ namespace smooth
 
 namespace smooth
 {
-#ifndef __WIN32__
-	const Int	 FW_NORMAL	= 400;
-	const Int	 FW_BOLD	= 700;
-#endif
-
 	namespace GUI
 	{
 		class SMOOTHAPI Font
@@ -38,11 +33,19 @@ namespace smooth
 				Int		 fontSize;
 				Int		 fontColor;
 				Int		 fontWeight;
-				Bool		 fontItalic;
-				Bool		 fontUnderline;
-				Bool		 fontStrikeOut;
+				Int		 fontStyle;
+			constants:
+				static String	 Default;
+				static Int	 DefaultSize;
+
+				static Int	 Normal;
+				static Int	 Bold;
+
+				static Int	 Italic;
+				static Int	 Underline;
+				static Int	 StrikeOut;
 			public:
-						 Font(const String & = I18N_DEFAULTFONT, Int = I18N_DEFAULTFONTSIZE, Int = 0, Int = FW_NORMAL, Bool = 0, Bool = 0, Bool = 0);
+						 Font(const String & = Font::Default, Int = Font::DefaultSize, Int = Font::Normal, Int = Font::Normal, Int = 0);
 						 Font(const Font &);
 				virtual		~Font();
 
@@ -54,17 +57,13 @@ namespace smooth
 				Int		 SetSize(Int);
 				Int		 SetColor(Int);
 				Int		 SetWeight(Int);
-				Int		 SetItalic(Bool);
-				Int		 SetUnderline(Bool);
-				Int		 SetStrikeOut(Bool);
+				Int		 SetStyle(Int);
 
 				const String	&GetName() const;
 				Int		 GetSize() const;
 				Int		 GetColor() const;
 				Int		 GetWeight() const;
-				Bool		 GetItalic() const;
-				Bool		 GetUnderline() const;
-				Bool		 GetStrikeOut() const;
+				Int		 GetStyle() const;
 
 				Int		 GetLineSizeX(const String &, Int) const;
 				Int		 GetLineSizeY(const String &) const;

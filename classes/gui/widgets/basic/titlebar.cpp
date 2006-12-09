@@ -25,7 +25,7 @@ S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
 	orientation	= OR_TOP;
 	subtype		= WO_NOSEPARATOR;
 
-	font.SetWeight(FW_BOLD);
+	font.SetWeight(Font::Bold);
 
 	minHotspot	= new HotspotSimpleButton(Point(37, 5), Size(11, 11));
 	minHotspot->SetOrientation(OR_UPPERRIGHT);

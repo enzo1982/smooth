@@ -115,7 +115,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	msgbox->SetSize(Size(maxsize + 34 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0), (((Int) Math::Max(2, lines) + 1) * 16) + 68 + buttonHeight));
 
-	Font	 tbFont(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, 0, FW_BOLD);
+	Font	 tbFont(Font::Default, Font::DefaultSize, Font::Bold);
 
 	titlesize = tbFont.GetTextSizeX(title);
 

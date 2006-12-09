@@ -128,43 +128,43 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 
 	huetext		= new Text(I18n::Translator::defaultTranslator->TranslateString("H"), bp);
 	huetext->SetOrientation(OR_UPPERRIGHT);
-	huetext->SetFont(Font(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, Setup::TextColor));
+	huetext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Setup::TextColor));
 
 	bp.y += 26;
 
 	sattext		= new Text(I18n::Translator::defaultTranslator->TranslateString("S"), bp);
 	sattext->SetOrientation(OR_UPPERRIGHT);
-	sattext->SetFont(Font(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, Setup::TextColor));
+	sattext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Setup::TextColor));
 
 	bp.y += 26;
 
 	valtext		= new Text(I18n::Translator::defaultTranslator->TranslateString("V"), bp);
 	valtext->SetOrientation(OR_UPPERRIGHT);
-	valtext->SetFont(Font(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, Setup::TextColor));
+	valtext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Setup::TextColor));
 
 	bp.y += 26;
 
 	redtext		= new Text(I18n::Translator::defaultTranslator->TranslateString("R"), bp);
 	redtext->SetOrientation(OR_UPPERRIGHT);
-	redtext->SetFont(Font(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, RGB(255, 0, 0)));
+	redtext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, RGB(255, 0, 0)));
 
 	bp.y += 26;
 
 	greentext	= new Text(I18n::Translator::defaultTranslator->TranslateString("G"), bp);
 	greentext->SetOrientation(OR_UPPERRIGHT);
-	greentext->SetFont(Font(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, RGB(0, 160, 0)));
+	greentext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, RGB(0, 160, 0)));
 
 	bp.y += 26;
 
 	bluetext	= new Text(I18n::Translator::defaultTranslator->TranslateString("B"), bp);
 	bluetext->SetOrientation(OR_UPPERRIGHT);
-	bluetext->SetFont(Font(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, RGB(0, 0, 255)));
+	bluetext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, RGB(0, 0, 255)));
 
 	bp.y += 26;
 
 	hextext		= new Text(I18n::Translator::defaultTranslator->TranslateString("HTML code"), bp);
 	hextext->SetOrientation(OR_UPPERRIGHT);
-	hextext->SetFont(Font(I18N_DEFAULTFONT, I18N_DEFAULTFONTSIZE, Setup::TextColor));
+	hextext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Setup::TextColor));
 
 	bp.x = 37;
 	bp.y = 34;

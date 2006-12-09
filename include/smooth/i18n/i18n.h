@@ -16,9 +16,6 @@
 
 namespace smooth
 {
-	SMOOTHVAR Int	 I18N_DEFAULTFONTSIZE;
-	SMOOTHVAR String I18N_DEFAULTFONT;
-
 	namespace I18n
 	{
 		class SMOOTHAPI Language

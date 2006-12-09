@@ -86,7 +86,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	pos.y = 7;
 
 	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), pos);
-	txt_didyouknow->SetFont(Font("Verdana", 14, 0, FW_BOLD));
+	txt_didyouknow->SetFont(Font("Verdana", 14, Font::Bold));
 
 	pos.x = 7;
 

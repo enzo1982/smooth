@@ -35,6 +35,7 @@ namespace smooth
 	extern int	 peekLoop;
 
 	Void	 GetColors();
+	Void	 GetDefaultFont();
 #endif
 };
 

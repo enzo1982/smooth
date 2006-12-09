@@ -816,7 +816,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 			lFont.lfWidth		= 0;
 			lFont.lfEscapement	= 0;
 			lFont.lfOrientation	= 0;
-			lFont.lfWeight		= font.GetWeight();
+			lFont.lfWeight		= (font.GetWeight() == Font::Bold) ? FW_BOLD : FW_NORMAL;
 			lFont.lfItalic		= false;
 			lFont.lfUnderline	= false;
 			lFont.lfStrikeOut	= false;
@@ -838,7 +838,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 			lFont.lfWidth		= 0;
 			lFont.lfEscapement	= 0;
 			lFont.lfOrientation	= 0;
-			lFont.lfWeight		= font.GetWeight();
+			lFont.lfWeight		= (font.GetWeight() == Font::Bold) ? FW_BOLD : FW_NORMAL;
 			lFont.lfItalic		= false;
 			lFont.lfUnderline	= false;
 			lFont.lfStrikeOut	= false;

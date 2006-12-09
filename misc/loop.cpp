@@ -8,14 +8,11 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/definitions.h>
 #include <smooth/loop.h>
 #include <smooth/resources.h>
-#include <smooth/threads/thread.h>
 #include <smooth/backends/backend.h>
+#include <smooth/threads/thread.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/graphics/color.h>
-#include <smooth/i18n/i18n.h>
 #include <smooth/gui/application/background.h>
 #include <smooth/system/event.h>
 #include <smooth/system/multimonitor.h>
@@ -38,6 +35,18 @@ __declspec (dllexport) S::String	 S::szCmdLine		= NIL;
 __declspec (dllexport) int		 S::iCmdShow		= 0;
 
 __declspec (dllexport) HICON	 S::SMOOTHICON = NIL;
+
+int CALLBACK EnumFontProcA(ENUMLOGFONTEXA *lpelfe, NEWTEXTMETRICEXA *lpntme, int fontType, LPARAM lParam)
+{
+	if (S::String(lpelfe->elfLogFont.lfFaceName) == "Microsoft Sans Serif")	return 0;
+	else									return 1;
+}
+
+int CALLBACK EnumFontProcW(ENUMLOGFONTEXW *lpelfe, NEWTEXTMETRICEXW *lpntme, int fontType, LPARAM lParam)
+{
+	if (S::String(lpelfe->elfLogFont.lfFaceName) == "Microsoft Sans Serif")	return 0;
+	else									return 1;
+}
 #endif
 
 namespace smooth
@@ -91,6 +100,7 @@ S::Void S::Init()
 #endif
 
 	GetColors();
+	GetDefaultFont();
 
 	I18n::Translator::defaultTranslator = new I18n::Translator("smooth", True);
 	I18n::Translator::defaultTranslator->SetInternalLanguageInfo("English", "Robert Kausch", "http://www.smooth-project.org/", False);
@@ -165,6 +175,35 @@ S::Void S::GetColors()
 	Setup::LightGrayColor			= RGB(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
 	Setup::TooltipColor			= GetSysColor(COLOR_INFOBK);
 	Setup::TooltipTextColor			= GetSysColor(COLOR_INFOTEXT);
+#endif
+}
+
+S::Void S::GetDefaultFont()
+{
+#ifdef __WIN32__
+	HDC		 dc = GetWindowDC(0);
+	LOGFONTA	 fontInfoA;
+	LOGFONTW	 fontInfoW;
+
+	fontInfoA.lfCharSet = DEFAULT_CHARSET;
+	fontInfoA.lfFaceName[0] = 0;
+	fontInfoA.lfPitchAndFamily = 0;
+
+	fontInfoW.lfCharSet = DEFAULT_CHARSET;
+	fontInfoW.lfFaceName[0] = 0;
+	fontInfoW.lfPitchAndFamily = 0;
+
+	int	 result;
+
+	if (Setup::enableUnicode)	result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
+	else				result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);
+
+	if (result == 0)	GUI::Font::Default = "Microsoft Sans Serif";
+	else			GUI::Font::Default = "MS Sans Serif";
+
+	ReleaseDC(0, dc);
+#else
+	GUI::Font::Default = "Helvetica";
 #endif
 }
 

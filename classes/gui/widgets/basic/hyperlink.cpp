@@ -26,7 +26,7 @@ S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const St
 
 	linkBitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
-	font.SetUnderline(True);
+	font.SetStyle(Font::Underline);
 	font.SetColor(Color(0, 0, 255));
 
 	if (linkBitmap != NIL)

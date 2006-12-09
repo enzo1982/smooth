@@ -61,20 +61,16 @@ const Error &S::GUI::Dialogs::FontSelection::ShowDialog()
 		{
 			font.SetName(lfw.lfFaceName);
 			font.SetSize(cfw.iPointSize);
-			font.SetWeight(lfw.lfWeight);
-			font.SetItalic(lfw.lfItalic);
-			font.SetUnderline(lfw.lfUnderline);
-			font.SetStrikeOut(lfw.lfStrikeOut);
+			font.SetWeight(lfw.lfWeight == FW_BOLD ? Font::Bold : Font::Normal);
+			font.SetStyle((lfw.lfItalic ? Font::Italic : Font::Normal) | (lfw.lfUnderline ? Font::Underline : Font::Normal) | (lfw.lfStrikeOut ? Font::StrikeOut : Font::Normal));
 			font.SetColor(cfw.rgbColors);
 		}
 		else
 		{
 			font.SetName(lfa.lfFaceName);
 			font.SetSize(cfa.iPointSize);
-			font.SetWeight(lfa.lfWeight);
-			font.SetItalic(lfa.lfItalic);
-			font.SetUnderline(lfa.lfUnderline);
-			font.SetStrikeOut(lfa.lfStrikeOut);
+			font.SetWeight(lfa.lfWeight == FW_BOLD ? Font::Bold : Font::Normal);
+			font.SetStyle((lfa.lfItalic ? Font::Italic : Font::Normal) | (lfa.lfUnderline ? Font::Underline : Font::Normal) | (lfa.lfStrikeOut ? Font::StrikeOut : Font::Normal));
 			font.SetColor(cfa.rgbColors);
 		}
 	}

@@ -24,7 +24,7 @@ S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 	listBox		= NIL;
 	toolWindow	= NIL;
 
-	SetFont(Font(font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
+	SetFont(Font(font.GetName(), Font::DefaultSize, Font::Normal, Font::Normal, Setup::ClientTextColor));
 
 	SetMetrics(iPos, iSize);
 

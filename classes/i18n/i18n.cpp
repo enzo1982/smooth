@@ -24,66 +24,9 @@
 
 S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
 
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::Int S::I18N_DEFAULTFONTSIZE;
-
-#ifdef __WIN32__
-__declspec (dllexport)
-#endif
-
-S::String S::I18N_DEFAULTFONT;
-
-#ifdef __WIN32__
-int CALLBACK EnumFontProcA(ENUMLOGFONTEXA *lpelfe, NEWTEXTMETRICEXA *lpntme, int fontType, LPARAM lParam)
-{
-	if (S::String(lpelfe->elfLogFont.lfFaceName) == "Microsoft Sans Serif")	return 0;
-	else									return 1;
-}
-
-int CALLBACK EnumFontProcW(ENUMLOGFONTEXW *lpelfe, NEWTEXTMETRICEXW *lpntme, int fontType, LPARAM lParam)
-{
-	if (S::String(lpelfe->elfLogFont.lfFaceName) == "Microsoft Sans Serif")	return 0;
-	else									return 1;
-}
-
-#endif
-
 S::I18n::Language::Language()
 {
 	rightToLeft = False;
-
-	// get the default font
-
-#ifdef __WIN32__
-	HDC		 dc = GetWindowDC(0);
-	LOGFONTA	 fontInfoA;
-	LOGFONTW	 fontInfoW;
-
-	fontInfoA.lfCharSet = DEFAULT_CHARSET;
-	fontInfoA.lfFaceName[0] = 0;
-	fontInfoA.lfPitchAndFamily = 0;
-
-	fontInfoW.lfCharSet = DEFAULT_CHARSET;
-	fontInfoW.lfFaceName[0] = 0;
-	fontInfoW.lfPitchAndFamily = 0;
-
-	int	 result;
-
-	if (Setup::enableUnicode)	result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
-	else				result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);
-
-	if (result == 0)	I18N_DEFAULTFONT = "Microsoft Sans Serif";
-	else			I18N_DEFAULTFONT = "MS Sans Serif";
-
-	ReleaseDC(0, dc);
-#else
-	I18N_DEFAULTFONT = "Helvetica";
-#endif
-
-	I18N_DEFAULTFONTSIZE = 8;
 }
 
 S::I18n::Language::~Language()

@@ -120,6 +120,7 @@
 #define signals		public
 #define slots		public
 #define accessors	public
+#define constants	public
 
 #define abstract
 #define sealed

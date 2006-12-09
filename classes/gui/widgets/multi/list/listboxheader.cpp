@@ -23,7 +23,7 @@ S::GUI::ListBoxHeader::ListBoxHeader(const Point &iPos, const Size &iSize) : Wid
 
 	type		= classID;
 
-	font.SetWeight(FW_BOLD);
+	font.SetWeight(Font::Bold);
 
 	onChangeSize.Connect(&ListBoxHeader::OnChangeSize, this);
 }

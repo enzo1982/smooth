@@ -24,7 +24,7 @@ S::GUI::ListBox::ListBox(const Point &iPos, const Size &iSize)
 
 	visibleEntriesChecksum	= 0;
 
-	SetFont(Font(font.GetName(), I18N_DEFAULTFONTSIZE, Setup::ClientTextColor));
+	SetFont(Font(font.GetName(), Font::DefaultSize, Font::Normal, Font::Normal, Setup::ClientTextColor));
 
 	SetBackgroundColor(Setup::ClientColor);
 

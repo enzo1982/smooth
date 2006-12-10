@@ -526,6 +526,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			GetColors();
 
 			break;
+		case WM_NCPAINT:
+			// Intercept WM_NCPAINT, because we are painting the frame on our own
+			rVal = Break;
+
+			break;
 		case WM_PAINT:
 			{
 				RECT	 uRect = { 0, 0, 0, 0 };
@@ -873,6 +878,36 @@ S::Int S::GUI::Window::Paint(Int message)
 		surface->EndPaint();
 
 		onPaint.Emit();
+	}
+
+	// Now paint the frame if necessary. This is done to
+	// make smooth compatible with Vista's themed mode.
+
+	if (type != ToolWindow::classID)
+	{
+		if (updateRect.top == frameWidth)
+		{
+			surface->Line(Point(0, 0), Point(GetSize().cx - 1, 0), Setup::BackgroundColor);
+			surface->Line(Point(1, 1), Point(GetSize().cx - 2, 1), Color(255, 255, 255));
+		}
+
+		if (updateRect.left == frameWidth)
+		{
+			surface->Line(Point(0, 0), Point(0, GetSize().cy - 1), Setup::BackgroundColor);
+			surface->Line(Point(1, 1), Point(1, GetSize().cy - 2), Color(255, 255, 255));
+		}
+
+		if (updateRect.bottom == GetHeight() - frameWidth)
+		{
+			surface->Line(Point(GetSize().cx - 1, 0), Point(GetSize().cx - 1, GetSize().cy), Color(64, 64, 64));
+			surface->Line(Point(GetSize().cx - 2, 1), Point(GetSize().cx - 2, GetSize().cy - 1), Color(128, 128, 128));
+		}
+
+		if (updateRect.right == GetWidth() - frameWidth)
+		{
+			surface->Line(Point(0, GetSize().cy - 1), Point(GetSize().cx, GetSize().cy - 1), Color(64, 64, 64));
+			surface->Line(Point(1, GetSize().cy - 2), Point(GetSize().cx - 1, GetSize().cy - 2), Color(128, 128, 128));
+		}
 	}
 
 	LeaveProtectedRegion();

@@ -176,6 +176,9 @@ S::DateTime S::Directory::GetCreateTime()
 
 S::Bool S::Directory::Exists()
 {
+	// Check if root directory of a drive
+	if (dirPath[dirPath.Length() - 1] == ':' && dirName == NIL) return True;
+
 	HANDLE			 handle;
 	WIN32_FIND_DATAW	 findDataW;
 	WIN32_FIND_DATAA	 findDataA;

@@ -29,7 +29,7 @@ Designer::Designer()
 	dlgcounter = 1;
 	active_dlg = NIL;
 
-	wnd		= new Window(String("smooth Designer v").Append(SMOOTH_VERSION), Point(50, 50), Size(600, 85));
+	wnd		= new Window(String("smooth Designer v").Append(SMOOTH_VERSION), Point(50, 50), Size(600, 87));
 	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	iconbar		= new Menubar();

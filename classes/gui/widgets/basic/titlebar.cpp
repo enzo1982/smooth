@@ -254,7 +254,7 @@ S::Bool S::GUI::Titlebar::ButtonHitTest(const Point &mousePos)
 S::Bool S::GUI::Titlebar::DragHitTest(const Point &mousePos)
 {
 	Window	*window		= container->GetContainerWindow();
-	Rect	 titleFrame	= Rect(Point(0, 0), GetSize());
+	Rect	 titleFrame	= Rect(Point(0, 0), GetSize() - Size(1, 0));
 	Rect	 buttonRect	= Rect(Point(titleFrame.right - 39, 3), Size(34, 13));
 
 	if (window->GetIcon() != NIL) titleFrame.left += 18;

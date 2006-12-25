@@ -74,7 +74,7 @@ BeatClock::BeatClock()
 
 	wnd->SetIcon(ImageLoader::Load("beat.pci:0"));
 	wnd->onPaint.Connect(&BeatClock::PaintAll, this);
-	wnd->SetFlags(WF_TOPMOST | WF_NOTASKBUTTON);
+	wnd->SetFlags(WF_TOPMOST | WF_NOTASKBUTTON | WF_NORESIZE);
 	wnd->onEvent.Connect(&BeatClock::EventProc, this);
 	wnd->Show();
 
@@ -111,7 +111,7 @@ Void BeatClock::EventProc(Int message, Int wParam, Int lParam)
 
 Void BeatClock::Options()
 {
-	optionsdialog	= new Window("BeatClock Options", Point(100, 100), Size(397, 181));
+	optionsdialog	= new Window("BeatClock Options", Point(100, 100), Size(399, 183));
 	display		= new Layer("Display");
 	alarm		= new Layer("Alarm");
 	misc		= new Layer("Misc");
@@ -550,7 +550,7 @@ Void BeatClock::PaintAll()
 	int			 ccbeats = 0;
 	String			 btext = "@";
 	String			 btext2 = "@";
-	Font			 font("Arial", 21, RGB(0, 0, 0), FW_BOLD);
+	Font			 font("Arial", 21, Font::Bold, Color(0, 0, 0));
 
 	GetLocalTime(&time);
 	GetTimeZoneInformation(&tzi);

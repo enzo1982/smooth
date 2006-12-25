@@ -65,22 +65,25 @@ S::Int S::GUI::Divider::Paint(Int message)
 			{
 				Bool	 afterMe = False;
 
-				if (Binary::IsFlagSet(flags, OR_RIGHT))	doubleBar1.x = container->GetRealPosition().x + container->GetWidth() - position;
-				else					doubleBar1.x = container->GetRealPosition().x + position;
-
-				doubleBar2.x = doubleBar1.x;
-
 				if (container->GetObjectType() == Window::classID)
 				{
+					if (Binary::IsFlagSet(flags, OR_RIGHT))	doubleBar1.x = ((Window *) container)->GetClientRect().right - position;
+					else					doubleBar1.x = ((Window *) container)->GetClientRect().left + position;
+
 					doubleBar1.y = wnd->GetClientRect().top;
 					doubleBar2.y = wnd->GetClientRect().bottom;
 
 				}
 				else
 				{
-					doubleBar1.y = container->GetRealPosition().y + 4;
-					doubleBar2.y = container->GetRealPosition().y + container->GetHeight() - 4;
+					if (Binary::IsFlagSet(flags, OR_RIGHT))	doubleBar1.x = container->GetRealPosition().x + container->GetWidth() - position;
+					else					doubleBar1.x = container->GetRealPosition().x + position;
+
+					doubleBar1.y = container->GetRealPosition().y + 3;
+					doubleBar2.y = container->GetRealPosition().y + container->GetHeight() - 3;
 				}
+
+				doubleBar2.x = doubleBar1.x;
 
 				for (Int i = container->GetNOfObjects() - 1; i >= 0; i--)
 				{
@@ -107,21 +110,24 @@ S::Int S::GUI::Divider::Paint(Int message)
 			{
 				Bool	 afterMe = False;
 
-				if (Binary::IsFlagSet(flags, OR_BOTTOM)) doubleBar1.y = container->GetRealPosition().y + container->GetHeight() - position;
-				else					 doubleBar1.y = container->GetRealPosition().y + position;
-
-				doubleBar2.y = doubleBar1.y;
-
 				if (container->GetObjectType() == Window::classID)
 				{
-					doubleBar1.x = wnd->GetClientRect().left + 1;
-					doubleBar2.x = wnd->GetClientRect().right - 1;
+					if (Binary::IsFlagSet(flags, OR_BOTTOM)) doubleBar1.y = ((Window *) container)->GetClientRect().bottom - position;
+					else					 doubleBar1.y = ((Window *) container)->GetClientRect().top + position;
+
+					doubleBar1.x = wnd->GetClientRect().left;
+					doubleBar2.x = wnd->GetClientRect().right;
 				}
 				else
 				{
-					doubleBar1.x = container->GetRealPosition().x + 4;
-					doubleBar2.x = container->GetRealPosition().x + container->GetWidth() - 4;
+					if (Binary::IsFlagSet(flags, OR_BOTTOM)) doubleBar1.y = container->GetRealPosition().y + container->GetHeight() - position;
+					else					 doubleBar1.y = container->GetRealPosition().y + position;
+
+					doubleBar1.x = container->GetRealPosition().x + 3;
+					doubleBar2.x = container->GetRealPosition().x + container->GetWidth() - 3;
 				}
+
+				doubleBar2.y = doubleBar1.y;
 
 				for (Int i = container->GetNOfObjects() - 1; i >= 0; i--)
 				{

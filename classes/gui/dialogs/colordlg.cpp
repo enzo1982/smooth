@@ -69,10 +69,10 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	bs.cx = 0;
 	bs.cy = 0;
 
-	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Color selection"), Point(100, 100), Size(436, 286));
+	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Color selection"), Point(100, 100), Size(438, 288));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
-	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
+	divbar		= new Divider(39, OR_HORZ | OR_BOTTOM);
 
 	okbtn		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bp, bs);
 	okbtn->onAction.Connect(&ColorSelection::ColorDlgOK, this);

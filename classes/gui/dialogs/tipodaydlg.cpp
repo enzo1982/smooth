@@ -46,10 +46,10 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	Point	 pos;
 	Size	 size;
 
-	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"), Point(Int((LiSAGetDisplaySizeX() - 350) / 2), Int((LiSAGetDisplaySizeY() - 300) / 2) - 50), Size(350, 300));
+	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"), Point(Int((LiSAGetDisplaySizeX() - 350) / 2), Int((LiSAGetDisplaySizeY() - 300) / 2) - 50), Size(352, 302));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
-	divbar		= new Divider(42, OR_HORZ | OR_BOTTOM);
+	divbar		= new Divider(39, OR_HORZ | OR_BOTTOM);
 
 	pos.x = 87;
 	pos.y = 29;

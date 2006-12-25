@@ -113,6 +113,8 @@ namespace smooth
 				Rect				 GetClientRect() const;
 				Rect				 GetRestoredWindowRect() const;
 
+				Int				 GetFrameWidth()			{ return frameWidth; }
+
 				const Rect			&GetUpdateRect() const;
 				Int				 SetUpdateRect(const Rect &);
 

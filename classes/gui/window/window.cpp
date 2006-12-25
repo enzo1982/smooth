@@ -14,7 +14,6 @@
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/widgets/basic/statusbar.h>
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
-#include <smooth/gui/widgets/basic/divider.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/misc/math.h>
 #include <smooth/gui/window/toolwindow.h>
@@ -51,7 +50,7 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 	if (title != NIL)	text = title;
 	else			text = "smooth Application";
 
-	frameWidth = 2;
+	frameWidth = GetSystemMetrics(SM_CXFRAME);
 	updateRect = Rect(Point(-1, -1), Size(0, 0));
 
 	icon = NIL;
@@ -417,6 +416,8 @@ S::Bool S::GUI::Window::Create()
 			created = True;
 			visible = False;
 
+			if (flags & WF_NORESIZE) frameWidth = 4;
+
 			CalculateOffsets();
 
 			onCreate.Emit();
@@ -526,11 +527,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			GetColors();
 
 			break;
-		case WM_NCPAINT:
-			// Intercept WM_NCPAINT, because we are painting the frame on our own
-			rVal = Break;
-
-			break;
 		case WM_PAINT:
 			{
 				RECT	 uRect = { 0, 0, 0, 0 };
@@ -541,8 +537,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				{
 					updateRect = uRect;
 
-					updateRect.right += 5;
-					updateRect.bottom += 5;
+					updateRect.right += frameWidth;
+					updateRect.bottom += frameWidth;
 
 					PAINTSTRUCT	 ps;
 
@@ -760,10 +756,10 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	surface->SetRightToLeft(IsRightToLeft());
 
-	if (updateRect.left < frameWidth)			updateRect.left		= frameWidth;
-	if (updateRect.top < frameWidth)			updateRect.top		= frameWidth;
-	if (GetWidth() - updateRect.right < frameWidth)		updateRect.right	= GetWidth() - frameWidth;
-	if (GetHeight() - updateRect.bottom < frameWidth)	updateRect.bottom	= GetHeight() - frameWidth;
+	if (updateRect.left < frameWidth)		  updateRect.left   = frameWidth - 1;
+	if (updateRect.top < frameWidth)		  updateRect.top    = frameWidth - 1;
+	if (GetWidth() - updateRect.right < frameWidth)	  updateRect.right  = GetWidth() - frameWidth + 1;
+	if (GetHeight() - updateRect.bottom < frameWidth) updateRect.bottom = GetHeight() - frameWidth + 1;
 
 	if (message == SP_UPDATE)
 	{
@@ -783,7 +779,7 @@ S::Int S::GUI::Window::Paint(Int message)
 		{
 			Widget	*lastWidget = NIL;
 			Int	 bias = 0;
-			Int	 topoffset = 3;
+			Int	 topoffset = frameWidth;
 			Int	 rightobjcount = 0;
 			Int	 leftobjcount = 0;
 			Int	 btmobjcount = 0;
@@ -808,8 +804,8 @@ S::Int S::GUI::Window::Paint(Int message)
 
 						topoffset += object->GetHeight() + 3;
 
-						Point	 p1 = Point(4, topoffset - 2);
-						Point	 p2 = Point(GetWidth() - 4, p1.y);
+						Point	 p1 = Point(frameWidth + 1, topoffset - 2);
+						Point	 p2 = Point(GetWidth() - frameWidth, p1.y);
 
 						if (icon != NIL) p1.x += 17;
 
@@ -826,8 +822,8 @@ S::Int S::GUI::Window::Paint(Int message)
 
 			if (topobjcount > 0)
 			{
-				Point	 p1 = Point(4, innerOffset.top - 2 + bias);
-				Point	 p2 = Point(GetWidth() - 4, p1.y);
+				Point	 p1 = Point(frameWidth, innerOffset.top - 2 + bias);
+				Point	 p2 = Point(GetWidth() - frameWidth, p1.y);
 
 				if (lastWidget->subtype == WO_NOSEPARATOR) { p1.y -= 3; p2.y -= 3; }
 
@@ -837,8 +833,8 @@ S::Int S::GUI::Window::Paint(Int message)
 
 			if (btmobjcount > 0)
 			{
-				Point	 p1 = Point(4, GetHeight() - innerOffset.bottom);
-				Point	 p2 = Point(GetWidth() - 4, p1.y);
+				Point	 p1 = Point(frameWidth, GetHeight() - innerOffset.bottom);
+				Point	 p2 = Point(GetWidth() - frameWidth, p1.y);
 
 				surface->Bar(p1, p2, OR_HORZ);
 				surface->Bar(p1 + Point(0, 2), p2 + Point(0, 2), OR_HORZ);
@@ -880,36 +876,6 @@ S::Int S::GUI::Window::Paint(Int message)
 		onPaint.Emit();
 	}
 
-	// Now paint the frame if necessary. This is done to
-	// make smooth compatible with Vista's themed mode.
-
-	if (type != ToolWindow::classID)
-	{
-		if (updateRect.top == frameWidth)
-		{
-			surface->Line(Point(0, 0), Point(GetSize().cx - 1, 0), Setup::BackgroundColor);
-			surface->Line(Point(1, 1), Point(GetSize().cx - 2, 1), Color(255, 255, 255));
-		}
-
-		if (updateRect.left == frameWidth)
-		{
-			surface->Line(Point(0, 0), Point(0, GetSize().cy - 1), Setup::BackgroundColor);
-			surface->Line(Point(1, 1), Point(1, GetSize().cy - 2), Color(255, 255, 255));
-		}
-
-		if (updateRect.bottom == GetHeight() - frameWidth)
-		{
-			surface->Line(Point(GetSize().cx - 1, 0), Point(GetSize().cx - 1, GetSize().cy), Color(64, 64, 64));
-			surface->Line(Point(GetSize().cx - 2, 1), Point(GetSize().cx - 2, GetSize().cy - 1), Color(128, 128, 128));
-		}
-
-		if (updateRect.right == GetWidth() - frameWidth)
-		{
-			surface->Line(Point(0, GetSize().cy - 1), Point(GetSize().cx, GetSize().cy - 1), Color(64, 64, 64));
-			surface->Line(Point(1, GetSize().cy - 2), Point(GetSize().cx - 1, GetSize().cy - 2), Color(128, 128, 128));
-		}
-	}
-
 	LeaveProtectedRegion();
 
 	return Success();
@@ -924,7 +890,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 	Int	 topobjcount	= 0;
 
 	if (GetObjectType() == ToolWindow::classID)	innerOffset = Rect(Point(0, 0), Size(0, 0));
-	else						innerOffset = Rect(Point(3, 3), Size(0, 0));
+	else						innerOffset = Rect(Point(frameWidth, frameWidth), Size(0, 0));
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{

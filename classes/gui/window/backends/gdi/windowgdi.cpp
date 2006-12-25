@@ -200,8 +200,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size &size, Int flags)
 {
-	Int	 style		= WS_THICKFRAME | WS_SYSMENU | WS_POPUP;
-	Int	 extStyle	= 0;
+	Int	 style	  = WS_THICKFRAME | WS_SYSMENU | WS_POPUP;
+	Int	 extStyle = 0;
 
 	if (flags & WF_NORESIZE)	style		= (style & ~WS_THICKFRAME) | WS_DLGFRAME;
 	if (flags & WF_THINBORDER)	style		= (style & ~WS_THICKFRAME & ~WS_SYSMENU);

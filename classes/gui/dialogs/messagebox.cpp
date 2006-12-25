@@ -113,7 +113,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 		thissize = 0;
 	}
 
-	msgbox->SetSize(Size(maxsize + 34 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0), (((Int) Math::Max(2, lines) + 1) * 16) + 68 + buttonHeight));
+	msgbox->SetSize(Size(maxsize + 36 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0), (((Int) Math::Max(2, lines) + 1) * 16) + 70 + buttonHeight));
 
 	Font	 tbFont(Font::Default, Font::DefaultSize, Font::Bold);
 

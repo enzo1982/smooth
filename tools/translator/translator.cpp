@@ -228,14 +228,13 @@ Bool Translator::ExitProc()
 
 Void Translator::ResizeProc()
 {
-	wnd->GetDrawSurface()->StartPaint(Rect(list_entries->GetPosition(), list_entries->GetSize()));
+	Rect	 clientRect = wnd->GetClientRect();
+	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
-	list_entries->SetSize(Size(wnd->GetWidth() - 20, wnd->GetHeight() - 247));
+	list_entries->SetSize(Size(clientSize.cx - 14, clientSize.cy - 178));
 
-	wnd->GetDrawSurface()->EndPaint();
-
-	edit_original->SetSize(Size(wnd->GetWidth() - 169, edit_original->GetHeight()));
-	edit_translated->SetSize(Size(wnd->GetWidth() - 169, edit_translated->GetHeight()));
+	edit_original->SetSize(Size(clientSize.cx - 163, edit_original->GetHeight()));
+	edit_translated->SetSize(Size(clientSize.cx - 163, edit_translated->GetHeight()));
 }
 
 void Translator::NewFile()

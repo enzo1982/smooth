@@ -45,12 +45,14 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Window	*window = container->GetContainerWindow();
+	Window	*window	 = container->GetContainerWindow();
+	Surface	*surface = container->GetDrawSurface();
+	Rect	 menubar = Rect(GetRealPosition(), GetSize() - Size(1, 1));
 
 	if (orientation == OR_TOP || orientation == OR_BOTTOM)
 	{
-		Int	 nextXPosLeft	= GetX() + 4 + (window->GetIcon() != NIL ? 17 : 0);
-		Int	 nextXPosRight	= GetX() + GetWidth() - 4;
+		Int	 nextXPosLeft	= 7 + (window->GetIcon() != NIL ? 17 : 0);
+		Int	 nextXPosRight	= GetSize().cx - 1;
 		Int	 highestEntry	= 0;
 
 		for (Int i = 0; i < GetNOfObjects(); i++)
@@ -140,9 +142,6 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			if (entry->GetText() == NIL && entry->GetBitmap() == NIL) entry->SetWidth(GetWidth() - 3);
 		}
 	}
-
-	Surface	*surface = container->GetDrawSurface();
-	Rect	 menubar = Rect(GetRealPosition(), GetSize() - Size(1, 1));
 
 	switch (message)
 	{

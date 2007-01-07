@@ -31,7 +31,7 @@ Translator::Translator(const String &openFile)
 	Point	 pos;
 	Size	 size;
 
-	wnd		= new Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 402));
+	wnd		= new Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 404));
 	title		= new Titlebar();
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");

@@ -11,13 +11,13 @@
 #ifndef _H_OBJSMOOTH_VERSION_
 #define _H_OBJSMOOTH_VERSION_
 
-#define SMOOTH_VERSION "0.8.69.0"
+#define SMOOTH_VERSION "0.8.69.1"
 
 #ifdef __SMOOTH_DLL__
-#define SMOOTH_RESVERS 0,8,69,0
+#define SMOOTH_RESVERS 0,8,69,1
 #define SMOOTH_RESPROD 0,8,0,0
 #define SMOOTH_PRODUCT "0.8\0"
-#define SMOOTH_FILEVER "69.0\0"
+#define SMOOTH_FILEVER "69.1\0"
 #endif
 
 #endif

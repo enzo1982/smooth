@@ -2,4 +2,7 @@ ChangeLog for smooth
 
 xx.01.07 xx:xx - smooth alpha 0.8.69.1
 
-- no changes yet
+- list.cpp	- Speed optimizations
+- buffer.cpp	- Fixed problems when using const Buffer<>
+
+- simplified Array<> API

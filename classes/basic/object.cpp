@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,12 +30,12 @@ S::Object::Object() : type(this)
 
 	flags			= 0;
 
-	objects.AddEntry(this, handle);
+	objects.Add(this, handle);
 }
 
 S::Object::~Object()
 {
-	objects.RemoveEntry(handle);
+	objects.Remove(handle);
 }
 
 S::Int S::Object::GetNOfObjects()
@@ -45,12 +45,12 @@ S::Int S::Object::GetNOfObjects()
 
 S::Object *S::Object::GetNthObject(Int n)
 {
-	return objects.GetNthEntry(n);
+	return objects.GetNth(n);
 }
 
 S::Object *S::Object::GetObject(Int objectHandle, Int objectType)
 {
-	Object	*object = objects.GetEntry(objectHandle);
+	Object	*object = objects.Get(objectHandle);
 
 	if (object == NIL) return NIL;
 

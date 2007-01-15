@@ -58,6 +58,8 @@ S::Int S::GUI::ListEntry::Hide()
 {
 	visible = False;
 
+	DeactivateTooltip();
+
 	return Success();
 }
 

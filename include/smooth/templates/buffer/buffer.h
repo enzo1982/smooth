@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,7 +35,7 @@ namespace smooth
 
 					~Buffer();
 
-			Int		 Size();
+			Int		 Size() const;
 			Int		 Resize(Int);
 
 			Int		 Zero();
@@ -44,11 +44,15 @@ namespace smooth
 			t &operator	 [](const int);
 			t &operator	 [](const Int);
 
+			t operator	 [](const int) const;
+			t operator	 [](const Int) const;
+
 			t *operator	 +(const int);
 
 			operator	 t *();
+			operator	 const t *() const;
 
-			String		 EncodeBase64(Int);
+			String		 EncodeBase64(Int) const;
 			Int		 DecodeBase64(const String &);
 	};
 };

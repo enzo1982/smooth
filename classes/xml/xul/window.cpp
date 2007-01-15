@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -50,7 +50,7 @@ S::XML::XUL::Window::Window(Node *node) : Widget(node)
 
 						window->RegisterObject(menu->GetWidget());
 
-						widgets.AddEntry(menu);
+						widgets.Add(menu);
 					}
 				}
 			}
@@ -60,13 +60,13 @@ S::XML::XUL::Window::Window(Node *node) : Widget(node)
 
 		window->RegisterObject(box->GetWidget());
 
-		widgets.AddEntry(box);
+		widgets.Add(box);
 	}
 }
 
 S::XML::XUL::Window::~Window()
 {
-	for (Int i = 0; i < widgets.GetNOfEntries(); i++) delete widgets.GetNthEntry(i);
+	for (Int i = 0; i < widgets.GetNOfEntries(); i++) delete widgets.GetNth(i);
 
 	widgets.RemoveAll();
 

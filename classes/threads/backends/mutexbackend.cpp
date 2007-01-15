@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,15 +29,15 @@ S::Int S::Threads::MutexBackend::AddBackend(MutexBackend *(*backend)(Void *))
 
 	if (backend_creators == NIL) backend_creators = new Array<MutexBackend *(*)(Void *), Void *>;
 
-	backend_creators->AddEntry(backend);
+	backend_creators->Add(backend);
 
 	return Success();
 }
 
 S::Threads::MutexBackend *S::Threads::MutexBackend::CreateBackendInstance(Void *iMutex)
 {
-	if (backend_creators->GetFirstEntry() != &CreateMutexBackend)	return backend_creators->GetFirstEntry()(iMutex);
-	else								return backend_creators->GetLastEntry()(iMutex);
+	if (backend_creators->GetFirst() != &CreateMutexBackend)	return backend_creators->GetFirst()(iMutex);
+	else								return backend_creators->GetLast()(iMutex);
 }
 
 S::Threads::MutexBackend::MutexBackend(Void *iMutex)

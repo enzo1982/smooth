@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -105,7 +105,7 @@ S::GUI::Widget::~Widget()
 {
 	DeactivateTooltip();
 
-	while (widgets.GetNOfEntries()) UnregisterObject(widgets.GetFirstEntry());
+	while (widgets.GetNOfEntries()) UnregisterObject(widgets.GetFirst());
 
 	widgets.RemoveAll();
 
@@ -120,7 +120,7 @@ S::Int S::GUI::Widget::RegisterObject(Widget *widget)
 
 	if (!widget->IsRegistered())
 	{
-		widgets.AddEntry(widget, widget->GetHandle());
+		widgets.Add(widget, widget->GetHandle());
 
 		widget->SetContainer(this);
 		widget->SetRegisteredFlag(True);
@@ -146,7 +146,7 @@ S::Int S::GUI::Widget::UnregisterObject(Widget *widget)
 
 	if (widget->IsRegistered())
 	{
-		if (widgets.RemoveEntry(widget->GetHandle()) == True)
+		if (widgets.Remove(widget->GetHandle()) == True)
 		{
 			widget->Hide();
 			widget->onUnregister.Emit(this);
@@ -170,7 +170,7 @@ S::Int S::GUI::Widget::GetNOfObjects() const
 
 S::GUI::Widget *S::GUI::Widget::GetNthObject(Int n) const
 {
-	return widgets.GetNthEntry(n);
+	return widgets.GetNth(n);
 }
 
 S::GUI::Window *S::GUI::Widget::GetContainerWindow()

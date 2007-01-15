@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -44,7 +44,7 @@ S::XML::XUL::PopupMenu::PopupMenu(Node *node) : Widget(node)
 
 					menu->AddEntry(popup->GetName(), NIL, (GUI::PopupMenu *) popup->GetWidget());
 
-					entries.AddEntry(popup);
+					entries.Add(popup);
 				}
 			}
 		}
@@ -53,7 +53,7 @@ S::XML::XUL::PopupMenu::PopupMenu(Node *node) : Widget(node)
 
 S::XML::XUL::PopupMenu::~PopupMenu()
 {
-	for (Int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetNthEntry(i);
+	for (Int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetNth(i);
 
 	entries.RemoveAll();
 

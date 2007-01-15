@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,8 +33,8 @@ Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 	wnd	= new Window(name, Point(150, 150), Size(400, 400));
 	title	= new Titlebar();
 
-	objects.AddEntry(wnd);
-	objects.AddEntry(title);
+	objects.Add(wnd);
+	objects.Add(title);
 
 	RegisterObject(wnd);
 
@@ -170,7 +170,7 @@ Widget *Designer_EditComponent::AddObject(Int objid)
 
 	registrar->RegisterObject(newobj);
 
-	objects.AddEntry(newobj);
+	objects.Add(newobj);
 
 	return newobj;
 }
@@ -179,7 +179,7 @@ Widget *Designer_EditComponent::GetFirstObject(Int objtype)
 {
 	for (Int i = 0; i < objects.GetNOfEntries(); i++)
 	{
-		if (objects.GetNthEntry(i)->GetObjectType() == objtype) return objects.GetNthEntry(i);
+		if (objects.GetNth(i)->GetObjectType() == objtype) return objects.GetNth(i);
 	}
 
 	return NIL;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,15 +29,15 @@ S::Int S::Threads::SemaphoreBackend::AddBackend(SemaphoreBackend *(*backend)(Voi
 
 	if (backend_creators == NIL) backend_creators = new Array<SemaphoreBackend *(*)(Void *), Void *>;
 
-	backend_creators->AddEntry(backend);
+	backend_creators->Add(backend);
 
 	return Success();
 }
 
 S::Threads::SemaphoreBackend *S::Threads::SemaphoreBackend::CreateBackendInstance(Void *iSemaphore)
 {
-	if (backend_creators->GetFirstEntry() != &CreateSemaphoreBackend)	return backend_creators->GetFirstEntry()(iSemaphore);
-	else									return backend_creators->GetLastEntry()(iSemaphore);
+	if (backend_creators->GetFirst() != &CreateSemaphoreBackend)	return backend_creators->GetFirst()(iSemaphore);
+	else								return backend_creators->GetLast()(iSemaphore);
 }
 
 S::Threads::SemaphoreBackend::SemaphoreBackend(Void *iSemaphore)

@@ -137,7 +137,7 @@ S::Bool S::IO::OutStream::Flush()
 
 	if (filters.GetNOfEntries() > 0)
 	{
-		if (filters.GetFirstEntry()->GetPackageSize() > 0)
+		if (filters.GetFirst()->GetPackageSize() > 0)
 		{
 			for (int i = 0; i < (packageSize - oldcpos); i++) OutputNumber(0, 1);
 		}
@@ -165,7 +165,7 @@ S::Bool S::IO::OutStream::WriteData()
 
 	if (filters.GetNOfEntries() > 0)
 	{
-		if (filters.GetFirstEntry()->GetPackageSize() == -1)
+		if (filters.GetFirst()->GetPackageSize() == -1)
 		{
 			backBuffer.Resize(packageSize);
 
@@ -190,7 +190,7 @@ S::Bool S::IO::OutStream::WriteData()
 		}
 		else
 		{
-			encsize = filters.GetFirstEntry()->WriteData(dataBuffer, packageSize);
+			encsize = filters.GetFirst()->WriteData(dataBuffer, packageSize);
 
 			if (encsize == -1)
 			{
@@ -475,7 +475,7 @@ S::Bool S::IO::OutStream::AddFilter(Filter *newFilter)
 
 	Flush();
 
-	filters.AddEntry(newFilter);
+	filters.Add(newFilter);
 
 	allowpackset = true;
 
@@ -501,7 +501,7 @@ S::Bool S::IO::OutStream::RemoveFilter(Filter *oldFilter)
 
 	Int	 index = -1;
 
-	for (Int i = 0; i < filters.GetNOfEntries(); i++) if (filters.GetNthEntry(i) == oldFilter) index = filters.GetNthEntryIndex(i);
+	for (Int i = 0; i < filters.GetNOfEntries(); i++) if (filters.GetNth(i) == oldFilter) index = filters.GetNthIndex(i);
 
 	if (index == -1) { lastError = IO_ERROR_BADPARAM; return false; }
 
@@ -531,7 +531,7 @@ S::Bool S::IO::OutStream::RemoveFilter(Filter *oldFilter)
 
 	oldFilter->Deactivate();
 
-	filters.RemoveEntry(index);
+	filters.Remove(index);
 
 	SetPackageSize(origpacksize);
 
@@ -542,7 +542,7 @@ S::Bool S::IO::OutStream::Close()
 {
 	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
 
-	while (filters.GetNOfEntries() != 0) RemoveFilter(filters.GetLastEntry());
+	while (filters.GetNOfEntries() != 0) RemoveFilter(filters.GetLast());
 
 	Flush();
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,7 +23,7 @@ S::Int S::Backends::Backend::AddBackend(Backend *(*backend)())
 
 	if (backend_creators == NIL) backend_creators = new Array<Backend *(*)(), Void *>;
 
-	backend_creators->AddEntry(backend);
+	backend_creators->Add(backend);
 
 	return Success();
 }
@@ -35,7 +35,7 @@ S::Int S::Backends::Backend::GetNOfBackends()
 
 S::Backends::Backend *S::Backends::Backend::GetNthBackend(Int n)
 {
-	return backends->GetNthEntry(n);
+	return backends->GetNth(n);
 }
 
 S::Int S::Backends::Backend::InitBackends()
@@ -45,12 +45,12 @@ S::Int S::Backends::Backend::InitBackends()
 
 	for (Int i = 0; i < backend_creators->GetNOfEntries(); i++)
 	{
-		backends->AddEntry(backend_creators->GetNthEntry(i)());
+		backends->Add(backend_creators->GetNth(i)());
 	}
 
 	for (Int j = 0; j < backends->GetNOfEntries(); j++)
 	{
-		backends->GetNthEntry(j)->Init();
+		backends->GetNth(j)->Init();
 	}
 
 	return Success();
@@ -60,9 +60,9 @@ S::Int S::Backends::Backend::DeinitBackends()
 {
 	for (Int i = 0; i < backends->GetNOfEntries(); i++)
 	{
-		backends->GetNthEntry(i)->Deinit();
+		backends->GetNth(i)->Deinit();
 
-		delete backends->GetNthEntry(i);
+		delete backends->GetNth(i);
 	}
 
 	backends->RemoveAll();

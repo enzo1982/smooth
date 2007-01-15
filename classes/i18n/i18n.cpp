@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -48,7 +48,7 @@ S::I18n::Translator::~Translator()
 {
 	for (int i = 0; i < languages.GetNOfEntries(); i++)
 	{
-		delete languages.GetNthEntry(i);
+		delete languages.GetNth(i);
 	}
 
 	languages.RemoveAll();
@@ -60,11 +60,11 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 
 	for (Int n = 0; n < languages.GetNOfEntries(); n++)
 	{
-		if (languages.GetNthEntry(n)->magic == "internal")
+		if (languages.GetNth(n)->magic == "internal")
 		{
-			iLang = languages.GetNthEntry(n);
+			iLang = languages.GetNth(n);
 
-			languages.RemoveEntry(languages.GetNthEntryIndex(n));
+			languages.Remove(languages.GetNthIndex(n));
 
 			break;
 		}
@@ -83,18 +83,18 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 		{
 			if (i == languages.GetNOfEntries())
 			{
-				languages.AddEntry(iLang);
+				languages.Add(iLang);
 
 				break;
 			}
 
-			Language	*lang = languages.GetNthEntry(i);
+			Language	*lang = languages.GetNth(i);
 
 			for (Int j = 0; j < (Int) Math::Max(iLang->name.Length(), lang->name.Length()); j++)
 			{
 				if (iLang->name[j] < lang->name[j])
 				{
-					languages.InsertEntryAtPos(i, iLang);
+					languages.InsertAtPos(i, iLang);
 
 					done = True;
 
@@ -128,7 +128,7 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 		language->url = "none";
 		language->rightToLeft = False;
 
-		languages.AddEntry(language);
+		languages.Add(language);
 	}
 
 	if (!internal)
@@ -221,32 +221,32 @@ S::Int S::I18n::Translator::GetNOfLanguages() const
 
 const S::String &S::I18n::Translator::GetNthLanguageName(Int index) const
 {
-	return languages.GetNthEntry(index)->name;
+	return languages.GetNth(index)->name;
 }
 
 const S::String &S::I18n::Translator::GetNthLanguageID(Int index) const
 {
-	return languages.GetNthEntry(index)->magic;
+	return languages.GetNth(index)->magic;
 }
 
 const S::String &S::I18n::Translator::GetNthLanguageAuthor(Int index) const
 {
-	return languages.GetNthEntry(index)->author;
+	return languages.GetNth(index)->author;
 }
 
 const S::String &S::I18n::Translator::GetNthLanguageEncoding(Int index) const
 {
-	return languages.GetNthEntry(index)->encoding;
+	return languages.GetNth(index)->encoding;
 }
 
 const S::String &S::I18n::Translator::GetNthLanguageURL(Int index) const
 {
-	return languages.GetNthEntry(index)->url;
+	return languages.GetNth(index)->url;
 }
 
 S::Bool S::I18n::Translator::IsNthLanguageRightToLeft(Int index) const
 {
-	return languages.GetNthEntry(index)->rightToLeft;
+	return languages.GetNth(index)->rightToLeft;
 }
 
 const S::String &S::I18n::Translator::GetActiveLanguageName() const
@@ -283,9 +283,9 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 {
 	for (int i = 0; i < languages.GetNOfEntries(); i++)
 	{
-		if (languages.GetNthEntry(i)->magic == magic)
+		if (languages.GetNth(i)->magic == magic)
 		{
-			activeLanguage = languages.GetNthEntry(i);
+			activeLanguage = languages.GetNth(i);
 
 			return Success();
 		}
@@ -296,7 +296,7 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 
 const S::String &S::I18n::Translator::TranslateString(const String &string)
 {
-	const String	&translation = activeLanguage->strings.GetEntry(string.ComputeCRC32());
+	const String	&translation = activeLanguage->strings.Get(string.ComputeCRC32());
 
 	if (translation == NIL)	return string;
 	else			return translation;
@@ -325,13 +325,13 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 
 	for (Int j = 0; j < languages.GetNOfEntries(); j++)
 	{
-		Language	*lang = languages.GetNthEntry(j);
+		Language	*lang = languages.GetNth(j);
 
 		for (Int k = 0; k < max(language->name.Length(), lang->name.Length()); k++)
 		{
 			if ((language->name[k] < lang->name[k] && !(language->name[k] == '(' && lang->name[k] == '/')) || (language->name[k] == '/' && lang->name[k] == '('))
 			{
-				languages.InsertEntryAtPos(j, language);
+				languages.InsertAtPos(j, language);
 
 				done = True;
 
@@ -345,7 +345,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 
 		if (j == languages.GetNOfEntries() - 1)
 		{
-			languages.AddEntry(language);
+			languages.Add(language);
 
 			done = True;
 		}
@@ -361,7 +361,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 
 		if (entry->GetName() == "entry")
 		{
-			language->strings.AddEntry(entry->GetContent(), entry->GetAttributeByName("string")->GetContent().ComputeCRC32());
+			language->strings.Add(entry->GetContent(), entry->GetAttributeByName("string")->GetContent().ComputeCRC32());
 		}
 	}
 

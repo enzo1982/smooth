@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -46,7 +46,7 @@ template <class t> S::Buffer<t>::~Buffer()
 	Free();
 }
 
-template <class t> S::Int S::Buffer<t>::Size()
+template <class t> S::Int S::Buffer<t>::Size() const
 {
 	return size;
 }
@@ -105,6 +105,16 @@ template <class t> t &S::Buffer<t>::operator [](Int n)
 	return (*this)[(int) n];
 }
 
+template <class t> t S::Buffer<t>::operator [](int n) const
+{
+	return memory[n];
+}
+
+template <class t> t S::Buffer<t>::operator [](Int n) const
+{
+	return (*this)[(int) n];
+}
+
 template <class t> t *S::Buffer<t>::operator +(const int offset)
 {
 	return memory + offset;
@@ -115,7 +125,12 @@ template <class t> S::Buffer<t>::operator t *()
 	return memory;
 }
 
-template <class t> S::String S::Buffer<t>::EncodeBase64(Int bytes)
+template <class t> S::Buffer<t>::operator const t *() const
+{
+	return memory;
+}
+
+template <class t> S::String S::Buffer<t>::EncodeBase64(Int bytes) const
 {
 	if (bytes > size) return NIL;
 

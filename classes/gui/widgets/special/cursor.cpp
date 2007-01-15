@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -82,11 +82,11 @@ S::Int S::GUI::Cursor::Paint(Int message)
 				String	 line;
 				Bool	 fillLineIndices = (lineIndices.GetNOfEntries() == 0);
 				Int	 lineNumber = (fillLineIndices ? 0 : scrollPos);
-				Int	 lineStart = (fillLineIndices ? 0 : lineIndices.GetNthEntry(scrollPos));
+				Int	 lineStart = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos));
 
-				lineIndices.AddEntry(0);
+				lineIndices.Add(0);
 
-				for (Int i = (fillLineIndices ? 0 : lineIndices.GetNthEntry(scrollPos)); i <= text.Length(); i++)
+				for (Int i = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos)); i <= text.Length(); i++)
 				{
 					if (lineNumber >= scrollPos)
 					{
@@ -133,7 +133,7 @@ S::Int S::GUI::Cursor::Paint(Int message)
 							lineStart = i + 1;
 							lineNumber++;
 
-							lineIndices.AddEntry(lineStart);
+							lineIndices.Add(lineStart);
 						}
 					}
 					else
@@ -143,7 +143,7 @@ S::Int S::GUI::Cursor::Paint(Int message)
 							lineStart = i + 1;
 							lineNumber++;
 
-							lineIndices.AddEntry(lineStart);
+							lineIndices.Add(lineStart);
 						}
 					}
 				}

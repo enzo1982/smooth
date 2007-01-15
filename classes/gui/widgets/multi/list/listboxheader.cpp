@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,10 +34,10 @@ S::GUI::ListBoxHeader::~ListBoxHeader()
 
 S::Int S::GUI::ListBoxHeader::AddTab(const String &iTabName, Int iTabWidth, Int iTabOrientation)
 {
-	tabNames.AddEntry(iTabName);
-	tabWidths.AddEntry(iTabWidth);
-	tabOrientations.AddEntry(iTabOrientation);
-	tabChecked.AddEntry(False);
+	tabNames.Add(iTabName);
+	tabWidths.Add(iTabWidth);
+	tabOrientations.Add(iTabOrientation);
+	tabChecked.Add(False);
 
 	OnChangeSize(GetSize());
 
@@ -69,7 +69,7 @@ S::Int S::GUI::ListBoxHeader::GetNthTabOffset(Int n) const
 
 	for (Int i = 0; i < n; i++)
 	{
-		offset += (Int) Math::Abs(tabWidths.GetNthEntry(i));
+		offset += (Int) Math::Abs(tabWidths.GetNth(i));
 	}
 
 	return offset;
@@ -77,12 +77,12 @@ S::Int S::GUI::ListBoxHeader::GetNthTabOffset(Int n) const
 
 S::Int S::GUI::ListBoxHeader::GetNthTabWidth(Int n) const
 {
-	return (Int) Math::Abs(tabWidths.GetNthEntry(n));
+	return (Int) Math::Abs(tabWidths.GetNth(n));
 }
 
 S::Int S::GUI::ListBoxHeader::GetNthTabOrientation(Int n) const
 {
-	return (Int) Math::Abs(tabOrientations.GetNthEntry(n));
+	return (Int) Math::Abs(tabOrientations.GetNth(n));
 }
 
 S::Int S::GUI::ListBoxHeader::Paint(Int message)
@@ -104,7 +104,7 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 
 				for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
 				{
-					frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(i)) + 1, realPos.x + GetWidth());
+					frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNth(i)) + 1, realPos.x + GetWidth());
 
 					surface->Box(frame, Setup::BackgroundColor, FILLED);
 					surface->Frame(frame, FRAME_UP);
@@ -116,10 +116,10 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 
 					if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
-					surface->SetText(tabNames.GetNthEntry(i), frame, nFont);
+					surface->SetText(tabNames.GetNth(i), frame, nFont);
 
 					frame.top -= 1;
-					frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) - 2);
+					frame.left += (Int) (Math::Abs(tabWidths.GetNth(i)) - 2);
 				}
 			}
 
@@ -153,7 +153,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 				for (Int i = 0; i < tabWidths.GetNOfEntries() - 1; i++)
 				{
-					frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(i)) + 1);
+					frame.left += (Int) (Math::Abs(tabWidths.GetNth(i)) + 1);
 					frame.right = frame.left + 4;
 
 					if (window->IsMouseOn(frame))
@@ -178,36 +178,36 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 				for (Int j = 0; j < tabWidths.GetNOfEntries(); j++)
 				{
-					frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNthEntry(j)), realPos.x + GetWidth() - 1);
+					frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNth(j)), realPos.x + GetWidth() - 1);
 
 					frame.left++;
 					frame.top++;
 
-					if (window->IsMouseOn(frame) && !tabChecked.GetNthEntry(j) && moveTab == -1)
+					if (window->IsMouseOn(frame) && !tabChecked.GetNth(j) && moveTab == -1)
 					{
 						surface->Box(frame, Setup::LightGrayColor, FILLED);
 
 						frame.left += 2;
-						surface->SetText(tabNames.GetNthEntry(j), frame, font);
+						surface->SetText(tabNames.GetNth(j), frame, font);
 						frame.left -= 2;
 
-						tabChecked.SetEntry(tabChecked.GetNthEntryIndex(j), True);
+						tabChecked.Set(tabChecked.GetNthIndex(j), True);
 					}
-					else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNthEntry(j))
+					else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNth(j))
 					{
 						surface->Box(frame, Setup::BackgroundColor, FILLED);
 
 						frame.left += 2;
-						surface->SetText(tabNames.GetNthEntry(j), frame, font);
+						surface->SetText(tabNames.GetNth(j), frame, font);
 						frame.left -= 2;
 
-						tabChecked.SetEntry(tabChecked.GetNthEntryIndex(j), False);
+						tabChecked.Set(tabChecked.GetNthIndex(j), False);
 					}
 
 					frame.left--;
 					frame.top--;
 
-					frame.left += (Int) (Math::Abs(tabWidths.GetNthEntry(j)) + 1);
+					frame.left += (Int) (Math::Abs(tabWidths.GetNth(j)) + 1);
 				}
 			}
 
@@ -236,8 +236,8 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 					if (bias != 0)
 					{
-						tabWidths.SetEntry(moveTab, (Int) Math::Max(Math::Abs(tabWidths.GetEntry(moveTab)) - bias, 1) * Math::Sign(tabWidths.GetEntry(moveTab)));
-						tabWidths.SetEntry(tabWidths.GetNOfEntries() - 1, (Int) Math::Max(Math::Abs(tabWidths.GetEntry(tabWidths.GetNOfEntries() - 1)) + bias, 1) * Math::Sign(tabWidths.GetEntry(tabWidths.GetNOfEntries() - 1)));
+						tabWidths.Set(moveTab, (Int) Math::Max(Math::Abs(tabWidths.Get(moveTab)) - bias, 1) * Math::Sign(tabWidths.Get(moveTab)));
+						tabWidths.Set(tabWidths.GetNOfEntries() - 1, (Int) Math::Max(Math::Abs(tabWidths.Get(tabWidths.GetNOfEntries() - 1)) + bias, 1) * Math::Sign(tabWidths.Get(tabWidths.GetNOfEntries() - 1)));
 
 						omx = mx;
 
@@ -268,12 +268,12 @@ S::Void S::GUI::ListBoxHeader::OnChangeSize(const Size &nSize)
 
 	for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
 	{
-		if (tabWidths.GetNthEntry(i) <= 0)	varSizeTabs++;
-		else					sumFixedTabSizes += tabWidths.GetNthEntry(i);
+		if (tabWidths.GetNth(i) <= 0)	varSizeTabs++;
+		else				sumFixedTabSizes += tabWidths.GetNth(i);
 	}
 
 	for (Int j = 0; j < tabWidths.GetNOfEntries(); j++)
 	{
-		if (tabWidths.GetNthEntry(j) <= 0) tabWidths.SetEntry(tabWidths.GetNthEntryIndex(j), -Math::Max(0, (GetWidth() - sumFixedTabSizes) / varSizeTabs));
+		if (tabWidths.GetNth(j) <= 0) tabWidths.Set(tabWidths.GetNthIndex(j), -Math::Max(0, (GetWidth() - sumFixedTabSizes) / varSizeTabs));
 	}
 }

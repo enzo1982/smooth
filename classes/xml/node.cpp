@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,7 +22,7 @@ S::XML::Node::Node(const String &iName, const String &iContent)
 	attributes	= NIL;
 	subnodes	= NIL;
 
-	if (elementNames.GetEntry(nameIndex) == NIL) elementNames.AddEntry(iName, nameIndex);
+	if (elementNames.Get(nameIndex) == NIL) elementNames.Add(iName, nameIndex);
 }
 
 S::XML::Node::~Node()
@@ -51,14 +51,14 @@ S::Int S::XML::Node::SetNodeID(Int newID)
 
 const S::String &S::XML::Node::GetName() const
 {
-	return elementNames.GetEntry(nameIndex);
+	return elementNames.Get(nameIndex);
 }
 
 S::Int S::XML::Node::SetName(const String &newName)
 {
 	nameIndex = newName.ComputeCRC32();
 
-	if (elementNames.GetEntry(nameIndex) == NIL) elementNames.AddEntry(newName, nameIndex);
+	if (elementNames.Get(nameIndex) == NIL) elementNames.Add(newName, nameIndex);
 
 	return Success();
 }
@@ -86,7 +86,7 @@ S::XML::Attribute *S::XML::Node::GetNthAttribute(Int attributeNumber) const
 {
 	if (attributeNumber >= GetNOfAttributes()) return NIL;
 
-	return attributes->GetNthEntry(attributeNumber);
+	return attributes->GetNth(attributeNumber);
 }
 
 S::XML::Attribute *S::XML::Node::GetAttributeByName(const String &attributeName) const
@@ -113,7 +113,7 @@ S::XML::Attribute *S::XML::Node::SetAttribute(const String &attributeName, const
 
 		if (attributes == NIL) attributes = new Array<Attribute *, Void *>();
 
-		attribute->SetAttributeID(attributes->AddEntry(attribute));
+		attribute->SetAttributeID(attributes->Add(attribute));
 	}
 	else
 	{
@@ -127,7 +127,7 @@ S::Int S::XML::Node::RemoveAttribute(Attribute *attribute)
 {
 	if (attribute == NIL) return Error();
 
-	attributes->RemoveEntry(attribute->GetAttributeID());
+	attributes->Remove(attribute->GetAttributeID());
 
 	delete attribute;
 
@@ -150,7 +150,7 @@ S::XML::Node *S::XML::Node::GetNthNode(Int nodeNumber) const
 {
 	if (nodeNumber >= GetNOfNodes()) return NIL;
 
-	return subnodes->GetNthEntry(nodeNumber);
+	return subnodes->GetNth(nodeNumber);
 }
 
 S::XML::Node *S::XML::Node::GetNodeByName(const String &nodeName) const
@@ -173,7 +173,7 @@ S::XML::Node *S::XML::Node::AddNode(const String &iName, const String &iContent)
 
 	if (subnodes == NIL) subnodes = new Array<Node *, Void *>();
 
-	node->SetNodeID(subnodes->AddEntry(node));
+	node->SetNodeID(subnodes->Add(node));
 
 	return node;
 }
@@ -182,7 +182,7 @@ S::Int S::XML::Node::RemoveNode(Node *node)
 {
 	if (node == NIL) return Error();
 
-	subnodes->RemoveEntry(node->GetNodeID());
+	subnodes->Remove(node->GetNodeID());
 
 	delete node;
 

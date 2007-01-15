@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,27 +39,27 @@ namespace smooth
 						 Array_Backend();
 			virtual			~Array_Backend();
 
-			Int			 AddEntry(const s &);
-			Bool			 AddEntry(const s &, Int);
+			Int			 Add(const s &);
+			Bool			 Add(const s &, Int);
 
-			Int			 InsertEntryAfter(Int, const s &);
-			Bool			 InsertEntryAfter(Int, const s &, Int);
-			Int			 InsertEntryAtPos(Int, const s &);
-			Bool			 InsertEntryAtPos(Int, const s &, Int);
+			Int			 InsertAfter(Int, const s &);
+			Bool			 InsertAfter(Int, const s &, Int);
+			Int			 InsertAtPos(Int, const s &);
+			Bool			 InsertAtPos(Int, const s &, Int);
 
-			Bool			 RemoveEntry(Int);
+			Bool			 Remove(Int);
 			Bool			 RemoveAll();
 
-			const s			&GetEntry(Int) const;
-			Bool			 SetEntry(Int, const s &);
+			const s			&Get(Int) const;
+			Bool			 Set(Int, const s &);
 
 			inline Int		 GetNOfEntries() const		{ return nOfEntries; };
-			const s			&GetFirstEntry() const;
-			const s			&GetLastEntry() const;
-			const s			&GetNextEntry() const;
-			const s			&GetPrevEntry() const;
-			const s			&GetNthEntry(Int) const;
-			Int			 GetNthEntryIndex(Int) const;
+			const s			&GetFirst() const;
+			const s			&GetLast() const;
+			const s			&GetNext() const;
+			const s			&GetPrev() const;
+			const s			&GetNth(Int) const;
+			Int			 GetNthIndex(Int) const;
 	};
 };
 

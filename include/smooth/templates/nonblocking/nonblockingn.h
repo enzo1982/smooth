@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -53,7 +53,7 @@ namespace smooth
 
 				thread = new Threads::Thread();
 
-				threadSlots.AddEntry(slotN, thread->GetHandle());
+				threadSlots.Add(slotN, thread->GetHandle());
 
 				thread->SetFlags(Threads::THREAD_WAITFLAG_START);
 
@@ -64,9 +64,9 @@ namespace smooth
 
 			Int Thread(Threads::Thread *thread)
 			{
-				NONBLOCKING_SLOT_BASE_CLASS_NAME<Void NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES>	*slot = (NONBLOCKING_SLOT_BASE_CLASS_NAME<Void NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES> *) threadSlots.GetEntry(thread->GetHandle());
+				NONBLOCKING_SLOT_BASE_CLASS_NAME<Void NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES>	*slot = (NONBLOCKING_SLOT_BASE_CLASS_NAME<Void NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES> *) threadSlots.Get(thread->GetHandle());
 
-				threadSlots.RemoveEntry(thread->GetHandle());
+				threadSlots.Remove(thread->GetHandle());
 
 				slot->Emit(NONBLOCKING_ARGUMENT_PARAMETERS);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -123,7 +123,7 @@ template <class s> S::Array_Entry<s> *S::Array_Backend<s>::GetNthArrayEntry(Int 
 	return entry;
 }
 
-template <class s> S::Int S::Array_Backend<s>::AddEntry(const s &value)
+template <class s> S::Int S::Array_Backend<s>::Add(const s &value)
 {
 	lastN		= -1024;
 	lastNthEntry	= ARRAY_NULLPOINTER;
@@ -164,14 +164,14 @@ template <class s> S::Int S::Array_Backend<s>::AddEntry(const s &value)
 	return lastEntry->GetIndex();
 }
 
-template <class s> S::Bool S::Array_Backend<s>::AddEntry(const s &value, Int index)
+template <class s> S::Bool S::Array_Backend<s>::Add(const s &value, Int index)
 {
 	if (!IndexAvailable(index)) return False;
 
 	lastN		= -1024;
 	lastNthEntry	= ARRAY_NULLPOINTER;
 
-	AddEntry(value);
+	Add(value);
 
 	prevAccessedEntry->SetIndex(index);
 
@@ -183,7 +183,7 @@ template <class s> S::Bool S::Array_Backend<s>::AddEntry(const s &value, Int ind
 	return True;
 }
 
-template <class s> S::Int S::Array_Backend<s>::InsertEntryAfter(Int prevIndex, const s &value)
+template <class s> S::Int S::Array_Backend<s>::InsertAfter(Int prevIndex, const s &value)
 {
 	if (GetArrayEntryByIndex(prevIndex) == ARRAY_NULLPOINTER) return False;
 
@@ -210,12 +210,12 @@ template <class s> S::Int S::Array_Backend<s>::InsertEntryAfter(Int prevIndex, c
 	return entry->GetIndex();
 }
 
-template <class s> S::Bool S::Array_Backend<s>::InsertEntryAfter(Int prevIndex, const s &value, Int index)
+template <class s> S::Bool S::Array_Backend<s>::InsertAfter(Int prevIndex, const s &value, Int index)
 {
 	if (GetArrayEntryByIndex(prevIndex) == ARRAY_NULLPOINTER) return False;
 	if (!IndexAvailable(index))				  return False;
 
-	InsertEntryAfter(prevIndex, value);
+	InsertAfter(prevIndex, value);
 
 	prevAccessedEntry->SetIndex(index);
 
@@ -225,7 +225,7 @@ template <class s> S::Bool S::Array_Backend<s>::InsertEntryAfter(Int prevIndex, 
 	return True;
 }
 
-template <class s> S::Int S::Array_Backend<s>::InsertEntryAtPos(Int position, const s &value)
+template <class s> S::Int S::Array_Backend<s>::InsertAtPos(Int position, const s &value)
 {
 	if (nOfEntries < position) return False;
 
@@ -268,12 +268,12 @@ template <class s> S::Int S::Array_Backend<s>::InsertEntryAtPos(Int position, co
 	return entry->GetIndex();
 }
 
-template <class s> S::Bool S::Array_Backend<s>::InsertEntryAtPos(Int position, const s &value, Int index)
+template <class s> S::Bool S::Array_Backend<s>::InsertAtPos(Int position, const s &value, Int index)
 {
 	if (nOfEntries < position)	return False;
 	if (!IndexAvailable(index))	return False;
 
-	InsertEntryAtPos(position, value);
+	InsertAtPos(position, value);
 
 	prevAccessedEntry->SetIndex(index);
 
@@ -283,7 +283,7 @@ template <class s> S::Bool S::Array_Backend<s>::InsertEntryAtPos(Int position, c
 	return True;
 }
 
-template <class s> S::Bool S::Array_Backend<s>::RemoveEntry(Int index)
+template <class s> S::Bool S::Array_Backend<s>::Remove(Int index)
 {
 	Array_Entry<s>	*entry = GetArrayEntryByIndex(index);
 
@@ -327,7 +327,7 @@ template <class s> S::Bool S::Array_Backend<s>::RemoveEntry(Int index)
 
 template <class s> S::Bool S::Array_Backend<s>::RemoveAll()
 {
-	while (firstEntry != ARRAY_NULLPOINTER) RemoveEntry(firstEntry->GetIndex());
+	while (firstEntry != ARRAY_NULLPOINTER) Remove(firstEntry->GetIndex());
 
 	nOfEntries		= 0;
 	greatestIndex		= -1;
@@ -343,7 +343,7 @@ template <class s> S::Bool S::Array_Backend<s>::RemoveAll()
 	return True;
 }
 
-template <class s> const s &S::Array_Backend<s>::GetEntry(Int index) const
+template <class s> const s &S::Array_Backend<s>::Get(Int index) const
 {
 	Array_Entry<s>	*entry = GetArrayEntryByIndex(index);
 
@@ -352,7 +352,7 @@ template <class s> const s &S::Array_Backend<s>::GetEntry(Int index) const
 	return nullValue;
 }
 
-template <class s> S::Bool S::Array_Backend<s>::SetEntry(Int index, const s &value)
+template <class s> S::Bool S::Array_Backend<s>::Set(Int index, const s &value)
 {
 	Array_Entry<s>	*entry = GetArrayEntryByIndex(index);
 
@@ -361,7 +361,7 @@ template <class s> S::Bool S::Array_Backend<s>::SetEntry(Int index, const s &val
 	return False;
 }
 
-template <class s> const s &S::Array_Backend<s>::GetFirstEntry() const
+template <class s> const s &S::Array_Backend<s>::GetFirst() const
 {
 	if (nOfEntries > 0 && firstEntry != ARRAY_NULLPOINTER)
 	{
@@ -373,7 +373,7 @@ template <class s> const s &S::Array_Backend<s>::GetFirstEntry() const
 	return nullValue;
 }
 
-template <class s> const s &S::Array_Backend<s>::GetLastEntry() const
+template <class s> const s &S::Array_Backend<s>::GetLast() const
 {
 	if (nOfEntries > 0 && lastEntry != ARRAY_NULLPOINTER)
 	{
@@ -385,7 +385,7 @@ template <class s> const s &S::Array_Backend<s>::GetLastEntry() const
 	return nullValue;
 }
 
-template <class s> const s &S::Array_Backend<s>::GetNextEntry() const
+template <class s> const s &S::Array_Backend<s>::GetNext() const
 {
 	if (prevAccessedEntry != ARRAY_NULLPOINTER)
 	{
@@ -400,7 +400,7 @@ template <class s> const s &S::Array_Backend<s>::GetNextEntry() const
 	return nullValue;
 }
 
-template <class s> const s &S::Array_Backend<s>::GetPrevEntry() const
+template <class s> const s &S::Array_Backend<s>::GetPrev() const
 {
 	if (prevAccessedEntry != ARRAY_NULLPOINTER)
 	{
@@ -415,7 +415,7 @@ template <class s> const s &S::Array_Backend<s>::GetPrevEntry() const
 	return nullValue;
 }
 
-template <class s> const s &S::Array_Backend<s>::GetNthEntry(Int n) const
+template <class s> const s &S::Array_Backend<s>::GetNth(Int n) const
 {
 	Array_Entry<s>	*entry = GetNthArrayEntry(n);
 
@@ -424,7 +424,7 @@ template <class s> const s &S::Array_Backend<s>::GetNthEntry(Int n) const
 	return nullValue;
 }
 
-template <class s> S::Int S::Array_Backend<s>::GetNthEntryIndex(Int n) const
+template <class s> S::Int S::Array_Backend<s>::GetNthIndex(Int n) const
 {
 	Array_Entry<s>	*entry = GetNthArrayEntry(n);
 

@@ -1,5 +1,5 @@
 /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -157,7 +157,7 @@ S::String::~String()
 
 	if (--nOfStrings == 0)
 	{
-		for (Int i = 0; i < allocatedBuffers.GetNOfEntries(); i++) delete [] allocatedBuffers.GetNthEntry(i);
+		for (Int i = 0; i < allocatedBuffers.GetNOfEntries(); i++) delete [] allocatedBuffers.GetNth(i);
 
 		allocatedBuffers.RemoveAll();
 	}
@@ -195,9 +195,9 @@ S::Void S::String::DeleteTemporaryBuffers()
 
 	for (Int i = 0; i < nOfEntries - 512; i++)
 	{
-		delete [] allocatedBuffers.GetFirstEntry();
+		delete [] allocatedBuffers.GetFirst();
 
-		allocatedBuffers.RemoveEntry(allocatedBuffers.GetNthEntryIndex(0));
+		allocatedBuffers.Remove(allocatedBuffers.GetNthIndex(0));
 	}
 }
 
@@ -310,7 +310,7 @@ char *S::String::SetInputFormat(const char *iFormat)
 	{
 		if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
 
-		allocatedBuffers.AddEntry(previousInputFormat);
+		allocatedBuffers.Add(previousInputFormat);
 	}
 
 	return previousInputFormat;
@@ -330,7 +330,7 @@ char *S::String::SetOutputFormat(const char *oFormat)
 	{
 		if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
 
-		allocatedBuffers.AddEntry(previousOutputFormat);
+		allocatedBuffers.Add(previousOutputFormat);
 	}
 
 	return previousOutputFormat;
@@ -417,7 +417,7 @@ char *S::String::ConvertTo(const char *encoding) const
 
 	if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
 
-	allocatedBuffers.AddEntry(buffer);
+	allocatedBuffers.Add(buffer);
 
 	return buffer;
 }

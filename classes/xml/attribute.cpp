@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,7 +19,7 @@ S::XML::Attribute::Attribute(const String &iName, const String &iContent)
 	nameIndex	= iName.ComputeCRC32();
 	content		= iContent;
 
-	if (attributeNames.GetEntry(nameIndex) == NIL) attributeNames.AddEntry(iName, nameIndex);
+	if (attributeNames.Get(nameIndex) == NIL) attributeNames.Add(iName, nameIndex);
 }
 
 S::XML::Attribute::~Attribute()
@@ -40,14 +40,14 @@ S::Int S::XML::Attribute::SetAttributeID(Int newID)
 
 const S::String &S::XML::Attribute::GetName() const
 {
-	return attributeNames.GetEntry(nameIndex);
+	return attributeNames.Get(nameIndex);
 }
 
 S::Int S::XML::Attribute::SetName(const String &newName)
 {
 	nameIndex = newName.ComputeCRC32();
 
-	if (attributeNames.GetEntry(nameIndex) == NIL) attributeNames.AddEntry(newName, nameIndex);
+	if (attributeNames.Get(nameIndex) == NIL) attributeNames.Add(newName, nameIndex);
 
 	return Success();
 }

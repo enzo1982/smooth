@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,8 +34,8 @@ S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text)
 
 	if (RegisterObject(newEntry) == Success())
 	{
-		elementOrder.AddEntry(newEntry->GetHandle(), newEntry->GetHandle());
-		createdEntry.AddEntry(True, newEntry->GetHandle());
+		elementOrder.Add(newEntry, newEntry->GetHandle());
+		createdEntry.Add(True, newEntry->GetHandle());
 
 		Paint(SP_UPDATE);
 
@@ -53,8 +53,8 @@ S::Int S::GUI::List::AddEntry(ListEntry *entry)
 
 	if (RegisterObject(entry) == Success())
 	{
-		elementOrder.AddEntry(entry->GetHandle(), entry->GetHandle());
-		createdEntry.AddEntry(False, entry->GetHandle());
+		elementOrder.Add(entry, entry->GetHandle());
+		createdEntry.Add(False, entry->GetHandle());
 
 		Paint(SP_UPDATE);
 
@@ -72,10 +72,10 @@ S::Int S::GUI::List::RemoveEntry(ListEntry *entry)
 	{
 		Int	 entryHandle = entry->GetHandle();
 
-		if (createdEntry.GetEntry(entryHandle)) DeleteObject(entry);
+		if (createdEntry.Get(entryHandle)) DeleteObject(entry);
 
-		elementOrder.RemoveEntry(entryHandle);
-		createdEntry.RemoveEntry(entryHandle);
+		elementOrder.Remove(entryHandle);
+		createdEntry.Remove(entryHandle);
 
 		Paint(SP_UPDATE);
 
@@ -97,7 +97,7 @@ S::Int S::GUI::List::RemoveAllEntries()
 
 		UnregisterObject(widget);
 
-		if (createdEntry.GetEntry(widget->GetHandle())) DeleteObject(widget);
+		if (createdEntry.Get(widget->GetHandle())) DeleteObject(widget);
 	}
 
 	elementOrder.RemoveAll();
@@ -114,14 +114,14 @@ S::Int S::GUI::List::SwitchEntries(Int entry1n, Int entry2n)
 	if (entry1n >= GetNOfEntries() || entry2n >= GetNOfEntries()) return Error();
 	if (entry1n <  0	       || entry2n <  0		    ) return Error();
 
-	Int	 entry1 = elementOrder.GetNthEntry(Math::Min(entry1n, entry2n));
-	Int	 entry2 = elementOrder.GetNthEntry(Math::Max(entry1n, entry2n));
+	ListEntry	*entry1 = elementOrder.GetNth(Math::Min(entry1n, entry2n));
+	ListEntry	*entry2 = elementOrder.GetNth(Math::Max(entry1n, entry2n));
 
-	elementOrder.RemoveEntry(entry1);
-	elementOrder.RemoveEntry(entry2);
+	elementOrder.Remove(entry1->GetHandle());
+	elementOrder.Remove(entry2->GetHandle());
 
-	elementOrder.InsertEntryAtPos(Math::Min(entry1n, entry2n), entry2, entry2);
-	elementOrder.InsertEntryAtPos(Math::Max(entry1n, entry2n), entry1, entry1);
+	elementOrder.InsertAtPos(Math::Min(entry1n, entry2n), entry2, entry2->GetHandle());
+	elementOrder.InsertAtPos(Math::Max(entry1n, entry2n), entry1, entry1->GetHandle());
 
 	return Success();
 }
@@ -133,27 +133,18 @@ S::Int S::GUI::List::GetNOfEntries() const
 
 S::GUI::ListEntry *S::GUI::List::GetNthEntry(Int n) const
 {
-	Int	 handle = elementOrder.GetNthEntry(n);
-
-	for (Int i = 0; i < GetNOfObjects(); i++)
-	{
-		if (GetNthObject(i)->GetHandle() == handle) return (ListEntry *) GetNthObject(i);
-	}
-
-	return NIL;
+	return elementOrder.GetNth(n);
 }
 
-S::Int S::GUI::List::SelectEntry(ListEntry *entry)
+S::Int S::GUI::List::SelectEntry(ListEntry *entryToSelect)
 {
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < elementOrder.GetNOfEntries(); i++)
 	{
-		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+		ListEntry	*entry = GetNthEntry(i);
 
-		ListEntry	*widget = (ListEntry *) GetNthObject(i);
-
-		if (widget == entry)
+		if (entry == entryToSelect)
 		{
-			widget->Select();
+			entry->Select();
 
 			return Success();
 		}
@@ -164,13 +155,11 @@ S::Int S::GUI::List::SelectEntry(ListEntry *entry)
 
 S::GUI::ListEntry *S::GUI::List::GetSelectedEntry() const
 {
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < elementOrder.GetNOfEntries(); i++)
 	{
-		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+		ListEntry	*entry = elementOrder.GetNth(i);
 
-		ListEntry	*widget = (ListEntry *) GetNthObject(i);
-
-		if (widget->IsSelected()) return widget;
+		if (entry->IsSelected()) return entry;
 	}
 
 	return NIL;
@@ -187,17 +176,9 @@ S::Int S::GUI::List::SelectNthEntry(Int n)
 
 S::Int S::GUI::List::GetSelectedEntryNumber() const
 {
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < elementOrder.GetNOfEntries(); i++)
 	{
-		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
-
-		if (((ListEntry *) GetNthObject(i))->IsSelected())
-		{
-			for (Int j = 0; j < elementOrder.GetNOfEntries(); j++)
-			{
-				if (GetNthObject(i)->GetHandle() == elementOrder.GetNthEntry(j)) return j;
-			}
-		}
+		if (elementOrder.GetNth(i)->IsSelected()) return i;
 	}
 
 	return -1;
@@ -205,11 +186,9 @@ S::Int S::GUI::List::GetSelectedEntryNumber() const
 
 S::Int S::GUI::List::SelectEntry(const String &entryText)
 {
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < elementOrder.GetNOfEntries(); i++)
 	{
-		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
-
-		ListEntry	*entry = (ListEntry *) GetNthObject(i);
+		ListEntry	*entry = elementOrder.GetNth(i);
 
 		if (entry->GetText() == entryText)
 		{

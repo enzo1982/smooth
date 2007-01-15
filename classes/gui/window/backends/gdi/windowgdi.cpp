@@ -110,7 +110,7 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 
 	className	= String::FromInt(System::System::RequestGUID());
 
-	id		= windowBackends.AddEntry(this);
+	id		= windowBackends.Add(this);
 
 	minSize		= Size(160, 24);
 
@@ -126,7 +126,7 @@ S::GUI::WindowGDI::~WindowGDI()
 {
 	if (destroyIcon) DestroyIcon(sysIcon);
 
-	windowBackends.RemoveEntry(id);
+	windowBackends.Remove(id);
 }
 
 S::Void *S::GUI::WindowGDI::GetSystemWindow() const
@@ -140,7 +140,7 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::GetWindowBackend(HWND hwnd)
 
 	for (Int i = 0; i < windowBackends.GetNOfEntries(); i++)
 	{
-		WindowGDI	*window = windowBackends.GetNthEntry(i);
+		WindowGDI	*window = windowBackends.GetNth(i);
 
 		if (window != NIL)
 		{

@@ -52,9 +52,9 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		for (int k = 0; k < filters.GetNOfEntries(); k++)
 		{
-			for (int l = 0; l < filterNames.GetNthEntry(k).Length(); l++)
+			for (int l = 0; l < filterNames.GetNth(k).Length(); l++)
 			{
-				filterw[bpos] = filterNames.GetNthEntry(k)[l];
+				filterw[bpos] = filterNames.GetNth(k)[l];
 
 				bpos++;
 			}
@@ -63,9 +63,9 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 			bpos++;
 
-			for (int m = 0; m < filters.GetNthEntry(k).Length(); m++)
+			for (int m = 0; m < filters.GetNth(k).Length(); m++)
 			{
-				filterw[bpos] = filters.GetNthEntry(k)[m];
+				filterw[bpos] = filters.GetNth(k)[m];
 
 				bpos++;
 			}
@@ -125,7 +125,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 						if (file[file.Length() - 1] == '\\') file[file.Length() - 1] = 0;
 
-						files.AddEntry(file);
+						files.Add(file);
 
 						pos = 0;
 
@@ -135,7 +135,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 			}
 			else
 			{
-				files.AddEntry(dir);
+				files.Add(dir);
 			}
 
 			delete [] buffer2w;
@@ -172,9 +172,9 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		for (int k = 0; k < filters.GetNOfEntries(); k++)
 		{
-			for (int l = 0; l < filterNames.GetNthEntry(k).Length(); l++)
+			for (int l = 0; l < filterNames.GetNth(k).Length(); l++)
 			{
-				filtera[bpos] = filterNames.GetNthEntry(k)[l];
+				filtera[bpos] = filterNames.GetNth(k)[l];
 
 				bpos++;
 			}
@@ -183,9 +183,9 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 			bpos++;
 
-			for (int m = 0; m < filters.GetNthEntry(k).Length(); m++)
+			for (int m = 0; m < filters.GetNth(k).Length(); m++)
 			{
-				filtera[bpos] = filters.GetNthEntry(k)[m];
+				filtera[bpos] = filters.GetNth(k)[m];
 
 				bpos++;
 			}
@@ -245,7 +245,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 						if (file[file.Length() - 1] == '\\') file[file.Length() - 1] = 0;
 
-						files.AddEntry(file);
+						files.Add(file);
 
 						pos = 0;
 
@@ -255,7 +255,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 			}
 			else
 			{
-				files.AddEntry(dir);
+				files.Add(dir);
 			}
 
 			delete [] buffer2a;
@@ -274,8 +274,8 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 S::Int S::GUI::Dialogs::FileSelection::AddFilter(const String &name, const String &filter)
 {
-	filterNames.AddEntry(name);
-	filters.AddEntry(filter);
+	filterNames.Add(name);
+	filters.Add(filter);
 
 	return Success();
 }
@@ -315,12 +315,12 @@ S::Int S::GUI::Dialogs::FileSelection::SetFileName(const String &newDefFile)
 
 S::String S::GUI::Dialogs::FileSelection::GetFileName()
 {
-	if (files.GetNOfEntries() > 0)	return files.GetFirstEntry();
+	if (files.GetNOfEntries() > 0)	return files.GetFirst();
 	else				return NIL;
 }
 
 S::String S::GUI::Dialogs::FileSelection::GetNthFileName(Int n)
 {
-	if (files.GetNOfEntries() > n)	return files.GetNthEntry(n);
+	if (files.GetNOfEntries() > n)	return files.GetNth(n);
 	else				return NIL;
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -153,7 +153,7 @@ const Error &S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 
 S::Int S::GUI::Dialogs::TipOfTheDay::AddTip(const String &tip)
 {
-	tips.AddEntry(tip);
+	tips.Add(tip);
 
 	return Success();
 }
@@ -199,7 +199,7 @@ S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 	switch (mode)
 	{
 		case TIP_ORDERED:
-			tip = tips.GetNthEntry(offset++);
+			tip = tips.GetNth(offset++);
 
 			if (offset == tips.GetNOfEntries()) offset = 0;
 
@@ -207,7 +207,7 @@ S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 		case TIP_RANDOM:
 			srand((unsigned) time(&timer));
 
-			tip = tips.GetNthEntry(rand() % tips.GetNOfEntries());
+			tip = tips.GetNth(rand() % tips.GetNOfEntries());
 
 			break;
 	}

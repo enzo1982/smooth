@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -104,7 +104,7 @@ Bool Designer::ExitProc()
 {
 	for (Int i = 0; i < dlgs.GetNOfEntries(); i++)
 	{
-		delete dlgs.GetNthEntry(i);
+		delete dlgs.GetNth(i);
 	}
 
 	dlgs.RemoveAll();
@@ -116,7 +116,7 @@ void Designer::NewDialog()
 {
 	Designer_EditComponent	*dlg = new Designer_EditComponent(this, String("Dialog").Append(String::FromInt(dlgcounter++)));
 
-	dlgs.AddEntry(dlg);
+	dlgs.Add(dlg);
 
 	dlg->ShowDialog();
 }
@@ -159,7 +159,7 @@ void Designer::TimerProc()
 
 	for (Int i = 0; i < dlgs.GetNOfEntries(); i++)
 	{
-		object = dlgs.GetNthEntry(i);
+		object = dlgs.GetNth(i);
 
 		Point	 mousePos = object->GetWindow()->GetMousePosition();
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,12 +26,12 @@ namespace smooth
 			{
 				for (int i = 0; i < oSignal.slotsN.GetNOfEntries(); i++)
 				{
-					slotsN.AddEntry(((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) oSignal.slotsN.GetNthEntry(i))->Copy());
+					slotsN.Add(((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) oSignal.slotsN.GetNthEntry(i))->Copy());
 				}
 
 				for (int j = 0; j < oSignal.slots0.GetNOfEntries(); j++)
 				{
-					slots0.AddEntry(((SlotRBase0<returnTYPE> *) oSignal.slots0.GetNthEntry(j))->Copy());
+					slots0.Add(((SlotRBase0<returnTYPE> *) oSignal.slots0.GetNthEntry(j))->Copy());
 				}
 
 				parent = oSignal.parent;
@@ -44,14 +44,14 @@ namespace smooth
 
 			template <class classTYPE, class oClassTYPE> Int Connect(returnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)
 			{
-				slotsN.AddEntry(new SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst));
+				slotsN.Add(new SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst));
 
 				return Success();
 			}
 
 			Int Connect(returnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
 			{
-				slotsN.AddEntry(new SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc));
+				slotsN.Add(new SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc));
 
 				return Success();
 			}
@@ -60,14 +60,14 @@ namespace smooth
 			{
 				if ((Signal *) sig == (Signal *) this) return Error();
 
-				slotsN.AddEntry(new SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig));
+				slotsN.Add(new SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig));
 		
 				return Success();
 			}
 
 			Int Connect(const returnTYPE value)
 			{
-				slots0.AddEntry(new SlotRValue0<returnTYPE>(value));
+				slots0.Add(new SlotRValue0<returnTYPE>(value));
 
 				return Success();
 			}
@@ -75,14 +75,14 @@ namespace smooth
 #ifndef SIGNALS_SIGNAL_ZERO
 			template <class classTYPE, class oClassTYPE> Int Connect(returnTYPE (classTYPE::*proc)(), oClassTYPE *inst)
 			{
-				slots0.AddEntry(new SlotRClass0<oClassTYPE, returnTYPE>(proc, inst));
+				slots0.Add(new SlotRClass0<oClassTYPE, returnTYPE>(proc, inst));
 
 				return Success();
 			}
 
 			Int Connect(returnTYPE (*proc)())
 			{
-				slots0.AddEntry(new SlotRGlobal0<returnTYPE>(proc));
+				slots0.Add(new SlotRGlobal0<returnTYPE>(proc));
 
 				return Success();
 			}
@@ -91,7 +91,7 @@ namespace smooth
 			{
 				if ((Signal *) sig == (Signal *) this) return Error();
 
-				slots0.AddEntry(new SlotRSignal0<returnTYPE>(sig));
+				slots0.Add(new SlotRSignal0<returnTYPE>(sig));
 
 				return Success();
 			}
@@ -101,11 +101,11 @@ namespace smooth
 			{
 				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
 				{
-					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i))) == SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst))
+					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))) == SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst))
 					{
-						delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i);
+						delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i);
 
-						slotsN.RemoveEntry(slotsN.GetNthEntryIndex(i));
+						slotsN.Remove(slotsN.GetNthIndex(i));
 
 						break;
 					}
@@ -118,11 +118,11 @@ namespace smooth
 			{
 				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
 				{
-					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i))) == SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc))
+					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))) == SIGNALS_SLOT_GLOBAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc))
 					{
-						delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i);
+						delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i);
 
-						slotsN.RemoveEntry(slotsN.GetNthEntryIndex(i));
+						slotsN.Remove(slotsN.GetNthIndex(i));
 
 						break;
 					}
@@ -135,11 +135,11 @@ namespace smooth
 			{
 				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
 				{
-					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i))) == SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig))
+					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))) == SIGNALS_SLOT_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig))
 					{
-						delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i);
+						delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i);
 
-						slotsN.RemoveEntry(slotsN.GetNthEntryIndex(i));
+						slotsN.Remove(slotsN.GetNthIndex(i));
 
 						break;
 					}
@@ -152,11 +152,11 @@ namespace smooth
 			{
 				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
 				{
-					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slots0.GetNthEntry(i))) == SlotRValue0<returnTYPE>(value))
+					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slots0.GetNth(i))) == SlotRValue0<returnTYPE>(value))
 					{
-						delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slots0.GetNthEntry(i);
+						delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slots0.GetNth(i);
 
-						slots0.RemoveEntry(slots0.GetNthEntryIndex(i));
+						slots0.Remove(slots0.GetNthIndex(i));
 
 						break;
 					}
@@ -170,11 +170,11 @@ namespace smooth
 			{
 				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
 				{
-					if ((*((SlotRBase0<returnTYPE> *) slots0.GetNthEntry(i))) == SlotRClass0<oClassTYPE, returnTYPE>(proc, inst))
+					if ((*((SlotRBase0<returnTYPE> *) slots0.GetNth(i))) == SlotRClass0<oClassTYPE, returnTYPE>(proc, inst))
 					{
-						delete (SlotRBase0<returnTYPE> *) slots0.GetNthEntry(i);
+						delete (SlotRBase0<returnTYPE> *) slots0.GetNth(i);
 
-						slots0.RemoveEntry(slots0.GetNthEntryIndex(i));
+						slots0.Remove(slots0.GetNthIndex(i));
 
 						break;
 					}
@@ -187,11 +187,11 @@ namespace smooth
 			{
 				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
 				{
-					if ((*((SlotRBase0<returnTYPE> *) slots0.GetNthEntry(i))) == SlotRGlobal0<returnTYPE>(proc))
+					if ((*((SlotRBase0<returnTYPE> *) slots0.GetNth(i))) == SlotRGlobal0<returnTYPE>(proc))
 					{
-						delete (SlotRBase0<returnTYPE> *) slots0.GetNthEntry(i);
+						delete (SlotRBase0<returnTYPE> *) slots0.GetNth(i);
 
-						slots0.RemoveEntry(slots0.GetNthEntryIndex(i));
+						slots0.Remove(slots0.GetNthIndex(i));
 
 						break;
 					}
@@ -204,11 +204,11 @@ namespace smooth
 			{
 				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
 				{
-					if ((*((SlotRBase0<returnTYPE> *) slots0.GetNthEntry(i))) == SlotRSignal0<returnTYPE>(sig))
+					if ((*((SlotRBase0<returnTYPE> *) slots0.GetNth(i))) == SlotRSignal0<returnTYPE>(sig))
 					{
-						delete (SlotRBase0<returnTYPE> *) slots0.GetNthEntry(i);
+						delete (SlotRBase0<returnTYPE> *) slots0.GetNth(i);
 
-						slots0.RemoveEntry(slots0.GetNthEntryIndex(i));
+						slots0.Remove(slots0.GetNthIndex(i));
 
 						break;
 					}
@@ -220,8 +220,8 @@ namespace smooth
 
 			Int DisconnectAll()
 			{
-				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i);
-				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	delete (SlotRBase0<returnTYPE> *) slots0.GetNthEntry(j);
+				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	delete (SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i);
+				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	delete (SlotRBase0<returnTYPE> *) slots0.GetNth(j);
 
 				slotsN.RemoveAll();
 				slots0.RemoveAll();
@@ -235,8 +235,8 @@ namespace smooth
 
 				ProtectParent();
 
-				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	returnValue = ((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
-				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	returnValue = ((SlotRBase0<returnTYPE> *) slots0.GetNthEntry(j))->Emit();
+				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	returnValue = ((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	returnValue = ((SlotRBase0<returnTYPE> *) slots0.GetNth(j))->Emit();
 
 				UnprotectParent();
 
@@ -251,16 +251,16 @@ namespace smooth
 				{
 					if (i == slotsN.GetNOfEntries() - 1 && slots0.GetNOfEntries() == 0) last = True;
 
-					if (last)	return ((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
-					else		((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNthEntry(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+					if (last)	return ((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+					else		((SIGNALS_SLOT_BASE_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
 				}
 
 				for (Int j = 0; j < slots0.GetNOfEntries(); j++)
 				{
 					if (j == slots0.GetNOfEntries() - 1) last = True;
 
-					if (last)	return ((SlotRBase0<returnTYPE> *) slots0.GetNthEntry(j))->Emit();
-					else		((SlotRBase0<returnTYPE> *) slots0.GetNthEntry(j))->Emit();
+					if (last)	return ((SlotRBase0<returnTYPE> *) slots0.GetNth(j))->Emit();
+					else		((SlotRBase0<returnTYPE> *) slots0.GetNth(j))->Emit();
 				}
 			}
 

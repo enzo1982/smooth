@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,7 +19,7 @@ S::ArgumentsParser::ArgumentsParser(const String &commandLine)
 	{
 		if (commandLine[i] == ' ' && !quoted && commandLine[i - 1] != '\\')
 		{
-			if (param.Length() > 0) args.AddEntry(String(param));
+			if (param.Length() > 0) args.Add(String(param));
 
 			param	= "";
 			j	= 0;
@@ -33,7 +33,7 @@ S::ArgumentsParser::ArgumentsParser(const String &commandLine)
 			param[j++] = commandLine[i];
 		}
 
-		if (i == commandLine.Length() - 1 && param.Length() > 0) args.AddEntry(String(param));
+		if (i == commandLine.Length() - 1 && param.Length() > 0) args.Add(String(param));
 	}
 }
 

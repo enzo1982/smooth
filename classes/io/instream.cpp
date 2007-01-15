@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -140,8 +140,8 @@ S::Bool S::IO::InStream::ReadData()
 	{
 		if (filters.GetNOfEntries() > 0)
 		{
-			if (filters.GetFirstEntry()->GetPackageSize() > 0)	packageSize = filters.GetFirstEntry()->GetPackageSize();
-			else							packageSize = stdpacksize;
+			if (filters.GetFirst()->GetPackageSize() > 0)	packageSize = filters.GetFirst()->GetPackageSize();
+			else						packageSize = stdpacksize;
 		}
 		else	packageSize = stdpacksize;
 
@@ -159,8 +159,8 @@ S::Bool S::IO::InStream::ReadData()
 		}
 		else
 		{
-			if (size != -1)	decsize = filters.GetFirstEntry()->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
-			else		decsize = filters.GetFirstEntry()->ReadData(dataBuffer, packageSize);
+			if (size != -1)	decsize = filters.GetFirst()->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
+			else		decsize = filters.GetFirst()->ReadData(dataBuffer, packageSize);
 		}
 
 		if (packageSize <= size-currentFilePos || filters.GetNOfEntries() > 0 || size == -1)
@@ -495,7 +495,7 @@ S::Bool S::IO::InStream::AddFilter(Filter *newFilter)
 
 	allowpackset = false;
 
-	filters.AddEntry(newFilter);
+	filters.Add(newFilter);
 
 	while (currentBufferPos >= packageSize)
 	{
@@ -511,13 +511,13 @@ S::Bool S::IO::InStream::RemoveFilter(Filter *oldFilter)
 
 	Int	 index = -1;
 
-	for (Int i = 0; i < filters.GetNOfEntries(); i++) if (filters.GetNthEntry(i) == oldFilter) index = filters.GetNthEntryIndex(i);
+	for (Int i = 0; i < filters.GetNOfEntries(); i++) if (filters.GetNth(i) == oldFilter) index = filters.GetNthIndex(i);
 
 	if (index == -1) { lastError = IO_ERROR_BADPARAM; return false; }
 
 	oldFilter->Deactivate();
 
-	filters.RemoveEntry(index);
+	filters.Remove(index);
 
 	allowpackset = true;
 
@@ -532,7 +532,7 @@ S::Bool S::IO::InStream::Close()
 
 	if (pbdActive) CompletePBD();
 
-	while (filters.GetNOfEntries() != 0) RemoveFilter(filters.GetLastEntry());
+	while (filters.GetNOfEntries() != 0) RemoveFilter(filters.GetLast());
 
 	if (crosslinked)
 	{

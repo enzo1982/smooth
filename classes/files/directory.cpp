@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -97,13 +97,13 @@ const S::Array<S::Directory> &S::Directory::GetDirectories()
 	{
 		if (Setup::enableUnicode)
 		{
-			if ((findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataW.cFileName) != "." && String(findDataW.cFileName) != "..") directories.AddEntry(Directory(findDataW.cFileName, *this));
+			if ((findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataW.cFileName) != "." && String(findDataW.cFileName) != "..") directories.Add(Directory(findDataW.cFileName, *this));
 
 			success = FindNextFileW(handle, &findDataW);
 		}
 		else
 		{
-			if ((findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataA.cFileName) != "." && String(findDataA.cFileName) != "..") directories.AddEntry(Directory(findDataA.cFileName, *this));
+			if ((findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataA.cFileName) != "." && String(findDataA.cFileName) != "..") directories.Add(Directory(findDataA.cFileName, *this));
 
 			success = FindNextFileA(handle, &findDataA);
 		}
@@ -131,13 +131,13 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern)
 	{
 		if (Setup::enableUnicode)
 		{
-			if (!(findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) files.AddEntry(File(findDataW.cFileName, *this));
+			if (!(findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) files.Add(File(findDataW.cFileName, *this));
 
 			success = FindNextFileW(handle, &findDataW);
 		}
 		else
 		{
-			if (!(findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) files.AddEntry(File(findDataA.cFileName, *this));
+			if (!(findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) files.Add(File(findDataA.cFileName, *this));
 
 			success = FindNextFileA(handle, &findDataA);
 		}

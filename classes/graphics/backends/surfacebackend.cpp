@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,15 +32,15 @@ S::Int S::GUI::SurfaceBackend::AddBackend(SurfaceBackend *(*backend)(Void *, con
 
 	if (backend_creators == NIL) backend_creators = new Array<SurfaceBackend *(*)(Void *, const Size &), Void *>;
 
-	backend_creators->AddEntry(backend);
+	backend_creators->Add(backend);
 
 	return Success();
 }
 
 S::GUI::SurfaceBackend *S::GUI::SurfaceBackend::CreateBackendInstance(Void *iSurface, const Size &maxSize)
 {
-	if (backend_creators->GetFirstEntry() != &CreateSurfaceBackend)	return backend_creators->GetFirstEntry()(iSurface, maxSize);
-	else								return backend_creators->GetLastEntry()(iSurface, maxSize);
+	if (backend_creators->GetFirst() != &CreateSurfaceBackend)	return backend_creators->GetFirst()(iSurface, maxSize);
+	else								return backend_creators->GetLast()(iSurface, maxSize);
 }
 
 S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface, const Size &maxSize)

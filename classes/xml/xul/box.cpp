@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,7 +40,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 
 				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(widget);
+				widgets.Add(widget);
 			}
 			else if (nNode->GetName() == "button")
 			{
@@ -48,7 +48,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 
 				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(widget);
+				widgets.Add(widget);
 			}
 			else if (nNode->GetName() == "textbox")
 			{
@@ -56,7 +56,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 
 				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(widget);
+				widgets.Add(widget);
 			}
 			else if (nNode->GetName() == "label")
 			{
@@ -64,7 +64,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 
 				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(widget);
+				widgets.Add(widget);
 			}
 			else if (nNode->GetName() == "description")
 			{
@@ -72,7 +72,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 
 				layer->RegisterObject(widget->GetWidget());
 
-				widgets.AddEntry(widget);
+				widgets.Add(widget);
 			}
 		}
 
@@ -82,7 +82,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 
 S::XML::XUL::Box::~Box()
 {
-	for (Int i = 0; i < widgets.GetNOfEntries(); i++) delete widgets.GetNthEntry(i);
+	for (Int i = 0; i < widgets.GetNOfEntries(); i++) delete widgets.GetNth(i);
 
 	widgets.RemoveAll();
 
@@ -109,7 +109,7 @@ S::Void	 S::XML::XUL::Box::CalculateChildMetrics()
 
 	for (Int i = 0; i < widgets.GetNOfEntries(); i++)
 	{
-		XUL::Widget	*widget = widgets.GetNthEntry(i);
+		XUL::Widget	*widget = widgets.GetNth(i);
 
 		maxWidth = Math::Max(maxWidth, widget->GetWidth());
 		maxHeight = Math::Max(maxHeight, widget->GetHeight());

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -44,7 +44,7 @@ Int MyActiveArea::Paint(Int message)
 	Surface	*surface	= window->GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
-	surface->Box(frame, areaColor, FILLED);
+	surface->Box(frame, areaColor, Rect::Filled);
 	surface->Frame(frame, FRAME_DOWN);
 
 	return Success();

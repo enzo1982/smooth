@@ -99,14 +99,14 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 				Point	 realPos = GetRealPosition();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
-				surface->Box(frame, Setup::BackgroundColor, FILLED);
+				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 				surface->Frame(frame, FRAME_UP);
 
 				for (Int i = 0; i < tabWidths.GetNOfEntries(); i++)
 				{
 					frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNth(i)) + 1, realPos.x + GetWidth());
 
-					surface->Box(frame, Setup::BackgroundColor, FILLED);
+					surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 					surface->Frame(frame, FRAME_UP);
 
 					frame.left += 3;
@@ -185,7 +185,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 					if (window->IsMouseOn(frame) && !tabChecked.GetNth(j) && moveTab == -1)
 					{
-						surface->Box(frame, Setup::LightGrayColor, FILLED);
+						surface->Box(frame, Setup::LightGrayColor, Rect::Filled);
 
 						frame.left += 2;
 						surface->SetText(tabNames.GetNth(j), frame, font);
@@ -195,7 +195,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					}
 					else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNth(j))
 					{
-						surface->Box(frame, Setup::BackgroundColor, FILLED);
+						surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 
 						frame.left += 2;
 						surface->SetText(tabNames.GetNth(j), frame, font);

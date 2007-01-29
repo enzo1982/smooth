@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -127,11 +127,11 @@ S::Int S::GUI::Surface::Frame(const Rect &rect, Int style)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::Box(const Rect &rect, Int color, Int style)
+S::Int S::GUI::Surface::Box(const Rect &rect, Int color, Int style, const Size &ellipse)
 {
 	if (mutex != NIL) mutex->Lock();
 
-	Int	 rVal = backend->Box(rect, color, style);
+	Int	 rVal = backend->Box(rect, color, style, ellipse);
 
 	if (mutex != NIL) mutex->Release();
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -62,7 +62,7 @@ S::Int S::GUI::Button::Paint(Int message)
 					surface->Frame(Rect(GetRealPosition() + Point(1, 1), GetSize() - Size(2, 2)), FRAME_UP);
 				}
 
-				if (GetBackgroundColor() >= 0) surface->Box(frame, GetBackgroundColor(), FILLED);
+				if (GetBackgroundColor() >= 0) surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 
 				if (text != NIL)
 				{

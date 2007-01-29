@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -76,7 +76,7 @@ S::Int S::GUI::Slider::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			surface->Box(Rect(realPos, GetSize()), Setup::BackgroundColor, FILLED);
+			surface->Box(Rect(realPos, GetSize()), Setup::BackgroundColor, Rect::Filled);
 
 			if (subtype == OR_HORZ)	surface->Bar(realPos + Point(4, 8), realPos + Point(GetWidth() - 4, 8), OR_HORZ);
 			else			surface->Bar(realPos + Point(8, 4), realPos + Point(8, GetHeight() - 4), OR_VERT);
@@ -84,8 +84,8 @@ S::Int S::GUI::Slider::Paint(Int message)
 			if (subtype == OR_HORZ)	sliderRect = Rect(realPos + Point((Int) (((Float) (GetWidth() - gripSize)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0), Size(gripSize, 17));
 			else			sliderRect = Rect(realPos + Point(0, (GetHeight() - gripSize - 1) - (Int) (((Float) (GetHeight() - gripSize - 1)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue)))), Size(18, gripSize + 1));
 
-			if (!dragging)	surface->Box(sliderRect, Setup::BackgroundColor, FILLED);
-			else		surface->Box(sliderRect, Setup::LightGrayColor, FILLED);
+			if (!dragging)	surface->Box(sliderRect, Setup::BackgroundColor, Rect::Filled);
+			else		surface->Box(sliderRect, Setup::LightGrayColor, Rect::Filled);
 
 			surface->Frame(sliderRect, FRAME_UP);
 

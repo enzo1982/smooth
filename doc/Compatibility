@@ -1,19 +1,21 @@
 Status of smooth ports
 ----------------------
 
-MinGW 1.x		up to 0.8.66.0	complete support
-MinGW 2.x, 3.0, 3.1	not supported	not supported, due to a bug in the GNU C++ Compiler
-MinGW 3.2		all versions	complete support
-MinGW 4.x		since 0.8.67.0	complete support
-Cygwin 1.5.x, GCC 3.3+	since 0.8.65.0	complete support (Win32 API); no GUI support, yet (Xlib API)
-MSVC			since 0.8.58.0	complete support
-Linux GCC		since 0.8.64.0	no GUI support, yet
-QNX 6.x GCC		untested	no GUI support, yet
+MinGW 1.x		up to 0.8.66.0			complete support
+MinGW 2.x, 3.0, 3.1	not supported			not supported, due to a bug in the GNU C++ Compiler
+MinGW 3.2		all versions			complete support
+MinGW 4.x		since 0.8.67.0			complete support
+Cygwin 1.5.x, GCC 3.3+	since 0.8.65.0			complete support (Win32 API); no GUI support, yet (Xlib API)
+MSVC 6.0		since 0.8.58.0, up to 0.8.69.0	complete support
+MSVC 8.0		since 0.8.69.1			complete support
+Linux GCC		since 0.8.64.0			no GUI support, yet
+QNX 6.x GCC		untested			no GUI support, yet
 
-Windows 2000/XP/2003	all versions	complete support
-Windows NT 4.0		supported	seems to work, no official support
-Windows 98/SE/ME	all versions	limited Unicode support
-Windows 95		since 0.8.62.0	limited Unicode support, requires msvcrt.dll
+Windows 2000/XP/2003	all versions			complete support
+Windows NT 4.0		supported			seems to work, no official support
+Windows Vista		since 0.8.69.0			complete support
+Windows 98/SE/ME	all versions			limited Unicode support
+Windows 95		since 0.8.62.0			limited Unicode support, requires: msvcrt.dll, ws2_32.dll, Shell Update
 
 Source and binary compatibility between different smooth Versions
 -----------------------------------------------------------------

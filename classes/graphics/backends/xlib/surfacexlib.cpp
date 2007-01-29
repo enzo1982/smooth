@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -177,7 +177,7 @@ S::Int S::GUI::SurfaceXLib::Line(const Point &iPos1, const Point &iPos2, Int col
 	return Success();
 }
 
-S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, Int color, Int style)
+S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, Int color, Int style, const Size &ellipse)
 {
 	if (window == NIL) return Success();
 
@@ -188,17 +188,17 @@ S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, Int color, Int style)
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
-	if (style == FILLED)
+	if (style & Rect::Filled)
 	{
 		XFillRectangle(display, window, gc, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 		XFillRectangle(display, bitmap, gc, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 	}
-	else if (style == OUTLINED)
+	else if (style == Rect::Outlined)
 	{
 		XDrawRectangle(display, window, gc, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 		XDrawRectangle(display, bitmap, gc, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
 	}
-	else if (style == OUTLINEDOTS)
+	else if (style & Rect::Dotted)
 	{
 		Bool	 dot = False;
 		Int	 x;

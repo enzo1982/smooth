@@ -241,7 +241,7 @@ S::Int S::GUI::SurfaceGDI::Line(const Point &iPos1, const Point &iPos2, Int colo
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style)
+S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style, const Size &ellipse)
 {
 	if (window == NIL) return Success();
 
@@ -249,24 +249,39 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style)
 
 	HDC	 gdi_dc = GetWindowDC(window);
 	HBRUSH	 brush = CreateSolidBrush(color);
+	HPEN	 pen = CreatePen(PS_SOLID, 0, color);
 	RECT	 wRect = rect;
 
-	if (style == FILLED)
+	if (style & Rect::Filled)
 	{
-		if (!painting) FillRect(gdi_dc, &wRect, brush);
-		FillRect(cDc_contexts.GetLast(), &wRect, brush);
+		if (style & Rect::Rounded)
+		{
+			HBRUSH	 previousBrush	= (HBRUSH) SelectObject(cDc_contexts.GetLast(), brush);
+			HPEN	 previousPen	= (HPEN) SelectObject(cDc_contexts.GetLast(), pen);
+
+			if (!painting) RoundRect(cDc_contexts.GetLast(), rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
+			RoundRect(cDc_contexts.GetLast(), rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
+
+			brush	= (HBRUSH) SelectObject(cDc_contexts.GetLast(), previousBrush);
+			pen	= (HPEN) SelectObject(cDc_contexts.GetLast(), previousPen);
+		}
+		else
+		{
+			if (!painting) FillRect(gdi_dc, &wRect, brush);
+			FillRect(cDc_contexts.GetLast(), &wRect, brush);
+		}
 	}
-	else if (style == OUTLINED)
+	else if (style == Rect::Outlined)
 	{
 		if (!painting) FrameRect(gdi_dc, &wRect, brush);
 		FrameRect(cDc_contexts.GetLast(), &wRect, brush);
 	}
-	else if (style == INVERT)
+	else if (style & Rect::Inverted)
 	{
 		if (!painting) InvertRect(gdi_dc, &wRect);
 		InvertRect(cDc_contexts.GetLast(), &wRect);
 	}
-	else if (style == OUTLINEDOTS)
+	else if (style & Rect::Dotted)
 	{
 		Bool	 dot = False;
 		Int	 x;
@@ -324,6 +339,7 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style)
 	}
 
 	::DeleteObject(brush);
+	::DeleteObject(pen);
 
 	ReleaseDC(window, gdi_dc);
 

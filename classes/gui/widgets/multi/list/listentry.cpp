@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -89,9 +89,9 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				surface->StartPaint(frame);
 
 				if (mouseOver)	surface->Gradient(frame, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
-				else		surface->Box(frame, Setup::ClientColor, FILLED);
+				else		surface->Box(frame, Setup::ClientColor, Rect::Filled);
 
-				if (selected)	surface->Box(frame, Setup::ClientTextColor, OUTLINEDOTS);
+				if (selected)	surface->Box(frame, Setup::ClientTextColor, Rect::Dotted);
 
 				if (container->GetFlags() & LF_MULTICHECKBOX)
 				{
@@ -99,8 +99,8 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 					if (cbRect.top <= cbRect.bottom - 1)
 					{
-						surface->Box(cbRect, Setup::ClientColor, FILLED);
-						surface->Box(cbRect, Setup::GrayTextColor, OUTLINED);
+						surface->Box(cbRect, Setup::ClientColor, Rect::Filled);
+						surface->Box(cbRect, Setup::GrayTextColor, Rect::Outlined);
 
 						if (marked && cbRect.top <= cbRect.bottom - 3)
 						{

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -80,13 +80,13 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 		case SP_PAINT:
 			if (!(flags & CB_HOTSPOTONLY))
 			{
-				if (IsActive())	surface->Box(frame, Setup::ClientColor, FILLED);
-				else		surface->Box(frame, Setup::BackgroundColor, FILLED);
+				if (IsActive())	surface->Box(frame, Setup::ClientColor, Rect::Filled);
+				else		surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 
 				surface->Frame(frame, FRAME_DOWN);
 			}
 
-			surface->Box(frame + Point(GetWidth() - 18, 1) - Size(GetWidth() - 17, 2), Setup::BackgroundColor, FILLED);
+			surface->Box(frame + Point(GetWidth() - 18, 1) - Size(GetWidth() - 17, 2), Setup::BackgroundColor, Rect::Filled);
 			surface->Frame(frame + Point(GetWidth() - 18, 1) - Size(GetWidth() - 17, 2), FRAME_UP);
 
 			lineStart	= Point(frame.right - 13 + (IsRightToLeft() ? 1 : 0), frame.top + 8);

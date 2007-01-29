@@ -77,7 +77,7 @@ S::Int S::GUI::Cursor::Paint(Int message)
 
 				surface->StartPaint(frame);
 
-				surface->Box(frame, GetBackgroundColor(), FILLED);
+				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 
 				String	 line;
 				Bool	 fillLineIndices = (lineIndices.GetNOfEntries() == 0);
@@ -120,7 +120,7 @@ S::Int S::GUI::Cursor::Paint(Int message)
 
 									Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText, lineMarkStart) - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY("*") + 3));
 
-									surface->Box(markRect, bColor, FILLED);
+									surface->Box(markRect, bColor, Rect::Filled);
 
 									Font	 nFont = font;
 
@@ -537,7 +537,19 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 					String	 insertText;
 
-					insertText[0] = wParam;
+					if (Setup::enableUnicode)
+					{
+						insertText[0] = wParam;
+					}
+					else
+					{
+						// Non Unicode Windows puts ANSI character codes into wParam.
+						// Import these using the current character input format.
+
+						char  ansiText[2] = { wParam, 0 };
+
+						insertText = ansiText;
+					}
 
 					InsertText(insertText);
 				}
@@ -604,7 +616,7 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 
 	if (!(line - scrollPos < 0 || (font.GetTextSizeY("*") + 3) * (line - scrollPos + 1) > GetHeight()))
 	{
-		surface->Box(Rect(point, Size(1, font.GetTextSizeY("*") + 3)), 0, INVERT);
+		surface->Box(Rect(point, Size(1, font.GetTextSizeY("*") + 3)), 0, Rect::Inverted);
 
 		promptVisible = visible;
 	}

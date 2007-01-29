@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -90,7 +90,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->Box(frame, Setup::BackgroundColor, FILLED);
+				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 				surface->SetText(text, textRect, nFont);
 
 				if (bitmap != NIL && bVar == NIL && iVar == NIL)
@@ -161,8 +161,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 								point -= Point(i, i);
 							}
 
-							surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, FILLED);
-							surface->Box(Rect(point + Point(0, 1), Size(5, 3)), color, FILLED);
+							surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, Rect::Filled);
+							surface->Box(Rect(point + Point(0, 1), Size(5, 3)), color, Rect::Filled);
 						}
 					}
 				}
@@ -248,8 +248,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 								point -= Point(i, i);
 							}
 
-							surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, FILLED);
-							surface->Box(Rect(point + Point(0, 1), Size(5, 3)), color, FILLED);
+							surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, Rect::Filled);
+							surface->Box(Rect(point + Point(0, 1), Size(5, 3)), color, Rect::Filled);
 						}
 					}
 				}

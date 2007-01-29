@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,7 +42,7 @@ S::Int S::GUI::Layer::Show()
 		Surface	*surface	= container->GetDrawSurface();
 		Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
-		surface->Box(frame, GetBackgroundColor(), FILLED);
+		surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 	}
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
@@ -99,7 +99,7 @@ S::Int S::GUI::Layer::Hide()
 		Surface	*surface	= container->GetDrawSurface();
 		Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
-		surface->Box(frame, Setup::BackgroundColor, FILLED);
+		surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 	}
 
 	onHide.Emit();
@@ -124,7 +124,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 				{
 					Rect	 frame = Rect(GetRealPosition(), GetSize());
 
-					surface->Box(Rect::OverlapRect(frame, updateRect), GetBackgroundColor(), FILLED);
+					surface->Box(Rect::OverlapRect(frame, updateRect), GetBackgroundColor(), Rect::Filled);
 				}
 			}
 

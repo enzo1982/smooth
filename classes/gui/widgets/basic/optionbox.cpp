@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -154,8 +154,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 						point -= Point((IsRightToLeft() ? -j : j), j);
 					}
 
-					surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, FILLED);
-					surface->Box(Rect(point + Point(0, 1), Size(5, 3)), color, FILLED);
+					surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, Rect::Filled);
+					surface->Box(Rect(point + Point(0, 1), Size(5, 3)), color, Rect::Filled);
 				}
 			}
 

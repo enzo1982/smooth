@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -111,8 +111,8 @@ S::Void S::GUI::Tooltip::OnToolWindowPaint()
 	Surface	*surface = toolWindow->GetDrawSurface();
 	Rect	 tRect	 = Rect(Point(0, 0), Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4));
 
-	surface->Box(tRect, Setup::TooltipColor, FILLED);
-	surface->Box(tRect, Color(0, 0, 0), OUTLINED);
+	surface->Box(tRect, Setup::TooltipColor, Rect::Filled);
+	surface->Box(tRect, Color(0, 0, 0), Rect::Outlined);
 
 	surface->SetText(text, tRect + Point(2, 1), font);
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,12 @@
 
 #include <smooth/graphics/forms/rect.h>
 #include <smooth/misc/math.h>
+
+S::Int	  S::GUI::Rect::Outlined = 0;
+S::Int	  S::GUI::Rect::Filled	 = 1;
+S::Int	  S::GUI::Rect::Rounded	 = 2;
+S::Int	  S::GUI::Rect::Inverted = 4;
+S::Int	  S::GUI::Rect::Dotted	 = 8;
 
 S::GUI::Rect S::GUI::Rect::operator +(const Point &point) const
 {

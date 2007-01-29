@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -75,8 +75,8 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 		case SP_PAINT:
 			OnValueChange();
 
-			surface->Box(arrow1Frame, Setup::BackgroundColor, FILLED);
-			surface->Box(arrow2Frame, Setup::BackgroundColor, FILLED);
+			surface->Box(arrow1Frame, Setup::BackgroundColor, Rect::Filled);
+			surface->Box(arrow2Frame, Setup::BackgroundColor, Rect::Filled);
 
 			surface->Frame(arrow1Frame, FRAME_UP);
 			surface->Frame(arrow2Frame, FRAME_UP);
@@ -189,9 +189,9 @@ S::Void S::GUI::Scrollbar::OnValueChange()
 	Rect	 backFrame	= Rect(GetRealPosition() + (subtype == OR_HORZ ? Point(hotspotSize + 4, 0) : Point(0, hotspotSize + 4)), GetSize() - (subtype == OR_HORZ ? Size(2 * (hotspotSize + 4), 0) : Size(0, 2 * (hotspotSize + 4))));
 	Rect	 sliderFrame	= Rect(GetRealPosition() + (subtype == OR_HORZ ? Point(hotspotSize + 4 + (Int) (((Float) GetWidth() - 3 * (hotspotSize + 4)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, hotspotSize + 4 + (Int) (((Float) GetHeight() - 3 * (hotspotSize + 4)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))))), subtype == OR_HORZ ? Size(hotspotSize + 4, GetHeight()) : Size(GetWidth(), hotspotSize + 4));
 
-	surface->Box(backFrame, Setup::LightGrayColor, FILLED);
+	surface->Box(backFrame, Setup::LightGrayColor, Rect::Filled);
 
-	if (!dragging) surface->Box(sliderFrame, Setup::BackgroundColor, FILLED);
+	if (!dragging) surface->Box(sliderFrame, Setup::BackgroundColor, Rect::Filled);
 
 	surface->Frame(sliderFrame, FRAME_UP);
 }

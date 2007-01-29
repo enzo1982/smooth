@@ -84,7 +84,7 @@ S::Float S::Math::Log10(Float f)
 
 S::Float S::Math::Log2(Float f)
 {
-	return log(f) / log(2);
+	return log(f) / log(2.0);
 }
 
 S::Float S::Math::Min(Float f1, Float f2)

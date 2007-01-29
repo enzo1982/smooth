@@ -6,3 +6,5 @@ xx.01.07 xx:xx - smooth alpha 0.8.69.1
 - buffer.cpp	- Fixed problems when using const Buffer<>
 
 - simplified Array<> API
+- converted project to MSVC 8.0
+- lots of fixes for non latin Windows 9x/ME

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -49,7 +49,7 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 
 				Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
 
-				surface->Box(textRect, Setup::BackgroundColor, FILLED);
+				surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
 				Font	 nFont		= font;
 
@@ -74,7 +74,7 @@ S::Int S::GUI::GroupBox::Activate()
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
 
-	surface->Box(textRect, Setup::BackgroundColor, FILLED);
+	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
 	surface->SetText(text, textRect + Point(1, 0), font);
 
@@ -91,7 +91,7 @@ S::Int S::GUI::GroupBox::Deactivate()
 	Surface	*surface	= container->GetDrawSurface();
 	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
 
-	surface->Box(textRect, Setup::BackgroundColor, FILLED);
+	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
 	Font	 nFont		= font;
 
@@ -117,7 +117,7 @@ S::Int S::GUI::GroupBox::Hide()
 	{
 		Surface	*surface = container->GetDrawSurface();
 
-		surface->Box(Rect(GetRealPosition() - Point(0, 6), GetSize() + Size(0, 6)), Setup::BackgroundColor, FILLED);
+		surface->Box(Rect(GetRealPosition() - Point(0, 6), GetSize() + Size(0, 6)), Setup::BackgroundColor, Rect::Filled);
 	}
 
 	return Layer::Hide();

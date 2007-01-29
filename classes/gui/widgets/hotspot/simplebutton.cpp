@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,7 +42,7 @@ S::Int S::GUI::HotspotSimpleButton::Paint(Int message)
 
 			break;
 		case SP_MOUSEOUT:
-			surface->Box(frame, GetBackgroundColor() >= 0 ? GetBackgroundColor() : Setup::BackgroundColor, OUTLINED);
+			surface->Box(frame, GetBackgroundColor() >= 0 ? GetBackgroundColor() : Setup::BackgroundColor, Rect::Outlined);
 
 			break;
 	}

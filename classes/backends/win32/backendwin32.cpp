@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,6 @@
 #include <smooth/backends/win32/backendwin32.h>
 #include <smooth/gui/application/application.h>
 
-#include <winsock2.h>
 #include <iconv.h>
 
 size_t	 (*iconv)(iconv_t, const char **, size_t *, char **, size_t *)	= NIL;

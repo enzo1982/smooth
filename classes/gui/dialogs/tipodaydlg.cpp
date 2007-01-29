@@ -217,5 +217,5 @@ S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 
 S::Void S::GUI::Dialogs::TipOfTheDay::Paint()
 {
-	dlgwnd->GetDrawSurface()->Box(Rect(Point(7, 38) + dlgwnd->GetMainLayer()->GetPosition(), Size(330, 184)), 0, OUTLINED);
+	dlgwnd->GetDrawSurface()->Box(Rect(Point(7, 38) + dlgwnd->GetMainLayer()->GetPosition(), Size(330, 184)), 0, Rect::Outlined);
 }

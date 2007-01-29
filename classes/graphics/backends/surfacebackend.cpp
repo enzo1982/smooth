@@ -198,7 +198,7 @@ S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Int style)
 	return Success();
 }
 
-S::Int S::GUI::SurfaceBackend::Box(const Rect &rect, Int color, Int style)
+S::Int S::GUI::SurfaceBackend::Box(const Rect &rect, Int color, Int style, const Size &ellipse)
 {
 	return Success();
 }

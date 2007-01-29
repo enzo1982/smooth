@@ -340,8 +340,8 @@ S::Int S::GUI::Widget::Hide()
 		Rect	 rect		= Rect(GetRealPosition(), size);
 		Surface	*surface	= container->GetDrawSurface();
 
-		if (container->GetBackgroundColor() != -1)	surface->Box(rect, container->GetBackgroundColor(), FILLED);
-		else						surface->Box(rect, Setup::BackgroundColor, FILLED);
+		if (container->GetBackgroundColor() != -1)	surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
+		else						surface->Box(rect, Setup::BackgroundColor, Rect::Filled);
 	}
 
 	onHide.Emit();

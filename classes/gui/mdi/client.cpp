@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -74,7 +74,7 @@ S::Int S::GUI::MDI::Client::Paint(Int message)
 
 				Rect	 intersectRect = Rect::OverlapRect(updateRect, client);
 
-				surface->Box(intersectRect, Setup::DividerDarkColor, FILLED);
+				surface->Box(intersectRect, Setup::DividerDarkColor, Rect::Filled);
 				surface->Frame(client, FRAME_DOWN);
 			}
 

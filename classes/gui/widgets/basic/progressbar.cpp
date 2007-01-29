@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -53,8 +53,8 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 		case SP_UPDATE:
 			surface->StartPaint(frame);
 
-			if (IsActive())	surface->Box(frame + Point(1, 1) - Size(2, 2), Setup::ClientColor, FILLED);
-			else		surface->Box(frame + Point(1, 1) - Size(2, 2), Setup::BackgroundColor, FILLED);
+			if (IsActive())	surface->Box(frame + Point(1, 1) - Size(2, 2), Setup::ClientColor, Rect::Filled);
+			else		surface->Box(frame + Point(1, 1) - Size(2, 2), Setup::BackgroundColor, Rect::Filled);
 
 			if (message != SP_UPDATE) surface->Frame(frame, FRAME_DOWN);
 

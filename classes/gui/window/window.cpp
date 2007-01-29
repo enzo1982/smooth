@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -773,7 +773,9 @@ S::Int S::GUI::Window::Paint(Int message)
 		surface->StartPaint(updateRect);
 		surface->SetRightToLeft(preRTL);
 
-		surface->Box(updateRect, Setup::BackgroundColor, FILLED);
+		surface->Box(updateRect, Setup::BackgroundColor, Rect::Filled);
+
+		onPaint.Emit();
 
 		if (type != ToolWindow::classID)
 		{
@@ -872,8 +874,6 @@ S::Int S::GUI::Window::Paint(Int message)
 		}
 
 		surface->EndPaint();
-
-		onPaint.Emit();
 	}
 
 	LeaveProtectedRegion();

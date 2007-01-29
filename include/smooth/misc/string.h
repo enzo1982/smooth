@@ -1,5 +1,5 @@
 /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -66,7 +66,10 @@ namespace smooth
 			static Bool			 IsANSI(const String &);
 			static Bool			 IsUnicode(const String &);
 
+			static const char		*GetInputFormat()				{ return inputFormat; }
 			static char			*SetInputFormat(const char *);
+
+			static const char		*GetOutputFormat()				{ return outputFormat; }
 			static char			*SetOutputFormat(const char *);
 
 			Int				 ImportFrom(const char *, const char *);

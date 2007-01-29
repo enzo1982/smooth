@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -54,25 +54,17 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		{
 			for (int l = 0; l < filterNames.GetNth(k).Length(); l++)
 			{
-				filterw[bpos] = filterNames.GetNth(k)[l];
-
-				bpos++;
+				filterw[bpos++] = filterNames.GetNth(k)[l];
 			}
 
-			filterw[bpos] = 0;
-
-			bpos++;
+			filterw[bpos++] = 0;
 
 			for (int m = 0; m < filters.GetNth(k).Length(); m++)
 			{
-				filterw[bpos] = filters.GetNth(k)[m];
-
-				bpos++;
+				filterw[bpos++] = filters.GetNth(k)[m];
 			}
 
-			filterw[bpos] = 0;
-
-			bpos++;
+			filterw[bpos++] = 0;
 		}
 
 		filterw[bpos++] = 0;
@@ -172,27 +164,23 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		for (int k = 0; k < filters.GetNOfEntries(); k++)
 		{
+			char	*filterName = filterNames.GetNth(k);
+
 			for (int l = 0; l < filterNames.GetNth(k).Length(); l++)
 			{
-				filtera[bpos] = filterNames.GetNth(k)[l];
-
-				bpos++;
+				filtera[bpos++] = filterName[l];
 			}
 
-			filtera[bpos] = 0;
+			filtera[bpos++] = 0;
 
-			bpos++;
+			char	*filter = filters.GetNth(k);
 
 			for (int m = 0; m < filters.GetNth(k).Length(); m++)
 			{
-				filtera[bpos] = filters.GetNth(k)[m];
-
-				bpos++;
+				filtera[bpos++] = filter[m];
 			}
 
-			filtera[bpos] = 0;
-
-			bpos++;
+			filtera[bpos++] = 0;
 		}
 
 		filtera[bpos++] = 0;

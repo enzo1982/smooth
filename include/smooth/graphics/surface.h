@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -63,7 +63,7 @@ namespace smooth
 
 				Int		 Line(const Point &, const Point &, Int);
 				Int		 Frame(const Rect &, Int);
-				Int		 Box(const Rect &, Int, Int);
+				Int		 Box(const Rect &, Int, Int, const Size & = Size(0, 0));
 
 				Int		 SetText(const String &, const Rect &, const Font &, Bool = False);
 
@@ -76,10 +76,6 @@ namespace smooth
 
 		const Int	 FRAME_UP	= 0;
 		const Int	 FRAME_DOWN	= 1;
-		const Int	 FILLED		= 0;
-		const Int	 OUTLINED	= 1;
-		const Int	 OUTLINEDOTS	= 2;
-		const Int	 INVERT		= 3;
 	};
 };
 

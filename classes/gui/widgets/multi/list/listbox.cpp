@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -96,8 +96,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				scrollbarPos = 0;
 			}
 
-			if (IsActive())	surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::ClientColor, FILLED);
-			else		surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::BackgroundColor, FILLED);
+			if (IsActive())	surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::ClientColor, Rect::Filled);
+			else		surface->Box(frame + Point(0, header->IsVisible() ? 17 : 0) - Size(scrollbar->IsVisible() ? 18 : 0, header->IsVisible() ? 17 : 0), Setup::BackgroundColor, Rect::Filled);
 
 			surface->Frame(frame, FRAME_DOWN);
 

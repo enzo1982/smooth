@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -385,13 +385,13 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 	rect.right = rect.left + crsizex + 1;
 	rect.bottom = rect.top + crsizey + 1;
 
-	surface->Box(rect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), FILLED);
+	surface->Box(rect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
 	surface->Frame(rect, FRAME_DOWN);
 
 	rect.left = ocxoffset;
 	rect.right = rect.left + crsizex + 1;
 
-	surface->Box(rect, color, FILLED);
+	surface->Box(rect, color, Rect::Filled);
 	surface->Frame(rect, FRAME_DOWN);
 
 	rect.left	= 3;
@@ -576,7 +576,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					blueedit->SetText(String::FromInt(actblue));
 					hexedit->SetText(hexval);
 
-					surface->Box(ncrect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), FILLED);
+					surface->Box(ncrect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
 				}
 			}
 			else if (vscapt)
@@ -621,7 +621,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					blueedit->SetText(String::FromInt(actblue));
 					hexedit->SetText(hexval);
 
-					surface->Box(ncrect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), FILLED);
+					surface->Box(ncrect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
 				}
 			}
 			break;
@@ -772,7 +772,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgSatSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	surface->Box(Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), FILLED);
+	surface->Box(Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgValSlider()
@@ -803,7 +803,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgValSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	surface->Box(Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), FILLED);
+	surface->Box(Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgRedSlider()

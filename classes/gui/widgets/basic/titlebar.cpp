@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -100,7 +100,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			if (icon != NIL) surface->BlitFromBitmap(icon, Rect(Point(0, 0), icon.GetSize()), Rect(Point(titleFrame.left - 18, titleFrame.top + 1), Size(16, 16)));
 
-			surface->Box(buttonRect, Setup::BackgroundColor, FILLED);
+			surface->Box(buttonRect, Setup::BackgroundColor, Rect::Filled);
 			surface->Frame(buttonRect, FRAME_DOWN);
 
 			button = Rect(Point(buttonRect.left + 4, buttonRect.top + 9), Size(7, 2));
@@ -110,7 +110,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 				if (Binary::IsFlagSet(flags, TB_MINBUTTON))	buttonColor = Setup::TextColor;
 				else						buttonColor = Setup::GrayTextColor;
 
-				surface->Box(button, buttonColor, FILLED);
+				surface->Box(button, buttonColor, Rect::Filled);
 
 				button.left	= button.right + 3;
 				button.right	= button.left + 7;
@@ -125,16 +125,16 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 				if (window->IsMaximized())
 				{
-					surface->Box(button + Point(1, -1) - Size(1, 1), buttonColor, OUTLINED);
-					surface->Box(button + Point(1, -2) - Size(1, 0), buttonColor, OUTLINED);
-					surface->Box(button + Point(-1, 2) - Size(1, 1), Setup::BackgroundColor, FILLED);
-					surface->Box(button + Point(-1, 2) - Size(1, 1), buttonColor, OUTLINED);
-					surface->Box(button + Point(-1, 1) - Size(1, 0), buttonColor, OUTLINED);
+					surface->Box(button + Point(1, -1) - Size(1, 1), buttonColor, Rect::Outlined);
+					surface->Box(button + Point(1, -2) - Size(1, 0), buttonColor, Rect::Outlined);
+					surface->Box(button + Point(-1, 2) - Size(1, 1), Setup::BackgroundColor, Rect::Filled);
+					surface->Box(button + Point(-1, 2) - Size(1, 1), buttonColor, Rect::Outlined);
+					surface->Box(button + Point(-1, 1) - Size(1, 0), buttonColor, Rect::Outlined);
 				}
 				else
 				{
-					surface->Box(button, buttonColor, OUTLINED);
-					surface->Box(button - Point(0, 1) + Size(0, 1), buttonColor, OUTLINED);
+					surface->Box(button, buttonColor, Rect::Outlined);
+					surface->Box(button - Point(0, 1) + Size(0, 1), buttonColor, Rect::Outlined);
 				}
 
 				button.left	= button.right + 3;

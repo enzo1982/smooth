@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,7 +14,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
 #include <smooth/system/multimonitor.h>
-#include <smooth/loop.h>
+#include <smooth/init.h>
 
 S::GUI::WindowBackend *CreateWindowGDI()
 {
@@ -308,12 +308,22 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 
 	ICONINFO	 icon;
 	Bitmap		 mask = newIcon;
+	Int		 transparentPixel = 0;
+
+	OSVERSIONINFOA	 vInfo;
+
+	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+	GetVersionExA(&vInfo);
+
+	if (vInfo.dwMajorVersion > 4) transparentPixel = 16777215;
+	else			      transparentPixel = 0;
 
 	for (Int y = 0; y < mask.GetSize().cy; y++)
 	{
 		for (Int x = 0; x < mask.GetSize().cx; x++)
 		{
-			if (mask.GetPixel(x, y) == (unsigned) Setup::BackgroundColor)	mask.SetPixel(x, y, 16777215);
+			if (mask.GetPixel(x, y) == (unsigned) Setup::BackgroundColor)	mask.SetPixel(x, y, transparentPixel);
 			else								mask.SetPixel(x, y, 0);
 		}
 	}

@@ -10,6 +10,8 @@
 
 #include <smooth/misc/string.h>
 #include <smooth/misc/math.h>
+#include <smooth/misc/encoding/base64.h>
+#include <smooth/misc/hash/crc32.h>
 #include <smooth/templates/buffer.h>
 #include <smooth/threads/thread.h>
 
@@ -29,15 +31,12 @@ namespace smooth
 	Int		 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
-char	*S::String::inputFormat		= NIL;
-char	*S::String::outputFormat	= NIL;
+char			*S::String::inputFormat		= NIL;
+char			*S::String::outputFormat	= NIL;
 
-S::Int	 S::String::nOfStrings		= 0;
+S::Int			 S::String::nOfStrings		= 0;
 
 S::Array<char *>	 S::String::allocatedBuffers;
-
-S::Int	 S::String::crc32_table[256];
-S::Bool	 S::String::crc32_initialized = False;
 
 S::String::String()
 {
@@ -47,7 +46,7 @@ S::String::String()
 
 	nOfStrings++;
 
-	wString = NIL;
+	wString.Resize(0);
 
 	Clean();
 
@@ -62,7 +61,7 @@ S::String::String(const int nil)
 
 	nOfStrings++;
 
-	wString = NIL;
+	wString.Resize(0);
 
 	Clean();
 
@@ -79,13 +78,13 @@ S::String::String(const char *iString)
 
 	if (iString == NIL)
 	{
-		wString = NIL;
+		wString.Resize(0);
 
 		Clean();
 	}
 	else
 	{
-		wString = NIL;
+		wString.Resize(0);
 
 		if (inputFormat == NIL) SetInputFormat("ISO-8859-1");
 
@@ -105,7 +104,7 @@ S::String::String(const wchar_t *iString)
 
 	if (iString == NIL)
 	{
-		wString = NIL;
+		wString.Resize(0);
 
 		Clean();
 	}
@@ -113,7 +112,7 @@ S::String::String(const wchar_t *iString)
 	{
 		Int	 size = wcslen(iString) + 1;
 
-		wString = new wchar_t [size];
+		wString.Resize(size);
 
 		wcsncpy(wString, iString, size);
 
@@ -131,15 +130,15 @@ S::String::String(const String &iString)
 
 	nOfStrings++;
 
-	if (iString.wString == NIL)
+	if (iString.wString.Size() == 0)
 	{
-		wString = NIL;
+		wString.Resize(0);
 
 		Clean();
 	}
 	else
 	{
-		wString = new wchar_t [iString.stringSize];
+		wString.Resize(iString.stringSize);
 
 		wcsncpy(wString, iString.wString, iString.stringSize);
 
@@ -207,76 +206,43 @@ S::Void S::String::Clean()
 
 	stringSize = 0;
 
-	if (wString != NIL) delete [] wString;
-
-	wString = NIL;
+	wString.Resize(0);
 
 	UnlockBuffers();
-}
-
-S::Void S::String::CRC32_InitTable()
-{
-	UnsignedLong	 ulPolynomial = 0x04c11db7;
-
-	for (Int i = 0; i <= 0xFF; i++)
-	{
-		crc32_table[i] = CRC32_Reflect(i, 8) << 24;
-
-		for (Int j = 0; j < 8; j++) crc32_table[i] = (crc32_table[i] << 1) ^ (crc32_table[i] & (1 << 31) ? ulPolynomial : 0);
-
-		crc32_table[i] = CRC32_Reflect(crc32_table[i], 32);
-	}
-
-	crc32_initialized = True;
-}
-
-S::UnsignedLong S::String::CRC32_Reflect(UnsignedLong ref, char ch)
-{
-	UnsignedLong	 value(0);
-
-	for (Int i = 1; i < (ch + 1); i++)
-	{
-		if (ref & 1) value |= 1 << (ch - i);
-
-		ref >>= 1;
-	}
-
-	return value;
 }
 
 S::Int S::String::ComputeCRC32() const
 {
-	if (!crc32_initialized) CRC32_InitTable();
+	if (wString.Size() == 0) return 0;
 
-	LockBuffers();
+	Buffer<UnsignedByte>	 buffer(Length() * 2 + 2);
 
-	UnsignedLong	 ulCRC(0xffffffff);
-	Int		 len = Length() * sizeof(wchar_t);
-	unsigned char	*buffer = (unsigned char *) wString;
+	wcscpy((wchar_t *) (UnsignedByte *) buffer, wString);
 
-	while (len--) ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer++];
-
-	UnlockBuffers();
-
-	return ulCRC ^ 0xffffffff;
+	return Hash::CRC32(buffer).Compute();
 }
 
 S::String S::String::EncodeBase64() const
 {
-	Buffer<char>	 buffer(Length() * 4);
+	if (wString.Size() == 0) return NIL;
 
-	strcpy(buffer, ConvertTo("UTF-8"));
+	Buffer<UnsignedByte>	 buffer(Length() * 4 + 1);
 
-	return buffer.EncodeBase64(strlen(buffer));
+	strcpy((char *) (UnsignedByte *) buffer, ConvertTo("UTF-8"));
+
+	return Encoding::Base64(buffer).Encode();
 }
 
 S::String S::String::DecodeBase64() const
 {
-	Buffer<char>	 buffer;
-	String		 string;
+	if (wString.Size() == 0) return NIL;
 
-	buffer.DecodeBase64(*this);
-	string.ImportFrom("UTF-8", buffer);
+	Buffer<UnsignedByte>	 buffer;
+	String			 string;
+
+	Encoding::Base64(buffer).Decode(*this);
+
+	string.ImportFrom("UTF-8", (char *) (UnsignedByte *) buffer);
 
 	return string;
 }
@@ -375,9 +341,9 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	LockBuffers();
 
-	wString = new wchar_t [size];
+	wString.Resize(size);
 
-	ConvertString(str, len, format, (char *) wString, size * 2, "UTF-16LE");
+	ConvertString(str, len, format, (char *) (wchar_t *) wString, size * 2, "UTF-16LE");
 
 	wString[size - 1] = 0;
 
@@ -392,9 +358,9 @@ char *S::String::ConvertTo(const char *encoding) const
 {
 	if (stringSize == 0) return NIL;
 
-	Int	 bufferSize = ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, encoding);
+	Int	 bufferSize = ConvertString((char *) (wchar_t *) wString, stringSize * 2, "UTF-16LE", NIL, 0, encoding);
 
-	if (bufferSize == -1)	bufferSize = ConvertString((char *) wString, stringSize * 2, "UTF-16LE", NIL, 0, "ISO-8859-1");
+	if (bufferSize == -1)	bufferSize = ConvertString((char *) (wchar_t *) wString, stringSize * 2, "UTF-16LE", NIL, 0, "ISO-8859-1");
 
 	char	*buffer = NIL;
 
@@ -402,7 +368,7 @@ char *S::String::ConvertTo(const char *encoding) const
 	{
 		buffer = new char [Length() + 1];
 
-		ConvertString((char *) wString, stringSize * 2, "UTF-16LE", buffer, Length() + 1, encoding);
+		ConvertString((char *) (wchar_t *) wString, stringSize * 2, "UTF-16LE", buffer, Length() + 1, encoding);
 
 		for (Int i = -bufferSize; i < Length(); i++) buffer[i] = '?';
 
@@ -412,7 +378,7 @@ char *S::String::ConvertTo(const char *encoding) const
 	{
 		buffer = new char [bufferSize + 1];
 
-		ConvertString((char *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize + 1, encoding);
+		ConvertString((char *) (wchar_t *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize + 1, encoding);
 	}
 
 	if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
@@ -424,21 +390,17 @@ char *S::String::ConvertTo(const char *encoding) const
 
 wchar_t &S::String::operator [](int n)
 {
-	wchar_t	*wBuffer;
-
 	if (n >= stringSize - 1)
 	{
 		LockBuffers();
 
 		if (stringSize > 0)
 		{
-			wBuffer = new wchar_t [stringSize];
+			wBuffer.Resize(stringSize);
 
 			wcsncpy(wBuffer, wString, stringSize);
 
-			delete [] wString;
-
-			wString = new wchar_t [n + 2];
+			wString.Resize(n + 2);
 
 			for (Int i = 0; i < (n + 1); i++)
 			{
@@ -453,14 +415,12 @@ wchar_t &S::String::operator [](int n)
 			}
 
 			stringSize = n + 2;
-
-			delete [] wBuffer;
 		}
 		else
 		{
 			Clean();
 
-			wString = new wchar_t [n + 2];
+			wString.Resize(n + 2);
 
 			for (Int i = 0; i < (n + 1); i++)
 			{
@@ -546,7 +506,7 @@ S::String &S::String::operator =(const wchar_t *newString)
 
 		Clean();
 
-		wString = new wchar_t [size];
+		wString.Resize(size);
 
 		wcsncpy(wString, newString, size);
 
@@ -560,7 +520,7 @@ S::String &S::String::operator =(const wchar_t *newString)
 
 S::String &S::String::operator =(const String &newString)
 {
-	if (newString.wString == NIL)
+	if (newString.wString.Size() == 0)
 	{
 		Clean();
 	}
@@ -572,7 +532,7 @@ S::String &S::String::operator =(const String &newString)
 
 		Clean();
 
-		wString = new wchar_t [backup.stringSize];
+		wString.Resize(backup.stringSize);
 
 		wcsncpy(wString, backup.wString, backup.stringSize);
 
@@ -586,17 +546,17 @@ S::String &S::String::operator =(const String &newString)
 
 S::Bool S::String::operator ==(const int nil) const
 {
-	if (wString == NIL)	return True;
-	if (wString[0] == 0)	return True;
-	else			return False;
+	if (wString.Size() == 0) return True;
+	if (wString[0] == 0)	 return True;
+	else			 return False;
 }
 
 S::Bool S::String::operator ==(const char *str) const
 {
-	if (wString == NIL && str == NIL)	return True;
-	if (wString == NIL && str != NIL)	if (str[0] == 0) return True;
-	if (wString != NIL && str == NIL)	if (wString[0] == 0) return True;
-	if (wString == NIL || str == NIL)	return False;
+	if (wString.Size() == 0 && str == NIL) return True;
+	if (wString.Size() == 0 && str != NIL) if (str[0] == 0) return True;
+	if (wString.Size() != 0 && str == NIL) if (wString[0] == 0) return True;
+	if (wString.Size() == 0 || str == NIL) return False;
 
 	if (!Compare(str))	return True;
 	else			return False;
@@ -604,10 +564,10 @@ S::Bool S::String::operator ==(const char *str) const
 
 S::Bool S::String::operator ==(const wchar_t *str) const
 {
-	if (wString == NIL && str == NIL)	return True;
-	if (wString == NIL && str != NIL)	if (str[0] == 0) return True;
-	if (wString != NIL && str == NIL)	if (wString[0] == 0) return True;
-	if (wString == NIL || str == NIL)	return False;
+	if (wString.Size() == 0 && str == NIL) return True;
+	if (wString.Size() == 0 && str != NIL) if (str[0] == 0) return True;
+	if (wString.Size() != 0 && str == NIL) if (wString[0] == 0) return True;
+	if (wString.Size() == 0 || str == NIL) return False;
 
 	if (!Compare(str))	return True;
 	else			return False;
@@ -615,10 +575,10 @@ S::Bool S::String::operator ==(const wchar_t *str) const
 
 S::Bool S::String::operator ==(const String &str) const
 {
-	if (wString == NIL && str.wString == NIL)	return True;
-	if (wString == NIL && str.wString != NIL)	if (str.wString[0] == 0) return True;
-	if (wString != NIL && str.wString == NIL)	if (wString[0] == 0) return True;
-	if (wString == NIL || str.wString == NIL)	return False;
+	if (wString.Size() == 0 && str.wString.Size() == 0) return True;
+	if (wString.Size() == 0 && str.wString.Size() != 0) if (str.wString[0] == 0) return True;
+	if (wString.Size() != 0 && str.wString.Size() == 0) if (wString[0] == 0) return True;
+	if (wString.Size() == 0 || str.wString.Size() == 0) return False;
 
 	if (!Compare(str))	return True;
 	else			return False;
@@ -626,17 +586,17 @@ S::Bool S::String::operator ==(const String &str) const
 
 S::Bool S::String::operator !=(const int nil) const
 {
-	if (wString == NIL)	return False;
-	if (wString[0] == 0)	return False;
-	else			return True;
+	if (wString.Size() == 0) return False;
+	if (wString[0] == 0)	 return False;
+	else			 return True;
 }
 
 S::Bool S::String::operator !=(const char *str) const
 {
-	if (wString == NIL && str == NIL)	return False;
-	if (wString == NIL && str != NIL)	if (str[0] == 0) return False;
-	if (wString != NIL && str == NIL)	if (wString[0] == 0) return False;
-	if (wString == NIL || str == NIL)	return True;
+	if (wString.Size() == 0 && str == NIL)	return False;
+	if (wString.Size() == 0 && str != NIL)	if (str[0] == 0) return False;
+	if (wString.Size() != 0 && str == NIL)	if (wString[0] == 0) return False;
+	if (wString.Size() == 0 || str == NIL)	return True;
 
 	if (Compare(str) != 0)	return True;
 	else			return False;
@@ -644,10 +604,10 @@ S::Bool S::String::operator !=(const char *str) const
 
 S::Bool S::String::operator !=(const wchar_t *str) const
 {
-	if (wString == NIL && str == NIL)	return False;
-	if (wString == NIL && str != NIL)	if (str[0] == 0) return False;
-	if (wString != NIL && str == NIL)	if (wString[0] == 0) return False;
-	if (wString == NIL || str == NIL)	return True;
+	if (wString.Size() == 0 && str == NIL) return False;
+	if (wString.Size() == 0 && str != NIL) if (str[0] == 0) return False;
+	if (wString.Size() != 0 && str == NIL) if (wString[0] == 0) return False;
+	if (wString.Size() == 0 || str == NIL) return True;
 
 	if (Compare(str) != 0)	return True;
 	else			return False;
@@ -655,10 +615,10 @@ S::Bool S::String::operator !=(const wchar_t *str) const
 
 S::Bool S::String::operator !=(const String &str) const
 {
-	if (wString == NIL && str.wString == NULL)	return False;
-	if (wString == NIL && str.wString != NIL)	if (str.wString[0] == 0) return False;
-	if (wString != NIL && str.wString == NIL)	if (wString[0] == 0) return False;
-	if (wString == NIL || str.wString == NULL)	return True;
+	if (wString.Size() == 0 && str.wString.Size() == 0) return False;
+	if (wString.Size() == 0 && str.wString.Size() != 0) if (str.wString[0] == 0) return False;
+	if (wString.Size() != 0 && str.wString.Size() == 0) if (wString[0] == 0) return False;
+	if (wString.Size() == 0 || str.wString.Size() == 0) return True;
 
 	if (Compare(str) != 0)	return True;
 	else			return False;
@@ -845,21 +805,18 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 			else
 			{
 				Int	 length = Length();
-				wchar_t	*backup = new wchar_t [length + 1];
 
-				memcpy((void *) backup, (void *) wString, (length + 1) * 2);
+				wBuffer.Resize(length + 1);
 
-				delete [] wString;
+				memcpy((void *) wBuffer, (void *) wString, (length + 1) * 2);
 
-				wString = new wchar_t [length + 1 + (bStr2.Length() - bStr1.Length())];
+				wString.Resize(length + 1 + (bStr2.Length() - bStr1.Length()));
 
-				memcpy((void *) wString, (void *) backup, i * 2);
+				memcpy((void *) wString, (void *) wBuffer, i * 2);
 
 				for (Int k = 0; k < bStr2.Length(); k++) wString[i + k] = bStr2[k];
 
-				for (Int l = 0; l < length - i - bStr1.Length() + 1; l++) wString[i + bStr2.Length() + l] = backup[i + bStr1.Length() + l];
-
-				delete [] backup;
+				for (Int l = 0; l < length - i - bStr1.Length() + 1; l++) wString[i + bStr2.Length() + l] = wBuffer[i + bStr1.Length() + l];
 
 				i += bStr2.Length() - 1;
 			}
@@ -1440,7 +1397,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	}
 	else if ((strcmp(inEncoding, "UTF-16LE") == 0 && strcmp(outEncoding, "UTF-16BE") == 0) || (strcmp(inEncoding, "UTF-16BE") == 0 && strcmp(outEncoding, "UTF-16LE") == 0))
 	{
-		size = inBytes - 2;
+		size = inBytes;
 
 		if (size < outBytes && size > 0)
 		{

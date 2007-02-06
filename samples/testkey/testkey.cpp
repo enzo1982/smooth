@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,7 +16,7 @@ Int smooth::Main()
 {
 	TestKey	*app = new TestKey();
 
-	Loop();
+	app->Loop();
 
 	Object::DeleteObject(app);
 
@@ -34,21 +34,16 @@ TestKey::TestKey()
 	title	= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	text	= new Text("ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000", pos);
 
-	RegisterObject(wnd);
+	Add(wnd);
 
-	wnd->RegisterObject(title);
-	wnd->RegisterObject(text);
+	wnd->Add(title);
+	wnd->Add(text);
 
 	wnd->onEvent.Connect(&TestKey::EventProc, this);
 }
 
 TestKey::~TestKey()
 {
-	wnd->UnregisterObject(text);
-	wnd->UnregisterObject(title);
-
-	UnregisterObject(wnd);
-
 	DeleteObject(title);
 	DeleteObject(wnd);
 	DeleteObject(text);

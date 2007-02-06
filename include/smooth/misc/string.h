@@ -24,6 +24,7 @@ namespace smooth
 };
 
 #include "../templates/array.h"
+#include "../templates/buffer.h"
 
 namespace smooth
 {
@@ -35,7 +36,8 @@ namespace smooth
 			Void				 LockBuffers() const;
 			Void				 UnlockBuffers() const;
 
-			wchar_t				*wString;
+			Buffer<wchar_t>			 wBuffer;
+			Buffer<wchar_t>			 wString;
 			mutable Int			 stringSize;
 
 			static char			*inputFormat;
@@ -44,12 +46,6 @@ namespace smooth
 			static Int			 nOfStrings;
 
 			static Array<char *>		 allocatedBuffers;
-
-			static Int			 crc32_table[256];
-			static Bool			 crc32_initialized;
-
-			static Void			 CRC32_InitTable();
-			static UnsignedLong		 CRC32_Reflect(UnsignedLong, char);
 
 			static Void			 DeleteTemporaryBuffers();
 		public:

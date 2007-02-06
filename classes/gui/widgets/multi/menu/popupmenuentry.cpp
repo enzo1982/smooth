@@ -43,7 +43,7 @@ S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitma
 		hotspot->onLeftButtonDown.Connect(&PopupMenuEntry::OpenPopupMenu, this);
 		hotspot->onLeftButtonClick.Connect(&PopupMenuEntry::OnClickEntry, this);
 
-		RegisterObject(hotspot);
+		Add(hotspot);
 
 		onChangeSize.Connect(&PopupMenuEntry::OnChangeSize, this);
 	}
@@ -384,7 +384,7 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 
 	owner->SetFlags(owner->GetFlags() | MB_POPUPOPEN);
 
-	RegisterObject(popup);
+	Add(popup);
 }
 
 S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
@@ -397,7 +397,7 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 
 		popup->internalRequestClose.Disconnect(&PopupMenuEntry::ClosePopupMenu, this);
 
-		UnregisterObject(popup);
+		Remove(popup);
 
 		hotspot->Activate();
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,7 @@
 
 #include <smooth/threads/thread.h>
 #include <smooth/threads/backends/threadbackend.h>
-#include <smooth/loop.h>
+#include <smooth/init.h>
 
 const S::Int	 S::Threads::Thread::classID = S::Object::RequestClassID();
 

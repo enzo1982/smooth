@@ -26,7 +26,7 @@ S::GUI::ActiveArea::ActiveArea(const Color &iColor, const Point &iPos, const Siz
 
 	hotspot->onLeftButtonClick.Connect(&onAction);
 
-	RegisterObject(hotspot);
+	Add(hotspot);
 
 	onChangeSize.Connect(&ActiveArea::OnChangeSize, this);
 }

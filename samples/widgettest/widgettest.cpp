@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,9 +19,9 @@ Int smooth::Main()
 {
 	WidgetTest	*app = new WidgetTest();
 
-	Loop();
+	app->Loop();
 
-	delete app;
+	Object::DeleteObject(app);
 
 	return 0;
 }
@@ -42,27 +42,20 @@ WidgetTest::WidgetTest()
 	activearea	= new MyActiveArea(RGB(255, 255, 128), pos, size);
 	activearea->onAction.Connect(&WidgetTest::activeAreaProc, this);
 	
-	RegisterObject(wnd);
+	Add(wnd);
 
-	wnd->RegisterObject(title);
-	wnd->RegisterObject(layer);
+	wnd->Add(title);
+	wnd->Add(layer);
 
-	layer->RegisterObject(activearea);
+	layer->Add(activearea);
 }
 
 WidgetTest::~WidgetTest()
 {
-	layer->UnregisterObject(activearea);
-
-	wnd->UnregisterObject(title);
-	wnd->UnregisterObject(layer);
-
-	UnregisterObject(wnd);
-
-	delete title;
-	delete wnd;
-	delete activearea;
-	delete layer;
+	DeleteObject(title);
+	DeleteObject(wnd);
+	DeleteObject(activearea);
+	DeleteObject(layer);
 }
 
 Void WidgetTest::activeAreaProc()

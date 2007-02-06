@@ -367,8 +367,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
 
-	if (Setup::enableUnicode)	hfont = CreateFontW(-Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, (font.GetWeight() == Font::Bold) ? FW_BOLD : FW_NORMAL, font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
-	else				hfont = CreateFontA(-Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, (font.GetWeight() == Font::Bold) ? FW_BOLD : FW_NORMAL, font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	if (Setup::enableUnicode)	hfont = CreateFontW(-Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	else				hfont = CreateFontA(-Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 
 	if (!painting)
 	{

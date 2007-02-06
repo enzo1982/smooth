@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,13 +10,15 @@
 
 #include <smooth/gui/dialogs/messagebox.h>
 #include <smooth/i18n/i18n.h>
-#include <smooth/gui/widgets/basic/button.h>
-#include <smooth/gui/widgets/layer.h>
 #include <smooth/misc/math.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/gui/window/window.h>
-#include <smooth/gui/widgets/basic/titlebar.h>
+#include <smooth/graphics/imageloader/imageloader.h>
+#include <smooth/gui/widgets/layer.h>
+#include <smooth/gui/widgets/basic/button.h>
 #include <smooth/gui/widgets/basic/checkbox.h>
+#include <smooth/gui/widgets/basic/image.h>
+#include <smooth/gui/widgets/basic/titlebar.h>
+#include <smooth/gui/window/window.h>
 
 S::Int S::GUI::Dialogs::MessageDlg::nOfMessageBoxes = 0;
 
@@ -46,14 +48,15 @@ S::Int S::GUI::Dialogs::QuickMessage(const String &text, const String &title, In
 	return rVal;
 }
 
-S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title, Int btns, wchar_t *icon, const String &checkBoxText, Bool *iCVar)
+S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title, Int btns, wchar_t *cIcon, const String &checkBoxText, Bool *iCVar)
 {
-	msgicon = icon;
+	msgicon = cIcon;
 	cVar = iCVar;
 
 	msgbox		= new Window(title, Point(), Size());
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	lay		= new Layer();
+	icon		= new Image(ImageLoader::Load(String("Icon:").Append(String::FromInt((Int) cIcon))), Point(13, 18), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
 	okbutton	= NIL;
 	yesbutton	= NIL;
 	nobutton	= NIL;
@@ -121,10 +124,11 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	if (msgbox->GetWidth() < titlesize + 80) msgbox->SetWidth(titlesize + 80);
 
-	RegisterObject(msgbox);
+	Add(msgbox);
 
-	msgbox->RegisterObject(titlebar);
-	msgbox->RegisterObject(lay);
+	msgbox->Add(titlebar);
+	msgbox->Add(lay);
+	msgbox->Add(icon);
 
 	msgbox->onPaint.Connect(&MessageDlg::MessagePaintProc, this);
 	msgbox->doQuit.Connect(&MessageDlg::MessageKillProc, this);
@@ -142,7 +146,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bpos, bsize);
 			okbutton->onAction.Connect(&MessageDlg::MessageOK, this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
-			lay->RegisterObject(okbutton);
+			lay->Add(okbutton);
 			break;
 		case MB_OKCANCEL:
 			if (msgbox->GetWidth() < (2 * buttonWidth + 39)) msgbox->SetWidth(2 * buttonWidth + 39);
@@ -154,8 +158,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bpos, bsize);
 			cancelbutton->onAction.Connect(&MessageDlg::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
-			lay->RegisterObject(okbutton);
-			lay->RegisterObject(cancelbutton);
+			lay->Add(okbutton);
+			lay->Add(cancelbutton);
 			break;
 		case MB_YESNO:
 			if (msgbox->GetWidth() < (2 * buttonWidth + 39)) msgbox->SetWidth(2 * buttonWidth + 39);
@@ -167,8 +171,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			nobutton = new Button(I18n::Translator::defaultTranslator->TranslateString("No"), NIL, bpos, bsize);
 			nobutton->onAction.Connect(&MessageDlg::MessageNo, this);
 			nobutton->SetOrientation(OR_LOWERLEFT);
-			lay->RegisterObject(yesbutton);
-			lay->RegisterObject(nobutton);
+			lay->Add(yesbutton);
+			lay->Add(nobutton);
 			break;
 		case MB_YESNOCANCEL:
 			if (msgbox->GetWidth() < (3 * buttonWidth + 48)) msgbox->SetWidth(3 * buttonWidth + 48);
@@ -184,9 +188,9 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bpos, bsize);
 			cancelbutton->onAction.Connect(&MessageDlg::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
-			lay->RegisterObject(yesbutton);
-			lay->RegisterObject(nobutton);
-			lay->RegisterObject(cancelbutton);
+			lay->Add(yesbutton);
+			lay->Add(nobutton);
+			lay->Add(cancelbutton);
 			break;
 		case MB_RETRYCANCEL:
 			if (msgbox->GetWidth() < (2 * buttonWidth + 39)) msgbox->SetWidth(2 * buttonWidth + 39);
@@ -198,8 +202,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bpos, bsize);
 			cancelbutton->onAction.Connect(&MessageDlg::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
-			lay->RegisterObject(retrybutton);
-			lay->RegisterObject(cancelbutton);
+			lay->Add(retrybutton);
+			lay->Add(cancelbutton);
 			break;
 		case MB_ABORTRETRYIGNORE:
 			if (msgbox->GetWidth() < (3 * buttonWidth + 48)) msgbox->SetWidth(3 * buttonWidth + 48);
@@ -215,9 +219,9 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			ignorebutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Ignore"), NIL, bpos, bsize);
 			ignorebutton->onAction.Connect(&MessageDlg::MessageIgnore, this);
 			ignorebutton->SetOrientation(OR_LOWERLEFT);
-			lay->RegisterObject(abortbutton);
-			lay->RegisterObject(retrybutton);
-			lay->RegisterObject(ignorebutton);
+			lay->Add(abortbutton);
+			lay->Add(retrybutton);
+			lay->Add(ignorebutton);
 			break;
 	}
 
@@ -234,7 +238,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 		msgbox->SetHeight(msgbox->GetHeight() + 22);
 
-		lay->RegisterObject(checkbox);
+		lay->Add(checkbox);
 	}
 
 	msgbox->SetPosition(Point((LiSAGetDisplaySizeX() - msgbox->GetWidth()) / 2, (LiSAGetDisplaySizeY() - msgbox->GetHeight()) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
@@ -279,6 +283,7 @@ S::GUI::Dialogs::MessageDlg::~MessageDlg()
 	}
 
 	DeleteObject(lay);
+	DeleteObject(icon);
 	DeleteObject(titlebar);
 	DeleteObject(msgbox);
 
@@ -309,30 +314,7 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 
 	txtrect.bottom = txtrect.top + 16;
 
-	if (msgicon != NIL)
-	{
-		HICON	 icon = NIL;
-
-		txtrect.left += GetSystemMetrics(SM_CXICON) + 20;
-
-		if (msgicon == MAKEINTRESOURCEW(32512) || msgicon == MAKEINTRESOURCEW(32516) || msgicon == MAKEINTRESOURCEW(32515) || msgicon == MAKEINTRESOURCEW(32513) || msgicon == MAKEINTRESOURCEW(32514) || msgicon == MAKEINTRESOURCEW(32517))
-		{
-			if (Setup::enableUnicode)	icon = (HICON) LoadImageW(NIL, msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-			else				icon = (HICON) LoadImageA(NIL, (char *) msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-		}
-		else
-		{
-			if (Setup::enableUnicode)	icon = (HICON) LoadImageW(hInstance, msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-			else				icon = (HICON) LoadImageA(hInstance, (char *) msgicon, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-		}
-
-		HWND	 window	= (HWND) surface->GetSystemSurface();
-		HDC	 dc	= GetWindowDC(window);
-
-		DrawIcon(dc, msgbox->IsRightToLeft() ? msgbox->GetWidth() - 17 - GetSystemMetrics(SM_CXICON) : 17, 47, icon);
-
-		ReleaseDC(window, dc);
-	}
+	if (msgicon != NIL) txtrect.left += GetSystemMetrics(SM_CXICON) + 20;
 
 	for (int i = 0; i < lines; i++)
 	{

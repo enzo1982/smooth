@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,8 +9,9 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/application/xulloader.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/xml/xul/renderer.h>
-#include <smooth/loop.h>
+#include <smooth/init.h>
 
 int WINAPI S::GUI::LoadXUL(HWND shWnd, HINSTANCE shInstance, LPSTR sszCmdLine, int siCmdShow)
 {
@@ -25,7 +26,7 @@ int WINAPI S::GUI::LoadXUL(HWND shWnd, HINSTANCE shInstance, LPSTR sszCmdLine, i
 
 	XULLoader	*loader = new XULLoader(szCmdLine);
 
-	Loop();
+	loader->Loop();
 
 	Object::DeleteObject(loader);
 
@@ -38,7 +39,7 @@ S::GUI::XULLoader::XULLoader(const String &xulFile)
 {
 	xulRenderer = new XML::XUL::Renderer();
 
-	if (xulRenderer->LoadXUL(xulFile) == Success()) RegisterObject(xulRenderer->GetWidget());
+	if (xulRenderer->LoadXUL(xulFile) == Success()) Add(xulRenderer->GetWidget());
 }
 
 S::GUI::XULLoader::~XULLoader()

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,7 @@
 #ifndef _H_OBJSMOOTH_WINAPPLICATION_
 #define _H_OBJSMOOTH_WINAPPLICATION_
 
-#include "loop.h"
+#include "init.h"
 #include "version.h"
 #include "system/system.h"
 #include "gui/application/application.h"

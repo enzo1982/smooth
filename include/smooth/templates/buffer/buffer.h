@@ -35,25 +35,19 @@ namespace smooth
 
 					~Buffer();
 
-			Int		 Size() const;
-			Int		 Resize(Int);
+			Int		 Size() const		{ return size; }
+			Bool		 Resize(Int);
 
-			Int		 Zero();
-			Int		 Free();
+			Bool		 Zero();
+			Bool		 Free();
 
-			t &operator	 [](const int);
-			t &operator	 [](const Int);
+			t &operator	 [](const int n)	{ return memory[n]; }
+			t &operator	 [](const Int n)	{ return (*this)[(int) n]; }
 
-			t operator	 [](const int) const;
-			t operator	 [](const Int) const;
+			t operator	 [](const int n) const	{ return memory[n]; }
+			t operator	 [](const Int n) const	{ return (*this)[(int) n]; }
 
-			t *operator	 +(const int);
-
-			operator	 t *();
-			operator	 const t *() const;
-
-			String		 EncodeBase64(Int) const;
-			Int		 DecodeBase64(const String &);
+			operator	 t *() const		{ return memory; }
 	};
 };
 

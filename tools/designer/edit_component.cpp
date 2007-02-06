@@ -36,9 +36,9 @@ Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 	objects.Add(wnd);
 	objects.Add(title);
 
-	RegisterObject(wnd);
+	Add(wnd);
 
-	wnd->RegisterObject(title);
+	wnd->Add(title);
 
 	wnd->onEvent.Connect(&Designer_EditComponent::EventProc, this);
 	wnd->doQuit.Connect(&Designer_EditComponent::ExitProc, this);
@@ -168,7 +168,7 @@ Widget *Designer_EditComponent::AddObject(Int objid)
 			return NIL;
 	}
 
-	registrar->RegisterObject(newobj);
+	registrar->Add(newobj);
 
 	objects.Add(newobj);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,7 +32,7 @@ S::GUI::MenuEntry *S::GUI::Menubar::AddEntry(const String &text, const Bitmap &b
 {
 	MenuEntry	*newEntry = new MenubarEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
 
-	RegisterObject(newEntry);
+	Add(newEntry);
 
 	if (GetHeight() < newEntry->GetHeight() + 2) SetHeight(newEntry->GetHeight() + 2);
 	if (GetWidth() < newEntry->GetWidth() + 3) SetWidth(newEntry->GetWidth() + 3);

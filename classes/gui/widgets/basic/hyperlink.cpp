@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -46,7 +46,7 @@ S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const St
 	hotspot->onMouseOut.Connect(&Hyperlink::OnMouseOut, this);
 	hotspot->onLeftButtonClick.Connect(&Hyperlink::OnClickLink, this);
 
-	RegisterObject(hotspot);
+	Add(hotspot);
 }
 
 S::GUI::Hyperlink::~Hyperlink()
@@ -126,9 +126,15 @@ S::Int S::GUI::Hyperlink::SetText(const String &newText)
 	return Success();
 }
 
-S::Int S::GUI::Hyperlink::SetBitmap(const Bitmap &newBmp)
+S::Int S::GUI::Hyperlink::SetBitmap(const Bitmap &newBitmap)
 {
-	return Error();
+	linkBitmap = newBitmap;
+
+	linkBitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+
+	Paint(SP_PAINT);
+
+	return Success();
 }
 
 const S::GUI::Bitmap &S::GUI::Hyperlink::GetBitmap()

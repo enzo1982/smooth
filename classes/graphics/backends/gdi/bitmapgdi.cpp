@@ -147,20 +147,18 @@ S::Bool S::GUI::BitmapGDI::SetSystemBitmap(Void *nBitmap)
 
 		CreateBitmap(bmp.bmWidth, bmp.bmHeight, bmp.bmBitsPixel);
 
-		HDC	 ddc = GetWindowDC(NIL);
-		HDC	 cdc1 = CreateCompatibleDC(ddc);
-		HDC	 cdc2 = CreateCompatibleDC(ddc);
-		HBITMAP	 backup1 = (HBITMAP) SelectObject(cdc1, nBitmap);
-		HBITMAP	 backup2 = (HBITMAP) SelectObject(cdc2, bitmap);
+		HDC	 dc1 = CreateCompatibleDC(NIL);
+		HDC	 dc2 = CreateCompatibleDC(NIL);
+		HBITMAP	 backup1 = (HBITMAP) SelectObject(dc1, nBitmap);
+		HBITMAP	 backup2 = (HBITMAP) SelectObject(dc2, bitmap);
 
-		BitBlt(cdc2, 0, 0, size.cx, size.cy, cdc1, 0, 0, SRCCOPY);
+		BitBlt(dc2, 0, 0, size.cx, size.cy, dc1, 0, 0, SRCCOPY);
 
-		nBitmap	= (HBITMAP) SelectObject(cdc1, backup1);
-		bitmap	= (HBITMAP) SelectObject(cdc2, backup2);
+		nBitmap	= (HBITMAP) SelectObject(dc1, backup1);
+		bitmap	= (HBITMAP) SelectObject(dc2, backup2);
 
-		DeleteDC(cdc1);
-		DeleteDC(cdc2);
-		ReleaseDC(NIL, ddc);
+		DeleteDC(dc1);
+		DeleteDC(dc2);
 	}
 
 	return True;

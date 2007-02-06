@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -57,6 +57,7 @@ namespace smooth
 				Surface				*drawSurface;
 
 				Color				 backgroundColor;
+				Bool				 backgroundColorSet;
 
 				Tooltip				*tooltip;
 				System::Timer			*tipTimer;
@@ -109,8 +110,8 @@ namespace smooth
 				Int				 GetNOfObjects() const;
 				Widget				*GetNthObject(Int) const;
 
-				virtual Int			 RegisterObject(Widget *);
-				virtual Int			 UnregisterObject(Widget *);
+				virtual Int			 Add(Widget *);
+				virtual Int			 Remove(Widget *);
 
 				Window				*GetContainerWindow();
 				virtual Surface			*GetDrawSurface() const;
@@ -124,9 +125,6 @@ namespace smooth
 				Widget				*GetNextTabstopWidget(Int) const;
 
 				virtual Point			 GetRealPosition() const;
-
-				Int				 SetBackgroundColor(const Color &);
-				const Color			&GetBackgroundColor() const;
 
 				virtual Int			 Show();
 				virtual Int			 Hide();
@@ -166,6 +164,10 @@ namespace smooth
 
 				virtual Int			 SetOrientation(Int);
 				virtual Int			 GetOrientation() const;
+
+				Int				 SetBackgroundColor(const Color &);
+				const Color			&GetBackgroundColor() const;
+				Bool				 IsBackgroundColorSet() const;
 
 				Int				 SetX(Int nX)			{ return SetMetrics(Point(nX, pos.y), size); }
 				Int				 GetX() const			{ return pos.x; }

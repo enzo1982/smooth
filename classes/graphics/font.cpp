@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,8 +14,15 @@
 S::String S::GUI::Font::Default		= "default";
 S::Int	  S::GUI::Font::DefaultSize	= 8;
 
-S::Int	  S::GUI::Font::Normal		= 0;
-S::Int	  S::GUI::Font::Bold		= 1;
+S::Int	  S::GUI::Font::Thin		= 100;
+S::Int	  S::GUI::Font::ExtraLight	= 200;
+S::Int	  S::GUI::Font::Light		= 300;
+S::Int	  S::GUI::Font::Normal		= 400;
+S::Int	  S::GUI::Font::Medium		= 500;
+S::Int	  S::GUI::Font::SemiBold	= 600;
+S::Int	  S::GUI::Font::Bold		= 700;
+S::Int	  S::GUI::Font::ExtraBold	= 800;
+S::Int	  S::GUI::Font::Black		= 900;
 
 S::Int	  S::GUI::Font::Italic		= 2;
 S::Int	  S::GUI::Font::Underline	= 4;
@@ -185,27 +192,25 @@ S::Int S::GUI::Font::GetLineSizeX(const String &text, Int nOfChars) const
 	if (nOfChars == 0)	return 0;
 
 #ifdef __WIN32__
-	HDC	 ddc	= GetWindowDC(0);
-	HDC	 cdc	= CreateCompatibleDC(ddc);
-	Int	 size	= -Math::Round(fontSize * 128.0 / GetDeviceCaps(cdc, LOGPIXELSY));
+	HDC	 dc	= CreateCompatibleDC(NIL);
+	Int	 size	= -Math::Round(fontSize * 128.0 / GetDeviceCaps(dc, LOGPIXELSY));
 	HFONT	 hFont;
 	HFONT	 hOldFont;
 
-	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, (fontWeight == Font::Bold) ? FW_BOLD : FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
-	else				hFont = CreateFontA(size, 0, 0, 0, (fontWeight == Font::Bold) ? FW_BOLD : FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	else				hFont = CreateFontA(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
 
-	hOldFont = (HFONT) SelectObject(cdc, hFont);
+	hOldFont = (HFONT) SelectObject(dc, hFont);
 
 	SIZE	 tSize;
 
-	if (Setup::enableUnicode)	GetTextExtentPoint32W(cdc, text, nOfChars, &tSize);
-	else				GetTextExtentPoint32A(cdc, text, nOfChars, &tSize);
+	if (Setup::enableUnicode)	GetTextExtentPoint32W(dc, text, nOfChars, &tSize);
+	else				GetTextExtentPoint32A(dc, text, nOfChars, &tSize);
 
-	SelectObject(cdc, hOldFont);
+	SelectObject(dc, hOldFont);
 	::DeleteObject(hFont);
 
-	DeleteDC(cdc);
-	ReleaseDC(0, ddc);
+	DeleteDC(dc);
 
 	return tSize.cx;
 #else
@@ -239,8 +244,8 @@ S::Int S::GUI::Font::GetLineSizeY(const String &text) const
 	HFONT	 hFont;
 	HFONT	 hOldFont;
 
-	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, (fontWeight == Font::Bold) ? FW_BOLD : FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
-	else				hFont = CreateFontA(size, 0, 0, 0, (fontWeight == Font::Bold) ? FW_BOLD : FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	else				hFont = CreateFontA(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
 
 	hOldFont = (HFONT) SelectObject(cdc, hFont);
 

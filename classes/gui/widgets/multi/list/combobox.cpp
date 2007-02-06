@@ -42,8 +42,8 @@ S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 	buttonHotspot->onLeftButtonDown.Connect(&ComboBox::OpenListBox, this);
 	buttonHotspot->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
-	RegisterObject(hotspot);
-	RegisterObject(buttonHotspot);
+	Add(hotspot);
+	Add(buttonHotspot);
 
 	onChangeSize.Connect(&ComboBox::OnChangeSize, this);
 }
@@ -175,9 +175,9 @@ S::Void S::GUI::ComboBox::OpenListBox()
 			entry->Activate();
 		}
 
-		toolWindow->RegisterObject(listBox);
+		toolWindow->Add(listBox);
 
-		RegisterObject(toolWindow);
+		Add(toolWindow);
 	}
 }
 
@@ -199,7 +199,7 @@ S::Void S::GUI::ComboBox::CloseListBox()
 			entry->Deactivate();
 		}
 
-		toolWindow->UnregisterObject(listBox);
+		toolWindow->Remove(listBox);
 
 		DeleteObject(listBox);
 
@@ -207,7 +207,7 @@ S::Void S::GUI::ComboBox::CloseListBox()
 
 		toolWindow->Close();
 
-		UnregisterObject(toolWindow);
+		Remove(toolWindow);
 
 		DeleteObject(toolWindow);
 

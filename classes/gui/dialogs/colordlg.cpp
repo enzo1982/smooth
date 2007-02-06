@@ -20,7 +20,7 @@
 #include <smooth/gui/widgets/basic/text.h>
 #include <smooth/gui/widgets/basic/editbox.h>
 #include <smooth/misc/string.h>
-#include <smooth/loop.h>
+#include <smooth/init.h>
 #include <smooth/misc/math.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
@@ -226,32 +226,32 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	lastsat = -1;
 	lastval = -1;
 
-	RegisterObject(dlgwnd);
+	Add(dlgwnd);
 
-	dlgwnd->RegisterObject(okbtn);
-	dlgwnd->RegisterObject(cancelbtn);
-	dlgwnd->RegisterObject(hueslider);
-	dlgwnd->RegisterObject(satslider);
-	dlgwnd->RegisterObject(valslider);
-	dlgwnd->RegisterObject(redslider);
-	dlgwnd->RegisterObject(greenslider);
-	dlgwnd->RegisterObject(blueslider);
-	dlgwnd->RegisterObject(huetext);
-	dlgwnd->RegisterObject(sattext);
-	dlgwnd->RegisterObject(valtext);
-	dlgwnd->RegisterObject(redtext);
-	dlgwnd->RegisterObject(greentext);
-	dlgwnd->RegisterObject(bluetext);
-	dlgwnd->RegisterObject(hueedit);
-	dlgwnd->RegisterObject(satedit);
-	dlgwnd->RegisterObject(valedit);
-	dlgwnd->RegisterObject(rededit);
-	dlgwnd->RegisterObject(greenedit);
-	dlgwnd->RegisterObject(blueedit);
-	dlgwnd->RegisterObject(hextext);
-	dlgwnd->RegisterObject(hexedit);
-	dlgwnd->RegisterObject(titlebar);
-	dlgwnd->RegisterObject(divbar);
+	dlgwnd->Add(okbtn);
+	dlgwnd->Add(cancelbtn);
+	dlgwnd->Add(hueslider);
+	dlgwnd->Add(satslider);
+	dlgwnd->Add(valslider);
+	dlgwnd->Add(redslider);
+	dlgwnd->Add(greenslider);
+	dlgwnd->Add(blueslider);
+	dlgwnd->Add(huetext);
+	dlgwnd->Add(sattext);
+	dlgwnd->Add(valtext);
+	dlgwnd->Add(redtext);
+	dlgwnd->Add(greentext);
+	dlgwnd->Add(bluetext);
+	dlgwnd->Add(hueedit);
+	dlgwnd->Add(satedit);
+	dlgwnd->Add(valedit);
+	dlgwnd->Add(rededit);
+	dlgwnd->Add(greenedit);
+	dlgwnd->Add(blueedit);
+	dlgwnd->Add(hextext);
+	dlgwnd->Add(hexedit);
+	dlgwnd->Add(titlebar);
+	dlgwnd->Add(divbar);
 
 	dlgwnd->onPaint.Connect(&ColorSelection::ColorDlgPaintProc, this);
 	dlgwnd->onEvent.Connect(&ColorSelection::ColorDlgMessageProc, this);

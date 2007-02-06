@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,15 +31,13 @@ S::GUI::Dialogs::SplashScreen::SplashScreen(const GUI::Bitmap &iBitmap, Int iTim
 
 	splashscreen->SetFlags(WF_NORESIZE | WF_TOPMOST);
 
-	RegisterObject(splashscreen);
+	Add(splashscreen);
 
 	timer->onInterval.Connect(&SplashScreen::TimerProc, this);
 }
 
 S::GUI::Dialogs::SplashScreen::~SplashScreen()
 {
-	UnregisterObject(splashscreen);
-
 	DeleteObject(splashscreen);
 	DeleteObject(timer);
 }

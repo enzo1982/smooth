@@ -101,21 +101,21 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	layer_inner->SetMetrics(pos, size);
 	layer_inner->SetBackgroundColor(Setup::TooltipColor);
 
-	RegisterObject(dlgwnd);
+	Add(dlgwnd);
 
-	dlgwnd->RegisterObject(titlebar);
-	dlgwnd->RegisterObject(divbar);
+	dlgwnd->Add(titlebar);
+	dlgwnd->Add(divbar);
 
-	dlgwnd->RegisterObject(btn_ok);
-	dlgwnd->RegisterObject(btn_next);
-	dlgwnd->RegisterObject(check_showtips);
+	dlgwnd->Add(btn_ok);
+	dlgwnd->Add(btn_next);
+	dlgwnd->Add(check_showtips);
 
-	dlgwnd->RegisterObject(img_light);
-	dlgwnd->RegisterObject(txt_didyouknow);
+	dlgwnd->Add(img_light);
+	dlgwnd->Add(txt_didyouknow);
 
-	dlgwnd->GetMainLayer()->RegisterObject(layer_inner);
+	dlgwnd->GetMainLayer()->Add(layer_inner);
 
-	layer_inner->RegisterObject(txt_tip);
+	layer_inner->Add(txt_tip);
 
 	dlgwnd->onPaint.Connect(&TipOfTheDay::Paint, this);
 }

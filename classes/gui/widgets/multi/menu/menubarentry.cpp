@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,8 +39,8 @@ S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, P
 		actionHotspot = new Hotspot(Point(), GetSize() - Size((text == NIL && bitmap != NIL && popup != NIL ? 12 : 0), 0));
 		actionHotspot->onLeftButtonClick.Connect(&onAction);
 
-		RegisterObject(hotspot);
-		RegisterObject(actionHotspot);
+		Add(hotspot);
+		Add(actionHotspot);
 	}
 }
 
@@ -201,7 +201,7 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : GetWidth() + 2 - popup->GetWidth(), GetHeight() + 1));
 		popup->internalRequestClose.Connect(&MenubarEntry::ClosePopupMenu, this);
 
-		RegisterObject(popup);
+		Add(popup);
 
 		container->SetFlags(container->GetFlags() | MB_POPUPOPEN);
 	}
@@ -215,7 +215,7 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 	{
 		container->SetFlags(container->GetFlags() & ~MB_POPUPOPEN);
 
-		UnregisterObject(popup);
+		Remove(popup);
 
 		popup->internalRequestClose.Disconnect(&MenubarEntry::ClosePopupMenu, this);
 

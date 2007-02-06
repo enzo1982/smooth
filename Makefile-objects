@@ -135,6 +135,11 @@ $(OBJECTDIR)/size.o: $(GRAPHICSCLASSESDIR)/forms/size.cpp $(SMOOTHINCLUDEDIR)/gr
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/forms/size.cpp -o $(OBJECTDIR)/size.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/imageloader_icon.o: $(GRAPHICSCLASSESDIR)/imageloader/icon.cpp $(SMOOTHINCLUDEDIR)/graphics/imageloader/icon.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/imageloader/icon.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/imageloader/icon.cpp -o $(OBJECTDIR)/imageloader_icon.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/imageloader.o: $(GRAPHICSCLASSESDIR)/imageloader/imageloader.cpp $(SMOOTHINCLUDEDIR)/graphics/imageloader/imageloader.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/imageloader/imageloader.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/imageloader/imageloader.cpp -o $(OBJECTDIR)/imageloader.o
@@ -540,6 +545,16 @@ $(OBJECTDIR)/stream.o: $(IOCLASSESDIR)/stream.cpp $(SMOOTHINCLUDEDIR)/io/stream.
 	$(COMPILER) $(COMPILER_OPTS) $(IOCLASSESDIR)/stream.cpp -o $(OBJECTDIR)/stream.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/base64.o: $(MISCCLASSESDIR)/encoding/base64.cpp $(SMOOTHINCLUDEDIR)/misc/encoding/base64.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/encoding/base64.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/encoding/base64.cpp -o $(OBJECTDIR)/base64.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/crc32.o: $(MISCCLASSESDIR)/hash/crc32.cpp $(SMOOTHINCLUDEDIR)/misc/hash/crc32.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/hash/crc32.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/hash/crc32.cpp -o $(OBJECTDIR)/crc32.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/args.o: $(MISCCLASSESDIR)/args.cpp $(SMOOTHINCLUDEDIR)/misc/args.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/args.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/args.cpp -o $(OBJECTDIR)/args.o
@@ -775,9 +790,9 @@ $(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/codecs.cpp -o $(OBJECTDIR)/codecs.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/loop.o: $(MISCDIR)/loop.cpp $(SMOOTHINCLUDEDIR)/loop.h
-	$(ECHO) -n Compiling $(MISCDIR)/loop.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/loop.cpp -o $(OBJECTDIR)/loop.o
+$(OBJECTDIR)/init.o: $(MISCDIR)/init.cpp $(SMOOTHINCLUDEDIR)/init.h
+	$(ECHO) -n Compiling $(MISCDIR)/init.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/init.cpp -o $(OBJECTDIR)/init.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/pciio.o: $(MISCDIR)/pciio.cpp $(SMOOTHINCLUDEDIR)/pciio.h
@@ -817,7 +832,7 @@ $(OBJECTDIR)/translator_translator.o: $(TRANSLATORDIR)/translator.cpp $(DLLNAME)
 
 $(OBJECTDIR)/translator_resources.o: $(TRANSLATORDIR)/translator.rc
 	$(ECHO) -n Compiling $(TRANSLATORDIR)/translator.rc...
-	$(RESCOMP) $(RESCOMP_OPTS) $(TRANSLATORDIR)/translator.rc -o $(OBJECTDIR)/translator_resources.o
+	$(RESCOMP) $(RESCOMP_OPTS) -D__SMOOTH_DLL__ $(TRANSLATORDIR)/translator.rc -o $(OBJECTDIR)/translator_resources.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/fribidi2_fribidi.o: $(FRIBIDI2DIR)/fribidi.c

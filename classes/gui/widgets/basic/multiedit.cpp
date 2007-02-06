@@ -40,7 +40,7 @@ S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size 
 	cursor->SetText(iText);
 	cursor->onInput.Connect(&onInput);
 
-	RegisterObject(cursor);
+	Add(cursor);
 
 	onInput.SetParentObject(this);
 
@@ -156,7 +156,7 @@ S::Void S::GUI::MultiEdit::OnCursorScroll(Int scrollPos, Int maxScrollPos)
 		scrollbar->SetOrientation(OR_UPPERRIGHT);
 		scrollbar->SetAlwaysActive(True);
 
-		RegisterObject(scrollbar);
+		Add(scrollbar);
 
 		Paint(SP_PAINT);
 	}

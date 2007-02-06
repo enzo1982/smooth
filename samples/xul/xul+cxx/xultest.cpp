@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,7 +16,7 @@ Int smooth::Main()
 {
 	XULTest	*app = new XULTest();
 
-	Loop();
+	app->Loop();
 
 	Object::DeleteObject(app);
 
@@ -27,7 +27,7 @@ XULTest::XULTest()
 {
 	xulRenderer = new Renderer();
 
-	if (xulRenderer->LoadXUL("layout.xul") == Success) RegisterObject(xulRenderer->GetWidget());
+	if (xulRenderer->LoadXUL("layout.xul") == Success) Add(xulRenderer->GetWidget());
 }
 
 XULTest::~XULTest()

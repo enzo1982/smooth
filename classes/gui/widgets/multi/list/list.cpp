@@ -32,7 +32,7 @@ S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text)
 
 	newEntry->Hide();
 
-	if (RegisterObject(newEntry) == Success())
+	if (Add(newEntry) == Success())
 	{
 		elementOrder.Add(newEntry, newEntry->GetHandle());
 		createdEntry.Add(True, newEntry->GetHandle());
@@ -51,7 +51,7 @@ S::Int S::GUI::List::AddEntry(ListEntry *entry)
 {
 	entry->Hide();
 
-	if (RegisterObject(entry) == Success())
+	if (Add(entry) == Success())
 	{
 		elementOrder.Add(entry, entry->GetHandle());
 		createdEntry.Add(False, entry->GetHandle());
@@ -68,7 +68,7 @@ S::Int S::GUI::List::RemoveEntry(ListEntry *entry)
 {
 	if (entry == NIL) return Error();
 
-	if (UnregisterObject(entry) == Success())
+	if (Remove(entry) == Success())
 	{
 		Int	 entryHandle = entry->GetHandle();
 
@@ -95,7 +95,7 @@ S::Int S::GUI::List::RemoveAllEntries()
 
 		Widget	*widget = GetNthObject(nonListEntry);
 
-		UnregisterObject(widget);
+		Remove(widget);
 
 		if (createdEntry.Get(widget->GetHandle())) DeleteObject(widget);
 	}

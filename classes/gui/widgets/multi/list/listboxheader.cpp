@@ -11,6 +11,7 @@
 #include <smooth/gui/widgets/multi/list/listboxheader.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/event.h>
 

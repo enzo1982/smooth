@@ -49,11 +49,11 @@ S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
 
 	if (Binary::IsFlagSet(flags, TB_MAXBUTTON)) dragHotspot->onLeftButtonDoubleClick.Connect(&Titlebar::OnMaxButtonClick, this);
 
-	if (Binary::IsFlagSet(flags, TB_MINBUTTON)) RegisterObject(minHotspot);
-	if (Binary::IsFlagSet(flags, TB_MAXBUTTON)) RegisterObject(maxHotspot);
-	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) RegisterObject(closeHotspot);
+	if (Binary::IsFlagSet(flags, TB_MINBUTTON)) Add(minHotspot);
+	if (Binary::IsFlagSet(flags, TB_MAXBUTTON)) Add(maxHotspot);
+	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) Add(closeHotspot);
 
-	RegisterObject(dragHotspot);
+	Add(dragHotspot);
 }
 
 S::GUI::Titlebar::~Titlebar()

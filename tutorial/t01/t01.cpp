@@ -11,7 +11,7 @@ Int smooth::Main()
 {
 	Hello	*app = new Hello();
 
-	Loop();
+	app->Loop();
 
 	Object::DeleteObject(app);
 
@@ -24,19 +24,14 @@ Hello::Hello()
 	title	= new Titlebar(TB_CLOSEBUTTON);
 	hello	= new Button("Hello world!", NIL, Point(20, 15), Size(160, 40));
 
-	mainWnd->RegisterObject(hello);
-	mainWnd->RegisterObject(title);
+	mainWnd->Add(hello);
+	mainWnd->Add(title);
 
-	RegisterObject(mainWnd);
+	Add(mainWnd);
 }
 
 Hello::~Hello()
 {
-	mainWnd->UnregisterObject(title);
-	mainWnd->UnregisterObject(hello);
-
-	UnregisterObject(mainWnd);
-
 	DeleteObject(mainWnd);
 	DeleteObject(title);
 	DeleteObject(hello);

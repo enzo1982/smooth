@@ -38,8 +38,8 @@ S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 15
 
 	hotspot->onMouseDrag.Connect(&ListEntry::InitDrag, this);
 
-	RegisterObject(hotspot);
-	RegisterObject(markHotspot);
+	Add(hotspot);
+	Add(markHotspot);
 
 	internalOnSelectEntry.Connect(&ListEntry::OnSelectOtherEntry, this);
 

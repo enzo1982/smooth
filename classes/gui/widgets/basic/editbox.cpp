@@ -38,7 +38,7 @@ S::GUI::EditBox::EditBox(const String &iText, const Point &iPos, const Size &iSi
 	cursor->onInput.Connect(&onInput);
 	cursor->onEnter.Connect(&onEnter);
 
-	RegisterObject(cursor);
+	Add(cursor);
 
 	onInput.SetParentObject(this);
 	onEnter.SetParentObject(this);
@@ -125,7 +125,7 @@ S::Int S::GUI::EditBox::SetDropDownList(List *nDropDownList)
 			comboBox->AddEntry(dropDownList->GetNthEntry(i)->GetText());
 		}
 
-		RegisterObject(comboBox);
+		Add(comboBox);
 
 		OnChangeSize(GetSize());
 	}

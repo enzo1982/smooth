@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,7 +17,7 @@ Int smooth::Main(const Array<String> &args)
 {
 	Translator	*app = new Translator(args.GetNth(0));
 
-	Loop();
+	app->Loop();
 
 	delete app;
 
@@ -137,21 +137,21 @@ Translator::Translator(const String &openFile)
 	button_new->Deactivate();
 	list_entries->Deactivate();
 
-	RegisterObject(wnd);
+	Add(wnd);
 
-	wnd->RegisterObject(text_id);
-	wnd->RegisterObject(edit_id);
-	wnd->RegisterObject(text_original);
-	wnd->RegisterObject(edit_original);
-	wnd->RegisterObject(text_translated);
-	wnd->RegisterObject(edit_translated);
-	wnd->RegisterObject(button_save);
-	wnd->RegisterObject(button_remove);
-	wnd->RegisterObject(button_new);
-	wnd->RegisterObject(list_entries);
-	wnd->RegisterObject(title);
-	wnd->RegisterObject(menubar);
-	wnd->RegisterObject(statusbar);
+	wnd->Add(text_id);
+	wnd->Add(edit_id);
+	wnd->Add(text_original);
+	wnd->Add(edit_original);
+	wnd->Add(text_translated);
+	wnd->Add(edit_translated);
+	wnd->Add(button_save);
+	wnd->Add(button_remove);
+	wnd->Add(button_new);
+	wnd->Add(list_entries);
+	wnd->Add(title);
+	wnd->Add(menubar);
+	wnd->Add(statusbar);
 
 	wnd->SetMinimumSize(Size(400, 350));
 	wnd->SetIcon(NIL);

@@ -34,7 +34,7 @@ S::GUI::MicroMenu::MicroMenu(const Point &iPos, const Size &iSize, Int sType)
 
 	hotspot->onLeftButtonDown.Connect(&MicroMenu::OpenPopupMenu, this);
 
-	RegisterObject(hotspot);
+	Add(hotspot);
 
 	popup = new PopupMenu();
 }
@@ -73,7 +73,7 @@ S::Int S::GUI::MicroMenu::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			if (GetBackgroundColor() >= 0) surface->Box(frame, GetBackgroundColor(), Rect::Filled);
+			if (IsBackgroundColorSet()) surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 
 			surface->Frame(frame, FRAME_UP);
 
@@ -126,14 +126,14 @@ S::Void S::GUI::MicroMenu::OpenPopupMenu()
 
 	onOpenPopupMenu.Emit();
 
-	RegisterObject(popup);
+	Add(popup);
 }
 
 S::Void S::GUI::MicroMenu::ClosePopupMenu()
 {
 	if (popup->GetContainer() == this)
 	{
-		UnregisterObject(popup);
+		Remove(popup);
 
 		onClosePopupMenu.Emit();
 

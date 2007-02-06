@@ -1,9 +1,13 @@
 ChangeLog for smooth
 
-xx.01.07 xx:xx - smooth alpha 0.8.69.1
+06.02.07 13:18 - smooth alpha 0.8.69.1
 
 - list.cpp	- Speed optimizations
 - buffer.cpp	- Fixed problems when using const Buffer<>
+- icon.cpp	- Added an image loader for Windows icon resources
+- widget.cpp	- Renamed RegisterObject to Add
+		- Renamed UnregisterObject to Remove
+- app..tion.cpp	- Moved main loop to Application
 
 - simplified Array<> API
 - converted project to MSVC 8.0

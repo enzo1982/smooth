@@ -69,7 +69,7 @@ S::Int S::GUI::Tooltip::Show()
 	toolWindow = new ToolWindow(tPos, tSize);
 	toolWindow->onPaint.Connect(&Tooltip::OnToolWindowPaint, this);
 
-	RegisterObject(toolWindow);
+	Add(toolWindow);
 
 	if (timeOut != 0)
 	{
@@ -94,7 +94,7 @@ S::Int S::GUI::Tooltip::Hide()
 
 	if (toolWindow != NIL)
 	{
-		UnregisterObject(toolWindow);
+		Remove(toolWindow);
 
 		DeleteObject(toolWindow);
 

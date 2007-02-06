@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,8 +38,15 @@ namespace smooth
 				static String	 Default;
 				static Int	 DefaultSize;
 
+				static Int	 Thin;
+				static Int	 ExtraLight;
+				static Int	 Light;
 				static Int	 Normal;
+				static Int	 Medium;
+				static Int	 SemiBold;
 				static Int	 Bold;
+				static Int	 ExtraBold;
+				static Int	 Black;
 
 				static Int	 Italic;
 				static Int	 Underline;

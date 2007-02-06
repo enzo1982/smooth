@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,7 +34,7 @@ S::GUI::PopupMenu::PopupMenu()
 
 	toolWindow->Hide();
 
-	RegisterObject(toolWindow);
+	Add(toolWindow);
 
 	internalRequestClose.SetParentObject(this);
 
@@ -54,7 +54,7 @@ S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap 
 
 	newEntry->SetOwner(this);
 
-	RegisterObject(newEntry);
+	Add(newEntry);
 
 	return newEntry;
 }
@@ -79,7 +79,7 @@ S::Int S::GUI::PopupMenu::Show()
 
 		entry->SetRegisteredFlag(False);
 
-		toolWindow->RegisterObject(entry);
+		toolWindow->Add(entry);
 	}
 
 	toolWindow->SetMetrics(GetPosition(), GetSize());
@@ -108,7 +108,7 @@ S::Int S::GUI::PopupMenu::Hide()
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
-		toolWindow->UnregisterObject(entry);
+		toolWindow->Remove(entry);
 
 		entry->SetRegisteredFlag(True);
 		entry->SetContainer(this);

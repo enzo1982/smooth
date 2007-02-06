@@ -49,8 +49,8 @@ S::GUI::Slider::Slider(const Point &iPos, const Size &iSize, Int sType, Int *var
 	dragHotspot->onMouseDrag.Connect(&Slider::OnMouseDrag, this);
 	dragHotspot->onMouseDragEnd.Connect(&Slider::OnMouseDragEnd, this);
 
-	RegisterObject(clickHotspot);
-	RegisterObject(dragHotspot);
+	Add(clickHotspot);
+	Add(dragHotspot);
 
 	onChangeSize.Connect(&Slider::UpdateHotspotPositions, this);
 
@@ -76,7 +76,7 @@ S::Int S::GUI::Slider::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			surface->Box(Rect(realPos, GetSize()), Setup::BackgroundColor, Rect::Filled);
+			surface->Box(Rect(realPos, GetSize()), GetBackgroundColor(), Rect::Filled);
 
 			if (subtype == OR_HORZ)	surface->Bar(realPos + Point(4, 8), realPos + Point(GetWidth() - 4, 8), OR_HORZ);
 			else			surface->Bar(realPos + Point(8, 4), realPos + Point(8, GetHeight() - 4), OR_VERT);

@@ -37,8 +37,8 @@ S::GUI::Scrollbar::Scrollbar(const Point &iPos, const Size &iSize, Int sType, In
 
 	dragHotspot->onMouseWheel.Connect(&Scrollbar::OnMouseWheel, this);
 
-	RegisterObject(clickHotspot);
-	RegisterObject(dragHotspot);
+	Add(clickHotspot);
+	Add(dragHotspot);
 
 	UpdateHotspotPositions();
 

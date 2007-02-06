@@ -21,7 +21,7 @@ Int smooth::Main()
 {
 	BeatClock	*app = new BeatClock();
 
-	Loop();
+	app->Loop();
 
 	delete app;
 
@@ -66,11 +66,11 @@ BeatClock::BeatClock()
 	entry->onAction.Connect(&BeatClock::Info, this);
 	entry->SetOrientation(OR_RIGHT);
 
-	RegisterObject(wnd);
+	Add(wnd);
 
-	wnd->RegisterObject(dragcontrol);
-	wnd->RegisterObject(title);
-	wnd->RegisterObject(menubar);
+	wnd->Add(dragcontrol);
+	wnd->Add(title);
+	wnd->Add(menubar);
 
 	wnd->SetIcon(ImageLoader::Load("beat.pci:0"));
 	wnd->onPaint.Connect(&BeatClock::PaintAll, this);
@@ -87,17 +87,11 @@ BeatClock::~BeatClock()
 
 	RegisterValues();
 
-	UnregisterObject(wnd);
-
-	wnd->UnregisterObject(title);
-	wnd->UnregisterObject(menubar);
-	wnd->UnregisterObject(dragcontrol);
-
-	delete wnd;
-	delete title;
-	delete menubar;
-	delete timer;
-	delete dragcontrol;
+	DeleteObject(wnd);
+	DeleteObject(title);
+	DeleteObject(menubar);
+	DeleteObject(timer);
+	DeleteObject(dragcontrol);
 }
 
 Void BeatClock::EventProc(Int message, Int wParam, Int lParam)
@@ -166,13 +160,13 @@ Void BeatClock::Options()
 	display_option4 = new OptionBox("Local time", pos, size, &timezone, 1);
 	display_option4->onAction.Connect(&BeatClock::OptionsPaint, this);
 
-	display->RegisterObject(display_group1);
-	display->RegisterObject(display_group2);
-	display->RegisterObject(display_option1);
-	display->RegisterObject(display_option2);
-	display->RegisterObject(display_option3);
-	display->RegisterObject(display_option4);
-	display->RegisterObject(display_check1);
+	display->Add(display_group1);
+	display->Add(display_group2);
+	display->Add(display_option1);
+	display->Add(display_option2);
+	display->Add(display_option3);
+	display->Add(display_option4);
+	display->Add(display_check1);
 
 // Configuring "Alarm" layer:
 
@@ -212,12 +206,12 @@ Void BeatClock::Options()
 
 	alarm_option2 = new OptionBox("every day", pos, size, &alarmoption, 1);
 
-	alarm->RegisterObject(alarm_check1);
-	alarm->RegisterObject(alarm_text1);
-	alarm->RegisterObject(alarm_text2);
-	alarm->RegisterObject(alarm_edit1);
-	alarm->RegisterObject(alarm_option1);
-	alarm->RegisterObject(alarm_option2);
+	alarm->Add(alarm_check1);
+	alarm->Add(alarm_text1);
+	alarm->Add(alarm_text2);
+	alarm->Add(alarm_edit1);
+	alarm->Add(alarm_option1);
+	alarm->Add(alarm_option2);
 
 	toggleAlarmState();
 
@@ -251,11 +245,11 @@ Void BeatClock::Options()
 
 	misc_option4 = new OptionBox("Change format and timezone", pos, size, &modechange, 3);
 
-	misc->RegisterObject(misc_group1);
-	misc->RegisterObject(misc_option1);
-	misc->RegisterObject(misc_option2);
-	misc->RegisterObject(misc_option3);
-	misc->RegisterObject(misc_option4);
+	misc->Add(misc_group1);
+	misc->Add(misc_option1);
+	misc->Add(misc_option2);
+	misc->Add(misc_option3);
+	misc->Add(misc_option4);
 
 // Configuring "Info" layer:
 
@@ -268,8 +262,8 @@ Void BeatClock::Options()
 
 	info_text2 = new Text("\n\neMail: robert.kausch@gmx.net", pos);
 
-	info->RegisterObject(info_text1);
-	info->RegisterObject(info_text2);
+	info->Add(info_text1);
+	info->Add(info_text2);
 
 // Configuring main layer:
 
@@ -295,17 +289,17 @@ Void BeatClock::Options()
 
 	main_reg1 = new TabWidget(pos, size);
 
-	RegisterObject(optionsdialog);
+	Add(optionsdialog);
 
-	optionsdialog->RegisterObject(optitle);
-	optionsdialog->RegisterObject(main_button1);
-	optionsdialog->RegisterObject(main_button2);
-	optionsdialog->RegisterObject(main_reg1);
+	optionsdialog->Add(optitle);
+	optionsdialog->Add(main_button1);
+	optionsdialog->Add(main_button2);
+	optionsdialog->Add(main_reg1);
 
-	main_reg1->RegisterObject(display);
-	main_reg1->RegisterObject(misc);
-	main_reg1->RegisterObject(alarm);
-	main_reg1->RegisterObject(info);
+	main_reg1->Add(display);
+	main_reg1->Add(misc);
+	main_reg1->Add(alarm);
+	main_reg1->Add(info);
 
 	optionsdialog->SetIcon(ImageLoader::Load("beat.pci:0"));
 	optionsdialog->doQuit.Connect(&BeatClock::OptionsKillProc, this);
@@ -322,71 +316,35 @@ Void BeatClock::Options()
 
 	optionsdialog->Stay();
 
-	display->UnregisterObject(display_group1);
-	display->UnregisterObject(display_group2);
-	display->UnregisterObject(display_option1);
-	display->UnregisterObject(display_option2);
-	display->UnregisterObject(display_option3);
-	display->UnregisterObject(display_option4);
-	display->UnregisterObject(display_check1);
-
-	alarm->UnregisterObject(alarm_check1);
-	alarm->UnregisterObject(alarm_text1);
-	alarm->UnregisterObject(alarm_text2);
-	alarm->UnregisterObject(alarm_edit1);
-	alarm->UnregisterObject(alarm_option1);
-	alarm->UnregisterObject(alarm_option2);
-
-	misc->UnregisterObject(misc_group1);
-	misc->UnregisterObject(misc_option1);
-	misc->UnregisterObject(misc_option2);
-	misc->UnregisterObject(misc_option3);
-	misc->UnregisterObject(misc_option4);
-
-	info->UnregisterObject(info_text1);
-	info->UnregisterObject(info_text2);
-
-	main_reg1->UnregisterObject(display);
-	main_reg1->UnregisterObject(alarm);
-	main_reg1->UnregisterObject(misc);
-	main_reg1->UnregisterObject(info);
-
-	optionsdialog->UnregisterObject(optitle);
-	optionsdialog->UnregisterObject(main_button1);
-	optionsdialog->UnregisterObject(main_button2);
-	optionsdialog->UnregisterObject(main_reg1);
-
-	UnregisterObject(optionsdialog);
-
-	delete optitle;
-	delete optionsdialog;
-	delete display;
-	delete alarm;
-	delete misc;
-	delete info;
-	delete main_button1;
-	delete main_button2;
-	delete main_reg1;
-	delete info_text1;
-	delete info_text2;
-	delete alarm_check1;
-	delete alarm_text1;
-	delete alarm_text2;
-	delete alarm_edit1;
-	delete alarm_option1;
-	delete alarm_option2;
-	delete misc_group1;
-	delete misc_option1;
-	delete misc_option2;
-	delete misc_option3;
-	delete misc_option4;
-	delete display_group1;
-	delete display_group2;
-	delete display_check1;
-	delete display_option1;
-	delete display_option2;
-	delete display_option3;
-	delete display_option4;
+	DeleteObject(optitle);
+	DeleteObject(optionsdialog);
+	DeleteObject(display);
+	DeleteObject(alarm);
+	DeleteObject(misc);
+	DeleteObject(info);
+	DeleteObject(main_button1);
+	DeleteObject(main_button2);
+	DeleteObject(main_reg1);
+	DeleteObject(info_text1);
+	DeleteObject(info_text2);
+	DeleteObject(alarm_check1);
+	DeleteObject(alarm_text1);
+	DeleteObject(alarm_text2);
+	DeleteObject(alarm_edit1);
+	DeleteObject(alarm_option1);
+	DeleteObject(alarm_option2);
+	DeleteObject(misc_group1);
+	DeleteObject(misc_option1);
+	DeleteObject(misc_option2);
+	DeleteObject(misc_option3);
+	DeleteObject(misc_option4);
+	DeleteObject(display_group1);
+	DeleteObject(display_group2);
+	DeleteObject(display_check1);
+	DeleteObject(display_option1);
+	DeleteObject(display_option2);
+	DeleteObject(display_option3);
+	DeleteObject(display_option4);
 }
 
 Void BeatClock::OptionsOK()

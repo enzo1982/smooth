@@ -17,7 +17,7 @@ Int smooth::Main()
 {
 	Designer	*app = new Designer();
 
-	Loop();
+	app->Loop();
 
 	delete app;
 
@@ -61,12 +61,12 @@ Designer::Designer()
 	menu_widgets_add_smooth->AddEntry("Layer")->onAction.Connect(&Designer::AddLayer, this);
 	menu_widgets_add_smooth->AddEntry("Menubar")->onAction.Connect(&Designer::AddMenubar, this);
 
-	RegisterObject(wnd);
+	Add(wnd);
 
-	wnd->RegisterObject(title);
-	wnd->RegisterObject(menubar);
-	wnd->RegisterObject(iconbar);
-	wnd->RegisterObject(statusbar);
+	wnd->Add(title);
+	wnd->Add(menubar);
+	wnd->Add(iconbar);
+	wnd->Add(statusbar);
 
 	wnd->SetIcon(NIL);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,7 +12,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
-#include <smooth/loop.h>
+#include <smooth/init.h>
 #include <smooth/backends/xlib/backendxlib.h>
 
 S::GUI::WindowBackend *CreateWindowXLib()

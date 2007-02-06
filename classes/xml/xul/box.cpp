@@ -38,7 +38,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 			{
 				widget = new XUL::Box(nNode);
 
-				layer->RegisterObject(widget->GetWidget());
+				layer->Add(widget->GetWidget());
 
 				widgets.Add(widget);
 			}
@@ -46,7 +46,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 			{
 				widget = new XUL::Button(nNode);
 
-				layer->RegisterObject(widget->GetWidget());
+				layer->Add(widget->GetWidget());
 
 				widgets.Add(widget);
 			}
@@ -54,7 +54,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 			{
 				widget = new XUL::TextBox(nNode);
 
-				layer->RegisterObject(widget->GetWidget());
+				layer->Add(widget->GetWidget());
 
 				widgets.Add(widget);
 			}
@@ -62,7 +62,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 			{
 				widget = new XUL::Label(nNode);
 
-				layer->RegisterObject(widget->GetWidget());
+				layer->Add(widget->GetWidget());
 
 				widgets.Add(widget);
 			}
@@ -70,7 +70,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 			{
 				widget = new XUL::Description(nNode);
 
-				layer->RegisterObject(widget->GetWidget());
+				layer->Add(widget->GetWidget());
 
 				widgets.Add(widget);
 			}

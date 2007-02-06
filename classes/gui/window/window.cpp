@@ -64,7 +64,7 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 
 	mainLayer = new Layer();
 
-	RegisterObject(mainLayer);
+	Add(mainLayer);
 
 	doQuit.Connect(True);
 
@@ -79,7 +79,7 @@ S::GUI::Window::~Window()
 {
 	if (created && !destroyed) backend->Close();
 
-	UnregisterObject(mainLayer);
+	Remove(mainLayer);
 	DeleteObject(mainLayer);
 
 	if (trackMenu != NIL) ClosePopupMenu();
@@ -775,8 +775,6 @@ S::Int S::GUI::Window::Paint(Int message)
 
 		surface->Box(updateRect, Setup::BackgroundColor, Rect::Filled);
 
-		onPaint.Emit();
-
 		if (type != ToolWindow::classID)
 		{
 			Widget	*lastWidget = NIL;
@@ -858,6 +856,8 @@ S::Int S::GUI::Window::Paint(Int message)
 				surface->Bar(p1, p2, OR_VERT);
 			}
 		}
+
+		onPaint.Emit();
 
 		for (Int j = 0; j < GetNOfObjects(); j++)
 		{
@@ -1033,7 +1033,7 @@ S::Void S::GUI::Window::OpenPopupMenu()
 		trackMenu->SetPosition(position);
 		trackMenu->internalRequestClose.Connect(&Window::ClosePopupMenu, this);
 
-		RegisterObject(trackMenu);
+		Remove(trackMenu);
 	}
 }
 
@@ -1043,28 +1043,28 @@ S::Void S::GUI::Window::ClosePopupMenu()
 	{
 		trackMenu->internalRequestClose.Disconnect(&Window::ClosePopupMenu, this);
 
-		UnregisterObject(trackMenu);
+		Remove(trackMenu);
 
 		trackMenu = NIL;
 	}
 }
 
-S::Int S::GUI::Window::RegisterObject(Widget *object)
+S::Int S::GUI::Window::Add(Widget *widget)
 {
-	if (object->GetOrientation() == OR_UPPERLEFT || object->GetOrientation() == OR_UPPERRIGHT || object->GetOrientation() == OR_LOWERLEFT || object->GetOrientation() == OR_LOWERRIGHT) return mainLayer->RegisterObject(object);
+	if (widget->GetOrientation() == OR_UPPERLEFT || widget->GetOrientation() == OR_UPPERRIGHT || widget->GetOrientation() == OR_LOWERLEFT || widget->GetOrientation() == OR_LOWERRIGHT) return mainLayer->Add(widget);
 
-	if (Widget::RegisterObject(object) == Success())
+	if (Widget::Add(widget) == Success())
 	{
-		if (object->GetObjectType() == Titlebar::classID)
+		if (widget->GetObjectType() == Titlebar::classID)
 		{
-			if (!Binary::IsFlagSet(object->GetFlags(), TB_MAXBUTTON)) flags = flags | WF_NORESIZE;
+			if (!Binary::IsFlagSet(widget->GetFlags(), TB_MAXBUTTON)) flags = flags | WF_NORESIZE;
 		}
-		else if (object->GetObjectType() == Statusbar::classID)
+		else if (widget->GetObjectType() == Statusbar::classID)
 		{
-			SetDefaultStatusText(object->GetText());
+			SetDefaultStatusText(widget->GetText());
 		}
 
-		if (object->GetOrientation() != OR_FREE) CalculateOffsets();
+		if (widget->GetOrientation() != OR_FREE) CalculateOffsets();
 
 		return Success();
 	}
@@ -1072,13 +1072,13 @@ S::Int S::GUI::Window::RegisterObject(Widget *object)
 	return Error();
 }
 
-S::Int S::GUI::Window::UnregisterObject(Widget *object)
+S::Int S::GUI::Window::Remove(Widget *widget)
 {
-	if (object->GetOrientation() == OR_UPPERLEFT || object->GetOrientation() == OR_UPPERRIGHT || object->GetOrientation() == OR_LOWERLEFT || object->GetOrientation() == OR_LOWERRIGHT) return mainLayer->UnregisterObject(object);
+	if (widget->GetOrientation() == OR_UPPERLEFT || widget->GetOrientation() == OR_UPPERRIGHT || widget->GetOrientation() == OR_LOWERLEFT || widget->GetOrientation() == OR_LOWERRIGHT) return mainLayer->Remove(widget);
 
-	if (Widget::UnregisterObject(object) == Success())
+	if (Widget::Remove(widget) == Success())
 	{
-		if (object->GetOrientation() != OR_FREE) CalculateOffsets();
+		if (widget->GetOrientation() != OR_FREE) CalculateOffsets();
 
 		return Success();
 	}

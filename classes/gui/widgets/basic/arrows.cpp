@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -53,8 +53,8 @@ S::GUI::Arrows::Arrows(const Point &iPos, const Size &iSize, Int sType, Int *var
 	arrow1Hotspot->onLeftButtonUp.Connect(&Arrows::OnMouseRelease, this);
 	arrow2Hotspot->onLeftButtonUp.Connect(&Arrows::OnMouseRelease, this);
 
-	RegisterObject(arrow1Hotspot);
-	RegisterObject(arrow2Hotspot);
+	Add(arrow1Hotspot);
+	Add(arrow2Hotspot);
 
 	onChangeSize.Connect(&Arrows::OnChangeSize, this);
 }

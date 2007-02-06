@@ -28,7 +28,7 @@ S::XML::XUL::Window::Window(Node *node) : Widget(node)
 		{
 			titlebar = new GUI::Titlebar();
 
-			window->RegisterObject(titlebar);
+			window->Add(titlebar);
 		}
 
 		if (GetXMLAttributeValue(node, "sizemode") == "maximized") window->Maximize();
@@ -48,7 +48,7 @@ S::XML::XUL::Window::Window(Node *node) : Widget(node)
 					{
 						XUL::Menubar	*menu = new XUL::Menubar(tNode);
 
-						window->RegisterObject(menu->GetWidget());
+						window->Add(menu->GetWidget());
 
 						widgets.Add(menu);
 					}
@@ -58,7 +58,7 @@ S::XML::XUL::Window::Window(Node *node) : Widget(node)
 
 		XUL::Box	*box = new XUL::Box(node);
 
-		window->RegisterObject(box->GetWidget());
+		window->Add(box->GetWidget());
 
 		widgets.Add(box);
 	}

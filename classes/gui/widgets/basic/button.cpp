@@ -33,7 +33,7 @@ S::GUI::Button::Button(const String &iText, const Bitmap &iBitmap, const Point &
 
 	hotspot->onLeftButtonClick.Connect(&onAction);
 
-	RegisterObject(hotspot);
+	Add(hotspot);
 
 	onChangeSize.Connect(&Button::OnChangeSize, this);
 }
@@ -62,7 +62,7 @@ S::Int S::GUI::Button::Paint(Int message)
 					surface->Frame(Rect(GetRealPosition() + Point(1, 1), GetSize() - Size(2, 2)), FRAME_UP);
 				}
 
-				if (GetBackgroundColor() >= 0) surface->Box(frame, GetBackgroundColor(), Rect::Filled);
+				if (IsBackgroundColorSet()) surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 
 				if (text != NIL)
 				{

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,9 +18,9 @@ Int smooth::Main()
 {
 	MDITest	*app = new MDITest();
 
-	Loop();
+	app->Loop();
 
-	delete app;
+	Object::DeleteObject(app);
 
 	return 0;
 }
@@ -40,12 +40,12 @@ MDITest::MDITest()
 
 	mainWnd_menubar->AddEntry("File", NIL, menu_file);
 
-	RegisterObject(mainWnd);
+	Add(mainWnd);
 
-	mainWnd->RegisterObject(mainWnd_titlebar);
-	mainWnd->RegisterObject(mainWnd_statusbar);
-	mainWnd->RegisterObject(mainWnd_client);
-	mainWnd->RegisterObject(mainWnd_menubar);
+	mainWnd->Add(mainWnd_titlebar);
+	mainWnd->Add(mainWnd_statusbar);
+	mainWnd->Add(mainWnd_client);
+	mainWnd->Add(mainWnd_menubar);
 
 	mainWnd->SetIcon(NIL);
 	mainWnd->doQuit.Connect(&MDITest::ExitProc, this);
@@ -53,19 +53,12 @@ MDITest::MDITest()
 
 MDITest::~MDITest()
 {
-	mainWnd->UnregisterObject(mainWnd_statusbar);
-	mainWnd->UnregisterObject(mainWnd_titlebar);
-	mainWnd->UnregisterObject(mainWnd_client);
-	mainWnd->UnregisterObject(mainWnd_menubar);
-
-	UnregisterObject(mainWnd);
-
-	delete mainWnd_statusbar;
-	delete mainWnd_titlebar;
-	delete mainWnd_client;
-	delete mainWnd_menubar;
-	delete menu_file;
-	delete mainWnd;
+	DeleteObject(mainWnd_statusbar);
+	DeleteObject(mainWnd_titlebar);
+	DeleteObject(mainWnd_client);
+	DeleteObject(mainWnd_menubar);
+	DeleteObject(menu_file);
+	DeleteObject(mainWnd);
 }
 
 Bool MDITest::ExitProc()

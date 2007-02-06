@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,7 +26,7 @@ S::Int S::GUI::Menu::RemoveEntry(MenuEntry *entry)
 {
 	if (entry == NIL) return Error();
 
-	if (UnregisterObject(entry) == Success())
+	if (Remove(entry) == Success())
 	{
 		Object::DeleteObject(entry);
 
@@ -46,7 +46,7 @@ S::Int S::GUI::Menu::RemoveAllEntries()
 
 		Widget	*widget = GetNthObject(nonMenuEntry);
 
-		UnregisterObject(widget);
+		Remove(widget);
 		DeleteObject(widget);
 	}
 

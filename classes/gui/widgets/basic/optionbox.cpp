@@ -43,7 +43,7 @@ S::GUI::OptionBox::OptionBox(const String &iText, const Point &iPos, const Size 
 
 	onChangeSize.Connect(&HotspotSimpleButton::SetSize, hotspot);
 
-	RegisterObject(hotspot);
+	Add(hotspot);
 }
 
 S::GUI::OptionBox::~OptionBox()

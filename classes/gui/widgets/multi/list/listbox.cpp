@@ -43,8 +43,8 @@ S::GUI::ListBox::ListBox(const Point &iPos, const Size &iSize)
 	header = new ListBoxHeader(Point(1, 1), Size(GetWidth() - 2, 16));
 	header->Hide();
 
-	RegisterObject(scrollbar);
-	RegisterObject(header);
+	Add(scrollbar);
+	Add(header);
 }
 
 S::GUI::ListBox::~ListBox()

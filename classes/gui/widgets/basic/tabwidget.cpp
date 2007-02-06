@@ -169,14 +169,14 @@ S::Void S::GUI::TabWidget::OnChangeSize(const Size &nSize)
 	for (Int i = 0; i < GetNOfObjects(); i++) GetNthObject(i)->SetSize(nSize - Size(3, 22));
 }
 
-S::Int S::GUI::TabWidget::RegisterObject(Widget *object)
+S::Int S::GUI::TabWidget::Add(Widget *widget)
 {
-	if (Widget::RegisterObject(object) == Success())
+	if (Widget::Add(widget) == Success())
 	{
-		object->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));
+		widget->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));
 
-		if (GetNOfObjects() == 1) object->Show();
-		else			  object->Hide();
+		if (GetNOfObjects() == 1) widget->Show();
+		else			  widget->Hide();
 
 		return Success();
 	}
@@ -184,13 +184,13 @@ S::Int S::GUI::TabWidget::RegisterObject(Widget *object)
 	return Error();
 }
 
-S::Int S::GUI::TabWidget::UnregisterObject(Widget *object)
+S::Int S::GUI::TabWidget::Remove(Widget *widget)
 {
-	if (object == NIL) return Error();
+	if (widget == NIL) return Error();
 
-	Bool	 wasVisible = object->IsVisible();
+	Bool	 wasVisible = widget->IsVisible();
 
-	if (Widget::UnregisterObject(object) == Success())
+	if (Widget::Remove(widget) == Success())
 	{
 		if (wasVisible && GetNOfObjects() > 0) GetNthObject(0)->Show();
 

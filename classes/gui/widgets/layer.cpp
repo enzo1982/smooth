@@ -37,7 +37,7 @@ S::Int S::GUI::Layer::Show()
 
 	if (!IsRegistered()) return Success();
 
-	if (GetBackgroundColor() != -1 && IsVisible())
+	if (IsBackgroundColorSet() && IsVisible())
 	{
 		Surface	*surface	= container->GetDrawSurface();
 		Rect	 frame		= Rect(GetRealPosition(), GetSize());
@@ -94,12 +94,12 @@ S::Int S::GUI::Layer::Hide()
 
 	if (!IsRegistered()) return Success();
 
-	if (GetBackgroundColor() != -1 && wasVisible)
+	if (IsBackgroundColorSet() && wasVisible)
 	{
 		Surface	*surface	= container->GetDrawSurface();
 		Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
-		surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
+		surface->Box(frame, container->GetBackgroundColor(), Rect::Filled);
 	}
 
 	onHide.Emit();
@@ -120,7 +120,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 				Surface	*surface	= container->GetDrawSurface();
 				Rect	 updateRect	= container->GetContainerWindow()->GetUpdateRect();
 
-				if (GetBackgroundColor() != -1)
+				if (IsBackgroundColorSet())
 				{
 					Rect	 frame = Rect(GetRealPosition(), GetSize());
 

@@ -58,7 +58,8 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 
 	font.SetColor(Setup::TextColor);
 
-	backgroundColor	= -1;
+	backgroundColor	= Setup::BackgroundColor;
+	backgroundColorSet = False;
 
 	nullSurface	= new GUI::Surface();
 	drawSurface	= nullSurface;
@@ -105,16 +106,16 @@ S::GUI::Widget::~Widget()
 {
 	DeactivateTooltip();
 
-	while (widgets.GetNOfEntries()) UnregisterObject(widgets.GetFirst());
+	while (widgets.GetNOfEntries()) Remove(widgets.GetFirst());
 
 	widgets.RemoveAll();
 
-	if (registered && container != NIL) container->UnregisterObject(this);
+	if (registered && container != NIL) container->Remove(this);
 
 	delete nullSurface;
 }
 
-S::Int S::GUI::Widget::RegisterObject(Widget *widget)
+S::Int S::GUI::Widget::Add(Widget *widget)
 {
 	if (widget == NIL) return Error();
 
@@ -140,7 +141,7 @@ S::Int S::GUI::Widget::RegisterObject(Widget *widget)
 	return Error();
 }
 
-S::Int S::GUI::Widget::UnregisterObject(Widget *widget)
+S::Int S::GUI::Widget::Remove(Widget *widget)
 {
 	if (widget == NIL) return Error();
 
@@ -289,18 +290,28 @@ S::GUI::Point S::GUI::Widget::GetRealPosition() const
 	return realPos;
 }
 
-const S::GUI::Color &S::GUI::Widget::GetBackgroundColor() const
-{
-	return backgroundColor;
-}
-
 S::Int S::GUI::Widget::SetBackgroundColor(const Color &nColor)
 {
 	backgroundColor = nColor;
+	backgroundColorSet = True;
 
 	Paint(SP_PAINT);
 
 	return Success();
+}
+
+const S::GUI::Color &S::GUI::Widget::GetBackgroundColor() const
+{
+	if (backgroundColorSet)	 return backgroundColor;
+	else if (IsRegistered()) return container->GetBackgroundColor();
+	else			 return Setup::BackgroundColor;
+}
+
+S::Bool S::GUI::Widget::IsBackgroundColorSet() const
+{
+	if (backgroundColorSet)	 return True;
+	else if (IsRegistered()) return container->IsBackgroundColorSet();
+	else			 return False;
 }
 
 S::Int S::GUI::Widget::Show()
@@ -340,8 +351,7 @@ S::Int S::GUI::Widget::Hide()
 		Rect	 rect		= Rect(GetRealPosition(), size);
 		Surface	*surface	= container->GetDrawSurface();
 
-		if (container->GetBackgroundColor() != -1)	surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
-		else						surface->Box(rect, Setup::BackgroundColor, Rect::Filled);
+		surface->Box(rect, GetBackgroundColor(), Rect::Filled);
 	}
 
 	onHide.Emit();
@@ -657,7 +667,7 @@ S::Void S::GUI::Widget::ActivateTooltip()
 
 	PopupMenu::internalOnOpenPopupMenu.Connect(&Widget::DeactivateTooltip, this);
 
-	window->RegisterObject(tooltip);
+	window->Add(tooltip);
 }
 
 S::Void S::GUI::Widget::DeactivateTooltip()

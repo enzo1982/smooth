@@ -40,7 +40,7 @@ S::GUI::CheckBox::CheckBox(const String &iText, const Point &iPos, const Size &i
 
 	onChangeSize.Connect(&HotspotSimpleButton::SetSize, hotspot);
 
-	RegisterObject(hotspot);
+	Add(hotspot);
 }
 
 S::GUI::CheckBox::~CheckBox()

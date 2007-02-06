@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,7 +19,7 @@ Int smooth::Main()
 {
 	Test	*application = new Test();
 
-	Loop();
+	application->Loop();
 
 	Object::DeleteObject(application);
 
@@ -125,57 +125,57 @@ Test::Test()
 	button_deactivate	= new Button("Deactivate", NIL, Point(422, 209), Size(70, 22));
 	button_deactivate->onAction.Connect(&Widget::Deactivate, selected_widget);
 
-	RegisterObject(mainWnd);
+	Add(mainWnd);
 
-	mainWnd->RegisterObject(mainWnd_titlebar);
-	mainWnd->RegisterObject(mainWnd_statusbar);
+	mainWnd->Add(mainWnd_titlebar);
+	mainWnd->Add(mainWnd_statusbar);
 
-	mainWnd->RegisterObject(mainWnd_divider1);
-	mainWnd->RegisterObject(mainWnd_divider2);
-	mainWnd->RegisterObject(mainWnd_client);
+	mainWnd->Add(mainWnd_divider1);
+	mainWnd->Add(mainWnd_divider2);
+	mainWnd->Add(mainWnd_client);
 
-	mainWnd->RegisterObject(mainWnd_menubar);
+	mainWnd->Add(mainWnd_menubar);
 
-	mainWnd->RegisterObject(text_arrows);
-	mainWnd->RegisterObject(widget_arrows);
-	mainWnd->RegisterObject(text_arrows_value);
+	mainWnd->Add(text_arrows);
+	mainWnd->Add(widget_arrows);
+	mainWnd->Add(text_arrows_value);
 
-	mainWnd->RegisterObject(text_activearea);
-	mainWnd->RegisterObject(widget_activearea);
+	mainWnd->Add(text_activearea);
+	mainWnd->Add(widget_activearea);
 
-	mainWnd->RegisterObject(text_button);
-	mainWnd->RegisterObject(widget_button);
+	mainWnd->Add(text_button);
+	mainWnd->Add(widget_button);
 
-	mainWnd->RegisterObject(text_hyperlink);
-	mainWnd->RegisterObject(widget_hyperlink);
+	mainWnd->Add(text_hyperlink);
+	mainWnd->Add(widget_hyperlink);
 
-	mainWnd->RegisterObject(text_scrollbar);
-	mainWnd->RegisterObject(widget_scrollbar);
-	mainWnd->RegisterObject(text_scrollbar_value);
+	mainWnd->Add(text_scrollbar);
+	mainWnd->Add(widget_scrollbar);
+	mainWnd->Add(text_scrollbar_value);
 
-	mainWnd->RegisterObject(text_progressbar);
-	mainWnd->RegisterObject(widget_progressbar);
+	mainWnd->Add(text_progressbar);
+	mainWnd->Add(widget_progressbar);
 
-	mainWnd->RegisterObject(text_slider);
-	mainWnd->RegisterObject(widget_slider);
+	mainWnd->Add(text_slider);
+	mainWnd->Add(widget_slider);
 
-	mainWnd->RegisterObject(text_checkbox);
-	mainWnd->RegisterObject(widget_checkbox);
+	mainWnd->Add(text_checkbox);
+	mainWnd->Add(widget_checkbox);
 
-	mainWnd->RegisterObject(text_optionbox);
-	mainWnd->RegisterObject(widget_optionbox1);
-	mainWnd->RegisterObject(widget_optionbox2);
+	mainWnd->Add(text_optionbox);
+	mainWnd->Add(widget_optionbox1);
+	mainWnd->Add(widget_optionbox2);
 
-	mainWnd->RegisterObject(text_editbox);
-	mainWnd->RegisterObject(widget_editbox);
+	mainWnd->Add(text_editbox);
+	mainWnd->Add(widget_editbox);
 
-	mainWnd->RegisterObject(text_combobox);
-	mainWnd->RegisterObject(widget_combobox);
+	mainWnd->Add(text_combobox);
+	mainWnd->Add(widget_combobox);
 
-	mainWnd->RegisterObject(button_show);
-	mainWnd->RegisterObject(button_hide);
-	mainWnd->RegisterObject(button_activate);
-	mainWnd->RegisterObject(button_deactivate);
+	mainWnd->Add(button_show);
+	mainWnd->Add(button_hide);
+	mainWnd->Add(button_activate);
+	mainWnd->Add(button_deactivate);
 
 	mainWnd->SetIcon(NIL);
 }
@@ -187,7 +187,7 @@ Test::~Test()
 	DeleteObject(text_arrows_value);
 
 	DeleteObject(text_activearea);
-	mainWnd->RegisterObject(widget_activearea);
+	DeleteObject(widget_activearea);
 
 	DeleteObject(text_button);
 	DeleteObject(widget_button);

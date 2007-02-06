@@ -57,7 +57,7 @@ S::Int S::System::TimerWin32::GetID() const
 	return timerid;
 }
 
-S::Void WINAPI S::System::TimerWin32::TimerProc(HWND wnd, unsigned int message, unsigned int timerid, unsigned long time)
+void WINAPI S::System::TimerWin32::TimerProc(HWND wnd, UINT message, UINT_PTR timerid, DWORD time)
 {
 	for (Int i = 0; i < Object::GetNOfObjects(); i++)
 	{

@@ -37,7 +37,7 @@ LinuxTest::LinuxTest()
 
 	mainWnd->SetMetrics(Point(100, 100), Size(400, 250));
 
-	RegisterObject(mainWnd);
+	Add(mainWnd);
 
 	mainWnd->Show();
 }

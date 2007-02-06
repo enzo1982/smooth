@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,7 +16,7 @@ Int smooth::Main()
 {
 	PCIFFManager	*app = new PCIFFManager();
 
-	Loop();
+	app->Loop();
 
 	delete app;
 
@@ -40,11 +40,11 @@ PCIFFManager::PCIFFManager()
 	menu_file->AddEntry();
 	menu_file->AddEntry("Exit")->onAction.Connect(&PCIFFManager::Close, this);
 
-	RegisterObject(wnd);
+	Add(wnd);
 
-	wnd->RegisterObject(title);
-	wnd->RegisterObject(menubar);
-	wnd->RegisterObject(statusbar);
+	wnd->Add(title);
+	wnd->Add(menubar);
+	wnd->Add(statusbar);
 
 	wnd->SetIcon(NIL);
 

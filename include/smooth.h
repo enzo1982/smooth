@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,7 +18,7 @@
 #define __SMOOTH__
 
 #include "smooth/definitions.h"
-#include "smooth/loop.h"
+#include "smooth/init.h"
 #include "smooth/version.h"
 
 #include "smooth/templates/array.h"
@@ -79,6 +79,10 @@
 #include "smooth/graphics/imageloader/imageloader.h"
 
 #include "smooth/i18n/i18n.h"
+
+#include "smooth/misc/encoding/base64.h"
+
+#include "smooth/misc/hash/crc32.h"
 
 #include "smooth/misc/binary.h"
 #include "smooth/misc/config.h"

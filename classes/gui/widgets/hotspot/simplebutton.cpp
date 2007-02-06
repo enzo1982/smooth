@@ -42,7 +42,7 @@ S::Int S::GUI::HotspotSimpleButton::Paint(Int message)
 
 			break;
 		case SP_MOUSEOUT:
-			surface->Box(frame, GetBackgroundColor() >= 0 ? GetBackgroundColor() : Setup::BackgroundColor, Rect::Outlined);
+			surface->Box(frame, GetBackgroundColor(), Rect::Outlined);
 
 			break;
 	}

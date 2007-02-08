@@ -1,5 +1,9 @@
 ChangeLog for smooth
 
+xx.02.07 xx:xx - smooth alpha 0.8.69.2
+
+- some bug fixes
+
 06.02.07 13:18 - smooth alpha 0.8.69.1
 
 - list.cpp	- Speed optimizations

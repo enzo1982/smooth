@@ -19,8 +19,8 @@ namespace smooth
 	};
 };
 
-#include "../../templates/buffer.h"
 #include "../string.h"
+#include "../../templates/buffer.h"
 
 namespace smooth
 {

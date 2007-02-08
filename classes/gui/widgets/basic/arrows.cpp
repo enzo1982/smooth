@@ -44,6 +44,8 @@ S::GUI::Arrows::Arrows(const Point &iPos, const Size &iSize, Int sType, Int *var
 	onValueChange.SetParentObject(this);
 	onValueChange.Connect(&onAction);
 
+	SetBackgroundColor(Setup::BackgroundColor);
+
 	arrow1Hotspot	= new HotspotSimpleButton(Point(2 + (subtype == OR_HORZ ? GetWidth() / 2 : 0), 2), GetSize() - Size(4 + (subtype == OR_HORZ ? GetWidth() / 2 : 0), 4 + (subtype == OR_HORZ ? 0 : GetHeight() / 2)));
 	arrow2Hotspot	= new HotspotSimpleButton(Point(2, 2 + (subtype == OR_VERT ? GetHeight() / 2 : 0)), GetSize() - Size(4 + (subtype == OR_HORZ ? GetWidth() / 2 : 0), 4 + (subtype == OR_HORZ ? 0 : GetHeight() / 2)));
 

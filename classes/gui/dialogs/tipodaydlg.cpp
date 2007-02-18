@@ -88,14 +88,15 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), pos);
 	txt_didyouknow->SetFont(Font("Verdana", 14, Font::Bold));
 
-	pos.x = 7;
+	pos.x = 6;
+	pos.y = 6;
 
 	txt_tip		= new Text("", pos);
 
-	pos.x = 7;
-	pos.y = 38;
-	size.cx = 330;
-	size.cy = 184;
+	pos.x = 8;
+	pos.y = 39;
+	size.cx = 328;
+	size.cy = 182;
 
 	layer_inner	= new Layer();
 	layer_inner->SetMetrics(pos, size);

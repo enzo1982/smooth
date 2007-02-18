@@ -56,7 +56,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	msgbox		= new Window(title, Point(), Size());
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	lay		= new Layer();
-	icon		= new Image(ImageLoader::Load(String("Icon:").Append(String::FromInt((Int) cIcon))), Point(13, 18), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
+	icon		= new Image(ImageLoader::Load(String("Icon:").Append(String::FromInt((Int) cIcon))), Point(14, 19), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
 	okbutton	= NIL;
 	yesbutton	= NIL;
 	nobutton	= NIL;
@@ -66,12 +66,10 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	ignorebutton	= NIL;
 	buttons		= btns;
 
-	int	 actpos = 0;
-	int	 thissize = 0;
-	int	 maxsize = 0;
-	Point	 bpos;
-	Size	 bsize;
-	int	 titlesize = 0;
+	Int	 actpos = 0;
+	Int	 thissize = 0;
+	Int	 maxsize = 0;
+	Int	 titlesize = 0;
 	Int	 buttonWidth = 80;
 	Int	 buttonHeight = 22;
 
@@ -118,11 +116,9 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	msgbox->SetSize(Size(maxsize + 36 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0), (((Int) Math::Max(2, lines) + 1) * 16) + 70 + buttonHeight));
 
-	Font	 tbFont(Font::Default, Font::DefaultSize, Font::Bold);
+	titlesize = Font(Font::Default, Font::DefaultSize, Font::Bold).GetTextSizeX(title);
 
-	titlesize = tbFont.GetTextSizeX(title);
-
-	if (msgbox->GetWidth() < titlesize + 80) msgbox->SetWidth(titlesize + 80);
+	msgbox->SetWidth(Math::Max(msgbox->GetWidth(), titlesize + 80));
 
 	Add(msgbox);
 
@@ -133,112 +129,116 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	msgbox->onPaint.Connect(&MessageDlg::MessagePaintProc, this);
 	msgbox->doQuit.Connect(&MessageDlg::MessageKillProc, this);
 
-	bpos.y = 14 + buttonHeight;
-	bsize.cy = 0;
-	bsize.cx = 0;
+	if (cVar != NIL)
+	{
+		checkbox = new CheckBox(checkBoxText, Point(13 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0), 46 + buttonHeight), Size(100, 0), cVar);
+		checkbox->SetOrientation(OR_LOWERLEFT);
+		checkbox->SetWidth(checkbox->textSize.cx + 21);
+
+		msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->textSize.cx + 54 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0)));
+		msgbox->SetHeight(msgbox->GetHeight() + 22);
+
+		lay->Add(checkbox);
+	}
 
 	switch (buttons)
 	{
 		default:
 		case MB_OK:
-			if (msgbox->GetWidth() < (buttonWidth + 30)) msgbox->SetWidth(buttonWidth + 30);
-			bpos.x = (msgbox->GetWidth() - buttonWidth) / 2 - 3;
-			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bpos, bsize);
+			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), buttonWidth + 30));
+
+			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, Point((msgbox->GetWidth() - buttonWidth) / 2 - 3, 14 + buttonHeight), Size());
 			okbutton->onAction.Connect(&MessageDlg::MessageOK, this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
+
 			lay->Add(okbutton);
+
 			break;
 		case MB_OKCANCEL:
-			if (msgbox->GetWidth() < (2 * buttonWidth + 39)) msgbox->SetWidth(2 * buttonWidth + 39);
-			bpos.x = (msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3;
-			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bpos, bsize);
+			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 2 * buttonWidth + 39));
+
+			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3, 14 + buttonHeight), Size());
 			okbutton->onAction.Connect(&MessageDlg::MessageOK, this);
 			okbutton->SetOrientation(OR_LOWERLEFT);
-			bpos.x += buttonWidth + 9;
-			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bpos, bsize);
+
+			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
 			cancelbutton->onAction.Connect(&MessageDlg::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
+
 			lay->Add(okbutton);
 			lay->Add(cancelbutton);
+
 			break;
 		case MB_YESNO:
-			if (msgbox->GetWidth() < (2 * buttonWidth + 39)) msgbox->SetWidth(2 * buttonWidth + 39);
-			bpos.x = (msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3;
-			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, bpos, bsize);
+			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 2 * buttonWidth + 39));
+
+			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3, 14 + buttonHeight), Size());
 			yesbutton->onAction.Connect(&MessageDlg::MessageYes, this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
-			bpos.x += buttonWidth + 9;
-			nobutton = new Button(I18n::Translator::defaultTranslator->TranslateString("No"), NIL, bpos, bsize);
+
+			nobutton = new Button(I18n::Translator::defaultTranslator->TranslateString("No"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
 			nobutton->onAction.Connect(&MessageDlg::MessageNo, this);
 			nobutton->SetOrientation(OR_LOWERLEFT);
+
 			lay->Add(yesbutton);
 			lay->Add(nobutton);
+
 			break;
 		case MB_YESNOCANCEL:
-			if (msgbox->GetWidth() < (3 * buttonWidth + 48)) msgbox->SetWidth(3 * buttonWidth + 48);
-			bpos.x = (msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3;
-			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, bpos, bsize);
+			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 3 * buttonWidth + 48));
+
+			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3, 14 + buttonHeight), Size());
 			yesbutton->onAction.Connect(&MessageDlg::MessageYes, this);
 			yesbutton->SetOrientation(OR_LOWERLEFT);
-			bpos.x += buttonWidth + 9;
-			nobutton = new Button(I18n::Translator::defaultTranslator->TranslateString("No"), NIL, bpos, bsize);
+
+			nobutton = new Button(I18n::Translator::defaultTranslator->TranslateString("No"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
 			nobutton->onAction.Connect(&MessageDlg::MessageNo, this);
 			nobutton->SetOrientation(OR_LOWERLEFT);
-			bpos.x += buttonWidth + 9;
-			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bpos, bsize);
+
+			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3 + 2 * buttonWidth + 18, 14 + buttonHeight), Size());
 			cancelbutton->onAction.Connect(&MessageDlg::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
+
 			lay->Add(yesbutton);
 			lay->Add(nobutton);
 			lay->Add(cancelbutton);
+
 			break;
 		case MB_RETRYCANCEL:
-			if (msgbox->GetWidth() < (2 * buttonWidth + 39)) msgbox->SetWidth(2 * buttonWidth + 39);
-			bpos.x = (msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3;
-			retrybutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Retry"), NIL, bpos, bsize);
+			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 2 * buttonWidth + 39));
+
+			retrybutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Retry"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3, 14 + buttonHeight), Size());
 			retrybutton->onAction.Connect(&MessageDlg::MessageRetry, this);
 			retrybutton->SetOrientation(OR_LOWERLEFT);
-			bpos.x += buttonWidth + 9;
-			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bpos, bsize);
+
+			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
 			cancelbutton->onAction.Connect(&MessageDlg::MessageCancel, this);
 			cancelbutton->SetOrientation(OR_LOWERLEFT);
+
 			lay->Add(retrybutton);
 			lay->Add(cancelbutton);
+
 			break;
 		case MB_ABORTRETRYIGNORE:
-			if (msgbox->GetWidth() < (3 * buttonWidth + 48)) msgbox->SetWidth(3 * buttonWidth + 48);
-			bpos.x = (msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3;
-			abortbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Abort"), NIL, bpos, bsize);
+			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 3 * buttonWidth + 48));
+
+			abortbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Abort"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3, 14 + buttonHeight), Size());
 			abortbutton->onAction.Connect(&MessageDlg::MessageAbort, this);
 			abortbutton->SetOrientation(OR_LOWERLEFT);
-			bpos.x += buttonWidth + 9;
-			retrybutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Retry"), NIL, bpos, bsize);
+
+			retrybutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Retry"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
 			retrybutton->onAction.Connect(&MessageDlg::MessageRetry, this);
 			retrybutton->SetOrientation(OR_LOWERLEFT);
-			bpos.x += buttonWidth + 9;
-			ignorebutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Ignore"), NIL, bpos, bsize);
+
+			ignorebutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Ignore"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3 + 2 * buttonWidth + 18, 14 + buttonHeight), Size());
 			ignorebutton->onAction.Connect(&MessageDlg::MessageIgnore, this);
 			ignorebutton->SetOrientation(OR_LOWERLEFT);
+
 			lay->Add(abortbutton);
 			lay->Add(retrybutton);
 			lay->Add(ignorebutton);
+
 			break;
-	}
-
-	if (cVar != NIL)
-	{
-		Point	 pos(13, 46 + buttonHeight);
-		Size	 size(100, 0);
-
-		if (msgicon != NIL) pos.x += GetSystemMetrics(SM_CXICON) + 20;
-
-		checkbox = new CheckBox(checkBoxText, pos, size, cVar);
-		checkbox->SetOrientation(OR_LOWERLEFT);
-		checkbox->SetWidth(checkbox->textSize.cx + 21);
-
-		msgbox->SetHeight(msgbox->GetHeight() + 22);
-
-		lay->Add(checkbox);
 	}
 
 	msgbox->SetPosition(Point((LiSAGetDisplaySizeX() - msgbox->GetWidth()) / 2, (LiSAGetDisplaySizeY() - msgbox->GetHeight()) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
@@ -306,11 +306,11 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 	Surface	*surface = msgbox->GetDrawSurface();
 	Rect	 txtrect;
 
-	txtrect.left = 17;
-	txtrect.top = 47;
+	txtrect.left = 18;
+	txtrect.top = 48;
 	txtrect.right = txtrect.left + msgbox->GetWidth() - 32;
 
-	if (lines == 1 && msgicon != NIL) txtrect.top = 55;
+	if (lines == 1 && msgicon != NIL) txtrect.top = 56;
 
 	txtrect.bottom = txtrect.top + 16;
 

@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.02.07 xx:xx - smooth alpha 0.8.69.2
+21.02.07 16:41 - smooth alpha 0.8.69.2
 
 - windowgdi.cpp	- Windows can now be minimized using the task bar button
 

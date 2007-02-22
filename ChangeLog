@@ -1,5 +1,9 @@
 ChangeLog for smooth
 
+xx.xx.07 xx:xx - smooth alpha 0.8.69.3
+
+- string.cpp	- fixed string conversion when inEncoding == outEncoding
+
 21.02.07 16:41 - smooth alpha 0.8.69.2
 
 - windowgdi.cpp	- Windows can now be minimized using the task bar button

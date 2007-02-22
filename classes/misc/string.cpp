@@ -1395,6 +1395,17 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		if (inBytesLeft) size *= -1;
 	}
+	else if (strcmp(inEncoding, outEncoding) == 0)
+	{
+		size = inBytes;
+
+		if (size < outBytes && size > 0)
+		{
+			wcsncpy((wchar_t *) outBuffer, (wchar_t *) inBuffer, size / 2);
+		}
+
+		if (size >= outBytes) size = 0;
+	}
 	else if ((strcmp(inEncoding, "UTF-16LE") == 0 && strcmp(outEncoding, "UTF-16BE") == 0) || (strcmp(inEncoding, "UTF-16BE") == 0 && strcmp(outEncoding, "UTF-16LE") == 0))
 	{
 		size = inBytes;

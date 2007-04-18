@@ -1,8 +1,18 @@
 ChangeLog for smooth
 
-xx.xx.07 xx:xx - smooth alpha 0.8.69.3
+xx.xx.07 xx:xx - smooth alpha 0.8.70.0
 
 - string.cpp	- fixed string conversion when inEncoding == outEncoding
+- config.cpp	- configuration is no longer automatically saved
+- window.cpp	- made context menus work again
+- system.cpp	- new function: GetAPIVersion()
+		- new functions to retrieve system folder locations
+- listentry.cpp	- ListEntries can now be displayed inactive
+- protocol.cpp	- new class: Protocol, base class for network protocol implementation
+- file.cpp	- new class: File, implementation of the file:// protocol
+- http.cpp	- new class: HTTP, HTTP protocol implementation
+
+- applications now check the smooth API version instead of the release number for compatibility
 
 21.02.07 16:41 - smooth alpha 0.8.69.2
 

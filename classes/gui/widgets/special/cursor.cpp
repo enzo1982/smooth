@@ -59,97 +59,7 @@ S::Int S::GUI::Cursor::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			{
-				Int	 nMaxScrollPos = Math::Max(0, Math::Ceil((Float) (font.GetTextSizeY(text) - GetHeight()) / (font.GetTextSizeY("*") + 3)));
-
-				if (nMaxScrollPos != maxScrollPos)
-				{
-					maxScrollPos = nMaxScrollPos;
-
-					if (maxScrollPos == 0) scrollPos = 0;
-
-					onScroll.Emit(scrollPos, maxScrollPos);
-				}
-
-				Surface	*surface = container->GetDrawSurface();
-				Point	 realPos = GetRealPosition();
-				Rect	 frame	 = Rect(realPos, GetSize());
-
-				surface->StartPaint(frame);
-
-				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
-
-				String	 line;
-				Bool	 fillLineIndices = (lineIndices.GetNOfEntries() == 0);
-				Int	 lineNumber = (fillLineIndices ? 0 : scrollPos);
-				Int	 lineStart = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos));
-
-				lineIndices.Add(0);
-
-				for (Int i = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos)); i <= text.Length(); i++)
-				{
-					if (lineNumber >= scrollPos)
-					{
-						line[i - lineStart] = text[i];
-
-						if (text[i] == '\n' || text[i] == 0)
-						{
-							line[i - lineStart] = 0;
-
-							if ((lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3) >= frame.bottom - frame.top && !fillLineIndices) break;
-
-							if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
-							else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
-
-							if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
-							{
-								Int	 lineMarkStart = Math::Max(0, Math::Min(markStart, markEnd) - lineStart);
-								Int	 lineMarkEnd = Math::Min(line.Length(), Math::Max(markStart, markEnd) - lineStart);
-
-								if (lineMarkStart < line.Length() && lineMarkEnd > 0)
-								{
-									Int	 bColor	 = GetSysColor(COLOR_HIGHLIGHT);
-									Int	 tColor	 = GetSysColor(COLOR_HIGHLIGHTTEXT);
-
-									String	 mText;
-									String	 wText = line;
-
-									if (Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) wText.FillN('*', wText.Length());
-
-									for (Int j = lineMarkStart; j < lineMarkEnd; j++) mText[j - lineMarkStart] = wText[j];
-
-									Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText, lineMarkStart) - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY("*") + 3));
-
-									surface->Box(markRect, bColor, Rect::Filled);
-
-									Font	 nFont = font;
-
-									nFont.SetColor(tColor);
-
-									surface->SetText(mText, markRect + Point(0, 1) - Size(0, 2), nFont);
-								}
-							}
-
-							lineStart = i + 1;
-							lineNumber++;
-
-							lineIndices.Add(lineStart);
-						}
-					}
-					else
-					{
-						if (text[i] == '\n' || text[i] == 0)
-						{
-							lineStart = i + 1;
-							lineNumber++;
-
-							lineIndices.Add(lineStart);
-						}
-					}
-				}
-
-				surface->EndPaint();
-			}
+			DrawWidget();
 
 			break;
 		case SP_MOUSEIN:
@@ -334,226 +244,11 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_KEYDOWN:
-			if (focussed)
-			{
-				Int	 newPos = 0;
-
-				switch (wParam)
-				{
-					case VK_LEFT:
-					case VK_RIGHT:
-					case VK_HOME:
-					case VK_END:
-						MarkText(-1, -1);
-
-						if (wParam == VK_LEFT && promptPos == 0)	      break;
-						if (wParam == VK_HOME && promptPos == 0)	      break;
-						if (wParam == VK_RIGHT && promptPos >= text.Length()) break;
-						if (wParam == VK_END && promptPos >= text.Length())   break;
-
-						if (wParam == VK_LEFT)	newPos = promptPos - 1;
-						if (wParam == VK_RIGHT)	newPos = promptPos + 1;
-						if (wParam == VK_HOME)	newPos = 0;
-						if (wParam == VK_END)	newPos = text.Length();
-
-						SetCursorPos(newPos);
-
-						break;
-					case VK_UP:
-					case VK_DOWN:
-						if (!Binary::IsFlagSet(GetFlags(), CF_MULTILINE)) break;
-
-						{
-							Int	 linePos = promptPos;
-							Int	 newPos = promptPos;
-
-							Int	 i = 0;
-
-							for (i = promptPos - 1; i >= 0; i--)
-							{
-								if (text[i] == '\n') { linePos -= (i + 1); break; }
-							}
-
-							if (wParam == VK_UP)
-							{
-								if (i == 0) newPos = 0;
-
-								for (Int j = i - 1; j >= 0; j--)
-								{
-									if (text[j] == '\n' || j == 0) { newPos = Math::Min(i, j + linePos + (j == 0 ? 0 : 1)); break; }
-								}
-							}
-							else
-							{
-								for (Int j = promptPos; j < text.Length(); j++)
-								{
-									if (text[j] == '\n')
-									{
-										for (Int k = j + 1; k <= j + 1 + linePos; k++)
-										{
-											newPos = k;
-
-											if (text[k] == '\n' || text[k] == 0) break;
-										}
-
-										break;
-									}
-								}
-							}
-
-							SetCursorPos(newPos);
-						}
-
-						break;
-					case VK_RETURN:
-						if (!IsActive()) break;
-
-						if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
-						{
-							DeleteSelectedText();
-
-							String	 insertText;
-
-							insertText[0] = '\n';
-
-							InsertText(insertText);
-						}
-						else
-						{
-							focussed = False;
-
-							onLoseFocus.Emit();
-
-							onEnter.Emit(text);
-
-							return Break;
-						}
-
-						break;
-					case VK_BACK:
-					case VK_DELETE:
-						if (!IsActive()) break;
-
-						if (markStart != markEnd) { DeleteSelectedText(); break; }
-
-						if (promptPos == 0 && wParam == VK_BACK)		break;
-						if (promptPos == text.Length() && wParam == VK_DELETE)	break;
-
-						if (wParam == VK_BACK)
-						{
-							markStart	= promptPos - 1;
-							markEnd		= promptPos;
-						}
-						else
-						{
-							markStart	= promptPos;
-							markEnd		= promptPos + 1;
-						}
-
-						DeleteSelectedText();
-
-						break;
-				}
-			}
+			OnSpecialKey(wParam);
 
 			break;
 		case WM_CHAR:
-			if (focussed)
-			{
-				if (wParam == 3 && !(lParam & (1 << 30)))
-				{
-					if (markStart != markEnd)
-					{
-						String	 mText;
-
-						for (int j = Math::Min(markStart, markEnd); j < Math::Max(markStart, markEnd); j++) mText[j - Math::Min(markStart, markEnd)] = text[j];
-
-						OpenClipboard((HWND) window->GetSystemWindow());
-
-						HGLOBAL	 memory = NIL;
-
-						if (Setup::enableUnicode)
-						{
-							memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, 2 * (mText.Length() + 1));
-
-							wcscpy((wchar_t *) GlobalLock(memory), mText);
-
-							SetClipboardData(CF_UNICODETEXT, memory);
-						}
-						else
-						{
-							memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, mText.Length() + 1);
-
-							strcpy((char *) GlobalLock(memory), mText);
-
-							SetClipboardData(CF_TEXT, memory);
-						}
-
-						CloseClipboard();
-					}
-				}
-
-				if (wParam == 24 && !(lParam & (1 << 30)) && IsActive())
-				{
-					Process(WM_CHAR, 3, 0);
-
-					DeleteSelectedText();
-				}
-
-				if (wParam == 22 && IsActive())
-				{
-					DeleteSelectedText();
-
-					String	 insertText;
-
-					OpenClipboard((HWND) window->GetSystemWindow());
-
-					if (Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT))
-					{
-						insertText = (wchar_t *) GetClipboardData(CF_UNICODETEXT);
-					}
-					else if (IsClipboardFormatAvailable(CF_TEXT))
-					{
-						insertText = (char *) GetClipboardData(CF_TEXT);
-					}
-
-					CloseClipboard();
-
-					if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
-					{
-						if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) break;
-
-						InsertText(insertText);
-					}
-				}
-
-				if (text.Length() == maxSize && markStart == markEnd) break;
-
-				if (wParam >= 32 && IsActive())
-				{
-					DeleteSelectedText();
-
-					if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (wParam < '0' || wParam > '9') && wParam != 45 && wParam != '.') break;
-
-					String	 insertText;
-
-					if (Setup::enableUnicode)
-					{
-						insertText[0] = wParam;
-					}
-					else
-					{
-						// Non Unicode Windows puts ANSI character codes into wParam.
-						// Import these using the current character input format.
-
-						char  ansiText[2] = { wParam, 0 };
-
-						insertText = ansiText;
-					}
-
-					InsertText(insertText);
-				}
-			}
+			OnInput(wParam, lParam);
 
 			break;
 #ifdef __WIN32__
@@ -575,6 +270,102 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 	}
 
 	return Widget::Process(message, wParam, lParam);
+}
+
+S::Int S::GUI::Cursor::DrawWidget()
+{
+	Int	 nMaxScrollPos = Math::Max(0, Math::Ceil((Float) (font.GetTextSizeY(text) - GetHeight()) / (font.GetTextSizeY("*") + 3)));
+
+	if (nMaxScrollPos != maxScrollPos)
+	{
+		maxScrollPos = nMaxScrollPos;
+
+		if (maxScrollPos == 0) scrollPos = 0;
+
+		onScroll.Emit(scrollPos, maxScrollPos);
+	}
+
+	Surface	*surface = container->GetDrawSurface();
+	Point	 realPos = GetRealPosition();
+	Rect	 frame	 = Rect(realPos, GetSize());
+
+	surface->StartPaint(frame);
+
+	surface->Box(frame, GetBackgroundColor(), Rect::Filled);
+
+	String	 line;
+	Bool	 fillLineIndices = (lineIndices.GetNOfEntries() == 0);
+	Int	 lineNumber = (fillLineIndices ? 0 : scrollPos);
+	Int	 lineStart = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos));
+
+	lineIndices.Add(0);
+
+	for (Int i = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos)); i <= text.Length(); i++)
+	{
+		// Check if the line is above the first visible line due to scrolling
+		if (lineNumber < scrollPos)
+		{
+			if (text[i] == '\n' || text[i] == 0)
+			{
+				lineStart = i + 1;
+				lineNumber++;
+
+				lineIndices.Add(lineStart);
+			}
+
+			continue;
+		}
+
+		line[i - lineStart] = text[i];
+
+		if (text[i] == '\n' || text[i] == 0)
+		{
+			line[i - lineStart] = 0;
+
+			if ((lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3) >= frame.bottom - frame.top && !fillLineIndices) break;
+
+			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
+			else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
+
+			if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
+			{
+				Int	 lineMarkStart = Math::Max(0, Math::Min(markStart, markEnd) - lineStart);
+				Int	 lineMarkEnd = Math::Min(line.Length(), Math::Max(markStart, markEnd) - lineStart);
+
+				if (lineMarkStart < line.Length() && lineMarkEnd > 0)
+				{
+					Int	 bColor	 = GetSysColor(COLOR_HIGHLIGHT);
+					Int	 tColor	 = GetSysColor(COLOR_HIGHLIGHTTEXT);
+
+					String	 mText;
+					String	 wText = line;
+
+					if (Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) wText.FillN('*', wText.Length());
+
+					for (Int j = lineMarkStart; j < lineMarkEnd; j++) mText[j - lineMarkStart] = wText[j];
+
+					Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText, lineMarkStart) - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY("*") + 3));
+
+					surface->Box(markRect, bColor, Rect::Filled);
+
+					Font	 nFont = font;
+
+					nFont.SetColor(tColor);
+
+					surface->SetText(mText, markRect + Point(0, 1) - Size(0, 2), nFont);
+				}
+			}
+
+			lineStart = i + 1;
+			lineNumber++;
+
+			lineIndices.Add(lineStart);
+		}
+	}
+
+	surface->EndPaint();
+
+	return Success();
 }
 
 S::Void S::GUI::Cursor::ShowCursor(Bool visible)
@@ -741,6 +532,233 @@ S::Void S::GUI::Cursor::OnLoseFocus()
 		DeleteObject(timer);
 
 		timer = NIL;
+	}
+}
+
+S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
+{
+	// Called when a special key such as
+	// return or an arrow key is hit
+
+	if (!focussed) return;
+
+	Int	 newPos = 0;
+	Int	 linePos = 0;
+
+	Int	 i = 0;
+
+	switch (keyCode)
+	{
+		case VK_LEFT:
+		case VK_RIGHT:
+		case VK_HOME:
+		case VK_END:
+			MarkText(-1, -1);
+
+			if (keyCode == VK_LEFT	&& promptPos == 0)	       break;
+			if (keyCode == VK_HOME	&& promptPos == 0)	       break;
+			if (keyCode == VK_RIGHT	&& promptPos >= text.Length()) break;
+			if (keyCode == VK_END	&& promptPos >= text.Length()) break;
+
+			if (keyCode == VK_LEFT)	 newPos = promptPos - 1;
+			if (keyCode == VK_RIGHT) newPos = promptPos + 1;
+			if (keyCode == VK_HOME)	 newPos = 0;
+			if (keyCode == VK_END)	 newPos = text.Length();
+
+			SetCursorPos(newPos);
+
+			break;
+		case VK_UP:
+		case VK_DOWN:
+			if (!Binary::IsFlagSet(GetFlags(), CF_MULTILINE)) break;
+
+			linePos = promptPos;
+			newPos = promptPos;
+
+			for (i = promptPos - 1; i >= 0; i--)
+			{
+				if (text[i] == '\n') { linePos -= (i + 1); break; }
+			}
+
+			if (keyCode == VK_UP)
+			{
+				if (i == 0) newPos = 0;
+
+				for (Int j = i - 1; j >= 0; j--)
+				{
+					if (text[j] == '\n' || j == 0) { newPos = Math::Min(i, j + linePos + (j == 0 ? 0 : 1)); break; }
+				}
+			}
+			else
+			{
+				for (Int j = promptPos; j < text.Length(); j++)
+				{
+					if (text[j] == '\n')
+					{
+						for (Int k = j + 1; k <= j + 1 + linePos; k++)
+						{
+							newPos = k;
+
+							if (text[k] == '\n' || text[k] == 0) break;
+						}
+
+						break;
+					}
+				}
+			}
+
+			SetCursorPos(newPos);
+
+			break;
+		case VK_RETURN:
+			if (!IsActive()) break;
+
+			if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
+			{
+				DeleteSelectedText();
+
+				String	 insertText;
+
+				insertText[0] = '\n';
+
+				InsertText(insertText);
+			}
+			else
+			{
+				focussed = False;
+
+				onLoseFocus.Emit();
+
+				onEnter.Emit(text);
+			}
+
+			break;
+		case VK_BACK:
+		case VK_DELETE:
+			if (!IsActive()) break;
+
+			if (markStart != markEnd) { DeleteSelectedText(); break; }
+
+			if (promptPos == 0	       && keyCode == VK_BACK)	break;
+			if (promptPos == text.Length() && keyCode == VK_DELETE)	break;
+
+			if (keyCode == VK_BACK)
+			{
+				markStart	= promptPos - 1;
+				markEnd		= promptPos;
+			}
+			else
+			{
+				markStart	= promptPos;
+				markEnd		= promptPos + 1;
+			}
+
+			DeleteSelectedText();
+
+			break;
+	}
+}
+
+S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
+{
+	// Called when a character is entered
+
+	if (!focussed) return;
+
+	Window	*window	= container->GetContainerWindow();
+
+	if (character == 3 && !(flags & (1 << 30)))
+	{
+		if (markStart != markEnd)
+		{
+			String	 mText;
+
+			for (int j = Math::Min(markStart, markEnd); j < Math::Max(markStart, markEnd); j++) mText[j - Math::Min(markStart, markEnd)] = text[j];
+
+			OpenClipboard((HWND) window->GetSystemWindow());
+
+			HGLOBAL	 memory = NIL;
+
+			if (Setup::enableUnicode)
+			{
+				memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, 2 * (mText.Length() + 1));
+
+				wcscpy((wchar_t *) GlobalLock(memory), mText);
+
+				SetClipboardData(CF_UNICODETEXT, memory);
+			}
+			else
+			{
+				memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, mText.Length() + 1);
+
+				strcpy((char *) GlobalLock(memory), mText);
+
+				SetClipboardData(CF_TEXT, memory);
+			}
+
+			CloseClipboard();
+		}
+	}
+
+	if (character == 24 && !(flags & (1 << 30)) && IsActive())
+	{
+		Process(WM_CHAR, 3, 0);
+
+		DeleteSelectedText();
+	}
+
+	if (character == 22 && IsActive())
+	{
+		DeleteSelectedText();
+
+		String	 insertText;
+
+		OpenClipboard((HWND) window->GetSystemWindow());
+
+		if (Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT))
+		{
+			insertText = (wchar_t *) GetClipboardData(CF_UNICODETEXT);
+		}
+		else if (IsClipboardFormatAvailable(CF_TEXT))
+		{
+			insertText = (char *) GetClipboardData(CF_TEXT);
+		}
+
+		CloseClipboard();
+
+		if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
+		{
+			if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) return;
+
+			InsertText(insertText);
+		}
+	}
+
+	if (text.Length() == maxSize && markStart == markEnd) return;
+
+	if (character >= 32 && IsActive())
+	{
+		DeleteSelectedText();
+
+		if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (character < '0' || character > '9') && character != 45 && character != '.') return;
+
+		String	 insertText;
+
+		if (Setup::enableUnicode)
+		{
+			insertText[0] = character;
+		}
+		else
+		{
+			// Non Unicode Windows puts ANSI character codes into wParam.
+			// Import these using the current character input format.
+
+			char  ansiText[2] = { character, 0 };
+
+			insertText = ansiText;
+		}
+
+		InsertText(insertText);
 	}
 }
 

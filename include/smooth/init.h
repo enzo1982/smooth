@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,12 +27,9 @@ namespace smooth
 
 	Void SMOOTHAPI	 Init();
 	Void SMOOTHAPI	 Free();
-	Int SMOOTHAPI	 Loop();
 
 #ifdef __SMOOTH_DLL__
-	extern bool	 initializing;
-	extern bool	 loopActive;
-	extern int	 peekLoop;
+	extern Bool	 initializing;
 
 	Void	 GetColors();
 	Void	 GetDefaultFont();

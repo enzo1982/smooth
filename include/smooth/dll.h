@@ -33,7 +33,7 @@ extern "C"
 
 				Init();
 
-				if (System::System::GetVersionString() != (String) SMOOTH_VERSION)
+				if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
 				{
 					GUI::Dialogs::QuickMessage("This DLL might not be compatible with the\nsmooth library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
 				}

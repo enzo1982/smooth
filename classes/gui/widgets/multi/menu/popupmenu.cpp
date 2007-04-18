@@ -10,6 +10,8 @@
 
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/widgets/multi/menu/popupmenuentry.h>
+#include <smooth/gui/widgets/multi/menu/popupmenuentrycheck.h>
+#include <smooth/gui/widgets/multi/menu/popupmenuentryoption.h>
 #include <smooth/gui/widgets/multi/menu/menubar.h>
 #include <smooth/gui/widgets/multi/menu/menubarentry.h>
 #include <smooth/gui/application/application.h>
@@ -50,7 +52,11 @@ S::GUI::PopupMenu::~PopupMenu()
 
 S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap &bitmap, PopupMenu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
 {
-	PopupMenuEntry	*newEntry = new PopupMenuEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
+	PopupMenuEntry	*newEntry = NIL;
+
+	if	(bVar != NIL)	newEntry = new PopupMenuEntryCheck(text, bVar);
+	else if (iVar != NIL)	newEntry = new PopupMenuEntryOption(text, iVar, iCode);
+	else			newEntry = new PopupMenuEntry(text, bitmap, popupMenu);
 
 	newEntry->SetOwner(this);
 

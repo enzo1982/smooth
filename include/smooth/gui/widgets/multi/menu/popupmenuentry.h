@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,7 +45,7 @@ namespace smooth
 			public:
 				static const Int	 classID;
 
-							 PopupMenuEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
+							 PopupMenuEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL);
 				virtual			~PopupMenuEntry();
 
 				virtual Int		 Paint(Int);
@@ -62,11 +62,11 @@ namespace smooth
 			accessors:
 				Void			 SetOwner(PopupMenu *nOwner)	{ owner = nOwner; }
 			slots:
-				Void			 OnMouseOver();
-				Void			 OnMouseOut();
+				virtual Void		 OnMouseOver();
+				virtual Void		 OnMouseOut();
 
-				Void			 OnClickEntry();
-				Void			 OnChangeSize(const Size &);
+				virtual Void		 OnClickEntry();
+				virtual Void		 OnChangeSize(const Size &);
 
 				Void			 OpenPopupMenu();
 				Void			 ClosePopupMenu();

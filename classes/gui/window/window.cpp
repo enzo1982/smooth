@@ -1033,7 +1033,7 @@ S::Void S::GUI::Window::OpenPopupMenu()
 		trackMenu->SetPosition(position);
 		trackMenu->internalRequestClose.Connect(&Window::ClosePopupMenu, this);
 
-		Remove(trackMenu);
+		Add(trackMenu);
 	}
 }
 

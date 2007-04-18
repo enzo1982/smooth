@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -93,18 +93,25 @@ S::Int S::Configuration::Open(const String &file, Bool create)
 	return Success();
 }
 
+S::Int S::Configuration::Save()
+{
+	if (configFile == NIL) return Error();
+
+	if (fileName != NIL && configFile->GetRootNode() != NIL)
+	{
+		if (configFile->GetRootNode()->GetNodeByName("configuration") != NIL)
+		{
+			if (configFile->GetRootNode()->GetNodeByName("configuration")->GetNOfNodes() >= 1) configFile->SaveFile(fileName);
+		}
+	}
+
+	return Success();
+}
+
 S::Int S::Configuration::Close()
 {
 	if (configFile != NIL)
 	{
-		if (fileName != NIL && configFile->GetRootNode() != NIL)
-		{
-			if (configFile->GetRootNode()->GetNodeByName("configuration") != NIL)
-			{
-				if (configFile->GetRootNode()->GetNodeByName("configuration")->GetNOfNodes() >= 1) configFile->SaveFile(fileName);
-			}
-		}
-
 		delete configFile;
 
 		configFile = NIL;

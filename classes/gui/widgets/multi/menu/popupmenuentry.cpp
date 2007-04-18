@@ -23,7 +23,7 @@
 
 const S::Int	 S::GUI::PopupMenuEntry::classID = S::Object::RequestClassID();
 
-S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : MenuEntry(iText, iBitmap, iPopup, ibVar, iiVar, iiCode)
+S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup) : MenuEntry(iText, iBitmap, iPopup)
 {
 	type		= classID;
 	orientation	= OR_UPPERLEFT;
@@ -112,60 +112,6 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 					for (Int i = 0; i < 4; i++) surface->Line(p1 + Point(i, i), p2 + Point(i, -i), Setup::TextColor);
 				}
-
-				if (bVar != NIL)
-				{
-					if (*bVar == True)
-					{
-						Point p1 = Point(frame.left + 4, frame.top + 4);
-						Point p2 = Point(frame.left + 11, frame.bottom - 4);
-
-						for (Int i = 0; i < 2; i++)
-						{
-							Int	 color = Setup::DividerDarkColor;
-
-							if (i == 1)
-							{
-								if (IsActive())	color = Setup::TextColor;
-								else		color = Setup::GrayTextColor;
-
-								p1 -= Point(i, i);
-								p2 -= Point(i, i);
-							}
-
-							surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), color);
-							surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), color);
-							surface->Line(p1 + Point(0, 1), p2 + Point(-1, 0), color);
-							surface->Line(p1 + Point(6, 0), p2 + Point(-8, 0), color);
-							surface->Line(p1 + Point(6, 1), p2 + Point(-7, 0), color);
-							surface->Line(p1 + Point(5, 0), p2 + Point(-8, -1), color);
-						}
-					}
-				}
-
-				if (iVar != NIL)
-				{
-					if (*iVar == iCode)
-					{
-						Point	 point = Point(frame.left + 5, frame.top + 5);
-
-						for (Int i = 0; i < 2; i++)
-						{
-							Int	 color = Setup::DividerDarkColor;
-
-							if (i == 1)
-							{
-								if (IsActive())	color = Setup::TextColor;
-								else		color = Setup::GrayTextColor;
-
-								point -= Point(i, i);
-							}
-
-							surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, Rect::Filled);
-							surface->Box(Rect(point + Point(0, 1), Size(5, 3)), color, Rect::Filled);
-						}
-					}
-				}
 			}
 
 			break;
@@ -200,58 +146,6 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 					Point	 p2 = Point(frame.right - 8, frame.top + 11);
 
 					for (Int i = 0; i < 4; i++) surface->Line(p1 + Point(i, i), p2 + Point(i, -i), Setup::GradientTextColor);
-				}
-
-				if (bVar != NIL)
-				{
-					if (*bVar == True)
-					{
-						Point p1 = Point(frame.left + 4, frame.top + 4);
-						Point p2 = Point(frame.left + 11, frame.bottom - 4);
-
-						for (Int i = 0; i < 2; i++)
-						{
-							Int	 color = Setup::InactiveGradientTextColor;
-
-							if (i == 1)
-							{
-								color = Setup::GradientTextColor;
-
-								p1 -= Point(i, i);
-								p2 -= Point(i, i);
-							}
-
-							surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), color);
-							surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), color);
-							surface->Line(p1 + Point(0, 1), p2 + Point(-1, 0), color);
-							surface->Line(p1 + Point(6, 0), p2 + Point(-8, 0), color);
-							surface->Line(p1 + Point(6, 1), p2 + Point(-7, 0), color);
-							surface->Line(p1 + Point(5, 0), p2 + Point(-8, -1), color);
-						}
-					}
-				}
-
-				if (iVar != NIL)
-				{
-					if (*iVar == iCode)
-					{
-						Point	 point = Point(frame.left + 5, frame.top + 5);
-
-						for (Int i = 0; i < 2; i++)
-						{
-							Int	 color = Setup::InactiveGradientTextColor;
-
-							if (i == 1)
-							{
-								color = Setup::GradientTextColor;
-
-								point -= Point(i, i);
-							}
-
-							surface->Box(Rect(point + Point(1, 0), Size(3, 5)), color, Rect::Filled);
-							surface->Box(Rect(point + Point(0, 1), Size(5, 3)), color, Rect::Filled);
-						}
-					}
 				}
 			}
 
@@ -340,9 +234,6 @@ S::Void S::GUI::PopupMenuEntry::OnClickEntry()
 
 	owner->SetClosedByClick(True);
 	owner->internalRequestClose.Emit();
-
-	if (bVar != NIL) { *bVar = !*bVar; CheckBox::internalCheckValues.Emit(); }
-	if (iVar != NIL) { *iVar = iCode; OptionBox::internalCheckValues.Emit(); }
 
 	onAction.Emit();
 

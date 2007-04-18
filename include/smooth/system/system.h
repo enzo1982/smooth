@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,6 +37,13 @@ namespace smooth
 				static Int	 RequestGUID();
 
 				static String	 GetVersionString();
+				static String	 GetAPIVersion();
+
+				static String	 GetWindowsRootDirectory();
+				static String	 GetPersonalFilesDirectory();
+				static String	 GetProgramFilesDirectory();
+				static String	 GetApplicationDataDirectory();
+				static String	 GetTempDirectory();
 		};
 	};
 };

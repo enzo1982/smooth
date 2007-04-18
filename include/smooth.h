@@ -62,6 +62,9 @@
 #include "smooth/io/instream.h"
 #include "smooth/io/outstream.h"
 
+#include "smooth/net/protocols/file.h"
+#include "smooth/net/protocols/http.h"
+
 #include "smooth/threads/mutex.h"
 #include "smooth/threads/semaphore.h"
 #include "smooth/threads/thread.h"

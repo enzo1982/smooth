@@ -400,6 +400,16 @@ $(OBJECTDIR)/popupmenuentry.o: $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentr
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentry.cpp -o $(OBJECTDIR)/popupmenuentry.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/popupmenuentrycheck.o: $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentrycheck.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/popupmenuentrycheck.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentrycheck.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentrycheck.cpp -o $(OBJECTDIR)/popupmenuentrycheck.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/popupmenuentryoption.o: $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentryoption.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/popupmenuentryoption.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentryoption.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentryoption.cpp -o $(OBJECTDIR)/popupmenuentryoption.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/cursor.o: $(GUICLASSESDIR)/widgets/special/cursor.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/special/cursor.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/special/cursor.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/special/cursor.cpp -o $(OBJECTDIR)/cursor.o
@@ -588,6 +598,21 @@ $(OBJECTDIR)/memory.o: $(MISCCLASSESDIR)/memory.cpp $(SMOOTHINCLUDEDIR)/misc/mem
 $(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/misc/string.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/string.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string.cpp -o $(OBJECTDIR)/string.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/protocol.o: $(NETCLASSESDIR)/protocols/protocol.cpp $(SMOOTHINCLUDEDIR)/net/protocols/protocol.h
+	$(ECHO) -n Compiling $(NETCLASSESDIR)/protocols/protocol.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(NETCLASSESDIR)/protocols/protocol.cpp -o $(OBJECTDIR)/protocol.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/protocol_file.o: $(NETCLASSESDIR)/protocols/file.cpp $(SMOOTHINCLUDEDIR)/net/protocols/file.h
+	$(ECHO) -n Compiling $(NETCLASSESDIR)/protocols/file.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(NETCLASSESDIR)/protocols/file.cpp -o $(OBJECTDIR)/protocol_file.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/protocol_http.o: $(NETCLASSESDIR)/protocols/http.cpp $(SMOOTHINCLUDEDIR)/net/protocols/http.h
+	$(ECHO) -n Compiling $(NETCLASSESDIR)/protocols/http.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(NETCLASSESDIR)/protocols/http.cpp -o $(OBJECTDIR)/protocol_http.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/timersdl.o: $(SYSTEMCLASSESDIR)/backends/sdl/timersdl.cpp $(SMOOTHINCLUDEDIR)/system/backends/sdl/timersdl.h

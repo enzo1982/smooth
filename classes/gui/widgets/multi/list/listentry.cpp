@@ -83,6 +83,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				Bool	 gotTabs = False;
 
 				if (mouseOver) nFont.SetColor(Setup::GradientTextColor);
+				if (!active) nFont.SetColor(Setup::GrayTextColor);
 
 				for (Int r = 0; r < text.Length(); r++) if (text[r] == '\t') { gotTabs = True; break; }
 
@@ -107,12 +108,17 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 							Point	 p1 = Point(cbRect.left + 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
 							Point	 p2 = Point(cbRect.right - 2 + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
 
-							surface->Line(p1, p2, Setup::ClientTextColor);
-							surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), Setup::GrayTextColor);
-							surface->Line(p1 + Point(0, 1), p2 + Point(-1, 0), Setup::GrayTextColor);
-							surface->Line(p1 + Point(4, 0), p2 + Point(-6, 0), Setup::ClientTextColor);
-							surface->Line(p1 + Point(4, 1), p2 + Point(-5, 0), Setup::GrayTextColor);
-							surface->Line(p1 + Point(3, 0), p2 + Point(-6, -1), Setup::GrayTextColor);
+							Color	 lightColor = Setup::GrayTextColor;
+							Color	 darkColor = Setup::ClientTextColor;
+
+							if (!active) darkColor = Setup::GrayTextColor;
+
+							surface->Line(p1, p2, darkColor);
+							surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), lightColor);
+							surface->Line(p1 + Point(0, 1), p2 + Point(-1, 0), lightColor);
+							surface->Line(p1 + Point(4, 0), p2 + Point(-6, 0), darkColor);
+							surface->Line(p1 + Point(4, 1), p2 + Point(-5, 0), lightColor);
+							surface->Line(p1 + Point(3, 0), p2 + Point(-6, -1), lightColor);
 						}
 					}
 				}
@@ -121,7 +127,6 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				{
 					for (Int i = 0; i < ((ListBox *) container)->GetNOfTabs(); i++)
 					{
-						String	 tabText;
 						Rect	 rect = Rect(GetRealPosition() + Point(1, 1), GetSize() - Size(3, 2));
 
 						rect.left += ((ListBox *) container)->GetNthTabOffset(i);
@@ -129,24 +134,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 						if (((ListBox *) container)->GetNOfTabs() >= i + 2) rect.right = rect.left + (((ListBox *) container)->GetNthTabOffset(i + 1) - ((ListBox *) container)->GetNthTabOffset(i)) - (i == 0 ? (container->GetFlags() & LF_MULTICHECKBOX ? 12 : 0) : 0) - 3;
 
-						Int	 tabCount = 0;
-
-						for (Int p = 0; p < text.Length(); p++)
-						{
-							if (tabCount == i)
-							{
-								for (Int q = p; q < text.Length(); q++)
-								{
-									if (text[q] == '\t') break;
-
-									tabText[q - p] = text[q];
-								}
-
-								break;
-							}
-
-							if (text[p] == '\t') tabCount++;
-						}
+						String	 tabText = GetNthTabText(i);
 
 						if (((ListBox *) container)->GetNthTabOrientation(i) == OR_RIGHT)
 						{
@@ -168,6 +156,31 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 	}
 
 	return Success();
+}
+
+S::String S::GUI::ListEntry::GetNthTabText(Int i)
+{
+	String	 tabText;
+	Int	 tabCount = 0;
+
+	for (Int p = 0; p < text.Length(); p++)
+	{
+		if (tabCount == i)
+		{
+			for (Int q = p; q < text.Length(); q++)
+			{
+				if (text[q] == '\t') break;
+
+				tabText[q - p] = text[q];
+			}
+
+			break;
+		}
+
+		if (text[p] == '\t') tabCount++;
+	}
+
+	return tabText;
 }
 
 S::Int S::GUI::ListEntry::SetMark(Bool nMarked)

@@ -8,17 +8,27 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_VERSION_
-#define _H_OBJSMOOTH_VERSION_
+#ifndef _H_OBJSMOOTH_PROTOCOL_FILE_
+#define _H_OBJSMOOTH_PROTOCOL_FILE_
 
-#define SMOOTH_VERSION	  "0.8.70.0"
-#define SMOOTH_APIVERSION "0.8.70.0"
+#include "protocol.h"
 
-#ifdef __SMOOTH_DLL__
-# define SMOOTH_RESVERS	   0,8,70,0
-# define SMOOTH_RESPROD	   0,8,0,0
-# define SMOOTH_PRODUCT	  "0.8\0"
-# define SMOOTH_FILEVER	  "70.0\0"
-#endif
+namespace smooth
+{
+	namespace Net
+	{
+		namespace Protocols
+		{
+			class File : public Protocol
+			{
+				public:
+						 File(const String &);
+					virtual	~File();
+
+					Int	 DownloadToFile(const String &);
+			};
+		};
+	};
+};
 
 #endif

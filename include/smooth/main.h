@@ -30,7 +30,7 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdL
 
 	Init();
 
-	if (System::System::GetVersionString() != (String) SMOOTH_VERSION)
+	if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
 	{
 		if (IDNO == GUI::Dialogs::QuickMessage("This program might not be compatible with the smooth library\ninstalled on your system. Continue execution?", "Warning", MB_YESNO, IDI_QUESTION))
 		{
@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
 	Init();
 
-	if (System::System::GetVersionString() != (String) SMOOTH_VERSION)
+	if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
 	{
 		Free();
 

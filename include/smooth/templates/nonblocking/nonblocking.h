@@ -8,23 +8,44 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_NONBLOCKING_
-#define _H_OBJSMOOTH_NONBLOCKING_
-
 #include "../../threads/thread.h"
+#include "caller.h"
 
 namespace smooth
 {
-	class NonBlocking
+	template <NONBLOCKING_ARGUMENT_LIST NONBLOCKING_CONDITIONAL_COMMA class dummyTYPE = Void> class NONBLOCKING_NONBLOCKING_CLASS_NAME : public NonBlocking
 	{
+		protected:
+			NONBLOCKING_CALLER_CLASS_NAME<NONBLOCKING_ARGUMENT_TYPES NONBLOCKING_CONDITIONAL_COMMA dummyTYPE>	*caller;
 		public:
-			static Int WaitForRunningCalls()
+			template <class classTYPE, class oClassTYPE, class slotReturnTYPE> NONBLOCKING_NONBLOCKING_CLASS_NAME(slotReturnTYPE (classTYPE::*proc)(NONBLOCKING_ARGUMENT_TYPES), oClassTYPE *inst)
 			{
-				while (Threads::Thread::GetNOfRunningThreads() > 0) Sleep(10);
+				caller	= new NONBLOCKING_CALLER_CLASS_NAME<NONBLOCKING_ARGUMENT_TYPES NONBLOCKING_CONDITIONAL_COMMA dummyTYPE>(proc, inst);
 
-				return Success();
+				callers.Add(caller);
+			}
+
+			template <class slotReturnTYPE> NONBLOCKING_NONBLOCKING_CLASS_NAME(slotReturnTYPE (*proc)(NONBLOCKING_ARGUMENT_TYPES))
+			{
+				caller	= new NONBLOCKING_CALLER_CLASS_NAME<NONBLOCKING_ARGUMENT_TYPES NONBLOCKING_CONDITIONAL_COMMA dummyTYPE>(proc);
+
+				callers.Add(caller);
+			}
+
+			template <class slotReturnTYPE> NONBLOCKING_NONBLOCKING_CLASS_NAME(NONBLOCKING_SIGNAL_CLASS_NAME<slotReturnTYPE NONBLOCKING_CONDITIONAL_COMMA NONBLOCKING_ARGUMENT_TYPES> *sig)
+			{
+				caller	= new NONBLOCKING_CALLER_CLASS_NAME<NONBLOCKING_ARGUMENT_TYPES NONBLOCKING_CONDITIONAL_COMMA dummyTYPE>(sig);
+
+				callers.Add(caller);
+			}
+
+			virtual ~NONBLOCKING_NONBLOCKING_CLASS_NAME()
+			{
+			}
+
+			Threads::Thread *Call(NONBLOCKING_ARGUMENT_PARAMETER_LIST)
+			{
+				return caller->Call(NONBLOCKING_ARGUMENT_PARAMETERS);
 			}
 	};
 };
-
-#endif

@@ -11,8 +11,12 @@ xx.xx.07 xx:xx - smooth alpha 0.8.70.0
 - protocol.cpp	- new class: Protocol, base class for network protocol implementation
 - file.cpp	- new class: File, implementation of the file:// protocol
 - http.cpp	- new class: HTTP, HTTP protocol implementation
+- scrollbar.cpp	- changed scrollbar behaviour to be more Windows-like
 
+- new template class: Iterator<t>, iterator for arrays of type Array<t>
 - applications now check the smooth API version instead of the release number for compatibility
+- added support for network files and directories
+- fixed grayscaled icons display in iconbars
 
 21.02.07 16:41 - smooth alpha 0.8.69.2
 

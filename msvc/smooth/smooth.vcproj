@@ -864,6 +864,14 @@
 									RelativePath="..\..\classes\gui\widgets\multi\menu\popupmenuentry.cpp"
 									>
 								</File>
+								<File
+									RelativePath="..\..\classes\gui\widgets\multi\menu\popupmenuentrycheck.cpp"
+									>
+								</File>
+								<File
+									RelativePath="..\..\classes\gui\widgets\multi\menu\popupmenuentryoption.cpp"
+									>
+								</File>
 							</Filter>
 						</Filter>
 						<Filter
@@ -2024,6 +2032,58 @@
 							RelativePath="..\..\include\smooth\misc\hash\crc32.h"
 							>
 						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="gui"
+					>
+					<Filter
+						Name="widgets"
+						>
+						<Filter
+							Name="multi"
+							>
+							<Filter
+								Name="menu"
+								>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\menu.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\menubar.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\menubarentry.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\menuentry.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\micromenu.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\popupmenu.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentry.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentrycheck.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentryoption.h"
+									>
+								</File>
+							</Filter>
+						</Filter>
 					</Filter>
 				</Filter>
 			</Filter>

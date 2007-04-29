@@ -17,7 +17,7 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 
 	if (dirName != NIL && dirPath == NIL)
 	{
-		if (dirName[1] == ':')
+		if (dirName[1] == ':' || dirName.StartsWith("\\\\"))
 		{
 			dirPath = dirName;
 			dirName = NIL;
@@ -65,22 +65,22 @@ S::Directory::operator S::String() const
 	return String(dirPath).Append("\\").Append(dirName);
 }
 
-const S::String &S::Directory::GetDirectoryName()
+const S::String &S::Directory::GetDirectoryName() const
 {
 	return dirName;
 }
 
-const S::String &S::Directory::GetDirectoryPath()
+const S::String &S::Directory::GetDirectoryPath() const
 {
 	return dirPath;
 }
 
-const S::Array<S::File> &S::Directory::GetFiles()
+const S::Array<S::File> &S::Directory::GetFiles() const
 {
 	return GetFilesByPattern("*.*");
 }
 
-const S::Array<S::Directory> &S::Directory::GetDirectories()
+const S::Array<S::Directory> &S::Directory::GetDirectories() const
 {
 	directories.RemoveAll();
 
@@ -114,7 +114,7 @@ const S::Array<S::Directory> &S::Directory::GetDirectories()
 	return directories;
 }
 
-const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern)
+const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) const
 {
 	files.RemoveAll();
 
@@ -148,7 +148,7 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern)
 	return files;
 }
 
-S::DateTime S::Directory::GetCreateTime()
+S::DateTime S::Directory::GetCreateTime() const
 {
 	DateTime	 dateTime;
 
@@ -174,7 +174,7 @@ S::DateTime S::Directory::GetCreateTime()
 	return dateTime;
 }
 
-S::Bool S::Directory::Exists()
+S::Bool S::Directory::Exists() const
 {
 	// Check if root directory of a drive
 	if (dirPath[dirPath.Length() - 1] == ':' && dirName == NIL) return True;

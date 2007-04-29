@@ -663,30 +663,18 @@ S::String &S::String::Append(const String &str)
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
-	wchar_t	*composed = new wchar_t [len1 + len2 + 1];
+	wBuffer.Resize(len1 + len2 + 1);
 
 	LockBuffers();
 
-	for (Int i = 0; i < (len1 + len2 + 1); i++)
-	{
-		composed[i] = 0;
-	}
+	wcsncpy(wBuffer, wString, len1);
+	wcsncpy(wBuffer + len1, str.wString, len2);
 
-	for (Int j = 0; j < len1; j++)
-	{
-		composed[j] = wString[j];
-	}
+	wBuffer[len1 + len2] = 0;
 
-	for (Int k = len1; k < (len1 + len2); k++)
-	{
-		composed[k] = str.wString[k - len1];
-	}
-
-	*this = composed;
+	*this = wBuffer;
 
 	UnlockBuffers();
-
-	delete [] composed;
 
 	return *this;
 }

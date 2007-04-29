@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,8 @@ S::System::Timer::Timer()
 
 	type = classID;
 
+	status = TIMER_STOPPED;
+
 	onInterval.SetParentObject(this);
 }
 
@@ -31,15 +33,37 @@ S::System::Timer::~Timer()
 
 S::Int S::System::Timer::Start(Int interval)
 {
+	if (status == TIMER_RUNNING) return Error();
+
+	status = TIMER_RUNNING;
+
 	return backend->Start(interval);
 }
 
 S::Int S::System::Timer::Stop()
 {
+	if (status != TIMER_RUNNING) return Error();
+
+	status = TIMER_STOPPED;
+
 	return backend->Stop();
+}
+
+S::Int S::System::Timer::Restart(Int interval)
+{
+	if (status != TIMER_RUNNING) return Error();
+
+	Stop();
+
+	return Start(interval);
 }
 
 S::Int S::System::Timer::GetID() const
 {
 	return backend->GetID();
+}
+
+S::Int S::System::Timer::GetStatus() const
+{
+	return status;
 }

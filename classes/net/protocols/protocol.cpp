@@ -47,11 +47,12 @@ S::Net::Protocols::Protocol::~Protocol()
 
 S::Int S::Net::Protocols::Protocol::DownloadToBuffer(Buffer<UnsignedByte> &destination)
 {
-	Bool	 error = DownloadToFile("download.temp");
+	S::File	 downloadFile = S::System::System::GetTempDirectory().Append("download.temp");
+	Bool	 error = DownloadToFile(downloadFile);
 
 	if (error) return Error();
 
-	IO::InStream	*f_in = new IO::InStream(IO::STREAM_FILE, "download.temp", IO::IS_READONLY);
+	IO::InStream	*f_in = new IO::InStream(IO::STREAM_FILE, downloadFile, IO::IS_READONLY);
 
 	Int		 bytes = f_in->Size();
 
@@ -69,7 +70,7 @@ S::Int S::Net::Protocols::Protocol::DownloadToBuffer(Buffer<UnsignedByte> &desti
 	delete b_out;
 	delete f_in;
 
-	S::File("download.temp").Delete();
+	downloadFile.Delete();
 
 	return Success();
 }

@@ -14,6 +14,7 @@
 #include <smooth/i18n/i18n.h>
 #include <smooth/system/event.h>
 #include <smooth/init.h>
+#include <smooth/templates/nonblocking.h>
 
 S::Bool	 S::loopActive		= S::False;
 S::Int	 S::peekLoop		= 0;
@@ -104,10 +105,14 @@ S::Int S::GUI::Application::Loop()
 		}
 	}
 
-	/* This is the same as NonBlocking::WaitForRunningCalls(),
-	   so we don't need to call that.			   */
+	// Wait for started threads to finish.
 
 	while (Threads::Thread::GetNOfRunningThreads() > 0) LiSASleep(10);
+
+	/* Delete all remaining callers left
+	   from nonblocking function calls.  */
+
+	NonBlocking::CleanUp();
 
 	return Success();
 }

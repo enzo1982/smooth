@@ -13,6 +13,7 @@
 #include <smooth/backends/backend.h>
 #include <smooth/gui/application/background.h>
 #include <smooth/system/multimonitor.h>
+#include <smooth/templates/nonblocking.h>
 
 #ifdef __WIN32__
 #include <wtypes.h>
@@ -48,7 +49,7 @@ int CALLBACK EnumFontProcW(ENUMLOGFONTEXW *lpelfe, NEWTEXTMETRICEXW *lpntme, int
 
 namespace smooth
 {
-	SMOOTHAPI S::Array<S::Void *> threadSlots;
+	SMOOTHAPI S::Array<S::Caller *> S::NonBlocking::callers;
 };
 
 S::Bool	 S::initializing = S::True;

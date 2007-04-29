@@ -54,8 +54,8 @@ S::Int S::GUI::MenuEntry::SetBitmap(const Bitmap &newBitmap)
 
 	bitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
-	graymap.GrayscaleBitmap();
 	graymap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+	graymap.GrayscaleBitmap();
 
 	return Success();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,7 +18,7 @@ S::File::File(const String &iFileName, const String &iFilePath)
 
 	if (fileName != NIL && filePath == NIL)
 	{
-		if (fileName[1] == ':')
+		if (fileName[1] == ':' || fileName.StartsWith("\\\\"))
 		{
 			filePath = fileName;
 			fileName = NIL;
@@ -64,17 +64,17 @@ S::File::operator S::String() const
 	return String(filePath).Append("\\").Append(fileName);
 }
 
-const S::String &S::File::GetFileName()
+const S::String &S::File::GetFileName() const
 {
 	return fileName;
 }
 
-const S::String &S::File::GetFilePath()
+const S::String &S::File::GetFilePath() const
 {
 	return filePath;
 }
 
-S::Int64 S::File::GetFileSize()
+S::Int64 S::File::GetFileSize() const
 {
 	if (!Exists()) return -1;
 
@@ -93,7 +93,7 @@ S::Int64 S::File::GetFileSize()
 	return (Int64(sizeHigh) << 32) + sizeLow;
 }
 
-S::Int S::File::GetFileTime(FILETIME *cT, FILETIME *aT, FILETIME *wT)
+S::Int S::File::GetFileTime(FILETIME *cT, FILETIME *aT, FILETIME *wT) const
 {
 	if (!Exists()) return Error();
 
@@ -109,7 +109,7 @@ S::Int S::File::GetFileTime(FILETIME *cT, FILETIME *aT, FILETIME *wT)
 	return Success();
 }
 
-S::DateTime S::File::GetCreationTime()
+S::DateTime S::File::GetCreationTime() const
 {
 	FILETIME	 fileTime;
 	SYSTEMTIME	 time;
@@ -126,7 +126,7 @@ S::DateTime S::File::GetCreationTime()
 	return dateTime;
 }
 
-S::DateTime S::File::GetAccessTime()
+S::DateTime S::File::GetAccessTime() const
 {
 	FILETIME	 fileTime;
 	SYSTEMTIME	 time;
@@ -143,7 +143,7 @@ S::DateTime S::File::GetAccessTime()
 	return dateTime;
 }
 
-S::DateTime S::File::GetWriteTime()
+S::DateTime S::File::GetWriteTime() const
 {
 	FILETIME	 fileTime;
 	SYSTEMTIME	 time;
@@ -160,7 +160,7 @@ S::DateTime S::File::GetWriteTime()
 	return dateTime;
 }
 
-S::Bool S::File::Exists()
+S::Bool S::File::Exists() const
 {
 	HANDLE	 handle;
 

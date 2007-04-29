@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,7 +28,7 @@ namespace smooth
 			String		 fileName;
 			String		 filePath;
 
-			Int		 GetFileTime(FILETIME *, FILETIME *, FILETIME *);
+			Int		 GetFileTime(FILETIME *, FILETIME *, FILETIME *) const;
 		public:
 					 File(const String &, const String & = NIL);
 					 File(const int = NIL);
@@ -36,16 +36,16 @@ namespace smooth
 
 					~File();
 
-			const String	&GetFileName();
-			const String	&GetFilePath();
+			const String	&GetFileName() const;
+			const String	&GetFilePath() const;
 
-			Int64		 GetFileSize();
+			Int64		 GetFileSize() const;
 
-			DateTime	 GetCreationTime();
-			DateTime	 GetWriteTime();
-			DateTime	 GetAccessTime();
+			DateTime	 GetCreationTime() const;
+			DateTime	 GetWriteTime() const;
+			DateTime	 GetAccessTime() const;
 
-			Bool		 Exists();
+			Bool		 Exists() const;
 
 			Int		 Create();
 

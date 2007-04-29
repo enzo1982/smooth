@@ -85,6 +85,9 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			{
 				scrollbar->SetMetrics(Point(18, 1 + (header->IsVisible() ? 16 : 0)), Size(scrollbar->GetWidth(), GetHeight() - 2 - (header->IsVisible() ? 16 : 0)));
 				scrollbar->SetRange(0, GetNOfEntries() - (int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / GetNthEntry(0)->GetHeight()));
+
+				scrollbar->SetPageSize((Int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / GetNthEntry(0)->GetHeight()) - 1);
+
 				scrollbar->Show();
 			}
 			else
@@ -198,6 +201,8 @@ S::Void S::GUI::ListBox::OnChangeSize(const Size &nSize)
 	{
 		scrollbar->SetHeight(nSize.cy - 2 - (header->IsVisible() ? 16 : 0));
 		scrollbar->SetRange(0, GetNOfEntries() - (int) ((nSize.cy - 4 - (header->IsVisible() ? 16 : 0)) / GetNthEntry(0)->GetHeight()));
+
+		scrollbar->SetPageSize((Int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / GetNthEntry(0)->GetHeight()) - 1);
 	}
 
 	header->SetWidth(nSize.cx - 2);

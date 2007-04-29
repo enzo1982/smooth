@@ -60,8 +60,8 @@ S::Void S::GUI::BackgroundApplication::TimerProc()
 				if (((Threads::Thread *) object)->GetStatus() == Threads::THREAD_RUNNING)
 				{
 #ifdef __WIN32__
-					if (Setup::enableUnicode)	PostThreadMessageW(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
-					else				PostThreadMessageA(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+					if (Setup::enableUnicode) PostThreadMessageW(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+					else			  PostThreadMessageA(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
 #endif
 				}
 			}

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,42 +23,42 @@ namespace smooth
 	class SMOOTHAPI Directory
 	{
 		private:
-			String			 dirName;
-			String			 dirPath;
+			String				 dirName;
+			String				 dirPath;
 
-			Array<Directory>	 directories;
-			Array<File>		 files;
+			mutable Array<Directory>	 directories;
+			mutable Array<File>		 files;
 		public:
-						 Directory(const String &, const String & = NIL);
-						 Directory(const int = NIL);
-						 Directory(const Directory &);
+							 Directory(const String &, const String & = NIL);
+							 Directory(const int = NIL);
+							 Directory(const Directory &);
 
-						~Directory();
+							~Directory();
 
-			const String		&GetDirectoryName();
-			const String		&GetDirectoryPath();
+			const String			&GetDirectoryName() const;
+			const String			&GetDirectoryPath() const;
 
-			const Array<File>	&GetFiles();
-			const Array<Directory>	&GetDirectories();
+			const Array<File>		&GetFiles() const;
+			const Array<Directory>		&GetDirectories() const;
 
-			const Array<File>	&GetFilesByPattern(const String &);
+			const Array<File>		&GetFilesByPattern(const String &) const;
 
-			DateTime		 GetCreateTime();
+			DateTime			 GetCreateTime() const;
 
-			Bool			 Exists();
+			Bool				 Exists() const;
 
-			Int			 Create();
+			Int				 Create();
 
-			Int			 Copy(const String &);
-			Int			 Move(const String &);
+			Int				 Copy(const String &);
+			Int				 Move(const String &);
 
-			Int			 Delete();
-			Int			 Empty();
+			Int				 Delete();
+			Int				 Empty();
 
-			operator		 String() const;
+			operator			 String() const;
 
-			static Directory	 GetActiveDirectory();
-			static Int		 SetActiveDirectory(const Directory &);
+			static Directory		 GetActiveDirectory();
+			static Int			 SetActiveDirectory(const Directory &);
 	};
 };
 

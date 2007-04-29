@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,8 +31,13 @@ namespace smooth
 				Int			 mouseBias;
 				Bool			 dragging;
 
+				System::Timer		*clickTimer;
+				Int			 clickTimerDirection;
+
 				Void			 UpdateHotspotPositions();
 			protected:
+				UnsignedInt		 pageSize;
+
 				Hotspot			*clickHotspot;
 				Hotspot			*dragHotspot;
 			public:
@@ -42,8 +47,13 @@ namespace smooth
 				virtual			~Scrollbar();
 
 				virtual Int		 Paint(Int);
+			accessors:
+				Int			 SetPageSize(UnsignedInt);
+				UnsignedInt		 GetPageSize();
 			slots:
 				Void			 OnMouseClick(const Point &);
+				Void			 OnMouseClickTimer();
+
 				Void			 OnMouseWheel(Int);
 
 				Void			 OnMouseDragStart(const Point &);

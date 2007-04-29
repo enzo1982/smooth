@@ -27,15 +27,23 @@ S::GUI::Scrollbar::Scrollbar(const Point &iPos, const Size &iSize, Int sType, In
 	clickHotspot	= new Hotspot(Point(), Size());
 	dragHotspot	= new Hotspot(Point(), Size());
 
+	clickTimer	= new System::Timer();
+	clickTimerDirection = 1;
+
+	pageSize	= 6;
 	dragging	= False;
 
-	clickHotspot->onLeftButtonClick.Connect(&Scrollbar::OnMouseClick, this);
+	clickHotspot->onLeftButtonDown.Connect(&Scrollbar::OnMouseClick, this);
+	clickHotspot->onLeftButtonUp.Connect(&System::Timer::Stop, clickTimer);
+	clickHotspot->onMouseOut.Connect(&System::Timer::Stop, clickTimer);
 
 	dragHotspot->onMouseDragStart.Connect(&Scrollbar::OnMouseDragStart, this);
 	dragHotspot->onMouseDrag.Connect(&Scrollbar::OnMouseDrag, this);
 	dragHotspot->onMouseDragEnd.Connect(&Scrollbar::OnMouseDragEnd, this);
 
 	dragHotspot->onMouseWheel.Connect(&Scrollbar::OnMouseWheel, this);
+
+	clickTimer->onInterval.Connect(&Scrollbar::OnMouseClickTimer, this);
 
 	Add(clickHotspot);
 	Add(dragHotspot);
@@ -50,6 +58,8 @@ S::GUI::Scrollbar::~Scrollbar()
 {
 	DeleteObject(clickHotspot);
 	DeleteObject(dragHotspot);
+
+	DeleteObject(clickTimer);
 }
 
 S::Int S::GUI::Scrollbar::Paint(Int message)
@@ -124,17 +134,43 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 	return Success();
 }
 
+S::Int S::GUI::Scrollbar::SetPageSize(UnsignedInt nPageSize)
+{
+	pageSize = nPageSize;
+
+	return Success();
+}
+
+S::UnsignedInt S::GUI::Scrollbar::GetPageSize()
+{
+	return pageSize;
+}
+
 S::Void S::GUI::Scrollbar::OnMouseClick(const Point &mousePos)
 {
+	if (dragHotspot->IsMouseOver()) return;
+
 	Int	 value = 0;
 
-	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
-	Int	 hotspotSize	= (smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) - 4;
+	if (subtype == OR_HORZ)	value = (mousePos.x < GetRealPosition().x + dragHotspot->GetX()) ? -pageSize : pageSize;
+	else			value = (mousePos.y < GetRealPosition().y + dragHotspot->GetY()) ? -pageSize : pageSize;
 
-	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - 3 * (hotspotSize + 4)) / ((Float) (mousePos.x - (GetRealPosition().x + 1.5 * (hotspotSize + 4))))));
-	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - 3 * (hotspotSize + 4)) / ((Float) (mousePos.y - (GetRealPosition().y + 1.5 * (hotspotSize + 4))))));
+	if (clickTimer->GetStatus() == System::TIMER_STOPPED)
+	{
+		clickTimer->Start(250);
+		clickTimerDirection = (value > 0 ? 1 : -1);
+	}
 
-	if (!dragging) SetValue(startValue + value);
+	if (value / clickTimerDirection >= 0) SetValue(*variable + value);
+}
+
+S::Void S::GUI::Scrollbar::OnMouseClickTimer()
+{
+	Window	*window	= container->GetContainerWindow();
+
+	OnMouseClick(window->GetMousePosition());
+
+	clickTimer->Restart(100);
 }
 
 S::Void S::GUI::Scrollbar::OnMouseWheel(Int value)
@@ -146,11 +182,8 @@ S::Void S::GUI::Scrollbar::OnMouseWheel(Int value)
 
 S::Void S::GUI::Scrollbar::OnMouseDragStart(const Point &mousePos)
 {
-	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
-	Int	 hotspotSize	= (smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) - 4;
-
-	if (subtype == OR_HORZ)	mouseBias = (GetRealPosition().x + dragHotspot->GetX() + (hotspotSize + 4) / 2) - mousePos.x;
-	else			mouseBias = (GetRealPosition().y + dragHotspot->GetY() + (hotspotSize + 4) / 2) - mousePos.y;
+	if (subtype == OR_HORZ)	mouseBias = mousePos.x - (GetRealPosition().x + dragHotspot->GetX());
+	else			mouseBias = mousePos.y - (GetRealPosition().y + dragHotspot->GetY());
 
 	dragging = True;
 }
@@ -162,8 +195,8 @@ S::Void S::GUI::Scrollbar::OnMouseDrag(const Point &mousePos)
 	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
 	Int	 hotspotSize	= (smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) - 4;
 
-	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetWidth() - 3 * (hotspotSize + 4)) / ((Float) (mousePos.x + mouseBias - (GetRealPosition().x + 1.5 * (hotspotSize + 4))))));
-	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) GetHeight() - 3 * (hotspotSize + 4)) / ((Float) (mousePos.y + mouseBias - (GetRealPosition().y + 1.5 * (hotspotSize + 4))))));
+	if (subtype == OR_HORZ)	value = Math::Round((((Float) (endValue - startValue)) / ((Float) GetWidth() - 3 * (hotspotSize + 4))) * ((Float) (mousePos.x - mouseBias - (GetRealPosition().x + hotspotSize + 4))));
+	else			value = Math::Round((((Float) (endValue - startValue)) / ((Float) GetHeight() - 3 * (hotspotSize + 4))) * ((Float) (mousePos.y - mouseBias - (GetRealPosition().y + hotspotSize + 4))));
 
 	SetValue(startValue + value);
 }

@@ -22,6 +22,7 @@
 #include "smooth/version.h"
 
 #include "smooth/templates/array.h"
+#include "smooth/templates/iterator.h"
 #include "smooth/templates/buffer.h"
 #include "smooth/templates/extended.h"
 #include "smooth/templates/nonblocking.h"

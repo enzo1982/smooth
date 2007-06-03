@@ -40,7 +40,7 @@ S::Object::~Object()
 
 S::Int S::Object::GetNOfObjects()
 {
-	return objects.GetNOfEntries();
+	return objects.Length();
 }
 
 S::Object *S::Object::GetNthObject(Int n)

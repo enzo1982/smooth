@@ -104,7 +104,7 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 	{
 		Surface	*surface = GetDrawSurface();
 
-		surface->SetSize(GetSize());
+		surface->SetSize(GetSize() * Font::GetSystemFontSize() / 96);
 
 		CalculateOffsets();
 
@@ -761,7 +761,13 @@ S::Int S::GUI::Window::Paint(Int message)
 	if (GetWidth() - updateRect.right < frameWidth)	  updateRect.right  = GetWidth() - frameWidth + 1;
 	if (GetHeight() - updateRect.bottom < frameWidth) updateRect.bottom = GetHeight() - frameWidth + 1;
 
-	if (message == SP_UPDATE)
+	Rect	 workArea = System::MultiMonitor::GetVirtualScreenMetrics();
+
+	if (message == SP_UPDATE				&&
+	    GetPosition().x		   > workArea.left - 2	&&
+	    GetPosition().y		   > workArea.top - 2	&&
+	    GetPosition().x + GetSize().cx < workArea.right + 2	&&
+	    GetPosition().y + GetSize().cy < workArea.bottom + 2)
 	{
 		surface->PaintRect(updateRect);
 	}
@@ -981,8 +987,10 @@ S::GUI::Point S::GUI::Window::GetMousePosition() const
 {
 	Point	 position = Input::GetMousePosition();
 
-	if (IsRightToLeft())	return Point(GetWidth() - (position.x - GetX()) - 1, position.y - GetY());
-	else			return Point(position.x - GetX(), position.y - GetY());
+	if (IsRightToLeft())	position = Point(GetWidth() - (position.x - GetX()) - 1, position.y - GetY());
+	else			position -= GetPosition();
+
+	return position * 96 / Font::GetSystemFontSize();
 }
 
 S::Bool S::GUI::Window::IsMouseOn(const Rect &rect) const

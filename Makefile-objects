@@ -150,6 +150,16 @@ $(OBJECTDIR)/imageloader_pci.o: $(GRAPHICSCLASSESDIR)/imageloader/pci.cpp $(SMOO
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/imageloader/pci.cpp -o $(OBJECTDIR)/imageloader_pci.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/modifier_fontsize.o: $(GRAPHICSCLASSESDIR)/modifiers/fontsize.cpp $(SMOOTHINCLUDEDIR)/graphics/modifiers/fontsize.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/modifiers/fontsize.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/modifiers/fontsize.cpp -o $(OBJECTDIR)/modifier_fontsize.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/modifier_righttoleft.o: $(GRAPHICSCLASSESDIR)/modifiers/righttoleft.cpp $(SMOOTHINCLUDEDIR)/graphics/modifiers/righttoleft.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/modifiers/righttoleft.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/modifiers/righttoleft.cpp -o $(OBJECTDIR)/modifier_righttoleft.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/bitmap.o: $(GRAPHICSCLASSESDIR)/bitmap.cpp $(SMOOTHINCLUDEDIR)/graphics/bitmap.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/bitmap.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/bitmap.cpp -o $(OBJECTDIR)/bitmap.o

@@ -43,7 +43,7 @@ S::XML::XUL::Menubar::Menubar(Node *node) : Widget(node)
 
 S::XML::XUL::Menubar::~Menubar()
 {
-	for (Int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetNth(i);
+	for (Int i = 0; i < entries.Length(); i++) delete entries.GetNth(i);
 
 	entries.RemoveAll();
 

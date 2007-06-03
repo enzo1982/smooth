@@ -202,13 +202,13 @@ S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 		case TIP_ORDERED:
 			tip = tips.GetNth(offset++);
 
-			if (offset == tips.GetNOfEntries()) offset = 0;
+			if (offset == tips.Length()) offset = 0;
 
 			break;
 		case TIP_RANDOM:
 			srand((unsigned) time(&timer));
 
-			tip = tips.GetNth(rand() % tips.GetNOfEntries());
+			tip = tips.GetNth(rand() % tips.Length());
 
 			break;
 	}

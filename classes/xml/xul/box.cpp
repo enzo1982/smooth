@@ -82,7 +82,7 @@ S::XML::XUL::Box::Box(Node *node) : Widget(node)
 
 S::XML::XUL::Box::~Box()
 {
-	for (Int i = 0; i < widgets.GetNOfEntries(); i++) delete widgets.GetNth(i);
+	for (Int i = 0; i < widgets.Length(); i++) delete widgets.GetNth(i);
 
 	widgets.RemoveAll();
 
@@ -96,7 +96,7 @@ S::GUI::Widget *S::XML::XUL::Box::GetWidget() const
 
 S::Void	 S::XML::XUL::Box::CalculateChildMetrics()
 {
-	if (widgets.GetNOfEntries() == 0) return;
+	if (widgets.Length() == 0) return;
 
 	Int	 xOffset = 0;
 	Int	 yOffset = 0;
@@ -104,10 +104,10 @@ S::Void	 S::XML::XUL::Box::CalculateChildMetrics()
 	Int	 maxWidth = 0;
 	Int	 maxHeight = 0;
 
-	Int	 elementWidth = width / widgets.GetNOfEntries();
-	Int	 elementHeight = height / widgets.GetNOfEntries();
+	Int	 elementWidth = width / widgets.Length();
+	Int	 elementHeight = height / widgets.Length();
 
-	for (Int i = 0; i < widgets.GetNOfEntries(); i++)
+	for (Int i = 0; i < widgets.Length(); i++)
 	{
 		XUL::Widget	*widget = widgets.GetNth(i);
 

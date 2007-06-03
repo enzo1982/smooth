@@ -46,7 +46,7 @@ S::I18n::Translator::Translator(const String &iAppPrefix, Bool iInternal)
 
 S::I18n::Translator::~Translator()
 {
-	for (int i = 0; i < languages.GetNOfEntries(); i++)
+	for (int i = 0; i < languages.Length(); i++)
 	{
 		delete languages.GetNth(i);
 	}
@@ -58,7 +58,7 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 {
 	Language	*iLang = NIL;
 
-	for (Int n = 0; n < languages.GetNOfEntries(); n++)
+	for (Int n = 0; n < languages.Length(); n++)
 	{
 		if (languages.GetNth(n)->magic == "internal")
 		{
@@ -79,9 +79,9 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 
 		Bool	 done = false;
 
-		for (Int i = 0; i <= languages.GetNOfEntries(); i++)
+		for (Int i = 0; i <= languages.Length(); i++)
 		{
-			if (i == languages.GetNOfEntries())
+			if (i == languages.Length())
 			{
 				languages.Add(iLang);
 
@@ -216,7 +216,7 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 
 S::Int S::I18n::Translator::GetNOfLanguages() const
 {
-	return languages.GetNOfEntries();
+	return languages.Length();
 }
 
 const S::String &S::I18n::Translator::GetNthLanguageName(Int index) const
@@ -281,7 +281,7 @@ S::Bool S::I18n::Translator::IsActiveLanguageRightToLeft() const
 
 S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 {
-	for (int i = 0; i < languages.GetNOfEntries(); i++)
+	for (int i = 0; i < languages.Length(); i++)
 	{
 		if (languages.GetNth(i)->magic == magic)
 		{
@@ -323,7 +323,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 
 	Bool		 done = False;
 
-	for (Int j = 0; j < languages.GetNOfEntries(); j++)
+	for (Int j = 0; j < languages.Length(); j++)
 	{
 		Language	*lang = languages.GetNth(j);
 
@@ -343,7 +343,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 			}
 		}
 
-		if (j == languages.GetNOfEntries() - 1)
+		if (j == languages.Length() - 1)
 		{
 			languages.Add(language);
 

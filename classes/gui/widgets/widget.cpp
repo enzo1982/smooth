@@ -106,7 +106,7 @@ S::GUI::Widget::~Widget()
 {
 	DeactivateTooltip();
 
-	while (widgets.GetNOfEntries()) Remove(widgets.GetFirst());
+	while (widgets.Length()) Remove(widgets.GetFirst());
 
 	widgets.RemoveAll();
 
@@ -166,7 +166,7 @@ S::Int S::GUI::Widget::Remove(Widget *widget)
 
 S::Int S::GUI::Widget::GetNOfObjects() const
 {
-	return widgets.GetNOfEntries();
+	return widgets.Length();
 }
 
 S::GUI::Widget *S::GUI::Widget::GetNthObject(Int n) const
@@ -589,34 +589,29 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			break;
 #ifdef __WIN32__
 		case WM_KEYDOWN:
-			if (focussed && tabstopCapable)
+			if (!focussed || !tabstopCapable) break;
+
+			if (wParam == VK_TAB)
 			{
-				switch (wParam)
+				BYTE	 state[256];
+
+				if (GetKeyboardState(state))
 				{
-					case VK_TAB:
-						{
-							BYTE	 state[256];
+					Widget	*widget = NIL;
 
-							GetKeyboardState(state);
+					if (state[VK_SHIFT] & 128) widget = container->GetPreviousTabstopWidget(GetHandle());
+					else			   widget = container->GetNextTabstopWidget(GetHandle());
 
-							Widget	*widget = NIL;
+					if (widget != NIL)
+					{
+						focussed = False;
 
-							if (state[VK_SHIFT] & 128) widget = container->GetPreviousTabstopWidget(GetHandle());
-							else			   widget = container->GetNextTabstopWidget(GetHandle());
+						onLoseFocus.Emit();
 
-							if (widget != NIL)
-							{
-								focussed = False;
+						widget->SetFocusByKeyboard();
+					}
 
-								onLoseFocus.Emit();
-
-								widget->SetFocusByKeyboard();
-							}
-
-							returnValue = Break;
-						}
-
-						break;
+					returnValue = Break;
 				}
 			}
 

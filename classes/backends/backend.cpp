@@ -30,7 +30,7 @@ S::Int S::Backends::Backend::AddBackend(Backend *(*backend)())
 
 S::Int S::Backends::Backend::GetNOfBackends()
 {
-	return backends->GetNOfEntries();
+	return backends->Length();
 }
 
 S::Backends::Backend *S::Backends::Backend::GetNthBackend(Int n)
@@ -43,12 +43,12 @@ S::Int S::Backends::Backend::InitBackends()
 	if (backends == NIL)		backends = new Array<Backend *, Void *>;
 	if (backend_creators == NIL)	backend_creators = new Array<Backend *(*)(), Void *>;
 
-	for (Int i = 0; i < backend_creators->GetNOfEntries(); i++)
+	for (Int i = 0; i < backend_creators->Length(); i++)
 	{
 		backends->Add(backend_creators->GetNth(i)());
 	}
 
-	for (Int j = 0; j < backends->GetNOfEntries(); j++)
+	for (Int j = 0; j < backends->Length(); j++)
 	{
 		backends->GetNth(j)->Init();
 	}
@@ -58,7 +58,7 @@ S::Int S::Backends::Backend::InitBackends()
 
 S::Int S::Backends::Backend::DeinitBackends()
 {
-	for (Int i = 0; i < backends->GetNOfEntries(); i++)
+	for (Int i = 0; i < backends->Length(); i++)
 	{
 		backends->GetNth(i)->Deinit();
 

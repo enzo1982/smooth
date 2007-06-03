@@ -79,7 +79,7 @@ S::Int S::XML::Node::GetNOfAttributes() const
 {
 	if (attributes == NIL) return 0;
 
-	return attributes->GetNOfEntries();
+	return attributes->Length();
 }
 
 S::XML::Attribute *S::XML::Node::GetNthAttribute(Int attributeNumber) const
@@ -143,7 +143,7 @@ S::Int S::XML::Node::GetNOfNodes() const
 {
 	if (subnodes == NIL) return 0;
 
-	return subnodes->GetNOfEntries();
+	return subnodes->Length();
 }
 
 S::XML::Node *S::XML::Node::GetNthNode(Int nodeNumber) const

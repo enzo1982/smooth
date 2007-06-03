@@ -45,7 +45,7 @@ namespace smooth
 
 				Int				 SwitchEntries(Int, Int);
 			accessors:
-				Int				 GetNOfEntries() const;
+				Int				 Length() const;
 				ListEntry			*GetNthEntry(Int) const;
 
 				Int				 SelectEntry(ListEntry *);

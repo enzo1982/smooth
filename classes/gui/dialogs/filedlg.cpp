@@ -50,7 +50,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		ofnw.Flags		= OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | flags;
 		ofnw.lpstrDefExt	= defExt;
 
-		for (int k = 0; k < filters.GetNOfEntries(); k++)
+		for (int k = 0; k < filters.Length(); k++)
 		{
 			for (int l = 0; l < filterNames.GetNth(k).Length(); l++)
 			{
@@ -162,7 +162,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		ofna.Flags		= OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | flags;
 		ofna.lpstrDefExt	= defExt;
 
-		for (int k = 0; k < filters.GetNOfEntries(); k++)
+		for (int k = 0; k < filters.Length(); k++)
 		{
 			char	*filterName = filterNames.GetNth(k);
 
@@ -291,7 +291,7 @@ S::Int S::GUI::Dialogs::FileSelection::SetDefaultExtension(const String &newDefE
 
 S::Int S::GUI::Dialogs::FileSelection::GetNumberOfFiles()
 {
-	return files.GetNOfEntries();
+	return files.Length();
 }
 
 S::Int S::GUI::Dialogs::FileSelection::SetFileName(const String &newDefFile)
@@ -303,12 +303,12 @@ S::Int S::GUI::Dialogs::FileSelection::SetFileName(const String &newDefFile)
 
 S::String S::GUI::Dialogs::FileSelection::GetFileName()
 {
-	if (files.GetNOfEntries() > 0)	return files.GetFirst();
+	if (files.Length() > 0)	return files.GetFirst();
 	else				return NIL;
 }
 
 S::String S::GUI::Dialogs::FileSelection::GetNthFileName(Int n)
 {
-	if (files.GetNOfEntries() > n)	return files.GetNth(n);
+	if (files.Length() > n)	return files.GetNth(n);
 	else				return NIL;
 }

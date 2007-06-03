@@ -120,7 +120,7 @@ S::Int S::GUI::EditBox::SetDropDownList(List *nDropDownList)
 		comboBox->SetFlags(CB_HOTSPOTONLY);
 		comboBox->onSelectEntry.Connect(&EditBox::OnSelectListEntry, this);
 
-		for (Int i = 0; i < dropDownList->GetNOfEntries(); i++)
+		for (Int i = 0; i < dropDownList->Length(); i++)
 		{
 			comboBox->AddEntry(dropDownList->GetNthEntry(i)->GetText());
 		}

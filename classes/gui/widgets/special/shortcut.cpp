@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -50,15 +50,16 @@ S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 			{
 				BYTE	 state[256];
 
-				GetKeyboardState(state);
-
-				if ((((flags & SC_ALT) 	 && (lParam & 536870912))      || (!(flags & SC_ALT)   && !(lParam & 536870912)))      &&
-				    (((flags & SC_CTRL)  && (state[VK_CONTROL] & 128)) || (!(flags & SC_CTRL)  && !(state[VK_CONTROL] & 128))) &&
-				    (((flags & SC_SHIFT) && (state[VK_SHIFT] & 128))   || (!(flags & SC_SHIFT) && !(state[VK_SHIFT] & 128))))
+				if (GetKeyboardState(state))
 				{
-					onKeyDown.Emit(param);
+					if ((((flags & SC_ALT) 	 && (lParam & 536870912))      || (!(flags & SC_ALT)   && !(lParam & 536870912)))      &&
+					    (((flags & SC_CTRL)  && (state[VK_CONTROL] & 128)) || (!(flags & SC_CTRL)  && !(state[VK_CONTROL] & 128))) &&
+					    (((flags & SC_SHIFT) && (state[VK_SHIFT] & 128))   || (!(flags & SC_SHIFT) && !(state[VK_SHIFT] & 128))))
+					{
+						onKeyDown.Emit(param);
 
-					retVal = Break;
+						retVal = Break;
+					}
 				}
 			}
 

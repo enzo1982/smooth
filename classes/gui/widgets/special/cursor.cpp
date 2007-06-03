@@ -294,7 +294,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 	surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 
 	String	 line;
-	Bool	 fillLineIndices = (lineIndices.GetNOfEntries() == 0);
+	Bool	 fillLineIndices = (lineIndices.Length() == 0);
 	Int	 lineNumber = (fillLineIndices ? 0 : scrollPos);
 	Int	 lineStart = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos));
 

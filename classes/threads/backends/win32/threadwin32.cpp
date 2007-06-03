@@ -62,6 +62,7 @@ S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadPa
 S::Int S::Threads::ThreadWin32::Stop()
 {
 	if (thread == NIL) return Error();
+	if (!IsRunning()) return Success();
 
 	HANDLE	 self = thread;
 
@@ -77,6 +78,15 @@ S::Int S::Threads::ThreadWin32::Stop()
 	}
 
 	return Success();
+}
+
+S::Bool S::Threads::ThreadWin32::IsRunning() const
+{
+	DWORD	 exitCode = 0;
+
+	GetExitCodeThread(thread, &exitCode);
+
+	return (exitCode == STILL_ACTIVE);
 }
 
 S::Void S::Threads::ThreadWin32::Exit()

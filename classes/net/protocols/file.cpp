@@ -9,6 +9,9 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/net/protocols/file.h>
+#include <smooth/io/instream.h>
+#include <smooth/io/outstream.h>
+#include <smooth/misc/math.h>
 
 #include <time.h>
 

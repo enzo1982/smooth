@@ -177,7 +177,7 @@ Widget *Designer_EditComponent::AddObject(Int objid)
 
 Widget *Designer_EditComponent::GetFirstObject(Int objtype)
 {
-	for (Int i = 0; i < objects.GetNOfEntries(); i++)
+	for (Int i = 0; i < objects.Length(); i++)
 	{
 		if (objects.GetNth(i)->GetObjectType() == objtype) return objects.GetNth(i);
 	}

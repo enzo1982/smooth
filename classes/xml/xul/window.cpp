@@ -66,7 +66,7 @@ S::XML::XUL::Window::Window(Node *node) : Widget(node)
 
 S::XML::XUL::Window::~Window()
 {
-	for (Int i = 0; i < widgets.GetNOfEntries(); i++) delete widgets.GetNth(i);
+	for (Int i = 0; i < widgets.Length(); i++) delete widgets.GetNth(i);
 
 	widgets.RemoveAll();
 

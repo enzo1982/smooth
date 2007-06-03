@@ -110,9 +110,9 @@ S::Int S::GUI::List::RemoveAllEntries()
 
 S::Int S::GUI::List::SwitchEntries(Int entry1n, Int entry2n)
 {
-	if (entry1n == entry2n)					      return Success();
-	if (entry1n >= GetNOfEntries() || entry2n >= GetNOfEntries()) return Error();
-	if (entry1n <  0	       || entry2n <  0		    ) return Error();
+	if (entry1n == entry2n)			        return Success();
+	if (entry1n >= Length() || entry2n >= Length()) return Error();
+	if (entry1n <  0	|| entry2n <  0	      ) return Error();
 
 	ListEntry	*entry1 = elementOrder.GetNth(Math::Min(entry1n, entry2n));
 	ListEntry	*entry2 = elementOrder.GetNth(Math::Max(entry1n, entry2n));
@@ -126,9 +126,9 @@ S::Int S::GUI::List::SwitchEntries(Int entry1n, Int entry2n)
 	return Success();
 }
 
-S::Int S::GUI::List::GetNOfEntries() const
+S::Int S::GUI::List::Length() const
 {
-	return elementOrder.GetNOfEntries();
+	return elementOrder.Length();
 }
 
 S::GUI::ListEntry *S::GUI::List::GetNthEntry(Int n) const
@@ -138,7 +138,7 @@ S::GUI::ListEntry *S::GUI::List::GetNthEntry(Int n) const
 
 S::Int S::GUI::List::SelectEntry(ListEntry *entryToSelect)
 {
-	for (Int i = 0; i < elementOrder.GetNOfEntries(); i++)
+	for (Int i = 0; i < elementOrder.Length(); i++)
 	{
 		ListEntry	*entry = GetNthEntry(i);
 
@@ -155,7 +155,7 @@ S::Int S::GUI::List::SelectEntry(ListEntry *entryToSelect)
 
 S::GUI::ListEntry *S::GUI::List::GetSelectedEntry() const
 {
-	for (Int i = 0; i < elementOrder.GetNOfEntries(); i++)
+	for (Int i = 0; i < elementOrder.Length(); i++)
 	{
 		ListEntry	*entry = elementOrder.GetNth(i);
 
@@ -167,7 +167,7 @@ S::GUI::ListEntry *S::GUI::List::GetSelectedEntry() const
 
 S::Int S::GUI::List::SelectNthEntry(Int n)
 {
-	if (n >= GetNOfEntries()) return Error();
+	if (n >= Length()) return Error();
 
 	GetNthEntry(n)->Select();
 
@@ -176,7 +176,7 @@ S::Int S::GUI::List::SelectNthEntry(Int n)
 
 S::Int S::GUI::List::GetSelectedEntryNumber() const
 {
-	for (Int i = 0; i < elementOrder.GetNOfEntries(); i++)
+	for (Int i = 0; i < elementOrder.Length(); i++)
 	{
 		if (elementOrder.GetNth(i)->IsSelected()) return i;
 	}
@@ -186,7 +186,7 @@ S::Int S::GUI::List::GetSelectedEntryNumber() const
 
 S::Int S::GUI::List::SelectEntry(const String &entryText)
 {
-	for (Int i = 0; i < elementOrder.GetNOfEntries(); i++)
+	for (Int i = 0; i < elementOrder.Length(); i++)
 	{
 		ListEntry	*entry = elementOrder.GetNth(i);
 

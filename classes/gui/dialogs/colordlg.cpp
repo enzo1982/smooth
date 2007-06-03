@@ -559,8 +559,6 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					lasthue = acthue;
 					acthue = newhue;
 
-					int	 hssize = 205;
-
 					dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
 					ColorDlgPaintProc();
 

@@ -167,7 +167,7 @@ Translator::Translator(const String &openFile)
 
 Translator::~Translator()
 {
-	for (int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetFirst();
+	for (int i = 0; i < entries.Length(); i++) delete entries.GetFirst();
 
 	entries.RemoveAll();
 
@@ -339,7 +339,7 @@ void Translator::CloseFile()
 
 	wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION));
 
-	for (int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetNth(i);
+	for (int i = 0; i < entries.Length(); i++) delete entries.GetNth(i);
 
 	entries.RemoveAll();
 
@@ -516,7 +516,7 @@ void Translator::SaveFileName(const String &file)
 
 	XML::Node	*data = root->AddNode("data");
 
-	for (Int i = 6; i < entries.GetNOfEntries(); i++)
+	for (Int i = 6; i < entries.Length(); i++)
 	{
 		listEntry	*entry = entries.GetNth(i);
 		XML::Node	*xentry = data->AddNode("entry", entry->translation);
@@ -621,7 +621,7 @@ void Translator::SaveData()
 		text_original->SetText("Original:");
 		text_translated->SetText("Translation:");
 
-		if (entries.GetNOfEntries() > 6)
+		if (entries.Length() > 6)
 		{
 			entry = entries.GetNth(6);
 
@@ -638,7 +638,7 @@ void Translator::SaveData()
 	}
 	else
 	{
-		for (Int i = 0; i < entries.GetNOfEntries(); i++)
+		for (Int i = 0; i < entries.Length(); i++)
 		{
 			if (entries.GetNth(i)->id == edit_id->GetText().ToInt())
 			{
@@ -676,7 +676,7 @@ void Translator::SaveData()
 
 		entry = NULL;
 
-		for (int j = 0; j < entries.GetNOfEntries(); j++)
+		for (int j = 0; j < entries.Length(); j++)
 		{
 			if (entries.GetNth(j)->id == edit_id->GetText().ToInt() + 1)
 			{
@@ -704,42 +704,45 @@ void Translator::SaveData()
 void Translator::SelectEntry()
 {
 	ListEntry	*lid = list_entries->GetSelectedEntry();
-	listEntry	*entry = NULL;
+	listEntry	*entry = NIL;
 
-	for (Int i = 0; i < entries.GetNOfEntries(); i++)
+	for (Int i = 0; i < entries.Length(); i++)
 	{
 		entry = entries.GetNth(i);
 
 		if (entry->entry == lid) break;
 	}
 
-	if (entry->id < 0)
+	if (entry != NIL)
 	{
-		edit_id->SetText("");
-		edit_original->SetText(entry->original);
-		edit_translated->SetText(entry->translation);
+		if (entry->id < 0)
+		{
+			edit_id->SetText("");
+			edit_original->SetText(entry->original);
+			edit_translated->SetText(entry->translation);
 
-		text_id->Deactivate();
-		edit_id->Deactivate();
-		edit_original->Deactivate();
-		button_remove->Deactivate();
+			text_id->Deactivate();
+			edit_id->Deactivate();
+			edit_original->Deactivate();
+			button_remove->Deactivate();
 
-		text_original->SetText("Field:");
-		text_translated->SetText("Value:");
-	}
-	else
-	{
-		text_id->Activate();
-		edit_id->Activate();
-		edit_original->Activate();
-		button_remove->Activate();
+			text_original->SetText("Field:");
+			text_translated->SetText("Value:");
+		}
+		else
+		{
+			text_id->Activate();
+			edit_id->Activate();
+			edit_original->Activate();
+			button_remove->Activate();
 
-		text_original->SetText("Original:");
-		text_translated->SetText("Translation:");
+			text_original->SetText("Original:");
+			text_translated->SetText("Translation:");
 
-		edit_id->SetText(String::FromInt(entry->id));
-		edit_original->SetText(entry->original);
-		edit_translated->SetText(entry->translation);
+			edit_id->SetText(String::FromInt(entry->id));
+			edit_original->SetText(entry->original);
+			edit_translated->SetText(entry->translation);
+		}
 	}
 }
 
@@ -766,7 +769,7 @@ void Translator::RemoveEntry()
 {
 	ListEntry	*lid = list_entries->GetSelectedEntry();
 
-	for (Int i = 0; i < entries.GetNOfEntries(); i++)
+	for (Int i = 0; i < entries.Length(); i++)
 	{
 		if (entries.GetNth(i)->entry == lid)
 		{

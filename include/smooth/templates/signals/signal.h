@@ -24,12 +24,12 @@ namespace smooth
 
 			SIGNALS_SIGNAL_CLASS_NAME(const SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &oSignal)
 			{
-				for (int i = 0; i < oSignal.slotsN.GetNOfEntries(); i++)
+				for (Int i = 0; i < oSignal.slotsN.Length(); i++)
 				{
 					slotsN.Add(((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) oSignal.slotsN.GetNth(i))->Copy());
 				}
 
-				for (int j = 0; j < oSignal.slots0.GetNOfEntries(); j++)
+				for (Int j = 0; j < oSignal.slots0.Length(); j++)
 				{
 					slots0.Add(((SlotBase0<Void> *) oSignal.slots0.GetNth(j))->Copy());
 				}
@@ -92,7 +92,7 @@ namespace smooth
 
 			template <class classTYPE, class oClassTYPE, class slotReturnTYPE> Int Disconnect(slotReturnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)
 			{
-				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
+				for (Int i = 0; i < slotsN.Length(); i++)
 				{
 					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))) == SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst))
 					{
@@ -109,7 +109,7 @@ namespace smooth
 
 			template <class slotReturnTYPE> Int Disconnect(slotReturnTYPE (*proc)(SIGNALS_ARGUMENT_TYPES))
 			{
-				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
+				for (Int i = 0; i < slotsN.Length(); i++)
 				{
 					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))) == SIGNALS_SLOT_GLOBAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc))
 					{
@@ -126,7 +126,7 @@ namespace smooth
 
 			template <class slotReturnTYPE> Int Disconnect(SIGNALS_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *sig)
 			{
-				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)
+				for (Int i = 0; i < slotsN.Length(); i++)
 				{
 					if ((*((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))) == SIGNALS_SLOT_SIGNAL_CLASS_NAME<slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(sig))
 					{
@@ -144,7 +144,7 @@ namespace smooth
 #ifndef SIGNALS_SIGNAL_ZERO
 			template <class classTYPE, class oClassTYPE, class slotReturnTYPE> Int Disconnect(slotReturnTYPE (classTYPE::*proc)(), oClassTYPE *inst)
 			{
-				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
+				for (Int i = 0; i < slots0.Length(); i++)
 				{
 					if ((*((SlotBase0<Void> *) slots0.GetNth(i))) == SlotClass0<oClassTYPE, slotReturnTYPE>(proc, inst))
 					{
@@ -161,7 +161,7 @@ namespace smooth
 
 			template <class slotReturnTYPE> Int Disconnect(slotReturnTYPE (*proc)())
 			{
-				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
+				for (Int i = 0; i < slots0.Length(); i++)
 				{
 					if ((*((SlotBase0<Void> *) slots0.GetNth(i))) == SlotGlobal0<slotReturnTYPE>(proc))
 					{
@@ -178,7 +178,7 @@ namespace smooth
 
 			template <class slotReturnTYPE> Int Disconnect(Signal0<slotReturnTYPE> *sig)
 			{
-				for (Int i = 0; i < slots0.GetNOfEntries(); i++)
+				for (Int i = 0; i < slots0.Length(); i++)
 				{
 					if ((*((SlotBase0<Void> *) slots0.GetNth(i))) == SlotSignal0<slotReturnTYPE>(sig))
 					{
@@ -196,8 +196,8 @@ namespace smooth
 
 			Int DisconnectAll()
 			{
-				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	delete (SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i);
-				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	delete (SlotBase0<Void> *) slots0.GetNth(j);
+				for (Int i = 0; i < slotsN.Length(); i++)	delete (SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i);
+				for (Int j = 0; j < slots0.Length(); j++)	delete (SlotBase0<Void> *) slots0.GetNth(j);
 
 				slotsN.RemoveAll();
 				slots0.RemoveAll();
@@ -209,21 +209,21 @@ namespace smooth
 			{
 				ProtectParent();
 
-				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
-				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	((SlotBase0<Void> *) slots0.GetNth(j))->Emit();
+				for (Int i = 0; i < slotsN.Length(); i++)	((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+				for (Int j = 0; j < slots0.Length(); j++)	((SlotBase0<Void> *) slots0.GetNth(j))->Emit();
 
 				UnprotectParent();
 			}
 
 			Void EmitUnprotected(SIGNALS_ARGUMENT_PARAMETER_LIST) const
 			{
-				for (Int i = 0; i < slotsN.GetNOfEntries(); i++)	((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
-				for (Int j = 0; j < slots0.GetNOfEntries(); j++)	((SlotBase0<Void> *) slots0.GetNth(j))->Emit();
+				for (Int i = 0; i < slotsN.Length(); i++)	((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) slotsN.GetNth(i))->Emit(SIGNALS_ARGUMENT_PARAMETERS);
+				for (Int j = 0; j < slots0.Length(); j++)	((SlotBase0<Void> *) slots0.GetNth(j))->Emit();
 			}
 
 			Int GetNOfConnectedSlots() const
 			{
-				return slotsN.GetNOfEntries() + slots0.GetNOfEntries();
+				return slotsN.Length() + slots0.Length();
 			}
 	};
 };

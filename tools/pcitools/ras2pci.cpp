@@ -12,7 +12,7 @@ using namespace smooth;
 
 Int smooth::Main(const Array<String> &args)
 {
-	if (args.GetNOfEntries() < 6)
+	if (args.Length() < 6)
 	{
 		cout << "RAS2PCI converter v0.2\n";
 		cout << "Copyright (C) 1998-2007 Robert Kausch\n\n";

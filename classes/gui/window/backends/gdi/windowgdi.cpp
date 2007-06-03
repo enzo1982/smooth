@@ -138,7 +138,7 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::GetWindowBackend(HWND hwnd)
 {
 	if (hwnd == NIL) return NIL;
 
-	for (Int i = 0; i < windowBackends.GetNOfEntries(); i++)
+	for (Int i = 0; i < windowBackends.Length(); i++)
 	{
 		WindowGDI	*window = windowBackends.GetNth(i);
 
@@ -169,8 +169,9 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			return Break;
 		case WM_GETMINMAXINFO:
 			{
-				RECT	 windowRect;
-				Int	 windowStyle;
+				RECT		 windowRect;
+				Int		 windowStyle;
+				LPMINMAXINFO	 minMaxInfo = (LPMINMAXINFO) lParam;
 
 				GetWindowRect(hwnd, &windowRect);
 
@@ -179,16 +180,16 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				if (windowStyle & WS_DLGFRAME)
 				{
-					((LPMINMAXINFO) lParam)->ptMaxSize = Point(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
-					((LPMINMAXINFO) lParam)->ptMaxPosition = Point(windowRect.left, windowRect.top);
+					minMaxInfo->ptMaxSize = Point(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
+					minMaxInfo->ptMaxPosition = Point(windowRect.left, windowRect.top);
 				}
 				else
 				{
-					((LPMINMAXINFO) lParam)->ptMinTrackSize.x = minSize.cx;
-					((LPMINMAXINFO) lParam)->ptMinTrackSize.y = minSize.cy;
+					minMaxInfo->ptMinTrackSize.x = minSize.cx;
+					minMaxInfo->ptMinTrackSize.y = minSize.cy;
 
-					if (maxSize.cx > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.x = maxSize.cx;
-					if (maxSize.cy > 0) ((LPMINMAXINFO) lParam)->ptMaxTrackSize.y = maxSize.cy;
+					if (maxSize.cx > 0) minMaxInfo->ptMaxTrackSize.x = maxSize.cx;
+					if (maxSize.cy > 0) minMaxInfo->ptMaxTrackSize.y = maxSize.cy;
 				}
 			}
 

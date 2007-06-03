@@ -28,6 +28,8 @@ namespace smooth
 	{
 		class SMOOTHAPI Font
 		{
+			private:
+				static Int	 systemFontSize;
 			protected:
 				String		 fontName;
 				Int		 fontSize;
@@ -71,6 +73,8 @@ namespace smooth
 				Int		 GetColor() const;
 				Int		 GetWeight() const;
 				Int		 GetStyle() const;
+
+				static Int	 GetSystemFontSize();
 
 				Int		 GetLineSizeX(const String &, Int) const;
 				Int		 GetLineSizeY(const String &) const;

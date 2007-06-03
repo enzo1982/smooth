@@ -9,7 +9,11 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/net/protocols/http.h>
+#include <smooth/files/file.h>
+#include <smooth/io/instream.h>
+#include <smooth/io/outstream.h>
 #include <smooth/io/drivers/driver_socket.h>
+#include <smooth/misc/math.h>
 
 #include <time.h>
 
@@ -68,35 +72,38 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 {
 	Bool	 error = False;
 
-	Int	 i, j;
 	String	 server;
 	String	 path;
 	Int	 port = 80;
 
-	for (i = 7; i < url.Length(); i++)
 	{
-		if (url[i] == '/' || url[i] == ':') break;
+		Int	 i, j;
 
-		server[i - 7] = url[i];
-	}
-
-	if (url[i] == ':')
-	{
-		String	 portString;
-
-		for (i = i + 1; i < url.Length(); i++)
+		for (i = 7; i < url.Length(); i++)
 		{
-			if (url[i] == '/') break;
+			if (url[i] == '/' || url[i] == ':') break;
 
-			portString[i - server.Length() - 8] = url[i];
+			server[i - 7] = url[i];
 		}
 
-		port = portString.ToInt();
-	}
+		if (url[i] == ':')
+		{
+			String	 portString;
 
-	for (j = i; j < url.Length(); j++)
-	{
-		path[j - i] = url[j];
+			for (i = i + 1; i < url.Length(); i++)
+			{
+				if (url[i] == '/') break;
+
+				portString[i - server.Length() - 8] = url[i];
+			}
+
+			port = portString.ToInt();
+		}
+
+		for (j = i; j < url.Length(); j++)
+		{
+			path[j - i] = url[j];
+		}
 	}
 
 	IO::Driver	*socket	= new IO::DriverSocket(server, port);
@@ -205,7 +212,7 @@ S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest(const St
 {
 	Bool	 haveFiles = False;
 
-	for (Int i = 0; i < parameters.GetNOfEntries(); i++)
+	for (Int i = 0; i < parameters.Length(); i++)
 	{
 		if (parameters.GetNth(i).isFile) { haveFiles = True; break; }
 	}
@@ -214,7 +221,7 @@ S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest(const St
 	{
 		String	 str = String("GET ").Append(path);
 
-		for (Int i = 0; i < parameters.GetNOfEntries(); i++)
+		for (Int i = 0; i < parameters.Length(); i++)
 		{
 			Parameter	 parameter = parameters.GetNth(i);
 
@@ -241,7 +248,7 @@ S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest(const St
 		{
 			contentType = "application/x-www-form-urlencoded";
 
-			for (Int i = 0; i < parameters.GetNOfEntries(); i++)
+			for (Int i = 0; i < parameters.Length(); i++)
 			{
 				Parameter	 parameter = parameters.GetNth(i);
 
@@ -260,7 +267,7 @@ S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest(const St
 			out->OutputString("Content-Disposition: form-data; name=\"MAX_FILE_SIZE\"\n\n");
 			out->OutputString("1000000\n");
 
-			for (Int i = 0; i < parameters.GetNOfEntries(); i++)
+			for (Int i = 0; i < parameters.Length(); i++)
 			{
 				out->OutputString(String("--").Append(separator).Append("\n"));
 

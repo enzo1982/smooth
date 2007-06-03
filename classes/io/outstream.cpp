@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -135,7 +135,7 @@ S::Bool S::IO::OutStream::Flush()
 	int	 ps		= packageSize;
 	int	 oldcpos	= currentBufferPos;
 
-	if (filters.GetNOfEntries() > 0)
+	if (filters.Length() > 0)
 	{
 		if (filters.GetFirst()->GetPackageSize() > 0)
 		{
@@ -163,7 +163,7 @@ S::Bool S::IO::OutStream::WriteData()
 
 	Int		 encsize = 0;
 
-	if (filters.GetNOfEntries() > 0)
+	if (filters.Length() > 0)
 	{
 		if (filters.GetFirst()->GetPackageSize() == -1)
 		{
@@ -184,7 +184,7 @@ S::Bool S::IO::OutStream::WriteData()
 
 	if (streamType == STREAM_DRIVER)
 	{
-		if (filters.GetNOfEntries() == 0) encsize = driver->WriteData(dataBuffer, packageSize);
+		if (filters.Length() == 0) encsize = driver->WriteData(dataBuffer, packageSize);
 		else				  encsize = filters.GetFirst()->WriteData(dataBuffer, packageSize);
 
 		if (encsize == -1)
@@ -495,7 +495,7 @@ S::Bool S::IO::OutStream::RemoveFilter(Filter *oldFilter)
 
 	Int	 index = -1;
 
-	for (Int i = 0; i < filters.GetNOfEntries(); i++) if (filters.GetNth(i) == oldFilter) index = filters.GetNthIndex(i);
+	for (Int i = 0; i < filters.Length(); i++) if (filters.GetNth(i) == oldFilter) index = filters.GetNthIndex(i);
 
 	if (index == -1) { lastError = IO_ERROR_BADPARAM; return false; }
 
@@ -536,7 +536,7 @@ S::Bool S::IO::OutStream::Close()
 {
 	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
 
-	while (filters.GetNOfEntries() != 0) RemoveFilter(filters.GetLast());
+	while (filters.Length() != 0) RemoveFilter(filters.GetLast());
 
 	Flush();
 

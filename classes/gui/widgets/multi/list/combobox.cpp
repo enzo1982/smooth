@@ -151,10 +151,10 @@ S::Void S::GUI::ComboBox::OpenListBox()
 {
 	if (listBox == NIL)
 	{
-		listBox		= new ListBox(Point(0, 0), Size(GetWidth(), 15 * Math::Min(GetNOfEntries(), 5) + 4));
+		listBox		= new ListBox(Point(0, 0), Size(GetWidth(), 15 * Math::Min(Length(), 5) + 4));
 		listBox->onSelectEntry.Connect(&ComboBox::OnSelectEntry, this);
 
-		toolWindow	= new ToolWindow(GetRealPosition() + Point(0, GetHeight()), Size(GetWidth(), 15 * Math::Min(GetNOfEntries(), 5) + 4));
+		toolWindow	= new ToolWindow(GetRealPosition() + Point(0, GetHeight()), Size(GetWidth(), 15 * Math::Min(Length(), 5) + 4));
 		toolWindow->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
 		listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);

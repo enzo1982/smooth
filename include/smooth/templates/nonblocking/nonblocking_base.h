@@ -19,7 +19,7 @@ namespace smooth
 		public:
 			static Int CleanUp()
 			{
-				for (Int i = 0; i < callers.GetNOfEntries(); i++) delete callers.GetNth(i);
+				for (Int i = 0; i < callers.Length(); i++) delete callers.GetNth(i);
 
 				callers.RemoveAll();
 

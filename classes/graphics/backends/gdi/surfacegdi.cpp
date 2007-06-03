@@ -41,6 +41,8 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iWindow, const Size &maxSize)
 			size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 		}
 
+		rightToLeft.SetSurfaceSize(size);
+
 		HDC	 bmp_dc = CreateCompatibleDC(gdi_dc);
 
 		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
@@ -71,6 +73,8 @@ S::GUI::SurfaceGDI::~SurfaceGDI()
 S::Int S::GUI::SurfaceGDI::SetSize(const Size &nSize)
 {
 	size = nSize;
+
+	rightToLeft.SetSurfaceSize(size);
 
 	if (allocSize.cx >= nSize.cx && allocSize.cy >= nSize.cy) return Success();
 
@@ -125,7 +129,7 @@ S::Int S::GUI::SurfaceGDI::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect	 pRect = TranslateRect(iPRect);
+	Rect	 pRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect));
 	Rect	 oRect = *(cDc_rects.GetLast());
 
 	HDC	 bmp_dc = CreateCompatibleDC(cDc_contexts.GetFirst());
@@ -150,9 +154,9 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 
 	painting--;
 
-	Rect	 iRect = Rect::OverlapRect(*(cDc_rects.GetLast()), *(cDc_rects.GetNth(cDc_rects.GetNOfEntries() - 2)));
+	Rect	 iRect = Rect::OverlapRect(*(cDc_rects.GetLast()), *(cDc_rects.GetNth(cDc_rects.Length() - 2)));
 
-	BitBlt(cDc_contexts.GetNth(cDc_contexts.GetNOfEntries() - 2), iRect.left, iRect.top, iRect.right - iRect.left, iRect.bottom - iRect.top, cDc_contexts.GetLast(), iRect.left, iRect.top, SRCCOPY);
+	BitBlt(cDc_contexts.GetNth(cDc_contexts.Length() - 2), iRect.left, iRect.top, iRect.right - iRect.left, iRect.bottom - iRect.top, cDc_contexts.GetLast(), iRect.left, iRect.top, SRCCOPY);
 
 	if (painting == 0) PaintRect(iRect);
 
@@ -163,9 +167,9 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 
 	delete cDc_rects.GetLast();
 
-	cDc_contexts.Remove(cDc_contexts.GetNthIndex(cDc_contexts.GetNOfEntries() - 1));
-	cDc_bitmaps.Remove(cDc_bitmaps.GetNthIndex(cDc_bitmaps.GetNOfEntries() - 1));
-	cDc_rects.Remove(cDc_rects.GetNthIndex(cDc_rects.GetNOfEntries() - 1));
+	cDc_contexts.Remove(cDc_contexts.GetNthIndex(cDc_contexts.Length() - 1));
+	cDc_bitmaps.Remove(cDc_bitmaps.GetNthIndex(cDc_bitmaps.Length() - 1));
+	cDc_rects.Remove(cDc_rects.GetNthIndex(cDc_rects.Length() - 1));
 
 	return Success();
 }
@@ -183,12 +187,12 @@ S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 	{
 		HDC	 gdi_dc = GetWindowDC(window);
 
-		::SetPixel(gdi_dc, TranslateX(x), TranslateY(y), color);
+		::SetPixel(gdi_dc, rightToLeft.TranslateX(fontSize.TranslateX(x)), rightToLeft.TranslateY(fontSize.TranslateY(y)), color);
 
 		ReleaseDC(window, gdi_dc);
 	}
 
-	::SetPixel(cDc_contexts.GetLast(), TranslateX(x), TranslateY(y), color);
+	::SetPixel(cDc_contexts.GetLast(), rightToLeft.TranslateX(fontSize.TranslateX(x)), rightToLeft.TranslateY(fontSize.TranslateY(y)), color);
 
 	return Success();
 }
@@ -198,7 +202,7 @@ S::Int S::GUI::SurfaceGDI::GetPixel(Int x, Int y) const
 	if (window == NIL) return 0;
 
 	HDC	 gdi_dc = GetWindowDC(window);
-	Int	 pixel = ::GetPixel(gdi_dc, TranslateX(x), TranslateY(y));
+	Int	 pixel = ::GetPixel(gdi_dc, rightToLeft.TranslateX(fontSize.TranslateX(x)), rightToLeft.TranslateY(fontSize.TranslateY(y)));
 
 	ReleaseDC(window, gdi_dc);
 
@@ -209,8 +213,8 @@ S::Int S::GUI::SurfaceGDI::Line(const Point &iPos1, const Point &iPos2, Int colo
 {
 	if (window == NIL) return Success();
 
-	Point	 pos1 = TranslatePoint(iPos1);
-	Point	 pos2 = TranslatePoint(iPos2);
+	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
+	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
 
 	HPEN	 hPen = CreatePen(PS_SOLID, 1, color);
 	HPEN	 hOldPen = NIL;
@@ -245,7 +249,7 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style, const Si
 {
 	if (window == NIL) return Success();
 
-	Rect	 rect = TranslateRect(iRect);
+	Rect	 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
 
 	HDC	 gdi_dc = GetWindowDC(window);
 	HBRUSH	 brush = CreateSolidBrush(color);
@@ -367,8 +371,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
 
-	if (Setup::enableUnicode)	hfont = CreateFontW(-Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
-	else				hfont = CreateFontA(-Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	if (Setup::enableUnicode)	hfont = CreateFontW(-Math::Round(fontSize.TranslateY(font.GetSize()) * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	else				hfont = CreateFontA(-Math::Round(fontSize.TranslateY(font.GetSize()) * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 
 	if (!painting)
 	{
@@ -412,9 +416,9 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			}
 		}
 
-		RECT	 Rect = TranslateRect(rect);
+		RECT	 Rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
 
-		if (rightToLeft) Rect.right--;
+		if (rightToLeft.GetRightToLeft()) Rect.right--;
 
 		if (rtlCharacters && Setup::useIconv)
 		{
@@ -451,27 +455,27 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 			if (!painting)
 			{
-				if (rightToLeft)	SetTextAlign(gdi_dc, TA_RIGHT);
-				else			SetTextAlign(gdi_dc, TA_LEFT);
+				if (rightToLeft.GetRightToLeft()) SetTextAlign(gdi_dc, TA_RIGHT);
+				else				  SetTextAlign(gdi_dc, TA_LEFT);
 			}
 
-			if (rightToLeft)	SetTextAlign(cDc_contexts.GetLast(), TA_RIGHT);
-			else			SetTextAlign(cDc_contexts.GetLast(), TA_LEFT);
+			if (rightToLeft.GetRightToLeft()) SetTextAlign(cDc_contexts.GetLast(), TA_RIGHT);
+			else				  SetTextAlign(cDc_contexts.GetLast(), TA_LEFT);
 
-			if (Setup::enableUnicode)	GetCharacterPlacementW(cDc_contexts.GetLast(), line, line.Length(), 0, &resultsw, 0);
-			else				GetCharacterPlacementA(cDc_contexts.GetLast(), line, line.Length(), 0, &resultsa, 0);
+			if (Setup::enableUnicode) GetCharacterPlacementW(cDc_contexts.GetLast(), line, line.Length(), 0, &resultsw, 0);
+			else			  GetCharacterPlacementA(cDc_contexts.GetLast(), line, line.Length(), 0, &resultsa, 0);
 
-			if (rightToLeft) Rect.left -= 10;
-			else		 Rect.right += 10;
+			if (rightToLeft.GetRightToLeft()) Rect.left -= 10;
+			else				  Rect.right += 10;
 
 			if (!painting)
 			{
-				if (Setup::enableUnicode)	ExtTextOutW(gdi_dc, (rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-				else				ExtTextOutA(gdi_dc, (rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+				if (Setup::enableUnicode) ExtTextOutW(gdi_dc, (rightToLeft.GetRightToLeft() ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
+				else			  ExtTextOutA(gdi_dc, (rightToLeft.GetRightToLeft() ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
 			}
 
-			if (Setup::enableUnicode)	ExtTextOutW(cDc_contexts.GetLast(), (rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-			else				ExtTextOutA(cDc_contexts.GetLast(), (rightToLeft ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+			if (Setup::enableUnicode) ExtTextOutW(cDc_contexts.GetLast(), (rightToLeft.GetRightToLeft() ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
+			else			  ExtTextOutA(cDc_contexts.GetLast(), (rightToLeft.GetRightToLeft() ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
 
 			delete [] glyphs;
 		}
@@ -485,14 +489,14 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			{
 				SetTextAlign(gdi_dc, TA_LEFT);
 
-				if (Setup::enableUnicode)	DrawTextExW(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-				else				DrawTextExA(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+				if (Setup::enableUnicode) DrawTextExW(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+				else			  DrawTextExA(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 			}
 
 			SetTextAlign(cDc_contexts.GetLast(), TA_LEFT);
 
-			if (Setup::enableUnicode)	DrawTextExW(cDc_contexts.GetLast(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-			else				DrawTextExA(cDc_contexts.GetLast(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			if (Setup::enableUnicode) DrawTextExW(cDc_contexts.GetLast(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			else			  DrawTextExA(cDc_contexts.GetLast(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 		}
 
 		rect.top += height;
@@ -513,7 +517,7 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, const Rect &src
 	if (window == NIL) return Success();
 
 	Bitmap	 bitmap	  = oBitmap;
-	Rect	 destRect = TranslateRect(iDestRect);
+	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
 	HDC	 gdi_dc	  = GetWindowDC(window);
 	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup	  = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
@@ -542,7 +546,7 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oBit
 	if (window == NIL) return Success();
 
 	Bitmap	 bitmap	 = oBitmap;
-	Rect	 srcRect = TranslateRect(iSrcRect);
+	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
 	HDC	 gdi_dc	 = GetWindowDC(window);
 	HDC	 cdc	 = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());

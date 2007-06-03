@@ -8,31 +8,31 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "../definitions.h"
+#ifndef _H_OBJSMOOTH_FONTSIZE_
+#define _H_OBJSMOOTH_FONTSIZE_
 
-#ifndef _H_OBJSMOOTH_ERROR_SUCCESS_
-#define _H_OBJSMOOTH_ERROR_SUCCESS_
-
-namespace smooth
-{
-	namespace Errors
-	{
-		class Success;
-	};
-};
-
-#include "error.h"
+#include "../../definitions.h"
+#include "../forms/rect.h"
 
 namespace smooth
 {
-	namespace Errors
+	namespace GUI
 	{
-		class SMOOTHAPI Success : public Error
+		class SMOOTHAPI FontSizeModifier
 		{
+			private:
+				Int		 fontSize;
 			public:
-						 Success()	{ code = 0; }
+						 FontSizeModifier();
+				virtual		~FontSizeModifier();
 
-				virtual String	 ToString() const;
+				Void		 SetFontSize(Int);
+				Int		 GetFontSize() const;
+
+				Int		 TranslateX(Int) const;
+				Int		 TranslateY(Int) const;
+				Point		 TranslatePoint(const Point &) const;
+				Rect		 TranslateRect(const Rect &) const;
 		};
 	};
 };

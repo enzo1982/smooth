@@ -59,7 +59,7 @@ bool CompressPCI(PCIOut out, PCIIO &ior)
 		delete filter;
 	}
 
-	delete lastline;
+	delete [] lastline;
 
 	return true;
 }
@@ -97,7 +97,7 @@ bool DecompressPCI(PCIIn in, PCIIO &ior)
 		delete filter;
 	}
 
-	delete lastline;
+	delete [] lastline;
 
 	return true;
 }
@@ -1051,12 +1051,12 @@ int RotatePaletteEntry(int entry)
 {
 	int col = palette[entry];
 
-	for (int x = entry; x < palentries-1; x++)
+	for (int x = entry; x < palentries - 1; x++)
 	{
-		palette[x] = palette[x+1];
+		palette[x] = palette[x + 1];
 	}
 
-	palette[palentries-1] = col;
+	palette[palentries - 1] = col;
 
 	return 1;
 }
@@ -1077,7 +1077,7 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 	int	 pcirle;
 	int	 allinpal = 0;
 	int	 gallinpal = 0;
-	int	 bits = 0;
+	int	 lbits = 0;
 	int	 mod04 = 0;
 	int	 mod16 = 0;
 	int	 comp = 0;
@@ -1152,19 +1152,19 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 			{
 				if ((palentries-1)-GetPaletteEntry(line[x]) < 18)
 				{
-					bits = GetMinimumBits(palentries-2);
-					if (bits > 4) bits = 4;
-					comp += (bits + 2);
-					if (saa) compsaa -= (bits + 2);
+					lbits = GetMinimumBits(palentries-2);
+					if (lbits > 4) bits = 4;
+					comp += (lbits + 2);
+					if (saa) compsaa -= (lbits + 2);
 				}
 				else
 				{
 					if ((palentries-1)-GetPaletteEntry(line[x]) < 82)
 					{
-						bits = GetMinimumBits(palentries-18);
-						if (bits > 6) bits = 6;
-						comp += (bits + 3);
-						if (saa) compsaa -= (bits + 3);
+						lbits = GetMinimumBits(palentries-18);
+						if (lbits > 6) lbits = 6;
+						comp += (lbits + 3);
+						if (saa) compsaa -= (lbits + 3);
 					}
 					else
 					{

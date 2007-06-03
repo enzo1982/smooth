@@ -28,6 +28,8 @@ S::Int	  S::GUI::Font::Italic		= 2;
 S::Int	  S::GUI::Font::Underline	= 4;
 S::Int	  S::GUI::Font::StrikeOut	= 8;
 
+S::Int	  S::GUI::Font::systemFontSize	= -1;
+
 S::GUI::Font::Font(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, Int iFontColor)
 {
 	fontName   = iFontName;
@@ -134,6 +136,20 @@ S::Int S::GUI::Font::GetWeight() const
 S::Int S::GUI::Font::GetStyle() const
 {
 	return fontStyle;
+}
+
+S::Int S::GUI::Font::GetSystemFontSize()
+{
+	if (systemFontSize != -1) return systemFontSize;
+
+	HDC	 dc = GetWindowDC(0);
+	Int	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
+
+	ReleaseDC(0, dc);
+
+	systemFontSize = dpi;
+
+	return dpi;
 }
 
 S::Int S::GUI::Font::GetTextSizeX(const String &text) const

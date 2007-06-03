@@ -12,6 +12,7 @@
 #define _H_OBJSMOOTH_PROTOCOL_
 
 #include "../../definitions.h"
+#include "../../templates/signals.h"
 
 namespace smooth
 {

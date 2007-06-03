@@ -9,6 +9,11 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/net/protocols/protocol.h>
+#include <smooth/files/file.h>
+#include <smooth/system/system.h>
+#include <smooth/io/instream.h>
+#include <smooth/io/outstream.h>
+#include <smooth/misc/math.h>
 
 S::Array<S::Net::Protocols::Protocol *(*)(const S::String &)>	*S::Net::Protocols::Protocol::protocol_creators = NIL;
 S::Array<S::String>						*S::Net::Protocols::Protocol::protocol_magics = NIL;
@@ -28,7 +33,7 @@ S::Int S::Net::Protocols::Protocol::AddProtocol(Protocol *(*protocol)(const Stri
 
 S::Net::Protocols::Protocol *S::Net::Protocols::Protocol::CreateForURL(const String &url)
 {
-	for (Int i = 0; i < protocol_creators->GetNOfEntries(); i++)
+	for (Int i = 0; i < protocol_creators->Length(); i++)
 	{
 		if (url.StartsWith(protocol_magics->GetNth(i))) return protocol_creators->GetNth(i)(url);
 	}

@@ -156,7 +156,7 @@ S::String::~String()
 
 	if (--nOfStrings == 0)
 	{
-		for (Int i = 0; i < allocatedBuffers.GetNOfEntries(); i++) delete [] allocatedBuffers.GetNth(i);
+		for (Int i = 0; i < allocatedBuffers.Length(); i++) delete [] allocatedBuffers.GetNth(i);
 
 		allocatedBuffers.RemoveAll();
 	}
@@ -190,7 +190,7 @@ S::Void S::String::UnlockBuffers() const
 
 S::Void S::String::DeleteTemporaryBuffers()
 {
-	Int	 nOfEntries = allocatedBuffers.GetNOfEntries();
+	Int	 nOfEntries = allocatedBuffers.Length();
 
 	for (Int i = 0; i < nOfEntries - 512; i++)
 	{
@@ -274,7 +274,7 @@ char *S::String::SetInputFormat(const char *iFormat)
 
 	if (previousInputFormat != NIL)
 	{
-		if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
+		if (allocatedBuffers.Length() >= 1024) DeleteTemporaryBuffers();
 
 		allocatedBuffers.Add(previousInputFormat);
 	}
@@ -294,7 +294,7 @@ char *S::String::SetOutputFormat(const char *oFormat)
 
 	if (previousOutputFormat != NIL)
 	{
-		if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
+		if (allocatedBuffers.Length() >= 1024) DeleteTemporaryBuffers();
 
 		allocatedBuffers.Add(previousOutputFormat);
 	}
@@ -381,7 +381,7 @@ char *S::String::ConvertTo(const char *encoding) const
 		ConvertString((char *) (wchar_t *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize + 1, encoding);
 	}
 
-	if (allocatedBuffers.GetNOfEntries() >= 1024) DeleteTemporaryBuffers();
+	if (allocatedBuffers.Length() >= 1024) DeleteTemporaryBuffers();
 
 	allocatedBuffers.Add(buffer);
 
@@ -632,7 +632,7 @@ S::Int S::String::Length() const
 
 	stringSize = 0;
 
-	for (Int i = 0; i >= 0; i++)
+	for (Int i = 0; True; i++)
 	{
 		stringSize++;
 
@@ -1365,7 +1365,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	{
 		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
 
-		if ((Int) cd == -1) return -1;
+		if (cd == (iconv_t) -1) return -1;
 
 		size_t		 inBytesLeft	= inBytes;
 		size_t		 outBytesLeft	= outBytes;

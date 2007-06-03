@@ -19,11 +19,11 @@ namespace smooth
 	};
 };
 
-#include "../../definitions.h"
-#include "../forms/rect.h"
-#include "../../misc/string.h"
 #include "../font.h"
 #include "../bitmap.h"
+#include "../modifiers/fontsize.h"
+#include "../modifiers/righttoleft.h"
+#include "../../misc/string.h"
 
 namespace smooth
 {
@@ -41,14 +41,10 @@ namespace smooth
 				Size								 size;
 				Rect								 paintRect;
 
-				Bool								 rightToLeft;
-
 				Int								 painting;
 
-				Int								 TranslateX(Int) const;
-				Int								 TranslateY(Int) const;
-				Point								 TranslatePoint(const Point &) const;
-				Rect								 TranslateRect(const Rect &) const;
+				FontSizeModifier						 fontSize;
+				RightToLeftModifier						 rightToLeft;
 			public:
 				static Int							 AddBackend(SurfaceBackend *(*)(Void *, const Size &));
 

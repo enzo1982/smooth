@@ -53,7 +53,7 @@ S::XML::XUL::PopupMenu::PopupMenu(Node *node) : Widget(node)
 
 S::XML::XUL::PopupMenu::~PopupMenu()
 {
-	for (Int i = 0; i < entries.GetNOfEntries(); i++) delete entries.GetNth(i);
+	for (Int i = 0; i < entries.Length(); i++) delete entries.GetNth(i);
 
 	entries.RemoveAll();
 

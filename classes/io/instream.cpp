@@ -138,7 +138,7 @@ S::Bool S::IO::InStream::ReadData()
 
 	if (streamType == STREAM_DRIVER)
 	{
-		if (filters.GetNOfEntries() > 0)
+		if (filters.Length() > 0)
 		{
 			if (filters.GetFirst()->GetPackageSize() > 0)	packageSize = filters.GetFirst()->GetPackageSize();
 			else						packageSize = stdpacksize;
@@ -148,7 +148,7 @@ S::Bool S::IO::InStream::ReadData()
 		size		= origsize;
 		currentFilePos	= origfilepos;
 
-		if (filters.GetNOfEntries() == 0)
+		if (filters.Length() == 0)
 		{
 			dataBuffer.Resize(packageSize);
 
@@ -163,7 +163,7 @@ S::Bool S::IO::InStream::ReadData()
 			else		decsize = filters.GetFirst()->ReadData(dataBuffer, packageSize);
 		}
 
-		if (packageSize <= size-currentFilePos || filters.GetNOfEntries() > 0 || size == -1)
+		if (packageSize <= size-currentFilePos || filters.Length() > 0 || size == -1)
 		{
 			origfilepos = currentFilePos + packageSize;
 
@@ -370,7 +370,7 @@ S::String S::IO::InStream::InputLine()
 
 	backBuffer.Resize(1024);
 
-	for (int j = 0; j >= 0; j++)
+	while (True)
 	{
 		for (int i = 0; i < 1024; i++)
 		{
@@ -468,7 +468,7 @@ S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 
 	if (pbdActive) CompletePBD();
 
-	if (filters.GetNOfEntries() == 0) dataBuffer.Resize(newPackageSize);
+	if (filters.Length() == 0) dataBuffer.Resize(newPackageSize);
 
 	packageSize = newPackageSize;
 	stdpacksize = packageSize;
@@ -511,7 +511,7 @@ S::Bool S::IO::InStream::RemoveFilter(Filter *oldFilter)
 
 	Int	 index = -1;
 
-	for (Int i = 0; i < filters.GetNOfEntries(); i++) if (filters.GetNth(i) == oldFilter) index = filters.GetNthIndex(i);
+	for (Int i = 0; i < filters.Length(); i++) if (filters.GetNth(i) == oldFilter) index = filters.GetNthIndex(i);
 
 	if (index == -1) { lastError = IO_ERROR_BADPARAM; return false; }
 
@@ -532,7 +532,7 @@ S::Bool S::IO::InStream::Close()
 
 	if (pbdActive) CompletePBD();
 
-	while (filters.GetNOfEntries() != 0) RemoveFilter(filters.GetLast());
+	while (filters.Length() != 0) RemoveFilter(filters.GetLast());
 
 	if (crosslinked)
 	{

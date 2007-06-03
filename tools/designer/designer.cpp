@@ -102,7 +102,7 @@ void Designer::Close()
 
 Bool Designer::ExitProc()
 {
-	for (Int i = 0; i < dlgs.GetNOfEntries(); i++)
+	for (Int i = 0; i < dlgs.Length(); i++)
 	{
 		delete dlgs.GetNth(i);
 	}
@@ -157,7 +157,7 @@ void Designer::TimerProc()
 	Designer_EditComponent	*object;
 	Bool			 mouseOnWindow = False;
 
-	for (Int i = 0; i < dlgs.GetNOfEntries(); i++)
+	for (Int i = 0; i < dlgs.Length(); i++)
 	{
 		object = dlgs.GetNth(i);
 

@@ -133,7 +133,7 @@ S::Void *S::GUI::SurfaceXLib::GetSystemSurface() const
 	return (Void *) window;
 }
 
-S::Int S::GUI::SurfaceXLib::SetPixel(Int x, Int y, Int color)
+S::Int S::GUI::SurfaceXLib::SetPixel(Int x, Int y, const Color &color)
 {
 	if (window == NIL) return Success();
 
@@ -151,14 +151,7 @@ S::Int S::GUI::SurfaceXLib::SetPixel(Int x, Int y, Int color)
 	return Success();
 }
 
-S::Int S::GUI::SurfaceXLib::GetPixel(Int x, Int y) const
-{
-	if (window == NIL) return 0;
-
-	return 0;
-}
-
-S::Int S::GUI::SurfaceXLib::Line(const Point &iPos1, const Point &iPos2, Int color)
+S::Int S::GUI::SurfaceXLib::Line(const Point &iPos1, const Point &iPos2, const Color &color)
 {
 	if (window == NIL) return Success();
 
@@ -179,7 +172,7 @@ S::Int S::GUI::SurfaceXLib::Line(const Point &iPos1, const Point &iPos2, Int col
 	return Success();
 }
 
-S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, Int color, Int style, const Size &ellipse)
+S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, const Color &color, Int style, const Size &ellipse)
 {
 	if (window == NIL) return Success();
 

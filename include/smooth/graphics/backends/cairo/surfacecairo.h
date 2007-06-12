@@ -8,38 +8,43 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_SURFACEGDI_
-#define _H_OBJSMOOTH_SURFACEGDI_
+#ifndef _H_OBJSMOOTH_SURFACECAIRO_
+#define _H_OBJSMOOTH_SURFACECAIRO_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SurfaceGDI;
+		class SurfaceCairo;
 	};
 };
 
 #include "../surfacebackend.h"
 
+#include <cairo/cairo.h>
+
 namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 SURFACE_GDI	= 1;
+		const Int	 SURFACE_CAIRO	= 3;
 
-		class SurfaceGDI : public SurfaceBackend
+		class SurfaceCairo : public SurfaceBackend
 		{
 			protected:
 				HWND		 window;
+				HDC		 dc;
 
 				Size		 allocSize;
 
-				Array<HDC>	 cDc_contexts;
-				Array<HBITMAP>	 cDc_bitmaps;
-				Array<Rect *>	 cDc_rects;
+				cairo_surface_t	*surface;
+				cairo_t		*context;
+
+				Int		 CreateContext();
+				Int		 DestroyContext();
 			public:
-						 SurfaceGDI(Void * = NIL, const Size & = Size());
-						~SurfaceGDI();
+						 SurfaceCairo(Void * = NIL, const Size & = Size());
+						~SurfaceCairo();
 
 				Int		 SetSize(const Size &);
 				const Size	&GetSize() const;
@@ -57,6 +62,8 @@ namespace smooth
 				Int		 Box(const Rect &, const Color &, Int, const Size &);
 
 				Int		 SetText(const String &, const Rect &, const Font &, Bool);
+
+				Int		 Gradient(const Rect &, const Color &, const Color &, Int);
 
 				Int		 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
 				Int		 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);

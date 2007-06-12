@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,10 @@
 
 #include <smooth/system/dynamicloader.h>
 #include <smooth/gui/application/application.h>
+
+#ifndef __WIN32__
+#	include <dlfnc.h>
+#endif
 
 const S::Int	 S::System::DynamicLoader::classID = S::Object::RequestClassID();
 
@@ -25,11 +29,11 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 		else				handle = LoadLibraryA(String(module).Append(module.EndsWith(".dll") ? "" : ".dll"));
 	}
 #else
-	handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(".so") ? "" : ".so"), RTLD_FIRST);
+	handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(".so") ? "" : ".so"), RTLD_GLOBAL);
 
 	if (handle == NIL)
 	{
-		handle = dlopen(String(module).Append(module.EndsWith(".so") ? "" : ".so"), RTLD_FIRST);
+		handle = dlopen(String(module).Append(module.EndsWith(".so") ? "" : ".so"), RTLD_GLOBAL);
 	}
 #endif
 }

@@ -40,13 +40,6 @@ void LiSADeinit()
 {
 }
 
-void LiSASleep(int mSeconds)
-{
-	if (mSeconds == 0) return;
-
-	Sleep(mSeconds);
-}
-
 int LiSASetMouseCursor(LiSAWindow *window, int mouseCursor)
 {
 	if (mouseCursor != LiSA_MOUSE_ARROW)	SetClassLongPtrA((HWND) window, GCLP_HCURSOR, (LONG_PTR) NULL);

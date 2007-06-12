@@ -26,9 +26,7 @@
 
 namespace smooth
 {
-	Buffer<char>	 csBuffer;
-
-	Int		 ConvertString(const char *, Int, const char *, char *, Int, const char *);
+	Int	 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
 char			*S::String::inputFormat		= NIL;
@@ -1350,7 +1348,8 @@ S::String S::String::ToUpper() const
 
 S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncoding, char *outBuffer, Int outBytes, const char *outEncoding)
 {
-	Int	 size = 0;
+	static Buffer<char>	 csBuffer;
+	Int			 size = 0;
 
 	if (outBuffer == NIL)
 	{

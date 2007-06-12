@@ -39,6 +39,8 @@ namespace smooth
 				static String	 GetVersionString();
 				static String	 GetAPIVersion();
 
+				static Bool	 Sleep(UnsignedInt);
+
 				static String	 GetWindowsRootDirectory();
 				static String	 GetPersonalFilesDirectory();
 				static String	 GetProgramFilesDirectory();

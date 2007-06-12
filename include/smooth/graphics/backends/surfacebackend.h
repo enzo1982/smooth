@@ -20,6 +20,7 @@ namespace smooth
 };
 
 #include "../font.h"
+#include "../color.h"
 #include "../bitmap.h"
 #include "../modifiers/fontsize.h"
 #include "../modifiers/righttoleft.h"
@@ -67,17 +68,16 @@ namespace smooth
 
 				virtual Void							*GetSystemSurface() const;
 
-				virtual Int							 SetPixel(Int, Int, Int);
-				virtual Int							 GetPixel(Int, Int) const;
+				virtual Int							 SetPixel(Int, Int, const Color &);
 
-				virtual Int							 Line(const Point &, const Point &, Int);
+				virtual Int							 Line(const Point &, const Point &, const Color &);
 				virtual Int							 Frame(const Rect &, Int);
-				virtual Int							 Box(const Rect &, Int, Int, const Size &);
+				virtual Int							 Box(const Rect &, const Color &, Int, const Size &);
 
 				virtual Int							 SetText(const String &, const Rect &, const Font &, Bool);
 
-				Int								 Gradient(const Rect &, Int, Int, Int);
-				Int								 Bar(const Point &, const Point &, Int);
+				virtual Int							 Gradient(const Rect &, const Color &, const Color &, Int);
+				virtual Int							 Bar(const Point &, const Point &, Int);
 
 				virtual Int							 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
 				virtual Int							 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);

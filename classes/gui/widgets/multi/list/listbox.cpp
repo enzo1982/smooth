@@ -12,6 +12,7 @@
 #include <smooth/gui/widgets/basic/scrollbar.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
+#include <smooth/system/system.h>
 
 const S::Int	 S::GUI::ListBox::classID = S::Object::RequestClassID();
 
@@ -116,7 +117,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 						visibleEntries.Append(operat->GetName());
 
-						frame.top = Math::Min((Int) (frame.top + operat->GetHeight()), GetHeight() - 3);
+						frame.top = Math::Min(frame.top + operat->GetHeight(), GetHeight() - 3);
 					}
 					else
 					{
@@ -150,7 +151,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					{
 						visibleEntries.Append(operat->GetName());
 
-						frame.top = Math::Min((Int) (frame.top + operat->GetHeight()), GetHeight() - 3);
+						frame.top = Math::Min(frame.top + operat->GetHeight(), GetHeight() - 3);
 					}
 				}
 			}
@@ -184,7 +185,7 @@ S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 
 		Paint(SP_PAINT);
 
-		if (scrollbarPos != oldSbPos) Sleep(100);
+		if (scrollbarPos != oldSbPos) System::System::Sleep(100);
 	}
 
 	return Success();

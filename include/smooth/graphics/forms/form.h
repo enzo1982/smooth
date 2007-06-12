@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,13 +29,13 @@ namespace smooth
 		class SMOOTHAPI Form
 		{
 			protected:
-				UnsignedLong	 color;
+				Color		 color;
 			public:
 						 Form()				{ color = 0; }
 				virtual		~Form()				{ }
 
-				Int		 SetColor(UnsignedLong nColor)	{ color = nColor; return Success(); }
-				UnsignedLong	 GetColor() const		{ return color; }
+				Int		 SetColor(const Color &nColor)	{ color = nColor; return Success(); }
+				const Color	&GetColor() const		{ return color; }
 
 				virtual Int	 Draw(GUI::Surface *);
 		};

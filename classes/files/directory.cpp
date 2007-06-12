@@ -84,6 +84,7 @@ const S::Array<S::Directory> &S::Directory::GetDirectories() const
 {
 	directories.RemoveAll();
 
+#ifdef __WIN32__
 	HANDLE		 handle;
 	WIN32_FIND_DATAW findDataW;
 	WIN32_FIND_DATAA findDataA;
@@ -110,6 +111,7 @@ const S::Array<S::Directory> &S::Directory::GetDirectories() const
 	}
 
 	FindClose(handle);
+#endif
 
 	return directories;
 }
@@ -118,6 +120,7 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 {
 	files.RemoveAll();
 
+#ifdef __WIN32__
 	HANDLE		 handle;
 	WIN32_FIND_DATAW findDataW;
 	WIN32_FIND_DATAA findDataA;
@@ -144,6 +147,7 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 	}
 
 	FindClose(handle);
+#endif
 
 	return files;
 }
@@ -154,6 +158,7 @@ S::DateTime S::Directory::GetCreateTime() const
 
 	if (!Exists()) return dateTime;
 
+#ifdef __WIN32__
 	HANDLE		 handle;
 	WIN32_FIND_DATAW findDataW;
 	WIN32_FIND_DATAA findDataA;
@@ -170,6 +175,7 @@ S::DateTime S::Directory::GetCreateTime() const
 
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
+#endif
 
 	return dateTime;
 }
@@ -179,6 +185,7 @@ S::Bool S::Directory::Exists() const
 	// Check if root directory of a drive
 	if (dirPath[dirPath.Length() - 1] == ':' && dirName == NIL) return True;
 
+#ifdef __WIN32__
 	HANDLE			 handle;
 	WIN32_FIND_DATAW	 findDataW;
 	WIN32_FIND_DATAA	 findDataA;
@@ -198,6 +205,7 @@ S::Bool S::Directory::Exists() const
 	{
 		if (!(findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return False;
 	}
+#endif
 
 	return True;
 }
@@ -216,8 +224,10 @@ S::Int S::Directory::Create()
 
 			path[i] = 0;
 
+#ifdef __WIN32__
 			if (Setup::enableUnicode)	CreateDirectoryW(path, NIL);
 			else				CreateDirectoryA(path, NIL);
+#endif
 		}
 	}
 
@@ -235,8 +245,10 @@ S::Int S::Directory::Move(const String &destination)
 
 	Bool	 result = False;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)	result = MoveFileW(String(dirPath).Append("\\").Append(dirName), destination);
 	else				result = MoveFileA(String(dirPath).Append("\\").Append(dirName), destination);
+#endif
 
 	if (result == False)	return Error();
 	else			return Success();
@@ -246,8 +258,10 @@ S::Int S::Directory::Delete()
 {
 	Bool	 result = False;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)	result = RemoveDirectoryW(String(*this));
 	else				result = RemoveDirectoryA(String(*this));
+#endif
 
 	if (result == False)	return Error();
 	else			return Success();
@@ -257,9 +271,9 @@ S::Int S::Directory::Empty()
 {
 	Directory	 backupDir = GetActiveDirectory();
 
-	if (Setup::enableUnicode)	SetCurrentDirectoryW(String(*this));
-	else				SetCurrentDirectoryA(String(*this));
+	SetActiveDirectory(*this);
 
+#ifdef __WIN32__
 	WIN32_FIND_DATAW	 findDataW;
 	WIN32_FIND_DATAA	 findDataA;
 	HANDLE			 handle;
@@ -314,9 +328,9 @@ S::Int S::Directory::Empty()
 
 		FindClose(handle);
 	}
+#endif
 
-	if (Setup::enableUnicode)	SetCurrentDirectoryW(String(backupDir));
-	else				SetCurrentDirectoryA(String(backupDir));
+	SetActiveDirectory(backupDir);
 
 	return Success();
 }
@@ -326,8 +340,10 @@ S::Directory S::Directory::GetActiveDirectory()
 	wchar_t	*bufferw = new wchar_t [MAX_PATH];
 	char	*buffera = new char [MAX_PATH];
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)	GetCurrentDirectoryW(MAX_PATH, bufferw);
 	else				GetCurrentDirectoryA(MAX_PATH, buffera);
+#endif
 
 	String	 dir = Setup::enableUnicode ? String(bufferw) : String(buffera);
 
@@ -341,8 +357,10 @@ S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 {
 	Bool	 result = False;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)	result = SetCurrentDirectoryW(String(directory));
 	else				result = SetCurrentDirectoryA(String(directory));
+#endif
 
 	if (result == False)	return Error();
 	else			return Success();

@@ -29,13 +29,6 @@ void LiSADeinit()
 {
 }
 
-void LiSASleep(int mSeconds)
-{
-	if (mSeconds == 0) return;
-
-	usleep(mSeconds * 1000);
-}
-
 int LiSASetMouseCursor(LiSAWindow *window, int mouseCursor)
 {
 	if (mouseCursor == LiSA_MOUSE_ARROW)	return 0;

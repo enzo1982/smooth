@@ -8,6 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include "../../system/system.h"
+
 namespace smooth
 {
 	template <NONBLOCKING_ARGUMENT_LIST NONBLOCKING_CONDITIONAL_COMMA class dummyTYPE = Void> class NONBLOCKING_CALLER_CLASS_NAME : public Caller
@@ -45,7 +47,7 @@ namespace smooth
 				else
 				{
 					while  (thread->GetStatus() != Threads::THREAD_STOPPED &&
-						thread->GetStatus() != Threads::THREAD_STOPPED_SELF) Sleep(10);
+						thread->GetStatus() != Threads::THREAD_STOPPED_SELF) System::System::Sleep(10);
 
 					delete slotN;
 					delete thread;

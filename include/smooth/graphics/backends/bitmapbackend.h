@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -79,10 +79,10 @@ namespace smooth
 
 				virtual Int							 GrayscaleBitmap();
 				virtual Int							 InvertColors();
-				virtual Int							 ReplaceColor(Int, Int);
+				virtual Int							 ReplaceColor(const Color &, const Color &);
 
-				virtual Bool							 SetPixel(Int, Int, UnsignedLong);
-				virtual UnsignedLong						 GetPixel(Int, Int) const;
+				virtual Bool							 SetPixel(Int, Int, const Color &);
+				virtual Color							 GetPixel(Int, Int) const;
 
 				virtual BitmapBackend &operator					 =(const int);
 				virtual BitmapBackend &operator					 =(const BitmapBackend &);

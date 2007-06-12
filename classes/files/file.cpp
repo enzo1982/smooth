@@ -78,6 +78,7 @@ S::Int64 S::File::GetFileSize() const
 {
 	if (!Exists()) return -1;
 
+#ifdef __WIN32__
 	HANDLE	 handle;
 
 	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
@@ -91,30 +92,36 @@ S::Int64 S::File::GetFileSize() const
 	CloseHandle(handle);
 
 	return (Int64(sizeHigh) << 32) + sizeLow;
+#else
+	return 0;
+#endif
 }
 
-S::Int S::File::GetFileTime(FILETIME *cT, FILETIME *aT, FILETIME *wT) const
-{
-	if (!Exists()) return Error();
+#ifdef __WIN32__
+	S::Int S::File::GetFileTime(FILETIME *cT, FILETIME *aT, FILETIME *wT) const
+	{
+		if (!Exists()) return Error();
 
-	HANDLE	 handle;
+		HANDLE	 handle;
 
-	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-	else				handle = CreateFileA(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+		if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+		else				handle = CreateFileA(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
-	::GetFileTime(handle, cT, aT, wT);
+		::GetFileTime(handle, cT, aT, wT);
 
-	CloseHandle(handle);
+		CloseHandle(handle);
 
-	return Success();
-}
+		return Success();
+	}
+#endif
 
 S::DateTime S::File::GetCreationTime() const
 {
+	DateTime	 dateTime;
+
+#ifdef __WIN32__
 	FILETIME	 fileTime;
 	SYSTEMTIME	 time;
-
-	DateTime	 dateTime;
 
 	if (GetFileTime(&fileTime, NIL, NIL) == Error()) return dateTime;
 
@@ -122,16 +129,18 @@ S::DateTime S::File::GetCreationTime() const
 
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
+#endif
 
 	return dateTime;
 }
 
 S::DateTime S::File::GetAccessTime() const
 {
+	DateTime	 dateTime;
+
+#ifdef __WIN32__
 	FILETIME	 fileTime;
 	SYSTEMTIME	 time;
-
-	DateTime	 dateTime;
 
 	if (GetFileTime(NIL, &fileTime, NIL) == Error()) return dateTime;
 
@@ -139,16 +148,18 @@ S::DateTime S::File::GetAccessTime() const
 
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
+#endif
 
 	return dateTime;
 }
 
 S::DateTime S::File::GetWriteTime() const
 {
+	DateTime	 dateTime;
+
+#ifdef __WIN32__
 	FILETIME	 fileTime;
 	SYSTEMTIME	 time;
-
-	DateTime	 dateTime;
 
 	if (GetFileTime(NIL, NIL, &fileTime) == Error()) return dateTime;
 
@@ -156,12 +167,14 @@ S::DateTime S::File::GetWriteTime() const
 
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
+#endif
 
 	return dateTime;
 }
 
 S::Bool S::File::Exists() const
 {
+#ifdef __WIN32__
 	HANDLE	 handle;
 
 	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
@@ -170,6 +183,7 @@ S::Bool S::File::Exists() const
 	if (handle == INVALID_HANDLE_VALUE) return False;
 
 	CloseHandle(handle);
+#endif
 
 	return True;
 }
@@ -178,6 +192,7 @@ S::Int S::File::Create()
 {
 	if (Exists()) return Error();
 
+#ifdef __WIN32__
 	HANDLE	 handle;
 
 	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
@@ -186,6 +201,7 @@ S::Int S::File::Create()
 	if (handle == INVALID_HANDLE_VALUE) return Error();
 
 	CloseHandle(handle);
+#endif
 
 	return Success();
 }
@@ -196,8 +212,10 @@ S::Int S::File::Copy(const String &destination)
 	
 	Bool	 result = False;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)	result = CopyFileW(String(filePath).Append("\\").Append(fileName), destination, True);
 	else				result = CopyFileA(String(filePath).Append("\\").Append(fileName), destination, True);
+#endif
 
 	if (result == False)	return Error();
 	else			return Success();
@@ -209,8 +227,10 @@ S::Int S::File::Move(const String &destination)
 
 	Bool	 result = False;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)	result = MoveFileW(String(filePath).Append("\\").Append(fileName), destination);
 	else				result = MoveFileA(String(filePath).Append("\\").Append(fileName), destination);
+#endif
 
 	if (result == False)	return Error();
 	else			return Success();
@@ -222,8 +242,10 @@ S::Int S::File::Delete()
 
 	Bool	 result = False;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)	result = DeleteFileW(String(filePath).Append("\\").Append(fileName));
 	else				result = DeleteFileA(String(filePath).Append("\\").Append(fileName));
+#endif
 
 	if (result == False)	return Error();
 	else			return Success();

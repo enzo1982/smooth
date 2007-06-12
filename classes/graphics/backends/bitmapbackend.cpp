@@ -254,7 +254,7 @@ S::Int S::GUI::BitmapBackend::InvertColors()
 	return Success();
 }
 
-S::Int S::GUI::BitmapBackend::ReplaceColor(Int color1, Int color2)
+S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &color1, const Color &color2)
 {
 	if (bytes == NIL) return Error();
 
@@ -262,14 +262,14 @@ S::Int S::GUI::BitmapBackend::ReplaceColor(Int color1, Int color2)
 	{
 		for (Int x = 0; x < size.cx; x++)
 		{
-			if (GetPixel(x, y) == (UnsignedInt) color1) SetPixel(x, y, color2);
+			if (GetPixel(x, y) == color1) SetPixel(x, y, color2);
 		}
 	}
 
 	return Success();
 }
 
-S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, UnsignedLong color)
+S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, const Color &color)
 {
 	if (bytes == NIL)			return False;
 	if (y >= size.cy || x >= size.cx)	return False;
@@ -305,13 +305,13 @@ S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, UnsignedLong color)
 	return done;
 }
 
-S::UnsignedLong S::GUI::BitmapBackend::GetPixel(Int x, Int y) const
+S::GUI::Color S::GUI::BitmapBackend::GetPixel(Int x, Int y) const
 {
 	if (bytes == NIL)			return 0;
 	if (y >= size.cy || x >= size.cx)	return 0;
 
 	UnsignedByte	*data = ((UnsignedByte *) bytes);
-	UnsignedLong	 color = 0;
+	Color		 color = 0;
 	Int		 offset = 0;
 
 	switch (depth)

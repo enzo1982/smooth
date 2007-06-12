@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -92,7 +92,7 @@ S::Int S::GUI::Bitmap::InvertColors()
 	return backend->InvertColors();
 }
 
-S::Int S::GUI::Bitmap::ReplaceColor(Int color1, Int color2)
+S::Int S::GUI::Bitmap::ReplaceColor(const Color &color1, const Color &color2)
 {
 	return backend->ReplaceColor(color1, color2);
 }
@@ -111,12 +111,12 @@ S::Int S::GUI::Bitmap::BlitToSurface(const Rect &srcRect, Surface *surface, cons
 	return surface->BlitFromBitmap(*this, srcRect, destRect);
 }
 
-S::Bool S::GUI::Bitmap::SetPixel(Int x, Int y, UnsignedLong color)
+S::Bool S::GUI::Bitmap::SetPixel(Int x, Int y, const Color &color)
 {
 	return backend->SetPixel(x, y, color);
 }
 
-S::UnsignedLong S::GUI::Bitmap::GetPixel(Int x, Int y) const
+S::GUI::Color S::GUI::Bitmap::GetPixel(Int x, Int y) const
 {
 	return backend->GetPixel(x, y);
 }

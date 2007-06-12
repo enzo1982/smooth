@@ -13,6 +13,7 @@
 #include <smooth/gui/widgets/basic/editbox.h>
 #include <smooth/misc/binary.h>
 #include <smooth/misc/math.h>
+#include <smooth/system/system.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 
@@ -820,7 +821,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 		onScroll.Emit(scrollPos, maxScrollPos);
 
-		Sleep(100);
+		System::System::Sleep(100);
 
 		return Success();
 	}

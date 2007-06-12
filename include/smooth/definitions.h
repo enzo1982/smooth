@@ -14,108 +14,90 @@
 #include <lisa.h>
 
 #ifdef __GNUC__
-	#ifndef __int64
-		#define __int64 long long
-	#endif
+#	ifndef __int64
+#		define __int64 long long
+#	endif
 #endif
 
 #if defined __WIN32__
-	#if defined __SMOOTH_DLL__ && !defined WIN32_LEAN_AND_MEAN
-	#define WIN32_LEAN_AND_MEAN
-	#endif
+#	if defined __SMOOTH_DLL__ && !defined WIN32_LEAN_AND_MEAN
+#		define WIN32_LEAN_AND_MEAN
+#	endif
 
-	#include <winsock2.h>
-	#include <windows.h>
-	#include <wchar.h>
+#	include <winsock2.h>
+#	include <windows.h>
+#	include <wchar.h>
 
-	#if defined __SMOOTH_DLL__
-		#define SMOOTHAPI __declspec (dllexport)
-		#define SMOOTHVAR extern __declspec (dllexport)
-	#elif defined __SMOOTH_PLUGIN_DLL__ && defined __SMOOTH_STATIC__
-		#define SMOOTHAPI
-		#define SMOOTHVAR extern
+#	if defined __SMOOTH_DLL__
+#		define SMOOTHAPI __declspec (dllexport)
+#		define SMOOTHVAR extern __declspec (dllexport)
+#	elif defined __SMOOTH_PLUGIN_DLL__ && defined __SMOOTH_STATIC__
+#		define SMOOTHAPI
+#		define SMOOTHVAR extern
 
-		#define SMOOTH_PLUGIN_API __declspec (dllexport)
-		#define SMOOTH_PLUGIN_VAR extern __declspec (dllexport)
+#		define SMOOTH_PLUGIN_API __declspec (dllexport)
+#		define SMOOTH_PLUGIN_VAR extern __declspec (dllexport)
 
-		#define __SMOOTH_DLL__
-	#elif defined __SMOOTH_STATIC__
-		#define SMOOTHAPI
-		#define SMOOTHVAR extern
+#		define __SMOOTH_DLL__
+#	elif defined __SMOOTH_STATIC__
+#		define SMOOTHAPI
+#		define SMOOTHVAR extern
 
-		#define SMOOTH_PLUGIN_API __declspec (dllimport)
-		#define SMOOTH_PLUGIN_VAR __declspec (dllimport)
+#		define SMOOTH_PLUGIN_API __declspec (dllimport)
+#		define SMOOTH_PLUGIN_VAR __declspec (dllimport)
 
-		#define __SMOOTH_DLL__
-	#elif defined __SMOOTH_PLUGIN_DLL__
-		#define SMOOTHAPI __declspec (dllimport)
-		#define SMOOTHVAR __declspec (dllimport)
+#		define __SMOOTH_DLL__
+#	elif defined __SMOOTH_PLUGIN_DLL__
+#		define SMOOTHAPI __declspec (dllimport)
+#		define SMOOTHVAR __declspec (dllimport)
 
-		#define SMOOTH_PLUGIN_API __declspec (dllexport)
-		#define SMOOTH_PLUGIN_VAR extern __declspec (dllexport)
-	#else
-		#define SMOOTHAPI __declspec (dllimport)
-		#define SMOOTHVAR __declspec (dllimport)
+#		define SMOOTH_PLUGIN_API __declspec (dllexport)
+#		define SMOOTH_PLUGIN_VAR extern __declspec (dllexport)
+#	else
+#		define SMOOTHAPI __declspec (dllimport)
+#		define SMOOTHVAR __declspec (dllimport)
 
-		#define SMOOTH_PLUGIN_API __declspec (dllimport)
-		#define SMOOTH_PLUGIN_VAR __declspec (dllimport)
-	#endif
+#		define SMOOTH_PLUGIN_API __declspec (dllimport)
+#		define SMOOTH_PLUGIN_VAR __declspec (dllimport)
+#	endif
 
-	#if !defined WM_MOUSEWHEEL
-		#define WM_MOUSEWHEEL 522
-	#endif
+#	if !defined WM_MOUSEWHEEL
+#		define WM_MOUSEWHEEL 522
+#	endif
 #elif defined __QNX__
-	#include <Ph.h>
-	#include <Pt.h>
-	#include <wchar.h>
+#	include <Ph.h>
+#	include <Pt.h>
+#	include <wchar.h>
 
-	#define SMOOTHAPI
-	#define SMOOTHVAR extern
+#	define SMOOTHAPI
+#	define SMOOTHVAR extern
 
-	#define SMOOTH_PLUGIN_API
-	#define SMOOTH_PLUGIN_VAR extern
+#	define SMOOTH_PLUGIN_API
+#	define SMOOTH_PLUGIN_VAR extern
 
-	#define __declspec(x)
+#	define __declspec(x)
 #else
-	#include <X11/Xlib.h>
-	#include <wchar.h>
-	#include <linux/limits.h>
+#	include <X11/Xlib.h>
+#	include <wchar.h>
+#	include <linux/limits.h>
 
-	#define SMOOTHAPI
-	#define SMOOTHVAR extern
+#	define SMOOTHAPI
+#	define SMOOTHVAR extern
 
-	#define SMOOTH_PLUGIN_API
-	#define SMOOTH_PLUGIN_VAR extern
+#	define SMOOTH_PLUGIN_API
+#	define SMOOTH_PLUGIN_VAR extern
 
-	#undef True
-	#undef False
-	#undef Bool
+#	undef True
+#	undef False
+#	undef Bool
+#	undef Success
 
-	#define __declspec(x)
+#	define __declspec(x)
 
-	#define MAX_PATH PATH_MAX
+#	define MAX_PATH PATH_MAX
 #endif
-
-#if !defined __WIN32__
-#ifndef __WINDOWS_TYPES__
-#define __WINDOWS_TYPES__
 
 #define NIL	(0)
-
-#define PS_SOLID	0
-#define PS_DASH		1
-#define PS_DOT		2
-#define PS_DASHDOT	3
-#define PS_DASHDOTDOT	4
-#define PS_NULL		5
-
-#define RGB(r,g,b) CombineColor(r,g,b)
-#define max(a,b) ((a)>(b)?(a):(b))
-#define min(a,b) ((a)<(b)?(a):(b))
-#endif
-#else
-#define NIL	(0)
-#endif
 
 #define callbacks	public
 #define signals		public

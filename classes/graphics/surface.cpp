@@ -83,7 +83,7 @@ S::Void *S::GUI::Surface::GetSystemSurface() const
 	return backend->GetSystemSurface();
 }
 
-S::Int S::GUI::Surface::SetPixel(Int x, Int y, Int color)
+S::Int S::GUI::Surface::SetPixel(Int x, Int y, const Color &color)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -94,18 +94,7 @@ S::Int S::GUI::Surface::SetPixel(Int x, Int y, Int color)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::GetPixel(Int x, Int y) const
-{
-	if (mutex != NIL) mutex->Lock();
-
-	Int	 rVal = backend->GetPixel(x, y);
-
-	if (mutex != NIL) mutex->Release();
-
-	return rVal;
-}
-
-S::Int S::GUI::Surface::Line(const Point &pos1, const Point &pos2, Int color)
+S::Int S::GUI::Surface::Line(const Point &pos1, const Point &pos2, const Color &color)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -127,7 +116,7 @@ S::Int S::GUI::Surface::Frame(const Rect &rect, Int style)
 	return rVal;
 }
 
-S::Int S::GUI::Surface::Box(const Rect &rect, Int color, Int style, const Size &ellipse)
+S::Int S::GUI::Surface::Box(const Rect &rect, const Color &color, Int style, const Size &ellipse)
 {
 	if (mutex != NIL) mutex->Lock();
 
@@ -149,7 +138,7 @@ S::Int S::GUI::Surface::SetText(const String &string, const Rect &rect, const Fo
 	return rVal;
 }
 
-S::Int S::GUI::Surface::Gradient(const Rect &rect, Int color1, Int color2, Int style)
+S::Int S::GUI::Surface::Gradient(const Rect &rect, const Color &color1, const Color &color2, Int style)
 {
 	if (mutex != NIL) mutex->Lock();
 

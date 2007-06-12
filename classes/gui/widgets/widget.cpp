@@ -578,8 +578,10 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			{
 				UnsignedInt	 scrollLines = 0;
 
+#ifdef __WIN32__
 				if (Setup::enableUnicode)	SystemParametersInfoW(104, NIL, &scrollLines, NIL);
 				else				SystemParametersInfoA(104, NIL, &scrollLines, NIL);
+#endif
 
 				if (scrollLines <= 0) scrollLines = 3;
 

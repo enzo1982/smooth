@@ -107,7 +107,7 @@ S::Int S::GUI::Application::Loop()
 
 	// Wait for started threads to finish.
 
-	while (Threads::Thread::GetNOfRunningThreads() > 0) LiSASleep(10);
+	while (Threads::Thread::GetNOfRunningThreads() > 0) System::System::Sleep(10);
 
 	/* Delete all remaining callers left
 	   from nonblocking function calls.  */

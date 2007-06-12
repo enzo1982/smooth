@@ -80,6 +80,16 @@ $(OBJECTDIR)/file.o: $(FILESCLASSESDIR)/file.cpp $(SMOOTHINCLUDEDIR)/files/file.
 	$(COMPILER) $(COMPILER_OPTS) $(FILESCLASSESDIR)/file.cpp -o $(OBJECTDIR)/file.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/bitmapcairo.o: $(GRAPHICSCLASSESDIR)/backends/cairo/bitmapcairo.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/cairo/bitmapcairo.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/cairo/bitmapcairo.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/cairo/bitmapcairo.cpp -o $(OBJECTDIR)/bitmapcairo.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/surfacecairo.o: $(GRAPHICSCLASSESDIR)/backends/cairo/surfacecairo.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/cairo/surfacecairo.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/cairo/surfacecairo.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/cairo/surfacecairo.cpp -o $(OBJECTDIR)/surfacecairo.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/bitmapgdi.o: $(GRAPHICSCLASSESDIR)/backends/gdi/bitmapgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/gdi/bitmapgdi.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/gdi/bitmapgdi.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/gdi/bitmapgdi.cpp -o $(OBJECTDIR)/bitmapgdi.o
@@ -670,7 +680,7 @@ $(OBJECTDIR)/multimonitor.o: $(SYSTEMCLASSESDIR)/multimonitor.cpp $(SMOOTHINCLUD
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/multimonitor.cpp -o $(OBJECTDIR)/multimonitor.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/system.o: $(SYSTEMCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system/system.h
+$(OBJECTDIR)/system.o: $(SYSTEMCLASSESDIR)/system.cpp $(SMOOTHINCLUDEDIR)/system/system.h $(SMOOTHINCLUDEDIR)/version.h
 	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/system.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/system.cpp -o $(OBJECTDIR)/system.o
 	$(ECHO) done.

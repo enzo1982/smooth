@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -57,13 +57,13 @@ namespace smooth
 
 				Int			 GrayscaleBitmap();
 				Int			 InvertColors();
-				Int			 ReplaceColor(Int, Int);
+				Int			 ReplaceColor(const Color &, const Color &);
 
 				Int			 BlitFromSurface(Surface *, const Rect &, const Rect &);
 				Int			 BlitToSurface(const Rect &, Surface *, const Rect &);
 
-				Bool			 SetPixel(Int, Int, UnsignedLong);
-				UnsignedLong		 GetPixel(Int, Int) const;
+				Bool			 SetPixel(Int, Int, const Color &);
+				Color			 GetPixel(Int, Int) const;
 
 				Bitmap &operator	 =(const int);
 				Bitmap &operator	 =(const Bitmap &);

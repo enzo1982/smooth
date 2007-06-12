@@ -78,7 +78,9 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 
 S::Void S::GUI::Hyperlink::OnMouseOver()
 {
+#ifdef __WIN32__
 	LiSASetMouseCursor((HWND) container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_HAND);
+#endif
 
 	if (linkBitmap == NIL)
 	{
@@ -94,7 +96,9 @@ S::Void S::GUI::Hyperlink::OnMouseOver()
 
 S::Void S::GUI::Hyperlink::OnMouseOut()
 {
+#ifdef __WIN32__
 	LiSASetMouseCursor((HWND) container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
+#endif
 
 	if (linkBitmap == NIL)
 	{

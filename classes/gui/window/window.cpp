@@ -10,6 +10,7 @@
 
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/window/backends/windowbackend.h>
+#include <smooth/backends/win32/backendwin32.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/widgets/basic/statusbar.h>
@@ -24,7 +25,6 @@
 #include <smooth/resources.h>
 #include <smooth/misc/binary.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/backends/win32/backendwin32.h>
 #include <smooth/system/event.h>
 #include <smooth/system/multimonitor.h>
 
@@ -50,7 +50,10 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 	if (title != NIL)	text = title;
 	else			text = "smooth Application";
 
+#ifdef __WIN32__
 	frameWidth = GetSystemMetrics(SM_CXFRAME);
+#endif
+
 	updateRect = Rect(Point(-1, -1), Size(0, 0));
 
 	icon = NIL;
@@ -763,7 +766,7 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	Rect	 workArea = System::MultiMonitor::GetVirtualScreenMetrics();
 
-	if (message == SP_UPDATE				&&
+/*	if (message == SP_UPDATE				&&
 	    GetPosition().x		   > workArea.left - 2	&&
 	    GetPosition().y		   > workArea.top - 2	&&
 	    GetPosition().x + GetSize().cx < workArea.right + 2	&&
@@ -772,7 +775,7 @@ S::Int S::GUI::Window::Paint(Int message)
 		surface->PaintRect(updateRect);
 	}
 	else
-	{
+*/	{
 		Bool	 preRTL = IsRightToLeft();
 
 		surface->SetRightToLeft(False);

@@ -12,6 +12,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
+#include <smooth/misc/math.h>
 
 #if defined __WIN32__ && defined __SMOOTH_STATIC__
 	#include <smooth/graphics/backends/gdi/surfacegdi.h>
@@ -120,17 +121,12 @@ S::Void *S::GUI::SurfaceBackend::GetSystemSurface() const
 	return NIL;
 }
 
-S::Int S::GUI::SurfaceBackend::SetPixel(Int x, Int y, Int color)
+S::Int S::GUI::SurfaceBackend::SetPixel(Int x, Int y, const Color &color)
 {
 	return Success();
 }
 
-S::Int S::GUI::SurfaceBackend::GetPixel(Int x, Int y) const
-{
-	return 0;
-}
-
-S::Int S::GUI::SurfaceBackend::Line(const Point &pos1, const Point &pos2, Int color)
+S::Int S::GUI::SurfaceBackend::Line(const Point &pos1, const Point &pos2, const Color &color)
 {
 	return Success();
 }
@@ -150,13 +146,13 @@ S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Int style)
 	switch (style)
 	{
 		case FRAME_UP:
-			color1 = RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255));
-			color2 = RGB(max(Setup::BackgroundColor.GetRed() - 64, 0), max(Setup::BackgroundColor.GetGreen() - 64, 0), max(Setup::BackgroundColor.GetBlue() - 64, 0));
+			color1 = Color(Math::Min(Setup::BackgroundColor.GetRed() + 64, 255), Math::Min(Setup::BackgroundColor.GetGreen() + 64, 255), Math::Min(Setup::BackgroundColor.GetBlue() + 64, 255));
+			color2 = Color(Math::Max(Setup::BackgroundColor.GetRed() - 64, 0), Math::Max(Setup::BackgroundColor.GetGreen() - 64, 0), Math::Max(Setup::BackgroundColor.GetBlue() - 64, 0));
 
 			break;
 		case FRAME_DOWN:
-			color1 = RGB(max(Setup::BackgroundColor.GetRed() - 64, 0), max(Setup::BackgroundColor.GetGreen() - 64, 0), max(Setup::BackgroundColor.GetBlue() - 64, 0));
-			color2 = RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255));
+			color1 = Color(Math::Max(Setup::BackgroundColor.GetRed() - 64, 0), Math::Max(Setup::BackgroundColor.GetGreen() - 64, 0), Math::Max(Setup::BackgroundColor.GetBlue() - 64, 0));
+			color2 = Color(Math::Min(Setup::BackgroundColor.GetRed() + 64, 255), Math::Min(Setup::BackgroundColor.GetGreen() + 64, 255), Math::Min(Setup::BackgroundColor.GetBlue() + 64, 255));
 
 			break;
 	}
@@ -177,7 +173,7 @@ S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Int style)
 	return Success();
 }
 
-S::Int S::GUI::SurfaceBackend::Box(const Rect &rect, Int color, Int style, const Size &ellipse)
+S::Int S::GUI::SurfaceBackend::Box(const Rect &rect, const Color &color, Int style, const Size &ellipse)
 {
 	return Success();
 }
@@ -204,14 +200,14 @@ S::Int S::GUI::SurfaceBackend::SetText(const String &string, const Rect &iRect, 
 	return Success();
 }
 
-S::Int S::GUI::SurfaceBackend::Gradient(const Rect &rect, Int color1, Int color2, Int style)
+S::Int S::GUI::SurfaceBackend::Gradient(const Rect &rect, const Color &color1, const Color &color2, Int style)
 {
-	Float	 red1	= Color(color1).GetRed();
-	Float	 green1	= Color(color1).GetGreen();
-	Float	 blue1	= Color(color1).GetBlue();
-	Float	 red2	= Color(color2).GetRed();
-	Float	 green2	= Color(color2).GetGreen();
-	Float	 blue2	= Color(color2).GetBlue();
+	Float	 red1	= color1.GetRed();
+	Float	 green1	= color1.GetGreen();
+	Float	 blue1	= color1.GetBlue();
+	Float	 red2	= color2.GetRed();
+	Float	 green2	= color2.GetGreen();
+	Float	 blue2	= color2.GetBlue();
 	Int	 xmax	= rect.right - rect.left;
 	Int	 ymax	= rect.bottom - rect.top;
 	Bitmap	 bmp(rect.right - rect.left, rect.bottom - rect.top, 24);
@@ -296,18 +292,18 @@ S::Int S::GUI::SurfaceBackend::Bar(const Point &iP1, const Point &iP2, Int orien
 
 	if (orientation == OR_HORZ)
 	{
-		Line(p1, p2, RGB(max(Setup::BackgroundColor.GetRed() - 64, 0), max(Setup::BackgroundColor.GetGreen() - 64, 0), max(Setup::BackgroundColor.GetBlue() - 64, 0)));
+		Line(p1, p2, Color(Math::Max(Setup::BackgroundColor.GetRed() - 64, 0), Math::Max(Setup::BackgroundColor.GetGreen() - 64, 0), Math::Max(Setup::BackgroundColor.GetBlue() - 64, 0)));
 		p1.y++;
 		p2.y++;
-		Line(p1, p2, RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255)));
+		Line(p1, p2, Color(Math::Min(Setup::BackgroundColor.GetRed() + 64, 255), Math::Min(Setup::BackgroundColor.GetGreen() + 64, 255), Math::Min(Setup::BackgroundColor.GetBlue() + 64, 255)));
 	}
 	else if (orientation == OR_VERT)
 	{
 		p2.y++;
-		Line(p1, p2, RGB(max(Setup::BackgroundColor.GetRed() - 64, 0), max(Setup::BackgroundColor.GetGreen() - 64, 0), max(Setup::BackgroundColor.GetBlue() - 64, 0)));
+		Line(p1, p2, Color(Math::Max(Setup::BackgroundColor.GetRed() - 64, 0), Math::Max(Setup::BackgroundColor.GetGreen() - 64, 0), Math::Max(Setup::BackgroundColor.GetBlue() - 64, 0)));
 		p1.x++;
 		p2.x++;
-		Line(p1, p2, RGB(min(Setup::BackgroundColor.GetRed() + 64, 255), min(Setup::BackgroundColor.GetGreen() + 64, 255), min(Setup::BackgroundColor.GetBlue() + 64, 255)));
+		Line(p1, p2, Color(Math::Min(Setup::BackgroundColor.GetRed() + 64, 255), Math::Min(Setup::BackgroundColor.GetGreen() + 64, 255), Math::Min(Setup::BackgroundColor.GetBlue() + 64, 255)));
 	}
 
 	rightToLeft.SetRightToLeft(preRTL);

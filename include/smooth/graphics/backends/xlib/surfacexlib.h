@@ -47,11 +47,10 @@ namespace smooth
 
 				Void	*GetSystemSurface() const;
 
-				Int	 SetPixel(Int, Int, Int);
-				Int	 GetPixel(Int, Int) const;
+				Int	 SetPixel(Int, Int, const Color &);
 
-				Int	 Line(const Point &, const Point &, Int);
-				Int	 Box(const Rect &, Int, Int, const Size &);
+				Int	 Line(const Point &, const Point &, const Color &);
+				Int	 Box(const Rect &, const Color &, Int, const Size &);
 
 				Int	 SetText(const String &, const Rect &, const Font &, Bool);
 

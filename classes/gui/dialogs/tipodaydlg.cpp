@@ -78,7 +78,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 
 	Bitmap	 bmp = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_LIGHT), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
 
-	bmp.ReplaceColor(RGB(192, 192, 192), Setup::BackgroundColor);
+	bmp.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
 	img_light	= new Image(bmp, pos, Size(32, 32));
 

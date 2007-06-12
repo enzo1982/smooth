@@ -38,8 +38,22 @@ S::String S::System::System::GetAPIVersion()
 	return SMOOTH_APIVERSION;
 }
 
+S::Bool S::System::System::Sleep(UnsignedInt mSeconds)
+{
+	if (mSeconds == 0) return True;
+
+#ifdef __WIN32__
+	::Sleep(mSeconds);
+#else
+	usleep(mSeconds * 1000);
+#endif
+
+	return True;
+}
+
 S::String S::System::System::GetWindowsRootDirectory()
 {
+#ifdef __WIN32__
 	String		 windowsDir;
 
 	if (Setup::enableUnicode)
@@ -66,10 +80,14 @@ S::String S::System::System::GetWindowsRootDirectory()
 	if (windowsDir[windowsDir.Length() - 1] != '\\') windowsDir.Append("\\");
 
 	return windowsDir;
+#else
+	return "";
+#endif
 }
 
 S::String S::System::System::GetProgramFilesDirectory()
 {
+#ifdef __WIN32__
 	String	 programsDir;
 	HKEY	 currentVersion;
 
@@ -120,10 +138,14 @@ S::String S::System::System::GetProgramFilesDirectory()
 	if (programsDir[programsDir.Length() - 1] != '\\') programsDir.Append("\\");
 
 	return programsDir;
+#else
+	return "";
+#endif
 }
 
 S::String S::System::System::GetApplicationDataDirectory()
 {
+#ifdef __WIN32__
 	String		 configDir;
 	ITEMIDLIST	*idlist;
 
@@ -156,10 +178,14 @@ S::String S::System::System::GetApplicationDataDirectory()
 	if (configDir == "\\") configDir = "";
 
 	return configDir;
+#else
+	return "~";
+#endif
 }
 
 S::String S::System::System::GetPersonalFilesDirectory()
 {
+#ifdef __WIN32__
 	String		 personalDir;
 	ITEMIDLIST	*idlist;
 
@@ -192,10 +218,14 @@ S::String S::System::System::GetPersonalFilesDirectory()
 	if (personalDir == "\\") personalDir = "C:\\";
 
 	return personalDir;
+#else
+	return "~";
+#endif
 }
 
 S::String S::System::System::GetTempDirectory()
 {
+#ifdef __WIN32__
 	// We need to use the ANSI version of GetTempPath, because
 	// the Unicode version is not compatible with MSLU.
 
@@ -211,4 +241,7 @@ S::String S::System::System::GetTempDirectory()
 	if (tempDir[tempDir.Length() - 1] != '\\') tempDir.Append("\\");
 
 	return tempDir;
+#else
+	return "/var/tmp";
+#endif
 }

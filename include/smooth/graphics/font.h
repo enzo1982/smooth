@@ -20,6 +20,7 @@ namespace smooth
 };
 
 #include "../definitions.h"
+#include "color.h"
 #include "../i18n/i18n.h"
 
 namespace smooth
@@ -33,7 +34,7 @@ namespace smooth
 			protected:
 				String		 fontName;
 				Int		 fontSize;
-				Int		 fontColor;
+				Color		 fontColor;
 				Int		 fontWeight;
 				Int		 fontStyle;
 			constants:
@@ -54,7 +55,7 @@ namespace smooth
 				static Int	 Underline;
 				static Int	 StrikeOut;
 			public:
-						 Font(const String & = Font::Default, Int = Font::DefaultSize, Int = Font::Normal, Int = Font::Normal, Int = 0);
+						 Font(const String & = Font::Default, Int = Font::DefaultSize, Int = Font::Normal, Int = Font::Normal, const Color & = Color());
 						 Font(const Font &);
 				virtual		~Font();
 
@@ -64,13 +65,13 @@ namespace smooth
 
 				Int		 SetName(const String &);
 				Int		 SetSize(Int);
-				Int		 SetColor(Int);
+				Int		 SetColor(const Color &);
 				Int		 SetWeight(Int);
 				Int		 SetStyle(Int);
 
 				const String	&GetName() const;
 				Int		 GetSize() const;
-				Int		 GetColor() const;
+				const Color	&GetColor() const;
 				Int		 GetWeight() const;
 				Int		 GetStyle() const;
 

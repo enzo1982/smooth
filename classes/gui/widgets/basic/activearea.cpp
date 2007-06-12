@@ -68,7 +68,7 @@ S::Int S::GUI::ActiveArea::SetColor(const Color &nColor)
 	return Success();
 }
 
-S::GUI::Color S::GUI::ActiveArea::GetColor()
+const S::GUI::Color &S::GUI::ActiveArea::GetColor() const
 {
 	return areaColor;
 }

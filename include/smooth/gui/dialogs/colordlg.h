@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,7 +41,7 @@ namespace smooth
 			class SMOOTHAPI ColorSelection : public Dialog
 			{
 				private:
-					Int		 color;
+					Color		 color;
 
 					Int		 yoffset;
 					Int		 huexoffset;
@@ -129,8 +129,8 @@ namespace smooth
 
 					const Error	&ShowDialog();
 				accessors:
-					Int		 GetColor();
-					Int		 SetColor(Int);
+					Int		 SetColor(const Color &);
+					const Color	&GetColor() const;
 			};
 		};
 	};

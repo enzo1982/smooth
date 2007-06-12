@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -913,93 +913,98 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 	switch (parts)
 	{
 		case 1:
-			gray = (pixb1+prevline[x])/2;
+			gray = (pixb1 + prevline[x]) / 2;
 
 			if (in->InputNumberPBD(1) == 1)
 			{
-				bias = in->InputNumberPBD(3)+1;
+				bias = in->InputNumberPBD(3) + 1;
 			}
 			else
 			{
-				bias = 0-in->InputNumberPBD(3);
+				bias = 0 - in->InputNumberPBD(3);
 			}
 
-			return gray+bias;
+			return gray + bias;
 		case 3:
-			red = (Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
-			green = (Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
-			blue = (Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
+			red = (Color(pixb1).GetRed() + Color(prevline[x]).GetRed()) / 2;
+			green = (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
+			blue = (Color(pixb1).GetBlue() + Color(prevline[x]).GetBlue()) / 2;
 
 			md = in->InputNumberPBD(2) + 2;
 
 			if (in->InputNumberPBD(1) == 1)
 			{
-				redbias = in->InputNumberPBD(md)+1;
+				redbias = in->InputNumberPBD(md) + 1;
 			}
 			else
 			{
-				redbias = 0-in->InputNumberPBD(md);
-			}
-			if (in->InputNumberPBD(1) == 1)
-			{
-				greenbias = in->InputNumberPBD(md)+1;
-			}
-			else
-			{
-				greenbias = 0-in->InputNumberPBD(md);
-			}
-			if (in->InputNumberPBD(1) == 1)
-			{
-				bluebias = in->InputNumberPBD(md)+1;
-			}
-			else
-			{
-				bluebias = 0-in->InputNumberPBD(md);
+				redbias = 0 - in->InputNumberPBD(md);
 			}
 
-			return RGB(red+redbias, green+greenbias, blue+bluebias);
+			if (in->InputNumberPBD(1) == 1)
+			{
+				greenbias = in->InputNumberPBD(md) + 1;
+			}
+			else
+			{
+				greenbias = 0 - in->InputNumberPBD(md);
+			}
+
+			if (in->InputNumberPBD(1) == 1)
+			{
+				bluebias = in->InputNumberPBD(md) + 1;
+			}
+			else
+			{
+				bluebias = 0 - in->InputNumberPBD(md);
+			}
+
+			return Color(red + redbias, green + greenbias, blue + bluebias);
 		case 4:
-			red = (Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
-			green = (Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
-			blue = (Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
-			alpha = (Color(pixb1).GetAlpha()+Color(prevline[x]).GetAlpha())/2;
+			red = (Color(pixb1).GetRed() + Color(prevline[x]).GetRed()) / 2;
+			green = (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
+			blue = (Color(pixb1).GetBlue() + Color(prevline[x]).GetBlue()) / 2;
+			alpha = (Color(pixb1).GetAlpha() + Color(prevline[x]).GetAlpha()) / 2;
 
 			md = in->InputNumberPBD(2) + 2;
 
 			if (in->InputNumberPBD(1) == 1)
 			{
-				redbias = in->InputNumberPBD(md)+1;
+				redbias = in->InputNumberPBD(md) + 1;
 			}
 			else
 			{
-				redbias = 0-in->InputNumberPBD(md);
-			}
-			if (in->InputNumberPBD(1) == 1)
-			{
-				greenbias = in->InputNumberPBD(md)+1;
-			}
-			else
-			{
-				greenbias = 0-in->InputNumberPBD(md);
-			}
-			if (in->InputNumberPBD(1) == 1)
-			{
-				bluebias = in->InputNumberPBD(md)+1;
-			}
-			else
-			{
-				bluebias = 0-in->InputNumberPBD(md);
-			}
-			if (in->InputNumberPBD(1) == 1)
-			{
-				alphabias = in->InputNumberPBD(md)+1;
-			}
-			else
-			{
-				alphabias = 0-in->InputNumberPBD(md);
+				redbias = 0 - in->InputNumberPBD(md);
 			}
 
-			return Color(red+redbias, green+greenbias, blue+bluebias, alpha+alphabias);
+			if (in->InputNumberPBD(1) == 1)
+			{
+				greenbias = in->InputNumberPBD(md) + 1;
+			}
+			else
+			{
+				greenbias = 0 - in->InputNumberPBD(md);
+			}
+
+			if (in->InputNumberPBD(1) == 1)
+			{
+				bluebias = in->InputNumberPBD(md) + 1;
+			}
+			else
+			{
+				bluebias = 0 - in->InputNumberPBD(md);
+			}
+
+			if (in->InputNumberPBD(1) == 1)
+			{
+				alphabias = in->InputNumberPBD(md) + 1;
+			}
+			else
+			{
+				alphabias = 0 - in->InputNumberPBD(md);
+			}
+
+			return Color(red + redbias, green + greenbias, blue + bluebias, alpha + alphabias);
 	}
 
 	return 1;
@@ -1007,7 +1012,7 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 
 int GetMinimumBits(int number)
 {
-	for (int i = 0; i <= 32; i++)
+	for (Int i = 0; i <= 32; i++)
 	{
 		if (number < Math::Pow(2l, i)) return i;
 	} 

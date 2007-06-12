@@ -30,7 +30,7 @@ S::Int	  S::GUI::Font::StrikeOut	= 8;
 
 S::Int	  S::GUI::Font::systemFontSize	= -1;
 
-S::GUI::Font::Font(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, Int iFontColor)
+S::GUI::Font::Font(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, const Color &iFontColor)
 {
 	fontName   = iFontName;
 	fontSize   = iFontSize;
@@ -92,7 +92,7 @@ S::Int S::GUI::Font::SetSize(Int newFontSize)
 	return Success();
 }
 
-S::Int S::GUI::Font::SetColor(Int newFontColor)
+S::Int S::GUI::Font::SetColor(const Color &newFontColor)
 {
 	fontColor = newFontColor;
 
@@ -123,7 +123,7 @@ S::Int S::GUI::Font::GetSize() const
 	return fontSize;
 }
 
-S::Int S::GUI::Font::GetColor() const
+const S::GUI::Color &S::GUI::Font::GetColor() const
 {
 	return fontColor;
 }
@@ -142,6 +142,7 @@ S::Int S::GUI::Font::GetSystemFontSize()
 {
 	if (systemFontSize != -1) return systemFontSize;
 
+#ifdef __WIN32__
 	HDC	 dc = GetWindowDC(0);
 	Int	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
 
@@ -150,6 +151,9 @@ S::Int S::GUI::Font::GetSystemFontSize()
 	systemFontSize = dpi;
 
 	return dpi;
+#else
+	return 96;
+#endif
 }
 
 S::Int S::GUI::Font::GetTextSizeX(const String &text) const
@@ -209,12 +213,11 @@ S::Int S::GUI::Font::GetLineSizeX(const String &text, Int nOfChars) const
 
 #ifdef __WIN32__
 	HDC	 dc	= CreateCompatibleDC(NIL);
-	Int	 size	= -Math::Round(fontSize * 128.0 / GetDeviceCaps(dc, LOGPIXELSY));
 	HFONT	 hFont;
 	HFONT	 hOldFont;
 
-	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
-	else				hFont = CreateFontA(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	if (Setup::enableUnicode)	hFont = CreateFontW(-Math::Round(fontSize * 96.0 / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	else				hFont = CreateFontA(-Math::Round(fontSize * 96.0 / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
 
 	hOldFont = (HFONT) SelectObject(dc, hFont);
 
@@ -254,14 +257,12 @@ S::Int S::GUI::Font::GetLineSizeY(const String &text) const
 	if (text == NIL) return 0;
 
 #ifdef __WIN32__
-	HDC	 ddc	= GetWindowDC(0);
-	HDC	 cdc	= CreateCompatibleDC(ddc);
-	Int	 size	= -Math::Round(fontSize * 128.0 / GetDeviceCaps(cdc, LOGPIXELSY));
+	HDC	 cdc	= CreateCompatibleDC(NIL);
 	HFONT	 hFont;
 	HFONT	 hOldFont;
 
-	if (Setup::enableUnicode)	hFont = CreateFontW(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
-	else				hFont = CreateFontA(size, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	if (Setup::enableUnicode)	hFont = CreateFontW(-Math::Round(fontSize * 96.0 / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	else				hFont = CreateFontA(-Math::Round(fontSize * 96.0 / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
 
 	hOldFont = (HFONT) SelectObject(cdc, hFont);
 
@@ -274,7 +275,6 @@ S::Int S::GUI::Font::GetLineSizeY(const String &text) const
 	::DeleteObject(hFont);
 
 	DeleteDC(cdc);
-	ReleaseDC(0, ddc);
 
 	return tSize.cy - 1;
 #else

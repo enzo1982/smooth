@@ -179,7 +179,7 @@ S::Void *S::GUI::SurfaceGDI::GetSystemSurface() const
 	return (Void *) window;
 }
 
-S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
+S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, const Color &color)
 {
 	if (window == NIL) return Success();
 
@@ -197,19 +197,7 @@ S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, Int color)
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDI::GetPixel(Int x, Int y) const
-{
-	if (window == NIL) return 0;
-
-	HDC	 gdi_dc = GetWindowDC(window);
-	Int	 pixel = ::GetPixel(gdi_dc, rightToLeft.TranslateX(fontSize.TranslateX(x)), rightToLeft.TranslateY(fontSize.TranslateY(y)));
-
-	ReleaseDC(window, gdi_dc);
-
-	return pixel;
-}
-
-S::Int S::GUI::SurfaceGDI::Line(const Point &iPos1, const Point &iPos2, Int color)
+S::Int S::GUI::SurfaceGDI::Line(const Point &iPos1, const Point &iPos2, const Color &color)
 {
 	if (window == NIL) return Success();
 
@@ -245,7 +233,7 @@ S::Int S::GUI::SurfaceGDI::Line(const Point &iPos1, const Point &iPos2, Int colo
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, Int color, Int style, const Size &ellipse)
+S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style, const Size &ellipse)
 {
 	if (window == NIL) return Success();
 
@@ -371,8 +359,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
 
-	if (Setup::enableUnicode)	hfont = CreateFontW(-Math::Round(fontSize.TranslateY(font.GetSize()) * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
-	else				hfont = CreateFontA(-Math::Round(fontSize.TranslateY(font.GetSize()) * 128.0 / GetDeviceCaps(gdi_dc, LOGPIXELSY)), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	if (Setup::enableUnicode)	hfont = CreateFontW(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	else				hfont = CreateFontA(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 
 	if (!painting)
 	{

@@ -91,6 +91,7 @@ S::String S::GUI::Shortcut::ToString() const
 {
 	String	 keyString;
 
+#ifdef __WIN32__
 	if (key >= VK_F1 && key <= VK_F24)	keyString = String("F").Append(String::FromInt(1 + (key - VK_F1)));
 	else if (key >= '0'  && key <= '9')	keyString[0] = key;
 	else if (key >= 'A'  && key <= 'Z')	keyString[0] = key;
@@ -109,6 +110,7 @@ S::String S::GUI::Shortcut::ToString() const
 	else if (key == VK_DOWN)		keyString = I18n::Translator::defaultTranslator->TranslateString("Down");
 	else if (key == VK_INSERT)		keyString = I18n::Translator::defaultTranslator->TranslateString("Ins");
 	else if (key == VK_DELETE)		keyString = I18n::Translator::defaultTranslator->TranslateString("Del");
+#endif
 
 	return	(Binary::IsFlagSet(flags, SC_CTRL) ? String(I18n::Translator::defaultTranslator->TranslateString("Ctrl")).Append("+") : String())
          .Append(Binary::IsFlagSet(flags, SC_ALT) ? String(I18n::Translator::defaultTranslator->TranslateString("Alt")).Append("+") : String())

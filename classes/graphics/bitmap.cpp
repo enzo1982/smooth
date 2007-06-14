@@ -111,14 +111,14 @@ S::Int S::GUI::Bitmap::BlitToSurface(const Rect &srcRect, Surface *surface, cons
 	return surface->BlitFromBitmap(*this, srcRect, destRect);
 }
 
-S::Bool S::GUI::Bitmap::SetPixel(Int x, Int y, const Color &color)
+S::Bool S::GUI::Bitmap::SetPixel(const Point &point, const Color &color)
 {
-	return backend->SetPixel(x, y, color);
+	return backend->SetPixel(point, color);
 }
 
-S::GUI::Color S::GUI::Bitmap::GetPixel(Int x, Int y) const
+S::GUI::Color S::GUI::Bitmap::GetPixel(const Point &point) const
 {
-	return backend->GetPixel(x, y);
+	return backend->GetPixel(point);
 }
 
 S::GUI::Bitmap &S::GUI::Bitmap::operator =(const int nil)

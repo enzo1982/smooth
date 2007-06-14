@@ -90,7 +90,7 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 
 			Language	*lang = languages.GetNth(i);
 
-			for (Int j = 0; j < (Int) Math::Max(iLang->name.Length(), lang->name.Length()); j++)
+			for (Int j = 0; j < Math::Max(iLang->name.Length(), lang->name.Length()); j++)
 			{
 				if (iLang->name[j] < lang->name[j])
 				{
@@ -327,7 +327,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 	{
 		Language	*lang = languages.GetNth(j);
 
-		for (Int k = 0; k < max(language->name.Length(), lang->name.Length()); k++)
+		for (Int k = 0; k < Math::Max(language->name.Length(), lang->name.Length()); k++)
 		{
 			if ((language->name[k] < lang->name[k] && !(language->name[k] == '(' && lang->name[k] == '/')) || (language->name[k] == '/' && lang->name[k] == '('))
 			{

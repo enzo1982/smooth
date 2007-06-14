@@ -31,7 +31,10 @@
 #include <smooth/i18n/i18n.h>
 
 #include <smooth/resources.h>
-#include <smooth/backends/win32/backendwin32.h>
+
+#ifdef __WIN32__
+#	include <smooth/backends/win32/backendwin32.h>
+#endif
 
 #include <time.h>
 #include <stdlib.h>
@@ -76,7 +79,11 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	pos.x = 5;
 	pos.y = 3;
 
-	Bitmap	 bmp = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_LIGHT), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
+	Bitmap	 bmp;
+
+#ifdef __WIN32__
+	bmp = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_LIGHT), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
+#endif
 
 	bmp.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 

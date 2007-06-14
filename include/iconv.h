@@ -5,6 +5,8 @@
 
 #include <libiconv/iconv.h>
 
+	extern int	 use_iconv;
+
 #else
 
 #undef iconv_t

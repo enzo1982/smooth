@@ -17,7 +17,9 @@
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 
-#include <imm.h>
+#ifdef __WIN32__
+#	include <imm.h>
+#endif
 
 const S::Int	 S::GUI::Cursor::classID = S::Object::RequestClassID();
 
@@ -64,11 +66,11 @@ S::Int S::GUI::Cursor::Paint(Int message)
 
 			break;
 		case SP_MOUSEIN:
-			LiSASetMouseCursor((HWND) container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_TEXTEDIT);
+			LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_TEXTEDIT);
 
 			break;
 		case SP_MOUSEOUT:
-			LiSASetMouseCursor((HWND) container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
+			LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
 
 			break;
 	}
@@ -244,6 +246,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+#ifdef __WIN32__
 		case WM_KEYDOWN:
 			OnSpecialKey(wParam);
 
@@ -252,7 +255,6 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			OnInput(wParam, lParam);
 
 			break;
-#ifdef __WIN32__
 		case WM_KILLFOCUS:
 			if (Window::GetWindow((HWND) wParam) != NIL)
 			{
@@ -335,9 +337,13 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 				if (lineMarkStart < line.Length() && lineMarkEnd > 0)
 				{
-					Int	 bColor	 = GetSysColor(COLOR_HIGHLIGHT);
-					Int	 tColor	 = GetSysColor(COLOR_HIGHLIGHTTEXT);
-
+#ifdef __WIN32__
+					Int	 bColor = GetSysColor(COLOR_HIGHLIGHT);
+					Int	 tColor	= GetSysColor(COLOR_HIGHLIGHTTEXT);
+#else
+					Int	 bColor	= Color(0, 0, 255);
+					Int	 tColor = Color(255, 255, 255);
+#endif
 					String	 mText;
 					String	 wText = line;
 
@@ -548,6 +554,7 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 	Int	 i = 0;
 
+#ifdef __WIN32__
 	switch (keyCode)
 	{
 		case VK_LEFT:
@@ -658,6 +665,7 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			break;
 	}
+#endif
 }
 
 S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
@@ -676,6 +684,7 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 
 			for (int j = Math::Min(markStart, markEnd); j < Math::Max(markStart, markEnd); j++) mText[j - Math::Min(markStart, markEnd)] = text[j];
 
+#ifdef __WIN32__
 			OpenClipboard((HWND) window->GetSystemWindow());
 
 			HGLOBAL	 memory = NIL;
@@ -698,12 +707,15 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 			}
 
 			CloseClipboard();
+#endif
 		}
 	}
 
 	if (character == 24 && !(flags & (1 << 30)) && IsActive())
 	{
+#ifdef __WIN32__
 		Process(WM_CHAR, 3, 0);
+#endif
 
 		DeleteSelectedText();
 	}
@@ -714,6 +726,7 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 
 		String	 insertText;
 
+#ifdef __WIN32__
 		OpenClipboard((HWND) window->GetSystemWindow());
 
 		if (Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT))
@@ -726,6 +739,7 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 		}
 
 		CloseClipboard();
+#endif
 
 		if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
 		{
@@ -826,6 +840,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		return Success();
 	}
 
+#ifdef __WIN32__
 	{
 		HWND	 hwnd	= (HWND) surface->GetSystemSurface();
 		HDC	 dc	= GetWindowDC(hwnd);
@@ -888,6 +903,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 		ReleaseDC(hwnd, dc);
 	}
+#endif
 
 	if (timer != NIL) DeleteObject(timer);
 

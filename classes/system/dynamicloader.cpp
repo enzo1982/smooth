@@ -12,7 +12,7 @@
 #include <smooth/gui/application/application.h>
 
 #ifndef __WIN32__
-#	include <dlfnc.h>
+#	include <dlfcn.h>
 #endif
 
 const S::Int	 S::System::DynamicLoader::classID = S::Object::RequestClassID();

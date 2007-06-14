@@ -11,7 +11,11 @@
 #include <smooth/system/system.h>
 #include <smooth/version.h>
 
-#include <shlobj.h>
+#ifdef __WIN32__
+#	include <shlobj.h>
+#else
+#	include <unistd.h>
+#endif
 
 S::Int S::System::System::nextGUID	= 0;
 

@@ -35,7 +35,7 @@ namespace smooth
 		class SMOOTHAPI DriverSOCKS4 : public Driver
 		{
 			private:
-				SOCKET		 stream;
+				unsigned int	 stream;
 				Bool		 closeStream;
 
 				Void		 CloseSocket();

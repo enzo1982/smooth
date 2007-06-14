@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,7 +13,9 @@
 #include <smooth/gui/dialogs/fontdlg.h>
 #include <smooth/gui/window/window.h>
 
-#include <commdlg.h>
+#ifdef __WIN32__
+#	include <commdlg.h>
+#endif
 
 S::GUI::Dialogs::FontSelection::FontSelection()
 {
@@ -25,6 +27,7 @@ S::GUI::Dialogs::FontSelection::~FontSelection()
 
 const Error &S::GUI::Dialogs::FontSelection::ShowDialog()
 {
+#ifdef __WIN32__
 	static CHOOSEFONTW	 cfw;
 	static CHOOSEFONTA	 cfa;
 	LOGFONTW		 lfw;
@@ -52,8 +55,8 @@ const Error &S::GUI::Dialogs::FontSelection::ShowDialog()
 	cfa.Flags	= CF_SCREENFONTS | CF_SCRIPTSONLY | CF_NOSCRIPTSEL | CF_EFFECTS | CF_NOOEMFONTS | CF_NOVERTFONTS;
 	cfa.rgbColors	= 0;
 
-	if (Setup::enableUnicode)	result = ChooseFontW(&cfw);
-	else				result = ChooseFontA(&cfa);
+	if (Setup::enableUnicode) result = ChooseFontW(&cfw);
+	else			  result = ChooseFontA(&cfa);
 
 	if (result)
 	{
@@ -78,6 +81,7 @@ const Error &S::GUI::Dialogs::FontSelection::ShowDialog()
 	{
 		error = Error();
 	}
+#endif
 
 	return error;
 }

@@ -148,14 +148,14 @@ S::Void S::GUI::Progressbar::CreateGradient(const Size &gSize)
 	{
 		for (Int x = 0; x < gSize.cx - 2; x++)
 		{
-			for (Int y = 0; y < gSize.cy - 2; y++) gradient.SetPixel(x, y, Color((Int) (rs + rp * x), (Int) (gs + gp * x), (Int) (bs + bp * x)));
+			for (Int y = 0; y < gSize.cy - 2; y++) gradient.SetPixel(Point(x, y), Color((Int) (rs + rp * x), (Int) (gs + gp * x), (Int) (bs + bp * x)));
 		}
 	}
 	else
 	{
 		for (Int y = 0; y < gSize.cy - 2; y++)
 		{
-			for (Int x = 0; x < gSize.cx - 2; x++) gradient.SetPixel(x, gSize.cy - 3 - y, Color((Int) (rs + rp * y), (Int) (gs + gp * y), (Int) (bs + bp * y)));
+			for (Int x = 0; x < gSize.cx - 2; x++) gradient.SetPixel(Point(x, gSize.cy - 3 - y), Color((Int) (rs + rp * y), (Int) (gs + gp * y), (Int) (bs + bp * y)));
 		}
 	}
 }

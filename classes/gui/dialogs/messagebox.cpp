@@ -56,7 +56,13 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	msgbox		= new Window(title, Point(), Size());
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	lay		= new Layer();
+
+#ifdef __WIN32__
 	icon		= new Image(ImageLoader::Load(String("Icon:").Append(String::FromInt((Int) cIcon))), Point(14, 19), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
+#else
+	icon		= NIL;
+#endif
+
 	okbutton	= NIL;
 	yesbutton	= NIL;
 	nobutton	= NIL;
@@ -114,7 +120,9 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 		thissize = 0;
 	}
 
+#ifdef __WIN32__
 	msgbox->SetSize(Size(maxsize + 36 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0), (((Int) Math::Max(2, lines) + 1) * 16) + 70 + buttonHeight));
+#endif
 
 	titlesize = Font(Font::Default, Font::DefaultSize, Font::Bold).GetTextSizeX(title);
 
@@ -131,16 +139,19 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	if (cVar != NIL)
 	{
+#ifdef __WIN32__
 		checkbox = new CheckBox(checkBoxText, Point(13 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0), 46 + buttonHeight), Size(100, 0), cVar);
 		checkbox->SetOrientation(OR_LOWERLEFT);
 		checkbox->SetWidth(checkbox->textSize.cx + 21);
 
 		msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->textSize.cx + 54 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0)));
 		msgbox->SetHeight(msgbox->GetHeight() + 22);
+#endif
 
 		lay->Add(checkbox);
 	}
 
+#ifdef __WIN32__
 	switch (buttons)
 	{
 		default:
@@ -240,12 +251,14 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 			break;
 	}
+#endif
 
 	msgbox->SetPosition(Point((LiSAGetDisplaySizeX() - msgbox->GetWidth()) / 2, (LiSAGetDisplaySizeY() - msgbox->GetHeight()) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
 }
 
 S::GUI::Dialogs::MessageDlg::~MessageDlg()
 {
+#ifdef __WIN32__
 	switch (buttons)
 	{
 		default:
@@ -281,6 +294,7 @@ S::GUI::Dialogs::MessageDlg::~MessageDlg()
 
 			break;
 	}
+#endif
 
 	DeleteObject(lay);
 	DeleteObject(icon);
@@ -294,7 +308,9 @@ const Error &S::GUI::Dialogs::MessageDlg::ShowDialog()
 {
 	nOfMessageBoxes++;
 
+#ifdef __WIN32__
 	MessageBeep(MB_ICONASTERISK);
+#endif
 
 	msgbox->Stay();
 
@@ -314,7 +330,9 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 
 	txtrect.bottom = txtrect.top + 16;
 
+#ifdef __WIN32__
 	if (msgicon != NIL) txtrect.left += GetSystemMetrics(SM_CXICON) + 20;
+#endif
 
 	for (int i = 0; i < lines; i++)
 	{
@@ -327,7 +345,9 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 
 S::Bool S::GUI::Dialogs::MessageDlg::MessageKillProc()
 {
+#ifdef __WIN32__
 	if (buttonCode == 0) buttonCode = IDCLOSE;
+#endif
 
 	nOfMessageBoxes--;
 
@@ -336,49 +356,63 @@ S::Bool S::GUI::Dialogs::MessageDlg::MessageKillProc()
 
 S::Void S::GUI::Dialogs::MessageDlg::MessageOK()
 {
+#ifdef __WIN32__
 	buttonCode = IDOK;
+#endif
 
 	msgbox->Close();
 }
 
 S::Void S::GUI::Dialogs::MessageDlg::MessageCancel()
 {
+#ifdef __WIN32__
 	buttonCode = IDCANCEL;
+#endif
 
 	msgbox->Close();
 }
 
 S::Void S::GUI::Dialogs::MessageDlg::MessageYes()
 {
+#ifdef __WIN32__
 	buttonCode = IDYES;
+#endif
 
 	msgbox->Close();
 }
 
 S::Void S::GUI::Dialogs::MessageDlg::MessageNo()
 {
+#ifdef __WIN32__
 	buttonCode = IDNO;
+#endif
 
 	msgbox->Close();
 }
 
 S::Void S::GUI::Dialogs::MessageDlg::MessageRetry()
 {
+#ifdef __WIN32__
 	buttonCode = IDRETRY;
+#endif
 
 	msgbox->Close();
 }
 
 S::Void S::GUI::Dialogs::MessageDlg::MessageAbort()
 {
+#ifdef __WIN32__
 	buttonCode = IDABORT;
+#endif
 
 	msgbox->Close();
 }
 
 S::Void S::GUI::Dialogs::MessageDlg::MessageIgnore()
 {
+#ifdef __WIN32__
 	buttonCode = IDIGNORE;
+#endif
 
 	msgbox->Close();
 }

@@ -133,7 +133,7 @@ S::Void *S::GUI::SurfaceXLib::GetSystemSurface() const
 	return (Void *) window;
 }
 
-S::Int S::GUI::SurfaceXLib::SetPixel(Int x, Int y, const Color &color)
+S::Int S::GUI::SurfaceXLib::SetPixel(const Point &point, const Color &color)
 {
 	if (window == NIL) return Success();
 
@@ -143,8 +143,8 @@ S::Int S::GUI::SurfaceXLib::SetPixel(Int x, Int y, const Color &color)
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
-	XDrawPoint(display, window, gc, rightToLeft.TranslateX(x), rightToLeft.TranslateY(y));
-	XDrawPoint(display, bitmap, gc, rightToLeft.TranslateX(x), rightToLeft.TranslateY(y));
+	XDrawPoint(display, window, gc, rightToLeft.TranslateX(point.x), rightToLeft.TranslateY(point.y));
+	XDrawPoint(display, bitmap, gc, rightToLeft.TranslateX(point.x), rightToLeft.TranslateY(point.y));
 
 	XFreeGC(display, gc);
 

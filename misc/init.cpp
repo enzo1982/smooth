@@ -126,22 +126,22 @@ S::Void S::Init()
 	String::SetInputFormat(String("CP").Append(String::FromInt(codePage)));
 	String::SetOutputFormat(String("CP").Append(String::FromInt(codePage)));
 
-#ifdef __WIN32__
 	GUI::backgroundApplication = new GUI::BackgroundApplication();
-#endif
 }
 
 S::Void S::Free()
 {
 	if (--initCount) return;
 
-	CoUninitialize();
-
 #ifdef __WIN32__
+	CoUninitialize();
+#endif
+
 	delete I18n::Translator::defaultTranslator;
 
 	delete GUI::backgroundApplication;
 
+#ifdef __WIN32__
 	if (Setup::useIconv) FreeIconvDLL();
 #endif
 

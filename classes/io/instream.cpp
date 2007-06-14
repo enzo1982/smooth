@@ -14,11 +14,15 @@
 
 #include <smooth/io/drivers/driver_ansi.h>
 #include <smooth/io/drivers/driver_posix.h>
-#include <smooth/io/drivers/driver_win32.h>
 #include <smooth/io/drivers/driver_memory.h>
+
+#ifdef __WIN32__
+#	include <smooth/io/drivers/driver_win32.h>
+#endif
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <memory.h>
 
 S::IO::InStream::InStream(Int type, Driver *iDriver)
 {

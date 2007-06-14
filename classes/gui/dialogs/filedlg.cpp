@@ -11,7 +11,9 @@
 #include <smooth/gui/dialogs/filedlg.h>
 #include <smooth/gui/window/window.h>
 
-#include <commdlg.h>
+#ifdef __WIN32__
+#	include <commdlg.h>
+#endif
 
 S::GUI::Dialogs::FileSelection::FileSelection()
 {
@@ -28,6 +30,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 	bool	 result;
 	Int	 bpos = 0;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
 		static OPENFILENAMEW	 ofnw;
@@ -256,6 +259,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		delete [] buffera;
 		delete [] filtera;
 	}
+#endif
 
 	return error;
 }
@@ -304,11 +308,11 @@ S::Int S::GUI::Dialogs::FileSelection::SetFileName(const String &newDefFile)
 S::String S::GUI::Dialogs::FileSelection::GetFileName()
 {
 	if (files.Length() > 0)	return files.GetFirst();
-	else				return NIL;
+	else			return NIL;
 }
 
 S::String S::GUI::Dialogs::FileSelection::GetNthFileName(Int n)
 {
 	if (files.Length() > n)	return files.GetNth(n);
-	else				return NIL;
+	else			return NIL;
 }

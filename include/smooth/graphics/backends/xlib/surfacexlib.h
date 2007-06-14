@@ -47,7 +47,7 @@ namespace smooth
 
 				Void	*GetSystemSurface() const;
 
-				Int	 SetPixel(Int, Int, const Color &);
+				Int	 SetPixel(const Point &, const Color &);
 
 				Int	 Line(const Point &, const Point &, const Color &);
 				Int	 Box(const Rect &, const Color &, Int, const Size &);

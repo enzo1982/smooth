@@ -437,7 +437,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 
 			for (register int val = Math::Max(0, xmin); val < Math::Min(hssize, xmax); val++)
 			{
-				bmp.SetPixel(val, sat, Color(Math::Round(ared += rbias), Math::Round(agreen += gbias), Math::Round(ablue += bbias)));
+				bmp.SetPixel(Point(val, sat), Color(Math::Round(ared += rbias), Math::Round(agreen += gbias), Math::Round(ablue += bbias)));
 			}
 		}
 
@@ -462,7 +462,6 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 	int	 newval;
 	int	 newsat;
 	int	 newhue;
-	int	 leftbutton;
 	int	 hssize = 205;
 
 	huerect.left	= huexoffset;
@@ -526,6 +525,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 				dlgwnd->SetUpdateRect(vsrect);
 				ColorDlgPaintProc();
 			}
+
 			break;
 		case SM_LBUTTONUP:
 			if (huecapt)
@@ -539,19 +539,27 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 			{
 				vscapt = false;
 			}
+
 			break;
 		case SM_MOUSEMOVE:
-			if (huecapt)
+			if (huecapt || vscapt)
 			{
-				if (GetSystemMetrics(SM_SWAPBUTTON))	leftbutton = VK_RBUTTON;
-				else					leftbutton = VK_LBUTTON;
+#ifdef __WIN32__
+				Int	 leftButton;
 
-				if (GetAsyncKeyState(leftbutton) == 0)
+				if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
+				else					leftButton = VK_LBUTTON;
+
+				if (GetAsyncKeyState(leftButton) == 0)
 				{
 					ColorDlgMessageProc(SM_LBUTTONUP, 0, 0);
 					break;
 				}
+#endif
+			}
 
+			if (huecapt)
+			{
 				newhue = 255 - Math::Round(Math::Max(Math::Min(dlgwnd->GetMousePosition().y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
 
 				if (newhue != acthue)
@@ -579,15 +587,6 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 			}
 			else if (vscapt)
 			{
-				if (GetSystemMetrics(SM_SWAPBUTTON))	leftbutton = VK_RBUTTON;
-				else					leftbutton = VK_LBUTTON;
-
-				if (GetAsyncKeyState(leftbutton) == 0)
-				{
-					ColorDlgMessageProc(SM_LBUTTONUP, 0, 0);
-					break;
-				}
-
 				Point	 mousePos = dlgwnd->GetMousePosition();
 
 				newval = Math::Round(Math::Max(Math::Min(mousePos.x - 8, hssize - 1), 0) * (256.0 / 205.0));
@@ -622,6 +621,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					surface->Box(ncrect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
 				}
 			}
+
 			break;
 	}
 }
@@ -650,7 +650,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 
 		for (int x = huexoffset + 1; x < (huexoffset + 17); x++)
 		{
-			surface->SetPixel(x, yoffset + 1 + (int) ((255.0 - acthue) / (256.0 / 205.0)), Color(255 - Color(ahrgb).GetRed(), 255 - Color(ahrgb).GetGreen(), 255 - Color(ahrgb).GetBlue()));
+			surface->SetPixel(Point(x, yoffset + 1 + (int) ((255.0 - acthue) / (256.0 / 205.0))), Color(255 - Color(ahrgb).GetRed(), 255 - Color(ahrgb).GetGreen(), 255 - Color(ahrgb).GetBlue()));
 		}
 
 		lasthue = acthue;
@@ -665,14 +665,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 			{
 				rgb = Color(acthue, lastsat, (int) (x * (256.0 / 205.0)), HSV).ConvertTo(RGBA);
 
-				surface->SetPixel(x + 8, yoffset + 1 + (int) ((255.0 - lastsat) / (256.0 / 205.0)), rgb);
+				surface->SetPixel(Point(x + 8, yoffset + 1 + (int) ((255.0 - lastsat) / (256.0 / 205.0))), rgb);
 			}
 
 			for (int y = 0; y < hssize; y++)
 			{
 				rgb = Color(acthue, (int) (255.0 - (y * (256.0 / 205.0))), lastval, HSV).ConvertTo(RGBA);
 
-				surface->SetPixel(8 + (int) (lastval / (256.0 / 205.0)), y + yoffset + 1, rgb);
+				surface->SetPixel(Point(8 + (int) (lastval / (256.0 / 205.0)), y + yoffset + 1), rgb);
 			}
 		}
 
@@ -680,14 +680,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 		{
 			rgb = Color(acthue, actsat, x, HSV).ConvertTo(RGBA);
 
-			surface->SetPixel(x + 8, yoffset + 1 + (int) ((255.0 - actsat) / (256.0 / 205.0)), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
+			surface->SetPixel(Point(x + 8, yoffset + 1 + (int) ((255.0 - actsat) / (256.0 / 205.0))), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
 
 		for (int y = 0; y < hssize; y++)
 		{
 			rgb = Color(acthue, 255 - y, actval, HSV).ConvertTo(RGBA);
 
-			surface->SetPixel(8 + (int) (actval / (256.0 / 205.0)), y + yoffset + 1, Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
+			surface->SetPixel(Point(8 + (int) (actval / (256.0 / 205.0)), y + yoffset + 1), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
 
 		lastval = actval;

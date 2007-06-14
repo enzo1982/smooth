@@ -81,8 +81,8 @@ namespace smooth
 				virtual Int							 InvertColors();
 				virtual Int							 ReplaceColor(const Color &, const Color &);
 
-				virtual Bool							 SetPixel(Int, Int, const Color &);
-				virtual Color							 GetPixel(Int, Int) const;
+				virtual Bool							 SetPixel(const Point &, const Color &);
+				virtual Color							 GetPixel(const Point &) const;
 
 				virtual BitmapBackend &operator					 =(const int);
 				virtual BitmapBackend &operator					 =(const BitmapBackend &);

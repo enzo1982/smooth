@@ -11,10 +11,12 @@
 #include <smooth/system/multimonitor.h>
 #include <smooth/basic/input.h>
 
-HMODULE user32dll = NIL;
+#ifdef __WIN32__
+	HMODULE user32dll = NIL;
 
-BOOL	 (*ex_GetMonitorInfo)(HMONITOR, LPMONITORINFO)	= NIL;
-HMONITOR (*ex_MonitorFromPoint)(POINT, DWORD)		= NIL;
+	BOOL	 (*ex_GetMonitorInfo)(HMONITOR, LPMONITORINFO)	= NIL;
+	HMONITOR (*ex_MonitorFromPoint)(POINT, DWORD)		= NIL;
+#endif
 
 S::System::MultiMonitor::MultiMonitor()
 {
@@ -26,6 +28,7 @@ S::System::MultiMonitor::MultiMonitor(const MultiMonitor &)
 
 S::Void S::System::MultiMonitor::Initialize()
 {
+#ifdef __WIN32__
 	OSVERSIONINFOA	 vInfo;
 
 	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
@@ -40,20 +43,24 @@ S::Void S::System::MultiMonitor::Initialize()
 		ex_GetMonitorInfo = (BOOL (*)(HMONITOR, LPMONITORINFO)) GetProcAddress(user32dll, "GetMonitorInfo");
 		ex_MonitorFromPoint = (HMONITOR (*)(POINT, DWORD)) GetProcAddress(user32dll, "MonitorFromPoint");
 	}
+#endif
 }
 
 S::Void S::System::MultiMonitor::Free()
 {
+#ifdef __WIN32__
 	if (user32dll != NIL)
 	{
 //		FreeLibrary(user32dll);
 
 		user32dll = NIL;
 	}
+#endif
 }
 
 S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorMetrics()
 {
+#ifdef __WIN32__
 	if (user32dll == NIL || GetSystemMetrics(SM_CMONITORS) == 1)
 	{
 		return GUI::Rect(GUI::Point(0, 0), GUI::Size(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)));
@@ -69,10 +76,12 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorMetrics()
 
 		return GUI::Rect(GUI::Point(info.rcMonitor.left, info.rcMonitor.top), GUI::Size(info.rcMonitor.right - info.rcMonitor.left, info.rcMonitor.bottom - info.rcMonitor.top));
 	}
+#endif
 }
 
 S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorWorkArea()
 {
+#ifdef __WIN32__
 	if (user32dll == NIL || GetSystemMetrics(SM_CMONITORS) == 1)
 	{
 		RECT rect;
@@ -93,10 +102,12 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorWorkArea()
 
 		return GUI::Rect(GUI::Point(info.rcWork.left, info.rcWork.top), GUI::Size(info.rcWork.right - info.rcWork.left, info.rcWork.bottom - info.rcWork.top));
 	}
+#endif
 }
 
 S::GUI::Rect S::System::MultiMonitor::GetVirtualScreenMetrics()
 {
+#ifdef __WIN32__
 	if (user32dll == NIL || GetSystemMetrics(SM_CMONITORS) == 1)
 	{
 		return GUI::Rect(GUI::Point(), GUI::Size(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)));
@@ -105,4 +116,5 @@ S::GUI::Rect S::System::MultiMonitor::GetVirtualScreenMetrics()
 	{
 		return GUI::Rect(GUI::Point(GetSystemMetrics(SM_XVIRTUALSCREEN), GetSystemMetrics(SM_YVIRTUALSCREEN)), GUI::Size(GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN)));
 	}
+#endif
 }

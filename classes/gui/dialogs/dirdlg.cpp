@@ -12,10 +12,12 @@
 #include <smooth/i18n/i18n.h>
 #include <smooth/gui/window/window.h>
 
-#include <wtypes.h>
-#include <shlobj.h>
+#ifdef __WIN32__
+#	include <wtypes.h>
+#	include <shlobj.h>
 
-int CALLBACK	 BrowseCallbackProc(HWND, UINT, LPARAM, LPARAM);
+	int CALLBACK	 BrowseCallbackProc(HWND, UINT, LPARAM, LPARAM);
+#endif
 
 S::GUI::Dialogs::DirSelection::DirSelection()
 {
@@ -29,6 +31,7 @@ S::GUI::Dialogs::DirSelection::~DirSelection()
 
 const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 {
+#ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
 		BROWSEINFOW	 infow;
@@ -89,6 +92,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 		delete [] buffera;
 	}
+#endif
 
 	if (directory != NIL)
 	{
@@ -114,13 +118,15 @@ const S::String &S::GUI::Dialogs::DirSelection::GetDirName()
 	return directory;
 }
 
-int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
-{
-	if (uMsg == BFFM_INITIALIZED && ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName() != NIL)
+#ifdef __WIN32__
+	int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 	{
-		if (S::Setup::enableUnicode)	SendMessageW(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
-		else				SendMessageA(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
-	}
+		if (uMsg == BFFM_INITIALIZED && ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName() != NIL)
+		{
+			if (S::Setup::enableUnicode)	SendMessageW(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
+			else				SendMessageA(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
+		}
 
-	return 0;
-}
+		return 0;
+	}
+#endif

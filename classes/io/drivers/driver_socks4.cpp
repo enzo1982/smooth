@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,12 @@
 
 #include <smooth/io/drivers/driver_socks4.h>
 #include <math.h>
+#include <string.h>
+
+#ifndef __WIN32__
+#	include <unistd.h>
+#	include <arpa/inet.h>
+#endif
 
 S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const String &hostName, Int port) : Driver()
 {
@@ -21,7 +27,7 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 
 	stream = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (stream == (SOCKET)(~0))
+	if (stream == (unsigned) (~0))
 	{
 		CloseSocket();
 

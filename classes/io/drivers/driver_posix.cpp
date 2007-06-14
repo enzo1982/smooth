@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,7 +12,27 @@
 
 #include <stdio.h>
 #include <fcntl.h>
-#include <io.h>
+
+#ifdef __WIN32__
+#	include <io.h>
+#else
+#	include <unistd.h>
+
+#	define _open open
+#	define _wopen open
+#	define _close close
+#	define _read read
+#	define _write write
+#	define _lseeki64 lseek64
+
+#	ifndef O_BINARY
+#		define O_BINARY	0
+#	endif
+
+#	ifndef O_RANDOM
+#		define O_RANDOM	0
+#	endif
+#endif
 
 S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 {

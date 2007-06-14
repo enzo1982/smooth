@@ -35,7 +35,7 @@ namespace smooth
 		class SMOOTHAPI DriverSocket : public Driver
 		{
 			private:
-				SOCKET		 stream;
+				unsigned int	 stream;
 				Bool		 closeStream;
 
 				UnsignedLong	 mode;
@@ -44,7 +44,7 @@ namespace smooth
 				Void		 CloseSocket();
 			public:
 						 DriverSocket(const String &, Int);
-						 DriverSocket(SOCKET);
+						 DriverSocket(unsigned int);
 						~DriverSocket();
 
 				Int		 ReadData(UnsignedByte *, Int);

@@ -32,41 +32,53 @@ namespace smooth
 		class SurfaceCairo : public SurfaceBackend
 		{
 			protected:
-				HWND		 window;
-				HDC		 dc;
+#ifdef __WIN32__
+				HWND			 window;
+#else
+				Window			 window;
+#endif
+				Size			 allocSize;
 
-				Size		 allocSize;
+#ifdef __WIN32__
+				Array<HDC>		 cDc_contexts;
+				Array<HBITMAP>		 cDc_bitmaps;
+				Array<Rect *>		 cDc_rects;
 
-				cairo_surface_t	*surface;
-				cairo_t		*context;
+				HDC			 gdi_dc;
+#endif
+				cairo_surface_t		*surface;
+				cairo_t			*context;
 
-				Int		 CreateContext();
-				Int		 DestroyContext();
+				Array<cairo_surface_t *> cairo_surfaces;
+				Array<cairo_t *>	 cairo_contexts;
+
+				Void			 CreateCairoContext();
+				Void			 DestroyCairoContext();
 			public:
-						 SurfaceCairo(Void * = NIL, const Size & = Size());
-						~SurfaceCairo();
+							 SurfaceCairo(Void * = NIL, const Size & = Size());
+							~SurfaceCairo();
 
-				Int		 SetSize(const Size &);
-				const Size	&GetSize() const;
+				Int			 SetSize(const Size &);
+				const Size		&GetSize() const;
 
-				Int		 PaintRect(const Rect &);
+				Int			 PaintRect(const Rect &);
 
-				Int		 StartPaint(const Rect &);
-				Int		 EndPaint();
+				Int			 StartPaint(const Rect &);
+				Int			 EndPaint();
 
-				Void		*GetSystemSurface() const;
+				Void			*GetSystemSurface() const;
 
-				Int		 SetPixel(Int, Int, const Color &);
+				Int			 SetPixel(const Point &, const Color &);
 
-				Int		 Line(const Point &, const Point &, const Color &);
-				Int		 Box(const Rect &, const Color &, Int, const Size &);
+				Int			 Line(const Point &, const Point &, const Color &);
+				Int			 Box(const Rect &, const Color &, Int, const Size &);
 
-				Int		 SetText(const String &, const Rect &, const Font &, Bool);
+				Int			 SetText(const String &, const Rect &, const Font &, Bool);
 
-				Int		 Gradient(const Rect &, const Color &, const Color &, Int);
+				Int			 Gradient(const Rect &, const Color &, const Color &, Int);
 
-				Int		 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
-				Int		 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
+				Int			 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
+				Int			 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
 		};
 	};
 };

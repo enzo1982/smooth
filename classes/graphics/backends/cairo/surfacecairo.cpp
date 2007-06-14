@@ -14,7 +14,11 @@
 #include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
 
-#include <cairo/cairo-win32.h>
+#ifdef __WIN32__
+#	include <cairo/cairo-win32.h>
+#else
+#	include <cairo/cairo-xlib.h>
+#endif
 
 S::GUI::SurfaceBackend *CreateSurfaceCairo(S::Void *iSurface, const S::GUI::Size &maxSize)
 {
@@ -27,25 +31,49 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 {
 	type = SURFACE_CAIRO;
 
+#ifdef __WIN32__
 	window = (HWND) iWindow;
 
-	surface = NIL;
+	gdi_dc = NIL;
+#endif
+
 	context = NIL;
+	surface = NIL;
 
 	if (window != NIL)
 	{
-		dc = GetWindowDC(window);
-
 		size = maxSize;
+
+#ifdef __WIN32__
+		HDC	 gdi_dc = GetWindowDC(window);
 
 		if (maxSize == Size())
 		{
-			size.cx	= GetDeviceCaps(dc, HORZRES) + 2;
-			size.cy	= GetDeviceCaps(dc, VERTRES) + 2;
+			size.cx	= GetDeviceCaps(gdi_dc, HORZRES) + 2;
+			size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 		}
+#endif
 
 		rightToLeft.SetSurfaceSize(size);
 
+#ifdef __WIN32__
+		HDC	 bmp_dc = CreateCompatibleDC(gdi_dc);
+		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
+
+		cDc_contexts.Add(bmp_dc);
+		cDc_bitmaps.Add((HBITMAP) SelectObject(bmp_dc, bitmap));
+		cDc_rects.Add(new Rect(Point(0, 0), size));
+
+		ReleaseDC(window, gdi_dc);
+
+		cairo_surface_t	*surface = cairo_win32_surface_create(bmp_dc);
+		cairo_t		*context = cairo_create(surface);
+
+		cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
+
+		cairo_surfaces.Add(surface);
+		cairo_contexts.Add(context);
+#endif
 		allocSize = size;
 	}
 }
@@ -54,7 +82,17 @@ S::GUI::SurfaceCairo::~SurfaceCairo()
 {
 	if (window != NIL)
 	{
-		ReleaseDC(window, dc);
+#ifdef __WIN32__
+		cairo_destroy(cairo_contexts.GetFirst());
+		cairo_surface_destroy(cairo_surfaces.GetFirst());
+
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetFirst(), cDc_bitmaps.GetFirst());
+
+		DeleteDC(cDc_contexts.GetFirst());
+		::DeleteObject(bitmap);
+
+		delete cDc_rects.GetFirst();
+#endif
 	}
 }
 
@@ -65,6 +103,29 @@ S::Int S::GUI::SurfaceCairo::SetSize(const Size &nSize)
 	rightToLeft.SetSurfaceSize(size);
 
 	if (allocSize.cx >= nSize.cx && allocSize.cy >= nSize.cy) return Success();
+
+	if (window != NIL && !painting)
+	{
+#ifdef __WIN32__
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetFirst(), cDc_bitmaps.GetFirst());
+
+		::DeleteObject(bitmap);
+
+		delete cDc_rects.GetFirst();
+
+		cDc_bitmaps.RemoveAll();
+		cDc_rects.RemoveAll();
+
+		HDC	 gdi_dc = GetWindowDC(window);
+
+		bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
+
+		cDc_bitmaps.Add((HBITMAP) SelectObject(cDc_contexts.GetFirst(), bitmap));
+		cDc_rects.Add(new Rect(Point(0, 0), size));
+
+		ReleaseDC(window, gdi_dc);
+#endif
+	}
 
 	allocSize = nSize;
 
@@ -78,16 +139,86 @@ const S::GUI::Size &S::GUI::SurfaceCairo::GetSize() const
 
 S::Int S::GUI::SurfaceCairo::PaintRect(const Rect &pRect)
 {
-	return Error();
+	if (painting) return Error();
+
+	if (window != NIL)
+	{
+#ifdef __WIN32__
+		HDC	 gdi_dc = GetWindowDC(window);
+
+		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, cDc_contexts.GetFirst(), pRect.left, pRect.top, SRCCOPY);
+
+		ReleaseDC(window, gdi_dc);
+#endif
+	}
+
+	return Success();
 }
 
 S::Int S::GUI::SurfaceCairo::StartPaint(const Rect &iPRect)
 {
+	if (window == NIL) return Success();
+
+	Rect	 pRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect));
+
+#ifdef __WIN32__
+	Rect	 oRect = *(cDc_rects.GetLast());
+	HDC	 bmp_dc = CreateCompatibleDC(cDc_contexts.GetFirst());
+	HBITMAP	 bitmap = CreateCompatibleBitmap(cDc_contexts.GetFirst(), size.cx, size.cy);
+
+	cDc_bitmaps.Add((HBITMAP) SelectObject(bmp_dc, bitmap));
+
+	if (pRect.left >= oRect.left && pRect.top >= oRect.top && pRect.right <= oRect.right && pRect.bottom <= oRect.bottom)	BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, cDc_contexts.GetLast(), pRect.left, pRect.top, SRCCOPY);
+	else															BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, cDc_contexts.GetFirst(), pRect.left, pRect.top, SRCCOPY);
+
+	cDc_contexts.Add(bmp_dc);
+	cDc_rects.Add(new Rect(pRect));
+
+	cairo_surface_t	*surface = cairo_win32_surface_create(bmp_dc);
+	cairo_t		*context = cairo_create(surface);
+
+	cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
+
+	cairo_surfaces.Add(surface);
+	cairo_contexts.Add(context);
+#endif
+
+	painting++;
+
 	return Success();
 }
 
 S::Int S::GUI::SurfaceCairo::EndPaint()
 {
+	if (!painting) return Error();
+
+	painting--;
+
+#ifdef __WIN32__
+	cairo_destroy(cairo_contexts.GetLast());
+	cairo_surface_destroy(cairo_surfaces.GetLast());
+
+	cairo_contexts.Remove(cairo_contexts.GetNthIndex(cairo_contexts.Length() - 1));
+	cairo_surfaces.Remove(cairo_surfaces.GetNthIndex(cairo_surfaces.Length() - 1));
+
+	Rect	 iRect = Rect::OverlapRect(*(cDc_rects.GetLast()), *(cDc_rects.GetNth(cDc_rects.Length() - 2)));
+
+	BitBlt(cDc_contexts.GetNth(cDc_contexts.Length() - 2), iRect.left, iRect.top, iRect.right - iRect.left, iRect.bottom - iRect.top, cDc_contexts.GetLast(), iRect.left, iRect.top, SRCCOPY);
+
+	if (painting == 0) PaintRect(iRect);
+
+	HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetLast(), cDc_bitmaps.GetLast());
+
+	DeleteDC(cDc_contexts.GetLast());
+	::DeleteObject(bitmap);
+
+	delete cDc_rects.GetLast();
+
+	cDc_contexts.Remove(cDc_contexts.GetNthIndex(cDc_contexts.Length() - 1));
+	cDc_bitmaps.Remove(cDc_bitmaps.GetNthIndex(cDc_bitmaps.Length() - 1));
+	cDc_rects.Remove(cDc_rects.GetNthIndex(cDc_rects.Length() - 1));
+#endif
+
 	return Success();
 }
 
@@ -96,42 +227,55 @@ S::Void *S::GUI::SurfaceCairo::GetSystemSurface() const
 	return (Void *) window;
 }
 
-S::Int S::GUI::SurfaceCairo::CreateContext()
+S::Void S::GUI::SurfaceCairo::CreateCairoContext()
 {
-	if (surface != NIL || context != NIL) return Error();
+#ifdef __WIN32__
+	if (gdi_dc != NIL || context != NIL || surface != NIL) return;
 
-	surface = cairo_win32_surface_create(dc);
+	gdi_dc = GetWindowDC(window);
+
+	surface = cairo_win32_surface_create(gdi_dc);
 	context = cairo_create(surface);
 
 	cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
-
-	return Success();
+#endif
 }
 
-S::Int S::GUI::SurfaceCairo::DestroyContext()
+S::Void S::GUI::SurfaceCairo::DestroyCairoContext()
 {
-	if (surface == NIL || context == NIL) return Error();
+#ifdef __WIN32__
+	if (gdi_dc == NIL || context == NIL || surface == NIL) return;
 
 	cairo_destroy(context);
 	cairo_surface_destroy(surface);
 
+	ReleaseDC(window, gdi_dc);
+
+	gdi_dc = NIL;
+#endif
+
 	context = NIL;
 	surface = NIL;
-
-	return Success();
 }
 
-S::Int S::GUI::SurfaceCairo::SetPixel(Int x, Int y, const Color &color)
+S::Int S::GUI::SurfaceCairo::SetPixel(const Point &point, const Color &color)
 {
 	if (window == NIL) return Success();
 
-	CreateContext();
+	if (!painting)
+	{
+		CreateCairoContext();
 
-	cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-	cairo_rectangle(context, rightToLeft.TranslateX(fontSize.TranslateX(x)), rightToLeft.TranslateY(fontSize.TranslateY(y)), 1, 1);
-	cairo_fill(context);
+		cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+		cairo_rectangle(context, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), 1, 1);
+		cairo_fill(context);
 
-	DestroyContext();
+		DestroyCairoContext();
+	}
+
+	cairo_set_source_rgb(cairo_contexts.GetLast(), color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+	cairo_rectangle(cairo_contexts.GetLast(), rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), 1, 1);
+	cairo_fill(cairo_contexts.GetLast());
 
 	return Success();
 }
@@ -143,15 +287,24 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
 	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
 
-	CreateContext();
+	if (!painting)
+	{
+		CreateCairoContext();
 
-	cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-	cairo_set_line_width(context, 1);
-	cairo_move_to(context, pos1.x, pos1.y);
-	cairo_line_to(context, pos2.x, pos2.y);
-	cairo_stroke(context);
+		cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+		cairo_set_line_width(context, 1);
+		cairo_move_to(context, pos1.x + 0.5, pos1.y);
+		cairo_line_to(context, pos2.x + 0.5, pos2.y);
+		cairo_stroke(context);
 
-	DestroyContext();
+		DestroyCairoContext();
+	}
+
+	cairo_set_source_rgb(cairo_contexts.GetLast(), color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+	cairo_set_line_width(cairo_contexts.GetLast(), 1);
+	cairo_move_to(cairo_contexts.GetLast(), pos1.x + 0.5, pos1.y);
+	cairo_line_to(cairo_contexts.GetLast(), pos2.x + 0.5, pos2.y);
+	cairo_stroke(cairo_contexts.GetLast());
 
 	return Success();
 }
@@ -162,9 +315,10 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 
 	Rect	 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
 
-	CreateContext();
+	CreateCairoContext();
 
 	cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+	cairo_set_source_rgb(cairo_contexts.GetLast(), color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
 
 	if (style & Rect::Filled)
 	{
@@ -173,14 +327,28 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 		}
 		else
 		{
-			cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
-			cairo_fill(context);
+			if (!painting)
+			{
+				cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+				cairo_fill(context);
+			}
+
+			cairo_rectangle(cairo_contexts.GetLast(), rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+			cairo_fill(cairo_contexts.GetLast());
 		}
 	}
 	else if (style == Rect::Outlined)
 	{
-		cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
-		cairo_stroke(context);
+		if (!painting)
+		{
+			cairo_set_line_width(context, 1);
+			cairo_rectangle(context, rect.left + 0.5, rect.top + 0.5, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
+			cairo_stroke(context);
+		}
+
+		cairo_set_line_width(cairo_contexts.GetLast(), 1);
+		cairo_rectangle(cairo_contexts.GetLast(), rect.left + 0.5, rect.top + 0.5, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
+		cairo_stroke(cairo_contexts.GetLast());
 	}
 	else if (style & Rect::Inverted)
 	{
@@ -195,8 +363,14 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 		{
 			if (dot == True)
 			{
-				cairo_rectangle(context, x, y, 1, 1);
-				cairo_fill(context);
+				if (!painting)
+				{
+					cairo_rectangle(context, x, y, 1, 1);
+					cairo_fill(context);
+				}
+
+				cairo_rectangle(cairo_contexts.GetLast(), x, y, 1, 1);
+				cairo_fill(cairo_contexts.GetLast());
 
 				dot = False;
 			}
@@ -209,8 +383,14 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 		{
 			if (dot == True)
 			{
-				cairo_rectangle(context, x, y, 1, 1);
-				cairo_fill(context);
+				if (!painting)
+				{
+					cairo_rectangle(context, x, y, 1, 1);
+					cairo_fill(context);
+				}
+
+				cairo_rectangle(cairo_contexts.GetLast(), x, y, 1, 1);
+				cairo_fill(cairo_contexts.GetLast());
 
 				dot = False;
 			}
@@ -223,8 +403,14 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 		{
 			if (dot == True)
 			{
-				cairo_rectangle(context, x, y, 1, 1);
-				cairo_fill(context);
+				if (!painting)
+				{
+					cairo_rectangle(context, x, y, 1, 1);
+					cairo_fill(context);
+				}
+
+				cairo_rectangle(cairo_contexts.GetLast(), x, y, 1, 1);
+				cairo_fill(cairo_contexts.GetLast());
 
 				dot = False;
 			}
@@ -237,8 +423,14 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 		{
 			if (dot == True)
 			{
-				cairo_rectangle(context, x, y, 1, 1);
-				cairo_fill(context);
+				if (!painting)
+				{
+					cairo_rectangle(context, x, y, 1, 1);
+					cairo_fill(context);
+				}
+
+				cairo_rectangle(cairo_contexts.GetLast(), x, y, 1, 1);
+				cairo_fill(cairo_contexts.GetLast());
 
 				dot = False;
 			}
@@ -246,7 +438,7 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 		}
 	}
 
-	DestroyContext();
+	DestroyCairoContext();
 
 	return Success();
 }
@@ -266,15 +458,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	String	 line;
 	Rect	 rect = iRect;
 
-	CreateContext();
-
-	cairo_select_font_face(context, font.GetName(),
-			       (font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-			       (font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
-
-	cairo_set_font_size(context, font.GetSize() * fontSize.TranslateY(96) / 72.0);
-
-	cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
+	if (rightToLeft.GetRightToLeft()) rect.right--;
 
 	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
 
@@ -307,17 +491,39 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 			}
 		}
 
-		RECT	 Rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
+		rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
 
-		if (rightToLeft.GetRightToLeft()) Rect.right--;
+		if (!painting)
+		{
+			CreateCairoContext();
 
-		cairo_move_to(context, Rect.left, Rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
-		cairo_show_text(context, line.ConvertTo("UTF-8"));
+			cairo_select_font_face(context, font.GetName(),
+					       (font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+					       (font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
+
+			cairo_set_font_size(context, font.GetSize() * fontSize.TranslateY(96) / 72.0);
+
+			cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
+
+			cairo_move_to(context, rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
+			cairo_show_text(context, line.ConvertTo("UTF-8"));
+
+			DestroyCairoContext();
+		}
+
+		cairo_select_font_face(cairo_contexts.GetLast(), font.GetName(),
+				       (font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+				       (font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
+
+		cairo_set_font_size(cairo_contexts.GetLast(), font.GetSize() * fontSize.TranslateY(96) / 72.0);
+
+		cairo_set_source_rgb(cairo_contexts.GetLast(), font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
+
+		cairo_move_to(cairo_contexts.GetLast(), rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
+		cairo_show_text(cairo_contexts.GetLast(), line.ConvertTo("UTF-8"));
 
 		rect.top += height;
 	}
-
-	DestroyContext();
 
 	return Success();
 }
@@ -327,8 +533,6 @@ S::Int S::GUI::SurfaceCairo::Gradient(const Rect &iRect, const Color &color1, co
 	if (window == NIL) return Success();
 
 	Rect	 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
-
-	CreateContext();
 
 	cairo_pattern_t	*pattern = NIL;
 
@@ -358,13 +562,22 @@ S::Int S::GUI::SurfaceCairo::Gradient(const Rect &iRect, const Color &color1, co
 			break;
 	}
 
-	cairo_set_source(context, pattern);
-	cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
-	cairo_fill(context);
+	if (!painting)
+	{
+		CreateCairoContext();
+
+		cairo_set_source(context, pattern);
+		cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+		cairo_fill(context);
+
+		DestroyCairoContext();
+	}
+
+	cairo_set_source(cairo_contexts.GetLast(), pattern);
+	cairo_rectangle(cairo_contexts.GetLast(), rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+	cairo_fill(cairo_contexts.GetLast());
 
 	cairo_pattern_destroy(pattern);
-
-	DestroyContext();
 
 	return Success();
 }
@@ -375,23 +588,28 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &s
 
 	Bitmap	 bitmap	  = oBitmap;
 	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
+
+#ifdef __WIN32__
 	HDC	 gdi_dc	  = GetWindowDC(window);
 	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup	  = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
-		BitBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
+		if (!painting) BitBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
+		BitBlt(cDc_contexts.GetLast(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
 	}
 	else
 	{
-		StretchBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+		if (!painting) StretchBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+		StretchBlt(cDc_contexts.GetLast(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
 	SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
 	ReleaseDC(window, gdi_dc);
+#endif
 
 	return Success();
 }
@@ -402,6 +620,8 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oB
 
 	Bitmap	 bitmap	 = oBitmap;
 	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
+
+#ifdef __WIN32__
 	HDC	 gdi_dc	 = GetWindowDC(window);
 	HDC	 cdc	 = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
@@ -419,6 +639,7 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oB
 
 	DeleteDC(cdc);
 	ReleaseDC(window, gdi_dc);
+#endif
 
 	return Success();
 }

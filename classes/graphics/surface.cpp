@@ -83,11 +83,11 @@ S::Void *S::GUI::Surface::GetSystemSurface() const
 	return backend->GetSystemSurface();
 }
 
-S::Int S::GUI::Surface::SetPixel(Int x, Int y, const Color &color)
+S::Int S::GUI::Surface::SetPixel(const Point &point, const Color &color)
 {
 	if (mutex != NIL) mutex->Lock();
 
-	Int	 rVal = backend->SetPixel(x, y, color);
+	Int	 rVal = backend->SetPixel(point, color);
 
 	if (mutex != NIL) mutex->Release();
 

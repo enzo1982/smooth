@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,11 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/io/drivers/driver_socket.h>
+
+#ifndef __WIN32__
+#	include <unistd.h>
+#	include <sys/ioctl.h>
+#endif
 
 S::IO::DriverSocket::DriverSocket(const String &hostName, Int port) : Driver()
 {
@@ -21,7 +26,7 @@ S::IO::DriverSocket::DriverSocket(const String &hostName, Int port) : Driver()
 
 	stream = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (stream == (SOCKET)(~0))
+	if (stream == (unsigned) (~0))
 	{
 		CloseSocket();
 
@@ -52,7 +57,7 @@ S::IO::DriverSocket::DriverSocket(const String &hostName, Int port) : Driver()
 	closeStream = true;
 }
 
-S::IO::DriverSocket::DriverSocket(SOCKET iStream) : Driver()
+S::IO::DriverSocket::DriverSocket(unsigned int iStream) : Driver()
 {
 	size = -1;
 
@@ -72,6 +77,7 @@ S::Int S::IO::DriverSocket::ReadData(UnsignedByte *data, Int dataSize)
 {
 	if (mode == MODE_SOCKET_BLOCKING && timeout != 0)
 	{
+#ifdef __WIN32__
 		TIMEVAL	 tv = {timeout, 0};
 		FD_SET	 sock;
 
@@ -79,6 +85,7 @@ S::Int S::IO::DriverSocket::ReadData(UnsignedByte *data, Int dataSize)
 		FD_SET(stream, &sock);
 
 		if (select(0, &sock, 0, 0, &tv) != 1) return 0;
+#endif
 	}
 
 	return recv(stream, (char *) data, dataSize, 0);
@@ -88,6 +95,7 @@ S::Int S::IO::DriverSocket::WriteData(UnsignedByte *data, Int dataSize)
 {
 	if (mode == MODE_SOCKET_BLOCKING && timeout != 0)
 	{
+#ifdef __WIN32__
 		TIMEVAL	 tv = {timeout, 0};
 		FD_SET	 sock;
 
@@ -95,6 +103,7 @@ S::Int S::IO::DriverSocket::WriteData(UnsignedByte *data, Int dataSize)
 		FD_SET(stream, &sock);
 
 		if (select(0, 0, &sock, 0, &tv) != 1) return 0;
+#endif
 	}
 
 	return send(stream, (char *) data, dataSize, 0);

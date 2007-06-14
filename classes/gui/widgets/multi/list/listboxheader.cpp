@@ -163,14 +163,14 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 						{
 							moveTab = i;
 
-							LiSASetMouseCursor((HWND) window->GetSystemWindow(), LiSA_MOUSE_HSIZE);
+							LiSASetMouseCursor(window->GetSystemWindow(), LiSA_MOUSE_HSIZE);
 						}
 					}
 					else if (moveTab == i)
 					{
 						moveTab = -1;
 
-						LiSASetMouseCursor((HWND) window->GetSystemWindow(), LiSA_MOUSE_ARROW);
+						LiSASetMouseCursor(window->GetSystemWindow(), LiSA_MOUSE_ARROW);
 					}
 				}
 
@@ -216,6 +216,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDOWN:
 			if (moveTab != -1)
 			{
+#ifdef __WIN32__
 				Int	 leftButton;
 
 				if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
@@ -252,6 +253,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 				delete event;
 
 				innerLoop = False;
+#endif
 			}
 
 			break;

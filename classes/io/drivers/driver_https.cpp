@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,10 @@
 #include <smooth/io/drivers/driver_https.h>
 #include <math.h>
 
+#ifndef __WIN32__
+#	include <unistd.h>
+#endif
+
 S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String &hostName, Int port, const String &uname, const String &passwd) : Driver()
 {
 	closeStream = false;
@@ -19,7 +23,7 @@ S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String 
 
 	stream = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (stream == (SOCKET)(~0))
+	if (stream == (unsigned) (~0))
 	{
 		CloseSocket();
 
@@ -53,7 +57,7 @@ S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String 
 
 	connect.Append("\n");
 
-	send(stream, connect, connect.Length(), 0);
+	send(stream, (char *) connect, connect.Length(), 0);
 
 	String	 answer = "";
 	char	 c[2] = { 0, 0 };

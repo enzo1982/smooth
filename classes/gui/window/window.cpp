@@ -10,7 +10,6 @@
 
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/window/backends/windowbackend.h>
-#include <smooth/backends/win32/backendwin32.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/widgets/basic/statusbar.h>
@@ -27,6 +26,10 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/system/event.h>
 #include <smooth/system/multimonitor.h>
+
+#ifdef __WIN32__
+#	include <smooth/backends/win32/backendwin32.h>
+#endif
 
 const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
 S::Int		 S::GUI::Window::nOfActiveWindows = 0;
@@ -766,7 +769,7 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	Rect	 workArea = System::MultiMonitor::GetVirtualScreenMetrics();
 
-/*	if (message == SP_UPDATE				&&
+	if (message == SP_UPDATE				&&
 	    GetPosition().x		   > workArea.left - 2	&&
 	    GetPosition().y		   > workArea.top - 2	&&
 	    GetPosition().x + GetSize().cx < workArea.right + 2	&&
@@ -775,7 +778,7 @@ S::Int S::GUI::Window::Paint(Int message)
 		surface->PaintRect(updateRect);
 	}
 	else
-*/	{
+	{
 		Bool	 preRTL = IsRightToLeft();
 
 		surface->SetRightToLeft(False);

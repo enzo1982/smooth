@@ -217,17 +217,18 @@ S::Int S::GUI::BitmapBackend::GrayscaleBitmap()
 {
 	if (bytes == NIL) return Error();
 
+	Point	 point;
 	Color	 color;
 
-	for (Int y = 0; y < size.cy; y++)
+	for (point.y = 0; point.y < size.cy; point.y++)
 	{
-		for (Int x = 0; x < size.cx; x++)
+		for (point.x = 0; point.x < size.cx; point.x++)
 		{
-			color = GetPixel(x, y);
+			color = GetPixel(point);
 			color = (color.GetRed() + color.GetGreen() + color.GetBlue()) / 3;
 			color = Color(color, color, color);
 
-			SetPixel(x, y, color);
+			SetPixel(point, color);
 		}
 	}
 
@@ -238,16 +239,17 @@ S::Int S::GUI::BitmapBackend::InvertColors()
 {
 	if (bytes == NIL) return Error();
 
+	Point	 point;
 	Color	 color;
 
-	for (Int y = 0; y < size.cy; y++)
+	for (point.y = 0; point.y < size.cy; point.y++)
 	{
-		for (Int x = 0; x < size.cx; x++)
+		for (point.x = 0; point.x < size.cx; point.x++)
 		{
-			color = GetPixel(x, y);
+			color = GetPixel(point);
 			color = Color(255 - color.GetRed(), 255 - color.GetGreen(), 255 - color.GetBlue());
 
-			SetPixel(x, y, color);
+			SetPixel(point, color);
 		}
 	}
 
@@ -258,30 +260,33 @@ S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &color1, const Color &col
 {
 	if (bytes == NIL) return Error();
 
-	for (Int y = 0; y < size.cy; y++)
+	Point	 point;
+
+	for (point.y = 0; point.y < size.cy; point.y++)
 	{
-		for (Int x = 0; x < size.cx; x++)
+		for (point.x = 0; point.x < size.cx; point.x++)
 		{
-			if (GetPixel(x, y) == color1) SetPixel(x, y, color2);
+			if (GetPixel(point) == color1) SetPixel(point, color2);
 		}
 	}
 
 	return Success();
 }
 
-S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, const Color &color)
+S::Bool S::GUI::BitmapBackend::SetPixel(const Point &iPoint, const Color &color)
 {
-	if (bytes == NIL)			return False;
-	if (y >= size.cy || x >= size.cx)	return False;
+	if (bytes == NIL)				return False;
+	if (iPoint.y >= size.cy || iPoint.x >= size.cx)	return False;
 
 	UnsignedByte	*data = ((UnsignedByte *) bytes);
+	Point		 point = iPoint;
 	Bool		 done = False;
 	Int		 offset = 0;
 
 	switch (depth)
 	{
 		case 24:
-			offset = (size.cy - ++y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + x * 3;
+			offset = (size.cy - ++point.y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + point.x * 3;
 
 			data[offset + 0] = (color >> 16) & 255;
 			data[offset + 1] = (color >> 8) & 255;
@@ -291,7 +296,7 @@ S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, const Color &color)
 
 			break;
 		case 32:
-			offset = (size.cy - ++y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + x * 4;
+			offset = (size.cy - ++point.y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + point.x * 4;
 
 			data[offset + 0] = (color >> 16) & 255;
 			data[offset + 1] = (color >> 8) & 255;
@@ -305,25 +310,26 @@ S::Bool S::GUI::BitmapBackend::SetPixel(Int x, Int y, const Color &color)
 	return done;
 }
 
-S::GUI::Color S::GUI::BitmapBackend::GetPixel(Int x, Int y) const
+S::GUI::Color S::GUI::BitmapBackend::GetPixel(const Point &iPoint) const
 {
-	if (bytes == NIL)			return 0;
-	if (y >= size.cy || x >= size.cx)	return 0;
+	if (bytes == NIL)				return 0;
+	if (iPoint.y >= size.cy || iPoint.x >= size.cx)	return 0;
 
 	UnsignedByte	*data = ((UnsignedByte *) bytes);
+	Point		 point = iPoint;
 	Color		 color = 0;
 	Int		 offset = 0;
 
 	switch (depth)
 	{
 		case 24:
-			offset = (size.cy - ++y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + x * 3;
+			offset = (size.cy - ++point.y) * (((4 - (size.cx * 3) & 3) & 3) + size.cx * 3) + point.x * 3;
 
 			color = Color(data[offset + 2], data[offset + 1], data[offset + 0]);
 
 			break;
 		case 32:
-			offset = (size.cy - ++y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + x * 4;
+			offset = (size.cy - ++point.y) * (((4 - (size.cx * 4) & 3) & 3) + size.cx * 4) + point.x * 4;
 
 			color = Color(data[offset + 2], data[offset + 1], data[offset + 0]);
 

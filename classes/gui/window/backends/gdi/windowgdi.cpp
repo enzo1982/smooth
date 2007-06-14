@@ -324,8 +324,8 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 	{
 		for (Int x = 0; x < mask.GetSize().cx; x++)
 		{
-			if (mask.GetPixel(x, y) == Setup::BackgroundColor)	mask.SetPixel(x, y, transparentPixel);
-			else							mask.SetPixel(x, y, 0);
+			if (mask.GetPixel(Point(x, y)) == Setup::BackgroundColor) mask.SetPixel(Point(x, y), transparentPixel);
+			else							  mask.SetPixel(Point(x, y), 0);
 		}
 	}
 

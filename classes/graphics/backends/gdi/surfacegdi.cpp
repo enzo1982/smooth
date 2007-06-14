@@ -44,7 +44,6 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iWindow, const Size &maxSize)
 		rightToLeft.SetSurfaceSize(size);
 
 		HDC	 bmp_dc = CreateCompatibleDC(gdi_dc);
-
 		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
 
 		cDc_contexts.Add(bmp_dc);
@@ -179,7 +178,7 @@ S::Void *S::GUI::SurfaceGDI::GetSystemSurface() const
 	return (Void *) window;
 }
 
-S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, const Color &color)
+S::Int S::GUI::SurfaceGDI::SetPixel(const Point &point, const Color &color)
 {
 	if (window == NIL) return Success();
 
@@ -187,12 +186,12 @@ S::Int S::GUI::SurfaceGDI::SetPixel(Int x, Int y, const Color &color)
 	{
 		HDC	 gdi_dc = GetWindowDC(window);
 
-		::SetPixel(gdi_dc, rightToLeft.TranslateX(fontSize.TranslateX(x)), rightToLeft.TranslateY(fontSize.TranslateY(y)), color);
+		::SetPixel(gdi_dc, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), color);
 
 		ReleaseDC(window, gdi_dc);
 	}
 
-	::SetPixel(cDc_contexts.GetLast(), rightToLeft.TranslateX(fontSize.TranslateX(x)), rightToLeft.TranslateY(fontSize.TranslateY(y)), color);
+	::SetPixel(cDc_contexts.GetLast(), rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), color);
 
 	return Success();
 }

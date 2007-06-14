@@ -11,7 +11,9 @@
 #include <smooth/gui/widgets/special/droparea.h>
 #include <smooth/gui/window/window.h>
 
-#include <shellapi.h>
+#ifdef __WIN32__
+#	include <shellapi.h>
+#endif
 
 const S::Int	 S::GUI::DropArea::classID = S::Object::RequestClassID();
 
@@ -44,6 +46,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 	if (!initialized)
 	{
+#ifdef __WIN32__
 		// Enable Drag & Drop only on the Windows NT family for now, due to problems on Windows 9x
 		{
 			OSVERSIONINFOA	 vInfo;
@@ -54,6 +57,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) DragAcceptFiles((HWND) container->GetContainerWindow()->GetSystemWindow(), True);
 		}
+#endif
 
 		initialized = True;
 	}
@@ -63,6 +67,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 	EnterProtectedRegion();
 
+#ifdef __WIN32__
 	switch (message)
 	{
 		case WM_DROPFILES:
@@ -115,6 +120,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 			break;
 	}
+#endif
 
 	LeaveProtectedRegion();
 

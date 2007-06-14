@@ -121,7 +121,7 @@ S::Void *S::GUI::SurfaceBackend::GetSystemSurface() const
 	return NIL;
 }
 
-S::Int S::GUI::SurfaceBackend::SetPixel(Int x, Int y, const Color &color)
+S::Int S::GUI::SurfaceBackend::SetPixel(const Point &point, const Color &color)
 {
 	return Success();
 }
@@ -166,7 +166,7 @@ S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Int style)
 	Line(p2, p4, color2);
 	Line(p3, p4, color2);
 
-	SetPixel(p4.x, p4.y, color2);
+	SetPixel(p4, color2);
 
 	rightToLeft.SetRightToLeft(preRTL);
 
@@ -228,7 +228,7 @@ S::Int S::GUI::SurfaceBackend::Gradient(const Rect &rect, const Color &color1, c
 					green1	= green1 + biasg;
 					blue1	= blue1 + biasb;
 
-					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, Color((Int) red1, (Int) green1, (Int) blue1));
+					for (Int y = 0; y < ymax; y++) bmp.SetPixel(Point(x, y), Color((Int) red1, (Int) green1, (Int) blue1));
 				}
 			}
 			else
@@ -239,7 +239,7 @@ S::Int S::GUI::SurfaceBackend::Gradient(const Rect &rect, const Color &color1, c
 					green1	= green1 + biasg;
 					blue1	= blue1 + biasb;
 
-					for (Int y = 0; y < ymax; y++) bmp.SetPixel(x, y, Color((Int) red1, (Int) green1, (Int) blue1));
+					for (Int y = 0; y < ymax; y++) bmp.SetPixel(Point(x, y), Color((Int) red1, (Int) green1, (Int) blue1));
 				}
 			}
 		}
@@ -257,7 +257,7 @@ S::Int S::GUI::SurfaceBackend::Gradient(const Rect &rect, const Color &color1, c
 				green1	= green1 + biasg;
 				blue1	= blue1 + biasb;
 
-				for (Int x = 0; x < xmax; x++) bmp.SetPixel(x, y, Color((Int) red1, (Int) green1, (Int) blue1));
+				for (Int x = 0; x < xmax; x++) bmp.SetPixel(Point(x, y), Color((Int) red1, (Int) green1, (Int) blue1));
 			}
 		}
 		break;

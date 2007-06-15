@@ -56,6 +56,8 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 	tipTimer	= NIL;
 	tooltip		= NIL;
 
+	contextMenu	= NIL;
+
 	font.SetColor(Setup::TextColor);
 
 	backgroundColor	= Setup::BackgroundColor;
@@ -65,6 +67,7 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 	drawSurface	= nullSurface;
 
 	hitTest.Connect(&Widget::DefaultHitTest, this);
+	getContextMenu.Connect((PopupMenu *) NIL);
 
 	onShow.SetParentObject(this);
 	onHide.SetParentObject(this);
@@ -93,6 +96,9 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 
 	onAction.SetParentObject(this);
 
+	onOpenContextMenu.SetParentObject(this);
+	onCloseContextMenu.SetParentObject(this);
+
 	onGetFocus.SetParentObject(this);
 	onLoseFocus.SetParentObject(this);
 
@@ -105,6 +111,8 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 S::GUI::Widget::~Widget()
 {
 	DeactivateTooltip();
+
+	CloseContextMenu();
 
 	while (widgets.Length()) Remove(widgets.GetFirst());
 
@@ -574,6 +582,13 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+		case SM_RBUTTONDOWN:
+			if (mouseOver)
+			{
+				OpenContextMenu();
+			}
+
+			break;
 		case SM_MOUSEWHEEL:
 			{
 				UnsignedInt	 scrollLines = 0;
@@ -687,6 +702,42 @@ S::Void S::GUI::Widget::DeactivateTooltip()
 		DeleteObject(tooltip);
 
 		tooltip = NIL;
+	}
+}
+
+S::Void S::GUI::Widget::OpenContextMenu()
+{
+	if (contextMenu != NIL) CloseContextMenu();
+
+	contextMenu = getContextMenu.Call();
+
+	if (contextMenu != NIL)
+	{
+		onOpenContextMenu.Emit();
+
+		Window	*window	= container->GetContainerWindow();
+		Point	 mousePos = window->GetMousePosition();
+
+		contextMenu->CalculateSize();
+
+		contextMenu->SetPosition(mousePos);
+		contextMenu->internalRequestClose.Connect(&Widget::CloseContextMenu, this);
+
+		Add(contextMenu);
+	}
+}
+
+S::Void S::GUI::Widget::CloseContextMenu()
+{
+	if (contextMenu != NIL)
+	{
+		contextMenu->internalRequestClose.Disconnect(&Widget::CloseContextMenu, this);
+
+		Remove(contextMenu);
+
+		contextMenu = NIL;
+
+		onCloseContextMenu.Emit();
 	}
 }
 

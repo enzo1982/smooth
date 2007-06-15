@@ -16,9 +16,10 @@ namespace smooth
 	namespace GUI
 	{
 		class Widget;
-
 		class Window;
+
 		class Tooltip;
+		class PopupMenu;
 
 		class Surface;
 	};
@@ -90,6 +91,8 @@ namespace smooth
 				Font				 font;
 
 				Widget				*container;
+
+				PopupMenu			*contextMenu;
 
 				Void				 ComputeTextSize();
 
@@ -193,6 +196,7 @@ namespace smooth
 				virtual Bool			 IsRightToLeft() const;
 			callbacks:
 				Callback1<Bool, const Point &>	 hitTest;
+				Callback0<PopupMenu *>		 getContextMenu;
 			signals:
 				Signal0<Void>			 onShow;
 				Signal0<Void>			 onHide;
@@ -224,6 +228,9 @@ namespace smooth
 
 				Signal0<Void>			 onAction;
 
+				Signal0<Void>			 onOpenContextMenu;
+				Signal0<Void>			 onCloseContextMenu;
+
 				Signal0<Void>			 onGetFocus;
 				Signal0<Void>			 onGetFocusByKeyboard;
 				Signal0<Void>			 onLoseFocus;
@@ -234,6 +241,9 @@ namespace smooth
 				Signal1<Void, Widget *>		 onUnregister;
 			slots:
 				Bool				 DefaultHitTest(const Point &);
+
+				Void				 OpenContextMenu();
+				Void				 CloseContextMenu();
 		};
 	};
 };

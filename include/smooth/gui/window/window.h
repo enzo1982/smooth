@@ -17,7 +17,6 @@ namespace smooth
 	{
 		class Window;
 		class WindowBackend;
-		class PopupMenu;
 		class Layer;
 	};
 };
@@ -69,8 +68,6 @@ namespace smooth
 				String				 defaultStatus;
 
 				Int				 layoutDirection;
-
-				PopupMenu			*trackMenu;
 
 				Layer				*mainLayer;
 
@@ -161,11 +158,7 @@ namespace smooth
 				Signal0<Void>			 onPeek;
 				Signal3<Void, Int, Int, Int>	 onEvent;
 			callbacks:
-				Callback2<PopupMenu *, Int, Int> getTrackMenu;
 				Callback0<Bool>			 doQuit;
-			slots:
-				Void				 OpenPopupMenu();
-				Void				 ClosePopupMenu();
 		};
 	};
 };

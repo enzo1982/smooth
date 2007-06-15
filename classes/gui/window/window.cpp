@@ -13,7 +13,6 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/widgets/basic/statusbar.h>
-#include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/misc/math.h>
 #include <smooth/gui/window/toolwindow.h>
@@ -66,8 +65,6 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 	destroyed	= False;
 	initshow	= False;
 
-	trackMenu = NIL;
-
 	mainLayer = new Layer();
 
 	Add(mainLayer);
@@ -87,8 +84,6 @@ S::GUI::Window::~Window()
 
 	Remove(mainLayer);
 	DeleteObject(mainLayer);
-
-	if (trackMenu != NIL) ClosePopupMenu();
 
 	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop--;
 
@@ -717,12 +712,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			rVal = Break;
 
 			break;
-		case SM_RBUTTONDOWN:
-			OpenPopupMenu();
-
-			if (trackMenu != NIL) rVal = Break;
-
-			break;
 	}
 #endif
 
@@ -1030,37 +1019,6 @@ S::GUI::Surface *S::GUI::Window::GetDrawSurface() const
 S::Void *S::GUI::Window::GetSystemWindow() const
 {
 	return backend->GetSystemWindow();
-}
-
-S::Void S::GUI::Window::OpenPopupMenu()
-{
-	if (trackMenu != NIL) ClosePopupMenu();
-
-	Point	 position = GetMousePosition();
-
-	trackMenu = getTrackMenu.Call(position.x, position.y);
-
-	if (trackMenu != NIL)
-	{
-		trackMenu->CalculateSize();
-
-		trackMenu->SetPosition(position);
-		trackMenu->internalRequestClose.Connect(&Window::ClosePopupMenu, this);
-
-		Add(trackMenu);
-	}
-}
-
-S::Void S::GUI::Window::ClosePopupMenu()
-{
-	if (trackMenu != NIL)
-	{
-		trackMenu->internalRequestClose.Disconnect(&Window::ClosePopupMenu, this);
-
-		Remove(trackMenu);
-
-		trackMenu = NIL;
-	}
 }
 
 S::Int S::GUI::Window::Add(Widget *widget)

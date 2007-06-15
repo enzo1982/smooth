@@ -147,8 +147,9 @@ S::Void S::GUI::PopupMenuEntryCheck::OnClickEntry()
 
 S::Bool S::GUI::PopupMenuEntryCheck::IsTypeCompatible(Int compType) const
 {
-	if (compType == Object::classID ||
-	    compType == Widget::classID ||
+	if (compType == Object::classID	   ||
+	    compType == Widget::classID	   ||
+	    compType == MenuEntry::classID ||
 	    compType == PopupMenuEntry::classID) return True;
 	else					 return False;
 }

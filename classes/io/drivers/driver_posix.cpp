@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 #	include <io.h>
 #else
 #	include <unistd.h>

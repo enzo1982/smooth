@@ -54,7 +54,7 @@ S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadPa
 {
 	Stop();
 
-	thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) threadProc, threadParam, 0, (UnsignedLong *) &threadID);
+	thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) threadProc, threadParam, 0, (DWORD *) &threadID);
 
 	return Success();
 }

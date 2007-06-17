@@ -1,0 +1,197 @@
+# Makefile for smooth v0.8, Wine
+
+include Makefile-common
+
+VERSION = 0.8.70.0
+
+HEADERS = $(OBJECTDIR)/smooth.h.gch
+
+OBJECTS = $(OBJECTDIR)/backendwin32.o $(OBJECTDIR)/backend.o $(OBJECTDIR)/input.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/error_endoffile.o $(OBJECTDIR)/error_filenotfound.o $(OBJECTDIR)/error_permissiondenied.o $(OBJECTDIR)/error.o $(OBJECTDIR)/success.o $(OBJECTDIR)/directory.o $(OBJECTDIR)/file.o $(OBJECTDIR)/bitmapgdi.o $(OBJECTDIR)/surfacegdi.o $(OBJECTDIR)/bitmapbackend.o $(OBJECTDIR)/surfacebackend.o $(OBJECTDIR)/form.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/imageloader_icon.o $(OBJECTDIR)/imageloader.o $(OBJECTDIR)/imageloader_pci.o $(OBJECTDIR)/modifier_fontsize.o $(OBJECTDIR)/modifier_righttoleft.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/color.o $(OBJECTDIR)/font.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/application.o $(OBJECTDIR)/background.o $(OBJECTDIR)/xulloader.o $(OBJECTDIR)/colordlg.o $(OBJECTDIR)/dialog.o $(OBJECTDIR)/dirdlg.o $(OBJECTDIR)/filedlg.o $(OBJECTDIR)/fontdlg.o $(OBJECTDIR)/messagebox.o $(OBJECTDIR)/splashscreen.o $(OBJECTDIR)/tipodaydlg.o $(OBJECTDIR)/mdiclient.o $(OBJECTDIR)/mdiwindow.o $(OBJECTDIR)/activearea.o $(OBJECTDIR)/arrows.o $(OBJECTDIR)/button.o $(OBJECTDIR)/checkbox.o $(OBJECTDIR)/client.o $(OBJECTDIR)/divider.o $(OBJECTDIR)/editbox.o $(OBJECTDIR)/groupbox.o $(OBJECTDIR)/hyperlink.o $(OBJECTDIR)/image.o $(OBJECTDIR)/multiedit.o $(OBJECTDIR)/optionbox.o $(OBJECTDIR)/progressbar.o $(OBJECTDIR)/scrollbar.o $(OBJECTDIR)/slider.o $(OBJECTDIR)/statusbar.o $(OBJECTDIR)/tabwidget.o $(OBJECTDIR)/text.o $(OBJECTDIR)/titlebar.o $(OBJECTDIR)/hotspot.o $(OBJECTDIR)/simplebutton.o $(OBJECTDIR)/combobox.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listbox.o $(OBJECTDIR)/listboxheader.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menubar.o $(OBJECTDIR)/menubarentry.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/micromenu.o $(OBJECTDIR)/popupmenu.o $(OBJECTDIR)/popupmenuentry.o $(OBJECTDIR)/popupmenuentrycheck.o $(OBJECTDIR)/popupmenuentryoption.o $(OBJECTDIR)/cursor.o $(OBJECTDIR)/dragcontrol.o $(OBJECTDIR)/droparea.o $(OBJECTDIR)/shortcut.o $(OBJECTDIR)/tooltip.o $(OBJECTDIR)/layer.o $(OBJECTDIR)/widget.o $(OBJECTDIR)/windowgdi.o $(OBJECTDIR)/windowbackend.o $(OBJECTDIR)/toolwindow.o $(OBJECTDIR)/window.o $(OBJECTDIR)/i18n.o $(OBJECTDIR)/driver_ansi.o $(OBJECTDIR)/driver_https.o $(OBJECTDIR)/driver_memory.o $(OBJECTDIR)/driver_posix.o $(OBJECTDIR)/driver_socket.o $(OBJECTDIR)/driver_socks4.o $(OBJECTDIR)/driver_socks5.o $(OBJECTDIR)/driver_win32.o $(OBJECTDIR)/driver_zero.o $(OBJECTDIR)/filter_bzip2.o $(OBJECTDIR)/filter_xor.o $(OBJECTDIR)/driver.o $(OBJECTDIR)/filter.o $(OBJECTDIR)/instream.o $(OBJECTDIR)/outstream.o $(OBJECTDIR)/stream.o $(OBJECTDIR)/base64.o $(OBJECTDIR)/crc32.o $(OBJECTDIR)/args.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/config.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/math.o $(OBJECTDIR)/memory.o $(OBJECTDIR)/string.o $(OBJECTDIR)/protocol_file.o $(OBJECTDIR)/protocol_http.o $(OBJECTDIR)/protocol.o $(OBJECTDIR)/eventwin32.o $(OBJECTDIR)/timerwin32.o $(OBJECTDIR)/eventbackend.o $(OBJECTDIR)/timerbackend.o $(OBJECTDIR)/console.o $(OBJECTDIR)/dynamicloader.o $(OBJECTDIR)/event.o $(OBJECTDIR)/multimonitor.o $(OBJECTDIR)/system.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/mutexwin32.o $(OBJECTDIR)/semaphorewin32.o $(OBJECTDIR)/threadwin32.o $(OBJECTDIR)/mutexbackend.o $(OBJECTDIR)/semaphorebackend.o $(OBJECTDIR)/threadbackend.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/xul_box.o $(OBJECTDIR)/xul_button.o $(OBJECTDIR)/xul_description.o $(OBJECTDIR)/xul_label.o $(OBJECTDIR)/xul_menubar.o $(OBJECTDIR)/xul_popupmenu.o $(OBJECTDIR)/xul_renderer.o $(OBJECTDIR)/xul_textbox.o $(OBJECTDIR)/xul_widget.o $(OBJECTDIR)/xul_window.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/init.o $(OBJECTDIR)/pciio.o $(OBJECTDIR)/templates.o
+RESOURCES = $(OBJECTDIR)/resources.o
+
+LIBS = -lfribidi2 -lbz2 -llisa -lxml2 -lwine -lstdc++
+
+SAMPLESLIBS = -lsmooth -lstdc++
+
+DLLNAME = $(BINDIR)/smooth-$(VERSION).so
+
+LIBBZ2 = $(LIBDIR)/libbz2.a
+LIBLISA = $(LIBDIR)/liblisa.a
+LIBFRIBIDI2 = $(LIBDIR)/libfribidi2.a
+
+OTHERLIBS = $(LIBFRIBIDI2) $(LIBBZ2) $(LIBLISA)
+
+LIBBZ2OBJECTS = $(OBJECTDIR)/libbz2_blocksort.o $(OBJECTDIR)/libbz2_bzlib.o $(OBJECTDIR)/libbz2_compress.o $(OBJECTDIR)/libbz2_crctable.o $(OBJECTDIR)/libbz2_decompress.o $(OBJECTDIR)/libbz2_huffman.o $(OBJECTDIR)/libbz2_randtable.o
+LISAOBJECTS = $(OBJECTDIR)/lisa_lisa.o
+FRIBIDI2OBJECTS = $(OBJECTDIR)/fribidi2_fribidi.o $(OBJECTDIR)/fribidi2_fribidi-bidi.o $(OBJECTDIR)/fribidi2_fribidi-bidi-types.o $(OBJECTDIR)/fribidi2_fribidi-env.o $(OBJECTDIR)/fribidi2_fribidi-joining.o $(OBJECTDIR)/fribidi2_fribidi-joining-types.o $(OBJECTDIR)/fribidi2_fribidi-mem.o $(OBJECTDIR)/fribidi2_fribidi-mirroring.o $(OBJECTDIR)/fribidi2_fribidi-run.o
+
+DESIGNEROBJECTS = $(OBJECTDIR)/designer_designer.o $(OBJECTDIR)/designer_edit_component.o
+TRANSLATOROBJECTS = $(OBJECTDIR)/translator_translator.o $(OBJECTDIR)/translator_resources.o
+PCIFFMANOBJECTS = $(OBJECTDIR)/pciffman_main.o
+SAMPLE1OBJECTS = $(SAMPLE1DIR)/beat.o
+SAMPLE2OBJECTS = $(SAMPLE2DIR)/test.o
+SAMPLE3OBJECTS = $(SAMPLE3DIR)/testkey.o
+SAMPLE4OBJECTS = $(SAMPLE4DIR)/widgettest.o
+SAMPLE5OBJECTS = $(SAMPLE5DIR)/mditest.o
+SAMPLE4DLLOBJECTS = $(SAMPLE4DIR)/myactivearea.o
+
+DESIGNEREXE = $(BINDIR)/designer
+TRANSLATOREXE = $(BINDIR)/translator
+PCIFFMANEXE = $(BINDIR)/pciffman
+SAMPLE1EXE = $(SAMPLE1DIR)/beat
+SAMPLE2EXE = $(SAMPLE2DIR)/test
+SAMPLE3EXE = $(SAMPLE3DIR)/testkey
+SAMPLE4EXE = $(SAMPLE4DIR)/widgettest
+SAMPLE5EXE = $(SAMPLE5DIR)/mditest
+SAMPLE4DLL = $(SAMPLE4DIR)/myactivearea.so
+SAMPLE4LIB = $(SAMPLE4DIR)/libmyactivearea.a
+
+COMPILER = g++
+C_COMPILER = gcc
+LINKER = gcc
+RESCOMP = wrc
+STRIP = strip
+REMOVER = rm
+COPIER = cp
+ECHO = echo
+AR = ar
+PACKER = upx
+COMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/include/wine/windows -include $(OBJECTDIR)/smooth.h -march=i586 -Os -g0 -Wall -fno-exceptions -D__WINE__ -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -c
+C_COMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/include/wine/windows -march=i586 -Os -g0 -Wall -fno-exceptions -D__WINE__ -DUNICODE -D_UNICODE -c
+LINKER_OPTS = -L$(LIBDIR) -L/usr/lib/wine --shared -o $(DLLNAME)
+PLUGIN_LINKER_OPTS = -L$(LIBDIR) -L/usr/lib/wine --shared -o $(SAMPLE4DLL)
+EXECOMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -Os -g0 -Wall -fno-exceptions -DUNICODE -D_UNICODE -c
+EXELINKER_OPTS = -L$(LIBDIR) $(SAMPLESLIBS)
+RESCOMP_OPTS = -D__SMOOTH_DLL__ -O res
+STRIP_OPTS = --strip-all
+LIBSTRIP_OPTS = --strip-debug
+REMOVER_OPTS = -f
+COPIER_OPTS = -f
+PACKER_OPTS = -9 -q
+
+.PHONY: all headers programs install clean clean_all clean_headers distribute
+.SILENT:
+
+all: $(HEADERS) $(OBJECTS) $(RESOURCES) $(OTHERLIBS) $(DLLNAME) distribute
+
+headers: clean_headers $(HEADERS)
+
+programs: $(HEADERS) $(DLLNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4DLL) $(SAMPLE4EXE) $(SAMPLE5EXE) distribute
+
+install:
+
+clean: clean_headers
+	$(ECHO) -n Cleaning directories...
+	$(REMOVER) $(REMOVER_OPTS) $(OBJECTS) $(RESOURCES) $(DLLNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4EXE) $(SAMPLE5EXE) $(DESIGNEROBJECTS) $(PCIFFMANOBJECTS) $(TRANSLATOROBJECTS) $(SAMPLE1OBJECTS) $(SAMPLE2OBJECTS) $(SAMPLE3OBJECTS) $(SAMPLE4OBJECTS) $(SAMPLE5OBJECTS) $(SAMPLE4DLLOBJECTS) $(SAMPLE4DLL) $(SAMPLE4LIB)
+	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE1DIR)/smooth-$(VERSION).so
+	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE2DIR)/smooth-$(VERSION).so
+	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE3DIR)/smooth-$(VERSION).so
+	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE4DIR)/smooth-$(VERSION).so
+	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE5DIR)/smooth-$(VERSION).so
+	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE6DIR)/smooth-$(VERSION).so
+	$(REMOVER) $(REMOVER_OPTS) $(SAMPLE7DIR)/smooth-$(VERSION).so
+	$(ECHO) done.
+
+clean_all: clean
+	$(ECHO) -n Cleaning 3rd party libraries...
+	$(REMOVER) $(REMOVER_OPTS) $(OTHERLIBS) $(LIBBZ2OBJECTS) $(LISAOBJECTS) $(FRIBIDI2OBJECTS)
+	$(ECHO) done.
+
+clean_headers:
+	$(ECHO) -n Cleaning precompiled headers...
+	$(REMOVER) $(REMOVER_OPTS) $(HEADERS)
+	$(ECHO) done.
+
+distribute: $(DLLNAME)
+	$(ECHO) -n Distributing files to directories...
+	$(REMOVER) $(REMOVER_OPTS) NULL
+	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE1DIR)/smooth-$(VERSION).so
+	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE2DIR)/smooth-$(VERSION).so
+	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE3DIR)/smooth-$(VERSION).so
+	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE4DIR)/smooth-$(VERSION).so
+	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE5DIR)/smooth-$(VERSION).so
+	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE6DIR)/smooth-$(VERSION).so
+	$(COPIER) $(COPIER_OPTS) $(DLLNAME) $(SAMPLE7DIR)/smooth-$(VERSION).so
+	$(ECHO) done.
+
+$(DLLNAME): $(HEADERS) $(OBJECTS) $(RESOURCES) $(OTHERLIBS)
+	$(ECHO) -n Linking $(DLLNAME)...
+	$(LINKER) $(OBJECTS) $(LINKER_OPTS) $(LIBS)
+	$(STRIP) $(STRIP_OPTS) $(DLLNAME)
+	$(ECHO) done.
+
+$(LIBBZ2): $(LIBBZ2OBJECTS)
+	$(ECHO) -n Linking $(LIBBZ2)...
+	$(AR) r $(LIBBZ2) $(LIBBZ2OBJECTS)
+	$(ECHO) done.
+
+$(LIBLISA): $(LISAOBJECTS)
+	$(ECHO) -n Linking $(LIBLISA)...
+	$(AR) r $(LIBLISA) $(LISAOBJECTS)
+	$(ECHO) done.
+
+$(LIBFRIBIDI2): $(FRIBIDI2OBJECTS)
+	$(ECHO) -n Linking $(LIBFRIBIDI2)...
+	$(AR) r $(LIBFRIBIDI2) $(FRIBIDI2OBJECTS)
+	$(ECHO) done.
+
+$(DESIGNEREXE): $(DLLNAME) $(DESIGNEROBJECTS)
+	$(ECHO) -n Linking $(DESIGNEREXE)...
+	$(LINKER) $(DESIGNEROBJECTS) $(EXELINKER_OPTS) -o$(DESIGNEREXE)
+	$(STRIP) $(STRIP_OPTS) $(DESIGNEREXE)
+	$(ECHO) done.
+
+$(PCIFFMANEXE): $(DLLNAME) $(PCIFFMANOBJECTS)
+	$(ECHO) -n Linking $(PCIFFMANEXE)...
+	$(LINKER) $(PCIFFMANOBJECTS) $(EXELINKER_OPTS) -o$(PCIFFMANEXE)
+	$(STRIP) $(STRIP_OPTS) $(PCIFFMANEXE)
+	$(ECHO) done.
+
+$(TRANSLATOREXE): $(DLLNAME) $(TRANSLATOROBJECTS)
+	$(ECHO) -n Linking $(TRANSLATOREXE)...
+	$(LINKER) $(TRANSLATOROBJECTS) $(EXELINKER_OPTS) -o$(TRANSLATOREXE)
+	$(STRIP) $(STRIP_OPTS) $(TRANSLATOREXE)
+	$(ECHO) done.
+
+$(SAMPLE4DLL): $(SAMPLE4DLLOBJECTS)
+	$(ECHO) Linking $(SAMPLE4DLL)...
+	$(LINKER) $(SAMPLE4DLLOBJECTS) $(PLUGIN_LINKER_OPTS) $(SAMPLESLIBS)
+	$(STRIP) $(STRIP_OPTS) $(SAMPLE4DLL)
+	$(ECHO) done.
+
+$(SAMPLE1EXE): $(DLLNAME) $(SAMPLE1OBJECTS)
+	$(ECHO) -n Linking $(SAMPLE1EXE)...
+	$(LINKER) $(SAMPLE1OBJECTS) $(EXELINKER_OPTS) -o$(SAMPLE1EXE)
+	$(STRIP) $(STRIP_OPTS) $(SAMPLE1EXE)
+	$(ECHO) done.
+
+$(SAMPLE2EXE): $(DLLNAME) $(SAMPLE2OBJECTS)
+	$(ECHO) -n Linking $(SAMPLE2EXE)...
+	$(LINKER) $(SAMPLE2OBJECTS) $(EXELINKER_OPTS) -o$(SAMPLE2EXE)
+	$(STRIP) $(STRIP_OPTS) $(SAMPLE2EXE)
+	$(ECHO) done.
+
+$(SAMPLE3EXE): $(DLLNAME) $(SAMPLE3OBJECTS)
+	$(ECHO) -n Linking $(SAMPLE3EXE)...
+	$(LINKER) $(SAMPLE3OBJECTS) $(EXELINKER_OPTS) -o$(SAMPLE3EXE)
+	$(STRIP) $(STRIP_OPTS) $(SAMPLE3EXE)
+	$(ECHO) done.
+
+$(SAMPLE4EXE): $(DLLNAME) $(SAMPLE4DLL) $(SAMPLE4OBJECTS)
+	$(ECHO) -n Linking $(SAMPLE4EXE)...
+	$(LINKER) $(SAMPLE4OBJECTS) $(EXELINKER_OPTS) -L$(SAMPLE4DIR) -lmyactivearea -o$(SAMPLE4EXE)
+	$(STRIP) $(STRIP_OPTS) $(SAMPLE4EXE)
+	$(ECHO) done.
+
+$(SAMPLE5EXE): $(DLLNAME) $(SAMPLE5OBJECTS)
+	$(ECHO) -n Linking $(SAMPLE5EXE)...
+	$(LINKER) $(SAMPLE5OBJECTS) $(EXELINKER_OPTS) -o$(SAMPLE5EXE)
+	$(STRIP) $(STRIP_OPTS) $(SAMPLE5EXE)
+	$(ECHO) done.
+
+include Makefile-objects
+
+$(OBJECTDIR)/lisa_lisa.o: $(LISADIR)/lisa_win32.cpp
+	$(ECHO) -n Compiling $(LISADIR)/lisa_win32.cpp...
+	$(COMPILER) $(C_COMPILER_OPTS) $(LISADIR)/lisa_win32.cpp -o $(OBJECTDIR)/lisa_lisa.o
+	$(ECHO) done.

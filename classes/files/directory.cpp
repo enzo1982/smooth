@@ -10,6 +10,10 @@
 
 #include <smooth/files/directory.h>
 
+#ifndef __WIN32__
+#	include <glob.h>
+#endif
+
 S::Directory::Directory(const String &iDirName, const String &iDirPath)
 {
 	dirName = iDirName;
@@ -147,6 +151,20 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 	}
 
 	FindClose(handle);
+#else
+	glob_t	*fileData = new glob_t;
+
+	if (glob(String(*this).Append("/").Append(pattern), GLOB_NOSORT, NIL, fileData) == 0)
+	{
+		for (Int i = 0; i < fileData->gl_pathc; i++)
+		{
+			files.Add(File(fileData->gl_pathv[i], *this));
+		}
+	}
+
+	globfree(fileData);
+
+	delete fileData;
 #endif
 
 	return files;

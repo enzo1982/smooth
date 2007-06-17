@@ -16,6 +16,10 @@
 #	include <wtypes.h>
 #	include <shlobj.h>
 
+#	ifndef BIF_USENEWUI
+#		define BIF_USENEWUI 0
+#	endif
+
 	int CALLBACK	 BrowseCallbackProc(HWND, UINT, LPARAM, LPARAM);
 #endif
 

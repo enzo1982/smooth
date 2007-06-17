@@ -18,10 +18,16 @@
 #include <iconv.h>
 #include <memory.h>
 
-#ifdef __WIN32__
-#include <smooth/threads/backends/win32/mutexwin32.h>
+#if defined __WIN32__
+#	include <smooth/threads/backends/win32/mutexwin32.h>
 #else
-#include <smooth/threads/backends/posix/mutexposix.h>
+#	include <smooth/threads/backends/posix/mutexposix.h>
+#endif
+
+#if defined __WINE__
+#	define wcslen lstrlenW
+#	define wcscpy lstrcpyW
+#	define wcsncpy lstrcpynW
 #endif
 
 namespace smooth

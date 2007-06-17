@@ -11,7 +11,7 @@
 #include <smooth/io/drivers/driver_https.h>
 #include <math.h>
 
-#ifndef __WIN32__
+#if !defined __WIN32__
 #	include <unistd.h>
 #endif
 

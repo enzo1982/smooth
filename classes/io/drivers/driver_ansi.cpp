@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 
-#ifndef __WIN32__
+#if !defined __WIN32__ || defined __WINE__
 #	define _wfopen fopen
 #endif
 

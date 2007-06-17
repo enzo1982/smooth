@@ -11,8 +11,6 @@
 #ifndef _H_OBJSMOOTH_DEFS_
 #define _H_OBJSMOOTH_DEFS_
 
-#include <lisa.h>
-
 #ifdef __GNUC__
 #	ifndef __int64
 #		define __int64 long long
@@ -64,6 +62,30 @@
 #	if !defined WM_MOUSEWHEEL
 #		define WM_MOUSEWHEEL 522
 #	endif
+#elif defined __WINE__
+#	define __WIN32__
+
+#	if defined __SMOOTH_DLL__ && !defined WIN32_LEAN_AND_MEAN
+#		define WIN32_LEAN_AND_MEAN
+#	endif
+
+#	include <winsock2.h>
+#	include <windows.h>
+#	include <wchar.h>
+
+#	undef wchar_t
+#	define wchar_t WCHAR
+
+#	define SMOOTHAPI
+#	define SMOOTHVAR extern
+
+#	define SMOOTH_PLUGIN_API
+#	define SMOOTH_PLUGIN_VAR extern
+
+#	undef True
+#	undef False
+#	undef Bool
+#	undef Success
 #elif defined __QNX__
 #	include <Ph.h>
 #	include <Pt.h>
@@ -96,6 +118,8 @@
 
 #	define MAX_PATH PATH_MAX
 #endif
+
+#include <lisa.h>
 
 #define NIL	(0)
 

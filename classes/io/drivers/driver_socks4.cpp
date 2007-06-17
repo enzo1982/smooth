@@ -12,7 +12,7 @@
 #include <math.h>
 #include <string.h>
 
-#ifndef __WIN32__
+#if !defined __WIN32__
 #	include <unistd.h>
 #	include <arpa/inet.h>
 #endif

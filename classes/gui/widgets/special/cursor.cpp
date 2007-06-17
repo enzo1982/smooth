@@ -691,9 +691,9 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 
 			if (Setup::enableUnicode)
 			{
-				memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, 2 * (mText.Length() + 1));
+				memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(wchar_t) * (mText.Length() + 1));
 
-				wcscpy((wchar_t *) GlobalLock(memory), mText);
+				memcpy(GlobalLock(memory), (wchar_t *) mText, sizeof(wchar_t) * (mText.Length() + 1));
 
 				SetClipboardData(CF_UNICODETEXT, memory);
 			}
@@ -872,7 +872,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 			lFont.lfQuality		= DEFAULT_QUALITY;
 			lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
 
-			wcscpy(lFont.lfFaceName, font.GetName());
+			memcpy(lFont.lfFaceName, (wchar_t *) font.GetName(), sizeof(wchar_t) * (font.GetName().Length() + 1));
 
 			ImmSetCompositionFontW(hImc, &lFont);
 		}

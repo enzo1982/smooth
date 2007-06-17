@@ -10,7 +10,7 @@
 
 #include <smooth/io/drivers/driver_socket.h>
 
-#ifndef __WIN32__
+#if !defined __WIN32__
 #	include <unistd.h>
 #	include <sys/ioctl.h>
 #endif

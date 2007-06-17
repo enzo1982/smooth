@@ -84,8 +84,8 @@ S::Int64 S::File::GetFileSize() const
 	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 	else				handle = CreateFileA(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
-	UnsignedInt32	 sizeLow	= 0;
-	UnsignedInt32	 sizeHigh	= 0;
+	DWORD	 sizeLow	= 0;
+	DWORD	 sizeHigh	= 0;
 
 	sizeLow = ::GetFileSize(handle, &sizeHigh);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -61,7 +61,7 @@ S::IO::DriverWin32::~DriverWin32()
 
 S::Int S::IO::DriverWin32::ReadData(UnsignedByte *data, Int dataSize)
 {
-	Unsigned long	 bytes;
+	DWORD	 bytes;
 
 	ReadFile(stream, (void *) data, (dataSize < (GetSize() - GetPos()) ? dataSize : (GetSize() - GetPos())), &bytes, NULL);
 
@@ -70,7 +70,7 @@ S::Int S::IO::DriverWin32::ReadData(UnsignedByte *data, Int dataSize)
 
 S::Int S::IO::DriverWin32::WriteData(UnsignedByte *data, Int dataSize)
 {
-	UnsignedLong	 bytes;
+	DWORD	 bytes;
 
 	WriteFile(stream, (void *) data, dataSize, &bytes, NULL);
 
@@ -79,24 +79,24 @@ S::Int S::IO::DriverWin32::WriteData(UnsignedByte *data, Int dataSize)
 
 S::Int64 S::IO::DriverWin32::Seek(Int64 newPos)
 {
-	Int32	 hi32 = newPos >> 32;
-	Int64	 lo32 = SetFilePointer(stream, newPos, &hi32, FILE_BEGIN);
+	LONG	 hi32 = newPos >> 32;
+	LONG	 lo32 = SetFilePointer(stream, newPos, &hi32, FILE_BEGIN);
 
 	return (Int64) hi32 << 32 | lo32;
 }
 
 S::Int64 S::IO::DriverWin32::GetSize() const
 {
-	Int32	 hi32 = 0;
-	Int64	 lo32 = GetFileSize(stream, (UnsignedLong *) &hi32);
+	DWORD	 hi32 = 0;
+	DWORD	 lo32 = GetFileSize(stream, &hi32);
 
 	return (Int64) hi32 << 32 | lo32;
 }
 
 S::Int64 S::IO::DriverWin32::GetPos() const
 {
-	Int32	 hi32 = 0;
-	Int64	 lo32 = SetFilePointer(stream, 0, &hi32, FILE_CURRENT);
+	LONG	 hi32 = 0;
+	LONG	 lo32 = SetFilePointer(stream, 0, &hi32, FILE_CURRENT);
 
 	return (Int64) hi32 << 32 | lo32;
 }

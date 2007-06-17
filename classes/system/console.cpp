@@ -10,7 +10,7 @@
 
 #include <smooth/system/console.h>
 
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 #	include <conio.h>
 #else
 #	include <stdio.h>
@@ -26,7 +26,7 @@ S::System::Console::Console(const Console &)
 
 S::Int S::System::Console::SetTitle(const String &title)
 {
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 	if (Setup::enableUnicode)	SetConsoleTitleW(title);
 	else				SetConsoleTitleA(title);
 #endif
@@ -36,7 +36,7 @@ S::Int S::System::Console::SetTitle(const String &title)
 
 S::Int S::System::Console::OutputString(const String &string)
 {
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 	_cprintf(string);
 #else
 	printf(string);
@@ -47,7 +47,7 @@ S::Int S::System::Console::OutputString(const String &string)
 
 S::Int S::System::Console::OutputLine(const String &string)
 {
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 	_cprintf(string);
 	_cprintf("\n");
 #else
@@ -60,7 +60,7 @@ S::Int S::System::Console::OutputLine(const String &string)
 
 S::Void S::System::Console::WaitForKey()
 {
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 	_getch();
 #else
 	getchar();

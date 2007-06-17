@@ -1,5 +1,5 @@
  /* LiSA - Library for System Adaptation
-  * Copyright (C) 2002-2003 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 2002-2007 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Library General Public
@@ -16,8 +16,18 @@
   * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
   * MA 02111-1307, USA */
 
-#include <lisa.h>
+#if defined __WINE__
+#	define __WIN32__
+#endif
+
 #include <windows.h>
+
+#if defined __WINE__
+#	undef wchar_t
+#	define wchar_t WCHAR
+#endif
+
+#include <lisa.h>
 
 HCURSOR	 LiSA_CURSOR_ARROW	= NULL;
 HCURSOR	 LiSA_CURSOR_TEXTEDIT	= NULL;
@@ -80,8 +90,8 @@ int LiSAOpenURLA(char *url)
 
 int LiSAOpenURLW(wchar_t *url)
 {
-	if (((int) ShellExecuteW(NULL, L"open", url, NULL, NULL, 0)) > 32)	return 0;
-	else									return 1;
+	if (((int) ShellExecuteW(NULL, (wchar_t *) L"open", url, NULL, NULL, 0)) > 32)	return 0;
+	else										return 1;
 }
 
 int LiSAGetDisplaySizeX()

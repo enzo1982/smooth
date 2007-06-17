@@ -15,13 +15,6 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 
-#ifdef __WIN32__
-#include <direct.h>
-#include <io.h>
-#else
-#include <glob.h>
-#endif
-
 S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
 
 S::I18n::Language::Language()
@@ -133,60 +126,22 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 
 	if (!internal)
 	{
-		if (Directory::SetActiveDirectory(Directory(GUI::Application::GetApplicationDirectory().Append("lang\\"))) == Error())
+		Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang\\"));
+		const Array<File>	&files = dir.GetFilesByPattern(String(appPrefix).ToLower().Append("_*.xml"));
+
+		for (Int i = 0; i < files.Length(); i++)
 		{
-			Directory::SetActiveDirectory(Directory(GUI::Application::GetStartupDirectory().Append("lang\\")));
+			doc = new XML::Document();
+			language = new Language();
+
+			doc->LoadFile(files.GetNth(i));
+
+			language->magic = files.GetNth(i).GetFileName();
+
+			LoadDoc(doc, language);
+
+			delete doc;
 		}
-
-#ifdef __WIN32__
-		_finddata_t	 fileData;
-		int		 handle;
-
-		if ((handle = _findfirst(String(appPrefix).ToLower().Append("_*.xml"), &fileData)) != -1)
-		{
-			do
-			{
-				doc = new XML::Document();
-				language = new Language();
-
-				doc->LoadFile(fileData.name);
-
-				language->magic = fileData.name;
-
-				LoadDoc(doc, language);
-
-				delete doc;
-			}
-			while (_findnext(handle, &fileData) == 0);
-		}
-
-		_findclose(handle);
-#else
-		glob_t	*fileData = new glob_t;
-
-		if (glob(String(appPrefix).ToLower().Append("_*.xml"), GLOB_NOSORT, NIL, fileData) == 0)
-		{
-			for (Int i = 0; i < fileData->gl_pathc; i++)
-			{
-				doc = new XML::Document();
-				language = new Language();
-
-				doc->LoadFile(fileData->gl_pathv[i]);
-
-				language->magic = fileData->gl_pathv[i];
-
-				LoadDoc(doc, language);
-
-				delete doc;
-			}
-		}
-
-		globfree(fileData);
-
-		delete fileData;
-#endif
-
-		Directory::SetActiveDirectory(Directory(GUI::Application::GetStartupDirectory()));
 	}
 	else
 	{

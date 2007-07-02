@@ -15,18 +15,18 @@
 #include <smooth/system/multimonitor.h>
 #include <smooth/templates/nonblocking.h>
 
-#ifdef __WIN32__
-#include <wtypes.h>
-#include <shlobj.h>
+#if defined __WIN32__
+#	include <wtypes.h>
+#	include <shlobj.h>
 
-#include <smooth/backends/win32/backendwin32.h>
+#	include <smooth/backends/win32/backendwin32.h>
 #else
-#include <unistd.h>
+#	include <unistd.h>
 #endif
 
 using namespace smooth::Backends;
 
-#ifdef __WIN32__
+#if defined __WIN32__
 __declspec (dllexport) HINSTANCE	 S::hInstance		= NIL;
 __declspec (dllexport) HINSTANCE	 S::hPrevInstance	= NIL;
 __declspec (dllexport) S::String	 S::szCmdLine		= NIL;
@@ -66,7 +66,7 @@ S::Void S::Init()
 
 	System::MultiMonitor::Initialize();
 
-#ifdef __WIN32__
+#if defined __WIN32__
 	if (hDllInstance == NIL) hDllInstance = hInstance;
 
 	// decide if we want to use unicode:
@@ -89,10 +89,14 @@ S::Void S::Init()
 
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
-	if (LoadIconvDLL() == True)	{ Setup::useIconv = True;  use_iconv = 1; }
-	else				{ Setup::useIconv = False; use_iconv = 0; }
+	if (LoadIconvDLL() == True)	Setup::useIconv = True;
+	else				Setup::useIconv = False;
 #else
-	{ Setup::useIconv = True; use_iconv = 1; }
+	Setup::useIconv = True;
+#endif
+
+#if defined __WIN32__ && !defined __WINE__
+	use_iconv = (Setup::useIconv ? 1 : 0);
 #endif
 
 	GetColors();
@@ -103,7 +107,7 @@ S::Void S::Init()
 
 	Int	 codePage = 1252;
 
-#ifdef __WIN32__
+#if defined __WIN32__
 	switch (PRIMARYLANGID(GetUserDefaultLangID()))
 	{
 		default:
@@ -133,7 +137,7 @@ S::Void S::Free()
 {
 	if (--initCount) return;
 
-#ifdef __WIN32__
+#if defined __WIN32__
 	CoUninitialize();
 #endif
 
@@ -141,7 +145,7 @@ S::Void S::Free()
 
 	delete GUI::backgroundApplication;
 
-#ifdef __WIN32__
+#if defined __WIN32__
 	if (Setup::useIconv) FreeIconvDLL();
 #endif
 
@@ -154,7 +158,7 @@ S::Void S::Free()
 
 S::Void S::GetColors()
 {
-#ifdef __WIN32__
+#if defined __WIN32__
 	Setup::BackgroundColor			= GetSysColor(COLOR_3DFACE);
 	Setup::ClientColor			= GetSysColor(COLOR_WINDOW);
 	Setup::ClientTextColor			= GetSysColor(COLOR_WINDOWTEXT);
@@ -176,7 +180,7 @@ S::Void S::GetColors()
 
 S::Void S::GetDefaultFont()
 {
-#ifdef __WIN32__
+#if defined __WIN32__
 	HDC		 dc = GetWindowDC(0);
 	LOGFONTA	 fontInfoA;
 	LOGFONTW	 fontInfoW;

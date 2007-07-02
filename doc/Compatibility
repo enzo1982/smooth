@@ -9,6 +9,7 @@ Cygwin 1.5.x, GCC 3.3+	since 0.8.65.0			complete support (Win32 API); no GUI sup
 MSVC 6.0		since 0.8.58.0, up to 0.8.69.0	complete support
 MSVC 8.0		since 0.8.69.1			complete support
 Linux GCC		since 0.8.64.0			no GUI support, yet
+Linux GCC Winelib	since 0.8.70.0			compete
 QNX 6.x GCC		untested			no GUI support, yet
 
 Windows 2000/XP/2003	all versions			complete support
@@ -23,6 +24,7 @@ Source and binary compatibility between different smooth Versions
 		Compatibility with older versions
 Version		Source		Binary			Comments
 ---------------------------------------------------------------------------------------------------------------------
+0.8.70.0	no		no			lots of API changes
 0.8.69.1	no		no			API naming changes
 0.8.69.0	no		no			constified lots of methods
 0.8.68.0	no		no			lots of API changes

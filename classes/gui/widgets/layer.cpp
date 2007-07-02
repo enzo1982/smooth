@@ -116,16 +116,11 @@ S::Int S::GUI::Layer::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
+			if (IsBackgroundColorSet())
 			{
-				Surface	*surface	= container->GetDrawSurface();
-				Rect	 updateRect	= container->GetContainerWindow()->GetUpdateRect();
+				Surface	*surface = container->GetDrawSurface();
 
-				if (IsBackgroundColorSet())
-				{
-					Rect	 frame = Rect(GetRealPosition(), GetSize());
-
-					surface->Box(Rect::OverlapRect(frame, updateRect), GetBackgroundColor(), Rect::Filled);
-				}
+				surface->Box(Rect(GetRealPosition(), GetSize()), GetBackgroundColor(), Rect::Filled);
 			}
 
 			break;

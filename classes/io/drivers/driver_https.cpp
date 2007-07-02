@@ -11,7 +11,7 @@
 #include <smooth/io/drivers/driver_https.h>
 #include <math.h>
 
-#if !defined __WIN32__
+#if !defined __WIN32__ || defined __WINE__
 #	include <unistd.h>
 #endif
 
@@ -91,7 +91,7 @@ S::Int S::IO::DriverHTTPS::WriteData(UnsignedByte *data, Int dataSize)
 
 S::Void S::IO::DriverHTTPS::CloseSocket()
 {
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 	closesocket(stream);
 #else
 	close(stream);

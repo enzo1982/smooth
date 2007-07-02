@@ -61,7 +61,7 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 			break;
 	}
 
-	return Widget::Paint(message);
+	return Layer::Paint(message);
 }
 
 S::Int S::GUI::GroupBox::Activate()

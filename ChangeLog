@@ -21,6 +21,9 @@ xx.xx.07 xx:xx - smooth alpha 0.8.70.0
 - added support for network files and directories
 - fixed grayscaled icons display in iconbars
 
+- improved Linux support
+- improved Winelib support
+
 21.02.07 16:41 - smooth alpha 0.8.69.2
 
 - windowgdi.cpp	- Windows can now be minimized using the task bar button

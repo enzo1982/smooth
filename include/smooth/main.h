@@ -20,7 +20,7 @@
 
 using namespace smooth;
 
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR sszCmdLine, int siCmdShow)
 {
 	hInstance		= shInstance;
@@ -62,6 +62,9 @@ int main(int argc, char **argv)
 
 		return -1;
 	}
+
+	GUI::Application::GetStartupDirectory();
+	GUI::Application::GetApplicationDirectory();
 
 	Int	 retValue = Main();
 

@@ -10,7 +10,7 @@
 
 #include <smooth/io/drivers/driver_socket.h>
 
-#if !defined __WIN32__
+#if !defined __WIN32__ || defined __WINE__
 #	include <unistd.h>
 #	include <sys/ioctl.h>
 #endif
@@ -111,7 +111,7 @@ S::Int S::IO::DriverSocket::WriteData(UnsignedByte *data, Int dataSize)
 
 S::Void S::IO::DriverSocket::CloseSocket()
 {
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 	closesocket(stream);
 #else
 	close(stream);
@@ -130,7 +130,7 @@ S::Bool S::IO::DriverSocket::SetMode(Int nm)
 			break;
 	}
 
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 	if (ioctlsocket(stream, FIONBIO, &mode) != 0)	return false;
 	else						return true;
 #else

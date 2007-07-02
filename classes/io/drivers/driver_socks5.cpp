@@ -9,10 +9,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/io/drivers/driver_socks5.h>
-#include <math.h>
-#include <string.h>
 
-#if !defined __WIN32__
+#if !defined __WIN32__ || defined __WINE__
 #	include <unistd.h>
 #endif
 
@@ -218,7 +216,7 @@ S::Int S::IO::DriverSOCKS5::WriteData(UnsignedByte *data, Int dataSize)
 
 S::Void S::IO::DriverSOCKS5::CloseSocket()
 {
-#ifdef __WIN32__
+#if defined __WIN32__ && !defined __WINE__
 	closesocket(stream);
 #else
 	close(stream);

@@ -8,24 +8,15 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/i18n/i18n.h>
-#include <smooth/i18n/smooth_de.h>
-#include <smooth/i18n/smooth_it.h>
+#include <smooth/i18n/translator.h>
+#include <smooth/i18n/language.h>
+#include <smooth/i18n/locales/smooth_de.h>
+#include <smooth/i18n/locales/smooth_it.h>
 #include <smooth/files/directory.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 
 S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
-
-S::I18n::Language::Language()
-{
-	rightToLeft = False;
-}
-
-S::I18n::Language::~Language()
-{
-	strings.RemoveAll();
-}
 
 S::I18n::Translator::Translator(const String &iAppPrefix, Bool iInternal)
 {

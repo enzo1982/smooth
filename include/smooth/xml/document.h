@@ -23,8 +23,11 @@ namespace smooth
 #include "../misc/string.h"
 #include "node.h"
 
-#include <libxml/xmlreader.h>
-#include <libxml/xmlwriter.h>
+typedef struct _xmlTextReader xmlTextReader;
+typedef struct _xmlTextWriter xmlTextWriter;
+
+typedef xmlTextReader *xmlTextReaderPtr;
+typedef xmlTextWriter *xmlTextWriterPtr;
 
 namespace smooth
 {

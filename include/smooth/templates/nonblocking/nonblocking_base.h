@@ -15,7 +15,7 @@ namespace smooth
 	class SMOOTHAPI NonBlocking
 	{
 		protected:
-			static Array<Caller *>	 callers;
+			static Array<Caller *, Void *>	 callers;
 		public:
 			static Int CleanUp()
 			{

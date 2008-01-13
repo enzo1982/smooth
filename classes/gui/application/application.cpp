@@ -11,7 +11,6 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/threads/thread.h>
-#include <smooth/i18n/i18n.h>
 #include <smooth/system/event.h>
 #include <smooth/init.h>
 #include <smooth/templates/nonblocking.h>

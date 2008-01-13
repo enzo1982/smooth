@@ -490,9 +490,19 @@ $(OBJECTDIR)/window.o: $(GUICLASSESDIR)/window/window.cpp $(SMOOTHINCLUDEDIR)/gu
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/window.cpp -o $(OBJECTDIR)/window.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/i18n.o: $(I18NCLASSESDIR)/i18n.cpp $(SMOOTHINCLUDEDIR)/i18n/i18n.h
-	$(ECHO) -n Compiling $(I18NCLASSESDIR)/i18n.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/i18n.cpp -o $(OBJECTDIR)/i18n.o
+$(OBJECTDIR)/language.o: $(I18NCLASSESDIR)/language.cpp $(SMOOTHINCLUDEDIR)/i18n/language.h
+	$(ECHO) -n Compiling $(I18NCLASSESDIR)/language.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/language.cpp -o $(OBJECTDIR)/language.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/number.o: $(I18NCLASSESDIR)/number.cpp $(SMOOTHINCLUDEDIR)/i18n/number.h
+	$(ECHO) -n Compiling $(I18NCLASSESDIR)/number.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/number.cpp -o $(OBJECTDIR)/number.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/translator.o: $(I18NCLASSESDIR)/translator.cpp $(SMOOTHINCLUDEDIR)/i18n/translator.h
+	$(ECHO) -n Compiling $(I18NCLASSESDIR)/translator.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/translator.cpp -o $(OBJECTDIR)/translator.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/driver_ansi.o: $(IOCLASSESDIR)/drivers/driver_ansi.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_ansi.h

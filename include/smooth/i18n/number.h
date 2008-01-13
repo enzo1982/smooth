@@ -8,9 +8,21 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_ITERATOR_INCLUDE_
-#define _H_OBJSMOOTH_ITERATOR_INCLUDE_
+#ifndef _H_OBJSMOOTH_I18N_NUMBER_
+#define _H_OBJSMOOTH_I18N_NUMBER_
 
-#include "iterator/iterator.h"
+#include "../misc/string.h"
+
+namespace smooth
+{
+	namespace I18n
+	{
+		class SMOOTHAPI Number
+		{
+			public:
+				static String	 GetLocalizedNumberString(Int64);
+		};
+	};
+};
 
 #endif

@@ -15,14 +15,14 @@
 #include <smooth/io/outstream.h>
 #include <smooth/misc/math.h>
 
-S::Array<S::Net::Protocols::Protocol *(*)(const S::String &)>	*S::Net::Protocols::Protocol::protocol_creators = NIL;
-S::Array<S::String>						*S::Net::Protocols::Protocol::protocol_magics = NIL;
+S::Array<S::Net::Protocols::Protocol *(*)(const S::String &), S::Void *>	*S::Net::Protocols::Protocol::protocol_creators = NIL;
+S::Array<S::String>								*S::Net::Protocols::Protocol::protocol_magics = NIL;
 
 S::Int S::Net::Protocols::Protocol::AddProtocol(Protocol *(*protocol)(const String &), const String &magic)
 {
 	if (protocol == NIL) return Error();
 
-	if (protocol_creators == NIL)	protocol_creators = new Array<Protocol *(*)(const String &)>;
+	if (protocol_creators == NIL)	protocol_creators = new Array<Protocol *(*)(const String &), Void *>;
 	if (protocol_magics == NIL)	protocol_magics = new Array<String>;
 
 	protocol_creators->Add(protocol);

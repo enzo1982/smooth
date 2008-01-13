@@ -8,9 +8,14 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_ITERATOR_INCLUDE_
-#define _H_OBJSMOOTH_ITERATOR_INCLUDE_
+#include <smooth/i18n/language.h>
 
-#include "iterator/iterator.h"
+S::I18n::Language::Language()
+{
+	rightToLeft = False;
+}
 
-#endif
+S::I18n::Language::~Language()
+{
+	strings.RemoveAll();
+}

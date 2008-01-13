@@ -11,33 +11,35 @@
 #ifndef _H_OBJSMOOTH_ARRAY_
 #define _H_OBJSMOOTH_ARRAY_
 
-#include "entry.h"
-#include "backend.h"
+#include "arrayentry.h"
+#include "arraybackend.h"
 
 namespace smooth
 {
-	template <class t, class s = t> class Array : public Array_Backend<s>
+	template <class t, class s = t> class Array : public ArrayBackend<s>
 	{
 		public:
 					 Array()						{ }
 			virtual		~Array()						{ }
 
-			Int		 Add(const t &value)					{ return Array_Backend<s>::Add((s) value); }
-			Bool		 Add(const t &value, Int index)				{ return Array_Backend<s>::Add((s) value, index); }
+			Int		 Add(const t &value)					{ return ArrayBackend<s>::Add((s) value); }
+			Bool		 Add(const t &value, Int index)				{ return ArrayBackend<s>::Add((s) value, index); }
 
-			Int		 InsertAfter(Int index, const t &value)			{ return Array_Backend<s>::InsertAfter(index, (s) value); }
-			Bool		 InsertAfter(Int index, const t &value, Int nIndex)	{ return Array_Backend<s>::InsertAfter(index, (s) value, nIndex); }
-			Int		 InsertAtPos(Int pos, const t &value)			{ return Array_Backend<s>::InsertAtPos(pos, (s) value); }
-			Bool		 InsertAtPos(Int pos, const t &value, Int nIndex)	{ return Array_Backend<s>::InsertAtPos(pos, (s) value, nIndex); }
+			Int		 InsertAfter(Int index, const t &value)			{ return ArrayBackend<s>::InsertAfter(index, (s) value); }
+			Bool		 InsertAfter(Int index, const t &value, Int nIndex)	{ return ArrayBackend<s>::InsertAfter(index, (s) value, nIndex); }
+			Int		 InsertAtPos(Int pos, const t &value)			{ return ArrayBackend<s>::InsertAtPos(pos, (s) value); }
+			Bool		 InsertAtPos(Int pos, const t &value, Int nIndex)	{ return ArrayBackend<s>::InsertAtPos(pos, (s) value, nIndex); }
 
-			const t		&Get(Int index) const					{ return (const t &) Array_Backend<s>::Get(index); }
-			Bool		 Set(Int index, const t &value)				{ return Array_Backend<s>::Set(index, (s) value); }
+			const t		&Get(Int index) const					{ return (const t &) ArrayBackend<s>::Get(index); }
+			Bool		 Set(Int index, const t &value)				{ return ArrayBackend<s>::Set(index, (s) value); }
 
-			const t		&GetFirst() const					{ return (const t &) Array_Backend<s>::GetFirst(); }
-			const t		&GetLast() const					{ return (const t &) Array_Backend<s>::GetLast(); }
-			const t		&GetNext() const					{ return (const t &) Array_Backend<s>::GetNext(); }
-			const t		&GetPrev() const					{ return (const t &) Array_Backend<s>::GetPrev(); }
-			const t		&GetNth(Int n) const					{ return (const t &) Array_Backend<s>::GetNth(n); }
+			const t		&GetNth(Int n) const					{ return (const t &) ArrayBackend<s>::GetNth(n); }
+			Bool		 SetNth(Int n, const t &value)				{ return ArrayBackend<s>::SetNth(n, (s) value); }
+
+			const t		&GetFirst() const					{ return (const t &) ArrayBackend<s>::GetFirst(); }
+			const t		&GetLast() const					{ return (const t &) ArrayBackend<s>::GetLast(); }
+			const t		&GetNext() const					{ return (const t &) ArrayBackend<s>::GetNext(); }
+			const t		&GetPrev() const					{ return (const t &) ArrayBackend<s>::GetPrev(); }
 	};
 };
 

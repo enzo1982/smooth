@@ -40,49 +40,42 @@ namespace smooth
 			class SMOOTHAPI MessageDlg : public Dialog
 			{
 				private:
-					static Int	 nOfMessageBoxes;
+					static Int		 nOfMessageBoxes;
 
-					Int		 lines;
-					String		 line[256];
-					wchar_t		*msgicon;
-					Int		 buttons;
+					Int			 lines;
+					String			 line[256];
+					wchar_t			*msgicon;
+					Int			 buttons;
 
-					Window		*msgbox;
-					Titlebar	*titlebar;
-					Layer		*lay;
-					Image		*icon;
+					Window			*msgbox;
+					Titlebar		*titlebar;
+					Layer			*lay;
+					Image			*icon;
 
-					Button		*okbutton;
-					Button		*yesbutton;
-					Button		*nobutton;
-					Button		*abortbutton;
-					Button		*cancelbutton;
-					Button		*retrybutton;
-					Button		*ignorebutton;
+					Array<String>		 buttonLabels;
+					Array<Button *, Void *>	 buttonWidgets;
 
-					Int		 buttonCode;
+					Int			 buttonCode;
 
-					CheckBox	*checkbox;
+					CheckBox		*checkbox;
 
-					Bool		*cVar;
+					Bool			*cVar;
 				slots:
-					Void		 MessagePaintProc();
-					Bool		 MessageKillProc();
+					Void			 MessagePaintProc();
+					Bool			 MessageKillProc();
 
-					Void		 MessageOK();
-					Void		 MessageCancel();
-					Void		 MessageYes();
-					Void		 MessageNo();
-					Void		 MessageRetry();
-					Void		 MessageAbort();
-					Void		 MessageIgnore();
+					Void			 MessageButton(Int);
+
+					Void			 MessageButton0();
+					Void			 MessageButton1();
+					Void			 MessageButton2();
 				public:
-							 MessageDlg(const String &, const String &, Int, wchar_t *, const String & = NIL, Bool * = NIL);
-					virtual		~MessageDlg();
+								 MessageDlg(const String &, const String &, Int, wchar_t *, const String & = NIL, Bool * = NIL);
+					virtual			~MessageDlg();
 
-					const Error	&ShowDialog();
+					const Error		&ShowDialog();
 				accessors:
-					Int		 GetButtonCode();
+					Int			 GetButtonCode();
 			};
 
 			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, char *);

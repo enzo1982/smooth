@@ -119,7 +119,9 @@
 #	define MAX_PATH PATH_MAX
 #endif
 
-#include <lisa.h>
+#if defined __SMOOTH_DLL__
+#	include <lisa.h>
+#endif
 
 #define NIL	(0)
 

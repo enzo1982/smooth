@@ -73,7 +73,6 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 
 	onCreate.SetParentObject(this);
 	onPaint.SetParentObject(this);
-	onResize.SetParentObject(this);
 	onPeek.SetParentObject(this);
 	onEvent.SetParentObject(this);
 }
@@ -94,8 +93,8 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	if (created && visible) backend->SetMetrics(nPos, nSize);
 
-	Bool	 resized = (GetWidth() != nSize.cx || GetHeight() != nSize.cy);
-	Bool	 prevVisible = visible;
+	Bool	 resized	= (GetWidth() != nSize.cx || GetHeight() != nSize.cy);
+	Bool	 prevVisible	= visible;
 
 	visible = False;
 
@@ -108,8 +107,6 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 		surface->SetSize(GetSize() * Font::GetSystemFontSize() / 96);
 
 		CalculateOffsets();
-
-		onResize.Emit();
 	}
 
 	visible = prevVisible;
@@ -242,7 +239,8 @@ S::Int S::GUI::Window::Show()
 
 	backend->SetMetrics(GetPosition(), GetSize());
 
-	onResize.Emit();
+	onChangePosition.Emit(GetPosition());
+	onChangeSize.Emit(GetSize());
 
 	if (maximized && !initshow)
 	{

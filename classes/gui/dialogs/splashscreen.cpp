@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/dialogs/splashscreen.h>
-#include <smooth/i18n/i18n.h>
+#include <smooth/i18n/translator.h>
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>

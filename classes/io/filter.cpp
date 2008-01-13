@@ -20,24 +20,14 @@ S::IO::Filter::~Filter()
 {
 }
 
-S::Int S::IO::Filter::GetPackageSize() const
-{
-	return packageSize;
-}
-
-S::Void S::IO::Filter::SetDriver(Driver *iDriver)
-{
-	driver = iDriver;
-}
-
 S::Bool S::IO::Filter::Activate()
 {
-	return true;
+	return True;
 }
 
 S::Bool S::IO::Filter::Deactivate()
 {
-	return true;
+	return True;
 }
 
 S::Int S::IO::Filter::WriteData(Buffer<UnsignedByte> &data, Int size)

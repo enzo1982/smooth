@@ -469,7 +469,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 				if (statusText != NIL) window->SetStatusText(statusText);
 
-				if (tooltipText != NIL)
+				if (tooltipText != NIL && window->IsFocussed())
 				{
 					tipTimer = new System::Timer();
 

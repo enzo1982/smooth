@@ -29,7 +29,7 @@ namespace smooth
 		{
 			private:
 				Array<Bool>			 createdEntry;
-				Array<ListEntry *>		 elementOrder;
+				Array<ListEntry *, Void *>	 elementOrder;
 			public:
 				static const Int		 classID;
 

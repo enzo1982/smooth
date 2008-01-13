@@ -1813,7 +1813,15 @@
 					Name="i18n"
 					>
 					<File
-						RelativePath="..\..\classes\i18n\i18n.cpp"
+						RelativePath="..\..\classes\i18n\language.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\classes\i18n\number.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\classes\i18n\translator.cpp"
 						>
 					</File>
 				</Filter>
@@ -2346,11 +2354,11 @@
 							>
 						</File>
 						<File
-							RelativePath="..\..\include\smooth\templates\array\backend.h"
+							RelativePath="..\..\include\smooth\templates\array\arraybackend.h"
 							>
 						</File>
 						<File
-							RelativePath="..\..\include\smooth\templates\array\entry.h"
+							RelativePath="..\..\include\smooth\templates\array\arrayentry.h"
 							>
 						</File>
 					</Filter>
@@ -2501,6 +2509,34 @@
 								>
 							</File>
 						</Filter>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="i18n"
+					>
+					<File
+						RelativePath="..\..\include\smooth\i18n\language.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\smooth\i18n\number.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\smooth\i18n\translator.h"
+						>
+					</File>
+					<Filter
+						Name="locales"
+						>
+						<File
+							RelativePath="..\..\include\smooth\i18n\locales\smooth_de.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\i18n\locales\smooth_it.h"
+							>
+						</File>
 					</Filter>
 				</Filter>
 			</Filter>

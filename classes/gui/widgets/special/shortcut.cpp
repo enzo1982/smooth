@@ -10,6 +10,7 @@
 
 #include <smooth/gui/widgets/special/shortcut.h>
 #include <smooth/misc/binary.h>
+#include <smooth/i18n/translator.h>
 
 const S::Int	 S::GUI::Shortcut::classID = S::Object::RequestClassID();
 

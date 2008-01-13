@@ -8,9 +8,31 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_ITERATOR_INCLUDE_
-#define _H_OBJSMOOTH_ITERATOR_INCLUDE_
+#ifndef _H_OBJSMOOTH_I18N_LANGUAGE_
+#define _H_OBJSMOOTH_I18N_LANGUAGE_
 
-#include "iterator/iterator.h"
+#include "../misc/string.h"
+
+namespace smooth
+{
+	namespace I18n
+	{
+		class SMOOTHAPI Language
+		{
+			public:
+				Array<String>	 strings;
+
+				String		 name;
+				String		 encoding;
+				String		 magic;
+				String		 author;
+				String		 url;
+				Bool		 rightToLeft;
+
+						 Language();
+						~Language();
+		};
+	};
+};
 
 #endif

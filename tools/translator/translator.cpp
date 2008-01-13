@@ -156,7 +156,7 @@ Translator::Translator(const String &openFile)
 	wnd->SetMinimumSize(Size(400, 350));
 	wnd->SetIcon(NIL);
 	wnd->doQuit.Connect(&Translator::ExitProc, this);
-	wnd->onResize.Connect(&Translator::ResizeProc, this);
+	wnd->onChangeSize.Connect(&Translator::ResizeProc, this);
 
 	ResizeProc();
 

@@ -62,6 +62,8 @@
 
 #include "smooth/io/instream.h"
 #include "smooth/io/outstream.h"
+#include "smooth/io/driver.h"
+#include "smooth/io/filter.h"
 
 #include "smooth/net/protocols/file.h"
 #include "smooth/net/protocols/http.h"
@@ -82,7 +84,8 @@
 
 #include "smooth/graphics/imageloader/imageloader.h"
 
-#include "smooth/i18n/i18n.h"
+#include "smooth/i18n/number.h"
+#include "smooth/i18n/translator.h"
 
 #include "smooth/misc/encoding/base64.h"
 

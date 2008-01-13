@@ -1,11 +1,14 @@
 ChangeLog for smooth
 
-xx.xx.07 xx:xx - smooth alpha 0.8.70.0
+xx.xx.08 xx:xx - smooth alpha 0.8.70.0
 
 - string.cpp	- fixed string conversion when inEncoding == outEncoding
+		- new function: Trim, strips whitespaces from both ends of a string
 - config.cpp	- configuration is no longer automatically saved
 - widget.cpp	- added a universal context menu framework
+		- tooltips are no longer displayed if the containing window is inactive
 - window.cpp	- removed support for context menus
+		- removed signal onResize (using Widget::onChangeSize instead)
 		- fixed display of a black window when part of it is outside the working area
 - system.cpp	- new function: GetAPIVersion()
 		- new functions to retrieve system folder locations
@@ -16,6 +19,7 @@ xx.xx.07 xx:xx - smooth alpha 0.8.70.0
 - scrollbar.cpp	- changed scrollbar behaviour to be more Windows-like
 - s...cairo.cpp	- added support for Cairo surfaces
 
+- completely new and improved Array<t> implementation
 - new template class: Iterator<t>, iterator for arrays of type Array<t>
 - applications now check the smooth API version instead of the release number for compatibility
 - added support for network files and directories
@@ -23,22 +27,3 @@ xx.xx.07 xx:xx - smooth alpha 0.8.70.0
 
 - improved Linux support
 - improved Winelib support
-
-21.02.07 16:41 - smooth alpha 0.8.69.2
-
-- windowgdi.cpp	- Windows can now be minimized using the task bar button
-
-- some bug fixes
-
-06.02.07 13:18 - smooth alpha 0.8.69.1
-
-- list.cpp	- Speed optimizations
-- buffer.cpp	- Fixed problems when using const Buffer<>
-- icon.cpp	- Added an image loader for Windows icon resources
-- widget.cpp	- Renamed RegisterObject to Add
-		- Renamed UnregisterObject to Remove
-- app..tion.cpp	- Moved main loop to Application
-
-- simplified Array<> API
-- converted project to MSVC 8.0
-- lots of fixes for non latin Windows 9x/ME

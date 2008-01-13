@@ -8,8 +8,16 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_I18N_
-#define _H_OBJSMOOTH_I18N_
+#ifndef _H_OBJSMOOTH_I18N_TRANSLATOR_
+#define _H_OBJSMOOTH_I18N_TRANSLATOR_
+
+namespace smooth
+{
+	namespace I18n
+	{
+		class Language;
+	};
+};
 
 #include "string.h"
 #include "../xml/document.h"
@@ -18,22 +26,6 @@ namespace smooth
 {
 	namespace I18n
 	{
-		class SMOOTHAPI Language
-		{
-			public:
-				Array<String>	 strings;
-
-				String		 name;
-				String		 encoding;
-				String		 magic;
-				String		 author;
-				String		 url;
-				Bool		 rightToLeft;
-
-						 Language();
-						~Language();
-		};
-
 		class SMOOTHAPI Translator
 		{
 			private:

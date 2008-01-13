@@ -28,7 +28,7 @@
 #include <smooth/gui/widgets/layer.h>
 
 #include <smooth/misc/string.h>
-#include <smooth/i18n/i18n.h>
+#include <smooth/i18n/translator.h>
 
 #include <smooth/resources.h>
 

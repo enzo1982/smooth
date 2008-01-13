@@ -11,7 +11,6 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/definitions.h>
-#include <smooth/i18n/i18n.h>
 #include <smooth/gui/widgets/basic/tabwidget.h>
 #include <smooth/graphics/surface.h>
 

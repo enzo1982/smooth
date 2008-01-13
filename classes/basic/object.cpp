@@ -9,7 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/basic/object.h>
-#include <smooth/i18n/i18n.h>
 
 const S::Int	 S::Object::classID		= S::Object::RequestClassID();
 

@@ -14,6 +14,7 @@
 #include <smooth/gui/application/background.h>
 #include <smooth/system/multimonitor.h>
 #include <smooth/templates/nonblocking.h>
+#include <smooth/i18n/translator.h>
 
 #if defined __WIN32__
 #	include <wtypes.h>
@@ -23,6 +24,8 @@
 #else
 #	include <unistd.h>
 #endif
+
+#include <iconv.h>
 
 using namespace smooth::Backends;
 
@@ -49,7 +52,7 @@ int CALLBACK EnumFontProcW(ENUMLOGFONTEXW *lpelfe, NEWTEXTMETRICEXW *lpntme, int
 
 namespace smooth
 {
-	SMOOTHAPI S::Array<S::Caller *> S::NonBlocking::callers;
+	SMOOTHAPI S::Array<S::Caller *, Void *> S::NonBlocking::callers;
 };
 
 S::Bool	 S::initializing = S::True;

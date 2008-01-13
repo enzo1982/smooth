@@ -23,27 +23,27 @@ namespace smooth
 			abstract class SMOOTHAPI Protocol
 			{
 				private:
-					static Array<Protocol *(*)(const String &)>	*protocol_creators;
-					static Array<String>				*protocol_magics;
+					static Array<Protocol *(*)(const String &), Void *>	*protocol_creators;
+					static Array<String>					*protocol_magics;
 				protected:
-					String						 url;
+					String							 url;
 				public:
-					static Int					 AddProtocol(Protocol *(*)(const String &), const String &);
+					static Int						 AddProtocol(Protocol *(*)(const String &), const String &);
 
-					static Protocol					*CreateForURL(const String &);
+					static Protocol						*CreateForURL(const String &);
 
-											 Protocol(const String &);
-					virtual						~Protocol();
+												 Protocol(const String &);
+					virtual							~Protocol();
 
-					virtual Int					 DownloadToFile(const String &) = 0;
+					virtual Int						 DownloadToFile(const String &) = 0;
 
-					Int						 DownloadToBuffer(Buffer<UnsignedByte> &);
+					Int							 DownloadToBuffer(Buffer<UnsignedByte> &);
 				signals:
-					Signal1<Void, Int>				 uploadProgress;
-					Signal1<Void, const String &>			 uploadSpeed;
+					Signal1<Void, Int>					 uploadProgress;
+					Signal1<Void, const String &>				 uploadSpeed;
 
-					Signal1<Void, Int>				 downloadProgress;
-					Signal1<Void, const String &>			 downloadSpeed;
+					Signal1<Void, Int>					 downloadProgress;
+					Signal1<Void, const String &>				 downloadSpeed;
 			};
 		};
 	};

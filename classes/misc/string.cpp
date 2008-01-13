@@ -1,5 +1,5 @@
 /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -189,7 +189,7 @@ S::Void S::String::LockBuffers() const
 
 S::Void S::String::UnlockBuffers() const
 {
-	if (Threads::Thread::GetNOfRunningThreads() > 0) mutex->Release();
+	if (mutex != NIL) mutex->Release();
 }
 
 S::Void S::String::DeleteTemporaryBuffers()
@@ -200,7 +200,7 @@ S::Void S::String::DeleteTemporaryBuffers()
 	{
 		delete [] allocatedBuffers.GetFirst();
 
-		allocatedBuffers.Remove(allocatedBuffers.GetNthIndex(0));
+		allocatedBuffers.RemoveNth(0);
 	}
 }
 
@@ -1030,6 +1030,37 @@ S::String S::String::Head(Int n) const
 S::String S::String::Tail(Int n) const
 {
 	return SubString(Length() - n, n);
+}
+
+S::String S::String::Trim() const
+{
+	Int	 len = Length();
+	Int	 triml = 0;
+	Int	 trimr = 0;
+
+	for (Int i = 0; i < len; i++)
+	{
+		if ((*this)[i] == ' '  ||
+		    (*this)[i] == '\t' ||
+		    (*this)[i] == '\n' ||
+		    (*this)[i] == '\r' ||
+		    (*this)[i] == '\0' ||
+		    (*this)[i] == '\x0B') triml++;
+		else			  break;
+	}
+
+	for (Int i = len - 1; i >= 0; i--)
+	{
+		if ((*this)[i] == ' '  ||
+		    (*this)[i] == '\t' ||
+		    (*this)[i] == '\n' ||
+		    (*this)[i] == '\r' ||
+		    (*this)[i] == '\0' ||
+		    (*this)[i] == '\x0B') trimr++;
+		else			  break;
+	}
+
+	return SubString(triml, len - triml - trimr);
 }
 
 S::String &S::String::Fill(const Int value)

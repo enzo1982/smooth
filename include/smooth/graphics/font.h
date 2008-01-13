@@ -21,7 +21,6 @@ namespace smooth
 
 #include "../definitions.h"
 #include "color.h"
-#include "../i18n/i18n.h"
 
 namespace smooth
 {

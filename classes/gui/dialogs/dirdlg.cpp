@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/dialogs/dirdlg.h>
-#include <smooth/i18n/i18n.h>
+#include <smooth/i18n/translator.h>
 #include <smooth/gui/window/window.h>
 
 #ifdef __WIN32__

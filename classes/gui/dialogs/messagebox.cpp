@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/dialogs/messagebox.h>
-#include <smooth/i18n/i18n.h>
+#include <smooth/i18n/translator.h>
 #include <smooth/misc/math.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/imageloader/imageloader.h>
@@ -63,13 +63,6 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	icon		= NIL;
 #endif
 
-	okbutton	= NIL;
-	yesbutton	= NIL;
-	nobutton	= NIL;
-	abortbutton	= NIL;
-	cancelbutton	= NIL;
-	retrybutton	= NIL;
-	ignorebutton	= NIL;
 	buttons		= btns;
 
 	Int	 actpos = 0;
@@ -156,145 +149,61 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	{
 		default:
 		case MB_OK:
-			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), buttonWidth + 30));
-
-			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, Point((msgbox->GetWidth() - buttonWidth) / 2 - 3, 14 + buttonHeight), Size());
-			okbutton->onAction.Connect(&MessageDlg::MessageOK, this);
-			okbutton->SetOrientation(OR_LOWERLEFT);
-
-			lay->Add(okbutton);
+			buttonLabels.Add("OK");
 
 			break;
 		case MB_OKCANCEL:
-			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 2 * buttonWidth + 39));
-
-			okbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3, 14 + buttonHeight), Size());
-			okbutton->onAction.Connect(&MessageDlg::MessageOK, this);
-			okbutton->SetOrientation(OR_LOWERLEFT);
-
-			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
-			cancelbutton->onAction.Connect(&MessageDlg::MessageCancel, this);
-			cancelbutton->SetOrientation(OR_LOWERLEFT);
-
-			lay->Add(okbutton);
-			lay->Add(cancelbutton);
+			buttonLabels.Add("OK");
+			buttonLabels.Add("Cancel");
 
 			break;
 		case MB_YESNO:
-			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 2 * buttonWidth + 39));
-
-			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3, 14 + buttonHeight), Size());
-			yesbutton->onAction.Connect(&MessageDlg::MessageYes, this);
-			yesbutton->SetOrientation(OR_LOWERLEFT);
-
-			nobutton = new Button(I18n::Translator::defaultTranslator->TranslateString("No"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
-			nobutton->onAction.Connect(&MessageDlg::MessageNo, this);
-			nobutton->SetOrientation(OR_LOWERLEFT);
-
-			lay->Add(yesbutton);
-			lay->Add(nobutton);
+			buttonLabels.Add("Yes");
+			buttonLabels.Add("No");
 
 			break;
 		case MB_YESNOCANCEL:
-			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 3 * buttonWidth + 48));
-
-			yesbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Yes"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3, 14 + buttonHeight), Size());
-			yesbutton->onAction.Connect(&MessageDlg::MessageYes, this);
-			yesbutton->SetOrientation(OR_LOWERLEFT);
-
-			nobutton = new Button(I18n::Translator::defaultTranslator->TranslateString("No"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
-			nobutton->onAction.Connect(&MessageDlg::MessageNo, this);
-			nobutton->SetOrientation(OR_LOWERLEFT);
-
-			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3 + 2 * buttonWidth + 18, 14 + buttonHeight), Size());
-			cancelbutton->onAction.Connect(&MessageDlg::MessageCancel, this);
-			cancelbutton->SetOrientation(OR_LOWERLEFT);
-
-			lay->Add(yesbutton);
-			lay->Add(nobutton);
-			lay->Add(cancelbutton);
+			buttonLabels.Add("Yes");
+			buttonLabels.Add("No");
+			buttonLabels.Add("Cancel");
 
 			break;
 		case MB_RETRYCANCEL:
-			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 2 * buttonWidth + 39));
-
-			retrybutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Retry"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3, 14 + buttonHeight), Size());
-			retrybutton->onAction.Connect(&MessageDlg::MessageRetry, this);
-			retrybutton->SetOrientation(OR_LOWERLEFT);
-
-			cancelbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, Point((msgbox->GetWidth() - (2 * buttonWidth + 9)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
-			cancelbutton->onAction.Connect(&MessageDlg::MessageCancel, this);
-			cancelbutton->SetOrientation(OR_LOWERLEFT);
-
-			lay->Add(retrybutton);
-			lay->Add(cancelbutton);
+			buttonLabels.Add("Retry");
+			buttonLabels.Add("Cancel");
 
 			break;
 		case MB_ABORTRETRYIGNORE:
-			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), 3 * buttonWidth + 48));
-
-			abortbutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Abort"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3, 14 + buttonHeight), Size());
-			abortbutton->onAction.Connect(&MessageDlg::MessageAbort, this);
-			abortbutton->SetOrientation(OR_LOWERLEFT);
-
-			retrybutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Retry"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3 + buttonWidth + 9, 14 + buttonHeight), Size());
-			retrybutton->onAction.Connect(&MessageDlg::MessageRetry, this);
-			retrybutton->SetOrientation(OR_LOWERLEFT);
-
-			ignorebutton = new Button(I18n::Translator::defaultTranslator->TranslateString("Ignore"), NIL, Point((msgbox->GetWidth() - (3 * buttonWidth + 18)) / 2 - 3 + 2 * buttonWidth + 18, 14 + buttonHeight), Size());
-			ignorebutton->onAction.Connect(&MessageDlg::MessageIgnore, this);
-			ignorebutton->SetOrientation(OR_LOWERLEFT);
-
-			lay->Add(abortbutton);
-			lay->Add(retrybutton);
-			lay->Add(ignorebutton);
+			buttonLabels.Add("Abort");
+			buttonLabels.Add("Retry");
+			buttonLabels.Add("Ignore");
 
 			break;
 	}
 #endif
 
+	for (Int i = 0; i < buttonLabels.Length(); i++)
+	{
+		Button	*button = new Button(I18n::Translator::defaultTranslator->TranslateString(buttonLabels.GetNth(i)), NIL, Point((msgbox->GetWidth() - (buttonLabels.Length() * (buttonWidth + 9) - 9)) / 2 - 3 + (i * (buttonWidth + 9)), 14 + buttonHeight), Size());
+
+		if	(i == 0) button->onAction.Connect(&MessageDlg::MessageButton0, this);
+		else if	(i == 1) button->onAction.Connect(&MessageDlg::MessageButton1, this);
+		else if	(i == 2) button->onAction.Connect(&MessageDlg::MessageButton2, this);
+
+		button->SetOrientation(OR_LOWERLEFT);
+
+		buttonWidgets.Add(button);
+
+		lay->Add(button);
+	}
+
+	msgbox->SetWidth(Math::Max(msgbox->GetWidth(), buttonLabels.Length() * (buttonWidth + 9) + 21));
 	msgbox->SetPosition(Point((LiSAGetDisplaySizeX() - msgbox->GetWidth()) / 2, (LiSAGetDisplaySizeY() - msgbox->GetHeight()) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
 }
 
 S::GUI::Dialogs::MessageDlg::~MessageDlg()
 {
-#ifdef __WIN32__
-	switch (buttons)
-	{
-		default:
-		case MB_OK:
-			DeleteObject(okbutton);
-
-			break;
-		case MB_OKCANCEL:
-			DeleteObject(okbutton);
-			DeleteObject(cancelbutton);
-
-			break;
-		case MB_YESNO:
-			DeleteObject(yesbutton);
-			DeleteObject(nobutton);
-
-			break;
-		case MB_YESNOCANCEL:
-			DeleteObject(yesbutton);
-			DeleteObject(nobutton);
-			DeleteObject(cancelbutton);
-
-			break;
-		case MB_RETRYCANCEL:
-			DeleteObject(retrybutton);
-			DeleteObject(cancelbutton);
-
-			break;
-		case MB_ABORTRETRYIGNORE:
-			DeleteObject(abortbutton);
-			DeleteObject(retrybutton);
-			DeleteObject(ignorebutton);
-
-			break;
-	}
-#endif
+	for (Int i = 0; i < buttonWidgets.Length(); i++) DeleteObject(buttonWidgets.GetNth(i));
 
 	DeleteObject(lay);
 	DeleteObject(icon);
@@ -354,67 +263,34 @@ S::Bool S::GUI::Dialogs::MessageDlg::MessageKillProc()
 	return True;
 }
 
-S::Void S::GUI::Dialogs::MessageDlg::MessageOK()
+S::Void S::GUI::Dialogs::MessageDlg::MessageButton(Int buttonID)
 {
 #ifdef __WIN32__
-	buttonCode = IDOK;
+	if	(buttonLabels.GetNth(buttonID) == "OK")		buttonCode = IDOK;
+	else if	(buttonLabels.GetNth(buttonID) == "Cancel")	buttonCode = IDCANCEL;
+	else if	(buttonLabels.GetNth(buttonID) == "Yes")	buttonCode = IDYES;
+	else if	(buttonLabels.GetNth(buttonID) == "No")		buttonCode = IDNO;
+	else if	(buttonLabels.GetNth(buttonID) == "Retry")	buttonCode = IDRETRY;
+	else if	(buttonLabels.GetNth(buttonID) == "Abort")	buttonCode = IDABORT;
+	else if	(buttonLabels.GetNth(buttonID) == "Ignore")	buttonCode = IDIGNORE;
 #endif
 
 	msgbox->Close();
 }
 
-S::Void S::GUI::Dialogs::MessageDlg::MessageCancel()
+S::Void S::GUI::Dialogs::MessageDlg::MessageButton0()
 {
-#ifdef __WIN32__
-	buttonCode = IDCANCEL;
-#endif
-
-	msgbox->Close();
+	MessageButton(0);
 }
 
-S::Void S::GUI::Dialogs::MessageDlg::MessageYes()
+S::Void S::GUI::Dialogs::MessageDlg::MessageButton1()
 {
-#ifdef __WIN32__
-	buttonCode = IDYES;
-#endif
-
-	msgbox->Close();
+	MessageButton(1);
 }
 
-S::Void S::GUI::Dialogs::MessageDlg::MessageNo()
+S::Void S::GUI::Dialogs::MessageDlg::MessageButton2()
 {
-#ifdef __WIN32__
-	buttonCode = IDNO;
-#endif
-
-	msgbox->Close();
-}
-
-S::Void S::GUI::Dialogs::MessageDlg::MessageRetry()
-{
-#ifdef __WIN32__
-	buttonCode = IDRETRY;
-#endif
-
-	msgbox->Close();
-}
-
-S::Void S::GUI::Dialogs::MessageDlg::MessageAbort()
-{
-#ifdef __WIN32__
-	buttonCode = IDABORT;
-#endif
-
-	msgbox->Close();
-}
-
-S::Void S::GUI::Dialogs::MessageDlg::MessageIgnore()
-{
-#ifdef __WIN32__
-	buttonCode = IDIGNORE;
-#endif
-
-	msgbox->Close();
+	MessageButton(2);
 }
 
 S::Int S::GUI::Dialogs::MessageDlg::GetButtonCode()

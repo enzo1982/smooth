@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,23 +30,23 @@ namespace smooth
 		class MutexBackend
 		{
 			private:
-				static Array<MutexBackend *(*)(Void *), Void *>	*backend_creators;
+				static MutexBackend	*(*backend_creator)(Void *);
 			protected:
-				Int						 type;
+				Int			 type;
 			public:
-				static Int					 AddBackend(MutexBackend *(*)(Void *));
+				static Int		 SetBackend(MutexBackend *(*)(Void *));
 
-				static MutexBackend				*CreateBackendInstance(Void * = NIL);
+				static MutexBackend	*CreateBackendInstance(Void * = NIL);
 
-										 MutexBackend(Void * = NIL);
-				virtual						~MutexBackend();
+							 MutexBackend(Void * = NIL);
+				virtual			~MutexBackend();
 
-				Int						 GetMutexType() const;
+				Int			 GetMutexType() const;
 
-				virtual Void					*GetSystemMutex() const;
+				virtual Void		*GetSystemMutex() const;
 
-				virtual Int					 Lock();
-				virtual Int					 Release();
+				virtual Int		 Lock();
+				virtual Int		 Release();
 		};
 	};
 };

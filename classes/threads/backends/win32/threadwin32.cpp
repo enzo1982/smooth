@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,7 +15,7 @@ S::Threads::ThreadBackend *CreateThreadWin32(S::Void *iThread)
 	return new S::Threads::ThreadWin32(iThread);
 }
 
-S::Int	 threadWin32Tmp = S::Threads::ThreadBackend::AddBackend(&CreateThreadWin32);
+S::Int	 threadWin32Tmp = S::Threads::ThreadBackend::SetBackend(&CreateThreadWin32);
 
 S::Threads::ThreadWin32::ThreadWin32(Void *iThread)
 {

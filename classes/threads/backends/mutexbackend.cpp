@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,25 +19,20 @@ S::Threads::MutexBackend *CreateMutexBackend(S::Void *iMutex)
 	return new S::Threads::MutexBackend(iMutex);
 }
 
-S::Int	 mutexBackendTmp = S::Threads::MutexBackend::AddBackend(&CreateMutexBackend);
+S::Threads::MutexBackend *(*S::Threads::MutexBackend::backend_creator)(S::Void *) = &CreateMutexBackend;
 
-S::Array<S::Threads::MutexBackend *(*)(S::Void *), S::Void *>	*S::Threads::MutexBackend::backend_creators = NIL;
-
-S::Int S::Threads::MutexBackend::AddBackend(MutexBackend *(*backend)(Void *))
+S::Int S::Threads::MutexBackend::SetBackend(MutexBackend *(*backend)(Void *))
 {
 	if (backend == NIL) return Error();
 
-	if (backend_creators == NIL) backend_creators = new Array<MutexBackend *(*)(Void *), Void *>;
-
-	backend_creators->Add(backend);
+	backend_creator = backend;
 
 	return Success();
 }
 
 S::Threads::MutexBackend *S::Threads::MutexBackend::CreateBackendInstance(Void *iMutex)
 {
-	if (backend_creators->GetFirst() != &CreateMutexBackend)	return backend_creators->GetFirst()(iMutex);
-	else								return backend_creators->GetLast()(iMutex);
+	return backend_creator(iMutex);
 }
 
 S::Threads::MutexBackend::MutexBackend(Void *iMutex)

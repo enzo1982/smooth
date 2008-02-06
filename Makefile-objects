@@ -195,11 +195,6 @@ $(OBJECTDIR)/application.o: $(GUICLASSESDIR)/application/application.cpp $(SMOOT
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/application/application.cpp -o $(OBJECTDIR)/application.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/background.o: $(GUICLASSESDIR)/application/background.cpp $(SMOOTHINCLUDEDIR)/gui/application/background.h
-	$(ECHO) -n Compiling $(GUICLASSESDIR)/application/background.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/application/background.cpp -o $(OBJECTDIR)/background.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/xulloader.o: $(GUICLASSESDIR)/application/xulloader.cpp $(SMOOTHINCLUDEDIR)/gui/application/xulloader.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/application/xulloader.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/application/xulloader.cpp -o $(OBJECTDIR)/xulloader.o
@@ -763,6 +758,11 @@ $(OBJECTDIR)/threadbackend.o: $(THREADSCLASSESDIR)/backends/threadbackend.cpp $(
 $(OBJECTDIR)/mutex.o: $(THREADSCLASSESDIR)/mutex.cpp $(SMOOTHINCLUDEDIR)/threads/mutex.h
 	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/mutex.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/mutex.cpp -o $(OBJECTDIR)/mutex.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/rwlock.o: $(THREADSCLASSESDIR)/rwlock.cpp $(SMOOTHINCLUDEDIR)/threads/rwlock.h
+	$(ECHO) -n Compiling $(THREADSCLASSESDIR)/rwlock.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(THREADSCLASSESDIR)/rwlock.cpp -o $(OBJECTDIR)/rwlock.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/semaphore.o: $(THREADSCLASSESDIR)/semaphore.cpp $(SMOOTHINCLUDEDIR)/threads/semaphore.h

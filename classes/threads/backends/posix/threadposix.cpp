@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,7 +15,7 @@ S::Threads::ThreadBackend *CreateThreadPOSIX(S::Void *iThread)
 	return new S::Threads::ThreadPOSIX(iThread);
 }
 
-S::Int	 threadPOSIXTmp = S::Threads::ThreadBackend::AddBackend(&CreateThreadPOSIX);
+S::Int	 threadPOSIXTmp = S::Threads::ThreadBackend::SetBackend(&CreateThreadPOSIX);
 
 S::Threads::ThreadPOSIX::ThreadPOSIX(Void *iThread)
 {

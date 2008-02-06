@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,20 +30,20 @@ namespace smooth
 		class EventBackend
 		{
 			private:
-				static Array<EventBackend *(*)(), Void *>	*backend_creators;
+				static EventBackend	*(*backend_creator)();
 			protected:
-				Int						 type;
+				Int			 type;
 			public:
-				static Int					 AddBackend(EventBackend *(*)());
+				static Int		 SetBackend(EventBackend *(*)());
 
-				static EventBackend				*CreateBackendInstance();
+				static EventBackend	*CreateBackendInstance();
 
-										 EventBackend();
-				virtual						~EventBackend();
+							 EventBackend();
+				virtual			~EventBackend();
 
-				Int						 GetEventType() const;
+				Int			 GetEventType() const;
 
-				virtual Int					 ProcessNextEvent(Bool);
+				virtual Int		 ProcessNextEvent(Bool);
 		};
 	};
 };

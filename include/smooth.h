@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -69,6 +69,7 @@
 #include "smooth/net/protocols/http.h"
 
 #include "smooth/threads/mutex.h"
+#include "smooth/threads/rwlock.h"
 #include "smooth/threads/semaphore.h"
 #include "smooth/threads/thread.h"
 
@@ -99,7 +100,6 @@
 #include "smooth/misc/string.h"
 
 #include "smooth/gui/application/application.h"
-#include "smooth/gui/application/background.h"
 
 #include "smooth/gui/dialogs/colordlg.h"
 #include "smooth/gui/dialogs/dirdlg.h"

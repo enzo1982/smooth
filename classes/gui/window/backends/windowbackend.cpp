@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,25 +19,20 @@ S::GUI::WindowBackend *CreateWindowBackend()
 	return new S::GUI::WindowBackend();
 }
 
-S::Int	 windowBackendTmp = S::GUI::WindowBackend::AddBackend(&CreateWindowBackend);
+S::GUI::WindowBackend *(*S::GUI::WindowBackend::backend_creator)() = &CreateWindowBackend;
 
-S::Array<S::GUI::WindowBackend *(*)(), S::Void *>	*S::GUI::WindowBackend::backend_creators = NIL;
-
-S::Int S::GUI::WindowBackend::AddBackend(WindowBackend *(*backend)())
+S::Int S::GUI::WindowBackend::SetBackend(WindowBackend *(*backend)())
 {
 	if (backend == NIL) return Error();
 
-	if (backend_creators == NIL) backend_creators = new Array<WindowBackend *(*)(), Void *>;
-
-	backend_creators->Add(backend);
+	backend_creator = backend;
 
 	return Success();
 }
 
 S::GUI::WindowBackend *S::GUI::WindowBackend::CreateBackendInstance()
 {
-	if (backend_creators->GetFirst() != &CreateWindowBackend)	return backend_creators->GetFirst()();
-	else								return backend_creators->GetLast()();
+	return backend_creator();
 }
 
 S::GUI::WindowBackend::WindowBackend(Void *iWindow)

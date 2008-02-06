@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,7 +26,7 @@ S::GUI::Surface::~Surface()
 {
 	delete backend;
 
-	if (mutex != NIL) Object::DeleteObject(mutex);
+	if (mutex != NIL) delete mutex;
 }
 
 S::Int S::GUI::Surface::GetSurfaceType() const

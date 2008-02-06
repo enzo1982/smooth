@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,25 +19,20 @@ S::System::EventBackend *CreateEventBackend()
 	return new S::System::EventBackend();
 }
 
-S::Int	 eventBackendTmp = S::System::EventBackend::AddBackend(&CreateEventBackend);
+S::System::EventBackend *(*S::System::EventBackend::backend_creator)() = &CreateEventBackend;
 
-S::Array<S::System::EventBackend *(*)(), S::Void *>	*S::System::EventBackend::backend_creators = NIL;
-
-S::Int S::System::EventBackend::AddBackend(EventBackend *(*backend)())
+S::Int S::System::EventBackend::SetBackend(EventBackend *(*backend)())
 {
 	if (backend == NIL) return Error();
 
-	if (backend_creators == NIL) backend_creators = new Array<EventBackend *(*)(), Void *>;
-
-	backend_creators->Add(backend);
+	backend_creator = backend;
 
 	return Success();
 }
 
 S::System::EventBackend *S::System::EventBackend::CreateBackendInstance()
 {
-	if (backend_creators->GetFirst() != &CreateEventBackend)	return backend_creators->GetFirst()();
-	else								return backend_creators->GetLast()();
+	return backend_creator();
 }
 
 S::System::EventBackend::EventBackend()

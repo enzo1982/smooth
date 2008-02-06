@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,14 +10,14 @@
 
 #include <smooth/threads/backends/win32/semaphorewin32.h>
 
-S::Threads::SemaphoreBackend *CreateSemaphoreWin32(S::Void *iSemaphore)
+S::Threads::SemaphoreBackend *CreateSemaphoreWin32(S::Int iValue, S::Void *iSemaphore)
 {
-	return new S::Threads::SemaphoreWin32(iSemaphore);
+	return new S::Threads::SemaphoreWin32(iValue, iSemaphore);
 }
 
-S::Int	 semaphoreWin32Tmp = S::Threads::SemaphoreBackend::AddBackend(&CreateSemaphoreWin32);
+S::Int	 semaphoreWin32Tmp = S::Threads::SemaphoreBackend::SetBackend(&CreateSemaphoreWin32);
 
-S::Threads::SemaphoreWin32::SemaphoreWin32(Void *iSemaphore)
+S::Threads::SemaphoreWin32::SemaphoreWin32(Int iValue, Void *iSemaphore) : SemaphoreBackend(iValue)
 {
 	type = SEMAPHORE_WIN32;
 
@@ -28,14 +28,17 @@ S::Threads::SemaphoreWin32::SemaphoreWin32(Void *iSemaphore)
 	}
 	else
 	{
-		semaphore	= CreateSemaphoreA(NULL, 1, 2147483647, NULL);
+		/* The semaphore will be created once we need it
+		 */
+		semaphore	= NIL;
+		initialValue	= iValue;
 		mySemaphore	= True;
 	}
 }
 
 S::Threads::SemaphoreWin32::~SemaphoreWin32()
 {
-	if (mySemaphore) CloseHandle(semaphore);
+	if (mySemaphore && semaphore != NIL) CloseHandle(semaphore);
 }
 
 S::Void *S::Threads::SemaphoreWin32::GetSystemSemaphore() const
@@ -45,6 +48,10 @@ S::Void *S::Threads::SemaphoreWin32::GetSystemSemaphore() const
 
 S::Int S::Threads::SemaphoreWin32::Wait()
 {
+	/* Lazy initialization of the semaphore happens here
+	 */
+	if (semaphore == NIL) semaphore	= CreateSemaphoreA(NULL, initialValue, initialValue, NULL);
+
 	WaitForSingleObject(semaphore, INFINITE);
 
 	return Success();
@@ -52,7 +59,7 @@ S::Int S::Threads::SemaphoreWin32::Wait()
 
 S::Int S::Threads::SemaphoreWin32::Release()
 {
-	ReleaseSemaphore(semaphore, 1, NULL);
+	if (semaphore != NIL) ReleaseSemaphore(semaphore, 1, NULL);
 
 	return Success();
 }

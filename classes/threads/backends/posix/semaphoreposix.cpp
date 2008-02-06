@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,14 +10,14 @@
 
 #include <smooth/threads/backends/posix/semaphoreposix.h>
 
-S::Threads::SemaphoreBackend *CreateSemaphorePOSIX(S::Void *iSemaphore)
+S::Threads::SemaphoreBackend *CreateSemaphorePOSIX(S::Int iValue, S::Void *iSemaphore)
 {
-	return new S::Threads::SemaphorePOSIX(iSemaphore);
+	return new S::Threads::SemaphorePOSIX(iValue, iSemaphore);
 }
 
-S::Int	 semaphorePOSIXTmp = S::Threads::SemaphoreBackend::AddBackend(&CreateSemaphorePOSIX);
+S::Int	 semaphorePOSIXTmp = S::Threads::SemaphoreBackend::SetBackend(&CreateSemaphorePOSIX);
 
-S::Threads::SemaphorePOSIX::SemaphorePOSIX(Void *iSemaphore)
+S::Threads::SemaphorePOSIX::SemaphorePOSIX(Int iValue, Void *iSemaphore)
 {
 	type = SEMAPHORE_POSIX;
 
@@ -28,17 +28,17 @@ S::Threads::SemaphorePOSIX::SemaphorePOSIX(Void *iSemaphore)
 	}
 	else
 	{
-		semaphore	= new sem_t;
-
-		sem_init(semaphore, 0, 1);
-
+		/* The semaphore will be created once we need it
+		 */
+		semaphore	= NIL;
+		initialValue	= iValue;
 		mySemaphore	= True;
 	}
 }
 
 S::Threads::SemaphorePOSIX::~SemaphorePOSIX()
 {
-	if (mySemaphore)
+	if (mySemaphore && semaphore != NIL)
 	{
 		sem_destroy(semaphore);
 
@@ -53,6 +53,15 @@ S::Void *S::Threads::SemaphorePOSIX::GetSystemSemaphore() const
 
 S::Int S::Threads::SemaphorePOSIX::Wait()
 {
+	/* Lazy initialization of the semaphore happens here
+	 */
+	if (semaphore == NIL)
+	{
+		semaphore = new sem_t;
+
+		sem_init(semaphore, 0, initialValue);
+	}
+
 	sem_wait(semaphore);
 
 	return Success();
@@ -60,7 +69,7 @@ S::Int S::Threads::SemaphorePOSIX::Wait()
 
 S::Int S::Threads::SemaphorePOSIX::Release()
 {
-	sem_post(semaphore);
+	if (semaphore != NIL) sem_post(semaphore);
 
 	return Success();
 }

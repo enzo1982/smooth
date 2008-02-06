@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,10 +31,10 @@ S::GUI::BitmapBackend *CreateBitmapXLib_crS(const S::GUI::BitmapBackend &iBitmap
 	return new S::GUI::BitmapXLib((const S::GUI::BitmapXLib &) iBitmap);
 }
 
-S::Int	 bitmapXLibTmp_pV	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapXLib_pV);
-S::Int	 bitmapXLibTmp_III	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapXLib_III);
-S::Int	 bitmapXLibTmp_cI	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapXLib_cI);
-S::Int	 bitmapXLibTmp_crS	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapXLib_crS);
+S::Int	 bitmapXLibTmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_pV);
+S::Int	 bitmapXLibTmp_III	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_III);
+S::Int	 bitmapXLibTmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_cI);
+S::Int	 bitmapXLibTmp_crS	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_crS);
 
 S::GUI::BitmapXLib::BitmapXLib(Void *iBitmap)
 {

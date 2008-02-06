@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,15 +15,19 @@
 #include <smooth/system/system.h>
 #include <smooth/system/multimonitor.h>
 #include <smooth/init.h>
+#include <smooth/system/timer.h>
+#include <smooth/threads/thread.h>
 
 S::GUI::WindowBackend *CreateWindowGDI()
 {
 	return new S::GUI::WindowGDI();
 }
 
-S::Int	 windowGDITmp = S::GUI::WindowBackend::AddBackend(&CreateWindowGDI);
+S::Int	 windowGDITmp = S::GUI::WindowBackend::SetBackend(&CreateWindowGDI);
 
 S::Array<S::GUI::WindowGDI *, S::Void *>	 S::GUI::WindowGDI::windowBackends;
+
+S::System::Timer	*S::GUI::WindowGDI::mouseNotifyTimer = NIL;
 
 LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -425,4 +429,44 @@ S::Int S::GUI::WindowGDI::Restore()
 	maximized = False;
 
 	return Success();
+}
+
+S::Void S::GUI::WindowGDI::InitMouseNotifier()
+{
+	mouseNotifyTimer = new System::Timer();
+
+	mouseNotifyTimer->onInterval.Connect(&WindowGDI::MouseNotifier);
+	mouseNotifyTimer->Start(50);
+}
+
+S::Void S::GUI::WindowGDI::FreeMouseNotifier()
+{
+	mouseNotifyTimer->Stop();
+	
+	delete mouseNotifyTimer;
+}
+
+S::Void S::GUI::WindowGDI::MouseNotifier()
+{
+	for (Int i = 0; i < Object::GetNOfObjects(); i++)
+	{
+		Object	*object = Object::GetNthObject(i);
+
+		if (object != NIL)
+		{
+			if (object->GetObjectType() == GUI::Window::classID)
+			{
+				if (((GUI::Window *) object)->IsInUse()) ((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
+			}
+
+			if (object->GetObjectType() == Threads::Thread::classID)
+			{
+				if (((Threads::Thread *) object)->GetStatus() == Threads::THREAD_RUNNING)
+				{
+					if (Setup::enableUnicode) PostThreadMessageW(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+					else			  PostThreadMessageA(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
+				}
+			}
+		}
+	}
 }

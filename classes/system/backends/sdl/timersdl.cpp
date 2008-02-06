@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,7 +18,7 @@ S::System::TimerBackend *CreateTimerSDL()
 	return new S::System::TimerSDL();
 }
 
-S::Int	 timerSDLTmp = S::System::TimerBackend::AddBackend(&CreateTimerSDL);
+S::Int	 timerSDLTmp = S::System::TimerBackend::SetBackend(&CreateTimerSDL);
 
 S::System::TimerSDL::TimerSDL()
 {

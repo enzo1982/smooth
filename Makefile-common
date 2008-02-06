@@ -37,9 +37,3 @@ TRANSLATORDIR = ./tools/translator
 PCIFFMANDIR = ./tools/pciffmanager
 RESOURCEDIR = ./resources
 BINRESDIR = $(RESOURCEDIR)/binary
-
-doc: doc-clean
-	doxys
-
-doc-clean:
-	rm -r -f doc/reference

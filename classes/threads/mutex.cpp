@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,18 +11,26 @@
 #include <smooth/threads/mutex.h>
 #include <smooth/threads/backends/mutexbackend.h>
 
-const S::Int	 S::Threads::Mutex::classID = S::Object::RequestClassID();
-
 S::Threads::Mutex::Mutex(Void *iMutex)
 {
 	backend = MutexBackend::CreateBackendInstance(iMutex);
+}
 
-	type = classID;
+S::Threads::Mutex::Mutex(const Mutex &oMutex)
+{
+	*this = oMutex;
 }
 
 S::Threads::Mutex::~Mutex()
 {
 	delete backend;
+}
+
+S::Threads::Mutex &S::Threads::Mutex::operator =(const Mutex &oMutex)
+{
+	backend = MutexBackend::CreateBackendInstance(NIL);
+
+	return *this;
 }
 
 S::Int S::Threads::Mutex::GetMutexType() const
@@ -37,10 +45,19 @@ S::Void *S::Threads::Mutex::GetSystemMutex() const
 
 S::Int S::Threads::Mutex::Lock()
 {
-	return backend->Lock();
+	/* Lock the mutex only if we are running multiple Threads
+	 */
+	if (Threads::Thread::GetNOfRunningThreads() > 0)
+	{
+		return backend->Lock();
+	}
+
+	return Success();
 }
 
 S::Int S::Threads::Mutex::Release()
 {
+	/* This is save even if we didn't call Lock() before
+	 */
 	return backend->Release();
 }

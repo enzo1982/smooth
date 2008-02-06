@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,6 +40,11 @@ namespace smooth
 			const t		&GetLast() const					{ return (const t &) ArrayBackend<s>::GetLast(); }
 			const t		&GetNext() const					{ return (const t &) ArrayBackend<s>::GetNext(); }
 			const t		&GetPrev() const					{ return (const t &) ArrayBackend<s>::GetPrev(); }
+
+			Int		 LockForRead() const					{ return ArrayBackend<s>::LockForRead(); }
+			Int		 LockForWrite() const					{ return ArrayBackend<s>::LockForWrite(); }
+
+			Int		 Unlock() const						{ return ArrayBackend<s>::Unlock(); }
 	};
 };
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,10 +30,10 @@ S::GUI::BitmapBackend *CreateBitmapGDI_crS(const S::GUI::BitmapBackend &iBitmap)
 	return new S::GUI::BitmapGDI((const S::GUI::BitmapGDI &) iBitmap);
 }
 
-S::Int	 bitmapGDITmp_pV	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapGDI_pV);
-S::Int	 bitmapGDITmp_III	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapGDI_III);
-S::Int	 bitmapGDITmp_cI	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapGDI_cI);
-S::Int	 bitmapGDITmp_crS	= S::GUI::BitmapBackend::AddBackend(&CreateBitmapGDI_crS);
+S::Int	 bitmapGDITmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_pV);
+S::Int	 bitmapGDITmp_III	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_III);
+S::Int	 bitmapGDITmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_cI);
+S::Int	 bitmapGDITmp_crS	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_crS);
 
 S::GUI::BitmapGDI::BitmapGDI(Void *iBitmap)
 {

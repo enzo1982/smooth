@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,25 +19,20 @@ S::System::TimerBackend *CreateTimerBackend()
 	return new S::System::TimerBackend();
 }
 
-S::Int	 timerBackendTmp = S::System::TimerBackend::AddBackend(&CreateTimerBackend);
+S::System::TimerBackend *(*S::System::TimerBackend::backend_creator)() = &CreateTimerBackend;
 
-S::Array<S::System::TimerBackend *(*)(), S::Void *>	*S::System::TimerBackend::backend_creators = NIL;
-
-S::Int S::System::TimerBackend::AddBackend(TimerBackend *(*backend)())
+S::Int S::System::TimerBackend::SetBackend(TimerBackend *(*backend)())
 {
 	if (backend == NIL) return Error();
 
-	if (backend_creators == NIL) backend_creators = new Array<TimerBackend *(*)(), Void *>;
-
-	backend_creators->Add(backend);
+	backend_creator = backend;
 
 	return Success();
 }
 
 S::System::TimerBackend *S::System::TimerBackend::CreateBackendInstance()
 {
-	if (backend_creators->GetFirst() != &CreateTimerBackend)	return backend_creators->GetFirst()();
-	else								return backend_creators->GetLast()();
+	return backend_creator();
 }
 
 S::System::TimerBackend::TimerBackend()

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,6 +24,11 @@ S::Threads::Thread::Thread(Void *iThread)
 	status	= THREAD_CREATED;
 }
 
+S::Threads::Thread::Thread(const Thread &oThread)
+{
+	*this = oThread;
+}
+
 S::Threads::Thread::~Thread()
 {
 	if (status == THREAD_CREATED || status == THREAD_STARTME || status == THREAD_STOPPED_SELF)
@@ -41,6 +46,18 @@ S::Threads::Thread::~Thread()
 	}
 
 	delete backend;
+}
+
+S::Threads::Thread &S::Threads::Thread::operator =(const Thread &oThread)
+{
+	backend = ThreadBackend::CreateBackendInstance(NIL);
+
+	type	= classID;
+	status	= THREAD_CREATED;
+
+	threadMain = oThread.threadMain;
+
+	return *this;
 }
 
 S::Int S::Threads::Thread::GetStatus() const

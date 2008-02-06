@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,25 +19,20 @@ S::Threads::ThreadBackend *CreateThreadBackend(S::Void *iThread)
 	return new S::Threads::ThreadBackend(iThread);
 }
 
-S::Int	 threadBackendTmp = S::Threads::ThreadBackend::AddBackend(&CreateThreadBackend);
+S::Threads::ThreadBackend *(*S::Threads::ThreadBackend::backend_creator)(S::Void *) = &CreateThreadBackend;
 
-S::Array<S::Threads::ThreadBackend *(*)(S::Void *), S::Void *>	*S::Threads::ThreadBackend::backend_creators = NIL;
-
-S::Int S::Threads::ThreadBackend::AddBackend(ThreadBackend *(*backend)(Void *))
+S::Int S::Threads::ThreadBackend::SetBackend(ThreadBackend *(*backend)(Void *))
 {
 	if (backend == NIL) return Error();
 
-	if (backend_creators == NIL) backend_creators = new Array<ThreadBackend *(*)(Void *), Void *>;
-
-	backend_creators->Add(backend);
+	backend_creator = backend;
 
 	return Success();
 }
 
 S::Threads::ThreadBackend *S::Threads::ThreadBackend::CreateBackendInstance(Void *iThread)
 {
-	if (backend_creators->GetFirst() != &CreateThreadBackend)	return backend_creators->GetFirst()(iThread);
-	else								return backend_creators->GetLast()(iThread);
+	return backend_creator(iThread);
 }
 
 S::Threads::ThreadBackend::ThreadBackend(Void *iThread)

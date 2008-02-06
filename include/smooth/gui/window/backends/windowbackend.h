@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,48 +34,48 @@ namespace smooth
 		class WindowBackend
 		{
 			private:
-				static Array<WindowBackend *(*)(), Void *>	*backend_creators;
+				static WindowBackend		*(*backend_creator)();
 			protected:
-				Int						 type;
+				Int				 type;
 
-				Surface						*nullSurface;
-				Surface						*drawSurface;
+				Surface				*nullSurface;
+				Surface				*drawSurface;
 			public:
-				static Int					 AddBackend(WindowBackend *(*)());
+				static Int			 SetBackend(WindowBackend *(*)());
 
-				static WindowBackend				*CreateBackendInstance();
+				static WindowBackend		*CreateBackendInstance();
 
-										 WindowBackend(Void * = NIL);
-				virtual						~WindowBackend();
+								 WindowBackend(Void * = NIL);
+				virtual				~WindowBackend();
 
-				Int						 GetWindowType();
+				Int				 GetWindowType();
 
-				virtual Void					*GetSystemWindow() const;
+				virtual Void			*GetSystemWindow() const;
 
-				virtual Surface					*GetDrawSurface() const;
+				virtual Surface			*GetDrawSurface() const;
 
-				virtual Int					 Open(const String &, const Point &, const Size &, Int);
-				virtual Int					 Close();
+				virtual Int			 Open(const String &, const Point &, const Size &, Int);
+				virtual Int			 Close();
 
-				virtual Int					 SetTitle(const String &);
-				virtual Int					 SetIcon(const Bitmap &);
+				virtual Int			 SetTitle(const String &);
+				virtual Int			 SetIcon(const Bitmap &);
 
-				virtual Int					 SetMinimumSize(const Size &);
-				virtual Int					 SetMaximumSize(const Size &);
+				virtual Int			 SetMinimumSize(const Size &);
+				virtual Int			 SetMaximumSize(const Size &);
 
-				virtual Int					 Show();
-				virtual Int					 Hide();
+				virtual Int			 Show();
+				virtual Int			 Hide();
 
-				virtual Rect					 GetRestoredWindowRect() const;
+				virtual Rect			 GetRestoredWindowRect() const;
 
-				virtual Int					 SetMetrics(const Point &, const Size &);
+				virtual Int			 SetMetrics(const Point &, const Size &);
 
-				virtual Int					 Minimize();
+				virtual Int			 Minimize();
 
-				virtual Int					 Maximize();
-				virtual Int					 Restore();
+				virtual Int			 Maximize();
+				virtual Int			 Restore();
 			signals:
-				Callback3<Int, Int, Int, Int>			 onEvent;
+				Callback3<Int, Int, Int, Int>	 onEvent;
 		};
 	};
 };

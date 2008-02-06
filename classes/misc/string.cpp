@@ -13,16 +13,9 @@
 #include <smooth/misc/encoding/base64.h>
 #include <smooth/misc/hash/crc32.h>
 #include <smooth/templates/buffer.h>
-#include <smooth/threads/thread.h>
 
 #include <iconv.h>
 #include <memory.h>
-
-#if defined __WIN32__
-#	include <smooth/threads/backends/win32/mutexwin32.h>
-#else
-#	include <smooth/threads/backends/posix/mutexposix.h>
-#endif
 
 #if defined __WINE__
 #	define wcslen lstrlenW
@@ -44,9 +37,7 @@ S::Array<char *>	 S::String::allocatedBuffers;
 
 S::String::String()
 {
-	mutex = NIL;
-
-	LockBuffers();
+	mutex.Lock();
 
 	nOfStrings++;
 
@@ -54,14 +45,12 @@ S::String::String()
 
 	Clean();
 
-	UnlockBuffers();
+	mutex.Release();
 }
 
 S::String::String(const int nil)
 {
-	mutex = NIL;
-
-	LockBuffers();
+	mutex.Lock();
 
 	nOfStrings++;
 
@@ -69,14 +58,12 @@ S::String::String(const int nil)
 
 	Clean();
 
-	UnlockBuffers();
+	mutex.Release();
 }
 
 S::String::String(const char *iString)
 {
-	mutex = NIL;
-
-	LockBuffers();
+	mutex.Lock();
 
 	nOfStrings++;
 
@@ -95,14 +82,12 @@ S::String::String(const char *iString)
 		ImportFrom(inputFormat, iString);
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 }
 
 S::String::String(const wchar_t *iString)
 {
-	mutex = NIL;
-
-	LockBuffers();
+	mutex.Lock();
 
 	nOfStrings++;
 
@@ -123,14 +108,12 @@ S::String::String(const wchar_t *iString)
 		stringSize = size;
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 }
 
 S::String::String(const String &iString)
 {
-	mutex = NIL;
-
-	LockBuffers();
+	mutex.Lock();
 
 	nOfStrings++;
 
@@ -149,12 +132,12 @@ S::String::String(const String &iString)
 		stringSize = iString.stringSize;
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 }
 
 S::String::~String()
 {
-	LockBuffers();
+	mutex.Lock();
 
 	Clean();
 
@@ -165,31 +148,7 @@ S::String::~String()
 		allocatedBuffers.RemoveAll();
 	}
 
-	UnlockBuffers();
-
-	if (mutex != NIL) delete mutex;
-}
-
-S::Void S::String::LockBuffers() const
-{
-	if (Threads::Thread::GetNOfRunningThreads() > 0)
-	{
-		if (mutex == NIL)
-		{
-#ifdef __WIN32__
-			mutex = new Threads::MutexWin32(NIL);
-#else
-			mutex = new Threads::MutexPOSIX(NIL);
-#endif
-		}
-
-		mutex->Lock();
-	}
-}
-
-S::Void S::String::UnlockBuffers() const
-{
-	if (mutex != NIL) mutex->Release();
+	mutex.Release();
 }
 
 S::Void S::String::DeleteTemporaryBuffers()
@@ -206,13 +165,13 @@ S::Void S::String::DeleteTemporaryBuffers()
 
 S::Void S::String::Clean()
 {
-	LockBuffers();
+	mutex.Lock();
 
 	stringSize = 0;
 
 	wString.Resize(0);
 
-	UnlockBuffers();
+	mutex.Release();
 }
 
 S::Int S::String::ComputeCRC32() const
@@ -343,7 +302,7 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	size = size / 2 + 1;
 
-	LockBuffers();
+	mutex.Lock();
 
 	wString.Resize(size);
 
@@ -353,7 +312,7 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	stringSize = size;
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return Success();
 }
@@ -396,7 +355,7 @@ wchar_t &S::String::operator [](int n)
 {
 	if (n >= stringSize - 1)
 	{
-		LockBuffers();
+		mutex.Lock();
 
 		if (stringSize > 0)
 		{
@@ -438,7 +397,7 @@ wchar_t &S::String::operator [](int n)
 
 		wString[n] = 0;
 
-		UnlockBuffers();
+		mutex.Release();
 	}
 
 	return wString[n];
@@ -506,7 +465,7 @@ S::String &S::String::operator =(const wchar_t *newString)
 	{
 		Int	 size = wcslen(newString) + 1;
 
-		LockBuffers();
+		mutex.Lock();
 
 		Clean();
 
@@ -516,7 +475,7 @@ S::String &S::String::operator =(const wchar_t *newString)
 
 		stringSize = size;
 
-		UnlockBuffers();
+		mutex.Release();
 	}
 
 	return *this;
@@ -532,7 +491,7 @@ S::String &S::String::operator =(const String &newString)
 	{
 		String	 backup(newString);
 
-		LockBuffers();
+		mutex.Lock();
 
 		Clean();
 
@@ -542,7 +501,7 @@ S::String &S::String::operator =(const String &newString)
 
 		stringSize = backup.stringSize;
 
-		UnlockBuffers();
+		mutex.Release();
 	}
 
 	return *this;
@@ -632,7 +591,7 @@ S::Int S::String::Length() const
 {
 	if (stringSize == 0) return 0;
 
-	LockBuffers();
+	mutex.Lock();
 
 	stringSize = 0;
 
@@ -643,7 +602,7 @@ S::Int S::String::Length() const
 		if (wString[i] == 0) break;
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return stringSize - 1;
 }
@@ -669,7 +628,7 @@ S::String &S::String::Append(const String &str)
 
 	wBuffer.Resize(len1 + len2 + 1);
 
-	LockBuffers();
+	mutex.Lock();
 
 	wcsncpy(wBuffer, wString, len1);
 	wcsncpy(wBuffer + len1, str.wString, len2);
@@ -678,7 +637,7 @@ S::String &S::String::Append(const String &str)
 
 	*this = wBuffer;
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return *this;
 }
@@ -701,7 +660,7 @@ S::Int S::String::Find(const String &str) const
 {
 	String	 bStr(str);
 
-	LockBuffers();
+	mutex.Lock();
 
 	for (Int i = 0; i <= Length() - bStr.Length(); i++)
 	{
@@ -716,10 +675,10 @@ S::Int S::String::Find(const String &str) const
 			}
 		}
 
-		if (foundString) { UnlockBuffers(); return i; }
+		if (foundString) { mutex.Release(); return i; }
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return -1;
 }
@@ -761,7 +720,7 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 
 	if (bStr1 == NIL) return *this;
 
-	LockBuffers();
+	mutex.Lock();
 
 	for (Int i = 0; i <= Length() - bStr1.Length(); i++)
 	{
@@ -815,7 +774,7 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 		}
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return *this;
 }
@@ -859,7 +818,7 @@ S::String &S::String::CopyN(const String &str, const Int n)
 {
 	String	 backup(str);
 
-	LockBuffers();
+	mutex.Lock();
 
 	Clean();
 
@@ -868,7 +827,7 @@ S::String &S::String::CopyN(const String &str, const Int n)
 		(*this)[i] = backup[i];
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return *this;
 }
@@ -898,14 +857,14 @@ S::Int S::String::Compare(const String &str) const
 	}
 	else
 	{
-		LockBuffers();
+		mutex.Lock();
 
 		for (Int i = 0; i < len1; i++)
 		{
-			if (wString[i] != str.wString[i]) { UnlockBuffers(); return 1; }
+			if (wString[i] != str.wString[i]) { mutex.Release(); return 1; }
 		}
 
-		UnlockBuffers();
+		mutex.Release();
 	}
 
 	return 0;
@@ -929,14 +888,14 @@ S::Int S::String::CompareN(const String &str, Int n) const
 {
 	if (Length() < n) return 1;
 
-	LockBuffers();
+	mutex.Lock();
 
 	for (Int i = 0; i < n; i++)
 	{
-		if (wString[i] != str.wString[i]) { UnlockBuffers(); return 1; }
+		if (wString[i] != str.wString[i]) { mutex.Release(); return 1; }
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return 0;
 }
@@ -962,14 +921,14 @@ S::Bool S::String::StartsWith(const String &str) const
 
 	if (len1 >= len2)
 	{
-		LockBuffers();
+		mutex.Lock();
 
 		for (Int i = 0; i < len2; i++)
 		{
-			if (wString[i] != str.wString[i]) { UnlockBuffers(); return False; }
+			if (wString[i] != str.wString[i]) { mutex.Release(); return False; }
 		}
 
-		UnlockBuffers();
+		mutex.Release();
 
 		return True;
 	}
@@ -998,14 +957,14 @@ S::Bool S::String::EndsWith(const String &str) const
 
 	if (len1 >= len2)
 	{
-		LockBuffers();
+		mutex.Lock();
 
 		for (Int i = 0; i < len2; i++)
 		{
-			if (wString[len1 - len2 + i] != str.wString[i]) { UnlockBuffers(); return False; }
+			if (wString[len1 - len2 + i] != str.wString[i]) { mutex.Release(); return False; }
 		}
 
-		UnlockBuffers();
+		mutex.Release();
 
 		return True;
 	}
@@ -1065,21 +1024,21 @@ S::String S::String::Trim() const
 
 S::String &S::String::Fill(const Int value)
 {
-	LockBuffers();
+	mutex.Lock();
 
 	for (Int i = 0; i < Length(); i++)
 	{
 		(*this)[i] = value;
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return *this;
 }
 
 S::String &S::String::FillN(const Int value, const Int count)
 {
-	LockBuffers();
+	mutex.Lock();
 
 	Clean();
 
@@ -1088,7 +1047,7 @@ S::String &S::String::FillN(const Int value, const Int count)
 		(*this)[i] = value;
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return *this;
 }
@@ -1102,7 +1061,7 @@ S::Int64 S::String::ToInt() const
 	Int64	 n = 0;
 	Int	 size = Length();
 
-	LockBuffers();
+	mutex.Lock();
 
 	for (Int i = size - 1; i >= 0; i--)
 	{
@@ -1121,7 +1080,7 @@ S::Int64 S::String::ToInt() const
 		n += (Int64) Math::Pow(10l, size - (j - first) - 1) * (wString[j] - 48);
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	if (!neg)	return n;
 	else		return 0 - n;
@@ -1138,7 +1097,7 @@ S::Float S::String::ToFloat() const
 	Int	 afpsize = 0;
 	Int	 firstafp = 0;
 
-	LockBuffers();
+	mutex.Lock();
 
 	for (Int i = size - 1; i >= 0; i--)
 	{
@@ -1173,7 +1132,7 @@ S::Float S::String::ToFloat() const
 		n += (Float) Math::Pow(10l, 0 - (k - firstafp) - 1) * (wString[k] - 48);
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	if (!neg)	return n;
 	else		return 0 - n;
@@ -1283,7 +1242,7 @@ S::String S::String::ToLower() const
 {
 	String	 retVal = *this;
 
-	LockBuffers();
+	mutex.Lock();
 
 	for (Int i = 0; i < Length(); i++)
 	{
@@ -1326,7 +1285,7 @@ S::String S::String::ToLower() const
 		else if	((*this)[i] >= 0x04D0 && (*this)[i] <= 0x04F8 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x0001; // Cyrillic special letters
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return retVal;
 }
@@ -1335,7 +1294,7 @@ S::String S::String::ToUpper() const
 {
 	String	 retVal = *this;
 
-	LockBuffers();
+	mutex.Lock();
 
 	for (Int i = 0; i < Length(); i++)
 	{
@@ -1378,7 +1337,7 @@ S::String S::String::ToUpper() const
 		else if	((*this)[i] >= 0x04D1 && (*this)[i] <= 0x04F9 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x0001; // Cyrillic special letters
 	}
 
-	UnlockBuffers();
+	mutex.Release();
 
 	return retVal;
 }

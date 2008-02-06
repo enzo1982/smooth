@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,25 +23,20 @@ S::GUI::SurfaceBackend *CreateSurfaceBackend(S::Void *iSurface, const S::GUI::Si
 	return new S::GUI::SurfaceBackend(iSurface, maxSize);
 }
 
-S::Int	 surfaceBackendTmp = S::GUI::SurfaceBackend::AddBackend(&CreateSurfaceBackend);
+S::GUI::SurfaceBackend *(*S::GUI::SurfaceBackend::backend_creator)(S::Void *, const S::GUI::Size &) = &CreateSurfaceBackend;
 
-S::Array<S::GUI::SurfaceBackend *(*)(S::Void *, const S::GUI::Size &), S::Void *>	*S::GUI::SurfaceBackend::backend_creators = NIL;
-
-S::Int S::GUI::SurfaceBackend::AddBackend(SurfaceBackend *(*backend)(Void *, const Size &))
+S::Int S::GUI::SurfaceBackend::SetBackend(SurfaceBackend *(*backend)(Void *, const Size &))
 {
 	if (backend == NIL) return Error();
 
-	if (backend_creators == NIL) backend_creators = new Array<SurfaceBackend *(*)(Void *, const Size &), Void *>;
-
-	backend_creators->Add(backend);
+	backend_creator = backend;
 
 	return Success();
 }
 
 S::GUI::SurfaceBackend *S::GUI::SurfaceBackend::CreateBackendInstance(Void *iSurface, const Size &maxSize)
 {
-	if (backend_creators->GetFirst() != &CreateSurfaceBackend)	return backend_creators->GetFirst()(iSurface, maxSize);
-	else								return backend_creators->GetLast()(iSurface, maxSize);
+	return backend_creator(iSurface, maxSize);
 }
 
 S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface, const Size &maxSize)

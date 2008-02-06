@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,7 +16,7 @@ S::System::EventBackend *CreateEventWin32()
 	return new S::System::EventWin32();
 }
 
-S::Int	 eventWin32Tmp = S::System::EventBackend::AddBackend(&CreateEventWin32);
+S::Int	 eventWin32Tmp = S::System::EventBackend::SetBackend(&CreateEventWin32);
 
 S::System::EventWin32::EventWin32()
 {

@@ -8,15 +8,16 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_SEMAPHORE_
-#define _H_OBJSMOOTH_SEMAPHORE_
+#ifndef _H_OBJSMOOTH_RWLOCK_
+#define _H_OBJSMOOTH_RWLOCK_
 
 namespace smooth
 {
 	namespace Threads
 	{
+		class Mutex;
 		class Semaphore;
-		class SemaphoreBackend;
+		class RWLock;
 	};
 };
 
@@ -26,28 +27,27 @@ namespace smooth
 {
 	namespace Threads
 	{
-		class SMOOTHAPI Semaphore
+		class SMOOTHAPI RWLock
 		{
 			private:
-				SemaphoreBackend	*backend;
+				static const Int	 MAX_READ_LOCKS;
 
-				Int			 value;
-				Int			 max;
+				Bool			 writeLocked;
+				Int			 readLocks;
+
+				Mutex			*exclusiveAccessMutex;
+				Semaphore		*sharedAccessSemaphore;
 			public:
-							 Semaphore(Int, Void * = NIL);
-							 Semaphore(const Semaphore &);
-							~Semaphore();
+							 RWLock();
+							 RWLock(const RWLock &);
+							~RWLock();
 
-				Semaphore &operator	 =(const Semaphore &);
+				RWLock &operator	 =(const RWLock &);
 
-				Int			 GetSemaphoreType() const;
+				Int			 LockForRead();
+				Int			 LockForWrite();
 
-				Void			*GetSystemSemaphore() const;
-
-				Int			 Wait();
 				Int			 Release();
-
-				Int			 GetSignalState() const	{ return value; }
 		};
 	};
 };

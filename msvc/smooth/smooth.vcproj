@@ -1072,10 +1072,6 @@
 							>
 						</File>
 						<File
-							RelativePath="..\..\classes\gui\application\background.cpp"
-							>
-						</File>
-						<File
 							RelativePath="..\..\classes\gui\application\xulloader.cpp"
 							>
 						</File>
@@ -1466,6 +1462,10 @@
 					>
 					<File
 						RelativePath="..\..\classes\threads\mutex.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\classes\threads\rwlock.cpp"
 						>
 					</File>
 					<File
@@ -2162,6 +2162,78 @@
 							</Filter>
 						</Filter>
 					</Filter>
+					<Filter
+						Name="window"
+						>
+						<File
+							RelativePath="..\..\include\smooth\gui\window\toolwindow.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\window\window.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="mdi"
+						>
+						<File
+							RelativePath="..\..\include\smooth\gui\mdi\client.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\mdi\window.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="dialogs"
+						>
+						<File
+							RelativePath="..\..\include\smooth\gui\dialogs\colordlg.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\dialogs\dialog.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\dialogs\dirdlg.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\dialogs\filedlg.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\dialogs\fontdlg.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\dialogs\messagebox.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\dialogs\splashscreen.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\dialogs\tipodaydlg.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="application"
+						>
+						<File
+							RelativePath="..\..\include\smooth\gui\application\application.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\application\xulloader.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="net"
@@ -2436,6 +2508,10 @@
 					>
 					<File
 						RelativePath="..\..\include\smooth\threads\mutex.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\smooth\threads\rwlock.h"
 						>
 					</File>
 					<File

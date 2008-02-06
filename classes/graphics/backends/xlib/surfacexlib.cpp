@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,7 +20,7 @@ S::GUI::SurfaceBackend *CreateSurfaceXLib(S::Void *iSurface, const S::GUI::Size 
 	return new S::GUI::SurfaceXLib(iSurface);
 }
 
-S::Int	 surfaceXLibTmp = S::GUI::SurfaceBackend::AddBackend(&CreateSurfaceXLib);
+S::Int	 surfaceXLibTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceXLib);
 
 S::GUI::SurfaceXLib::SurfaceXLib(Void *iDc, const Size &maxSize)
 {

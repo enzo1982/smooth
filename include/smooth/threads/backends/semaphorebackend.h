@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,23 +30,23 @@ namespace smooth
 		class SemaphoreBackend
 		{
 			private:
-				static Array<SemaphoreBackend *(*)(Void *), Void *>	*backend_creators;
+				static SemaphoreBackend		*(*backend_creator)(Int, Void *);
 			protected:
-				Int							 type;
+				Int				 type;
 			public:
-				static Int						 AddBackend(SemaphoreBackend *(*)(Void *));
+				static Int			 SetBackend(SemaphoreBackend *(*)(Int, Void *));
 
-				static SemaphoreBackend					*CreateBackendInstance(Void * = NIL);
+				static SemaphoreBackend		*CreateBackendInstance(Int, Void * = NIL);
 
-											 SemaphoreBackend(Void * = NIL);
-				virtual							~SemaphoreBackend();
+								 SemaphoreBackend(Int, Void * = NIL);
+				virtual				~SemaphoreBackend();
 
-				Int							 GetSemaphoreType() const;
+				Int				 GetSemaphoreType() const;
 
-				virtual Void						*GetSystemSemaphore() const;
+				virtual Void			*GetSystemSemaphore() const;
 
-				virtual Int						 Wait();
-				virtual Int						 Release();
+				virtual Int			 Wait();
+				virtual Int			 Release();
 		};
 	};
 };

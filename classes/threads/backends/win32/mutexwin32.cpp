@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,7 +15,7 @@ S::Threads::MutexBackend *CreateMutexWin32(S::Void *iMutex)
 	return new S::Threads::MutexWin32(iMutex);
 }
 
-S::Int	 mutexWin32Tmp = S::Threads::MutexBackend::AddBackend(&CreateMutexWin32);
+S::Int	 mutexWin32Tmp = S::Threads::MutexBackend::SetBackend(&CreateMutexWin32);
 
 S::Threads::MutexWin32::MutexWin32(Void *iMutex)
 {
@@ -28,14 +28,16 @@ S::Threads::MutexWin32::MutexWin32(Void *iMutex)
 	}
 	else
 	{
-		mutex	= CreateMutexA(NULL, false, NULL);
+		/* The mutex will be created once we need it
+		 */
+		mutex	= NIL;
 		myMutex	= True;
 	}
 }
 
 S::Threads::MutexWin32::~MutexWin32()
 {
-	if (myMutex) CloseHandle(mutex);
+	if (myMutex && mutex != NIL) CloseHandle(mutex);
 }
 
 S::Void *S::Threads::MutexWin32::GetSystemMutex() const
@@ -45,6 +47,10 @@ S::Void *S::Threads::MutexWin32::GetSystemMutex() const
 
 S::Int S::Threads::MutexWin32::Lock()
 {
+	/* Lazy initialization of the mutex happens here
+	 */
+	if (mutex == NIL) mutex	= CreateMutexA(NULL, false, NULL);
+
 	WaitForSingleObject(mutex, INFINITE);
 
 	return Success();
@@ -52,7 +58,7 @@ S::Int S::Threads::MutexWin32::Lock()
 
 S::Int S::Threads::MutexWin32::Release()
 {
-	ReleaseMutex(mutex);
+	if (mutex != NIL) ReleaseMutex(mutex);
 
 	return Success();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,52 +35,52 @@ namespace smooth
 		class SurfaceBackend
 		{
 			private:
-				static Array<SurfaceBackend *(*)(Void *, const Size &), Void *>	*backend_creators;
+				static SurfaceBackend	*(*backend_creator)(Void *, const Size &);
 			protected:
-				Int								 type;
+				Int			 type;
 
-				Size								 size;
-				Rect								 paintRect;
+				Size			 size;
+				Rect			 paintRect;
 
-				Int								 painting;
+				Int			 painting;
 
-				FontSizeModifier						 fontSize;
-				RightToLeftModifier						 rightToLeft;
+				FontSizeModifier	 fontSize;
+				RightToLeftModifier	 rightToLeft;
 			public:
-				static Int							 AddBackend(SurfaceBackend *(*)(Void *, const Size &));
+				static Int		 SetBackend(SurfaceBackend *(*)(Void *, const Size &));
 
-				static SurfaceBackend						*CreateBackendInstance(Void * = NIL, const Size & = Size());
+				static SurfaceBackend	*CreateBackendInstance(Void * = NIL, const Size & = Size());
 
-												 SurfaceBackend(Void * = NIL, const Size & = Size());
-				virtual								~SurfaceBackend();
+							 SurfaceBackend(Void * = NIL, const Size & = Size());
+				virtual			~SurfaceBackend();
 
-				Int								 GetSurfaceType() const;
+				Int			 GetSurfaceType() const;
 
-				virtual Int							 SetSize(const Size &);
-				virtual const Size						&GetSize() const;
+				virtual Int		 SetSize(const Size &);
+				virtual const Size	&GetSize() const;
 
-				Int								 SetRightToLeft(Bool);
+				Int			 SetRightToLeft(Bool);
 
-				virtual Int							 PaintRect(const Rect &);
+				virtual Int		 PaintRect(const Rect &);
 
-				virtual Int							 StartPaint(const Rect &);
-				virtual Int							 EndPaint();
+				virtual Int		 StartPaint(const Rect &);
+				virtual Int		 EndPaint();
 
-				virtual Void							*GetSystemSurface() const;
+				virtual Void		*GetSystemSurface() const;
 
-				virtual Int							 SetPixel(const Point &, const Color &);
+				virtual Int		 SetPixel(const Point &, const Color &);
 
-				virtual Int							 Line(const Point &, const Point &, const Color &);
-				virtual Int							 Frame(const Rect &, Int);
-				virtual Int							 Box(const Rect &, const Color &, Int, const Size &);
+				virtual Int		 Line(const Point &, const Point &, const Color &);
+				virtual Int		 Frame(const Rect &, Int);
+				virtual Int		 Box(const Rect &, const Color &, Int, const Size &);
 
-				virtual Int							 SetText(const String &, const Rect &, const Font &, Bool);
+				virtual Int		 SetText(const String &, const Rect &, const Font &, Bool);
 
-				virtual Int							 Gradient(const Rect &, const Color &, const Color &, Int);
-				virtual Int							 Bar(const Point &, const Point &, Int);
+				virtual Int		 Gradient(const Rect &, const Color &, const Color &, Int);
+				virtual Int		 Bar(const Point &, const Point &, Int);
 
-				virtual Int							 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
-				virtual Int							 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
+				virtual Int		 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
+				virtual Int		 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
 		};
 	};
 };

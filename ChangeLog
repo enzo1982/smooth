@@ -18,6 +18,8 @@ xx.xx.08 xx:xx - smooth alpha 0.8.70.0
 - http.cpp	- new class: HTTP, HTTP protocol implementation
 - scrollbar.cpp	- changed scrollbar behaviour to be more Windows-like
 - s...cairo.cpp	- added support for Cairo surfaces
+- semaphore.cpp - added support for initializing semaphores with a maximum value
+- rwlock.cpp	- new class: RWLock, implements a simple read/write lock based on Mutex and Semaphore
 
 - completely new and improved Array<t> implementation
 - new template class: Iterator<t>, iterator for arrays of type Array<t>

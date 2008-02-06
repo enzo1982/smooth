@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,28 +30,28 @@ namespace smooth
 		class ThreadBackend
 		{
 			private:
-				static Array<ThreadBackend *(*)(Void *), Void *>	*backend_creators;
+				static ThreadBackend	*(*backend_creator)(Void *);
 			protected:
-				Int							 type;
+				Int			 type;
 			public:
-				static Int						 AddBackend(ThreadBackend *(*)(Void *));
+				static Int		 SetBackend(ThreadBackend *(*)(Void *));
 
-				static ThreadBackend					*CreateBackendInstance(Void * = NIL);
+				static ThreadBackend	*CreateBackendInstance(Void * = NIL);
 
-											 ThreadBackend(Void * = NIL);
-				virtual							~ThreadBackend();
+							 ThreadBackend(Void * = NIL);
+				virtual			~ThreadBackend();
 
-				Int							 GetThreadType() const;
+				Int			 GetThreadType() const;
 
-				virtual Void						*GetSystemThread() const;
+				virtual Void		*GetSystemThread() const;
 
-				virtual Int						 GetThreadID() const;
+				virtual Int		 GetThreadID() const;
 
-				virtual Int						 Start(Void (*)(Void *), Void *);
-				virtual Int						 Stop();
+				virtual Int		 Start(Void (*)(Void *), Void *);
+				virtual Int		 Stop();
 
-				virtual Void						 Exit();
-				virtual Void						*Self() const;
+				virtual Void		 Exit();
+				virtual Void		*Self() const;
 		};
 	};
 };

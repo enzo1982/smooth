@@ -30,23 +30,11 @@ namespace smooth
 
 char			*S::String::inputFormat		= NIL;
 char			*S::String::outputFormat	= NIL;
+char			*S::String::internalFormat	= NIL;
 
 S::Int			 S::String::nOfStrings		= 0;
 
 S::Array<char *>	 S::String::allocatedBuffers;
-
-S::String::String()
-{
-	mutex.Lock();
-
-	nOfStrings++;
-
-	wString.Resize(0);
-
-	Clean();
-
-	mutex.Release();
-}
 
 S::String::String(const int nil)
 {
@@ -67,20 +55,9 @@ S::String::String(const char *iString)
 
 	nOfStrings++;
 
-	if (iString == NIL)
-	{
-		wString.Resize(0);
+	wString.Resize(0);
 
-		Clean();
-	}
-	else
-	{
-		wString.Resize(0);
-
-		if (inputFormat == NIL) SetInputFormat("ISO-8859-1");
-
-		ImportFrom(inputFormat, iString);
-	}
+	*this = iString;
 
 	mutex.Release();
 }
@@ -178,7 +155,7 @@ S::Int S::String::ComputeCRC32() const
 {
 	if (wString.Size() == 0) return 0;
 
-	Buffer<UnsignedByte>	 buffer(Length() * 2 + 2);
+	Buffer<UnsignedByte>	 buffer((Length() + 1) * sizeof(wchar_t));
 
 	wcscpy((wchar_t *) (UnsignedByte *) buffer, wString);
 
@@ -265,6 +242,20 @@ char *S::String::SetOutputFormat(const char *oFormat)
 	return previousOutputFormat;
 }
 
+const char *S::String::GetInternalFormat()
+{
+	if (internalFormat == NIL)
+	{
+		internalFormat = new char [9];
+
+		if	(sizeof(wchar_t) == 1)	strcpy(internalFormat, "UTF-8");
+		else if (sizeof(wchar_t) == 2)	strcpy(internalFormat, "UTF-16LE");
+		else if (sizeof(wchar_t) == 4)	strcpy(internalFormat, "UTF-32LE");
+	}
+
+	return internalFormat;
+}
+
 S::Int S::String::ImportFrom(const char *format, const char *str)
 {
 	Clean();
@@ -292,7 +283,7 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 	else if (width == 2)	while (true) { if (((short *) str)[++len] == 0) { len *= 2; break; } }
 	else if (width == 4)	while (true) { if (((long  *) str)[++len] == 0) { len *= 4; break; } }
 
-	Int	 size = ConvertString(str, len, format, NIL, 0, "UTF-16LE");
+	Int	 size = ConvertString(str, len, format, NIL, 0, GetInternalFormat());
 
 	if ((size < 0) && (strcmp(format, "ISO-8859-1") != 0))
 	{
@@ -300,13 +291,13 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 	}
 	else if (size < 0) return Error();
 
-	size = size / 2 + 1;
+	size = size / sizeof(wchar_t) + 1;
 
 	mutex.Lock();
 
 	wString.Resize(size);
 
-	ConvertString(str, len, format, (char *) (wchar_t *) wString, size * 2, "UTF-16LE");
+	ConvertString(str, len, format, (char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat());
 
 	wString[size - 1] = 0;
 
@@ -321,9 +312,9 @@ char *S::String::ConvertTo(const char *encoding) const
 {
 	if (stringSize == 0) return NIL;
 
-	Int	 bufferSize = ConvertString((char *) (wchar_t *) wString, stringSize * 2, "UTF-16LE", NIL, 0, encoding);
+	Int	 bufferSize = ConvertString((char *) (wchar_t *) wString, stringSize * sizeof(wchar_t), GetInternalFormat(), NIL, 0, encoding);
 
-	if (bufferSize == -1)	bufferSize = ConvertString((char *) (wchar_t *) wString, stringSize * 2, "UTF-16LE", NIL, 0, "ISO-8859-1");
+	if (bufferSize == -1)	bufferSize = ConvertString((char *) (wchar_t *) wString, stringSize * sizeof(wchar_t), GetInternalFormat(), NIL, 0, "ISO-8859-1");
 
 	char	*buffer = NIL;
 
@@ -331,7 +322,7 @@ char *S::String::ConvertTo(const char *encoding) const
 	{
 		buffer = new char [Length() + 1];
 
-		ConvertString((char *) (wchar_t *) wString, stringSize * 2, "UTF-16LE", buffer, Length() + 1, encoding);
+		ConvertString((char *) (wchar_t *) wString, stringSize * sizeof(wchar_t), GetInternalFormat(), buffer, Length() + 1, encoding);
 
 		for (Int i = -bufferSize; i < Length(); i++) buffer[i] = '?';
 
@@ -341,7 +332,7 @@ char *S::String::ConvertTo(const char *encoding) const
 	{
 		buffer = new char [bufferSize + 1];
 
-		ConvertString((char *) (wchar_t *) wString, stringSize * 2, "UTF-16LE", buffer, bufferSize + 1, encoding);
+		ConvertString((char *) (wchar_t *) wString, stringSize * sizeof(wchar_t), GetInternalFormat(), buffer, bufferSize + 1, encoding);
 	}
 
 	if (allocatedBuffers.Length() >= 1024) DeleteTemporaryBuffers();
@@ -759,11 +750,11 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 
 				wBuffer.Resize(length + 1);
 
-				memcpy((void *) wBuffer, (void *) wString, (length + 1) * 2);
+				memcpy((void *) wBuffer, (void *) wString, (length + 1) * sizeof(wchar_t));
 
 				wString.Resize(length + 1 + (bStr2.Length() - bStr1.Length()));
 
-				memcpy((void *) wString, (void *) wBuffer, i * 2);
+				memcpy((void *) wString, (void *) wBuffer, i * sizeof(wchar_t));
 
 				for (Int k = 0; k < bStr2.Length(); k++) wString[i + k] = bStr2[k];
 
@@ -1356,7 +1347,11 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		outBuffer	= csBuffer;
 	}
 
+#ifdef __WIN32__
 	if (Setup::useIconv)
+#else
+	if (1)
+#endif
 	{
 		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
 
@@ -1384,7 +1379,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		if (size < outBytes && size > 0)
 		{
-			wcsncpy((wchar_t *) outBuffer, (wchar_t *) inBuffer, size / 2);
+			wcsncpy((wchar_t *) outBuffer, (wchar_t *) inBuffer, size / sizeof(wchar_t));
 		}
 
 		if (size >= outBytes) size = 0;
@@ -1395,7 +1390,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		if (size < outBytes && size > 0)
 		{
-			for (Int i = 0; i < size / 2; i++) ((wchar_t *) outBuffer)[i] = ((((wchar_t *) inBuffer)[i] & 255) << 8) | (((wchar_t *) inBuffer)[i] >> 8);
+			for (UnsignedInt i = 0; i < size / sizeof(wchar_t); i++) ((wchar_t *) outBuffer)[i] = ((((wchar_t *) inBuffer)[i] & 255) << 8) | (((wchar_t *) inBuffer)[i] >> 8);
 		}
 
 		if (size >= outBytes) size = 0;
@@ -1433,12 +1428,12 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 			codePage = cpString.ToInt();
 		}
 
-		size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * 2;
+		size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * sizeof(wchar_t);
 
 		// Codepage not installed? Let's try CP_ACP!
-		if (size == 0 && GetLastError() == ERROR_INVALID_PARAMETER) size = MultiByteToWideChar(codePage = CP_ACP, 0, inBuffer, -1, NIL, 0) * 2;
+		if (size == 0 && GetLastError() == ERROR_INVALID_PARAMETER) size = MultiByteToWideChar(codePage = CP_ACP, 0, inBuffer, -1, NIL, 0) * sizeof(wchar_t);
 
-		if (size < outBytes && size > 0) MultiByteToWideChar(codePage, 0, inBuffer, -1, (wchar_t *) outBuffer, size / 2);
+		if (size < outBytes && size > 0) MultiByteToWideChar(codePage, 0, inBuffer, -1, (wchar_t *) outBuffer, size / sizeof(wchar_t));
 		else if (size >= outBytes)	 size = 0;
 	}
 	else if (strcmp(inEncoding, "UTF-16LE") == 0)

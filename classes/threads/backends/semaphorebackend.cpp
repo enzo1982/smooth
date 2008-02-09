@@ -40,7 +40,7 @@ S::Threads::SemaphoreBackend::SemaphoreBackend(Int iValue, Void *iSemaphore)
 #if defined __WIN32__ && defined __SMOOTH_STATIC__
 	volatile Bool	 null = 0;
 
-	if (null) SemaphoreWin32(iValue);
+	if (null) SemaphoreWin32(iValue, iSemaphore);
 #endif
 
 	type = SEMAPHORE_NONE;

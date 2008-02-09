@@ -8,7 +8,9 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <smooth/misc/string.h>
 #include <smooth/threads/mutex.h>
+#include <smooth/threads/thread.h>
 #include <smooth/threads/backends/mutexbackend.h>
 
 S::Threads::Mutex::Mutex(Void *iMutex)

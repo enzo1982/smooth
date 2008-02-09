@@ -17,7 +17,7 @@ S::Threads::SemaphoreBackend *CreateSemaphorePOSIX(S::Int iValue, S::Void *iSema
 
 S::Int	 semaphorePOSIXTmp = S::Threads::SemaphoreBackend::SetBackend(&CreateSemaphorePOSIX);
 
-S::Threads::SemaphorePOSIX::SemaphorePOSIX(Int iValue, Void *iSemaphore)
+S::Threads::SemaphorePOSIX::SemaphorePOSIX(Int iValue, Void *iSemaphore) : SemaphoreBackend(iValue)
 {
 	type = SEMAPHORE_POSIX;
 

@@ -28,7 +28,7 @@ Int smooth::Main()
 
 Test::Test()
 {
-	mainWnd			= new Window("smooth Test", Point(100, 100), Size(600, 500));
+	mainWnd			= new GUI::Window("smooth Test", Point(100, 100), Size(600, 500));
 	mainWnd_titlebar	= new Titlebar();
 	mainWnd_statusbar	= new Statusbar("Ready");
 
@@ -40,7 +40,7 @@ Test::Test()
 	mainWnd_menubar		= new Menubar();
 
 	menu_file		= new PopupMenu();
-	menu_file->AddEntry("Exit")->onAction.Connect(&Window::Close, mainWnd);
+	menu_file->AddEntry("Exit")->onAction.Connect(&GUI::Window::Close, mainWnd);
 
 	menu_dialogs		= new PopupMenu();
 	menu_dialogs->AddEntry("File chooser...");
@@ -270,5 +270,7 @@ Void Test::OnScrollbarValueChange(Int value)
 
 Void Test::OnWidgetAction()
 {
+#ifdef __WIN32__
 	QuickMessage("Some widget action occurred!", "Info", MB_OK, IDI_INFORMATION);
+#endif
 }

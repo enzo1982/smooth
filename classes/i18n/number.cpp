@@ -14,9 +14,10 @@ S::String S::I18n::Number::GetLocalizedNumberString(Int64 number)
 {
 	// Localize a number according to the current locale settings
 
-	Int	 negFormat;
-	String	 sThousand;
+	Int	 negFormat = 1;
+	String	 sThousand = ".";
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
 		static wchar_t	 buffer[4];
@@ -37,6 +38,7 @@ S::String S::I18n::Number::GetLocalizedNumberString(Int64 number)
 		GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_INEGNUMBER, buffer, 2);
 		negFormat = String(buffer).ToInt();
 	}
+#endif
 
 	String	 nString = String::FromInt(number >= 0 ? number : -number);
 	String	 retVal;

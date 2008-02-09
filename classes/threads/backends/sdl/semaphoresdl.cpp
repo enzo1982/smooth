@@ -17,7 +17,7 @@ S::Threads::SemaphoreBackend *CreateSemaphoreSDL(Int iValue, S::Void *iSemaphore
 
 S::Int	 semaphoreSDLTmp = S::Threads::SemaphoreBackend::SetBackend(&CreateSemaphoreSDL);
 
-S::Threads::SemaphoreSDL::SemaphoreSDL(Int iValue, Void *iSemaphore)
+S::Threads::SemaphoreSDL::SemaphoreSDL(Int iValue, Void *iSemaphore) : SemaphoreBackend(iValue)
 {
 	type = SEMAPHORE_SDL;
 

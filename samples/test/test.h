@@ -20,7 +20,7 @@ using namespace smooth::GUI::Dialogs;
 class Test : public Application
 {
 	private:
-		Window		*mainWnd;
+		GUI::Window	*mainWnd;
 		Titlebar	*mainWnd_titlebar;
 		Statusbar	*mainWnd_statusbar;
 

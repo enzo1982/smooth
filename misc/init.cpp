@@ -29,10 +29,11 @@
 
 using namespace smooth::Backends;
 
+__declspec (dllexport) S::String	 S::szCmdLine		= NIL;
+
 #if defined __WIN32__
 __declspec (dllexport) HINSTANCE	 S::hInstance		= NIL;
 __declspec (dllexport) HINSTANCE	 S::hPrevInstance	= NIL;
-__declspec (dllexport) S::String	 S::szCmdLine		= NIL;
 __declspec (dllexport) int		 S::iCmdShow		= 0;
 
 __declspec (dllexport) HICON	 S::SMOOTHICON = NIL;

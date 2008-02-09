@@ -35,6 +35,7 @@ namespace smooth
 
 			static char		*inputFormat;
 			static char		*outputFormat;
+			static char		*internalFormat;
 
 			static Int		 nOfStrings;
 
@@ -42,8 +43,7 @@ namespace smooth
 
 			static Void		 DeleteTemporaryBuffers();
 		public:
-						 String();
-						 String(const int);
+						 String(const int = NIL);
 						 String(const char *);
 						 String(const wchar_t *);
 						 String(const String &);
@@ -60,6 +60,8 @@ namespace smooth
 
 			static const char	*GetOutputFormat()				{ return outputFormat; }
 			static char		*SetOutputFormat(const char *);
+
+			static const char	*GetInternalFormat();
 
 			Int			 ImportFrom(const char *, const char *);
 			char			*ConvertTo(const char *) const;

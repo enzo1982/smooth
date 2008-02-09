@@ -27,7 +27,9 @@ S::GUI::Bitmap S::GUI::ImageLoader::Load(const String &fileName)
 	ImageLoader	*loader = NIL;
 
 	if	(fileName.ToLower().Find(".pci:") != -1) loader = new ImageLoaderPCI(fileName);
+#ifdef __WIN32__
 	else if (fileName.StartsWith("Icon:"))		 loader = new ImageLoaderIcon(fileName);
+#endif
 
 	if (loader == NIL) return NIL;
 

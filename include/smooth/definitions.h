@@ -181,6 +181,7 @@ const S::Int SM_RBUTTONDBLCLK		= 1030;
 const S::Int SM_WINDOWTITLECHANGED	= 1031;
 const S::Int SM_SHOWTOOLTIP		= 1032;
 const S::Int SM_MOUSEWHEEL		= 1033;
+const S::Int SM_PAINT			= 1034;
 
 const S::Int SM_EXECUTEPEEK		= 1534;
 const S::Int SM_TIMER			= 1535;

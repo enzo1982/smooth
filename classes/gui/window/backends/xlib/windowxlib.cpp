@@ -70,6 +70,11 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 {
 	switch (e->type)
 	{
+		case MapNotify:
+			onEvent.Call(SM_PAINT, 0, 0);
+
+			XFlush(display);
+			break;
 	}
 
 	return Success();

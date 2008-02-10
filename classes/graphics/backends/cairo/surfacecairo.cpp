@@ -36,6 +36,15 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 	window = (HWND) iWindow;
 
 	gdi_dc = NIL;
+#else
+	window = (Window) iWindow;
+
+	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
+	{
+		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
+	}
+
+	visual = XDefaultVisual(display, XDefaultScreen(display));
 #endif
 
 	context = NIL;
@@ -53,6 +62,12 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 			size.cx	= GetDeviceCaps(gdi_dc, HORZRES) + 2;
 			size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 		}
+#else
+		if (maxSize == Size())
+		{
+			size.cx = XDisplayWidth(display, XDefaultScreen(display)) + 2;
+			size.cy = XDisplayHeight(display, XDefaultScreen(display)) + 2;
+		}
 #endif
 
 		rightToLeft.SetSurfaceSize(size);
@@ -68,13 +83,17 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 		ReleaseDC(window, gdi_dc);
 
 		cairo_surface_t	*surface = cairo_win32_surface_create(bmp_dc);
-		cairo_t		*context = cairo_create(surface);
+#else
+		cairo_surface_t	*surface = cairo_xlib_surface_create(display, window, visual, size.cx, size.cy);
+#endif
 
+		cairo_t		*context = cairo_create(surface);
+	
 		cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
 
 		cairo_surfaces.Add(surface);
 		cairo_contexts.Add(context);
-#endif
+
 		allocSize = size;
 	}
 }
@@ -83,10 +102,10 @@ S::GUI::SurfaceCairo::~SurfaceCairo()
 {
 	if (window != NIL)
 	{
-#ifdef __WIN32__
 		cairo_destroy(cairo_contexts.GetFirst());
 		cairo_surface_destroy(cairo_surfaces.GetFirst());
 
+#ifdef __WIN32__
 		HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetFirst(), cDc_bitmaps.GetFirst());
 
 		DeleteDC(cDc_contexts.GetFirst());
@@ -230,52 +249,36 @@ S::Void *S::GUI::SurfaceCairo::GetSystemSurface() const
 
 S::Void S::GUI::SurfaceCairo::CreateCairoContext()
 {
-#ifdef __WIN32__
-	if (gdi_dc != NIL || context != NIL || surface != NIL) return;
+	if (context != NIL || surface != NIL) return;
 
+#ifdef __WIN32__
 	gdi_dc = GetWindowDC(window);
 
 	surface = cairo_win32_surface_create(gdi_dc);
-	context = cairo_create(surface);
-
-	cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
 #else
-	if (context != NIL || surface != NIL) return;
+	surface = cairo_xlib_surface_create(display, window, visual, size.cx, size.cy);
+#endif
 
-	Display	*display = NIL;
-
-	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
-	{
-		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
-	}
-
-	surface = cairo_xlib_surface_create(display, window, XDefaultVisual(display, 0), XDisplayWidth(display, 0), XDisplayHeight(display, 0));
 	context = cairo_create(surface);
 
 	cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
-#endif
 }
 
 S::Void S::GUI::SurfaceCairo::DestroyCairoContext()
 {
-#ifdef __WIN32__
-	if (gdi_dc == NIL || context == NIL || surface == NIL) return;
-
-	cairo_destroy(context);
-	cairo_surface_destroy(surface);
-
-	ReleaseDC(window, gdi_dc);
-
-	gdi_dc = NIL;
-#else
 	if (context == NIL || surface == NIL) return;
 
 	cairo_destroy(context);
 	cairo_surface_destroy(surface);
-#endif
 
 	context = NIL;
 	surface = NIL;
+
+#ifdef __WIN32__
+	ReleaseDC(window, gdi_dc);
+
+	gdi_dc = NIL;
+#endif
 }
 
 S::Int S::GUI::SurfaceCairo::SetPixel(const Point &point, const Color &color)

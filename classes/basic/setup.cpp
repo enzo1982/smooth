@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,12 +20,12 @@ S::GUI::Color S::Setup::DividerDarkColor;
 S::GUI::Color S::Setup::TextColor(0, 0, 0);
 S::GUI::Color S::Setup::GrayTextColor(128, 128, 128);
 S::GUI::Color S::Setup::ShadowColor;
-S::GUI::Color S::Setup::GradientStartColor;
-S::GUI::Color S::Setup::GradientEndColor;
+S::GUI::Color S::Setup::GradientStartColor(0, 0, 128);
+S::GUI::Color S::Setup::GradientEndColor(128, 192, 255);
 S::GUI::Color S::Setup::GradientTextColor(255, 255, 255);
-S::GUI::Color S::Setup::InactiveGradientStartColor;
-S::GUI::Color S::Setup::InactiveGradientEndColor;
-S::GUI::Color S::Setup::InactiveGradientTextColor;
+S::GUI::Color S::Setup::InactiveGradientStartColor(64, 64, 64);
+S::GUI::Color S::Setup::InactiveGradientEndColor(192, 192, 192);
+S::GUI::Color S::Setup::InactiveGradientTextColor(192, 192, 192);
 S::GUI::Color S::Setup::TooltipColor;
 S::GUI::Color S::Setup::TooltipTextColor;
 

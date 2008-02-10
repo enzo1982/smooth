@@ -487,9 +487,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	Int	 rVal = Success();
 
-#ifdef __WIN32__
 	switch (message)
 	{
+#ifdef __WIN32__
 		case WM_CLOSE:
 			if (doQuit.Call()) backend->Close();
 
@@ -524,33 +524,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			return Break;
 		case WM_SYSCOLORCHANGE:
 			GetColors();
-
-			break;
-		case WM_PAINT:
-			{
-				RECT	 uRect = { 0, 0, 0, 0 };
-
-				updateRect = uRect;
-
-				if (::GetUpdateRect((HWND) backend->GetSystemWindow(), &uRect, 0))
-				{
-					updateRect = uRect;
-
-					updateRect.right += frameWidth;
-					updateRect.bottom += frameWidth;
-
-					PAINTSTRUCT	 ps;
-
-					BeginPaint((HWND) backend->GetSystemWindow(), &ps);
-
-					if (Math::Abs((updateRect.right - updateRect.left) - GetWidth()) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - GetHeight()) < 20)	Paint(SP_PAINT);
-					else																		Paint(SP_UPDATE);
-
-					EndPaint((HWND) backend->GetSystemWindow(), &ps);
-				}
-			}
-
-			rVal = Break;
 
 			break;
 		case WM_WINDOWPOSCHANGED:
@@ -704,6 +677,40 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+#endif
+		case SM_PAINT:
+#ifdef __WIN32__
+			{
+				RECT	 uRect = { 0, 0, 0, 0 };
+
+				updateRect = uRect;
+
+				if (::GetUpdateRect((HWND) backend->GetSystemWindow(), &uRect, 0))
+				{
+					updateRect = uRect;
+
+					updateRect.right += frameWidth;
+					updateRect.bottom += frameWidth;
+
+					PAINTSTRUCT	 ps;
+
+					BeginPaint((HWND) backend->GetSystemWindow(), &ps);
+
+					if (Math::Abs((updateRect.right - updateRect.left) - GetWidth()) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - GetHeight()) < 20)	Paint(SP_PAINT);
+					else																		Paint(SP_UPDATE);
+
+					EndPaint((HWND) backend->GetSystemWindow(), &ps);
+				}
+			}
+#else
+			updateRect = Rect(Point(0, 0), GetSize());
+
+			Paint(SP_PAINT);
+#endif
+
+			rVal = Break;
+
+			break;
 		case SM_EXECUTEPEEK:
 			onPeek.Emit();
 
@@ -711,7 +718,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 	}
-#endif
 
 	if (rVal == Success())
 	{

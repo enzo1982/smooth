@@ -45,6 +45,9 @@ namespace smooth
 				Array<Rect *, Void *>		 cDc_rects;
 
 				HDC				 gdi_dc;
+#else
+				Display				*display;
+				Visual				*visual;
 #endif
 				cairo_surface_t			*surface;
 				cairo_t				*context;

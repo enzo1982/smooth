@@ -91,6 +91,11 @@ LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM
 			param1 = wParam;
 			param2 = 0;
 			break;
+		case WM_PAINT:
+			message = SM_PAINT;
+			param1 = wParam;
+			param2 = lParam;
+			break;
 	}
 
 	if (smoothWindow != NIL)

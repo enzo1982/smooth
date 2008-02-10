@@ -655,6 +655,11 @@ $(OBJECTDIR)/timerwin32.o: $(SYSTEMCLASSESDIR)/backends/win32/timerwin32.cpp $(S
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/win32/timerwin32.cpp -o $(OBJECTDIR)/timerwin32.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/eventxlib.o: $(SYSTEMCLASSESDIR)/backends/xlib/eventxlib.cpp $(SMOOTHINCLUDEDIR)/system/backends/xlib/eventxlib.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/backends/xlib/eventxlib.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/xlib/eventxlib.cpp -o $(OBJECTDIR)/eventxlib.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/eventbackend.o: $(SYSTEMCLASSESDIR)/backends/eventbackend.cpp $(SMOOTHINCLUDEDIR)/system/backends/eventbackend.h
 	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/backends/eventbackend.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/eventbackend.cpp -o $(OBJECTDIR)/eventbackend.o

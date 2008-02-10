@@ -18,6 +18,7 @@
 #	include <cairo/cairo-win32.h>
 #else
 #	include <cairo/cairo-xlib.h>
+#	include <smooth/backends/xlib/backendxlib.h>
 #endif
 
 S::GUI::SurfaceBackend *CreateSurfaceCairo(S::Void *iSurface, const S::GUI::Size &maxSize)
@@ -238,6 +239,20 @@ S::Void S::GUI::SurfaceCairo::CreateCairoContext()
 	context = cairo_create(surface);
 
 	cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
+#else
+	if (context != NIL || surface != NIL) return;
+
+	Display	*display = NIL;
+
+	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
+	{
+		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
+	}
+
+	surface = cairo_xlib_surface_create(display, window, XDefaultVisual(display, 0), XDisplayWidth(display, 0), XDisplayHeight(display, 0));
+	context = cairo_create(surface);
+
+	cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
 #endif
 }
 
@@ -252,6 +267,11 @@ S::Void S::GUI::SurfaceCairo::DestroyCairoContext()
 	ReleaseDC(window, gdi_dc);
 
 	gdi_dc = NIL;
+#else
+	if (context == NIL || surface == NIL) return;
+
+	cairo_destroy(context);
+	cairo_surface_destroy(surface);
 #endif
 
 	context = NIL;

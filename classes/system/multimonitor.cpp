@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -76,6 +76,8 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorMetrics()
 
 		return GUI::Rect(GUI::Point(info.rcMonitor.left, info.rcMonitor.top), GUI::Size(info.rcMonitor.right - info.rcMonitor.left, info.rcMonitor.bottom - info.rcMonitor.top));
 	}
+#else
+	return GUI::Rect(GUI::Point(0, 0), GUI::Size(LiSAGetDisplaySizeX(), LiSAGetDisplaySizeY()));
 #endif
 }
 
@@ -102,6 +104,8 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorWorkArea()
 
 		return GUI::Rect(GUI::Point(info.rcWork.left, info.rcWork.top), GUI::Size(info.rcWork.right - info.rcWork.left, info.rcWork.bottom - info.rcWork.top));
 	}
+#else
+	return GUI::Rect(GUI::Point(0, 0), GUI::Size(LiSAGetDisplaySizeX(), LiSAGetDisplaySizeY()));
 #endif
 }
 
@@ -116,5 +120,7 @@ S::GUI::Rect S::System::MultiMonitor::GetVirtualScreenMetrics()
 	{
 		return GUI::Rect(GUI::Point(GetSystemMetrics(SM_XVIRTUALSCREEN), GetSystemMetrics(SM_YVIRTUALSCREEN)), GUI::Size(GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN)));
 	}
+#else
+	return GUI::Rect(GUI::Point(0, 0), GUI::Size(LiSAGetDisplaySizeX(), LiSAGetDisplaySizeY()));
 #endif
 }

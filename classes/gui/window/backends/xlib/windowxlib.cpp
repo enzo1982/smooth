@@ -22,6 +22,8 @@ S::GUI::WindowBackend *CreateWindowXLib()
 
 S::Int	 windowXLibTmp = S::GUI::WindowBackend::SetBackend(&CreateWindowXLib);
 
+S::Array<S::GUI::WindowXLib *, S::Void *>	 S::GUI::WindowXLib::windowBackends;
+
 S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 {
 	type	= WINDOW_XLIB;
@@ -33,15 +35,44 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 	{
 		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
 	}
+
+	id	= windowBackends.Add(this);
 }
 
 S::GUI::WindowXLib::~WindowXLib()
 {
+	windowBackends.Remove(id);
 }
 
 S::Void *S::GUI::WindowXLib::GetSystemWindow() const
 {
 	return (Void *) wnd;
+}
+
+S::GUI::WindowXLib *S::GUI::WindowXLib::GetWindowBackend(::Window wnd)
+{
+	if (wnd == 0) return NIL;
+
+	for (Int i = 0; i < windowBackends.Length(); i++)
+	{
+		WindowXLib	*window = windowBackends.GetNth(i);
+
+		if (window != NIL)
+		{
+			if (window->wnd == wnd) return window;
+		}
+	}
+
+	return NIL;
+}
+
+S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
+{
+	switch (e->type)
+	{
+	}
+
+	return Success();
 }
 
 S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Size &size, Int flags)
@@ -53,6 +84,9 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	attributes.override_redirect	= True;
 
 	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx, size.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBackPixel | CWBorderPixel | CWOverrideRedirect, &attributes);
+
+	/* Select event types wanted */
+	XSelectInput(display, wnd, ExposureMask | KeyPressMask | ButtonPressMask | StructureNotifyMask);
 
 	if (wnd != NIL)
 	{

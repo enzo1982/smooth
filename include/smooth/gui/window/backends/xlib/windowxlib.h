@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2006 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,8 +22,6 @@ namespace smooth
 #include "../windowbackend.h"
 #include "../../../../graphics/forms/rect.h"
 
-#include <X11/Xlib.h>
-
 namespace smooth
 {
 	namespace GUI
@@ -33,17 +31,25 @@ namespace smooth
 		class WindowXLib : public WindowBackend
 		{
 			private:
-				Display	*display;
+				static Array<WindowXLib *, Void *>	 windowBackends;
+
+				Display					*display;
 			protected:
-				Window	 wnd;
+				Int					 id;
+
+				Window					 wnd;
 			public:
-					 WindowXLib(Void * = NIL);
-					~WindowXLib();
+									 WindowXLib(Void * = NIL);
+									~WindowXLib();
 
-				Void	*GetSystemWindow() const;
+				Void					*GetSystemWindow() const;
 
-				Int	 Open(const String &, const Point &, const Size &, Int);
-				Int	 Close();
+				static WindowXLib			*GetWindowBackend(::Window);
+
+				Int					 ProcessSystemMessages(XEvent *);
+
+				Int					 Open(const String &, const Point &, const Size &, Int);
+				Int					 Close();
 		};
 	};
 };

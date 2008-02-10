@@ -246,11 +246,9 @@ const char *S::String::GetInternalFormat()
 {
 	if (internalFormat == NIL)
 	{
-		internalFormat = new char [9];
-
-		if	(sizeof(wchar_t) == 1)	strcpy(internalFormat, "UTF-8");
-		else if (sizeof(wchar_t) == 2)	strcpy(internalFormat, "UTF-16LE");
-		else if (sizeof(wchar_t) == 4)	strcpy(internalFormat, "UTF-32LE");
+		if	(sizeof(wchar_t) == 1)	internalFormat = (char *) "UTF-8";
+		else if (sizeof(wchar_t) == 2)	internalFormat = (char *) "UTF-16LE";
+		else if (sizeof(wchar_t) == 4)	internalFormat = (char *) "UTF-32LE";
 	}
 
 	return internalFormat;

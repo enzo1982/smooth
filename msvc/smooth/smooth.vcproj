@@ -1123,6 +1123,10 @@
 							RelativePath="..\..\classes\misc\hash\crc32.cpp"
 							>
 						</File>
+						<File
+							RelativePath="..\..\classes\misc\hash\md5.cpp"
+							>
+						</File>
 					</Filter>
 				</Filter>
 				<Filter
@@ -2107,6 +2111,10 @@
 						>
 						<File
 							RelativePath="..\..\include\smooth\misc\hash\crc32.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\misc\hash\md5.h"
 							>
 						</File>
 					</Filter>

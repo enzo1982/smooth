@@ -70,10 +70,35 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 {
 	switch (e->type)
 	{
+		case CreateNotify:
+			break;
+		case DestroyNotify:
+			break;
 		case MapNotify:
 			onEvent.Call(SM_PAINT, 0, 0);
 
 			XFlush(display);
+
+			break;
+		case UnmapNotify:
+			break;
+		case MotionNotify:
+			onEvent.Call(SM_MOUSEMOVE, 0, 0);
+
+			break;
+		case ButtonPress:
+			if	(e->xbutton.button = Button1) onEvent.Call(SM_LBUTTONDOWN, 0, 0);
+			else if (e->xbutton.button = Button2) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
+
+			break;
+		case ButtonRelease:
+			if	(e->xbutton.button = Button1) onEvent.Call(SM_LBUTTONUP, 0, 0);
+			else if (e->xbutton.button = Button2) onEvent.Call(SM_RBUTTONUP, 0, 0);
+
+			break;
+		case KeyPress:
+			break;
+		case KeyRelease:
 			break;
 	}
 
@@ -91,7 +116,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx, size.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBackPixel | CWBorderPixel | CWOverrideRedirect, &attributes);
 
 	/* Select event types wanted */
-	XSelectInput(display, wnd, ExposureMask | KeyPressMask | ButtonPressMask | StructureNotifyMask);
+	XSelectInput(display, wnd, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | StructureNotifyMask);
 
 	if (wnd != NIL)
 	{

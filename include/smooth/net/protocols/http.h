@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,20 +35,37 @@ namespace smooth
 				private:
 					Int			 mode;
 
+					String			 content;
+
+					String			 proxy;
+					Int			 proxyPort;
+					String			 proxyUser;
+					String			 proxyPass;
+
 					Array<Parameter>	 parameters;
 					Buffer<UnsignedByte>	 requestBuffer;
 
 					Int			 DecodeHexNumber(const String &);
 
 					Buffer<UnsignedByte>	&ComposeHTTPRequest(const String &, const String &);
+
+					Void			 ComposeGETRequest(const String &, const String &);
+					Void			 ComposePOSTRequest(const String &, const String &);
+
+					String			 GetParametersURLEncoded();
 				public:
 								 HTTP(const String &);
 					virtual			~HTTP();
 
-					Int			 SetParameter(const String &, const String &);
+					Int			 SetParameter(const String &, const String &);		// Set header parameter
 					Int			 SetParameterFile(const String &, const String &);
 
-					Int			 SetMode(Int);
+					Int			 SetMode(Int);						// Set mode (get or post)
+
+					Int			 SetContent(const String &);				// Set content to be transmitted
+
+					Int			 SetProxy(const String &, Int);				// Set proxy host name and port
+					Int			 SetProxyAuth(const String &, const String &);		// Set user name and password for proxy
 
 					Int			 DownloadToFile(const String &);
 			};

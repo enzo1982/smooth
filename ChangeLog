@@ -20,6 +20,7 @@ xx.xx.08 xx:xx - smooth alpha 0.8.70.0
 - s...cairo.cpp	- added support for Cairo surfaces
 - semaphore.cpp - added support for initializing semaphores with a maximum value
 - rwlock.cpp	- new class: RWLock, implements a simple read/write lock based on Mutex and Semaphore
+- md5.cpp	- new class: MD5, implements the message digest algorithm
 
 - completely new and improved Array<t> implementation
 - new template class: Iterator<t>, iterator for arrays of type Array<t>

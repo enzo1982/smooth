@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -64,6 +64,29 @@ S::Int S::Net::Protocols::HTTP::SetParameterFile(const String &key, const String
 S::Int S::Net::Protocols::HTTP::SetMode(Int nMode)
 {
 	mode = nMode;
+
+	return Success();
+}
+
+S::Int S::Net::Protocols::HTTP::SetContent(const String &nContent)
+{
+	content = nContent;
+
+	return Success();
+}
+
+S::Int S::Net::Protocols::HTTP::SetProxy(const String &nProxy, Int nProxyPort)
+{
+	proxy	  = nProxy;
+	proxyPort = nProxyPort;
+
+	return Success();
+}
+
+S::Int S::Net::Protocols::HTTP::SetProxyAuth(const String &nProxyUser, const String &nProxyPass)
+{
+	proxyUser = nProxyUser;
+	proxyPass = nProxyPass;
 
 	return Success();
 }
@@ -217,105 +240,119 @@ S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest(const St
 		if (parameters.GetNth(i).isFile) { haveFiles = True; break; }
 	}
 
-	if (mode == HTTP_METHOD_GET && !haveFiles)
+	if	(mode == HTTP_METHOD_GET && !haveFiles)	ComposeGETRequest(server, path);
+	else if (mode == HTTP_METHOD_POST || haveFiles)	ComposePOSTRequest(server, path);
+
+	return requestBuffer;
+}
+
+S::Void S::Net::Protocols::HTTP::ComposeGETRequest(const String &server, const String &path)
+{
+	String	 str = String("GET ").Append(path);
+
+	if (parameters.Length() > 0) str.Append("?");
+
+	str.Append(GetParametersURLEncoded());
+
+	str.Append(" HTTP/1.1\n").
+	    Append("Host: ").Append(server).Append("\n").
+	    Append("\n");
+
+	requestBuffer.Resize(str.Length());
+
+	for (Int i = 0; i < str.Length(); i++) requestBuffer[i] = str[i];
+}
+
+S::Void S::Net::Protocols::HTTP::ComposePOSTRequest(const String &server, const String &path)
+{
+	Bool	 haveFiles = False;
+
+	for (Int i = 0; i < parameters.Length(); i++)
 	{
-		String	 str = String("GET ").Append(path);
+		if (parameters.GetNth(i).isFile) { haveFiles = True; break; }
+	}
+
+	String		 contentType;
+	IO::OutStream	*out = new IO::OutStream(IO::STREAM_FILE, "httprequest.temp", IO::OS_OVERWRITE);
+
+	if (!haveFiles)
+	{
+		contentType = "application/x-www-form-urlencoded";
+
+		out->OutputString(GetParametersURLEncoded());
+	}
+	else
+	{
+		String	 separator = "THIS_STRING_SEPARATES";
+
+		contentType = String("multipart/form-data; boundary=").Append(separator);
+
+		out->OutputString(String("--").Append(separator).Append("\n"));
+		out->OutputString("Content-Disposition: form-data; name=\"MAX_FILE_SIZE\"\n\n");
+		out->OutputString("1000000\n");
 
 		for (Int i = 0; i < parameters.Length(); i++)
 		{
+			out->OutputString(String("--").Append(separator).Append("\n"));
+
 			Parameter	 parameter = parameters.GetNth(i);
 
-			if (i == 0) str.Append("?");
-			else	    str.Append("&");
+			if (!parameter.isFile)
+			{
+				out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"\n\n"));
+				out->OutputString(String(parameter.value).Append("\n"));
+			}
+			else
+			{
+				out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"; filename=\"").Append(parameter.value).Append("\"\n\n"));
 
-			str.Append(parameter.key).Append("=").Append(parameter.value);
+				IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, parameter.value, IO::IS_READONLY);
+
+				for (Int j = 0; j < in->Size(); j++) out->OutputNumber(in->InputNumber(1), 1);
+
+				delete in;
+
+				out->OutputString("\n");
+			}
 		}
 
-		str.Append(" HTTP/1.1\n").
-		    Append("Host: ").Append(server).Append("\n").
-		    Append("\n");
-
-		requestBuffer.Resize(str.Length());
-
-		for (Int i = 0; i < str.Length(); i++) requestBuffer[i] = str[i];
+		out->OutputString(String("--").Append(separator).Append("--"));
 	}
-	else if (mode == HTTP_METHOD_POST || haveFiles)
+
+	delete out;
+
+	IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, "httprequest.temp", IO::IS_READONLY);
+
+	String	 str = String("POST ").Append(path).Append(" HTTP/1.1\n").
+		       Append("Host: ").Append(server).Append("\n").
+		       Append("Content-Length: ").Append(String::FromInt(in->Size())).Append("\n").
+		       Append("Content-Type: ").Append(contentType).Append("\n").
+		       Append("\n");
+
+	requestBuffer.Resize(str.Length() + in->Size());
+
+	for (Int i = 0; i < str.Length(); i++) requestBuffer[i] = str[i];
+	for (Int i = 0; i < in->Size(); i++) requestBuffer[str.Length() + i] = in->InputNumber(1);
+
+	delete in;
+
+	S::File("httprequest.temp").Delete();
+}
+
+S::String S::Net::Protocols::HTTP::GetParametersURLEncoded()
+{
+	String	 str;
+
+	for (Int i = 0; i < parameters.Length(); i++)
 	{
-		String		 contentType;
-		IO::OutStream	*out = new IO::OutStream(IO::STREAM_FILE, "httprequest.temp", IO::OS_OVERWRITE);
+		Parameter	 parameter = parameters.GetNth(i);
 
-		if (!haveFiles)
-		{
-			contentType = "application/x-www-form-urlencoded";
+		if (i > 0) str.Append("&");
 
-			for (Int i = 0; i < parameters.Length(); i++)
-			{
-				Parameter	 parameter = parameters.GetNth(i);
-
-				if (i > 0) out->OutputString("&");
-
-				out->OutputString(String(parameter.key).Append("=").Append(parameter.value));
-			}
-		}
-		else
-		{
-			String	 separator = "THIS_STRING_SEPARATES";
-
-			contentType = String("multipart/form-data; boundary=").Append(separator);
-
-			out->OutputString(String("--").Append(separator).Append("\n"));
-			out->OutputString("Content-Disposition: form-data; name=\"MAX_FILE_SIZE\"\n\n");
-			out->OutputString("1000000\n");
-
-			for (Int i = 0; i < parameters.Length(); i++)
-			{
-				out->OutputString(String("--").Append(separator).Append("\n"));
-
-				Parameter	 parameter = parameters.GetNth(i);
-
-				if (!parameter.isFile)
-				{
-					out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"\n\n"));
-					out->OutputString(String(parameter.value).Append("\n"));
-				}
-				else
-				{
-					out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"; filename=\"").Append(parameter.value).Append("\"\n\n"));
-
-					IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, parameter.value, IO::IS_READONLY);
-
-					for (Int j = 0; j < in->Size(); j++) out->OutputNumber(in->InputNumber(1), 1);
-
-					delete in;
-
-					out->OutputString("\n");
-				}
-			}
-
-			out->OutputString(String("--").Append(separator).Append("--"));
-		}
-
-		delete out;
-
-		IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, "httprequest.temp", IO::IS_READONLY);
-
-		String	 str = String("POST ").Append(path).Append(" HTTP/1.1\n").
-			       Append("Host: ").Append(server).Append("\n").
-			       Append("Content-Length: ").Append(String::FromInt(in->Size())).Append("\n").
-			       Append("Content-Type: ").Append(contentType).Append("\n").
-			       Append("\n");
-
-		requestBuffer.Resize(str.Length() + in->Size());
-
-		for (Int i = 0; i < str.Length(); i++) requestBuffer[i] = str[i];
-		for (Int i = 0; i < in->Size(); i++) requestBuffer[str.Length() + i] = in->InputNumber(1);
-
-		delete in;
-
-		S::File("httprequest.temp").Delete();
+		str.Append(parameter.key).Append("=").Append(parameter.value);
 	}
 
-	return requestBuffer;
+	return str;
 }
 
 S::Int S::Net::Protocols::HTTP::DecodeHexNumber(const String &string)

@@ -8,14 +8,17 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_CRC32_
-#define _H_OBJSMOOTH_CRC32_
+ /* This code is derived from the RSA Data Security,
+  * Inc. MD5 Message-Digest Algorithm. */
+
+#ifndef _H_OBJSMOOTH_MD5_
+#define _H_OBJSMOOTH_MD5_
 
 namespace smooth
 {
 	namespace Hash
 	{
-		class CRC32;
+		class MD5;
 	};
 };
 
@@ -26,21 +29,21 @@ namespace smooth
 {
 	namespace Hash
 	{
-		class SMOOTHAPI CRC32
+		class SMOOTHAPI MD5
 		{
 			private:
-				static Int			 table[256];
-				static Bool			 initialized;
+				UnsignedInt32			 state[4];
 
-				static Void			 InitTable();
-				static UnsignedLong		 Reflect(UnsignedLong, char);
+				Void				 Init();
+				Void				 Transform(UnsignedByte *);
+				Void				 Final(UnsignedByte *);
 
 				const Buffer<UnsignedByte>	&buffer;
 			public:
-								 CRC32(const Buffer<UnsignedByte> &);
-								~CRC32();
+								 MD5(const Buffer<UnsignedByte> &);
+								~MD5();
 
-				Int				 Compute() const;
+				String				 Compute();
 		};
 	};
 };

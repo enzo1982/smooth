@@ -91,6 +91,7 @@
 #include "smooth/misc/encoding/base64.h"
 
 #include "smooth/misc/hash/crc32.h"
+#include "smooth/misc/hash/md5.h"
 
 #include "smooth/misc/binary.h"
 #include "smooth/misc/config.h"

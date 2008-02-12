@@ -585,9 +585,14 @@ $(OBJECTDIR)/base64.o: $(MISCCLASSESDIR)/encoding/base64.cpp $(SMOOTHINCLUDEDIR)
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/encoding/base64.cpp -o $(OBJECTDIR)/base64.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/crc32.o: $(MISCCLASSESDIR)/hash/crc32.cpp $(SMOOTHINCLUDEDIR)/misc/hash/crc32.h
+$(OBJECTDIR)/hash_crc32.o: $(MISCCLASSESDIR)/hash/crc32.cpp $(SMOOTHINCLUDEDIR)/misc/hash/crc32.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/hash/crc32.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/hash/crc32.cpp -o $(OBJECTDIR)/crc32.o
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/hash/crc32.cpp -o $(OBJECTDIR)/hash_crc32.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/hash_md5.o: $(MISCCLASSESDIR)/hash/md5.cpp $(SMOOTHINCLUDEDIR)/misc/hash/md5.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/hash/md5.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/hash/md5.cpp -o $(OBJECTDIR)/hash_md5.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/args.o: $(MISCCLASSESDIR)/args.cpp $(SMOOTHINCLUDEDIR)/misc/args.h

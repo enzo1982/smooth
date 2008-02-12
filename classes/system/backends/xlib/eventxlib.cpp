@@ -42,23 +42,7 @@ S::Int S::System::EventXLib::ProcessNextEvent(Bool block)
 
 	XNextEvent(display, &e);
 
-	GUI::WindowXLib	*window = NIL;
-
-	switch (e.type)
-	{
-		case CreateNotify:
-			window = GUI::WindowXLib::GetWindowBackend(e.xcreatewindow.window);
-			break;
-		case DestroyNotify:
-			window = GUI::WindowXLib::GetWindowBackend(e.xdestroywindow.window);
-			break;
-		case MapNotify:
-			window = GUI::WindowXLib::GetWindowBackend(e.xmap.window);
-			break;
-		case UnmapNotify:
-			window = GUI::WindowXLib::GetWindowBackend(e.xunmap.window);
-			break;
-	}
+	GUI::WindowXLib	*window = GUI::WindowXLib::GetWindowBackend(e.xany.window);
 
 	if (window != NIL) window->ProcessSystemMessages(&e);
 

@@ -12,25 +12,14 @@
   * Inc. MD5 Message-Digest Algorithm. */
 
 #include <smooth/misc/hash/md5.h>
+#include <smooth/misc/number.h>
 
 /* Constants for MD5Transform routine.
  */
-#define S11 7
-#define S12 12
-#define S13 17
-#define S14 22
-#define S21 5
-#define S22 9
-#define S23 14
-#define S24 20
-#define S31 4
-#define S32 11
-#define S33 16
-#define S34 23
-#define S41 6
-#define S42 10
-#define S43 15
-#define S44 21
+const S::Int	 S11 = 7, S12 = 12, S13 = 17, S14 = 22,
+		 S21 = 5, S22 =  9, S23 = 14, S24 = 20,
+		 S31 = 4, S32 = 11, S33 = 16, S34 = 23,
+		 S41 = 6, S42 = 10, S43 = 15, S44 = 21;
 
 static unsigned char PADDING[64] = {
 	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -55,28 +44,28 @@ static unsigned char PADDING[64] = {
  */
 #define FF(a, b, c, d, x, s, ac)					\
 	{								\
-		(a) += F ((b), (c), (d)) + (x) + (UnsignedInt32) (ac);	\
+		(a) += F((b), (c), (d)) + (x) + (UnsignedInt32) (ac);	\
 		(a) = ROTATE_LEFT((a), (s));				\
 		(a) += (b);						\
 	}
 
 #define GG(a, b, c, d, x, s, ac)					\
 	{								\
-		(a) += G ((b), (c), (d)) + (x) + (UnsignedInt32) (ac);	\
+		(a) += G((b), (c), (d)) + (x) + (UnsignedInt32) (ac);	\
 		(a) = ROTATE_LEFT((a), (s));				\
 		(a) += (b);						\
 	}
 
 #define HH(a, b, c, d, x, s, ac)					\
 	{								\
-		(a) += H ((b), (c), (d)) + (x) + (UnsignedInt32) (ac);	\
+		(a) += H((b), (c), (d)) + (x) + (UnsignedInt32) (ac);	\
 		(a) = ROTATE_LEFT((a), (s));				\
 		(a) += (b);						\
 	}
 
 #define II(a, b, c, d, x, s, ac)					\
 	{								\
-		(a) += I ((b), (c), (d)) + (x) + (UnsignedInt32) (ac);	\
+		(a) += I((b), (c), (d)) + (x) + (UnsignedInt32) (ac);	\
 		(a) = ROTATE_LEFT((a), (s));				\
 		(a) += (b);						\
 	}
@@ -185,7 +174,7 @@ S::Void S::Hash::MD5::Transform(UnsignedByte *buffer)
 	state[3] += d;
 }
 
-S::Void S::Hash::MD5::Final(UnsignedByte *digest)
+S::Void S::Hash::MD5::Final()
 {
 	UnsignedInt64	 bits = buffer.Size() * 8;
 	Int		 index = buffer.Size() % 64;
@@ -205,9 +194,6 @@ S::Void S::Hash::MD5::Final(UnsignedByte *digest)
 	if (padLen > 56) Transform(end + 64);
 
 	delete [] end;
-
-	/* Store state in digest */
-	memcpy(digest, state, 16);
 }
 
 S::String S::Hash::MD5::Compute()
@@ -216,30 +202,11 @@ S::String S::Hash::MD5::Compute()
 
 	for (Int i = 0; i + 63 < buffer.Size(); i += 64) Transform(buffer + i);
 
-	UnsignedByte	 digest[16];
-
-	Final(digest);
+	Final();
 
 	String	 string;
 
-	for (Int i = 0; i < 16; i++)
-	{
-		if	(digest[i] / 16 == 15) string.Append("f");
-		else if	(digest[i] / 16 == 14) string.Append("e");
-		else if	(digest[i] / 16 == 13) string.Append("d");
-		else if	(digest[i] / 16 == 12) string.Append("c");
-		else if	(digest[i] / 16 == 11) string.Append("b");
-		else if	(digest[i] / 16 == 10) string.Append("a");
-		else			       string[string.Length()] = '0' + digest[i] / 16;
-
-		if	(digest[i] % 16 == 15) string.Append("f");
-		else if	(digest[i] % 16 == 14) string.Append("e");
-		else if	(digest[i] % 16 == 13) string.Append("d");
-		else if	(digest[i] % 16 == 12) string.Append("c");
-		else if	(digest[i] % 16 == 11) string.Append("b");
-		else if	(digest[i] % 16 == 10) string.Append("a");
-		else			       string[string.Length()] = '0' + digest[i] % 16;
-	}
+	for (Int i = 0; i < 16; i++) string.Append(Number((Int64) ((UnsignedByte *) state)[i]).ToHexString(2));
 
 	return string;
 }

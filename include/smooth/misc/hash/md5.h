@@ -36,7 +36,7 @@ namespace smooth
 
 				Void				 Init();
 				Void				 Transform(UnsignedByte *);
-				Void				 Final(UnsignedByte *);
+				Void				 Final();
 
 				const Buffer<UnsignedByte>	&buffer;
 			public:

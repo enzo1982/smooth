@@ -14,6 +14,7 @@
 #include <smooth/io/outstream.h>
 #include <smooth/io/drivers/driver_socket.h>
 #include <smooth/misc/math.h>
+#include <smooth/misc/number.h>
 
 #include <time.h>
 
@@ -186,7 +187,7 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 				if (encoding == "chunked")
 				{
 					str = in->InputLine();
-					bytes = DecodeHexNumber(str);
+					bytes = (Int64) Number::FromHexString(str);
 
 					if (bytes == 0) break;
 				}
@@ -353,25 +354,4 @@ S::String S::Net::Protocols::HTTP::GetParametersURLEncoded()
 	}
 
 	return str;
-}
-
-S::Int S::Net::Protocols::HTTP::DecodeHexNumber(const String &string)
-{
-	Int	 value = 0;
-	Int	 length = 0;
-
-	for (Int i = 0; i < string.Length(); i++)
-	{
-		if	((string[i] >= '0' && string[i] <= '9') ||
-			 (string[i] >= 'a' && string[i] <= 'f')) length++;
-		else						 break;
-	}
-
-	for (Int i = 0; i < length; i++)
-	{
-		if (string[i] >= '0' && string[i] <= '9')	value += ((string[i] - '0') << ((length - i - 1) * 4));
-		else if (string[i] >= 'a' && string[i] <= 'f')	value += ((string[i] - 'a' + 10) << ((length - i - 1) * 4));
-	}
-
-	return value;
 }

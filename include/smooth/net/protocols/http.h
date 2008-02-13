@@ -45,8 +45,6 @@ namespace smooth
 					Array<Parameter>	 parameters;
 					Buffer<UnsignedByte>	 requestBuffer;
 
-					Int			 DecodeHexNumber(const String &);
-
 					Buffer<UnsignedByte>	&ComposeHTTPRequest(const String &, const String &);
 
 					Void			 ComposeGETRequest(const String &, const String &);

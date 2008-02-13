@@ -485,19 +485,19 @@ $(OBJECTDIR)/window.o: $(GUICLASSESDIR)/window/window.cpp $(SMOOTHINCLUDEDIR)/gu
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/window/window.cpp -o $(OBJECTDIR)/window.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/language.o: $(I18NCLASSESDIR)/language.cpp $(SMOOTHINCLUDEDIR)/i18n/language.h
+$(OBJECTDIR)/i18n_language.o: $(I18NCLASSESDIR)/language.cpp $(SMOOTHINCLUDEDIR)/i18n/language.h
 	$(ECHO) -n Compiling $(I18NCLASSESDIR)/language.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/language.cpp -o $(OBJECTDIR)/language.o
+	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/language.cpp -o $(OBJECTDIR)/i18n_language.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/number.o: $(I18NCLASSESDIR)/number.cpp $(SMOOTHINCLUDEDIR)/i18n/number.h
+$(OBJECTDIR)/i18n_number.o: $(I18NCLASSESDIR)/number.cpp $(SMOOTHINCLUDEDIR)/i18n/number.h
 	$(ECHO) -n Compiling $(I18NCLASSESDIR)/number.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/number.cpp -o $(OBJECTDIR)/number.o
+	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/number.cpp -o $(OBJECTDIR)/i18n_number.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/translator.o: $(I18NCLASSESDIR)/translator.cpp $(SMOOTHINCLUDEDIR)/i18n/translator.h
+$(OBJECTDIR)/i18n_translator.o: $(I18NCLASSESDIR)/translator.cpp $(SMOOTHINCLUDEDIR)/i18n/translator.h
 	$(ECHO) -n Compiling $(I18NCLASSESDIR)/translator.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/translator.cpp -o $(OBJECTDIR)/translator.o
+	$(COMPILER) $(COMPILER_OPTS) $(I18NCLASSESDIR)/translator.cpp -o $(OBJECTDIR)/i18n_translator.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/driver_ansi.o: $(IOCLASSESDIR)/drivers/driver_ansi.cpp $(SMOOTHINCLUDEDIR)/io/drivers/driver_ansi.h
@@ -623,6 +623,11 @@ $(OBJECTDIR)/math.o: $(MISCCLASSESDIR)/math.cpp $(SMOOTHINCLUDEDIR)/misc/math.h
 $(OBJECTDIR)/memory.o: $(MISCCLASSESDIR)/memory.cpp $(SMOOTHINCLUDEDIR)/misc/memory.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/memory.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/memory.cpp -o $(OBJECTDIR)/memory.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/number.o: $(MISCCLASSESDIR)/number.cpp $(SMOOTHINCLUDEDIR)/misc/number.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/number.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/number.cpp -o $(OBJECTDIR)/number.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/misc/string.h

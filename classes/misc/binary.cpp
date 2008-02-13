@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,8 +26,8 @@ S::Bool S::Binary::GetBit(Int n, UnsignedInt bit)
 
 S::Int S::Binary::SetBit(Int &n, UnsignedInt bit, Bool value)
 {
-	if (value)	return (n |= Math::Pow(2l, (Signed) bit));
-	else		return (n = (n | Math::Pow(2l, (Signed) bit) ^ Math::Pow(2l, (Signed) bit)));
+	if (value)	return (n |= (Int) Math::Pow(2l, (Signed) bit));
+	else		return (n = (n | (Int) Math::Pow(2l, (Signed) bit) ^ (Int) Math::Pow(2l, (Signed) bit)));
 }
 
 S::Int S::Binary::GetBits(Int n, UnsignedInt startBit, UnsignedInt endBit)

@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/misc/string.h>
-#include <smooth/misc/math.h>
+#include <smooth/misc/number.h>
 #include <smooth/misc/encoding/base64.h>
 #include <smooth/misc/hash/crc32.h>
 #include <smooth/templates/buffer.h>
@@ -1043,188 +1043,22 @@ S::String &S::String::FillN(const Int value, const Int count)
 
 S::Int64 S::String::ToInt() const
 {
-	if (Length() == 0) return 0;
-
-	Bool	 neg = False;
-	Int	 first = 0;
-	Int64	 n = 0;
-	Int	 size = Length();
-
-	mutex.Lock();
-
-	for (Int i = size - 1; i >= 0; i--)
-	{
-		if ((wString[i] < 48 || wString[i] > 57) && wString[i] != 45) size = i;
-	}
-
-	if (wString[0] == '-')
-	{
-		neg = True;
-		first = 1;
-		size--;
-	}
-
-	for (Int j = first; j < (first + size); j++)
-	{
-		n += (Int64) Math::Pow(10l, size - (j - first) - 1) * (wString[j] - 48);
-	}
-
-	mutex.Release();
-
-	if (!neg)	return n;
-	else		return 0 - n;
+	return Number::FromIntString(*this);
 }
 
 S::Float S::String::ToFloat() const
 {
-	if (Length() == 0) return 0;
-
-	Bool	 neg = False;
-	Int	 first = 0;
-	Float	 n = 0;
-	Int	 size = Length();
-	Int	 afpsize = 0;
-	Int	 firstafp = 0;
-
-	mutex.Lock();
-
-	for (Int i = size - 1; i >= 0; i--)
-	{
-		if ((wString[i] < 48 || wString[i] > 57) && wString[i] != 45) size = i;
-	}
-
-	if (wString[size] == '.')
-	{
-		firstafp = size + 1;
-
-		for (Int i = size + 1; i < Length(); i++)
-		{
-			if (wString[i] >= 48 && wString[i] <= 57)	afpsize++;
-			else						break;
-		}
-	}
-
-	if (wString[0] == '-')
-	{
-		neg = True;
-		first = 1;
-		size--;
-	}
-
-	for (Int j = first; j < (first + size); j++)
-	{
-		n += (Int) Math::Pow(10l, size - (j - first) - 1) * (wString[j] - 48);
-	}
-
-	for (Int k = firstafp; k < (firstafp + afpsize); k++)
-	{
-		n += (Float) Math::Pow(10l, 0 - (k - firstafp) - 1) * (wString[k] - 48);
-	}
-
-	mutex.Release();
-
-	if (!neg)	return n;
-	else		return 0 - n;
+	return Number::FromFloatString(*this);
 }
 
 S::String S::String::FromInt(const Int64 value)
 {
-	String	 newString;
-	Int	 sz;
-
-	if (value == 0)		sz = 1;
-	else if (value < 0)	sz = (Int) Math::Log10(-value) + 2;
-	else			sz = (Int) Math::Log10(value) + 1;
-
-	if (value < 0)
-	{
-		newString[0] = 45;
-
-		for (Int i = 0; i < sz-1; i++)
-		{
-			newString[i + 1] = (wchar_t) Math::Floor(((-value) % Math::Pow((Int64) 10, (Int64) sz - i - 1)) / Math::Pow((Int64) 10, (Int64) sz - (i + 1) - 1)) + 48;
-		}
-	}
-	else
-	{
-		for (Int i = 0; i < sz; i++)
-		{
-			newString[i] = (wchar_t) Math::Floor((value % Math::Pow((Int64) 10, (Int64) sz - i)) / Math::Pow((Int64) 10, (Int64) sz - (i + 1))) + 48;
-		}
-	}
-
-	return newString;
+	return Number(value).ToIntString();
 }
 
 S::String S::String::FromFloat(Float value)
 {
-	String	 newString;
-	Int	 sz;
-	Int	 afpslen;
-	Int	 lastnn = 0;
-	String	 afps;
-
-	if ((Int) value == 0)	sz = 1;
-	else if (value < 0)	sz = (Int) Math::Log10(-value) + 1;
-	else			sz = (Int) Math::Log10(value) + 1;
-
-	if (value < 0)
-	{
-		sz++;
-
-		newString[0] = 45;
-
-		for (Int i = 0; i < sz-1; i++)
-		{
-			newString[i + 1] = (wchar_t) Math::Floor(((Int) (-value) % Math::Pow(10l, sz - i - 1)) / Math::Pow(10l, sz - (i + 1) - 1)) + 48;
-		}
-
-		afps = FromInt((Int) (-(value - (Int) value) * Math::Pow(10l, 8)));
-	}
-	else
-	{
-		for (Int i = 0; i < sz; i++)
-		{
-			newString[i] = (wchar_t) Math::Floor(((Int) value % Math::Pow(10l, sz - i)) / Math::Pow(10l, sz - (i + 1))) + 48;
-		}
-
-		afps = FromInt((Int) ((value - (Int) value) * Math::Pow(10l, 8)));
-	}
-
-	afpslen = afps.Length();
-
-	for (Int i = 0; i < afpslen; i++)
-	{
-		if (afps[i] != 48) lastnn = i + 1;
-	}
-
-	afps.CopyN(afps, lastnn);
-
-	lastnn = 0;
-
-	for (Int j = 0; j < afpslen; j++)
-	{
-		if (afps[j] != 57) lastnn = j + 1;
-	}
-
-	if (lastnn == 0)	afps.CopyN(afps, 1);
-	else			afps.CopyN(afps, lastnn);
-
-	if (lastnn != 0) afps[lastnn - 1] = afps[lastnn - 1] + 1;
-
-	if (value - (Int) value != 0)
-	{
-		newString.Append(".");
-
-		for (Int i = 0; i < (8 - afpslen); i++)
-		{
-			newString.Append("0");
-		}
-
-		newString.Append(afps);
-	}
-
-	return newString;
+	return Number(value).ToFloatString();
 }
 
 S::String S::String::ToLower() const

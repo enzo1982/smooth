@@ -1,4 +1,4 @@
-/* The smooth Class Library
+ /* The smooth Class Library
   * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,15 +26,22 @@ namespace smooth
 
 			SIGNALS_CALLBACK_CLASS_NAME(const SIGNALS_CALLBACK_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &oSignal)
 			{
-				slotN = oSignal.slotN->Copy();
-				slot0 = oSignal.slot0->Copy();
-
-				parent = oSignal.parent;
+				*this = oSignal;
 			}
 
 			virtual ~SIGNALS_CALLBACK_CLASS_NAME()
 			{
 				DisconnectAll();
+			}
+
+			SIGNALS_CALLBACK_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &operator =(const SIGNALS_CALLBACK_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &oSignal)
+			{
+				slotN = oSignal.slotN->Copy();
+				slot0 = oSignal.slot0->Copy();
+
+				parent = oSignal.parent;
+
+				return *this;
 			}
 
 			template <class classTYPE, class oClassTYPE> Int Connect(returnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)

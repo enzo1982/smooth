@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2007 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,6 +24,16 @@ namespace smooth
 
 			SIGNALS_SIGNAL_CLASS_NAME(const SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &oSignal)
 			{
+				*this = oSignal;
+			}
+
+			virtual ~SIGNALS_SIGNAL_CLASS_NAME()
+			{
+				DisconnectAll();
+			}
+
+			SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &operator =(const SIGNALS_SIGNAL_CLASS_NAME<returnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> &oSignal)
+			{
 				for (Int i = 0; i < oSignal.slotsN.Length(); i++)
 				{
 					slotsN.Add(((SIGNALS_SLOT_BASE_CLASS_NAME<Void SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES> *) oSignal.slotsN.GetNth(i))->Copy());
@@ -35,11 +45,8 @@ namespace smooth
 				}
 
 				parent = oSignal.parent;
-			}
 
-			virtual ~SIGNALS_SIGNAL_CLASS_NAME()
-			{
-				DisconnectAll();
+				return *this;
 			}
 
 			template <class classTYPE, class oClassTYPE, class slotReturnTYPE> Int Connect(slotReturnTYPE (classTYPE::*proc)(SIGNALS_ARGUMENT_TYPES), oClassTYPE *inst)

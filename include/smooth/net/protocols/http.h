@@ -35,34 +35,47 @@ namespace smooth
 				private:
 					Int			 mode;
 
-					String			 content;
+					String			 server;
+					String			 path;
+					Int			 port;
 
 					String			 proxy;
 					Int			 proxyPort;
+					Int			 proxyMode;
 					String			 proxyUser;
 					String			 proxyPass;
 
+					Array<Parameter>	 fields;
 					Array<Parameter>	 parameters;
 					Buffer<UnsignedByte>	 requestBuffer;
 
-					Buffer<UnsignedByte>	&ComposeHTTPRequest(const String &, const String &);
+					String			 content;
 
-					Void			 ComposeGETRequest(const String &, const String &);
-					Void			 ComposePOSTRequest(const String &, const String &);
+					Error			 DecodeURL();
+
+					Buffer<UnsignedByte>	&ComposeHTTPRequest();
+
+					Void			 ComposeGETRequest();
+					Void			 ComposePOSTRequest();
+
+					String			 ComposeHeader();
 
 					String			 GetParametersURLEncoded();
 				public:
 								 HTTP(const String &);
 					virtual			~HTTP();
 
-					Int			 SetParameter(const String &, const String &);		// Set header parameter
-					Int			 SetParameterFile(const String &, const String &);
+					Int			 SetHeaderField(const String &, const String &);	// Set header field
+
+					Int			 SetParameter(const String &, const String &);		// Set parameter
+					Int			 SetParameterFile(const String &, const String &);	// Set file to be transmitted; forces HTTP_METHOD_POST
 
 					Int			 SetMode(Int);						// Set mode (get or post)
 
-					Int			 SetContent(const String &);				// Set content to be transmitted
+					Int			 SetContent(const String &);				// Set content to be transmitted; forces HTTP_METHOD_POST
 
 					Int			 SetProxy(const String &, Int);				// Set proxy host name and port
+					Int			 SetProxyMode(Int);					// Set proxy mode
 					Int			 SetProxyAuth(const String &, const String &);		// Set user name and password for proxy
 
 					Int			 DownloadToFile(const String &);
@@ -70,6 +83,12 @@ namespace smooth
 
 			const Int	 HTTP_METHOD_GET	= 0;
 			const Int	 HTTP_METHOD_POST	= 1;
+
+			const Int	 HTTP_PROXY_NONE	= 0;
+			const Int	 HTTP_PROXY_HTTP	= 1;
+			const Int	 HTTP_PROXY_HTTPS	= 2;
+			const Int	 HTTP_PROXY_SOCKS4	= 3;
+			const Int	 HTTP_PROXY_SOCKS5	= 4;
 		};
 	};
 };

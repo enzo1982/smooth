@@ -25,6 +25,7 @@ xx.xx.08 xx:xx - smooth alpha 0.8.70.0
 
 - completely new and improved Array<t> implementation
 - new template class: Iterator<t>, iterator for arrays of type Array<t>
+- added missing operator =() to signal classes
 - applications now check the smooth API version instead of the release number for compatibility
 - added support for network files and directories
 - fixed grayscaled icons display in iconbars

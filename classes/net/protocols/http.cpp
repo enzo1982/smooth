@@ -13,6 +13,9 @@
 #include <smooth/io/instream.h>
 #include <smooth/io/outstream.h>
 #include <smooth/io/drivers/driver_socket.h>
+#include <smooth/io/drivers/driver_https.h>
+#include <smooth/io/drivers/driver_socks4.h>
+#include <smooth/io/drivers/driver_socks5.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/number.h>
 
@@ -27,11 +30,24 @@ S::Int	 protocolHTTPTmp = S::Net::Protocols::Protocol::AddProtocol(&CreateProtoc
 
 S::Net::Protocols::HTTP::HTTP(const String &iURL) : Protocol(iURL)
 {
-	mode = HTTP_METHOD_GET;
+	mode	  = HTTP_METHOD_GET;
+	proxyMode = HTTP_PROXY_NONE;
 }
 
 S::Net::Protocols::HTTP::~HTTP()
 {
+}
+
+S::Int S::Net::Protocols::HTTP::SetHeaderField(const String &key, const String &value)
+{
+	Parameter	 field;
+
+	field.key	= key;
+	field.value	= value;
+
+	fields.Add(field);
+
+	return Success();
 }
 
 S::Int S::Net::Protocols::HTTP::SetParameter(const String &key, const String &value)
@@ -81,6 +97,15 @@ S::Int S::Net::Protocols::HTTP::SetProxy(const String &nProxy, Int nProxyPort)
 	proxy	  = nProxy;
 	proxyPort = nProxyPort;
 
+	if (proxyMode == HTTP_PROXY_NONE) proxyMode = HTTP_PROXY_HTTP;
+
+	return Success();
+}
+
+S::Int S::Net::Protocols::HTTP::SetProxyMode(Int nProxyMode)
+{
+	proxyMode = nProxyMode;
+
 	return Success();
 }
 
@@ -94,43 +119,19 @@ S::Int S::Net::Protocols::HTTP::SetProxyAuth(const String &nProxyUser, const Str
 
 S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 {
-	Bool	 error = False;
+	if (DecodeURL() == Error()) return Error();
 
-	String	 server;
-	String	 path;
-	Int	 port = 80;
+	Bool		 error	= False;
+	IO::Driver	*socket	= NIL;
 
-	{
-		Int	 i, j;
+	/* Create a connection to the server or proxy
+	 */
+	if	(proxyMode == HTTP_PROXY_NONE)	 socket = new IO::DriverSocket(server, port);
+	else if (proxyMode == HTTP_PROXY_HTTP)	 socket = new IO::DriverSocket(proxy, proxyPort);
+	else if (proxyMode == HTTP_PROXY_HTTPS)	 socket = new IO::DriverHTTPS(proxy, proxyPort, server, port, proxyUser, proxyPass);
+	else if (proxyMode == HTTP_PROXY_SOCKS4) socket = new IO::DriverSOCKS4(proxy, proxyPort, server, port);
+	else if (proxyMode == HTTP_PROXY_SOCKS5) socket = new IO::DriverSOCKS5(proxy, proxyPort, server, port, proxyUser, proxyPass);
 
-		for (i = 7; i < url.Length(); i++)
-		{
-			if (url[i] == '/' || url[i] == ':') break;
-
-			server[i - 7] = url[i];
-		}
-
-		if (url[i] == ':')
-		{
-			String	 portString;
-
-			for (i = i + 1; i < url.Length(); i++)
-			{
-				if (url[i] == '/') break;
-
-				portString[i - server.Length() - 8] = url[i];
-			}
-
-			port = portString.ToInt();
-		}
-
-		for (j = i; j < url.Length(); j++)
-		{
-			path[j - i] = url[j];
-		}
-	}
-
-	IO::Driver	*socket	= new IO::DriverSocket(server, port);
 	IO::InStream	*in	= new IO::InStream(IO::STREAM_DRIVER, socket);
 	IO::OutStream	*out	= new IO::OutStream(IO::STREAM_STREAM, in);
 
@@ -139,7 +140,7 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 	if (in->GetLastError() == IO::IO_ERROR_OK)
 	{
-		Buffer<UnsignedByte>	&buffer = ComposeHTTPRequest(server, path);
+		Buffer<UnsignedByte>	&buffer = ComposeHTTPRequest();
 
 		uploadProgress.Emit(0);
 		uploadSpeed.Emit("");
@@ -232,39 +233,70 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 	else		return Error();
 }
 
-S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest(const String &server, const String &path)
+S::Errors::Error S::Net::Protocols::HTTP::DecodeURL()
 {
-	Bool	 haveFiles = False;
+	if (!url.StartsWith("http://")) return Error();
 
-	for (Int i = 0; i < parameters.Length(); i++)
+	server	= "";
+	path	= "";
+	port	= 80;
+
+	Int	 i, j;
+
+	for (i = 7; i < url.Length(); i++)
 	{
-		if (parameters.GetNth(i).isFile) { haveFiles = True; break; }
+		if (url[i] == '/' || url[i] == ':') break;
+
+		server[i - 7] = url[i];
 	}
 
-	if	(mode == HTTP_METHOD_GET && !haveFiles)	ComposeGETRequest(server, path);
-	else if (mode == HTTP_METHOD_POST || haveFiles)	ComposePOSTRequest(server, path);
+	if (url[i] == ':')
+	{
+		String	 portString;
+
+		for (i = i + 1; i < url.Length(); i++)
+		{
+			if (url[i] == '/') break;
+
+			portString[i - server.Length() - 8] = url[i];
+		}
+
+		port = portString.ToInt();
+	}
+
+	for (j = i; j < url.Length(); j++)
+	{
+		path[j - i] = url[j];
+	}
+
+	return Success();
+}
+
+S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest()
+{
+	for (Int i = 0; i < parameters.Length(); i++)
+	{
+		if (parameters.GetNth(i).isFile) { mode = HTTP_METHOD_POST; break; }
+	}
+
+	if (content != NIL) mode = HTTP_METHOD_POST;
+
+	if	(mode == HTTP_METHOD_GET)  ComposeGETRequest();
+	else if (mode == HTTP_METHOD_POST) ComposePOSTRequest();
 
 	return requestBuffer;
 }
 
-S::Void S::Net::Protocols::HTTP::ComposeGETRequest(const String &server, const String &path)
+S::Void S::Net::Protocols::HTTP::ComposeGETRequest()
 {
-	String	 str = String("GET ").Append(path);
+	String	 header = ComposeHeader();
 
-	if (parameters.Length() > 0) str.Append("?");
+	requestBuffer.Resize(header.Length());
 
-	str.Append(GetParametersURLEncoded());
-
-	str.Append(" HTTP/1.1\n").
-	    Append("Host: ").Append(server).Append("\n").
-	    Append("\n");
-
-	requestBuffer.Resize(str.Length());
-
-	for (Int i = 0; i < str.Length(); i++) requestBuffer[i] = str[i];
+	for (Int i = 0; i < header.Length(); i++) requestBuffer[i] = header[i];
 }
 
-S::Void S::Net::Protocols::HTTP::ComposePOSTRequest(const String &server, const String &path)
+S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 {
 	Bool	 haveFiles = False;
 
@@ -276,7 +308,17 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest(const String &server, const 
 	String		 contentType;
 	IO::OutStream	*out = new IO::OutStream(IO::STREAM_FILE, "httprequest.temp", IO::OS_OVERWRITE);
 
-	if (!haveFiles)
+	if (content != NIL)
+	{
+		contentType = "text/plain; charset=UTF-8";
+
+		String	 outputFormat = String::SetOutputFormat("UTF-8");
+
+		out->OutputString(content);
+
+		String::SetOutputFormat(outputFormat);
+	}
+	else if (!haveFiles)
 	{
 		contentType = "application/x-www-form-urlencoded";
 
@@ -324,20 +366,67 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest(const String &server, const 
 
 	IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, "httprequest.temp", IO::IS_READONLY);
 
-	String	 str = String("POST ").Append(path).Append(" HTTP/1.1\n").
-		       Append("Host: ").Append(server).Append("\n").
-		       Append("Content-Length: ").Append(String::FromInt(in->Size())).Append("\n").
-		       Append("Content-Type: ").Append(contentType).Append("\n").
-		       Append("\n");
+	SetHeaderField("Content-Length", String::FromInt(in->Size()));
+	SetHeaderField("Content-Type", contentType);
 
-	requestBuffer.Resize(str.Length() + in->Size());
+	String	 header = ComposeHeader();
 
-	for (Int i = 0; i < str.Length(); i++) requestBuffer[i] = str[i];
-	for (Int i = 0; i < in->Size(); i++) requestBuffer[str.Length() + i] = in->InputNumber(1);
+	requestBuffer.Resize(header.Length() + in->Size());
+
+	for (Int i = 0; i < header.Length(); i++) requestBuffer[i] = header[i];
+	for (Int i = 0; i < in->Size(); i++) requestBuffer[header.Length() + i] = in->InputNumber(1);
 
 	delete in;
 
 	S::File("httprequest.temp").Delete();
+}
+
+S::String S::Net::Protocols::HTTP::ComposeHeader()
+{
+	String	 str;
+
+	if	(mode == HTTP_METHOD_GET)  str.Append("GET ");
+	else if (mode == HTTP_METHOD_POST) str.Append("POST ");
+
+	/* Prepend http:// prefix and server domain to path if an HTTP proxy is used
+	 */
+	if (proxyMode == HTTP_PROXY_HTTP)
+	{
+		str.Append("http://").Append(server);
+
+		if (port != 80) str.Append(":").Append(String::FromInt(port));
+	}
+
+	str.Append(path);
+
+	if (mode == HTTP_METHOD_GET && parameters.Length() > 0)
+	{
+		str.Append("?");
+		str.Append(GetParametersURLEncoded());
+	}
+
+	str.Append(" HTTP/1.1\n");
+
+	if (port == 80)	SetHeaderField("Host", server);
+	else		SetHeaderField("Host", String(server).Append(":").Append(String::FromInt(port)));
+
+	/* Add proxy authorization if requested
+	 */
+	if (proxyMode == HTTP_PROXY_HTTP && proxyUser != NIL)
+	{
+		SetHeaderField("Proxy-Authorization", String("Basic ").Append(String(String(proxyUser).Append(":").Append(proxyPass)).EncodeBase64()));
+	}
+
+	for (Int i = 0; i < fields.Length(); i++)
+	{
+		Parameter	 field = fields.GetNth(i);
+
+		str.Append(field.key).Append(": ").Append(field.value).Append("\n");
+	}
+
+	str.Append("\n");
+
+	return str;
 }
 
 S::String S::Net::Protocols::HTTP::GetParametersURLEncoded()

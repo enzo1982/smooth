@@ -42,7 +42,7 @@ S::Object::Object() : type(this)
 		cleanupTimer = new System::Timer();
 
 		cleanupTimer->onInterval.Connect(&Object::ObjectCleanup);
-		cleanupTimer->Start(5000);
+		cleanupTimer->Start(100);
 	}
 }
 

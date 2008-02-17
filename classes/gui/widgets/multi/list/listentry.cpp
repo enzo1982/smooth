@@ -75,8 +75,6 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 		case SP_MOUSEIN:
 		case SP_MOUSEOUT:
 			{
-				if (container->GetObjectType() != ListBox::classID) return Success();
-
 				Surface	*surface = container->GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 				Font	 nFont	 = font;
@@ -207,6 +205,8 @@ S::Int S::GUI::ListEntry::Select()
 
 	((List *) container)->onSelectEntry.Emit(this);
 
+	onSelect.Emit();
+
 	return Success();
 }
 
@@ -215,6 +215,8 @@ S::Int S::GUI::ListEntry::Deselect()
 	selected = False;
 
 	Paint(SP_PAINT);
+
+	onDeselect.Emit();
 
 	return Success();
 }
@@ -246,5 +248,7 @@ S::Void S::GUI::ListEntry::OnSelectEntry()
 
 S::Void S::GUI::ListEntry::OnSelectOtherEntry(Int containerHandle, Int handle)
 {
+	if (!IsRegistered()) return;
+
 	if (container->GetHandle() == containerHandle && GetHandle() != handle && selected) Deselect();
 }

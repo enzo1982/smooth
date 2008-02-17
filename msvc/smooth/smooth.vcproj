@@ -886,6 +886,18 @@
 									>
 								</File>
 							</Filter>
+							<Filter
+								Name="tree"
+								>
+								<File
+									RelativePath="..\..\classes\gui\widgets\multi\tree\tree.cpp"
+									>
+								</File>
+								<File
+									RelativePath="..\..\classes\gui\widgets\multi\tree\treeview.cpp"
+									>
+								</File>
+							</Filter>
 						</Filter>
 						<Filter
 							Name="special"
@@ -2209,6 +2221,42 @@
 								</File>
 								<File
 									RelativePath="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentryoption.h"
+									>
+								</File>
+							</Filter>
+							<Filter
+								Name="list"
+								>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\list\combobox.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\list\list.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\list\listbox.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\list\listboxheader.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\list\listentry.h"
+									>
+								</File>
+							</Filter>
+							<Filter
+								Name="tree"
+								>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\tree\tree.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\tree\treeview.h"
 									>
 								</File>
 							</Filter>

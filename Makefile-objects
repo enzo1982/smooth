@@ -425,6 +425,16 @@ $(OBJECTDIR)/popupmenuentryoption.o: $(GUICLASSESDIR)/widgets/multi/menu/popupme
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/popupmenuentryoption.cpp -o $(OBJECTDIR)/popupmenuentryoption.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/tree.o: $(GUICLASSESDIR)/widgets/multi/tree/tree.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/tree/tree.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/tree/tree.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/tree/tree.cpp -o $(OBJECTDIR)/tree.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/treeview.o: $(GUICLASSESDIR)/widgets/multi/tree/treeview.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/tree/treeview.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/tree/treeview.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/tree/treeview.cpp -o $(OBJECTDIR)/treeview.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/cursor.o: $(GUICLASSESDIR)/widgets/special/cursor.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/special/cursor.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/special/cursor.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/special/cursor.cpp -o $(OBJECTDIR)/cursor.o

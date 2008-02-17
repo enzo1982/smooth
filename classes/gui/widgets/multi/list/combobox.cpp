@@ -170,7 +170,7 @@ S::Void S::GUI::ComboBox::OpenListBox()
 
 			entry->SetRegisteredFlag(False);
 
-			listBox->AddEntry(entry);
+			listBox->Add(entry);
 
 			entry->Activate();
 		}

@@ -103,26 +103,24 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			surface->Frame(frame, FRAME_DOWN);
 
+			frame.top = 1 + (header->IsVisible() ? 16 : 0);
+
+			for (Int i = 0, n = 0; i < Length(); i++)
 			{
-				frame.top = 1 + (header->IsVisible() ? 16 : 0);
+				ListEntry	*operat = GetNthEntry(i);
 
-				for (Int i = 0, n = 0; i < Length(); i++)
+				if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
 				{
-					ListEntry	*operat = GetNthEntry(i);
+					operat->SetMetrics(Point(2, frame.top + 1), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), operat->GetHeight()));
+					operat->Show();
 
-					if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
-					{
-						operat->SetMetrics(Point(2, frame.top + 1), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), operat->GetHeight()));
-						operat->Show();
+					visibleEntries.Append(operat->GetName());
 
-						visibleEntries.Append(operat->GetName());
-
-						frame.top = Math::Min(frame.top + operat->GetHeight(), GetHeight() - 3);
-					}
-					else
-					{
-						operat->Hide();
-					}
+					frame.top = Math::Min(frame.top + operat->GetHeight(), GetHeight() - 3);
+				}
+				else
+				{
+					operat->Hide();
 				}
 			}
 
@@ -140,19 +138,17 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				else 				scrollbar->SetRange(0, Length() - (int) ((GetHeight() - 4 - (header->IsVisible() ? 16 : 0)) / GetNthEntry(0)->GetHeight()));
 			}
 
+			frame.top = 1 + (header->IsVisible() ? 16 : 0);
+
+			for (Int i = 0, n = 0; i < Length(); i++)
 			{
-				frame.top = 1 + (header->IsVisible() ? 16 : 0);
+				ListEntry	*operat = GetNthEntry(i);
 
-				for (Int i = 0, n = 0; i < Length(); i++)
+				if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
 				{
-					ListEntry	*operat = GetNthEntry(i);
+					visibleEntries.Append(operat->GetName());
 
-					if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
-					{
-						visibleEntries.Append(operat->GetName());
-
-						frame.top = Math::Min(frame.top + operat->GetHeight(), GetHeight() - 3);
-					}
+					frame.top = Math::Min(frame.top + operat->GetHeight(), GetHeight() - 3);
 				}
 			}
 

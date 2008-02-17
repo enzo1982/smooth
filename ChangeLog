@@ -22,6 +22,8 @@ xx.xx.08 xx:xx - smooth alpha 0.8.70.0
 - rwlock.cpp	- new class: RWLock, implements a simple read/write lock based on Mutex and Semaphore
 - md5.cpp	- new class: MD5, implements the message digest algorithm
 - number.cpp	- new class: Number, implements string to number conversions
+- treeview.cpp	- new class: TreeView, container for Tree entries
+- tree.cpp	- new class: Tree, implements Tree entries for Lists
 
 - completely new and improved Array<t> implementation
 - new template class: Iterator<t>, iterator for arrays of type Array<t>

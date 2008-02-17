@@ -779,7 +779,7 @@ void Translator::RemoveEntry()
 		}
 	}
 
-	list_entries->RemoveEntry(lid);
+	list_entries->Remove(lid);
 
 	edit_original->SetText("");
 	edit_translated->SetText("");

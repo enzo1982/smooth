@@ -30,15 +30,8 @@ S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text)
 {
 	ListEntry	*newEntry = new ListEntry(text);
 
-	newEntry->Hide();
-
 	if (Add(newEntry) == Success())
 	{
-		elementOrder.Add(newEntry, newEntry->GetHandle());
-		createdEntry.Add(True, newEntry->GetHandle());
-
-		Paint(SP_UPDATE);
-
 		return newEntry;
 	}
 
@@ -47,14 +40,14 @@ S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text)
 	return NIL;
 }
 
-S::Int S::GUI::List::AddEntry(ListEntry *entry)
+S::Int S::GUI::List::Add(Widget *widget)
 {
-	entry->Hide();
+	if (widget->GetObjectType() == ListEntry::classID) widget->Hide();
 
-	if (Add(entry) == Success())
+	if (Widget::Add(widget) == Success() && widget->GetObjectType() == ListEntry::classID)
 	{
-		elementOrder.Add(entry, entry->GetHandle());
-		createdEntry.Add(False, entry->GetHandle());
+		elementOrder.Add((ListEntry *) widget, widget->GetHandle());
+		createdEntry.Add(False, widget->GetHandle());
 
 		Paint(SP_UPDATE);
 
@@ -64,15 +57,15 @@ S::Int S::GUI::List::AddEntry(ListEntry *entry)
 	return Error();
 }
 
-S::Int S::GUI::List::RemoveEntry(ListEntry *entry)
+S::Int S::GUI::List::Remove(Widget *widget)
 {
-	if (entry == NIL) return Error();
+	if (widget == NIL) return Error();
 
-	if (Remove(entry) == Success())
+	if (Widget::Remove(widget) == Success() && widget->GetObjectType() == ListEntry::classID)
 	{
-		Int	 entryHandle = entry->GetHandle();
+		Int	 entryHandle = widget->GetHandle();
 
-		if (createdEntry.Get(entryHandle)) DeleteObject(entry);
+		if (createdEntry.Get(entryHandle)) DeleteObject(widget);
 
 		elementOrder.Remove(entryHandle);
 		createdEntry.Remove(entryHandle);
@@ -95,7 +88,7 @@ S::Int S::GUI::List::RemoveAllEntries()
 
 		Widget	*widget = GetNthObject(nonListEntry);
 
-		Remove(widget);
+		Widget::Remove(widget);
 
 		if (createdEntry.Get(widget->GetHandle())) DeleteObject(widget);
 	}

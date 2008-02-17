@@ -47,7 +47,7 @@ S::Int S::IO::DriverMemory::WriteData(UnsignedByte *data, Int dataSize)
 
 S::Int64 S::IO::DriverMemory::Seek(Int64 newPosition)
 {
-	if (position >= size) return -1;
+	if (newPosition > size) return -1;
 
 	position = newPosition;
 

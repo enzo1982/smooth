@@ -170,6 +170,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 		if (!error)
 		{
+			S::File(fileName).Delete();
+
 			Int	 bytes = 0;
 			String	 encoding;
 			String	 str;
@@ -193,7 +195,7 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 					if (bytes == 0) break;
 				}
 
-				IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, fileName, IO::OS_OVERWRITE);
+				IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, fileName, IO::OS_APPEND);
 				UnsignedByte	*buffer		= new UnsignedByte [1024];
 				Int		 startTicks	= clock();
 				Int		 percent	= 0;
@@ -214,7 +216,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 				delete [] buffer;
 				delete fOut;
 
-				if (encoding != "chunked") break;
+				if (encoding == "chunked") in->InputLine();
+				else			   break;
 			}
 		}
 	}

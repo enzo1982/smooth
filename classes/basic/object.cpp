@@ -17,6 +17,7 @@ S::Int		 S::Object::nextClassID		= 0;
 S::Int		 S::Object::nextObjectHandle	= 0;
 
 S::Array<S::Object *, S::Void *>	 S::Object::objects;
+S::Array<S::Object *, S::Void *>	 S::Object::deleteable;
 
 S::System::Timer	*S::Object::cleanupTimer = NIL;
 
@@ -27,7 +28,6 @@ S::Object::Object() : type(this)
 	handle			= RequestObjectHandle();
 	name			= String("Object::").Append(String::FromInt(handle));
 
-	deleteObject		= False;
 	isObjectInUse		= 0;
 
 	flags			= 0;
@@ -42,12 +42,15 @@ S::Object::Object() : type(this)
 		cleanupTimer = new System::Timer();
 
 		cleanupTimer->onInterval.Connect(&Object::ObjectCleanup);
-		cleanupTimer->Start(100);
+		cleanupTimer->Start(10000);
 	}
 }
 
 S::Object::~Object()
 {
+	/* Try to remove ourself from the object list
+	 * as DeleteObject might not have been called.
+	 */
 	objects.Remove(handle);
 
 	/* Free periodical cleanup timer if the timer
@@ -57,7 +60,9 @@ S::Object::~Object()
 	{
 		cleanupTimer->Stop();
 
-		delete cleanupTimer;
+		DeleteObject(cleanupTimer);
+
+		ObjectCleanup();
 	}
 }
 
@@ -114,14 +119,11 @@ S::Int S::Object::DeleteObject(Object *object)
 {
 	if (object != NIL)
 	{
-		if (!object->IsObjectInUse())
-		{
-			delete object;
-
-			return Success();
-		}
-
-		object->deleteObject = True;
+		/* Remove object from object list and add
+		 * it to the list of objects to delete.
+		 */
+		objects.Remove(object->handle);
+		deleteable.Add(object, object->handle);
 
 		return Success();
 	}
@@ -131,23 +133,20 @@ S::Int S::Object::DeleteObject(Object *object)
 
 S::Void S::Object::ObjectCleanup()
 {
-	for (Int i = 0; i < Object::GetNOfObjects(); i++)
+	/* Loop through all deleteable objects...
+	 */
+	for (Int i = 0; i < deleteable.Length(); i++)
 	{
-		Object	*object = Object::GetNthObject(i);
+		Object	*object = deleteable.GetNth(i);
 
-		if (object != NIL)
+		if (!object->IsObjectInUse())
 		{
-			if (object->IsObjectDeletable())
-			{
-				if (!object->IsObjectInUse())
-				{
-					delete object;
+			deleteable.Remove(object->handle);
+			delete object;
 
-					i = -1;
+			i = -1;
 
-					continue;
-				}
-			}
+			continue;
 		}
 	}
 }

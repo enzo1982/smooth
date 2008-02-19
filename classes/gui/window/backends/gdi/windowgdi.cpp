@@ -16,7 +16,6 @@
 #include <smooth/system/multimonitor.h>
 #include <smooth/init.h>
 #include <smooth/system/timer.h>
-#include <smooth/threads/thread.h>
 
 S::GUI::WindowBackend *CreateWindowGDI()
 {
@@ -453,25 +452,10 @@ S::Void S::GUI::WindowGDI::FreeMouseNotifier()
 
 S::Void S::GUI::WindowGDI::MouseNotifier()
 {
-	for (Int i = 0; i < Object::GetNOfObjects(); i++)
+	for (Int i = 0; i < Window::GetNOfWindows(); i++)
 	{
-		Object	*object = Object::GetNthObject(i);
+		Window	*window = Window::GetNthWindow(i);
 
-		if (object != NIL)
-		{
-			if (object->GetObjectType() == GUI::Window::classID)
-			{
-				if (((GUI::Window *) object)->IsInUse()) ((GUI::Window *) object)->Process(SM_MOUSEMOVE, 1, 0);
-			}
-
-			if (object->GetObjectType() == Threads::Thread::classID)
-			{
-				if (((Threads::Thread *) object)->GetStatus() == Threads::THREAD_RUNNING)
-				{
-					if (Setup::enableUnicode) PostThreadMessageW(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
-					else			  PostThreadMessageA(((Threads::Thread *) object)->GetThreadID(), SM_MOUSEMOVE, 1, 0);
-				}
-			}
-		}
+		if (window->IsInUse()) window->Process(SM_MOUSEMOVE, 1, 0);
 	}
 }

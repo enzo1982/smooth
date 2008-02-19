@@ -17,8 +17,6 @@
 #include <smooth/misc/math.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/color.h>
-#include <smooth/gui/widgets/multi/menu/menubar.h>
-#include <smooth/gui/mdi/window.h>
 #include <smooth/basic/input.h>
 #include <smooth/resources.h>
 #include <smooth/misc/binary.h>
@@ -30,14 +28,18 @@
 #	include <smooth/backends/win32/backendwin32.h>
 #endif
 
-const S::Int	 S::GUI::Window::classID = S::Object::RequestClassID();
-S::Int		 S::GUI::Window::nOfActiveWindows = 0;
+S::Array<S::GUI::Window *, S::Void *>	 S::GUI::Window::windows;
+
+const S::Int				 S::GUI::Window::classID = S::Object::RequestClassID();
+S::Int					 S::GUI::Window::nOfActiveWindows = 0;
 
 S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize, Void *iWindow) : Widget(iPos, iSize)
 {
 	backend = WindowBackend::CreateBackendInstance();
 	backend->onEvent.SetParentObject(this);
 	backend->onEvent.Connect(&Window::Process, this);
+
+	windows.Add(this, GetHandle());
 
 	stay		= False;
 	maximized	= False;
@@ -85,6 +87,8 @@ S::GUI::Window::~Window()
 	DeleteObject(mainLayer);
 
 	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop--;
+
+	windows.Remove(GetHandle());
 
 	delete backend;
 }
@@ -541,15 +545,13 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 		case WM_ACTIVATE:
 			if (LOWORD(wParam) != WA_INACTIVE && !(flags & WF_SYSTEMMODAL))
 			{
-				for (Int i = 0; i < Object::GetNOfObjects(); i++)
+				for (Int i = 0; i < windows.Length(); i++)
 				{
-					Object	*object = Object::GetNthObject(i);
+					Window	*window = windows.GetNth(i);
 
-					if (object == NIL) continue;
-
-					if (object->GetObjectType() == classID && ((Window *) object)->GetOrder() > GetOrder() && (object->GetFlags() & WF_MODAL))
+					if (window->GetOrder() > GetOrder() && (window->GetFlags() & WF_MODAL))
 					{
-						SetActiveWindow((HWND) ((Window *) object)->GetSystemWindow());
+						SetActiveWindow((HWND) window->GetSystemWindow());
 
 						rVal = Break;
 
@@ -1066,18 +1068,11 @@ S::GUI::Window *S::GUI::Window::GetWindow(Void *sysWindow)
 {
 	if (sysWindow == NIL) return NIL;
 
-	for (Int i = 0; i < Object::GetNOfObjects(); i++)
+	for (Int i = 0; i < windows.Length(); i++)
 	{
-		Object			*window = Object::GetNthObject(i);
+		Window		*window = windows.GetNth(i);
 
-		if (window == NIL) continue;
-
-		const ObjectType	&objType = window->GetObjectType();
-
-		if (objType == Window::classID || objType == MDI::Window::classID || objType == ToolWindow::classID)
-		{
-			if (((Window *) window)->GetSystemWindow() == sysWindow) return (Window *) window;
-		}
+		if (window->GetSystemWindow() == sysWindow) return window;
 	}
 
 	return NIL;

@@ -196,6 +196,7 @@ S::Void S::GUI::ComboBox::CloseListBox()
 			entry->SetRegisteredFlag(True);
 			entry->SetContainer(this);
 
+			entry->Hide();
 			entry->Deactivate();
 		}
 

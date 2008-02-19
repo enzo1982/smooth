@@ -238,8 +238,8 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 					if (bias != 0)
 					{
-						tabWidths.Set(moveTab, (Int) Math::Max(Math::Abs(tabWidths.Get(moveTab)) - bias, 1) * Math::Sign(tabWidths.Get(moveTab)));
-						tabWidths.Set(tabWidths.Length() - 1, (Int) Math::Max(Math::Abs(tabWidths.Get(tabWidths.Length() - 1)) + bias, 1) * Math::Sign(tabWidths.Get(tabWidths.Length() - 1)));
+						tabWidths.SetNth(moveTab, (Int) Math::Max(Math::Abs(tabWidths.GetNth(moveTab)) - bias, 1) * Math::Sign(tabWidths.GetNth(moveTab)));
+						tabWidths.SetNth(tabWidths.Length() - 1, (Int) Math::Max(Math::Abs(tabWidths.GetNth(tabWidths.Length() - 1)) + bias, 1) * Math::Sign(tabWidths.GetNth(tabWidths.Length() - 1)));
 
 						omx = mx;
 
@@ -277,6 +277,6 @@ S::Void S::GUI::ListBoxHeader::OnChangeSize(const Size &nSize)
 
 	for (Int j = 0; j < tabWidths.Length(); j++)
 	{
-		if (tabWidths.GetNth(j) <= 0) tabWidths.Set(tabWidths.GetNthIndex(j), -Math::Max(0, (GetWidth() - sumFixedTabSizes) / varSizeTabs));
+		if (tabWidths.GetNth(j) <= 0) tabWidths.SetNth(j, -Math::Max(0, (GetWidth() - sumFixedTabSizes) / varSizeTabs));
 	}
 }

@@ -121,7 +121,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 					}
 				}
 
-				if (((ListBox *) container)->GetNOfTabs() > 0 && gotTabs)
+				if (container->GetObjectType() == ListBox::classID && ((ListBox *) container)->GetNOfTabs() > 0 && gotTabs)
 				{
 					for (Int i = 0; i < ((ListBox *) container)->GetNOfTabs(); i++)
 					{

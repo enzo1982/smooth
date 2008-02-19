@@ -20,3 +20,9 @@ S::GUI::MDI::Window::Window(const String &title, const Point &iPos, const Size &
 S::GUI::MDI::Window::~Window()
 {
 }
+
+S::Bool S::GUI::MDI::Window::IsTypeCompatible(Int compType) const
+{
+	if (compType == Object::classID || compType == Widget::classID || compType == Window::classID)	return True;
+	else												return False;
+}

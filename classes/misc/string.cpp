@@ -81,8 +81,6 @@ S::String::String(const wchar_t *iString)
 		wString.Resize(size);
 
 		wcsncpy(wString, iString, size);
-
-		stringSize = size;
 	}
 
 	mutex.Release();
@@ -102,11 +100,11 @@ S::String::String(const String &iString)
 	}
 	else
 	{
-		wString.Resize(iString.stringSize);
+		Int	 size = iString.wString.Size();
 
-		wcsncpy(wString, iString.wString, iString.stringSize);
+		wString.Resize(size);
 
-		stringSize = iString.stringSize;
+		wcsncpy(wString, iString.wString, size);
 	}
 
 	mutex.Release();
@@ -132,7 +130,7 @@ S::Void S::String::DeleteTemporaryBuffers()
 {
 	Int	 nOfEntries = allocatedBuffers.Length();
 
-	for (Int i = 0; i < nOfEntries - 512; i++)
+	for (Int i = 0; i < nOfEntries - 32; i++)
 	{
 		delete [] allocatedBuffers.GetFirst();
 
@@ -143,8 +141,6 @@ S::Void S::String::DeleteTemporaryBuffers()
 S::Void S::String::Clean()
 {
 	mutex.Lock();
-
-	stringSize = 0;
 
 	wString.Resize(0);
 
@@ -214,7 +210,7 @@ char *S::String::SetInputFormat(const char *iFormat)
 
 	if (previousInputFormat != NIL)
 	{
-		if (allocatedBuffers.Length() >= 1024) DeleteTemporaryBuffers();
+		if (allocatedBuffers.Length() >= 64) DeleteTemporaryBuffers();
 
 		allocatedBuffers.Add(previousInputFormat);
 	}
@@ -234,7 +230,7 @@ char *S::String::SetOutputFormat(const char *oFormat)
 
 	if (previousOutputFormat != NIL)
 	{
-		if (allocatedBuffers.Length() >= 1024) DeleteTemporaryBuffers();
+		if (allocatedBuffers.Length() >= 64) DeleteTemporaryBuffers();
 
 		allocatedBuffers.Add(previousOutputFormat);
 	}
@@ -299,8 +295,6 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	wString[size - 1] = 0;
 
-	stringSize = size;
-
 	mutex.Release();
 
 	return Success();
@@ -308,11 +302,13 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 char *S::String::ConvertTo(const char *encoding) const
 {
-	if (stringSize == 0) return NIL;
+	Int	 size = Length() + 1;
 
-	Int	 bufferSize = ConvertString((char *) (wchar_t *) wString, stringSize * sizeof(wchar_t), GetInternalFormat(), NIL, 0, encoding);
+	if (size == 1) return NIL;
 
-	if (bufferSize == -1)	bufferSize = ConvertString((char *) (wchar_t *) wString, stringSize * sizeof(wchar_t), GetInternalFormat(), NIL, 0, "ISO-8859-1");
+	Int	 bufferSize = ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), NIL, 0, encoding);
+
+	if (bufferSize == -1)	bufferSize = ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), NIL, 0, "ISO-8859-1");
 
 	char	*buffer = NIL;
 
@@ -320,7 +316,7 @@ char *S::String::ConvertTo(const char *encoding) const
 	{
 		buffer = new char [Length() + 1];
 
-		ConvertString((char *) (wchar_t *) wString, stringSize * sizeof(wchar_t), GetInternalFormat(), buffer, Length() + 1, encoding);
+		ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), buffer, Length() + 1, encoding);
 
 		for (Int i = -bufferSize; i < Length(); i++) buffer[i] = '?';
 
@@ -330,10 +326,10 @@ char *S::String::ConvertTo(const char *encoding) const
 	{
 		buffer = new char [bufferSize + 1];
 
-		ConvertString((char *) (wchar_t *) wString, stringSize * sizeof(wchar_t), GetInternalFormat(), buffer, bufferSize + 1, encoding);
+		ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), buffer, bufferSize + 1, encoding);
 	}
 
-	if (allocatedBuffers.Length() >= 1024) DeleteTemporaryBuffers();
+	if (allocatedBuffers.Length() >= 64) DeleteTemporaryBuffers();
 
 	allocatedBuffers.Add(buffer);
 
@@ -342,49 +338,18 @@ char *S::String::ConvertTo(const char *encoding) const
 
 wchar_t &S::String::operator [](int n)
 {
-	if (n >= stringSize - 1)
+	Int	 length = Length();
+
+	if (n >= length)
 	{
 		mutex.Lock();
 
-		if (stringSize > 0)
-		{
-			wBuffer.Resize(stringSize);
+		wString.Resize(n + 2);
 
-			wcsncpy(wBuffer, wString, stringSize);
+		for (Int i = length; i < n; i++) wString[i] = 32;
 
-			wString.Resize(n + 2);
-
-			for (Int i = 0; i < (n + 1); i++)
-			{
-				wString[i] = 32;
-			}
-
-			wString[n + 1] = 0;
-
-			for (Int j = 0; j < stringSize - 1; j++)
-			{
-				wString[j] = wBuffer[j];
-			}
-
-			stringSize = n + 2;
-		}
-		else
-		{
-			Clean();
-
-			wString.Resize(n + 2);
-
-			for (Int i = 0; i < (n + 1); i++)
-			{
-				wString[i] = 32;
-			}
-
-			wString[n + 1] = 0;
-
-			stringSize = n + 2;
-		}
-
-		wString[n] = 0;
+		wString[n]	= 0;
+		wString[n + 1]	= 0;
 
 		mutex.Release();
 	}
@@ -399,7 +364,7 @@ wchar_t &S::String::operator [](Int n)
 
 wchar_t S::String::operator [](int n) const
 {
-	if (n >= stringSize - 1) return 0;
+	if (n >= Length()) return 0;
 
 	return wString[n];
 }
@@ -462,8 +427,6 @@ S::String &S::String::operator =(const wchar_t *newString)
 
 		wcsncpy(wString, newString, size);
 
-		stringSize = size;
-
 		mutex.Release();
 	}
 
@@ -478,17 +441,13 @@ S::String &S::String::operator =(const String &newString)
 	}
 	else
 	{
-		String	 backup(newString);
+		Int	 size = newString.Length() + 1;
 
 		mutex.Lock();
 
-		Clean();
+		wString.Resize(size);
 
-		wString.Resize(backup.stringSize);
-
-		wcsncpy(wString, backup.wString, backup.stringSize);
-
-		stringSize = backup.stringSize;
+		wcsncpy(wString, newString.wString, size);
 
 		mutex.Release();
 	}
@@ -578,22 +537,22 @@ S::Bool S::String::operator !=(const String &str) const
 
 S::Int S::String::Length() const
 {
-	if (stringSize == 0) return 0;
+	if (wString.Size() == 0) return 0;
 
 	mutex.Lock();
 
-	stringSize = 0;
+	Int	 size = 0;
 
 	for (Int i = 0; True; i++)
 	{
-		stringSize++;
-
 		if (wString[i] == 0) break;
+
+		size++;
 	}
 
 	mutex.Release();
 
-	return stringSize - 1;
+	return size;
 }
 
 S::String &S::String::Append(const char *str)
@@ -615,16 +574,13 @@ S::String &S::String::Append(const String &str)
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
-	wBuffer.Resize(len1 + len2 + 1);
-
 	mutex.Lock();
 
-	wcsncpy(wBuffer, wString, len1);
-	wcsncpy(wBuffer + len1, str.wString, len2);
+	wString.Resize(len1 + len2 + 1);
 
-	wBuffer[len1 + len2] = 0;
+	wcsncpy(wString + len1, str.wString, len2);
 
-	*this = wBuffer;
+	wString[len1 + len2] = 0;
 
 	mutex.Release();
 
@@ -704,20 +660,17 @@ S::String &S::String::Replace(const wchar_t *str1, const String &str2)
 
 S::String &S::String::Replace(const String &str1, const String &str2)
 {
-	String	 bStr1(str1);
-	String	 bStr2(str2);
-
-	if (bStr1 == NIL) return *this;
+	if (str1 == NIL) return *this;
 
 	mutex.Lock();
 
-	for (Int i = 0; i <= Length() - bStr1.Length(); i++)
+	for (Int i = 0; i <= Length() - str1.Length(); i++)
 	{
 		Bool	 foundString = True;
 
-		for (Int j = 0; j < bStr1.Length(); j++)
+		for (Int j = 0; j < str1.Length(); j++)
 		{
-			if (wString[i + j] != bStr1[j])
+			if (wString[i + j] != str1[j])
 			{
 				foundString = False;
 				break;
@@ -726,40 +679,18 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 
 		if (foundString)
 		{
-			if (bStr1.Length() == bStr2.Length())
+			if (str1.Length() != str2.Length())
 			{
-				for (Int k = 0; k < bStr2.Length(); k++) wString[i + k] = bStr2[k];
+				wString.Resize(Length() + 1 + (str2.Length() - str1.Length()));
 
-				i += bStr2.Length() - 1;
+				wmemmove(wString + i + str2.Length(), wString + i + str1.Length(), Length() - i - str1.Length() + 1);
+
+				if (str1.Length() > str2.Length()) wString[Length() - (str1.Length() - str2.Length()) + 1] = 0;
 			}
-			else if (bStr1.Length() > bStr2.Length())
-			{
-				for (Int k = 0; k < bStr2.Length(); k++) wString[i + k] = bStr2[k];
 
-				for (Int l = bStr2.Length(); l < Length() - i - (bStr1.Length() - bStr2.Length()); l++) wString[i + l] = wString[i + l + (bStr1.Length() - bStr2.Length())];
+			wcsncpy(wString + i, str2.wString, str2.Length());
 
-				wString[Length() - (bStr1.Length() - bStr2.Length())] = 0;
-
-				i += bStr2.Length() - 1;
-			}
-			else
-			{
-				Int	 length = Length();
-
-				wBuffer.Resize(length + 1);
-
-				memcpy((void *) wBuffer, (void *) wString, (length + 1) * sizeof(wchar_t));
-
-				wString.Resize(length + 1 + (bStr2.Length() - bStr1.Length()));
-
-				memcpy((void *) wString, (void *) wBuffer, i * sizeof(wchar_t));
-
-				for (Int k = 0; k < bStr2.Length(); k++) wString[i + k] = bStr2[k];
-
-				for (Int l = 0; l < length - i - bStr1.Length() + 1; l++) wString[i + bStr2.Length() + l] = wBuffer[i + bStr1.Length() + l];
-
-				i += bStr2.Length() - 1;
-			}
+			i += str2.Length() - 1;
 		}
 	}
 

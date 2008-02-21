@@ -139,6 +139,8 @@ S::Void S::Free()
 {
 	if (--initCount) return;
 
+	Object::ObjectCleanup();
+
 #if defined __WIN32__
 	CoUninitialize();
 #endif

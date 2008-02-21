@@ -11,21 +11,21 @@
 #include <smooth/definitions.h>
 #include <smooth/misc/memory.h>
 
+#include <malloc.h>
+
 S::Memory::Memory(Int size)
 {
-	memory = new UnsignedByte [size];
+	memory = (UnsignedByte *) malloc(size);
 }
 
 S::Memory::~Memory()
 {
-	delete [] memory;
+	free(memory);
 }
 
 S::Bool S::Memory::Resize(Int size)
 {
-	delete [] memory;
-
-	memory = new UnsignedByte [size];
+	memory = (UnsignedByte *) realloc(memory, size);
 
 	return True;
 }

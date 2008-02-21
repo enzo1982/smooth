@@ -32,6 +32,8 @@ S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text)
 
 	if (Add(newEntry) == Success())
 	{
+		createdEntry.Set(newEntry->GetHandle(), True);
+
 		return newEntry;
 	}
 

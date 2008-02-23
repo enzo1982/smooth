@@ -113,11 +113,9 @@ S::Int S::GUI::MultiEdit::GetNOfLines()
 
 S::Int S::GUI::MultiEdit::GetNOfInvisibleLines()
 {
-	Int	 lineSize = text.Find("\n");
+	static Int	 lineSize = font.GetTextSizeY("abcdefghijklmnopqrstuvwxyz") + 1;
 
-	if (lineSize == -1) lineSize = text.Length();
-
-	return 1 + GetNOfLines() - Math::Floor((GetHeight() - 6) / (font.GetTextSizeY(text.Head(lineSize)) + 1));
+	return 1 + GetNOfLines() - Math::Floor((GetHeight() - 6) / lineSize);
 }
 
 S::Int S::GUI::MultiEdit::SetText(const String &newText)

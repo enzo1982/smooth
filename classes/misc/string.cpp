@@ -338,18 +338,15 @@ char *S::String::ConvertTo(const char *encoding) const
 
 wchar_t &S::String::operator [](int n)
 {
-	Int	 length = Length();
-
-	if (n >= length)
+	if (n + 1 >= wString.Size())
 	{
 		mutex.Lock();
 
+		Int	 length = Length();
+
 		wString.Resize(n + 2);
 
-		for (Int i = length; i < n; i++) wString[i] = 32;
-
-		wString[n]	= 0;
-		wString[n + 1]	= 0;
+		wmemset(wString + length, 0, wString.Size() - length);
 
 		mutex.Release();
 	}
@@ -364,7 +361,7 @@ wchar_t &S::String::operator [](Int n)
 
 wchar_t S::String::operator [](int n) const
 {
-	if (n >= Length()) return 0;
+	if (n + 1 >= wString.Size()) return 0;
 
 	return wString[n];
 }
@@ -681,11 +678,9 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 		{
 			if (str1.Length() != str2.Length())
 			{
-				wString.Resize(Length() + 1 + (str2.Length() - str1.Length()));
+				if (str2.Length() > str1.Length()) wString.Resize(Length() + 1 + (str2.Length() - str1.Length()));
 
 				wmemmove(wString + i + str2.Length(), wString + i + str1.Length(), Length() - i - str1.Length() + 1);
-
-				if (str1.Length() > str2.Length()) wString[Length() - (str1.Length() - str2.Length()) + 1] = 0;
 			}
 
 			wcsncpy(wString + i, str2.wString, str2.Length());

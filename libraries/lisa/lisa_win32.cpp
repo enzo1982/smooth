@@ -84,14 +84,14 @@ int LiSASetMouseCursor(LiSAWindow *window, int mouseCursor)
 
 int LiSAOpenURLA(char *url)
 {
-	if (((int) ShellExecuteA(NULL, "open", url, NULL, NULL, 0)) > 32)	return 0;
+	if (((__int64) ShellExecuteA(NULL, "open", url, NULL, NULL, 0)) > 32)	return 0;
 	else									return 1;
 }
 
 int LiSAOpenURLW(wchar_t *url)
 {
-	if (((int) ShellExecuteW(NULL, (wchar_t *) L"open", url, NULL, NULL, 0)) > 32)	return 0;
-	else										return 1;
+	if (((__int64) ShellExecuteW(NULL, (wchar_t *) L"open", url, NULL, NULL, 0)) > 32)	return 0;
+	else											return 1;
 }
 
 int LiSAGetDisplaySizeX()

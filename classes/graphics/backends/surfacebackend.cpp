@@ -59,7 +59,7 @@ S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface, const Size &maxSize)
 
 	painting = 0;
 
-	fontSize.SetFontSize(Font::GetSystemFontSize());
+	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceBackend::~SurfaceBackend()
@@ -114,6 +114,11 @@ S::Int S::GUI::SurfaceBackend::EndPaint()
 S::Void *S::GUI::SurfaceBackend::GetSystemSurface() const
 {
 	return NIL;
+}
+
+S::Int S::GUI::SurfaceBackend::GetSurfaceDPI() const
+{
+	return 96;
 }
 
 S::Int S::GUI::SurfaceBackend::SetPixel(const Point &point, const Color &color)

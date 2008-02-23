@@ -19,6 +19,8 @@ S::Backends::Backend *CreateBackendXLib()
 
 S::Int	 backendXLibTmp = S::Backends::Backend::AddBackend(&CreateBackendXLib);
 
+Display	*S::Backends::BackendXLib::display = NIL;
+
 S::Backends::BackendXLib::BackendXLib()
 {
 	type = BACKEND_XLIB;

@@ -83,6 +83,11 @@ S::Void *S::GUI::Surface::GetSystemSurface() const
 	return backend->GetSystemSurface();
 }
 
+S::Int S::GUI::Surface::GetSurfaceDPI() const
+{
+	return backend->GetSurfaceDPI();
+}
+
 S::Int S::GUI::Surface::SetPixel(const Point &point, const Color &color)
 {
 	if (mutex != NIL) mutex->Lock();

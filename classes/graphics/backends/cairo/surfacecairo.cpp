@@ -28,23 +28,20 @@ S::GUI::SurfaceBackend *CreateSurfaceCairo(S::Void *iSurface, const S::GUI::Size
 
 S::Int	 surfaceCairoTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceCairo);
 
+S::Int	  S::GUI::SurfaceCairo::surfaceDPI	= -1;
+
 S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 {
-	type = SURFACE_CAIRO;
+	type	= SURFACE_CAIRO;
 
 #ifdef __WIN32__
-	window = (HWND) iWindow;
+	window	= (HWND) iWindow;
 
-	gdi_dc = NIL;
+	gdi_dc	= NIL;
 #else
-	window = (Window) iWindow;
-
-	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
-	{
-		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
-	}
-
-	visual = XDefaultVisual(display, XDefaultScreen(display));
+	window	= (Window) iWindow;
+	display	= Backends::BackendXLib::GetDisplay();
+	visual	= XDefaultVisual(display, XDefaultScreen(display));
 #endif
 
 	context = NIL;
@@ -245,6 +242,17 @@ S::Int S::GUI::SurfaceCairo::EndPaint()
 S::Void *S::GUI::SurfaceCairo::GetSystemSurface() const
 {
 	return (Void *) window;
+}
+
+S::Int S::GUI::SurfaceCairo::GetSurfaceDPI() const
+{
+	if (surfaceDPI != -1) return surfaceDPI;
+
+	Int	 dpi = 96;
+
+	surfaceDPI = dpi;
+
+	return dpi;
 }
 
 S::Void S::GUI::SurfaceCairo::CreateCairoContext()
@@ -476,7 +484,6 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	int	 lines = 1;
 	int	 offset = 0;
 	int	 origoffset;
-	int	 height = font.GetLineSizeY(string) + 3;
 	int	 txtsize = string.Length();
 	String	 line;
 	Rect	 rect = iRect;
@@ -513,6 +520,8 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 				if (line[j] >= 0x0590 && line[j] <= 0x07BF) rtlCharacters = True;
 			}
 		}
+
+		Int	 height = font.GetTextSizeY(line) + 3;
 
 		rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
 

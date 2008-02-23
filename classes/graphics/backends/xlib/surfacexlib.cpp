@@ -31,12 +31,7 @@ S::GUI::SurfaceXLib::SurfaceXLib(Void *iDc, const Size &maxSize)
 
 	bitmap	= NIL;
 
-	display	= NIL;
-
-	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
-	{
-		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
-	}
+	display	= Backends::BackendXLib::GetDisplay();
 
 	if (window != NIL)
 	{

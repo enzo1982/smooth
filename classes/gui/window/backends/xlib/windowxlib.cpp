@@ -29,12 +29,7 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 	type	= WINDOW_XLIB;
 
 	wnd	= NIL;
-	display	= NIL;
-
-	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
-	{
-		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
-	}
+	display	= Backends::BackendXLib::GetDisplay();
 
 	id	= windowBackends.Add(this);
 }

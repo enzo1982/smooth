@@ -23,6 +23,8 @@ S::GUI::SurfaceBackend *CreateSurfaceGDI(S::Void *iSurface, const S::GUI::Size &
 
 S::Int	 surfaceGDITmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceGDI);
 
+S::Int	  S::GUI::SurfaceGDI::surfaceDPI	= -1;
+
 S::GUI::SurfaceGDI::SurfaceGDI(Void *iWindow, const Size &maxSize)
 {
 	type = SURFACE_GDI;
@@ -176,6 +178,20 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 S::Void *S::GUI::SurfaceGDI::GetSystemSurface() const
 {
 	return (Void *) window;
+}
+
+S::Int S::GUI::SurfaceGDI::GetSurfaceDPI() const
+{
+	if (surfaceDPI != -1) return surfaceDPI;
+
+	HDC	 dc = GetWindowDC(0);
+	Int	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
+
+	ReleaseDC(0, dc);
+
+	surfaceDPI = dpi;
+
+	return dpi;
 }
 
 S::Int S::GUI::SurfaceGDI::SetPixel(const Point &point, const Color &color)
@@ -351,7 +367,6 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	int	 lines = 1;
 	int	 offset = 0;
 	int	 origoffset;
-	int	 height = font.GetLineSizeY(string) + 3;
 	int	 txtsize = string.Length();
 	String	 line;
 	Rect	 rect = iRect;
@@ -403,6 +418,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			}
 		}
 
+		Int	 height = font.GetTextSizeY(line) + 3;
 		RECT	 Rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
 
 		if (rightToLeft.GetRightToLeft()) Rect.right--;

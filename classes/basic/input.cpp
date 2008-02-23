@@ -34,13 +34,7 @@ const S::GUI::Point &S::Input::GetMousePosition()
 	mousePosition.x = point.x;
 	mousePosition.y = point.y;
 #else
-	Display	*display = NIL;
-
-	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
-	{
-		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
-	}
-
+	Display	*display = Backends::BackendXLib::GetDisplay();
 	XEvent	 e;
 
 	XQueryPointer(display, RootWindow(display, DefaultScreen(display)), &e.xbutton.root, &e.xbutton.window, &e.xbutton.x_root, &e.xbutton.y_root, &e.xbutton.x, &e.xbutton.y, &e.xbutton.state);

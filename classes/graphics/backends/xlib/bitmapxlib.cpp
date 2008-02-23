@@ -74,12 +74,7 @@ S::Void S::GUI::BitmapXLib::Initialize()
 	type	= BITMAP_XLIB;
 	bitmap	= NIL;
 
-	display	= NIL;
-
-	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
-	{
-		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
-	}
+	display	= Backends::BackendXLib::GetDisplay();
 }
 
 S::Bool S::GUI::BitmapXLib::CreateBitmap(Int cx, Int cy, Int bpp)

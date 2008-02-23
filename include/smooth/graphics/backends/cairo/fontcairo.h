@@ -8,39 +8,32 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_BACKENDXLIB_
-#define _H_OBJSMOOTH_BACKENDXLIB_
+#ifndef _H_OBJSMOOTH_FONTCAIRO_
+#define _H_OBJSMOOTH_FONTCAIRO_
 
 namespace smooth
 {
-	namespace Backends
+	namespace GUI
 	{
-		class BackendXLib;
+		class FontCairo;
 	};
 };
 
-#include "../backend.h"
-
-#include <X11/Xlib.h>
+#include "../fontbackend.h"
 
 namespace smooth
 {
-	namespace Backends
+	namespace GUI
 	{
-		const Int	 BACKEND_XLIB = 1;
+		const Int	 FONT_CAIRO	= 3;
 
-		class BackendXLib : public Backend
+		class FontCairo : public FontBackend
 		{
-			private:
-				static Display	*display;
 			public:
-						 BackendXLib();
-				virtual		~BackendXLib();
+					 FontCairo(const String &, Int, Int, Int, const Color &);
+					~FontCairo();
 
-				Int		 Init();
-				Int		 Deinit();
-
-				static Display	*GetDisplay();
+				Size	 GetTextSize(const String &) const;
 		};
 	};
 };

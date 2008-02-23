@@ -108,7 +108,7 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 	{
 		Surface	*surface = GetDrawSurface();
 
-		surface->SetSize(GetSize() * Font::GetSystemFontSize() / 96);
+		surface->SetSize(GetSize() * surface->GetSurfaceDPI() / 96);
 
 		CalculateOffsets();
 	}
@@ -986,12 +986,14 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 S::GUI::Point S::GUI::Window::GetMousePosition() const
 {
+	static Int	 surfaceDPI = backend->GetDrawSurface()->GetSurfaceDPI();
+
 	Point	 position = Input::GetMousePosition();
 
 	if (IsRightToLeft())	position = Point(GetWidth() - (position.x - GetX()) - 1, position.y - GetY());
 	else			position -= GetPosition();
 
-	return position * 96 / Font::GetSystemFontSize();
+	return position * 96 / surfaceDPI;
 }
 
 S::Bool S::GUI::Window::IsMouseOn(const Rect &rect) const

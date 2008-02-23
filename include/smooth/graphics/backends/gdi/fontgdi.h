@@ -8,39 +8,32 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_BACKENDXLIB_
-#define _H_OBJSMOOTH_BACKENDXLIB_
+#ifndef _H_OBJSMOOTH_FONTGDI_
+#define _H_OBJSMOOTH_FONTGDI_
 
 namespace smooth
 {
-	namespace Backends
+	namespace GUI
 	{
-		class BackendXLib;
+		class FontGDI;
 	};
 };
 
-#include "../backend.h"
-
-#include <X11/Xlib.h>
+#include "../fontbackend.h"
 
 namespace smooth
 {
-	namespace Backends
+	namespace GUI
 	{
-		const Int	 BACKEND_XLIB = 1;
+		const Int	 FONT_GDI	= 1;
 
-		class BackendXLib : public Backend
+		class FontGDI : public FontBackend
 		{
-			private:
-				static Display	*display;
 			public:
-						 BackendXLib();
-				virtual		~BackendXLib();
+					 FontGDI(const String &, Int, Int, Int, const Color &);
+					~FontGDI();
 
-				Int		 Init();
-				Int		 Deinit();
-
-				static Display	*GetDisplay();
+				Size	 GetTextSize(const String &) const;
 		};
 	};
 };

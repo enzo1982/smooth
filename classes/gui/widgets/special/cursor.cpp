@@ -127,8 +127,8 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 				for (Int i = 0; i <= wText.Length(); i++)
 				{
-					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText, i) - visibleOffset;
-					else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
+					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText.Head(i)) - visibleOffset;
+					else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i)) - visibleOffset;
 
 					if (i > 0 && window->GetMousePosition().x < (lastPos + newPos) / 2) { newPromptPos	= i - 1; break; }
 					else if (i == wText.Length())					      newPromptPos	= wText.Length();
@@ -229,8 +229,8 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 					for (Int i = 0; i <= wText.Length(); i++)
 					{
-						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText, i) - visibleOffset;
-						else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i), i) - visibleOffset;
+						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText.Head(i)) - visibleOffset;
+						else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i)) - visibleOffset;
 
 						if (i > 0 && window->GetMousePosition().x < (lastPos + newPos) / 2) { newMarkEnd	= i - 1; break; }
 						else if (i == wText.Length())					      newMarkEnd	= wText.Length();
@@ -351,7 +351,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 					for (Int j = lineMarkStart; j < lineMarkEnd; j++) mText[j - lineMarkStart] = wText[j];
 
-					Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText, lineMarkStart) - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY("*") + 3));
+					Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText.Head(lineMarkStart)) - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY("*") + 3));
 
 					surface->Box(markRect, bColor, Rect::Filled);
 
@@ -407,8 +407,8 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 		}
 	}
 
-	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	point.x += font.GetTextSizeX(wText, wPromptPos) - visibleOffset;
-	else								point.x += font.GetTextSizeX(String().FillN('*', wPromptPos), wPromptPos) - visibleOffset;
+	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	point.x += font.GetTextSizeX(wText.Head(wPromptPos)) - visibleOffset;
+	else								point.x += font.GetTextSizeX(String().FillN('*', wPromptPos)) - visibleOffset;
 
 	point.y += (font.GetTextSizeY("*") + 3) * (line - scrollPos);
 
@@ -815,8 +815,8 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		}
 	}
 
-	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	p1.x += font.GetTextSizeX(wText, wPromptPos) - visibleOffset;
-	else								p1.x += font.GetTextSizeX(String().FillN('*', wPromptPos), wPromptPos) - visibleOffset;
+	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	p1.x += font.GetTextSizeX(wText.Head(wPromptPos)) - visibleOffset;
+	else								p1.x += font.GetTextSizeX(String().FillN('*', wPromptPos)) - visibleOffset;
 
 	while (p1.x > frame.right || p1.x < frame.left)
 	{

@@ -80,9 +80,9 @@ $(OBJECTDIR)/file.o: $(FILESCLASSESDIR)/file.cpp $(SMOOTHINCLUDEDIR)/files/file.
 	$(COMPILER) $(COMPILER_OPTS) $(FILESCLASSESDIR)/file.cpp -o $(OBJECTDIR)/file.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/bitmapcairo.o: $(GRAPHICSCLASSESDIR)/backends/cairo/bitmapcairo.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/cairo/bitmapcairo.h
-	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/cairo/bitmapcairo.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/cairo/bitmapcairo.cpp -o $(OBJECTDIR)/bitmapcairo.o
+$(OBJECTDIR)/fontcairo.o: $(GRAPHICSCLASSESDIR)/backends/cairo/fontcairo.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/cairo/fontcairo.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/cairo/fontcairo.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/cairo/fontcairo.cpp -o $(OBJECTDIR)/fontcairo.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/surfacecairo.o: $(GRAPHICSCLASSESDIR)/backends/cairo/surfacecairo.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/cairo/surfacecairo.h
@@ -93,6 +93,11 @@ $(OBJECTDIR)/surfacecairo.o: $(GRAPHICSCLASSESDIR)/backends/cairo/surfacecairo.c
 $(OBJECTDIR)/bitmapgdi.o: $(GRAPHICSCLASSESDIR)/backends/gdi/bitmapgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/gdi/bitmapgdi.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/gdi/bitmapgdi.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/gdi/bitmapgdi.cpp -o $(OBJECTDIR)/bitmapgdi.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fontgdi.o: $(GRAPHICSCLASSESDIR)/backends/gdi/fontgdi.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/gdi/fontgdi.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/gdi/fontgdi.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/gdi/fontgdi.cpp -o $(OBJECTDIR)/fontgdi.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/surfacegdi.o: $(GRAPHICSCLASSESDIR)/backends/gdi/surfacegdi.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/gdi/surfacegdi.h
@@ -113,6 +118,11 @@ $(OBJECTDIR)/surfacexlib.o: $(GRAPHICSCLASSESDIR)/backends/xlib/surfacexlib.cpp 
 $(OBJECTDIR)/bitmapbackend.o: $(GRAPHICSCLASSESDIR)/backends/bitmapbackend.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/bitmapbackend.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/bitmapbackend.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/bitmapbackend.cpp -o $(OBJECTDIR)/bitmapbackend.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/fontbackend.o: $(GRAPHICSCLASSESDIR)/backends/fontbackend.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/fontbackend.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/backends/fontbackend.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/backends/fontbackend.cpp -o $(OBJECTDIR)/fontbackend.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/surfacebackend.o: $(GRAPHICSCLASSESDIR)/backends/surfacebackend.cpp $(SMOOTHINCLUDEDIR)/graphics/backends/surfacebackend.h

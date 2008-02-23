@@ -58,7 +58,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	lay		= new Layer();
 
 #ifdef __WIN32__
-	icon		= new Image(ImageLoader::Load(String("Icon:").Append(String::FromInt((Int) cIcon))), Point(14, 19), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
+	icon		= new Image(ImageLoader::Load(String("Icon:").Append(String::FromInt((Int64) cIcon))), Point(14, 19), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
 #else
 	icon		= NIL;
 #endif

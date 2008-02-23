@@ -24,12 +24,7 @@ S::System::EventXLib::EventXLib()
 {
 	type = EVENT_XLIB;
 
-	display	= NIL;
-
-	for (Int i = 0; i < Backends::Backend::GetNOfBackends(); i++)
-	{
-		if (Backends::Backend::GetNthBackend(i)->GetBackendType() == Backends::BACKEND_XLIB) display = ((Backends::BackendXLib *) Backends::Backend::GetNthBackend(i))->GetDisplay();
-	}
+	display	= Backends::BackendXLib::GetDisplay();
 }
 
 S::System::EventXLib::~EventXLib()

@@ -572,6 +572,10 @@
 							>
 						</File>
 						<File
+							RelativePath="..\..\classes\graphics\backends\fontbackend.cpp"
+							>
+						</File>
+						<File
 							RelativePath="..\..\classes\graphics\backends\surfacebackend.cpp"
 							>
 						</File>
@@ -580,6 +584,10 @@
 							>
 							<File
 								RelativePath="..\..\classes\graphics\backends\gdi\bitmapgdi.cpp"
+								>
+							</File>
+							<File
+								RelativePath="..\..\classes\graphics\backends\gdi\fontgdi.cpp"
 								>
 							</File>
 							<File
@@ -655,6 +663,34 @@
 								</FileConfiguration>
 								<FileConfiguration
 									Name="Release|x64"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
+							</File>
+						</Filter>
+						<Filter
+							Name="cairo"
+							>
+							<File
+								RelativePath="..\..\classes\graphics\backends\cairo\fontcairo.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
+							</File>
+							<File
+								RelativePath="..\..\classes\graphics\backends\cairo\surfacecairo.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
 									ExcludedFromBuild="true"
 									>
 									<Tool
@@ -2382,6 +2418,10 @@
 							>
 						</File>
 						<File
+							RelativePath="..\..\include\smooth\graphics\backends\fontbackend.h"
+							>
+						</File>
+						<File
 							RelativePath="..\..\include\smooth\graphics\backends\surfacebackend.h"
 							>
 						</File>
@@ -2390,6 +2430,10 @@
 							>
 							<File
 								RelativePath="..\..\include\smooth\graphics\backends\gdi\bitmapgdi.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\graphics\backends\gdi\fontgdi.h"
 								>
 							</File>
 							<File
@@ -2406,6 +2450,18 @@
 							</File>
 							<File
 								RelativePath="..\..\include\smooth\graphics\backends\xlib\surfacexlib.h"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="cairo"
+							>
+							<File
+								RelativePath="..\..\include\smooth\graphics\backends\cairo\fontcairo.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\graphics\backends\cairo\surfacecairo.h"
 								>
 							</File>
 						</Filter>

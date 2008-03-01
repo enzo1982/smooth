@@ -24,6 +24,7 @@ Source and binary compatibility between different smooth Versions
 		Compatibility with older versions
 Version		Source		Binary			Comments
 ---------------------------------------------------------------------------------------------------------------------
+0.8.71.0	no		no			lots of API changes
 0.8.70.0	no		no			lots of API changes
 0.8.69.1	no		no			API naming changes
 0.8.69.0	no		no			constified lots of methods

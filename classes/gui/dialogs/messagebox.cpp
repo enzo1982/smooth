@@ -128,7 +128,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	msgbox->Add(icon);
 
 	msgbox->onPaint.Connect(&MessageDlg::MessagePaintProc, this);
-	msgbox->doQuit.Connect(&MessageDlg::MessageKillProc, this);
+	msgbox->doClose.Connect(&MessageDlg::MessageKillProc, this);
 
 	if (cVar != NIL)
 	{

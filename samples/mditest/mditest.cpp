@@ -48,7 +48,7 @@ MDITest::MDITest()
 	mainWnd->Add(mainWnd_menubar);
 
 	mainWnd->SetIcon(NIL);
-	mainWnd->doQuit.Connect(&MDITest::ExitProc, this);
+	mainWnd->doClose.Connect(&MDITest::ExitProc, this);
 }
 
 MDITest::~MDITest()

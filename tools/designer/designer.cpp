@@ -70,7 +70,7 @@ Designer::Designer()
 
 	wnd->SetIcon(NIL);
 
-	wnd->doQuit.Connect(&Designer::ExitProc, this);
+	wnd->doClose.Connect(&Designer::ExitProc, this);
 
 	wnd->Show();
 

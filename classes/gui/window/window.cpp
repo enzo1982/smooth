@@ -39,6 +39,16 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 	backend->onEvent.SetParentObject(this);
 	backend->onEvent.Connect(&Window::Process, this);
 
+	backend->onCreate.Connect(&Window::OnCreate, this);
+	backend->onDestroy.Connect(&Window::OnDestroy, this);
+
+	backend->onMinimize.Connect(&Window::OnMinimize, this);
+	backend->onMaximize.Connect(&Window::OnMaximize, this);
+
+	backend->onRestore.Connect(&Window::OnRestore, this);
+
+	backend->doClose.Connect(&doClose);
+
 	windows.Add(this, GetHandle());
 
 	stay		= False;
@@ -71,7 +81,7 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 
 	Add(mainLayer);
 
-	doQuit.Connect(True);
+	doClose.Connect(True);
 
 	onCreate.SetParentObject(this);
 	onPaint.SetParentObject(this);
@@ -311,8 +321,6 @@ S::Int S::GUI::Window::Minimize()
 
 	backend->Minimize();
 
-	minimized = True;
-
 	return Success();
 }
 
@@ -328,8 +336,6 @@ S::Int S::GUI::Window::Maximize()
 	}
 
 	backend->Maximize();
-
-	maximized = True;
 
 	return Success();
 }
@@ -347,9 +353,6 @@ S::Int S::GUI::Window::Restore()
 	}
 
 	backend->Restore();
-
-	maximized = False;
-	minimized = False;
 
 	return Success();
 }
@@ -414,16 +417,9 @@ S::Bool S::GUI::Window::Create()
 
 		if (backend->Open(text, GetPosition(), GetSize(), flags) == Success())
 		{
-			if (GetObjectType() != ToolWindow::classID) nOfActiveWindows++;
-
-			created = True;
 			visible = False;
 
 			if (flags & WF_NORESIZE) frameWidth = 4;
-
-			CalculateOffsets();
-
-			onCreate.Emit();
 
 			return True;
 		}
@@ -468,10 +464,7 @@ S::Int S::GUI::Window::Stay()
 
 S::Int S::GUI::Window::Close()
 {
-#ifdef __WIN32__
-	if (Setup::enableUnicode) PostMessageW((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
-	else			  PostMessageA((HWND) backend->GetSystemWindow(), WM_CLOSE, 0, 0);
-#endif
+	if (doClose.Call()) backend->Close();
 
 	return Success();
 }
@@ -479,6 +472,49 @@ S::Int S::GUI::Window::Close()
 S::Bool S::GUI::Window::IsInUse() const
 {
 	return (created && !destroyed);
+}
+
+S::Void S::GUI::Window::OnCreate()
+{
+	if (GetObjectType() != ToolWindow::classID) nOfActiveWindows++;
+
+	created = True;
+
+	CalculateOffsets();
+
+	onCreate.Emit();
+}
+
+S::Void S::GUI::Window::OnDestroy()
+{
+	destroyed = True;
+
+	if (nOfActiveWindows == 0 && loopActive)
+	{
+#ifdef __WIN32__
+		PostQuitMessage(0);
+#endif
+	}
+	else
+	{
+		if (GetObjectType() != ToolWindow::classID) nOfActiveWindows--;
+	}
+}
+
+S::Void S::GUI::Window::OnMinimize()
+{
+	minimized = True;
+}
+
+S::Void S::GUI::Window::OnMaximize()
+{
+	maximized = True;
+}
+
+S::Void S::GUI::Window::OnRestore()
+{
+	minimized = False;
+	maximized = False;
 }
 
 S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
@@ -494,38 +530,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 	switch (message)
 	{
 #ifdef __WIN32__
-		case WM_CLOSE:
-			if (doQuit.Call()) backend->Close();
-
-			rVal = Break;
-
-			break;
-		case WM_DESTROY:
-			destroyed = True;
-
-			if (nOfActiveWindows == 0 && loopActive)
-			{
-				if (Setup::enableUnicode)	::SendMessageW((HWND) backend->GetSystemWindow(), WM_QUIT, 0, 0);
-				else				::SendMessageA((HWND) backend->GetSystemWindow(), WM_QUIT, 0, 0);
-			}
-			else
-			{
-				if (GetObjectType() != ToolWindow::classID) nOfActiveWindows--;
-			}
-
-			rVal = Break;
-
-			break;
-		case WM_QUIT:
-			destroyed = True;
-
-			if (GetObjectType() != ToolWindow::classID) nOfActiveWindows--;
-
-			LeaveProtectedRegion();
-
-			PostQuitMessage(0);
-
-			return Break;
 		case WM_SYSCOLORCHANGE:
 			GetColors();
 
@@ -536,10 +540,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				Window::SetMetrics(Point(wndpos->x, wndpos->y), Size(wndpos->cx, wndpos->cy));
 			}
-
-			break;
-		case WM_SIZE:
-			if (wParam == SIZE_RESTORED) minimized = False;
 
 			break;
 		case WM_ACTIVATE:

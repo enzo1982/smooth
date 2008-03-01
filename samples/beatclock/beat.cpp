@@ -302,7 +302,7 @@ Void BeatClock::Options()
 	main_reg1->Add(info);
 
 	optionsdialog->SetIcon(ImageLoader::Load("beat.pci:0"));
-	optionsdialog->doQuit.Connect(&BeatClock::OptionsKillProc, this);
+	optionsdialog->doClose.Connect(&BeatClock::OptionsKillProc, this);
 
 	oldtf = timeformat;
 	oldct = centi;

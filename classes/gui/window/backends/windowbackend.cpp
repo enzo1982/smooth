@@ -47,6 +47,8 @@ S::GUI::WindowBackend::WindowBackend(Void *iWindow)
 
 	nullSurface = new Surface();
 	drawSurface = nullSurface;
+
+	doClose.Connect(True);
 }
 
 S::GUI::WindowBackend::~WindowBackend()

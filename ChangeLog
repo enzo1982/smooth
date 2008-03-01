@@ -1,5 +1,12 @@
 ChangeLog for smooth
 
+xx.xx.08 xx:xx - smooth alpha 0.8.71.0
+
+- window.cpp	- renamed doQuit to doClose
+
+- fixed implementation of callback signals
+- improved Linux support
+
 xx.xx.08 xx:xx - smooth alpha 0.8.70.0
 
 - string.cpp	- fixed string conversion when inEncoding == outEncoding
@@ -31,6 +38,7 @@ xx.xx.08 xx:xx - smooth alpha 0.8.70.0
 - applications now check the smooth API version instead of the release number for compatibility
 - added support for network files and directories
 - fixed grayscaled icons display in iconbars
+- added foreach macro
 
 - improved Linux support
 - improved Winelib support

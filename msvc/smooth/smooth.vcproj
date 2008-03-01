@@ -1982,6 +1982,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\misc\foreach.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\misc\init.cpp"
 					>
 				</File>
@@ -2021,6 +2025,10 @@
 				</File>
 				<File
 					RelativePath="..\..\include\smooth\dll.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\smooth\foreach.h"
 					>
 				</File>
 				<File
@@ -2309,6 +2317,30 @@
 							RelativePath="..\..\include\smooth\gui\window\window.h"
 							>
 						</File>
+						<Filter
+							Name="backends"
+							>
+							<File
+								RelativePath="..\..\include\smooth\gui\window\backends\windowbackend.h"
+								>
+							</File>
+							<Filter
+								Name="gdi"
+								>
+								<File
+									RelativePath="..\..\include\smooth\gui\window\backends\gdi\windowgdi.h"
+									>
+								</File>
+							</Filter>
+							<Filter
+								Name="xlib"
+								>
+								<File
+									RelativePath="..\..\include\smooth\gui\window\backends\xlib\windowxlib.h"
+									>
+								</File>
+							</Filter>
+						</Filter>
 					</Filter>
 					<Filter
 						Name="mdi"

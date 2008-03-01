@@ -163,6 +163,33 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 {
 	switch (message)
 	{
+		case WM_CLOSE:
+			if (doClose.Call()) Close();
+
+			return Break;
+		case WM_CREATE:
+			onCreate.Emit();
+
+			return Break;
+		case WM_DESTROY:
+			onDestroy.Emit();
+
+			return Break;
+		case WM_SIZE:
+			if (wParam == SIZE_MINIMIZED)
+			{
+				minimized = True;
+
+				onMinimize.Emit();
+			}
+			else if (wParam == SIZE_RESTORED)
+			{
+				minimized = False;
+
+				onRestore.Emit();
+			}
+
+			break;
 		case WM_SETTINGCHANGE:
 			if ((wParam == SPI_SETWORKAREA) && maximized)
 			{
@@ -266,6 +293,11 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 	if (hwnd != NIL)
 	{
+		/* Process the WM_CREATE message again, as GetWindowBackend
+		 * cannot find the correct backend until hwnd is set.
+		 */
+		ProcessSystemMessages(WM_CREATE, 0, 0);
+
 		if (flags & WF_THINBORDER || flags & WF_NORESIZE) drawSurface = new Surface(hwnd, size);
 		else						  drawSurface = new Surface(hwnd);
 
@@ -420,6 +452,8 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 	maximized = True;
 
+	onMaximize.Emit();
+
 	return Success();
 }
 
@@ -431,6 +465,8 @@ S::Int S::GUI::WindowGDI::Restore()
 	else				SetWindowLongA(hwnd, GWL_STYLE, origWndStyle | WS_VISIBLE);
 
 	maximized = False;
+
+	onRestore.Emit();
 
 	return Success();
 }

@@ -27,7 +27,7 @@ S::GUI::Dialogs::SplashScreen::SplashScreen(const GUI::Bitmap &iBitmap, Int iTim
 	splashscreen = new Window("Splash screen", Point((LiSAGetDisplaySizeX() - (bitmap.GetSize().cx + 2)) / 2, (LiSAGetDisplaySizeY() - (bitmap.GetSize().cy + 2)) / 2 - 40), bitmap.GetSize() + Size(2, 2));
 
 	splashscreen->onPaint.Connect(&SplashScreen::SplashPaintProc, this);
-	splashscreen->doQuit.Connect(&SplashScreen::SplashKillProc, this);
+	splashscreen->doClose.Connect(&SplashScreen::SplashKillProc, this);
 
 	splashscreen->SetFlags(WF_NORESIZE | WF_TOPMOST);
 

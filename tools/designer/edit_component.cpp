@@ -41,7 +41,7 @@ Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 	wnd->Add(title);
 
 	wnd->onEvent.Connect(&Designer_EditComponent::EventProc, this);
-	wnd->doQuit.Connect(&Designer_EditComponent::ExitProc, this);
+	wnd->doClose.Connect(&Designer_EditComponent::ExitProc, this);
 }
 
 Designer_EditComponent::~Designer_EditComponent()

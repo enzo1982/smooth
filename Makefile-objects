@@ -880,11 +880,6 @@ $(OBJECTDIR)/codecs.o: $(MISCDIR)/codecs.cpp $(SMOOTHINCLUDEDIR)/codecs.h
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/codecs.cpp -o $(OBJECTDIR)/codecs.o
 	$(ECHO) done.
 
-$(OBJECTDIR)/foreach.o: $(MISCDIR)/foreach.cpp $(SMOOTHINCLUDEDIR)/foreach.h
-	$(ECHO) -n Compiling $(MISCDIR)/foreach.cpp...
-	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/foreach.cpp -o $(OBJECTDIR)/foreach.o
-	$(ECHO) done.
-
 $(OBJECTDIR)/init.o: $(MISCDIR)/init.cpp $(SMOOTHINCLUDEDIR)/init.h
 	$(ECHO) -n Compiling $(MISCDIR)/init.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCDIR)/init.cpp -o $(OBJECTDIR)/init.o

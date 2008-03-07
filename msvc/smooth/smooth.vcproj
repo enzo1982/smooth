@@ -1982,10 +1982,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\misc\foreach.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\misc\init.cpp"
 					>
 				</File>

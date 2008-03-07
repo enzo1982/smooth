@@ -13,8 +13,6 @@
 
 #include "definitions.h"
 
-using namespace std;
-
 /* FIXME: The array argument is evaluated multiple times which
  *         prevents us from passing rvalues, yet.
  *

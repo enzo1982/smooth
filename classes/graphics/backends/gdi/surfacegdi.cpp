@@ -360,18 +360,20 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	if (string == NIL)	return Error();
 	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
 
-	HDC	 gdi_dc = GetWindowDC(window);
-	HFONT	 hfont;
-	HFONT	 holdfont = NIL;
-	HFONT	 holdfont2 = NIL;
 	int	 lines = 1;
 	int	 offset = 0;
 	int	 origoffset;
 	int	 txtsize = string.Length();
 	String	 line;
 	Rect	 rect = iRect;
+	Int	 lineHeight = font.GetTextSizeY("abcdefghijklmnopqrstuvwxyz") + 3;
 
 	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
+
+	HDC	 gdi_dc = GetWindowDC(window);
+	HFONT	 hfont;
+	HFONT	 holdfont = NIL;
+	HFONT	 holdfont2 = NIL;
 
 	if (Setup::enableUnicode)	hfont = CreateFontW(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 	else				hfont = CreateFontA(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
@@ -418,7 +420,6 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			}
 		}
 
-		Int	 height = font.GetTextSizeY(line) + 3;
 		RECT	 Rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
 
 		if (rightToLeft.GetRightToLeft()) Rect.right--;
@@ -502,7 +503,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			else			  DrawTextExA(cDc_contexts.GetLast(), line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 		}
 
-		rect.top += height;
+		rect.top += lineHeight;
 	}
 
 	if (!painting) SelectObject(gdi_dc, holdfont);

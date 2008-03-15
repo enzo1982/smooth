@@ -260,7 +260,7 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 	int	 lines = 1;
 	int	 offset = 0;
 	int	 origoffset;
-	int	 height = font.GetLineSizeY(string) + 3;
+	int	 lineHeight = font.GetTextSizeY("abcdefghijklmnopqrstuvwxyz") + 3;
 	int	 txtsize = string.Length();
 	String	 line;
 
@@ -310,7 +310,7 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 			XDrawString(display, bitmap, gc, rect.left, rect.top, line, line.Length());
 		}
 
-		rect.top += height;
+		rect.top += lineHeight;
 	}
 
 	XFreeGC(display, gc);

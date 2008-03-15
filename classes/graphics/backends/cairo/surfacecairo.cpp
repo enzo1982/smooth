@@ -487,6 +487,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	int	 txtsize = string.Length();
 	String	 line;
 	Rect	 rect = iRect;
+	Int	 lineHeight = font.GetTextSizeY("abcdefghijklmnopqrstuvwxyz") + 3;
 
 	if (rightToLeft.GetRightToLeft()) rect.right--;
 
@@ -521,8 +522,6 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 			}
 		}
 
-		Int	 height = font.GetTextSizeY(line) + 3;
-
 		rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
 
 		if (!painting)
@@ -554,7 +553,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		cairo_move_to(cairo_contexts.GetLast(), rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
 		cairo_show_text(cairo_contexts.GetLast(), line.ConvertTo("UTF-8"));
 
-		rect.top += height;
+		rect.top += lineHeight;
 	}
 
 	return Success();

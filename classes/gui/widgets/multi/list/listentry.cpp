@@ -54,15 +54,6 @@ S::GUI::ListEntry::~ListEntry()
 	DeleteObject(markHotspot);
 }
 
-S::Int S::GUI::ListEntry::Hide()
-{
-	visible = False;
-
-	DeactivateTooltip();
-
-	return Success();
-}
-
 S::Int S::GUI::ListEntry::Paint(Int message)
 {
 	if (!IsRegistered())	return Error();

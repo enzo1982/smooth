@@ -193,11 +193,11 @@ S::Void S::GUI::ComboBox::CloseListBox()
 
 			ListEntry	*entry = (ListEntry *) GetNthObject(i);
 
-			entry->SetRegisteredFlag(True);
-			entry->SetContainer(this);
-
 			entry->Hide();
 			entry->Deactivate();
+
+			entry->SetRegisteredFlag(True);
+			entry->SetContainer(this);
 		}
 
 		toolWindow->Remove(listBox);

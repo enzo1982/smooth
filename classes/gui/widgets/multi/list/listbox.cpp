@@ -27,6 +27,7 @@ S::GUI::ListBox::ListBox(const Point &iPos, const Size &iSize)
 
 	SetFont(Font(font.GetName(), Font::DefaultSize, Font::Normal, Font::Normal, Setup::ClientTextColor));
 
+	SetBackgroundColor(Setup::ClientColor);
 	SetMetrics(iPos, iSize);
 
 	if (GetWidth() == 0) SetWidth(120);

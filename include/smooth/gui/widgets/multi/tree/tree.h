@@ -30,6 +30,9 @@ namespace smooth
 		{
 			protected:
 				List				 list;
+				Hotspot				*headHotspot;
+
+				Void				 PaintText(const Color &, Bool);
 			public:
 				static const Int		 classID;
 
@@ -57,6 +60,11 @@ namespace smooth
 				Int				 GetSelectedEntryNumber() const	{ return list.GetSelectedEntryNumber(); }
 			signals:
 				Signal1<Void, ListEntry *>	 onSelectEntry;
+			slots:
+				Void				 OnChangeSize(const Size &);
+
+				Void				 OnMouseOver();
+				Void				 OnMouseOut();
 		};
 	};
 };

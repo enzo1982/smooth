@@ -61,6 +61,14 @@ S::Int S::GUI::MicroMenu::RemoveAllEntries()
 	return popup->RemoveAllEntries();
 }
 
+S::GUI::Rect S::GUI::MicroMenu::GetVisibleArea() const
+{
+	/* MicroMenus are usually placed outside of their containers,
+	 * so let's ignore the containers visible area.
+	 */
+	return Rect(GetRealPosition(), GetSize());
+}
+
 S::Int S::GUI::MicroMenu::Paint(Int message)
 {
 	if (!IsRegistered())	return Error();

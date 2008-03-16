@@ -190,7 +190,8 @@ S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 
 S::GUI::Rect S::GUI::ListBox::GetVisibleArea() const
 {
-	return Widget::GetVisibleArea() - Size(0, 2);
+	if (!IsVisible()) return Widget::GetVisibleArea();
+	else		  return Widget::GetVisibleArea() - Size(0, 2);
 }
 
 S::Void S::GUI::ListBox::OnScrollbarValueChange()

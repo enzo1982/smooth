@@ -46,6 +46,9 @@ namespace smooth
 
 				Int				 RemoveAllEntries()		{ return list.RemoveAllEntries(); }
 
+				Int				 Open()				{ return SetMark(True); }
+				Int				 Close()			{ return SetMark(False); }
+
 				virtual Int			 Paint(Int);
 
 				virtual Bool			 IsTypeCompatible(Int) const;

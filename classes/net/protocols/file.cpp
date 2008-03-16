@@ -33,21 +33,14 @@ S::Net::Protocols::File::~File()
 S::Int S::Net::Protocols::File::DownloadToFile(const String &destination)
 {
 	Bool	 error = True;
-
-	String	 file;
-	Int	 i = 0, j = 0;
-
-	for (i = 0; i < url.Length(); i++)	{ if (url[i] == '/') j = i; }
-	for (i = j + 1; i < url.Length(); i++)	{ file[i - j - 1] = url[i]; }
-
-	file = String(destination).Append("\\").Append(file);
-
 	String	 fileName;
+
+	Int	 j;
 
 	if (url[7] == '/' && url[9] == ':' && url[10] == '/')	j = 8;
 	else							j = 7;
 
-	for (i = j; i < url.Length(); i++)
+	for (Int i = j; i < url.Length(); i++)
 	{
 		fileName[i - j] = url[i];
 	}
@@ -63,7 +56,7 @@ S::Int S::Net::Protocols::File::DownloadToFile(const String &destination)
 
 		if (bytes > 0)
 		{
-			IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, file);
+			IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, destination);
 			UnsignedByte	*buffer		= new UnsignedByte [1024];
 			Int		 startTicks	= clock();
 			Int		 percent	= 0;

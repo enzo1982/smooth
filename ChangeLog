@@ -3,6 +3,8 @@ ChangeLog for smooth
 xx.xx.08 xx:xx - smooth alpha 0.8.71.0
 
 - window.cpp	- renamed doQuit to doClose
+- listbox.cpp	- show partially visible entries again
+- widget.cpp	- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
 
 - fixed implementation of callback signals
 - improved Linux support

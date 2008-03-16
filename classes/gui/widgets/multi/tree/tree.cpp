@@ -10,6 +10,8 @@
 
 #include <smooth/gui/widgets/multi/tree/tree.h>
 #include <smooth/gui/widgets/multi/list/listbox.h>
+#include <smooth/gui/widgets/hotspot/hotspot.h>
+#include <smooth/gui/window/window.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
 
@@ -80,7 +82,7 @@ S::Int S::GUI::Tree::Paint(Int message)
 				Rect	 frame		= Rect(GetRealPosition(), GetSize());
 				Window	*window		= container->GetContainerWindow();
 
-				surface->StartPaint(frame);
+				surface->StartPaint(GetVisibleArea());
 
 				if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(GetWidth(), 15)))) PaintText(Setup::GradientTextColor, True);
 				else										 PaintText(active ? font.GetColor() : Setup::GrayTextColor, False);
@@ -143,7 +145,7 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 
 	for (Int r = 0; r < text.Length(); r++) if (text[r] == '\t') { gotTabs = True; break; }
 
-	surface->StartPaint(frame);
+	surface->StartPaint(GetVisibleArea());
 
 	if (drawGradient)	surface->Gradient(Rect(Point(frame.left, frame.top), Size(GetWidth(), 15)), Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 	else			surface->Box(Rect(Point(frame.left, frame.top), Size(GetWidth(), 15)), Setup::ClientColor, Rect::Filled);

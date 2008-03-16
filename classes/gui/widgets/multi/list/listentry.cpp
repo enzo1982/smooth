@@ -76,7 +76,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 				for (Int r = 0; r < text.Length(); r++) if (text[r] == '\t') { gotTabs = True; break; }
 
-				surface->StartPaint(frame);
+				surface->StartPaint(GetVisibleArea());
 
 				if (mouseOver)	surface->Gradient(frame, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
 				else		surface->Box(frame, Setup::ClientColor, Rect::Filled);

@@ -110,7 +110,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			{
 				ListEntry	*operat = GetNthEntry(i);
 
-				if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
+				if (n++ >= scrollbarPos && frame.top <= GetHeight() - 3)
 				{
 					operat->SetMetrics(Point(2, frame.top + 1), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), operat->GetHeight()));
 					operat->Show();
@@ -145,7 +145,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			{
 				ListEntry	*operat = GetNthEntry(i);
 
-				if (n++ >= scrollbarPos && frame.top + operat->GetHeight() <= GetHeight() - 3)
+				if (n++ >= scrollbarPos && frame.top <= GetHeight() - 3)
 				{
 					visibleEntries.Append(operat->GetName());
 
@@ -186,6 +186,11 @@ S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 	}
 
 	return Success();
+}
+
+S::GUI::Rect S::GUI::ListBox::GetVisibleArea() const
+{
+	return Widget::GetVisibleArea() - Size(0, 2);
 }
 
 S::Void S::GUI::ListBox::OnScrollbarValueChange()

@@ -356,7 +356,7 @@ S::Int S::GUI::Widget::Hide()
 			onLoseFocus.Emit();
 		}
 
-		Rect	 rect		= Rect(GetRealPosition(), size);
+		Rect	 rect		= GetVisibleArea();
 		Surface	*surface	= container->GetDrawSurface();
 
 		surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
@@ -457,13 +457,14 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 	Point	 realPosition	= GetRealPosition();
 	Rect	 frame		= Rect(realPosition, size);
+	Rect	 visibleArea	= GetVisibleArea();
 	Point	 mousePos	= window->GetMousePosition();
 	Int	 returnValue	= Success();
 
 	switch (message)
 	{
 		case SM_MOUSEMOVE:
-			if (!mouseOver && window->IsMouseOn(frame) && hitTest.Call(mousePos - realPosition))
+			if (!mouseOver && window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition))
 			{
 				mouseOver = True;
 
@@ -481,7 +482,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 				onMouseOver.Emit();
 			}
-			else if (mouseOver && !(window->IsMouseOn(frame) && hitTest.Call(mousePos - realPosition)))
+			else if (mouseOver && !(window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition)))
 			{
 				mouseOver = False;
 
@@ -496,7 +497,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 				onMouseOut.Emit();
 			}
-			else if (mouseOver && window->IsMouseOn(frame) && hitTest.Call(mousePos - realPosition))
+			else if (mouseOver && window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition))
 			{
 				if (tipTimer != NIL && wParam == 0)
 				{
@@ -853,6 +854,13 @@ S::Int S::GUI::Widget::SetOrientation(Int nOrientation)
 S::Int S::GUI::Widget::GetOrientation() const
 {
 	return orientation;
+}
+
+S::GUI::Rect S::GUI::Widget::GetVisibleArea() const
+{
+	if (!IsRegistered()) return Rect();
+
+	return Rect::OverlapRect(Rect(GetRealPosition(), GetSize()), container->GetVisibleArea());
 }
 
 S::Int S::GUI::Widget::SetMetrics(const Point &nPos, const Size &nSize)

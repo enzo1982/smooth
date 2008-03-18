@@ -167,7 +167,7 @@ S::Bool S::IO::InStream::ReadData()
 			else		decsize = filters.GetFirst()->ReadData(dataBuffer, packageSize);
 		}
 
-		if (packageSize <= size-currentFilePos || filters.Length() > 0 || size == -1)
+		if (packageSize <= size - currentFilePos || filters.Length() > 0 || size == -1)
 		{
 			origfilepos = currentFilePos + packageSize;
 
@@ -329,9 +329,9 @@ S::String S::IO::InStream::InputString(Int bytes)
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
-	int	 bytesleft = bytes;
-	int	 databufferpos = 0;
-	int	 amount = 0;
+	int	 bytesleft	= bytes;
+	int	 databufferpos	= 0;
+	int	 amount		= 0;
 
 	backBuffer.Resize(bytes + 1);
 
@@ -352,10 +352,10 @@ S::String S::IO::InStream::InputString(Int bytes)
 
 		for (Int i = 0; i < amount; i++) backBuffer[databufferpos + i] = ((char *) (((UnsignedByte *) dataBuffer) + currentBufferPos))[i];
 
-		bytesleft -= amount;
-		databufferpos += amount;
+		bytesleft	 -= amount;
+		databufferpos	 += amount;
 		currentBufferPos += amount;
-		currentFilePos += amount;
+		currentFilePos	 += amount;
 	}
 
 	backBuffer[bytes] = 0;
@@ -421,9 +421,9 @@ S::Void *S::IO::InStream::InputData(Void *pointer, Int bytes)
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
-	int	 bytesleft = bytes;
-	int	 databufferpos = 0;
-	int	 amount = 0;
+	int	 bytesleft	= bytes;
+	int	 databufferpos	= 0;
+	int	 amount		= 0;
 
 	while (bytesleft)
 	{
@@ -439,10 +439,10 @@ S::Void *S::IO::InStream::InputData(Void *pointer, Int bytes)
 
 		memcpy((void *) ((unsigned char *) pointer + databufferpos), (void *) (((UnsignedByte *) dataBuffer) + currentBufferPos), amount);
 
-		bytesleft -= amount;
-		databufferpos += amount;
+		bytesleft	 -= amount;
+		databufferpos	 += amount;
 		currentBufferPos += amount;
-		currentFilePos += amount;
+		currentFilePos	 += amount;
 	}
 
 	return pointer;

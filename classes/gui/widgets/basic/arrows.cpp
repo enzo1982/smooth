@@ -25,6 +25,8 @@ S::GUI::Arrows::Arrows(const Point &iPos, const Size &iSize, Int sType, Int *var
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
 
+	stepSize	= 1;
+
 	dummyVariable	= 0;
 
 	if (var == NIL)	variable = &dummyVariable;
@@ -148,6 +150,18 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	return Success();
 }
 
+S::Int S::GUI::Arrows::SetStepSize(UnsignedInt nStepSize)
+{
+	stepSize = nStepSize;
+
+	return Success();
+}
+
+S::UnsignedInt S::GUI::Arrows::GetStepSize() const
+{
+	return stepSize;
+}
+
 S::Void S::GUI::Arrows::OnMouseDownPlus()
 {
 	if (timer == NIL)
@@ -194,11 +208,11 @@ S::Void S::GUI::Arrows::OnTimer()
 	if (timerCount == 1) { timer->Stop(); timer->Start(100); }
 
 	Int	 prevValue	= *variable;
-	Int	 difference	= timerDirection * 1;
+	Int	 difference	= timerDirection * stepSize;
 
 	for (Int n = 1; n < 10; n++)
 	{
-		if (timerCount >= 10 * n && *variable % (Int) Math::Pow(10, n) == 0) difference = timerDirection * (Int) Math::Pow(10, n);
+		if (timerCount >= 10 * n && *variable % (Int) Math::Pow(10, n) == 0) difference = timerDirection * stepSize * (Int) Math::Pow(10, n);
 	}
 
 	*variable = Math::Min(Math::Max(*variable + difference, startValue), endValue);

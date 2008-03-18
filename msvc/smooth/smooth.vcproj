@@ -929,10 +929,6 @@
 									RelativePath="..\..\classes\gui\widgets\multi\tree\tree.cpp"
 									>
 								</File>
-								<File
-									RelativePath="..\..\classes\gui\widgets\multi\tree\treeview.cpp"
-									>
-								</File>
 							</Filter>
 						</Filter>
 						<Filter
@@ -2293,10 +2289,6 @@
 								>
 								<File
 									RelativePath="..\..\include\smooth\gui\widgets\multi\tree\tree.h"
-									>
-								</File>
-								<File
-									RelativePath="..\..\include\smooth\gui\widgets\multi\tree\treeview.h"
 									>
 								</File>
 							</Filter>

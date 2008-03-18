@@ -188,7 +188,7 @@ S::Bool S::IO::OutStream::WriteData()
 	if (streamType == STREAM_DRIVER)
 	{
 		if (filters.Length() == 0) encsize = driver->WriteData(dataBuffer, packageSize);
-		else				  encsize = filters.GetFirst()->WriteData(dataBuffer, packageSize);
+		else			   encsize = filters.GetFirst()->WriteData(dataBuffer, packageSize);
 
 		if (encsize == -1)
 		{
@@ -199,9 +199,10 @@ S::Bool S::IO::OutStream::WriteData()
 
 		driver->Flush();
 
-		currentBufferPos -= packageSize;
 		if (size == currentFilePos) size -= (packageSize - encsize);
-		currentFilePos -= (packageSize - encsize);
+
+		currentFilePos	 -= (packageSize - encsize);
+		currentBufferPos -= packageSize;
 	}
 
 	return true;
@@ -348,9 +349,9 @@ S::Bool S::IO::OutStream::OutputString(const String &string)
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
-	int	 bytesleft = strlen(string);
-	int	 databufferpos = 0;
-	int	 amount = 0;
+	int	 bytesleft	= strlen(string);
+	int	 databufferpos	= 0;
+	int	 amount		= 0;
 
 	while (bytesleft)
 	{
@@ -358,10 +359,10 @@ S::Bool S::IO::OutStream::OutputString(const String &string)
 
 		for (Int i = 0; i < amount; i++) ((char *) (((UnsignedByte *) dataBuffer) + currentBufferPos))[i] = ((char *) string)[databufferpos + i];
 
-		bytesleft -= amount;
-		databufferpos += amount;
+		bytesleft	 -= amount;
+		databufferpos	 += amount;
 		currentBufferPos += amount;
-		currentFilePos += amount;
+		currentFilePos	 += amount;
 
 		if (size < currentFilePos) size = currentFilePos;
 
@@ -392,9 +393,9 @@ S::Bool S::IO::OutStream::OutputData(const Void *pointer, Int bytes)
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
-	int	 bytesleft = bytes;
-	int	 databufferpos = 0;
-	int	 amount = 0;
+	int	 bytesleft	= bytes;
+	int	 databufferpos	= 0;
+	int	 amount		= 0;
 
 	while (bytesleft)
 	{
@@ -402,10 +403,10 @@ S::Bool S::IO::OutStream::OutputData(const Void *pointer, Int bytes)
 
 		memcpy((void *) (((UnsignedByte *) dataBuffer) + currentBufferPos), (void *) ((unsigned char *) pointer + databufferpos), amount);
 
-		bytesleft -= amount;
-		databufferpos += amount;
+		bytesleft	 -= amount;
+		databufferpos	 += amount;
 		currentBufferPos += amount;
-		currentFilePos += amount;
+		currentFilePos	 += amount;
 
 		if (size < currentFilePos) size = currentFilePos;
 

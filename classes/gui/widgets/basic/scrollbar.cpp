@@ -141,7 +141,7 @@ S::Int S::GUI::Scrollbar::SetPageSize(UnsignedInt nPageSize)
 	return Success();
 }
 
-S::UnsignedInt S::GUI::Scrollbar::GetPageSize()
+S::UnsignedInt S::GUI::Scrollbar::GetPageSize() const
 {
 	return pageSize;
 }
@@ -177,7 +177,7 @@ S::Void S::GUI::Scrollbar::OnMouseWheel(Int value)
 {
 	Window	*window	= container->GetContainerWindow();
 
-	if (IsMouseOver() || window->IsMouseOn(Rect(container->GetRealPosition(), container->GetSize()))) SetValue(*variable - value);
+	if (IsMouseOver() || window->IsMouseOn(Rect(container->GetRealPosition(), container->GetSize()))) SetValue(*variable - (value * stepSize));
 }
 
 S::Void S::GUI::Scrollbar::OnMouseDragStart(const Point &mousePos)

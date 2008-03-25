@@ -464,7 +464,7 @@ S::Int S::GUI::Window::Stay()
 
 S::Int S::GUI::Window::Close()
 {
-	if (doClose.Call()) backend->Close();
+	backend->RequestClose();
 
 	return Success();
 }

@@ -81,6 +81,11 @@ S::Int S::GUI::WindowBackend::Close()
 	return Success();
 }
 
+S::Int S::GUI::WindowBackend::RequestClose()
+{
+	return Close();
+}
+
 S::Int S::GUI::WindowBackend::SetTitle(const String &nTitle)
 {
 	return Success();

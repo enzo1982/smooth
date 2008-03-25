@@ -335,6 +335,14 @@ S::Int S::GUI::WindowGDI::Close()
 	return Success();
 }
 
+S::Int S::GUI::WindowGDI::RequestClose()
+{
+	if (Setup::enableUnicode)	SendMessageW(hwnd, WM_CLOSE, 0, 0);
+	else				SendMessageA(hwnd, WM_CLOSE, 0, 0);
+
+	return Success();
+}
+
 S::Int S::GUI::WindowGDI::SetTitle(const String &nTitle)
 {
 	if (Setup::enableUnicode)	SetWindowTextW(hwnd, nTitle);

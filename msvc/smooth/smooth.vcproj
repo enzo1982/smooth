@@ -851,6 +851,10 @@
 								>
 							</File>
 							<File
+								RelativePath="..\..\classes\gui\widgets\hotspot\independent.cpp"
+								>
+							</File>
+							<File
 								RelativePath="..\..\classes\gui\widgets\hotspot\simplebutton.cpp"
 								>
 							</File>
@@ -2217,6 +2221,14 @@
 					<Filter
 						Name="widgets"
 						>
+						<File
+							RelativePath="..\..\include\smooth\gui\widgets\layer.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\smooth\gui\widgets\widget.h"
+							>
+						</File>
 						<Filter
 							Name="multi"
 							>
@@ -2292,6 +2304,126 @@
 									>
 								</File>
 							</Filter>
+						</Filter>
+						<Filter
+							Name="basic"
+							>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\activearea.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\arrows.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\button.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\checkbox.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\client.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\divider.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\editbox.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\groupbox.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\hyperlink.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\image.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\multiedit.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\optionbox.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\progressbar.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\scrollbar.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\slider.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\statusbar.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\tabwidget.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\text.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\basic\titlebar.h"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="special"
+							>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\special\cursor.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\special\dragcontrol.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\special\droparea.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\special\shortcut.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\special\tooltip.h"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="hotspot"
+							>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\hotspot\hotspot.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\hotspot\independent.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\widgets\hotspot\simplebutton.h"
+								>
+							</File>
 						</Filter>
 					</Filter>
 					<Filter

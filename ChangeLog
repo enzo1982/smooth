@@ -5,12 +5,13 @@ xx.xx.08 xx:xx - smooth alpha 0.8.71.0
 - window.cpp	- renamed doQuit to doClose
 - listbox.cpp	- show partially visible entries again
 - widget.cpp	- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
+- ind...ent.cpp	- new class: IndependentHotspot, a hotspot that is independent from its container
 
 - removed TreeView widget (use ListBox instead)
 - fixed implementation of callback signals
 - improved Linux support
 
-xx.xx.08 xx:xx - smooth alpha 0.8.70.0
+22.03.08 11:25 - smooth alpha 0.8.70.0
 
 - string.cpp	- fixed string conversion when inEncoding == outEncoding
 		- new function: Trim, strips whitespaces from both ends of a string

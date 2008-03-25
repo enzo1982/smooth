@@ -360,6 +360,11 @@ $(OBJECTDIR)/hotspot.o: $(GUICLASSESDIR)/widgets/hotspot/hotspot.cpp $(SMOOTHINC
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/hotspot/hotspot.cpp -o $(OBJECTDIR)/hotspot.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/independent.o: $(GUICLASSESDIR)/widgets/hotspot/independent.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/hotspot/independent.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/hotspot/independent.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/hotspot/independent.cpp -o $(OBJECTDIR)/independent.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/simplebutton.o: $(GUICLASSESDIR)/widgets/hotspot/simplebutton.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/hotspot/simplebutton.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/hotspot/simplebutton.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/hotspot/simplebutton.cpp -o $(OBJECTDIR)/simplebutton.o

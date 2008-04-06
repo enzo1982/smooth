@@ -144,7 +144,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 			break;
 	}
 
-	return Success();
+	return Widget::Paint(message);
 }
 
 S::String S::GUI::ListEntry::GetNthTabText(Int i)

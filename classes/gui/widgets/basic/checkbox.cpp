@@ -22,7 +22,12 @@ S::GUI::CheckBox::CheckBox(const String &iText, const Point &iPos, const Size &i
 {
 	type		= classID;
 	text		= iText;
-	variable	= iVariable;
+
+	dummyVariable	= False;
+
+	if (iVariable == NIL)	variable = &dummyVariable;
+	else			variable = iVariable;
+
 	state		= *variable;
 
 	font.SetColor(Setup::ClientTextColor);
@@ -112,6 +117,20 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	}
 
 	return Success();
+}
+
+S::Int S::GUI::CheckBox::SetChecked(Bool newValue)
+{
+	*variable = newValue;
+
+	if (*variable != state) internalCheckValues.Emit();
+
+	return Success();
+}
+
+S::Bool S::GUI::CheckBox::IsChecked()
+{
+	return *variable;
 }
 
 S::Void S::GUI::CheckBox::OnLeftButtonClick()

@@ -16,7 +16,7 @@
 
 const S::Int	 S::GUI::Layer::classID = S::Object::RequestClassID();
 
-S::GUI::Layer::Layer(const String &name) : Widget(Point(), Size())
+S::GUI::Layer::Layer(const String &name) : Widget(Point(0, 0), Size(32768, 32768))
 {
 	type		= classID;
 

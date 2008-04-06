@@ -122,9 +122,16 @@ S::Int S::GUI::MultiEdit::SetText(const String &newText)
 {
 	scrollbarPos = 0;
 
+	Surface	*surface = container->GetDrawSurface();
+	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+
+	surface->StartPaint(frame);
+
 	cursor->SetText(newText);
 
-	return Paint(SP_PAINT);
+	surface->EndPaint();
+
+	return Success();
 }
 
 const S::String &S::GUI::MultiEdit::GetText() const
@@ -176,5 +183,7 @@ S::Int S::GUI::MultiEdit::GetCursorPos()
 
 S::Void S::GUI::MultiEdit::OnChangeSize(const Size &nSize)
 {
+	if (scrollbar != NIL) scrollbar->SetHeight(nSize.cy - 2);
+
 	cursor->SetSize(nSize - Size(6 + (scrollbar != NIL ? 17 : 0), 4));
 }

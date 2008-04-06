@@ -851,10 +851,6 @@
 								>
 							</File>
 							<File
-								RelativePath="..\..\classes\gui\widgets\hotspot\independent.cpp"
-								>
-							</File>
-							<File
 								RelativePath="..\..\classes\gui\widgets\hotspot\simplebutton.cpp"
 								>
 							</File>
@@ -2414,10 +2410,6 @@
 							>
 							<File
 								RelativePath="..\..\include\smooth\gui\widgets\hotspot\hotspot.h"
-								>
-							</File>
-							<File
-								RelativePath="..\..\include\smooth\gui\widgets\hotspot\independent.h"
 								>
 							</File>
 							<File

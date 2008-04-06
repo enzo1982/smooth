@@ -199,8 +199,8 @@ S::String S::Number::ToIntString() const
 S::String S::Number::ToFloatString() const
 {
 	Int	 digits = 10;
-	Int64	 fract	= Math::Fract(floatValue) * Math::Pow(10, digits);
-	Int	 lead	= digits - (Math::Log10(fract) + 1);
+	Int64	 fract	= Math::Fract(Math::Abs(floatValue)) * Math::Pow(10, digits);
+	Int	 lead	= digits - Math::Floor((Math::Log10(fract) + 1.000000001));
 
 	Int	 nOfNull = 0;
 
@@ -221,11 +221,11 @@ S::String S::Number::ToFloatString() const
 	if	(nOfNull > 0) fract = fract / Math::Pow(10, nOfNull);
 	else if (nOfNine > 0) fract = fract / Math::Pow(10, nOfNine) + 1;
 
-	String	 string = Number(Math::Floor(floatValue)).ToIntString();;
+	String	 string = Number(Math::Floor(Math::Abs(floatValue))).ToIntString();;
 
 	if (nOfNine == digits)
 	{
-		string = Number(Math::Floor(floatValue) + 1).ToIntString();
+		string = Number(Math::Floor(Math::Abs(floatValue)) + 1).ToIntString();
 	}
 	else if (fract > 0)
 	{
@@ -235,6 +235,8 @@ S::String S::Number::ToFloatString() const
 
 		string.Append(Number(fract).ToIntString());
 	}
+
+	if (floatValue < 0) string = String("-").Append(string);
 
 	return string;
 }

@@ -51,6 +51,7 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 	mouseDragging	= False;
 
 	alwaysActive	= False;
+	independent	= False;
 	tabstopCapable	= False;
 
 	tipTimer	= NIL;
@@ -860,7 +861,8 @@ S::GUI::Rect S::GUI::Widget::GetVisibleArea() const
 {
 	if (!IsRegistered()) return Rect();
 
-	return Rect::OverlapRect(Rect(GetRealPosition(), GetSize()), container->GetVisibleArea());
+	if (IsIndependent()) return Rect(GetRealPosition(), GetSize());
+	else		     return Rect::OverlapRect(Rect(GetRealPosition(), GetSize()), container->GetVisibleArea());
 }
 
 S::Int S::GUI::Widget::SetMetrics(const Point &nPos, const Size &nSize)

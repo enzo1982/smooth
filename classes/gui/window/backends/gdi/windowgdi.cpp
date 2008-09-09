@@ -31,82 +31,14 @@ S::System::Timer	*S::GUI::WindowGDI::mouseNotifyTimer = NIL;
 LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	WindowGDI	*smoothWindow = WindowGDI::GetWindowBackend(window);
-	Int		 retVal = -1;
-	Int		 originalMessage = message;
-	Int		 param1 = wParam;
-	Int		 param2 = lParam;
-
-	switch (message)
-	{
-		case WM_MOUSEMOVE:
-		case WM_NCMOUSEMOVE:
-			message = SM_MOUSEMOVE;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_MOUSEWHEEL:
-			message = SM_MOUSEWHEEL;
-			param1 = (short) HIWORD(wParam);
-			param2 = 0;
-			break;
-		case WM_LBUTTONDOWN:
-		case WM_NCLBUTTONDOWN:
-			message = SM_LBUTTONDOWN;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_LBUTTONUP:
-		case WM_NCLBUTTONUP:
-			message = SM_LBUTTONUP;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_RBUTTONDOWN:
-		case WM_NCRBUTTONDOWN:
-			message = SM_RBUTTONDOWN;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_RBUTTONUP:
-		case WM_NCRBUTTONUP:
-			message = SM_RBUTTONUP;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_LBUTTONDBLCLK:
-		case WM_NCLBUTTONDBLCLK:
-			message = SM_LBUTTONDBLCLK;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_RBUTTONDBLCLK:
-		case WM_NCRBUTTONDBLCLK:
-			message = SM_RBUTTONDBLCLK;
-			param1 = 0;
-			param2 = 0;
-			break;
-		case WM_TIMER:
-			message = SM_TIMER;
-			param1 = wParam;
-			param2 = 0;
-			break;
-		case WM_PAINT:
-			message = SM_PAINT;
-			param1 = wParam;
-			param2 = lParam;
-			break;
-	}
 
 	if (smoothWindow != NIL)
 	{
-		retVal = smoothWindow->ProcessSystemMessages(message, wParam, lParam);
-
-		if (retVal == Success()) retVal = smoothWindow->onEvent.Call(message, param1, param2);
+		if (smoothWindow->ProcessSystemMessages(message, wParam, lParam) == Break) return 0;
 	}
 
-	if (retVal == Break)		return 0;
-	else if (Setup::enableUnicode)	return DefWindowProcW(window, originalMessage, wParam, lParam);
-	else				return DefWindowProcA(window, originalMessage, wParam, lParam);
+	if (Setup::enableUnicode) return DefWindowProcW(window, message, wParam, lParam);
+	else			  return DefWindowProcA(window, message, wParam, lParam);
 }
 
 S::GUI::WindowGDI::WindowGDI(Void *iWindow)
@@ -124,8 +56,8 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 
 	maximized	= False;
 
-	if (Setup::enableUnicode)	sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-	else				sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+	if (Setup::enableUnicode) sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+	else			  sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
 	destroyIcon	= False;
 }
@@ -161,6 +93,9 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::GetWindowBackend(HWND hwnd)
 
 S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lParam)
 {
+	/* Process system messages not relevant
+	 * to portable Window implementation.
+	 */
 	switch (message)
 	{
 		case WM_CLOSE:
@@ -195,8 +130,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			{
 				RECT	 rect;
 
-				if (Setup::enableUnicode)	SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-				else				SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
+				if (Setup::enableUnicode) SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
+				else			  SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
 
 				SetMetrics(Point(rect.left - 2, rect.top - 2), Size(rect.right - rect.left + 4, rect.bottom - rect.top + 4));
 			}
@@ -210,8 +145,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				GetWindowRect(hwnd, &windowRect);
 
-				if (Setup::enableUnicode)	windowStyle = GetWindowLongW(hwnd, GWL_STYLE);
-				else				windowStyle = GetWindowLongA(hwnd, GWL_STYLE);
+				if (Setup::enableUnicode) windowStyle = GetWindowLongW(hwnd, GWL_STYLE);
+				else			  windowStyle = GetWindowLongA(hwnd, GWL_STYLE);
 
 				if (windowStyle & WS_DLGFRAME)
 				{
@@ -231,7 +166,64 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			return Break;
 	}
 
-	return Success();
+	/* Convert Windows messages to smooth messages.
+	 */
+	switch (message)
+	{
+		/* Mouse messages:
+		 */
+		case WM_MOUSEMOVE:
+		case WM_NCMOUSEMOVE:
+			return onEvent.Call(SM_MOUSEMOVE, 0, 0);
+		case WM_MOUSEWHEEL:
+			return onEvent.Call(SM_MOUSEWHEEL, HIWORD(wParam), 0);
+		case WM_LBUTTONDOWN:
+		case WM_NCLBUTTONDOWN:
+			return onEvent.Call(SM_LBUTTONDOWN, 0, 0);
+		case WM_LBUTTONUP:
+		case WM_NCLBUTTONUP:
+			return onEvent.Call(SM_LBUTTONUP, 0, 0);
+		case WM_RBUTTONDOWN:
+		case WM_NCRBUTTONDOWN:
+			return onEvent.Call(SM_RBUTTONDOWN, 0, 0);
+		case WM_RBUTTONUP:
+		case WM_NCRBUTTONUP:
+			return onEvent.Call(SM_RBUTTONUP, 0, 0);
+		case WM_LBUTTONDBLCLK:
+		case WM_NCLBUTTONDBLCLK:
+			return onEvent.Call(SM_LBUTTONDBLCLK, 0, 0);
+		case WM_RBUTTONDBLCLK:
+		case WM_NCRBUTTONDBLCLK:
+			return onEvent.Call(SM_RBUTTONDBLCLK, 0, 0);
+
+		/* Keyboard messages:
+		 */
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+			return onEvent.Call(SM_KEYDOWN, wParam, lParam);
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+			return onEvent.Call(SM_KEYUP, wParam, lParam);
+		case WM_CHAR:
+			return onEvent.Call(SM_CHAR, wParam, lParam);
+
+		/* Other messages:
+		 */
+		case WM_TIMER:
+			return onEvent.Call(SM_TIMER, wParam, 0);
+		case WM_PAINT:
+			return onEvent.Call(SM_PAINT, wParam, lParam);
+	}
+
+	/* Call event for any other Windows messages.
+	 *
+	 * FIXME:
+	 *
+	 * Windows messages should not be propagated to smooth applications.
+	 * Define a smooth message for every Windows message we need and
+	 * replace the next line with return Success();.
+	 */
+	return onEvent.Call(message, wParam, lParam);;
 }
 
 S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size &size, Int flags)
@@ -239,10 +231,10 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 	Int	 style	  = WS_THICKFRAME | WS_SYSMENU | WS_MINIMIZEBOX | WS_POPUP;
 	Int	 extStyle = 0;
 
-	if (flags & WF_NORESIZE)	style		= (style & ~WS_THICKFRAME) | WS_DLGFRAME;
-	if (flags & WF_THINBORDER)	style		= (style & ~WS_THICKFRAME & ~WS_SYSMENU);
-	if (flags & WF_TOPMOST)		extStyle	= extStyle | WS_EX_TOPMOST;
-	if (flags & WF_NOTASKBUTTON)	extStyle	= extStyle | WS_EX_TOOLWINDOW;
+	if (flags & WF_NORESIZE)	style	 = (style & ~WS_THICKFRAME) | WS_DLGFRAME;
+	if (flags & WF_THINBORDER)	style	 = (style & ~WS_THICKFRAME & ~WS_SYSMENU);
+	if (flags & WF_TOPMOST)		extStyle = extStyle | WS_EX_TOPMOST;
+	if (flags & WF_NOTASKBUTTON)	extStyle = extStyle | WS_EX_TOOLWINDOW;
 
 	if (Setup::enableUnicode)
 	{
@@ -250,18 +242,18 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		WNDCLASSEXW	*wndclassw = (WNDCLASSEXW *) wndclass;
 
-		wndclassw->cbSize	= sizeof(WNDCLASSEXW);
-		wndclassw->style	= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-		wndclassw->lpfnWndProc	= WindowProc;
-		wndclassw->cbClsExtra	= 0;
-		wndclassw->cbWndExtra	= 0;
-		wndclassw->hInstance	= hDllInstance;
-		wndclassw->hIcon	= sysIcon;
-		wndclassw->hCursor	= (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-		wndclassw->hbrBackground= NIL;
-		wndclassw->lpszMenuName	= NIL;
-		wndclassw->lpszClassName= className;
-		wndclassw->hIconSm	= sysIcon;
+		wndclassw->cbSize	 = sizeof(WNDCLASSEXW);
+		wndclassw->style	 = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+		wndclassw->lpfnWndProc	 = WindowProc;
+		wndclassw->cbClsExtra	 = 0;
+		wndclassw->cbWndExtra	 = 0;
+		wndclassw->hInstance	 = hDllInstance;
+		wndclassw->hIcon	 = sysIcon;
+		wndclassw->hCursor	 = (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+		wndclassw->hbrBackground = NIL;
+		wndclassw->lpszMenuName	 = NIL;
+		wndclassw->lpszClassName = className;
+		wndclassw->hIconSm	 = sysIcon;
 
 		RegisterClassExW(wndclassw);
 
@@ -273,18 +265,18 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		WNDCLASSEXA	*wndclassa = (WNDCLASSEXA *) wndclass;
 
-		wndclassa->cbSize	= sizeof(WNDCLASSEXA);
-		wndclassa->style	= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-		wndclassa->lpfnWndProc	= WindowProc;
-		wndclassa->cbClsExtra	= 0;
-		wndclassa->cbWndExtra	= 0;
-		wndclassa->hInstance	= hDllInstance;
-		wndclassa->hIcon	= sysIcon;
-		wndclassa->hCursor	= (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-		wndclassa->hbrBackground= NIL;
-		wndclassa->lpszMenuName	= NIL;
-		wndclassa->lpszClassName= className;
-		wndclassa->hIconSm	= sysIcon;
+		wndclassa->cbSize	 = sizeof(WNDCLASSEXA);
+		wndclassa->style	 = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+		wndclassa->lpfnWndProc	 = WindowProc;
+		wndclassa->cbClsExtra	 = 0;
+		wndclassa->cbWndExtra	 = 0;
+		wndclassa->hInstance	 = hDllInstance;
+		wndclassa->hIcon	 = sysIcon;
+		wndclassa->hCursor	 = (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+		wndclassa->hbrBackground = NIL;
+		wndclassa->lpszMenuName	 = NIL;
+		wndclassa->lpszClassName = className;
+		wndclassa->hIconSm	 = sysIcon;
 
 		RegisterClassExA(wndclassa);
 
@@ -337,16 +329,16 @@ S::Int S::GUI::WindowGDI::Close()
 
 S::Int S::GUI::WindowGDI::RequestClose()
 {
-	if (Setup::enableUnicode)	SendMessageW(hwnd, WM_CLOSE, 0, 0);
-	else				SendMessageA(hwnd, WM_CLOSE, 0, 0);
+	if (Setup::enableUnicode) SendMessageW(hwnd, WM_CLOSE, 0, 0);
+	else			  SendMessageA(hwnd, WM_CLOSE, 0, 0);
 
 	return Success();
 }
 
 S::Int S::GUI::WindowGDI::SetTitle(const String &nTitle)
 {
-	if (Setup::enableUnicode)	SetWindowTextW(hwnd, nTitle);
-	else				SetWindowTextA(hwnd, nTitle);
+	if (Setup::enableUnicode) SetWindowTextW(hwnd, nTitle);
+	else			  SetWindowTextA(hwnd, nTitle);
 
 	return Success();
 }
@@ -452,11 +444,11 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 	SetMetrics(Point(workArea.left - 2, workArea.top - 2), Size(workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4));
 
-	if (Setup::enableUnicode)	origWndStyle = GetWindowLongW(hwnd, GWL_STYLE);
-	else				origWndStyle = GetWindowLongA(hwnd, GWL_STYLE);
+	if (Setup::enableUnicode) origWndStyle = GetWindowLongW(hwnd, GWL_STYLE);
+	else			  origWndStyle = GetWindowLongA(hwnd, GWL_STYLE);
 
-	if (Setup::enableUnicode)	SetWindowLongW(hwnd, GWL_STYLE, (origWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-	else				SetWindowLongA(hwnd, GWL_STYLE, (origWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, (origWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+	else			  SetWindowLongA(hwnd, GWL_STYLE, (origWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
 
 	maximized = True;
 
@@ -469,8 +461,8 @@ S::Int S::GUI::WindowGDI::Restore()
 {
 	SetMetrics(Point(nonMaxRect.left, nonMaxRect.top), Size((Int) Math::Max(minSize.cx, nonMaxRect.right - nonMaxRect.left), (Int) Math::Max(minSize.cy, nonMaxRect.bottom - nonMaxRect.top)));
 
-	if (Setup::enableUnicode)	SetWindowLongW(hwnd, GWL_STYLE, origWndStyle | WS_VISIBLE);
-	else				SetWindowLongA(hwnd, GWL_STYLE, origWndStyle | WS_VISIBLE);
+	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, origWndStyle | WS_VISIBLE);
+	else			  SetWindowLongA(hwnd, GWL_STYLE, origWndStyle | WS_VISIBLE);
 
 	maximized = False;
 

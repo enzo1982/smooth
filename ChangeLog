@@ -7,6 +7,10 @@ xx.xx.08 xx:xx - smooth alpha 0.8.71.0
 - number.cpp	- fixed floating point number -> string conversion
 - widget.cpp	- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
 		- new attribute: independent, makes a widget independent of its container
+- string.cpp	- new function: Explode(), splits a string at a delimiter
+		- new function: Implode(), concatenates strings from an array
+- str...ase.cpp - case conversion functions are now generated from UnicodeData.txt
+		- added title case conversion function
 
 - removed TreeView widget (use ListBox instead)
 - fixed implementation of callback signals

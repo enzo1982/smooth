@@ -43,7 +43,7 @@ S::Int S::GUI::Text::Paint(Int message)
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->SetText(text, Rect(GetRealPosition(), Size(textSize.cx, Math::Round(textSize.cy * 1.2))), nFont);
+				surface->SetText(text, Rect::OverlapRect(Rect(GetRealPosition(), Size(textSize.cx, Math::Round(textSize.cy * 1.2))), GetVisibleArea()), nFont);
 			}
 
 			break;

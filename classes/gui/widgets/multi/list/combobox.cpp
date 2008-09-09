@@ -46,6 +46,7 @@ S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 	Add(buttonHotspot);
 
 	onChangeSize.Connect(&ComboBox::OnChangeSize, this);
+	onSelectEntry.Connect(&ComboBox::OnSelectEntry, this);
 }
 
 S::GUI::ComboBox::~ComboBox()
@@ -135,15 +136,15 @@ S::Void S::GUI::ComboBox::OnSelectEntry(ListEntry *entry)
 	if (listBox != NIL)
 	{
 		CloseListBox();
+	}
 
-		if (prevSelectedEntry != entry)
-		{
-			Paint(SP_PAINT);
+	if (prevSelectedEntry != entry)
+	{
+		Paint(SP_PAINT);
 
-			if (flags & CB_HOTSPOTONLY) entry->Deselect();
+		if (flags & CB_HOTSPOTONLY) entry->Deselect();
 
-			onSelectEntry.Emit(entry);
-		}
+		prevSelectedEntry = entry;
 	}
 }
 
@@ -152,7 +153,7 @@ S::Void S::GUI::ComboBox::OpenListBox()
 	if (listBox == NIL)
 	{
 		listBox		= new ListBox(Point(0, 0), Size(GetWidth(), 15 * Math::Min(Length(), 5) + 4));
-		listBox->onSelectEntry.Connect(&ComboBox::OnSelectEntry, this);
+		listBox->onSelectEntry.Connect(&onSelectEntry);
 
 		toolWindow	= new ToolWindow(GetRealPosition() + Point(0, GetHeight()), Size(GetWidth(), 15 * Math::Min(Length(), 5) + 4));
 		toolWindow->onLoseFocus.Connect(&ComboBox::CloseListBox, this);

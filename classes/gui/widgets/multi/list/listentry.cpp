@@ -141,7 +141,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				surface->EndPaint();
 			}
 
-			break;
+			return Widget::Paint(SP_PAINT);
 	}
 
 	return Widget::Paint(message);

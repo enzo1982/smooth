@@ -758,7 +758,7 @@ void Translator::NewEntry()
 	text_original->SetText("Original:");
 	text_translated->SetText("Translation:");
 
-	edit_id->SetText(String::FromInt(max(entry->id, 0) + 1));
+	edit_id->SetText(String::FromInt(Math::Max(entry->id, 0) + 1));
 	edit_original->SetText("");
 	edit_translated->SetText("");
 

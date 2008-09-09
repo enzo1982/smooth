@@ -51,7 +51,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 		case SP_UPDATE:
-			surface->StartPaint(frame);
+			surface->StartPaint(GetVisibleArea());
 
 			if (IsActive())	surface->Box(frame + Point(1, 1) - Size(2, 2), Setup::ClientColor, Rect::Filled);
 			else		surface->Box(frame + Point(1, 1) - Size(2, 2), Setup::BackgroundColor, Rect::Filled);

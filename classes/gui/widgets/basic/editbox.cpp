@@ -67,10 +67,14 @@ S::Int S::GUI::EditBox::Paint(Int message)
 				Surface	*surface = container->GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
+				surface->StartPaint(GetVisibleArea());
+
 				if (IsActive())	surface->Box(frame, Setup::ClientColor, Rect::Filled);
 				else		surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 
 				surface->Frame(frame, FRAME_DOWN);
+
+				surface->EndPaint();
 			}
 
 			break;

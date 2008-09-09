@@ -27,7 +27,7 @@ S::Bool S::Binary::GetBit(Int n, UnsignedInt bit)
 S::Int S::Binary::SetBit(Int &n, UnsignedInt bit, Bool value)
 {
 	if (value)	return (n |= (Int) Math::Pow(2l, (Signed) bit));
-	else		return (n = (n | (Int) Math::Pow(2l, (Signed) bit) ^ (Int) Math::Pow(2l, (Signed) bit)));
+	else		return (n = ((n | (Int) Math::Pow(2l, (Signed) bit)) ^ (Int) Math::Pow(2l, (Signed) bit)));
 }
 
 S::Int S::Binary::GetBits(Int n, UnsignedInt startBit, UnsignedInt endBit)

@@ -650,6 +650,11 @@ $(OBJECTDIR)/string.o: $(MISCCLASSESDIR)/string.cpp $(SMOOTHINCLUDEDIR)/misc/str
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string.cpp -o $(OBJECTDIR)/string.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/string_case.o: $(MISCCLASSESDIR)/string_case.cpp $(SMOOTHINCLUDEDIR)/misc/string.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/string_case.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/string_case.cpp -o $(OBJECTDIR)/string_case.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/protocol.o: $(NETCLASSESDIR)/protocols/protocol.cpp $(SMOOTHINCLUDEDIR)/net/protocols/protocol.h
 	$(ECHO) -n Compiling $(NETCLASSESDIR)/protocols/protocol.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(NETCLASSESDIR)/protocols/protocol.cpp -o $(OBJECTDIR)/protocol.o

@@ -63,6 +63,9 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::GetWindowBackend(::Window wnd)
 
 S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 {
+	/* Process system events not relevant
+	 * to portable Window implementation.
+	 */
 	switch (e->type)
 	{
 		case CreateNotify:
@@ -74,6 +77,10 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 		case MapNotify:
+			/* Grab the keyboard focus.
+			 */
+			XSetInputFocus(display, wnd, RevertToParent, CurrentTime);
+
 			onEvent.Call(SM_PAINT, 0, 0);
 
 			XFlush(display);
@@ -81,6 +88,14 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			break;
 		case UnmapNotify:
 			break;
+	}
+
+	/* Convert Xlib events to smooth messages.
+	 */
+	switch (e->type)
+	{
+		/* Mouse events:
+		 */
 		case MotionNotify:
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
@@ -89,15 +104,43 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			if	(e->xbutton.button = Button1) onEvent.Call(SM_LBUTTONDOWN, 0, 0);
 			else if (e->xbutton.button = Button2) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
 
+			/* Grab the keyboard focus if we don't have it already.
+			 */
+			{
+				::Window	 wndFocus;
+				int		 revertTo;
+
+				XGetInputFocus(display, &wndFocus, &revertTo);
+
+				if (wndFocus != wnd) XSetInputFocus(display, wnd, RevertToParent, CurrentTime);
+			}
+
 			break;
 		case ButtonRelease:
 			if	(e->xbutton.button = Button1) onEvent.Call(SM_LBUTTONUP, 0, 0);
 			else if (e->xbutton.button = Button2) onEvent.Call(SM_RBUTTONUP, 0, 0);
 
 			break;
+
+		/* Keyboard events:
+		 */
 		case KeyPress:
+			onEvent.Call(SM_KEYDOWN, XKeycodeToKeysym(display, e->xkey.keycode, 0), 0);
+
+			/* Convert keyboard event to input string and
+			 * call SM_CHAR event for each character.
+			 */
+			{
+				char	 text[255];
+				Int	 numChars = XLookupString(&e->xkey, text, 255, NIL, NIL);
+
+				for (Int i = 0; i < numChars; i++) onEvent.Call(SM_CHAR, text[i], 0);
+			}
+
 			break;
 		case KeyRelease:
+			onEvent.Call(SM_KEYUP, XKeycodeToKeysym(display, e->xkey.keycode, 0), 0);
+
 			break;
 	}
 
@@ -130,18 +173,19 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		attributes.override_redirect	= True;
 	}
 
-	attributes.event_mask		= 0;
-	attributes.do_not_propagate_mask= 0;
-	attributes.colormap		= CopyFromParent;
-	attributes.cursor		= None;
+	attributes.event_mask		 = 0;
+	attributes.do_not_propagate_mask = 0;
+	attributes.colormap		 = CopyFromParent;
+	attributes.cursor		 = None;
 
 	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx, size.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBackPixel | CWBorderPixel | CWOverrideRedirect, &attributes);
 
-	/* Select event types wanted */
-	XSelectInput(display, wnd, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | StructureNotifyMask);
-
 	if (wnd != NIL)
 	{
+		/* Select event types we want to receive.
+		 */
+		XSelectInput(display, wnd, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | StructureNotifyMask);
+
 		/* Process the CreateNotify event again, as GetWindowBackend
 		 * cannot find the correct backend until wnd is set.
 		 */
@@ -151,10 +195,16 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 		ProcessSystemMessages(&e);
 
+		/* Create drawing surface.
+		 */
 		if (flags & WF_THINBORDER || flags & WF_NORESIZE) drawSurface = new Surface((Void *) wnd, size);
 		else						  drawSurface = new Surface((Void *) wnd);
 
 		drawSurface->SetSize(size);
+
+		/* Set window title.
+		 */
+		SetTitle(title);
 
 		return Success();
 	}
@@ -169,6 +219,19 @@ S::Int S::GUI::WindowXLib::Close()
 	drawSurface = nullSurface;
 
 	XDestroyWindow(display, wnd);
+
+	return Success();
+}
+
+S::Int S::GUI::WindowXLib::SetTitle(const String &nTitle)
+{
+	XTextProperty	 titleProp;
+	const char	*title = nTitle;
+
+	XStringListToTextProperty((char **) &title, 1, &titleProp);
+
+	XSetWMName(display, wnd, &titleProp);
+	XSetWMIconName(display, wnd, &titleProp);
 
 	return Success();
 }
@@ -189,6 +252,16 @@ S::Int S::GUI::WindowXLib::Hide()
 
 	XUnmapWindow(display, wnd);
 	XFlush(display);
+
+	return Success();
+}
+
+S::Int S::GUI::WindowXLib::SetMetrics(const Point &nPos, const Size &nSize)
+{
+	XMoveResizeWindow(display, wnd, nPos.x, nPos.y, nSize.cx, nSize.cy);
+	XFlush(display);
+
+	drawSurface->SetSize(nSize);
 
 	return Success();
 }

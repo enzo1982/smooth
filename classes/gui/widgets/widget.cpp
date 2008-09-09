@@ -606,12 +606,12 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
-#ifdef __WIN32__
-		case WM_KEYDOWN:
+		case SM_KEYDOWN:
 			if (!focussed || !tabstopCapable) break;
 
 			if (wParam == VK_TAB)
 			{
+#ifdef __WIN32__
 				BYTE	 state[256];
 
 				if (GetKeyboardState(state))
@@ -632,9 +632,11 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 					returnValue = Break;
 				}
+#endif
 			}
 
 			break;
+#ifdef __WIN32__
 		case WM_KILLFOCUS:
 			{
 				Window	*windowGetFocus = Window::GetWindow((HWND) wParam);

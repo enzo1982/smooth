@@ -351,12 +351,12 @@ Void BeatClock::OptionsOK()
 {
 	if (timeformat == 0)
 	{
-		alarmbeats = min(999, alarm_edit1->GetText().ToInt());
+		alarmbeats = Math::Min(999, alarm_edit1->GetText().ToInt());
 		alarmsecs = convertBeatsToSeconds(alarmbeats);
 	}
 	else
 	{
-		alarmsecs = min(86340, convertTimeStringToSeconds(alarm_edit1->GetText()));
+		alarmsecs = Math::Min(86340, convertTimeStringToSeconds(alarm_edit1->GetText()));
 		alarmbeats = convertSecondsToBeats(alarmsecs);
 	}
 
@@ -383,7 +383,7 @@ Void BeatClock::OptionsBeats()
 	display_check1->SetText("Show centibeats");
 	misc_option1->SetText("Show/hide centibeats");
 	alarm_text2->SetText("Internet Beats");
-	alarm_edit1->SetText(String::FromInt(min(999, convertSecondsToBeats(convertTimeStringToSeconds(alarm_edit1->GetText())))));
+	alarm_edit1->SetText(String::FromInt(Math::Min(999, convertSecondsToBeats(convertTimeStringToSeconds(alarm_edit1->GetText())))));
 }
 
 Void BeatClock::OptionsSTF()
@@ -391,7 +391,7 @@ Void BeatClock::OptionsSTF()
 	display_check1->SetText("Show seconds");
 	misc_option1->SetText("Show/hide seconds");
 	alarm_text2->SetText("Hours/Minutes");
-	alarm_edit1->SetText(convertSecondsToTimeString(min(86340, convertBeatsToSeconds(alarm_edit1->GetText().ToInt()))));
+	alarm_edit1->SetText(convertSecondsToTimeString(Math::Min(86340, convertBeatsToSeconds(alarm_edit1->GetText().ToInt()))));
 }
 
 Void BeatClock::OptionsPaint()

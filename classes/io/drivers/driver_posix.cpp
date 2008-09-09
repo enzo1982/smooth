@@ -45,20 +45,20 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 			return;
 		case 0:				// open a file for appending data
 			if (Setup::enableUnicode)	stream = _wopen(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
-			else				stream = _open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
+			else				stream = open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
 			Seek(GetSize());
 			break;
 		case 1:				// create or overwrite a file
 			if (Setup::enableUnicode)	stream = _wopen(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT | O_TRUNC, 0600);
-			else				stream = _open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT | O_TRUNC, 0600);
+			else				stream = open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT | O_TRUNC, 0600);
 			break;
 		case 2:				// open a file for reading data
 			if (Setup::enableUnicode)	stream = _wopen(fileName, O_RDWR | O_BINARY);
-			else				stream = _open(fileName, O_RDWR | O_BINARY);
+			else				stream = open(fileName, O_RDWR | O_BINARY);
 			break;
 		case 3:				// open a file in read only mode
 			if (Setup::enableUnicode)	stream = _wopen(fileName, O_RDONLY | O_BINARY);
-			else				stream = _open(fileName, O_RDONLY | O_BINARY);
+			else				stream = open(fileName, O_RDONLY | O_BINARY);
 			break;
 	}
 

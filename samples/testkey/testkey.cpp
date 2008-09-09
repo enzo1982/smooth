@@ -58,12 +58,14 @@ Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 	Int		 vkCode		= 0;
 	Byte		 keys[256];
 
-	if (message == WM_KEYDOWN)
+	if (message == SM_KEYDOWN)
 	{
+#ifdef __WIN32__
 		GetKeyboardState((UnsignedByte *) &keys);
 		ToAscii(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (UnsignedShort *) &asciiCode, 0);
 
 		if (Setup::enableUnicode) ToUnicode(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, &unicode, 1, 0);
+#endif
 
 		scanCode	= GetBits(lParam, 16, 23);
 		vkCode		= wParam;

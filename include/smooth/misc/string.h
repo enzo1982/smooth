@@ -126,8 +126,15 @@ namespace smooth
 			static String		 FromInt(const Int64);
 			static String		 FromFloat(const Float);
 
+			/* Case conversion routines for lower, upper and title case
+			 * (implemented in generated string_case.cpp)
+			 */
 			String			 ToLower() const;
 			String			 ToUpper() const;
+			String			 ToTitle() const;
+
+			const Array<String>	&Explode(const String &) const;
+			static String		 Implode(const Array<String> &, const String & = String());
 
 			wchar_t &operator	 [](const int);
 			wchar_t &operator	 [](const Int);

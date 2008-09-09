@@ -246,15 +246,15 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
-#ifdef __WIN32__
-		case WM_KEYDOWN:
+		case SM_KEYDOWN:
 			OnSpecialKey(wParam);
 
 			break;
-		case WM_CHAR:
+		case SM_CHAR:
 			OnInput(wParam, lParam);
 
 			break;
+#ifdef __WIN32__
 		case WM_KILLFOCUS:
 			if (Window::GetWindow((HWND) wParam) != NIL)
 			{
@@ -292,7 +292,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 	Point	 realPos = GetRealPosition();
 	Rect	 frame	 = Rect(realPos, GetSize());
 
-	surface->StartPaint(frame);
+	surface->StartPaint(GetVisibleArea());
 
 	surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 
@@ -544,9 +544,9 @@ S::Void S::GUI::Cursor::OnLoseFocus()
 
 S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 {
-	// Called when a special key such as
-	// return or an arrow key is hit
-
+	/* Called when a special key such as
+	 * return or an arrow key is hit.
+	 */
 	if (!focussed) return;
 
 	Int	 newPos = 0;
@@ -554,7 +554,6 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 	Int	 i = 0;
 
-#ifdef __WIN32__
 	switch (keyCode)
 	{
 		case VK_LEFT:
@@ -665,17 +664,18 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			break;
 	}
-#endif
 }
 
 S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 {
-	// Called when a character is entered
-
+	/* Called when a character is entered.
+	 */
 	if (!focussed) return;
 
 	Window	*window	= container->GetContainerWindow();
 
+	/* CTRL + C
+	 */
 	if (character == 3 && !(flags & (1 << 30)))
 	{
 		if (markStart != markEnd)
@@ -711,6 +711,8 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 		}
 	}
 
+	/* CTRL + X
+	 */
 	if (character == 24 && !(flags & (1 << 30)) && IsActive())
 	{
 #ifdef __WIN32__
@@ -720,6 +722,8 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 		DeleteSelectedText();
 	}
 
+	/* CTRL + V
+	 */
 	if (character == 22 && IsActive())
 	{
 		DeleteSelectedText();

@@ -141,6 +141,8 @@ S::Int S::GUI::List::SelectEntry(ListEntry *entryToSelect)
 		{
 			entry->Select();
 
+			onSelectEntry.Emit(entry);
+
 			return Success();
 		}
 	}
@@ -164,7 +166,11 @@ S::Int S::GUI::List::SelectNthEntry(Int n)
 {
 	if (n >= Length()) return Error();
 
-	GetNthEntry(n)->Select();
+	ListEntry	*entry = GetNthEntry(n);
+
+	entry->Select();
+
+	onSelectEntry.Emit(entry);
 
 	return Success();
 }
@@ -188,6 +194,8 @@ S::Int S::GUI::List::SelectEntry(const String &entryText)
 		if (entry->GetText() == entryText)
 		{
 			entry->Select();
+
+			onSelectEntry.Emit(entry);
 
 			return Success();
 		}

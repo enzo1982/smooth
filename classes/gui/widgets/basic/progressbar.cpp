@@ -135,7 +135,7 @@ S::Int S::GUI::Progressbar::GetValue()
 
 S::Void S::GUI::Progressbar::CreateGradient(const Size &gSize)
 {
-	gradient.CreateBitmap(gSize.cx - 2, gSize.cy - 2, 32);
+	gradient.CreateBitmap(gSize.cx - 2, gSize.cy - 2, 24);
 
 	Int	 rs	= Setup::GradientStartColor.GetRed();
 	Int	 gs	= Setup::GradientStartColor.GetGreen();

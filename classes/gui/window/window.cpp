@@ -66,6 +66,8 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 
 #ifdef __WIN32__
 	frameWidth = GetSystemMetrics(SM_CXFRAME);
+#else
+	frameWidth = 4;
 #endif
 
 	updateRect = Rect(Point(-1, -1), Size(0, 0));

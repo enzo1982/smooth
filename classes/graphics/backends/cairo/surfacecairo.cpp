@@ -39,9 +39,10 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 
 	gdi_dc	= NIL;
 #else
-	window	= (Window) iWindow;
 	display	= Backends::BackendXLib::GetDisplay();
 	visual	= XDefaultVisual(display, XDefaultScreen(display));
+
+	window	= (Window) iWindow;
 #endif
 
 	context = NIL;
@@ -60,6 +61,8 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 			size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 		}
 #else
+		XGetWindowAttributes(display, window, &windowAttributes);
+
 		if (maxSize == Size())
 		{
 			size.cx = XDisplayWidth(display, XDefaultScreen(display)) + 2;
@@ -73,15 +76,20 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 		HDC	 bmp_dc = CreateCompatibleDC(gdi_dc);
 		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
 
-		cDc_contexts.Add(bmp_dc);
-		cDc_bitmaps.Add((HBITMAP) SelectObject(bmp_dc, bitmap));
-		cDc_rects.Add(new Rect(Point(0, 0), size));
+		paint_contexts.Add(bmp_dc);
+		paint_bitmaps.Add((HBITMAP) SelectObject(bmp_dc, bitmap));
+		paint_rects.Add(new Rect(Point(0, 0), size));
 
 		ReleaseDC(window, gdi_dc);
 
 		cairo_surface_t	*surface = cairo_win32_surface_create(bmp_dc);
 #else
-		cairo_surface_t	*surface = cairo_xlib_surface_create(display, window, visual, size.cx, size.cy);
+		Pixmap	 pixmap = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
+
+		paint_bitmaps.Add(pixmap);
+		paint_rects.Add(new Rect(Point(0, 0), size));
+
+		cairo_surface_t	*surface = cairo_xlib_surface_create(display, pixmap, visual, size.cx, size.cy);
 #endif
 
 		cairo_t		*context = cairo_create(surface);
@@ -103,13 +111,15 @@ S::GUI::SurfaceCairo::~SurfaceCairo()
 		cairo_surface_destroy(cairo_surfaces.GetFirst());
 
 #ifdef __WIN32__
-		HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetFirst(), cDc_bitmaps.GetFirst());
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(paint_contexts.GetFirst(), paint_bitmaps.GetFirst());
 
-		DeleteDC(cDc_contexts.GetFirst());
+		DeleteDC(paint_contexts.GetFirst());
 		::DeleteObject(bitmap);
-
-		delete cDc_rects.GetFirst();
+#else
+		XFreePixmap(display, paint_bitmaps.GetFirst());
 #endif
+
+		delete paint_rects.GetFirst();
 	}
 }
 
@@ -124,23 +134,46 @@ S::Int S::GUI::SurfaceCairo::SetSize(const Size &nSize)
 	if (window != NIL && !painting)
 	{
 #ifdef __WIN32__
-		HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetFirst(), cDc_bitmaps.GetFirst());
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(paint_contexts.GetFirst(), paint_bitmaps.GetFirst());
 
 		::DeleteObject(bitmap);
+#else
+		cairo_destroy(cairo_contexts.GetFirst());
+		cairo_surface_destroy(cairo_surfaces.GetFirst());
 
-		delete cDc_rects.GetFirst();
+		cairo_surfaces.RemoveAll();
+		cairo_contexts.RemoveAll();
 
-		cDc_bitmaps.RemoveAll();
-		cDc_rects.RemoveAll();
+		XFreePixmap(display, paint_bitmaps.GetFirst());
+#endif
 
+		delete paint_rects.GetFirst();
+
+		paint_bitmaps.RemoveAll();
+		paint_rects.RemoveAll();
+
+#ifdef __WIN32__
 		HDC	 gdi_dc = GetWindowDC(window);
 
 		bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
 
-		cDc_bitmaps.Add((HBITMAP) SelectObject(cDc_contexts.GetFirst(), bitmap));
-		cDc_rects.Add(new Rect(Point(0, 0), size));
+		paint_bitmaps.Add((HBITMAP) SelectObject(paint_contexts.GetFirst(), bitmap));
+		paint_rects.Add(new Rect(Point(0, 0), size));
 
 		ReleaseDC(window, gdi_dc);
+#else
+		Pixmap	 pixmap = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
+
+		paint_bitmaps.Add(pixmap);
+		paint_rects.Add(new Rect(Point(0, 0), size));
+
+		cairo_surface_t	*surface = cairo_xlib_surface_create(display, pixmap, visual, size.cx, size.cy);
+		cairo_t		*context = cairo_create(surface);
+	
+		cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
+
+		cairo_surfaces.Add(surface);
+		cairo_contexts.Add(context);
 #endif
 	}
 
@@ -163,9 +196,15 @@ S::Int S::GUI::SurfaceCairo::PaintRect(const Rect &pRect)
 #ifdef __WIN32__
 		HDC	 gdi_dc = GetWindowDC(window);
 
-		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, cDc_contexts.GetFirst(), pRect.left, pRect.top, SRCCOPY);
+		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, paint_contexts.GetFirst(), pRect.left, pRect.top, SRCCOPY);
 
 		ReleaseDC(window, gdi_dc);
+#else
+		GC	 gc = XCreateGC(display, window, 0, NIL);
+
+		XCopyArea(display, paint_bitmaps.GetFirst(), window, gc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, pRect.left, pRect.top);
+
+		XFreeGC(display, gc);
 #endif
 	}
 
@@ -177,28 +216,42 @@ S::Int S::GUI::SurfaceCairo::StartPaint(const Rect &iPRect)
 	if (window == NIL) return Success();
 
 	Rect	 pRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect));
+	Rect	 oRect = *(paint_rects.GetLast());
 
 #ifdef __WIN32__
-	Rect	 oRect = *(cDc_rects.GetLast());
-	HDC	 bmp_dc = CreateCompatibleDC(cDc_contexts.GetFirst());
-	HBITMAP	 bitmap = CreateCompatibleBitmap(cDc_contexts.GetFirst(), size.cx, size.cy);
+	HDC	 bmp_dc = CreateCompatibleDC(paint_contexts.GetFirst());
+	HBITMAP	 bitmap = CreateCompatibleBitmap(paint_contexts.GetFirst(), size.cx, size.cy);
 
-	cDc_bitmaps.Add((HBITMAP) SelectObject(bmp_dc, bitmap));
+	paint_bitmaps.Add((HBITMAP) SelectObject(bmp_dc, bitmap));
 
-	if (pRect.left >= oRect.left && pRect.top >= oRect.top && pRect.right <= oRect.right && pRect.bottom <= oRect.bottom)	BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, cDc_contexts.GetLast(), pRect.left, pRect.top, SRCCOPY);
-	else															BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, cDc_contexts.GetFirst(), pRect.left, pRect.top, SRCCOPY);
+	if (pRect.left >= oRect.left && pRect.top >= oRect.top && pRect.right <= oRect.right && pRect.bottom <= oRect.bottom)	BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, paint_contexts.GetLast(), pRect.left, pRect.top, SRCCOPY);
+	else															BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, paint_contexts.GetFirst(), pRect.left, pRect.top, SRCCOPY);
 
-	cDc_contexts.Add(bmp_dc);
-	cDc_rects.Add(new Rect(pRect));
+	paint_contexts.Add(bmp_dc);
+	paint_rects.Add(new Rect(pRect));
 
 	cairo_surface_t	*surface = cairo_win32_surface_create(bmp_dc);
-	cairo_t		*context = cairo_create(surface);
+#else
+	Pixmap	 pixmap = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
+	GC	 gc = XCreateGC(display, pixmap, 0, NIL);
 
+	if (pRect.left >= oRect.left && pRect.top >= oRect.top && pRect.right <= oRect.right && pRect.bottom <= oRect.bottom)	XCopyArea(display, paint_bitmaps.GetLast(), pixmap, gc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, pRect.left, pRect.top);
+	else															XCopyArea(display, paint_bitmaps.GetFirst(), pixmap, gc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, pRect.left, pRect.top);
+
+	XFreeGC(display, gc);
+
+	paint_bitmaps.Add(pixmap);
+	paint_rects.Add(new Rect(pRect));
+
+	cairo_surface_t	*surface = cairo_xlib_surface_create(display, pixmap, visual, size.cx, size.cy);
+#endif
+
+	cairo_t		*context = cairo_create(surface);
+	
 	cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
 
 	cairo_surfaces.Add(surface);
 	cairo_contexts.Add(context);
-#endif
 
 	painting++;
 
@@ -211,30 +264,41 @@ S::Int S::GUI::SurfaceCairo::EndPaint()
 
 	painting--;
 
-#ifdef __WIN32__
 	cairo_destroy(cairo_contexts.GetLast());
 	cairo_surface_destroy(cairo_surfaces.GetLast());
 
 	cairo_contexts.Remove(cairo_contexts.GetNthIndex(cairo_contexts.Length() - 1));
 	cairo_surfaces.Remove(cairo_surfaces.GetNthIndex(cairo_surfaces.Length() - 1));
 
-	Rect	 iRect = Rect::OverlapRect(*(cDc_rects.GetLast()), *(cDc_rects.GetNth(cDc_rects.Length() - 2)));
+	Rect	 iRect = Rect::OverlapRect(*(paint_rects.GetLast()), *(paint_rects.GetNth(paint_rects.Length() - 2)));
 
-	BitBlt(cDc_contexts.GetNth(cDc_contexts.Length() - 2), iRect.left, iRect.top, iRect.right - iRect.left, iRect.bottom - iRect.top, cDc_contexts.GetLast(), iRect.left, iRect.top, SRCCOPY);
+#ifdef __WIN32__
+	BitBlt(paint_contexts.GetNth(paint_contexts.Length() - 2), iRect.left, iRect.top, iRect.right - iRect.left, iRect.bottom - iRect.top, paint_contexts.GetLast(), iRect.left, iRect.top, SRCCOPY);
+#else
+	GC	 gc = XCreateGC(display, paint_bitmaps.GetNth(paint_bitmaps.Length() - 2), 0, NIL);
+
+	XCopyArea(display, paint_bitmaps.GetLast(), paint_bitmaps.GetNth(paint_bitmaps.Length() - 2), gc, iRect.left, iRect.top, iRect.right - iRect.left, iRect.bottom - iRect.top, iRect.left, iRect.top);
+
+	XFreeGC(display, gc);
+#endif
 
 	if (painting == 0) PaintRect(iRect);
 
-	HBITMAP	 bitmap = (HBITMAP) SelectObject(cDc_contexts.GetLast(), cDc_bitmaps.GetLast());
+#ifdef __WIN32__
+	HBITMAP	 bitmap = (HBITMAP) SelectObject(paint_contexts.GetLast(), paint_bitmaps.GetLast());
 
-	DeleteDC(cDc_contexts.GetLast());
+	DeleteDC(paint_contexts.GetLast());
 	::DeleteObject(bitmap);
 
-	delete cDc_rects.GetLast();
-
-	cDc_contexts.Remove(cDc_contexts.GetNthIndex(cDc_contexts.Length() - 1));
-	cDc_bitmaps.Remove(cDc_bitmaps.GetNthIndex(cDc_bitmaps.Length() - 1));
-	cDc_rects.Remove(cDc_rects.GetNthIndex(cDc_rects.Length() - 1));
+	paint_contexts.Remove(paint_contexts.GetNthIndex(paint_contexts.Length() - 1));
+#else
+	XFreePixmap(display, paint_bitmaps.GetLast());
 #endif
+
+	delete paint_rects.GetLast();
+
+	paint_bitmaps.Remove(paint_bitmaps.GetNthIndex(paint_bitmaps.Length() - 1));
+	paint_rects.Remove(paint_rects.GetNthIndex(paint_rects.Length() - 1));
 
 	return Success();
 }
@@ -315,8 +379,27 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 {
 	if (window == NIL) return Success();
 
-	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
-	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
+	Point	 pos1 = iPos1;
+	Point	 pos2 = iPos2;
+
+	/* Adjust to Windows GDI behavior for diagonal lines.
+	 */
+	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y))
+	{
+		if (pos1.x < pos2.x && pos1.y > pos2.y) { pos1.y++; pos2.y++; }
+		if (pos1.x > pos2.x && pos1.y < pos2.y) { pos1.x++; pos2.x++; }
+	} 
+
+	pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(pos1));
+	pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(pos2));
+
+	/* Adjust to X11 behaviour.
+	 */
+#ifdef __WIN32__
+	Float	 xAdjust = 0;
+#else
+	Float	 xAdjust = 0.5;
+#endif
 
 	if (!painting)
 	{
@@ -324,8 +407,8 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 
 		cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
 		cairo_set_line_width(context, 1);
-		cairo_move_to(context, pos1.x + 0.5, pos1.y);
-		cairo_line_to(context, pos2.x + 0.5, pos2.y);
+		cairo_move_to(context, pos1.x + xAdjust, pos1.y);
+		cairo_line_to(context, pos2.x + xAdjust, pos2.y);
 		cairo_stroke(context);
 
 		DestroyCairoContext();
@@ -333,8 +416,8 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 
 	cairo_set_source_rgb(cairo_contexts.GetLast(), color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
 	cairo_set_line_width(cairo_contexts.GetLast(), 1);
-	cairo_move_to(cairo_contexts.GetLast(), pos1.x + 0.5, pos1.y);
-	cairo_line_to(cairo_contexts.GetLast(), pos2.x + 0.5, pos2.y);
+	cairo_move_to(cairo_contexts.GetLast(), pos1.x + xAdjust, pos1.y);
+	cairo_line_to(cairo_contexts.GetLast(), pos2.x + xAdjust, pos2.y);
 	cairo_stroke(cairo_contexts.GetLast());
 
 	return Success();
@@ -628,18 +711,34 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &s
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
 		if (!painting) BitBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
-		BitBlt(cDc_contexts.GetLast(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
+		BitBlt(paint_contexts.GetLast(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
 	}
 	else
 	{
 		if (!painting) StretchBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
-		StretchBlt(cDc_contexts.GetLast(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+		StretchBlt(paint_contexts.GetLast(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
 	SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
 	ReleaseDC(window, gdi_dc);
+#else
+	GC	 gc = XCreateGC(display, window, 0, NIL);
+
+	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
+	{
+		if (!painting) XCopyArea(display, (Pixmap) bitmap.GetSystemBitmap(), window, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+		XCopyArea(display, (Pixmap) bitmap.GetSystemBitmap(), paint_bitmaps.GetLast(), gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+	}
+	else
+	{
+		/* ToDo: Allow copying from bitmaps of different
+		 *	 size than destination.
+		 */
+	}
+
+	XFreeGC(display, gc);
 #endif
 
 	return Success();
@@ -670,6 +769,21 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oB
 
 	DeleteDC(cdc);
 	ReleaseDC(window, gdi_dc);
+#else
+	GC	 gc = XCreateGC(display, (Pixmap) bitmap.GetSystemBitmap(), 0, NIL);
+
+	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
+	{
+		XCopyArea(display, window, (Pixmap) bitmap.GetSystemBitmap(), gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+	}
+	else
+	{
+		/* ToDo: Allow copying to bitmaps of different
+		 *	 size than original.
+		 */
+	}
+
+	XFreeGC(display, gc);
 #endif
 
 	return Success();

@@ -11,23 +11,24 @@
 #include <smooth/basic/setup.h>
 #include <smooth/graphics/color.h>
 
-S::GUI::Color S::Setup::BackgroundColor(192, 192, 192);
+/* Init color constant with default values.
+ */
+S::GUI::Color S::Setup::BackgroundColor(212, 208, 200);
 S::GUI::Color S::Setup::ClientColor(255, 255, 255);
 S::GUI::Color S::Setup::ClientTextColor(0, 0, 0);
-S::GUI::Color S::Setup::LightGrayColor;
-S::GUI::Color S::Setup::DividerLightColor;
-S::GUI::Color S::Setup::DividerDarkColor;
+S::GUI::Color S::Setup::LightGrayColor(237, 236, 232);
+S::GUI::Color S::Setup::DividerLightColor(237, 236, 232);
+S::GUI::Color S::Setup::DividerDarkColor(128, 128, 128);
 S::GUI::Color S::Setup::TextColor(0, 0, 0);
 S::GUI::Color S::Setup::GrayTextColor(128, 128, 128);
-S::GUI::Color S::Setup::ShadowColor;
-S::GUI::Color S::Setup::GradientStartColor(0, 0, 128);
-S::GUI::Color S::Setup::GradientEndColor(128, 192, 255);
+S::GUI::Color S::Setup::GradientStartColor(10, 36, 106);
+S::GUI::Color S::Setup::GradientEndColor(166, 202, 240);
 S::GUI::Color S::Setup::GradientTextColor(255, 255, 255);
-S::GUI::Color S::Setup::InactiveGradientStartColor(64, 64, 64);
+S::GUI::Color S::Setup::InactiveGradientStartColor(128, 128, 128);
 S::GUI::Color S::Setup::InactiveGradientEndColor(192, 192, 192);
-S::GUI::Color S::Setup::InactiveGradientTextColor(192, 192, 192);
-S::GUI::Color S::Setup::TooltipColor;
-S::GUI::Color S::Setup::TooltipTextColor;
+S::GUI::Color S::Setup::InactiveGradientTextColor(212, 208, 200);
+S::GUI::Color S::Setup::TooltipColor(255, 255, 225);
+S::GUI::Color S::Setup::TooltipTextColor(0, 0, 0);
 
 S::Bool S::Setup::enableUnicode = S::False;
 S::Bool S::Setup::rightToLeft = S::False;

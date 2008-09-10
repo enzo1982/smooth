@@ -31,7 +31,7 @@ listEntry;
 class Translator : public Application
 {
 	private:
-		Window			*wnd;
+		GUI::Window		*wnd;
 		Titlebar		*title;
 		Menubar			*menubar;
 		Statusbar		*statusbar;

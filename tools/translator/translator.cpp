@@ -31,7 +31,7 @@ Translator::Translator(const String &openFile)
 	Point	 pos;
 	Size	 size;
 
-	wnd		= new Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 404));
+	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 404));
 	title		= new Titlebar();
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
@@ -124,7 +124,7 @@ Translator::Translator(const String &openFile)
 	menu_file->AddEntry("Save")->onAction.Connect(&Translator::SaveFile, this);
 	menu_file->AddEntry("Save as...")->onAction.Connect(&Translator::SaveFileAs, this);
 	menu_file->AddEntry();
-	menu_file->AddEntry("Exit")->onAction.Connect(&Window::Close, wnd);
+	menu_file->AddEntry("Exit")->onAction.Connect(&GUI::Window::Close, wnd);
 
 	text_id->Deactivate();
 	edit_id->Deactivate();
@@ -200,6 +200,7 @@ Bool Translator::ExitProc()
 
 		for (int j = ++lastBs; j < filename.Length(); j++) file[j - lastBs] = filename[j];
 
+#ifdef __WIN32__
 		Int	 id = QuickMessage(String("Do you want to save changes in ").Append(file).Append("?"), "smooth Translator", MB_YESNOCANCEL, IDI_QUESTION);
 
 		switch (id)
@@ -217,6 +218,7 @@ Bool Translator::ExitProc()
 			case IDCLOSE:
 				return False;
 		}
+#endif
 	}
 	else if (filename != "" && !modified)
 	{
@@ -256,7 +258,7 @@ void Translator::NewFile()
 	list_entries->Activate();
 
 	{
-		Font	 entryFont;
+		GUI::Font	 entryFont;
 
 		entryFont.SetColor(Color(0, 0, 255));
 
@@ -436,7 +438,7 @@ void Translator::OpenFileName(const String &openFile)
 
 		if (xentry->GetName() == "entry")
 		{
-			Font	 redFont;
+			GUI::Font	 redFont;
 
 			redFont.SetColor(Color(255, 0, 0));
 
@@ -666,8 +668,8 @@ void Translator::SaveData()
 			entries.Add(entry);
 		}
 
-		Font	 redFont;
-		Font	 blackFont;
+		GUI::Font	 redFont;
+		GUI::Font	 blackFont;
 
 		redFont.SetColor(Color(255, 0, 0));
 

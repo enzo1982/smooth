@@ -147,6 +147,32 @@ S::Void *S::GUI::BitmapXLib::GetSystemBitmap() const
 	return (Void *) bitmap;
 }
 
+S::Bool S::GUI::BitmapXLib::SetPixel(const Point &iPoint, const Color &color)
+{
+	XGCValues	 gcValues;
+
+	gcValues.foreground = Color(color.GetBlue(), color.GetGreen(), color.GetRed());
+
+	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
+
+	XDrawPoint(display, bitmap, gc, iPoint.x, iPoint.y);
+
+	XFreeGC(display, gc);
+
+	return True;
+}
+
+S::GUI::Color S::GUI::BitmapXLib::GetPixel(const Point &iPoint) const
+{
+	XImage	*image = XGetImage(display, bitmap, iPoint.x, iPoint.y, 1, 1, AllPlanes, XYPixmap);
+	Color	 value = XGetPixel(image, 0, 0);
+	Color	 color = Color(value.GetBlue(), value.GetGreen(), value.GetRed());
+
+	XDestroyImage(image);
+
+	return color;
+}
+
 S::GUI::BitmapBackend &S::GUI::BitmapXLib::operator =(const BitmapBackend &newBitmap)
 {
 	SetSystemBitmap((Void *) ((BitmapXLib &) newBitmap).bitmap);

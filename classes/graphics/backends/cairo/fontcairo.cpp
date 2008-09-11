@@ -65,5 +65,5 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &text) const
 	cairo_destroy(context);
 	cairo_surface_destroy(surface);
 
-	return Size(extents.width, extents.height);
+	return Size(Int(extents.width) + 1, Int(extents.height) + 2);
 }

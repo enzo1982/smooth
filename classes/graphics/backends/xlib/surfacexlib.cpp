@@ -134,7 +134,7 @@ S::Int S::GUI::SurfaceXLib::SetPixel(const Point &point, const Color &color)
 
 	XGCValues	 gcValues;
 
-	gcValues.foreground = color;
+	gcValues.foreground = Color(color.GetBlue(), color.GetGreen(), color.GetRed());
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
@@ -152,7 +152,7 @@ S::Int S::GUI::SurfaceXLib::Line(const Point &iPos1, const Point &iPos2, const C
 
 	XGCValues	 gcValues;
 
-	gcValues.foreground = color;
+	gcValues.foreground = Color(color.GetBlue(), color.GetGreen(), color.GetRed());
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
@@ -174,7 +174,7 @@ S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, const Color &color, Int style
 	Rect		 rect = rightToLeft.TranslateRect(iRect);
 	XGCValues	 gcValues;
 
-	gcValues.foreground = color;
+	gcValues.foreground = Color(color.GetBlue(), color.GetGreen(), color.GetRed());
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
@@ -266,7 +266,7 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 
 	XGCValues	 gcValues;
 
-	gcValues.foreground = font.GetColor();
+	gcValues.foreground = Color(color.GetBlue(), color.GetGreen(), color.GetRed());
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 

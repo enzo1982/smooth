@@ -21,7 +21,7 @@ S::Binary::Binary(const Binary &)
 
 S::Bool S::Binary::GetBit(Int n, UnsignedInt bit)
 {
-	return IsFlagSet(n, Math::Pow(2l, (Signed) bit));
+	return IsFlagSet(n, (Int) Math::Pow(2l, (Signed) bit));
 }
 
 S::Int S::Binary::SetBit(Int &n, UnsignedInt bit, Bool value)
@@ -38,7 +38,7 @@ S::Int S::Binary::GetBits(Int n, UnsignedInt startBit, UnsignedInt endBit)
 
 	for (UnsignedInt i = startBit; i <= endBit; i++)
 	{
-		retVal += Math::Pow(2l, (Signed) i - (Signed) startBit) * ((n >> i) & 1);
+		retVal += (Int) Math::Pow(2l, (Signed) i - (Signed) startBit) * ((n >> i) & 1);
 	}
 
 	return retVal;

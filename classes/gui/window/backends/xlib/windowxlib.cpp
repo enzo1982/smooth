@@ -106,6 +106,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			/* Grab the keyboard focus if we don't have it already.
 			 */
+			if (wnd != NIL)
 			{
 				::Window	 wndFocus;
 				int		 revertTo;
@@ -214,11 +215,15 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 S::Int S::GUI::WindowXLib::Close()
 {
+	if (wnd == NIL) return Success();
+
 	if (drawSurface != nullSurface) delete drawSurface;
 
 	drawSurface = nullSurface;
 
 	XDestroyWindow(display, wnd);
+
+	wnd = NIL;
 
 	return Success();
 }

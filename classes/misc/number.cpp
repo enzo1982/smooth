@@ -19,7 +19,7 @@ S::Number::Number(const Int64 iNumber)
 
 S::Number::Number(const Float iNumber)
 {
-	intValue   = iNumber;
+	intValue   = (Int64) iNumber;
 	floatValue = iNumber;
 }
 
@@ -111,7 +111,7 @@ S::Number S::Number::FromIntString(const String &iString)
 
 	for (Int i = 0; i < length; i++)
 	{
-		value += (string[i] - '0') * Math::Pow(10, length - i - 1);
+		value += (string[i] - '0') * (Int64) Math::Pow(10, length - i - 1);
 	}
 
 	return value * sign;
@@ -184,7 +184,7 @@ S::String S::Number::ToIntString() const
 	if (intValue == 0) return "0";
 
 	String	 string;
-	Int	 length = Math::Log10(Math::Abs(intValue)) + 1;
+	Int	 length = (Int) Math::Log10(Math::Abs(intValue)) + 1;
 
 	for (Int i = 0; i < length; i++)
 	{
@@ -199,7 +199,7 @@ S::String S::Number::ToIntString() const
 S::String S::Number::ToFloatString() const
 {
 	Int	 digits = 10;
-	Int64	 fract	= Math::Fract(Math::Abs(floatValue)) * Math::Pow(10, digits);
+	Int64	 fract	= Math::Fract(Math::Abs(floatValue)) * (Int64) Math::Pow(10, digits);
 	Int	 lead	= digits - Math::Floor((Math::Log10(fract) + 1.000000001));
 
 	Int	 nOfNull = 0;
@@ -218,8 +218,8 @@ S::String S::Number::ToFloatString() const
 		else						break;
 	}
 
-	if	(nOfNull > 0) fract = fract / Math::Pow(10, nOfNull);
-	else if (nOfNine > 0) fract = fract / Math::Pow(10, nOfNine) + 1;
+	if	(nOfNull > 0) fract = (Int64) (fract / Math::Pow(10, nOfNull));
+	else if (nOfNine > 0) fract = (Int64) (fract / Math::Pow(10, nOfNine)) + 1;
 
 	String	 string = Number(Math::Floor(Math::Abs(floatValue))).ToIntString();;
 

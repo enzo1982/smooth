@@ -117,7 +117,7 @@ S::Int S::GUI::FontBackend::GetTextSizeY(const String &text) const
 		if (text[i] == 10) lines++;
 	}
 
-	return (lines * (GetTextSize(text).cy - 1)) + (lines - 1) * 3;
+	return (lines * (GetTextSize("abcdefghijklmnopqrstuvwxyz").cy - 1)) + (lines - 1) * 3;
 }
 
 S::GUI::Size S::GUI::FontBackend::GetTextSize(const String &text) const

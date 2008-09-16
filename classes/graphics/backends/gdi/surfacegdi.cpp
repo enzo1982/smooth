@@ -366,7 +366,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	int	 txtsize = string.Length();
 	String	 line;
 	Rect	 rect = iRect;
-	Int	 lineHeight = font.GetTextSizeY("abcdefghijklmnopqrstuvwxyz") + 3;
+	Int	 lineHeight = font.GetTextSizeY() + 3;
 
 	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
 

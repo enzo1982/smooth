@@ -570,7 +570,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	int	 txtsize = string.Length();
 	String	 line;
 	Rect	 rect = iRect;
-	Int	 lineHeight = font.GetTextSizeY("abcdefghijklmnopqrstuvwxyz") + 3;
+	Int	 lineHeight = font.GetTextSizeY() + 3;
 
 	if (rightToLeft.GetRightToLeft()) rect.right--;
 

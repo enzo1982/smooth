@@ -117,6 +117,9 @@ S::Int S::GUI::FontBackend::GetTextSizeY(const String &text) const
 		if (text[i] == 10) lines++;
 	}
 
+	/* Line height is always the same regardless of the actual text,
+	 * so we use a default text here and multiply by the numer of lines.
+	 */
 	return (lines * (GetTextSize("abcdefghijklmnopqrstuvwxyz").cy - 1)) + (lines - 1) * 3;
 }
 

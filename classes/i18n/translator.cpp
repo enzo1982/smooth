@@ -12,6 +12,7 @@
 #include <smooth/i18n/language.h>
 #include <smooth/i18n/locales/smooth_de.h>
 #include <smooth/i18n/locales/smooth_it.h>
+#include <smooth/i18n/locales/smooth_sr.h>
 #include <smooth/files/directory.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
@@ -136,12 +137,13 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 	}
 	else
 	{
-		for (Int i = 0; i < 2; i++)
+		for (Int i = 0; i < 3; i++)
 		{
 			String	 var = NIL;
 
 			if (i == 0) var = smooth_de;
 			if (i == 1) var = smooth_it;
+			if (i == 2) var = smooth_sr;
 
 			doc = new XML::Document();
 			language = new Language();
@@ -150,6 +152,7 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 
 			if (i == 0) language->magic = "smooth_de";
 			if (i == 1) language->magic = "smooth_it";
+			if (i == 2) language->magic = "smooth_sr";
 
 			LoadDoc(doc, language);
 

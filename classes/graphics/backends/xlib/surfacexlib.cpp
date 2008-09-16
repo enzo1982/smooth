@@ -260,7 +260,7 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 	int	 lines = 1;
 	int	 offset = 0;
 	int	 origoffset;
-	int	 lineHeight = font.GetTextSizeY("abcdefghijklmnopqrstuvwxyz") + 3;
+	int	 lineHeight = font.GetTextSizeY() + 3;
 	int	 txtsize = string.Length();
 	String	 line;
 

@@ -19,6 +19,7 @@ S::System::Timer::Timer()
 
 	type = classID;
 
+	interval = 0;
 	status = TIMER_STOPPED;
 
 	onInterval.SetParentObject(this);
@@ -31,10 +32,11 @@ S::System::Timer::~Timer()
 	delete backend;
 }
 
-S::Int S::System::Timer::Start(Int interval)
+S::Int S::System::Timer::Start(Int iInterval)
 {
 	if (status == TIMER_RUNNING) return Error();
 
+	interval = iInterval;
 	status = TIMER_RUNNING;
 
 	return backend->Start(interval);
@@ -49,7 +51,7 @@ S::Int S::System::Timer::Stop()
 	return backend->Stop();
 }
 
-S::Int S::System::Timer::Restart(Int interval)
+S::Int S::System::Timer::Restart(Int iInterval)
 {
 	if (status != TIMER_RUNNING) return Error();
 
@@ -61,6 +63,11 @@ S::Int S::System::Timer::Restart(Int interval)
 S::Int S::System::Timer::GetID() const
 {
 	return backend->GetID();
+}
+
+S::Int S::System::Timer::GetInterval() const
+{
+	return interval;
 }
 
 S::Int S::System::Timer::GetStatus() const

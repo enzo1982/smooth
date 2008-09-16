@@ -247,12 +247,21 @@ S::String S::Number::ToHexString(Int length) const
 
 	for (Int i = 0; i < 16; i++)
 	{
-		if	((intValue >> (4 * (15 - i))) % 16 >= 10) string[string.Length()] = 'a' + (intValue >> (4 * (15 - i))) % 16 - 10;
-		else if ((intValue >> (4 * (15 - i))) % 16 >=  1) string[string.Length()] = '0' + (intValue >> (4 * (15 - i))) % 16;
-		else if (string.Length()		   >   0) string[string.Length()] = '0';
+		if	(((intValue >> (4 * (15 - i))) & 15) >= 10) string[string.Length()] = 'a' + ((intValue >> (4 * (15 - i))) & 15) - 10;
+		else if (((intValue >> (4 * (15 - i))) & 15) >=  1) string[string.Length()] = '0' + ((intValue >> (4 * (15 - i))) & 15);
+		else if (string.Length()		     >   0) string[string.Length()] = '0';
 	}
 
-	for (Int i = string.Length(); i < Math::Max(1, length); i++) string = String("0").Append(String());
+	if (length != -1)
+	{
+		/* Add leading zeros if necessary.
+		 */
+		if (string.Length() < length) string = String().FillN('0', length - string.Length()).Append(string);
+
+		/* Cut string if too long.
+		 */
+		if (string.Length() > length) string = string.Tail(length);
+	}
 
 	return string;
 }

@@ -102,7 +102,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 				{
-					line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY("*") + 3);
+					line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY() + 3);
 
 					Int	 lineCount = 0;
 
@@ -198,7 +198,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 				{
-					line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY("*") + 3);
+					line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY() + 3);
 
 					if (window->GetMousePosition().y - frame.top < 0) line--;
 
@@ -277,7 +277,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::Cursor::DrawWidget()
 {
-	Int	 nMaxScrollPos = Math::Max(0, Math::Ceil((Float) (font.GetTextSizeY(text) - GetHeight()) / (font.GetTextSizeY("*") + 3)));
+	Int	 nMaxScrollPos = Math::Max(0, Math::Ceil((Float) (font.GetTextSizeY(text) - GetHeight()) / (font.GetTextSizeY() + 3)));
 
 	if (nMaxScrollPos != maxScrollPos)
 	{
@@ -325,10 +325,10 @@ S::Int S::GUI::Cursor::DrawWidget()
 		{
 			line[i - lineStart] = 0;
 
-			if ((lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3) >= frame.bottom - frame.top && !fillLineIndices) break;
+			if ((lineNumber - scrollPos) * (font.GetTextSizeY() + 3) >= frame.bottom - frame.top && !fillLineIndices) break;
 
-			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
-			else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)) + Size(visibleOffset, -2), font);
+			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)) + Size(visibleOffset, -2), font);
+			else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)) + Size(visibleOffset, -2), font);
 
 			if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
 			{
@@ -351,7 +351,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 					for (Int j = lineMarkStart; j < lineMarkEnd; j++) mText[j - lineMarkStart] = wText[j];
 
-					Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText.Head(lineMarkStart)) - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY("*") + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY("*") + 3));
+					Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText.Head(lineMarkStart)) - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY() + 3));
 
 					surface->Box(markRect, bColor, Rect::Filled);
 
@@ -410,11 +410,11 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	point.x += font.GetTextSizeX(wText.Head(wPromptPos)) - visibleOffset;
 	else								point.x += font.GetTextSizeX(String().FillN('*', wPromptPos)) - visibleOffset;
 
-	point.y += (font.GetTextSizeY("*") + 3) * (line - scrollPos);
+	point.y += (font.GetTextSizeY() + 3) * (line - scrollPos);
 
-	if (!(line - scrollPos < 0 || (font.GetTextSizeY("*") + 3) * (line - scrollPos + 1) > GetHeight()))
+	if (!(line - scrollPos < 0 || (font.GetTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()))
 	{
-		surface->Box(Rect(point, Size(1, font.GetTextSizeY("*") + 3)), 0, Rect::Inverted);
+		surface->Box(Rect(point, Size(1, font.GetTextSizeY() + 3)), 0, Rect::Inverted);
 
 		promptVisible = visible;
 	}
@@ -830,12 +830,12 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	if (visibleOffset < 0) { p1.x -= visibleOffset; visibleOffset = 0; }
 
-	p1.y += (font.GetTextSizeY("*") + 3) * (line - scrollPos);
+	p1.y += (font.GetTextSizeY() + 3) * (line - scrollPos);
 
-	if (line - scrollPos < 0 || (font.GetTextSizeY("*") + 3) * (line - scrollPos + 1) > GetHeight())
+	if (line - scrollPos < 0 || (font.GetTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight())
 	{
-		while (line - scrollPos < 0)						    scrollPos--;
-		while ((font.GetTextSizeY("*") + 3) * (line - scrollPos + 1) > GetHeight()) scrollPos++;
+		while (line - scrollPos < 0)						 scrollPos--;
+		while ((font.GetTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()) scrollPos++;
 
 		onScroll.Emit(scrollPos, maxScrollPos);
 

@@ -34,10 +34,20 @@ S::Int S::GUI::Image::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = container->GetDrawSurface();
-				Rect	 bmpRect = Rect(GetRealPosition(), GetSize());
+				/* Scale image if necessary.
+				 */
+				Size	 bmpSize = bitmap.GetSize();
+				Size	 newSize = bmpSize;
 
-				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), GetSize()), bmpRect);
+				if	(float(bmpSize.cx) / GetWidth()  >= float(bmpSize.cy) / GetHeight() && bmpSize.cx > GetWidth())	 newSize = newSize * (float(GetWidth()) / bmpSize.cx);
+				else if (float(bmpSize.cy) / GetHeight() >= float(bmpSize.cx) / GetWidth()  && bmpSize.cy > GetHeight()) newSize = newSize * (float(GetHeight()) / bmpSize.cy);
+
+				/* Draw image centered.
+				 */
+				Surface	*surface = container->GetDrawSurface();
+				Rect	 bmpRect = Rect(GetRealPosition() + Point(GetWidth() - newSize.cx, GetHeight() - newSize.cy) / 2, newSize);
+
+				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 			}
 
 			break;

@@ -133,7 +133,13 @@ S::String S::String::ToUpper() const
 		else if	((*this)[i] == 0x1f53)							retVal[i] =		 0x1f5b;	// Single character
 		else if	((*this)[i] == 0x1f55)							retVal[i] =		 0x1f5d;	// Single character
 		else if	((*this)[i] == 0x1f57)							retVal[i] =		 0x1f5f;	// Single character
-		else if	((*this)[i] >= 0x1f60 && (*this)[i] <= 0x1f67)				retVal[i] = (*this)[i] + 0x8;	// Alphabet
+
+		/* Work around stupid MSVC's limit on alternatives...
+		 * ----
+		 * This is not generated automatically, but
+		 * needs to be inserted manually here.
+		 */
+		if	((*this)[i] >= 0x1f60 && (*this)[i] <= 0x1f67)				retVal[i] = (*this)[i] + 0x8;	// Alphabet
 		else if	((*this)[i] >= 0x1f70 && (*this)[i] <= 0x1f71)				retVal[i] = (*this)[i] + 0x4a;	// Alphabet
 		else if	((*this)[i] >= 0x1f72 && (*this)[i] <= 0x1f75)				retVal[i] = (*this)[i] + 0x56;	// Alphabet
 		else if	((*this)[i] >= 0x1f76 && (*this)[i] <= 0x1f77)				retVal[i] = (*this)[i] + 0x64;	// Alphabet
@@ -308,7 +314,13 @@ S::String S::String::ToLower() const
 		else if	((*this)[i] == 0x2183)							retVal[i] =		 0x2184;	// Single character
 		else if	((*this)[i] >= 0x24b6 && (*this)[i] <= 0x24cf)				retVal[i] = (*this)[i] + 0x1a;	// Alphabet
 		else if	((*this)[i] >= 0x2c00 && (*this)[i] <= 0x2c2e)				retVal[i] = (*this)[i] + 0x30;	// Alphabet
-		else if	((*this)[i] == 0x2c60)							retVal[i] =		 0x2c61;	// Single character
+
+		/* Work around stupid MSVC's limit on alternatives...
+		 * ----
+		 * This is not generated automatically, but
+		 * needs to be inserted manually here.
+		 */
+		if	((*this)[i] == 0x2c60)							retVal[i] =		 0x2c61;	// Single character
 		else if	((*this)[i] == 0x2c62)							retVal[i] =		 0x26b;	// Single character
 		else if	((*this)[i] == 0x2c63)							retVal[i] =		 0x1d7d;	// Single character
 		else if	((*this)[i] == 0x2c64)							retVal[i] =		 0x27d;	// Single character
@@ -461,7 +473,13 @@ S::String S::String::ToTitle() const
 		else if	((*this)[i] == 0x1f53)							retVal[i] =		 0x1f5b;	// Single character
 		else if	((*this)[i] == 0x1f55)							retVal[i] =		 0x1f5d;	// Single character
 		else if	((*this)[i] == 0x1f57)							retVal[i] =		 0x1f5f;	// Single character
-		else if	((*this)[i] >= 0x1f60 && (*this)[i] <= 0x1f67)				retVal[i] = (*this)[i] + 0x8;	// Alphabet
+
+		/* Work around stupid MSVC's limit on alternatives...
+		 * ----
+		 * This is not generated automatically, but
+		 * needs to be inserted manually here.
+		 */
+		if	((*this)[i] >= 0x1f60 && (*this)[i] <= 0x1f67)				retVal[i] = (*this)[i] + 0x8;	// Alphabet
 		else if	((*this)[i] >= 0x1f70 && (*this)[i] <= 0x1f71)				retVal[i] = (*this)[i] + 0x4a;	// Alphabet
 		else if	((*this)[i] >= 0x1f72 && (*this)[i] <= 0x1f75)				retVal[i] = (*this)[i] + 0x56;	// Alphabet
 		else if	((*this)[i] >= 0x1f76 && (*this)[i] <= 0x1f77)				retVal[i] = (*this)[i] + 0x64;	// Alphabet

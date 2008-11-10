@@ -190,7 +190,9 @@ S::Bool S::String::IsANSI(const String &string)
 
 S::Bool S::String::IsUnicode(const String &string)
 {
-	for (Int i = 0; i < string.Length(); i++)
+	Int	 len = string.Length();
+
+	for (Int i = 0; i < len; i++)
 	{
 		if (string[i] > 255) return True;
 	}
@@ -538,14 +540,7 @@ S::Int S::String::Length() const
 
 	mutex.Lock();
 
-	Int	 size = 0;
-
-	for (Int i = 0; True; i++)
-	{
-		if (wString[i] == 0) break;
-
-		size++;
-	}
+	Int	 size = wcslen(wString);
 
 	mutex.Release();
 
@@ -600,24 +595,19 @@ S::Int S::String::Find(const wchar_t *str) const
 
 S::Int S::String::Find(const String &str) const
 {
-	String	 bStr(str);
+	Int	 len1 = Length();
+	Int	 len2 = str.Length();
 
 	mutex.Lock();
 
-	for (Int i = 0; i <= Length() - bStr.Length(); i++)
+	for (Int i = 0; i <= len1 - len2; i++)
 	{
-		Bool	 foundString = True;
-
-		for (Int j = 0; j < bStr.Length(); j++)
+		if (wcsncmp(wString + i, str.wString, len2) == 0)
 		{
-			if (wString[i + j] != bStr[j])
-			{
-				foundString = False;
-				break;
-			}
-		}
+			mutex.Release();
 
-		if (foundString) { mutex.Release(); return i; }
+			return i;
+		}
 	}
 
 	mutex.Release();
@@ -659,33 +649,28 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 {
 	if (str1 == NIL) return *this;
 
+	Int	 len1 = Length();
+	Int	 len2 = str1.Length();
+	Int	 len3 = str2.Length();
+
 	mutex.Lock();
 
-	for (Int i = 0; i <= Length() - str1.Length(); i++)
+	for (Int i = 0; i <= len1 - len2; i++)
 	{
-		Bool	 foundString = True;
-
-		for (Int j = 0; j < str1.Length(); j++)
+		if (wcsncmp(wString + i, str1.wString, len2) == 0)
 		{
-			if (wString[i + j] != str1[j])
+			if (len2 != len3)
 			{
-				foundString = False;
-				break;
-			}
-		}
+				if (len3 > len2) wString.Resize(len1 + 1 + (len3 - len2));
 
-		if (foundString)
-		{
-			if (str1.Length() != str2.Length())
-			{
-				if (str2.Length() > str1.Length()) wString.Resize(Length() + 1 + (str2.Length() - str1.Length()));
+				wmemmove(wString + i + len3, wString + i + len2, len1 - i - len2 + 1);
 
-				wmemmove(wString + i + str2.Length(), wString + i + str1.Length(), Length() - i - str1.Length() + 1);
+				len1 += (len3 - len2);
 			}
 
-			wcsncpy(wString + i, str2.wString, str2.Length());
+			wcsncpy(wString + i, str2.wString, len3);
 
-			i += str2.Length() - 1;
+			i += len3 - 1;
 		}
 	}
 
@@ -1090,26 +1075,26 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	{
 		Int	 codePage = CP_ACP;
 
-		if (strcmp(inEncoding, "UTF-8") == 0)			codePage = CP_UTF8;
-		else if (strcmp(inEncoding, "UTF-7") == 0)		codePage = CP_UTF7;
-		else if (strcmp(inEncoding, "ISO-8859-1") == 0)		codePage = 28591;
-		else if (strcmp(inEncoding, "ISO-8859-2") == 0)		codePage = 28592;
-		else if (strcmp(inEncoding, "ISO-8859-3") == 0)		codePage = 28593;
-		else if (strcmp(inEncoding, "ISO-8859-4") == 0)		codePage = 28594;
-		else if (strcmp(inEncoding, "ISO-8859-5") == 0)		codePage = 28595;
-		else if (strcmp(inEncoding, "ISO-8859-6") == 0)		codePage = 28596;
-		else if (strcmp(inEncoding, "ISO-8859-7") == 0)		codePage = 28597;
-		else if (strcmp(inEncoding, "ISO-8859-8") == 0)		codePage = 28598;
-		else if (strcmp(inEncoding, "ISO-8859-9") == 0)		codePage = 28599;
-		else if (strcmp(inEncoding, "ISO-8859-15") == 0)	codePage = 28605;
-		else if (strcmp(inEncoding, "KOI8-R") == 0)		codePage = 20866;
-		else if (strcmp(inEncoding, "KOI8-U") == 0)		codePage = 21866;
-		else if (strcmp(inEncoding, "SHIFT-JIS") == 0)		codePage = 932;
-		else if (strcmp(inEncoding, "GBK") == 0)		codePage = 936;
-		else if (strcmp(inEncoding, "BIG-5") == 0)		codePage = 950;
-		else if (strcmp(inEncoding, "ISO-2022-JP") == 0)	codePage = 50220;
-		else if (strcmp(inEncoding, "ISO-2022-KR") == 0)	codePage = 50225;
-		else if (strcmp(inEncoding, "ISO-2022-CN") == 0)	codePage = 50227;
+		if	(strcmp(inEncoding, "UTF-8")	   == 0) codePage = CP_UTF8;
+		else if (strcmp(inEncoding, "UTF-7")	   == 0) codePage = CP_UTF7;
+		else if (strcmp(inEncoding, "ISO-8859-1")  == 0) codePage = 28591;
+		else if (strcmp(inEncoding, "ISO-8859-2")  == 0) codePage = 28592;
+		else if (strcmp(inEncoding, "ISO-8859-3")  == 0) codePage = 28593;
+		else if (strcmp(inEncoding, "ISO-8859-4")  == 0) codePage = 28594;
+		else if (strcmp(inEncoding, "ISO-8859-5")  == 0) codePage = 28595;
+		else if (strcmp(inEncoding, "ISO-8859-6")  == 0) codePage = 28596;
+		else if (strcmp(inEncoding, "ISO-8859-7")  == 0) codePage = 28597;
+		else if (strcmp(inEncoding, "ISO-8859-8")  == 0) codePage = 28598;
+		else if (strcmp(inEncoding, "ISO-8859-9")  == 0) codePage = 28599;
+		else if (strcmp(inEncoding, "ISO-8859-15") == 0) codePage = 28605;
+		else if (strcmp(inEncoding, "KOI8-R")	   == 0) codePage = 20866;
+		else if (strcmp(inEncoding, "KOI8-U")	   == 0) codePage = 21866;
+		else if (strcmp(inEncoding, "SHIFT-JIS")   == 0) codePage = 932;
+		else if (strcmp(inEncoding, "GBK")	   == 0) codePage = 936;
+		else if (strcmp(inEncoding, "BIG-5")	   == 0) codePage = 950;
+		else if (strcmp(inEncoding, "ISO-2022-JP") == 0) codePage = 50220;
+		else if (strcmp(inEncoding, "ISO-2022-KR") == 0) codePage = 50225;
+		else if (strcmp(inEncoding, "ISO-2022-CN") == 0) codePage = 50227;
 
 		if (inEncoding[0] == 'C' && inEncoding[1] == 'P')
 		{
@@ -1130,26 +1115,26 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	{
 		Int	 codePage = CP_ACP;
 
-		if (strcmp(outEncoding, "UTF-8") == 0)			codePage = CP_UTF8;
-		else if (strcmp(outEncoding, "UTF-7") == 0)		codePage = CP_UTF7;
-		else if (strcmp(outEncoding, "ISO-8859-1") == 0)	codePage = 28591;
-		else if (strcmp(outEncoding, "ISO-8859-2") == 0)	codePage = 28592;
-		else if (strcmp(outEncoding, "ISO-8859-3") == 0)	codePage = 28593;
-		else if (strcmp(outEncoding, "ISO-8859-4") == 0)	codePage = 28594;
-		else if (strcmp(outEncoding, "ISO-8859-5") == 0)	codePage = 28595;
-		else if (strcmp(outEncoding, "ISO-8859-6") == 0)	codePage = 28596;
-		else if (strcmp(outEncoding, "ISO-8859-7") == 0)	codePage = 28597;
-		else if (strcmp(outEncoding, "ISO-8859-8") == 0)	codePage = 28598;
-		else if (strcmp(outEncoding, "ISO-8859-9") == 0)	codePage = 28599;
-		else if (strcmp(outEncoding, "ISO-8859-15") == 0)	codePage = 28605;
-		else if (strcmp(outEncoding, "KOI8-R") == 0)		codePage = 20866;
-		else if (strcmp(outEncoding, "KOI8-U") == 0)		codePage = 21866;
-		else if (strcmp(outEncoding, "SHIFT-JIS") == 0)		codePage = 932;
-		else if (strcmp(outEncoding, "GBK") == 0)		codePage = 936;
-		else if (strcmp(outEncoding, "BIG-5") == 0)		codePage = 950;
-		else if (strcmp(outEncoding, "ISO-2022-JP") == 0)	codePage = 50220;
-		else if (strcmp(outEncoding, "ISO-2022-KR") == 0)	codePage = 50225;
-		else if (strcmp(outEncoding, "ISO-2022-CN") == 0)	codePage = 50227;
+		if	(strcmp(outEncoding, "UTF-8")	    == 0) codePage = CP_UTF8;
+		else if (strcmp(outEncoding, "UTF-7")	    == 0) codePage = CP_UTF7;
+		else if (strcmp(outEncoding, "ISO-8859-1")  == 0) codePage = 28591;
+		else if (strcmp(outEncoding, "ISO-8859-2")  == 0) codePage = 28592;
+		else if (strcmp(outEncoding, "ISO-8859-3")  == 0) codePage = 28593;
+		else if (strcmp(outEncoding, "ISO-8859-4")  == 0) codePage = 28594;
+		else if (strcmp(outEncoding, "ISO-8859-5")  == 0) codePage = 28595;
+		else if (strcmp(outEncoding, "ISO-8859-6")  == 0) codePage = 28596;
+		else if (strcmp(outEncoding, "ISO-8859-7")  == 0) codePage = 28597;
+		else if (strcmp(outEncoding, "ISO-8859-8")  == 0) codePage = 28598;
+		else if (strcmp(outEncoding, "ISO-8859-9")  == 0) codePage = 28599;
+		else if (strcmp(outEncoding, "ISO-8859-15") == 0) codePage = 28605;
+		else if (strcmp(outEncoding, "KOI8-R")	    == 0) codePage = 20866;
+		else if (strcmp(outEncoding, "KOI8-U")	    == 0) codePage = 21866;
+		else if (strcmp(outEncoding, "SHIFT-JIS")   == 0) codePage = 932;
+		else if (strcmp(outEncoding, "GBK")	    == 0) codePage = 936;
+		else if (strcmp(outEncoding, "BIG-5")	    == 0) codePage = 950;
+		else if (strcmp(outEncoding, "ISO-2022-JP") == 0) codePage = 50220;
+		else if (strcmp(outEncoding, "ISO-2022-KR") == 0) codePage = 50225;
+		else if (strcmp(outEncoding, "ISO-2022-CN") == 0) codePage = 50227;
 
 		if (outEncoding[0] == 'C' && outEncoding[1] == 'P')
 		{

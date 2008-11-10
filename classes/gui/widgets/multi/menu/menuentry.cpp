@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/multi/menu/menuentry.h>
+#include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/widgets/special/shortcut.h>
 #include <smooth/gui/window/window.h>
 
@@ -28,11 +29,25 @@ S::GUI::MenuEntry::MenuEntry(const String &iText, const Bitmap &iBitmap, PopupMe
 	SetBitmap(iBitmap);
 
 	shortcut	= NIL;
+
+	if (popup != NIL)
+	{
+		popup->onEnqueueForDeletion.Connect(&MenuEntry::InternalOnDeletePopup, this);
+	}
 }
 
 S::GUI::MenuEntry::~MenuEntry()
 {
 	if (shortcut != NIL) DeleteObject(shortcut);
+
+	if (popup != NIL) popup->onEnqueueForDeletion.Disconnect(&MenuEntry::InternalOnDeletePopup, this);
+}
+
+S::Void S::GUI::MenuEntry::InternalOnDeletePopup()
+{
+	popup->onEnqueueForDeletion.Disconnect(&MenuEntry::InternalOnDeletePopup, this);
+
+	popup = NIL;
 }
 
 S::Int S::GUI::MenuEntry::SetShortcut(Int scFlags, Int scKey, Window *window)

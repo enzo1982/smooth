@@ -48,6 +48,8 @@ namespace smooth
 				virtual			~ComboBox();
 
 				virtual Int		 Paint(Int);
+
+				virtual String		 ToString() const		{ return "a ComboBox"; }
 			slots:
 				Void			 OpenListBox();
 				Void			 CloseListBox();

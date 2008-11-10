@@ -176,7 +176,12 @@ S::Int S::GUI::ListEntry::SetMark(Bool nMarked)
 {
 	marked = nMarked;
 
-	Paint(SP_PAINT);
+	if (IsRegistered())
+	{
+		Paint(SP_PAINT);
+
+		((List *) container)->onMarkEntry.Emit(this);
+	}
 
 	return Success();
 }
@@ -228,8 +233,6 @@ S::Void S::GUI::ListEntry::InitDrag()
 S::Void S::GUI::ListEntry::OnToggleMark()
 {
 	SetMark(!marked);
-
-	((List *) container)->onMarkEntry.Emit(this);
 }
 
 S::Void S::GUI::ListEntry::OnSelectEntry()

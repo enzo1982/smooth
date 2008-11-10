@@ -165,9 +165,19 @@ $(OBJECTDIR)/imageloader.o: $(GRAPHICSCLASSESDIR)/imageloader/imageloader.cpp $(
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/imageloader/imageloader.cpp -o $(OBJECTDIR)/imageloader.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/imageloader_jpeg.o: $(GRAPHICSCLASSESDIR)/imageloader/jpeg.cpp $(SMOOTHINCLUDEDIR)/graphics/imageloader/jpeg.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/imageloader/jpeg.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/imageloader/jpeg.cpp -o $(OBJECTDIR)/imageloader_jpeg.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/imageloader_pci.o: $(GRAPHICSCLASSESDIR)/imageloader/pci.cpp $(SMOOTHINCLUDEDIR)/graphics/imageloader/pci.h
 	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/imageloader/pci.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/imageloader/pci.cpp -o $(OBJECTDIR)/imageloader_pci.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/imageloader_png.o: $(GRAPHICSCLASSESDIR)/imageloader/png.cpp $(SMOOTHINCLUDEDIR)/graphics/imageloader/png.h
+	$(ECHO) -n Compiling $(GRAPHICSCLASSESDIR)/imageloader/png.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GRAPHICSCLASSESDIR)/imageloader/png.cpp -o $(OBJECTDIR)/imageloader_png.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/modifier_fontsize.o: $(GRAPHICSCLASSESDIR)/modifiers/fontsize.cpp $(SMOOTHINCLUDEDIR)/graphics/modifiers/fontsize.h
@@ -363,6 +373,16 @@ $(OBJECTDIR)/hotspot.o: $(GUICLASSESDIR)/widgets/hotspot/hotspot.cpp $(SMOOTHINC
 $(OBJECTDIR)/simplebutton.o: $(GUICLASSESDIR)/widgets/hotspot/simplebutton.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/hotspot/simplebutton.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/hotspot/simplebutton.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/hotspot/simplebutton.cpp -o $(OBJECTDIR)/simplebutton.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/imagebox.o: $(GUICLASSESDIR)/widgets/multi/image/imagebox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/image/imagebox.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/image/imagebox.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/image/imagebox.cpp -o $(OBJECTDIR)/imagebox.o
+	$(ECHO) done.
+
+$(OBJECTDIR)/imageentry.o: $(GUICLASSESDIR)/widgets/multi/image/imageentry.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/image/imageentry.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/image/imageentry.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/image/imageentry.cpp -o $(OBJECTDIR)/imageentry.o
 	$(ECHO) done.
 
 $(OBJECTDIR)/combobox.o: $(GUICLASSESDIR)/widgets/multi/list/combobox.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/list/combobox.h
@@ -675,6 +695,11 @@ $(OBJECTDIR)/timersdl.o: $(SYSTEMCLASSESDIR)/backends/sdl/timersdl.cpp $(SMOOTHI
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/sdl/timersdl.cpp -o $(OBJECTDIR)/timersdl.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/timerthreads.o: $(SYSTEMCLASSESDIR)/backends/threads/timerthreads.cpp $(SMOOTHINCLUDEDIR)/system/backends/threads/timerthreads.h
+	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/backends/threads/timerthreads.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/threads/timerthreads.cpp -o $(OBJECTDIR)/timerthreads.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/eventwin32.o: $(SYSTEMCLASSESDIR)/backends/win32/eventwin32.cpp $(SMOOTHINCLUDEDIR)/system/backends/win32/eventwin32.h
 	$(ECHO) -n Compiling $(SYSTEMCLASSESDIR)/backends/win32/eventwin32.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(SYSTEMCLASSESDIR)/backends/win32/eventwin32.cpp -o $(OBJECTDIR)/eventwin32.o
@@ -923,201 +948,6 @@ $(OBJECTDIR)/translator_translator.o: $(TRANSLATORDIR)/translator.cpp $(DLLNAME)
 $(OBJECTDIR)/translator_resources.o: $(TRANSLATORDIR)/translator.rc
 	$(ECHO) -n Compiling $(TRANSLATORDIR)/translator.rc...
 	$(RESCOMP) $(RESCOMP_OPTS) -D__SMOOTH_DLL__ $(TRANSLATORDIR)/translator.rc -o $(OBJECTDIR)/translator_resources.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fribidi2_fribidi.o: $(FRIBIDI2DIR)/fribidi.c
-	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi.c -o $(OBJECTDIR)/fribidi2_fribidi.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fribidi2_fribidi-bidi.o: $(FRIBIDI2DIR)/fribidi-bidi.c
-	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-bidi.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-bidi.c -o $(OBJECTDIR)/fribidi2_fribidi-bidi.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fribidi2_fribidi-bidi-types.o: $(FRIBIDI2DIR)/fribidi-bidi-types.c
-	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-bidi-types.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-bidi-types.c -o $(OBJECTDIR)/fribidi2_fribidi-bidi-types.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fribidi2_fribidi-env.o: $(FRIBIDI2DIR)/fribidi-env.c
-	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-env.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-env.c -o $(OBJECTDIR)/fribidi2_fribidi-env.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fribidi2_fribidi-joining.o: $(FRIBIDI2DIR)/fribidi-joining.c
-	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-joining.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-joining.c -o $(OBJECTDIR)/fribidi2_fribidi-joining.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fribidi2_fribidi-joining-types.o: $(FRIBIDI2DIR)/fribidi-joining-types.c
-	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-joining-types.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-joining-types.c -o $(OBJECTDIR)/fribidi2_fribidi-joining-types.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fribidi2_fribidi-mem.o: $(FRIBIDI2DIR)/fribidi-mem.c
-	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-mem.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-mem.c -o $(OBJECTDIR)/fribidi2_fribidi-mem.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fribidi2_fribidi-mirroring.o: $(FRIBIDI2DIR)/fribidi-mirroring.c
-	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-mirroring.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-mirroring.c -o $(OBJECTDIR)/fribidi2_fribidi-mirroring.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/fribidi2_fribidi-run.o: $(FRIBIDI2DIR)/fribidi-run.c
-	$(ECHO) -n Compiling $(FRIBIDI2DIR)/fribidi-run.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -I$(FRIBIDI2DIR) $(FRIBIDI2DIR)/fribidi-run.c -o $(OBJECTDIR)/fribidi2_fribidi-run.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libbz2_blocksort.o: $(LIBBZ2DIR)/blocksort.c
-	$(ECHO) -n Compiling $(LIBBZ2DIR)/blocksort.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/blocksort.c -o $(OBJECTDIR)/libbz2_blocksort.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libbz2_bzlib.o: $(LIBBZ2DIR)/bzlib.c
-	$(ECHO) -n Compiling $(LIBBZ2DIR)/bzlib.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/bzlib.c -o $(OBJECTDIR)/libbz2_bzlib.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libbz2_compress.o: $(LIBBZ2DIR)/compress.c
-	$(ECHO) -n Compiling $(LIBBZ2DIR)/compress.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/compress.c -o $(OBJECTDIR)/libbz2_compress.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libbz2_crctable.o: $(LIBBZ2DIR)/crctable.c
-	$(ECHO) -n Compiling $(LIBBZ2DIR)/crctable.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/crctable.c -o $(OBJECTDIR)/libbz2_crctable.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libbz2_decompress.o: $(LIBBZ2DIR)/decompress.c
-	$(ECHO) -n Compiling $(LIBBZ2DIR)/decompress.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/decompress.c -o $(OBJECTDIR)/libbz2_decompress.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libbz2_huffman.o: $(LIBBZ2DIR)/huffman.c
-	$(ECHO) -n Compiling $(LIBBZ2DIR)/huffman.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/huffman.c -o $(OBJECTDIR)/libbz2_huffman.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libbz2_randtable.o: $(LIBBZ2DIR)/randtable.c
-	$(ECHO) -n Compiling $(LIBBZ2DIR)/randtable.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBBZ2DIR)/randtable.c -o $(OBJECTDIR)/libbz2_randtable.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_chvalid.o: $(LIBXMLDIR)/chvalid.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/chvalid.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/chvalid.c -o $(OBJECTDIR)/libxml_chvalid.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_dict.o: $(LIBXMLDIR)/dict.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/dict.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/dict.c -o $(OBJECTDIR)/libxml_dict.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_encoding.o: $(LIBXMLDIR)/encoding.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/encoding.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/encoding.c -o $(OBJECTDIR)/libxml_encoding.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_entities.o: $(LIBXMLDIR)/entities.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/entities.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/entities.c -o $(OBJECTDIR)/libxml_entities.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_error.o: $(LIBXMLDIR)/error.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/error.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/error.c -o $(OBJECTDIR)/libxml_error.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_globals.o: $(LIBXMLDIR)/globals.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/globals.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/globals.c -o $(OBJECTDIR)/libxml_globals.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_hash.o: $(LIBXMLDIR)/hash.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/hash.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/hash.c -o $(OBJECTDIR)/libxml_hash.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_list.o: $(LIBXMLDIR)/list.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/list.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/list.c -o $(OBJECTDIR)/libxml_list.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_parser.o: $(LIBXMLDIR)/parser.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/parser.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/parser.c -o $(OBJECTDIR)/libxml_parser.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_parserInternals.o: $(LIBXMLDIR)/parserInternals.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/parserInternals.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/parserInternals.c -o $(OBJECTDIR)/libxml_parserInternals.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_SAX2.o: $(LIBXMLDIR)/SAX2.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/SAX2.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/SAX2.c -o $(OBJECTDIR)/libxml_SAX2.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_threads.o: $(LIBXMLDIR)/threads.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/threads.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/threads.c -o $(OBJECTDIR)/libxml_threads.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_tree.o: $(LIBXMLDIR)/tree.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/tree.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -w $(LIBXMLDIR)/tree.c -o $(OBJECTDIR)/libxml_tree.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_uri.o: $(LIBXMLDIR)/uri.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/uri.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/uri.c -o $(OBJECTDIR)/libxml_uri.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_valid.o: $(LIBXMLDIR)/valid.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/valid.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/valid.c -o $(OBJECTDIR)/libxml_valid.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_xmlIO.o: $(LIBXMLDIR)/xmlIO.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlIO.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -w $(LIBXMLDIR)/xmlIO.c -o $(OBJECTDIR)/libxml_xmlIO.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_xmlmemory.o: $(LIBXMLDIR)/xmlmemory.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlmemory.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlmemory.c -o $(OBJECTDIR)/libxml_xmlmemory.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_xmlreader.o: $(LIBXMLDIR)/xmlreader.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlreader.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlreader.c -o $(OBJECTDIR)/libxml_xmlreader.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_xmlsave.o: $(LIBXMLDIR)/xmlsave.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlsave.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlsave.c -o $(OBJECTDIR)/libxml_xmlsave.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_xmlstring.o: $(LIBXMLDIR)/xmlstring.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlstring.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlstring.c -o $(OBJECTDIR)/libxml_xmlstring.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libxml_xmlwriter.o: $(LIBXMLDIR)/xmlwriter.c
-	$(ECHO) -n Compiling $(LIBXMLDIR)/xmlwriter.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) $(LIBXMLDIR)/xmlwriter.c -o $(OBJECTDIR)/libxml_xmlwriter.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libiconv_iconv.o: $(LIBICONVDIR)/iconv.c $(LIBICONVDIR)/config.h
-	$(ECHO) -n Compiling $(LIBICONVDIR)/iconv.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -D_ICONVDLL_ $(LIBICONVDIR)/iconv.c -o $(OBJECTDIR)/libiconv_iconv.o
-	$(ECHO) done.
-
-$(OBJECTDIR)/libiconv_localcharset.o: $(LIBICONVDIR)/localcharset.c $(LIBICONVDIR)/config.h
-	$(ECHO) -n Compiling $(LIBICONVDIR)/localcharset.c...
-	$(C_COMPILER) $(C_COMPILER_OPTS) -D_ICONVDLL_ $(LIBICONVDIR)/localcharset.c -o $(OBJECTDIR)/libiconv_localcharset.o
 	$(ECHO) done.
 
 $(SAMPLE1DIR)/beat.o: $(SAMPLE1DIR)/beat.cpp $(DLLNAME)

@@ -111,6 +111,18 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 
 S::GUI::Widget::~Widget()
 {
+	/* Clean up everything in case this widget
+	 * is not deleted using DeleteObject.
+	 */
+	EnqueueForDeletion();
+
+	delete nullSurface;
+}
+
+S::Void S::GUI::Widget::EnqueueForDeletion()
+{
+	onEnqueueForDeletion.Emit();
+
 	DeactivateTooltip();
 
 	CloseContextMenu();
@@ -120,8 +132,6 @@ S::GUI::Widget::~Widget()
 	widgets.RemoveAll();
 
 	if (registered && container != NIL) container->Remove(this);
-
-	delete nullSurface;
 }
 
 S::Int S::GUI::Widget::Add(Widget *widget)

@@ -4,29 +4,23 @@ include Makefile-common
 
 HEADERS = $(OBJECTDIR)/smooth.h.gch
 
-OBJECTS = $(OBJECTDIR)/backendwin32.o $(OBJECTDIR)/backend.o $(OBJECTDIR)/input.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/error_endoffile.o $(OBJECTDIR)/error_filenotfound.o $(OBJECTDIR)/error_permissiondenied.o $(OBJECTDIR)/error.o $(OBJECTDIR)/success.o $(OBJECTDIR)/directory.o $(OBJECTDIR)/file.o $(OBJECTDIR)/bitmapgdi.o $(OBJECTDIR)/fontgdi.o $(OBJECTDIR)/surfacegdi.o $(OBJECTDIR)/bitmapbackend.o $(OBJECTDIR)/fontbackend.o $(OBJECTDIR)/surfacebackend.o $(OBJECTDIR)/form.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/imageloader_icon.o $(OBJECTDIR)/imageloader.o $(OBJECTDIR)/imageloader_pci.o $(OBJECTDIR)/modifier_fontsize.o $(OBJECTDIR)/modifier_righttoleft.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/color.o $(OBJECTDIR)/font.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/application.o $(OBJECTDIR)/xulloader.o $(OBJECTDIR)/colordlg.o $(OBJECTDIR)/dialog.o $(OBJECTDIR)/dirdlg.o $(OBJECTDIR)/filedlg.o $(OBJECTDIR)/fontdlg.o $(OBJECTDIR)/messagebox.o $(OBJECTDIR)/splashscreen.o $(OBJECTDIR)/tipodaydlg.o $(OBJECTDIR)/mdiclient.o $(OBJECTDIR)/mdiwindow.o $(OBJECTDIR)/activearea.o $(OBJECTDIR)/arrows.o $(OBJECTDIR)/button.o $(OBJECTDIR)/checkbox.o $(OBJECTDIR)/client.o $(OBJECTDIR)/divider.o $(OBJECTDIR)/editbox.o $(OBJECTDIR)/groupbox.o $(OBJECTDIR)/hyperlink.o $(OBJECTDIR)/image.o $(OBJECTDIR)/multiedit.o $(OBJECTDIR)/optionbox.o $(OBJECTDIR)/progressbar.o $(OBJECTDIR)/scrollbar.o $(OBJECTDIR)/slider.o $(OBJECTDIR)/statusbar.o $(OBJECTDIR)/tabwidget.o $(OBJECTDIR)/text.o $(OBJECTDIR)/titlebar.o $(OBJECTDIR)/hotspot.o $(OBJECTDIR)/simplebutton.o $(OBJECTDIR)/combobox.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listbox.o $(OBJECTDIR)/listboxheader.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menubar.o $(OBJECTDIR)/menubarentry.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/micromenu.o $(OBJECTDIR)/popupmenu.o $(OBJECTDIR)/popupmenuentry.o $(OBJECTDIR)/popupmenuentrycheck.o $(OBJECTDIR)/popupmenuentryoption.o $(OBJECTDIR)/tree.o $(OBJECTDIR)/cursor.o $(OBJECTDIR)/dragcontrol.o $(OBJECTDIR)/droparea.o $(OBJECTDIR)/shortcut.o $(OBJECTDIR)/tooltip.o $(OBJECTDIR)/layer.o $(OBJECTDIR)/widget.o $(OBJECTDIR)/windowgdi.o $(OBJECTDIR)/windowbackend.o $(OBJECTDIR)/toolwindow.o $(OBJECTDIR)/window.o $(OBJECTDIR)/i18n_language.o $(OBJECTDIR)/i18n_number.o $(OBJECTDIR)/i18n_translator.o $(OBJECTDIR)/driver_ansi.o $(OBJECTDIR)/driver_https.o $(OBJECTDIR)/driver_memory.o $(OBJECTDIR)/driver_posix.o $(OBJECTDIR)/driver_socket.o $(OBJECTDIR)/driver_socks4.o $(OBJECTDIR)/driver_socks5.o $(OBJECTDIR)/driver_win32.o $(OBJECTDIR)/driver_zero.o $(OBJECTDIR)/filter_bzip2.o $(OBJECTDIR)/filter_xor.o $(OBJECTDIR)/driver.o $(OBJECTDIR)/filter.o $(OBJECTDIR)/instream.o $(OBJECTDIR)/outstream.o $(OBJECTDIR)/stream.o $(OBJECTDIR)/base64.o $(OBJECTDIR)/hash_crc32.o $(OBJECTDIR)/hash_md5.o $(OBJECTDIR)/args.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/config.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/math.o $(OBJECTDIR)/memory.o $(OBJECTDIR)/number.o $(OBJECTDIR)/string.o $(OBJECTDIR)/string_case.o $(OBJECTDIR)/protocol_file.o $(OBJECTDIR)/protocol_http.o $(OBJECTDIR)/protocol.o $(OBJECTDIR)/eventwin32.o $(OBJECTDIR)/timerwin32.o $(OBJECTDIR)/eventbackend.o $(OBJECTDIR)/timerbackend.o $(OBJECTDIR)/console.o $(OBJECTDIR)/dynamicloader.o $(OBJECTDIR)/event.o $(OBJECTDIR)/multimonitor.o $(OBJECTDIR)/system.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/mutexwin32.o $(OBJECTDIR)/semaphorewin32.o $(OBJECTDIR)/threadwin32.o $(OBJECTDIR)/mutexbackend.o $(OBJECTDIR)/semaphorebackend.o $(OBJECTDIR)/threadbackend.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/rwlock.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/xul_box.o $(OBJECTDIR)/xul_button.o $(OBJECTDIR)/xul_description.o $(OBJECTDIR)/xul_label.o $(OBJECTDIR)/xul_menubar.o $(OBJECTDIR)/xul_popupmenu.o $(OBJECTDIR)/xul_renderer.o $(OBJECTDIR)/xul_textbox.o $(OBJECTDIR)/xul_widget.o $(OBJECTDIR)/xul_window.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/init.o $(OBJECTDIR)/pciio.o $(OBJECTDIR)/templates.o
+OBJECTS = $(OBJECTDIR)/backendwin32.o $(OBJECTDIR)/backend.o $(OBJECTDIR)/input.o $(OBJECTDIR)/object.o $(OBJECTDIR)/objecttype.o $(OBJECTDIR)/setup.o $(OBJECTDIR)/error_endoffile.o $(OBJECTDIR)/error_filenotfound.o $(OBJECTDIR)/error_permissiondenied.o $(OBJECTDIR)/error.o $(OBJECTDIR)/success.o $(OBJECTDIR)/directory.o $(OBJECTDIR)/file.o $(OBJECTDIR)/bitmapgdi.o $(OBJECTDIR)/fontgdi.o $(OBJECTDIR)/surfacegdi.o $(OBJECTDIR)/bitmapbackend.o $(OBJECTDIR)/fontbackend.o $(OBJECTDIR)/surfacebackend.o $(OBJECTDIR)/form.o $(OBJECTDIR)/line.o $(OBJECTDIR)/point.o $(OBJECTDIR)/rect.o $(OBJECTDIR)/size.o $(OBJECTDIR)/imageloader.o $(OBJECTDIR)/imageloader_icon.o $(OBJECTDIR)/imageloader_jpeg.o $(OBJECTDIR)/imageloader_pci.o $(OBJECTDIR)/imageloader_png.o $(OBJECTDIR)/modifier_fontsize.o $(OBJECTDIR)/modifier_righttoleft.o $(OBJECTDIR)/bitmap.o $(OBJECTDIR)/color.o $(OBJECTDIR)/font.o $(OBJECTDIR)/surface.o $(OBJECTDIR)/application.o $(OBJECTDIR)/xulloader.o $(OBJECTDIR)/colordlg.o $(OBJECTDIR)/dialog.o $(OBJECTDIR)/dirdlg.o $(OBJECTDIR)/filedlg.o $(OBJECTDIR)/fontdlg.o $(OBJECTDIR)/messagebox.o $(OBJECTDIR)/splashscreen.o $(OBJECTDIR)/tipodaydlg.o $(OBJECTDIR)/mdiclient.o $(OBJECTDIR)/mdiwindow.o $(OBJECTDIR)/activearea.o $(OBJECTDIR)/arrows.o $(OBJECTDIR)/button.o $(OBJECTDIR)/checkbox.o $(OBJECTDIR)/client.o $(OBJECTDIR)/divider.o $(OBJECTDIR)/editbox.o $(OBJECTDIR)/groupbox.o $(OBJECTDIR)/hyperlink.o $(OBJECTDIR)/image.o $(OBJECTDIR)/multiedit.o $(OBJECTDIR)/optionbox.o $(OBJECTDIR)/progressbar.o $(OBJECTDIR)/scrollbar.o $(OBJECTDIR)/slider.o $(OBJECTDIR)/statusbar.o $(OBJECTDIR)/tabwidget.o $(OBJECTDIR)/text.o $(OBJECTDIR)/titlebar.o $(OBJECTDIR)/hotspot.o $(OBJECTDIR)/simplebutton.o $(OBJECTDIR)/imagebox.o $(OBJECTDIR)/imageentry.o $(OBJECTDIR)/combobox.o $(OBJECTDIR)/list.o $(OBJECTDIR)/listbox.o $(OBJECTDIR)/listboxheader.o $(OBJECTDIR)/listentry.o $(OBJECTDIR)/menu.o $(OBJECTDIR)/menubar.o $(OBJECTDIR)/menubarentry.o $(OBJECTDIR)/menuentry.o $(OBJECTDIR)/micromenu.o $(OBJECTDIR)/popupmenu.o $(OBJECTDIR)/popupmenuentry.o $(OBJECTDIR)/popupmenuentrycheck.o $(OBJECTDIR)/popupmenuentryoption.o $(OBJECTDIR)/tree.o $(OBJECTDIR)/cursor.o $(OBJECTDIR)/dragcontrol.o $(OBJECTDIR)/droparea.o $(OBJECTDIR)/shortcut.o $(OBJECTDIR)/tooltip.o $(OBJECTDIR)/layer.o $(OBJECTDIR)/widget.o $(OBJECTDIR)/windowgdi.o $(OBJECTDIR)/windowbackend.o $(OBJECTDIR)/toolwindow.o $(OBJECTDIR)/window.o $(OBJECTDIR)/i18n_language.o $(OBJECTDIR)/i18n_number.o $(OBJECTDIR)/i18n_translator.o $(OBJECTDIR)/driver_ansi.o $(OBJECTDIR)/driver_https.o $(OBJECTDIR)/driver_memory.o $(OBJECTDIR)/driver_posix.o $(OBJECTDIR)/driver_socket.o $(OBJECTDIR)/driver_socks4.o $(OBJECTDIR)/driver_socks5.o $(OBJECTDIR)/driver_win32.o $(OBJECTDIR)/driver_zero.o $(OBJECTDIR)/filter_bzip2.o $(OBJECTDIR)/filter_xor.o $(OBJECTDIR)/driver.o $(OBJECTDIR)/filter.o $(OBJECTDIR)/instream.o $(OBJECTDIR)/outstream.o $(OBJECTDIR)/stream.o $(OBJECTDIR)/base64.o $(OBJECTDIR)/hash_crc32.o $(OBJECTDIR)/hash_md5.o $(OBJECTDIR)/args.o $(OBJECTDIR)/binary.o $(OBJECTDIR)/config.o $(OBJECTDIR)/datetime.o $(OBJECTDIR)/math.o $(OBJECTDIR)/memory.o $(OBJECTDIR)/number.o $(OBJECTDIR)/string.o $(OBJECTDIR)/string_case.o $(OBJECTDIR)/protocol_file.o $(OBJECTDIR)/protocol_http.o $(OBJECTDIR)/protocol.o $(OBJECTDIR)/eventwin32.o $(OBJECTDIR)/timerwin32.o $(OBJECTDIR)/eventbackend.o $(OBJECTDIR)/timerbackend.o $(OBJECTDIR)/console.o $(OBJECTDIR)/dynamicloader.o $(OBJECTDIR)/event.o $(OBJECTDIR)/multimonitor.o $(OBJECTDIR)/system.o $(OBJECTDIR)/timer.o $(OBJECTDIR)/mutexwin32.o $(OBJECTDIR)/semaphorewin32.o $(OBJECTDIR)/threadwin32.o $(OBJECTDIR)/mutexbackend.o $(OBJECTDIR)/semaphorebackend.o $(OBJECTDIR)/threadbackend.o $(OBJECTDIR)/mutex.o $(OBJECTDIR)/rwlock.o $(OBJECTDIR)/semaphore.o $(OBJECTDIR)/thread.o $(OBJECTDIR)/xul_box.o $(OBJECTDIR)/xul_button.o $(OBJECTDIR)/xul_description.o $(OBJECTDIR)/xul_label.o $(OBJECTDIR)/xul_menubar.o $(OBJECTDIR)/xul_popupmenu.o $(OBJECTDIR)/xul_renderer.o $(OBJECTDIR)/xul_textbox.o $(OBJECTDIR)/xul_widget.o $(OBJECTDIR)/xul_window.o $(OBJECTDIR)/xml_attribute.o $(OBJECTDIR)/xml_document.o $(OBJECTDIR)/xml_node.o $(OBJECTDIR)/codecs.o $(OBJECTDIR)/init.o $(OBJECTDIR)/pciio.o $(OBJECTDIR)/templates.o
 RESOURCES = $(OBJECTDIR)/resources.o
 
-LIBS = -lunicows -lfribidi2 -lbz2 -llisa -lxml -lws2_32 -limm32 -lole32 -lstdc++
+LIBS = -lunicows -lfribidi2 -lbz2 -llisa -lxml -ljpeg -lpng -lz -lws2_32 -limm32 -lole32 -lstdc++
 
 SAMPLESLIBS = -lsmooth -lstdc++
 
 DLLNAME = $(BINDIR)/smooth.dll
 LIBNAME = $(LIBDIR)/libsmooth.a
 
-LIBBZ2 = $(LIBDIR)/libbz2.a
-LIBXML = $(LIBDIR)/libxml.a
-LIBICONV = $(BINDIR)/iconv.dll
+LIBICONV = $(LIBDIR)/libiconv.a
+LIBICONVDLL = $(BINDIR)/iconv.dll
 LIBLISA = $(LIBDIR)/liblisa.a
-LIBFRIBIDI2 = $(LIBDIR)/libfribidi2.a
 
-OTHERLIBS = $(LIBFRIBIDI2) $(LIBBZ2) $(LIBXML) $(LIBICONV) $(LIBLISA)
+OTHERLIBS = libs $(LIBICONVDLL) $(LIBLISA)
 
-LIBBZ2OBJECTS = $(OBJECTDIR)/libbz2_blocksort.o $(OBJECTDIR)/libbz2_bzlib.o $(OBJECTDIR)/libbz2_compress.o $(OBJECTDIR)/libbz2_crctable.o $(OBJECTDIR)/libbz2_decompress.o $(OBJECTDIR)/libbz2_huffman.o $(OBJECTDIR)/libbz2_randtable.o
-LIBXMLOBJECTS = $(OBJECTDIR)/libxml_chvalid.o $(OBJECTDIR)/libxml_dict.o $(OBJECTDIR)/libxml_encoding.o $(OBJECTDIR)/libxml_entities.o $(OBJECTDIR)/libxml_error.o $(OBJECTDIR)/libxml_globals.o $(OBJECTDIR)/libxml_hash.o $(OBJECTDIR)/libxml_list.o $(OBJECTDIR)/libxml_parser.o $(OBJECTDIR)/libxml_parserInternals.o $(OBJECTDIR)/libxml_SAX2.o $(OBJECTDIR)/libxml_threads.o $(OBJECTDIR)/libxml_tree.o $(OBJECTDIR)/libxml_uri.o $(OBJECTDIR)/libxml_valid.o $(OBJECTDIR)/libxml_xmlIO.o $(OBJECTDIR)/libxml_xmlmemory.o $(OBJECTDIR)/libxml_xmlreader.o $(OBJECTDIR)/libxml_xmlsave.o $(OBJECTDIR)/libxml_xmlstring.o $(OBJECTDIR)/libxml_xmlwriter.o
-LIBICONVOBJECTS = $(OBJECTDIR)/libiconv_iconv.o $(OBJECTDIR)/libiconv_localcharset.o
 LISAOBJECTS = $(OBJECTDIR)/lisa_lisa.o
-FRIBIDI2OBJECTS = $(OBJECTDIR)/fribidi2_fribidi.o $(OBJECTDIR)/fribidi2_fribidi-bidi.o $(OBJECTDIR)/fribidi2_fribidi-bidi-types.o $(OBJECTDIR)/fribidi2_fribidi-env.o $(OBJECTDIR)/fribidi2_fribidi-joining.o $(OBJECTDIR)/fribidi2_fribidi-joining-types.o $(OBJECTDIR)/fribidi2_fribidi-mem.o $(OBJECTDIR)/fribidi2_fribidi-mirroring.o $(OBJECTDIR)/fribidi2_fribidi-run.o
 
 DESIGNEROBJECTS = $(OBJECTDIR)/designer_designer.o $(OBJECTDIR)/designer_edit_component.o
 TRANSLATOROBJECTS = $(OBJECTDIR)/translator_translator.o $(OBJECTDIR)/translator_resources.o
@@ -82,6 +76,9 @@ headers: clean_headers $(HEADERS)
 
 programs: $(HEADERS) $(DLLNAME) $(DESIGNEREXE) $(PCIFFMANEXE) $(TRANSLATOREXE) $(SAMPLE1EXE) $(SAMPLE2EXE) $(SAMPLE3EXE) $(SAMPLE4DLL) $(SAMPLE4EXE) $(SAMPLE5EXE) distribute
 
+libs:
+	$(MAKE) -C libraries
+
 install:
 
 clean: clean_headers
@@ -98,7 +95,8 @@ clean: clean_headers
 
 clean_all: clean
 	$(ECHO) -n Cleaning 3rd party libraries...
-	$(REMOVER) $(REMOVER_OPTS) $(OTHERLIBS) $(LIBBZ2OBJECTS) $(LIBXMLOBJECTS) $(LIBICONVOBJECTS) $(LISAOBJECTS) $(FRIBIDI2OBJECTS)
+	$(MAKE) -C libraries clean
+	$(REMOVER) $(REMOVER_OPTS) $(LIBICONVDLL) $(LIBLISA) $(LISAOBJECTS)
 	$(ECHO) done.
 
 clean_headers:
@@ -133,32 +131,17 @@ $(DLLNAME): $(HEADERS) $(OBJECTS) $(RESOURCES) $(OTHERLIBS)
 	countbuild BuildNumber
 	$(ECHO) done.
 
-$(LIBBZ2): $(LIBBZ2OBJECTS)
-	$(ECHO) -n Linking $(LIBBZ2)...
-	$(AR) r $(LIBBZ2) $(LIBBZ2OBJECTS) &> NULL
-	$(ECHO) done.
-
-$(LIBXML): $(LIBXMLOBJECTS)
-	$(ECHO) -n Linking $(LIBXML)...
-	$(AR) r $(LIBXML) $(LIBXMLOBJECTS) &> NULL
-	$(ECHO) done.
-
-$(LIBICONV): $(LIBICONVOBJECTS)
-	$(ECHO) -n Linking $(LIBICONV)...
-	$(LINKER) $(LIBICONVOBJECTS) -L$(LIBDIR) --shared -o $(LIBICONV) &> NULL
-	$(STRIP) $(STRIP_OPTS) $(LIBICONV)
-	$(STRIP) $(LIBSTRIP_OPTS) $(LIBICONV)
-	$(PACKER) $(PACKER_OPTS) $(LIBICONV) > NULL
+$(LIBICONVDLL): $(LIBICONV)
+	$(ECHO) -n Linking $(LIBICONVDLL)...
+	$(LINKER) $(LIBICONV) -L$(LIBDIR) --shared -o $(LIBICONVDLL) &> NULL
+	$(STRIP) $(STRIP_OPTS) $(LIBICONVDLL)
+	$(STRIP) $(LIBSTRIP_OPTS) $(LIBICONVDLL)
+	$(PACKER) $(PACKER_OPTS) $(LIBICONVDLL) > NULL
 	$(ECHO) done.
 
 $(LIBLISA): $(LISAOBJECTS)
 	$(ECHO) -n Linking $(LIBLISA)...
 	$(AR) r $(LIBLISA) $(LISAOBJECTS) &> NULL
-	$(ECHO) done.
-
-$(LIBFRIBIDI2): $(FRIBIDI2OBJECTS)
-	$(ECHO) -n Linking $(LIBFRIBIDI2)...
-	$(AR) r $(LIBFRIBIDI2) $(FRIBIDI2OBJECTS) &> NULL
 	$(ECHO) done.
 
 $(DESIGNEREXE): $(DLLNAME) $(LIBNAME) $(DESIGNEROBJECTS)

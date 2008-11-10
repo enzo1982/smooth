@@ -44,7 +44,28 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 			break;
 	};
 
-	return Success();
+	Int	 occupied_right = 5;
+	Int	 occupied_left = 5;
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*object = GetNthObject(i);
+
+		if (object->GetOrientation() == OR_UPPERRIGHT)
+		{
+			object->SetPosition(Point(occupied_right + object->GetWidth(), (GetHeight() - object->GetHeight()) / 2 + 1));
+
+			occupied_right += object->GetWidth() + 5;
+		}
+		else if (object->GetOrientation() == OR_UPPERLEFT)
+		{
+			object->SetPosition(Point(occupied_left, (GetHeight() - object->GetHeight()) / 2 + 1));
+
+			occupied_left += object->GetWidth() + 5;
+		}
+	}
+
+	return Widget::Paint(message);
 }
 
 S::Int S::GUI::Statusbar::SetText(const String &newStatus)

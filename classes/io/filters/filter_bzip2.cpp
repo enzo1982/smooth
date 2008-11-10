@@ -10,7 +10,7 @@
 
 #include <smooth/io/filters/filter_bzip2.h>
 #include <smooth/io/driver.h>
-#include <bzlib.h>
+#include <bzlib/bzlib.h>
 
 S::IO::FilterBZip2::FilterBZip2()
 {

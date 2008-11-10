@@ -199,7 +199,7 @@ S::String S::Number::ToIntString() const
 S::String S::Number::ToFloatString() const
 {
 	Int	 digits = 10;
-	Int64	 fract	= Math::Fract(Math::Abs(floatValue)) * (Int64) Math::Pow(10, digits);
+	Int64	 fract	= (Int64) (Math::Fract(Math::Abs(floatValue)) * Math::Pow(10, digits));
 	Int	 lead	= digits - Math::Floor((Math::Log10(fract) + 1.000000001));
 
 	Int	 nOfNull = 0;

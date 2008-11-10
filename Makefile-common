@@ -2,7 +2,9 @@ INCLUDEDIR = ./include
 SMOOTHINCLUDEDIR = $(INCLUDEDIR)/smooth
 OBJECTDIR = ./objects
 BINDIR = ./bin
-LIBDIR = ./lib
+
+export LIBDIR = ./lib
+
 OTHERLIBSDIR = ./libraries
 FRIBIDI2DIR = $(OTHERLIBSDIR)/fribidi2
 LIBBZ2DIR = $(OTHERLIBSDIR)/bzlib

@@ -117,6 +117,12 @@ S::Int S::Object::DeleteObject(Object *object)
 {
 	if (object != NIL)
 	{
+		if (objects.Get(object->handle) == NIL) return Error();
+
+		/* Notify object that it will be deleted soon.
+		 */
+		object->EnqueueForDeletion();
+
 		/* Remove object from object list and add
 		 * it to the list of objects to delete.
 		 */

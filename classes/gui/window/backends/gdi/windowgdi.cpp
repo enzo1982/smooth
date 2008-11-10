@@ -176,7 +176,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		case WM_NCMOUSEMOVE:
 			return onEvent.Call(SM_MOUSEMOVE, 0, 0);
 		case WM_MOUSEWHEEL:
-			return onEvent.Call(SM_MOUSEWHEEL, HIWORD(wParam), 0);
+			return onEvent.Call(SM_MOUSEWHEEL, (short) HIWORD(wParam), 0);
 		case WM_LBUTTONDOWN:
 		case WM_NCLBUTTONDOWN:
 			return onEvent.Call(SM_LBUTTONDOWN, 0, 0);

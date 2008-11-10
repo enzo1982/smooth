@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libbzip2.lib fribidi2.lib libxml.lib lisa.lib iconv.lib imm32.lib ws2_32.lib"
+				AdditionalDependencies="libbzip2.lib fribidi2.lib libxml.lib lisa.lib iconv.lib libjpeg.lib libpng.lib libz.lib imm32.lib ws2_32.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="Debug"
 				GenerateDebugInformation="true"
@@ -560,7 +560,15 @@
 							>
 						</File>
 						<File
+							RelativePath="..\..\classes\graphics\imageloader\jpeg.cpp"
+							>
+						</File>
+						<File
 							RelativePath="..\..\classes\graphics\imageloader\pci.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\classes\graphics\imageloader\png.cpp"
 							>
 						</File>
 					</Filter>
@@ -1190,6 +1198,10 @@
 					</File>
 					<File
 						RelativePath="..\..\classes\misc\string.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\classes\misc\string_case.cpp"
 						>
 					</File>
 					<Filter
@@ -2101,6 +2113,14 @@
 								>
 							</File>
 						</Filter>
+						<Filter
+							Name="threads"
+							>
+							<File
+								RelativePath="..\..\include\smooth\system\backends\threads\timerthreads.h"
+								>
+							</File>
+						</Filter>
 					</Filter>
 				</Filter>
 				<Filter
@@ -2913,7 +2933,23 @@
 							RelativePath="..\..\include\smooth\i18n\locales\smooth_it.h"
 							>
 						</File>
+						<File
+							RelativePath="..\..\include\smooth\i18n\locales\smooth_sr.h"
+							>
+						</File>
 					</Filter>
+				</Filter>
+				<Filter
+					Name="files"
+					>
+					<File
+						RelativePath="..\..\include\smooth\files\directory.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\smooth\files\file.h"
+						>
+					</File>
 				</Filter>
 			</Filter>
 		</Filter>

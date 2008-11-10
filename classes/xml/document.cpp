@@ -131,7 +131,7 @@ S::Int S::XML::Document::LoadNode(xmlTextReaderPtr reader, Node *node)
 
 		while ((nodeType = xmlTextReaderNodeType(reader)) != XML_ELEMENT_DECL)
 		{
-			if (nodeType == XML_ELEMENT_NODE)	LoadNode(reader, node->AddNode(NIL));
+			if	(nodeType == XML_ELEMENT_NODE)	LoadNode(reader, node->AddNode(NIL));
 			else if (nodeType == XML_TEXT_NODE)	node->SetContent((const char *) xmlTextReaderConstValue(reader));
 
 			xmlTextReaderRead(reader);

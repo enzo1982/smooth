@@ -15,6 +15,10 @@ S::GUI::ImageLoaderPCI::ImageLoaderPCI(const String &iFileName) : ImageLoader(iF
 {
 }
 
+S::GUI::ImageLoaderPCI::ImageLoaderPCI(const Buffer<UnsignedByte> &iBuffer) : ImageLoader(iBuffer)
+{
+}
+
 S::GUI::ImageLoaderPCI::~ImageLoaderPCI()
 {
 }

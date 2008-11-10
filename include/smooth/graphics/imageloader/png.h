@@ -8,32 +8,31 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef _H_OBJSMOOTH_TREEVIEW_
-#define _H_OBJSMOOTH_TREEVIEW_
+#ifndef _H_OBJSMOOTH_IMAGELOADER_PNG_
+#define _H_OBJSMOOTH_IMAGELOADER_PNG_
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class TreeView;
+		class ImageLoaderPNG;
 	};
 };
 
-#include "../list/listbox.h"
+#include "imageloader.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI TreeView : public ListBox
+		class SMOOTHAPI ImageLoaderPNG : public ImageLoader
 		{
 			public:
-				static const Int	 classID;
+						 ImageLoaderPNG(const String &);
+						 ImageLoaderPNG(const Buffer<UnsignedByte> &);
+						~ImageLoaderPNG();
 
-							 TreeView(const Point &, const Size &);
-				virtual			~TreeView();
-
-				virtual Bool		 IsTypeCompatible(Int) const;
+				const Bitmap	&Load();
 		};
 	};
 };

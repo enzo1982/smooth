@@ -10,6 +10,7 @@
 
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/widgets/hotspot/simplebutton.h>
+#include <smooth/gui/widgets/special/shortcut.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/application/application.h>
@@ -32,15 +33,21 @@ S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
 	minHotspot->hitTest.Connect(&Titlebar::ButtonHitTest, this);
 	minHotspot->onLeftButtonClick.Connect(&Titlebar::OnMinButtonClick, this);
 
+	if (Binary::IsFlagSet(flags, TB_MINBUTTON)) Add(minHotspot);
+
 	maxHotspot	= new HotspotSimpleButton(Point(27, 5), Size(11, 11));
 	maxHotspot->SetOrientation(OR_UPPERRIGHT);
 	maxHotspot->hitTest.Connect(&Titlebar::ButtonHitTest, this);
 	maxHotspot->onLeftButtonClick.Connect(&Titlebar::OnMaxButtonClick, this);
 
+	if (Binary::IsFlagSet(flags, TB_MAXBUTTON)) Add(maxHotspot);
+
 	closeHotspot	= new HotspotSimpleButton(Point(17, 5), Size(11, 11));
 	closeHotspot->SetOrientation(OR_UPPERRIGHT);
 	closeHotspot->hitTest.Connect(&Titlebar::ButtonHitTest, this);
 	closeHotspot->onLeftButtonClick.Connect(&Titlebar::OnCloseButtonClick, this);
+
+	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) Add(closeHotspot);
 
 	dragHotspot	= new Hotspot(Point(0, 0), Size(4096, 19));
 	dragHotspot->onMouseDragStart.Connect(&Titlebar::OnMouseDragStart, this);
@@ -49,11 +56,12 @@ S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
 
 	if (Binary::IsFlagSet(flags, TB_MAXBUTTON)) dragHotspot->onLeftButtonDoubleClick.Connect(&Titlebar::OnMaxButtonClick, this);
 
-	if (Binary::IsFlagSet(flags, TB_MINBUTTON)) Add(minHotspot);
-	if (Binary::IsFlagSet(flags, TB_MAXBUTTON)) Add(maxHotspot);
-	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) Add(closeHotspot);
-
 	Add(dragHotspot);
+
+	closeShortcut	= new Shortcut(0, VK_ESCAPE);
+	closeShortcut->onKeyDown.Connect(&Titlebar::OnCloseButtonClick, this);
+
+	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) Add(closeShortcut);
 }
 
 S::GUI::Titlebar::~Titlebar()
@@ -62,6 +70,7 @@ S::GUI::Titlebar::~Titlebar()
 	DeleteObject(maxHotspot);
 	DeleteObject(closeHotspot);
 	DeleteObject(dragHotspot);
+	DeleteObject(closeShortcut);
 }
 
 S::Int S::GUI::Titlebar::Paint(Int message)

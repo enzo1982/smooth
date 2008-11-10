@@ -11,6 +11,9 @@ xx.xx.08 xx:xx - smooth alpha 0.8.71.0
 		- new function: Implode(), concatenates strings from an array
 - str...ase.cpp - case conversion functions are now generated from UnicodeData.txt
 		- added title case conversion function
+- image...r.cpp - added support for JPEG and PNG images
+- titlebar.cpp	- pressing the escape key now closes the active window
+- imagebox.cpp	- new widget: a box containing selectable images
 
 - removed TreeView widget (use ListBox instead)
 - fixed implementation of callback signals

@@ -45,8 +45,6 @@ S::GUI::MenuEntry::~MenuEntry()
 
 S::Void S::GUI::MenuEntry::InternalOnDeletePopup()
 {
-	popup->onEnqueueForDeletion.Disconnect(&MenuEntry::InternalOnDeletePopup, this);
-
 	popup = NIL;
 }
 

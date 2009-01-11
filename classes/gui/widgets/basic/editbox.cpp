@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -69,8 +69,18 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 				surface->StartPaint(GetVisibleArea());
 
-				if (IsActive())	surface->Box(frame, Setup::ClientColor, Rect::Filled);
-				else		surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
+				if (IsActive())
+				{
+					cursor->SetBackgroundColor(Setup::ClientColor);
+
+					surface->Box(frame, Setup::ClientColor, Rect::Filled);
+				}
+				else
+				{
+					cursor->SetBackgroundColor(Setup::BackgroundColor);
+
+					surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
+				}
 
 				surface->Frame(frame, FRAME_DOWN);
 
@@ -86,20 +96,6 @@ S::Int S::GUI::EditBox::Paint(Int message)
 S::Int S::GUI::EditBox::MarkAll()
 {
 	return cursor->MarkAll();
-}
-
-S::Int S::GUI::EditBox::Activate()
-{
-	cursor->SetBackgroundColor(Setup::ClientColor);
-
-	return Widget::Activate();
-}
-
-S::Int S::GUI::EditBox::Deactivate()
-{
-	cursor->SetBackgroundColor(Setup::BackgroundColor);
-
-	return Widget::Deactivate();
 }
 
 S::Int S::GUI::EditBox::SetText(const String &newText)

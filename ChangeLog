@@ -1,8 +1,9 @@
 ChangeLog for smooth
 
-xx.xx.08 xx:xx - smooth alpha 0.8.71.0
+xx.xx.09 xx:xx - smooth alpha 0.8.71.0
 
 - window.cpp	- renamed doQuit to doClose
+		- removed onPeek
 - listbox.cpp	- show partially visible entries again
 - number.cpp	- fixed floating point number -> string conversion
 - widget.cpp	- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
@@ -17,6 +18,7 @@ xx.xx.08 xx:xx - smooth alpha 0.8.71.0
 
 - removed TreeView widget (use ListBox instead)
 - fixed implementation of callback signals
+- fixed implementation of Array<>
 - improved Linux support
 
 22.03.08 11:25 - smooth alpha 0.8.70.0

@@ -36,7 +36,7 @@ S::String S::Encoding::Base64::Encode(Int bytes) const
 
 		for (Int j = 0; j < 4; j++)
 		{
-			if (val[j] >= 0 && val[j] <= 25)	b64[i / 3 * 4 + j] = 'A' + val[j] - 0;
+			if	(val[j] >=  0 && val[j] <= 25)	b64[i / 3 * 4 + j] = 'A' + val[j] - 0;
 			else if (val[j] >= 26 && val[j] <= 51)	b64[i / 3 * 4 + j] = 'a' + val[j] - 26;
 			else if (val[j] >= 52 && val[j] <= 61)	b64[i / 3 * 4 + j] = '0' + val[j] - 52;
 			else if (val[j] == 62)			b64[i / 3 * 4 + j] = '+';
@@ -60,7 +60,7 @@ S::Int S::Encoding::Base64::Decode(const String &string)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			if (string[i + j] >= 'A' && string[i + j] <= 'Z')	val[j] = string[i + j] - 'A' + 0;
+			if	(string[i + j] >= 'A' && string[i + j] <= 'Z')	val[j] = string[i + j] - 'A' +  0;
 			else if (string[i + j] >= 'a' && string[i + j] <= 'z')	val[j] = string[i + j] - 'a' + 26;
 			else if (string[i + j] >= '0' && string[i + j] <= '9')	val[j] = string[i + j] - '0' + 52;
 			else if (string[i + j] == '+')				val[j] = 62;

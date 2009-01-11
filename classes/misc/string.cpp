@@ -346,7 +346,10 @@ wchar_t &S::String::operator [](int n)
 
 		Int	 length = Length();
 
-		wString.Resize(n + 2);
+		/* Allocate more memory than actually
+		 * needed to speed up string operations.
+		 */
+		wString.Resize(n + 100);
 
 		wmemset(wString + length, 0, wString.Size() - length);
 
@@ -716,16 +719,15 @@ S::String &S::String::CopyN(const wchar_t *str, const Int n)
 
 S::String &S::String::CopyN(const String &str, const Int n)
 {
-	String	 backup(str);
-
 	mutex.Lock();
 
 	Clean();
 
-	for (Int i = n - 1; i >= 0; i--)
-	{
-		(*this)[i] = backup[i];
-	}
+	wString.Resize(n + 1);
+
+	wcsncpy(wString, str.wString, n);
+
+	wString[n] = 0;
 
 	mutex.Release();
 
@@ -759,9 +761,11 @@ S::Int S::String::Compare(const String &str) const
 	{
 		mutex.Lock();
 
-		for (Int i = 0; i < len1; i++)
+		if (wcsncmp(wString, str.wString, len1) != 0)
 		{
-			if (wString[i] != str.wString[i]) { mutex.Release(); return 1; }
+			mutex.Release();
+
+			return 1;
 		}
 
 		mutex.Release();
@@ -790,9 +794,11 @@ S::Int S::String::CompareN(const String &str, Int n) const
 
 	mutex.Lock();
 
-	for (Int i = 0; i < n; i++)
+	if (wcsncmp(wString, str.wString, n) != 0)
 	{
-		if (wString[i] != str.wString[i]) { mutex.Release(); return 1; }
+		mutex.Release();
+
+		return 1;
 	}
 
 	mutex.Release();
@@ -823,9 +829,11 @@ S::Bool S::String::StartsWith(const String &str) const
 	{
 		mutex.Lock();
 
-		for (Int i = 0; i < len2; i++)
+		if (wcsncmp(wString, str.wString, len2) != 0)
 		{
-			if (wString[i] != str.wString[i]) { mutex.Release(); return False; }
+			mutex.Release();
+
+			return False;
 		}
 
 		mutex.Release();
@@ -859,9 +867,11 @@ S::Bool S::String::EndsWith(const String &str) const
 	{
 		mutex.Lock();
 
-		for (Int i = 0; i < len2; i++)
+		if (wcsncmp(wString + len1 - len2, str.wString, len2) != 0)
 		{
-			if (wString[len1 - len2 + i] != str.wString[i]) { mutex.Release(); return False; }
+			mutex.Release();
+
+			return False;
 		}
 
 		mutex.Release();
@@ -874,9 +884,15 @@ S::Bool S::String::EndsWith(const String &str) const
 
 S::String S::String::SubString(Int start, Int number) const
 {
+	if (number <= 0 || start < 0 || start >= Length()) return NIL;
+
 	String	 subString;
 
-	for (Int i = 0; i < number; i++) subString[i] = (*this)[start + i];
+	subString.wString.Resize(number + 1);
+
+	wcsncpy(subString.wString, wString + start, number);
+
+	subString.wString[number] = 0;
 
 	return subString;
 }
@@ -926,10 +942,7 @@ S::String &S::String::Fill(const Int value)
 {
 	mutex.Lock();
 
-	for (Int i = 0; i < Length(); i++)
-	{
-		(*this)[i] = value;
-	}
+	wmemset(wString, value, Length());
 
 	mutex.Release();
 
@@ -942,10 +955,11 @@ S::String &S::String::FillN(const Int value, const Int count)
 
 	Clean();
 
-	for (Int i = count - 1; i >= 0; i--)
-	{
-		(*this)[i] = value;
-	}
+	wString.Resize(count + 1);
+
+	wmemset(wString, value, count);
+
+	wString[count] = 0;
 
 	mutex.Release();
 

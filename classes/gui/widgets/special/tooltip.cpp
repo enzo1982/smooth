@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/special/tooltip.h>
+#include <smooth/gui/widgets/layer.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/system/timer.h>
 #include <smooth/system/multimonitor.h>
@@ -24,6 +25,8 @@ S::GUI::Tooltip::Tooltip() : Widget(Point(), Size())
 	toolWindow	= NIL;
 	timeOut		= 5000;
 	timer		= NIL;
+
+	layer		= NIL;
 
 	font.SetColor(Setup::TooltipTextColor);
 }
@@ -49,7 +52,7 @@ S::Int S::GUI::Tooltip::Show()
 	if (!IsRegistered()) return Success();
 
 	Window	*window	 = container->GetContainerWindow();
-	Size	 tSize	 = Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4);
+	Size	 tSize	 = (layer != NIL ? layer->GetSize() : Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4));
 	Point	 tPos	 = Point(GetX(), GetY() - tSize.cy + 1);
 	Rect	 vScreen = System::MultiMonitor::GetVirtualScreenMetrics();
 
@@ -68,6 +71,8 @@ S::Int S::GUI::Tooltip::Show()
 
 	toolWindow = new ToolWindow(tPos, tSize);
 	toolWindow->onPaint.Connect(&Tooltip::OnToolWindowPaint, this);
+
+	if (layer != NIL) toolWindow->Add(layer);
 
 	Add(toolWindow);
 
@@ -96,6 +101,8 @@ S::Int S::GUI::Tooltip::Hide()
 	{
 		Remove(toolWindow);
 
+		if (layer != NIL) toolWindow->Remove(layer);
+
 		DeleteObject(toolWindow);
 
 		toolWindow = NIL;
@@ -109,7 +116,7 @@ S::Int S::GUI::Tooltip::Hide()
 S::Void S::GUI::Tooltip::OnToolWindowPaint()
 {
 	Surface	*surface = toolWindow->GetDrawSurface();
-	Rect	 tRect	 = Rect(Point(0, 0), Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4));
+	Rect	 tRect	 = Rect(Point(0, 0), layer != NIL ? layer->GetSize() : Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4));
 
 	surface->Box(tRect, Setup::TooltipColor, Rect::Filled);
 	surface->Box(tRect, Color(0, 0, 0), Rect::Outlined);
@@ -120,6 +127,13 @@ S::Void S::GUI::Tooltip::OnToolWindowPaint()
 S::Int S::GUI::Tooltip::SetTimeout(Int mSeconds)
 {
 	timeOut = mSeconds;
+
+	return Success();
+}
+
+S::Int S::GUI::Tooltip::SetLayer(Layer *nLayer)
+{
+	layer = nLayer;
 
 	return Success();
 }

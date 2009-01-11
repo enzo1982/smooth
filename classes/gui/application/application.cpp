@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,8 +15,7 @@
 #include <smooth/init.h>
 #include <smooth/templates/nonblocking.h>
 
-S::Bool	 S::loopActive		= S::False;
-S::Int	 S::peekLoop		= 0;
+S::Bool	 S::loopActive	= S::False;
 
 const S::Int	 S::GUI::Application::classID = S::Object::RequestClassID();
 
@@ -40,16 +39,13 @@ S::Int S::GUI::Application::Loop()
 		initializing = false;
 		loopActive = true;
 
-		for (Int i = 0; i < Object::GetNOfObjects(); i++)
+		for (Int i = 0; i < Window::GetNOfWindows(); i++)
 		{
-			Object	*object = Object::GetNthObject(i);
+			Window	*window = Window::GetNthWindow(i);
 
-			if (object != NIL)
+			if (window != NIL)
 			{
-				if (object->GetObjectType() == GUI::Window::classID)
-				{
-					if (!((GUI::Window *) object)->initshow) ((GUI::Window *) object)->Show();
-				}
+				if (!window->initshow) window->Show();
 			}
 		}
 
@@ -78,10 +74,7 @@ S::Int S::GUI::Application::Loop()
 
 	while (!quit)
 	{
-		Int	 result = Success();
-
-		if (peekLoop > 0)	result = event->ProcessNextEvent(False);
-		else			result = event->ProcessNextEvent(True);
+		Int	 result = event->ProcessNextEvent();
 
 		if (result == Break)			quit = True;
 		if (GUI::Window::nOfActiveWindows == 0)	quit = True;

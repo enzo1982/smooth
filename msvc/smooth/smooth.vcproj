@@ -144,9 +144,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libbzip2.lib fribidi2.lib libxml.lib lisa.lib iconv.lib imm32.lib ws2_32.lib"
+				AdditionalDependencies="libbzip2.lib fribidi2.lib libxml.lib lisa.lib libjpeg.lib libpng.lib libz.lib iconv.lib imm32.lib ws2_32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="Debug"
+				AdditionalLibraryDirectories="x64/Debug"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -693,12 +693,28 @@
 										Name="VCCLCompilerTool"
 									/>
 								</FileConfiguration>
+								<FileConfiguration
+									Name="Debug|x64"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath="..\..\classes\graphics\backends\cairo\surfacecairo.cpp"
 								>
 								<FileConfiguration
 									Name="Debug|Win32"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
+								<FileConfiguration
+									Name="Debug|x64"
 									ExcludedFromBuild="true"
 									>
 									<Tool
@@ -935,6 +951,18 @@
 								>
 								<File
 									RelativePath="..\..\classes\gui\widgets\multi\tree\tree.cpp"
+									>
+								</File>
+							</Filter>
+							<Filter
+								Name="image"
+								>
+								<File
+									RelativePath="..\..\classes\gui\widgets\multi\image\imagebox.cpp"
+									>
+								</File>
+								<File
+									RelativePath="..\..\classes\gui\widgets\multi\image\imageentry.cpp"
 									>
 								</File>
 							</Filter>
@@ -2317,6 +2345,18 @@
 								>
 								<File
 									RelativePath="..\..\include\smooth\gui\widgets\multi\tree\tree.h"
+									>
+								</File>
+							</Filter>
+							<Filter
+								Name="image"
+								>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\image\imagebox.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\image\imageentry.h"
 									>
 								</File>
 							</Filter>

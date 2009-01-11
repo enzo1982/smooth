@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -109,7 +109,11 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	{
 		for (UnsignedInt x = 0; x < info_ptr->width; x++)
 		{
-			bitmap.SetPixel(Point(x, y), Color(row_pointers[y][3 * x], row_pointers[y][3 * x + 1], row_pointers[y][3 * x + 2]));
+			if	(info_ptr->color_type == 0 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][x], row_pointers[y][x], row_pointers[y][x]));									 // 8 bit grayscale
+			else if	(info_ptr->color_type == 2 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][3 * x], row_pointers[y][3 * x + 1], row_pointers[y][3 * x + 2]));							 // 24 bit RGB
+			else if (info_ptr->color_type == 3 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(info_ptr->palette[row_pointers[y][x]].red, info_ptr->palette[row_pointers[y][x]].green, info_ptr->palette[row_pointers[y][x]].blue)); // 8 bit palette
+			else if	(info_ptr->color_type == 4 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][2 * x], row_pointers[y][2 * x], row_pointers[y][2 * x]));								 // 8 bit grayscale plus 8 bit alpha
+			else if	(info_ptr->color_type == 6 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][4 * x], row_pointers[y][4 * x + 1], row_pointers[y][4 * x + 2]));							 // 24 bit RGB plus 8 bit alpha
 		}
 	}
 

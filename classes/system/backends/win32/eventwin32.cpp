@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/event.h>
+#include <smooth/system/system.h>
 #include <smooth/system/backends/win32/eventwin32.h>
 
 S::System::EventBackend *CreateEventWin32()
@@ -27,40 +28,35 @@ S::System::EventWin32::~EventWin32()
 {
 }
 
-S::Int S::System::EventWin32::ProcessNextEvent(Bool block)
+S::Int S::System::EventWin32::ProcessNextEvent()
 {
-	MSG	 msg;
-	Bool	 result = False;
-
-	if (block)
+	/* Emulate a timeout of ~100ms by trying to find a message
+	 * 10 times while sleeping for 10ms between trying.
+	 *
+	 * We cannot use MsgWaitForMultipleObjects here as that
+	 * function is not available on pre Windows 2000 systems.
+	 */
+	for (Int i = 0; i < 10; i++)
 	{
-		if (Setup::enableUnicode)	result = GetMessageW(&msg, NIL, 0, 0);
-		else				result = GetMessageA(&msg, NIL, 0, 0);
+		MSG	 msg;
+		Bool	 result = False;
 
-		TranslateMessage(&msg);
-
-		if (Setup::enableUnicode)	DispatchMessageW(&msg);
-		else				DispatchMessageA(&msg);
-
-		if (!result) return Break;
-	}
-	else
-	{
-		if (Setup::enableUnicode)	result = PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-		else				result = PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
-
-		if (Setup::enableUnicode)	PostMessageW(NIL, SM_EXECUTEPEEK, 0, 0);
-		else				PostMessageA(NIL, SM_EXECUTEPEEK, 0, 0);
+		if (Setup::enableUnicode) result = PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
+		else			  result = PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
 
 		if (result)
 		{
 			TranslateMessage(&msg);
 
-			if (Setup::enableUnicode)	DispatchMessageW(&msg);
-			else				DispatchMessageA(&msg);
+			if (Setup::enableUnicode) DispatchMessageW(&msg);
+			else			  DispatchMessageA(&msg);
 
 			if (msg.message == WM_QUIT) return Break;
+
+			break;
 		}
+
+		S::System::System::Sleep(10);
 	}
 
 	return Success();

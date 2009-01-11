@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,7 +38,6 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 	orientation	= OR_UPPERLEFT;
 
 	text		= NIL;
-	tooltipText	= NIL;
 
 	textSize.cx	= 0;
 	textSize.cy	= 0;
@@ -53,6 +52,9 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 	alwaysActive	= False;
 	independent	= False;
 	tabstopCapable	= False;
+
+	tooltipText	= NIL;
+	tooltipLayer	= NIL;
 
 	tipTimer	= NIL;
 	tooltip		= NIL;
@@ -114,7 +116,15 @@ S::GUI::Widget::~Widget()
 	/* Clean up everything in case this widget
 	 * is not deleted using DeleteObject.
 	 */
-	EnqueueForDeletion();
+	DeactivateTooltip();
+
+	CloseContextMenu();
+
+	while (widgets.Length()) Remove(widgets.GetFirst());
+
+	widgets.RemoveAll();
+
+	if (registered && container != NIL) container->Remove(this);
 
 	delete nullSurface;
 }
@@ -126,10 +136,6 @@ S::Void S::GUI::Widget::EnqueueForDeletion()
 	DeactivateTooltip();
 
 	CloseContextMenu();
-
-	while (widgets.Length()) Remove(widgets.GetFirst());
-
-	widgets.RemoveAll();
 
 	if (registered && container != NIL) container->Remove(this);
 }
@@ -371,6 +377,8 @@ S::Int S::GUI::Widget::Hide()
 		Surface	*surface	= container->GetDrawSurface();
 
 		surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
+
+		DeactivateTooltip();
 	}
 
 	onHide.Emit();
@@ -481,7 +489,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 				if (statusText != NIL) window->SetStatusText(statusText);
 
-				if (tooltipText != NIL && window->IsFocussed())
+				if ((tooltipText != NIL || tooltipLayer != NIL) && window->IsFocussed())
 				{
 					tipTimer = new System::Timer();
 
@@ -687,9 +695,18 @@ S::Void S::GUI::Widget::ActivateTooltip()
 
 	tooltip = new Tooltip();
 
-	tooltip->SetText(tooltipText);
-	tooltip->SetMetrics(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1), Size(0, 0));
-	tooltip->SetTimeout(3000);
+	if (tooltipText != NIL)
+	{
+		tooltip->SetText(tooltipText);
+		tooltip->SetMetrics(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1), Size(0, 0));
+		tooltip->SetTimeout(3000);
+	}
+	else if (tooltipLayer != NIL)
+	{
+		tooltip->SetLayer(tooltipLayer);
+		tooltip->SetPosition(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1));
+		tooltip->SetTimeout(3000);
+	}
 
 	PopupMenu::internalOnOpenPopupMenu.Connect(&Widget::DeactivateTooltip, this);
 
@@ -810,6 +827,7 @@ const S::String &S::GUI::Widget::GetText() const
 S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 {
 	tooltipText = nTooltipText;
+	tooltipLayer = NIL;
 
 	return Success();
 }
@@ -817,6 +835,19 @@ S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 const S::String &S::GUI::Widget::GetTooltipText() const
 {
 	return tooltipText;
+}
+
+S::Int S::GUI::Widget::SetTooltipLayer(Layer *nTooltipLayer)
+{
+	tooltipText = NIL;
+	tooltipLayer = nTooltipLayer;
+
+	return Success();
+}
+
+S::GUI::Layer *S::GUI::Widget::GetTooltipLayer() const
+{
+	return tooltipLayer;
 }
 
 S::Int S::GUI::Widget::SetStatusText(const String &nStatusText)

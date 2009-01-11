@@ -140,9 +140,12 @@ S::Void S::Init()
 
 S::Void S::Free()
 {
-	if (--initCount) return;
-
+	/* Call ObjectCleanup() to make sure other
+	 * DLLs are unloaded before we continue.
+	 */
 	Object::ObjectCleanup();
+
+	if (--initCount) return;
 
 #if defined __WIN32__
 	CoUninitialize();
@@ -157,6 +160,12 @@ S::Void S::Free()
 	System::MultiMonitor::Free();
 
 	Backend::DeinitBackends();
+
+	/* All pending objects should be marked for
+	 * deletion now, so let's call ObjectCleanup()
+	 * again to actually free them.
+	 */
+	Object::ObjectCleanup();
 
 	LiSADeinit();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -333,7 +333,7 @@ S::String S::IO::InStream::InputString(Int bytes)
 	int	 databufferpos	= 0;
 	int	 amount		= 0;
 
-	backBuffer.Resize(bytes + 1);
+	Buffer<UnsignedByte>	 stringBuffer(bytes + 1);
 
 	while (bytesleft)
 	{
@@ -350,7 +350,7 @@ S::String S::IO::InStream::InputString(Int bytes)
 
 		amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
-		for (Int i = 0; i < amount; i++) backBuffer[databufferpos + i] = ((char *) (((UnsignedByte *) dataBuffer) + currentBufferPos))[i];
+		for (Int i = 0; i < amount; i++) stringBuffer[databufferpos + i] = (((UnsignedByte *) dataBuffer) + currentBufferPos)[i];
 
 		bytesleft	 -= amount;
 		databufferpos	 += amount;
@@ -358,9 +358,9 @@ S::String S::IO::InStream::InputString(Int bytes)
 		currentFilePos	 += amount;
 	}
 
-	backBuffer[bytes] = 0;
+	stringBuffer[bytes] = 0;
 
-	return String((char *) (UnsignedByte *) backBuffer);
+	return String((char *) (UnsignedByte *) stringBuffer);
 }
 
 S::String S::IO::InStream::InputLine()
@@ -372,7 +372,8 @@ S::String S::IO::InStream::InputLine()
 	long	 inpval;
 	int	 bytes = 0;
 
-	backBuffer.Resize(1024);
+
+	Buffer<UnsignedByte>	 stringBuffer(1024);
 
 	while (True)
 	{
@@ -382,32 +383,26 @@ S::String S::IO::InStream::InputLine()
 
 			if (inpval == -1)
 			{
-				backBuffer[bytes] = 0;
+				stringBuffer[bytes] = 0;
 
-				return String((char *) (UnsignedByte *) backBuffer);
+				return String((char *) (UnsignedByte *) stringBuffer);
 			}
 
 			if (inpval != 13 && inpval != 10)
 			{
-				backBuffer[bytes++] = (char) inpval;
+				stringBuffer[bytes++] = (char) inpval;
 			}
 			else
 			{
 				if (inpval == 13) InputNumber(1);
 
-				backBuffer[bytes] = 0;
+				stringBuffer[bytes] = 0;
 
-				return String((char *) (UnsignedByte *) backBuffer);
+				return String((char *) (UnsignedByte *) stringBuffer);
 			}
 		}
 
-		Buffer<UnsignedByte>	 backBuffer2(bytes);
-
-		memcpy(backBuffer2, backBuffer, bytes);
-
-		backBuffer.Resize(bytes + 1024);
-
-		memcpy(backBuffer, backBuffer2, bytes);
+		stringBuffer.Resize(bytes + 1024);
 	}
 
 	return NIL; // never reached

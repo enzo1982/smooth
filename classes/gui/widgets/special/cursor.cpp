@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -414,7 +414,7 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 
 	if (!(line - scrollPos < 0 || (font.GetTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()))
 	{
-		surface->Box(Rect(point, Size(1, font.GetTextSizeY() + 3)), 0, Rect::Inverted);
+		if (IsVisible()) surface->Box(Rect(point, Size(1, font.GetTextSizeY() + 3)), 0, Rect::Inverted);
 
 		promptVisible = visible;
 	}
@@ -515,6 +515,13 @@ S::Int S::GUI::Cursor::Scroll(Int nScrollPos)
 
 S::Void S::GUI::Cursor::OnTimer()
 {
+	if (!IsVisible())
+	{
+		onLoseFocus.Emit();
+
+		return;
+	}
+
 	ShowCursor(!promptVisible);
 }
 

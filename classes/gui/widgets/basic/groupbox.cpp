@@ -78,6 +78,13 @@ S::Int S::GUI::GroupBox::Activate()
 
 	surface->SetText(text, textRect + Point(1, 0), font);
 
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*widget = GetNthObject(i);
+
+		widget->Paint(SP_PAINT);
+	}
+
 	return Success();
 }
 
@@ -98,6 +105,13 @@ S::Int S::GUI::GroupBox::Deactivate()
 	nFont.SetColor(Setup::GrayTextColor);
 
 	surface->SetText(text, textRect + Point(1, 0), nFont);
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*widget = GetNthObject(i);
+
+		widget->Paint(SP_PAINT);
+	}
 
 	return Success();
 }

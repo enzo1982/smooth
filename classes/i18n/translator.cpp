@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -254,6 +254,11 @@ const S::String &S::I18n::Translator::TranslateString(const String &string)
 S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 {
 	XML::Node	*info = doc->GetRootNode()->GetNodeByName("info");
+
+	/* Return an error if we didn't find an info node.
+	 */
+	if (info == NIL) return Error();
+
 	String		 program;
 	String		 version;
 
@@ -268,6 +273,22 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 		if (property == "encoding")	 language->encoding = info->GetNthNode(i)->GetContent();
 		if (property == "author")	 language->author = info->GetNthNode(i)->GetContent();
 		if (property == "url")		 language->url = info->GetNthNode(i)->GetContent();
+	}
+
+	XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
+
+	/* Return an error if we didn't find a data node.
+	 */
+	if (data == NIL) return Error();
+
+	for (Int k = 0; k < data->GetNOfNodes(); k++)
+	{
+		XML::Node	*entry = data->GetNthNode(k);
+
+		if (entry->GetName() == "entry")
+		{
+			language->strings.Add(entry->GetContent(), entry->GetAttributeByName("string")->GetContent().ComputeCRC32());
+		}
 	}
 
 	Bool		 done = False;
@@ -300,18 +321,6 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 		}
 
 		if (done) break;
-	}
-
-	XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
-
-	for (Int k = 0; k < data->GetNOfNodes(); k++)
-	{
-		XML::Node	*entry = data->GetNthNode(k);
-
-		if (entry->GetName() == "entry")
-		{
-			language->strings.Add(entry->GetContent(), entry->GetAttributeByName("string")->GetContent().ComputeCRC32());
-		}
 	}
 
 	return Success();

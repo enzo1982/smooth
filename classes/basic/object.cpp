@@ -28,6 +28,7 @@ S::Object::Object() : type(this)
 	handle			= RequestObjectHandle();
 	name			= String("Object::").Append(String::FromInt(handle));
 
+	isDeleteable		= False;
 	isObjectInUse		= 0;
 
 	flags			= 0;
@@ -51,7 +52,7 @@ S::Object::~Object()
 	/* Try to remove ourself from the object list
 	 * as DeleteObject might not have been called.
 	 */
-	objects.Remove(handle);
+	if (!isDeleteable) objects.Remove(handle);
 
 	/* Free periodical cleanup timer if the timer
 	 * itself is the only remaining object.
@@ -122,6 +123,7 @@ S::Int S::Object::DeleteObject(Object *object)
 		/* Notify object that it will be deleted soon.
 		 */
 		object->EnqueueForDeletion();
+		object->isDeleteable = True;
 
 		/* Remove object from object list and add
 		 * it to the list of objects to delete.
@@ -145,10 +147,10 @@ S::Void S::Object::ObjectCleanup()
 
 		if (!object->IsObjectInUse())
 		{
-			deleteable.Remove(object->handle);
+			deleteable.RemoveNth(i);
 			delete object;
 
-			i = -1;
+			i -= 1;
 
 			continue;
 		}

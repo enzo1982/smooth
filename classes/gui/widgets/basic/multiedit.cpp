@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -68,10 +68,24 @@ S::Int S::GUI::MultiEdit::Paint(Int message)
 				Surface	*surface = container->GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
-				if (IsActive())	surface->Box(frame, Setup::ClientColor, Rect::Filled);
-				else		surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
+				surface->StartPaint(GetVisibleArea());
+
+				if (IsActive())
+				{
+					cursor->SetBackgroundColor(Setup::ClientColor);
+
+					surface->Box(frame, Setup::ClientColor, Rect::Filled);
+				}
+				else
+				{
+					cursor->SetBackgroundColor(Setup::BackgroundColor);
+
+					surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
+				}
 
 				surface->Frame(frame, FRAME_DOWN);
+
+				surface->EndPaint();
 			}
 
 			break;
@@ -83,20 +97,6 @@ S::Int S::GUI::MultiEdit::Paint(Int message)
 S::Int S::GUI::MultiEdit::MarkAll()
 {
 	return cursor->MarkAll();
-}
-
-S::Int S::GUI::MultiEdit::Activate()
-{
-	cursor->SetBackgroundColor(Setup::ClientColor);
-
-	return Widget::Activate();
-}
-
-S::Int S::GUI::MultiEdit::Deactivate()
-{
-	cursor->SetBackgroundColor(Setup::BackgroundColor);
-
-	return Widget::Deactivate();
 }
 
 S::Int S::GUI::MultiEdit::GetNOfLines()

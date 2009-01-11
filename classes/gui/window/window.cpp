@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -87,7 +87,6 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 
 	onCreate.SetParentObject(this);
 	onPaint.SetParentObject(this);
-	onPeek.SetParentObject(this);
 	onEvent.SetParentObject(this);
 }
 
@@ -97,8 +96,6 @@ S::GUI::Window::~Window()
 
 	Remove(mainLayer);
 	DeleteObject(mainLayer);
-
-	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop--;
 
 	windows.Remove(GetHandle());
 
@@ -431,8 +428,6 @@ S::Bool S::GUI::Window::Create()
 		}
 	}
 
-	if (onPeek.GetNOfConnectedSlots() > 0) peekLoop++;
-
 	return False;
 }
 
@@ -451,8 +446,7 @@ S::Int S::GUI::Window::Stay()
 
 	while (!destroyed)
 	{
-		if (peekLoop > 0) event->ProcessNextEvent(False);
-		else		  event->ProcessNextEvent(True);
+		event->ProcessNextEvent();
 	}
 
 	delete event;
@@ -611,7 +605,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				Window	*window = GetWindow(actWnd);
 
-				if (window == NIL)				activate = False;
+				if	(window == NIL)				activate = False;
 				else if (window->type == ToolWindow::classID)	break;
 				else if (window->GetOrder() < GetOrder())	activate = True;
 				else if (window->GetOrder() > GetOrder())	window->SetFlags(WF_MODAL);
@@ -641,7 +635,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				const Window	*window = GetWindow(actWnd);
 
-				if (window == NIL)				activate = False;
+				if	(window == NIL)				activate = False;
 				else if (window->type == ToolWindow::classID)	break;
 				else						activate = True;
 
@@ -668,7 +662,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				Window	*window = GetWindow(actWnd);
 
-				if (window == NIL)				activate = True;
+				if	(window == NIL)				activate = True;
 				else if (window->type == ToolWindow::classID)	activate = False;
 				else if (window->GetOrder() < GetOrder())	activate = True;
 				else if (window->GetOrder() > GetOrder())	window->SetFlags(WF_SYSTEMMODAL);
@@ -711,12 +705,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			Paint(SP_PAINT);
 #endif
-
-			rVal = Break;
-
-			break;
-		case SM_EXECUTEPEEK:
-			onPeek.Emit();
 
 			rVal = Break;
 
@@ -798,7 +786,7 @@ S::Int S::GUI::Window::Paint(Int message)
 			{
 				Widget	*object = GetNthObject(i);
 
-				if (object->GetOrientation() == OR_TOP)		topobjcount++;
+				if	(object->GetOrientation() == OR_TOP)	topobjcount++;
 				else if (object->GetOrientation() == OR_BOTTOM)	btmobjcount++;
 				else if (object->GetOrientation() == OR_LEFT)	leftobjcount++;
 				else if (object->GetOrientation() == OR_RIGHT)	rightobjcount++;

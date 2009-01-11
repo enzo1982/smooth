@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <libjpeg/jpeglib.h>
+#include <libjpeg/jerror.h>
 
 using namespace smooth::IO;
 
@@ -84,7 +85,16 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 
 	/* Read file parameters with jpeg_read_header()
 	 */
-	jpeg_read_header(&cinfo, TRUE);
+	if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK)
+	{
+		jpeg_destroy_decompress(&cinfo);
+
+		fclose(stream);
+
+		if (gotBuffer) File(fileName).Delete();
+
+		return bitmap;
+	}
 
 	/* We can ignore the return value from jpeg_read_header since
 	 *   (a) suspension is not possible with the stdio data source, and

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -73,7 +73,8 @@ S::Void S::Init()
 #if defined __WIN32__
 	if (hDllInstance == NIL) hDllInstance = hInstance;
 
-	// decide if we want to use unicode:
+	/* Decide if we want to use unicode:
+	 */
 	{
 		OSVERSIONINFOA	 vInfo;
 
@@ -140,6 +141,11 @@ S::Void S::Init()
 
 S::Void S::Free()
 {
+	/* Delete all remaining callers left
+	   from nonblocking function calls.
+	 */
+	NonBlocking::CleanUp();
+
 	/* Call ObjectCleanup() to make sure other
 	 * DLLs are unloaded before we continue.
 	 */

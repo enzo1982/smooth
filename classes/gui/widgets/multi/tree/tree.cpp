@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,11 +34,17 @@ S::GUI::Tree::Tree(const String &iText) : ListEntry(iText)
 
 	Add(headHotspot);
 
+	hotspot->onLeftButtonDown.Disconnect(&ListEntry::OnSelectEntry, this);
+
+	internalOnSelectEntry.Connect(&Tree::OnSelectEntry, this);
+
 	onChangeSize.Connect(&Tree::OnChangeSize, this);
 }
 
 S::GUI::Tree::~Tree()
 {
+	internalOnSelectEntry.Disconnect(&Tree::OnSelectEntry, this);
+
 	DeleteObject(headHotspot);
 }
 
@@ -214,6 +220,14 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 	surface->EndPaint();
 }
 
+S::Void S::GUI::Tree::OnSelectEntry(Int containerHandle, Int handle)
+{
+	if (!IsRegistered()) return;
+
+	if	(containerHandle == list.GetHandle()	   && handle != GetHandle()) internalOnSelectEntry.Emit(container->GetHandle(), GetHandle());
+	else if (containerHandle == container->GetHandle() && handle != GetHandle()) internalOnSelectEntry.Emit(list.GetHandle(),	GetHandle());
+}
+
 S::Void S::GUI::Tree::OnChangeSize(const Size &newSize)
 {
 	headHotspot->SetSize(Size(newSize.cx, 15));
@@ -233,6 +247,6 @@ S::Void S::GUI::Tree::OnMouseOut()
 
 S::Bool S::GUI::Tree::IsTypeCompatible(Int compType) const
 {
-	if (compType == Object::classID || compType == Widget::classID || compType == ListEntry::classID)	return True;
-	else													return False;
+	if (compType == Object::classID || compType == Widget::classID || compType == ListEntry::classID) return True;
+	else												  return False;
 }

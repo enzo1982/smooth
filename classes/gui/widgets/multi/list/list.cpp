@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -141,8 +141,6 @@ S::Int S::GUI::List::SelectEntry(ListEntry *entryToSelect)
 		{
 			entry->Select();
 
-			onSelectEntry.Emit(entry);
-
 			return Success();
 		}
 	}
@@ -170,8 +168,6 @@ S::Int S::GUI::List::SelectNthEntry(Int n)
 
 	entry->Select();
 
-	onSelectEntry.Emit(entry);
-
 	return Success();
 }
 
@@ -194,8 +190,6 @@ S::Int S::GUI::List::SelectEntry(const String &entryText)
 		if (entry->GetText() == entryText)
 		{
 			entry->Select();
-
-			onSelectEntry.Emit(entry);
 
 			return Success();
 		}

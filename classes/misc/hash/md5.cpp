@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,6 +21,8 @@ const S::Int	 S11 = 7, S12 = 12, S13 = 17, S14 = 22,
 		 S31 = 4, S32 = 11, S33 = 16, S34 = 23,
 		 S41 = 6, S42 = 10, S43 = 15, S44 = 21;
 
+/* MD5 padding bytes.
+ */
 static unsigned char PADDING[64] = {
 	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

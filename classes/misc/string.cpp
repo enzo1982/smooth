@@ -437,6 +437,8 @@ S::String &S::String::operator =(const wchar_t *newString)
 
 S::String &S::String::operator =(const String &newString)
 {
+	if (&newString == this) return *this;
+
 	if (newString.wString.Size() == 0)
 	{
 		Clean();

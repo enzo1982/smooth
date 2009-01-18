@@ -630,6 +630,11 @@ $(OBJECTDIR)/hash_md5.o: $(MISCCLASSESDIR)/hash/md5.cpp $(SMOOTHINCLUDEDIR)/misc
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/hash/md5.cpp -o $(OBJECTDIR)/hash_md5.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/hash_sha1.o: $(MISCCLASSESDIR)/hash/sha1.cpp $(SMOOTHINCLUDEDIR)/misc/hash/sha1.h
+	$(ECHO) -n Compiling $(MISCCLASSESDIR)/hash/sha1.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/hash/sha1.cpp -o $(OBJECTDIR)/hash_sha1.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/args.o: $(MISCCLASSESDIR)/args.cpp $(SMOOTHINCLUDEDIR)/misc/args.h
 	$(ECHO) -n Compiling $(MISCCLASSESDIR)/args.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(MISCCLASSESDIR)/args.cpp -o $(OBJECTDIR)/args.o

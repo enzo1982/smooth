@@ -49,8 +49,8 @@ S::Int S::GUI::Application::Loop()
 			}
 		}
 
-		// start waiting threads here
-
+		/* Start waiting threads here.
+		 */
 		for (Int j = 0; j < Object::GetNOfObjects(); j++)
 		{
 			Object	*object = Object::GetNthObject(j);
@@ -97,14 +97,9 @@ S::Int S::GUI::Application::Loop()
 		}
 	}
 
-	// Wait for started threads to finish.
-
+	/* Wait for started threads to finish.
+	 */
 	while (Threads::Thread::GetNOfRunningThreads() > 0) System::System::Sleep(10);
-
-	/* Delete all remaining callers left
-	   from nonblocking function calls.  */
-
-	NonBlocking::CleanUp();
 
 	return Success();
 }

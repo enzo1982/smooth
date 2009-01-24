@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -152,10 +152,17 @@ S::Void S::GUI::ComboBox::OpenListBox()
 {
 	if (listBox == NIL)
 	{
-		listBox		= new ListBox(Point(0, 0), Size(GetWidth(), 15 * Math::Min(Length(), 5) + 4));
+		Widget	*window		= container->GetContainerWindow();
+ 
+		Size	 listBoxSize	= Size(GetWidth(), 15 * Math::Min(Length(), Math::Max(5, Math::Min(15, Length() / 3))) + 4);
+		Point	 listBoxPos	= Point(GetRealPosition() + Point(0, GetHeight()));
+
+		if (window->GetY() + listBoxPos.y + listBoxSize.cy >= LiSAGetDisplaySizeY()) listBoxPos = Point(GetRealPosition() - Point(0, listBoxSize.cy));
+
+		listBox		= new ListBox(Point(), listBoxSize);
 		listBox->onSelectEntry.Connect(&onSelectEntry);
 
-		toolWindow	= new ToolWindow(GetRealPosition() + Point(0, GetHeight()), Size(GetWidth(), 15 * Math::Min(Length(), 5) + 4));
+		toolWindow	= new ToolWindow(listBoxPos, listBoxSize);
 		toolWindow->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
 		listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);

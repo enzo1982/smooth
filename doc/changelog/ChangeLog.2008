@@ -1,0 +1,37 @@
+ChangeLog for smooth
+
+22.03.08 11:25 - smooth alpha 0.8.70.0
+
+- string.cpp	- fixed string conversion when inEncoding == outEncoding
+		- new function: Trim, strips whitespaces from both ends of a string
+- config.cpp	- configuration is no longer automatically saved
+- widget.cpp	- added a universal context menu framework
+		- tooltips are no longer displayed if the containing window is inactive
+- window.cpp	- removed support for context menus
+		- removed signal onResize (using Widget::onChangeSize instead)
+		- fixed display of a black window when part of it is outside the working area
+- system.cpp	- new function: GetAPIVersion()
+		- new functions to retrieve system folder locations
+- listentry.cpp	- ListEntries can now be displayed inactive
+- protocol.cpp	- new class: Protocol, base class for network protocol implementation
+- file.cpp	- new class: File, implementation of the file:// protocol
+- http.cpp	- new class: HTTP, HTTP protocol implementation
+- scrollbar.cpp	- changed scrollbar behaviour to be more Windows-like
+- s...cairo.cpp	- added support for Cairo surfaces
+- semaphore.cpp - added support for initializing semaphores with a maximum value
+- rwlock.cpp	- new class: RWLock, implements a simple read/write lock based on Mutex and Semaphore
+- md5.cpp	- new class: MD5, implements the message digest algorithm
+- number.cpp	- new class: Number, implements string to number conversions
+- treeview.cpp	- new class: TreeView, container for Tree entries
+- tree.cpp	- new class: Tree, implements Tree entries for Lists
+
+- completely new and improved Array<t> implementation
+- new template class: Iterator<t>, iterator for arrays of type Array<t>
+- added missing operator =() to signal classes
+- applications now check the smooth API version instead of the release number for compatibility
+- added support for network files and directories
+- fixed grayscaled icons display in iconbars
+- added foreach macro
+
+- improved Linux support
+- improved Winelib support

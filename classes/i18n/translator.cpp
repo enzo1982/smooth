@@ -285,7 +285,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 	{
 		XML::Node	*entry = data->GetNthNode(k);
 
-		if (entry->GetName() == "entry")
+		if (entry->GetName() == "entry" && entry->GetAttributeByName("string") != NIL)
 		{
 			language->strings.Add(entry->GetContent(), entry->GetAttributeByName("string")->GetContent().ComputeCRC32());
 		}

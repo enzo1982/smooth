@@ -20,6 +20,8 @@ S::Threads::RWLock::RWLock()
 	writeLocked = False;
 	readLocks = 0;
 
+	readLockMutex		= new Mutex();
+
 	exclusiveAccessMutex	= new Mutex();
 	sharedAccessSemaphore	= new Semaphore(MAX_READ_LOCKS);
 }
@@ -48,13 +50,21 @@ S::Threads::RWLock &S::Threads::RWLock::operator =(const RWLock &oRWLock)
 
 S::Int S::Threads::RWLock::LockForRead()
 {
-	/* Increase shared access counter by one.
+	/* Wait for write locks to be released.
 	 */
 	exclusiveAccessMutex->Lock();
+
+	/* Increase shared access counter by one.
+	 */
+	readLockMutex->Lock();
 
 	sharedAccessSemaphore->Wait();
 	readLocks++;
 
+	readLockMutex->Release();
+
+	/* Allow new read and write locks again.
+	 */
 	exclusiveAccessMutex->Release();
 
 	return Success();
@@ -95,12 +105,12 @@ S::Int S::Threads::RWLock::Release()
 
 	/* Decrease shared access counter by one.
 	 */
-	exclusiveAccessMutex->Lock();
+	readLockMutex->Lock();
 
 	readLocks--;
 	sharedAccessSemaphore->Release();
 
-	exclusiveAccessMutex->Release();
+	readLockMutex->Release();
 
 	return Success();
 }

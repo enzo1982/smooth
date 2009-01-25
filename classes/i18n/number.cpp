@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,15 +12,15 @@
 
 S::String S::I18n::Number::GetLocalizedNumberString(Int64 number)
 {
-	// Localize a number according to the current locale settings
-
+	/* Localize a number according to the current locale settings
+	 */
 	Int	 negFormat = 1;
 	String	 sThousand = ".";
 
 #ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
-		static wchar_t	 buffer[4];
+		wchar_t	 buffer[4];
 
 		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, buffer, 4);
 		sThousand = buffer;
@@ -30,7 +30,7 @@ S::String S::I18n::Number::GetLocalizedNumberString(Int64 number)
 	}
 	else
 	{
-		static char	 buffer[4];
+		char	 buffer[4];
 
 		GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, buffer, 4);
 		sThousand = buffer;
@@ -43,8 +43,8 @@ S::String S::I18n::Number::GetLocalizedNumberString(Int64 number)
 	String	 nString = String::FromInt(number >= 0 ? number : -number);
 	String	 retVal;
 
-	// Separate three number blocks
-
+	/* Separate three number blocks.
+	 */
 	for (Int i = 0; i < nString.Length(); i++)
 	{
 		if ((nString.Length() - i) % 3 == 0 && i > 0) retVal.Append(sThousand);
@@ -52,8 +52,8 @@ S::String S::I18n::Number::GetLocalizedNumberString(Int64 number)
 		retVal[retVal.Length()] = nString[i];
 	}
 
-	// Format negative numbers according to the locale
-
+	/* Format negative numbers according to the locale.
+	 */
 	if (number < 0)
 	{
 		switch (negFormat)

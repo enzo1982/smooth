@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,11 +28,11 @@ S::GUI::Dialogs::FontSelection::~FontSelection()
 const Error &S::GUI::Dialogs::FontSelection::ShowDialog()
 {
 #ifdef __WIN32__
-	static CHOOSEFONTW	 cfw;
-	static CHOOSEFONTA	 cfa;
-	LOGFONTW		 lfw;
-	LOGFONTA		 lfa;
-	bool			 result;
+	CHOOSEFONTW	 cfw;
+	CHOOSEFONTA	 cfa;
+	LOGFONTW	 lfw;
+	LOGFONTA	 lfa;
+	bool		 result;
 
 	if (parentWindow != NIL)
 	{

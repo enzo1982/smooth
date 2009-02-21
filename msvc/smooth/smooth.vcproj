@@ -905,6 +905,10 @@
 									RelativePath="..\..\classes\gui\widgets\multi\list\listentry.cpp"
 									>
 								</File>
+								<File
+									RelativePath="..\..\classes\gui\widgets\multi\list\listentryseparator.cpp"
+									>
+								</File>
 							</Filter>
 							<Filter
 								Name="menu"
@@ -2345,6 +2349,10 @@
 								</File>
 								<File
 									RelativePath="..\..\include\smooth\gui\widgets\multi\list\listentry.h"
+									>
+								</File>
+								<File
+									RelativePath="..\..\include\smooth\gui\widgets\multi\list\listentryseparator.h"
 									>
 								</File>
 							</Filter>

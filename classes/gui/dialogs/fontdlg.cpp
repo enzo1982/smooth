@@ -28,11 +28,11 @@ S::GUI::Dialogs::FontSelection::~FontSelection()
 const Error &S::GUI::Dialogs::FontSelection::ShowDialog()
 {
 #ifdef __WIN32__
-	CHOOSEFONTW	 cfw;
-	CHOOSEFONTA	 cfa;
-	LOGFONTW	 lfw;
-	LOGFONTA	 lfa;
-	bool		 result;
+	static CHOOSEFONTW	 cfw;
+	static CHOOSEFONTA	 cfa;
+	LOGFONTW		 lfw;
+	LOGFONTA		 lfa;
+	bool			 result;
 
 	if (parentWindow != NIL)
 	{

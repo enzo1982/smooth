@@ -122,7 +122,8 @@ S::Int S::GUI::EditBox::SetDropDownList(List *nDropDownList)
 
 		for (Int i = 0; i < dropDownList->Length(); i++)
 		{
-			comboBox->AddEntry(dropDownList->GetNthEntry(i)->GetText());
+			if (dropDownList->GetNthEntry(i)->GetObjectType() == ListEntrySeparator::classID) comboBox->AddSeparator();
+			else										  comboBox->AddEntry(dropDownList->GetNthEntry(i)->GetText());
 		}
 
 		Add(comboBox);

@@ -33,9 +33,9 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 #ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
-		OPENFILENAMEW	 ofnw;
-		wchar_t		*filterw = new wchar_t [32768];
-		wchar_t		*bufferw = new wchar_t [32768];
+		static OPENFILENAMEW	 ofnw;
+		wchar_t			*filterw = new wchar_t [32768];
+		wchar_t			*bufferw = new wchar_t [32768];
 
 		for (Int i = 0; i < 32768; i++)		   bufferw[i] = 0;
 		for (Int n = 0; n < defFile.Length(); n++) bufferw[n] = defFile[n];
@@ -145,9 +145,9 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 	}
 	else
 	{
-		OPENFILENAMEA	 ofna;
-		char		*filtera = new char [32768];
-		char		*buffera = new char [32768];
+		static OPENFILENAMEA	 ofna;
+		char			*filtera = new char [32768];
+		char			*buffera = new char [32768];
 
 		for (Int j = 0; j < 32768; j++)		   buffera[j] = 0;
 		for (Int n = 0; n < defFile.Length(); n++) buffera[n] = defFile[n];

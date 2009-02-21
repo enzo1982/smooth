@@ -5,6 +5,7 @@ xx.xx.09 xx:xx - smooth alpha 0.8.71.0
 - window.cpp	- renamed doQuit to doClose
 		- removed onPeek
 - listbox.cpp	- show partially visible entries again
+- combobox.cpp	- improved drop-down list size adjustment
 - number.cpp	- fixed floating point number -> string conversion
 - widget.cpp	- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
 		- new attribute: independent, makes a widget independent of its container
@@ -20,4 +21,5 @@ xx.xx.09 xx:xx - smooth alpha 0.8.71.0
 - removed TreeView widget (use ListBox instead)
 - fixed implementation of callback signals
 - fixed implementation of Array<>
+- updated Translator to support template files
 - improved Linux support

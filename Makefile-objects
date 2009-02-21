@@ -410,6 +410,11 @@ $(OBJECTDIR)/listentry.o: $(GUICLASSESDIR)/widgets/multi/list/listentry.cpp $(SM
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/list/listentry.cpp -o $(OBJECTDIR)/listentry.o
 	$(ECHO) done.
 
+$(OBJECTDIR)/listentryseparator.o: $(GUICLASSESDIR)/widgets/multi/list/listentryseparator.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/list/listseparator.h
+	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/list/listentryseparator.cpp...
+	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/list/listentryseparator.cpp -o $(OBJECTDIR)/listentryseparator.o
+	$(ECHO) done.
+
 $(OBJECTDIR)/menu.o: $(GUICLASSESDIR)/widgets/multi/menu/menu.cpp $(SMOOTHINCLUDEDIR)/gui/widgets/multi/menu/menu.h
 	$(ECHO) -n Compiling $(GUICLASSESDIR)/widgets/multi/menu/menu.cpp...
 	$(COMPILER) $(COMPILER_OPTS) $(GUICLASSESDIR)/widgets/multi/menu/menu.cpp -o $(OBJECTDIR)/menu.o

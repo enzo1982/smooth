@@ -33,6 +33,8 @@ S::Threads::RWLock::RWLock(const RWLock &oRWLock)
 
 S::Threads::RWLock::~RWLock()
 {
+	delete readLockMutex;
+
 	delete exclusiveAccessMutex;
 	delete sharedAccessSemaphore;
 }
@@ -41,6 +43,8 @@ S::Threads::RWLock &S::Threads::RWLock::operator =(const RWLock &oRWLock)
 {
 	writeLocked = False;
 	readLocks = 0;
+
+	readLockMutex		= new Mutex();
 
 	exclusiveAccessMutex	= new Mutex();
 	sharedAccessSemaphore	= new Semaphore(MAX_READ_LOCKS);

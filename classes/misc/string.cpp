@@ -620,6 +620,42 @@ S::Int S::String::Find(const String &str) const
 	return -1;
 }
 
+S::Int S::String::FindLast(const char *str) const
+{
+	String 	 str2 = str;
+
+	return FindLast(str2);
+}
+
+S::Int S::String::FindLast(const wchar_t *str) const
+{
+	String 	 str2 = str;
+
+	return FindLast(str2);
+}
+
+S::Int S::String::FindLast(const String &str) const
+{
+	Int	 len1 = Length();
+	Int	 len2 = str.Length();
+
+	mutex.Lock();
+
+	for (Int i = len1 - len2; i >= 0; i--)
+	{
+		if (wcsncmp(wString + i, str.wString, len2) == 0)
+		{
+			mutex.Release();
+
+			return i;
+		}
+	}
+
+	mutex.Release();
+
+	return -1;
+}
+
 S::String &S::String::Replace(const char *str1, const char *str2)
 {
 	String	 str3 = str1;

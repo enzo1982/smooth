@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/multi/list/list.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
 
 const S::Int	 S::GUI::List::classID = S::Object::RequestClassID();
@@ -29,6 +30,22 @@ S::GUI::List::~List()
 S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text)
 {
 	ListEntry	*newEntry = new ListEntry(text);
+
+	if (Add(newEntry) == Success())
+	{
+		createdEntry.Set(newEntry->GetHandle(), True);
+
+		return newEntry;
+	}
+
+	DeleteObject(newEntry);
+
+	return NIL;
+}
+
+S::GUI::ListEntrySeparator *S::GUI::List::AddSeparator()
+{
+	ListEntrySeparator	*newEntry = new ListEntrySeparator();
 
 	if (Add(newEntry) == Success())
 	{
@@ -82,23 +99,28 @@ S::Int S::GUI::List::Remove(Widget *widget)
 
 S::Int S::GUI::List::RemoveAllEntries()
 {
-	Int	 nonListEntry = 0;
+	Surface	*surface = NIL;
 
-	while (GetNOfObjects() - nonListEntry)
+	if (IsRegistered()) surface = container->GetDrawSurface();
+
+	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+	Bool	 visible = IsVisible();
+
+	if (surface != NIL)
 	{
-		if (GetNthObject(nonListEntry)->GetObjectType() != ListEntry::classID) { nonListEntry++; continue; }
+		surface->StartPaint(frame);
 
-		Widget	*widget = GetNthObject(nonListEntry);
-
-		Widget::Remove(widget);
-
-		if (createdEntry.Get(widget->GetHandle())) DeleteObject(widget);
+		if (visible) Hide();
 	}
 
-	elementOrder.RemoveAll();
-	createdEntry.RemoveAll();
+	while (Length() > 0) Remove(GetNthEntry(Length() - 1));
 
-	Paint(SP_PAINT);
+	if (surface != NIL)
+	{
+		if (visible) Show();
+
+		surface->EndPaint();
+	}
 
 	return Success();
 }

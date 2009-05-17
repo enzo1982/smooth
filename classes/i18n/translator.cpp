@@ -139,16 +139,16 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 	{
 		for (Int i = 0; i < 3; i++)
 		{
-			String	 var = NIL;
+			const char	*xml = NIL;
 
-			if (i == 0) var = smooth_de;
-			if (i == 1) var = smooth_it;
-			if (i == 2) var = smooth_sr;
+			if (i == 0) xml = smooth_de;
+			if (i == 1) xml = smooth_it;
+			if (i == 2) xml = smooth_sr;
 
 			doc = new XML::Document();
 			language = new Language();
 
-			doc->ParseMemory((void *) (char *) var, var.Length());
+			doc->ParseMemory((void *) xml, strlen(xml));
 
 			if (i == 0) language->magic = "smooth_de";
 			if (i == 1) language->magic = "smooth_it";

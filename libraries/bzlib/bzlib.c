@@ -85,7 +85,8 @@
 #ifndef BZ_NO_STDIO
 void BZ2_bz__AssertH__fail ( int errcode )
 {
-   fprintf(stderr, 
+// Commented out bug note.
+/*   fprintf(stderr, 
       "\n\nbzip2/libbzip2: internal error number %d.\n"
       "This is a bug in bzip2/libbzip2, %s.\n"
       "Please report it to me at: jseward@acm.org.  If this happened\n"
@@ -97,9 +98,10 @@ void BZ2_bz__AssertH__fail ( int errcode )
       errcode,
       BZ2_bzlibVersion()
    );
-
+*/
    if (errcode == 1007) {
-   fprintf(stderr,
+// Commented out bug note.
+/*   fprintf(stderr,
       "\n*** A special note about internal error number 1007 ***\n"
       "\n"
       "Experience suggests that a common cause of i.e. 1007\n"
@@ -124,7 +126,7 @@ void BZ2_bz__AssertH__fail ( int errcode )
       "  problem -- without which I will be unable to investigate it.\n"
       "\n"
    );
-   }
+*/   }
 
    exit(3);
 }

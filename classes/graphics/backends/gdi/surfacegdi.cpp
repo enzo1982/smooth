@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -518,7 +518,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, const Rect &srcRect, const Rect &iDestRect)
 {
-	if (window == NIL) return Success();
+	if (window  == NIL) return Success();
+	if (oBitmap == NIL) return Error();
 
 	Bitmap	 bitmap	  = oBitmap;
 	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
@@ -557,7 +558,8 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, const Rect &src
 
 S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oBitmap, const Rect &destRect)
 {
-	if (window == NIL) return Success();
+	if (window  == NIL) return Success();
+	if (oBitmap == NIL) return Error();
 
 	Bitmap	 bitmap	 = oBitmap;
 	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));

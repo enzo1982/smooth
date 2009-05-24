@@ -61,6 +61,8 @@ S::GUI::ListEntrySeparator *S::GUI::List::AddSeparator()
 
 S::Int S::GUI::List::Add(Widget *widget)
 {
+	if (widget == NIL) return Error();
+
 	if (widget->GetObjectType() == ListEntry::classID) widget->Hide();
 
 	if (Widget::Add(widget) == Success() && widget->GetObjectType() == ListEntry::classID)

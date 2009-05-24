@@ -166,9 +166,8 @@ Widget *Designer_EditComponent::AddObject(Int objid)
 
 			break;
 		default:
-#ifdef __WIN32__
 			QuickMessage("Unknown object ID!", "Error", MB_OK, IDI_HAND);
-#endif
+
 			return NIL;
 	}
 

@@ -698,7 +698,8 @@ S::Int S::GUI::SurfaceCairo::Gradient(const Rect &iRect, const Color &color1, co
 
 S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &srcRect, const Rect &iDestRect)
 {
-	if (window == NIL) return Success();
+	if (window  == NIL) return Success();
+	if (oBitmap == NIL) return Error();
 
 	Bitmap	 bitmap	  = oBitmap;
 	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
@@ -760,7 +761,8 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &s
 
 S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oBitmap, const Rect &destRect)
 {
-	if (window == NIL) return Success();
+	if (window  == NIL) return Success();
+	if (oBitmap == NIL) return Error();
 
 	Bitmap	 bitmap	 = oBitmap;
 	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -320,7 +320,8 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 
 S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &oBitmap, const Rect &srcRect, const Rect &iDestRect)
 {
-	if (window == NIL) return Success();
+	if (window  == NIL) return Success();
+	if (oBitmap == NIL) return Error();
 
 	Bitmap	 bmp	  = oBitmap;
 	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
@@ -336,7 +337,8 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &oBitmap, const Rect &sr
 
 S::Int S::GUI::SurfaceXLib::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oBitmap, const Rect &destRect)
 {
-	if (window == NIL) return Success();
+	if (window  == NIL) return Success();
+	if (oBitmap == NIL) return Error();
 
 	Bitmap	 bmp	 = oBitmap;
 	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);

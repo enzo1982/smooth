@@ -50,6 +50,8 @@ S::GUI::Tree::~Tree()
 
 S::Int S::GUI::Tree::Add(Widget *widget)
 {
+	if (widget == NIL) return Error();
+
 	if (widget->GetObjectType() == ListEntry::classID) return list.Add(widget);
 
 	return Widget::Add(widget);
@@ -57,6 +59,8 @@ S::Int S::GUI::Tree::Add(Widget *widget)
 
 S::Int S::GUI::Tree::Remove(Widget *widget)
 {
+	if (widget == NIL) return Error();
+
 	if (widget->GetObjectType() == ListEntry::classID) return list.Remove(widget);
 
 	return Widget::Remove(widget);

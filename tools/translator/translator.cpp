@@ -157,7 +157,6 @@ Bool Translator::ExitProc()
 {
 	if (fileName != NIL && modified)
 	{
-#ifdef __WIN32__
 		Int	 id = QuickMessage(String("Do you want to save changes in ").Append(GetShortFileName(fileName)).Append("?"), "smooth Translator", MB_YESNOCANCEL, IDI_QUESTION);
 
 		switch (id)
@@ -175,7 +174,6 @@ Bool Translator::ExitProc()
 			case IDCLOSE:
 				return False;
 		}
-#endif
 	}
 	else if (fileName != NIL && !modified)
 	{

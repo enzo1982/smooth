@@ -995,6 +995,8 @@ S::Void *S::GUI::Window::GetSystemWindow() const
 
 S::Int S::GUI::Window::Add(Widget *widget)
 {
+	if (widget == NIL) return Error();
+
 	if (widget->GetOrientation() == OR_UPPERLEFT || widget->GetOrientation() == OR_UPPERRIGHT || widget->GetOrientation() == OR_LOWERLEFT || widget->GetOrientation() == OR_LOWERRIGHT) return mainLayer->Add(widget);
 
 	if (Widget::Add(widget) == Success())
@@ -1018,6 +1020,8 @@ S::Int S::GUI::Window::Add(Widget *widget)
 
 S::Int S::GUI::Window::Remove(Widget *widget)
 {
+	if (widget == NIL) return Error();
+
 	if (widget->GetOrientation() == OR_UPPERLEFT || widget->GetOrientation() == OR_UPPERRIGHT || widget->GetOrientation() == OR_LOWERLEFT || widget->GetOrientation() == OR_LOWERRIGHT) return mainLayer->Remove(widget);
 
 	if (Widget::Remove(widget) == Success())

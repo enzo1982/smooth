@@ -63,7 +63,6 @@ MDITest::~MDITest()
 
 Bool MDITest::ExitProc()
 {
-#ifdef __WIN32__
 	Int	 id = QuickMessage("Do you really want to quit?", "Exit program", MB_YESNO, IDI_QUESTION);
 
 	switch (id)
@@ -74,9 +73,6 @@ Bool MDITest::ExitProc()
 		case IDNO:
 			return False;
 	}
-#else
-	return True;
-#endif
 }
 
 Void MDITest::Close()

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -113,9 +113,16 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 		thissize = 0;
 	}
 
+	msgbox->SetWidth(maxsize + 36);
+	msgbox->SetHeight((((Int) Math::Max(2, lines) + 1) * 16) + 70 + buttonHeight);
+
+	if (msgicon != NIL)
+	{
 #ifdef __WIN32__
-	msgbox->SetSize(Size(maxsize + 36 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0), (((Int) Math::Max(2, lines) + 1) * 16) + 70 + buttonHeight));
+		msgbox->SetWidth(maxsize + 36 + GetSystemMetrics(SM_CXICON) + 20);
 #endif
+	}
+
 
 	titlesize = Font(Font::Default, Font::DefaultSize, Font::Bold).GetTextSizeX(title);
 
@@ -132,19 +139,25 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	if (cVar != NIL)
 	{
-#ifdef __WIN32__
-		checkbox = new CheckBox(checkBoxText, Point(13 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0), 46 + buttonHeight), Size(100, 0), cVar);
+		checkbox = new CheckBox(checkBoxText, Point(13, 46 + buttonHeight), Size(100, 0), cVar);
 		checkbox->SetOrientation(OR_LOWERLEFT);
 		checkbox->SetWidth(checkbox->textSize.cx + 21);
 
-		msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->textSize.cx + 54 + (msgicon != NIL ? GetSystemMetrics(SM_CXICON) + 20 : 0)));
+		msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->textSize.cx + 54));
 		msgbox->SetHeight(msgbox->GetHeight() + 22);
+
+		if (msgicon != NIL)
+		{
+#ifdef __WIN32__
+			checkbox->SetX(checkbox->GetX() + GetSystemMetrics(SM_CXICON) + 20);
+
+			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->textSize.cx + 54 + GetSystemMetrics(SM_CXICON) + 20));
 #endif
+		}
 
 		lay->Add(checkbox);
 	}
 
-#ifdef __WIN32__
 	switch (buttons)
 	{
 		default:
@@ -180,7 +193,6 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 			break;
 	}
-#endif
 
 	for (Int i = 0; i < buttonLabels.Length(); i++)
 	{
@@ -254,9 +266,7 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 
 S::Bool S::GUI::Dialogs::MessageDlg::MessageKillProc()
 {
-#ifdef __WIN32__
 	if (buttonCode == 0) buttonCode = IDCLOSE;
-#endif
 
 	nOfMessageBoxes--;
 
@@ -265,7 +275,6 @@ S::Bool S::GUI::Dialogs::MessageDlg::MessageKillProc()
 
 S::Void S::GUI::Dialogs::MessageDlg::MessageButton(Int buttonID)
 {
-#ifdef __WIN32__
 	if	(buttonLabels.GetNth(buttonID) == "OK")		buttonCode = IDOK;
 	else if	(buttonLabels.GetNth(buttonID) == "Cancel")	buttonCode = IDCANCEL;
 	else if	(buttonLabels.GetNth(buttonID) == "Yes")	buttonCode = IDYES;
@@ -273,7 +282,6 @@ S::Void S::GUI::Dialogs::MessageDlg::MessageButton(Int buttonID)
 	else if	(buttonLabels.GetNth(buttonID) == "Retry")	buttonCode = IDRETRY;
 	else if	(buttonLabels.GetNth(buttonID) == "Abort")	buttonCode = IDABORT;
 	else if	(buttonLabels.GetNth(buttonID) == "Ignore")	buttonCode = IDIGNORE;
-#endif
 
 	msgbox->Close();
 }

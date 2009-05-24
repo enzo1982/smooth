@@ -270,7 +270,5 @@ Void Test::OnScrollbarValueChange(Int value)
 
 Void Test::OnWidgetAction()
 {
-#ifdef __WIN32__
 	QuickMessage("Some widget action occurred!", "Info", MB_OK, IDI_INFORMATION);
-#endif
 }

@@ -708,9 +708,7 @@ Void BeatClock::PaintAll()
 
 Void BeatClock::Info()
 {
-#ifdef __WIN32__
 	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2008\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
-#endif
 }
 
 Int BeatClock::GetDayOfWeek(Int day, Int month, Int year)

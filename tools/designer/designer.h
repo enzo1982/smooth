@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,11 +24,13 @@ using namespace smooth::System;
 class Designer : public Application
 {
 	private:
-		Window				*wnd;
+		GUI::Window			*wnd;
 		Titlebar			*title;
+
 		Menubar				*menubar;
 		Menubar				*iconbar;
 		Statusbar			*statusbar;
+
 		PopupMenu			*menu_file;
 		PopupMenu			*menu_dialog;
 		PopupMenu			*menu_widgets;
@@ -53,6 +55,7 @@ class Designer : public Application
 	public:
 						 Designer();
 						~Designer();
+
 		Void				 ReportStatus(Designer_Status);
 };
 

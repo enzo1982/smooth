@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -83,8 +83,9 @@ S::Bool S::GUI::BitmapXLib::CreateBitmap(Int cx, Int cy, Int bpp)
 
 	if (bpp != 24 && bpp != 32) bpp = 32;
 	
-	bitmap = XCreatePixmap(display, DefaultRootWindow(display), cx, cy, bpp);
-	
+	bitmap	= XCreatePixmap(display, DefaultRootWindow(display), cx, cy, bpp);
+	bytes	= (Void *) -1;	
+
 	if (bitmap == NIL) return False;
 
 	size	= Size(cx, cy);

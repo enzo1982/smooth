@@ -22,7 +22,7 @@ class Translator : public Application
 	private:
 		static const Int	 numInfoItems = 7;
 
-		Window			*wnd;
+		GUI::Window		*wnd;
 		Titlebar		*title;
 		Menubar			*menubar;
 		Statusbar		*statusbar;

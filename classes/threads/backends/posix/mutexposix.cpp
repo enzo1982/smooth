@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,15 +23,17 @@ S::Threads::MutexPOSIX::MutexPOSIX(Void *iMutex)
 
 	if (iMutex != NIL)
 	{
-		mutex	= (pthread_mutex_t *) iMutex;
-		myMutex	= False;
+		attributes = NIL;
+		mutex	   = (pthread_mutex_t *) iMutex;
+		myMutex	   = False;
 	}
 	else
 	{
 		/* The mutex will be created once we need it
 		 */
-		mutex	= NIL;
-		myMutex	= True;
+		attributes = NIL;
+		mutex	   = NIL;
+		myMutex	   = True;
 	}
 }
 
@@ -42,6 +44,10 @@ S::Threads::MutexPOSIX::~MutexPOSIX()
 		pthread_mutex_destroy(mutex);
 
 		delete mutex;
+
+		pthread_mutexattr_destroy(attributes);
+
+		delete attributes;
 	}
 }
 
@@ -56,9 +62,14 @@ S::Int S::Threads::MutexPOSIX::Lock()
 	 */
 	if (mutex == NIL)
 	{
+		attributes = new pthread_mutexattr_t;
+
+		pthread_mutexattr_init(attributes);
+		pthread_mutexattr_settype(attributes, PTHREAD_MUTEX_RECURSIVE);
+
 		mutex = new pthread_mutex_t;
 
-		pthread_mutex_init(mutex, NULL);
+		pthread_mutex_init(mutex, attributes);
 	}
 
 	pthread_mutex_lock(mutex);

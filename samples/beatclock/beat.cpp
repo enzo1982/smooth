@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,9 @@
 #include <smooth.h>
 #include <smooth/main.h>
 
-#include <tchar.h>
+#ifdef __WIN32__
+#	include <tchar.h>
+#endif
 
 #include "beat.h"
 
@@ -48,7 +50,7 @@ BeatClock::BeatClock()
 
 	InputValues();
 
-	wnd		= new Window("BeatClock", Point(wpx, wpy), Size(Math::Round(164 * Setup::FontSize), Math::Round(103 * Setup::FontSize)));
+	wnd		= new GUI::Window("BeatClock", Point(wpx, wpy), Size(Math::Round(164 * Setup::FontSize), Math::Round(103 * Setup::FontSize)));
 	title		= new Titlebar(TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	timer		= new Timer();
@@ -96,16 +98,18 @@ BeatClock::~BeatClock()
 
 Void BeatClock::EventProc(Int message, Int wParam, Int lParam)
 {
+#ifdef __WIN32__
 	if (message == WM_WINDOWPOSCHANGED)
 	{
 		wpx = ((LPWINDOWPOS) lParam)->x;
 		wpy = ((LPWINDOWPOS) lParam)->y;
 	}
+#endif
 }
 
 Void BeatClock::Options()
 {
-	optionsdialog	= new Window("BeatClock Options", Point(100, 100), Size(399, 183));
+	optionsdialog	= new GUI::Window("BeatClock Options", Point(100, 100), Size(399, 183));
 	display		= new Layer("Display");
 	alarm		= new Layer("Alarm");
 	misc		= new Layer("Misc");
@@ -497,6 +501,7 @@ Void BeatClock::PaintAll()
 
 	surface->StartPaint(Rect(Point(10, 50), Size(wnd->GetWidth() - 20, 50)));
 
+#ifdef __WIN32__
 	Rect			 textRect;
 	SYSTEMTIME		 time;
 	TIME_ZONE_INFORMATION	 tzi;
@@ -697,13 +702,15 @@ Void BeatClock::PaintAll()
 		actcbeats = cbeats;
 		actccbeats = ccbeats;
 	}
-
+#endif
 	surface->EndPaint();
 }
 
 Void BeatClock::Info()
 {
+#ifdef __WIN32__
 	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2008\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", MB_OK, IDI_ASTERISK);
+#endif
 }
 
 Int BeatClock::GetDayOfWeek(Int day, Int month, Int year)
@@ -785,6 +792,7 @@ Int BeatClock::convertTimeStringToSeconds(String time)
 
 Void BeatClock::RegisterValues()
 {
+#ifdef __WIN32__
 	HKEY	 beatclock;
 
 	RegCreateKey(HKEY_LOCAL_MACHINE, _TEXT("Software\\BeatClock"), &beatclock);
@@ -801,10 +809,12 @@ Void BeatClock::RegisterValues()
 	RegSetValueEx(beatclock, _TEXT("WindowPosY"), 0, REG_DWORD, (BYTE *) &wpy, 4);
 
 	RegCloseKey(beatclock);
+#endif
 }
 
 Void BeatClock::InputValues()
 {
+#ifdef __WIN32__
 	HKEY	beatclock;
 	DWORD	size;
 	DWORD	type;
@@ -847,4 +857,5 @@ Void BeatClock::InputValues()
 
 		RegCloseKey(beatclock);
 	}
+#endif
 }

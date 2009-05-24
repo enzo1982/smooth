@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,15 @@
 
 #ifndef __WIN32__
 #	include <glob.h>
+#	include <unistd.h>
+#	include <stdio.h>
+#	include <sys/stat.h>
+#endif
+
+#ifdef __WIN32__
+S::String	 S::Directory::dirDelimiter = "\\";
+#else
+S::String	 S::Directory::dirDelimiter = "/";
 #endif
 
 S::Directory::Directory(const String &iDirName, const String &iDirPath)
@@ -21,7 +30,11 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 
 	if (dirName != NIL && dirPath == NIL)
 	{
+#ifdef __WIN32__
 		if (dirName[1] == ':' || dirName.StartsWith("\\\\"))
+#else
+		if (dirName.StartsWith(dirDelimiter))
+#endif
 		{
 			dirPath = dirName;
 			dirName = NIL;
@@ -30,11 +43,11 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 
 	if (dirName == NIL)
 	{
-		if (dirPath[dirPath.Length() - 1] == '\\') dirPath[dirPath.Length() - 1] = 0;
+		if (dirPath.EndsWith(dirDelimiter)) dirPath[dirPath.Length() - 1] = 0;
 
 		for (Int lastBS = dirPath.Length() - 1; lastBS >= 0; lastBS--)
 		{
-			if (dirPath[lastBS] == '\\')
+			if (dirPath[lastBS] == dirDelimiter[0])
 			{
 				for (Int i = lastBS + 1; i < dirPath.Length(); i++) dirName[i - lastBS - 1] = dirPath[i];
 
@@ -66,7 +79,7 @@ S::Directory::~Directory()
 
 S::Directory::operator S::String() const
 {
-	return String(dirPath).Append("\\").Append(dirName);
+	return String(dirPath).Append(dirDelimiter).Append(dirName);
 }
 
 const S::String &S::Directory::GetDirectoryName() const
@@ -158,7 +171,7 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 	{
 		for (Int i = 0; i < fileData->gl_pathc; i++)
 		{
-			files.Add(File(fileData->gl_pathv[i], *this));
+			files.Add(File(fileData->gl_pathv[i]));
 		}
 	}
 
@@ -200,7 +213,8 @@ S::DateTime S::Directory::GetCreateTime() const
 
 S::Bool S::Directory::Exists() const
 {
-	// Check if root directory of a drive
+	/* Check if root directory of a drive
+	 */
 	if (dirPath[dirPath.Length() - 1] == ':' && dirName == NIL) return True;
 
 #ifdef __WIN32__
@@ -223,6 +237,12 @@ S::Bool S::Directory::Exists() const
 	{
 		if (!(findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return False;
 	}
+#else
+	struct stat	 info;
+
+	if (stat(String(*this), &info) != 0) return False;
+
+	if (!S_ISDIR(info.st_mode)) return False;
 #endif
 
 	return True;
@@ -245,6 +265,8 @@ S::Int S::Directory::Create()
 #ifdef __WIN32__
 			if (Setup::enableUnicode)	CreateDirectoryW(path, NIL);
 			else				CreateDirectoryA(path, NIL);
+#else
+			mkdir(path, 0755);
 #endif
 		}
 	}
@@ -264,8 +286,10 @@ S::Int S::Directory::Move(const String &destination)
 	Bool	 result = False;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)	result = MoveFileW(String(dirPath).Append("\\").Append(dirName), destination);
-	else				result = MoveFileA(String(dirPath).Append("\\").Append(dirName), destination);
+	if (Setup::enableUnicode)	result = MoveFileW(String(*this), destination);
+	else				result = MoveFileA(String(*this), destination);
+#else
+	result = (rename(String(*this), destination) == 0);
 #endif
 
 	if (result == False)	return Error();
@@ -279,6 +303,8 @@ S::Int S::Directory::Delete()
 #ifdef __WIN32__
 	if (Setup::enableUnicode)	result = RemoveDirectoryW(String(*this));
 	else				result = RemoveDirectoryA(String(*this));
+#else
+	result = (rmdir(String(*this)) == 0);
 #endif
 
 	if (result == False)	return Error();
@@ -353,20 +379,45 @@ S::Int S::Directory::Empty()
 	return Success();
 }
 
+const S::String &S::Directory::GetDirectoryDelimiter()
+{
+	return dirDelimiter;
+}
+
 S::Directory S::Directory::GetActiveDirectory()
 {
-	wchar_t	*bufferw = new wchar_t [MAX_PATH];
-	char	*buffera = new char [MAX_PATH];
+	String	 dir;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)	GetCurrentDirectoryW(MAX_PATH, bufferw);
-	else				GetCurrentDirectoryA(MAX_PATH, buffera);
+	if (Setup::enableUnicode)
+	{
+		wchar_t	*bufferw = new wchar_t [MAX_PATH];
+
+		GetCurrentDirectoryW(MAX_PATH, bufferw);
+
+		dir = bufferw;
+
+		delete [] bufferw;
+	}
+	else
+	{
+		char	*buffera = new char [MAX_PATH];
+
+		GetCurrentDirectoryA(MAX_PATH, buffera);
+
+		dir = buffera;
+
+		delete [] buffera;
+	}
+#else
+	char	*buffer = new char [MAX_PATH];
+
+	getcwd(buffer, MAX_PATH);
+
+	dir = buffer;
+
+	delete [] buffer;
 #endif
-
-	String	 dir = Setup::enableUnicode ? String(bufferw) : String(buffera);
-
-	delete [] bufferw;
-	delete [] buffera;
 
 	return Directory(NIL, dir);
 }
@@ -378,6 +429,8 @@ S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 #ifdef __WIN32__
 	if (Setup::enableUnicode)	result = SetCurrentDirectoryW(String(directory));
 	else				result = SetCurrentDirectoryA(String(directory));
+#else
+	result = (chdir(String(directory)) == 0);
 #endif
 
 	if (result == False)	return Error();

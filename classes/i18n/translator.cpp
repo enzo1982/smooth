@@ -118,7 +118,7 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 
 	if (!internal)
 	{
-		Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang\\"));
+		Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
 		const Array<File>	&files = dir.GetFilesByPattern(String(appPrefix).ToLower().Append("_*.xml"));
 
 		for (Int i = 0; i < files.Length(); i++)

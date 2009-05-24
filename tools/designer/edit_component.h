@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,7 +23,7 @@ using namespace smooth::GUI;
 class Designer_EditComponent : public Application
 {
 	private:
-		Window		*wnd;
+		GUI::Window	*wnd;
 		Titlebar	*title;
 
 		Array<Widget *>	 objects;
@@ -36,9 +36,12 @@ class Designer_EditComponent : public Application
 	public:
 				 Designer_EditComponent(Designer *, String);
 				~Designer_EditComponent();
+
 		Void		 ShowDialog();
+
 		String		 GetName();
-		Window		*GetWindow();
+		GUI::Window	*GetWindow();
+
 		Widget		*AddObject(Int);
 		Widget		*GetFirstObject(Int);
 };

@@ -677,34 +677,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			break;
 #endif
 		case SM_PAINT:
-#ifdef __WIN32__
-			{
-				RECT	 uRect = { 0, 0, 0, 0 };
+			updateRect = backend->GetUpdateRect();
 
-				updateRect = uRect;
-
-				if (::GetUpdateRect((HWND) backend->GetSystemWindow(), &uRect, 0))
-				{
-					updateRect = uRect;
-
-					updateRect.right += frameWidth;
-					updateRect.bottom += frameWidth;
-
-					PAINTSTRUCT	 ps;
-
-					BeginPaint((HWND) backend->GetSystemWindow(), &ps);
-
-					if (Math::Abs((updateRect.right - updateRect.left) - GetWidth()) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - GetHeight()) < 20)	Paint(SP_PAINT);
-					else																		Paint(SP_UPDATE);
-
-					EndPaint((HWND) backend->GetSystemWindow(), &ps);
-				}
-			}
-#else
-			updateRect = Rect(Point(0, 0), GetSize());
-
-			Paint(SP_PAINT);
-#endif
+			if (Math::Abs((updateRect.right - updateRect.left) - GetWidth()) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - GetHeight()) < 20)	Paint(SP_PAINT);
+			else																		Paint(SP_UPDATE);
 
 			rVal = Break;
 

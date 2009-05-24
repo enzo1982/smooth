@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,11 @@
 #include <smooth/files/file.h>
 #include <smooth/files/directory.h>
 
+#ifndef __WIN32__
+#	include <stdio.h>
+#	include <sys/stat.h>
+#endif
+
 S::File::File(const String &iFileName, const String &iFilePath)
 {
 	fileName = iFileName;
@@ -18,7 +23,11 @@ S::File::File(const String &iFileName, const String &iFilePath)
 
 	if (fileName != NIL && filePath == NIL)
 	{
+#ifdef __WIN32__
 		if (fileName[1] == ':' || fileName.StartsWith("\\\\"))
+#else
+		if (fileName.StartsWith(Directory::GetDirectoryDelimiter()))
+#endif
 		{
 			filePath = fileName;
 			fileName = NIL;
@@ -29,7 +38,7 @@ S::File::File(const String &iFileName, const String &iFilePath)
 	{
 		for (Int lastBS = filePath.Length() - 1; lastBS >= 0; lastBS--)
 		{
-			if (filePath[lastBS] == '\\')
+			if (filePath[lastBS] == Directory::GetDirectoryDelimiter()[0])
 			{
 				for (Int i = lastBS + 1; i < filePath.Length(); i++) fileName[i - lastBS - 1] = filePath[i];
 
@@ -61,7 +70,7 @@ S::File::~File()
 
 S::File::operator S::String() const
 {
-	return String(filePath).Append("\\").Append(fileName);
+	return String(filePath).Append(Directory::GetDirectoryDelimiter()).Append(fileName);
 }
 
 const S::String &S::File::GetFileName() const
@@ -81,8 +90,8 @@ S::Int64 S::File::GetFileSize() const
 #ifdef __WIN32__
 	HANDLE	 handle;
 
-	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-	else				handle = CreateFileA(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+	if (Setup::enableUnicode)	handle = CreateFileW(String(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+	else				handle = CreateFileA(String(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
 	DWORD	 sizeLow	= 0;
 	DWORD	 sizeHigh	= 0;
@@ -104,8 +113,8 @@ S::Int64 S::File::GetFileSize() const
 
 		HANDLE	 handle;
 
-		if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-		else				handle = CreateFileA(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+		if (Setup::enableUnicode)	handle = CreateFileW(String(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+		else				handle = CreateFileA(String(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
 		::GetFileTime(handle, cT, aT, wT);
 
@@ -177,12 +186,18 @@ S::Bool S::File::Exists() const
 #ifdef __WIN32__
 	HANDLE	 handle;
 
-	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-	else				handle = CreateFileA(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+	if (Setup::enableUnicode)	handle = CreateFileW(String(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+	else				handle = CreateFileA(String(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
 	if (handle == INVALID_HANDLE_VALUE) return False;
 
 	CloseHandle(handle);
+#else
+	struct stat	 info;
+
+	if (stat(String(*this), &info) != 0) return False;
+
+	if (!S_ISREG(info.st_mode)) return False;
 #endif
 
 	return True;
@@ -195,8 +210,8 @@ S::Int S::File::Create()
 #ifdef __WIN32__
 	HANDLE	 handle;
 
-	if (Setup::enableUnicode)	handle = CreateFileW(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
-	else				handle = CreateFileA(String(filePath).Append("\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
+	if (Setup::enableUnicode)	handle = CreateFileW(String(*this), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
+	else				handle = CreateFileA(String(*this), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
 
 	if (handle == INVALID_HANDLE_VALUE) return Error();
 
@@ -213,8 +228,8 @@ S::Int S::File::Copy(const String &destination)
 	Bool	 result = False;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)	result = CopyFileW(String(filePath).Append("\\").Append(fileName), destination, True);
-	else				result = CopyFileA(String(filePath).Append("\\").Append(fileName), destination, True);
+	if (Setup::enableUnicode)	result = CopyFileW(String(*this), destination, True);
+	else				result = CopyFileA(String(*this), destination, True);
 #endif
 
 	if (result == False)	return Error();
@@ -228,8 +243,10 @@ S::Int S::File::Move(const String &destination)
 	Bool	 result = False;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)	result = MoveFileW(String(filePath).Append("\\").Append(fileName), destination);
-	else				result = MoveFileA(String(filePath).Append("\\").Append(fileName), destination);
+	if (Setup::enableUnicode)	result = MoveFileW(String(*this), destination);
+	else				result = MoveFileA(String(*this), destination);
+#else
+	result = (rename(String(*this), destination) == 0);
 #endif
 
 	if (result == False)	return Error();
@@ -243,8 +260,10 @@ S::Int S::File::Delete()
 	Bool	 result = False;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)	result = DeleteFileW(String(filePath).Append("\\").Append(fileName));
-	else				result = DeleteFileA(String(filePath).Append("\\").Append(fileName));
+	if (Setup::enableUnicode)	result = DeleteFileW(String(*this));
+	else				result = DeleteFileA(String(*this));
+#else
+	result = (remove(String(*this)) == 0);
 #endif
 
 	if (result == False)	return Error();

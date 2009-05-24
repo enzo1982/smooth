@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,15 +19,17 @@ using namespace smooth::GUI;
 class MDITest : public Application
 {
 	private:
-		Window		*mainWnd;
+		GUI::Window	*mainWnd;
 		Titlebar	*mainWnd_titlebar;
 		Statusbar	*mainWnd_statusbar;
 		MDI::Client	*mainWnd_client;
+
 		Menubar		*mainWnd_menubar;
 		PopupMenu	*menu_file;
 	public:
 				 MDITest();
 				~MDITest();
+
 		Bool		 ExitProc();
 		Void		 Close();
 		Void		 NewMDI();

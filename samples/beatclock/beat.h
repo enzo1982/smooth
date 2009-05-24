@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,11 +20,11 @@ using namespace smooth::System;
 class BeatClock : public Application
 {
 	private:
-		Window		*wnd;
+		GUI::Window	*wnd;
 		Titlebar	*title;
 		Menubar		*menubar;
 
-		Window		*optionsdialog;
+		GUI::Window	*optionsdialog;
 		Layer		*display;
 		Layer		*alarm;
 		Layer		*misc;
@@ -102,6 +102,7 @@ class BeatClock : public Application
 	public:
 				 BeatClock();
 				~BeatClock();
+
 		Void		 EventProc(Int, Int, Int);
 		Void		 Options();
 		Void		 OptionsOK();

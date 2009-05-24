@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,7 +27,7 @@ Int smooth::Main()
 
 MDITest::MDITest()
 {
-	mainWnd			= new Window("MDITest", Point(50, 50), Size(700, 500));
+	mainWnd			= new GUI::Window("MDITest", Point(50, 50), Size(700, 500));
 	mainWnd_titlebar	= new Titlebar();
 	mainWnd_statusbar	= new Statusbar("Ready");
 	mainWnd_client		= new MDI::Client();
@@ -63,6 +63,7 @@ MDITest::~MDITest()
 
 Bool MDITest::ExitProc()
 {
+#ifdef __WIN32__
 	Int	 id = QuickMessage("Do you really want to quit?", "Exit program", MB_YESNO, IDI_QUESTION);
 
 	switch (id)
@@ -73,6 +74,9 @@ Bool MDITest::ExitProc()
 		case IDNO:
 			return False;
 	}
+#else
+	return True;
+#endif
 }
 
 Void MDITest::Close()

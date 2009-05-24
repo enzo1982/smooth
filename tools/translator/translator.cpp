@@ -216,7 +216,7 @@ Void Translator::NewFile()
 
 	{
 		ListEntry	*entry = NIL;
-		Font		 entryFont;
+		GUI::Font	 entryFont;
 
 		entryFont.SetColor(Color(0, 0, 255));
 

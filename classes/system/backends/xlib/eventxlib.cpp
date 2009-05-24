@@ -32,7 +32,7 @@ S::System::EventXLib::~EventXLib()
 {
 }
 
-S::Int S::System::EventXLib::ProcessNextEvent(Bool block)
+S::Int S::System::EventXLib::ProcessNextEvent()
 {
 	/* Emulate a timeout of ~100ms by trying to find a message
 	 * 10 times while sleeping for 10ms between trying.

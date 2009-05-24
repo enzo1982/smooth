@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,7 +29,7 @@ Designer::Designer()
 	dlgcounter = 1;
 	active_dlg = NIL;
 
-	wnd		= new Window(String("smooth Designer v").Append(SMOOTH_VERSION), Point(50, 50), Size(600, 87));
+	wnd		= new GUI::Window(String("smooth Designer v").Append(SMOOTH_VERSION), Point(50, 50), Size(600, 87));
 	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	iconbar		= new Menubar();

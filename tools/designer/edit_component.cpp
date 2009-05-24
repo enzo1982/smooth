@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,7 +30,7 @@ Designer_EditComponent::Designer_EditComponent(Designer *des, String name)
 
 	designer->ReportStatus(status);
 
-	wnd	= new Window(name, Point(150, 150), Size(400, 400));
+	wnd	= new GUI::Window(name, Point(150, 150), Size(400, 400));
 	title	= new Titlebar();
 
 	objects.Add(wnd);
@@ -54,6 +54,7 @@ Designer_EditComponent::~Designer_EditComponent()
 
 Void Designer_EditComponent::EventProc(Int message, Int wParam, Int lParam)
 {
+#ifdef __WIN32__
 	WINDOWPOS	*wndpos;
 
 	switch (message)
@@ -107,6 +108,7 @@ Void Designer_EditComponent::EventProc(Int message, Int wParam, Int lParam)
 
 			break;
 	}
+#endif
 }
 
 Bool Designer_EditComponent::ExitProc()
@@ -128,7 +130,7 @@ String Designer_EditComponent::GetName()
 	return wnd->GetText();
 }
 
-Window *Designer_EditComponent::GetWindow()
+GUI::Window *Designer_EditComponent::GetWindow()
 {
 	return wnd;
 }
@@ -164,7 +166,9 @@ Widget *Designer_EditComponent::AddObject(Int objid)
 
 			break;
 		default:
+#ifdef __WIN32__
 			QuickMessage("Unknown object ID!", "Error", MB_OK, IDI_HAND);
+#endif
 			return NIL;
 	}
 

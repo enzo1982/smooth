@@ -55,8 +55,12 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 
 	FILE	 *stream = NIL;
 
-	if (Setup::enableUnicode) stream = _wfopen(fileName, String("r+b"));
+#ifdef __WIN32__
+	if (Setup::enableUnicode) stream = _wfopen(fileName, L"r+b");
 	else			  stream = fopen(fileName, "r+b");
+#else
+	stream = fopen(fileName.ConvertTo("UTF-8"), "r+b");
+#endif
 
 	if (stream == NIL)
 	{

@@ -56,6 +56,8 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 
 	maximized	= False;
 
+	frameSize	= Size(GetSystemMetrics(SM_CXFRAME), GetSystemMetrics(SM_CYFRAME));
+
 	if (Setup::enableUnicode) sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 	else			  sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
@@ -212,7 +214,28 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		case WM_TIMER:
 			return onEvent.Call(SM_TIMER, wParam, 0);
 		case WM_PAINT:
-			return onEvent.Call(SM_PAINT, wParam, lParam);
+			{
+				Int	 rVal = Break;
+				RECT	 uRect = { 0, 0, 0, 0 };
+
+				updateRect = uRect;
+
+				if (::GetUpdateRect(hwnd, &uRect, 0))
+				{
+					updateRect = uRect;
+					updateRect = updateRect + frameSize;
+
+					PAINTSTRUCT	 ps;
+
+					BeginPaint(hwnd, &ps);
+
+					rVal = onEvent.Call(SM_PAINT, wParam, lParam);
+
+					EndPaint(hwnd, &ps);
+				}
+
+				return rVal;
+			}
 	}
 
 	/* Call event for any other Windows messages.

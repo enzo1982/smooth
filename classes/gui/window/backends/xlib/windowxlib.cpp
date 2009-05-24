@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,7 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 	type	= WINDOW_XLIB;
 
 	wnd	= NIL;
+	oldwnd	= NIL;
 	display	= Backends::BackendXLib::GetDisplay();
 
 	id	= windowBackends.Add(this);
@@ -54,7 +55,8 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::GetWindowBackend(::Window wnd)
 
 		if (window != NIL)
 		{
-			if (window->wnd == wnd) return window;
+			if (window->wnd    == wnd ||
+			    window->oldwnd == wnd) return window;
 		}
 	}
 
@@ -74,6 +76,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			break;
 		case DestroyNotify:
 			onDestroy.Emit();
+
+			oldwnd = NIL;
 
 			break;
 		case MapNotify:
@@ -101,8 +105,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 		case ButtonPress:
-			if	(e->xbutton.button = Button1) onEvent.Call(SM_LBUTTONDOWN, 0, 0);
-			else if (e->xbutton.button = Button2) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
+			if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONDOWN, 0, 0);
+			else if (e->xbutton.button == Button2) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
 
 			/* Grab the keyboard focus if we don't have it already.
 			 */
@@ -118,8 +122,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 		case ButtonRelease:
-			if	(e->xbutton.button = Button1) onEvent.Call(SM_LBUTTONUP, 0, 0);
-			else if (e->xbutton.button = Button2) onEvent.Call(SM_RBUTTONUP, 0, 0);
+			if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONUP, 0, 0);
+			else if (e->xbutton.button == Button2) onEvent.Call(SM_RBUTTONUP, 0, 0);
 
 			break;
 
@@ -141,6 +145,23 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			break;
 		case KeyRelease:
 			onEvent.Call(SM_KEYUP, XKeycodeToKeysym(display, e->xkey.keycode, 0), 0);
+
+			break;
+
+		/* Paint events:
+		 */
+		case Expose:
+			updateRect.left = Math::Min(updateRect.left, e->xexpose.x);
+			updateRect.top = Math::Min(updateRect.top, e->xexpose.y);
+			updateRect.right = Math::Max(updateRect.right, e->xexpose.x + e->xexpose.width);
+			updateRect.bottom = Math::Max(updateRect.bottom, e->xexpose.y + e->xexpose.height);
+
+			if (e->xexpose.count == 0)
+			{
+				onEvent.Call(SM_PAINT, 0, 0);
+
+				updateRect = Rect();
+			}
 
 			break;
 	}
@@ -223,7 +244,8 @@ S::Int S::GUI::WindowXLib::Close()
 
 	XDestroyWindow(display, wnd);
 
-	wnd = NIL;
+	oldwnd	= wnd;
+	wnd	= NIL;
 
 	return Success();
 }

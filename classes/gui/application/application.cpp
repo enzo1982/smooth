@@ -15,6 +15,11 @@
 #include <smooth/init.h>
 #include <smooth/templates/nonblocking.h>
 
+#ifndef __WIN32__
+#	include <unistd.h>
+#	include <stdio.h>
+#endif
+
 S::Bool	 S::loopActive	= S::False;
 
 const S::Int	 S::GUI::Application::classID = S::Object::RequestClassID();
@@ -133,9 +138,17 @@ S::String S::GUI::Application::GetStartupDirectory()
 		delete [] buffer;
 	}
 
-	Int	 len = startupDirectory.Length() - 1;
+	if (!startupDirectory.EndsWith("\\")) startupDirectory.Append("\\");
+#else
+	char	*buffer = new char [MAX_PATH];
 
-	if (startupDirectory[len] != '\\') startupDirectory[++len] = '\\';
+	getcwd(buffer, MAX_PATH);
+
+	startupDirectory = buffer;
+
+	delete [] buffer;
+
+	if (!startupDirectory.EndsWith("/")) startupDirectory.Append("/");
 #endif
 
 	return startupDirectory;
@@ -146,8 +159,6 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	if (applicationDirectory != NIL) return applicationDirectory;
 
 #ifdef __WIN32__
-	String	 path;
-	Int	 lastBs = 0;
 	Int	 length = 0;
 
 	if (Setup::enableUnicode)
@@ -156,7 +167,7 @@ S::String S::GUI::Application::GetApplicationDirectory()
 
 		length = GetModuleFileNameW(NIL, buffer, MAX_PATH);
 
-		path = buffer;
+		applicationDirectory = buffer;
 
 		delete [] buffer;
 	}
@@ -167,16 +178,27 @@ S::String S::GUI::Application::GetApplicationDirectory()
 
 		GetModuleFileNameA(NIL, buffer, MAX_PATH);
 
-		path = buffer;
+		applicationDirectory = buffer;
 
 		delete [] buffer;
 	}
 
-	for (Int i = 0; i < path.Length(); i++) if (path[i] == '\\') lastBs = i;
+	applicationDirectory[applicationDirectory.FindLast("\\") + 1] = 0;
+#else
+	char	 szTmp[32];
 
-	path[lastBs + 1] = 0;
+	sprintf(szTmp, "/proc/%d/exe", getpid());
 
-	applicationDirectory = path;
+	char	*buffer = new char [MAX_PATH];
+	int	 bytes = readlink(szTmp, buffer, MAX_PATH);
+
+	if (bytes >= 0) buffer[bytes] = '\0';
+
+	applicationDirectory = buffer;
+
+	delete [] buffer;
+
+	applicationDirectory[applicationDirectory.FindLast("/") + 1] = 0;
 #endif
 
 	return applicationDirectory;

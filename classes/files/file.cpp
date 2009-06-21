@@ -26,7 +26,7 @@ S::File::File(const String &iFileName, const String &iFilePath)
 #ifdef __WIN32__
 		if (fileName[1] == ':' || fileName.StartsWith("\\\\"))
 #else
-		if (fileName.StartsWith(Directory::GetDirectoryDelimiter()))
+		if (fileName.StartsWith(Directory::GetDirectoryDelimiter()) || fileName.StartsWith("~"))
 #endif
 		{
 			filePath = fileName;

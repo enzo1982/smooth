@@ -33,7 +33,7 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 #ifdef __WIN32__
 		if (dirName[1] == ':' || dirName.StartsWith("\\\\"))
 #else
-		if (dirName.StartsWith(dirDelimiter))
+		if (dirName.StartsWith(dirDelimiter) || dirName.StartsWith("~"))
 #endif
 		{
 			dirPath = dirName;
@@ -65,8 +65,7 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 
 S::Directory::Directory(const Directory &iDirectory)
 {
-	dirName = iDirectory.dirName;
-	dirPath = iDirectory.dirPath;
+	*this = iDirectory;
 }
 
 S::Directory::Directory(const int nil)
@@ -77,9 +76,19 @@ S::Directory::~Directory()
 {
 }
 
+S::Directory &S::Directory::operator =(const Directory &nDirectory)
+{
+	if (&nDirectory == this) return *this;
+
+	dirName = nDirectory.dirName;
+	dirPath = nDirectory.dirPath;
+
+	return *this;
+}
+
 S::Directory::operator S::String() const
 {
-	return String(dirPath).Append(dirDelimiter).Append(dirName);
+	return String(dirPath).Append(dirName == NIL ? String() : String(dirDelimiter).Append(dirName));
 }
 
 const S::String &S::Directory::GetDirectoryName() const
@@ -213,11 +222,17 @@ S::DateTime S::Directory::GetCreateTime() const
 
 S::Bool S::Directory::Exists() const
 {
+#ifdef __WIN32__
 	/* Check if root directory of a drive
 	 */
-	if (dirPath[dirPath.Length() - 1] == ':' && dirName == NIL) return True;
+	if (dirPath[dirPath.Length() - 1] == ':' && dirName == NIL)
+	{
+		DWORD	 drives = GetLogicalDrives();
 
-#ifdef __WIN32__
+		if ((drives >> (dirPath.ToUpper()[0] - 'A')) & 1) return True;
+		else						  return False;
+	}
+
 	HANDLE			 handle;
 	WIN32_FIND_DATAW	 findDataW;
 	WIN32_FIND_DATAA	 findDataA;

@@ -30,6 +30,8 @@ S::GUI::ImageEntry::ImageEntry(const Bitmap &iBitmap, const Size &iSize) : ListE
 S::GUI::ImageEntry::~ImageEntry()
 {
 	DeleteObject(image);
+
+	if (IsRegistered() && container != NIL) container->Remove(this);
 }
 
 S::Int S::GUI::ImageEntry::Paint(Int message)

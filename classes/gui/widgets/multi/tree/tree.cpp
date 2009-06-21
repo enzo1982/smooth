@@ -32,6 +32,8 @@ S::GUI::Tree::Tree(const String &iText) : ListEntry(iText)
 	headHotspot->onMouseOver.Connect(&Tree::OnMouseOver, this);
 	headHotspot->onMouseOut.Connect(&Tree::OnMouseOut, this);
 
+	headHotspot->onLeftButtonDown.Connect(&onSelect);
+
 	Add(headHotspot);
 
 	hotspot->onLeftButtonDown.Disconnect(&ListEntry::OnSelectEntry, this);
@@ -39,6 +41,7 @@ S::GUI::Tree::Tree(const String &iText) : ListEntry(iText)
 	internalOnSelectEntry.Connect(&Tree::OnSelectEntry, this);
 
 	onChangeSize.Connect(&Tree::OnChangeSize, this);
+	onToggleMark.Connect(&Tree::OnToggleMark, this);
 }
 
 S::GUI::Tree::~Tree()
@@ -46,6 +49,8 @@ S::GUI::Tree::~Tree()
 	internalOnSelectEntry.Disconnect(&Tree::OnSelectEntry, this);
 
 	DeleteObject(headHotspot);
+
+	if (IsRegistered() && container != NIL) container->Remove(this);
 }
 
 S::Int S::GUI::Tree::Add(Widget *widget)
@@ -92,7 +97,14 @@ S::Int S::GUI::Tree::Paint(Int message)
 				Rect	 frame		= Rect(GetRealPosition(), GetSize());
 				Window	*window		= container->GetContainerWindow();
 
+				if (window == NIL) break;
+
 				surface->StartPaint(GetVisibleArea());
+
+				if (!IsMarked())
+				{
+					list.Hide();
+				}
 
 				if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(GetWidth(), 15)))) PaintText(Setup::GradientTextColor, True);
 				else										 PaintText(active ? font.GetColor() : Setup::GrayTextColor, False);
@@ -122,10 +134,6 @@ S::Int S::GUI::Tree::Paint(Int message)
 					{
 						surface->SetPixel(realPos + Point(6, i), Setup::GrayTextColor);
 					}
-				}
-				else
-				{
-					list.Hide();
 				}
 
 				surface->EndPaint();
@@ -237,6 +245,12 @@ S::Void S::GUI::Tree::OnChangeSize(const Size &newSize)
 	headHotspot->SetSize(Size(newSize.cx, 15));
 
 	if (IsRegistered()) container->Paint(SP_PAINT);
+}
+
+S::Void S::GUI::Tree::OnToggleMark(Bool marked)
+{
+	if (marked) onOpen.Emit();
+	else	    onClose.Emit();
 }
 
 S::Void S::GUI::Tree::OnMouseOver()

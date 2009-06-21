@@ -30,6 +30,7 @@ S::GUI::ListEntrySeparator::ListEntrySeparator() : ListEntry(NIL)
 
 S::GUI::ListEntrySeparator::~ListEntrySeparator()
 {
+	if (IsRegistered() && container != NIL) container->Remove(this);
 }
 
 S::Int S::GUI::ListEntrySeparator::Paint(Int message)

@@ -1124,14 +1124,6 @@
 							>
 						</File>
 						<File
-							RelativePath="..\..\classes\gui\dialogs\dirdlg.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\..\classes\gui\dialogs\filedlg.cpp"
-							>
-						</File>
-						<File
 							RelativePath="..\..\classes\gui\dialogs\fontdlg.cpp"
 							>
 						</File>
@@ -1147,6 +1139,126 @@
 							RelativePath="..\..\classes\gui\dialogs\tipodaydlg.cpp"
 							>
 						</File>
+						<Filter
+							Name="file"
+							>
+							<File
+								RelativePath="..\..\classes\gui\dialogs\file\filedlg.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+										ObjectFile="$(IntDir)\$(InputName)1.obj"
+										XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+									/>
+								</FileConfiguration>
+								<FileConfiguration
+									Name="Debug|x64"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+										ObjectFile="$(IntDir)\$(InputName)1.obj"
+										XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+									/>
+								</FileConfiguration>
+								<FileConfiguration
+									Name="Release|Win32"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+										ObjectFile="$(IntDir)\$(InputName)1.obj"
+										XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+									/>
+								</FileConfiguration>
+								<FileConfiguration
+									Name="Release|x64"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+										ObjectFile="$(IntDir)\$(InputName)1.obj"
+										XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+									/>
+								</FileConfiguration>
+							</File>
+							<File
+								RelativePath="..\..\classes\gui\dialogs\file\filedlg_gtk.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
+							</File>
+							<File
+								RelativePath="..\..\classes\gui\dialogs\file\filedlg_win32.cpp"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="directory"
+							>
+							<File
+								RelativePath="..\..\classes\gui\dialogs\directory\dirdlg.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+										ObjectFile="$(IntDir)\$(InputName)1.obj"
+										XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+									/>
+								</FileConfiguration>
+								<FileConfiguration
+									Name="Debug|x64"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+										ObjectFile="$(IntDir)\$(InputName)1.obj"
+										XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+									/>
+								</FileConfiguration>
+								<FileConfiguration
+									Name="Release|Win32"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+										ObjectFile="$(IntDir)\$(InputName)1.obj"
+										XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+									/>
+								</FileConfiguration>
+								<FileConfiguration
+									Name="Release|x64"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+										ObjectFile="$(IntDir)\$(InputName)1.obj"
+										XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+									/>
+								</FileConfiguration>
+							</File>
+							<File
+								RelativePath="..\..\classes\gui\dialogs\directory\dirdlg_gtk.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
+							</File>
+							<File
+								RelativePath="..\..\classes\gui\dialogs\directory\dirdlg_win32.cpp"
+								>
+							</File>
+						</Filter>
 					</Filter>
 					<Filter
 						Name="application"
@@ -2554,14 +2666,6 @@
 							>
 						</File>
 						<File
-							RelativePath="..\..\include\smooth\gui\dialogs\dirdlg.h"
-							>
-						</File>
-						<File
-							RelativePath="..\..\include\smooth\gui\dialogs\filedlg.h"
-							>
-						</File>
-						<File
 							RelativePath="..\..\include\smooth\gui\dialogs\fontdlg.h"
 							>
 						</File>
@@ -2577,6 +2681,38 @@
 							RelativePath="..\..\include\smooth\gui\dialogs\tipodaydlg.h"
 							>
 						</File>
+						<Filter
+							Name="file"
+							>
+							<File
+								RelativePath="..\..\include\smooth\gui\dialogs\file\filedlg.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\dialogs\file\filedlg_gtk.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\dialogs\file\filedlg_win32.h"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="directory"
+							>
+							<File
+								RelativePath="..\..\include\smooth\gui\dialogs\directory\dirdlg.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\dialogs\directory\dirdlg_gtk.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\gui\dialogs\directory\dirdlg_win32.h"
+								>
+							</File>
+						</Filter>
 					</Filter>
 					<Filter
 						Name="application"

@@ -65,7 +65,7 @@ S::Int S::GUI::MultiEdit::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
 				surface->StartPaint(GetVisibleArea());
@@ -122,7 +122,7 @@ S::Int S::GUI::MultiEdit::SetText(const String &newText)
 {
 	scrollbarPos = 0;
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
 	surface->StartPaint(frame);

@@ -199,9 +199,9 @@ S::GUI::Widget *S::GUI::Widget::GetNthObject(Int n) const
 	return widgets.GetNth(n);
 }
 
-S::GUI::Window *S::GUI::Widget::GetContainerWindow()
+S::GUI::Window *S::GUI::Widget::GetContainerWindow() const
 {
-	Widget	*widget = this;
+	Widget	*widget = const_cast<Widget *>(this);
 
 	while (widget->GetObjectType() != Window::classID)
 	{
@@ -374,7 +374,7 @@ S::Int S::GUI::Widget::Hide()
 		}
 
 		Rect	 rect		= GetVisibleArea();
-		Surface	*surface	= container->GetDrawSurface();
+		Surface	*surface	= GetDrawSurface();
 
 		surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
 

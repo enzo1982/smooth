@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -64,7 +64,7 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 
 				if (linkBitmap == NIL)	surface->SetText(text, Rect(GetRealPosition(), textSize + Size(0, 1)), font);
 				else			surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), Rect(GetRealPosition(), GetSize()));
@@ -84,7 +84,7 @@ S::Void S::GUI::Hyperlink::OnMouseOver()
 
 	if (linkBitmap == NIL)
 	{
-		Surface	*surface  = container->GetDrawSurface();
+		Surface	*surface  = GetDrawSurface();
 		Rect	 textRect = Rect(GetRealPosition(), textSize + Size(0, 1));
 		Font	 nFont	  = font;
 
@@ -102,7 +102,7 @@ S::Void S::GUI::Hyperlink::OnMouseOut()
 
 	if (linkBitmap == NIL)
 	{
-		Surface	*surface  = container->GetDrawSurface();
+		Surface	*surface  = GetDrawSurface();
 		Rect	 textRect = Rect(GetRealPosition(), textSize + Size(0, 1));
 
 		surface->SetText(text, textRect, font);

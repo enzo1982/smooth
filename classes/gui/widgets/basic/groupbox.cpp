@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,7 +41,7 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
 				surface->Frame(frame, FRAME_DOWN);
@@ -71,7 +71,7 @@ S::Int S::GUI::GroupBox::Activate()
 	if (!IsRegistered())	return Success();
 	if (!IsVisible())	return Success();
 
-	Surface	*surface	= container->GetDrawSurface();
+	Surface	*surface	= GetDrawSurface();
 	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
 
 	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
@@ -95,7 +95,7 @@ S::Int S::GUI::GroupBox::Deactivate()
 	if (!IsRegistered())	return Success();
 	if (!IsVisible())	return Success();
 
-	Surface	*surface	= container->GetDrawSurface();
+	Surface	*surface	= GetDrawSurface();
 	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
 
 	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
@@ -129,7 +129,7 @@ S::Int S::GUI::GroupBox::Hide()
 {
 	if (IsRegistered() && IsVisible())
 	{
-		Surface	*surface = container->GetDrawSurface();
+		Surface	*surface = GetDrawSurface();
 
 		surface->Box(Rect(GetRealPosition() - Point(0, 6), GetSize() + Size(0, 6)), Setup::BackgroundColor, Rect::Filled);
 	}

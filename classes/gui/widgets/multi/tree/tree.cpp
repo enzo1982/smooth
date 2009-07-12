@@ -93,7 +93,7 @@ S::Int S::GUI::Tree::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface	= container->GetDrawSurface();
+				Surface	*surface	= GetDrawSurface();
 				Rect	 frame		= Rect(GetRealPosition(), GetSize());
 				Window	*window		= container->GetContainerWindow();
 
@@ -160,7 +160,7 @@ S::Int S::GUI::Tree::Paint(Int message)
 
 S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 {
-	Surface	*surface	= container->GetDrawSurface();
+	Surface	*surface	= GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), GetSize());
 	Font	 nFont		= font;
 	Bool	 gotTabs	= False;

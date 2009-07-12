@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,34 +8,21 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/gui/dialogs/dirdlg.h>
-#include <smooth/i18n/translator.h>
+#include <smooth/gui/dialogs/directory/dirdlg_win32.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/files/directory.h>
 
-#ifdef __WIN32__
-#	include <wtypes.h>
-#	include <shlobj.h>
+#include <wtypes.h>
+#include <shlobj.h>
 
-#	ifndef BIF_USENEWUI
-#		define BIF_USENEWUI 0
-#	endif
-
-	int CALLBACK	 BrowseCallbackProc(HWND, UINT, LPARAM, LPARAM);
+#ifndef BIF_USENEWUI
+#	define BIF_USENEWUI 0
 #endif
 
-S::GUI::Dialogs::DirSelection::DirSelection()
-{
-	caption		= I18n::Translator::defaultTranslator->TranslateString("Select directory");
-	directory	= NIL;
-}
-
-S::GUI::Dialogs::DirSelection::~DirSelection()
-{
-}
+int CALLBACK	 BrowseCallbackProc(HWND, UINT, LPARAM, LPARAM);
 
 const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 {
-#ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
 		BROWSEINFOW	 infow;
@@ -96,11 +83,10 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 		delete [] buffera;
 	}
-#endif
 
 	if (directory != NIL)
 	{
-		if (directory[directory.Length() - 1] != '\\') directory[directory.Length()] = '\\';
+		if (!directory.EndsWith(Directory::GetDirectoryDelimiter())) directory.Append(Directory::GetDirectoryDelimiter());
 	}
 	else
 	{
@@ -110,27 +96,13 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 	return error;
 }
 
-S::Int S::GUI::Dialogs::DirSelection::SetDirName(const String &nDirectory)
+int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
-	directory = nDirectory;
-
-	return Success();
-}
-
-const S::String &S::GUI::Dialogs::DirSelection::GetDirName()
-{
-	return directory;
-}
-
-#ifdef __WIN32__
-	int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
+	if (uMsg == BFFM_INITIALIZED && ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName() != NIL)
 	{
-		if (uMsg == BFFM_INITIALIZED && ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName() != NIL)
-		{
-			if (S::Setup::enableUnicode)	SendMessageW(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
-			else				SendMessageA(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
-		}
-
-		return 0;
+		if (S::Setup::enableUnicode)	SendMessageW(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
+		else				SendMessageA(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
 	}
-#endif
+
+	return 0;
+}

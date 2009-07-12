@@ -64,7 +64,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
 				surface->StartPaint(GetVisibleArea());
@@ -110,6 +110,10 @@ const S::String &S::GUI::EditBox::GetText() const
 
 S::Int S::GUI::EditBox::SetDropDownList(List *nDropDownList)
 {
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(GetVisibleArea());
+
 	if (comboBox != NIL) DeleteObject(comboBox);
 
 	dropDownList = nDropDownList;
@@ -130,6 +134,10 @@ S::Int S::GUI::EditBox::SetDropDownList(List *nDropDownList)
 
 		OnChangeSize(GetSize());
 	}
+
+	Paint(SP_PAINT);
+
+	surface->EndPaint();
 
 	return Success();
 }

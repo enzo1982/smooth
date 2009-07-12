@@ -288,7 +288,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 		onScroll.Emit(scrollPos, maxScrollPos);
 	}
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface = GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame	 = Rect(realPos, GetSize());
 
@@ -379,7 +379,7 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 {
 	if (promptVisible == visible) return;
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface = GetDrawSurface();
 	Point	 point	 = GetRealPosition();
 
 	String	 wText = text;
@@ -457,7 +457,7 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 	Int	 bMarkStart	= Math::Min(markStart, markEnd);
 	Int	 bMarkEnd	= Math::Max(markStart, markEnd);
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface = GetDrawSurface();
 
 	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
 
@@ -487,7 +487,7 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 	for (Int j = promptPos; j < promptPos + insertText.Length(); j++)	newText[j] = insertText[j - promptPos];
 	for (Int k = promptPos; k <= text.Length(); k++)			newText[k + insertText.Length()] = text[k];
 
-	Surface	*surface = container->GetDrawSurface();
+	Surface	*surface = GetDrawSurface();
 
 	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
 
@@ -794,8 +794,8 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	ShowCursor(False);
 
-	Window	*wnd	 = container->GetContainerWindow();
-	Surface	*surface = container->GetDrawSurface();
+	Window	*wnd	 = GetContainerWindow();
+	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 	Point	 p1	 = GetRealPosition();
 

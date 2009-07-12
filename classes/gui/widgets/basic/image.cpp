@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -44,7 +44,7 @@ S::Int S::GUI::Image::Paint(Int message)
 
 				/* Draw image centered.
 				 */
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 				Rect	 bmpRect = Rect(GetRealPosition() + Point(GetWidth() - newSize.cx, GetHeight() - newSize.cy) / 2, newSize);
 
 				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);

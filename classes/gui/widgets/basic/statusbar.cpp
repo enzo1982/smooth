@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,7 +35,7 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 
 				surface->Box(Rect(GetRealPosition(), GetSize()), Setup::BackgroundColor, Rect::Filled);
 				surface->SetText(text, Rect(GetRealPosition() + Point(4, 1), GetSize() - Size(8, 2)), font);

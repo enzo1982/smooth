@@ -96,7 +96,7 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 				Point	 realPos = GetRealPosition();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
@@ -135,8 +135,8 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 	if (!IsRegistered())			return Error();
 	if (!IsActive() || !IsVisible())	return Success();
 
-	Window	*window	 = container->GetContainerWindow();
-	Surface	*surface = container->GetDrawSurface();
+	Window	*window	 = GetContainerWindow();
+	Surface	*surface = GetDrawSurface();
 
 	EnterProtectedRegion();
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -67,7 +67,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Surface	*surface	= container->GetDrawSurface();
+	Surface	*surface	= GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
 
 	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
@@ -214,7 +214,7 @@ S::Void S::GUI::Scrollbar::OnValueChange()
 
 	if (!IsRegistered() || !IsVisible()) return;
 
-	Surface	*surface	= container->GetDrawSurface();
+	Surface	*surface	= GetDrawSurface();
 
 	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
 	Int	 hotspotSize	= (smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) - 4;

@@ -70,7 +70,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	if (flags & CB_HOTSPOTONLY)	hotspot->Deactivate();
 	else				hotspot->Activate();
 
-	Surface		*surface	= container->GetDrawSurface();
+	Surface		*surface	= GetDrawSurface();
 	Rect		 frame		= Rect(GetRealPosition(), GetSize());
 	Point		 lineStart;
 	Point		 lineEnd;

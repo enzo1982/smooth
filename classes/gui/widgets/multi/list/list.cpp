@@ -103,7 +103,7 @@ S::Int S::GUI::List::RemoveAllEntries()
 {
 	Surface	*surface = NIL;
 
-	if (IsRegistered()) surface = container->GetDrawSurface();
+	if (IsRegistered()) surface = GetDrawSurface();
 
 	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 	Bool	 visible = IsVisible();
@@ -186,7 +186,7 @@ S::GUI::ListEntry *S::GUI::List::GetSelectedEntry() const
 
 S::Int S::GUI::List::SelectNthEntry(Int n)
 {
-	if (n >= Length()) return Error();
+	if (n < 0 || n >= Length()) return Error();
 
 	ListEntry	*entry = GetNthEntry(n);
 
@@ -205,19 +205,24 @@ S::Int S::GUI::List::GetSelectedEntryNumber() const
 	return -1;
 }
 
-S::Int S::GUI::List::SelectEntry(const String &entryText)
+S::Int S::GUI::List::GetEntryNumber(const String &entryText) const
 {
 	for (Int i = 0; i < elementOrder.Length(); i++)
 	{
 		ListEntry	*entry = elementOrder.GetNth(i);
 
-		if (entry->GetText() == entryText)
-		{
-			entry->Select();
-
-			return Success();
-		}
+		if (entry->GetText() == entryText) return i;
 	}
 
-	return Error();
+	return -1;
+}
+
+S::GUI::ListEntry *S::GUI::List::GetEntry(const String &entryText) const
+{
+	return GetNthEntry(GetEntryNumber(entryText));
+}
+
+S::Int S::GUI::List::SelectEntry(const String &entryText)
+{
+	return SelectNthEntry(GetEntryNumber(entryText));
 }

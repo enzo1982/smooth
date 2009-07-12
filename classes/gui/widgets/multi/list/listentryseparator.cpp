@@ -43,7 +43,7 @@ S::Int S::GUI::ListEntrySeparator::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
 				surface->Box(frame + Point(4, 1) - Size(8, 2), font.GetColor(), Rect::Filled);

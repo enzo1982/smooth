@@ -8,29 +8,17 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/gui/dialogs/filedlg.h>
+#include <smooth/gui/dialogs/file/filedlg_win32.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/files/directory.h>
 
-#ifdef __WIN32__
-#	include <commdlg.h>
-#endif
-
-S::GUI::Dialogs::FileSelection::FileSelection()
-{
-	flags = 0;
-	mode = 0;
-}
-
-S::GUI::Dialogs::FileSelection::~FileSelection()
-{
-}
+#include <commdlg.h>
 
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
-	bool	 result;
+	Bool	 result = False;
 	Int	 bpos = 0;
 
-#ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
 		static OPENFILENAMEW	 ofnw;
@@ -80,7 +68,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 			result = GetOpenFileNameW(&ofnw);
 		}
-		else
+		else if (mode == SFM_SAVE)
 		{
 			result = GetSaveFileNameW(&ofnw);
 		}
@@ -116,9 +104,9 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 					if (bufferw[n] == 0)
 					{
-						file = file.Copy(dir).Append("\\").Append(buffer2w);
+						file = file.Copy(dir).Append(Directory::GetDirectoryDelimiter()).Append(buffer2w);
 
-						if (file[file.Length() - 1] == '\\') file[file.Length() - 1] = 0;
+						if (file.EndsWith(Directory::GetDirectoryDelimiter())) file[file.Length() - 1] = 0;
 
 						files.Add(file);
 
@@ -196,7 +184,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 			result = GetOpenFileNameA(&ofna);
 		}
-		else
+		else if (mode == SFM_SAVE)
 		{
 			result = GetSaveFileNameA(&ofna);
 		}
@@ -232,9 +220,9 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 					if (buffera[n] == 0)
 					{
-						file = file.Copy(dir).Append("\\").Append(buffer2a);
+						file = file.Copy(dir).Append(Directory::GetDirectoryDelimiter()).Append(buffer2a);
 
-						if (file[file.Length() - 1] == '\\') file[file.Length() - 1] = 0;
+						if (file.EndsWith(Directory::GetDirectoryDelimiter())) file[file.Length() - 1] = 0;
 
 						files.Add(file);
 
@@ -259,60 +247,6 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		delete [] buffera;
 		delete [] filtera;
 	}
-#endif
 
 	return error;
-}
-
-S::Int S::GUI::Dialogs::FileSelection::AddFilter(const String &name, const String &filter)
-{
-	filterNames.Add(name);
-	filters.Add(filter);
-
-	return Success();
-}
-
-S::Int S::GUI::Dialogs::FileSelection::SetFlags(Int newFlags)
-{
-	flags |= newFlags;
-
-	return Success();
-}
-
-S::Int S::GUI::Dialogs::FileSelection::SetMode(Int newMode)
-{
-	mode = newMode;
-
-	return Success();
-}
-
-S::Int S::GUI::Dialogs::FileSelection::SetDefaultExtension(const String &newDefExt)
-{
-	defExt = newDefExt;
-
-	return Success();
-}
-
-S::Int S::GUI::Dialogs::FileSelection::GetNumberOfFiles()
-{
-	return files.Length();
-}
-
-S::Int S::GUI::Dialogs::FileSelection::SetFileName(const String &newDefFile)
-{
-	defFile = newDefFile;
-
-	return Success();
-}
-
-S::String S::GUI::Dialogs::FileSelection::GetFileName()
-{
-	if (files.Length() > 0)	return files.GetFirst();
-	else			return NIL;
-}
-
-S::String S::GUI::Dialogs::FileSelection::GetNthFileName(Int n)
-{
-	if (files.Length() > n)	return files.GetNth(n);
-	else			return NIL;
 }

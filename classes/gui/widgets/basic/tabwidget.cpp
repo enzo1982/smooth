@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,7 +38,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 
 				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
@@ -146,20 +146,16 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::TabWidget::SelectTab(Int tabID)
 {
-	if (IsRegistered())
-	{
-		container->GetDrawSurface()->StartPaint(Rect(GetRealPosition(), GetSize()));
-	}
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(GetVisibleArea());
 
 	for (Int i = 0; i < GetNOfObjects(); i++) if (GetNthObject(i)->GetHandle() != tabID) GetNthObject(i)->Hide();
 	for (Int j = 0; j < GetNOfObjects(); j++) if (GetNthObject(j)->GetHandle() == tabID) GetNthObject(j)->Show();
 
-	if (IsRegistered())
-	{
-		Paint(SP_PAINT);
+	Paint(SP_PAINT);
 
-		container->GetDrawSurface()->EndPaint();
-	}
+	surface->EndPaint();
 
 	return Success();
 }

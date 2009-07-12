@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,7 +38,7 @@ S::Int S::GUI::Layer::Show()
 
 	if (IsBackgroundColorSet() && IsVisible())
 	{
-		Surface	*surface	= container->GetDrawSurface();
+		Surface	*surface	= GetDrawSurface();
 		Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
 		surface->Box(frame, GetBackgroundColor(), Rect::Filled);
@@ -95,7 +95,7 @@ S::Int S::GUI::Layer::Hide()
 
 	if (IsBackgroundColorSet() && wasVisible)
 	{
-		Surface	*surface	= container->GetDrawSurface();
+		Surface	*surface	= GetDrawSurface();
 		Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
 		surface->Box(frame, container->GetBackgroundColor(), Rect::Filled);
@@ -117,7 +117,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 		case SP_PAINT:
 			if (IsBackgroundColorSet())
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 
 				surface->Box(Rect(GetRealPosition(), GetSize()), GetBackgroundColor(), Rect::Filled);
 			}

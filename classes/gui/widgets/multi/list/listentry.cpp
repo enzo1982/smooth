@@ -66,20 +66,20 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 		case SP_MOUSEIN:
 		case SP_MOUSEOUT:
 			{
-				Surface	*surface = container->GetDrawSurface();
+				Surface	*surface = GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 				Font	 nFont	 = font;
 				Bool	 gotTabs = False;
 
 				if (mouseOver) nFont.SetColor(Setup::GradientTextColor);
-				if (!active) nFont.SetColor(Setup::GrayTextColor);
+				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
 				for (Int r = 0; r < text.Length(); r++) if (text[r] == '\t') { gotTabs = True; break; }
 
 				surface->StartPaint(GetVisibleArea());
 
 				if (mouseOver)	surface->Gradient(frame, Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
-				else		surface->Box(frame, Setup::ClientColor, Rect::Filled);
+				else		surface->Box(frame, IsActive() ? Setup::ClientColor : Setup::BackgroundColor, Rect::Filled);
 
 				if (selected)	surface->Box(frame, Setup::ClientTextColor, Rect::Dotted);
 
@@ -100,7 +100,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 							Color	 lightColor = Setup::GrayTextColor;
 							Color	 darkColor = Setup::ClientTextColor;
 
-							if (!active) darkColor = Setup::GrayTextColor;
+							if (!IsActive()) darkColor = Setup::GrayTextColor;
 
 							surface->Line(p1, p2, darkColor);
 							surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), lightColor);

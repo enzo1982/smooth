@@ -9,28 +9,36 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/multi/list/listboxheader.h>
+#include <smooth/gui/widgets/hotspot/hotspot.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
-#include <smooth/system/event.h>
 
 const S::Int	 S::GUI::ListBoxHeader::classID = S::Object::RequestClassID();
 
 S::GUI::ListBoxHeader::ListBoxHeader(const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
 	moveTab		= -1;
-	innerLoop	= False;
+	draggingTab	= False;
 
 	type		= classID;
 
 	font.SetWeight(Font::Bold);
+
+	dragHotspot	= new Hotspot(Point(0, 0), GetSize());
+	dragHotspot->SetIndependent(True);
+	dragHotspot->onMouseDragStart.Connect(&ListBoxHeader::OnMouseDragStart, this);
+	dragHotspot->onMouseDrag.Connect(&ListBoxHeader::OnMouseDrag, this);
+	dragHotspot->onMouseDragEnd.Connect(&ListBoxHeader::OnMouseDragEnd, this);
+
+	Add(dragHotspot);
 
 	onChangeSize.Connect(&ListBoxHeader::OnChangeSize, this);
 }
 
 S::GUI::ListBoxHeader::~ListBoxHeader()
 {
+	DeleteObject(dragHotspot);
 }
 
 S::Int S::GUI::ListBoxHeader::AddTab(const String &iTabName, Int iTabWidth, Int iTabOrientation)
@@ -138,129 +146,106 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 	Window	*window	 = GetContainerWindow();
 	Surface	*surface = GetDrawSurface();
 
-	EnterProtectedRegion();
-
 	Point	 realPos = GetRealPosition();
 	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
-	Int	 retVal	 = Success();
 
 	switch (message)
 	{
 		case SM_MOUSEMOVE:
-			if (innerLoop) break;
+			if (draggingTab) break;
 
+			frame.left = realPos.x - 2;
+
+			for (Int i = 0; i < tabWidths.Length() - 1; i++)
 			{
-				frame.left = realPos.x - 2;
+				frame.left += (Int) (Math::Abs(tabWidths.GetNth(i)) + 1);
+				frame.right = frame.left + 4;
 
-				for (Int i = 0; i < tabWidths.Length() - 1; i++)
+				if (window->IsMouseOn(frame))
 				{
-					frame.left += (Int) (Math::Abs(tabWidths.GetNth(i)) + 1);
-					frame.right = frame.left + 4;
-
-					if (window->IsMouseOn(frame))
+					if (moveTab != i)
 					{
-						if (moveTab != i)
-						{
-							moveTab = i;
+						moveTab = i;
 
-							LiSASetMouseCursor(window->GetSystemWindow(), LiSA_MOUSE_HSIZE);
-						}
-					}
-					else if (moveTab == i)
-					{
-						moveTab = -1;
-
-						LiSASetMouseCursor(window->GetSystemWindow(), LiSA_MOUSE_ARROW);
+						LiSASetMouseCursor(window->GetSystemWindow(), LiSA_MOUSE_HSIZE);
 					}
 				}
-
-				frame.left = realPos.x;
-				frame.bottom--;
-
-				for (Int j = 0; j < tabWidths.Length(); j++)
+				else if (moveTab == i)
 				{
-					frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNth(j)), realPos.x + GetWidth() - 1);
+					moveTab = -1;
 
-					frame.left++;
-					frame.top++;
-
-					if (window->IsMouseOn(frame) && !tabChecked.GetNth(j) && moveTab == -1)
-					{
-						surface->Box(frame, Setup::LightGrayColor, Rect::Filled);
-
-						frame.left += 2;
-						surface->SetText(tabNames.GetNth(j), frame, font);
-						frame.left -= 2;
-
-						tabChecked.Set(tabChecked.GetNthIndex(j), True);
-					}
-					else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNth(j))
-					{
-						surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
-
-						frame.left += 2;
-						surface->SetText(tabNames.GetNth(j), frame, font);
-						frame.left -= 2;
-
-						tabChecked.Set(tabChecked.GetNthIndex(j), False);
-					}
-
-					frame.left--;
-					frame.top--;
-
-					frame.left += (Int) (Math::Abs(tabWidths.GetNth(j)) + 1);
+					LiSASetMouseCursor(window->GetSystemWindow(), LiSA_MOUSE_ARROW);
 				}
 			}
 
-			break;
-		case SM_LBUTTONDOWN:
-			if (moveTab != -1)
+			frame.left = realPos.x;
+			frame.bottom--;
+
+			for (Int j = 0; j < tabWidths.Length(); j++)
 			{
-#ifdef __WIN32__
-				Int	 leftButton;
+				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNth(j)), realPos.x + GetWidth() - 1);
 
-				if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
-				else					leftButton = VK_LBUTTON;
+				frame.left++;
+				frame.top++;
 
-				Int	 omx = window->GetMousePosition().x;
-
-				innerLoop = True;
-
-				System::EventProcessor	*event = new System::EventProcessor();
-
-				do
+				if (window->IsMouseOn(frame) && !tabChecked.GetNth(j) && moveTab == -1)
 				{
-					event->ProcessNextEvent();
+					surface->Box(frame, Setup::LightGrayColor, Rect::Filled);
+					surface->SetText(tabNames.GetNth(j), frame + Point(2, 0) - Size(2, 0), font);
 
-					Int	 mx = window->GetMousePosition().x;
-					Int	 bias = omx - mx;
-
-					if (bias != 0)
-					{
-						tabWidths.SetNth(moveTab, (Int) Math::Max(Math::Abs(tabWidths.GetNth(moveTab)) - bias, 1) * Math::Sign(tabWidths.GetNth(moveTab)));
-						tabWidths.SetNth(tabWidths.Length() - 1, (Int) Math::Max(Math::Abs(tabWidths.GetNth(tabWidths.Length() - 1)) + bias, 1) * Math::Sign(tabWidths.GetNth(tabWidths.Length() - 1)));
-
-						omx = mx;
-
-						OnChangeSize(GetSize());
-
-						container->Paint(SP_PAINT);
-					}
+					tabChecked.Set(tabChecked.GetNthIndex(j), True);
 				}
-				while (GetAsyncKeyState(leftButton) != 0);
+				else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNth(j))
+				{
+					surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
+					surface->SetText(tabNames.GetNth(j), frame + Point(2, 0) - Size(2, 0), font);
 
-				delete event;
+					tabChecked.Set(tabChecked.GetNthIndex(j), False);
+				}
 
-				innerLoop = False;
-#endif
+				frame.left--;
+				frame.top--;
+
+				frame.left += (Int) (Math::Abs(tabWidths.GetNth(j)) + 1);
 			}
 
 			break;
 	}
 
-	LeaveProtectedRegion();
+	return Widget::Process(message, wParam, lParam);
+}
 
-	return retVal;
+S::Void S::GUI::ListBoxHeader::OnMouseDragStart(const Point &mousePos)
+{
+	if (moveTab == -1) return;
+
+	startMousePos = mousePos;
+
+	draggingTab = True;
+}
+
+S::Void S::GUI::ListBoxHeader::OnMouseDrag(const Point &mousePos)
+{
+	if (!draggingTab) return;
+
+	Int	 bias = startMousePos.x - mousePos.x;
+
+	if (bias != 0)
+	{
+		tabWidths.SetNth(moveTab, (Int) Math::Max(Math::Abs(tabWidths.GetNth(moveTab)) - bias, 1) * Math::Sign(tabWidths.GetNth(moveTab)));
+		tabWidths.SetNth(tabWidths.Length() - 1, (Int) Math::Max(Math::Abs(tabWidths.GetNth(tabWidths.Length() - 1)) + bias, 1) * Math::Sign(tabWidths.GetNth(tabWidths.Length() - 1)));
+
+		startMousePos = mousePos;
+
+		OnChangeSize(GetSize());
+
+		container->Paint(SP_PAINT);
+	}
+}
+
+S::Void S::GUI::ListBoxHeader::OnMouseDragEnd(const Point &mousePos)
+{
+	draggingTab = False;
 }
 
 S::Void S::GUI::ListBoxHeader::OnChangeSize(const Size &nSize)
@@ -278,4 +263,6 @@ S::Void S::GUI::ListBoxHeader::OnChangeSize(const Size &nSize)
 	{
 		if (tabWidths.GetNth(j) <= 0) tabWidths.SetNth(j, -Math::Max(0, (GetWidth() - sumFixedTabSizes) / varSizeTabs));
 	}
+
+	dragHotspot->SetSize(nSize);
 }

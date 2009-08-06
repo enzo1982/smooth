@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -188,7 +188,7 @@ S::String S::Number::ToIntString() const
 
 	for (Int i = 0; i < length; i++)
 	{
-		string[string.Length()] = '0' + Int(Math::Abs(intValue) / Math::Pow(10, length - i - 1)) % 10;
+		string[string.Length()] = '0' + Int64(Math::Abs(intValue) / Math::Pow(10, length - i - 1)) % 10;
 	}
 
 	if (intValue < 0) string = String("-").Append(string);

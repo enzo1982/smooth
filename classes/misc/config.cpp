@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/misc/config.h>
+#include <smooth/files/directory.h>
 #include <smooth/gui/application/application.h>
 
 S::Configuration::Configuration()
@@ -99,6 +100,12 @@ S::Int S::Configuration::Save()
 
 	if (fileName != NIL && configFile->GetRootNode() != NIL)
 	{
+		/* Create base directory first.
+		 */
+		Directory(File(fileName).GetFilePath()).Create();
+
+		/* Save config file.
+		 */
 		if (configFile->GetRootNode()->GetNodeByName("configuration") != NIL)
 		{
 			if (configFile->GetRootNode()->GetNodeByName("configuration")->GetNOfNodes() >= 1) configFile->SaveFile(fileName);

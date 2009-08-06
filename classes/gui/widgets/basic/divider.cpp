@@ -23,10 +23,23 @@ S::GUI::Divider::Divider(Int iPosition, Int iOrientation) : Widget(Point(), Size
 	position	= iPosition;
 
 	if (position == 0) position = 120;
+
+	dragHotspot = new Hotspot(Point(), Size());
+	dragHotspot->SetIndependent(True);
+
+	dragHotspot->onMouseOver.Connect(&Divider::OnMouseOver, this);
+	dragHotspot->onMouseOut.Connect(&Divider::OnMouseOut, this);
+
+	dragHotspot->onMouseDragStart.Connect(&Divider::OnMouseDragStart, this);
+	dragHotspot->onMouseDrag.Connect(&Divider::OnMouseDrag, this);
+	dragHotspot->onMouseDragEnd.Connect(&Divider::OnMouseDragEnd, this);
+
+	Add(dragHotspot);
 }
 
 S::GUI::Divider::~Divider()
 {
+	DeleteObject(dragHotspot);
 }
 
 S::Int S::GUI::Divider::SetPos(Int nPosition)
@@ -57,11 +70,13 @@ S::Int S::GUI::Divider::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = GetDrawSurface();
-				Rect	 rect = GetDividerRect();
+				UpdateMetrics();
 
-				if (Binary::IsFlagSet(flags, OR_VERT))	surface->Bar(Point(rect.left, rect.top), Point(rect.right - 1, rect.bottom), OR_VERT);
-				else					surface->Bar(Point(rect.left, rect.top), Point(rect.right, rect.bottom - 1), OR_HORZ);
+				Surface	*surface = GetDrawSurface();
+				Rect	 rect = Rect(GetRealPosition(), GetSize());
+
+				if (Binary::IsFlagSet(flags, OR_VERT))	surface->Bar(Point(rect.left, rect.top), Point(rect.right - 2, rect.bottom - 1), OR_VERT);
+				else					surface->Bar(Point(rect.left, rect.top), Point(rect.right - 1, rect.bottom - 2), OR_HORZ);
 			}
 
 			break;
@@ -70,17 +85,12 @@ S::Int S::GUI::Divider::Paint(Int message)
 	return Success();
 }
 
-S::Bool S::GUI::Divider::IsAffected(const Rect &uRect) const
-{
-	return Rect::DoRectsOverlap(uRect, GetDividerRect());
-}
-
-S::GUI::Rect S::GUI::Divider::GetDividerRect() const
+S::Void S::GUI::Divider::UpdateMetrics()
 {
 	Window	*wnd = GetContainerWindow();
 	Rect	 rect;
 
-	if (wnd == NIL) return rect;
+	if (wnd == NIL) return;
 
 	if (Binary::IsFlagSet(flags, OR_VERT))
 	{
@@ -96,11 +106,11 @@ S::GUI::Rect S::GUI::Divider::GetDividerRect() const
 		}
 		else
 		{
-			if (Binary::IsFlagSet(flags, OR_RIGHT))	rect.left = container->GetRealPosition().x + container->GetWidth() - position;
-			else					rect.left = container->GetRealPosition().x + position;
+			if (Binary::IsFlagSet(flags, OR_RIGHT))	rect.left = container->GetWidth() - position;
+			else					rect.left = position;
 
-			rect.top	= container->GetRealPosition().y + 3;
-			rect.bottom	= container->GetRealPosition().y + container->GetHeight() - 3;
+			rect.top	= 3;
+			rect.bottom	= container->GetHeight() - 3;
 		}
 
 		rect.right = rect.left + 1;
@@ -115,11 +125,11 @@ S::GUI::Rect S::GUI::Divider::GetDividerRect() const
 			{
 				if (Binary::IsFlagSet(divider->flags, OR_BOTTOM))
 				{
-					if (container->GetRealPosition().y + container->GetHeight() - divider->position <= rect.bottom + 1) rect.bottom = container->GetRealPosition().y + container->GetHeight() - divider->position - 2;
+					if (container->GetHeight() - divider->position <= rect.bottom + 1) rect.bottom = container->GetHeight() - divider->position - 2;
 				}
 				else
 				{
-					if (container->GetRealPosition().y + divider->position >= rect.top - 2) rect.top = container->GetRealPosition().y + divider->position + 3;
+					if (divider->position >= rect.top - 2) rect.top = divider->position + 3;
 				}
 			}
 
@@ -140,11 +150,11 @@ S::GUI::Rect S::GUI::Divider::GetDividerRect() const
 		}
 		else
 		{
-			if (Binary::IsFlagSet(flags, OR_BOTTOM)) rect.top = container->GetRealPosition().y + container->GetHeight() - position;
-			else					 rect.top = container->GetRealPosition().y + position;
+			if (Binary::IsFlagSet(flags, OR_BOTTOM)) rect.top = container->GetHeight() - position;
+			else					 rect.top = position;
 
-			rect.left	= container->GetRealPosition().x + 3;
-			rect.right	= container->GetRealPosition().x + container->GetWidth() - 3;
+			rect.left	= 3;
+			rect.right	= container->GetWidth() - 3;
 		}
 
 		rect.bottom = rect.top + 1;
@@ -159,11 +169,11 @@ S::GUI::Rect S::GUI::Divider::GetDividerRect() const
 			{
 				if (Binary::IsFlagSet(divider->flags, OR_RIGHT))
 				{
-					if (container->GetRealPosition().x + container->GetWidth() - divider->position <= rect.right + 1) rect.right = container->GetRealPosition().x + container->GetWidth() - divider->position - 2;
+					if (container->GetWidth() - divider->position <= rect.right + 1) rect.right = container->GetWidth() - divider->position - 2;
 				}
 				else
 				{
-					if (container->GetRealPosition().x + divider->position >= rect.left - 2) rect.left = container->GetRealPosition().x + divider->position + 3;
+					if (divider->position >= rect.left - 2) rect.left = divider->position + 3;
 				}
 			}
 
@@ -171,5 +181,49 @@ S::GUI::Rect S::GUI::Divider::GetDividerRect() const
 		}
 	}
 
-	return rect;
+	SetMetrics(Point(rect.left, rect.top), Size(rect.right - rect.left + 1, rect.bottom - rect.top + 1));
+
+	if (Binary::IsFlagSet(flags, OR_VERT))	dragHotspot->SetMetrics(Point(-1, 0), Size(rect.right - rect.left + 3, rect.bottom - rect.top + 1));
+	else					dragHotspot->SetMetrics(Point(0, -1), Size(rect.right - rect.left + 1, rect.bottom - rect.top + 3));
+}
+
+S::Void S::GUI::Divider::OnMouseOver()
+{
+	if (!Binary::IsFlagSet(flags, DIV_MOVABLE)) return;
+
+	if (Binary::IsFlagSet(flags, OR_VERT))	LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_HSIZE);
+	else					LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_VSIZE);
+}
+
+S::Void S::GUI::Divider::OnMouseOut()
+{
+	if (!Binary::IsFlagSet(flags, DIV_MOVABLE)) return;
+
+	if (!dragging) LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
+}
+
+S::Void S::GUI::Divider::OnMouseDragStart(const Point &mousePos)
+{
+	dragging = True;
+
+	startPos = GetPos();
+	startMousePos = mousePos;
+}
+
+S::Void S::GUI::Divider::OnMouseDrag(const Point &mousePos)
+{
+	Int	 pos = startPos;
+
+	if (Binary::IsFlagSet(flags, OR_VERT))	pos -= (startMousePos.x - mousePos.x);
+	else					pos -= (startMousePos.y - mousePos.y);
+
+	if (pos != GetPos()) onDrag.Emit(pos);
+}
+
+
+S::Void S::GUI::Divider::OnMouseDragEnd(const Point &mousePos)
+{
+	dragging = False;
+
+	if (!dragHotspot->IsMouseOver()) LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
 }

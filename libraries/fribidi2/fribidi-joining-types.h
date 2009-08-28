@@ -198,6 +198,9 @@ typedef fribidi_uint8 FriBidiArabicProp;
 	(FRIBIDI_LEVEL_IS_RTL (level) ? FRIBIDI_MASK_JOINS_LEFT	\
 				      : FRIBIDI_MASK_JOINS_RIGHT)
 
+#define FRIBIDI_JOIN_SHAPE(p)	\
+	((p) & ( FRIBIDI_MASK_JOINS_RIGHT | FRIBIDI_MASK_JOINS_LEFT ))
+
 /* Functions finally */
 
 

@@ -38,7 +38,20 @@
 #include "fribidi-begindecls.h"
 
 
-#if !FRIBIDI_USE_GLIB
+#if FRIBIDI_USE_GLIB+0
+# ifndef __FRIBIDI_DOC
+#  include <glib/gtypes.h>
+#  include <glib/gunicode.h>
+# endif	/* !__FRIBIDI_DOC */
+# define FRIBIDI_INT8_LOCAL		gint8
+# define FRIBIDI_INT16_LOCAL		gint16
+# define FRIBIDI_INT32_LOCAL		gint32
+# define FRIBIDI_UINT8_LOCAL		guint8
+# define FRIBIDI_UINT16_LOCAL		guint16
+# define FRIBIDI_UINT32_LOCAL		guint32
+# define FRIBIDI_BOOLEAN_LOCAL		gboolean
+# define FRIBIDI_UNICHAR_LOCAL		gunichar
+#else /* !FRIBIDI_USE_GLIB */
 # if defined(HAVE_INTTYPES_H) || defined(HAVE_STDINT_H)
 #  ifndef __FRIBIDI_DOC
 #   if HAVE_INTTYPES_H
@@ -84,22 +97,10 @@
 # else /* SIZEOF_WCHAR_T < 4 */
 #  define FRIBIDI_UNICHAR_LOCAL		fribidi_uint32
 # endif	/* SIZEOF_WCHAR_T < 4 */
-#else /* FRIBIDI_USE_GLIB */
-# ifndef __FRIBIDI_DOC
-#  include <glib/gtypes.h>
-#  include <glib/gunicode.h>
-# endif	/* !__FRIBIDI_DOC */
-# define FRIBIDI_INT8_LOCAL		gint8
-# define FRIBIDI_INT16_LOCAL		gint16
-# define FRIBIDI_INT32_LOCAL		gint32
-# define FRIBIDI_UINT8_LOCAL		guint8
-# define FRIBIDI_UINT16_LOCAL		guint16
-# define FRIBIDI_UINT32_LOCAL		guint32
-# define FRIBIDI_BOOLEAN_LOCAL		gboolean
-# define FRIBIDI_UNICHAR_LOCAL		gunichar
-#endif /* FRIBIDI_USE_GLIB */
+#endif /* !FRIBIDI_USE_GLIB */
 
-#if !FRIBIDI_INT_TYPES
+#if FRIBIDI_INT_TYPES+0
+#else
 # define FRIBIDI_INT8	FRIBIDI_INT8_LOCAL
 # define FRIBIDI_INT16	FRIBIDI_INT16_LOCAL
 # define FRIBIDI_INT32	FRIBIDI_INT32_LOCAL
@@ -138,21 +139,21 @@ typedef FRIBIDI_STR_INDEX FriBidiStrIndex;
 
 /* A few macros for working with bits */
 
-#define FRIBIDI_TEST_BITS(x, mask) ((x) & (mask))
+#define FRIBIDI_TEST_BITS(x, mask) (((x) & (mask)) ? 1 : 0)
 
 #define FRIBIDI_INCLUDE_BITS(x, mask) ((x) | (mask))
 
 #define FRIBIDI_EXCLUDE_BITS(x, mask) ((x) & ~(mask))
 
-#define FRIBIDI_SET_BITS(x, mask)	\
-	FRIBIDI_BEGIN_STMT	\
-	(x) |= (mask);	\
-	FRIBIDI_END_STMT
+#define FRIBIDI_SET_BITS(x, mask)	((x) |= (mask))
 
-#define FRIBIDI_UNSET_BITS(x, mask)	\
-	FRIBIDI_BEGIN_STMT	\
-	(x) &= ~(mask);	\
-	FRIBIDI_END_STMT
+#define FRIBIDI_UNSET_BITS(x, mask)	((x) &= ~(mask))
+
+#define FRIBIDI_ADJUST_BITS(x, mask, cond)	\
+	((x) = ((x) & ~(mask)) | ((cond) ? (mask) : 0))
+
+#define FRIBIDI_ADJUST_AND_TEST_BITS(x, mask, cond)	\
+	FRIBIDI_TEST_BITS(FRIBIDI_ADJUST_BITS((x), (mask), (cond)), (mask))
 
 #include "fribidi-enddecls.h"
 

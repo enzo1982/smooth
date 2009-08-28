@@ -32,7 +32,7 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
-#if HAVE_CONFIG_H
+#if HAVE_CONFIG_H+0
 # include <config.h>
 #endif
 
@@ -40,10 +40,16 @@
 
 /* FRIBIDI_PRIVATESPACE is a macro used to name library internal symbols. */
 #ifndef FRIBIDI_PRIVATESPACE
-# define FRIBIDI_PRIVATESPACE(SYMBOL) FRIBIDI_NAMESPACE(_##SYMBOL##__internal__)
+# define FRIBIDI_PRIVATESPACE1(A,B) A##B
+# define FRIBIDI_PRIVATESPACE0(A,B) FRIBIDI_PRIVATESPACE1(A,B)
+# define FRIBIDI_PRIVATESPACE(SYMBOL) FRIBIDI_PRIVATESPACE0(_,FRIBIDI_NAMESPACE(_##SYMBOL##__internal__))
 #endif /* !FRIBIDI_PRIVATESPACE */
 
-#if FRIBIDI_USE_GLIB
+#if (defined(WIN32)) || (defined(_WIN32_WCE))
+# define FRIBIDI_ENTRY //__declspec(dllexport)
+#endif /* WIN32 */
+
+#if FRIBIDI_USE_GLIB+0
 # ifndef SIZEOF_LONG
 #  define SIZEOF_LONG GLIB_SIZEOF_LONG
 # endif	/* !SIZEOF_LONG */
@@ -115,6 +121,16 @@
 # endif	/* !fribidi_free */
 #endif /* fribidi_malloc */
 
+#if HAVE_STRING_H+0
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H+0
+# include <strings.h>
+#endif
+
 /* FRIBIDI_CHUNK_SIZE is the number of bytes in each chunk of memory being
  * allocated for data structure pools. */
 #ifndef FRIBIDI_CHUNK_SIZE
@@ -151,7 +167,7 @@
 # define FRIBIDI_EMPTY_STMT FRIBIDI_BEGIN_STMT (void) 0; FRIBIDI_END_STMT
 #endif /* !FRIBIDI_EMPTY_STMT */
 
-#if HAVE_STRINGIZE
+#if HAVE_STRINGIZE+0
 # define STRINGIZE(symbol) #symbol
 #else /* !HAVE_STRINGIZE */
 # define STRINGIZE(symbol) "(no stringize operator available)"
@@ -163,8 +179,7 @@
 #endif /* !_GNU_SOURCE */
 
 /* We respect our own rules. */
-#define FRIBIDI_STRICT 1
-#undef FRIBIDI_COMPAT
+#define FRIBIDI_NO_DEPRECATED
 
 
 #include "debug.h"

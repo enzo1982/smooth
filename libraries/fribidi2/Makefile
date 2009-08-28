@@ -2,7 +2,7 @@ SMOOTH_PATH = ../..
 
 TARGET	    = libfribidi2.a
 THISPATH    = libraries/fribidi2
-OBJECTS	    = fribidi.o fribidi-bidi.o fribidi-bidi-types.o fribidi-env.o fribidi-joining.o fribidi-joining-types.o fribidi-mem.o fribidi-mirroring.o fribidi-run.o
+OBJECTS	    = fribidi.o fribidi-arabic.o fribidi-bidi.o fribidi-bidi-types.o fribidi-deprecated.o fribidi-joining.o fribidi-joining-types.o fribidi-mem.o fribidi-mirroring.o fribidi-run.o fribidi-shape.o
 
 CC = gcc
 CCOPTS = -g0 -Wall -ffast-math -march=i586 -Os -I. -I$(SMOOTH_PATH)/include

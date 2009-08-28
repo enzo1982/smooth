@@ -38,10 +38,8 @@
 #include <fribidi-bidi.h>
 #include <fribidi-mirroring.h>
 #include <fribidi-unicode.h>
-#include <fribidi-env.h>
 
 #include "mem.h"
-#include "env.h"
 #include "bidi-types.h"
 #include "run.h"
 
@@ -114,7 +112,7 @@ compact_neutrals (
     }
 }
 
-#if DEBUG
+#if DEBUG+0
 /*======================================================================
  *  For debugging, define some functions for printing the types and the
  *  levels.
@@ -722,20 +720,24 @@ fribidi_get_par_embedding_levels (
 /* Reinsert the explicit codes & BN's that are already removed, from the
    explicits_list to main_run_list. */
   DBG ("reinserting explicit codes");
-  {
-    register FriBidiRun *p;
-    register fribidi_boolean stat =
-      shadow_run_list (main_run_list, explicits_list, true);
-    explicits_list = NULL;
-    if UNLIKELY
-      (!stat) goto out;
+  if UNLIKELY
+    (explicits_list->next != explicits_list)
+    {
+      register FriBidiRun *p;
+      register fribidi_boolean stat =
+	shadow_run_list (main_run_list, explicits_list, true);
+      explicits_list = NULL;
+      if UNLIKELY
+	(!stat) goto out;
 
-    p = main_run_list->next;
-    if (p != main_run_list && p->level == FRIBIDI_SENTINEL)
-      p->level = base_level;
-    for_run_list (p, main_run_list) if (p->level == FRIBIDI_SENTINEL)
-      p->level = p->prev->level;
-  }
+      /* Set level of inserted explicit chars to that of their previous
+       * char, such that they do not affect reordering. */
+      p = main_run_list->next;
+      if (p != main_run_list && p->level == FRIBIDI_SENTINEL)
+	p->level = base_level;
+      for_run_list (p, main_run_list) if (p->level == FRIBIDI_SENTINEL)
+	p->level = p->prev->level;
+    }
 
 # if DEBUG
   if UNLIKELY
@@ -875,6 +877,7 @@ index_array_reverse (
 FRIBIDI_ENTRY FriBidiLevel
 fribidi_reorder_line (
   /* input */
+  FriBidiFlags flags, /* reorder flags */
   const FriBidiCharType *bidi_types,
   const FriBidiStrIndex len,
   const FriBidiStrIndex off,
@@ -883,11 +886,9 @@ fribidi_reorder_line (
   FriBidiLevel *embedding_levels,
   FriBidiChar *visual_str,
   /* output */
-  FriBidiStrIndex *positions_L_to_V,
-  FriBidiStrIndex *positions_V_to_L
+  FriBidiStrIndex *map
 )
 {
-  fribidi_boolean private_V_to_L = false;
   fribidi_boolean status = false;
   FriBidiLevel max_level = 0;
 
@@ -895,17 +896,6 @@ fribidi_reorder_line (
     (len == 0)
     {
       status = true;
-      goto out;
-    }
-
-  if UNLIKELY
-    ((unsigned long) off + (unsigned long) len >
-     FRIBIDI_MAX_STRING_LENGTH && (positions_V_to_L || positions_L_to_V))
-    {
-#     if DEBUG
-      MSG2 (FRIBIDI ": cannot handle strings > %lu characters\n",
-	    (unsigned long) FRIBIDI_MAX_STRING_LENGTH);
-#     endif /* DEBUG */
       goto out;
     }
 
@@ -925,32 +915,14 @@ fribidi_reorder_line (
       embedding_levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
   }
 
-  /* If l2v is to be calculated we must have v2l as well. If it is not
-     given by the caller, we have to make a private instance of it. */
-  if (positions_L_to_V && !positions_V_to_L)
-    {
-      positions_V_to_L = fribidi_malloc (sizeof (positions_V_to_L[0]) * len);
-      if UNLIKELY
-	(!positions_V_to_L) goto out;
-      private_V_to_L = true;
-    }
-
-
   /* 7. Reordering resolved levels */
   {
     register FriBidiLevel level;
     register FriBidiStrIndex i;
 
-    /* Set up the ordering array to identity order */
-    if (positions_V_to_L)
-      {
-	for (i = off + len - 1; i >= off; i--)
-	  positions_V_to_L[i] = i;
-      }
-
     /* Reorder both the outstring and the order array */
     {
-      if (fribidi_reorder_nsm_status ())
+      if (FRIBIDI_TEST_BITS (flags, FRIBIDI_FLAG_REORDER_NSM))
 	{
 	  /* L3. Reorder NSMs. */
 	  for (i = off + len - 1; i >= off; i--)
@@ -975,10 +947,9 @@ fribidi_reorder_line (
 		  {
 		    bidi_string_reverse (visual_str + i, seq_end - i + 1);
 		  }
-		if (positions_V_to_L)
+		if (map)
 		  {
-		    index_array_reverse (positions_V_to_L + i,
-					 seq_end - i + 1);
+		    index_array_reverse (map + i, seq_end - i + 1);
 		  }
 	      }
 	}
@@ -1002,25 +973,16 @@ fribidi_reorder_line (
 
 	      if (visual_str)
 		bidi_string_reverse (visual_str + i + 1, seq_end - i);
-	      if (positions_V_to_L)
-		index_array_reverse (positions_V_to_L + i + 1, seq_end - i);
+	      if (map)
+		index_array_reverse (map + i + 1, seq_end - i);
 	    }
     }
 
-    /* Convert the v2l list to l2v */
-    if (positions_L_to_V)
-      {
-	for (i = off + len - 1; i >= off; i--)
-	  positions_L_to_V[positions_V_to_L[i]] = i;
-      }
   }
 
   status = true;
 
 out:
-
-  if (private_V_to_L)
-    fribidi_free (positions_V_to_L);
 
   return status ? max_level + 1 : 0;
 }

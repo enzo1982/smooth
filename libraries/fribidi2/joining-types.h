@@ -40,13 +40,13 @@
 
 #include <fribidi-begindecls.h>
 
-#if DEBUG
+#if DEBUG+0
 
 #define fribidi_char_from_joining_type FRIBIDI_PRIVATESPACE(char_from_joining_type)
 char
 fribidi_char_from_joining_type (
   FriBidiJoiningType j,		/* input joining type */
-  fribidi_boolean visual	/* in visual context or logincal? */
+  fribidi_boolean visual	/* in visual context or logical? */
 ) FRIBIDI_GNUC_HIDDEN;
 
 #endif /* DEBUG */

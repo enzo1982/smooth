@@ -126,8 +126,9 @@ new_run (
 
 #define move_node_before(x, list) \
 	FRIBIDI_BEGIN_STMT \
-	if ((x)->prev) \
+	if ((x)->prev) { \
 	  delete_node(x); \
+	} \
 	insert_node_before((x), (list)); \
 	FRIBIDI_END_STMT
 
@@ -135,7 +136,7 @@ new_run (
 	for ((x) = (list)->next; (x)->type != FRIBIDI_TYPE_SENTINEL; (x) = (x)->next)
 
 
-#if DEBUG
+#if DEBUG+0
 
 #define fribidi_validate_run_list FRIBIDI_PRIVATESPACE(validate_run_list)
      void fribidi_validate_run_list (

@@ -35,7 +35,10 @@
 
 #include "mem.h"
 
-#if !FRIBIDI_USE_GLIB
+#if FRIBIDI_USE_GLIB+0
+#else
+#if USE_SIMPLE_MALLOC+0
+#else
 
 struct _FriBidiMemChunk
 {
@@ -129,6 +132,7 @@ fribidi_mem_chunk_destroy (
   fribidi_free (mem_chunk);
 }
 
+#endif /* !USE_SIMPLE_MALLOC */
 #endif /* !FRIBIDI_USE_GLIB */
 
 /* Editor directions:

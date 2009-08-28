@@ -43,11 +43,11 @@
 #define FRIBIDI_UNICODE_CHARS	(sizeof(FriBidiChar) >= 4 ? 0x110000 : 0xFFFE)
 
 /* Unicode version - FRIBIDI_UNICODE_VERSION */
-#if !DONT_HAVE_FRIBIDI_UNICODE_VERSION_H
-# include "fribidi-unicode-version.h"
-#else /* DONT_HAVE_FRIBIDI_UNICODE_VERSION_H */
+#if DONT_HAVE_FRIBIDI_UNICODE_VERSION_H+0
 # define FRIBIDI_UNICODE_VERSION "unknown"
-#endif /* DONT_HAVE_FRIBIDI_UNICODE_VERSION_H */
+#else /* !DONT_HAVE_FRIBIDI_UNICODE_VERSION_H */
+# include "fribidi-unicode-version.h"
+#endif /* !DONT_HAVE_FRIBIDI_UNICODE_VERSION_H */
 
 #define fribidi_unicode_version FRIBIDI_NAMESPACE(unicode_version)
 /* An string containing the version the Unicode standard implemented,
@@ -91,24 +91,11 @@ extern const char *fribidi_unicode_version;
 #define FRIBIDI_CHAR_ARABIC_ZERO	0x0660
 #define FRIBIDI_CHAR_PERSIAN_ZERO	0x06F0
 
-/* These are here just for lazy people. */
-#if !FRIBIDI_STRICT
-#define UNI_MAX_BIDI_LEVEL	FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL
-#define UNI_LRM			FRIBIDI_CHAR_LRM
-#define UNI_RLM			FRIBIDI_CHAR_RLM
-#define UNI_LRE			FRIBIDI_CHAR_LRE
-#define UNI_RLE			FRIBIDI_CHAR_RLE
-#define UNI_LRO			FRIBIDI_CHAR_LRO
-#define UNI_RLO			FRIBIDI_CHAR_RLO
-#define UNI_LS			FRIBIDI_CHAR_LS
-#define UNI_PS			FRIBIDI_CHAR_PS
-#define UNI_ZWNJ		FRIBIDI_CHAR_ZWNJ
-#define UNI_ZWJ			FRIBIDI_CHAR_ZWJ
-#define UNI_HEBREW_ALEF		FRIBIDI_CHAR_HEBREW_ALEF
-#define UNI_ARABIC_ALEF		FRIBIDI_CHAR_ARABIC_ALEF
-#define UNI_ARABIC_ZERO		FRIBIDI_CHAR_ARABIC_ZERO
-#define UNI_FARSI_ZERO		FRIBIDI_CHAR_PERSIAN_ZERO
-#endif /* !FRIBIDI_STRICT */
+/* Misc */
+#define FRIBIDI_CHAR_ZWNBSP		0xFEFF
+
+/* Char we place for a deleted slot, to delete later */
+#define FRIBIDI_CHAR_FILL		FRIBIDI_CHAR_ZWNBSP
 
 #include "fribidi-enddecls.h"
 

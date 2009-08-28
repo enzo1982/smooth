@@ -20,7 +20,11 @@ xx.xx.09 xx:xx - smooth alpha 0.8.71.0
 - sha1.cpp	- new class: SHA1, implements the SHA-1 hash algorithm
 
 - removed TreeView widget (use ListBox instead)
+- added support for path names exceeding MAX_PATH
 - fixed implementation of callback signals
 - fixed implementation of Array<>
 - updated Translator to support template files
+- added Vietnamese language support
 - improved Linux support
+- upgraded libbz2 to version 1.0.5
+- upgraded fribidi2 to version 0.19.2

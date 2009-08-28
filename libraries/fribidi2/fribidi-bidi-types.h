@@ -228,17 +228,6 @@ typedef fribidi_uint32 FriBidiParType;
 #define FRIBIDI_TYPE_WLTR	FRIBIDI_PAR_WLTR
 #define FRIBIDI_TYPE_WRTL	FRIBIDI_PAR_WRTL
 
-/* These are here just for lazy people. */
-#if !FRIBIDI_STRICT
-#define FRIBIDI_TYPE_WL		FRIBIDI_PAR_WLTR
-#define FRIBIDI_TYPE_WR		FRIBIDI_PAR_WRTL
-#define FRIBIDI_TYPE_L		FRIBIDI_PAR_LTR
-#define FRIBIDI_TYPE_R		FRIBIDI_PAR_RTL
-#define FRIBIDI_TYPE_N		FRIBIDI_PAR_ON
-#define FRIBIDI_TYPE_B		FRIBIDI_TYPE_BS
-#define FRIBIDI_TYPE_S		FRIBIDI_TYPE_SS
-#endif /* !FRIBIDI_STRICT */
-
 
 /*
  * Defining macros for needed queries, It is fully dependent on the 
@@ -285,7 +274,7 @@ typedef fribidi_uint32 FriBidiParType;
 /* Is explicit mark: LRE, RLE, LRO, RLO, PDF? */
 #define FRIBIDI_IS_EXPLICIT(p) ((p) & FRIBIDI_MASK_EXPLICIT)
 
-/* Is test separator: BS, SS? */
+/* Is text separator: BS, SS? */
 #define FRIBIDI_IS_SEPARATOR(p) ((p) & FRIBIDI_MASK_SEPARATOR)
 
 /* Is explicit override: LRO, RLO? */

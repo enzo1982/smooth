@@ -69,10 +69,10 @@ fribidi_shape_mirroring (
 
   DBG ("in fribidi_shape_mirroring");
 
-  fribidi_assert (embedding_levels);
-
   if UNLIKELY
     (len == 0 || !str) return;
+
+  fribidi_assert (embedding_levels);
 
   /* L4. Mirror all characters that are in odd levels and have mirrors. */
   for (i = len - 1; i >= 0; i--)

@@ -1,5 +1,5 @@
 /* FriBidi
- * fribidi.h - Unicode bidirectional and Arabic joining/shaping algorithms
+ * fribidi-flags.h - option flags
  *
  * $Id$
  * $Author$
@@ -8,9 +8,9 @@
  * $Source$
  *
  * Author:
- *   Behdad Esfahbod, 2004
+ *   Behdad Esfahbod, 2005
  *
- * Copyright (C) 2004 Sharif FarsiWeb, Inc
+ * Copyright (C) 2005 Behdad Esfahbod
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,48 +26,53 @@
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA
- * 
+ *
  * For licensing issues, contact <license@farsiweb.info>.
  */
-#ifndef _FRIBIDI_H
-#define _FRIBIDI_H
+#ifndef _FRIBIDI_FLAGS_H
+#define _FRIBIDI_FLAGS_H
 
 #include "fribidi-common.h"
 
-#include "fribidi-unicode.h"
 #include "fribidi-types.h"
-#include "fribidi-flags.h"
-#include "fribidi-bidi-types.h"
-#include "fribidi-bidi.h"
-#include "fribidi-joining-types.h"
-#include "fribidi-joining.h"
-#include "fribidi-mirroring.h"
-#include "fribidi-arabic.h"
-#include "fribidi-shape.h"
-
-
-#if FRIBIDI_CHARSETS+0
-# include "fribidi-char-sets.h"
-#endif				/* FRIBIDI_CHARSETS */
-
-
-#if FRIBIDI_NO_DEPRECATED+0
-#else
-# include "fribidi-deprecated.h"
-#endif				/* !FRIBIDI_NO_DEPRECATED */
-
 
 #include "fribidi-begindecls.h"
 
+typedef fribidi_uint32 FriBidiFlags;
+
+/* 
+ * Define option flags that various functions use. Each mask has
+ * only one bit set.
+ */
+
+#define FRIBIDI_FLAG_SHAPE_MIRRORING	0x00000001
+#define FRIBIDI_FLAG_REORDER_NSM	0x00000002
+
+#define FRIBIDI_FLAG_SHAPE_ARAB_PRES	0x00000100
+#define FRIBIDI_FLAG_SHAPE_ARAB_LIGA	0x00000200
+#define FRIBIDI_FLAG_SHAPE_ARAB_CONSOLE	0x00000400
+
+#define FRIBIDI_FLAG_REMOVE_BIDI	0x00010000
+#define FRIBIDI_FLAG_REMOVE_JOINING	0x00020000
+#define FRIBIDI_FLAG_REMOVE_SPECIALS	0x00040000
 
 
-#define fribidi_version_info FRIBIDI_NAMESPACE(version_info)
-/* An string containing the version information of the library. */
-     extern const char *fribidi_version_info;
+/*
+ * And their combinations.
+ */
+
+#define FRIBIDI_FLAGS_DEFAULT		( \
+	FRIBIDI_FLAG_SHAPE_MIRRORING	| \
+	FRIBIDI_FLAG_REORDER_NSM	| \
+	FRIBIDI_FLAG_REMOVE_SPECIALS	)
+
+#define FRIBIDI_FLAGS_ARABIC		( \
+	FRIBIDI_FLAG_SHAPE_ARAB_PRES	| \
+	FRIBIDI_FLAG_SHAPE_ARAB_LIGA	)
 
 #include "fribidi-enddecls.h"
 
-#endif /* !_FRIBIDI_H */
+#endif /* !_FRIBIDI_FLAGS_H */
 /* Editor directions:
  * vim:textwidth=78:tabstop=8:shiftwidth=2:autoindent:cindent
  */

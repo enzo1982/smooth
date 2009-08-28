@@ -39,7 +39,7 @@
 
 #include <fribidi-begindecls.h>
 
-#if DEBUG
+#if DEBUG+0
 
 /* These definitions should only be used in DEBUG mode: */
 #ifndef __LINE__
@@ -73,23 +73,23 @@
 #endif /* !MSG */
 
 #ifndef DBG
-# include <fribidi-env.h>
 # define DBG(s) \
 	FRIBIDI_BEGIN_STMT \
-	if (fribidi_debug_status()) MSG(FRIBIDI ": " s "\n"); \
+	if (fribidi_debug_status()) { MSG(FRIBIDI ": " s "\n"); } \
 	FRIBIDI_END_STMT
 # define DBG2(s, t) \
 	FRIBIDI_BEGIN_STMT \
-	if (fribidi_debug_status()) MSG2(FRIBIDI ": " s "\n", t); \
+	if (fribidi_debug_status()) { MSG2(FRIBIDI ": " s "\n", t); } \
 	FRIBIDI_END_STMT
 #endif /* !DBG */
 
 #ifndef fribidi_assert
 # define fribidi_assert(cond) \
 	FRIBIDI_BEGIN_STMT \
-	if (!(cond)) \
+	if (!(cond)) { \
 		DBG(__FILE__ ":" STRINGIZE(__LINE__) ": " \
 		    "assertion failed (" STRINGIZE(cond) ")"); \
+	} \
 	FRIBIDI_END_STMT
 #endif /* !fribidi_assert */
 

@@ -32,17 +32,17 @@
 #ifndef _FRIBIDI_COMMON_H
 #define _FRIBIDI_COMMON_H
 
-#if !DONT_HAVE_FRIBIDI_CONFIG_H
-# include "fribidi-config.h"
-#else /* DONT_HAVE_FRIBIDI_CONFIG_H */
+#if DONT_HAVE_FRIBIDI_CONFIG_H+0
 # define FRIBIDI "fribidi"
 # define FRIBIDI_NAME "fribidi"
 # define FRIBIDI_VERSION "unknown"
 # define FRIBIDI_BUGREPORT "unknown"
 # define FRIBIDI_INTERFACE_VERSION_STRING "unknown"
-#endif /* DONT_HAVE_FRIBIDI_CONFIG_H */
+#else /* !DONT_HAVE_FRIBIDI_CONFIG_H */
+# include "fribidi-config.h"
+#endif /* !DONT_HAVE_FRIBIDI_CONFIG_H */
 
-#if HAVE_FRIBIDI_CUSTOM_H
+#if HAVE_FRIBIDI_CUSTOM_H+0
 # include <fribidi-custom.h>
 #endif /* HAVE_FRIBIDI_CUSTOM_H */
 
@@ -53,14 +53,14 @@
 
 /* FRIBIDI_ENTRY is a macro used to declare library entry points. */
 #ifndef FRIBIDI_ENTRY
-# ifdef WIN32
-#  define FRIBIDI_ENTRY 
+# if (defined(WIN32)) || (defined(_WIN32_WCE))
+#  define FRIBIDI_ENTRY //__declspec(dllimport)
 # else /* !WIN32 */
 #  define FRIBIDI_ENTRY		/* empty */
 # endif	/* !WIN32 */
 #endif /* !FRIBIDI_ENTRY */
 
-#if FRIBIDI_USE_GLIB
+#if FRIBIDI_USE_GLIB+0
 # ifndef __FRIBIDI_DOC
 #  include <glib/gmacros.h>
 # endif	/* !__FRIBIDI_DOC */
@@ -100,6 +100,29 @@
 #  define FRIBIDI_END_DECLS	/* empty */
 # endif	/* !__cplusplus */
 #endif /* !FRIBIDI_BEGIN_DECLS */
+
+
+
+
+#define fribidi_debug_status FRIBIDI_NAMESPACE(debug_status)
+FRIBIDI_ENTRY int fribidi_debug_status (
+  void
+);
+#define fribidi_set_debug FRIBIDI_NAMESPACE(set_debug)
+FRIBIDI_ENTRY int
+fribidi_set_debug (
+  int state		/* new state to set */
+);
+
+
+
+
+
+
+
+
+
+
 
 #endif /* !_FRIBIDI_COMMON_H */
 /* Editor directions:

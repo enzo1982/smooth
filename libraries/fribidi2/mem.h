@@ -39,7 +39,19 @@
 
 #include <fribidi-begindecls.h>
 
-#if !FRIBIDI_USE_GLIB
+#if FRIBIDI_USE_GLIB+0
+
+#ifndef __FRIBIDI_DOC
+# include <glib/gmem.h>
+#endif /* !__FRIBIDI_DOC */
+
+#define FriBidiMemChunk GMemChunk
+#define FRIBIDI_ALLOC_ONLY G_ALLOC_ONLY
+#define fribidi_mem_chunk_new g_mem_chunk_new
+#define fribidi_mem_chunk_alloc g_mem_chunk_alloc
+#define fribidi_mem_chunk_destroy g_mem_chunk_destroy
+
+#else /* !FRIBIDI_USE_GLIB */
 
 typedef struct _FriBidiMemChunk FriBidiMemChunk;
 
@@ -66,19 +78,7 @@ fribidi_mem_chunk_new (
   FriBidiMemChunk *mem_chunk
 ) FRIBIDI_GNUC_HIDDEN;
 
-#else /* FRIBIDI_USE_GLIB */
-
-#ifndef __FRIBIDI_DOC
-# include <glib/gmem.h>
-#endif /* !__FRIBIDI_DOC */
-
-#define FriBidiMemChunk GMemChunk
-#define FRIBIDI_ALLOC_ONLY G_ALLOC_ONLY
-#define fribidi_mem_chunk_new g_mem_chunk_new
-#define fribidi_mem_chunk_alloc g_mem_chunk_alloc
-#define fribidi_mem_chunk_destroy g_mem_chunk_destroy
-
-#endif /* FRIBIDI_USE_GLIB */
+#endif /* !FRIBIDI_USE_GLIB */
 
 #define fribidi_chunk_new(type, chunk)        ( \
 		(type *) fribidi_mem_chunk_alloc (chunk) \

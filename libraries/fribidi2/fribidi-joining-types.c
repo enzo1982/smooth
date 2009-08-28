@@ -33,8 +33,6 @@
 
 #include "common.h"
 
-#if !FRIBIDI_NO_ARABIC
-
 #include <fribidi-joining-types.h>
 
 #include "joining-types.h"
@@ -91,7 +89,7 @@ fribidi_get_joining_type_name (
     }
 }
 
-#ifdef DEBUG
+#if DEBUG+0
 
 char
 fribidi_char_from_joining_type (
@@ -114,8 +112,6 @@ fribidi_char_from_joining_type (
 }
 
 #endif /* DEBUG */
-
-#endif /* !FRIBIDI_NO_ARABIC */
 
 /* Editor directions:
  * vim:textwidth=78:tabstop=8:shiftwidth=2:autoindent:cindent

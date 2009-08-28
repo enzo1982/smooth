@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,7 +12,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/color.h>
 
-#if defined __WIN32__ && defined __SMOOTH_STATIC__
+#if defined __WIN32__ && defined SMOOTH_STATIC
 	#include <smooth/graphics/backends/gdi/bitmapgdi.h>
 #endif
 
@@ -99,7 +99,7 @@ S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(const Bitmap
 
 S::GUI::BitmapBackend::BitmapBackend(Void *iBitmap)
 {
-#if defined __WIN32__ && defined __SMOOTH_STATIC__
+#if defined __WIN32__ && defined SMOOTH_STATIC
 	volatile Bool	 null = 0;
 
 	if (null) BitmapGDI();

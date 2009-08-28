@@ -57,13 +57,13 @@ REMOVER = rm
 COPIER = cp
 ECHO = echo
 AR = ar
-COMPILER_OPTS = -I$(INCLUDEDIR) -include $(OBJECTDIR)/smooth.h -g -Wall -fno-exceptions -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -DLIBICONV_PLUG -DLIBXML_STATIC -c
+COMPILER_OPTS = -I$(INCLUDEDIR) -include $(OBJECTDIR)/smooth.h -g -Wall -fno-exceptions -DUNICODE -D_UNICODE -DSMOOTH_DLL -DLIBICONV_PLUG -DLIBXML_STATIC -c
 C_COMPILER_OPTS = -I$(INCLUDEDIR) -g -Wall -fno-exceptions -DUNICODE -D_UNICODE -DLIBICONV_PLUG -DLIBXML_STATIC -c
 LINKER_OPTS = -L$(LIBDIR) -mwindows --shared -Xlinker --kill-at -Xlinker --out-implib -Xlinker $(LIBNAME) -o $(DLLNAME)
 PLUGIN_LINKER_OPTS = -L$(LIBDIR) -mwindows --shared -Xlinker --kill-at -Xlinker --out-implib -Xlinker $(SAMPLE4LIB) -o $(SAMPLE4DLL)
 EXECOMPILER_OPTS = -I$(INCLUDEDIR) -g -Wall -fno-exceptions -DUNICODE -D_UNICODE -c
 EXELINKER_OPTS = -L$(LIBDIR) $(SAMPLESLIBS) -mwindows
-RESCOMP_OPTS = -D__SMOOTH_DLL__ -O coff
+RESCOMP_OPTS = -DSMOOTH_DLL -O coff
 REMOVER_OPTS = -f
 COPIER_OPTS = -f
 

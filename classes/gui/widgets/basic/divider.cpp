@@ -21,6 +21,7 @@ S::GUI::Divider::Divider(Int iPosition, Int iOrientation) : Widget(Point(), Size
 	flags		= iOrientation;
 	orientation	= OR_FREE;
 	position	= iPosition;
+	dragging	= False;
 
 	if (position == 0) position = 120;
 

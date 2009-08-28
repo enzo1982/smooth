@@ -436,6 +436,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, (FriBidiChar *) visual, NIL, NIL, NIL);
 
+			visual[line.Length()] = 0;
+
 			line.ImportFrom("UCS-4LE", (char *) visual);
 
 			delete [] visual;

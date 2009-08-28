@@ -10,7 +10,7 @@
 
 #include <smooth/gui/window/backends/windowbackend.h>
 
-#if defined __WIN32__ && defined __SMOOTH_STATIC__
+#if defined __WIN32__ && defined SMOOTH_STATIC
 	#include <smooth/gui/window/backends/gdi/windowgdi.h>
 #endif
 
@@ -37,7 +37,7 @@ S::GUI::WindowBackend *S::GUI::WindowBackend::CreateBackendInstance()
 
 S::GUI::WindowBackend::WindowBackend(Void *iWindow)
 {
-#if defined __WIN32__ && defined __SMOOTH_STATIC__
+#if defined __WIN32__ && defined SMOOTH_STATIC
 	volatile Bool	 null = 0;
 
 	if (null) WindowGDI();

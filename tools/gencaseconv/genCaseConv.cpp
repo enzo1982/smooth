@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -99,7 +99,7 @@ Int smooth::Main()
 	OutStream	 out(STREAM_FILE, "string_case.cpp", OS_OVERWRITE);
 
 	out.OutputString(" /* The smooth Class Library						\
-		\r\n  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>		\
+		\r\n  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>		\
 		\r\n  *										\
 		\r\n  * This library is free software; you can redistribute it and/or		\
 		\r\n  * modify it under the terms of \"The Artistic License, Version 2.0\".	\

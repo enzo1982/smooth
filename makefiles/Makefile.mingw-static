@@ -56,13 +56,13 @@ COPIER = cp
 ECHO = echo
 AR = ar
 PACKER = upx
-COMPILER_OPTS = -I$(INCLUDEDIR) -include $(OBJECTDIR)/smooth.h -march=i586 -Os -g0 -Wall -fno-exceptions -DUNICODE -D_UNICODE -D__SMOOTH_STATIC__ -DLIBICONV_PLUG -DLIBXML_STATIC -c
-#COMPILER_OPTS = -I$(INCLUDEDIR) -include $(OBJECTDIR)/smooth.h -march=i586 -Os -g0 -Wall -fno-exceptions -fno-implicit-templates -D__EXPLICIT_TEMPLATES__ -DUNICODE -D_UNICODE -D__SMOOTH_STATIC__ -DLIBICONV_PLUG -DLIBXML_STATIC -c
+COMPILER_OPTS = -I$(INCLUDEDIR) -include $(OBJECTDIR)/smooth.h -march=i586 -Os -g0 -Wall -fno-exceptions -DUNICODE -D_UNICODE -DSMOOTH_STATIC -DLIBICONV_PLUG -DLIBXML_STATIC -c
+#COMPILER_OPTS = -I$(INCLUDEDIR) -include $(OBJECTDIR)/smooth.h -march=i586 -Os -g0 -Wall -fno-exceptions -fno-implicit-templates -DEXPLICIT_TEMPLATES -DUNICODE -D_UNICODE -DSMOOTH_STATIC -DLIBICONV_PLUG -DLIBXML_STATIC -c
 C_COMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -Os -g0 -Wall -fno-exceptions -DUNICODE -D_UNICODE -DLIBICONV_PLUG -DLIBXML_STATIC -c
 PLUGIN_LINKER_OPTS = -L$(LIBDIR) -mwindows --shared -Xlinker --kill-at -Xlinker --out-implib -Xlinker $(SAMPLE4LIB) -o $(SAMPLE4DLL)
-EXECOMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -Os -g0 -Wall -fno-exceptions -DUNICODE -D_UNICODE -D__SMOOTH_STATIC__ -c
+EXECOMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -Os -g0 -Wall -fno-exceptions -DUNICODE -D_UNICODE -DSMOOTH_STATIC -c
 EXELINKER_OPTS = -L$(LIBDIR) $(SAMPLESLIBS) -mwindows
-RESCOMP_OPTS = -D__SMOOTH_STATIC__ -O coff
+RESCOMP_OPTS = -DSMOOTH_STATIC -O coff
 STRIP_OPTS = --strip-all
 LIBSTRIP_OPTS = --strip-debug
 REMOVER_OPTS = -f

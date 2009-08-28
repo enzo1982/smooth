@@ -128,6 +128,9 @@ S::Void S::Init()
 		case LANG_SERBIAN:
 			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_sr");
 			break;
+		case LANG_VIETNAMESE:
+			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_vi");
+			break;
 	}
 
 	codePage = GetACP();

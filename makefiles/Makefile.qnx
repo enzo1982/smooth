@@ -45,7 +45,7 @@ REMOVER = rm
 COPIER = cp
 ECHO = echo
 AR = ar
-COMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -O6 -ffast-math -fPIC -Wno-pmf-conversions -fno-exceptions -fpermissive -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -DLIBICONV_PLUG -c
+COMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -O6 -ffast-math -fPIC -Wno-pmf-conversions -fno-exceptions -fpermissive -DUNICODE -D_UNICODE -DSMOOTH_DLL -DLIBICONV_PLUG -c
 LINKER_OPTS = -L$(LIBDIR) -shared -Wl,-soname,libsmooth.so -o $(DLLNAME)
 PLUGIN_LINKER_OPTS = -L$(LIBDIR) -o $(SAMPLE4DLL)
 EXECOMPILER_OPTS = -I$(INCLUDEDIR) -march=i586 -O6 -ffast-math -Wno-pmf-conversions -fno-exceptions -c

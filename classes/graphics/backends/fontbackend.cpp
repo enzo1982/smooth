@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2008 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,7 @@
 #include <smooth/graphics/backends/fontbackend.h>
 #include <smooth/misc/math.h>
 
-#if defined __WIN32__ && defined __SMOOTH_STATIC__
+#if defined __WIN32__ && defined SMOOTH_STATIC
 	#include <smooth/graphics/backends/gdi/fontgdi.h>
 #endif
 
@@ -38,7 +38,7 @@ S::GUI::FontBackend *S::GUI::FontBackend::CreateBackendInstance(const String &iF
 
 S::GUI::FontBackend::FontBackend(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, const Color &iFontColor)
 {
-#if defined __WIN32__ && defined __SMOOTH_STATIC__
+#if defined __WIN32__ && defined SMOOTH_STATIC
 	volatile Bool	 null = 0;
 
 	if (null) FontGDI();

@@ -10,7 +10,7 @@
 
 #include <smooth/system/backends/eventbackend.h>
 
-#if defined __WIN32__ && defined __SMOOTH_STATIC__
+#if defined __WIN32__ && defined SMOOTH_STATIC
 	#include <smooth/system/backends/win32/eventwin32.h>
 #endif
 
@@ -37,7 +37,7 @@ S::System::EventBackend *S::System::EventBackend::CreateBackendInstance()
 
 S::System::EventBackend::EventBackend()
 {
-#if defined __WIN32__ && defined __SMOOTH_STATIC__
+#if defined __WIN32__ && defined SMOOTH_STATIC
 	volatile Bool	 null = 0;
 
 	if (null) EventWin32();

@@ -53,13 +53,13 @@ COPIER = cp
 ECHO = echo
 AR = ar
 PACKER = upx
-COMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/include/wine/windows -include $(OBJECTDIR)/smooth.h -march=i586 -Os -g0 -Wall -fno-exceptions -D__WINE__ -DUNICODE -D_UNICODE -D__SMOOTH_DLL__ -c
+COMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/include/wine/windows -include $(OBJECTDIR)/smooth.h -march=i586 -Os -g0 -Wall -fno-exceptions -D__WINE__ -DUNICODE -D_UNICODE -DSMOOTH_DLL -c
 C_COMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/include/wine/windows -march=i586 -Os -g0 -Wall -fno-exceptions -D__WINE__ -DUNICODE -D_UNICODE -c
 LINKER_OPTS = -L$(LIBDIR) -L/usr/lib/wine --shared -o $(DLLNAME)
 PLUGIN_LINKER_OPTS = -L$(LIBDIR) -L/usr/lib/wine --shared -o $(SAMPLE4DLL)
 EXECOMPILER_OPTS = -I$(INCLUDEDIR) -I/usr/include/wine/windows -march=i586 -Os -g0 -Wall -fno-exceptions -D__WINE__ -DUNICODE -D_UNICODE -c
 EXELINKER_OPTS = -L$(LIBDIR) $(SAMPLESLIBS)
-RESCOMP_OPTS = -D__SMOOTH_DLL__ -O res
+RESCOMP_OPTS = -DSMOOTH_DLL -O res
 STRIP_OPTS = --strip-all
 LIBSTRIP_OPTS = --strip-debug
 REMOVER_OPTS = -f

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2001 Free Software Foundation, Inc.
+ * Copyright (C) 1999-2001, 2008 Free Software Foundation, Inc.
  * This file is part of the GNU LIBICONV Library.
  *
  * The GNU LIBICONV Library is free software; you can redistribute it
@@ -14,8 +14,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
- * Suite 330, Boston, MA 02111-1307, USA.
+ * If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 /*
@@ -99,7 +99,7 @@ inactive:
         state = 1;
         goto active;
       }
-      return RET_ILSEQ;
+      goto ilseq;
     }
   }
 
@@ -127,9 +127,9 @@ active:
       else {
         /* c terminates base64 encoding */
         if (base64state & -4)
-          return RET_ILSEQ; /* data must be 0, otherwise illegal */
+          goto ilseq; /* data must be 0, otherwise illegal */
         if (base64count)
-          return RET_ILSEQ; /* partial UTF-16 characters are invalid */
+          goto ilseq; /* partial UTF-16 characters are invalid */
         if (c == '-') {
           s++; count++;
         }
@@ -168,7 +168,7 @@ active:
       ucs4_t wc1 = wc >> 16;
       ucs4_t wc2 = wc & 0xffff;
       if (!(wc1 >= 0xd800 && wc1 < 0xdc00)) abort();
-      if (!(wc2 >= 0xdc00 && wc2 < 0xe000)) return RET_ILSEQ;
+      if (!(wc2 >= 0xdc00 && wc2 < 0xe000)) goto ilseq;
       *pwc = 0x10000 + ((wc1 - 0xd800) << 10) + (wc2 - 0xdc00);
     } else {
       *pwc = wc;
@@ -180,6 +180,10 @@ active:
 none:
   conv->istate = state;
   return RET_TOOFEW(count);
+
+ilseq:
+  conv->istate = state;
+  return RET_SHIFT_ILSEQ(count);
 }
 
 /*

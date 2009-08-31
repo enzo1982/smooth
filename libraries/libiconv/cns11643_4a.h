@@ -14,11 +14,10 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
- * Suite 330, Boston, MA 02111-1307, USA.
+ * If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifdef ENABLE_EXTRA
 /*
  * CNS 11643-1992 plane 4 part a
  */
@@ -458,4 +457,4 @@ static const ucs4_t cns11643_4a_2uni_upages[212] = {
   0x28f00, 0x29000, 0x29100, 0x29200, 0x29400, 0x29500, 0x29600, 0x29a00,
   0x29d00, 0x2f800, 0x2f900, 0x2fa00,
 };
-#endif
+

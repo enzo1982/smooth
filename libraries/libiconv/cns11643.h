@@ -14,11 +14,10 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
- * Suite 330, Boston, MA 02111-1307, USA.
+ * If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifdef ENABLE_EXTRA
 /*
  * CNS 11643-1992
  */
@@ -40,4 +39,3 @@
 
 /* Returns the plane number (1,...,7,15) in r[0], the two bytes in r[1],r[2]. */
 #define cns11643_wctomb cns11643_inv_wctomb
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2002 Free Software Foundation, Inc.
+ * Copyright (C) 1999-2002, 2004-2009 Free Software Foundation, Inc.
  * This file is part of the GNU LIBICONV Library.
  *
  * The GNU LIBICONV Library is free software; you can redistribute it
@@ -14,8 +14,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
- * Suite 330, Boston, MA 02111-1307, USA.
+ * If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 /* This file defines all the converters. */
@@ -51,10 +51,16 @@ struct mbtowc_funcs {
    */
 };
 
+/* Return code if invalid input after a shift sequence of n bytes was read.
+   (xxx_mbtowc) */
+#define RET_SHIFT_ILSEQ(n)  (-1-2*(n))
 /* Return code if invalid. (xxx_mbtowc) */
-#define RET_ILSEQ      -1
+#define RET_ILSEQ           RET_SHIFT_ILSEQ(0)
 /* Return code if only a shift sequence of n bytes was read. (xxx_mbtowc) */
-#define RET_TOOFEW(n)  (-2-(n))
+#define RET_TOOFEW(n)       (-2-2*(n))
+/* Retrieve the n from the encoded RET_... value. */
+#define DECODE_SHIFT_ILSEQ(r)  ((unsigned int)(RET_SHIFT_ILSEQ(0) - (r)) / 2)
+#define DECODE_TOOFEW(r)       ((unsigned int)(RET_TOOFEW(0) - (r)) / 2)
 
 /*
  * Data type for conversion unicode -> multibyte
@@ -98,6 +104,10 @@ struct conv_struct {
   /* Operation flags */
   int transliterate;
   int discard_ilseq;
+  #ifndef LIBICONV_PLUG
+  struct iconv_fallbacks fallbacks;
+  struct iconv_hooks hooks;
+  #endif
 };
 
 /*
@@ -139,6 +149,7 @@ struct conv_struct {
 #include "iso8859_8.h"
 #include "iso8859_9.h"
 #include "iso8859_10.h"
+#include "iso8859_11.h"
 #include "iso8859_13.h"
 #include "iso8859_14.h"
 #include "iso8859_15.h"
@@ -158,6 +169,7 @@ struct conv_struct {
 #include "cp850.h"
 #include "cp862.h"
 #include "cp866.h"
+#include "cp1131.h"
 #include "mac_roman.h"
 #include "mac_centraleurope.h"
 #include "mac_iceland.h"
@@ -176,6 +188,8 @@ struct conv_struct {
 #include "georgian_academy.h"
 #include "georgian_ps.h"
 #include "koi8_t.h"
+#include "pt154.h"
+#include "rk1048.h"
 #include "mulelao.h"
 #include "cp1133.h"
 #include "tis620.h"
@@ -217,6 +231,7 @@ typedef struct {
 
 #include "euc_cn.h"
 #include "ces_gbk.h"
+#include "cp936.h"
 #include "gb18030.h"
 #include "iso2022_cn.h"
 #include "iso2022_cnext.h"
@@ -224,7 +239,9 @@ typedef struct {
 #include "euc_tw.h"
 #include "ces_big5.h"
 #include "cp950.h"
-#include "big5hkscs.h"
+#include "big5hkscs1999.h"
+#include "big5hkscs2001.h"
+#include "big5hkscs2004.h"
 
 #include "euc_kr.h"
 #include "cp949.h"
@@ -272,7 +289,9 @@ typedef struct {
 #include "euc_jisx0213.h"
 #include "shift_jisx0213.h"
 #include "iso2022_jp3.h"
+#include "big5_2003.h"
 #include "tds565.h"
+#include "atarist.h"
 #include "riscos1.h"
 #endif
 

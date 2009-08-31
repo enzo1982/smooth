@@ -1,4 +1,4 @@
-/* Copyright (C) 1999-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2003, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU LIBICONV Library.
 
    The GNU LIBICONV Library is free software; you can redistribute it
@@ -13,15 +13,15 @@
 
    You should have received a copy of the GNU Library General Public
    License along with the GNU LIBICONV Library; see the file COPYING.LIB.
-   If not, write to the Free Software Foundation, Inc., 59 Temple Place -
-   Suite 330, Boston, MA 02111-1307, USA.  */
+   If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+   Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 
 /* Define to 1 to enable a few rarely used encodings. */
-#define ENABLE_EXTRA
+#undef ENABLE_EXTRA
 
-/* Define to enable GBK encoding */
-#define ENABLE_GBK
+/* Define to 1 if the package shall run at any location in the filesystem. */
+#undef ENABLE_RELOCATABLE
 
 /* Define to a type if <wchar.h> does not define. */
 #undef mbstate_t
@@ -29,56 +29,40 @@
 /* Define if you have <iconv.h>, the iconv_t type, and the
    iconv_open, iconv, iconv_close functions. */
 #undef HAVE_ICONV
-
 /* Define as const if the declaration of iconv() needs const. */
-#define ICONV_CONST const
+#define ICONV_CONST /* empty by default */
+
+/* Define to 1 if you have the getc_unlocked() function. */
+#undef HAVE_GETC_UNLOCKED
+
+/* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
+#undef HAVE_LANGINFO_CODESET
 
 /* Define if you have the mbrtowc() function. */
 #undef HAVE_MBRTOWC
+
+/* Define to 1 if you have the setlocale() function. */
+#undef HAVE_SETLOCALE
+
+/* Define to 1 if you have the <stddef.h> header file. */
+#undef HAVE_STDDEF_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 or 0, depending whether the compiler supports simple visibility
+   declarations. */
+#undef HAVE_VISIBILITY
 
 /* Define if you have the wcrtomb() function. */
 #undef HAVE_WCRTOMB
 
 /* Define if the machine's byte ordering is little endian. */
-#define WORDS_LITTLEENDIAN 1
+#undef WORDS_LITTLEENDIAN
 
-/* Define if on AIX 3.
-   System headers sometimes define this.
-   We just want to avoid a redefinition error message.  */
-#ifndef _ALL_SOURCE
-#undef _ALL_SOURCE
-#endif
+/* Define to the value of ${prefix}, as a string. */
+#undef INSTALLPREFIX
 
-/* Define if on MINIX.  */
-#undef _MINIX
-
-/* Define if the system does not provide POSIX.1 features except
-   with this defined.  */
-#undef _POSIX_1_SOURCE
-
-/* Define if you need to in order for stat and other things to work.  */
-#undef _POSIX_SOURCE
-
-/* Define if you have the nl_langinfo function.  */
-#undef HAVE_NL_LANGINFO
-
-/* Define if you have the setlocale function.  */
-#undef HAVE_SETLOCALE
-
-/* Define if you have the <dlfcn.h> header file.  */
-#undef HAVE_DLFCN_H
-
-/* Define if you have the <langinfo.h> header file.  */
-#undef HAVE_LANGINFO_H
-
-/* Define if you have the <stddef.h> header file.  */
-#define HAVE_STDDEF_H
-
-/* Define if you have the <stdlib.h> header file.  */
-#define HAVE_STDLIB_H
-
-/* Define if you have the <string.h> header file.  */
-#define HAVE_STRING_H
-
-/* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
-#undef HAVE_LANGINFO_CODESET

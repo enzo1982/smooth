@@ -21,7 +21,7 @@ void XMLCDECL xmlGenericErrorDefaultFunc	(void *ctx ATTRIBUTE_UNUSED,
 				 ...);
 
 #define XML_GET_VAR_STR(msg, str) {				\
-    int       size;						\
+    int       size, prev_size = -1;				\
     int       chars;						\
     char      *larger;						\
     va_list   ap;						\
@@ -31,12 +31,17 @@ void XMLCDECL xmlGenericErrorDefaultFunc	(void *ctx ATTRIBUTE_UNUSED,
 								\
     size = 150;							\
 								\
-    while (1) {							\
+    while (size < 64000) {					\
 	va_start(ap, msg);					\
   	chars = vsnprintf(str, size, msg, ap);			\
 	va_end(ap);						\
-	if ((chars > -1) && (chars < size))			\
-	    break;						\
+	if ((chars > -1) && (chars < size)) {			\
+	    if (prev_size == chars) {				\
+		break;						\
+	    } else {						\
+		prev_size = chars;				\
+	    }							\
+	}							\
 	if (chars > -1)						\
 	    size += chars + 1;					\
 	else							\
@@ -293,8 +298,6 @@ xmlReportError(xmlErrorPtr err, xmlParserCtxtPtr ctxt, const char *str,
     if (name != NULL) {
         channel(data, "element %s: ", name);
     }
-    if (code == XML_ERR_OK)
-        return;
     switch (domain) {
         case XML_FROM_PARSER:
             channel(data, "parser ");
@@ -360,8 +363,6 @@ xmlReportError(xmlErrorPtr err, xmlParserCtxtPtr ctxt, const char *str,
         default:
             break;
     }
-    if (code == XML_ERR_OK)
-        return;
     switch (level) {
         case XML_ERR_NONE:
             channel(data, ": ");
@@ -376,8 +377,6 @@ xmlReportError(xmlErrorPtr err, xmlParserCtxtPtr ctxt, const char *str,
             channel(data, "error : ");
             break;
     }
-    if (code == XML_ERR_OK)
-        return;
     if (str != NULL) {
         int len;
 	len = xmlStrlen((const xmlChar *)str);
@@ -388,8 +387,6 @@ xmlReportError(xmlErrorPtr err, xmlParserCtxtPtr ctxt, const char *str,
     } else {
         channel(data, "%s\n", "out of memory error");
     }
-    if (code == XML_ERR_OK)
-        return;
 
     if (ctxt != NULL) {
         xmlParserPrintFileContextInternal(input, channel, data);
@@ -984,3 +981,6 @@ xmlCopyError(xmlErrorPtr from, xmlErrorPtr to) {
 
     return 0;
 }
+
+#define bottom_error
+#include "elfgcchack.h"

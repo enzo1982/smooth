@@ -128,27 +128,21 @@ asciiToUTF8(unsigned char* out, int *outlen,
     unsigned char* outend = out + *outlen;
     const unsigned char* inend;
     unsigned int c;
-    int bits;
 
     inend = in + (*inlen);
     while ((in < inend) && (out - outstart + 5 < *outlen)) {
 	c= *in++;
 
-	/* assertion: c is a single UTF-4 value */
         if (out >= outend)
 	    break;
-        if      (c <    0x80) {  *out++=  c;                bits= -6; }
-        else { 
+        if (c < 0x80) {
+	    *out++ = c;
+	} else { 
 	    *outlen = out - outstart;
 	    *inlen = processed - base;
 	    return(-1);
 	}
  
-        for ( ; bits >= 0; bits-= 6) {
-            if (out >= outend)
-	        break;
-            *out++= ((c >> bits) & 0x3F) | 0x80;
-        }
 	processed = (const unsigned char*) in;
     }
     *outlen = out - outstart;
@@ -531,7 +525,7 @@ UTF8ToUTF16LE(unsigned char* outb, int *outlen,
     const unsigned char *const instart = in;
     unsigned short* outstart= out;
     unsigned short* outend;
-    const unsigned char* inend= in+*inlen;
+    const unsigned char* inend;
     unsigned int c, d;
     int trailing;
     unsigned char *tmp;
@@ -544,6 +538,7 @@ UTF8ToUTF16LE(unsigned char* outb, int *outlen,
 	*inlen = 0;
 	return(0);
     }
+    inend= in + *inlen;
     outend = out + (*outlen / 2);
     while (in < inend) {
       d= *in++;
@@ -772,7 +767,7 @@ UTF8ToUTF16BE(unsigned char* outb, int *outlen,
     const unsigned char *const instart = in;
     unsigned short* outstart= out;
     unsigned short* outend;
-    const unsigned char* inend= in+*inlen;
+    const unsigned char* inend;
     unsigned int c, d;
     int trailing;
     unsigned char *tmp;
@@ -785,6 +780,7 @@ UTF8ToUTF16BE(unsigned char* outb, int *outlen,
 	*inlen = 0;
 	return(0);
     }
+    inend= in + *inlen;
     outend = out + (*outlen / 2);
     while (in < inend) {
       d= *in++;
@@ -1620,6 +1616,12 @@ if (use_iconv) {
     /* check whether iconv can handle this */
     icv_in = iconv_open("UTF-8", name);
     icv_out = iconv_open(name, "UTF-8");
+    if (icv_in == (iconv_t) -1) {
+        icv_in = iconv_open("UTF-8", upper);
+    }
+    if (icv_out == (iconv_t) -1) {
+	icv_out = iconv_open(upper, "UTF-8");
+    }
     if ((icv_in != (iconv_t) -1) && (icv_out != (iconv_t) -1)) {
 	    enc = (xmlCharEncodingHandlerPtr)
 	          xmlMalloc(sizeof(xmlCharEncodingHandler));
@@ -1704,14 +1706,9 @@ xmlIconvWrapper(iconv_t cd, unsigned char *out, int *outlen,
     }
     icv_inlen = *inlen;
     icv_outlen = *outlen;
-    ret = iconv(cd, (char **) &icv_in, &icv_inlen, &icv_out, &icv_outlen);
-    if (in != NULL) {
-        *inlen -= icv_inlen;
-        *outlen -= icv_outlen;
-    } else {
-        *inlen = 0;
-        *outlen = 0;
-    }
+    ret = iconv(cd, (ICONV_CONST char **) &icv_in, &icv_inlen, &icv_out, &icv_outlen);
+    *inlen -= icv_inlen;
+    *outlen -= icv_outlen;
     if ((icv_inlen != 0) || (ret == -1)) {
 #ifdef EILSEQ
         if (errno == EILSEQ) {
@@ -1767,19 +1764,21 @@ xmlCharEncFirstLine(xmlCharEncodingHandler *handler, xmlBufferPtr out,
     if (out == NULL) return(-1);
     if (in == NULL) return(-1);
 
+    /* calculate space available */
     written = out->size - out->use;
     toconv = in->use;
-    if (toconv * 2 >= written) {
-        xmlBufferGrow(out, toconv);
-	written = out->size - out->use - 1;
-    }
-
     /*
      * echo '<?xml version="1.0" encoding="UCS4"?>' | wc -c => 38
      * 45 chars should be sufficient to reach the end of the encoding
      * declaration without going too far inside the document content.
+     * on UTF-16 this means 90bytes, on UCS4 this means 180
      */
-    written = 45;
+    if (toconv > 180)
+	toconv  = 180;
+    if (toconv * 2 >= written) {
+        xmlBufferGrow(out, toconv);
+	written = out->size - out->use - 1;
+    }
 
     if (handler->input != NULL) {
 	ret = handler->input(&out->content[out->use], &written,
@@ -1996,16 +1995,18 @@ retry:
     toconv = in->use;
     if (toconv == 0)
 	return(0);
-    if (toconv * 2 >= written) {
-        xmlBufferGrow(out, toconv * 2);
+    if (toconv * 4 >= written) {
+        xmlBufferGrow(out, toconv * 4);
 	written = out->size - out->use - 1;
     }
     if (handler->output != NULL) {
 	ret = handler->output(&out->content[out->use], &written,
 	                      in->content, &toconv);
-	xmlBufferShrink(in, toconv);
-	out->use += written;
-	writtentot += written;
+	if (written > 0) {
+	    xmlBufferShrink(in, toconv);
+	    out->use += written;
+	    writtentot += written;
+	} 
 	out->content[out->use] = 0;
     }
 #ifdef LIBXML_ICONV_ENABLED
@@ -2095,7 +2096,8 @@ retry:
 		xmlEncodingErr(XML_I18N_CONV_FAILED,
 		    "output conversion failed due to conv error, bytes %s\n",
 			       buf);
-		in->content[0] = ' ';
+		if (in->alloc != XML_BUFFER_ALLOC_IMMUTABLE)
+		    in->content[0] = ' ';
 	    }
 	    break;
 	}
@@ -3294,3 +3296,7 @@ xmlRegisterCharEncodingHandlersISO8859x (void) {
 
 #endif
 #endif
+
+#define bottom_encoding
+#include "elfgcchack.h"
+

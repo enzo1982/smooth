@@ -60,6 +60,7 @@ void xmlCleanupGlobals(void)
 	xmlFreeMutex(xmlThrDefMutex);
 	xmlThrDefMutex = NULL;
     }
+    __xmlGlobalInitMutexDestroy();
 }
 
 /************************************************************************
@@ -1090,3 +1091,5 @@ __xmlOutputBufferCreateFilenameValue(void) {
 	return (&xmlGetGlobalState()->xmlOutputBufferCreateFilenameValue);
 }
 
+#define bottom_globals
+#include "elfgcchack.h"

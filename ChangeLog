@@ -28,3 +28,5 @@ xx.xx.09 xx:xx - smooth alpha 0.8.71.0
 - improved Linux support
 - upgraded libbz2 to version 1.0.5
 - upgraded fribidi2 to version 0.19.2
+- upgraded libiconv to version 1.13.1
+- upgraded libxml2 to version 2.7.3

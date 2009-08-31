@@ -569,15 +569,15 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 		case VK_END:
 			MarkText(-1, -1);
 
-			if (keyCode == VK_LEFT	&& promptPos == 0)	       break;
-			if (keyCode == VK_HOME	&& promptPos == 0)	       break;
-			if (keyCode == VK_RIGHT	&& promptPos >= text.Length()) break;
-			if (keyCode == VK_END	&& promptPos >= text.Length()) break;
+			{
+				Bool	 isLeft	 = ((keyCode == VK_LEFT  && !IsRightToLeft()) || (keyCode == VK_RIGHT && IsRightToLeft()));
+				Bool	 isRight = ((keyCode == VK_RIGHT && !IsRightToLeft()) || (keyCode == VK_LEFT  && IsRightToLeft()));
 
-			if (keyCode == VK_LEFT)	 newPos = promptPos - 1;
-			if (keyCode == VK_RIGHT) newPos = promptPos + 1;
-			if (keyCode == VK_HOME)	 newPos = 0;
-			if (keyCode == VK_END)	 newPos = text.Length();
+				if	(isLeft)		{ if (promptPos == 0)		  break; newPos = promptPos - 1; }
+				else if (isRight)		{ if (promptPos >= text.Length()) break; newPos = promptPos + 1; }
+				else if (keyCode == VK_HOME)	{ if (promptPos == 0)		  break; newPos = 0;		 }
+				else if (keyCode == VK_END)	{ if (promptPos >= text.Length()) break; newPos = text.Length(); }
+			}
 
 			SetCursorPos(newPos);
 
@@ -722,9 +722,7 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 	 */
 	if (character == 24 && !(flags & (1 << 30)) && IsActive())
 	{
-#ifdef __WIN32__
-		Process(WM_CHAR, 3, 0);
-#endif
+		Process(SM_CHAR, 3, 0);
 
 		DeleteSelectedText();
 	}

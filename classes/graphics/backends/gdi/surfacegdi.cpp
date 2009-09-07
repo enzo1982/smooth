@@ -431,10 +431,10 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 				and display using the glyph indices.
 				This does not work with Kanji.	*/
 
-			FriBidiParType	*visual = new FriBidiParType [line.Length() + 1];
-			FriBidiParType	 type = FRIBIDI_TYPE_ON;
+			FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
+			FriBidiParType	 type = (rightToLeft.GetRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
-			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, (FriBidiChar *) visual, NIL, NIL, NIL);
+			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, NIL, NIL, NIL);
 
 			visual[line.Length()] = 0;
 

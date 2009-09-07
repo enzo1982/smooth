@@ -125,13 +125,14 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 		for (Int i = 0; i < files.Length(); i++)
 		{
 			doc = new XML::Document();
-			language = new Language();
 
-			doc->LoadFile(files.GetNth(i));
+			if (doc->LoadFile(files.GetNth(i)) == Success())
+			{
+				language = new Language();
+				language->magic = files.GetNth(i).GetFileName();
 
-			language->magic = files.GetNth(i).GetFileName();
-
-			LoadDoc(doc, language);
+				LoadDoc(doc, language);
+			}
 
 			delete doc;
 		}
@@ -256,7 +257,17 @@ const S::String &S::I18n::Translator::TranslateString(const String &string)
 
 S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 {
-	XML::Node	*info = doc->GetRootNode()->GetNodeByName("info");
+	/* Return an error if we are passed a null document.
+	 */
+	if (doc == NIL) return Error();
+
+	XML::Node	*root = doc->GetRootNode();
+
+	/* Return an error if the document is invalid.
+	 */
+	if (root == NIL) return Error();
+
+	XML::Node	*info = root->GetNodeByName("info");
 
 	/* Return an error if we didn't find an info node.
 	 */
@@ -278,7 +289,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 		if (property == "url")		 language->url = info->GetNthNode(i)->GetContent();
 	}
 
-	XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
+	XML::Node	*data = root->GetNodeByName("data");
 
 	/* Return an error if we didn't find a data node.
 	 */

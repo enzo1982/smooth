@@ -50,6 +50,9 @@ namespace smooth
 				Int				 maxScrollPos;
 
 				Array<Int>			 lineIndices;
+
+				Int				 GetCursorPosition() const;
+				Int				 GetCharacterVisualIndex(const String &, Int) const;
 			protected:
 				Int				 maxSize;
 
@@ -74,10 +77,10 @@ namespace smooth
 				Int				 Scroll(Int);
 			accessors:
 				Int				 SetCursorPos(Int);
-				Int				 GetCursorPos();
+				Int				 GetCursorPos() const;
 
 				Int				 SetMaxSize(Int);
-				Int				 GetMaxSize();
+				Int				 GetMaxSize() const;
 
 				virtual Int			 SetText(const String &);
 			signals:

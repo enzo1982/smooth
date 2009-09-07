@@ -383,7 +383,7 @@
 					>
 					<Tool
 						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions="_UNICODE;UNICODE;__SMOOTH_DLL__"
+						PreprocessorDefinitions="_UNICODE;UNICODE;SMOOTH_DLL"
 					/>
 				</FileConfiguration>
 			</File>

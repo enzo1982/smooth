@@ -17,6 +17,8 @@
 #include <smooth/system/timer.h>
 #include <smooth/graphics/surface.h>
 
+#include <fribidi.h>
+
 #ifdef __WIN32__
 #	include <imm.h>
 #endif
@@ -382,34 +384,17 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 	Surface	*surface = GetDrawSurface();
 	Point	 point	 = GetRealPosition();
 
-	String	 wText = text;
-	Int	 wPromptPos = promptPos;
 	Int	 line = 0;
 
 	if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 	{
-		for (Int i = promptPos - 1; i >= 0; i--)
-		{
-			if (text[i] == '\n')
-			{
-				for (Int j = i + 1; j < promptPos; j++) wText[j - i - 1] = text[j];
-
-				wText[promptPos - i - 1] = 0;
-				wPromptPos = promptPos - i - 1;
-
-				break;
-			}
-		}
-
 		for (Int j = promptPos - 1; j >= 0; j--)
 		{
 			if (text[j] == '\n') line++;
 		}
 	}
 
-	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	point.x += font.GetTextSizeX(wText.Head(wPromptPos)) - visibleOffset;
-	else								point.x += font.GetTextSizeX(String().FillN('*', wPromptPos)) - visibleOffset;
-
+	point.x += GetCursorPosition();
 	point.y += (font.GetTextSizeY() + 3) * (line - scrollPos);
 
 	if (!(line - scrollPos < 0 || (font.GetTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()))
@@ -799,33 +784,17 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	promptPos = newPos;
 
-	String	 wText = text;
-	Int	 wPromptPos = promptPos;
 	Int	 line = 0;
 
 	if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 	{
-		for (Int i = promptPos - 1; i >= 0; i--)
-		{
-			if (text[i] == '\n')
-			{
-				for (Int j = i + 1; j < promptPos; j++) wText[j - i - 1] = text[j];
-
-				wText[promptPos - i - 1] = 0;
-				wPromptPos = promptPos - i - 1;
-
-				break;
-			}
-		}
-
 		for (Int j = promptPos - 1; j >= 0; j--)
 		{
 			if (text[j] == '\n') line++;
 		}
 	}
 
-	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	p1.x += font.GetTextSizeX(wText.Head(wPromptPos)) - visibleOffset;
-	else								p1.x += font.GetTextSizeX(String().FillN('*', wPromptPos)) - visibleOffset;
+	p1.x += GetCursorPosition();
 
 	while (p1.x > frame.right || p1.x < frame.left)
 	{
@@ -928,7 +897,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 	return Success();
 }
 
-S::Int S::GUI::Cursor::GetCursorPos()
+S::Int S::GUI::Cursor::GetCursorPos() const
 {
 	if (focussed)	return promptPos;
 	else		return -1;
@@ -942,7 +911,105 @@ S::Int S::GUI::Cursor::SetMaxSize(Int newMaxSize)
 	return Success();
 }
 
-S::Int S::GUI::Cursor::GetMaxSize()
+S::Int S::GUI::Cursor::GetMaxSize() const
 {
 	return maxSize;
+}
+
+S::Int S::GUI::Cursor::GetCursorPosition() const
+{
+	Int	 position = 0;
+
+	String	 wText = text;
+	Int	 wPromptPos = promptPos;
+
+	if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
+	{
+		for (Int i = promptPos - 1; i >= 0; i--)
+		{
+			if (text[i] == '\n')
+			{
+				for (Int j = i + 1; j < promptPos; j++) wText[j - i - 1] = text[j];
+
+				wText[promptPos - i - 1] = 0;
+				wPromptPos = promptPos - i - 1;
+
+				break;
+			}
+		}
+	}
+
+	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))
+	{
+		String	 vText = wText;
+		Bool	 rtlCharacters = False;
+
+		for (Int i = 0; i < wText.Length(); i++)
+		{
+			if (wText[i] >= 0x0590 && wText[i] <= 0x07BF) rtlCharacters = True;
+		}
+
+		if (rtlCharacters)
+		{
+			FriBidiChar	*visual = new FriBidiChar [vText.Length() + 1];
+			FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
+
+			fribidi_log2vis((FriBidiChar *) vText.ConvertTo("UCS-4LE"), vText.Length(), &type, visual, NIL, NIL, NIL);
+
+			visual[vText.Length()] = 0;
+
+			vText.ImportFrom("UCS-4LE", (char *) visual);
+
+			delete [] visual;
+		}
+
+		Int	 vPromptPos = GetCharacterVisualIndex(wText, wPromptPos);
+
+		if (!IsRightToLeft())	position += font.GetTextSizeX(vText.Head(vPromptPos)) - visibleOffset;
+		else			position += font.GetTextSizeX(vText.Tail(vText.Length() - vPromptPos)) - visibleOffset;
+	}
+	else
+	{
+		position += font.GetTextSizeX(String().FillN('*', wPromptPos)) - visibleOffset;
+	}
+
+	return position;
+}
+
+S::Int S::GUI::Cursor::GetCharacterVisualIndex(const String &line, Int n) const
+{
+	Bool	 rtlCharacters = False;
+
+	for (Int i = 0; i < line.Length(); i++)
+	{
+		if (line[i] >= 0x0590 && line[i] <= 0x07BF) rtlCharacters = True;
+	}
+
+	if (!rtlCharacters) return n;
+
+	Int		 position = 0;
+
+	FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
+	FriBidiStrIndex	*positions = new FriBidiStrIndex [line.Length() + 1];
+	FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
+
+	fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, positions, NIL, NIL);
+
+	visual[line.Length()] = 0;
+
+	if (n == line.Length())
+	{
+		if (line[n - 1] >= 0x0590 && line[n - 1] <= 0x07BF) position = positions[n - 1];
+		else						    position = n;
+	}
+	else
+	{
+		if (line[n    ] >= 0x0590 && line[n    ] <= 0x07BF) position = positions[n] + 1;
+		else						    position = positions[n];
+	}
+
+	delete [] visual;
+	delete [] positions;
+
+	return position;
 }

@@ -157,7 +157,7 @@ typedef void (*iconv_unicode_uc_to_mb_fallback)
                                          void* callback_arg),
               void* callback_arg,
               void* data);
-#if @HAVE_WCHAR_T@
+#if HAVE_WCHAR_T
 /* Fallback function.  Invoked when a number of bytes could not be converted to
    a wide character.  This function should process all bytes from inbuf and may
    produce replacement wide characters by calling the write_replacement

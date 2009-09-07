@@ -44,7 +44,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../include"
-				PreprocessorDefinitions="WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;__SMOOTH_DLL__;LIBICONV_PLUG;LIBXML_STATIC;UNICODE;_UNICODE"
+				PreprocessorDefinitions="WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;LIBICONV_PLUG;LIBXML_STATIC;UNICODE;_UNICODE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -3158,7 +3158,7 @@
 					>
 					<Tool
 						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions="_UNICODE;UNICODE;__SMOOTH_DLL__"
+						PreprocessorDefinitions="_UNICODE;UNICODE;SMOOTH_DLL"
 						AdditionalIncludeDirectories="../.."
 					/>
 				</FileConfiguration>

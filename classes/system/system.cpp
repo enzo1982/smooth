@@ -44,8 +44,6 @@ S::String S::System::System::GetAPIVersion()
 
 S::Bool S::System::System::Sleep(UnsignedInt mSeconds)
 {
-	if (mSeconds == 0) return True;
-
 #ifdef __WIN32__
 	::Sleep(mSeconds);
 #else

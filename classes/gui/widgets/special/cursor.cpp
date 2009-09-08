@@ -96,8 +96,6 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 		case SM_LBUTTONDOWN:
 			if (mouseOver)
 			{
-				Int	 newPromptPos = 0;
-
 				String	 wText = text;
 				Int	 wPromptPos = 0;
 				Int	 line = 0;
@@ -124,20 +122,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 					}
 				}
 
-				Int	 newPos	 = 0;
-				Int	 lastPos = 0;
-
-				for (Int i = 0; i <= wText.Length(); i++)
-				{
-					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText.Head(i)) - visibleOffset;
-					else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i)) - visibleOffset;
-
-					if (i > 0 && window->GetMousePosition().x < (lastPos + newPos) / 2) { newPromptPos	= i - 1; break; }
-					else if (i == wText.Length())					      newPromptPos	= wText.Length();
-					else								      lastPos		= newPos;
-				}
-
-				newPromptPos += wPromptPos;
+				Int	 newPromptPos = GetLogicalCursorPositionFromDisplay(wText, window->GetMousePosition().x - frame.left) + wPromptPos;
 
 				marking = True;
 
@@ -192,8 +177,6 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 			if (focussed && markStart != -1 && marking)
 			{
-				Int	 newMarkEnd = 0;
-
 				String	 wText = text;
 				Int	 wPromptPos = 0;
 				Int	 line = 0;
@@ -226,20 +209,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 				if (wPromptPos >= 0)
 				{
-					Int	 newPos	 = 0;
-					Int	 lastPos = 0;
-
-					for (Int i = 0; i <= wText.Length(); i++)
-					{
-						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = frame.left + font.GetTextSizeX(wText.Head(i)) - visibleOffset;
-						else								newPos = frame.left + font.GetTextSizeX(String().FillN('*', i)) - visibleOffset;
-
-						if (i > 0 && window->GetMousePosition().x < (lastPos + newPos) / 2) { newMarkEnd	= i - 1; break; }
-						else if (i == wText.Length())					      newMarkEnd	= wText.Length();
-						else								      lastPos		= newPos;
-					}
-
-					newMarkEnd += wPromptPos;
+					Int	 newMarkEnd = GetLogicalCursorPositionFromDisplay(wText, window->GetMousePosition().x - frame.left) + wPromptPos;
 
 					MarkText(markStart, newMarkEnd);
 
@@ -307,7 +277,8 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 	for (Int i = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos)); i <= text.Length(); i++)
 	{
-		// Check if the line is above the first visible line due to scrolling
+		/* Check if the line is above the first visible line due to scrolling
+		 */
 		if (lineNumber < scrollPos)
 		{
 			if (text[i] == '\n' || text[i] == 0)
@@ -394,7 +365,7 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 		}
 	}
 
-	point.x += GetCursorPosition();
+	point.x += GetDisplayCursorPositionFromLogical(promptPos);
 	point.y += (font.GetTextSizeY() + 3) * (line - scrollPos);
 
 	if (!(line - scrollPos < 0 || (font.GetTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()))
@@ -794,7 +765,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		}
 	}
 
-	p1.x += GetCursorPosition();
+	p1.x += GetDisplayCursorPositionFromLogical(promptPos);
 
 	while (p1.x > frame.right || p1.x < frame.left)
 	{
@@ -916,7 +887,10 @@ S::Int S::GUI::Cursor::GetMaxSize() const
 	return maxSize;
 }
 
-S::Int S::GUI::Cursor::GetCursorPosition() const
+/* Returns the display cursor position
+ * for a given logical cursor position.
+ */
+S::Int S::GUI::Cursor::GetDisplayCursorPositionFromLogical(Int promptPos) const
 {
 	Int	 position = 0;
 
@@ -946,7 +920,7 @@ S::Int S::GUI::Cursor::GetCursorPosition() const
 
 		for (Int i = 0; i < wText.Length(); i++)
 		{
-			if (wText[i] >= 0x0590 && wText[i] <= 0x07BF) rtlCharacters = True;
+			if (wText[i] >= 0x0590 && wText[i] <= 0x07BF) { rtlCharacters = True; break; }
 		}
 
 		if (rtlCharacters)
@@ -963,7 +937,7 @@ S::Int S::GUI::Cursor::GetCursorPosition() const
 			delete [] visual;
 		}
 
-		Int	 vPromptPos = GetCharacterVisualIndex(wText, wPromptPos);
+		Int	 vPromptPos = GetVisualCursorPositionFromLogical(wText, wPromptPos);
 
 		if (!IsRightToLeft())	position += font.GetTextSizeX(vText.Head(vPromptPos)) - visibleOffset;
 		else			position += font.GetTextSizeX(vText.Tail(vText.Length() - vPromptPos)) - visibleOffset;
@@ -976,40 +950,84 @@ S::Int S::GUI::Cursor::GetCursorPosition() const
 	return position;
 }
 
-S::Int S::GUI::Cursor::GetCharacterVisualIndex(const String &line, Int n) const
+/* Return the logical cursor position
+ * for a given display cursor position.
+ */
+S::Int S::GUI::Cursor::GetLogicalCursorPositionFromDisplay(const String &line, Int displayPos) const
 {
-	Bool	 rtlCharacters = False;
+	Int	 length = line.Length();
 
-	for (Int i = 0; i < line.Length(); i++)
+	Int	 newPromptPos = 0;
+
+	Int	 newPos	 = 0;
+	Int	 lastPos = 0;
+
+	for (Int i = 0; i <= length; i++)
 	{
-		if (line[i] >= 0x0590 && line[i] <= 0x07BF) rtlCharacters = True;
+		if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = font.GetTextSizeX(line.Head(i)) - visibleOffset;
+		else								newPos = font.GetTextSizeX(String().FillN('*', i)) - visibleOffset;
+
+		if (i > 0 && displayPos < (lastPos + newPos) / 2) { newPromptPos = i - 1; break; }
+		else if (i == length)				    newPromptPos = length;
+		else						    lastPos	 = newPos;
 	}
 
-	if (!rtlCharacters) return n;
+	return newPromptPos;
+}
 
-	Int		 position = 0;
+/* Returns the cursor position in the visual string
+ * for a given logical cursor position.
+ */
+S::Int S::GUI::Cursor::GetVisualCursorPositionFromLogical(const String &line, Int n) const
+{
+	FriBidiStrIndex	 length = line.Length();
 
-	FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
-	FriBidiStrIndex	*positions = new FriBidiStrIndex [line.Length() + 1];
-	FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
+	if (length == 0) return 0;
 
-	fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, positions, NIL, NIL);
+	/* Get BiDi types for input string.
+	 */
+	FriBidiChar	*text = new FriBidiChar [length + 1];
+	FriBidiCharType	*types = new FriBidiCharType [length + 1];
 
-	visual[line.Length()] = 0;
+	memcpy(text, line.ConvertTo("UCS-4LE"), (length + 1) * sizeof(FriBidiChar));
 
-	if (n == line.Length())
+	fribidi_get_bidi_types(text, length, types);
+
+	Int		 position = n;
+	Bool		 rtlCharacters = False;
+
+	/* Check if the input string contains RTL characters.
+	 */
+	for (Int i = 0; i < length; i++)
 	{
-		if (line[n - 1] >= 0x0590 && line[n - 1] <= 0x07BF) position = positions[n - 1];
-		else						    position = n;
-	}
-	else
-	{
-		if (line[n    ] >= 0x0590 && line[n    ] <= 0x07BF) position = positions[n] + 1;
-		else						    position = positions[n];
+		if (FRIBIDI_IS_RTL(types[i])) { rtlCharacters = True; break; }
 	}
 
-	delete [] visual;
-	delete [] positions;
+	/* Get visual cursor position.
+	 */
+	if (rtlCharacters)
+	{
+		FriBidiStrIndex	*positions = new FriBidiStrIndex [length + 1];
+		FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
+
+		fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), length, &type, NIL, positions, NIL, NIL);
+
+		if (n == length)
+		{
+			if (FRIBIDI_IS_RTL(types[n - 1])) position = positions[n - 1];
+			else				  position = n;
+		}
+		else
+		{
+			if (FRIBIDI_IS_RTL(types[n    ])) position = positions[n] + 1;
+			else				  position = positions[n];
+		}
+
+		delete [] positions;
+	}
+
+	delete [] text;
+	delete [] types;
 
 	return position;
 }

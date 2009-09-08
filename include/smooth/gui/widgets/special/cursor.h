@@ -51,8 +51,10 @@ namespace smooth
 
 				Array<Int>			 lineIndices;
 
-				Int				 GetCursorPosition() const;
-				Int				 GetCharacterVisualIndex(const String &, Int) const;
+				Int				 GetDisplayCursorPositionFromLogical(Int) const;
+				Int				 GetLogicalCursorPositionFromDisplay(const String &, Int) const;
+
+				Int				 GetVisualCursorPositionFromLogical(const String &, Int) const;
 			protected:
 				Int				 maxSize;
 

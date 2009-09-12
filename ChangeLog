@@ -18,6 +18,7 @@ xx.xx.09 xx:xx - smooth alpha 0.8.71.0
 - titlebar.cpp	- pressing the escape key now closes the active window
 - imagebox.cpp	- new widget: a box containing selectable images
 - sha1.cpp	- new class: SHA1, implements the SHA-1 hash algorithm
+- cursor.cpp	- fixed support for right-to-left scripts
 
 - removed TreeView widget (use ListBox instead)
 - added support for path names exceeding MAX_PATH

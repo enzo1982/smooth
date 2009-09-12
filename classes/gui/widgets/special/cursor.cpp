@@ -317,22 +317,97 @@ S::Int S::GUI::Cursor::DrawWidget()
 					Int	 bColor	= Color(0, 0, 255);
 					Int	 tColor = Color(255, 255, 255);
 #endif
-					String	 mText;
-					String	 wText = line;
+					Array<Int>	 markRegionStarts;
+					Array<Int>	 markRegionEnds;
 
-					if (Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) wText.FillN('*', wText.Length());
+					if (Setup::useIconv && ContainsRTLCharacters(line))
+					{
+						FriBidiStrIndex	 length = line.Length();
 
-					for (Int j = lineMarkStart; j < lineMarkEnd; j++) mText[j - lineMarkStart] = wText[j];
+						/* Get visual positions.
+						 */
+						FriBidiStrIndex	*positions = new FriBidiStrIndex [length + 1];
+						FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
-					Rect	 markRect = Rect(realPos + Point(font.GetTextSizeX(wText.Head(lineMarkStart)) - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)), Size(font.GetTextSizeX(mText), font.GetTextSizeY() + 3));
+						fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), length, &type, NIL, positions, NIL, NIL);
 
-					surface->Box(markRect, bColor, Rect::Filled);
+						/* Find marked regions in visual string.
+						 */
+						for (Int i = lineMarkStart; i < lineMarkEnd; i++)
+						{
+							Bool	 done = False;
 
-					Font	 nFont = font;
+							for (Int j = 0; j < markRegionStarts.Length(); j++)
+							{
+								if	(markRegionStarts.GetNth(j) == positions[i] + 1) { markRegionStarts.SetNth(j, markRegionStarts.GetNth(j) - 1); done = True; break; }
+								else if (markRegionEnds.GetNth(j)   == positions[i]    ) { markRegionEnds.SetNth(j, markRegionEnds.GetNth(j) + 1);     done = True; break; }
+							}
 
-					nFont.SetColor(tColor);
+							if (!done)
+							{
+								markRegionStarts.Add(positions[i]);
+								markRegionEnds.Add(positions[i] + 1);
+							}
+						}
 
-					surface->SetText(mText, markRect + Point(0, 1) - Size(0, 2), nFont);
+						delete [] positions;
+
+						/* Consolidate adjacent regions into one.
+						 */
+						for (Int i = 0; i < markRegionStarts.Length() - 1; i++)
+						{
+							for (Int j = i + 1; j < markRegionStarts.Length(); j++)
+							{
+								if (markRegionStarts.GetNth(i) < markRegionStarts.GetNth(j) &&
+								    markRegionEnds.GetNth(i) >= markRegionStarts.GetNth(j))
+								{
+									markRegionEnds.SetNth(i, markRegionEnds.GetNth(j));
+
+									markRegionStarts.RemoveNth(j);
+									markRegionEnds.RemoveNth(j);
+
+									j--;
+								}
+								else if (markRegionStarts.GetNth(j) < markRegionStarts.GetNth(i) &&
+								    	 markRegionEnds.GetNth(j) >= markRegionStarts.GetNth(i))
+								{
+									markRegionStarts.SetNth(i, markRegionStarts.GetNth(j));
+
+									markRegionStarts.RemoveNth(j);
+									markRegionEnds.RemoveNth(j);
+
+									j--;
+								}
+							}
+						}
+					}
+					else
+					{
+						markRegionStarts.Add(lineMarkStart);
+						markRegionEnds.Add(lineMarkEnd);
+					}
+
+					/* Draw marked regions.
+					 */
+					for (Int i = 0; i < markRegionStarts.Length(); i++)
+					{
+						Int	 markRegionStart = GetDisplayCursorPositionFromVisual(line, markRegionStarts.GetNth(i));
+						Int	 markRegionEnd	 = GetDisplayCursorPositionFromVisual(line, markRegionEnds.GetNth(i));
+
+						Rect	 markRect = Rect(realPos + Point(markRegionStart - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)), Size(markRegionEnd - markRegionStart, font.GetTextSizeY() + 3));
+						Font	 nFont = font;
+
+						nFont.SetColor(tColor);
+
+						surface->StartPaint(markRect);
+
+						surface->Box(markRect, bColor, Rect::Filled);
+
+						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)) + Size(visibleOffset, -2), nFont);
+						else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)) + Size(visibleOffset, -2), nFont);
+
+						surface->EndPaint();
+					}
 				}
 			}
 
@@ -892,8 +967,6 @@ S::Int S::GUI::Cursor::GetMaxSize() const
  */
 S::Int S::GUI::Cursor::GetDisplayCursorPositionFromLogical(Int promptPos) const
 {
-	Int	 position = 0;
-
 	String	 wText = text;
 	Int	 wPromptPos = promptPos;
 
@@ -913,38 +986,52 @@ S::Int S::GUI::Cursor::GetDisplayCursorPositionFromLogical(Int promptPos) const
 		}
 	}
 
+	return GetDisplayCursorPositionFromLogical(wText, wPromptPos);
+}
+
+/* Returns the display cursor position
+ * for a given logical cursor position.
+ */
+S::Int S::GUI::Cursor::GetDisplayCursorPositionFromLogical(const String &line, Int promptPos) const
+{
+	return GetDisplayCursorPositionFromVisual(line, GetVisualCursorPositionFromLogical(line, promptPos));
+}
+
+/* Returns the display cursor position
+ * for a given visual cursor position.
+ */
+S::Int S::GUI::Cursor::GetDisplayCursorPositionFromVisual(const String &line, Int promptPos) const
+{
+	FriBidiStrIndex	 length = line.Length();
+
+	if (length == 0) return 0;
+
+	Int		 position = 0;
+
 	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))
 	{
-		String	 vText = wText;
-		Bool	 rtlCharacters = False;
+		String	 vText = line;
 
-		for (Int i = 0; i < wText.Length(); i++)
+		if (Setup::useIconv && ContainsRTLCharacters(line))
 		{
-			if (wText[i] >= 0x0590 && wText[i] <= 0x07BF) { rtlCharacters = True; break; }
-		}
-
-		if (rtlCharacters)
-		{
-			FriBidiChar	*visual = new FriBidiChar [vText.Length() + 1];
+			FriBidiChar	*visual = new FriBidiChar [length + 1];
 			FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
-			fribidi_log2vis((FriBidiChar *) vText.ConvertTo("UCS-4LE"), vText.Length(), &type, visual, NIL, NIL, NIL);
+			fribidi_log2vis((FriBidiChar *) vText.ConvertTo("UCS-4LE"), length, &type, visual, NIL, NIL, NIL);
 
-			visual[vText.Length()] = 0;
+			visual[length] = 0;
 
 			vText.ImportFrom("UCS-4LE", (char *) visual);
 
 			delete [] visual;
 		}
 
-		Int	 vPromptPos = GetVisualCursorPositionFromLogical(wText, wPromptPos);
-
-		if (!IsRightToLeft())	position += font.GetTextSizeX(vText.Head(vPromptPos)) - visibleOffset;
-		else			position += font.GetTextSizeX(vText.Tail(vText.Length() - vPromptPos)) - visibleOffset;
+		if (!IsRightToLeft())	position += font.GetTextSizeX(vText.Head(promptPos)) - visibleOffset;
+		else			position += font.GetTextSizeX(vText.Tail(length - promptPos)) - visibleOffset;
 	}
 	else
 	{
-		position += font.GetTextSizeX(String().FillN('*', wPromptPos)) - visibleOffset;
+		position += font.GetTextSizeX(String().FillN('*', promptPos)) - visibleOffset;
 	}
 
 	return position;
@@ -955,24 +1042,27 @@ S::Int S::GUI::Cursor::GetDisplayCursorPositionFromLogical(Int promptPos) const
  */
 S::Int S::GUI::Cursor::GetLogicalCursorPositionFromDisplay(const String &line, Int displayPos) const
 {
-	Int	 length = line.Length();
+	FriBidiStrIndex	 length = line.Length();
 
-	Int	 newPromptPos = 0;
+	if (length == 0) return 0;
 
-	Int	 newPos	 = 0;
-	Int	 lastPos = 0;
+	Int		 bestPos = 0;
+	Int		 bestPosValue = 100000;
 
 	for (Int i = 0; i <= length; i++)
 	{
-		if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	newPos = font.GetTextSizeX(line.Head(i)) - visibleOffset;
-		else								newPos = font.GetTextSizeX(String().FillN('*', i)) - visibleOffset;
+		Int	 pos = GetDisplayCursorPositionFromLogical(line, i);
 
-		if (i > 0 && displayPos < (lastPos + newPos) / 2) { newPromptPos = i - 1; break; }
-		else if (i == length)				    newPromptPos = length;
-		else						    lastPos	 = newPos;
+		if (Math::Abs(pos - displayPos) < bestPosValue)
+		{
+			bestPos = i;
+			bestPosValue = Math::Abs(pos - displayPos);
+
+			if (bestPosValue == 0) return i;
+		}
 	}
 
-	return newPromptPos;
+	return bestPos;
 }
 
 /* Returns the cursor position in the visual string
@@ -984,29 +1074,20 @@ S::Int S::GUI::Cursor::GetVisualCursorPositionFromLogical(const String &line, In
 
 	if (length == 0) return 0;
 
-	/* Get BiDi types for input string.
-	 */
-	FriBidiChar	*text = new FriBidiChar [length + 1];
-	FriBidiCharType	*types = new FriBidiCharType [length + 1];
-
-	memcpy(text, line.ConvertTo("UCS-4LE"), (length + 1) * sizeof(FriBidiChar));
-
-	fribidi_get_bidi_types(text, length, types);
-
 	Int		 position = n;
-	Bool		 rtlCharacters = False;
 
 	/* Check if the input string contains RTL characters.
 	 */
-	for (Int i = 0; i < length; i++)
+	if (Setup::useIconv && ContainsRTLCharacters(line))
 	{
-		if (FRIBIDI_IS_RTL(types[i])) { rtlCharacters = True; break; }
-	}
+		/* Get BiDi types for input string.
+		 */
+		FriBidiCharType	*types = new FriBidiCharType [length + 1];
 
-	/* Get visual cursor position.
-	 */
-	if (rtlCharacters)
-	{
+		fribidi_get_bidi_types((FriBidiChar *) line.ConvertTo("UCS-4LE"), length, types);
+
+		/* Get visual cursor position.
+		 */
 		FriBidiStrIndex	*positions = new FriBidiStrIndex [length + 1];
 		FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
@@ -1014,20 +1095,64 @@ S::Int S::GUI::Cursor::GetVisualCursorPositionFromLogical(const String &line, In
 
 		if (n == length)
 		{
-			if (FRIBIDI_IS_RTL(types[n - 1])) position = positions[n - 1];
-			else				  position = n;
+			if	( FRIBIDI_IS_RTL(types[n - 1])) position = positions[n - 1];
+			else					position = positions[n - 1] + 1;
+		}
+		else if (n == 0)
+		{
+			if	( FRIBIDI_IS_RTL(types[n    ]))	position = positions[n    ] + 1;
+			else					position = positions[n    ];
 		}
 		else
 		{
-			if (FRIBIDI_IS_RTL(types[n    ])) position = positions[n] + 1;
-			else				  position = positions[n];
+			if	( FRIBIDI_IS_RTL(types[n    ]))	position = positions[n    ] + 1;
+			else if ( FRIBIDI_IS_RTL(types[n - 1])) position = positions[n - 1];
+			else if ( FRIBIDI_IS_SPACE(types[n]) &&
+				 !FRIBIDI_IS_RTL(types[n - 1])) position = positions[n - 1] + 1;
+			else					position = positions[n    ];
 		}
 
+		delete [] types;
 		delete [] positions;
 	}
 
-	delete [] text;
-	delete [] types;
-
 	return position;
+}
+
+/* Check if the string contains right-to-left characters.
+ */
+S::Bool S::GUI::Cursor::ContainsRTLCharacters(const String &line) const
+{
+	FriBidiStrIndex	 length = line.Length();
+
+	if (length == 0) return False;
+
+	Bool		 rtlCharacters = False;
+
+	if (Setup::useIconv)
+	{
+		/* Get BiDi types for input string.
+		 */
+		FriBidiCharType	*types = new FriBidiCharType [length + 1];
+
+		fribidi_get_bidi_types((FriBidiChar *) line.ConvertTo("UCS-4LE"), length, types);
+
+		/* Check if the input string contains RTL characters.
+		 */
+		for (Int i = 0; i < length; i++)
+		{
+			if (FRIBIDI_IS_RTL(types[i])) { rtlCharacters = True; break; }
+		}
+
+		delete [] types;
+	}
+	else
+	{
+		for (Int i = 0; i < length; i++)
+		{
+			if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
+		}
+	}
+
+	return rtlCharacters;
 }

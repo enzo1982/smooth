@@ -61,6 +61,12 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 	{
 		dirPath = Directory::GetActiveDirectory();
 	}
+
+	dirPath.Replace("/",  Directory::GetDirectoryDelimiter());
+	dirPath.Replace("\\", Directory::GetDirectoryDelimiter());
+
+	dirName.Replace("/",  Directory::GetDirectoryDelimiter());
+	dirName.Replace("\\", Directory::GetDirectoryDelimiter());
 }
 
 S::Directory::Directory(const Directory &iDirectory)

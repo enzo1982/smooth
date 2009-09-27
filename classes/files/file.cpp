@@ -52,6 +52,12 @@ S::File::File(const String &iFileName, const String &iFilePath)
 	{
 		filePath = Directory::GetActiveDirectory();
 	}
+
+	filePath.Replace("/",  Directory::GetDirectoryDelimiter());
+	filePath.Replace("\\", Directory::GetDirectoryDelimiter());
+
+	fileName.Replace("/",  Directory::GetDirectoryDelimiter());
+	fileName.Replace("\\", Directory::GetDirectoryDelimiter());
 }
 
 S::File::File(const File &iFile)

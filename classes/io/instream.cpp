@@ -138,10 +138,10 @@ S::Bool S::IO::InStream::ReadData()
 {
 	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
 
-	int decsize = 0;
-
 	if (streamType == STREAM_DRIVER)
 	{
+		Int	 decsize = 0;
+
 		if (filters.Length() > 0)
 		{
 			if (filters.GetFirst()->GetPackageSize() > 0)	packageSize = filters.GetFirst()->GetPackageSize();

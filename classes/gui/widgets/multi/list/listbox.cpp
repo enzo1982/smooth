@@ -171,13 +171,13 @@ S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 	Int	 selectedEntryNumber = GetSelectedEntryNumber();
 	Int	 exchangedEntryNumber = selectedEntryNumber;
 
-	if (upDown && selectedEntryNumber != 0)				exchangedEntryNumber = selectedEntryNumber - 1;
-	else if (!upDown && selectedEntryNumber != Length() - 1)	exchangedEntryNumber = selectedEntryNumber + 1;
+	if	( upDown && selectedEntryNumber != 0)		 exchangedEntryNumber = selectedEntryNumber - 1;
+	else if (!upDown && selectedEntryNumber != Length() - 1) exchangedEntryNumber = selectedEntryNumber + 1;
 
 	Int	 oldSbPos = scrollbarPos;
 
-	if (exchangedEntryNumber < scrollbarPos)			scrollbarPos--;
-	else if (!GetNthEntry(exchangedEntryNumber)->IsVisible())	scrollbarPos++;
+	if	(exchangedEntryNumber < scrollbarPos)		  scrollbarPos--;
+	else if (!GetNthEntry(exchangedEntryNumber)->IsVisible()) scrollbarPos++;
 
 	if (selectedEntryNumber != exchangedEntryNumber)
 	{

@@ -48,7 +48,7 @@ S::Int S::Net::Protocols::File::DownloadToFile(const String &destination)
 	IO::InStream	*in	= new IO::InStream(IO::STREAM_FILE, fileName, IO::IS_READONLY);
 
 	downloadProgress.Emit(0);
-	downloadSpeed.Emit("");
+	downloadSpeed.Emit(NIL);
 
 	if (in->GetLastError() == IO::IO_ERROR_OK)
 	{

@@ -136,14 +136,14 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 	IO::OutStream	*out	= new IO::OutStream(IO::STREAM_STREAM, in);
 
 	downloadProgress.Emit(0);
-	downloadSpeed.Emit("");
+	downloadSpeed.Emit(NIL);
 
 	if (in->GetLastError() == IO::IO_ERROR_OK)
 	{
 		Buffer<UnsignedByte>	&buffer = ComposeHTTPRequest();
 
 		uploadProgress.Emit(0);
-		uploadSpeed.Emit("");
+		uploadSpeed.Emit(NIL);
 
 		Int	 startTicks	= clock();
 		Int	 percent	= 0;
@@ -240,8 +240,8 @@ S::Errors::Error S::Net::Protocols::HTTP::DecodeURL()
 {
 	if (!url.StartsWith("http://")) return Error();
 
-	server	= "";
-	path	= "";
+	server	= NIL;
+	path	= NIL;
 	port	= 80;
 
 	Int	 i, j;

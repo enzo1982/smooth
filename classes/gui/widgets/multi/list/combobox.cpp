@@ -166,7 +166,7 @@ S::Void S::GUI::ComboBox::OpenListBox()
 		toolWindow->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
 		listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
-		listBox->AddTab("", 32768);
+		listBox->AddTab(NIL, 32768);
 
 		prevSelectedEntry = GetSelectedEntry();
 

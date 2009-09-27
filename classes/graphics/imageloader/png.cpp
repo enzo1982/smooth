@@ -44,17 +44,6 @@ void my_png_read(png_structp png_ptr, png_bytep buffer, png_size_t size)
 
 const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 {
-	InStream	*in = NIL;
-
-	if (gotFileName)
-	{
-		in = new InStream(STREAM_FILE, fileName, IS_READONLY);
-	}
-	else if (gotBuffer)
-	{
-		in = new InStream(STREAM_BUFFER, buffer, buffer.Size());
-	}
-
 	/* Create and initialize the png_struct with the desired error handler
 	 * functions.  If you want to use the default stderr and longjump method,
 	 * you can supply NULL for the last three parameters.  We also supply the
@@ -81,6 +70,19 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 		bitmap = NIL;
 
 		return bitmap;
+	}
+
+	/* Create input stream for file or buffer.
+	 */
+	InStream	*in = NIL;
+
+	if (gotFileName)
+	{
+		in = new InStream(STREAM_FILE, fileName, IS_READONLY);
+	}
+	else if (gotBuffer)
+	{
+		in = new InStream(STREAM_BUFFER, buffer, buffer.Size());
 	}
 
 	/* If you are using replacement read functions, instead of calling

@@ -98,12 +98,10 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			{
 				String	 wText = text;
 				Int	 wPromptPos = 0;
-				Int	 line = 0;
 
 				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 				{
-					line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY() + 3);
-
+					Int	 line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY() + 3);
 					Int	 lineCount = 0;
 
 					for (Int i = 0; i <= text.Length(); i++)
@@ -179,15 +177,13 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			{
 				String	 wText = text;
 				Int	 wPromptPos = 0;
-				Int	 line = 0;
 
 				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 				{
-					line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY() + 3);
+					Int	 line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY() + 3);
+					Int	 lineCount = 0;
 
 					if (window->GetMousePosition().y - frame.top < 0) line--;
-
-					Int	 lineCount = 0;
 
 					for (Int i = 0; i <= text.Length(); i++)
 					{

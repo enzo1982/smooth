@@ -333,13 +333,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 {
 	Surface		*surface = dlgwnd->GetDrawSurface();
 	Rect		 rect;
-	Point		 p1;
-	Point		 p2;
 	Bitmap		 bmp(256, 256, 24);
 	Rect		 urect = dlgwnd->GetUpdateRect();
-	Rect		 irect;
 	Int		 hssize = 205;
-	double		 hue = 0;
 	double		 huebias = 256 / (double) hssize;
 	register Int	 xmin = 0;
 	register Int	 ymin = 0;
@@ -360,14 +356,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 
 	if (Rect::DoRectsOverlap(rect, urect))
 	{
+		double	 hue = 0;
+
 		surface->Frame(rect, FRAME_DOWN);
 
-		for (int ypos = 0; ypos < hssize; ypos++)
+		for (Int ypos = 0; ypos < hssize; ypos++)
 		{
-			p1.x = huexoffset + 1;
-			p1.y = yoffset + 1 + ypos;
-			p2.x = huexoffset + 17;
-			p2.y = yoffset + 1 + ypos;
+			Point	 p1(huexoffset +  1, yoffset + 1 + ypos);
+			Point	 p2(huexoffset + 17, yoffset + 1 + ypos);
 
 			surface->Line(p1, p2, Color(255 - Math::Round(hue), 255, 255, HSV).ConvertTo(RGBA));
 
@@ -408,7 +404,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 
 	if (Rect::DoRectsOverlap(rect, urect))
 	{
-		irect = Rect::OverlapRect(rect, urect);
+		Rect	 irect = Rect::OverlapRect(rect, urect);
 
 		irect.right += 5;
 		irect.bottom += 5;
@@ -459,9 +455,6 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 	Rect	 vsrect;
 	Rect	 ncrect;
 	Rect	 ocrect;
-	int	 newval;
-	int	 newsat;
-	int	 newhue;
 	int	 hssize = 205;
 
 	huerect.left	= huexoffset;
@@ -560,7 +553,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 
 			if (huecapt)
 			{
-				newhue = 255 - Math::Round(Math::Max(Math::Min(dlgwnd->GetMousePosition().y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
+				Int	 newhue = 255 - Math::Round(Math::Max(Math::Min(dlgwnd->GetMousePosition().y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
 
 				if (newhue != acthue)
 				{
@@ -589,8 +582,8 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 			{
 				Point	 mousePos = dlgwnd->GetMousePosition();
 
-				newval = Math::Round(Math::Max(Math::Min(mousePos.x - 8, hssize - 1), 0) * (256.0 / 205.0));
-				newsat = 255 - Math::Round(Math::Max(Math::Min(mousePos.y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
+				Int	 newval = Math::Round(Math::Max(Math::Min(mousePos.x - 8, hssize - 1), 0) * (256.0 / 205.0));
+				Int	 newsat = 255 - Math::Round(Math::Max(Math::Min(mousePos.y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
 
 				if ((newval != actval) || (newsat != actsat))
 				{
@@ -629,28 +622,24 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 {
 	Surface	*surface = dlgwnd->GetDrawSurface();
-	Point	 p1;
-	Point	 p2;
-	int	 ahrgb = Color(acthue, 255, 255, HSV).ConvertTo(RGBA);
-	int	 rgb;
-	int	 hssize = 205;
 
 	if (((lasthue != acthue) || forcehupdate) && !preventhupdate)
 	{
-		// update hue picker
+		/* Update hue picker.
+		 */
 		if (lasthue != -1)
 		{
-			p1.x = huexoffset + 1;
-			p1.y = yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / 205.0));
-			p2.x = huexoffset + 17;
-			p2.y = yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / 205.0));
+			Point	 p1(huexoffset +  1, yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / 205.0)));
+			Point	 p2(huexoffset + 17, yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / 205.0)));
 
 			surface->Line(p1, p2, Color(lasthue, 255, 255, HSV).ConvertTo(RGBA));
 		}
 
+		Color	 ahrgb(acthue, 255, 255, HSV);
+
 		for (int x = huexoffset + 1; x < (huexoffset + 17); x++)
 		{
-			surface->SetPixel(Point(x, yoffset + 1 + (int) ((255.0 - acthue) / (256.0 / 205.0))), Color(255 - Color(ahrgb).GetRed(), 255 - Color(ahrgb).GetGreen(), 255 - Color(ahrgb).GetBlue()));
+			surface->SetPixel(Point(x, yoffset + 1 + (int) ((255.0 - acthue) / (256.0 / 205.0))), Color(255 - ahrgb.GetRed(), 255 - ahrgb.GetGreen(), 255 - ahrgb.GetBlue()));
 		}
 
 		lasthue = acthue;
@@ -658,19 +647,22 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 
 	if (((lastval != actval) || (lastsat != actsat) || forcevsupdate) && !preventvsupdate)
 	{
-		// update val/sat picker
+		Int	 hssize = 205;
+
+		/* Update val/sat picker.
+		 */
 		if ((lastval != -1) && (lastsat != -1))
 		{
 			for (int x = 0; x < hssize; x++)
 			{
-				rgb = Color(acthue, lastsat, (int) (x * (256.0 / 205.0)), HSV).ConvertTo(RGBA);
+				Color	 rgb(acthue, lastsat, (int) (x * (256.0 / 205.0)), HSV);
 
 				surface->SetPixel(Point(x + 8, yoffset + 1 + (int) ((255.0 - lastsat) / (256.0 / 205.0))), rgb);
 			}
 
 			for (int y = 0; y < hssize; y++)
 			{
-				rgb = Color(acthue, (int) (255.0 - (y * (256.0 / 205.0))), lastval, HSV).ConvertTo(RGBA);
+				Color	 rgb(acthue, (int) (255.0 - (y * (256.0 / 205.0))), lastval, HSV);
 
 				surface->SetPixel(Point(8 + (int) (lastval / (256.0 / 205.0)), y + yoffset + 1), rgb);
 			}
@@ -678,14 +670,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 
 		for (int x = 0; x < hssize; x++)
 		{
-			rgb = Color(acthue, actsat, x, HSV).ConvertTo(RGBA);
+			Color	 rgb(acthue, actsat, x, HSV);
 
 			surface->SetPixel(Point(x + 8, yoffset + 1 + (int) ((255.0 - actsat) / (256.0 / 205.0))), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
 
 		for (int y = 0; y < hssize; y++)
 		{
-			rgb = Color(acthue, 255 - y, actval, HSV).ConvertTo(RGBA);
+			Color	 rgb(acthue, 255 - y, actval, HSV);
 
 			surface->SetPixel(Point(8 + (int) (actval / (256.0 / 205.0)), y + yoffset + 1), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}

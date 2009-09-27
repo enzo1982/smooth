@@ -270,7 +270,9 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 
 	popup->CalculateSize();
 
-	if (window->GetX() + popupPos.x + popup->GetWidth() >= LiSAGetDisplaySizeX()) popupPos.x = realPos.x - popup->GetWidth();
+	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popup->GetWidth() >= LiSAGetDisplaySizeX()) popupPos.x = realPos.x - popup->GetWidth(); }
+	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popup->GetWidth() <= 0)		     popupPos.x = realPos.x - popup->GetWidth(); }
+
 	if (window->GetY() + popupPos.y + popup->GetHeight() >= LiSAGetDisplaySizeY()) popupPos.y = realPos.y - popup->GetHeight() + GetHeight() + 3;
 
 	popup->SetPosition(popupPos);

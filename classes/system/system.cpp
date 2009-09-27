@@ -83,7 +83,7 @@ S::String S::System::System::GetWindowsRootDirectory()
 
 	return windowsDir;
 #else
-	return "";
+	return NIL;
 #endif
 }
 
@@ -141,7 +141,7 @@ S::String S::System::System::GetProgramFilesDirectory()
 
 	return programsDir;
 #else
-	return "";
+	return NIL;
 #endif
 }
 
@@ -177,7 +177,7 @@ S::String S::System::System::GetApplicationDataDirectory()
 	CoTaskMemFree(idlist);
 
 	if (configDir[configDir.Length() - 1] != '\\') configDir.Append("\\");
-	if (configDir == "\\") configDir = "";
+	if (configDir == "\\") configDir = NIL;
 
 	return configDir;
 #else

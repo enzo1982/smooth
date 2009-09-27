@@ -21,7 +21,7 @@ S::ArgumentsParser::ArgumentsParser(const String &commandLine)
 		{
 			if (param.Length() > 0) args.Add(String(param));
 
-			param	= "";
+			param	= NIL;
 			j	= 0;
 		}
 		else if (commandLine[i] == '\"')

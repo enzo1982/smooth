@@ -164,8 +164,6 @@ S::Bool S::IO::OutStream::WriteData()
 
 	if (currentBufferPos < packageSize) return true;
 
-	Int		 encsize = 0;
-
 	if (filters.Length() > 0)
 	{
 		if (filters.GetFirst()->GetPackageSize() == -1)
@@ -181,6 +179,8 @@ S::Bool S::IO::OutStream::WriteData()
 
 	if (streamType == STREAM_DRIVER)
 	{
+		Int	 encsize = 0;
+
 		if (filters.Length() == 0) encsize = driver->WriteData(dataBuffer, packageSize);
 		else			   encsize = filters.GetFirst()->WriteData(dataBuffer, packageSize);
 

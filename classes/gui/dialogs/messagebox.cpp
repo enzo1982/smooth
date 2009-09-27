@@ -20,7 +20,8 @@
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/window/window.h>
 
-S::Int S::GUI::Dialogs::MessageDlg::nOfMessageBoxes = 0;
+S::Int	 S::GUI::Dialogs::MessageDlg::nOfMessageBoxes = 0;
+S::Bool	 S::GUI::Dialogs::MessageDlg::defaultRightToLeft = False;
 
 S::Int S::GUI::Dialogs::QuickMessage(const String &text, const String &title, Int buttons, char *icon)
 {
@@ -54,6 +55,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	cVar = iCVar;
 
 	msgbox		= new Window(title, Point(), Size());
+	msgbox->SetRightToLeft(defaultRightToLeft);
+
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	lay		= new Layer();
 
@@ -65,7 +68,6 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	buttons		= btns;
 
-	Int	 actpos = 0;
 	Int	 thissize = 0;
 	Int	 maxsize = 0;
 	Int	 titlesize = 0;
@@ -76,6 +78,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	if (text != NIL)
 	{
+		Int	 actpos = 0;
+
 		if (text[0] == 0) lines = 0;
 
 		for (int i = 0; i < 256; i++)
@@ -301,7 +305,27 @@ S::Void S::GUI::Dialogs::MessageDlg::MessageButton2()
 	MessageButton(2);
 }
 
-S::Int S::GUI::Dialogs::MessageDlg::GetButtonCode()
+S::Int S::GUI::Dialogs::MessageDlg::GetButtonCode() const
 {
 	return buttonCode;
+}
+
+S::Void S::GUI::Dialogs::MessageDlg::SetRightToLeft(Bool rightToLeft)
+{
+	msgbox->SetRightToLeft(rightToLeft);
+}
+
+S::Bool S::GUI::Dialogs::MessageDlg::IsRightToLeft() const
+{
+	return msgbox->IsRightToLeft();
+}
+
+S::Void S::GUI::Dialogs::MessageDlg::SetDefaultRightToLeft(Bool nDefaultRightToLeft)
+{
+	defaultRightToLeft = nDefaultRightToLeft;
+}
+
+S::Bool S::GUI::Dialogs::MessageDlg::IsDefaultRightToLeft()
+{
+	return defaultRightToLeft;
 }

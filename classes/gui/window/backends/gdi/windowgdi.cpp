@@ -210,10 +210,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		case WM_CHAR:
 			return onEvent.Call(SM_CHAR, wParam, lParam);
 
-		/* Other messages:
+		/* Paint messages:
 		 */
-		case WM_TIMER:
-			return onEvent.Call(SM_TIMER, wParam, 0);
 		case WM_PAINT:
 			{
 				Int	 rVal = Break;
@@ -237,6 +235,22 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				return rVal;
 			}
+
+		/* Window state change messages:
+		 */
+		case WM_WINDOWPOSCHANGED:
+			{
+				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
+
+				onEvent.Call(SM_WINDOWMETRICS, (wndpos->x << 16) | wndpos->y, (wndpos->cx << 16) | wndpos->cy);
+			}
+
+			return Success();
+
+		/* Other messages:
+		 */
+		case WM_TIMER:
+			return onEvent.Call(SM_TIMER, wParam, 0);
 	}
 
 	/* Call event for any other Windows messages.

@@ -4,11 +4,11 @@
 SMOOTH_PATH = ../..
 
 # Change these variables to fit your project:
-GLOBALLIB   = libxml2.a
-MYCCOPTS    = -I. -DLIBICONV_PLUG -DLIBXML_STATIC
+GLOBALLIB   = libcpuid.a
+MYCCOPTS    = -I. -D VERSION=\"0.1.0\"
 
 # Enter object files here:
-OBJECTS	    = chvalid.o dict.o encoding.o entities.o error.o globals.o hash.o list.o parser.o parserInternals.o SAX2.o threads.o tree.o uri.o valid.o xmlIO.o xmlmemory.o xmlreader.o xmlsave.o xmlstring.o xmlwriter.o
+OBJECTS	    = asm-bits.o cpuid_main.o libcpuid_util.o rdtsc.o recog_amd.o recog_intel.o
 
 ## Do not change anything below this line. ##
 

@@ -14,7 +14,7 @@
 
 #include <iconv.h>
 
-size_t	 (*iconv)(iconv_t, const char **, size_t *, char **, size_t *)	= NIL;
+size_t	 (*iconv)(iconv_t, char **, size_t *, char **, size_t *)	= NIL;
 iconv_t	 (*iconv_open)(const char *, const char *)			= NIL;
 int	 (*iconv_close)(iconv_t)					= NIL;
 
@@ -26,7 +26,7 @@ S::Bool S::LoadIconvDLL()
 	if (Setup::enableUnicode) iconvDLL = LoadLibraryW(GUI::Application::GetApplicationDirectory().Append("iconv"));
 	else			  iconvDLL = LoadLibraryA(GUI::Application::GetApplicationDirectory().Append("iconv"));
 
-	iconv		= (size_t (*)(iconv_t, const char **, size_t *, char **, size_t *)) GetProcAddress(iconvDLL, "iconv");
+	iconv		= (size_t (*)(iconv_t, char **, size_t *, char **, size_t *)) GetProcAddress(iconvDLL, "iconv");
 	iconv_open	= (iconv_t (*)(const char *, const char *)) GetProcAddress(iconvDLL, "iconv_open");
 	iconv_close	= (int (*)(iconv_t)) GetProcAddress(iconvDLL, "iconv_close");
 

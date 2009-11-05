@@ -20,6 +20,8 @@ S::GUI::List::List() : Widget(Point(), Size())
 
 	onSelectEntry.SetParentObject(this);
 	onMarkEntry.SetParentObject(this);
+
+	onChangeEntryOrder.SetParentObject(this);
 }
 
 S::GUI::List::~List()
@@ -72,6 +74,8 @@ S::Int S::GUI::List::Add(Widget *widget)
 
 		Paint(SP_UPDATE);
 
+		onChangeEntryOrder.Emit();
+
 		return Success();
 	}
 
@@ -92,6 +96,8 @@ S::Int S::GUI::List::Remove(Widget *widget)
 		createdEntry.Remove(entryHandle);
 
 		Paint(SP_UPDATE);
+
+		onChangeEntryOrder.Emit();
 
 		return Success();
 	}
@@ -141,6 +147,8 @@ S::Int S::GUI::List::SwitchEntries(Int entry1n, Int entry2n)
 
 	elementOrder.InsertAtPos(Math::Min(entry1n, entry2n), entry2, entry2->GetHandle());
 	elementOrder.InsertAtPos(Math::Max(entry1n, entry2n), entry1, entry1->GetHandle());
+
+	onChangeEntryOrder.Emit();
 
 	return Success();
 }

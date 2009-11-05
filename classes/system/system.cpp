@@ -9,12 +9,14 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/system.h>
+#include <smooth/files/directory.h>
 #include <smooth/version.h>
 
 #ifdef __WIN32__
 #	include <shlobj.h>
 #else
 #	include <unistd.h>
+#	include <pwd.h>
 #endif
 
 S::Int S::System::System::nextGUID	= 0;
@@ -55,9 +57,9 @@ S::Bool S::System::System::Sleep(UnsignedInt mSeconds)
 
 S::String S::System::System::GetWindowsRootDirectory()
 {
-#ifdef __WIN32__
-	String		 windowsDir;
+	String	 windowsDir;
 
+#ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
 		wchar_t	*bufferw = new wchar_t [MAX_PATH];
@@ -78,26 +80,28 @@ S::String S::System::System::GetWindowsRootDirectory()
 
 		delete [] buffera;
 	}
+#else
+	windowsDir = NIL;
+#endif
 
-	if (windowsDir[windowsDir.Length() - 1] != '\\') windowsDir.Append("\\");
+	if (!windowsDir.EndsWith(Directory::GetDirectoryDelimiter())) windowsDir.Append(Directory::GetDirectoryDelimiter());
+	if (windowsDir == Directory::GetDirectoryDelimiter()) windowsDir = NIL;
 
 	return windowsDir;
-#else
-	return NIL;
-#endif
 }
 
 S::String S::System::System::GetProgramFilesDirectory()
 {
-#ifdef __WIN32__
 	String	 programsDir;
+
+#ifdef __WIN32__
 	HKEY	 currentVersion;
 
 	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion", 0, KEY_QUERY_VALUE, &currentVersion) == ERROR_SUCCESS)
 	{
-		// We need to use the ANSI version of RegQueryValueEx, because
-		// the Unicode version is not compatible with MSLU.
-
+		/* We need to use the ANSI version of RegQueryValueEx, because
+		 * the Unicode version is not compatible with MSLU.
+		 */
 		DWORD	 size = MAX_PATH;
 		char	*buffer = new char [size];
 
@@ -112,9 +116,9 @@ S::String S::System::System::GetProgramFilesDirectory()
 
 	if (programsDir == NIL)
 	{
-		// Failed to get the program files directory from the registry.
-		// Get the directory name from the environment variable.
-
+		/* Failed to get the program files directory from the registry.
+		 * Get the directory name from the environment variable.
+		 */
 		if (Setup::enableUnicode)
 		{
 			wchar_t	*bufferw = new wchar_t [MAX_PATH];
@@ -136,20 +140,23 @@ S::String S::System::System::GetProgramFilesDirectory()
 			delete [] buffera;
 		}
 	}
+#else
+	programsDir = NIL;
+#endif
 
-	if (programsDir[programsDir.Length() - 1] != '\\') programsDir.Append("\\");
+	if (!programsDir.EndsWith(Directory::GetDirectoryDelimiter())) programsDir.Append(Directory::GetDirectoryDelimiter());
+	if (programsDir == Directory::GetDirectoryDelimiter()) programsDir = NIL;
 
 	return programsDir;
-#else
-	return NIL;
-#endif
 }
 
 S::String S::System::System::GetApplicationDataDirectory()
 {
+	String	 configDir;
+
 #ifdef __WIN32__
-	String		 configDir;
 	ITEMIDLIST	*idlist;
+
 
 	SHGetSpecialFolderLocation(NIL, CSIDL_APPDATA, &idlist);
 
@@ -175,20 +182,24 @@ S::String S::System::System::GetApplicationDataDirectory()
 	}
 
 	CoTaskMemFree(idlist);
+#else
+	passwd	*pw = getpwuid(getuid());
 
-	if (configDir[configDir.Length() - 1] != '\\') configDir.Append("\\");
-	if (configDir == "\\") configDir = NIL;
+	if (pw != NIL)	configDir = pw->pw_dir;
+	else		configDir = "~";
+#endif
+
+	if (!configDir.EndsWith(Directory::GetDirectoryDelimiter())) configDir.Append(Directory::GetDirectoryDelimiter());
+	if (configDir == Directory::GetDirectoryDelimiter()) configDir = NIL;
 
 	return configDir;
-#else
-	return "~";
-#endif
 }
 
 S::String S::System::System::GetPersonalFilesDirectory()
 {
+	String	 personalDir;
+
 #ifdef __WIN32__
-	String		 personalDir;
 	ITEMIDLIST	*idlist;
 
 	SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
@@ -216,22 +227,28 @@ S::String S::System::System::GetPersonalFilesDirectory()
 
 	CoTaskMemFree(idlist);
 
-	if (personalDir[personalDir.Length() - 1] != '\\') personalDir.Append("\\");
-	if (personalDir == "\\") personalDir = "C:\\";
+	if (personalDir == NIL) personalDir = "C:";
+#else
+	passwd	*pw = getpwuid(getuid());
+
+	if (pw != NIL)	personalDir = pw->pw_dir;
+	else		personalDir = "~";
+#endif
+
+	if (!personalDir.EndsWith(Directory::GetDirectoryDelimiter())) personalDir.Append(Directory::GetDirectoryDelimiter());
+	if (personalDir == Directory::GetDirectoryDelimiter()) personalDir = NIL;
 
 	return personalDir;
-#else
-	return "~";
-#endif
 }
 
 S::String S::System::System::GetTempDirectory()
 {
-#ifdef __WIN32__
-	// We need to use the ANSI version of GetTempPath, because
-	// the Unicode version is not compatible with MSLU.
-
 	String	 tempDir;
+
+#ifdef __WIN32__
+	/* We need to use the ANSI version of GetTempPath, because
+	 * the Unicode version is not compatible with MSLU.
+	 */
 	char	*buffera = new char [MAX_PATH];
 
 	GetTempPathA(MAX_PATH, buffera);
@@ -239,11 +256,12 @@ S::String S::System::System::GetTempDirectory()
 	tempDir = buffera;
 
 	delete [] buffera;
+#else
+	tempDir = "/var/tmp";
+#endif
 
-	if (tempDir[tempDir.Length() - 1] != '\\') tempDir.Append("\\");
+	if (!tempDir.EndsWith(Directory::GetDirectoryDelimiter())) tempDir.Append(Directory::GetDirectoryDelimiter());
+	if (tempDir == Directory::GetDirectoryDelimiter()) tempDir = NIL;
 
 	return tempDir;
-#else
-	return "/var/tmp";
-#endif
 }

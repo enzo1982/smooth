@@ -118,23 +118,23 @@ S::Int S::XML::Document::LoadNode(xmlTextReaderPtr reader, Node *node)
 
 	if (xmlTextReaderHasAttributes(reader))
 	{
-		while (xmlTextReaderMoveToNextAttribute(reader)) node->SetAttribute((const char *) xmlTextReaderConstName(reader), (const char *) xmlTextReaderConstValue(reader));
+		while (xmlTextReaderMoveToNextAttribute(reader) == 1) node->SetAttribute((const char *) xmlTextReaderConstName(reader), (const char *) xmlTextReaderConstValue(reader));
 
 		xmlTextReaderMoveToElement(reader);
 	}
 
 	if (!xmlTextReaderIsEmptyElement(reader))
 	{
-		Int	 nodeType = xmlTextReaderNodeType(reader);
+		Int	 nodeType = 0;
 
-		xmlTextReaderRead(reader);
+		if (xmlTextReaderRead(reader) == -1) return Error();
 
 		while ((nodeType = xmlTextReaderNodeType(reader)) != XML_ELEMENT_DECL)
 		{
 			if	(nodeType == XML_ELEMENT_NODE)	LoadNode(reader, node->AddNode(NIL));
 			else if (nodeType == XML_TEXT_NODE)	node->SetContent((const char *) xmlTextReaderConstValue(reader));
 
-			xmlTextReaderRead(reader);
+			if (xmlTextReaderRead(reader) == -1) return Error();
 		}
 	}
 

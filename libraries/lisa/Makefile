@@ -3,12 +3,25 @@
 # Change these variables to fit this location:
 SMOOTH_PATH = ../..
 
+include $(SMOOTH_PATH)/Makefile-options
+
 # Change these variables to fit your project:
-GLOBALLIB   = libxml2.a
-MYCCOPTS    = -I. -DLIBICONV_PLUG -DLIBXML_STATIC
+GLOBALLIB   = liblisa.a
 
 # Enter object files here:
-OBJECTS	    = chvalid.o dict.o encoding.o entities.o error.o globals.o hash.o list.o parser.o parserInternals.o SAX2.o threads.o tree.o uri.o valid.o xmlIO.o xmlmemory.o xmlreader.o xmlsave.o xmlstring.o xmlwriter.o
+OBJECTS	    = 
+
+ifeq ($(BUILD_WIN32),True)
+	OBJECTS += lisa_win32.o
+endif
+
+ifeq ($(BUILD_LINUX),True)
+	OBJECTS += lisa_linux.o
+endif
+
+ifeq ($(BUILD_QNX),True)
+	OBJECTS += lisa_qnx.o
+endif
 
 ## Do not change anything below this line. ##
 

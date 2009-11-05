@@ -164,6 +164,16 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			}
 
 			break;
+
+		/* Window state change events:
+		 */
+		case ConfigureNotify:
+			pos  = Point(e->xconfigure.x, e->xconfigure.y);
+			size = Size(e->xconfigure.width, e->xconfigure.height);
+
+			onEvent.Call(SM_WINDOWMETRICS, e->xconfigure.x << 16 | e->xconfigure.y, e->xconfigure.width << 16 | e->xconfigure.height);
+
+			break;
 	}
 
 	return Success();
@@ -192,7 +202,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	else
 	{
 		attributes.save_under		= False;
-		attributes.override_redirect	= True;
+		attributes.override_redirect	= False;
 	}
 
 	attributes.event_mask		 = 0;
@@ -285,6 +295,8 @@ S::Int S::GUI::WindowXLib::Hide()
 
 S::Int S::GUI::WindowXLib::SetMetrics(const Point &nPos, const Size &nSize)
 {
+	if (nPos == pos && nSize == size) return Success();
+
 	XMoveResizeWindow(display, wnd, nPos.x, nPos.y, nSize.cx, nSize.cy);
 	XFlush(display);
 

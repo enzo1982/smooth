@@ -65,7 +65,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 				if (subtype == OR_HORZ)	frame.right = frame.left   + (Int) ((GetWidth() - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
 				else			frame.top   = frame.bottom - (Int) ((GetHeight() - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
 
-				gradient.BlitToSurface(Rect(Point(0, 0), Size(frame.right - frame.left, frame.bottom - frame.top)), surface, frame);
+				gradient.BlitToSurface(Rect(Point(0 + (IsRightToLeft() ? frame.right - frame.left : 0), 0), Size((frame.right - frame.left) * (IsRightToLeft() ? -1 : 1), frame.bottom - frame.top)), surface, frame);
 			}
 
 			if (subtype == OR_HORZ)

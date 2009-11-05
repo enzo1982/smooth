@@ -1095,7 +1095,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		while (inBytesLeft)
 		{
-			if (iconv(cd, inPointer, &inBytesLeft, outPointer, &outBytesLeft) == (size_t) -1) break;
+			if (iconv(cd, const_cast<char **>(inPointer), &inBytesLeft, outPointer, &outBytesLeft) == (size_t) -1) break;
 		}
 
 		iconv_close(cd);

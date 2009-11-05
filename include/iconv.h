@@ -16,7 +16,7 @@ extern "C"
 
 	extern int	 use_iconv;
 
-	extern size_t	 (*iconv)(iconv_t, const char **, size_t *, char **, size_t *);
+	extern size_t	 (*iconv)(iconv_t, char **, size_t *, char **, size_t *);
 	extern iconv_t	 (*iconv_open)(const char *, const char *);
 	extern int	 (*iconv_close)(iconv_t);
 

@@ -67,7 +67,7 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 #ifdef __WIN32__
 	frameWidth = GetSystemMetrics(SM_CXFRAME);
 #else
-	frameWidth = 4;
+	frameWidth = 0;
 #endif
 
 	updateRect = Rect(Point(-1, -1), Size(0, 0));
@@ -106,7 +106,7 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	if (created && visible) backend->SetMetrics(nPos, nSize);
 
-	Bool	 resized	= (GetWidth() != nSize.cx || GetHeight() != nSize.cy);
+	Bool	 resized	= (GetSize() != nSize);
 	Bool	 prevVisible	= visible;
 
 	visible = False;
@@ -530,14 +530,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			GetColors();
 
 			break;
-		case WM_WINDOWPOSCHANGED:
-			{
-				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
-
-				Window::SetMetrics(Point(wndpos->x, wndpos->y), Size(wndpos->cx, wndpos->cy));
-			}
-
-			break;
 		case WM_ACTIVATE:
 			if (LOWORD(wParam) != WA_INACTIVE && !(flags & WF_SYSTEMMODAL))
 			{
@@ -676,6 +668,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 #endif
+		case SM_WINDOWMETRICS:
+			Window::SetMetrics(Point(wParam >> 16, wParam & 65535), Size(lParam >> 16, lParam & 65535));
+
+			break;
 		case SM_PAINT:
 			updateRect = backend->GetUpdateRect();
 

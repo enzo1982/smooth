@@ -25,6 +25,7 @@ xx.xx.09 xx:xx - smooth alpha 0.8.71.0
 - added support for path names exceeding MAX_PATH
 - fixed implementation of callback signals
 - fixed implementation of Array<>
+- fixed file IO problems on Windows 9x with Unicows
 - updated Translator to support template files
 - added Vietnamese language support
 - improved Linux support

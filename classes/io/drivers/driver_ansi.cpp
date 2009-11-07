@@ -20,27 +20,54 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 {
 	closeStream = false;
 
+	static Bool	 enableUnicode		  = Setup::enableUnicode;
+	static Bool	 enableUnicodeInitialized = False;
+
+#ifdef __WIN32__
+	/* Disable Unicode functions on Windows 9x even if we
+	 * have Unicows as it does not work correctly there.
+	 */
+	if (!enableUnicodeInitialized)
+	{
+		OSVERSIONINFOA	 vInfo;
+
+		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+		GetVersionExA(&vInfo);
+
+		if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) enableUnicode = False;
+
+		enableUnicodeInitialized = True;
+	}
+#endif
+
 	switch (mode)
 	{
 		default:
 			lastError = IO_ERROR_BADPARAM;
+
 			return;
 		case 0:				// open a file for appending data
-			if (Setup::enableUnicode)	stream = _wfopen(fileName, String("r+b"));
-			else				stream = fopen(fileName, "r+b");
+			if (enableUnicode)	stream = _wfopen(fileName, String("r+b"));
+			else			stream = fopen(fileName, "r+b");
+
 			Seek(GetSize());
+
 			break;
 		case 1:				// create or overwrite a file
-			if (Setup::enableUnicode)	stream = _wfopen(fileName, String("w+b"));
-			else				stream = fopen(fileName, "w+b");
+			if (enableUnicode)	stream = _wfopen(fileName, String("w+b"));
+			else			stream = fopen(fileName, "w+b");
+
 			break;
 		case 2:				// open a file for reading data
-			if (Setup::enableUnicode)	stream = _wfopen(fileName, String("r+b"));
-			else				stream = fopen(fileName, "r+b");
+			if (enableUnicode)	stream = _wfopen(fileName, String("r+b"));
+			else			stream = fopen(fileName, "r+b");
+
 			break;
 		case 3:				// open a file in read only mode
-			if (Setup::enableUnicode)	stream = _wfopen(fileName, String("rb"));
-			else				stream = fopen(fileName, "rb");
+			if (enableUnicode)	stream = _wfopen(fileName, String("rb"));
+			else			stream = fopen(fileName, "rb");
+
 			break;
 	}
 

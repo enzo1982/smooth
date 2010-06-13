@@ -10,10 +10,13 @@
 
 #include <smooth/i18n/translator.h>
 #include <smooth/i18n/language.h>
+
 #include <smooth/i18n/locales/smooth_de.h>
 #include <smooth/i18n/locales/smooth_it.h>
 #include <smooth/i18n/locales/smooth_sr.h>
 #include <smooth/i18n/locales/smooth_vi.h>
+#include <smooth/i18n/locales/smooth_zh_CN.h>
+
 #include <smooth/files/directory.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
@@ -139,24 +142,26 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 	}
 	else
 	{
-		for (Int i = 0; i < 4; i++)
+		for (Int i = 0; i < 5; i++)
 		{
 			const char	*xml = NIL;
 
-			if (i == 0) xml = smooth_de;
-			if (i == 1) xml = smooth_it;
-			if (i == 2) xml = smooth_sr;
-			if (i == 3) xml = smooth_vi;
+			if	(i == 0) xml = smooth_de;
+			else if (i == 1) xml = smooth_it;
+			else if (i == 2) xml = smooth_sr;
+			else if (i == 3) xml = smooth_vi;
+			else if (i == 4) xml = smooth_zh_CN;
 
 			doc = new XML::Document();
 			language = new Language();
 
 			doc->ParseMemory((void *) xml, strlen(xml));
 
-			if (i == 0) language->magic = "smooth_de";
-			if (i == 1) language->magic = "smooth_it";
-			if (i == 2) language->magic = "smooth_sr";
-			if (i == 3) language->magic = "smooth_vi";
+			if	(i == 0) language->magic = "smooth_de";
+			else if (i == 1) language->magic = "smooth_it";
+			else if (i == 2) language->magic = "smooth_sr";
+			else if (i == 3) language->magic = "smooth_vi";
+			else if (i == 4) language->magic = "smooth_zh_CN";
 
 			LoadDoc(doc, language);
 

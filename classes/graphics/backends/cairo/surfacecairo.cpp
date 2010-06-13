@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -73,31 +73,24 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 		rightToLeft.SetSurfaceSize(size);
 
 #ifdef __WIN32__
-		HDC	 bmp_dc = CreateCompatibleDC(gdi_dc);
+		paintContext = CreateCompatibleDC(gdi_dc);
+
 		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
 
-		paint_contexts.Add(bmp_dc);
-		paint_bitmaps.Add((HBITMAP) SelectObject(bmp_dc, bitmap));
-		paint_rects.Add(new Rect(Point(0, 0), size));
+		paintBitmap	  = (HBITMAP) SelectObject(paintContext, bitmap);
+		paintSurfaceCairo = cairo_win32_surface_create(paintContext);
 
 		ReleaseDC(window, gdi_dc);
-
-		cairo_surface_t	*surface = cairo_win32_surface_create(bmp_dc);
 #else
-		Pixmap	 pixmap = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
-
-		paint_bitmaps.Add(pixmap);
-		paint_rects.Add(new Rect(Point(0, 0), size));
-
-		cairo_surface_t	*surface = cairo_xlib_surface_create(display, pixmap, visual, size.cx, size.cy);
+		paintBitmap	  = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
+		paintSurfaceCairo = cairo_xlib_surface_create(display, paintBitmap, visual, size.cx, size.cy);
 #endif
 
-		cairo_t		*context = cairo_create(surface);
-	
-		cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
+		paintRects.Add(new Rect(Point(0, 0), size));
 
-		cairo_surfaces.Add(surface);
-		cairo_contexts.Add(context);
+		paintContextCairo = cairo_create(paintSurfaceCairo);
+	
+		cairo_set_antialias(paintContextCairo, CAIRO_ANTIALIAS_NONE);
 
 		allocSize = size;
 	}
@@ -107,19 +100,19 @@ S::GUI::SurfaceCairo::~SurfaceCairo()
 {
 	if (window != NIL)
 	{
-		cairo_destroy(cairo_contexts.GetFirst());
-		cairo_surface_destroy(cairo_surfaces.GetFirst());
+		cairo_destroy(paintContextCairo);
+		cairo_surface_destroy(paintSurfaceCairo);
 
 #ifdef __WIN32__
-		HBITMAP	 bitmap = (HBITMAP) SelectObject(paint_contexts.GetFirst(), paint_bitmaps.GetFirst());
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(paintContext, paintBitmap);
 
-		DeleteDC(paint_contexts.GetFirst());
+		DeleteDC(paintContext);
 		::DeleteObject(bitmap);
 #else
-		XFreePixmap(display, paint_bitmaps.GetFirst());
+		XFreePixmap(display, paintBitmap);
 #endif
 
-		delete paint_rects.GetFirst();
+		delete paintRects.GetFirst();
 	}
 }
 
@@ -133,48 +126,40 @@ S::Int S::GUI::SurfaceCairo::SetSize(const Size &nSize)
 
 	if (window != NIL && !painting)
 	{
+		cairo_destroy(paintContextCairo);
+		cairo_surface_destroy(paintSurfaceCairo);
+
 #ifdef __WIN32__
-		HBITMAP	 bitmap = (HBITMAP) SelectObject(paint_contexts.GetFirst(), paint_bitmaps.GetFirst());
+		HBITMAP	 bitmap = (HBITMAP) SelectObject(paintContext, paintBitmap);
 
 		::DeleteObject(bitmap);
 #else
-		cairo_destroy(cairo_contexts.GetFirst());
-		cairo_surface_destroy(cairo_surfaces.GetFirst());
-
-		cairo_surfaces.RemoveAll();
-		cairo_contexts.RemoveAll();
-
-		XFreePixmap(display, paint_bitmaps.GetFirst());
+		XFreePixmap(display, paintBitmap);
 #endif
 
-		delete paint_rects.GetFirst();
+		delete paintRects.GetFirst();
 
-		paint_bitmaps.RemoveAll();
-		paint_rects.RemoveAll();
+		paintRects.RemoveAll();
 
 #ifdef __WIN32__
 		HDC	 gdi_dc = GetWindowDC(window);
 
 		bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
 
-		paint_bitmaps.Add((HBITMAP) SelectObject(paint_contexts.GetFirst(), bitmap));
-		paint_rects.Add(new Rect(Point(0, 0), size));
+		paintBitmap	  = (HBITMAP) SelectObject(paintContext, bitmap);
+		paintSurfaceCairo = cairo_win32_surface_create(paintContext);
 
 		ReleaseDC(window, gdi_dc);
 #else
-		Pixmap	 pixmap = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
-
-		paint_bitmaps.Add(pixmap);
-		paint_rects.Add(new Rect(Point(0, 0), size));
-
-		cairo_surface_t	*surface = cairo_xlib_surface_create(display, pixmap, visual, size.cx, size.cy);
-		cairo_t		*context = cairo_create(surface);
-	
-		cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
-
-		cairo_surfaces.Add(surface);
-		cairo_contexts.Add(context);
+		paintBitmap	  = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
+		paintSurfaceCairo = cairo_xlib_surface_create(display, paintBitmap, visual, size.cx, size.cy);
 #endif
+
+		paintRects.Add(new Rect(Point(0, 0), size));
+
+		paintContextCairo = cairo_create(paintSurfaceCairo);
+
+		cairo_set_antialias(paintContextCairo, CAIRO_ANTIALIAS_NONE);
 	}
 
 	allocSize = nSize;
@@ -196,13 +181,13 @@ S::Int S::GUI::SurfaceCairo::PaintRect(const Rect &pRect)
 #ifdef __WIN32__
 		HDC	 gdi_dc = GetWindowDC(window);
 
-		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, paint_contexts.GetFirst(), pRect.left, pRect.top, SRCCOPY);
+		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, paintContext, pRect.left, pRect.top, SRCCOPY);
 
 		ReleaseDC(window, gdi_dc);
 #else
 		GC	 gc = XCreateGC(display, window, 0, NIL);
 
-		XCopyArea(display, paint_bitmaps.GetFirst(), window, gc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, pRect.left, pRect.top);
+		XCopyArea(display, paintBitmap, window, gc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, pRect.left, pRect.top);
 
 		XFreeGC(display, gc);
 #endif
@@ -216,42 +201,12 @@ S::Int S::GUI::SurfaceCairo::StartPaint(const Rect &iPRect)
 	if (window == NIL) return Success();
 
 	Rect	 pRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect));
-	Rect	 oRect = *(paint_rects.GetLast());
 
-#ifdef __WIN32__
-	HDC	 bmp_dc = CreateCompatibleDC(paint_contexts.GetFirst());
-	HBITMAP	 bitmap = CreateCompatibleBitmap(paint_contexts.GetFirst(), size.cx, size.cy);
+	cairo_save(paintContextCairo);
+	cairo_rectangle(paintContextCairo, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top);
+	cairo_clip(paintContextCairo);
 
-	paint_bitmaps.Add((HBITMAP) SelectObject(bmp_dc, bitmap));
-
-	if (pRect.left >= oRect.left && pRect.top >= oRect.top && pRect.right <= oRect.right && pRect.bottom <= oRect.bottom)	BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, paint_contexts.GetLast(), pRect.left, pRect.top, SRCCOPY);
-	else															BitBlt(bmp_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, paint_contexts.GetFirst(), pRect.left, pRect.top, SRCCOPY);
-
-	paint_contexts.Add(bmp_dc);
-	paint_rects.Add(new Rect(pRect));
-
-	cairo_surface_t	*surface = cairo_win32_surface_create(bmp_dc);
-#else
-	Pixmap	 pixmap = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
-	GC	 gc = XCreateGC(display, pixmap, 0, NIL);
-
-	if (pRect.left >= oRect.left && pRect.top >= oRect.top && pRect.right <= oRect.right && pRect.bottom <= oRect.bottom)	XCopyArea(display, paint_bitmaps.GetLast(), pixmap, gc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, pRect.left, pRect.top);
-	else															XCopyArea(display, paint_bitmaps.GetFirst(), pixmap, gc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, pRect.left, pRect.top);
-
-	XFreeGC(display, gc);
-
-	paint_bitmaps.Add(pixmap);
-	paint_rects.Add(new Rect(pRect));
-
-	cairo_surface_t	*surface = cairo_xlib_surface_create(display, pixmap, visual, size.cx, size.cy);
-#endif
-
-	cairo_t		*context = cairo_create(surface);
-	
-	cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
-
-	cairo_surfaces.Add(surface);
-	cairo_contexts.Add(context);
+	paintRects.Add(new Rect(pRect));
 
 	painting++;
 
@@ -264,41 +219,15 @@ S::Int S::GUI::SurfaceCairo::EndPaint()
 
 	painting--;
 
-	cairo_destroy(cairo_contexts.GetLast());
-	cairo_surface_destroy(cairo_surfaces.GetLast());
-
-	cairo_contexts.Remove(cairo_contexts.GetNthIndex(cairo_contexts.Length() - 1));
-	cairo_surfaces.Remove(cairo_surfaces.GetNthIndex(cairo_surfaces.Length() - 1));
-
-	Rect	 iRect = Rect::OverlapRect(*(paint_rects.GetLast()), *(paint_rects.GetNth(paint_rects.Length() - 2)));
-
-#ifdef __WIN32__
-	BitBlt(paint_contexts.GetNth(paint_contexts.Length() - 2), iRect.left, iRect.top, iRect.right - iRect.left, iRect.bottom - iRect.top, paint_contexts.GetLast(), iRect.left, iRect.top, SRCCOPY);
-#else
-	GC	 gc = XCreateGC(display, paint_bitmaps.GetNth(paint_bitmaps.Length() - 2), 0, NIL);
-
-	XCopyArea(display, paint_bitmaps.GetLast(), paint_bitmaps.GetNth(paint_bitmaps.Length() - 2), gc, iRect.left, iRect.top, iRect.right - iRect.left, iRect.bottom - iRect.top, iRect.left, iRect.top);
-
-	XFreeGC(display, gc);
-#endif
+	Rect	 iRect = Rect::OverlapRect(*(paintRects.GetLast()), *(paintRects.GetNth(paintRects.Length() - 2)));
 
 	if (painting == 0) PaintRect(iRect);
 
-#ifdef __WIN32__
-	HBITMAP	 bitmap = (HBITMAP) SelectObject(paint_contexts.GetLast(), paint_bitmaps.GetLast());
+	delete paintRects.GetLast();
 
-	DeleteDC(paint_contexts.GetLast());
-	::DeleteObject(bitmap);
+	paintRects.Remove(paintRects.GetNthIndex(paintRects.Length() - 1));
 
-	paint_contexts.Remove(paint_contexts.GetNthIndex(paint_contexts.Length() - 1));
-#else
-	XFreePixmap(display, paint_bitmaps.GetLast());
-#endif
-
-	delete paint_rects.GetLast();
-
-	paint_bitmaps.Remove(paint_bitmaps.GetNthIndex(paint_bitmaps.Length() - 1));
-	paint_rects.Remove(paint_rects.GetNthIndex(paint_rects.Length() - 1));
+	cairo_restore(paintContextCairo);
 
 	return Success();
 }
@@ -368,9 +297,9 @@ S::Int S::GUI::SurfaceCairo::SetPixel(const Point &point, const Color &color)
 		DestroyCairoContext();
 	}
 
-	cairo_set_source_rgb(cairo_contexts.GetLast(), color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-	cairo_rectangle(cairo_contexts.GetLast(), rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), 1, 1);
-	cairo_fill(cairo_contexts.GetLast());
+	cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+	cairo_rectangle(paintContextCairo, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), 1, 1);
+	cairo_fill(paintContextCairo);
 
 	return Success();
 }
@@ -414,11 +343,11 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 		DestroyCairoContext();
 	}
 
-	cairo_set_source_rgb(cairo_contexts.GetLast(), color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-	cairo_set_line_width(cairo_contexts.GetLast(), 1);
-	cairo_move_to(cairo_contexts.GetLast(), pos1.x + xAdjust, pos1.y);
-	cairo_line_to(cairo_contexts.GetLast(), pos2.x + xAdjust, pos2.y);
-	cairo_stroke(cairo_contexts.GetLast());
+	cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+	cairo_set_line_width(paintContextCairo, 1);
+	cairo_move_to(paintContextCairo, pos1.x + xAdjust, pos1.y);
+	cairo_line_to(paintContextCairo, pos2.x + xAdjust, pos2.y);
+	cairo_stroke(paintContextCairo);
 
 	return Success();
 }
@@ -432,7 +361,7 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 	CreateCairoContext();
 
 	cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-	cairo_set_source_rgb(cairo_contexts.GetLast(), color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+	cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
 
 	if (style & Rect::Filled)
 	{
@@ -447,8 +376,8 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 				cairo_fill(context);
 			}
 
-			cairo_rectangle(cairo_contexts.GetLast(), rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
-			cairo_fill(cairo_contexts.GetLast());
+			cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+			cairo_fill(paintContextCairo);
 		}
 	}
 	else if (style == Rect::Outlined)
@@ -460,9 +389,9 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 			cairo_stroke(context);
 		}
 
-		cairo_set_line_width(cairo_contexts.GetLast(), 1);
-		cairo_rectangle(cairo_contexts.GetLast(), rect.left + 0.5, rect.top + 0.5, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
-		cairo_stroke(cairo_contexts.GetLast());
+		cairo_set_line_width(paintContextCairo, 1);
+		cairo_rectangle(paintContextCairo, rect.left + 0.5, rect.top + 0.5, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
+		cairo_stroke(paintContextCairo);
 	}
 	else if (style & Rect::Inverted)
 	{
@@ -483,8 +412,8 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 					cairo_fill(context);
 				}
 
-				cairo_rectangle(cairo_contexts.GetLast(), x, y, 1, 1);
-				cairo_fill(cairo_contexts.GetLast());
+				cairo_rectangle(paintContextCairo, x, y, 1, 1);
+				cairo_fill(paintContextCairo);
 
 				dot = False;
 			}
@@ -503,8 +432,8 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 					cairo_fill(context);
 				}
 
-				cairo_rectangle(cairo_contexts.GetLast(), x, y, 1, 1);
-				cairo_fill(cairo_contexts.GetLast());
+				cairo_rectangle(paintContextCairo, x, y, 1, 1);
+				cairo_fill(paintContextCairo);
 
 				dot = False;
 			}
@@ -523,8 +452,8 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 					cairo_fill(context);
 				}
 
-				cairo_rectangle(cairo_contexts.GetLast(), x, y, 1, 1);
-				cairo_fill(cairo_contexts.GetLast());
+				cairo_rectangle(paintContextCairo, x, y, 1, 1);
+				cairo_fill(paintContextCairo);
 
 				dot = False;
 			}
@@ -543,8 +472,8 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 					cairo_fill(context);
 				}
 
-				cairo_rectangle(cairo_contexts.GetLast(), x, y, 1, 1);
-				cairo_fill(cairo_contexts.GetLast());
+				cairo_rectangle(paintContextCairo, x, y, 1, 1);
+				cairo_fill(paintContextCairo);
 
 				dot = False;
 			}
@@ -625,16 +554,16 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 			DestroyCairoContext();
 		}
 
-		cairo_select_font_face(cairo_contexts.GetLast(), font.GetName(),
+		cairo_select_font_face(paintContextCairo, font.GetName(),
 				       (font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
 				       (font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
-		cairo_set_font_size(cairo_contexts.GetLast(), font.GetSize() * fontSize.TranslateY(96) / 72.0);
+		cairo_set_font_size(paintContextCairo, font.GetSize() * fontSize.TranslateY(96) / 72.0);
 
-		cairo_set_source_rgb(cairo_contexts.GetLast(), font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
+		cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
 
-		cairo_move_to(cairo_contexts.GetLast(), rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
-		cairo_show_text(cairo_contexts.GetLast(), line.ConvertTo("UTF-8"));
+		cairo_move_to(paintContextCairo, rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
+		cairo_show_text(paintContextCairo, line.ConvertTo("UTF-8"));
 
 		rect.top += lineHeight;
 	}
@@ -687,9 +616,9 @@ S::Int S::GUI::SurfaceCairo::Gradient(const Rect &iRect, const Color &color1, co
 		DestroyCairoContext();
 	}
 
-	cairo_set_source(cairo_contexts.GetLast(), pattern);
-	cairo_rectangle(cairo_contexts.GetLast(), rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
-	cairo_fill(cairo_contexts.GetLast());
+	cairo_set_source(paintContextCairo, pattern);
+	cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+	cairo_fill(paintContextCairo);
 
 	cairo_pattern_destroy(pattern);
 
@@ -716,7 +645,7 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &s
 			BitBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
 		}
 
-		BitBlt(paint_contexts.GetLast(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
+		BitBlt(paintContext, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, SRCCOPY);
 	}
 	else
 	{
@@ -726,8 +655,8 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &s
 			StretchBlt(gdi_dc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 		}
 
-		SetStretchBltMode(cDc_contexts.GetLast(), HALFTONE);
-		StretchBlt(paint_contexts.GetLast(), destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+		SetStretchBltMode(paintContext, HALFTONE);
+		StretchBlt(paintContext, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, cdc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
 	SelectObject(cdc, backup);
@@ -744,7 +673,7 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &s
 			XCopyArea(display, (Pixmap) bitmap.GetSystemBitmap(), window, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
 		}
 
-		XCopyArea(display, (Pixmap) bitmap.GetSystemBitmap(), paint_bitmaps.GetLast(), gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+		XCopyArea(display, (Pixmap) bitmap.GetSystemBitmap(), paintBitmap, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
 	}
 	else
 	{

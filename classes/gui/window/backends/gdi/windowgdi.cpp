@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,6 +17,10 @@
 #include <smooth/init.h>
 #include <smooth/system/timer.h>
 #include <smooth/basic/input.h>
+
+#ifndef CS_DROPSHADOW
+#	define CS_DROPSHADOW 0x00020000
+#endif
 
 S::GUI::WindowBackend *CreateWindowGDI()
 {
@@ -114,13 +118,13 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 			return Break;
 		case WM_SIZE:
-			if (wParam == SIZE_MINIMIZED)
+			if (!minimized && wParam == SIZE_MINIMIZED)
 			{
 				minimized = True;
 
 				onMinimize.Emit();
 			}
-			else if (wParam == SIZE_RESTORED)
+			else if (minimized && wParam == SIZE_RESTORED)
 			{
 				minimized = False;
 
@@ -131,12 +135,9 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		case WM_SETTINGCHANGE:
 			if ((wParam == SPI_SETWORKAREA) && maximized)
 			{
-				RECT	 rect;
+				Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
 
-				if (Setup::enableUnicode) SystemParametersInfoW(SPI_GETWORKAREA, 0, &rect, 0);
-				else			  SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
-
-				SetMetrics(Point(rect.left - 2, rect.top - 2), Size(rect.right - rect.left + 4, rect.bottom - rect.top + 4));
+				SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.right - workArea.left + (2 * frameSize.cx - 4), workArea.bottom - workArea.top + (2 * frameSize.cy - 4)));
 			}
 
 			return Break;
@@ -242,7 +243,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			{
 				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
 
-				onEvent.Call(SM_WINDOWMETRICS, (wndpos->x << 16) | wndpos->y, (wndpos->cx << 16) | wndpos->cy);
+				onEvent.Call(SM_WINDOWMETRICS, ((wndpos->x + 32768) << 16) | (wndpos->y + 32768), ((wndpos->cx + 32768) << 16) | (wndpos->cy + 32768));
 			}
 
 			return Success();
@@ -282,12 +283,29 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		wndclassw->cbSize	 = sizeof(WNDCLASSEXW);
 		wndclassw->style	 = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+
+		/* Enable shadows for tool windows.
+		 */
+		if ((flags & WF_NOTASKBUTTON) && (flags & WF_TOPMOST) && (flags & WF_THINBORDER)) 
+		{
+			OSVERSIONINFOA	 vInfo;
+
+			vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+			GetVersionExA(&vInfo);
+
+			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && (vInfo.dwMajorVersion >= 6 || (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)))
+			{
+				wndclassw->style = wndclassw->style | CS_DROPSHADOW;
+			}
+		}
+
 		wndclassw->lpfnWndProc	 = WindowProc;
 		wndclassw->cbClsExtra	 = 0;
 		wndclassw->cbWndExtra	 = 0;
 		wndclassw->hInstance	 = hDllInstance;
 		wndclassw->hIcon	 = sysIcon;
-		wndclassw->hCursor	 = (HCURSOR) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+		wndclassw->hCursor	 = LoadCursorW(NIL, MAKEINTRESOURCEW(32512));
 		wndclassw->hbrBackground = NIL;
 		wndclassw->lpszMenuName	 = NIL;
 		wndclassw->lpszClassName = className;
@@ -305,12 +323,29 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		wndclassa->cbSize	 = sizeof(WNDCLASSEXA);
 		wndclassa->style	 = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+
+		/* Enable shadows for tool windows.
+		 */
+		if ((flags & WF_NOTASKBUTTON) && (flags & WF_TOPMOST) && (flags & WF_THINBORDER)) 
+		{
+			OSVERSIONINFOA	 vInfo;
+
+			vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+			GetVersionExA(&vInfo);
+
+			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && (vInfo.dwMajorVersion >= 6 || (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)))
+			{
+				wndclassa->style = wndclassa->style | CS_DROPSHADOW;
+			}
+		}
+
 		wndclassa->lpfnWndProc	 = WindowProc;
 		wndclassa->cbClsExtra	 = 0;
 		wndclassa->cbWndExtra	 = 0;
 		wndclassa->hInstance	 = hDllInstance;
 		wndclassa->hIcon	 = sysIcon;
-		wndclassa->hCursor	 = (HCURSOR) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+		wndclassa->hCursor	 = LoadCursorA(NIL, MAKEINTRESOURCEA(32512));
 		wndclassa->hbrBackground = NIL;
 		wndclassa->lpszMenuName	 = NIL;
 		wndclassa->lpszClassName = className;
@@ -346,7 +381,7 @@ S::Int S::GUI::WindowGDI::Close()
 	drawSurface = nullSurface;
 
 	DestroyWindow(hwnd);
-
+	
 	if (Setup::enableUnicode)
 	{
 		UnregisterClassW(className, hDllInstance);
@@ -367,8 +402,16 @@ S::Int S::GUI::WindowGDI::Close()
 
 S::Int S::GUI::WindowGDI::RequestClose()
 {
-	if (Setup::enableUnicode) SendMessageW(hwnd, WM_CLOSE, 0, 0);
-	else			  SendMessageA(hwnd, WM_CLOSE, 0, 0);
+	if (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId())
+	{
+		if (Setup::enableUnicode) PostMessageW(hwnd, WM_CLOSE, 0, 0);
+		else			  PostMessageA(hwnd, WM_CLOSE, 0, 0);
+	}
+	else
+	{
+		if (Setup::enableUnicode) SendMessageW(hwnd, WM_CLOSE, 0, 0);
+		else			  SendMessageA(hwnd, WM_CLOSE, 0, 0);
+	}
 
 	return Success();
 }
@@ -480,7 +523,7 @@ S::Int S::GUI::WindowGDI::Maximize()
 		nonMaxRect = rect;
 	}
 
-	SetMetrics(Point(workArea.left - 2, workArea.top - 2), Size(workArea.right - workArea.left + 4, workArea.bottom - workArea.top + 4));
+	SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.right - workArea.left + (2 * frameSize.cx - 4), workArea.bottom - workArea.top + (2 * frameSize.cy - 4)));
 
 	if (Setup::enableUnicode) origWndStyle = GetWindowLongW(hwnd, GWL_STYLE);
 	else			  origWndStyle = GetWindowLongA(hwnd, GWL_STYLE);

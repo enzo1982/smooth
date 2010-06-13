@@ -61,20 +61,29 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	Surface	*surface	= GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), GetSize());
 
-	Point	 lineStart;
-	Point	 lineEnd;
-
-	Int	 lightColor;
-
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
+			{
+				Font	 nFont = font;
+
+				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+
+				surface->SetText(text,  frame + Point(17, 2), nFont);
+			}
+
+			/* Fall through to SP_UPDATE here.
+			 */
+
+		case SP_UPDATE:
+			Int	 lightColor;
+
 			if (IsActive())	lightColor = Setup::ClientColor;
 			else		lightColor = Setup::BackgroundColor;
 
-			lineStart	= GetRealPosition() + Point(6 + (IsRightToLeft() ? 1 : 0), 3);
-			lineEnd		= lineStart + Point(5, 0);
+			Point	 lineStart	= GetRealPosition() + Point(6 + (IsRightToLeft() ? 1 : 0), 3);
+			Point	 lineEnd	= lineStart + Point(5, 0);
 
 			surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
@@ -159,12 +168,6 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 				}
 			}
 
-			Font	 nFont = font;
-
-			if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
-
-			surface->SetText(text,  frame + Point(17, 2), nFont);
-
 			break;
 	}
 
@@ -182,5 +185,5 @@ S::Void S::GUI::OptionBox::InternalCheckValues()
 {
 	state = (*variable == code ? True : False);
 
-	Paint(SP_PAINT);
+	Paint(SP_UPDATE);
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -67,6 +67,8 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 
 	dirName.Replace("/",  Directory::GetDirectoryDelimiter());
 	dirName.Replace("\\", Directory::GetDirectoryDelimiter());
+
+	if (dirPath.EndsWith(Directory::GetDirectoryDelimiter())) dirPath[dirPath.Length() - 1] = 0;
 }
 
 S::Directory::Directory(const Directory &iDirectory)
@@ -94,7 +96,7 @@ S::Directory &S::Directory::operator =(const Directory &nDirectory)
 
 S::Directory::operator S::String() const
 {
-	return String(dirPath).Append(dirName == NIL ? String() : String(dirDelimiter).Append(dirName));
+	return String(dirPath).Append(dirName == NIL ? String() : String(Directory::GetDirectoryDelimiter()).Append(dirName));
 }
 
 const S::String &S::Directory::GetDirectoryName() const
@@ -433,9 +435,10 @@ S::Directory S::Directory::GetActiveDirectory()
 #else
 	char	*buffer = new char [MAX_PATH];
 
-	getcwd(buffer, MAX_PATH);
-
-	dir = buffer;
+	if (getcwd(buffer, MAX_PATH) != NIL)
+	{
+		dir = buffer;
+	}
 
 	delete [] buffer;
 #endif

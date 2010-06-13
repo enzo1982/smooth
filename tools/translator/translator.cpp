@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -150,7 +150,7 @@ Translator::~Translator()
 
 String Translator::GetShortFileName(const String &fileName)
 {
-	return fileName.Tail(fileName.Length() - fileName.FindLast("\\") - 1);
+	return fileName.Tail(fileName.Length() - fileName.FindLast(Directory::GetDirectoryDelimiter()) - 1);
 }
 
 Bool Translator::ExitProc()
@@ -408,7 +408,7 @@ Void Translator::OpenFileName(const String &openFile)
 		{
 			templateName = info->GetNthNode(k)->GetContent();
 
-			if (OpenTemplate(String(File(fileName).GetFilePath()).Append("\\").Append(templateName)) != Success())
+			if (OpenTemplate(String(File(fileName).GetFilePath()).Append(Directory::GetDirectoryDelimiter()).Append(templateName)) != Success())
 			{
 				templateName = NIL;
 			}

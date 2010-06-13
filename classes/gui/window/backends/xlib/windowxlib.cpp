@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -171,7 +171,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			pos  = Point(e->xconfigure.x, e->xconfigure.y);
 			size = Size(e->xconfigure.width, e->xconfigure.height);
 
-			onEvent.Call(SM_WINDOWMETRICS, e->xconfigure.x << 16 | e->xconfigure.y, e->xconfigure.width << 16 | e->xconfigure.height);
+			onEvent.Call(SM_WINDOWMETRICS, ((e->xconfigure.x + 32768) << 16) | (e->xconfigure.y + 32768), ((e->xconfigure.width + 32768) << 16) | (e->xconfigure.height + 32768));
 
 			break;
 	}
@@ -184,7 +184,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	XSetWindowAttributes	 attributes;
 
 	attributes.background_pixmap	= None;
-	attributes.background_pixel	= BlackPixel(display, 0);
+	attributes.background_pixel	= None;
 	attributes.border_pixmap	= None;
 	attributes.border_pixel		= BlackPixel(display, 0);
 
@@ -210,7 +210,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	attributes.colormap		 = CopyFromParent;
 	attributes.cursor		 = None;
 
-	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx, size.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBackPixel | CWBorderPixel | CWOverrideRedirect, &attributes);
+	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx, size.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBorderPixel | CWOverrideRedirect, &attributes);
 
 	if (wnd != NIL)
 	{

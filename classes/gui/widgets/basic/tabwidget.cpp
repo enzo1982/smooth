@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,8 +18,12 @@ S::GUI::TabWidget::TabWidget(const Point &iPos, const Size &iSize) : Widget(iPos
 {
 	type	= classID;
 
-	if (GetWidth() == 0) SetWidth(120);
-	if (GetHeight() == 0) SetHeight(100);
+	if (GetWidth()	== 0) SetWidth(120);
+	if (GetHeight()	== 0) SetHeight(100);
+
+	selectedTab = NIL;
+
+	onSelectTab.SetParentObject(this);
 
 	onChangeSize.Connect(&TabWidget::OnChangeSize, this);
 }
@@ -135,7 +139,7 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 				frame.left = frame.right + 1;
 				frame.right = frame.left + font.GetTextSizeX(widget->GetText()) + 12;
 
-				if (!widget->IsVisible() && window->IsMouseOn(frame)) { SelectTab(widget->GetHandle()); break; }
+				if (!widget->IsVisible() && window->IsMouseOn(frame)) { SelectTab(widget); break; }
 			}
 
 			break;
@@ -144,20 +148,44 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	return Widget::Process(message, wParam, lParam);
 }
 
-S::Int S::GUI::TabWidget::SelectTab(Int tabID)
+S::Int S::GUI::TabWidget::SelectTab(const Widget *tabWidget)
 {
-	Surface	*surface = GetDrawSurface();
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*widget = GetNthObject(i);
 
-	surface->StartPaint(GetVisibleArea());
+		if (widget != tabWidget) continue;
 
-	for (Int i = 0; i < GetNOfObjects(); i++) if (GetNthObject(i)->GetHandle() != tabID) GetNthObject(i)->Hide();
-	for (Int j = 0; j < GetNOfObjects(); j++) if (GetNthObject(j)->GetHandle() == tabID) GetNthObject(j)->Show();
+		Surface	*surface = GetDrawSurface();
 
-	Paint(SP_PAINT);
+		surface->StartPaint(GetVisibleArea());
 
-	surface->EndPaint();
+		for (Int j = 0; j < GetNOfObjects(); j++)
+		{
+			if (j == i) continue;
 
-	return Success();
+			GetNthObject(j)->Hide();
+		}
+
+		widget->Show();
+
+		Paint(SP_PAINT);
+
+		surface->EndPaint();
+
+		selectedTab = widget;
+
+		onSelectTab.Emit(widget);
+
+		return Success();
+	}
+	
+	return Error();
+}
+
+const S::GUI::Widget *S::GUI::TabWidget::GetSelectedTab()
+{
+	return selectedTab;
 }
 
 S::Void S::GUI::TabWidget::OnChangeSize(const Size &nSize)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -58,6 +58,8 @@ S::File::File(const String &iFileName, const String &iFilePath)
 
 	fileName.Replace("/",  Directory::GetDirectoryDelimiter());
 	fileName.Replace("\\", Directory::GetDirectoryDelimiter());
+	
+	if (filePath.EndsWith(Directory::GetDirectoryDelimiter())) filePath[filePath.Length() - 1] = 0;
 }
 
 S::File::File(const File &iFile)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -414,11 +414,11 @@ S::Bool S::GUI::Window::Create()
 			SetPosition(Point(monitorRect.left, monitorRect.top) + GetPosition());
 		}
 
+		if (flags & WF_NORESIZE) frameWidth = 4;
+
 		if (backend->Open(text, GetPosition(), GetSize(), flags) == Success())
 		{
 			visible = False;
-
-			if (flags & WF_NORESIZE) frameWidth = 4;
 
 			return True;
 		}
@@ -554,7 +554,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (window != NIL)
 				{
-					if (window->GetObjectType() == ToolWindow::classID && window->GetOrder() >= GetOrder()) break;
+					if (window->GetObjectType() == ToolWindow::classID && window->GetOrder() >= GetOrder())
+					{
+						PostMessage((HWND) backend->GetSystemWindow(), WM_NCACTIVATE, True, 0);
+						
+						break;
+					}
 				}
 
 				focussed = False;
@@ -579,7 +584,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (window != NIL)
 				{
-					if (window->GetObjectType() == ToolWindow::classID && window->GetOrder() >= GetOrder()) break;
+					if (window->GetObjectType() == ToolWindow::classID && window->GetOrder() >= GetOrder())
+					{
+						PostMessage((HWND) backend->GetSystemWindow(), WM_NCACTIVATE, True, 0);
+						
+						break;
+					}
 				}
 
 				focussed = False;
@@ -669,7 +679,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			break;
 #endif
 		case SM_WINDOWMETRICS:
-			Window::SetMetrics(Point(wParam >> 16, wParam & 65535), Size(lParam >> 16, lParam & 65535));
+			Window::SetMetrics(Point((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768), Size((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768));
 
 			break;
 		case SM_PAINT:
@@ -962,21 +972,20 @@ S::Bool S::GUI::Window::IsMouseOn(const Rect &rect) const
 
 	if (surface->GetSystemSurface() == NIL) return False;
 
-#ifdef __WIN32__
-	Point	 position = Input::GetMousePosition();
-	HWND	 window = (HWND) surface->GetSystemSurface();
-	HDC	 dc = GetWindowDC(window);
-	Bool	 pointVisible = PtVisible(dc, position.x - GetX(), position.y - GetY());
-
-	ReleaseDC(window, dc);
-
-	if (!pointVisible) return False;
-#endif
-
 	Point	 mousePos = GetMousePosition();
 
-	if ((mousePos.x >= rect.left) && (mousePos.x < rect.right) && (mousePos.y >= rect.top) && (mousePos.y < rect.bottom))	return True;
-	else															return False;
+	if ((mousePos.x >= rect.left) && (mousePos.x < rect.right) && (mousePos.y >= rect.top) && (mousePos.y < rect.bottom))
+	{
+#ifdef __WIN32__
+		Point	 position = Input::GetMousePosition();
+		HWND	 window = (HWND) surface->GetSystemSurface();
+
+		if (WindowFromPoint(position) != window) return False;
+#endif
+		return True;
+	}
+
+	return False;
 }
 
 S::GUI::Surface *S::GUI::Window::GetDrawSurface() const

@@ -60,45 +60,14 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
+	Surface	*surface = GetDrawSurface();
+	Rect	 frame	 = Rect(GetRealPosition() + Point(3, 3), Size(11, 11));
+
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition() + Point(3, 3), Size(11, 11));
-
-				if (IsActive())	surface->Box(frame, Setup::ClientColor, Rect::Filled);
-				else		surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
-
-				surface->Frame(frame, FRAME_DOWN);
-
-				if (*variable == True)
-				{
-					Point p1 = Point(frame.left + 3 - (IsRightToLeft() ? 1 : 0), frame.top + 3);
-					Point p2 = Point(frame.left + 10 - (IsRightToLeft() ? 1 : 0), frame.bottom - 1);
-
-					for (Int i = 0; i < 2; i++)
-					{
-						Int	 color = IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
-
-						if (i == 1)
-						{
-							color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
-
-							p1 -= Point((IsRightToLeft() ? -i : i), i);
-							p2 -= Point((IsRightToLeft() ? -i : i), i);
-						}
-
-						surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), color);
-						surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), color);
-						surface->Line(p1 + Point(0, 1), p2 + Point(-1, 0), color);
-						surface->Line(p1 + Point(6, 0), p2 + Point(-8, 0), color);
-						surface->Line(p1 + Point(6, 1), p2 + Point(-7, 0), color);
-						surface->Line(p1 + Point(5, 0), p2 + Point(-8, -1), color);
-					}
-				}
-
 				Rect	 textRect;
 
 				textRect.left	= frame.right + 3;
@@ -111,6 +80,41 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
 				surface->SetText(text, textRect, nFont);
+			}
+
+			/* Fall through to SP_UPDATE here.
+			 */
+
+		case SP_UPDATE:
+			if (IsActive())	surface->Box(frame, Setup::ClientColor, Rect::Filled);
+			else		surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
+
+			surface->Frame(frame, FRAME_DOWN);
+
+			if (*variable == True)
+			{
+				Point p1 = Point(frame.left + 3 - (IsRightToLeft() ? 1 : 0), frame.top + 3);
+				Point p2 = Point(frame.left + 10 - (IsRightToLeft() ? 1 : 0), frame.bottom - 1);
+
+				for (Int i = 0; i < 2; i++)
+				{
+					Int	 color = IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
+
+					if (i == 1)
+					{
+						color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
+
+						p1 -= Point((IsRightToLeft() ? -i : i), i);
+						p2 -= Point((IsRightToLeft() ? -i : i), i);
+					}
+
+					surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), color);
+					surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), color);
+					surface->Line(p1 + Point(0, 1), p2 + Point(-1, 0), color);
+					surface->Line(p1 + Point(6, 0), p2 + Point(-8, 0), color);
+					surface->Line(p1 + Point(6, 1), p2 + Point(-7, 0), color);
+					surface->Line(p1 + Point(5, 0), p2 + Point(-8, -1), color);
+				}
 			}
 
 			break;
@@ -147,6 +151,6 @@ S::Void S::GUI::CheckBox::InternalCheckValues()
 	{
 		state = *variable;
 
-		Paint(SP_PAINT);
+		Paint(SP_UPDATE);
 	}
 }

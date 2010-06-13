@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.xx.09 xx:xx - smooth alpha 0.8.71.0
+xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 
 - window.cpp	- renamed doQuit to doClose
 		- removed onPeek
@@ -20,6 +20,9 @@ xx.xx.09 xx:xx - smooth alpha 0.8.71.0
 - sha1.cpp	- new class: SHA1, implements the SHA-1 hash algorithm
 - cursor.cpp	- fixed support for right-to-left scripts
 - cpu.cpp	- added CPUID support
+- fontcairo.cpp	- fixed a ressource leak
+- sur...gdi.cpp	- now using clipping instead of buffering to speed up drawing
+- sur...iro.cpp	- now using clipping instead of buffering to speed up drawing
 
 - removed TreeView widget (use ListBox instead)
 - added support for path names exceeding MAX_PATH
@@ -27,9 +30,9 @@ xx.xx.09 xx:xx - smooth alpha 0.8.71.0
 - fixed implementation of Array<>
 - fixed file IO problems on Windows 9x with Unicows
 - updated Translator to support template files
-- added Vietnamese language support
+- added Vietnamese and Chinese (simplified) language support
 - improved Linux support
 - upgraded libbz2 to version 1.0.5
 - upgraded fribidi2 to version 0.19.2
 - upgraded libiconv to version 1.13.1
-- upgraded libxml2 to version 2.7.3
+- upgraded libxml2 to version 2.7.6

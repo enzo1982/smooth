@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -70,6 +70,15 @@ S::Void S::Init()
 
 	System::MultiMonitor::Initialize();
 
+	Int	 codePage = 1252;
+
+#if defined __WIN32__
+	codePage = GetACP();
+#endif
+
+	String::SetInputFormat(String("CP").Append(String::FromInt(codePage)));
+	String::SetOutputFormat(String("CP").Append(String::FromInt(codePage)));
+
 #if defined __WIN32__
 	if (hDllInstance == NIL) hDllInstance = hInstance;
 
@@ -110,8 +119,6 @@ S::Void S::Init()
 	I18n::Translator::defaultTranslator = new I18n::Translator("smooth", True);
 	I18n::Translator::defaultTranslator->SetInternalLanguageInfo("English", "Robert Kausch", "http://www.smooth-project.org/", False);
 
-	Int	 codePage = 1252;
-
 #if defined __WIN32__
 	switch (PRIMARYLANGID(GetUserDefaultLangID()))
 	{
@@ -132,14 +139,9 @@ S::Void S::Init()
 			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_vi");
 			break;
 	}
-
-	codePage = GetACP();
 #endif
 
 	Setup::rightToLeft = I18n::Translator::defaultTranslator->IsActiveLanguageRightToLeft();
-
-	String::SetInputFormat(String("CP").Append(String::FromInt(codePage)));
-	String::SetOutputFormat(String("CP").Append(String::FromInt(codePage)));
 }
 
 S::Void S::Free()

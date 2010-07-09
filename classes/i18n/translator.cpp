@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,22 +11,15 @@
 #include <smooth/i18n/translator.h>
 #include <smooth/i18n/language.h>
 
-#include <smooth/i18n/locales/smooth_de.h>
-#include <smooth/i18n/locales/smooth_it.h>
-#include <smooth/i18n/locales/smooth_sr.h>
-#include <smooth/i18n/locales/smooth_vi.h>
-#include <smooth/i18n/locales/smooth_zh_CN.h>
-
 #include <smooth/files/directory.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 
 S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
 
-S::I18n::Translator::Translator(const String &iAppPrefix, Bool iInternal)
+S::I18n::Translator::Translator(const String &iAppPrefix)
 {
-	internal = iInternal;
-	appPrefix = iAppPrefix;
+	appPrefix = iAppPrefix.ToLower();
 
 	GetSupportedLanguages();
 
@@ -102,13 +95,67 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 	return Success();
 }
 
+S::Int S::I18n::Translator::SelectUserDefaultLanguage()
+{
+	String	 code;
+
+#if defined __WIN32__
+
+#  ifndef SUBLANG_CROATIAN_CROATIA
+#    define SUBLANG_CROATIAN_CROATIA 0x01
+#  endif
+
+	switch (PRIMARYLANGID(GetUserDefaultLangID()))
+	{
+		case LANG_ENGLISH:	code = "en";	break;
+		case LANG_ARABIC:	code = "ar";	break;
+		case LANG_CATALAN:	code = "ca";	break;
+		case LANG_CHINESE:	code = "zh_CN";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_CHINESE_SIMPLIFIED)	code = "zh_CN";
+							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_CHINESE_TRADITIONAL)	code = "zh_TW";
+							break;
+		case LANG_CZECH:	code = "cs";	break;
+		case LANG_DANISH:	code = "da";	break;
+		case LANG_DUTCH:	code = "nl";	break;
+		case LANG_ESTONIAN:	code = "et";	break;
+		case LANG_FINNISH:	code = "fi";	break;
+		case LANG_FRENCH:	code = "fr";	break;
+		case LANG_GALICIAN:	code = "gl";	break;
+		case LANG_GERMAN:	code = "de";	break;
+		case LANG_GREEK:	code = "el";	break;
+		case LANG_HEBREW:	code = "he";	break;
+		case LANG_HUNGARIAN:	code = "hu";	break;
+		case LANG_ITALIAN:	code = "it";	break;
+		case LANG_JAPANESE:	code = "ja";	break;
+		case LANG_KOREAN:	code = "ko";	break;
+		case LANG_LITHUANIAN:	code = "lt";	break;
+		case LANG_NORWEGIAN:	code = "no";	break;
+		case LANG_POLISH:	code = "pl";	break;
+		case LANG_PORTUGUESE:	code = "pt";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_PORTUGUESE)		code = "pt";
+							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_PORTUGUESE_BRAZILIAN)	code = "pt_BR";
+							break;
+		case LANG_ROMANIAN:	code = "ro";	break;
+		case LANG_RUSSIAN:	code = "ru";	break;
+		case LANG_SERBIAN:	code = "sr";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_CROATIAN_CROATIA)		code = "hr";
+							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SERBIAN_LATIN)		code = "sr";
+							break;
+		case LANG_SLOVAK:	code = "sk";	break;
+		case LANG_SPANISH:	code = "es";	break;
+		case LANG_SWEDISH:	code = "sv";	break;
+		case LANG_TURKISH:	code = "tr";	break;
+		case LANG_UKRAINIAN:	code = "uk";	break;
+		case LANG_VIETNAMESE:	code = "vi";	break;
+	}
+#endif
+
+	if (ActivateLanguage(String(appPrefix).Append("_").Append(code).Append(".xml")) == Error()) ActivateLanguage("internal");
+
+	return Success();
+}
+
 S::Int S::I18n::Translator::GetSupportedLanguages()
 {
-	XML::Document	*doc = NIL;
-	Language	*language = NIL;
-
 	{
-		language = new Language();
+		Language	*language = new Language();
 
 		language->name = "Default language";
 		language->encoding = "UTF-8";
@@ -120,53 +167,23 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 		languages.Add(language);
 	}
 
-	if (!internal)
+	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
+	const Array<File>	&files = dir.GetFilesByPattern(String(appPrefix).Append("_*.xml"));
+
+	for (Int i = 0; i < files.Length(); i++)
 	{
-		Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
-		const Array<File>	&files = dir.GetFilesByPattern(String(appPrefix).ToLower().Append("_*.xml"));
+		XML::Document	*doc = new XML::Document();
 
-		for (Int i = 0; i < files.Length(); i++)
+		if (doc->LoadFile(files.GetNth(i)) == Success())
 		{
-			doc = new XML::Document();
+			Language	*language = new Language();
 
-			if (doc->LoadFile(files.GetNth(i)) == Success())
-			{
-				language = new Language();
-				language->magic = files.GetNth(i).GetFileName();
-
-				LoadDoc(doc, language);
-			}
-
-			delete doc;
-		}
-	}
-	else
-	{
-		for (Int i = 0; i < 5; i++)
-		{
-			const char	*xml = NIL;
-
-			if	(i == 0) xml = smooth_de;
-			else if (i == 1) xml = smooth_it;
-			else if (i == 2) xml = smooth_sr;
-			else if (i == 3) xml = smooth_vi;
-			else if (i == 4) xml = smooth_zh_CN;
-
-			doc = new XML::Document();
-			language = new Language();
-
-			doc->ParseMemory((void *) xml, strlen(xml));
-
-			if	(i == 0) language->magic = "smooth_de";
-			else if (i == 1) language->magic = "smooth_it";
-			else if (i == 2) language->magic = "smooth_sr";
-			else if (i == 3) language->magic = "smooth_vi";
-			else if (i == 4) language->magic = "smooth_zh_CN";
+			language->magic = files.GetNth(i).GetFileName();
 
 			LoadDoc(doc, language);
-
-			delete doc;
 		}
+
+		delete doc;
 	}
 
 	return Success();

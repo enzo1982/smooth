@@ -1,0 +1,34 @@
+########## smooth options makefile ##########
+
+EXCEPTION = False
+EXECUTABLE = 
+
+# Build using Win32 backends
+BUILD_WIN32 = False
+
+# Build on Linux
+BUILD_LINUX = True
+
+# Build on QNX
+BUILD_QNX = False
+
+# Build using XLib backends
+BUILD_XLIB = True
+
+# Build using SDL backends
+BUILD_SDL = False
+
+# Build using Cairo graphics backend
+BUILD_CAIRO = True
+
+# Build using GDI+ graphics backend
+BUILD_GDIPLUS = False
+
+# Build using Posix threads
+BUILD_POSIXTHREADS = True
+
+# Build using a threads based timer
+BUILD_THREADSTIMER = True
+
+# Build using V8 JavaScript library
+BUILD_V8 = True

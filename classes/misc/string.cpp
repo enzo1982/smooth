@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -770,6 +770,26 @@ S::String &S::String::CopyN(const String &str, const Int n)
 	mutex.Release();
 
 	return *this;
+}
+
+S::Bool S::String::Contains(const char *str) const
+{
+	String 	 str2 = str;
+
+	return Contains(str2);
+}
+
+S::Bool S::String::Contains(const wchar_t *str) const
+{
+	String 	 str2 = str;
+
+	return Contains(str2);
+}
+
+S::Bool S::String::Contains(const String &str) const
+{
+	if (Find(str) >= 0) return True;
+	else		    return False;
 }
 
 S::Int S::String::Compare(const char *str) const

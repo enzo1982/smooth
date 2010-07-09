@@ -836,8 +836,6 @@ S::Int S::GUI::Window::Paint(Int message)
 			}
 		}
 
-		onPaint.Emit();
-
 		for (Int j = 0; j < GetNOfObjects(); j++)
 		{
 			Widget	*widget = GetNthObject(j);
@@ -851,6 +849,8 @@ S::Int S::GUI::Window::Paint(Int message)
 
 			if (widget->IsAffected(updateRect) && widget->GetObjectType() == Layer::classID) widget->Paint(SP_PAINT);
 		}
+
+		onPaint.Emit();
 
 		surface->EndPaint();
 	}

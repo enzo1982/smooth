@@ -1,0 +1,103 @@
+########## smooth commands makefile ##########
+
+include $(SMOOTH_PATH)/Makefile-options
+
+CC	 = gcc
+CCOPTS	 = -g0 -Wall -ffast-math -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
+#CCOPTS	 = -g0 -Wall -ffast-math -I$(SMOOTH_PATH)/include -include $(SMOOTH_PATH)/include/smooth.h -DUNICODE -D_UNICODE $(MYCCOPTS)
+RC	 = windres
+RCOPTS	 = -DSMOOTH_DLL -O coff
+LD	 = gcc
+LDOPTS	 = -L$(SMOOTH_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
+
+ifeq ($(BUILD_WIN32),True)
+	LDOPTS += -mwindows -Xlinker --dynamicbase -Xlinker --nxcompat
+
+ifeq ($(BUILD_CAIRO),True)
+	CCOPTS += -I$(SMOOTH_PATH)/include/cairowin
+endif
+else
+	CCOPTS += -I/usr/include/cairo -I/usr/include/atk-1.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/pango-1.0
+	LDOPTS += -lcairo -lgtk-x11-2.0 -lglib-2.0 -lbz2 -lxml2 -lcpuid -lpthread -ljpeg -lX11 -lSDL
+endif
+
+ifneq ($(EXCEPTION),True)
+	CCOPTS += -fno-exceptions
+endif
+
+ifeq ($(BUILD_X64),True)
+	CCOPTS += -march=nocona
+else
+	CCOPTS += -march=i586 -Os
+endif
+
+ifndef GLOBALLIB
+ifndef GLOBALEXE
+ifndef LOCALEXE
+	CCOPTS += -DSMOOTH_DLL -DLIBICONV_PLUG -DLIBXML_STATIC
+endif
+endif
+endif
+
+CPPC	 = g++
+CPPCOPTS = $(CCOPTS)
+
+.SUFFIXES: .rc
+
+TARGETS =
+
+ifdef GLOBALLIB
+	TARGETS += $(SMOOTH_PATH)/$(LIBDIR)/$(GLOBALLIB)
+endif
+
+ifdef GLOBALEXE
+	TARGETS += $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE)
+endif
+
+ifdef LOCALEXE
+	TARGETS += $(LOCALEXE)$(EXECUTABLE)
+endif
+
+all: $(OBJECTS) $(TARGETS)
+	$(ALLCMD1)
+	$(ALLCMD2)
+	$(ALLCMD3)
+	$(ALLCMD4)
+	$(ALLCMD5)
+
+clean:
+	rm -f $(OBJECTS) $(TARGETS)
+	$(CLEANCMD1)
+	$(CLEANCMD2)
+	$(CLEANCMD3)
+	$(CLEANCMD4)
+	$(CLEANCMD5)
+
+.c.o:
+	$(CC) $(CCOPTS) -c $< -o $@
+
+.cc.o:
+	$(CPPC) $(CPPCOPTS) -c $< -o $@
+
+.cpp.o:
+	$(CPPC) $(CPPCOPTS) -c $< -o $@
+
+.rc.o:
+	$(RC) $(RCOPTS) $< -o $@
+
+ifdef GLOBALLIB
+$(SMOOTH_PATH)/$(LIBDIR)/$(GLOBALLIB): $(OBJECTS)
+	$(AR) r $@ $(OBJECTS)
+endif
+
+ifdef GLOBALEXE
+$(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE): $(OBJECTS)
+	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
+	strip --strip-all $@
+endif
+
+ifdef LOCALEXE
+$(LOCALEXE)$(EXECUTABLE): $(OBJECTS)
+	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
+	strip --strip-all $@
+endif

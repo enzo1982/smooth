@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -93,7 +93,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	pos.y = 7;
 
 	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), pos);
-	txt_didyouknow->SetFont(Font("Verdana", 14, Font::Bold));
+	txt_didyouknow->SetFont(Font(Font::Default, 14, Font::Bold));
 
 	pos.x = 6;
 	pos.y = 6;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,11 +38,14 @@ S::Int S::GUI::Text::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = GetDrawSurface();
-				Font	 nFont	 = font;
+				Font	 nFont		= font;
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
+				Rect	 rect		= Rect(GetRealPosition(), GetSize());
+				Surface	*surface	= GetDrawSurface();
+
+				surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
 				surface->SetText(text, Rect::OverlapRect(Rect(GetRealPosition(), Size(textSize.cx, Math::Round(textSize.cy * 1.2))), GetVisibleArea()), nFont);
 			}
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -635,7 +635,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 			surface->Line(p1, p2, Color(lasthue, 255, 255, HSV).ConvertTo(RGBA));
 		}
 
-		Color	 ahrgb(acthue, 255, 255, HSV);
+		Color	 ahrgb = Color(acthue, 255, 255, HSV).ConvertTo(RGBA);
 
 		for (int x = huexoffset + 1; x < (huexoffset + 17); x++)
 		{
@@ -655,14 +655,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 		{
 			for (int x = 0; x < hssize; x++)
 			{
-				Color	 rgb(acthue, lastsat, (int) (x * (256.0 / 205.0)), HSV);
+				Color	 rgb = Color(acthue, lastsat, (int) (x * (256.0 / 205.0)), HSV).ConvertTo(RGBA);
 
 				surface->SetPixel(Point(x + 8, yoffset + 1 + (int) ((255.0 - lastsat) / (256.0 / 205.0))), rgb);
 			}
 
 			for (int y = 0; y < hssize; y++)
 			{
-				Color	 rgb(acthue, (int) (255.0 - (y * (256.0 / 205.0))), lastval, HSV);
+				Color	 rgb = Color(acthue, (int) (255.0 - (y * (256.0 / 205.0))), lastval, HSV).ConvertTo(RGBA);
 
 				surface->SetPixel(Point(8 + (int) (lastval / (256.0 / 205.0)), y + yoffset + 1), rgb);
 			}
@@ -670,14 +670,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 
 		for (int x = 0; x < hssize; x++)
 		{
-			Color	 rgb(acthue, actsat, x, HSV);
+			Color	 rgb = Color(acthue, actsat, x, HSV).ConvertTo(RGBA);
 
 			surface->SetPixel(Point(x + 8, yoffset + 1 + (int) ((255.0 - actsat) / (256.0 / 205.0))), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
 
 		for (int y = 0; y < hssize; y++)
 		{
-			Color	 rgb(acthue, 255 - y, actval, HSV);
+			Color	 rgb = Color(acthue, 255 - y, actval, HSV).ConvertTo(RGBA);
 
 			surface->SetPixel(Point(8 + (int) (actval / (256.0 / 205.0)), y + yoffset + 1), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
@@ -984,6 +984,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdateHexValue()
 	{
 		if (hexval[i] > 57) hexval[i] = 'a' + (hexval[i] - 58);
 	}
+
+	if (hueslider	!= NIL)	hueslider->SetValue(acthue);
+	if (satslider	!= NIL)	satslider->SetValue(actsat);
+	if (valslider	!= NIL)	valslider->SetValue(actval);
+
+	if (redslider	!= NIL)	redslider->SetValue(actred);
+	if (greenslider != NIL)	greenslider->SetValue(actgreen);
+	if (blueslider	!= NIL)	blueslider->SetValue(actblue);
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgHexValueChanged()

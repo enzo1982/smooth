@@ -12,8 +12,10 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 		- new attribute: independent, makes a widget independent of its container
 - string.cpp	- new function: Explode(), splits a string at a delimiter
 		- new function: Implode(), concatenates strings from an array
+		- new function: Contains(), true if the string contains another one
 - str...ase.cpp - case conversion functions are now generated from UnicodeData.txt
 		- added title case conversion function
+- trans...r.cpp	- new function: SelectUserDefaultLang(), selects the best fit language available
 - image...r.cpp - added support for JPEG and PNG images
 - titlebar.cpp	- pressing the escape key now closes the active window
 - imagebox.cpp	- new widget: a box containing selectable images
@@ -23,14 +25,15 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - fontcairo.cpp	- fixed a ressource leak
 - sur...gdi.cpp	- now using clipping instead of buffering to speed up drawing
 - sur...iro.cpp	- now using clipping instead of buffering to speed up drawing
+- colordlg.cpp	- fixed color selection dialog
 
 - removed TreeView widget (use ListBox instead)
 - added support for path names exceeding MAX_PATH
 - fixed implementation of callback signals
 - fixed implementation of Array<>
 - fixed file IO problems on Windows 9x with Unicows
-- updated Translator to support template files
-- added Vietnamese and Chinese (simplified) language support
+- updated Translator utility to support template files
+- improved international language support
 - improved Linux support
 - upgraded libbz2 to version 1.0.5
 - upgraded fribidi2 to version 0.19.2

@@ -13,7 +13,7 @@
 #include <smooth/backends/backend.h>
 #include <smooth/system/multimonitor.h>
 #include <smooth/templates/nonblocking.h>
-#include <smooth/i18n/translator.h>
+#include <smooth/i18n/translator_internal.h>
 #include <smooth/graphics/font.h>
 
 #if defined __WIN32__
@@ -116,30 +116,8 @@ S::Void S::Init()
 	GetColors();
 	GetDefaultFont();
 
-	I18n::Translator::defaultTranslator = new I18n::Translator("smooth", True);
-	I18n::Translator::defaultTranslator->SetInternalLanguageInfo("English", "Robert Kausch", "http://www.smooth-project.org/", False);
-
-#if defined __WIN32__
-	switch (PRIMARYLANGID(GetUserDefaultLangID()))
-	{
-		default:
-		case LANG_ENGLISH:
-			I18n::Translator::defaultTranslator->ActivateLanguage("internal");
-			break;
-		case LANG_GERMAN:
-			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_de");
-			break;
-		case LANG_ITALIAN:
-			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_it");
-			break;
-		case LANG_SERBIAN:
-			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_sr");
-			break;
-		case LANG_VIETNAMESE:
-			I18n::Translator::defaultTranslator->ActivateLanguage("smooth_vi");
-			break;
-	}
-#endif
+	I18n::Translator::defaultTranslator = new I18n::TranslatorInternal();
+	I18n::Translator::defaultTranslator->SelectUserDefaultLanguage();
 
 	Setup::rightToLeft = I18n::Translator::defaultTranslator->IsActiveLanguageRightToLeft();
 }

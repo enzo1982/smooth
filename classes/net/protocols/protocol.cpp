@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -57,7 +57,7 @@ S::Int S::Net::Protocols::Protocol::DownloadToBuffer(Buffer<UnsignedByte> &desti
 
 	if (error) return Error();
 
-	IO::InStream	*f_in = new IO::InStream(IO::STREAM_FILE, downloadFile, IO::IS_READONLY);
+	IO::InStream	*f_in = new IO::InStream(IO::STREAM_FILE, downloadFile, IO::IS_READ);
 
 	Int		 bytes = f_in->Size();
 
@@ -68,7 +68,8 @@ S::Int S::Net::Protocols::Protocol::DownloadToBuffer(Buffer<UnsignedByte> &desti
 
 	for (Int i = 0; i < bytes; i += 1024)
 	{
-		b_out->OutputData(f_in->InputData(buffer, Math::Min(1024, bytes - i)), Math::Min(1024, bytes - i));
+		f_in->InputData(buffer, Math::Min(1024, bytes - i));
+		b_out->OutputData(buffer, Math::Min(1024, bytes - i));
 	}
 
 	delete [] buffer;

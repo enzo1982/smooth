@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,6 +18,7 @@
 #include <smooth/io/drivers/driver_socks5.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/number.h>
+#include <smooth/foreach.h>
 
 #include <time.h>
 
@@ -45,7 +46,7 @@ S::Int S::Net::Protocols::HTTP::SetHeaderField(const String &key, const String &
 	field.key	= key;
 	field.value	= value;
 
-	fields.Add(field);
+	requestFields.Add(field);
 
 	return Success();
 }
@@ -57,7 +58,7 @@ S::Int S::Net::Protocols::HTTP::SetParameter(const String &key, const String &va
 	parameter.key	= key;
 	parameter.value	= value;
 
-	parameters.Add(parameter);
+	requestParameters.Add(parameter);
 
 	return Success();
 }
@@ -73,7 +74,7 @@ S::Int S::Net::Protocols::HTTP::SetParameterFile(const String &key, const String
 
 	parameter.isFile= True;
 
-	parameters.Add(parameter);
+	requestParameters.Add(parameter);
 
 	return Success();
 }
@@ -115,6 +116,16 @@ S::Int S::Net::Protocols::HTTP::SetProxyAuth(const String &nProxyUser, const Str
 	proxyPass = nProxyPass;
 
 	return Success();
+}
+
+S::String S::Net::Protocols::HTTP::GetResponseHeaderField(const String &key)
+{
+	foreach (Parameter field, responseFields)
+	{
+		if (field.key == key) return field.value;
+	}
+
+	return NIL;
 }
 
 S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
@@ -172,24 +183,37 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 		{
 			S::File(fileName).Delete();
 
-			Int	 bytes = 0;
-			String	 encoding;
-			String	 str;
-
-			do
+			/* Read header fields first.
+			 */
+			while (true)
 			{
-				str = in->InputLine();
+				String		 str	= in->InputLine();
+				Int		 colon	= str.Find(":");
 
-				if (str.StartsWith("Transfer-Encoding: "))	encoding = str.Tail(str.Length() - 19);
-				else if (str.StartsWith("Content-Length: "))	bytes = str.Tail(str.Length() - 16).ToInt();
+				if (colon >= 0)
+				{
+					Parameter	 field;
+
+					field.key	= str.Head(colon);
+					field.value	= str.Tail(str.Length() - colon - 2);
+
+					responseFields.Add(field);
+				}
+
+				if (str == NIL) break;
 			}
-			while (str != NIL);
 
+			String	 encoding = GetResponseHeaderField("Transfer-Encoding");
+			Int	 bytes = GetResponseHeaderField("Content-Length").ToInt();
+
+			/* Continue to read data.
+			 */
 			while (true)
 			{
 				if (encoding == "chunked")
 				{
-					str = in->InputLine();
+					String	 str = in->InputLine();
+
 					bytes = (Int64) Number::FromHexString(str);
 
 					if (bytes == 0) break;
@@ -202,7 +226,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 				for (Int i = 0; i < bytes; i += 1024)
 				{
-					fOut->OutputData(in->InputData((Void *) buffer, Math::Min(1024, bytes - i)), Math::Min(1024, bytes - i));
+					in->InputData((Void *) buffer, Math::Min(1024, bytes - i));
+					fOut->OutputData((Void *) buffer, Math::Min(1024, bytes - i));
 
 					if (Math::Round(1000.0 * i / bytes) != percent)
 					{
@@ -277,9 +302,9 @@ S::Errors::Error S::Net::Protocols::HTTP::DecodeURL()
 
 S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest()
 {
-	for (Int i = 0; i < parameters.Length(); i++)
+	for (Int i = 0; i < requestParameters.Length(); i++)
 	{
-		if (parameters.GetNth(i).isFile) { mode = HTTP_METHOD_POST; break; }
+		if (requestParameters.GetNth(i).isFile) { mode = HTTP_METHOD_POST; break; }
 	}
 
 	if (content != NIL) mode = HTTP_METHOD_POST;
@@ -303,13 +328,13 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 {
 	Bool	 haveFiles = False;
 
-	for (Int i = 0; i < parameters.Length(); i++)
+	for (Int i = 0; i < requestParameters.Length(); i++)
 	{
-		if (parameters.GetNth(i).isFile) { haveFiles = True; break; }
+		if (requestParameters.GetNth(i).isFile) { haveFiles = True; break; }
 	}
 
 	String		 contentType;
-	IO::OutStream	*out = new IO::OutStream(IO::STREAM_FILE, "httprequest.temp", IO::OS_OVERWRITE);
+	IO::OutStream	*out = new IO::OutStream(IO::STREAM_FILE, "httprequest.temp", IO::OS_REPLACE);
 
 	if (content != NIL)
 	{
@@ -337,11 +362,11 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 		out->OutputString("Content-Disposition: form-data; name=\"MAX_FILE_SIZE\"\n\n");
 		out->OutputString("1000000\n");
 
-		for (Int i = 0; i < parameters.Length(); i++)
+		for (Int i = 0; i < requestParameters.Length(); i++)
 		{
 			out->OutputString(String("--").Append(separator).Append("\n"));
 
-			Parameter	 parameter = parameters.GetNth(i);
+			Parameter	 parameter = requestParameters.GetNth(i);
 
 			if (!parameter.isFile)
 			{
@@ -352,7 +377,7 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 			{
 				out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"; filename=\"").Append(parameter.value).Append("\"\n\n"));
 
-				IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, parameter.value, IO::IS_READONLY);
+				IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, parameter.value, IO::IS_READ);
 
 				for (Int j = 0; j < in->Size(); j++) out->OutputNumber(in->InputNumber(1), 1);
 
@@ -367,7 +392,7 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 
 	delete out;
 
-	IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, "httprequest.temp", IO::IS_READONLY);
+	IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, "httprequest.temp", IO::IS_READ);
 
 	SetHeaderField("Content-Length", String::FromInt(in->Size()));
 	SetHeaderField("Content-Type", contentType);
@@ -402,7 +427,7 @@ S::String S::Net::Protocols::HTTP::ComposeHeader()
 
 	str.Append(path);
 
-	if (mode == HTTP_METHOD_GET && parameters.Length() > 0)
+	if (mode == HTTP_METHOD_GET && requestParameters.Length() > 0)
 	{
 		str.Append("?");
 		str.Append(GetParametersURLEncoded());
@@ -420,9 +445,9 @@ S::String S::Net::Protocols::HTTP::ComposeHeader()
 		SetHeaderField("Proxy-Authorization", String("Basic ").Append(String(String(proxyUser).Append(":").Append(proxyPass)).EncodeBase64()));
 	}
 
-	for (Int i = 0; i < fields.Length(); i++)
+	for (Int i = 0; i < requestFields.Length(); i++)
 	{
-		Parameter	 field = fields.GetNth(i);
+		Parameter	 field = requestFields.GetNth(i);
 
 		str.Append(field.key).Append(": ").Append(field.value).Append("\n");
 	}
@@ -436,9 +461,9 @@ S::String S::Net::Protocols::HTTP::GetParametersURLEncoded()
 {
 	String	 str;
 
-	for (Int i = 0; i < parameters.Length(); i++)
+	for (Int i = 0; i < requestParameters.Length(); i++)
 	{
-		Parameter	 parameter = parameters.GetNth(i);
+		Parameter	 parameter = requestParameters.GetNth(i);
 
 		if (i > 0) str.Append("&");
 

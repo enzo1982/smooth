@@ -99,7 +99,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 			{
 				Rect	 textRect = Rect(realPos + Point(3, 1), GetSize() - Size(4, 2));
 
-				surface->Box(textRect, container->GetBackgroundColor(), Rect::Filled);
+				surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
 				surface->SetText(text, textRect, font);
 			}
 			else if (text == NIL && bitmap != NIL)

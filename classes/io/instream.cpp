@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -408,11 +408,11 @@ S::String S::IO::InStream::InputLine()
 	return NIL; // never reached
 }
 
-S::Void *S::IO::InStream::InputData(Void *pointer, Int bytes)
+S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 {
-	if (streamType == STREAM_NONE)		{ lastError = IO_ERROR_NOTOPEN; return NULL; }
-	if (pointer == NULL)			{ lastError = IO_ERROR_BADPARAM; return NULL; }
-	if (bytes < 0)				{ lastError = IO_ERROR_BADPARAM; return NULL; }
+	if (streamType == STREAM_NONE)		{ lastError = IO_ERROR_NOTOPEN; return 0; }
+	if (pointer == NULL)			{ lastError = IO_ERROR_BADPARAM; return 0; }
+	if (bytes < 0)				{ lastError = IO_ERROR_BADPARAM; return 0; }
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
@@ -422,15 +422,19 @@ S::Void *S::IO::InStream::InputData(Void *pointer, Int bytes)
 
 	while (bytesleft)
 	{
-		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IO_ERROR_UNKNOWN; return NULL; }
+		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IO_ERROR_UNKNOWN; return 0; }
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return NULL; }
-			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return NULL; }
+			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return 0; }
+
+			/* If no more data is available, set lastError and
+			 * return the number of bytes actually read.
+			 */
+			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return bytes - bytesleft; }
 		}
 
-		amount = ((packageSize - currentBufferPos)<(bytesleft))?(packageSize - currentBufferPos):(bytesleft);
+		amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
 		memcpy((void *) ((unsigned char *) pointer + databufferpos), (void *) (((UnsignedByte *) dataBuffer) + currentBufferPos), amount);
 
@@ -440,7 +444,7 @@ S::Void *S::IO::InStream::InputData(Void *pointer, Int bytes)
 		currentFilePos	 += amount;
 	}
 
-	return pointer;
+	return bytes;
 }
 
 S::Bool S::IO::InStream::InitPBD()

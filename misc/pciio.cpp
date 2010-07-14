@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -137,7 +137,7 @@ S::GUI::Bitmap &PCIIO::GetBitmap()
 
 PCIOut CreatePCI(const S::String &filename)
 {
-	return new IO::OutStream(IO::STREAM_FILE, filename, IO::OS_OVERWRITE);
+	return new IO::OutStream(IO::STREAM_FILE, filename, IO::OS_REPLACE);
 }
 
 PCIOut OpenPCIForOutput(const S::String &filename)
@@ -147,7 +147,7 @@ PCIOut OpenPCIForOutput(const S::String &filename)
 
 PCIIn OpenPCIForInput(const S::String &filename)
 {
-	return new IO::InStream(IO::STREAM_FILE, filename, IO::IS_READONLY);
+	return new IO::InStream(IO::STREAM_FILE, filename, IO::IS_READ);
 }
 
 bool ClosePCI(PCIIn instream)

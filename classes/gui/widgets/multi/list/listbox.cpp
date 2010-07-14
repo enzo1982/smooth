@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -61,6 +61,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 	Surface	*surface	= GetDrawSurface();
 	Rect	 frame		= Rect(GetRealPosition(), GetSize());
+	Rect	 entryRect	= frame;
 
 	String	 visibleEntries;
 
@@ -94,36 +95,38 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				scrollbarPos = 0;
 			}
 
-			if (IsActive())	surface->Box(frame + Point(0, headerHeight) - Size(scrollbar->IsVisible() ? 18 : 0, headerHeight), Setup::ClientColor, Rect::Filled);
-			else		surface->Box(frame + Point(0, headerHeight) - Size(scrollbar->IsVisible() ? 18 : 0, headerHeight), Setup::BackgroundColor, Rect::Filled);
-
-			surface->Frame(frame, FRAME_DOWN);
-
-			frame.top = -scrollbarPos;
-			frame.bottom = frame.top;
+			/* Set visibility of list entries first.
+			 */
+			entryRect.top	 = -scrollbarPos;
+			entryRect.bottom = -scrollbarPos;
 
 			for (Int i = 0; i < Length(); i++)
 			{
 				ListEntry	*operat = GetNthEntry(i);
 
-				frame.bottom += operat->GetHeight();
+				operat->SetVisibleDirect(False);
 
-				if (frame.bottom >= 0 && frame.top <= GetHeight() - headerHeight - 4)
+				entryRect.bottom += operat->GetHeight();
+
+				if (entryRect.bottom >= 0 && entryRect.top <= GetHeight() - headerHeight - 4)
 				{
-					operat->SetMetrics(Point(2, frame.top + 2 + headerHeight), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), operat->GetHeight()));
-					operat->Show();
+					operat->SetMetrics(Point(2, entryRect.top + 2 + headerHeight), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), operat->GetHeight()));
+					operat->SetVisibleDirect(True);
 
 					visibleEntries.Append(operat->GetName());
 				}
-				else
-				{
-					operat->Hide();
-				}
 
-				frame.top += operat->GetHeight();
+				entryRect.top += operat->GetHeight();
 			}
 
 			visibleEntriesChecksum = visibleEntries.ComputeCRC32();
+
+			/* Now paint the listbox and all entries.
+			 */
+			if (IsActive())	surface->Box(frame + Point(0, headerHeight) - Size(scrollbar->IsVisible() ? 18 : 0, headerHeight), Setup::ClientColor, Rect::Filled);
+			else		surface->Box(frame + Point(0, headerHeight) - Size(scrollbar->IsVisible() ? 18 : 0, headerHeight), Setup::BackgroundColor, Rect::Filled);
+
+			surface->Frame(frame, FRAME_DOWN);
 
 			Widget::Paint(message);
 
@@ -154,6 +157,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				}
 
 				frame.top += operat->GetHeight();
+
+				if (frame.top > GetHeight() - headerHeight - 4) break;
 			}
 
 			if (visibleEntriesChecksum != visibleEntries.ComputeCRC32()) Paint(SP_PAINT);

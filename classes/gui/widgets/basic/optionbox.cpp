@@ -70,7 +70,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->Box(frame, container->GetBackgroundColor(), Rect::Filled);
+				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 				surface->SetText(text,  frame + Point(17, 2), nFont);
 			}
 

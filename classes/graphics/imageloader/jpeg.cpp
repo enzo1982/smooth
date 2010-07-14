@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -48,7 +48,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 		 */
 		fileName = System::System::GetTempDirectory().Append("tmpJpeg-").Append(String::FromInt(clock())).Append(".jpg");
 
-		OutStream	 out(STREAM_FILE, fileName, OS_OVERWRITE);
+		OutStream	 out(STREAM_FILE, fileName, OS_REPLACE);
 
 		out.OutputData(buffer, buffer.Size());
 	}

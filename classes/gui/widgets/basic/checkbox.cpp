@@ -79,7 +79,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->Box(Rect(GetRealPosition(), GetSize()), container->GetBackgroundColor(), Rect::Filled);
+				surface->Box(Rect(GetRealPosition(), GetSize()), GetBackgroundColor(), Rect::Filled);
 				surface->SetText(text, textRect, nFont);
 			}
 

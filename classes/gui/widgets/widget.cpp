@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -248,8 +248,8 @@ S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle) const
 
 		if (widget->GetHandle() == widgetHandle) return lastTabstopObject;
 
-		if (widget->IsTabstopCapable() && widget->IsActive()) lastTabstopObject = widget;
-		else if (widget->GetPreviousTabstopWidget(0) != NIL) lastTabstopObject = widget->GetPreviousTabstopWidget(0);
+		if	(widget->IsTabstopCapable() && widget->IsActive()) lastTabstopObject = widget;
+		else if (widget->GetPreviousTabstopWidget(0) != NIL)	   lastTabstopObject = widget->GetPreviousTabstopWidget(0);
 	}
 
 	if (widgetHandle == 0) return lastTabstopObject;
@@ -273,8 +273,8 @@ S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle) const
 			continue;
 		}
 
-		if (found && widget->IsTabstopCapable() && widget->IsActive()) return widget;
-		else if (found && widget->GetNextTabstopWidget(0) != NIL) return widget->GetNextTabstopWidget(0);
+		if	(found && widget->IsTabstopCapable() && widget->IsActive()) return widget;
+		else if (found && widget->GetNextTabstopWidget(0) != NIL)	    return widget->GetNextTabstopWidget(0);
 	}
 
 	if (registered && widgetHandle != 0) return container->GetNextTabstopWidget(GetHandle());
@@ -437,6 +437,10 @@ S::Int S::GUI::Widget::Paint(Int message)
 	if (!registered)	return Error();
 	if (!visible)		return Success();
 
+	Window	*window	= container->GetContainerWindow();
+
+	if (window == NIL) return Success();
+
 	switch (message)
 	{
 		case SP_SHOW:
@@ -445,7 +449,7 @@ S::Int S::GUI::Widget::Paint(Int message)
 			{
 				Widget	*widget = GetNthObject(i);
 
-				widget->Paint(message);
+				if (widget->IsAffected(window->GetUpdateRect())) widget->Paint(message);
 			}
 
 			break;

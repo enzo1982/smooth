@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,7 +45,7 @@ S::Int S::Net::Protocols::File::DownloadToFile(const String &destination)
 		fileName[i - j] = url[i];
 	}
 
-	IO::InStream	*in	= new IO::InStream(IO::STREAM_FILE, fileName, IO::IS_READONLY);
+	IO::InStream	*in	= new IO::InStream(IO::STREAM_FILE, fileName, IO::IS_READ);
 
 	downloadProgress.Emit(0);
 	downloadSpeed.Emit(NIL);
@@ -63,7 +63,8 @@ S::Int S::Net::Protocols::File::DownloadToFile(const String &destination)
 
 			for (Int i = 0; i < bytes; i += 1024)
 			{
-				fOut->OutputData(in->InputData((Void *) buffer, Math::Min(1024, bytes - i)), Math::Min(1024, bytes - i));
+				in->InputData((Void *) buffer, Math::Min(1024, bytes - i));
+				fOut->OutputData((Void *) buffer, Math::Min(1024, bytes - i));
 
 				if (Math::Round(1000.0 * i / bytes) != percent)
 				{

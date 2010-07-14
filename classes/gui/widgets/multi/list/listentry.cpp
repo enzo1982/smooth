@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,7 +34,7 @@ S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 15
 	markHotspot	= new Hotspot(Point(2, 3), Size(9, 9));
 
 	hotspot->onLeftButtonDown.Connect(&ListEntry::OnSelectEntry, this);
-	markHotspot->onLeftButtonDown.Connect(&ListEntry::OnToggleMark, this);
+	markHotspot->onLeftButtonDown.Connect(&ListEntry::OnClickMarkHotspot, this);
 
 	hotspot->onMouseDrag.Connect(&ListEntry::InitDrag, this);
 
@@ -174,6 +174,8 @@ S::String S::GUI::ListEntry::GetNthTabText(Int i)
 
 S::Int S::GUI::ListEntry::SetMark(Bool nMarked)
 {
+	if (nMarked == marked) return Success();
+
 	marked = nMarked;
 
 	if (IsRegistered())
@@ -182,6 +184,8 @@ S::Int S::GUI::ListEntry::SetMark(Bool nMarked)
 
 		((List *) container)->onMarkEntry.Emit(this);
 	}
+
+	onToggleMark.Emit(marked);
 
 	return Success();
 }
@@ -230,11 +234,9 @@ S::Void S::GUI::ListEntry::InitDrag()
 	}
 }
 
-S::Void S::GUI::ListEntry::OnToggleMark()
+S::Void S::GUI::ListEntry::OnClickMarkHotspot()
 {
 	SetMark(!marked);
-
-	onToggleMark.Emit(marked);
 }
 
 S::Void S::GUI::ListEntry::OnSelectEntry()

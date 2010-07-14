@@ -45,7 +45,7 @@ S::Int S::GUI::Text::Paint(Int message)
 				Rect	 rect		= Rect(GetRealPosition(), GetSize());
 				Surface	*surface	= GetDrawSurface();
 
-				surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
+				surface->Box(rect, GetBackgroundColor(), Rect::Filled);
 				surface->SetText(text, Rect::OverlapRect(Rect(GetRealPosition(), Size(textSize.cx, Math::Round(textSize.cy * 1.2))), GetVisibleArea()), nFont);
 			}
 

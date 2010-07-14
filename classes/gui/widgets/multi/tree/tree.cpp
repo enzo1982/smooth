@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -71,22 +71,48 @@ S::Int S::GUI::Tree::Remove(Widget *widget)
 	return Widget::Remove(widget);
 }
 
+S::Void S::GUI::Tree::CalculateHeight()
+{
+	/* Calculate tree height.
+	 */
+	Int	 height	= 15;
+
+	if (IsMarked())
+	{
+		for (Int i = 0; i < Length(); i++) height += GetNthEntry(i)->GetHeight();
+	}
+
+	if (height != GetHeight())
+	{
+		SetHeight(height);
+
+		if (IsRegistered())
+		{
+			/* Recalculate all parent trees.
+		 	*/
+			Widget	*widget = container;
+
+			while (widget->GetObjectType() != ListBox::classID)
+			{
+				if (widget->GetObjectType() == Tree::classID)
+				{
+					((Tree *) widget)->CalculateHeight();
+
+					break;
+				}
+
+				widget = widget->GetContainer();
+			}
+		}
+	}
+}
+
 S::Int S::GUI::Tree::Paint(Int message)
 {
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Int	 height	= 15;
-
-	if (IsMarked())
-	{
-		for (Int i = 0; i < Length(); i++)
-		{
-			height += GetNthEntry(i)->GetHeight();
-		}
-	}
-
-	SetHeight(height);
+	CalculateHeight();
 
 	switch (message)
 	{
@@ -111,22 +137,24 @@ S::Int S::GUI::Tree::Paint(Int message)
 
 				if (IsMarked())
 				{
-					frame.top = 15;
-					frame.left = 12;
+					list.SetVisibleDirect(False);
+					list.SetMetrics(Point(12, 15), GetSize() - Size(12, 15));
 
-					list.SetMetrics(Point(0, 0), GetSize());
-					list.Show();
+					Point	 position;
 
 					for (Int i = 0; i < Length(); i++)
 					{
 						ListEntry	*operat = GetNthEntry(i);
 
-						operat->SetMetrics(Point(frame.left, frame.top), Size(GetWidth() - frame.left, operat->GetHeight()));
+						operat->SetMetrics(Point(position.x, position.y), Size(GetWidth() - 12, operat->GetHeight()));
 						operat->Show();
-						operat->Paint(SP_PAINT);
 
-						frame.top += operat->GetHeight();
+						position.y += operat->GetHeight();
+
+						if (position.y > GetHeight() - 15) break;
 					}
+
+					list.Show();
 
 					Point	 realPos = GetRealPosition();
 
@@ -243,14 +271,25 @@ S::Void S::GUI::Tree::OnSelectEntry(Int containerHandle, Int handle)
 S::Void S::GUI::Tree::OnChangeSize(const Size &newSize)
 {
 	headHotspot->SetSize(Size(newSize.cx, 15));
-
-	if (IsRegistered()) container->Paint(SP_PAINT);
 }
 
 S::Void S::GUI::Tree::OnToggleMark(Bool marked)
 {
 	if (marked) onOpen.Emit();
 	else	    onClose.Emit();
+
+	CalculateHeight();
+
+	if (IsRegistered())
+	{
+		/* Find ListBox container and repaint it.
+		 */
+		Widget	*widget = container;
+
+		while (widget->GetObjectType() != ListBox::classID) widget = widget->GetContainer();
+
+		widget->Paint(SP_PAINT);
+	}
 }
 
 S::Void S::GUI::Tree::OnMouseOver()

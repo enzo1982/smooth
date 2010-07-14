@@ -90,7 +90,7 @@ S::Void S::GUI::Hyperlink::OnMouseOver()
 
 		nFont.SetColor(Color(0, 128, 255));
 
-		surface->Box(textRect, container->GetBackgroundColor(), Rect::Filled);
+		surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
 		surface->SetText(text, textRect, nFont);
 	}
 }
@@ -106,7 +106,7 @@ S::Void S::GUI::Hyperlink::OnMouseOut()
 		Surface	*surface  = GetDrawSurface();
 		Rect	 textRect = Rect(GetRealPosition(), textSize + Size(0, 1));
 
-		surface->Box(textRect, container->GetBackgroundColor(), Rect::Filled);
+		surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
 		surface->SetText(text, textRect, font);
 	}
 }

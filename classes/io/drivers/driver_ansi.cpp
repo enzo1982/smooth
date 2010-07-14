@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,9 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/io/drivers/driver_ansi.h>
+
+#include <smooth/io/instream.h>
+#include <smooth/io/outstream.h>
 
 #include <stdio.h>
 
@@ -47,24 +50,24 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 			lastError = IO_ERROR_BADPARAM;
 
 			return;
-		case 0:				// open a file for appending data
+		case OS_APPEND:			// open a file for appending data
 			if (enableUnicode)	stream = _wfopen(fileName, String("r+b"));
 			else			stream = fopen(fileName, "r+b");
 
 			Seek(GetSize());
 
 			break;
-		case 1:				// create or overwrite a file
+		case OS_REPLACE:		// create or overwrite a file
 			if (enableUnicode)	stream = _wfopen(fileName, String("w+b"));
 			else			stream = fopen(fileName, "w+b");
 
 			break;
-		case 2:				// open a file for reading data
+		case IS_READ | IS_WRITE:	// open a file for reading data
 			if (enableUnicode)	stream = _wfopen(fileName, String("r+b"));
 			else			stream = fopen(fileName, "r+b");
 
 			break;
-		case 3:				// open a file in read only mode
+		case IS_READ:			// open a file in read only mode
 			if (enableUnicode)	stream = _wfopen(fileName, String("rb"));
 			else			stream = fopen(fileName, "rb");
 

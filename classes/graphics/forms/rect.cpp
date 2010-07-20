@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -94,7 +94,6 @@ S::GUI::Rect &S::GUI::Rect::operator =(const RECT &rect)
 	return *this;
 }
 #endif
-
 
 S::Bool S::GUI::Rect::DoRectsOverlap(const Rect &rect1, const Rect &rect2)
 {

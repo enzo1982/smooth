@@ -207,8 +207,7 @@ S::Long S::IO::InStream::InputNumber(Int bytes)	// Intel byte order DCBA
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return -1; }
-			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return -1; }
+			if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 		}
 
 		rval += dataBuffer[currentBufferPos] * (1 << (i * 8));
@@ -234,8 +233,7 @@ S::Long S::IO::InStream::InputNumberRaw(Int bytes)	// Raw byte order ABCD
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return -1; }
-			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return -1; }
+			if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 		}
 
 		rval += dataBuffer[currentBufferPos] * (1 << (i * 8));
@@ -263,8 +261,7 @@ S::Long S::IO::InStream::InputNumberPDP(Int bytes)	// PDP byte order BADC
 
 			while (currentBufferPos >= packageSize)
 			{
-				if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return -1; }
-				if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return -1; }
+				if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 			}
 
 			rval += (dataBuffer[currentBufferPos] << (((3 - i) ^ 1) * 8)) >> (8 * (4 - bytes));
@@ -292,8 +289,7 @@ S::Long S::IO::InStream::InputNumberPBD(Int bits)
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return -1; }
-			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return -1; }
+			if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 		}
 
 		inp = dataBuffer[currentBufferPos];
@@ -344,8 +340,7 @@ S::String S::IO::InStream::InputString(Int bytes)
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return NIL; }
-			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return NIL; }
+			if (!ReadData()) { lastError = IO_ERROR_NODATA; return NIL; }
 		}
 
 		amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
@@ -426,12 +421,10 @@ S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 
 		while (currentBufferPos >= packageSize)
 		{
-			if (!ReadData())	{ lastError = IO_ERROR_UNKNOWN; return 0; }
-
 			/* If no more data is available, set lastError and
 			 * return the number of bytes actually read.
 			 */
-			if (packageSize == 0)	{ lastError = IO_ERROR_NODATA; return bytes - bytesleft; }
+			if (!ReadData()) { lastError = IO_ERROR_NODATA; return bytes - bytesleft; }
 		}
 
 		amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);

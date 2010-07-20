@@ -2,6 +2,7 @@ all:
 	$(MAKE) -C lisa
 	$(MAKE) -C libcpuid
 	$(MAKE) -C fribidi2
+	$(MAKE) -C nsucd
 ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C bzlib
 	$(MAKE) -C libiconv
@@ -15,6 +16,7 @@ clean:
 	$(MAKE) -C lisa clean
 	$(MAKE) -C libcpuid clean
 	$(MAKE) -C fribidi2 clean
+	$(MAKE) -C nsucd clean
 ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C bzlib clean
 	$(MAKE) -C libiconv clean

@@ -109,6 +109,7 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 	{
 		case LANG_ENGLISH:	code = "en";	break;
 		case LANG_ARABIC:	code = "ar";	break;
+		case LANG_BASQUE:	code = "eu";	break;
 		case LANG_BULGARIAN:	code = "bg";	break;
 		case LANG_CATALAN:	code = "ca";	break;
 		case LANG_CHINESE:	code = "zh_CN";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_CHINESE_SIMPLIFIED)	code = "zh_CN";
@@ -118,6 +119,7 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		case LANG_DANISH:	code = "da";	break;
 		case LANG_DUTCH:	code = "nl";	break;
 		case LANG_ESTONIAN:	code = "et";	break;
+		case LANG_FARSI:	code = "fa";	break;
 		case LANG_FINNISH:	code = "fi";	break;
 		case LANG_FRENCH:	code = "fr";	break;
 		case LANG_GALICIAN:	code = "gl";	break;
@@ -131,6 +133,7 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		case LANG_JAPANESE:	code = "ja";	break;
 		case LANG_KOREAN:	code = "ko";	break;
 		case LANG_LITHUANIAN:	code = "lt";	break;
+		case LANG_LATVIAN:	code = "lv";	break;
 		case LANG_MALAY:	code = "ms";	break;
 		case LANG_NORWEGIAN:	code = "no";	break;
 		case LANG_POLISH:	code = "pl";	break;
@@ -144,6 +147,7 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SERBIAN_LATIN)		code = "sr";
 							break;
 		case LANG_SLOVAK:	code = "sk";	break;
+		case LANG_SLOVENIAN:	code = "sl";	break;
 		case LANG_SPANISH:	code = "es";	break;
 		case LANG_SWEDISH:	code = "sv";	break;
 		case LANG_THAI:		code = "th";	break;

@@ -2,30 +2,32 @@ ChangeLog for smooth
 
 xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 
-- window.cpp	- renamed doQuit to doClose
-		- removed onPeek
-- listbox.cpp	- show partially visible entries again
-- combobox.cpp	- improved drop-down list size adjustment
-- number.cpp	- fixed floating point number -> string conversion
-		- fixed integer -> string conversion
-- widget.cpp	- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
-		- new attribute: independent, makes a widget independent of its container
-- string.cpp	- new function: Explode(), splits a string at a delimiter
-		- new function: Implode(), concatenates strings from an array
-		- new function: Contains(), true if the string contains another one
-- str...ase.cpp - case conversion functions are now generated from UnicodeData.txt
-		- added title case conversion function
-- trans...r.cpp	- new function: SelectUserDefaultLang(), selects the best fit language available
-- image...r.cpp - added support for JPEG and PNG images
-- titlebar.cpp	- pressing the escape key now closes the active window
-- imagebox.cpp	- new widget: a box containing selectable images
-- sha1.cpp	- new class: SHA1, implements the SHA-1 hash algorithm
-- cursor.cpp	- fixed support for right-to-left scripts
-- cpu.cpp	- added CPUID support
-- fontcairo.cpp	- fixed a ressource leak
-- sur...gdi.cpp	- now using clipping instead of buffering to speed up drawing
-- sur...iro.cpp	- now using clipping instead of buffering to speed up drawing
-- colordlg.cpp	- fixed color selection dialog
+- window.cpp		- renamed doQuit to doClose
+			- removed onPeek
+- listbox.cpp		- show partially visible entries again
+- combobox.cpp		- improved drop-down list size adjustment
+- number.cpp		- fixed floating point number -> string conversion
+			- fixed integer -> string conversion
+- widget.cpp		- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
+			- new attribute: independent, makes a widget independent of its container
+- string.cpp		- new function: Explode(), splits a string at a delimiter
+			- new function: Implode(), concatenates strings from an array
+			- new function: Contains(), true if the string contains another one
+- stringcase.cpp 	- case conversion functions are now generated from UnicodeData.txt
+			- added title case conversion function
+- translator.cpp	- new function: SelectUserDefaultLang(), selects the best fit language available
+- imagereader.cpp 	- added support for JPEG and PNG images
+- titlebar.cpp		- pressing the escape key now closes the active window
+- imagebox.cpp		- new widget: a box containing selectable images
+- sha1.cpp		- new class: SHA1, implements the SHA-1 hash algorithm
+- cursor.cpp		- fixed support for right-to-left scripts
+- cpu.cpp		- added CPUID support
+- fontcairo.cpp		- fixed a ressource leak
+- surfacegdi.cpp	- now using clipping instead of buffering to speed up drawing
+- sururfacecairo.cpp	- now using clipping instead of buffering to speed up drawing
+- colordlg.cpp		- fixed color selection dialog
+- charsetdetector.cpp	- new class: CharsetDetector, detects the character set of a string
+- mutexwin32.cpp	- now using critical sections instead of Win32 mutexes
 
 - removed TreeView widget (use ListBox instead)
 - added support for path names exceeding MAX_PATH

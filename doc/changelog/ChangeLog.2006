@@ -2,9 +2,9 @@ ChangeLog for smooth
 
 22.12.06 16:04 - smooth alpha 0.8.69.0
 
-- bitmap.cpp	- Added a method for inverting the colors of a bitmap
-- popupmenu.cpp	- Added support for images in popup menu entries
-- slider.cpp	- Added support for changing the slider grip size
+- bitmap.cpp		- Added a method for inverting the colors of a bitmap
+- popupmenu.cpp		- Added support for images in popup menu entries
+- slider.cpp		- Added support for changing the slider grip size
 
 - added multi monitor support
 - made compatible with big window frames
@@ -13,46 +13,46 @@ ChangeLog for smooth
 
 18.06.06 15:10 - smooth aplha 0.8.68.0
 
-- shortcut.cpp	- Added support for menu shortcuts
-- buffer.cpp	- Added Base 64 encoder and decoder
-- memory.cpp	- New class for memory management to prevent bad memory frees using Buffer
-- d...https.cpp	- Added an IO driver for HTTPS proxy connections
+- shortcut.cpp		- Added support for menu shortcuts
+- buffer.cpp		- Added Base 64 encoder and decoder
+- memory.cpp		- New class for memory management to prevent bad memory frees using Buffer
+- driver_https.cpp	- Added an IO driver for HTTPS proxy connections
 
 - some smaller bug fixes
 
 29.03.06 13:23 - smooth alpha 0.8.67.0
 
-- listentry.cpp	- ListEntries are now Widgets
-- list.cpp	- List now derives from Container
-		- changed the way entries are handled
-- dirdlg.cpp	- allow to set the initially selected directory with SetDirName
-		- the new style directory selection dialog is used if available
-- error.cpp	- added error classes
-- object.cpp	- new function: ToString()
-- widget.cpp	- all widgets can have tooltips now
-		- implemented a universal Process(...) method to replace most others
-- surface.cpp	- fixed frames being painted too large
-- editbox.cpp	- fixed copying text to clipboard (now using GlobalAlloc instead of new)
-		- allowed copying from inactive editboxes
-- checkbox.cpp	- replaced SM_CHECKCHECKBOXES with a static signal
-- optionbox.cpp	- replaced SM_CHECKOPTIONBOXES with a static signal
-- textbox.cpp	- new class: XUL::TextBox
-- box.cpp	- new class: XUL::Box; implements <box/>, <hbox/> and <vbox/>
-- groupbox.cpp	- GroupBoxes are now Layers
-- editbox.cpp	- removed multi line support
-		- now using Cursor widget
-- multiedit.cpp	- new class: MultiEdit; implements a multi line edit box
-- console.cpp	- new class: System::Console; implements a simple console API
-- string.cpp	- added method: Find(String); returns the position of the given string (or -1)
-		- added methods: ToLower(), ToUpper()
-		- added native support for UTF-16BE encoding
-		- simplified iconv usage (with great speedups)
-- color.cpp	- new class: Color; replaces old color.cpp
-- array.cpp	- some optimizations to increase speed
-		- code cleaned up
-- d..loader.cpp	- new class: DynamicLoader; dynamic module loader
-- hotspot.cpp	- new class: Hotspot; simple widget to handle user action
-- scrollbar.cpp - improved scrolling with mouse wheel
+- listentry.cpp		- ListEntries are now Widgets
+- list.cpp		- List now derives from Container
+			- changed the way entries are handled
+- dirdlg.cpp		- allow to set the initially selected directory with SetDirName
+			- the new style directory selection dialog is used if available
+- error.cpp		- added error classes
+- object.cpp		- new function: ToString()
+- widget.cpp		- all widgets can have tooltips now
+			- implemented a universal Process(...) method to replace most others
+- surface.cpp		- fixed frames being painted too large
+- editbox.cpp		- fixed copying text to clipboard (now using GlobalAlloc instead of new)
+			- allowed copying from inactive editboxes
+- checkbox.cpp		- replaced SM_CHECKCHECKBOXES with a static signal
+- optionbox.cpp		- replaced SM_CHECKOPTIONBOXES with a static signal
+- textbox.cpp		- new class: XUL::TextBox
+- box.cpp		- new class: XUL::Box; implements <box/>, <hbox/> and <vbox/>
+- groupbox.cpp		- GroupBoxes are now Layers
+- editbox.cpp		- removed multi line support
+			- now using Cursor widget
+- multiedit.cpp		- new class: MultiEdit; implements a multi line edit box
+- console.cpp		- new class: System::Console; implements a simple console API
+- string.cpp		- added method: Find(String); returns the position of the given string (or -1)
+			- added methods: ToLower(), ToUpper()
+			- added native support for UTF-16BE encoding
+			- simplified iconv usage (with great speedups)
+- color.cpp		- new class: Color; replaces old color.cpp
+- array.cpp		- some optimizations to increase speed
+			- code cleaned up
+- dynamicloader.cpp	- new class: DynamicLoader; dynamic module loader
+- hotspot.cpp		- new class: Hotspot; simple widget to handle user action
+- scrollbar.cpp 	- improved scrolling with mouse wheel
 
 - added a class for smart pointers
 - added a class for nonblocking function calls

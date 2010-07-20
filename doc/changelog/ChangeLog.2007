@@ -2,18 +2,18 @@ ChangeLog for smooth
 
 21.02.07 16:41 - smooth alpha 0.8.69.2
 
-- windowgdi.cpp	- Windows can now be minimized using the task bar button
+- windowgdi.cpp		- Windows can now be minimized using the task bar button
 
 - some bug fixes
 
 06.02.07 13:18 - smooth alpha 0.8.69.1
 
-- list.cpp	- Speed optimizations
-- buffer.cpp	- Fixed problems when using const Buffer<>
-- icon.cpp	- Added an image loader for Windows icon resources
-- widget.cpp	- Renamed RegisterObject to Add
-		- Renamed UnregisterObject to Remove
-- app..tion.cpp	- Moved main loop to Application
+- list.cpp		- Speed optimizations
+- buffer.cpp		- Fixed problems when using const Buffer<>
+- icon.cpp		- Added an image loader for Windows icon resources
+- widget.cpp		- Renamed RegisterObject to Add
+			- Renamed UnregisterObject to Remove
+- application.cpp	- Moved main loop to Application
 
 - simplified Array<> API
 - converted project to MSVC 8.0

@@ -140,18 +140,22 @@ S::Int S::GUI::Tree::Paint(Int message)
 					list.SetVisibleDirect(False);
 					list.SetMetrics(Point(12, 15), GetSize() - Size(12, 15));
 
-					Point	 position;
+					Rect	 visibleArea = list.GetVisibleArea() - list.GetRealPosition();
+					Point	 entryPosition = Point(0, 0);
 
 					for (Int i = 0; i < Length(); i++)
 					{
-						ListEntry	*operat = GetNthEntry(i);
+						ListEntry	*entry = GetNthEntry(i);
 
-						operat->SetMetrics(Point(position.x, position.y), Size(GetWidth() - 12, operat->GetHeight()));
-						operat->Show();
+						entry->SetVisibleDirect(False);
 
-						position.y += operat->GetHeight();
+						if (entryPosition.y + entry->GetHeight() >= visibleArea.top && entryPosition.y <= visibleArea.bottom)
+						{
+							entry->SetMetrics(entryPosition, Size(list.GetWidth(), entry->GetHeight()));
+							entry->SetVisibleDirect(True);
+						}
 
-						if (position.y > GetHeight() - 15) break;
+						entryPosition.y += entry->GetHeight();
 					}
 
 					list.Show();

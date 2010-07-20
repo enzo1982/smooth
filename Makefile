@@ -19,7 +19,7 @@ ifeq ($(BUILD_WIN32),True)
 endif
 endif
 
-LIBS += -lfribidi -lbz2 -llisa -lxml2 -lcpuid -ljpeg -lpng -lz -lstdc++
+LIBS += -lfribidi -lbz2 -llisa -lxml2 -lcpuid -ljpeg -lpng -lz -lnsucd -lstdc++
 
 ifeq ($(BUILD_WIN32),True)
 	LIBS += -lws2_32 -limm32 -lole32

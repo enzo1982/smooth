@@ -102,21 +102,21 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			for (Int i = 0; i < Length(); i++)
 			{
-				ListEntry	*operat = GetNthEntry(i);
+				ListEntry	*entry = GetNthEntry(i);
 
-				operat->SetVisibleDirect(False);
+				entry->SetVisibleDirect(False);
 
-				entryRect.bottom += operat->GetHeight();
+				entryRect.bottom += entry->GetHeight();
 
 				if (entryRect.bottom >= 0 && entryRect.top <= GetHeight() - headerHeight - 4)
 				{
-					operat->SetMetrics(Point(2, entryRect.top + 2 + headerHeight), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), operat->GetHeight()));
-					operat->SetVisibleDirect(True);
+					entry->SetMetrics(Point(2, entryRect.top + 2 + headerHeight), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), entry->GetHeight()));
+					entry->SetVisibleDirect(True);
 
-					visibleEntries.Append(operat->GetName());
+					visibleEntries.Append(entry->GetName());
 				}
 
-				entryRect.top += operat->GetHeight();
+				entryRect.top += entry->GetHeight();
 			}
 
 			visibleEntriesChecksum = visibleEntries.ComputeCRC32();
@@ -147,16 +147,16 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			for (Int i = 0; i < Length(); i++)
 			{
-				ListEntry	*operat = GetNthEntry(i);
+				ListEntry	*entry = GetNthEntry(i);
 
-				frame.bottom += operat->GetHeight();
+				frame.bottom += entry->GetHeight();
 
 				if (frame.bottom >= 0 && frame.top <= GetHeight() - headerHeight - 4)
 				{
-					visibleEntries.Append(operat->GetName());
+					visibleEntries.Append(entry->GetName());
 				}
 
-				frame.top += operat->GetHeight();
+				frame.top += entry->GetHeight();
 
 				if (frame.top > GetHeight() - headerHeight - 4) break;
 			}

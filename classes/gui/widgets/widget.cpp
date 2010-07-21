@@ -607,9 +607,22 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_RBUTTONDOWN:
+		case SM_RBUTTONDBLCLK:
 			if (mouseOver)
 			{
+				/* Activate this widget before opening the context menu.
+				 */
+				if (!focussed)
+				{
+					window->Process(SM_LBUTTONDOWN, 0, 0);
+					window->Process(SM_LBUTTONUP, 0, 0);
+				}
+
 				OpenContextMenu();
+
+				/* Force mouseOut event.
+				 */
+				window->Process(SM_MOUSEMOVE, 0, 0);
 			}
 
 			break;
@@ -756,6 +769,7 @@ S::Void S::GUI::Widget::OpenContextMenu()
 		contextMenu->CalculateSize();
 
 		contextMenu->SetPosition(mousePos);
+		contextMenu->SetAlwaysActive(True);
 		contextMenu->internalRequestClose.Connect(&Widget::CloseContextMenu, this);
 
 		Add(contextMenu);

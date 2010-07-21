@@ -21,6 +21,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - imagebox.cpp		- new widget: a box containing selectable images
 - sha1.cpp		- new class: SHA1, implements the SHA-1 hash algorithm
 - cursor.cpp		- fixed support for right-to-left scripts
+			- added default context menu
 - cpu.cpp		- added CPUID support
 - fontcairo.cpp		- fixed a ressource leak
 - surfacegdi.cpp	- now using clipping instead of buffering to speed up drawing

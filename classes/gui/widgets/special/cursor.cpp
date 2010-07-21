@@ -9,13 +9,15 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/special/cursor.h>
-#include <smooth/gui/window/toolwindow.h>
 #include <smooth/gui/widgets/basic/editbox.h>
+#include <smooth/gui/widgets/multi/menu/popupmenu.h>
+#include <smooth/gui/window/toolwindow.h>
+#include <smooth/graphics/surface.h>
+#include <smooth/i18n/translator.h>
 #include <smooth/misc/binary.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
 #include <smooth/system/timer.h>
-#include <smooth/graphics/surface.h>
 
 #include <fribidi.h>
 
@@ -38,12 +40,15 @@ S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSiz
 	visibleOffset	= 0;
 	scrollPos	= 0;
 	maxScrollPos	= 0;
+	contextMenu	= NIL;
 
 	SetTabstopCapable(True);
 
 	onGetFocus.Connect(&Cursor::OnGetFocus, this);
 	onGetFocusByKeyboard.Connect(&Cursor::OnGetFocusByKeyboard, this);
 	onLoseFocus.Connect(&Cursor::OnLoseFocus, this);
+
+	getContextMenu.Connect(&Cursor::GetContextMenu, this);
 
 	onInput.SetParentObject(this);
 	onEnter.SetParentObject(this);
@@ -52,6 +57,8 @@ S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSiz
 
 S::GUI::Cursor::~Cursor()
 {
+	if (contextMenu != NIL) DeleteObject(contextMenu);
+
 	if (timer != NIL) DeleteObject(timer);
 }
 
@@ -156,6 +163,28 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 				if (markStart == markEnd) { markStart = -1; markEnd = -1; }
 
 				marking = False;
+			}
+
+			break;
+		case SM_RBUTTONDOWN:
+		case SM_RBUTTONDBLCLK:
+			/* Enable the context menu even for inactive widgets.
+			 */
+			if (!IsActive() && IsMouseOver())
+			{
+				/* Activate ourself before opening the context menu.
+				 */
+				if (!focussed)
+				{
+					window->Process(SM_LBUTTONDOWN, 0, 0);
+					window->Process(SM_LBUTTONUP, 0, 0);
+				}
+
+				OpenContextMenu();
+
+				/* Force mouseOut event.
+				 */
+				window->Process(SM_MOUSEMOVE, 0, 0);
 			}
 
 			break;
@@ -475,6 +504,97 @@ S::Int S::GUI::Cursor::MarkAll()
 	return Success();
 }
 
+S::Void S::GUI::Cursor::InsertText(const String &insertText)
+{
+	ShowCursor(False);
+
+	String	 newText;
+
+	for (Int i = 0;		i < promptPos;			     i++) newText[i] = text[i];
+	for (Int j = promptPos; j < promptPos + insertText.Length(); j++) newText[j] = insertText[j - promptPos];
+	for (Int k = promptPos; k <= text.Length();		     k++) newText[k + insertText.Length()] = text[k];
+
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+
+	SetText(newText);
+
+	surface->EndPaint();
+
+	SetCursorPos(promptPos + insertText.Length());
+
+	onInput.Emit(newText);
+}
+
+S::Void S::GUI::Cursor::CopyToClipboard()
+{
+	Window	*window	= container->GetContainerWindow();
+
+	if (markStart != markEnd)
+	{
+		String	 mText;
+
+		for (int j = Math::Min(markStart, markEnd); j < Math::Max(markStart, markEnd); j++) mText[j - Math::Min(markStart, markEnd)] = text[j];
+
+#ifdef __WIN32__
+		OpenClipboard((HWND) window->GetSystemWindow());
+
+		HGLOBAL	 memory = NIL;
+
+		if (Setup::enableUnicode)
+		{
+			memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(wchar_t) * (mText.Length() + 1));
+
+			memcpy(GlobalLock(memory), (wchar_t *) mText, sizeof(wchar_t) * (mText.Length() + 1));
+
+			SetClipboardData(CF_UNICODETEXT, memory);
+		}
+		else
+		{
+			memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, mText.Length() + 1);
+
+			strcpy((char *) GlobalLock(memory), mText);
+
+			SetClipboardData(CF_TEXT, memory);
+		}
+
+		CloseClipboard();
+#endif
+	}
+}
+
+S::Void S::GUI::Cursor::InsertFromClipboard()
+{
+	Window	*window	= container->GetContainerWindow();
+
+	DeleteSelectedText();
+
+	String	 insertText;
+
+#ifdef __WIN32__
+	OpenClipboard((HWND) window->GetSystemWindow());
+
+	if (Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT))
+	{
+		insertText = (wchar_t *) GetClipboardData(CF_UNICODETEXT);
+	}
+	else if (IsClipboardFormatAvailable(CF_TEXT))
+	{
+		insertText = (char *) GetClipboardData(CF_TEXT);
+	}
+
+	CloseClipboard();
+#endif
+
+	if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
+	{
+		if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) return;
+
+		InsertText(insertText);
+	}
+}
+
 S::Void S::GUI::Cursor::DeleteSelectedText()
 {
 	if (markStart == markEnd || markStart < 0 || markEnd < 0) return;
@@ -500,29 +620,6 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 	surface->EndPaint();
 
 	SetCursorPos(bMarkStart);
-
-	onInput.Emit(newText);
-}
-
-S::Void S::GUI::Cursor::InsertText(const String &insertText)
-{
-	ShowCursor(False);
-
-	String	 newText;
-
-	for (Int i = 0; i < promptPos; i++)					newText[i] = text[i];
-	for (Int j = promptPos; j < promptPos + insertText.Length(); j++)	newText[j] = insertText[j - promptPos];
-	for (Int k = promptPos; k <= text.Length(); k++)			newText[k + insertText.Length()] = text[k];
-
-	Surface	*surface = GetDrawSurface();
-
-	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
-
-	SetText(newText);
-
-	surface->EndPaint();
-
-	SetCursorPos(promptPos + insertText.Length());
 
 	onInput.Emit(newText);
 }
@@ -706,50 +803,18 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 	 */
 	if (!focussed) return;
 
-	Window	*window	= container->GetContainerWindow();
-
 	/* CTRL + C
 	 */
 	if (character == 3 && !(flags & (1 << 30)))
 	{
-		if (markStart != markEnd)
-		{
-			String	 mText;
-
-			for (int j = Math::Min(markStart, markEnd); j < Math::Max(markStart, markEnd); j++) mText[j - Math::Min(markStart, markEnd)] = text[j];
-
-#ifdef __WIN32__
-			OpenClipboard((HWND) window->GetSystemWindow());
-
-			HGLOBAL	 memory = NIL;
-
-			if (Setup::enableUnicode)
-			{
-				memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(wchar_t) * (mText.Length() + 1));
-
-				memcpy(GlobalLock(memory), (wchar_t *) mText, sizeof(wchar_t) * (mText.Length() + 1));
-
-				SetClipboardData(CF_UNICODETEXT, memory);
-			}
-			else
-			{
-				memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, mText.Length() + 1);
-
-				strcpy((char *) GlobalLock(memory), mText);
-
-				SetClipboardData(CF_TEXT, memory);
-			}
-
-			CloseClipboard();
-#endif
-		}
+		CopyToClipboard();
 	}
 
 	/* CTRL + X
 	 */
 	if (character == 24 && !(flags & (1 << 30)) && IsActive())
 	{
-		Process(SM_CHAR, 3, 0);
+		CopyToClipboard();
 
 		DeleteSelectedText();
 	}
@@ -758,31 +823,7 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 	 */
 	if (character == 22 && IsActive())
 	{
-		DeleteSelectedText();
-
-		String	 insertText;
-
-#ifdef __WIN32__
-		OpenClipboard((HWND) window->GetSystemWindow());
-
-		if (Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT))
-		{
-			insertText = (wchar_t *) GetClipboardData(CF_UNICODETEXT);
-		}
-		else if (IsClipboardFormatAvailable(CF_TEXT))
-		{
-			insertText = (char *) GetClipboardData(CF_TEXT);
-		}
-
-		CloseClipboard();
-#endif
-
-		if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
-		{
-			if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) return;
-
-			InsertText(insertText);
-		}
+		InsertFromClipboard();
 	}
 
 	if (text.Length() == maxSize && markStart == markEnd) return;
@@ -801,9 +842,9 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 		}
 		else
 		{
-			// Non Unicode Windows puts ANSI character codes into wParam.
-			// Import these using the current character input format.
-
+			/* Non Unicode Windows puts ANSI character codes into wParam.
+			 * Import these using the current character input format.
+			 */
 			char  ansiText[2] = { character, 0 };
 
 			insertText = ansiText;
@@ -811,6 +852,69 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 
 		InsertText(insertText);
 	}
+}
+
+S::Void S::GUI::Cursor::OnCut()
+{
+	CopyToClipboard();
+	DeleteSelectedText();
+}
+
+S::Void S::GUI::Cursor::OnInsert()
+{
+	InsertFromClipboard();
+}
+
+S::GUI::PopupMenu *S::GUI::Cursor::GetContextMenu()
+{
+	if (!IsActive() && text == NIL) return NIL;
+
+	if (contextMenu == NIL) contextMenu = new PopupMenu();
+
+	contextMenu->RemoveAllEntries();
+
+	MenuEntry	*entryCut     = contextMenu->AddEntry(I18n::Translator::defaultTranslator->TranslateString("Cut"));
+	MenuEntry	*entryCopy    = contextMenu->AddEntry(I18n::Translator::defaultTranslator->TranslateString("Copy"));
+	MenuEntry	*entryInsert  = contextMenu->AddEntry(I18n::Translator::defaultTranslator->TranslateString("Paste"));
+	MenuEntry	*entryDelete  = contextMenu->AddEntry(I18n::Translator::defaultTranslator->TranslateString("Clear"));
+
+	contextMenu->AddEntry();
+
+	MenuEntry	*entryMarkAll = contextMenu->AddEntry(I18n::Translator::defaultTranslator->TranslateString("Select all"));
+
+	entryCut->onAction.Connect(&Cursor::OnCut, this);
+	entryCopy->onAction.Connect(&Cursor::CopyToClipboard, this);
+	entryInsert->onAction.Connect(&Cursor::OnInsert, this);
+	entryDelete->onAction.Connect(&Cursor::DeleteSelectedText, this);
+
+	entryMarkAll->onAction.Connect(&Cursor::MarkAll, this);
+
+	/* Disable modification if inactive.
+	 */
+	if (!IsActive())
+	{
+		entryCut->Deactivate();
+		entryInsert->Deactivate();
+		entryDelete->Deactivate();
+	}
+
+	/* Disable copy and delete if nothing is selected.
+	 */
+	if (markStart == markEnd)
+	{
+		entryCut->Deactivate();
+		entryCopy->Deactivate();
+		entryDelete->Deactivate();
+	}
+
+	/* Disable "Select all" if everything is selected already.
+	 */
+	if ((markStart == 0 && markEnd == text.Length()) || text == NIL)
+	{
+		entryMarkAll->Deactivate();
+	}
+
+	return contextMenu;
 }
 
 S::Int S::GUI::Cursor::SetCursorPos(Int newPos)

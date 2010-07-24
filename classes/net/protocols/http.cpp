@@ -18,6 +18,7 @@
 #include <smooth/io/drivers/driver_socks5.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/number.h>
+#include <smooth/system/system.h>
 #include <smooth/foreach.h>
 
 #include <time.h>
@@ -333,8 +334,10 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 		if (requestParameters.GetNth(i).isFile) { haveFiles = True; break; }
 	}
 
+	S::File		 tempFile = S::System::System::GetTempDirectory().Append("httprequest.temp");
+	IO::OutStream	*out = new IO::OutStream(IO::STREAM_FILE, tempFile, IO::OS_REPLACE);
+
 	String		 contentType;
-	IO::OutStream	*out = new IO::OutStream(IO::STREAM_FILE, "httprequest.temp", IO::OS_REPLACE);
 
 	if (content != NIL)
 	{
@@ -392,7 +395,7 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 
 	delete out;
 
-	IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, "httprequest.temp", IO::IS_READ);
+	IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, tempFile, IO::IS_READ);
 
 	SetHeaderField("Content-Length", String::FromInt(in->Size()));
 	SetHeaderField("Content-Type", contentType);
@@ -406,7 +409,7 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 
 	delete in;
 
-	S::File("httprequest.temp").Delete();
+	tempFile.Delete();
 }
 
 S::String S::Net::Protocols::HTTP::ComposeHeader()

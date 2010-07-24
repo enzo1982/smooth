@@ -1,2 +1,4 @@
 - classes that derive from a smooth::Object and have their own classID need to implement IsTypeCompatile
 - classes that implement IsTypeCompatible must care for being removed from containers on destruction
+
+- always use Object::DeleteObject to delete smooth objects, otherwise the program might crash

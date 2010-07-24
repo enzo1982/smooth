@@ -199,7 +199,7 @@ S::Int S::GUI::TabWidget::Add(Widget *widget)
 	{
 		widget->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));
 
-		if (GetNOfObjects() == 1) widget->Show();
+		if (GetNOfObjects() == 1) SelectTab(widget);
 		else			  widget->Hide();
 
 		return Success();
@@ -216,7 +216,11 @@ S::Int S::GUI::TabWidget::Remove(Widget *widget)
 
 	if (Widget::Remove(widget) == Success())
 	{
-		if (wasVisible && GetNOfObjects() > 0) GetNthObject(0)->Show();
+		if (wasVisible)
+		{
+			if (GetNOfObjects() > 0) SelectTab(GetNthObject(0));
+			else			 selectedTab = NIL;
+		}
 
 		return Success();
 	}

@@ -168,11 +168,9 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			break;
 		case SM_RBUTTONDOWN:
 		case SM_RBUTTONDBLCLK:
-			/* Enable the context menu even for inactive widgets.
-			 */
-			if (!IsActive() && IsMouseOver())
+			if (mouseOver)
 			{
-				/* Activate ourself before opening the context menu.
+				/* Activate this widget before opening the context menu.
 				 */
 				if (!focussed)
 				{
@@ -180,11 +178,16 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 					window->Process(SM_LBUTTONUP, 0, 0);
 				}
 
-				OpenContextMenu();
-
-				/* Force mouseOut event.
+				/* Enable the context menu even for inactive widgets.
 				 */
-				window->Process(SM_MOUSEMOVE, 0, 0);
+				if (!IsActive())
+				{
+					OpenContextMenu();
+
+					/* Force mouseOut event.
+					 */
+					window->Process(SM_MOUSEMOVE, 0, 0);
+				}
 			}
 
 			break;
@@ -419,7 +422,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 						Int	 markRegionStart = GetDisplayCursorPositionFromVisual(line, markRegionStarts.GetNth(i));
 						Int	 markRegionEnd	 = GetDisplayCursorPositionFromVisual(line, markRegionEnds.GetNth(i));
 
-						Rect	 markRect = Rect(realPos + Point(markRegionStart - visibleOffset, (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)), Size(markRegionEnd - markRegionStart, font.GetTextSizeY() + 3));
+						Rect	 markRect = Rect(realPos + Point(markRegionStart, (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)), Size(markRegionEnd - markRegionStart, font.GetTextSizeY() + 3));
 						Font	 nFont = font;
 
 						nFont.SetColor(tColor);
@@ -478,7 +481,15 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 
 S::Int S::GUI::Cursor::SetText(const String &newText)
 {
+	if (text == newText) return Success();
+
 	lineIndices.RemoveAll();
+
+	OnLoseFocus();
+
+	promptPos	= 0;
+	visibleOffset	= 0;
+	scrollPos	= 0;
 
 	return Widget::SetText(newText);
 }
@@ -514,12 +525,20 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 	for (Int j = promptPos; j < promptPos + insertText.Length(); j++) newText[j] = insertText[j - promptPos];
 	for (Int k = promptPos; k <= text.Length();		     k++) newText[k + insertText.Length()] = text[k];
 
+	Bool	 prevVisible = IsVisible();
+
+	visible = False;
+
+	lineIndices.RemoveAll();
+
+	Widget::SetText(newText);
+
+	visible = prevVisible;
+
 	Surface	*surface = GetDrawSurface();
 
 	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
-
-	SetText(newText);
-
+	container->Paint(SP_PAINT);
 	surface->EndPaint();
 
 	SetCursorPos(promptPos + insertText.Length());
@@ -604,9 +623,9 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 	Int	 bMarkStart	= Math::Min(markStart, markEnd);
 	Int	 bMarkEnd	= Math::Max(markStart, markEnd);
 
-	Surface	*surface = GetDrawSurface();
+	Bool	 prevVisible = IsVisible();
 
-	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+	visible = False;
 
 	MarkText(-1, -1);
 
@@ -615,8 +634,16 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 	for (Int i = 0; i < bMarkStart; i++)		newText[i] = text[i];
 	for (Int j = bMarkEnd; j <= text.Length(); j++)	newText[j - (bMarkEnd - bMarkStart)] = text[j];
 
-	SetText(newText);
+	lineIndices.RemoveAll();
 
+	Widget::SetText(newText);
+
+	visible = prevVisible;
+
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+	container->Paint(SP_PAINT);
 	surface->EndPaint();
 
 	SetCursorPos(bMarkStart);
@@ -1072,18 +1099,14 @@ S::Int S::GUI::Cursor::GetDisplayCursorPositionFromLogical(Int promptPos) const
 
 	if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 	{
-		for (Int i = promptPos - 1; i >= 0; i--)
-		{
-			if (text[i] == '\n')
-			{
-				for (Int j = i + 1; j < promptPos; j++) wText[j - i - 1] = text[j];
+		Int	 lineStart  = promptPos;
+		Int	 lineLength = 0;
 
-				wText[promptPos - i - 1] = 0;
-				wPromptPos = promptPos - i - 1;
+		for (Int i = promptPos - 1; i >= 0;		i--) { if (text[i] == '\n')		    break; lineStart--;	 }
+		for (Int i = lineStart;	    i <  text.Length();	i++) { if (text[i] == '\n' || text[i] == 0) break; lineLength++; }
 
-				break;
-			}
-		}
+		wText = text.SubString(lineStart, lineLength);
+		wPromptPos = promptPos - lineStart;
 	}
 
 	return GetDisplayCursorPositionFromLogical(wText, wPromptPos);

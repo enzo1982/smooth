@@ -16,7 +16,7 @@ using namespace smooth::IO;
 
 Void generateConversion(Int field, OutStream &out)
 {
-	InStream	 in(STREAM_FILE, "UnicodeData.txt", IS_READ);
+	InStream	 in(STREAM_FILE, String("UnicodeData.txt"), IS_READ);
 
 	Int	 seriesCount	=  0;
 	Int	 seriesLength	=  0;
@@ -96,7 +96,7 @@ Void generateConversion(Int field, OutStream &out)
 
 Int smooth::Main()
 {
-	OutStream	 out(STREAM_FILE, "string_case.cpp", OS_REPLACE);
+	OutStream	 out(STREAM_FILE, String("string_case.cpp"), OS_REPLACE);
 
 	out.OutputString(" /* The smooth Class Library						\
 		\r\n  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>		\

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -120,20 +120,21 @@ S::Int S::Object::DeleteObject(Object *object)
 	{
 		if (objects.Get(object->handle) == NIL) return Error();
 
+		/* Notify object that it will be deleted soon.
+		 */
+		object->EnqueueForDeletion();
+		object->isDeleteable = True;
+
 		if (!object->IsObjectInUse())
 		{
 			/* Delete object immediately if
 			 * it is not currently in use.
 			 */
+			objects.Remove(object->handle);
 			delete object;
 		}
 		else
 		{
-			/* Notify object that it will be deleted soon.
-			 */
-			object->EnqueueForDeletion();
-			object->isDeleteable = True;
-
 			/* Remove object from object list and add
 			* it to the list of objects to delete.
 			*/

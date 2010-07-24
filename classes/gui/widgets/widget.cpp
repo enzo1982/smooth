@@ -610,14 +610,6 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 		case SM_RBUTTONDBLCLK:
 			if (mouseOver)
 			{
-				/* Activate this widget before opening the context menu.
-				 */
-				if (!focussed)
-				{
-					window->Process(SM_LBUTTONDOWN, 0, 0);
-					window->Process(SM_LBUTTONUP, 0, 0);
-				}
-
 				OpenContextMenu();
 
 				/* Force mouseOut event.

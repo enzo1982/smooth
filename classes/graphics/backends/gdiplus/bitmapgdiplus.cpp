@@ -132,6 +132,8 @@ S::Bool S::GUI::BitmapGDIPlus::DeleteBitmap()
 
 S::Bool S::GUI::BitmapGDIPlus::SetSystemBitmap(Void *nBitmap)
 {
+	if (nBitmap == GetSystemBitmap()) return True;
+
 	if (nBitmap == NIL)
 	{
 		DeleteBitmap();

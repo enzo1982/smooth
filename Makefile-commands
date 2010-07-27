@@ -11,7 +11,11 @@ LD	 = gcc
 LDOPTS	 = -L$(SMOOTH_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_WIN32),True)
-	LDOPTS += -mwindows -Xlinker --dynamicbase -Xlinker --nxcompat
+	LDOPTS += -mwindows
+
+ifneq ($(BUILD_X64),True)
+	LDOPTS += -Xlinker --dynamicbase -Xlinker --nxcompat
+endif
 
 ifeq ($(BUILD_CAIRO),True)
 	CCOPTS += -I$(SMOOTH_PATH)/include/cairowin

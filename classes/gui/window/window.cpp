@@ -152,6 +152,13 @@ S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 	return Success();
 }
 
+S::Int S::GUI::Window::SetIconDirect(Void *nIcon)
+{
+	backend->SetIconDirect(nIcon);
+
+	return Success();
+}
+
 S::GUI::Layer *S::GUI::Window::GetMainLayer() const
 {
 	return mainLayer;

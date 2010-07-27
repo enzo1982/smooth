@@ -10,7 +10,6 @@ int main()
 	char rfn[1024];
 	char pfn[1024];
 	HBITMAP bmp;
-	int im_id = 0;
 
 	cout << "PCI filename: ";
 	cin >> pfn;

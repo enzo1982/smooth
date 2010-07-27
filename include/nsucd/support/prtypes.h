@@ -60,6 +60,10 @@
 
 #include <stddef.h>
 
+#if defined(_WIN64) && defined(__GNUC__)
+#define __int64  long long
+#endif
+
 /***********************************************************************
 ** MACROS:      PR_EXTERN
 **              PR_IMPLEMENT

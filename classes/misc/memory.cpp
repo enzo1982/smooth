@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,12 +20,19 @@ S::Memory::Memory(Int size)
 
 S::Memory::~Memory()
 {
-	free(memory);
+	if (memory != NIL) free(memory);
 }
 
 S::Bool S::Memory::Resize(Int size)
 {
-	memory = (UnsignedByte *) realloc(memory, size);
+	UnsignedByte	*oldMemory = memory;
+
+	if ((memory = (UnsignedByte *) realloc(memory, size)) == NIL)
+	{
+		free(oldMemory);
+
+		return False;
+	}
 
 	return True;
 }

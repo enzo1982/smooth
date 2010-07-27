@@ -337,17 +337,6 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 	Rect		 urect = dlgwnd->GetUpdateRect();
 	Int		 hssize = 205;
 	double		 huebias = 256 / (double) hssize;
-	register Int	 xmin = 0;
-	register Int	 ymin = 0;
-	register Int	 xmax = hssize;
-	register Int	 ymax = hssize;
-	register int	 normrgb;
-	register double	 rbias;
-	register double	 gbias;
-	register double	 bbias;
-	register double  ared;
-	register double  agreen;
-	register double  ablue;
 
 	rect.left	= huexoffset;
 	rect.top	= yoffset;
@@ -409,10 +398,10 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 		irect.right += 5;
 		irect.bottom += 5;
 
-		xmin = irect.left - 8;
-		xmax = irect.right - 8;
-		ymin = irect.top - (yoffset + 1);
-		ymax = irect.bottom - (yoffset + 1);
+		register Int	 xmin = irect.left - 8;
+		register Int	 ymin = irect.top - (yoffset + 1);
+		register Int	 xmax = irect.right - 8;
+		register Int	 ymax = irect.bottom - (yoffset + 1);
 
 		rect.left	= xmin;
 		rect.top	= ymin;
@@ -421,15 +410,15 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 
 		for (register int sat = Math::Max(0, ymin); sat < Math::Min(hssize, ymax); sat++)
 		{
-			normrgb = colortable[acthue][255 - Math::Round(sat * (256.0 / 205.0))];
+			register int	 normrgb = colortable[acthue][255 - Math::Round(sat * (256.0 / 205.0))];
 
-			rbias = (double) Color(normrgb).GetRed() / (255.0 / (256.0 / 205.0));
-			gbias = (double) Color(normrgb).GetGreen() / (255.0 / (256.0 / 205.0));
-			bbias = (double) Color(normrgb).GetBlue() / (255.0 / (256.0 / 205.0));
+			register double	 rbias	 = (double) Color(normrgb).GetRed() / (255.0 / (256.0 / 205.0));
+			register double	 gbias	 = (double) Color(normrgb).GetGreen() / (255.0 / (256.0 / 205.0));
+			register double	 bbias	 = (double) Color(normrgb).GetBlue() / (255.0 / (256.0 / 205.0));
 
-			ared = -rbias + Math::Max(0, xmin) * rbias;
-			agreen = -gbias + Math::Max(0, xmin) * gbias;
-			ablue = -bbias + Math::Max(0, xmin) * bbias;
+			register double  ared	 = -rbias + Math::Max(0, xmin) * rbias;
+			register double  agreen	 = -gbias + Math::Max(0, xmin) * gbias;
+			register double  ablue	 = -bbias + Math::Max(0, xmin) * bbias;
 
 			for (register int val = Math::Max(0, xmin); val < Math::Min(hssize, xmax); val++)
 			{

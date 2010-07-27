@@ -16,6 +16,9 @@
 #include "infoitem.h"
 #include "stringitem.h"
 
+#define IDI_ICON	100
+#define IDB_ICON	200
+
 Int smooth::Main(const Array<String> &args)
 {
 	Translator	*app = new Translator(args.GetNth(0));
@@ -117,6 +120,12 @@ Translator::Translator(const String &openFile)
 
 	wnd->SetMinimumSize(Size(400, 350));
 	wnd->SetIcon(NIL);
+
+#ifdef __WIN32__
+	wnd->SetIcon(Bitmap((HBITMAP) LoadImageA(hInstance, MAKEINTRESOURCEA(IDB_ICON), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED)));
+	wnd->SetIconDirect(LoadImageA(hInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
+#endif
+
 	wnd->doClose.Connect(&Translator::ExitProc, this);
 	wnd->onChangeSize.Connect(&Translator::ResizeProc, this);
 
@@ -704,7 +713,14 @@ Void Translator::SelectEntry()
 
 Void Translator::NewEntry()
 {
-	StringItem	*entry = (StringItem *) entries.GetLast();
+	Int	 id = 1;
+
+	if (entries.Length() > 7)
+	{
+		StringItem	*entry = (StringItem *) entries.GetLast();
+
+		id = Math::Max(entry->GetID(), 0) + 1;
+	}
 
 	text_id->Activate();
 	edit_id->Activate();
@@ -714,7 +730,7 @@ Void Translator::NewEntry()
 	text_original->SetText("Original:");
 	text_translated->SetText("Translation:");
 
-	edit_id->SetText(String::FromInt(Math::Max(entry->GetID(), 0) + 1));
+	edit_id->SetText(String::FromInt(id));
 	edit_original->SetText(NIL);
 	edit_translated->SetText(NIL);
 

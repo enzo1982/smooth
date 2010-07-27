@@ -1,6 +1,7 @@
-# Makefile for smooth v0.8, Windows, MinGW32
+# Makefile for smooth v0.8
 
 include Makefile-directories
+
 include Makefile-options
 
 HEADERS = $(OBJECTDIR)/smooth.h.gch
@@ -54,7 +55,11 @@ LIBSTRIP_OPTS = --strip-debug
 REMOVER_OPTS = -f
 
 ifeq ($(BUILD_WIN32),True)
-	LINKER_OPTS += -mwindows -Xlinker --dynamicbase -Xlinker --nxcompat -Xlinker --kill-at -Xlinker --out-implib -Xlinker $(LIBNAME)
+	LINKER_OPTS += -mwindows -Xlinker --kill-at -Xlinker --out-implib -Xlinker $(LIBNAME)
+
+ifneq ($(BUILD_X64),True)
+	LDOPTS += -Xlinker --dynamicbase -Xlinker --nxcompat
+endif
 endif
 
 .PHONY: all headers objects programs libs install clean clean_all clean_headers doc doc-clean
@@ -108,7 +113,11 @@ endif
 
 $(LIBICONVDLL): $(LIBICONV)
 ifeq ($(BUILD_WIN32),True)
+ifneq ($(BUILD_X64),True)
 	$(LINKER) libraries/libiconv/*.o -L$(LIBDIR) --shared -Xlinker --dynamicbase -Xlinker --nxcompat -o $(LIBICONVDLL)
+else
+	$(LINKER) libraries/libiconv/*.o -L$(LIBDIR) --shared -o $(LIBICONVDLL)
+endif
 else
 	$(LINKER) libraries/libiconv/*.o -L$(LIBDIR) --shared -o $(LIBICONVDLL)
 endif

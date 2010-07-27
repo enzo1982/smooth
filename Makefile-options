@@ -1,0 +1,13 @@
+########## smooth options makefile ##########
+
+ifndef SMOOTH_PATH
+	SMOOTH_PATH = .
+endif
+
+ifeq ($(BUILD_WIN32),True)
+	include $(SMOOTH_PATH)/Makefile-options.win32
+else
+ifeq ($(BUILD_UNIX),True)
+	include $(SMOOTH_PATH)/Makefile-options.linux
+endif
+endif

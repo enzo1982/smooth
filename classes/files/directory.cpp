@@ -17,11 +17,8 @@
 #	include <sys/stat.h>
 #endif
 
-#ifdef __WIN32__
-S::String	 S::Directory::dirDelimiter = "\\";
-#else
-S::String	 S::Directory::dirDelimiter = "/";
-#endif
+char	*S::Directory::directoryDelimiter = NIL;
+char	*S::Directory::unicodePathPrefix  = NIL;
 
 S::Directory::Directory(const String &iDirName, const String &iDirPath)
 {
@@ -33,7 +30,7 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 #ifdef __WIN32__
 		if (dirName[1] == ':' || dirName.StartsWith("\\\\"))
 #else
-		if (dirName.StartsWith(dirDelimiter) || dirName.StartsWith("~"))
+		if (dirName.StartsWith(GetDirectoryDelimiter()) || dirName.StartsWith("~"))
 #endif
 		{
 			dirPath = dirName;
@@ -43,11 +40,11 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 
 	if (dirName == NIL)
 	{
-		if (dirPath.EndsWith(dirDelimiter)) dirPath[dirPath.Length() - 1] = 0;
+		if (dirPath.EndsWith(GetDirectoryDelimiter())) dirPath[dirPath.Length() - 1] = 0;
 
 		for (Int lastBS = dirPath.Length() - 1; lastBS >= 0; lastBS--)
 		{
-			if (dirPath[lastBS] == dirDelimiter[0])
+			if (dirPath[lastBS] == GetDirectoryDelimiter()[0])
 			{
 				for (Int i = lastBS + 1; i < dirPath.Length(); i++) dirName[i - lastBS - 1] = dirPath[i];
 
@@ -123,7 +120,7 @@ const S::Array<S::Directory> &S::Directory::GetDirectories() const
 	WIN32_FIND_DATAW findDataW;
 	WIN32_FIND_DATAA findDataA;
 
-	if (Setup::enableUnicode)	handle = FindFirstFileW(String("\\\\?\\").Append(*this).Append("\\*.*"), &findDataW);
+	if (Setup::enableUnicode)	handle = FindFirstFileW(String(GetUnicodePathPrefix()).Append(*this).Append("\\*.*"), &findDataW);
 	else				handle = FindFirstFileA(String(*this).Append("\\*.*"), &findDataA);
 
 	Bool	 success = (handle != INVALID_HANDLE_VALUE);
@@ -159,7 +156,7 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 	WIN32_FIND_DATAW findDataW;
 	WIN32_FIND_DATAA findDataA;
 
-	if (Setup::enableUnicode)	handle = FindFirstFileW(String("\\\\?\\").Append(*this).Append("\\").Append(pattern), &findDataW);
+	if (Setup::enableUnicode)	handle = FindFirstFileW(String(GetUnicodePathPrefix()).Append(*this).Append("\\").Append(pattern), &findDataW);
 	else				handle = FindFirstFileA(String(*this).Append("\\").Append(pattern), &findDataA);
 
 	Bool	 success = (handle != INVALID_HANDLE_VALUE);
@@ -211,7 +208,7 @@ S::DateTime S::Directory::GetCreateTime() const
 	WIN32_FIND_DATAW findDataW;
 	WIN32_FIND_DATAA findDataA;
 
-	if (Setup::enableUnicode)	handle = FindFirstFileW(String("\\\\?\\").Append(*this), &findDataW);
+	if (Setup::enableUnicode)	handle = FindFirstFileW(String(GetUnicodePathPrefix()).Append(*this), &findDataW);
 	else				handle = FindFirstFileA(String(*this), &findDataA);
 
 	FindClose(handle);
@@ -245,7 +242,7 @@ S::Bool S::Directory::Exists() const
 	WIN32_FIND_DATAW	 findDataW;
 	WIN32_FIND_DATAA	 findDataA;
 
-	if (Setup::enableUnicode)	handle = FindFirstFileW(String("\\\\?\\").Append(*this), &findDataW);
+	if (Setup::enableUnicode)	handle = FindFirstFileW(String(GetUnicodePathPrefix()).Append(*this), &findDataW);
 	else				handle = FindFirstFileA(String(*this), &findDataA);
 
 	if (handle == INVALID_HANDLE_VALUE) return False;
@@ -286,7 +283,7 @@ S::Int S::Directory::Create()
 			path[i] = 0;
 
 #ifdef __WIN32__
-			if (Setup::enableUnicode)	CreateDirectoryW(String("\\\\?\\").Append(path), NIL);
+			if (Setup::enableUnicode)	CreateDirectoryW(String(GetUnicodePathPrefix()).Append(path), NIL);
 			else				CreateDirectoryA(path, NIL);
 #else
 			mkdir(path, 0755);
@@ -309,7 +306,7 @@ S::Int S::Directory::Move(const String &destination)
 	Bool	 result = False;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)	result = MoveFileW(String("\\\\?\\").Append(*this), String("\\\\?\\").Append(destination));
+	if (Setup::enableUnicode)	result = MoveFileW(String(GetUnicodePathPrefix()).Append(*this), String(GetUnicodePathPrefix()).Append(destination));
 	else				result = MoveFileA(String(*this), destination);
 #else
 	result = (rename(String(*this), destination) == 0);
@@ -324,7 +321,7 @@ S::Int S::Directory::Delete()
 	Bool	 result = False;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)	result = RemoveDirectoryW(String("\\\\?\\").Append(*this));
+	if (Setup::enableUnicode)	result = RemoveDirectoryW(String(GetUnicodePathPrefix()).Append(*this));
 	else				result = RemoveDirectoryA(String(*this));
 #else
 	result = (rmdir(String(*this)) == 0);
@@ -345,7 +342,7 @@ S::Int S::Directory::Empty()
 	WIN32_FIND_DATAA	 findDataA;
 	HANDLE			 handle;
 
-	if (Setup::enableUnicode)	handle = FindFirstFileW(String("\\\\?\\").Append("*"), &findDataW);
+	if (Setup::enableUnicode)	handle = FindFirstFileW(String(GetUnicodePathPrefix()).Append("*"), &findDataW);
 	else				handle = FindFirstFileA(String("*"), &findDataA);
 
 	if (handle != INVALID_HANDLE_VALUE)
@@ -402,9 +399,39 @@ S::Int S::Directory::Empty()
 	return Success();
 }
 
-const S::String &S::Directory::GetDirectoryDelimiter()
+const char *S::Directory::GetDirectoryDelimiter()
 {
-	return dirDelimiter;
+	if (directoryDelimiter == NIL)
+	{
+#ifdef __WIN32__
+		directoryDelimiter = (char *) "\\";
+#else
+		directoryDelimiter = (char *) "/";
+#endif
+	}
+
+	return directoryDelimiter;
+}
+
+const char *S::Directory::GetUnicodePathPrefix()
+{
+	if (unicodePathPrefix == NIL)
+	{
+#ifdef __WIN32__
+		OSVERSIONINFOA	 vInfo;
+
+		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+		GetVersionExA(&vInfo);
+
+		if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) unicodePathPrefix = (char *) "\\\\?\\";
+		else						 unicodePathPrefix = (char *) "";
+#else
+		unicodePathPrefix = (char *) "";
+#endif
+	}
+
+	return unicodePathPrefix;
 }
 
 S::Directory S::Directory::GetActiveDirectory()
@@ -451,7 +478,7 @@ S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 	Bool	 result = False;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)	result = SetCurrentDirectoryW(String("\\\\?\\").Append(directory));
+	if (Setup::enableUnicode)	result = SetCurrentDirectoryW(String(GetUnicodePathPrefix()).Append(directory));
 	else				result = SetCurrentDirectoryA(String(directory));
 #else
 	result = (chdir(String(directory)) == 0);

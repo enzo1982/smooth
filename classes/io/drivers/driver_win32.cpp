@@ -15,6 +15,20 @@
 
 S::IO::DriverWin32::DriverWin32(const String &fileName, Int mode) : Driver()
 {
+	static char	*unicodePathPrefix = NIL;
+
+	if (unicodePathPrefix == NIL)
+	{
+		OSVERSIONINFOA	 vInfo;
+
+		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+		GetVersionExA(&vInfo);
+
+		if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) unicodePathPrefix = (char *) "\\\\?\\";
+		else						 unicodePathPrefix = (char *) "";
+	}
+
 	closeStream = False;
 
 	switch (mode)
@@ -23,21 +37,21 @@ S::IO::DriverWin32::DriverWin32(const String &fileName, Int mode) : Driver()
 			lastError = IO_ERROR_BADPARAM;
 			return;
 		case OS_APPEND:				// open a file for appending data
-			if (Setup::enableUnicode)	stream = CreateFileW(String("\\\\?\\").Append(fileName), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			else				stream = CreateFileA(fileName,				 GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (Setup::enableUnicode)	stream = CreateFileW(String(unicodePathPrefix).Append(fileName), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			else				stream = CreateFileA(fileName,					 GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			Seek(GetSize());
 			break;
 		case OS_REPLACE:			// create or overwrite a file
-			if (Setup::enableUnicode)	stream = CreateFileW(String("\\\\?\\").Append(fileName), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			else				stream = CreateFileA(fileName,				 GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (Setup::enableUnicode)	stream = CreateFileW(String(unicodePathPrefix).Append(fileName), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			else				stream = CreateFileA(fileName,					 GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			break;
 		case IS_READ | IS_WRITE:		// open a file for reading data
-			if (Setup::enableUnicode)	stream = CreateFileW(String("\\\\?\\").Append(fileName), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-			else				stream = CreateFileA(fileName,				 GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (Setup::enableUnicode)	stream = CreateFileW(String(unicodePathPrefix).Append(fileName), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			else				stream = CreateFileA(fileName,					 GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 			break;
 		case IS_READ:				// open a file in read only mode
-			if (Setup::enableUnicode)	stream = CreateFileW(String("\\\\?\\").Append(fileName), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-			else				stream = CreateFileA(fileName,				 GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (Setup::enableUnicode)	stream = CreateFileW(String(unicodePathPrefix).Append(fileName), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			else				stream = CreateFileA(fileName,					 GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 			break;
 	}
 

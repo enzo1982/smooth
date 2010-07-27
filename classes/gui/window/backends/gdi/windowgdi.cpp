@@ -462,6 +462,16 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 	return Success();
 }
 
+S::Int S::GUI::WindowGDI::SetIconDirect(Void *newIcon)
+{
+	if (destroyIcon) DestroyIcon(sysIcon);
+
+	sysIcon = (HICON) newIcon;
+	destroyIcon = False;
+
+	return Success();
+}
+
 S::Int S::GUI::WindowGDI::SetMinimumSize(const Size &nMinSize)
 {
 	minSize = nMinSize;

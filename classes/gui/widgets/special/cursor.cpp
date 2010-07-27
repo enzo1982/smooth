@@ -548,8 +548,6 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 
 S::Void S::GUI::Cursor::CopyToClipboard()
 {
-	Window	*window	= container->GetContainerWindow();
-
 	if (markStart != markEnd)
 	{
 		String	 mText;
@@ -557,6 +555,8 @@ S::Void S::GUI::Cursor::CopyToClipboard()
 		for (int j = Math::Min(markStart, markEnd); j < Math::Max(markStart, markEnd); j++) mText[j - Math::Min(markStart, markEnd)] = text[j];
 
 #ifdef __WIN32__
+		Window	*window	= container->GetContainerWindow();
+
 		OpenClipboard((HWND) window->GetSystemWindow());
 
 		HGLOBAL	 memory = NIL;
@@ -585,13 +585,13 @@ S::Void S::GUI::Cursor::CopyToClipboard()
 
 S::Void S::GUI::Cursor::InsertFromClipboard()
 {
-	Window	*window	= container->GetContainerWindow();
-
 	DeleteSelectedText();
 
 	String	 insertText;
 
 #ifdef __WIN32__
+	Window	*window	= container->GetContainerWindow();
+
 	OpenClipboard((HWND) window->GetSystemWindow());
 
 	if (Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT))
@@ -950,8 +950,6 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	ShowCursor(False);
 
-	Window	*wnd	 = GetContainerWindow();
-	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
 	Point	 p1	 = GetRealPosition();
 
@@ -993,10 +991,13 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 #ifdef __WIN32__
 	{
-		HWND	 hwnd	= (HWND) surface->GetSystemSurface();
-		HDC	 dc	= GetWindowDC(hwnd);
+		Window	*window	 = GetContainerWindow();
+		Surface	*surface = GetDrawSurface();
 
-		HIMC		 hImc = ImmGetContext((HWND) wnd->GetSystemWindow());
+		HWND	 hwnd	 = (HWND) surface->GetSystemSurface();
+		HDC	 dc	 = GetWindowDC(hwnd);
+
+		HIMC		 hImc = ImmGetContext((HWND) window->GetSystemWindow());
 		COMPOSITIONFORM	 info;
 
 		info.dwStyle = CFS_POINT;

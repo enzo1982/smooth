@@ -7,7 +7,7 @@ SMOOTH_PATH = ../..
 GLOBALEXE = translator
 
 # Enter object files here:
-OBJECTS	  = infoitem.o stringitem.o translator.o
+OBJECTS	  = infoitem.o section.o stringitem.o translator.o
 
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += resources.o

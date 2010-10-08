@@ -13,6 +13,8 @@
 
 #include <libpng/png.h>
 
+#include <malloc.h>
+
 using namespace smooth::IO;
 
 S::GUI::ImageLoaderPNG::ImageLoaderPNG(const String &iFileName) : ImageLoader(iFileName)
@@ -85,25 +87,52 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 		in = new InStream(STREAM_BUFFER, buffer, buffer.Size());
 	}
 
+	if (in->GetLastError() != IO_ERROR_OK)
+	{
+		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+
+		delete in;
+
+		bitmap = NIL;
+
+		return bitmap;
+	}
+
 	/* If you are using replacement read functions, instead of calling
 	 * png_init_io() here you would call:
 	 */
 	png_set_read_fn(png_ptr, (void *) in, &my_png_read);
 
-	/* If you have enough memory to read in the entire image at once,
-	 * and you need to specify only transforms that can be controlled
-	 * with one of the PNG_TRANSFORM_* bits (this presently excludes
-	 * dithering, filling, setting background, and doing gamma
-	 * adjustment), then you can read the entire image (including
-	 * pixels) into the info structure with this call:
+	/* The call to png_read_info() gives us all of the information from the
+	 * PNG file before the first IDAT (image data chunk).
 	 */
-	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_STRIP_ALPHA | PNG_TRANSFORM_PACKING, png_voidp_NULL);
+	png_read_info(png_ptr, info_ptr);
 
-	/* Get PNG row data and copy it to an actual bitmap
-	 *
-	 * TODO: The copying step needs lots of optimization
+	/* Tell libpng to strip 16 bit/color files down to 8 bits/color
 	 */
-	png_bytep	*row_pointers = png_get_rows(png_ptr, info_ptr);
+	png_set_strip_16(png_ptr);
+
+	/* Set the background color to draw transparent and alpha images over.
+	 * It is possible to set the red, green, and blue components directly
+	 * for paletted images instead of supplying a palette index.
+	 */
+	png_color_16	 my_background;
+
+	my_background.red	= Setup::BackgroundColor.GetRed();
+	my_background.green	= Setup::BackgroundColor.GetGreen();
+	my_background.blue	= Setup::BackgroundColor.GetBlue();
+
+	png_set_background(png_ptr, &my_background, PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
+
+	/* The easiest way to read the image
+	 */
+	png_bytep *row_pointers = (png_bytep *) malloc(info_ptr->height * sizeof(png_bytep));
+
+	for (unsigned int row = 0; row < info_ptr->height; row++) row_pointers[row] = (png_bytep) malloc(png_get_rowbytes(png_ptr, info_ptr));
+
+	/* Now it's time to read the image.
+	 */
+	png_read_image(png_ptr, row_pointers);
 
 	bitmap.CreateBitmap(info_ptr->width, info_ptr->height, 24);
 
@@ -111,13 +140,20 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	{
 		for (UnsignedInt x = 0; x < info_ptr->width; x++)
 		{
-			if	(info_ptr->color_type == 0 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][x], row_pointers[y][x], row_pointers[y][x]));									 // 8 bit grayscale
-			else if	(info_ptr->color_type == 2 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][3 * x], row_pointers[y][3 * x + 1], row_pointers[y][3 * x + 2]));							 // 24 bit RGB
-			else if (info_ptr->color_type == 3 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(info_ptr->palette[row_pointers[y][x]].red, info_ptr->palette[row_pointers[y][x]].green, info_ptr->palette[row_pointers[y][x]].blue)); // 8 bit palette
-			else if	(info_ptr->color_type == 4 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][2 * x], row_pointers[y][2 * x], row_pointers[y][2 * x]));								 // 8 bit grayscale plus 8 bit alpha
-			else if	(info_ptr->color_type == 6 && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][4 * x], row_pointers[y][4 * x + 1], row_pointers[y][4 * x + 2]));							 // 24 bit RGB plus 8 bit alpha
+			if	((info_ptr->color_type == PNG_COLOR_TYPE_GRAY || info_ptr->color_type == PNG_COLOR_TYPE_GRAY_ALPHA) && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][x], row_pointers[y][x], row_pointers[y][x]));
+			else if	((info_ptr->color_type == PNG_COLOR_TYPE_RGB  || info_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)  && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][3 * x], row_pointers[y][3 * x + 1], row_pointers[y][3 * x + 2]));
+			else if ( info_ptr->color_type == PNG_COLOR_TYPE_PALETTE						    && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(info_ptr->palette[row_pointers[y][x]].red, info_ptr->palette[row_pointers[y][x]].green, info_ptr->palette[row_pointers[y][x]].blue));
 		}
 	}
+
+	/* Free PNG rows.
+	 */
+	for (unsigned int row = 0; row < info_ptr->height; row++) free(row_pointers[row]);
+
+	free(row_pointers);
+
+	/* Read rest of file, and get additional chunks in info_ptr */
+	png_read_end(png_ptr, info_ptr);
 
 	/* Clean up after the read, and free any memory allocated
 	 */

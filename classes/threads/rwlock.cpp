@@ -13,7 +13,7 @@
 #include <smooth/threads/semaphore.h>
 #include <smooth/system/system.h>
 
-const S::Int	 S::Threads::RWLock::MAX_READ_LOCKS = 16;
+const S::Short	 S::Threads::RWLock::MAX_READ_LOCKS = 16;
 
 S::Threads::RWLock::RWLock()
 {

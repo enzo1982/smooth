@@ -14,7 +14,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
-const S::Int		 S::GUI::CheckBox::classID = S::Object::RequestClassID();
+const S::Short		 S::GUI::CheckBox::classID = S::Object::RequestClassID();
 
 S::Signal0<S::Void>	 S::GUI::CheckBox::internalCheckValues;
 

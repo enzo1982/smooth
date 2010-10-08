@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,7 @@
 #define H_OBJSMOOTH_TRANSLATOR
 
 #include <smooth.h>
+#include "section.h"
 
 using namespace smooth;
 using namespace smooth::GUI;
@@ -20,7 +21,7 @@ using namespace smooth::GUI::Dialogs;
 class Translator : public Application
 {
 	private:
-		static const Int	 numInfoItems = 7;
+		static const Short	 numInfoItems = 7;
 
 		GUI::Window		*wnd;
 		Titlebar		*title;
@@ -43,6 +44,7 @@ class Translator : public Application
 		String			 templateName;
 
 		Array<ListEntry *>	 entries;
+		Section			*dataSection;
 
 		Bool			 modified;
 
@@ -54,11 +56,14 @@ class Translator : public Application
 		Void			 SaveFileName(const String &);
 
 		Void			 Close();
+
+		Void			 ReplaceLineEndings(const String &);
+		Void			 FormatLines(const String &);
 	slots:
 		Void			 NewEntry();
 		Void			 SaveData();
 		Void			 RemoveEntry();
-		Void			 SelectEntry();
+		Void			 SelectEntry(ListEntry *);
 
 		Void			 NewFile();
 		Void			 OpenFile();

@@ -4,7 +4,7 @@
 SMOOTH_PATH = ../..
 
 # Enter object files here:
-OBJECTS	  = charsetdetector.o charsetdetector_internal.o language.o number.o translator.o translator_internal.o
+OBJECTS	  = charsetdetector.o charsetdetector_internal.o language.o number.o section.o translator.o translator_internal.o
 
 ## Do not change anything below this line. ##
 

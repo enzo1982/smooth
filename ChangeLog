@@ -5,6 +5,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - window.cpp		- renamed doQuit to doClose
 			- removed onPeek
 - listbox.cpp		- show partially visible entries again
+- listentry.cpp		- entries in a subordinate list now respect the outer lists columns
 - combobox.cpp		- improved drop-down list size adjustment
 - number.cpp		- fixed floating point number -> string conversion
 			- fixed integer -> string conversion
@@ -16,6 +17,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - stringcase.cpp 	- case conversion functions are now generated from UnicodeData.txt
 			- added title case conversion function
 - translator.cpp	- new function: SelectUserDefaultLang(), selects the best fit language available
+			- added support for translation contexts
 - imagereader.cpp 	- added support for JPEG and PNG images
 - titlebar.cpp		- pressing the escape key now closes the active window
 - imagebox.cpp		- new widget: a box containing selectable images
@@ -38,8 +40,10 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - fixed file IO problems on Windows 9x with Unicows
 - updated Translator utility to support template files
 - improved international language support
+- removed Extended<> template
+- removed Pointer<> template
 - improved Linux support
-- upgraded libbz2 to version 1.0.5
+- upgraded libbzip2 to version 1.0.6
 - upgraded fribidi2 to version 0.19.2
 - upgraded libiconv to version 1.13.1
-- upgraded libxml2 to version 2.7.6
+- upgraded libxml2 to version 2.7.7

@@ -56,7 +56,7 @@ S::GUI::WindowBackend::~WindowBackend()
 	delete nullSurface;
 }
 
-S::Int S::GUI::WindowBackend::GetWindowType()
+S::Short S::GUI::WindowBackend::GetWindowType()
 {
 	return type;
 }

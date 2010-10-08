@@ -22,7 +22,7 @@
 
 S::Bool	 S::loopActive	= S::False;
 
-const S::Int	 S::GUI::Application::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Application::classID = S::Object::RequestClassID();
 
 S::String	 S::GUI::Application::startupDirectory;
 S::String	 S::GUI::Application::applicationDirectory;

@@ -15,7 +15,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 
-const S::Int	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
 
 S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const String &link, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
@@ -37,7 +37,7 @@ S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const St
 	{
 		ComputeTextSize();
 
-		SetSize(textSize);
+		SetSize(textSize + Size(0, 2));
 	}
 
 	hotspot	= new Hotspot(Point(0, 0), GetSize());
@@ -64,10 +64,18 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = GetDrawSurface();
+				Rect	 rect		= Rect(GetRealPosition(), GetSize());
+				Surface	*surface	= GetDrawSurface();
 
-				if (linkBitmap == NIL)	surface->SetText(text, Rect(GetRealPosition(), textSize + Size(0, 1)), font);
-				else			surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), Rect(GetRealPosition(), GetSize()));
+				if (linkBitmap == NIL)
+				{
+					surface->Box(rect, GetBackgroundColor(), Rect::Filled);
+					surface->SetText(text, Rect(GetRealPosition(), textSize + Size(0, 1)), font);
+				}
+				else
+				{
+					surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), Rect(GetRealPosition(), GetSize()));
+				}
 			}
 
 			break;
@@ -125,7 +133,7 @@ S::Int S::GUI::Hyperlink::SetText(const String &newText)
 
 	Widget::SetText(newText);
 
-	SetSize(textSize);
+	SetSize(textSize + Size(0, 2));
 
 	hotspot->SetSize(GetSize());
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,7 +13,7 @@
 S::GUI::Dialogs::FileSelectionBase::FileSelectionBase()
 {
 	flags = 0;
-	mode = 0;
+	mode  = 0;
 }
 
 S::GUI::Dialogs::FileSelectionBase::~FileSelectionBase()
@@ -28,14 +28,14 @@ S::Int S::GUI::Dialogs::FileSelectionBase::AddFilter(const String &name, const S
 	return Success();
 }
 
-S::Int S::GUI::Dialogs::FileSelectionBase::SetFlags(Int newFlags)
+S::Int S::GUI::Dialogs::FileSelectionBase::SetFlags(Short newFlags)
 {
 	flags |= newFlags;
 
 	return Success();
 }
 
-S::Int S::GUI::Dialogs::FileSelectionBase::SetMode(Int newMode)
+S::Int S::GUI::Dialogs::FileSelectionBase::SetMode(Short newMode)
 {
 	mode = newMode;
 

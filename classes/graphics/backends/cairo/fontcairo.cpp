@@ -18,14 +18,14 @@
 #	include <smooth/backends/xlib/backendxlib.h>
 #endif
 
-S::GUI::FontBackend *CreateFontCairo(const S::String &iFontName, S::Int iFontSize, S::Int iFontWeight, S::Int iFontStyle, const S::GUI::Color &iFontColor)
+S::GUI::FontBackend *CreateFontCairo(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
 	return new S::GUI::FontCairo(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor);
 }
 
 S::Int	 fontCairoTmp = S::GUI::FontBackend::SetBackend(&CreateFontCairo);
 
-S::GUI::FontCairo::FontCairo(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
+S::GUI::FontCairo::FontCairo(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
 {
 	type = FONT_CAIRO;
 }

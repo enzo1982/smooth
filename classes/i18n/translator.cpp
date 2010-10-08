@@ -54,7 +54,8 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 
 	if (iLang != NIL)
 	{
-		iLang->name = langName;
+		iLang->SetName(langName);
+
 		iLang->author = author;
 		iLang->url = url;
 		iLang->rightToLeft = rightToLeft;
@@ -72,9 +73,9 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 
 			Language	*lang = languages.GetNth(i);
 
-			for (Int j = 0; j < Math::Max(iLang->name.Length(), lang->name.Length()); j++)
+			for (Int j = 0; j < Math::Max(iLang->GetName().Length(), lang->GetName().Length()); j++)
 			{
-				if (iLang->name[j] < lang->name[j])
+				if (iLang->GetName()[j] < lang->GetName()[j])
 				{
 					languages.InsertAtPos(i, iLang);
 
@@ -82,7 +83,7 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 
 					break;
 				}
-				else if (iLang->name[j] > lang->name[j])
+				else if (iLang->GetName()[j] > lang->GetName()[j])
 				{
 					break;
 				}
@@ -167,7 +168,8 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 	{
 		Language	*language = new Language();
 
-		language->name = "Default language";
+		language->SetName("Default language");
+
 		language->encoding = "UTF-8";
 		language->magic = "internal";
 		language->author = "unknown";
@@ -199,6 +201,16 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 	return Success();
 }
 
+S::Bool S::I18n::Translator::SetContext(const String &nContext)
+{
+	return activeLanguage->SetContext(nContext);
+}
+
+const S::String &S::I18n::Translator::GetContext() const
+{
+	return activeLanguage->GetContext();
+}
+
 S::Int S::I18n::Translator::GetNOfLanguages() const
 {
 	return languages.Length();
@@ -206,7 +218,7 @@ S::Int S::I18n::Translator::GetNOfLanguages() const
 
 const S::String &S::I18n::Translator::GetNthLanguageName(Int index) const
 {
-	return languages.GetNth(index)->name;
+	return languages.GetNth(index)->GetName();
 }
 
 const S::String &S::I18n::Translator::GetNthLanguageID(Int index) const
@@ -236,7 +248,7 @@ S::Bool S::I18n::Translator::IsNthLanguageRightToLeft(Int index) const
 
 const S::String &S::I18n::Translator::GetActiveLanguageName() const
 {
-	return activeLanguage->name;
+	return activeLanguage->GetName();
 }
 
 const S::String &S::I18n::Translator::GetActiveLanguageID() const
@@ -279,9 +291,15 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 	return Error();
 }
 
-const S::String &S::I18n::Translator::TranslateString(const String &string)
+const S::String &S::I18n::Translator::TranslateString(const String &string, const String &context)
 {
-	const String	&translation = activeLanguage->strings.Get(string.ComputeCRC32());
+	const String	&prevContext = activeLanguage->GetContext();
+
+	if (context != NIL) activeLanguage->SetContext(context);
+
+	const String	&translation = activeLanguage->GetString(string);
+
+	if (context != NIL) activeLanguage->SetContext(prevContext);
 
 	if (translation == NIL)	return string;
 	else			return translation;
@@ -299,43 +317,9 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 	 */
 	if (root == NIL) return Error();
 
-	XML::Node	*info = root->GetNodeByName("info");
+	Error		 result = language->Parse(root);
 
-	/* Return an error if we didn't find an info node.
-	 */
-	if (info == NIL) return Error();
-
-	String		 program;
-	String		 version;
-
-	for (Int i = 0; i < info->GetNOfNodes(); i++)
-	{
-		String	 property = info->GetNthNode(i)->GetAttributeByName("name")->GetContent();
-
-		if (property == "program")	 program = info->GetNthNode(i)->GetContent();
-		if (property == "version")	 version = info->GetNthNode(i)->GetContent();
-		if (property == "language")	 language->name = info->GetNthNode(i)->GetContent();
-		if (property == "righttoleft")	 language->rightToLeft = (info->GetNthNode(i)->GetContent() == "true" ? True : False);
-		if (property == "encoding")	 language->encoding = info->GetNthNode(i)->GetContent();
-		if (property == "author")	 language->author = info->GetNthNode(i)->GetContent();
-		if (property == "url")		 language->url = info->GetNthNode(i)->GetContent();
-	}
-
-	XML::Node	*data = root->GetNodeByName("data");
-
-	/* Return an error if we didn't find a data node.
-	 */
-	if (data == NIL) return Error();
-
-	for (Int k = 0; k < data->GetNOfNodes(); k++)
-	{
-		XML::Node	*entry = data->GetNthNode(k);
-
-		if (entry->GetName() == "entry" && entry->GetAttributeByName("string") != NIL)
-		{
-			language->strings.Add(entry->GetContent(), entry->GetAttributeByName("string")->GetContent().ComputeCRC32());
-		}
-	}
+	if (result != Success()) return Error();
 
 	Bool		 done = False;
 
@@ -343,9 +327,9 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 	{
 		Language	*lang = languages.GetNth(j);
 
-		for (Int k = 0; k < Math::Max(language->name.Length(), lang->name.Length()); k++)
+		for (Int k = 0; k < Math::Max(language->GetName().Length(), lang->GetName().Length()); k++)
 		{
-			if ((language->name[k] < lang->name[k] && !(language->name[k] == '(' && lang->name[k] == '/')) || (language->name[k] == '/' && lang->name[k] == '('))
+			if ((language->GetName()[k] < lang->GetName()[k] && !(language->GetName()[k] == '(' && lang->GetName()[k] == '/')) || (language->GetName()[k] == '/' && lang->GetName()[k] == '('))
 			{
 				languages.InsertAtPos(j, language);
 
@@ -353,7 +337,7 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 
 				break;
 			}
-			else if ((language->name[k] > lang->name[k] && !(language->name[k] == '/' && lang->name[k] == '(')) || (language->name[k] == '(' && lang->name[k] == '/'))
+			else if ((language->GetName()[k] > lang->GetName()[k] && !(language->GetName()[k] == '/' && lang->GetName()[k] == '(')) || (language->GetName()[k] == '(' && lang->GetName()[k] == '/'))
 			{
 				break;
 			}

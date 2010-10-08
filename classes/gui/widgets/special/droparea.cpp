@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,7 +15,7 @@
 #	include <shellapi.h>
 #endif
 
-const S::Int	 S::GUI::DropArea::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::DropArea::classID = S::Object::RequestClassID();
 
 S::GUI::DropArea::DropArea(const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
@@ -81,6 +81,10 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 				if (pos.x > realPos.x && pos.x < (realPos.x + GetWidth()) && pos.y > realPos.y && pos.y < (realPos.y + GetHeight()))
 				{
+					static Array<String>	 fileNames;
+
+					fileNames.RemoveAll();
+
 					Int	 nOfFiles;
 
 					if (Setup::enableUnicode)	nOfFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0);
@@ -98,6 +102,8 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 							onDropFile.Emit(String(bufferW));
 
+							fileNames.Add(String(bufferW));
+
 							delete [] bufferW;
 						}
 						else
@@ -108,9 +114,13 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 							onDropFile.Emit(String(bufferA));
 
+							fileNames.Add(String(bufferA));
+
 							delete [] bufferA;
 						}
 					}
+
+					onDropFiles.Emit(fileNames);
 
 					DragFinish(hDrop);
 

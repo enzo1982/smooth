@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,7 +29,7 @@ S::GUI::Surface::~Surface()
 	if (mutex != NIL) delete mutex;
 }
 
-S::Int S::GUI::Surface::GetSurfaceType() const
+S::Short S::GUI::Surface::GetSurfaceType() const
 {
 	return backend->GetSurfaceType();
 }
@@ -83,7 +83,7 @@ S::Void *S::GUI::Surface::GetSystemSurface() const
 	return backend->GetSystemSurface();
 }
 
-S::Int S::GUI::Surface::GetSurfaceDPI() const
+S::Short S::GUI::Surface::GetSurfaceDPI() const
 {
 	return backend->GetSurfaceDPI();
 }
@@ -110,7 +110,7 @@ S::Int S::GUI::Surface::Line(const Point &pos1, const Point &pos2, const Color &
 	return rVal;
 }
 
-S::Int S::GUI::Surface::Frame(const Rect &rect, Int style)
+S::Int S::GUI::Surface::Frame(const Rect &rect, Short style)
 {
 	if (mutex != NIL) mutex->Lock();
 

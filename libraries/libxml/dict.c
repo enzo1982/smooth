@@ -25,7 +25,7 @@
 #else
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
-#elif (defined(WIN32) && defined(_MSC_VER)) || defined(__WIN64__)
+#else //if (defined(WIN32) && defined(_MSC_VER)) || defined(__WIN64__)
 typedef unsigned __int32 uint32_t;
 #endif
 #endif

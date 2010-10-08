@@ -133,6 +133,38 @@ S::Bool S::GUI::BitmapGDI::DeleteBitmap()
 	return True;
 }
 
+S::Int S::GUI::BitmapGDI::Scale(const Size &newSize)
+{
+	if (bitmap == NIL) return Error();
+
+	if (size == newSize) return Success();
+
+	HBITMAP	 backup = bitmap;
+	Size	 backupSize = size;
+
+	bitmap = NIL;
+
+	CreateBitmap(newSize.cx, newSize.cy, depth);
+
+	HDC	 dc1 = CreateCompatibleDC(NIL);
+	HDC	 dc2 = CreateCompatibleDC(NIL);
+	HBITMAP	 backup1 = (HBITMAP) SelectObject(dc1, backup);
+	HBITMAP	 backup2 = (HBITMAP) SelectObject(dc2, bitmap);
+
+	SetStretchBltMode(dc2, HALFTONE);
+	StretchBlt(dc2, 0, 0, newSize.cx, newSize.cy, dc1, 0, 0, backupSize.cx, backupSize.cy, SRCCOPY);
+
+	backup	= (HBITMAP) SelectObject(dc1, backup1);
+	bitmap	= (HBITMAP) SelectObject(dc2, backup2);
+
+	DeleteDC(dc1);
+	DeleteDC(dc2);
+
+	::DeleteObject(backup);
+
+	return Success();
+}
+
 S::Bool S::GUI::BitmapGDI::SetSystemBitmap(Void *nBitmap)
 {
 	if (nBitmap == GetSystemBitmap()) return True;

@@ -14,7 +14,7 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/misc/math.h>
 
-const S::Int	 S::GUI::Button::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Button::classID = S::Object::RequestClassID();
 
 S::GUI::Button::Button(const String &iText, const Bitmap &iBitmap, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {

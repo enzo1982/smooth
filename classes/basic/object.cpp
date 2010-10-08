@@ -11,9 +11,9 @@
 #include <smooth/basic/object.h>
 #include <smooth/system/timer.h>
 
-const S::Int	 S::Object::classID		= S::Object::RequestClassID();
+const S::Short	 S::Object::classID		= S::Object::RequestClassID();
 
-S::Int		 S::Object::nextClassID		= 0;
+S::Short	 S::Object::nextClassID		= 0;
 S::Int		 S::Object::nextObjectHandle	= 0;
 
 S::Array<S::Object *, S::Void *>	 S::Object::objects;
@@ -75,7 +75,7 @@ S::Object *S::Object::GetNthObject(Int n)
 	return objects.GetNth(n);
 }
 
-S::Object *S::Object::GetObject(Int objectHandle, Int objectType)
+S::Object *S::Object::GetObject(Int objectHandle, Short objectType)
 {
 	Object	*object = objects.Get(objectHandle);
 
@@ -104,7 +104,7 @@ S::Int S::Object::SetName(const String &nName)
 	return Success();
 }
 
-S::Int S::Object::RequestClassID()
+S::Short S::Object::RequestClassID()
 {
 	return nextClassID++;
 }

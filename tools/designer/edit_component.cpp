@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -135,7 +135,7 @@ GUI::Window *Designer_EditComponent::GetWindow()
 	return wnd;
 }
 
-Widget *Designer_EditComponent::AddObject(Int objid)
+Widget *Designer_EditComponent::AddObject(Short objid)
 {
 	Widget	*newobj;
 	Widget	*registrar;
@@ -178,7 +178,7 @@ Widget *Designer_EditComponent::AddObject(Int objid)
 	return newobj;
 }
 
-Widget *Designer_EditComponent::GetFirstObject(Int objtype)
+Widget *Designer_EditComponent::GetFirstObject(Short objtype)
 {
 	for (Int i = 0; i < objects.Length(); i++)
 	{

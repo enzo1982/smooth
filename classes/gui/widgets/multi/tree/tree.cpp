@@ -15,7 +15,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
 
-const S::Int	 S::GUI::Tree::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Tree::classID = S::Object::RequestClassID();
 
 S::GUI::Tree::Tree(const String &iText) : ListEntry(iText)
 {
@@ -306,7 +306,7 @@ S::Void S::GUI::Tree::OnMouseOut()
 	Paint(SP_MOUSEOUT);
 }
 
-S::Bool S::GUI::Tree::IsTypeCompatible(Int compType) const
+S::Bool S::GUI::Tree::IsTypeCompatible(Short compType) const
 {
 	if (compType == Object::classID || compType == Widget::classID || compType == ListEntry::classID) return True;
 	else												  return False;

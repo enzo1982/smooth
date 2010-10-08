@@ -26,9 +26,9 @@ S::GUI::SurfaceBackend *CreateSurfaceCairo(S::Void *iSurface, const S::GUI::Size
 	return new S::GUI::SurfaceCairo(iSurface, maxSize);
 }
 
-S::Int	 surfaceCairoTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceCairo);
+S::Int		 surfaceCairoTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceCairo);
 
-S::Int	  S::GUI::SurfaceCairo::surfaceDPI	= -1;
+S::Short	 S::GUI::SurfaceCairo::surfaceDPI = -1;
 
 S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 {
@@ -200,7 +200,7 @@ S::Int S::GUI::SurfaceCairo::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect	 pRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect)), *(paintRects.GetLast()));
 
 	cairo_save(paintContextCairo);
 	cairo_rectangle(paintContextCairo, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top);
@@ -219,9 +219,7 @@ S::Int S::GUI::SurfaceCairo::EndPaint()
 
 	painting--;
 
-	Rect	 iRect = Rect::OverlapRect(*(paintRects.GetLast()), *(paintRects.GetNth(paintRects.Length() - 2)));
-
-	if (painting == 0) PaintRect(iRect);
+	if (painting == 0) PaintRect(*(paintRects.GetLast()));
 
 	delete paintRects.GetLast();
 
@@ -237,11 +235,11 @@ S::Void *S::GUI::SurfaceCairo::GetSystemSurface() const
 	return (Void *) window;
 }
 
-S::Int S::GUI::SurfaceCairo::GetSurfaceDPI() const
+S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 {
 	if (surfaceDPI != -1) return surfaceDPI;
 
-	Int	 dpi = 96;
+	Short	 dpi = 96;
 
 	surfaceDPI = dpi;
 

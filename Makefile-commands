@@ -8,13 +8,21 @@ CCOPTS	 = -g0 -Wall -ffast-math -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(
 RC	 = windres
 RCOPTS	 = -DSMOOTH_DLL -O coff
 LD	 = gcc
-LDOPTS	 = -L$(SMOOTH_PATH)/$(LIBDIR) -lsmooth -lstdc++ $(LIBS)
+LDOPTS	 = -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
+
+ifndef GLOBALDLL
+	LDOPTS += -lsmooth
+endif
 
 ifeq ($(BUILD_WIN32),True)
-	LDOPTS += -mwindows
+	LDOPTS += -mwindows -Xlinker --dynamicbase -Xlinker --nxcompat
 
-ifneq ($(BUILD_X64),True)
-	LDOPTS += -Xlinker --dynamicbase -Xlinker --nxcompat
+ifdef IMPORTLIB
+ifdef GLOBALDLL
+	LDOPTS += -Xlinker --out-implib -Xlinker $(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB)
+else
+	LDOPTS += -Xlinker --out-implib -Xlinker $(IMPORTLIB)
+endif
 endif
 
 ifeq ($(BUILD_CAIRO),True)
@@ -37,8 +45,12 @@ endif
 
 ifndef GLOBALLIB
 ifndef GLOBALEXE
+ifndef GLOBALDLL
 ifndef LOCALEXE
+ifndef LOCALDLL
 	CCOPTS += -DSMOOTH_DLL -DLIBICONV_PLUG -DLIBXML_STATIC
+endif
+endif
 endif
 endif
 endif
@@ -58,8 +70,24 @@ ifdef GLOBALEXE
 	TARGETS += $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE)
 endif
 
+ifdef GLOBALDLL
+	TARGETS += $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED)
+
+ifeq ($(BUILD_WIN32),True)
+	TARGETS += $(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB)
+endif
+endif
+
 ifdef LOCALEXE
 	TARGETS += $(LOCALEXE)$(EXECUTABLE)
+endif
+
+ifdef LOCALDLL
+	TARGETS += $(LOCALDLL)$(SHARED)
+
+ifeq ($(BUILD_WIN32),True)
+	TARGETS += $(IMPORTLIB)
+endif
 endif
 
 all: $(OBJECTS) $(TARGETS)
@@ -100,8 +128,28 @@ $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE): $(OBJECTS)
 	strip --strip-all $@
 endif
 
+ifdef GLOBALDLL
+$(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED): $(OBJECTS)
+	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+	strip --strip-all $@
+
+ifeq ($(BUILD_WIN32),True)
+$(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB): $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED)
+endif
+endif
+
 ifdef LOCALEXE
 $(LOCALEXE)$(EXECUTABLE): $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
 	strip --strip-all $@
+endif
+
+ifdef LOCALDLL
+$(LOCALDLL)$(SHARED): $(OBJECTS)
+	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+	strip --strip-all $@
+
+ifeq ($(BUILD_WIN32),True)
+$(IMPORTLIB): $(LOCALDLL)$(SHARED)
+endif
 endif

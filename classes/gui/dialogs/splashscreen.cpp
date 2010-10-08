@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,7 @@
 #include <smooth/gui/dialogs/splashscreen.h>
 #include <smooth/i18n/translator.h>
 #include <smooth/system/timer.h>
+#include <smooth/system/multimonitor.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/gui/window/window.h>
@@ -24,7 +25,9 @@ S::GUI::Dialogs::SplashScreen::SplashScreen(const GUI::Bitmap &iBitmap, Int iTim
 
 	bitmap	= iBitmap;
 
-	splashscreen = new Window("Splash screen", Point((LiSAGetDisplaySizeX() - (bitmap.GetSize().cx + 2)) / 2, (LiSAGetDisplaySizeY() - (bitmap.GetSize().cy + 2)) / 2 - 40), bitmap.GetSize() + Size(2, 2));
+	Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
+
+	splashscreen = new Window("Splash screen", workArea.GetPosition() + Point((workArea.GetSize().cx - (bitmap.GetSize().cx + 2)) / 2, (workArea.GetSize().cy - (bitmap.GetSize().cy + 2)) / 2), bitmap.GetSize() + Size(2, 2));
 
 	splashscreen->onPaint.Connect(&SplashScreen::SplashPaintProc, this);
 	splashscreen->doClose.Connect(&SplashScreen::SplashKillProc, this);

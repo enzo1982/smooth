@@ -12,7 +12,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/graphics/surface.h>
 
-const S::Int	 S::GUI::Text::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Text::classID = S::Object::RequestClassID();
 
 S::GUI::Text::Text(const String &iText, const Point &iPos) : Widget(iPos, Size())
 {

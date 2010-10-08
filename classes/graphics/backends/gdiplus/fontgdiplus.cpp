@@ -11,14 +11,14 @@
 #include <smooth/graphics/backends/gdiplus/fontgdiplus.h>
 #include <smooth/misc/math.h>
 
-S::GUI::FontBackend *CreateFontGDIPlus(const S::String &iFontName, S::Int iFontSize, S::Int iFontWeight, S::Int iFontStyle, const S::GUI::Color &iFontColor)
+S::GUI::FontBackend *CreateFontGDIPlus(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
 	return new S::GUI::FontGDIPlus(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor);
 }
 
 S::Int	 fontGDITmp = S::GUI::FontBackend::SetBackend(&CreateFontGDIPlus);
 
-S::GUI::FontGDIPlus::FontGDIPlus(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
+S::GUI::FontGDIPlus::FontGDIPlus(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
 {
 	type = FONT_GDIPLUS;
 }

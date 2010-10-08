@@ -20,6 +20,8 @@
 #	include <smooth/io/drivers/driver_win32.h>
 #endif
 
+#include <smooth/files/file.h>
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <memory.h>
@@ -41,14 +43,14 @@ S::IO::InStream::InStream(Int type, Driver *iDriver)
 	dataBuffer.Resize(packageSize);
 }
 
-S::IO::InStream::InStream(Int type, const String &filename, Int mode)
+S::IO::InStream::InStream(Int type, const String &fileName, Int mode)
 {
 	if (type != STREAM_FILE)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
 #ifdef __WIN32__
-	driver = new DriverWin32(filename, mode);
+	driver = new DriverWin32(File(fileName), mode);
 #else
-	driver = new DriverPOSIX(filename, mode);
+	driver = new DriverPOSIX(File(fileName), mode);
 #endif
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
@@ -61,11 +63,11 @@ S::IO::InStream::InStream(Int type, const String &filename, Int mode)
 	dataBuffer.Resize(packageSize);
 }
 
-S::IO::InStream::InStream(Int type, FILE *openfile)
+S::IO::InStream::InStream(Int type, FILE *openFile)
 {
 	if (type != STREAM_ANSI)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-	driver = new DriverANSI(openfile);
+	driver = new DriverANSI(openFile);
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
@@ -81,11 +83,11 @@ S::IO::InStream::InStream(Int type, FILE *openfile)
 	dataBuffer.Resize(packageSize);
 }
 
-S::IO::InStream::InStream(Int type, Void *inbuffer, Long bufsize)
+S::IO::InStream::InStream(Int type, Void *inBuffer, Long bufferSize)
 {
 	if (type != STREAM_BUFFER)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-	driver = new DriverMemory(inbuffer, bufsize);
+	driver = new DriverMemory(inBuffer, bufferSize);
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
@@ -367,7 +369,6 @@ S::String S::IO::InStream::InputLine()
 	long	 inpval;
 	int	 bytes = 0;
 
-
 	Buffer<UnsignedByte>	 stringBuffer(1024);
 
 	while (True)
@@ -476,29 +477,24 @@ S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 
 S::Bool S::IO::InStream::AddFilter(Filter *newFilter)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 
 	newFilter->SetDriver(driver);
 
 	Seek(currentFilePos);
 
-	if (newFilter->Activate() == false) { lastError = IO_ERROR_UNKNOWN; return false; }
+	if (newFilter->Activate() == False) { lastError = IO_ERROR_UNKNOWN; return False; }
 
-	allowpackset = true;
+	allowpackset = True;
 
-	if (newFilter->GetPackageSize() > 0)		SetPackageSize(newFilter->GetPackageSize());
-	else if (newFilter->GetPackageSize() == -1)	SetPackageSize(size - currentFilePos);
+	if	(newFilter->GetPackageSize() >   0) SetPackageSize(newFilter->GetPackageSize());
+	else if (newFilter->GetPackageSize() == -1) SetPackageSize(size - currentFilePos);
 
-	allowpackset = false;
+	allowpackset = False;
 
 	filters.Add(newFilter);
 
-	while (currentBufferPos >= packageSize)
-	{
-		if (!ReadData()) { lastError = IO_ERROR_UNKNOWN; return false; }
-	}
-
-	return true;
+	return True;
 }
 
 S::Bool S::IO::InStream::RemoveFilter(Filter *oldFilter)
@@ -551,15 +547,7 @@ S::Bool S::IO::InStream::Seek(Int64 position)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
 
-	if (pbdActive) CompletePBD();
-
-	driver->Seek(position);
-
-	currentFilePos	 = position;
-	currentBufferPos = packageSize;
-	origfilepos	 = position;
-
-	return true;
+	return RelSeek(position - currentFilePos);
 }
 
 S::Bool S::IO::InStream::RelSeek(Int64 offset)
@@ -568,11 +556,19 @@ S::Bool S::IO::InStream::RelSeek(Int64 offset)
 
 	if (pbdActive) CompletePBD();
 
-	driver->Seek(currentFilePos + offset);
+	if (currentBufferPos + offset >= 0 && currentBufferPos + offset <= packageSize)
+	{
+		currentFilePos	 += offset;
+		currentBufferPos += offset;
+	}
+	else
+	{
+		driver->Seek(currentFilePos + offset);
 
-	currentFilePos	 += offset;
-	currentBufferPos = packageSize;
-	origfilepos	 = currentFilePos;
+		currentFilePos	 += offset;
+		currentBufferPos = packageSize;
+		origfilepos	 = currentFilePos;
+	}
 
 	return true;
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,7 +12,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/surface.h>
 
-const S::Int	 S::GUI::Statusbar::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Statusbar::classID = S::Object::RequestClassID();
 
 S::GUI::Statusbar::Statusbar(const String &status) : Widget(Point(), Size(0, 16))
 {

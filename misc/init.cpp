@@ -91,12 +91,19 @@ S::Void S::Init()
 
 		GetVersionExA(&vInfo);
 
-		HMODULE		 hUnicows = LoadLibraryA("unicows.dll");
+		if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
+		{
+			Setup::enableUnicode = True;
+		}
+		else
+		{
+			HMODULE	 hUnicows = LoadLibraryA("unicows.dll");
 
-		if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT || hUnicows != NIL)	Setup::enableUnicode = True;
-		else									Setup::enableUnicode = False;
+			if (hUnicows != NIL) Setup::enableUnicode = True;
+			else		     Setup::enableUnicode = False;
 
-		FreeLibrary(hUnicows);
+			FreeLibrary(hUnicows);
+		}
 	}
 
 	CoInitialize(NIL);

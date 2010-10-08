@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,14 +11,14 @@
 #include <smooth/graphics/backends/gdi/fontgdi.h>
 #include <smooth/misc/math.h>
 
-S::GUI::FontBackend *CreateFontGDI(const S::String &iFontName, S::Int iFontSize, S::Int iFontWeight, S::Int iFontStyle, const S::GUI::Color &iFontColor)
+S::GUI::FontBackend *CreateFontGDI(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
 	return new S::GUI::FontGDI(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor);
 }
 
 S::Int	 fontGDITmp = S::GUI::FontBackend::SetBackend(&CreateFontGDI);
 
-S::GUI::FontGDI::FontGDI(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
+S::GUI::FontGDI::FontGDI(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
 {
 	type = FONT_GDI;
 }

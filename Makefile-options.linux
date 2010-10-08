@@ -2,6 +2,7 @@
 
 EXCEPTION = False
 EXECUTABLE = 
+SHARED = .so
 
 # Build using Win32 backends
 BUILD_WIN32 = False

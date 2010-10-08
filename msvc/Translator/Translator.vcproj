@@ -339,6 +339,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tools\translator\section.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tools\translator\stringitem.cpp"
 				>
 			</File>
@@ -354,6 +358,10 @@
 			>
 			<File
 				RelativePath="..\..\tools\translator\infoitem.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tools\translator\section.h"
 				>
 			</File>
 			<File

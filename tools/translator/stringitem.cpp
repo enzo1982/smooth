@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,7 @@
 
 #include "stringitem.h"
 
-const S::Int	 StringItem::classID = S::Object::RequestClassID();
+const S::Short	 StringItem::classID = S::Object::RequestClassID();
 
 StringItem::StringItem(Int iID, const String &iOriginal, const String &iTranslation) : ListEntry(NIL)
 {
@@ -35,7 +35,7 @@ Int StringItem::UpdateText()
 	return Success();
 }
 
-Bool StringItem::IsTypeCompatible(Int compType) const
+Bool StringItem::IsTypeCompatible(Short compType) const
 {
 	if (compType == Object::classID || compType == Widget::classID || compType == ListEntry::classID)	return True;
 	else													return False;

@@ -25,7 +25,7 @@
 #	include <imm.h>
 #endif
 
-const S::Int	 S::GUI::Cursor::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Cursor::classID = S::Object::RequestClassID();
 
 S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
@@ -538,7 +538,9 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 	Surface	*surface = GetDrawSurface();
 
 	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+
 	container->Paint(SP_PAINT);
+
 	surface->EndPaint();
 
 	SetCursorPos(promptPos + insertText.Length());
@@ -643,7 +645,9 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 	Surface	*surface = GetDrawSurface();
 
 	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+
 	container->Paint(SP_PAINT);
+
 	surface->EndPaint();
 
 	SetCursorPos(bMarkStart);

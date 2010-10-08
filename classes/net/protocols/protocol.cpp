@@ -44,6 +44,8 @@ S::Net::Protocols::Protocol *S::Net::Protocols::Protocol::CreateForURL(const Str
 S::Net::Protocols::Protocol::Protocol(const String &iURL)
 {
 	url = iURL;
+
+	doCancelDownload.Connect(False);
 }
 
 S::Net::Protocols::Protocol::~Protocol()

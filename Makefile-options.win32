@@ -2,6 +2,7 @@
 
 EXCEPTION = False
 EXECUTABLE = .exe
+SHARED = .dll
 
 # Build using Win32 backends
 BUILD_WIN32 = True

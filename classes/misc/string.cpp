@@ -28,92 +28,42 @@ namespace smooth
 	Int	 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
-char			*S::String::inputFormat		= NIL;
-char			*S::String::outputFormat	= NIL;
-char			*S::String::internalFormat	= NIL;
+char				*S::String::inputFormat		= NIL;
+char				*S::String::outputFormat	= NIL;
+char				*S::String::internalFormat	= NIL;
 
-S::Int			 S::String::nOfStrings		= 0;
+S::Int				 S::String::nOfStrings		= 0;
 
-S::Array<char *>	 S::String::allocatedBuffers;
+S::Array<char *, void *>	 S::String::allocatedBuffers;
 
 S::String::String(const int nil)
 {
-	mutex.Lock();
-
 	nOfStrings++;
-
-	wString.Resize(0);
-
-	Clean();
-
-	mutex.Release();
 }
 
 S::String::String(const char *iString)
 {
-	mutex.Lock();
-
-	nOfStrings++;
-
-	wString.Resize(0);
-
 	*this = iString;
 
-	mutex.Release();
+	nOfStrings++;
 }
 
 S::String::String(const wchar_t *iString)
 {
-	mutex.Lock();
+	*this = iString;
 
 	nOfStrings++;
-
-	if (iString == NIL)
-	{
-		wString.Resize(0);
-
-		Clean();
-	}
-	else
-	{
-		Int	 size = wcslen(iString) + 1;
-
-		wString.Resize(size);
-
-		wcsncpy(wString, iString, size);
-	}
-
-	mutex.Release();
 }
 
 S::String::String(const String &iString)
 {
-	mutex.Lock();
+	*this = iString;
 
 	nOfStrings++;
-
-	if (iString.wString.Size() == 0)
-	{
-		wString.Resize(0);
-
-		Clean();
-	}
-	else
-	{
-		Int	 size = iString.wString.Size();
-
-		wString.Resize(size);
-
-		wcsncpy(wString, iString.wString, size);
-	}
-
-	mutex.Release();
 }
 
 S::String::~String()
 {
-	mutex.Lock();
-
 	Clean();
 
 	if (--nOfStrings == 0)
@@ -122,8 +72,6 @@ S::String::~String()
 
 		allocatedBuffers.RemoveAll();
 	}
-
-	mutex.Release();
 }
 
 S::Void S::String::DeleteTemporaryBuffers()
@@ -423,8 +371,6 @@ S::String &S::String::operator =(const wchar_t *newString)
 
 		mutex.Lock();
 
-		Clean();
-
 		wString.Resize(size);
 
 		wcsncpy(wString, newString, size);
@@ -445,7 +391,7 @@ S::String &S::String::operator =(const String &newString)
 	}
 	else
 	{
-		Int	 size = newString.Length() + 1;
+		Int	 size = newString.wString.Size();
 
 		mutex.Lock();
 

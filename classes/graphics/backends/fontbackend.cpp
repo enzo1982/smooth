@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,14 +15,14 @@
 	#include <smooth/graphics/backends/gdi/fontgdi.h>
 #endif
 
-S::GUI::FontBackend *CreateFontBackend(const S::String &iFontName, S::Int iFontSize, S::Int iFontWeight, S::Int iFontStyle, const S::GUI::Color &iFontColor)
+S::GUI::FontBackend *CreateFontBackend(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
 	return new S::GUI::FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor);
 }
 
-S::GUI::FontBackend *(*S::GUI::FontBackend::backend_creator)(const String &, Int, Int, Int, const Color &) = &CreateFontBackend;
+S::GUI::FontBackend *(*S::GUI::FontBackend::backend_creator)(const String &, Short, Short, Short, const Color &) = &CreateFontBackend;
 
-S::Int S::GUI::FontBackend::SetBackend(FontBackend *(*backend)(const String &, Int, Int, Int, const Color &))
+S::Int S::GUI::FontBackend::SetBackend(FontBackend *(*backend)(const String &, Short, Short, Short, const Color &))
 {
 	if (backend == NIL) return Error();
 
@@ -31,12 +31,12 @@ S::Int S::GUI::FontBackend::SetBackend(FontBackend *(*backend)(const String &, I
 	return Success();
 }
 
-S::GUI::FontBackend *S::GUI::FontBackend::CreateBackendInstance(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, const Color &iFontColor)
+S::GUI::FontBackend *S::GUI::FontBackend::CreateBackendInstance(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor)
 {
 	return backend_creator(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor);
 }
 
-S::GUI::FontBackend::FontBackend(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, const Color &iFontColor)
+S::GUI::FontBackend::FontBackend(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor)
 {
 #if defined __WIN32__ && defined SMOOTH_STATIC
 	volatile Bool	 null = 0;
@@ -57,7 +57,7 @@ S::GUI::FontBackend::~FontBackend()
 {
 }
 
-S::Int S::GUI::FontBackend::GetFontType() const
+S::Short S::GUI::FontBackend::GetFontType() const
 {
 	return type;
 }

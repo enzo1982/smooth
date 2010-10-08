@@ -16,7 +16,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
 
-const S::Int	 S::GUI::Tooltip::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Tooltip::classID = S::Object::RequestClassID();
 
 S::GUI::Tooltip::Tooltip() : Widget(Point(), Size())
 {

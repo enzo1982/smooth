@@ -30,8 +30,8 @@
 
 S::Array<S::GUI::Window *, S::Void *>	 S::GUI::Window::windows;
 
-const S::Int				 S::GUI::Window::classID = S::Object::RequestClassID();
-S::Int					 S::GUI::Window::nOfActiveWindows = 0;
+const S::Short				 S::GUI::Window::classID = S::Object::RequestClassID();
+S::Short				 S::GUI::Window::nOfActiveWindows = 0;
 
 S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize, Void *iWindow) : Widget(iPos, iSize)
 {
@@ -414,10 +414,10 @@ S::Bool S::GUI::Window::Create()
 {
 	if (IsRegistered() && !created)
 	{
-		if (GetPosition().x >= 0 && GetPosition().y >= 0 && GetPosition().x < LiSAGetDisplaySizeX() && GetPosition().y < LiSAGetDisplaySizeY())
-		{
-			Rect	 monitorRect = System::MultiMonitor::GetActiveMonitorMetrics();
+		Rect	 monitorRect = System::MultiMonitor::GetActiveMonitorMetrics();
 
+		if (GetPosition().x >= 0 && GetPosition().y >= 0 && GetPosition().x < monitorRect.GetSize().cx && GetPosition().y < monitorRect.GetSize().cy)
+		{
 			SetPosition(Point(monitorRect.left, monitorRect.top) + GetPosition());
 		}
 
@@ -694,6 +694,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			if (Math::Abs((updateRect.right - updateRect.left) - GetWidth()) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - GetHeight()) < 20)	Paint(SP_PAINT);
 			else																		Paint(SP_UPDATE);
+
+			updateRect = Rect(Point(0, 0), GetSize());
 
 			rVal = Break;
 

@@ -58,7 +58,17 @@ S::File::File(const String &iFileName, const String &iFilePath)
 
 	fileName.Replace("/",  Directory::GetDirectoryDelimiter());
 	fileName.Replace("\\", Directory::GetDirectoryDelimiter());
-	
+
+	if (!filePath.EndsWith(Directory::GetDirectoryDelimiter())) filePath.Append(Directory::GetDirectoryDelimiter());
+
+	while (filePath.Contains(String(Directory::GetDirectoryDelimiter()).Append("..").Append(Directory::GetDirectoryDelimiter())))
+	{
+		Int	 upPos	= filePath.Find(String(Directory::GetDirectoryDelimiter()).Append("..").Append(Directory::GetDirectoryDelimiter()));
+		Int	 prePos	= filePath.Head(upPos).FindLast(Directory::GetDirectoryDelimiter());
+
+		filePath.Replace(filePath.SubString(prePos, upPos - prePos + 3), String());
+	}
+
 	if (filePath.EndsWith(Directory::GetDirectoryDelimiter())) filePath[filePath.Length() - 1] = 0;
 }
 

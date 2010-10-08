@@ -14,6 +14,7 @@
 #include <smooth/gui/application/application.h>
 
 #include <smooth/graphics/surface.h>
+#include <smooth/system/multimonitor.h>
 
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/widgets/basic/divider.h>
@@ -49,7 +50,9 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	Point	 pos;
 	Size	 size;
 
-	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"), Point(Int((LiSAGetDisplaySizeX() - 350) / 2), Int((LiSAGetDisplaySizeY() - 300) / 2) - 50), Size(352, 302));
+	Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
+
+	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"), workArea.GetPosition() + Point((workArea.GetSize().cx - 350) / 2, (workArea.GetSize().cy - 300) / 2), Size(352, 302));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(39, OR_HORZ | OR_BOTTOM);

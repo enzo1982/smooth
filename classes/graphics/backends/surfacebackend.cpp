@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -66,7 +66,7 @@ S::GUI::SurfaceBackend::~SurfaceBackend()
 {
 }
 
-S::Int S::GUI::SurfaceBackend::GetSurfaceType() const
+S::Short S::GUI::SurfaceBackend::GetSurfaceType() const
 {
 	return type;
 }
@@ -116,7 +116,7 @@ S::Void *S::GUI::SurfaceBackend::GetSystemSurface() const
 	return NIL;
 }
 
-S::Int S::GUI::SurfaceBackend::GetSurfaceDPI() const
+S::Short S::GUI::SurfaceBackend::GetSurfaceDPI() const
 {
 	return 96;
 }
@@ -131,7 +131,7 @@ S::Int S::GUI::SurfaceBackend::Line(const Point &pos1, const Point &pos2, const 
 	return Success();
 }
 
-S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Int style)
+S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Short style)
 {
 	Rect	 rect = rightToLeft.TranslateRect(iRect);
 

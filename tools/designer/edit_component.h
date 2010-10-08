@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,12 +42,12 @@ class Designer_EditComponent : public Application
 		String		 GetName();
 		GUI::Window	*GetWindow();
 
-		Widget		*AddObject(Int);
-		Widget		*GetFirstObject(Int);
+		Widget		*AddObject(Short);
+		Widget		*GetFirstObject(Short);
 };
 
-const Int	 SMOOTH_BUTTON		=  1;
-const Int	 SMOOTH_MENUBAR		=  2;
-const Int	 SMOOTH_LAYER		=  3;
+const Short	 SMOOTH_BUTTON		=  1;
+const Short	 SMOOTH_MENUBAR		=  2;
+const Short	 SMOOTH_LAYER		=  3;
 
 #endif

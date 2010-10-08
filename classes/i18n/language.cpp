@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,5 +17,35 @@ S::I18n::Language::Language()
 
 S::I18n::Language::~Language()
 {
-	strings.RemoveAll();
+}
+
+S::Errors::Error S::I18n::Language::Parse(XML::Node *language)
+{
+	if (language == NIL) return Error();
+
+	XML::Node	*info = language->GetNodeByName("info");
+
+	/* Return an error if we didn't find an info node.
+	 */
+	if (info == NIL) return Error();
+
+	for (Int i = 0; i < info->GetNOfNodes(); i++)
+	{
+		String	 property = info->GetNthNode(i)->GetAttributeByName("name")->GetContent();
+
+		if (property == "language")	 SetName(info->GetNthNode(i)->GetContent());
+
+		if (property == "righttoleft")	 rightToLeft = (info->GetNthNode(i)->GetContent() == "true" ? True : False);
+		if (property == "encoding")	 encoding = info->GetNthNode(i)->GetContent();
+		if (property == "author")	 author = info->GetNthNode(i)->GetContent();
+		if (property == "url")		 url = info->GetNthNode(i)->GetContent();
+	}
+
+	XML::Node	*data = language->GetNodeByName("data");
+
+	/* Return an error if we didn't find a data node.
+	 */
+	if (data == NIL) return Error();
+
+	return Section::Parse(data);
 }

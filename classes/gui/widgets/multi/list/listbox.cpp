@@ -14,7 +14,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
 
-const S::Int	 S::GUI::ListBox::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::ListBox::classID = S::Object::RequestClassID();
 
 S::GUI::ListBox::ListBox(const Point &iPos, const Size &iSize)
 {

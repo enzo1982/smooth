@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,8 @@
 #ifdef __WIN32__
 #	include <smooth/io/drivers/driver_win32.h>
 #endif
+
+#include <smooth/files/file.h>
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -41,14 +43,14 @@ S::IO::OutStream::OutStream(Int type, Driver *iDriver)
 	dataBuffer.Resize(packageSize);
 }
 
-S::IO::OutStream::OutStream(Int type, const String &file, Int mode)
+S::IO::OutStream::OutStream(Int type, const String &fileName, Int mode)
 {
 	if (type != STREAM_FILE)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
 #ifdef __WIN32__
-	driver = new DriverWin32(file, mode);
+	driver = new DriverWin32(File(fileName), mode);
 #else
-	driver = new DriverPOSIX(file, mode);
+	driver = new DriverPOSIX(File(fileName), mode);
 #endif
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
@@ -60,29 +62,29 @@ S::IO::OutStream::OutStream(Int type, const String &file, Int mode)
 	dataBuffer.Resize(packageSize);
 }
 
-S::IO::OutStream::OutStream(Int type, FILE *openfile)
+S::IO::OutStream::OutStream(Int type, FILE *openFile)
 {
 	if (type != STREAM_ANSI)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-	driver = new DriverANSI(openfile);
+	driver = new DriverANSI(openFile);
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
 	streamType	= STREAM_DRIVER;
 	size		= driver->GetSize();
 	currentFilePos	= driver->GetPos();
-	packageSize	= 1; // low package size, 'cause openfile could point at the console or so
+	packageSize	= 1; // low package size, 'cause openFile could point to the console
 	stdpacksize	= packageSize;
 	origpacksize	= packageSize;
 
 	dataBuffer.Resize(packageSize);
 }
 
-S::IO::OutStream::OutStream(Int type, Void *outbuffer, Long bufsize)
+S::IO::OutStream::OutStream(Int type, Void *outBuffer, Long bufferSize)
 {
 	if (type != STREAM_BUFFER)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-	driver = new DriverMemory(outbuffer, bufsize);
+	driver = new DriverMemory(outBuffer, bufferSize);
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 

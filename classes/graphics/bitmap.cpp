@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,7 +37,7 @@ S::GUI::Bitmap::~Bitmap()
 	delete backend;
 }
 
-S::Int S::GUI::Bitmap::GetBitmapType() const
+S::Short S::GUI::Bitmap::GetBitmapType() const
 {
 	return backend->GetBitmapType();
 }
@@ -47,7 +47,7 @@ const S::GUI::Size &S::GUI::Bitmap::GetSize() const
 	return backend->GetSize();
 }
 
-S::Int S::GUI::Bitmap::GetDepth() const
+S::Byte S::GUI::Bitmap::GetDepth() const
 {
 	return backend->GetDepth();
 }
@@ -57,7 +57,7 @@ S::UnsignedByte *S::GUI::Bitmap::GetBytes() const
 	return backend->GetBytes();
 }
 
-S::Int S::GUI::Bitmap::GetLineAlignment() const
+S::Byte S::GUI::Bitmap::GetLineAlignment() const
 {
 	return backend->GetLineAlignment();
 }
@@ -95,6 +95,11 @@ S::Int S::GUI::Bitmap::InvertColors()
 S::Int S::GUI::Bitmap::ReplaceColor(const Color &color1, const Color &color2)
 {
 	return backend->ReplaceColor(color1, color2);
+}
+
+S::Int S::GUI::Bitmap::Scale(const Size &newSize)
+{
+	return backend->Scale(newSize);
 }
 
 S::Int S::GUI::Bitmap::BlitFromSurface(Surface *surface, const Rect &srcRect, const Rect &destRect)

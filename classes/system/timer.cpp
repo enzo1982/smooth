@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,7 @@
 #include <smooth/system/timer.h>
 #include <smooth/system/backends/timerbackend.h>
 
-const S::Int	 S::System::Timer::classID = S::Object::RequestClassID();
+const S::Short	 S::System::Timer::classID = S::Object::RequestClassID();
 
 S::System::Timer::Timer()
 {
@@ -70,7 +70,7 @@ S::Int S::System::Timer::GetInterval() const
 	return interval;
 }
 
-S::Int S::System::Timer::GetStatus() const
+S::Short S::System::Timer::GetStatus() const
 {
 	return status;
 }

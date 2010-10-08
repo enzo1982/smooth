@@ -17,7 +17,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
 
-const S::Int	 S::GUI::Widget::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Widget::classID = S::Object::RequestClassID();
 
 S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 {

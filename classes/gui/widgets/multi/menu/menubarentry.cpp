@@ -17,7 +17,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/binary.h>
 
-const S::Int	 S::GUI::MenubarEntry::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::MenubarEntry::classID = S::Object::RequestClassID();
 
 S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : MenuEntry(iText, iBitmap, iPopup, ibVar, iiVar, iiCode)
 {
@@ -229,7 +229,7 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 	}
 }
 
-S::Bool S::GUI::MenubarEntry::IsTypeCompatible(Int compType) const
+S::Bool S::GUI::MenubarEntry::IsTypeCompatible(Short compType) const
 {
 	if (compType == Object::classID || compType == Widget::classID || compType == MenuEntry::classID)	return True;
 	else													return False;

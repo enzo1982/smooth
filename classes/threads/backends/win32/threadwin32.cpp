@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -62,13 +62,13 @@ S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadPa
 S::Int S::Threads::ThreadWin32::Stop()
 {
 	if (thread == NIL) return Error();
-	if (!IsRunning()) return Success();
 
 	HANDLE	 self = thread;
+	Bool	 running = IsRunning();
 
 	thread = NIL;
 
-	TerminateThread(self, 0);
+	if (running) TerminateThread(self, 0);
 
 	if (myThread)
 	{

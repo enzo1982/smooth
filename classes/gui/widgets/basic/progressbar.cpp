@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,7 +13,7 @@
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 
-const S::Int	 S::GUI::Progressbar::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Progressbar::classID = S::Object::RequestClassID();
 
 S::GUI::Progressbar::Progressbar(const Point &iPos, const Size &iSize, Int sType, Int iTextFlag, Int rangeStart, Int rangeEnd, Int iValue) : Widget(iPos, iSize)
 {

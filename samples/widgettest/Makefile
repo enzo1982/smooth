@@ -4,19 +4,19 @@
 SMOOTH_PATH = ../..
 
 # Change these variables to fit your project:
-#LOCALEXE  = widgettest
+LOCALEXE  = widgettest
 
 # Enter object files here:
-#OBJECTS	  = widgettest.o
+OBJECTS	  = widgettest.o
 
 # Enter additional library dependencies here
-LIBS	  = libmyactivearea.a
+LIBS	  = widget/libmyactivearea.a
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   =
+ALLCMD1   = cd widget && make
 ALLCMD2   =
 ALLCMD3   =
-CLEANCMD1 =
+CLEANCMD1 = cd widget && make clean
 CLEANCMD2 =
 CLEANCMD3 =
 

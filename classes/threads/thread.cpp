@@ -12,9 +12,9 @@
 #include <smooth/threads/backends/threadbackend.h>
 #include <smooth/init.h>
 
-const S::Int	 S::Threads::Thread::classID = S::Object::RequestClassID();
+const S::Short	 S::Threads::Thread::classID = S::Object::RequestClassID();
 
-S::Int		 S::Threads::Thread::nOfRunningThreads = 0;
+S::Short	 S::Threads::Thread::nOfRunningThreads = 0;
 
 S::Threads::Thread::Thread(Void *iThread)
 {
@@ -62,7 +62,7 @@ S::Threads::Thread &S::Threads::Thread::operator =(const Thread &oThread)
 	return *this;
 }
 
-S::Int S::Threads::Thread::GetStatus() const
+S::Short S::Threads::Thread::GetStatus() const
 {
 	return status;
 }
@@ -127,4 +127,6 @@ S::Void S::Threads::Thread::MainCaller(Thread *thread)
 	thread->status = THREAD_STOPPED;
 
 	nOfRunningThreads--;
+
+	thread->backend->Exit();
 }

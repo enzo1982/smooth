@@ -24,9 +24,9 @@ S::GUI::SurfaceBackend *CreateSurfaceGDIPlus(S::Void *iSurface, const S::GUI::Si
 	return new S::GUI::SurfaceGDIPlus(iSurface, maxSize);
 }
 
-S::Int	 surfaceGDITmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceGDIPlus);
+S::Int		 surfaceGDITmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceGDIPlus);
 
-S::Int	  S::GUI::SurfaceGDIPlus::surfaceDPI	= -1;
+S::Short	 S::GUI::SurfaceGDIPlus::surfaceDPI = -1;
 
 S::GUI::SurfaceGDIPlus::SurfaceGDIPlus(Void *iWindow, const Size &maxSize)
 {
@@ -139,7 +139,7 @@ S::Int S::GUI::SurfaceGDIPlus::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect	 pRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect)), *(paintRects.GetLast()));
 
 	paintContext->SetClip(Gdiplus::Rect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top));
 
@@ -156,9 +156,7 @@ S::Int S::GUI::SurfaceGDIPlus::EndPaint()
 
 	painting--;
 
-	Rect	 iRect = Rect::OverlapRect(*(paintRects.GetLast()), *(paintRects.GetNth(paintRects.Length() - 2)));
-
-	if (painting == 0) PaintRect(iRect);
+	if (painting == 0) PaintRect(*(paintRects.GetLast()));
 
 	delete paintRects.GetLast();
 
@@ -176,12 +174,12 @@ S::Void *S::GUI::SurfaceGDIPlus::GetSystemSurface() const
 	return (Void *) window;
 }
 
-S::Int S::GUI::SurfaceGDIPlus::GetSurfaceDPI() const
+S::Short S::GUI::SurfaceGDIPlus::GetSurfaceDPI() const
 {
 	if (surfaceDPI != -1) return surfaceDPI;
 
 	HDC	 dc = GetWindowDC(0);
-	Int	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
+	Short	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
 
 	ReleaseDC(0, dc);
 

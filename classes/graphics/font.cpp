@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,24 +12,24 @@
 #include <smooth/graphics/backends/fontbackend.h>
 #include <smooth/misc/math.h>
 
-S::String S::GUI::Font::Default		= "default";
-S::Int	  S::GUI::Font::DefaultSize	= 8;
+S::String	 S::GUI::Font::Default		= "default";
+S::Short	 S::GUI::Font::DefaultSize	= 8;
 
-S::Int	  S::GUI::Font::Thin		= 100;
-S::Int	  S::GUI::Font::ExtraLight	= 200;
-S::Int	  S::GUI::Font::Light		= 300;
-S::Int	  S::GUI::Font::Normal		= 400;
-S::Int	  S::GUI::Font::Medium		= 500;
-S::Int	  S::GUI::Font::SemiBold	= 600;
-S::Int	  S::GUI::Font::Bold		= 700;
-S::Int	  S::GUI::Font::ExtraBold	= 800;
-S::Int	  S::GUI::Font::Black		= 900;
+S::Short	 S::GUI::Font::Thin		= 100;
+S::Short	 S::GUI::Font::ExtraLight	= 200;
+S::Short	 S::GUI::Font::Light		= 300;
+S::Short	 S::GUI::Font::Normal		= 400;
+S::Short	 S::GUI::Font::Medium		= 500;
+S::Short	 S::GUI::Font::SemiBold		= 600;
+S::Short	 S::GUI::Font::Bold		= 700;
+S::Short	 S::GUI::Font::ExtraBold	= 800;
+S::Short	 S::GUI::Font::Black		= 900;
 
-S::Int	  S::GUI::Font::Italic		= 2;
-S::Int	  S::GUI::Font::Underline	= 4;
-S::Int	  S::GUI::Font::StrikeOut	= 8;
+S::Short	 S::GUI::Font::Italic		= 2;
+S::Short	 S::GUI::Font::Underline	= 4;
+S::Short	 S::GUI::Font::StrikeOut	= 8;
 
-S::GUI::Font::Font(const String &iFontName, Int iFontSize, Int iFontWeight, Int iFontStyle, const Color &iFontColor)
+S::GUI::Font::Font(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor)
 {
 	fontName   = iFontName;
 	fontSize   = iFontSize;
@@ -58,23 +58,23 @@ S::GUI::Font::~Font()
 
 S::GUI::Font &S::GUI::Font::operator =(const Font &newFont)
 {
-	SetName(newFont.fontName);
-	SetSize(newFont.fontSize);
-	SetColor(newFont.fontColor);
-	SetWeight(newFont.fontWeight);
-	SetStyle(newFont.fontStyle);
+	SetName(newFont.GetName());
+	SetSize(newFont.GetSize());
+	SetColor(newFont.GetColor());
+	SetWeight(newFont.GetWeight());
+	SetStyle(newFont.GetStyle());
 
 	return *this;
 }
 
 S::Bool S::GUI::Font::operator ==(const Font &font) const
 {
-	if (fontName   == font.fontName	  &&
-	    fontSize   == font.fontSize	  &&
-	    fontColor  == font.fontColor  &&
-	    fontWeight == font.fontWeight &&
-	    fontStyle  == font.fontStyle) return True;
-	else				  return False;
+	if (fontName   == font.GetName()   &&
+	    fontSize   == font.GetSize()   &&
+	    fontColor  == font.GetColor()  &&
+	    fontWeight == font.GetWeight() &&
+	    fontStyle  == font.GetStyle()) return True;
+	else				   return False;
 }
 
 S::Bool S::GUI::Font::operator !=(const Font &font) const
@@ -91,7 +91,7 @@ S::Int S::GUI::Font::SetName(const String &newFontName)
 	return Success();
 }
 
-S::Int S::GUI::Font::SetSize(Int newFontSize)
+S::Int S::GUI::Font::SetSize(Short newFontSize)
 {
 	backend->SetSize(newFontSize);
 
@@ -109,7 +109,7 @@ S::Int S::GUI::Font::SetColor(const Color &newFontColor)
 	return Success();
 }
 
-S::Int S::GUI::Font::SetWeight(Int newFontWeight)
+S::Int S::GUI::Font::SetWeight(Short newFontWeight)
 {
 	backend->SetWeight(newFontWeight);
 
@@ -118,7 +118,7 @@ S::Int S::GUI::Font::SetWeight(Int newFontWeight)
 	return Success();
 }
 
-S::Int S::GUI::Font::SetStyle(Int newFontStyle)
+S::Int S::GUI::Font::SetStyle(Short newFontStyle)
 {
 	backend->SetStyle(newFontStyle);
 
@@ -132,7 +132,7 @@ const S::String &S::GUI::Font::GetName() const
 	return fontName;
 }
 
-S::Int S::GUI::Font::GetSize() const
+S::Short S::GUI::Font::GetSize() const
 {
 	return fontSize;
 }
@@ -142,12 +142,12 @@ const S::GUI::Color &S::GUI::Font::GetColor() const
 	return fontColor;
 }
 
-S::Int S::GUI::Font::GetWeight() const
+S::Short S::GUI::Font::GetWeight() const
 {
 	return fontWeight;
 }
 
-S::Int S::GUI::Font::GetStyle() const
+S::Short S::GUI::Font::GetStyle() const
 {
 	return fontStyle;
 }

@@ -524,10 +524,6 @@
 						Name="forms"
 						>
 						<File
-							RelativePath="..\..\classes\graphics\forms\form.cpp"
-							>
-						</File>
-						<File
 							RelativePath="..\..\classes\graphics\forms\line.cpp"
 							>
 						</File>
@@ -2069,6 +2065,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\classes\i18n\section.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\classes\i18n\translator.cpp"
 						>
 					</File>
@@ -2994,10 +2994,6 @@
 						Name="forms"
 						>
 						<File
-							RelativePath="..\..\include\smooth\graphics\forms\form.h"
-							>
-						</File>
-						<File
 							RelativePath="..\..\include\smooth\graphics\forms\line.h"
 							>
 						</File>
@@ -3059,19 +3055,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\smooth\templates\extended.h"
-						>
-					</File>
-					<File
 						RelativePath="..\..\include\smooth\templates\iterator.h"
 						>
 					</File>
 					<File
 						RelativePath="..\..\include\smooth\templates\nonblocking.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\include\smooth\templates\pointer.h"
 						>
 					</File>
 					<File
@@ -3174,14 +3162,6 @@
 							>
 						</File>
 					</Filter>
-					<Filter
-						Name="extended"
-						>
-						<File
-							RelativePath="..\..\include\smooth\templates\extended\extended.h"
-							>
-						</File>
-					</Filter>
 				</Filter>
 				<Filter
 					Name="threads"
@@ -3276,6 +3256,10 @@
 					</File>
 					<File
 						RelativePath="..\..\include\smooth\i18n\number.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\smooth\i18n\section.h"
 						>
 					</File>
 					<File

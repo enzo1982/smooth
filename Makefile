@@ -1,7 +1,6 @@
 # Makefile for smooth v0.8
 
 include Makefile-directories
-
 include Makefile-options
 
 HEADERS = $(OBJECTDIR)/smooth.h.gch
@@ -37,14 +36,9 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	DLLNAME = $(BINDIR)/smooth.dll
 	LIBNAME = $(LIBDIR)/libsmooth.a
-
-	LIBICONV = $(LIBDIR)/libiconv.a
-	LIBICONVDLL = $(BINDIR)/iconv.dll
 else
 	DLLNAME = $(LIBDIR)/libsmooth.so
 endif
-
-OTHERLIBS = libs $(LIBICONVDLL)
 
 LINKER = gcc
 STRIP = strip
@@ -55,11 +49,7 @@ LIBSTRIP_OPTS = --strip-debug
 REMOVER_OPTS = -f
 
 ifeq ($(BUILD_WIN32),True)
-	LINKER_OPTS += -mwindows -Xlinker --kill-at -Xlinker --out-implib -Xlinker $(LIBNAME)
-
-ifneq ($(BUILD_X64),True)
-	LDOPTS += -Xlinker --dynamicbase -Xlinker --nxcompat
-endif
+	LINKER_OPTS += -mwindows -Xlinker --dynamicbase -Xlinker --nxcompat -Xlinker --kill-at -Xlinker --out-implib -Xlinker $(LIBNAME)
 endif
 
 .PHONY: all headers objects programs libs install clean clean_all clean_headers doc doc-clean
@@ -92,7 +82,6 @@ clean: clean_headers
 
 clean_all: clean
 	$(MAKE) -C libraries clean
-	$(REMOVER) $(REMOVER_OPTS) $(LIBICONVDLL)
 
 clean_headers:
 	$(REMOVER) $(REMOVER_OPTS) $(HEADERS)
@@ -103,22 +92,10 @@ doc: doc-clean
 doc-clean:
 	rm -r -f doc/reference
 
-$(DLLNAME): objects libs $(LIBICONVDLL)
+$(DLLNAME): objects libs
 	$(LINKER) $(OBJECTS) $(LINKER_OPTS) $(LIBS)
 	$(STRIP) $(STRIP_OPTS) $(DLLNAME)
 ifeq ($(BUILD_WIN32),True)
 	$(STRIP) $(LIBSTRIP_OPTS) $(LIBNAME)
 	countbuild BuildNumber
 endif
-
-$(LIBICONVDLL): $(LIBICONV)
-ifeq ($(BUILD_WIN32),True)
-ifneq ($(BUILD_X64),True)
-	$(LINKER) libraries/libiconv/*.o -L$(LIBDIR) --shared -Xlinker --dynamicbase -Xlinker --nxcompat -o $(LIBICONVDLL)
-else
-	$(LINKER) libraries/libiconv/*.o -L$(LIBDIR) --shared -o $(LIBICONVDLL)
-endif
-else
-	$(LINKER) libraries/libiconv/*.o -L$(LIBDIR) --shared -o $(LIBICONVDLL)
-endif
-	$(STRIP) $(STRIP_OPTS) $(LIBICONVDLL)

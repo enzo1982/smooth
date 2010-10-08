@@ -80,7 +80,7 @@ S::Int S::Net::Protocols::HTTP::SetParameterFile(const String &key, const String
 	return Success();
 }
 
-S::Int S::Net::Protocols::HTTP::SetMode(Int nMode)
+S::Int S::Net::Protocols::HTTP::SetMode(Short nMode)
 {
 	mode = nMode;
 
@@ -104,7 +104,7 @@ S::Int S::Net::Protocols::HTTP::SetProxy(const String &nProxy, Int nProxyPort)
 	return Success();
 }
 
-S::Int S::Net::Protocols::HTTP::SetProxyMode(Int nProxyMode)
+S::Int S::Net::Protocols::HTTP::SetProxyMode(Short nProxyMode)
 {
 	proxyMode = nProxyMode;
 
@@ -134,6 +134,7 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 	if (DecodeURL() == Error()) return Error();
 
 	Bool		 error	= False;
+	Bool		 cancel	= False;
 	IO::Driver	*socket	= NIL;
 
 	/* Create a connection to the server or proxy
@@ -162,12 +163,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 		for (Int i = 0; i < buffer.Size(); i += 1024)
 		{
-			if (!out->OutputData(((UnsignedByte *) buffer) + i, Math::Min(1024, buffer.Size() - i)))
-			{
-				error = True;
-
-				break;
-			}
+			if (doCancelDownload.Call())								 { cancel = True; break; }
+			if (!out->OutputData(((UnsignedByte *) buffer) + i, Math::Min(1024, buffer.Size() - i))) { error  = True; break; }
 
 			if (Math::Round(1000.0 * i / buffer.Size()) != percent)
 			{
@@ -180,7 +177,7 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 		uploadProgress.Emit(1000);
 
-		if (!error)
+		if (!error && !cancel)
 		{
 			S::File(fileName).Delete();
 
@@ -227,6 +224,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 				for (Int i = 0; i < bytes; i += 1024)
 				{
+					if (doCancelDownload.Call()) { cancel = True; break; }
+
 					in->InputData((Void *) buffer, Math::Min(1024, bytes - i));
 					fOut->OutputData((Void *) buffer, Math::Min(1024, bytes - i));
 
@@ -241,6 +240,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 				delete [] buffer;
 				delete fOut;
+
+				if (cancel) break;
 
 				if (encoding == "chunked") in->InputLine();
 				else			   break;

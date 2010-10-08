@@ -18,7 +18,7 @@
 
 S::Signal2<S::Void, S::Int, S::Int>	 S::GUI::ListEntry::internalOnSelectEntry;
 
-const S::Int	 S::GUI::ListEntry::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::ListEntry::classID = S::Object::RequestClassID();
 
 S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 15))
 {
@@ -112,20 +112,29 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 					}
 				}
 
-				if (container->GetObjectType() == ListBox::classID && ((ListBox *) container)->GetNOfTabs() > 0 && gotTabs)
-				{
-					for (Int i = 0; i < ((ListBox *) container)->GetNOfTabs(); i++)
-					{
-						Rect	 rect = Rect(GetRealPosition() + Point(1, 1), GetSize() - Size(3, 2));
+				Widget	*listBox = container;
 
-						rect.left += ((ListBox *) container)->GetNthTabOffset(i);
+				while (listBox->GetObjectType() != ListBox::classID)
+				{
+					listBox = listBox->GetContainer();
+
+					if (listBox == NIL) break;
+				}
+
+				if (listBox != NIL && ((ListBox *) listBox)->GetNOfTabs() > 0 && gotTabs)
+				{
+					for (Int i = 0; i < ((ListBox *) listBox)->GetNOfTabs(); i++)
+					{
+						Rect	 rect = Rect(GetRealPosition() + Point(1 + (i > 0 && listBox != container ? listBox->GetRealPosition().x - container->GetRealPosition().x + 2 : 0), 1), GetSize() - Size(3, 2));
+
+						rect.left += ((ListBox *) listBox)->GetNthTabOffset(i);
 						rect.left += (i == 0 ? (container->GetFlags() & LF_MULTICHECKBOX ? 12 : 0) : 0);
 
-						if (((ListBox *) container)->GetNOfTabs() >= i + 2) rect.right = rect.left + (((ListBox *) container)->GetNthTabOffset(i + 1) - ((ListBox *) container)->GetNthTabOffset(i)) - (i == 0 ? (container->GetFlags() & LF_MULTICHECKBOX ? 12 : 0) : 0) - 3;
+						if (((ListBox *) listBox)->GetNOfTabs() >= i + 2) rect.right = rect.left + (((ListBox *) listBox)->GetNthTabOffset(i + 1) - ((ListBox *) listBox)->GetNthTabOffset(i)) - (i == 0 ? (container->GetFlags() & LF_MULTICHECKBOX ? 12 : 0) : 0) - 3;
 
 						String	 tabText = GetNthTabText(i);
 
-						if (((ListBox *) container)->GetNthTabOrientation(i) == OR_RIGHT)
+						if (((ListBox *) listBox)->GetNthTabOrientation(i) == OR_RIGHT)
 						{
 							rect.left = Math::Max(rect.left, rect.right - nFont.GetTextSizeX(tabText));
 						}

@@ -78,7 +78,7 @@ S::Int S::GUI::SurfaceXLib::PaintRect(const Rect &pRect)
 
 S::Int S::GUI::SurfaceXLib::StartPaint(const Rect &iPRect)
 {
-	Rect	 pRect = rightToLeft.TranslateRect(iPRect);
+	Rect	 pRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect));
 
 	if (paintRect.left == -1 && paintRect.top == -1 && paintRect.right == -1 && paintRect.bottom == -1)
 	{
@@ -138,8 +138,8 @@ S::Int S::GUI::SurfaceXLib::SetPixel(const Point &point, const Color &color)
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
-	XDrawPoint(display, window, gc, rightToLeft.TranslateX(point.x), rightToLeft.TranslateY(point.y));
-	XDrawPoint(display, bitmap, gc, rightToLeft.TranslateX(point.x), rightToLeft.TranslateY(point.y));
+	XDrawPoint(display, window, gc, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)));
+	XDrawPoint(display, bitmap, gc, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)));
 
 	XFreeGC(display, gc);
 
@@ -156,8 +156,8 @@ S::Int S::GUI::SurfaceXLib::Line(const Point &iPos1, const Point &iPos2, const C
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
-	Point	 pos1 = rightToLeft.TranslatePoint(iPos1);
-	Point	 pos2 = rightToLeft.TranslatePoint(iPos2);
+	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
+	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
 
 	XDrawLine(display, window, gc, pos1.x, pos1.y, pos2.x, pos2.y);
 	XDrawLine(display, bitmap, gc, pos1.x, pos1.y, pos2.x, pos2.y);
@@ -171,7 +171,7 @@ S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, const Color &color, Int style
 {
 	if (window == NIL) return Success();
 
-	Rect		 rect = rightToLeft.TranslateRect(iRect);
+	Rect		 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
 	XGCValues	 gcValues;
 
 	gcValues.foreground = Color(color.GetBlue(), color.GetGreen(), color.GetRed());
@@ -297,7 +297,7 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 			}
 		}
 
-		Rect	 rect = rightToLeft.TranslateRect(iRect);
+		Rect	 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
 
 		if (Setup::enableUnicode)
 		{
@@ -324,7 +324,7 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &oBitmap, const Rect &sr
 	if (oBitmap == NIL) return Error();
 
 	Bitmap	 bmp	  = oBitmap;
-	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
+	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
 	GC	 gc	  = XCreateGC(display, bitmap, 0, NIL);
 
 	XCopyArea(display, (Drawable) bmp.GetSystemBitmap(), window, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
@@ -341,7 +341,7 @@ S::Int S::GUI::SurfaceXLib::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oBi
 	if (oBitmap == NIL) return Error();
 
 	Bitmap	 bmp	 = oBitmap;
-	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
+	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
 	GC	 gc	 = XCreateGC(display, bitmap, 0, NIL);
 
 	XCopyArea(display, window, (Drawable) bmp.GetSystemBitmap(), gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);

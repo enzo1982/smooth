@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,7 @@
 #include <smooth/gui/widgets/basic/image.h>
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/system/multimonitor.h>
 
 S::Int	 S::GUI::Dialogs::MessageDlg::nOfMessageBoxes = 0;
 S::Bool	 S::GUI::Dialogs::MessageDlg::defaultRightToLeft = False;
@@ -213,8 +214,10 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 		lay->Add(button);
 	}
 
+	Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
+
 	msgbox->SetWidth(Math::Max(msgbox->GetWidth(), buttonLabels.Length() * (buttonWidth + 9) + 21));
-	msgbox->SetPosition(Point((LiSAGetDisplaySizeX() - msgbox->GetWidth()) / 2, (LiSAGetDisplaySizeY() - msgbox->GetHeight()) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
+	msgbox->SetPosition(workArea.GetPosition() + Point((workArea.GetSize().cx - msgbox->GetWidth()) / 2, (workArea.GetSize().cy - msgbox->GetHeight()) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
 }
 
 S::GUI::Dialogs::MessageDlg::~MessageDlg()

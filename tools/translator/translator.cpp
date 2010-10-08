@@ -35,15 +35,17 @@ Translator::Translator(const String &openFile)
 	fileName = NIL;
 	templateName = NIL;
 
-	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 434));
+	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 450));
 	title		= new Titlebar();
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
 
+	Section::onSelectItem.Connect(&Translator::SelectEntry, this);
+
 	list_entries	= new ListBox(Point(7, 7), Size(757, 191));
 	list_entries->onSelectEntry.Connect(&Translator::SelectEntry, this);
 	list_entries->SetFlags(LF_ALLOWRESELECT);
-	list_entries->AddTab("ID", 30);
+	list_entries->AddTab("ID", 80);
 	list_entries->AddTab("String");
 	list_entries->AddTab("Translation");
 
@@ -207,6 +209,8 @@ Void Translator::NewFile()
 {
 	if (!ExitProc()) return;
 
+	dataSection = new Section();
+
 	fileName = "unnamed";
 	modified = False;
 
@@ -295,7 +299,7 @@ Void Translator::NewFile()
 
 	list_entries->SelectNthEntry(0);
 
-	SelectEntry();
+	SelectEntry(NIL);
 }
 
 Void Translator::Close()
@@ -305,6 +309,8 @@ Void Translator::Close()
 
 Void Translator::CloseFile()
 {
+	if (entries.Length() == 0) return;
+
 	fileName = NIL;
 	templateName = NIL;
 
@@ -312,9 +318,11 @@ Void Translator::CloseFile()
 
 	list_entries->RemoveAllEntries();
 
-	for (Int i = entries.Length() - 1; i >= 0; i--) DeleteObject(entries.GetNth(i));
+	for (Int i = 0; i < numInfoItems; i++) DeleteObject(entries.GetNth(i));
 
 	entries.RemoveAll();
+
+	delete dataSection;
 
 	text_original->SetText("Original:");
 	text_translated->SetText("Translation:");
@@ -362,27 +370,7 @@ Int Translator::OpenTemplate(const String &fileName)
 
 	XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
 
-	for (Int l = 0; l < data->GetNOfNodes(); l++)
-	{
-		XML::Node	*xentry = data->GetNthNode(l);
-
-		if (xentry->GetName() == "entry")
-		{
-			GUI::Font	 redFont;
-
-			redFont.SetColor(Color(255, 0, 0));
-
-			StringItem	*entry = new StringItem(xentry->GetAttributeByName("id")->GetContent().ToInt(),
-								 xentry->GetAttributeByName("string")->GetContent(),
-								 NIL);
-
-			entry->SetFont(redFont);
-
-			list_entries->Add(entry);
-
-			entries.Add(entry, entry->GetID());
-		}
-	}
+	dataSection->Parse(data, list_entries, entries);
 
 	delete doc;
 
@@ -436,58 +424,46 @@ Void Translator::OpenFileName(const String &openFile)
 
 	XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
 
-	for (Int l = 0; l < data->GetNOfNodes(); l++)
+	dataSection->Parse(data, list_entries, entries);
+
+	delete doc;
+
+	/* Look for entries with the same original text and suggest a translation.
+	 */
+	for (Int i = 0; i < entries.Length(); i++)
 	{
-		XML::Node	*xentry = data->GetNthNode(l);
+		if (entries.GetNthIndex(i) < 0) continue;
 
-		if (xentry->GetName() == "entry")
+		StringItem	*item = (StringItem *) entries.GetNth(i);
+
+		if (item->GetTranslation() != NIL) continue;
+
+		for (Int j = 0; j < entries.Length(); j++)
 		{
-			GUI::Font	 blackFont;
-			GUI::Font	 redFont;
-			GUI::Font	 orangeFont;
+			if (entries.GetNthIndex(j) < 0 || i == j) continue;
 
-			redFont.SetColor(Color(255, 0, 0));
-			orangeFont.SetColor(Color(255, 127, 36));
+			StringItem	*item2 = (StringItem *) entries.GetNth(j);
 
-			if (entries.Get(xentry->GetAttributeByName("id")->GetContent().ToInt()) != NIL)
+			if (item->GetOriginal() == item2->GetOriginal() && item2->GetTranslation() != NIL)
 			{
-				StringItem	*entry = (StringItem *) entries.Get(xentry->GetAttributeByName("id")->GetContent().ToInt());
+				item->SetTranslation(item2->GetTranslation());
 
-				entry->SetTranslation(xentry->GetContent());
-
-				if	(entry->GetTranslation() == NIL)						entry->SetFont(redFont);
-				else if (entry->GetOriginal() != xentry->GetAttributeByName("string")->GetContent())	entry->SetFont(orangeFont);
-				else											entry->SetFont(blackFont);
-			}
-			else
-			{
-				StringItem	*entry = new StringItem(xentry->GetAttributeByName("id")->GetContent().ToInt(),
-									xentry->GetAttributeByName("string")->GetContent(),
-									xentry->GetContent());
-
-				if (entry->GetTranslation() == NIL)	entry->SetFont(redFont);
-				else					entry->SetFont(orangeFont);
-
-				list_entries->Add(entry);
-
-				entries.Add(entry, entry->GetID());
+				break;
 			}
 		}
 	}
 
-	delete doc;
-
 	list_entries->SelectNthEntry(0);
 
-	SelectEntry();
+	SelectEntry(NIL);
 }
 
 Void Translator::SaveFile()
 {
 	if (fileName == NIL) return;
 
-	if (fileName != "unnamed")	SaveFileName(fileName);
-	else				SaveFileAs();
+	if (fileName != "unnamed") SaveFileName(fileName);
+	else			   SaveFileAs();
 }
 
 Void Translator::SaveFileAs()
@@ -532,21 +508,7 @@ Void Translator::SaveFileName(const String &file)
 
 	XML::Node	*data = root->AddNode("data");
 
-	for (Int i = numInfoItems; i < entries.Length(); i++)
-	{
-		StringItem	*entry = (StringItem *) entries.GetNth(i);
-
-		/* If we have a template, save only
-		 * entries with a translation.
-		 */
-		if (templateName == NIL || entry->GetTranslation() != NIL)
-		{
-			XML::Node	*xentry = data->AddNode("entry", entry->GetTranslation());
-
-			xentry->SetAttribute("id", String::FromInt(entry->GetID()));
-			xentry->SetAttribute("string", entry->GetOriginal());
-		}
-	}
+	dataSection->Save(data, templateName);
 
 	doc->SetEncoding("UTF-8");
 	doc->SetRootNode(root);
@@ -557,6 +519,64 @@ Void Translator::SaveFileName(const String &file)
 
 	delete doc;
 	delete root;
+
+	ReplaceLineEndings(file);
+	FormatLines(file);
+}
+
+Void Translator::ReplaceLineEndings(const String &file)
+{
+	const char	*inFormat = String::SetInputFormat("UTF-8");
+	const char	*outFormat = String::SetOutputFormat("UTF-8");
+
+	IO::InStream	 in(IO::STREAM_FILE, file, IO::IS_READ);
+
+	String		 xmlString = in.InputString(in.Size());
+
+	/* Replace line endings.
+	 */
+	xmlString.Replace("\n", "&#10;");
+	xmlString.Replace(">&#10;", ">\n");
+
+	IO::OutStream	 out(IO::STREAM_FILE, file, IO::OS_REPLACE);
+
+	out.OutputString(xmlString);
+
+	out.Close();
+
+	String::SetInputFormat(inFormat);
+	String::SetOutputFormat(outFormat);
+}
+
+Void Translator::FormatLines(const String &file)
+{
+	const char	*inFormat = String::SetInputFormat("UTF-8");
+	const char	*outFormat = String::SetOutputFormat("UTF-8");
+
+	IO::InStream	 in(IO::STREAM_FILE, file, IO::IS_READ);
+
+	String		 xmlString;
+
+	while (in.GetPos() < in.Size())
+	{
+		String	 line = in.InputLine();
+
+		if (line.Trim().StartsWith("<section ")) xmlString.Append("\n");
+
+		while (line.StartsWith("    "))	{ xmlString.Append("\t"); line = line.Tail(line.Length() - 4); }
+		while (line.StartsWith(" "))	{ xmlString.Append("  "); line = line.Tail(line.Length() - 1); }
+
+		xmlString.Append(line).Append("\n");
+	}
+
+	IO::OutStream	 out(IO::STREAM_FILE, file, IO::OS_REPLACE);
+
+	out.OutputString(xmlString);
+
+	out.Close();
+
+	String::SetInputFormat(inFormat);
+	String::SetOutputFormat(outFormat);
 }
 
 Void Translator::SaveData()
@@ -674,40 +694,37 @@ Void Translator::SaveData()
 	modified = True;
 }
 
-Void Translator::SelectEntry()
+Void Translator::SelectEntry(ListEntry *entry)
 {
-	ListEntry	*entry = list_entries->GetSelectedEntry();
+	if (entry == NIL) return;
 
-	if (entry != NIL)
+	if (entry->GetObjectType() == InfoItem::classID)
 	{
-		if (entry->GetObjectType() == InfoItem::classID)
-		{
-			edit_id->SetText(NIL);
-			edit_original->SetText(((InfoItem *) entry)->GetName());
-			edit_translated->SetText(((InfoItem *) entry)->GetValue());
+		edit_id->SetText(NIL);
+		edit_original->SetText(((InfoItem *) entry)->GetName());
+		edit_translated->SetText(((InfoItem *) entry)->GetValue());
 
-			text_id->Deactivate();
-			edit_id->Deactivate();
-			edit_original->Deactivate();
-			button_remove->Deactivate();
+		text_id->Deactivate();
+		edit_id->Deactivate();
+		edit_original->Deactivate();
+		button_remove->Deactivate();
 
-			text_original->SetText("Field:");
-			text_translated->SetText("Value:");
-		}
-		else
-		{
-			text_id->Activate();
-			edit_id->Activate();
-			edit_original->Activate();
-			button_remove->Activate();
+		text_original->SetText("Field:");
+		text_translated->SetText("Value:");
+	}
+	else
+	{
+		text_id->Activate();
+		edit_id->Activate();
+		edit_original->Activate();
+		button_remove->Activate();
 
-			text_original->SetText("Original:");
-			text_translated->SetText("Translation:");
+		text_original->SetText("Original:");
+		text_translated->SetText("Translation:");
 
-			edit_id->SetText(String::FromInt(((StringItem *) entry)->GetID()));
-			edit_original->SetText(((StringItem *) entry)->GetOriginal());
-			edit_translated->SetText(((StringItem *) entry)->GetTranslation());
-		}
+		edit_id->SetText(String::FromInt(((StringItem *) entry)->GetID()));
+		edit_original->SetText(((StringItem *) entry)->GetOriginal());
+		edit_translated->SetText(((StringItem *) entry)->GetTranslation());
 	}
 }
 

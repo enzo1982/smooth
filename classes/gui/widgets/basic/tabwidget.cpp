@@ -12,7 +12,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
-const S::Int	 S::GUI::TabWidget::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::TabWidget::classID = S::Object::RequestClassID();
 
 S::GUI::TabWidget::TabWidget(const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {

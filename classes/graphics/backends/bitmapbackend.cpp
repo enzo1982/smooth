@@ -151,7 +151,7 @@ S::GUI::BitmapBackend::~BitmapBackend()
 {
 }
 
-S::Int S::GUI::BitmapBackend::GetBitmapType() const
+S::Short S::GUI::BitmapBackend::GetBitmapType() const
 {
 	return type;
 }
@@ -161,7 +161,7 @@ const S::GUI::Size &S::GUI::BitmapBackend::GetSize() const
 	return size;
 }
 
-S::Int S::GUI::BitmapBackend::GetDepth() const
+S::Byte S::GUI::BitmapBackend::GetDepth() const
 {
 	return depth;
 }
@@ -171,7 +171,7 @@ S::UnsignedByte *S::GUI::BitmapBackend::GetBytes() const
 	return (UnsignedByte *) bytes;
 }
 
-S::Int S::GUI::BitmapBackend::GetLineAlignment() const
+S::Byte S::GUI::BitmapBackend::GetLineAlignment() const
 {
 	return align;
 }
@@ -254,6 +254,11 @@ S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &color1, const Color &col
 	}
 
 	return Success();
+}
+
+S::Int S::GUI::BitmapBackend::Scale(const Size &newSize)
+{
+	return Error();
 }
 
 S::Bool S::GUI::BitmapBackend::SetPixel(const Point &iPoint, const Color &color)

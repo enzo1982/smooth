@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,7 @@
 #include <smooth/gui/widgets/basic/image.h>
 #include <smooth/graphics/surface.h>
 
-const S::Int	 S::GUI::Image::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Image::classID = S::Object::RequestClassID();
 
 S::GUI::Image::Image(const Bitmap &iBitmap, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
@@ -47,7 +47,11 @@ S::Int S::GUI::Image::Paint(Int message)
 				Surface	*surface = GetDrawSurface();
 				Rect	 bmpRect = Rect(GetRealPosition() + Point(GetWidth() - newSize.cx, GetHeight() - newSize.cy) / 2, newSize);
 
+				surface->StartPaint(GetVisibleArea());
+
 				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+
+				surface->EndPaint();
 			}
 
 			break;

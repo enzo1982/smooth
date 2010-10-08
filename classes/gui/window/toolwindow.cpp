@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,7 @@
 
 #include <smooth/gui/window/toolwindow.h>
 
-const S::Int	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
 
 S::GUI::ToolWindow::ToolWindow(const Point &iPos, const Size &iSize) : Window("smooth ToolWindow", iPos, iSize)
 {
@@ -75,7 +75,7 @@ S::Bool S::GUI::ToolWindow::IsRightToLeft() const
 	return Window::IsRightToLeft();
 }
 
-S::Bool S::GUI::ToolWindow::IsTypeCompatible(Int compType) const
+S::Bool S::GUI::ToolWindow::IsTypeCompatible(Short compType) const
 {
 	if (compType == Object::classID || compType == Widget::classID || compType == Window::classID)	return True;
 	else												return False;

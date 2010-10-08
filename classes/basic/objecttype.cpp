@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,7 +23,7 @@ S::ObjectType::ObjectType(const ObjectType &objectType)
 	type	= objectType.type;
 }
 
-S::Bool S::ObjectType::operator ==(Int objType) const
+S::Bool S::ObjectType::operator ==(Short objType) const
 {
 	return (type == objType) ? True : object->IsTypeCompatible(objType);
 }

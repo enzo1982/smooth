@@ -4,7 +4,9 @@
 SMOOTH_PATH = ../..
 
 # Change these variables to fit your project:
-GLOBALLIB   = libiconv.a
+GLOBALDLL   = iconv
+IMPORTLIB   = libiconv.a
+
 MYCCOPTS    = -DLIBICONV_PLUG -D_ICONVDLL_ -I.
 
 # Enter object files here:

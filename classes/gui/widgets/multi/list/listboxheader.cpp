@@ -10,8 +10,9 @@
 
 #include <smooth/gui/widgets/multi/list/listboxheader.h>
 #include <smooth/gui/widgets/hotspot/hotspot.h>
-#include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/graphics/surface.h>
+#include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 
 const S::Short	 S::GUI::ListBoxHeader::classID = S::Object::RequestClassID();
@@ -167,14 +168,14 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					{
 						moveTab = i;
 
-						LiSASetMouseCursor(window->GetSystemWindow(), LiSA_MOUSE_HSIZE);
+						Input::Pointer::SetCursor(window, Input::Pointer::CursorHSize);
 					}
 				}
 				else if (moveTab == i)
 				{
 					moveTab = -1;
 
-					LiSASetMouseCursor(window->GetSystemWindow(), LiSA_MOUSE_ARROW);
+					Input::Pointer::SetCursor(window, Input::Pointer::CursorArrow);
 				}
 			}
 

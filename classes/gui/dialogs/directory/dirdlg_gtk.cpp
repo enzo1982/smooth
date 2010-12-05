@@ -36,7 +36,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 	{
 		char	*name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
-		directory = name;
+		directory.ImportFrom("UTF-8", name);
 
 		g_free(name);
 	}

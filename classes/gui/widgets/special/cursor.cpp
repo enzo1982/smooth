@@ -12,7 +12,9 @@
 #include <smooth/gui/widgets/basic/editbox.h>
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/window/toolwindow.h>
+#include <smooth/gui/clipboard/clipboard.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/input/pointer.h>
 #include <smooth/i18n/translator.h>
 #include <smooth/misc/binary.h>
 #include <smooth/misc/math.h>
@@ -75,11 +77,11 @@ S::Int S::GUI::Cursor::Paint(Int message)
 
 			break;
 		case SP_MOUSEIN:
-			LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_TEXTEDIT);
+			Input::Pointer::SetCursor(container->GetContainerWindow(), Input::Pointer::CursorTextEdit);
 
 			break;
 		case SP_MOUSEOUT:
-			LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
+			Input::Pointer::SetCursor(container->GetContainerWindow(), Input::Pointer::CursorArrow);
 
 			break;
 	}
@@ -254,22 +256,6 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			OnInput(wParam, lParam);
 
 			break;
-#ifdef __WIN32__
-		case WM_KILLFOCUS:
-			if (Window::GetWindow((HWND) wParam) != NIL)
-			{
-				if (Window::GetWindow((HWND) wParam)->GetObjectType() == ToolWindow::classID || Window::GetWindow((HWND) wParam) == window) break;
-			}
-
-			if (focussed)
-			{
-				focussed = False;
-
-				onLoseFocus.Emit();
-			}
-
-			break;
-#endif
 	}
 
 	return Widget::Process(message, wParam, lParam);
@@ -556,32 +542,7 @@ S::Void S::GUI::Cursor::CopyToClipboard()
 
 		for (int j = Math::Min(markStart, markEnd); j < Math::Max(markStart, markEnd); j++) mText[j - Math::Min(markStart, markEnd)] = text[j];
 
-#ifdef __WIN32__
-		Window	*window	= container->GetContainerWindow();
-
-		OpenClipboard((HWND) window->GetSystemWindow());
-
-		HGLOBAL	 memory = NIL;
-
-		if (Setup::enableUnicode)
-		{
-			memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(wchar_t) * (mText.Length() + 1));
-
-			memcpy(GlobalLock(memory), (wchar_t *) mText, sizeof(wchar_t) * (mText.Length() + 1));
-
-			SetClipboardData(CF_UNICODETEXT, memory);
-		}
-		else
-		{
-			memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, mText.Length() + 1);
-
-			strcpy((char *) GlobalLock(memory), mText);
-
-			SetClipboardData(CF_TEXT, memory);
-		}
-
-		CloseClipboard();
-#endif
+		Clipboard(container->GetContainerWindow()).SetClipboardText(mText);
 	}
 }
 
@@ -589,24 +550,7 @@ S::Void S::GUI::Cursor::InsertFromClipboard()
 {
 	DeleteSelectedText();
 
-	String	 insertText;
-
-#ifdef __WIN32__
-	Window	*window	= container->GetContainerWindow();
-
-	OpenClipboard((HWND) window->GetSystemWindow());
-
-	if (Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT))
-	{
-		insertText = (wchar_t *) GetClipboardData(CF_UNICODETEXT);
-	}
-	else if (IsClipboardFormatAvailable(CF_TEXT))
-	{
-		insertText = (char *) GetClipboardData(CF_TEXT);
-	}
-
-	CloseClipboard();
-#endif
+	String	 insertText = Clipboard(container->GetContainerWindow()).GetClipboardText();
 
 	if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
 	{
@@ -836,14 +780,14 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 
 	/* CTRL + C
 	 */
-	if (character == 3 && !(flags & (1 << 30)))
+	if (character == 0x03 && !(flags & (1 << 30)))
 	{
 		CopyToClipboard();
 	}
 
 	/* CTRL + X
 	 */
-	if (character == 24 && !(flags & (1 << 30)) && IsActive())
+	if (character == 0x18 && !(flags & (1 << 30)) && IsActive())
 	{
 		CopyToClipboard();
 
@@ -852,18 +796,18 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 
 	/* CTRL + V
 	 */
-	if (character == 22 && IsActive())
+	if (character == 0x16 && IsActive())
 	{
 		InsertFromClipboard();
 	}
 
 	if (text.Length() == maxSize && markStart == markEnd) return;
 
-	if (character >= 32 && IsActive())
+	if (character >= 0x20 && character != 0x7F && IsActive())
 	{
 		DeleteSelectedText();
 
-		if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (character < '0' || character > '9') && character != 45 && character != '.') return;
+		if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (character < '0' || character > '9') && character != '-' && character != '.') return;
 
 		String	 insertText;
 

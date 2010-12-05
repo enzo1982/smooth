@@ -11,6 +11,8 @@
 #include <smooth/graphics/backends/xlib/bitmapxlib.h>
 #include <smooth/backends/xlib/backendxlib.h>
 
+using namespace X11;
+
 S::GUI::BitmapBackend *CreateBitmapXLib_pV(S::Void *iBitmap)
 {
 	return new S::GUI::BitmapXLib(iBitmap);

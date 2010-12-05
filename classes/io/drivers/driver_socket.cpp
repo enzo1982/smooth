@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -88,7 +88,10 @@ S::Int S::IO::DriverSocket::ReadData(UnsignedByte *data, Int dataSize)
 #endif
 	}
 
-	return recv(stream, (char *) data, dataSize, 0);
+	int	 bytes = recv(stream, (char *) data, dataSize, 0);
+
+	if (bytes == 0) return -1; // connection closed
+	else		return bytes;
 }
 
 S::Int S::IO::DriverSocket::WriteData(UnsignedByte *data, Int dataSize)

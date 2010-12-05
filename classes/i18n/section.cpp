@@ -73,17 +73,22 @@ S::Errors::Error S::I18n::Section::Parse(XML::Node *section)
 {
 	if (section == NIL) return Error();
 
-	if (section->GetAttributeByName("name") != NIL) SetName(section->GetAttributeByName("name")->GetContent());
+	static String	 sectionNode	 = "section";
+	static String	 nameAttribute	 = "name";
+	static String	 entryNode	 = "entry";
+	static String	 stringAttribute = "string";
+
+	if (section->GetAttributeByName(nameAttribute) != NIL) SetName(section->GetAttributeByName(nameAttribute)->GetContent());
 
 	for (Int i = 0; i < section->GetNOfNodes(); i++)
 	{
 		XML::Node	*entry = section->GetNthNode(i);
 
-		if (entry->GetName() == "entry" && entry->GetAttributeByName("string") != NIL)
+		if (entry->GetName() == entryNode && entry->GetAttributeByName(stringAttribute) != NIL)
 		{
-			strings.Add(entry->GetContent(), entry->GetAttributeByName("string")->GetContent().ComputeCRC32());
+			strings.Add(entry->GetContent(), entry->GetAttributeByName(stringAttribute)->GetContent().ComputeCRC32());
 		}
-		else if (entry->GetName() == "section" && entry->GetAttributeByName("name") != NIL)
+		else if (entry->GetName() == sectionNode && entry->GetAttributeByName(nameAttribute) != NIL)
 		{
 			Section	*section = new Section();
 

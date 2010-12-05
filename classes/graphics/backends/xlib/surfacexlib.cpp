@@ -15,6 +15,8 @@
 #include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
 
+using namespace X11;
+
 S::GUI::SurfaceBackend *CreateSurfaceXLib(S::Void *iSurface, const S::GUI::Size &)
 {
 	return new S::GUI::SurfaceXLib(iSurface);
@@ -128,9 +130,11 @@ S::Void *S::GUI::SurfaceXLib::GetSystemSurface() const
 	return (Void *) window;
 }
 
-S::Int S::GUI::SurfaceXLib::SetPixel(const Point &point, const Color &color)
+S::Int S::GUI::SurfaceXLib::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL) return Success();
+
+	Point	 point = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPoint));
 
 	XGCValues	 gcValues;
 
@@ -138,8 +142,8 @@ S::Int S::GUI::SurfaceXLib::SetPixel(const Point &point, const Color &color)
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
-	XDrawPoint(display, window, gc, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)));
-	XDrawPoint(display, bitmap, gc, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)));
+	XDrawPoint(display, window, gc, point.x, point.y);
+	XDrawPoint(display, bitmap, gc, point.x, point.y);
 
 	XFreeGC(display, gc);
 

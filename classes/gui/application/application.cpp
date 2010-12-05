@@ -12,6 +12,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/threads/thread.h>
 #include <smooth/system/event.h>
+#include <smooth/system/multimonitor.h>
 #include <smooth/init.h>
 #include <smooth/templates/nonblocking.h>
 
@@ -27,15 +28,13 @@ const S::Short	 S::GUI::Application::classID = S::Object::RequestClassID();
 S::String	 S::GUI::Application::startupDirectory;
 S::String	 S::GUI::Application::applicationDirectory;
 
-S::GUI::Application::Application(const String &name) : Widget(Point(0, 0), Size(LiSAGetDisplaySizeX(), LiSAGetDisplaySizeY()))
+S::GUI::Application::Application(const String &name) : Widget(Point(0, 0), System::MultiMonitor::GetActiveMonitorMetrics().GetSize())
 {
 	type	= classID;
+	text	= name == NIL ? String("smooth Application") : name;
 
 	Show();
-
-	text	= name == NIL ? String("smooth Application") : name;
 }
-
 
 S::Int S::GUI::Application::Loop()
 {

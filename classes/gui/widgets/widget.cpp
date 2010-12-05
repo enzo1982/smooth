@@ -189,16 +189,6 @@ S::Int S::GUI::Widget::Remove(Widget *widget)
 	return Error();
 }
 
-S::Int S::GUI::Widget::GetNOfObjects() const
-{
-	return widgets.Length();
-}
-
-S::GUI::Widget *S::GUI::Widget::GetNthObject(Int n) const
-{
-	return widgets.GetNth(n);
-}
-
 S::GUI::Window *S::GUI::Widget::GetContainerWindow() const
 {
 	Widget	*widget = const_cast<Widget *>(this);
@@ -663,16 +653,20 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
-#ifdef __WIN32__
-		case WM_KILLFOCUS:
+		case SM_LOSEFOCUS:
+			if (focussed)
 			{
-				Window	*windowGetFocus = Window::GetWindow((HWND) wParam);
+				Window	*focusWnd = (Window *) Object::GetObject(wParam, Window::classID);
 
-				if (windowGetFocus != NIL)
+				if (focusWnd != NIL)
 				{
-					if (windowGetFocus->GetObjectType() == ToolWindow::classID && windowGetFocus->GetOrder() >= window->GetOrder()) break;
+					if ((focusWnd->GetObjectType() == ToolWindow::classID && focusWnd->GetOrder() >= window->GetOrder()) || focusWnd == window) break;
 				}
 			}
+
+			/* Fall through to WM_ACTIVATEAPP on Windows.
+			 */
+#ifdef __WIN32__
 		case WM_ACTIVATEAPP:
 			if (focussed)
 			{
@@ -680,9 +674,9 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 				onLoseFocus.Emit();
 			}
+#endif
 
 			break;
-#endif
 	}
 
 	LeaveProtectedRegion();

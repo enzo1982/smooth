@@ -4,7 +4,7 @@
 SMOOTH_PATH = ../..
 
 # Enter object files here:
-OBJECTS	  = input.o object.o objecttype.o setup.o
+OBJECTS	  = object.o objecttype.o setup.o
 
 ## Do not change anything below this line. ##
 

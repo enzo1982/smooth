@@ -15,8 +15,9 @@
 
 #include <stdio.h>
 #include <time.h>
-#include <libjpeg/jpeglib.h>
-#include <libjpeg/jerror.h>
+
+#include <jpeglib.h>
+#include <jerror.h>
 
 using namespace smooth::IO;
 

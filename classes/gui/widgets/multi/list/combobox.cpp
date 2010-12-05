@@ -14,6 +14,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/system/multimonitor.h>
 
 const S::Short	 S::GUI::ComboBox::classID = S::Object::RequestClassID();
 
@@ -154,10 +155,11 @@ S::Void S::GUI::ComboBox::OpenListBox()
 	{
 		Widget	*window		= container->GetContainerWindow();
  
+		Rect	 monitor	= System::MultiMonitor::GetActiveMonitorMetrics();
 		Size	 listBoxSize	= Size(GetWidth(), 15 * Math::Min(Length(), Math::Max(5, Math::Min(15, Length() / 3))) + 4);
 		Point	 listBoxPos	= Point(GetRealPosition() + Point(0, GetHeight()));
 
-		if (window->GetY() + listBoxPos.y + listBoxSize.cy >= LiSAGetDisplaySizeY()) listBoxPos = Point(GetRealPosition() - Point(0, listBoxSize.cy));
+		if (window->GetY() + listBoxPos.y + listBoxSize.cy >= monitor.GetHeight()) listBoxPos = Point(GetRealPosition() - Point(0, listBoxSize.cy));
 
 		listBox		= new ListBox(Point(), listBoxSize);
 		listBox->onSelectEntry.Connect(&onSelectEntry);

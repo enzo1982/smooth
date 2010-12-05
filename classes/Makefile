@@ -8,6 +8,7 @@ all:
 	cd graphics && make
 	cd gui && make
 	cd i18n && make
+	cd input && make
 	cd io && make
 	cd misc && make
 	cd net && make
@@ -23,6 +24,7 @@ clean:
 	cd graphics && make clean
 	cd gui && make clean
 	cd i18n && make clean
+	cd input && make clean
 	cd io && make clean
 	cd misc && make clean
 	cd net && make clean

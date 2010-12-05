@@ -11,9 +11,9 @@
 #include <smooth/graphics/imageloader/png.h>
 #include <smooth/io/instream.h>
 
-#include <libpng/png.h>
-
 #include <malloc.h>
+
+#include <png.h>
 
 using namespace smooth::IO;
 
@@ -39,7 +39,7 @@ void my_png_warning(png_structp png_ptr, png_const_charp warning)
 
 void my_png_read(png_structp png_ptr, png_bytep buffer, png_size_t size)
 {
-	InStream	*in = (InStream *) png_ptr->io_ptr;
+	InStream	*in = (InStream *) png_get_io_ptr(png_ptr);
 
 	in->InputData(buffer, size);
 }
@@ -67,7 +67,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 
 	if (info_ptr == NULL)
 	{
-		png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+		png_destroy_read_struct(&png_ptr, NULL, NULL);
 
 		bitmap = NIL;
 
@@ -89,7 +89,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 
 	if (in->GetLastError() != IO_ERROR_OK)
 	{
-		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
 		delete in;
 
@@ -124,31 +124,47 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 
 	png_set_background(png_ptr, &my_background, PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
 
+	/* Get basic image information
+	 */
+	png_uint_32	 width	    = 0;
+	png_uint_32	 height	    = 0;
+	int		 bit_depth  = 0;
+	int		 color_type = 0;
+
+	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, NULL, NULL, NULL);
+
+	/* Get palette information
+	 */
+	png_colorp	 palette     = NULL;
+	int		 num_palette = 0;
+
+	png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette);
+
 	/* The easiest way to read the image
 	 */
-	png_bytep *row_pointers = (png_bytep *) malloc(info_ptr->height * sizeof(png_bytep));
+	png_bytep *row_pointers = (png_bytep *) malloc(height * sizeof(png_bytep));
 
-	for (unsigned int row = 0; row < info_ptr->height; row++) row_pointers[row] = (png_bytep) malloc(png_get_rowbytes(png_ptr, info_ptr));
+	for (unsigned int row = 0; row < height; row++) row_pointers[row] = (png_bytep) malloc(png_get_rowbytes(png_ptr, info_ptr));
 
 	/* Now it's time to read the image.
 	 */
 	png_read_image(png_ptr, row_pointers);
 
-	bitmap.CreateBitmap(info_ptr->width, info_ptr->height, 24);
+	bitmap.CreateBitmap(width, height, 24);
 
-	for (UnsignedInt y = 0; y < info_ptr->height; y++)
+	for (UnsignedInt y = 0; y < height; y++)
 	{
-		for (UnsignedInt x = 0; x < info_ptr->width; x++)
+		for (UnsignedInt x = 0; x < width; x++)
 		{
-			if	((info_ptr->color_type == PNG_COLOR_TYPE_GRAY || info_ptr->color_type == PNG_COLOR_TYPE_GRAY_ALPHA) && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][x], row_pointers[y][x], row_pointers[y][x]));
-			else if	((info_ptr->color_type == PNG_COLOR_TYPE_RGB  || info_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)  && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][3 * x], row_pointers[y][3 * x + 1], row_pointers[y][3 * x + 2]));
-			else if ( info_ptr->color_type == PNG_COLOR_TYPE_PALETTE						    && info_ptr->bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(info_ptr->palette[row_pointers[y][x]].red, info_ptr->palette[row_pointers[y][x]].green, info_ptr->palette[row_pointers[y][x]].blue));
+			if	((color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA) && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][x], row_pointers[y][x], row_pointers[y][x]));
+			else if	((color_type == PNG_COLOR_TYPE_RGB  || color_type == PNG_COLOR_TYPE_RGB_ALPHA)  && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][3 * x], row_pointers[y][3 * x + 1], row_pointers[y][3 * x + 2]));
+			else if ( color_type == PNG_COLOR_TYPE_PALETTE						&& bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(palette[row_pointers[y][x]].red, palette[row_pointers[y][x]].green, palette[row_pointers[y][x]].blue));
 		}
 	}
 
 	/* Free PNG rows.
 	 */
-	for (unsigned int row = 0; row < info_ptr->height; row++) free(row_pointers[row]);
+	for (unsigned int row = 0; row < height; row++) free(row_pointers[row]);
 
 	free(row_pointers);
 
@@ -157,7 +173,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 
 	/* Clean up after the read, and free any memory allocated
 	 */
-	png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
 	delete in;
 

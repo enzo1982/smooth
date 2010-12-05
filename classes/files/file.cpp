@@ -10,9 +10,11 @@
 
 #include <smooth/files/file.h>
 #include <smooth/files/directory.h>
+#include <smooth/misc/math.h>
 
 #ifndef __WIN32__
 #	include <stdio.h>
+#	include <time.h>
 #	include <sys/stat.h>
 #endif
 
@@ -20,6 +22,12 @@ S::File::File(const String &iFileName, const String &iFilePath)
 {
 	fileName = iFileName;
 	filePath = iFilePath;
+
+	fileName.Replace("/",  Directory::GetDirectoryDelimiter());
+	fileName.Replace("\\", Directory::GetDirectoryDelimiter());
+
+	filePath.Replace("/",  Directory::GetDirectoryDelimiter());
+	filePath.Replace("\\", Directory::GetDirectoryDelimiter());
 
 	if (fileName != NIL && filePath == NIL)
 	{
@@ -36,28 +44,15 @@ S::File::File(const String &iFileName, const String &iFilePath)
 
 	if (fileName == NIL)
 	{
-		for (Int lastBS = filePath.Length() - 1; lastBS >= 0; lastBS--)
-		{
-			if (filePath[lastBS] == Directory::GetDirectoryDelimiter()[0])
-			{
-				for (Int i = lastBS + 1; i < filePath.Length(); i++) fileName[i - lastBS - 1] = filePath[i];
+		Int	 lastBS = filePath.FindLast(Directory::GetDirectoryDelimiter());
 
-				filePath[lastBS] = 0;
-
-				break;
-			}
-		}
+		fileName = filePath.Tail(filePath.Length() - lastBS - 1);
+		filePath[lastBS >= 0 ? lastBS : 0] = 0;
 	}
 	else if (filePath == NIL)
 	{
 		filePath = Directory::GetActiveDirectory();
 	}
-
-	filePath.Replace("/",  Directory::GetDirectoryDelimiter());
-	filePath.Replace("\\", Directory::GetDirectoryDelimiter());
-
-	fileName.Replace("/",  Directory::GetDirectoryDelimiter());
-	fileName.Replace("\\", Directory::GetDirectoryDelimiter());
 
 	if (!filePath.EndsWith(Directory::GetDirectoryDelimiter())) filePath.Append(Directory::GetDirectoryDelimiter());
 
@@ -120,27 +115,43 @@ S::Int64 S::File::GetFileSize() const
 
 	return (Int64(sizeHigh) << 32) + sizeLow;
 #else
-	return 0;
+	struct stat	 info;
+
+	if (stat(String(*this).ConvertTo("UTF-8"), &info) != 0) return 0;
+
+	return info.st_size;
 #endif
 }
 
 #ifdef __WIN32__
-	S::Int S::File::GetFileTime(FILETIME *cT, FILETIME *aT, FILETIME *wT) const
-	{
-		if (!Exists()) return Error();
-
-		HANDLE	 handle;
-
-		if (Setup::enableUnicode)	handle = CreateFileW(String(Directory::GetUnicodePathPrefix()).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-		else				handle = CreateFileA(String(*this),					      GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-
-		::GetFileTime(handle, cT, aT, wT);
-
-		CloseHandle(handle);
-
-		return Success();
-	}
+S::Int S::File::GetFileTime(FILETIME *cTime, FILETIME *aTime, FILETIME *wTime) const
+#else
+S::Int S::File::GetFileTime(time_t *cTime, time_t *aTime, time_t *wTime) const
 #endif
+{
+	if (!Exists()) return Error();
+
+#ifdef __WIN32__
+	HANDLE	 handle;
+
+	if (Setup::enableUnicode)	handle = CreateFileW(String(Directory::GetUnicodePathPrefix()).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+	else				handle = CreateFileA(String(*this),					      GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+
+	::GetFileTime(handle, cTime, aTime, wTime);
+
+	CloseHandle(handle);
+#else
+	struct stat	 info;
+
+	if (stat(String(*this).ConvertTo("UTF-8"), &info) != 0) return Error();
+
+	if (cTime != NIL) *cTime = info.st_ctime;
+	if (aTime != NIL) *aTime = info.st_atime;
+	if (wTime != NIL) *wTime = info.st_mtime;
+#endif
+
+	return Success();
+}
 
 S::DateTime S::File::GetCreationTime() const
 {
@@ -149,13 +160,23 @@ S::DateTime S::File::GetCreationTime() const
 #ifdef __WIN32__
 	FILETIME	 fileTime;
 	SYSTEMTIME	 time;
+#else
+	time_t		 fileTime;
+	tm		*time;
+#endif
 
 	if (GetFileTime(&fileTime, NIL, NIL) == Error()) return dateTime;
 
+#ifdef __WIN32__
 	FileTimeToSystemTime(&fileTime, &time);
 
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
+#else
+	time = localtime(&fileTime);
+
+	dateTime.SetYMD(time->tm_year, time->tm_mon, time->tm_mday);
+	dateTime.SetHMS(time->tm_hour, time->tm_min, time->tm_sec);
 #endif
 
 	return dateTime;
@@ -168,13 +189,23 @@ S::DateTime S::File::GetAccessTime() const
 #ifdef __WIN32__
 	FILETIME	 fileTime;
 	SYSTEMTIME	 time;
+#else
+	time_t		 fileTime;
+	tm		*time;
+#endif
 
 	if (GetFileTime(NIL, &fileTime, NIL) == Error()) return dateTime;
 
+#ifdef __WIN32__
 	FileTimeToSystemTime(&fileTime, &time);
 
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
+#else
+	time = localtime(&fileTime);
+
+	dateTime.SetYMD(time->tm_year, time->tm_mon, time->tm_mday);
+	dateTime.SetHMS(time->tm_hour, time->tm_min, time->tm_sec);
 #endif
 
 	return dateTime;
@@ -187,13 +218,23 @@ S::DateTime S::File::GetWriteTime() const
 #ifdef __WIN32__
 	FILETIME	 fileTime;
 	SYSTEMTIME	 time;
+#else
+	time_t		 fileTime;
+	tm		*time;
+#endif
 
 	if (GetFileTime(NIL, NIL, &fileTime) == Error()) return dateTime;
 
+#ifdef __WIN32__
 	FileTimeToSystemTime(&fileTime, &time);
 
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
+#else
+	time = localtime(&fileTime);
+
+	dateTime.SetYMD(time->tm_year, time->tm_mon, time->tm_mday);
+	dateTime.SetHMS(time->tm_hour, time->tm_min, time->tm_sec);
 #endif
 
 	return dateTime;
@@ -202,18 +243,20 @@ S::DateTime S::File::GetWriteTime() const
 S::Bool S::File::Exists() const
 {
 #ifdef __WIN32__
-	HANDLE	 handle;
+	HANDLE		 handle;
+	WIN32_FIND_DATAW findDataW;
+	WIN32_FIND_DATAA findDataA;
 
-	if (Setup::enableUnicode)	handle = CreateFileW(String(Directory::GetUnicodePathPrefix()).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-	else				handle = CreateFileA(String(*this),					      GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+	if (Setup::enableUnicode)	handle = FindFirstFileW(String(Directory::GetUnicodePathPrefix()).Append(*this), &findDataW);
+	else				handle = FindFirstFileA(String(*this), &findDataA);
 
 	if (handle == INVALID_HANDLE_VALUE) return False;
 
-	CloseHandle(handle);
+	FindClose(handle);
 #else
 	struct stat	 info;
 
-	if (stat(String(*this), &info) != 0) return False;
+	if (stat(String(*this).ConvertTo("UTF-8"), &info) != 0) return False;
 
 	if (!S_ISREG(info.st_mode)) return False;
 #endif
@@ -248,6 +291,34 @@ S::Int S::File::Copy(const String &destination)
 #ifdef __WIN32__
 	if (Setup::enableUnicode)	result = CopyFileW(String(Directory::GetUnicodePathPrefix()).Append(*this), String(Directory::GetUnicodePathPrefix()).Append(destination), True);
 	else				result = CopyFileA(String(*this), destination, True);
+#else
+	FILE	*source	= fopen(String(*this).ConvertTo("UTF-8"), "rb");
+	FILE	*dest	= fopen(destination.ConvertTo("UTF-8"), "wb");
+
+	if (source != NIL && dest != NIL)
+	{
+		Int	 bytesLeft = GetFileSize();
+		Int	 chunkSize = 32768;
+
+		UnsignedByte	*buffer = new UnsignedByte [chunkSize];
+
+		while (bytesLeft)
+		{
+			chunkSize = Math::Min(chunkSize, bytesLeft);
+
+			fread(buffer, chunkSize, 1, source);
+			fwrite(buffer, chunkSize, 1, dest);
+
+			bytesLeft -= chunkSize;
+		}
+
+		delete [] buffer;
+
+		result = True;
+	}
+
+	if (source != NIL) fclose(source);
+	if (dest != NIL) fclose(dest);
 #endif
 
 	if (result == False)	return Error();
@@ -264,7 +335,7 @@ S::Int S::File::Move(const String &destination)
 	if (Setup::enableUnicode)	result = MoveFileW(String(Directory::GetUnicodePathPrefix()).Append(*this), String(Directory::GetUnicodePathPrefix()).Append(destination));
 	else				result = MoveFileA(String(*this), destination);
 #else
-	result = (rename(String(*this), destination) == 0);
+	result = (rename(String(*this).ConvertTo("UTF-8"), destination.ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False)	return Error();
@@ -281,7 +352,7 @@ S::Int S::File::Delete()
 	if (Setup::enableUnicode)	result = DeleteFileW(String(Directory::GetUnicodePathPrefix()).Append(*this));
 	else				result = DeleteFileA(String(*this));
 #else
-	result = (remove(String(*this)) == 0);
+	result = (remove(String(*this).ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False)	return Error();

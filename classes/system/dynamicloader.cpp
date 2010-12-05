@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/dynamicloader.h>
+#include <smooth/files/directory.h>
 #include <smooth/gui/application/application.h>
 
 #ifndef __WIN32__
@@ -29,11 +30,22 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 		else				handle = LoadLibraryA(String(module).Append(module.EndsWith(".dll") ? "" : ".dll"));
 	}
 #else
-	handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(".so") ? "" : ".so"), RTLD_NOW | RTLD_GLOBAL);
+	handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(".so") || module.Find(".so.") >= 0 ? "" : ".so"), RTLD_NOW | RTLD_LOCAL);
 
 	if (handle == NIL)
 	{
-		handle = dlopen(String(module).Append(module.EndsWith(".so") ? "" : ".so"), RTLD_NOW | RTLD_GLOBAL);
+		handle = dlopen(String(module).Append(module.EndsWith(".so") || module.Find(".so.") >= 0 ? "" : ".so"), RTLD_NOW | RTLD_LOCAL);
+	}
+
+	if (handle == NIL)
+	{
+		Directory		 directory("/usr/lib");
+		const Array<File>	&files = directory.GetFilesByPattern(String(module.StartsWith("lib") || module.Find("/") >= 0 ? "" : "lib").Append(module).Append(module.EndsWith(".so") || module.Find(".so.") >= 0 ? "" : ".so").Append(".*"));
+
+		if (files.Length() > 0)
+		{
+			handle = dlopen((String) files.GetFirst(), RTLD_NOW | RTLD_LOCAL);
+		}
 	}
 #endif
 }

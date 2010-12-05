@@ -10,10 +10,13 @@
 
 #include <smooth/gui/window/backends/xlib/windowxlib.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
 #include <smooth/init.h>
 #include <smooth/backends/xlib/backendxlib.h>
+
+using namespace X11;
 
 S::GUI::WindowBackend *CreateWindowXLib()
 {
@@ -28,16 +31,49 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 {
 	type	= WINDOW_XLIB;
 
+	display	= Backends::BackendXLib::GetDisplay();
+	im	= Backends::BackendXLib::GetIM();
+
 	wnd	= NIL;
 	oldwnd	= NIL;
-	display	= Backends::BackendXLib::GetDisplay();
+
+	ic	= NIL;
 
 	id	= windowBackends.Add(this);
+
+	minSize	= Size(160, 24);
+
+	flags	= 0;
 }
 
 S::GUI::WindowXLib::~WindowXLib()
 {
 	windowBackends.Remove(id);
+}
+
+S::Void S::GUI::WindowXLib::UpdateWMNormalHints()
+{
+	if (wnd == NIL) return;
+
+	XSizeHints	 normal;
+
+	normal.flags	   = (minSize != Size() ? PMinSize : 0) |
+			     (maxSize != Size() ? PMaxSize : 0) |
+			     (flags & WF_NORESIZE ? PPosition | PSize : 0);
+
+	normal.x	   = pos.x;
+	normal.y	   = pos.y;
+
+	normal.width	   = size.cx;
+	normal.height	   = size.cy;
+
+	normal.min_width   = minSize.cx;
+	normal.min_height  = minSize.cy;
+
+	normal.max_width   = maxSize.cx;
+	normal.max_height  = maxSize.cy;
+
+	XSetWMNormalHints(display, wnd, &normal);
 }
 
 S::Void *S::GUI::WindowXLib::GetSystemWindow() const
@@ -92,6 +128,46 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			break;
 		case UnmapNotify:
 			break;
+		case SelectionRequest:
+			if (selection != NIL)
+			{
+				XEvent	 respond;
+
+				if (e->xselectionrequest.target == XA_STRING)
+				{
+					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_STRING, 8, PropModeReplace, (unsigned char *) (char *) selection, selection.Length());
+
+					respond.xselection.property = e->xselectionrequest.property;
+				}
+				else if (e->xselectionrequest.target == XA_UTF8_STRING(display))
+				{
+					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_UTF8_STRING(display), 8, PropModeReplace, (unsigned char *) selection.ConvertTo("UTF-8"), strlen(selection.ConvertTo("UTF-8")));
+
+					respond.xselection.property = e->xselectionrequest.property;
+				}
+				else
+				{
+					/* Strings only please!
+					 */
+					respond.xselection.property = None;
+				}
+
+				respond.xselection.type	     = SelectionNotify;
+				respond.xselection.display   = e->xselectionrequest.display;
+				respond.xselection.requestor = e->xselectionrequest.requestor;
+				respond.xselection.selection = e->xselectionrequest.selection;
+				respond.xselection.target    = e->xselectionrequest.target;
+				respond.xselection.time	     = e->xselectionrequest.time;
+
+				XSendEvent(display, e->xselectionrequest.requestor, 0, 0, &respond);
+				XFlush(display);
+			}
+
+			break;
+		case SelectionClear:
+			selection = NIL;
+
+			break;
 	}
 
 	/* Convert Xlib events to smooth messages.
@@ -101,16 +177,22 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 		/* Mouse events:
 		 */
 		case MotionNotify:
+			Input::Pointer::UpdatePosition(e->xmotion.x_root, e->xmotion.y_root);
+
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
 			break;
 		case ButtonPress:
+			Input::Pointer::UpdatePosition(e->xmotion.x_root, e->xmotion.y_root);
+
 			if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONDOWN, 0, 0);
-			else if (e->xbutton.button == Button2) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
+			else if (e->xbutton.button == Button3) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
+			else if (e->xbutton.button == Button4) onEvent.Call(SM_MOUSEWHEEL, 120, 0);
+			else if (e->xbutton.button == Button5) onEvent.Call(SM_MOUSEWHEEL, -120, 0);
 
 			/* Grab the keyboard focus if we don't have it already.
 			 */
-			if (wnd != NIL)
+			if (wnd != NIL && e->xbutton.button <= 3)
 			{
 				::Window	 wndFocus;
 				int		 revertTo;
@@ -122,13 +204,19 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 		case ButtonRelease:
+			Input::Pointer::UpdatePosition(e->xmotion.x_root, e->xmotion.y_root);
+
 			if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONUP, 0, 0);
-			else if (e->xbutton.button == Button2) onEvent.Call(SM_RBUTTONUP, 0, 0);
+			else if (e->xbutton.button == Button3) onEvent.Call(SM_RBUTTONUP, 0, 0);
 
 			break;
 
 		/* Keyboard events:
 		 */
+		case KeymapNotify:
+			XRefreshKeyboardMapping(&e->xmapping);
+
+			break;
 		case KeyPress:
 			onEvent.Call(SM_KEYDOWN, XKeycodeToKeysym(display, e->xkey.keycode, 0), 0);
 
@@ -136,10 +224,20 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			 * call SM_CHAR event for each character.
 			 */
 			{
-				char	 text[255];
-				Int	 numChars = XLookupString(&e->xkey, text, 255, NIL, NIL);
+				Status	 status;
+				char	 text[32];
+				Int	 numChars = Xutf8LookupString(ic, &e->xkey, text, 32, NIL, &status);
 
-				for (Int i = 0; i < numChars; i++) onEvent.Call(SM_CHAR, text[i], 0);
+				text[numChars] = 0;
+
+				if (status & XLookupChars)
+				{
+					String	 string;
+
+					string.ImportFrom("UTF-8", text);
+
+					for (Int i = 0; i < string.Length(); i++) onEvent.Call(SM_CHAR, string[i], 0);
+				}
 			}
 
 			break;
@@ -151,9 +249,9 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 		/* Paint events:
 		 */
 		case Expose:
-			updateRect.left = Math::Min(updateRect.left, e->xexpose.x);
-			updateRect.top = Math::Min(updateRect.top, e->xexpose.y);
-			updateRect.right = Math::Max(updateRect.right, e->xexpose.x + e->xexpose.width);
+			updateRect.left	  = Math::Min(updateRect.left, e->xexpose.x);
+			updateRect.top	  = Math::Min(updateRect.top, e->xexpose.y);
+			updateRect.right  = Math::Max(updateRect.right, e->xexpose.x + e->xexpose.width);
 			updateRect.bottom = Math::Max(updateRect.bottom, e->xexpose.y + e->xexpose.height);
 
 			if (e->xexpose.count == 0)
@@ -168,10 +266,50 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 		/* Window state change events:
 		 */
 		case ConfigureNotify:
+			/* Get screen coordinates for window.
+			 */
+			{
+				::Window	 child = 0;
+
+				XTranslateCoordinates(display, wnd, RootWindow(display, DefaultScreen(display)), 0, 0, &e->xconfigure.x, &e->xconfigure.y, &child);
+			}
+
 			pos  = Point(e->xconfigure.x, e->xconfigure.y);
 			size = Size(e->xconfigure.width, e->xconfigure.height);
 
 			onEvent.Call(SM_WINDOWMETRICS, ((e->xconfigure.x + 32768) << 16) | (e->xconfigure.y + 32768), ((e->xconfigure.width + 32768) << 16) | (e->xconfigure.height + 32768));
+
+			break;
+		case FocusIn:
+			onEvent.Call(SM_GETFOCUS, 0, 0);
+
+			break;
+		case FocusOut:
+			/* Get the window that now has the focus.
+			 */
+			{
+				::Window	 xWnd;
+				int		 revertTo;
+
+				XGetInputFocus(display, &xWnd, &revertTo);
+
+				Window		*focusWnd = Window::GetWindow((Void *) xWnd);
+
+				onEvent.Call(SM_LOSEFOCUS, focusWnd != NIL ? focusWnd->GetHandle() : -1, 0);
+			}
+
+			break;
+
+		/* Window manager events:
+		 */
+		case ClientMessage:
+			if (e->xclient.message_type == XInternAtom(display, "WM_PROTOCOLS", True))
+			{
+				if ((Atom) e->xclient.data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", True))
+				{
+					if (doClose.Call()) Close();
+				}
+			}
 
 			break;
 	}
@@ -179,8 +317,10 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 	return Success();
 }
 
-S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Size &size, Int flags)
+S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Size &size, Int iFlags)
 {
+	flags = iFlags;
+
 	XSetWindowAttributes	 attributes;
 
 	attributes.background_pixmap	= None;
@@ -194,7 +334,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	attributes.backing_planes	= 0;
 	attributes.backing_pixel	= 0;
 
-	if (flags & WF_NOTASKBUTTON)
+	if (flags & WF_NOTASKBUTTON && flags & WF_THINBORDER)
 	{
 		attributes.save_under		= True;
 		attributes.override_redirect	= True;
@@ -214,9 +354,22 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 	if (wnd != NIL)
 	{
+		ic = XCreateIC(im, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, wnd, NULL);
+
+		/* Get mask of filter events for IC.
+		 */
+		long	 filterEvents = 0;
+
+		XGetICValues(ic, XNFilterEvents, &filterEvents, NULL);
+
 		/* Select event types we want to receive.
 		 */
-		XSelectInput(display, wnd, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | StructureNotifyMask);
+		XSelectInput(display, wnd, ExposureMask | FocusChangeMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | StructureNotifyMask | filterEvents);
+
+		/* Opt in to receive WM_DELETE_WINDOW messages.
+		 */
+		Atom	 atomKill = XInternAtom(display, "WM_DELETE_WINDOW", False);
+		XSetWMProtocols(display, wnd, &atomKill, 1);
 
 		/* Process the CreateNotify event again, as GetWindowBackend
 		 * cannot find the correct backend until wnd is set.
@@ -238,6 +391,16 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		 */
 		SetTitle(title);
 
+		/* Set minimum and maximum size.
+		 */
+		if (flags & WF_NORESIZE)
+		{
+			minSize = size;
+			maxSize = size;
+		}
+
+		UpdateWMNormalHints();
+
 		return Success();
 	}
 
@@ -252,10 +415,13 @@ S::Int S::GUI::WindowXLib::Close()
 
 	drawSurface = nullSurface;
 
+	XDestroyIC(ic);
 	XDestroyWindow(display, wnd);
 
 	oldwnd	= wnd;
 	wnd	= NIL;
+
+	ic	= NIL;
 
 	return Success();
 }
@@ -263,12 +429,30 @@ S::Int S::GUI::WindowXLib::Close()
 S::Int S::GUI::WindowXLib::SetTitle(const String &nTitle)
 {
 	XTextProperty	 titleProp;
-	const char	*title = nTitle;
+	const char	*title = nTitle.ConvertTo("UTF-8");
 
-	XStringListToTextProperty((char **) &title, 1, &titleProp);
+	Xutf8TextListToTextProperty(display, (char **) &title, 1, XUTF8StringStyle, &titleProp);
 
 	XSetWMName(display, wnd, &titleProp);
 	XSetWMIconName(display, wnd, &titleProp);
+
+	return Success();
+}
+
+S::Int S::GUI::WindowXLib::SetMinimumSize(const Size &nMinSize)
+{
+	minSize = nMinSize;
+
+	UpdateWMNormalHints();
+
+	return Success();
+}
+
+S::Int S::GUI::WindowXLib::SetMaximumSize(const Size &nMaxSize)
+{
+	maxSize = nMaxSize;
+
+	UpdateWMNormalHints();
 
 	return Success();
 }

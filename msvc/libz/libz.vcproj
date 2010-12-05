@@ -292,10 +292,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libraries\libz\gzio.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libraries\libz\infback.c"
 				>
 			</File>

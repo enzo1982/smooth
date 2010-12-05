@@ -118,55 +118,57 @@ S::Int S::I18n::TranslatorInternal::GetSupportedLanguages()
 		else if (i == 42) xml = smooth_zh_TW;
 
 		XML::Document	*doc = new XML::Document();
-		Language	*language = new Language();
 
-		doc->ParseMemory((void *) xml, strlen(xml));
+		if (doc->ParseMemory((void *) xml, strlen(xml)) == Success())
+		{
+			Language	*language = new Language();
 
-		if	(i ==  0) language->magic = "smooth_ar.xml";
-		else if (i ==  1) language->magic = "smooth_bg.xml";
-		else if (i ==  2) language->magic = "smooth_ca.xml";
-		else if (i ==  3) language->magic = "smooth_cs.xml";
-		else if (i ==  4) language->magic = "smooth_da.xml";
-		else if (i ==  5) language->magic = "smooth_de.xml";
-		else if (i ==  6) language->magic = "smooth_el.xml";
-		else if (i ==  7) language->magic = "smooth_es.xml";
-		else if (i ==  8) language->magic = "smooth_et.xml";
-		else if (i ==  9) language->magic = "smooth_eu.xml";
-		else if (i == 10) language->magic = "smooth_fa.xml";
-		else if (i == 11) language->magic = "smooth_fi.xml";
-		else if (i == 12) language->magic = "smooth_fr.xml";
-		else if (i == 13) language->magic = "smooth_gl.xml";
-		else if (i == 14) language->magic = "smooth_he.xml";
-		else if (i == 15) language->magic = "smooth_hi.xml";
-		else if (i == 16) language->magic = "smooth_hr.xml";
-		else if (i == 17) language->magic = "smooth_hu.xml";
-		else if (i == 18) language->magic = "smooth_id.xml";
-		else if (i == 19) language->magic = "smooth_it.xml";
-		else if (i == 20) language->magic = "smooth_ja.xml";
-		else if (i == 21) language->magic = "smooth_ko.xml";
-		else if (i == 22) language->magic = "smooth_lt.xml";
-		else if (i == 23) language->magic = "smooth_lv.xml";
-		else if (i == 24) language->magic = "smooth_ms.xml";
-		else if (i == 25) language->magic = "smooth_nl.xml";
-		else if (i == 26) language->magic = "smooth_no.xml";
-		else if (i == 27) language->magic = "smooth_pa.xml";
-		else if (i == 28) language->magic = "smooth_pl.xml";
-		else if (i == 29) language->magic = "smooth_pt.xml";
-		else if (i == 30) language->magic = "smooth_pt_BR.xml";
-		else if (i == 31) language->magic = "smooth_ro.xml";
-		else if (i == 32) language->magic = "smooth_ru.xml";
-		else if (i == 33) language->magic = "smooth_sk.xml";
-		else if (i == 34) language->magic = "smooth_sl.xml";
-		else if (i == 35) language->magic = "smooth_sr.xml";
-		else if (i == 36) language->magic = "smooth_sv.xml";
-		else if (i == 37) language->magic = "smooth_th.xml";
-		else if (i == 38) language->magic = "smooth_tr.xml";
-		else if (i == 39) language->magic = "smooth_uk.xml";
-		else if (i == 40) language->magic = "smooth_vi.xml";
-		else if (i == 41) language->magic = "smooth_zh_CN.xml";
-		else if (i == 42) language->magic = "smooth_zh_TW.xml";
+			if	(i ==  0) language->magic = "smooth_ar.xml";
+			else if (i ==  1) language->magic = "smooth_bg.xml";
+			else if (i ==  2) language->magic = "smooth_ca.xml";
+			else if (i ==  3) language->magic = "smooth_cs.xml";
+			else if (i ==  4) language->magic = "smooth_da.xml";
+			else if (i ==  5) language->magic = "smooth_de.xml";
+			else if (i ==  6) language->magic = "smooth_el.xml";
+			else if (i ==  7) language->magic = "smooth_es.xml";
+			else if (i ==  8) language->magic = "smooth_et.xml";
+			else if (i ==  9) language->magic = "smooth_eu.xml";
+			else if (i == 10) language->magic = "smooth_fa.xml";
+			else if (i == 11) language->magic = "smooth_fi.xml";
+			else if (i == 12) language->magic = "smooth_fr.xml";
+			else if (i == 13) language->magic = "smooth_gl.xml";
+			else if (i == 14) language->magic = "smooth_he.xml";
+			else if (i == 15) language->magic = "smooth_hi.xml";
+			else if (i == 16) language->magic = "smooth_hr.xml";
+			else if (i == 17) language->magic = "smooth_hu.xml";
+			else if (i == 18) language->magic = "smooth_id.xml";
+			else if (i == 19) language->magic = "smooth_it.xml";
+			else if (i == 20) language->magic = "smooth_ja.xml";
+			else if (i == 21) language->magic = "smooth_ko.xml";
+			else if (i == 22) language->magic = "smooth_lt.xml";
+			else if (i == 23) language->magic = "smooth_lv.xml";
+			else if (i == 24) language->magic = "smooth_ms.xml";
+			else if (i == 25) language->magic = "smooth_nl.xml";
+			else if (i == 26) language->magic = "smooth_no.xml";
+			else if (i == 27) language->magic = "smooth_pa.xml";
+			else if (i == 28) language->magic = "smooth_pl.xml";
+			else if (i == 29) language->magic = "smooth_pt.xml";
+			else if (i == 30) language->magic = "smooth_pt_BR.xml";
+			else if (i == 31) language->magic = "smooth_ro.xml";
+			else if (i == 32) language->magic = "smooth_ru.xml";
+			else if (i == 33) language->magic = "smooth_sk.xml";
+			else if (i == 34) language->magic = "smooth_sl.xml";
+			else if (i == 35) language->magic = "smooth_sr.xml";
+			else if (i == 36) language->magic = "smooth_sv.xml";
+			else if (i == 37) language->magic = "smooth_th.xml";
+			else if (i == 38) language->magic = "smooth_tr.xml";
+			else if (i == 39) language->magic = "smooth_uk.xml";
+			else if (i == 40) language->magic = "smooth_vi.xml";
+			else if (i == 41) language->magic = "smooth_zh_CN.xml";
+			else if (i == 42) language->magic = "smooth_zh_TW.xml";
 
-		LoadDoc(doc, language);
+			LoadDoc(doc, language);
+		}
 
 		delete doc;
 	}

@@ -8,7 +8,7 @@ GLOBALLIB   = libz.a
 MYCCOPTS    = -I. -I$(SMOOTH_PATH)/include/libz
 
 # Enter object files here:
-OBJECTS	    = adler32.o compress.o crc32.o deflate.o gzio.o infback.o inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o
+OBJECTS	    = adler32.o compress.o crc32.o deflate.o infback.o inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o
 
 ## Do not change anything below this line. ##
 

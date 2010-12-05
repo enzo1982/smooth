@@ -208,14 +208,14 @@ S::Void S::GUI::Arrows::OnTimer()
 	if (timerCount == 1) { timer->Stop(); timer->Start(100); }
 
 	Int	 prevValue	= *variable;
-	Int	 difference	= timerDirection * stepSize;
+	Int	 difference	= timerDirection;
 
-	for (Int n = 1; n < 10; n++)
+	for (Int n = 1; n <= 8; n++)
 	{
-		if (timerCount >= 10 * n && *variable % (Int) Math::Pow(10, n) == 0) difference = timerDirection * stepSize * (Int) Math::Pow(10, n);
+		if (timerCount >= 8 * n) difference = timerDirection * (Int) Math::Pow(2, n);
 	}
 
-	*variable = Math::Min(Math::Max(*variable + difference, startValue), endValue);
+	*variable = Math::Min(Math::Max(*variable + difference * stepSize, startValue), endValue);
 
 	if (*variable != prevValue) onValueChange.Emit(*variable);
 

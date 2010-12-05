@@ -26,7 +26,7 @@ namespace smooth
 			     <property name=\"righttoleft\">false</property>				\
 			     <property name=\"encoding\">UTF-8</property>				\
 			     <property name=\"author\">Joeyong Jen</property>				\
-			     <property name=\"url\">http://www.bonkenc.org/</property>			\
+			     <property name=\"url\">http://www.smooth-project.org/</property>		\
 			   </info>									\
 			   <data>									\
 			     <entry id=\"1\" string=\"OK\">确认</entry>					\

@@ -181,12 +181,15 @@ int localtime_s(tm* out_tm, const time_t* time) {
   return 0;
 }
 
-
+#if __MSVCRT_VERSION__ >= 0x0800
+#else
+#if !defined _WIN64 || defined _CRT_NO_INLINE
 // Not sure this the correct interpretation of _mkgmtime
 time_t _mkgmtime(tm* timeptr) {
   return mktime(timeptr);
 }
-
+#endif
+#endif
 
 int fopen_s(FILE** pFile, const char* filename, const char* mode) {
   *pFile = fopen(filename, mode);
@@ -648,6 +651,11 @@ double OS::LocalTimeOffset() {
 double OS::DaylightSavingsOffset(double time) {
   int64_t offset = Time(time).DaylightSavingsOffset();
   return static_cast<double>(offset);
+}
+
+
+int OS::GetLastError() {
+  return ::GetLastError();
 }
 
 
@@ -1341,7 +1349,7 @@ int OS::ActivationFrameAlignment() {
 
 
 void OS::ReleaseStore(volatile AtomicWord* ptr, AtomicWord value) {
-#if defined(_MSC_VER) || defined(_WIN64)
+#if defined(_MSC_VER)
   MemoryBarrier();
 #else
   {

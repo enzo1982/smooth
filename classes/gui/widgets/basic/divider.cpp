@@ -10,6 +10,7 @@
 
 #include <smooth/gui/widgets/basic/divider.h>
 #include <smooth/misc/binary.h>
+#include <smooth/input/pointer.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/window/window.h>
 
@@ -192,15 +193,15 @@ S::Void S::GUI::Divider::OnMouseOver()
 {
 	if (!Binary::IsFlagSet(flags, DIV_MOVABLE)) return;
 
-	if (Binary::IsFlagSet(flags, OR_VERT))	LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_HSIZE);
-	else					LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_VSIZE);
+	if (Binary::IsFlagSet(flags, OR_VERT))	Input::Pointer::SetCursor(container->GetContainerWindow(), Input::Pointer::CursorHSize);
+	else					Input::Pointer::SetCursor(container->GetContainerWindow(), Input::Pointer::CursorVSize);
 }
 
 S::Void S::GUI::Divider::OnMouseOut()
 {
 	if (!Binary::IsFlagSet(flags, DIV_MOVABLE)) return;
 
-	if (!dragging) LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
+	if (!dragging) Input::Pointer::SetCursor(container->GetContainerWindow(), Input::Pointer::CursorArrow);
 }
 
 S::Void S::GUI::Divider::OnMouseDragStart(const Point &mousePos)
@@ -226,5 +227,5 @@ S::Void S::GUI::Divider::OnMouseDragEnd(const Point &mousePos)
 {
 	dragging = False;
 
-	if (!dragHotspot->IsMouseOver()) LiSASetMouseCursor(container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
+	if (!dragHotspot->IsMouseOver()) Input::Pointer::SetCursor(container->GetContainerWindow(), Input::Pointer::CursorArrow);
 }

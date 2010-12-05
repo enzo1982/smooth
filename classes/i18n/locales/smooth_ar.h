@@ -22,7 +22,7 @@ namespace smooth
 			   <info>											\
 			     <property name=\"program\">smooth</property>						\
 			     <property name=\"version\">0.8</property>							\
-			     <property name=\"language\">Arabic / عربي</property>					\
+			     <property name=\"language\">Arabic / العربية</property>					\
 			     <property name=\"righttoleft\">true</property>						\
 			     <property name=\"encoding\">UTF-8</property>						\
 			     <property name=\"author\">Robert Kausch &lt;robert.kausch@gmx.net&gt;</property>		\

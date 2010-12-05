@@ -184,20 +184,22 @@ S::Short S::GUI::SurfaceGDI::GetSurfaceDPI() const
 	return dpi;
 }
 
-S::Int S::GUI::SurfaceGDI::SetPixel(const Point &point, const Color &color)
+S::Int S::GUI::SurfaceGDI::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL) return Success();
+
+	Point	 point = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPoint));
 
 	if (!painting)
 	{
 		HDC	 gdi_dc = GetWindowDC(window);
 
-		::SetPixel(gdi_dc, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), color);
+		::SetPixel(gdi_dc, point.x, point.y, color);
 
 		ReleaseDC(window, gdi_dc);
 	}
 
-	::SetPixel(paintContext, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), color);
+	::SetPixel(paintContext, point.x, point.y, color);
 
 	return Success();
 }
@@ -412,15 +414,13 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 		RECT	 Rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
 
-		if (rightToLeft.GetRightToLeft()) Rect.right--;
-
 		if (rtlCharacters && Setup::useIconv)
 		{
-			/*	Reorder the string with fribidi, then get
-				the glyph indices using GetCharacterPlacement
-				and display using the glyph indices.
-				This does not work with Kanji.	*/
-
+			/* Reorder the string with fribidi, then get
+			 * the glyph indices using GetCharacterPlacement
+			 * and display using the glyph indices.
+			 * This does not work with Kanji.
+			 */
 			FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
 			FriBidiParType	 type = (rightToLeft.GetRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
@@ -440,12 +440,12 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			ZeroMemory(&resultsw, sizeof(resultsw));
 
 			resultsa.lStructSize = sizeof(resultsa);
-			resultsa.lpGlyphs = glyphs;
-			resultsa.nGlyphs = line.Length() + 1;
+			resultsa.lpGlyphs    = glyphs;
+			resultsa.nGlyphs     = line.Length() + 1;
 
 			resultsw.lStructSize = sizeof(resultsw);
-			resultsw.lpGlyphs = glyphs;
-			resultsw.nGlyphs = line.Length() + 1;
+			resultsw.lpGlyphs    = glyphs;
+			resultsw.nGlyphs     = line.Length() + 1;
 
 			ZeroMemory(glyphs, 2 * (line.Length() + 1));
 
@@ -477,10 +477,10 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 		}
 		else
 		{
-			/*	Let Windows do any reordering and ligating.
-				Works with Kanji, but RTL is only supported
-				on XP and later versions of Windows.	*/
-
+			/* Let Windows do any reordering and ligating.
+			 * Works with Kanji, but RTL is only supported
+			 * on XP and later versions of Windows.
+			 */
 			if (!painting)
 			{
 				SetTextAlign(gdi_dc, TA_LEFT);

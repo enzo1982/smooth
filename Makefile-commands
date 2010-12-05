@@ -3,8 +3,8 @@
 include $(SMOOTH_PATH)/Makefile-options
 
 CC	 = gcc
-CCOPTS	 = -g0 -Wall -ffast-math -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
-#CCOPTS	 = -g0 -Wall -ffast-math -I$(SMOOTH_PATH)/include -include $(SMOOTH_PATH)/include/smooth.h -DUNICODE -D_UNICODE $(MYCCOPTS)
+CCOPTS	 = -g0 -Wall -Os -ffast-math -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
+#CCOPTS	 = -g0 -Wall -Os -ffast-math -I$(SMOOTH_PATH)/include -include $(SMOOTH_PATH)/include/smooth.h -DUNICODE -D_UNICODE $(MYCCOPTS)
 RC	 = windres
 RCOPTS	 = -DSMOOTH_DLL -O coff
 LD	 = gcc
@@ -15,22 +15,25 @@ ifndef GLOBALDLL
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	LDOPTS += -mwindows -Xlinker --dynamicbase -Xlinker --nxcompat
+	LDOPTS += -mwindows -Wl,--dynamicbase,--nxcompat
 
 ifdef IMPORTLIB
 ifdef GLOBALDLL
-	LDOPTS += -Xlinker --out-implib -Xlinker $(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB)
+	LDOPTS += -Wl,--out-implib,$(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB)
 else
-	LDOPTS += -Xlinker --out-implib -Xlinker $(IMPORTLIB)
+	LDOPTS += -Wl,--out-implib,$(IMPORTLIB)
 endif
 endif
+
+	CCOPTS += -I$(SMOOTH_PATH)/include/libjpeg -I$(SMOOTH_PATH)/include/libpng
 
 ifeq ($(BUILD_CAIRO),True)
 	CCOPTS += -I$(SMOOTH_PATH)/include/cairowin
 endif
 else
-	CCOPTS += -I/usr/include/cairo -I/usr/include/atk-1.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/pango-1.0
-	LDOPTS += -lcairo -lgtk-x11-2.0 -lglib-2.0 -lbz2 -lxml2 -lcpuid -lpthread -ljpeg -lX11 -lSDL
+	LDOPTS += -Wl,-rpath,.
+
+	CCOPTS += -I/usr/include/cairo -I/usr/include/atk-1.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0
 endif
 
 ifneq ($(EXCEPTION),True)
@@ -40,7 +43,7 @@ endif
 ifeq ($(BUILD_X64),True)
 	CCOPTS += -march=nocona
 else
-	CCOPTS += -march=i586 -Os
+	CCOPTS += -march=i586
 endif
 
 ifndef GLOBALLIB

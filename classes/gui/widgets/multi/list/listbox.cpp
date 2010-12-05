@@ -69,7 +69,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	else						  header->Hide();
 
 	Int	 entriesHeight	= 0;
-	Int	 headerHeight	= (header->IsVisible() ? 16 : 0);
+	Int	 headerHeight	= (header->IsVisible()	  ? header->GetHeight()	  : 0);
+	Int	 scrollbarWidth	= (scrollbar->IsVisible() ? scrollbar->GetWidth() : 0);
 
 	switch (message)
 	{
@@ -87,12 +88,15 @@ S::Int S::GUI::ListBox::Paint(Int message)
 				scrollbar->SetPageSize(GetHeight() - 4 - headerHeight);
 
 				scrollbar->Show();
+
+				scrollbarWidth = scrollbar->GetWidth();
 			}
 			else
 			{
 				scrollbar->Hide();
 
-				scrollbarPos = 0;
+				scrollbarPos   = 0;
+				scrollbarWidth = 0;
 			}
 
 			/* Set visibility of list entries first.
@@ -110,7 +114,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 				if (entryRect.bottom >= 0 && entryRect.top <= GetHeight() - headerHeight - 4)
 				{
-					entry->SetMetrics(Point(2, entryRect.top + 2 + headerHeight), Size(GetWidth() - 4 - (scrollbar->IsVisible() ? 17 : 0), entry->GetHeight()));
+					entry->SetMetrics(Point(2, entryRect.top + 2 + headerHeight), Size(GetWidth() - 4 - scrollbarWidth, entry->GetHeight()));
 					entry->SetVisibleDirect(True);
 
 					visibleEntries.Append(entry->GetName());
@@ -123,8 +127,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			/* Now paint the listbox and all entries.
 			 */
-			if (IsActive())	surface->Box(frame + Point(0, headerHeight) - Size(scrollbar->IsVisible() ? 18 : 0, headerHeight), Setup::ClientColor, Rect::Filled);
-			else		surface->Box(frame + Point(0, headerHeight) - Size(scrollbar->IsVisible() ? 18 : 0, headerHeight), Setup::BackgroundColor, Rect::Filled);
+			if (IsActive())	surface->Box(frame + Point(0, headerHeight) - Size(scrollbarWidth, headerHeight), Setup::ClientColor, Rect::Filled);
+			else		surface->Box(frame + Point(0, headerHeight) - Size(scrollbarWidth, headerHeight), Setup::BackgroundColor, Rect::Filled);
 
 			surface->Frame(frame, FRAME_DOWN);
 
@@ -198,19 +202,19 @@ S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 
 S::GUI::Rect S::GUI::ListBox::GetVisibleArea() const
 {
+	Int	 headerHeight = (header->IsVisible() ? header->GetHeight() : 0);
+
 	if (!IsVisible()) return Widget::GetVisibleArea();
-	else		  return Widget::GetVisibleArea() + Point(0, 2 + (header->IsVisible() ? 16 : 0)) - Size(0, 4 + (header->IsVisible() ? 16 : 0));
+	else		  return Widget::GetVisibleArea() + Point(0, 2 + headerHeight) - Size(0, 4 + headerHeight);
 }
 
 S::Int S::GUI::ListBox::GetEntriesHeight() const
 {
 	Int	 entriesHeight	= 0;
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < Length(); i++)
 	{
-		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
-
-		entriesHeight += GetNthObject(i)->GetHeight();
+		entriesHeight += GetNthEntry(i)->GetHeight();
 	}
 
 	return entriesHeight;
@@ -218,14 +222,27 @@ S::Int S::GUI::ListBox::GetEntriesHeight() const
 
 S::Void S::GUI::ListBox::OnScrollbarValueChange()
 {
+	/* Redraw only the list entries.
+	 */
+	Surface	*surface = GetDrawSurface();
+
+	Rect	 frame		= Rect(GetRealPosition(), GetSize());
+
+	Int	 headerHeight	= (header->IsVisible()	  ? header->GetHeight()	  : 0);
+	Int	 scrollbarWidth	= (scrollbar->IsVisible() ? scrollbar->GetWidth() : 0);
+
+	surface->StartPaint(frame + Point(2, 2 + headerHeight) - Size(4 + scrollbarWidth, 4 + headerHeight));
+
 	Paint(SP_PAINT);
+
+	surface->EndPaint();
 }
 
 S::Void S::GUI::ListBox::OnChangeSize(const Size &nSize)
 {
 	if (scrollbar->IsVisible())
 	{
-		Int	 headerHeight = (header->IsVisible() ? 16 : 0);
+		Int	 headerHeight = (header->IsVisible() ? header->GetHeight() : 0);
 
 		scrollbar->SetHeight(nSize.cy - 2 - headerHeight);
 		scrollbar->SetRange(0, GetEntriesHeight() - (GetHeight() - 4 - headerHeight));

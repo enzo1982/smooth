@@ -526,8 +526,8 @@ Void Translator::SaveFileName(const String &file)
 
 Void Translator::ReplaceLineEndings(const String &file)
 {
-	const char	*inFormat = String::SetInputFormat("UTF-8");
-	const char	*outFormat = String::SetOutputFormat("UTF-8");
+	String		 inFormat  = String::SetInputFormat("UTF-8");
+	String		 outFormat = String::SetOutputFormat("UTF-8");
 
 	IO::InStream	 in(IO::STREAM_FILE, file, IO::IS_READ);
 
@@ -550,8 +550,8 @@ Void Translator::ReplaceLineEndings(const String &file)
 
 Void Translator::FormatLines(const String &file)
 {
-	const char	*inFormat = String::SetInputFormat("UTF-8");
-	const char	*outFormat = String::SetOutputFormat("UTF-8");
+	String		 inFormat  = String::SetInputFormat("UTF-8");
+	String		 outFormat = String::SetOutputFormat("UTF-8");
 
 	IO::InStream	 in(IO::STREAM_FILE, file, IO::IS_READ);
 

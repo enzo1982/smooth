@@ -2737,6 +2737,20 @@ Object* Heap::AllocateArgumentsObject(Object* callee, int length) {
 }
 
 
+static bool HasDuplicates(DescriptorArray* descriptors) {
+  int count = descriptors->number_of_descriptors();
+  if (count > 1) {
+    String* prev_key = descriptors->GetKey(0);
+    for (int i = 1; i != count; i++) {
+      String* current_key = descriptors->GetKey(i);
+      if (prev_key == current_key) return true;
+      prev_key = current_key;
+    }
+  }
+  return false;
+}
+
+
 Object* Heap::AllocateInitialMap(JSFunction* fun) {
   ASSERT(!fun->has_initial_map());
 
@@ -2770,23 +2784,34 @@ Object* Heap::AllocateInitialMap(JSFunction* fun) {
   if (fun->shared()->CanGenerateInlineConstructor(prototype)) {
     int count = fun->shared()->this_property_assignments_count();
     if (count > in_object_properties) {
-      count = in_object_properties;
+      // Inline constructor can only handle inobject properties.
+      fun->shared()->ForbidInlineConstructor();
+    } else {
+      Object* descriptors_obj = DescriptorArray::Allocate(count);
+      if (descriptors_obj->IsFailure()) return descriptors_obj;
+      DescriptorArray* descriptors = DescriptorArray::cast(descriptors_obj);
+      for (int i = 0; i < count; i++) {
+        String* name = fun->shared()->GetThisPropertyAssignmentName(i);
+        ASSERT(name->IsSymbol());
+        FieldDescriptor field(name, i, NONE);
+        field.SetEnumerationIndex(i);
+        descriptors->Set(i, &field);
+      }
+      descriptors->SetNextEnumerationIndex(count);
+      descriptors->SortUnchecked();
+
+      // The descriptors may contain duplicates because the compiler does not
+      // guarantee the uniqueness of property names (it would have required
+      // quadratic time). Once the descriptors are sorted we can check for
+      // duplicates in linear time.
+      if (HasDuplicates(descriptors)) {
+        fun->shared()->ForbidInlineConstructor();
+      } else {
+        map->set_instance_descriptors(descriptors);
+        map->set_pre_allocated_property_fields(count);
+        map->set_unused_property_fields(in_object_properties - count);
+      }
     }
-    Object* descriptors_obj = DescriptorArray::Allocate(count);
-    if (descriptors_obj->IsFailure()) return descriptors_obj;
-    DescriptorArray* descriptors = DescriptorArray::cast(descriptors_obj);
-    for (int i = 0; i < count; i++) {
-      String* name = fun->shared()->GetThisPropertyAssignmentName(i);
-      ASSERT(name->IsSymbol());
-      FieldDescriptor field(name, i, NONE);
-      field.SetEnumerationIndex(i);
-      descriptors->Set(i, &field);
-    }
-    descriptors->SetNextEnumerationIndex(count);
-    descriptors->Sort();
-    map->set_instance_descriptors(descriptors);
-    map->set_pre_allocated_property_fields(count);
-    map->set_unused_property_fields(in_object_properties - count);
   }
   return map;
 }
@@ -4111,7 +4136,7 @@ bool Heap::ConfigureHeapDefault() {
 }
 
 
-void Heap::RecordStats(HeapStats* stats) {
+void Heap::RecordStats(HeapStats* stats, bool take_snapshot) {
   *stats->start_marker = 0xDECADE00;
   *stats->end_marker = 0xDECADE01;
   *stats->new_space_size = new_space_.Size();
@@ -4128,6 +4153,24 @@ void Heap::RecordStats(HeapStats* stats) {
   *stats->cell_space_capacity = cell_space_->Capacity();
   *stats->lo_space_size = lo_space_->Size();
   GlobalHandles::RecordStats(stats);
+  *stats->memory_allocator_size = MemoryAllocator::Size();
+  *stats->memory_allocator_capacity =
+      MemoryAllocator::Size() + MemoryAllocator::Available();
+  *stats->os_error = OS::GetLastError();
+  if (take_snapshot) {
+    HeapIterator iterator;
+    for (HeapObject* obj = iterator.next();
+         obj != NULL;
+         obj = iterator.next()) {
+      // Note: snapshot won't be precise because IsFreeListNode returns true
+      // for any bytearray.
+      if (FreeListNode::IsFreeListNode(obj)) continue;
+      InstanceType type = obj->map()->instance_type();
+      ASSERT(0 <= type && type <= LAST_TYPE);
+      stats->objects_per_type[type]++;
+      stats->size_per_type[type] += obj->Size();
+    }
+  }
 }
 
 

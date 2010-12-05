@@ -21,8 +21,8 @@ S::GUI::Scrollbar::Scrollbar(const Point &iPos, const Size &iSize, Int sType, In
 {
 	type		= classID;
 
-	if (GetWidth() == 0) SetWidth(subtype == OR_VERT ? 17 : 120);
-	if (GetHeight() == 0) SetHeight(subtype == OR_VERT ? 120 : 17);
+	if (GetWidth()	== 0) SetWidth(subtype	== OR_VERT ? 17  : 120);
+	if (GetHeight()	== 0) SetHeight(subtype	== OR_VERT ? 120 :  17);
 
 	clickHotspot	= new Hotspot(Point(), Size());
 	dragHotspot	= new Hotspot(Point(), Size());

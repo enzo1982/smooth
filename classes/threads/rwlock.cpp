@@ -100,7 +100,7 @@ S::Int S::Threads::RWLock::Release()
 {
 	/* Check if we are locked for write.
 	 */
-	if (writeLocked)
+	if (writeLocked && readLocks == 0)
 	{
 		/* Release write lock.
 		 */
@@ -109,14 +109,19 @@ S::Int S::Threads::RWLock::Release()
 		return exclusiveAccessMutex->Release();
 	}
 
-	/* Decrease shared access counter by one.
+	/* Check if we are locked for read.
 	 */
-	readLockMutex->Lock();
+	if (readLocks > 0)
+	{
+		/* Decrease shared access counter by one.
+		 */
+		readLockMutex->Lock();
 
-	readLocks--;
-	sharedAccessSemaphore->Release();
+		readLocks--;
+		sharedAccessSemaphore->Release();
 
-	readLockMutex->Release();
+		readLockMutex->Release();
+	}
 
 	return Success();
 }

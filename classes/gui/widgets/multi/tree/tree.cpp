@@ -164,7 +164,7 @@ S::Int S::GUI::Tree::Paint(Int message)
 
 					for (Int i = 15; i < GetHeight() - 7; i += 2)
 					{
-						surface->SetPixel(realPos + Point(6, i), Setup::GrayTextColor);
+						surface->SetPixel(realPos + Point(6 + (IsRightToLeft() ? 1 : 0), i), Setup::GrayTextColor);
 					}
 				}
 

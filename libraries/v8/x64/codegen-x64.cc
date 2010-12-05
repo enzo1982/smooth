@@ -1368,11 +1368,14 @@ Result CodeGenerator::LikelySmiBinaryOperation(BinaryOperation* expr,
                                           overwrite_mode);
 
     Label do_op;
+    // Left operand must be unchanged in left->reg() for deferred code.
+    // Left operand is in answer.reg(), possibly converted to int32, for
+    // inline code.
+    __ movq(answer.reg(), left->reg());
     if (right_type_info.IsSmi()) {
       if (FLAG_debug_code) {
         __ AbortIfNotSmi(right->reg());
       }
-      __ movq(answer.reg(), left->reg());
       // If left is not known to be a smi, check if it is.
       // If left is not known to be a number, and it isn't a smi, check if
       // it is a HeapNumber.
@@ -1389,7 +1392,7 @@ Result CodeGenerator::LikelySmiBinaryOperation(BinaryOperation* expr,
                      FieldOperand(answer.reg(), HeapNumber::kValueOffset));
         // Branch if we might have overflowed.
         // (False negative for Smi::kMinValue)
-        __ cmpq(answer.reg(), Immediate(0x80000000));
+        __ cmpl(answer.reg(), Immediate(0x80000000));
         deferred->Branch(equal);
         // TODO(lrn): Inline shifts on int32 here instead of first smi-tagging.
         __ Integer32ToSmi(answer.reg(), answer.reg());
@@ -1408,18 +1411,18 @@ Result CodeGenerator::LikelySmiBinaryOperation(BinaryOperation* expr,
     // Perform the operation.
     switch (op) {
       case Token::SAR:
-        __ SmiShiftArithmeticRight(answer.reg(), left->reg(), rcx);
+        __ SmiShiftArithmeticRight(answer.reg(), answer.reg(), rcx);
         break;
       case Token::SHR: {
         __ SmiShiftLogicalRight(answer.reg(),
-                              left->reg(),
-                              rcx,
-                              deferred->entry_label());
+                                answer.reg(),
+                                rcx,
+                                deferred->entry_label());
         break;
       }
       case Token::SHL: {
         __ SmiShiftLeft(answer.reg(),
-                        left->reg(),
+                        answer.reg(),
                         rcx);
         break;
       }
@@ -5677,6 +5680,25 @@ void CodeGenerator::GenerateIsObject(ZoneList<Expression*>* args) {
   __ cmpq(kScratchRegister, Immediate(LAST_JS_OBJECT_TYPE));
   obj.Unuse();
   destination()->Split(below_equal);
+}
+
+
+void CodeGenerator::GenerateIsSpecObject(ZoneList<Expression*>* args) {
+  // This generates a fast version of:
+  // (typeof(arg) === 'object' || %_ClassOf(arg) == 'RegExp' ||
+  // typeof(arg) == function).
+  // It includes undetectable objects (as opposed to IsObject).
+  ASSERT(args->length() == 1);
+  Load(args->at(0));
+  Result value = frame_->Pop();
+  value.ToRegister();
+  ASSERT(value.is_valid());
+  Condition is_smi = masm_->CheckSmi(value.reg());
+  destination()->false_target()->Branch(is_smi);
+  // Check that this is an object.
+  __ CmpObjectType(value.reg(), FIRST_JS_OBJECT_TYPE, kScratchRegister);
+  value.Unuse();
+  destination()->Split(above_equal);
 }
 
 

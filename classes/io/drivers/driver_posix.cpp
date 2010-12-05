@@ -41,13 +41,14 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 {
 	closeStream = false;
 
-	static Bool	 enableUnicode		  = Setup::enableUnicode;
-	static Bool	 enableUnicodeInitialized = False;
+	static Bool	 enableUnicode = Setup::enableUnicode;
 
 #ifdef __WIN32__
 	/* Disable Unicode functions on Windows 9x even if we
 	 * have Unicows as it does not work correctly there.
 	 */
+	static Bool	 enableUnicodeInitialized = False;
+
 	if (!enableUnicodeInitialized)
 	{
 		OSVERSIONINFOA	 vInfo;
@@ -60,6 +61,10 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 
 		enableUnicodeInitialized = True;
 	}
+#else
+	/* Set output format to UTF-8 on non Windows systems.
+	 */
+	const char	*previousOutputFormat = String::SetOutputFormat("UTF-8");
 #endif
 
 	switch (mode)
@@ -91,6 +96,12 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 
 			break;
 	}
+
+#ifndef __WIN32__
+	/* Restore original output format.
+	 */
+	String::SetOutputFormat(previousOutputFormat);
+#endif
 
 	if (stream == -1)
 	{

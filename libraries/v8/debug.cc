@@ -44,7 +44,7 @@
 #include "stub-cache.h"
 #include "log.h"
 
-#include "v8-debug.h"
+#include "v8/v8-debug.h"
 
 namespace v8 {
 namespace internal {

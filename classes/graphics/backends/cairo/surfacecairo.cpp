@@ -16,8 +16,12 @@
 
 #ifdef __WIN32__
 #	include <cairowin/cairo-win32.h>
+#	include <fribidi.h>
 #else
+	using namespace X11;
+
 #	include <cairo/cairo-xlib.h>
+#	include <pango/pangocairo.h>
 #	include <smooth/backends/xlib/backendxlib.h>
 #endif
 
@@ -280,23 +284,25 @@ S::Void S::GUI::SurfaceCairo::DestroyCairoContext()
 #endif
 }
 
-S::Int S::GUI::SurfaceCairo::SetPixel(const Point &point, const Color &color)
+S::Int S::GUI::SurfaceCairo::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL) return Success();
+
+	Point	 point = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPoint));
 
 	if (!painting)
 	{
 		CreateCairoContext();
 
 		cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-		cairo_rectangle(context, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), 1, 1);
+		cairo_rectangle(context, point.x, point.y, 1, 1);
 		cairo_fill(context);
 
 		DestroyCairoContext();
 	}
 
 	cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-	cairo_rectangle(paintContextCairo, rightToLeft.TranslateX(fontSize.TranslateX(point.x)), rightToLeft.TranslateY(fontSize.TranslateY(point.y)), 1, 1);
+	cairo_rectangle(paintContextCairo, point.x, point.y, 1, 1);
 	cairo_fill(paintContextCairo);
 
 	return Success();
@@ -306,8 +312,15 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 {
 	if (window == NIL) return Success();
 
-	Point	 pos1 = iPos1;
-	Point	 pos2 = iPos2;
+	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
+	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
+
+	/* Adjust to new Cairo 1.10 behaviour.
+	 */
+	if (pos1.x == pos2.x) { pos1.x++; pos2.x++; }
+	if (pos1.y == pos2.y) { pos1.y++; pos2.y++; }
+
+	if (rightToLeft.GetRightToLeft() && pos1.y == pos2.y) { pos1.x++; pos2.x++; }
 
 	/* Adjust to Windows GDI behavior for diagonal lines.
 	 */
@@ -317,25 +330,14 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 		if (pos1.x > pos2.x && pos1.y < pos2.y) { pos1.x++; pos2.x++; }
 	} 
 
-	pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(pos1));
-	pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(pos2));
-
-	/* Adjust to X11 behaviour.
-	 */
-#ifdef __WIN32__
-	Float	 xAdjust = 0;
-#else
-	Float	 xAdjust = 0.5;
-#endif
-
 	if (!painting)
 	{
 		CreateCairoContext();
 
 		cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
 		cairo_set_line_width(context, 1);
-		cairo_move_to(context, pos1.x + xAdjust, pos1.y);
-		cairo_line_to(context, pos2.x + xAdjust, pos2.y);
+		cairo_move_to(context, pos1.x, pos1.y);
+		cairo_line_to(context, pos2.x, pos2.y);
 		cairo_stroke(context);
 
 		DestroyCairoContext();
@@ -343,8 +345,8 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 
 	cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
 	cairo_set_line_width(paintContextCairo, 1);
-	cairo_move_to(paintContextCairo, pos1.x + xAdjust, pos1.y);
-	cairo_line_to(paintContextCairo, pos2.x + xAdjust, pos2.y);
+	cairo_move_to(paintContextCairo, pos1.x, pos1.y);
+	cairo_line_to(paintContextCairo, pos2.x, pos2.y);
 	cairo_stroke(paintContextCairo);
 
 	return Success();
@@ -393,6 +395,20 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 	}
 	else if (style & Rect::Inverted)
 	{
+		if (!painting)
+		{
+			cairo_set_operator(context, CAIRO_OPERATOR_DIFFERENCE);
+			cairo_set_source_rgb(context, 1.0, 1.0, 1.0);
+			cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+			cairo_fill(context);
+			cairo_set_operator(context, CAIRO_OPERATOR_OVER);
+		}
+
+		cairo_set_operator(paintContextCairo, CAIRO_OPERATOR_DIFFERENCE);
+		cairo_set_source_rgb(paintContextCairo, 1.0, 1.0, 1.0);
+		cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+		cairo_fill(paintContextCairo);
+		cairo_set_operator(paintContextCairo, CAIRO_OPERATOR_OVER);
 	}
 	else if (style & Rect::Dotted)
 	{
@@ -499,8 +515,6 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	Rect	 rect = iRect;
 	Int	 lineHeight = font.GetTextSizeY() + 3;
 
-	if (rightToLeft.GetRightToLeft()) rect.right--;
-
 	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
 
 	for (Int i = 0; i < lines; i++)
@@ -534,34 +548,105 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
 
+		Int	 lineSize = font.GetTextSizeX(line);
+
+#ifdef __WIN32__
+		if (rtlCharacters && Setup::useIconv)
+		{
+			/* Reorder the string with fribidi.
+			 */
+			FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
+			FriBidiParType	 type = (rightToLeft.GetRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
+
+			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, NIL, NIL, NIL);
+
+			visual[line.Length()] = 0;
+
+			line.ImportFrom("UCS-4LE", (char *) visual);
+
+			delete [] visual;
+		}
+#endif
+
 		if (!painting)
 		{
 			CreateCairoContext();
 
+			cairo_save(context);
+			cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top + 1);
+			cairo_clip(context);
+
+			cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
+
+#ifdef __WIN32__
 			cairo_select_font_face(context, font.GetName(),
 					       (font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
 					       (font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
 			cairo_set_font_size(context, font.GetSize() * fontSize.TranslateY(96) / 72.0);
 
-			cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
-
-			cairo_move_to(context, rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
+			cairo_move_to(context, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
 			cairo_show_text(context, line.ConvertTo("UTF-8"));
+#else
+			PangoLayout		*layout	= pango_cairo_create_layout(context);
+			PangoFontDescription	*desc	= pango_font_description_from_string(String(font.GetName())
+											    .Append(" ")
+											    .Append(font.GetStyle() == Font::Italic ? "Italic " : "")
+											    .Append(font.GetWeight() == Font::Bold ? "Bold " : "")
+											    .Append(String::FromInt(font.GetSize())));
+
+			if (line.Length() > 0) pango_layout_set_text(layout, line.ConvertTo("UTF-8"), -1);
+
+			pango_layout_set_font_description(layout, desc);
+
+			pango_font_description_free(desc);
+
+			cairo_move_to(context, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top);
+			pango_cairo_show_layout(context, layout);
+
+			g_object_unref(layout);
+#endif
+
+			cairo_restore(context);
 
 			DestroyCairoContext();
 		}
 
+		cairo_save(paintContextCairo);
+		cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top + 1);
+		cairo_clip(paintContextCairo);
+
+		cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
+
+#ifdef __WIN32__
 		cairo_select_font_face(paintContextCairo, font.GetName(),
 				       (font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
 				       (font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
 		cairo_set_font_size(paintContextCairo, font.GetSize() * fontSize.TranslateY(96) / 72.0);
 
-		cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
-
-		cairo_move_to(paintContextCairo, rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
+		cairo_move_to(paintContextCairo, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
 		cairo_show_text(paintContextCairo, line.ConvertTo("UTF-8"));
+#else
+		PangoLayout		*layout	= pango_cairo_create_layout(paintContextCairo);
+		PangoFontDescription	*desc	= pango_font_description_from_string(String(font.GetName())
+										    .Append(" ")
+										    .Append(font.GetStyle() == Font::Italic ? "Italic " : "")
+										    .Append(font.GetWeight() == Font::Bold ? "Bold " : "")
+										    .Append(String::FromInt(font.GetSize())));
+
+		if (line.Length() > 0) pango_layout_set_text(layout, line.ConvertTo("UTF-8"), -1);
+
+		pango_layout_set_font_description(layout, desc);
+		pango_font_description_free(desc);
+
+		cairo_move_to(paintContextCairo, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top);
+		pango_cairo_show_layout(paintContextCairo, layout);
+
+		g_object_unref(layout);
+#endif
+
+		cairo_restore(paintContextCairo);
 
 		rect.top += lineHeight;
 	}
@@ -675,9 +760,30 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &s
 	}
 	else
 	{
-		/* ToDo: Allow copying from bitmaps of different
-		 *	 size than destination.
-		 */
+		X11::Pixmap	 destBitmap  = XCreatePixmap(display, DefaultRootWindow(display), destRect.GetSize().cx, destRect.GetSize().cy, windowAttributes.depth);
+
+		cairo_surface_t	*srcSurface  = cairo_xlib_surface_create(display, (Pixmap) bitmap.GetSystemBitmap(), visual, bitmap.GetSize().cx, bitmap.GetSize().cy);
+		cairo_surface_t	*destSurface = cairo_xlib_surface_create(display, destBitmap, visual, destRect.GetSize().cx, destRect.GetSize().cy);
+
+		cairo_t		*context     = cairo_create(destSurface);
+
+		cairo_scale(context, (float) destRect.GetSize().cx / srcRect.GetSize().cx, (float) destRect.GetSize().cy / srcRect.GetSize().cy);
+		cairo_set_source_surface(context, srcSurface, -((float) srcRect.left * destRect.GetSize().cx / srcRect.GetSize().cx), -((float) srcRect.top * destRect.GetSize().cy / srcRect.GetSize().cy));
+		cairo_paint(context);
+
+		if (!painting)
+		{
+			XCopyArea(display, destBitmap, window, gc, 0, 0, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+		}
+
+		XCopyArea(display, destBitmap, paintBitmap, gc, 0, 0, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+
+		cairo_destroy(context);
+
+		cairo_surface_destroy(destSurface);
+		cairo_surface_destroy(srcSurface);
+
+		XFreePixmap(display, destBitmap);
 	}
 
 	XFreeGC(display, gc);

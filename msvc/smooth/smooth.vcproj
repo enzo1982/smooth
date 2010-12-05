@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../include"
+				AdditionalIncludeDirectories="../../include;../../include/libpng;../../include/libjpeg"
 				PreprocessorDefinitions="WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;LIBICONV_PLUG;LIBXML_STATIC;UNICODE;_UNICODE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libcpuid.lib libbzip2.lib fribidi2.lib libxml.lib lisa.lib iconv.lib libjpeg.lib libpng.lib libz.lib imm32.lib ws2_32.lib"
+				AdditionalDependencies="libcpuid.lib libbzip2.lib fribidi2.lib libxml.lib iconv.lib libjpeg.lib libpng.lib libz.lib imm32.lib ws2_32.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="Debug"
 				GenerateDebugInformation="true"
@@ -345,10 +345,6 @@
 					Name="basic"
 					>
 					<File
-						RelativePath="..\..\classes\basic\input.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\..\classes\basic\object.cpp"
 						>
 					</File>
@@ -369,37 +365,13 @@
 						>
 					</File>
 					<Filter
-						Name="sdl"
+						Name="gdiplus"
 						>
 						<File
-							RelativePath="..\..\classes\backends\sdl\backendsdl.cpp"
+							RelativePath="..\..\classes\backends\gdiplus\backendgdiplus.cpp"
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
-								>
-								<Tool
-									Name="VCCLCompilerTool"
-								/>
-							</FileConfiguration>
-							<FileConfiguration
-								Name="Debug|x64"
-								ExcludedFromBuild="true"
-								>
-								<Tool
-									Name="VCCLCompilerTool"
-								/>
-							</FileConfiguration>
-							<FileConfiguration
-								Name="Release|Win32"
-								ExcludedFromBuild="true"
-								>
-								<Tool
-									Name="VCCLCompilerTool"
-								/>
-							</FileConfiguration>
-							<FileConfiguration
-								Name="Release|x64"
 								ExcludedFromBuild="true"
 								>
 								<Tool
@@ -707,6 +679,46 @@
 								</FileConfiguration>
 								<FileConfiguration
 									Name="Debug|x64"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
+							</File>
+						</Filter>
+						<Filter
+							Name="gdiplus"
+							>
+							<File
+								RelativePath="..\..\classes\graphics\backends\gdiplus\bitmapgdiplus.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
+							</File>
+							<File
+								RelativePath="..\..\classes\graphics\backends\gdiplus\fontgdiplus.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
+							</File>
+							<File
+								RelativePath="..\..\classes\graphics\backends\gdiplus\surfacegdiplus.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
 									ExcludedFromBuild="true"
 									>
 									<Tool
@@ -1264,6 +1276,46 @@
 							>
 						</File>
 					</Filter>
+					<Filter
+						Name="clipboard"
+						>
+						<File
+							RelativePath="..\..\classes\gui\clipboard\clipboard.cpp"
+							>
+						</File>
+						<Filter
+							Name="backends"
+							>
+							<File
+								RelativePath="..\..\classes\gui\clipboard\backends\clipboardbackend.cpp"
+								>
+							</File>
+							<Filter
+								Name="win32"
+								>
+								<File
+									RelativePath="..\..\classes\gui\clipboard\backends\win32\clipboardwin32.cpp"
+									>
+								</File>
+							</Filter>
+							<Filter
+								Name="xlib"
+								>
+								<File
+									RelativePath="..\..\classes\gui\clipboard\backends\xlib\clipboardxlib.cpp"
+									>
+									<FileConfiguration
+										Name="Debug|Win32"
+										ExcludedFromBuild="true"
+										>
+										<Tool
+											Name="VCCLCompilerTool"
+										/>
+									</FileConfiguration>
+								</File>
+							</Filter>
+						</Filter>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="misc"
@@ -1648,37 +1700,13 @@
 							>
 						</File>
 						<Filter
-							Name="sdl"
+							Name="xlib"
 							>
 							<File
-								RelativePath="..\..\classes\system\backends\sdl\timersdl.cpp"
+								RelativePath="..\..\classes\system\backends\xlib\eventxlib.cpp"
 								>
 								<FileConfiguration
 									Name="Debug|Win32"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Debug|x64"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Release|Win32"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Release|x64"
 									ExcludedFromBuild="true"
 									>
 									<Tool
@@ -1697,6 +1725,38 @@
 							<File
 								RelativePath="..\..\classes\system\backends\win32\timerwin32.cpp"
 								>
+							</File>
+						</Filter>
+						<Filter
+							Name="posix"
+							>
+							<File
+								RelativePath="..\..\classes\system\backends\posix\timerposix.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
+							</File>
+						</Filter>
+						<Filter
+							Name="threads"
+							>
+							<File
+								RelativePath="..\..\classes\system\backends\threads\timerthreads.cpp"
+								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									ExcludedFromBuild="true"
+									>
+									<Tool
+										Name="VCCLCompilerTool"
+									/>
+								</FileConfiguration>
 							</File>
 						</Filter>
 					</Filter>
@@ -1812,118 +1872,6 @@
 							</File>
 							<File
 								RelativePath="..\..\classes\threads\backends\posix\threadposix.cpp"
-								>
-								<FileConfiguration
-									Name="Debug|Win32"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Debug|x64"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Release|Win32"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Release|x64"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-							</File>
-						</Filter>
-						<Filter
-							Name="sdl"
-							>
-							<File
-								RelativePath="..\..\classes\threads\backends\sdl\mutexsdl.cpp"
-								>
-								<FileConfiguration
-									Name="Debug|Win32"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Debug|x64"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Release|Win32"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Release|x64"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-							</File>
-							<File
-								RelativePath="..\..\classes\threads\backends\sdl\semaphoresdl.cpp"
-								>
-								<FileConfiguration
-									Name="Debug|Win32"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Debug|x64"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Release|Win32"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-								<FileConfiguration
-									Name="Release|x64"
-									ExcludedFromBuild="true"
-									>
-									<Tool
-										Name="VCCLCompilerTool"
-									/>
-								</FileConfiguration>
-							</File>
-							<File
-								RelativePath="..\..\classes\threads\backends\sdl\threadsdl.cpp"
 								>
 								<FileConfiguration
 									Name="Debug|Win32"
@@ -2293,6 +2241,14 @@
 						</File>
 					</Filter>
 				</Filter>
+				<Filter
+					Name="input"
+					>
+					<File
+						RelativePath="..\..\classes\input\pointer.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="misc"
@@ -2410,10 +2366,10 @@
 							>
 						</File>
 						<Filter
-							Name="sdl"
+							Name="posix"
 							>
 							<File
-								RelativePath="..\..\include\smooth\system\backends\sdl\timersdl.h"
+								RelativePath="..\..\include\smooth\system\backends\posix\timerposix.h"
 								>
 							</File>
 						</Filter>
@@ -2437,15 +2393,19 @@
 								>
 							</File>
 						</Filter>
+						<Filter
+							Name="xlib"
+							>
+							<File
+								RelativePath="..\..\include\smooth\system\backends\xlib\eventxlib.h"
+								>
+							</File>
+						</Filter>
 					</Filter>
 				</Filter>
 				<Filter
 					Name="basic"
 					>
-					<File
-						RelativePath="..\..\include\smooth\basic\input.h"
-						>
-					</File>
 					<File
 						RelativePath="..\..\include\smooth\basic\object.h"
 						>
@@ -2467,10 +2427,10 @@
 						>
 					</File>
 					<Filter
-						Name="sdl"
+						Name="gdiplus"
 						>
 						<File
-							RelativePath="..\..\include\smooth\backends\sdl\backendsdl.h"
+							RelativePath="..\..\include\smooth\backends\gdiplus\backendgdiplus.h"
 							>
 						</File>
 					</Filter>
@@ -2894,6 +2854,38 @@
 							>
 						</File>
 					</Filter>
+					<Filter
+						Name="clipboard"
+						>
+						<File
+							RelativePath="..\..\include\smooth\gui\clipboard\clipboard.h"
+							>
+						</File>
+						<Filter
+							Name="backends"
+							>
+							<File
+								RelativePath="..\..\include\smooth\gui\clipboard\backends\clipboardbackend.h"
+								>
+							</File>
+							<Filter
+								Name="win32"
+								>
+								<File
+									RelativePath="..\..\include\smooth\gui\clipboard\backends\win32\clipboardwin32.h"
+									>
+								</File>
+							</Filter>
+							<Filter
+								Name="xlib"
+								>
+								<File
+									RelativePath="..\..\include\smooth\gui\clipboard\backends\xlib\clipboardxlib.h"
+									>
+								</File>
+							</Filter>
+						</Filter>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="net"
@@ -2986,6 +2978,22 @@
 							</File>
 							<File
 								RelativePath="..\..\include\smooth\graphics\backends\cairo\surfacecairo.h"
+								>
+							</File>
+						</Filter>
+						<Filter
+							Name="gdiplus"
+							>
+							<File
+								RelativePath="..\..\include\smooth\graphics\backends\gdiplus\bitmapgdiplus.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\graphics\backends\gdiplus\fontgdiplus.h"
+								>
+							</File>
+							<File
+								RelativePath="..\..\include\smooth\graphics\backends\gdiplus\surfacegdiplus.h"
 								>
 							</File>
 						</Filter>
@@ -3214,22 +3222,6 @@
 							</File>
 						</Filter>
 						<Filter
-							Name="sdl"
-							>
-							<File
-								RelativePath="..\..\include\smooth\threads\backends\sdl\mutexsdl.h"
-								>
-							</File>
-							<File
-								RelativePath="..\..\include\smooth\threads\backends\sdl\semaphoresdl.h"
-								>
-							</File>
-							<File
-								RelativePath="..\..\include\smooth\threads\backends\sdl\threadsdl.h"
-								>
-							</File>
-						</Filter>
-						<Filter
 							Name="win32"
 							>
 							<File
@@ -3280,6 +3272,14 @@
 					</File>
 					<File
 						RelativePath="..\..\include\smooth\files\file.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="input"
+					>
+					<File
+						RelativePath="..\..\include\smooth\input\pointer.h"
 						>
 					</File>
 				</Filter>

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,8 @@
 
 #include <smooth/gui/dialogs/file/filedlg_gtk.h>
 #include <smooth/files/file.h>
+#include <smooth/misc/number.h>
+#include <smooth/foreach.h>
 
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
@@ -49,10 +51,12 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 	 */
 	for (int i = 0; i < filters.Length(); i++)
 	{
-		GtkFileFilter	*filter = gtk_file_filter_new();
+		GtkFileFilter		*filter = gtk_file_filter_new();
+		const Array<String>	&patterns = filters.GetNth(i).Explode(";");
+
+		foreach (String pattern, patterns) gtk_file_filter_add_pattern(filter, pattern.Trim());
 
 		gtk_file_filter_set_name(filter, filterNames.GetNth(i));
-		gtk_file_filter_add_pattern(filter, filters.GetNth(i));
 
 		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 	}
@@ -66,7 +70,19 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		while (current != NULL)
 		{
-			files.Add(String((char *) current->data));
+			String	 file = String((char *) current->data).Replace("file://", NIL);
+
+			for (Int i = 0; i < file.Length() - 2; i++)
+			{
+				if (file[i] == '%')
+				{
+					file[i] = (Int64) Number::FromHexString(file.SubString(i + 1, 2));
+					file = file.Head(i + 1).Append(file.Tail(file.Length() - i - 3));
+				}
+			}
+
+			file.ImportFrom("UTF-8", file.ConvertTo("ISO-8859-1"));
+			files.Add(file);
 
 			g_free(current->data);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,35 +13,16 @@
 #include <smooth/system/backends/threads/timerthreads.h>
 #include <smooth/templates/nonblocking.h>
 
-#ifdef __WIN32__
-#	include <time.h>
-#else
-#	include <sys/time.h>
-#endif
-
-unsigned int mtime()
-{
-#ifdef __WIN32__
-	return clock();
-#else
-	timeval	 tv;
-
-	gettimeofday(&tv, NIL);
-
-	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-#endif
-}
-
 using namespace smooth::Threads;
 
-S::System::TimerBackend *CreateTimerThreads()
+S::System::TimerBackend *CreateTimerThreads(S::System::Timer *timer)
 {
-	return new S::System::TimerThreads();
+	return new S::System::TimerThreads(timer);
 }
 
 S::Int	 timerThreadsTmp = S::System::TimerBackend::SetBackend(&CreateTimerThreads);
 
-S::System::TimerThreads::TimerThreads()
+S::System::TimerThreads::TimerThreads(Timer *iTimer) : TimerBackend(iTimer)
 {
 	type	 = TIMER_THREADS;
 
@@ -56,16 +37,18 @@ S::System::TimerThreads::~TimerThreads()
 	Stop();
 }
 
-S::Int S::System::TimerThreads::Start(UnsignedInt nInterval)
+S::Int S::System::TimerThreads::Start(Int nInterval)
 {
+	if (nInterval <= 0) nInterval = 1;
+
 	/* Cancel previous cancellation if
 	 * the thread is still running.
 	 */
-	if (cancel)
+	if (cancel && thread->IsCurrentThread())
 	{
 		cancel	 = False;
 		interval = nInterval;
-		timeout	 = mtime() + interval;
+		timeout	 = System::System::Clock() + interval;
 
 		return Success();
 	}
@@ -73,8 +56,8 @@ S::Int S::System::TimerThreads::Start(UnsignedInt nInterval)
 	if (thread != NIL) return Error();
 
 	interval = nInterval;
-	timeout	 = mtime() + interval;
-	thread	 = NonBlocking0<>(&TimerThreads::TimerProc, this).Call();
+	timeout	 = System::System::Clock() + interval;
+	thread	 = NonBlocking1<Int>(&TimerThreads::TimerProc, this).Call(thisTimer->GetHandle());
 
 	return Success();
 }
@@ -83,9 +66,22 @@ S::Int S::System::TimerThreads::Stop()
 {
 	if (thread == NIL) return Error();
 
+	/* Check if the thread is already gone.
+	 */
+	if (thread->GetStatus() != THREAD_RUNNING) return Success();
+
 	/* Order the thread to cancel.
 	 */
-	cancel = True;
+	if (!thread->IsCurrentThread())
+	{
+		cancel = True;
+
+		while (cancel == True) System::System::Sleep(0);
+	}
+	else
+	{
+		cancel = True;
+	}
 
 	return Success();
 }
@@ -97,35 +93,18 @@ S::Int S::System::TimerThreads::GetID() const
 	return (Int) thread;
 }
 
-S::Int S::System::TimerThreads::TimerProc()
+S::Int S::System::TimerThreads::TimerProc(Int handle)
 {
-	Signal0<Void>	 *onInterval = NIL;
-
-	for (Int i = 0; i < Object::GetNOfObjects(); i++)
-	{
-		Object *object = Object::GetNthObject(i);
-
-		if (object != NIL)
-		{
-			if (object->GetObjectType() == Timer::classID)
-			{
-				if (((Timer *) object)->GetID() == (Int) thread)
-				{
-					onInterval = &(((Timer *) object)->onInterval);
-				}
-			}
-		}
-	}
-
 	while (!cancel)
 	{
-		if (mtime() >= timeout)
+		if (System::System::Clock() >= timeout)
 		{
-			timeout = mtime() + interval;
+			Timer	*timer = (Timer *) Object::GetObject(handle, Timer::classID);
 
-			onInterval->Emit();
+			if (timer != NIL) timer->onInterval.Emit();
+			else		  cancel = True;
 
-			while (timeout <= mtime()) timeout += interval;
+			while (timeout <= System::System::Clock()) timeout += interval;
 		}
 
 		System::System::Sleep(1);

@@ -28,6 +28,7 @@ S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
 
 	font.SetWeight(Font::Bold);
 
+#ifdef __WIN32__
 	minHotspot	= new HotspotSimpleButton(Point(37, 5), Size(11, 11));
 	minHotspot->SetOrientation(OR_UPPERRIGHT);
 	minHotspot->hitTest.Connect(&Titlebar::ButtonHitTest, this);
@@ -62,15 +63,20 @@ S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
 	closeShortcut->onKeyDown.Connect(&Titlebar::OnCloseButtonClick, this);
 
 	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) Add(closeShortcut);
+#else
+	SetHeight(0);
+#endif
 }
 
 S::GUI::Titlebar::~Titlebar()
 {
+#ifdef __WIN32__
 	DeleteObject(minHotspot);
 	DeleteObject(maxHotspot);
 	DeleteObject(closeHotspot);
 	DeleteObject(dragHotspot);
 	DeleteObject(closeShortcut);
+#endif
 }
 
 S::Int S::GUI::Titlebar::Paint(Int message)
@@ -78,6 +84,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
+#ifdef __WIN32__
 	Surface	*surface = GetDrawSurface();
 	Window	*window	 = container->GetContainerWindow();
 
@@ -169,6 +176,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			break;
 	}
+#endif
 
 	return Success();
 }
@@ -183,10 +191,10 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
-#ifdef __WIN32__
-		case WM_SETFOCUS:
-		case WM_KILLFOCUS:
+		case SM_GETFOCUS:
+		case SM_LOSEFOCUS:
 		case SM_WINDOWTITLECHANGED:
+#ifdef __WIN32__
 			if (GetActiveWindow() == (HWND) window->GetSystemWindow() && (!paintActive || message == SM_WINDOWTITLECHANGED))
 			{
 				paintActive = True;
@@ -211,11 +219,10 @@ S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 					}
 				}
 			}
-
+#endif
 			if (message == SM_WINDOWTITLECHANGED || paintActive != prevPaintActive) Paint(SP_PAINT);
 
 			break;
-#endif
 	}
 
 	return Widget::Process(message, wParam, lParam);

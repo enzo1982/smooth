@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,7 @@
 
 #include <smooth/backends/xlib/backendxlib.h>
 
-#include <X11/Xlib.h>
+using namespace X11;
 
 S::Backends::Backend *CreateBackendXLib()
 {
@@ -20,6 +20,7 @@ S::Backends::Backend *CreateBackendXLib()
 S::Int	 backendXLibTmp = S::Backends::Backend::AddBackend(&CreateBackendXLib);
 
 Display	*S::Backends::BackendXLib::display = NIL;
+XIM	 S::Backends::BackendXLib::im	   = NIL;
 
 S::Backends::BackendXLib::BackendXLib()
 {
@@ -32,7 +33,10 @@ S::Backends::BackendXLib::~BackendXLib()
 
 S::Int S::Backends::BackendXLib::Init()
 {
-	display = XOpenDisplay(NIL);
+	XInitThreads();
+
+	display	= XOpenDisplay(NIL);
+	im	= XOpenIM(display, NIL, NIL, NIL);
 
 	Setup::FontSize = 1.00;
 
@@ -41,6 +45,7 @@ S::Int S::Backends::BackendXLib::Init()
 
 S::Int S::Backends::BackendXLib::Deinit()
 {
+	XCloseIM(im);
 	XCloseDisplay(display);
 
 	return Success();
@@ -49,4 +54,9 @@ S::Int S::Backends::BackendXLib::Deinit()
 Display *S::Backends::BackendXLib::GetDisplay()
 {
 	return display;
+}
+
+XIM S::Backends::BackendXLib::GetIM()
+{
+	return im;
 }

@@ -14,14 +14,14 @@
 	#include <smooth/system/backends/win32/timerwin32.h>
 #endif
 
-S::System::TimerBackend *CreateTimerBackend()
+S::System::TimerBackend *CreateTimerBackend(S::System::Timer *timer)
 {
-	return new S::System::TimerBackend();
+	return new S::System::TimerBackend(timer);
 }
 
-S::System::TimerBackend *(*S::System::TimerBackend::backend_creator)() = &CreateTimerBackend;
+S::System::TimerBackend *(*S::System::TimerBackend::backend_creator)(S::System::Timer *) = &CreateTimerBackend;
 
-S::Int S::System::TimerBackend::SetBackend(TimerBackend *(*backend)())
+S::Int S::System::TimerBackend::SetBackend(TimerBackend *(*backend)(Timer *))
 {
 	if (backend == NIL) return Error();
 
@@ -30,12 +30,12 @@ S::Int S::System::TimerBackend::SetBackend(TimerBackend *(*backend)())
 	return Success();
 }
 
-S::System::TimerBackend *S::System::TimerBackend::CreateBackendInstance()
+S::System::TimerBackend *S::System::TimerBackend::CreateBackendInstance(Timer *timer)
 {
-	return backend_creator();
+	return backend_creator(timer);
 }
 
-S::System::TimerBackend::TimerBackend()
+S::System::TimerBackend::TimerBackend(Timer *iTimer)
 {
 #if defined __WIN32__ && defined SMOOTH_STATIC
 	volatile Bool	 null = 0;
@@ -44,6 +44,8 @@ S::System::TimerBackend::TimerBackend()
 #endif
 
 	type = TIMER_NONE;
+
+	thisTimer = iTimer;
 }
 
 S::System::TimerBackend::~TimerBackend()

@@ -2584,7 +2584,8 @@ bool JSObject::ReferencesObject(Object* obj) {
 Object* JSObject::PreventExtensions() {
   // If there are fast elements we normalize.
   if (HasFastElements()) {
-    NormalizeElements();
+    Object* ok = NormalizeElements();
+    if (ok->IsFailure()) return ok;
   }
   // Make sure that we never go back to fast case.
   element_dictionary()->set_requires_slow_elements();
@@ -3705,7 +3706,7 @@ Object* DescriptorArray::RemoveTransitions() {
 }
 
 
-void DescriptorArray::Sort() {
+void DescriptorArray::SortUnchecked() {
   // In-place heap sort.
   int len = number_of_descriptors();
 
@@ -3755,7 +3756,11 @@ void DescriptorArray::Sort() {
       parent_index = child_index;
     }
   }
+}
 
+
+void DescriptorArray::Sort() {
+  SortUnchecked();
   SLOW_ASSERT(IsSortedNoDuplicates());
 }
 
@@ -4738,7 +4743,7 @@ bool String::SlowEquals(String* other) {
   }
 
   if (lhs->IsFlat()) {
-    if (IsAsciiRepresentation()) {
+    if (lhs->IsAsciiRepresentation()) {
       Vector<const char> vec1 = lhs->ToAsciiVector();
       if (rhs->IsFlat()) {
         if (rhs->IsAsciiRepresentation()) {
@@ -5182,6 +5187,13 @@ bool SharedFunctionInfo::CanGenerateInlineConstructor(Object* prototype) {
   }
 
   return true;
+}
+
+
+void SharedFunctionInfo::ForbidInlineConstructor() {
+  set_compiler_hints(BooleanBit::set(compiler_hints(),
+                                     kHasOnlySimpleThisPropertyAssignments,
+                                     false));
 }
 
 

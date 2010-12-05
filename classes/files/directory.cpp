@@ -25,6 +25,12 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 	dirName = iDirName;
 	dirPath = iDirPath;
 
+	dirName.Replace("/",  Directory::GetDirectoryDelimiter());
+	dirName.Replace("\\", Directory::GetDirectoryDelimiter());
+
+	dirPath.Replace("/",  Directory::GetDirectoryDelimiter());
+	dirPath.Replace("\\", Directory::GetDirectoryDelimiter());
+
 	if (dirName != NIL && dirPath == NIL)
 	{
 #ifdef __WIN32__
@@ -42,28 +48,18 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 	{
 		if (dirPath.EndsWith(GetDirectoryDelimiter())) dirPath[dirPath.Length() - 1] = 0;
 
-		for (Int lastBS = dirPath.Length() - 1; lastBS >= 0; lastBS--)
+		Int	 lastBS = dirPath.FindLast(GetDirectoryDelimiter());
+
+		if (lastBS >= 0)
 		{
-			if (dirPath[lastBS] == GetDirectoryDelimiter()[0])
-			{
-				for (Int i = lastBS + 1; i < dirPath.Length(); i++) dirName[i - lastBS - 1] = dirPath[i];
-
-				dirPath[lastBS] = 0;
-
-				break;
-			}
+			dirName = dirPath.Tail(dirPath.Length() - lastBS - 1);
+			dirPath[lastBS] = 0;
 		}
 	}
 	else if (dirPath == NIL)
 	{
 		dirPath = Directory::GetActiveDirectory();
 	}
-
-	dirPath.Replace("/",  Directory::GetDirectoryDelimiter());
-	dirPath.Replace("\\", Directory::GetDirectoryDelimiter());
-
-	dirName.Replace("/",  Directory::GetDirectoryDelimiter());
-	dirName.Replace("\\", Directory::GetDirectoryDelimiter());
 
 	if (dirPath.EndsWith(Directory::GetDirectoryDelimiter())) dirPath[dirPath.Length() - 1] = 0;
 }
@@ -93,7 +89,7 @@ S::Directory &S::Directory::operator =(const Directory &nDirectory)
 
 S::Directory::operator S::String() const
 {
-	return String(dirPath).Append(dirName == NIL ? String() : String(Directory::GetDirectoryDelimiter()).Append(dirName));
+	return String(dirPath).Append(dirName == NIL ? String() : String(Directory::GetDirectoryDelimiter())).Append(dirName);
 }
 
 const S::String &S::Directory::GetDirectoryName() const
@@ -142,6 +138,24 @@ const S::Array<S::Directory> &S::Directory::GetDirectories() const
 	}
 
 	FindClose(handle);
+#else
+	glob_t	*fileData = new glob_t;
+
+	if (glob(String(*this).Append("/*").ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, fileData) == 0)
+	{
+		String	 previousInputFormat = String::SetInputFormat("UTF-8");
+
+		for (UnsignedInt i = 0; i < fileData->gl_pathc; i++)
+		{
+			if (String(fileData->gl_pathv[i]).EndsWith("/")) directories.Add(Directory(fileData->gl_pathv[i]));
+		}
+
+		String::SetInputFormat(previousInputFormat);
+	}
+
+	globfree(fileData);
+
+	delete fileData;
 #endif
 
 	return directories;
@@ -181,12 +195,16 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 #else
 	glob_t	*fileData = new glob_t;
 
-	if (glob(String(*this).Append("/").Append(pattern), GLOB_NOSORT, NIL, fileData) == 0)
+	if (glob(String(*this).Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK, NIL, fileData) == 0)
 	{
-		for (Int i = 0; i < fileData->gl_pathc; i++)
+		String	 previousInputFormat = String::SetInputFormat("UTF-8");
+
+		for (UnsignedInt i = 0; i < fileData->gl_pathc; i++)
 		{
-			files.Add(File(fileData->gl_pathv[i]));
+			if (!String(fileData->gl_pathv[i]).EndsWith("/")) files.Add(File(fileData->gl_pathv[i]));
 		}
+
+		String::SetInputFormat(previousInputFormat);
 	}
 
 	globfree(fileData);
@@ -260,7 +278,7 @@ S::Bool S::Directory::Exists() const
 #else
 	struct stat	 info;
 
-	if (stat(String(*this), &info) != 0) return False;
+	if (stat(String(*this).ConvertTo("UTF-8"), &info) != 0) return False;
 
 	if (!S_ISDIR(info.st_mode)) return False;
 #endif
@@ -270,11 +288,11 @@ S::Bool S::Directory::Exists() const
 
 S::Int S::Directory::Create()
 {
-	if (Exists()) return Error();
+	if (Exists()) return Success();
 
 	String	 directory = *this;
 
-	for (Int i = 5; i <= directory.Length(); i++)
+	for (Int i = 0; i <= directory.Length(); i++)
 	{
 		if (directory[i] == '\\' || directory[i] == '/' || directory[i] == 0)
 		{
@@ -286,7 +304,7 @@ S::Int S::Directory::Create()
 			if (Setup::enableUnicode)	CreateDirectoryW(String(GetUnicodePathPrefix()).Append(path), NIL);
 			else				CreateDirectoryA(path, NIL);
 #else
-			mkdir(path, 0755);
+			mkdir(path.ConvertTo("UTF-8"), 0755);
 #endif
 		}
 	}
@@ -309,7 +327,7 @@ S::Int S::Directory::Move(const String &destination)
 	if (Setup::enableUnicode)	result = MoveFileW(String(GetUnicodePathPrefix()).Append(*this), String(GetUnicodePathPrefix()).Append(destination));
 	else				result = MoveFileA(String(*this), destination);
 #else
-	result = (rename(String(*this), destination) == 0);
+	result = (rename(String(*this).ConvertTo("UTF-8"), destination.ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False)	return Error();
@@ -324,7 +342,7 @@ S::Int S::Directory::Delete()
 	if (Setup::enableUnicode)	result = RemoveDirectoryW(String(GetUnicodePathPrefix()).Append(*this));
 	else				result = RemoveDirectoryA(String(*this));
 #else
-	result = (rmdir(String(*this)) == 0);
+	result = (rmdir(String(*this).ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False)	return Error();
@@ -481,7 +499,7 @@ S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 	if (Setup::enableUnicode)	result = SetCurrentDirectoryW(String(GetUnicodePathPrefix()).Append(directory));
 	else				result = SetCurrentDirectoryA(String(directory));
 #else
-	result = (chdir(String(directory)) == 0);
+	result = (chdir(String(directory).ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False)	return Error();

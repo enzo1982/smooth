@@ -23,10 +23,12 @@ S::System::Timer	*S::Object::cleanupTimer = NIL;
 
 S::Object::Object() : type(this)
 {
+	static String	 prefix = "Object::";
+
 	type			= classID;
 
 	handle			= RequestObjectHandle();
-	name			= String("Object::").Append(String::FromInt(handle));
+	name			= String(prefix).Append(String::FromInt(handle));
 
 	isDeleteable		= False;
 	isObjectInUse		= 0;

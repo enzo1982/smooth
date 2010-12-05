@@ -9,6 +9,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - combobox.cpp		- improved drop-down list size adjustment
 - number.cpp		- fixed floating point number -> string conversion
 			- fixed integer -> string conversion
+- pointer.cpp		- new class: Pointer, replaces class Input and parts of LiSA library
 - widget.cpp		- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
 			- new attribute: independent, makes a widget independent of its container
 - string.cpp		- new function: Explode(), splits a string at a delimiter
@@ -32,8 +33,12 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - colordlg.cpp		- fixed color selection dialog
 - charsetdetector.cpp	- new class: CharsetDetector, detects the character set of a string
 - mutexwin32.cpp	- now using critical sections instead of Win32 mutexes
+- clipboard.cpp		- new class: Clipboard, implements clipboard support
+- timerposix.cpp	- new class: TimerPOSIX, POSIX timer backend
 
 - removed TreeView widget (use ListBox instead)
+- removed SDL backends
+- removed LiSA library
 - added support for path names exceeding MAX_PATH
 - fixed implementation of callback signals
 - fixed implementation of Array<>

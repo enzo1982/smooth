@@ -50,6 +50,11 @@ S::Int S::Threads::ThreadWin32::GetThreadID() const
 	return threadID;
 }
 
+S::Bool S::Threads::ThreadWin32::IsCurrentThread() const
+{
+	return (threadID == GetCurrentThreadId());
+}
+
 S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadParam)
 {
 	Stop();
@@ -98,9 +103,4 @@ S::Void S::Threads::ThreadWin32::Exit()
 	thread = NIL;
 
 	ExitThread(0);
-}
-
-S::Void *S::Threads::ThreadWin32::Self() const
-{
-	return (Void *) GetCurrentThreadId();
 }

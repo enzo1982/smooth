@@ -13,8 +13,12 @@
 
 #ifdef __WIN32__
 #	include <cairowin/cairo-win32.h>
+#	include <fribidi.h>
 #else
+	using namespace X11;
+
 #	include <cairo/cairo-xlib.h>
+#	include <pango/pangocairo.h>
 #	include <smooth/backends/xlib/backendxlib.h>
 #endif
 
@@ -34,9 +38,35 @@ S::GUI::FontCairo::~FontCairo()
 {
 }
 
-S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &text) const
+S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
 {
-	if (text == NIL) return Size();
+	if (iText == NIL) return Size();
+
+	String	 text	       = iText;
+	Bool	 rtlCharacters = False;
+
+	for (Int j = 0; j < text.Length(); j++)
+	{
+		if (text[j] >= 0x0590 && text[j] <= 0x07BF) { rtlCharacters = True; break; }
+	}
+
+#ifdef __WIN32__
+	if (rtlCharacters && Setup::useIconv)
+	{
+		/* Reorder the string with fribidi.
+		 */
+		FriBidiChar	*visual = new FriBidiChar [text.Length() + 1];
+		FriBidiParType	 type = FRIBIDI_PAR_RTL;
+
+		fribidi_log2vis((FriBidiChar *) text.ConvertTo("UCS-4LE"), text.Length(), &type, visual, NIL, NIL, NIL);
+
+		visual[text.Length()] = 0;
+
+		text.ImportFrom("UCS-4LE", (char *) visual);
+
+		delete [] visual;
+	}
+#endif
 
 #ifdef __WIN32__
 	HDC		 dc	 = CreateCompatibleDC(NIL);
@@ -52,22 +82,47 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &text) const
 
 	cairo_t		*context = cairo_create(surface);
 
+#ifdef __WIN32__
 	cairo_select_font_face(context, fontName,
 			       (fontStyle == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
 			       (fontWeight == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
 	cairo_set_font_size(context, fontSize * 96.0 / 72.0);
 
-	cairo_text_extents_t	 extents;
+	cairo_font_extents_t	 fontExtents;
+	cairo_text_extents_t	 textExtents;
 
-	cairo_text_extents(context, text.ConvertTo("UTF-8"), &extents);
+	cairo_font_extents(context, &fontExtents);
+	cairo_text_extents(context, text.ConvertTo("UTF-8"), &textExtents);
+#else
+	PangoLayout		*layout	= pango_cairo_create_layout(context);
+	PangoFontDescription	*desc	= pango_font_description_from_string(String(fontName)
+									    .Append(" ")
+									    .Append(fontStyle == Font::Italic ? "Italic " : "")
+									    .Append(fontWeight == Font::Bold ? "Bold " : "")
+									    .Append(String::FromInt(fontSize)));
+
+	if (text.Length() > 0) pango_layout_set_text(layout, text.ConvertTo("UTF-8"), -1);
+
+	pango_layout_set_font_description(layout, desc);
+	pango_font_description_free(desc);
+
+	int	 x = 0;
+	int	 y = 0;
+
+	pango_layout_get_pixel_size(layout, &x, &y);
+
+	g_object_unref(layout);
+#endif
 
 	cairo_destroy(context);
 	cairo_surface_destroy(surface);
 
 #ifdef __WIN32__
 	DeleteDC(dc);
-#endif
 
-	return Size(Int(extents.width) + 1, Int(extents.height) + 2);
+	return Size(textExtents.x_advance, fontExtents.height);
+#else
+	return Size(x, y - 2);
+#endif
 }

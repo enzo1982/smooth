@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,10 +13,15 @@
 #include <smooth/version.h>
 
 #ifdef __WIN32__
+#	include <time.h>
 #	include <shlobj.h>
+#	include <shellapi.h>
 #else
+#	include <sys/time.h>
 #	include <unistd.h>
 #	include <pwd.h>
+#	include <stdlib.h>
+#	include <string.h>
 #endif
 
 S::Int S::System::System::nextGUID	= 0;
@@ -44,12 +49,54 @@ S::String S::System::System::GetAPIVersion()
 	return SMOOTH_APIVERSION;
 }
 
+S::UnsignedInt64 S::System::System::Clock()
+{
+#ifdef __WIN32__
+	return clock() * 1000 / CLOCKS_PER_SEC;
+#else
+	timeval	 tv;
+
+	gettimeofday(&tv, NIL);
+
+	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+#endif
+}
+
 S::Bool S::System::System::Sleep(UnsignedInt mSeconds)
 {
 #ifdef __WIN32__
 	::Sleep(mSeconds);
 #else
 	usleep(mSeconds * 1000);
+#endif
+
+	return True;
+}
+
+S::Bool S::System::System::OpenURL(const String &url)
+{
+#ifdef __WIN32__
+	if (Setup::enableUnicode) ShellExecuteW(NULL, (wchar_t *) L"open", url, NULL, NULL, 0);
+	else			  ShellExecuteA(NULL, "open", url, NULL, NULL, 0);
+#else
+	static const char	*browsers[] = { "firefox", "konqueror", "opera", "epiphany", "mozilla", "netscape" };
+
+	String	 command;
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (i > 0) command.Append(" || ");
+
+		command.Append(browsers[i]).Append(" \"").Append(url).Append("\"");
+	}
+
+	pid_t	 pid = fork();
+
+	if (pid == 0)
+	{
+		execl("/bin/sh", "sh", "-c", (char *) command, NULL);
+		exit(0);
+	}
 #endif
 
 	return True;

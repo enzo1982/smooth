@@ -20,6 +20,7 @@
 #include <smooth/misc/number.h>
 #include <smooth/system/system.h>
 #include <smooth/foreach.h>
+#include <smooth/version.h>
 
 #include <time.h>
 
@@ -50,6 +51,16 @@ S::Int S::Net::Protocols::HTTP::SetHeaderField(const String &key, const String &
 	requestFields.Add(field);
 
 	return Success();
+}
+
+S::String S::Net::Protocols::HTTP::GetHeaderField(const String &key)
+{
+	foreach (Parameter field, requestFields)
+	{
+		if (field.key == key) return field.value;
+	}
+
+	return NIL;
 }
 
 S::Int S::Net::Protocols::HTTP::SetParameter(const String &key, const String &value)
@@ -148,6 +159,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 	IO::InStream	*in	= new IO::InStream(IO::STREAM_DRIVER, socket);
 	IO::OutStream	*out	= new IO::OutStream(IO::STREAM_STREAM, in);
 
+	out->SetPackageSize(1024);
+
 	downloadProgress.Emit(0);
 	downloadSpeed.Emit(NIL);
 
@@ -174,6 +187,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 				uploadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
 			}
 		}
+
+		out->Flush();
 
 		uploadProgress.Emit(1000);
 
@@ -222,20 +237,40 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 				Int		 startTicks	= clock();
 				Int		 percent	= 0;
 
-				for (Int i = 0; i < bytes; i += 1024)
+				if (bytes > 0)
 				{
-					if (doCancelDownload.Call()) { cancel = True; break; }
-
-					in->InputData((Void *) buffer, Math::Min(1024, bytes - i));
-					fOut->OutputData((Void *) buffer, Math::Min(1024, bytes - i));
-
-					if (Math::Round(1000.0 * i / bytes) != percent)
+					for (Int i = 0; i < bytes; i += 1024)
 					{
-						percent = Math::Round(1000.0 * i / bytes);
+						if (doCancelDownload.Call()) { cancel = True; break; }
 
-						downloadProgress.Emit(percent);
-						downloadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
+						in->InputData((Void *) buffer, Math::Min(1024, bytes - i));
+						fOut->OutputData((Void *) buffer, Math::Min(1024, bytes - i));
+
+						if (Math::Round(1000.0 * i / bytes) != percent)
+						{
+							percent = Math::Round(1000.0 * i / bytes);
+
+							downloadProgress.Emit(percent);
+							downloadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
+						}
 					}
+				}
+				else
+				{
+					Int	 total = 0;
+
+					do
+					{
+						if (doCancelDownload.Call()) { cancel = True; break; }
+
+						bytes = in->InputData((Void *) buffer, 1024);
+						fOut->OutputData((Void *) buffer, bytes);
+
+						total += bytes;
+
+						downloadSpeed.Emit(String::FromInt(Math::Round((total / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
+					}
+					while (bytes > 0);
 				}
 
 				delete [] buffer;
@@ -362,24 +397,24 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 
 		contentType = String("multipart/form-data; boundary=").Append(separator);
 
-		out->OutputString(String("--").Append(separator).Append("\n"));
-		out->OutputString("Content-Disposition: form-data; name=\"MAX_FILE_SIZE\"\n\n");
-		out->OutputString("1000000\n");
+		out->OutputString(String("--").Append(separator).Append("\r\n"));
+		out->OutputString("Content-Disposition: form-data; name=\"MAX_FILE_SIZE\"\r\n\r\n");
+		out->OutputString("1000000\r\n");
 
 		for (Int i = 0; i < requestParameters.Length(); i++)
 		{
-			out->OutputString(String("--").Append(separator).Append("\n"));
+			out->OutputString(String("--").Append(separator).Append("\r\n"));
 
 			Parameter	 parameter = requestParameters.GetNth(i);
 
 			if (!parameter.isFile)
 			{
-				out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"\n\n"));
-				out->OutputString(String(parameter.value).Append("\n"));
+				out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"\r\n\r\n"));
+				out->OutputString(String(parameter.value).Append("\r\n"));
 			}
 			else
 			{
-				out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"; filename=\"").Append(parameter.value).Append("\"\n\n"));
+				out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"; filename=\"").Append(parameter.value).Append("\"\r\n\r\n"));
 
 				IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, parameter.value, IO::IS_READ);
 
@@ -387,7 +422,7 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 
 				delete in;
 
-				out->OutputString("\n");
+				out->OutputString("\r\n");
 			}
 		}
 
@@ -437,10 +472,12 @@ S::String S::Net::Protocols::HTTP::ComposeHeader()
 		str.Append(GetParametersURLEncoded());
 	}
 
-	str.Append(" HTTP/1.1\n");
+	str.Append(" HTTP/1.1\r\n");
 
 	if (port == 80)	SetHeaderField("Host", server);
 	else		SetHeaderField("Host", String(server).Append(":").Append(String::FromInt(port)));
+
+	if (GetHeaderField("User-Agent") == NIL) SetHeaderField("User-Agent", String("smooth/").Append(SMOOTH_VERSION));
 
 	/* Add proxy authorization if requested
 	 */
@@ -453,10 +490,10 @@ S::String S::Net::Protocols::HTTP::ComposeHeader()
 	{
 		Parameter	 field = requestFields.GetNth(i);
 
-		str.Append(field.key).Append(": ").Append(field.value).Append("\n");
+		str.Append(field.key).Append(": ").Append(field.value).Append("\r\n");
 	}
 
-	str.Append("\n");
+	str.Append("\r\n");
 
 	return str;
 }

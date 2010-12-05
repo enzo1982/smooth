@@ -16,6 +16,7 @@
 
 #include <iconv.h>
 #include <memory.h>
+#include <stdlib.h>
 
 #if defined __WINE__
 #	define wcslen lstrlenW
@@ -1028,49 +1029,18 @@ S::String S::String::Implode(const Array<String> &array, const String &delimiter
 
 S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncoding, char *outBuffer, Int outBytes, const char *outEncoding)
 {
-	static Threads::Mutex	 csMutex;
-	static Buffer<char>	 csBuffer;
-
-	csMutex.Lock();
-
-	Int	 size = 0;
+	Int		 size = 0;
+	Buffer<char>	 buffer;
 
 	if (outBuffer == NIL)
 	{
-		csBuffer.Resize(inBytes * 8);
-		csBuffer.Zero();
+		buffer.Resize(inBytes * 8);
 
-		outBytes	= csBuffer.Size();
-		outBuffer	= csBuffer;
+		outBytes  = buffer.Size();
+		outBuffer = buffer;
 	}
 
-#ifdef __WIN32__
-	if (Setup::useIconv)
-#else
-	if (True)
-#endif
-	{
-		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
-
-		if (cd == (iconv_t) -1) { csMutex.Release(); return -1; }
-
-		size_t		 inBytesLeft	= inBytes;
-		size_t		 outBytesLeft	= outBytes;
-		const char     **inPointer	= &inBuffer;
-		char	       **outPointer	= &outBuffer;
-
-		while (inBytesLeft)
-		{
-			if (iconv(cd, const_cast<char **>(inPointer), &inBytesLeft, outPointer, &outBytesLeft) == (size_t) -1) break;
-		}
-
-		iconv_close(cd);
-
-		size = !outBytesLeft ? 0 : outBytes - outBytesLeft;
-
-		if (inBytesLeft) size *= -1;
-	}
-	else if (strcmp(inEncoding, outEncoding) == 0)
+	if (strcmp(inEncoding, outEncoding) == 0)
 	{
 		size = inBytes;
 
@@ -1091,6 +1061,32 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		}
 
 		if (size >= outBytes) size = 0;
+	}
+#ifdef __WIN32__
+	else if (Setup::useIconv)
+#else
+	else if (True)
+#endif
+	{
+		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
+
+		if (cd == (iconv_t) -1) return -1;
+
+		size_t		 inBytesLeft	= inBytes;
+		size_t		 outBytesLeft	= outBytes;
+		const char     **inPointer	= &inBuffer;
+		char	       **outPointer	= &outBuffer;
+
+		while (inBytesLeft)
+		{
+			if (iconv(cd, const_cast<char **>(inPointer), &inBytesLeft, outPointer, &outBytesLeft) == (size_t) -1) break;
+		}
+
+		iconv_close(cd);
+
+		size = !outBytesLeft ? 0 : outBytes - outBytesLeft;
+
+		if (inBytesLeft) size *= -1;
 	}
 #ifdef __WIN32__
 	else if (strcmp(outEncoding, "UTF-16LE") == 0)
@@ -1118,12 +1114,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		else if (strcmp(inEncoding, "ISO-2022-KR") == 0) codePage = 50225;
 		else if (strcmp(inEncoding, "ISO-2022-CN") == 0) codePage = 50227;
 
-		if (inEncoding[0] == 'C' && inEncoding[1] == 'P')
-		{
-			String	 cpString = String().ImportFrom("ISO-8859-1", inEncoding + 2);
-
-			codePage = cpString.ToInt();
-		}
+		if (inEncoding[0] == 'C' && inEncoding[1] == 'P') codePage = atoi(inEncoding + 2);
 
 		size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * sizeof(wchar_t);
 
@@ -1159,12 +1150,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		else if (strcmp(outEncoding, "ISO-2022-KR") == 0) codePage = 50225;
 		else if (strcmp(outEncoding, "ISO-2022-CN") == 0) codePage = 50227;
 
-		if (outEncoding[0] == 'C' && outEncoding[1] == 'P')
-		{
-			String	 cpString = String().ImportFrom("ISO-8859-1", outEncoding + 2);
-
-			codePage = cpString.ToInt();
-		}
+		if (outEncoding[0] == 'C' && outEncoding[1] == 'P') codePage = atoi(outEncoding + 2);
 
 		size = WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
 
@@ -1176,8 +1162,6 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		else if (size >= outBytes)	 size = 0;
 	}
 #endif
-
-	csMutex.Release();
 
 	return size;
 }

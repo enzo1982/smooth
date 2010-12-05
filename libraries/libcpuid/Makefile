@@ -5,7 +5,7 @@ SMOOTH_PATH = ../..
 
 # Change these variables to fit your project:
 GLOBALLIB   = libcpuid.a
-MYCCOPTS    = -I. -D VERSION=\"0.1.0\"
+MYCCOPTS    = -I. -D VERSION=\"0.1.3\"
 
 # Enter object files here:
 OBJECTS	    = asm-bits.o cpuid_main.o libcpuid_util.o rdtsc.o recog_amd.o recog_intel.o

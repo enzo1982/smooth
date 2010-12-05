@@ -4,7 +4,7 @@
 using namespace smooth;
 using namespace smooth::GUI::Dialogs;
 
-#include <v8/v8-main.h>
+#include <v8/v8.h>
 
 using namespace v8;
 

@@ -40,14 +40,18 @@ __declspec (dllexport) HICON	 S::SMOOTHICON = NIL;
 
 int CALLBACK EnumFontProcA(ENUMLOGFONTEXA *lpelfe, NEWTEXTMETRICEXA *lpntme, int fontType, LPARAM lParam)
 {
-	if (S::String(lpelfe->elfLogFont.lfFaceName) == "Microsoft Sans Serif")	return 0;
-	else									return 1;
+	static S::String	 fontName = "Microsoft Sans Serif";
+
+	if (S::String(lpelfe->elfLogFont.lfFaceName) == fontName) return 0;
+	else							  return 1;
 }
 
 int CALLBACK EnumFontProcW(ENUMLOGFONTEXW *lpelfe, NEWTEXTMETRICEXW *lpntme, int fontType, LPARAM lParam)
 {
-	if (S::String(lpelfe->elfLogFont.lfFaceName) == "Microsoft Sans Serif")	return 0;
-	else									return 1;
+	static S::String	 fontName = "Microsoft Sans Serif";
+
+	if (S::String(lpelfe->elfLogFont.lfFaceName) == fontName) return 0;
+	else							  return 1;
 }
 #endif
 
@@ -63,8 +67,6 @@ S::Int	 initCount = 0;
 S::Void S::Init()
 {
 	if (initCount++) return;
-
-	LiSAInit();
 
 	Backend::InitBackends();
 
@@ -113,7 +115,8 @@ S::Void S::Init()
 	if (LoadIconvDLL() == True)	Setup::useIconv = True;
 	else				Setup::useIconv = False;
 #else
-	Setup::useIconv = True;
+	Setup::enableUnicode = True;
+	Setup::useIconv	     = True;
 #endif
 
 #if defined __WIN32__ && !defined __WINE__
@@ -162,8 +165,6 @@ S::Void S::Free()
 	 * again to actually free them.
 	 */
 	Object::ObjectCleanup();
-
-	LiSADeinit();
 }
 
 S::Void S::GetColors()

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -46,6 +46,16 @@ S::Int S::System::EventWin32::ProcessNextEvent()
 
 		if (result)
 		{
+			/* Process only the most recent WM_MOUSEMOVE message.
+			 */
+			if (msg.message == WM_MOUSEMOVE)
+			{
+				if (Setup::enableUnicode) while (PeekMessageW(&msg, msg.hwnd, WM_MOUSEMOVE, WM_MOUSEMOVE, PM_REMOVE)) { }
+				else			  while (PeekMessageA(&msg, msg.hwnd, WM_MOUSEMOVE, WM_MOUSEMOVE, PM_REMOVE)) { }
+			}
+
+			/* Translate and dispatch message.
+			 */
 			TranslateMessage(&msg);
 
 			if (Setup::enableUnicode) DispatchMessageW(&msg);

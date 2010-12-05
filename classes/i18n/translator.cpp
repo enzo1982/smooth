@@ -15,6 +15,10 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 
+#ifndef __WIN32__
+#	include <stdlib.h>
+#endif
+
 S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
 
 S::I18n::Translator::Translator(const String &iAppPrefix)
@@ -156,9 +160,31 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		case LANG_UKRAINIAN:	code = "uk";	break;
 		case LANG_VIETNAMESE:	code = "vi";	break;
 	}
+#else
+	String	 lang = getenv("LANG");
+
+	if (lang != NIL)
+	{
+		if (lang.Find(".") >= 0) lang = lang.Head(lang.Find("."));
+
+		code = lang;
+	}
 #endif
 
-	if (ActivateLanguage(String(appPrefix).Append("_").Append(code).Append(".xml")) == Error()) ActivateLanguage("internal");
+	/* Try the language code, possibly with appended country code.
+	 */
+	if (ActivateLanguage(String(appPrefix).Append("_").Append(code).Append(".xml")) == Success()) return Success();
+
+	/* If failed, try the base language code if applicable.
+	 */
+	if (code.Find("_") >= 0)
+	{
+		if (ActivateLanguage(String(appPrefix).Append("_").Append(code.Head(code.Find("_"))).Append(".xml")) == Success()) return Success();
+	}
+
+	/* Fall back to internal language.
+	 */
+	ActivateLanguage("internal");
 
 	return Success();
 }
@@ -307,16 +333,11 @@ const S::String &S::I18n::Translator::TranslateString(const String &string, cons
 
 S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 {
-	/* Return an error if we are passed a null document.
+	/* Check arguments and return an error if they are not sane.
 	 */
-	if (doc == NIL) return Error();
+	if (doc == NIL || doc->GetRootNode() == NIL || language == NIL) return Error();
 
 	XML::Node	*root = doc->GetRootNode();
-
-	/* Return an error if the document is invalid.
-	 */
-	if (root == NIL) return Error();
-
 	Error		 result = language->Parse(root);
 
 	if (result != Success()) return Error();

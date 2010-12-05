@@ -16,20 +16,20 @@ BUILD_QNX = False
 # Build using XLib backends
 BUILD_XLIB = True
 
-# Build using SDL backends
-BUILD_SDL = False
-
 # Build using Cairo graphics backend
 BUILD_CAIRO = True
 
 # Build using GDI+ graphics backend
 BUILD_GDIPLUS = False
 
-# Build using Posix threads
+# Build using POSIX threads
 BUILD_POSIXTHREADS = True
 
-# Build using a threads based timer
-BUILD_THREADSTIMER = True
+# Build using POSIX timers
+BUILD_POSIXTIMER = True
+
+# Build using threads based timers
+BUILD_THREADSTIMER = False
 
 # Build using V8 JavaScript library
 BUILD_V8 = True

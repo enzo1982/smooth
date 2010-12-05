@@ -247,20 +247,16 @@ const Error &S::GUI::Dialogs::MessageDlg::ShowDialog()
 
 S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 {
-	Surface	*surface = msgbox->GetDrawSurface();
-	Rect	 txtrect;
+	Point	 offset = msgbox->GetMainLayer()->GetRealPosition();
+	Rect	 txtrect = Rect(offset + Point(14, 19), Size(msgbox->GetWidth() - 32, 16));
 
-	txtrect.left = 18;
-	txtrect.top = 48;
-	txtrect.right = txtrect.left + msgbox->GetWidth() - 32;
-
-	if (lines == 1 && msgicon != NIL) txtrect.top = 56;
-
-	txtrect.bottom = txtrect.top + 16;
+	if (lines == 1 && msgicon != NIL) { txtrect.top += 8; txtrect.bottom += 8; }
 
 #ifdef __WIN32__
 	if (msgicon != NIL) txtrect.left += GetSystemMetrics(SM_CXICON) + 20;
 #endif
+
+	Surface	*surface = msgbox->GetDrawSurface();
 
 	for (int i = 0; i < lines; i++)
 	{

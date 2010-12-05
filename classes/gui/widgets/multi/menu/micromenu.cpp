@@ -14,6 +14,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
+#include <smooth/system/multimonitor.h>
 
 const S::Short	 S::GUI::MicroMenu::classID = S::Object::RequestClassID();
 
@@ -121,15 +122,17 @@ S::Void S::GUI::MicroMenu::OpenPopupMenu()
 	hotspot->Deactivate();
 
 	Widget	*window		= container->GetContainerWindow();
+
+	Rect	 monitor	= System::MultiMonitor::GetActiveMonitorMetrics();
 	Point	 realPos	= GetRealPosition();
 	Point	 popupPos	= realPos + Point(subtype == OR_HORZ ? GetWidth() : 0, subtype == OR_VERT ? GetHeight() : 0);
 
 	popup->CalculateSize();
 
-	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popup->GetWidth() >= LiSAGetDisplaySizeX()) popupPos.x = realPos.x - popup->GetWidth() + (subtype == OR_VERT ? GetWidth() : 0); }
-	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popup->GetWidth() <= 0)		     popupPos.x = realPos.x - popup->GetWidth() + (subtype == OR_VERT ? GetWidth() : 0); }
+	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popup->GetWidth() >= monitor.GetWidth()) popupPos.x = realPos.x - popup->GetWidth() + (subtype == OR_VERT ? GetWidth() : 0); }
+	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popup->GetWidth() <= 0)		  popupPos.x = realPos.x - popup->GetWidth() + (subtype == OR_VERT ? GetWidth() : 0); }
 
-	if (window->GetY() + popupPos.y + popup->GetHeight() >= LiSAGetDisplaySizeY()) popupPos.y = realPos.y - popup->GetHeight() + (subtype == OR_HORZ ? GetHeight() : 0);
+	if (window->GetY() + popupPos.y + popup->GetHeight() >= monitor.GetHeight()) popupPos.y = realPos.y - popup->GetHeight() + (subtype == OR_HORZ ? GetHeight() : 0);
 
 	popup->SetPosition(popupPos);
 	popup->internalRequestClose.Connect(&MicroMenu::ClosePopupMenu, this);

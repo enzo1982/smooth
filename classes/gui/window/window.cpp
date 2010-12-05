@@ -17,7 +17,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/color.h>
-#include <smooth/basic/input.h>
+#include <smooth/input/pointer.h>
 #include <smooth/resources.h>
 #include <smooth/misc/binary.h>
 #include <smooth/graphics/surface.h>
@@ -67,7 +67,7 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 #ifdef __WIN32__
 	frameWidth = GetSystemMetrics(SM_CXFRAME);
 #else
-	frameWidth = 0;
+	frameWidth = 1;
 #endif
 
 	updateRect = Rect(Point(-1, -1), Size(0, 0));
@@ -168,7 +168,7 @@ S::Int S::GUI::Window::SetText(const String &nTitle)
 {
 	text = nTitle;
 
-	if (created)
+	if (created && !destroyed)
 	{
 		Process(SM_WINDOWTITLECHANGED, 0, 0);
 
@@ -280,8 +280,8 @@ S::Int S::GUI::Window::Show()
 
 	backend->Show();
 
-	initshow	= True;
-	visible		= True;
+	initshow = True;
+	visible	 = True;
 
 	onShow.Emit();
 
@@ -290,24 +290,12 @@ S::Int S::GUI::Window::Show()
 
 S::Int S::GUI::Window::Hide()
 {
-	if (!created) Create();
+	if (!visible) return Success();
 
-	backend->Hide();
+	if (created) backend->Hide();
 
-	if (maximized && !initshow)
-	{
-		maximized = False;
-		Maximize();
-	}
-
-	if (minimized && !initshow)
-	{
-		minimized = False;
-		Minimize();
-	}
-
-	initshow	= True;
-	visible		= False;
+	initshow = True;
+	visible	 = False;
 
 	onHide.Emit();
 
@@ -421,7 +409,9 @@ S::Bool S::GUI::Window::Create()
 			SetPosition(Point(monitorRect.left, monitorRect.top) + GetPosition());
 		}
 
+#ifdef __WIN32__
 		if (flags & WF_NORESIZE) frameWidth = 4;
+#endif
 
 		if (backend->Open(text, GetPosition(), GetSize(), flags) == Success())
 		{
@@ -526,7 +516,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	EnterProtectedRegion();
 
-	if (!(message == SM_MOUSEMOVE && wParam == 1)) onEvent.Emit(message, wParam, lParam);
+	onEvent.Emit(message, wParam, lParam);
 
 	Int	 rVal = Success();
 
@@ -575,7 +565,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
-		case WM_SETFOCUS:
+#endif
+		case SM_GETFOCUS:
 			if (!focussed)
 			{
 				focussed = True;
@@ -584,18 +575,19 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
-		case WM_KILLFOCUS:
+		case SM_LOSEFOCUS:
 			if (focussed)
 			{
-				const Window	*window = Window::GetWindow((HWND) wParam);
+				Window	*focusWnd = (Window *) Object::GetObject(wParam, Window::classID);
 
-				if (window != NIL)
+				if (focusWnd != NIL)
 				{
-					if (window->GetObjectType() == ToolWindow::classID && window->GetOrder() >= GetOrder())
+					if (focusWnd->GetObjectType() == ToolWindow::classID && focusWnd->GetOrder() >= GetOrder())
 					{
+#ifdef __WIN32__
 						PostMessage((HWND) backend->GetSystemWindow(), WM_NCACTIVATE, True, 0);
-						
-						break;
+#endif
+						return Success();
 					}
 				}
 
@@ -604,6 +596,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				onLoseFocus.Emit();
 			}
 
+			/* Fall through to WM_ACTIVATEAPP on Windows.
+			 */
+#ifdef __WIN32__
 		case WM_ACTIVATEAPP:
 			if (flags & WF_MODAL)
 			{
@@ -625,14 +620,14 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 					else		activate = False;
 				}
 
-				if (activate && message == WM_KILLFOCUS)
+				if (activate && message == SM_LOSEFOCUS)
 				{
 					if (GetWindow(SetActiveWindow((HWND) backend->GetSystemWindow())) != NIL)	activate = True;
 					else										activate = False;
 				}
 
 				if (activate)	SetWindowPos((HWND) backend->GetSystemWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-				else		SetWindowPos((HWND) backend->GetSystemWindow(), message == WM_KILLFOCUS ? HWND_NOTOPMOST : GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+				else		SetWindowPos((HWND) backend->GetSystemWindow(), message == SM_LOSEFOCUS ? HWND_NOTOPMOST : GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
 			}
 
 			if (flags & WF_APPTOPMOST)
@@ -662,7 +657,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
-			if (flags & WF_SYSTEMMODAL && message == WM_KILLFOCUS)
+			if (flags & WF_SYSTEMMODAL && message == SM_LOSEFOCUS)
 			{
 				Bool	 activate = False;
 				HWND	 actWnd = GetForegroundWindow();
@@ -683,6 +678,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				}
 			}
 
+			break;
+#else
 			break;
 #endif
 		case SM_WINDOWMETRICS:
@@ -765,7 +762,7 @@ S::Int S::GUI::Window::Paint(Int message)
 
 		if (type != ToolWindow::classID)
 		{
-			Widget	*lastWidget = NIL;
+			Widget	*lastTopWidget = NIL;
 			Int	 bias = 0;
 			Int	 topoffset = frameWidth;
 			Int	 rightobjcount = 0;
@@ -784,7 +781,7 @@ S::Int S::GUI::Window::Paint(Int message)
 
 				if (object->GetOrientation() == OR_TOP)
 				{
-					lastWidget = object;
+					lastTopWidget = object;
 
 					if (object->subtype == WO_SEPARATOR)
 					{
@@ -813,7 +810,7 @@ S::Int S::GUI::Window::Paint(Int message)
 				Point	 p1 = Point(frameWidth, innerOffset.top - 2 + bias);
 				Point	 p2 = Point(GetWidth() - frameWidth, p1.y);
 
-				if (lastWidget->subtype == WO_NOSEPARATOR) { p1.y -= 3; p2.y -= 3; }
+				if (lastTopWidget->subtype == WO_NOSEPARATOR) { p1.y -= 3; p2.y -= 3; }
 
 				surface->Bar(p1, p2, OR_HORZ);
 				surface->Bar(p1 + Point(0, 2), p2 + Point(0, 2), OR_HORZ);
@@ -845,18 +842,18 @@ S::Int S::GUI::Window::Paint(Int message)
 			}
 		}
 
-		for (Int j = 0; j < GetNOfObjects(); j++)
+		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
-			Widget	*widget = GetNthObject(j);
+			Widget	*widget = GetNthObject(i);
 
-			if (widget->IsAffected(updateRect) && widget->GetObjectType() != Layer::classID) widget->Paint(SP_PAINT);
+			if (widget->GetObjectType() != Layer::classID && widget->IsAffected(updateRect)) widget->Paint(SP_PAINT);
 		}
 
-		for (Int k = 0; k < GetNOfObjects(); k++)
+		for (Int i = 0; i < GetNOfObjects(); i++)
 		{
-			Widget	*widget = GetNthObject(k);
+			Widget	*widget = GetNthObject(i);
 
-			if (widget->IsAffected(updateRect) && widget->GetObjectType() == Layer::classID) widget->Paint(SP_PAINT);
+			if (widget->GetObjectType() == Layer::classID && widget->IsAffected(updateRect)) widget->Paint(SP_PAINT);
 		}
 
 		onPaint.Emit();
@@ -871,7 +868,7 @@ S::Int S::GUI::Window::Paint(Int message)
 
 S::Void S::GUI::Window::CalculateOffsets()
 {
-	Widget	*lastWidget	= NIL;
+	Widget	*lastTopWidget	= NIL;
 	Int	 rightobjcount	= 0;
 	Int	 leftobjcount	= 0;
 	Int	 btmobjcount	= 0;
@@ -888,7 +885,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 		{
 			topobjcount++;
 
-			lastWidget = widget;
+			lastTopWidget = widget;
 
 			widget->SetMetrics(Point(innerOffset.left, innerOffset.top), Size(GetWidth() - innerOffset.left - innerOffset.right, widget->GetHeight()));
 
@@ -896,20 +893,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 			if (widget->subtype == WO_SEPARATOR) innerOffset.top += 3;
 		}
-	}
-
-	if (topobjcount > 0)
-	{
-		innerOffset.top += 3;
-
-		if (lastWidget->subtype == WO_NOSEPARATOR) innerOffset.top += 3;
-	}
-
-	for (Int j = 0; j < GetNOfObjects(); j++)
-	{
-		Widget	*widget = GetNthObject(j);
-
-		if (widget->GetOrientation() == OR_BOTTOM)
+		else if (widget->GetOrientation() == OR_BOTTOM)
 		{
 			btmobjcount++;
 
@@ -919,11 +903,12 @@ S::Void S::GUI::Window::CalculateOffsets()
 		}
 	}
 
+	if (topobjcount > 0) innerOffset.top	+= 3 + (lastTopWidget->subtype == WO_NOSEPARATOR ? 3 : 0);
 	if (btmobjcount > 0) innerOffset.bottom += 4;
 
-	for (Int k = 0; k < GetNOfObjects(); k++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		Widget	*widget = GetNthObject(k);
+		Widget	*widget = GetNthObject(i);
 
 		if (widget->GetOrientation() == OR_LEFT)
 		{
@@ -933,15 +918,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 			innerOffset.left += widget->GetWidth();
 		}
-	}
-
-	if (leftobjcount > 0) innerOffset.left += 3;
-
-	for (Int l = 0; l < GetNOfObjects(); l++)
-	{
-		Widget	*widget = GetNthObject(l);
-
-		if (widget->GetOrientation() == OR_RIGHT)
+		else if (widget->GetOrientation() == OR_RIGHT)
 		{
 			rightobjcount++;
 
@@ -951,11 +928,12 @@ S::Void S::GUI::Window::CalculateOffsets()
 		}
 	}
 
+	if (leftobjcount  > 0) innerOffset.left	 += 3;
 	if (rightobjcount > 0) innerOffset.right += 3;
 
-	for (Int m = 0; m < GetNOfObjects(); m++)
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		Widget	*widget = GetNthObject(m);
+		Widget	*widget = GetNthObject(i);
 
 		if (widget->GetOrientation() == OR_CENTER)
 		{
@@ -967,7 +945,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 S::GUI::Point S::GUI::Window::GetMousePosition() const
 {
-	Point	 position = Input::GetMousePosition();
+	Point	 position = Input::Pointer::GetPosition();
 
 	if (IsRightToLeft())	position = Point(GetWidth() - (position.x - GetX()) - 1, position.y - GetY());
 	else			position -= GetPosition();
@@ -986,7 +964,7 @@ S::Bool S::GUI::Window::IsMouseOn(const Rect &rect) const
 	if ((mousePos.x >= rect.left) && (mousePos.x < rect.right) && (mousePos.y >= rect.top) && (mousePos.y < rect.bottom))
 	{
 #ifdef __WIN32__
-		Point	 position = Input::GetMousePosition();
+		Point	 position = Input::Pointer::GetPosition();
 		HWND	 window = (HWND) surface->GetSystemSurface();
 
 		if (WindowFromPoint(position) != window) return False;

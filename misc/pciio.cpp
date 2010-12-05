@@ -221,7 +221,9 @@ bool ReadPCIFTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		if (in->InputString(4).Compare("PCIF") == 0)
+		static String	 pcifTag = "PCIF";
+
+		if (in->InputString(4).Compare(pcifTag) == 0)
 		{
 			ior.majorversion = in->InputNumber(1);
 			ior.minorversion = in->InputNumber(1);
@@ -258,7 +260,9 @@ bool ReadIMAGTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		if (in->InputString(4).Compare("IMAG") == 0)
+		static String	 imagTag = "IMAG";
+
+		if (in->InputString(4).Compare(imagTag) == 0)
 		{
 			in->RelSeek(2);
 
@@ -304,7 +308,9 @@ bool ReadRESOTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		if (in->InputString(4).Compare("RESO") == 0)
+		static String	 resoTag = "RESO";
+
+		if (in->InputString(4).Compare(resoTag) == 0)
 		{
 			in->RelSeek(2);
 
@@ -364,7 +370,9 @@ bool ReadFORMTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		if (in->InputString(4).Compare("FORM") == 0)
+		static String	 formTag = "FORM";
+
+		if (in->InputString(4).Compare(formTag) == 0)
 		{
 			in->RelSeek(2);
 
@@ -422,7 +430,9 @@ bool ReadDESCTAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		if (in->InputString(4).Compare("DESC") == 0)
+		static String	 descTag = "DESC";
+
+		if (in->InputString(4).Compare(descTag) == 0)
 		{
 			in->RelSeek(2);
 
@@ -466,7 +476,9 @@ bool ReadNAMETAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		if (in->InputString(4).Compare("NAME") == 0)
+		static String	 nameTag = "NAME";
+
+		if (in->InputString(4).Compare(nameTag) == 0)
 		{
 			in->RelSeek(2);
 
@@ -528,7 +540,9 @@ bool ReadDATATAG(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		if (in->InputString(4).Compare("DATA") == 0)
+		static String	 dataTag = "DATA";
+
+		if (in->InputString(4).Compare(dataTag) == 0)
 		{
 			in->RelSeek(2);
 
@@ -566,7 +580,9 @@ bool FindImageID(PCIIn in, PCIIO &ior)
 
 	do
 	{
-		if (in->InputString(4).Compare("NAME") == 0)
+		static String	 nameTag = "NAME";
+
+		if (in->InputString(4).Compare(nameTag) == 0)
 		{
 			in->RelSeek(2);
 

@@ -65,6 +65,11 @@ S::Int S::Threads::ThreadBackend::GetThreadID() const
 	return -1;
 }
 
+S::Bool S::Threads::ThreadBackend::IsCurrentThread() const
+{
+	return False;
+}
+
 S::Int S::Threads::ThreadBackend::Start(Void (*threadProc)(Void *), Void *threadParam)
 {
 	return Error();
@@ -77,9 +82,4 @@ S::Int S::Threads::ThreadBackend::Stop()
 
 S::Void S::Threads::ThreadBackend::Exit()
 {
-}
-
-S::Void *S::Threads::ThreadBackend::Self() const
-{
-	return NIL;
 }

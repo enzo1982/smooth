@@ -19,7 +19,7 @@ ifeq ($(BUILD_WIN32),True)
 endif
 endif
 
-LIBS += -lfribidi -lbz2 -llisa -lxml2 -lcpuid -ljpeg -lpng -lz -lnsucd -lstdc++
+LIBS += -lfribidi -lbz2 -lxml2 -lcpuid -ljpeg -lpng -lz -lnsucd -lstdc++
 
 ifeq ($(BUILD_WIN32),True)
 	LIBS += -lws2_32 -limm32 -lole32
@@ -31,6 +31,8 @@ endif
 ifeq ($(BUILD_CAIRO),True)
 	LIBS += -lcairo.dll
 endif
+else
+	LIBS += -lcairo -lpango-1.0 -lpangocairo-1.0 -lgtk-x11-2.0 -lglib-2.0 -lpthread -lX11 -lXmu
 endif
 
 ifeq ($(BUILD_WIN32),True)
@@ -49,7 +51,7 @@ LIBSTRIP_OPTS = --strip-debug
 REMOVER_OPTS = -f
 
 ifeq ($(BUILD_WIN32),True)
-	LINKER_OPTS += -mwindows -Xlinker --dynamicbase -Xlinker --nxcompat -Xlinker --kill-at -Xlinker --out-implib -Xlinker $(LIBNAME)
+	LINKER_OPTS += -mwindows -Wl,--dynamicbase,--nxcompat,--kill-at,--out-implib,$(LIBNAME)
 endif
 
 .PHONY: all headers objects programs libs install clean clean_all clean_headers doc doc-clean

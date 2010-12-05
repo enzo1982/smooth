@@ -16,7 +16,7 @@
 #include <smooth/system/multimonitor.h>
 #include <smooth/init.h>
 #include <smooth/system/timer.h>
-#include <smooth/basic/input.h>
+#include <smooth/input/pointer.h>
 
 #ifndef CS_DROPSHADOW
 #	define CS_DROPSHADOW 0x00020000
@@ -170,6 +170,23 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			return Break;
 	}
 
+	/* Update cursor position when receiving mouse messages.
+	 */
+	if (message == WM_MOUSEMOVE	|| message == WM_NCMOUSEMOVE	 ||
+	    message == WM_LBUTTONDOWN	|| message == WM_NCLBUTTONDOWN	 ||
+	    message == WM_RBUTTONDOWN	|| message == WM_NCRBUTTONDOWN	 ||
+	    message == WM_LBUTTONUP	|| message == WM_NCLBUTTONUP	 ||
+	    message == WM_RBUTTONUP	|| message == WM_NCRBUTTONUP	 ||
+	    message == WM_LBUTTONDBLCLK	|| message == WM_NCLBUTTONDBLCLK ||
+	    message == WM_RBUTTONDBLCLK	|| message == WM_NCRBUTTONDBLCLK)
+	{
+		POINT	 point;
+
+		GetCursorPos(&point);
+
+		Input::Pointer::UpdatePosition(point.x, point.y);
+	}
+
 	/* Convert Windows messages to smooth messages.
 	 */
 	switch (message)
@@ -247,6 +264,14 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			return Success();
+		case WM_SETFOCUS:
+			return onEvent.Call(SM_GETFOCUS, 0, 0);
+		case WM_KILLFOCUS:
+			{
+				Window	*focusWnd = Window::GetWindow((HWND) wParam);
+
+				return onEvent.Call(SM_LOSEFOCUS, focusWnd != NIL ? focusWnd->GetHandle() : -1, 0);
+			}
 
 		/* Other messages:
 		 */
@@ -567,7 +592,7 @@ S::Void S::GUI::WindowGDI::InitMouseNotifier()
 	mouseNotifyTimer = new System::Timer();
 
 	mouseNotifyTimer->onInterval.Connect(&WindowGDI::MouseNotifier);
-	mouseNotifyTimer->Start(50);
+	mouseNotifyTimer->Start(25);
 }
 
 S::Void S::GUI::WindowGDI::FreeMouseNotifier()
@@ -579,16 +604,20 @@ S::Void S::GUI::WindowGDI::FreeMouseNotifier()
 
 S::Void S::GUI::WindowGDI::MouseNotifier()
 {
-	static Point	 savedMousePos	 = Point(0, 0);
-	const Point	&currentMousePos = Input::GetMousePosition();
+	static Point	 savedMousePos = Point(0, 0);
+	POINT		 currentMousePos;
 
-	if (currentMousePos != savedMousePos)
+	GetCursorPos(&currentMousePos);
+
+	Input::Pointer::UpdatePosition(currentMousePos.x, currentMousePos.y);
+
+	if (currentMousePos.x != savedMousePos.x || currentMousePos.y != savedMousePos.y)
 	{
 		for (Int i = 0; i < Window::GetNOfWindows(); i++)
 		{
 			Window	*window = Window::GetNthWindow(i);
 
-			if (window->IsInUse()) window->Process(SM_MOUSEMOVE, 1, 0);
+			if (window->IsInUse() && !window->IsMouseOn(Rect(Point(), window->GetSize()))) window->Process(SM_MOUSEMOVE, 0, 0);
 		}
 
 		savedMousePos = currentMousePos;

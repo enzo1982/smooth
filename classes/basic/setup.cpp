@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,10 +13,10 @@
 
 /* Init color constant with default values.
  */
-S::GUI::Color S::Setup::BackgroundColor(212, 208, 200);
+S::GUI::Color S::Setup::BackgroundColor(240, 240, 240);
 S::GUI::Color S::Setup::ClientColor(255, 255, 255);
 S::GUI::Color S::Setup::ClientTextColor(0, 0, 0);
-S::GUI::Color S::Setup::LightGrayColor(237, 236, 232);
+S::GUI::Color S::Setup::LightGrayColor(248, 248, 248);
 S::GUI::Color S::Setup::DividerLightColor(237, 236, 232);
 S::GUI::Color S::Setup::DividerDarkColor(128, 128, 128);
 S::GUI::Color S::Setup::TextColor(0, 0, 0);

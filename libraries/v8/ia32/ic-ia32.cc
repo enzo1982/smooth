@@ -698,7 +698,6 @@ void KeyedLoadIC::GenerateString(MacroAssembler* masm) {
   //  -- esp[0] : return address
   // -----------------------------------
   Label miss;
-  Label index_out_of_range;
 
   Register receiver = edx;
   Register index = eax;
@@ -713,17 +712,13 @@ void KeyedLoadIC::GenerateString(MacroAssembler* masm) {
                                           result,
                                           &miss,  // When not a string.
                                           &miss,  // When not a number.
-                                          &index_out_of_range,
+                                          &miss,  // When index out of range.
                                           STRING_INDEX_IS_ARRAY_INDEX);
   char_at_generator.GenerateFast(masm);
   __ ret(0);
 
   ICRuntimeCallHelper call_helper;
   char_at_generator.GenerateSlow(masm, call_helper);
-
-  __ bind(&index_out_of_range);
-  __ Set(eax, Immediate(Factory::undefined_value()));
-  __ ret(0);
 
   __ bind(&miss);
   GenerateMiss(masm);
@@ -896,8 +891,8 @@ void KeyedLoadIC::GenerateIndexedInterceptor(MacroAssembler* masm) {
   __ test(edx, Immediate(kSmiTagMask));
   __ j(zero, &slow, not_taken);
 
-  // Check that the key is a smi.
-  __ test(eax, Immediate(kSmiTagMask));
+  // Check that the key is an array index, that is Uint32.
+  __ test(eax, Immediate(kSmiTagMask | kSmiSignMask));
   __ j(not_zero, &slow, not_taken);
 
   // Get the map of the receiver.

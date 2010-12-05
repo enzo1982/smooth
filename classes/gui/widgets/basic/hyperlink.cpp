@@ -14,6 +14,8 @@
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
+#include <smooth/input/pointer.h>
+#include <smooth/system/system.h>
 
 const S::Short	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
 
@@ -86,9 +88,7 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 
 S::Void S::GUI::Hyperlink::OnMouseOver()
 {
-#ifdef __WIN32__
-	LiSASetMouseCursor((HWND) container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_HAND);
-#endif
+	Input::Pointer::SetCursor(container->GetContainerWindow(), Input::Pointer::CursorHand);
 
 	if (linkBitmap == NIL)
 	{
@@ -105,9 +105,7 @@ S::Void S::GUI::Hyperlink::OnMouseOver()
 
 S::Void S::GUI::Hyperlink::OnMouseOut()
 {
-#ifdef __WIN32__
-	LiSASetMouseCursor((HWND) container->GetContainerWindow()->GetSystemWindow(), LiSA_MOUSE_ARROW);
-#endif
+	Input::Pointer::SetCursor(container->GetContainerWindow(), Input::Pointer::CursorArrow);
 
 	if (linkBitmap == NIL)
 	{
@@ -121,8 +119,7 @@ S::Void S::GUI::Hyperlink::OnMouseOut()
 
 S::Void S::GUI::Hyperlink::OnClickLink()
 {
-	if (Setup::enableUnicode)	LiSAOpenURLW(linkURL);
-	else				LiSAOpenURLA(linkURL);
+	S::System::System::OpenURL(linkURL);
 
 	onAction.Emit();
 }

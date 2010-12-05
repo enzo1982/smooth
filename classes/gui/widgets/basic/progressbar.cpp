@@ -70,6 +70,9 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 
 			if (subtype == OR_HORZ)
 			{
+				static String	 zeroString    = "0";
+				static String	 percentString = "%";
+
 				switch (GetFlags())
 				{
 					case PB_NOTEXT:
@@ -79,9 +82,9 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 						break;
 					case PB_PERCENT:
 						if (value > 0)	text = String::FromInt((Int) Math::Max(0, Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
-						else		text = "0";
+						else		text = zeroString;
 
-						text.Append("%");
+						text.Append(percentString);
 						break;
 				}
 

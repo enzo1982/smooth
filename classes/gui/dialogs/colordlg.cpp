@@ -62,8 +62,6 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	actgreen = color.GetGreen();
 	actblue = color.GetBlue();
 
-	ColorDlgUpdateHexValue();
-
 	bp.x = 87;
 	bp.y = 29;
 	bs.cx = 0;
@@ -210,6 +208,8 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	blueedit->onInput.Connect(&ColorSelection::ColorDlgBlueEdit, this);
 	blueedit->SetFlags(EDB_NUMERIC);
 	blueedit->SetOrientation(OR_UPPERRIGHT);
+
+	ColorDlgUpdateHexValue();
 
 	bp.x += 40;
 	bp.y += 26;
@@ -974,13 +974,13 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdateHexValue()
 		if (hexval[i] > 57) hexval[i] = 'a' + (hexval[i] - 58);
 	}
 
-	if (hueslider	!= NIL)	hueslider->SetValue(acthue);
-	if (satslider	!= NIL)	satslider->SetValue(actsat);
-	if (valslider	!= NIL)	valslider->SetValue(actval);
+	hueslider->SetValue(acthue);
+	satslider->SetValue(actsat);
+	valslider->SetValue(actval);
 
-	if (redslider	!= NIL)	redslider->SetValue(actred);
-	if (greenslider != NIL)	greenslider->SetValue(actgreen);
-	if (blueslider	!= NIL)	blueslider->SetValue(actblue);
+	redslider->SetValue(actred);
+	greenslider->SetValue(actgreen);
+	blueslider->SetValue(actblue);
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgHexValueChanged()

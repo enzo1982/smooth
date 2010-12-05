@@ -52,7 +52,7 @@
 #endif
 
 // Basic includes
-#include "v8-main.h"
+#include "v8/v8.h"
 #include "globals.h"
 #include "checks.h"
 #include "allocation.h"
@@ -92,7 +92,8 @@ class V8 : public AllStatic {
   static void SetFatalError();
 
   // Report process out of memory. Implementation found in api.cc.
-  static void FatalProcessOutOfMemory(const char* location);
+  static void FatalProcessOutOfMemory(const char* location,
+                                      bool take_snapshot = false);
 
   // Random number generation support. Not cryptographically safe.
   static uint32_t Random();

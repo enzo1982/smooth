@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,14 +11,16 @@
 #include <smooth/system/timer.h>
 #include <smooth/system/backends/win32/timerwin32.h>
 
-S::System::TimerBackend *CreateTimerWin32()
+S::System::TimerBackend *CreateTimerWin32(S::System::Timer *timer)
 {
-	return new S::System::TimerWin32();
+	return new S::System::TimerWin32(timer);
 }
 
 S::Int	 timerWin32Tmp = S::System::TimerBackend::SetBackend(&CreateTimerWin32);
 
-S::System::TimerWin32::TimerWin32()
+S::Array<S::Int>	 S::System::TimerWin32::handles;
+
+S::System::TimerWin32::TimerWin32(Timer *timer) : TimerBackend(timer)
 {
 	type = TIMER_WIN32;
 
@@ -36,6 +38,8 @@ S::Int S::System::TimerWin32::Start(Int interval)
 
 	timerid = SetTimer(NIL, 0, interval, &TimerProc);
 
+	handles.Add(thisTimer->GetHandle(), timerid);
+
 	return Success();
 }
 
@@ -44,6 +48,8 @@ S::Int S::System::TimerWin32::Stop()
 	if (timerid == -1) return Error();
 
 	KillTimer(NIL, timerid);
+
+	handles.Remove(timerid);
 
 	timerid = -1;
 
@@ -59,21 +65,7 @@ S::Int S::System::TimerWin32::GetID() const
 
 void WINAPI S::System::TimerWin32::TimerProc(HWND wnd, UINT message, UINT_PTR timerid, DWORD time)
 {
-	for (Int i = 0; i < Object::GetNOfObjects(); i++)
-	{
-		Object *object = Object::GetNthObject(i);
+	Timer	*timer = (Timer *) Object::GetObject(handles.Get((Int) timerid), Timer::classID);
 
-		if (object != NIL)
-		{
-			if (object->GetObjectType() == Timer::classID)
-			{
-				if (((Timer *) object)->GetID() == (Int) timerid)
-				{
-					((Timer *) object)->onInterval.Emit();
-
-					return;
-				}
-			}
-		}
-	}
+	if (timer != NIL) timer->onInterval.Emit();
 }

@@ -72,6 +72,11 @@ S::Int S::Threads::Thread::GetThreadID() const
 	return backend->GetThreadID();
 }
 
+S::Bool S::Threads::Thread::IsCurrentThread() const
+{
+	return backend->IsCurrentThread();
+}
+
 S::Int S::Threads::Thread::Start()
 {
 	if ((status == THREAD_CREATED && !initializing) || status == THREAD_STARTME || (flags & THREAD_WAITFLAG_START))
@@ -98,7 +103,7 @@ S::Int S::Threads::Thread::Stop()
 {
 	if (status == THREAD_RUNNING)
 	{
-		if (backend->Self() == backend->GetSystemThread())
+		if (IsCurrentThread())
 		{
 			status = THREAD_STOPPED_SELF;
 

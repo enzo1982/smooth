@@ -48,6 +48,11 @@ S::Int S::Threads::ThreadPOSIX::GetThreadID() const
 	return thread - (pthread_t *) NIL;
 }
 
+S::Bool S::Threads::ThreadPOSIX::IsCurrentThread() const
+{
+	return pthread_equal(pthread_self(), *thread);
+}
+
 S::Int S::Threads::ThreadPOSIX::Start(Void (*threadProc)(Void *), Void *threadParam)
 {
 	Stop();
@@ -86,11 +91,4 @@ S::Void S::Threads::ThreadPOSIX::Exit()
 	thread = NIL;
 
 	pthread_exit(0);
-}
-
-S::Void *S::Threads::ThreadPOSIX::Self() const
-{
-	pthread_t	 thisThread = pthread_self();
-
-	return (Void *) thisThread;
 }

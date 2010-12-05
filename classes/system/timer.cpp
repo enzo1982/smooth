@@ -15,7 +15,7 @@ const S::Short	 S::System::Timer::classID = S::Object::RequestClassID();
 
 S::System::Timer::Timer()
 {
-	backend = TimerBackend::CreateBackendInstance();
+	backend = TimerBackend::CreateBackendInstance(this);
 
 	type = classID;
 

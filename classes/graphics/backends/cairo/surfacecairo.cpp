@@ -15,7 +15,7 @@
 #include <smooth/misc/math.h>
 
 #ifdef __WIN32__
-#	include <cairowin/cairo-win32.h>
+#	include <cairo/cairo-win32.h>
 #	include <fribidi.h>
 #else
 	using namespace X11;
@@ -23,6 +23,10 @@
 #	include <cairo/cairo-xlib.h>
 #	include <pango/pangocairo.h>
 #	include <smooth/backends/xlib/backendxlib.h>
+#endif
+
+#ifndef CAIRO_OPERATOR_DIFFERENCE
+#	define CAIRO_OPERATOR_DIFFERENCE CAIRO_OPERATOR_XOR
 #endif
 
 S::GUI::SurfaceBackend *CreateSurfaceCairo(S::Void *iSurface, const S::GUI::Size &maxSize)
@@ -317,8 +321,13 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 
 	/* Adjust to new Cairo 1.10 behaviour.
 	 */
-	if (pos1.x == pos2.x) { pos1.x++; pos2.x++; }
-	if (pos1.y == pos2.y) { pos1.y++; pos2.y++; }
+#ifndef __APPLE__
+	if (cairo_version() >= CAIRO_VERSION_ENCODE(1,10,0))
+	{
+		if (pos1.x == pos2.x) { pos1.x++; pos2.x++; }
+		if (pos1.y == pos2.y) { pos1.y++; pos2.y++; }
+	}
+#endif
 
 	if (rightToLeft.GetRightToLeft() && pos1.y == pos2.y) { pos1.x++; pos2.x++; }
 

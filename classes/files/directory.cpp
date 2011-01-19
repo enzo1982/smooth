@@ -10,11 +10,18 @@
 
 #include <smooth/files/directory.h>
 
-#ifndef __WIN32__
+#ifdef __WIN32__
+#	include <windows.h>
+#else
 #	include <glob.h>
 #	include <unistd.h>
 #	include <stdio.h>
+#	include <limits.h>
 #	include <sys/stat.h>
+
+#	ifndef GLOB_ONLYDIR
+#		define GLOB_ONLYDIR 0
+#	endif
 #endif
 
 char	*S::Directory::directoryDelimiter = NIL;
@@ -459,33 +466,27 @@ S::Directory S::Directory::GetActiveDirectory()
 #ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
-		wchar_t	*bufferw = new wchar_t [32000];
+		Buffer<wchar_t>	 buffer(32768);
 
-		GetCurrentDirectoryW(32000, bufferw);
+		GetCurrentDirectoryW(buffer.Size(), buffer);
 
-		dir = bufferw;
-
-		delete [] bufferw;
+		dir = buffer;
 	}
 	else
 	{
-		char	*buffera = new char [MAX_PATH];
+		Buffer<char>	 buffer(MAX_PATH);
 
-		GetCurrentDirectoryA(MAX_PATH, buffera);
+		GetCurrentDirectoryA(buffer.Size(), buffer);
 
-		dir = buffera;
-
-		delete [] buffera;
+		dir = buffer;
 	}
 #else
-	char	*buffer = new char [MAX_PATH];
+	Buffer<char>	 buffer(PATH_MAX);
 
-	if (getcwd(buffer, MAX_PATH) != NIL)
+	if (getcwd(buffer, buffer.Size()) != NIL)
 	{
 		dir = buffer;
 	}
-
-	delete [] buffer;
 #endif
 
 	return Directory(NIL, dir);

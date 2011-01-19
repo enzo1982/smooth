@@ -1,33 +1,33 @@
-########## smooth directory makefile ##########
+########## smooth directory $(MAKE)file ##########
 
 all:
-	cd backends && make
-	cd basic && make
-	cd errors && make
-	cd files && make
-	cd graphics && make
-	cd gui && make
-	cd i18n && make
-	cd input && make
-	cd io && make
-	cd misc && make
-	cd net && make
-	cd system && make
-	cd threads && make
-	cd xml && make
+	cd backends && $(MAKE)
+	cd basic && $(MAKE)
+	cd errors && $(MAKE)
+	cd files && $(MAKE)
+	cd graphics && $(MAKE)
+	cd gui && $(MAKE)
+	cd i18n && $(MAKE)
+	cd input && $(MAKE)
+	cd io && $(MAKE)
+	cd misc && $(MAKE)
+	cd net && $(MAKE)
+	cd system && $(MAKE)
+	cd threads && $(MAKE)
+	cd xml && $(MAKE)
 
 clean:
-	cd backends && make clean
-	cd basic && make clean
-	cd errors && make clean
-	cd files && make clean
-	cd graphics && make clean
-	cd gui && make clean
-	cd i18n && make clean
-	cd input && make clean
-	cd io && make clean
-	cd misc && make clean
-	cd net && make clean
-	cd system && make clean
-	cd threads && make clean
-	cd xml && make clean
+	cd backends && $(MAKE) clean
+	cd basic && $(MAKE) clean
+	cd errors && $(MAKE) clean
+	cd files && $(MAKE) clean
+	cd graphics && $(MAKE) clean
+	cd gui && $(MAKE) clean
+	cd i18n && $(MAKE) clean
+	cd input && $(MAKE) clean
+	cd io && $(MAKE) clean
+	cd misc && $(MAKE) clean
+	cd net && $(MAKE) clean
+	cd system && $(MAKE) clean
+	cd threads && $(MAKE) clean
+	cd xml && $(MAKE) clean

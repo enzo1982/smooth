@@ -15,7 +15,9 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 
-#ifndef __WIN32__
+#ifdef __WIN32__
+#	include <windows.h>
+#else
 #	include <stdlib.h>
 #endif
 

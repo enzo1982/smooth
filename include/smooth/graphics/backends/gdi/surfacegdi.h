@@ -11,6 +11,8 @@
 #ifndef H_OBJSMOOTH_SURFACEGDI
 #define H_OBJSMOOTH_SURFACEGDI
 
+#include <windows.h>
+
 namespace smooth
 {
 	namespace GUI

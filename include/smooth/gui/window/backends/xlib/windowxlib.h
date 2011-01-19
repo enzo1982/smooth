@@ -22,6 +22,22 @@ namespace smooth
 #include "../windowbackend.h"
 #include "../../../../graphics/forms/rect.h"
 
+namespace X11
+{
+	extern "C"
+	{
+#		include <X11/Xlib.h>
+#		include <X11/Xutil.h>
+#		include <X11/Xatom.h>
+#		include <X11/Xmu/Atoms.h>
+
+#		undef True
+#		undef False
+#		undef Bool
+#		undef Success
+	}
+};
+
 namespace smooth
 {
 	namespace GUI
@@ -54,6 +70,8 @@ namespace smooth
 				String					 selection;
 
 				Void					 UpdateWMNormalHints();
+
+				Key					 ConvertKey(Int);
 			public:
 									 WindowXLib(Void * = NIL);
 									~WindowXLib();
@@ -76,6 +94,8 @@ namespace smooth
 				Int					 Hide();
 
 				Int					 SetMetrics(const Point &, const Size &);
+
+				Int					 Raise();
 			accessors:
 				Void					 SetSelection(const String &nSelection) { selection = nSelection; }
 		};

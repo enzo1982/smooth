@@ -21,6 +21,10 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/system/multimonitor.h>
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 S::Int	 S::GUI::Dialogs::MessageDlg::nOfMessageBoxes = 0;
 S::Bool	 S::GUI::Dialogs::MessageDlg::defaultRightToLeft = False;
 

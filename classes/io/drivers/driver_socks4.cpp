@@ -10,12 +10,11 @@
 
 #include <smooth/io/drivers/driver_socks4.h>
 
-#if !defined __WIN32__ || defined __WINE__
+#if defined __WIN32__
+#	include <windows.h>
+#else
 #	include <unistd.h>
-
-#	if !defined __WINE__
-#		include <arpa/inet.h>
-#	endif
+#	include <arpa/inet.h>
 #endif
 
 S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const String &hostName, Int port) : Driver()

@@ -205,9 +205,7 @@ S::Void S::GUI::PopupMenuEntry::OnMouseOver()
 
 	if (Binary::IsFlagSet(owner->GetFlags(), MB_POPUPOPEN))
 	{
-#ifdef __WIN32__
-		SetActiveWindow((HWND) container->GetContainerWindow()->GetSystemWindow());
-#endif
+		container->GetContainerWindow()->Raise();
 
 		OpenPopupMenu();
 	}
@@ -307,10 +305,7 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 		else
 		{
 			if (!container->GetContainerWindow()->IsMouseOn(Rect(Point(), container->GetSize()))) owner->internalRequestClose.Emit();
-
-#ifdef __WIN32__
-			else										      SetActiveWindow((HWND) container->GetContainerWindow()->GetSystemWindow());
-#endif
+			else										      container->GetContainerWindow()->Raise();
 		}
 	}
 }

@@ -11,16 +11,22 @@
 #ifndef H_OBJSMOOTH_I18N_CHARSET_DETECTOR_INTERNAL
 #define H_OBJSMOOTH_I18N_CHARSET_DETECTOR_INTERNAL
 
-#include "../definitions.h"
+#if defined __WIN32__ || defined __APPLE__ || defined __linux__
+#	include <nsucd/support/nscore.h>
+#	include <nsucd/nsUniversalDetector.h>
+#endif
 
-#include <nsucd/support/nscore.h>
-#include <nsucd/nsUniversalDetector.h>
+#include "../definitions.h"
 
 namespace smooth
 {
 	namespace I18n
 	{
+#if defined __WIN32__ || defined __APPLE__ || defined __linux__
 		class CharsetDetectorInternal : public nsUniversalDetector
+#else
+		class CharsetDetectorInternal
+#endif
 		{
 			private:
 				String		 detectedCharset;

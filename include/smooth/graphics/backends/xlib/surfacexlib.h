@@ -21,6 +21,19 @@ namespace smooth
 
 #include "../surfacebackend.h"
 
+namespace X11
+{
+	extern "C"
+	{
+#		include <X11/Xlib.h>
+
+#		undef True
+#		undef False
+#		undef Bool
+#		undef Success
+	}
+};
+
 namespace smooth
 {
 	namespace GUI

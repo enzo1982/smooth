@@ -1,23 +1,23 @@
 ########## smooth directory makefile ##########
 
 all:
-	cd beatclock && make
-	cd mditest && make
-	cd test && make
-	cd testkey && make
+	cd beatclock && $(MAKE)
+	cd mditest && $(MAKE)
+	cd test && $(MAKE)
+	cd testkey && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
-	cd v8test && make
+	cd v8test && $(MAKE)
 endif
-#	cd widgettest && make
-	cd xul && make
+#	cd widgettest && $(MAKE)
+	cd xul && $(MAKE)
 
 clean:
-	cd beatclock && make clean
-	cd mditest && make clean
-	cd test && make clean
-	cd testkey && make clean
+	cd beatclock && $(MAKE) clean
+	cd mditest && $(MAKE) clean
+	cd test && $(MAKE) clean
+	cd testkey && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)
-	cd v8test && make clean
+	cd v8test && $(MAKE) clean
 endif
-#	cd widgettest && make clean
-	cd xul && make clean
+#	cd widgettest && $(MAKE) clean
+	cd xul && $(MAKE) clean

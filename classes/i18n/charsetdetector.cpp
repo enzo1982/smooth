@@ -8,8 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/i18n/charsetdetector.h>
 #include <smooth/i18n/charsetdetector_internal.h>
+#include <smooth/i18n/charsetdetector.h>
 
 S::I18n::CharsetDetector::CharsetDetector()
 {

@@ -7,8 +7,8 @@ SMOOTH_PATH = ../..
 OBJECTS	  = console.o cpu.o dynamicloader.o event.o multimonitor.o system.o timer.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd backends && make
-CLEANCMD1 = cd backends && make clean
+ALLCMD1   = cd backends && $(MAKE)
+CLEANCMD1 = cd backends && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

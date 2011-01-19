@@ -4,6 +4,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 
 - window.cpp		- renamed doQuit to doClose
 			- removed onPeek
+			- removed support for the WF_SYSTEMMODAL and WF_APPTOPMOST flags
 - listbox.cpp		- show partially visible entries again
 - listentry.cpp		- entries in a subordinate list now respect the outer lists columns
 - combobox.cpp		- improved drop-down list size adjustment
@@ -47,7 +48,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - improved international language support
 - removed Extended<> template
 - removed Pointer<> template
-- improved Linux support
+- improved Linux, FreeBSD and Mac OS X support
 - upgraded libbzip2 to version 1.0.6
 - upgraded fribidi2 to version 0.19.2
 - upgraded libiconv to version 1.13.1

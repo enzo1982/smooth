@@ -12,7 +12,7 @@
 #include <smooth/graphics/font.h>
 
 #ifdef __WIN32__
-#	include <cairowin/cairo-win32.h>
+#	include <cairo/cairo-win32.h>
 #	include <fribidi.h>
 #else
 	using namespace X11;

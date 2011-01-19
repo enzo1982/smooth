@@ -12,6 +12,10 @@
 #include <time.h>
 #include "edit_component.h"
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 using namespace smooth::GUI::Dialogs;
 
 Designer_EditComponent::Designer_EditComponent(Designer *des, String name)

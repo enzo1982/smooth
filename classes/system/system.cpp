@@ -22,6 +22,7 @@
 #	include <pwd.h>
 #	include <stdlib.h>
 #	include <string.h>
+#	include <limits.h>
 #endif
 
 S::Int S::System::System::nextGUID	= 0;
@@ -75,24 +76,33 @@ S::Bool S::System::System::Sleep(UnsignedInt mSeconds)
 
 S::Bool S::System::System::OpenURL(const String &url)
 {
-#ifdef __WIN32__
+#if defined __WIN32__
 	if (Setup::enableUnicode) ShellExecuteW(NULL, (wchar_t *) L"open", url, NULL, NULL, 0);
 	else			  ShellExecuteA(NULL, "open", url, NULL, NULL, 0);
+#elif defined __APPLE__
+	if (!fork())
+	{
+		execl("/usr/bin/open", "open", (char *) url, NULL);
+		exit(0);
+	}
 #else
-	static const char	*browsers[] = { "firefox", "konqueror", "opera", "epiphany", "mozilla", "netscape" };
+	/* Try the open commands from freedesktop.org and the Gnome and
+	 * KDE desktops first, then try some widely used browsers. 
+	 */
+	static const char	*browsers[] = { "xdg-open", "gnome-open", "kde-open",
+						"firefox", "safari", "chrome", "opera", "mozilla", "netscape", "epiphany", "konqueror",
+						NIL };
 
 	String	 command;
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; browsers[i] != NIL; i++)
 	{
 		if (i > 0) command.Append(" || ");
 
 		command.Append(browsers[i]).Append(" \"").Append(url).Append("\"");
 	}
 
-	pid_t	 pid = fork();
-
-	if (pid == 0)
+	if (!fork())
 	{
 		execl("/bin/sh", "sh", "-c", (char *) command, NULL);
 		exit(0);
@@ -109,23 +119,19 @@ S::String S::System::System::GetWindowsRootDirectory()
 #ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
-		wchar_t	*bufferw = new wchar_t [MAX_PATH];
+		Buffer<wchar_t>	 buffer(32768);
 
-		GetWindowsDirectoryW(bufferw, MAX_PATH);
+		GetWindowsDirectoryW(buffer, buffer.Size());
 
-		windowsDir = bufferw;
-
-		delete [] bufferw;
+		windowsDir = buffer;
 	}
 	else
 	{
-		char	*buffera = new char [MAX_PATH];
+		Buffer<char>	 buffer(MAX_PATH);
 
-		GetWindowsDirectoryA(buffera, MAX_PATH);
+		GetWindowsDirectoryA(buffer, buffer.Size());
 
-		windowsDir = buffera;
-
-		delete [] buffera;
+		windowsDir = buffer;
 	}
 #else
 	windowsDir = NIL;
@@ -149,14 +155,12 @@ S::String S::System::System::GetProgramFilesDirectory()
 		/* We need to use the ANSI version of RegQueryValueEx, because
 		 * the Unicode version is not compatible with MSLU.
 		 */
-		DWORD	 size = MAX_PATH;
-		char	*buffer = new char [size];
+		DWORD		 size = MAX_PATH;
+		Buffer<char>	 buffer(size);
 
-		RegQueryValueExA(currentVersion, String("ProgramFilesDir"), 0, NIL, (BYTE *) buffer, &size);
+		RegQueryValueExA(currentVersion, String("ProgramFilesDir"), 0, NIL, (BYTE *) (char *) buffer, &size);
 
 		programsDir = buffer;
-
-		delete [] buffer;
 
 		RegCloseKey(currentVersion);
 	}
@@ -168,23 +172,19 @@ S::String S::System::System::GetProgramFilesDirectory()
 		 */
 		if (Setup::enableUnicode)
 		{
-			wchar_t	*bufferw = new wchar_t [MAX_PATH];
+			Buffer<wchar_t>	 buffer(MAX_PATH);
 
-			ExpandEnvironmentStringsW(String("%ProgramFiles%"), bufferw, MAX_PATH);
+			ExpandEnvironmentStringsW(String("%ProgramFiles%"), buffer, buffer.Size());
 
-			programsDir = bufferw;
-
-			delete [] bufferw;
+			programsDir = buffer;
 		}
 		else
 		{
-			char	*buffera = new char [MAX_PATH];
+			Buffer<char>	 buffer(MAX_PATH);
 
-			ExpandEnvironmentStringsA(String("%ProgramFiles%"), buffera, MAX_PATH);
+			ExpandEnvironmentStringsA(String("%ProgramFiles%"), buffer, buffer.Size());
 
-			programsDir = buffera;
-
-			delete [] buffera;
+			programsDir = buffer;
 		}
 	}
 #else
@@ -209,23 +209,19 @@ S::String S::System::System::GetApplicationDataDirectory()
 
 	if (Setup::enableUnicode)
 	{
-		wchar_t	*bufferw = new wchar_t [MAX_PATH];
+		Buffer<wchar_t>	 buffer(MAX_PATH);
 
-		SHGetPathFromIDListW(idlist, bufferw);
+		SHGetPathFromIDListW(idlist, buffer);
 
-		configDir = bufferw;
-
-		delete [] bufferw;
+		configDir = buffer;
 	}
 	else
 	{
-		char	*buffera = new char [MAX_PATH];
+		Buffer<char>	 buffer(MAX_PATH);
 
-		SHGetPathFromIDListA(idlist, buffera);
+		SHGetPathFromIDListA(idlist, buffer);
 
-		configDir = buffera;
-
-		delete [] buffera;
+		configDir = buffer;
 	}
 
 	CoTaskMemFree(idlist);
@@ -253,23 +249,19 @@ S::String S::System::System::GetPersonalFilesDirectory()
 
 	if (Setup::enableUnicode)
 	{
-		wchar_t	*bufferw = new wchar_t [MAX_PATH];
+		Buffer<wchar_t>	 buffer(MAX_PATH);
 
-		SHGetPathFromIDListW(idlist, bufferw);
+		SHGetPathFromIDListW(idlist, buffer);
 
-		personalDir = bufferw;
-
-		delete [] bufferw;
+		personalDir = buffer;
 	}
 	else
 	{
-		char	*buffera = new char [MAX_PATH];
+		Buffer<char>	 buffer(MAX_PATH);
 
-		SHGetPathFromIDListA(idlist, buffera);
+		SHGetPathFromIDListA(idlist, buffer);
 
-		personalDir = buffera;
-
-		delete [] buffera;
+		personalDir = buffer;
 	}
 
 	CoTaskMemFree(idlist);
@@ -296,13 +288,11 @@ S::String S::System::System::GetTempDirectory()
 	/* We need to use the ANSI version of GetTempPath, because
 	 * the Unicode version is not compatible with MSLU.
 	 */
-	char	*buffera = new char [MAX_PATH];
+	Buffer<char>	 buffer(MAX_PATH);
 
-	GetTempPathA(MAX_PATH, buffera);
+	GetTempPathA(buffer.Size(), buffer);
 
-	tempDir = buffera;
-
-	delete [] buffera;
+	tempDir = buffer;
 #else
 	tempDir = "/var/tmp";
 #endif

@@ -24,6 +24,7 @@
 #include <fribidi.h>
 
 #ifdef __WIN32__
+#	include <windows.h>
 #	include <imm.h>
 #endif
 
@@ -662,27 +663,27 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 	switch (keyCode)
 	{
-		case VK_LEFT:
-		case VK_RIGHT:
-		case VK_HOME:
-		case VK_END:
+		case SK_LEFT:
+		case SK_RIGHT:
+		case SK_HOME:
+		case SK_END:
 			MarkText(-1, -1);
 
 			{
-				Bool	 isLeft	 = ((keyCode == VK_LEFT  && !IsRightToLeft()) || (keyCode == VK_RIGHT && IsRightToLeft()));
-				Bool	 isRight = ((keyCode == VK_RIGHT && !IsRightToLeft()) || (keyCode == VK_LEFT  && IsRightToLeft()));
+				Bool	 isLeft	 = ((keyCode == SK_LEFT  && !IsRightToLeft()) || (keyCode == SK_RIGHT && IsRightToLeft()));
+				Bool	 isRight = ((keyCode == SK_RIGHT && !IsRightToLeft()) || (keyCode == SK_LEFT  && IsRightToLeft()));
 
 				if	(isLeft)		{ if (promptPos == 0)		  break; newPos = promptPos - 1; }
 				else if (isRight)		{ if (promptPos >= text.Length()) break; newPos = promptPos + 1; }
-				else if (keyCode == VK_HOME)	{ if (promptPos == 0)		  break; newPos = 0;		 }
-				else if (keyCode == VK_END)	{ if (promptPos >= text.Length()) break; newPos = text.Length(); }
+				else if (keyCode == SK_HOME)	{ if (promptPos == 0)		  break; newPos = 0;		 }
+				else if (keyCode == SK_END)	{ if (promptPos >= text.Length()) break; newPos = text.Length(); }
 			}
 
 			SetCursorPos(newPos);
 
 			break;
-		case VK_UP:
-		case VK_DOWN:
+		case SK_UP:
+		case SK_DOWN:
 			if (!Binary::IsFlagSet(GetFlags(), CF_MULTILINE)) break;
 
 			linePos = promptPos;
@@ -693,7 +694,7 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 				if (text[i] == '\n') { linePos -= (i + 1); break; }
 			}
 
-			if (keyCode == VK_UP)
+			if (keyCode == SK_UP)
 			{
 				if (i == 0) newPos = 0;
 
@@ -723,7 +724,7 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 			SetCursorPos(newPos);
 
 			break;
-		case VK_RETURN:
+		case SK_RETURN:
 			if (!IsActive()) break;
 
 			if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
@@ -746,16 +747,16 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 			}
 
 			break;
-		case VK_BACK:
-		case VK_DELETE:
+		case SK_BACK:
+		case SK_DELETE:
 			if (!IsActive()) break;
 
 			if (markStart != markEnd) { DeleteSelectedText(); break; }
 
-			if (promptPos == 0	       && keyCode == VK_BACK)	break;
-			if (promptPos == text.Length() && keyCode == VK_DELETE)	break;
+			if (promptPos == 0	       && keyCode == SK_BACK)	break;
+			if (promptPos == text.Length() && keyCode == SK_DELETE)	break;
 
-			if (keyCode == VK_BACK)
+			if (keyCode == SK_BACK)
 			{
 				markStart	= promptPos - 1;
 				markEnd		= promptPos;
@@ -990,6 +991,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 			lFont.lfStrikeOut	= false;
 			lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
 			lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
+
 			lFont.lfCharSet		= DEFAULT_CHARSET;
 			lFont.lfQuality		= DEFAULT_QUALITY;
 			lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;

@@ -7,14 +7,14 @@ SMOOTH_PATH = ../../..
 OBJECTS	  = bitmapbackend.o fontbackend.o surfacebackend.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd cairo && make
-ALLCMD2   = cd gdi && make
-ALLCMD3   = cd gdiplus && make
-ALLCMD4   = cd xlib && make
-CLEANCMD1 = cd cairo && make clean
-CLEANCMD2 = cd gdi && make clean
-CLEANCMD3 = cd gdiplus && make clean
-CLEANCMD4 = cd xlib && make clean
+ALLCMD1   = cd cairo && $(MAKE)
+ALLCMD2   = cd gdi && $(MAKE)
+ALLCMD3   = cd gdiplus && $(MAKE)
+ALLCMD4   = cd xlib && $(MAKE)
+CLEANCMD1 = cd cairo && $(MAKE) clean
+CLEANCMD2 = cd gdi && $(MAKE) clean
+CLEANCMD3 = cd gdiplus && $(MAKE) clean
+CLEANCMD4 = cd xlib && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

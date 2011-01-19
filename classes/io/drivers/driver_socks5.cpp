@@ -10,7 +10,9 @@
 
 #include <smooth/io/drivers/driver_socks5.h>
 
-#if !defined __WIN32__ || defined __WINE__
+#if defined __WIN32__
+#	include <windows.h>
+#else
 #	include <unistd.h>
 #endif
 

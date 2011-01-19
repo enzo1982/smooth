@@ -2,13 +2,15 @@
 
 include $(SMOOTH_PATH)/Makefile-options
 
-CC	 = gcc
-CCOPTS	 = -g0 -Wall -Os -ffast-math -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
-#CCOPTS	 = -g0 -Wall -Os -ffast-math -I$(SMOOTH_PATH)/include -include $(SMOOTH_PATH)/include/smooth.h -DUNICODE -D_UNICODE $(MYCCOPTS)
-RC	 = windres
-RCOPTS	 = -DSMOOTH_DLL -O coff
-LD	 = gcc
-LDOPTS	 = -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
+CC	   = gcc
+CCOPTS	   = -g0 -Wall -Os -ffast-math -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
+#CCOPTS	   = -g0 -Wall -Os -ffast-math -I$(SMOOTH_PATH)/include -include $(SMOOTH_PATH)/include/smooth.h -DUNICODE -D_UNICODE $(MYCCOPTS)
+RC	   = windres
+RCOPTS	   = -DSMOOTH_DLL -O coff
+LD	   = gcc
+LDOPTS	   = -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
+STRIP	   = strip
+STRIP_OPTS = --strip-all
 
 ifndef GLOBALDLL
 	LDOPTS += -lsmooth
@@ -25,15 +27,19 @@ else
 endif
 endif
 
-	CCOPTS += -I$(SMOOTH_PATH)/include/libjpeg -I$(SMOOTH_PATH)/include/libpng
-
-ifeq ($(BUILD_CAIRO),True)
-	CCOPTS += -I$(SMOOTH_PATH)/include/cairowin
-endif
+	CCOPTS += -I$(SMOOTH_PATH)/include/support
 else
 	LDOPTS += -Wl,-rpath,.
 
-	CCOPTS += -I/usr/include/cairo -I/usr/include/atk-1.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0
+ifeq ($(BUILD_OSX),True)
+	STRIP = true
+
+	LDOPTS += -L/opt/local/lib
+	CCOPTS += -I/opt/local/include
+else
+	LDOPTS += -L/usr/local/lib
+	CCOPTS += -I/usr/local/include
+endif
 endif
 
 ifneq ($(EXCEPTION),True)
@@ -51,7 +57,11 @@ ifndef GLOBALEXE
 ifndef GLOBALDLL
 ifndef LOCALEXE
 ifndef LOCALDLL
-	CCOPTS += -DSMOOTH_DLL -DLIBICONV_PLUG -DLIBXML_STATIC
+	CCOPTS += -DSMOOTH_DLL
+
+ifeq ($(BUILD_WIN32),True)
+	CCOPTS += -DLIBICONV_PLUG -DLIBXML_STATIC
+endif
 endif
 endif
 endif
@@ -61,7 +71,7 @@ endif
 CPPC	 = g++
 CPPCOPTS = $(CCOPTS)
 
-.SUFFIXES: .rc
+.SUFFIXES: .mm .rc
 
 TARGETS =
 
@@ -117,6 +127,9 @@ clean:
 .cpp.o:
 	$(CPPC) $(CPPCOPTS) -c $< -o $@
 
+.mm.o:
+	$(CPPC) $(CPPCOPTS) -c $< -o $@
+
 .rc.o:
 	$(RC) $(RCOPTS) $< -o $@
 
@@ -128,13 +141,13 @@ endif
 ifdef GLOBALEXE
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE): $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
-	strip --strip-all $@
+	$(STRIP) $(STRIP_OPTS) $@
 endif
 
 ifdef GLOBALDLL
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED): $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
-	strip --strip-all $@
+	$(STRIP) $(STRIP_OPTS) $@
 
 ifeq ($(BUILD_WIN32),True)
 $(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB): $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED)
@@ -144,13 +157,13 @@ endif
 ifdef LOCALEXE
 $(LOCALEXE)$(EXECUTABLE): $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
-	strip --strip-all $@
+	$(STRIP) $(STRIP_OPTS) $@
 endif
 
 ifdef LOCALDLL
 $(LOCALDLL)$(SHARED): $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
-	strip --strip-all $@
+	$(STRIP) $(STRIP_OPTS) $@
 
 ifeq ($(BUILD_WIN32),True)
 $(IMPORTLIB): $(LOCALDLL)$(SHARED)

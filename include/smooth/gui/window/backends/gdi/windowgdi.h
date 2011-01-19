@@ -11,6 +11,8 @@
 #ifndef H_OBJSMOOTH_WINDOWGDI
 #define H_OBJSMOOTH_WINDOWGDI
 
+#include <windows.h>
+
 namespace smooth
 {
 	namespace System
@@ -66,6 +68,8 @@ namespace smooth
 
 				Bool					 minimized;
 				Bool					 maximized;
+
+				Key					 ConvertKey(Int);
 			public:
 									 WindowGDI(Void * = NIL);
 									~WindowGDI();
@@ -96,6 +100,8 @@ namespace smooth
 
 				Int					 Maximize();
 				Int					 Restore();
+
+				Int					 Raise();
 
 				static Void				 InitMouseNotifier();
 				static Void				 FreeMouseNotifier();

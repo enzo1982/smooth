@@ -63,7 +63,16 @@ S::Int S::Threads::MutexPOSIX::Lock()
 
 		mutex = new pthread_mutex_t;
 
-		pthread_mutex_init(mutex, &mutexattr);
+		if (pthread_mutex_init(mutex, &mutexattr) != 0)
+		{
+			pthread_mutexattr_destroy(&mutexattr);
+
+			delete mutex;
+
+			mutex = NIL;
+
+			return Error();
+		}
 
 		pthread_mutexattr_destroy(&mutexattr);
 	}

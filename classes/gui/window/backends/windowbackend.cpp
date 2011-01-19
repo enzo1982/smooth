@@ -146,6 +146,11 @@ S::Int S::GUI::WindowBackend::Restore()
 	return Success();
 }
 
+S::Int S::GUI::WindowBackend::Raise()
+{
+	return Success();
+}
+
 const S::GUI::Rect &S::GUI::WindowBackend::GetUpdateRect()
 {
 	return updateRect;

@@ -5,7 +5,7 @@ SMOOTH_PATH = ../..
 
 # Change these variables to fit your project:
 GLOBALLIB   = libz.a
-MYCCOPTS    = -I. -I$(SMOOTH_PATH)/include/libz
+MYCCOPTS    = -I. -I$(SMOOTH_PATH)/include/support/libz
 
 # Enter object files here:
 OBJECTS	    = adler32.o compress.o crc32.o deflate.o infback.o inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o

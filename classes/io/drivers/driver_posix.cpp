@@ -16,7 +16,8 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#if defined __WIN32__ && !defined __WINE__
+#if defined __WIN32__
+#	include <windows.h>
 #	include <io.h>
 #else
 #	include <unistd.h>
@@ -26,7 +27,12 @@
 #	define _close close
 #	define _read read
 #	define _write write
-#	define _lseeki64 lseek64
+
+#	ifdef __linux__
+#		define _lseeki64 lseek64
+#	else
+#		define _lseeki64 lseek
+#	endif
 
 #	ifndef O_BINARY
 #		define O_BINARY	0

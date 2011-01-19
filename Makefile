@@ -19,10 +19,10 @@ ifeq ($(BUILD_WIN32),True)
 endif
 endif
 
-LIBS += -lfribidi -lbz2 -lxml2 -lcpuid -ljpeg -lpng -lz -lnsucd -lstdc++
+LIBS += -lfribidi -lbz2 -lxml2 -lcpuid -ljpeg -lpng -lz -lstdc++
 
 ifeq ($(BUILD_WIN32),True)
-	LIBS += -lws2_32 -limm32 -lole32
+	LIBS += -lnsucd -lws2_32 -limm32 -lole32
 
 ifeq ($(BUILD_GDIPLUS),True)
 	LIBS += -lgdiplus
@@ -32,14 +32,28 @@ ifeq ($(BUILD_CAIRO),True)
 	LIBS += -lcairo.dll
 endif
 else
-	LIBS += -lcairo -lpango-1.0 -lpangocairo-1.0 -lgtk-x11-2.0 -lglib-2.0 -lpthread -lX11 -lXmu
+	LIBS += -lcairo -lpango-1.0 -lpangocairo-1.0 -lgobject-2.0 -lpthread -lX11 -lXmu
+
+ifeq ($(BUILD_OSX),True)
+	LIBS += -lnsucd -liconv
+else
+	LIBS += -lgtk-x11-2.0
+endif
+
+ifeq ($(BUILD_LINUX),True)
+	LIBS += -lnsucd
+endif
+
+ifeq ($(BUILD_FREEBSD),True)
+	LIBS += -lrt
+endif
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	DLLNAME = $(BINDIR)/smooth.dll
+	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
 else
-	DLLNAME = $(LIBDIR)/libsmooth.so
+	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
 endif
 
 LINKER = gcc
@@ -52,6 +66,16 @@ REMOVER_OPTS = -f
 
 ifeq ($(BUILD_WIN32),True)
 	LINKER_OPTS += -mwindows -Wl,--dynamicbase,--nxcompat,--kill-at,--out-implib,$(LIBNAME)
+endif
+
+ifeq ($(BUILD_FREEBSD),True)
+	LINKER_OPTS += -L/usr/local/lib
+endif
+
+ifeq ($(BUILD_OSX),True)
+	STRIP = true
+
+	LINKER_OPTS += -framework Cocoa -L/opt/local/lib -L/usr/X11/lib -Wl,-dylib_install_name,libsmooth$(SHARED)
 endif
 
 .PHONY: all headers objects programs libs install clean clean_all clean_headers doc doc-clean

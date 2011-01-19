@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -59,7 +59,14 @@ S::Int S::Threads::SemaphorePOSIX::Wait()
 	{
 		semaphore = new sem_t;
 
-		sem_init(semaphore, 0, initialValue);
+		if (sem_init(semaphore, 0, initialValue) == -1)
+		{
+			delete semaphore;
+
+			semaphore = NIL;
+
+			return Error();
+		}
 	}
 
 	sem_wait(semaphore);

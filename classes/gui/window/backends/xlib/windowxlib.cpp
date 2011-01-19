@@ -99,6 +99,74 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::GetWindowBackend(::Window wnd)
 	return NIL;
 }
 
+S::Key S::GUI::WindowXLib::ConvertKey(Int keySym)
+{
+	Key	 key = SK_OTHER;
+
+	switch (keySym)
+	{
+		case XK_Left:	   key = SK_LEFT;    break;
+		case XK_Up:	   key = SK_UP;	     break;
+		case XK_Right:	   key = SK_RIGHT;   break;
+		case XK_Down:	   key = SK_DOWN;    break;
+
+		case XK_Home:	   key = SK_HOME;    break;
+		case XK_End:	   key = SK_END;     break;
+		case XK_Insert:	   key = SK_INSERT;  break;
+		case XK_Delete:	   key = SK_DELETE;  break;
+		case XK_Prior:	   key = SK_PRIOR;   break;
+		case XK_Next:	   key = SK_NEXT;    break;
+
+		case XK_Return:	   key = SK_RETURN;  break;
+		case XK_BackSpace: key = SK_BACK;    break;
+		case XK_Tab:	   key = SK_TAB;     break;
+
+		case XK_space:	   key = SK_SPACE;   break;
+
+		case XK_Shift_L:
+		case XK_Shift_R:   key = SK_SHIFT;   break;
+
+		case XK_Control_L:
+		case XK_Control_R: key = SK_CONTROL; break;
+
+		case XK_Alt_L:
+		case XK_Alt_R:	   key = SK_ALT;     break;
+
+		case XK_Escape:	   key = SK_ESCAPE;  break;
+
+		case XK_F1:	   key = SK_F1;	     break;
+		case XK_F2:	   key = SK_F2;	     break;
+		case XK_F3:	   key = SK_F3;	     break;
+		case XK_F4:	   key = SK_F4;	     break;
+		case XK_F5:	   key = SK_F5;	     break;
+		case XK_F6:	   key = SK_F6;	     break;
+		case XK_F7:	   key = SK_F7;	     break;
+		case XK_F8:	   key = SK_F8;	     break;
+		case XK_F9:	   key = SK_F9;	     break;
+		case XK_F10:	   key = SK_F10;     break;
+		case XK_F11:	   key = SK_F11;     break;
+		case XK_F12:	   key = SK_F12;     break;
+		case XK_F13:	   key = SK_F13;     break;
+		case XK_F14:	   key = SK_F14;     break;
+		case XK_F15:	   key = SK_F15;     break;
+		case XK_F16:	   key = SK_F16;     break;
+		case XK_F17:	   key = SK_F17;     break;
+		case XK_F18:	   key = SK_F18;     break;
+		case XK_F19:	   key = SK_F19;     break;
+		case XK_F20:	   key = SK_F20;     break;
+		case XK_F21:	   key = SK_F21;     break;
+		case XK_F22:	   key = SK_F22;     break;
+		case XK_F23:	   key = SK_F23;     break;
+		case XK_F24:	   key = SK_F24;     break;
+	}
+
+	if	(keySym >= '0' && keySym <= '9') key = (Key)  keySym;
+	else if	(keySym >= 'A' && keySym <= 'Z') key = (Key)  keySym;
+	else if	(keySym >= 'a' && keySym <= 'z') key = (Key) (keySym + ('A' - 'a'));
+
+	return key;
+}
+
 S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 {
 	/* Process system events not relevant
@@ -218,7 +286,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 		case KeyPress:
-			onEvent.Call(SM_KEYDOWN, XKeycodeToKeysym(display, e->xkey.keycode, 0), 0);
+			onEvent.Call(SM_KEYDOWN, ConvertKey(XKeycodeToKeysym(display, e->xkey.keycode, 0)), 0);
 
 			/* Convert keyboard event to input string and
 			 * call SM_CHAR event for each character.
@@ -242,7 +310,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 		case KeyRelease:
-			onEvent.Call(SM_KEYUP, XKeycodeToKeysym(display, e->xkey.keycode, 0), 0);
+			onEvent.Call(SM_KEYUP, ConvertKey(XKeycodeToKeysym(display, e->xkey.keycode, 0)), 0);
 
 			break;
 
@@ -350,7 +418,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	attributes.colormap		 = CopyFromParent;
 	attributes.cursor		 = None;
 
-	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx, size.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBorderPixel | CWOverrideRedirect, &attributes);
+	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx, size.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBorderPixel | CWOverrideRedirect | CWSaveUnder, &attributes);
 
 	if (wnd != NIL)
 	{
@@ -461,7 +529,7 @@ S::Int S::GUI::WindowXLib::Show()
 {
 	if (wnd == NIL) return Success();
 
-	XMapWindow(display, wnd);
+	XMapRaised(display, wnd);
 	XFlush(display);
 
 	return Success();
@@ -485,6 +553,16 @@ S::Int S::GUI::WindowXLib::SetMetrics(const Point &nPos, const Size &nSize)
 	XFlush(display);
 
 	drawSurface->SetSize(nSize);
+
+	return Success();
+}
+
+S::Int S::GUI::WindowXLib::Raise()
+{
+	if (wnd == NIL) return Success();
+
+	XSetInputFocus(display, wnd, RevertToParent, CurrentTime);
+	XFlush(display);
 
 	return Success();
 }

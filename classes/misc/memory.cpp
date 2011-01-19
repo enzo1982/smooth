@@ -11,7 +11,7 @@
 #include <smooth/definitions.h>
 #include <smooth/misc/memory.h>
 
-#include <malloc.h>
+#include <stdlib.h>
 
 S::Memory::Memory(Int size)
 {

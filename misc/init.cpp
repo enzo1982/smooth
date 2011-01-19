@@ -17,6 +17,8 @@
 #include <smooth/graphics/font.h>
 
 #if defined __WIN32__
+#	include <smooth/init.win32.h>
+
 #	include <wtypes.h>
 #	include <shlobj.h>
 
@@ -213,6 +215,8 @@ S::Void S::GetDefaultFont()
 	else			GUI::Font::Default = "MS Sans Serif";
 
 	ReleaseDC(0, dc);
+#elif defined __APPLE__
+	GUI::Font::Default = "Arial";
 #else
 	GUI::Font::Default = "Helvetica";
 #endif

@@ -26,6 +26,8 @@
 
 #ifdef __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
+
+#	undef GetObject
 #endif
 
 S::Array<S::GUI::Window *, S::Void *>	 S::GUI::Window::windows;
@@ -351,6 +353,13 @@ S::Int S::GUI::Window::Restore()
 	return Success();
 }
 
+S::Int S::GUI::Window::Raise()
+{
+	if (created) backend->Raise();
+
+	return Success();
+}
+
 S::GUI::Point S::GUI::Window::GetRealPosition() const
 {
 	return Point(0, 0);
@@ -528,7 +537,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case WM_ACTIVATE:
-			if (LOWORD(wParam) != WA_INACTIVE && !(flags & WF_SYSTEMMODAL))
+			if (LOWORD(wParam) != WA_INACTIVE)
 			{
 				for (Int i = 0; i < windows.Length(); i++)
 				{
@@ -536,7 +545,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 					if (window->GetOrder() > GetOrder() && (window->GetFlags() & WF_MODAL))
 					{
-						SetActiveWindow((HWND) window->GetSystemWindow());
+						window->Raise();
 
 						rVal = Break;
 
@@ -628,54 +637,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				if (activate)	SetWindowPos((HWND) backend->GetSystemWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 				else		SetWindowPos((HWND) backend->GetSystemWindow(), message == SM_LOSEFOCUS ? HWND_NOTOPMOST : GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
-			}
-
-			if (flags & WF_APPTOPMOST)
-			{
-				Bool	 activate = False;
-				HWND	 actWnd = ::GetActiveWindow();
-
-				if (actWnd == (HWND) backend->GetSystemWindow()) break;
-
-				const Window	*window = GetWindow(actWnd);
-
-				if	(window == NIL)				activate = False;
-				else if (window->type == ToolWindow::classID)	break;
-				else						activate = True;
-
-				if (activate && message == WM_ACTIVATEAPP)
-				{
-					if (wParam)	activate = True;
-					else		activate = False;
-				}
-
-				if (activate) SetWindowPos((HWND) backend->GetSystemWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
-				else
-				{
-					SetWindowPos((HWND) backend->GetSystemWindow(), GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
-					SetWindowPos((HWND) backend->GetSystemWindow(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
-				}
-			}
-
-			if (flags & WF_SYSTEMMODAL && message == SM_LOSEFOCUS)
-			{
-				Bool	 activate = False;
-				HWND	 actWnd = GetForegroundWindow();
-
-				if (actWnd == (HWND) backend->GetSystemWindow()) break;
-
-				Window	*window = GetWindow(actWnd);
-
-				if	(window == NIL)				activate = True;
-				else if (window->type == ToolWindow::classID)	activate = False;
-				else if (window->GetOrder() < GetOrder())	activate = True;
-				else if (window->GetOrder() > GetOrder())	window->SetFlags(WF_SYSTEMMODAL);
-
-				if (activate)
-				{
-					SetWindowPos((HWND) backend->GetSystemWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-					SetForegroundWindow((HWND) backend->GetSystemWindow());
-				}
 			}
 
 			break;
@@ -965,9 +926,10 @@ S::Bool S::GUI::Window::IsMouseOn(const Rect &rect) const
 	{
 #ifdef __WIN32__
 		Point	 position = Input::Pointer::GetPosition();
+		POINT	 wPosition = { position.x, position.y };
 		HWND	 window = (HWND) surface->GetSystemSurface();
 
-		if (WindowFromPoint(position) != window) return False;
+		if (WindowFromPoint(wPosition) != window) return False;
 #endif
 		return True;
 	}

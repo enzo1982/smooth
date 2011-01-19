@@ -12,6 +12,7 @@
 #include <smooth/gui/window/window.h>
 
 #ifdef __WIN32__
+#	include <windows.h>
 #	include <shellapi.h>
 #endif
 

@@ -11,7 +11,7 @@
 #include <smooth/graphics/imageloader/png.h>
 #include <smooth/io/instream.h>
 
-#include <malloc.h>
+#include <stdlib.h>
 
 #include <png.h>
 

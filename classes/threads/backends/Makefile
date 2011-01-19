@@ -7,10 +7,10 @@ SMOOTH_PATH = ../../..
 OBJECTS	  = mutexbackend.o semaphorebackend.o threadbackend.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd posix && make
-ALLCMD2   = cd win32 && make
-CLEANCMD1 = cd posix && make clean
-CLEANCMD2 = cd win32 && make clean
+ALLCMD1   = cd posix && $(MAKE)
+ALLCMD2   = cd win32 && $(MAKE)
+CLEANCMD1 = cd posix && $(MAKE) clean
+CLEANCMD2 = cd win32 && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

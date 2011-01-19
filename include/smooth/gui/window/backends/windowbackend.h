@@ -81,6 +81,8 @@ namespace smooth
 
 				virtual Int			 Maximize();
 				virtual Int			 Restore();
+
+				virtual Int			 Raise();
 			accessors:
 				const Rect			&GetUpdateRect();
 			signals:

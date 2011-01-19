@@ -11,6 +11,10 @@
 #ifndef H_OBJSMOOTH_TIMERWIN32
 #define H_OBJSMOOTH_TIMERWIN32
 
+#include <windows.h>
+
+#undef GetObject
+
 namespace smooth
 {
 	namespace System

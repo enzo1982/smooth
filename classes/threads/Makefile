@@ -7,8 +7,8 @@ SMOOTH_PATH = ../..
 OBJECTS	  = mutex.o rwlock.o semaphore.o thread.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd backends && make
-CLEANCMD1 = cd backends && make clean
+ALLCMD1   = cd backends && $(MAKE)
+CLEANCMD1 = cd backends && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

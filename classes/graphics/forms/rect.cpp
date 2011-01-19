@@ -71,30 +71,6 @@ S::Bool S::GUI::Rect::operator !=(const Rect &rect) const
 	else												return False;
 }
 
-#ifdef __WIN32__
-S::GUI::Rect::operator RECT() const
-{
-	RECT	 rect;
-
-	rect.left	= left;
-	rect.top	= top;
-	rect.right	= right;
-	rect.bottom	= bottom;
-
-	return rect;
-}
-
-S::GUI::Rect &S::GUI::Rect::operator =(const RECT &rect)
-{
-	left	= rect.left;
-	top	= rect.top;
-	right	= rect.right;
-	bottom	= rect.bottom;
-
-	return *this;
-}
-#endif
-
 S::Bool S::GUI::Rect::DoRectsOverlap(const Rect &rect1, const Rect &rect2)
 {
 	if ((rect1.left < rect2.right) && (rect1.right > rect2.left) && (rect1.top < rect2.bottom) && (rect1.bottom > rect2.top)) return true;

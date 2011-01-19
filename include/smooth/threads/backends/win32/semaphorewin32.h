@@ -21,6 +21,7 @@ namespace smooth
 
 #include "../semaphorebackend.h"
 
+#include <windows.h>
 #include <winnt.h>
 
 namespace smooth

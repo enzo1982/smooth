@@ -11,6 +11,8 @@
 #ifndef H_OBJSMOOTH_FONTGDI
 #define H_OBJSMOOTH_FONTGDI
 
+#include <windows.h>
+
 namespace smooth
 {
 	namespace GUI

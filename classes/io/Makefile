@@ -7,10 +7,10 @@ SMOOTH_PATH = ../..
 OBJECTS	  = driver.o filter.o instream.o outstream.o stream.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd drivers && make
-ALLCMD2   = cd filters && make
-CLEANCMD1 = cd drivers && make clean
-CLEANCMD2 = cd filters && make clean
+ALLCMD1   = cd drivers && $(MAKE)
+ALLCMD2   = cd filters && $(MAKE)
+CLEANCMD1 = cd drivers && $(MAKE) clean
+CLEANCMD2 = cd filters && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

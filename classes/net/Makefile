@@ -1,7 +1,7 @@
 ########## smooth directory makefile ##########
 
 all:
-	cd protocols && make
+	cd protocols && $(MAKE)
 
 clean:
-	cd protocols && make clean
+	cd protocols && $(MAKE) clean

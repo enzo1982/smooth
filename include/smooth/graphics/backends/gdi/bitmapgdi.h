@@ -11,6 +11,8 @@
 #ifndef H_OBJSMOOTH_BITMAPGDI
 #define H_OBJSMOOTH_BITMAPGDI
 
+#include <windows.h>
+
 namespace smooth
 {
 	namespace GUI

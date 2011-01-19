@@ -11,6 +11,8 @@
 #ifndef H_OBJSMOOTH_CLIPBOARDWIN32
 #define H_OBJSMOOTH_CLIPBOARDWIN32
 
+#include <windows.h>
+
 namespace smooth
 {
 	namespace GUI

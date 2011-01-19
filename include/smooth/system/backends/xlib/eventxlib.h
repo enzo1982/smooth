@@ -21,6 +21,20 @@ namespace smooth
 
 #include "../eventbackend.h"
 
+namespace X11
+{
+	extern "C"
+	{
+#		include <X11/Xlib.h>
+#		include <X11/Xmu/Atoms.h>
+
+#		undef True
+#		undef False
+#		undef Bool
+#		undef Success
+	}
+};
+
 namespace smooth
 {
 	namespace System

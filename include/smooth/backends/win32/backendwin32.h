@@ -21,6 +21,8 @@ namespace smooth
 
 #include "../backend.h"
 
+#include <windows.h>
+
 extern HINSTANCE	 hDllInstance;
 
 #ifndef SMOOTH_STATIC

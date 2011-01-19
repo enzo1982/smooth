@@ -13,12 +13,16 @@
 #include <smooth/threads/thread.h>
 #include <smooth/system/event.h>
 #include <smooth/system/multimonitor.h>
+#include <smooth/files/directory.h>
 #include <smooth/init.h>
 #include <smooth/templates/nonblocking.h>
 
-#ifndef __WIN32__
+#ifdef __WIN32__
+#	include <windows.h>
+#else
 #	include <unistd.h>
 #	include <stdio.h>
+#	include <limits.h>
 #endif
 
 S::Bool	 S::loopActive	= S::False;
@@ -117,36 +121,30 @@ S::String S::GUI::Application::GetStartupDirectory()
 
 	if (Setup::enableUnicode)
 	{
-		wchar_t	*buffer = new wchar_t [MAX_PATH];
+		Buffer<wchar_t>	 buffer(32768);
 
-		length = GetCurrentDirectoryW(MAX_PATH, buffer);
+		length = GetCurrentDirectoryW(buffer.Size(), buffer);
 
 		startupDirectory = buffer;
-
-		delete [] buffer;
 	}
 
 	if (!Setup::enableUnicode || length == 0)
 	{
-		char	*buffer = new char [MAX_PATH];
+		Buffer<char>	 buffer(MAX_PATH);
 
-		GetCurrentDirectoryA(MAX_PATH, buffer);
+		GetCurrentDirectoryA(buffer.Size(), buffer);
 
 		startupDirectory = buffer;
-
-		delete [] buffer;
 	}
 
 	if (!startupDirectory.EndsWith("\\")) startupDirectory.Append("\\");
 #else
-	char	*buffer = new char [MAX_PATH];
+	Buffer<char>	 buffer(PATH_MAX);
 
-	if (getcwd(buffer, MAX_PATH) != NIL)
+	if (getcwd(buffer, buffer.Size()) != NIL)
 	{
 		startupDirectory = buffer;
 	}
-
-	delete [] buffer;
 
 	if (!startupDirectory.EndsWith("/")) startupDirectory.Append("/");
 #endif
@@ -158,48 +156,51 @@ S::String S::GUI::Application::GetApplicationDirectory()
 {
 	if (applicationDirectory != NIL) return applicationDirectory;
 
-#ifdef __WIN32__
+#if defined __WIN32__
 	Int	 length = 0;
 
 	if (Setup::enableUnicode)
 	{
-		wchar_t	*buffer = new wchar_t [MAX_PATH];
+		Buffer<wchar_t>	 buffer(32768 + 1);
 
-		length = GetModuleFileNameW(NIL, buffer, MAX_PATH);
+		buffer.Zero();
+
+		length = GetModuleFileNameW(NIL, buffer, buffer.Size() - 1);
 
 		applicationDirectory = buffer;
-
-		delete [] buffer;
 	}
 
 	if (!Setup::enableUnicode || length == 0)
 	{
-		char	*buffer = new char [MAX_PATH];
+		Buffer<char>	 buffer(MAX_PATH + 1);
 
-		GetModuleFileNameA(NIL, buffer, MAX_PATH);
+		buffer.Zero();
+
+		GetModuleFileNameA(NIL, buffer, buffer.Size() - 1);
 
 		applicationDirectory = buffer;
-
-		delete [] buffer;
 	}
-
-	applicationDirectory[applicationDirectory.FindLast("\\") + 1] = 0;
 #else
-	char	 szTmp[32];
+	Buffer<char>	 buffer(PATH_MAX + 1);
 
-	sprintf(szTmp, "/proc/%d/exe", getpid());
+	buffer.Zero();
 
-	char	*buffer = new char [MAX_PATH];
-	int	 bytes = readlink(szTmp, buffer, MAX_PATH);
+#if defined __APPLE__
+	FILE	*stdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print $9 }'"), "r");
 
-	if (bytes >= 0) buffer[bytes] = '\0';
+	fscanf(stdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+	pclose(stdin);
+#elif defined __linux__
+	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1);
+#else
+	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/file"), buffer, buffer.Size() - 1);
+#endif
 
 	applicationDirectory = buffer;
-
-	delete [] buffer;
-
-	applicationDirectory[applicationDirectory.FindLast("/") + 1] = 0;
 #endif
+
+	applicationDirectory[applicationDirectory.FindLast(Directory::GetDirectoryDelimiter()) + 1] = 0;
 
 	return applicationDirectory;
 }

@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "nsLatin1Prober.h"
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #define UDF    0        // undefined

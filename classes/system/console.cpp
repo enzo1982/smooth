@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,8 @@
 
 #include <smooth/system/console.h>
 
-#if defined __WIN32__ && !defined __WINE__
+#if defined __WIN32__
+#	include <windows.h>
 #	include <conio.h>
 #else
 #	include <stdio.h>
@@ -26,7 +27,7 @@ S::System::Console::Console(const Console &)
 
 S::Int S::System::Console::SetTitle(const String &title)
 {
-#if defined __WIN32__ && !defined __WINE__
+#if defined __WIN32__
 	if (Setup::enableUnicode)	SetConsoleTitleW(title);
 	else				SetConsoleTitleA(title);
 #endif
@@ -36,7 +37,7 @@ S::Int S::System::Console::SetTitle(const String &title)
 
 S::Int S::System::Console::OutputString(const String &string)
 {
-#if defined __WIN32__ && !defined __WINE__
+#if defined __WIN32__
 	_cprintf(string);
 #else
 	printf(string);
@@ -47,7 +48,7 @@ S::Int S::System::Console::OutputString(const String &string)
 
 S::Int S::System::Console::OutputLine(const String &string)
 {
-#if defined __WIN32__ && !defined __WINE__
+#if defined __WIN32__
 	_cprintf(string);
 	_cprintf("\n");
 #else
@@ -60,7 +61,7 @@ S::Int S::System::Console::OutputLine(const String &string)
 
 S::Void S::System::Console::WaitForKey()
 {
-#if defined __WIN32__ && !defined __WINE__
+#if defined __WIN32__
 	_getch();
 #else
 	getchar();

@@ -5,6 +5,11 @@ SMOOTH_PATH = ../../..
 
 include $(SMOOTH_PATH)/Makefile-options
 
+# Change these variables to fit your project:
+ifeq ($(BUILD_WIN32),True)
+	MYCCOPTS = -I$(SMOOTH_PATH)/include/support/libjpeg -I$(SMOOTH_PATH)/include/support/libpng
+endif
+
 # Enter object files here:
 OBJECTS	  = imageloader.o jpeg.o pci.o png.o
 

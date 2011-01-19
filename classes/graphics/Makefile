@@ -7,14 +7,14 @@ SMOOTH_PATH = ../..
 OBJECTS	  = bitmap.o color.o font.o surface.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd backends && make
-ALLCMD2   = cd forms && make
-ALLCMD3   = cd imageloader && make
-ALLCMD4   = cd modifiers && make
-CLEANCMD1 = cd backends && make clean
-CLEANCMD2 = cd forms && make clean
-CLEANCMD3 = cd imageloader && make clean
-CLEANCMD4 = cd modifiers && make clean
+ALLCMD1   = cd backends && $(MAKE)
+ALLCMD2   = cd forms && $(MAKE)
+ALLCMD3   = cd imageloader && $(MAKE)
+ALLCMD4   = cd modifiers && $(MAKE)
+CLEANCMD1 = cd backends && $(MAKE) clean
+CLEANCMD2 = cd forms && $(MAKE) clean
+CLEANCMD3 = cd imageloader && $(MAKE) clean
+CLEANCMD4 = cd modifiers && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

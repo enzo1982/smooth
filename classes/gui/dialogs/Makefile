@@ -7,10 +7,10 @@ SMOOTH_PATH = ../../..
 OBJECTS	  = colordlg.o dialog.o fontdlg.o messagebox.o splashscreen.o tipodaydlg.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd directory && make
-ALLCMD2   = cd file && make
-CLEANCMD1 = cd directory && make clean
-CLEANCMD2 = cd file && make clean
+ALLCMD1   = cd directory && $(MAKE)
+ALLCMD2   = cd file && $(MAKE)
+CLEANCMD1 = cd directory && $(MAKE) clean
+CLEANCMD2 = cd file && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

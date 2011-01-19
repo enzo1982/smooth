@@ -7,10 +7,10 @@ SMOOTH_PATH = ../..
 OBJECTS	  = error.o success.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd fs && make
-ALLCMD2   = cd misc && make
-CLEANCMD1 = cd fs && make clean
-CLEANCMD2 = cd misc && make clean
+ALLCMD1   = cd fs && $(MAKE)
+ALLCMD2   = cd misc && $(MAKE)
+CLEANCMD1 = cd fs && $(MAKE) clean
+CLEANCMD2 = cd misc && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

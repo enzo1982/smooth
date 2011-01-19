@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "nsSBCharSetProber.h"

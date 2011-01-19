@@ -1,13 +1,13 @@
-########## smooth directory makefile ##########
+########## smooth directory $(MAKE)file ##########
 
 all:
-	cd image && make
-	cd list && make
-	cd menu && make
-	cd tree && make
+	cd image && $(MAKE)
+	cd list && $(MAKE)
+	cd menu && $(MAKE)
+	cd tree && $(MAKE)
 
 clean:
-	cd image && make clean
-	cd list && make clean
-	cd menu && make clean
-	cd tree && make clean
+	cd image && $(MAKE) clean
+	cd list && $(MAKE) clean
+	cd menu && $(MAKE) clean
+	cd tree && $(MAKE) clean

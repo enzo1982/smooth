@@ -21,6 +21,20 @@ namespace smooth
 
 #include "../bitmapbackend.h"
 
+namespace X11
+{
+	extern "C"
+	{
+#		include <X11/Xlib.h>
+#		include <X11/Xutil.h>
+
+#		undef True
+#		undef False
+#		undef Bool
+#		undef Success
+	}
+};
+
 namespace smooth
 {
 	namespace GUI

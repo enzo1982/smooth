@@ -1,17 +1,17 @@
-########## smooth directory makefile ##########
+########## smooth directory $(MAKE)file ##########
 
 all:
-	cd application && make
-	cd clipboard && make
-	cd dialogs && make
-	cd mdi && make
-	cd widgets && make
-	cd window && make
+	cd application && $(MAKE)
+	cd clipboard && $(MAKE)
+	cd dialogs && $(MAKE)
+	cd mdi && $(MAKE)
+	cd widgets && $(MAKE)
+	cd window && $(MAKE)
 
 clean:
-	cd application && make clean
-	cd clipboard && make clean
-	cd dialogs && make clean
-	cd mdi && make clean
-	cd widgets && make clean
-	cd window && make clean
+	cd application && $(MAKE) clean
+	cd clipboard && $(MAKE) clean
+	cd dialogs && $(MAKE) clean
+	cd mdi && $(MAKE) clean
+	cd widgets && $(MAKE) clean
+	cd window && $(MAKE) clean

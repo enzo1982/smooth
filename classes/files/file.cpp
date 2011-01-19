@@ -12,11 +12,46 @@
 #include <smooth/files/directory.h>
 #include <smooth/misc/math.h>
 
-#ifndef __WIN32__
+#ifdef __WIN32__
+#	include <windows.h>
+#else
 #	include <stdio.h>
 #	include <time.h>
 #	include <sys/stat.h>
 #endif
+
+namespace smooth
+{
+#ifdef __WIN32__
+	Int GetFileTime(const File &file, FILETIME *cTime, FILETIME *aTime, FILETIME *wTime)
+#else
+	Int GetFileTime(const File &file, time_t *cTime, time_t *aTime, time_t *wTime)
+#endif
+	{
+		if (!file.Exists()) return Error();
+
+#ifdef __WIN32__
+		HANDLE	 handle;
+
+		if (Setup::enableUnicode)	handle = CreateFileW(String(Directory::GetUnicodePathPrefix()).Append(file), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+		else				handle = CreateFileA(String(file),					     GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+
+		::GetFileTime(handle, cTime, aTime, wTime);
+
+		CloseHandle(handle);
+#else
+		struct stat	 info;
+
+		if (stat(String(file).ConvertTo("UTF-8"), &info) != 0) return Error();
+
+		if (cTime != NIL) *cTime = info.st_ctime;
+		if (aTime != NIL) *aTime = info.st_atime;
+		if (wTime != NIL) *wTime = info.st_mtime;
+#endif
+
+		return Success();
+	}
+};
 
 S::File::File(const String &iFileName, const String &iFilePath)
 {
@@ -123,36 +158,6 @@ S::Int64 S::File::GetFileSize() const
 #endif
 }
 
-#ifdef __WIN32__
-S::Int S::File::GetFileTime(FILETIME *cTime, FILETIME *aTime, FILETIME *wTime) const
-#else
-S::Int S::File::GetFileTime(time_t *cTime, time_t *aTime, time_t *wTime) const
-#endif
-{
-	if (!Exists()) return Error();
-
-#ifdef __WIN32__
-	HANDLE	 handle;
-
-	if (Setup::enableUnicode)	handle = CreateFileW(String(Directory::GetUnicodePathPrefix()).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-	else				handle = CreateFileA(String(*this),					      GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-
-	::GetFileTime(handle, cTime, aTime, wTime);
-
-	CloseHandle(handle);
-#else
-	struct stat	 info;
-
-	if (stat(String(*this).ConvertTo("UTF-8"), &info) != 0) return Error();
-
-	if (cTime != NIL) *cTime = info.st_ctime;
-	if (aTime != NIL) *aTime = info.st_atime;
-	if (wTime != NIL) *wTime = info.st_mtime;
-#endif
-
-	return Success();
-}
-
 S::DateTime S::File::GetCreationTime() const
 {
 	DateTime	 dateTime;
@@ -165,7 +170,7 @@ S::DateTime S::File::GetCreationTime() const
 	tm		*time;
 #endif
 
-	if (GetFileTime(&fileTime, NIL, NIL) == Error()) return dateTime;
+	if (GetFileTime(*this, &fileTime, NIL, NIL) == Error()) return dateTime;
 
 #ifdef __WIN32__
 	FileTimeToSystemTime(&fileTime, &time);
@@ -194,7 +199,7 @@ S::DateTime S::File::GetAccessTime() const
 	tm		*time;
 #endif
 
-	if (GetFileTime(NIL, &fileTime, NIL) == Error()) return dateTime;
+	if (GetFileTime(*this, NIL, &fileTime, NIL) == Error()) return dateTime;
 
 #ifdef __WIN32__
 	FileTimeToSystemTime(&fileTime, &time);
@@ -223,7 +228,7 @@ S::DateTime S::File::GetWriteTime() const
 	tm		*time;
 #endif
 
-	if (GetFileTime(NIL, NIL, &fileTime) == Error()) return dateTime;
+	if (GetFileTime(*this, NIL, NIL, &fileTime) == Error()) return dateTime;
 
 #ifdef __WIN32__
 	FileTimeToSystemTime(&fileTime, &time);

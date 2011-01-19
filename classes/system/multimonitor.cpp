@@ -12,6 +12,8 @@
 #include <smooth/input/pointer.h>
 
 #ifdef __WIN32__
+#	include <windows.h>
+
 	HMODULE user32dll = NIL;
 
 	BOOL	 (*ex_GetMonitorInfo)(HMONITOR, LPMONITORINFO)	= NIL;
@@ -71,7 +73,8 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorMetrics()
 	}
 	else
 	{
-		HMONITOR	 monitor = ex_MonitorFromPoint(Input::Pointer::GetPosition(), 2);
+		GUI::Point	 position = Input::Pointer::GetPosition();
+		HMONITOR	 monitor = ex_MonitorFromPoint((POINT) { position.x, position.y }, 2);
 		MONITORINFO	 info;
 
 		info.cbSize = sizeof(MONITORINFO);
@@ -99,7 +102,8 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorWorkArea()
 	}
 	else
 	{
-		HMONITOR	 monitor = ex_MonitorFromPoint(Input::Pointer::GetPosition(), 2);
+		GUI::Point	 position = Input::Pointer::GetPosition();
+		HMONITOR	 monitor = ex_MonitorFromPoint((POINT) { position.x, position.y }, 2);
 		MONITORINFO	 info;
 
 		info.cbSize = sizeof(MONITORINFO);

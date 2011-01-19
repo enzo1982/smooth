@@ -11,6 +11,8 @@
 #ifndef H_OBJSMOOTH_EVENTWIN32
 #define H_OBJSMOOTH_EVENTWIN32
 
+#include <windows.h>
+
 namespace smooth
 {
 	namespace System

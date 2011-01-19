@@ -18,10 +18,8 @@
 #include <memory.h>
 #include <stdlib.h>
 
-#if defined __WINE__
-#	define wcslen lstrlenW
-#	define wcscpy lstrcpyW
-#	define wcsncpy lstrcpynW
+#ifdef __WIN32__
+#	include <windows.h>
 #endif
 
 namespace smooth
@@ -1074,12 +1072,17 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		size_t		 inBytesLeft	= inBytes;
 		size_t		 outBytesLeft	= outBytes;
-		const char     **inPointer	= &inBuffer;
 		char	       **outPointer	= &outBuffer;
+
+#ifdef __FreeBSD__
+		const char     **inPointer	= &inBuffer;
+#else
+		char	       **inPointer	= const_cast<char **>(&inBuffer);
+#endif
 
 		while (inBytesLeft)
 		{
-			if (iconv(cd, const_cast<char **>(inPointer), &inBytesLeft, outPointer, &outBytesLeft) == (size_t) -1) break;
+			if (iconv(cd, inPointer, &inBytesLeft, outPointer, &outBytesLeft) == (size_t) -1) break;
 		}
 
 		iconv_close(cd);

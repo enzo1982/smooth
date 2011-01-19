@@ -21,6 +21,21 @@ namespace smooth
 
 #include "../fontbackend.h"
 
+#ifndef __WIN32__
+	namespace X11
+	{
+		extern "C"
+		{
+#			include <X11/Xlib.h>
+
+#			undef True
+#			undef False
+#			undef Bool
+#			undef Success
+		}
+	};
+#endif
+
 namespace smooth
 {
 	namespace GUI

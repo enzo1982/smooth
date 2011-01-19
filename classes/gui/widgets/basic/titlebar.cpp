@@ -16,6 +16,10 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/binary.h>
 
+#ifdef __WIN32__
+#	include <windows.h>
+#endif
+
 const S::Short	 S::GUI::Titlebar::classID = S::Object::RequestClassID();
 
 S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
@@ -59,7 +63,7 @@ S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
 
 	Add(dragHotspot);
 
-	closeShortcut	= new Shortcut(0, VK_ESCAPE);
+	closeShortcut	= new Shortcut(0, SK_ESCAPE);
 	closeShortcut->onKeyDown.Connect(&Titlebar::OnCloseButtonClick, this);
 
 	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) Add(closeShortcut);

@@ -524,22 +524,6 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 
 			break;
 		case SM_MOUSEMOVE:
-			if (huecapt || vscapt)
-			{
-#ifdef __WIN32__
-				Int	 leftButton;
-
-				if (GetSystemMetrics(SM_SWAPBUTTON))	leftButton = VK_RBUTTON;
-				else					leftButton = VK_LBUTTON;
-
-				if (GetAsyncKeyState(leftButton) == 0)
-				{
-					ColorDlgMessageProc(SM_LBUTTONUP, 0, 0);
-					break;
-				}
-#endif
-			}
-
 			if (huecapt)
 			{
 				Int	 newhue = 255 - Math::Round(Math::Max(Math::Min(dlgwnd->GetMousePosition().y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));

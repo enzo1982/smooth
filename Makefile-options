@@ -1,13 +1,65 @@
 ########## smooth options makefile ##########
 
+UNAME = $(shell uname)
+
 ifndef SMOOTH_PATH
 	SMOOTH_PATH = .
 endif
 
-ifeq ($(BUILD_WIN32),True)
-	include $(SMOOTH_PATH)/Makefile-options.win32
+# Disable exceptions by default
+EXCEPTION = False
+
+# Disable threads based timers
+BUILD_THREADSTIMER = False
+
+# Build using V8 JavaScript library
+BUILD_V8 = True
+
+ifneq ($(findstring MINGW,$(UNAME)),)
+#	Set executable and shared object extensions
+	EXECUTABLE = .exe
+	SHARED = .dll
+
+#	Build using Win32 backends
+	BUILD_WIN32 = True
+
+#	Disable GDI+ backend by default
+	BUILD_GDIPLUS = False
+
+#	Disable Cairo backend by default
+	BUILD_CAIRO = False
 else
-ifeq ($(BUILD_UNIX),True)
-	include $(SMOOTH_PATH)/Makefile-options.linux
+#	Set executable and shared object extensions
+	EXECUTABLE = 
+	SHARED = .so
+
+	BUILD_UNIX = True
+
+#	Build using XLib backends
+	BUILD_XLIB = True
+
+#	Build using Cairo graphics backend
+	BUILD_CAIRO = True
+
+#	Build using POSIX threads
+	BUILD_POSIXTHREADS = True
+
+#	Build using POSIX timers
+	BUILD_POSIXTIMER = True
+
+ifeq ($(UNAME),Linux)
+	BUILD_LINUX = True
+endif
+ifeq ($(UNAME),FreeBSD)
+	BUILD_FREEBSD = True
+endif
+ifeq ($(UNAME),Darwin)
+	SHARED = .dylib
+
+	BUILD_OSX = True
+
+# 	Enable threads based timers
+	BUILD_POSIXTIMER = False
+	BUILD_THREADSTIMER = True
 endif
 endif

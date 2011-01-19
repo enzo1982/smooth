@@ -18,7 +18,11 @@
 #include <smooth/system/timer.h>
 #include <smooth/input/pointer.h>
 
-#ifndef CS_DROPSHADOW
+#if !defined WM_MOUSEWHEEL
+#	define WM_MOUSEWHEEL 522
+#endif
+
+#if !defined CS_DROPSHADOW
 #	define CS_DROPSHADOW 0x00020000
 #endif
 
@@ -98,6 +102,68 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::GetWindowBackend(HWND hwnd)
 	return NIL;
 }
 
+S::Key S::GUI::WindowGDI::ConvertKey(Int keySym)
+{
+	Key	 key = SK_OTHER;
+
+	switch (keySym)
+	{
+		case VK_LEFT:	 key = SK_LEFT;	   break;
+		case VK_UP:	 key = SK_UP;	   break;
+		case VK_RIGHT:	 key = SK_RIGHT;   break;
+		case VK_DOWN:	 key = SK_DOWN;	   break;
+
+		case VK_HOME:	 key = SK_HOME;	   break;
+		case VK_END:	 key = SK_END;	   break;
+		case VK_INSERT:	 key = SK_INSERT;  break;
+		case VK_DELETE:	 key = SK_DELETE;  break;
+		case VK_PRIOR:	 key = SK_PRIOR;   break;
+		case VK_NEXT:	 key = SK_NEXT;	   break;
+
+		case VK_RETURN:	 key = SK_RETURN;  break;
+		case VK_BACK:	 key = SK_BACK;	   break;
+		case VK_TAB:	 key = SK_TAB;	   break;
+
+		case VK_SPACE:	 key = SK_SPACE;   break;
+
+		case VK_SHIFT:	 key = SK_SHIFT;   break;
+		case VK_CONTROL: key = SK_CONTROL; break;
+		case VK_MENU:	 key = SK_ALT;	   break;
+
+		case VK_ESCAPE:	 key = SK_ESCAPE;  break;
+
+		case VK_F1:	 key = SK_F1;	   break;
+		case VK_F2:	 key = SK_F2;	   break;
+		case VK_F3:	 key = SK_F3;	   break;
+		case VK_F4:	 key = SK_F4;	   break;
+		case VK_F5:	 key = SK_F5;	   break;
+		case VK_F6:	 key = SK_F6;	   break;
+		case VK_F7:	 key = SK_F7;	   break;
+		case VK_F8:	 key = SK_F8;	   break;
+		case VK_F9:	 key = SK_F9;	   break;
+		case VK_F10:	 key = SK_F10;	   break;
+		case VK_F11:	 key = SK_F11;	   break;
+		case VK_F12:	 key = SK_F12;	   break;
+		case VK_F13:	 key = SK_F13;	   break;
+		case VK_F14:	 key = SK_F14;	   break;
+		case VK_F15:	 key = SK_F15;	   break;
+		case VK_F16:	 key = SK_F16;	   break;
+		case VK_F17:	 key = SK_F17;	   break;
+		case VK_F18:	 key = SK_F18;	   break;
+		case VK_F19:	 key = SK_F19;	   break;
+		case VK_F20:	 key = SK_F20;	   break;
+		case VK_F21:	 key = SK_F21;	   break;
+		case VK_F22:	 key = SK_F22;	   break;
+		case VK_F23:	 key = SK_F23;	   break;
+		case VK_F24:	 key = SK_F24;	   break;
+	}
+
+	if	(keySym >= '0' && keySym <= '9') key = (Key) keySym;
+	else if	(keySym >= 'A' && keySym <= 'Z') key = (Key) keySym;
+
+	return key;
+}
+
 S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lParam)
 {
 	/* Process system messages not relevant
@@ -154,8 +220,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				if (windowStyle & WS_DLGFRAME)
 				{
-					minMaxInfo->ptMaxSize = Point(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
-					minMaxInfo->ptMaxPosition = Point(windowRect.left, windowRect.top);
+					minMaxInfo->ptMaxSize = (POINT) { windowRect.right - windowRect.left, windowRect.bottom - windowRect.top };
+					minMaxInfo->ptMaxPosition = (POINT) { windowRect.left, windowRect.top };
 				}
 				else
 				{
@@ -221,10 +287,10 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		 */
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			return onEvent.Call(SM_KEYDOWN, wParam, lParam);
+			return onEvent.Call(SM_KEYDOWN, ConvertKey(wParam), lParam);
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			return onEvent.Call(SM_KEYUP, wParam, lParam);
+			return onEvent.Call(SM_KEYUP, ConvertKey(wParam), lParam);
 		case WM_CHAR:
 			return onEvent.Call(SM_CHAR, wParam, lParam);
 
@@ -235,11 +301,11 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 				Int	 rVal = Break;
 				RECT	 uRect = { 0, 0, 0, 0 };
 
-				updateRect = uRect;
+				updateRect = Rect();
 
 				if (::GetUpdateRect(hwnd, &uRect, 0))
 				{
-					updateRect = uRect;
+					updateRect = Rect(Point(uRect.left, uRect.top), Size(uRect.right - uRect.left, uRect.bottom - uRect.top));
 					updateRect = updateRect + frameSize;
 
 					PAINTSTRUCT	 ps;
@@ -555,7 +621,7 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 		GetWindowRect(hwnd, &rect);
 
-		nonMaxRect = rect;
+		nonMaxRect = Rect(Point(rect.left, rect.top), Size(rect.right - rect.left, rect.bottom - rect.top));
 	}
 
 	SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.right - workArea.left + (2 * frameSize.cx - 4), workArea.bottom - workArea.top + (2 * frameSize.cy - 4)));
@@ -583,6 +649,13 @@ S::Int S::GUI::WindowGDI::Restore()
 	maximized = False;
 
 	onRestore.Emit();
+
+	return Success();
+}
+
+S::Int S::GUI::WindowGDI::Raise()
+{
+	SetActiveWindow(hwnd);
 
 	return Success();
 }
@@ -620,6 +693,6 @@ S::Void S::GUI::WindowGDI::MouseNotifier()
 			if (window->IsInUse() && !window->IsMouseOn(Rect(Point(), window->GetSize()))) window->Process(SM_MOUSEMOVE, 0, 0);
 		}
 
-		savedMousePos = currentMousePos;
+		savedMousePos = Point(currentMousePos.x, currentMousePos.y);
 	}
 }

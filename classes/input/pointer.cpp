@@ -11,7 +11,9 @@
 #include <smooth/input/pointer.h>
 #include <smooth/gui/window/window.h>
 
-#ifndef __WIN32__
+#ifdef __WIN32__
+#	include <windows.h>
+#else
 #	include <smooth/backends/xlib/backendxlib.h>
 
 #	include <X11/cursorfont.h>

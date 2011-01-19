@@ -17,6 +17,12 @@
 #include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
 
+#ifdef __WIN32__
+#	include <windows.h>
+
+#	undef GetObject
+#endif
+
 const S::Short	 S::GUI::Widget::classID = S::Object::RequestClassID();
 
 S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
@@ -626,7 +632,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 		case SM_KEYDOWN:
 			if (!focussed || !tabstopCapable) break;
 
-			if (wParam == VK_TAB)
+			if (wParam == SK_TAB)
 			{
 #ifdef __WIN32__
 				BYTE	 state[256];
@@ -635,7 +641,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				{
 					Widget	*widget = NIL;
 
-					if (state[VK_SHIFT] & 128) widget = container->GetPreviousTabstopWidget(GetHandle());
+					if (state[SK_SHIFT] & 128) widget = container->GetPreviousTabstopWidget(GetHandle());
 					else			   widget = container->GetNextTabstopWidget(GetHandle());
 
 					if (widget != NIL)

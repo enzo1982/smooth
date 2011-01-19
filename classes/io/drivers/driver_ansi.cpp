@@ -15,7 +15,9 @@
 
 #include <stdio.h>
 
-#if !defined __WIN32__ || defined __WINE__
+#if defined __WIN32__
+#	include <windows.h>
+#else
 #	define _wfopen fopen
 #endif
 

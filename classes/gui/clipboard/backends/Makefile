@@ -7,10 +7,10 @@ SMOOTH_PATH = ../../../..
 OBJECTS	  = clipboardbackend.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd win32 && make
-ALLCMD2   = cd xlib && make
-CLEANCMD1 = cd win32 && make clean
-CLEANCMD2 = cd xlib && make clean
+ALLCMD1   = cd win32 && $(MAKE)
+ALLCMD2   = cd xlib && $(MAKE)
+CLEANCMD1 = cd win32 && $(MAKE) clean
+CLEANCMD2 = cd xlib && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

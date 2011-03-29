@@ -3,17 +3,17 @@ SMOOTH_PATH = ..
 include $(SMOOTH_PATH)/Makefile-options
 
 all:
-	$(MAKE) -C libcpuid
 	$(MAKE) -C fribidi2
 ifeq ($(BUILD_LINUX),True)
+	$(MAKE) -C libcpuid
 	$(MAKE) -C nsucd
-endif
-ifeq ($(BUILD_OSX),True)
+else ifeq ($(BUILD_OSX),True)
+	$(MAKE) -C libcpuid
+	$(MAKE) -C libjpeg
 	$(MAKE) -C nsucd
-endif
-ifeq ($(BUILD_WIN32),True)
-	$(MAKE) -C nsucd
+else ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C bzlib
+	$(MAKE) -C libcpuid
 	$(MAKE) -C libiconv
 	$(MAKE) -C libjpeg
 	$(MAKE) -C libpng
@@ -21,24 +21,25 @@ ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C libz
 	$(MAKE) -C lzma
 	$(MAKE) -C mzip
+	$(MAKE) -C nsucd
 	$(MAKE) -C pcre
+endif
 ifeq ($(BUILD_V8),True)
 	$(MAKE) -C v8
 endif
-endif
 
 clean:
-	$(MAKE) -C libcpuid clean
 	$(MAKE) -C fribidi2 clean
 ifeq ($(BUILD_LINUX),True)
+	$(MAKE) -C libcpuid clean
 	$(MAKE) -C nsucd clean
-endif
-ifeq ($(BUILD_OSX),True)
+else ifeq ($(BUILD_OSX),True)
+	$(MAKE) -C libcpuid clean
+	$(MAKE) -C libjpeg clean
 	$(MAKE) -C nsucd clean
-endif
-ifeq ($(BUILD_WIN32),True)
-	$(MAKE) -C nsucd clean
+else ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C bzlib clean
+	$(MAKE) -C libcpuid clean
 	$(MAKE) -C libiconv clean
 	$(MAKE) -C libjpeg clean
 	$(MAKE) -C libpng clean
@@ -46,8 +47,9 @@ ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C libz clean
 	$(MAKE) -C lzma clean
 	$(MAKE) -C mzip clean
+	$(MAKE) -C nsucd clean
 	$(MAKE) -C pcre clean
+endif
 ifeq ($(BUILD_V8),True)
 	$(MAKE) -C v8 clean
-endif
 endif

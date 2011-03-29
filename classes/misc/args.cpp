@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,9 +17,13 @@ S::ArgumentsParser::ArgumentsParser(const String &commandLine)
 
 	for (Int i = 0, j = 0; i < commandLine.Length(); i++)
 	{
-		if (commandLine[i] == ' ' && !quoted && commandLine[i - 1] != '\\')
+		if ((commandLine[i] == ' ' && !quoted && commandLine[i - 1] != '\\') || i == commandLine.Length() - 1)
 		{
-			if (param.Length() > 0) args.Add(String(param));
+#ifdef __APPLE__
+			if (!param.StartsWith("-psn_"))
+#endif
+
+			if (param.Length() > 0) args.Add(param);
 
 			param	= NIL;
 			j	= 0;
@@ -32,8 +36,6 @@ S::ArgumentsParser::ArgumentsParser(const String &commandLine)
 		{
 			param[j++] = commandLine[i];
 		}
-
-		if (i == commandLine.Length() - 1 && param.Length() > 0) args.Add(String(param));
 	}
 }
 

@@ -310,8 +310,7 @@ void Builtins::Generate_FunctionCall(MacroAssembler* masm) {
   __ movsxlq(rbx,
              FieldOperand(rdx,
                           SharedFunctionInfo::kFormalParameterCountOffset));
-  __ movq(rdx, FieldOperand(rdx, SharedFunctionInfo::kCodeOffset));
-  __ lea(rdx, FieldOperand(rdx, Code::kHeaderSize));
+  __ movq(rdx, FieldOperand(rdi, JSFunction::kCodeEntryOffset));
   __ cmpq(rax, rbx);
   __ j(not_equal,
        Handle<Code>(builtin(ArgumentsAdaptorTrampoline)),
@@ -716,7 +715,7 @@ static void ArrayNativeCode(MacroAssembler* masm,
   __ cmpq(rax, Immediate(1));
   __ j(not_equal, &argc_two_or_more);
   __ movq(rdx, Operand(rsp, kPointerSize));  // Get the argument from the stack.
-  __ JumpIfNotPositiveSmi(rdx, call_generic_code);
+  __ JumpUnlessNonNegativeSmi(rdx, call_generic_code);
 
   // Handle construction of an empty array of a certain size. Bail out if size
   // is to large to actually allocate an elements array.
@@ -876,6 +875,13 @@ void Builtins::Generate_ArrayConstructCode(MacroAssembler* masm) {
 }
 
 
+void Builtins::Generate_StringConstructCode(MacroAssembler* masm) {
+  // TODO(849): implement custom construct stub.
+  // Generate a copy of the generic stub for now.
+  Generate_JSConstructStubGeneric(masm);
+}
+
+
 void Builtins::Generate_JSConstructCall(MacroAssembler* masm) {
   // ----------- S t a t e -------------
   //  -- rax: number of arguments
@@ -895,13 +901,9 @@ void Builtins::Generate_JSConstructCall(MacroAssembler* masm) {
   __ lea(rbx, FieldOperand(rbx, Code::kHeaderSize));
   __ jmp(rbx);
 
-  // edi: called object
-  // eax: number of arguments
+  // rdi: called object
+  // rax: number of arguments
   __ bind(&non_function_call);
-  // CALL_NON_FUNCTION expects the non-function constructor as receiver
-  // (instead of the original receiver from the call site).  The receiver is
-  // stack element argc+1.
-  __ movq(Operand(rsp, rax, times_pointer_size, kPointerSize), rdi);
   // Set expected number of arguments to zero (not changing rax).
   __ movq(rbx, Immediate(0));
   __ GetBuiltinEntry(rdx, Builtins::CALL_NON_FUNCTION_AS_CONSTRUCTOR);
@@ -911,7 +913,11 @@ void Builtins::Generate_JSConstructCall(MacroAssembler* masm) {
 
 
 static void Generate_JSConstructStubHelper(MacroAssembler* masm,
-                                           bool is_api_function) {
+                                           bool is_api_function,
+                                           bool count_constructions) {
+  // Should never count constructions for api objects.
+  ASSERT(!is_api_function || !count_constructions);
+
     // Enter a construct frame.
   __ EnterConstructFrame();
 
@@ -956,6 +962,26 @@ static void Generate_JSConstructStubHelper(MacroAssembler* masm,
     __ CmpInstanceType(rax, JS_FUNCTION_TYPE);
     __ j(equal, &rt_call);
 
+    if (count_constructions) {
+      Label allocate;
+      // Decrease generous allocation count.
+      __ movq(rcx, FieldOperand(rdi, JSFunction::kSharedFunctionInfoOffset));
+      __ decb(FieldOperand(rcx, SharedFunctionInfo::kConstructionCountOffset));
+      __ j(not_zero, &allocate);
+
+      __ push(rax);
+      __ push(rdi);
+
+      __ push(rdi);  // constructor
+      // The call will replace the stub, so the countdown is only done once.
+      __ CallRuntime(Runtime::kFinalizeInstanceSize, 1);
+
+      __ pop(rdi);
+      __ pop(rax);
+
+      __ bind(&allocate);
+    }
+
     // Now allocate the JSObject on the heap.
     __ movzxbq(rdi, FieldOperand(rax, Map::kInstanceSizeOffset));
     __ shl(rdi, Immediate(kPointerSizeLog2));
@@ -979,7 +1005,12 @@ static void Generate_JSConstructStubHelper(MacroAssembler* masm,
     // rbx: JSObject
     // rdi: start of next object
     { Label loop, entry;
-      __ LoadRoot(rdx, Heap::kUndefinedValueRootIndex);
+      // To allow for truncation.
+      if (count_constructions) {
+        __ LoadRoot(rdx, Heap::kOnePointerFillerMapRootIndex);
+      } else {
+        __ LoadRoot(rdx, Heap::kUndefinedValueRootIndex);
+      }
       __ lea(rcx, Operand(rbx, JSObject::kHeaderSize));
       __ jmp(&entry);
       __ bind(&loop);
@@ -1162,13 +1193,18 @@ static void Generate_JSConstructStubHelper(MacroAssembler* masm,
 }
 
 
+void Builtins::Generate_JSConstructStubCountdown(MacroAssembler* masm) {
+  Generate_JSConstructStubHelper(masm, false, true);
+}
+
+
 void Builtins::Generate_JSConstructStubGeneric(MacroAssembler* masm) {
-  Generate_JSConstructStubHelper(masm, false);
+  Generate_JSConstructStubHelper(masm, false, false);
 }
 
 
 void Builtins::Generate_JSConstructStubApi(MacroAssembler* masm) {
-  Generate_JSConstructStubHelper(masm, true);
+  Generate_JSConstructStubHelper(masm, true, false);
 }
 
 
@@ -1289,6 +1325,26 @@ void Builtins::Generate_JSEntryTrampoline(MacroAssembler* masm) {
 
 void Builtins::Generate_JSConstructEntryTrampoline(MacroAssembler* masm) {
   Generate_JSEntryTrampolineHelper(masm, true);
+}
+
+
+void Builtins::Generate_LazyCompile(MacroAssembler* masm) {
+  // Enter an internal frame.
+  __ EnterInternalFrame();
+
+  // Push a copy of the function onto the stack.
+  __ push(rdi);
+
+  __ push(rdi);  // Function is also the parameter to the runtime call.
+  __ CallRuntime(Runtime::kLazyCompile, 1);
+  __ pop(rdi);
+
+  // Tear down temporary frame.
+  __ LeaveInternalFrame();
+
+  // Do a tail-call of the compiled function.
+  __ lea(rcx, FieldOperand(rax, Code::kHeaderSize));
+  __ jmp(rcx);
 }
 
 } }  // namespace v8::internal

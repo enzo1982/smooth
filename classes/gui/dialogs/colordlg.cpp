@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -861,7 +861,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgBlueSlider()
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgHueEdit()
 {
-	int newhue = Math::Max(0, Math::Min(255, hueedit->GetText().ToInt()));
+	int newhue = Math::Max(0, Math::Min(255, (Int) hueedit->GetText().ToInt()));
 
 	if (newhue != acthue)
 	{
@@ -875,7 +875,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgHueEdit()
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgSatEdit()
 {
-	int newsat = Math::Max(0, Math::Min(255, satedit->GetText().ToInt()));
+	int newsat = Math::Max(0, Math::Min(255, (Int) satedit->GetText().ToInt()));
 
 	if (newsat != actsat)
 	{
@@ -889,7 +889,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgSatEdit()
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgValEdit()
 {
-	int newval = Math::Max(0, Math::Min(255, valedit->GetText().ToInt()));
+	int newval = Math::Max(0, Math::Min(255, (Int) valedit->GetText().ToInt()));
 
 	if (newval != actval)
 	{
@@ -903,7 +903,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgValEdit()
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgRedEdit()
 {
-	int newred = Math::Max(0, Math::Min(255, rededit->GetText().ToInt()));
+	int newred = Math::Max(0, Math::Min(255, (Int) rededit->GetText().ToInt()));
 
 	if (newred != Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetRed())
 	{
@@ -917,7 +917,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgRedEdit()
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgGreenEdit()
 {
-	int newgreen = Math::Max(0, Math::Min(255, greenedit->GetText().ToInt()));
+	int newgreen = Math::Max(0, Math::Min(255, (Int) greenedit->GetText().ToInt()));
 
 	if (newgreen != Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetGreen())
 	{
@@ -931,7 +931,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgGreenEdit()
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgBlueEdit()
 {
-	int newblue = Math::Max(0, Math::Min(255, blueedit->GetText().ToInt()));
+	int newblue = Math::Max(0, Math::Min(255, (Int) blueedit->GetText().ToInt()));
 
 	if (newblue != Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetBlue())
 	{

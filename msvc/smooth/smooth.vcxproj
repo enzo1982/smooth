@@ -1,0 +1,815 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CD9FE2EC-DF4C-4139-9C0F-6236BB55153B}</ProjectGuid>
+    <RootNamespace>smooth</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libpng;../../include/support/libjpeg;../../include/support/bzlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;LIBICONV_PLUG;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libcpuid.lib;libbzip2.lib;fribidi2.lib;libxml.lib;iconv.lib;libjpeg.lib;libpng.lib;libz.lib;imm32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;__SMOOTH_DLL__;LIBICONV_PLUG;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libbzip2.lib;fribidi2.lib;libxml.lib;lisa.lib;libjpeg.lib;libpng.lib;libz.lib;iconv.lib;imm32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>x64/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;__WIN32__;_NDEBUG;_WINDOWS;_USRDLL;__SMOOTH_DLL__;LIBICONV_PLUG;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libbzip2.lib;fribidi2.lib;libxml.lib;lisa.lib;iconv.lib;imm32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;__WIN32__;_NDEBUG;_WINDOWS;_USRDLL;__SMOOTH_DLL__;LIBICONV_PLUG;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libbzip2.lib;fribidi2.lib;libxml.lib;lisa.lib;iconv.lib;imm32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\classes\basic\object.cpp" />
+    <ClCompile Include="..\..\classes\basic\objecttype.cpp" />
+    <ClCompile Include="..\..\classes\basic\setup.cpp" />
+    <ClCompile Include="..\..\classes\backends\backend.cpp" />
+    <ClCompile Include="..\..\classes\backends\gdiplus\backendgdiplus.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\backends\win32\backendwin32.cpp" />
+    <ClCompile Include="..\..\classes\backends\xlib\backendxlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\errors\error.cpp" />
+    <ClCompile Include="..\..\classes\errors\success.cpp" />
+    <ClCompile Include="..\..\classes\errors\fs\endoffile.cpp" />
+    <ClCompile Include="..\..\classes\errors\fs\filenotfound.cpp" />
+    <ClCompile Include="..\..\classes\errors\misc\permissiondenied.cpp" />
+    <ClCompile Include="..\..\classes\files\directory.cpp" />
+    <ClCompile Include="..\..\classes\files\file.cpp" />
+    <ClCompile Include="..\..\classes\graphics\bitmap.cpp" />
+    <ClCompile Include="..\..\classes\graphics\color.cpp" />
+    <ClCompile Include="..\..\classes\graphics\font.cpp" />
+    <ClCompile Include="..\..\classes\graphics\surface.cpp" />
+    <ClCompile Include="..\..\classes\graphics\forms\line.cpp" />
+    <ClCompile Include="..\..\classes\graphics\forms\point.cpp" />
+    <ClCompile Include="..\..\classes\graphics\forms\rect.cpp" />
+    <ClCompile Include="..\..\classes\graphics\forms\size.cpp" />
+    <ClCompile Include="..\..\classes\graphics\imageloader\icon.cpp" />
+    <ClCompile Include="..\..\classes\graphics\imageloader\imageloader.cpp" />
+    <ClCompile Include="..\..\classes\graphics\imageloader\jpeg.cpp" />
+    <ClCompile Include="..\..\classes\graphics\imageloader\pci.cpp" />
+    <ClCompile Include="..\..\classes\graphics\imageloader\png.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\bitmapbackend.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\fontbackend.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\surfacebackend.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\gdi\bitmapgdi.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\gdi\fontgdi.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\gdi\surfacegdi.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\xlib\bitmapxlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\xlib\surfacexlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\cairo\fontcairo.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\cairo\surfacecairo.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\bitmapgdiplus.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\fontgdiplus.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\surfacegdiplus.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\modifiers\fontsize.cpp" />
+    <ClCompile Include="..\..\classes\graphics\modifiers\righttoleft.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\layer.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\widget.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\activearea.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\arrows.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\button.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\checkbox.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\client.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\divider.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\editbox.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\groupbox.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\hyperlink.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\image.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\multiedit.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\optionbox.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\progressbar.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\scrollbar.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\slider.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\statusbar.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\tabwidget.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\text.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\basic\titlebar.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\hotspot\hotspot.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\hotspot\simplebutton.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\combobox.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\list.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\listbox.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\listboxheader.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\listentry.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\listentryseparator.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\menu.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\menubar.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\menubarentry.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\menuentry.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\micromenu.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\popupmenu.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\popupmenuentry.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\popupmenuentrycheck.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\popupmenuentryoption.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\tree\tree.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\image\imagebox.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\image\imageentry.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\special\cursor.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\special\dragcontrol.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\special\droparea.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\special\shortcut.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\special\tooltip.cpp" />
+    <ClCompile Include="..\..\classes\gui\mdi\client.cpp" />
+    <ClCompile Include="..\..\classes\gui\mdi\window.cpp" />
+    <ClCompile Include="..\..\classes\gui\window\toolwindow.cpp" />
+    <ClCompile Include="..\..\classes\gui\window\window.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\window\backends\windowbackend.cpp" />
+    <ClCompile Include="..\..\classes\gui\window\backends\gdi\windowgdi.cpp" />
+    <ClCompile Include="..\..\classes\gui\window\backends\xlib\windowxlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\colordlg.cpp" />
+    <ClCompile Include="..\..\classes\gui\dialogs\dialog.cpp" />
+    <ClCompile Include="..\..\classes\gui\dialogs\fontdlg.cpp" />
+    <ClCompile Include="..\..\classes\gui\dialogs\messagebox.cpp" />
+    <ClCompile Include="..\..\classes\gui\dialogs\splashscreen.cpp" />
+    <ClCompile Include="..\..\classes\gui\dialogs\tipodaydlg.cpp" />
+    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_gtk.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_win32.cpp" />
+    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_gtk.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_win32.cpp" />
+    <ClCompile Include="..\..\classes\gui\application\application.cpp" />
+    <ClCompile Include="..\..\classes\gui\application\xulloader.cpp" />
+    <ClCompile Include="..\..\classes\gui\clipboard\clipboard.cpp" />
+    <ClCompile Include="..\..\classes\gui\clipboard\backends\clipboardbackend.cpp" />
+    <ClCompile Include="..\..\classes\gui\clipboard\backends\win32\clipboardwin32.cpp" />
+    <ClCompile Include="..\..\classes\gui\clipboard\backends\xlib\clipboardxlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\args.cpp" />
+    <ClCompile Include="..\..\classes\misc\binary.cpp" />
+    <ClCompile Include="..\..\classes\misc\config.cpp" />
+    <ClCompile Include="..\..\classes\misc\datetime.cpp" />
+    <ClCompile Include="..\..\classes\misc\math.cpp" />
+    <ClCompile Include="..\..\classes\misc\memory.cpp" />
+    <ClCompile Include="..\..\classes\misc\number.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\string.cpp" />
+    <ClCompile Include="..\..\classes\misc\string_case.cpp" />
+    <ClCompile Include="..\..\classes\misc\encoding\base64.cpp" />
+    <ClCompile Include="..\..\classes\misc\hash\crc32.cpp" />
+    <ClCompile Include="..\..\classes\misc\hash\md5.cpp" />
+    <ClCompile Include="..\..\classes\misc\hash\sha1.cpp" />
+    <ClCompile Include="..\..\classes\xml\attribute.cpp" />
+    <ClCompile Include="..\..\classes\xml\document.cpp" />
+    <ClCompile Include="..\..\classes\xml\node.cpp" />
+    <ClCompile Include="..\..\classes\xml\xul\box.cpp" />
+    <ClCompile Include="..\..\classes\xml\xul\button.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\description.cpp" />
+    <ClCompile Include="..\..\classes\xml\xul\label.cpp" />
+    <ClCompile Include="..\..\classes\xml\xul\menubar.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\popupmenu.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\renderer.cpp" />
+    <ClCompile Include="..\..\classes\xml\xul\textbox.cpp" />
+    <ClCompile Include="..\..\classes\xml\xul\widget.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\window.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)2.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)2.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)2.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)2.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)2.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)2.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)2.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)2.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\console.cpp" />
+    <ClCompile Include="..\..\classes\system\cpu.cpp" />
+    <ClCompile Include="..\..\classes\system\dynamicloader.cpp" />
+    <ClCompile Include="..\..\classes\system\event.cpp" />
+    <ClCompile Include="..\..\classes\system\multimonitor.cpp" />
+    <ClCompile Include="..\..\classes\system\system.cpp" />
+    <ClCompile Include="..\..\classes\system\timer.cpp" />
+    <ClCompile Include="..\..\classes\system\backends\eventbackend.cpp" />
+    <ClCompile Include="..\..\classes\system\backends\timerbackend.cpp" />
+    <ClCompile Include="..\..\classes\system\backends\xlib\eventxlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\win32\eventwin32.cpp" />
+    <ClCompile Include="..\..\classes\system\backends\win32\timerwin32.cpp" />
+    <ClCompile Include="..\..\classes\system\backends\posix\timerposix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\threads\timerthreads.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\mutex.cpp" />
+    <ClCompile Include="..\..\classes\threads\rwlock.cpp" />
+    <ClCompile Include="..\..\classes\threads\semaphore.cpp" />
+    <ClCompile Include="..\..\classes\threads\thread.cpp" />
+    <ClCompile Include="..\..\classes\threads\backends\mutexbackend.cpp" />
+    <ClCompile Include="..\..\classes\threads\backends\semaphorebackend.cpp" />
+    <ClCompile Include="..\..\classes\threads\backends\threadbackend.cpp" />
+    <ClCompile Include="..\..\classes\threads\backends\posix\mutexposix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\posix\semaphoreposix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\posix\threadposix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\win32\mutexwin32.cpp" />
+    <ClCompile Include="..\..\classes\threads\backends\win32\semaphorewin32.cpp" />
+    <ClCompile Include="..\..\classes\threads\backends\win32\threadwin32.cpp" />
+    <ClCompile Include="..\..\classes\io\driver.cpp" />
+    <ClCompile Include="..\..\classes\io\filter.cpp" />
+    <ClCompile Include="..\..\classes\io\instream.cpp" />
+    <ClCompile Include="..\..\classes\io\outstream.cpp" />
+    <ClCompile Include="..\..\classes\io\stream.cpp" />
+    <ClCompile Include="..\..\classes\io\drivers\driver_ansi.cpp" />
+    <ClCompile Include="..\..\classes\io\drivers\driver_https.cpp" />
+    <ClCompile Include="..\..\classes\io\drivers\driver_memory.cpp" />
+    <ClCompile Include="..\..\classes\io\drivers\driver_posix.cpp" />
+    <ClCompile Include="..\..\classes\io\drivers\driver_socket.cpp" />
+    <ClCompile Include="..\..\classes\io\drivers\driver_socks4.cpp" />
+    <ClCompile Include="..\..\classes\io\drivers\driver_socks5.cpp" />
+    <ClCompile Include="..\..\classes\io\drivers\driver_win32.cpp" />
+    <ClCompile Include="..\..\classes\io\drivers\driver_zero.cpp" />
+    <ClCompile Include="..\..\classes\io\filters\filter_bzip2.cpp" />
+    <ClCompile Include="..\..\classes\io\filters\filter_xor.cpp" />
+    <ClCompile Include="..\..\classes\i18n\language.cpp" />
+    <ClCompile Include="..\..\classes\i18n\number.cpp" />
+    <ClCompile Include="..\..\classes\i18n\section.cpp" />
+    <ClCompile Include="..\..\classes\i18n\translator.cpp" />
+    <ClCompile Include="..\..\classes\i18n\translator_internal.cpp" />
+    <ClCompile Include="..\..\classes\net\protocols\file.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\net\protocols\http.cpp" />
+    <ClCompile Include="..\..\classes\net\protocols\protocol.cpp" />
+    <ClCompile Include="..\..\classes\input\pointer.cpp" />
+    <ClCompile Include="..\..\misc\codecs.cpp" />
+    <ClCompile Include="..\..\misc\init.cpp" />
+    <ClCompile Include="..\..\misc\pciio.cpp" />
+    <ClCompile Include="..\..\misc\templates.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ar.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_bg.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ca.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_cs.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_da.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_de.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_el.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_es.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_et.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_fi.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_fr.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_gl.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_he.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_hi.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_hr.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_hu.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_id.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_it.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ja.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ko.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_lt.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ms.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_nl.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_no.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_pa.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_pl.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_pt.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_pt_BR.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ro.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ru.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_sk.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_sr.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_sv.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_th.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_tr.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_uk.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_vi.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_zh_CN.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_zh_TW.h" />
+    <ClInclude Include="..\..\include\smooth.h" />
+    <ClInclude Include="..\..\include\smooth\args.h" />
+    <ClInclude Include="..\..\include\smooth\codecs.h" />
+    <ClInclude Include="..\..\include\smooth\definitions.h" />
+    <ClInclude Include="..\..\include\smooth\dll.h" />
+    <ClInclude Include="..\..\include\smooth\foreach.h" />
+    <ClInclude Include="..\..\include\smooth\init.h" />
+    <ClInclude Include="..\..\include\smooth\main.h" />
+    <ClInclude Include="..\..\include\smooth\pciio.h" />
+    <ClInclude Include="..\..\include\smooth\resources.h" />
+    <ClInclude Include="..\..\include\smooth\version.h" />
+    <ClInclude Include="..\..\include\smooth\system\console.h" />
+    <ClInclude Include="..\..\include\smooth\system\cpu.h" />
+    <ClInclude Include="..\..\include\smooth\system\dynamicloader.h" />
+    <ClInclude Include="..\..\include\smooth\system\event.h" />
+    <ClInclude Include="..\..\include\smooth\system\multimonitor.h" />
+    <ClInclude Include="..\..\include\smooth\system\system.h" />
+    <ClInclude Include="..\..\include\smooth\system\timer.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\eventbackend.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\timerbackend.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\posix\timerposix.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\win32\eventwin32.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\win32\timerwin32.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\threads\timerthreads.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\xlib\eventxlib.h" />
+    <ClInclude Include="..\..\include\smooth\basic\object.h" />
+    <ClInclude Include="..\..\include\smooth\basic\objecttype.h" />
+    <ClInclude Include="..\..\include\smooth\basic\setup.h" />
+    <ClInclude Include="..\..\include\smooth\backends\backend.h" />
+    <ClInclude Include="..\..\include\smooth\backends\gdiplus\backendgdiplus.h" />
+    <ClInclude Include="..\..\include\smooth\backends\win32\backendwin32.h" />
+    <ClInclude Include="..\..\include\smooth\backends\xlib\backendxlib.h" />
+    <ClInclude Include="..\..\include\smooth\misc\args.h" />
+    <ClInclude Include="..\..\include\smooth\misc\binary.h" />
+    <ClInclude Include="..\..\include\smooth\misc\config.h" />
+    <ClInclude Include="..\..\include\smooth\misc\datetime.h" />
+    <ClInclude Include="..\..\include\smooth\misc\math.h" />
+    <ClInclude Include="..\..\include\smooth\misc\memory.h" />
+    <ClInclude Include="..\..\include\smooth\misc\number.h" />
+    <ClInclude Include="..\..\include\smooth\misc\string.h" />
+    <ClInclude Include="..\..\include\smooth\misc\encoding\base64.h" />
+    <ClInclude Include="..\..\include\smooth\misc\hash\crc32.h" />
+    <ClInclude Include="..\..\include\smooth\misc\hash\md5.h" />
+    <ClInclude Include="..\..\include\smooth\misc\hash\sha1.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\layer.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\widget.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\menu.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\menubar.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\menubarentry.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\menuentry.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\micromenu.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\popupmenu.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentry.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentrycheck.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentryoption.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\combobox.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\list.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\listbox.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\listboxheader.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\listentry.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\listentryseparator.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\tree\tree.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\image\imagebox.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\image\imageentry.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\activearea.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\arrows.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\button.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\checkbox.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\client.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\divider.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\editbox.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\groupbox.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\hyperlink.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\image.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\multiedit.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\optionbox.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\progressbar.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\scrollbar.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\slider.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\statusbar.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\tabwidget.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\text.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\titlebar.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\cursor.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\dragcontrol.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\droparea.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\shortcut.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\tooltip.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\hotspot\hotspot.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\hotspot\simplebutton.h" />
+    <ClInclude Include="..\..\include\smooth\gui\window\toolwindow.h" />
+    <ClInclude Include="..\..\include\smooth\gui\window\window.h" />
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\windowbackend.h" />
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\gdi\windowgdi.h" />
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\xlib\windowxlib.h" />
+    <ClInclude Include="..\..\include\smooth\gui\mdi\client.h" />
+    <ClInclude Include="..\..\include\smooth\gui\mdi\window.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\colordlg.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\dialog.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\fontdlg.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\messagebox.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\splashscreen.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\tipodaydlg.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_gtk.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_win32.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_gtk.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_win32.h" />
+    <ClInclude Include="..\..\include\smooth\gui\application\application.h" />
+    <ClInclude Include="..\..\include\smooth\gui\application\xulloader.h" />
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\clipboard.h" />
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\clipboardbackend.h" />
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\win32\clipboardwin32.h" />
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\xlib\clipboardxlib.h" />
+    <ClInclude Include="..\..\include\smooth\net\protocols\file.h" />
+    <ClInclude Include="..\..\include\smooth\net\protocols\http.h" />
+    <ClInclude Include="..\..\include\smooth\net\protocols\protocol.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\bitmap.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\color.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\font.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\surface.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\bitmapbackend.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\fontbackend.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\surfacebackend.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdi\bitmapgdi.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdi\fontgdi.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdi\surfacegdi.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\xlib\bitmapxlib.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\xlib\surfacexlib.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\fontcairo.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\surfacecairo.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\bitmapgdiplus.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\fontgdiplus.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\surfacegdiplus.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\forms\line.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\forms\point.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\forms\rect.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\forms\size.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\icon.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\imageloader.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\pci.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\modifiers\fontsize.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\modifiers\righttoleft.h" />
+    <ClInclude Include="..\..\include\smooth\templates\array.h" />
+    <ClInclude Include="..\..\include\smooth\templates\buffer.h" />
+    <ClInclude Include="..\..\include\smooth\templates\callbacks.h" />
+    <ClInclude Include="..\..\include\smooth\templates\iterator.h" />
+    <ClInclude Include="..\..\include\smooth\templates\nonblocking.h" />
+    <ClInclude Include="..\..\include\smooth\templates\signals.h" />
+    <ClInclude Include="..\..\include\smooth\templates\signalsr.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slotsr.h" />
+    <ClInclude Include="..\..\include\smooth\templates\buffer\buffer.h" />
+    <ClInclude Include="..\..\include\smooth\templates\array\array.h" />
+    <ClInclude Include="..\..\include\smooth\templates\array\arraybackend.h" />
+    <ClInclude Include="..\..\include\smooth\templates\array\arrayentry.h" />
+    <ClInclude Include="..\..\include\smooth\templates\signals\callback.h" />
+    <ClInclude Include="..\..\include\smooth\templates\signals\signal.h" />
+    <ClInclude Include="..\..\include\smooth\templates\signals\signal_base.h" />
+    <ClInclude Include="..\..\include\smooth\templates\signals\signalr.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots\slot_base.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots\slot_class.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots\slot_global.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots\slot_signal.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_base.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_class.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_global.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_signal.h" />
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_value.h" />
+    <ClInclude Include="..\..\include\smooth\threads\mutex.h" />
+    <ClInclude Include="..\..\include\smooth\threads\rwlock.h" />
+    <ClInclude Include="..\..\include\smooth\threads\semaphore.h" />
+    <ClInclude Include="..\..\include\smooth\threads\thread.h" />
+    <ClInclude Include="..\..\include\smooth\threads\backends\mutexbackend.h" />
+    <ClInclude Include="..\..\include\smooth\threads\backends\semaphorebackend.h" />
+    <ClInclude Include="..\..\include\smooth\threads\backends\threadbackend.h" />
+    <ClInclude Include="..\..\include\smooth\threads\backends\posix\mutexposix.h" />
+    <ClInclude Include="..\..\include\smooth\threads\backends\posix\semaphoreposix.h" />
+    <ClInclude Include="..\..\include\smooth\threads\backends\posix\threadposix.h" />
+    <ClInclude Include="..\..\include\smooth\threads\backends\win32\mutexwin32.h" />
+    <ClInclude Include="..\..\include\smooth\threads\backends\win32\semaphorewin32.h" />
+    <ClInclude Include="..\..\include\smooth\threads\backends\win32\threadwin32.h" />
+    <ClInclude Include="..\..\include\smooth\i18n\language.h" />
+    <ClInclude Include="..\..\include\smooth\i18n\number.h" />
+    <ClInclude Include="..\..\include\smooth\i18n\section.h" />
+    <ClInclude Include="..\..\include\smooth\i18n\translator.h" />
+    <ClInclude Include="..\..\include\smooth\i18n\translator_internal.h" />
+    <ClInclude Include="..\..\include\smooth\files\directory.h" />
+    <ClInclude Include="..\..\include\smooth\files\file.h" />
+    <ClInclude Include="..\..\include\smooth\input\pointer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\resources\resources.rc">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_UNICODE;UNICODE;SMOOTH_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_UNICODE;UNICODE;__SMOOTH_DLL__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_UNICODE;UNICODE;__SMOOTH_DLL__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_UNICODE;UNICODE;__SMOOTH_DLL__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\fribidi2\fribidi2.vcxproj">
+      <Project>{3f531a26-f2a2-42aa-bde3-2332d76b0be4}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\iconv\iconv.vcxproj">
+      <Project>{fdac8125-a567-42f4-ae6c-6d7c271e19e6}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\libbzip2\libbzip2.vcxproj">
+      <Project>{601d2c29-07f2-4a25-aa49-3d703db3cbe5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\libcpuid\libcpuid.vcxproj">
+      <Project>{667d5bae-b1f4-4b9b-bf8b-912887ba623a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\libjpeg\libjpeg.vcxproj">
+      <Project>{6ce83872-6448-4baf-98c0-086dc164cad2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\libpng\libpng.vcxproj">
+      <Project>{b54f3035-a219-400c-b399-2502bdba5ee2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\libxml\libxml.vcxproj">
+      <Project>{627a7d3d-09fe-4a48-8473-1437698232f0}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\libz\libz.vcxproj">
+      <Project>{681cb867-a887-45e9-b339-b4b6b3ce8f20}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

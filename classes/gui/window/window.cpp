@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -70,6 +70,8 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 	frameWidth = GetSystemMetrics(SM_CXFRAME);
 #else
 	frameWidth = 1;
+
+	backend->SetSizeModifier(Size(-6, -6));
 #endif
 
 	updateRect = Rect(Point(-1, -1), Size(0, 0));
@@ -904,6 +906,11 @@ S::Void S::GUI::Window::CalculateOffsets()
 	}
 }
 
+const S::GUI::Size &S::GUI::Window::GetSizeModifier() const
+{
+	return backend->GetSizeModifier();
+}
+
 S::GUI::Point S::GUI::Window::GetMousePosition() const
 {
 	Point	 position = Input::Pointer::GetPosition();
@@ -958,6 +965,8 @@ S::Int S::GUI::Window::Add(Widget *widget)
 		if (widget->GetObjectType() == Titlebar::classID)
 		{
 			if (!Binary::IsFlagSet(widget->GetFlags(), TB_MAXBUTTON)) flags = flags | WF_NORESIZE;
+
+			if (widget->GetHeight() == 0) backend->SetSizeModifier(backend->GetSizeModifier() - Size(0, 19));
 		}
 		else if (widget->GetObjectType() == Statusbar::classID)
 		{

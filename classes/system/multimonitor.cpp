@@ -74,7 +74,8 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorMetrics()
 	else
 	{
 		GUI::Point	 position = Input::Pointer::GetPosition();
-		HMONITOR	 monitor = ex_MonitorFromPoint((POINT) { position.x, position.y }, 2);
+		POINT		 pos	  = { position.x, position.y };
+		HMONITOR	 monitor  = ex_MonitorFromPoint(pos, 2);
 		MONITORINFO	 info;
 
 		info.cbSize = sizeof(MONITORINFO);
@@ -103,7 +104,8 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorWorkArea()
 	else
 	{
 		GUI::Point	 position = Input::Pointer::GetPosition();
-		HMONITOR	 monitor = ex_MonitorFromPoint((POINT) { position.x, position.y }, 2);
+		POINT		 pos	  = { position.x, position.y };
+		HMONITOR	 monitor  = ex_MonitorFromPoint(pos, 2);
 		MONITORINFO	 info;
 
 		info.cbSize = sizeof(MONITORINFO);

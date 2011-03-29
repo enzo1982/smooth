@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,8 +10,8 @@
 
 #include <smooth/misc/hash/crc32.h>
 
-S::Int	 S::Hash::CRC32::table[256];
-S::Bool	 S::Hash::CRC32::initialized = False;
+S::UnsignedInt32	 S::Hash::CRC32::table[256];
+S::Bool			 S::Hash::CRC32::initialized = False;
 
 S::Hash::CRC32::CRC32(const Buffer<UnsignedByte> &iBuffer) : buffer(iBuffer)
 {
@@ -24,7 +24,7 @@ S::Hash::CRC32::~CRC32()
 
 S::Void S::Hash::CRC32::InitTable()
 {
-	UnsignedLong	 ulPolynomial = 0x04c11db7;
+	UnsignedInt32	 ulPolynomial = 0x04c11db7;
 
 	for (Int i = 0; i <= 0xFF; i++)
 	{
@@ -38,9 +38,9 @@ S::Void S::Hash::CRC32::InitTable()
 	initialized = True;
 }
 
-S::UnsignedLong S::Hash::CRC32::Reflect(UnsignedLong ref, char ch)
+S::UnsignedInt32 S::Hash::CRC32::Reflect(UnsignedInt32 ref, char ch)
 {
-	UnsignedLong	 value(0);
+	UnsignedInt32	 value(0);
 
 	for (Int i = 1; i < (ch + 1); i++)
 	{
@@ -52,9 +52,9 @@ S::UnsignedLong S::Hash::CRC32::Reflect(UnsignedLong ref, char ch)
 	return value;
 }
 
-S::Int S::Hash::CRC32::Compute() const
+S::UnsignedInt32 S::Hash::CRC32::Compute() const
 {
-	UnsignedLong	 ulCRC(0xffffffff);
+	UnsignedInt32	 ulCRC(0xffffffff);
 	Int		 len = buffer.Size();
 	UnsignedByte	*pBuffer = buffer;
 

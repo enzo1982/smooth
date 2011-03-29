@@ -57,7 +57,7 @@ class Label BASE_EMBEDDED {
 
   INLINE(void Unuse())            { pos_ = 0; }
 
-  INLINE(bool is_bound()  const)  { return pos_ <  0; }
+  INLINE(bool is_bound() const)  { return pos_ <  0; }
   INLINE(bool is_unused() const)  { return pos_ == 0; }
   INLINE(bool is_linked() const)  { return pos_ >  0; }
 
@@ -88,6 +88,57 @@ class Label BASE_EMBEDDED {
   friend class Displacement;
   friend class ShadowTarget;
   friend class RegExpMacroAssemblerIrregexp;
+};
+
+
+// -----------------------------------------------------------------------------
+// NearLabels are labels used for short jumps (in Intel jargon).
+// NearLabels should be used if it can be guaranteed that the jump range is
+// within -128 to +127. We already use short jumps when jumping backwards,
+// so using a NearLabel will only have performance impact if used for forward
+// jumps.
+class NearLabel BASE_EMBEDDED {
+ public:
+  NearLabel() { Unuse(); }
+  ~NearLabel() { ASSERT(!is_linked()); }
+
+  void Unuse() {
+    pos_ = -1;
+    unresolved_branches_ = 0;
+#ifdef DEBUG
+    for (int i = 0; i < kMaxUnresolvedBranches; i++) {
+      unresolved_positions_[i] = -1;
+    }
+#endif
+  }
+
+  int pos() {
+    ASSERT(is_bound());
+    return pos_;
+  }
+
+  bool is_bound() { return pos_ >= 0; }
+  bool is_linked() { return !is_bound() && unresolved_branches_ > 0; }
+  bool is_unused() { return !is_bound() && unresolved_branches_ == 0; }
+
+  void bind_to(int position) {
+    ASSERT(!is_bound());
+    pos_ = position;
+  }
+
+  void link_to(int position) {
+    ASSERT(!is_bound());
+    ASSERT(unresolved_branches_ < kMaxUnresolvedBranches);
+    unresolved_positions_[unresolved_branches_++] = position;
+  }
+
+ private:
+  static const int kMaxUnresolvedBranches = 8;
+  int pos_;
+  int unresolved_branches_;
+  int unresolved_positions_[kMaxUnresolvedBranches];
+
+  friend class Assembler;
 };
 
 
@@ -181,10 +232,10 @@ class RelocInfo BASE_EMBEDDED {
   static inline int ModeMask(Mode mode) { return 1 << mode; }
 
   // Accessors
-  byte* pc() const  { return pc_; }
+  byte* pc() const { return pc_; }
   void set_pc(byte* pc) { pc_ = pc; }
   Mode rmode() const {  return rmode_; }
-  intptr_t data() const  { return data_; }
+  intptr_t data() const { return data_; }
 
   // Apply a relocation by delta bytes
   INLINE(void apply(intptr_t delta));
@@ -235,6 +286,7 @@ class RelocInfo BASE_EMBEDDED {
   INLINE(void set_call_object(Object* target));
   INLINE(Object** call_object_address());
 
+  template<typename StaticVisitor> inline void Visit();
   inline void Visit(ObjectVisitor* v);
 
   // Patch the code with some other code.
@@ -338,7 +390,7 @@ class RelocIterator: public Malloced {
   explicit RelocIterator(const CodeDesc& desc, int mode_mask = -1);
 
   // Iteration
-  bool done() const  { return done_; }
+  bool done() const { return done_; }
   void next();
 
   // Return pointer valid until next next().
@@ -430,6 +482,7 @@ class ExternalReference BASE_EMBEDDED {
   static ExternalReference fill_heap_number_with_random_function();
   static ExternalReference random_uint32_function();
   static ExternalReference transcendental_cache_array_address();
+  static ExternalReference delete_handle_scope_extensions();
 
   // Static data in the keyed lookup cache.
   static ExternalReference keyed_lookup_cache_keys();
@@ -467,9 +520,9 @@ class ExternalReference BASE_EMBEDDED {
   static ExternalReference double_fp_operation(Token::Value operation);
   static ExternalReference compare_doubles();
 
-  static ExternalReference handle_scope_extensions_address();
   static ExternalReference handle_scope_next_address();
   static ExternalReference handle_scope_limit_address();
+  static ExternalReference handle_scope_level_address();
 
   static ExternalReference scheduled_exception_address();
 
@@ -528,6 +581,67 @@ class ExternalReference BASE_EMBEDDED {
   }
 
   void* address_;
+};
+
+
+// -----------------------------------------------------------------------------
+// Position recording support
+
+enum PositionRecordingType { FORCED_POSITION, NORMAL_POSITION };
+
+class PositionsRecorder BASE_EMBEDDED {
+ public:
+  explicit PositionsRecorder(Assembler* assembler)
+      : assembler_(assembler),
+        current_position_(RelocInfo::kNoPosition),
+        current_position_recording_type_(NORMAL_POSITION),
+        written_position_(RelocInfo::kNoPosition),
+        current_statement_position_(RelocInfo::kNoPosition),
+        written_statement_position_(RelocInfo::kNoPosition) { }
+
+  // Set current position to pos. If recording_type is FORCED_POSITION then
+  // WriteRecordedPositions will write this position even if it is equal to
+  // statement position previously written for another pc.
+  void RecordPosition(int pos,
+                      PositionRecordingType recording_type = NORMAL_POSITION);
+
+  // Set current statement position to pos.
+  void RecordStatementPosition(int pos);
+
+  // Write recorded positions to relocation information.
+  bool WriteRecordedPositions();
+
+  int current_position() const { return current_position_; }
+
+  int current_statement_position() const { return current_statement_position_; }
+
+ private:
+  Assembler* assembler_;
+
+  int current_position_;
+  PositionRecordingType current_position_recording_type_;
+  int written_position_;
+
+  int current_statement_position_;
+  int written_statement_position_;
+};
+
+
+class PreserveStatementPositionScope BASE_EMBEDDED {
+ public:
+  explicit PreserveStatementPositionScope(PositionsRecorder* positions_recorder)
+      : positions_recorder_(positions_recorder),
+        statement_position_(positions_recorder->current_statement_position()) {}
+
+  ~PreserveStatementPositionScope() {
+    if (statement_position_ != RelocInfo::kNoPosition) {
+      positions_recorder_->RecordStatementPosition(statement_position_);
+    }
+  }
+
+ private:
+  PositionsRecorder* positions_recorder_;
+  int statement_position_;
 };
 
 

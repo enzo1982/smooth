@@ -10,6 +10,10 @@ ifeq ($(BUILD_WIN32),True)
 	MYCCOPTS = -I$(SMOOTH_PATH)/include/support/libjpeg -I$(SMOOTH_PATH)/include/support/libpng
 endif
 
+ifeq ($(BUILD_OSX),True)
+	MYCCOPTS = -I$(SMOOTH_PATH)/include/support/libjpeg
+endif
+
 # Enter object files here:
 OBJECTS	  = imageloader.o jpeg.o pci.o png.o
 

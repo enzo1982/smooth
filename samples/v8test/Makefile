@@ -10,7 +10,7 @@ LOCALEXE  = v8test
 OBJECTS	  = v8test.o
 
 # Enter additional library dependencies here
-LIBS	  = -lv8
+LIBS	  = -lsmooth-js
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =

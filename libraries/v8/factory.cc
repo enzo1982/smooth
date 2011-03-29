@@ -32,6 +32,7 @@
 #include "execution.h"
 #include "factory.h"
 #include "macro-assembler.h"
+#include "objects-visiting.h"
 
 namespace v8 {
 namespace internal {
@@ -277,8 +278,7 @@ Handle<Map> Factory::CopyMap(Handle<Map> src,
   copy->set_inobject_properties(inobject_properties);
   copy->set_unused_property_fields(inobject_properties);
   copy->set_instance_size(copy->instance_size() + instance_size_delta);
-  copy->set_scavenger(Heap::GetScavenger(copy->instance_type(),
-                                         copy->instance_size()));
+  copy->set_visitor_id(StaticVisitorBase::GetVisitorId(*copy));
   return copy;
 }
 
@@ -431,7 +431,8 @@ Handle<Object> Factory::NewError(const char* maker,
                                  const char* type,
                                  Handle<JSArray> args) {
   Handle<String> make_str = Factory::LookupAsciiSymbol(maker);
-  Handle<Object> fun_obj(Top::builtins()->GetProperty(*make_str));
+  Handle<Object> fun_obj(Top::builtins()->GetPropertyNoExceptionThrown(
+      *make_str));
   // If the builtins haven't been properly configured yet this error
   // constructor may not have been defined.  Bail out.
   if (!fun_obj->IsJSFunction())
@@ -464,7 +465,7 @@ Handle<Object> Factory::NewError(const char* constructor,
   Handle<JSFunction> fun =
       Handle<JSFunction>(
           JSFunction::cast(
-              Top::builtins()->GetProperty(*constr)));
+              Top::builtins()->GetPropertyNoExceptionThrown(*constr)));
   Object** argv[1] = { Handle<Object>::cast(message).location() };
 
   // Invoke the JavaScript factory method. If an exception is thrown while
@@ -486,6 +487,10 @@ Handle<JSFunction> Factory::NewFunction(Handle<String> name,
                                         bool force_initial_map) {
   // Allocate the function
   Handle<JSFunction> function = NewFunction(name, the_hole_value());
+
+  // Setup the code pointer in both the shared function info and in
+  // the function itself.
+  function->shared()->set_code(*code);
   function->set_code(*code);
 
   if (force_initial_map ||
@@ -511,9 +516,12 @@ Handle<JSFunction> Factory::NewFunctionWithPrototype(Handle<String> name,
                                                      Handle<JSObject> prototype,
                                                      Handle<Code> code,
                                                      bool force_initial_map) {
-  // Allocate the function
+  // Allocate the function.
   Handle<JSFunction> function = NewFunction(name, prototype);
 
+  // Setup the code pointer in both the shared function info and in
+  // the function itself.
+  function->shared()->set_code(*code);
   function->set_code(*code);
 
   if (force_initial_map ||
@@ -535,6 +543,7 @@ Handle<JSFunction> Factory::NewFunctionWithPrototype(Handle<String> name,
 Handle<JSFunction> Factory::NewFunctionWithoutPrototype(Handle<String> name,
                                                         Handle<Code> code) {
   Handle<JSFunction> function = NewFunctionWithoutPrototype(name);
+  function->shared()->set_code(*code);
   function->set_code(*code);
   ASSERT(!function->has_initial_map());
   ASSERT(!function->has_prototype());
@@ -559,12 +568,13 @@ Handle<Code> Factory::CopyCode(Handle<Code> code, Vector<byte> reloc_info) {
 }
 
 
-static inline Object* DoCopyInsert(DescriptorArray* array,
-                                   String* key,
-                                   Object* value,
-                                   PropertyAttributes attributes) {
+MUST_USE_RESULT static inline MaybeObject* DoCopyInsert(
+    DescriptorArray* array,
+    String* key,
+    Object* value,
+    PropertyAttributes attributes) {
   CallbacksDescriptor desc(key, value, attributes);
-  Object* obj = array->CopyInsert(&desc, REMOVE_TRANSITIONS);
+  MaybeObject* obj = array->CopyInsert(&desc, REMOVE_TRANSITIONS);
   return obj;
 }
 
@@ -684,7 +694,7 @@ Handle<SharedFunctionInfo> Factory::NewSharedFunctionInfo(
     Handle<String> name,
     int number_of_literals,
     Handle<Code> code,
-    Handle<Object> scope_info) {
+    Handle<SerializedScopeInfo> scope_info) {
   Handle<SharedFunctionInfo> shared = NewSharedFunctionInfo(name);
   shared->set_code(*code);
   shared->set_scope_info(*scope_info);
@@ -913,11 +923,15 @@ Handle<MapCache> Factory::NewMapCache(int at_least_space_for) {
 }
 
 
-static Object* UpdateMapCacheWith(Context* context,
-                                  FixedArray* keys,
-                                  Map* map) {
-  Object* result = MapCache::cast(context->map_cache())->Put(keys, map);
-  if (!result->IsFailure()) context->set_map_cache(MapCache::cast(result));
+MUST_USE_RESULT static MaybeObject* UpdateMapCacheWith(Context* context,
+                                                       FixedArray* keys,
+                                                       Map* map) {
+  Object* result;
+  { MaybeObject* maybe_result =
+        MapCache::cast(context->map_cache())->Put(keys, map);
+    if (!maybe_result->ToObject(&result)) return maybe_result;
+  }
+  context->set_map_cache(MapCache::cast(result));
   return result;
 }
 

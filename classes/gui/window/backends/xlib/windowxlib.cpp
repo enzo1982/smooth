@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -253,10 +253,39 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 		case ButtonPress:
 			Input::Pointer::UpdatePosition(e->xmotion.x_root, e->xmotion.y_root);
 
-			if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONDOWN, 0, 0);
-			else if (e->xbutton.button == Button3) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
-			else if (e->xbutton.button == Button4) onEvent.Call(SM_MOUSEWHEEL, 120, 0);
-			else if (e->xbutton.button == Button5) onEvent.Call(SM_MOUSEWHEEL, -120, 0);
+			{
+				static XButtonEvent	 prevButtonEvent;
+				static Bool		 prevButtonEventInitialized = False;
+
+				if (!prevButtonEventInitialized)
+				{
+					prevButtonEvent.button = 0;
+					prevButtonEvent.time   = 0;
+					prevButtonEvent.x      = 0;
+					prevButtonEvent.y      = 0;
+
+					prevButtonEventInitialized = True;
+				}
+
+				if ((e->xbutton.button == Button1 || e->xbutton.button == Button3) &&
+				     e->xbutton.button == prevButtonEvent.button		   &&
+				     e->xbutton.time   <= prevButtonEvent.time + 500		   &&
+				     Math::Abs(e->xbutton.x - prevButtonEvent.x) <= 5		   &&
+				     Math::Abs(e->xbutton.y - prevButtonEvent.y) <= 5)
+				{
+					if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONDBLCLK, 0, 0);
+					else if (e->xbutton.button == Button3) onEvent.Call(SM_RBUTTONDBLCLK, 0, 0);
+				}
+				else
+				{
+					if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONDOWN, 0, 0);
+					else if (e->xbutton.button == Button3) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
+					else if (e->xbutton.button == Button4) onEvent.Call(SM_MOUSEWHEEL, 120, 0);
+					else if (e->xbutton.button == Button5) onEvent.Call(SM_MOUSEWHEEL, -120, 0);
+				}
+
+				prevButtonEvent = e->xbutton;
+			}
 
 			/* Grab the keyboard focus if we don't have it already.
 			 */
@@ -418,7 +447,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	attributes.colormap		 = CopyFromParent;
 	attributes.cursor		 = None;
 
-	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx, size.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBorderPixel | CWOverrideRedirect | CWSaveUnder, &attributes);
+	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx + sizeModifier.cx, size.cy + sizeModifier.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBorderPixel | CWOverrideRedirect | CWSaveUnder, &attributes);
 
 	if (wnd != NIL)
 	{
@@ -463,8 +492,8 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		 */
 		if (flags & WF_NORESIZE)
 		{
-			minSize = size;
-			maxSize = size;
+			minSize = size + sizeModifier;
+			maxSize = size + sizeModifier;
 		}
 
 		UpdateWMNormalHints();
@@ -509,7 +538,7 @@ S::Int S::GUI::WindowXLib::SetTitle(const String &nTitle)
 
 S::Int S::GUI::WindowXLib::SetMinimumSize(const Size &nMinSize)
 {
-	minSize = nMinSize;
+	minSize = nMinSize + sizeModifier;
 
 	UpdateWMNormalHints();
 
@@ -518,7 +547,7 @@ S::Int S::GUI::WindowXLib::SetMinimumSize(const Size &nMinSize)
 
 S::Int S::GUI::WindowXLib::SetMaximumSize(const Size &nMaxSize)
 {
-	maxSize = nMaxSize;
+	maxSize = nMaxSize + sizeModifier;
 
 	UpdateWMNormalHints();
 
@@ -549,7 +578,7 @@ S::Int S::GUI::WindowXLib::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	if (nPos == pos && nSize == size) return Success();
 
-	XMoveResizeWindow(display, wnd, nPos.x, nPos.y, nSize.cx, nSize.cy);
+	XMoveResizeWindow(display, wnd, nPos.x, nPos.y, nSize.cx + sizeModifier.cx, nSize.cy + sizeModifier.cy);
 	XFlush(display);
 
 	drawSurface->SetSize(nSize);

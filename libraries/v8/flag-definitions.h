@@ -108,6 +108,8 @@ DEFINE_bool(enable_sse2, true,
             "enable use of SSE2 instructions if available")
 DEFINE_bool(enable_sse3, true,
             "enable use of SSE3 instructions if available")
+DEFINE_bool(enable_sse4_1, true,
+            "enable use of SSE4.1 instructions if available")
 DEFINE_bool(enable_cmov, true,
             "enable use of CMOV instruction if available")
 DEFINE_bool(enable_rdtsc, true,
@@ -138,6 +140,9 @@ DEFINE_bool(stack_trace_on_abort, true,
 // codegen-ia32.cc / codegen-arm.cc
 DEFINE_bool(trace, false, "trace function calls")
 DEFINE_bool(defer_negation, true, "defer negation operation")
+DEFINE_bool(mask_constants_with_cookie,
+            true,
+            "use random jit cookie to mask large constants")
 
 // codegen.cc
 DEFINE_bool(lazy, true, "use lazy compilation")
@@ -148,11 +153,8 @@ DEFINE_bool(strict, false, "strict error checking")
 DEFINE_int(min_preparse_length, 1024,
            "minimum length for automatic enable preparsing")
 DEFINE_bool(full_compiler, true, "enable dedicated backend for run-once code")
-DEFINE_bool(fast_compiler, false, "enable speculative optimizing backend")
 DEFINE_bool(always_full_compiler, false,
             "try to use the dedicated run-once backend for all code")
-DEFINE_bool(always_fast_compiler, false,
-            "try to use the speculative optimizing backend for all code")
 DEFINE_bool(trace_bailout, false,
             "print reasons for falling back to using the classic V8 backend")
 DEFINE_bool(safe_int32_compiler, true,
@@ -177,9 +179,14 @@ DEFINE_bool(enable_liveedit, true, "enable liveedit experimental feature")
 DEFINE_int(max_stack_trace_source_length, 300,
            "maximum length of function source code printed in a stack trace.")
 
+// full-codegen.cc
+DEFINE_bool(always_inline_smi_code, false,
+            "always inline smi code in non-opt code")
+
 // heap.cc
-DEFINE_int(max_new_space_size, 0, "max size of the new generation")
-DEFINE_int(max_old_space_size, 0, "max size of the old generation")
+DEFINE_int(max_new_space_size, 0, "max size of the new generation (in kBytes)")
+DEFINE_int(max_old_space_size, 0, "max size of the old generation (in Mbytes)")
+DEFINE_int(max_executable_size, 0, "max size of executable memory (in Mbytes)")
 DEFINE_bool(gc_global, false, "always perform global GCs")
 DEFINE_int(gc_interval, -1, "garbage collect after <n> allocations")
 DEFINE_bool(trace_gc, false,
@@ -286,7 +293,7 @@ DEFINE_bool(remote_debugger, false, "Connect JavaScript debugger to the "
                                     "debugger agent in another process")
 DEFINE_bool(debugger_agent, false, "Enable debugger agent")
 DEFINE_int(debugger_port, 5858, "Port to use for remote debugging")
-DEFINE_string(map_counters, false, "Map counters to a file")
+DEFINE_string(map_counters, NULL, "Map counters to a file")
 DEFINE_args(js_arguments, JSArguments(),
             "Pass all remaining arguments to the script. Alias for \"--\".")
 
@@ -409,6 +416,7 @@ DEFINE_bool(sliding_state_window, false,
             "Update sliding state window counters.")
 DEFINE_string(logfile, "v8.log", "Specify the name of the log file.")
 DEFINE_bool(oprofile, false, "Enable JIT agent for OProfile.")
+DEFINE_bool(ll_prof, false, "Enable low-level linux profiler.")
 
 //
 // Heap protection flags

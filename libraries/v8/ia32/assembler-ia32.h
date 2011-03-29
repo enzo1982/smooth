@@ -64,15 +64,15 @@ namespace internal {
 // and best performance in optimized code.
 //
 struct Register {
-  bool is_valid() const  { return 0 <= code_ && code_ < 8; }
-  bool is(Register reg) const  { return code_ == reg.code_; }
+  bool is_valid() const { return 0 <= code_ && code_ < 8; }
+  bool is(Register reg) const { return code_ == reg.code_; }
   // eax, ebx, ecx and edx are byte registers, the rest are not.
-  bool is_byte_register() const  { return code_ <= 3; }
-  int code() const  {
+  bool is_byte_register() const { return code_ <= 3; }
+  int code() const {
     ASSERT(is_valid());
     return code_;
   }
-  int bit() const  {
+  int bit() const {
     ASSERT(is_valid());
     return 1 << code_;
   }
@@ -93,8 +93,8 @@ const Register no_reg = { -1 };
 
 
 struct XMMRegister {
-  bool is_valid() const  { return 0 <= code_ && code_ < 8; }
-  int code() const  {
+  bool is_valid() const { return 0 <= code_ && code_ < 8; }
+  int code() const {
     ASSERT(is_valid());
     return code_;
   }
@@ -376,6 +376,7 @@ class CpuFeatures : public AllStatic {
   static bool IsSupported(CpuFeature f) {
     if (f == SSE2 && !FLAG_enable_sse2) return false;
     if (f == SSE3 && !FLAG_enable_sse3) return false;
+    if (f == SSE4_1 && !FLAG_enable_sse4_1) return false;
     if (f == CMOV && !FLAG_enable_cmov) return false;
     if (f == RDTSC && !FLAG_enable_rdtsc) return false;
     return (supported_ & (static_cast<uint64_t>(1) << f)) != 0;
@@ -520,7 +521,6 @@ class Assembler : public Malloced {
   void push(const Immediate& x);
   void push(Register src);
   void push(const Operand& src);
-  void push(Label* label, RelocInfo::Mode relocation_mode);
 
   void pop(Register dst);
   void pop(const Operand& dst);
@@ -577,6 +577,7 @@ class Assembler : public Malloced {
   void add(const Operand& dst, const Immediate& x);
 
   void and_(Register dst, int32_t imm32);
+  void and_(Register dst, const Immediate& x);
   void and_(Register dst, const Operand& src);
   void and_(const Operand& src, Register dst);
   void and_(const Operand& dst, const Immediate& x);
@@ -594,6 +595,7 @@ class Assembler : public Malloced {
   void cmp(const Operand& op, Handle<Object> handle);
 
   void dec_b(Register dst);
+  void dec_b(const Operand& dst);
 
   void dec(Register dst);
   void dec(const Operand& dst);
@@ -625,6 +627,7 @@ class Assembler : public Malloced {
   void or_(const Operand& dst, const Immediate& x);
 
   void rcl(Register dst, uint8_t imm8);
+  void rcr(Register dst, uint8_t imm8);
 
   void sar(Register dst, uint8_t imm8);
   void sar_cl(Register dst);
@@ -685,12 +688,12 @@ class Assembler : public Malloced {
   // but it may be bound only once.
 
   void bind(Label* L);  // binds an unbound label L to the current code position
+  void bind(NearLabel* L);
 
   // Calls
   void call(Label* L);
   void call(byte* entry, RelocInfo::Mode rmode);
   void call(const Operand& adr);
-  void call(const ExternalReference& target);
   void call(Handle<Code> code, RelocInfo::Mode rmode);
 
   // Jumps
@@ -699,10 +702,16 @@ class Assembler : public Malloced {
   void jmp(const Operand& adr);
   void jmp(Handle<Code> code, RelocInfo::Mode rmode);
 
+  // Short jump
+  void jmp(NearLabel* L);
+
   // Conditional jumps
   void j(Condition cc, Label* L, Hint hint = no_hint);
   void j(Condition cc, byte* entry, RelocInfo::Mode rmode, Hint hint = no_hint);
   void j(Condition cc, Handle<Code> code, Hint hint = no_hint);
+
+  // Conditional short jump
+  void j(Condition cc, NearLabel* L, Hint hint = no_hint);
 
   // Floating-point operations
   void fld(int i);
@@ -786,8 +795,14 @@ class Assembler : public Malloced {
   void xorpd(XMMRegister dst, XMMRegister src);
   void sqrtsd(XMMRegister dst, XMMRegister src);
 
+  void andpd(XMMRegister dst, XMMRegister src);
+
   void ucomisd(XMMRegister dst, XMMRegister src);
   void movmskpd(Register dst, XMMRegister src);
+
+  void cmpltsd(XMMRegister dst, XMMRegister src);
+
+  void movaps(XMMRegister dst, XMMRegister src);
 
   void movdqa(XMMRegister dst, const Operand& src);
   void movdqa(const Operand& dst, XMMRegister src);
@@ -803,6 +818,8 @@ class Assembler : public Malloced {
 
   void pxor(XMMRegister dst, XMMRegister src);
   void ptest(XMMRegister dst, XMMRegister src);
+
+  void psllq(XMMRegister reg, int8_t imm8);
 
   // Parallel XMM operations.
   void movntdqa(XMMRegister src, const Operand& dst);
@@ -829,17 +846,11 @@ class Assembler : public Malloced {
   // Use --debug_code to enable.
   void RecordComment(const char* msg);
 
-  void RecordPosition(int pos);
-  void RecordStatementPosition(int pos);
-  bool WriteRecordedPositions();
-
   // Writes a single word of data in the code stream.
   // Used for inline tables, e.g., jump-tables.
   void dd(uint32_t data, RelocInfo::Mode reloc_info);
 
-  int pc_offset() const  { return pc_ - buffer_; }
-  int current_statement_position() const { return current_statement_position_; }
-  int current_position() const  { return current_position_; }
+  int pc_offset() const { return pc_ - buffer_; }
 
   // Check if there is less than kGap bytes available in the buffer.
   // If this is the case, we need to grow the buffer before emitting
@@ -850,6 +861,8 @@ class Assembler : public Malloced {
   inline int available_space() const { return reloc_info_writer.pos() - pc_; }
 
   static bool IsNop(Address addr) { return *addr == 0x90; }
+
+  PositionsRecorder* positions_recorder() { return &positions_recorder_; }
 
   // Avoid overflows for displacements etc.
   static const int kMaximalBufferSize = 512*MB;
@@ -866,6 +879,7 @@ class Assembler : public Malloced {
  private:
   byte* addr_at(int pos)  { return buffer_ + pos; }
   byte byte_at(int pos)  { return buffer_[pos]; }
+  void set_byte_at(int pos, byte value) { buffer_[pos] = value; }
   uint32_t long_at(int pos)  {
     return *reinterpret_cast<uint32_t*>(addr_at(pos));
   }
@@ -900,7 +914,6 @@ class Assembler : public Malloced {
   // labels
   void print(Label* L);
   void bind_to(Label* L, int pos);
-  void link_to(Label* L, Label* appendix);
 
   // displacements
   inline Displacement disp_at(Label* L);
@@ -929,11 +942,9 @@ class Assembler : public Malloced {
   // push-pop elimination
   byte* last_pc_;
 
-  // source position information
-  int current_statement_position_;
-  int current_position_;
-  int written_statement_position_;
-  int written_position_;
+  PositionsRecorder positions_recorder_;
+
+  friend class PositionsRecorder;
 };
 
 

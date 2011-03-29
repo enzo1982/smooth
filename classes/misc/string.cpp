@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -98,9 +98,11 @@ S::Int S::String::ComputeCRC32() const
 {
 	if (wString.Size() == 0) return 0;
 
-	Buffer<UnsignedByte>	 buffer((Length() + 1) * sizeof(wchar_t));
+	Int			 length = Length();
 
-	wcscpy((wchar_t *) (UnsignedByte *) buffer, wString);
+	Buffer<UnsignedByte>	 buffer(length * sizeof(wchar_t));
+
+	wcsncpy((wchar_t *) (UnsignedByte *) buffer, wString, length);
 
 	return Hash::CRC32(buffer).Compute();
 }
@@ -109,9 +111,12 @@ S::String S::String::EncodeBase64() const
 {
 	if (wString.Size() == 0) return NIL;
 
-	Buffer<UnsignedByte>	 buffer(Length() * 4 + 1);
+	const char		*utf8string = ConvertTo("UTF-8");
+	Int			 length	    = strlen(utf8string);
 
-	strcpy((char *) (UnsignedByte *) buffer, ConvertTo("UTF-8"));
+	Buffer<UnsignedByte>	 buffer(length);
+
+	strncpy((char *) (UnsignedByte *) buffer, utf8string, length);
 
 	return Encoding::Base64(buffer).Encode();
 }
@@ -222,9 +227,9 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	Int	 len = -1;
 
-	if (width == 1)		while (true) { if (((char  *) str)[++len] == 0) { len *= 1; break; } }
-	else if (width == 2)	while (true) { if (((short *) str)[++len] == 0) { len *= 2; break; } }
-	else if (width == 4)	while (true) { if (((long  *) str)[++len] == 0) { len *= 4; break; } }
+	if	(width == 1) while (true) { if (((char  *) str)[++len] == 0) { len *= 1; break; } }
+	else if (width == 2) while (true) { if (((short *) str)[++len] == 0) { len *= 2; break; } }
+	else if (width == 4) while (true) { if (((long  *) str)[++len] == 0) { len *= 4; break; } }
 
 	Int	 size = ConvertString(str, len, format, NIL, 0, GetInternalFormat());
 
@@ -306,21 +311,11 @@ wchar_t &S::String::operator [](int n)
 	return wString[n];
 }
 
-wchar_t &S::String::operator [](Int n)
-{
-	return (*this)[(int) n];
-}
-
 wchar_t S::String::operator [](int n) const
 {
 	if (n + 1 >= wString.Size()) return 0;
 
 	return wString[n];
-}
-
-wchar_t S::String::operator [](Int n) const
-{
-	return (*this)[(int) n];
 }
 
 S::String::operator char *() const
@@ -1074,7 +1069,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		size_t		 outBytesLeft	= outBytes;
 		char	       **outPointer	= &outBuffer;
 
-#ifdef __FreeBSD__
+#if defined __FreeBSD__ || defined __sun
 		const char     **inPointer	= &inBuffer;
 #else
 		char	       **inPointer	= const_cast<char **>(&inBuffer);

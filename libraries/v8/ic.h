@@ -123,8 +123,8 @@ class IC {
                                                             JSObject* holder);
   static inline InlineCacheHolderFlag GetCodeCacheForObject(JSObject* object,
                                                             JSObject* holder);
-  static inline Map* GetCodeCacheMap(Object* object,
-                                     InlineCacheHolderFlag holder);
+  static inline JSObject* GetCodeCacheHolder(Object* object,
+                                             InlineCacheHolderFlag holder);
 
  protected:
   Address fp() const { return fp_; }
@@ -191,7 +191,9 @@ class CallICBase: public IC {
   explicit CallICBase(Code::Kind kind) : IC(EXTRA_CALL_FRAME), kind_(kind) {}
 
  public:
-  Object* LoadFunction(State state, Handle<Object> object, Handle<String> name);
+  MUST_USE_RESULT MaybeObject* LoadFunction(State state,
+                                            Handle<Object> object,
+                                            Handle<String> name);
 
  protected:
   Code::Kind kind_;
@@ -235,7 +237,9 @@ class KeyedCallIC: public CallICBase {
     ASSERT(target()->is_keyed_call_stub());
   }
 
-  Object* LoadFunction(State state, Handle<Object> object, Handle<Object> key);
+  MUST_USE_RESULT MaybeObject* LoadFunction(State state,
+                                            Handle<Object> object,
+                                            Handle<Object> key);
 
   // Code generator routines.
   static void GenerateInitialize(MacroAssembler* masm, int argc) {
@@ -251,7 +255,9 @@ class LoadIC: public IC {
  public:
   LoadIC() : IC(NO_EXTRA_FRAME) { ASSERT(target()->is_load_stub()); }
 
-  Object* Load(State state, Handle<Object> object, Handle<String> name);
+  MUST_USE_RESULT MaybeObject* Load(State state,
+                                    Handle<Object> object,
+                                    Handle<String> name);
 
   // Code generator routines.
   static void GenerateInitialize(MacroAssembler* masm) { GenerateMiss(masm); }
@@ -298,6 +304,11 @@ class LoadIC: public IC {
 
   static bool PatchInlinedLoad(Address address, Object* map, int index);
 
+  static bool PatchInlinedContextualLoad(Address address,
+                                         Object* map,
+                                         Object* cell,
+                                         bool is_dont_delete);
+
   friend class IC;
 };
 
@@ -306,7 +317,9 @@ class KeyedLoadIC: public IC {
  public:
   KeyedLoadIC() : IC(NO_EXTRA_FRAME) { ASSERT(target()->is_keyed_load_stub()); }
 
-  Object* Load(State state, Handle<Object> object, Handle<Object> key);
+  MUST_USE_RESULT MaybeObject* Load(State state,
+                                    Handle<Object> object,
+                                    Handle<Object> key);
 
   // Code generator routines.
   static void GenerateMiss(MacroAssembler* masm);
@@ -379,10 +392,10 @@ class StoreIC: public IC {
  public:
   StoreIC() : IC(NO_EXTRA_FRAME) { ASSERT(target()->is_store_stub()); }
 
-  Object* Store(State state,
-                Handle<Object> object,
-                Handle<String> name,
-                Handle<Object> value);
+  MUST_USE_RESULT MaybeObject* Store(State state,
+                                     Handle<Object> object,
+                                     Handle<String> name,
+                                     Handle<Object> value);
 
   // Code generators for stub routines. Only called once at startup.
   static void GenerateInitialize(MacroAssembler* masm) { GenerateMiss(masm); }
@@ -390,6 +403,13 @@ class StoreIC: public IC {
   static void GenerateMegamorphic(MacroAssembler* masm);
   static void GenerateArrayLength(MacroAssembler* masm);
   static void GenerateNormal(MacroAssembler* masm);
+
+  // Clear the use of an inlined version.
+  static void ClearInlinedVersion(Address address);
+
+  // The offset from the inlined patch site to the start of the
+  // inlined store instruction.
+  static const int kOffsetToStoreInstruction;
 
  private:
   // Update the inline cache and the global stub cache based on the
@@ -408,6 +428,11 @@ class StoreIC: public IC {
   }
 
   static void Clear(Address address, Code* target);
+
+  // Support for patching the index and the map that is checked in an
+  // inlined version of the named store.
+  static bool PatchInlinedStore(Address address, Object* map, int index);
+
   friend class IC;
 };
 
@@ -416,10 +441,10 @@ class KeyedStoreIC: public IC {
  public:
   KeyedStoreIC() : IC(NO_EXTRA_FRAME) { }
 
-  Object* Store(State state,
-                Handle<Object> object,
-                Handle<Object> name,
-                Handle<Object> value);
+  MUST_USE_RESULT MaybeObject* Store(State state,
+                                     Handle<Object> object,
+                                     Handle<Object> name,
+                                     Handle<Object> value);
 
   // Code generators for stub routines.  Only called once at startup.
   static void GenerateInitialize(MacroAssembler* masm) { GenerateMiss(masm); }

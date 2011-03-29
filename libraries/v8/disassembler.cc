@@ -44,7 +44,10 @@ namespace internal {
 void Disassembler::Dump(FILE* f, byte* begin, byte* end) {
   for (byte* pc = begin; pc < end; pc++) {
     if (f == NULL) {
-      PrintF("%" V8PRIxPTR "  %4" V8PRIdPTR "  %02x\n", pc, pc - begin, *pc);
+      PrintF("%" V8PRIxPTR "  %4" V8PRIdPTR "  %02x\n",
+             reinterpret_cast<intptr_t>(pc),
+             pc - begin,
+             *pc);
     } else {
       fprintf(f, "%" V8PRIxPTR "  %4" V8PRIdPTR "  %02x\n",
               reinterpret_cast<uintptr_t>(pc), pc - begin, *pc);
@@ -258,11 +261,12 @@ static int DecodeIt(FILE* f,
             // Get the STUB key and extract major and minor key.
             uint32_t key = Smi::cast(obj)->value();
             uint32_t minor_key = CodeStub::MinorKeyFromKey(key);
-            ASSERT(code->major_key() == CodeStub::MajorKeyFromKey(key));
+            CodeStub::Major major_key = CodeStub::GetMajorKey(code);
+            ASSERT(major_key == CodeStub::MajorKeyFromKey(key));
             out.AddFormatted(" %s, %s, ",
                              Code::Kind2String(kind),
-                             CodeStub::MajorName(code->major_key(), false));
-            switch (code->major_key()) {
+                             CodeStub::MajorName(major_key, false));
+            switch (major_key) {
               case CodeStub::CallFunction:
                 out.AddFormatted("argc = %d", minor_key);
                 break;

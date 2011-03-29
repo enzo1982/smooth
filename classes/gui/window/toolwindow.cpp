@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/window/toolwindow.h>
+#include <smooth/gui/window/backends/windowbackend.h>
 
 const S::Short	 S::GUI::ToolWindow::classID = S::Object::RequestClassID();
 
@@ -19,6 +20,8 @@ S::GUI::ToolWindow::ToolWindow(const Point &iPos, const Size &iSize) : Window("s
 	visible		= True;
 
 	frameWidth	= 0;
+
+	backend->SetSizeModifier(Size());
 
 	SetFlags(WF_TOPMOST | WF_NOTASKBUTTON | WF_THINBORDER);
 }

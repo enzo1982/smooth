@@ -111,13 +111,20 @@ function GlobalParseInt(string, radix) {
     if (!(radix == 0 || (2 <= radix && radix <= 36)))
       return $NaN;
   }
-  return %StringParseInt(ToString(string), radix);
+  string = TO_STRING_INLINE(string);
+  if (%_HasCachedArrayIndex(string) &&
+      (radix == 0 || radix == 10)) {
+    return %_GetCachedArrayIndex(string);
+  }
+  return %StringParseInt(string, radix);
 }
 
 
 // ECMA-262 - 15.1.2.3
 function GlobalParseFloat(string) {
-  return %StringParseFloat(ToString(string));
+  string = TO_STRING_INLINE(string);
+  if (%_HasCachedArrayIndex(string)) return %_GetCachedArrayIndex(string);
+  return %StringParseFloat(string);
 }
 
 
@@ -133,7 +140,7 @@ function GlobalEval(x) {
                          'be the global object from which eval originated');
   }
 
-  var f = %CompileString(x, false);
+  var f = %CompileString(x);
   if (!IS_FUNCTION(f)) return f;
 
   return f.call(this);
@@ -144,7 +151,7 @@ function GlobalEval(x) {
 function GlobalExecScript(expr, lang) {
   // NOTE: We don't care about the character casing.
   if (!lang || /javascript/i.test(lang)) {
-    var f = %CompileString(ToString(expr), false);
+    var f = %CompileString(ToString(expr));
     f.call(%GlobalReceiver(global));
   }
   return null;
@@ -484,28 +491,29 @@ PropertyDescriptor.prototype.hasSetter = function() {
 }
 
 
-
-// ES5 section 8.12.1.
-function GetOwnProperty(obj, p) {
-  var desc = new PropertyDescriptor();
-
-  // GetOwnProperty returns an array indexed by the constants
-  // defined in macros.py.
-  // If p is not a property on obj undefined is returned.
-  var props = %GetOwnProperty(ToObject(obj), ToString(p));
-
-  if (IS_UNDEFINED(props)) return void 0;
-
-  // This is an accessor
-  if (props[IS_ACCESSOR_INDEX]) {
-    desc.setGet(props[GETTER_INDEX]);
-    desc.setSet(props[SETTER_INDEX]);
-  } else {
-    desc.setValue(props[VALUE_INDEX]);
-    desc.setWritable(props[WRITABLE_INDEX]);
+// Converts an array returned from Runtime_GetOwnProperty to an actual
+// property descriptor. For a description of the array layout please
+// see the runtime.cc file.
+function ConvertDescriptorArrayToDescriptor(desc_array) {
+  if (desc_array == false) {
+    throw 'Internal error: invalid desc_array';
   }
-  desc.setEnumerable(props[ENUMERABLE_INDEX]);
-  desc.setConfigurable(props[CONFIGURABLE_INDEX]);
+
+  if (IS_UNDEFINED(desc_array)) {
+    return void 0;
+  }
+
+  var desc = new PropertyDescriptor();
+  // This is an accessor.
+  if (desc_array[IS_ACCESSOR_INDEX]) {
+    desc.setGet(desc_array[GETTER_INDEX]);
+    desc.setSet(desc_array[SETTER_INDEX]);
+  } else {
+    desc.setValue(desc_array[VALUE_INDEX]);
+    desc.setWritable(desc_array[WRITABLE_INDEX]);
+  }
+  desc.setEnumerable(desc_array[ENUMERABLE_INDEX]);
+  desc.setConfigurable(desc_array[CONFIGURABLE_INDEX]);
 
   return desc;
 }
@@ -528,9 +536,27 @@ function HasProperty(obj, p) {
 }
 
 
+// ES5 section 8.12.1.
+function GetOwnProperty(obj, p) {
+  // GetOwnProperty returns an array indexed by the constants
+  // defined in macros.py.
+  // If p is not a property on obj undefined is returned.
+  var props = %GetOwnProperty(ToObject(obj), ToString(p));
+
+  // A false value here means that access checks failed.
+  if (props == false) return void 0;
+
+  return ConvertDescriptorArrayToDescriptor(props);
+}
+
+
 // ES5 8.12.9.
 function DefineOwnProperty(obj, p, desc, should_throw) {
-  var current = GetOwnProperty(obj, p);
+  var current_or_access = %GetOwnProperty(ToObject(obj), ToString(p));
+  // A false value here means that access checks failed.
+  if (current_or_access == false) return void 0;
+
+  var current = ConvertDescriptorArrayToDescriptor(current_or_access);
   var extensible = %IsExtensible(ToObject(obj));
 
   // Error handling according to spec.
@@ -539,21 +565,21 @@ function DefineOwnProperty(obj, p, desc, should_throw) {
     throw MakeTypeError("define_disallowed", ["defineProperty"]);
 
   if (!IS_UNDEFINED(current) && !current.isConfigurable()) {
-      // Step 5 and 6
-     if ((!desc.hasEnumerable() || 
-          SameValue(desc.isEnumerable() && current.isEnumerable())) &&
-         (!desc.hasConfigurable() || 
-          SameValue(desc.isConfigurable(), current.isConfigurable())) &&
-         (!desc.hasWritable() || 
-          SameValue(desc.isWritable(), current.isWritable())) &&
-         (!desc.hasValue() ||
-          SameValue(desc.getValue(), current.getValue())) &&
-         (!desc.hasGetter() ||
-          SameValue(desc.getGet(), current.getGet())) &&
-         (!desc.hasSetter() ||
-          SameValue(desc.getSet(), current.getSet()))) {
-       return true;
-     }
+    // Step 5 and 6
+    if ((!desc.hasEnumerable() ||
+         SameValue(desc.isEnumerable() && current.isEnumerable())) &&
+        (!desc.hasConfigurable() ||
+         SameValue(desc.isConfigurable(), current.isConfigurable())) &&
+        (!desc.hasWritable() ||
+         SameValue(desc.isWritable(), current.isWritable())) &&
+        (!desc.hasValue() ||
+         SameValue(desc.getValue(), current.getValue())) &&
+        (!desc.hasGetter() ||
+         SameValue(desc.getGet(), current.getGet())) &&
+        (!desc.hasSetter() ||
+         SameValue(desc.getSet(), current.getSet()))) {
+      return true;
+    }
 
     // Step 7
     if (desc.isConfigurable() ||  desc.isEnumerable() != current.isEnumerable())
@@ -748,7 +774,7 @@ function ObjectSeal(obj) {
     var desc = GetOwnProperty(obj, name);
     if (desc.isConfigurable()) desc.setConfigurable(false);
     DefineOwnProperty(obj, name, desc, true);
-  }  
+  }
   return ObjectPreventExtension(obj);
 }
 
@@ -765,7 +791,7 @@ function ObjectFreeze(obj) {
     if (IsDataDescriptor(desc)) desc.setWritable(false);
     if (desc.isConfigurable()) desc.setConfigurable(false);
     DefineOwnProperty(obj, name, desc, true);
-  }  
+  }
   return ObjectPreventExtension(obj);
 }
 
@@ -836,6 +862,7 @@ function ObjectIsExtensible(obj) {
   }
 });
 
+%SetExpectedNumberOfProperties($Object, 4);
 
 // ----------------------------------------------------------------------------
 
@@ -1099,6 +1126,56 @@ function FunctionToString() {
 }
 
 
+// ES5 15.3.4.5
+function FunctionBind(this_arg) { // Length is 1.
+  if (!IS_FUNCTION(this)) {
+      throw new $TypeError('Bind must be called on a function');
+  }
+  // this_arg is not an argument that should be bound.
+  var argc_bound = (%_ArgumentsLength() || 1) - 1;
+  if (argc_bound > 0) {
+    var bound_args = new $Array(argc_bound);
+    for(var i = 0; i < argc_bound; i++) {
+      bound_args[i] = %_Arguments(i+1);
+    }
+  }
+  var fn = this;
+  var result = function() {
+    // Combine the args we got from the bind call with the args
+    // given as argument to the invocation.
+    var argc = %_ArgumentsLength();
+    var args = new $Array(argc + argc_bound);
+    // Add bound arguments.
+    for (var i = 0; i < argc_bound; i++) {
+      args[i] = bound_args[i];
+    }
+    // Add arguments from call.
+    for (var i = 0; i < argc; i++) {
+      args[argc_bound + i] = %_Arguments(i);
+    }
+    // If this is a construct call we use a special runtime method
+    // to generate the actual object using the bound function.
+    if (%_IsConstructCall()) {
+      return %NewObjectFromBound(fn, args);
+    }
+    return fn.apply(this_arg, args);
+  };
+
+  // We already have caller and arguments properties on functions,
+  // which are non-configurable. It therefore makes no sence to
+  // try to redefine these as defined by the spec. The spec says
+  // that bind should make these throw a TypeError if get or set
+  // is called and make them non-enumerable and non-configurable.
+  // To be consistent with our normal functions we leave this as it is.
+
+  // Set the correct length.
+  var length = (this.length - argc_bound) > 0 ? this.length - argc_bound : 0;
+  %FunctionSetLength(result, length);
+
+  return result;
+}
+
+
 function NewFunction(arg1) {  // length == 1
   var n = %_ArgumentsLength();
   var p = '';
@@ -1119,7 +1196,7 @@ function NewFunction(arg1) {  // length == 1
 
   // The call to SetNewFunctionAttributes will ensure the prototype
   // property of the resulting function is enumerable (ECMA262, 15.3.5.2).
-  var f = %CompileString(source, false)();
+  var f = %CompileString(source)();
   %FunctionSetName(f, "anonymous");
   return %SetNewFunctionAttributes(f);
 }
@@ -1130,6 +1207,7 @@ function NewFunction(arg1) {  // length == 1
 
 function SetupFunction() {
   InstallFunctions($Function.prototype, DONT_ENUM, $Array(
+    "bind", FunctionBind,
     "toString", FunctionToString
   ));
 }

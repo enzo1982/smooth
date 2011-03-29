@@ -49,11 +49,11 @@ else
 
 ifeq ($(UNAME),Linux)
 	BUILD_LINUX = True
-endif
-ifeq ($(UNAME),FreeBSD)
+else ifeq ($(UNAME),FreeBSD)
 	BUILD_FREEBSD = True
-endif
-ifeq ($(UNAME),Darwin)
+else ifeq ($(UNAME),SunOS)
+	BUILD_SOLARIS = True
+else ifeq ($(UNAME),Darwin)
 	SHARED = .dylib
 
 	BUILD_OSX = True

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,10 +17,6 @@
 
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
-	/* Create a GC pool.
-	 */
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-
 	/* Create file chooser dialog.
 	 */
 	if (mode == SFM_OPEN)
@@ -60,8 +56,6 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		[savePanel release];
 	}
-
-	[pool release];
 
 	if (files.Length() == 0) error = Error();
 

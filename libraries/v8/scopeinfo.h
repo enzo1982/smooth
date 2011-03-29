@@ -54,27 +54,22 @@ class ScopeInfo BASE_EMBEDDED {
   // Create a ScopeInfo instance from a scope.
   explicit ScopeInfo(Scope* scope);
 
-  // Create a ScopeInfo instance from an Object holding the serialized data.
-  explicit ScopeInfo(Object* data);
+  // Create a ScopeInfo instance from SerializedScopeInfo.
+  explicit ScopeInfo(SerializedScopeInfo* data);
 
-  // Creates a heap object holding the serialized scope info.
-  Handle<Object> Serialize();
-
-  static Handle<Object> CreateHeapObject(Scope* scope);
-
-  // Serializes empty scope info.
-  static Object* EmptyHeapObject();
+  // Creates a SerializedScopeInfo holding the serialized scope info.
+  Handle<SerializedScopeInfo> Serialize();
 
   // --------------------------------------------------------------------------
   // Lookup
 
-  Handle<String> function_name() const  { return function_name_; }
+  Handle<String> function_name() const { return function_name_; }
 
-  Handle<String> parameter_name(int i) const  { return parameters_[i]; }
-  int number_of_parameters() const  { return parameters_.length(); }
+  Handle<String> parameter_name(int i) const { return parameters_[i]; }
+  int number_of_parameters() const { return parameters_.length(); }
 
-  Handle<String> stack_slot_name(int i) const  { return stack_slots_[i]; }
-  int number_of_stack_slots() const  { return stack_slots_.length(); }
+  Handle<String> stack_slot_name(int i) const { return stack_slots_[i]; }
+  int number_of_stack_slots() const { return stack_slots_.length(); }
 
   Handle<String> context_slot_name(int i) const {
     return context_slots_[i - Context::MIN_CONTEXT_SLOTS];
@@ -86,51 +81,6 @@ class ScopeInfo BASE_EMBEDDED {
 
   Handle<String> LocalName(int i) const;
   int NumberOfLocals() const;
-
-  // --------------------------------------------------------------------------
-  // The following functions provide quick access to scope info details
-  // for runtime routines w/o the need to explicitly create a ScopeInfo
-  // object.
-  //
-  // ScopeInfo is the only class which should have to know about the
-  // encoding of it's information in a FixedArray object, which is why these
-  // functions are in this class.
-
-  // Does this scope call eval.
-  static bool CallsEval(Object* data);
-
-  // Return the number of stack slots for code.
-  static int NumberOfStackSlots(Object* data);
-
-  // Return the number of context slots for code.
-  static int NumberOfContextSlots(Object* data);
-
-  // Return if this has context slots besides MIN_CONTEXT_SLOTS;
-  static bool HasHeapAllocatedLocals(Object* data);
-
-  // Lookup support for serialized scope info. Returns the
-  // the stack slot index for a given slot name if the slot is
-  // present; otherwise returns a value < 0. The name must be a symbol
-  // (canonicalized).
-  static int StackSlotIndex(Object* data, String* name);
-
-  // Lookup support for serialized scope info. Returns the
-  // context slot index for a given slot name if the slot is present; otherwise
-  // returns a value < 0. The name must be a symbol (canonicalized).
-  // If the slot is present and mode != NULL, sets *mode to the corresponding
-  // mode for that variable.
-  static int ContextSlotIndex(Object* data, String* name, Variable::Mode* mode);
-
-  // Lookup support for serialized scope info. Returns the
-  // parameter index for a given parameter name if the parameter is present;
-  // otherwise returns a value < 0. The name must be a symbol (canonicalized).
-  static int ParameterIndex(Object* data, String* name);
-
-  // Lookup support for serialized scope info. Returns the
-  // function context slot index if the function name is present (named
-  // function expressions, only), otherwise returns a value < 0. The name
-  // must be a symbol (canonicalized).
-  static int FunctionContextSlotIndex(Object* data, String* name);
 
   // --------------------------------------------------------------------------
   // Debugging support
@@ -146,6 +96,67 @@ class ScopeInfo BASE_EMBEDDED {
   List<Handle<String>, Allocator > stack_slots_;
   List<Handle<String>, Allocator > context_slots_;
   List<Variable::Mode, Allocator > context_modes_;
+};
+
+
+// This object provides quick access to scope info details for runtime
+// routines w/o the need to explicitly create a ScopeInfo object.
+class SerializedScopeInfo : public FixedArray {
+ public :
+
+  static SerializedScopeInfo* cast(Object* object) {
+    ASSERT(object->IsFixedArray());
+    return reinterpret_cast<SerializedScopeInfo*>(object);
+  }
+
+  // Does this scope call eval.
+  bool CallsEval();
+
+  // Return the number of stack slots for code.
+  int NumberOfStackSlots();
+
+  // Return the number of context slots for code.
+  int NumberOfContextSlots();
+
+  // Return if this has context slots besides MIN_CONTEXT_SLOTS;
+  bool HasHeapAllocatedLocals();
+
+  // Lookup support for serialized scope info. Returns the
+  // the stack slot index for a given slot name if the slot is
+  // present; otherwise returns a value < 0. The name must be a symbol
+  // (canonicalized).
+  int StackSlotIndex(String* name);
+
+  // Lookup support for serialized scope info. Returns the
+  // context slot index for a given slot name if the slot is present; otherwise
+  // returns a value < 0. The name must be a symbol (canonicalized).
+  // If the slot is present and mode != NULL, sets *mode to the corresponding
+  // mode for that variable.
+  int ContextSlotIndex(String* name, Variable::Mode* mode);
+
+  // Lookup support for serialized scope info. Returns the
+  // parameter index for a given parameter name if the parameter is present;
+  // otherwise returns a value < 0. The name must be a symbol (canonicalized).
+  int ParameterIndex(String* name);
+
+  // Lookup support for serialized scope info. Returns the
+  // function context slot index if the function name is present (named
+  // function expressions, only), otherwise returns a value < 0. The name
+  // must be a symbol (canonicalized).
+  int FunctionContextSlotIndex(String* name);
+
+  static Handle<SerializedScopeInfo> Create(Scope* scope);
+
+  // Serializes empty scope info.
+  static SerializedScopeInfo* Empty();
+
+ private:
+
+  inline Object** ContextEntriesAddr();
+
+  inline Object** ParameterEntriesAddr();
+
+  inline Object** StackSlotEntriesAddr();
 };
 
 

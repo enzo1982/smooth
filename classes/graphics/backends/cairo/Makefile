@@ -8,9 +8,7 @@ include $(SMOOTH_PATH)/Makefile-options
 # Change these variables to fit your project:
 ifneq ($(BUILD_WIN32),True)
 ifeq ($(BUILD_OSX),True)
-	MYCCOPTS += -I/opt/local/include/cairo
-	MYCCOPTS += -I/opt/local/include/pango-1.0
-	MYCCOPTS += -I/opt/local/include/glib-2.0 -I/opt/local/lib/glib-2.0/include
+	MYCCOPTS += -/usr/X11/include/freetype2
 else
 	MYCCOPTS += -I/usr/include/cairo -I/usr/local/include/cairo
 	MYCCOPTS += -I/usr/include/pango-1.0 -I/usr/local/include/pango-1.0

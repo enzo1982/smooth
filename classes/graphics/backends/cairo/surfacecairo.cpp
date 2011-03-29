@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,7 +21,14 @@
 	using namespace X11;
 
 #	include <cairo/cairo-xlib.h>
-#	include <pango/pangocairo.h>
+
+#	ifdef __APPLE__
+//#		include <cairo/cairo-ft.h>
+//#		include <fontconfig/fontconfig.h>
+#	else
+#		include <pango/pangocairo.h>
+#	endif
+
 #	include <smooth/backends/xlib/backendxlib.h>
 #endif
 
@@ -41,6 +48,12 @@ S::Short	 S::GUI::SurfaceCairo::surfaceDPI = -1;
 S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 {
 	type	= SURFACE_CAIRO;
+
+#ifdef __APPLE__
+	/* Make sure Fontconfig is initialized.
+	 */
+//	FcInit();
+#endif
 
 #ifdef __WIN32__
 	window	= (HWND) iWindow;
@@ -322,7 +335,9 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 	/* Adjust to new Cairo 1.10 behaviour.
 	 */
 #ifndef __APPLE__
+#ifndef __sun
 	if (cairo_version() >= CAIRO_VERSION_ENCODE(1,10,0))
+#endif
 	{
 		if (pos1.x == pos2.x) { pos1.x++; pos2.x++; }
 		if (pos1.y == pos2.y) { pos1.y++; pos2.y++; }
@@ -587,7 +602,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 			cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
 
-#ifdef __WIN32__
+#if defined __WIN32__ || defined __APPLE__
 			cairo_select_font_face(context, font.GetName(),
 					       (font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
 					       (font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
@@ -596,6 +611,28 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 			cairo_move_to(context, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
 			cairo_show_text(context, line.ConvertTo("UTF-8"));
+/*#elif defined __APPLE__
+			FcCharSet		*charset = FcCharSetCreate();
+
+			for (Int i = 0; i < line.Length(); i++) FcCharSetAddChar(charset, line[i]);
+
+			FcPattern		*pattern = FcPatternBuild(0, FC_FAMILY,	 FcTypeString,	(char *) font.GetName(),
+									     FC_WEIGHT,  FcTypeInteger,	(font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL),
+									     FC_SLANT,	 FcTypeInteger,	(font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+									     FC_CHARSET, FcTypeCharSet,	charset, (char *) 0);
+
+			cairo_font_face_t	*fontface = cairo_ft_font_face_create_for_pattern(pattern);
+
+			cairo_set_font_face(context, fontface);
+			cairo_set_font_size(context, font.GetSize() * fontSize.TranslateY(96) / 72.0);
+
+			cairo_move_to(context, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
+			cairo_show_text(context, line.ConvertTo("UTF-8"));
+
+			cairo_font_face_destroy(fontface);
+
+			FcPatternDestroy(pattern);
+			FcCharSetDestroy(charset);*/
 #else
 			PangoLayout		*layout	= pango_cairo_create_layout(context);
 			PangoFontDescription	*desc	= pango_font_description_from_string(String(font.GetName())
@@ -627,7 +664,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
 
-#ifdef __WIN32__
+#if defined __WIN32__ || defined __APPLE__
 		cairo_select_font_face(paintContextCairo, font.GetName(),
 				       (font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
 				       (font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
@@ -636,6 +673,28 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		cairo_move_to(paintContextCairo, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
 		cairo_show_text(paintContextCairo, line.ConvertTo("UTF-8"));
+/*#elif defined __APPLE__
+		FcCharSet		*charset = FcCharSetCreate();
+
+		for (Int i = 0; i < line.Length(); i++) FcCharSetAddChar(charset, line[i]);
+
+		FcPattern		*pattern = FcPatternBuild(0, FC_FAMILY,	 FcTypeString,	(char *) font.GetName(),
+								     FC_WEIGHT,  FcTypeInteger,	(font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL),
+								     FC_SLANT,	 FcTypeInteger,	(font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+								     FC_CHARSET, FcTypeCharSet,	charset, (char *) 0);
+
+		cairo_font_face_t	*fontface = cairo_ft_font_face_create_for_pattern(pattern);
+
+		cairo_set_font_face(paintContextCairo, fontface);
+		cairo_set_font_size(paintContextCairo, font.GetSize() * fontSize.TranslateY(96) / 72.0);
+
+		cairo_move_to(paintContextCairo, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
+		cairo_show_text(paintContextCairo, line.ConvertTo("UTF-8"));
+
+		cairo_font_face_destroy(fontface);
+
+		FcPatternDestroy(pattern);
+		FcCharSetDestroy(charset);*/
 #else
 		PangoLayout		*layout	= pango_cairo_create_layout(paintContextCairo);
 		PangoFontDescription	*desc	= pango_font_description_from_string(String(font.GetName())

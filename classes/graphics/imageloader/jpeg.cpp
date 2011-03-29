@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,8 +16,11 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <jpeglib.h>
-#include <jerror.h>
+extern "C"
+{
+#	include <jpeglib.h>
+#	include <jerror.h>
+}
 
 using namespace smooth::IO;
 

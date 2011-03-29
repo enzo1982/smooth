@@ -118,9 +118,11 @@ void CpuFeatures::Probe()  {
 
   CodeDesc desc;
   assm.GetCode(&desc);
-  Object* code = Heap::CreateCode(desc,
-                                  Code::ComputeFlags(Code::STUB),
-                                  Handle<Object>());
+  MaybeObject* maybe_code = Heap::CreateCode(desc,
+                                             Code::ComputeFlags(Code::STUB),
+                                             Handle<Object>());
+  Object* code;
+  if (!maybe_code->ToObject(&code)) return;
   if (!code->IsCode()) return;
   PROFILE(CodeCreateEvent(Logger::BUILTIN_TAG,
                           Code::cast(code), "CpuFeatures::Probe"));
@@ -253,7 +255,7 @@ Operand::Operand(const Operand& operand, int32_t offset) {
   int32_t disp_value = 0;
   if (mode == 0x80 || is_baseless) {
     // Mode 2 or mode 0 with rbp/r13 as base: Word displacement.
-    disp_value = *reinterpret_cast<const int32_t*>(&operand.buf_[disp_offset]);
+    disp_value = *BitCast<const int32_t*>(&operand.buf_[disp_offset]);
   } else if (mode == 0x40) {
     // Mode 1: Byte displacement.
     disp_value = static_cast<signed char>(operand.buf_[disp_offset]);
@@ -294,7 +296,7 @@ static void InitCoverageLog();
 byte* Assembler::spare_buffer_ = NULL;
 
 Assembler::Assembler(void* buffer, int buffer_size)
-    : code_targets_(100) {
+    : code_targets_(100), positions_recorder_(this) {
   if (buffer == NULL) {
     // Do our own buffer management.
     if (buffer_size <= kMinimalBufferSize) {
@@ -335,10 +337,7 @@ Assembler::Assembler(void* buffer, int buffer_size)
   reloc_info_writer.Reposition(buffer_ + buffer_size, pc_);
 
   last_pc_ = NULL;
-  current_statement_position_ = RelocInfo::kNoPosition;
-  current_position_ = RelocInfo::kNoPosition;
-  written_statement_position_ = current_statement_position_;
-  written_position_ = current_position_;
+
 #ifdef GENERATED_CODE_COVERAGE
   InitCoverageLog();
 #endif
@@ -415,6 +414,20 @@ void Assembler::bind_to(Label* L, int pos) {
 
 void Assembler::bind(Label* L) {
   bind_to(L, pc_offset());
+}
+
+
+void Assembler::bind(NearLabel* L) {
+  ASSERT(!L->is_bound());
+  last_pc_ = NULL;
+  while (L->unresolved_branches_ > 0) {
+    int branch_pos = L->unresolved_positions_[L->unresolved_branches_ - 1];
+    int disp = pc_offset() - branch_pos;
+    ASSERT(is_int8(disp));
+    set_byte_at(branch_pos - sizeof(int8_t), disp);
+    L->unresolved_branches_--;
+  }
+  L->bind_to(pc_offset());
 }
 
 
@@ -829,6 +842,7 @@ void Assembler::call(Label* L) {
 
 
 void Assembler::call(Handle<Code> target, RelocInfo::Mode rmode) {
+  positions_recorder()->WriteRecordedPositions();
   EnsureSpace ensure_space(this);
   last_pc_ = pc_;
   // 1110 1000 #32-bit disp.
@@ -1226,6 +1240,27 @@ void Assembler::j(Condition cc,
 }
 
 
+void Assembler::j(Condition cc, NearLabel* L, Hint hint) {
+  EnsureSpace ensure_space(this);
+  last_pc_ = pc_;
+  ASSERT(0 <= cc && cc < 16);
+  if (FLAG_emit_branch_hints && hint != no_hint) emit(hint);
+  if (L->is_bound()) {
+    const int short_size = 2;
+    int offs = L->pos() - pc_offset();
+    ASSERT(offs <= 0);
+    ASSERT(is_int8(offs - short_size));
+    // 0111 tttn #8-bit disp
+    emit(0x70 | cc);
+    emit((offs - short_size) & 0xFF);
+  } else {
+    emit(0x70 | cc);
+    emit(0x00);      // The displacement will be resolved later.
+    L->link_to(pc_offset());
+  }
+}
+
+
 void Assembler::jmp(Label* L) {
   EnsureSpace ensure_space(this);
   last_pc_ = pc_;
@@ -1265,6 +1300,25 @@ void Assembler::jmp(Handle<Code> target, RelocInfo::Mode rmode) {
   // 1110 1001 #32-bit disp.
   emit(0xE9);
   emit_code_target(target, rmode);
+}
+
+
+void Assembler::jmp(NearLabel* L) {
+  EnsureSpace ensure_space(this);
+  last_pc_ = pc_;
+  if (L->is_bound()) {
+    const int short_size = sizeof(int8_t);
+    int offs = L->pos() - pc_offset();
+    ASSERT(offs <= 0);
+    ASSERT(is_int8(offs - short_size));
+    // 1110 1011 #8-bit disp.
+    emit(0xEB);
+    emit((offs - short_size) & 0xFF);
+  } else {
+    emit(0xEB);
+    emit(0x00);      // The displacement will be resolved later.
+    L->link_to(pc_offset());
+  }
 }
 
 
@@ -1496,12 +1550,8 @@ void Assembler::movq(Register dst, int64_t value, RelocInfo::Mode rmode) {
 
 
 void Assembler::movq(Register dst, ExternalReference ref) {
-  EnsureSpace ensure_space(this);
-  last_pc_ = pc_;
-  emit_rex_64(dst);
-  emit(0xB8 | dst.low_bits());
-  emitq(reinterpret_cast<uintptr_t>(ref.address()),
-        RelocInfo::EXTERNAL_REFERENCE);
+  int64_t value = reinterpret_cast<int64_t>(ref.address());
+  movq(dst, value, RelocInfo::EXTERNAL_REFERENCE);
 }
 
 
@@ -2882,14 +2932,14 @@ void Assembler::RecordRelocInfo(RelocInfo::Mode rmode, intptr_t data) {
 }
 
 void Assembler::RecordJSReturn() {
-  WriteRecordedPositions();
+  positions_recorder()->WriteRecordedPositions();
   EnsureSpace ensure_space(this);
   RecordRelocInfo(RelocInfo::JS_RETURN);
 }
 
 
 void Assembler::RecordDebugBreakSlot() {
-  WriteRecordedPositions();
+  positions_recorder()->WriteRecordedPositions();
   EnsureSpace ensure_space(this);
   RecordRelocInfo(RelocInfo::DEBUG_BREAK_SLOT);
 }
@@ -2900,47 +2950,6 @@ void Assembler::RecordComment(const char* msg) {
     EnsureSpace ensure_space(this);
     RecordRelocInfo(RelocInfo::COMMENT, reinterpret_cast<intptr_t>(msg));
   }
-}
-
-
-void Assembler::RecordPosition(int pos) {
-  ASSERT(pos != RelocInfo::kNoPosition);
-  ASSERT(pos >= 0);
-  current_position_ = pos;
-}
-
-
-void Assembler::RecordStatementPosition(int pos) {
-  ASSERT(pos != RelocInfo::kNoPosition);
-  ASSERT(pos >= 0);
-  current_statement_position_ = pos;
-}
-
-
-bool Assembler::WriteRecordedPositions() {
-  bool written = false;
-
-  // Write the statement position if it is different from what was written last
-  // time.
-  if (current_statement_position_ != written_statement_position_) {
-    EnsureSpace ensure_space(this);
-    RecordRelocInfo(RelocInfo::STATEMENT_POSITION, current_statement_position_);
-    written_statement_position_ = current_statement_position_;
-    written = true;
-  }
-
-  // Write the position if it is different from what was written last time and
-  // also different from the written statement position.
-  if (current_position_ != written_position_ &&
-      current_position_ != written_statement_position_) {
-    EnsureSpace ensure_space(this);
-    RecordRelocInfo(RelocInfo::POSITION, current_position_);
-    written_position_ = current_position_;
-    written = true;
-  }
-
-  // Return whether something was written.
-  return written;
 }
 
 

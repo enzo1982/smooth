@@ -32,12 +32,12 @@ ifeq ($(BUILD_CAIRO),True)
 	LIBS += -lcairo.dll
 endif
 else
-	LIBS += -lcairo -lpango-1.0 -lpangocairo-1.0 -lgobject-2.0 -lpthread -lX11 -lXmu
+	LIBS += -lcairo -lpthread -lX11 -lXmu
 
 ifeq ($(BUILD_OSX),True)
-	LIBS += -lnsucd -liconv
+	LIBS += -lnsucd -liconv -lfontconfig
 else
-	LIBS += -lgtk-x11-2.0
+	LIBS += -lpango-1.0 -lpangocairo-1.0 -lgobject-2.0 -lgtk-x11-2.0
 endif
 
 ifeq ($(BUILD_LINUX),True)
@@ -75,7 +75,7 @@ endif
 ifeq ($(BUILD_OSX),True)
 	STRIP = true
 
-	LINKER_OPTS += -framework Cocoa -L/opt/local/lib -L/usr/X11/lib -Wl,-dylib_install_name,libsmooth$(SHARED)
+	LINKER_OPTS += -framework Cocoa -L/usr/X11/lib -Wl,-dylib_install_name,libsmooth$(SHARED)
 endif
 
 .PHONY: all headers objects programs libs install clean clean_all clean_headers doc doc-clean

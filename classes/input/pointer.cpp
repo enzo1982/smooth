@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,7 +31,7 @@ S::Input::Pointer::Pointer(const Pointer &)
 {
 }
 
-S::Bool S::Input::Pointer::SetCursor(const GUI::Window *window, Int mouseCursor)
+S::Bool S::Input::Pointer::SetCursor(const GUI::Window *window, CursorType mouseCursor)
 {
 #ifdef __WIN32__
 	static HCURSOR	 hCursorArrow	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);

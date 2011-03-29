@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -56,7 +56,7 @@ S::GUI::WindowBackend::~WindowBackend()
 	delete nullSurface;
 }
 
-S::Short S::GUI::WindowBackend::GetWindowType()
+S::Short S::GUI::WindowBackend::GetWindowType() const
 {
 	return type;
 }
@@ -151,7 +151,17 @@ S::Int S::GUI::WindowBackend::Raise()
 	return Success();
 }
 
-const S::GUI::Rect &S::GUI::WindowBackend::GetUpdateRect()
+const S::GUI::Size &S::GUI::WindowBackend::GetSizeModifier() const
+{
+	return sizeModifier;
+}
+
+S::Void S::GUI::WindowBackend::SetSizeModifier(const Size &nSizeModifier)
+{
+	sizeModifier = nSizeModifier;
+}
+
+const S::GUI::Rect &S::GUI::WindowBackend::GetUpdateRect() const
 {
 	return updateRect;
 }

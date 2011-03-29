@@ -7,11 +7,7 @@ include $(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 ifneq ($(BUILD_WIN32),True)
-ifeq ($(BUILD_OSX),True)
-	MYCCOPTS += -I/opt/local/include/libxml2
-else
 	MYCCOPTS += -I/usr/include/libxml2 -I/usr/local/include/libxml2
-endif
 endif
 
 # Enter object files here:

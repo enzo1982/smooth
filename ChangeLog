@@ -32,6 +32,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - surfacegdi.cpp	- now using clipping instead of buffering to speed up drawing
 - sururfacecairo.cpp	- now using clipping instead of buffering to speed up drawing
 - colordlg.cpp		- fixed color selection dialog
+- tipodaydlg.cpp	- made dialog width adjust to button size
 - charsetdetector.cpp	- new class: CharsetDetector, detects the character set of a string
 - mutexwin32.cpp	- now using critical sections instead of Win32 mutexes
 - clipboard.cpp		- new class: Clipboard, implements clipboard support
@@ -48,7 +49,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - improved international language support
 - removed Extended<> template
 - removed Pointer<> template
-- improved Linux, FreeBSD and Mac OS X support
+- improved Linux, Mac OS X, Solaris and FreeBSD support
 - upgraded libbzip2 to version 1.0.6
 - upgraded fribidi2 to version 0.19.2
 - upgraded libiconv to version 1.13.1

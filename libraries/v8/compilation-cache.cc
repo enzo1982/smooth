@@ -79,10 +79,9 @@ class CompilationSubCache {
   // young generation.
   void Age();
 
-  bool HasFunction(SharedFunctionInfo* function_info);
-
   // GC support.
   void Iterate(ObjectVisitor* v);
+  void IterateFunctions(ObjectVisitor* v);
 
   // Clear this sub-cache evicting all its content.
   void Clear();
@@ -111,6 +110,9 @@ class CompilationCacheScript : public CompilationSubCache {
   void Put(Handle<String> source, Handle<SharedFunctionInfo> function_info);
 
  private:
+  MUST_USE_RESULT MaybeObject* TryTablePut(
+      Handle<String> source, Handle<SharedFunctionInfo> function_info);
+
   // Note: Returns a new hash table if operation results in expansion.
   Handle<CompilationCacheTable> TablePut(
       Handle<String> source, Handle<SharedFunctionInfo> function_info);
@@ -138,6 +140,12 @@ class CompilationCacheEval: public CompilationSubCache {
            Handle<SharedFunctionInfo> function_info);
 
  private:
+  MUST_USE_RESULT MaybeObject* TryTablePut(
+      Handle<String> source,
+      Handle<Context> context,
+      Handle<SharedFunctionInfo> function_info);
+
+
   // Note: Returns a new hash table if operation results in expansion.
   Handle<CompilationCacheTable> TablePut(
       Handle<String> source,
@@ -160,6 +168,10 @@ class CompilationCacheRegExp: public CompilationSubCache {
            JSRegExp::Flags flags,
            Handle<FixedArray> data);
  private:
+  MUST_USE_RESULT MaybeObject* TryTablePut(Handle<String> source,
+                                           JSRegExp::Flags flags,
+                                           Handle<FixedArray> data);
+
   // Note: Returns a new hash table if operation results in expansion.
   Handle<CompilationCacheTable> TablePut(Handle<String> source,
                                          JSRegExp::Flags flags,
@@ -206,27 +218,6 @@ Handle<CompilationCacheTable> CompilationSubCache::GetTable(int generation) {
 }
 
 
-bool CompilationSubCache::HasFunction(SharedFunctionInfo* function_info) {
-  if (function_info->script()->IsUndefined() ||
-      Script::cast(function_info->script())->source()->IsUndefined()) {
-    return false;
-  }
-
-  String* source =
-      String::cast(Script::cast(function_info->script())->source());
-  // Check all generations.
-  for (int generation = 0; generation < generations(); generation++) {
-    if (tables_[generation]->IsUndefined()) continue;
-
-    CompilationCacheTable* table =
-        CompilationCacheTable::cast(tables_[generation]);
-    Object* object = table->Lookup(source);
-    if (object->IsSharedFunctionInfo()) return true;
-  }
-  return false;
-}
-
-
 void CompilationSubCache::Age() {
   // Age the generations implicitly killing off the oldest.
   for (int i = generations_ - 1; i > 0; i--) {
@@ -235,6 +226,16 @@ void CompilationSubCache::Age() {
 
   // Set the first generation as unborn.
   tables_[0] = Heap::undefined_value();
+}
+
+
+void CompilationSubCache::IterateFunctions(ObjectVisitor* v) {
+  Object* undefined = Heap::raw_unchecked_undefined_value();
+  for (int i = 0; i < generations_; i++) {
+    if (tables_[i] != undefined) {
+      reinterpret_cast<CompilationCacheTable*>(tables_[i])->IterateElements(v);
+    }
+  }
 }
 
 
@@ -332,11 +333,18 @@ Handle<SharedFunctionInfo> CompilationCacheScript::Lookup(Handle<String> source,
 }
 
 
+MaybeObject* CompilationCacheScript::TryTablePut(
+    Handle<String> source,
+    Handle<SharedFunctionInfo> function_info) {
+  Handle<CompilationCacheTable> table = GetFirstTable();
+  return table->Put(*source, *function_info);
+}
+
+
 Handle<CompilationCacheTable> CompilationCacheScript::TablePut(
     Handle<String> source,
     Handle<SharedFunctionInfo> function_info) {
-  CALL_HEAP_FUNCTION(GetFirstTable()->Put(*source, *function_info),
-                     CompilationCacheTable);
+  CALL_HEAP_FUNCTION(TryTablePut(source, function_info), CompilationCacheTable);
 }
 
 
@@ -378,13 +386,20 @@ Handle<SharedFunctionInfo> CompilationCacheEval::Lookup(
 }
 
 
+MaybeObject* CompilationCacheEval::TryTablePut(
+    Handle<String> source,
+    Handle<Context> context,
+    Handle<SharedFunctionInfo> function_info) {
+  Handle<CompilationCacheTable> table = GetFirstTable();
+  return table->PutEval(*source, *context, *function_info);
+}
+
+
 Handle<CompilationCacheTable> CompilationCacheEval::TablePut(
     Handle<String> source,
     Handle<Context> context,
     Handle<SharedFunctionInfo> function_info) {
-  CALL_HEAP_FUNCTION(GetFirstTable()->PutEval(*source,
-                                              *context,
-                                              *function_info),
+  CALL_HEAP_FUNCTION(TryTablePut(source, context, function_info),
                      CompilationCacheTable);
 }
 
@@ -427,12 +442,20 @@ Handle<FixedArray> CompilationCacheRegExp::Lookup(Handle<String> source,
 }
 
 
+MaybeObject* CompilationCacheRegExp::TryTablePut(
+    Handle<String> source,
+    JSRegExp::Flags flags,
+    Handle<FixedArray> data) {
+  Handle<CompilationCacheTable> table = GetFirstTable();
+  return table->PutRegExp(*source, flags, *data);
+}
+
+
 Handle<CompilationCacheTable> CompilationCacheRegExp::TablePut(
     Handle<String> source,
     JSRegExp::Flags flags,
     Handle<FixedArray> data) {
-  CALL_HEAP_FUNCTION(GetFirstTable()->PutRegExp(*source, flags, *data),
-                     CompilationCacheTable);
+  CALL_HEAP_FUNCTION(TryTablePut(source, flags, data), CompilationCacheTable);
 }
 
 
@@ -528,15 +551,16 @@ void CompilationCache::Clear() {
   }
 }
 
-
-bool CompilationCache::HasFunction(SharedFunctionInfo* function_info) {
-  return script.HasFunction(function_info);
-}
-
-
 void CompilationCache::Iterate(ObjectVisitor* v) {
   for (int i = 0; i < kSubCacheCount; i++) {
     subcaches[i]->Iterate(v);
+  }
+}
+
+
+void CompilationCache::IterateFunctions(ObjectVisitor* v) {
+  for (int i = 0; i < kSubCacheCount; i++) {
+    subcaches[i]->IterateFunctions(v);
   }
 }
 

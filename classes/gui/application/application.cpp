@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -193,6 +193,8 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	pclose(stdin);
 #elif defined __linux__
 	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1);
+#elif defined __sun
+	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/path/a.out"), buffer, buffer.Size() - 1);
 #else
 	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/file"), buffer, buffer.Size() - 1);
 #endif
@@ -201,6 +203,12 @@ S::String S::GUI::Application::GetApplicationDirectory()
 #endif
 
 	applicationDirectory[applicationDirectory.FindLast(Directory::GetDirectoryDelimiter()) + 1] = 0;
+
+#if defined __APPLE__
+	/* Change the returned path to Resources for Mac OS X application bundles.
+	 */
+	if (applicationDirectory.EndsWith(".app/Contents/MacOS/")) applicationDirectory.Replace(".app/Contents/MacOS/", ".app/Contents/Resources/");
+#endif
 
 	return applicationDirectory;
 }

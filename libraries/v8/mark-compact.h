@@ -36,15 +36,6 @@ namespace internal {
 // to the first live object in the page (only used for old and map objects).
 typedef bool (*IsAliveFunction)(HeapObject* obj, int* size, int* offset);
 
-// Callback function for non-live blocks in the old generation.
-// If add_to_freelist is false then just accounting stats are updated and
-// no attempt to add area to free list is made.
-typedef void (*DeallocateFunction)(Address start,
-                                   int size_in_bytes,
-                                   bool add_to_freelist,
-                                   bool last_on_page);
-
-
 // Forward declarations.
 class RootMarkingVisitor;
 class MarkingVisitor;
@@ -62,7 +53,8 @@ class MarkCompactCollector: public AllStatic {
   // Object* that will be the object after forwarding.  There is a separate
   // allocation function for each (compactable) space based on the location
   // of the object before compaction.
-  typedef Object* (*AllocationFunction)(HeapObject* object, int object_size);
+  typedef MaybeObject* (*AllocationFunction)(HeapObject* object,
+                                             int object_size);
 
   // Type of functions to encode the forwarding address for an object.
   // Given the object, its size, and the new (non-failure) object it will be
@@ -85,6 +77,9 @@ class MarkCompactCollector: public AllStatic {
   static void SetForceCompaction(bool value) {
     force_compaction_ = value;
   }
+
+
+  static void Initialize();
 
   // Prepares for GC by resetting relocation info in old and map spaces and
   // choosing spaces to compact.
@@ -118,10 +113,19 @@ class MarkCompactCollector: public AllStatic {
 #ifdef DEBUG
   // Checks whether performing mark-compact collection.
   static bool in_use() { return state_ > PREPARE_GC; }
+  static bool are_map_pointers_encoded() { return state_ == UPDATE_POINTERS; }
 #endif
 
   // Determine type of object and emit deletion log event.
   static void ReportDeleteIfNeeded(HeapObject* obj);
+
+  // Returns size of a possibly marked object.
+  static int SizeOfMarkedObject(HeapObject* obj);
+
+  // Distinguishable invalid map encodings (for single word and multiple words)
+  // that indicate free regions.
+  static const uint32_t kSingleFreeEncoding = 0;
+  static const uint32_t kMultiFreeEncoding = 1;
 
  private:
 #ifdef DEBUG
@@ -171,6 +175,11 @@ class MarkCompactCollector: public AllStatic {
 
   friend class RootMarkingVisitor;
   friend class MarkingVisitor;
+  friend class StaticMarkingVisitor;
+  friend class CodeMarkingVisitor;
+  friend class SharedFunctionInfoMarkingVisitor;
+
+  static void PrepareForCodeFlushing();
 
   // Marking operations for objects reachable from roots.
   static void MarkLiveObjects();
@@ -214,17 +223,17 @@ class MarkCompactCollector: public AllStatic {
   // Mark all objects in an object group with at least one marked
   // object, then all objects reachable from marked objects in object
   // groups, and repeat.
-  static void ProcessObjectGroups(MarkingVisitor* visitor);
+  static void ProcessObjectGroups();
 
   // Mark objects reachable (transitively) from objects in the marking stack
   // or overflowed in the heap.
-  static void ProcessMarkingStack(MarkingVisitor* visitor);
+  static void ProcessMarkingStack();
 
   // Mark objects reachable (transitively) from objects in the marking
   // stack.  This function empties the marking stack, but may leave
   // overflowed objects in the heap, in which case the marking stack's
   // overflow flag will be set.
-  static void EmptyMarkingStack(MarkingVisitor* visitor);
+  static void EmptyMarkingStack();
 
   // Refill the marking stack with overflowed objects from the heap.  This
   // function either leaves the marking stack full or clears the overflow
@@ -314,33 +323,6 @@ class MarkCompactCollector: public AllStatic {
   // number of live objects.
   static int IterateLiveObjectsInRange(Address start, Address end,
                                        HeapObjectCallback size_func);
-
-  // Callback functions for deallocating non-live blocks in the old
-  // generation.
-  static void DeallocateOldPointerBlock(Address start,
-                                        int size_in_bytes,
-                                        bool add_to_freelist,
-                                        bool last_on_page);
-
-  static void DeallocateOldDataBlock(Address start,
-                                     int size_in_bytes,
-                                     bool add_to_freelist,
-                                     bool last_on_page);
-
-  static void DeallocateCodeBlock(Address start,
-                                  int size_in_bytes,
-                                  bool add_to_freelist,
-                                  bool last_on_page);
-
-  static void DeallocateMapBlock(Address start,
-                                 int size_in_bytes,
-                                 bool add_to_freelist,
-                                 bool last_on_page);
-
-  static void DeallocateCellBlock(Address start,
-                                  int size_in_bytes,
-                                  bool add_to_freelist,
-                                  bool last_on_page);
 
   // If we are not compacting the heap, we simply sweep the spaces except
   // for the large object space, clearing mark bits and adding unmarked

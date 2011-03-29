@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -220,8 +220,11 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				if (windowStyle & WS_DLGFRAME)
 				{
-					minMaxInfo->ptMaxSize = (POINT) { windowRect.right - windowRect.left, windowRect.bottom - windowRect.top };
-					minMaxInfo->ptMaxPosition = (POINT) { windowRect.left, windowRect.top };
+					POINT	 maxSize     = { windowRect.right - windowRect.left, windowRect.bottom - windowRect.top };
+					POINT	 maxPosition = { windowRect.left, windowRect.top };
+
+					minMaxInfo->ptMaxSize	  = maxSize;
+					minMaxInfo->ptMaxPosition = maxPosition;
 				}
 				else
 				{
@@ -567,12 +570,24 @@ S::Int S::GUI::WindowGDI::SetMinimumSize(const Size &nMinSize)
 {
 	minSize = nMinSize;
 
+	RECT	 windowRect;
+
+	GetWindowRect(hwnd, &windowRect);
+
+	SetMetrics(Point(windowRect.left, windowRect.top), Size(Math::Max(windowRect.right - windowRect.left, minSize.cx), Math::Max(windowRect.bottom - windowRect.top, minSize.cy)));
+
 	return Success();
 }
 
 S::Int S::GUI::WindowGDI::SetMaximumSize(const Size &nMaxSize)
 {
 	maxSize = nMaxSize;
+
+	RECT	 windowRect;
+
+	GetWindowRect(hwnd, &windowRect);
+
+	SetMetrics(Point(windowRect.left, windowRect.top), Size(Math::Min(windowRect.right - windowRect.left, maxSize.cx), Math::Min(windowRect.bottom - windowRect.top, maxSize.cy)));
 
 	return Success();
 }

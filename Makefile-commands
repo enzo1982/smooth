@@ -34,9 +34,16 @@ else
 ifeq ($(BUILD_OSX),True)
 	STRIP = true
 
-	LDOPTS += -L/opt/local/lib
-	CCOPTS += -I/opt/local/include
+ifdef GLOBALDLL
+	LDOPTS += -Wl,-dylib_install_name,lib$(GLOBALDLL)$(SHARED)
+endif
+
+	CCOPTS += -I/usr/X11/include
 else
+ifeq ($(BUILD_SOLARIS),True)
+	CCOPTS += -fpic
+endif
+
 	LDOPTS += -L/usr/local/lib
 	CCOPTS += -I/usr/local/include
 endif
@@ -84,9 +91,10 @@ ifdef GLOBALEXE
 endif
 
 ifdef GLOBALDLL
+ifneq ($(BUILD_WIN32),True)
+	TARGETS += $(SMOOTH_PATH)/$(LIBDIR)/lib$(GLOBALDLL)$(SHARED)
+else
 	TARGETS += $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED)
-
-ifeq ($(BUILD_WIN32),True)
 	TARGETS += $(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB)
 endif
 endif
@@ -145,7 +153,11 @@ $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE): $(OBJECTS)
 endif
 
 ifdef GLOBALDLL
+ifneq ($(BUILD_WIN32),True)
+$(SMOOTH_PATH)/$(LIBDIR)/lib$(GLOBALDLL)$(SHARED): $(OBJECTS)
+else
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED): $(OBJECTS)
+endif
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
 	$(STRIP) $(STRIP_OPTS) $@
 

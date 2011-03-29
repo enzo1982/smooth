@@ -329,7 +329,7 @@ class Factory : public AllStatic {
 
 #define ROOT_ACCESSOR(type, name, camel_name)                                  \
   static inline Handle<type> name() {                                          \
-    return Handle<type>(BitCast<type**, Object**>(                             \
+    return Handle<type>(BitCast<type**>(                                       \
         &Heap::roots_[Heap::k##camel_name##RootIndex]));                       \
   }
   ROOT_LIST(ROOT_ACCESSOR)
@@ -337,7 +337,7 @@ class Factory : public AllStatic {
 
 #define SYMBOL_ACCESSOR(name, str) \
   static inline Handle<String> name() {                                        \
-    return Handle<String>(BitCast<String**, Object**>(                         \
+    return Handle<String>(BitCast<String**>(                                   \
         &Heap::roots_[Heap::k##name##RootIndex]));                             \
   }
   SYMBOL_LIST(SYMBOL_ACCESSOR)
@@ -351,7 +351,7 @@ class Factory : public AllStatic {
       Handle<String> name,
       int number_of_literals,
       Handle<Code> code,
-      Handle<Object> scope_info);
+      Handle<SerializedScopeInfo> scope_info);
   static Handle<SharedFunctionInfo> NewSharedFunctionInfo(Handle<String> name);
 
   static Handle<NumberDictionary> DictionaryAtNumberPut(

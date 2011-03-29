@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,6 +42,7 @@ namespace smooth
 				Surface				*nullSurface;
 				Surface				*drawSurface;
 
+				Size				 sizeModifier;
 				Rect				 updateRect;
 			public:
 				static Int			 SetBackend(WindowBackend *(*)());
@@ -51,7 +52,7 @@ namespace smooth
 								 WindowBackend(Void * = NIL);
 				virtual				~WindowBackend();
 
-				Short				 GetWindowType();
+				Short				 GetWindowType() const;
 
 				virtual Void			*GetSystemWindow() const;
 
@@ -84,7 +85,10 @@ namespace smooth
 
 				virtual Int			 Raise();
 			accessors:
-				const Rect			&GetUpdateRect();
+				const Size			&GetSizeModifier() const;
+				Void				 SetSizeModifier(const Size &);
+
+				const Rect			&GetUpdateRect() const;
 			signals:
 				Callback0<Bool>			 doClose;
 

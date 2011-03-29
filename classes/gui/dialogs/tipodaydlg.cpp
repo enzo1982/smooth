@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,7 @@
 #include <smooth/gui/widgets/layer.h>
 
 #include <smooth/misc/string.h>
+#include <smooth/misc/math.h>
 #include <smooth/i18n/translator.h>
 
 #include <smooth/resources.h>
@@ -47,9 +48,6 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	mode = TIP_ORDERED;
 	offset = 0;
 
-	Point	 pos;
-	Size	 size;
-
 	Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
 
 	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"), workArea.GetPosition() + Point((workArea.GetSize().cx - 350) / 2, (workArea.GetSize().cy - 300) / 2), Size(352, 302));
@@ -57,30 +55,22 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(39, OR_HORZ | OR_BOTTOM);
 
-	pos.x = 87;
-	pos.y = 29;
-
-	btn_ok		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, pos, size);
+	btn_ok		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, Point(87, 29), Size());
 	btn_ok->onAction.Connect(&TipOfTheDay::ButtonOK, this);
 	btn_ok->SetOrientation(OR_LOWERRIGHT);
 
-	pos.x = 175;
-
-	btn_next	= new Button(I18n::Translator::defaultTranslator->TranslateString("Next tip"), NIL, pos, size);
+	btn_next	= new Button(I18n::Translator::defaultTranslator->TranslateString("Next tip"), NIL, Point(175, 29), Size());
 	btn_next->onAction.Connect(&TipOfTheDay::ButtonNext, this);
 	btn_next->SetOrientation(OR_LOWERRIGHT);
 
-	pos.x = 7;
-	pos.y -= 2;
-
-	size.cx = 150;
-
-	check_showtips	= new CheckBox(I18n::Translator::defaultTranslator->TranslateString("Show tips on startup"), pos, size, showTips);
+	check_showtips	= new CheckBox(I18n::Translator::defaultTranslator->TranslateString("Show tips on startup"), Point(7, 27), Size(150, 0), showTips);
 	check_showtips->SetOrientation(OR_LOWERLEFT);
 	check_showtips->SetWidth(check_showtips->textSize.cx + 21);
 
-	pos.x = 5;
-	pos.y = 3;
+	Int	 additionalSize = Math::Max(0, check_showtips->textSize.cx - 133);
+
+	dlgwnd->SetWidth(dlgwnd->GetWidth() + additionalSize);
+	dlgwnd->SetX(workArea.GetPosition().x + (workArea.GetSize().cx - 350 - additionalSize) / 2);
 
 	Bitmap	 bmp;
 
@@ -90,26 +80,15 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 
 	bmp.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
-	img_light	= new Image(bmp, pos, Size(32, 32));
+	img_light	= new Image(bmp, Point(5, 3), Size(32, 32));
 
-	pos.x = 40;
-	pos.y = 7;
-
-	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), pos);
+	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), Point(40, 7));
 	txt_didyouknow->SetFont(Font(Font::Default, 14, Font::Bold));
 
-	pos.x = 6;
-	pos.y = 6;
-
-	txt_tip		= new Text("", pos);
-
-	pos.x = 8;
-	pos.y = 39;
-	size.cx = 328;
-	size.cy = 182;
+	txt_tip		= new Text(NIL, Point(6, 6));
 
 	layer_inner	= new Layer();
-	layer_inner->SetMetrics(pos, size);
+	layer_inner->SetMetrics(Point(8, 39), Size(328 + additionalSize, 182));
 	layer_inner->SetBackgroundColor(Setup::TooltipColor);
 
 	Add(dlgwnd);
@@ -228,5 +207,5 @@ S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 
 S::Void S::GUI::Dialogs::TipOfTheDay::Paint()
 {
-	dlgwnd->GetDrawSurface()->Box(Rect(Point(7, 38) + dlgwnd->GetMainLayer()->GetPosition(), Size(330, 184)), 0, Rect::Outlined);
+	dlgwnd->GetDrawSurface()->Box(Rect(layer_inner->GetRealPosition() - Point(1, 1), layer_inner->GetSize() + Size(2, 2)), 0, Rect::Outlined);
 }

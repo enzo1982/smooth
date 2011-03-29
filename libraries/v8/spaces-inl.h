@@ -220,21 +220,22 @@ void Page::ClearRegionMarks(Address start, Address end, bool reaches_limit) {
 
 
 void Page::FlipMeaningOfInvalidatedWatermarkFlag() {
-  watermark_invalidated_mark_ ^= WATERMARK_INVALIDATED;
+  watermark_invalidated_mark_ ^= 1 << WATERMARK_INVALIDATED;
 }
 
 
 bool Page::IsWatermarkValid() {
-  return (flags_ & WATERMARK_INVALIDATED) != watermark_invalidated_mark_;
+  return (flags_ & (1 << WATERMARK_INVALIDATED)) != watermark_invalidated_mark_;
 }
 
 
 void Page::InvalidateWatermark(bool value) {
   if (value) {
-    flags_ = (flags_ & ~WATERMARK_INVALIDATED) | watermark_invalidated_mark_;
+    flags_ = (flags_ & ~(1 << WATERMARK_INVALIDATED)) |
+             watermark_invalidated_mark_;
   } else {
-    flags_ = (flags_ & ~WATERMARK_INVALIDATED) |
-             (watermark_invalidated_mark_ ^ WATERMARK_INVALIDATED);
+    flags_ = (flags_ & ~(1 << WATERMARK_INVALIDATED)) |
+             (watermark_invalidated_mark_ ^ (1 << WATERMARK_INVALIDATED));
   }
 
   ASSERT(IsWatermarkValid() == !value);
@@ -242,15 +243,15 @@ void Page::InvalidateWatermark(bool value) {
 
 
 bool Page::GetPageFlag(PageFlag flag) {
-  return (flags_ & flag) != 0;
+  return (flags_ & static_cast<intptr_t>(1 << flag)) != 0;
 }
 
 
 void Page::SetPageFlag(PageFlag flag, bool value) {
   if (value) {
-    flags_ |= flag;
+    flags_ |= static_cast<intptr_t>(1 << flag);
   } else {
-    flags_ &= ~flag;
+    flags_ &= ~static_cast<intptr_t>(1 << flag);
   }
 }
 
@@ -289,9 +290,26 @@ void Page::SetIsLargeObjectPage(bool is_large_object_page) {
   SetPageFlag(IS_NORMAL_PAGE, !is_large_object_page);
 }
 
+bool Page::IsPageExecutable() {
+  return GetPageFlag(IS_EXECUTABLE);
+}
+
+
+void Page::SetIsPageExecutable(bool is_page_executable) {
+  SetPageFlag(IS_EXECUTABLE, is_page_executable);
+}
+
 
 // -----------------------------------------------------------------------------
 // MemoryAllocator
+
+void MemoryAllocator::ChunkInfo::init(Address a, size_t s, PagedSpace* o) {
+  address_ = a;
+  size_ = s;
+  owner_ = o;
+  executable_ = (o == NULL) ? NOT_EXECUTABLE : o->executable();
+}
+
 
 bool MemoryAllocator::IsValidChunk(int chunk_id) {
   if (!IsValidChunkId(chunk_id)) return false;
@@ -389,8 +407,7 @@ void MemoryAllocator::UnprotectChunkFromPage(Page* page) {
 
 bool PagedSpace::Contains(Address addr) {
   Page* p = Page::FromAddress(addr);
-  ASSERT(p->is_valid());
-
+  if (!p->is_valid()) return false;
   return MemoryAllocator::IsPageInSpace(p, this);
 }
 
@@ -413,7 +430,7 @@ HeapObject* PagedSpace::AllocateLinearly(AllocationInfo* alloc_info,
 
 
 // Raw allocation.
-Object* PagedSpace::AllocateRaw(int size_in_bytes) {
+MaybeObject* PagedSpace::AllocateRaw(int size_in_bytes) {
   ASSERT(HasBeenSetup());
   ASSERT_OBJECT_SIZE(size_in_bytes);
   HeapObject* object = AllocateLinearly(&allocation_info_, size_in_bytes);
@@ -422,12 +439,12 @@ Object* PagedSpace::AllocateRaw(int size_in_bytes) {
   object = SlowAllocateRaw(size_in_bytes);
   if (object != NULL) return object;
 
-  return Failure::RetryAfterGC(size_in_bytes, identity());
+  return Failure::RetryAfterGC(identity());
 }
 
 
 // Reallocating (and promoting) objects during a compacting collection.
-Object* PagedSpace::MCAllocateRaw(int size_in_bytes) {
+MaybeObject* PagedSpace::MCAllocateRaw(int size_in_bytes) {
   ASSERT(HasBeenSetup());
   ASSERT_OBJECT_SIZE(size_in_bytes);
   HeapObject* object = AllocateLinearly(&mc_forwarding_info_, size_in_bytes);
@@ -436,7 +453,7 @@ Object* PagedSpace::MCAllocateRaw(int size_in_bytes) {
   object = SlowMCAllocateRaw(size_in_bytes);
   if (object != NULL) return object;
 
-  return Failure::RetryAfterGC(size_in_bytes, identity());
+  return Failure::RetryAfterGC(identity());
 }
 
 
@@ -454,10 +471,10 @@ HeapObject* LargeObjectChunk::GetObject() {
 // -----------------------------------------------------------------------------
 // LargeObjectSpace
 
-Object* NewSpace::AllocateRawInternal(int size_in_bytes,
-                                      AllocationInfo* alloc_info) {
+MaybeObject* NewSpace::AllocateRawInternal(int size_in_bytes,
+                                           AllocationInfo* alloc_info) {
   Address new_top = alloc_info->top + size_in_bytes;
-  if (new_top > alloc_info->limit) return Failure::RetryAfterGC(size_in_bytes);
+  if (new_top > alloc_info->limit) return Failure::RetryAfterGC();
 
   Object* obj = HeapObject::FromAddress(alloc_info->top);
   alloc_info->top = new_top;

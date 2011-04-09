@@ -8,12 +8,16 @@ include $(SMOOTH_PATH)/Makefile-options
 # Change these variables to fit your project:
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
-	MYCCOPTS += -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/local/include/gtk-2.0 -I/usr/local/lib/gtk-2.0/include
-	MYCCOPTS += -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/local/include/glib-2.0 -I/usr/local/lib/glib-2.0/include
-	MYCCOPTS += -I/usr/include/gdk-pixbuf-2.0 -I/usr/local/include/gdk-pixbuf-2.0
-	MYCCOPTS += -I/usr/include/atk-1.0 -I/usr/local/include/atk-1.0
-	MYCCOPTS += -I/usr/include/cairo -I/usr/local/include/cairo
-	MYCCOPTS += -I/usr/include/pango-1.0 -I/usr/local/include/pango-1.0
+ifeq ($(BUILD_SOLARIS),True)
+	MYCCOPTS += -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include
+	MYCCOPTS += -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
+	MYCCOPTS += -I/usr/include/gdk-pixbuf-2.0
+	MYCCOPTS += -I/usr/include/atk-1.0
+	MYCCOPTS += -I/usr/include/cairo
+	MYCCOPTS += -I/usr/include/pango-1.0
+else
+	MYCCOPTS += $(shell pkg-config --cflags gtk+-2.0)
+endif
 endif
 endif
 

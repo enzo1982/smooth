@@ -8,10 +8,8 @@ include $(SMOOTH_PATH)/Makefile-options
 # Enter object files here:
 OBJECTS	  = 
 
-ifeq ($(BUILD_XLIB),True)
-ifneq ($(BUILD_OSX),True)
-	OBJECTS += clipboardxlib.o
-endif
+ifeq ($(BUILD_OSX),True)
+	OBJECTS += clipboardcocoa.o
 endif
 
 ## Do not change anything below this line. ##

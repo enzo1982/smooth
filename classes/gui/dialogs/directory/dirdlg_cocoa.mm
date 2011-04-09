@@ -15,6 +15,8 @@
 
 const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 {
+	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
+
 	/* Create file chooser dialog
 	 */
 	NSOpenPanel	*openPanel = [NSOpenPanel openPanel];
@@ -22,11 +24,9 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 	[openPanel setCanChooseDirectories: true];
 	[openPanel setCanChooseFiles: false];
 
-	[openPanel runModal];
+	if ([openPanel runModal] == NSOKButton) directory.ImportFrom("UTF-8", [[[openPanel URL] path] UTF8String]);
 
-	directory.ImportFrom("UTF-8", [[[openPanel URL] path] UTF8String]);
-
-	[openPanel release];
+	[pool release];
 
 	/* Check if we actually have a directory
 	 */

@@ -19,10 +19,7 @@
 
 #	include <cairo/cairo-xlib.h>
 
-#	ifdef __APPLE__
-//#		include <cairo/cairo-ft.h>
-//#		include <fontconfig/fontconfig.h>
-#	else
+#	ifndef __APPLE__
 #		include <pango/pangocairo.h>
 #	endif
 
@@ -39,12 +36,6 @@ S::Int	 fontCairoTmp = S::GUI::FontBackend::SetBackend(&CreateFontCairo);
 S::GUI::FontCairo::FontCairo(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
 {
 	type = FONT_CAIRO;
-
-#ifdef __APPLE__
-	/* Make sure Fontconfig is initialized.
-	 */
-//	FcInit();
-#endif
 }
 
 S::GUI::FontCairo::~FontCairo()
@@ -107,31 +98,6 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
 
 	cairo_font_extents(context, &fontExtents);
 	cairo_text_extents(context, text.ConvertTo("UTF-8"), &textExtents);
-/*#elif defined __APPLE__
-	FcCharSet		*charset = FcCharSetCreate();
-
-	for (Int i = 0; i < text.Length(); i++) FcCharSetAddChar(charset, text[i]);
-
-	FcPattern		*pattern = FcPatternBuild(0, FC_FAMILY,	 FcTypeString,	(char *) fontName,
-							     FC_WEIGHT,  FcTypeInteger,	(fontWeight == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL),
-							     FC_SLANT,	 FcTypeInteger,	(fontStyle == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-							     FC_CHARSET, FcTypeCharSet,	charset, (char *) 0);
-
-	cairo_font_face_t	*fontface = cairo_ft_font_face_create_for_pattern(pattern);
-
-	cairo_set_font_face(context, fontface);
-	cairo_set_font_size(context, fontSize * 96.0 / 72.0);
-
-	cairo_font_extents_t	 fontExtents;
-	cairo_text_extents_t	 textExtents;
-
-	cairo_font_extents(context, &fontExtents);
-	cairo_text_extents(context, text.ConvertTo("UTF-8"), &textExtents);
-
-	cairo_font_face_destroy(fontface);
-
-	FcPatternDestroy(pattern);
-	FcCharSetDestroy(charset);*/
 #else
 	PangoLayout		*layout	= pango_cairo_create_layout(context);
 	PangoFontDescription	*desc	= pango_font_description_from_string(String(fontName)

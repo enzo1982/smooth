@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -255,10 +255,20 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 	{
 		if (style & Rect::Rounded)
 		{
+			if (!painting)
+			{
+				HBRUSH	 previousBrush	= (HBRUSH) SelectObject(gdi_dc, brush);
+				HPEN	 previousPen	= (HPEN) SelectObject(gdi_dc, pen);
+
+				RoundRect(gdi_dc, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
+
+				brush	= (HBRUSH) SelectObject(gdi_dc, previousBrush);
+				pen	= (HPEN) SelectObject(gdi_dc, previousPen);
+			}
+
 			HBRUSH	 previousBrush	= (HBRUSH) SelectObject(paintContext, brush);
 			HPEN	 previousPen	= (HPEN) SelectObject(paintContext, pen);
 
-			if (!painting) RoundRect(gdi_dc, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
 			RoundRect(paintContext, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
 
 			brush	= (HBRUSH) SelectObject(paintContext, previousBrush);
@@ -282,59 +292,18 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 	}
 	else if (style & Rect::Dotted)
 	{
-		Bool	 dot = False;
-		Int	 x;
-		Int	 y = rect.top;
-
-		for (x = rect.left; x < rect.right - 1; x++)
+		if (!painting)
 		{
-			if (dot == True)
-			{
-				if (!painting) ::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(paintContext, x, y, color);
-				dot = False;
-			}
-			else dot = True;
+			for (Int x = rect.left								 + 1; x <  rect.right;	 x += 2) ::SetPixel(gdi_dc, x, rect.top, color);
+			for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2; y <  rect.bottom;	 y += 2) ::SetPixel(gdi_dc, rect.right - 1, y, color);
+			for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2; x >= rect.left;	 x -= 2) ::SetPixel(gdi_dc, x, rect.bottom - 1, color);
+			for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1; y >= rect.top;	 y -= 2) ::SetPixel(gdi_dc, rect.left, y, color);
 		}
 
-		x = rect.right - 1;
-
-		for (y = rect.top; y < rect.bottom; y++)
-		{
-			if (dot == True)
-			{
-				if (!painting) ::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(paintContext, x, y, color);
-				dot = False;
-			}
-			else dot = True;
-		}
-
-		y = rect.bottom - 1;
-
-		for (x = rect.right - 2; x >= rect.left; x--)
-		{
-			if (dot == True)
-			{
-				if (!painting) ::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(paintContext, x, y, color);
-				dot = False;
-			}
-			else dot = True;
-		}
-
-		x = rect.left;
-
-		for (y = rect.bottom - 2; y >= rect.top; y--)
-		{
-			if (dot == True)
-			{
-				if (!painting) ::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(paintContext, x, y, color);
-				dot = False;
-			}
-			else dot = True;
-		}
+		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) ::SetPixel(paintContext, x, rect.top, color);
+		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) ::SetPixel(paintContext, rect.right - 1, y, color);
+		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) ::SetPixel(paintContext, x, rect.bottom - 1, color);
+		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) ::SetPixel(paintContext, rect.left, y, color);
 	}
 
 	::DeleteObject(brush);
@@ -509,12 +478,11 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, const Rect &srcRect, const Rect &iDestRect)
+S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcRect, const Rect &iDestRect)
 {
-	if (window  == NIL) return Success();
-	if (oBitmap == NIL) return Error();
+	if (window == NIL) return Success();
+	if (bitmap == NIL) return Error();
 
-	Bitmap	 bitmap	  = oBitmap;
 	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
 	HDC	 gdi_dc	  = GetWindowDC(window);
 	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
@@ -549,12 +517,11 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &oBitmap, const Rect &src
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oBitmap, const Rect &destRect)
+S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, const Bitmap &bitmap, const Rect &destRect)
 {
-	if (window  == NIL) return Success();
-	if (oBitmap == NIL) return Error();
+	if (window == NIL) return Success();
+	if (bitmap == NIL) return Error();
 
-	Bitmap	 bitmap	 = oBitmap;
 	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
 	HDC	 gdi_dc	 = GetWindowDC(window);
 	HDC	 cdc	 = CreateCompatibleDC(gdi_dc);

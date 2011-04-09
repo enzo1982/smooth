@@ -171,8 +171,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 			surface->Line(start + Point(1, 0), end - Point(0, 1), buttonColor);
 			surface->Line(start + Point(0, 1), end - Point(1, 0), buttonColor);
 
-			start.y		= button.bottom - 1;
-			end.y		= button.top - 2;
+			start	= Point(button.left + (IsRightToLeft() ? 1 : 0), button.bottom - 1);
+			end	= Point(button.right + (IsRightToLeft() ? 1 : 0), button.top - 2);
 
 			surface->Line(start, end, buttonColor);
 			surface->Line(start + Point(1, 0), end + Point(0, 1), buttonColor);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,7 +35,7 @@ S::GUI::ClipboardXLib::~ClipboardXLib()
 
 unsigned char *S::GUI::ClipboardXLib::QueryAtom(Display *display, ::Window self, Atom atom) const
 {
-	XConvertSelection(display, XA_PRIMARY, atom, atom, self, CurrentTime);
+	XConvertSelection(display, XA_CLIPBOARD(display), atom, atom, self, CurrentTime);
 	XFlush(display);
 
 	/* Wait for SelectionNotify event to be sent.
@@ -76,7 +76,7 @@ S::String S::GUI::ClipboardXLib::GetClipboardText() const
 
 	Display		*display = Backends::BackendXLib::GetDisplay();
 	::Window	 self	 = (::Window) window->GetSystemWindow();
-	::Window	 owner	 = XGetSelectionOwner(display, XA_PRIMARY);
+	::Window	 owner	 = XGetSelectionOwner(display, XA_CLIPBOARD(display));
 
 	if (owner != None)
 	{
@@ -117,7 +117,6 @@ S::Bool S::GUI::ClipboardXLib::SetClipboardText(const String &text)
 	Display		*display = Backends::BackendXLib::GetDisplay();
 	::Window	 self	 = (::Window) window->GetSystemWindow();
 
-	XSetSelectionOwner(display, XA_PRIMARY, self, CurrentTime);
 	XSetSelectionOwner(display, XA_CLIPBOARD(display), self, CurrentTime);
 	XFlush(display);
 

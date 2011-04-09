@@ -329,7 +329,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 					Int	 bColor = GetSysColor(COLOR_HIGHLIGHT);
 					Int	 tColor	= GetSysColor(COLOR_HIGHLIGHTTEXT);
 #else
-					Int	 bColor	= Color(0, 0, 255);
+					Int	 bColor	= Color(55, 115, 215);
 					Int	 tColor = Color(255, 255, 255);
 #endif
 					Array<Int>	 markRegionStarts;

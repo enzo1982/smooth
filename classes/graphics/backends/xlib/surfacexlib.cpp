@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -194,59 +194,10 @@ S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, const Color &color, Int style
 	}
 	else if (style & Rect::Dotted)
 	{
-		Bool	 dot = False;
-		Int	 x;
-		Int	 y = rect.top;
-
-		for (x = rect.left; x < rect.right - 1; x++)
-		{
-			if (dot == True)
-			{
-				SetPixel(Point(x, y), color);
-
-				dot = False;
-			}
-			else dot = True;
-		}
-
-		x = rect.right - 1;
-
-		for (y = rect.top; y < rect.bottom; y++)
-		{
-			if (dot == True)
-			{
-				SetPixel(Point(x, y), color);
-
-				dot = False;
-			}
-			else dot = True;
-		}
-
-		y = rect.bottom - 1;
-
-		for (x = rect.right - 2; x >= rect.left; x--)
-		{
-			if (dot == True)
-			{
-				SetPixel(Point(x, y), color);
-
-				dot = False;
-			}
-			else dot = True;
-		}
-
-		x = rect.left;
-
-		for (y = rect.bottom - 2; y >= rect.top; y--)
-		{
-			if (dot == True)
-			{
-				SetPixel(Point(x, y), color);
-
-				dot = False;
-			}
-			else dot = True;
-		}
+		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) SetPixel(Point(x, rect.top), color);
+		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) SetPixel(Point(rect.right - 1, y), color);
+		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) SetPixel(Point(x, rect.bottom - 1), color);
+		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) SetPixel(Point(rect.left, y), color);
 	}
 
 	XFreeGC(display, gc);
@@ -322,12 +273,11 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 	return Success();
 }
 
-S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &oBitmap, const Rect &srcRect, const Rect &iDestRect)
+S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bmp, const Rect &srcRect, const Rect &iDestRect)
 {
-	if (window  == NIL) return Success();
-	if (oBitmap == NIL) return Error();
+	if (window == NIL) return Success();
+	if (bmp	   == NIL) return Error();
 
-	Bitmap	 bmp	  = oBitmap;
 	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
 	GC	 gc	  = XCreateGC(display, bitmap, 0, NIL);
 
@@ -339,12 +289,11 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &oBitmap, const Rect &sr
 	return Success();
 }
 
-S::Int S::GUI::SurfaceXLib::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oBitmap, const Rect &destRect)
+S::Int S::GUI::SurfaceXLib::BlitToBitmap(const Rect &iSrcRect, const Bitmap &bmp, const Rect &destRect)
 {
-	if (window  == NIL) return Success();
-	if (oBitmap == NIL) return Error();
+	if (window == NIL) return Success();
+	if (bmp	   == NIL) return Error();
 
-	Bitmap	 bmp	 = oBitmap;
 	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
 	GC	 gc	 = XCreateGC(display, bitmap, 0, NIL);
 

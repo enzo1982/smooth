@@ -21,7 +21,9 @@ namespace smooth
 
 #include "../surfacebackend.h"
 
-#ifndef __WIN32__
+#ifdef __WIN32__
+#	include <windows.h>
+#else
 	namespace X11
 	{
 		extern "C"
@@ -36,11 +38,7 @@ namespace smooth
 	};
 #endif
 
-#ifdef __WIN32__
-#	include <cairowin/cairo.h>
-#else
-#	include <cairo/cairo.h>
-#endif
+#include <cairo/cairo.h>
 
 namespace smooth
 {

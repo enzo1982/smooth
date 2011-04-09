@@ -82,7 +82,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 
 	img_light	= new Image(bmp, Point(5, 3), Size(32, 32));
 
-	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), Point(40, 7));
+	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), Point(8 + bmp.GetSize().cx, 7));
 	txt_didyouknow->SetFont(Font(Font::Default, 14, Font::Bold));
 
 	txt_tip		= new Text(NIL, Point(6, 6));

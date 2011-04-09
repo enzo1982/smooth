@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,12 @@
 
 #include <smooth/system/system.h>
 #include <smooth/files/directory.h>
+#include <smooth/io/instream.h>
 #include <smooth/version.h>
+
+#ifdef __APPLE__
+#	include <CoreServices/CoreServices.h>
+#endif
 
 #ifdef __WIN32__
 #	include <time.h>
@@ -238,14 +243,44 @@ S::String S::System::System::GetApplicationDataDirectory()
 	return configDir;
 }
 
-S::String S::System::System::GetPersonalFilesDirectory()
+S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 {
 	String	 personalDir;
 
 #ifdef __WIN32__
 	ITEMIDLIST	*idlist;
+	OSVERSIONINFOA	 vInfo;
 
-	SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+	GetVersionExA(&vInfo);
+
+	switch (type)
+	{
+		default:
+		case PersonalFilesGeneric:
+			SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			break;
+		case PersonalFilesDocuments:
+			SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			break;
+		case PersonalFilesPictures:
+			if ( vInfo.dwMajorVersion >= 5				    ) SHGetSpecialFolderLocation(NIL, CSIDL_MYPICTURES, &idlist);
+			else							      SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			break;
+		case PersonalFilesMusic:
+			if ( vInfo.dwMajorVersion >= 5				    ) SHGetSpecialFolderLocation(NIL, CSIDL_MYMUSIC, &idlist);
+			else							      SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			break;
+		case PersonalFilesMovies:
+			if ( vInfo.dwMajorVersion >= 6 ||
+			    (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)) SHGetSpecialFolderLocation(NIL, CSIDL_MYVIDEO, &idlist);
+			else							      SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			break;
+		case PersonalFilesDownloads:
+			SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			break;
+	}
 
 	if (Setup::enableUnicode)
 	{
@@ -272,10 +307,82 @@ S::String S::System::System::GetPersonalFilesDirectory()
 
 	if (pw != NIL)	personalDir = pw->pw_dir;
 	else		personalDir = "~";
+
+#ifdef __APPLE__
+	OSErr	 error = -1;
+	FSRef	 entry;
+
+	switch (type)
+	{
+		default:
+		case PersonalFilesGeneric:
+			break;
+		case PersonalFilesDocuments:
+			error = FSFindFolder(kUserDomain, kDocumentsFolderType, kDontCreateFolder, &entry);
+			break;
+		case PersonalFilesPictures:
+			error = FSFindFolder(kUserDomain, kPictureDocumentsFolderType, kDontCreateFolder, &entry);
+			break;
+		case PersonalFilesMusic:
+			error = FSFindFolder(kUserDomain, kMusicDocumentsFolderType, kDontCreateFolder, &entry);
+			break;
+		case PersonalFilesMovies:
+			error = FSFindFolder(kUserDomain, kMovieDocumentsFolderType, kDontCreateFolder, &entry);
+			break;
+		case PersonalFilesDownloads:
+			break;
+	}
+
+	if (error == noErr)
+	{
+		CFURLRef	 url = CFURLCreateFromFSRef(kCFAllocatorSystemDefault, &entry);
+
+		if (url != NIL)
+		{
+			CFStringRef	 path = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
+
+			if (path != NIL)
+			{
+				Buffer<char>	 buffer(CFStringGetLength(path) * 4 + 1);
+
+				CFStringGetCString(path, buffer, buffer.Size(), kCFStringEncodingUTF8);
+
+				personalDir.ImportFrom("UTF-8", buffer);
+
+				CFRelease(path);
+			}
+
+			CFRelease(url);
+		}
+	}
+#else
+	if (File(String(personalDir).Append("/.config/user-dirs.dirs")).Exists())
+	{
+		String		 format = String::SetInputFormat("UTF-8");
+		IO::InStream	 in(IO::STREAM_FILE, String(personalDir).Append("/.config/user-dirs.dirs"), IO::IS_READ);
+
+		while (in.GetPos() < in.Size())
+		{
+			String	 entry = in.InputLine();
+
+			if ((type == PersonalFilesDocuments && entry.StartsWith("XDG_DOCUMENTS_DIR")) ||
+			    (type == PersonalFilesPictures  && entry.StartsWith("XDG_PICTURES_DIR" )) ||
+			    (type == PersonalFilesMusic	    && entry.StartsWith("XDG_MUSIC_DIR"	   )) ||
+			    (type == PersonalFilesMovies    && entry.StartsWith("XDG_VIDEOS_DIR"   )) ||
+			    (type == PersonalFilesDownloads && entry.StartsWith("XDG_DOWNLOAD_DIR" )))
+			{
+				personalDir = entry.SubString(entry.Find("\"") + 1, entry.FindLast("\"") - entry.Find("\"") - 1).Replace("$HOME", personalDir);
+
+				break;
+			}
+		}
+
+		String::SetInputFormat(format);
+	}
+#endif
 #endif
 
-	if (!personalDir.EndsWith(Directory::GetDirectoryDelimiter())) personalDir.Append(Directory::GetDirectoryDelimiter());
-	if (personalDir == Directory::GetDirectoryDelimiter()) personalDir = NIL;
+	if (personalDir != NIL && !personalDir.EndsWith(Directory::GetDirectoryDelimiter())) personalDir.Append(Directory::GetDirectoryDelimiter());
 
 	return personalDir;
 }

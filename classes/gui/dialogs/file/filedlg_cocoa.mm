@@ -17,6 +17,8 @@
 
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
+	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
+
 	/* Create file chooser dialog.
 	 */
 	if (mode == SFM_OPEN)
@@ -27,19 +29,18 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		SetFilters(openPanel);
 
-		[openPanel runModal];
-
-		NSArray *URLs = [openPanel URLs];
-
-		for (unsigned int i = 0; i < [URLs count]; i++)
+		if ([openPanel runModal] == NSOKButton)
 		{
-			String	 file;
+			NSArray *URLs = [openPanel URLs];
 
-			file.ImportFrom("UTF-8", [[[URLs objectAtIndex: i] path] UTF8String]);
-			files.Add(file);
+			for (unsigned int i = 0; i < [URLs count]; i++)
+			{
+				String	 file;
+
+				file.ImportFrom("UTF-8", [[[URLs objectAtIndex: i] path] UTF8String]);
+				files.Add(file);
+			}
 		}
-
-		[openPanel release];
 	}
 	else if (mode == SFM_SAVE)
 	{
@@ -47,15 +48,16 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		SetFilters(savePanel);
 
-		[savePanel runModal];
+		if ([savePanel runModal] == NSOKButton)
+		{
+			String	 file;
 
-		String	 file;
-
-		file.ImportFrom("UTF-8", [[[savePanel URL] path] UTF8String]);
-		files.Add(file);
-
-		[savePanel release];
+			file.ImportFrom("UTF-8", [[[savePanel URL] path] UTF8String]);
+			files.Add(file);
+		}
 	}
+
+	[pool release];
 
 	if (files.Length() == 0) error = Error();
 

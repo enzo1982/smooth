@@ -19,10 +19,10 @@ ifeq ($(BUILD_WIN32),True)
 endif
 endif
 
-LIBS += -lfribidi -lbz2 -lxml2 -lcpuid -ljpeg -lpng -lz -lstdc++
+LIBS += -lfribidi -lbz2 -lxml2 -ljpeg -lpng -lz -lstdc++
 
 ifeq ($(BUILD_WIN32),True)
-	LIBS += -lnsucd -lws2_32 -limm32 -lole32
+	LIBS += -lcpuid -lnsucd -lws2_32 -limm32 -lole32
 
 ifeq ($(BUILD_GDIPLUS),True)
 	LIBS += -lgdiplus
@@ -35,13 +35,13 @@ else
 	LIBS += -lcairo -lpthread -lX11 -lXmu
 
 ifeq ($(BUILD_OSX),True)
-	LIBS += -lnsucd -liconv -lfontconfig
+	LIBS += -lcpuid -lnsucd -liconv -lfontconfig
 else
 	LIBS += -lpango-1.0 -lpangocairo-1.0 -lgobject-2.0 -lgtk-x11-2.0
 endif
 
 ifeq ($(BUILD_LINUX),True)
-	LIBS += -lnsucd
+	LIBS += -lcpuid -lnsucd
 endif
 
 ifeq ($(BUILD_FREEBSD),True)
@@ -63,6 +63,12 @@ LINKER_OPTS = -L$(LIBDIR) --shared -o $(DLLNAME)
 STRIP_OPTS = --strip-all
 LIBSTRIP_OPTS = --strip-debug
 REMOVER_OPTS = -f
+
+ifeq ($(BUILD_X64),True)
+	LINKER_OPTS += -m64
+else
+	LINKER_OPTS += -m32
+endif
 
 ifeq ($(BUILD_WIN32),True)
 	LINKER_OPTS += -mwindows -Wl,--dynamicbase,--nxcompat,--kill-at,--out-implib,$(LIBNAME)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -258,7 +258,7 @@ S::Int S::GUI::SurfaceGDIPlus::Box(const Rect &iRect, const Color &color, Int st
 	HDC	 gdi_dc = GetWindowDC(window);
 	HBRUSH	 brush = CreateSolidBrush(color);
 	HPEN	 pen = CreatePen(PS_SOLID, 0, color);
-	RECT	 wRect = rect;
+	RECT	 wRect = { rect.left, rect.top, rect.right, rect.bottom };
 
 	Gdiplus::SolidBrush	 gdip_brush(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
 	Gdiplus::Pen		 gdip_pen(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
@@ -268,12 +268,21 @@ S::Int S::GUI::SurfaceGDIPlus::Box(const Rect &iRect, const Color &color, Int st
 	{
 		if (style & Rect::Rounded)
 		{
-			HDC	 cdc		= paintContext->GetHDC();
+			if (!painting)
+			{
+				HBRUSH	 previousBrush	= (HBRUSH) SelectObject(gdi_dc, brush);
+				HPEN	 previousPen	= (HPEN) SelectObject(gdi_dc, pen);
 
+				RoundRect(gdi_dc, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
+
+				brush	= (HBRUSH) SelectObject(gdi_dc, previousBrush);
+				pen	= (HPEN) SelectObject(gdi_dc, previousPen);
+			}
+
+			HDC	 cdc		= paintContext->GetHDC();
 			HBRUSH	 previousBrush	= (HBRUSH) SelectObject(cdc, brush);
 			HPEN	 previousPen	= (HPEN) SelectObject(cdc, pen);
 
-			if (!painting) RoundRect(gdi_dc, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
 			RoundRect(cdc, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
 
 			brush	= (HBRUSH) SelectObject(cdc, previousBrush);
@@ -305,59 +314,18 @@ S::Int S::GUI::SurfaceGDIPlus::Box(const Rect &iRect, const Color &color, Int st
 	{
 		HDC	 cdc = paintContext->GetHDC();
 
-		Bool	 dot = False;
-		Int	 x;
-		Int	 y = rect.top;
-
-		for (x = rect.left; x < rect.right - 1; x++)
+		if (!painting)
 		{
-			if (dot == True)
-			{
-				if (!painting) ::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(cdc, x, y, color);
-				dot = False;
-			}
-			else dot = True;
+			for (Int x = rect.left								 + 1; x <  rect.right;	 x += 2) ::SetPixel(gdi_dc, x, rect.top, color);
+			for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2; y <  rect.bottom;	 y += 2) ::SetPixel(gdi_dc, rect.right - 1, y, color);
+			for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2; x >= rect.left;	 x -= 2) ::SetPixel(gdi_dc, x, rect.bottom - 1, color);
+			for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1; y >= rect.top;	 y -= 2) ::SetPixel(gdi_dc, rect.left, y, color);
 		}
 
-		x = rect.right - 1;
-
-		for (y = rect.top; y < rect.bottom; y++)
-		{
-			if (dot == True)
-			{
-				if (!painting) ::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(cdc, x, y, color);
-				dot = False;
-			}
-			else dot = True;
-		}
-
-		y = rect.bottom - 1;
-
-		for (x = rect.right - 2; x >= rect.left; x--)
-		{
-			if (dot == True)
-			{
-				if (!painting) ::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(cdc, x, y, color);
-				dot = False;
-			}
-			else dot = True;
-		}
-
-		x = rect.left;
-
-		for (y = rect.bottom - 2; y >= rect.top; y--)
-		{
-			if (dot == True)
-			{
-				if (!painting) ::SetPixel(gdi_dc, x, y, color);
-				::SetPixel(cdc, x, y, color);
-				dot = False;
-			}
-			else dot = True;
-		}
+		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) ::SetPixel(cdc, x, rect.top, color);
+		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) ::SetPixel(cdc, rect.right - 1, y, color);
+		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) ::SetPixel(cdc, x, rect.bottom - 1, color);
+		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) ::SetPixel(cdc, rect.left, y, color);
 
 		paintContext->ReleaseHDC(cdc);
 	}
@@ -439,7 +407,8 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 			}
 		}
 
-		RECT	 Rect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
+		Rect	 tRect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
+		RECT	 wRect = { tRect.left, tRect.top, tRect.right, tRect.bottom };
 
 		if (rtlCharacters && Setup::useIconv)
 		{
@@ -488,17 +457,17 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 			if (Setup::enableUnicode) GetCharacterPlacementW(cdc, line, line.Length(), 0, &resultsw, 0);
 			else			  GetCharacterPlacementA(cdc, line, line.Length(), 0, &resultsa, 0);
 
-			if (rightToLeft.GetRightToLeft()) Rect.left -= 10;
-			else				  Rect.right += 10;
+			if (rightToLeft.GetRightToLeft()) wRect.left -= 10;
+			else				  wRect.right += 10;
 
 			if (!painting)
 			{
-				if (Setup::enableUnicode) ExtTextOutW(gdi_dc, (rightToLeft.GetRightToLeft() ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-				else			  ExtTextOutA(gdi_dc, (rightToLeft.GetRightToLeft() ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+				if (Setup::enableUnicode) ExtTextOutW(gdi_dc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
+				else			  ExtTextOutA(gdi_dc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
 			}
 
-			if (Setup::enableUnicode) ExtTextOutW(cdc, (rightToLeft.GetRightToLeft() ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-			else			  ExtTextOutA(cdc, (rightToLeft.GetRightToLeft() ? Rect.right : Rect.left), Rect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &Rect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+			if (Setup::enableUnicode) ExtTextOutW(cdc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
+			else			  ExtTextOutA(cdc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
 
 			delete [] glyphs;
 		}
@@ -512,14 +481,14 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 			{
 				SetTextAlign(gdi_dc, TA_LEFT);
 
-				if (Setup::enableUnicode) DrawTextExW(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-				else			  DrawTextExA(gdi_dc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+				if (Setup::enableUnicode) DrawTextExW(gdi_dc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+				else			  DrawTextExA(gdi_dc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 			}
 
 			SetTextAlign(cdc, TA_LEFT);
 
-			if (Setup::enableUnicode) DrawTextExW(cdc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-			else			  DrawTextExA(cdc, line, -1, &Rect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			if (Setup::enableUnicode) DrawTextExW(cdc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			else			  DrawTextExA(cdc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 		}
 
 		rect.top += lineHeight;
@@ -537,16 +506,16 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &oBitmap, const Rect &srcRect, const Rect &iDestRect)
+S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcRect, const Rect &iDestRect)
 {
-	if (window  == NIL) return Success();
-	if (oBitmap == NIL) return Error();
+	if (window == NIL) return Success();
+	if (bitmap == NIL) return Error();
 
-	Gdiplus::Bitmap		 bitmap((HBITMAP) oBitmap.GetSystemBitmap(), NIL);
+	Gdiplus::Bitmap		 bmp((HBITMAP) bitmap.GetSystemBitmap(), NIL);
 	Rect			 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
 	HDC			 gdi_dc = GetWindowDC(window);
 	Gdiplus::Graphics	*screen = new Gdiplus::Graphics(gdi_dc);
-	Gdiplus::CachedBitmap	 cachedBitmap(&bitmap, screen);
+	Gdiplus::CachedBitmap	 cachedBitmap(&bmp, screen);
 
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
@@ -561,10 +530,10 @@ S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &oBitmap, const Rect 
 	{
 		if (!painting)
 		{
-			screen->DrawImage(&bitmap, INT(destRect.left), INT(destRect.top), INT(destRect.right - destRect.left), INT(destRect.bottom - destRect.top));
+			screen->DrawImage(&bmp, INT(destRect.left), INT(destRect.top), INT(destRect.right - destRect.left), INT(destRect.bottom - destRect.top));
 		}
 
-		paintContext->DrawImage(&bitmap, INT(destRect.left), INT(destRect.top), INT(destRect.right - destRect.left), INT(destRect.bottom - destRect.top));
+		paintContext->DrawImage(&bmp, INT(destRect.left), INT(destRect.top), INT(destRect.right - destRect.left), INT(destRect.bottom - destRect.top));
 	}
 
 	delete screen;
@@ -574,12 +543,11 @@ S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &oBitmap, const Rect 
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDIPlus::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oBitmap, const Rect &destRect)
+S::Int S::GUI::SurfaceGDIPlus::BlitToBitmap(const Rect &iSrcRect, const Bitmap &bitmap, const Rect &destRect)
 {
-	if (window  == NIL) return Success();
-	if (oBitmap == NIL) return Error();
+	if (window == NIL) return Success();
+	if (bitmap == NIL) return Error();
 
-	Bitmap	 bitmap	 = oBitmap;
 	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
 	HDC	 gdi_dc	 = GetWindowDC(window);
 	HDC	 cdc	 = CreateCompatibleDC(gdi_dc);

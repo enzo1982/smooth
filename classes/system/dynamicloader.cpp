@@ -47,15 +47,21 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 		else				handle = LoadLibraryA(String(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
 	}
 #else
+	Int	 dlopenFlags = RTLD_NOW | RTLD_LOCAL;
+
+#ifdef __FreeBSD__
+	dlopenFlags |= RTLD_NODELETE;
+#endif
+
 	/* Try the supplied module name in application directory.
 	 */
-	handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt), RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
+	handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt), dlopenFlags);
 
 	if (handle == NIL)
 	{
 		/* Try the supplied module name system wide.
 		 */
-		handle = dlopen(String(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt), RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
+		handle = dlopen(String(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt), dlopenFlags);
 	}
 
 	if (handle == NIL)
@@ -75,7 +81,7 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 
 			if (files.Length() > 0)
 			{
-				handle = dlopen((String) files.GetFirst(), RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
+				handle = dlopen((String) files.GetFirst(), dlopenFlags);
 			}
 
 			if (handle != NIL) return;
@@ -90,7 +96,7 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 
 			if (files.Length() > 0)
 			{
-				handle = dlopen((String) files.GetFirst(), RTLD_NOW | RTLD_LOCAL | RTLD_NODELETE);
+				handle = dlopen((String) files.GetFirst(), dlopenFlags);
 			}
 
 			if (handle != NIL) return;

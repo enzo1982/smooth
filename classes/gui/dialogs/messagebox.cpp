@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,6 +20,8 @@
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/system/multimonitor.h>
+#include <smooth/files/file.h>
+#include <smooth/files/directory.h>
 
 #ifdef __WIN32__
 #	include <windows.h>
@@ -56,7 +58,6 @@ S::Int S::GUI::Dialogs::QuickMessage(const String &text, const String &title, In
 
 S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title, Int btns, wchar_t *cIcon, const String &checkBoxText, Bool *iCVar)
 {
-	msgicon = cIcon;
 	cVar = iCVar;
 
 	msgbox		= new Window(title, Point(), Size());
@@ -68,7 +69,32 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 #ifdef __WIN32__
 	icon		= new Image(ImageLoader::Load(String("Icon:").Append(String::FromInt((Int64) cIcon))), Point(14, 19), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
 #else
+	String	 iconName;
+	Int	 iconSize = 32;
+
 	icon		= NIL;
+
+	if	(cIcon == IDI_ERROR)	   iconName = "dialog-error.png";
+	else if (cIcon == IDI_QUESTION)	   iconName = "dialog-question.png";
+	else if (cIcon == IDI_WARNING)	   iconName = "dialog-warning.png";
+	else if (cIcon == IDI_INFORMATION) iconName = "dialog-information.png";
+
+	static const char	*iconDirs[] = { "/usr/share/icons", "/usr/local/share/icons", NIL };
+
+	for (int i = 0; iconDirs[i] != NIL; i++)
+	{
+		if (Directory(iconDirs[i]).Exists())
+		{
+			String	 file = String(iconDirs[i]).Append("/gnome/").Append(String::FromInt(iconSize)).Append("x").Append(String::FromInt(iconSize)).Append("/status/").Append(iconName);
+
+			if (File(file).Exists())
+			{
+				icon = new Image(ImageLoader::Load(file), Point(14, 19), Size(iconSize, iconSize));
+
+				break;
+			}
+		}
+	}
 #endif
 
 	buttons		= btns;
@@ -125,13 +151,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	msgbox->SetWidth(maxsize + 36);
 	msgbox->SetHeight((((Int) Math::Max(2, lines) + 1) * 16) + 70 + buttonHeight);
 
-	if (msgicon != NIL)
-	{
-#ifdef __WIN32__
-		msgbox->SetWidth(maxsize + 36 + GetSystemMetrics(SM_CXICON) + 20);
-#endif
-	}
-
+	if (icon != NIL) msgbox->SetWidth(maxsize + 36 + icon->GetWidth() + 20);
 
 	titlesize = Font(Font::Default, Font::DefaultSize, Font::Bold).GetTextSizeX(title);
 
@@ -155,13 +175,11 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 		msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->textSize.cx + 54));
 		msgbox->SetHeight(msgbox->GetHeight() + 22);
 
-		if (msgicon != NIL)
+		if (icon !=  NIL)
 		{
-#ifdef __WIN32__
-			checkbox->SetX(checkbox->GetX() + GetSystemMetrics(SM_CXICON) + 20);
+			checkbox->SetX(checkbox->GetX() + icon->GetWidth() + 20);
 
-			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->textSize.cx + 54 + GetSystemMetrics(SM_CXICON) + 20));
-#endif
+			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->textSize.cx + 54 + icon->GetWidth() + 20));
 		}
 
 		lay->Add(checkbox);
@@ -254,11 +272,12 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 	Point	 offset = msgbox->GetMainLayer()->GetRealPosition();
 	Rect	 txtrect = Rect(offset + Point(14, 19), Size(msgbox->GetWidth() - 32, 16));
 
-	if (lines == 1 && msgicon != NIL) { txtrect.top += 8; txtrect.bottom += 8; }
+	if (icon != NIL)
+	{
+		if (lines == 1) { txtrect.top += 8; txtrect.bottom += 8; }
 
-#ifdef __WIN32__
-	if (msgicon != NIL) txtrect.left += GetSystemMetrics(SM_CXICON) + 20;
-#endif
+		txtrect.left += icon->GetWidth() + 20;
+	}
 
 	Surface	*surface = msgbox->GetDrawSurface();
 

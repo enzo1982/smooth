@@ -8,10 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_CLIPBOARDWIN32
-#define H_OBJSMOOTH_CLIPBOARDWIN32
+#ifndef H_OBJSMOOTH_CLIPBOARDCOCOA
+#define H_OBJSMOOTH_CLIPBOARDCOCOA
 
-#include <windows.h>
+#import <Cocoa/Cocoa.h>
 
 namespace smooth
 {
@@ -19,7 +19,7 @@ namespace smooth
 	{
 		class Window;
 
-		class ClipboardWin32;
+		class ClipboardCocoa;
 	};
 };
 
@@ -29,15 +29,15 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Short	 CLIPBOARD_WIN32	= 1;
+		const Short	 CLIPBOARD_COCOA	= 3;
 
-		class ClipboardWin32 : public ClipboardBackend
+		class ClipboardCocoa : public ClipboardBackend
 		{
 			private:
 				Window	*window;
 			public:
-					 ClipboardWin32(Window *);
-					~ClipboardWin32();
+					 ClipboardCocoa(Window *);
+					~ClipboardCocoa();
 
 				String	 GetClipboardText() const;
 				Bool	 SetClipboardText(const String &);

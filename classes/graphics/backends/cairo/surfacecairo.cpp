@@ -22,17 +22,16 @@
 
 #	include <cairo/cairo-xlib.h>
 
-#	ifdef __APPLE__
-//#		include <cairo/cairo-ft.h>
-//#		include <fontconfig/fontconfig.h>
-#	else
+#	ifndef __APPLE__
 #		include <pango/pangocairo.h>
 #	endif
 
 #	include <smooth/backends/xlib/backendxlib.h>
 #endif
 
-#ifndef CAIRO_OPERATOR_DIFFERENCE
+#if (CAIRO_VERSION_MAJOR == 0							     ) || \
+    (CAIRO_VERSION_MAJOR == 1 && CAIRO_VERSION_MINOR <= 8			     ) || \
+    (CAIRO_VERSION_MAJOR == 1 && CAIRO_VERSION_MINOR == 9 && CAIRO_VERSION_MICRO <= 1)
 #	define CAIRO_OPERATOR_DIFFERENCE CAIRO_OPERATOR_XOR
 #endif
 
@@ -48,12 +47,6 @@ S::Short	 S::GUI::SurfaceCairo::surfaceDPI = -1;
 S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 {
 	type	= SURFACE_CAIRO;
-
-#ifdef __APPLE__
-	/* Make sure Fontconfig is initialized.
-	 */
-//	FcInit();
-#endif
 
 #ifdef __WIN32__
 	window	= (HWND) iWindow;
@@ -312,14 +305,14 @@ S::Int S::GUI::SurfaceCairo::SetPixel(const Point &iPoint, const Color &color)
 		CreateCairoContext();
 
 		cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-		cairo_rectangle(context, point.x, point.y, 1, 1);
+		cairo_rectangle(context, point.x, point.y, 1.0, 1.0);
 		cairo_fill(context);
 
 		DestroyCairoContext();
 	}
 
 	cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-	cairo_rectangle(paintContextCairo, point.x, point.y, 1, 1);
+	cairo_rectangle(paintContextCairo, point.x, point.y, 1.0, 1.0);
 	cairo_fill(paintContextCairo);
 
 	return Success();
@@ -332,45 +325,31 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
 	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
 
-	/* Adjust to new Cairo 1.10 behaviour.
-	 */
-#ifndef __APPLE__
-#ifndef __sun
-	if (cairo_version() >= CAIRO_VERSION_ENCODE(1,10,0))
-#endif
-	{
-		if (pos1.x == pos2.x) { pos1.x++; pos2.x++; }
-		if (pos1.y == pos2.y) { pos1.y++; pos2.y++; }
-	}
-#endif
-
-	if (rightToLeft.GetRightToLeft() && pos1.y == pos2.y) { pos1.x++; pos2.x++; }
-
 	/* Adjust to Windows GDI behavior for diagonal lines.
 	 */
 	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y))
 	{
-		if (pos1.x < pos2.x && pos1.y > pos2.y) { pos1.y++; pos2.y++; }
-		if (pos1.x > pos2.x && pos1.y < pos2.y) { pos1.x++; pos2.x++; }
-	} 
+		if (pos1.x > pos2.x) { pos1.x++; pos2.x++; }
+		if (pos1.y > pos2.y) { pos1.y++; pos2.y++; }
+	}
 
 	if (!painting)
 	{
 		CreateCairoContext();
 
 		cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-		cairo_set_line_width(context, 1);
-		cairo_move_to(context, pos1.x, pos1.y);
-		cairo_line_to(context, pos2.x, pos2.y);
+		cairo_set_line_width(context, 1.0);
+		cairo_move_to(context, pos1.x + 0.01, pos1.y + 0.01);
+		cairo_line_to(context, pos2.x + 0.01, pos2.y + 0.01);
 		cairo_stroke(context);
 
 		DestroyCairoContext();
 	}
 
 	cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-	cairo_set_line_width(paintContextCairo, 1);
-	cairo_move_to(paintContextCairo, pos1.x, pos1.y);
-	cairo_line_to(paintContextCairo, pos2.x, pos2.y);
+	cairo_set_line_width(paintContextCairo, 1.0);
+	cairo_move_to(paintContextCairo, pos1.x + 0.01, pos1.y + 0.01);
+	cairo_line_to(paintContextCairo, pos2.x + 0.01, pos2.y + 0.01);
 	cairo_stroke(paintContextCairo);
 
 	return Success();
@@ -382,15 +361,45 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 
 	Rect	 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
 
-	CreateCairoContext();
+	if (!painting)
+	{
+		CreateCairoContext();
 
-	cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+		cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+	}
+
 	cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
 
 	if (style & Rect::Filled)
 	{
 		if (style & Rect::Rounded)
 		{
+			if (!painting)
+			{
+				cairo_move_to(context, rect.left + ellipse.cx, rect.top);
+				cairo_line_to(context, rect.right - ellipse.cx, rect.top);
+				cairo_curve_to(context, rect.right, rect.top, rect.right, rect.top, rect.right, rect.top + ellipse.cy);
+				cairo_line_to(context, rect.right, rect.bottom - ellipse.cy);
+				cairo_curve_to(context, rect.right, rect.bottom, rect.right, rect.bottom, rect.right - ellipse.cx, rect.bottom);
+				cairo_line_to(context, rect.left + ellipse.cx, rect.bottom);
+				cairo_curve_to(context, rect.left, rect.bottom, rect.left, rect.bottom, rect.left, rect.bottom - ellipse.cy);
+				cairo_line_to(context, rect.left, rect.top + ellipse.cy);
+				cairo_curve_to(context, rect.left, rect.top, rect.left, rect.top, rect.left + ellipse.cx, rect.top);
+
+				cairo_fill(context);
+			}
+
+			cairo_move_to(paintContextCairo, rect.left + ellipse.cx, rect.top);
+			cairo_line_to(paintContextCairo, rect.right - ellipse.cx, rect.top);
+			cairo_curve_to(paintContextCairo, rect.right, rect.top, rect.right, rect.top, rect.right, rect.top + ellipse.cy);
+			cairo_line_to(paintContextCairo, rect.right, rect.bottom - ellipse.cy);
+			cairo_curve_to(paintContextCairo, rect.right, rect.bottom, rect.right, rect.bottom, rect.right - ellipse.cx, rect.bottom);
+			cairo_line_to(paintContextCairo, rect.left + ellipse.cx, rect.bottom);
+			cairo_curve_to(paintContextCairo, rect.left, rect.bottom, rect.left, rect.bottom, rect.left, rect.bottom - ellipse.cy);
+			cairo_line_to(paintContextCairo, rect.left, rect.top + ellipse.cy);
+			cairo_curve_to(paintContextCairo, rect.left, rect.top, rect.left, rect.top, rect.left + ellipse.cx, rect.top);
+
+			cairo_fill(paintContextCairo);
 		}
 		else
 		{
@@ -408,118 +417,66 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 	{
 		if (!painting)
 		{
-			cairo_set_line_width(context, 1);
+			cairo_set_line_width(context, 1.0);
 			cairo_rectangle(context, rect.left + 0.5, rect.top + 0.5, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
 			cairo_stroke(context);
 		}
 
-		cairo_set_line_width(paintContextCairo, 1);
+		cairo_set_line_width(paintContextCairo, 1.0);
 		cairo_rectangle(paintContextCairo, rect.left + 0.5, rect.top + 0.5, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
 		cairo_stroke(paintContextCairo);
 	}
 	else if (style & Rect::Inverted)
 	{
-		if (!painting)
+		if (cairo_version() >= CAIRO_VERSION_ENCODE(1,9,2))
 		{
-			cairo_set_operator(context, CAIRO_OPERATOR_DIFFERENCE);
-			cairo_set_source_rgb(context, 1.0, 1.0, 1.0);
-			cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
-			cairo_fill(context);
-			cairo_set_operator(context, CAIRO_OPERATOR_OVER);
-		}
+			if (!painting)
+			{
+				cairo_set_operator(context, CAIRO_OPERATOR_DIFFERENCE);
+				cairo_set_source_rgb(context, 1.0, 1.0, 1.0);
+				cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+				cairo_fill(context);
+				cairo_set_operator(context, CAIRO_OPERATOR_OVER);
+			}
 
-		cairo_set_operator(paintContextCairo, CAIRO_OPERATOR_DIFFERENCE);
-		cairo_set_source_rgb(paintContextCairo, 1.0, 1.0, 1.0);
-		cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
-		cairo_fill(paintContextCairo);
-		cairo_set_operator(paintContextCairo, CAIRO_OPERATOR_OVER);
+			cairo_set_operator(paintContextCairo, CAIRO_OPERATOR_DIFFERENCE);
+			cairo_set_source_rgb(paintContextCairo, 1.0, 1.0, 1.0);
+			cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+			cairo_fill(paintContextCairo);
+			cairo_set_operator(paintContextCairo, CAIRO_OPERATOR_OVER);
+		}
+		else
+		{
+			Bitmap	 area(rect.right - rect.left, rect.bottom - rect.top, 24);
+
+			BlitToBitmap(rect, area, Rect(Point(0, 0), area.GetSize()));
+
+			area.InvertColors();
+
+			BlitFromBitmap(area, Rect(Point(0, 0), area.GetSize()), rect);
+		}
 	}
 	else if (style & Rect::Dotted)
 	{
-		Bool	 dot = False;
-		Int	 x;
-		Int	 y = rect.top;
-
-		for (x = rect.left; x < rect.right - 1; x++)
+		if (!painting)
 		{
-			if (dot == True)
-			{
-				if (!painting)
-				{
-					cairo_rectangle(context, x, y, 1, 1);
-					cairo_fill(context);
-				}
+			for (Int x = rect.left								 + 1; x <  rect.right;	 x += 2) cairo_rectangle(context, x, rect.top, 1.0, 1.0);
+			for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2; y <  rect.bottom;	 y += 2) cairo_rectangle(context, rect.right - 1, y, 1.0, 1.0);
+			for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2; x >= rect.left;	 x -= 2) cairo_rectangle(context, x, rect.bottom - 1, 1.0, 1.0);
+			for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1; y >= rect.top;	 y -= 2) cairo_rectangle(context, rect.left, y, 1.0, 1.0);
 
-				cairo_rectangle(paintContextCairo, x, y, 1, 1);
-				cairo_fill(paintContextCairo);
-
-				dot = False;
-			}
-			else dot = True;
+			cairo_fill(context);
 		}
 
-		x = rect.right - 1;
+		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) cairo_rectangle(paintContextCairo, x, rect.top,  1.0, 1.0);
+		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) cairo_rectangle(paintContextCairo, rect.right - 1, y,  1.0, 1.0);
+		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) cairo_rectangle(paintContextCairo, x, rect.bottom - 1,  1.0, 1.0);
+		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) cairo_rectangle(paintContextCairo, rect.left, y,  1.0, 1.0);
 
-		for (y = rect.top; y < rect.bottom; y++)
-		{
-			if (dot == True)
-			{
-				if (!painting)
-				{
-					cairo_rectangle(context, x, y, 1, 1);
-					cairo_fill(context);
-				}
-
-				cairo_rectangle(paintContextCairo, x, y, 1, 1);
-				cairo_fill(paintContextCairo);
-
-				dot = False;
-			}
-			else dot = True;
-		}
-
-		y = rect.bottom - 1;
-
-		for (x = rect.right - 2; x >= rect.left; x--)
-		{
-			if (dot == True)
-			{
-				if (!painting)
-				{
-					cairo_rectangle(context, x, y, 1, 1);
-					cairo_fill(context);
-				}
-
-				cairo_rectangle(paintContextCairo, x, y, 1, 1);
-				cairo_fill(paintContextCairo);
-
-				dot = False;
-			}
-			else dot = True;
-		}
-
-		x = rect.left;
-
-		for (y = rect.bottom - 2; y >= rect.top; y--)
-		{
-			if (dot == True)
-			{
-				if (!painting)
-				{
-					cairo_rectangle(context, x, y, 1, 1);
-					cairo_fill(context);
-				}
-
-				cairo_rectangle(paintContextCairo, x, y, 1, 1);
-				cairo_fill(paintContextCairo);
-
-				dot = False;
-			}
-			else dot = True;
-		}
+		cairo_fill(paintContextCairo);
 	}
 
-	DestroyCairoContext();
+	if (!painting) DestroyCairoContext();
 
 	return Success();
 }
@@ -611,28 +568,6 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 			cairo_move_to(context, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
 			cairo_show_text(context, line.ConvertTo("UTF-8"));
-/*#elif defined __APPLE__
-			FcCharSet		*charset = FcCharSetCreate();
-
-			for (Int i = 0; i < line.Length(); i++) FcCharSetAddChar(charset, line[i]);
-
-			FcPattern		*pattern = FcPatternBuild(0, FC_FAMILY,	 FcTypeString,	(char *) font.GetName(),
-									     FC_WEIGHT,  FcTypeInteger,	(font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL),
-									     FC_SLANT,	 FcTypeInteger,	(font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-									     FC_CHARSET, FcTypeCharSet,	charset, (char *) 0);
-
-			cairo_font_face_t	*fontface = cairo_ft_font_face_create_for_pattern(pattern);
-
-			cairo_set_font_face(context, fontface);
-			cairo_set_font_size(context, font.GetSize() * fontSize.TranslateY(96) / 72.0);
-
-			cairo_move_to(context, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
-			cairo_show_text(context, line.ConvertTo("UTF-8"));
-
-			cairo_font_face_destroy(fontface);
-
-			FcPatternDestroy(pattern);
-			FcCharSetDestroy(charset);*/
 #else
 			PangoLayout		*layout	= pango_cairo_create_layout(context);
 			PangoFontDescription	*desc	= pango_font_description_from_string(String(font.GetName())
@@ -673,28 +608,6 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		cairo_move_to(paintContextCairo, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
 		cairo_show_text(paintContextCairo, line.ConvertTo("UTF-8"));
-/*#elif defined __APPLE__
-		FcCharSet		*charset = FcCharSetCreate();
-
-		for (Int i = 0; i < line.Length(); i++) FcCharSetAddChar(charset, line[i]);
-
-		FcPattern		*pattern = FcPatternBuild(0, FC_FAMILY,	 FcTypeString,	(char *) font.GetName(),
-								     FC_WEIGHT,  FcTypeInteger,	(font.GetWeight() == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL),
-								     FC_SLANT,	 FcTypeInteger,	(font.GetStyle() == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-								     FC_CHARSET, FcTypeCharSet,	charset, (char *) 0);
-
-		cairo_font_face_t	*fontface = cairo_ft_font_face_create_for_pattern(pattern);
-
-		cairo_set_font_face(paintContextCairo, fontface);
-		cairo_set_font_size(paintContextCairo, font.GetSize() * fontSize.TranslateY(96) / 72.0);
-
-		cairo_move_to(paintContextCairo, rightToLeft.GetRightToLeft() ? rect.right - lineSize : rect.left, rect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
-		cairo_show_text(paintContextCairo, line.ConvertTo("UTF-8"));
-
-		cairo_font_face_destroy(fontface);
-
-		FcPatternDestroy(pattern);
-		FcCharSetDestroy(charset);*/
 #else
 		PangoLayout		*layout	= pango_cairo_create_layout(paintContextCairo);
 		PangoFontDescription	*desc	= pango_font_description_from_string(String(font.GetName())
@@ -776,12 +689,11 @@ S::Int S::GUI::SurfaceCairo::Gradient(const Rect &iRect, const Color &color1, co
 	return Success();
 }
 
-S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &srcRect, const Rect &iDestRect)
+S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcRect, const Rect &iDestRect)
 {
-	if (window  == NIL) return Success();
-	if (oBitmap == NIL) return Error();
+	if (window == NIL) return Success();
+	if (bitmap == NIL) return Error();
 
-	Bitmap	 bitmap	  = oBitmap;
 	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
 
 #ifdef __WIN32__
@@ -860,12 +772,11 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &oBitmap, const Rect &s
 	return Success();
 }
 
-S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, const Bitmap &oBitmap, const Rect &destRect)
+S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, const Bitmap &bitmap, const Rect &destRect)
 {
-	if (window  == NIL) return Success();
-	if (oBitmap == NIL) return Error();
+	if (window == NIL) return Success();
+	if (bitmap == NIL) return Error();
 
-	Bitmap	 bitmap	 = oBitmap;
 	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
 
 #ifdef __WIN32__

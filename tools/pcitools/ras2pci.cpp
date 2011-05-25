@@ -15,7 +15,7 @@ Int smooth::Main(const Array<String> &args)
 	if (args.Length() < 6)
 	{
 		cout << "RAS2PCI converter v0.2\n";
-		cout << "Copyright (C) 1998-2009 Robert Kausch\n\n";
+		cout << "Copyright (C) 1998-2011 Robert Kausch\n\n";
 		cout << "Usage: ras2pci <ras file> <pci file> <image id> <compression> <color> <depth>\n\n";
 		cout << "<compression> is one of these compression formats:\n";
 		cout << "\t0 = uncompressed\n";
@@ -58,7 +58,7 @@ Int smooth::Main(const Array<String> &args)
 	pio->SetBitsPerChannel(bpc);
 	pio->SetImageID(im_id);
 
-	WritePCI(pci, *pio);
+	pio->WritePCI(pci);
 
 	ClosePCI(pci);
 

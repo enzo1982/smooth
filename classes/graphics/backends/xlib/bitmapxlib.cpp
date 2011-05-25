@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -83,7 +83,8 @@ S::Bool S::GUI::BitmapXLib::CreateBitmap(Int cx, Int cy, Int bpp)
 {
 	DeleteBitmap();
 
-	if (bpp != 24 && bpp != 32) bpp = 32;
+	if (bpp == -1)				 bpp = XDefaultDepth(display, XDefaultScreen(display));
+	if (bpp != 16 && bpp != 24 && bpp != 32) bpp = 32;
 	
 	bitmap	= XCreatePixmap(display, DefaultRootWindow(display), cx, cy, bpp);
 	bytes	= (Void *) -1;	
@@ -156,7 +157,8 @@ S::Bool S::GUI::BitmapXLib::SetPixel(const Point &iPoint, const Color &color)
 {
 	XGCValues	 gcValues;
 
-	gcValues.foreground = Color(color.GetBlue(), color.GetGreen(), color.GetRed());
+	if (depth == 16) gcValues.foreground = ((color.GetRed() >> 3) << 11) | ((color.GetGreen() >> 2) << 5) | (color.GetBlue() >> 3);
+	else		 gcValues.foreground = ( color.GetRed()	      << 16) | ( color.GetGreen()	<< 8) | (color.GetBlue()     );
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
@@ -170,12 +172,12 @@ S::Bool S::GUI::BitmapXLib::SetPixel(const Point &iPoint, const Color &color)
 S::GUI::Color S::GUI::BitmapXLib::GetPixel(const Point &iPoint) const
 {
 	XImage	*image = XGetImage(display, bitmap, iPoint.x, iPoint.y, 1, 1, AllPlanes, XYPixmap);
-	Color	 value = XGetPixel(image, 0, 0);
-	Color	 color = Color(value.GetBlue(), value.GetGreen(), value.GetRed());
+	Long	 value = XGetPixel(image, 0, 0);
 
 	XDestroyImage(image);
 
-	return color;
+	if (depth == 16) return Color(((value >> 11) &  31) << 3, ((value >> 5) &  63) << 2, (value &  31) << 3);
+	else		 return Color( (value >> 16) & 255,	   (value >> 8) & 255,	      value & 255      );
 }
 
 S::GUI::BitmapBackend &S::GUI::BitmapXLib::operator =(const BitmapBackend &newBitmap)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,7 +40,7 @@ S::Threads::Thread::~Thread()
 	{
 		status = THREAD_STOPPED;
 
-		nOfRunningThreads--;
+		Access::Decrement(nOfRunningThreads);
 
 		backend->Stop();
 	}
@@ -81,7 +81,7 @@ S::Int S::Threads::Thread::Start()
 {
 	if ((status == THREAD_CREATED && !initializing) || status == THREAD_STARTME || (flags & THREAD_WAITFLAG_START))
 	{
-		nOfRunningThreads++;
+		Access::Increment(nOfRunningThreads);
 
 		status = THREAD_RUNNING;
 
@@ -107,7 +107,7 @@ S::Int S::Threads::Thread::Stop()
 		{
 			status = THREAD_STOPPED_SELF;
 
-			nOfRunningThreads--;
+			Access::Decrement(nOfRunningThreads);
 
 			backend->Exit();
 
@@ -116,11 +116,26 @@ S::Int S::Threads::Thread::Stop()
 
 		status = THREAD_STOPPED;
 
-		nOfRunningThreads--;
+		Access::Decrement(nOfRunningThreads);
 
 		backend->Stop();
 
 		return Success();
+	}
+
+	return Error();
+}
+
+S::Int S::Threads::Thread::Wait()
+{
+	if (status == THREAD_RUNNING)
+	{
+		if (IsCurrentThread())
+		{
+			return Error();
+		}
+
+		return backend->Wait();
 	}
 
 	return Error();
@@ -131,7 +146,7 @@ S::Void S::Threads::Thread::MainCaller(Thread *thread)
 	thread->threadMain.Call(thread);
 	thread->status = THREAD_STOPPED;
 
-	nOfRunningThreads--;
+	Access::Decrement(nOfRunningThreads);
 
 	thread->backend->Exit();
 }

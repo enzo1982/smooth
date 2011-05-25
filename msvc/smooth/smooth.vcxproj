@@ -246,6 +246,12 @@
     </ClCompile>
     <ClCompile Include="..\..\classes\graphics\modifiers\fontsize.cpp" />
     <ClCompile Include="..\..\classes\graphics\modifiers\righttoleft.cpp" />
+    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_photon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_photon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\classes\gui\widgets\layer.cpp" />
     <ClCompile Include="..\..\classes\gui\widgets\widget.cpp" />
     <ClCompile Include="..\..\classes\gui\widgets\basic\activearea.cpp" />
@@ -364,6 +370,7 @@
     <ClCompile Include="..\..\classes\gui\clipboard\backends\xlib\clipboardxlib.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\classes\input\keyboard.cpp" />
     <ClCompile Include="..\..\classes\misc\args.cpp" />
     <ClCompile Include="..\..\classes\misc\binary.cpp" />
     <ClCompile Include="..\..\classes\misc\config.cpp" />
@@ -386,6 +393,7 @@
     <ClCompile Include="..\..\classes\misc\hash\crc32.cpp" />
     <ClCompile Include="..\..\classes\misc\hash\md5.cpp" />
     <ClCompile Include="..\..\classes\misc\hash\sha1.cpp" />
+    <ClCompile Include="..\..\classes\threads\access.cpp" />
     <ClCompile Include="..\..\classes\xml\attribute.cpp" />
     <ClCompile Include="..\..\classes\xml\document.cpp" />
     <ClCompile Include="..\..\classes\xml\node.cpp" />
@@ -577,10 +585,16 @@
     <ClInclude Include="..\..\include\smooth\definitions.h" />
     <ClInclude Include="..\..\include\smooth\dll.h" />
     <ClInclude Include="..\..\include\smooth\foreach.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_cocoa.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_photon.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_cocoa.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_photon.h" />
     <ClInclude Include="..\..\include\smooth\init.h" />
+    <ClInclude Include="..\..\include\smooth\input\keyboard.h" />
     <ClInclude Include="..\..\include\smooth\main.h" />
     <ClInclude Include="..\..\include\smooth\pciio.h" />
     <ClInclude Include="..\..\include\smooth\resources.h" />
+    <ClInclude Include="..\..\include\smooth\threads\access.h" />
     <ClInclude Include="..\..\include\smooth\version.h" />
     <ClInclude Include="..\..\include\smooth\system\console.h" />
     <ClInclude Include="..\..\include\smooth\system\cpu.h" />
@@ -808,6 +822,14 @@
       <Project>{681cb867-a887-45e9-b339-b4b6b3ce8f20}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\classes\gui\dialogs\directory\dirdlg_cocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\gui\dialogs\file\filedlg_cocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

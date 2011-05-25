@@ -11,6 +11,14 @@ IMPORTLIB   = libsmooth-js.a
 
 MYCCOPTS    = -I. -I./include
 
+ifeq ($(BUILD_FREEBSD),True)
+	MYCCOPTS += -I/usr/local/include
+endif
+
+ifeq ($(BUILD_OPENBSD),True)
+	MYCCOPTS += -I/usr/local/include
+endif
+
 ifeq ($(BUILD_SOLARIS),True)
 	MYCCOPTS += -D_STDC_C99 -D_XPG6
 endif
@@ -30,12 +38,28 @@ ifeq ($(BUILD_FREEBSD),True)
 	OBJECTS += platform-freebsd.o platform-posix.o
 endif
 
+ifeq ($(BUILD_OPENBSD),True)
+	OBJECTS += platform-openbsd.o platform-posix.o
+endif
+
+ifeq ($(BUILD_NETBSD),True)
+	OBJECTS += platform-openbsd.o platform-posix.o
+endif
+
 ifeq ($(BUILD_SOLARIS),True)
 	OBJECTS += platform-solaris.o platform-posix.o
 endif
 
 ifeq ($(BUILD_OSX),True)
 	OBJECTS += platform-macos.o platform-posix.o
+endif
+
+ifeq ($(BUILD_QNX),True)
+	OBJECTS += platform-qnx.o platform-posix.o
+endif
+
+ifeq ($(BUILD_HAIKU),True)
+	OBJECTS += platform-haiku.o platform-posix.o
 endif
 
 ifeq ($(BUILD_X64),True)
@@ -54,7 +78,7 @@ ifeq ($(BUILD_WIN32),True)
 endif
 
 ifeq ($(BUILD_FREEBSD),True)
-	LIBS = -lexecinfo
+	LIBS = -L/usr/local/lib -lexecinfo
 endif
 
 # Additional things to do on clean:
@@ -66,4 +90,4 @@ include $(SMOOTH_PATH)/Makefile-directories
 include $(SMOOTH_PATH)/Makefile-commands
 
 libraries.cc: runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js date.js regexp.js json.js liveedit-debugger.js mirror-debugger.js debug-debugger.js macros.py
-	python js2c.py libraries.cc libraries-empty.cc CORE runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js date.js regexp.js json.js liveedit-debugger.js mirror-debugger.js debug-debugger.js macros.py
+	python2.6 js2c.py libraries.cc libraries-empty.cc CORE runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js date.js regexp.js json.js liveedit-debugger.js mirror-debugger.js debug-debugger.js macros.py

@@ -13,6 +13,7 @@
 #include <smooth/misc/encoding/base64.h>
 #include <smooth/misc/hash/crc32.h>
 #include <smooth/templates/buffer.h>
+#include <smooth/init.h>
 
 #include <iconv.h>
 #include <memory.h>
@@ -24,64 +25,102 @@
 
 namespace smooth
 {
-	Int	 ConvertString(const char *, Int, const char *, char *, Int, const char *);
+	static multithread char		*inputFormat	= NIL;
+	static multithread char		*outputFormat	= NIL;
+	static multithread char		*internalFormat	= NIL;
+
+	Int				 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
-char				*S::String::inputFormat		= NIL;
-char				*S::String::outputFormat	= NIL;
-char				*S::String::internalFormat	= NIL;
-
-S::Int				 S::String::nOfStrings		= 0;
+S::Threads::Mutex		 S::String::explodeMutex;
 
 S::Array<char *, void *>	 S::String::allocatedBuffers;
 
+S::Int	 addStringInitTmp = S::AddInitFunction(&S::String::Initialize);
+S::Int	 addStringFreeTmp = S::AddFreeFunction(&S::String::Free);
+
 S::String::String(const int nil)
 {
-	nOfStrings++;
 }
 
 S::String::String(const char *iString)
 {
 	*this = iString;
-
-	nOfStrings++;
 }
 
 S::String::String(const wchar_t *iString)
 {
 	*this = iString;
-
-	nOfStrings++;
 }
 
 S::String::String(const String &iString)
 {
 	*this = iString;
-
-	nOfStrings++;
 }
 
 S::String::~String()
 {
 	Clean();
-
-	if (--nOfStrings == 0)
-	{
-		for (Int i = 0; i < allocatedBuffers.Length(); i++) delete [] allocatedBuffers.GetNth(i);
-
-		allocatedBuffers.RemoveAll();
-	}
 }
 
-S::Void S::String::DeleteTemporaryBuffers()
+S::Int S::String::Initialize()
+{
+	/* Enable locking on string buffers.
+	 */
+	allocatedBuffers.EnableLocking();
+
+	return Success();
+}
+
+S::Int S::String::Free()
+{
+	/* Delete all temporarily allocated string buffers.
+	 */
+	DeleteTemporaryBuffers(True);
+
+	return Success();
+}
+
+const char *S::String::GetDefaultEncoding()
+{
+#ifdef __WIN32__
+	static char	 encoding[16] = { 0, };
+
+	if (strlen(encoding) == 0)
+	{
+		/* Find system codepage.
+		 */
+		Int	 codePage = GetACP();
+		char	 buffer[8];
+
+		strncpy(encoding, "CP", 2);
+		strcat(encoding, itoa(codePage, buffer, 10));
+	}
+
+	return encoding;
+#else
+	return "UTF-8";
+#endif
+}
+
+S::Void S::String::DeleteTemporaryBuffers(Bool all)
 {
 	Int	 nOfEntries = allocatedBuffers.Length();
 
-	for (Int i = 0; i < nOfEntries - 32; i++)
+	for (Int i = 0; i < nOfEntries - (all ? 0 : 32); i++)
 	{
 		delete [] allocatedBuffers.GetFirst();
 
 		allocatedBuffers.RemoveNth(0);
+	}
+
+	if (all)
+	{
+		if (inputFormat	 != NIL) delete [] inputFormat;
+		if (outputFormat != NIL) delete [] outputFormat;
+
+		inputFormat  = NIL;
+		outputFormat = NIL;
 	}
 }
 
@@ -112,7 +151,7 @@ S::String S::String::EncodeBase64() const
 	if (wString.Size() == 0) return NIL;
 
 	const char		*utf8string = ConvertTo("UTF-8");
-	Int			 length	    = strlen(utf8string);
+	int			 length	    = strlen(utf8string);
 
 	Buffer<UnsignedByte>	 buffer(length);
 
@@ -152,15 +191,21 @@ S::Bool S::String::IsUnicode(const String &string)
 	return False;
 }
 
+const char *S::String::GetInputFormat()
+{
+	return inputFormat;
+}
+
 char *S::String::SetInputFormat(const char *iFormat)
 {
-	if (iFormat == NIL) return SetInputFormat("ISO-8859-1");
+	if (iFormat == NIL) return SetInputFormat(GetDefaultEncoding());
 
 	char	*previousInputFormat = inputFormat;
+	int	 length		     = strlen(iFormat) + 1;
 
-	inputFormat = new char [strlen(iFormat) + 1];
+	inputFormat = new char [length];
 
-	strcpy(inputFormat, iFormat);
+	strncpy(inputFormat, iFormat, length);
 
 	if (previousInputFormat != NIL)
 	{
@@ -172,15 +217,21 @@ char *S::String::SetInputFormat(const char *iFormat)
 	return previousInputFormat;
 }
 
+const char *S::String::GetOutputFormat()
+{
+	return outputFormat;
+}
+
 char *S::String::SetOutputFormat(const char *oFormat)
 {
-	if (oFormat == NIL) return SetOutputFormat("ISO-8859-1");
+	if (oFormat == NIL) return SetOutputFormat(GetDefaultEncoding());
 
 	char	*previousOutputFormat = outputFormat;
+	int	 length		      = strlen(oFormat) + 1;
 
-	outputFormat = new char [strlen(oFormat) + 1];
+	outputFormat = new char [length];
 
-	strcpy(outputFormat, oFormat);
+	strncpy(outputFormat, oFormat, length);
 
 	if (previousOutputFormat != NIL)
 	{
@@ -320,7 +371,7 @@ wchar_t S::String::operator [](int n) const
 
 S::String::operator char *() const
 {
-	if (outputFormat == NIL) SetOutputFormat("ISO-8859-1");
+	if (outputFormat == NIL) SetOutputFormat(GetDefaultEncoding());
 
 	return ConvertTo(outputFormat);
 }
@@ -345,7 +396,7 @@ S::String &S::String::operator =(const char *newString)
 	}
 	else
 	{
-		if (inputFormat == NIL) SetInputFormat("ISO-8859-1");
+		if (inputFormat == NIL) SetInputFormat(GetDefaultEncoding());
 
 		ImportFrom(inputFormat, newString);
 	}
@@ -988,6 +1039,8 @@ const S::Array<S::String> &S::String::Explode(const String &delimiter) const
 {
 	static Array<String>	 array;
 
+	explodeMutex.Lock();
+
 	array.RemoveAll();
 
 	for (Int i = 0; i < Length(); )
@@ -1004,6 +1057,13 @@ const S::Array<S::String> &S::String::Explode(const String &delimiter) const
 	}
 
 	return array;
+}
+
+S::Int S::String::ExplodeFinish()
+{
+	explodeMutex.Release();
+
+	return Success();
 }
 
 S::String S::String::Implode(const Array<String> &array, const String &delimiter)
@@ -1055,11 +1115,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		if (size >= outBytes) size = 0;
 	}
-#ifdef __WIN32__
 	else if (Setup::useIconv)
-#else
-	else if (True)
-#endif
 	{
 		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
 
@@ -1069,7 +1125,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		size_t		 outBytesLeft	= outBytes;
 		char	       **outPointer	= &outBuffer;
 
-#if defined __FreeBSD__ || defined __sun
+#if defined __FreeBSD__ || defined __NetBSD__ || defined __sun
 		const char     **inPointer	= &inBuffer;
 #else
 		char	       **inPointer	= const_cast<char **>(&inBuffer);

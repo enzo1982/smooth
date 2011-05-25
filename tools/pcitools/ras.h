@@ -1,7 +1,9 @@
 // Load raster images
 
 #include <smooth.h>
+#include <windows.h>
 
+using namespace smooth;
 using namespace smooth::IO;
 
 HBITMAP LoadRAS(char *);
@@ -16,7 +18,7 @@ int SaveRAS(HBITMAP hbmp, char *file)
 
 	int		 sizex = bit.bmWidth;
 	int		 sizey = bit.bmHeight;
-	OutStream	 Out(STREAM_FILE, file, OS_OVERWRITE);
+	OutStream	 Out(STREAM_FILE, String(file), OS_REPLACE);
 	HDC		 hdc = CreateCompatibleDC(dc);
 	HBITMAP		 oldbmp;
 

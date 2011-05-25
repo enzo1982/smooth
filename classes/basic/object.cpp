@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,10 +25,20 @@ S::Object::Object() : type(this)
 {
 	static String	 prefix = "Object::";
 
+	/* Enable R/W locking for object lists.
+	 */
+	if (objects.Length() == 0)
+	{
+		objects.EnableLocking();
+		deleteable.EnableLocking();
+	}
+
 	type			= classID;
 
 	handle			= RequestObjectHandle();
 	name			= String(prefix).Append(String::FromInt(handle));
+
+	lockingEnabled		= False;
 
 	isDeleteable		= False;
 	isObjectInUse		= 0;
@@ -65,6 +75,13 @@ S::Object::~Object()
 
 		DeleteObject(cleanupTimer);
 	}
+}
+
+S::Int S::Object::EnableLocking(Bool enable)
+{
+	lockingEnabled = enable;
+
+	return Success();
 }
 
 S::Int S::Object::GetNOfObjects()
@@ -113,7 +130,7 @@ S::Short S::Object::RequestClassID()
 
 S::Int S::Object::RequestObjectHandle()
 {
-	return nextObjectHandle++;
+	return Threads::Access::Increment(nextObjectHandle) - 1;
 }
 
 S::Int S::Object::DeleteObject(Object *object)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,18 +15,22 @@
 #include <smooth/gui/application/xulloader.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/xml/xul/renderer.h>
+#include <smooth/misc/args.h>
 #include <smooth/init.h>
 
 #ifdef __WIN32__
 #	include <smooth/init.win32.h>
 
-	int WINAPI S::GUI::LoadXUL(HWND shWnd, HINSTANCE shInstance, LPSTR sszCmdLine, int siCmdShow)
+	int WINAPI S::GUI::LoadXUL(HWND hWnd, HINSTANCE shInstance, LPSTR szCmdLine, int iCmdShow)
 	{
-		hInstance	= shInstance;
-		szCmdLine	= String(sszCmdLine);
-		iCmdShow	= siCmdShow;
+		hInstance = shInstance;
 
 		Init();
+
+		ArgumentsParser	 args(NIL, szCmdLine);
+
+		GUI::Application::SetCommand(args.GetCommand());
+		GUI::Application::SetArguments(args.GetArguments());
 
 		GUI::Application::GetStartupDirectory();
 		GUI::Application::GetApplicationDirectory();

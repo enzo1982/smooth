@@ -49,10 +49,7 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
 	String	 text	       = iText;
 	Bool	 rtlCharacters = False;
 
-	for (Int j = 0; j < text.Length(); j++)
-	{
-		if (text[j] >= 0x0590 && text[j] <= 0x07BF) { rtlCharacters = True; break; }
-	}
+	for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x07BF) { rtlCharacters = True; break; }
 
 #ifdef __WIN32__
 	if (rtlCharacters && Setup::useIconv)

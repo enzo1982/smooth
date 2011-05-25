@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,9 +14,12 @@
 #include <smooth/io/instream.h>
 #include <smooth/io/outstream.h>
 #include <smooth/misc/math.h>
+#include <smooth/init.h>
 
 S::Array<S::Net::Protocols::Protocol *(*)(const S::String &), S::Void *>	*S::Net::Protocols::Protocol::protocol_creators = NIL;
 S::Array<S::String>								*S::Net::Protocols::Protocol::protocol_magics = NIL;
+
+S::Int	 addProtocolFreeTmp = S::AddFreeFunction(&S::Net::Protocols::Protocol::RemoveAllProtocols);
 
 S::Int S::Net::Protocols::Protocol::AddProtocol(Protocol *(*protocol)(const String &), const String &magic)
 {
@@ -27,6 +30,17 @@ S::Int S::Net::Protocols::Protocol::AddProtocol(Protocol *(*protocol)(const Stri
 
 	protocol_creators->Add(protocol);
 	protocol_magics->Add(magic);
+
+	return Success();
+}
+
+S::Int S::Net::Protocols::Protocol::RemoveAllProtocols()
+{
+	protocol_creators->RemoveAll();
+	protocol_magics->RemoveAll();
+
+	delete protocol_creators;
+	delete protocol_magics;
 
 	return Success();
 }

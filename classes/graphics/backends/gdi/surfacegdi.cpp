@@ -13,6 +13,7 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
+#include <smooth/foreach.h>
 
 #include <fribidi.h>
 
@@ -321,15 +322,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	if (string == NIL)	return Error();
 	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
 
-	int	 lines = 1;
-	int	 offset = 0;
-	int	 origoffset;
-	int	 txtsize = string.Length();
-	String	 line;
-	Rect	 rect = iRect;
+	Rect	 rect	    = iRect;
 	Int	 lineHeight = font.GetTextSizeY() + 3;
-
-	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
 
 	HDC	 gdi_dc = GetWindowDC(window);
 	HFONT	 hfont;
@@ -352,40 +346,21 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	holdfont2 = (HFONT) SelectObject(paintContext, hfont);
 
-	for (Int i = 0; i < lines; i++)
+	const Array<String>	&lines = string.Explode("\n");
+
+	foreach (const String &line, lines)
 	{
 		Bool	 rtlCharacters = False;
 
-		origoffset = offset;
-
-		for (Int j = 0; j <= txtsize; j++)
-		{
-			if (j + origoffset == txtsize)
-			{
-				line[j] = 0;
-				break;
-			}
-
-			if (string[j + origoffset] == 10 || string[j + origoffset] == 0)
-			{
-				offset++;
-				line[j] = 0;
-				break;
-			}
-			else
-			{
-				offset++;
-				line[j] = string[j + origoffset];
-
-				if (line[j] >= 0x0590 && line[j] <= 0x07BF) rtlCharacters = True;
-			}
-		}
+		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
 
 		Rect	 tRect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
 		RECT	 wRect = { tRect.left, tRect.top, tRect.right, tRect.bottom };
 
 		if (rtlCharacters && Setup::useIconv)
 		{
+			String		 visualLine;
+
 			/* Reorder the string with fribidi, then get
 			 * the glyph indices using GetCharacterPlacement
 			 * and display using the glyph indices.
@@ -398,26 +373,26 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 			visual[line.Length()] = 0;
 
-			line.ImportFrom("UCS-4LE", (char *) visual);
+			visualLine.ImportFrom("UCS-4LE", (char *) visual);
 
 			delete [] visual;
 
 			GCP_RESULTSA	 resultsa;
 			GCP_RESULTSW	 resultsw;
-			wchar_t		*glyphs = new wchar_t [line.Length() + 1];
+			wchar_t		*glyphs = new wchar_t [visualLine.Length() + 1];
 
 			ZeroMemory(&resultsa, sizeof(resultsa));
 			ZeroMemory(&resultsw, sizeof(resultsw));
 
 			resultsa.lStructSize = sizeof(resultsa);
 			resultsa.lpGlyphs    = glyphs;
-			resultsa.nGlyphs     = line.Length() + 1;
+			resultsa.nGlyphs     = visualLine.Length() + 1;
 
 			resultsw.lStructSize = sizeof(resultsw);
 			resultsw.lpGlyphs    = glyphs;
-			resultsw.nGlyphs     = line.Length() + 1;
+			resultsw.nGlyphs     = visualLine.Length() + 1;
 
-			ZeroMemory(glyphs, 2 * (line.Length() + 1));
+			ZeroMemory(glyphs, 2 * (visualLine.Length() + 1));
 
 			if (!painting)
 			{
@@ -428,8 +403,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			if (rightToLeft.GetRightToLeft()) SetTextAlign(paintContext, TA_RIGHT);
 			else				  SetTextAlign(paintContext, TA_LEFT);
 
-			if (Setup::enableUnicode) GetCharacterPlacementW(paintContext, line, line.Length(), 0, &resultsw, 0);
-			else			  GetCharacterPlacementA(paintContext, line, line.Length(), 0, &resultsa, 0);
+			if (Setup::enableUnicode) GetCharacterPlacementW(paintContext, visualLine, visualLine.Length(), 0, &resultsw, 0);
+			else			  GetCharacterPlacementA(paintContext, visualLine, visualLine.Length(), 0, &resultsa, 0);
 
 			if (rightToLeft.GetRightToLeft()) wRect.left -= 10;
 			else				  wRect.right += 10;
@@ -467,6 +442,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 		rect.top += lineHeight;
 	}
+
+	String::ExplodeFinish();
 
 	if (!painting) SelectObject(gdi_dc, holdfont);
 	SelectObject(paintContext, holdfont2);
@@ -517,30 +494,28 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, const Bitmap &bitmap, const Rect &destRect)
+S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, const Rect &destRect)
 {
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
 	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
-	HDC	 gdi_dc	 = GetWindowDC(window);
-	HDC	 cdc	 = CreateCompatibleDC(gdi_dc);
+	HDC	 cdc	 = CreateCompatibleDC(paintContext);
 	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
-		BitBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, gdi_dc, srcRect.left, srcRect.top, SRCCOPY);
+		BitBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, paintContext, srcRect.left, srcRect.top, SRCCOPY);
 	}
 	else
 	{
 		SetStretchBltMode(cdc, HALFTONE);
-		StretchBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, gdi_dc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+		StretchBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, paintContext, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
 	}
 
 	SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
-	ReleaseDC(window, gdi_dc);
 
 	return Success();
 }

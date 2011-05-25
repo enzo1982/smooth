@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,8 +8,11 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <windows.h>
+#include <gdiplus.h>
+
 #include <smooth/graphics/backends/gdiplus/fontgdiplus.h>
-#include <smooth/misc/math.h>
+#include <smooth/graphics/font.h>
 
 S::GUI::FontBackend *CreateFontGDIPlus(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
@@ -31,24 +34,15 @@ S::GUI::Size S::GUI::FontGDIPlus::GetTextSize(const String &text) const
 {
 	if (text == NIL) return Size();
 
-	HDC	 dc	= CreateCompatibleDC(NIL);
-	HFONT	 hFont;
-	HFONT	 hOldFont;
+	Gdiplus::Graphics	 context((HWND) NIL);
 
-	if (Setup::enableUnicode)	hFont = CreateFontW(-Math::Round(fontSize * 96.0 / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
-	else				hFont = CreateFontA(-Math::Round(fontSize * 96.0 / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	Gdiplus::Font		 gdip_font(fontName, fontSize, fontWeight >= Font::Bold ? Gdiplus::FontStyleBold : Gdiplus::FontStyleRegular);
+	Gdiplus::StringFormat	 gdip_format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsMeasureTrailingSpaces);
+	Gdiplus::RectF		 rect;
 
-	hOldFont = (HFONT) SelectObject(dc, hFont);
+	gdip_format.SetAlignment(Gdiplus::StringAlignmentNear);
 
-	SIZE	 tSize;
+	context.MeasureString(text, -1, &gdip_font, Gdiplus::PointF(0.0, 0.0), &gdip_format, &rect);
 
-	if (Setup::enableUnicode)	GetTextExtentPoint32W(dc, text, text.Length(), &tSize);
-	else				GetTextExtentPoint32A(dc, text, text.Length(), &tSize);
-
-	SelectObject(dc, hOldFont);
-	::DeleteObject(hFont);
-
-	DeleteDC(dc);
-
-	return Size(tSize.cx, tSize.cy);
+	return Size(rect.Width, rect.Height);
 }

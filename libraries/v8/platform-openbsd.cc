@@ -41,7 +41,11 @@
 #include <sys/stat.h>   // open
 #include <sys/fcntl.h>  // open
 #include <unistd.h>     // getpagesize
+
+#ifndef __NetBSD__
 #include <execinfo.h>   // backtrace, backtrace_symbols
+#endif
+
 #include <strings.h>    // index
 #include <errno.h>
 #include <stdarg.h>

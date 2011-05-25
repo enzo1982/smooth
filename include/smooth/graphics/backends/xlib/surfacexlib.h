@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -43,32 +43,40 @@ namespace smooth
 		class SurfaceXLib : public SurfaceBackend
 		{
 			private:
-				X11::Display	*display;
+				X11::Display		*display;
 			protected:
-				X11::Window	 window;
-				X11::Window	 rWindow;
+				Size			 allocSize;
 
-				X11::Pixmap	 bitmap;
+				X11::Window		 window;
+				X11::XWindowAttributes	 windowAttributes;
+
+				X11::Pixmap		 bitmap;
+				X11::GC			 gc;
+
+				Array<Rect *, Void *>	 paintRects;
 			public:
-						 SurfaceXLib(Void * = NIL, const Size & = Size());
-						~SurfaceXLib();
+							 SurfaceXLib(Void * = NIL, const Size & = Size());
+							~SurfaceXLib();
 
-				Int		 PaintRect(const Rect &);
+				Int			 SetSize(const Size &);
+				const Size		&GetSize() const;
 
-				Int		 StartPaint(const Rect &);
-				Int		 EndPaint();
+				Int			 PaintRect(const Rect &);
 
-				Void		*GetSystemSurface() const;
+				Int			 StartPaint(const Rect &);
+				Int			 EndPaint();
 
-				Int		 SetPixel(const Point &, const Color &);
+				Void			*GetSystemSurface() const;
 
-				Int		 Line(const Point &, const Point &, const Color &);
-				Int		 Box(const Rect &, const Color &, Int, const Size &);
+				Int			 SetPixel(const Point &, const Color &);
 
-				Int		 SetText(const String &, const Rect &, const Font &, Bool);
+				Int			 Line(const Point &, const Point &, const Color &);
+				Int			 Box(const Rect &, const Color &, Int, const Size &);
 
-				Int		 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
-				Int		 BlitToBitmap(const Rect &, const Bitmap &, const Rect &);
+				Int			 SetText(const String &, const Rect &, const Font &, Bool);
+
+				Int			 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
+				Int			 BlitToBitmap(const Rect &, Bitmap &, const Rect &);
 		};
 	};
 };

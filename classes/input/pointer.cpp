@@ -21,7 +21,8 @@
 	using namespace X11;
 #endif
 
-S::GUI::Point	 S::Input::Pointer::mousePosition = S::GUI::Point();
+const S::GUI::Window	*S::Input::Pointer::pointerWindow = NIL;
+S::GUI::Point		 S::Input::Pointer::mousePosition = S::GUI::Point();
 
 S::Input::Pointer::Pointer()
 {
@@ -75,16 +76,24 @@ const S::GUI::Point &S::Input::Pointer::GetPosition()
 	return mousePosition;
 }
 
-S::Void S::Input::Pointer::UpdatePosition(Int x, Int y)
+const S::GUI::Window *S::Input::Pointer::GetPointerWindow()
 {
-	mousePosition.x = x;
-	mousePosition.y = y;
+	return pointerWindow;
+}
 
-	/* FixMe: The -2 offset seems to be necessary at least
-	 *	  on Ubuntu 10.10. However, I somehow feel this
-	 *	  can't be the right way to do it.
+S::Void S::Input::Pointer::UpdatePosition(const GUI::Window *window, Int x, Int y)
+{
+	pointerWindow	= window;
+
+	mousePosition.x	= x;
+	mousePosition.y	= y;
+
+	/* FixMe: The -2 offsets seem to be necessary on
+	 *	  all X11 systems. However, I somehow feel
+	 *	  this can't be the right way to do it.
 	 */
 #ifndef __WIN32__
+	mousePosition.x -= 2;
 	mousePosition.y -= 2;
 #endif
 }

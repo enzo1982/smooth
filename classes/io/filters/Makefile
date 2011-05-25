@@ -8,6 +8,8 @@ include $(SMOOTH_PATH)/Makefile-options
 # Change these variables to fit your project:
 ifeq ($(BUILD_WIN32),True)
 	MYCCOPTS += -I$(SMOOTH_PATH)/include/support/bzlib
+else
+	MYCCOPTS += -I/usr/local/include
 endif
 
 # Enter object files here:

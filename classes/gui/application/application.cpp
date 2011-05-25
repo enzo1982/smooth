@@ -14,8 +14,9 @@
 #include <smooth/system/event.h>
 #include <smooth/system/multimonitor.h>
 #include <smooth/files/directory.h>
-#include <smooth/init.h>
+#include <smooth/misc/math.h>
 #include <smooth/templates/nonblocking.h>
+#include <smooth/foreach.h>
 
 #ifdef __WIN32__
 #	include <windows.h>
@@ -23,14 +24,21 @@
 #	include <unistd.h>
 #	include <stdio.h>
 #	include <limits.h>
+
+#	ifndef PATH_MAX
+#		define PATH_MAX 32768
+#	endif
 #endif
 
 S::Bool	 S::loopActive	= S::False;
 
 const S::Short	 S::GUI::Application::classID = S::Object::RequestClassID();
 
-S::String	 S::GUI::Application::startupDirectory;
-S::String	 S::GUI::Application::applicationDirectory;
+S::String		 S::GUI::Application::command;
+S::Array<S::String>	 S::GUI::Application::args;
+
+S::String		 S::GUI::Application::startupDirectory;
+S::String		 S::GUI::Application::applicationDirectory;
 
 S::GUI::Application::Application(const String &name) : Widget(Point(0, 0), System::MultiMonitor::GetActiveMonitorMetrics().GetSize())
 {
@@ -112,6 +120,11 @@ S::Int S::GUI::Application::Loop()
 	return Success();
 }
 
+S::Void S::GUI::Application::SetArguments(const Array<String> &nArgs)
+{
+	foreach (const String &arg, nArgs) args.Add(arg);
+}
+
 S::String S::GUI::Application::GetStartupDirectory()
 {
 	if (startupDirectory != NIL) return startupDirectory;
@@ -121,7 +134,7 @@ S::String S::GUI::Application::GetStartupDirectory()
 
 	if (Setup::enableUnicode)
 	{
-		Buffer<wchar_t>	 buffer(32768);
+		Buffer<wchar_t>	 buffer(32768 + 1);
 
 		length = GetCurrentDirectoryW(buffer.Size(), buffer);
 
@@ -130,7 +143,7 @@ S::String S::GUI::Application::GetStartupDirectory()
 
 	if (!Setup::enableUnicode || length == 0)
 	{
-		Buffer<char>	 buffer(MAX_PATH);
+		Buffer<char>	 buffer(MAX_PATH + 1);
 
 		GetCurrentDirectoryA(buffer.Size(), buffer);
 
@@ -139,7 +152,7 @@ S::String S::GUI::Application::GetStartupDirectory()
 
 	if (!startupDirectory.EndsWith("\\")) startupDirectory.Append("\\");
 #else
-	Buffer<char>	 buffer(PATH_MAX);
+	Buffer<char>	 buffer(PATH_MAX + 1);
 
 	if (getcwd(buffer, buffer.Size()) != NIL)
 	{
@@ -186,17 +199,50 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	buffer.Zero();
 
 #if defined __APPLE__
-	FILE	*stdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print $9 }'"), "r");
+	/* In Mac OS X, lsof -p <pid> always returns the path to the current binary in the first txt section.
+	 */
+	FILE	*pstdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print $9 }'"), "r");
 
-	fscanf(stdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
 
-	pclose(stdin);
-#elif defined __linux__
-	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1);
+	pclose(pstdin);
+#elif defined __FreeBSD__
+	/* In FreeBSD, procfs is not necessarily available, so check if it's there first.
+	 */
+	if (File(String("/proc/").Append(String::FromInt(getpid())).Append("/file")).Exists())
+	{
+		/* If procfs is available, /proc/<pid>/file links to the current binary.
+		 */
+		readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/file"), buffer, buffer.Size() - 1);
+	}
+	else
+	{
+		/* Otherwise, procstat -b <pid> will provide the path to the current binary.
+		 */
+		FILE	*pstdin = popen(String("procstat -b ").Append(String::FromInt(getpid())).Append(" | awk '$1 == \"").Append(String::FromInt(getpid())).Append("\" { print $3 }'"), "r");
+
+		fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+		pclose(pstdin);
+	}
 #elif defined __sun
+	/* In Solaris, /proc/<pid>/path/a.out links to the current binary.
+	 */
 	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/path/a.out"), buffer, buffer.Size() - 1);
+#elif defined __linux__ || defined __NetBSD__
+	/* In Linux and NetBSD, /proc/<pid>/exe links to the current binary.
+	 */
+	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1);
 #else
-	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/file"), buffer, buffer.Size() - 1);
+	/* No system specific way to get the current binary path.
+	 * Try concatenating the startup directory and command.
+	 */
+	String	 path	= GetStartupDirectory().Append(command).Replace("/./", "/");
+	Int	 length	= Math::Min(buffer.Size(), path.Length() + 1);
+
+	memcpy(buffer, (char *) path, length);
+
+	buffer[length - 1] = 0;
 #endif
 
 	applicationDirectory = buffer;

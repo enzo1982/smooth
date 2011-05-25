@@ -8,14 +8,7 @@ include $(SMOOTH_PATH)/Makefile-options
 # Change these variables to fit your project:
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
-ifeq ($(BUILD_SOLARIS),True)
-	MYCCOPTS += -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include
-	MYCCOPTS += -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
-	MYCCOPTS += -I/usr/include/gdk-pixbuf-2.0
-	MYCCOPTS += -I/usr/include/atk-1.0
-	MYCCOPTS += -I/usr/include/cairo
-	MYCCOPTS += -I/usr/include/pango-1.0
-else
+ifneq ($(BUILD_QNX),True)
 	MYCCOPTS += $(shell pkg-config --cflags gtk+-2.0)
 endif
 endif
@@ -26,12 +19,12 @@ OBJECTS	  = filedlg.o
 
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += filedlg_win32.o
-else
-ifeq ($(BUILD_OSX),True)
+else ifeq ($(BUILD_OSX),True)
 	OBJECTS += filedlg_cocoa.o
+else ifeq ($(BUILD_QNX),True)
+	OBJECTS += filedlg_photon.o
 else
 	OBJECTS += filedlg_gtk.o
-endif
 endif
 
 ## Do not change anything below this line. ##

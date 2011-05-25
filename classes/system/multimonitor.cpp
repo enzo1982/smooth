@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,7 @@
 
 #include <smooth/system/multimonitor.h>
 #include <smooth/input/pointer.h>
+#include <smooth/init.h>
 
 #ifdef __WIN32__
 #	include <windows.h>
@@ -24,6 +25,9 @@
 	using namespace X11;
 #endif
 
+S::Int	 addMultiMonitorInitTmp = S::AddInitFunction(&S::System::MultiMonitor::Initialize);
+S::Int	 addMultiMonitorFreeTmp = S::AddFreeFunction(&S::System::MultiMonitor::Free);
+
 S::System::MultiMonitor::MultiMonitor()
 {
 }
@@ -32,7 +36,7 @@ S::System::MultiMonitor::MultiMonitor(const MultiMonitor &)
 {
 }
 
-S::Void S::System::MultiMonitor::Initialize()
+S::Int S::System::MultiMonitor::Initialize()
 {
 #ifdef __WIN32__
 	OSVERSIONINFOA	 vInfo;
@@ -50,9 +54,11 @@ S::Void S::System::MultiMonitor::Initialize()
 		ex_MonitorFromPoint = (HMONITOR (*)(POINT, DWORD)) GetProcAddress(user32dll, "MonitorFromPoint");
 	}
 #endif
+
+	return Success();
 }
 
-S::Void S::System::MultiMonitor::Free()
+S::Int S::System::MultiMonitor::Free()
 {
 #ifdef __WIN32__
 	if (user32dll != NIL)
@@ -62,6 +68,8 @@ S::Void S::System::MultiMonitor::Free()
 		user32dll = NIL;
 	}
 #endif
+
+	return Success();
 }
 
 S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorMetrics()
@@ -85,7 +93,7 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorMetrics()
 		return GUI::Rect(GUI::Point(info.rcMonitor.left, info.rcMonitor.top), GUI::Size(info.rcMonitor.right - info.rcMonitor.left, info.rcMonitor.bottom - info.rcMonitor.top));
 	}
 #else
-	return GUI::Rect(GUI::Point(0, 0), GUI::Size(WidthOfScreen(DefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay())), HeightOfScreen(DefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay()))));
+	return GUI::Rect(GUI::Point(0, 0), GUI::Size(XWidthOfScreen(XDefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay())), XHeightOfScreen(XDefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay()))));
 #endif
 }
 
@@ -115,7 +123,7 @@ S::GUI::Rect S::System::MultiMonitor::GetActiveMonitorWorkArea()
 		return GUI::Rect(GUI::Point(info.rcWork.left, info.rcWork.top), GUI::Size(info.rcWork.right - info.rcWork.left, info.rcWork.bottom - info.rcWork.top));
 	}
 #else
-	return GUI::Rect(GUI::Point(0, 0), GUI::Size(WidthOfScreen(DefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay())), HeightOfScreen(DefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay()))));
+	return GUI::Rect(GUI::Point(0, 0), GUI::Size(XWidthOfScreen(XDefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay())), XHeightOfScreen(XDefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay()))));
 #endif
 }
 
@@ -131,6 +139,6 @@ S::GUI::Rect S::System::MultiMonitor::GetVirtualScreenMetrics()
 		return GUI::Rect(GUI::Point(GetSystemMetrics(SM_XVIRTUALSCREEN), GetSystemMetrics(SM_YVIRTUALSCREEN)), GUI::Size(GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN)));
 	}
 #else
-	return GUI::Rect(GUI::Point(0, 0), GUI::Size(WidthOfScreen(DefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay())), HeightOfScreen(DefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay()))));
+	return GUI::Rect(GUI::Point(0, 0), GUI::Size(XWidthOfScreen(XDefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay())), XHeightOfScreen(XDefaultScreenOfDisplay(Backends::BackendXLib::GetDisplay()))));
 #endif
 }

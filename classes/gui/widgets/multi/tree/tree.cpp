@@ -290,9 +290,9 @@ S::Void S::GUI::Tree::OnToggleMark(Bool marked)
 		 */
 		Widget	*widget = container;
 
-		while (widget->GetObjectType() != ListBox::classID) widget = widget->GetContainer();
+		while (widget != NIL && widget->GetObjectType() != ListBox::classID) widget = widget->GetContainer();
 
-		widget->Paint(SP_PAINT);
+		if (widget != NIL) widget->Paint(SP_PAINT);
 	}
 }
 

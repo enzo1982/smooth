@@ -133,7 +133,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 	 */
 	JSAMPARRAY	 buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-	bitmap.CreateBitmap(cinfo.output_width, cinfo.output_height, 24);
+	bitmap.CreateBitmap(cinfo.output_width, cinfo.output_height);
 
 	/* Here we use the library's state variable cinfo.output_scanline as the
 	 * loop counter, so that we don't have to keep track ourselves.

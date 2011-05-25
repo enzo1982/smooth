@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,6 +28,7 @@ namespace smooth
 
 #include "../windowbackend.h"
 #include "../../../../graphics/forms/rect.h"
+#include "../../../../input/keyboard.h"
 
 namespace smooth
 {
@@ -47,6 +48,8 @@ namespace smooth
 				static System::Timer			*mouseNotifyTimer;
 
 				Int					 ProcessSystemMessages(Int, Int, Int);
+
+				WindowGDI				*FindLeaderWindow();
 			protected:
 				Int					 id;
 
@@ -58,8 +61,8 @@ namespace smooth
 				HICON					 sysIcon;
 				Bool					 destroyIcon;
 
-				Int					 origWndStyle;
 				Rect					 nonMaxRect;
+				Int					 nonMaxWndStyle;
 
 				Size					 frameSize;
 
@@ -69,7 +72,9 @@ namespace smooth
 				Bool					 minimized;
 				Bool					 maximized;
 
-				Key					 ConvertKey(Int);
+				Int					 flags;
+
+				Input::Keyboard::Key			 ConvertKey(Int);
 			public:
 									 WindowGDI(Void * = NIL);
 									~WindowGDI();

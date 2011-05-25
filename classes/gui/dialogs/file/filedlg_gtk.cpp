@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,11 +17,11 @@
 
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
-	/* Init the GTK
+	/* Init the GTK.
 	 */
 	gtk_init(NULL, NULL);
 
-	/* Create file chooser dialog
+	/* Create file chooser dialog.
 	 */
 	GtkWidget	*dialog = NULL;
 
@@ -47,7 +47,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), File(defFile).GetFileName());
 	}
 
-	/* Add file filters
+	/* Add file filters.
 	 */
 	for (int i = 0; i < filters.Length(); i++)
 	{
@@ -56,12 +56,14 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		foreach (String pattern, patterns) gtk_file_filter_add_pattern(filter, pattern.Trim());
 
+		String::ExplodeFinish();
+
 		gtk_file_filter_set_name(filter, filterNames.GetNth(i));
 
 		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 	}
 
-	/* Run dialog and check result
+	/* Run dialog and check result.
 	 */
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
@@ -98,7 +100,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 	gtk_widget_destroy(dialog);
 
-	/* Wait for GTK to finish pending actions
+	/* Wait for GTK to finish pending actions.
 	 */
 	while (gtk_events_pending()) gtk_main_iteration();
 

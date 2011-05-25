@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -47,8 +47,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPCI::Load()
 	PCIIO	*pio = new PCIIO();
 
 	pio->SelectImage(id);
-
-	ReadPCI(pci, *pio);
+	pio->ReadPCI(pci);
 
 	ClosePCI(pci);
 

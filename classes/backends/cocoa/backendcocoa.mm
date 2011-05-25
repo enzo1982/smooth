@@ -30,7 +30,7 @@ S::Backends::BackendCocoa::~BackendCocoa()
 
 S::Int S::Backends::BackendCocoa::Init()
 {
-	/* Init the Cocoa app
+	/* Init the Cocoa app.
 	 */
 	[NSApplication sharedApplication];
 
@@ -38,6 +38,14 @@ S::Int S::Backends::BackendCocoa::Init()
 	 */
 	pool = [[NSAutoreleasePool alloc] init];
 
+	/* Set default language if not set.
+	 */
+	NSUserDefaults	*defaults  = [NSUserDefaults standardUserDefaults];
+	NSArray		*languages = [defaults objectForKey: @"AppleLanguages"];
+	NSString	*language  = [languages objectAtIndex: 0];
+
+	setenv("LANG", [language UTF8String], False);
+	
 	return Success();
 }
 

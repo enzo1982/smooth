@@ -14,6 +14,7 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/gui/clipboard/clipboard.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/input/keyboard.h>
 #include <smooth/input/pointer.h>
 #include <smooth/i18n/translator.h>
 #include <smooth/misc/binary.h>
@@ -134,7 +135,17 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 				marking = True;
 
-				MarkText(newPromptPos, newPromptPos);
+				if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))
+				{
+					if (markStart == -1) markStart = GetCursorPos();
+					if (markStart == -1) markStart = newPromptPos;
+
+					MarkText(markStart, newPromptPos);
+				}
+				else
+				{
+					MarkText(newPromptPos, newPromptPos);
+				}
 
 				SetCursorPos(newPromptPos);
 
@@ -166,6 +177,56 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 				if (markStart == markEnd) { markStart = -1; markEnd = -1; }
 
 				marking = False;
+			}
+
+			break;
+		case SM_LBUTTONDBLCLK:
+			if (focussed)
+			{
+				/* Compute word start and end.
+				 */
+				Int	 wordStart = 0;
+				Int	 wordEnd   = text.Length();
+
+				for (Int i = promptPos - 2; i >= 0; i--)
+				{
+					if ( (						   text[i + 1] == '\n') ||
+					    ((text[i    ] == ' ' || text[i    ] == '\t' || text[i    ] == '\n') &&
+					     (text[i + 1] != ' ' && text[i + 1] != '\t' && text[i + 1] != '\n'))) { wordStart = i + 1; break; }
+				}
+
+				for (Int i = promptPos - 1; i < text.Length(); i++)
+				{
+					if ( (						   text[i + 1] == '\n') ||
+					    ((text[i    ] == ' ' || text[i    ] == '\t' || text[i    ] == '\n') &&
+					     (text[i + 1] != ' ' && text[i + 1] != '\t' && text[i + 1] != '\n'))) { wordEnd = i + 1; break; }
+				}
+
+				/* Set mark region.
+				 */
+				if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))
+				{
+					if (markStart == -1) markStart = promptPos;
+	
+					if (promptPos <= markStart)
+					{
+						MarkText(markStart, wordStart);
+
+						SetCursorPos(wordStart);
+					}
+					else
+					{
+						MarkText(markStart, wordEnd);
+
+						SetCursorPos(wordEnd);
+					}
+				}
+				else
+				{
+					MarkText(wordStart, wordEnd);
+
+					SetCursorPos(wordEnd);
+				}
 			}
 
 			break;
@@ -288,7 +349,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 	Int	 lineNumber = (fillLineIndices ? 0 : scrollPos);
 	Int	 lineStart = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos));
 
-	lineIndices.Add(0);
+	if (fillLineIndices) lineIndices.Add(0);
 
 	for (Int i = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos)); i <= text.Length(); i++)
 	{
@@ -429,7 +490,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 			lineStart = i + 1;
 			lineNumber++;
 
-			lineIndices.Add(lineStart);
+			if (fillLineIndices) lineIndices.Add(lineStart);
 		}
 	}
 
@@ -663,38 +724,121 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 	switch (keyCode)
 	{
-		case SK_LEFT:
-		case SK_RIGHT:
-		case SK_HOME:
-		case SK_END:
-			MarkText(-1, -1);
+		case Input::Keyboard::KeyLeft:
+		case Input::Keyboard::KeyRight:
+			if (!Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) MarkText(-1, -1);
 
+			/* Calculate new cursor pos.
+			 */
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))
 			{
-				Bool	 isLeft	 = ((keyCode == SK_LEFT  && !IsRightToLeft()) || (keyCode == SK_RIGHT && IsRightToLeft()));
-				Bool	 isRight = ((keyCode == SK_RIGHT && !IsRightToLeft()) || (keyCode == SK_LEFT  && IsRightToLeft()));
+				Bool	 isLeft = ((keyCode == Input::Keyboard::KeyLeft  && !IsRightToLeft()) || (keyCode == Input::Keyboard::KeyRight && IsRightToLeft()));
 
-				if	(isLeft)		{ if (promptPos == 0)		  break; newPos = promptPos - 1; }
-				else if (isRight)		{ if (promptPos >= text.Length()) break; newPos = promptPos + 1; }
-				else if (keyCode == SK_HOME)	{ if (promptPos == 0)		  break; newPos = 0;		 }
-				else if (keyCode == SK_END)	{ if (promptPos >= text.Length()) break; newPos = text.Length(); }
+				if (isLeft)
+				{
+					newPos = 0;
+
+					for (Int i = promptPos - 2; i >= 0; i--)
+					{
+						if ( (						   text[i + 1] == '\n') ||
+						    ((text[i    ] == ' ' || text[i    ] == '\t' || text[i    ] == '\n') &&
+						     (text[i + 1] != ' ' && text[i + 1] != '\t' && text[i + 1] != '\n'))) { newPos = i + 1; break; }
+					}
+				}
+				else
+				{
+					newPos = text.Length();
+
+					for (Int i = promptPos; i < text.Length(); i++)
+					{
+						if ( (						   text[i + 1] == '\n') ||
+						    ((text[i    ] == ' ' || text[i    ] == '\t' || text[i    ] == '\n') &&
+						     (text[i + 1] != ' ' && text[i + 1] != '\t' && text[i + 1] != '\n'))) { newPos = i + 1; break; }
+					}
+				}
+			}
+			else
+			{
+				Bool	 isLeft = ((keyCode == Input::Keyboard::KeyLeft  && !IsRightToLeft()) || (keyCode == Input::Keyboard::KeyRight && IsRightToLeft()));
+
+				if (isLeft) { if (promptPos == 0)	      break; newPos = promptPos - 1; }
+				else	    { if (promptPos >= text.Length()) break; newPos = promptPos + 1; }
+			}
+
+			/* Set mark region and cursor.
+			 */
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))
+			{
+				if (markStart == -1) markStart = promptPos;
+
+				MarkText(markStart, newPos);
 			}
 
 			SetCursorPos(newPos);
 
 			break;
-		case SK_UP:
-		case SK_DOWN:
+		case Input::Keyboard::KeyHome:
+		case Input::Keyboard::KeyEnd:
+			if (!Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) MarkText(-1, -1);
+
+			/* Calculate new cursor pos.
+			 */
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))
+			{
+				if	(keyCode == Input::Keyboard::KeyHome)	{ if (promptPos == 0)		  break; newPos = 0;		 }
+				else if (keyCode == Input::Keyboard::KeyEnd)	{ if (promptPos >= text.Length()) break; newPos = text.Length(); }
+			}
+			else
+			{
+				if (keyCode == Input::Keyboard::KeyHome)
+				{
+					newPos = 0;
+
+					for (Int i = promptPos - 1; i >= 0; i--)
+					{
+						if (text[i] == '\n') { newPos = i + 1; break; }
+					}
+				}
+				else
+				{
+					newPos = text.Length();
+
+					for (Int i = promptPos; i < text.Length(); i++)
+					{
+						if (text[i] == '\n') { newPos = i; break; }
+					}
+				}
+			}
+
+			/* Set mark region and cursor.
+			 */
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))
+			{
+				if (markStart == -1) markStart = promptPos;
+
+				MarkText(markStart, newPos);
+			}
+
+			SetCursorPos(newPos);
+
+			break;
+		case Input::Keyboard::KeyUp:
+		case Input::Keyboard::KeyDown:
 			if (!Binary::IsFlagSet(GetFlags(), CF_MULTILINE)) break;
 
-			linePos = promptPos;
-			newPos = promptPos;
+			if (!Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) MarkText(-1, -1);
+
+			/* Calculate new cursor pos.
+			 */
+			linePos	= promptPos;
+			newPos	= promptPos;
 
 			for (i = promptPos - 1; i >= 0; i--)
 			{
 				if (text[i] == '\n') { linePos -= (i + 1); break; }
 			}
 
-			if (keyCode == SK_UP)
+			if (keyCode == Input::Keyboard::KeyUp)
 			{
 				if (i == 0) newPos = 0;
 
@@ -721,10 +865,19 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 				}
 			}
 
+			/* Set mark region and cursor.
+			 */
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))
+			{
+				if (markStart == -1) markStart = promptPos;
+
+				MarkText(markStart, newPos);
+			}
+
 			SetCursorPos(newPos);
 
 			break;
-		case SK_RETURN:
+		case Input::Keyboard::KeyReturn:
 			if (!IsActive()) break;
 
 			if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
@@ -747,16 +900,16 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 			}
 
 			break;
-		case SK_BACK:
-		case SK_DELETE:
+		case Input::Keyboard::KeyBack:
+		case Input::Keyboard::KeyDelete:
 			if (!IsActive()) break;
 
 			if (markStart != markEnd) { DeleteSelectedText(); break; }
 
-			if (promptPos == 0	       && keyCode == SK_BACK)	break;
-			if (promptPos == text.Length() && keyCode == SK_DELETE)	break;
+			if (promptPos == 0	       && keyCode == Input::Keyboard::KeyBack)	 break;
+			if (promptPos == text.Length() && keyCode == Input::Keyboard::KeyDelete) break;
 
-			if (keyCode == SK_BACK)
+			if (keyCode == Input::Keyboard::KeyBack)
 			{
 				markStart	= promptPos - 1;
 				markEnd		= promptPos;
@@ -778,6 +931,13 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 	/* Called when a character is entered.
 	 */
 	if (!focussed) return;
+
+	/* CTRL + A
+	 */
+	if (character == 0x01 && !(flags & (1 << 30)))
+	{
+		MarkAll();
+	}
 
 	/* CTRL + C
 	 */
@@ -958,6 +1118,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		if (Setup::enableUnicode)
 		{
 			LOGFONTW	 lFont;
+			int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
 
 			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(dc, LOGPIXELSY));
 			lFont.lfWidth		= 0;
@@ -973,13 +1134,16 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 			lFont.lfQuality		= DEFAULT_QUALITY;
 			lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
 
-			memcpy(lFont.lfFaceName, (wchar_t *) font.GetName(), sizeof(wchar_t) * (font.GetName().Length() + 1));
+			memcpy(lFont.lfFaceName, (wchar_t *) font.GetName(), sizeof(wchar_t) * nameLength);
+
+			lFont.lfFaceName[nameLength - 1] = 0;
 
 			ImmSetCompositionFontW(hImc, &lFont);
 		}
 		else
 		{
 			LOGFONTA	 lFont;
+			int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
 
 			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(dc, LOGPIXELSY));
 			lFont.lfWidth		= 0;
@@ -991,12 +1155,13 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 			lFont.lfStrikeOut	= false;
 			lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
 			lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
-
 			lFont.lfCharSet		= DEFAULT_CHARSET;
 			lFont.lfQuality		= DEFAULT_QUALITY;
 			lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
 
-			strcpy(lFont.lfFaceName, font.GetName());
+			memcpy(lFont.lfFaceName, (char *) font.GetName(), sizeof(char) * nameLength);
+
+			lFont.lfFaceName[nameLength - 1] = 0;
 
 			ImmSetCompositionFontA(hImc, &lFont);
 		}

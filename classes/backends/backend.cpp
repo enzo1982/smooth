@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -48,9 +48,16 @@ S::Int S::Backends::Backend::InitBackends()
 		backends->Add(backend_creators->GetNth(i)());
 	}
 
-	for (Int j = 0; j < backends->Length(); j++)
+	for (Int i = 0; i < backends->Length(); i++)
 	{
-		backends->GetNth(j)->Init();
+		if (backends->GetNth(i)->Init() == Error())
+		{
+			/* Deinit already initialized backends and return.
+			 */
+			for (Int j = i - 1; j >= 0; j--) backends->GetNth(j)->Deinit();
+
+			return Error();
+		}
 	}
 
 	return Success();

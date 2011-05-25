@@ -533,50 +533,6 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
-#ifdef __WIN32__
-		case WM_SYSCOLORCHANGE:
-			GetColors();
-
-			break;
-		case WM_ACTIVATE:
-			if (LOWORD(wParam) != WA_INACTIVE)
-			{
-				for (Int i = 0; i < windows.Length(); i++)
-				{
-					Window	*window = windows.GetNth(i);
-
-					if (window->GetOrder() > GetOrder() && (window->GetFlags() & WF_MODAL))
-					{
-						window->Raise();
-
-						rVal = Break;
-
-						break;
-					}
-				}
-			}
-
-			if (LOWORD(wParam) == WA_INACTIVE && focussed)
-			{
-				const Window	*window = GetWindow((HWND) lParam);
-
-				if (window != NIL)
-				{
-					if (window->GetObjectType() == ToolWindow::classID && window->GetOrder() >= GetOrder())
-					{
-						PostMessage((HWND) backend->GetSystemWindow(), WM_NCACTIVATE, True, 0);
-						
-						break;
-					}
-				}
-
-				focussed = False;
-
-				onLoseFocus.Emit();
-			}
-
-			break;
-#endif
 		case SM_GETFOCUS:
 			if (!focussed)
 			{
@@ -595,9 +551,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				{
 					if (focusWnd->GetObjectType() == ToolWindow::classID && focusWnd->GetOrder() >= GetOrder())
 					{
-#ifdef __WIN32__
-						PostMessage((HWND) backend->GetSystemWindow(), WM_NCACTIVATE, True, 0);
-#endif
+						LeaveProtectedRegion();
+
 						return Success();
 					}
 				}
@@ -607,44 +562,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				onLoseFocus.Emit();
 			}
 
-			/* Fall through to WM_ACTIVATEAPP on Windows.
-			 */
-#ifdef __WIN32__
-		case WM_ACTIVATEAPP:
-			if (flags & WF_MODAL)
-			{
-				Bool	 activate = False;
-				HWND	 actWnd = ::GetActiveWindow();
-
-				if (actWnd == (HWND) backend->GetSystemWindow()) break;
-
-				Window	*window = GetWindow(actWnd);
-
-				if	(window == NIL)				activate = False;
-				else if (window->type == ToolWindow::classID)	break;
-				else if (window->GetOrder() < GetOrder())	activate = True;
-				else if (window->GetOrder() > GetOrder())	window->SetFlags(WF_MODAL);
-
-				if (activate && message == WM_ACTIVATEAPP)
-				{
-					if (wParam)	activate = True;
-					else		activate = False;
-				}
-
-				if (activate && message == SM_LOSEFOCUS)
-				{
-					if (GetWindow(SetActiveWindow((HWND) backend->GetSystemWindow())) != NIL)	activate = True;
-					else										activate = False;
-				}
-
-				if (activate)	SetWindowPos((HWND) backend->GetSystemWindow(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-				else		SetWindowPos((HWND) backend->GetSystemWindow(), message == SM_LOSEFOCUS ? HWND_NOTOPMOST : GetForegroundWindow(), 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
-			}
-
 			break;
-#else
-			break;
-#endif
 		case SM_WINDOWMETRICS:
 			Window::SetMetrics(Point((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768), Size((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768));
 
@@ -705,10 +623,10 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	Rect	 workArea = System::MultiMonitor::GetVirtualScreenMetrics();
 
-	if (message == SP_UPDATE				&&
-	    GetPosition().x		   > workArea.left - 2	&&
-	    GetPosition().y		   > workArea.top - 2	&&
-	    GetPosition().x + GetSize().cx < workArea.right + 2	&&
+	if (message == SP_UPDATE				 &&
+	    GetPosition().x		   > workArea.left   - 2 &&
+	    GetPosition().y		   > workArea.top    - 2 &&
+	    GetPosition().x + GetSize().cx < workArea.right  + 2 &&
 	    GetPosition().y + GetSize().cy < workArea.bottom + 2)
 	{
 		surface->PaintRect(updateRect);
@@ -931,14 +849,8 @@ S::Bool S::GUI::Window::IsMouseOn(const Rect &rect) const
 
 	if ((mousePos.x >= rect.left) && (mousePos.x < rect.right) && (mousePos.y >= rect.top) && (mousePos.y < rect.bottom))
 	{
-#ifdef __WIN32__
-		Point	 position = Input::Pointer::GetPosition();
-		POINT	 wPosition = { position.x, position.y };
-		HWND	 window = (HWND) surface->GetSystemSurface();
-
-		if (WindowFromPoint(wPosition) != window) return False;
-#endif
-		return True;
+		if (Input::Pointer::GetPointerWindow() != this)	return False;
+		else						return True;
 	}
 
 	return False;

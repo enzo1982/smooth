@@ -4,7 +4,7 @@
 SMOOTH_PATH = ../..
 
 # Enter object files here:
-OBJECTS	  = mutex.o rwlock.o semaphore.o thread.o
+OBJECTS	  = access.o mutex.o rwlock.o semaphore.o thread.o
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = cd backends && $(MAKE)

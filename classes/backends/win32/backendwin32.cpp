@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,7 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/gui/window/backends/gdi/windowgdi.h>
 
+#include <shlobj.h>
 #include <iconv.h>
 
 size_t	 (*iconv)(iconv_t, char **, size_t *, char **, size_t *)	= NIL;
@@ -90,17 +91,27 @@ S::Backends::BackendWin32::~BackendWin32()
 
 S::Int S::Backends::BackendWin32::Init()
 {
+	/* Init COM library.
+	 */
+	CoInitialize(NIL);
+
+	/* Init Windows sockets.
+	 */
 	WORD	 wVersionRequested = MAKEWORD(2,2);
 	WSADATA	 wsaData;
 
 	WSAStartup(wVersionRequested, &wsaData);
 
+	/* Get default font size.
+	 */
 	HDC	 dc = GetWindowDC(0);
 
 	Setup::FontSize = (Float) GetDeviceCaps(dc, LOGPIXELSY) / 96;
 
 	ReleaseDC(0, dc);
 
+	/* Start up mouse notifier.
+	 */
 	GUI::WindowGDI::InitMouseNotifier();
 
 	return Success();
@@ -108,9 +119,17 @@ S::Int S::Backends::BackendWin32::Init()
 
 S::Int S::Backends::BackendWin32::Deinit()
 {
+	/* Free mouse notifier.
+	 */
 	GUI::WindowGDI::FreeMouseNotifier();
 
+	/* Cleanup Windows sockets.
+	 */
 	WSACleanup();
+
+	/* Uninit COM library.
+	 */
+	CoUninitialize();
 
 	return Success();
 }

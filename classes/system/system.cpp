@@ -23,6 +23,8 @@
 #	include <shellapi.h>
 #else
 #	include <sys/time.h>
+#	include <time.h>
+#	include <errno.h>
 #	include <unistd.h>
 #	include <pwd.h>
 #	include <stdlib.h>
@@ -73,7 +75,19 @@ S::Bool S::System::System::Sleep(UnsignedInt mSeconds)
 #ifdef __WIN32__
 	::Sleep(mSeconds);
 #else
-	usleep(mSeconds * 1000);
+	timespec	 req;
+	timespec	 rem;
+
+	req.tv_sec  = mSeconds / 1000;
+	req.tv_nsec = (mSeconds % 1000) * 1000000;
+
+	while (nanosleep(&req, &rem) == -1)
+	{
+		if (errno != EINTR) break;
+
+		req.tv_sec  = rem.tv_sec;
+		req.tv_nsec = rem.tv_nsec;
+	}
 #endif
 
 	return True;
@@ -88,6 +102,12 @@ S::Bool S::System::System::OpenURL(const String &url)
 	if (!fork())
 	{
 		execl("/usr/bin/open", "open", (char *) url, NULL);
+		exit(0);
+	}
+#elif defined __HAIKU__
+	if (!fork())
+	{
+		execl("/boot/system/bin/open", "open", (char *) url, NULL);
 		exit(0);
 	}
 #else
@@ -124,7 +144,7 @@ S::String S::System::System::GetWindowsRootDirectory()
 #ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
-		Buffer<wchar_t>	 buffer(32768);
+		Buffer<wchar_t>	 buffer(32768 + 1);
 
 		GetWindowsDirectoryW(buffer, buffer.Size());
 
@@ -132,7 +152,7 @@ S::String S::System::System::GetWindowsRootDirectory()
 	}
 	else
 	{
-		Buffer<char>	 buffer(MAX_PATH);
+		Buffer<char>	 buffer(MAX_PATH + 1);
 
 		GetWindowsDirectoryA(buffer, buffer.Size());
 
@@ -160,7 +180,7 @@ S::String S::System::System::GetProgramFilesDirectory()
 		/* We need to use the ANSI version of RegQueryValueEx, because
 		 * the Unicode version is not compatible with MSLU.
 		 */
-		DWORD		 size = MAX_PATH;
+		DWORD		 size = MAX_PATH + 1;
 		Buffer<char>	 buffer(size);
 
 		RegQueryValueExA(currentVersion, String("ProgramFilesDir"), 0, NIL, (BYTE *) (char *) buffer, &size);
@@ -177,7 +197,7 @@ S::String S::System::System::GetProgramFilesDirectory()
 		 */
 		if (Setup::enableUnicode)
 		{
-			Buffer<wchar_t>	 buffer(MAX_PATH);
+			Buffer<wchar_t>	 buffer(32768 + 1);
 
 			ExpandEnvironmentStringsW(String("%ProgramFiles%"), buffer, buffer.Size());
 
@@ -185,7 +205,7 @@ S::String S::System::System::GetProgramFilesDirectory()
 		}
 		else
 		{
-			Buffer<char>	 buffer(MAX_PATH);
+			Buffer<char>	 buffer(MAX_PATH + 1);
 
 			ExpandEnvironmentStringsA(String("%ProgramFiles%"), buffer, buffer.Size());
 
@@ -209,12 +229,11 @@ S::String S::System::System::GetApplicationDataDirectory()
 #ifdef __WIN32__
 	ITEMIDLIST	*idlist;
 
-
 	SHGetSpecialFolderLocation(NIL, CSIDL_APPDATA, &idlist);
 
 	if (Setup::enableUnicode)
 	{
-		Buffer<wchar_t>	 buffer(MAX_PATH);
+		Buffer<wchar_t>	 buffer(32768 + 1);
 
 		SHGetPathFromIDListW(idlist, buffer);
 
@@ -222,7 +241,7 @@ S::String S::System::System::GetApplicationDataDirectory()
 	}
 	else
 	{
-		Buffer<char>	 buffer(MAX_PATH);
+		Buffer<char>	 buffer(MAX_PATH + 1);
 
 		SHGetPathFromIDListA(idlist, buffer);
 
@@ -284,7 +303,7 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 
 	if (Setup::enableUnicode)
 	{
-		Buffer<wchar_t>	 buffer(MAX_PATH);
+		Buffer<wchar_t>	 buffer(32768 + 1);
 
 		SHGetPathFromIDListW(idlist, buffer);
 
@@ -292,7 +311,7 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 	}
 	else
 	{
-		Buffer<char>	 buffer(MAX_PATH);
+		Buffer<char>	 buffer(MAX_PATH + 1);
 
 		SHGetPathFromIDListA(idlist, buffer);
 
@@ -391,13 +410,24 @@ S::String S::System::System::GetTempDirectory()
 {
 	String	 tempDir;
 
-#ifdef __WIN32__
+#if defined __WIN32__
 	/* We need to use the ANSI version of GetTempPath, because
 	 * the Unicode version is not compatible with MSLU.
 	 */
-	Buffer<char>	 buffer(MAX_PATH);
+	Buffer<char>	 buffer(MAX_PATH + 1);
 
 	GetTempPathA(buffer.Size(), buffer);
+
+	tempDir = buffer;
+#elif defined __HAIKU__
+	FILE		*pstdin = popen("finddir B_COMMON_TEMP_DIRECTORY", "r");
+	Buffer<char>	 buffer(PATH_MAX + 1);
+
+	buffer.Zero();
+
+	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+	pclose(pstdin);
 
 	tempDir = buffer;
 #else

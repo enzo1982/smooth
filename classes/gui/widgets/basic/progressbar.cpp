@@ -19,8 +19,11 @@ S::GUI::Progressbar::Progressbar(const Point &iPos, const Size &iSize, Int sType
 {
 	type		= classID;
 	subtype		= sType;
+
 	startValue	= rangeStart;
 	endValue	= rangeEnd;
+
+	value		= startValue;
 
 	SetFlags(iTextFlag);
 	SetValue(iValue);
@@ -138,7 +141,7 @@ S::Int S::GUI::Progressbar::GetValue()
 
 S::Void S::GUI::Progressbar::CreateGradient(const Size &gSize)
 {
-	gradient.CreateBitmap(gSize.cx - 2, gSize.cy - 2, 24);
+	gradient.CreateBitmap(gSize.cx - 2, gSize.cy - 2);
 
 	Int	 rs	= Setup::GradientStartColor.GetRed();
 	Int	 gs	= Setup::GradientStartColor.GetGreen();

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,6 +21,7 @@ namespace smooth
 
 #include "../windowbackend.h"
 #include "../../../../graphics/forms/rect.h"
+#include "../../../../input/keyboard.h"
 
 namespace X11
 {
@@ -35,6 +36,8 @@ namespace X11
 #		undef False
 #		undef Bool
 #		undef Success
+
+#		include <X11/keysym.h>
 	}
 };
 
@@ -51,6 +54,8 @@ namespace smooth
 
 				X11::Display				*display;
 				X11::XIM				 im;
+
+				WindowXLib				*FindLeaderWindow();
 			protected:
 				Int					 id;
 
@@ -71,7 +76,7 @@ namespace smooth
 
 				Void					 UpdateWMNormalHints();
 
-				Key					 ConvertKey(Int);
+				Input::Keyboard::Key			 ConvertKey(Int);
 			public:
 									 WindowXLib(Void * = NIL);
 									~WindowXLib();
@@ -84,6 +89,8 @@ namespace smooth
 
 				Int					 Open(const String &, const Point &, const Size &, Int);
 				Int					 Close();
+
+				Int					 RequestClose();
 
 				Int					 SetTitle(const String &);
 

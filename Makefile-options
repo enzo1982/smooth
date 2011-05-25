@@ -51,8 +51,27 @@ ifeq ($(UNAME),Linux)
 	BUILD_LINUX = True
 else ifeq ($(UNAME),FreeBSD)
 	BUILD_FREEBSD = True
+else ifeq ($(UNAME),OpenBSD)
+	BUILD_OPENBSD = True
+
+# 	Enable threads based timers
+	BUILD_POSIXTIMER = False
+	BUILD_THREADSTIMER = True
+else ifeq ($(UNAME),NetBSD)
+	BUILD_NETBSD = True
 else ifeq ($(UNAME),SunOS)
 	BUILD_SOLARIS = True
+else ifeq ($(UNAME),Haiku)
+	BUILD_HAIKU = True
+
+# 	Enable threads based timers
+	BUILD_POSIXTIMER = False
+	BUILD_THREADSTIMER = True
+else ifeq ($(UNAME),QNX)
+	BUILD_QNX = True
+
+#	Disable Cairo graphics backend
+	BUILD_CAIRO = False
 else ifeq ($(UNAME),Darwin)
 	SHARED = .dylib
 

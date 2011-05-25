@@ -9,8 +9,6 @@ include $(SMOOTH_PATH)/Makefile-options
 ifneq ($(BUILD_WIN32),True)
 ifeq ($(BUILD_OSX),True)
 	MYCCOPTS += -I/usr/include/libxml2
-else ifeq ($(BUILD_SOLARIS),True)
-	MYCCOPTS += -I/usr/include/libxml2
 else
 	MYCCOPTS += $(shell pkg-config --cflags libxml-2.0)
 endif

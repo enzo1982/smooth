@@ -333,7 +333,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 {
 	Surface		*surface = dlgwnd->GetDrawSurface();
 	Rect		 rect;
-	Bitmap		 bmp(256, 256, 24);
+	Bitmap		 bmp(256, 256);
 	Rect		 urect = dlgwnd->GetUpdateRect();
 	Int		 hssize = 205;
 	double		 huebias = 256 / (double) hssize;

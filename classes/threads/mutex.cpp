@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -49,19 +49,10 @@ S::Void *S::Threads::Mutex::GetSystemMutex() const
 
 S::Int S::Threads::Mutex::Lock()
 {
-	/* Lock the mutex only if we are running multiple Threads
-	 */
-	if (Threads::Thread::GetNOfRunningThreads() > 0)
-	{
-		return backend->Lock();
-	}
-
-	return Success();
+	return backend->Lock();
 }
 
 S::Int S::Threads::Mutex::Release()
 {
-	/* This is save even if we didn't call Lock() before
-	 */
 	return backend->Release();
 }

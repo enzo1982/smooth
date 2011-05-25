@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -76,7 +76,8 @@ S::Bool S::GUI::BitmapGDI::CreateBitmap(Int cx, Int cy, Int bpp)
 {
 	DeleteBitmap();
 
-	if (bpp != 24 && bpp != 32) bpp = 32;
+	if (bpp == -1)		    bpp = 24;
+	if (bpp != 24 && bpp != 32) bpp = 24;
 
 	UnsignedByte	*buffer = new UnsignedByte [sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)];
 	BITMAPINFO	*bmpInfo = (BITMAPINFO *) buffer;

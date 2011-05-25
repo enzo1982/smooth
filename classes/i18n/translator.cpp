@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -321,7 +321,7 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 
 const S::String &S::I18n::Translator::TranslateString(const String &string, const String &context)
 {
-	const String	&prevContext = activeLanguage->GetContext();
+	String	prevContext = activeLanguage->GetContext();
 
 	if (context != NIL) activeLanguage->SetContext(context);
 

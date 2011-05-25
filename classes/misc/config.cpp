@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -136,7 +136,7 @@ S::Int S::Configuration::Close()
 	return Success();
 }
 
-S::Int S::Configuration::SetActiveConfiguration(const String &nConfig)
+S::Int S::Configuration::AddConfiguration(const String &nConfig)
 {
 	if (configFile == NIL) return Error();
 
@@ -145,24 +145,84 @@ S::Int S::Configuration::SetActiveConfiguration(const String &nConfig)
 	if (configuration == NIL)
 	{
 		configFile->GetRootNode()->AddNode("configuration")->SetAttribute("name", nConfig);
+
+		return Success();
 	}
 
-	activeConfig = nConfig;
-
-	return Success();
+	return Error();
 }
 
-S::Int S::Configuration::SetConfigurationName(const String &nName)
+S::Int S::Configuration::RemoveConfiguration(const String &rConfig)
 {
 	if (configFile == NIL) return Error();
 
-	XML::Node	*configuration = FindConfigurationNode(activeConfig);
+	XML::Node	*configuration = FindConfigurationNode(rConfig);
 
-	if (configuration == NIL) return Error();
+	if (configuration != NIL)
+	{
+		if (activeConfig == rConfig) SetActiveConfiguration("default");
 
-	activeConfig = nName;
+		configFile->GetRootNode()->RemoveNode(configuration);
 
-	configuration->SetAttribute("name", nName);
+		return Success();
+	}
+
+	return Error();
+}
+
+S::Int S::Configuration::GetNOfConfigurations()
+{
+	XML::Node	*root = configFile->GetRootNode();
+
+	if (root == NIL) return 0;
+
+	Int	 count = 0;
+
+	for (Int i = 0; i < root->GetNOfNodes(); i++)
+	{
+		XML::Node	*node = root->GetNthNode(i);
+
+		if (node->GetName() != "configuration") continue;
+
+		count++;
+	}
+
+	return count;
+}
+
+S::String S::Configuration::GetNthConfigurationName(Int n)
+{
+	XML::Node	*root = configFile->GetRootNode();
+
+	if (root == NIL) return NIL;
+
+	Int	 count = 0;
+
+	for (Int i = 0; i < root->GetNOfNodes(); i++)
+	{
+		XML::Node	*node = root->GetNthNode(i);
+
+		if (node->GetName() != "configuration") continue;
+
+		if (count++ == n)
+		{
+			if (node->GetAttributeByName("name") != NIL) return node->GetAttributeByName("name")->GetContent();
+			else					     return NIL;
+		}
+	}
+
+	return NIL;
+}
+
+S::Int S::Configuration::SetActiveConfiguration(const String &nConfig)
+{
+	if (configFile == NIL) return Error();
+
+	XML::Node	*configuration = FindConfigurationNode(nConfig);
+
+	if (configuration == NIL) AddConfiguration(nConfig);
+
+	activeConfig = nConfig;
 
 	return Success();
 }
@@ -176,6 +236,32 @@ S::Int S::Configuration::SetParentConfiguration(const String &nParent)
 	if (configuration == NIL) return Error();
 
 	configuration->SetAttribute("inheriting", nParent);
+
+	return Success();
+}
+
+S::String S::Configuration::GetConfigurationName()
+{
+	if (configFile == NIL) return NIL;
+
+	XML::Node	*configuration = FindConfigurationNode(activeConfig);
+
+	if (configuration == NIL) return NIL;
+
+	return activeConfig;
+}
+
+S::Int S::Configuration::SetConfigurationName(const String &nName)
+{
+	if (configFile == NIL) return Error();
+
+	XML::Node	*configuration = FindConfigurationNode(activeConfig);
+
+	if (configuration == NIL) return Error();
+
+	activeConfig = nName;
+
+	configuration->SetAttribute("name", nName);
 
 	return Success();
 }

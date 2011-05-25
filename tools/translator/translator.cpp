@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -166,29 +166,31 @@ String Translator::GetShortFileName(const String &fileName)
 
 Bool Translator::ExitProc()
 {
-	if (fileName != NIL && modified)
-	{
-		Int	 id = QuickMessage(String("Do you want to save changes in ").Append(GetShortFileName(fileName)).Append("?"), "smooth Translator", MB_YESNOCANCEL, IDI_QUESTION);
+	if (entries.Length() == 0) return True;
 
-		switch (id)
-		{
-			case IDYES:
-				SaveFile();
-				CloseFile();
-
-				return True;
-			case IDNO:
-				CloseFile();
-
-				return True;
-			case IDCANCEL:
-			case IDCLOSE:
-				return False;
-		}
-	}
-	else if (fileName != NIL && !modified)
+	if (!modified)
 	{
 		CloseFile();
+
+		return True;
+	}
+
+	Int	 id = QuickMessage(String("Do you want to save changes in ").Append(GetShortFileName(fileName)).Append("?"), "smooth Translator", MB_YESNOCANCEL, IDI_QUESTION);
+
+	switch (id)
+	{
+		case IDYES:
+			SaveFile();
+			CloseFile();
+
+			return True;
+		case IDNO:
+			CloseFile();
+
+			return True;
+		case IDCANCEL:
+		case IDCLOSE:
+			return False;
 	}
 
 	return True;
@@ -318,9 +320,11 @@ Void Translator::CloseFile()
 
 	list_entries->RemoveAllEntries();
 
-	for (Int i = 0; i < numInfoItems; i++) DeleteObject(entries.GetNth(i));
+	for (Int i = 0; i < numInfoItems;	     i++) DeleteObject(entries.GetNth(i));
+	for (Int i = 0; i < createdEntries.Length(); i++) DeleteObject(createdEntries.GetNth(i));
 
 	entries.RemoveAll();
+	createdEntries.RemoveAll();
 
 	delete dataSection;
 
@@ -358,6 +362,8 @@ Void Translator::OpenFile()
 	{
 		OpenFileName(dialog->GetFileName());
 	}
+
+	DeleteObject(dialog);
 }
 
 Int Translator::OpenTemplate(const String &fileName)
@@ -488,7 +494,7 @@ Void Translator::SaveFileAs()
 		wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION).Append(" - ").Append(GetShortFileName(fileName)));
 	}
 
-	delete dialog;
+	DeleteObject(dialog);
 }
 
 Void Translator::SaveFileName(const String &file)
@@ -657,6 +663,7 @@ Void Translator::SaveData()
 			list_entries->Add(entry);
 
 			entries.Add(entry, entry->GetID());
+			createdEntries.Add(entry, entry->GetID());
 		}
 
 		GUI::Font	 redFont;
@@ -667,7 +674,7 @@ Void Translator::SaveData()
 		if (entry->GetTranslation() == NIL)	entry->SetFont(redFont);
 		else					entry->SetFont(blackFont);
 
-		entry = NULL;
+		entry = NIL;
 
 		for (Int j = numInfoItems; j < entries.Length(); j++)
 		{
@@ -683,7 +690,7 @@ Void Translator::SaveData()
 			}
 		}
 
-		if (entry == NULL)
+		if (entry == NIL)
 		{
 			edit_id->SetText(String::FromInt(edit_id->GetText().ToInt() + 1));
 			edit_original->SetText(NIL);
@@ -757,12 +764,18 @@ Void Translator::NewEntry()
 Void Translator::RemoveEntry()
 {
 	StringItem	*entry = (StringItem *) list_entries->GetSelectedEntry();
+	Int		 id    = entry->GetID();
 
-	entries.Remove(entry->GetID());
+	entries.Remove(id);
 
 	list_entries->Remove(entry);
 
-	DeleteObject(entry);
+	if (createdEntries.Get(id) != NIL)
+	{
+		DeleteObject(entry);
+
+		createdEntries.Remove(id);
+	}
 
 	edit_original->SetText(NIL);
 	edit_translated->SetText(NIL);

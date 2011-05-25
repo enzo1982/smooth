@@ -66,8 +66,12 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 
 	if (handle == NIL)
 	{
-#ifdef __APPLE__
-		const char	*directories[] = { "/usr/lib", "/opt/local/lib", NIL };
+#if defined __APPLE__
+		const char	*directories[] = { "/usr/lib", "/usr/local/lib", "/opt/local/lib", "/sw/lib", NIL };
+#elif defined __HAIKU__
+		const char	*directories[] = { "/boot/common/lib", NIL };
+#elif defined __NetBSD__
+		const char	*directories[] = { "/usr/lib", "/usr/local/lib", "/usr/pkg/lib", NIL };
 #else
 		const char	*directories[] = { "/usr/lib", "/usr/local/lib", NIL };
 #endif
@@ -110,7 +114,15 @@ S::System::DynamicLoader::~DynamicLoader()
 #ifdef __WIN32__
 	if (handle != NIL) FreeLibrary((HINSTANCE) handle);
 #else
+#if defined __NetBSD__ || defined __HAIKU__
+	/* NetBSD and Haiku do not support RTLD_NODELETE yet,
+	 * so we cannot close .so files without risking a crash.
+	 *
+	 * ToDo: Fix this for NetBSD once release 6.0 is out.
+	 */
+#else
 	if (handle != NIL) dlclose(handle);
+#endif
 #endif
 }
 

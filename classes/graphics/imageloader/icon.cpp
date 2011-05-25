@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,7 +38,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderIcon::Load()
 			else				icon = (HICON) LoadImageA(hInstance, MAKEINTRESOURCEA(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 		}
 
-		Bitmap	 nBitmap(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), 24);
+		Bitmap	 nBitmap(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
 
 		HDC	 dc = CreateCompatibleDC(NIL);
 		HBRUSH	 brush = CreateSolidBrush(Setup::BackgroundColor);

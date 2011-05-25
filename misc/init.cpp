@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,19 +8,18 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/init.h>
-#include <smooth/resources.h>
 #include <smooth/backends/backend.h>
-#include <smooth/system/multimonitor.h>
 #include <smooth/templates/nonblocking.h>
 #include <smooth/i18n/translator_internal.h>
 #include <smooth/graphics/font.h>
+#include <smooth/init.h>
+#include <smooth/foreach.h>
+#include <smooth/resources.h>
 
 #if defined __WIN32__
 #	include <smooth/init.win32.h>
 
 #	include <wtypes.h>
-#	include <shlobj.h>
 
 #	include <smooth/backends/win32/backendwin32.h>
 #else
@@ -29,16 +28,14 @@
 
 #include <iconv.h>
 
-using namespace smooth::Backends;
-
-__declspec (dllexport) S::String	 S::szCmdLine		= NIL;
+static S::Array<S::Int (*)(), S::Void *>	*initFunctions = NIL;
+static S::Array<S::Int (*)(), S::Void *>	*freeFunctions = NIL;
 
 #if defined __WIN32__
-__declspec (dllexport) HINSTANCE	 S::hInstance		= NIL;
-__declspec (dllexport) HINSTANCE	 S::hPrevInstance	= NIL;
-__declspec (dllexport) int		 S::iCmdShow		= 0;
+__declspec (dllexport) HINSTANCE	 S::hInstance	  = NIL;
+__declspec (dllexport) HINSTANCE	 S::hPrevInstance = NIL;
 
-__declspec (dllexport) HICON	 S::SMOOTHICON = NIL;
+__declspec (dllexport) HICON		 S::SMOOTHICON	  = NIL;
 
 int CALLBACK EnumFontProcA(ENUMLOGFONTEXA *lpelfe, NEWTEXTMETRICEXA *lpntme, int fontType, LPARAM lParam)
 {
@@ -66,27 +63,54 @@ S::Bool	 S::initializing = S::True;
 
 S::Int	 initCount = 0;
 
-S::Void S::Init()
+S::Int S::AddInitFunction(Int (*initFunction)())
 {
-	if (initCount++) return;
+	if (initFunction == NIL) return Error();
 
-	Backend::InitBackends();
+	if (initFunctions == NIL) initFunctions = new Array<Int (*)(), Void *>;
 
-	System::MultiMonitor::Initialize();
+	initFunctions->Add(initFunction);
 
-	Int	 codePage = 1252;
+	return Success();
+}
 
-#if defined __WIN32__
-	codePage = GetACP();
-#endif
+S::Int S::AddFreeFunction(Int (*freeFunction)())
+{
+	if (freeFunction == NIL) return Error();
 
-	String::SetInputFormat(String("CP").Append(String::FromInt(codePage)));
-	String::SetOutputFormat(String("CP").Append(String::FromInt(codePage)));
+	if (freeFunctions == NIL) freeFunctions = new Array<Int (*)(), Void *>;
+
+	freeFunctions->Add(freeFunction);
+
+	return Success();
+}
+
+S::Bool S::Init()
+{
+	if (initCount++) return True;
+
+	/* Init system backends.
+	 */
+	if (Backends::Backend::InitBackends() == Error()) return False;
+
+	/* Call registered init functions.
+	 */
+	foreach (Int (*initFunction)(), (*initFunctions))
+	{
+		if (initFunction() != Success())
+		{
+			/* Deinit system backends.
+			 */
+			Backends::Backend::DeinitBackends();
+
+			return False;
+		}
+	}
 
 #if defined __WIN32__
 	if (hDllInstance == NIL) hDllInstance = hInstance;
 
-	/* Decide if we want to use unicode:
+	/* Decide if we want to use unicode.
 	 */
 	{
 		OSVERSIONINFOA	 vInfo;
@@ -104,40 +128,39 @@ S::Void S::Init()
 			HMODULE	 hUnicows = LoadLibraryA("unicows.dll");
 
 			if (hUnicows != NIL) Setup::enableUnicode = True;
-			else		     Setup::enableUnicode = False;
 
 			FreeLibrary(hUnicows);
 		}
 	}
 
-	CoInitialize(NIL);
-
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
-	if (LoadIconvDLL() == True)	Setup::useIconv = True;
-	else				Setup::useIconv = False;
-#else
-	Setup::enableUnicode = True;
-	Setup::useIconv	     = True;
-#endif
+	if (LoadIconvDLL() == True) Setup::useIconv = True;
 
-#if defined __WIN32__ && !defined __WINE__
+#if !defined __WINE__
 	use_iconv = (Setup::useIconv ? 1 : 0);
 #endif
+#endif
 
+	/* Get default colors and fonts.
+	 */
 	GetColors();
 	GetDefaultFont();
 
+	/* Init internationalization system.
+	 */
 	I18n::Translator::defaultTranslator = new I18n::TranslatorInternal();
 	I18n::Translator::defaultTranslator->SelectUserDefaultLanguage();
 
 	Setup::rightToLeft = I18n::Translator::defaultTranslator->IsActiveLanguageRightToLeft();
+
+	return True;
 }
 
 S::Void S::Free()
 {
 	/* Delete all remaining callers left
-	   from nonblocking function calls.
+	 * from nonblocking function calls.
 	 */
 	NonBlocking::CleanUp();
 
@@ -148,19 +171,22 @@ S::Void S::Free()
 
 	if (--initCount) return;
 
-#if defined __WIN32__
-	CoUninitialize();
-#endif
-
 	delete I18n::Translator::defaultTranslator;
 
 #if defined __WIN32__
 	if (Setup::useIconv) FreeIconvDLL();
 #endif
 
-	System::MultiMonitor::Free();
+	/* Call registered free functions.
+	 */
+	foreach (Int (*freeFunction)(), (*freeFunctions))
+	{
+		freeFunction();
+	}
 
-	Backend::DeinitBackends();
+	/* Deinit system backends.
+	 */
+	Backends::Backend::DeinitBackends();
 
 	/* All pending objects should be marked for
 	 * deletion now, so let's call ObjectCleanup()

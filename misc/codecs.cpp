@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,7 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/definitions.h>
-#include <smooth/codecs.h>
 #include <smooth/graphics/color.h>
 #include <smooth/pciio.h>
 #include <smooth/misc/math.h>
@@ -26,7 +25,23 @@ int	 bitssaa = 0;
 int	 bitsnrle = 0;
 int	 bitssaanrle = 0;
 
-bool CompressPCI(PCIOut out, PCIIO &ior)
+int	 GetSLAL(int [], int [], int);
+int	 DecompressSLAL(int [], int [], int);
+int	 GetRLE(int [], int, int, int);
+int	 GetVRLE(int [], int [], int, int, int);
+int	 ProbeComp(int, int, int [], int [], int, int, bool, int &, int &);
+int	 GetSAA(int [], int [], int);
+int	 GetDelta(int [], int [], int, int);
+int	 CompressDelta(int [], int [], int, int, PCIOut);
+int	 DecompressDelta(int [], int [], int, int, PCIIn);
+int	 GetMinimumBits(int);
+int	 GetMinimumTriples(int);
+int	 GetMinimumDecades(int);
+int	 RotatePalette(int);
+int	 RotatePaletteEntry(int);
+int	 GetPaletteEntry(int);
+
+bool PCIIO::CompressPCI(PCIOut out)
 {
 	IO::FilterBZip2	*filter = NULL;
 
@@ -35,24 +50,24 @@ bool CompressPCI(PCIOut out, PCIIO &ior)
 	bitssaa = 0;
 	bitsnrle = 0;
 	bitssaanrle = 0;
-	lastline = new int [ior.sizex];
+	lastline = new int [sizex];
 
-	for (int x1 = 0; x1 < ior.sizex; x1++) lastline[x1] = 0;
+	for (int x1 = 0; x1 < sizex; x1++) lastline[x1] = 0;
 	for (int x2 = 0; x2 < 338; x2++) palette[x2] = 0;
 
-	if (ior.compression == BZIP2)
+	if (compression == BZIP2)
 	{
 		filter = new IO::FilterBZip2();
 
 		out->AddFilter(filter);
 	}
 
-	for (int y = 0; y < ior.sizey; y++)
+	for (int y = 0; y < sizey; y++)
 	{
-		WriteLine(out, ior, y);
+		WriteLine(out, y);
 	}
 
-	if (ior.compression == BZIP2)
+	if (compression == BZIP2)
 	{
 		out->RemoveFilter(filter);
 
@@ -64,7 +79,7 @@ bool CompressPCI(PCIOut out, PCIIO &ior)
 	return true;
 }
 
-bool DecompressPCI(PCIIn in, PCIIO &ior)
+bool PCIIO::DecompressPCI(PCIIn in)
 {
 	IO::FilterBZip2	*filter = NULL;
 
@@ -73,24 +88,24 @@ bool DecompressPCI(PCIIn in, PCIIO &ior)
 	bitssaa = 0;
 	bitsnrle = 0;
 	bitssaanrle = 0;
-	lastline = new int [ior.sizex];
+	lastline = new int [sizex];
 
-	for (int x1 = 0; x1 < ior.sizex; x1++) lastline[x1] = 0;
+	for (int x1 = 0; x1 < sizex; x1++) lastline[x1] = 0;
 	for (int x2 = 0; x2 < 338; x2++) palette[x2] = 0;
 
-	if (ior.compression == BZIP2)
+	if (compression == BZIP2)
 	{
 		filter = new IO::FilterBZip2();
 
 		in->AddFilter(filter);
 	}
 
-	for (int y = 0; y < ior.sizey; y++)
+	for (int y = 0; y < sizey; y++)
 	{
-		ReadLine(in, ior, y);
+		ReadLine(in, y);
 	}
 
-	if (ior.compression == BZIP2)
+	if (compression == BZIP2)
 	{
 		in->RemoveFilter(filter);
 
@@ -102,9 +117,9 @@ bool DecompressPCI(PCIIn in, PCIIO &ior)
 	return true;
 }
 
-bool WriteLine(PCIOut out, PCIIO &ior, int y)
+bool PCIIO::WriteLine(PCIOut out, int y)
 {
-	int	*line = new int [ior.sizex];
+	int	*line = new int [sizex];
 	int	 rle;
 	int	 ctsize;
 	int	 dorle = 0;
@@ -119,7 +134,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 	int	 maxpalentries;
 	int	 x;
 
-	switch (ior.colorspace)
+	switch (colorspace)
 	{
 		case RGBA:
 		case YUV:
@@ -127,46 +142,55 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 		case CMY:
 			ctsize = 3;
 			maxpalentries = 338;
+
 			break;
 		case CMYK:
 			ctsize = 4;
 			maxpalentries = 338;
+
 			break;
 		case GRAY:
 			ctsize = 1;
 			maxpalentries = 338;
+
 			break;
 		default:
 			ctsize = 3;
 			maxpalentries = 338;
+
 			break;
 	}
 
-	for (x = 0; x < ior.sizex; x++)
+	for (x = 0; x < sizex; x++)
 	{
-		line[x] = Color(ior.bmp.GetPixel(Point(x, y))).ConvertTo(ior.colorspace).Downsample(ior.bpcc);
+		line[x] = Color(bmp.GetPixel(Point(x, y))).ConvertTo(colorspace).Downsample(bpcc);
 	}
 
-	switch (ior.compression)
+	switch (compression)
 	{
 		case BZIP2:
 		case UNCOMPRESSED:
-			for (x = 0; x < ior.sizex; x++)
+			for (x = 0; x < sizex; x++)
 			{
-				out->OutputNumberPBD(line[x], ctsize * ior.bpcc);
+				out->OutputNumberPBD(line[x], ctsize * bpcc);
 			}
+
 			break;
 		case RLE:
-			for (x = 0; x < ior.sizex; x++)
+			for (x = 0; x < sizex; x++)
 			{
-				out->OutputNumberPBD(line[x], ctsize * ior.bpcc);
-				rle = GetRLE(line, ior.sizex, x, ior.rlebits);
-				out->OutputNumberPBD(rle, ior.rlebits);
+				out->OutputNumberPBD(line[x], ctsize * bpcc);
+
+				rle = GetRLE(line, sizex, x, rlebits);
+
+				out->OutputNumberPBD(rle, rlebits);
+
 				x += rle;
 			}
+
 			break;
 		case PCI:
-			if (GetSLAL(line, lastline, ior.sizex))
+			if (GetSLAL(line, lastline, sizex))
 			{
 				out->OutputNumberPBD(1, 1);
 			}
@@ -174,8 +198,8 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 			{
 				out->OutputNumberPBD(0, 1);
 
-				ProbeComp(0, ior.sizex, line, lastline, ior.sizex, ctsize, false, bits, bitssaa);
-				ProbeComp(0, ior.sizex, line, lastline, ior.sizex, ctsize, true, bitsnrle, bitssaanrle);
+				ProbeComp(0, sizex, line, lastline, sizex, ctsize, false, bits, bitssaa);
+				ProbeComp(0, sizex, line, lastline, sizex, ctsize, true, bitsnrle, bitssaanrle);
 
 				if (bitssaa < bits)
 				{
@@ -210,10 +234,10 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 					}
 				}
 
-				for (x = 0; x < ior.sizex; x++)
+				for (x = 0; x < sizex; x++)
 				{
-					if (x == 0)	lastcol = 0;
-					else		lastcol = line[x-1];
+					if (x == 0) lastcol = 0;
+					else	    lastcol = line[x - 1];
 
 					if ((x % 16) == mod16)
 					{
@@ -221,11 +245,11 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 
 						for (int x2 = 0; x2 < 16; x2++)
 						{
-							if ((x+x2) < ior.sizex && GetPaletteEntry(line[x+x2]) == -1) { gallinpal = 0; break; }
+							if ((x + x2) < sizex && GetPaletteEntry(line[x + x2]) == -1) { gallinpal = 0; break; }
 						}
 
-						if (gallinpal == 1)	out->OutputNumberPBD(1, 1);
-						else			out->OutputNumberPBD(0, 1);
+						if (gallinpal == 1) out->OutputNumberPBD(1, 1);
+						else		    out->OutputNumberPBD(0, 1);
 					}
 
 					if (((x % 4) == mod04) && !gallinpal)
@@ -234,11 +258,11 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 
 						for (int x2 = 0; x2 < 4; x2++)
 						{
-							if ((x+x2) < ior.sizex && GetPaletteEntry(line[x+x2]) == -1) { allinpal = 0; break; }
+							if ((x + x2) < sizex && GetPaletteEntry(line[x + x2]) == -1) { allinpal = 0; break; }
 						}
 
-						if (allinpal == 1)	out->OutputNumberPBD(1, 1);
-						else			out->OutputNumberPBD(0, 1);
+						if (allinpal == 1) out->OutputNumberPBD(1, 1);
+						else		   out->OutputNumberPBD(0, 1);
 					}
 
 					if ((GetPaletteEntry(line[x]) == -1))
@@ -248,12 +272,13 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 						if (GetDelta(line, lastline, x, ctsize))
 						{
 							out->OutputNumberPBD(1, 1);
+
 							CompressDelta(line, lastline, x, ctsize, out);
 						}
 						else
 						{
 							out->OutputNumberPBD(0, 1);
-							out->OutputNumberPBD(line[x], ctsize*ior.bpcc);
+							out->OutputNumberPBD(line[x], ctsize * bpcc);
 						}
 
 						if (palentries < maxpalentries)
@@ -278,37 +303,43 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 						{
 							if (dosaa) out->OutputNumberPBD(0, 1);
 
-							if ((palentries-1)-GetPaletteEntry(line[x]) < 2)
+							if ((palentries - 1) - GetPaletteEntry(line[x]) < 2)
 							{
 								out->OutputNumberPBD(1, 1);
-								out->OutputNumberPBD((palentries-1)-GetPaletteEntry(line[x]), 1);
+								out->OutputNumberPBD((palentries - 1) - GetPaletteEntry(line[x]), 1);
 							}
 							else
 							{
 								out->OutputNumberPBD(0, 1);
 
-								if ((palentries-1)-GetPaletteEntry(line[x]) < 18)
+								if ((palentries - 1)-GetPaletteEntry(line[x]) < 18)
 								{
 									out->OutputNumberPBD(1, 1);
-									lbits = GetMinimumBits(palentries-2);
+
+									lbits = GetMinimumBits(palentries - 2);
+
 									if (lbits > 4) lbits = 4;
-									out->OutputNumberPBD((palentries-1)-GetPaletteEntry(line[x])-2, lbits);
+
+									out->OutputNumberPBD((palentries - 1) - GetPaletteEntry(line[x]) - 2, lbits);
 								}
 								else
 								{
 									out->OutputNumberPBD(0, 1);
 
-									if ((palentries-1)-GetPaletteEntry(line[x]) < 82)
+									if ((palentries - 1) - GetPaletteEntry(line[x]) < 82)
 									{
 										out->OutputNumberPBD(1, 1);
-										lbits = GetMinimumBits(palentries-18);
+
+										lbits = GetMinimumBits(palentries - 18);
+
 										if (lbits > 6) lbits = 6;
-										out->OutputNumberPBD((palentries-1)-GetPaletteEntry(line[x])-18, lbits);
+
+										out->OutputNumberPBD((palentries - 1)-GetPaletteEntry(line[x]) - 18, lbits);
 									}
 									else
 									{
 										out->OutputNumberPBD(0, 1);
-										out->OutputNumberPBD((palentries-1)-GetPaletteEntry(line[x])-82, GetMinimumBits(palentries-83));
+										out->OutputNumberPBD((palentries - 1)-GetPaletteEntry(line[x]) - 82, GetMinimumBits(palentries - 83));
 									}
 								}
 							}
@@ -319,11 +350,12 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 
 					if (line[x] == lastcol)
 					{
-						pcirle = GetRLE(line, ior.sizex, x, 8);
+						pcirle = GetRLE(line, sizex, x, 8);
 
 						if (pcirle >= 2)
 						{
 							out->OutputNumberPBD(1, 1);
+
 							if (pcirle > 9)
 							{
 								out->OutputNumberPBD(1, 1);
@@ -334,9 +366,12 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 								out->OutputNumberPBD(0, 1);
 								out->OutputNumberPBD(pcirle - 2, 3);
 							}
+
 							x = x + pcirle;
+
 							allinpal = 0;
 							gallinpal = 0;
+
 							mod04 = (x + 1) %  4;
 							mod16 = (x + 1) % 16;
 						}
@@ -347,11 +382,12 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 					}
 					else if ((line[x] == lastline[x]) && dorle)
 					{
-						pcirle = GetVRLE(line, lastline, ior.sizex, x, 8);
+						pcirle = GetVRLE(line, lastline, sizex, x, 8);
 
 						if (pcirle >= 2)
 						{
 							out->OutputNumberPBD(1, 1);
+
 							if (pcirle > 9)
 							{
 								out->OutputNumberPBD(1, 1);
@@ -362,9 +398,12 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 								out->OutputNumberPBD(0, 1);
 								out->OutputNumberPBD(pcirle - 2, 3);
 							}
+
 							x = x + pcirle;
+
 							allinpal = 0;
 							gallinpal = 0;
+
 							mod04 = (x + 1) %  4;
 							mod16 = (x + 1) % 16;
 						}
@@ -376,7 +415,7 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 				}
 			}
 
-			for (x = 0; x < ior.sizex; x++) lastline[x] = line[x];
+			for (x = 0; x < sizex; x++) lastline[x] = line[x];
 
 			break;
 		default:
@@ -388,9 +427,9 @@ bool WriteLine(PCIOut out, PCIIO &ior, int y)
 	return true;
 }
 
-bool ReadLine(PCIIn in, PCIIO &ior, int y)
+bool PCIIO::ReadLine(PCIIn in, int y)
 {
-	int	*line = new int [ior.sizex];
+	int	*line = new int [sizex];
 	int	 rle;
 	int	 col;
 	int	 ctsize;
@@ -408,7 +447,7 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 	int	 maxpalentries;
 	int	 x;
 
-	switch (ior.colorspace)
+	switch (colorspace)
 	{
 		case RGBA:
 		case YUV:
@@ -416,35 +455,40 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 		case CMY:
 			ctsize = 3;
 			maxpalentries = 338;
+
 			break;
 		case CMYK:
 			ctsize = 4;
 			maxpalentries = 338;
+
 			break;
 		case GRAY:
 			ctsize = 1;
 			maxpalentries = 338;
+
 			break;
 		default:
 			ctsize = 3;
 			maxpalentries = 338;
+
 			break;
 	}
 
-	switch (ior.compression)
+	switch (compression)
 	{
 		case BZIP2:
 		case UNCOMPRESSED:
-			for (x = 0; x < ior.sizex; x++)
+			for (x = 0; x < sizex; x++)
 			{
-				line[x] = in->InputNumberPBD(ctsize * ior.bpcc);
+				line[x] = in->InputNumberPBD(ctsize * bpcc);
 			}
+
 			break;
 		case RLE:
-			for (x = 0; x < ior.sizex; x++)
+			for (x = 0; x < sizex; x++)
 			{
-				col = in->InputNumberPBD(ctsize * ior.bpcc);
-				rle = in->InputNumberPBD(ior.rlebits);
+				col = in->InputNumberPBD(ctsize * bpcc);
+				rle = in->InputNumberPBD(rlebits);
 
 				for (int i = x; i <= x + rle; i++)
 				{
@@ -453,21 +497,22 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 
 				x += rle;
 			}
+
 			break;
 		case PCI:
 			if (in->InputNumberPBD(1) == 1)
 			{
-				DecompressSLAL(line, lastline, ior.sizex);
+				DecompressSLAL(line, lastline, sizex);
 			}
 			else
 			{
 				dosaa = in->InputNumberPBD(1);
 				dorle = in->InputNumberPBD(1);
 
-				for (x = 0; x < ior.sizex; x++)
+				for (x = 0; x < sizex; x++)
 				{
 					if (x == 0)	lastcol = 0;
-					else		lastcol = line[x-1];
+					else		lastcol = line[x - 1];
 
 					if ((x % 16) == mod16)
 					{
@@ -479,8 +524,8 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 						allinpal = in->InputNumberPBD(1);
 					}
 
-					if (allinpal || gallinpal)	inpal = 1;
-					else				inpal = in->InputNumberPBD(1);
+					if (allinpal || gallinpal) inpal = 1;
+					else			   inpal = in->InputNumberPBD(1);
 
 					if (inpal == 0)
 					{
@@ -490,7 +535,7 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 						}
 						else
 						{
-							col = in->InputNumberPBD(ctsize*ior.bpcc);
+							col = in->InputNumberPBD(ctsize * bpcc);
 						}
 
 						if (palentries < maxpalentries)
@@ -505,8 +550,8 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 					}
 					else
 					{
-						if (dosaa)	saa = in->InputNumberPBD(1);
-						else		saa = 0;
+						if (dosaa) saa = in->InputNumberPBD(1);
+						else	   saa = 0;
 
 						if (saa)
 						{
@@ -516,27 +561,31 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 						{
 							if (in->InputNumberPBD(1) == 1)
 							{
-								col = palette[(palentries-1)-in->InputNumberPBD(1)];
+								col = palette[(palentries - 1) - in->InputNumberPBD(1)];
 							}
 							else
 							{
 								if (in->InputNumberPBD(1) == 1)
 								{
-									lbits = GetMinimumBits(palentries-2);
+									lbits = GetMinimumBits(palentries - 2);
+
 									if (lbits > 4) lbits = 4;
-									col = palette[(palentries-1)-in->InputNumberPBD(lbits)-2];
+
+									col = palette[(palentries - 1) - in->InputNumberPBD(lbits) - 2];
 								}
 								else
 								{
 									if (in->InputNumberPBD(1) == 1)
 									{
-										lbits = GetMinimumBits(palentries-18);
+										lbits = GetMinimumBits(palentries - 18);
+
 										if (lbits > 6) lbits = 6;
-										col = palette[(palentries-1)-in->InputNumberPBD(lbits)-18];
+
+										col = palette[(palentries - 1) - in->InputNumberPBD(lbits) - 18];
 									}
 									else
 									{
-										col = palette[(palentries-1)-in->InputNumberPBD(GetMinimumBits(palentries-83))-82];
+										col = palette[(palentries - 1) - in->InputNumberPBD(GetMinimumBits(palentries - 83)) - 82];
 									}
 								}
 							}
@@ -566,8 +615,10 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 							}
 
 							x = x + pcirle;
+
 							allinpal = 0;
 							gallinpal = 0;
+
 							mod04 = (x + 1) %  4;
 							mod16 = (x + 1) % 16;
 						}
@@ -591,8 +642,10 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 							}
 
 							x = x + pcirle;
+
 							allinpal = 0;
 							gallinpal = 0;
+
 							mod04 = (x + 1) %  4;
 							mod16 = (x + 1) % 16;
 						}
@@ -600,23 +653,22 @@ bool ReadLine(PCIIn in, PCIIO &ior, int y)
 				}
 			}
 
-			for (x = 0; x < ior.sizex; x++) lastline[x] = line[x];
+			for (x = 0; x < sizex; x++) lastline[x] = line[x];
 
 			break;
 		default:
 			break;
 	}
 
-	for (x = 0; x < ior.sizex; x++)
+	for (x = 0; x < sizex; x++)
 	{
-		ior.bmp.SetPixel(Point(x, y), Color(line[x], ior.colorspace).Upsample(ior.bpcc).ConvertTo(RGBA));
+		bmp.SetPixel(Point(x, y), Color(line[x], colorspace).Upsample(bpcc).ConvertTo(RGBA));
 	}
 
 	delete [] line;
 
 	return true;
 }
-
 
 int GetSLAL(int line[], int prevline[], int sx)
 {
@@ -647,7 +699,8 @@ int GetRLE(int line[], int sx, int x, int maxbits)
 	for (int i = x + 1; i < x + Math::Pow(2l, maxbits); i++)
 	{
 		if (line[i] == line[x]) rle++;
-		else break;
+		else			break;
+
 		if (i == sx - 1) break;
 	}
 
@@ -663,7 +716,8 @@ int GetVRLE(int line[], int prevline[], int sx, int x, int maxbits)
 	for (int i = x + 1; i < x + Math::Pow(2l, maxbits); i++)
 	{
 		if (line[i] == prevline[i]) rle++;
-		else break;
+		else			    break;
+
 		if (i == sx - 1) break;
 	}
 
@@ -673,15 +727,16 @@ int GetVRLE(int line[], int prevline[], int sx, int x, int maxbits)
 int GetSAA(int line[], int prevline[], int x)
 {
 	if (line[x] == prevline[x]) return 1;
+
 	return 0;
 }
 
 int GetDelta(int line[], int prevline[], int x, int parts)
 {
-	int pixb1;
+	int	 pixb1;
 
 	if (x == 0) pixb1 = 0;
-	else pixb1 = line[x-1];
+	else	    pixb1 = line[x - 1];
 
 	int	 bias;
 	int	 redbias;
@@ -692,7 +747,7 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 	switch (parts)
 	{
 		case 1:
-			bias = line[x]-(pixb1+prevline[x])/2;
+			bias = line[x] - (pixb1 + prevline[x]) / 2;
 
 			if ((bias > -Math::Pow(2l, 3)) && (bias <= Math::Pow(2l, 3)))
 			{
@@ -701,9 +756,9 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 
 			break;
 		case 3:
-			redbias = Color(line[x]).GetRed()-(Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
-			greenbias = Color(line[x]).GetGreen()-(Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
-			bluebias = Color(line[x]).GetBlue()-(Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
+			redbias	  = Color(line[x]).GetRed()   - (Color(pixb1).GetRed()	 + Color(prevline[x]).GetRed())	  / 2;
+			greenbias = Color(line[x]).GetGreen() - (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
+			bluebias  = Color(line[x]).GetBlue()  - (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
 
 			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))))
 			{
@@ -712,10 +767,10 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 
 			break;
 		case 4:
-			redbias = Color(line[x]).GetRed()-(Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
-			greenbias = Color(line[x]).GetGreen()-(Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
-			bluebias = Color(line[x]).GetBlue()-(Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
-			alphabias = Color(line[x]).GetAlpha()-(Color(pixb1).GetAlpha()+Color(prevline[x]).GetAlpha())/2;
+			redbias	  = Color(line[x]).GetRed()   - (Color(pixb1).GetRed()	 + Color(prevline[x]).GetRed())	  / 2;
+			greenbias = Color(line[x]).GetGreen() - (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
+			bluebias  = Color(line[x]).GetBlue()  - (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
+			alphabias = Color(line[x]).GetAlpha() - (Color(pixb1).GetAlpha() + Color(prevline[x]).GetAlpha()) / 2;
 
 			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))) && ((alphabias > -Math::Pow(2l, 5)) && (alphabias <= Math::Pow(2l, 5))))
 			{
@@ -733,7 +788,7 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 	int pixb1;
 
 	if (x == 0) pixb1 = 0;
-	else pixb1 = line[x-1];
+	else	    pixb1 = line[x - 1];
 
 	int	 md = 0;
 	int	 bias;
@@ -760,9 +815,9 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 
 			break;
 		case 3:
-			redbias = Color(line[x]).GetRed()-(Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
-			greenbias = Color(line[x]).GetGreen()-(Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
-			bluebias = Color(line[x]).GetBlue()-(Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
+			redbias	  = Color(line[x]).GetRed()   - (Color(pixb1).GetRed()	 + Color(prevline[x]).GetRed())	  / 2;
+			greenbias = Color(line[x]).GetGreen() - (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
+			bluebias  = Color(line[x]).GetBlue()  - (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
 
 			if (((redbias > -Math::Pow(2l, 2)) && (redbias <= Math::Pow(2l, 2))) && ((greenbias > -Math::Pow(2l, 2)) && (greenbias <= Math::Pow(2l, 2))) && ((bluebias > -Math::Pow(2l, 2)) && (bluebias <= Math::Pow(2l, 2))))
 			{
@@ -788,40 +843,40 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 			if (redbias <= 0)
 			{
 				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0-redbias, md);
+				out->OutputNumberPBD(0 - redbias, md);
 			}
 			else
 			{
 				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(redbias-1, md);
+				out->OutputNumberPBD(redbias - 1, md);
 			}
 			if (greenbias <= 0)
 			{
 				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0-greenbias, md);
+				out->OutputNumberPBD(0 - greenbias, md);
 			}
 			else
 			{
 				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(greenbias-1, md);
+				out->OutputNumberPBD(greenbias - 1, md);
 			}
 			if (bluebias <= 0)
 			{
 				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0-bluebias, md);
+				out->OutputNumberPBD(0 - bluebias, md);
 			}
 			else
 			{
 				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(bluebias-1, md);
+				out->OutputNumberPBD(bluebias - 1, md);
 			}
 
 			break;
 		case 4:
-			redbias = Color(line[x]).GetRed()-(Color(pixb1).GetRed()+Color(prevline[x]).GetRed())/2;
-			greenbias = Color(line[x]).GetGreen()-(Color(pixb1).GetGreen()+Color(prevline[x]).GetGreen())/2;
-			bluebias = Color(line[x]).GetBlue()-(Color(pixb1).GetBlue()+Color(prevline[x]).GetBlue())/2;
-			alphabias = Color(line[x]).GetAlpha()-(Color(pixb1).GetAlpha()+Color(prevline[x]).GetAlpha())/2;
+			redbias	  = Color(line[x]).GetRed()   - (Color(pixb1).GetRed()	 + Color(prevline[x]).GetRed())	  / 2;
+			greenbias = Color(line[x]).GetGreen() - (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
+			bluebias  = Color(line[x]).GetBlue()  - (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
+			alphabias = Color(line[x]).GetAlpha() - (Color(pixb1).GetAlpha() + Color(prevline[x]).GetAlpha()) / 2;
 
 			if (((redbias > -Math::Pow(2l, 2)) && (redbias <= Math::Pow(2l, 2))) && ((greenbias > -Math::Pow(2l, 2)) && (greenbias <= Math::Pow(2l, 2))) && ((bluebias > -Math::Pow(2l, 2)) && (bluebias <= Math::Pow(2l, 2))) && ((alphabias > -Math::Pow(2l, 2)) && (alphabias <= Math::Pow(2l, 2))))
 			{
@@ -847,42 +902,42 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 			if (redbias <= 0)
 			{
 				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0-redbias, md);
+				out->OutputNumberPBD(0 - redbias, md);
 			}
 			else
 			{
 				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(redbias-1, md);
+				out->OutputNumberPBD(redbias - 1, md);
 			}
 			if (greenbias <= 0)
 			{
 				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0-greenbias, md);
+				out->OutputNumberPBD(0 - greenbias, md);
 			}
 			else
 			{
 				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(greenbias-1, md);
+				out->OutputNumberPBD(greenbias - 1, md);
 			}
 			if (bluebias <= 0)
 			{
 				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0-bluebias, md);
+				out->OutputNumberPBD(0 - bluebias, md);
 			}
 			else
 			{
 				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(bluebias-1, md);
+				out->OutputNumberPBD(bluebias - 1, md);
 			}
 			if (alphabias <= 0)
 			{
 				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0-alphabias, md);
+				out->OutputNumberPBD(0 - alphabias, md);
 			}
 			else
 			{
 				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(alphabias-1, md);
+				out->OutputNumberPBD(alphabias - 1, md);
 			}
 
 			break;
@@ -893,10 +948,10 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 
 int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 {
-	int pixb1;
+	int	 pixb1;
 
 	if (x == 0) pixb1 = 0;
-	else pixb1 = line[x-1];
+	else	    pixb1 = line[x - 1];
 
 	int	 md;
 	int	 bias;
@@ -926,9 +981,9 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 
 			return gray + bias;
 		case 3:
-			red = (Color(pixb1).GetRed() + Color(prevline[x]).GetRed()) / 2;
+			red   = (Color(pixb1).GetRed()	 + Color(prevline[x]).GetRed())	  / 2;
 			green = (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
-			blue = (Color(pixb1).GetBlue() + Color(prevline[x]).GetBlue()) / 2;
+			blue  = (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
 
 			md = in->InputNumberPBD(2) + 2;
 
@@ -961,9 +1016,9 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 
 			return Color(red + redbias, green + greenbias, blue + bluebias);
 		case 4:
-			red = (Color(pixb1).GetRed() + Color(prevline[x]).GetRed()) / 2;
+			red   = (Color(pixb1).GetRed()	 + Color(prevline[x]).GetRed())	  / 2;
 			green = (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
-			blue = (Color(pixb1).GetBlue() + Color(prevline[x]).GetBlue()) / 2;
+			blue  = (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
 			alpha = (Color(pixb1).GetAlpha() + Color(prevline[x]).GetAlpha()) / 2;
 
 			md = in->InputNumberPBD(2) + 2;
@@ -1042,12 +1097,12 @@ int GetMinimumDecades(int number)
 
 int RotatePalette(int color)
 {
-	for (int x = 0; x < palentries-1; x++)
+	for (int x = 0; x < palentries - 1; x++)
 	{
-		palette[x] = palette[x+1];
+		palette[x] = palette[x + 1];
 	}
 
-	palette[palentries-1] = color;
+	palette[palentries - 1] = color;
 
 	return 1;
 }
@@ -1068,7 +1123,7 @@ int RotatePaletteEntry(int entry)
 
 int GetPaletteEntry(int color)
 {
-	for (int i = palentries-1; i >= 0; i--)
+	for (int i = palentries - 1; i >= 0; i--)
 	{
 		if (palette[i] == color) return i;
 	}
@@ -1098,25 +1153,30 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 	{
 		saa = 0;
 
-		if (x == 0)	lastcol = 0;
-		else		lastcol = line[x-1];
+		if (x == 0) lastcol = 0;
+		else	    lastcol = line[x - 1];
 
 		if ((x % 16) == mod16)
 		{
 			gallinpal = 1;
+
 			for (int x2 = 0; x2 < 16; x2++)
 			{
-				if ((x+x2) < sx) if (GetPaletteEntry(line[x+x2]) == -1 )	{ gallinpal = 0; break; }
+				if ((x + x2) < sx) if (GetPaletteEntry(line[x + x2]) == -1 ) { gallinpal = 0; break; }
 			}
+
 			comp++;
 		}
+
 		if (((x % 4) == mod04) && !gallinpal)
 		{
 			allinpal = 1;
+
 			for (int x2 = 0; x2 < 4; x2++)
 			{
-				if ((x+x2) < sx) if (GetPaletteEntry(line[x+x2]) == -1 )	{ allinpal = 0; break; }
+				if ((x + x2) < sx) if (GetPaletteEntry(line[x + x2]) == -1 ) { allinpal = 0; break; }
 			}
+
 			comp++;
 		}
 
@@ -1130,6 +1190,7 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 			{
 				comp += 26;
 			}
+
 			if (palentries < 338)
 			{
 				palette[palentries] = line[x];
@@ -1148,42 +1209,52 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 
 			if (GetSAA(line, prevline, x)) saa = 1;
 
-			if ((palentries-1)-GetPaletteEntry(line[x]) < 2)
+			if ((palentries - 1) - GetPaletteEntry(line[x]) < 2)
 			{
 				comp += 2;
+
 				if (saa) compsaa -= 2;
 			}
 			else
 			{
-				if ((palentries-1)-GetPaletteEntry(line[x]) < 18)
+				if ((palentries - 1)-GetPaletteEntry(line[x]) < 18)
 				{
 					lbits = GetMinimumBits(palentries-2);
+
 					if (lbits > 4) bits = 4;
+
 					comp += (lbits + 2);
+
 					if (saa) compsaa -= (lbits + 2);
 				}
 				else
 				{
-					if ((palentries-1)-GetPaletteEntry(line[x]) < 82)
+					if ((palentries - 1) - GetPaletteEntry(line[x]) < 82)
 					{
-						lbits = GetMinimumBits(palentries-18);
+						lbits = GetMinimumBits(palentries - 18);
+
 						if (lbits > 6) lbits = 6;
+
 						comp += (lbits + 3);
+
 						if (saa) compsaa -= (lbits + 3);
 					}
 					else
 					{
-						comp += (GetMinimumBits(palentries-83)+3);
-						if (saa) compsaa -= (GetMinimumBits(palentries-83)+3);
+						comp += (GetMinimumBits(palentries - 83) + 3);
+
+						if (saa) compsaa -= (GetMinimumBits(palentries - 83) + 3);
 					}
 				}
 			}
+
 			RotatePaletteEntry(GetPaletteEntry(line[x]));
 		}
 
 		if (line[x] == lastcol)
 		{
 			pcirle = GetRLE(line, sx, x, 8);
+
 			if (pcirle >= 2)
 			{
 				if (pcirle > 9)
@@ -1194,9 +1265,12 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 				{
 					comp += 5;
 				}
+
 				x = x + pcirle;
+
 				allinpal = 0;
 				gallinpal = 0;
+
 				mod04 = (x + 1) %  4;
 				mod16 = (x + 1) % 16;
 			}
@@ -1208,6 +1282,7 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 		else if (line[x] == prevline[x] && !nvRLE)
 		{
 			pcirle = GetVRLE(line, prevline, sx, x, 8);
+
 			if (pcirle >= 2)
 			{
 				if (pcirle > 9)
@@ -1218,9 +1293,12 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 				{
 					comp += 5;
 				}
+
 				x = x + pcirle;
+
 				allinpal = 0;
 				gallinpal = 0;
+
 				mod04 = (x + 1) %  4;
 				mod16 = (x + 1) % 16;
 			}

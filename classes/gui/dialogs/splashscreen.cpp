@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,8 +15,6 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/gui/window/window.h>
-
-S::Int S::GUI::Dialogs::SplashScreen::nOfSplashScreens = 0;
 
 S::GUI::Dialogs::SplashScreen::SplashScreen(const GUI::Bitmap &iBitmap, Int iTime)
 {
@@ -47,8 +45,6 @@ S::GUI::Dialogs::SplashScreen::~SplashScreen()
 
 const Error &S::GUI::Dialogs::SplashScreen::ShowDialog()
 {
-	nOfSplashScreens++;
-
 	splashscreen->Show();
 
 	timer->Start(time);
@@ -74,8 +70,6 @@ S::Void S::GUI::Dialogs::SplashScreen::SplashPaintProc()
 S::Bool S::GUI::Dialogs::SplashScreen::SplashKillProc()
 {
 	timer->Stop();
-
-	nOfSplashScreens--;
 
 	return True;
 }

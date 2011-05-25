@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,6 +16,8 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
+#include <smooth/input/keyboard.h>
+#include <smooth/foreach.h>
 
 #ifdef __WIN32__
 #	include <windows.h>
@@ -135,6 +137,16 @@ S::GUI::Widget::~Widget()
 	delete nullSurface;
 }
 
+S::Int S::GUI::Widget::EnableLocking(Bool enable)
+{
+	if (enable) widgets.EnableLocking();
+	else	    widgets.DisableLocking();
+
+	foreach (Widget *widget, widgets) widget->EnableLocking(enable);
+
+	return Object::EnableLocking(enable);
+}
+
 S::Void S::GUI::Widget::EnqueueForDeletion()
 {
 	onEnqueueForDeletion.Emit();
@@ -153,6 +165,8 @@ S::Int S::GUI::Widget::Add(Widget *widget)
 	if (!widget->IsRegistered())
 	{
 		widgets.Add(widget, widget->GetHandle());
+
+		widget->EnableLocking(IsLockingEnabled());
 
 		widget->SetContainer(this);
 		widget->SetRegisteredFlag(True);
@@ -211,8 +225,8 @@ S::GUI::Window *S::GUI::Widget::GetContainerWindow() const
 
 S::GUI::Surface *S::GUI::Widget::GetDrawSurface() const
 {
-	if (IsRegistered())	return container->GetDrawSurface();
-	else			return drawSurface;
+	if (IsRegistered()) return container->GetDrawSurface();
+	else		    return drawSurface;
 }
 
 S::Int S::GUI::Widget::SetContainer(Widget *newContainer)
@@ -238,10 +252,8 @@ S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle) const
 
 	if (registered && widgetHandle != 0) lastTabstopObject = container->GetPreviousTabstopWidget(GetHandle());
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	foreach (Widget *widget, widgets)
 	{
-		Widget	*widget = GetNthObject(i);
-
 		if (widget->GetHandle() == widgetHandle) return lastTabstopObject;
 
 		if	(widget->IsTabstopCapable() && widget->IsActive()) lastTabstopObject = widget;
@@ -259,10 +271,8 @@ S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle) const
 
 	if (widgetHandle == 0) found = True;
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	foreach (Widget *widget, widgets)
 	{
-		Widget	*widget = GetNthObject(i);
-
 		if (widget->GetHandle() == widgetHandle)
 		{
 			found = True;
@@ -369,8 +379,8 @@ S::Int S::GUI::Widget::Hide()
 			onLoseFocus.Emit();
 		}
 
-		Rect	 rect		= GetVisibleArea();
-		Surface	*surface	= GetDrawSurface();
+		Rect	 rect	 = GetVisibleArea();
+		Surface	*surface = GetDrawSurface();
 
 		surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
 
@@ -409,10 +419,8 @@ S::Int S::GUI::Widget::Deactivate()
 
 	active = False;
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	foreach (Widget *widget, widgets)
 	{
-		Widget	*widget = GetNthObject(i);
-
 		widget->mouseOver	= False;
 
 		widget->leftButtonDown	= False;
@@ -430,8 +438,8 @@ S::Int S::GUI::Widget::Deactivate()
 
 S::Int S::GUI::Widget::Paint(Int message)
 {
-	if (!registered)	return Error();
-	if (!visible)		return Success();
+	if (!registered) return Error();
+	if (!visible)	 return Success();
 
 	Window	*window	= container->GetContainerWindow();
 
@@ -441,10 +449,8 @@ S::Int S::GUI::Widget::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
-			for (Int i = 0; i < GetNOfObjects(); i++)
+			foreach (Widget *widget, widgets)
 			{
-				Widget	*widget = GetNthObject(i);
-
 				if (widget->IsAffected(window->GetUpdateRect())) widget->Paint(message);
 			}
 
@@ -456,21 +462,19 @@ S::Int S::GUI::Widget::Paint(Int message)
 
 S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Window	*window	= container->GetContainerWindow();
 
 	if (window == NIL) return Success();
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	foreach (Widget *widget, widgets)
 	{
-		Widget	*object = GetNthObject(i);
-
-		if (object->Process(message, wParam, lParam) == Break) return Break;
+		if (widget->Process(message, wParam, lParam) == Break) return Break;
 	}
 
-	if (!IsActive())	return Success();
+	if (!IsActive()) return Success();
 
 	EnterProtectedRegion();
 
@@ -619,8 +623,8 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				UnsignedInt	 scrollLines = 0;
 
 #ifdef __WIN32__
-				if (Setup::enableUnicode)	SystemParametersInfoW(104, NIL, &scrollLines, NIL);
-				else				SystemParametersInfoA(104, NIL, &scrollLines, NIL);
+				if (Setup::enableUnicode) SystemParametersInfoW(104, NIL, &scrollLines, NIL);
+				else			  SystemParametersInfoA(104, NIL, &scrollLines, NIL);
 #endif
 
 				if (scrollLines <= 0) scrollLines = 3;
@@ -632,30 +636,23 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 		case SM_KEYDOWN:
 			if (!focussed || !tabstopCapable) break;
 
-			if (wParam == SK_TAB)
+			if (wParam == Input::Keyboard::KeyTab)
 			{
-#ifdef __WIN32__
-				BYTE	 state[256];
+				Widget	*widget = NIL;
 
-				if (GetKeyboardState(state))
+				if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) widget = container->GetPreviousTabstopWidget(GetHandle());
+				else							     widget = container->GetNextTabstopWidget(GetHandle());
+
+				if (widget != NIL)
 				{
-					Widget	*widget = NIL;
+					focussed = False;
 
-					if (state[SK_SHIFT] & 128) widget = container->GetPreviousTabstopWidget(GetHandle());
-					else			   widget = container->GetNextTabstopWidget(GetHandle());
+					onLoseFocus.Emit();
 
-					if (widget != NIL)
-					{
-						focussed = False;
-
-						onLoseFocus.Emit();
-
-						widget->SetFocusByKeyboard();
-					}
-
-					returnValue = Break;
+					widget->SetFocusByKeyboard();
 				}
-#endif
+
+				returnValue = Break;
 			}
 
 			break;
@@ -700,26 +697,29 @@ S::Void S::GUI::Widget::ActivateTooltip()
 
 	tipTimer = NIL;
 
-	Window	*window	= container->GetContainerWindow();
-
-	tooltip = new Tooltip();
-
-	if (tooltipText != NIL)
+	if (IsVisible())
 	{
-		tooltip->SetText(tooltipText);
-		tooltip->SetMetrics(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1), Size(0, 0));
-		tooltip->SetTimeout(3000);
-	}
-	else if (tooltipLayer != NIL)
-	{
-		tooltip->SetLayer(tooltipLayer);
-		tooltip->SetPosition(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1));
-		tooltip->SetTimeout(3000);
-	}
+		Window	*window	= container->GetContainerWindow();
 
-	PopupMenu::internalOnOpenPopupMenu.Connect(&Widget::DeactivateTooltip, this);
+		tooltip = new Tooltip();
 
-	window->Add(tooltip);
+		if (tooltipText != NIL)
+		{
+			tooltip->SetText(tooltipText);
+			tooltip->SetMetrics(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1), Size(0, 0));
+			tooltip->SetTimeout(3000);
+		}
+		else if (tooltipLayer != NIL)
+		{
+			tooltip->SetLayer(tooltipLayer);
+			tooltip->SetPosition(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1));
+			tooltip->SetTimeout(3000);
+		}
+
+		PopupMenu::internalOnOpenPopupMenu.Connect(&Widget::DeactivateTooltip, this);
+
+		window->Add(tooltip);
+	}
 }
 
 S::Void S::GUI::Widget::DeactivateTooltip()
@@ -755,7 +755,7 @@ S::Void S::GUI::Widget::OpenContextMenu()
 	{
 		onOpenContextMenu.Emit();
 
-		Window	*window	= container->GetContainerWindow();
+		Window	*window	  = container->GetContainerWindow();
 		Point	 mousePos = window->GetMousePosition();
 
 		contextMenu->CalculateSize();
@@ -811,17 +811,17 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 {
 	if (text == newText) return Success();
 
-	Bool	 prevVisible = IsVisible();
+	Bool	 prevVisible  = IsVisible();
 	Bool	 prevFocussed = focussed;
 
 	if (registered && prevFocussed) focussed = False;
-	if (registered && prevVisible) Hide();
+	if (registered && prevVisible)	Hide();
 
 	text = newText;
 
 	ComputeTextSize();
 
-	if (registered && prevVisible) Show();
+	if (registered && prevVisible)	Show();
 	if (registered && prevFocussed) focussed = True;
 
 	Process(SM_MOUSEMOVE, 0, 0);
@@ -836,7 +836,7 @@ const S::String &S::GUI::Widget::GetText() const
 
 S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 {
-	tooltipText = nTooltipText;
+	tooltipText  = nTooltipText;
 	tooltipLayer = NIL;
 
 	return Success();
@@ -849,7 +849,7 @@ const S::String &S::GUI::Widget::GetTooltipText() const
 
 S::Int S::GUI::Widget::SetTooltipLayer(Layer *nTooltipLayer)
 {
-	tooltipText = NIL;
+	tooltipText  = NIL;
 	tooltipLayer = nTooltipLayer;
 
 	return Success();

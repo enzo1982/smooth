@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,6 +39,7 @@ S::GUI::BitmapGDIPlus::BitmapGDIPlus(Void *iBitmap)
 {
 	type	= BITMAP_GDIPLUS;
 	bitmap	= NIL;
+	hBitmap	= NIL;
 
 	SetSystemBitmap(iBitmap);
 }
@@ -47,6 +48,7 @@ S::GUI::BitmapGDIPlus::BitmapGDIPlus(Int cx, Int cy, Int bpp)
 {
 	type	= BITMAP_GDIPLUS;
 	bitmap	= NIL;
+	hBitmap	= NIL;
 
 	CreateBitmap(cx, cy, bpp);
 }
@@ -55,6 +57,7 @@ S::GUI::BitmapGDIPlus::BitmapGDIPlus(const int nil)
 {
 	type	= BITMAP_GDIPLUS;
 	bitmap	= NIL;
+	hBitmap	= NIL;
 
 	SetSystemBitmap(NIL);
 }
@@ -63,6 +66,7 @@ S::GUI::BitmapGDIPlus::BitmapGDIPlus(const BitmapGDIPlus &iBitmap)
 {
 	type	= BITMAP_GDIPLUS;
 	bitmap	= NIL;
+	hBitmap	= NIL;
 
 	SetSystemBitmap(iBitmap.GetSystemBitmap());
 }
@@ -76,6 +80,7 @@ S::Bool S::GUI::BitmapGDIPlus::CreateBitmap(Int cx, Int cy, Int bpp)
 {
 	DeleteBitmap();
 
+	if (bpp == -1) bpp = 32;
 	if (bpp != 32) bpp = 32;
 
 	UnsignedByte	*buffer = new UnsignedByte [sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)];
@@ -118,10 +123,15 @@ S::Bool S::GUI::BitmapGDIPlus::DeleteBitmap()
 	{
 		delete bitmap;
 
+		if (hBitmap != NIL) ::DeleteObject(hBitmap);
+
 		bitmap	= NIL;
+		hBitmap	= NIL;
 
 		size	= Size(0, 0);
 		depth	= 0;
+
+		delete [] (UnsignedByte *) bytes;
 
 		bytes	= NIL;
 		align	= 0;
@@ -132,7 +142,7 @@ S::Bool S::GUI::BitmapGDIPlus::DeleteBitmap()
 
 S::Bool S::GUI::BitmapGDIPlus::SetSystemBitmap(Void *nBitmap)
 {
-	if (nBitmap == GetSystemBitmap()) return True;
+	if (hBitmap != NIL && nBitmap == hBitmap) return True;
 
 	if (nBitmap == NIL)
 	{
@@ -159,11 +169,11 @@ S::Void *S::GUI::BitmapGDIPlus::GetSystemBitmap() const
 {
 	if (bitmap == NIL) return NIL;
 
-	HBITMAP	 hbitmap;
+	if (hBitmap != NIL) ::DeleteObject(hBitmap);
 
-	bitmap->GetHBITMAP(Gdiplus::Color(255, 255, 255), &hbitmap);
+	bitmap->GetHBITMAP(Gdiplus::Color(255, 255, 255), &hBitmap);
 
-	return (Void *) hbitmap;
+	return (Void *) hBitmap;
 }
 
 S::GUI::BitmapBackend &S::GUI::BitmapGDIPlus::operator =(const BitmapBackend &newBitmap)

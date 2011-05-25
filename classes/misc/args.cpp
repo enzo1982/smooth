@@ -10,14 +10,16 @@
 
 #include <smooth/misc/args.h>
 
-S::ArgumentsParser::ArgumentsParser(const String &commandLine)
+S::ArgumentsParser::ArgumentsParser(const String &iCommand, const String &iArgs)
 {
+	command = iCommand;
+
 	String	 param;
 	Bool	 quoted = False;
 
-	for (Int i = 0, j = 0; i < commandLine.Length(); i++)
+	for (Int i = 0, j = 0; i <= iArgs.Length(); i++)
 	{
-		if ((commandLine[i] == ' ' && !quoted && commandLine[i - 1] != '\\') || i == commandLine.Length() - 1)
+		if ((iArgs[i] == ' ' && !quoted && iArgs[i - 1] != '\\') || i == iArgs.Length())
 		{
 #ifdef __APPLE__
 			if (!param.StartsWith("-psn_"))
@@ -28,22 +30,17 @@ S::ArgumentsParser::ArgumentsParser(const String &commandLine)
 			param	= NIL;
 			j	= 0;
 		}
-		else if (commandLine[i] == '\"')
+		else if (iArgs[i] == '\"')
 		{
 			quoted = !quoted;
 		}
-		else if (!(commandLine[i] == '\\' && commandLine[i + 1] == ' '))
+		else if (!(iArgs[i] == '\\' && iArgs[i + 1] == ' '))
 		{
-			param[j++] = commandLine[i];
+			param[j++] = iArgs[i];
 		}
 	}
 }
 
 S::ArgumentsParser::~ArgumentsParser()
 {
-}
-
-const S::Array<S::String> &S::ArgumentsParser::GetArguments() const
-{
-	return args;
 }

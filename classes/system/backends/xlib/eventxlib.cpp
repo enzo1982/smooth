@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,6 +14,7 @@
 #include <smooth/gui/window/backends/xlib/windowxlib.h>
 #include <smooth/backends/xlib/backendxlib.h>
 
+#include <pthread.h>
 #include <signal.h>
 
 using namespace X11;
@@ -43,6 +44,13 @@ int FindMotionEvent(Display *d, XEvent *e, XPointer arg)
 	return (e->type == MotionNotify && e->xany.window == (X11::Window) arg);
 }
 
+/* Predicate function to find ConfigureNotify events.
+ */
+int FindConfigureEvent(Display *d, XEvent *e, XPointer arg)
+{
+	return (e->type == ConfigureNotify && e->xany.window == (X11::Window) arg);
+}
+
 S::Int S::System::EventXLib::ProcessNextEvent()
 {
 	/* Emulate a timeout of ~100ms by trying to find a message
@@ -58,9 +66,10 @@ S::Int S::System::EventXLib::ProcessNextEvent()
 
 			if (XFilterEvent(&e, None)) break;
 
-			/* Process only the most recent MotionNotify event.
+			/* Process only the most recent MotionNotify and ConfigureNotify events.
 			 */
-			if (e.type == MotionNotify) while (XCheckIfEvent(display, &e, FindMotionEvent, (XPointer) e.xany.window)) { }
+			if (e.type == MotionNotify)    while (XCheckIfEvent(display, &e, FindMotionEvent,    (XPointer) e.xany.window)) { }
+			if (e.type == ConfigureNotify) while (XCheckIfEvent(display, &e, FindConfigureEvent, (XPointer) e.xany.window)) { }
 
 			/* Find window and dispatch event.
 			 */

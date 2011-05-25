@@ -235,10 +235,11 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 				IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, fileName, IO::OS_APPEND);
 				UnsignedByte	*buffer		= new UnsignedByte [1024];
 				Int		 startTicks	= clock();
-				Int		 percent	= 0;
 
 				if (bytes > 0)
 				{
+					Int	 percent = 0;
+
 					for (Int i = 0; i < bytes; i += 1024)
 					{
 						if (doCancelDownload.Call()) { cancel = True; break; }

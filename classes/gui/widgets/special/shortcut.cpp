@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,10 +11,7 @@
 #include <smooth/gui/widgets/special/shortcut.h>
 #include <smooth/misc/binary.h>
 #include <smooth/i18n/translator.h>
-
-#ifdef __WIN32__
-#	include <windows.h>
-#endif
+#include <smooth/input/keyboard.h>
 
 const S::Short	 S::GUI::Shortcut::classID = S::Object::RequestClassID();
 
@@ -51,21 +48,14 @@ S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 		case SM_KEYDOWN:
 			if (wParam == key)
 			{
-#ifdef __WIN32__
-				BYTE	 state[256];
-
-				if (GetKeyboardState(state))
+				if ((((flags & SC_ALT) 	 && Input::Keyboard::GetKeyState(Input::Keyboard::KeyAlt))     || (!(flags & SC_ALT)   && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyAlt)))     &&
+				    (((flags & SC_CTRL)  && Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl)) || (!(flags & SC_CTRL)  && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))) &&
+				    (((flags & SC_SHIFT) && Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))   || (!(flags & SC_SHIFT) && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))))
 				{
-					if ((((flags & SC_ALT) 	 && (lParam & 536870912))      || (!(flags & SC_ALT)   && !(lParam & 536870912)))      &&
-					    (((flags & SC_CTRL)  && (state[SK_CONTROL] & 128)) || (!(flags & SC_CTRL)  && !(state[SK_CONTROL] & 128))) &&
-					    (((flags & SC_SHIFT) && (state[SK_SHIFT] & 128))   || (!(flags & SC_SHIFT) && !(state[SK_SHIFT] & 128))))
-					{
-						onKeyDown.Emit(param);
+					onKeyDown.Emit(param);
 
-						retVal = Break;
-					}
+					retVal = Break;
 				}
-#endif
 			}
 
 			break;
@@ -98,25 +88,26 @@ S::String S::GUI::Shortcut::ToString() const
 	if	(key >= '0'  && key <= '9')	keyString[0] = key;
 	else if (key >= 'A'  && key <= 'Z')	keyString[0] = key;
 
-	if	(key >= SK_F1 && key <= SK_F24)	keyString = String("F").Append(String::FromInt(1 + (key - SK_F1)));
-	else if (key == SK_BACK)		keyString = I18n::Translator::defaultTranslator->TranslateString("Backspace");
-	else if (key == SK_TAB)			keyString = I18n::Translator::defaultTranslator->TranslateString("Tab");
-	else if (key == SK_RETURN)		keyString = I18n::Translator::defaultTranslator->TranslateString("Return");
-	else if (key == SK_ESCAPE)		keyString = I18n::Translator::defaultTranslator->TranslateString("Esc");
-	else if (key == SK_SPACE)		keyString = I18n::Translator::defaultTranslator->TranslateString("Space");
-	else if (key == SK_PRIOR)		keyString = I18n::Translator::defaultTranslator->TranslateString("PgUp");
-	else if (key == SK_NEXT)		keyString = I18n::Translator::defaultTranslator->TranslateString("PgDown");
-	else if (key == SK_END)			keyString = I18n::Translator::defaultTranslator->TranslateString("End");
-	else if (key == SK_HOME)		keyString = I18n::Translator::defaultTranslator->TranslateString("Home");
-	else if (key == SK_LEFT)		keyString = I18n::Translator::defaultTranslator->TranslateString("Left");
-	else if (key == SK_UP)			keyString = I18n::Translator::defaultTranslator->TranslateString("Up");
-	else if (key == SK_RIGHT)		keyString = I18n::Translator::defaultTranslator->TranslateString("Right");
-	else if (key == SK_DOWN)		keyString = I18n::Translator::defaultTranslator->TranslateString("Down");
-	else if (key == SK_INSERT)		keyString = I18n::Translator::defaultTranslator->TranslateString("Ins");
-	else if (key == SK_DELETE)		keyString = I18n::Translator::defaultTranslator->TranslateString("Del");
+	if	(key >= Input::Keyboard::KeyF1 &&
+		 key <= Input::Keyboard::KeyF24)    keyString = String("F").Append(String::FromInt(1 + (key - Input::Keyboard::KeyF1)));
+	else if (key == Input::Keyboard::KeyBack)   keyString = I18n::Translator::defaultTranslator->TranslateString("Backspace");
+	else if (key == Input::Keyboard::KeyTab)    keyString = I18n::Translator::defaultTranslator->TranslateString("Tab");
+	else if (key == Input::Keyboard::KeyReturn) keyString = I18n::Translator::defaultTranslator->TranslateString("Return");
+	else if (key == Input::Keyboard::KeyEscape) keyString = I18n::Translator::defaultTranslator->TranslateString("Esc");
+	else if (key == Input::Keyboard::KeySpace)  keyString = I18n::Translator::defaultTranslator->TranslateString("Space");
+	else if (key == Input::Keyboard::KeyPrior)  keyString = I18n::Translator::defaultTranslator->TranslateString("PgUp");
+	else if (key == Input::Keyboard::KeyNext)   keyString = I18n::Translator::defaultTranslator->TranslateString("PgDown");
+	else if (key == Input::Keyboard::KeyEnd)    keyString = I18n::Translator::defaultTranslator->TranslateString("End");
+	else if (key == Input::Keyboard::KeyHome)   keyString = I18n::Translator::defaultTranslator->TranslateString("Home");
+	else if (key == Input::Keyboard::KeyLeft)   keyString = I18n::Translator::defaultTranslator->TranslateString("Left");
+	else if (key == Input::Keyboard::KeyUp)	    keyString = I18n::Translator::defaultTranslator->TranslateString("Up");
+	else if (key == Input::Keyboard::KeyRight)  keyString = I18n::Translator::defaultTranslator->TranslateString("Right");
+	else if (key == Input::Keyboard::KeyDown)   keyString = I18n::Translator::defaultTranslator->TranslateString("Down");
+	else if (key == Input::Keyboard::KeyInsert) keyString = I18n::Translator::defaultTranslator->TranslateString("Ins");
+	else if (key == Input::Keyboard::KeyDelete) keyString = I18n::Translator::defaultTranslator->TranslateString("Del");
 
-	return	(Binary::IsFlagSet(flags, SC_CTRL) ? String(I18n::Translator::defaultTranslator->TranslateString("Ctrl")).Append("+") : String())
-         .Append(Binary::IsFlagSet(flags, SC_ALT) ? String(I18n::Translator::defaultTranslator->TranslateString("Alt")).Append("+") : String())
-	 .Append(Binary::IsFlagSet(flags, SC_SHIFT) ? String(I18n::Translator::defaultTranslator->TranslateString("Shift")).Append("+") : String())
+	return	(Binary::IsFlagSet(flags, SC_CTRL)  ? String(I18n::Translator::defaultTranslator->TranslateString("Ctrl")).Append("+")	: String())
+         .Append(Binary::IsFlagSet(flags, SC_ALT)   ? String(I18n::Translator::defaultTranslator->TranslateString("Alt")).Append("+")	: String())
+	 .Append(Binary::IsFlagSet(flags, SC_SHIFT) ? String(I18n::Translator::defaultTranslator->TranslateString("Shift")).Append("+")	: String())
 	 .Append(keyString);
 }

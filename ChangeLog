@@ -11,6 +11,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - number.cpp		- fixed floating point number -> string conversion
 			- fixed integer -> string conversion
 - pointer.cpp		- new class: Pointer, replaces class Input and parts of LiSA library
+- keyboard.cpp		- new class: Keyboard, represents keyboard state
 - widget.cpp		- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
 			- new attribute: independent, makes a widget independent of its container
 - string.cpp		- new function: Explode(), splits a string at a delimiter
@@ -35,6 +36,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - tipodaydlg.cpp	- made dialog width adjust to button size
 - charsetdetector.cpp	- new class: CharsetDetector, detects the character set of a string
 - mutexwin32.cpp	- now using critical sections instead of Win32 mutexes
+- access.cpp		- new class: functions for threads save variable access
 - clipboard.cpp		- new class: Clipboard, implements clipboard support
 - timerposix.cpp	- new class: TimerPOSIX, POSIX timer backend
 
@@ -49,7 +51,8 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - improved international language support
 - removed Extended<> template
 - removed Pointer<> template
-- improved Linux, Mac OS X, Solaris and FreeBSD support
+- improved Linux support
+- ported to FreeBSD, OpenBSD, NetBSD, Solaris, Mac OS X, QNX and Haiku
 - upgraded libbzip2 to version 1.0.6
 - upgraded fribidi2 to version 0.19.2
 - upgraded libiconv to version 1.13.1

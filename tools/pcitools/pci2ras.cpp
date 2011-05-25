@@ -18,7 +18,7 @@ int main()
 	PCIIn	 pci = OpenPCIForInput(pfn);
 	PCIIO	*pio = new PCIIO();
 
-	ReadPCI(pci, *pio);
+	pio->ReadPCI(pci);
 
 	bmp = (HBITMAP) pio->GetBitmap().GetSystemBitmap();
 

@@ -16,8 +16,7 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
-
-#include <fribidi.h>
+#include <smooth/foreach.h>
 
 S::GUI::SurfaceBackend *CreateSurfaceGDIPlus(S::Void *iSurface, const S::GUI::Size &maxSize)
 {
@@ -178,8 +177,12 @@ S::Short S::GUI::SurfaceGDIPlus::GetSurfaceDPI() const
 {
 	if (surfaceDPI != -1) return surfaceDPI;
 
-	HDC	 dc = GetWindowDC(0);
-	Short	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
+	HDC			 dc	  = GetWindowDC(0);
+	Gdiplus::Graphics	*graphics = new Gdiplus::Graphics(dc);
+
+	Short	 dpi = graphics->GetDpiY();
+
+	delete graphics;
 
 	ReleaseDC(0, dc);
 
@@ -192,22 +195,24 @@ S::Int S::GUI::SurfaceGDIPlus::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL) return Success();
 
-	Point	 point = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPoint));
+	Point		 point = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPoint));
+	Gdiplus::Bitmap	 bitmap(1, 1);
+
+	bitmap.SetPixel(0, 0, Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
 
 	if (!painting)
 	{
-		HDC	 gdi_dc = GetWindowDC(window);
+		HDC			 gdi_dc = GetWindowDC(window);
+		Gdiplus::Graphics	*pGraphics = new Gdiplus::Graphics(gdi_dc);
 
-		::SetPixel(gdi_dc, point.x, point.y, color);
+		pGraphics->DrawImage(&bitmap, point.x, point.y);
+
+		delete pGraphics;
 
 		ReleaseDC(window, gdi_dc);
 	}
 
-	HDC	 cdc = paintContext->GetHDC();
-
-	::SetPixel(cdc, point.x, point.y, color);
-
-	paintContext->ReleaseHDC(cdc);
+	paintContext->DrawImage(&bitmap, point.x, point.y);
 
 	return Success();
 }
@@ -216,19 +221,29 @@ S::Int S::GUI::SurfaceGDIPlus::Line(const Point &iPos1, const Point &iPos2, cons
 {
 	if (window == NIL) return Success();
 
-	Point	 pos1 = iPos1;
-	Point	 pos2 = iPos2;
+	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
+	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
 
 	/* Adjust to Windows GDI behavior for diagonal lines.
 	 */
 	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y))
 	{
-		if (pos1.x < pos2.x && pos1.y < pos2.y) { pos2.x--; pos2.y--; }
-		if (pos1.x < pos2.x && pos1.y > pos2.y) { pos2.x--; pos2.y++; }
-	} 
+		if	(pos1.x < pos2.x) pos2.x--;
+		else if (pos1.x > pos2.x) pos2.x++;
 
-	pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(pos1));
-	pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(pos2));
+		if	(pos1.y < pos2.y) pos2.y--;
+		else if (pos1.y > pos2.y) pos2.y++;
+	}
+
+	/* Adjust to Windows GDI behaviour for horizontal and vertical lines.
+	 */
+	if (pos1.x == pos2.x && pos1.y < pos2.y) pos2.y--;
+	if (pos1.x == pos2.x && pos1.y > pos2.y) pos1.y--;
+
+	if (pos1.y == pos2.y && pos1.x < pos2.x) pos2.x--;
+	if (pos1.y == pos2.y && pos1.x > pos2.x) pos1.x--;
+
+	if (pos1 == pos2) return SetPixel(rightToLeft.TranslatePoint(pos1), color);
 
 	Gdiplus::Pen	 pen(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
 
@@ -237,14 +252,14 @@ S::Int S::GUI::SurfaceGDIPlus::Line(const Point &iPos1, const Point &iPos2, cons
 		HDC			 gdi_dc = GetWindowDC(window);
 		Gdiplus::Graphics	*pGraphics = new Gdiplus::Graphics(gdi_dc);
 
-		pGraphics->DrawLine(&pen, INT(pos1.x), INT(pos1.y), INT(pos2.x), INT(pos2.y));
+		pGraphics->DrawLine(&pen, pos1.x, pos1.y, pos2.x, pos2.y);
 
 		delete pGraphics;
 
 		ReleaseDC(window, gdi_dc);
 	}
 
-	paintContext->DrawLine(&pen, INT(pos1.x), INT(pos1.y), INT(pos2.x), INT(pos2.y));
+	paintContext->DrawLine(&pen, pos1.x, pos1.y, pos2.x, pos2.y);
 
 	return Success();
 }
@@ -255,85 +270,75 @@ S::Int S::GUI::SurfaceGDIPlus::Box(const Rect &iRect, const Color &color, Int st
 
 	Rect	 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
 
-	HDC	 gdi_dc = GetWindowDC(window);
-	HBRUSH	 brush = CreateSolidBrush(color);
-	HPEN	 pen = CreatePen(PS_SOLID, 0, color);
-	RECT	 wRect = { rect.left, rect.top, rect.right, rect.bottom };
-
 	Gdiplus::SolidBrush	 gdip_brush(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
 	Gdiplus::Pen		 gdip_pen(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
 	Gdiplus::Rect		 gdip_rect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+
+	HDC			 gdi_dc	   = NIL;
+	Gdiplus::Graphics	*pGraphics = NIL;
+
+	if (!painting)
+	{
+		gdi_dc	  = GetWindowDC(window);
+
+		pGraphics = new Gdiplus::Graphics(gdi_dc);
+	}
 
 	if (style & Rect::Filled)
 	{
 		if (style & Rect::Rounded)
 		{
-			if (!painting)
-			{
-				HBRUSH	 previousBrush	= (HBRUSH) SelectObject(gdi_dc, brush);
-				HPEN	 previousPen	= (HPEN) SelectObject(gdi_dc, pen);
-
-				RoundRect(gdi_dc, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
-
-				brush	= (HBRUSH) SelectObject(gdi_dc, previousBrush);
-				pen	= (HPEN) SelectObject(gdi_dc, previousPen);
-			}
-
-			HDC	 cdc		= paintContext->GetHDC();
-			HBRUSH	 previousBrush	= (HBRUSH) SelectObject(cdc, brush);
-			HPEN	 previousPen	= (HPEN) SelectObject(cdc, pen);
-
-			RoundRect(cdc, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
-
-			brush	= (HBRUSH) SelectObject(cdc, previousBrush);
-			pen	= (HPEN) SelectObject(cdc, previousPen);
-
-			paintContext->ReleaseHDC(cdc);
+			/* ToDo: Allow drawing of rounded rects.
+			 */
 		}
 		else
 		{
-			if (!painting) FillRect(gdi_dc, &wRect, brush);
+			if (!painting) pGraphics->FillRectangle(&gdip_brush, gdip_rect);
+
 			paintContext->FillRectangle(&gdip_brush, gdip_rect);
 		}
 	}
 	else if (style == Rect::Outlined)
 	{
-		if (!painting) FrameRect(gdi_dc, &wRect, brush);
+		gdip_rect.Width--;
+		gdip_rect.Height--;
+
+		if (!painting) pGraphics->DrawRectangle(&gdip_pen, gdip_rect);
+
 		paintContext->DrawRectangle(&gdip_pen, gdip_rect);
 	}
 	else if (style & Rect::Inverted)
 	{
-		HDC	 cdc = paintContext->GetHDC();
+		Bitmap	 area(rect.right - rect.left, rect.bottom - rect.top);
 
-		if (!painting) InvertRect(gdi_dc, &wRect);
-		InvertRect(cdc, &wRect);
+		BlitToBitmap(iRect, area, Rect(Point(0, 0), area.GetSize()));
 
-		paintContext->ReleaseHDC(cdc);
+		area.InvertColors();
+
+		BlitFromBitmap(area, Rect(Point(0, 0), area.GetSize()), iRect);
 	}
 	else if (style & Rect::Dotted)
 	{
-		HDC	 cdc = paintContext->GetHDC();
-
 		if (!painting)
 		{
-			for (Int x = rect.left								 + 1; x <  rect.right;	 x += 2) ::SetPixel(gdi_dc, x, rect.top, color);
-			for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2; y <  rect.bottom;	 y += 2) ::SetPixel(gdi_dc, rect.right - 1, y, color);
-			for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2; x >= rect.left;	 x -= 2) ::SetPixel(gdi_dc, x, rect.bottom - 1, color);
-			for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1; y >= rect.top;	 y -= 2) ::SetPixel(gdi_dc, rect.left, y, color);
+			for (Int x = rect.left								 + 1; x <  rect.right;	 x += 2) pGraphics->DrawLine(&gdip_pen, x, rect.top, x, rect.top - 1);
+			for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2; y <  rect.bottom;	 y += 2) pGraphics->DrawLine(&gdip_pen, rect.right - 1, y, rect.right, y);
+			for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2; x >= rect.left;	 x -= 2) pGraphics->DrawLine(&gdip_pen, x, rect.bottom - 1, x, rect.bottom);
+			for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1; y >= rect.top;	 y -= 2) pGraphics->DrawLine(&gdip_pen, rect.left, y, rect.left - 1, y);
 		}
 
-		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) ::SetPixel(cdc, x, rect.top, color);
-		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) ::SetPixel(cdc, rect.right - 1, y, color);
-		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) ::SetPixel(cdc, x, rect.bottom - 1, color);
-		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) ::SetPixel(cdc, rect.left, y, color);
-
-		paintContext->ReleaseHDC(cdc);
+		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) paintContext->DrawLine(&gdip_pen, x, rect.top, x, rect.top - 1);
+		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) paintContext->DrawLine(&gdip_pen, rect.right - 1, y, rect.right, y);
+		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) paintContext->DrawLine(&gdip_pen, x, rect.bottom - 1, x, rect.bottom);
+		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) paintContext->DrawLine(&gdip_pen, rect.left, y, rect.left - 1, y);
 	}
 
-	::DeleteObject(brush);
-	::DeleteObject(pen);
+	if (!painting)
+	{
+		delete pGraphics;
 
-	ReleaseDC(window, gdi_dc);
+		ReleaseDC(window, gdi_dc);
+	}
 
 	return Success();
 }
@@ -345,163 +350,61 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 	if (string == NIL)	return Error();
 	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
 
-	int	 lines = 1;
-	int	 offset = 0;
-	int	 origoffset;
-	int	 txtsize = string.Length();
-	String	 line;
-	Rect	 rect = iRect;
-	Int	 lineHeight = font.GetTextSizeY() + 3;
+	Rect			 rect	    = iRect;
+	Int			 lineHeight = font.GetTextSizeY() + 3;
 
-	for (Int j = 0; j < txtsize; j++) if (string[j] == 10) lines++;
+	Color			 color = font.GetColor();
 
-	HDC	 gdi_dc = GetWindowDC(window);
-	HFONT	 hfont;
-	HFONT	 holdfont = NIL;
-	HFONT	 holdfont2 = NIL;
+	Gdiplus::Font		 gdip_font(font.GetName(), font.GetSize(), (font.GetWeight() >= Font::Bold    ? Gdiplus::FontStyleBold	    : Gdiplus::FontStyleRegular) |
+									   (font.GetStyle() & Font::Italic    ? Gdiplus::FontStyleItalic    : Gdiplus::FontStyleRegular) |
+									   (font.GetStyle() & Font::Underline ? Gdiplus::FontStyleUnderline : Gdiplus::FontStyleRegular) |
+									   (font.GetStyle() & Font::StrikeOut ? Gdiplus::FontStyleStrikeout : Gdiplus::FontStyleRegular));
+	Gdiplus::SolidBrush	 gdip_brush(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
+	Gdiplus::StringFormat	 gdip_format(Gdiplus::StringFormatFlagsNoWrap);
 
-	HDC	 cdc = paintContext->GetHDC();
-
-	if (Setup::enableUnicode)	hfont = CreateFontW(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
-	else				hfont = CreateFontA(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	HDC			 gdi_dc	   = NIL;
+	Gdiplus::Graphics	*pGraphics = NIL;
 
 	if (!painting)
 	{
-		SetBkMode(gdi_dc, TRANSPARENT);
-		SetTextColor(gdi_dc, font.GetColor());
+		gdi_dc	  = GetWindowDC(window);
 
-		holdfont = (HFONT) SelectObject(gdi_dc, hfont);
+		pGraphics = new Gdiplus::Graphics(gdi_dc);
 	}
 
-	SetBkMode(cdc, TRANSPARENT);
-	SetTextColor(cdc, font.GetColor());
+	const Array<String>	&lines = string.Explode("\n");
 
-	holdfont2 = (HFONT) SelectObject(cdc, hfont);
-
-	for (Int i = 0; i < lines; i++)
+	foreach (const String &line, lines)
 	{
 		Bool	 rtlCharacters = False;
 
-		origoffset = offset;
+		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
 
-		for (Int j = 0; j <= txtsize; j++)
-		{
-			if (j + origoffset == txtsize)
-			{
-				line[j] = 0;
-				break;
-			}
+		Rect		 tRect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
+		Gdiplus::RectF	 gdip_rect(tRect.left, tRect.top, tRect.right - tRect.left + 2, tRect.bottom - tRect.top);
 
-			if (string[j + origoffset] == 10 || string[j + origoffset] == 0)
-			{
-				offset++;
-				line[j] = 0;
-				break;
-			}
-			else
-			{
-				offset++;
-				line[j] = string[j + origoffset];
+		if (rtlCharacters) gdip_format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsDirectionRightToLeft);
+		else		   gdip_format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);
 
-				if (line[j] >= 0x0590 && line[j] <= 0x07BF) rtlCharacters = True;
-			}
-		}
+		if ((!rtlCharacters &&  rightToLeft.GetRightToLeft()) ||
+		    ( rtlCharacters && !rightToLeft.GetRightToLeft())) gdip_format.SetAlignment(Gdiplus::StringAlignmentFar);
+		else						       gdip_format.SetAlignment(Gdiplus::StringAlignmentNear);
 
-		Rect	 tRect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
-		RECT	 wRect = { tRect.left, tRect.top, tRect.right, tRect.bottom };
+		if (!painting) pGraphics->DrawString(line, -1, &gdip_font, gdip_rect, &gdip_format, &gdip_brush);
 
-		if (rtlCharacters && Setup::useIconv)
-		{
-			/* Reorder the string with fribidi, then get
-			 * the glyph indices using GetCharacterPlacement
-			 * and display using the glyph indices.
-			 * This does not work with Kanji.
-			 */
-			FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
-			FriBidiParType	 type = (rightToLeft.GetRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
-
-			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, NIL, NIL, NIL);
-
-			visual[line.Length()] = 0;
-
-			line.ImportFrom("UCS-4LE", (char *) visual);
-
-			delete [] visual;
-
-			GCP_RESULTSA	 resultsa;
-			GCP_RESULTSW	 resultsw;
-			wchar_t		*glyphs = new wchar_t [line.Length() + 1];
-
-			ZeroMemory(&resultsa, sizeof(resultsa));
-			ZeroMemory(&resultsw, sizeof(resultsw));
-
-			resultsa.lStructSize = sizeof(resultsa);
-			resultsa.lpGlyphs    = glyphs;
-			resultsa.nGlyphs     = line.Length() + 1;
-
-			resultsw.lStructSize = sizeof(resultsw);
-			resultsw.lpGlyphs    = glyphs;
-			resultsw.nGlyphs     = line.Length() + 1;
-
-			ZeroMemory(glyphs, 2 * (line.Length() + 1));
-
-			if (!painting)
-			{
-				if (rightToLeft.GetRightToLeft()) SetTextAlign(gdi_dc, TA_RIGHT);
-				else				  SetTextAlign(gdi_dc, TA_LEFT);
-			}
-
-			if (rightToLeft.GetRightToLeft()) SetTextAlign(cdc, TA_RIGHT);
-			else				  SetTextAlign(cdc, TA_LEFT);
-
-			if (Setup::enableUnicode) GetCharacterPlacementW(cdc, line, line.Length(), 0, &resultsw, 0);
-			else			  GetCharacterPlacementA(cdc, line, line.Length(), 0, &resultsa, 0);
-
-			if (rightToLeft.GetRightToLeft()) wRect.left -= 10;
-			else				  wRect.right += 10;
-
-			if (!painting)
-			{
-				if (Setup::enableUnicode) ExtTextOutW(gdi_dc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-				else			  ExtTextOutA(gdi_dc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
-			}
-
-			if (Setup::enableUnicode) ExtTextOutW(cdc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-			else			  ExtTextOutA(cdc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
-
-			delete [] glyphs;
-		}
-		else
-		{
-			/* Let Windows do any reordering and ligating.
-			 * Works with Kanji, but RTL is only supported
-			 * on XP and later versions of Windows.
-			 */
-			if (!painting)
-			{
-				SetTextAlign(gdi_dc, TA_LEFT);
-
-				if (Setup::enableUnicode) DrawTextExW(gdi_dc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-				else			  DrawTextExA(gdi_dc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-			}
-
-			SetTextAlign(cdc, TA_LEFT);
-
-			if (Setup::enableUnicode) DrawTextExW(cdc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-			else			  DrawTextExA(cdc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-		}
+		paintContext->DrawString(line, -1, &gdip_font, gdip_rect, &gdip_format, &gdip_brush);
 
 		rect.top += lineHeight;
 	}
 
-	if (!painting) SelectObject(gdi_dc, holdfont);
-	SelectObject(cdc, holdfont2);
+	String::ExplodeFinish();
 
-	::DeleteObject(hfont);
+	if (!painting)
+	{
+		delete pGraphics;
 
-	paintContext->ReleaseHDC(cdc);
-
-	ReleaseDC(window, gdi_dc);
+		ReleaseDC(window, gdi_dc);
+	}
 
 	return Success();
 }
@@ -511,30 +414,17 @@ S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &bitmap, const Rect &
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
-	Gdiplus::Bitmap		 bmp((HBITMAP) bitmap.GetSystemBitmap(), NIL);
 	Rect			 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
 	HDC			 gdi_dc = GetWindowDC(window);
 	Gdiplus::Graphics	*screen = new Gdiplus::Graphics(gdi_dc);
-	Gdiplus::CachedBitmap	 cachedBitmap(&bmp, screen);
+	Gdiplus::Bitmap		 gdip_bitmap((HBITMAP) bitmap.GetSystemBitmap(), NIL);
 
-	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
+	if (!painting)
 	{
-		if (!painting)
-		{
-			screen->DrawCachedBitmap(&cachedBitmap, destRect.left, destRect.top);
-		}
-
-		paintContext->DrawCachedBitmap(&cachedBitmap, destRect.left, destRect.top);
+		screen->DrawImage(&gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top), srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, Gdiplus::UnitPixel, NIL, NIL, NIL);
 	}
-	else
-	{
-		if (!painting)
-		{
-			screen->DrawImage(&bmp, INT(destRect.left), INT(destRect.top), INT(destRect.right - destRect.left), INT(destRect.bottom - destRect.top));
-		}
 
-		paintContext->DrawImage(&bmp, INT(destRect.left), INT(destRect.top), INT(destRect.right - destRect.left), INT(destRect.bottom - destRect.top));
-	}
+	paintContext->DrawImage(&gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top), srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, Gdiplus::UnitPixel, NIL, NIL, NIL);
 
 	delete screen;
 
@@ -543,30 +433,25 @@ S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &bitmap, const Rect &
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDIPlus::BlitToBitmap(const Rect &iSrcRect, const Bitmap &bitmap, const Rect &destRect)
+S::Int S::GUI::SurfaceGDIPlus::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, const Rect &destRect)
 {
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
 	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
-	HDC	 gdi_dc	 = GetWindowDC(window);
-	HDC	 cdc	 = CreateCompatibleDC(gdi_dc);
-	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
-	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
-	{
-		BitBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, gdi_dc, srcRect.left, srcRect.top, SRCCOPY);
-	}
-	else
-	{
-		SetStretchBltMode(cdc, HALFTONE);
-		StretchBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, gdi_dc, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
-	}
+	Gdiplus::Bitmap		 gdip_bitmap((HBITMAP) bitmap.GetSystemBitmap(), NIL);
+	Gdiplus::Graphics	 gdip_graphics(&gdip_bitmap);
 
-	SelectObject(cdc, backup);
+	gdip_graphics.DrawImage(paintBitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top), srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, Gdiplus::UnitPixel, NIL, NIL, NIL);
 
-	DeleteDC(cdc);
-	ReleaseDC(window, gdi_dc);
+	HBITMAP			 hBitmap = NIL;
+
+	gdip_bitmap.GetHBITMAP(Gdiplus::Color(), &hBitmap);
+
+	bitmap.SetSystemBitmap(hBitmap);
+
+	::DeleteObject(hBitmap);
 
 	return Success();
 }

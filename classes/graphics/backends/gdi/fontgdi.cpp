@@ -31,7 +31,7 @@ S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text) const
 {
 	if (text == NIL) return Size();
 
-	HDC	 dc	= CreateCompatibleDC(NIL);
+	HDC	 dc = CreateCompatibleDC(NIL);
 	HFONT	 hFont;
 	HFONT	 hOldFont;
 

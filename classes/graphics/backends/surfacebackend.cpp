@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -210,7 +210,7 @@ S::Int S::GUI::SurfaceBackend::Gradient(const Rect &rect, const Color &color1, c
 	Float	 blue2	= color2.GetBlue();
 	Int	 xmax	= rect.right - rect.left;
 	Int	 ymax	= rect.bottom - rect.top;
-	Bitmap	 bmp(rect.right - rect.left, rect.bottom - rect.top, 24);
+	Bitmap	 bmp(rect.right - rect.left, rect.bottom - rect.top);
 
 	switch (style)
 	{
@@ -316,7 +316,7 @@ S::Int S::GUI::SurfaceBackend::BlitFromBitmap(const Bitmap &bitmap, const Rect &
 	return Success();
 }
 
-S::Int S::GUI::SurfaceBackend::BlitToBitmap(const Rect &srcRect, const Bitmap &bitmap, const Rect &destRect)
+S::Int S::GUI::SurfaceBackend::BlitToBitmap(const Rect &srcRect, Bitmap &bitmap, const Rect &destRect)
 {
 	return Success();
 }

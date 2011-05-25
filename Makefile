@@ -7,52 +7,48 @@ HEADERS = $(OBJECTDIR)/smooth.h.gch
 
 OBJECTS = classes/*/*.o classes/*/*/*.o classes/*/*/*/*.o classes/*/*/*/*/*.o misc/*.o
 
+LIBS = -lfribidi -lbz2 -lxml2 -ljpeg -lz -lstdc++
+
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += resources/*.o
-endif
 
-ifeq ($(BUILD_X64),True)
-	LIBS = 
-else
-ifeq ($(BUILD_WIN32),True)
-	LIBS = -lunicows
-endif
-endif
+	ifneq ($(BUILD_X64),True)
+		LIBS += -lunicows
+	endif
 
-LIBS += -lfribidi -lbz2 -lxml2 -ljpeg -lpng -lz -lstdc++
+	ifeq ($(BUILD_GDIPLUS),True)
+		LIBS += -lgdiplus
+	endif
 
-ifeq ($(BUILD_WIN32),True)
-	LIBS += -lcpuid -lnsucd -lws2_32 -limm32 -lole32
+	ifeq ($(BUILD_CAIRO),True)
+		LIBS += -lcairo.dll
+	endif
 
-ifeq ($(BUILD_GDIPLUS),True)
-	LIBS += -lgdiplus
-endif
+	LIBS += -lcpuid -lnsucd -lpng -lz -lws2_32 -limm32 -lole32
 
-ifeq ($(BUILD_CAIRO),True)
-	LIBS += -lcairo.dll
-endif
-else
-	LIBS += -lcairo -lpthread -lX11 -lXmu
-
-ifeq ($(BUILD_OSX),True)
-	LIBS += -lcpuid -lnsucd -liconv -lfontconfig
-else
-	LIBS += -lpango-1.0 -lpangocairo-1.0 -lgobject-2.0 -lgtk-x11-2.0
-endif
-
-ifeq ($(BUILD_LINUX),True)
-	LIBS += -lcpuid -lnsucd
-endif
-
-ifeq ($(BUILD_FREEBSD),True)
-	LIBS += -lrt
-endif
-endif
-
-ifeq ($(BUILD_WIN32),True)
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
 else
+	ifeq ($(BUILD_OSX),True)
+		LIBS += -lcpuid -lnsucd -liconv -lpng -lcairo -lX11 -lXmu
+	else ifeq ($(BUILD_QNX),True)
+		LIBS += -liconv -lpng -lz -lsocket -lX11 -lXmu -lph
+	else
+		ifeq ($(BUILD_LINUX),True)
+			LIBS += -lcpuid -lnsucd
+		endif
+
+		ifeq ($(BUILD_FREEBSD),True)
+			LIBS += -lrt
+		endif
+
+		LIBS += $(shell pkg-config --libs xmu) $(shell pkg-config --libs gtk+-2.0)
+	endif
+
+	ifneq ($(BUILD_HAIKU),True)
+		LIBS += -lpthread
+	endif
+
 	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
 endif
 
@@ -72,15 +68,15 @@ endif
 
 ifeq ($(BUILD_WIN32),True)
 	LINKER_OPTS += -mwindows -Wl,--dynamicbase,--nxcompat,--kill-at,--out-implib,$(LIBNAME)
-endif
-
-ifeq ($(BUILD_FREEBSD),True)
+else ifeq ($(BUILD_FREEBSD),True)
 	LINKER_OPTS += -L/usr/local/lib
-endif
-
-ifeq ($(BUILD_OSX),True)
-	STRIP = true
-
+else ifeq ($(BUILD_OPENBSD),True)
+	LINKER_OPTS += -Wl,-rpath,/usr/local/lib -L/usr/local/lib -Wl,-rpath,/usr/X11R6/lib -L/usr/X11R6/lib
+else ifeq ($(BUILD_NETBSD),True)
+	LINKER_OPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib -Wl,-rpath,/usr/X11R7/lib -L/usr/X11R7/lib
+else ifeq ($(BUILD_QNX),True)
+	LINKER_OPTS += -L/usr/X11R6/lib
+else ifeq ($(BUILD_OSX),True)
 	LINKER_OPTS += -framework Cocoa -L/usr/X11/lib -Wl,-dylib_install_name,libsmooth$(SHARED)
 endif
 
@@ -126,7 +122,9 @@ doc-clean:
 
 $(DLLNAME): objects libs
 	$(LINKER) $(OBJECTS) $(LINKER_OPTS) $(LIBS)
+ifneq ($(BUILD_OSX),True)
 	$(STRIP) $(STRIP_OPTS) $(DLLNAME)
+endif
 ifeq ($(BUILD_WIN32),True)
 	$(STRIP) $(LIBSTRIP_OPTS) $(LIBNAME)
 	countbuild BuildNumber

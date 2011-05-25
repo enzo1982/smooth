@@ -9,14 +9,14 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/window/backends/gdi/windowgdi.h>
-#include <smooth/backends/win32/backendwin32.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
+#include <smooth/system/timer.h>
 #include <smooth/system/multimonitor.h>
 #include <smooth/init.h>
-#include <smooth/system/timer.h>
-#include <smooth/input/pointer.h>
+#include <smooth/backends/win32/backendwin32.h>
 
 #if !defined WM_MOUSEWHEEL
 #	define WM_MOUSEWHEEL 522
@@ -102,64 +102,64 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::GetWindowBackend(HWND hwnd)
 	return NIL;
 }
 
-S::Key S::GUI::WindowGDI::ConvertKey(Int keySym)
+S::Input::Keyboard::Key S::GUI::WindowGDI::ConvertKey(Int keySym)
 {
-	Key	 key = SK_OTHER;
+	Input::Keyboard::Key	 key = Input::Keyboard::KeyOther;
 
 	switch (keySym)
 	{
-		case VK_LEFT:	 key = SK_LEFT;	   break;
-		case VK_UP:	 key = SK_UP;	   break;
-		case VK_RIGHT:	 key = SK_RIGHT;   break;
-		case VK_DOWN:	 key = SK_DOWN;	   break;
+		case VK_LEFT:	 key = Input::Keyboard::KeyLeft;    break;
+		case VK_UP:	 key = Input::Keyboard::KeyUp;	    break;
+		case VK_RIGHT:	 key = Input::Keyboard::KeyRight;   break;
+		case VK_DOWN:	 key = Input::Keyboard::KeyDown;    break;
 
-		case VK_HOME:	 key = SK_HOME;	   break;
-		case VK_END:	 key = SK_END;	   break;
-		case VK_INSERT:	 key = SK_INSERT;  break;
-		case VK_DELETE:	 key = SK_DELETE;  break;
-		case VK_PRIOR:	 key = SK_PRIOR;   break;
-		case VK_NEXT:	 key = SK_NEXT;	   break;
+		case VK_HOME:	 key = Input::Keyboard::KeyHome;    break;
+		case VK_END:	 key = Input::Keyboard::KeyEnd;	    break;
+		case VK_INSERT:	 key = Input::Keyboard::KeyInsert;  break;
+		case VK_DELETE:	 key = Input::Keyboard::KeyDelete;  break;
+		case VK_PRIOR:	 key = Input::Keyboard::KeyPrior;   break;
+		case VK_NEXT:	 key = Input::Keyboard::KeyNext;    break;
 
-		case VK_RETURN:	 key = SK_RETURN;  break;
-		case VK_BACK:	 key = SK_BACK;	   break;
-		case VK_TAB:	 key = SK_TAB;	   break;
+		case VK_RETURN:	 key = Input::Keyboard::KeyReturn;  break;
+		case VK_BACK:	 key = Input::Keyboard::KeyBack;    break;
+		case VK_TAB:	 key = Input::Keyboard::KeyTab;	    break;
 
-		case VK_SPACE:	 key = SK_SPACE;   break;
+		case VK_SPACE:	 key = Input::Keyboard::KeySpace;   break;
 
-		case VK_SHIFT:	 key = SK_SHIFT;   break;
-		case VK_CONTROL: key = SK_CONTROL; break;
-		case VK_MENU:	 key = SK_ALT;	   break;
+		case VK_SHIFT:	 key = Input::Keyboard::KeyShift;   break;
+		case VK_CONTROL: key = Input::Keyboard::KeyControl; break;
+		case VK_MENU:	 key = Input::Keyboard::KeyAlt;	    break;
 
-		case VK_ESCAPE:	 key = SK_ESCAPE;  break;
+		case VK_ESCAPE:	 key = Input::Keyboard::KeyEscape;  break;
 
-		case VK_F1:	 key = SK_F1;	   break;
-		case VK_F2:	 key = SK_F2;	   break;
-		case VK_F3:	 key = SK_F3;	   break;
-		case VK_F4:	 key = SK_F4;	   break;
-		case VK_F5:	 key = SK_F5;	   break;
-		case VK_F6:	 key = SK_F6;	   break;
-		case VK_F7:	 key = SK_F7;	   break;
-		case VK_F8:	 key = SK_F8;	   break;
-		case VK_F9:	 key = SK_F9;	   break;
-		case VK_F10:	 key = SK_F10;	   break;
-		case VK_F11:	 key = SK_F11;	   break;
-		case VK_F12:	 key = SK_F12;	   break;
-		case VK_F13:	 key = SK_F13;	   break;
-		case VK_F14:	 key = SK_F14;	   break;
-		case VK_F15:	 key = SK_F15;	   break;
-		case VK_F16:	 key = SK_F16;	   break;
-		case VK_F17:	 key = SK_F17;	   break;
-		case VK_F18:	 key = SK_F18;	   break;
-		case VK_F19:	 key = SK_F19;	   break;
-		case VK_F20:	 key = SK_F20;	   break;
-		case VK_F21:	 key = SK_F21;	   break;
-		case VK_F22:	 key = SK_F22;	   break;
-		case VK_F23:	 key = SK_F23;	   break;
-		case VK_F24:	 key = SK_F24;	   break;
+		case VK_F1:	 key = Input::Keyboard::KeyF1;	    break;
+		case VK_F2:	 key = Input::Keyboard::KeyF2;	    break;
+		case VK_F3:	 key = Input::Keyboard::KeyF3;	    break;
+		case VK_F4:	 key = Input::Keyboard::KeyF4;	    break;
+		case VK_F5:	 key = Input::Keyboard::KeyF5;	    break;
+		case VK_F6:	 key = Input::Keyboard::KeyF6;	    break;
+		case VK_F7:	 key = Input::Keyboard::KeyF7;	    break;
+		case VK_F8:	 key = Input::Keyboard::KeyF8;	    break;
+		case VK_F9:	 key = Input::Keyboard::KeyF9;	    break;
+		case VK_F10:	 key = Input::Keyboard::KeyF10;	    break;
+		case VK_F11:	 key = Input::Keyboard::KeyF11;	    break;
+		case VK_F12:	 key = Input::Keyboard::KeyF12;	    break;
+		case VK_F13:	 key = Input::Keyboard::KeyF13;	    break;
+		case VK_F14:	 key = Input::Keyboard::KeyF14;	    break;
+		case VK_F15:	 key = Input::Keyboard::KeyF15;	    break;
+		case VK_F16:	 key = Input::Keyboard::KeyF16;	    break;
+		case VK_F17:	 key = Input::Keyboard::KeyF17;	    break;
+		case VK_F18:	 key = Input::Keyboard::KeyF18;	    break;
+		case VK_F19:	 key = Input::Keyboard::KeyF19;	    break;
+		case VK_F20:	 key = Input::Keyboard::KeyF20;	    break;
+		case VK_F21:	 key = Input::Keyboard::KeyF21;	    break;
+		case VK_F22:	 key = Input::Keyboard::KeyF22;	    break;
+		case VK_F23:	 key = Input::Keyboard::KeyF23;	    break;
+		case VK_F24:	 key = Input::Keyboard::KeyF24;	    break;
 	}
 
-	if	(keySym >= '0' && keySym <= '9') key = (Key) keySym;
-	else if	(keySym >= 'A' && keySym <= 'Z') key = (Key) keySym;
+	if	(keySym >= '0' && keySym <= '9') key = (Input::Keyboard::Key) keySym;
+	else if	(keySym >= 'A' && keySym <= 'Z') key = (Input::Keyboard::Key) keySym;
 
 	return key;
 }
@@ -183,6 +183,35 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			onDestroy.Emit();
 
 			return Break;
+		case WM_ACTIVATE:
+			if (LOWORD(wParam) == WA_INACTIVE)
+			{
+				const WindowGDI	*backend = WindowGDI::GetWindowBackend((HWND) lParam);
+
+				if (backend != NIL)
+				{
+					if ((backend->flags & WF_TOPMOST)      &&
+					    (backend->flags & WF_NOTASKBUTTON) &&
+					    (backend->flags & WF_THINBORDER)   && backend->id > id)
+					{
+						PostMessage(hwnd, WM_NCACTIVATE, True, 0);
+					}
+				}
+			}
+
+			return Break;
+		case WM_ACTIVATEAPP:
+			if (wParam == True && !IsWindowEnabled(hwnd))
+			{
+				for (Int i = 0; i < windowBackends.Length(); i++)
+				{
+					WindowGDI	*backend = windowBackends.GetNth(i);
+
+					if (backend->hwnd != NIL && backend->id > id && (backend->flags & WF_MODAL)) backend->Raise();
+				}
+			}
+
+			break;
 		case WM_SIZE:
 			if (!minimized && wParam == SIZE_MINIMIZED)
 			{
@@ -237,6 +266,10 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			return Break;
+		case WM_SYSCOLORCHANGE:
+			GetColors();
+
+			break;
 	}
 
 	/* Update cursor position when receiving mouse messages.
@@ -253,7 +286,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 		GetCursorPos(&point);
 
-		Input::Pointer::UpdatePosition(point.x, point.y);
+		Input::Pointer::UpdatePosition(Window::GetWindow(hwnd), point.x, point.y);
 	}
 
 	/* Convert Windows messages to smooth messages.
@@ -290,15 +323,43 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		 */
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
+			Input::Keyboard::UpdateKeyState(ConvertKey(wParam), True);
+
 			return onEvent.Call(SM_KEYDOWN, ConvertKey(wParam), lParam);
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
+			Input::Keyboard::UpdateKeyState(ConvertKey(wParam), False);
+
 			return onEvent.Call(SM_KEYUP, ConvertKey(wParam), lParam);
 		case WM_CHAR:
 			return onEvent.Call(SM_CHAR, wParam, lParam);
 
 		/* Paint messages:
 		 */
+		case WM_ERASEBKGND:
+			{
+				static Size	 prevSize;
+
+				RECT		 windowRect;
+
+				GetWindowRect(hwnd, &windowRect);
+
+				Size		 size = Size(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
+
+				if (size.cx > prevSize.cx || size.cy > prevSize.cy)
+				{
+					HBRUSH	 brush = CreateSolidBrush(Setup::BackgroundColor);
+
+					if (size.cx > prevSize.cx) { RECT rect = { prevSize.cx - 2 * frameSize.cx + 2, 0, size.cx - 2 * frameSize.cx + 2, size.cy - 2 * frameSize.cy + 2 }; FillRect((HDC) wParam, &rect, brush); }
+					if (size.cy > prevSize.cy) { RECT rect = { 0, prevSize.cy - 2 * frameSize.cy + 2, size.cx - 2 * frameSize.cx + 2, size.cy - 2 * frameSize.cy + 2 }; FillRect((HDC) wParam, &rect, brush); }
+
+					::DeleteObject(brush);
+				}
+
+				prevSize = size;
+			}
+
+			return Break;
 		case WM_PAINT:
 			{
 				Int	 rVal = Break;
@@ -327,15 +388,34 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		 */
 		case WM_WINDOWPOSCHANGED:
 			{
-				WINDOWPOS	*wndpos = (LPWINDOWPOS) lParam;
+				WINDOWPOS	*windowPos = (LPWINDOWPOS) lParam;
 
-				onEvent.Call(SM_WINDOWMETRICS, ((wndpos->x + 32768) << 16) | (wndpos->y + 32768), ((wndpos->cx + 32768) << 16) | (wndpos->cy + 32768));
+				if (!(windowPos->flags & SWP_NOMOVE) && !(windowPos->flags & SWP_NOSIZE))
+				{
+					onEvent.Call(SM_WINDOWMETRICS, ((windowPos->x  + 32768) << 16) | (windowPos->y  + 32768),
+								       ((windowPos->cx + 32768) << 16) | (windowPos->cy + 32768));
+				}
+				else if (!(windowPos->flags & SWP_NOMOVE && windowPos->flags & SWP_NOSIZE))
+				{
+					RECT	 windowRect;
+
+					GetWindowRect(hwnd, &windowRect);
+
+					if	(windowPos->flags & SWP_NOMOVE) onEvent.Call(SM_WINDOWMETRICS, ((windowRect.left		    + 32768) << 16) | (windowRect.top			  + 32768),
+													       ((windowPos->cx			    + 32768) << 16) | (windowPos->cy			  + 32768));
+					else if (windowPos->flags & SWP_NOSIZE) onEvent.Call(SM_WINDOWMETRICS, ((windowPos->x			    + 32768) << 16) | (windowPos->y			  + 32768),
+													       ((windowRect.right - windowRect.left + 32768) << 16) | (windowRect.bottom - windowRect.top + 32768));
+				}
 			}
 
 			return Success();
 		case WM_SETFOCUS:
 			return onEvent.Call(SM_GETFOCUS, 0, 0);
 		case WM_KILLFOCUS:
+			Input::Keyboard::ResetKeyState();
+
+			/* Get the window that now has the focus.
+			 */
 			{
 				Window	*focusWnd = Window::GetWindow((HWND) wParam);
 
@@ -350,17 +430,17 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 	/* Call event for any other Windows messages.
 	 *
-	 * FIXME:
-	 *
-	 * Windows messages should not be propagated to smooth applications.
-	 * Define a smooth message for every Windows message we need and
-	 * replace the next line with return Success();.
+	 * FixMe: Windows messages should not be propagated to smooth applications.
+	 *	  Define a smooth message for every Windows message we need and
+	 *	  replace the next line with return Success();.
 	 */
 	return onEvent.Call(message, wParam, lParam);;
 }
 
-S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size &size, Int flags)
+S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size &size, Int iFlags)
 {
+	flags = iFlags;
+
 	Int	 style	  = WS_THICKFRAME | WS_SYSMENU | WS_MINIMIZEBOX | WS_POPUP;
 	Int	 extStyle = 0;
 
@@ -380,7 +460,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		/* Enable shadows for tool windows.
 		 */
-		if ((flags & WF_NOTASKBUTTON) && (flags & WF_TOPMOST) && (flags & WF_THINBORDER)) 
+		if ((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER)) 
 		{
 			OSVERSIONINFOA	 vInfo;
 
@@ -388,7 +468,8 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 			GetVersionExA(&vInfo);
 
-			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && (vInfo.dwMajorVersion >= 6 || (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)))
+			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && ( vInfo.dwMajorVersion >= 6 ||
+									    (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)))
 			{
 				wndclassw->style = wndclassw->style | CS_DROPSHADOW;
 			}
@@ -428,7 +509,8 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 			GetVersionExA(&vInfo);
 
-			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && (vInfo.dwMajorVersion >= 6 || (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)))
+			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && ( vInfo.dwMajorVersion >= 6 ||
+									    (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)))
 			{
 				wndclassa->style = wndclassa->style | CS_DROPSHADOW;
 			}
@@ -457,10 +539,24 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 		 */
 		ProcessSystemMessages(WM_CREATE, 0, 0);
 
-		if (flags & WF_THINBORDER || flags & WF_NORESIZE) drawSurface = new Surface(hwnd, size);
-		else						  drawSurface = new Surface(hwnd);
+		if ((flags & WF_THINBORDER) || (flags & WF_NORESIZE)) drawSurface = new Surface(hwnd, size);
+		else						      drawSurface = new Surface(hwnd);
 
 		drawSurface->SetSize(size);
+
+		/* Disable leader window if we are modal.
+		 */
+		if (flags & WF_MODAL)
+		{
+			WindowGDI	*leader = FindLeaderWindow();
+
+			if (leader != NIL)
+			{
+				EnableWindow(leader->hwnd, False);
+
+				Raise();
+			}
+		}
 
 		return Success();
 	}
@@ -470,10 +566,30 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 S::Int S::GUI::WindowGDI::Close()
 {
+	if (hwnd == NIL) return Success();
+
+	/* Reenable leader window if we have one.
+	 */
+	if (flags & WF_MODAL)
+	{
+		WindowGDI	*leader = FindLeaderWindow();
+
+		if (leader != NIL)
+		{
+			EnableWindow(leader->hwnd, True);
+
+			leader->Raise();
+		}
+	}
+
+	/* Delete surface.
+	 */
 	if (drawSurface != nullSurface) delete drawSurface;
 
 	drawSurface = nullSurface;
 
+	/* Destroy window and unregister class.
+	 */
 	DestroyWindow(hwnd);
 	
 	if (Setup::enableUnicode)
@@ -508,6 +624,20 @@ S::Int S::GUI::WindowGDI::RequestClose()
 	}
 
 	return Success();
+}
+
+S::GUI::WindowGDI *S::GUI::WindowGDI::FindLeaderWindow()
+{
+	/* The leader window is the newest non topmost window.
+	 */
+	for (Int i = windowBackends.Length() - 1; i >= 0; i--)
+	{
+		WindowGDI	*backend = windowBackends.GetNth(i);
+
+		if (backend != this && backend->hwnd != NIL && !(backend->flags & WF_TOPMOST)) return backend;
+	}
+
+	return NIL;
 }
 
 S::Int S::GUI::WindowGDI::SetTitle(const String &nTitle)
@@ -641,11 +771,11 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 	SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.right - workArea.left + (2 * frameSize.cx - 4), workArea.bottom - workArea.top + (2 * frameSize.cy - 4)));
 
-	if (Setup::enableUnicode) origWndStyle = GetWindowLongW(hwnd, GWL_STYLE);
-	else			  origWndStyle = GetWindowLongA(hwnd, GWL_STYLE);
+	if (Setup::enableUnicode) nonMaxWndStyle = GetWindowLongW(hwnd, GWL_STYLE);
+	else			  nonMaxWndStyle = GetWindowLongA(hwnd, GWL_STYLE);
 
-	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, (origWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-	else			  SetWindowLongA(hwnd, GWL_STYLE, (origWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, (nonMaxWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+	else			  SetWindowLongA(hwnd, GWL_STYLE, (nonMaxWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
 
 	maximized = True;
 
@@ -658,8 +788,8 @@ S::Int S::GUI::WindowGDI::Restore()
 {
 	SetMetrics(Point(nonMaxRect.left, nonMaxRect.top), Size((Int) Math::Max(minSize.cx, nonMaxRect.right - nonMaxRect.left), (Int) Math::Max(minSize.cy, nonMaxRect.bottom - nonMaxRect.top)));
 
-	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, origWndStyle | WS_VISIBLE);
-	else			  SetWindowLongA(hwnd, GWL_STYLE, origWndStyle | WS_VISIBLE);
+	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);
+	else			  SetWindowLongA(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);
 
 	maximized = False;
 
@@ -671,6 +801,7 @@ S::Int S::GUI::WindowGDI::Restore()
 S::Int S::GUI::WindowGDI::Raise()
 {
 	SetActiveWindow(hwnd);
+	SetFocus(hwnd);
 
 	return Success();
 }
@@ -697,7 +828,7 @@ S::Void S::GUI::WindowGDI::MouseNotifier()
 
 	GetCursorPos(&currentMousePos);
 
-	Input::Pointer::UpdatePosition(currentMousePos.x, currentMousePos.y);
+	Input::Pointer::UpdatePosition(Window::GetWindow(WindowFromPoint(currentMousePos)), currentMousePos.x, currentMousePos.y);
 
 	if (currentMousePos.x != savedMousePos.x || currentMousePos.y != savedMousePos.y)
 	{

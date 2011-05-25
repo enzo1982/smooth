@@ -69,9 +69,9 @@ S::Bool S::GUI::ClipboardWin32::SetClipboardText(const String &text)
 	}
 	else
 	{
-		memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, text.Length() + 1);
+		memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(char) * (text.Length() + 1));
 
-		strcpy((char *) GlobalLock(memory), text);
+		memcpy(GlobalLock(memory), (char *) text, sizeof(char) * (text.Length() + 1));
 
 		SetClipboardData(CF_TEXT, memory);
 	}

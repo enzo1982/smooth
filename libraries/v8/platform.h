@@ -91,6 +91,13 @@ int signbit(double x);
 #endif
 
 
+#ifdef __HAIKU__
+# ifndef isless
+int isless(double x, double y);
+# endif
+#endif
+
+
 // GCC specific stuff
 #ifdef __GNUC__
 

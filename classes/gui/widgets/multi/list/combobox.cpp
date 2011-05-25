@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,10 +20,12 @@ const S::Short	 S::GUI::ComboBox::classID = S::Object::RequestClassID();
 
 S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 {
-	type		= classID;
+	type		  = classID;
 
-	listBox		= NIL;
-	toolWindow	= NIL;
+	listBox		  = NIL;
+	toolWindow	  = NIL;
+
+	prevSelectedEntry = NIL;
 
 	SetFont(Font(font.GetName(), Font::DefaultSize, Font::Normal, Font::Normal, Setup::ClientTextColor));
 
@@ -33,21 +35,18 @@ S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 	if (GetHeight() == 0) SetHeight(19);
 
 	hotspot		= new Hotspot(Point(1, 1), GetSize() - Size(19, 2));
-
 	hotspot->onLeftButtonDown.Connect(&ComboBox::OpenListBox, this);
-	hotspot->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
 	buttonHotspot	= new HotspotSimpleButton(Point(16, 3), Size(13, GetHeight() - 6));
 	buttonHotspot->SetOrientation(OR_UPPERRIGHT);
-
 	buttonHotspot->onLeftButtonDown.Connect(&ComboBox::OpenListBox, this);
-	buttonHotspot->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
 	Add(hotspot);
 	Add(buttonHotspot);
 
 	onChangeSize.Connect(&ComboBox::OnChangeSize, this);
 	onSelectEntry.Connect(&ComboBox::OnSelectEntry, this);
+	onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 }
 
 S::GUI::ComboBox::~ComboBox()
@@ -165,7 +164,6 @@ S::Void S::GUI::ComboBox::OpenListBox()
 		listBox->onSelectEntry.Connect(&onSelectEntry);
 
 		toolWindow	= new ToolWindow(listBoxPos, listBoxSize);
-		toolWindow->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
 		listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
 		listBox->AddTab(NIL, 32768);
@@ -188,6 +186,12 @@ S::Void S::GUI::ComboBox::OpenListBox()
 		toolWindow->Add(listBox);
 
 		Add(toolWindow);
+
+		hotspot->onLeftButtonDown.Disconnect(&ComboBox::OpenListBox, this);
+		hotspot->onLeftButtonDown.Connect(&ComboBox::CloseListBox, this);
+
+		buttonHotspot->onLeftButtonDown.Disconnect(&ComboBox::OpenListBox, this);
+		buttonHotspot->onLeftButtonDown.Connect(&ComboBox::CloseListBox, this);
 	}
 }
 
@@ -195,6 +199,12 @@ S::Void S::GUI::ComboBox::CloseListBox()
 {
 	if (listBox != NIL)
 	{
+		hotspot->onLeftButtonDown.Disconnect(&ComboBox::CloseListBox, this);
+		hotspot->onLeftButtonDown.Connect(&ComboBox::OpenListBox, this);
+
+		buttonHotspot->onLeftButtonDown.Disconnect(&ComboBox::CloseListBox, this);
+		buttonHotspot->onLeftButtonDown.Connect(&ComboBox::OpenListBox, this);
+
 		listBox->RemoveAllEntries();
 
 		for (Int i = 0; i < GetNOfObjects(); i++)

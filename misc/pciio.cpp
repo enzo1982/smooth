@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,6 @@
 #include <smooth/definitions.h>
 #include <smooth/graphics/color.h>
 #include <smooth/pciio.h>
-#include <smooth/codecs.h>
 #include <smooth/misc/string.h>
 
 using namespace smooth;
@@ -22,18 +21,18 @@ S::String	 cpNames[5];
 
 PCIIO::PCIIO(const S::GUI::Bitmap &b)
 {
-	cfNames[RGBA]		= "RGB";
-	cfNames[HSV]		= "HSV";
-	cfNames[YUV]		= "YUV";
-	cfNames[CMY]		= "CMY";
-	cfNames[CMYK]		= "CMK";
-	cfNames[GRAY]		= "GRY";
+	cfNames[RGBA]	= "RGB";
+	cfNames[HSV]	= "HSV";
+	cfNames[YUV]	= "YUV";
+	cfNames[CMY]	= "CMY";
+	cfNames[CMYK]	= "CMK";
+	cfNames[GRAY]	= "GRY";
 
-	cpNames[RAW]		= "RAW";
-	cpNames[PCI]		= "PCI";
-	cpNames[RLE]		= "RLE";
-	cpNames[JPEG]		= "JPG";
-	cpNames[BZIP2]		= "BZ2";
+	cpNames[RAW]	= "RAW";
+	cpNames[PCI]	= "PCI";
+	cpNames[RLE]	= "RLE";
+	cpNames[JPEG]	= "JPG";
+	cpNames[BZIP2]	= "BZ2";
 
 	majorversion = PCIMajorVersion;
 	minorversion = PCIMinorVersion;
@@ -58,18 +57,18 @@ PCIIO::PCIIO(const S::GUI::Bitmap &b)
 
 PCIIO::PCIIO()
 {
-	cfNames[RGBA]		= "RGB";
-	cfNames[HSV]		= "HSV";
-	cfNames[YUV]		= "YUV";
-	cfNames[CMY]		= "CMY";
-	cfNames[CMYK]		= "CMK";
-	cfNames[GRAY]		= "GRY";
+	cfNames[RGBA]	= "RGB";
+	cfNames[HSV]	= "HSV";
+	cfNames[YUV]	= "YUV";
+	cfNames[CMY]	= "CMY";
+	cfNames[CMYK]	= "CMK";
+	cfNames[GRAY]	= "GRY";
 
-	cpNames[RAW]		= "RAW";
-	cpNames[PCI]		= "PCI";
-	cpNames[RLE]		= "RLE";
-	cpNames[JPEG]		= "JPG";
-	cpNames[BZIP2]		= "BZ2";
+	cpNames[RAW]	= "RAW";
+	cpNames[PCI]	= "PCI";
+	cpNames[RLE]	= "RLE";
+	cpNames[JPEG]	= "JPG";
+	cpNames[BZIP2]	= "BZ2";
 
 	rlebits = 8;
 	quality = 100;
@@ -168,54 +167,54 @@ bool ClosePCI(PCIOut outstream)
 	return true;
 }
 
-bool WritePCI(PCIOut outstream, PCIIO &ior)
+bool PCIIO::WritePCI(PCIOut outstream)
 {
 	if (outstream->GetLastError() != IO::IO_ERROR_OK) return false;
 
-	if (outstream->GetPos() == 0) WritePCIFTAG(outstream, ior);
+	if (outstream->GetPos() == 0) WritePCIFTAG(outstream);
 
-	WriteIMAGTAG(outstream, ior);
-	WriteRESOTAG(outstream, ior);
-	WriteFORMTAG(outstream, ior);
+	WriteIMAGTAG(outstream);
+	WriteRESOTAG(outstream);
+	WriteFORMTAG(outstream);
 
-	if (ior.description != NIL) WriteDESCTAG(outstream, ior);
-	if (ior.imagename != NIL) WriteNAMETAG(outstream, ior);
+	if (description != NIL) WriteDESCTAG(outstream);
+	if (imagename	!= NIL) WriteNAMETAG(outstream);
 
-	WriteDATATAG(outstream, ior);
+	WriteDATATAG(outstream);
 
 	return true;
 }
 
-bool ReadPCI(PCIIn instream, PCIIO &ior)
+bool PCIIO::ReadPCI(PCIIn instream)
 {
 	if (instream->GetLastError() != IO::IO_ERROR_OK) return false;
 
-	if (ior.imagename != NIL) FindImageID(instream, ior);
+	if (imagename != NIL) FindImageID(instream);
 
-	if (ReadPCIFTAG(instream, ior) == false) return false;
-	if (ReadIMAGTAG(instream, ior) == false) return false;
-	if (ReadRESOTAG(instream, ior) == false) return false;
-	if (ReadFORMTAG(instream, ior) == false) return false;
+	if (ReadPCIFTAG(instream) == false) return false;
+	if (ReadIMAGTAG(instream) == false) return false;
+	if (ReadRESOTAG(instream) == false) return false;
+	if (ReadFORMTAG(instream) == false) return false;
 
-	ReadDESCTAG(instream, ior);
+	ReadDESCTAG(instream);
 
-	if (ReadDATATAG(instream, ior) == false) return false;
+	if (ReadDATATAG(instream) == false) return false;
 
 	return true;
 }
 
-bool WritePCIFTAG(PCIOut out, PCIIO &ior)
+bool PCIIO::WritePCIFTAG(PCIOut out)
 {
 	out->OutputString("PCIF");
-	out->OutputNumber(ior.majorversion, 1);
-	out->OutputNumber(ior.minorversion, 1);
+	out->OutputNumber(majorversion, 1);
+	out->OutputNumber(minorversion, 1);
 	out->OutputNumber(-1, 4);
 	out->OutputNumber(0 + 14, 4);
 
 	return true;
 }
 
-bool ReadPCIFTAG(PCIIn in, PCIIO &ior)
+bool PCIIO::ReadPCIFTAG(PCIIn in)
 {
 	in->Seek(0);
 
@@ -225,8 +224,8 @@ bool ReadPCIFTAG(PCIIn in, PCIIO &ior)
 
 		if (in->InputString(4).Compare(pcifTag) == 0)
 		{
-			ior.majorversion = in->InputNumber(1);
-			ior.minorversion = in->InputNumber(1);
+			majorversion = in->InputNumber(1);
+			minorversion = in->InputNumber(1);
 
 			if (in->InputNumber(4) != -1)	return false;
 			if (in->InputNumber(4) != 14)	return false;
@@ -238,23 +237,24 @@ bool ReadPCIFTAG(PCIIn in, PCIIO &ior)
 
 			in->RelSeek(in->InputNumber(4) - 14);
 		}
-	} while (in->Size() > in->GetPos());
+	}
+	while (in->Size() > in->GetPos());
 
 	return false;
 }
 
-bool WriteIMAGTAG(PCIOut out, PCIIO &ior)
+bool PCIIO::WriteIMAGTAG(PCIOut out)
 {
 	out->OutputString("IMAG");
-	out->OutputNumber(ior.majorversion, 1);
-	out->OutputNumber(ior.minorversion, 1);
-	out->OutputNumber(ior.imageid, 4);
+	out->OutputNumber(majorversion, 1);
+	out->OutputNumber(minorversion, 1);
+	out->OutputNumber(imageid, 4);
 	out->OutputNumber(0 + 14, 4);
 
 	return true;
 }
 
-bool ReadIMAGTAG(PCIIn in, PCIIO &ior)
+bool PCIIO::ReadIMAGTAG(PCIIn in)
 {
 	in->Seek(0);
 
@@ -266,7 +266,7 @@ bool ReadIMAGTAG(PCIIn in, PCIIO &ior)
 		{
 			in->RelSeek(2);
 
-			if (in->InputNumber(4) == ior.imageid)
+			if (in->InputNumber(4) == imageid)
 			{
 				if (in->InputNumber(4) != 14)	return false;
 				else				return true;
@@ -282,27 +282,28 @@ bool ReadIMAGTAG(PCIIn in, PCIIO &ior)
 
 			in->RelSeek(in->InputNumber(4) - 14);
 		}
-	} while (in->Size() > in->GetPos());
+	}
+	while (in->Size() > in->GetPos());
 
 	return false;
 }
 
-bool WriteRESOTAG(PCIOut out, PCIIO &ior)
+bool PCIIO::WriteRESOTAG(PCIOut out)
 {
 	out->OutputString("RESO");
-	out->OutputNumber(ior.majorversion, 1);
-	out->OutputNumber(ior.minorversion, 1);
-	out->OutputNumber(ior.imageid, 4);
+	out->OutputNumber(majorversion, 1);
+	out->OutputNumber(minorversion, 1);
+	out->OutputNumber(imageid, 4);
 	out->OutputNumber(16 + 14, 4);
-	out->OutputNumber(ior.sizex, 4);
-	out->OutputNumber(ior.sizey, 4);
-	out->OutputNumber(ior.dpix, 4);
-	out->OutputNumber(ior.dpiy, 4);
+	out->OutputNumber(sizex, 4);
+	out->OutputNumber(sizey, 4);
+	out->OutputNumber(dpix, 4);
+	out->OutputNumber(dpiy, 4);
 
 	return true;
 }
 
-bool ReadRESOTAG(PCIIn in, PCIIO &ior)
+bool PCIIO::ReadRESOTAG(PCIIn in)
 {
 	in->Seek(0);
 
@@ -314,15 +315,15 @@ bool ReadRESOTAG(PCIIn in, PCIIO &ior)
 		{
 			in->RelSeek(2);
 
-			if (in->InputNumber(4) == ior.imageid)
+			if (in->InputNumber(4) == imageid)
 			{
 				if (in->InputNumber(4) != 30)	return false;
 				else
 				{
-					ior.sizex = in->InputNumber(4);
-					ior.sizey = in->InputNumber(4);
-					ior.dpix = in->InputNumber(4);
-					ior.dpiy = in->InputNumber(4);
+					sizex = in->InputNumber(4);
+					sizey = in->InputNumber(4);
+					dpix = in->InputNumber(4);
+					dpiy = in->InputNumber(4);
 
 					return true;
 				}
@@ -338,31 +339,32 @@ bool ReadRESOTAG(PCIIn in, PCIIO &ior)
 
 			in->RelSeek(in->InputNumber(4) - 14);
 		}
-	} while (in->Size() > in->GetPos());
+	}
+	while (in->Size() > in->GetPos());
 
 	return false;
 }
 
-bool WriteFORMTAG(PCIOut out, PCIIO &ior)
+bool PCIIO::WriteFORMTAG(PCIOut out)
 {
 	out->OutputString("FORM");
-	out->OutputNumber(ior.majorversion, 1);
-	out->OutputNumber(ior.minorversion, 1);
-	out->OutputNumber(ior.imageid, 4);
+	out->OutputNumber(majorversion, 1);
+	out->OutputNumber(minorversion, 1);
+	out->OutputNumber(imageid, 4);
 
-	if (ior.compression == RLE)	out->OutputNumber(6 + 14, 4);
-	else				out->OutputNumber(5 + 14, 4);
+	if (compression == RLE)	out->OutputNumber(6 + 14, 4);
+	else			out->OutputNumber(5 + 14, 4);
 
-	out->OutputString(cfNames[ior.colorspace]);
-	out->OutputNumber(ior.bpcc, 1);
-	out->OutputNumber(ior.compression, 1);
+	out->OutputString(cfNames[colorspace]);
+	out->OutputNumber(bpcc, 1);
+	out->OutputNumber(compression, 1);
 
-	if (ior.compression == RLE)	out->OutputNumber(ior.rlebits, 1);
+	if (compression == RLE)	out->OutputNumber(rlebits, 1);
 
 	return true;
 }
 
-bool ReadFORMTAG(PCIIn in, PCIIO &ior)
+bool PCIIO::ReadFORMTAG(PCIIn in)
 {
 	S::String cfName;
 
@@ -376,21 +378,21 @@ bool ReadFORMTAG(PCIIn in, PCIIO &ior)
 		{
 			in->RelSeek(2);
 
-			if (in->InputNumber(4) == ior.imageid)
+			if (in->InputNumber(4) == imageid)
 			{
 				if (in->InputNumber(4) > 20)	return false;
 				else
 				{
 					cfName = in->InputString(3);
 
-					ior.bpcc = in->InputNumber(1);
-					ior.compression = in->InputNumber(1);
+					bpcc = in->InputNumber(1);
+					compression = in->InputNumber(1);
 
-					if (ior.compression == RLE) ior.rlebits = in->InputNumber(1);
+					if (compression == RLE) rlebits = in->InputNumber(1);
 
 					for (int i = 0; i < 8; i++)
 					{
-						if (cfName.Compare(cfNames[i]) == 0) ior.colorspace = i;
+						if (cfName.Compare(cfNames[i]) == 0) colorspace = i;
 					}
 
 					return true;
@@ -407,24 +409,25 @@ bool ReadFORMTAG(PCIIn in, PCIIO &ior)
 
 			in->RelSeek(in->InputNumber(4) - 14);
 		}
-	} while (in->Size() > in->GetPos());
+	}
+	while (in->Size() > in->GetPos());
 
 	return false;
 }
 
-bool WriteDESCTAG(PCIOut out, PCIIO &ior)
+bool PCIIO::WriteDESCTAG(PCIOut out)
 {
 	out->OutputString("DESC");
-	out->OutputNumber(ior.majorversion, 1);
-	out->OutputNumber(ior.minorversion, 1);
-	out->OutputNumber(ior.imageid, 4);
-	out->OutputNumber(ior.description.Length() + 14, 4);
-	out->OutputString(ior.description);
+	out->OutputNumber(majorversion, 1);
+	out->OutputNumber(minorversion, 1);
+	out->OutputNumber(imageid, 4);
+	out->OutputNumber(description.Length() + 14, 4);
+	out->OutputString(description);
 
 	return true;
 }
 
-bool ReadDESCTAG(PCIIn in, PCIIO &ior)
+bool PCIIO::ReadDESCTAG(PCIIn in)
 {
 	in->Seek(0);
 
@@ -436,9 +439,9 @@ bool ReadDESCTAG(PCIIn in, PCIIO &ior)
 		{
 			in->RelSeek(2);
 
-			if (in->InputNumber(4) == ior.imageid)
+			if (in->InputNumber(4) == imageid)
 			{
-				ior.description = in->InputString(in->InputNumber(4) - 14);
+				description = in->InputString(in->InputNumber(4) - 14);
 
 				return true;
 			}
@@ -453,24 +456,25 @@ bool ReadDESCTAG(PCIIn in, PCIIO &ior)
 
 			in->RelSeek(in->InputNumber(4) - 14);
 		}
-	} while (in->Size() > in->GetPos());
+	}
+	while (in->Size() > in->GetPos());
 
 	return false;
 }
 
-bool WriteNAMETAG(PCIOut out, PCIIO &ior)
+bool PCIIO::WriteNAMETAG(PCIOut out)
 {
 	out->OutputString("NAME");
-	out->OutputNumber(ior.majorversion, 1);
-	out->OutputNumber(ior.minorversion, 1);
-	out->OutputNumber(ior.imageid, 4);
-	out->OutputNumber(ior.imagename.Length() + 14, 4);
-	out->OutputString(ior.imagename);
+	out->OutputNumber(majorversion, 1);
+	out->OutputNumber(minorversion, 1);
+	out->OutputNumber(imageid, 4);
+	out->OutputNumber(imagename.Length() + 14, 4);
+	out->OutputString(imagename);
 
 	return true;
 }
 
-bool ReadNAMETAG(PCIIn in, PCIIO &ior)
+bool PCIIO::ReadNAMETAG(PCIIn in)
 {
 	in->Seek(0);
 
@@ -482,9 +486,9 @@ bool ReadNAMETAG(PCIIn in, PCIIO &ior)
 		{
 			in->RelSeek(2);
 
-			if (in->InputNumber(4) == ior.imageid)
+			if (in->InputNumber(4) == imageid)
 			{
-				ior.imagename = in->InputString(in->InputNumber(4) - 14);
+				imagename = in->InputString(in->InputNumber(4) - 14);
 
 				return true;
 			}
@@ -499,33 +503,29 @@ bool ReadNAMETAG(PCIIn in, PCIIO &ior)
 
 			in->RelSeek(in->InputNumber(4) - 14);
 		}
-	} while (in->Size() > in->GetPos());
+	}
+	while (in->Size() > in->GetPos());
 
 	return false;
 }
 
-bool WriteDATATAG(PCIOut out, PCIIO &ior)
+bool PCIIO::WriteDATATAG(PCIOut out)
 {
-	int dpos;
-	int npos;
-	int dsize;
-
 	out->OutputString("DATA");
-	out->OutputNumber(ior.majorversion, 1);
-	out->OutputNumber(ior.minorversion, 1);
-	out->OutputNumber(ior.imageid, 4);
+	out->OutputNumber(majorversion, 1);
+	out->OutputNumber(minorversion, 1);
+	out->OutputNumber(imageid, 4);
 
-	dpos = out->GetPos();
+	int	 dpos = out->GetPos();
 
 	out->OutputNumber(0 + 14, 4);
 
-	CompressPCI(out, ior);
+	CompressPCI(out);
 
 	out->RelSeek(0);
 
-	npos = out->GetPos();
-
-	dsize = npos - dpos - 4;
+	int	 npos = out->GetPos();
+	int	 dsize = npos - dpos - 4;
 
 	out->Seek(dpos);
 	out->OutputNumber(dsize + 14, 4);
@@ -534,7 +534,7 @@ bool WriteDATATAG(PCIOut out, PCIIO &ior)
 	return true;
 }
 
-bool ReadDATATAG(PCIIn in, PCIIO &ior)
+bool PCIIO::ReadDATATAG(PCIIn in)
 {
 	in->Seek(0);
 
@@ -546,13 +546,13 @@ bool ReadDATATAG(PCIIn in, PCIIO &ior)
 		{
 			in->RelSeek(2);
 
-			if (in->InputNumber(4) == ior.imageid)
+			if (in->InputNumber(4) == imageid)
 			{
 				in->RelSeek(4);
 
-				ior.bmp.CreateBitmap(ior.sizex, ior.sizey, 24);
+				bmp.CreateBitmap(sizex, sizey);
 
-				DecompressPCI(in, ior);
+				DecompressPCI(in);
 
 				return true;
 			}
@@ -567,12 +567,13 @@ bool ReadDATATAG(PCIIn in, PCIIO &ior)
 
 			in->RelSeek(in->InputNumber(4) - 14);
 		}
-	} while (in->Size() > in->GetPos());
+	}
+	while (in->Size() > in->GetPos());
 
 	return false;
 }
 
-bool FindImageID(PCIIn in, PCIIO &ior)
+bool PCIIO::FindImageID(PCIIn in)
 {
 	int	 imageid = 0;
 
@@ -588,9 +589,9 @@ bool FindImageID(PCIIn in, PCIIO &ior)
 
 			imageid = in->InputNumber(4);
 
-			if (in->InputString(in->InputNumber(4) - 14).Compare(ior.imagename) == 0)
+			if (in->InputString(in->InputNumber(4) - 14).Compare(imagename) == 0)
 			{
-				ior.imageid = imageid;
+				imageid = imageid;
 
 				return true;
 			}
@@ -601,7 +602,8 @@ bool FindImageID(PCIIn in, PCIIO &ior)
 
 			in->RelSeek(in->InputNumber(4) - 14);
 		}
-	} while (in->Size() > in->GetPos());
+	}
+	while (in->Size() > in->GetPos());
 
 	return false;
 }

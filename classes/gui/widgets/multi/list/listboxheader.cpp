@@ -42,6 +42,26 @@ S::GUI::ListBoxHeader::~ListBoxHeader()
 	DeleteObject(dragHotspot);
 }
 
+S::Int S::GUI::ListBoxHeader::EnableLocking(Bool enable)
+{
+	if (enable)
+	{
+		tabNames.EnableLocking();
+		tabWidths.EnableLocking();
+		tabOrientations.EnableLocking();
+		tabChecked.EnableLocking();
+	}
+	else
+	{
+		tabNames.DisableLocking();
+		tabWidths.DisableLocking();
+		tabOrientations.DisableLocking();
+		tabChecked.DisableLocking();
+	}
+
+	return Widget::EnableLocking(enable);
+}
+
 S::Int S::GUI::ListBoxHeader::AddTab(const String &iTabName, Int iTabWidth, Int iTabOrientation)
 {
 	tabNames.Add(iTabName);

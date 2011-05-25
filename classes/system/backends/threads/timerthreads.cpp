@@ -90,7 +90,7 @@ S::Int S::System::TimerThreads::GetID() const
 {
 	if (thread == NIL) return Error();
 
-	return (intptr_t) thread & 0xFFFFFFFF;
+	return (Int64) thread & 0xFFFFFFFF;
 }
 
 S::Int S::System::TimerThreads::TimerProc(Int handle)

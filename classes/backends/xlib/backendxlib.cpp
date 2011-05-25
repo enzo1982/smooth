@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,9 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/backends/xlib/backendxlib.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace X11;
 
@@ -36,7 +39,17 @@ S::Int S::Backends::BackendXLib::Init()
 	XInitThreads();
 
 	display	= XOpenDisplay(NIL);
-	im	= XOpenIM(display, NIL, NIL, NIL);
+
+	if (display == NIL)
+	{
+		const char	*display = getenv("DISPLAY");
+
+		fprintf(stderr, "Error: Unable to open display at %s.\n", display != NIL ? display : "<none>");
+
+		return Error();
+	}
+
+	im = XOpenIM(display, NIL, NIL, NIL);
 
 	Setup::FontSize = 1.00;
 
@@ -45,8 +58,8 @@ S::Int S::Backends::BackendXLib::Init()
 
 S::Int S::Backends::BackendXLib::Deinit()
 {
-	XCloseIM(im);
-	XCloseDisplay(display);
+	if (im	    != NIL) XCloseIM(im);
+	if (display != NIL) XCloseDisplay(display);
 
 	return Success();
 }

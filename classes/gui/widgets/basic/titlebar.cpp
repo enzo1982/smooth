@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,6 +15,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/binary.h>
+#include <smooth/input/keyboard.h>
 
 #ifdef __WIN32__
 #	include <windows.h>
@@ -63,7 +64,7 @@ S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
 
 	Add(dragHotspot);
 
-	closeShortcut	= new Shortcut(0, SK_ESCAPE);
+	closeShortcut	= new Shortcut(0, Input::Keyboard::KeyEscape);
 	closeShortcut->onKeyDown.Connect(&Titlebar::OnCloseButtonClick, this);
 
 	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) Add(closeShortcut);

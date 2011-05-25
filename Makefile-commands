@@ -19,34 +19,35 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	LDOPTS += -mwindows -Wl,--dynamicbase,--nxcompat
 
-ifdef IMPORTLIB
-ifdef GLOBALDLL
-	LDOPTS += -Wl,--out-implib,$(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB)
-else
-	LDOPTS += -Wl,--out-implib,$(IMPORTLIB)
-endif
-endif
+	ifdef IMPORTLIB
+		ifdef GLOBALDLL
+			LDOPTS += -Wl,--out-implib,$(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB)
+		else
+			LDOPTS += -Wl,--out-implib,$(IMPORTLIB)
+		endif
+	endif
 
 	CCOPTS += -I$(SMOOTH_PATH)/include/support
 else
 	LDOPTS += -Wl,-rpath,.
 
-ifeq ($(BUILD_OSX),True)
-	STRIP = true
+	ifeq ($(BUILD_OSX),True)
+		ifdef GLOBALDLL
+			LDOPTS += -Wl,-dylib_install_name,lib$(GLOBALDLL)$(SHARED)
+		endif
+	endif
 
-ifdef GLOBALDLL
-	LDOPTS += -Wl,-dylib_install_name,lib$(GLOBALDLL)$(SHARED)
+ifneq ($(BUILD_SOLARIS),True)
+	CCOPTS += -pthread
+endif
 endif
 
-	CCOPTS += -I/usr/X11/include
-else
 ifeq ($(BUILD_SOLARIS),True)
 	CCOPTS += -fpic
 endif
 
-	LDOPTS += -L/usr/local/lib
-	CCOPTS += -I/usr/local/include
-endif
+ifeq ($(BUILD_QNX),True)
+	CCOPTS += -I$(SMOOTH_PATH)/include/support
 endif
 
 ifneq ($(EXCEPTION),True)
@@ -151,7 +152,9 @@ endif
 ifdef GLOBALEXE
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE): $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
+ifneq ($(BUILD_OSX),True)
 	$(STRIP) $(STRIP_OPTS) $@
+endif
 endif
 
 ifdef GLOBALDLL
@@ -161,7 +164,9 @@ else
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED): $(OBJECTS)
 endif
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+ifneq ($(BUILD_OSX),True)
 	$(STRIP) $(STRIP_OPTS) $@
+endif
 
 ifeq ($(BUILD_WIN32),True)
 $(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB): $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED)
@@ -171,13 +176,17 @@ endif
 ifdef LOCALEXE
 $(LOCALEXE)$(EXECUTABLE): $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
+ifneq ($(BUILD_OSX),True)
 	$(STRIP) $(STRIP_OPTS) $@
+endif
 endif
 
 ifdef LOCALDLL
 $(LOCALDLL)$(SHARED): $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+ifneq ($(BUILD_OSX),True)
 	$(STRIP) $(STRIP_OPTS) $@
+endif
 
 ifeq ($(BUILD_WIN32),True)
 $(IMPORTLIB): $(LOCALDLL)$(SHARED)

@@ -289,6 +289,7 @@ S::Bool S::GUI::BitmapBackend::SetPixel(const Point &iPoint, const Color &color)
 			data[offset + 0] = (color >> 16) & 255;
 			data[offset + 1] = (color >> 8) & 255;
 			data[offset + 2] = color & 255;
+			data[offset + 3] = 0;
 
 			done = True;
 

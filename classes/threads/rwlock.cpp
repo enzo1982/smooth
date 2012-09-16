@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -98,6 +98,10 @@ S::Int S::Threads::RWLock::LockForWrite()
 
 S::Int S::Threads::RWLock::Release()
 {
+	/* Acquire exclusive lock.
+	 */
+	exclusiveAccessMutex->Lock();
+
 	/* Check if we are locked for write.
 	 */
 	if (writeLocked && readLocks == 0)
@@ -105,6 +109,10 @@ S::Int S::Threads::RWLock::Release()
 		/* Release write lock.
 		 */
 		writeLocked = False;
+
+		/* Allow new read and write locks again.
+		 */
+		exclusiveAccessMutex->Release();
 
 		return exclusiveAccessMutex->Release();
 	}
@@ -122,6 +130,10 @@ S::Int S::Threads::RWLock::Release()
 
 		readLockMutex->Release();
 	}
+
+	/* Allow new read and write locks again.
+	 */
+	exclusiveAccessMutex->Release();
 
 	return Success();
 }

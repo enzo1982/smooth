@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,16 +23,20 @@ S::Threads::SemaphorePOSIX::SemaphorePOSIX(Int iValue, Void *iSemaphore) : Semap
 
 	if (iSemaphore != NIL)
 	{
-		semaphore	= (sem_t *) iSemaphore;
-		mySemaphore	= False;
+		semaphore   = (sem_t *) iSemaphore;
+		mySemaphore = False;
 	}
 	else
 	{
-		/* The semaphore will be created once we need it
-		 */
-		semaphore	= NIL;
-		initialValue	= iValue;
-		mySemaphore	= True;
+		semaphore   = new sem_t;
+		mySemaphore = True;
+
+		if (sem_init(semaphore, 0, iValue) == -1)
+		{
+			delete semaphore;
+
+			semaphore = NIL;
+		}
 	}
 }
 
@@ -53,21 +57,7 @@ S::Void *S::Threads::SemaphorePOSIX::GetSystemSemaphore() const
 
 S::Int S::Threads::SemaphorePOSIX::Wait()
 {
-	/* Lazy initialization of the semaphore happens here
-	 */
-	if (semaphore == NIL)
-	{
-		semaphore = new sem_t;
-
-		if (sem_init(semaphore, 0, initialValue) == -1)
-		{
-			delete semaphore;
-
-			semaphore = NIL;
-
-			return Error();
-		}
-	}
+	if (semaphore == NIL) return Error();
 
 	sem_wait(semaphore);
 
@@ -76,7 +66,9 @@ S::Int S::Threads::SemaphorePOSIX::Wait()
 
 S::Int S::Threads::SemaphorePOSIX::Release()
 {
-	if (semaphore != NIL) sem_post(semaphore);
+	if (semaphore == NIL) return Error();
+
+	sem_post(semaphore);
 
 	return Success();
 }

@@ -1,4 +1,4 @@
-// Copyright 2006-2008 the V8 project authors. All rights reserved.
+// Copyright 2012 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -27,6 +27,9 @@
 
 #ifndef V8_ACCESSORS_H_
 #define V8_ACCESSORS_H_
+
+#include "allocation.h"
+#include "v8globals.h"
 
 namespace v8 {
 namespace internal {
@@ -78,13 +81,14 @@ class Accessors : public AllStatic {
   MUST_USE_RESULT static MaybeObject* FunctionGetPrototype(Object* object,
                                                            void*);
   MUST_USE_RESULT static MaybeObject* FunctionSetPrototype(JSObject* object,
-                                                           Object* value,
-                                                           void*);
+                                                      Object* value,
+                                                      void*);
+  static MaybeObject* FunctionGetArguments(Object* object, void*);
+
  private:
   // Accessor functions only used through the descriptor.
   static MaybeObject* FunctionGetLength(Object* object, void*);
   static MaybeObject* FunctionGetName(Object* object, void*);
-  static MaybeObject* FunctionGetArguments(Object* object, void*);
   static MaybeObject* FunctionGetCaller(Object* object, void*);
   MUST_USE_RESULT static MaybeObject* ArraySetLength(JSObject* object,
                                                      Object* value, void*);

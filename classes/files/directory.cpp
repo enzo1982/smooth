@@ -156,7 +156,7 @@ const S::Array<S::Directory> &S::Directory::GetDirectories() const
 	{
 		String	 previousInputFormat = String::SetInputFormat("UTF-8");
 
-		for (UnsignedInt i = 0; i < fileData->gl_pathc; i++)
+		for (size_t i = 0; i < fileData->gl_pathc; i++)
 		{
 			if (String(fileData->gl_pathv[i]).EndsWith("/")) directories.Add(Directory(fileData->gl_pathv[i]));
 		}
@@ -210,7 +210,7 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 	{
 		String	 previousInputFormat = String::SetInputFormat("UTF-8");
 
-		for (UnsignedInt i = 0; i < fileData->gl_pathc; i++)
+		for (size_t i = 0; i < fileData->gl_pathc; i++)
 		{
 			if (!String(fileData->gl_pathv[i]).EndsWith("/")) files.Add(File(fileData->gl_pathv[i]));
 		}

@@ -8,8 +8,10 @@ include $(SMOOTH_PATH)/Makefile-options
 # Change these variables to fit your project:
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
+ifneq ($(BUILD_HAIKU),True)
 ifneq ($(BUILD_QNX),True)
 	MYCCOPTS += $(shell pkg-config --cflags gtk+-2.0)
+endif
 endif
 endif
 endif
@@ -21,6 +23,8 @@ ifeq ($(BUILD_WIN32),True)
 	OBJECTS += filedlg_win32.o
 else ifeq ($(BUILD_OSX),True)
 	OBJECTS += filedlg_cocoa.o
+else ifeq ($(BUILD_HAIKU),True)
+	OBJECTS += filedlg_haiku.o
 else ifeq ($(BUILD_QNX),True)
 	OBJECTS += filedlg_photon.o
 else

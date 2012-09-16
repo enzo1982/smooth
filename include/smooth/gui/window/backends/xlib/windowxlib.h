@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,10 +27,16 @@ namespace X11
 {
 	extern "C"
 	{
+#		define True	1
+#		define False	0
+#		define Bool	int
+#		define Success	0
+
 #		include <X11/Xlib.h>
 #		include <X11/Xutil.h>
 #		include <X11/Xatom.h>
 #		include <X11/Xmu/Atoms.h>
+#		include <X11/XKBlib.h>
 
 #		undef True
 #		undef False
@@ -63,6 +69,8 @@ namespace smooth
 				X11::Window				 oldwnd;
 
 				X11::XIC				 ic;
+
+				Float					 fontSize;
 
 				Point					 pos;
 				Size					 size;

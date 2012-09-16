@@ -2,6 +2,12 @@
 #define _ICONV_WRAP_
 
 #if !defined __WIN32__ || defined _ICONVDLL_
+#	if defined __WIN32__
+#		define LIBICONV_DLL_EXPORTED __declspec (dllexport)
+#	else
+#		define LIBICONV_DLL_EXPORTED
+#	endif
+
 #	include <libiconv/iconv.h>
 #else
 

@@ -7,7 +7,7 @@ SMOOTH_PATH = ../..
 LOCALEXE  = beat
 
 # Enter object files here:
-OBJECTS	  = beat.o
+OBJECTS	  = beat.o options.o time.o
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =

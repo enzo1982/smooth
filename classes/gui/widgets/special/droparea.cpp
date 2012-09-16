@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,8 +42,8 @@ S::Int S::GUI::DropArea::Hide()
 
 S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())			return Error();
-	if (!IsActive() || !IsVisible())	return Success();
+	if (!IsRegistered())		 return Error();
+	if (!IsActive() || !IsVisible()) return Success();
 
 	if (!initialized)
 	{
@@ -64,9 +64,6 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 	}
 
 	Int	 retVal = Success();
-	Point	 realPos = GetRealPosition();
-
-	EnterProtectedRegion();
 
 #ifdef __WIN32__
 	switch (message)
@@ -79,6 +76,7 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 				DragQueryPoint(hDrop, &pPos);
 
 				Point	 pos(pPos.x, pPos.y);
+				Point	 realPos = GetRealPosition();
 
 				if (pos.x > realPos.x && pos.x < (realPos.x + GetWidth()) && pos.y > realPos.y && pos.y < (realPos.y + GetHeight()))
 				{
@@ -88,8 +86,10 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 					Int	 nOfFiles;
 
-					if (Setup::enableUnicode)	nOfFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0);
-					else				nOfFiles = DragQueryFileA(hDrop, 0xFFFFFFFF, NULL, 0);
+					if (Setup::enableUnicode) nOfFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0);
+					else			  nOfFiles = DragQueryFileA(hDrop, 0xFFFFFFFF, NULL, 0);
+
+					EnterProtectedRegion();
 
 					for (Int i = 0; i < nOfFiles; i++)
 					{
@@ -125,6 +125,8 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 					DragFinish(hDrop);
 
+					LeaveProtectedRegion();
+
 					retVal = Break;
 				}
 			}
@@ -132,8 +134,6 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 			break;
 	}
 #endif
-
-	LeaveProtectedRegion();
 
 	return retVal;
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,15 +14,15 @@
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/widgets/basic/statusbar.h>
 #include <smooth/gui/widgets/layer.h>
-#include <smooth/misc/math.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/color.h>
-#include <smooth/input/pointer.h>
-#include <smooth/resources.h>
-#include <smooth/misc/binary.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/input/pointer.h>
+#include <smooth/misc/math.h>
+#include <smooth/misc/binary.h>
 #include <smooth/system/event.h>
 #include <smooth/system/multimonitor.h>
+#include <smooth/resources.h>
 
 #ifdef __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
@@ -117,14 +117,7 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 
 	Widget::SetMetrics(nPos, nSize);
 
-	if (resized)
-	{
-		Surface	*surface = GetDrawSurface();
-
-		surface->SetSize(GetSize() * surface->GetSurfaceDPI() / 96);
-
-		CalculateOffsets();
-	}
+	if (resized) CalculateOffsets();
 
 	visible = prevVisible;
 
@@ -282,10 +275,10 @@ S::Int S::GUI::Window::Show()
 		Minimize();
 	}
 
-	backend->Show();
-
 	initshow = True;
 	visible	 = True;
+
+	backend->Show();
 
 	onShow.Emit();
 
@@ -564,16 +557,36 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_WINDOWMETRICS:
-			Window::SetMetrics(Point((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768), Size((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768));
+			{
+				Point	 nPos((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768);
+				Size	 nSize((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768);
+
+				Bool	 resized	= (GetSize() != nSize);
+				Bool	 prevVisible	= visible;
+
+				visible = False;
+
+				Widget::SetMetrics(nPos, nSize);
+
+				if (resized) CalculateOffsets();
+
+				visible = prevVisible;
+
+				rVal = Break;
+			}
 
 			break;
 		case SM_PAINT:
 			updateRect = backend->GetUpdateRect();
 
-			if (Math::Abs((updateRect.right - updateRect.left) - GetWidth()) < 20 && Math::Abs((updateRect.bottom - updateRect.top) - GetHeight()) < 20)	Paint(SP_PAINT);
-			else																		Paint(SP_UPDATE);
+			{
+				Size	 realSize = GetRealSize();
 
-			updateRect = Rect(Point(0, 0), GetSize());
+				if (Math::Abs(updateRect.GetWidth() - realSize.cx) < 20 && Math::Abs(updateRect.GetHeight() - realSize.cy) < 20) Paint(SP_PAINT);
+				else														 Paint(SP_UPDATE);
+
+				updateRect = Rect(Point(0, 0), realSize);
+			}
 
 			rVal = Break;
 
@@ -608,7 +621,7 @@ S::Int S::GUI::Window::Paint(Int message)
 	if (!created)		return Success();
 	if (!IsVisible())	return Success();
 
-	if ((updateRect.right - updateRect.left == 0) || (updateRect.bottom - updateRect.top == 0)) return Success();
+	if (updateRect.GetWidth() == 0 || updateRect.GetHeight() == 0) return Success();
 
 	EnterProtectedRegion();
 
@@ -616,10 +629,13 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	surface->SetRightToLeft(IsRightToLeft());
 
+	Size	 realSize = GetRealSize();
+	Float	 fontSize = surface->GetSurfaceDPI() / 96.0;
+
 	if (updateRect.left < frameWidth)		  updateRect.left   = frameWidth - 1;
-	if (updateRect.top < frameWidth)		  updateRect.top    = frameWidth - 1;
-	if (GetWidth() - updateRect.right < frameWidth)	  updateRect.right  = GetWidth() - frameWidth + 1;
-	if (GetHeight() - updateRect.bottom < frameWidth) updateRect.bottom = GetHeight() - frameWidth + 1;
+	if (updateRect.top  < frameWidth)		  updateRect.top    = frameWidth - 1;
+	if (realSize.cx - updateRect.right  < frameWidth) updateRect.right  = realSize.cx - frameWidth + 1;
+	if (realSize.cy - updateRect.bottom < frameWidth) updateRect.bottom = realSize.cy - frameWidth + 1;
 
 	Rect	 workArea = System::MultiMonitor::GetVirtualScreenMetrics();
 
@@ -644,21 +660,14 @@ S::Int S::GUI::Window::Paint(Int message)
 		if (type != ToolWindow::classID)
 		{
 			Widget	*lastTopWidget = NIL;
-			Int	 bias = 0;
 			Int	 topoffset = frameWidth;
-			Int	 rightobjcount = 0;
-			Int	 leftobjcount = 0;
-			Int	 btmobjcount = 0;
-			Int	 topobjcount = 0;
+			Int	 positions = 0;
 
 			for (Int i = 0; i < GetNOfObjects(); i++)
 			{
 				Widget	*object = GetNthObject(i);
 
-				if	(object->GetOrientation() == OR_TOP)	topobjcount++;
-				else if (object->GetOrientation() == OR_BOTTOM)	btmobjcount++;
-				else if (object->GetOrientation() == OR_LEFT)	leftobjcount++;
-				else if (object->GetOrientation() == OR_RIGHT)	rightobjcount++;
+				positions |= object->GetOrientation();
 
 				if (object->GetOrientation() == OR_TOP)
 				{
@@ -666,58 +675,54 @@ S::Int S::GUI::Window::Paint(Int message)
 
 					if (object->subtype == WO_SEPARATOR)
 					{
-						bias = -3;
+						topoffset += object->GetSize().cy + 3;
 
-						topoffset += object->GetHeight() + 3;
+						Point	 p1 = Point(frameWidth * fontSize + 1, topoffset * fontSize - 2);
+						Point	 p2 = Point(realSize.cx - frameWidth, p1.y);
 
-						Point	 p1 = Point(frameWidth + 1, topoffset - 2);
-						Point	 p2 = Point(GetWidth() - frameWidth, p1.y);
-
-						if (icon != NIL) p1.x += 17;
+						if (icon != NIL) p1.x += Math::Round(18 * fontSize) - 1;
 
 						surface->Bar(p1, p2, OR_HORZ);
 					}
 					else
 					{
-						bias = 0;
-
-						topoffset += object->GetHeight();
+						topoffset += object->GetSize().cy;
 					}
 				}
 			}
 
-			if (topobjcount > 0)
+			if (positions & OR_TOP)
 			{
-				Point	 p1 = Point(frameWidth, innerOffset.top - 2 + bias);
-				Point	 p2 = Point(GetWidth() - frameWidth, p1.y);
+				Point	 p1 = Point(frameWidth, topoffset * fontSize - 2);
+				Point	 p2 = Point(realSize.cx - frameWidth, p1.y);
 
-				if (lastTopWidget->subtype == WO_NOSEPARATOR) { p1.y -= 3; p2.y -= 3; }
+				if (lastTopWidget->subtype == WO_NOSEPARATOR) { p1.y += Math::Round(3 * surface->GetSurfaceDPI() / 96.0); p2.y += Math::Round(3 * surface->GetSurfaceDPI() / 96.0); }
 
 				surface->Bar(p1, p2, OR_HORZ);
 				surface->Bar(p1 + Point(0, 2), p2 + Point(0, 2), OR_HORZ);
 			}
 
-			if (btmobjcount > 0)
+			if (positions & OR_BOTTOM)
 			{
-				Point	 p1 = Point(frameWidth, GetHeight() - innerOffset.bottom);
-				Point	 p2 = Point(GetWidth() - frameWidth, p1.y);
+				Point	 p1 = Point(frameWidth, realSize.cy - innerOffset.bottom * fontSize);
+				Point	 p2 = Point(realSize.cx - frameWidth, p1.y);
 
 				surface->Bar(p1, p2, OR_HORZ);
 				surface->Bar(p1 + Point(0, 2), p2 + Point(0, 2), OR_HORZ);
 			}
 
-			if (leftobjcount > 0)
+			if (positions & OR_LEFT)
 			{
-				Point	 p1 = Point(innerOffset.left - 3, innerOffset.top);
-				Point	 p2 = Point(p1.x, GetHeight() - innerOffset.bottom - 2);
+				Point	 p1 = Point(innerOffset.left * fontSize - 3, innerOffset.top);
+				Point	 p2 = Point(p1.x, realSize.cy - innerOffset.bottom - 2);
 
 				surface->Bar(p1, p2, OR_VERT);
 			}
 
-			if (rightobjcount > 0)
+			if (positions & OR_RIGHT)
 			{
-				Point	 p1 = Point(GetWidth() - innerOffset.right + 1, innerOffset.top);
-				Point	 p2 = Point(p1.x, GetHeight() - innerOffset.bottom - 2);
+				Point	 p1 = Point(realSize.cx - innerOffset.right * fontSize + 1, innerOffset.top);
+				Point	 p2 = Point(p1.x, realSize.cy - innerOffset.bottom - 2);
 
 				surface->Bar(p1, p2, OR_VERT);
 			}
@@ -750,10 +755,7 @@ S::Int S::GUI::Window::Paint(Int message)
 S::Void S::GUI::Window::CalculateOffsets()
 {
 	Widget	*lastTopWidget	= NIL;
-	Int	 rightobjcount	= 0;
-	Int	 leftobjcount	= 0;
-	Int	 btmobjcount	= 0;
-	Int	 topobjcount	= 0;
+	Int	 positions	= 0;
 
 	if (GetObjectType() == ToolWindow::classID)	innerOffset = Rect(Point(0, 0), Size(0, 0));
 	else						innerOffset = Rect(Point(frameWidth, frameWidth), Size(0, 0));
@@ -762,10 +764,10 @@ S::Void S::GUI::Window::CalculateOffsets()
 	{
 		Widget	*widget = GetNthObject(i);
 
+		positions |= widget->GetOrientation();
+
 		if (widget->GetOrientation() == OR_TOP)
 		{
-			topobjcount++;
-
 			lastTopWidget = widget;
 
 			widget->SetMetrics(Point(innerOffset.left, innerOffset.top), Size(GetWidth() - innerOffset.left - innerOffset.right, widget->GetHeight()));
@@ -776,16 +778,14 @@ S::Void S::GUI::Window::CalculateOffsets()
 		}
 		else if (widget->GetOrientation() == OR_BOTTOM)
 		{
-			btmobjcount++;
-
 			widget->SetMetrics(Point(innerOffset.left, GetHeight() - innerOffset.bottom - widget->GetHeight()), Size(GetWidth() - innerOffset.left - innerOffset.right, widget->GetHeight()));
 
 			innerOffset.bottom += widget->GetHeight();
 		}
 	}
 
-	if (topobjcount > 0) innerOffset.top	+= 3 + (lastTopWidget->subtype == WO_NOSEPARATOR ? 3 : 0);
-	if (btmobjcount > 0) innerOffset.bottom += 4;
+	if (positions & OR_TOP)	   innerOffset.top    += 3 + (lastTopWidget->subtype == WO_NOSEPARATOR ? 3 : 0);
+	if (positions & OR_BOTTOM) innerOffset.bottom += 4;
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -793,24 +793,20 @@ S::Void S::GUI::Window::CalculateOffsets()
 
 		if (widget->GetOrientation() == OR_LEFT)
 		{
-			leftobjcount++;
-
 			widget->SetMetrics(Point(innerOffset.left, innerOffset.top), Size(widget->GetWidth(), GetHeight() - innerOffset.top - innerOffset.bottom));
 
 			innerOffset.left += widget->GetWidth();
 		}
 		else if (widget->GetOrientation() == OR_RIGHT)
 		{
-			rightobjcount++;
-
 			widget->SetMetrics(Point(GetWidth() - innerOffset.right - widget->GetWidth(), innerOffset.top), Size(widget->GetWidth(), GetHeight() - innerOffset.top - innerOffset.bottom));
 
 			innerOffset.right += widget->GetWidth();
 		}
 	}
 
-	if (leftobjcount  > 0) innerOffset.left	 += 3;
-	if (rightobjcount > 0) innerOffset.right += 3;
+	if (positions & OR_LEFT)  innerOffset.left  += 3;
+	if (positions & OR_RIGHT) innerOffset.right += 3;
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -833,7 +829,7 @@ S::GUI::Point S::GUI::Window::GetMousePosition() const
 {
 	Point	 position = Input::Pointer::GetPosition();
 
-	if (IsRightToLeft())	position = Point(GetWidth() - (position.x - GetX()) - 1, position.y - GetY());
+	if (IsRightToLeft())	position = Point(GetRealSize().cx - (position.x - GetX()) - 1, position.y - GetY());
 	else			position -= GetPosition();
 
 	return position;
@@ -878,7 +874,7 @@ S::Int S::GUI::Window::Add(Widget *widget)
 		{
 			if (!Binary::IsFlagSet(widget->GetFlags(), TB_MAXBUTTON)) flags = flags | WF_NORESIZE;
 
-			if (widget->GetHeight() == 0) backend->SetSizeModifier(backend->GetSizeModifier() - Size(0, 19));
+			if (widget->GetHeight() == 0) backend->SetSizeModifier(backend->GetSizeModifier() - Size(0, 19) * Surface().GetSurfaceDPI() / 96.0);
 		}
 		else if (widget->GetObjectType() == Statusbar::classID)
 		{

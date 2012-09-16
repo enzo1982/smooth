@@ -1,4 +1,4 @@
-// Copyright 2010 the V8 project authors. All rights reserved.
+// Copyright 2011 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -25,10 +25,9 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "v8.h"
-
-#include "bignum.h"
+#include "../include/v8stdint.h"
 #include "utils.h"
+#include "bignum.h"
 
 namespace v8 {
 namespace internal {
@@ -67,7 +66,7 @@ void Bignum::AssignUInt64(uint64_t value) {
   int needed_bigits = kUInt64Size / kBigitSize + 1;
   EnsureCapacity(needed_bigits);
   for (int i = 0; i < needed_bigits; ++i) {
-    bigits_[i] = value & kBigitMask;
+    bigits_[i] = static_cast<Chunk>(value & kBigitMask);
     value = value >> kBigitSize;
   }
   used_digits_ = needed_bigits;
@@ -266,7 +265,7 @@ void Bignum::MultiplyByUInt32(uint32_t factor) {
   }
   while (carry != 0) {
     EnsureCapacity(used_digits_ + 1);
-    bigits_[used_digits_] = carry & kBigitMask;
+    bigits_[used_digits_] = static_cast<Chunk>(carry & kBigitMask);
     used_digits_++;
     carry >>= kBigitSize;
   }
@@ -287,13 +286,13 @@ void Bignum::MultiplyByUInt64(uint64_t factor) {
     uint64_t product_low = low * bigits_[i];
     uint64_t product_high = high * bigits_[i];
     uint64_t tmp = (carry & kBigitMask) + product_low;
-    bigits_[i] = tmp & kBigitMask;
+    bigits_[i] = static_cast<Chunk>(tmp & kBigitMask);
     carry = (carry >> kBigitSize) + (tmp >> kBigitSize) +
         (product_high << (32 - kBigitSize));
   }
   while (carry != 0) {
     EnsureCapacity(used_digits_ + 1);
-    bigits_[used_digits_] = carry & kBigitMask;
+    bigits_[used_digits_] = static_cast<Chunk>(carry & kBigitMask);
     used_digits_++;
     carry >>= kBigitSize;
   }
@@ -748,7 +747,8 @@ void Bignum::SubtractTimes(const Bignum& other, int factor) {
   for (int i = 0; i < other.used_digits_; ++i) {
     DoubleChunk product = static_cast<DoubleChunk>(factor) * other.bigits_[i];
     DoubleChunk remove = borrow + product;
-    Chunk difference = bigits_[i + exponent_diff] - (remove & kBigitMask);
+    Chunk difference =
+        bigits_[i + exponent_diff] - static_cast<Chunk>(remove & kBigitMask);
     bigits_[i + exponent_diff] = difference & kBigitMask;
     borrow = static_cast<Chunk>((difference >> (kChunkSize - 1)) +
                                 (remove >> kBigitSize));

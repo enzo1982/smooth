@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,6 +41,7 @@ S::Int S::GUI::ImageEntry::Paint(Int message)
 
 	Surface	*surface	= GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
+	Size	 realSize	= GetRealSize();
 
 	switch (message)
 	{
@@ -48,7 +49,7 @@ S::Int S::GUI::ImageEntry::Paint(Int message)
 		case SP_PAINT:
 			surface->StartPaint(GetVisibleArea());
 
-			surface->Box(Rect(realPos, GetSize()), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos, realSize), Setup::ClientColor, Rect::Filled);
 			image->Paint(SP_PAINT);
 
 			surface->EndPaint();
@@ -57,10 +58,10 @@ S::Int S::GUI::ImageEntry::Paint(Int message)
 		case SP_MOUSEIN:
 			surface->StartPaint(GetVisibleArea());
 
-			surface->Box(Rect(realPos,				Size(GetWidth(), 2)), Setup::GradientStartColor, Rect::Filled);
-			surface->Box(Rect(realPos,				Size(2, GetHeight())), Setup::GradientStartColor, Rect::Filled);
-			surface->Box(Rect(realPos + Point(GetWidth() - 2, 0),	Size(2, GetHeight())), Setup::GradientStartColor, Rect::Filled);
-			surface->Box(Rect(realPos + Point(0, GetHeight() - 2),	Size(GetWidth(), 2)), Setup::GradientStartColor, Rect::Filled);
+			surface->Box(Rect(realPos,				Size(realSize.cx, 2)), Setup::GradientStartColor, Rect::Filled);
+			surface->Box(Rect(realPos,				Size(2, realSize.cy)), Setup::GradientStartColor, Rect::Filled);
+			surface->Box(Rect(realPos + Point(realSize.cx - 2, 0),	Size(2, realSize.cy)), Setup::GradientStartColor, Rect::Filled);
+			surface->Box(Rect(realPos + Point(0, realSize.cy - 2),	Size(realSize.cx, 2)), Setup::GradientStartColor, Rect::Filled);
 
 			surface->EndPaint();
 
@@ -68,10 +69,10 @@ S::Int S::GUI::ImageEntry::Paint(Int message)
 		case SP_MOUSEOUT:
 			surface->StartPaint(GetVisibleArea());
 
-			surface->Box(Rect(realPos,				Size(GetWidth(), 2)), Setup::ClientColor, Rect::Filled);
-			surface->Box(Rect(realPos,				Size(2, GetHeight())), Setup::ClientColor, Rect::Filled);
-			surface->Box(Rect(realPos + Point(GetWidth() - 2, 0),	Size(2, GetHeight())), Setup::ClientColor, Rect::Filled);
-			surface->Box(Rect(realPos + Point(0, GetHeight() - 2),	Size(GetWidth(), 2)), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos,				Size(realSize.cx, 2)), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos,				Size(2, realSize.cy)), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos + Point(realSize.cx - 2, 0),	Size(2, realSize.cy)), Setup::ClientColor, Rect::Filled);
+			surface->Box(Rect(realPos + Point(0, realSize.cy - 2),	Size(realSize.cx, 2)), Setup::ClientColor, Rect::Filled);
 
 			surface->EndPaint();
 

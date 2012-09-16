@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,8 +40,8 @@ S::GUI::Point S::GUI::RightToLeftModifier::TranslatePoint(const Point &p) const
 
 S::GUI::Rect S::GUI::RightToLeftModifier::TranslateRect(const Rect &r) const
 {
-	if (rightToLeft) return Rect(Point(surfaceSize.cx - r.right, r.top), Size(r.right - r.left, r.bottom - r.top));
-	else		 return Rect(Point(r.left, r.top), Size(r.right - r.left, r.bottom - r.top));
+	if (rightToLeft) return Rect(Point(surfaceSize.cx - r.right, r.top), r.GetSize());
+	else		 return Rect(Point(		    r.left,  r.top), r.GetSize());
 }
 
 S::Void S::GUI::RightToLeftModifier::SetSurfaceSize(const Size &nSurfaceSize)

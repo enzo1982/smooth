@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,11 +13,10 @@
 #include <smooth/gui/widgets/multi/menu/menubar.h>
 #include <smooth/gui/widgets/hotspot/hotspot.h>
 #include <smooth/gui/widgets/special/shortcut.h>
-#include <smooth/gui/widgets/basic/checkbox.h>
-#include <smooth/gui/widgets/basic/optionbox.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/misc/math.h>
 #include <smooth/misc/binary.h>
 #include <smooth/system/timer.h>
 #include <smooth/system/multimonitor.h>
@@ -68,9 +67,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 	if (!IsVisible())	return Success();
 
 	Surface	*surface = GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Rect	 frame	 = Rect(realPos, GetSize());
-	Rect	 bmpRect = Rect(realPos + Point(2, 1), bitmap.GetSize());
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+	Rect	 bmpRect = Rect(GetRealPosition() + Point(2, 2) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0);
 
 	switch (message)
 	{
@@ -86,8 +84,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 			}
 			else if (text != NIL || bitmap != NIL)
 			{
-				Rect	 textRect = Rect(realPos + Point(18, 0), GetSize() - Size(22, 2));
-				Font	 nFont = font;
+				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, 0) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 2);
+				Font	 nFont	  = font;
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
@@ -101,17 +99,19 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 				if (shortcut != NIL)
 				{
-					textRect.left = textRect.right - shortcutOffset;
+					textRect.left = textRect.right - Math::Round(shortcutOffset * surface->GetSurfaceDPI() / 96.0);
 
 					surface->SetText(shortcut->ToString(), textRect, nFont);
 				}
 
 				if (popup != NIL)
 				{
-					Point	 p1 = Point(frame.right - 8, frame.top + 4);
-					Point	 p2 = Point(frame.right - 8, frame.top + 11);
+					Int	 size = Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
 
-					for (Int i = 0; i < 4; i++) surface->Line(p1 + Point(i, i), p2 + Point(i, -i), Setup::TextColor);
+					Point	 lineStart = Point(frame.right - 4 - size, frame.top + 1 + Math::Round(4 * surface->GetSurfaceDPI() / 96.0));
+					Point	 lineEnd   = Point(frame.right - 4 - size, frame.top + 1 + Math::Round(4 * surface->GetSurfaceDPI() / 96.0) + size * 2 - 1);
+
+					for (Int i = 0; i < size; i++) surface->Line(lineStart + Point(i, i), lineEnd + Point(i, -i), Setup::TextColor);
 				}
 			}
 
@@ -119,8 +119,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 		case SP_MOUSEIN:
 			if (text != NIL || bitmap != NIL)
 			{
-				Rect	 textRect	= Rect(realPos + Point(18, 0), GetSize() - Size(22, 2));
-				Font	 nFont		= font;
+				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, 0) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 2);
+				Font	 nFont	  = font;
 
 				nFont.SetColor(Setup::GradientTextColor);
 
@@ -136,17 +136,19 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 				if (shortcut != NIL)
 				{
-					textRect.left = textRect.right - shortcutOffset;
+					textRect.left = textRect.right - Math::Round(shortcutOffset * surface->GetSurfaceDPI() / 96.0);
 
 					surface->SetText(shortcut->ToString(), textRect, nFont);
 				}
 
 				if (popup != NIL)
 				{
-					Point	 p1 = Point(frame.right - 8, frame.top + 4);
-					Point	 p2 = Point(frame.right - 8, frame.top + 11);
+					Int	 size = Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
 
-					for (Int i = 0; i < 4; i++) surface->Line(p1 + Point(i, i), p2 + Point(i, -i), Setup::GradientTextColor);
+					Point	 lineStart = Point(frame.right - 4 - size, frame.top + 1 + Math::Round(4 * surface->GetSurfaceDPI() / 96.0));
+					Point	 lineEnd   = Point(frame.right - 4 - size, frame.top + 1 + Math::Round(4 * surface->GetSurfaceDPI() / 96.0) + size * 2 - 1);
+
+					for (Int i = 0; i < size; i++) surface->Line(lineStart + Point(i, i), lineEnd + Point(i, -i), Setup::GradientTextColor);
 				}
 			}
 
@@ -181,8 +183,8 @@ S::Int S::GUI::PopupMenuEntry::Hide()
 
 S::GUI::Size S::GUI::PopupMenuEntry::GetMinimumSize() const
 {
-	if (text != NIL && shortcut == NIL) return Size(textSize.cx + 44, 15);
-	if (text != NIL && shortcut != NIL) return Size(textSize.cx + font.GetTextSizeX(shortcut->ToString()) + 59, 15);
+	if (text != NIL && shortcut == NIL) return Size(unscaledTextSize.cx + 44, 15);
+	if (text != NIL && shortcut != NIL) return Size(unscaledTextSize.cx + font.GetUnscaledTextSizeX(shortcut->ToString()) + 59, 15);
 
 	return Size(15, 4);
 }
@@ -191,7 +193,7 @@ S::Int S::GUI::PopupMenuEntry::GetShortcutTextSize() const
 {
 	if (shortcut == NIL) return 0;
 
-	return font.GetTextSizeX(shortcut->ToString());
+	return font.GetUnscaledTextSizeX(shortcut->ToString());
 }
 
 S::Void S::GUI::PopupMenuEntry::SetShortcutOffset(Int nShortcutOffset)
@@ -252,6 +254,7 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 	if (popup == NIL) return;
 
 	Widget	*window		= container->GetContainerWindow();
+	Surface	*surface	= GetDrawSurface();
 
 	if (window == NIL) return;
 
@@ -266,12 +269,13 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 
 	Rect	 monitor	= System::MultiMonitor::GetActiveMonitorMetrics();
 	Point	 realPos	= GetRealPosition();
-	Point	 popupPos	= realPos + Point(GetWidth(), -3);
+	Size	 realSize	= GetRealSize();
+	Point	 popupPos	= realPos + Point(realSize.cx, Math::Round(-3 * surface->GetSurfaceDPI() / 96.0));
 
 	popup->CalculateSize();
 
-	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popup->GetWidth() >= monitor.GetWidth()) popupPos.x = realPos.x - popup->GetWidth(); }
-	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popup->GetWidth() <= 0)		  popupPos.x = realPos.x - popup->GetWidth(); }
+	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popup->GetWidth() >= monitor.GetWidth()) popupPos.x = realPos.x - Math::Round(popup->GetWidth() * surface->GetSurfaceDPI() / 96.0); }
+	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popup->GetWidth() <= 0)		  popupPos.x = realPos.x - Math::Round(popup->GetWidth() * surface->GetSurfaceDPI() / 96.0); }
 
 	if (window->GetY() + popupPos.y + popup->GetHeight() >= monitor.GetHeight()) popupPos.y = realPos.y - popup->GetHeight() + GetHeight() + 3;
 
@@ -304,14 +308,14 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 		}
 		else
 		{
-			if (!container->GetContainerWindow()->IsMouseOn(Rect(Point(), container->GetSize()))) owner->internalRequestClose.Emit();
-			else										      container->GetContainerWindow()->Raise();
+			if (!container->GetContainerWindow()->IsMouseOn(Rect(Point(), container->GetRealSize()))) owner->internalRequestClose.Emit();
+			else											  container->GetContainerWindow()->Raise();
 		}
 	}
 }
 
 S::Bool S::GUI::PopupMenuEntry::IsTypeCompatible(Short compType) const
 {
-	if (compType == Object::classID || compType == Widget::classID || compType == MenuEntry::classID)	return True;
-	else													return False;
+	if (compType == Object::classID || compType == Widget::classID || compType == MenuEntry::classID) return True;
+	else												  return False;
 }

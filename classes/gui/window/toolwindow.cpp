@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,7 +38,7 @@ S::Bool S::GUI::ToolWindow::Create()
 
 		if (containerWindow != NIL)
 		{
-			if (IsRightToLeft()) Window::SetMetrics(Point(containerWindow->GetWidth() - (GetX() + GetWidth()), GetY()), GetSize());
+			if (IsRightToLeft()) Window::SetMetrics(Point(containerWindow->GetRealSize().cx - (GetX() + GetRealSize().cx), GetY()), GetSize());
 
 			Window::SetMetrics(GetPosition() + containerWindow->GetPosition(), GetSize());
 		}
@@ -57,7 +57,13 @@ S::Int S::GUI::ToolWindow::SetMetrics(const Point &nPos, const Size &nSize)
 
 		if (containerWindow != NIL)
 		{
-			if (IsRightToLeft()) position.x = containerWindow->GetWidth() - (nPos.x + nSize.cx);
+			if (IsRightToLeft())
+			{
+				Surface	*surface  = GetDrawSurface();
+				Float	 fontSize = surface->GetSurfaceDPI() / 96.0;
+
+				position.x = containerWindow->GetRealSize().cx - (nPos.x + Math::Round(nSize.cx * fontSize));
+			}
 
 			position += containerWindow->GetPosition();
 		}

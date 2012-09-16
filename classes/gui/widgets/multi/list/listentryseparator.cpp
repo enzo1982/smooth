@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -44,7 +44,7 @@ S::Int S::GUI::ListEntrySeparator::Paint(Int message)
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 				surface->Box(frame + Point(4, 1) - Size(8, 2), font.GetColor(), Rect::Filled);
 			}

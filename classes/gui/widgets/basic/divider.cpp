@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -75,10 +75,10 @@ S::Int S::GUI::Divider::Paint(Int message)
 				UpdateMetrics();
 
 				Surface	*surface = GetDrawSurface();
-				Rect	 rect = Rect(GetRealPosition(), GetSize());
+				Rect	 rect = Rect(GetRealPosition(), GetRealSize());
 
-				if (Binary::IsFlagSet(flags, OR_VERT))	surface->Bar(Point(rect.left, rect.top), Point(rect.right - 2, rect.bottom - 1), OR_VERT);
-				else					surface->Bar(Point(rect.left, rect.top), Point(rect.right - 1, rect.bottom - 2), OR_HORZ);
+				if (Binary::IsFlagSet(flags, OR_VERT))	surface->Bar(rect.GetPosition(), Point(rect.left,      rect.bottom - 1), OR_VERT);
+				else					surface->Bar(rect.GetPosition(), Point(rect.right - 1, rect.top       ), OR_HORZ);
 			}
 
 			break;
@@ -145,7 +145,7 @@ S::Void S::GUI::Divider::UpdateMetrics()
 		if (container->GetObjectType() == Window::classID)
 		{
 			if (Binary::IsFlagSet(flags, OR_BOTTOM)) rect.top = ((Window *) container)->GetClientRect().bottom - position;
-			else					 rect.top = ((Window *) container)->GetClientRect().top + position;
+			else					 rect.top = ((Window *) container)->GetClientRect().top	   + position;
 
 			rect.left	= wnd->GetClientRect().left;
 			rect.right	= wnd->GetClientRect().right;
@@ -153,7 +153,7 @@ S::Void S::GUI::Divider::UpdateMetrics()
 		else
 		{
 			if (Binary::IsFlagSet(flags, OR_BOTTOM)) rect.top = container->GetHeight() - position;
-			else					 rect.top = position;
+			else					 rect.top = 			     position;
 
 			rect.left	= 3;
 			rect.right	= container->GetWidth() - 3;
@@ -183,10 +183,10 @@ S::Void S::GUI::Divider::UpdateMetrics()
 		}
 	}
 
-	SetMetrics(Point(rect.left, rect.top), Size(rect.right - rect.left + 1, rect.bottom - rect.top + 1));
+	SetMetrics(rect.GetPosition(), rect.GetSize() + Size(1, 1));
 
-	if (Binary::IsFlagSet(flags, OR_VERT))	dragHotspot->SetMetrics(Point(-1, 0), Size(rect.right - rect.left + 3, rect.bottom - rect.top + 1));
-	else					dragHotspot->SetMetrics(Point(0, -1), Size(rect.right - rect.left + 1, rect.bottom - rect.top + 3));
+	if (Binary::IsFlagSet(flags, OR_VERT))	dragHotspot->SetMetrics(Point(-1, 0), rect.GetSize() + Size(3, 1));
+	else					dragHotspot->SetMetrics(Point(0, -1), rect.GetSize() + Size(1, 3));
 }
 
 S::Void S::GUI::Divider::OnMouseOver()

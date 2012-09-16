@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,8 +13,12 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/backends/xlib/backendxlib.h>
 #include <smooth/graphics/color.h>
+#include <smooth/files/file.h>
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
+
+#include <unistd.h>
+#include <stdio.h>
 
 using namespace X11;
 
@@ -23,7 +27,9 @@ S::GUI::SurfaceBackend *CreateSurfaceXLib(S::Void *iSurface, const S::GUI::Size 
 	return new S::GUI::SurfaceXLib(iSurface);
 }
 
-S::Int	 surfaceXLibTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceXLib);
+S::Int		 surfaceXLibTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceXLib);
+
+S::Short	 S::GUI::SurfaceXLib::surfaceDPI = -1;
 
 S::GUI::SurfaceXLib::SurfaceXLib(Void *iWindow, const Size &maxSize)
 {
@@ -57,6 +63,8 @@ S::GUI::SurfaceXLib::SurfaceXLib(Void *iWindow, const Size &maxSize)
 
 		allocSize = size;
 	}
+
+	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceXLib::~SurfaceXLib()
@@ -119,7 +127,7 @@ S::Int S::GUI::SurfaceXLib::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect		 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect)), *(paintRects.GetLast()));
+	Rect		 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
 	XRectangle	 clipRect;
 
 	clipRect.x	= pRect.left;
@@ -163,7 +171,7 @@ S::Int S::GUI::SurfaceXLib::EndPaint()
 
 	delete paintRects.GetLast();
 
-	paintRects.Remove(paintRects.GetNthIndex(paintRects.Length() - 1));
+	paintRects.RemoveNth(paintRects.Length() - 1);
 
 	return Success();
 }
@@ -173,11 +181,52 @@ S::Void *S::GUI::SurfaceXLib::GetSystemSurface() const
 	return (Void *) window;
 }
 
+S::Short S::GUI::SurfaceXLib::GetSurfaceDPI() const
+{
+	if (surfaceDPI != -1) return surfaceDPI;
+
+	Short	 dpi = 96;
+
+	/* Search the path for gsettings.
+	 */
+	String			 path  = getenv("PATH");
+	const Array<String>	&paths = path.Explode(":");
+
+	foreach (const String &path, paths)
+	{
+		/* Check for gsettings in this path.
+		 */
+		if (File(String(path).Append("/").Append("gsettings")).Exists())
+		{
+			/* If gsettings exists, use it to get the font scaling factor.
+			 */
+			FILE	*pstdin = popen("gsettings get org.gnome.desktop.interface text-scaling-factor", "r");
+
+			if (pstdin != NIL)
+			{
+				float	 factor = 1.0;
+
+				if (fscanf(pstdin, "%f", &factor) > 0) dpi = Math::Round(96.0 * factor);
+
+				pclose(pstdin);
+			}
+
+			break;
+		}
+	}
+
+	String::ExplodeFinish();
+
+	surfaceDPI = dpi;
+
+	return dpi;
+}
+
 S::Int S::GUI::SurfaceXLib::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL) return Success();
 
-	Point	 point = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPoint));
+	Point	 point = rightToLeft.TranslatePoint(iPoint);
 
 	XGCValues	 gcValues;
 
@@ -196,8 +245,8 @@ S::Int S::GUI::SurfaceXLib::Line(const Point &iPos1, const Point &iPos2, const C
 {
 	if (window == NIL) return Success();
 
-	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
-	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
+	Point	 pos1 = rightToLeft.TranslatePoint(iPos1);
+	Point	 pos2 = rightToLeft.TranslatePoint(iPos2);
 
 	/* Adjust to Windows GDI behavior for diagonal lines.
 	 */
@@ -235,7 +284,7 @@ S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, const Color &color, Int style
 {
 	if (window == NIL) return Success();
 
-	Rect		 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
+	Rect		 rect = rightToLeft.TranslateRect(iRect);
 	XGCValues	 gcValues;
 
 	gcValues.foreground = Color(color.GetBlue(), color.GetGreen(), color.GetRed());
@@ -299,10 +348,10 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
 
 	Rect		 rect	    = iRect;
-	Int		 lineHeight = font.GetTextSizeY() + 3;
+	Int		 lineHeight = font.GetScaledTextSizeY() + 3;
 
 	XGCValues	 gcValues;
-	X11::Font	 xfont = XLoadFont(display, String("-*-").Append(font.GetName().ToLower()).Append("-").Append(font.GetWeight() >= Font::Bold ? "bold" : "medium").Append("-").Append(font.GetStyle() & Font::Italic ? "i" : "r").Append("-normal-*-").Append(String::FromInt(font.GetSize() * fontSize.TranslateY(96) / 72.0)).Append("-*-*-*-*-*-*-*"));
+	X11::Font	 xfont = XLoadFont(display, String("-*-").Append(font.GetName().ToLower()).Append("-").Append(font.GetWeight() >= Font::Bold ? "bold" : "medium").Append("-").Append(font.GetStyle() & Font::Italic ? "i" : "r").Append("-normal-*-").Append(String::FromInt(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0))).Append("-*-*-*-*-*-*-*"));
 
 	gcValues.foreground = Color(font.GetColor().GetBlue(), font.GetColor().GetGreen(), font.GetColor().GetRed());
 	gcValues.font	    = xfont;
@@ -313,11 +362,7 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 
 	foreach (const String &line, lines)
 	{
-		Bool	 rtlCharacters = False;
-
-		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
-
-		Rect	 tRect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
+		Rect	 tRect = rightToLeft.TranslateRect(rect);
 
 		if (Setup::enableUnicode)
 		{
@@ -347,7 +392,7 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
-	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
+	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
@@ -370,7 +415,7 @@ S::Int S::GUI::SurfaceXLib::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, c
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
-	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
+	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
 
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{

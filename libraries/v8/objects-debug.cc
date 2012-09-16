@@ -1,4 +1,4 @@
-// Copyright 2006-2008 the V8 project authors. All rights reserved.
+// Copyright 2012 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -37,30 +37,6 @@ namespace internal {
 
 #ifdef DEBUG
 
-static const char* TypeToString(InstanceType type);
-
-
-void MaybeObject::Print() {
-  Object* this_as_object;
-  if (ToObject(&this_as_object)) {
-    if (this_as_object->IsSmi()) {
-      Smi::cast(this_as_object)->SmiPrint();
-    } else {
-      HeapObject::cast(this_as_object)->HeapObjectPrint();
-    }
-  } else {
-    Failure::cast(this)->FailurePrint();
-  }
-  Flush();
-}
-
-
-void MaybeObject::PrintLn() {
-  Print();
-  PrintF("\n");
-}
-
-
 void MaybeObject::Verify() {
   Object* this_as_object;
   if (ToObject(&this_as_object)) {
@@ -94,112 +70,6 @@ void Failure::FailureVerify() {
 }
 
 
-void HeapObject::PrintHeader(const char* id) {
-  PrintF("%p: [%s]\n", reinterpret_cast<void*>(this), id);
-}
-
-
-void HeapObject::HeapObjectPrint() {
-  InstanceType instance_type = map()->instance_type();
-
-  HandleScope scope;
-  if (instance_type < FIRST_NONSTRING_TYPE) {
-    String::cast(this)->StringPrint();
-    return;
-  }
-
-  switch (instance_type) {
-    case MAP_TYPE:
-      Map::cast(this)->MapPrint();
-      break;
-    case HEAP_NUMBER_TYPE:
-      HeapNumber::cast(this)->HeapNumberPrint();
-      break;
-    case FIXED_ARRAY_TYPE:
-      FixedArray::cast(this)->FixedArrayPrint();
-      break;
-    case BYTE_ARRAY_TYPE:
-      ByteArray::cast(this)->ByteArrayPrint();
-      break;
-    case PIXEL_ARRAY_TYPE:
-      PixelArray::cast(this)->PixelArrayPrint();
-      break;
-    case EXTERNAL_BYTE_ARRAY_TYPE:
-      ExternalByteArray::cast(this)->ExternalByteArrayPrint();
-      break;
-    case EXTERNAL_UNSIGNED_BYTE_ARRAY_TYPE:
-      ExternalUnsignedByteArray::cast(this)->ExternalUnsignedByteArrayPrint();
-      break;
-    case EXTERNAL_SHORT_ARRAY_TYPE:
-      ExternalShortArray::cast(this)->ExternalShortArrayPrint();
-      break;
-    case EXTERNAL_UNSIGNED_SHORT_ARRAY_TYPE:
-      ExternalUnsignedShortArray::cast(this)->ExternalUnsignedShortArrayPrint();
-      break;
-    case EXTERNAL_INT_ARRAY_TYPE:
-      ExternalIntArray::cast(this)->ExternalIntArrayPrint();
-      break;
-    case EXTERNAL_UNSIGNED_INT_ARRAY_TYPE:
-      ExternalUnsignedIntArray::cast(this)->ExternalUnsignedIntArrayPrint();
-      break;
-    case EXTERNAL_FLOAT_ARRAY_TYPE:
-      ExternalFloatArray::cast(this)->ExternalFloatArrayPrint();
-      break;
-    case FILLER_TYPE:
-      PrintF("filler");
-      break;
-    case JS_OBJECT_TYPE:  // fall through
-    case JS_CONTEXT_EXTENSION_OBJECT_TYPE:
-    case JS_ARRAY_TYPE:
-    case JS_REGEXP_TYPE:
-      JSObject::cast(this)->JSObjectPrint();
-      break;
-    case ODDBALL_TYPE:
-      Oddball::cast(this)->to_string()->Print();
-      break;
-    case JS_FUNCTION_TYPE:
-      JSFunction::cast(this)->JSFunctionPrint();
-      break;
-    case JS_GLOBAL_PROXY_TYPE:
-      JSGlobalProxy::cast(this)->JSGlobalProxyPrint();
-      break;
-    case JS_GLOBAL_OBJECT_TYPE:
-      JSGlobalObject::cast(this)->JSGlobalObjectPrint();
-      break;
-    case JS_BUILTINS_OBJECT_TYPE:
-      JSBuiltinsObject::cast(this)->JSBuiltinsObjectPrint();
-      break;
-    case JS_VALUE_TYPE:
-      PrintF("Value wrapper around:");
-      JSValue::cast(this)->value()->Print();
-      break;
-    case CODE_TYPE:
-      Code::cast(this)->CodePrint();
-      break;
-    case PROXY_TYPE:
-      Proxy::cast(this)->ProxyPrint();
-      break;
-    case SHARED_FUNCTION_INFO_TYPE:
-      SharedFunctionInfo::cast(this)->SharedFunctionInfoPrint();
-      break;
-    case JS_GLOBAL_PROPERTY_CELL_TYPE:
-      JSGlobalPropertyCell::cast(this)->JSGlobalPropertyCellPrint();
-      break;
-#define MAKE_STRUCT_CASE(NAME, Name, name) \
-  case NAME##_TYPE:                        \
-    Name::cast(this)->Name##Print();       \
-    break;
-  STRUCT_LIST(MAKE_STRUCT_CASE)
-#undef MAKE_STRUCT_CASE
-
-    default:
-      PrintF("UNKNOWN TYPE %d", map()->instance_type());
-      UNREACHABLE();
-      break;
-  }
-}
-
-
 void HeapObject::HeapObjectVerify() {
   InstanceType instance_type = map()->instance_type();
 
@@ -218,11 +88,17 @@ void HeapObject::HeapObjectVerify() {
     case FIXED_ARRAY_TYPE:
       FixedArray::cast(this)->FixedArrayVerify();
       break;
+    case FIXED_DOUBLE_ARRAY_TYPE:
+      FixedDoubleArray::cast(this)->FixedDoubleArrayVerify();
+      break;
     case BYTE_ARRAY_TYPE:
       ByteArray::cast(this)->ByteArrayVerify();
       break;
-    case PIXEL_ARRAY_TYPE:
-      PixelArray::cast(this)->PixelArrayVerify();
+    case FREE_SPACE_TYPE:
+      FreeSpace::cast(this)->FreeSpaceVerify();
+      break;
+    case EXTERNAL_PIXEL_ARRAY_TYPE:
+      ExternalPixelArray::cast(this)->ExternalPixelArrayVerify();
       break;
     case EXTERNAL_BYTE_ARRAY_TYPE:
       ExternalByteArray::cast(this)->ExternalByteArrayVerify();
@@ -246,6 +122,9 @@ void HeapObject::HeapObjectVerify() {
     case EXTERNAL_FLOAT_ARRAY_TYPE:
       ExternalFloatArray::cast(this)->ExternalFloatArrayVerify();
       break;
+    case EXTERNAL_DOUBLE_ARRAY_TYPE:
+      ExternalDoubleArray::cast(this)->ExternalDoubleArrayVerify();
+      break;
     case CODE_TYPE:
       Code::cast(this)->CodeVerify();
       break;
@@ -258,6 +137,9 @@ void HeapObject::HeapObjectVerify() {
       break;
     case JS_VALUE_TYPE:
       JSValue::cast(this)->JSValueVerify();
+      break;
+    case JS_DATE_TYPE:
+      JSDate::cast(this)->JSDateVerify();
       break;
     case JS_FUNCTION_TYPE:
       JSFunction::cast(this)->JSFunctionVerify();
@@ -277,16 +159,34 @@ void HeapObject::HeapObjectVerify() {
     case JS_ARRAY_TYPE:
       JSArray::cast(this)->JSArrayVerify();
       break;
+    case JS_SET_TYPE:
+      JSSet::cast(this)->JSSetVerify();
+      break;
+    case JS_MAP_TYPE:
+      JSMap::cast(this)->JSMapVerify();
+      break;
+    case JS_WEAK_MAP_TYPE:
+      JSWeakMap::cast(this)->JSWeakMapVerify();
+      break;
     case JS_REGEXP_TYPE:
       JSRegExp::cast(this)->JSRegExpVerify();
       break;
     case FILLER_TYPE:
       break;
-    case PROXY_TYPE:
-      Proxy::cast(this)->ProxyVerify();
+    case JS_PROXY_TYPE:
+      JSProxy::cast(this)->JSProxyVerify();
+      break;
+    case JS_FUNCTION_PROXY_TYPE:
+      JSFunctionProxy::cast(this)->JSFunctionProxyVerify();
+      break;
+    case FOREIGN_TYPE:
+      Foreign::cast(this)->ForeignVerify();
       break;
     case SHARED_FUNCTION_INFO_TYPE:
       SharedFunctionInfo::cast(this)->SharedFunctionInfoVerify();
+      break;
+    case JS_MESSAGE_OBJECT_TYPE:
+      JSMessageObject::cast(this)->JSMessageObjectVerify();
       break;
 
 #define MAKE_STRUCT_CASE(NAME, Name, name) \
@@ -305,7 +205,7 @@ void HeapObject::HeapObjectVerify() {
 
 void HeapObject::VerifyHeapPointer(Object* p) {
   ASSERT(p->IsHeapObject());
-  ASSERT(Heap::Contains(HeapObject::cast(p)));
+  ASSERT(HEAP->Contains(HeapObject::cast(p)));
 }
 
 
@@ -314,58 +214,18 @@ void HeapNumber::HeapNumberVerify() {
 }
 
 
-void ByteArray::ByteArrayPrint() {
-  PrintF("byte array, data starts at %p", GetDataStartAddress());
-}
-
-
-void PixelArray::PixelArrayPrint() {
-  PrintF("pixel array");
-}
-
-
-void ExternalByteArray::ExternalByteArrayPrint() {
-  PrintF("external byte array");
-}
-
-
-void ExternalUnsignedByteArray::ExternalUnsignedByteArrayPrint() {
-  PrintF("external unsigned byte array");
-}
-
-
-void ExternalShortArray::ExternalShortArrayPrint() {
-  PrintF("external short array");
-}
-
-
-void ExternalUnsignedShortArray::ExternalUnsignedShortArrayPrint() {
-  PrintF("external unsigned short array");
-}
-
-
-void ExternalIntArray::ExternalIntArrayPrint() {
-  PrintF("external int array");
-}
-
-
-void ExternalUnsignedIntArray::ExternalUnsignedIntArrayPrint() {
-  PrintF("external unsigned int array");
-}
-
-
-void ExternalFloatArray::ExternalFloatArrayPrint() {
-  PrintF("external float array");
-}
-
-
 void ByteArray::ByteArrayVerify() {
   ASSERT(IsByteArray());
 }
 
 
-void PixelArray::PixelArrayVerify() {
-  ASSERT(IsPixelArray());
+void FreeSpace::FreeSpaceVerify() {
+  ASSERT(IsFreeSpace());
+}
+
+
+void ExternalPixelArray::ExternalPixelArrayVerify() {
+  ASSERT(IsExternalPixelArray());
 }
 
 
@@ -404,252 +264,40 @@ void ExternalFloatArray::ExternalFloatArrayVerify() {
 }
 
 
-void JSObject::PrintProperties() {
-  if (HasFastProperties()) {
-    DescriptorArray* descs = map()->instance_descriptors();
-    for (int i = 0; i < descs->number_of_descriptors(); i++) {
-      PrintF("   ");
-      descs->GetKey(i)->StringPrint();
-      PrintF(": ");
-      switch (descs->GetType(i)) {
-        case FIELD: {
-          int index = descs->GetFieldIndex(i);
-          FastPropertyAt(index)->ShortPrint();
-          PrintF(" (field at offset %d)\n", index);
-          break;
-        }
-        case CONSTANT_FUNCTION:
-          descs->GetConstantFunction(i)->ShortPrint();
-          PrintF(" (constant function)\n");
-          break;
-        case CALLBACKS:
-          descs->GetCallbacksObject(i)->ShortPrint();
-          PrintF(" (callback)\n");
-          break;
-        case MAP_TRANSITION:
-          PrintF(" (map transition)\n");
-          break;
-        case CONSTANT_TRANSITION:
-          PrintF(" (constant transition)\n");
-          break;
-        case NULL_DESCRIPTOR:
-          PrintF(" (null descriptor)\n");
-          break;
-        default:
-          UNREACHABLE();
-          break;
-      }
-    }
-  } else {
-    property_dictionary()->Print();
-  }
-}
-
-
-void JSObject::PrintElements() {
-  switch (GetElementsKind()) {
-    case FAST_ELEMENTS: {
-      // Print in array notation for non-sparse arrays.
-      FixedArray* p = FixedArray::cast(elements());
-      for (int i = 0; i < p->length(); i++) {
-        PrintF("   %d: ", i);
-        p->get(i)->ShortPrint();
-        PrintF("\n");
-      }
-      break;
-    }
-    case PIXEL_ELEMENTS: {
-      PixelArray* p = PixelArray::cast(elements());
-      for (int i = 0; i < p->length(); i++) {
-        PrintF("   %d: %d\n", i, p->get(i));
-      }
-      break;
-    }
-    case EXTERNAL_BYTE_ELEMENTS: {
-      ExternalByteArray* p = ExternalByteArray::cast(elements());
-      for (int i = 0; i < p->length(); i++) {
-        PrintF("   %d: %d\n", i, static_cast<int>(p->get(i)));
-      }
-      break;
-    }
-    case EXTERNAL_UNSIGNED_BYTE_ELEMENTS: {
-      ExternalUnsignedByteArray* p =
-          ExternalUnsignedByteArray::cast(elements());
-      for (int i = 0; i < p->length(); i++) {
-        PrintF("   %d: %d\n", i, static_cast<int>(p->get(i)));
-      }
-      break;
-    }
-    case EXTERNAL_SHORT_ELEMENTS: {
-      ExternalShortArray* p = ExternalShortArray::cast(elements());
-      for (int i = 0; i < p->length(); i++) {
-        PrintF("   %d: %d\n", i, static_cast<int>(p->get(i)));
-      }
-      break;
-    }
-    case EXTERNAL_UNSIGNED_SHORT_ELEMENTS: {
-      ExternalUnsignedShortArray* p =
-          ExternalUnsignedShortArray::cast(elements());
-      for (int i = 0; i < p->length(); i++) {
-        PrintF("   %d: %d\n", i, static_cast<int>(p->get(i)));
-      }
-      break;
-    }
-    case EXTERNAL_INT_ELEMENTS: {
-      ExternalIntArray* p = ExternalIntArray::cast(elements());
-      for (int i = 0; i < p->length(); i++) {
-        PrintF("   %d: %d\n", i, static_cast<int>(p->get(i)));
-      }
-      break;
-    }
-    case EXTERNAL_UNSIGNED_INT_ELEMENTS: {
-      ExternalUnsignedIntArray* p =
-          ExternalUnsignedIntArray::cast(elements());
-      for (int i = 0; i < p->length(); i++) {
-        PrintF("   %d: %d\n", i, static_cast<int>(p->get(i)));
-      }
-      break;
-    }
-    case EXTERNAL_FLOAT_ELEMENTS: {
-      ExternalFloatArray* p = ExternalFloatArray::cast(elements());
-      for (int i = 0; i < p->length(); i++) {
-        PrintF("   %d: %f\n", i, p->get(i));
-      }
-      break;
-    }
-    case DICTIONARY_ELEMENTS:
-      elements()->Print();
-      break;
-    default:
-      UNREACHABLE();
-      break;
-  }
-}
-
-
-void JSObject::JSObjectPrint() {
-  PrintF("%p: [JSObject]\n", reinterpret_cast<void*>(this));
-  PrintF(" - map = %p\n", reinterpret_cast<void*>(map()));
-  PrintF(" - prototype = %p\n", reinterpret_cast<void*>(GetPrototype()));
-  PrintF(" {\n");
-  PrintProperties();
-  PrintElements();
-  PrintF(" }\n");
+void ExternalDoubleArray::ExternalDoubleArrayVerify() {
+  ASSERT(IsExternalDoubleArray());
 }
 
 
 void JSObject::JSObjectVerify() {
   VerifyHeapPointer(properties());
   VerifyHeapPointer(elements());
+
+  if (GetElementsKind() == NON_STRICT_ARGUMENTS_ELEMENTS) {
+    ASSERT(this->elements()->IsFixedArray());
+    ASSERT(this->elements()->length() >= 2);
+  }
+
   if (HasFastProperties()) {
     CHECK_EQ(map()->unused_property_fields(),
              (map()->inobject_properties() + properties()->length() -
               map()->NextFreePropertyIndex()));
   }
-  ASSERT(map()->has_fast_elements() ==
-         (elements()->map() == Heap::fixed_array_map() ||
-          elements()->map() == Heap::fixed_cow_array_map()));
+  ASSERT_EQ((map()->has_fast_elements() ||
+             map()->has_fast_smi_only_elements() ||
+             (elements() == GetHeap()->empty_fixed_array())),
+            (elements()->map() == GetHeap()->fixed_array_map() ||
+             elements()->map() == GetHeap()->fixed_cow_array_map()));
   ASSERT(map()->has_fast_elements() == HasFastElements());
 }
 
 
-static const char* TypeToString(InstanceType type) {
-  switch (type) {
-    case INVALID_TYPE: return "INVALID";
-    case MAP_TYPE: return "MAP";
-    case HEAP_NUMBER_TYPE: return "HEAP_NUMBER";
-    case SYMBOL_TYPE: return "SYMBOL";
-    case ASCII_SYMBOL_TYPE: return "ASCII_SYMBOL";
-    case CONS_SYMBOL_TYPE: return "CONS_SYMBOL";
-    case CONS_ASCII_SYMBOL_TYPE: return "CONS_ASCII_SYMBOL";
-    case EXTERNAL_ASCII_SYMBOL_TYPE:
-    case EXTERNAL_SYMBOL_WITH_ASCII_DATA_TYPE:
-    case EXTERNAL_SYMBOL_TYPE: return "EXTERNAL_SYMBOL";
-    case ASCII_STRING_TYPE: return "ASCII_STRING";
-    case STRING_TYPE: return "TWO_BYTE_STRING";
-    case CONS_STRING_TYPE:
-    case CONS_ASCII_STRING_TYPE: return "CONS_STRING";
-    case EXTERNAL_ASCII_STRING_TYPE:
-    case EXTERNAL_STRING_WITH_ASCII_DATA_TYPE:
-    case EXTERNAL_STRING_TYPE: return "EXTERNAL_STRING";
-    case FIXED_ARRAY_TYPE: return "FIXED_ARRAY";
-    case BYTE_ARRAY_TYPE: return "BYTE_ARRAY";
-    case PIXEL_ARRAY_TYPE: return "PIXEL_ARRAY";
-    case EXTERNAL_BYTE_ARRAY_TYPE: return "EXTERNAL_BYTE_ARRAY";
-    case EXTERNAL_UNSIGNED_BYTE_ARRAY_TYPE:
-      return "EXTERNAL_UNSIGNED_BYTE_ARRAY";
-    case EXTERNAL_SHORT_ARRAY_TYPE: return "EXTERNAL_SHORT_ARRAY";
-    case EXTERNAL_UNSIGNED_SHORT_ARRAY_TYPE:
-      return "EXTERNAL_UNSIGNED_SHORT_ARRAY";
-    case EXTERNAL_INT_ARRAY_TYPE: return "EXTERNAL_INT_ARRAY";
-    case EXTERNAL_UNSIGNED_INT_ARRAY_TYPE:
-      return "EXTERNAL_UNSIGNED_INT_ARRAY";
-    case EXTERNAL_FLOAT_ARRAY_TYPE: return "EXTERNAL_FLOAT_ARRAY";
-    case FILLER_TYPE: return "FILLER";
-    case JS_OBJECT_TYPE: return "JS_OBJECT";
-    case JS_CONTEXT_EXTENSION_OBJECT_TYPE: return "JS_CONTEXT_EXTENSION_OBJECT";
-    case ODDBALL_TYPE: return "ODDBALL";
-    case JS_GLOBAL_PROPERTY_CELL_TYPE: return "JS_GLOBAL_PROPERTY_CELL";
-    case SHARED_FUNCTION_INFO_TYPE: return "SHARED_FUNCTION_INFO";
-    case JS_FUNCTION_TYPE: return "JS_FUNCTION";
-    case CODE_TYPE: return "CODE";
-    case JS_ARRAY_TYPE: return "JS_ARRAY";
-    case JS_REGEXP_TYPE: return "JS_REGEXP";
-    case JS_VALUE_TYPE: return "JS_VALUE";
-    case JS_GLOBAL_OBJECT_TYPE: return "JS_GLOBAL_OBJECT";
-    case JS_BUILTINS_OBJECT_TYPE: return "JS_BUILTINS_OBJECT";
-    case JS_GLOBAL_PROXY_TYPE: return "JS_GLOBAL_PROXY";
-    case PROXY_TYPE: return "PROXY";
-#define MAKE_STRUCT_CASE(NAME, Name, name) case NAME##_TYPE: return #NAME;
-  STRUCT_LIST(MAKE_STRUCT_CASE)
-#undef MAKE_STRUCT_CASE
-  }
-  return "UNKNOWN";
-}
-
-
-void Map::MapPrint() {
-  HeapObject::PrintHeader("Map");
-  PrintF(" - type: %s\n", TypeToString(instance_type()));
-  PrintF(" - instance size: %d\n", instance_size());
-  PrintF(" - inobject properties: %d\n", inobject_properties());
-  PrintF(" - pre-allocated property fields: %d\n",
-      pre_allocated_property_fields());
-  PrintF(" - unused property fields: %d\n", unused_property_fields());
-  if (is_hidden_prototype()) {
-    PrintF(" - hidden_prototype\n");
-  }
-  if (has_named_interceptor()) {
-    PrintF(" - named_interceptor\n");
-  }
-  if (has_indexed_interceptor()) {
-    PrintF(" - indexed_interceptor\n");
-  }
-  if (is_undetectable()) {
-    PrintF(" - undetectable\n");
-  }
-  if (has_instance_call_handler()) {
-    PrintF(" - instance_call_handler\n");
-  }
-  if (is_access_check_needed()) {
-    PrintF(" - access_check_needed\n");
-  }
-  PrintF(" - instance descriptors: ");
-  instance_descriptors()->ShortPrint();
-  PrintF("\n - prototype: ");
-  prototype()->ShortPrint();
-  PrintF("\n - constructor: ");
-  constructor()->ShortPrint();
-  PrintF("\n");
-}
-
-
 void Map::MapVerify() {
-  ASSERT(!Heap::InNewSpace(this));
+  ASSERT(!HEAP->InNewSpace(this));
   ASSERT(FIRST_TYPE <= instance_type() && instance_type() <= LAST_TYPE);
   ASSERT(instance_size() == kVariableSizeSentinel ||
          (kPointerSize <= instance_size() &&
-          instance_size() < Heap::Capacity()));
+          instance_size() < HEAP->Capacity()));
   VerifyHeapPointer(prototype());
   VerifyHeapPointer(instance_descriptors());
 }
@@ -658,21 +306,11 @@ void Map::MapVerify() {
 void Map::SharedMapVerify() {
   MapVerify();
   ASSERT(is_shared());
-  ASSERT_EQ(Heap::empty_descriptor_array(), instance_descriptors());
-  ASSERT_EQ(Heap::empty_fixed_array(), code_cache());
+  ASSERT(instance_descriptors()->IsEmpty());
   ASSERT_EQ(0, pre_allocated_property_fields());
   ASSERT_EQ(0, unused_property_fields());
   ASSERT_EQ(StaticVisitorBase::GetVisitorId(instance_type(), instance_size()),
       visitor_id());
-}
-
-
-void CodeCache::CodeCachePrint() {
-  HeapObject::PrintHeader("CodeCache");
-  PrintF("\n - default_cache: ");
-  default_cache()->ShortPrint();
-  PrintF("\n - normal_type_cache: ");
-  normal_type_cache()->ShortPrint();
 }
 
 
@@ -685,14 +323,21 @@ void CodeCache::CodeCacheVerify() {
 }
 
 
-void FixedArray::FixedArrayPrint() {
-  HeapObject::PrintHeader("FixedArray");
-  PrintF(" - length: %d", length());
-  for (int i = 0; i < length(); i++) {
-    PrintF("\n  [%d]: ", i);
-    get(i)->ShortPrint();
-  }
-  PrintF("\n");
+void PolymorphicCodeCache::PolymorphicCodeCacheVerify() {
+  VerifyHeapPointer(cache());
+  ASSERT(cache()->IsUndefined() || cache()->IsPolymorphicCodeCacheHashTable());
+}
+
+
+void TypeFeedbackInfo::TypeFeedbackInfoVerify() {
+  VerifyObjectField(kIcTotalCountOffset);
+  VerifyObjectField(kIcWithTypeinfoCountOffset);
+  VerifyHeapPointer(type_feedback_cells());
+}
+
+
+void AliasedArgumentsEntry::AliasedArgumentsEntryVerify() {
+  VerifySmiField(kAliasedContextSlot);
 }
 
 
@@ -708,9 +353,16 @@ void FixedArray::FixedArrayVerify() {
 }
 
 
-void JSValue::JSValuePrint() {
-  HeapObject::PrintHeader("ValueObject");
-  value()->Print();
+void FixedDoubleArray::FixedDoubleArrayVerify() {
+  for (int i = 0; i < length(); i++) {
+    if (!is_the_hole(i)) {
+      double value = get_scalar(i);
+      ASSERT(!isnan(value) ||
+             (BitCast<uint64_t>(value) ==
+              BitCast<uint64_t>(canonical_not_the_hole_nan_as_double())) ||
+             ((BitCast<uint64_t>(value) & Double::kSignMask) != 0));
+    }
+  }
 }
 
 
@@ -722,20 +374,63 @@ void JSValue::JSValueVerify() {
 }
 
 
-void String::StringPrint() {
-  if (StringShape(this).IsSymbol()) {
-    PrintF("#");
-  } else if (StringShape(this).IsCons()) {
-    PrintF("c\"");
-  } else {
-    PrintF("\"");
+void JSDate::JSDateVerify() {
+  if (value()->IsHeapObject()) {
+    VerifyHeapPointer(value());
   }
+  CHECK(value()->IsUndefined() || value()->IsSmi() || value()->IsHeapNumber());
+  CHECK(year()->IsUndefined() || year()->IsSmi() || year()->IsNaN());
+  CHECK(month()->IsUndefined() || month()->IsSmi() || month()->IsNaN());
+  CHECK(day()->IsUndefined() || day()->IsSmi() || day()->IsNaN());
+  CHECK(weekday()->IsUndefined() || weekday()->IsSmi() || weekday()->IsNaN());
+  CHECK(hour()->IsUndefined() || hour()->IsSmi() || hour()->IsNaN());
+  CHECK(min()->IsUndefined() || min()->IsSmi() || min()->IsNaN());
+  CHECK(sec()->IsUndefined() || sec()->IsSmi() || sec()->IsNaN());
+  CHECK(cache_stamp()->IsUndefined() ||
+        cache_stamp()->IsSmi() ||
+        cache_stamp()->IsNaN());
 
-  for (int i = 0; i < length(); i++) {
-    PrintF("%c", Get(i));
+  if (month()->IsSmi()) {
+    int month = Smi::cast(this->month())->value();
+    CHECK(0 <= month && month <= 11);
   }
+  if (day()->IsSmi()) {
+    int day = Smi::cast(this->day())->value();
+    CHECK(1 <= day && day <= 31);
+  }
+  if (hour()->IsSmi()) {
+    int hour = Smi::cast(this->hour())->value();
+    CHECK(0 <= hour && hour <= 23);
+  }
+  if (min()->IsSmi()) {
+    int min = Smi::cast(this->min())->value();
+    CHECK(0 <= min && min <= 59);
+  }
+  if (sec()->IsSmi()) {
+    int sec = Smi::cast(this->sec())->value();
+    CHECK(0 <= sec && sec <= 59);
+  }
+  if (weekday()->IsSmi()) {
+    int weekday = Smi::cast(this->weekday())->value();
+    CHECK(0 <= weekday && weekday <= 6);
+  }
+  if (cache_stamp()->IsSmi()) {
+    CHECK(Smi::cast(cache_stamp())->value() <=
+          Smi::cast(Isolate::Current()->date_cache()->stamp())->value());
+  }
+}
 
-  if (!StringShape(this).IsSymbol()) PrintF("\"");
+
+void JSMessageObject::JSMessageObjectVerify() {
+  CHECK(IsJSMessageObject());
+  CHECK(type()->IsString());
+  CHECK(arguments()->IsJSArray());
+  VerifyObjectField(kStartPositionOffset);
+  VerifyObjectField(kEndPositionOffset);
+  VerifyObjectField(kArgumentsOffset);
+  VerifyObjectField(kScriptOffset);
+  VerifyObjectField(kStackTraceOffset);
+  VerifyObjectField(kStackFramesOffset);
 }
 
 
@@ -743,68 +438,45 @@ void String::StringVerify() {
   CHECK(IsString());
   CHECK(length() >= 0 && length() <= Smi::kMaxValue);
   if (IsSymbol()) {
-    CHECK(!Heap::InNewSpace(this));
+    CHECK(!HEAP->InNewSpace(this));
+  }
+  if (IsConsString()) {
+    ConsString::cast(this)->ConsStringVerify();
+  } else if (IsSlicedString()) {
+    SlicedString::cast(this)->SlicedStringVerify();
   }
 }
 
 
-void JSFunction::JSFunctionPrint() {
-  HeapObject::PrintHeader("Function");
-  PrintF(" - map = 0x%p\n", reinterpret_cast<void*>(map()));
-  PrintF(" - initial_map = ");
-  if (has_initial_map()) {
-    initial_map()->ShortPrint();
+void ConsString::ConsStringVerify() {
+  CHECK(this->first()->IsString());
+  CHECK(this->second() == GetHeap()->empty_string() ||
+        this->second()->IsString());
+  CHECK(this->length() >= ConsString::kMinLength);
+  if (this->IsFlat()) {
+    // A flat cons can only be created by String::SlowTryFlatten.
+    // Afterwards, the first part may be externalized.
+    CHECK(this->first()->IsSeqString() || this->first()->IsExternalString());
   }
-  PrintF("\n - shared_info = ");
-  shared()->ShortPrint();
-  PrintF("\n   - name = ");
-  shared()->name()->Print();
-  PrintF("\n - context = ");
-  unchecked_context()->ShortPrint();
-  PrintF("\n - code = ");
-  code()->ShortPrint();
-  PrintF("\n");
+}
 
-  PrintProperties();
-  PrintElements();
 
-  PrintF("\n");
+void SlicedString::SlicedStringVerify() {
+  CHECK(!this->parent()->IsConsString());
+  CHECK(!this->parent()->IsSlicedString());
+  CHECK(this->length() >= SlicedString::kMinLength);
 }
 
 
 void JSFunction::JSFunctionVerify() {
   CHECK(IsJSFunction());
   VerifyObjectField(kPrototypeOrInitialMapOffset);
+  VerifyObjectField(kNextFunctionLinkOffset);
+  CHECK(code()->IsCode());
+  CHECK(next_function_link()->IsUndefined() ||
+        next_function_link()->IsJSFunction());
 }
 
-
-void SharedFunctionInfo::SharedFunctionInfoPrint() {
-  HeapObject::PrintHeader("SharedFunctionInfo");
-  PrintF(" - name: ");
-  name()->ShortPrint();
-  PrintF("\n - expected_nof_properties: %d", expected_nof_properties());
-  PrintF("\n - instance class name = ");
-  instance_class_name()->Print();
-  PrintF("\n - code = ");
-  code()->ShortPrint();
-  PrintF("\n - source code = ");
-  GetSourceCode()->ShortPrint();
-  // Script files are often large, hard to read.
-  // PrintF("\n - script =");
-  // script()->Print();
-  PrintF("\n - function token position = %d", function_token_position());
-  PrintF("\n - start position = %d", start_position());
-  PrintF("\n - end position = %d", end_position());
-  PrintF("\n - is expression = %d", is_expression());
-  PrintF("\n - debug info = ");
-  debug_info()->ShortPrint();
-  PrintF("\n - length = %d", length());
-  PrintF("\n - has_only_simple_this_property_assignments = %d",
-         has_only_simple_this_property_assignments());
-  PrintF("\n - this_property_assignments = ");
-  this_property_assignments()->ShortPrint();
-  PrintF("\n");
-}
 
 void SharedFunctionInfo::SharedFunctionInfoVerify() {
   CHECK(IsSharedFunctionInfo());
@@ -815,15 +487,6 @@ void SharedFunctionInfo::SharedFunctionInfoVerify() {
   VerifyObjectField(kFunctionDataOffset);
   VerifyObjectField(kScriptOffset);
   VerifyObjectField(kDebugInfoOffset);
-}
-
-
-void JSGlobalProxy::JSGlobalProxyPrint() {
-  PrintF("global_proxy");
-  JSObjectPrint();
-  PrintF("context : ");
-  context()->ShortPrint();
-  PrintF("\n");
 }
 
 
@@ -838,15 +501,6 @@ void JSGlobalProxy::JSGlobalProxyVerify() {
 }
 
 
-void JSGlobalObject::JSGlobalObjectPrint() {
-  PrintF("global ");
-  JSObjectPrint();
-  PrintF("global context : ");
-  global_context()->ShortPrint();
-  PrintF("\n");
-}
-
-
 void JSGlobalObject::JSGlobalObjectVerify() {
   CHECK(IsJSGlobalObject());
   JSObjectVerify();
@@ -855,12 +509,6 @@ void JSGlobalObject::JSGlobalObjectVerify() {
        i += kPointerSize) {
     VerifyObjectField(i);
   }
-}
-
-
-void JSBuiltinsObject::JSBuiltinsObjectPrint() {
-  PrintF("builtins ");
-  JSObjectPrint();
 }
 
 
@@ -880,12 +528,14 @@ void Oddball::OddballVerify() {
   VerifyHeapPointer(to_string());
   Object* number = to_number();
   if (number->IsHeapObject()) {
-    ASSERT(number == Heap::nan_value());
+    ASSERT(number == HEAP->nan_value());
   } else {
     ASSERT(number->IsSmi());
     int value = Smi::cast(number)->value();
-    ASSERT(value == 0 || value == 1 || value == -1 ||
-           value == -2 || value == -3);
+    // Hidden oddballs have negative smis.
+    const int kLeastHiddenOddballNumber = -4;
+    ASSERT(value <= 1);
+    ASSERT(value >= kLeastHiddenOddballNumber);
   }
 }
 
@@ -896,22 +546,10 @@ void JSGlobalPropertyCell::JSGlobalPropertyCellVerify() {
 }
 
 
-void JSGlobalPropertyCell::JSGlobalPropertyCellPrint() {
-  HeapObject::PrintHeader("JSGlobalPropertyCell");
-}
-
-
-void Code::CodePrint() {
-  HeapObject::PrintHeader("Code");
-#ifdef ENABLE_DISASSEMBLER
-  Disassemble(NULL);
-#endif
-}
-
-
 void Code::CodeVerify() {
   CHECK(IsAligned(reinterpret_cast<intptr_t>(instruction_start()),
                   kCodeAlignment));
+  relocation_info()->Verify();
   Address last_gc_pc = NULL;
   for (RelocIterator it(this); !it.done(); it.next()) {
     it.rinfo()->Verify();
@@ -927,7 +565,33 @@ void Code::CodeVerify() {
 void JSArray::JSArrayVerify() {
   JSObjectVerify();
   ASSERT(length()->IsNumber() || length()->IsUndefined());
-  ASSERT(elements()->IsUndefined() || elements()->IsFixedArray());
+  ASSERT(elements()->IsUndefined() ||
+         elements()->IsFixedArray() ||
+         elements()->IsFixedDoubleArray());
+}
+
+
+void JSSet::JSSetVerify() {
+  CHECK(IsJSSet());
+  JSObjectVerify();
+  VerifyHeapPointer(table());
+  ASSERT(table()->IsHashTable() || table()->IsUndefined());
+}
+
+
+void JSMap::JSMapVerify() {
+  CHECK(IsJSMap());
+  JSObjectVerify();
+  VerifyHeapPointer(table());
+  ASSERT(table()->IsHashTable() || table()->IsUndefined());
+}
+
+
+void JSWeakMap::JSWeakMapVerify() {
+  CHECK(IsJSWeakMap());
+  JSObjectVerify();
+  VerifyHeapPointer(table());
+  ASSERT(table()->IsHashTable() || table()->IsUndefined());
 }
 
 
@@ -945,14 +609,22 @@ void JSRegExp::JSRegExpVerify() {
 
       FixedArray* arr = FixedArray::cast(data());
       Object* ascii_data = arr->get(JSRegExp::kIrregexpASCIICodeIndex);
-      // TheHole : Not compiled yet.
+      // Smi : Not compiled yet (-1) or code prepared for flushing.
       // JSObject: Compilation error.
       // Code/ByteArray: Compiled code.
-      ASSERT(ascii_data->IsTheHole() || ascii_data->IsJSObject() ||
-          (is_native ? ascii_data->IsCode() : ascii_data->IsByteArray()));
+      ASSERT(ascii_data->IsSmi() ||
+             (is_native ? ascii_data->IsCode() : ascii_data->IsByteArray()));
       Object* uc16_data = arr->get(JSRegExp::kIrregexpUC16CodeIndex);
-      ASSERT(uc16_data->IsTheHole() || ascii_data->IsJSObject() ||
-          (is_native ? uc16_data->IsCode() : uc16_data->IsByteArray()));
+      ASSERT(uc16_data->IsSmi() ||
+             (is_native ? uc16_data->IsCode() : uc16_data->IsByteArray()));
+
+      Object* ascii_saved = arr->get(JSRegExp::kIrregexpASCIICodeSavedIndex);
+      ASSERT(ascii_saved->IsSmi() || ascii_saved->IsString() ||
+             ascii_saved->IsCode());
+      Object* uc16_saved = arr->get(JSRegExp::kIrregexpUC16CodeSavedIndex);
+      ASSERT(uc16_saved->IsSmi() || uc16_saved->IsString() ||
+             uc16_saved->IsCode());
+
       ASSERT(arr->get(JSRegExp::kIrregexpCaptureCountIndex)->IsSmi());
       ASSERT(arr->get(JSRegExp::kIrregexpMaxRegisterCountIndex)->IsSmi());
       break;
@@ -965,13 +637,23 @@ void JSRegExp::JSRegExpVerify() {
 }
 
 
-void Proxy::ProxyPrint() {
-  PrintF("proxy to %p", proxy());
+void JSProxy::JSProxyVerify() {
+  CHECK(IsJSProxy());
+  VerifyPointer(handler());
+  ASSERT(hash()->IsSmi() || hash()->IsUndefined());
 }
 
 
-void Proxy::ProxyVerify() {
-  ASSERT(IsProxy());
+void JSFunctionProxy::JSFunctionProxyVerify() {
+  CHECK(IsJSFunctionProxy());
+  JSProxyVerify();
+  VerifyPointer(call_trap());
+  VerifyPointer(construct_trap());
+}
+
+
+void Foreign::ForeignVerify() {
+  ASSERT(IsForeign());
 }
 
 
@@ -984,19 +666,13 @@ void AccessorInfo::AccessorInfoVerify() {
   VerifyPointer(flag());
 }
 
-void AccessorInfo::AccessorInfoPrint() {
-  HeapObject::PrintHeader("AccessorInfo");
-  PrintF("\n - getter: ");
-  getter()->ShortPrint();
-  PrintF("\n - setter: ");
-  setter()->ShortPrint();
-  PrintF("\n - name: ");
-  name()->ShortPrint();
-  PrintF("\n - data: ");
-  data()->ShortPrint();
-  PrintF("\n - flag: ");
-  flag()->ShortPrint();
+
+void AccessorPair::AccessorPairVerify() {
+  CHECK(IsAccessorPair());
+  VerifyPointer(getter());
+  VerifyPointer(setter());
 }
+
 
 void AccessCheckInfo::AccessCheckInfoVerify() {
   CHECK(IsAccessCheckInfo());
@@ -1005,15 +681,6 @@ void AccessCheckInfo::AccessCheckInfoVerify() {
   VerifyPointer(data());
 }
 
-void AccessCheckInfo::AccessCheckInfoPrint() {
-  HeapObject::PrintHeader("AccessCheckInfo");
-  PrintF("\n - named_callback: ");
-  named_callback()->ShortPrint();
-  PrintF("\n - indexed_callback: ");
-  indexed_callback()->ShortPrint();
-  PrintF("\n - data: ");
-  data()->ShortPrint();
-}
 
 void InterceptorInfo::InterceptorInfoVerify() {
   CHECK(IsInterceptorInfo());
@@ -1025,21 +692,6 @@ void InterceptorInfo::InterceptorInfoVerify() {
   VerifyPointer(data());
 }
 
-void InterceptorInfo::InterceptorInfoPrint() {
-  HeapObject::PrintHeader("InterceptorInfo");
-  PrintF("\n - getter: ");
-  getter()->ShortPrint();
-  PrintF("\n - setter: ");
-  setter()->ShortPrint();
-  PrintF("\n - query: ");
-  query()->ShortPrint();
-  PrintF("\n - deleter: ");
-  deleter()->ShortPrint();
-  PrintF("\n - enumerator: ");
-  enumerator()->ShortPrint();
-  PrintF("\n - data: ");
-  data()->ShortPrint();
-}
 
 void CallHandlerInfo::CallHandlerInfoVerify() {
   CHECK(IsCallHandlerInfo());
@@ -1047,14 +699,6 @@ void CallHandlerInfo::CallHandlerInfoVerify() {
   VerifyPointer(data());
 }
 
-void CallHandlerInfo::CallHandlerInfoPrint() {
-  HeapObject::PrintHeader("CallHandlerInfo");
-  PrintF("\n - callback: ");
-  callback()->ShortPrint();
-  PrintF("\n - data: ");
-  data()->ShortPrint();
-  PrintF("\n - call_stub_cache: ");
-}
 
 void TemplateInfo::TemplateInfoVerify() {
   VerifyPointer(tag());
@@ -1076,38 +720,6 @@ void FunctionTemplateInfo::FunctionTemplateInfoVerify() {
   VerifyPointer(access_check_info());
 }
 
-void FunctionTemplateInfo::FunctionTemplateInfoPrint() {
-  HeapObject::PrintHeader("FunctionTemplateInfo");
-  PrintF("\n - class name: ");
-  class_name()->ShortPrint();
-  PrintF("\n - tag: ");
-  tag()->ShortPrint();
-  PrintF("\n - property_list: ");
-  property_list()->ShortPrint();
-  PrintF("\n - serial_number: ");
-  serial_number()->ShortPrint();
-  PrintF("\n - call_code: ");
-  call_code()->ShortPrint();
-  PrintF("\n - property_accessors: ");
-  property_accessors()->ShortPrint();
-  PrintF("\n - prototype_template: ");
-  prototype_template()->ShortPrint();
-  PrintF("\n - parent_template: ");
-  parent_template()->ShortPrint();
-  PrintF("\n - named_property_handler: ");
-  named_property_handler()->ShortPrint();
-  PrintF("\n - indexed_property_handler: ");
-  indexed_property_handler()->ShortPrint();
-  PrintF("\n - instance_template: ");
-  instance_template()->ShortPrint();
-  PrintF("\n - signature: ");
-  signature()->ShortPrint();
-  PrintF("\n - access_check_info: ");
-  access_check_info()->ShortPrint();
-  PrintF("\n - hidden_prototype: %s", hidden_prototype() ? "true" : "false");
-  PrintF("\n - undetectable: %s", undetectable() ? "true" : "false");
-  PrintF("\n - need_access_check: %s", needs_access_check() ? "true" : "false");
-}
 
 void ObjectTemplateInfo::ObjectTemplateInfoVerify() {
   CHECK(IsObjectTemplateInfo());
@@ -1116,13 +728,6 @@ void ObjectTemplateInfo::ObjectTemplateInfoVerify() {
   VerifyPointer(internal_field_count());
 }
 
-void ObjectTemplateInfo::ObjectTemplateInfoPrint() {
-  HeapObject::PrintHeader("ObjectTemplateInfo");
-  PrintF("\n - constructor: ");
-  constructor()->ShortPrint();
-  PrintF("\n - internal_field_count: ");
-  internal_field_count()->ShortPrint();
-}
 
 void SignatureInfo::SignatureInfoVerify() {
   CHECK(IsSignatureInfo());
@@ -1130,23 +735,10 @@ void SignatureInfo::SignatureInfoVerify() {
   VerifyPointer(args());
 }
 
-void SignatureInfo::SignatureInfoPrint() {
-  HeapObject::PrintHeader("SignatureInfo");
-  PrintF("\n - receiver: ");
-  receiver()->ShortPrint();
-  PrintF("\n - args: ");
-  args()->ShortPrint();
-}
 
 void TypeSwitchInfo::TypeSwitchInfoVerify() {
   CHECK(IsTypeSwitchInfo());
   VerifyPointer(types());
-}
-
-void TypeSwitchInfo::TypeSwitchInfoPrint() {
-  HeapObject::PrintHeader("TypeSwitchInfo");
-  PrintF("\n - types: ");
-  types()->ShortPrint();
 }
 
 
@@ -1164,38 +756,6 @@ void Script::ScriptVerify() {
 }
 
 
-void Script::ScriptPrint() {
-  HeapObject::PrintHeader("Script");
-  PrintF("\n - source: ");
-  source()->ShortPrint();
-  PrintF("\n - name: ");
-  name()->ShortPrint();
-  PrintF("\n - line_offset: ");
-  line_offset()->ShortPrint();
-  PrintF("\n - column_offset: ");
-  column_offset()->ShortPrint();
-  PrintF("\n - type: ");
-  type()->ShortPrint();
-  PrintF("\n - id: ");
-  id()->ShortPrint();
-  PrintF("\n - data: ");
-  data()->ShortPrint();
-  PrintF("\n - context data: ");
-  context_data()->ShortPrint();
-  PrintF("\n - wrapper: ");
-  wrapper()->ShortPrint();
-  PrintF("\n - compilation type: ");
-  compilation_type()->ShortPrint();
-  PrintF("\n - line ends: ");
-  line_ends()->ShortPrint();
-  PrintF("\n - eval from shared: ");
-  eval_from_shared()->ShortPrint();
-  PrintF("\n - eval from instructions offset: ");
-  eval_from_instructions_offset()->ShortPrint();
-  PrintF("\n");
-}
-
-
 #ifdef ENABLE_DEBUGGER_SUPPORT
 void DebugInfo::DebugInfoVerify() {
   CHECK(IsDebugInfo());
@@ -1206,19 +766,6 @@ void DebugInfo::DebugInfoVerify() {
 }
 
 
-void DebugInfo::DebugInfoPrint() {
-  HeapObject::PrintHeader("DebugInfo");
-  PrintF("\n - shared: ");
-  shared()->ShortPrint();
-  PrintF("\n - original_code: ");
-  original_code()->ShortPrint();
-  PrintF("\n - code: ");
-  code()->ShortPrint();
-  PrintF("\n - break_points: ");
-  break_points()->Print();
-}
-
-
 void BreakPointInfo::BreakPointInfoVerify() {
   CHECK(IsBreakPointInfo());
   code_position()->SmiVerify();
@@ -1226,17 +773,7 @@ void BreakPointInfo::BreakPointInfoVerify() {
   statement_position()->SmiVerify();
   VerifyPointer(break_point_objects());
 }
-
-
-void BreakPointInfo::BreakPointInfoPrint() {
-  HeapObject::PrintHeader("BreakPointInfo");
-  PrintF("\n - code_position: %d", code_position()->value());
-  PrintF("\n - source_position: %d", source_position()->value());
-  PrintF("\n - statement_position: %d", statement_position()->value());
-  PrintF("\n - break_point_objects: ");
-  break_point_objects()->ShortPrint();
-}
-#endif
+#endif  // ENABLE_DEBUGGER_SUPPORT
 
 
 void JSObject::IncrementSpillStatistics(SpillInformation* info) {
@@ -1259,21 +796,22 @@ void JSObject::IncrementSpillStatistics(SpillInformation* info) {
       int holes = 0;
       FixedArray* e = FixedArray::cast(elements());
       int len = e->length();
+      Heap* heap = HEAP;
       for (int i = 0; i < len; i++) {
-        if (e->get(i) == Heap::the_hole_value()) holes++;
+        if (e->get(i) == heap->the_hole_value()) holes++;
       }
       info->number_of_fast_used_elements_   += len - holes;
       info->number_of_fast_unused_elements_ += holes;
       break;
     }
-    case PIXEL_ELEMENTS: {
+    case EXTERNAL_PIXEL_ELEMENTS: {
       info->number_of_objects_with_fast_elements_++;
-      PixelArray* e = PixelArray::cast(elements());
+      ExternalPixelArray* e = ExternalPixelArray::cast(elements());
       info->number_of_fast_used_elements_ += e->length();
       break;
     }
     case DICTIONARY_ELEMENTS: {
-      NumberDictionary* dict = element_dictionary();
+      SeededNumberDictionary* dict = element_dictionary();
       info->number_of_slow_used_elements_ += dict->NumberOfElements();
       info->number_of_slow_unused_elements_ +=
           dict->Capacity() - dict->NumberOfElements();
@@ -1323,18 +861,6 @@ void JSObject::SpillInformation::Print() {
 }
 
 
-void DescriptorArray::PrintDescriptors() {
-  PrintF("Descriptor array  %d\n", number_of_descriptors());
-  for (int i = 0; i < number_of_descriptors(); i++) {
-    PrintF(" %d: ", i);
-    Descriptor desc;
-    Get(i, &desc);
-    desc.Print();
-  }
-  PrintF("\n");
-}
-
-
 bool DescriptorArray::IsSortedNoDuplicates() {
   String* current_key = NULL;
   uint32_t current = 0;
@@ -1366,7 +892,7 @@ void JSFunctionResultCache::JSFunctionResultCacheVerify() {
 
   int finger = Smi::cast(get(kFingerIndex))->value();
   ASSERT(kEntriesIndex <= finger);
-  ASSERT(finger < size || finger == kEntriesIndex);
+  ASSERT((finger < size) || (finger == kEntriesIndex && finger == size));
   ASSERT_EQ(0, finger % kEntrySize);
 
   if (FLAG_enable_slow_asserts) {

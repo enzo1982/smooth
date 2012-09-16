@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,41 +20,62 @@ S::String S::I18n::Number::GetLocalizedNumberString(Int64 number)
 	 */
 	Int	 negFormat = 1;
 	String	 sThousand = ".";
+	String	 sGrouping = "3;0";
 
 #ifdef __WIN32__
 	if (Setup::enableUnicode)
 	{
-		wchar_t	 buffer[4];
+		wchar_t	 buffer[10];
+
+		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_INEGNUMBER, buffer, 2);
+		negFormat = String(buffer).ToInt();
 
 		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, buffer, 4);
 		sThousand = buffer;
 
-		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_INEGNUMBER, buffer, 2);
-		negFormat = String(buffer).ToInt();
+		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_SGROUPING, buffer, 10);
+		sGrouping = buffer;
 	}
 	else
 	{
-		char	 buffer[4];
+		char	 buffer[10];
+
+		GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_INEGNUMBER, buffer, 2);
+		negFormat = String(buffer).ToInt();
 
 		GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, buffer, 4);
 		sThousand = buffer;
 
-		GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_INEGNUMBER, buffer, 2);
-		negFormat = String(buffer).ToInt();
+		GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SGROUPING, buffer, 10);
+		sGrouping = buffer;
 	}
 #endif
 
 	String	 nString = String::FromInt(number >= 0 ? number : -number);
 	String	 retVal;
 
-	/* Separate three number blocks.
+	/* Separate number blocks.
 	 */
-	for (Int i = 0; i < nString.Length(); i++)
-	{
-		if ((nString.Length() - i) % 3 == 0 && i > 0) retVal.Append(sThousand);
+	const Array<String>	&groupSize = sGrouping.Explode(";");
+	Int			 group	   = 0;
+	Int			 count	   = 0;
 
-		retVal[retVal.Length()] = nString[i];
+	for (Int i = nString.Length() - 1; i >= 0; i--)
+	{
+		if (groupSize.Length() > group && groupSize.GetNth(group).ToInt() == count++)
+		{
+			retVal = String(sThousand).Append(retVal);
+
+			count = 1;
+			group++;
+
+			if (groupSize.Length() > group && groupSize.GetNth(group).ToInt() == 0) group--;
+		}
+
+		retVal = String().FillN(nString[i], 1).Append(retVal);
 	}
+
+	String::ExplodeFinish();
 
 	/* Format negative numbers according to the locale.
 	 */

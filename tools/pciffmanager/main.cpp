@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -56,9 +56,8 @@ PCIFFManager::~PCIFFManager()
 	DeleteObject(title);
 	DeleteObject(wnd);
 	DeleteObject(menubar);
+	DeleteObject(menu_file);
 	DeleteObject(statusbar);
-
-	delete menu_file;
 }
 
 Void PCIFFManager::Close()
@@ -89,5 +88,5 @@ Void PCIFFManager::OpenFile()
 		wnd->SetText(String("smooth PCIFF Manager v").Append(SMOOTH_VERSION).Append(" - ").Append(file));
 	}
 
-	delete dialog;
+	DeleteObject(dialog);
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -57,6 +57,8 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iWindow, const Size &maxSize)
 
 		allocSize = size;
 	}
+
+	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceGDI::~SurfaceGDI()
@@ -130,7 +132,7 @@ S::Int S::GUI::SurfaceGDI::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect)), *(paintRects.GetLast()));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
 	HRGN	 region = CreateRectRgn(pRect.left, pRect.top, pRect.right, pRect.bottom);
 
 	SelectClipRgn(paintContext, region);
@@ -154,7 +156,7 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 
 	delete paintRects.GetLast();
 
-	paintRects.Remove(paintRects.GetNthIndex(paintRects.Length() - 1));
+	paintRects.RemoveNth(paintRects.Length() - 1);
 
 	Rect	 pRect(*paintRects.GetLast());
 	HRGN	 region = CreateRectRgn(pRect.left, pRect.top, pRect.right, pRect.bottom);
@@ -175,7 +177,7 @@ S::Short S::GUI::SurfaceGDI::GetSurfaceDPI() const
 {
 	if (surfaceDPI != -1) return surfaceDPI;
 
-	HDC	 dc = GetWindowDC(0);
+	HDC	 dc  = GetWindowDC(0);
 	Short	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
 
 	ReleaseDC(0, dc);
@@ -189,7 +191,7 @@ S::Int S::GUI::SurfaceGDI::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL) return Success();
 
-	Point	 point = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPoint));
+	Point	 point = rightToLeft.TranslatePoint(iPoint);
 
 	if (!painting)
 	{
@@ -209,8 +211,8 @@ S::Int S::GUI::SurfaceGDI::Line(const Point &iPos1, const Point &iPos2, const Co
 {
 	if (window == NIL) return Success();
 
-	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
-	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
+	Point	 pos1 = rightToLeft.TranslatePoint(iPos1);
+	Point	 pos2 = rightToLeft.TranslatePoint(iPos2);
 
 	HPEN	 hPen = CreatePen(PS_SOLID, 1, color);
 	HPEN	 hOldPen = NIL;
@@ -245,7 +247,7 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 {
 	if (window == NIL) return Success();
 
-	Rect	 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
+	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
 	HDC	 gdi_dc = GetWindowDC(window);
 	HBRUSH	 brush = CreateSolidBrush(color);
@@ -323,7 +325,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
 
 	Rect	 rect	    = iRect;
-	Int	 lineHeight = font.GetTextSizeY() + 3;
+	Int	 lineHeight = font.GetScaledTextSizeY() + 3;
 
 	HDC	 gdi_dc = GetWindowDC(window);
 	HFONT	 hfont;
@@ -354,7 +356,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
 
-		Rect	 tRect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
+		Rect	 tRect = rightToLeft.TranslateRect(rect);
 		RECT	 wRect = { tRect.left, tRect.top, tRect.right, tRect.bottom };
 
 		if (rtlCharacters && Setup::useIconv)
@@ -460,7 +462,7 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
-	Rect	 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
+	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 	HDC	 gdi_dc	  = GetWindowDC(window);
 	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup	  = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
@@ -499,7 +501,7 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, co
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
-	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
+	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
 	HDC	 cdc	 = CreateCompatibleDC(paintContext);
 	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 

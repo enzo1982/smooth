@@ -7,14 +7,16 @@ SMOOTH_PATH = ../../..
 OBJECTS	  = eventbackend.o timerbackend.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd posix && $(MAKE)
-ALLCMD2   = cd threads && $(MAKE)
-ALLCMD3   = cd win32 && $(MAKE)
-ALLCMD4   = cd xlib && $(MAKE)
-CLEANCMD1 = cd posix && $(MAKE) clean
-CLEANCMD2 = cd threads && $(MAKE) clean
-CLEANCMD3 = cd win32 && $(MAKE) clean
-CLEANCMD4 = cd xlib && $(MAKE) clean
+ALLCMD1   = cd haiku && $(MAKE)
+ALLCMD2   = cd posix && $(MAKE)
+ALLCMD3   = cd threads && $(MAKE)
+ALLCMD4   = cd win32 && $(MAKE)
+ALLCMD5   = cd xlib && $(MAKE)
+CLEANCMD1 = cd haiku && $(MAKE) clean
+CLEANCMD2 = cd posix && $(MAKE) clean
+CLEANCMD3 = cd threads && $(MAKE) clean
+CLEANCMD4 = cd win32 && $(MAKE) clean
+CLEANCMD5 = cd xlib && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

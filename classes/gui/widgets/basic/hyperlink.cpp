@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,7 +39,7 @@ S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const St
 	{
 		ComputeTextSize();
 
-		SetSize(textSize + Size(0, 2));
+		SetSize(unscaledTextSize + Size(0, 2));
 	}
 
 	hotspot	= new Hotspot(Point(0, 0), GetSize());
@@ -66,17 +66,17 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Rect	 rect		= Rect(GetRealPosition(), GetSize());
+				Rect	 rect		= Rect(GetRealPosition(), GetRealSize());
 				Surface	*surface	= GetDrawSurface();
 
 				if (linkBitmap == NIL)
 				{
 					surface->Box(rect, GetBackgroundColor(), Rect::Filled);
-					surface->SetText(text, Rect(GetRealPosition(), textSize + Size(0, 1)), font);
+					surface->SetText(text, Rect(GetRealPosition(), scaledTextSize + Size(0, 1)), font);
 				}
 				else
 				{
-					surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), Rect(GetRealPosition(), GetSize()));
+					surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), rect);
 				}
 			}
 
@@ -93,7 +93,7 @@ S::Void S::GUI::Hyperlink::OnMouseOver()
 	if (linkBitmap == NIL)
 	{
 		Surface	*surface  = GetDrawSurface();
-		Rect	 textRect = Rect(GetRealPosition(), textSize + Size(0, 1));
+		Rect	 textRect = Rect(GetRealPosition(), scaledTextSize + Size(0, 1));
 		Font	 nFont	  = font;
 
 		nFont.SetColor(Color(0, 128, 255));
@@ -110,7 +110,7 @@ S::Void S::GUI::Hyperlink::OnMouseOut()
 	if (linkBitmap == NIL)
 	{
 		Surface	*surface  = GetDrawSurface();
-		Rect	 textRect = Rect(GetRealPosition(), textSize + Size(0, 1));
+		Rect	 textRect = Rect(GetRealPosition(), scaledTextSize + Size(0, 1));
 
 		surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
 		surface->SetText(text, textRect, font);
@@ -130,9 +130,11 @@ S::Int S::GUI::Hyperlink::SetText(const String &newText)
 
 	Widget::SetText(newText);
 
-	SetSize(textSize + Size(0, 2));
+	SetSize(unscaledTextSize + Size(0, 2));
 
 	hotspot->SetSize(GetSize());
+
+	Paint(SP_PAINT);
 
 	return Success();
 }

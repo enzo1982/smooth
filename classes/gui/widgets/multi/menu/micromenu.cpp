@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -67,7 +67,7 @@ S::GUI::Rect S::GUI::MicroMenu::GetVisibleArea() const
 	/* MicroMenus are usually placed outside of their containers,
 	 * so let's ignore the containers visible area.
 	 */
-	return Rect(GetRealPosition(), GetSize());
+	return Rect(GetRealPosition(), GetRealSize());
 }
 
 S::Int S::GUI::MicroMenu::Paint(Int message)
@@ -76,7 +76,7 @@ S::Int S::GUI::MicroMenu::Paint(Int message)
 	if (!IsVisible())	return Success();
 
 	Surface	*surface = GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 	switch (message)
 	{
@@ -88,20 +88,24 @@ S::Int S::GUI::MicroMenu::Paint(Int message)
 
 			if (subtype == OR_HORZ)
 			{
-				for (Int i = 0; i < 3; i++)
+				Int	 size = Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
+
+				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(frame.left + GetWidth() / 2 - 1 + i, frame.top + GetHeight() / 2 - 2 + i);
-					Point	 lineEnd	= lineStart + Point(0, 5 - 2 * i);
+					Point	 lineStart	= Point(frame.left + (frame.GetWidth() - size) / 2 + i, frame.top + frame.GetHeight() / 2 - size + 1 + i);
+					Point	 lineEnd	= lineStart + Point(0, 2 * (size - i) - 1);
 
 					surface->Line(lineStart, lineEnd, Color(0, 0, 0));
 				}
 			}
 			else if (subtype == OR_VERT)
 			{
-				for (Int i = 0; i < 3; i++)
+				Int	 size = Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
+
+				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(frame.left + GetWidth() / 2 - 2 + (IsRightToLeft() ? 1 : 0) + i, frame.top + GetHeight() / 2 - 1 + i);
-					Point	 lineEnd	= lineStart + Point(5 - 2 * i, 0);
+					Point	 lineStart	= Point(frame.left + frame.GetWidth() / 2 - size + 1 + (IsRightToLeft() ? 1 : 0) + i, frame.top + (frame.GetHeight() - size) / 2 + i);
+					Point	 lineEnd	= lineStart + Point(2 * (size - i) - 1, 0);
 
 					surface->Line(lineStart, lineEnd, Color(0, 0, 0));
 				}
@@ -119,18 +123,24 @@ S::Int S::GUI::MicroMenu::Paint(Int message)
 
 S::Void S::GUI::MicroMenu::OpenPopupMenu()
 {
-	hotspot->Deactivate();
+	if (popup == NIL) return;
 
 	Widget	*window		= container->GetContainerWindow();
+	Surface	*surface	= GetDrawSurface();
+
+	if (window == NIL) return;
+
+	hotspot->Deactivate();
 
 	Rect	 monitor	= System::MultiMonitor::GetActiveMonitorMetrics();
 	Point	 realPos	= GetRealPosition();
-	Point	 popupPos	= realPos + Point(subtype == OR_HORZ ? GetWidth() : 0, subtype == OR_VERT ? GetHeight() : 0);
+	Size	 realSize	= GetRealSize();
+	Point	 popupPos	= realPos + Point(subtype == OR_HORZ ? realSize.cx : 0, subtype == OR_VERT ? realSize.cy : 0);
 
 	popup->CalculateSize();
 
-	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popup->GetWidth() >= monitor.GetWidth()) popupPos.x = realPos.x - popup->GetWidth() + (subtype == OR_VERT ? GetWidth() : 0); }
-	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popup->GetWidth() <= 0)		  popupPos.x = realPos.x - popup->GetWidth() + (subtype == OR_VERT ? GetWidth() : 0); }
+	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popup->GetWidth() >= monitor.GetWidth()) popupPos.x = realPos.x - Math::Round(popup->GetWidth() * surface->GetSurfaceDPI() / 96.0) + (subtype == OR_VERT ? realSize.cx : 0); }
+	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popup->GetWidth() <= 0)		  popupPos.x = realPos.x - Math::Round(popup->GetWidth() * surface->GetSurfaceDPI() / 96.0) + (subtype == OR_VERT ? realSize.cx : 0); }
 
 	if (window->GetY() + popupPos.y + popup->GetHeight() >= monitor.GetHeight()) popupPos.y = realPos.y - popup->GetHeight() + (subtype == OR_HORZ ? GetHeight() : 0);
 

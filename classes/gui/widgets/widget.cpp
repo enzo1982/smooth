@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -47,8 +47,8 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 
 	text		= NIL;
 
-	textSize.cx	= 0;
-	textSize.cy	= 0;
+	unscaledTextSize= Size();
+	scaledTextSize	= Size();
 
 	mouseOver	= False;
 
@@ -73,9 +73,6 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 
 	backgroundColor	= Setup::BackgroundColor;
 	backgroundColorSet = False;
-
-	nullSurface	= new GUI::Surface();
-	drawSurface	= nullSurface;
 
 	hitTest.Connect(&Widget::DefaultHitTest, this);
 	getContextMenu.Connect((PopupMenu *) NIL);
@@ -133,8 +130,6 @@ S::GUI::Widget::~Widget()
 	widgets.RemoveAll();
 
 	if (registered && container != NIL) container->Remove(this);
-
-	delete nullSurface;
 }
 
 S::Int S::GUI::Widget::EnableLocking(Bool enable)
@@ -226,7 +221,7 @@ S::GUI::Window *S::GUI::Widget::GetContainerWindow() const
 S::GUI::Surface *S::GUI::Widget::GetDrawSurface() const
 {
 	if (IsRegistered()) return container->GetDrawSurface();
-	else		    return drawSurface;
+	else		    return Surface::GetNullSurface();
 }
 
 S::Int S::GUI::Widget::SetContainer(Widget *newContainer)
@@ -290,35 +285,49 @@ S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle) const
 
 S::Void S::GUI::Widget::ComputeTextSize()
 {
-	textSize.cx = font.GetTextSizeX(text);
-	textSize.cy = font.GetTextSizeY(text);
+	unscaledTextSize.cx = font.GetUnscaledTextSizeX(text);
+	unscaledTextSize.cy = font.GetUnscaledTextSizeY(text);
+
+	scaledTextSize.cx   = font.GetScaledTextSizeX(text);
+	scaledTextSize.cy   = font.GetScaledTextSizeY(text);
 }
 
 S::GUI::Point S::GUI::Widget::GetRealPosition() const
 {
 	if (!registered) return pos;
 
-	Point	 realPos	= pos;
-	Point	 containerPos	= container->GetRealPosition();
+	Surface	*surface = GetDrawSurface();
 
-	realPos.x = containerPos.x + pos.x;
-	realPos.y = containerPos.y + pos.y;
+	Point	 containerPos	= container->GetRealPosition();
+	Point	 scaledPos	= pos * surface->GetSurfaceDPI() / 96.0;
+	Point	 realPos	= containerPos + scaledPos;
+
+	if (orientation == OR_UPPERLEFT) return realPos;
+
+	Size	 containerSize = container->GetRealSize();
 
 	if (orientation == OR_UPPERRIGHT)
 	{
-		realPos.x = containerPos.x + container->size.cx - pos.x;
+		realPos.x = containerPos.x + containerSize.cx - scaledPos.x;
 	}
 	else if (orientation == OR_LOWERLEFT)
 	{
-		realPos.y = containerPos.y + container->size.cy - pos.y;
+		realPos.y = containerPos.y + containerSize.cy - scaledPos.y;
 	}
 	else if (orientation == OR_LOWERRIGHT)
 	{
-		realPos.x = containerPos.x + container->size.cx - pos.x;
-		realPos.y = containerPos.y + container->size.cy - pos.y;
+		realPos.x = containerPos.x + containerSize.cx - scaledPos.x;
+		realPos.y = containerPos.y + containerSize.cy - scaledPos.y;
 	}
 
 	return realPos;
+}
+
+S::GUI::Size S::GUI::Widget::GetRealSize() const
+{
+	Surface	*surface = GetDrawSurface();
+
+	return size * surface->GetSurfaceDPI() / 96.0;
 }
 
 S::Int S::GUI::Widget::SetBackgroundColor(const Color &nColor)
@@ -478,54 +487,56 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 	EnterProtectedRegion();
 
-	Point	 realPosition	= GetRealPosition();
-	Rect	 frame		= Rect(realPosition, size);
-	Rect	 visibleArea	= GetVisibleArea();
-	Point	 mousePos	= window->GetMousePosition();
-	Int	 returnValue	= Success();
+	Int	 returnValue = Success();
+	Point	 mousePos    = window->GetMousePosition();
 
 	switch (message)
 	{
 		case SM_MOUSEMOVE:
-			if (!mouseOver && window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition))
 			{
-				mouseOver = True;
+				Point	 realPosition = GetRealPosition();
+				Rect	 visibleArea  = GetVisibleArea();
 
-				if (statusText != NIL) window->SetStatusText(statusText);
-
-				if ((tooltipText != NIL || tooltipLayer != NIL) && window->IsFocussed())
+				if (!mouseOver && window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition))
 				{
-					tipTimer = new System::Timer();
+					mouseOver = True;
 
-					tipTimer->onInterval.Connect(&Widget::ActivateTooltip, this);
-					tipTimer->Start(500);
+					if (statusText != NIL) window->SetStatusText(statusText);
+
+					if ((tooltipText != NIL || tooltipLayer != NIL) && window->IsFocussed())
+					{
+						tipTimer = new System::Timer();
+
+						tipTimer->onInterval.Connect(&Widget::ActivateTooltip, this);
+						tipTimer->Start(500);
+					}
+
+					Paint(SP_MOUSEIN);
+
+					onMouseOver.Emit();
 				}
-
-				Paint(SP_MOUSEIN);
-
-				onMouseOver.Emit();
-			}
-			else if (mouseOver && !(window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition)))
-			{
-				mouseOver = False;
-
-				leftButtonDown = False;
-				rightButtonDown = False;
-
-				if (statusText != NIL && window->GetStatusText() == statusText) window->RestoreDefaultStatusText();
-
-				DeactivateTooltip();
-
-				Paint(SP_MOUSEOUT);
-
-				onMouseOut.Emit();
-			}
-			else if (mouseOver && window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition))
-			{
-				if (tipTimer != NIL && wParam == 0)
+				else if (mouseOver && !(window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition)))
 				{
-					tipTimer->Stop();
-					tipTimer->Start(500);
+					mouseOver = False;
+
+					leftButtonDown = False;
+					rightButtonDown = False;
+
+					if (statusText != NIL && window->GetStatusText() == statusText) window->RestoreDefaultStatusText();
+
+					DeactivateTooltip();
+
+					Paint(SP_MOUSEOUT);
+
+					onMouseOut.Emit();
+				}
+				else if (mouseOver && window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition))
+				{
+					if (tipTimer != NIL && wParam == 0)
+					{
+						tipTimer->Stop();
+						tipTimer->Start(500);
+					}
 				}
 			}
 
@@ -706,13 +717,13 @@ S::Void S::GUI::Widget::ActivateTooltip()
 		if (tooltipText != NIL)
 		{
 			tooltip->SetText(tooltipText);
-			tooltip->SetMetrics(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1), Size(0, 0));
+			tooltip->SetMetrics(window->GetMousePosition() - Point(tooltip->GetUnscaledTextWidth() > 0 ? Math::Round(0.2 * tooltip->GetUnscaledTextWidth()) : 20, 1), Size(0, 0));
 			tooltip->SetTimeout(3000);
 		}
 		else if (tooltipLayer != NIL)
 		{
 			tooltip->SetLayer(tooltipLayer);
-			tooltip->SetPosition(window->GetMousePosition() - Point(Math::Round(0.2 * tooltip->textSize.cx), 1));
+			tooltip->SetPosition(window->GetMousePosition() - Point(tooltip->GetUnscaledTextWidth() > 0 ? Math::Round(0.2 * tooltip->GetUnscaledTextWidth()) : 20, 1));
 			tooltip->SetTimeout(3000);
 		}
 
@@ -914,13 +925,15 @@ S::GUI::Rect S::GUI::Widget::GetVisibleArea() const
 {
 	if (!IsRegistered()) return Rect();
 
-	if (IsIndependent()) return Rect(GetRealPosition(), GetSize());
-	else		     return Rect::OverlapRect(Rect(GetRealPosition(), GetSize()), container->GetVisibleArea());
+	if (IsIndependent()) return Rect(GetRealPosition(), GetRealSize());
+	else		     return Rect::OverlapRect(Rect(GetRealPosition(), GetRealSize()), container->GetVisibleArea());
 }
 
 S::Int S::GUI::Widget::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	if (nPos.x == pos.x && nPos.y == pos.y && nSize.cx == size.cx && nSize.cy == size.cy) return Success();
+
+	DeactivateTooltip();
 
 	Bool	 prevVisible = IsVisible();
 
@@ -948,10 +961,12 @@ S::Bool S::GUI::Widget::IsRightToLeft() const
 
 S::Bool S::GUI::Widget::IsAffected(const Rect &uRect) const
 {
-	return Rect::DoRectsOverlap(uRect, Rect(GetRealPosition() - Point(10, 10), size + Size(20, 20)));
+	return Rect::DoRectsOverlap(uRect, Rect(GetRealPosition() - Point(10, 10), GetRealSize() + Size(20, 20)));
 }
 
 S::Bool S::GUI::Widget::DefaultHitTest(const Point &mousePos)
 {
-	return (mousePos.x >= 0 && mousePos.y >= 0 && mousePos.x <= size.cx - 1 && mousePos.y <= size.cy - 1);
+	Size	 realSize = GetRealSize();
+
+	return (mousePos.x >= 0 && mousePos.y >= 0 && mousePos.x <= realSize.cx - 1 && mousePos.y <= realSize.cy - 1);
 }

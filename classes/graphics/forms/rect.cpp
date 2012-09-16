@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,60 +16,6 @@ S::Int	  S::GUI::Rect::Filled	 = 1;
 S::Int	  S::GUI::Rect::Rounded	 = 2;
 S::Int	  S::GUI::Rect::Inverted = 4;
 S::Int	  S::GUI::Rect::Dotted	 = 8;
-
-S::GUI::Rect S::GUI::Rect::operator +(const Point &point) const
-{
-	Rect	 retR(Point(left, top) + point, Size(right - left, bottom - top));
-
-	return retR;
-}
-
-S::GUI::Rect S::GUI::Rect::operator -(const Point &point) const
-{
-	Rect	 retR(Point(left, top) - point, Size(right - left, bottom - top));
-
-	return retR;
-}
-
-S::GUI::Rect S::GUI::Rect::operator +(const Size &size) const
-{
-	Rect	 retR(Point(left, top), Size(right - left, bottom - top) + size);
-
-	return retR;
-}
-
-S::GUI::Rect S::GUI::Rect::operator -(const Size &size) const
-{
-	Rect	 retR(Point(left, top), Size(right - left, bottom - top) - size);
-
-	return retR;
-}
-
-S::GUI::Rect S::GUI::Rect::operator *(const Float factor) const
-{
-	Rect	 retR(Point(left, top) * factor, Size(right - left, bottom - top) * factor);
-
-	return retR;
-}
-
-S::GUI::Rect S::GUI::Rect::operator /(const Float divisor) const
-{
-	Rect	 retR(Point(left, top) / divisor, Size(right - left, bottom - top) / divisor);
-
-	return retR;
-}
-
-S::Bool S::GUI::Rect::operator ==(const Rect &rect) const
-{
-	if (left == rect.left && top == rect.top && right == rect.right && bottom == rect.bottom)	return True;
-	else												return False;
-}
-
-S::Bool S::GUI::Rect::operator !=(const Rect &rect) const
-{
-	if (left != rect.left || top != rect.top || right != rect.right || bottom != rect.bottom)	return True;
-	else												return False;
-}
 
 S::Bool S::GUI::Rect::DoRectsOverlap(const Rect &rect1, const Rect &rect2)
 {

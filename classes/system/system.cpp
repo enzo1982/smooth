@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -226,7 +226,7 @@ S::String S::System::System::GetApplicationDataDirectory()
 {
 	String	 configDir;
 
-#ifdef __WIN32__
+#if defined __WIN32__
 	ITEMIDLIST	*idlist;
 
 	SHGetSpecialFolderLocation(NIL, CSIDL_APPDATA, &idlist);
@@ -249,6 +249,17 @@ S::String S::System::System::GetApplicationDataDirectory()
 	}
 
 	CoTaskMemFree(idlist);
+#elif defined __HAIKU__
+	FILE		*pstdin = popen("finddir B_USER_SETTINGS_DIRECTORY", "r");
+	Buffer<char>	 buffer(PATH_MAX + 1);
+
+	buffer.Zero();
+
+	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+	pclose(pstdin);
+
+	configDir = buffer;
 #else
 	passwd	*pw = getpwuid(getuid());
 

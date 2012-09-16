@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -101,7 +101,7 @@ Int smooth::Main()
 	OutStream	 out(STREAM_FILE, String("string_case.cpp"), OS_REPLACE);
 
 	out.OutputString(" /* The smooth Class Library						\
-		\r\n  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>		\
+		\r\n  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>		\
 		\r\n  *										\
 		\r\n  * This library is free software; you can redistribute it and/or		\
 		\r\n  * modify it under the terms of \"The Artistic License, Version 2.0\".	\
@@ -116,8 +116,6 @@ Int smooth::Main()
 		\r\n{										\
 		\r\n	String	 retVal = *this;						\
 		\r\n										\
-		\r\n	mutex.Lock();								\
-		\r\n										\
 		\r\n	for (Int i = 0; i < Length(); i++)					\
 		\r\n	{");
 
@@ -126,8 +124,6 @@ Int smooth::Main()
 	out.OutputString("					\
 								\
 		\r\n	}					\
-		\r\n						\
-		\r\n	mutex.Release();			\
 		\r\n						\
 		\r\n	return retVal;				\
 		\r\n}						\
@@ -139,8 +135,6 @@ Int smooth::Main()
 		\r\n{						\
 		\r\n	String	 retVal = *this;		\
 		\r\n						\
-		\r\n	mutex.Lock();				\
-		\r\n						\
 		\r\n	for (Int i = 0; i < Length(); i++)	\
 		\r\n	{");
 
@@ -149,8 +143,6 @@ Int smooth::Main()
 	out.OutputString("					\
 								\
 		\r\n	}					\
-		\r\n						\
-		\r\n	mutex.Release();			\
 		\r\n						\
 		\r\n	return retVal;				\
 		\r\n}						\
@@ -162,8 +154,6 @@ Int smooth::Main()
 		\r\n{						\
 		\r\n	String	 retVal = *this;		\
 		\r\n						\
-		\r\n	mutex.Lock();				\
-		\r\n						\
 		\r\n	for (Int i = 0; i < Length(); i++)	\
 		\r\n	{");
 
@@ -172,8 +162,6 @@ Int smooth::Main()
 	out.OutputString("					\
 								\
 		\r\n	}					\
-		\r\n						\
-		\r\n	mutex.Release();			\
 		\r\n						\
 		\r\n	return retVal;				\
 		\r\n}						\

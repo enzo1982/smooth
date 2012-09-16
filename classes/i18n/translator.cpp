@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,7 @@
 #	include <windows.h>
 #else
 #	include <stdlib.h>
+#	include <unistd.h>
 #endif
 
 S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
@@ -162,11 +163,33 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		case LANG_UKRAINIAN:	code = "uk";	break;
 		case LANG_VIETNAMESE:	code = "vi";	break;
 	}
-#else
-	String	 lang = getenv("LANG");
+#elif defined __HAIKU__
+	FILE		*pstdin = popen("locale -l", "r");
+	Buffer<char>	 buffer(256);
+
+	buffer.Zero();
+
+	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+	pclose(pstdin);
+
+	String	 lang = (char *) buffer;
 
 	if (lang != NIL)
 	{
+		if (lang.Find("@") >= 0) lang = lang.Head(lang.Find("@"));
+		if (lang.Find(".") >= 0) lang = lang.Head(lang.Find("."));
+
+		code = lang;
+	}
+#else
+	String	 lang = getenv("LANG");
+
+	if (lang == NIL) lang = getenv("LC_MESSAGES");
+
+	if (lang != NIL)
+	{
+		if (lang.Find("@") >= 0) lang = lang.Head(lang.Find("@"));
 		if (lang.Find(".") >= 0) lang = lang.Head(lang.Find("."));
 
 		code = lang;
@@ -198,10 +221,10 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 
 		language->SetName("Default language");
 
-		language->encoding = "UTF-8";
-		language->magic = "internal";
-		language->author = "unknown";
-		language->url = "none";
+		language->encoding    = "UTF-8";
+		language->magic	      = "internal";
+		language->author      = "unknown";
+		language->url	      = "none";
 		language->rightToLeft = False;
 
 		languages.Add(language);

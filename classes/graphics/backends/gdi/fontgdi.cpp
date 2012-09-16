@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/gdi/fontgdi.h>
-#include <smooth/misc/math.h>
+#include <smooth/graphics/surface.h>
 
 S::GUI::FontBackend *CreateFontGDI(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
@@ -27,28 +27,28 @@ S::GUI::FontGDI::~FontGDI()
 {
 }
 
-S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text) const
+S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text, Bool scaled) const
 {
 	if (text == NIL) return Size();
 
-	HDC	 dc = CreateCompatibleDC(NIL);
+	Float	 dpi = Surface().GetSurfaceDPI();
+	HDC	 dc  = CreateCompatibleDC(NIL);
 	HFONT	 hFont;
-	HFONT	 hOldFont;
 
-	if (Setup::enableUnicode)	hFont = CreateFontW(-Math::Round(fontSize * 96.0 / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
-	else				hFont = CreateFontA(-Math::Round(fontSize * 96.0 / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	if (Setup::enableUnicode) hFont = CreateFontW(-Math::Round(fontSize * dpi / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	else			  hFont = CreateFontA(-Math::Round(fontSize * dpi / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
 
-	hOldFont = (HFONT) SelectObject(dc, hFont);
-
+	HFONT	 hOldFont = (HFONT) SelectObject(dc, hFont);
 	SIZE	 tSize;
 
-	if (Setup::enableUnicode)	GetTextExtentPoint32W(dc, text, text.Length(), &tSize);
-	else				GetTextExtentPoint32A(dc, text, text.Length(), &tSize);
+	if (Setup::enableUnicode) GetTextExtentPoint32W(dc, text, text.Length(), &tSize);
+	else			  GetTextExtentPoint32A(dc, text, text.Length(), &tSize);
 
 	SelectObject(dc, hOldFont);
 	::DeleteObject(hFont);
 
 	DeleteDC(dc);
 
-	return Size(tSize.cx, tSize.cy);
+	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(tSize.cx, tSize.cy);
+	else					   return Size(tSize.cx, tSize.cy) * 96.0 / dpi;
 }

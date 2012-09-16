@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -53,11 +53,12 @@ namespace smooth
 			     <entry id=\"22\" string=\"Did you know...\">Wussten Sie schon...</entry>		\
 			     <entry id=\"23\" string=\"Show tips on startup\">Tipps beim Start anzeigen</entry>	\
 			     <entry id=\"24\" string=\"Next tip\">Nächster Tipp</entry>				\
-			     <entry id=\"25\" string=\"Cut\">Ausschneiden</entry>				\
-			     <entry id=\"26\" string=\"Copy\">Kopieren</entry>					\
-			     <entry id=\"27\" string=\"Paste\">Einfügen</entry>					\
-			     <entry id=\"28\" string=\"Clear\">Löschen</entry>					\
-			     <entry id=\"29\" string=\"Select all\">Alles auswählen</entry>			\
+			     <entry id=\"25\" string=\"Undo\">Rückgängig</entry>				\
+			     <entry id=\"26\" string=\"Cut\">Ausschneiden</entry>				\
+			     <entry id=\"27\" string=\"Copy\">Kopieren</entry>					\
+			     <entry id=\"28\" string=\"Paste\">Einfügen</entry>					\
+			     <entry id=\"29\" string=\"Clear\">Löschen</entry>					\
+			     <entry id=\"30\" string=\"Select all\">Alles auswählen</entry>			\
 			   </data>										\
 			 </LangFile>										\
 			";

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -60,6 +60,8 @@ S::GUI::SurfaceGDIPlus::SurfaceGDIPlus(Void *iWindow, const Size &maxSize)
 
 		allocSize = size;
 	}
+
+	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceGDIPlus::~SurfaceGDIPlus()
@@ -138,7 +140,7 @@ S::Int S::GUI::SurfaceGDIPlus::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(fontSize.TranslateRect(iPRect)), *(paintRects.GetLast()));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
 
 	paintContext->SetClip(Gdiplus::Rect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top));
 
@@ -159,7 +161,7 @@ S::Int S::GUI::SurfaceGDIPlus::EndPaint()
 
 	delete paintRects.GetLast();
 
-	paintRects.Remove(paintRects.GetNthIndex(paintRects.Length() - 1));
+	paintRects.RemoveNth(paintRects.Length() - 1);
 
 	Rect	 pRect(*paintRects.GetLast());
 
@@ -177,12 +179,8 @@ S::Short S::GUI::SurfaceGDIPlus::GetSurfaceDPI() const
 {
 	if (surfaceDPI != -1) return surfaceDPI;
 
-	HDC			 dc	  = GetWindowDC(0);
-	Gdiplus::Graphics	*graphics = new Gdiplus::Graphics(dc);
-
-	Short	 dpi = graphics->GetDpiY();
-
-	delete graphics;
+	HDC	 dc  = GetWindowDC(0);
+	Short	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
 
 	ReleaseDC(0, dc);
 
@@ -195,7 +193,7 @@ S::Int S::GUI::SurfaceGDIPlus::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL) return Success();
 
-	Point		 point = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPoint));
+	Point		 point = rightToLeft.TranslatePoint(iPoint);
 	Gdiplus::Bitmap	 bitmap(1, 1);
 
 	bitmap.SetPixel(0, 0, Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
@@ -221,8 +219,8 @@ S::Int S::GUI::SurfaceGDIPlus::Line(const Point &iPos1, const Point &iPos2, cons
 {
 	if (window == NIL) return Success();
 
-	Point	 pos1 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos1));
-	Point	 pos2 = rightToLeft.TranslatePoint(fontSize.TranslatePoint(iPos2));
+	Point	 pos1 = rightToLeft.TranslatePoint(iPos1);
+	Point	 pos2 = rightToLeft.TranslatePoint(iPos2);
 
 	/* Adjust to Windows GDI behavior for diagonal lines.
 	 */
@@ -268,7 +266,7 @@ S::Int S::GUI::SurfaceGDIPlus::Box(const Rect &iRect, const Color &color, Int st
 {
 	if (window == NIL) return Success();
 
-	Rect	 rect = rightToLeft.TranslateRect(fontSize.TranslateRect(iRect));
+	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
 	Gdiplus::SolidBrush	 gdip_brush(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
 	Gdiplus::Pen		 gdip_pen(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
@@ -351,14 +349,14 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
 
 	Rect			 rect	    = iRect;
-	Int			 lineHeight = font.GetTextSizeY() + 3;
+	Int			 lineHeight = font.GetScaledTextSizeY() + 3;
 
 	Color			 color = font.GetColor();
 
-	Gdiplus::Font		 gdip_font(font.GetName(), font.GetSize(), (font.GetWeight() >= Font::Bold    ? Gdiplus::FontStyleBold	    : Gdiplus::FontStyleRegular) |
-									   (font.GetStyle() & Font::Italic    ? Gdiplus::FontStyleItalic    : Gdiplus::FontStyleRegular) |
-									   (font.GetStyle() & Font::Underline ? Gdiplus::FontStyleUnderline : Gdiplus::FontStyleRegular) |
-									   (font.GetStyle() & Font::StrikeOut ? Gdiplus::FontStyleStrikeout : Gdiplus::FontStyleRegular));
+	Gdiplus::Font		 gdip_font(font.GetName(), fontSize.TranslateY(font.GetSize()), (font.GetWeight() >= Font::Bold    ? Gdiplus::FontStyleBold	 : Gdiplus::FontStyleRegular) |
+												(font.GetStyle() & Font::Italic    ? Gdiplus::FontStyleItalic    : Gdiplus::FontStyleRegular) |
+												(font.GetStyle() & Font::Underline ? Gdiplus::FontStyleUnderline : Gdiplus::FontStyleRegular) |
+												(font.GetStyle() & Font::StrikeOut ? Gdiplus::FontStyleStrikeout : Gdiplus::FontStyleRegular));
 	Gdiplus::SolidBrush	 gdip_brush(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
 	Gdiplus::StringFormat	 gdip_format(Gdiplus::StringFormatFlagsNoWrap);
 
@@ -380,7 +378,7 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 
 		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
 
-		Rect		 tRect = rightToLeft.TranslateRect(fontSize.TranslateRect(rect));
+		Rect		 tRect = rightToLeft.TranslateRect(rect);
 		Gdiplus::RectF	 gdip_rect(tRect.left, tRect.top, tRect.right - tRect.left + 2, tRect.bottom - tRect.top);
 
 		if (rtlCharacters) gdip_format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsDirectionRightToLeft);
@@ -414,7 +412,7 @@ S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &bitmap, const Rect &
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
-	Rect			 destRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iDestRect));
+	Rect			 destRect = rightToLeft.TranslateRect(iDestRect);
 	HDC			 gdi_dc = GetWindowDC(window);
 	Gdiplus::Graphics	*screen = new Gdiplus::Graphics(gdi_dc);
 	Gdiplus::Bitmap		 gdip_bitmap((HBITMAP) bitmap.GetSystemBitmap(), NIL);
@@ -438,7 +436,7 @@ S::Int S::GUI::SurfaceGDIPlus::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
-	Rect	 srcRect = rightToLeft.TranslateRect(fontSize.TranslateRect(iSrcRect));
+	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
 
 	Gdiplus::Bitmap		 gdip_bitmap((HBITMAP) bitmap.GetSystemBitmap(), NIL);
 	Gdiplus::Graphics	 gdip_graphics(&gdip_bitmap);

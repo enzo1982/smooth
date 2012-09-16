@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.xx.10 xx:xx - smooth alpha 0.8.71.0
+xx.xx.12 xx:xx - smooth alpha 0.8.71.0
 
 - window.cpp		- renamed doQuit to doClose
 			- removed onPeek
@@ -14,6 +14,7 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - keyboard.cpp		- new class: Keyboard, represents keyboard state
 - widget.cpp		- new function: GetVisibleArea(), returns the area of the widget that is actually visible (considering clipping through containers)
 			- new attribute: independent, makes a widget independent of its container
+			- made textSize attribute protected and added getter methods
 - string.cpp		- new function: Explode(), splits a string at a delimiter
 			- new function: Implode(), concatenates strings from an array
 			- new function: Contains(), true if the string contains another one
@@ -25,13 +26,16 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - titlebar.cpp		- pressing the escape key now closes the active window
 - imagebox.cpp		- new widget: a box containing selectable images
 - sha1.cpp		- new class: SHA1, implements the SHA-1 hash algorithm
+- math.cpp		- fixed rounding of negative values
 - cursor.cpp		- fixed support for right-to-left scripts
 			- fixed text selection issues
 			- added default context menu
+			- added undo and redo support
 - cpu.cpp		- added CPUID support
+- fontgdi.cpp		- added support for font scaling
 - fontcairo.cpp		- fixed a ressource leak
 - surfacegdi.cpp	- now using clipping instead of buffering to speed up drawing
-- sururfacecairo.cpp	- now using clipping instead of buffering to speed up drawing
+- surfacecairo.cpp	- now using clipping instead of buffering to speed up drawing
 - colordlg.cpp		- fixed color selection dialog
 - tipodaydlg.cpp	- made dialog width adjust to button size
 - charsetdetector.cpp	- new class: CharsetDetector, detects the character set of a string
@@ -39,6 +43,8 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - access.cpp		- new class: functions for threads save variable access
 - clipboard.cpp		- new class: Clipboard, implements clipboard support
 - timerposix.cpp	- new class: TimerPOSIX, POSIX timer backend
+- document.cpp		- added support for parsing CDATA nodes
+- messagebox.cpp	- replaced Windows message box defines with own constants
 
 - removed TreeView widget (use ListBox instead)
 - removed SDL backends
@@ -55,5 +61,5 @@ xx.xx.10 xx:xx - smooth alpha 0.8.71.0
 - ported to FreeBSD, OpenBSD, NetBSD, Solaris, Mac OS X, QNX and Haiku
 - upgraded libbzip2 to version 1.0.6
 - upgraded fribidi2 to version 0.19.2
-- upgraded libiconv to version 1.13.1
-- upgraded libxml2 to version 2.7.7
+- upgraded libiconv to version 1.14
+- upgraded libxml2 to version 2.7.8

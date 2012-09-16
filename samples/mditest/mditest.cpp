@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -63,14 +63,14 @@ MDITest::~MDITest()
 
 Bool MDITest::ExitProc()
 {
-	Int	 id = QuickMessage("Do you really want to quit?", "Exit program", MB_YESNO, IDI_QUESTION);
+	Int	 id = QuickMessage("Do you really want to quit?", "Exit program", Message::Buttons::YesNo, Message::Icon::Question);
 
 	switch (id)
 	{
-		case IDYES:
+		case Message::Button::Yes:
 			return True;
 		default:
-		case IDNO:
+		case Message::Button::No:
 			return False;
 	}
 }

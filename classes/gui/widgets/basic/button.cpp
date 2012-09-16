@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,7 +24,7 @@ S::GUI::Button::Button(const String &iText, const Bitmap &iBitmap, const Point &
 
 	bitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
-	if (GetWidth() == 0) SetWidth(80);
+	if (GetWidth()	== 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(22);
 
 	ComputeTextSize();
@@ -54,25 +54,25 @@ S::Int S::GUI::Button::Paint(Int message)
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 				if (!(flags & BF_NOFRAME))
 				{
 					surface->Frame(frame, FRAME_DOWN);
-					surface->Frame(Rect(GetRealPosition() + Point(1, 1), GetSize() - Size(2, 2)), FRAME_UP);
+					surface->Frame(Rect(GetRealPosition() + Point(1, 1), GetRealSize() - Size(2, 2)), FRAME_UP);
 				}
 
 				if (text != NIL)
 				{
 					Rect	 textRect;
 
-					textRect.left	= frame.left + ((GetWidth() - textSize.cx) / 2);
+					textRect.left	= frame.left + ((frame.GetWidth() - scaledTextSize.cx) / 2);
 
-					if (bitmap != NIL) textRect.left = frame.left + ((GetWidth() - textSize.cx - bitmap.GetSize().cx - 7) / 2) + bitmap.GetSize().cx + 7;
+					if (bitmap != NIL) textRect.left = frame.left + ((frame.GetWidth() - scaledTextSize.cx - bitmap.GetSize().cx - 7) / 2) + bitmap.GetSize().cx + 7;
 
-					textRect.top	= frame.top + ((GetHeight() - textSize.cy) / 2) - 1;
-					textRect.right	= textRect.left + textSize.cx + 1;
-					textRect.bottom	= textRect.top + Math::Round(textSize.cy * 1.2);
+					textRect.top	= frame.top + ((frame.GetHeight() - scaledTextSize.cy) / 2) - 1;
+					textRect.right	= textRect.left + scaledTextSize.cx + 1;
+					textRect.bottom	= textRect.top + Math::Round(scaledTextSize.cy * 1.2);
 
 					Font	 nFont = font;
 
@@ -85,14 +85,15 @@ S::Int S::GUI::Button::Paint(Int message)
 				if (bitmap != NIL)
 				{
 					Rect	 bmpRect;
+					Size	 bmpSize = bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0;
 
-					bmpRect.left	= frame.left + (frame.right - frame.left - bitmap.GetSize().cx) / 2;
+					bmpRect.left	= frame.left + (frame.GetWidth() - bmpSize.cx) / 2;
 
-					if (text != NIL) bmpRect.left = frame.left + (frame.right - frame.left - bitmap.GetSize().cx - textSize.cx - 7) / 2;
+					if (text != NIL) bmpRect.left = frame.left + (frame.GetWidth() - bmpSize.cx - scaledTextSize.cx - 7) / 2;
 
-					bmpRect.top	= frame.top + (frame.bottom - frame.top - bitmap.GetSize().cy) / 2;
-					bmpRect.right	= bmpRect.left + bitmap.GetSize().cx;
-					bmpRect.bottom	= bmpRect.top + bitmap.GetSize().cy;
+					bmpRect.top	= frame.top + (frame.GetHeight() - bmpSize.cy) / 2;
+					bmpRect.right	= bmpRect.left + bmpSize.cx;
+					bmpRect.bottom	= bmpRect.top + bmpSize.cy;
 
 					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 				}

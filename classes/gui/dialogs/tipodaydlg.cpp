@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -65,9 +65,9 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 
 	check_showtips	= new CheckBox(I18n::Translator::defaultTranslator->TranslateString("Show tips on startup"), Point(7, 27), Size(150, 0), showTips);
 	check_showtips->SetOrientation(OR_LOWERLEFT);
-	check_showtips->SetWidth(check_showtips->textSize.cx + 21);
+	check_showtips->SetWidth(check_showtips->GetUnscaledTextWidth() + 21);
 
-	Int	 additionalSize = Math::Max(0, check_showtips->textSize.cx - 133);
+	Int	 additionalSize = Math::Max(0, check_showtips->GetUnscaledTextWidth() - 133);
 
 	dlgwnd->SetWidth(dlgwnd->GetWidth() + additionalSize);
 	dlgwnd->SetX(workArea.GetPosition().x + (workArea.GetSize().cx - 350 - additionalSize) / 2);
@@ -207,5 +207,5 @@ S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 
 S::Void S::GUI::Dialogs::TipOfTheDay::Paint()
 {
-	dlgwnd->GetDrawSurface()->Box(Rect(layer_inner->GetRealPosition() - Point(1, 1), layer_inner->GetSize() + Size(2, 2)), 0, Rect::Outlined);
+	dlgwnd->GetDrawSurface()->Box(Rect(layer_inner->GetRealPosition() - Point(1, 1), layer_inner->GetRealSize() + Size(2, 2)), 0, Rect::Outlined);
 }

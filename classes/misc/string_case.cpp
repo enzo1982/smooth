@@ -1,5 +1,5 @@
  /* The smooth Class Library								
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>				
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>				
   *												
   * This library is free software; you can redistribute it and/or				
   * modify it under the terms of "The Artistic License, Version 2.0".			
@@ -13,8 +13,6 @@
 S::String S::String::ToUpper() const							
 {												
 	String	 retVal = *this;								
-												
-	mutex.Lock();										
 												
 	for (Int i = 0; i < Length(); i++)							
 	{
@@ -181,16 +179,12 @@ S::String S::String::ToUpper() const
 		else if	((*this)[i] >= 0xff41 && (*this)[i] <= 0xff5a)				retVal[i] = (*this)[i] - 0x20;	// Alphabet															
 	}							
 								
-	mutex.Release();					
-								
 	return retVal;						
 }								
 															
 S::String S::String::ToLower() const			
 {								
 	String	 retVal = *this;				
-								
-	mutex.Lock();						
 								
 	for (Int i = 0; i < Length(); i++)			
 	{
@@ -343,16 +337,12 @@ S::String S::String::ToLower() const
 		else if	((*this)[i] >= 0xff21 && (*this)[i] <= 0xff3a)				retVal[i] = (*this)[i] + 0x20;	// Alphabet															
 	}							
 								
-	mutex.Release();					
-								
 	return retVal;						
 }								
 															
 S::String S::String::ToTitle() const			
 {								
 	String	 retVal = *this;				
-								
-	mutex.Lock();						
 								
 	for (Int i = 0; i < Length(); i++)			
 	{
@@ -520,8 +510,6 @@ S::String S::String::ToTitle() const
 		else if	((*this)[i] == 0xa78c)							retVal[i] =		 0xa78b;	// Single character
 		else if	((*this)[i] >= 0xff41 && (*this)[i] <= 0xff5a)				retVal[i] = (*this)[i] - 0x20;	// Alphabet															
 	}							
-								
-	mutex.Release();					
 								
 	return retVal;						
 }								

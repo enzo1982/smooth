@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,6 +18,8 @@
 
 #define IDI_ICON	100
 #define IDB_ICON	200
+
+using namespace smooth::Input;
 
 Int smooth::Main(const Array<String> &args)
 {
@@ -80,18 +82,61 @@ Translator::Translator(const String &openFile)
 	edit_translated	= new MultiEdit(NIL, Point(156, 68), Size(608, 60), 0);
 	edit_translated->SetOrientation(OR_LOWERLEFT);
 
+	MenuEntry	*entry = NIL;
+
 	menu_file	= new PopupMenu();
 
-	menubar->AddEntry("File", NIL, menu_file);
+	entry = menubar->AddEntry("File", NIL, menu_file);
 
-	menu_file->AddEntry("New")->onAction.Connect(&Translator::NewFile, this);
-	menu_file->AddEntry("Close")->onAction.Connect(&Translator::Close, this);
+	entry = menu_file->AddEntry("New");
+	entry->onAction.Connect(&Translator::NewFile, this);
+	entry->SetShortcut(SC_CTRL, 'N', wnd);
+
+	entry = menu_file->AddEntry("Close");
+	entry->onAction.Connect(&Translator::Close, this);
+	entry->Deactivate();
+
 	menu_file->AddEntry();
-	menu_file->AddEntry("Open...")->onAction.Connect(&Translator::OpenFile, this);
-	menu_file->AddEntry("Save")->onAction.Connect(&Translator::SaveFile, this);
-	menu_file->AddEntry("Save as...")->onAction.Connect(&Translator::SaveFileAs, this);
+
+	entry = menu_file->AddEntry("Open...");
+	entry->onAction.Connect(&Translator::OpenFile, this);
+	entry->SetShortcut(SC_CTRL, 'O', wnd);
+
+	entry = menu_file->AddEntry("Save");
+	entry->onAction.Connect(&Translator::SaveFile, this);
+	entry->SetShortcut(SC_CTRL, 'S', wnd);
+	entry->Deactivate();
+
+	entry = menu_file->AddEntry("Save as...");
+	entry->onAction.Connect(&Translator::SaveFileAs, this);
+	entry->SetShortcut(SC_CTRL | SC_SHIFT, 'S', wnd);
+	entry->Deactivate();
+
 	menu_file->AddEntry();
-	menu_file->AddEntry("Exit")->onAction.Connect(&GUI::Window::Close, wnd);
+
+	entry = menu_file->AddEntry("Exit");
+	entry->onAction.Connect(&GUI::Window::Close, wnd);
+	entry->SetShortcut(SC_ALT, Keyboard::KeyF4, wnd);
+
+	menu_entry	= new PopupMenu();
+
+	entry = menubar->AddEntry("Entry", NIL, menu_entry);
+	entry->Deactivate();
+
+	entry = menu_entry->AddEntry("New");
+	entry->onAction.Connect(&Translator::NewEntry, this);
+	entry->SetShortcut(SC_ALT, 'N', wnd);
+
+	menu_entry->AddEntry();
+
+	entry = menu_entry->AddEntry("Save");
+	entry->onAction.Connect(&Translator::SaveData, this);
+	entry->SetShortcut(SC_ALT, 'S', wnd);
+
+	entry = menu_entry->AddEntry("Remove");
+	entry->onAction.Connect(&Translator::RemoveEntry, this);
+	entry->SetShortcut(SC_ALT, 'R', wnd);
+	entry->Deactivate();
 
 	text_id->Deactivate();
 	edit_id->Deactivate();
@@ -146,6 +191,7 @@ Translator::~Translator()
 	DeleteObject(wnd);
 	DeleteObject(menubar);
 	DeleteObject(menu_file);
+	DeleteObject(menu_entry);
 	DeleteObject(statusbar);
 	DeleteObject(text_id);
 	DeleteObject(edit_id);
@@ -175,21 +221,21 @@ Bool Translator::ExitProc()
 		return True;
 	}
 
-	Int	 id = QuickMessage(String("Do you want to save changes in ").Append(GetShortFileName(fileName)).Append("?"), "smooth Translator", MB_YESNOCANCEL, IDI_QUESTION);
+	Int	 id = QuickMessage(String("Do you want to save changes in ").Append(GetShortFileName(fileName)).Append("?"), "smooth Translator", Message::Buttons::YesNoCancel, Message::Icon::Question);
 
 	switch (id)
 	{
-		case IDYES:
+		case Message::Button::Yes:
 			SaveFile();
 			CloseFile();
 
 			return True;
-		case IDNO:
+		case Message::Button::No:
 			CloseFile();
 
 			return True;
-		case IDCANCEL:
-		case IDCLOSE:
+		case Message::Button::Cancel:
+		case Message::Button::Close:
 			return False;
 	}
 
@@ -226,6 +272,12 @@ Void Translator::NewFile()
 	button_remove->Activate();
 	button_new->Activate();
 	list_entries->Activate();
+
+	menu_file->GetNthEntry(1)->Activate();
+	menu_file->GetNthEntry(4)->Activate();
+	menu_file->GetNthEntry(5)->Activate();
+
+	menubar->GetNthEntry(1)->Activate();
 
 	{
 		ListEntry	*entry = NIL;
@@ -345,6 +397,12 @@ Void Translator::CloseFile()
 	button_remove->Deactivate();
 	button_new->Deactivate();
 	list_entries->Deactivate();
+
+	menu_file->GetNthEntry(1)->Deactivate();
+	menu_file->GetNthEntry(4)->Deactivate();
+	menu_file->GetNthEntry(5)->Deactivate();
+
+	menubar->GetNthEntry(1)->Deactivate();
 }
 
 Void Translator::OpenFile()
@@ -609,8 +667,7 @@ Void Translator::SaveData()
 			{
 				entry = (InfoItem *) entries.GetNth(index + 1);
 
-				edit_original->SetText(entry->GetName());
-				edit_translated->SetText(entry->GetValue());
+				entry->Select();
 			}
 			else
 			{
@@ -619,6 +676,8 @@ Void Translator::SaveData()
 				edit_original->Activate();
 				button_remove->Activate();
 
+				menu_entry->GetNthEntry(3)->Activate();
+
 				text_original->SetText("Original:");
 				text_translated->SetText("Translation:");
 
@@ -626,15 +685,15 @@ Void Translator::SaveData()
 				{
 					StringItem	*entry = (StringItem *) entries.GetNth(numInfoItems);
 
-					edit_id->SetText(String::FromInt(entry->GetID()));
-					edit_original->SetText(entry->GetOriginal());
-					edit_translated->SetText(entry->GetTranslation());
+					entry->Select();
 				}
 				else
 				{
 					edit_id->SetText("1");
 					edit_original->SetText(NIL);
 					edit_translated->SetText(NIL);
+
+					edit_translated->MarkAll();
 				}
 			}
 		}
@@ -674,27 +733,19 @@ Void Translator::SaveData()
 		if (entry->GetTranslation() == NIL)	entry->SetFont(redFont);
 		else					entry->SetFont(blackFont);
 
-		entry = NIL;
+		entry = (StringItem *) entries.GetNext();
 
-		for (Int j = numInfoItems; j < entries.Length(); j++)
+		if (entry != NIL)
 		{
-			if (((StringItem *) entries.GetNth(j))->GetID() == edit_id->GetText().ToInt() + 1)
-			{
-				entry = (StringItem *) entries.GetNth(j);
-
-				edit_id->SetText(String::FromInt(entry->GetID()));
-				edit_original->SetText(entry->GetOriginal());
-				edit_translated->SetText(entry->GetTranslation());
-
-				break;
-			}
+			entry->Select();
 		}
-
-		if (entry == NIL)
+		else
 		{
 			edit_id->SetText(String::FromInt(edit_id->GetText().ToInt() + 1));
 			edit_original->SetText(NIL);
 			edit_translated->SetText(NIL);
+
+			edit_translated->MarkAll();
 		}
 	}
 
@@ -716,6 +767,8 @@ Void Translator::SelectEntry(ListEntry *entry)
 		edit_original->Deactivate();
 		button_remove->Deactivate();
 
+		menu_entry->GetNthEntry(3)->Deactivate();
+
 		text_original->SetText("Field:");
 		text_translated->SetText("Value:");
 	}
@@ -726,6 +779,8 @@ Void Translator::SelectEntry(ListEntry *entry)
 		edit_original->Activate();
 		button_remove->Activate();
 
+		menu_entry->GetNthEntry(3)->Activate();
+
 		text_original->SetText("Original:");
 		text_translated->SetText("Translation:");
 
@@ -733,6 +788,8 @@ Void Translator::SelectEntry(ListEntry *entry)
 		edit_original->SetText(((StringItem *) entry)->GetOriginal());
 		edit_translated->SetText(((StringItem *) entry)->GetTranslation());
 	}
+
+	edit_translated->MarkAll();
 }
 
 Void Translator::NewEntry()
@@ -750,6 +807,8 @@ Void Translator::NewEntry()
 	edit_id->Activate();
 	edit_original->Activate();
 	button_remove->Activate();
+
+	menu_entry->GetNthEntry(3)->Activate();
 
 	text_original->SetText("Original:");
 	text_translated->SetText("Translation:");

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,9 +23,9 @@ S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, P
 {
 	type		= classID;
 
-	if (text == NIL && bitmap == NIL)	SetSize(Size(4, 15));
-	else if (text != NIL && bitmap == NIL)	SetSize(Size(textSize.cx + 7, 16));
-	else if (text == NIL && bitmap != NIL)	SetSize(bitmap.GetSize() + Size(4 + (popup != NIL ? 12 : 0), 4));
+	if	(text == NIL && bitmap == NIL) SetSize(Size(4, 15));
+	else if (text != NIL && bitmap == NIL) SetSize(Size(unscaledTextSize.cx + 7, 16));
+	else if (text == NIL && bitmap != NIL) SetSize(bitmap.GetSize() + Size(4 + (popup != NIL ? 12 : 0), 4));
 
 	hotspot = NIL;
 	actionHotspot = NIL;
@@ -55,10 +55,10 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Surface	*surface = GetDrawSurface();
-	Point	 realPos = GetRealPosition();
-	Rect	 frame	 = Rect(realPos, GetSize());
-	Rect	 bmpRect = Rect(realPos + Point(2, 2), bitmap.GetSize());
+	Surface	*surface  = GetDrawSurface();
+	Point	 realPos  = GetRealPosition();
+	Size	 realSize = GetRealSize();
+	Rect	 bmpRect  = Rect(realPos + Point(2, 2) * surface->GetSurfaceDPI() / 96.0, bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0);
 
 	switch (message)
 	{
@@ -71,7 +71,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 					SetWidth(4);
 
 					Point	 p1 = Point(realPos.x, realPos.y);
-					Point	 p2 = Point(p1.x, p1.y + GetHeight());
+					Point	 p2 = Point(p1.x, p1.y + realSize.cy);
 
 					surface->Bar(p1, p2, OR_VERT);
 
@@ -85,7 +85,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 					SetHeight(4);
 
 					Point	 p1 = Point(realPos.x, realPos.y);
-					Point	 p2 = Point(p1.x + GetWidth(), p1.y);
+					Point	 p2 = Point(p1.x + realSize.cx, p1.y);
 
 					surface->Bar(p1, p2, OR_HORZ);
 
@@ -97,10 +97,13 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 			}
 			else if (text != NIL && bitmap == NIL)
 			{
-				Rect	 textRect = Rect(realPos + Point(3, 1), GetSize() - Size(4, 2));
+				Rect	 textRect = Rect(realPos + Point(1, 1) + Point(2, 0) * surface->GetSurfaceDPI() / 96.0, realSize - Size(2, 2) - Size(2, 0) * surface->GetSurfaceDPI() / 96.0);
+				Font	 nFont	  = font;
+
+				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
 				surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
-				surface->SetText(text, textRect, font);
+				surface->SetText(text, textRect, nFont);
 			}
 			else if (text == NIL && bitmap != NIL)
 			{
@@ -109,22 +112,17 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 				if (popup != NIL)
 				{
-					Point	 p1;
-					Point	 p2;
+					Int	 height	   = Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
 
-					p1.x = realPos.x + GetWidth() - 10 + (IsRightToLeft() ? 1 : 0);
-					p2.x = p1.x + 7;
-					p1.y = realPos.y + (GetHeight() - 3) / 2;
-					p2.y = p1.y;
+					Point	 lineStart = realPos + Point(realSize.cx - height * 2 - 2 * surface->GetSurfaceDPI() / 96.0 - (IsRightToLeft() ? 0 : 1), (realSize.cy - height) / 2 + 1);
+					Point	 lineEnd   = lineStart + Point(height * 2 - 1, 0);
 
-					for (Int y = 0; y < 3; y++)
+					for (Int i = 0; i < height; i++)
 					{
-						p1.x++;
-						p2.x--;
-						p1.y++;
-						p2.y++;
+						surface->Line(lineStart, lineEnd, Setup::TextColor);
 
-						surface->Line(p1, p2, Setup::TextColor);
+						lineStart += Point(1, 1);
+						lineEnd	  += Point(-1, 1);
 					}
 				}
 			}
@@ -140,8 +138,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 				if (onAction.GetNOfConnectedSlots() > 0 && popup != NIL)
 				{
-					Point	 p1 = Point(realPos.x + GetWidth() - 13, realPos.y + 1);
-					Point	 p2 = Point(realPos.x + GetWidth() - 13, realPos.y + GetHeight() - 2);
+					Point	 p1 = Point(realPos.x + realSize.cx - 11 * surface->GetSurfaceDPI() / 96.0 - 2, realPos.y + 1);
+					Point	 p2 = Point(realPos.x + realSize.cx - 11 * surface->GetSurfaceDPI() / 96.0 - 2, realPos.y + realSize.cy - 2);
 
 					surface->Bar(p1, p2, OR_VERT);
 				}
@@ -158,8 +156,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 				if (onAction.GetNOfConnectedSlots() > 0 && popup != NIL)
 				{
-					Point	 p1 = Point(realPos.x + GetWidth() - 13 + (IsRightToLeft() ? 1 : 0), realPos.y + 1);
-					Point	 p2 = Point(realPos.x + GetWidth() - 13 + (IsRightToLeft() ? 1 : 0), realPos.y + GetHeight() - 1);
+					Point	 p1 = Point(realPos.x + realSize.cx - 11 * surface->GetSurfaceDPI() / 96.0 - 2 + (IsRightToLeft() ? 1 : 0), realPos.y + 1);
+					Point	 p2 = Point(realPos.x + realSize.cx - 11 * surface->GetSurfaceDPI() / 96.0 - 2 + (IsRightToLeft() ? 1 : 0), realPos.y + realSize.cy - 1);
 
 					surface->Line(p1, p2, Setup::BackgroundColor);
 
@@ -190,8 +188,10 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 {
 	if (popup == NIL) return;
 
-	Window	*window		= container->GetContainerWindow();
-	Rect	 popupFrame	= Rect(GetRealPosition() + Point(GetWidth() - 11, 0), Size(11, GetHeight()));
+	Window	*window	    = container->GetContainerWindow();
+	Surface	*surface    = GetDrawSurface();
+	Size	 realSize   = GetRealSize();
+	Rect	 popupFrame = Rect(GetRealPosition() + Point(realSize.cx - 11 * surface->GetSurfaceDPI() / 96.0, 0), Size(11 * surface->GetSurfaceDPI() / 96.0, realSize.cy));
 
 	if (onAction.GetNOfConnectedSlots() == 0 || window->IsMouseOn(popupFrame))
 	{
@@ -199,7 +199,7 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 
 		popup->CalculateSize();
 
-		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : GetWidth() + 2 - popup->GetWidth(), GetHeight() + 1));
+		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : realSize.cx + 2 - popup->GetWidth() * surface->GetSurfaceDPI() / 96.0, realSize.cy + 1));
 		popup->internalRequestClose.Connect(&MenubarEntry::ClosePopupMenu, this);
 
 		Add(popup);
@@ -221,16 +221,18 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 		popup->internalRequestClose.Disconnect(&MenubarEntry::ClosePopupMenu, this);
 
 		Window	*window	= container->GetContainerWindow();
-		Rect	 frame	= Rect(GetRealPosition(), GetSize());
+		Rect	 frame	= Rect(GetRealPosition(), GetRealSize());
 
 		if (!window->IsMouseOn(frame)) Paint(SP_MOUSEOUT);
 
 		hotspot->Activate();
+
+		Process(SM_MOUSEMOVE, 0, 0);
 	}
 }
 
 S::Bool S::GUI::MenubarEntry::IsTypeCompatible(Short compType) const
 {
-	if (compType == Object::classID || compType == Widget::classID || compType == MenuEntry::classID)	return True;
-	else													return False;
+	if (compType == Object::classID || compType == Widget::classID || compType == MenuEntry::classID) return True;
+	else												  return False;
 }

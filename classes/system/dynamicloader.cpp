@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,9 @@
 
 #include <smooth/system/dynamicloader.h>
 #include <smooth/files/directory.h>
+#include <smooth/io/instream.h>
 #include <smooth/gui/application/application.h>
+#include <smooth/foreach.h>
 
 #ifdef __WIN32__
 #	include <windows.h>
@@ -49,7 +51,7 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 #else
 	Int	 dlopenFlags = RTLD_NOW | RTLD_LOCAL;
 
-#ifdef __FreeBSD__
+#if defined __FreeBSD__ || defined __NetBSD__
 	dlopenFlags |= RTLD_NODELETE;
 #endif
 
@@ -66,21 +68,13 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 
 	if (handle == NIL)
 	{
-#if defined __APPLE__
-		const char	*directories[] = { "/usr/lib", "/usr/local/lib", "/opt/local/lib", "/sw/lib", NIL };
-#elif defined __HAIKU__
-		const char	*directories[] = { "/boot/common/lib", NIL };
-#elif defined __NetBSD__
-		const char	*directories[] = { "/usr/lib", "/usr/local/lib", "/usr/pkg/lib", NIL };
-#else
-		const char	*directories[] = { "/usr/lib", "/usr/local/lib", NIL };
-#endif
+		const Array<String> &directories = GetLibraryDirectories();
 
 		/* Try loading an unversioned library.
 		 */
-		for (Int i = 0; directories[i] != NIL; i++)
+		foreach (const String &path, directories)
 		{
-			Directory		 directory(directories[i]);
+			Directory		 directory(path);
 			const Array<File>	&files = directory.GetFilesByPattern(String(module.StartsWith("lib") || module.Find("/") >= 0 ? String() : "lib").Append(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt));
 
 			if (files.Length() > 0)
@@ -93,9 +87,9 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 
 		/* Try loading a versioned library.
 		 */
-		for (Int i = 0; directories[i] != NIL; i++)
+		foreach (const String &path, directories)
 		{
-			Directory		 directory(directories[i]);
+			Directory		 directory(path);
 			const Array<File>	&files = directory.GetFilesByPattern(String(module.StartsWith("lib") || module.Find("/") >= 0 ? String() : "lib").Append(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : versionPattern));
 
 			if (files.Length() > 0)
@@ -114,11 +108,9 @@ S::System::DynamicLoader::~DynamicLoader()
 #ifdef __WIN32__
 	if (handle != NIL) FreeLibrary((HINSTANCE) handle);
 #else
-#if defined __NetBSD__ || defined __HAIKU__
-	/* NetBSD and Haiku do not support RTLD_NODELETE yet,
-	 * so we cannot close .so files without risking a crash.
-	 *
-	 * ToDo: Fix this for NetBSD once release 6.0 is out.
+#ifdef __HAIKU__
+	/* Haiku does not support RTLD_NODELETE yet, so we
+	 * cannot close .so files without risking a crash.
 	 */
 #else
 	if (handle != NIL) dlclose(handle);
@@ -140,4 +132,53 @@ S::Void *S::System::DynamicLoader::GetFunctionAddress(const String &functionName
 S::Void *S::System::DynamicLoader::GetSystemModuleHandle() const
 {
 	return handle;
+}
+
+const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
+{
+	static Array<String>	 directories;
+
+	if (directories.Length() == 0)
+	{
+#if defined __APPLE__
+		directories.Add("/usr/lib");
+		directories.Add("/usr/local/lib");
+		directories.Add("/opt/local/lib");
+		directories.Add("/sw/lib");
+#elif defined __HAIKU__
+		directories.Add("/boot/common/lib");
+#elif defined __NetBSD__
+		directories.Add("/usr/lib");
+		directories.Add("/usr/local/lib");
+		directories.Add("/usr/pkg/lib");
+#else
+		directories.Add("/usr/lib");
+
+		if (File("/etc/ld.so.conf").Exists()) ParseDirectoryList("/etc/ld.so.conf", directories);
+		else				      directories.Add("/usr/local/lib");
+#endif
+	}
+
+	return directories;
+}
+
+S::Void S::System::DynamicLoader::ParseDirectoryList(const String &pattern, Array<String> &directories)
+{
+	Directory		 directory(File(pattern).GetFilePath());
+	const Array<File>	&files = directory.GetFilesByPattern(File(pattern).GetFileName());
+
+	foreach (const File &file, files)
+	{
+		IO::InStream	 in(IO::STREAM_FILE, file);
+
+		while (in.GetPos() < in.Size())
+		{
+			String	 line = in.InputLine();
+
+			if	(line == NIL)			continue;
+			else if (line.StartsWith("#"))		continue;
+			else if (line.StartsWith("include "))	ParseDirectoryList(line.Tail(line.Length() - 8), directories);
+			else					directories.Add(line);
+		}
+	}
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/cairo/fontcairo.h>
-#include <smooth/graphics/font.h>
+#include <smooth/graphics/surface.h>
 
 #ifdef __WIN32__
 #	include <cairo/cairo-win32.h>
@@ -42,16 +42,18 @@ S::GUI::FontCairo::~FontCairo()
 {
 }
 
-S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
+S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText, Bool scaled) const
 {
 	if (iText == NIL) return Size();
 
-	String	 text	       = iText;
+	String	 text = iText;
+	Float	 dpi  = Surface().GetSurfaceDPI();
+
+#ifdef __WIN32__
 	Bool	 rtlCharacters = False;
 
 	for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x07BF) { rtlCharacters = True; break; }
 
-#ifdef __WIN32__
 	if (rtlCharacters && Setup::useIconv)
 	{
 		/* Reorder the string with fribidi.
@@ -85,10 +87,10 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
 
 #if defined __WIN32__ || defined __APPLE__
 	cairo_select_font_face(context, fontName,
-			       (fontStyle == Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-			       (fontWeight == Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
+			       (fontStyle & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+			       (fontWeight >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
-	cairo_set_font_size(context, fontSize * 96.0 / 72.0);
+	cairo_set_font_size(context, fontSize * dpi / 72.0);
 
 	cairo_font_extents_t	 fontExtents;
 	cairo_text_extents_t	 textExtents;
@@ -99,9 +101,9 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
 	PangoLayout		*layout	= pango_cairo_create_layout(context);
 	PangoFontDescription	*desc	= pango_font_description_from_string(String(fontName)
 									    .Append(" ")
-									    .Append(fontStyle == Font::Italic ? "Italic " : "")
-									    .Append(fontWeight == Font::Bold ? "Bold " : "")
-									    .Append(String::FromInt(fontSize)));
+									    .Append(fontStyle & Font::Italic ? "Italic " : "")
+									    .Append(fontWeight >= Font::Bold ? "Bold " : "")
+									    .Append(String::FromInt(Math::Round(fontSize * dpi / 96.0))));
 
 	if (text.Length() > 0) pango_layout_set_text(layout, text.ConvertTo("UTF-8"), -1);
 
@@ -124,8 +126,10 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
 #endif
 
 #if defined __WIN32__ || defined __APPLE__
-	return Size(textExtents.x_advance, fontExtents.height);
+	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(textExtents.x_advance, fontExtents.height);
+	else					   return Size(textExtents.x_advance, fontExtents.height) * 96.0 / dpi;
 #else
-	return Size(x, y - 2);
+	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(x, y - 2);
+	else					   return Size(x, y - 2) * 96.0 / dpi;
 #endif
 }

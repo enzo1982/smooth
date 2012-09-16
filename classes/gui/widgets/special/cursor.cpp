@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,6 +45,7 @@ S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSiz
 	scrollPos	= 0;
 	maxScrollPos	= 0;
 	contextMenu	= NIL;
+	historyPos	= 0;
 
 	SetTabstopCapable(True);
 
@@ -57,6 +58,8 @@ S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSiz
 	onInput.SetParentObject(this);
 	onEnter.SetParentObject(this);
 	onScroll.SetParentObject(this);
+
+	AddHistoryEntry();
 }
 
 S::GUI::Cursor::~Cursor()
@@ -93,26 +96,26 @@ S::Int S::GUI::Cursor::Paint(Int message)
 
 S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Window	*window	= container->GetContainerWindow();
 
 	if (window == NIL) return Success();
-
-	Rect	 frame	= Rect(GetRealPosition(), GetSize());
 
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
 			if (mouseOver)
 			{
+				Rect	 frame = Rect(GetRealPosition(), GetRealSize());
+
 				String	 wText = text;
 				Int	 wPromptPos = 0;
 
 				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 				{
-					Int	 line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY() + 3);
+					Int	 line = (window->GetMousePosition().y - frame.top) / (font.GetScaledTextSizeY() + 3);
 					Int	 lineCount = 0;
 
 					for (Int i = 0; i <= text.Length(); i++)
@@ -256,56 +259,60 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MOUSEMOVE:
-			if (!mouseOver && window->IsMouseOn(frame))
 			{
-				mouseOver = True;
+				Rect	 frame = Rect(GetRealPosition(), GetRealSize());
 
-				Paint(SP_MOUSEIN);
-			}
-			else if (mouseOver && !window->IsMouseOn(frame))
-			{
-				mouseOver = False;
-
-				Paint(SP_MOUSEOUT);
-			}
-
-			if (focussed && markStart != -1 && marking)
-			{
-				String	 wText = text;
-				Int	 wPromptPos = 0;
-
-				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
+				if (!mouseOver && window->IsMouseOn(frame))
 				{
-					Int	 line = (window->GetMousePosition().y - frame.top) / (font.GetTextSizeY() + 3);
-					Int	 lineCount = 0;
+					mouseOver = True;
 
-					if (window->GetMousePosition().y - frame.top < 0) line--;
+					Paint(SP_MOUSEIN);
+				}
+				else if (mouseOver && !window->IsMouseOn(frame))
+				{
+					mouseOver = False;
 
-					for (Int i = 0; i <= text.Length(); i++)
-					{
-						if (text[i] == '\n' || text[i] == 0)
-						{
-							wText[i - wPromptPos] = 0;
-
-							if (lineCount - scrollPos == line) break;
-
-							wPromptPos = i;
-							lineCount++;
-						}
-
-						wText[i - wPromptPos] = text[i];
-					}
-
-					if (lineCount - scrollPos != line) wPromptPos = -1;
+					Paint(SP_MOUSEOUT);
 				}
 
-				if (wPromptPos >= 0)
+				if (focussed && markStart != -1 && marking)
 				{
-					Int	 newMarkEnd = GetLogicalCursorPositionFromDisplay(wText, window->GetMousePosition().x - frame.left) + wPromptPos;
+					String	 wText = text;
+					Int	 wPromptPos = 0;
 
-					MarkText(markStart, newMarkEnd);
+					if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
+					{
+						Int	 line = (window->GetMousePosition().y - frame.top) / (font.GetScaledTextSizeY() + 3);
+						Int	 lineCount = 0;
 
-					SetCursorPos(newMarkEnd);
+						if (window->GetMousePosition().y - frame.top < 0) line--;
+
+						for (Int i = 0; i <= text.Length(); i++)
+						{
+							if (text[i] == '\n' || text[i] == 0)
+							{
+								wText[i - wPromptPos] = 0;
+
+								if (lineCount - scrollPos == line) break;
+
+								wPromptPos = i;
+								lineCount++;
+							}
+
+							wText[i - wPromptPos] = text[i];
+						}
+
+						if (lineCount - scrollPos != line) wPromptPos = -1;
+					}
+
+					if (wPromptPos >= 0)
+					{
+						Int	 newMarkEnd = GetLogicalCursorPositionFromDisplay(wText, window->GetMousePosition().x - frame.left) + wPromptPos;
+
+						MarkText(markStart, newMarkEnd);
+
+						SetCursorPos(newMarkEnd);
+					}
 				}
 			}
 
@@ -325,7 +332,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::Cursor::DrawWidget()
 {
-	Int	 nMaxScrollPos = Math::Max(0, (Int) Math::Ceil((Float) (font.GetTextSizeY(text) - GetHeight()) / (font.GetTextSizeY() + 3)));
+	Int	 nMaxScrollPos = Math::Max(0, (Int) Math::Ceil((Float) (font.GetUnscaledTextSizeY(text) - GetHeight()) / (font.GetUnscaledTextSizeY() + 3)));
 
 	if (nMaxScrollPos != maxScrollPos)
 	{
@@ -338,7 +345,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 	Surface	*surface = GetDrawSurface();
 	Point	 realPos = GetRealPosition();
-	Rect	 frame	 = Rect(realPos, GetSize());
+	Rect	 frame	 = Rect(realPos, GetRealSize());
 
 	surface->StartPaint(GetVisibleArea());
 
@@ -374,10 +381,10 @@ S::Int S::GUI::Cursor::DrawWidget()
 		{
 			line[i - lineStart] = 0;
 
-			if ((lineNumber - scrollPos) * (font.GetTextSizeY() + 3) >= frame.bottom - frame.top && !fillLineIndices) break;
+			if ((lineNumber - scrollPos) * (font.GetUnscaledTextSizeY() + 3) >= frame.GetHeight() && !fillLineIndices) break;
 
-			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)) + Size(visibleOffset, -2), font);
-			else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)) + Size(visibleOffset, -2), font);
+			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line,				     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
+			else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
 
 			if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
 			{
@@ -470,7 +477,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 						Int	 markRegionStart = GetDisplayCursorPositionFromVisual(line, markRegionStarts.GetNth(i));
 						Int	 markRegionEnd	 = GetDisplayCursorPositionFromVisual(line, markRegionEnds.GetNth(i));
 
-						Rect	 markRect = Rect(realPos + Point(markRegionStart, (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)), Size(markRegionEnd - markRegionStart, font.GetTextSizeY() + 3));
+						Rect	 markRect = Rect(realPos + Point(markRegionStart, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), Size(markRegionEnd - markRegionStart, font.GetScaledTextSizeY() + 3));
 						Font	 nFont = font;
 
 						nFont.SetColor(tColor);
@@ -479,8 +486,8 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 						surface->Box(markRect, bColor, Rect::Filled);
 
-						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line, frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)) + Size(visibleOffset, -2), nFont);
-						else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, 1 + (lineNumber - scrollPos) * (font.GetTextSizeY() + 3)) + Size(visibleOffset, -2), nFont);
+						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line,				     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+						else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
 
 						surface->EndPaint();
 					}
@@ -517,11 +524,11 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 	}
 
 	point.x += GetDisplayCursorPositionFromLogical(promptPos);
-	point.y += (font.GetTextSizeY() + 3) * (line - scrollPos);
+	point.y += (font.GetScaledTextSizeY() + 3) * (line - scrollPos);
 
-	if (!(line - scrollPos < 0 || (font.GetTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()))
+	if (!(line - scrollPos < 0 || (font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()))
 	{
-		if (IsVisible()) surface->Box(Rect(point, Size(1, font.GetTextSizeY() + 3)), 0, Rect::Inverted);
+		if (IsVisible()) surface->Box(Rect(point, Size(1, font.GetScaledTextSizeY() + 3)), 0, Rect::Inverted);
 
 		promptVisible = visible;
 	}
@@ -535,11 +542,17 @@ S::Int S::GUI::Cursor::SetText(const String &newText)
 
 	OnLoseFocus();
 
-	promptPos	= 0;
+	promptPos	= newText.Length();
 	visibleOffset	= 0;
 	scrollPos	= 0;
 
-	return Widget::SetText(newText);
+	ClearHistory();
+
+	Widget::SetText(newText);
+
+	AddHistoryEntry();
+
+	return Success();
 }
 
 S::Void S::GUI::Cursor::MarkText(Int newMarkStart, Int newMarkEnd)
@@ -585,13 +598,15 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 
 	Surface	*surface = GetDrawSurface();
 
-	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+	surface->StartPaint(Rect(container->GetRealPosition(), container->GetRealSize()));
 
 	container->Paint(SP_PAINT);
 
 	surface->EndPaint();
 
 	SetCursorPos(promptPos + insertText.Length());
+
+	AddHistoryEntry();
 
 	onInput.Emit(newText);
 }
@@ -610,6 +625,8 @@ S::Void S::GUI::Cursor::CopyToClipboard()
 
 S::Void S::GUI::Cursor::InsertFromClipboard()
 {
+	Bool	 selected = (markStart != markEnd && markStart >= 0 && markEnd >= 0);
+
 	DeleteSelectedText();
 
 	String	 insertText = Clipboard(container->GetContainerWindow()).GetClipboardText();
@@ -617,6 +634,8 @@ S::Void S::GUI::Cursor::InsertFromClipboard()
 	if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
 	{
 		if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) return;
+
+		if (selected) RemoveHistoryEntry();
 
 		InsertText(insertText);
 	}
@@ -650,13 +669,15 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 
 	Surface	*surface = GetDrawSurface();
 
-	surface->StartPaint(Rect(container->GetRealPosition(), container->GetSize()));
+	surface->StartPaint(Rect(container->GetRealPosition(), container->GetRealSize()));
 
 	container->Paint(SP_PAINT);
 
 	surface->EndPaint();
 
 	SetCursorPos(bMarkStart);
+
+	AddHistoryEntry();
 
 	onInput.Emit(newText);
 }
@@ -882,7 +903,11 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 			{
+				Bool	 selected = (markStart != markEnd && markStart >= 0 && markEnd >= 0);
+
 				DeleteSelectedText();
+
+				if (selected) RemoveHistoryEntry();
 
 				String	 insertText;
 
@@ -962,10 +987,26 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 		InsertFromClipboard();
 	}
 
+	/* CTRL + Z
+	 */
+	if (character == 0x1A && IsActive())
+	{
+		Undo();
+	}
+
+	/* CTRL + Y
+	 */
+	if (character == 0x19 && IsActive())
+	{
+		Redo();
+	}
+
 	if (text.Length() == maxSize && markStart == markEnd) return;
 
 	if (character >= 0x20 && character != 0x7F && IsActive())
 	{
+		Bool	 selected = (markStart != markEnd && markStart >= 0 && markEnd >= 0);
+
 		DeleteSelectedText();
 
 		if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (character < '0' || character > '9') && character != '-' && character != '.') return;
@@ -986,6 +1027,8 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 			insertText = ansiText;
 		}
 
+		if (selected) RemoveHistoryEntry();
+
 		InsertText(insertText);
 	}
 }
@@ -1001,6 +1044,57 @@ S::Void S::GUI::Cursor::OnInsert()
 	InsertFromClipboard();
 }
 
+S::Void S::GUI::Cursor::AddHistoryEntry()
+{
+	while (history.Length() > historyPos)
+	{
+		history.RemoveNth(history.Length() - 1);
+		historyPrompt.RemoveNth(historyPrompt.Length() - 1);
+	}
+
+	history.Add(text);
+	historyPrompt.Add(promptPos);
+	historyPos++;
+}
+
+S::Void S::GUI::Cursor::RemoveHistoryEntry()
+{
+	history.RemoveNth(history.Length() - 1);
+	historyPrompt.RemoveNth(historyPrompt.Length() - 1);
+	historyPos--;
+}
+
+S::Void S::GUI::Cursor::ClearHistory()
+{
+	history.RemoveAll();
+	historyPrompt.RemoveAll();
+	historyPos = 0;
+}
+
+S::Void S::GUI::Cursor::Undo()
+{
+	if (historyPos <= 1) return;
+
+	Int	 index = --historyPos - 1;
+
+	Widget::SetText(history.GetNth(index));
+	SetCursorPos(historyPrompt.GetNth(index));
+
+	onInput.Emit(text);
+}
+
+S::Void S::GUI::Cursor::Redo()
+{
+	if (historyPos >= history.Length()) return;
+
+	Int	 index = historyPos++;
+
+	Widget::SetText(history.GetNth(index));
+	SetCursorPos(historyPrompt.GetNth(index));
+
+	onInput.Emit(text);
+}
+
 S::GUI::PopupMenu *S::GUI::Cursor::GetContextMenu()
 {
 	if (!IsActive() && text == NIL) return NIL;
@@ -1008,6 +1102,10 @@ S::GUI::PopupMenu *S::GUI::Cursor::GetContextMenu()
 	if (contextMenu == NIL) contextMenu = new PopupMenu();
 
 	contextMenu->RemoveAllEntries();
+
+	MenuEntry	*entryUndo    = contextMenu->AddEntry(I18n::Translator::defaultTranslator->TranslateString("Undo"));
+
+	contextMenu->AddEntry();
 
 	MenuEntry	*entryCut     = contextMenu->AddEntry(I18n::Translator::defaultTranslator->TranslateString("Cut"));
 	MenuEntry	*entryCopy    = contextMenu->AddEntry(I18n::Translator::defaultTranslator->TranslateString("Copy"));
@@ -1017,6 +1115,8 @@ S::GUI::PopupMenu *S::GUI::Cursor::GetContextMenu()
 	contextMenu->AddEntry();
 
 	MenuEntry	*entryMarkAll = contextMenu->AddEntry(I18n::Translator::defaultTranslator->TranslateString("Select all"));
+
+	entryUndo->onAction.Connect(&Cursor::Undo, this);
 
 	entryCut->onAction.Connect(&Cursor::OnCut, this);
 	entryCopy->onAction.Connect(&Cursor::CopyToClipboard, this);
@@ -1029,6 +1129,7 @@ S::GUI::PopupMenu *S::GUI::Cursor::GetContextMenu()
 	 */
 	if (!IsActive())
 	{
+		entryUndo->Deactivate();
 		entryCut->Deactivate();
 		entryInsert->Deactivate();
 		entryDelete->Deactivate();
@@ -1050,6 +1151,13 @@ S::GUI::PopupMenu *S::GUI::Cursor::GetContextMenu()
 		entryMarkAll->Deactivate();
 	}
 
+	/* Disable undo if no history is available.
+	 */
+	if (historyPos == 1)
+	{
+		entryUndo->Deactivate();
+	}
+
 	return contextMenu;
 }
 
@@ -1059,7 +1167,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	ShowCursor(False);
 
-	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 	Point	 p1	 = GetRealPosition();
 
 	promptPos = newPos;
@@ -1084,12 +1192,12 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	if (visibleOffset < 0) { p1.x -= visibleOffset; visibleOffset = 0; }
 
-	p1.y += (font.GetTextSizeY() + 3) * (line - scrollPos);
+	p1.y += (font.GetScaledTextSizeY() + 3) * (line - scrollPos);
 
-	if (line - scrollPos < 0 || (font.GetTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight())
+	if (line - scrollPos < 0 || (font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight())
 	{
-		while (line - scrollPos < 0)						 scrollPos--;
-		while ((font.GetTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()) scrollPos++;
+		while (line - scrollPos < 0)							 scrollPos--;
+		while ((font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()) scrollPos++;
 
 		onScroll.Emit(scrollPos, maxScrollPos);
 
@@ -1265,12 +1373,12 @@ S::Int S::GUI::Cursor::GetDisplayCursorPositionFromVisual(const String &line, In
 			delete [] visual;
 		}
 
-		if (!IsRightToLeft())	position += font.GetTextSizeX(vText.Head(promptPos)) - visibleOffset;
-		else			position += font.GetTextSizeX(vText.Tail(length - promptPos)) - visibleOffset;
+		if (!IsRightToLeft())	position += font.GetScaledTextSizeX(vText.Head(promptPos)) - visibleOffset;
+		else			position += font.GetScaledTextSizeX(vText.Tail(length - promptPos)) - visibleOffset;
 	}
 	else
 	{
-		position += font.GetTextSizeX(String().FillN('*', promptPos)) - visibleOffset;
+		position += font.GetScaledTextSizeX(String().FillN('*', promptPos)) - visibleOffset;
 	}
 
 	return position;

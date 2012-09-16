@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,21 +29,23 @@ S::Array<S::GUI::WindowXLib *, S::Void *>	 S::GUI::WindowXLib::windowBackends;
 
 S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 {
-	type	= WINDOW_XLIB;
+	type	 = WINDOW_XLIB;
 
-	display	= Backends::BackendXLib::GetDisplay();
-	im	= Backends::BackendXLib::GetIM();
+	display	 = Backends::BackendXLib::GetDisplay();
+	im	 = Backends::BackendXLib::GetIM();
 
-	wnd	= NIL;
-	oldwnd	= NIL;
+	wnd	 = NIL;
+	oldwnd	 = NIL;
 
-	ic	= NIL;
+	ic	 = NIL;
 
-	id	= windowBackends.Add(this);
+	id	 = windowBackends.Add(this);
 
-	minSize	= Size(160, 24);
+	minSize	 = Size(160, 24);
 
-	flags	= 0;
+	fontSize = Surface().GetSurfaceDPI() / 96.0;
+
+	flags	 = 0;
 }
 
 S::GUI::WindowXLib::~WindowXLib()
@@ -64,14 +66,14 @@ S::Void S::GUI::WindowXLib::UpdateWMNormalHints()
 	normal.x	   = pos.x;
 	normal.y	   = pos.y;
 
-	normal.width	   = size.cx;
-	normal.height	   = size.cy;
+	normal.width	   = size.cx * fontSize;
+	normal.height	   = size.cy * fontSize;
 
-	normal.min_width   = minSize.cx;
-	normal.min_height  = minSize.cy;
+	normal.min_width   = minSize.cx * fontSize;
+	normal.min_height  = minSize.cy * fontSize;
 
-	normal.max_width   = maxSize.cx;
-	normal.max_height  = maxSize.cy;
+	normal.max_width   = maxSize.cx * fontSize;
+	normal.max_height  = maxSize.cy * fontSize;
 
 	XSetWMNormalHints(display, wnd, &normal);
 }
@@ -190,6 +192,31 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			/* Set internal focus window.
 			 */
 			focusWndID = id;
+
+			/* Initialize window metrics here to handle X servers
+			 * that do not send a ConfigureNotify to new windows.
+			 */
+			{
+				XWindowAttributes	 attributes;
+
+				XGetWindowAttributes(display, wnd, &attributes);
+
+				/* Get screen coordinates for window.
+				 */
+				::Window	 child = 0;
+
+				XTranslateCoordinates(display, wnd, RootWindow(display, DefaultScreen(display)), 0, 0, &attributes.x, &attributes.y, &child);
+
+				/* Set metrics and emit window metrics event.
+				 */
+				pos  = Point(attributes.x, attributes.y);
+				size = Size(attributes.width, attributes.height) / fontSize;
+
+				if (drawSurface != NIL) drawSurface->SetSize(Size(attributes.width, attributes.height));
+
+				onEvent.Call(SM_WINDOWMETRICS, ((	     attributes.x		  + 32768) << 16) | (		 attributes.y		       + 32768),
+							       ((Math::Floor(attributes.width / fontSize) + 32768) << 16) | (Math::Floor(attributes.height / fontSize) + 32768));
+			}
 
 			onEvent.Call(SM_GETFOCUS, 0, 0);
 
@@ -360,13 +387,14 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 		case KeyPress:
-			Input::Keyboard::UpdateKeyState(ConvertKey(XKeycodeToKeysym(display, e->xkey.keycode, 0)), True);
+			Input::Keyboard::UpdateKeyState(ConvertKey(XkbKeycodeToKeysym(display, e->xkey.keycode, 0, 0)), True);
 
-			onEvent.Call(SM_KEYDOWN, ConvertKey(XKeycodeToKeysym(display, e->xkey.keycode, 0)), 0);
+			onEvent.Call(SM_KEYDOWN, ConvertKey(XkbKeycodeToKeysym(display, e->xkey.keycode, 0, 0)), 0);
 
 			/* Convert keyboard event to input string and
 			 * call SM_CHAR event for each character.
 			 */
+			if (ic != NIL)
 			{
 				Status	 status;
 				char	 text[32];
@@ -383,12 +411,19 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 					for (Int i = 0; i < string.Length(); i++) onEvent.Call(SM_CHAR, string[i], 0);
 				}
 			}
+			else
+			{
+				char	 text[32];
+				Int	 numChars = XLookupString(&e->xkey, text, 32, NIL, NIL);
+
+				for (Int i = 0; i < numChars; i++) onEvent.Call(SM_CHAR, text[i], 0);
+			}
 
 			break;
 		case KeyRelease:
-			Input::Keyboard::UpdateKeyState(ConvertKey(XKeycodeToKeysym(display, e->xkey.keycode, 0)), False);
+			Input::Keyboard::UpdateKeyState(ConvertKey(XkbKeycodeToKeysym(display, e->xkey.keycode, 0, 0)), False);
 
-			onEvent.Call(SM_KEYUP, ConvertKey(XKeycodeToKeysym(display, e->xkey.keycode, 0)), 0);
+			onEvent.Call(SM_KEYUP, ConvertKey(XkbKeycodeToKeysym(display, e->xkey.keycode, 0, 0)), 0);
 
 			break;
 
@@ -427,24 +462,32 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 		/* Window state change events:
 		 */
 		case ConfigureNotify:
-			/* Get screen coordinates for window.
-			 */
-			{
-				::Window	 child = 0;
-
-				XTranslateCoordinates(display, wnd, RootWindow(display, DefaultScreen(display)), 0, 0, &e->xconfigure.x, &e->xconfigure.y, &child);
-			}
-
-			/* Emit window metrics and paint events.
+			/* Process window metrics changes.
 			 */
 			{
 				static Size	 prevSize;
 
+				/* Get screen coordinates for window.
+				 */
+				if (wnd != NIL)
+				{
+					::Window	 child = 0;
+
+					XTranslateCoordinates(display, wnd, RootWindow(display, DefaultScreen(display)), 0, 0, &e->xconfigure.x, &e->xconfigure.y, &child);
+				}
+
+				/* Set metrics and emit window metrics event.
+				 */
 				pos  = Point(e->xconfigure.x, e->xconfigure.y);
-				size = Size(e->xconfigure.width, e->xconfigure.height);
+				size = Size(e->xconfigure.width, e->xconfigure.height) / fontSize;
 
-				onEvent.Call(SM_WINDOWMETRICS, ((e->xconfigure.x + 32768) << 16) | (e->xconfigure.y + 32768), ((e->xconfigure.width + 32768) << 16) | (e->xconfigure.height + 32768));
+				if (drawSurface != NIL) drawSurface->SetSize(Size(e->xconfigure.width, e->xconfigure.height));
 
+				onEvent.Call(SM_WINDOWMETRICS, ((	     e->xconfigure.x		     + 32768) << 16) | (	    e->xconfigure.y		     + 32768),
+							       ((Math::Floor(e->xconfigure.width / fontSize) + 32768) << 16) | (Math::Floor(e->xconfigure.height / fontSize) + 32768));
+
+				/* Update window rect and emit paint event if necessary.
+				 */
 				if (size != prevSize)
 				{
 					updateRect.left	  = Math::Min(updateRect.left, 0);
@@ -529,19 +572,19 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		attributes.override_redirect = False;
 	}
 
-	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, size.cx + sizeModifier.cx, size.cy + sizeModifier.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBackPixel | CWBitGravity | CWSaveUnder | CWOverrideRedirect, &attributes);
+	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBackPixel | CWBitGravity | CWSaveUnder | CWOverrideRedirect, &attributes);
 
 	if (wnd != NIL)
 	{
 		/* Create input context.
 		 */
-		ic = XCreateIC(im, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, wnd, NULL);
+		if (im != NIL) ic = XCreateIC(im, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, wnd, NULL);
 
 		/* Get mask of filter events for IC.
 		 */
 		long	 filterEvents = 0;
 
-		XGetICValues(ic, XNFilterEvents, &filterEvents, NULL);
+		if (ic != NIL) XGetICValues(ic, XNFilterEvents, &filterEvents, NULL);
 
 		/* Select event types we want to receive.
 		 */
@@ -565,10 +608,10 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 		/* Create drawing surface.
 		 */
-		if ((flags & WF_THINBORDER) || (flags & WF_NORESIZE)) drawSurface = new Surface((Void *) wnd, size);
+		if ((flags & WF_THINBORDER) || (flags & WF_NORESIZE)) drawSurface = new Surface((Void *) wnd, size * fontSize);
 		else						      drawSurface = new Surface((Void *) wnd);
 
-		drawSurface->SetSize(size);
+		drawSurface->SetSize(size * fontSize);
 
 		/* Set window title.
 		 */
@@ -578,8 +621,8 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		 */
 		if (flags & WF_NORESIZE)
 		{
-			minSize = size + sizeModifier;
-			maxSize = size + sizeModifier;
+			minSize = size * fontSize + sizeModifier;
+			maxSize = size * fontSize + sizeModifier;
 		}
 
 		UpdateWMNormalHints();
@@ -634,9 +677,9 @@ S::Int S::GUI::WindowXLib::Close()
 
 	/* Delete surface.
 	 */
-	if (drawSurface != nullSurface) delete drawSurface;
+	if (drawSurface != NIL) delete drawSurface;
 
-	drawSurface = nullSurface;
+	drawSurface = NIL;
 
 	/* Destroy input context and window.
 	 */
@@ -674,6 +717,8 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::FindLeaderWindow()
 
 S::Int S::GUI::WindowXLib::SetTitle(const String &nTitle)
 {
+	if (wnd == NIL) return Error();
+
 	XTextProperty	 titleProp;
 	XTextProperty	 titlePropUTF8;
 
@@ -743,12 +788,8 @@ S::Int S::GUI::WindowXLib::Hide()
 
 S::Int S::GUI::WindowXLib::SetMetrics(const Point &nPos, const Size &nSize)
 {
-	if (nPos == pos && nSize == size) return Success();
-
-	XMoveResizeWindow(display, wnd, nPos.x, nPos.y, nSize.cx + sizeModifier.cx, nSize.cy + sizeModifier.cy);
+	XMoveResizeWindow(display, wnd, nPos.x, nPos.y, Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy);
 	XFlush(display);
-
-	drawSurface->SetSize(nSize);
 
 	return Success();
 }

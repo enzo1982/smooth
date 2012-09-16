@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,7 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/xlib/fontxlib.h>
-#include <smooth/graphics/font.h>
+#include <smooth/graphics/surface.h>
 
 using namespace X11;
 
@@ -31,12 +31,13 @@ S::GUI::FontXLib::~FontXLib()
 {
 }
 
-S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &text) const
+S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &text, Bool scaled) const
 {
 	if (text == NIL) return Size();
 
+	Float		 dpi	    = Surface().GetSurfaceDPI();
 	Display		*display    = Backends::BackendXLib::GetDisplay();
-	XFontStruct	*fontStruct = XLoadQueryFont(display, String("-*-").Append(fontName.ToLower()).Append("-").Append(fontWeight >= Font::Bold ? "bold" : "medium").Append("-").Append(fontStyle & Font::Italic ? "i" : "r").Append("-normal-*-").Append(String::FromInt(fontSize * 96.0 / 72.0)).Append("-*-*-*-*-*-*-*"));
+	XFontStruct	*fontStruct = XLoadQueryFont(display, String("-*-").Append(fontName.ToLower()).Append("-").Append(fontWeight >= Font::Bold ? "bold" : "medium").Append("-").Append(fontStyle & Font::Italic ? "i" : "r").Append("-normal-*-").Append(String::FromInt(Math::Round(fontSize * dpi / 72.0))).Append("-*-*-*-*-*-*-*"));
 
 	int		 direction  = 0;
 	int		 ascent	    = 0;
@@ -52,5 +53,6 @@ S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &text) const
 
 	for (Int j = 0; j < text.Length(); j++) if (text[j] == '\n') lines++;
 
-	return Size(overall.width, (overall.ascent + overall.descent + 3) * lines);
+	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(overall.width, (overall.ascent + overall.descent + 3) * lines);
+	else					   return Size(overall.width, (overall.ascent + overall.descent + 3) * lines) * 96.0 / dpi;
 }

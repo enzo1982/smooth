@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -57,10 +57,10 @@ namespace smooth
 				Int			 SetWeight(Short newFontWeight)		{ fontWeight = newFontWeight; return Success(); }
 				Int			 SetStyle(Short newFontStyle)		{ fontStyle = newFontStyle; return Success(); }
 
-				Int			 GetTextSizeX(const String &) const;
-				Int			 GetTextSizeY(const String &) const;
+				Int			 GetTextSizeX(const String &, Bool) const;
+				Int			 GetTextSizeY(const String &, Bool) const;
 
-				virtual Size		 GetTextSize(const String &) const;
+				virtual Size		 GetTextSize(const String &, Bool) const;
 		};
 	};
 };

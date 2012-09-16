@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -62,9 +62,9 @@ S::Short S::GUI::FontBackend::GetFontType() const
 	return type;
 }
 
-S::Int S::GUI::FontBackend::GetTextSizeX(const String &text) const
+S::Int S::GUI::FontBackend::GetTextSizeX(const String &text, Bool scaled) const
 {
-	if (text == NIL)	return 0;
+	if (text == NIL) return 0;
 
 	Int	 nOfChars = text.Length();
 	Int	 sizex	= 0;
@@ -99,13 +99,13 @@ S::Int S::GUI::FontBackend::GetTextSizeX(const String &text) const
 			}
 		}
 
-		sizex = (Int) Math::Max(sizex, GetTextSize(line).cx);
+		sizex = (Int) Math::Max(sizex, GetTextSize(line, scaled).cx);
 	}
 
 	return sizex;
 }
 
-S::Int S::GUI::FontBackend::GetTextSizeY(const String &text) const
+S::Int S::GUI::FontBackend::GetTextSizeY(const String &text, Bool scaled) const
 {
 	if (text == NIL) return 0;
 
@@ -122,10 +122,10 @@ S::Int S::GUI::FontBackend::GetTextSizeY(const String &text) const
 	 */
 	static String	 string	= "abcdefghijklmnopqrstuvwxyz";
 
-	return (lines * (GetTextSize(string).cy - 1)) + (lines - 1) * 3;
+	return (lines * (GetTextSize(string, scaled).cy - 1)) + (lines - 1) * 3;
 }
 
-S::GUI::Size S::GUI::FontBackend::GetTextSize(const String &text) const
+S::GUI::Size S::GUI::FontBackend::GetTextSize(const String &text, Bool scaled) const
 {
 	return Size();
 }

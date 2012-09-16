@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -274,7 +274,11 @@ S::Bool S::GUI::BitmapBackend::SetPixel(const Point &iPoint, const Color &color)
 	switch (depth)
 	{
 		case 24:
+#ifdef __WIN32__
 			offset = (size.cy - ++point.y) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
+#else
+			offset = 	      point.y  * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
+#endif
 
 			data[offset + 0] = (color >> 16) & 255;
 			data[offset + 1] = (color >> 8) & 255;
@@ -284,12 +288,16 @@ S::Bool S::GUI::BitmapBackend::SetPixel(const Point &iPoint, const Color &color)
 
 			break;
 		case 32:
+#ifdef __WIN32__
 			offset = (size.cy - ++point.y) * (((4 - ((size.cx * 4) & 3)) & 3) + size.cx * 4) + point.x * 4;
+#else
+			offset = 	      point.y  * (((4 - ((size.cx * 4) & 3)) & 3) + size.cx * 4) + point.x * 4;
+#endif
 
 			data[offset + 0] = (color >> 16) & 255;
 			data[offset + 1] = (color >> 8) & 255;
 			data[offset + 2] = color & 255;
-			data[offset + 3] = 0;
+			data[offset + 3] = 255;
 
 			done = True;
 
@@ -312,13 +320,21 @@ S::GUI::Color S::GUI::BitmapBackend::GetPixel(const Point &iPoint) const
 	switch (depth)
 	{
 		case 24:
+#ifdef __WIN32__
 			offset = (size.cy - ++point.y) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
+#else
+			offset = 	      point.y  * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
+#endif
 
 			color = Color(data[offset + 2], data[offset + 1], data[offset + 0]);
 
 			break;
 		case 32:
+#ifdef __WIN32__
 			offset = (size.cy - ++point.y) * (((4 - ((size.cx * 4) & 3)) & 3) + size.cx * 4) + point.x * 4;
+#else
+			offset = 	      point.y  * (((4 - ((size.cx * 4) & 3)) & 3) + size.cx * 4) + point.x * 4;
+#endif
 
 			color = Color(data[offset + 2], data[offset + 1], data[offset + 0]);
 

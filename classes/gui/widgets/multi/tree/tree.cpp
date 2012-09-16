@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,7 +27,7 @@ S::GUI::Tree::Tree(const String &iText) : ListEntry(iText)
 
 	Add(&list);
 
-	headHotspot	= new Hotspot(Point(), Size(GetWidth(), 15));
+	headHotspot	= new Hotspot(Point(), Size(GetWidth(), 16));
 
 	headHotspot->onMouseOver.Connect(&Tree::OnMouseOver, this);
 	headHotspot->onMouseOut.Connect(&Tree::OnMouseOut, this);
@@ -75,7 +75,7 @@ S::Void S::GUI::Tree::CalculateHeight()
 {
 	/* Calculate tree height.
 	 */
-	Int	 height	= 15;
+	Int	 height	= 16;
 
 	if (IsMarked())
 	{
@@ -119,9 +119,9 @@ S::Int S::GUI::Tree::Paint(Int message)
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface	= GetDrawSurface();
-				Rect	 frame		= Rect(GetRealPosition(), GetSize());
-				Window	*window		= container->GetContainerWindow();
+				Surface	*surface = GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+				Window	*window	 = container->GetContainerWindow();
 
 				if (window == NIL) break;
 
@@ -132,39 +132,43 @@ S::Int S::GUI::Tree::Paint(Int message)
 					list.Hide();
 				}
 
-				if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(GetWidth(), 15)))) PaintText(Setup::GradientTextColor, True);
-				else										 PaintText(active ? font.GetColor() : Setup::GrayTextColor, False);
+				if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(),  Math::Round(16 * surface->GetSurfaceDPI() / 96.0))))) PaintText(Setup::GradientTextColor, True);
+				else																       PaintText(active ? font.GetColor() : Setup::GrayTextColor, False);
 
 				if (IsMarked())
 				{
 					list.SetVisibleDirect(False);
-					list.SetMetrics(Point(12, 15), GetSize() - Size(12, 15));
+					list.SetMetrics(Point(12, 16), GetSize() - Size(12, 15));
 
-					Rect	 visibleArea = list.GetVisibleArea() - list.GetRealPosition();
-					Point	 entryPosition = Point(0, 0);
+					Rect	 visibleArea	   = list.GetVisibleArea() - list.GetRealPosition();
+
+					Point	 entryPosition	   = Point(0, 0);
+					Point	 entryRealPosition = Point(0, 0);
 
 					for (Int i = 0; i < Length(); i++)
 					{
-						ListEntry	*entry = GetNthEntry(i);
-
+						ListEntry	*entry	       = GetNthEntry(i);
+						Size		 entryRealSize = entry->GetRealSize();
+	
 						entry->SetVisibleDirect(False);
 
-						if (entryPosition.y + entry->GetHeight() >= visibleArea.top && entryPosition.y <= visibleArea.bottom)
+						if (entryRealPosition.y + entryRealSize.cy >= visibleArea.top && entryRealPosition.y <= visibleArea.bottom)
 						{
 							entry->SetMetrics(entryPosition, Size(list.GetWidth(), entry->GetHeight()));
 							entry->SetVisibleDirect(True);
 						}
 
-						entryPosition.y += entry->GetHeight();
+						entryPosition.y	    += entry->GetHeight();
+						entryRealPosition.y  = Math::Round(entryPosition.y * surface->GetSurfaceDPI() / 96.0);
 					}
 
 					list.Show();
 
 					Point	 realPos = GetRealPosition();
 
-					for (Int i = 15; i < GetHeight() - 7; i += 2)
+					for (Int i = Math::Round(16 * surface->GetSurfaceDPI() / 96.0); i < frame.GetHeight() - Math::Round(7 * surface->GetSurfaceDPI() / 96.0); i += 2)
 					{
-						surface->SetPixel(realPos + Point(6 + (IsRightToLeft() ? 1 : 0), i), Setup::GrayTextColor);
+						surface->SetPixel(realPos + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), i), Setup::GrayTextColor);
 					}
 				}
 
@@ -174,10 +178,11 @@ S::Int S::GUI::Tree::Paint(Int message)
 			break;
 		case SP_MOUSEIN:
 			{
-				Rect	 frame	= Rect(GetRealPosition(), GetSize());
-				Window	*window	= container->GetContainerWindow();
+				Surface	*surface = GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+				Window	*window	 = container->GetContainerWindow();
 
-				if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(GetWidth(), 15)))) PaintText(Setup::GradientTextColor, True);
+				if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(), Math::Round(16 * surface->GetSurfaceDPI() / 96.0))))) PaintText(Setup::GradientTextColor, True);
 			}
 
 			break;
@@ -193,7 +198,7 @@ S::Int S::GUI::Tree::Paint(Int message)
 S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 {
 	Surface	*surface	= GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
+	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
 	Font	 nFont		= font;
 	Bool	 gotTabs	= False;
 
@@ -204,10 +209,12 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 
 	surface->StartPaint(GetVisibleArea());
 
-	if (drawGradient)	surface->Gradient(Rect(Point(frame.left, frame.top), Size(GetWidth(), 15)), Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
-	else			surface->Box(Rect(Point(frame.left, frame.top), Size(GetWidth(), 15)), Setup::ClientColor, Rect::Filled);
+	if (drawGradient)	surface->Gradient(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(), Math::Round(16 * surface->GetSurfaceDPI() / 96.0))), Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
+	else			surface->Box(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(), Math::Round(16 * surface->GetSurfaceDPI() / 96.0))), Setup::ClientColor, Rect::Filled);
 
-	Rect	 cbRect = Rect(GetRealPosition() + Point(2, 3), Size(9, 9));
+	Rect	 cbRect = Rect(GetRealPosition() + Point(2, 3) * surface->GetSurfaceDPI() / 96.0, Size(9, 9) * surface->GetSurfaceDPI() / 96.0);
+
+	if (cbRect.GetWidth() % 2 == 0) cbRect = cbRect - Size(1, 1);
 
 	if (cbRect.top <= cbRect.bottom - 1)
 	{
@@ -216,8 +223,8 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 
 		if (cbRect.top <= cbRect.bottom - 3)
 		{
-			Point	 p1 = Point(cbRect.left + 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + 4);
-			Point	 p2 = Point(cbRect.right - 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + 4);
+			Point	 p1 = Point(cbRect.left + 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + Math::Round(4 * surface->GetSurfaceDPI() / 96.0));
+			Point	 p2 = Point(cbRect.right - 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + Math::Round(4 * surface->GetSurfaceDPI() / 96.0));
 
 			Color	 darkColor = Setup::ClientTextColor;
 
@@ -227,8 +234,8 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 
 			if (!IsMarked())
 			{
-				p1 = Point(cbRect.left + 4 + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
-				p2 = Point(cbRect.left + 4 + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
+				p1 = Point(cbRect.left + Math::Round(4 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
+				p2 = Point(cbRect.left + Math::Round(4 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
 
 				surface->Line(p1, p2, darkColor);
 			}
@@ -239,18 +246,18 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 	{
 		for (Int i = 0; i < ((ListBox *) container)->GetNOfTabs(); i++)
 		{
-			Rect	 rect = Rect(GetRealPosition() + Point(1, 1), GetSize() - Size(3, 2));
+			Rect	 rect = Rect(GetRealPosition() + Point(1, 1) * surface->GetSurfaceDPI() / 96.0, GetSize() - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(1, 0));
 
 			rect.left += ((ListBox *) container)->GetNthTabOffset(i);
-			rect.left += (i == 0 ? 12 : 0);
+			rect.left += (i == 0 ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0);
 
-			if (((ListBox *) container)->GetNOfTabs() >= i + 2) rect.right = rect.left + (((ListBox *) container)->GetNthTabOffset(i + 1) - ((ListBox *) container)->GetNthTabOffset(i)) - (i == 0 ? 12 : 0) - 3;
+			if (((ListBox *) container)->GetNOfTabs() >= i + 2) rect.right = rect.left + (((ListBox *) container)->GetNthTabOffset(i + 1) - ((ListBox *) container)->GetNthTabOffset(i)) - (i == 0 ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0) - Math::Round(1 * surface->GetSurfaceDPI() / 96.0) * 2 - 1;
 
 			String	 tabText = GetNthTabText(i);
 
 			if (((ListBox *) container)->GetNthTabOrientation(i) == OR_RIGHT)
 			{
-				rect.left = Math::Max(rect.left, rect.right - nFont.GetTextSizeX(tabText));
+				rect.left = Math::Max(rect.left, rect.right - nFont.GetScaledTextSizeX(tabText));
 			}
 
 			surface->SetText(tabText, rect, nFont);
@@ -258,7 +265,7 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 	}
 	else
 	{
-		surface->SetText(text, frame + Point(1 + 12, 1) - Size(2 + 12, 2), nFont);
+		surface->SetText(text, frame + Point(1, 1) * surface->GetSurfaceDPI() / 96.0 + Point(Math::Round(12 * surface->GetSurfaceDPI() / 96.0), 0) - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(Math::Round(12 * surface->GetSurfaceDPI() / 96.0), 0), nFont);
 	}
 
 	surface->EndPaint();
@@ -274,7 +281,7 @@ S::Void S::GUI::Tree::OnSelectEntry(Int containerHandle, Int handle)
 
 S::Void S::GUI::Tree::OnChangeSize(const Size &newSize)
 {
-	headHotspot->SetSize(Size(newSize.cx, 15));
+	headHotspot->SetWidth(newSize.cx);
 }
 
 S::Void S::GUI::Tree::OnToggleMark(Bool marked)

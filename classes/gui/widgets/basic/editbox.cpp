@@ -27,7 +27,7 @@ S::GUI::EditBox::EditBox(const String &iText, const Point &iPos, const Size &iSi
 
 	font.SetColor(Setup::ClientTextColor);
 
-	if (GetWidth() == 0) SetWidth(80);
+	if (GetWidth()	== 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(19);
 
 	cursor = new Cursor(Point(3, 2), GetSize() - Size(6, 4));
@@ -65,7 +65,7 @@ S::Int S::GUI::EditBox::Paint(Int message)
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 				surface->StartPaint(GetVisibleArea());
 
@@ -159,6 +159,11 @@ S::Int S::GUI::EditBox::SetCursorPos(Int nPos)
 S::Int S::GUI::EditBox::GetCursorPos()
 {
 	return cursor->GetCursorPos();
+}
+
+S::Bool S::GUI::EditBox::IsFocussed() const
+{
+	return cursor->IsFocussed();
 }
 
 S::Void S::GUI::EditBox::OnChangeSize(const Size &nSize)

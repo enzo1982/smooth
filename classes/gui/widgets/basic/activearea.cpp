@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,7 +19,7 @@ S::GUI::ActiveArea::ActiveArea(const Color &iColor, const Point &iPos, const Siz
 	type		= classID;
 	areaColor	= iColor;
 
-	if (GetWidth() == 0) SetWidth(80);
+	if (GetWidth()	== 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(20);
 
 	hotspot	= new Hotspot(Point(1, 1), GetSize() - Size(2, 2));
@@ -47,7 +47,7 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 				surface->Box(frame, areaColor, Rect::Filled);
 				surface->Frame(frame, FRAME_DOWN);

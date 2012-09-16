@@ -26,13 +26,13 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../include/v8stdint.h"
-#include "globals.h"
-#include "checks.h"
-#include "allocation.h"
-#include "utils.h"
-#include "list-inl.h"
-#include "hashmap.h"
+
+#include "preparse-data-format.h"
 #include "preparse-data.h"
+
+#include "checks.h"
+#include "globals.h"
+#include "hashmap.h"
 
 namespace v8 {
 namespace internal {
@@ -74,7 +74,7 @@ void FunctionLoggingParserRecorder::LogMessage(int start_pos,
   function_store_.Add((arg_opt == NULL) ? 0 : 1);
   STATIC_ASSERT(PreparseDataConstants::kMessageTextPos == 3);
   WriteString(CStrVector(message));
-  if (arg_opt) WriteString(CStrVector(arg_opt));
+  if (arg_opt != NULL) WriteString(CStrVector(arg_opt));
   is_recording_ = false;
 }
 
@@ -110,26 +110,29 @@ Vector<unsigned> PartialParserRecorder::ExtractData() {
 
 CompleteParserRecorder::CompleteParserRecorder()
     : FunctionLoggingParserRecorder(),
+      literal_chars_(0),
       symbol_store_(0),
-      symbol_entries_(0),
+      symbol_keys_(0),
       symbol_table_(vector_compare),
       symbol_id_(0) {
 }
 
 
-void CompleteParserRecorder::LogSymbol(
-    int start, const char* literal_chars, int length) {
-  if (!is_recording_) return;
-
-  Vector<const char> literal(literal_chars, length);
-  int hash = vector_hash(literal);
-  HashMap::Entry* entry = symbol_table_.Lookup(&literal, hash, true);
+void CompleteParserRecorder::LogSymbol(int start,
+                                       int hash,
+                                       bool is_ascii,
+                                       Vector<const byte> literal_bytes) {
+  Key key = { is_ascii, literal_bytes };
+  HashMap::Entry* entry = symbol_table_.Lookup(&key, hash, true);
   int id = static_cast<int>(reinterpret_cast<intptr_t>(entry->value));
   if (id == 0) {
+    // Copy literal contents for later comparison.
+    key.literal_bytes =
+        Vector<const byte>::cast(literal_chars_.AddBlock(literal_bytes));
     // Put (symbol_id_ + 1) into entry and increment it.
     id = ++symbol_id_;
     entry->value = reinterpret_cast<void*>(id);
-    Vector<Vector<const char> > symbol = symbol_entries_.AddBlock(1, literal);
+    Vector<Key> symbol = symbol_keys_.AddBlock(1, key);
     entry->key = &symbol[0];
   }
   WriteNumber(id - 1);

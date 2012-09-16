@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,16 +28,16 @@ S::Threads::MutexWin32::MutexWin32(Void *iMutex)
 	}
 	else
 	{
-		/* The mutex will be created once we need it
-		 */
- 		mutex	= NIL;
+ 		mutex	= new CRITICAL_SECTION;
 		myMutex	= True;
+
+		InitializeCriticalSection(mutex);
 	}
 }
 
 S::Threads::MutexWin32::~MutexWin32()
 {
-	if (myMutex && mutex != NIL)
+	if (myMutex)
 	{
 		DeleteCriticalSection(mutex);
 
@@ -52,15 +52,6 @@ S::Void *S::Threads::MutexWin32::GetSystemMutex() const
 
 S::Int S::Threads::MutexWin32::Lock()
 {
-	/* Lazy initialization of the mutex happens here
-	 */
-	if (mutex == NIL)
-	{
-		mutex = new CRITICAL_SECTION;
-
-		InitializeCriticalSection(mutex);
-	}
-
 	EnterCriticalSection(mutex);
 
 	return Success();
@@ -68,7 +59,7 @@ S::Int S::Threads::MutexWin32::Lock()
 
 S::Int S::Threads::MutexWin32::Release()
 {
-	if (mutex != NIL) LeaveCriticalSection(mutex);
+	LeaveCriticalSection(mutex);
 
 	return Success();
 }

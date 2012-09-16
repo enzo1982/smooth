@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -52,8 +52,10 @@ S::Int S::GUI::Tooltip::Show()
 	if (!IsRegistered()) return Success();
 
 	Window	*window	 = container->GetContainerWindow();
-	Size	 tSize	 = (layer != NIL ? layer->GetSize() : Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4));
-	Point	 tPos	 = Point(GetX(), GetY() - tSize.cy + 1);
+	Surface	*surface = GetDrawSurface();
+	Size	 tSize	 = (layer != NIL ? layer->GetSize() : Size(font.GetUnscaledTextSizeX(text) + 6, font.GetUnscaledTextSizeY(text) + 4));
+	Size	 sSize	 = tSize * surface->GetSurfaceDPI() / 96.0;
+	Point	 tPos	 = Point(GetX(), GetY() - sSize.cy + 1);
 	Rect	 vScreen = System::MultiMonitor::GetVirtualScreenMetrics();
 
 	if (tPos.y + window->GetY() < vScreen.top + 2) tPos.y = GetY() + vScreen.top + 2;
@@ -71,6 +73,7 @@ S::Int S::GUI::Tooltip::Show()
 
 	toolWindow = new ToolWindow(tPos, tSize);
 	toolWindow->onPaint.Connect(&Tooltip::OnToolWindowPaint, this);
+	toolWindow->onEvent.Connect(&Tooltip::OnToolWindowEvent, this);
 	toolWindow->SetBackgroundColor(Setup::TooltipColor);
 
 	if (layer != NIL) toolWindow->Add(layer);
@@ -117,11 +120,37 @@ S::Int S::GUI::Tooltip::Hide()
 S::Void S::GUI::Tooltip::OnToolWindowPaint()
 {
 	Surface	*surface = toolWindow->GetDrawSurface();
-	Rect	 tRect	 = Rect(Point(0, 0), layer != NIL ? layer->GetSize() : Size(font.GetTextSizeX(text) + 6, font.GetTextSizeY(text) + 4));
+	Rect	 tRect	 = Rect(Point(0, 0), surface->GetSize());
 
 	surface->Box(tRect, Color(0, 0, 0), Rect::Outlined);
 
 	surface->SetText(text, tRect + Point(2, 1), font);
+}
+
+S::Void S::GUI::Tooltip::OnToolWindowEvent(Int message, Int wParam, Int lParam)
+{
+	static Bool	 forwarding = False;
+
+	if (forwarding) return;
+
+	Window	*window	= container->GetContainerWindow();
+
+	if (window == NIL) return;
+
+	forwarding = True;
+
+	switch (message)
+	{
+		case SM_MOUSEWHEEL:
+			/* Forward mouse wheel messages posted to
+			 * the tool window to our parent window.
+			 */
+			window->Process(message, wParam, lParam);
+
+			break;
+	}
+
+	forwarding = False;
 }
 
 S::Int S::GUI::Tooltip::SetTimeout(Int mSeconds)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,23 +8,24 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/gui/dialogs/colordlg.h>
-#include <smooth/gui/application/application.h>
-#include <smooth/gui/window/window.h>
-#include <smooth/i18n/translator.h>
+#include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
+#include <smooth/graphics/surface.h>
+#include <smooth/gui/application/application.h>
+#include <smooth/gui/dialogs/colordlg.h>
+#include <smooth/gui/widgets/basic/activearea.h>
 #include <smooth/gui/widgets/basic/button.h>
-#include <smooth/definitions.h>
 #include <smooth/gui/widgets/basic/divider.h>
+#include <smooth/gui/widgets/basic/editbox.h>
 #include <smooth/gui/widgets/basic/slider.h>
 #include <smooth/gui/widgets/basic/text.h>
-#include <smooth/gui/widgets/basic/editbox.h>
+#include <smooth/gui/widgets/basic/titlebar.h>
+#include <smooth/gui/widgets/layer.h>
+#include <smooth/gui/window/window.h>
+#include <smooth/i18n/translator.h>
+#include <smooth/misc/math.h>
 #include <smooth/misc/string.h>
 #include <smooth/init.h>
-#include <smooth/misc/math.h>
-#include <smooth/graphics/surface.h>
-#include <smooth/graphics/bitmap.h>
-#include <smooth/gui/widgets/basic/titlebar.h>
 
 S::GUI::Dialogs::ColorSelection::ColorSelection()
 {
@@ -36,9 +37,6 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 		}
 	}
 
-	Point	 bp;
-	Size	 bs;
-
 	color = 0;
 
 	forcehupdate = false;
@@ -48,13 +46,6 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	updatetext = true;
 	updatehextext = true;
 
-	yoffset = 32;
-	huexoffset = 219;
-	ncxoffset = 242;
-	ocxoffset = 338;
-	crsizex = 90;
-	crsizey = 22;
-
 	acthue = color.ConvertTo(HSV).GetRed();
 	actsat = color.ConvertTo(HSV).GetGreen();
 	actval = color.ConvertTo(HSV).GetBlue();
@@ -62,160 +53,108 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	actgreen = color.GetGreen();
 	actblue = color.GetBlue();
 
-	bp.x = 87;
-	bp.y = 29;
-	bs.cx = 0;
-	bs.cy = 0;
-
 	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Color selection"), Point(100, 100), Size(438, 288));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(39, OR_HORZ | OR_BOTTOM);
 
-	okbtn		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, bp, bs);
-	okbtn->onAction.Connect(&ColorSelection::ColorDlgOK, this);
+	okbtn		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, Point(87, 29), Size());
+	okbtn->onAction.Connect(&ColorSelection::OnOK, this);
 	okbtn->SetOrientation(OR_LOWERRIGHT);
 
-	bp.x = 175;
-
-	cancelbtn	= new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, bp, bs);
-	cancelbtn->onAction.Connect(&ColorSelection::ColorDlgCancel, this);
+	cancelbtn	= new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, Point(175, 29), Size());
+	cancelbtn->onAction.Connect(&ColorSelection::OnCancel, this);
 	cancelbtn->SetOrientation(OR_LOWERRIGHT);
 
-	bp.x = 174;
-	bp.y = 35;
-	bs.cx = 129;
-	bs.cy = 0;
+	ncarea		= new ActiveArea(Color(), Point(238, 3), Size(91, 23));
+	ocarea		= new ActiveArea(Color(), Point(334, 3), Size(91, 23));
+	ocarea->onAction.Connect(&ColorSelection::OnSelectOriginalColor, this);
 
-	hueslider	= new Slider(bp, bs, OR_HORZ, &acthue, 0, 255);
+	hueslider	= new Slider(Point(174, 35), Size(129, 0), OR_HORZ, &acthue, 0, 255);
 	hueslider->onValueChange.Connect(&ColorSelection::ColorDlgHueSlider, this);
 	hueslider->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	satslider	= new Slider(bp, bs, OR_HORZ, &actsat, 0, 255);
+	satslider	= new Slider(Point(174, hueslider->GetY() + 26), Size(129, 0), OR_HORZ, &actsat, 0, 255);
 	satslider->onValueChange.Connect(&ColorSelection::ColorDlgSatSlider, this);
 	satslider->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	valslider	= new Slider(bp, bs, OR_HORZ, &actval, 0, 255);
+	valslider	= new Slider(Point(174, satslider->GetY() + 26), Size(129, 0), OR_HORZ, &actval, 0, 255);
 	valslider->onValueChange.Connect(&ColorSelection::ColorDlgValSlider, this);
 	valslider->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	redslider	= new Slider(bp, bs, OR_HORZ, &actred, 0, 255);
+	redslider	= new Slider(Point(174, valslider->GetY() + 26), Size(129, 0), OR_HORZ, &actred, 0, 255);
 	redslider->onValueChange.Connect(&ColorSelection::ColorDlgRedSlider, this);
 	redslider->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	greenslider	= new Slider(bp, bs, OR_HORZ, &actgreen, 0, 255);
+	greenslider	= new Slider(Point(174, redslider->GetY() + 26), Size(129, 0), OR_HORZ, &actgreen, 0, 255);
 	greenslider->onValueChange.Connect(&ColorSelection::ColorDlgGreenSlider, this);
 	greenslider->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	blueslider	= new Slider(bp, bs, OR_HORZ, &actblue, 0, 255);
+	blueslider	= new Slider(Point(174, greenslider->GetY() + 26), Size(129, 0), OR_HORZ, &actblue, 0, 255);
 	blueslider->onValueChange.Connect(&ColorSelection::ColorDlgBlueSlider, this);
 	blueslider->SetOrientation(OR_UPPERRIGHT);
 
-	bp.x = 189;
-	bp.y = 37;
-
-	huetext		= new Text(I18n::Translator::defaultTranslator->TranslateString("H"), bp);
+	huetext		= new Text(I18n::Translator::defaultTranslator->TranslateString("H"), Point(189, 37));
 	huetext->SetOrientation(OR_UPPERRIGHT);
 	huetext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Setup::TextColor));
 
-	bp.y += 26;
-
-	sattext		= new Text(I18n::Translator::defaultTranslator->TranslateString("S"), bp);
+	sattext		= new Text(I18n::Translator::defaultTranslator->TranslateString("S"), Point(189, huetext->GetY() + 26));
 	sattext->SetOrientation(OR_UPPERRIGHT);
 	sattext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Setup::TextColor));
 
-	bp.y += 26;
-
-	valtext		= new Text(I18n::Translator::defaultTranslator->TranslateString("V"), bp);
+	valtext		= new Text(I18n::Translator::defaultTranslator->TranslateString("V"), Point(189, sattext->GetY() + 26));
 	valtext->SetOrientation(OR_UPPERRIGHT);
 	valtext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Setup::TextColor));
 
-	bp.y += 26;
-
-	redtext		= new Text(I18n::Translator::defaultTranslator->TranslateString("R"), bp);
+	redtext		= new Text(I18n::Translator::defaultTranslator->TranslateString("R"), Point(189, valtext->GetY() + 26));
 	redtext->SetOrientation(OR_UPPERRIGHT);
 	redtext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Color(255, 0, 0)));
 
-	bp.y += 26;
-
-	greentext	= new Text(I18n::Translator::defaultTranslator->TranslateString("G"), bp);
+	greentext	= new Text(I18n::Translator::defaultTranslator->TranslateString("G"), Point(189, redtext->GetY() + 26));
 	greentext->SetOrientation(OR_UPPERRIGHT);
 	greentext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Color(0, 160, 0)));
 
-	bp.y += 26;
-
-	bluetext	= new Text(I18n::Translator::defaultTranslator->TranslateString("B"), bp);
+	bluetext	= new Text(I18n::Translator::defaultTranslator->TranslateString("B"), Point(189, greentext->GetY() + 26));
 	bluetext->SetOrientation(OR_UPPERRIGHT);
 	bluetext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Color(0, 0, 255)));
 
-	bp.y += 26;
-
-	hextext		= new Text(I18n::Translator::defaultTranslator->TranslateString("HTML code"), bp);
+	hextext		= new Text(I18n::Translator::defaultTranslator->TranslateString("HTML code"), Point(189, bluetext->GetY() + 26));
 	hextext->SetOrientation(OR_UPPERRIGHT);
 	hextext->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, Font::Normal, Setup::TextColor));
 
-	bp.x = 37;
-	bp.y = 34;
-	bs.cx = 30;
-	bs.cy = 0;
-
-	hueedit		= new EditBox(String::FromInt(acthue), bp, bs, 3);
+	hueedit		= new EditBox(String::FromInt(acthue), Point(37, 34), Size(30, 0), 3);
 	hueedit->onInput.Connect(&ColorSelection::ColorDlgHueEdit, this);
 	hueedit->SetFlags(EDB_NUMERIC);
 	hueedit->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	satedit		= new EditBox(String::FromInt(actsat), bp, bs, 3);
+	satedit		= new EditBox(String::FromInt(actsat), Point(37, hueedit->GetY() + 26), Size(30, 0), 3);
 	satedit->onInput.Connect(&ColorSelection::ColorDlgSatEdit, this);
 	satedit->SetFlags(EDB_NUMERIC);
 	satedit->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	valedit		= new EditBox(String::FromInt(actval), bp, bs, 3);
+	valedit		= new EditBox(String::FromInt(actval), Point(37, satedit->GetY() + 26), Size(30, 0), 3);
 	valedit->onInput.Connect(&ColorSelection::ColorDlgValEdit, this);
 	valedit->SetFlags(EDB_NUMERIC);
 	valedit->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	rededit		= new EditBox(String::FromInt(actred), bp, bs, 3);
+	rededit		= new EditBox(String::FromInt(actred), Point(37, valedit->GetY() + 26), Size(30, 0), 3);
 	rededit->onInput.Connect(&ColorSelection::ColorDlgRedEdit, this);
 	rededit->SetFlags(EDB_NUMERIC);
 	rededit->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	greenedit	= new EditBox(String::FromInt(actgreen), bp, bs, 3);
+	greenedit	= new EditBox(String::FromInt(actgreen), Point(37, rededit->GetY() + 26), Size(30, 0), 3);
 	greenedit->onInput.Connect(&ColorSelection::ColorDlgGreenEdit, this);
 	greenedit->SetFlags(EDB_NUMERIC);
 	greenedit->SetOrientation(OR_UPPERRIGHT);
 
-	bp.y += 26;
-
-	blueedit	= new EditBox(String::FromInt(actblue), bp, bs, 3);
+	blueedit	= new EditBox(String::FromInt(actblue), Point(37, greenedit->GetY() + 26), Size(30, 0), 3);
 	blueedit->onInput.Connect(&ColorSelection::ColorDlgBlueEdit, this);
 	blueedit->SetFlags(EDB_NUMERIC);
 	blueedit->SetOrientation(OR_UPPERRIGHT);
 
 	ColorDlgUpdateHexValue();
 
-	bp.x += 40;
-	bp.y += 26;
-	bs.cx += 40;
-
-	hexedit		= new EditBox(hexval, bp, bs, 7);
+	hexedit		= new EditBox(hexval, Point(77, blueedit->GetY() + 26), Size(70, 0), 7);
 	hexedit->onInput.Connect(&ColorSelection::ColorDlgHexEdit, this);
 	hexedit->SetOrientation(OR_UPPERRIGHT);
 
@@ -230,6 +169,8 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 
 	dlgwnd->Add(okbtn);
 	dlgwnd->Add(cancelbtn);
+	dlgwnd->Add(ncarea);
+	dlgwnd->Add(ocarea);
 	dlgwnd->Add(hueslider);
 	dlgwnd->Add(satslider);
 	dlgwnd->Add(valslider);
@@ -255,6 +196,9 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 
 	dlgwnd->onPaint.Connect(&ColorSelection::ColorDlgPaintProc, this);
 	dlgwnd->onEvent.Connect(&ColorSelection::ColorDlgMessageProc, this);
+
+	xoffset = Math::Round((dlgwnd->GetMainLayer()->GetX() - 1.0) * Surface().GetSurfaceDPI() / 96.0);
+	yoffset = Math::Round((dlgwnd->GetMainLayer()->GetY() - 1.0) * Surface().GetSurfaceDPI() / 96.0);
 }
 
 S::GUI::Dialogs::ColorSelection::~ColorSelection()
@@ -264,6 +208,8 @@ S::GUI::Dialogs::ColorSelection::~ColorSelection()
 	DeleteObject(dlgwnd);
 	DeleteObject(okbtn);
 	DeleteObject(cancelbtn);
+	DeleteObject(ncarea);
+	DeleteObject(ocarea);
 	DeleteObject(hueslider);
 	DeleteObject(satslider);
 	DeleteObject(valslider);
@@ -288,8 +234,8 @@ S::GUI::Dialogs::ColorSelection::~ColorSelection()
 
 const Error &S::GUI::Dialogs::ColorSelection::ShowDialog()
 {
-	if (parentWindow != NIL)	dlgwnd->SetMetrics(parentWindow->GetPosition() + Point(25, 25), Size(436, 286));
-	if (caption != NIL)		dlgwnd->SetText(caption);
+	if (parentWindow != NIL) dlgwnd->SetMetrics(parentWindow->GetPosition() + Point(25, 25), Size(436, 286));
+	if (caption != NIL)	 dlgwnd->SetText(caption);
 
 	dlgwnd->Show();
 
@@ -333,14 +279,15 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 {
 	Surface		*surface = dlgwnd->GetDrawSurface();
 	Rect		 rect;
-	Bitmap		 bmp(256, 256);
 	Rect		 urect = dlgwnd->GetUpdateRect();
-	Int		 hssize = 205;
+	Int		 hssize = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
+	Int		 huexoffset = hssize + Math::Round(14.0 * surface->GetSurfaceDPI() / 96.0);
 	double		 huebias = 256 / (double) hssize;
+	Bitmap		 bmp(hssize, hssize);
 
 	rect.left	= huexoffset;
 	rect.top	= yoffset;
-	rect.right	= rect.left + 18;
+	rect.right	= rect.left + Math::Round(16.0 * surface->GetSurfaceDPI() / 96.0) + 2;
 	rect.bottom	= rect.top + hssize + 2;
 
 	if (Rect::DoRectsOverlap(rect, urect))
@@ -351,8 +298,8 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 
 		for (Int ypos = 0; ypos < hssize; ypos++)
 		{
-			Point	 p1(huexoffset +  1, yoffset + 1 + ypos);
-			Point	 p2(huexoffset + 17, yoffset + 1 + ypos);
+			Point	 p1(huexoffset							     + 1, yoffset + 1 + ypos);
+			Point	 p2(huexoffset + Math::Round(16.0 * surface->GetSurfaceDPI() / 96.0) + 1, yoffset + 1 + ypos);
 
 			surface->Line(p1, p2, Color(255 - Math::Round(hue), 255, 255, HSV).ConvertTo(RGBA));
 
@@ -360,31 +307,17 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 		}
 	}
 
-	rect.left	= 7;
+	rect.left	= xoffset;
 	rect.right	= rect.left + hssize + 2;
 
 	surface->Frame(rect, FRAME_DOWN);
 
-	rect.left = ncxoffset;
-	rect.top = yoffset;
-	rect.right = rect.left + crsizex + 1;
-	rect.bottom = rect.top + crsizey + 1;
-
-	surface->Box(rect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
-	surface->Frame(rect, FRAME_DOWN);
-
-	rect.left = ocxoffset;
-	rect.right = rect.left + crsizex + 1;
-
-	surface->Box(rect, color, Rect::Filled);
-	surface->Frame(rect, FRAME_DOWN);
-
-	rect.left	= 3;
+	rect.left	= xoffset - 4;
 	rect.top	= yoffset - 4;
 	rect.right	= rect.left + hssize;
 	rect.bottom	= rect.top + hssize;
 
-	surface->StartPaint(Rect(Point(3, yoffset - 4), Size(hssize + 35, hssize + 5)));
+	surface->StartPaint(Rect(Point(xoffset - 4, yoffset - 4), Size(hssize + Math::Round(30.0 * surface->GetSurfaceDPI() / 96.0) + 5, hssize + 5)));
 
 	forcehupdate = true;
 	preventvsupdate = true;
@@ -398,9 +331,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 		irect.right += 5;
 		irect.bottom += 5;
 
-		register Int	 xmin = irect.left - 8;
+		register Int	 xmin = irect.left - (xoffset + 1);
 		register Int	 ymin = irect.top - (yoffset + 1);
-		register Int	 xmax = irect.right - 8;
+		register Int	 xmax = irect.right - (xoffset + 1);
 		register Int	 ymax = irect.bottom - (yoffset + 1);
 
 		rect.left	= xmin;
@@ -410,11 +343,11 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 
 		for (register int sat = Math::Max(0, ymin); sat < Math::Min(hssize, ymax); sat++)
 		{
-			register int	 normrgb = colortable[acthue][255 - Math::Round(sat * (256.0 / 205.0))];
+			register int	 normrgb = colortable[acthue][255 - Math::Round(sat * (256.0 / hssize))];
 
-			register double	 rbias	 = (double) Color(normrgb).GetRed() / (255.0 / (256.0 / 205.0));
-			register double	 gbias	 = (double) Color(normrgb).GetGreen() / (255.0 / (256.0 / 205.0));
-			register double	 bbias	 = (double) Color(normrgb).GetBlue() / (255.0 / (256.0 / 205.0));
+			register double	 rbias	 = (double) Color(normrgb).GetRed() / (255.0 / (256.0 / hssize));
+			register double	 gbias	 = (double) Color(normrgb).GetGreen() / (255.0 / (256.0 / hssize));
+			register double	 bbias	 = (double) Color(normrgb).GetBlue() / (255.0 / (256.0 / hssize));
 
 			register double  ared	 = -rbias + Math::Max(0, xmin) * rbias;
 			register double  agreen	 = -gbias + Math::Max(0, xmin) * gbias;
@@ -435,6 +368,8 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 	ColorDlgUpdatePickers();
 
 	surface->EndPaint();
+
+	ncarea->SetColor(Color(acthue, actsat, actval, HSV).ConvertTo(RGBA));
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int lparam)
@@ -442,29 +377,18 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 	Surface	*surface = dlgwnd->GetDrawSurface();
 	Rect	 huerect;
 	Rect	 vsrect;
-	Rect	 ncrect;
-	Rect	 ocrect;
-	int	 hssize = 205;
+	Int	 hssize = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
+	Int	 huexoffset = hssize + Math::Round(14.0 * surface->GetSurfaceDPI() / 96.0);
 
 	huerect.left	= huexoffset;
 	huerect.top	= yoffset;
-	huerect.right	= huerect.left + 17;
+	huerect.right	= huerect.left + Math::Round(16.0 * surface->GetSurfaceDPI() / 96.0) + 1;
 	huerect.bottom	= huerect.top + hssize + 1;
 
-	vsrect.left	= 8;
+	vsrect.left	= xoffset + 1;
 	vsrect.top	= yoffset + 1;
 	vsrect.right	= vsrect.left + hssize;
 	vsrect.bottom	= vsrect.top + hssize;
-
-	ncrect.left = ncxoffset + 1;
-	ncrect.top = yoffset + 1;
-	ncrect.right = ncrect.left + (crsizex - 1);
-	ncrect.bottom = ncrect.top + (crsizey - 1);
-
-	ocrect.left = ocxoffset + 1;
-	ocrect.top = yoffset + 1;
-	ocrect.right = ocrect.left + (crsizex - 1);
-	ocrect.bottom = ocrect.top + (crsizey - 1);
 
 	switch (message)
 	{
@@ -480,32 +404,6 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 				vscapt = true;
 
 				ColorDlgMessageProc(SM_MOUSEMOVE, 0, 0);
-			}
-			else if (dlgwnd->IsMouseOn(ocrect))
-			{
-				lasthue = acthue;
-				lastsat = actsat;
-				lastval = actval;
-
-				acthue = color.ConvertTo(HSV).GetRed();
-				actsat = color.ConvertTo(HSV).GetGreen();
-				actval = color.ConvertTo(HSV).GetBlue();
-				actred = color.GetRed();
-				actgreen = color.GetGreen();
-				actblue = color.GetBlue();
-
-				ColorDlgUpdateHexValue();
-
-				hueedit->SetText(String::FromInt(acthue));
-				satedit->SetText(String::FromInt(actsat));
-				valedit->SetText(String::FromInt(actval));
-				rededit->SetText(String::FromInt(actred));
-				greenedit->SetText(String::FromInt(actgreen));
-				blueedit->SetText(String::FromInt(actblue));
-				hexedit->SetText(hexval);
-
-				dlgwnd->SetUpdateRect(vsrect);
-				ColorDlgPaintProc();
 			}
 
 			break;
@@ -526,14 +424,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 		case SM_MOUSEMOVE:
 			if (huecapt)
 			{
-				Int	 newhue = 255 - Math::Round(Math::Max(Math::Min(dlgwnd->GetMousePosition().y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
+				Int	 newhue = 255 - Math::Round(Math::Max(Math::Min(dlgwnd->GetMousePosition().y - (yoffset + 1), hssize - 1), 0) * (256.0 / hssize));
 
 				if (newhue != acthue)
 				{
 					lasthue = acthue;
 					acthue = newhue;
 
-					dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
+					dlgwnd->SetUpdateRect(Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize)));
 					ColorDlgPaintProc();
 
 					actred = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetRed();
@@ -547,16 +445,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					greenedit->SetText(String::FromInt(actgreen));
 					blueedit->SetText(String::FromInt(actblue));
 					hexedit->SetText(hexval);
-
-					surface->Box(ncrect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
 				}
 			}
 			else if (vscapt)
 			{
 				Point	 mousePos = dlgwnd->GetMousePosition();
 
-				Int	 newval = Math::Round(Math::Max(Math::Min(mousePos.x - 8, hssize - 1), 0) * (256.0 / 205.0));
-				Int	 newsat = 255 - Math::Round(Math::Max(Math::Min(mousePos.y - (yoffset + 1), hssize - 1), 0) * (256.0 / 205.0));
+				Int	 newval = 	Math::Round(Math::Max(Math::Min(mousePos.x - (xoffset + 1), hssize - 1), 0) * (256.0 / hssize));
+				Int	 newsat = 255 - Math::Round(Math::Max(Math::Min(mousePos.y - (yoffset + 1), hssize - 1), 0) * (256.0 / hssize));
 
 				if ((newval != actval) || (newsat != actsat))
 				{
@@ -565,7 +461,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					actval = newval;
 					actsat = newsat;
 
-					surface->StartPaint(Rect(Point(3, yoffset - 4), Size(hssize + 5, hssize + 5)));
+					ncarea->SetColor(Color(acthue, actsat, actval, HSV).ConvertTo(RGBA));
+
+					surface->StartPaint(Rect(Point(xoffset - 4, yoffset - 4), Size(hssize + 5, hssize + 5)));
 
 					ColorDlgUpdatePickers();
 
@@ -583,8 +481,6 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					greenedit->SetText(String::FromInt(actgreen));
 					blueedit->SetText(String::FromInt(actblue));
 					hexedit->SetText(hexval);
-
-					surface->Box(ncrect, Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
 				}
 			}
 
@@ -594,7 +490,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 {
-	Surface	*surface = dlgwnd->GetDrawSurface();
+	Surface	*surface    = dlgwnd->GetDrawSurface();
+	Int	 hssize	    = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
+	Int	 huexoffset = hssize + Math::Round(14.0 * surface->GetSurfaceDPI() / 96.0);
 
 	if (((lasthue != acthue) || forcehupdate) && !preventhupdate)
 	{
@@ -602,17 +500,17 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 		 */
 		if (lasthue != -1)
 		{
-			Point	 p1(huexoffset +  1, yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / 205.0)));
-			Point	 p2(huexoffset + 17, yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / 205.0)));
+			Point	 p1(huexoffset							     + 1, yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / hssize)));
+			Point	 p2(huexoffset + Math::Round(16.0 * surface->GetSurfaceDPI() / 96.0) + 1, yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / hssize)));
 
 			surface->Line(p1, p2, Color(lasthue, 255, 255, HSV).ConvertTo(RGBA));
 		}
 
 		Color	 ahrgb = Color(acthue, 255, 255, HSV).ConvertTo(RGBA);
 
-		for (int x = huexoffset + 1; x < (huexoffset + 17); x++)
+		for (int x = huexoffset + 1; x < (huexoffset + Math::Round(16.0 * surface->GetSurfaceDPI() / 96.0) + 1); x++)
 		{
-			surface->SetPixel(Point(x, yoffset + 1 + (int) ((255.0 - acthue) / (256.0 / 205.0))), Color(255 - ahrgb.GetRed(), 255 - ahrgb.GetGreen(), 255 - ahrgb.GetBlue()));
+			surface->SetPixel(Point(x, yoffset + 1 + (int) ((255.0 - acthue) / (256.0 / hssize))), Color(255 - ahrgb.GetRed(), 255 - ahrgb.GetGreen(), 255 - ahrgb.GetBlue()));
 		}
 
 		lasthue = acthue;
@@ -620,44 +518,44 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 
 	if (((lastval != actval) || (lastsat != actsat) || forcevsupdate) && !preventvsupdate)
 	{
-		Int	 hssize = 205;
-
 		/* Update val/sat picker.
 		 */
 		if ((lastval != -1) && (lastsat != -1))
 		{
 			for (int x = 0; x < hssize; x++)
 			{
-				Color	 rgb = Color(acthue, lastsat, (int) (x * (256.0 / 205.0)), HSV).ConvertTo(RGBA);
+				Color	 rgb = Color(acthue, lastsat, (int) (x * (256.0 / hssize)), HSV).ConvertTo(RGBA);
 
-				surface->SetPixel(Point(x + 8, yoffset + 1 + (int) ((255.0 - lastsat) / (256.0 / 205.0))), rgb);
+				surface->SetPixel(Point(x + xoffset + 1, yoffset + 1 + (int) ((255.0 - lastsat) / (256.0 / hssize))), rgb);
 			}
 
 			for (int y = 0; y < hssize; y++)
 			{
-				Color	 rgb = Color(acthue, (int) (255.0 - (y * (256.0 / 205.0))), lastval, HSV).ConvertTo(RGBA);
+				Color	 rgb = Color(acthue, (int) (255.0 - (y * (256.0 / hssize))), lastval, HSV).ConvertTo(RGBA);
 
-				surface->SetPixel(Point(8 + (int) (lastval / (256.0 / 205.0)), y + yoffset + 1), rgb);
+				surface->SetPixel(Point(xoffset + 1 + (int) (lastval / (256.0 / hssize)), y + yoffset + 1), rgb);
 			}
 		}
 
 		for (int x = 0; x < hssize; x++)
 		{
-			Color	 rgb = Color(acthue, actsat, x, HSV).ConvertTo(RGBA);
+			Color	 rgb = Color(acthue, actsat, (int) (x * (256.0 / hssize)), HSV).ConvertTo(RGBA);
 
-			surface->SetPixel(Point(x + 8, yoffset + 1 + (int) ((255.0 - actsat) / (256.0 / 205.0))), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
+			surface->SetPixel(Point(x + xoffset + 1, yoffset + 1 + (int) ((255.0 - actsat) / (256.0 / hssize))), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
 
 		for (int y = 0; y < hssize; y++)
 		{
-			Color	 rgb = Color(acthue, 255 - y, actval, HSV).ConvertTo(RGBA);
+			Color	 rgb = Color(acthue, (int) (255.0 - (y * (256.0 / hssize))), actval, HSV).ConvertTo(RGBA);
 
-			surface->SetPixel(Point(8 + (int) (actval / (256.0 / 205.0)), y + yoffset + 1), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
+			surface->SetPixel(Point(xoffset + 1 + (int) (actval / (256.0 / hssize)), y + yoffset + 1), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
 
 		lastval = actval;
 		lastsat = actsat;
 	}
+
+	ncarea->SetColor(Color(acthue, actsat, actval, HSV).ConvertTo(RGBA));
 
 	forcehupdate = false;
 	preventhupdate = false;
@@ -665,21 +563,53 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 	preventvsupdate = false;
 }
 
-void S::GUI::Dialogs::ColorSelection::ColorDlgOK()
+S::Void S::GUI::Dialogs::ColorSelection::OnOK()
 {
 	color = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA);
 
 	dlgwnd->Close();
 }
 
-void S::GUI::Dialogs::ColorSelection::ColorDlgCancel()
+S::Void S::GUI::Dialogs::ColorSelection::OnCancel()
 {
 	dlgwnd->Close();
 }
 
+S::Void S::GUI::Dialogs::ColorSelection::OnSelectOriginalColor()
+{
+	Surface	*surface = dlgwnd->GetDrawSurface();
+	Int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
+	Rect	 vsrect	 = Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize));
+
+	lasthue = acthue;
+	lastsat = actsat;
+	lastval = actval;
+
+	acthue = color.ConvertTo(HSV).GetRed();
+	actsat = color.ConvertTo(HSV).GetGreen();
+	actval = color.ConvertTo(HSV).GetBlue();
+	actred = color.GetRed();
+	actgreen = color.GetGreen();
+	actblue = color.GetBlue();
+
+	ColorDlgUpdateHexValue();
+
+	hueedit->SetText(String::FromInt(acthue));
+	satedit->SetText(String::FromInt(actsat));
+	valedit->SetText(String::FromInt(actval));
+	rededit->SetText(String::FromInt(actred));
+	greenedit->SetText(String::FromInt(actgreen));
+	blueedit->SetText(String::FromInt(actblue));
+	hexedit->SetText(hexval);
+
+	dlgwnd->SetUpdateRect(vsrect);
+	ColorDlgPaintProc();
+}
+
 void S::GUI::Dialogs::ColorSelection::ColorDlgHueSlider()
 {
-	int	 hssize = 205;
+	Surface	*surface = dlgwnd->GetDrawSurface();
+	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
 	actred = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetRed();
 	actgreen = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetGreen();
@@ -703,13 +633,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgHueSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
+	dlgwnd->SetUpdateRect(Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize)));
 	ColorDlgPaintProc();
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgSatSlider()
 {
 	Surface	*surface = dlgwnd->GetDrawSurface();
+	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
 	ColorDlgUpdatePickers();
 
@@ -735,12 +666,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgSatSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	surface->Box(Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
+	dlgwnd->SetUpdateRect(Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize)));
+	ColorDlgPaintProc();
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgValSlider()
 {
 	Surface	*surface = dlgwnd->GetDrawSurface();
+	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
 	ColorDlgUpdatePickers();
 
@@ -766,12 +699,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgValSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	surface->Box(Rect(Point(ncxoffset + 1, yoffset + 1), Size(crsizex - 1, crsizey - 1)), Color(acthue, actsat, actval, HSV).ConvertTo(RGBA), Rect::Filled);
+	dlgwnd->SetUpdateRect(Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize)));
+	ColorDlgPaintProc();
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgRedSlider()
 {
-	int	 hssize = 205;
+	Surface	*surface = dlgwnd->GetDrawSurface();
+	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
 	acthue = Color(actred, actgreen, actblue).ConvertTo(HSV).GetRed();
 	actsat = Color(actred, actgreen, actblue).ConvertTo(HSV).GetGreen();
@@ -795,13 +730,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgRedSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
+	dlgwnd->SetUpdateRect(Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize)));
 	ColorDlgPaintProc();
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgGreenSlider()
 {
-	int	 hssize = 205;
+	Surface	*surface = dlgwnd->GetDrawSurface();
+	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
 	acthue = Color(actred, actgreen, actblue).ConvertTo(HSV).GetRed();
 	actsat = Color(actred, actgreen, actblue).ConvertTo(HSV).GetGreen();
@@ -825,13 +761,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgGreenSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
+	dlgwnd->SetUpdateRect(Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize)));
 	ColorDlgPaintProc();
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgBlueSlider()
 {
-	int	 hssize = 205;
+	Surface	*surface = dlgwnd->GetDrawSurface();
+	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
 	acthue = Color(actred, actgreen, actblue).ConvertTo(HSV).GetRed();
 	actsat = Color(actred, actgreen, actblue).ConvertTo(HSV).GetGreen();
@@ -855,7 +792,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgBlueSlider()
 	updatehextext = true;
 	updatetext = true;
 
-	dlgwnd->SetUpdateRect(Rect(Point(8, yoffset + 1), Size(hssize, hssize)));
+	dlgwnd->SetUpdateRect(Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize)));
 	ColorDlgPaintProc();
 }
 

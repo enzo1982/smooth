@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -43,21 +43,22 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+				Int	 offset	 = 19 * surface->GetSurfaceDPI() / 96;
 
 				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
-				surface->Frame(frame + Point(0, 19) - Size(0, 19), FRAME_UP);
+				surface->Frame(frame + Point(0, offset) - Size(0, offset), FRAME_UP);
 
 				frame.right	= frame.left;
-				frame.bottom	= frame.top + 19;
+				frame.bottom	= frame.top + offset;
 
 				for (Int j = 0; j < GetNOfObjects(); j++)
 				{
 					Widget	*object	= GetNthObject(j);
 					Widget	*prev	= (j > 0) ? GetNthObject(j - 1) : NIL;
 
-					frame.left = frame.right + 1;
-					frame.right = frame.left + font.GetTextSizeX(object->GetText()) + 12;
+					frame.left  = frame.right + 1;
+					frame.right = frame.left + object->GetScaledTextWidth() + 12;
 
 					if (object->IsVisible())
 					{
@@ -90,7 +91,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 					if (IsRightToLeft()) { frame.left--; frame.right--; }
 
-					surface->SetText(object->GetText(), Rect(Point(frame.left + 6 + (object->IsVisible() ? 1 : 0), frame.top + 2), Size(font.GetTextSizeX(object->GetText()), 20)), font);
+					surface->SetText(object->GetText(), Rect(Point(frame.left + 6 + (object->IsVisible() ? 1 : 0), frame.top + 2), Size(object->GetScaledTextWidth(), offset - 2)), object->GetFont());
 
 					if (object->IsVisible())
 					{
@@ -125,21 +126,25 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 	if (!IsRegistered())		 return Error();
 	if (!IsActive() || !IsVisible()) return Success();
 
-	Window	*window	 = container->GetContainerWindow();
-	Point	 realPos = GetRealPosition();
-	Rect	 frame	 = Rect(Point(0, realPos.y + 1), Size(realPos.x, 18));
-
 	switch (message)
 	{
 		case SM_LBUTTONDOWN:
-			for (Int i = 0; i < GetNOfObjects(); i++)
 			{
-				Widget	*widget = GetNthObject(i);
+				Window	*window	 = container->GetContainerWindow();
+				Surface	*surface = GetDrawSurface();
+				Point	 realPos = GetRealPosition();
+				Int	 offset	 = 19 * surface->GetSurfaceDPI() / 96;
+				Rect	 frame	 = Rect(Point(0, realPos.y + 1), Size(realPos.x, offset - 1));
 
-				frame.left = frame.right + 1;
-				frame.right = frame.left + font.GetTextSizeX(widget->GetText()) + 12;
+				for (Int i = 0; i < GetNOfObjects(); i++)
+				{
+					Widget	*widget = GetNthObject(i);
 
-				if (!widget->IsVisible() && window->IsMouseOn(frame)) { SelectTab(widget); break; }
+					frame.left  = frame.right + 1;
+					frame.right = frame.left + widget->GetScaledTextWidth() + 12;
+
+					if (!widget->IsVisible() && window->IsMouseOn(frame)) { SelectTab(widget); break; }
+				}
 			}
 
 			break;

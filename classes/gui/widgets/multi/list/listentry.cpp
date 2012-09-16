@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,7 +20,7 @@ S::Signal2<S::Void, S::Int, S::Int>	 S::GUI::ListEntry::internalOnSelectEntry;
 
 const S::Short	 S::GUI::ListEntry::classID = S::Object::RequestClassID();
 
-S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 15))
+S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 16))
 {
 	type		= classID;
 
@@ -67,7 +67,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 		case SP_MOUSEOUT:
 			{
 				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 				Font	 nFont	 = font;
 				Bool	 gotTabs = False;
 
@@ -85,7 +85,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 				if (container->GetFlags() & LF_MULTICHECKBOX)
 				{
-					Rect	 cbRect = Rect(GetRealPosition() + Point(2, 3), Size(9, 9));
+					Rect	 cbRect = Rect(GetRealPosition() + Point(2, 3) * surface->GetSurfaceDPI() / 96.0, Size(9, 9) * surface->GetSurfaceDPI() / 96.0);
 
 					if (cbRect.top <= cbRect.bottom - 1)
 					{
@@ -94,20 +94,24 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 						if (marked && cbRect.top <= cbRect.bottom - 3)
 						{
-							Point	 p1 = Point(cbRect.left + 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
-							Point	 p2 = Point(cbRect.right - 2 + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
-
 							Color	 lightColor = Setup::GrayTextColor;
 							Color	 darkColor = Setup::ClientTextColor;
 
 							if (!IsActive()) darkColor = Setup::GrayTextColor;
 
-							surface->Line(p1, p2, darkColor);
+							Point	 p1 = Point(cbRect.left + 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
+							Point	 p2 = Point(cbRect.right - 2 + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
+
+							surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), darkColor);
 							surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), lightColor);
 							surface->Line(p1 + Point(0, 1), p2 + Point(-1, 0), lightColor);
-							surface->Line(p1 + Point(4, 0), p2 + Point(-6, 0), darkColor);
-							surface->Line(p1 + Point(4, 1), p2 + Point(-5, 0), lightColor);
-							surface->Line(p1 + Point(3, 0), p2 + Point(-6, -1), lightColor);
+
+							p1 = Point(cbRect.right - 3 + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
+							p2 = Point(cbRect.left + 1 + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
+
+							surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), darkColor);
+							surface->Line(p1 + Point(0, 1), p2 + Point(1, 0), lightColor);
+							surface->Line(p1 + Point(-1, 0), p2 + Point(0, -1), lightColor);
 						}
 					}
 				}
@@ -125,18 +129,19 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				{
 					for (Int i = 0; i < ((ListBox *) listBox)->GetNOfTabs(); i++)
 					{
-						Rect	 rect = Rect(GetRealPosition() + Point(1 + (i > 0 && listBox != container ? listBox->GetRealPosition().x - container->GetRealPosition().x + 2 : 0), 1), GetSize() - Size(3, 2));
+						Rect	 rect = Rect(GetRealPosition() + Point(1, 1) * surface->GetSurfaceDPI() / 96.0 + Point(i > 0 && listBox != container ? listBox->GetRealPosition().x - container->GetRealPosition().x + 2 : 0, 0), GetRealSize() - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(1, 0));
 
-						rect.left += ((ListBox *) listBox)->GetNthTabOffset(i);
-						rect.left += (i == 0 ? (container->GetFlags() & LF_MULTICHECKBOX ? 12 : 0) : 0);
+						rect.left += Math::Round(((ListBox *) listBox)->GetNthTabOffset(i) * surface->GetSurfaceDPI() / 96.0);
+						rect.left += (i == 0 ? (container->GetFlags() & LF_MULTICHECKBOX ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0) : 0);
 
-						if (((ListBox *) listBox)->GetNOfTabs() >= i + 2) rect.right = rect.left + (((ListBox *) listBox)->GetNthTabOffset(i + 1) - ((ListBox *) listBox)->GetNthTabOffset(i)) - (i == 0 ? (container->GetFlags() & LF_MULTICHECKBOX ? 12 : 0) : 0) - 3;
+						if	(((ListBox *) listBox)->GetNOfTabs() >= i + 2)		     rect.right  = rect.left + (Math::Round(((ListBox *) listBox)->GetNthTabOffset(i + 1) * surface->GetSurfaceDPI() / 96.0) - Math::Round(((ListBox *) listBox)->GetNthTabOffset(i) * surface->GetSurfaceDPI() / 96.0)) - (i == 0 ? (container->GetFlags() & LF_MULTICHECKBOX ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0) : 0) - Math::Round(1 * surface->GetSurfaceDPI() / 96.0) * 2 - 1;
+						else if (((ListBox *) listBox)->GetNthTabOrientation(i) == OR_RIGHT) rect.right += 1;
 
 						String	 tabText = GetNthTabText(i);
 
 						if (((ListBox *) listBox)->GetNthTabOrientation(i) == OR_RIGHT)
 						{
-							rect.left = Math::Max(rect.left, rect.right - nFont.GetTextSizeX(tabText));
+							rect.left = Math::Max(rect.left, rect.right - nFont.GetScaledTextSizeX(tabText) - 1);
 						}
 
 						surface->SetText(tabText, rect, nFont);
@@ -144,13 +149,15 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				}
 				else
 				{
-					surface->SetText(text, frame + Point(1 + (container->GetFlags() & LF_MULTICHECKBOX ? 12 : 0), 1) - Size(2 + (container->GetFlags() & LF_MULTICHECKBOX ? 12 : 0), 2), nFont);
+					surface->SetText(text, frame + Point(1, 1) * surface->GetSurfaceDPI() / 96.0 + Point(container->GetFlags() & LF_MULTICHECKBOX ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0, 0) - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(container->GetFlags() & LF_MULTICHECKBOX ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0, 0), nFont);
 				}
+
+				Widget::Paint(SP_PAINT);
 
 				surface->EndPaint();
 			}
 
-			return Widget::Paint(SP_PAINT);
+			return Success();
 	}
 
 	return Widget::Paint(message);

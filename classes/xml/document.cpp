@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -131,8 +131,8 @@ S::Int S::XML::Document::LoadNode(xmlTextReaderPtr reader, Node *node)
 
 		while ((nodeType = xmlTextReaderNodeType(reader)) != XML_ELEMENT_DECL)
 		{
-			if	(nodeType == XML_ELEMENT_NODE)	LoadNode(reader, node->AddNode(NIL));
-			else if (nodeType == XML_TEXT_NODE)	node->SetContent((const char *) xmlTextReaderConstValue(reader));
+			if	(nodeType == XML_ELEMENT_NODE)					  LoadNode(reader, node->AddNode(NIL));
+			else if (nodeType == XML_TEXT_NODE || nodeType == XML_CDATA_SECTION_NODE) node->SetContent((const char *) xmlTextReaderConstValue(reader));
 
 			if (xmlTextReaderRead(reader) == -1) return Error();
 		}

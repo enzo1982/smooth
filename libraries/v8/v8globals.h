@@ -1,4 +1,4 @@
-// Copyright 2010 the V8 project authors. All rights reserved.
+// Copyright 2012 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -29,6 +29,7 @@
 #define V8_V8GLOBALS_H_
 
 #include "globals.h"
+#include "checks.h"
 
 namespace v8 {
 namespace internal {
@@ -69,26 +70,30 @@ const intptr_t kFailureTagMask = (1 << kFailureTagSize) - 1;
 
 
 // Zap-value: The value used for zapping dead objects.
-// Should be a recognizable hex value tagged as a heap object pointer.
+// Should be a recognizable hex value tagged as a failure.
 #ifdef V8_HOST_ARCH_64_BIT
 const Address kZapValue =
-    reinterpret_cast<Address>(V8_UINT64_C(0xdeadbeedbeadbeed));
+    reinterpret_cast<Address>(V8_UINT64_C(0xdeadbeedbeadbeef));
 const Address kHandleZapValue =
-    reinterpret_cast<Address>(V8_UINT64_C(0x1baddead0baddead));
+    reinterpret_cast<Address>(V8_UINT64_C(0x1baddead0baddeaf));
 const Address kFromSpaceZapValue =
-    reinterpret_cast<Address>(V8_UINT64_C(0x1beefdad0beefdad));
-const uint64_t kDebugZapValue = 0xbadbaddbbadbaddb;
+    reinterpret_cast<Address>(V8_UINT64_C(0x1beefdad0beefdaf));
+const uint64_t kDebugZapValue = V8_UINT64_C(0xbadbaddbbadbaddb);
+const uint64_t kSlotsZapValue = V8_UINT64_C(0xbeefdeadbeefdeef);
+const uint64_t kFreeListZapValue = 0xfeed1eaffeed1eaf;
 #else
-const Address kZapValue = reinterpret_cast<Address>(0xdeadbeed);
-const Address kHandleZapValue = reinterpret_cast<Address>(0xbaddead);
-const Address kFromSpaceZapValue = reinterpret_cast<Address>(0xbeefdad);
+const Address kZapValue = reinterpret_cast<Address>(0xdeadbeef);
+const Address kHandleZapValue = reinterpret_cast<Address>(0xbaddeaf);
+const Address kFromSpaceZapValue = reinterpret_cast<Address>(0xbeefdaf);
+const uint32_t kSlotsZapValue = 0xbeefdeef;
 const uint32_t kDebugZapValue = 0xbadbaddb;
+const uint32_t kFreeListZapValue = 0xfeed1eaf;
 #endif
 
 
-// Number of bits to represent the page size for paged spaces. The value of 13
-// gives 8K bytes per page.
-const int kPageSizeBits = 13;
+// Number of bits to represent the page size for paged spaces. The value of 20
+// gives 1Mb bytes per page.
+const int kPageSizeBits = 20;
 
 // On Intel architecture, cache line size is 64 bytes.
 // On ARM it may be less (32 bytes), but as far this constant is
@@ -96,24 +101,18 @@ const int kPageSizeBits = 13;
 const int kProcessorCacheLineSize = 64;
 
 // Constants relevant to double precision floating point numbers.
-
-// Quiet NaNs have bits 51 to 62 set, possibly the sign bit, and no
-// other bits set.
-const uint64_t kQuietNaNMask = static_cast<uint64_t>(0xfff) << 51;
 // If looking only at the top 32 bits, the QNaN mask is bits 19 to 30.
 const uint32_t kQuietNaNHighBitsMask = 0xfff << (51 - 32);
 
 
 // -----------------------------------------------------------------------------
 // Forward declarations for frequently used classes
-// (sorted alphabetically)
 
 class AccessorInfo;
 class Allocation;
 class Arguments;
 class Assembler;
 class AssertNoAllocation;
-class BreakableStatement;
 class Code;
 class CodeGenerator;
 class CodeStub;
@@ -123,20 +122,18 @@ class Debugger;
 class DebugInfo;
 class Descriptor;
 class DescriptorArray;
-class Expression;
 class ExternalReference;
 class FixedArray;
-class FunctionEntry;
-class FunctionLiteral;
 class FunctionTemplateInfo;
-class NumberDictionary;
+class MemoryChunk;
+class SeededNumberDictionary;
+class UnseededNumberDictionary;
 class StringDictionary;
 template <typename T> class Handle;
 class Heap;
 class HeapObject;
 class IC;
 class InterceptorInfo;
-class IterationStatement;
 class JSArray;
 class JSFunction;
 class JSObject;
@@ -147,32 +144,19 @@ class Map;
 class MapSpace;
 class MarkCompactCollector;
 class NewSpace;
-class NodeVisitor;
 class Object;
 class MaybeObject;
 class OldSpace;
-class Property;
-class Proxy;
-class RegExpNode;
-struct RegExpCompileData;
-class RegExpTree;
-class RegExpCompiler;
-class RegExpVisitor;
+class Foreign;
 class Scope;
-template<class Allocator = FreeStoreAllocationPolicy> class ScopeInfo;
-class SerializedScopeInfo;
+class ScopeInfo;
 class Script;
-class Slot;
 class Smi;
 template <typename Config, class Allocator = FreeStoreAllocationPolicy>
     class SplayTree;
-class Statement;
 class String;
 class Struct;
-class SwitchStatement;
-class AstVisitor;
 class Variable;
-class VariableProxy;
 class RelocInfo;
 class Deserializer;
 class MessageLocation;
@@ -182,6 +166,8 @@ class VirtualMemory;
 class Mutex;
 
 typedef bool (*WeakSlotCallback)(Object** pointer);
+
+typedef bool (*WeakSlotCallbackWithHeap)(Heap* heap, Object** pointer);
 
 // -----------------------------------------------------------------------------
 // Miscellaneous
@@ -216,7 +202,12 @@ enum GarbageCollector { SCAVENGER, MARK_COMPACTOR };
 
 enum Executability { NOT_EXECUTABLE, EXECUTABLE };
 
-enum VisitMode { VISIT_ALL, VISIT_ALL_IN_SCAVENGE, VISIT_ONLY_STRONG };
+enum VisitMode {
+  VISIT_ALL,
+  VISIT_ALL_IN_SCAVENGE,
+  VISIT_ALL_IN_SWEEP_NEWSPACE,
+  VISIT_ONLY_STRONG
+};
 
 // Flag indicating whether code is built into the VM (one of the natives files).
 enum NativesFlag { NOT_NATIVES_CODE, NATIVES_CODE };
@@ -243,12 +234,6 @@ struct CodeDesc {
   int reloc_size;
   Assembler* origin;
 };
-
-
-// Callback function on object slots, used for iterating heap object slots in
-// HeapObjects, global pointers to heap objects, etc. The callback allows the
-// callback function to change the value of the slot.
-typedef void (*ObjectSlotCallback)(HeapObject** pointer);
 
 
 // Callback function used for iterating objects in heap spaces,
@@ -285,15 +270,21 @@ enum InlineCacheState {
 };
 
 
-enum InLoopFlag {
-  NOT_IN_LOOP,
-  IN_LOOP
+enum CheckType {
+  RECEIVER_MAP_CHECK,
+  STRING_CHECK,
+  NUMBER_CHECK,
+  BOOLEAN_CHECK
 };
 
 
 enum CallFunctionFlags {
   NO_CALL_FUNCTION_FLAGS = 0,
-  RECEIVER_MIGHT_BE_VALUE = 1 << 0  // Receiver might not be a JSObject.
+  // Receiver might implicitly be the global objects. If it is, the
+  // hole is passed to the call function stub.
+  RECEIVER_MIGHT_BE_IMPLICIT = 1 << 0,
+  // The call target is cached in the instruction stream.
+  RECORD_CALL_TARGET = 1 << 1
 };
 
 
@@ -303,26 +294,17 @@ enum InlineCacheHolderFlag {
 };
 
 
-// Type of properties.
-// Order of properties is significant.
-// Must fit in the BitField PropertyDetails::TypeField.
-// A copy of this is in mirror-debugger.js.
-enum PropertyType {
-  NORMAL              = 0,  // only in slow mode
-  FIELD               = 1,  // only in fast mode
-  CONSTANT_FUNCTION   = 2,  // only in fast mode
-  CALLBACKS           = 3,
-  INTERCEPTOR         = 4,  // only in lookup results, not in descriptors.
-  MAP_TRANSITION      = 5,  // only in fast mode
-  CONSTANT_TRANSITION = 6,  // only in fast mode
-  NULL_DESCRIPTOR     = 7,  // only in fast mode
-  // All properties before MAP_TRANSITION are real.
-  FIRST_PHANTOM_PROPERTY_TYPE = MAP_TRANSITION,
-  // There are no IC stubs for NULL_DESCRIPTORS. Therefore,
-  // NULL_DESCRIPTOR can be used as the type flag for IC stubs for
-  // nonexistent properties.
-  NONEXISTENT = NULL_DESCRIPTOR
-};
+// The Store Buffer (GC).
+typedef enum {
+  kStoreBufferFullEvent,
+  kStoreBufferStartScanningPagesEvent,
+  kStoreBufferScanningPageEvent
+} StoreBufferEvent;
+
+
+typedef void (*StoreBufferCallback)(Heap* heap,
+                                    MemoryChunk* page,
+                                    StoreBufferEvent event);
 
 
 // Whether to remove map transitions and constant transitions from a
@@ -374,12 +356,11 @@ struct AccessorDescriptor {
 };
 
 
-// Logging and profiling.
-// A StateTag represents a possible state of the VM.  When compiled with
-// ENABLE_VMSTATE_TRACKING, the logger maintains a stack of these.
-// Creating a VMState object enters a state by pushing on the stack, and
-// destroying a VMState object leaves a state by popping the current state
-// from the stack.
+// Logging and profiling.  A StateTag represents a possible state of
+// the VM. The logger maintains a stack of these. Creating a VMState
+// object enters a state by pushing on the stack, and destroying a
+// VMState object leaves a state by popping the current state from the
+// stack.
 
 #define STATE_TAG_LIST(V) \
   V(JS)                   \
@@ -433,11 +414,11 @@ enum StateTag {
 #define TRACK_MEMORY(name) \
   void* operator new(size_t size) { \
     void* result = ::operator new(size); \
-    Logger::NewEvent(name, result, size); \
+    Logger::NewEventStatic(name, result, size); \
     return result; \
   } \
   void operator delete(void* object) { \
-    Logger::DeleteEvent(name, object); \
+    Logger::DeleteEventStatic(name, object); \
     ::operator delete(object); \
   }
 #else
@@ -457,7 +438,120 @@ enum CpuFeature { SSE4_1 = 32 + 19,  // x86
                   CPUID = 10,  // x86
                   VFP3 = 1,    // ARM
                   ARMv7 = 2,   // ARM
-                  SAHF = 0};   // x86
+                  SAHF = 0,    // x86
+                  FPU = 1};    // MIPS
+
+
+// Used to specify if a macro instruction must perform a smi check on tagged
+// values.
+enum SmiCheckType {
+  DONT_DO_SMI_CHECK,
+  DO_SMI_CHECK
+};
+
+
+// Used to specify whether a receiver is implicitly or explicitly
+// provided to a call.
+enum CallKind {
+  CALL_AS_METHOD,
+  CALL_AS_FUNCTION
+};
+
+
+enum ScopeType {
+  EVAL_SCOPE,      // The top-level scope for an eval source.
+  FUNCTION_SCOPE,  // The top-level scope for a function.
+  MODULE_SCOPE,    // The scope introduced by a module literal
+  GLOBAL_SCOPE,    // The top-level scope for a program or a top-level eval.
+  CATCH_SCOPE,     // The scope introduced by catch.
+  BLOCK_SCOPE,     // The scope introduced by a new block.
+  WITH_SCOPE       // The scope introduced by with.
+};
+
+
+const uint32_t kHoleNanUpper32 = 0x7FFFFFFF;
+const uint32_t kHoleNanLower32 = 0xFFFFFFFF;
+const uint32_t kNaNOrInfinityLowerBoundUpper32 = 0x7FF00000;
+
+const uint64_t kHoleNanInt64 =
+    (static_cast<uint64_t>(kHoleNanUpper32) << 32) | kHoleNanLower32;
+const uint64_t kLastNonNaNInt64 =
+    (static_cast<uint64_t>(kNaNOrInfinityLowerBoundUpper32) << 32);
+
+
+enum VariableMode {
+  // User declared variables:
+  VAR,             // declared via 'var', and 'function' declarations
+
+  CONST,           // declared via 'const' declarations
+
+  CONST_HARMONY,   // declared via 'const' declarations in harmony mode
+
+  LET,             // declared via 'let' declarations
+
+  // Variables introduced by the compiler:
+  DYNAMIC,         // always require dynamic lookup (we don't know
+                   // the declaration)
+
+  DYNAMIC_GLOBAL,  // requires dynamic lookup, but we know that the
+                   // variable is global unless it has been shadowed
+                   // by an eval-introduced variable
+
+  DYNAMIC_LOCAL,   // requires dynamic lookup, but we know that the
+                   // variable is local and where it is unless it
+                   // has been shadowed by an eval-introduced
+                   // variable
+
+  INTERNAL,        // like VAR, but not user-visible (may or may not
+                   // be in a context)
+
+  TEMPORARY        // temporary variables (not user-visible), never
+                   // in a context
+};
+
+
+// ES6 Draft Rev3 10.2 specifies declarative environment records with mutable
+// and immutable bindings that can be in two states: initialized and
+// uninitialized. In ES5 only immutable bindings have these two states. When
+// accessing a binding, it needs to be checked for initialization. However in
+// the following cases the binding is initialized immediately after creation
+// so the initialization check can always be skipped:
+// 1. Var declared local variables.
+//      var foo;
+// 2. A local variable introduced by a function declaration.
+//      function foo() {}
+// 3. Parameters
+//      function x(foo) {}
+// 4. Catch bound variables.
+//      try {} catch (foo) {}
+// 6. Function variables of named function expressions.
+//      var x = function foo() {}
+// 7. Implicit binding of 'this'.
+// 8. Implicit binding of 'arguments' in functions.
+//
+// ES5 specified object environment records which are introduced by ES elements
+// such as Program and WithStatement that associate identifier bindings with the
+// properties of some object. In the specification only mutable bindings exist
+// (which may be non-writable) and have no distinct initialization step. However
+// V8 allows const declarations in global code with distinct creation and
+// initialization steps which are represented by non-writable properties in the
+// global object. As a result also these bindings need to be checked for
+// initialization.
+//
+// The following enum specifies a flag that indicates if the binding needs a
+// distinct initialization step (kNeedsInitialization) or if the binding is
+// immediately initialized upon creation (kCreatedInitialized).
+enum InitializationFlag {
+  kNeedsInitialization,
+  kCreatedInitialized
+};
+
+
+enum ClearExceptionFlag {
+  KEEP_EXCEPTION,
+  CLEAR_EXCEPTION
+};
+
 
 } }  // namespace v8::internal
 

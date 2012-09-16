@@ -4,7 +4,7 @@
 SMOOTH_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = line.o point.o rect.o size.o
+OBJECTS	  = rect.o
 
 ## Do not change anything below this line. ##
 

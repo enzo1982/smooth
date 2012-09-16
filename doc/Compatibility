@@ -13,8 +13,8 @@ OpenBSD, GCC 4.x	since 0.8.71.0			complete support
 Solaris, GCC 3.4	since 0.8.71.0			complete support
 
 Mac OS X, GCC 4.x	since 0.8.71.0			X11 GUI only
-Haiku, GCC 4.x		since 0.8.71.0			X11 GUI only
-QNX, GCC 4.x		since 0.8.71.0			X11 GUI only, currently broken
+QNX, GCC 4.x		since 0.8.71.0			X11 GUI only
+Haiku, GCC 4.x		since 0.8.71.0			GUI still very unstable
 
 Syllable, GCC 4.x	untested			no GUI support yet
 
@@ -22,7 +22,7 @@ Syllable, GCC 4.x	untested			no GUI support yet
 Support for different version of Microsoft Windows
 --------------------------------------------------
 
-Windows Vista/7		since 0.8.69.0			complete support
+Windows Vista/7/8	since 0.8.69.0			complete support
 Windows 2000/XP/2003	all versions			complete support
 Windows NT 4.0		all versions			seems to work, no official support
 

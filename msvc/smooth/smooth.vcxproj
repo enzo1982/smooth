@@ -200,10 +200,7 @@
     <ClCompile Include="..\..\classes\graphics\color.cpp" />
     <ClCompile Include="..\..\classes\graphics\font.cpp" />
     <ClCompile Include="..\..\classes\graphics\surface.cpp" />
-    <ClCompile Include="..\..\classes\graphics\forms\line.cpp" />
-    <ClCompile Include="..\..\classes\graphics\forms\point.cpp" />
     <ClCompile Include="..\..\classes\graphics\forms\rect.cpp" />
-    <ClCompile Include="..\..\classes\graphics\forms\size.cpp" />
     <ClCompile Include="..\..\classes\graphics\imageloader\icon.cpp" />
     <ClCompile Include="..\..\classes\graphics\imageloader\imageloader.cpp" />
     <ClCompile Include="..\..\classes\graphics\imageloader\jpeg.cpp" />

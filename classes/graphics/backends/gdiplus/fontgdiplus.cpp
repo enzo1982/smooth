@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,7 +12,7 @@
 #include <gdiplus.h>
 
 #include <smooth/graphics/backends/gdiplus/fontgdiplus.h>
-#include <smooth/graphics/font.h>
+#include <smooth/graphics/surface.h>
 
 S::GUI::FontBackend *CreateFontGDIPlus(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
@@ -30,13 +30,14 @@ S::GUI::FontGDIPlus::~FontGDIPlus()
 {
 }
 
-S::GUI::Size S::GUI::FontGDIPlus::GetTextSize(const String &text) const
+S::GUI::Size S::GUI::FontGDIPlus::GetTextSize(const String &text, Bool scaled) const
 {
 	if (text == NIL) return Size();
 
+	Float			 dpi = Surface().GetSurfaceDPI();
 	Gdiplus::Graphics	 context((HWND) NIL);
 
-	Gdiplus::Font		 gdip_font(fontName, fontSize, fontWeight >= Font::Bold ? Gdiplus::FontStyleBold : Gdiplus::FontStyleRegular);
+	Gdiplus::Font		 gdip_font(fontName, fontSize * dpi / 96.0, fontWeight >= Font::Bold ? Gdiplus::FontStyleBold : Gdiplus::FontStyleRegular);
 	Gdiplus::StringFormat	 gdip_format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsMeasureTrailingSpaces);
 	Gdiplus::RectF		 rect;
 
@@ -44,5 +45,6 @@ S::GUI::Size S::GUI::FontGDIPlus::GetTextSize(const String &text) const
 
 	context.MeasureString(text, -1, &gdip_font, Gdiplus::PointF(0.0, 0.0), &gdip_format, &rect);
 
-	return Size(rect.Width, rect.Height);
+	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(rect.Width, rect.Height);
+	else					   return Size(rect.Width, rect.Height) * 96.0 / dpi;
 }

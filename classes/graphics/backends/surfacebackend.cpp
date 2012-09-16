@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,10 +13,13 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
+#include <smooth/init.h>
 
 #if defined __WIN32__ && defined SMOOTH_STATIC
 	#include <smooth/graphics/backends/gdi/surfacegdi.h>
 #endif
+
+S::Threads::Mutex	*S::GUI::SurfaceBackend::mutex = NIL;
 
 S::GUI::SurfaceBackend *CreateSurfaceBackend(S::Void *iSurface, const S::GUI::Size &maxSize)
 {
@@ -39,6 +42,9 @@ S::GUI::SurfaceBackend *S::GUI::SurfaceBackend::CreateBackendInstance(Void *iSur
 	return backend_creator(iSurface, maxSize);
 }
 
+S::Int	 addSurfaceBackendInitTmp = S::AddInitFunction(&S::GUI::SurfaceBackend::Initialize);
+S::Int	 addSurfaceBackendFreeTmp = S::AddFreeFunction(&S::GUI::SurfaceBackend::Free);
+
 S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface, const Size &maxSize)
 {
 #if defined __WIN32__ && defined SMOOTH_STATIC
@@ -58,12 +64,36 @@ S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface, const Size &maxSize)
 	paintRect.bottom = -1;
 
 	painting = 0;
-
-	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceBackend::~SurfaceBackend()
 {
+}
+
+S::Int S::GUI::SurfaceBackend::Initialize()
+{
+	mutex = new Threads::Mutex();
+
+	return Success();
+}
+
+S::Int S::GUI::SurfaceBackend::Free()
+{
+	delete mutex;
+
+	mutex = NIL;
+
+	return Success();
+}
+
+S::Int S::GUI::SurfaceBackend::Lock()
+{
+	return mutex->Lock();
+}
+
+S::Int S::GUI::SurfaceBackend::Release()
+{
+	return mutex->Release();
 }
 
 S::Short S::GUI::SurfaceBackend::GetSurfaceType() const
@@ -135,9 +165,9 @@ S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Short style)
 {
 	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
-	Point	 p1 = Point(rect.left, rect.top);
+	Point	 p1 = Point(rect.left,	    rect.top);
 	Point	 p2 = Point(rect.right - 1, rect.top);
-	Point	 p3 = Point(rect.left, rect.bottom - 1);
+	Point	 p3 = Point(rect.left,	    rect.bottom - 1);
 	Point	 p4 = Point(rect.right - 1, rect.bottom - 1);
 
 	Long	 color1 = 0;
@@ -208,9 +238,10 @@ S::Int S::GUI::SurfaceBackend::Gradient(const Rect &rect, const Color &color1, c
 	Float	 red2	= color2.GetRed();
 	Float	 green2	= color2.GetGreen();
 	Float	 blue2	= color2.GetBlue();
-	Int	 xmax	= rect.right - rect.left;
-	Int	 ymax	= rect.bottom - rect.top;
-	Bitmap	 bmp(rect.right - rect.left, rect.bottom - rect.top);
+	Int	 xmax	= rect.GetWidth();
+	Int	 ymax	= rect.GetHeight();
+
+	Bitmap	 bmp(xmax, ymax);
 
 	switch (style)
 	{
@@ -263,14 +294,7 @@ S::Int S::GUI::SurfaceBackend::Gradient(const Rect &rect, const Color &color1, c
 		break;
 	}
 
-	Rect	 srect;
-
-	srect.left	= 0;
-	srect.top	= 0;
-	srect.right	= rect.right - rect.left;
-	srect.bottom	= rect.bottom - rect.top;
-
-	BlitFromBitmap(bmp, srect, rect);
+	BlitFromBitmap(bmp, Rect(Point(0, 0), rect.GetSize()), rect);
 
 	return Success();
 }

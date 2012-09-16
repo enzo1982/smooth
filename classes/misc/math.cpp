@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,7 @@
 #include <smooth/misc/math.h>
 #include <math.h>
 
-const S::Float S::Math::Pi	= 3.14159265358979323846;
+const S::Float S::Math::Pi	= 3.1415926535897932385;
 const S::Float S::Math::e	= 2.7182818284590452354;
 
 S::Math::Math()
@@ -32,11 +32,6 @@ S::Int64 S::Math::Sign(Float f)
 	return (f == 0 ? 0 : (f < 0 ? -1 : 1));
 }
 
-S::Int64 S::Math::Round(Float f)
-{
-	return (Int64) (f + 0.5);
-}
-
 S::Float S::Math::Fract(Float f)
 {
 	return f - Floor(f);
@@ -55,16 +50,6 @@ S::Int64 S::Math::Ceil(Float f)
 S::Float S::Math::Mod(Float fd, Float fb)
 {
 	return fmod(fd, fb);
-}
-
-S::Float S::Math::Min(Float f1, Float f2)
-{
-	return (f1 < f2 ? f1 : f2);
-}
-
-S::Float S::Math::Max(Float f1, Float f2)
-{
-	return (f1 > f2 ? f1 : f2);
 }
 
 S::Float S::Math::Pow(Float fn, Float fe)
@@ -151,15 +136,6 @@ S::Int S::Math::Abs(Int i)
 	return i * Sign(i);
 }
 
-S::Int S::Math::Min(Int i1, Int i2)
-{
-	return (i1 < i2 ? i1 : i2);
-}
-
-S::Int S::Math::Max(Int i1, Int i2)
-{
-	return (i1 > i2 ? i1 : i2);
-}
 
 S::Int S::Math::Mod(Int id, Int ib)
 {
@@ -179,16 +155,6 @@ S::Float S::Math::Pow(Int in, Int ie)
 S::Int64 S::Math::Abs(Int64 i)
 {
 	return i * Sign(i);
-}
-
-S::Int64 S::Math::Min(Int64 i1, Int64 i2)
-{
-	return (i1 < i2 ? i1 : i2);
-}
-
-S::Int64 S::Math::Max(Int64 i1, Int64 i2)
-{
-	return (i1 > i2 ? i1 : i2);
 }
 
 S::Int64 S::Math::Mod(Int64 id, Int64 ib)

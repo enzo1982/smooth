@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,7 +31,7 @@ S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 
 	SetMetrics(iPos, iSize);
 
-	if (GetWidth() == 0) SetWidth(80);
+	if (GetWidth()	== 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(19);
 
 	hotspot		= new Hotspot(Point(1, 1), GetSize() - Size(19, 2));
@@ -67,13 +67,11 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 		if (GetNthEntry(0) != NIL) ((ListEntry *) GetNthEntry(0))->Select();
 	}
 
-	if (flags & CB_HOTSPOTONLY)	hotspot->Deactivate();
-	else				hotspot->Activate();
+	if (flags & CB_HOTSPOTONLY) hotspot->Deactivate();
+	else			    hotspot->Activate();
 
 	Surface		*surface	= GetDrawSurface();
-	Rect		 frame		= Rect(GetRealPosition(), GetSize());
-	Point		 lineStart;
-	Point		 lineEnd;
+	Rect		 frame		= Rect(GetRealPosition(), GetRealSize());
 
 	switch (message)
 	{
@@ -87,19 +85,23 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 				surface->Frame(frame, FRAME_DOWN);
 			}
 
-			surface->Box(frame + Point(GetWidth() - 18, 1) - Size(GetWidth() - 17, 2), Setup::BackgroundColor, Rect::Filled);
-			surface->Frame(frame + Point(GetWidth() - 18, 1) - Size(GetWidth() - 17, 2), FRAME_UP);
+			surface->Box(frame + Point(frame.GetWidth() - frame.GetHeight() + 1, 1) - Size(frame.GetWidth() - frame.GetHeight() + 2, 2), Setup::BackgroundColor, Rect::Filled);
+			surface->Frame(frame + Point(frame.GetWidth() - frame.GetHeight() + 1, 1) - Size(frame.GetWidth() - frame.GetHeight() + 2, 2), FRAME_UP);
 
-			lineStart	= Point(frame.right - 13 + (IsRightToLeft() ? 1 : 0), frame.top + 8);
-			lineEnd		= lineStart + Point(7, 0);
-
-			for (Int i = 0; i < 4; i++)
 			{
-				if (IsActive())	surface->Line(lineStart, lineEnd, Setup::TextColor);
-				else		surface->Line(lineStart, lineEnd, Setup::GrayTextColor);
+				Int	 height	   = Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
 
-				lineStart += Point(1, 1);
-				lineEnd += Point(-1, 1);
+				Point	 lineStart = Point(frame.right - (frame.GetHeight() - 1) / 2 - height + (IsRightToLeft() ? 1 : 0), frame.top + (frame.GetHeight() - height) / 2);
+				Point	 lineEnd   = lineStart + Point(height * 2 - 1, 0);
+
+				for (Int i = 0; i < height; i++)
+				{
+					if (IsActive())	surface->Line(lineStart, lineEnd, Setup::TextColor);
+					else		surface->Line(lineStart, lineEnd, Setup::GrayTextColor);
+
+					lineStart += Point(1, 1);
+					lineEnd	  += Point(-1, 1);
+				}
 			}
 
 			if (!(flags & CB_HOTSPOTONLY))
@@ -120,7 +122,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 							else					nText[k] = operat->GetText()[k];
 						}
 
-						surface->SetText(nText, frame + Point(3, 3) - Size(21, 0), font);
+						surface->SetText(nText, frame + Point(3, 3) * surface->GetSurfaceDPI() / 96.0 - Size(frame.GetHeight() + 2, 0), font);
 					}
 				}
 			}
@@ -153,12 +155,13 @@ S::Void S::GUI::ComboBox::OpenListBox()
 	if (listBox == NIL)
 	{
 		Widget	*window		= container->GetContainerWindow();
- 
-		Rect	 monitor	= System::MultiMonitor::GetActiveMonitorMetrics();
-		Size	 listBoxSize	= Size(GetWidth(), 15 * Math::Min(Length(), Math::Max(5, Math::Min(15, Length() / 3))) + 4);
-		Point	 listBoxPos	= Point(GetRealPosition() + Point(0, GetHeight()));
+ 		Surface	*surface	= GetDrawSurface();
 
-		if (window->GetY() + listBoxPos.y + listBoxSize.cy >= monitor.GetHeight()) listBoxPos = Point(GetRealPosition() - Point(0, listBoxSize.cy));
+		Rect	 monitor	= System::MultiMonitor::GetActiveMonitorMetrics();
+		Size	 listBoxSize	= Size(GetWidth(), 16 * Math::Min(Length(), Math::Max(5, Math::Min(16, Length() / 3))) + 4);
+		Point	 listBoxPos	= Point(GetRealPosition() + Point(0, GetRealSize().cy));
+
+		if (window->GetY() + listBoxPos.y + listBoxSize.cy >= monitor.GetHeight()) listBoxPos = Point(GetRealPosition() - Point(0, Math::Round(listBoxSize.cy * surface->GetSurfaceDPI() / 96.0)));
 
 		listBox		= new ListBox(Point(), listBoxSize);
 		listBox->onSelectEntry.Connect(&onSelectEntry);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -66,6 +66,7 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 	maximized	= False;
 
 	frameSize	= Size(GetSystemMetrics(SM_CXFRAME), GetSystemMetrics(SM_CYFRAME));
+	fontSize	= Surface().GetSurfaceDPI() / 96.0;
 
 	if (Setup::enableUnicode) sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 	else			  sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
@@ -232,7 +233,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			{
 				Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
 
-				SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.right - workArea.left + (2 * frameSize.cx - 4), workArea.bottom - workArea.top + (2 * frameSize.cy - 4)));
+				SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.GetWidth() + (2 * frameSize.cx - 4), workArea.GetHeight() + (2 * frameSize.cy - 4)) / fontSize);
 			}
 
 			return Break;
@@ -249,7 +250,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				if (windowStyle & WS_DLGFRAME)
 				{
-					POINT	 maxSize     = { windowRect.right - windowRect.left, windowRect.bottom - windowRect.top };
+					POINT	 maxSize     = { (windowRect.right  - windowRect.left) * fontSize,
+								 (windowRect.bottom - windowRect.top)  * fontSize };
 					POINT	 maxPosition = { windowRect.left, windowRect.top };
 
 					minMaxInfo->ptMaxSize	  = maxSize;
@@ -257,11 +259,11 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 				}
 				else
 				{
-					minMaxInfo->ptMinTrackSize.x = minSize.cx;
-					minMaxInfo->ptMinTrackSize.y = minSize.cy;
+					minMaxInfo->ptMinTrackSize.x = minSize.cx * fontSize;
+					minMaxInfo->ptMinTrackSize.y = minSize.cy * fontSize;
 
-					if (maxSize.cx > 0) minMaxInfo->ptMaxTrackSize.x = maxSize.cx;
-					if (maxSize.cy > 0) minMaxInfo->ptMaxTrackSize.y = maxSize.cy;
+					if (maxSize.cx > 0) minMaxInfo->ptMaxTrackSize.x = maxSize.cx * fontSize;
+					if (maxSize.cy > 0) minMaxInfo->ptMaxTrackSize.y = maxSize.cy * fontSize;
 				}
 			}
 
@@ -370,7 +372,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 				if (::GetUpdateRect(hwnd, &uRect, 0))
 				{
 					updateRect = Rect(Point(uRect.left, uRect.top), Size(uRect.right - uRect.left, uRect.bottom - uRect.top));
-					updateRect = updateRect + frameSize;
+					updateRect = updateRect + frameSize - sizeModifier;
 
 					PAINTSTRUCT	 ps;
 
@@ -392,8 +394,10 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				if (!(windowPos->flags & SWP_NOMOVE) && !(windowPos->flags & SWP_NOSIZE))
 				{
-					onEvent.Call(SM_WINDOWMETRICS, ((windowPos->x  + 32768) << 16) | (windowPos->y  + 32768),
-								       ((windowPos->cx + 32768) << 16) | (windowPos->cy + 32768));
+					if (drawSurface != NIL) drawSurface->SetSize(Size(windowPos->cx, windowPos->cy));
+
+					onEvent.Call(SM_WINDOWMETRICS, ((	     windowPos->x	       + 32768) << 16) | (	      windowPos->y		+ 32768),
+								       ((Math::Floor(windowPos->cx / fontSize) + 32768) << 16) | (Math::Floor(windowPos->cy / fontSize) + 32768));
 				}
 				else if (!(windowPos->flags & SWP_NOMOVE && windowPos->flags & SWP_NOSIZE))
 				{
@@ -401,10 +405,18 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 					GetWindowRect(hwnd, &windowRect);
 
-					if	(windowPos->flags & SWP_NOMOVE) onEvent.Call(SM_WINDOWMETRICS, ((windowRect.left		    + 32768) << 16) | (windowRect.top			  + 32768),
-													       ((windowPos->cx			    + 32768) << 16) | (windowPos->cy			  + 32768));
-					else if (windowPos->flags & SWP_NOSIZE) onEvent.Call(SM_WINDOWMETRICS, ((windowPos->x			    + 32768) << 16) | (windowPos->y			  + 32768),
-													       ((windowRect.right - windowRect.left + 32768) << 16) | (windowRect.bottom - windowRect.top + 32768));
+					if (windowPos->flags & SWP_NOMOVE)
+					{
+						if (drawSurface != NIL) drawSurface->SetSize(Size(windowPos->cx, windowPos->cy));
+
+						onEvent.Call(SM_WINDOWMETRICS, ((	      windowRect.left				      + 32768) << 16) | (	      windowRect.top				      + 32768),
+									       ((Math::Floor( windowPos->cx			  / fontSize) + 32768) << 16) | (Math::Floor( windowPos->cy			  / fontSize) + 32768));
+					}
+					else if (windowPos->flags & SWP_NOSIZE)
+					{
+						onEvent.Call(SM_WINDOWMETRICS, ((	      windowPos->x				      + 32768) << 16) | (	      windowPos->y				      + 32768),
+									       ((Math::Floor((windowRect.right - windowRect.left) / fontSize) + 32768) << 16) | (Math::Floor((windowRect.bottom - windowRect.top) / fontSize) + 32768));
+					}
 				}
 			}
 
@@ -434,7 +446,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 	 *	  Define a smooth message for every Windows message we need and
 	 *	  replace the next line with return Success();.
 	 */
-	return onEvent.Call(message, wParam, lParam);;
+	return onEvent.Call(message, wParam, lParam);
 }
 
 S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size &size, Int iFlags)
@@ -488,7 +500,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		RegisterClassExW(wndclassw);
 
-		hwnd = CreateWindowExW(extStyle, className, title, style, pos.x, pos.y, size.cx, size.cy, NIL, NIL, hDllInstance, NIL);
+		hwnd = CreateWindowExW(extStyle, className, title, style, pos.x, pos.y, Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy, NIL, NIL, hDllInstance, NIL);
 	}
 	else
 	{
@@ -529,7 +541,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		RegisterClassExA(wndclassa);
 
-		hwnd = CreateWindowExA(extStyle, className, title, style, pos.x, pos.y, size.cx, size.cy, NIL, NIL, hDllInstance, NIL);
+		hwnd = CreateWindowExA(extStyle, className, title, style, pos.x, pos.y, Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy, NIL, NIL, hDllInstance, NIL);
 	}
 
 	if (hwnd != NIL)
@@ -539,10 +551,10 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 		 */
 		ProcessSystemMessages(WM_CREATE, 0, 0);
 
-		if ((flags & WF_THINBORDER) || (flags & WF_NORESIZE)) drawSurface = new Surface(hwnd, size);
+		if ((flags & WF_THINBORDER) || (flags & WF_NORESIZE)) drawSurface = new Surface(hwnd, size * fontSize + sizeModifier);
 		else						      drawSurface = new Surface(hwnd);
 
-		drawSurface->SetSize(size);
+		drawSurface->SetSize(size * fontSize + sizeModifier);
 
 		/* Disable leader window if we are modal.
 		 */
@@ -584,9 +596,9 @@ S::Int S::GUI::WindowGDI::Close()
 
 	/* Delete surface.
 	 */
-	if (drawSurface != nullSurface) delete drawSurface;
+	if (drawSurface != NIL) delete drawSurface;
 
-	drawSurface = nullSurface;
+	drawSurface = NIL;
 
 	/* Destroy window and unregister class.
 	 */
@@ -642,6 +654,8 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::FindLeaderWindow()
 
 S::Int S::GUI::WindowGDI::SetTitle(const String &nTitle)
 {
+	if (hwnd == NIL) return Error();
+
 	if (Setup::enableUnicode) SetWindowTextW(hwnd, nTitle);
 	else			  SetWindowTextA(hwnd, nTitle);
 
@@ -698,26 +712,30 @@ S::Int S::GUI::WindowGDI::SetIconDirect(Void *newIcon)
 
 S::Int S::GUI::WindowGDI::SetMinimumSize(const Size &nMinSize)
 {
-	minSize = nMinSize;
+	minSize = nMinSize + sizeModifier;
 
 	RECT	 windowRect;
 
 	GetWindowRect(hwnd, &windowRect);
 
-	SetMetrics(Point(windowRect.left, windowRect.top), Size(Math::Max(windowRect.right - windowRect.left, minSize.cx), Math::Max(windowRect.bottom - windowRect.top, minSize.cy)));
+	SetMetrics(Point(windowRect.left, windowRect.top),
+		   Size(Math::Max((Int) Math::Round((windowRect.right  - windowRect.left) / fontSize), minSize.cx),
+			Math::Max((Int) Math::Round((windowRect.bottom - windowRect.top)  / fontSize), minSize.cy)) - sizeModifier);
 
 	return Success();
 }
 
 S::Int S::GUI::WindowGDI::SetMaximumSize(const Size &nMaxSize)
 {
-	maxSize = nMaxSize;
+	maxSize = nMaxSize + sizeModifier;
 
 	RECT	 windowRect;
 
 	GetWindowRect(hwnd, &windowRect);
 
-	SetMetrics(Point(windowRect.left, windowRect.top), Size(Math::Min(windowRect.right - windowRect.left, maxSize.cx), Math::Min(windowRect.bottom - windowRect.top, maxSize.cy)));
+	SetMetrics(Point(windowRect.left, windowRect.top),
+		   Size(Math::Min((Int) Math::Round((windowRect.right  - windowRect.left) / fontSize), maxSize.cx),
+			Math::Min((Int) Math::Round((windowRect.bottom - windowRect.top)  / fontSize), maxSize.cy)) - sizeModifier);
 
 	return Success();
 }
@@ -743,9 +761,7 @@ S::GUI::Rect S::GUI::WindowGDI::GetRestoredWindowRect() const
 
 S::Int S::GUI::WindowGDI::SetMetrics(const Point &nPos, const Size &nSize)
 {
-	SetWindowPos(hwnd, 0, nPos.x, nPos.y, nSize.cx, nSize.cy, SWP_NOZORDER);
-
-	drawSurface->SetSize(nSize);
+	SetWindowPos(hwnd, 0, nPos.x, nPos.y, Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy, SWP_NOZORDER);
 
 	return Success();
 }
@@ -766,10 +782,10 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 		GetWindowRect(hwnd, &rect);
 
-		nonMaxRect = Rect(Point(rect.left, rect.top), Size(rect.right - rect.left, rect.bottom - rect.top));
+		nonMaxRect = Rect(Point(rect.left, rect.top), Size(rect.right - rect.left, rect.bottom - rect.top) / fontSize);
 	}
 
-	SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.right - workArea.left + (2 * frameSize.cx - 4), workArea.bottom - workArea.top + (2 * frameSize.cy - 4)));
+	SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.GetWidth() + (2 * frameSize.cx - 4), workArea.GetHeight() + (2 * frameSize.cy - 4)) / fontSize);
 
 	if (Setup::enableUnicode) nonMaxWndStyle = GetWindowLongW(hwnd, GWL_STYLE);
 	else			  nonMaxWndStyle = GetWindowLongA(hwnd, GWL_STYLE);
@@ -786,7 +802,7 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 S::Int S::GUI::WindowGDI::Restore()
 {
-	SetMetrics(Point(nonMaxRect.left, nonMaxRect.top), Size((Int) Math::Max(minSize.cx, nonMaxRect.right - nonMaxRect.left), (Int) Math::Max(minSize.cy, nonMaxRect.bottom - nonMaxRect.top)));
+	SetMetrics(Point(nonMaxRect.left, nonMaxRect.top), Size((Int) Math::Max(minSize.cx, nonMaxRect.GetWidth()), (Int) Math::Max(minSize.cy, nonMaxRect.GetHeight())));
 
 	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);
 	else			  SetWindowLongA(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);

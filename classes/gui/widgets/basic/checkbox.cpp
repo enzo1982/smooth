@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -61,60 +61,57 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	if (!IsVisible())	return Success();
 
 	Surface	*surface = GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition() + Point(3, 3), Size(11, 11));
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Rect	 textRect;
-
-				textRect.left	= frame.right + 3;
-				textRect.top	= frame.top - 1;
-				textRect.right	= textRect.left + GetWidth();
-				textRect.bottom	= textRect.top + 20;
-
 				Font	 nFont = font;
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->Box(Rect(GetRealPosition(), GetSize()), GetBackgroundColor(), Rect::Filled);
-				surface->SetText(text, textRect, nFont);
+				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
+				surface->SetText(text, frame + Point(frame.GetHeight(), 2), nFont);
 			}
 
 			/* Fall through to SP_UPDATE here.
 			 */
 
 		case SP_UPDATE:
-			if (IsActive())	surface->Box(frame, Setup::ClientColor, Rect::Filled);
-			else		surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
-
-			surface->Frame(frame, FRAME_DOWN);
-
-			if (*variable == True)
 			{
-				Point p1 = Point(frame.left + 3 - (IsRightToLeft() ? 1 : 0), frame.top + 3);
-				Point p2 = Point(frame.left + 10 - (IsRightToLeft() ? 1 : 0), frame.bottom - 1);
+				Rect	 valueFrame = Rect(GetRealPosition() + Point(3, 3) * surface->GetSurfaceDPI() / 96.0, Size(frame.GetHeight(), frame.GetHeight()) - (Size(3, 3) * surface->GetSurfaceDPI() / 96.0) * 2);
 
-				for (Int i = 0; i < 2; i++)
+				if (IsActive())	surface->Box(valueFrame, Setup::ClientColor, Rect::Filled);
+				else		surface->Box(valueFrame, Setup::BackgroundColor, Rect::Filled);
+
+				surface->Frame(valueFrame, FRAME_DOWN);
+
+				if (*variable == True)
 				{
-					Int	 color = IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
+					Point p1 = Point(valueFrame.left + 3 - (IsRightToLeft() ? 1 : 0), valueFrame.top + 3);
+					Point p2 = Point(valueFrame.right - 1 - (IsRightToLeft() ? 1 : 0), valueFrame.bottom - 1);
 
-					if (i == 1)
+					for (Int i = 0; i < 2; i++)
 					{
-						color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
+						Int	 color = IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
 
-						p1 -= Point((IsRightToLeft() ? -i : i), i);
-						p2 -= Point((IsRightToLeft() ? -i : i), i);
+						if (i == 1)
+						{
+							color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
+
+							p1 -= Point((IsRightToLeft() ? -i : i), i);
+							p2 -= Point((IsRightToLeft() ? -i : i), i);
+						}
+
+						surface->Line(p1 + Point(0, 0),				p2 - Point(0, 0),			  color);
+						surface->Line(p1 + Point(1, 0),				p2 - Point(0, 1),			  color);
+						surface->Line(p1 + Point(0, 1),				p2 - Point(1, 0),			  color);
+						surface->Line(p1 + Point(valueFrame.GetWidth() - 5, 0), p2 - Point(valueFrame.GetWidth() - 3, 0), color);
+						surface->Line(p1 + Point(valueFrame.GetWidth() - 5, 1), p2 - Point(valueFrame.GetWidth() - 4, 0), color);
+						surface->Line(p1 + Point(valueFrame.GetWidth() - 6, 0), p2 - Point(valueFrame.GetWidth() - 3, 1), color);
 					}
-
-					surface->Line(p1 + Point(0, 0), p2 + Point(0, 0), color);
-					surface->Line(p1 + Point(1, 0), p2 + Point(0, -1), color);
-					surface->Line(p1 + Point(0, 1), p2 + Point(-1, 0), color);
-					surface->Line(p1 + Point(6, 0), p2 + Point(-8, 0), color);
-					surface->Line(p1 + Point(6, 1), p2 + Point(-7, 0), color);
-					surface->Line(p1 + Point(5, 0), p2 + Point(-8, -1), color);
 				}
 			}
 

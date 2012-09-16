@@ -36,9 +36,10 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
-				surface->Box(Rect(GetRealPosition(), GetSize()), Setup::BackgroundColor, Rect::Filled);
-				surface->SetText(text, Rect(GetRealPosition() + Point(4, 1), GetSize() - Size(8, 2)), font);
+				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
+				surface->SetText(text, frame + Point(4, 1) - Size(8, 2), font);
 			}
 
 			break;

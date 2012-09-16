@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -256,10 +256,13 @@ Void Test::OnArrowsValueChange(Int value)
 	surface->Box(Rect(Point(250, 150), Size(10, 10)), Color(255, 0, 0), Rect::Filled);
 	surface->Box(Rect(Point(250, 170), Size(10, 10)), Color(255, 0, 0), Rect::Dotted);
 	surface->Box(Rect(Point(250, 190), Size(10, 10)), Color(255, 0, 0), Rect::Outlined);
+
 	surface->Gradient(Rect(Point(300, 150), Size(100, 10)), Color(255, 0, 0), Color(0, 0, 255), OR_HORZ);
+
 	surface->Line(Point(300, 170), Point(400, 170), Color(255, 0, 0));
 	surface->Line(Point(300, 190), Point(300, 200), Color(255, 0, 0));
 	surface->Line(Point(310, 190), Point(320, 200), Color(255, 0, 0));
+
 	surface->SetPixel(Point(350, 190), Color(255, 0, 0));
 }
 
@@ -270,5 +273,5 @@ Void Test::OnScrollbarValueChange(Int value)
 
 Void Test::OnWidgetAction()
 {
-	QuickMessage("Some widget action occurred!", "Info", MB_OK, IDI_INFORMATION);
+	QuickMessage("Some widget action occurred!", "Info", Message::Buttons::Ok, Message::Icon::Information);
 }

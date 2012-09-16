@@ -36,7 +36,7 @@ Int smooth::Main()
 	// Convert the result to an ASCII string and print it.
 	v8::String::AsciiValue ascii(result);
 
-	QuickMessage((char *) *ascii, "V8 Engine Test", MB_OK, IDI_INFORMATION);
+	QuickMessage((char *) *ascii, "V8 Engine Test", Message::Buttons::Ok, Message::Icon::Information);
 
 	return 0;
 }

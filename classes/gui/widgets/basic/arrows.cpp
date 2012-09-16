@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -84,7 +84,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	if (!IsVisible())	return Success();
 
 	Surface	*surface	= GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
+	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
 	Int	 arrowColor	= Setup::TextColor;
 
 	if (!IsActive()) arrowColor = Setup::GrayTextColor;
@@ -103,18 +103,21 @@ S::Int S::GUI::Arrows::Paint(Int message)
 				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 				surface->Line(lineStart + Point(1, 0), lineEnd + Point(1, 0), Setup::DividerLightColor);
 
-				for (Int i = 0; i < 4; i++)
+				Int	 size		= Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
+				Point	 offset		= Point(size % 2 ? 1 : 0, frame.GetHeight() % 2 ? 0 : 1);
+
+				for (Int i = 0; i < size; i++)
 				{
-					lineStart	= Point((frame.left + GetWidth() / 4) - 2 + i, frame.top + GetHeight() / 2 - i);
+					lineStart	= Point((frame.left + frame.GetWidth() / 4) - size / 2 + i - offset.x, frame.top + frame.GetHeight() / 2 - i - offset.y);
 					lineEnd		= lineStart + Point(0, 2 * i + 1);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
 
-				for (Int j = 0; j < 4; j++)
+				for (Int j = 0; j < size; j++)
 				{
-					lineStart	= Point((frame.right - GetWidth() / 4) - 2 + j, frame.top + GetHeight() / 2 - 3 + j);
-					lineEnd		= lineStart + Point(0, 7 - 2 * j);
+					lineStart	= Point((frame.right - frame.GetWidth() / 4) - (size + 1) / 2 + j, frame.top + frame.GetHeight() / 2 - size + 1 + j - offset.y);
+					lineEnd		= lineStart + Point(0, 2 * (size - j) - 1);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
@@ -127,18 +130,20 @@ S::Int S::GUI::Arrows::Paint(Int message)
 				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 				surface->Line(lineStart + Point(0, 1), lineEnd + Point(0, 1), Setup::DividerLightColor);
 
-				for (Int i = 0; i < 4; i++)
+				Int	 size		= Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
+
+				for (Int i = 0; i < size; i++)
 				{
-					lineStart	= Point(frame.left + GetWidth() / 2 + (IsRightToLeft() ? 1 : 0) - i, (frame.top + GetHeight() / 4) - 2 + i);
+					lineStart	= Point(frame.left + frame.GetWidth() / 2 + (IsRightToLeft() ? 1 : 0) - i, (frame.top + frame.GetHeight() / 4) - size / 2 + i);
 					lineEnd		= lineStart + Point(2 * i + 1, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
 
-				for (Int j = 0; j < 4; j++)
+				for (Int j = 0; j < size; j++)
 				{
-					lineStart	= Point(frame.left + GetWidth() / 2 - 3 + (IsRightToLeft() ? 1 : 0) + j, (frame.bottom - GetHeight() / 4) - 2 + j);
-					lineEnd		= lineStart + Point(7 - 2 * j, 0);
+					lineStart	= Point(frame.left + frame.GetWidth() / 2 + (IsRightToLeft() ? 1 : 0) - size + 1 + j, (frame.bottom - frame.GetHeight() / 4) - (size + 1) / 2 + j);
+					lineEnd		= lineStart + Point(2 * (size - j) - 1, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}

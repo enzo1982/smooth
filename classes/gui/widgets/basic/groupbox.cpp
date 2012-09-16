@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,8 +33,8 @@ S::GUI::GroupBox::~GroupBox()
 
 S::Int S::GUI::GroupBox::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	switch (message)
 	{
@@ -42,12 +42,12 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 				surface->Frame(frame, FRAME_DOWN);
 				surface->Frame(frame + Point(1, 1) - Size(2, 2), FRAME_UP);
 
-				Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
+				Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
 
 				surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
@@ -55,7 +55,7 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
-				surface->SetText(text, textRect + Point(1, 0), nFont);
+				surface->SetText(text, textRect + Point(1, 0) * surface->GetSurfaceDPI() / 96.0, nFont);
 			}
 
 			break;
@@ -72,11 +72,11 @@ S::Int S::GUI::GroupBox::Activate()
 	if (!IsVisible())	return Success();
 
 	Surface	*surface	= GetDrawSurface();
-	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
+	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
 
 	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
-	surface->SetText(text, textRect + Point(1, 0), font);
+	surface->SetText(text, textRect + Point(1, 0) * surface->GetSurfaceDPI() / 96.0, font);
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -96,7 +96,7 @@ S::Int S::GUI::GroupBox::Deactivate()
 	if (!IsVisible())	return Success();
 
 	Surface	*surface	= GetDrawSurface();
-	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6), Size(textSize.cx + 3, Math::Round(textSize.cy * 1.2)));
+	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
 
 	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
@@ -104,7 +104,7 @@ S::Int S::GUI::GroupBox::Deactivate()
 
 	nFont.SetColor(Setup::GrayTextColor);
 
-	surface->SetText(text, textRect + Point(1, 0), nFont);
+	surface->SetText(text, textRect + Point(1, 0) * surface->GetSurfaceDPI() / 96.0, nFont);
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -131,7 +131,7 @@ S::Int S::GUI::GroupBox::Hide()
 	{
 		Surface	*surface = GetDrawSurface();
 
-		surface->Box(Rect(GetRealPosition() - Point(0, 6), GetSize() + Size(0, 6)), Setup::BackgroundColor, Rect::Filled);
+		surface->Box(Rect(GetRealPosition() - Point(0, 6) * surface->GetSurfaceDPI() / 96.0, GetRealSize() + Size(0, 6) * surface->GetSurfaceDPI() / 96.0), Setup::BackgroundColor, Rect::Filled);
 	}
 
 	return Layer::Hide();

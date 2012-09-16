@@ -65,6 +65,7 @@ namespace smooth
 				Int					 nonMaxWndStyle;
 
 				Size					 frameSize;
+				Float					 fontSize;
 
 				Size					 minSize;
 				Size					 maxSize;

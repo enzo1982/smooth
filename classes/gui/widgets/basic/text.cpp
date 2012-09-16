@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,8 +9,8 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/widgets/basic/text.h>
-#include <smooth/misc/math.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/misc/math.h>
 
 const S::Short	 S::GUI::Text::classID = S::Object::RequestClassID();
 
@@ -31,22 +31,23 @@ S::Int S::GUI::Text::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	SetSize(textSize + Size(0, 1));
+	Surface	*surface = GetDrawSurface();
+
+	SetSize(scaledTextSize * 96.0 / surface->GetSurfaceDPI() + Size(0, 1));
 
 	switch (message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Font	 nFont		= font;
+				Font	 nFont = font;
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
-				Rect	 rect		= Rect(GetRealPosition(), GetSize());
-				Surface	*surface	= GetDrawSurface();
+				Rect	 rect  = Rect(GetRealPosition(), GetRealSize());
 
 				surface->Box(rect, GetBackgroundColor(), Rect::Filled);
-				surface->SetText(text, Rect::OverlapRect(Rect(GetRealPosition(), Size(textSize.cx, Math::Round(textSize.cy * 1.2))), GetVisibleArea()), nFont);
+				surface->SetText(text, Rect::OverlapRect(Rect(GetRealPosition(), Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2))), GetVisibleArea()), nFont);
 			}
 
 			break;

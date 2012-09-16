@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,15 +45,13 @@ S::GUI::WindowBackend::WindowBackend(Void *iWindow)
 
 	type = WINDOW_NONE;
 
-	nullSurface = new Surface();
-	drawSurface = nullSurface;
+	drawSurface = NIL;
 
 	doClose.Connect(True);
 }
 
 S::GUI::WindowBackend::~WindowBackend()
 {
-	delete nullSurface;
 }
 
 S::Short S::GUI::WindowBackend::GetWindowType() const
@@ -68,7 +66,8 @@ S::Void *S::GUI::WindowBackend::GetSystemWindow() const
 
 S::GUI::Surface *S::GUI::WindowBackend::GetDrawSurface() const
 {
-	return drawSurface;
+	if (drawSurface != NIL) return drawSurface;
+	else			return Surface::GetNullSurface();
 }
 
 S::Int S::GUI::WindowBackend::Open(const String &title, const Point &pos, const Size &size, Int flags)

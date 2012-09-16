@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,7 @@
 
 #include <smooth/basic/object.h>
 #include <smooth/system/timer.h>
+#include <smooth/init.h>
 
 const S::Short	 S::Object::classID		= S::Object::RequestClassID();
 
@@ -130,7 +131,8 @@ S::Short S::Object::RequestClassID()
 
 S::Int S::Object::RequestObjectHandle()
 {
-	return Threads::Access::Increment(nextObjectHandle) - 1;
+	if (initializing) return			    nextObjectHandle++;
+	else		  return Threads::Access::Increment(nextObjectHandle) - 1;
 }
 
 S::Int S::Object::DeleteObject(Object *object)
@@ -155,8 +157,8 @@ S::Int S::Object::DeleteObject(Object *object)
 		else
 		{
 			/* Remove object from object list and add
-			* it to the list of objects to delete.
-			*/
+			 * it to the list of objects to delete.
+			 */
 			objects.Remove(object->handle);
 			deleteable.Add(object, object->handle);
 		}

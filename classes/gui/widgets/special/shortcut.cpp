@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,14 +34,12 @@ S::GUI::Shortcut::~Shortcut()
 
 S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsActive())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsActive())     return Success();
 
-	if (ref != NIL && !ref->IsActive())	return Success();
+	if (ref != NIL && !ref->IsActive()) return Success();
 
 	Int	 retVal = Success();
-
-	EnterProtectedRegion();
 
 	switch (message)
 	{
@@ -52,7 +50,11 @@ S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 				    (((flags & SC_CTRL)  && Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl)) || (!(flags & SC_CTRL)  && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))) &&
 				    (((flags & SC_SHIFT) && Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))   || (!(flags & SC_SHIFT) && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))))
 				{
+					EnterProtectedRegion();
+
 					onKeyDown.Emit(param);
+
+					LeaveProtectedRegion();
 
 					retVal = Break;
 				}
@@ -60,8 +62,6 @@ S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 
 			break;
 	}
-
-	LeaveProtectedRegion();
 
 	return retVal;
 }

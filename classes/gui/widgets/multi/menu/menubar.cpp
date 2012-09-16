@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,7 @@
 #include <smooth/gui/widgets/multi/menu/menubarentry.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/misc/math.h>
 
 const S::Short	 S::GUI::Menubar::classID = S::Object::RequestClassID();
 
@@ -47,7 +48,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 	Window	*window	 = GetContainerWindow();
 	Surface	*surface = GetDrawSurface();
-	Rect	 menubar = Rect(GetRealPosition(), GetSize() - Size(1, 1));
+	Rect	 menubar = Rect(GetRealPosition(), GetRealSize() - Size(1, 1));
 
 	if (orientation == OR_TOP || orientation == OR_BOTTOM)
 	{
@@ -156,8 +157,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 				if (window->GetIcon() != NIL && orientation == OR_TOP)
 				{
-					p1.x += 17;
-					p2.x += 17;
+					p1.x += Math::Round(18 * surface->GetSurfaceDPI() / 96.0) - 1;
+					p2.x += Math::Round(18 * surface->GetSurfaceDPI() / 96.0) - 1;
 				}
 
 				surface->Bar(p1, p2, OR_VERT);

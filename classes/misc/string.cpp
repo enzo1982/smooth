@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,7 @@
 #include <smooth/misc/number.h>
 #include <smooth/misc/encoding/base64.h>
 #include <smooth/misc/hash/crc32.h>
+#include <smooth/threads/mutex.h>
 #include <smooth/templates/buffer.h>
 #include <smooth/init.h>
 
@@ -32,9 +33,11 @@ namespace smooth
 	Int				 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
-S::Threads::Mutex		 S::String::explodeMutex;
+S::Array<S::Array<S::String> *, void *>	 S::String::explodeBuffers;
+S::Threads::Mutex			*S::String::explodeBuffersMutex	  = NIL;
 
-S::Array<char *, void *>	 S::String::allocatedBuffers;
+S::Array<char *, void *>		 S::String::allocatedBuffers;
+S::Threads::Mutex			*S::String::allocatedBuffersMutex = NIL;
 
 S::Int	 addStringInitTmp = S::AddInitFunction(&S::String::Initialize);
 S::Int	 addStringFreeTmp = S::AddFreeFunction(&S::String::Free);
@@ -65,9 +68,10 @@ S::String::~String()
 
 S::Int S::String::Initialize()
 {
-	/* Enable locking on string buffers.
+	/* Create static mutexecs.
 	 */
-	allocatedBuffers.EnableLocking();
+	explodeBuffersMutex   = new Threads::Mutex();
+	allocatedBuffersMutex = new Threads::Mutex();
 
 	return Success();
 }
@@ -77,6 +81,14 @@ S::Int S::String::Free()
 	/* Delete all temporarily allocated string buffers.
 	 */
 	DeleteTemporaryBuffers(True);
+
+	/* Free static mutexecs.
+	 */
+	delete explodeBuffersMutex;
+	delete allocatedBuffersMutex;
+
+	explodeBuffersMutex   = NIL;
+	allocatedBuffersMutex = NIL;
 
 	return Success();
 }
@@ -105,6 +117,8 @@ const char *S::String::GetDefaultEncoding()
 
 S::Void S::String::DeleteTemporaryBuffers(Bool all)
 {
+	if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
+
 	Int	 nOfEntries = allocatedBuffers.Length();
 
 	for (Int i = 0; i < nOfEntries - (all ? 0 : 32); i++)
@@ -122,15 +136,13 @@ S::Void S::String::DeleteTemporaryBuffers(Bool all)
 		inputFormat  = NIL;
 		outputFormat = NIL;
 	}
+
+	if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
 }
 
 S::Void S::String::Clean()
 {
-	mutex.Lock();
-
 	wString.Resize(0);
-
-	mutex.Release();
 }
 
 S::Int S::String::ComputeCRC32() const
@@ -209,9 +221,13 @@ char *S::String::SetInputFormat(const char *iFormat)
 
 	if (previousInputFormat != NIL)
 	{
+		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
+
 		if (allocatedBuffers.Length() >= 64) DeleteTemporaryBuffers();
 
 		allocatedBuffers.Add(previousInputFormat);
+
+		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
 	}
 
 	return previousInputFormat;
@@ -235,9 +251,13 @@ char *S::String::SetOutputFormat(const char *oFormat)
 
 	if (previousOutputFormat != NIL)
 	{
+		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
+
 		if (allocatedBuffers.Length() >= 64) DeleteTemporaryBuffers();
 
 		allocatedBuffers.Add(previousOutputFormat);
+
+		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
 	}
 
 	return previousOutputFormat;
@@ -292,15 +312,11 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	size = size / sizeof(wchar_t) + 1;
 
-	mutex.Lock();
-
 	wString.Resize(size);
 
 	ConvertString(str, len, format, (char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat());
 
 	wString[size - 1] = 0;
-
-	mutex.Release();
 
 	return Success();
 }
@@ -313,7 +329,7 @@ char *S::String::ConvertTo(const char *encoding) const
 
 	Int	 bufferSize = ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), NIL, 0, encoding);
 
-	if (bufferSize == -1)	bufferSize = ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), NIL, 0, "ISO-8859-1");
+	if (bufferSize == -1) bufferSize = ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), NIL, 0, "ISO-8859-1");
 
 	char	*buffer = NIL;
 
@@ -334,9 +350,13 @@ char *S::String::ConvertTo(const char *encoding) const
 		ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), buffer, bufferSize + 1, encoding);
 	}
 
+	if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
+
 	if (allocatedBuffers.Length() >= 64) DeleteTemporaryBuffers();
 
 	allocatedBuffers.Add(buffer);
+
+	if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
 
 	return buffer;
 }
@@ -345,8 +365,6 @@ wchar_t &S::String::operator [](int n)
 {
 	if (n + 1 >= wString.Size())
 	{
-		mutex.Lock();
-
 		Int	 length = Length();
 
 		/* Allocate more memory than actually
@@ -355,8 +373,6 @@ wchar_t &S::String::operator [](int n)
 		wString.Resize(n + 100);
 
 		wmemset(wString + length, 0, wString.Size() - length);
-
-		mutex.Release();
 	}
 
 	return wString[n];
@@ -414,13 +430,9 @@ S::String &S::String::operator =(const wchar_t *newString)
 	{
 		Int	 size = wcslen(newString) + 1;
 
-		mutex.Lock();
-
 		wString.Resize(size);
 
 		wcsncpy(wString, newString, size);
-
-		mutex.Release();
 	}
 
 	return *this;
@@ -438,13 +450,9 @@ S::String &S::String::operator =(const String &newString)
 	{
 		Int	 size = newString.wString.Size();
 
-		mutex.Lock();
-
 		wString.Resize(size);
 
 		wcsncpy(wString, newString.wString, size);
-
-		mutex.Release();
 	}
 
 	return *this;
@@ -534,11 +542,7 @@ S::Int S::String::Length() const
 {
 	if (wString.Size() == 0) return 0;
 
-	mutex.Lock();
-
 	Int	 size = wcslen(wString);
-
-	mutex.Release();
 
 	return size;
 }
@@ -562,15 +566,11 @@ S::String &S::String::Append(const String &str)
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
-	mutex.Lock();
-
 	wString.Resize(len1 + len2 + 1);
 
 	wcsncpy(wString + len1, str.wString, len2);
 
 	wString[len1 + len2] = 0;
-
-	mutex.Release();
 
 	return *this;
 }
@@ -594,19 +594,10 @@ S::Int S::String::Find(const String &str) const
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
-	mutex.Lock();
-
 	for (Int i = 0; i <= len1 - len2; i++)
 	{
-		if (wcsncmp(wString + i, str.wString, len2) == 0)
-		{
-			mutex.Release();
-
-			return i;
-		}
+		if (wcsncmp(wString + i, str.wString, len2) == 0) return i;
 	}
-
-	mutex.Release();
 
 	return -1;
 }
@@ -630,19 +621,10 @@ S::Int S::String::FindLast(const String &str) const
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
-	mutex.Lock();
-
 	for (Int i = len1 - len2; i >= 0; i--)
 	{
-		if (wcsncmp(wString + i, str.wString, len2) == 0)
-		{
-			mutex.Release();
-
-			return i;
-		}
+		if (wcsncmp(wString + i, str.wString, len2) == 0) return i;
 	}
-
-	mutex.Release();
 
 	return -1;
 }
@@ -685,8 +667,6 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 	Int	 len2 = str1.Length();
 	Int	 len3 = str2.Length();
 
-	mutex.Lock();
-
 	for (Int i = 0; i <= len1 - len2; i++)
 	{
 		if (wcsncmp(wString + i, str1.wString, len2) == 0)
@@ -705,8 +685,6 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 			i += len3 - 1;
 		}
 	}
-
-	mutex.Release();
 
 	return *this;
 }
@@ -748,8 +726,6 @@ S::String &S::String::CopyN(const wchar_t *str, const Int n)
 
 S::String &S::String::CopyN(const String &str, const Int n)
 {
-	mutex.Lock();
-
 	Clean();
 
 	wString.Resize(n + 1);
@@ -757,8 +733,6 @@ S::String &S::String::CopyN(const String &str, const Int n)
 	wcsncpy(wString, str.wString, n);
 
 	wString[n] = 0;
-
-	mutex.Release();
 
 	return *this;
 }
@@ -802,23 +776,8 @@ S::Int S::String::Compare(const String &str) const
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
-	if (len1 != len2)
-	{
-		return len1 - len2;
-	}
-	else
-	{
-		mutex.Lock();
-
-		if (wcsncmp(wString, str.wString, len1) != 0)
-		{
-			mutex.Release();
-
-			return 1;
-		}
-
-		mutex.Release();
-	}
+	if	(len1 != len2)				   return len1 - len2;
+	else if (wcsncmp(wString, str.wString, len1) != 0) return 1;
 
 	return 0;
 }
@@ -841,16 +800,7 @@ S::Int S::String::CompareN(const String &str, Int n) const
 {
 	if (Length() < n) return 1;
 
-	mutex.Lock();
-
-	if (wcsncmp(wString, str.wString, n) != 0)
-	{
-		mutex.Release();
-
-		return 1;
-	}
-
-	mutex.Release();
+	if (wcsncmp(wString, str.wString, n) != 0) return 1;
 
 	return 0;
 }
@@ -876,16 +826,7 @@ S::Bool S::String::StartsWith(const String &str) const
 
 	if (len1 >= len2)
 	{
-		mutex.Lock();
-
-		if (wcsncmp(wString, str.wString, len2) != 0)
-		{
-			mutex.Release();
-
-			return False;
-		}
-
-		mutex.Release();
+		if (wcsncmp(wString, str.wString, len2) != 0) return False;
 
 		return True;
 	}
@@ -914,16 +855,7 @@ S::Bool S::String::EndsWith(const String &str) const
 
 	if (len1 >= len2)
 	{
-		mutex.Lock();
-
-		if (wcsncmp(wString + len1 - len2, str.wString, len2) != 0)
-		{
-			mutex.Release();
-
-			return False;
-		}
-
-		mutex.Release();
+		if (wcsncmp(wString + len1 - len2, str.wString, len2) != 0) return False;
 
 		return True;
 	}
@@ -989,28 +921,23 @@ S::String S::String::Trim() const
 
 S::String &S::String::Fill(const Int value)
 {
-	mutex.Lock();
-
 	wmemset(wString, value, Length());
-
-	mutex.Release();
 
 	return *this;
 }
 
 S::String &S::String::FillN(const Int value, const Int count)
 {
-	mutex.Lock();
-
 	Clean();
 
-	wString.Resize(count + 1);
+	if (count >= 0)
+	{
+		wString.Resize(count + 1);
 
-	wmemset(wString, value, count);
+		wmemset(wString, value, count);
 
-	wString[count] = 0;
-
-	mutex.Release();
+		wString[count] = 0;
+	}
 
 	return *this;
 }
@@ -1037,11 +964,11 @@ S::String S::String::FromFloat(Float value)
 
 const S::Array<S::String> &S::String::Explode(const String &delimiter) const
 {
-	static Array<String>	 array;
+	if (explodeBuffersMutex != NIL) explodeBuffersMutex->Lock();
 
-	explodeMutex.Lock();
+	Array<String>	*array = new Array<String>();
 
-	array.RemoveAll();
+	explodeBuffers.Add(array);
 
 	for (Int i = 0; i < Length(); )
 	{
@@ -1051,17 +978,21 @@ const S::Array<S::String> &S::String::Explode(const String &delimiter) const
 		if (index == -1) part = SubString(i, Length() - i);
 		else		 part = SubString(i, index);
 
-		array.Add(part);
+		array->Add(part);
 
 		i += part.Length() + delimiter.Length();
 	}
 
-	return array;
+	return *array;
 }
 
 S::Int S::String::ExplodeFinish()
 {
-	explodeMutex.Release();
+	delete explodeBuffers.GetLast();
+
+	explodeBuffers.RemoveNth(explodeBuffers.Length() - 1);
+
+	if (explodeBuffersMutex != NIL) explodeBuffersMutex->Release();
 
 	return Success();
 }

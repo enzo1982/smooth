@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,6 +22,8 @@ S::GUI::Layer::Layer(const String &name) : Widget(Point(0, 0), Size(32768, 32768
 
 	text		= name;
 	orientation	= OR_CENTER;
+
+	ComputeTextSize();
 }
 
 S::GUI::Layer::~Layer()
@@ -39,7 +41,7 @@ S::Int S::GUI::Layer::Show()
 	if (IsBackgroundColorSet() && IsVisible())
 	{
 		Surface	*surface	= GetDrawSurface();
-		Rect	 frame		= Rect(GetRealPosition(), GetSize());
+		Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
 
 		surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 	}
@@ -96,7 +98,7 @@ S::Int S::GUI::Layer::Hide()
 	if (IsBackgroundColorSet() && wasVisible)
 	{
 		Surface	*surface	= GetDrawSurface();
-		Rect	 frame		= Rect(GetRealPosition(), GetSize());
+		Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
 
 		surface->Box(frame, container->GetBackgroundColor(), Rect::Filled);
 	}
@@ -119,7 +121,7 @@ S::Int S::GUI::Layer::Paint(Int message)
 			{
 				Surface	*surface = GetDrawSurface();
 
-				surface->Box(Rect(GetRealPosition(), GetSize()), GetBackgroundColor(), Rect::Filled);
+				surface->Box(Rect(GetRealPosition(), GetRealSize()), GetBackgroundColor(), Rect::Filled);
 			}
 
 			break;

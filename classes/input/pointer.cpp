@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,8 +11,10 @@
 #include <smooth/input/pointer.h>
 #include <smooth/gui/window/window.h>
 
-#ifdef __WIN32__
+#if defined __WIN32__
 #	include <windows.h>
+#elif defined __HAIKU__
+#	include <Application.h>
 #else
 #	include <smooth/backends/xlib/backendxlib.h>
 
@@ -34,7 +36,7 @@ S::Input::Pointer::Pointer(const Pointer &)
 
 S::Bool S::Input::Pointer::SetCursor(const GUI::Window *window, CursorType mouseCursor)
 {
-#ifdef __WIN32__
+#if defined __WIN32__
 	static HCURSOR	 hCursorArrow	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 	static HCURSOR	 hCursorTextEdit = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32513), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 	static HCURSOR	 hCursorHand	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32649), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
@@ -51,6 +53,13 @@ S::Bool S::Input::Pointer::SetCursor(const GUI::Window *window, CursorType mouse
 	else if	(mouseCursor == CursorHand)	::SetCursor(hCursorHand);
 	else if	(mouseCursor == CursorHSize)	::SetCursor(hCursorHSize);
 	else if	(mouseCursor == CursorVSize)	::SetCursor(hCursorVSize);
+	else					return False;
+#elif defined __HAIKU__
+	if	(mouseCursor == CursorArrow)	be_app->SetCursor(B_CURSOR_SYSTEM_DEFAULT);
+	else if (mouseCursor == CursorTextEdit)	be_app->SetCursor(B_CURSOR_I_BEAM);
+	else if (mouseCursor == CursorHand)	be_app->SetCursor(B_CURSOR_SYSTEM_DEFAULT);
+	else if (mouseCursor == CursorHSize)	be_app->SetCursor(B_CURSOR_SYSTEM_DEFAULT);
+	else if (mouseCursor == CursorVSize)	be_app->SetCursor(B_CURSOR_SYSTEM_DEFAULT);
 	else					return False;
 #else
 	static Cursor	 hCursorTextEdit = XCreateFontCursor(Backends::BackendXLib::GetDisplay(), XC_xterm);

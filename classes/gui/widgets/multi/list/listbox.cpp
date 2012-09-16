@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,7 +37,7 @@ S::GUI::ListBox::ListBox(const Point &iPos, const Size &iSize)
 
 	scrollbar = new Scrollbar(Point(), Size(), OR_VERT, &scrollbarPos, 0, 1);
 	scrollbar->SetOrientation(OR_UPPERRIGHT);
-	scrollbar->SetStepSize(15);
+	scrollbar->SetStepSize(16);
 	scrollbar->onValueChange.Connect(&ListBox::OnScrollbarValueChange, this);
 	scrollbar->Hide();
 
@@ -60,7 +60,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	if (!IsVisible())	return Success();
 
 	Surface	*surface	= GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
+	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
 	Rect	 entryRect	= frame;
 
 	String	 visibleEntries;
@@ -110,9 +110,7 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 				entry->SetVisibleDirect(False);
 
-				entryRect.bottom += entry->GetHeight();
-
-				if (entryRect.bottom >= 0 && entryRect.top <= GetHeight() - headerHeight - 4)
+				if (entryRect.bottom + entry->GetHeight() >= 0 && entryRect.top <= GetHeight() - headerHeight - 4)
 				{
 					entry->SetMetrics(Point(2, entryRect.top + 2 + headerHeight), Size(GetWidth() - 4 - scrollbarWidth, entry->GetHeight()));
 					entry->SetVisibleDirect(True);
@@ -120,7 +118,8 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					visibleEntries.Append(entry->GetName());
 				}
 
-				entryRect.top += entry->GetHeight();
+				entryRect.top	 += entry->GetHeight();
+				entryRect.bottom += entry->GetHeight();
 			}
 
 			visibleEntriesChecksum = visibleEntries.ComputeCRC32();
@@ -153,14 +152,13 @@ S::Int S::GUI::ListBox::Paint(Int message)
 			{
 				ListEntry	*entry = GetNthEntry(i);
 
-				frame.bottom += entry->GetHeight();
-
-				if (frame.bottom >= 0 && frame.top <= GetHeight() - headerHeight - 4)
+				if (frame.bottom + entry->GetHeight() >= 0 && frame.top <= GetHeight() - headerHeight - 4)
 				{
 					visibleEntries.Append(entry->GetName());
 				}
 
-				frame.top += entry->GetHeight();
+				frame.top    += entry->GetHeight();
+				frame.bottom += entry->GetHeight();
 
 				if (frame.top > GetHeight() - headerHeight - 4) break;
 			}
@@ -202,7 +200,7 @@ S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 
 S::GUI::Rect S::GUI::ListBox::GetVisibleArea() const
 {
-	Int	 headerHeight = (header->IsVisible() ? header->GetHeight() : 0);
+	Int	 headerHeight = (header->IsVisible() ? header->GetRealSize().cy : 0);
 
 	if (!IsVisible()) return Widget::GetVisibleArea();
 	else		  return Widget::GetVisibleArea() + Point(0, 2 + headerHeight) - Size(0, 4 + headerHeight);
@@ -226,10 +224,10 @@ S::Void S::GUI::ListBox::OnScrollbarValueChange()
 	 */
 	Surface	*surface = GetDrawSurface();
 
-	Rect	 frame		= Rect(GetRealPosition(), GetSize());
+	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
 
-	Int	 headerHeight	= (header->IsVisible()	  ? header->GetHeight()	  : 0);
-	Int	 scrollbarWidth	= (scrollbar->IsVisible() ? scrollbar->GetWidth() : 0);
+	Int	 headerHeight	= (header->IsVisible()	  ? header->GetRealSize().cy	: 0);
+	Int	 scrollbarWidth	= (scrollbar->IsVisible() ? scrollbar->GetRealSize().cx : 0);
 
 	surface->StartPaint(frame + Point(2, 2 + headerHeight) - Size(4 + scrollbarWidth, 4 + headerHeight));
 

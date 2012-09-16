@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/basic/divider.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/misc/math.h>
 #include <smooth/misc/binary.h>
 
 const S::Short	 S::GUI::Client::classID = S::Object::RequestClassID();
@@ -34,7 +35,7 @@ S::Int S::GUI::Client::Paint(Int message)
 	if (!IsVisible())	return Success();
 
 	Surface	*surface = GetDrawSurface();
-	Rect	 client	 = Rect(GetRealPosition() + Point(2, 2), GetSize() - Size(3, 4));
+	Rect	 client	 = Rect(GetRealPosition() + Point(2, 2), GetRealSize() - Size(3, 4));
 
 	for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
 	{
@@ -46,17 +47,18 @@ S::Int S::GUI::Client::Paint(Int message)
 			{
 				if (((Widget *) object)->GetContainer() == container)
 				{
-					Divider	*db = (Divider *) object;
+					Divider	*db    = (Divider *) object;
+					Int	 dbPos = Math::Round(db->GetPos() * surface->GetSurfaceDPI() / 96.0);
 
 					if (Binary::IsFlagSet(db->GetFlags(), OR_VERT))
 					{
-						if (Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && db->GetPos() >= client.left - 3)		client.left = db->GetPos() + 5;
-						else if (!Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && db->GetPos() <= client.right + 1)	client.right = container->GetWidth() - db->GetPos() - 2;
+						if	( Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && dbPos >= client.left   - 3) client.left	  = 			     dbPos + 5;
+						else if (!Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && dbPos <= client.right  + 1) client.right  = container->GetWidth()  - dbPos - 2;
 					}
 					else if (Binary::IsFlagSet(db->GetFlags(), OR_HORZ))
 					{
-						if (Binary::IsFlagSet(db->GetFlags(), OR_TOP) && db->GetPos() >= client.top - 2)		client.top = db->GetPos() + 5;
-						else if (!Binary::IsFlagSet(db->GetFlags(), OR_TOP) && db->GetPos() <= client.bottom + 1)	client.bottom = container->GetHeight() - db->GetPos() - 2;
+						if	( Binary::IsFlagSet(db->GetFlags(), OR_TOP)  && dbPos >= client.top    - 2) client.top	  = 			     dbPos + 5;
+						else if (!Binary::IsFlagSet(db->GetFlags(), OR_TOP)  && dbPos <= client.bottom + 1) client.bottom = container->GetHeight() - dbPos - 2;
 					}
 				}
 			}

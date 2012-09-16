@@ -1,4 +1,4 @@
-// Copyright 2010 the V8 project authors. All rights reserved.
+// Copyright 2011 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -25,39 +25,15 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef V8_PREPARSER_DATA_H_
-#define V8_PREPARSER_DATA_H_
+#ifndef V8_PREPARSE_DATA_H_
+#define V8_PREPARSE_DATA_H_
 
+#include "allocation.h"
 #include "hashmap.h"
+#include "utils-inl.h"
 
 namespace v8 {
 namespace internal {
-
-// Generic and general data used by preparse data recorders and readers.
-
-class PreparseDataConstants : public AllStatic {
- public:
-  // Layout and constants of the preparse data exchange format.
-  static const unsigned kMagicNumber = 0xBadDead;
-  static const unsigned kCurrentVersion = 5;
-
-  static const int kMagicOffset = 0;
-  static const int kVersionOffset = 1;
-  static const int kHasErrorOffset = 2;
-  static const int kFunctionsSizeOffset = 3;
-  static const int kSymbolCountOffset = 4;
-  static const int kSizeOffset = 5;
-  static const int kHeaderSize = 6;
-
-  // If encoding a message, the following positions are fixed.
-  static const int kMessageStartPos = 0;
-  static const int kMessageEndPos = 1;
-  static const int kMessageArgCountPos = 2;
-  static const int kMessageTextPos = 3;
-
-  static const byte kNumberTerminator = 0x80u;
-};
-
 
 // ----------------------------------------------------------------------------
 // ParserRecorder - Logging of preparser data.
@@ -72,10 +48,12 @@ class ParserRecorder {
   virtual void LogFunction(int start,
                            int end,
                            int literals,
-                           int properties) = 0;
+                           int properties,
+                           LanguageMode language_mode) = 0;
 
   // Logs a symbol creation of a literal or identifier.
-  virtual void LogSymbol(int start, const char* symbol, int length) = 0;
+  virtual void LogAsciiSymbol(int start, Vector<const char> literal) { }
+  virtual void LogUtf16Symbol(int start, Vector<const uc16> literal) { }
 
   // Logs an error message and marks the log as containing an error.
   // Further logging will be ignored, and ExtractData will return a vector
@@ -107,11 +85,16 @@ class FunctionLoggingParserRecorder : public ParserRecorder {
   FunctionLoggingParserRecorder();
   virtual ~FunctionLoggingParserRecorder() {}
 
-  virtual void LogFunction(int start, int end, int literals, int properties) {
+  virtual void LogFunction(int start,
+                           int end,
+                           int literals,
+                           int properties,
+                           LanguageMode language_mode) {
     function_store_.Add(start);
     function_store_.Add(end);
     function_store_.Add(literals);
     function_store_.Add(properties);
+    function_store_.Add(language_mode);
   }
 
   // Logs an error message and marks the log as containing an error.
@@ -165,7 +148,8 @@ class FunctionLoggingParserRecorder : public ParserRecorder {
 class PartialParserRecorder : public FunctionLoggingParserRecorder {
  public:
   PartialParserRecorder() : FunctionLoggingParserRecorder() { }
-  virtual void LogSymbol(int start, const char* symbol, int length) { }
+  virtual void LogAsciiSymbol(int start, Vector<const char> literal) { }
+  virtual void LogUtf16Symbol(int start, Vector<const uc16> literal) { }
   virtual ~PartialParserRecorder() { }
   virtual Vector<unsigned> ExtractData();
   virtual int symbol_position() { return 0; }
@@ -181,7 +165,17 @@ class CompleteParserRecorder: public FunctionLoggingParserRecorder {
   CompleteParserRecorder();
   virtual ~CompleteParserRecorder() { }
 
-  virtual void LogSymbol(int start, const char* symbol, int length);
+  virtual void LogAsciiSymbol(int start, Vector<const char> literal) {
+    if (!is_recording_) return;
+    int hash = vector_hash(literal);
+    LogSymbol(start, hash, true, Vector<const byte>::cast(literal));
+  }
+
+  virtual void LogUtf16Symbol(int start, Vector<const uc16> literal) {
+    if (!is_recording_) return;
+    int hash = vector_hash(literal);
+    LogSymbol(start, hash, false, Vector<const byte>::cast(literal));
+  }
 
   virtual Vector<unsigned> ExtractData();
 
@@ -189,10 +183,21 @@ class CompleteParserRecorder: public FunctionLoggingParserRecorder {
   virtual int symbol_ids() { return symbol_id_; }
 
  private:
-  static int vector_hash(Vector<const char> string) {
+  struct Key {
+    bool is_ascii;
+    Vector<const byte> literal_bytes;
+  };
+
+  virtual void LogSymbol(int start,
+                         int hash,
+                         bool is_ascii,
+                         Vector<const byte> literal);
+
+  template <typename Char>
+  static int vector_hash(Vector<const Char> string) {
     int hash = 0;
     for (int i = 0; i < string.length(); i++) {
-      int c = string[i];
+      int c = static_cast<int>(string[i]);
       hash += c;
       hash += (hash << 10);
       hash ^= (hash >> 6);
@@ -201,18 +206,21 @@ class CompleteParserRecorder: public FunctionLoggingParserRecorder {
   }
 
   static bool vector_compare(void* a, void* b) {
-    Vector<const char>* string1 = reinterpret_cast<Vector<const char>* >(a);
-    Vector<const char>* string2 = reinterpret_cast<Vector<const char>* >(b);
-    int length = string1->length();
-    if (string2->length() != length) return false;
-    return memcmp(string1->start(), string2->start(), length) == 0;
+    Key* string1 = reinterpret_cast<Key*>(a);
+    Key* string2 = reinterpret_cast<Key*>(b);
+    if (string1->is_ascii != string2->is_ascii) return false;
+    int length = string1->literal_bytes.length();
+    if (string2->literal_bytes.length() != length) return false;
+    return memcmp(string1->literal_bytes.start(),
+                  string2->literal_bytes.start(), length) == 0;
   }
 
   // Write a non-negative number to the symbol store.
   void WriteNumber(int number);
 
+  Collector<byte> literal_chars_;
   Collector<byte> symbol_store_;
-  Collector<Vector<const char> > symbol_entries_;
+  Collector<Key> symbol_keys_;
   HashMap symbol_table_;
   int symbol_id_;
 };
@@ -220,4 +228,4 @@ class CompleteParserRecorder: public FunctionLoggingParserRecorder {
 
 } }  // namespace v8::internal.
 
-#endif  // V8_PREPARSER_DATA_H_
+#endif  // V8_PREPARSE_DATA_H_

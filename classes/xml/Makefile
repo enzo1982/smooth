@@ -9,7 +9,7 @@ include $(SMOOTH_PATH)/Makefile-options
 ifneq ($(BUILD_WIN32),True)
 ifeq ($(BUILD_OSX),True)
 	MYCCOPTS += -I/usr/include/libxml2
-else
+else ifneq ($(BUILD_QNX),True)
 	MYCCOPTS += $(shell pkg-config --cflags libxml-2.0)
 endif
 endif

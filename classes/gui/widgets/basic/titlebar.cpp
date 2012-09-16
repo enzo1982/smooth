@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,6 +14,7 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/gui/application/application.h>
+#include <smooth/misc/math.h>
 #include <smooth/misc/binary.h>
 #include <smooth/input/keyboard.h>
 
@@ -93,15 +94,15 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	Surface	*surface = GetDrawSurface();
 	Window	*window	 = container->GetContainerWindow();
 
-	Rect	 titleFrame	= Rect(GetPosition(), GetSize());
-	Rect	 buttonRect	= Rect(Point(titleFrame.right - 39 + (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 20), titleFrame.top + 3), Size(35 - (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 0 : 20), 14));
+	Rect	 titleFrame	= Rect(GetRealPosition(), GetRealSize());
+	Rect	 buttonRect	= Rect(Point(titleFrame.right - Math::Round(4 * surface->GetSurfaceDPI() / 96.0) - Math::Round((5 + 10 * (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 3 : 1)) * surface->GetSurfaceDPI() / 96.0), titleFrame.top + 3), Size(Math::Round((5 + 10 * (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 3 : 1)) * surface->GetSurfaceDPI() / 96.0), titleFrame.GetHeight() - 5));
 	Rect	 button;
 	Point	 start;
 	Point	 end;
 	Int	 buttonColor;
 	Bitmap	 icon		= window->GetIcon();
 
-	if (icon != NIL) titleFrame.left += 18;
+	if (icon != NIL) titleFrame.left += titleFrame.GetHeight() - 1;
 
 	text = window->GetText();
 
@@ -119,12 +120,12 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			surface->SetText(text, titleFrame + Point(4, 3) - Size(9, 6), font);
 
-			if (icon != NIL) surface->BlitFromBitmap(icon, Rect(Point(0, 0), icon.GetSize()), Rect(Point(titleFrame.left - 18, titleFrame.top + 1), Size(16, 16)));
+			if (icon != NIL) surface->BlitFromBitmap(icon, Rect(Point(0, 0), icon.GetSize()), Rect(Point(titleFrame.left - 16 * surface->GetSurfaceDPI() / 96.0 - 2, titleFrame.top + 1), Size(16, 16) * surface->GetSurfaceDPI() / 96.0));
 
 			surface->Box(buttonRect, Setup::BackgroundColor, Rect::Filled);
 			surface->Frame(buttonRect, FRAME_DOWN);
 
-			button = Rect(Point(buttonRect.left + 4, buttonRect.top + 9), Size(7, 2));
+			button = Rect(Point(buttonRect.left + Math::Round(4 * surface->GetSurfaceDPI() / 96.0), buttonRect.bottom - Math::Round(5 * surface->GetSurfaceDPI() / 96.0)), Size(Math::Round(7 * surface->GetSurfaceDPI() / 96.0), 2));
 
 			if (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON))
 			{
@@ -133,11 +134,10 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 				surface->Box(button, buttonColor, Rect::Filled);
 
-				button.left	= button.right + 3;
-				button.right	= button.left + 7;
+				button = button + Point(button.GetWidth() + Math::Round(2 * surface->GetSurfaceDPI() / 96.0) + 1, 0);
 			}
 
-			button.top	= button.top - 4;
+			button.top	= buttonRect.top + Math::Round(5 * surface->GetSurfaceDPI() / 96.0);
 
 			if (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON))
 			{
@@ -158,8 +158,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 					surface->Box(button - Point(0, 1) + Size(0, 1), buttonColor, Rect::Outlined);
 				}
 
-				button.left	= button.right + 3;
-				button.right	= button.left + 7;
+				button = button + Point(button.GetWidth() + Math::Round(2 * surface->GetSurfaceDPI() / 96.0) + 1, 0);
 			}
 
 			start	= Point(button.left + (IsRightToLeft() ? 1 : 0), button.top - 1);
@@ -188,8 +187,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 S::Int S::GUI::Titlebar::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())			return Error();
-	if (!IsActive() || !IsVisible())	return Success();
+	if (!IsRegistered())		 return Error();
+	if (!IsActive() || !IsVisible()) return Success();
 
 	Window	*window = container->GetContainerWindow();
 	Bool	 prevPaintActive = paintActive;
@@ -269,16 +268,19 @@ S::Void S::GUI::Titlebar::OnCloseButtonClick()
 
 S::Bool S::GUI::Titlebar::ButtonHitTest(const Point &mousePos)
 {
-	return (mousePos.x >= 1 && mousePos.y >= 1 && mousePos.x <= 9 && mousePos.y <= 9);
+	Surface	*surface = GetDrawSurface();
+
+	return (mousePos.x >= 1 && mousePos.y >= 1 && mousePos.x <= 9 * surface->GetSurfaceDPI() / 96.0 && mousePos.y <= 9 * surface->GetSurfaceDPI() / 96.0);
 }
 
 S::Bool S::GUI::Titlebar::DragHitTest(const Point &mousePos)
 {
+	Surface	*surface	= GetDrawSurface();
 	Window	*window		= container->GetContainerWindow();
-	Rect	 titleFrame	= Rect(Point(0, 0), GetSize() - Size(1, 0));
-	Rect	 buttonRect	= Rect(Point(titleFrame.right - 39, 3), Size(34, 13));
+	Rect	 titleFrame	= Rect(Point(0, 0), GetRealSize() - Size(1, 0));
+	Rect	 buttonRect	= Rect(Point(titleFrame.right - 5 - 4 * surface->GetSurfaceDPI() / 96.0 - (titleFrame.GetHeight() / 2 + 1) * (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 3 : 1), titleFrame.top + 3), Size(4 + (titleFrame.GetHeight() / 2 + 1) * (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON) ? 3 : 1), titleFrame.GetHeight() - 6));
 
-	if (window->GetIcon() != NIL) titleFrame.left += 18;
+	if (window->GetIcon() != NIL) titleFrame.left += titleFrame.GetHeight() - 1;
 
 	return ((mousePos.x >= titleFrame.left && mousePos.y >= titleFrame.top && mousePos.x <= titleFrame.right && mousePos.y <= titleFrame.bottom) &&
 	       !(mousePos.x >= buttonRect.left && mousePos.y >= buttonRect.top && mousePos.x <= buttonRect.right && mousePos.y <= buttonRect.bottom));

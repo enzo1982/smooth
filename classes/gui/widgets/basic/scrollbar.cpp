@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -69,12 +69,13 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 	Surface	*surface	= GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
+	Size	 realSize	= GetRealSize();
 
 	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
-	Int	 hotspotSize	= (smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) - 4;
+	Int	 hotspotSize	= Math::Round((smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) * surface->GetSurfaceDPI() / 96.0) - 4;
 
-	Rect	 arrow1Frame	= Rect(realPos + Point(subtype == OR_HORZ ? GetWidth() - (hotspotSize + 4) : 0, subtype == OR_VERT ? GetHeight() - (hotspotSize + 4) : 0), subtype == OR_HORZ ? Size(hotspotSize + 4, GetHeight()) : Size(GetWidth(), hotspotSize + 4));
-	Rect	 arrow2Frame	= Rect(realPos + Point(0, 0), subtype == OR_HORZ ? Size(hotspotSize + 4, GetHeight()) : Size(GetWidth(), hotspotSize + 4));
+	Rect	 arrow1Frame	= Rect(realPos + Point(subtype == OR_HORZ ? realSize.cx - (hotspotSize + 4) : 0, subtype == OR_VERT ? realSize.cy - (hotspotSize + 4) : 0), subtype == OR_HORZ ? Size(hotspotSize + 4, realSize.cy) : Size(realSize.cx, hotspotSize + 4));
+	Rect	 arrow2Frame	= Rect(realPos + Point(0, 0), subtype == OR_HORZ ? Size(hotspotSize + 4, realSize.cy) : Size(realSize.cx, hotspotSize + 4));
 	Int	 arrowColor	= Setup::TextColor;
 
 	if (!IsActive()) arrowColor = Setup::GrayTextColor;
@@ -93,36 +94,40 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 			if (subtype == OR_HORZ)
 			{
-				for (Int i = 0; i < 4 - (smallHotspots ? 1 : 0); i++)
+				Int	 size = Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
+
+				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(realPos.x + (hotspotSize + 4) / 2 - 2 + i, realPos.y + GetHeight() / 2 - i);
+					Point	 lineStart	= Point(realPos.x + (hotspotSize + 4) / 2 - size / 2 + i, realPos.y + realSize.cy / 2 - i);
 					Point	 lineEnd	= lineStart + Point(0, 2 * i + 1);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
 
-				for (Int j = 0 + (smallHotspots ? 1 : 0); j < 4; j++)
+				for (Int j = 0; j < size; j++)
 				{
-					Point	 lineStart	= Point(realPos.x + GetWidth() - (hotspotSize + 4) / 2 - 2 + j, realPos.y + GetHeight() / 2 - 3 + j);
-					Point	 lineEnd	= lineStart + Point(0, 7 - 2 * j);
+					Point	 lineStart	= Point(realPos.x + realSize.cx - (hotspotSize + 4) / 2 - (size + 1) / 2 + j, realPos.y + realSize.cy / 2 - size + 1 + j);
+					Point	 lineEnd	= lineStart + Point(0, 2 * (size - j) - 1);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
 			}
 			else if (subtype == OR_VERT)
 			{
-				for (Int i = 0; i < 4 - (smallHotspots ? 1 : 0); i++)
+				Int	 size = Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
+
+				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(realPos.x + GetWidth() / 2 + (IsRightToLeft() ? 1 : 0) - i, (realPos.y + (hotspotSize + 4) / 2) - 2 + i);
+					Point	 lineStart	= Point(realPos.x + realSize.cx / 2 + (IsRightToLeft() ? 1 : 0) - i, (realPos.y + (hotspotSize + 4) / 2) - size / 2 + i);
 					Point	 lineEnd	= lineStart + Point(2 * i + 1, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
 
-				for (Int j = 0 + (smallHotspots ? 1 : 0); j < 4; j++)
+				for (Int j = 0; j < size; j++)
 				{
-					Point	 lineStart	= Point(realPos.x + GetWidth() / 2 - 3 + (IsRightToLeft() ? 1 : 0) + j, (realPos.y + GetHeight() - (hotspotSize + 4) / 2) - 2 + j);
-					Point	 lineEnd	= lineStart + Point(7 - 2 * j, 0);
+					Point	 lineStart	= Point(realPos.x + realSize.cx / 2 + (IsRightToLeft() ? 1 : 0) - size + 1 + j, (realPos.y + realSize.cy - (hotspotSize + 4) / 2) - (size + 1) / 2 + j);
+					Point	 lineEnd	= lineStart + Point(2 * (size - j) - 1, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
@@ -152,8 +157,8 @@ S::Void S::GUI::Scrollbar::OnMouseClick(const Point &mousePos)
 
 	Int	 value = 0;
 
-	if (subtype == OR_HORZ)	value = (mousePos.x < GetRealPosition().x + dragHotspot->GetX()) ? -pageSize : pageSize;
-	else			value = (mousePos.y < GetRealPosition().y + dragHotspot->GetY()) ? -pageSize : pageSize;
+	if (subtype == OR_HORZ)	value = (mousePos.x < dragHotspot->GetRealPosition().x) ? -pageSize : pageSize;
+	else			value = (mousePos.y < dragHotspot->GetRealPosition().y) ? -pageSize : pageSize;
 
 	if (clickTimer->GetStatus() == System::TIMER_STOPPED)
 	{
@@ -175,28 +180,35 @@ S::Void S::GUI::Scrollbar::OnMouseClickTimer()
 
 S::Void S::GUI::Scrollbar::OnMouseWheel(Int value)
 {
+	if (subtype != OR_VERT) return;
+
 	Window	*window	= container->GetContainerWindow();
 
-	if (IsMouseOver() || window->IsMouseOn(Rect(container->GetRealPosition(), container->GetSize()))) SetValue(*variable - (value * stepSize));
+	if (IsMouseOver() || window->IsMouseOn(Rect(container->GetRealPosition(), container->GetRealSize()))) SetValue(*variable - (value * stepSize));
 }
 
 S::Void S::GUI::Scrollbar::OnMouseDragStart(const Point &mousePos)
 {
-	if (subtype == OR_HORZ)	mouseBias = mousePos.x - (GetRealPosition().x + dragHotspot->GetX());
-	else			mouseBias = mousePos.y - (GetRealPosition().y + dragHotspot->GetY());
+	if (subtype == OR_HORZ)	mouseBias = mousePos.x - dragHotspot->GetRealPosition().x;
+	else			mouseBias = mousePos.y - dragHotspot->GetRealPosition().y;
 
 	dragging = True;
 }
 
 S::Void S::GUI::Scrollbar::OnMouseDrag(const Point &mousePos)
 {
+	Point	 realPos  = GetRealPosition();
+	Size	 realSize = GetRealSize();
+
 	Int	 value = 0;
 
-	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
-	Int	 hotspotSize	= (smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) - 4;
+	Surface	*surface	= GetDrawSurface();
 
-	if (subtype == OR_HORZ)	value = Math::Round((((Float) (endValue - startValue)) / ((Float) GetWidth() - 3 * (hotspotSize + 4))) * ((Float) (mousePos.x - mouseBias - (GetRealPosition().x + hotspotSize + 4))));
-	else			value = Math::Round((((Float) (endValue - startValue)) / ((Float) GetHeight() - 3 * (hotspotSize + 4))) * ((Float) (mousePos.y - mouseBias - (GetRealPosition().y + hotspotSize + 4))));
+	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
+	Int	 hotspotSize	= Math::Round((smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) * surface->GetSurfaceDPI() / 96.0) - 4;
+
+	if (subtype == OR_HORZ)	value = Math::Round((((Float) (endValue - startValue)) / ((Float) realSize.cx - 3 * (hotspotSize + 4))) * ((Float) (mousePos.x - mouseBias - (realPos.x + hotspotSize + 4))));
+	else			value = Math::Round((((Float) (endValue - startValue)) / ((Float) realSize.cy - 3 * (hotspotSize + 4))) * ((Float) (mousePos.y - mouseBias - (realPos.y + hotspotSize + 4))));
 
 	SetValue(startValue + value);
 }
@@ -215,12 +227,14 @@ S::Void S::GUI::Scrollbar::OnValueChange()
 	if (!IsRegistered() || !IsVisible()) return;
 
 	Surface	*surface	= GetDrawSurface();
+	Point	 realPos	= GetRealPosition();
+	Size	 realSize	= GetRealSize();
 
 	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
-	Int	 hotspotSize	= (smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) - 4;
+	Int	 hotspotSize	= Math::Round((smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) * surface->GetSurfaceDPI() / 96.0) - 4;
 
-	Rect	 backFrame	= Rect(GetRealPosition() + (subtype == OR_HORZ ? Point(hotspotSize + 4, 0) : Point(0, hotspotSize + 4)), GetSize() - (subtype == OR_HORZ ? Size(2 * (hotspotSize + 4), 0) : Size(0, 2 * (hotspotSize + 4))));
-	Rect	 sliderFrame	= Rect(GetRealPosition() + (subtype == OR_HORZ ? Point(hotspotSize + 4 + (Int) (((Float) GetWidth() - 3 * (hotspotSize + 4)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, hotspotSize + 4 + (Int) (((Float) GetHeight() - 3 * (hotspotSize + 4)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))))), subtype == OR_HORZ ? Size(hotspotSize + 4, GetHeight()) : Size(GetWidth(), hotspotSize + 4));
+	Rect	 backFrame	= Rect(realPos + (subtype == OR_HORZ ? Point(hotspotSize + 4, 0) : Point(0, hotspotSize + 4)), realSize - (subtype == OR_HORZ ? Size(2 * (hotspotSize + 4), 0) : Size(0, 2 * (hotspotSize + 4))));
+	Rect	 sliderFrame	= Rect(realPos + (subtype == OR_HORZ ? Point(hotspotSize + 4 + (Int) (((Float) realSize.cx - 3 * (hotspotSize + 4)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, hotspotSize + 4 + (Int) (((Float) realSize.cy - 3 * (hotspotSize + 4)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))))), subtype == OR_HORZ ? Size(hotspotSize + 4, realSize.cy) : Size(realSize.cx, hotspotSize + 4));
 
 	surface->Box(backFrame, Setup::LightGrayColor, Rect::Filled);
 

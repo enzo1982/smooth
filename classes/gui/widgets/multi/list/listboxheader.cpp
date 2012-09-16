@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -127,14 +127,14 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 			{
 				Surface	*surface = GetDrawSurface();
 				Point	 realPos = GetRealPosition();
-				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 				surface->Frame(frame, FRAME_UP);
 
 				for (Int i = 0; i < tabWidths.Length(); i++)
 				{
-					frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNth(i)) + 1, realPos.x + GetWidth());
+					frame.right = (Int) Math::Min(frame.left + Math::Abs((Int) Math::Round(tabWidths.GetNth(i) * surface->GetSurfaceDPI() / 96.0)), realPos.x + GetRealSize().cx);
 
 					surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 					surface->Frame(frame, FRAME_UP);
@@ -149,7 +149,7 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 					surface->SetText(tabNames.GetNth(i), frame, nFont);
 
 					frame.top -= 1;
-					frame.left += (Int) (Math::Abs(tabWidths.GetNth(i)) - 2);
+					frame.left += (Int) (Math::Abs(Math::Round(tabWidths.GetNth(i) * surface->GetSurfaceDPI() / 96.0)) - 3);
 				}
 			}
 
@@ -161,73 +161,71 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 
 S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 {
-	if (!IsRegistered())			return Error();
-	if (!IsActive() || !IsVisible())	return Success();
-
-	Window	*window	 = GetContainerWindow();
-	Surface	*surface = GetDrawSurface();
-
-	Point	 realPos = GetRealPosition();
-	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+	if (!IsRegistered())		 return Error();
+	if (!IsActive() || !IsVisible()) return Success();
 
 	switch (message)
 	{
 		case SM_MOUSEMOVE:
 			if (draggingTab) break;
 
-			frame.left = realPos.x - 2;
-
-			for (Int i = 0; i < tabWidths.Length() - 1; i++)
 			{
-				frame.left += (Int) (Math::Abs(tabWidths.GetNth(i)) + 1);
-				frame.right = frame.left + 4;
+				Window	*window	  = GetContainerWindow();
+				Surface	*surface  = GetDrawSurface();
 
-				if (window->IsMouseOn(frame))
+				Point	 realPos  = GetRealPosition();
+				Size	 realSize = GetRealSize();
+				Rect	 frame	  = Rect(realPos, realSize);
+
+				frame.left = realPos.x - 2;
+
+				for (Int i = 0; i < tabWidths.Length() - 1; i++)
 				{
-					if (moveTab != i)
-					{
-						moveTab = i;
+					frame.left += (Int) Math::Abs(Math::Round(tabWidths.GetNth(i) * surface->GetSurfaceDPI() / 96.0));
+					frame.right = frame.left + 4;
 
-						Input::Pointer::SetCursor(window, Input::Pointer::CursorHSize);
+					if (window->IsMouseOn(frame))
+					{
+						if (moveTab != i)
+						{
+							moveTab = i;
+
+							Input::Pointer::SetCursor(window, Input::Pointer::CursorHSize);
+						}
+					}
+					else if (moveTab == i)
+					{
+						moveTab = -1;
+
+						Input::Pointer::SetCursor(window, Input::Pointer::CursorArrow);
 					}
 				}
-				else if (moveTab == i)
-				{
-					moveTab = -1;
 
-					Input::Pointer::SetCursor(window, Input::Pointer::CursorArrow);
-				}
-			}
-
-			frame.left = realPos.x;
-			frame.bottom--;
-
-			for (Int j = 0; j < tabWidths.Length(); j++)
-			{
-				frame.right = (Int) Math::Min(frame.left + Math::Abs(tabWidths.GetNth(j)), realPos.x + GetWidth() - 1);
-
-				frame.left++;
+				frame.left = realPos.x + 1;
 				frame.top++;
+				frame.bottom--;
 
-				if (window->IsMouseOn(frame) && !tabChecked.GetNth(j) && moveTab == -1)
+				for (Int j = 0; j < tabWidths.Length(); j++)
 				{
-					surface->Box(frame, Setup::LightGrayColor, Rect::Filled);
-					surface->SetText(tabNames.GetNth(j), frame + Point(2, 0) - Size(2, 0), font);
+					frame.right = (Int) Math::Min(frame.left + Math::Abs((Int) Math::Round(tabWidths.GetNth(j) * surface->GetSurfaceDPI() / 96.0)) - 2, realPos.x + GetRealSize().cx - 1);
 
-					tabChecked.Set(tabChecked.GetNthIndex(j), True);
+					if (window->IsMouseOn(frame) && !tabChecked.GetNth(j) && moveTab == -1)
+					{
+						surface->Box(frame, Setup::LightGrayColor, Rect::Filled);
+						surface->SetText(tabNames.GetNth(j), frame + Point(2, 0) - Size(2, 0), font);
+
+						tabChecked.Set(tabChecked.GetNthIndex(j), True);
+					}
+					else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNth(j))
+					{
+						surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
+						surface->SetText(tabNames.GetNth(j), frame + Point(2, 0) - Size(2, 0), font);
+
+						tabChecked.Set(tabChecked.GetNthIndex(j), False);
+					}
+
+					frame.left += (Int) Math::Abs(Math::Round(tabWidths.GetNth(j) * surface->GetSurfaceDPI() / 96.0));
 				}
-				else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNth(j))
-				{
-					surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
-					surface->SetText(tabNames.GetNth(j), frame + Point(2, 0) - Size(2, 0), font);
-
-					tabChecked.Set(tabChecked.GetNthIndex(j), False);
-				}
-
-				frame.left--;
-				frame.top--;
-
-				frame.left += (Int) (Math::Abs(tabWidths.GetNth(j)) + 1);
 			}
 
 			break;
@@ -242,6 +240,9 @@ S::Void S::GUI::ListBoxHeader::OnMouseDragStart(const Point &mousePos)
 
 	startMousePos = mousePos;
 
+	moveTabStartWidth = tabWidths.GetNth(moveTab);
+	lastTabStartWidth = tabWidths.GetNth(tabWidths.Length() - 1);
+
 	draggingTab = True;
 }
 
@@ -249,14 +250,12 @@ S::Void S::GUI::ListBoxHeader::OnMouseDrag(const Point &mousePos)
 {
 	if (!draggingTab) return;
 
-	Int	 bias = startMousePos.x - mousePos.x;
+	Int	 bias = Math::Round((startMousePos.x - mousePos.x) * 96.0 / Surface().GetSurfaceDPI());
 
 	if (bias != 0)
 	{
-		tabWidths.SetNth(moveTab, (Int) Math::Max(Math::Abs(tabWidths.GetNth(moveTab)) - bias, 1) * Math::Sign(tabWidths.GetNth(moveTab)));
-		tabWidths.SetNth(tabWidths.Length() - 1, (Int) Math::Max(Math::Abs(tabWidths.GetNth(tabWidths.Length() - 1)) + bias, 1) * Math::Sign(tabWidths.GetNth(tabWidths.Length() - 1)));
-
-		startMousePos = mousePos;
+		tabWidths.SetNth(moveTab, (Int) Math::Max(Math::Abs(moveTabStartWidth) - bias, 1) * Math::Sign(moveTabStartWidth));
+		tabWidths.SetNth(tabWidths.Length() - 1, (Int) Math::Max(Math::Abs(lastTabStartWidth) + bias, 1) * Math::Sign(lastTabStartWidth));
 
 		OnChangeSize(GetSize());
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,7 +33,7 @@ S::GUI::Progressbar::Progressbar(const Point &iPos, const Size &iSize, Int sType
 	if (GetWidth() == 0) SetWidth(subtype == OR_VERT ? 19 : 80);
 	if (GetHeight() == 0) SetHeight(subtype == OR_VERT ? 80 : 19);
 
-	CreateGradient(GetSize());
+	CreateGradient(GetRealSize());
 }
 
 S::GUI::Progressbar::~Progressbar()
@@ -45,9 +45,8 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 	if (!IsRegistered())	return Error();
 	if (!IsVisible())	return Success();
 
-	Surface	*surface	= GetDrawSurface();
-	Point	 realPos	= GetRealPosition();
-	Rect	 frame		= Rect(realPos, GetSize());
+	Surface	*surface = GetDrawSurface();
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 	switch (message)
 	{
@@ -63,12 +62,12 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 
 			if (value > 0)
 			{
-				frame = frame + Point(1, 1) - Size(2, 2);
+				Rect	 frame = Rect(GetRealPosition(), GetRealSize()) + Point(1, 1) - Size(2, 2);
 
-				if (subtype == OR_HORZ)	frame.right = frame.left   + (Int) ((GetWidth() - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
-				else			frame.top   = frame.bottom - (Int) ((GetHeight() - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+				if (subtype == OR_HORZ)	frame.right = frame.left   + (Int) (frame.GetWidth() / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+				else			frame.top   = frame.bottom - (Int) (frame.GetHeight() / ((Float) (endValue - startValue) / (Float) (value - startValue)));
 
-				gradient.BlitToSurface(Rect(Point(0 + (IsRightToLeft() ? frame.right - frame.left : 0), 0), Size((frame.right - frame.left) * (IsRightToLeft() ? -1 : 1), frame.bottom - frame.top)), surface, frame);
+				gradient.BlitToSurface(Rect(Point(0 + (IsRightToLeft() ? frame.GetWidth() : 0), 0), Size(frame.GetWidth() * (IsRightToLeft() ? -1 : 1), frame.GetHeight())), surface, frame);
 			}
 
 			if (subtype == OR_HORZ)
@@ -91,14 +90,16 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 						break;
 				}
 
-				Int	 textSize	= font.GetTextSizeX(text);
-				Rect	 textRect	= Rect(Point(realPos.x + (GetWidth() / 2) - (textSize / 2), realPos.y + 2), Size(textSize, GetHeight() - 3));
+				Point	 realPos	= GetRealPosition();
+
+				Int	 textSize	= font.GetScaledTextSizeX(text);
+				Rect	 textRect	= Rect(Point(realPos.x + (frame.GetWidth() / 2) - (textSize / 2), realPos.y + Math::Round(2 * surface->GetSurfaceDPI() / 96.0)), Size(textSize, frame.GetHeight() - Math::Round(2 * surface->GetSurfaceDPI() / 96.0) - 1));
 
 				surface->SetText(text, textRect, font);
 
 				if (value > 0)
 				{
-					textRect.right = realPos.x + (Int) ((GetWidth() - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+					textRect.right = realPos.x + (Int) ((frame.GetWidth() - 2) / ((Float) (endValue - startValue) / (Float) (value - startValue)));
 
 					Font	 nFont = font;
 
@@ -118,7 +119,9 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 
 S::Int S::GUI::Progressbar::SetMetrics(const Point &nPos, const Size &nSize)
 {
-	CreateGradient(nSize);
+	Surface	*surface = GetDrawSurface();
+
+	CreateGradient(nSize * surface->GetSurfaceDPI() / 96.0);
 
 	return Widget::SetMetrics(nPos, nSize);
 }

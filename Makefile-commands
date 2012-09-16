@@ -10,7 +10,11 @@ RCOPTS	   = -DSMOOTH_DLL -O coff
 LD	   = gcc
 LDOPTS	   = -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 STRIP	   = strip
-STRIP_OPTS = --strip-all
+STRIP_OPTS = 
+
+ifneq ($(BUILD_SOLARIS),True)
+	STRIP_OPTS += --strip-all
+endif
 
 ifndef GLOBALDLL
 	LDOPTS += -lsmooth
@@ -38,7 +42,11 @@ else
 	endif
 
 ifneq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_HAIKU),True)
+ifneq ($(BUILD_QNX),True)
 	CCOPTS += -pthread
+endif
+endif
 endif
 endif
 
@@ -71,6 +79,8 @@ ifndef LOCALDLL
 
 ifeq ($(BUILD_WIN32),True)
 	CCOPTS += -DLIBICONV_PLUG -DLIBXML_STATIC
+else ifeq ($(BUILD_QNX),True)
+	CCOPTS += -DLIBICONV_PLUG
 endif
 endif
 endif
@@ -122,7 +132,12 @@ all: $(OBJECTS) $(TARGETS)
 	$(ALLCMD5)
 
 clean:
-	rm -f $(OBJECTS) $(TARGETS)
+ifdef OBJECTS
+	rm -f $(OBJECTS)
+endif
+ifdef TARGETS
+	rm -f $(TARGETS)
+endif
 	$(CLEANCMD1)
 	$(CLEANCMD2)
 	$(CLEANCMD3)

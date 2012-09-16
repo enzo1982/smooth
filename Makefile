@@ -28,37 +28,40 @@ ifeq ($(BUILD_WIN32),True)
 
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
+else ifeq ($(BUILD_OSX),True)
+	LIBS += -lcpuid -lnsucd -liconv -lpng -lcairo -lpthread -lX11 -lXmu
+
+	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
+else ifeq ($(BUILD_HAIKU),True)
+	LIBS += -lpng -lbe -ltracker
+
+	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
+else ifeq ($(BUILD_QNX),True)
+	LIBS += -liconv -lpng -lz -lsocket -lX11 -lXmu -lph
+
+	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
 else
-	ifeq ($(BUILD_OSX),True)
-		LIBS += -lcpuid -lnsucd -liconv -lpng -lcairo -lX11 -lXmu
-	else ifeq ($(BUILD_QNX),True)
-		LIBS += -liconv -lpng -lz -lsocket -lX11 -lXmu -lph
-	else
-		ifeq ($(BUILD_LINUX),True)
-			LIBS += -lcpuid -lnsucd
-		endif
-
-		ifeq ($(BUILD_FREEBSD),True)
-			LIBS += -lrt
-		endif
-
-		LIBS += $(shell pkg-config --libs xmu) $(shell pkg-config --libs gtk+-2.0)
+	ifeq ($(BUILD_LINUX),True)
+		LIBS += -lcpuid -lnsucd
+	else ifeq ($(BUILD_FREEBSD),True)
+		LIBS += -lrt
+	else ifeq ($(BUILD_OPENBSD),True)
+		LIBS += -lXau -lXdmcp -lXxf86vm -lSM -lICE -lffi -ldrm -lpcre
 	endif
 
-	ifneq ($(BUILD_HAIKU),True)
-		LIBS += -lpthread
-	endif
+	LIBS += $(shell pkg-config --libs xmu) $(shell pkg-config --libs gtk+-2.0)
+	LIBS += -lpthread
 
 	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
 endif
 
-LINKER = gcc
-STRIP = strip
-REMOVER = rm
-LINKER_OPTS = -L$(LIBDIR) --shared -o $(DLLNAME)
-STRIP_OPTS = --strip-all
-LIBSTRIP_OPTS = --strip-debug
-REMOVER_OPTS = -f
+LINKER	      = gcc
+STRIP	      = strip
+REMOVER	      = rm
+LINKER_OPTS   = -L$(LIBDIR) --shared -o $(DLLNAME)
+STRIP_OPTS    = 
+LIBSTRIP_OPTS = 
+REMOVER_OPTS  = -f
 
 ifeq ($(BUILD_X64),True)
 	LINKER_OPTS += -m64
@@ -74,10 +77,17 @@ else ifeq ($(BUILD_OPENBSD),True)
 	LINKER_OPTS += -Wl,-rpath,/usr/local/lib -L/usr/local/lib -Wl,-rpath,/usr/X11R6/lib -L/usr/X11R6/lib
 else ifeq ($(BUILD_NETBSD),True)
 	LINKER_OPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib -Wl,-rpath,/usr/X11R7/lib -L/usr/X11R7/lib
+else ifeq ($(BUILD_HAIKU),True)
+	LINKER_OPTS += -L/boot/common/lib
 else ifeq ($(BUILD_QNX),True)
 	LINKER_OPTS += -L/usr/X11R6/lib
 else ifeq ($(BUILD_OSX),True)
 	LINKER_OPTS += -framework Cocoa -L/usr/X11/lib -Wl,-dylib_install_name,libsmooth$(SHARED)
+endif
+
+ifneq ($(BUILD_SOLARIS),True)
+	STRIP_OPTS    += --strip-all
+	LIBSTRIP_OPTS += --strip-debug
 endif
 
 .PHONY: all headers objects programs libs install clean clean_all clean_headers doc doc-clean

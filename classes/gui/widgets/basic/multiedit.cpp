@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -66,7 +66,7 @@ S::Int S::GUI::MultiEdit::Paint(Int message)
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 				surface->StartPaint(GetVisibleArea());
 
@@ -113,7 +113,7 @@ S::Int S::GUI::MultiEdit::GetNOfLines()
 
 S::Int S::GUI::MultiEdit::GetNOfInvisibleLines()
 {
-	static Int	 lineSize = font.GetTextSizeY() + 1;
+	static Int	 lineSize = font.GetUnscaledTextSizeY() + 1;
 
 	return 1 + GetNOfLines() - Math::Floor((GetHeight() - 6) / lineSize);
 }
@@ -123,7 +123,7 @@ S::Int S::GUI::MultiEdit::SetText(const String &newText)
 	scrollbarPos = 0;
 
 	Surface	*surface = GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetSize());
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 	surface->StartPaint(frame);
 

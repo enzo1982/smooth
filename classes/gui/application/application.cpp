@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -48,6 +48,10 @@ S::GUI::Application::Application(const String &name) : Widget(Point(0, 0), Syste
 	Show();
 }
 
+S::GUI::Application::~Application()
+{
+}
+
 S::Int S::GUI::Application::Loop()
 {
 	if (!loopActive)
@@ -59,10 +63,7 @@ S::Int S::GUI::Application::Loop()
 		{
 			Window	*window = Window::GetNthWindow(i);
 
-			if (window != NIL)
-			{
-				if (!window->initshow) window->Show();
-			}
+			if (window != NIL && !window->initshow) window->Show();
 		}
 
 		/* Start waiting threads here.
@@ -71,13 +72,10 @@ S::Int S::GUI::Application::Loop()
 		{
 			Object	*object = Object::GetNthObject(j);
 
-			if (object != NIL)
-			{
-				if (object->GetObjectType() == Threads::Thread::classID)
-				{
-					if (((Threads::Thread *) object)->GetStatus() == Threads::THREAD_STARTME) ((Threads::Thread *) object)->Start();
-				}
-			}
+			if (object == NIL) continue;
+
+			if (object->GetObjectType() == Threads::Thread::classID &&
+			    ((Threads::Thread *) object)->GetStatus() == Threads::THREAD_STARTME) ((Threads::Thread *) object)->Start();
 		}
 	}
 
@@ -99,23 +97,6 @@ S::Int S::GUI::Application::Loop()
 	delete event;
 
 	loopActive = false;
-
-	for (int i = 0; i < Object::GetNOfObjects(); i++)
-	{
-		Object	*object = Object::GetNthObject(i);
-
-		if (object != NIL)
-		{
-			if (object->GetObjectType() == Threads::Thread::classID)
-			{
-				if (!(((Threads::Thread *) object)->GetFlags() & Threads::THREAD_KILLFLAG_WAIT)) ((Threads::Thread *) object)->Stop();
-			}
-		}
-	}
-
-	/* Wait for started threads to finish.
-	 */
-	while (Threads::Thread::GetNOfRunningThreads() > 0) System::System::Sleep(10);
 
 	return Success();
 }

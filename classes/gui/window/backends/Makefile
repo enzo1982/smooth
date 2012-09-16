@@ -8,9 +8,11 @@ OBJECTS	  = windowbackend.o
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = cd gdi && $(MAKE)
-ALLCMD2   = cd xlib && $(MAKE)
+ALLCMD2   = cd haiku && $(MAKE)
+ALLCMD3   = cd xlib && $(MAKE)
 CLEANCMD1 = cd gdi && $(MAKE) clean
-CLEANCMD2 = cd xlib && $(MAKE) clean
+CLEANCMD2 = cd haiku && $(MAKE) clean
+CLEANCMD3 = cd xlib && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

@@ -69,7 +69,11 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	lay		= new Layer();
 
 #ifdef __WIN32__
-	icon		= new Image(ImageLoader::Load(String("Icon:").Append(String::FromInt((Int64) cIcon))), Point(14, 19), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
+	Bitmap	 bitmap = ImageLoader::Load(String("Icon:").Append(String::FromInt((Int64) cIcon)));
+
+	bitmap.SetBackgroundColor(Setup::BackgroundColor);
+
+	icon		= new Image(bitmap, Point(14, 19), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
 #else
 	String	 iconName;
 	Int	 iconSize = 32;
@@ -91,7 +95,11 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 			if (File(file).Exists())
 			{
-				icon = new Image(ImageLoader::Load(file), Point(14, 19), Size(iconSize, iconSize));
+				Bitmap	 bitmap = ImageLoader::Load(file);
+
+				bitmap.SetBackgroundColor(Setup::BackgroundColor);
+
+				icon = new Image(bitmap, Point(14, 19), Size(iconSize, iconSize));
 
 				break;
 			}

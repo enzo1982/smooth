@@ -169,7 +169,7 @@ Translator::Translator(const String &openFile)
 	wnd->SetIcon(NIL);
 
 #ifdef __WIN32__
-	wnd->SetIcon(Bitmap((HBITMAP) LoadImageA(hInstance, MAKEINTRESOURCEA(IDB_ICON), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED)));
+	wnd->SetIcon(ImageLoader::Load(String("Icon:").Append(String::FromInt(IDI_ICON))));
 	wnd->SetIconDirect(LoadImageA(hInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 #endif
 

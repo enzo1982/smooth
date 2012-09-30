@@ -1390,9 +1390,11 @@ void HeapObject::IterateBody(InstanceType type, int object_size,
     case EXTERNAL_FLOAT_ARRAY_TYPE:
     case EXTERNAL_DOUBLE_ARRAY_TYPE:
       break;
-    case SHARED_FUNCTION_INFO_TYPE:
-      SharedFunctionInfo::BodyDescriptor::IterateBody(this, v);
+    case SHARED_FUNCTION_INFO_TYPE: {
+      SharedFunctionInfo* shared = reinterpret_cast<SharedFunctionInfo*>(this);
+      shared->SharedFunctionInfoIterateBody(v);
       break;
+    }
 
 #define MAKE_STRUCT_CASE(NAME, Name, name) \
         case NAME##_TYPE:
@@ -7869,6 +7871,22 @@ void SharedFunctionInfo::AttachInitialMap(Map* map) {
 }
 
 
+void SharedFunctionInfo::ResetForNewContext(int new_ic_age) {
+  code()->ClearInlineCaches();
+  set_ic_age(new_ic_age);
+  if (code()->kind() == Code::FUNCTION) {
+    code()->set_profiler_ticks(0);
+    if (optimization_disabled() &&
+        opt_count() >= Compiler::kDefaultMaxOptCount) {
+      // Re-enable optimizations if they were disabled due to opt_count limit.
+      set_optimization_disabled(false);
+      code()->set_optimizable(true);
+    }
+    set_opt_count(0);
+  }
+}
+
+
 static void GetMinInobjectSlack(Map* map, void* data) {
   int slack = map->unused_property_fields();
   if (*reinterpret_cast<int*>(data) > slack) {
@@ -7909,6 +7927,12 @@ void SharedFunctionInfo::CompleteInobjectSlackTracking() {
     ASSERT(expected_nof_properties() >= slack);
     set_expected_nof_properties(expected_nof_properties() - slack);
   }
+}
+
+
+void SharedFunctionInfo::SharedFunctionInfoIterateBody(ObjectVisitor* v) {
+  v->VisitSharedFunctionInfo(this);
+  SharedFunctionInfo::BodyDescriptor::IterateBody(this, v);
 }
 
 
@@ -7968,7 +7992,6 @@ void ObjectVisitor::VisitDebugTarget(RelocInfo* rinfo) {
   VisitPointer(&target);
   CHECK_EQ(target, old_target);  // VisitPointer doesn't change Code* *target.
 }
-
 
 void ObjectVisitor::VisitEmbeddedPointer(RelocInfo* rinfo) {
   ASSERT(rinfo->rmode() == RelocInfo::EMBEDDED_OBJECT);
@@ -8113,6 +8136,21 @@ Map* Code::FindFirstMap() {
     if (object->IsMap()) return Map::cast(object);
   }
   return NULL;
+}
+
+
+void Code::ClearInlineCaches() {
+  int mask = RelocInfo::ModeMask(RelocInfo::CODE_TARGET) |
+             RelocInfo::ModeMask(RelocInfo::CONSTRUCT_CALL) |
+             RelocInfo::ModeMask(RelocInfo::CODE_TARGET_WITH_ID) |
+             RelocInfo::ModeMask(RelocInfo::CODE_TARGET_CONTEXT);
+  for (RelocIterator it(this, mask); !it.done(); it.next()) {
+    RelocInfo* info = it.rinfo();
+    Code* target(Code::GetCodeFromTargetAddress(info->target_address()));
+    if (target->is_inline_cache_stub()) {
+      IC::Clear(info->pc());
+    }
+  }
 }
 
 
@@ -8483,7 +8521,7 @@ MaybeObject* JSObject::SetFastDoubleElementsCapacityAndLength(
   // We should never end in here with a pixel or external array.
   ASSERT(!HasExternalArrayElements());
 
-  FixedDoubleArray* elems;
+  FixedArrayBase* elems;
   { MaybeObject* maybe_obj =
         heap->AllocateUninitializedFixedDoubleArray(capacity);
     if (!maybe_obj->To(&elems)) return maybe_obj;
@@ -9634,9 +9672,10 @@ MaybeObject* JSObject::TransitionElementsKind(ElementsKind to_kind) {
   ElementsKind from_kind = map()->elements_kind();
 
   Isolate* isolate = GetIsolate();
-  if (from_kind == FAST_SMI_ONLY_ELEMENTS &&
-      (to_kind == FAST_ELEMENTS ||
-       elements() == isolate->heap()->empty_fixed_array())) {
+  if ((from_kind == FAST_SMI_ONLY_ELEMENTS ||
+      elements() == isolate->heap()->empty_fixed_array()) &&
+      to_kind == FAST_ELEMENTS) {
+    ASSERT(from_kind != FAST_ELEMENTS);
     MaybeObject* maybe_new_map = GetElementsTransitionMap(isolate, to_kind);
     Map* new_map;
     if (!maybe_new_map->To(&new_map)) return maybe_new_map;

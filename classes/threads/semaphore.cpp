@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,7 +15,6 @@ S::Threads::Semaphore::Semaphore(Int iValue, Void *iSemaphore)
 {
 	backend = SemaphoreBackend::CreateBackendInstance(iValue, iSemaphore);
 
-	value = iValue;
 	max = iValue;
 }
 
@@ -35,7 +34,6 @@ S::Threads::Semaphore &S::Threads::Semaphore::operator =(const Semaphore &oSemap
 
 	backend = SemaphoreBackend::CreateBackendInstance(oSemaphore.max, NIL);
 
-	value = oSemaphore.max;
 	max = oSemaphore.max;
 
 	return *this;
@@ -53,24 +51,10 @@ S::Void *S::Threads::Semaphore::GetSystemSemaphore() const
 
 S::Int S::Threads::Semaphore::Wait()
 {
-	if (backend->Wait() == Success())
-	{
-		value--;
-
-		return Success();
-	}
-
-	return Error();
+	return backend->Wait();
 }
 
 S::Int S::Threads::Semaphore::Release()
 {
-	if (backend->Release() == Success())
-	{
-		value++;
-
-		return Success();
-	}
-
-	return Error();
+	return backend->Release();
 }

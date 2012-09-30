@@ -240,7 +240,8 @@ namespace internal {
   V(use_strict, "use strict")                                            \
   V(dot_symbol, ".")                                                     \
   V(anonymous_function_symbol, "(anonymous function)")                   \
-  V(compare_ic_symbol, ".compare_ic")                                    \
+  V(compare_ic_symbol, "==")                                             \
+  V(strict_compare_ic_symbol, "===")                                     \
   V(infinity_symbol, "Infinity")                                         \
   V(minus_infinity_symbol, "-Infinity")                                  \
   V(hidden_stack_trace_symbol, "v8::hidden_stack_trace")
@@ -1569,10 +1570,6 @@ class Heap {
   // The roots that have an index less than this are always in old space.
   static const int kOldSpaceRoots = 0x20;
 
-  bool idle_notification_will_schedule_next_gc() {
-    return idle_notification_will_schedule_next_gc_;
-  }
-
   uint32_t HashSeed() {
     uint32_t seed = static_cast<uint32_t>(hash_seed()->value());
     ASSERT(FLAG_randomize_hashes || seed == 0);
@@ -2033,7 +2030,6 @@ class Heap {
   unsigned int last_idle_notification_gc_count_;
   bool last_idle_notification_gc_count_init_;
 
-  bool idle_notification_will_schedule_next_gc_;
   int mark_sweeps_since_idle_round_started_;
   int ms_count_at_last_idle_notification_;
   unsigned int gc_count_at_last_idle_gc_;

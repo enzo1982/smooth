@@ -394,11 +394,37 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 
 	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 
+	/* Convert format if depths do not match.
+	 */
+	const Bitmap	*srcBitmap = &bitmap;
+
+	if (bitmap.GetDepth() != windowAttributes.depth)
+	{
+		Size	 size  = bitmap.GetSize();
+		Bitmap	*copy  = new Bitmap(size.cx, size.cy, windowAttributes.depth);
+		XImage	*image = XGetImage(display, (Pixmap) bitmap.GetSystemBitmap(), 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+		Point	 point;
+
+		for (point.y = 0; point.y < size.cy; point.y++)
+		{
+			for (point.x = 0; point.x < size.cx; point.x++)
+			{
+				Long	 value = XGetPixel(image, point.x, point.y);
+
+				copy->SetPixel(point, Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255)));
+			}
+		}
+
+		srcBitmap = copy;
+	}
+
+	/* Copy the image.
+	 */
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
-		if (!painting) XCopyArea(display, (Drawable) bitmap.GetSystemBitmap(), window, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+		if (!painting) XCopyArea(display, (Drawable) srcBitmap->GetSystemBitmap(), window, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
 
-		XCopyArea(display, (Drawable) bitmap.GetSystemBitmap(), this->bitmap, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+		XCopyArea(display, (Drawable) srcBitmap->GetSystemBitmap(), this->bitmap, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
 	}
 	else
 	{
@@ -406,6 +432,10 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 		 *	 size than destination.
 		 */
 	}
+
+	/* Delete copy if we created one earlier.
+	 */
+	if (bitmap.GetDepth() != windowAttributes.depth) delete srcBitmap;
 
 	return Success();
 }
@@ -417,6 +447,8 @@ S::Int S::GUI::SurfaceXLib::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, c
 
 	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
 
+	/* Copy the image.
+	 */
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
 		XCopyArea(display, this->bitmap, (Drawable) bitmap.GetSystemBitmap(), gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);

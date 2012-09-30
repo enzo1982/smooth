@@ -417,6 +417,8 @@ S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &bitmap, const Rect &
 	Gdiplus::Graphics	*screen = new Gdiplus::Graphics(gdi_dc);
 	Gdiplus::Bitmap		 gdip_bitmap((HBITMAP) bitmap.GetSystemBitmap(), NIL);
 
+	/* Copy the image.
+	 */
 	if (!painting)
 	{
 		screen->DrawImage(&gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top), srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, Gdiplus::UnitPixel, NIL, NIL, NIL);
@@ -441,6 +443,8 @@ S::Int S::GUI::SurfaceGDIPlus::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap
 	Gdiplus::Bitmap		 gdip_bitmap((HBITMAP) bitmap.GetSystemBitmap(), NIL);
 	Gdiplus::Graphics	 gdip_graphics(&gdip_bitmap);
 
+	/* Copy the image.
+	 */
 	gdip_graphics.DrawImage(paintBitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top), srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, Gdiplus::UnitPixel, NIL, NIL, NIL);
 
 	HBITMAP			 hBitmap = NIL;

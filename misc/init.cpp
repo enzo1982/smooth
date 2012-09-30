@@ -140,9 +140,7 @@ S::Bool S::Init()
 
 	if (LoadIconvDLL() == True) Setup::useIconv = True;
 
-#if !defined __WINE__
 	use_iconv = (Setup::useIconv ? 1 : 0);
-#endif
 #endif
 
 	/* Get default colors and fonts.
@@ -274,21 +272,21 @@ S::Void S::GetDefaultFont()
 	LOGFONTA	 fontInfoA;
 	LOGFONTW	 fontInfoW;
 
-	fontInfoA.lfCharSet = DEFAULT_CHARSET;
-	fontInfoA.lfFaceName[0] = 0;
+	fontInfoA.lfCharSet	   = DEFAULT_CHARSET;
+	fontInfoA.lfFaceName[0]	   = 0;
 	fontInfoA.lfPitchAndFamily = 0;
 
-	fontInfoW.lfCharSet = DEFAULT_CHARSET;
-	fontInfoW.lfFaceName[0] = 0;
+	fontInfoW.lfCharSet	   = DEFAULT_CHARSET;
+	fontInfoW.lfFaceName[0]	   = 0;
 	fontInfoW.lfPitchAndFamily = 0;
 
 	int	 result;
 
-	if (Setup::enableUnicode)	result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
-	else				result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);
+	if (Setup::enableUnicode) result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
+	else			  result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);
 
-	if (result == 0)	GUI::Font::Default = "Microsoft Sans Serif";
-	else			GUI::Font::Default = "MS Sans Serif";
+	if (result == 0) GUI::Font::Default = "Microsoft Sans Serif";
+	else		 GUI::Font::Default = "MS Sans Serif";
 
 	ReleaseDC(0, dc);
 #elif defined __APPLE__

@@ -34,6 +34,7 @@ namespace smooth
 #			define Success	0
 
 #			include <X11/Xlib.h>
+#			include <X11/Xutil.h>
 
 #			undef True
 #			undef False

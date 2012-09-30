@@ -17,6 +17,7 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/graphics/imageloader/imageloader.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/binary.h>
@@ -134,16 +135,17 @@ S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 	Bitmap	 newIcon = nIcon;
 
 #ifdef __WIN32__
-	if (nIcon == NIL) newIcon = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_ICON), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
+	if (newIcon == NIL) newIcon = ImageLoader::Load(String("Icon:").Append(String::FromInt(IDI_ICON)));
 #endif
 
 	if (newIcon != NIL)
 	{
 		icon = newIcon;
 
-		icon.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
-
 		backend->SetIcon(icon);
+
+		if (icon.GetDepth() == 32) icon.SetBackgroundColor(Setup::BackgroundColor);
+		else			   icon.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 	}
 
 	return Success();

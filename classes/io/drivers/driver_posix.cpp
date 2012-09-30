@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -49,7 +49,7 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 
 	static Bool	 enableUnicode = Setup::enableUnicode;
 
-#ifdef __WIN32__
+#if defined __WIN32__
 	/* Disable Unicode functions on Windows 9x even if we
 	 * have Unicows as it does not work correctly there.
 	 */
@@ -103,7 +103,7 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 			break;
 	}
 
-#ifndef __WIN32__
+#if !defined __WIN32__
 	/* Restore original output format.
 	 */
 	String::SetOutputFormat(previousOutputFormat);

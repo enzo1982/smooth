@@ -198,20 +198,13 @@ S::Void *S::GUI::BitmapBackend::GetSystemBitmap() const
 
 S::Int S::GUI::BitmapBackend::GrayscaleBitmap()
 {
-	if (bytes == NIL) return Error();
-
 	Point	 point;
-	Color	 color;
 
 	for (point.y = 0; point.y < size.cy; point.y++)
 	{
 		for (point.x = 0; point.x < size.cx; point.x++)
 		{
-			color = GetPixel(point);
-			color = (color.GetRed() + color.GetGreen() + color.GetBlue()) / 3;
-			color = Color(color, color, color);
-
-			SetPixel(point, color);
+			SetPixel(point, GetPixel(point).Grayscale());
 		}
 	}
 
@@ -220,19 +213,15 @@ S::Int S::GUI::BitmapBackend::GrayscaleBitmap()
 
 S::Int S::GUI::BitmapBackend::InvertColors()
 {
-	if (bytes == NIL) return Error();
-
 	Point	 point;
-	Color	 color;
 
 	for (point.y = 0; point.y < size.cy; point.y++)
 	{
 		for (point.x = 0; point.x < size.cx; point.x++)
 		{
-			color = GetPixel(point);
-			color = Color(255 - color.GetRed(), 255 - color.GetGreen(), 255 - color.GetBlue());
+			Color	 pixel = GetPixel(point);
 
-			SetPixel(point, color);
+			SetPixel(point, Color(255 - pixel.GetRed(), 255 - pixel.GetGreen(), 255 - pixel.GetBlue()));
 		}
 	}
 
@@ -241,8 +230,6 @@ S::Int S::GUI::BitmapBackend::InvertColors()
 
 S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &color1, const Color &color2)
 {
-	if (bytes == NIL) return Error();
-
 	Point	 point;
 
 	for (point.y = 0; point.y < size.cy; point.y++)
@@ -250,6 +237,27 @@ S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &color1, const Color &col
 		for (point.x = 0; point.x < size.cx; point.x++)
 		{
 			if (GetPixel(point) == color1) SetPixel(point, color2);
+		}
+	}
+
+	return Success();
+}
+
+S::Int S::GUI::BitmapBackend::SetBackgroundColor(const Color &color)
+{
+	if (depth != 32) return Success();
+
+	Point	 point;
+
+	for (point.y = 0; point.y < size.cy; point.y++)
+	{
+		for (point.x = 0; point.x < size.cx; point.x++)
+		{
+			Color	 pixel = GetPixel(point);
+
+			if (pixel.GetAlpha() != 255) SetPixel(point, Color((pixel.GetRed()   * pixel.GetAlpha() + color.GetRed()   * (255 - pixel.GetAlpha())) / 255,
+									   (pixel.GetGreen() * pixel.GetAlpha() + color.GetGreen() * (255 - pixel.GetAlpha())) / 255,
+									   (pixel.GetBlue()  * pixel.GetAlpha() + color.GetBlue()  * (255 - pixel.GetAlpha())) / 255));
 		}
 	}
 
@@ -281,8 +289,8 @@ S::Bool S::GUI::BitmapBackend::SetPixel(const Point &iPoint, const Color &color)
 #endif
 
 			data[offset + 0] = (color >> 16) & 255;
-			data[offset + 1] = (color >> 8) & 255;
-			data[offset + 2] = color & 255;
+			data[offset + 1] = (color >>  8) & 255;
+			data[offset + 2] =  color	 & 255;
 
 			done = True;
 
@@ -295,9 +303,9 @@ S::Bool S::GUI::BitmapBackend::SetPixel(const Point &iPoint, const Color &color)
 #endif
 
 			data[offset + 0] = (color >> 16) & 255;
-			data[offset + 1] = (color >> 8) & 255;
-			data[offset + 2] = color & 255;
-			data[offset + 3] = 255;
+			data[offset + 1] = (color >>  8) & 255;
+			data[offset + 2] =  color	 & 255;
+			data[offset + 3] = (color >> 24) & 255;
 
 			done = True;
 
@@ -336,7 +344,7 @@ S::GUI::Color S::GUI::BitmapBackend::GetPixel(const Point &iPoint) const
 			offset = 	      point.y  * (((4 - ((size.cx * 4) & 3)) & 3) + size.cx * 4) + point.x * 4;
 #endif
 
-			color = Color(data[offset + 2], data[offset + 1], data[offset + 0]);
+			color = Color(data[offset + 3] << 24 | data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2]);
 
 			break;
 	}

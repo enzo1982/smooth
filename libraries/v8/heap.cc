@@ -67,21 +67,26 @@ Heap::Heap()
     : isolate_(NULL),
 // semispace_size_ should be a power of 2 and old_generation_size_ should be
 // a multiple of Page::kPageSize.
-#if defined(ANDROID)
-#define LUMP_OF_MEMORY (128 * KB)
-      code_range_size_(0),
-#elif defined(V8_TARGET_ARCH_X64)
+#if defined(V8_TARGET_ARCH_X64)
 #define LUMP_OF_MEMORY (2 * MB)
       code_range_size_(512*MB),
 #else
 #define LUMP_OF_MEMORY MB
       code_range_size_(0),
 #endif
+#if defined(ANDROID)
+      reserved_semispace_size_(4 * Max(LUMP_OF_MEMORY, Page::kPageSize)),
+      max_semispace_size_(4 * Max(LUMP_OF_MEMORY, Page::kPageSize)),
+      initial_semispace_size_(Page::kPageSize),
+      max_old_generation_size_(192*MB),
+      max_executable_size_(max_old_generation_size_),
+#else
       reserved_semispace_size_(8 * Max(LUMP_OF_MEMORY, Page::kPageSize)),
       max_semispace_size_(8 * Max(LUMP_OF_MEMORY, Page::kPageSize)),
       initial_semispace_size_(Page::kPageSize),
       max_old_generation_size_(700ul * LUMP_OF_MEMORY),
       max_executable_size_(256l * LUMP_OF_MEMORY),
+#endif
 
 // Variables set based on semispace_size_ and old_generation_size_ in
 // ConfigureHeap (survived_since_last_expansion_, external_allocation_limit_)
@@ -145,7 +150,6 @@ Heap::Heap()
       number_idle_notifications_(0),
       last_idle_notification_gc_count_(0),
       last_idle_notification_gc_count_init_(false),
-      idle_notification_will_schedule_next_gc_(false),
       mark_sweeps_since_idle_round_started_(0),
       ms_count_at_last_idle_notification_(0),
       gc_count_at_last_idle_gc_(0),
@@ -504,11 +508,17 @@ bool Heap::CollectGarbage(AllocationSpace space,
       !incremental_marking()->IsStopped() &&
       !incremental_marking()->should_hurry() &&
       FLAG_incremental_marking_steps) {
-    if (FLAG_trace_incremental_marking) {
-      PrintF("[IncrementalMarking] Delaying MarkSweep.\n");
+    // Make progress in incremental marking.
+    const intptr_t kStepSizeWhenDelayedByScavenge = 1 * MB;
+    incremental_marking()->Step(kStepSizeWhenDelayedByScavenge,
+                                IncrementalMarking::NO_GC_VIA_STACK_GUARD);
+    if (!incremental_marking()->IsComplete()) {
+      if (FLAG_trace_incremental_marking) {
+        PrintF("[IncrementalMarking] Delaying MarkSweep.\n");
+      }
+      collector = SCAVENGER;
+      collector_reason = "incremental marking delaying mark-sweep";
     }
-    collector = SCAVENGER;
-    collector_reason = "incremental marking delaying mark-sweep";
   }
 
   bool next_gc_likely_to_collect_more = false;
@@ -1953,7 +1963,7 @@ MaybeObject* Heap::AllocateTypeFeedbackInfo() {
     if (!maybe_info->To(&info)) return maybe_info;
   }
   info->set_ic_total_count(0);
-  info->set_ic_with_typeinfo_count(0);
+  info->set_ic_with_type_info_count(0);
   info->set_type_feedback_cells(TypeFeedbackCells::cast(empty_fixed_array()),
                                 SKIP_WRITE_BARRIER);
   return info;
@@ -2897,9 +2907,9 @@ MaybeObject* Heap::AllocateSharedFunctionInfo(Object* name) {
   share->set_inferred_name(empty_string(), SKIP_WRITE_BARRIER);
   share->set_initial_map(undefined_value(), SKIP_WRITE_BARRIER);
   share->set_this_property_assignments(undefined_value(), SKIP_WRITE_BARRIER);
-  share->set_deopt_counter(FLAG_deopt_every_n_times);
-  share->set_profiler_ticks(0);
   share->set_ast_node_count(0);
+  share->set_deopt_counter(FLAG_deopt_every_n_times);
+  share->set_ic_age(0);
 
   // Set integer fields (smi or int, depending on the architecture).
   share->set_length(0);
@@ -4817,10 +4827,8 @@ void Heap::EnsureHeapIsIterable() {
 
 
 void Heap::AdvanceIdleIncrementalMarking(intptr_t step_size) {
-  // This flag prevents incremental marking from requesting GC via stack guard
-  idle_notification_will_schedule_next_gc_ = true;
-  incremental_marking()->Step(step_size);
-  idle_notification_will_schedule_next_gc_ = false;
+  incremental_marking()->Step(step_size,
+                              IncrementalMarking::NO_GC_VIA_STACK_GUARD);
 
   if (incremental_marking()->IsComplete()) {
     bool uncommit = false;

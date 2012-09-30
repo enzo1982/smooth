@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -87,7 +87,7 @@ S::Bool S::GUI::BitmapXLib::CreateBitmap(Int cx, Int cy, Int bpp)
 	if (bpp != 16 && bpp != 24 && bpp != 32) bpp = 32;
 	
 	bitmap	= XCreatePixmap(display, DefaultRootWindow(display), cx, cy, bpp);
-	bytes	= (Void *) -1;	
+	bytes	= NIL;
 
 	if (bitmap == NIL) return False;
 
@@ -153,12 +153,110 @@ S::Void *S::GUI::BitmapXLib::GetSystemBitmap() const
 	return (Void *) bitmap;
 }
 
+S::Int S::GUI::BitmapXLib::GrayscaleBitmap()
+{
+	if (bitmap == NIL) return Error();
+
+	XImage	*image = XGetImage(display, bitmap, 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+	Point	 point;
+
+	for (point.y = 0; point.y < size.cy; point.y++)
+	{
+		for (point.x = 0; point.x < size.cx; point.x++)
+		{
+			Long	 value = XGetPixel(image, point.x, point.y);
+			Color	 pixel = Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255));
+
+			SetPixel(point, pixel.Grayscale());
+		}
+	}
+
+	XDestroyImage(image);
+
+	return Success();
+}
+
+S::Int S::GUI::BitmapXLib::InvertColors()
+{
+	if (bitmap == NIL) return Error();
+
+	XImage	*image = XGetImage(display, bitmap, 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+	Point	 point;
+
+	for (point.y = 0; point.y < size.cy; point.y++)
+	{
+		for (point.x = 0; point.x < size.cx; point.x++)
+		{
+			Long	 value = XGetPixel(image, point.x, point.y);
+			Color	 pixel = Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255));
+
+			SetPixel(point, Color(255 - pixel.GetRed(), 255 - pixel.GetGreen(), 255 - pixel.GetBlue()));
+		}
+	}
+
+	XDestroyImage(image);
+
+	return Success();
+}
+
+S::Int S::GUI::BitmapXLib::ReplaceColor(const Color &color1, const Color &color2)
+{
+	if (bitmap == NIL) return Error();
+
+	XImage	*image = XGetImage(display, bitmap, 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+	Point	 point;
+
+	for (point.y = 0; point.y < size.cy; point.y++)
+	{
+		for (point.x = 0; point.x < size.cx; point.x++)
+		{
+			Long	 value = XGetPixel(image, point.x, point.y);
+			Color	 pixel = Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255));
+
+			if (pixel == color1) SetPixel(point, color2);
+		}
+	}
+
+	XDestroyImage(image);
+
+	return Success();
+}
+
+S::Int S::GUI::BitmapXLib::SetBackgroundColor(const Color &color)
+{
+	if (bitmap == NIL) return Error();
+	if (depth  != 32)  return Success();
+
+	XImage	*image = XGetImage(display, bitmap, 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+	Point	 point;
+
+	for (point.y = 0; point.y < size.cy; point.y++)
+	{
+		for (point.x = 0; point.x < size.cx; point.x++)
+		{
+			Long	 value = XGetPixel(image, point.x, point.y);
+			Color	 pixel = Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255));
+
+			if (pixel.GetAlpha() != 255) SetPixel(point, Color((pixel.GetRed()   * pixel.GetAlpha() + color.GetRed()   * (255 - pixel.GetAlpha())) / 255,
+									   (pixel.GetGreen() * pixel.GetAlpha() + color.GetGreen() * (255 - pixel.GetAlpha())) / 255,
+									   (pixel.GetBlue()  * pixel.GetAlpha() + color.GetBlue()  * (255 - pixel.GetAlpha())) / 255));
+		}
+	}
+
+	XDestroyImage(image);
+
+	return Success();
+}
+
 S::Bool S::GUI::BitmapXLib::SetPixel(const Point &iPoint, const Color &color)
 {
+	if (bitmap == NIL) return Error();
+
 	XGCValues	 gcValues;
 
-	if (depth == 16) gcValues.foreground = ((color.GetRed() >> 3) << 11) | ((color.GetGreen() >> 2) << 5) | (color.GetBlue() >> 3);
-	else		 gcValues.foreground = ( color.GetRed()	      << 16) | ( color.GetGreen()	<< 8) | (color.GetBlue()     );
+	if	(depth == 16) gcValues.foreground =			       ((color.GetRed() >> 3) << 11) | ((color.GetGreen() >> 2) << 5) | (color.GetBlue() >> 3);
+	else if (depth == 24) gcValues.foreground =			       ( color.GetRed()	      << 16) | ( color.GetGreen()       << 8) | (color.GetBlue()     );
+	else if (depth == 32) gcValues.foreground = (color.GetAlpha() << 24) | ( color.GetRed()	      << 16) | ( color.GetGreen()	<< 8) | (color.GetBlue()     );
 
 	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
 
@@ -171,13 +269,18 @@ S::Bool S::GUI::BitmapXLib::SetPixel(const Point &iPoint, const Color &color)
 
 S::GUI::Color S::GUI::BitmapXLib::GetPixel(const Point &iPoint) const
 {
+	if (bitmap == NIL) return Color();
+
 	XImage	*image = XGetImage(display, bitmap, iPoint.x, iPoint.y, 1, 1, AllPlanes, XYPixmap);
 	Long	 value = XGetPixel(image, 0, 0);
 
 	XDestroyImage(image);
 
-	if (depth == 16) return Color(((value >> 11) &  31) << 3, ((value >> 5) &  63) << 2, (value &  31) << 3);
-	else		 return Color( (value >> 16) & 255,	   (value >> 8) & 255,	      value & 255      );
+	if	(depth == 16) return	 255		   << 24 | Color(((value >> 11) &  31) << 3, ((value >> 5) &  63) << 2, (value &  31) << 3);
+	else if (depth == 24) return	 255		   << 24 | Color( (value >> 16) & 255,	      (value >> 8) & 255,	 value & 255      );
+	else if (depth == 32) return ((value >> 24) & 255) << 24 | Color( (value >> 16) & 255,	      (value >> 8) & 255,	 value & 255      );
+
+	return Color();
 }
 
 S::GUI::BitmapBackend &S::GUI::BitmapXLib::operator =(const BitmapBackend &newBitmap)

@@ -250,8 +250,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				if (windowStyle & WS_DLGFRAME)
 				{
-					POINT	 maxSize     = { (windowRect.right  - windowRect.left) * fontSize,
-								 (windowRect.bottom - windowRect.top)  * fontSize };
+					POINT	 maxSize     = { (LONG) Math::Round((windowRect.right  - windowRect.left) * fontSize),
+								 (LONG) Math::Round((windowRect.bottom - windowRect.top)  * fontSize) };
 					POINT	 maxPosition = { windowRect.left, windowRect.top };
 
 					minMaxInfo->ptMaxSize	  = maxSize;
@@ -679,12 +679,17 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 	if (vInfo.dwMajorVersion > 4) transparentPixel = 16777215;
 	else			      transparentPixel = 0;
 
-	for (Int y = 0; y < mask.GetSize().cy; y++)
+	Size	 size  = newIcon.GetSize();
+	Int	 depth = newIcon.GetDepth();
+
+	for (Int y = 0; y < size.cy; y++)
 	{
-		for (Int x = 0; x < mask.GetSize().cx; x++)
+		for (Int x = 0; x < size.cx; x++)
 		{
-			if (mask.GetPixel(Point(x, y)) == Setup::BackgroundColor) mask.SetPixel(Point(x, y), transparentPixel);
-			else							  mask.SetPixel(Point(x, y), 0);
+			Color	 pixel = newIcon.GetPixel(Point(x, y));
+
+			if (depth == 32) mask.SetPixel(Point(x, y), pixel.GetAlpha() >=    128  ? transparentPixel : 0);
+			else		 mask.SetPixel(Point(x, y), pixel == Color(192,192,192) ? transparentPixel : 0);
 		}
 	}
 

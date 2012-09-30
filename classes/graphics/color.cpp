@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -43,39 +43,27 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 					g = GetGreen();
 					b = GetBlue();
 
-					if (r > g)
-					{
-						if (r > b)	max = r;
-						else		max = b;
-						if (g < b)	min = g;
-						else		min = b;
-					}
-					else
-					{
-						if (g > b)	max = g;
-						else		max = b;
-						if (r < b)	min = r;
-						else		min = b;
-					}
+					max = Math::Max(Math::Max(r, g), b);
+					min = Math::Min(Math::Min(r, g), b);
 
 					v = max;
 
-					if (max != 0)	s = (max - min) / max;
-					else		s = 0;
+					if (max != 0) s = (max - min) / max;
+					else	      s = 0;
 
-					if (s == 0)	h = 0;
-					else
+					h = 0;
+
+					if (s != 0)
 					{
-						h = 0;
 						delta = max - min;
 
-						if (r == max)		h = (g - b) / delta;
-						else if (g == max)	h = 2 + (b - r) / delta;
-						else if (b == max)	h = 4 + (r - g) / delta;
+						if	(r == max) h =	   (g - b) / delta;
+						else if (g == max) h = 2 + (b - r) / delta;
+						else if (b == max) h = 4 + (r - g) / delta;
 
 						h *= 60;
 
-						if (h < 0)	h += 360;
+						if (h < 0) h += 360;
 					}
 
 					p1 = h / 360 * 255;
@@ -88,8 +76,8 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 					return Color((int) p1, (int) p2, (int) p3);
 				case YUV:
 					p1 = (GetRed() + GetGreen() + GetBlue()) / 3;
-					p2 = GetBlue();
-					p3 = GetRed();
+					p2 =  GetBlue();
+					p3 =  GetRed();
 
 					p1 = Math::Round(p1);
 
@@ -105,22 +93,12 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 					g = GetGreen();
 					b = GetBlue();
 
-					if (r > g)
-					{
-						if (r > b)	p4 = 255 - r;
-						else		p4 = 255 - b;
-					}
-					else
-					{
-						if (g > b)	p4 = 255 - g;
-						else		p4 = 255 - b;
-					}
-
+					p4 = 255 - Math::Max(Math::Max(r, g), b);
 					p1 = 255 - r - p4;
 					p2 = 255 - g - p4;
 					p3 = 255 - b - p4;
 
-					return Color((Int) p1, (Int) p2, (Int) p3, (Int) p4);
+					return Color(((Int) p1) | ((Int) p2) << 8 | ((Int) p3) << 16 | ((Int) p4) << 24);
 				case GRAY:
 					return Color((GetRed() + GetGreen() + GetBlue()) / 3);
 				default:
@@ -144,14 +122,14 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 					}
 					else
 					{
-						while (h < 0)		h += 360;
-						while (h >= 360)	h -= 360;
+						while (h <    0) h += 360;
+						while (h >= 360) h -= 360;
 
 						h /= 60;
 
 						f = h - (int) h;
-						p = v * (1 - s);
-						q = v * (1 - (s * f));
+						p = v * (1 -  s		  );
+						q = v * (1 - (s *      f ));
 						t = v * (1 - (s * (1 - f)));
 
 						switch ((int) h)
@@ -213,8 +191,8 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 			switch (cs)
 			{
 				case RGBA:
-					p1 = GetBlue();
-					p3 = GetGreen();
+					p1 =	 GetBlue();
+					p3 =	 GetGreen();
 					p2 = 3 * GetRed() - p1 - p3;
 
 					if (p2 < 0) p2 = 0;
@@ -263,10 +241,10 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 			switch (cs)
 			{
 				case RGBA:
-					p4 = GetAlpha();
-					p1 = 255 - GetRed() - p4;
+					p4 =	   GetAlpha();
+					p1 = 255 - GetRed()   - p4;
 					p2 = 255 - GetGreen() - p4;
-					p3 = 255 - GetBlue() - p4;
+					p3 = 255 - GetBlue()  - p4;
 
 					return Color((int) p1, (int) p2, (int) p3);
 				case HSV:
@@ -315,13 +293,13 @@ S::GUI::Color S::GUI::Color::Downsample(Int bpcc) const
 {
 	if (bpcc == 8) return *this;
 
-	int first = GetRed();
+	int first  = GetRed();
 	int second = GetGreen();
-	int third = GetBlue();
+	int third  = GetBlue();
 
-	first >>= (8 - bpcc);
+	first  >>= (8 - bpcc);
 	second >>= (8 - bpcc);
-	third >>= (8 - bpcc);
+	third  >>= (8 - bpcc);
 
 	return Color((Long) (first + Math::Pow(2, bpcc) * second + Math::Pow(4, bpcc) * third), colorSpace);
 }
@@ -330,13 +308,13 @@ S::GUI::Color S::GUI::Color::Upsample(Int bpcc) const
 {
 	if (bpcc == 8) return *this;
 
-	int first = color & (int) (Math::Pow(2, bpcc) - 1);
-	int second = (color >> bpcc) & (int) (Math::Pow(2, bpcc) - 1);
-	int third = (color >> (2 * bpcc)) & (int) (Math::Pow(2, bpcc) - 1);
+	int first  =  color		   & (int) (Math::Pow(2, bpcc) - 1);
+	int second = (color >>	    bpcc ) & (int) (Math::Pow(2, bpcc) - 1);
+	int third  = (color >> (2 * bpcc)) & (int) (Math::Pow(2, bpcc) - 1);
 
-	first = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) first);
+	first  = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) first);
 	second = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) second);
-	third = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) third);
+	third  = (int) (255 / (Math::Pow(2, bpcc) - 1) * (double) third);
 
 	return Color(first, second, third, colorSpace);
 }

@@ -7582,7 +7582,7 @@ RUNTIME_FUNCTION(MaybeObject*, Runtime_DateSetValue) {
     }
   }
   date->SetValue(value, is_value_nan);
-  return *date;
+  return value;
 }
 
 
@@ -8043,8 +8043,6 @@ RUNTIME_FUNCTION(MaybeObject*, Runtime_LazyRecompile) {
   ASSERT(args.length() == 1);
   Handle<JSFunction> function = args.at<JSFunction>(0);
 
-  function->shared()->set_profiler_ticks(0);
-
   // If the function is not compiled ignore the lazy
   // recompilation. This can happen if the debugger is activated and
   // the function is returned to the not compiled state.
@@ -8067,6 +8065,7 @@ RUNTIME_FUNCTION(MaybeObject*, Runtime_LazyRecompile) {
     function->ReplaceCode(function->shared()->code());
     return function->code();
   }
+  function->shared()->code()->set_profiler_ticks(0);
   if (JSFunction::CompileOptimized(function,
                                    AstNode::kNoNumber,
                                    CLEAR_EXCEPTION)) {
@@ -8396,6 +8395,12 @@ RUNTIME_FUNCTION(MaybeObject*, Runtime_CompileForOnStackReplacement) {
 RUNTIME_FUNCTION(MaybeObject*, Runtime_CheckIsBootstrapping) {
   RUNTIME_ASSERT(isolate->bootstrapper()->IsActive());
   return isolate->heap()->undefined_value();
+}
+
+
+RUNTIME_FUNCTION(MaybeObject*, Runtime_GetRootNaN) {
+  RUNTIME_ASSERT(isolate->bootstrapper()->IsActive());
+  return isolate->heap()->nan_value();
 }
 
 
@@ -9921,36 +9926,6 @@ RUNTIME_FUNCTION(MaybeObject*, Runtime_EstimateNumberOfElements) {
   } else {
     return Smi::FromInt(FixedArray::cast(elements)->length());
   }
-}
-
-
-RUNTIME_FUNCTION(MaybeObject*, Runtime_SwapElements) {
-  HandleScope handle_scope(isolate);
-
-  ASSERT_EQ(3, args.length());
-
-  CONVERT_ARG_HANDLE_CHECKED(JSObject, object, 0);
-  Handle<Object> key1 = args.at<Object>(1);
-  Handle<Object> key2 = args.at<Object>(2);
-
-  uint32_t index1, index2;
-  if (!key1->ToArrayIndex(&index1)
-      || !key2->ToArrayIndex(&index2)) {
-    return isolate->ThrowIllegalOperation();
-  }
-
-  Handle<JSObject> jsobject = Handle<JSObject>::cast(object);
-  Handle<Object> tmp1 = Object::GetElement(jsobject, index1);
-  RETURN_IF_EMPTY_HANDLE(isolate, tmp1);
-  Handle<Object> tmp2 = Object::GetElement(jsobject, index2);
-  RETURN_IF_EMPTY_HANDLE(isolate, tmp2);
-
-  RETURN_IF_EMPTY_HANDLE(
-      isolate, JSObject::SetElement(jsobject, index1, tmp2, NONE, kStrictMode));
-  RETURN_IF_EMPTY_HANDLE(
-      isolate, JSObject::SetElement(jsobject, index2, tmp1, NONE, kStrictMode));
-
-  return isolate->heap()->undefined_value();
 }
 
 

@@ -467,6 +467,8 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup	  = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
+	/* Copy the image.
+	 */
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
 		if (!painting)
@@ -505,6 +507,8 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, co
 	HDC	 cdc	 = CreateCompatibleDC(paintContext);
 	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
+	/* Copy the image.
+	 */
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
 		BitBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, paintContext, srcRect.left, srcRect.top, SRCCOPY);

@@ -22,7 +22,7 @@
 
 const S::Short	 S::System::DynamicLoader::classID = S::Object::RequestClassID();
 
-S::System::DynamicLoader::DynamicLoader(const String &module)
+S::System::DynamicLoader::DynamicLoader(const String &module) : handle(NIL)
 {
 #if defined __WIN32__
 	static String	 dllExt		= ".dll";
@@ -36,17 +36,20 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 #endif
 
 #ifdef __WIN32__
-	/* Try the supplied module name in application directory.
-	 */
-	if (Setup::enableUnicode)	handle = LoadLibraryW(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
-	else				handle = LoadLibraryA(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
+	if (module[1] != ':')
+	{
+		/* Try the supplied module name in application directory.
+		 */
+		if (Setup::enableUnicode) handle = LoadLibraryW(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
+		else			  handle = LoadLibraryA(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
+	}
 
 	if (handle == NIL)
 	{
 		/* Try the supplied module name system wide.
 		 */
-		if (Setup::enableUnicode)	handle = LoadLibraryW(String(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
-		else				handle = LoadLibraryA(String(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
+		if (Setup::enableUnicode) handle = LoadLibraryW(String(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
+		else			  handle = LoadLibraryA(String(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
 	}
 #else
 	Int	 dlopenFlags = RTLD_NOW | RTLD_LOCAL;
@@ -55,9 +58,12 @@ S::System::DynamicLoader::DynamicLoader(const String &module)
 	dlopenFlags |= RTLD_NODELETE;
 #endif
 
-	/* Try the supplied module name in application directory.
-	 */
-	handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt), dlopenFlags);
+	if (!module.StartsWith("/"))
+	{
+		/* Try the supplied module name in application directory.
+		 */
+		handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt), dlopenFlags);
+	}
 
 	if (handle == NIL)
 	{

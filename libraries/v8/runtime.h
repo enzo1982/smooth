@@ -77,6 +77,7 @@ namespace internal {
   \
   /* Utilities */ \
   F(CheckIsBootstrapping, 0, 1) \
+  F(GetRootNaN, 0, 1) \
   F(Call, -1 /* >= 2 */, 1) \
   F(Apply, 5, 1) \
   F(GetFunctionDelegate, 1, 1) \
@@ -268,7 +269,6 @@ namespace internal {
   F(GetArrayKeys, 2, 1) \
   F(MoveArrayContents, 2, 1) \
   F(EstimateNumberOfElements, 1, 1) \
-  F(SwapElements, 3, 1) \
   \
   /* Getters and Setters */ \
   F(LookupAccessor, 3, 1) \
@@ -529,8 +529,7 @@ namespace internal {
   F(RegExpExec, 4, 1)                                                        \
   F(RegExpConstructResult, 3, 1)                                             \
   F(GetFromCache, 2, 1)                                                      \
-  F(NumberToString, 1, 1)                                                    \
-  F(SwapElements, 3, 1)
+  F(NumberToString, 1, 1)
 
 
 //---------------------------------------------------------------------------

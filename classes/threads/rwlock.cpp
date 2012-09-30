@@ -18,12 +18,9 @@ const S::Short	 S::Threads::RWLock::MAX_READ_LOCKS = 16;
 S::Threads::RWLock::RWLock()
 {
 	writeLocked = False;
-	readLocks = 0;
 
-	readLockMutex		= new Mutex();
-
-	exclusiveAccessMutex	= new Mutex();
-	sharedAccessSemaphore	= new Semaphore(MAX_READ_LOCKS);
+	exclusiveAccessMutex  = new Mutex();
+	sharedAccessSemaphore = new Semaphore(MAX_READ_LOCKS);
 }
 
 S::Threads::RWLock::RWLock(const RWLock &oRWLock)
@@ -33,8 +30,6 @@ S::Threads::RWLock::RWLock(const RWLock &oRWLock)
 
 S::Threads::RWLock::~RWLock()
 {
-	delete readLockMutex;
-
 	delete exclusiveAccessMutex;
 	delete sharedAccessSemaphore;
 }
@@ -44,34 +39,18 @@ S::Threads::RWLock &S::Threads::RWLock::operator =(const RWLock &oRWLock)
 	if (&oRWLock == this) return *this;
 
 	writeLocked = False;
-	readLocks = 0;
 
-	readLockMutex		= new Mutex();
-
-	exclusiveAccessMutex	= new Mutex();
-	sharedAccessSemaphore	= new Semaphore(MAX_READ_LOCKS);
+	exclusiveAccessMutex  = new Mutex();
+	sharedAccessSemaphore = new Semaphore(MAX_READ_LOCKS);
 
 	return *this;
 }
 
 S::Int S::Threads::RWLock::LockForRead()
 {
-	/* Wait for write locks to be released.
-	 */
-	exclusiveAccessMutex->Lock();
-
 	/* Increase shared access counter by one.
 	 */
-	readLockMutex->Lock();
-
 	sharedAccessSemaphore->Wait();
-	readLocks++;
-
-	readLockMutex->Release();
-
-	/* Allow new read and write locks again.
-	 */
-	exclusiveAccessMutex->Release();
 
 	return Success();
 }
@@ -84,10 +63,7 @@ S::Int S::Threads::RWLock::LockForWrite()
 
 	/* Wait for read operations to finish.
 	 */
-	while (readLocks > 0)
-	{
-		System::System::Sleep(0);
-	}
+	for (Int i = 0; i < MAX_READ_LOCKS; i++) sharedAccessSemaphore->Wait();
 
 	/* Mark ourself locked for write.
 	 */
@@ -98,42 +74,24 @@ S::Int S::Threads::RWLock::LockForWrite()
 
 S::Int S::Threads::RWLock::Release()
 {
-	/* Acquire exclusive lock.
-	 */
-	exclusiveAccessMutex->Lock();
-
 	/* Check if we are locked for write.
 	 */
-	if (writeLocked && readLocks == 0)
+	if (writeLocked)
 	{
 		/* Release write lock.
 		 */
 		writeLocked = False;
 
+		/* Release shared access semaphore.
+		 */
+		for (Int i = 0; i < MAX_READ_LOCKS; i++) sharedAccessSemaphore->Release();
+
 		/* Allow new read and write locks again.
 		 */
-		exclusiveAccessMutex->Release();
-
 		return exclusiveAccessMutex->Release();
 	}
 
-	/* Check if we are locked for read.
+	/* Decrease shared access counter by one.
 	 */
-	if (readLocks > 0)
-	{
-		/* Decrease shared access counter by one.
-		 */
-		readLockMutex->Lock();
-
-		readLocks--;
-		sharedAccessSemaphore->Release();
-
-		readLockMutex->Release();
-	}
-
-	/* Allow new read and write locks again.
-	 */
-	exclusiveAccessMutex->Release();
-
-	return Success();
+	return sharedAccessSemaphore->Release();
 }

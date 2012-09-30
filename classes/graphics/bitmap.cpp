@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -95,6 +95,11 @@ S::Int S::GUI::Bitmap::InvertColors()
 S::Int S::GUI::Bitmap::ReplaceColor(const Color &color1, const Color &color2)
 {
 	return backend->ReplaceColor(color1, color2);
+}
+
+S::Int S::GUI::Bitmap::SetBackgroundColor(const Color &color)
+{
+	return backend->SetBackgroundColor(color);
 }
 
 S::Int S::GUI::Bitmap::Scale(const Size &newSize)

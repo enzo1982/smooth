@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -112,18 +112,6 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	 */
 	png_set_strip_16(png_ptr);
 
-	/* Set the background color to draw transparent and alpha images over.
-	 * It is possible to set the red, green, and blue components directly
-	 * for paletted images instead of supplying a palette index.
-	 */
-	png_color_16	 my_background;
-
-	my_background.red	= Setup::BackgroundColor.GetRed();
-	my_background.green	= Setup::BackgroundColor.GetGreen();
-	my_background.blue	= Setup::BackgroundColor.GetBlue();
-
-	png_set_background(png_ptr, &my_background, PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
-
 	/* Get basic image information
 	 */
 	png_uint_32	 width	    = 0;
@@ -150,15 +138,17 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	 */
 	png_read_image(png_ptr, row_pointers);
 
-	bitmap.CreateBitmap(width, height);
+	bitmap.CreateBitmap(width, height, (color_type == PNG_COLOR_TYPE_RGB_ALPHA) ? 32 : 24);
 
 	for (UnsignedInt y = 0; y < height; y++)
 	{
 		for (UnsignedInt x = 0; x < width; x++)
 		{
-			if	((color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA) && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][x], row_pointers[y][x], row_pointers[y][x]));
-			else if	((color_type == PNG_COLOR_TYPE_RGB  || color_type == PNG_COLOR_TYPE_RGB_ALPHA)  && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][3 * x], row_pointers[y][3 * x + 1], row_pointers[y][3 * x + 2]));
-			else if ( color_type == PNG_COLOR_TYPE_PALETTE						&& bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(palette[row_pointers[y][x]].red, palette[row_pointers[y][x]].green, palette[row_pointers[y][x]].blue));
+			if	(color_type == PNG_COLOR_TYPE_GRAY	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(					  row_pointers[y][    x	   ] << 16 | row_pointers[y][	 x    ] << 8 | row_pointers[y][	   x]));
+			else if	(color_type == PNG_COLOR_TYPE_GRAY_ALPHA && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][2 * x + 1] << 24 | row_pointers[y][2 * x	   ] << 16 | row_pointers[y][2 * x    ] << 8 | row_pointers[y][2 * x]));
+			else if	(color_type == PNG_COLOR_TYPE_RGB	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(					  row_pointers[y][3 * x + 2] << 16 | row_pointers[y][3 * x + 1] << 8 | row_pointers[y][3 * x]));
+			else if	(color_type == PNG_COLOR_TYPE_RGB_ALPHA	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][4 * x + 3] << 24 | row_pointers[y][4 * x + 2] << 16 | row_pointers[y][4 * x + 1] << 8 | row_pointers[y][4 * x]));
+			else if (color_type == PNG_COLOR_TYPE_PALETTE	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(palette[row_pointers[y][x]].red, palette[row_pointers[y][x]].green, palette[row_pointers[y][x]].blue));
 		}
 	}
 

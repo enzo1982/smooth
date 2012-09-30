@@ -747,6 +747,8 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup	  = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
+	/* Copy the image.
+	 */
 	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
 	{
 		if (!painting)
@@ -775,20 +777,46 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 #else
 	GC	 gc = XCreateGC(display, window, 0, NIL);
 
+	/* Convert format if depths do not match.
+	 */
+	const Bitmap	*srcBitmap = &bitmap;
+
+	if (bitmap.GetDepth() != windowAttributes.depth)
+	{
+		Size	 size  = bitmap.GetSize();
+		Bitmap	*copy  = new Bitmap(size.cx, size.cy, windowAttributes.depth);
+		XImage	*image = XGetImage(display, (Pixmap) bitmap.GetSystemBitmap(), 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+		Point	 point;
+
+		for (point.y = 0; point.y < size.cy; point.y++)
+		{
+			for (point.x = 0; point.x < size.cx; point.x++)
+			{
+				Long	 value = XGetPixel(image, point.x, point.y);
+
+				copy->SetPixel(point, Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255)));
+			}
+		}
+
+		srcBitmap = copy;
+	}
+
+	/* Copy the image.
+	 */
 	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
 	{
 		if (!painting)
 		{
-			XCopyArea(display, (Pixmap) bitmap.GetSystemBitmap(), window, gc, srcRect.left, srcRect.top, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);
+			XCopyArea(display, (Pixmap) srcBitmap->GetSystemBitmap(), window, gc, srcRect.left, srcRect.top, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);
 		}
 
-		XCopyArea(display, (Pixmap) bitmap.GetSystemBitmap(), paintBitmap, gc, srcRect.left, srcRect.top, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);
+		XCopyArea(display, (Pixmap) srcBitmap->GetSystemBitmap(), paintBitmap, gc, srcRect.left, srcRect.top, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);
 	}
 	else
 	{
 		X11::Pixmap	 destBitmap  = XCreatePixmap(display, DefaultRootWindow(display), destRect.GetWidth(), destRect.GetHeight(), windowAttributes.depth);
 
-		cairo_surface_t	*srcSurface  = cairo_xlib_surface_create(display, (Pixmap) bitmap.GetSystemBitmap(), visual, bitmap.GetSize().cx, bitmap.GetSize().cy);
+		cairo_surface_t	*srcSurface  = cairo_xlib_surface_create(display, (Pixmap) srcBitmap->GetSystemBitmap(), visual, bitmap.GetSize().cx, bitmap.GetSize().cy);
 		cairo_surface_t	*destSurface = cairo_xlib_surface_create(display, destBitmap, visual, destRect.GetWidth(), destRect.GetHeight());
 
 		cairo_t		*context     = cairo_create(destSurface);
@@ -812,6 +840,10 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 		XFreePixmap(display, destBitmap);
 	}
 
+	/* Delete copy if we created one earlier.
+	 */
+	if (bitmap.GetDepth() != windowAttributes.depth) delete srcBitmap;
+
 	XFreeGC(display, gc);
 #endif
 
@@ -829,6 +861,8 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	HDC	 cdc	 = CreateCompatibleDC(paintContext);
 	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
+	/* Copy the image.
+	 */
 	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
 	{
 		BitBlt(cdc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), paintContext, srcRect.left, srcRect.top, SRCCOPY);
@@ -845,6 +879,8 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 #else
 	GC	 gc = XCreateGC(display, (Pixmap) bitmap.GetSystemBitmap(), 0, NIL);
 
+	/* Copy the image.
+	 */
 	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
 	{
 		XCopyArea(display, paintBitmap, (Pixmap) bitmap.GetSystemBitmap(), gc, srcRect.left, srcRect.top, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);

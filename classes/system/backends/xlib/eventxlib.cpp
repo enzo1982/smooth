@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -58,7 +58,12 @@ S::Int S::System::EventXLib::ProcessNextEvent()
 	 */
 	for (Int i = 0; i < 10; i++)
 	{
-		if (XEventsQueued(display, QueuedAfterFlush))
+		/* XEventsQueued with QueuedAfterFlush sometimes hanged,
+		 * so we flush manually and use QueuedAfterReading then.
+		 */
+		XFlush(display);
+
+		if (XEventsQueued(display, QueuedAfterReading))
 		{
 			XEvent		 e;
 

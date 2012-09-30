@@ -102,7 +102,7 @@ S::Int S::System::TimerPOSIX::GetID() const
 {
 	if (timer == NIL) return Error();
 
-	return (Int) timer;
+	return (Int64) timer;
 }
 
 void S::System::TimerPOSIX::TimerProc(int sig, siginfo_t *info, void *text)

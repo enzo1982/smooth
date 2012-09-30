@@ -67,6 +67,11 @@ namespace smooth
 				Bool			 SetSystemBitmap(Void *);
 				Void			*GetSystemBitmap() const;
 
+				Int			 GrayscaleBitmap();
+				Int			 InvertColors();
+				Int			 ReplaceColor(const Color &, const Color &);
+				Int			 SetBackgroundColor(const Color &);
+
 				Bool			 SetPixel(const Point &, const Color &);
 				Color			 GetPixel(const Point &) const;
 

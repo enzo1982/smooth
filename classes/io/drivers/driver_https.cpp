@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -93,7 +93,7 @@ S::Int S::IO::DriverHTTPS::WriteData(UnsignedByte *data, Int dataSize)
 
 S::Void S::IO::DriverHTTPS::CloseSocket()
 {
-#if defined __WIN32__ && !defined __WINE__
+#if defined __WIN32__
 	closesocket(stream);
 #else
 	close(stream);

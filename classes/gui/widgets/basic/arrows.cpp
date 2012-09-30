@@ -104,7 +104,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 				surface->Line(lineStart + Point(1, 0), lineEnd + Point(1, 0), Setup::DividerLightColor);
 
 				Int	 size		= Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
-				Point	 offset		= Point(size % 2 ? 1 : 0, frame.GetHeight() % 2 ? 0 : 1);
+				Point	 offset		= Point((size % 2) ? 1 : 0, (frame.GetHeight() % 2) ? 0 : 1);
 
 				for (Int i = 0; i < size; i++)
 				{

@@ -3,8 +3,6 @@
 include Makefile-directories
 include Makefile-options
 
-HEADERS = $(OBJECTDIR)/smooth.h.gch
-
 OBJECTS = classes/*/*.o classes/*/*/*.o classes/*/*/*/*.o classes/*/*/*/*/*.o misc/*.o
 
 LIBS = -lfribidi -lbz2 -lxml2 -ljpeg -lz -lstdc++
@@ -29,7 +27,11 @@ ifeq ($(BUILD_WIN32),True)
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
 else ifeq ($(BUILD_OSX),True)
-	LIBS += -lcpuid -lnsucd -liconv -lpng -lcairo -lpthread -lX11 -lXmu
+	ifeq ($(BUILD_CAIRO),True)
+		LIBS += -lcairo
+	endif
+
+	LIBS += -lcpuid -lnsucd -liconv -lpng -lpthread -lX11 -lXmu
 
 	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
 else ifeq ($(BUILD_HAIKU),True)
@@ -49,7 +51,7 @@ else
 		LIBS += -lXau -lXdmcp -lXxf86vm -lSM -lICE -lffi -ldrm -lpcre
 	endif
 
-	LIBS += $(shell pkg-config --libs xmu) $(shell pkg-config --libs gtk+-2.0)
+	LIBS += $(shell pkg-config --libs libpng) $(shell pkg-config --libs xmu) $(shell pkg-config --libs gtk+-2.0)
 	LIBS += -lpthread
 
 	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
@@ -90,11 +92,9 @@ ifneq ($(BUILD_SOLARIS),True)
 	LIBSTRIP_OPTS += --strip-debug
 endif
 
-.PHONY: all headers objects programs libs install clean clean_all clean_headers doc doc-clean
+.PHONY: all objects programs libs install clean clean_all doc doc-clean
 
 all: $(DLLNAME)
-
-headers: clean_headers $(HEADERS)
 
 objects:
 	$(MAKE) -C classes
@@ -110,7 +110,7 @@ libs:
 
 install:
 
-clean: clean_headers
+clean:
 	$(MAKE) -C classes clean
 	$(MAKE) -C misc clean
 	$(MAKE) -C resources clean
@@ -120,9 +120,6 @@ clean: clean_headers
 
 clean_all: clean
 	$(MAKE) -C libraries clean
-
-clean_headers:
-	$(REMOVER) $(REMOVER_OPTS) $(HEADERS)
 
 doc: doc-clean
 	doxys

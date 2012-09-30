@@ -314,7 +314,8 @@ bool FullCodeGenerator::MakeCode(CompilationInfo* info) {
   Code::Flags flags = Code::ComputeFlags(Code::FUNCTION);
   Handle<Code> code = CodeGenerator::MakeCodeEpilogue(&masm, flags, info);
   code->set_optimizable(info->IsOptimizable() &&
-                        !info->function()->flags()->Contains(kDontOptimize));
+                        !info->function()->flags()->Contains(kDontOptimize) &&
+                        info->function()->scope()->AllowsLazyRecompilation());
   code->set_self_optimization_header(cgen.has_self_optimization_header_);
   cgen.PopulateDeoptimizationData(code);
   cgen.PopulateTypeFeedbackInfo(code);
@@ -327,6 +328,7 @@ bool FullCodeGenerator::MakeCode(CompilationInfo* info) {
   code->set_compiled_optimizable(info->IsOptimizable());
 #endif  // ENABLE_DEBUGGER_SUPPORT
   code->set_allow_osr_at_loop_nesting_level(0);
+  code->set_profiler_ticks(0);
   code->set_stack_check_table_offset(table_offset);
   CodeGenerator::PrintCode(code, info);
   info->SetCode(code);  // May be an empty handle.

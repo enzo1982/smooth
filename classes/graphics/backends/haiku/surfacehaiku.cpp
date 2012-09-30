@@ -427,6 +427,8 @@ S::Int S::GUI::SurfaceHaiku::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 
+	/* Copy the image.
+	 */
 	if (!painting)
 	{
 		view->DrawBitmapAsync((BBitmap *) bitmap.GetSystemBitmap(), BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom));
@@ -451,6 +453,9 @@ S::Int S::GUI::SurfaceHaiku::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	destBitmap->Lock();
 
 	bitmapView->Sync();	
+
+	/* Copy the image.
+	 */
 	destView->DrawBitmap(this->bitmap, BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom));
 	
 	destBitmap->Unlock();

@@ -10,7 +10,7 @@ Windows, MSVC 10.0	since 0.8.70.9			complete support
 Linux, GCC 4.x		since 0.8.71.0			complete support
 FreeBSD, GCC 4.x	since 0.8.71.0			complete support
 OpenBSD, GCC 4.x	since 0.8.71.0			complete support
-Solaris, GCC 3.4	since 0.8.71.0			complete support
+Solaris, GCC 4.x	since 0.8.71.0			complete support
 
 Mac OS X, GCC 4.x	since 0.8.71.0			X11 GUI only
 QNX, GCC 4.x		since 0.8.71.0			X11 GUI only

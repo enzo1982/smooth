@@ -33,6 +33,7 @@ namespace X11
 #		define Success	0
 
 #		include <X11/Xlib.h>
+#		include <X11/Xproto.h>
 #		include <X11/Xutil.h>
 #		include <X11/Xatom.h>
 #		include <X11/Xmu/Atoms.h>
@@ -70,6 +71,9 @@ namespace smooth
 
 				X11::XIC				 ic;
 
+				X11::CARD32				*sysIcon;
+				Int					 sysIconSize;
+
 				Float					 fontSize;
 
 				Point					 pos;
@@ -101,6 +105,8 @@ namespace smooth
 				Int					 RequestClose();
 
 				Int					 SetTitle(const String &);
+
+				Int					 SetIcon(const Bitmap &);
 
 				Int					 SetMinimumSize(const Size &);
 				Int					 SetMaximumSize(const Size &);

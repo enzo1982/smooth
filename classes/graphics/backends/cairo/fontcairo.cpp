@@ -71,18 +71,7 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText, Bool scaled) co
 	}
 #endif
 
-#ifdef __WIN32__
-	HDC		 dc	 = CreateCompatibleDC(NIL);
-
-	cairo_surface_t	*surface = cairo_win32_surface_create(dc);
-#else
-	Display		*display = Backends::BackendXLib::GetDisplay();
-	Visual		*visual	 = XDefaultVisual(display, XDefaultScreen(display));
-	Window		 window	 = XRootWindow(display, XDefaultScreen(display));
-
-	cairo_surface_t	*surface = cairo_xlib_surface_create(display, window, visual, 0, 0);
-#endif
-
+	cairo_surface_t	*surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
 	cairo_t		*context = cairo_create(surface);
 
 #if defined __WIN32__ || defined __APPLE__
@@ -120,10 +109,6 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText, Bool scaled) co
 
 	cairo_destroy(context);
 	cairo_surface_destroy(surface);
-
-#ifdef __WIN32__
-	DeleteDC(dc);
-#endif
 
 #if defined __WIN32__ || defined __APPLE__
 	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(textExtents.x_advance, fontExtents.height);

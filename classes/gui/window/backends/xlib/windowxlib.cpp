@@ -29,27 +29,38 @@ S::Array<S::GUI::WindowXLib *, S::Void *>	 S::GUI::WindowXLib::windowBackends;
 
 S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 {
-	type	 = WINDOW_XLIB;
+	type	    = WINDOW_XLIB;
 
-	display	 = Backends::BackendXLib::GetDisplay();
-	im	 = Backends::BackendXLib::GetIM();
+	display	    = Backends::BackendXLib::GetDisplay();
+	im	    = Backends::BackendXLib::GetIM();
 
-	wnd	 = NIL;
-	oldwnd	 = NIL;
+	wnd	    = NIL;
+	oldwnd	    = NIL;
 
-	ic	 = NIL;
+	ic	    = NIL;
 
-	id	 = windowBackends.Add(this);
+	id	    = windowBackends.Add(this);
 
-	minSize	 = Size(160, 24);
+	minSize	    = Size(160, 24);
 
-	fontSize = Surface().GetSurfaceDPI() / 96.0;
+	fontSize    = Surface().GetSurfaceDPI() / 96.0;
 
-	flags	 = 0;
+	flags	    = 0;
+
+	sysIcon	    = NIL;
+	sysIconSize = 0;
 }
 
 S::GUI::WindowXLib::~WindowXLib()
 {
+	if (sysIcon != NIL)
+	{
+		delete [] sysIcon;
+
+		sysIcon	    = NIL;
+		sysIconSize = 0;
+	}
+
 	windowBackends.Remove(id);
 }
 
@@ -617,6 +628,15 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		 */
 		SetTitle(title);
 
+		/* Set icon.
+		 */
+		if (sysIcon != NIL)
+		{
+			Atom	 iconAtom = XInternAtom(display, "_NET_WM_ICON", False);
+
+			XChangeProperty(display, wnd, iconAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *) sysIcon, sysIconSize);
+		}
+
 		/* Set minimum and maximum size.
 		 */
 		if (flags & WF_NORESIZE)
@@ -683,13 +703,17 @@ S::Int S::GUI::WindowXLib::Close()
 
 	/* Destroy input context and window.
 	 */
-	XDestroyIC(ic);
+	if (ic != NIL)
+	{
+		XDestroyIC(ic);
+
+		ic = NIL;
+	}
+
 	XDestroyWindow(display, wnd);
 
 	oldwnd	= wnd;
 	wnd	= NIL;
-
-	ic	= NIL;
 
 	return Success();
 }
@@ -743,6 +767,40 @@ S::Int S::GUI::WindowXLib::SetTitle(const String &nTitle)
 		XSetTextProperty(display, wnd, &titlePropUTF8, XInternAtom(display, "_NET_WM_ICON_NAME", False));
 
 		XFree(titlePropUTF8.value);
+	}
+
+	return Success();
+}
+
+S::Int S::GUI::WindowXLib::SetIcon(const Bitmap &newIcon)
+{
+	if (sysIcon != NIL)
+	{
+		delete [] sysIcon;
+
+		sysIcon	    = NIL;
+		sysIconSize = 0;
+	}
+
+	Int	 index = 0;
+	Size	 size  = newIcon.GetSize();
+	Int	 depth = newIcon.GetDepth();
+
+	sysIconSize = 2 + size.cx * size.cy;
+	sysIcon	    = new CARD32 [sysIconSize];
+
+	sysIcon[index++] = size.cx;
+	sysIcon[index++] = size.cy;
+
+	for (Int y = 0; y < size.cy; y++)
+	{
+		for (Int x = 0; x < size.cx; x++)
+		{
+			Color	 pixel = newIcon.GetPixel(Point(x, y));
+
+			if (depth == 32) sysIcon[index++] =  pixel.GetAlpha()			      << 24 | Color(pixel.GetBlue(), pixel.GetGreen(), pixel.GetRed());
+			else		 sysIcon[index++] = (pixel == Color(192, 192, 192) ? 0 : 255) << 24 | Color(pixel.GetBlue(), pixel.GetGreen(), pixel.GetRed());
+		}
 	}
 
 	return Success();

@@ -3,8 +3,7 @@
 include $(SMOOTH_PATH)/Makefile-options
 
 CC	   = gcc
-CCOPTS	   = -g0 -Wall -Os -ffast-math -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
-#CCOPTS	   = -g0 -Wall -Os -ffast-math -I$(SMOOTH_PATH)/include -include $(SMOOTH_PATH)/include/smooth.h -DUNICODE -D_UNICODE $(MYCCOPTS)
+CCOPTS	   = -g0 -Wall -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
 RC	   = windres
 RCOPTS	   = -DSMOOTH_DLL -O coff
 LD	   = gcc
@@ -13,6 +12,8 @@ STRIP	   = strip
 STRIP_OPTS = 
 
 ifneq ($(BUILD_SOLARIS),True)
+	CCOPTS += -Os -ffast-math
+
 	STRIP_OPTS += --strip-all
 endif
 
@@ -51,7 +52,13 @@ endif
 endif
 
 ifeq ($(BUILD_SOLARIS),True)
-	CCOPTS += -fpic
+	CCOPTS += -fPIC
+endif
+
+ifeq ($(BUILD_LINUX),True)
+ifeq ($(BUILD_X64),True)
+	CCOPTS += -fPIC
+endif
 endif
 
 ifeq ($(BUILD_QNX),True)

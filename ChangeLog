@@ -44,6 +44,7 @@ xx.xx.12 xx:xx - smooth alpha 0.8.71.0
 - clipboard.cpp		- new class: Clipboard, implements clipboard support
 - timerposix.cpp	- new class: TimerPOSIX, POSIX timer backend
 - document.cpp		- added support for parsing CDATA nodes
+			- fixed Unicode filename support
 - messagebox.cpp	- replaced Windows message box defines with own constants
 
 - removed TreeView widget (use ListBox instead)

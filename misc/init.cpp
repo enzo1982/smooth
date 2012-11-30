@@ -236,6 +236,8 @@ S::Void S::GetColors()
 	Setup::LightGrayColor		  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
 	Setup::TooltipColor		  = GetSysColor(COLOR_INFOBK);
 	Setup::TooltipTextColor		  = GetSysColor(COLOR_INFOTEXT);
+#elif defined __APPLE__
+	Setup::BackgroundColor		  = GUI::Color(216, 216, 216);
 #elif defined __HAIKU__
 	rgb_color	 panelBackground    = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color	 panelText	    = ui_color(B_PANEL_TEXT_COLOR);

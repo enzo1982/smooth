@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -47,7 +47,7 @@ S::Int S::XML::Document::SetEncoding(const String &newEncoding)
 
 S::Int S::XML::Document::LoadFile(const String &fileName)
 {
-	xmlTextReaderPtr reader = xmlNewTextReaderFilename(fileName);
+	xmlTextReaderPtr reader = xmlNewTextReaderFilename(fileName.ConvertTo("UTF-8"));
 
 	if (reader == NIL) { return Error(); }
 
@@ -143,7 +143,7 @@ S::Int S::XML::Document::LoadNode(xmlTextReaderPtr reader, Node *node)
 
 S::Int S::XML::Document::SaveFile(const String &fileName)
 {
-	xmlTextWriterPtr	 writer = xmlNewTextWriterFilename(fileName, 0);
+	xmlTextWriterPtr	 writer = xmlNewTextWriterFilename(fileName.ConvertTo("UTF-8"), 0);
 
 	xmlTextWriterSetIndent(writer, 1);
 	xmlTextWriterStartDocument(writer, "1.0", encoding, NIL);

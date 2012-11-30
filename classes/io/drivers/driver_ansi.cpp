@@ -57,26 +57,26 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 			lastError = IO_ERROR_BADPARAM;
 
 			return;
-		case OS_APPEND:			// open a file for appending data
-			if (enableUnicode)	stream = _wfopen(fileName, String("r+b"));
-			else			stream = fopen(fileName, "r+b");
+		case OS_APPEND:		   // open a file for appending data
+			if (enableUnicode) stream = _wfopen(fileName, String("r+b"));
+			else		   stream =   fopen(fileName,	     "r+b" );
 
 			Seek(GetSize());
 
 			break;
-		case OS_REPLACE:		// create or overwrite a file
-			if (enableUnicode)	stream = _wfopen(fileName, String("w+b"));
-			else			stream = fopen(fileName, "w+b");
+		case OS_REPLACE:	   // create or overwrite a file
+			if (enableUnicode) stream = _wfopen(fileName, String("w+b"));
+			else		   stream =   fopen(fileName,	     "w+b" );
 
 			break;
-		case IS_READ | IS_WRITE:	// open a file for reading data
-			if (enableUnicode)	stream = _wfopen(fileName, String("r+b"));
-			else			stream = fopen(fileName, "r+b");
+		case IS_READ | IS_WRITE:   // open a file for reading data
+			if (enableUnicode) stream = _wfopen(fileName, String("r+b"));
+			else		   stream =   fopen(fileName,	     "r+b" );
 
 			break;
-		case IS_READ:			// open a file in read only mode
-			if (enableUnicode)	stream = _wfopen(fileName, String("rb"));
-			else			stream = fopen(fileName, "rb");
+		case IS_READ:		   // open a file in read only mode
+			if (enableUnicode) stream = _wfopen(fileName, String("rb"));
+			else		   stream =   fopen(fileName,	     "rb" );
 
 			break;
 	}

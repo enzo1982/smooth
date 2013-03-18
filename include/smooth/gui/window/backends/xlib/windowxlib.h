@@ -85,6 +85,7 @@ namespace smooth
 				Int					 flags;
 
 				String					 selection;
+				String					 clipboard;
 
 				Void					 UpdateWMNormalHints();
 
@@ -119,6 +120,7 @@ namespace smooth
 				Int					 Raise();
 			accessors:
 				Void					 SetSelection(const String &nSelection) { selection = nSelection; }
+				Void					 SetClipboard(const String &nClipboard) { clipboard = nClipboard; }
 		};
 	};
 };

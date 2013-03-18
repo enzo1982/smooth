@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,12 +45,21 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 	if (dirName != NIL && dirPath == NIL)
 	{
 #ifdef __WIN32__
+		if (dirName.StartsWith(Directory::GetDirectoryDelimiter()) && !dirName.StartsWith("\\\\")) dirName = String(Directory::GetActiveDirectory()).Head(2).Append(dirName);
+#endif
+
+#ifdef __WIN32__
 		if (dirName[1] == ':' || dirName.StartsWith("\\\\"))
 #else
 		if (dirName.StartsWith(GetDirectoryDelimiter()) || dirName.StartsWith("~"))
 #endif
 		{
 			dirPath = dirName;
+			dirName = NIL;
+		}
+		else
+		{
+			dirPath = String(Directory::GetActiveDirectory()).Append(Directory::GetDirectoryDelimiter()).Append(dirName);
 			dirName = NIL;
 		}
 	}
@@ -66,10 +75,6 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 			dirName = dirPath.Tail(dirPath.Length() - lastBS - 1);
 			dirPath[lastBS] = 0;
 		}
-	}
-	else if (dirPath == NIL)
-	{
-		dirPath = Directory::GetActiveDirectory();
 	}
 
 	if (dirPath.EndsWith(Directory::GetDirectoryDelimiter())) dirPath[dirPath.Length() - 1] = 0;

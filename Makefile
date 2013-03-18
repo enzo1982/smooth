@@ -3,6 +3,8 @@
 include Makefile-directories
 include Makefile-options
 
+### Output options ###
+
 OBJECTS = classes/*/*.o classes/*/*/*.o classes/*/*/*/*.o classes/*/*/*/*/*.o misc/*.o
 
 LIBS = -lfribidi -lbz2 -lxml2 -ljpeg -lz -lstdc++
@@ -33,15 +35,15 @@ else ifeq ($(BUILD_OSX),True)
 
 	LIBS += -lcpuid -lnsucd -liconv -lpng -lpthread -lX11 -lXmu
 
-	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
+	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_HAIKU),True)
 	LIBS += -lpng -lbe -ltracker
 
-	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
+	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_QNX),True)
 	LIBS += -liconv -lpng -lz -lsocket -lX11 -lXmu -lph
 
-	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
+	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else
 	ifeq ($(BUILD_LINUX),True)
 		LIBS += -lcpuid -lnsucd
@@ -54,16 +56,15 @@ else
 	LIBS += $(shell pkg-config --libs libpng) $(shell pkg-config --libs xmu) $(shell pkg-config --libs gtk+-2.0)
 	LIBS += -lpthread
 
-	DLLNAME = $(LIBDIR)/libsmooth$(SHARED)
+	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 endif
 
-LINKER	      = gcc
-STRIP	      = strip
-REMOVER	      = rm
-LINKER_OPTS   = -L$(LIBDIR) --shared -o $(DLLNAME)
-STRIP_OPTS    = 
-LIBSTRIP_OPTS = 
-REMOVER_OPTS  = -f
+### Linker options ###
+
+LINKER	    = gcc
+REMOVE	    = rm
+LINKER_OPTS = -L$(LIBDIR) -s --shared -o $(DLLNAME)
+REMOVE_OPTS = -f
 
 ifeq ($(BUILD_X64),True)
 	LINKER_OPTS += -m64
@@ -73,26 +74,32 @@ endif
 
 ifeq ($(BUILD_WIN32),True)
 	LINKER_OPTS += -mwindows -Wl,--dynamicbase,--nxcompat,--kill-at,--out-implib,$(LIBNAME)
-else ifeq ($(BUILD_FREEBSD),True)
-	LINKER_OPTS += -L/usr/local/lib
-else ifeq ($(BUILD_OPENBSD),True)
-	LINKER_OPTS += -Wl,-rpath,/usr/local/lib -L/usr/local/lib -Wl,-rpath,/usr/X11R6/lib -L/usr/X11R6/lib
-else ifeq ($(BUILD_NETBSD),True)
-	LINKER_OPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib -Wl,-rpath,/usr/X11R7/lib -L/usr/X11R7/lib
-else ifeq ($(BUILD_HAIKU),True)
-	LINKER_OPTS += -L/boot/common/lib
-else ifeq ($(BUILD_QNX),True)
-	LINKER_OPTS += -L/usr/X11R6/lib
 else ifeq ($(BUILD_OSX),True)
-	LINKER_OPTS += -framework Cocoa -L/usr/X11/lib -Wl,-dylib_install_name,libsmooth$(SHARED)
+	LINKER_OPTS += -framework Cocoa -L/usr/X11/lib -Wl,-dylib_install_name,libsmooth-$(VERSION).$(REVISION)$(SHARED)
+else
+	LINKER_OPTS += -Wl,-soname,libsmooth-$(VERSION)$(SHARED).$(REVISION)
+
+	ifeq ($(BUILD_FREEBSD),True)
+		LINKER_OPTS += -L/usr/local/lib
+	else ifeq ($(BUILD_OPENBSD),True)
+		LINKER_OPTS += -Wl,-rpath,/usr/local/lib -L/usr/local/lib -Wl,-rpath,/usr/X11R6/lib -L/usr/X11R6/lib
+	else ifeq ($(BUILD_NETBSD),True)
+		LINKER_OPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib -Wl,-rpath,/usr/X11R7/lib -L/usr/X11R7/lib
+	else ifeq ($(BUILD_HAIKU),True)
+		LINKER_OPTS += -L/boot/common/lib
+	else ifeq ($(BUILD_QNX),True)
+		LINKER_OPTS += -L/usr/X11R6/lib
+	endif
 endif
 
-ifneq ($(BUILD_SOLARIS),True)
-	STRIP_OPTS    += --strip-all
-	LIBSTRIP_OPTS += --strip-debug
-endif
+### Install options ###
+COPY  = cp
+LINK  = ln
+CHMOD = chmod
 
-.PHONY: all objects programs libs install clean clean_all doc doc-clean
+### Targets ###
+
+.PHONY: all objects programs libs install uninstall clean clean_all doc doc-clean
 
 all: $(DLLNAME)
 
@@ -108,7 +115,60 @@ programs: $(DLLNAME)
 libs:
 	$(MAKE) -C libraries
 
-install:
+install: uninstall
+ifneq ($(BUILD_WIN32),True)
+ifneq ($(BUILD_OSX),True)
+	$(COPY) $(LIBDIR)/libsmooth-$(VERSION)$(SHARED) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED).$(REVISION)
+	$(LINK) -s $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
+	$(CHMOD) a=r,u=rw $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
+
+	$(COPY) $(LIBDIR)/libsmooth-js-$(VERSION)$(SHARED) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION)
+	$(LINK) -s $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
+	$(CHMOD) a=r,u=rw $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
+else
+	$(COPY) $(DLLNAME) $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED)
+	$(LINK) -s $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
+	$(CHMOD) a=r,u=rw $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
+
+	$(COPY) $(LIBDIR)/libsmooth-js-$(VERSION)$(SHARED) $(PREFIX)/lib/libsmooth-js-$(VERSION).$(REVISION)$(SHARED)
+	$(LINK) -s $(PREFIX)/lib/libsmooth-js-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
+	$(CHMOD) a=r,u=rw $(PREFIX)/lib/libsmooth-js-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
+endif
+
+	$(COPY) $(BINDIR)/translator $(PREFIX)/bin
+	$(CHMOD) -R a=rX,u=rwX $(PREFIX)/bin/translator
+
+	$(COPY) -r include/smooth $(PREFIX)/include
+	$(COPY) -r include/smooth-js $(PREFIX)/include
+	$(COPY) include/smooth.h $(PREFIX)/include
+
+	$(CHMOD) -R a=rX,u=rwX $(PREFIX)/include/smooth
+	$(CHMOD) -R a=rX,u=rwX $(PREFIX)/include/smooth-js
+	$(CHMOD) a=r,u=rw $(PREFIX)/include/smooth.h
+endif
+
+uninstall:
+ifneq ($(BUILD_WIN32),True)
+ifneq ($(BUILD_OSX),True)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED).$(REVISION)
+
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION)
+else
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED)
+
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION).$(REVISION)$(SHARED)
+endif
+
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/bin/translator
+
+	$(REMOVE) $(REMOVE_OPTS) -r $(PREFIX)/include/smooth
+	$(REMOVE) $(REMOVE_OPTS) -r $(PREFIX)/include/smooth-js
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/include/smooth.h
+endif
 
 clean:
 	$(MAKE) -C classes clean
@@ -116,7 +176,7 @@ clean:
 	$(MAKE) -C resources clean
 	$(MAKE) -C tools clean
 	$(MAKE) -C samples clean
-	$(REMOVER) $(REMOVER_OPTS) $(DLLNAME) $(LIBNAME)
+	$(REMOVE) $(REMOVE_OPTS) $(DLLNAME) $(LIBNAME)
 
 clean_all: clean
 	$(MAKE) -C libraries clean
@@ -129,10 +189,6 @@ doc-clean:
 
 $(DLLNAME): objects libs
 	$(LINKER) $(OBJECTS) $(LINKER_OPTS) $(LIBS)
-ifneq ($(BUILD_OSX),True)
-	$(STRIP) $(STRIP_OPTS) $(DLLNAME)
-endif
 ifeq ($(BUILD_WIN32),True)
-	$(STRIP) $(LIBSTRIP_OPTS) $(LIBNAME)
 	countbuild BuildNumber
 endif

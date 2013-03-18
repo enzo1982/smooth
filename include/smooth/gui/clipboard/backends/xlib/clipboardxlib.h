@@ -54,10 +54,16 @@ namespace smooth
 			private:
 				Window		*window;
 
-				unsigned char	*QueryAtom(X11::Display *, X11::Window, X11::Atom) const;
+				unsigned char	*QueryAtom(X11::Display *, X11::Window, X11::Atom, X11::Atom) const;
+
+				String		 GetText(X11::Atom) const;
+				Bool		 SetText(X11::Atom, const String &);
 			public:
 						 ClipboardXLib(Window *);
 						~ClipboardXLib();
+
+				String		 GetSelectionText() const;
+				Bool		 SetSelectionText(const String &);
 
 				String		 GetClipboardText() const;
 				Bool		 SetClipboardText(const String &);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -67,12 +67,21 @@ S::File::File(const String &iFileName, const String &iFilePath)
 	if (fileName != NIL && filePath == NIL)
 	{
 #ifdef __WIN32__
+		if (fileName.StartsWith(Directory::GetDirectoryDelimiter()) && !fileName.StartsWith("\\\\")) fileName = String(Directory::GetActiveDirectory()).Head(2).Append(fileName);
+#endif
+
+#ifdef __WIN32__
 		if (fileName[1] == ':' || fileName.StartsWith("\\\\"))
 #else
 		if (fileName.StartsWith(Directory::GetDirectoryDelimiter()) || fileName.StartsWith("~"))
 #endif
 		{
 			filePath = fileName;
+			fileName = NIL;
+		}
+		else
+		{
+			filePath = String(Directory::GetActiveDirectory()).Append(Directory::GetDirectoryDelimiter()).Append(fileName);
 			fileName = NIL;
 		}
 	}
@@ -83,10 +92,6 @@ S::File::File(const String &iFileName, const String &iFilePath)
 
 		fileName = filePath.Tail(filePath.Length() - lastBS - 1);
 		filePath[lastBS >= 0 ? lastBS : 0] = 0;
-	}
-	else if (filePath == NIL)
-	{
-		filePath = Directory::GetActiveDirectory();
 	}
 
 	if (!filePath.EndsWith(Directory::GetDirectoryDelimiter())) filePath.Append(Directory::GetDirectoryDelimiter());

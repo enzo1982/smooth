@@ -7,18 +7,18 @@ CCOPTS	   = -g0 -Wall -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
 RC	   = windres
 RCOPTS	   = -DSMOOTH_DLL -O coff
 LD	   = gcc
-LDOPTS	   = -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
-STRIP	   = strip
-STRIP_OPTS = 
+LDOPTS	   = -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ -s $(LIBS)
 
 ifneq ($(BUILD_SOLARIS),True)
-	CCOPTS += -Os -ffast-math
-
-	STRIP_OPTS += --strip-all
+	CCOPTS += -Os
 endif
 
 ifndef GLOBALDLL
+ifeq ($(BUILD_WIN32),True)
 	LDOPTS += -lsmooth
+else
+	LDOPTS += -lsmooth-$(VERSION)
+endif
 endif
 
 ifeq ($(BUILD_WIN32),True)
@@ -36,9 +36,11 @@ ifeq ($(BUILD_WIN32),True)
 else
 	LDOPTS += -Wl,-rpath,.
 
-	ifeq ($(BUILD_OSX),True)
-		ifdef GLOBALDLL
-			LDOPTS += -Wl,-dylib_install_name,lib$(GLOBALDLL)$(SHARED)
+	ifdef GLOBALDLL
+		ifeq ($(BUILD_OSX),True)
+			LDOPTS += -Wl,-dylib_install_name,lib$(GLOBALDLL)-$(VERSION).$(REVISION)$(SHARED)
+		else
+			LDOPTS += -Wl,-soname,lib$(GLOBALDLL)-$(VERSION)$(SHARED).$(REVISION)
 		endif
 	endif
 
@@ -70,10 +72,14 @@ ifneq ($(EXCEPTION),True)
 endif
 
 ifeq ($(BUILD_X64),True)
-	CCOPTS += -m64 -march=nocona
+	CCOPTS += -m64
+	RCOPTS += --target=pe-x86-64
+
 	LDOPTS += -m64
 else
-	CCOPTS += -m32 -march=pentium4
+	CCOPTS += -m32
+	RCOPTS += --target=pe-i386
+
 	LDOPTS += -m32
 endif
 
@@ -111,11 +117,11 @@ ifdef GLOBALEXE
 endif
 
 ifdef GLOBALDLL
-ifneq ($(BUILD_WIN32),True)
-	TARGETS += $(SMOOTH_PATH)/$(LIBDIR)/lib$(GLOBALDLL)$(SHARED)
-else
+ifeq ($(BUILD_WIN32),True)
 	TARGETS += $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED)
 	TARGETS += $(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB)
+else
+	TARGETS += $(SMOOTH_PATH)/$(LIBDIR)/lib$(GLOBALDLL)-$(VERSION)$(SHARED)
 endif
 endif
 
@@ -174,21 +180,15 @@ endif
 ifdef GLOBALEXE
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE): $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
-ifneq ($(BUILD_OSX),True)
-	$(STRIP) $(STRIP_OPTS) $@
-endif
 endif
 
 ifdef GLOBALDLL
-ifneq ($(BUILD_WIN32),True)
-$(SMOOTH_PATH)/$(LIBDIR)/lib$(GLOBALDLL)$(SHARED): $(OBJECTS)
-else
+ifeq ($(BUILD_WIN32),True)
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED): $(OBJECTS)
+else
+$(SMOOTH_PATH)/$(LIBDIR)/lib$(GLOBALDLL)-$(VERSION)$(SHARED): $(OBJECTS)
 endif
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
-ifneq ($(BUILD_OSX),True)
-	$(STRIP) $(STRIP_OPTS) $@
-endif
 
 ifeq ($(BUILD_WIN32),True)
 $(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB): $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED)
@@ -198,17 +198,11 @@ endif
 ifdef LOCALEXE
 $(LOCALEXE)$(EXECUTABLE): $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
-ifneq ($(BUILD_OSX),True)
-	$(STRIP) $(STRIP_OPTS) $@
-endif
 endif
 
 ifdef LOCALDLL
 $(LOCALDLL)$(SHARED): $(OBJECTS)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
-ifneq ($(BUILD_OSX),True)
-	$(STRIP) $(STRIP_OPTS) $@
-endif
 
 ifeq ($(BUILD_WIN32),True)
 $(IMPORTLIB): $(LOCALDLL)$(SHARED)

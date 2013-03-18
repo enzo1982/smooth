@@ -96,7 +96,9 @@ include $(SMOOTH_PATH)/Makefile-directories
 include $(SMOOTH_PATH)/Makefile-commands
 
 libraries.cc: runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js date.js regexp.js json.js liveedit-debugger.js mirror-debugger.js debug-debugger.js macros.py
+	chmod a+x ./js2c.py
 	./js2c.py libraries.cc CORE off runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js date.js regexp.js json.js liveedit-debugger.js mirror-debugger.js debug-debugger.js macros.py
 
 experimental-libraries.cc: proxy.js collection.js macros.py
+	chmod a+x ./js2c.py
 	./js2c.py experimental-libraries.cc EXPERIMENTAL off proxy.js collection.js macros.py

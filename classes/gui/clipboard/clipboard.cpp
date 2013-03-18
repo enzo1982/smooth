@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,16 @@ S::GUI::Clipboard::Clipboard(Window *window)
 S::GUI::Clipboard::~Clipboard()
 {
 	delete backend;
+}
+
+S::String S::GUI::Clipboard::GetSelectionText() const
+{
+	return 	backend->GetSelectionText();
+}
+
+S::Bool S::GUI::Clipboard::SetSelectionText(const String &text)
+{
+	return backend->SetSelectionText(text);
 }
 
 S::String S::GUI::Clipboard::GetClipboardText() const

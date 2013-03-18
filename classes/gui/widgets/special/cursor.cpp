@@ -258,6 +258,26 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			}
 
 			break;
+		case SM_MBUTTONDOWN:
+			if (Clipboard(container->GetContainerWindow()).GetSelectionText() != NIL)
+			{
+				Bool	 selected = (markStart != markEnd && markStart >= 0 && markEnd >= 0);
+
+				DeleteSelectedText();
+
+				String	 insertText = Clipboard(container->GetContainerWindow()).GetSelectionText();
+
+				if (insertText.Length() > 0 && (insertText.Length() + text.Length()) <= maxSize)
+				{
+					if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (insertText.ToInt() == 0 && insertText[0] != '0')) break;
+
+					if (selected) RemoveHistoryEntry();
+
+					InsertText(insertText);
+				}
+			}
+
+			break;
 		case SM_MOUSEMOVE:
 			{
 				Rect	 frame = Rect(GetRealPosition(), GetRealSize());
@@ -565,6 +585,10 @@ S::Void S::GUI::Cursor::MarkText(Int newMarkStart, Int newMarkEnd)
 	markEnd		= newMarkEnd;
 
 	Paint(SP_PAINT);
+
+	/* Copy selected text to selection clipboard.
+	 */
+	if (Math::Abs(markEnd - markStart) > 0) Clipboard(container->GetContainerWindow()).SetSelectionText(text.SubString(Math::Min(markStart, markEnd), Math::Abs(markEnd - markStart)));
 }
 
 S::Int S::GUI::Cursor::MarkAll()
@@ -615,11 +639,7 @@ S::Void S::GUI::Cursor::CopyToClipboard()
 {
 	if (markStart != markEnd)
 	{
-		String	 mText;
-
-		for (int j = Math::Min(markStart, markEnd); j < Math::Max(markStart, markEnd); j++) mText[j - Math::Min(markStart, markEnd)] = text[j];
-
-		Clipboard(container->GetContainerWindow()).SetClipboardText(mText);
+		Clipboard(container->GetContainerWindow()).SetClipboardText(text.SubString(Math::Min(markStart, markEnd), Math::Abs(markEnd - markStart)));
 	}
 }
 
@@ -1022,7 +1042,7 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 			/* Non Unicode Windows puts ANSI character codes into wParam.
 			 * Import these using the current character input format.
 			 */
-			char  ansiText[2] = { character, 0 };
+			char  ansiText[2] = { (char) character, 0 };
 
 			insertText = ansiText;
 		}

@@ -278,17 +278,20 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 
 			if	(buttons == B_PRIMARY_MOUSE_BUTTON)   onEvent.Call(SM_LBUTTONDOWN, 0, 0);
 			else if (buttons == B_SECONDARY_MOUSE_BUTTON) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
+			else if (buttons == B_TERTIARY_MOUSE_BUTTON)  onEvent.Call(SM_MBUTTONDOWN, 0, 0);
 
 			if (clicks == 2)
 			{
 				if	(buttons == B_PRIMARY_MOUSE_BUTTON)   onEvent.Call(SM_LBUTTONDBLCLK, 0, 0);
 				else if (buttons == B_SECONDARY_MOUSE_BUTTON) onEvent.Call(SM_RBUTTONDBLCLK, 0, 0);
+				else if (buttons == B_TERTIARY_MOUSE_BUTTON)  onEvent.Call(SM_MBUTTONDBLCLK, 0, 0);
 			}
 
 			break;
 		case B_MOUSE_UP:
 			if	(buttons == B_PRIMARY_MOUSE_BUTTON)   onEvent.Call(SM_LBUTTONUP, 0, 0);
 			else if (buttons == B_SECONDARY_MOUSE_BUTTON) onEvent.Call(SM_RBUTTONUP, 0, 0);
+			else if (buttons == B_TERTIARY_MOUSE_BUTTON)  onEvent.Call(SM_MBUTTONUP, 0, 0);
 
 			break;
 

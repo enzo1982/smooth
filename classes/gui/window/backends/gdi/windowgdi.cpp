@@ -279,10 +279,13 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 	if (message == WM_MOUSEMOVE	|| message == WM_NCMOUSEMOVE	 ||
 	    message == WM_LBUTTONDOWN	|| message == WM_NCLBUTTONDOWN	 ||
 	    message == WM_RBUTTONDOWN	|| message == WM_NCRBUTTONDOWN	 ||
+	    message == WM_MBUTTONDOWN	|| message == WM_NCMBUTTONDOWN	 ||
 	    message == WM_LBUTTONUP	|| message == WM_NCLBUTTONUP	 ||
 	    message == WM_RBUTTONUP	|| message == WM_NCRBUTTONUP	 ||
+	    message == WM_MBUTTONUP	|| message == WM_NCMBUTTONUP	 ||
 	    message == WM_LBUTTONDBLCLK	|| message == WM_NCLBUTTONDBLCLK ||
-	    message == WM_RBUTTONDBLCLK	|| message == WM_NCRBUTTONDBLCLK)
+	    message == WM_RBUTTONDBLCLK	|| message == WM_NCRBUTTONDBLCLK ||
+	    message == WM_MBUTTONDBLCLK	|| message == WM_NCMBUTTONDBLCLK)
 	{
 		POINT	 point;
 
@@ -314,12 +317,21 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		case WM_RBUTTONUP:
 		case WM_NCRBUTTONUP:
 			return onEvent.Call(SM_RBUTTONUP, 0, 0);
+		case WM_MBUTTONDOWN:
+		case WM_NCMBUTTONDOWN:
+			return onEvent.Call(SM_MBUTTONDOWN, 0, 0);
+		case WM_MBUTTONUP:
+		case WM_NCMBUTTONUP:
+			return onEvent.Call(SM_MBUTTONUP, 0, 0);
 		case WM_LBUTTONDBLCLK:
 		case WM_NCLBUTTONDBLCLK:
 			return onEvent.Call(SM_LBUTTONDBLCLK, 0, 0);
 		case WM_RBUTTONDBLCLK:
 		case WM_NCRBUTTONDBLCLK:
 			return onEvent.Call(SM_RBUTTONDBLCLK, 0, 0);
+		case WM_MBUTTONDBLCLK:
+		case WM_NCMBUTTONDBLCLK:
+			return onEvent.Call(SM_MBUTTONDBLCLK, 0, 0);
 
 		/* Keyboard messages:
 		 */

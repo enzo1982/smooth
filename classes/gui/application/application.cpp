@@ -214,6 +214,14 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	/* In Linux and NetBSD, /proc/<pid>/exe links to the current binary.
 	 */
 	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1);
+#elif defined __HAIKU__
+	/* In Haiku, ps lists all processes with full path.
+	 */
+	FILE	*pstdin = popen(String("ps | awk '$2 == \"").Append(String::FromInt(getpid())).Append("\" { print $1 }'"), "r");
+
+	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+	pclose(pstdin);
 #else
 	/* No system specific way to get the current binary path.
 	 * Try concatenating the startup directory and command.

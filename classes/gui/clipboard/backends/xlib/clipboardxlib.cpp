@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,9 +33,9 @@ S::GUI::ClipboardXLib::~ClipboardXLib()
 {
 }
 
-unsigned char *S::GUI::ClipboardXLib::QueryAtom(Display *display, ::Window self, Atom atom) const
+unsigned char *S::GUI::ClipboardXLib::QueryAtom(Display *display, ::Window self, Atom clipboard, Atom atom) const
 {
-	XConvertSelection(display, XA_CLIPBOARD(display), atom, atom, self, CurrentTime);
+	XConvertSelection(display, clipboard, atom, atom, self, CurrentTime);
 	XFlush(display);
 
 	/* Wait for SelectionNotify event to be sent.
@@ -71,57 +71,84 @@ unsigned char *S::GUI::ClipboardXLib::QueryAtom(Display *display, ::Window self,
 	return data;
 }
 
-S::String S::GUI::ClipboardXLib::GetClipboardText() const
+S::String S::GUI::ClipboardXLib::GetText(Atom clipboard) const
 {
 	if (window == NIL) return NIL;
 
-	String		 clipboardText;
+	String		 text;
 
 	Display		*display = Backends::BackendXLib::GetDisplay();
 	::Window	 self	 = (::Window) window->GetSystemWindow();
-	::Window	 owner	 = XGetSelectionOwner(display, XA_CLIPBOARD(display));
+	::Window	 owner	 = XGetSelectionOwner(display, clipboard);
 
 	if (owner != None)
 	{
 		unsigned char *data = NIL;
 
-		data = QueryAtom(display, self, XA_UTF8_STRING(display));
+		data = QueryAtom(display, self, clipboard, XA_UTF8_STRING(display));
 
 		if (data != NIL)
 		{
-			clipboardText.ImportFrom("UTF-8", (char *) data);
+			text.ImportFrom("UTF-8", (char *) data);
 
 			XFree(data);
 		}
 		else
 		{
-			data = QueryAtom(display, self, XA_STRING);
+			data = QueryAtom(display, self, clipboard, XA_STRING);
 
 			if (data != NIL)
 			{
-				clipboardText = (char *) data;
+				text = (char *) data;
 
 				XFree(data);
 			}
 		}
 	}
 
-	return clipboardText;
+	return text;
+}
+
+S::Bool S::GUI::ClipboardXLib::SetText(Atom clipboard, const String &text)
+{
+	if (window == NIL) return False;
+
+	Display		*display = Backends::BackendXLib::GetDisplay();
+	::Window	 self	 = (::Window) window->GetSystemWindow();
+	WindowXLib	*backend = GUI::WindowXLib::GetWindowBackend(self);
+
+	if (backend != NIL)
+	{
+		if	(clipboard == XA_PRIMARY)	     backend->SetSelection(text);
+		else if (clipboard == XA_CLIPBOARD(display)) backend->SetClipboard(text);
+	}
+
+	XSetSelectionOwner(display, clipboard, self, CurrentTime);
+	XFlush(display);
+
+	return True;
+}
+
+S::String S::GUI::ClipboardXLib::GetSelectionText() const
+{
+	return GetText(XA_PRIMARY);
+}
+
+S::Bool S::GUI::ClipboardXLib::SetSelectionText(const String &text)
+{
+	return SetText(XA_PRIMARY, text);
+}
+
+S::String S::GUI::ClipboardXLib::GetClipboardText() const
+{
+	Display	*display = Backends::BackendXLib::GetDisplay();
+
+	return GetText(XA_CLIPBOARD(display));
 }
 
 S::Bool S::GUI::ClipboardXLib::SetClipboardText(const String &text)
 {
-	if (window == NIL) return False;
+	Display	*display = Backends::BackendXLib::GetDisplay();
 
-	WindowXLib	*backend = GUI::WindowXLib::GetWindowBackend((::Window) window->GetSystemWindow());
-
-	if (backend != NIL) backend->SetSelection(text);
-
-	Display		*display = Backends::BackendXLib::GetDisplay();
-	::Window	 self	 = (::Window) window->GetSystemWindow();
-
-	XSetSelectionOwner(display, XA_CLIPBOARD(display), self, CurrentTime);
-	XFlush(display);
-
-	return True;
+	return SetText(XA_CLIPBOARD(display), text);
 }

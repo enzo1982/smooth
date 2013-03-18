@@ -231,6 +231,14 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 	}
 
 	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
+
+#ifndef __WIN32__
+	if (Directory(GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
+	{
+		dir = GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
+	}
+#endif
+
 	const Array<File>	&files = dir.GetFilesByPattern(String(appPrefix).Append("_*.xml"));
 
 	for (Int i = 0; i < files.Length(); i++)

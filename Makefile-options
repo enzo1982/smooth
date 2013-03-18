@@ -1,6 +1,14 @@
 ########## smooth options makefile ##########
 
+VERSION	 = 0.8.71
+REVISION = 0
+
 UNAME = $(shell uname)
+MACHINE = $(shell gcc -dumpmachine)
+
+ifneq ($(findstring x86_64,$(MACHINE)),)
+	BUILD_X64 = True
+endif
 
 ifndef SMOOTH_PATH
 	SMOOTH_PATH = .
@@ -84,5 +92,13 @@ else ifeq ($(UNAME),Darwin)
 # 	Enable threads based timers
 	BUILD_POSIXTIMER = False
 	BUILD_THREADSTIMER = True
+endif
+endif
+
+ifeq ($(PREFIX),)
+	PREFIX = /usr/local
+
+ifeq ($(BUILD_HAIKU),True)
+	PREFIX = /boot/common
 endif
 endif

@@ -77,9 +77,13 @@ static HaikuEventDispatcher	 app;
 
 S::Int S::System::EventHaiku::ProcessNextEvent()
 {
-	if (app.IsLaunching())
+	static Bool	 dispatcherStarted = False;
+
+	if (!dispatcherStarted)
 	{
 		NonBlocking0<Void>(&HaikuEventDispatcher::Start, &app).Call();
+
+		dispatcherStarted = True;
 	}
 
 	/* Emulate a timeout of ~100ms by trying to find a message

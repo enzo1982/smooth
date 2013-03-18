@@ -239,19 +239,25 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 		case SelectionRequest:
-			if (selection != NIL)
 			{
+				String	 text;
+
+				if	(e->xselectionrequest.selection == XA_PRIMARY)		  text = selection;
+				else if (e->xselectionrequest.selection == XA_CLIPBOARD(display)) text = clipboard;
+
+				if (text == NIL) break;
+
 				XEvent	 respond;
 
 				if (e->xselectionrequest.target == XA_STRING)
 				{
-					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_STRING, 8, PropModeReplace, (unsigned char *) (char *) selection, selection.Length());
+					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_STRING, 8, PropModeReplace, (unsigned char *) (char *) text, text.Length());
 
 					respond.xselection.property = e->xselectionrequest.property;
 				}
 				else if (e->xselectionrequest.target == XA_UTF8_STRING(display))
 				{
-					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_UTF8_STRING(display), 8, PropModeReplace, (unsigned char *) selection.ConvertTo("UTF-8"), strlen(selection.ConvertTo("UTF-8")));
+					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_UTF8_STRING(display), 8, PropModeReplace, (unsigned char *) text.ConvertTo("UTF-8"), strlen(text.ConvertTo("UTF-8")));
 
 					respond.xselection.property = e->xselectionrequest.property;
 				}
@@ -275,7 +281,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 		case SelectionClear:
-			selection = NIL;
+			if	(e->xselectionclear.selection == XA_PRIMARY)		selection = NIL;
+			else if (e->xselectionclear.selection == XA_CLIPBOARD(display)) clipboard = NIL;
 
 			break;
 	}
@@ -341,18 +348,22 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 					prevButtonEventInitialized = True;
 				}
 
-				if ((e->xbutton.button == Button1 || e->xbutton.button == Button3) &&
-				     e->xbutton.button == prevButtonEvent.button		   &&
-				     e->xbutton.time   <= prevButtonEvent.time + 500		   &&
-				     Math::Abs(e->xbutton.x - prevButtonEvent.x) <= 5		   &&
-				     Math::Abs(e->xbutton.y - prevButtonEvent.y) <= 5)
+				if ((e->xbutton.button == Button1 ||
+				     e->xbutton.button == Button2 ||
+				     e->xbutton.button == Button3)		     &&
+				    e->xbutton.button == prevButtonEvent.button	     &&
+				    e->xbutton.time   <= prevButtonEvent.time + 500  &&
+				    Math::Abs(e->xbutton.x - prevButtonEvent.x) <= 5 &&
+				    Math::Abs(e->xbutton.y - prevButtonEvent.y) <= 5)
 				{
 					if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONDBLCLK, 0, 0);
+					else if (e->xbutton.button == Button2) onEvent.Call(SM_MBUTTONDBLCLK, 0, 0);
 					else if (e->xbutton.button == Button3) onEvent.Call(SM_RBUTTONDBLCLK, 0, 0);
 				}
 				else
 				{
 					if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONDOWN, 0, 0);
+					else if (e->xbutton.button == Button2) onEvent.Call(SM_MBUTTONDOWN, 0, 0);
 					else if (e->xbutton.button == Button3) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
 					else if (e->xbutton.button == Button4) onEvent.Call(SM_MOUSEWHEEL, 120, 0);
 					else if (e->xbutton.button == Button5) onEvent.Call(SM_MOUSEWHEEL, -120, 0);
@@ -387,6 +398,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			/* Pass message to smooth window.
 			 */
 			if	(e->xbutton.button == Button1) onEvent.Call(SM_LBUTTONUP, 0, 0);
+			else if (e->xbutton.button == Button2) onEvent.Call(SM_MBUTTONUP, 0, 0);
 			else if (e->xbutton.button == Button3) onEvent.Call(SM_RBUTTONUP, 0, 0);
 
 			break;

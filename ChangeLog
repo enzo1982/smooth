@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-xx.xx.12 xx:xx - smooth alpha 0.8.71.0
+xx.xx.13 xx:xx - smooth alpha 0.8.71.0
 
 - window.cpp		- renamed doQuit to doClose
 			- removed onPeek

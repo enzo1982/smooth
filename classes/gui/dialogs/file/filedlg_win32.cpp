@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,6 +18,26 @@
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
 	Bool	 result = False;
+
+	/* Get default filter index.
+	 */
+	Int	 filterIndex = 1;
+
+	if (defExt != NIL)
+	{
+		for (Int k = 0; k < filters.Length(); k++)
+		{
+			if (filters.GetNth(k).ToLower().Contains(String("*.").Append(defExt).ToLower()))
+			{
+				filterIndex = k + 1;
+
+				break;
+			}
+		}
+	}
+
+	/* Configure and display dialog.
+	 */
 	Int	 bpos = 0;
 
 	if (Setup::enableUnicode)
@@ -33,7 +53,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		else				ofnw.hwndOwner = NIL;
 
 		ofnw.lStructSize	= sizeof(OPENFILENAMEW);
-		ofnw.nFilterIndex	= 1;
+		ofnw.nFilterIndex	= filterIndex;
 		ofnw.lpstrFile		= bufferw;
 		ofnw.nMaxFile		= 32768;
 		ofnw.lpstrFileTitle	= NIL;
@@ -145,7 +165,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		else				ofna.hwndOwner = NIL;
 
 		ofna.lStructSize	= sizeof(OPENFILENAMEA);
-		ofna.nFilterIndex	= 1;
+		ofna.nFilterIndex	= filterIndex;
 		ofna.lpstrFile		= buffera;
 		ofna.nMaxFile		= 32768;
 		ofna.lpstrFileTitle	= NIL;

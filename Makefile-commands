@@ -174,20 +174,24 @@ endif
 
 ifdef GLOBALLIB
 $(SMOOTH_PATH)/$(LIBDIR)/$(GLOBALLIB): $(OBJECTS)
+	mkdir -p $(SMOOTH_PATH)/$(LIBDIR)
 	$(AR) r $@ $(OBJECTS)
 endif
 
 ifdef GLOBALEXE
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE): $(OBJECTS)
+	mkdir -p $(SMOOTH_PATH)/$(BINDIR)
 	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
 endif
 
 ifdef GLOBALDLL
 ifeq ($(BUILD_WIN32),True)
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED): $(OBJECTS)
+	mkdir -p $(SMOOTH_PATH)/$(BINDIR)
 else
 $(SMOOTH_PATH)/$(LIBDIR)/lib$(GLOBALDLL)-$(VERSION)$(SHARED): $(OBJECTS)
 endif
+	mkdir -p $(SMOOTH_PATH)/$(LIBDIR)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
 
 ifeq ($(BUILD_WIN32),True)

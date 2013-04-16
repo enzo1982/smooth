@@ -249,17 +249,27 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				XEvent	 respond;
 
-				if (e->xselectionrequest.target == XA_STRING)
+				respond.xselection.type	     = SelectionNotify;
+				respond.xselection.display   = e->xselectionrequest.display;
+				respond.xselection.requestor = e->xselectionrequest.requestor;
+				respond.xselection.selection = e->xselectionrequest.selection;
+				respond.xselection.target    = e->xselectionrequest.target;
+				respond.xselection.property  = e->xselectionrequest.property;
+				respond.xselection.time	     = e->xselectionrequest.time;
+
+				if (e->xselectionrequest.target == XA_TARGETS(display))
+				{
+					Atom	 targets[] = { XA_STRING, XA_UTF8_STRING(display) };
+					
+					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_ATOM, 32, PropModeReplace, (unsigned char *) targets, 2);
+				}
+				else if (e->xselectionrequest.target == XA_STRING)
 				{
 					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_STRING, 8, PropModeReplace, (unsigned char *) (char *) text, text.Length());
-
-					respond.xselection.property = e->xselectionrequest.property;
 				}
 				else if (e->xselectionrequest.target == XA_UTF8_STRING(display))
 				{
 					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_UTF8_STRING(display), 8, PropModeReplace, (unsigned char *) text.ConvertTo("UTF-8"), strlen(text.ConvertTo("UTF-8")));
-
-					respond.xselection.property = e->xselectionrequest.property;
 				}
 				else
 				{
@@ -267,13 +277,6 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 					 */
 					respond.xselection.property = None;
 				}
-
-				respond.xselection.type	     = SelectionNotify;
-				respond.xselection.display   = e->xselectionrequest.display;
-				respond.xselection.requestor = e->xselectionrequest.requestor;
-				respond.xselection.selection = e->xselectionrequest.selection;
-				respond.xselection.target    = e->xselectionrequest.target;
-				respond.xselection.time	     = e->xselectionrequest.time;
 
 				XSendEvent(display, e->xselectionrequest.requestor, 0, 0, &respond);
 				XFlush(display);

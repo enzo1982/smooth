@@ -259,7 +259,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_MBUTTONDOWN:
-			if (Clipboard(container->GetContainerWindow()).GetSelectionText() != NIL)
+			if (focussed && IsActive() && Clipboard(container->GetContainerWindow()).GetSelectionText() != NIL)
 			{
 				Bool	 selected = (markStart != markEnd && markStart >= 0 && markEnd >= 0);
 

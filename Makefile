@@ -125,6 +125,18 @@ ifneq ($(BUILD_OSX),True)
 	$(COPY) $(LIBDIR)/libsmooth-js-$(VERSION)$(SHARED) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION)
 	$(LINK) -s $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
 	$(CHMOD) a=r,u=rw $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
+
+ifeq ($(BUILD_LINUX),True)
+	ldconfig
+else ifeq ($(BUILD_FREEBSD),True)
+	ldconfig
+else ifeq ($(BUILD_OPENBSD),True)
+	ldconfig
+else ifeq ($(BUILD_NETBSD),True)
+	ldconfig
+else ifeq ($(BUILD_HAIKU),True)
+	ldconfig
+endif
 else
 	$(COPY) $(DLLNAME) $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED)
 	$(LINK) -s $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
@@ -155,6 +167,18 @@ ifneq ($(BUILD_OSX),True)
 
 	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
 	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION)
+
+ifeq ($(BUILD_LINUX),True)
+	ldconfig
+else ifeq ($(BUILD_FREEBSD),True)
+	ldconfig
+else ifeq ($(BUILD_OPENBSD),True)
+	ldconfig
+else ifeq ($(BUILD_NETBSD),True)
+	ldconfig
+else ifeq ($(BUILD_HAIKU),True)
+	ldconfig
+endif
 else
 	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
 	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED)

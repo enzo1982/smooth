@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -146,22 +146,37 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 
 	if (directories.Length() == 0)
 	{
-#if defined __APPLE__
-		directories.Add("/usr/lib");
-		directories.Add("/usr/local/lib");
-		directories.Add("/opt/local/lib");
-		directories.Add("/sw/lib");
-#elif defined __HAIKU__
-		directories.Add("/boot/common/lib");
-#elif defined __NetBSD__
-		directories.Add("/usr/lib");
-		directories.Add("/usr/local/lib");
-		directories.Add("/usr/pkg/lib");
-#else
-		directories.Add("/usr/lib");
+		/* Look for /usr/lib and /usr/local/lib on all systems.
+		 */
+		if (Directory("/usr/lib").Exists())	    directories.Add("/usr/lib");
+		if (Directory("/usr/local/lib").Exists())   directories.Add("/usr/local/lib");
 
-		if (File("/etc/ld.so.conf").Exists()) ParseDirectoryList("/etc/ld.so.conf", directories);
-		else				      directories.Add("/usr/local/lib");
+#if defined __APPLE__
+		/* Look for library directories of ports projects.
+		 */
+		if (Directory("/opt/local/lib").Exists())   directories.Add("/opt/local/lib");
+		if (Directory("/sw/lib").Exists())	    directories.Add("/sw/lib");
+#elif defined __HAIKU__
+		/* Haiku puts libraries into /boot/common/lib.
+		 */
+							    directories.Add("/boot/common/lib");
+#elif defined __NetBSD__
+		/* Packages live in /usr/pkg on NetBSD.
+		 */
+		if (Directory("/usr/pkg/lib").Exists())	    directories.Add("/usr/pkg/lib");
+#else
+		/* Take care of lib32 and lib64 directories on multilib systems.
+		 */
+#if defined __x86_64__
+		if (Directory("/usr/lib64").Exists())	    directories.Add("/usr/lib64");
+		if (Directory("/usr/local/lib64").Exists()) directories.Add("/usr/local/lib64");
+#elif defined __i386__
+		if (Directory("/usr/lib32").Exists())	    directories.Add("/usr/lib32");
+		if (Directory("/usr/local/lib32").Exists()) directories.Add("/usr/local/lib32");
+#endif
+		/* Parse /etc/ld.so.conf if it exists.
+		 */
+		if (File("/etc/ld.so.conf").Exists())	    ParseDirectoryList("/etc/ld.so.conf", directories);
 #endif
 	}
 

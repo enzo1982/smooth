@@ -1,7 +1,7 @@
 # Makefile for smooth v0.8
 
-include Makefile-directories
 include Makefile-options
+include Makefile-directories
 
 ### Output options ###
 
@@ -96,6 +96,7 @@ endif
 COPY  = cp
 LINK  = ln
 CHMOD = chmod
+MKDIR = mkdir
 
 ### Targets ###
 
@@ -118,19 +119,18 @@ libs:
 install: uninstall
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
-	$(COPY) $(LIBDIR)/libsmooth-$(VERSION)$(SHARED) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED).$(REVISION)
-	$(LINK) -s $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
-	$(CHMOD) a=r,u=rw $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
+	$(MKDIR) -p $(PREFIX)/$(LIB)
+	$(COPY) $(LIBDIR)/libsmooth-$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED).$(REVISION)
+	$(LINK) -s $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED)
+	$(CHMOD) a=r,u=rw $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED)
 
-	$(COPY) $(LIBDIR)/libsmooth-js-$(VERSION)$(SHARED) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION)
-	$(LINK) -s $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
-	$(CHMOD) a=r,u=rw $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
+	$(COPY) $(LIBDIR)/libsmooth-js-$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED).$(REVISION)
+	$(LINK) -s $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED)
+	$(CHMOD) a=r,u=rw $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED).$(REVISION) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_LINUX),True)
 	ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
-	ldconfig
-else ifeq ($(BUILD_OPENBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
 	ldconfig
@@ -138,18 +138,21 @@ else ifeq ($(BUILD_HAIKU),True)
 	ldconfig
 endif
 else
-	$(COPY) $(DLLNAME) $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED)
-	$(LINK) -s $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
-	$(CHMOD) a=r,u=rw $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
+	$(MKDIR) -p $(PREFIX)/$(LIB)
+	$(COPY) $(DLLNAME) $(PREFIX)/$(LIB)/libsmooth-$(VERSION).$(REVISION)$(SHARED)
+	$(LINK) -s $(PREFIX)/$(LIB)/libsmooth-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED)
+	$(CHMOD) a=r,u=rw $(PREFIX)/$(LIB)/libsmooth-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED)
 
-	$(COPY) $(LIBDIR)/libsmooth-js-$(VERSION)$(SHARED) $(PREFIX)/lib/libsmooth-js-$(VERSION).$(REVISION)$(SHARED)
-	$(LINK) -s $(PREFIX)/lib/libsmooth-js-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
-	$(CHMOD) a=r,u=rw $(PREFIX)/lib/libsmooth-js-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
+	$(COPY) $(LIBDIR)/libsmooth-js-$(VERSION)$(SHARED) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION).$(REVISION)$(SHARED)
+	$(LINK) -s $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED)
+	$(CHMOD) a=r,u=rw $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION).$(REVISION)$(SHARED) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED)
 endif
 
+	$(MKDIR) -p $(PREFIX)/bin
 	$(COPY) $(BINDIR)/translator $(PREFIX)/bin
 	$(CHMOD) -R a=rX,u=rwX $(PREFIX)/bin/translator
 
+	$(MKDIR) -p $(PREFIX)/include
 	$(COPY) -r include/smooth $(PREFIX)/include
 	$(COPY) -r include/smooth-js $(PREFIX)/include
 	$(COPY) include/smooth.h $(PREFIX)/include
@@ -162,17 +165,15 @@ endif
 uninstall:
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
-	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
-	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED).$(REVISION)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED).$(REVISION)
 
-	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
-	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED).$(REVISION)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED).$(REVISION)
 
 ifeq ($(BUILD_LINUX),True)
 	ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
-	ldconfig
-else ifeq ($(BUILD_OPENBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
 	ldconfig
@@ -180,11 +181,11 @@ else ifeq ($(BUILD_HAIKU),True)
 	ldconfig
 endif
 else
-	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION)$(SHARED)
-	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-$(VERSION).$(REVISION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-$(VERSION).$(REVISION)$(SHARED)
 
-	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION)$(SHARED)
-	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/lib/libsmooth-js-$(VERSION).$(REVISION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED)
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION).$(REVISION)$(SHARED)
 endif
 
 	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/bin/translator

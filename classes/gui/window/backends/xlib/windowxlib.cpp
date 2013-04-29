@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -318,6 +318,10 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			/* Update pointer position in Input::Pointer.
 			 */
 			Input::Pointer::UpdatePosition(Window::GetWindow((Void *) e->xbutton.window), e->xbutton.x_root, e->xbutton.y_root);
+
+			/* Reject if a modal window is active.
+			 */
+			if (IsModalWindowActive()) break;
 
 			/* Reject button messages if we do not have the focus and
 			 * we are not an utility window.
@@ -752,6 +756,21 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::FindLeaderWindow()
 	}
 
 	return NIL;
+}
+
+S::Bool S::GUI::WindowXLib::IsModalWindowActive()
+{
+	/* Look for modal windows opened after ourselves.
+	 */
+	for (Int i = windowBackends.Length() - 1; i >= 0; i--)
+	{
+		WindowXLib	*backend = windowBackends.GetNth(i);
+
+		if	(backend == this)				   return False;
+		else if (backend->wnd != NIL && backend->flags & WF_MODAL) return True;
+	}
+
+	return False;
 }
 
 S::Int S::GUI::WindowXLib::SetTitle(const String &nTitle)

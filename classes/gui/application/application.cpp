@@ -182,7 +182,7 @@ S::String S::GUI::Application::GetApplicationDirectory()
 #if defined __APPLE__
 	/* In Mac OS X, lsof -p <pid> always returns the path to the current binary in the first txt section.
 	 */
-	FILE	*pstdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print $9 }'"), "r");
+	FILE	*pstdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print substr($0, index($0, $9)) }'"), "r");
 
 	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
 

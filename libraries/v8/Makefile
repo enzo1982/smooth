@@ -66,10 +66,12 @@ ifeq ($(BUILD_HAIKU),True)
 	OBJECTS += platform-haiku.o platform-posix.o
 endif
 
-ifeq ($(BUILD_X64),True)
-	OBJECTS += x64/assembler-x64.o x64/builtins-x64.o x64/codegen-x64.o x64/code-stubs-x64.o x64/cpu-x64.o x64/debug-x64.o x64/deoptimizer-x64.o x64/disasm-x64.o x64/frames-x64.o x64/full-codegen-x64.o x64/ic-x64.o x64/lithium-x64.o x64/lithium-codegen-x64.o x64/lithium-gap-resolver-x64.o x64/macro-assembler-x64.o x64/regexp-macro-assembler-x64.o x64/stub-cache-x64.o
-else
+ifeq ($(BUILD_X86),True)
 	OBJECTS += ia32/assembler-ia32.o ia32/builtins-ia32.o ia32/codegen-ia32.o ia32/code-stubs-ia32.o ia32/cpu-ia32.o ia32/debug-ia32.o ia32/deoptimizer-ia32.o ia32/disasm-ia32.o ia32/frames-ia32.o ia32/full-codegen-ia32.o ia32/ic-ia32.o ia32/lithium-ia32.o ia32/lithium-codegen-ia32.o ia32/lithium-gap-resolver-ia32.o ia32/macro-assembler-ia32.o ia32/regexp-macro-assembler-ia32.o ia32/stub-cache-ia32.o
+endif
+
+ifeq ($(BUILD_X86_64),True)
+	OBJECTS += x64/assembler-x64.o x64/builtins-x64.o x64/codegen-x64.o x64/code-stubs-x64.o x64/cpu-x64.o x64/debug-x64.o x64/deoptimizer-x64.o x64/disasm-x64.o x64/frames-x64.o x64/full-codegen-x64.o x64/ic-x64.o x64/lithium-x64.o x64/lithium-codegen-x64.o x64/lithium-gap-resolver-x64.o x64/macro-assembler-x64.o x64/regexp-macro-assembler-x64.o x64/stub-cache-x64.o
 endif
 
 OBJECTS += extensions/externalize-string-extension.o extensions/gc-extension.o

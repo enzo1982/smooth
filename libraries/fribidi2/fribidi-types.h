@@ -25,8 +25,8 @@
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307, USA
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA
  *
  * For licensing issues, contact <license@farsiweb.info>.
  */
@@ -40,8 +40,7 @@
 
 #if FRIBIDI_USE_GLIB+0
 # ifndef __FRIBIDI_DOC
-#  include <glib/gtypes.h>
-#  include <glib/gunicode.h>
+#  include <glib.h>
 # endif	/* !__FRIBIDI_DOC */
 # define FRIBIDI_INT8_LOCAL		gint8
 # define FRIBIDI_INT16_LOCAL		gint16

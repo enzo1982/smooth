@@ -8,7 +8,7 @@ GLOBALLIB   = libxml2.a
 MYCCOPTS    = -I. -DLIBICONV_PLUG
 
 # Enter object files here:
-OBJECTS	    = chvalid.o dict.o encoding.o entities.o error.o globals.o hash.o list.o parser.o parserInternals.o SAX2.o threads.o tree.o uri.o valid.o xmlIO.o xmlmemory.o xmlreader.o xmlsave.o xmlstring.o xmlwriter.o
+OBJECTS	    = buf.o chvalid.o dict.o encoding.o entities.o error.o globals.o hash.o list.o parser.o parserInternals.o SAX2.o threads.o tree.o uri.o valid.o xmlIO.o xmlmemory.o xmlreader.o xmlsave.o xmlstring.o xmlwriter.o
 
 ## Do not change anything below this line. ##
 

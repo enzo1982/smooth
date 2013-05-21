@@ -24,8 +24,8 @@
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library, in a file named COPYING; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307, USA
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA
  *
  * For licensing issues, contact <license@farsiweb.info>.
  */
@@ -57,7 +57,7 @@
 #  define SIZEOF_VOID_P GLIB_SIZEOF_VOID_P
 # endif	/* !SIZEOF_VOID_P */
 # ifndef __FRIBIDI_DOC
-#  include <glib/gmem.h>
+#  include <glib.h>
 # endif	/* !__FRIBIDI_DOC */
 # ifndef fribidi_malloc
 #  define fribidi_malloc g_try_malloc
@@ -65,12 +65,12 @@
 # endif	/* !fribidi_malloc */
 # ifndef fribidi_assert
 #  ifndef __FRIBIDI_DOC
-#   include <glib/gmessages.h>
+#   include <glib.h>
 #  endif /* !__FRIBIDI_DOC */
 #  define fribidi_assert g_assert
 # endif	/* !fribidi_assert */
 # ifndef __FRIBIDI_DOC
-#  include <glib/gmacros.h>
+#  include <glib.h>
 # endif	/* !__FRIBIDI_DOC */
 # ifndef FRIBIDI_BEGIN_STMT
 #  define FRIBIDI_BEGIN_STMT G_STMT_START {

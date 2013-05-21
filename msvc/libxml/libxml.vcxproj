@@ -126,6 +126,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\libraries\libxml\buf.c" />
     <ClCompile Include="..\..\libraries\libxml\chvalid.c" />
     <ClCompile Include="..\..\libraries\libxml\dict.c" />
     <ClCompile Include="..\..\libraries\libxml\encoding.c" />

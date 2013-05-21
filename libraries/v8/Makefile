@@ -66,6 +66,10 @@ ifeq ($(BUILD_HAIKU),True)
 	OBJECTS += platform-haiku.o platform-posix.o
 endif
 
+ifeq ($(BUILD_GNU),True)
+	OBJECTS += platform-hurd.o platform-posix.o
+endif
+
 ifeq ($(BUILD_X86),True)
 	OBJECTS += ia32/assembler-ia32.o ia32/builtins-ia32.o ia32/codegen-ia32.o ia32/code-stubs-ia32.o ia32/cpu-ia32.o ia32/debug-ia32.o ia32/deoptimizer-ia32.o ia32/disasm-ia32.o ia32/frames-ia32.o ia32/full-codegen-ia32.o ia32/ic-ia32.o ia32/lithium-ia32.o ia32/lithium-codegen-ia32.o ia32/lithium-gap-resolver-ia32.o ia32/macro-assembler-ia32.o ia32/regexp-macro-assembler-ia32.o ia32/stub-cache-ia32.o
 endif

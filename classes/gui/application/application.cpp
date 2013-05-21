@@ -226,10 +226,33 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	/* No system specific way to get the current binary path.
 	 * Try concatenating the startup directory and command.
 	 */
-	String	 path	= GetStartupDirectory().Append(command).Replace("/./", "/");
-	Int	 length	= Math::Min(buffer.Size(), path.Length() + 1);
+	String	 binary	= (command.StartsWith("/") ? String() : GetStartupDirectory()).Append(command).Replace("/./", "/");
 
-	memcpy(buffer, (char *) path, length);
+	if (!File(binary).Exists())
+	{
+		/* Search the path for command.
+		 */
+		String			 path  = getenv("PATH");
+		const Array<String>	&paths = path.Explode(":");
+
+		foreach (const String &path, paths)
+		{
+			/* Check for command in this path.
+			 */
+			if (File(String(path).Append("/").Append(command)).Exists())
+			{
+				binary = String(path).Append("/").Append(command);
+
+				break;
+			}
+		}
+
+		String::ExplodeFinish();
+	}
+
+	Int	 length	= Math::Min(buffer.Size(), binary.Length() + 1);
+
+	memcpy(buffer, (char *) binary, length);
 
 	buffer[length - 1] = 0;
 #endif

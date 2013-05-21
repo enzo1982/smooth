@@ -59,7 +59,7 @@ xx.xx.13 xx:xx - smooth alpha 0.8.71.0
 - removed Extended<> template
 - removed Pointer<> template
 - improved Linux support
-- ported to FreeBSD, OpenBSD, NetBSD, Solaris, Mac OS X, QNX and Haiku
+- ported to FreeBSD, OpenBSD, NetBSD, Solaris, Mac OS X, QNX, Hurd and Haiku
 - upgraded libbzip2 to version 1.0.6
 - upgraded fribidi2 to version 0.19.5
 - upgraded libiconv to version 1.14

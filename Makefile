@@ -132,6 +132,8 @@ ifneq ($(BUILD_OSX),True)
 
 ifeq ($(BUILD_LINUX),True)
 	ldconfig
+else ifeq ($(BUILD_GNU),True)
+	ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
@@ -174,6 +176,8 @@ ifneq ($(BUILD_OSX),True)
 	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-js-$(VERSION)$(SHARED).$(REVISION)
 
 ifeq ($(BUILD_LINUX),True)
+	ldconfig
+else ifeq ($(BUILD_GNU),True)
 	ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
 	ldconfig

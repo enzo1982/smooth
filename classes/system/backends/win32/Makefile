@@ -9,7 +9,7 @@ include $(SMOOTH_PATH)/Makefile-options
 OBJECTS	  = 
 
 ifeq ($(BUILD_WIN32),True)
-	OBJECTS += eventwin32.o timerwin32.o
+	OBJECTS += eventwin32.o screenwin32.o timerwin32.o
 endif
 
 ## Do not change anything below this line. ##

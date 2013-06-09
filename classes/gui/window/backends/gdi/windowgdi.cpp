@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,7 +14,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
 #include <smooth/system/timer.h>
-#include <smooth/system/multimonitor.h>
+#include <smooth/system/screen.h>
 #include <smooth/init.h>
 #include <smooth/backends/win32/backendwin32.h>
 
@@ -231,7 +231,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		case WM_SETTINGCHANGE:
 			if ((wParam == SPI_SETWORKAREA) && maximized)
 			{
-				Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
+				Rect	 workArea = System::Screen::GetActiveScreenWorkArea();
 
 				SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.GetWidth() + (2 * frameSize.cx - 4), workArea.GetHeight() + (2 * frameSize.cy - 4)) / fontSize);
 			}
@@ -792,7 +792,7 @@ S::Int S::GUI::WindowGDI::Minimize()
 
 S::Int S::GUI::WindowGDI::Maximize()
 {
-	Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
+	Rect	 workArea = System::Screen::GetActiveScreenWorkArea();
 
 	{
 		RECT	 rect;

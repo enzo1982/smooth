@@ -46,6 +46,7 @@ xx.xx.13 xx:xx - smooth alpha 0.8.71.0
 - document.cpp		- added support for parsing CDATA nodes
 			- fixed Unicode filename support
 - messagebox.cpp	- replaced Windows message box defines with own constants
+- screen.cpp		- new class: Screen, replaces MultiMonitor
 
 - removed TreeView widget (use ListBox instead)
 - removed SDL backends

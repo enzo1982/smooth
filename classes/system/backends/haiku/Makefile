@@ -9,7 +9,7 @@ include $(SMOOTH_PATH)/Makefile-options
 OBJECTS	  = 
 
 ifeq ($(BUILD_HAIKU),True)
-	OBJECTS += eventhaiku.o
+	OBJECTS += eventhaiku.o screenhaiku.o
 endif
 
 ## Do not change anything below this line. ##

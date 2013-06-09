@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,7 +12,7 @@
 #include <smooth/gui/widgets/layer.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/system/timer.h>
-#include <smooth/system/multimonitor.h>
+#include <smooth/system/screen.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
 
@@ -56,7 +56,7 @@ S::Int S::GUI::Tooltip::Show()
 	Size	 tSize	 = (layer != NIL ? layer->GetSize() : Size(font.GetUnscaledTextSizeX(text) + 6, font.GetUnscaledTextSizeY(text) + 4));
 	Size	 sSize	 = tSize * surface->GetSurfaceDPI() / 96.0;
 	Point	 tPos	 = Point(GetX(), GetY() - sSize.cy + 1);
-	Rect	 vScreen = System::MultiMonitor::GetVirtualScreenMetrics();
+	Rect	 vScreen = System::Screen::GetVirtualScreenMetrics();
 
 	if (tPos.y + window->GetY() < vScreen.top + 2) tPos.y = GetY() + vScreen.top + 2;
 

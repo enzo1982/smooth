@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,7 +19,7 @@
 #include <smooth/gui/widgets/basic/image.h>
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/system/multimonitor.h>
+#include <smooth/system/screen.h>
 #include <smooth/files/file.h>
 #include <smooth/files/directory.h>
 
@@ -231,7 +231,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			break;
 	}
 
-	Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
+	Rect	 workArea = System::Screen::GetActiveScreenWorkArea();
 
 	msgbox->SetWidth(Math::Max(msgbox->GetWidth(), buttonLabels.Length() * (buttonWidth + 9) + 21));
 	msgbox->SetPosition(workArea.GetPosition() + Point((workArea.GetSize().cx - msgbox->GetWidth()) / 2, (workArea.GetSize().cy - msgbox->GetHeight()) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));

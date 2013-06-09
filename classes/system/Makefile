@@ -19,7 +19,7 @@ endif
 endif
 
 # Enter object files here:
-OBJECTS	  = console.o cpu.o dynamicloader.o event.o multimonitor.o system.o timer.o
+OBJECTS	  = console.o cpu.o dynamicloader.o event.o screen.o system.o timer.o
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = cd backends && $(MAKE)

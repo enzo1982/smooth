@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,7 +14,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
-#include <smooth/system/multimonitor.h>
+#include <smooth/system/screen.h>
 
 const S::Short	 S::GUI::MicroMenu::classID = S::Object::RequestClassID();
 
@@ -132,7 +132,7 @@ S::Void S::GUI::MicroMenu::OpenPopupMenu()
 
 	hotspot->Deactivate();
 
-	Rect	 monitor	= System::MultiMonitor::GetActiveMonitorMetrics();
+	Rect	 monitor	= System::Screen::GetActiveScreenMetrics();
 	Point	 realPos	= GetRealPosition();
 	Size	 realSize	= GetRealSize();
 	Point	 popupPos	= realPos + Point(subtype == OR_HORZ ? realSize.cx : 0, subtype == OR_VERT ? realSize.cy : 0);

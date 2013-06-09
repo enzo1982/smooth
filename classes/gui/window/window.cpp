@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,7 +22,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/misc/binary.h>
 #include <smooth/system/event.h>
-#include <smooth/system/multimonitor.h>
+#include <smooth/system/screen.h>
 #include <smooth/resources.h>
 
 #ifdef __WIN32__
@@ -408,7 +408,7 @@ S::Bool S::GUI::Window::Create()
 {
 	if (IsRegistered() && !created)
 	{
-		Rect	 monitorRect = System::MultiMonitor::GetActiveMonitorMetrics();
+		Rect	 monitorRect = System::Screen::GetActiveScreenMetrics();
 
 		if (GetPosition().x >= 0 && GetPosition().y >= 0 && GetPosition().x < monitorRect.GetSize().cx && GetPosition().y < monitorRect.GetSize().cy)
 		{
@@ -639,7 +639,7 @@ S::Int S::GUI::Window::Paint(Int message)
 	if (realSize.cx - updateRect.right  < frameWidth) updateRect.right  = realSize.cx - frameWidth + 1;
 	if (realSize.cy - updateRect.bottom < frameWidth) updateRect.bottom = realSize.cy - frameWidth + 1;
 
-	Rect	 workArea = System::MultiMonitor::GetVirtualScreenMetrics();
+	Rect	 workArea = System::Screen::GetVirtualScreenMetrics();
 
 	if (message == SP_UPDATE				 &&
 	    GetPosition().x		   > workArea.left   - 2 &&

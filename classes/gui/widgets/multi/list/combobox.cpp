@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,7 +14,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/surface.h>
-#include <smooth/system/multimonitor.h>
+#include <smooth/system/screen.h>
 
 const S::Short	 S::GUI::ComboBox::classID = S::Object::RequestClassID();
 
@@ -157,7 +157,7 @@ S::Void S::GUI::ComboBox::OpenListBox()
 		Widget	*window		= container->GetContainerWindow();
  		Surface	*surface	= GetDrawSurface();
 
-		Rect	 monitor	= System::MultiMonitor::GetActiveMonitorMetrics();
+		Rect	 monitor	= System::Screen::GetActiveScreenMetrics();
 		Size	 listBoxSize	= Size(GetWidth(), 16 * Math::Min(Length(), Math::Max(5, Math::Min(16, Length() / 3))) + 4);
 		Point	 listBoxPos	= Point(GetRealPosition() + Point(0, GetRealSize().cy));
 

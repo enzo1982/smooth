@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,7 +14,7 @@
 #include <smooth/gui/application/application.h>
 
 #include <smooth/graphics/surface.h>
-#include <smooth/system/multimonitor.h>
+#include <smooth/system/screen.h>
 
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/widgets/basic/divider.h>
@@ -48,7 +48,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	mode = TIP_ORDERED;
 	offset = 0;
 
-	Rect	 workArea = System::MultiMonitor::GetActiveMonitorWorkArea();
+	Rect	 workArea = System::Screen::GetActiveScreenWorkArea();
 
 	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"), workArea.GetPosition() + Point((workArea.GetSize().cx - 350) / 2, (workArea.GetSize().cy - 300) / 2), Size(352, 302));
 

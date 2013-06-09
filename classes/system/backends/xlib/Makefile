@@ -22,7 +22,7 @@ endif
 OBJECTS	  = 
 
 ifeq ($(BUILD_XLIB),True)
-	OBJECTS += eventxlib.o
+	OBJECTS += eventxlib.o screenxlib.o
 endif
 
 ## Do not change anything below this line. ##

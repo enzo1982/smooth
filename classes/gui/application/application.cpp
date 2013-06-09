@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,7 +12,7 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/threads/thread.h>
 #include <smooth/system/event.h>
-#include <smooth/system/multimonitor.h>
+#include <smooth/system/screen.h>
 #include <smooth/files/directory.h>
 #include <smooth/misc/math.h>
 #include <smooth/templates/nonblocking.h>
@@ -40,7 +40,7 @@ S::Array<S::String>	 S::GUI::Application::args;
 S::String		 S::GUI::Application::startupDirectory;
 S::String		 S::GUI::Application::applicationDirectory;
 
-S::GUI::Application::Application(const String &name) : Widget(Point(0, 0), System::MultiMonitor::GetActiveMonitorMetrics().GetSize())
+S::GUI::Application::Application(const String &name) : Widget(Point(0, 0), System::Screen::GetActiveScreenMetrics().GetSize())
 {
 	type	= classID;
 	text	= name == NIL ? String("smooth Application") : name;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,6 +25,8 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 	{
 		NSOpenPanel	*openPanel = [NSOpenPanel openPanel];
 
+		[openPanel setFloatingPanel: YES];
+
 		if (flags & SFD_ALLOWMULTISELECT) [openPanel setAllowsMultipleSelection: true];
 
 		SetFilters(openPanel);
@@ -45,6 +47,8 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 	else if (mode == SFM_SAVE)
 	{
 		NSSavePanel	*savePanel = [NSSavePanel savePanel];
+
+		[savePanel setFloatingPanel: YES];
 
 		SetFilters(savePanel);
 

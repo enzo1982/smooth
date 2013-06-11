@@ -4,7 +4,7 @@
 SMOOTH_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = eventbackend.o timerbackend.o
+OBJECTS	  = eventbackend.o screenbackend.o timerbackend.o
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = cd haiku && $(MAKE)

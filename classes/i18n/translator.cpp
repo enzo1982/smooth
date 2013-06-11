@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,6 +14,7 @@
 #include <smooth/files/directory.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
+#include <smooth/foreach.h>
 
 #ifdef __WIN32__
 #	include <windows.h>
@@ -251,7 +252,7 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 
 			language->magic = files.GetNth(i).GetFileName();
 
-			LoadDoc(doc, language);
+			if (LoadDescription(doc, language) == Success()) AddLanguage(language);
 		}
 
 		delete doc;
@@ -337,11 +338,32 @@ S::Bool S::I18n::Translator::IsActiveLanguageRightToLeft() const
 
 S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 {
-	for (int i = 0; i < languages.Length(); i++)
+	foreach (Language *language, languages)
 	{
-		if (languages.GetNth(i)->magic == magic)
+		if (language->magic == magic)
 		{
-			activeLanguage = languages.GetNth(i);
+			activeLanguage = language;
+
+			/* Load actual language data.
+			 */
+			if (magic != "internal" && activeLanguage->strings.Length() == 0 && activeLanguage->sections.Length() == 0)
+			{
+				Directory	 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
+
+#ifndef __WIN32__
+				if (Directory(GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
+				{
+					dir = GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
+				}
+#endif
+
+				String		 file = String(dir).Append(Directory::GetDirectoryDelimiter()).Append(magic);
+				XML::Document	*doc  = new XML::Document();
+
+				if (doc->LoadFile(file) == Success()) LoadData(doc, activeLanguage);
+
+				delete doc;
+			}
 
 			return Success();
 		}
@@ -364,18 +386,13 @@ const S::String &S::I18n::Translator::TranslateString(const String &string, cons
 	else			return translation;
 }
 
-S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
+S::Int S::I18n::Translator::AddLanguage(Language *language)
 {
 	/* Check arguments and return an error if they are not sane.
 	 */
-	if (doc == NIL || doc->GetRootNode() == NIL || language == NIL) return Error();
+	if (language == NIL) return Error();
 
-	XML::Node	*root = doc->GetRootNode();
-	Error		 result = language->Parse(root);
-
-	if (result != Success()) return Error();
-
-	Bool		 done = False;
+	Bool	 done = False;
 
 	for (Int j = 0; j < languages.Length(); j++)
 	{
@@ -406,6 +423,34 @@ S::Int S::I18n::Translator::LoadDoc(XML::Document *doc, Language *language)
 
 		if (done) break;
 	}
+
+	return Success();
+}
+
+S::Int S::I18n::Translator::LoadDescription(XML::Document *doc, Language *language)
+{
+	/* Check arguments and return an error if they are not sane.
+	 */
+	if (doc == NIL || doc->GetRootNode() == NIL || language == NIL) return Error();
+
+	XML::Node	*root = doc->GetRootNode();
+	Error		 result = language->ParseHeader(root);
+
+	if (result != Success()) return Error();
+
+	return Success();
+}
+
+S::Int S::I18n::Translator::LoadData(XML::Document *doc, Language *language)
+{
+	/* Check arguments and return an error if they are not sane.
+	 */
+	if (doc == NIL || doc->GetRootNode() == NIL || language == NIL) return Error();
+
+	XML::Node	*root = doc->GetRootNode();
+	Error		 result = language->Parse(root);
+
+	if (result != Success()) return Error();
 
 	return Success();
 }

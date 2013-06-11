@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,7 +19,7 @@ S::I18n::Language::~Language()
 {
 }
 
-S::Errors::Error S::I18n::Language::Parse(XML::Node *language)
+S::Errors::Error S::I18n::Language::ParseHeader(XML::Node *language)
 {
 	if (language == NIL) return Error();
 
@@ -40,6 +40,13 @@ S::Errors::Error S::I18n::Language::Parse(XML::Node *language)
 		if (property == "author")	 author = info->GetNthNode(i)->GetContent();
 		if (property == "url")		 url = info->GetNthNode(i)->GetContent();
 	}
+
+	return Success();
+}
+
+S::Errors::Error S::I18n::Language::Parse(XML::Node *language)
+{
+	if (language == NIL) return Error();
 
 	XML::Node	*data = language->GetNodeByName("data");
 

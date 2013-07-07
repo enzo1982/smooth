@@ -31,9 +31,12 @@
 #include "v8.h"
 
 #include "platform.h"
-#include "smart-array-pointer.h"
+#include "smart-pointers.h"
 #include "string-stream.h"
 
+#ifdef V8_TARGET_ARCH_ARM
+#include "arm/assembler-arm-inl.h"
+#endif
 
 namespace v8 {
 namespace internal {
@@ -305,7 +308,7 @@ static void SplitArgument(const char* arg,
       // make a copy so we can NUL-terminate flag name
       size_t n = arg - *name;
       CHECK(n < static_cast<size_t>(buffer_size));  // buffer is too small
-      memcpy(buffer, *name, n);
+      OS::MemCopy(buffer, *name, n);
       buffer[n] = '\0';
       *name = buffer;
       // get the value
@@ -343,6 +346,7 @@ static Flag* FindFlag(const char* name) {
 int FlagList::SetFlagsFromCommandLine(int* argc,
                                       char** argv,
                                       bool remove_flags) {
+  int return_code = 0;
   // parse arguments
   for (int i = 1; i < *argc;) {
     int j = i;  // j > 0
@@ -366,9 +370,10 @@ int FlagList::SetFlagsFromCommandLine(int* argc,
           // sense there.
           continue;
         } else {
-          fprintf(stderr, "Error: unrecognized flag %s\n"
-                  "Try --help for options\n", arg);
-          return j;
+          PrintF(stderr, "Error: unrecognized flag %s\n"
+                 "Try --help for options\n", arg);
+          return_code = j;
+          break;
         }
       }
 
@@ -379,10 +384,11 @@ int FlagList::SetFlagsFromCommandLine(int* argc,
         if (i < *argc) {
           value = argv[i++];
         } else {
-          fprintf(stderr, "Error: missing value for flag %s of type %s\n"
-                  "Try --help for options\n",
-                  arg, Type2String(flag->type()));
-          return j;
+          PrintF(stderr, "Error: missing value for flag %s of type %s\n"
+                 "Try --help for options\n",
+                 arg, Type2String(flag->type()));
+          return_code = j;
+          break;
         }
       }
 
@@ -421,10 +427,11 @@ int FlagList::SetFlagsFromCommandLine(int* argc,
       if ((flag->type() == Flag::TYPE_BOOL && value != NULL) ||
           (flag->type() != Flag::TYPE_BOOL && is_bool) ||
           *endp != '\0') {
-        fprintf(stderr, "Error: illegal value for flag %s of type %s\n"
-                "Try --help for options\n",
-                arg, Type2String(flag->type()));
-        return j;
+        PrintF(stderr, "Error: illegal value for flag %s of type %s\n"
+               "Try --help for options\n",
+               arg, Type2String(flag->type()));
+        return_code = j;
+        break;
       }
 
       // remove the flag & value from the command
@@ -451,7 +458,7 @@ int FlagList::SetFlagsFromCommandLine(int* argc,
     exit(0);
   }
   // parsed all flags successfully
-  return 0;
+  return return_code;
 }
 
 
@@ -471,7 +478,7 @@ static char* SkipBlackSpace(char* p) {
 int FlagList::SetFlagsFromString(const char* str, int len) {
   // make a 0-terminated copy of str
   ScopedVector<char> copy0(len + 1);
-  memcpy(copy0.start(), str, len);
+  OS::MemCopy(copy0.start(), str, len);
   copy0[len] = '\0';
 
   // strip leading white space
@@ -513,6 +520,12 @@ void FlagList::ResetAllFlags() {
 
 // static
 void FlagList::PrintHelp() {
+#ifdef V8_TARGET_ARCH_ARM
+  CpuFeatures::PrintTarget();
+  CpuFeatures::Probe();
+  CpuFeatures::PrintFeatures();
+#endif  // V8_TARGET_ARCH_ARM
+
   printf("Usage:\n");
   printf("  shell [options] -e string\n");
   printf("    execute string in V8\n");
@@ -538,6 +551,7 @@ void FlagList::PrintHelp() {
 void FlagList::EnforceFlagImplications() {
 #define FLAG_MODE_DEFINE_IMPLICATIONS
 #include "flag-definitions.h"
+#undef FLAG_MODE_DEFINE_IMPLICATIONS
 }
 
 } }  // namespace v8::internal

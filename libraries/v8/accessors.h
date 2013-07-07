@@ -56,8 +56,7 @@ namespace internal {
   V(ScriptContextData)              \
   V(ScriptEvalFromScript)           \
   V(ScriptEvalFromScriptPosition)   \
-  V(ScriptEvalFromFunctionName)     \
-  V(ObjectPrototype)
+  V(ScriptEvalFromFunctionName)
 
 // Accessors contains all predefined proxy accessors.
 
@@ -80,10 +79,16 @@ class Accessors : public AllStatic {
   // Accessor functions called directly from the runtime system.
   MUST_USE_RESULT static MaybeObject* FunctionGetPrototype(Object* object,
                                                            void*);
+  static Handle<Object> FunctionGetPrototype(Handle<Object> object);
+
   MUST_USE_RESULT static MaybeObject* FunctionSetPrototype(JSObject* object,
                                                       Object* value,
                                                       void*);
   static MaybeObject* FunctionGetArguments(Object* object, void*);
+
+  // Accessor infos.
+  static Handle<AccessorInfo> MakeModuleExport(
+      Handle<String> name, int index, PropertyAttributes attributes);
 
  private:
   // Accessor functions only used through the descriptor.
@@ -107,10 +112,6 @@ class Accessors : public AllStatic {
   static MaybeObject* ScriptGetEvalFromScript(Object* object, void*);
   static MaybeObject* ScriptGetEvalFromScriptPosition(Object* object, void*);
   static MaybeObject* ScriptGetEvalFromFunctionName(Object* object, void*);
-  static MaybeObject* ObjectGetPrototype(Object* receiver, void*);
-  static MaybeObject* ObjectSetPrototype(JSObject* receiver,
-                                         Object* value,
-                                         void*);
 
   // Helper functions.
   static Object* FlattenNumber(Object* value);

@@ -1,4 +1,4 @@
-// Copyright 2007-2008 the V8 project authors. All rights reserved.
+// Copyright 2012 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -32,31 +32,64 @@
 namespace v8 {
 namespace internal {
 
-Counters::Counters() {
+Counters::Counters(Isolate* isolate) {
 #define HT(name, caption) \
-    HistogramTimer name = { #caption, NULL, false, 0, 0 }; \
-    name##_ = name;
+    name##_ = HistogramTimer(#caption, 0, 10000, 50, isolate);
     HISTOGRAM_TIMER_LIST(HT)
 #undef HT
 
+#define HP(name, caption) \
+    name##_ = Histogram(#caption, 0, 101, 100, isolate);
+    HISTOGRAM_PERCENTAGE_LIST(HP)
+#undef HP
+
+#define HM(name, caption) \
+    name##_ = Histogram(#caption, 1000, 500000, 50, isolate);
+    HISTOGRAM_MEMORY_LIST(HM)
+#undef HM
+
 #define SC(name, caption) \
-    StatsCounter name = { "c:" #caption, NULL, false };\
-    name##_ = name;
+    name##_ = StatsCounter("c:" #caption);
 
     STATS_COUNTER_LIST_1(SC)
     STATS_COUNTER_LIST_2(SC)
 #undef SC
 
-  StatsCounter state_counters[] = {
-#define COUNTER_NAME(name) \
-    { "c:V8.State" #name, NULL, false },
-    STATE_TAG_LIST(COUNTER_NAME)
-#undef COUNTER_NAME
-  };
+#define SC(name) \
+    count_of_##name##_ = StatsCounter("c:" "V8.CountOf_" #name); \
+    size_of_##name##_ = StatsCounter("c:" "V8.SizeOf_" #name);
+    INSTANCE_TYPE_LIST(SC)
+#undef SC
 
-  for (int i = 0; i < kSlidingStateWindowCounterCount; ++i) {
-    state_counters_[i] = state_counters[i];
-  }
+#define SC(name) \
+    count_of_CODE_TYPE_##name##_ = \
+        StatsCounter("c:" "V8.CountOf_CODE_TYPE-" #name); \
+    size_of_CODE_TYPE_##name##_ = \
+        StatsCounter("c:" "V8.SizeOf_CODE_TYPE-" #name);
+    CODE_KIND_LIST(SC)
+#undef SC
+
+#define SC(name) \
+    count_of_FIXED_ARRAY_##name##_ = \
+        StatsCounter("c:" "V8.CountOf_FIXED_ARRAY-" #name); \
+    size_of_FIXED_ARRAY_##name##_ = \
+        StatsCounter("c:" "V8.SizeOf_FIXED_ARRAY-" #name); \
+    FIXED_ARRAY_SUB_INSTANCE_TYPE_LIST(SC)
+#undef SC
+}
+
+void Counters::ResetHistograms() {
+#define HT(name, caption) name##_.Reset();
+    HISTOGRAM_TIMER_LIST(HT)
+#undef HT
+
+#define HP(name, caption) name##_.Reset();
+    HISTOGRAM_PERCENTAGE_LIST(HP)
+#undef HP
+
+#define HM(name, caption) name##_.Reset();
+    HISTOGRAM_MEMORY_LIST(HM)
+#undef HM
 }
 
 } }  // namespace v8::internal

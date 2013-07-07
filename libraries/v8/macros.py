@@ -32,6 +32,8 @@ const NONE        = 0;
 const READ_ONLY   = 1;
 const DONT_ENUM   = 2;
 const DONT_DELETE = 4;
+const NEW_ONE_BYTE_STRING = true;
+const NEW_TWO_BYTE_STRING = false;
 
 # Constants used for getter and setter operations.
 const GETTER = 0;
@@ -97,6 +99,7 @@ macro IS_UNDEFINED(arg)         = (typeof(arg) === 'undefined');
 macro IS_NUMBER(arg)            = (typeof(arg) === 'number');
 macro IS_STRING(arg)            = (typeof(arg) === 'string');
 macro IS_BOOLEAN(arg)           = (typeof(arg) === 'boolean');
+macro IS_SYMBOL(arg)            = (typeof(arg) === 'symbol');
 macro IS_OBJECT(arg)            = (%_IsObject(arg));
 macro IS_ARRAY(arg)             = (%_IsArray(arg));
 macro IS_FUNCTION(arg)          = (%_IsFunction(arg));
@@ -107,11 +110,14 @@ macro IS_WEAKMAP(arg)           = (%_ClassOf(arg) === 'WeakMap');
 macro IS_DATE(arg)              = (%_ClassOf(arg) === 'Date');
 macro IS_NUMBER_WRAPPER(arg)    = (%_ClassOf(arg) === 'Number');
 macro IS_STRING_WRAPPER(arg)    = (%_ClassOf(arg) === 'String');
+macro IS_SYMBOL_WRAPPER(arg)    = (%_ClassOf(arg) === 'Symbol');
 macro IS_BOOLEAN_WRAPPER(arg)   = (%_ClassOf(arg) === 'Boolean');
 macro IS_ERROR(arg)             = (%_ClassOf(arg) === 'Error');
 macro IS_SCRIPT(arg)            = (%_ClassOf(arg) === 'Script');
 macro IS_ARGUMENTS(arg)         = (%_ClassOf(arg) === 'Arguments');
 macro IS_GLOBAL(arg)            = (%_ClassOf(arg) === 'global');
+macro IS_ARRAYBUFFER(arg)       = (%_ClassOf(arg) === 'ArrayBuffer');
+macro IS_GENERATOR(arg)         = (%_ClassOf(arg) === 'Generator');
 macro IS_UNDETECTABLE(arg)      = (%_IsUndetectableObject(arg));
 macro FLOOR(arg)                = $floor(arg);
 
@@ -138,6 +144,7 @@ const kBoundArgumentsStartIndex = 2;
 macro NUMBER_IS_NAN(arg) = (!%_IsSmi(%IS_VAR(arg)) && !(arg == arg));
 macro NUMBER_IS_FINITE(arg) = (%_IsSmi(%IS_VAR(arg)) || ((arg == arg) && (arg != 1/0) && (arg != -1/0)));
 macro TO_INTEGER(arg) = (%_IsSmi(%IS_VAR(arg)) ? arg : %NumberToInteger(ToNumber(arg)));
+macro TO_POSITIVE_INTEGER(arg) = (%_IsSmi(%IS_VAR(arg)) ? (arg > 0 ? arg : 0) : %NumberToPositiveInteger(ToNumber(arg)));
 macro TO_INTEGER_MAP_MINUS_ZERO(arg) = (%_IsSmi(%IS_VAR(arg)) ? arg : %NumberToIntegerMapMinusZero(ToNumber(arg)));
 macro TO_INT32(arg) = (%_IsSmi(%IS_VAR(arg)) ? arg : (arg >> 0));
 macro TO_UINT32(arg) = (arg >>> 0);
@@ -196,6 +203,7 @@ macro SET_UTC_DATE_VALUE(arg, value) = (%DateSetValue(arg, value, 1));
 macro SET_LOCAL_DATE_VALUE(arg, value) = (%DateSetValue(arg, value, 0));
 
 # Last input and last subject of regexp matches.
+const LAST_SUBJECT_INDEX = 1;
 macro LAST_SUBJECT(array) = ((array)[1]);
 macro LAST_INPUT(array) = ((array)[2]);
 
@@ -203,6 +211,15 @@ macro LAST_INPUT(array) = ((array)[2]);
 macro CAPTURE(index) = (3 + (index));
 const CAPTURE0 = 3;
 const CAPTURE1 = 4;
+
+# For the regexp capture override array.  This has the same
+# format as the arguments to a function called from
+# String.prototype.replace.
+macro OVERRIDE_MATCH(override) = ((override)[0]);
+macro OVERRIDE_POS(override) = ((override)[(override).length - 2]);
+macro OVERRIDE_SUBJECT(override) = ((override)[(override).length - 1]);
+# 1-based so index of 1 returns the first capture
+macro OVERRIDE_CAPTURE(override, index) = ((override)[(index)]);
 
 # PropertyDescriptor return value indices - must match
 # PropertyDescriptorIndices in runtime.cc.

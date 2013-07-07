@@ -42,11 +42,7 @@
 #include <sys/stat.h>   // open
 #include <fcntl.h>      // open
 #include <unistd.h>     // sysconf
-
-#ifndef __NetBSD__
 #include <execinfo.h>   // backtrace, backtrace_symbols
-#endif
-
 #include <strings.h>    // index
 #include <errno.h>
 #include <stdarg.h>
@@ -104,18 +100,8 @@ static void* GetRandomMmapAddr() {
 }
 
 
-void OS::SetUp() {
-  // Seed the random number generator. We preserve microsecond resolution.
-  uint64_t seed = Ticks() ^ (getpid() << 16);
-  srandom(static_cast<unsigned int>(seed));
-  limit_mutex = CreateMutex();
-}
-
-
 void OS::PostSetUp() {
-  // Math functions depend on CPU features therefore they are initialized after
-  // CPU.
-  MathSetup();
+  POSIXPostSetUp();
 }
 
 
@@ -139,7 +125,7 @@ void OS::ReleaseStore(volatile AtomicWord* ptr, AtomicWord value) {
 
 
 const char* OS::LocalTimezone(double time) {
-  if (isnan(time)) return "";
+  if (std::isnan(time)) return "";
   time_t tv = static_cast<time_t>(floor(time/msPerSecond));
   struct tm* t = localtime(&tv);
   if (NULL == t) return "";
@@ -218,6 +204,11 @@ void OS::Sleep(int milliseconds) {
 }
 
 
+int OS::NumberOfCores() {
+  return sysconf(_SC_NPROCESSORS_ONLN);
+}
+
+
 void OS::Abort() {
   // Redirect to std abort to signal abnormal program termination.
   abort();
@@ -226,6 +217,11 @@ void OS::Abort() {
 
 void OS::DebugBreak() {
   asm("int $3");
+}
+
+
+void OS::DumpBacktrace() {
+  // Currently unsupported.
 }
 
 
@@ -337,9 +333,6 @@ void OS::LogSharedLibraryAddresses() {
 }
 
 
-static const char kGCFakeMmap[] = "/tmp/__v8_gc__";
-
-
 void OS::SignalCodeMovingGC() {
   // Support for ll_prof.py.
   //
@@ -350,7 +343,11 @@ void OS::SignalCodeMovingGC() {
   // by the kernel and allows us to synchronize V8 code log and the
   // kernel log.
   int size = sysconf(_SC_PAGESIZE);
-  FILE* f = fopen(kGCFakeMmap, "w+");
+  FILE* f = fopen(FLAG_gc_fake_mmap, "w+");
+  if (f == NULL) {
+    OS::PrintError("Failed to open %s\n", FLAG_gc_fake_mmap);
+    OS::Abort();
+  }
   void* addr = mmap(NULL, size, PROT_READ | PROT_EXEC, MAP_PRIVATE,
                     fileno(f), 0);
   ASSERT(addr != MAP_FAILED);
@@ -360,7 +357,6 @@ void OS::SignalCodeMovingGC() {
 
 
 int OS::StackWalk(Vector<OS::StackFrame> frames) {
-#ifndef __NetBSD__
   // backtrace is a glibc extension.
   int frames_size = frames.length();
   ScopedVector<void*> addresses(frames_size);
@@ -386,10 +382,6 @@ int OS::StackWalk(Vector<OS::StackFrame> frames) {
   free(symbols);
 
   return frames_count;
-#else
-  UNIMPLEMENTED();
-  return 1;
-#endif
 }
 
 
@@ -397,12 +389,12 @@ int OS::StackWalk(Vector<OS::StackFrame> frames) {
 static const int kMmapFd = -1;
 static const int kMmapFdOffset = 0;
 
+
 VirtualMemory::VirtualMemory() : address_(NULL), size_(0) { }
 
-VirtualMemory::VirtualMemory(size_t size) {
-  address_ = ReserveRegion(size);
-  size_ = size;
-}
+
+VirtualMemory::VirtualMemory(size_t size)
+    : address_(ReserveRegion(size)), size_(size) { }
 
 
 VirtualMemory::VirtualMemory(size_t size, size_t alignment)
@@ -526,6 +518,12 @@ bool VirtualMemory::ReleaseRegion(void* base, size_t size) {
 }
 
 
+bool VirtualMemory::HasLazyCommits() {
+  // TODO(alph): implement for the platform.
+  return false;
+}
+
+
 class Thread::PlatformData : public Malloced {
  public:
   PlatformData() : thread_(kNoThread) {}
@@ -535,7 +533,8 @@ class Thread::PlatformData : public Malloced {
 
 Thread::Thread(const Options& options)
     : data_(new PlatformData()),
-      stack_size_(options.stack_size()) {
+      stack_size_(options.stack_size()),
+      start_semaphore_(NULL) {
   set_name(options.name());
 }
 
@@ -557,7 +556,7 @@ static void* ThreadEntry(void* arg) {
 #endif
   thread->data()->thread_ = pthread_self();
   ASSERT(thread->data()->thread_ != kNoThread);
-  thread->Run();
+  thread->NotifyStartedAndRun();
   return NULL;
 }
 
@@ -733,252 +732,16 @@ Semaphore* OS::CreateSemaphore(int count) {
 }
 
 
-static pthread_t GetThreadID() {
-  return pthread_self();
-}
-
-static void ProfilerSignalHandler(int signal, siginfo_t* info, void* context) {
-  USE(info);
-  if (signal != SIGPROF) return;
-  Isolate* isolate = Isolate::UncheckedCurrent();
-  if (isolate == NULL || !isolate->IsInitialized() || !isolate->IsInUse()) {
-    // We require a fully initialized and entered isolate.
-    return;
-  }
-  if (v8::Locker::IsActive() &&
-      !isolate->thread_manager()->IsLockedByCurrentThread()) {
-    return;
-  }
-
-  Sampler* sampler = isolate->logger()->sampler();
-  if (sampler == NULL || !sampler->IsActive()) return;
-
-  TickSample sample_obj;
-  TickSample* sample = CpuProfiler::TickSampleEvent(isolate);
-  if (sample == NULL) sample = &sample_obj;
-
-  // Extracting the sample from the context is extremely machine dependent.
-  sample->state = isolate->current_vm_state();
-  ucontext_t* ucontext = reinterpret_cast<ucontext_t*>(context);
-#ifdef __NetBSD__
-  mcontext_t& mcontext = ucontext->uc_mcontext;
-#if V8_HOST_ARCH_IA32
-  sample->pc = reinterpret_cast<Address>(mcontext.__gregs[_REG_EIP]);
-  sample->sp = reinterpret_cast<Address>(mcontext.__gregs[_REG_ESP]);
-  sample->fp = reinterpret_cast<Address>(mcontext.__gregs[_REG_EBP]);
-#elif V8_HOST_ARCH_X64
-  sample->pc = reinterpret_cast<Address>(mcontext.__gregs[_REG_RIP]);
-  sample->sp = reinterpret_cast<Address>(mcontext.__gregs[_REG_RSP]);
-  sample->fp = reinterpret_cast<Address>(mcontext.__gregs[_REG_RBP]);
-#endif  // V8_HOST_ARCH
-#else  // OpenBSD
-#if V8_HOST_ARCH_IA32
-  sample->pc = reinterpret_cast<Address>(ucontext->sc_eip);
-  sample->sp = reinterpret_cast<Address>(ucontext->sc_esp);
-  sample->fp = reinterpret_cast<Address>(ucontext->sc_ebp);
-#elif V8_HOST_ARCH_X64
-  sample->pc = reinterpret_cast<Address>(ucontext->sc_rip);
-  sample->sp = reinterpret_cast<Address>(ucontext->sc_rsp);
-  sample->fp = reinterpret_cast<Address>(ucontext->sc_rbp);
-#endif  // V8_HOST_ARCH
-#endif  // __NetBSD__
-  sampler->SampleStack(sample);
-  sampler->Tick(sample);
+void OS::SetUp() {
+  // Seed the random number generator. We preserve microsecond resolution.
+  uint64_t seed = Ticks() ^ (getpid() << 16);
+  srandom(static_cast<unsigned int>(seed));
+  limit_mutex = CreateMutex();
 }
 
 
-class Sampler::PlatformData : public Malloced {
- public:
-  PlatformData() : vm_tid_(GetThreadID()) {}
-
-  pthread_t vm_tid() const { return vm_tid_; }
-
- private:
-  pthread_t vm_tid_;
-};
-
-
-class SignalSender : public Thread {
- public:
-  enum SleepInterval {
-    HALF_INTERVAL,
-    FULL_INTERVAL
-  };
-
-  static const int kSignalSenderStackSize = 64 * KB;
-
-  explicit SignalSender(int interval)
-      : Thread(Thread::Options("SignalSender", kSignalSenderStackSize)),
-        vm_tgid_(getpid()),
-        interval_(interval) {}
-
-  static void InstallSignalHandler() {
-    struct sigaction sa;
-    sa.sa_sigaction = ProfilerSignalHandler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART | SA_SIGINFO;
-    signal_handler_installed_ =
-        (sigaction(SIGPROF, &sa, &old_signal_handler_) == 0);
-  }
-
-  static void RestoreSignalHandler() {
-    if (signal_handler_installed_) {
-      sigaction(SIGPROF, &old_signal_handler_, 0);
-      signal_handler_installed_ = false;
-    }
-  }
-
-  static void AddActiveSampler(Sampler* sampler) {
-    ScopedLock lock(mutex_.Pointer());
-    SamplerRegistry::AddActiveSampler(sampler);
-    if (instance_ == NULL) {
-      // Start a thread that will send SIGPROF signal to VM threads,
-      // when CPU profiling will be enabled.
-      instance_ = new SignalSender(sampler->interval());
-      instance_->Start();
-    } else {
-      ASSERT(instance_->interval_ == sampler->interval());
-    }
-  }
-
-  static void RemoveActiveSampler(Sampler* sampler) {
-    ScopedLock lock(mutex_.Pointer());
-    SamplerRegistry::RemoveActiveSampler(sampler);
-    if (SamplerRegistry::GetState() == SamplerRegistry::HAS_NO_SAMPLERS) {
-      RuntimeProfiler::StopRuntimeProfilerThreadBeforeShutdown(instance_);
-      delete instance_;
-      instance_ = NULL;
-      RestoreSignalHandler();
-    }
-  }
-
-  // Implement Thread::Run().
-  virtual void Run() {
-    SamplerRegistry::State state;
-    while ((state = SamplerRegistry::GetState()) !=
-           SamplerRegistry::HAS_NO_SAMPLERS) {
-      bool cpu_profiling_enabled =
-          (state == SamplerRegistry::HAS_CPU_PROFILING_SAMPLERS);
-      bool runtime_profiler_enabled = RuntimeProfiler::IsEnabled();
-      if (cpu_profiling_enabled && !signal_handler_installed_) {
-        InstallSignalHandler();
-      } else if (!cpu_profiling_enabled && signal_handler_installed_) {
-        RestoreSignalHandler();
-      }
-      // When CPU profiling is enabled both JavaScript and C++ code is
-      // profiled. We must not suspend.
-      if (!cpu_profiling_enabled) {
-        if (rate_limiter_.SuspendIfNecessary()) continue;
-      }
-      if (cpu_profiling_enabled && runtime_profiler_enabled) {
-        if (!SamplerRegistry::IterateActiveSamplers(&DoCpuProfile, this)) {
-          return;
-        }
-        Sleep(HALF_INTERVAL);
-        if (!SamplerRegistry::IterateActiveSamplers(&DoRuntimeProfile, NULL)) {
-          return;
-        }
-        Sleep(HALF_INTERVAL);
-      } else {
-        if (cpu_profiling_enabled) {
-          if (!SamplerRegistry::IterateActiveSamplers(&DoCpuProfile,
-                                                      this)) {
-            return;
-          }
-        }
-        if (runtime_profiler_enabled) {
-          if (!SamplerRegistry::IterateActiveSamplers(&DoRuntimeProfile,
-                                                      NULL)) {
-            return;
-          }
-        }
-        Sleep(FULL_INTERVAL);
-      }
-    }
-  }
-
-  static void DoCpuProfile(Sampler* sampler, void* raw_sender) {
-    if (!sampler->IsProfiling()) return;
-    SignalSender* sender = reinterpret_cast<SignalSender*>(raw_sender);
-    sender->SendProfilingSignal(sampler->platform_data()->vm_tid());
-  }
-
-  static void DoRuntimeProfile(Sampler* sampler, void* ignored) {
-    if (!sampler->isolate()->IsInitialized()) return;
-    sampler->isolate()->runtime_profiler()->NotifyTick();
-  }
-
-  void SendProfilingSignal(pthread_t tid) {
-    if (!signal_handler_installed_) return;
-    pthread_kill(tid, SIGPROF);
-  }
-
-  void Sleep(SleepInterval full_or_half) {
-    // Convert ms to us and subtract 100 us to compensate delays
-    // occuring during signal delivery.
-    useconds_t interval = interval_ * 1000 - 100;
-    if (full_or_half == HALF_INTERVAL) interval /= 2;
-    int result = usleep(interval);
-#ifdef DEBUG
-    if (result != 0 && errno != EINTR) {
-      fprintf(stderr,
-              "SignalSender usleep error; interval = %u, errno = %d\n",
-              interval,
-              errno);
-      ASSERT(result == 0 || errno == EINTR);
-    }
-#endif
-    USE(result);
-  }
-
-  const int vm_tgid_;
-  const int interval_;
-  RuntimeProfilerRateLimiter rate_limiter_;
-
-  // Protects the process wide state below.
-  static LazyMutex mutex_;
-  static SignalSender* instance_;
-  static bool signal_handler_installed_;
-  static struct sigaction old_signal_handler_;
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(SignalSender);
-};
-
-
-LazyMutex SignalSender::mutex_ = LAZY_MUTEX_INITIALIZER;
-SignalSender* SignalSender::instance_ = NULL;
-struct sigaction SignalSender::old_signal_handler_;
-bool SignalSender::signal_handler_installed_ = false;
-
-
-Sampler::Sampler(Isolate* isolate, int interval)
-    : isolate_(isolate),
-      interval_(interval),
-      profiling_(false),
-      active_(false),
-      samples_taken_(0) {
-  data_ = new PlatformData;
-}
-
-
-Sampler::~Sampler() {
-  ASSERT(!IsActive());
-  delete data_;
-}
-
-
-void Sampler::Start() {
-  ASSERT(!IsActive());
-  SetActive(true);
-  SignalSender::AddActiveSampler(this);
-}
-
-
-void Sampler::Stop() {
-  ASSERT(IsActive());
-  SignalSender::RemoveActiveSampler(this);
-  SetActive(false);
+void OS::TearDown() {
+  delete limit_mutex;
 }
 
 

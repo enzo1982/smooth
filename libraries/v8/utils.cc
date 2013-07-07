@@ -28,6 +28,7 @@
 #include <stdarg.h>
 #include "../include/v8stdint.h"
 #include "checks.h"
+#include "platform.h"
 #include "utils.h"
 
 namespace v8 {
@@ -46,9 +47,9 @@ void SimpleStringBuilder::AddString(const char* s) {
 
 
 void SimpleStringBuilder::AddSubstring(const char* s, int n) {
-  ASSERT(!is_finalized() && position_ + n < buffer_.length());
+  ASSERT(!is_finalized() && position_ + n <= buffer_.length());
   ASSERT(static_cast<size_t>(n) <= strlen(s));
-  memcpy(&buffer_[position_], s, n * kCharSize);
+  OS::MemCopy(&buffer_[position_], s, n * kCharSize);
   position_ += n;
 }
 
@@ -79,7 +80,13 @@ void SimpleStringBuilder::AddDecimalInteger(int32_t value) {
 
 
 char* SimpleStringBuilder::Finalize() {
-  ASSERT(!is_finalized() && position_ < buffer_.length());
+  ASSERT(!is_finalized() && position_ <= buffer_.length());
+  // If there is no space for null termination, overwrite last character.
+  if (position_ == buffer_.length()) {
+    position_--;
+    // Print ellipsis.
+    for (int i = 3; i > 0 && position_ > i; --i) buffer_[position_ - i] = '.';
+  }
   buffer_[position_] = '\0';
   // Make sure nobody managed to add a 0-character to the
   // buffer while building the string.
@@ -87,6 +94,21 @@ char* SimpleStringBuilder::Finalize() {
   position_ = -1;
   ASSERT(is_finalized());
   return buffer_.start();
+}
+
+
+const DivMagicNumbers DivMagicNumberFor(int32_t divisor) {
+  switch (divisor) {
+    case 3:    return DivMagicNumberFor3;
+    case 5:    return DivMagicNumberFor5;
+    case 7:    return DivMagicNumberFor7;
+    case 9:    return DivMagicNumberFor9;
+    case 11:   return DivMagicNumberFor11;
+    case 25:   return DivMagicNumberFor25;
+    case 125:  return DivMagicNumberFor125;
+    case 625:  return DivMagicNumberFor625;
+    default:   return InvalidDivMagicNumber;
+  }
 }
 
 } }  // namespace v8::internal

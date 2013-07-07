@@ -58,7 +58,7 @@ typedef int32_t Atomic32;
 #ifdef V8_HOST_ARCH_64_BIT
 // We need to be able to go between Atomic64 and AtomicWord implicitly.  This
 // means Atomic64 and AtomicWord should be the same type on 64-bit.
-#if defined(__APPLE__)
+#if defined(__ILP32__) || defined(__APPLE__)
 // MacOS is an exception to the implicit conversion rule above,
 // because it uses long for intptr_t.
 typedef int64_t Atomic64;
@@ -69,7 +69,11 @@ typedef intptr_t Atomic64;
 
 // Use AtomicWord for a machine-sized pointer.  It will use the Atomic32 or
 // Atomic64 routines below, depending on your architecture.
+#if defined(__OpenBSD__) && defined(__i386__)
+typedef Atomic32 AtomicWord;
+#else
 typedef intptr_t AtomicWord;
+#endif
 
 // Atomically execute:
 //      result = *ptr;
@@ -147,11 +151,14 @@ Atomic64 Release_Load(volatile const Atomic64* ptr);
 } }  // namespace v8::internal
 
 // Include our platform specific implementation.
-#if defined(_MSC_VER) && \
+#if defined(THREAD_SANITIZER)
+#include "atomicops_internals_tsan.h"
+#elif defined(_MSC_VER) && \
   (defined(V8_HOST_ARCH_IA32) || defined(V8_HOST_ARCH_X64))
 #include "atomicops_internals_x86_msvc.h"
 #elif defined(__APPLE__) && \
-  (defined(V8_HOST_ARCH_IA32) || defined(V8_HOST_ARCH_X64))
+  (defined(V8_HOST_ARCH_IA32) || defined(V8_HOST_ARCH_X64) || \
+   defined(V8_HOST_ARCH_PPC) || defined(V8_HOST_ARCH_PPC64))
 #include "atomicops_internals_x86_macosx.h"
 #elif defined(__GNUC__) && \
   (defined(V8_HOST_ARCH_IA32) || defined(V8_HOST_ARCH_X64))

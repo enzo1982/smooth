@@ -31,11 +31,13 @@
 
 #include "bootstrapper.h"
 #include "compiler.h"
+#include "frames.h"
+#include "frames-inl.h"
 #include "global-handles.h"
 #include "messages.h"
-#include "platform.h"
 #include "natives.h"
-#include "scopeinfo.h"
+#include "platform.h"
+#include "scopes.h"
 
 namespace v8 {
 namespace internal {
@@ -185,7 +187,7 @@ class Writer BASE_EMBEDDED {
   byte* buffer_;
 };
 
-class StringTable;
+class ELFStringTable;
 
 template<typename THeader>
 class DebugSectionBase : public ZoneObject {
@@ -194,7 +196,7 @@ class DebugSectionBase : public ZoneObject {
 
   virtual void WriteBody(Writer::Slot<THeader> header, Writer* writer) {
     uintptr_t start = writer->position();
-    if (WriteBody(writer)) {
+    if (WriteBodyInternal(writer)) {
       uintptr_t end = writer->position();
       header->offset = start;
 #if defined(__MACH_O)
@@ -204,7 +206,7 @@ class DebugSectionBase : public ZoneObject {
     }
   }
 
-  virtual bool WriteBody(Writer* writer) {
+  virtual bool WriteBodyInternal(Writer* writer) {
     return false;
   }
 
@@ -336,18 +338,18 @@ class ELFSection : public DebugSectionBase<ELFSectionHeader> {
 
   virtual ~ELFSection() { }
 
-  void PopulateHeader(Writer::Slot<Header> header, StringTable* strtab);
+  void PopulateHeader(Writer::Slot<Header> header, ELFStringTable* strtab);
 
   virtual void WriteBody(Writer::Slot<Header> header, Writer* w) {
     uintptr_t start = w->position();
-    if (WriteBody(w)) {
+    if (WriteBodyInternal(w)) {
       uintptr_t end = w->position();
       header->offset = start;
       header->size = end - start;
     }
   }
 
-  virtual bool WriteBody(Writer* w) {
+  virtual bool WriteBodyInternal(Writer* w) {
     return false;
   }
 
@@ -436,9 +438,9 @@ class FullHeaderELFSection : public ELFSection {
 };
 
 
-class StringTable : public ELFSection {
+class ELFStringTable : public ELFSection {
  public:
-  explicit StringTable(const char* name)
+  explicit ELFStringTable(const char* name)
       : ELFSection(name, TYPE_STRTAB, 1), writer_(NULL), offset_(0), size_(0) {
   }
 
@@ -486,7 +488,7 @@ class StringTable : public ELFSection {
 
 
 void ELFSection::PopulateHeader(Writer::Slot<ELFSection::Header> header,
-                                StringTable* strtab) {
+                                ELFStringTable* strtab) {
   header->name = strtab->Add(name_);
   header->type = type_;
   header->alignment = align_;
@@ -627,9 +629,9 @@ class MachO BASE_EMBEDDED {
 #if defined(__ELF)
 class ELF BASE_EMBEDDED {
  public:
-  ELF() : sections_(6) {
-    sections_.Add(new ELFSection("", ELFSection::TYPE_NULL, 0));
-    sections_.Add(new StringTable(".shstrtab"));
+  explicit ELF(Zone* zone) : sections_(6, zone) {
+    sections_.Add(new(zone) ELFSection("", ELFSection::TYPE_NULL, 0), zone);
+    sections_.Add(new(zone) ELFStringTable(".shstrtab"), zone);
   }
 
   void Write(Writer* w) {
@@ -642,8 +644,8 @@ class ELF BASE_EMBEDDED {
     return sections_[index];
   }
 
-  uint32_t AddSection(ELFSection* section) {
-    sections_.Add(section);
+  uint32_t AddSection(ELFSection* section, Zone* zone) {
+    sections_.Add(section, zone);
     section->set_index(sections_.length() - 1);
     return sections_.length() - 1;
   }
@@ -675,11 +677,11 @@ class ELF BASE_EMBEDDED {
         { 0x7f, 'E', 'L', 'F', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #elif defined(V8_TARGET_ARCH_X64)
     const uint8_t ident[16] =
-        { 0x7f, 'E', 'L', 'F', 2, 1, 1, 0, 0, 0 , 0, 0, 0, 0, 0, 0};
+        { 0x7f, 'E', 'L', 'F', 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #else
 #error Unsupported target architecture.
 #endif
-    memcpy(header->ident, ident, 16);
+    OS::MemCopy(header->ident, ident, 16);
     header->type = 1;
 #if defined(V8_TARGET_ARCH_IA32)
     header->machine = 3;
@@ -716,7 +718,7 @@ class ELF BASE_EMBEDDED {
         w->CreateSlotsHere<ELFSection::Header>(sections_.length());
 
     // String table for section table is the first section.
-    StringTable* strtab = static_cast<StringTable*>(SectionAt(1));
+    ELFStringTable* strtab = static_cast<ELFStringTable*>(SectionAt(1));
     strtab->AttachWriter(w);
     for (int i = 0, length = sections_.length();
          i < length;
@@ -830,7 +832,7 @@ class ELFSymbol BASE_EMBEDDED {
   };
 #endif
 
-  void Write(Writer::Slot<SerializedLayout> s, StringTable* t) {
+  void Write(Writer::Slot<SerializedLayout> s, ELFStringTable* t) {
     // Convert symbol names from strings to indexes in the string table.
     s->name = t->Add(name);
     s->value = value;
@@ -852,10 +854,10 @@ class ELFSymbol BASE_EMBEDDED {
 
 class ELFSymbolTable : public ELFSection {
  public:
-  explicit ELFSymbolTable(const char* name)
+  ELFSymbolTable(const char* name, Zone* zone)
       : ELFSection(name, TYPE_SYMTAB, sizeof(uintptr_t)),
-        locals_(1),
-        globals_(1) {
+        locals_(1, zone),
+        globals_(1, zone) {
   }
 
   virtual void WriteBody(Writer::Slot<Header> header, Writer* w) {
@@ -869,8 +871,8 @@ class ELFSymbolTable : public ELFSection {
     header->size = w->position() - header->offset;
 
     // String table for this symbol table should follow it in the section table.
-    StringTable* strtab =
-        static_cast<StringTable*>(w->debug_object()->SectionAt(index() + 1));
+    ELFStringTable* strtab =
+        static_cast<ELFStringTable*>(w->debug_object()->SectionAt(index() + 1));
     strtab->AttachWriter(w);
     symbols.at(0).set(ELFSymbol::SerializedLayout(0,
                                                   0,
@@ -883,11 +885,11 @@ class ELFSymbolTable : public ELFSection {
     strtab->DetachWriter();
   }
 
-  void Add(const ELFSymbol& symbol) {
+  void Add(const ELFSymbol& symbol, Zone* zone) {
     if (symbol.binding() == ELFSymbol::BIND_LOCAL) {
-      locals_.Add(symbol);
+      locals_.Add(symbol, zone);
     } else {
-      globals_.Add(symbol);
+      globals_.Add(symbol, zone);
     }
   }
 
@@ -903,7 +905,7 @@ class ELFSymbolTable : public ELFSection {
  private:
   void WriteSymbolsList(const ZoneList<ELFSymbol>* src,
                         Writer::Slot<ELFSymbol::SerializedLayout> dst,
-                        StringTable* strtab) {
+                        ELFStringTable* strtab) {
     for (int i = 0, len = src->length();
          i < len;
          i++) {
@@ -1017,28 +1019,31 @@ class CodeDescription BASE_EMBEDDED {
 
 #if defined(__ELF)
 static void CreateSymbolsTable(CodeDescription* desc,
+                               Zone* zone,
                                ELF* elf,
                                int text_section_index) {
-  ELFSymbolTable* symtab = new ELFSymbolTable(".symtab");
-  StringTable* strtab = new StringTable(".strtab");
+  ELFSymbolTable* symtab = new(zone) ELFSymbolTable(".symtab", zone);
+  ELFStringTable* strtab = new(zone) ELFStringTable(".strtab");
 
   // Symbol table should be followed by the linked string table.
-  elf->AddSection(symtab);
-  elf->AddSection(strtab);
+  elf->AddSection(symtab, zone);
+  elf->AddSection(strtab, zone);
 
   symtab->Add(ELFSymbol("V8 Code",
                         0,
                         0,
                         ELFSymbol::BIND_LOCAL,
                         ELFSymbol::TYPE_FILE,
-                        ELFSection::INDEX_ABSOLUTE));
+                        ELFSection::INDEX_ABSOLUTE),
+              zone);
 
   symtab->Add(ELFSymbol(desc->name(),
                         0,
                         desc->CodeSize(),
                         ELFSymbol::BIND_GLOBAL,
                         ELFSymbol::TYPE_FUNC,
-                        text_section_index));
+                        text_section_index),
+              zone);
 }
 #endif  // defined(__ELF)
 
@@ -1074,7 +1079,7 @@ class DebugInfoSection : public DebugSection {
     DW_ATE_SIGNED = 0x5
   };
 
-  bool WriteBody(Writer* w) {
+  bool WriteBodyInternal(Writer* w) {
     uintptr_t cu_start = w->position();
     Writer::Slot<uint32_t> size = w->CreateSlotHere<uint32_t>();
     uintptr_t start = w->position();
@@ -1094,8 +1099,7 @@ class DebugInfoSection : public DebugSection {
     w->WriteString("v8value");
 
     if (desc_->IsInfoAvailable()) {
-      CompilationInfo* info = desc_->info();
-      ScopeInfo<FreeStoreAllocationPolicy> scope_info(info->scope());
+      Scope* scope = desc_->info()->scope();
       w->WriteULEB128(2);
       w->WriteString(desc_->name());
       w->Write<intptr_t>(desc_->CodeStart());
@@ -1106,23 +1110,27 @@ class DebugInfoSection : public DebugSection {
       w->Write<uint8_t>(DW_OP_reg5);  // The frame pointer's here on ia32
 #elif defined(V8_TARGET_ARCH_X64)
       w->Write<uint8_t>(DW_OP_reg6);  // and here on x64.
+#elif defined(V8_TARGET_ARCH_ARM)
+      UNIMPLEMENTED();
+#elif defined(V8_TARGET_ARCH_MIPS)
+      UNIMPLEMENTED();
 #else
 #error Unsupported target architecture.
 #endif
       fb_block_size.set(static_cast<uint32_t>(w->position() - fb_block_start));
 
-      int params = scope_info.number_of_parameters();
-      int slots = scope_info.number_of_stack_slots();
-      int context_slots = scope_info.number_of_context_slots();
+      int params = scope->num_parameters();
+      int slots = scope->num_stack_slots();
+      int context_slots = scope->ContextLocalCount();
       // The real slot ID is internal_slots + context_slot_id.
       int internal_slots = Context::MIN_CONTEXT_SLOTS;
-      int locals = scope_info.LocalCount();
+      int locals = scope->StackLocalCount();
       int current_abbreviation = 4;
 
       for (int param = 0; param < params; ++param) {
         w->WriteULEB128(current_abbreviation++);
         w->WriteString(
-            *scope_info.ParameterName(param)->ToCString(DISALLOW_NULLS));
+            *scope->parameter(param)->name()->ToCString(DISALLOW_NULLS));
         w->Write<uint32_t>(ty_offset);
         Writer::Slot<uint32_t> block_size = w->CreateSlotHere<uint32_t>();
         uintptr_t block_start = w->position();
@@ -1148,7 +1156,7 @@ class DebugInfoSection : public DebugSection {
       ASSERT(Context::CLOSURE_INDEX == 0);
       ASSERT(Context::PREVIOUS_INDEX == 1);
       ASSERT(Context::EXTENSION_INDEX == 2);
-      ASSERT(Context::GLOBAL_INDEX == 3);
+      ASSERT(Context::GLOBAL_OBJECT_INDEX == 3);
       w->WriteULEB128(current_abbreviation++);
       w->WriteString(".closure");
       w->WriteULEB128(current_abbreviation++);
@@ -1167,10 +1175,13 @@ class DebugInfoSection : public DebugSection {
         w->WriteString(builder.Finalize());
       }
 
+      ZoneList<Variable*> stack_locals(locals, scope->zone());
+      ZoneList<Variable*> context_locals(context_slots, scope->zone());
+      scope->CollectStackAndContextLocals(&stack_locals, &context_locals);
       for (int local = 0; local < locals; ++local) {
         w->WriteULEB128(current_abbreviation++);
         w->WriteString(
-            *scope_info.LocalName(local)->ToCString(DISALLOW_NULLS));
+            *stack_locals[local]->name()->ToCString(DISALLOW_NULLS));
         w->Write<uint32_t>(ty_offset);
         Writer::Slot<uint32_t> block_size = w->CreateSlotHere<uint32_t>();
         uintptr_t block_start = w->position();
@@ -1202,8 +1213,11 @@ class DebugInfoSection : public DebugSection {
         w->WriteSLEB128(StandardFrameConstants::kContextOffset);
         block_size.set(static_cast<uint32_t>(w->position() - block_start));
       }
+
+      w->WriteULEB128(0);  // Terminate the sub program.
     }
 
+    w->WriteULEB128(0);  // Terminate the compile unit.
     size.set(static_cast<uint32_t>(w->position() - start));
     return true;
   }
@@ -1287,7 +1301,7 @@ class DebugAbbrevSection : public DebugSection {
     w->WriteULEB128(0);
   }
 
-  bool WriteBody(Writer* w) {
+  bool WriteBodyInternal(Writer* w) {
     int current_abbreviation = 1;
     bool extra_info = desc_->IsInfoAvailable();
     ASSERT(desc_->IsLineInfoAvailable());
@@ -1306,23 +1320,21 @@ class DebugAbbrevSection : public DebugSection {
     w->WriteULEB128(0);
 
     if (extra_info) {
-      CompilationInfo* info = desc_->info();
-      ScopeInfo<FreeStoreAllocationPolicy> scope_info(info->scope());
-      int params = scope_info.number_of_parameters();
-      int slots = scope_info.number_of_stack_slots();
-      int context_slots = scope_info.number_of_context_slots();
+      Scope* scope = desc_->info()->scope();
+      int params = scope->num_parameters();
+      int slots = scope->num_stack_slots();
+      int context_slots = scope->ContextLocalCount();
       // The real slot ID is internal_slots + context_slot_id.
       int internal_slots = Context::MIN_CONTEXT_SLOTS;
-      int locals = scope_info.LocalCount();
-      int total_children =
-          params + slots + context_slots + internal_slots + locals + 2;
+      int locals = scope->StackLocalCount();
+      // Total children is params + slots + context_slots + internal_slots +
+      // locals + 2 (__function and __context).
 
       // The extra duplication below seems to be necessary to keep
       // gdb from getting upset on OSX.
       w->WriteULEB128(current_abbreviation++);  // Abbreviation code.
       w->WriteULEB128(DW_TAG_SUBPROGRAM);
-      w->Write<uint8_t>(
-          total_children != 0 ? DW_CHILDREN_YES : DW_CHILDREN_NO);
+      w->Write<uint8_t>(DW_CHILDREN_YES);
       w->WriteULEB128(DW_AT_NAME);
       w->WriteULEB128(DW_FORM_STRING);
       w->WriteULEB128(DW_AT_LOW_PC);
@@ -1374,9 +1386,7 @@ class DebugAbbrevSection : public DebugSection {
       // The context.
       WriteVariableAbbreviation(w, current_abbreviation++, true, false);
 
-      if (total_children != 0) {
-        w->WriteULEB128(0);  // Terminate the sibling list.
-      }
+      w->WriteULEB128(0);  // Terminate the sibling list.
     }
 
     w->WriteULEB128(0);  // Terminate the table.
@@ -1418,7 +1428,7 @@ class DebugLineSection : public DebugSection {
     DW_LNE_DEFINE_FILE = 3
   };
 
-  bool WriteBody(Writer* w) {
+  bool WriteBodyInternal(Writer* w) {
     // Write prologue.
     Writer::Slot<uint32_t> total_length = w->CreateSlotHere<uint32_t>();
     uintptr_t start = w->position();
@@ -1558,7 +1568,7 @@ class DebugLineSection : public DebugSection {
 class UnwindInfoSection : public DebugSection {
  public:
   explicit UnwindInfoSection(CodeDescription* desc);
-  virtual bool WriteBody(Writer* w);
+  virtual bool WriteBodyInternal(Writer* w);
 
   int WriteCIE(Writer* w);
   void WriteFDE(Writer* w, int);
@@ -1770,7 +1780,7 @@ void UnwindInfoSection::WriteFDEStateAfterRBPPop(Writer* w) {
 }
 
 
-bool UnwindInfoSection::WriteBody(Writer* w) {
+bool UnwindInfoSection::WriteBodyInternal(Writer* w) {
   uint32_t cie_position = WriteCIE(w);
   WriteFDE(w, cie_position);
   return true;
@@ -1779,14 +1789,16 @@ bool UnwindInfoSection::WriteBody(Writer* w) {
 
 #endif  // V8_TARGET_ARCH_X64
 
-static void CreateDWARFSections(CodeDescription* desc, DebugObject* obj) {
+static void CreateDWARFSections(CodeDescription* desc,
+                                Zone* zone,
+                                DebugObject* obj) {
   if (desc->IsLineInfoAvailable()) {
-    obj->AddSection(new DebugInfoSection(desc));
-    obj->AddSection(new DebugAbbrevSection(desc));
-    obj->AddSection(new DebugLineSection(desc));
+    obj->AddSection(new(zone) DebugInfoSection(desc), zone);
+    obj->AddSection(new(zone) DebugAbbrevSection(desc), zone);
+    obj->AddSection(new(zone) DebugLineSection(desc), zone);
   }
 #ifdef V8_TARGET_ARCH_X64
-  obj->AddSection(new UnwindInfoSection(desc));
+  obj->AddSection(new(zone) UnwindInfoSection(desc), zone);
 #endif
 }
 
@@ -1830,7 +1842,7 @@ extern "C" {
 #ifdef OBJECT_PRINT
   void __gdb_print_v8_object(MaybeObject* object) {
     object->Print();
-    fprintf(stdout, "\n");
+    PrintF(stdout, "\n");
   }
 #endif
 }
@@ -1843,7 +1855,7 @@ static JITCodeEntry* CreateCodeEntry(Address symfile_addr,
 
   entry->symfile_addr_ = reinterpret_cast<Address>(entry + 1);
   entry->symfile_size_ = symfile_size;
-  memcpy(entry->symfile_addr_, symfile_addr, symfile_size);
+  OS::MemCopy(entry->symfile_addr_, symfile_addr, symfile_size);
 
   entry->prev_ = entry->next_ = NULL;
 
@@ -1904,8 +1916,8 @@ static void UnregisterCodeEntry(JITCodeEntry* entry) {
 }
 
 
-static JITCodeEntry* CreateELFObject(CodeDescription* desc) {
-  ZoneScope zone_scope(Isolate::Current(), DELETE_ON_EXIT);
+static JITCodeEntry* CreateELFObject(CodeDescription* desc, Zone* zone) {
+  ZoneScope zone_scope(zone, DELETE_ON_EXIT);
 #ifdef __MACH_O
   MachO mach_o;
   Writer w(&mach_o);
@@ -1918,21 +1930,23 @@ static JITCodeEntry* CreateELFObject(CodeDescription* desc) {
 
   mach_o.Write(&w, desc->CodeStart(), desc->CodeSize());
 #else
-  ELF elf;
+  ELF elf(zone);
   Writer w(&elf);
 
   int text_section_index = elf.AddSection(
-      new FullHeaderELFSection(".text",
-                               ELFSection::TYPE_NOBITS,
-                               kCodeAlignment,
-                               desc->CodeStart(),
-                               0,
-                               desc->CodeSize(),
-                               ELFSection::FLAG_ALLOC | ELFSection::FLAG_EXEC));
+      new(zone) FullHeaderELFSection(
+          ".text",
+          ELFSection::TYPE_NOBITS,
+          kCodeAlignment,
+          desc->CodeStart(),
+          0,
+          desc->CodeSize(),
+          ELFSection::FLAG_ALLOC | ELFSection::FLAG_EXEC),
+      zone);
 
-  CreateSymbolsTable(desc, &elf, text_section_index);
+  CreateSymbolsTable(desc, zone, &elf, text_section_index);
 
-  CreateDWARFSections(desc, &elf);
+  CreateDWARFSections(desc, zone, &elf);
 
   elf.Write(&w);
 #endif
@@ -1982,7 +1996,7 @@ static GDBJITLineInfo* UntagLineInfo(void* ptr) {
 }
 
 
-void GDBJITInterface::AddCode(Handle<String> name,
+void GDBJITInterface::AddCode(Handle<Name> name,
                               Handle<Script> script,
                               Handle<Code> code,
                               CompilationInfo* info) {
@@ -1991,8 +2005,9 @@ void GDBJITInterface::AddCode(Handle<String> name,
   // Force initialization of line_ends array.
   GetScriptLineNumber(script, 0);
 
-  if (!name.is_null()) {
-    SmartArrayPointer<char> name_cstring = name->ToCString(DISALLOW_NULLS);
+  if (!name.is_null() && name->IsString()) {
+    SmartArrayPointer<char> name_cstring =
+        Handle<String>::cast(name)->ToCString(DISALLOW_NULLS);
     AddCode(*name_cstring, *code, GDBJITInterface::FUNCTION, *script, info);
   } else {
     AddCode("", *code, GDBJITInterface::FUNCTION, *script, info);
@@ -2047,7 +2062,7 @@ void GDBJITInterface::AddCode(const char* name,
   if (!FLAG_gdbjit) return;
 
   ScopedLock lock(mutex.Pointer());
-  AssertNoAllocation no_gc;
+  DisallowHeapAllocation no_gc;
 
   HashMap::Entry* e = GetEntries()->Lookup(code, HashForCodeObject(code), true);
   if (e->value != NULL && !IsLineInfoTagged(e->value)) return;
@@ -2068,7 +2083,8 @@ void GDBJITInterface::AddCode(const char* name,
   }
 
   AddUnwindInfo(&code_desc);
-  JITCodeEntry* entry = CreateELFObject(&code_desc);
+  Zone* zone = code->GetIsolate()->runtime_zone();
+  JITCodeEntry* entry = CreateELFObject(&code_desc, zone);
   ASSERT(!IsLineInfoTagged(entry));
 
   delete lineinfo;
@@ -2110,10 +2126,14 @@ void GDBJITInterface::AddCode(GDBJITInterface::CodeTag tag,
 
 
 void GDBJITInterface::AddCode(GDBJITInterface::CodeTag tag,
-                              String* name,
+                              Name* name,
                               Code* code) {
   if (!FLAG_gdbjit) return;
-  AddCode(tag, name != NULL ? *name->ToCString(DISALLOW_NULLS) : NULL, code);
+  if (name != NULL && name->IsString()) {
+    AddCode(tag, *String::cast(name)->ToCString(DISALLOW_NULLS), code);
+  } else {
+    AddCode(tag, "", code);
+  }
 }
 
 

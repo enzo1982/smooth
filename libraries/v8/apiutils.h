@@ -1,4 +1,4 @@
-// Copyright 2009 the V8 project authors. All rights reserved.
+// Copyright 2012 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -39,33 +39,9 @@ class ImplementationUtilities {
     return that->names_;
   }
 
-  // Packs additional parameters for the NewArguments function. |implicit_args|
-  // is a pointer to the last element of 3-elements array controlled by GC.
-  static void PrepareArgumentsData(internal::Object** implicit_args,
-                                   internal::Object* data,
-                                   internal::JSFunction* callee,
-                                   internal::Object* holder) {
-    implicit_args[v8::Arguments::kDataIndex] = data;
-    implicit_args[v8::Arguments::kCalleeIndex] = callee;
-    implicit_args[v8::Arguments::kHolderIndex] = holder;
-  }
-
-  static v8::Arguments NewArguments(internal::Object** implicit_args,
-                                    internal::Object** argv, int argc,
-                                    bool is_construct_call) {
-    ASSERT(implicit_args[v8::Arguments::kCalleeIndex]->IsJSFunction());
-    ASSERT(implicit_args[v8::Arguments::kHolderIndex]->IsHeapObject());
-
-    return v8::Arguments(implicit_args, argv, argc, is_construct_call);
-  }
-
   // Introduce an alias for the handle scope data to allow non-friends
   // to access the HandleScope data.
   typedef v8::HandleScope::Data HandleScopeData;
-
-#ifdef DEBUG
-  static void ZapHandleRange(internal::Object** begin, internal::Object** end);
-#endif
 };
 
 }  // namespace v8

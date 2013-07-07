@@ -1,4 +1,4 @@
-// Copyright 2011 the V8 project authors. All rights reserved.
+// Copyright 2013 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -25,39 +25,53 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef V8_TYPING_H_
+#define V8_TYPING_H_
 
 #include "v8.h"
-#include "inspector.h"
 
+#include "allocation.h"
+#include "ast.h"
+#include "compiler.h"
+#include "type-info.h"
+#include "zone.h"
+#include "scopes.h"
 
 namespace v8 {
 namespace internal {
 
-#ifdef INSPECTOR
 
-//============================================================================
-// The Inspector.
+class AstTyper: public AstVisitor {
+ public:
+  static void Run(CompilationInfo* info);
 
-void Inspector::DumpObjectType(FILE* out, Object* obj, bool print_more) {
-  // Dump the object pointer.
-  OS::FPrint(out, "%p:", reinterpret_cast<void*>(obj));
-  if (obj->IsHeapObject()) {
-    HeapObject* hobj = HeapObject::cast(obj);
-    OS::FPrint(out, " size %d :", hobj->Size());
+  void* operator new(size_t size, Zone* zone) {
+    return zone->New(static_cast<int>(size));
   }
+  void operator delete(void* pointer, Zone* zone) { }
+  void operator delete(void* pointer) { }
 
-  // Dump each object classification that matches this object.
-#define FOR_EACH_TYPE(type)   \
-  if (obj->Is##type()) {      \
-    OS::FPrint(out, " %s", #type);    \
-  }
-  OBJECT_TYPE_LIST(FOR_EACH_TYPE)
-  HEAP_OBJECT_TYPE_LIST(FOR_EACH_TYPE)
-#undef FOR_EACH_TYPE
-}
+  DEFINE_AST_VISITOR_SUBCLASS_MEMBERS();
 
+ private:
+  explicit AstTyper(CompilationInfo* info);
 
-#endif  // INSPECTOR
+  CompilationInfo* info_;
+  TypeFeedbackOracle oracle_;
+
+  TypeFeedbackOracle* oracle() { return &oracle_; }
+  Zone* zone() const { return info_->zone(); }
+
+  void VisitDeclarations(ZoneList<Declaration*>* declarations);
+  void VisitStatements(ZoneList<Statement*>* statements);
+
+#define DECLARE_VISIT(type) virtual void Visit##type(type* node);
+  AST_NODE_LIST(DECLARE_VISIT)
+#undef DECLARE_VISIT
+
+  DISALLOW_COPY_AND_ASSIGN(AstTyper);
+};
 
 } }  // namespace v8::internal
 
+#endif  // V8_TYPING_H_

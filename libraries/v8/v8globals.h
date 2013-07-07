@@ -48,14 +48,9 @@ const intptr_t kObjectAlignmentMask = kObjectAlignment - 1;
 const intptr_t kPointerAlignment = (1 << kPointerSizeLog2);
 const intptr_t kPointerAlignmentMask = kPointerAlignment - 1;
 
-// Desired alignment for maps.
-#if V8_HOST_ARCH_64_BIT
-const intptr_t kMapAlignmentBits = kObjectAlignmentBits;
-#else
-const intptr_t kMapAlignmentBits = kObjectAlignmentBits + 3;
-#endif
-const intptr_t kMapAlignment = (1 << kMapAlignmentBits);
-const intptr_t kMapAlignmentMask = kMapAlignment - 1;
+// Desired alignment for double values.
+const intptr_t kDoubleAlignment = 8;
+const intptr_t kDoubleAlignmentMask = kDoubleAlignment - 1;
 
 // Desired alignment for generated code is 32 bytes (to improve cache line
 // utilization).
@@ -76,6 +71,8 @@ const Address kZapValue =
     reinterpret_cast<Address>(V8_UINT64_C(0xdeadbeedbeadbeef));
 const Address kHandleZapValue =
     reinterpret_cast<Address>(V8_UINT64_C(0x1baddead0baddeaf));
+const Address kGlobalHandleZapValue =
+    reinterpret_cast<Address>(V8_UINT64_C(0x1baffed00baffedf));
 const Address kFromSpaceZapValue =
     reinterpret_cast<Address>(V8_UINT64_C(0x1beefdad0beefdaf));
 const uint64_t kDebugZapValue = V8_UINT64_C(0xbadbaddbbadbaddb);
@@ -84,12 +81,14 @@ const uint64_t kFreeListZapValue = 0xfeed1eaffeed1eaf;
 #else
 const Address kZapValue = reinterpret_cast<Address>(0xdeadbeef);
 const Address kHandleZapValue = reinterpret_cast<Address>(0xbaddeaf);
+const Address kGlobalHandleZapValue = reinterpret_cast<Address>(0xbaffedf);
 const Address kFromSpaceZapValue = reinterpret_cast<Address>(0xbeefdaf);
 const uint32_t kSlotsZapValue = 0xbeefdeef;
 const uint32_t kDebugZapValue = 0xbadbaddb;
 const uint32_t kFreeListZapValue = 0xfeed1eaf;
 #endif
 
+const int kCodeZapValue = 0xbadc0de;
 
 // Number of bits to represent the page size for paged spaces. The value of 20
 // gives 1Mb bytes per page.
@@ -112,7 +111,6 @@ class AccessorInfo;
 class Allocation;
 class Arguments;
 class Assembler;
-class AssertNoAllocation;
 class Code;
 class CodeGenerator;
 class CodeStub;
@@ -122,18 +120,20 @@ class Debugger;
 class DebugInfo;
 class Descriptor;
 class DescriptorArray;
+class TransitionArray;
 class ExternalReference;
 class FixedArray;
 class FunctionTemplateInfo;
 class MemoryChunk;
 class SeededNumberDictionary;
 class UnseededNumberDictionary;
-class StringDictionary;
+class NameDictionary;
 template <typename T> class Handle;
 class Heap;
 class HeapObject;
 class IC;
 class InterceptorInfo;
+class JSReceiver;
 class JSArray;
 class JSFunction;
 class JSObject;
@@ -155,13 +155,12 @@ class Smi;
 template <typename Config, class Allocator = FreeStoreAllocationPolicy>
     class SplayTree;
 class String;
+class Name;
 class Struct;
 class Variable;
 class RelocInfo;
 class Deserializer;
 class MessageLocation;
-class ObjectGroup;
-class TickSample;
 class VirtualMemory;
 class Mutex;
 
@@ -181,12 +180,13 @@ enum AllocationSpace {
   CODE_SPACE,           // No pointers to new space, marked executable.
   MAP_SPACE,            // Only and all map objects.
   CELL_SPACE,           // Only and all cell objects.
+  PROPERTY_CELL_SPACE,  // Only and all global property cell objects.
   LO_SPACE,             // Promoted large objects.
 
   FIRST_SPACE = NEW_SPACE,
   LAST_SPACE = LO_SPACE,
   FIRST_PAGED_SPACE = OLD_POINTER_SPACE,
-  LAST_PAGED_SPACE = CELL_SPACE
+  LAST_PAGED_SPACE = PROPERTY_CELL_SPACE
 };
 const int kSpaceTagSize = 3;
 const int kSpaceTagMask = (1 << kSpaceTagSize) - 1;
@@ -263,16 +263,20 @@ enum InlineCacheState {
   // Like MONOMORPHIC but check failed due to prototype.
   MONOMORPHIC_PROTOTYPE_FAILURE,
   // Multiple receiver types have been seen.
+  POLYMORPHIC,
+  // Many receiver types have been seen.
   MEGAMORPHIC,
-  // Special states for debug break or step in prepare stubs.
-  DEBUG_BREAK,
-  DEBUG_PREPARE_STEP_IN
+  // A generic handler is installed and no extra typefeedback is recorded.
+  GENERIC,
+  // Special state for debug break or step in prepare stubs.
+  DEBUG_STUB
 };
 
 
 enum CheckType {
   RECEIVER_MAP_CHECK,
   STRING_CHECK,
+  SYMBOL_CHECK,
   NUMBER_CHECK,
   BOOLEAN_CHECK
 };
@@ -305,14 +309,6 @@ typedef enum {
 typedef void (*StoreBufferCallback)(Heap* heap,
                                     MemoryChunk* page,
                                     StoreBufferEvent event);
-
-
-// Whether to remove map transitions and constant transitions from a
-// DescriptorArray.
-enum TransitionFlag {
-  REMOVE_TRANSITIONS,
-  KEEP_TRANSITIONS
-};
 
 
 // Union used for fast testing of specific double values.
@@ -362,19 +358,12 @@ struct AccessorDescriptor {
 // VMState object leaves a state by popping the current state from the
 // stack.
 
-#define STATE_TAG_LIST(V) \
-  V(JS)                   \
-  V(GC)                   \
-  V(COMPILER)             \
-  V(OTHER)                \
-  V(EXTERNAL)
-
 enum StateTag {
-#define DEF_STATE_TAG(name) name,
-  STATE_TAG_LIST(DEF_STATE_TAG)
-#undef DEF_STATE_TAG
-  // Pseudo-types.
-  state_tag_count
+  JS,
+  GC,
+  COMPILER,
+  OTHER,
+  EXTERNAL
 };
 
 
@@ -396,10 +385,6 @@ enum StateTag {
 // POINTER_SIZE_ALIGN returns the value aligned as a pointer.
 #define POINTER_SIZE_ALIGN(value)                               \
   (((value) + kPointerAlignmentMask) & ~kPointerAlignmentMask)
-
-// MAP_POINTER_ALIGN returns the value aligned as a map pointer.
-#define MAP_POINTER_ALIGN(value)                                \
-  (((value) + kMapAlignmentMask) & ~kMapAlignmentMask)
 
 // CODE_POINTER_ALIGN returns the value aligned as a generated code segment.
 #define CODE_POINTER_ALIGN(value)                               \
@@ -426,6 +411,13 @@ enum StateTag {
 #endif
 
 
+enum CpuImplementer {
+  UNKNOWN_IMPLEMENTER,
+  ARM_IMPLEMENTER,
+  QUALCOMM_IMPLEMENTER
+};
+
+
 // Feature flags bit positions. They are mostly based on the CPUID spec.
 // (We assign CPUID itself to one of the currently reserved bits --
 // feel free to change this if needed.)
@@ -438,6 +430,10 @@ enum CpuFeature { SSE4_1 = 32 + 19,  // x86
                   CPUID = 10,  // x86
                   VFP3 = 1,    // ARM
                   ARMv7 = 2,   // ARM
+                  SUDIV = 3,   // ARM
+                  UNALIGNED_ACCESSES = 4,  // ARM
+                  MOVW_MOVT_IMMEDIATE_LOADS = 5,  // ARM
+                  VFP32DREGS = 6,  // ARM
                   SAHF = 0,    // x86
                   FPU = 1};    // MIPS
 
@@ -479,17 +475,26 @@ const uint64_t kLastNonNaNInt64 =
     (static_cast<uint64_t>(kNaNOrInfinityLowerBoundUpper32) << 32);
 
 
+// The order of this enum has to be kept in sync with the predicates below.
 enum VariableMode {
   // User declared variables:
   VAR,             // declared via 'var', and 'function' declarations
 
   CONST,           // declared via 'const' declarations
 
+  LET,             // declared via 'let' declarations (first lexical)
+
   CONST_HARMONY,   // declared via 'const' declarations in harmony mode
 
-  LET,             // declared via 'let' declarations
+  MODULE,          // declared via 'module' declaration (last lexical)
 
   // Variables introduced by the compiler:
+  INTERNAL,        // like VAR, but not user-visible (may or may not
+                   // be in a context)
+
+  TEMPORARY,       // temporary variables (not user-visible), stack-allocated
+                   // unless the scope as a whole has forced context allocation
+
   DYNAMIC,         // always require dynamic lookup (we don't know
                    // the declaration)
 
@@ -497,17 +502,31 @@ enum VariableMode {
                    // variable is global unless it has been shadowed
                    // by an eval-introduced variable
 
-  DYNAMIC_LOCAL,   // requires dynamic lookup, but we know that the
+  DYNAMIC_LOCAL    // requires dynamic lookup, but we know that the
                    // variable is local and where it is unless it
                    // has been shadowed by an eval-introduced
                    // variable
-
-  INTERNAL,        // like VAR, but not user-visible (may or may not
-                   // be in a context)
-
-  TEMPORARY        // temporary variables (not user-visible), never
-                   // in a context
 };
+
+
+inline bool IsDynamicVariableMode(VariableMode mode) {
+  return mode >= DYNAMIC && mode <= DYNAMIC_LOCAL;
+}
+
+
+inline bool IsDeclaredVariableMode(VariableMode mode) {
+  return mode >= VAR && mode <= MODULE;
+}
+
+
+inline bool IsLexicalVariableMode(VariableMode mode) {
+  return mode >= LET && mode <= MODULE;
+}
+
+
+inline bool IsImmutableVariableMode(VariableMode mode) {
+  return mode == CONST || (mode >= CONST_HARMONY && mode <= MODULE);
+}
 
 
 // ES6 Draft Rev3 10.2 specifies declarative environment records with mutable

@@ -1,4 +1,4 @@
-// Copyright 2011 the V8 project authors. All rights reserved.
+// Copyright 2013 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -25,36 +25,64 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef V8_HEAP_SNAPSHOT_GENERATOR_INL_H_
+#define V8_HEAP_SNAPSHOT_GENERATOR_INL_H_
 
-#ifndef V8_INSPECTOR_H_
-#define V8_INSPECTOR_H_
-
-// Only build this code if we're configured with the INSPECTOR.
-#ifdef INSPECTOR
-
-#include "v8.h"
-
-#include "objects.h"
+#include "heap-snapshot-generator.h"
 
 namespace v8 {
 namespace internal {
 
-class Inspector {
- public:
-  static void DumpObjectType(FILE* out, Object* obj, bool print_more);
-  static void DumpObjectType(FILE* out, Object* obj) {
-    DumpObjectType(out, obj, false);
-  }
-  static void DumpObjectType(Object* obj, bool print_more) {
-    DumpObjectType(stdout, obj, print_more);
-  }
-  static void DumpObjectType(Object* obj) {
-    DumpObjectType(stdout, obj, false);
-  }
-};
+
+HeapEntry* HeapGraphEdge::from() const {
+  return &snapshot()->entries()[from_index_];
+}
+
+
+HeapSnapshot* HeapGraphEdge::snapshot() const {
+  return to_entry_->snapshot();
+}
+
+
+int HeapEntry::index() const {
+  return static_cast<int>(this - &snapshot_->entries().first());
+}
+
+
+int HeapEntry::set_children_index(int index) {
+  children_index_ = index;
+  int next_index = index + children_count_;
+  children_count_ = 0;
+  return next_index;
+}
+
+
+HeapGraphEdge** HeapEntry::children_arr() {
+  ASSERT(children_index_ >= 0);
+  return &snapshot_->children()[children_index_];
+}
+
+
+SnapshotObjectId HeapObjectsMap::GetNthGcSubrootId(int delta) {
+  return kGcRootsFirstSubrootId + delta * kObjectIdStep;
+}
+
+
+HeapObject* V8HeapExplorer::GetNthGcSubrootObject(int delta) {
+  return reinterpret_cast<HeapObject*>(
+      reinterpret_cast<char*>(kFirstGcSubrootObject) +
+      delta * HeapObjectsMap::kObjectIdStep);
+}
+
+
+int V8HeapExplorer::GetGcSubrootOrder(HeapObject* subroot) {
+  return static_cast<int>(
+      (reinterpret_cast<char*>(subroot) -
+       reinterpret_cast<char*>(kFirstGcSubrootObject)) /
+      HeapObjectsMap::kObjectIdStep);
+}
 
 } }  // namespace v8::internal
 
-#endif  // INSPECTOR
+#endif  // V8_HEAP_SNAPSHOT_GENERATOR_INL_H_
 
-#endif  // V8_INSPECTOR_H_

@@ -85,33 +85,61 @@ void PromotionQueue::ActivateGuardIfOnTheSamePage() {
 MaybeObject* Heap::AllocateStringFromUtf8(Vector<const char> str,
                                           PretenureFlag pretenure) {
   // Check for ASCII first since this is the common case.
-  if (String::IsAscii(str.start(), str.length())) {
+  const char* start = str.start();
+  int length = str.length();
+  int non_ascii_start = String::NonAsciiStart(start, length);
+  if (non_ascii_start >= length) {
     // If the string is ASCII, we do not need to convert the characters
     // since UTF8 is backwards compatible with ASCII.
-    return AllocateStringFromAscii(str, pretenure);
+    return AllocateStringFromOneByte(str, pretenure);
   }
   // Non-ASCII and we need to decode.
-  return AllocateStringFromUtf8Slow(str, pretenure);
+  return AllocateStringFromUtf8Slow(str, non_ascii_start, pretenure);
 }
 
 
-MaybeObject* Heap::AllocateSymbol(Vector<const char> str,
-                                  int chars,
-                                  uint32_t hash_field) {
-  unibrow::Utf8InputBuffer<> buffer(str.start(),
-                                    static_cast<unsigned>(str.length()));
-  return AllocateInternalSymbol(&buffer, chars, hash_field);
+template<>
+bool inline Heap::IsOneByte(Vector<const char> str, int chars) {
+  // TODO(dcarney): incorporate Latin-1 check when Latin-1 is supported?
+  // ASCII only check.
+  return chars == str.length();
 }
 
 
-MaybeObject* Heap::AllocateAsciiSymbol(Vector<const char> str,
-                                       uint32_t hash_field) {
-  if (str.length() > SeqAsciiString::kMaxLength) {
-    return Failure::OutOfMemoryException();
+template<>
+bool inline Heap::IsOneByte(String* str, int chars) {
+  return str->IsOneByteRepresentation();
+}
+
+
+MaybeObject* Heap::AllocateInternalizedStringFromUtf8(
+    Vector<const char> str, int chars, uint32_t hash_field) {
+  if (IsOneByte(str, chars)) {
+    return AllocateOneByteInternalizedString(
+        Vector<const uint8_t>::cast(str), hash_field);
+  }
+  return AllocateInternalizedStringImpl<false>(str, chars, hash_field);
+}
+
+
+template<typename T>
+MaybeObject* Heap::AllocateInternalizedStringImpl(
+    T t, int chars, uint32_t hash_field) {
+  if (IsOneByte(t, chars)) {
+    return AllocateInternalizedStringImpl<true>(t, chars, hash_field);
+  }
+  return AllocateInternalizedStringImpl<false>(t, chars, hash_field);
+}
+
+
+MaybeObject* Heap::AllocateOneByteInternalizedString(Vector<const uint8_t> str,
+                                                     uint32_t hash_field) {
+  if (str.length() > SeqOneByteString::kMaxLength) {
+    return Failure::OutOfMemoryException(0x2);
   }
   // Compute map and object size.
-  Map* map = ascii_symbol_map();
-  int size = SeqAsciiString::SizeFor(str.length());
+  Map* map = ascii_internalized_string_map();
+  int size = SeqOneByteString::SizeFor(str.length());
 
   // Allocate string.
   Object* result;
@@ -131,20 +159,20 @@ MaybeObject* Heap::AllocateAsciiSymbol(Vector<const char> str,
   ASSERT_EQ(size, answer->Size());
 
   // Fill in the characters.
-  memcpy(answer->address() + SeqAsciiString::kHeaderSize,
-         str.start(), str.length());
+  OS::MemCopy(answer->address() + SeqOneByteString::kHeaderSize,
+              str.start(), str.length());
 
   return answer;
 }
 
 
-MaybeObject* Heap::AllocateTwoByteSymbol(Vector<const uc16> str,
-                                         uint32_t hash_field) {
+MaybeObject* Heap::AllocateTwoByteInternalizedString(Vector<const uc16> str,
+                                                     uint32_t hash_field) {
   if (str.length() > SeqTwoByteString::kMaxLength) {
-    return Failure::OutOfMemoryException();
+    return Failure::OutOfMemoryException(0x3);
   }
   // Compute map and object size.
-  Map* map = symbol_map();
+  Map* map = internalized_string_map();
   int size = SeqTwoByteString::SizeFor(str.length());
 
   // Allocate string.
@@ -164,8 +192,8 @@ MaybeObject* Heap::AllocateTwoByteSymbol(Vector<const uc16> str,
   ASSERT_EQ(size, answer->Size());
 
   // Fill in the characters.
-  memcpy(answer->address() + SeqTwoByteString::kHeaderSize,
-         str.start(), str.length() * kUC16Size);
+  OS::MemCopy(answer->address() + SeqTwoByteString::kHeaderSize,
+              str.start(), str.length() * kUC16Size);
 
   return answer;
 }
@@ -183,7 +211,7 @@ MaybeObject* Heap::CopyFixedDoubleArray(FixedDoubleArray* src) {
 MaybeObject* Heap::AllocateRaw(int size_in_bytes,
                                AllocationSpace space,
                                AllocationSpace retry_space) {
-  ASSERT(allocation_allowed_ && gc_state_ == NOT_IN_GC);
+  ASSERT(AllowHandleAllocation::IsAllowed() && gc_state_ == NOT_IN_GC);
   ASSERT(space != NEW_SPACE ||
          retry_space == OLD_POINTER_SPACE ||
          retry_space == OLD_DATA_SPACE ||
@@ -217,6 +245,8 @@ MaybeObject* Heap::AllocateRaw(int size_in_bytes,
     result = lo_space_->AllocateRaw(size_in_bytes, NOT_EXECUTABLE);
   } else if (CELL_SPACE == space) {
     result = cell_space_->AllocateRaw(size_in_bytes);
+  } else if (PROPERTY_CELL_SPACE == space) {
+    result = property_cell_space_->AllocateRaw(size_in_bytes);
   } else {
     ASSERT(MAP_SPACE == space);
     result = map_space_->AllocateRaw(size_in_bytes);
@@ -236,8 +266,9 @@ MaybeObject* Heap::NumberFromInt32(
 
 MaybeObject* Heap::NumberFromUint32(
     uint32_t value, PretenureFlag pretenure) {
-  if ((int32_t)value >= 0 && Smi::IsValid((int32_t)value)) {
-    return Smi::FromInt((int32_t)value);
+  if (static_cast<int32_t>(value) >= 0 &&
+      Smi::IsValid(static_cast<int32_t>(value))) {
+    return Smi::FromInt(static_cast<int32_t>(value));
   }
   // Bypass NumberFromDouble to avoid various redundant checks.
   return AllocateHeapNumber(FastUI2D(value), pretenure);
@@ -267,13 +298,6 @@ MaybeObject* Heap::AllocateRawMap() {
 #endif
   MaybeObject* result = map_space_->AllocateRaw(Map::kSize);
   if (result->IsFailure()) old_gen_exhausted_ = true;
-#ifdef DEBUG
-  if (!result->IsFailure()) {
-    // Maps have their own alignment.
-    CHECK((reinterpret_cast<intptr_t>(result) & kMapAlignmentMask) ==
-          static_cast<intptr_t>(kHeapObjectTag));
-  }
-#endif
   return result;
 }
 
@@ -283,7 +307,19 @@ MaybeObject* Heap::AllocateRawCell() {
   isolate_->counters()->objs_since_last_full()->Increment();
   isolate_->counters()->objs_since_last_young()->Increment();
 #endif
-  MaybeObject* result = cell_space_->AllocateRaw(JSGlobalPropertyCell::kSize);
+  MaybeObject* result = cell_space_->AllocateRaw(Cell::kSize);
+  if (result->IsFailure()) old_gen_exhausted_ = true;
+  return result;
+}
+
+
+MaybeObject* Heap::AllocateRawPropertyCell() {
+#ifdef DEBUG
+  isolate_->counters()->objs_since_last_full()->Increment();
+  isolate_->counters()->objs_since_last_young()->Increment();
+#endif
+  MaybeObject* result =
+      property_cell_space_->AllocateRaw(PropertyCell::kSize);
   if (result->IsFailure()) old_gen_exhausted_ = true;
   return result;
 }
@@ -298,8 +334,8 @@ bool Heap::InNewSpace(Object* object) {
 }
 
 
-bool Heap::InNewSpace(Address addr) {
-  return new_space_.Contains(addr);
+bool Heap::InNewSpace(Address address) {
+  return new_space_.Contains(address);
 }
 
 
@@ -310,6 +346,26 @@ bool Heap::InFromSpace(Object* object) {
 
 bool Heap::InToSpace(Object* object) {
   return new_space_.ToSpaceContains(object);
+}
+
+
+bool Heap::InOldPointerSpace(Address address) {
+  return old_pointer_space_->Contains(address);
+}
+
+
+bool Heap::InOldPointerSpace(Object* object) {
+  return InOldPointerSpace(reinterpret_cast<Address>(object));
+}
+
+
+bool Heap::InOldDataSpace(Address address) {
+  return old_data_space_->Contains(address);
+}
+
+
+bool Heap::InOldDataSpace(Object* object) {
+  return InOldDataSpace(reinterpret_cast<Address>(object));
 }
 
 
@@ -365,9 +421,12 @@ AllocationSpace Heap::TargetSpaceId(InstanceType type) {
   ASSERT(type != MAP_TYPE);
   ASSERT(type != CODE_TYPE);
   ASSERT(type != ODDBALL_TYPE);
-  ASSERT(type != JS_GLOBAL_PROPERTY_CELL_TYPE);
+  ASSERT(type != CELL_TYPE);
+  ASSERT(type != PROPERTY_CELL_TYPE);
 
-  if (type < FIRST_NONSTRING_TYPE) {
+  if (type <= LAST_NAME_TYPE) {
+    if (type == SYMBOL_TYPE) return OLD_POINTER_SPACE;
+    ASSERT(type < FIRST_NONSTRING_TYPE);
     // There are four string representations: sequential strings, external
     // strings, cons strings, and sliced strings.
     // Only the latter two contain non-map-word pointers to heap objects.
@@ -383,7 +442,7 @@ AllocationSpace Heap::TargetSpaceId(InstanceType type) {
 void Heap::CopyBlock(Address dst, Address src, int byte_size) {
   CopyWords(reinterpret_cast<Object**>(dst),
             reinterpret_cast<Object**>(src),
-            byte_size / kPointerSize);
+            static_cast<size_t>(byte_size / kPointerSize));
 }
 
 
@@ -401,7 +460,7 @@ void Heap::MoveBlock(Address dst, Address src, int byte_size) {
       *dst_slot++ = *src_slot++;
     }
   } else {
-    memmove(dst, src, byte_size);
+    OS::MemMove(dst, src, static_cast<size_t>(byte_size));
   }
 }
 
@@ -434,6 +493,15 @@ void Heap::ScavengeObject(HeapObject** p, HeapObject* object) {
 }
 
 
+MaybeObject* Heap::AllocateEmptyJSArrayWithAllocationSite(
+      ElementsKind elements_kind,
+      Handle<Object> allocation_site_payload) {
+  return AllocateJSArrayAndStorageWithAllocationSite(elements_kind, 0, 0,
+      allocation_site_payload,
+      DONT_INITIALIZE_ARRAY_ELEMENTS);
+}
+
+
 bool Heap::CollectGarbage(AllocationSpace space, const char* gc_reason) {
   const char* collector_reason = NULL;
   GarbageCollector collector = SelectGarbageCollector(space, &collector_reason);
@@ -460,17 +528,20 @@ MaybeObject* Heap::PrepareForCompare(String* str) {
 }
 
 
-int Heap::AdjustAmountOfExternalAllocatedMemory(int change_in_bytes) {
+intptr_t Heap::AdjustAmountOfExternalAllocatedMemory(
+    intptr_t change_in_bytes) {
   ASSERT(HasBeenSetUp());
-  int amount = amount_of_external_allocated_memory_ + change_in_bytes;
-  if (change_in_bytes >= 0) {
+  intptr_t amount = amount_of_external_allocated_memory_ + change_in_bytes;
+  if (change_in_bytes > 0) {
     // Avoid overflow.
     if (amount > amount_of_external_allocated_memory_) {
       amount_of_external_allocated_memory_ = amount;
+    } else {
+      // Give up and reset the counters in case of an overflow.
+      amount_of_external_allocated_memory_ = 0;
+      amount_of_external_allocated_memory_at_last_global_gc_ = 0;
     }
-    int amount_since_last_global_gc =
-        amount_of_external_allocated_memory_ -
-        amount_of_external_allocated_memory_at_last_global_gc_;
+    intptr_t amount_since_last_global_gc = PromotedExternalMemorySize();
     if (amount_since_last_global_gc > external_allocation_limit_) {
       CollectAllGarbage(kNoGCFlags, "external memory allocation limit reached");
     }
@@ -478,7 +549,18 @@ int Heap::AdjustAmountOfExternalAllocatedMemory(int change_in_bytes) {
     // Avoid underflow.
     if (amount >= 0) {
       amount_of_external_allocated_memory_ = amount;
+    } else {
+      // Give up and reset the counters in case of an overflow.
+      amount_of_external_allocated_memory_ = 0;
+      amount_of_external_allocated_memory_at_last_global_gc_ = 0;
     }
+  }
+  if (FLAG_trace_external_memory) {
+    PrintPID("%8.0f ms: ", isolate()->time_millis_since_init());
+    PrintF("Adjust amount of external memory: delta=%6" V8_PTR_PREFIX "d KB, "
+           " amount=%6" V8_PTR_PREFIX "d KB, isolate=0x%08" V8PRIxPTR ".\n",
+           change_in_bytes / 1024, amount_of_external_allocated_memory_ / 1024,
+           reinterpret_cast<intptr_t>(isolate()));
   }
   ASSERT(amount_of_external_allocated_memory_ >= 0);
   return amount_of_external_allocated_memory_;
@@ -510,61 +592,68 @@ Isolate* Heap::isolate() {
 // Warning: Do not use the identifiers __object__, __maybe_object__ or
 // __scope__ in a call to this macro.
 
-#define CALL_AND_RETRY(ISOLATE, FUNCTION_CALL, RETURN_VALUE, RETURN_EMPTY)\
-  do {                                                                    \
-    GC_GREEDY_CHECK();                                                    \
-    MaybeObject* __maybe_object__ = FUNCTION_CALL;                        \
-    Object* __object__ = NULL;                                            \
-    if (__maybe_object__->ToObject(&__object__)) RETURN_VALUE;            \
-    if (__maybe_object__->IsOutOfMemory()) {                              \
-      v8::internal::V8::FatalProcessOutOfMemory("CALL_AND_RETRY_0", true);\
-    }                                                                     \
-    if (!__maybe_object__->IsRetryAfterGC()) RETURN_EMPTY;                \
-    ISOLATE->heap()->CollectGarbage(Failure::cast(__maybe_object__)->     \
-                                    allocation_space(),                   \
-                                    "allocation failure");                \
-    __maybe_object__ = FUNCTION_CALL;                                     \
-    if (__maybe_object__->ToObject(&__object__)) RETURN_VALUE;            \
-    if (__maybe_object__->IsOutOfMemory()) {                              \
-      v8::internal::V8::FatalProcessOutOfMemory("CALL_AND_RETRY_1", true);\
-    }                                                                     \
-    if (!__maybe_object__->IsRetryAfterGC()) RETURN_EMPTY;                \
-    ISOLATE->counters()->gc_last_resort_from_handles()->Increment();      \
-    ISOLATE->heap()->CollectAllAvailableGarbage("last resort gc");        \
-    {                                                                     \
-      AlwaysAllocateScope __scope__;                                      \
-      __maybe_object__ = FUNCTION_CALL;                                   \
-    }                                                                     \
-    if (__maybe_object__->ToObject(&__object__)) RETURN_VALUE;            \
-    if (__maybe_object__->IsOutOfMemory() ||                              \
-        __maybe_object__->IsRetryAfterGC()) {                             \
-      /* TODO(1181417): Fix this. */                                      \
-      v8::internal::V8::FatalProcessOutOfMemory("CALL_AND_RETRY_2", true);\
-    }                                                                     \
-    RETURN_EMPTY;                                                         \
+#define CALL_AND_RETRY(ISOLATE, FUNCTION_CALL, RETURN_VALUE, RETURN_EMPTY, OOM)\
+  do {                                                                         \
+    GC_GREEDY_CHECK();                                                         \
+    MaybeObject* __maybe_object__ = FUNCTION_CALL;                             \
+    Object* __object__ = NULL;                                                 \
+    if (__maybe_object__->ToObject(&__object__)) RETURN_VALUE;                 \
+    if (__maybe_object__->IsOutOfMemory()) {                                   \
+      OOM;                                                                     \
+    }                                                                          \
+    if (!__maybe_object__->IsRetryAfterGC()) RETURN_EMPTY;                     \
+    ISOLATE->heap()->CollectGarbage(Failure::cast(__maybe_object__)->          \
+                                    allocation_space(),                        \
+                                    "allocation failure");                     \
+    __maybe_object__ = FUNCTION_CALL;                                          \
+    if (__maybe_object__->ToObject(&__object__)) RETURN_VALUE;                 \
+    if (__maybe_object__->IsOutOfMemory()) {                                   \
+      OOM;                                                                     \
+    }                                                                          \
+    if (!__maybe_object__->IsRetryAfterGC()) RETURN_EMPTY;                     \
+    ISOLATE->counters()->gc_last_resort_from_handles()->Increment();           \
+    ISOLATE->heap()->CollectAllAvailableGarbage("last resort gc");             \
+    {                                                                          \
+      AlwaysAllocateScope __scope__;                                           \
+      __maybe_object__ = FUNCTION_CALL;                                        \
+    }                                                                          \
+    if (__maybe_object__->ToObject(&__object__)) RETURN_VALUE;                 \
+    if (__maybe_object__->IsOutOfMemory()) {                                   \
+      OOM;                                                                     \
+    }                                                                          \
+    if (__maybe_object__->IsRetryAfterGC()) {                                  \
+      /* TODO(1181417): Fix this. */                                           \
+      v8::internal::V8::FatalProcessOutOfMemory("CALL_AND_RETRY_LAST", true);  \
+    }                                                                          \
+    RETURN_EMPTY;                                                              \
   } while (false)
 
+#define CALL_AND_RETRY_OR_DIE(                                             \
+     ISOLATE, FUNCTION_CALL, RETURN_VALUE, RETURN_EMPTY)                   \
+  CALL_AND_RETRY(                                                          \
+      ISOLATE,                                                             \
+      FUNCTION_CALL,                                                       \
+      RETURN_VALUE,                                                        \
+      RETURN_EMPTY,                                                        \
+      v8::internal::V8::FatalProcessOutOfMemory("CALL_AND_RETRY", true))
 
-#define CALL_HEAP_FUNCTION(ISOLATE, FUNCTION_CALL, TYPE)       \
-  CALL_AND_RETRY(ISOLATE,                                      \
-                 FUNCTION_CALL,                                \
-                 return Handle<TYPE>(TYPE::cast(__object__), ISOLATE),  \
-                 return Handle<TYPE>())
+#define CALL_HEAP_FUNCTION(ISOLATE, FUNCTION_CALL, TYPE)                      \
+  CALL_AND_RETRY_OR_DIE(ISOLATE,                                              \
+                        FUNCTION_CALL,                                        \
+                        return Handle<TYPE>(TYPE::cast(__object__), ISOLATE), \
+                        return Handle<TYPE>())                                \
 
 
-#define CALL_HEAP_FUNCTION_VOID(ISOLATE, FUNCTION_CALL) \
-  CALL_AND_RETRY(ISOLATE, FUNCTION_CALL, return, return)
+#define CALL_HEAP_FUNCTION_VOID(ISOLATE, FUNCTION_CALL)  \
+  CALL_AND_RETRY_OR_DIE(ISOLATE, FUNCTION_CALL, return, return)
 
 
-#ifdef DEBUG
-
-inline bool Heap::allow_allocation(bool new_state) {
-  bool old = allocation_allowed_;
-  allocation_allowed_ = new_state;
-  return old;
-}
-
-#endif
+#define CALL_HEAP_FUNCTION_PASS_EXCEPTION(ISOLATE, FUNCTION_CALL) \
+  CALL_AND_RETRY(ISOLATE,                                         \
+                 FUNCTION_CALL,                                   \
+                 return __object__,                               \
+                 return __maybe_object__,                         \
+                 return __maybe_object__)
 
 
 void ExternalStringTable::AddString(String* string) {
@@ -594,12 +683,16 @@ void ExternalStringTable::Iterate(ObjectVisitor* v) {
 void ExternalStringTable::Verify() {
 #ifdef DEBUG
   for (int i = 0; i < new_space_strings_.length(); ++i) {
-    ASSERT(heap_->InNewSpace(new_space_strings_[i]));
-    ASSERT(new_space_strings_[i] != HEAP->raw_unchecked_the_hole_value());
+    Object* obj = Object::cast(new_space_strings_[i]);
+    // TODO(yangguo): check that the object is indeed an external string.
+    ASSERT(heap_->InNewSpace(obj));
+    ASSERT(obj != HEAP->the_hole_value());
   }
   for (int i = 0; i < old_space_strings_.length(); ++i) {
-    ASSERT(!heap_->InNewSpace(old_space_strings_[i]));
-    ASSERT(old_space_strings_[i] != HEAP->raw_unchecked_the_hole_value());
+    Object* obj = Object::cast(old_space_strings_[i]);
+    // TODO(yangguo): check that the object is indeed an external string.
+    ASSERT(!heap_->InNewSpace(obj));
+    ASSERT(obj != HEAP->the_hole_value());
   }
 #endif
 }
@@ -614,8 +707,23 @@ void ExternalStringTable::AddOldString(String* string) {
 
 void ExternalStringTable::ShrinkNewStrings(int position) {
   new_space_strings_.Rewind(position);
+#ifdef VERIFY_HEAP
   if (FLAG_verify_heap) {
     Verify();
+  }
+#endif
+}
+
+
+void ErrorObjectList::Add(JSObject* object) {
+  list_.Add(object);
+}
+
+
+void ErrorObjectList::Iterate(ObjectVisitor* v) {
+  if (!list_.is_empty()) {
+    Object** start = &list_[0];
+    v->VisitPointers(start, start + list_.length());
   }
 }
 
@@ -715,28 +823,27 @@ AlwaysAllocateScope::~AlwaysAllocateScope() {
 }
 
 
-LinearAllocationScope::LinearAllocationScope() {
-  HEAP->linear_allocation_scope_depth_++;
+#ifdef VERIFY_HEAP
+NoWeakEmbeddedMapsVerificationScope::NoWeakEmbeddedMapsVerificationScope() {
+  HEAP->no_weak_embedded_maps_verification_scope_depth_++;
 }
 
 
-LinearAllocationScope::~LinearAllocationScope() {
-  HEAP->linear_allocation_scope_depth_--;
-  ASSERT(HEAP->linear_allocation_scope_depth_ >= 0);
+NoWeakEmbeddedMapsVerificationScope::~NoWeakEmbeddedMapsVerificationScope() {
+  HEAP->no_weak_embedded_maps_verification_scope_depth_--;
 }
+#endif
 
 
-#ifdef DEBUG
 void VerifyPointersVisitor::VisitPointers(Object** start, Object** end) {
   for (Object** current = start; current < end; current++) {
     if ((*current)->IsHeapObject()) {
       HeapObject* object = HeapObject::cast(*current);
-      ASSERT(HEAP->Contains(object));
-      ASSERT(object->map()->IsMap());
+      CHECK(HEAP->Contains(object));
+      CHECK(object->map()->IsMap());
     }
   }
 }
-#endif
 
 
 double GCTracer::SizeOfHeapObjects() {
@@ -744,47 +851,19 @@ double GCTracer::SizeOfHeapObjects() {
 }
 
 
-#ifdef DEBUG
 DisallowAllocationFailure::DisallowAllocationFailure() {
+#ifdef DEBUG
   old_state_ = HEAP->disallow_allocation_failure_;
   HEAP->disallow_allocation_failure_ = true;
+#endif
 }
 
 
 DisallowAllocationFailure::~DisallowAllocationFailure() {
-  HEAP->disallow_allocation_failure_ = old_state_;
-}
-#endif
-
-
 #ifdef DEBUG
-AssertNoAllocation::AssertNoAllocation() {
-  old_state_ = HEAP->allow_allocation(false);
-}
-
-
-AssertNoAllocation::~AssertNoAllocation() {
-  HEAP->allow_allocation(old_state_);
-}
-
-
-DisableAssertNoAllocation::DisableAssertNoAllocation() {
-  old_state_ = HEAP->allow_allocation(true);
-}
-
-
-DisableAssertNoAllocation::~DisableAssertNoAllocation() {
-  HEAP->allow_allocation(old_state_);
-}
-
-#else
-
-AssertNoAllocation::AssertNoAllocation() { }
-AssertNoAllocation::~AssertNoAllocation() { }
-DisableAssertNoAllocation::DisableAssertNoAllocation() { }
-DisableAssertNoAllocation::~DisableAssertNoAllocation() { }
-
+  HEAP->disallow_allocation_failure_ = old_state_;
 #endif
+}
 
 
 } }  // namespace v8::internal

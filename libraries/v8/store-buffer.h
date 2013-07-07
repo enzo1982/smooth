@@ -37,6 +37,8 @@
 namespace v8 {
 namespace internal {
 
+class Page;
+class PagedSpace;
 class StoreBuffer;
 
 typedef void (*ObjectSlotCallback)(HeapObject** from, HeapObject* to);
@@ -158,7 +160,7 @@ class StoreBuffer {
 
   void ClearFilteringHashSets();
 
-  void CheckForFullBuffer();
+  bool SpaceAvailable(intptr_t space_needed);
   void Uniq();
   void ExemptPopularPages(int prime_sample_step, int threshold);
 
@@ -195,7 +197,7 @@ class StoreBuffer {
 
   void IteratePointersInStoreBuffer(ObjectSlotCallback slot_callback);
 
-#ifdef DEBUG
+#ifdef VERIFY_HEAP
   void VerifyPointers(PagedSpace* space, RegionCallback region_callback);
   void VerifyPointers(LargeObjectSpace* space);
 #endif
@@ -210,8 +212,7 @@ class StoreBufferRebuildScope {
   explicit StoreBufferRebuildScope(Heap* heap,
                                    StoreBuffer* store_buffer,
                                    StoreBufferCallback callback)
-      : heap_(heap),
-        store_buffer_(store_buffer),
+      : store_buffer_(store_buffer),
         stored_state_(store_buffer->store_buffer_rebuilding_enabled_),
         stored_callback_(store_buffer->callback_) {
     store_buffer_->store_buffer_rebuilding_enabled_ = true;
@@ -222,11 +223,9 @@ class StoreBufferRebuildScope {
   ~StoreBufferRebuildScope() {
     store_buffer_->callback_ = stored_callback_;
     store_buffer_->store_buffer_rebuilding_enabled_ = stored_state_;
-    store_buffer_->CheckForFullBuffer();
   }
 
  private:
-  Heap* heap_;
   StoreBuffer* store_buffer_;
   bool stored_state_;
   StoreBufferCallback stored_callback_;

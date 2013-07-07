@@ -35,6 +35,14 @@
 namespace v8 {
 namespace internal {
 
+#define LITHIUM_OPERAND_LIST(V)         \
+  V(ConstantOperand, CONSTANT_OPERAND)  \
+  V(StackSlot,       STACK_SLOT)        \
+  V(DoubleStackSlot, DOUBLE_STACK_SLOT) \
+  V(Register,        REGISTER)          \
+  V(DoubleRegister,  DOUBLE_REGISTER)
+
+
 class LOperand: public ZoneObject {
  public:
   enum Kind {
@@ -52,14 +60,13 @@ class LOperand: public ZoneObject {
 
   Kind kind() const { return KindField::decode(value_); }
   int index() const { return static_cast<int>(value_) >> kKindFieldWidth; }
-  bool IsConstantOperand() const { return kind() == CONSTANT_OPERAND; }
-  bool IsStackSlot() const { return kind() == STACK_SLOT; }
-  bool IsDoubleStackSlot() const { return kind() == DOUBLE_STACK_SLOT; }
-  bool IsRegister() const { return kind() == REGISTER; }
-  bool IsDoubleRegister() const { return kind() == DOUBLE_REGISTER; }
-  bool IsArgument() const { return kind() == ARGUMENT; }
-  bool IsUnallocated() const { return kind() == UNALLOCATED; }
-  bool IsIgnored() const { return kind() == INVALID; }
+#define LITHIUM_OPERAND_PREDICATE(name, type) \
+  bool Is##name() const { return kind() == type; }
+  LITHIUM_OPERAND_LIST(LITHIUM_OPERAND_PREDICATE)
+  LITHIUM_OPERAND_PREDICATE(Argument, ARGUMENT)
+  LITHIUM_OPERAND_PREDICATE(Unallocated, UNALLOCATED)
+  LITHIUM_OPERAND_PREDICATE(Ignored, INVALID)
+#undef LITHIUM_OPERAND_PREDICATE
   bool Equals(LOperand* other) const { return value_ == other->value_; }
 
   void PrintTo(StringStream* stream);
@@ -69,9 +76,9 @@ class LOperand: public ZoneObject {
     ASSERT(this->index() == index);
   }
 
-  // Calls SetUpCache() for each subclass. Don't forget to update this method
-  // if you add a new LOperand subclass.
+  // Calls SetUpCache()/TearDownCache() for each subclass.
   static void SetUpCaches();
+  static void TearDownCaches();
 
  protected:
   static const int kKindFieldWidth = 3;
@@ -85,12 +92,16 @@ class LOperand: public ZoneObject {
 
 class LUnallocated: public LOperand {
  public:
-  enum Policy {
+  enum BasicPolicy {
+    FIXED_SLOT,
+    EXTENDED_POLICY
+  };
+
+  enum ExtendedPolicy {
     NONE,
     ANY,
     FIXED_REGISTER,
     FIXED_DOUBLE_REGISTER,
-    FIXED_SLOT,
     MUST_HAVE_REGISTER,
     WRITABLE_REGISTER,
     SAME_AS_FIRST_INPUT
@@ -110,78 +121,36 @@ class LUnallocated: public LOperand {
     USED_AT_END
   };
 
-  explicit LUnallocated(Policy policy) : LOperand(UNALLOCATED, 0) {
-    Initialize(policy, 0, USED_AT_END);
+  explicit LUnallocated(ExtendedPolicy policy) : LOperand(UNALLOCATED, 0) {
+    value_ |= BasicPolicyField::encode(EXTENDED_POLICY);
+    value_ |= ExtendedPolicyField::encode(policy);
+    value_ |= LifetimeField::encode(USED_AT_END);
   }
 
-  LUnallocated(Policy policy, int fixed_index) : LOperand(UNALLOCATED, 0) {
-    Initialize(policy, fixed_index, USED_AT_END);
+  LUnallocated(BasicPolicy policy, int index) : LOperand(UNALLOCATED, 0) {
+    ASSERT(policy == FIXED_SLOT);
+    value_ |= BasicPolicyField::encode(policy);
+    value_ |= index << FixedSlotIndexField::kShift;
+    ASSERT(this->fixed_slot_index() == index);
   }
 
-  LUnallocated(Policy policy, Lifetime lifetime) : LOperand(UNALLOCATED, 0) {
-    Initialize(policy, 0, lifetime);
+  LUnallocated(ExtendedPolicy policy, int index) : LOperand(UNALLOCATED, 0) {
+    ASSERT(policy == FIXED_REGISTER || policy == FIXED_DOUBLE_REGISTER);
+    value_ |= BasicPolicyField::encode(EXTENDED_POLICY);
+    value_ |= ExtendedPolicyField::encode(policy);
+    value_ |= LifetimeField::encode(USED_AT_END);
+    value_ |= FixedRegisterField::encode(index);
   }
 
-  // The superclass has a KindField.  Some policies have a signed fixed
-  // index in the upper bits.
-  static const int kPolicyWidth = 3;
-  static const int kLifetimeWidth = 1;
-  static const int kVirtualRegisterWidth = 18;
-
-  static const int kPolicyShift = kKindFieldWidth;
-  static const int kLifetimeShift = kPolicyShift + kPolicyWidth;
-  static const int kVirtualRegisterShift = kLifetimeShift + kLifetimeWidth;
-  static const int kFixedIndexShift =
-      kVirtualRegisterShift + kVirtualRegisterWidth;
-
-  class PolicyField : public BitField<Policy, kPolicyShift, kPolicyWidth> { };
-
-  class LifetimeField
-      : public BitField<Lifetime, kLifetimeShift, kLifetimeWidth> {
-  };
-
-  class VirtualRegisterField
-      : public BitField<unsigned,
-                        kVirtualRegisterShift,
-                        kVirtualRegisterWidth> {
-  };
-
-  static const int kMaxVirtualRegisters = 1 << kVirtualRegisterWidth;
-  static const int kMaxFixedIndex = 63;
-  static const int kMinFixedIndex = -64;
-
-  bool HasAnyPolicy() const {
-    return policy() == ANY;
-  }
-  bool HasFixedPolicy() const {
-    return policy() == FIXED_REGISTER ||
-        policy() == FIXED_DOUBLE_REGISTER ||
-        policy() == FIXED_SLOT;
-  }
-  bool HasRegisterPolicy() const {
-    return policy() == WRITABLE_REGISTER || policy() == MUST_HAVE_REGISTER;
-  }
-  bool HasSameAsInputPolicy() const {
-    return policy() == SAME_AS_FIRST_INPUT;
-  }
-  Policy policy() const { return PolicyField::decode(value_); }
-  void set_policy(Policy policy) {
-    value_ = PolicyField::update(value_, policy);
-  }
-  int fixed_index() const {
-    return static_cast<int>(value_) >> kFixedIndexShift;
+  LUnallocated(ExtendedPolicy policy, Lifetime lifetime)
+      : LOperand(UNALLOCATED, 0) {
+    value_ |= BasicPolicyField::encode(EXTENDED_POLICY);
+    value_ |= ExtendedPolicyField::encode(policy);
+    value_ |= LifetimeField::encode(lifetime);
   }
 
-  int virtual_register() const {
-    return VirtualRegisterField::decode(value_);
-  }
-
-  void set_virtual_register(unsigned id) {
-    value_ = VirtualRegisterField::update(value_, id);
-  }
-
-  LUnallocated* CopyUnconstrained() {
-    LUnallocated* result = new LUnallocated(ANY);
+  LUnallocated* CopyUnconstrained(Zone* zone) {
+    LUnallocated* result = new(zone) LUnallocated(ANY);
     result->set_virtual_register(virtual_register());
     return result;
   }
@@ -191,16 +160,113 @@ class LUnallocated: public LOperand {
     return reinterpret_cast<LUnallocated*>(op);
   }
 
-  bool IsUsedAtStart() {
-    return LifetimeField::decode(value_) == USED_AT_START;
+  // The encoding used for LUnallocated operands depends on the policy that is
+  // stored within the operand. The FIXED_SLOT policy uses a compact encoding
+  // because it accommodates a larger pay-load.
+  //
+  // For FIXED_SLOT policy:
+  //     +------------------------------------------+
+  //     |       slot_index      |  vreg  | 0 | 001 |
+  //     +------------------------------------------+
+  //
+  // For all other (extended) policies:
+  //     +------------------------------------------+
+  //     |  reg_index  | L | PPP |  vreg  | 1 | 001 |    L ... Lifetime
+  //     +------------------------------------------+    P ... Policy
+  //
+  // The slot index is a signed value which requires us to decode it manually
+  // instead of using the BitField utility class.
+
+  // The superclass has a KindField.
+  STATIC_ASSERT(kKindFieldWidth == 3);
+
+  // BitFields for all unallocated operands.
+  class BasicPolicyField     : public BitField<BasicPolicy,     3,  1> {};
+  class VirtualRegisterField : public BitField<unsigned,        4, 18> {};
+
+  // BitFields specific to BasicPolicy::FIXED_SLOT.
+  class FixedSlotIndexField  : public BitField<int,            22, 10> {};
+
+  // BitFields specific to BasicPolicy::EXTENDED_POLICY.
+  class ExtendedPolicyField  : public BitField<ExtendedPolicy, 22,  3> {};
+  class LifetimeField        : public BitField<Lifetime,       25,  1> {};
+  class FixedRegisterField   : public BitField<int,            26,  6> {};
+
+  static const int kMaxVirtualRegisters = VirtualRegisterField::kMax + 1;
+  static const int kFixedSlotIndexWidth = FixedSlotIndexField::kSize;
+  static const int kMaxFixedSlotIndex = (1 << (kFixedSlotIndexWidth - 1)) - 1;
+  static const int kMinFixedSlotIndex = -(1 << (kFixedSlotIndexWidth - 1));
+
+  // Predicates for the operand policy.
+  bool HasAnyPolicy() const {
+    return basic_policy() == EXTENDED_POLICY &&
+        extended_policy() == ANY;
+  }
+  bool HasFixedPolicy() const {
+    return basic_policy() == FIXED_SLOT ||
+        extended_policy() == FIXED_REGISTER ||
+        extended_policy() == FIXED_DOUBLE_REGISTER;
+  }
+  bool HasRegisterPolicy() const {
+    return basic_policy() == EXTENDED_POLICY && (
+        extended_policy() == WRITABLE_REGISTER ||
+        extended_policy() == MUST_HAVE_REGISTER);
+  }
+  bool HasSameAsInputPolicy() const {
+    return basic_policy() == EXTENDED_POLICY &&
+        extended_policy() == SAME_AS_FIRST_INPUT;
+  }
+  bool HasFixedSlotPolicy() const {
+    return basic_policy() == FIXED_SLOT;
+  }
+  bool HasFixedRegisterPolicy() const {
+    return basic_policy() == EXTENDED_POLICY &&
+        extended_policy() == FIXED_REGISTER;
+  }
+  bool HasFixedDoubleRegisterPolicy() const {
+    return basic_policy() == EXTENDED_POLICY &&
+        extended_policy() == FIXED_DOUBLE_REGISTER;
+  }
+  bool HasWritableRegisterPolicy() const {
+    return basic_policy() == EXTENDED_POLICY &&
+        extended_policy() == WRITABLE_REGISTER;
   }
 
- private:
-  void Initialize(Policy policy, int fixed_index, Lifetime lifetime) {
-    value_ |= PolicyField::encode(policy);
-    value_ |= LifetimeField::encode(lifetime);
-    value_ |= fixed_index << kFixedIndexShift;
-    ASSERT(this->fixed_index() == fixed_index);
+  // [basic_policy]: Distinguish between FIXED_SLOT and all other policies.
+  BasicPolicy basic_policy() const {
+    return BasicPolicyField::decode(value_);
+  }
+
+  // [extended_policy]: Only for non-FIXED_SLOT. The finer-grained policy.
+  ExtendedPolicy extended_policy() const {
+    ASSERT(basic_policy() == EXTENDED_POLICY);
+    return ExtendedPolicyField::decode(value_);
+  }
+
+  // [fixed_slot_index]: Only for FIXED_SLOT.
+  int fixed_slot_index() const {
+    ASSERT(HasFixedSlotPolicy());
+    return static_cast<int>(value_) >> FixedSlotIndexField::kShift;
+  }
+
+  // [fixed_register_index]: Only for FIXED_REGISTER or FIXED_DOUBLE_REGISTER.
+  int fixed_register_index() const {
+    ASSERT(HasFixedRegisterPolicy() || HasFixedDoubleRegisterPolicy());
+    return FixedRegisterField::decode(value_);
+  }
+
+  // [virtual_register]: The virtual register ID for this operand.
+  int virtual_register() const {
+    return VirtualRegisterField::decode(value_);
+  }
+  void set_virtual_register(unsigned id) {
+    value_ = VirtualRegisterField::update(value_, id);
+  }
+
+  // [lifetime]: Only for non-FIXED_SLOT.
+  bool IsUsedAtStart() {
+    ASSERT(basic_policy() == EXTENDED_POLICY);
+    return LifetimeField::decode(value_) == USED_AT_START;
   }
 };
 
@@ -253,10 +319,10 @@ class LMoveOperands BASE_EMBEDDED {
 
 class LConstantOperand: public LOperand {
  public:
-  static LConstantOperand* Create(int index) {
+  static LConstantOperand* Create(int index, Zone* zone) {
     ASSERT(index >= 0);
     if (index < kNumCachedOperands) return &cache[index];
-    return new LConstantOperand(index);
+    return new(zone) LConstantOperand(index);
   }
 
   static LConstantOperand* cast(LOperand* op) {
@@ -265,6 +331,7 @@ class LConstantOperand: public LOperand {
   }
 
   static void SetUpCache();
+  static void TearDownCache();
 
  private:
   static const int kNumCachedOperands = 128;
@@ -288,10 +355,10 @@ class LArgument: public LOperand {
 
 class LStackSlot: public LOperand {
  public:
-  static LStackSlot* Create(int index) {
+  static LStackSlot* Create(int index, Zone* zone) {
     ASSERT(index >= 0);
     if (index < kNumCachedOperands) return &cache[index];
-    return new LStackSlot(index);
+    return new(zone) LStackSlot(index);
   }
 
   static LStackSlot* cast(LOperand* op) {
@@ -300,6 +367,7 @@ class LStackSlot: public LOperand {
   }
 
   static void SetUpCache();
+  static void TearDownCache();
 
  private:
   static const int kNumCachedOperands = 128;
@@ -312,10 +380,10 @@ class LStackSlot: public LOperand {
 
 class LDoubleStackSlot: public LOperand {
  public:
-  static LDoubleStackSlot* Create(int index) {
+  static LDoubleStackSlot* Create(int index, Zone* zone) {
     ASSERT(index >= 0);
     if (index < kNumCachedOperands) return &cache[index];
-    return new LDoubleStackSlot(index);
+    return new(zone) LDoubleStackSlot(index);
   }
 
   static LDoubleStackSlot* cast(LOperand* op) {
@@ -324,6 +392,7 @@ class LDoubleStackSlot: public LOperand {
   }
 
   static void SetUpCache();
+  static void TearDownCache();
 
  private:
   static const int kNumCachedOperands = 128;
@@ -336,10 +405,10 @@ class LDoubleStackSlot: public LOperand {
 
 class LRegister: public LOperand {
  public:
-  static LRegister* Create(int index) {
+  static LRegister* Create(int index, Zone* zone) {
     ASSERT(index >= 0);
     if (index < kNumCachedOperands) return &cache[index];
-    return new LRegister(index);
+    return new(zone) LRegister(index);
   }
 
   static LRegister* cast(LOperand* op) {
@@ -348,6 +417,7 @@ class LRegister: public LOperand {
   }
 
   static void SetUpCache();
+  static void TearDownCache();
 
  private:
   static const int kNumCachedOperands = 16;
@@ -360,10 +430,10 @@ class LRegister: public LOperand {
 
 class LDoubleRegister: public LOperand {
  public:
-  static LDoubleRegister* Create(int index) {
+  static LDoubleRegister* Create(int index, Zone* zone) {
     ASSERT(index >= 0);
     if (index < kNumCachedOperands) return &cache[index];
-    return new LDoubleRegister(index);
+    return new(zone) LDoubleRegister(index);
   }
 
   static LDoubleRegister* cast(LOperand* op) {
@@ -372,6 +442,7 @@ class LDoubleRegister: public LOperand {
   }
 
   static void SetUpCache();
+  static void TearDownCache();
 
  private:
   static const int kNumCachedOperands = 16;
@@ -384,10 +455,10 @@ class LDoubleRegister: public LOperand {
 
 class LParallelMove : public ZoneObject {
  public:
-  LParallelMove() : move_operands_(4) { }
+  explicit LParallelMove(Zone* zone) : move_operands_(4, zone) { }
 
-  void AddMove(LOperand* from, LOperand* to) {
-    move_operands_.Add(LMoveOperands(from, to));
+  void AddMove(LOperand* from, LOperand* to, Zone* zone) {
+    move_operands_.Add(LMoveOperands(from, to), zone);
   }
 
   bool IsRedundant() const;
@@ -405,9 +476,9 @@ class LParallelMove : public ZoneObject {
 
 class LPointerMap: public ZoneObject {
  public:
-  explicit LPointerMap(int position)
-      : pointer_operands_(8),
-        untagged_operands_(0),
+  explicit LPointerMap(int position, Zone* zone)
+      : pointer_operands_(8, zone),
+        untagged_operands_(0, zone),
         position_(position),
         lithium_position_(-1) { }
 
@@ -426,9 +497,9 @@ class LPointerMap: public ZoneObject {
     lithium_position_ = pos;
   }
 
-  void RecordPointer(LOperand* op);
+  void RecordPointer(LOperand* op, Zone* zone);
   void RemovePointer(LOperand* op);
-  void RecordUntagged(LOperand* op);
+  void RecordUntagged(LOperand* op, Zone* zone);
   void PrintTo(StringStream* stream);
 
  private:
@@ -443,31 +514,38 @@ class LEnvironment: public ZoneObject {
  public:
   LEnvironment(Handle<JSFunction> closure,
                FrameType frame_type,
-               int ast_id,
+               BailoutId ast_id,
                int parameter_count,
                int argument_count,
                int value_count,
-               LEnvironment* outer)
+               LEnvironment* outer,
+               HEnterInlined* entry,
+               Zone* zone)
       : closure_(closure),
         frame_type_(frame_type),
         arguments_stack_height_(argument_count),
         deoptimization_index_(Safepoint::kNoDeoptimizationIndex),
         translation_index_(-1),
         ast_id_(ast_id),
+        translation_size_(value_count),
         parameter_count_(parameter_count),
         pc_offset_(-1),
-        values_(value_count),
-        is_tagged_(value_count, closure->GetHeap()->isolate()->zone()),
+        values_(value_count, zone),
+        is_tagged_(value_count, zone),
+        is_uint32_(value_count, zone),
         spilled_registers_(NULL),
         spilled_double_registers_(NULL),
-        outer_(outer) { }
+        outer_(outer),
+        entry_(entry),
+        zone_(zone) { }
 
   Handle<JSFunction> closure() const { return closure_; }
   FrameType frame_type() const { return frame_type_; }
   int arguments_stack_height() const { return arguments_stack_height_; }
   int deoptimization_index() const { return deoptimization_index_; }
   int translation_index() const { return translation_index_; }
-  int ast_id() const { return ast_id_; }
+  BailoutId ast_id() const { return ast_id_; }
+  int translation_size() const { return translation_size_; }
   int parameter_count() const { return parameter_count_; }
   int pc_offset() const { return pc_offset_; }
   LOperand** spilled_registers() const { return spilled_registers_; }
@@ -476,16 +554,29 @@ class LEnvironment: public ZoneObject {
   }
   const ZoneList<LOperand*>* values() const { return &values_; }
   LEnvironment* outer() const { return outer_; }
+  HEnterInlined* entry() { return entry_; }
+  Zone* zone() const { return zone_; }
 
-  void AddValue(LOperand* operand, Representation representation) {
-    values_.Add(operand);
-    if (representation.IsTagged()) {
-      is_tagged_.Add(values_.length() - 1);
+  void AddValue(LOperand* operand,
+                Representation representation,
+                bool is_uint32) {
+    values_.Add(operand, zone());
+    if (representation.IsSmiOrTagged()) {
+      ASSERT(!is_uint32);
+      is_tagged_.Add(values_.length() - 1, zone());
+    }
+
+    if (is_uint32) {
+      is_uint32_.Add(values_.length() - 1, zone());
     }
   }
 
   bool HasTaggedValueAt(int index) const {
     return is_tagged_.Contains(index);
+  }
+
+  bool HasUint32ValueAt(int index) const {
+    return is_uint32_.Contains(index);
   }
 
   void Register(int deoptimization_index,
@@ -514,11 +605,16 @@ class LEnvironment: public ZoneObject {
   int arguments_stack_height_;
   int deoptimization_index_;
   int translation_index_;
-  int ast_id_;
+  BailoutId ast_id_;
+  int translation_size_;
   int parameter_count_;
   int pc_offset_;
+
+  // Value array: [parameters] [locals] [expression stack] [de-materialized].
+  //              |>--------- translation_size ---------<|
   ZoneList<LOperand*> values_;
-  BitVector is_tagged_;
+  GrowableBitVector is_tagged_;
+  GrowableBitVector is_uint32_;
 
   // Allocation index indexed arrays of spill slot operands for registers
   // that are also in spill slots at an OSR entry.  NULL for environments
@@ -527,6 +623,8 @@ class LEnvironment: public ZoneObject {
   LOperand** spilled_double_registers_;
 
   LEnvironment* outer_;
+  HEnterInlined* entry_;
+  Zone* zone_;
 };
 
 
@@ -544,6 +642,7 @@ class ShallowIterator BASE_EMBEDDED {
 
   LOperand* Current() {
     ASSERT(!Done());
+    ASSERT(env_->values()->at(current_) != NULL);
     return env_->values()->at(current_);
   }
 
@@ -585,6 +684,7 @@ class DeepIterator BASE_EMBEDDED {
 
   LOperand* Current() {
     ASSERT(!current_iterator_.Done());
+    ASSERT(current_iterator_.Current() != NULL);
     return current_iterator_.Current();
   }
 
@@ -604,7 +704,78 @@ class DeepIterator BASE_EMBEDDED {
 };
 
 
+class LPlatformChunk;
+class LGap;
+class LLabel;
+
+// Superclass providing data and behavior common to all the
+// arch-specific LPlatformChunk classes.
+class LChunk: public ZoneObject {
+ public:
+  static LChunk* NewChunk(HGraph* graph);
+
+  void AddInstruction(LInstruction* instruction, HBasicBlock* block);
+  LConstantOperand* DefineConstantOperand(HConstant* constant);
+  HConstant* LookupConstant(LConstantOperand* operand) const;
+  Representation LookupLiteralRepresentation(LConstantOperand* operand) const;
+
+  int ParameterAt(int index);
+  int GetParameterStackSlot(int index) const;
+  int spill_slot_count() const { return spill_slot_count_; }
+  CompilationInfo* info() const { return info_; }
+  HGraph* graph() const { return graph_; }
+  Isolate* isolate() const { return graph_->isolate(); }
+  const ZoneList<LInstruction*>* instructions() const { return &instructions_; }
+  void AddGapMove(int index, LOperand* from, LOperand* to);
+  LGap* GetGapAt(int index) const;
+  bool IsGapAt(int index) const;
+  int NearestGapPos(int index) const;
+  void MarkEmptyBlocks();
+  const ZoneList<LPointerMap*>* pointer_maps() const { return &pointer_maps_; }
+  LLabel* GetLabel(int block_id) const;
+  int LookupDestination(int block_id) const;
+  Label* GetAssemblyLabel(int block_id) const;
+
+  const ZoneList<Handle<JSFunction> >* inlined_closures() const {
+    return &inlined_closures_;
+  }
+
+  void AddInlinedClosure(Handle<JSFunction> closure) {
+    inlined_closures_.Add(closure, zone());
+  }
+
+  Zone* zone() const { return info_->zone(); }
+
+  Handle<Code> Codegen();
+
+  void set_allocated_double_registers(BitVector* allocated_registers);
+  BitVector* allocated_double_registers() {
+    return allocated_double_registers_;
+  }
+
+ protected:
+  LChunk(CompilationInfo* info, HGraph* graph);
+
+  int spill_slot_count_;
+
+ private:
+  CompilationInfo* info_;
+  HGraph* const graph_;
+  BitVector* allocated_double_registers_;
+  ZoneList<LInstruction*> instructions_;
+  ZoneList<LPointerMap*> pointer_maps_;
+  ZoneList<Handle<JSFunction> > inlined_closures_;
+};
+
+
 int ElementsKindToShiftSize(ElementsKind elements_kind);
+int StackSlotOffset(int index);
+
+enum NumberUntagDMode {
+  NUMBER_CANDIDATE_IS_SMI,
+  NUMBER_CANDIDATE_IS_ANY_TAGGED,
+  NUMBER_CANDIDATE_IS_ANY_TAGGED_CONVERT_HOLE
+};
 
 
 } }  // namespace v8::internal

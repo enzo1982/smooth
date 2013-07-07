@@ -38,6 +38,12 @@ enum PropertyAttributes {
   READ_ONLY         = v8::ReadOnly,
   DONT_ENUM         = v8::DontEnum,
   DONT_DELETE       = v8::DontDelete,
+
+  SEALED            = DONT_DELETE,
+  FROZEN            = SEALED | READ_ONLY,
+
+  SYMBOLIC          = 8,  // Used to filter symbol names
+  DONT_SHOW         = DONT_ENUM | SYMBOLIC,
   ABSENT            = 16  // Used in runtime to indicate a property is absent.
   // ABSENT can never be stored in or returned from a descriptor's attributes
   // bitfield.  It is only used as a return value meaning the attributes of
@@ -55,21 +61,98 @@ class Smi;
 // Must fit in the BitField PropertyDetails::TypeField.
 // A copy of this is in mirror-debugger.js.
 enum PropertyType {
-  NORMAL                    = 0,  // only in slow mode
-  FIELD                     = 1,  // only in fast mode
-  CONSTANT_FUNCTION         = 2,  // only in fast mode
+  // Only in slow mode.
+  NORMAL                    = 0,
+  // Only in fast mode.
+  FIELD                     = 1,
+  CONSTANT_FUNCTION         = 2,
   CALLBACKS                 = 3,
-  HANDLER                   = 4,  // only in lookup results, not in descriptors
-  INTERCEPTOR               = 5,  // only in lookup results, not in descriptors
-  // All properties before MAP_TRANSITION are real.
-  MAP_TRANSITION            = 6,  // only in fast mode
-  ELEMENTS_TRANSITION       = 7,
-  CONSTANT_TRANSITION       = 8,  // only in fast mode
-  NULL_DESCRIPTOR           = 9,  // only in fast mode
-  // There are no IC stubs for NULL_DESCRIPTORS. Therefore,
-  // NULL_DESCRIPTOR can be used as the type flag for IC stubs for
-  // nonexistent properties.
-  NONEXISTENT = NULL_DESCRIPTOR
+  // Only in lookup results, not in descriptors.
+  HANDLER                   = 4,
+  INTERCEPTOR               = 5,
+  TRANSITION                = 6,
+  // Only used as a marker in LookupResult.
+  NONEXISTENT               = 7
+};
+
+
+class Representation {
+ public:
+  enum Kind {
+    kNone,
+    kSmi,
+    kInteger32,
+    kDouble,
+    kHeapObject,
+    kTagged,
+    kExternal,
+    kNumRepresentations
+  };
+
+  Representation() : kind_(kNone) { }
+
+  static Representation None() { return Representation(kNone); }
+  static Representation Tagged() { return Representation(kTagged); }
+  static Representation Smi() { return Representation(kSmi); }
+  static Representation Integer32() { return Representation(kInteger32); }
+  static Representation Double() { return Representation(kDouble); }
+  static Representation HeapObject() { return Representation(kHeapObject); }
+  static Representation External() { return Representation(kExternal); }
+
+  static Representation FromKind(Kind kind) { return Representation(kind); }
+
+  bool Equals(const Representation& other) const {
+    return kind_ == other.kind_;
+  }
+
+  bool IsCompatibleForLoad(const Representation& other) const {
+    return (IsDouble() && other.IsDouble()) ||
+        (!IsDouble() && !other.IsDouble());
+  }
+
+  bool IsCompatibleForStore(const Representation& other) const {
+    return Equals(other);
+  }
+
+  bool is_more_general_than(const Representation& other) const {
+    ASSERT(kind_ != kExternal);
+    ASSERT(other.kind_ != kExternal);
+    if (IsHeapObject()) return other.IsDouble() || other.IsNone();
+    return kind_ > other.kind_;
+  }
+
+  bool fits_into(const Representation& other) const {
+    return other.is_more_general_than(*this) || other.Equals(*this);
+  }
+
+  Representation generalize(Representation other) {
+    if (other.fits_into(*this)) return *this;
+    if (other.is_more_general_than(*this)) return other;
+    return Representation::Tagged();
+  }
+
+  Kind kind() const { return static_cast<Kind>(kind_); }
+  bool IsNone() const { return kind_ == kNone; }
+  bool IsTagged() const { return kind_ == kTagged; }
+  bool IsSmi() const { return kind_ == kSmi; }
+  bool IsSmiOrTagged() const { return IsSmi() || IsTagged(); }
+  bool IsInteger32() const { return kind_ == kInteger32; }
+  bool IsSmiOrInteger32() const { return IsSmi() || IsInteger32(); }
+  bool IsDouble() const { return kind_ == kDouble; }
+  bool IsHeapObject() const { return kind_ == kHeapObject; }
+  bool IsExternal() const { return kind_ == kExternal; }
+  bool IsSpecialization() const {
+    return kind_ == kInteger32 || kind_ == kDouble;
+  }
+  const char* Mnemonic() const;
+
+ private:
+  explicit Representation(Kind k) : kind_(k) { }
+
+  // Make sure kind fits in int8.
+  STATIC_ASSERT(kNumRepresentations <= (1 << kBitsPerByte));
+
+  int8_t kind_;
 };
 
 
@@ -79,51 +162,108 @@ class PropertyDetails BASE_EMBEDDED {
  public:
   PropertyDetails(PropertyAttributes attributes,
                   PropertyType type,
-                  int index = 0) {
-    ASSERT(TypeField::is_valid(type));
-    ASSERT(AttributesField::is_valid(attributes));
-    ASSERT(StorageField::is_valid(index));
-
+                  int index) {
     value_ = TypeField::encode(type)
         | AttributesField::encode(attributes)
-        | StorageField::encode(index);
+        | DictionaryStorageField::encode(index);
 
     ASSERT(type == this->type());
     ASSERT(attributes == this->attributes());
-    ASSERT(index == this->index());
+  }
+
+  PropertyDetails(PropertyAttributes attributes,
+                  PropertyType type,
+                  Representation representation,
+                  int field_index = 0) {
+    value_ = TypeField::encode(type)
+        | AttributesField::encode(attributes)
+        | RepresentationField::encode(EncodeRepresentation(representation))
+        | FieldIndexField::encode(field_index);
+  }
+
+  int pointer() { return DescriptorPointer::decode(value_); }
+
+  PropertyDetails set_pointer(int i) { return PropertyDetails(value_, i); }
+
+  PropertyDetails CopyWithRepresentation(Representation representation) {
+    return PropertyDetails(value_, representation);
+  }
+  PropertyDetails CopyAddAttributes(PropertyAttributes new_attributes) {
+    new_attributes =
+        static_cast<PropertyAttributes>(attributes() | new_attributes);
+    return PropertyDetails(value_, new_attributes);
   }
 
   // Conversion for storing details as Object*.
   explicit inline PropertyDetails(Smi* smi);
   inline Smi* AsSmi();
 
+  static uint8_t EncodeRepresentation(Representation representation) {
+    return representation.kind();
+  }
+
+  static Representation DecodeRepresentation(uint32_t bits) {
+    return Representation::FromKind(static_cast<Representation::Kind>(bits));
+  }
+
   PropertyType type() { return TypeField::decode(value_); }
 
-  PropertyAttributes attributes() { return AttributesField::decode(value_); }
+  PropertyAttributes attributes() const {
+    return AttributesField::decode(value_);
+  }
 
-  int index() { return StorageField::decode(value_); }
+  int dictionary_index() {
+    return DictionaryStorageField::decode(value_);
+  }
+
+  Representation representation() {
+    ASSERT(type() != NORMAL);
+    return DecodeRepresentation(RepresentationField::decode(value_));
+  }
+
+  int  field_index() {
+    return FieldIndexField::decode(value_);
+  }
 
   inline PropertyDetails AsDeleted();
 
   static bool IsValidIndex(int index) {
-    return StorageField::is_valid(index);
+    return DictionaryStorageField::is_valid(index);
   }
 
-  bool IsReadOnly() { return (attributes() & READ_ONLY) != 0; }
-  bool IsDontDelete() { return (attributes() & DONT_DELETE) != 0; }
-  bool IsDontEnum() { return (attributes() & DONT_ENUM) != 0; }
-  bool IsDeleted() { return DeletedField::decode(value_) != 0;}
+  bool IsReadOnly() const { return (attributes() & READ_ONLY) != 0; }
+  bool IsDontDelete() const { return (attributes() & DONT_DELETE) != 0; }
+  bool IsDontEnum() const { return (attributes() & DONT_ENUM) != 0; }
+  bool IsDeleted() const { return DeletedField::decode(value_) != 0;}
 
   // Bit fields in value_ (type, shift, size). Must be public so the
   // constants can be embedded in generated code.
-  class TypeField:       public BitField<PropertyType,       0, 4> {};
-  class AttributesField: public BitField<PropertyAttributes, 4, 3> {};
-  class DeletedField:    public BitField<uint32_t,           7, 1> {};
-  class StorageField:    public BitField<uint32_t,           8, 32-8> {};
+  class TypeField:                public BitField<PropertyType,       0,  3> {};
+  class AttributesField:          public BitField<PropertyAttributes, 3,  3> {};
+
+  // Bit fields for normalized objects.
+  class DeletedField:             public BitField<uint32_t,           6,  1> {};
+  class DictionaryStorageField:   public BitField<uint32_t,           7, 24> {};
+
+  // Bit fields for fast objects.
+  class DescriptorPointer:        public BitField<uint32_t,           6, 11> {};
+  class RepresentationField:      public BitField<uint32_t,          17,  3> {};
+  class FieldIndexField:          public BitField<uint32_t,          20, 11> {};
 
   static const int kInitialIndex = 1;
 
  private:
+  PropertyDetails(int value, int pointer) {
+    value_ = DescriptorPointer::update(value, pointer);
+  }
+  PropertyDetails(int value, Representation representation) {
+    value_ = RepresentationField::update(
+        value, EncodeRepresentation(representation));
+  }
+  PropertyDetails(int value, PropertyAttributes attributes) {
+    value_ = AttributesField::update(value, attributes);
+  }
+
   uint32_t value_;
 };
 

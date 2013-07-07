@@ -32,9 +32,10 @@
 
 #include "checks.h"
 #include "deoptimizer.h"
+#include "ia32/lithium-gap-resolver-ia32.h"
 #include "safepoint-table.h"
 #include "scopes.h"
-#include "ia32/lithium-gap-resolver-ia32.h"
+#include "v8utils.h"
 
 namespace v8 {
 namespace internal {
@@ -47,20 +48,28 @@ class SafepointGenerator;
 class LCodeGen BASE_EMBEDDED {
  public:
   LCodeGen(LChunk* chunk, MacroAssembler* assembler, CompilationInfo* info)
-      : chunk_(chunk),
+      : zone_(info->zone()),
+        chunk_(static_cast<LPlatformChunk*>(chunk)),
         masm_(assembler),
         info_(info),
         current_block_(-1),
         current_instruction_(-1),
         instructions_(chunk->instructions()),
-        deoptimizations_(4),
-        deoptimization_literals_(8),
+        deoptimizations_(4, info->zone()),
+        jump_table_(4, info->zone()),
+        deoptimization_literals_(8, info->zone()),
         inlined_function_count_(0),
         scope_(info->scope()),
         status_(UNUSED),
-        deferred_(8),
+        translations_(info->zone()),
+        deferred_(8, info->zone()),
+        dynamic_frame_alignment_(false),
+        support_aligned_spilled_doubles_(false),
         osr_pc_offset_(-1),
         last_lazy_deopt_pc_(0),
+        frame_is_built_(false),
+        x87_stack_depth_(0),
+        safepoints_(info->zone()),
         resolver_(this),
         expected_safepoint_kind_(Safepoint::kSimple) {
     PopulateDeoptimizationLiteralsWithInlinedFunctions();
@@ -72,16 +81,51 @@ class LCodeGen BASE_EMBEDDED {
   Isolate* isolate() const { return info_->isolate(); }
   Factory* factory() const { return isolate()->factory(); }
   Heap* heap() const { return isolate()->heap(); }
+  Zone* zone() const { return zone_; }
+
+  // TODO(svenpanne) Use this consistently.
+  int LookupDestination(int block_id) const {
+    return chunk()->LookupDestination(block_id);
+  }
+
+  bool IsNextEmittedBlock(int block_id) const {
+    return LookupDestination(block_id) == GetNextEmittedBlock();
+  }
+
+  bool NeedsEagerFrame() const {
+    return GetStackSlotCount() > 0 ||
+        info()->is_non_deferred_calling() ||
+        !info()->IsStub() ||
+        info()->requires_frame();
+  }
+  bool NeedsDeferredFrame() const {
+    return !NeedsEagerFrame() && info()->is_deferred_calling();
+  }
 
   // Support for converting LOperands to assembler types.
   Operand ToOperand(LOperand* op) const;
   Register ToRegister(LOperand* op) const;
   XMMRegister ToDoubleRegister(LOperand* op) const;
+  bool IsX87TopOfStack(LOperand* op) const;
 
   bool IsInteger32(LConstantOperand* op) const;
+  bool IsSmi(LConstantOperand* op) const;
   Immediate ToInteger32Immediate(LOperand* op) const {
     return Immediate(ToInteger32(LConstantOperand::cast(op)));
   }
+  Immediate ToSmiImmediate(LOperand* op) const {
+    return Immediate(Smi::FromInt(ToInteger32(LConstantOperand::cast(op))));
+  }
+
+  // Support for non-sse2 (x87) floating point stack handling.
+  // These functions maintain the depth of the stack (either 0 or 1)
+  void PushX87DoubleOperand(Operand src);
+  void PushX87FloatOperand(Operand src);
+  void ReadX87Operand(Operand dst);
+  bool X87StackNonEmpty() const { return x87_stack_depth_ > 0; }
+  void PopX87();
+  void CurrentInstructionReturnsX87Result();
+  void FlushX87StackIfNecessary(LInstruction* instr);
 
   Handle<Object> ToHandle(LConstantOperand* op) const;
 
@@ -100,19 +144,24 @@ class LCodeGen BASE_EMBEDDED {
 
   // Deferred code support.
   void DoDeferredNumberTagD(LNumberTagD* instr);
-  void DoDeferredNumberTagI(LNumberTagI* instr);
+
+  enum IntegerSignedness { SIGNED_INT32, UNSIGNED_INT32 };
+  void DoDeferredNumberTagI(LInstruction* instr,
+                            LOperand* value,
+                            IntegerSignedness signedness);
+
   void DoDeferredTaggedToI(LTaggedToI* instr);
-  void DoDeferredMathAbsTaggedHeapNumber(LUnaryMathOperation* instr);
+  void DoDeferredTaggedToINoSSE2(LTaggedToINoSSE2* instr);
+  void DoDeferredMathAbsTaggedHeapNumber(LMathAbs* instr);
   void DoDeferredStackCheck(LStackCheck* instr);
   void DoDeferredRandom(LRandom* instr);
   void DoDeferredStringCharCodeAt(LStringCharCodeAt* instr);
   void DoDeferredStringCharFromCode(LStringCharFromCode* instr);
-  void DoDeferredAllocateObject(LAllocateObject* instr);
+  void DoDeferredAllocate(LAllocate* instr);
   void DoDeferredInstanceOfKnownGlobal(LInstanceOfKnownGlobal* instr,
                                        Label* map_check);
 
-  void DoCheckMapCommon(Register reg, Handle<Map> map,
-                        CompareMapMode mode, LEnvironment* env);
+  void DoCheckMapCommon(Register reg, Handle<Map> map, LInstruction* instr);
 
   // Parallel move support.
   void DoParallelMove(LParallelMove* move);
@@ -145,11 +194,11 @@ class LCodeGen BASE_EMBEDDED {
     return info()->is_classic_mode() ? kNonStrictMode : kStrictMode;
   }
 
-  LChunk* chunk() const { return chunk_; }
+  LPlatformChunk* chunk() const { return chunk_; }
   Scope* scope() const { return scope_; }
-  HGraph* graph() const { return chunk_->graph(); }
+  HGraph* graph() const { return chunk()->graph(); }
 
-  int GetNextEmittedBlock(int block);
+  int GetNextEmittedBlock() const;
 
   void EmitClassOfTest(Label* if_true,
                        Label* if_false,
@@ -159,21 +208,18 @@ class LCodeGen BASE_EMBEDDED {
                        Register temporary2);
 
   int GetStackSlotCount() const { return chunk()->spill_slot_count(); }
-  int GetParameterCount() const { return scope()->num_parameters(); }
 
-  void Abort(const char* format, ...);
-  void Comment(const char* format, ...);
+  void Abort(const char* reason);
+  void FPRINTF_CHECKING Comment(const char* format, ...);
 
-  void AddDeferredCode(LDeferredCode* code) { deferred_.Add(code); }
+  void AddDeferredCode(LDeferredCode* code) { deferred_.Add(code, zone()); }
 
   // Code generation passes.  Returns true if code generation should
   // continue.
   bool GeneratePrologue();
   bool GenerateBody();
   bool GenerateDeferredCode();
-  // Pad the reloc info to ensure that we have enough space to patch during
-  // deoptimization.
-  bool GenerateRelocPadding();
+  bool GenerateJumpTable();
   bool GenerateSafepointTable();
 
   enum SafepointMode {
@@ -206,23 +252,38 @@ class LCodeGen BASE_EMBEDDED {
                                LInstruction* instr,
                                LOperand* context);
 
+  void LoadContextFromDeferred(LOperand* context);
+
+  enum EDIState {
+    EDI_UNINITIALIZED,
+    EDI_CONTAINS_TARGET
+  };
+
   // Generate a direct call to a known function.  Expects the function
   // to be in edi.
   void CallKnownFunction(Handle<JSFunction> function,
+                         int formal_parameter_count,
                          int arity,
                          LInstruction* instr,
-                         CallKind call_kind);
+                         CallKind call_kind,
+                         EDIState edi_state);
 
   void RecordSafepointWithLazyDeopt(LInstruction* instr,
                                     SafepointMode safepoint_mode);
 
   void RegisterEnvironmentForDeoptimization(LEnvironment* environment,
                                             Safepoint::DeoptMode mode);
+  void DeoptimizeIf(Condition cc,
+                    LEnvironment* environment,
+                    Deoptimizer::BailoutType bailout_type);
   void DeoptimizeIf(Condition cc, LEnvironment* environment);
+  void SoftDeoptimize(LEnvironment* environment);
 
   void AddToTranslation(Translation* translation,
                         LOperand* op,
-                        bool is_tagged);
+                        bool is_tagged,
+                        bool is_uint32);
+  void RegisterDependentCodeForEmbeddedMaps(Handle<Code> code);
   void PopulateDeoptimizationData(Handle<Code> code);
   int DefineDeoptimizationLiteral(Handle<Object> literal);
 
@@ -235,19 +296,12 @@ class LCodeGen BASE_EMBEDDED {
   double ToDouble(LConstantOperand* op) const;
   Operand BuildFastArrayOperand(LOperand* elements_pointer,
                                 LOperand* key,
+                                Representation key_representation,
                                 ElementsKind elements_kind,
-                                uint32_t offset);
+                                uint32_t offset,
+                                uint32_t additional_index = 0);
 
-  // Specific math operations - used from DoUnaryMathOperation.
-  void EmitIntegerMathAbs(LUnaryMathOperation* instr);
-  void DoMathAbs(LUnaryMathOperation* instr);
-  void DoMathFloor(LUnaryMathOperation* instr);
-  void DoMathRound(LUnaryMathOperation* instr);
-  void DoMathSqrt(LUnaryMathOperation* instr);
-  void DoMathLog(LUnaryMathOperation* instr);
-  void DoMathTan(LUnaryMathOperation* instr);
-  void DoMathCos(LUnaryMathOperation* instr);
-  void DoMathSin(LUnaryMathOperation* instr);
+  void EmitIntegerMathAbs(LMathAbs* instr);
 
   // Support for recording safepoint and position information.
   void RecordSafepoint(LPointerMap* pointers,
@@ -264,12 +318,22 @@ class LCodeGen BASE_EMBEDDED {
   static Condition TokenToCondition(Token::Value op, bool is_unsigned);
   void EmitGoto(int block);
   void EmitBranch(int left_block, int right_block, Condition cc);
-  void EmitNumberUntagD(Register input,
-                        Register temp,
-                        XMMRegister result,
-                        bool deoptimize_on_undefined,
-                        bool deoptimize_on_minus_zero,
-                        LEnvironment* env);
+  void EmitNumberUntagD(
+      Register input,
+      Register temp,
+      XMMRegister result,
+      bool allow_undefined_as_nan,
+      bool deoptimize_on_minus_zero,
+      LEnvironment* env,
+      NumberUntagDMode mode = NUMBER_CANDIDATE_IS_ANY_TAGGED);
+
+  void EmitNumberUntagDNoSSE2(
+      Register input,
+      Register temp,
+      bool allow_undefined_as_nan,
+      bool deoptimize_on_minus_zero,
+      LEnvironment* env,
+      NumberUntagDMode mode = NUMBER_CANDIDATE_IS_ANY_TAGGED);
 
   // Emits optimized code for typeof x == "y".  Modifies input register.
   // Returns the condition on which a final split to
@@ -301,22 +365,33 @@ class LCodeGen BASE_EMBEDDED {
   void EmitLoadFieldOrConstantFunction(Register result,
                                        Register object,
                                        Handle<Map> type,
-                                       Handle<String> name);
+                                       Handle<String> name,
+                                       LEnvironment* env);
 
   // Emits optimized code to deep-copy the contents of statically known
   // object graphs (e.g. object literal boilerplate).
   void EmitDeepCopy(Handle<JSObject> object,
                     Register result,
                     Register source,
-                    int* offset);
+                    int* offset,
+                    AllocationSiteMode mode);
 
   void EnsureSpaceForLazyDeopt();
+  void DoLoadKeyedExternalArray(LLoadKeyed* instr);
+  void DoLoadKeyedFixedDoubleArray(LLoadKeyed* instr);
+  void DoLoadKeyedFixedArray(LLoadKeyed* instr);
+  void DoStoreKeyedExternalArray(LStoreKeyed* instr);
+  void DoStoreKeyedFixedDoubleArray(LStoreKeyed* instr);
+  void DoStoreKeyedFixedArray(LStoreKeyed* instr);
+
+  void EmitReturn(LReturn* instr, bool dynamic_frame_alignment);
 
   // Emits code for pushing either a tagged constant, a (non-double)
   // register, or a stack slot operand.
   void EmitPushTaggedOperand(LOperand* operand);
 
-  LChunk* const chunk_;
+  Zone* zone_;
+  LPlatformChunk* const chunk_;
   MacroAssembler* const masm_;
   CompilationInfo* const info_;
 
@@ -324,14 +399,19 @@ class LCodeGen BASE_EMBEDDED {
   int current_instruction_;
   const ZoneList<LInstruction*>* instructions_;
   ZoneList<LEnvironment*> deoptimizations_;
+  ZoneList<Deoptimizer::JumpTableEntry> jump_table_;
   ZoneList<Handle<Object> > deoptimization_literals_;
   int inlined_function_count_;
   Scope* const scope_;
   Status status_;
   TranslationBuffer translations_;
   ZoneList<LDeferredCode*> deferred_;
+  bool dynamic_frame_alignment_;
+  bool support_aligned_spilled_doubles_;
   int osr_pc_offset_;
   int last_lazy_deopt_pc_;
+  bool frame_is_built_;
+  int x87_stack_depth_;
 
   // Builder that keeps track of safepoints in the code. The table
   // itself is emitted at the end of the generated code.
@@ -349,6 +429,7 @@ class LCodeGen BASE_EMBEDDED {
       ASSERT(codegen_->expected_safepoint_kind_ == Safepoint::kSimple);
       codegen_->masm_->PushSafepointRegisters();
       codegen_->expected_safepoint_kind_ = Safepoint::kWithRegisters;
+      ASSERT(codegen_->info()->is_calling());
     }
 
     ~PushSafepointRegistersScope() {

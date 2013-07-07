@@ -1,4 +1,4 @@
-// Copyright 2009 the V8 project authors. All rights reserved.
+// Copyright 2012 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -157,7 +157,9 @@ void DebuggerAgent::OnSessionClosed(DebuggerAgentSession* session) {
   ScopedLock with(session_access_);
   ASSERT(session == session_);
   if (session == session_) {
-    CloseSession();
+    session_->Shutdown();
+    delete session_;
+    session_ = NULL;
   }
 }
 
@@ -190,21 +192,14 @@ void DebuggerAgentSession::Run() {
     }
 
     // Convert UTF-8 to UTF-16.
-    unibrow::Utf8InputBuffer<> buf(msg, StrLength(msg));
-    int len = 0;
-    while (buf.has_more()) {
-      buf.GetNext();
-      len++;
-    }
-    ScopedVector<int16_t> temp(len + 1);
-    buf.Reset(msg, StrLength(msg));
-    for (int i = 0; i < len; i++) {
-      temp[i] = buf.GetNext();
-    }
+    unibrow::Utf8Decoder<128> decoder(msg, StrLength(msg));
+    int utf16_length = decoder.Utf16Length();
+    ScopedVector<uint16_t> temp(utf16_length + 1);
+    decoder.WriteUtf16(temp.start(), utf16_length);
 
     // Send the request received to the debugger.
-    v8::Debug::SendCommand(reinterpret_cast<const uint16_t *>(temp.start()),
-                           len,
+    v8::Debug::SendCommand(temp.start(),
+                           utf16_length,
                            NULL,
                            reinterpret_cast<v8::Isolate*>(agent_->isolate()));
 
@@ -247,7 +242,7 @@ SmartArrayPointer<char> DebuggerAgentUtil::ReceiveMessage(const Socket* conn) {
     while (!(c == '\n' && prev_c == '\r')) {
       prev_c = c;
       received = conn->Receive(&c, 1);
-      if (received <= 0) {
+      if (received == 0) {
         PrintF("Error %d\n", Socket::LastError());
         return SmartArrayPointer<char>();
       }
@@ -397,7 +392,7 @@ bool DebuggerAgentUtil::SendMessage(const Socket* conn,
     uint16_t character = message[i];
     buffer_position +=
         unibrow::Utf8::Encode(buffer + buffer_position, character, previous);
-    ASSERT(buffer_position < kBufferSize);
+    ASSERT(buffer_position <= kBufferSize);
 
     // Send buffer if full or last character is encoded.
     if (kBufferSize - buffer_position <
@@ -454,7 +449,7 @@ int DebuggerAgentUtil::ReceiveAll(const Socket* conn, char* data, int len) {
   int total_received = 0;
   while (total_received < len) {
     int received = conn->Receive(data + total_received, len - total_received);
-    if (received <= 0) {
+    if (received == 0) {
       return total_received;
     }
     total_received += received;

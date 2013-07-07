@@ -67,6 +67,7 @@ void Log::Initialize() {
     FLAG_log_suspect = true;
     FLAG_log_handles = true;
     FLAG_log_regexp = true;
+    FLAG_log_internal_timer_events = true;
   }
 
   // --prof implies --log-code.
@@ -78,12 +79,8 @@ void Log::Initialize() {
     FLAG_prof_auto = false;
   }
 
-  bool open_log_file = FLAG_log || FLAG_log_runtime || FLAG_log_api
-      || FLAG_log_code || FLAG_log_gc || FLAG_log_handles || FLAG_log_suspect
-      || FLAG_log_regexp || FLAG_log_state_changes || FLAG_ll_prof;
-
   // If we're logging anything, we need to open the log file.
-  if (open_log_file) {
+  if (Log::InitLogAtStart()) {
     if (strcmp(FLAG_logfile, "-") == 0) {
       OpenStdout();
     } else if (strcmp(FLAG_logfile, kLogToTemporaryFile) == 0) {
@@ -104,6 +101,9 @@ void Log::Initialize() {
                 // If there's a % at the end of the string we back up
                 // one character so we can escape the loop properly.
                 p--;
+                break;
+              case 'p':
+                stream.Add("%d", OS::GetCurrentProcessId());
                 break;
               case 't': {
                 // %t expands to the current time in milliseconds.
@@ -162,8 +162,9 @@ void Log::OpenFile(const char* name) {
     // Open the low-level log file.
     size_t len = strlen(name);
     ScopedVector<char> ll_name(static_cast<int>(len + sizeof(kLowLevelLogExt)));
-    memcpy(ll_name.start(), name, len);
-    memcpy(ll_name.start() + len, kLowLevelLogExt, sizeof(kLowLevelLogExt));
+    OS::MemCopy(ll_name.start(), name, len);
+    OS::MemCopy(ll_name.start() + len,
+                kLowLevelLogExt, sizeof(kLowLevelLogExt));
     ll_output_handle_ = OS::FOpen(ll_name.start(), OS::LogFileOpenMode);
     setvbuf(ll_output_handle_, NULL, _IOFBF, kLowLevelLogBufferSize);
   }
@@ -237,7 +238,7 @@ void LogMessageBuilder::Append(const char c) {
 
 
 void LogMessageBuilder::Append(String* str) {
-  AssertNoAllocation no_heap_allocation;  // Ensure string stay valid.
+  DisallowHeapAllocation no_gc;  // Ensure string stay valid.
   int length = str->length();
   for (int i = 0; i < length; i++) {
     Append(static_cast<char>(str->Get(i)));
@@ -252,15 +253,15 @@ void LogMessageBuilder::AppendAddress(Address addr) {
 
 void LogMessageBuilder::AppendDetailed(String* str, bool show_impl_info) {
   if (str == NULL) return;
-  AssertNoAllocation no_heap_allocation;  // Ensure string stay valid.
+  DisallowHeapAllocation no_gc;  // Ensure string stay valid.
   int len = str->length();
   if (len > 0x1000)
     len = 0x1000;
   if (show_impl_info) {
-    Append(str->IsAsciiRepresentation() ? 'a' : '2');
+    Append(str->IsOneByteRepresentation() ? 'a' : '2');
     if (StringShape(str).IsExternal())
       Append('e');
-    if (StringShape(str).IsSymbol())
+    if (StringShape(str).IsInternalized())
       Append('#');
     Append(":%i:", str->length());
   }

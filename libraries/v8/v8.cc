@@ -27,17 +27,20 @@
 
 #include "v8.h"
 
+#include "assembler.h"
 #include "isolate.h"
 #include "elements.h"
 #include "bootstrapper.h"
 #include "debug.h"
 #include "deoptimizer.h"
+#include "frames.h"
 #include "heap-profiler.h"
 #include "hydrogen.h"
 #include "lithium-allocator.h"
-#include "log.h"
+#include "objects.h"
 #include "once.h"
 #include "platform.h"
+#include "sampler.h"
 #include "runtime-profiler.h"
 #include "serialize.h"
 #include "store-buffer.h"
@@ -53,6 +56,7 @@ bool V8::has_been_disposed_ = false;
 bool V8::has_fatal_error_ = false;
 bool V8::use_crankshaft_ = true;
 List<CallCompletedCallback>* V8::call_completed_callbacks_ = NULL;
+v8::ArrayBuffer::Allocator* V8::array_buffer_allocator_ = NULL;
 
 static LazyMutex entropy_mutex = LAZY_MUTEX_INITIALIZER;
 
@@ -60,8 +64,6 @@ static EntropySource entropy_source;
 
 
 bool V8::Initialize(Deserializer* des) {
-  FlagList::EnforceFlagImplications();
-
   InitializeOncePerProcess();
 
   // The current thread may not yet had entered an isolate to run.
@@ -103,13 +105,27 @@ void V8::TearDown() {
   ASSERT(isolate->IsDefaultIsolate());
 
   if (!has_been_set_up_ || has_been_disposed_) return;
+
+  // The isolate has to be torn down before clearing the LOperand
+  // caches so that the optimizing compiler thread (if running)
+  // doesn't see an inconsistent view of the lithium instructions.
   isolate->TearDown();
+  delete isolate;
+
+  ElementsAccessor::TearDown();
+  LOperand::TearDownCaches();
+  ExternalReference::TearDownMathExpData();
+  RegisteredExtension::UnregisterAll();
+  Isolate::GlobalTearDown();
 
   is_running_ = false;
   has_been_disposed_ = true;
 
   delete call_completed_callbacks_;
   call_completed_callbacks_ = NULL;
+
+  Sampler::TearDown();
+  OS::TearDown();
 }
 
 
@@ -156,7 +172,7 @@ void V8::SetReturnAddressLocationResolver(
 
 // Used by JavaScript APIs
 uint32_t V8::Random(Context* context) {
-  ASSERT(context->IsGlobalContext());
+  ASSERT(context->IsNativeContext());
   ByteArray* seed = context->random_seed();
   return random_base(reinterpret_cast<uint32_t*>(seed->GetDataStartAddress()));
 }
@@ -203,14 +219,22 @@ void V8::RemoveCallCompletedCallback(CallCompletedCallback callback) {
 
 
 void V8::FireCallCompletedCallback(Isolate* isolate) {
-  if (call_completed_callbacks_ == NULL) return;
+  bool has_call_completed_callbacks = call_completed_callbacks_ != NULL;
+  bool observer_delivery_pending =
+      FLAG_harmony_observation && isolate->observer_delivery_pending();
+  if (!has_call_completed_callbacks && !observer_delivery_pending) return;
   HandleScopeImplementer* handle_scope_implementer =
       isolate->handle_scope_implementer();
   if (!handle_scope_implementer->CallDepthIsZero()) return;
   // Fire callbacks.  Increase call depth to prevent recursive callbacks.
   handle_scope_implementer->IncrementCallDepth();
-  for (int i = 0; i < call_completed_callbacks_->length(); i++) {
-    call_completed_callbacks_->at(i)();
+  if (observer_delivery_pending) {
+    JSObject::DeliverChangeRecords(isolate);
+  }
+  if (has_call_completed_callbacks) {
+    for (int i = 0; i < call_completed_callbacks_->length(); i++) {
+      call_completed_callbacks_->at(i)();
+    }
   }
   handle_scope_implementer->DecrementCallDepth();
 }
@@ -240,33 +264,25 @@ Object* V8::FillHeapNumberWithRandom(Object* heap_number,
 }
 
 void V8::InitializeOncePerProcessImpl() {
-  // Set up the platform OS support.
-  OS::SetUp();
-
-  use_crankshaft_ = FLAG_crankshaft;
-
-  if (Serializer::enabled()) {
-    use_crankshaft_ = false;
-  }
-
-  CPU::SetUp();
-  if (!CPU::SupportsCrankshaft()) {
-    use_crankshaft_ = false;
-  }
-
-  OS::PostSetUp();
-
-  RuntimeProfiler::GlobalSetup();
-
-  ElementsAccessor::InitializeOncePerProcess();
-
+  FlagList::EnforceFlagImplications();
   if (FLAG_stress_compaction) {
     FLAG_force_marking_deque_overflows = true;
     FLAG_gc_global = true;
     FLAG_max_new_space_size = (1 << (kPageSizeBits - 10)) * 2;
   }
-
+  if (FLAG_trace_hydrogen) FLAG_parallel_recompilation = false;
+  OS::SetUp();
+  Sampler::SetUp();
+  CPU::SetUp();
+  use_crankshaft_ = FLAG_crankshaft
+      && !Serializer::enabled()
+      && CPU::SupportsCrankshaft();
+  OS::PostSetUp();
+  ElementsAccessor::InitializeOncePerProcess();
   LOperand::SetUpCaches();
+  SetUpJSCallerSavedCodeData();
+  ExternalReference::SetUp();
+  Bootstrapper::InitializeOncePerProcess();
 }
 
 void V8::InitializeOncePerProcess() {

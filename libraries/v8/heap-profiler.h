@@ -44,23 +44,30 @@ class HeapSnapshotsCollection;
     }                                                                        \
   } while (false)
 
-// The HeapProfiler writes data to the log files, which can be postprocessed
-// to generate .hp files for use by the GHC/Valgrind tool hp2ps.
 class HeapProfiler {
  public:
-  static void SetUp();
-  static void TearDown();
+  explicit HeapProfiler(Heap* heap);
+  ~HeapProfiler();
 
-  static HeapSnapshot* TakeSnapshot(const char* name,
-                                    int type,
-                                    v8::ActivityControl* control);
-  static HeapSnapshot* TakeSnapshot(String* name,
-                                    int type,
-                                    v8::ActivityControl* control);
-  static int GetSnapshotsCount();
-  static HeapSnapshot* GetSnapshot(int index);
-  static HeapSnapshot* FindSnapshot(unsigned uid);
-  static void DeleteAllSnapshots();
+  size_t GetMemorySizeUsedByProfiler();
+
+  HeapSnapshot* TakeSnapshot(
+      const char* name,
+      v8::ActivityControl* control,
+      v8::HeapProfiler::ObjectNameResolver* resolver);
+  HeapSnapshot* TakeSnapshot(
+      String* name,
+      v8::ActivityControl* control,
+      v8::HeapProfiler::ObjectNameResolver* resolver);
+
+  void StartHeapObjectsTracking();
+  void StopHeapObjectsTracking();
+  SnapshotObjectId PushHeapObjectsStats(OutputStream* stream);
+  int GetSnapshotsCount();
+  HeapSnapshot* GetSnapshot(int index);
+  HeapSnapshot* FindSnapshot(unsigned uid);
+  SnapshotObjectId GetSnapshotObjectId(Handle<Object> obj);
+  void DeleteAllSnapshots();
 
   void ObjectMoveEvent(Address from, Address to);
 
@@ -73,16 +80,10 @@ class HeapProfiler {
     return snapshots_->is_tracking_objects();
   }
 
+  void SetRetainedObjectInfo(UniqueId id, RetainedObjectInfo* info);
+
  private:
-  HeapProfiler();
-  ~HeapProfiler();
-  HeapSnapshot* TakeSnapshotImpl(const char* name,
-                                 int type,
-                                 v8::ActivityControl* control);
-  HeapSnapshot* TakeSnapshotImpl(String* name,
-                                 int type,
-                                 v8::ActivityControl* control);
-  void ResetSnapshots();
+  Heap* heap() const { return snapshots_->heap(); }
 
   HeapSnapshotsCollection* snapshots_;
   unsigned next_snapshot_uid_;

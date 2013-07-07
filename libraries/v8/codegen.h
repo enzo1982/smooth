@@ -1,4 +1,4 @@
-// Copyright 2011 the V8 project authors. All rights reserved.
+// Copyright 2012 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -90,18 +90,28 @@ namespace internal {
 typedef double (*UnaryMathFunction)(double x);
 
 UnaryMathFunction CreateTranscendentalFunction(TranscendentalCache::Type type);
+UnaryMathFunction CreateExpFunction();
 UnaryMathFunction CreateSqrtFunction();
 
 
 class ElementsTransitionGenerator : public AllStatic {
  public:
-  static void GenerateSmiOnlyToObject(MacroAssembler* masm);
-  static void GenerateSmiOnlyToDouble(MacroAssembler* masm, Label* fail);
-  static void GenerateDoubleToObject(MacroAssembler* masm, Label* fail);
+  // If |mode| is set to DONT_TRACK_ALLOCATION_SITE,
+  // |allocation_site_info_found| may be NULL.
+  static void GenerateMapChangeElementsTransition(MacroAssembler* masm,
+      AllocationSiteMode mode,
+      Label* allocation_site_info_found);
+  static void GenerateSmiToDouble(MacroAssembler* masm,
+                                  AllocationSiteMode mode,
+                                  Label* fail);
+  static void GenerateDoubleToObject(MacroAssembler* masm,
+                                     AllocationSiteMode mode,
+                                     Label* fail);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ElementsTransitionGenerator);
 };
+
 
 } }  // namespace v8::internal
 

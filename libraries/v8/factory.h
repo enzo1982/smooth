@@ -39,6 +39,11 @@ namespace internal {
 
 class Factory {
  public:
+  // Allocate a new boxed value.
+  Handle<Box> NewBox(
+      Handle<Object> value,
+      PretenureFlag pretenure = NOT_TENURED);
+
   // Allocate a new uninitialized fixed array.
   Handle<FixedArray> NewFixedArray(
       int size,
@@ -60,13 +65,14 @@ class Factory {
   Handle<UnseededNumberDictionary> NewUnseededNumberDictionary(
       int at_least_space_for);
 
-  Handle<StringDictionary> NewStringDictionary(int at_least_space_for);
+  Handle<NameDictionary> NewNameDictionary(int at_least_space_for);
 
   Handle<ObjectHashSet> NewObjectHashSet(int at_least_space_for);
 
   Handle<ObjectHashTable> NewObjectHashTable(int at_least_space_for);
 
-  Handle<DescriptorArray> NewDescriptorArray(int number_of_descriptors);
+  Handle<DescriptorArray> NewDescriptorArray(int number_of_descriptors,
+                                             int slack = 0);
   Handle<DeoptimizationInputData> NewDeoptimizationInputData(
       int deopt_entry_count,
       PretenureFlag pretenure);
@@ -78,16 +84,16 @@ class Factory {
 
   Handle<TypeFeedbackInfo> NewTypeFeedbackInfo();
 
-  Handle<String> LookupSymbol(Vector<const char> str);
-  Handle<String> LookupSymbol(Handle<String> str);
-  Handle<String> LookupAsciiSymbol(Vector<const char> str);
-  Handle<String> LookupAsciiSymbol(Handle<SeqAsciiString>,
+  Handle<String> InternalizeUtf8String(Vector<const char> str);
+  Handle<String> InternalizeUtf8String(const char* str) {
+    return InternalizeUtf8String(CStrVector(str));
+  }
+  Handle<String> InternalizeString(Handle<String> str);
+  Handle<String> InternalizeOneByteString(Vector<const uint8_t> str);
+  Handle<String> InternalizeOneByteString(Handle<SeqOneByteString>,
                                    int from,
                                    int length);
-  Handle<String> LookupTwoByteSymbol(Vector<const uc16> str);
-  Handle<String> LookupAsciiSymbol(const char* str) {
-    return LookupSymbol(CStrVector(str));
-  }
+  Handle<String> InternalizeTwoByteString(Vector<const uc16> str);
 
 
   // String creation functions.  Most of the string creation functions take
@@ -112,9 +118,15 @@ class Factory {
   //     two byte.
   //
   // ASCII strings are pretenured when used as keys in the SourceCodeCache.
-  Handle<String> NewStringFromAscii(
-      Vector<const char> str,
+  Handle<String> NewStringFromOneByte(
+      Vector<const uint8_t> str,
       PretenureFlag pretenure = NOT_TENURED);
+  // TODO(dcarney): remove this function.
+  inline Handle<String> NewStringFromAscii(
+      Vector<const char> str,
+      PretenureFlag pretenure = NOT_TENURED) {
+    return NewStringFromOneByte(Vector<const uint8_t>::cast(str), pretenure);
+  }
 
   // UTF8 strings are pretenured when used for regexp literal patterns and
   // flags in the parser.
@@ -129,7 +141,7 @@ class Factory {
   // Allocates and partially initializes an ASCII or TwoByte String. The
   // characters of the string are uninitialized. Currently used in regexp code
   // only, where they are pretenured.
-  Handle<SeqAsciiString> NewRawAsciiString(
+  Handle<SeqOneByteString> NewRawOneByteString(
       int length,
       PretenureFlag pretenure = NOT_TENURED);
   Handle<SeqTwoByteString> NewRawTwoByteString(
@@ -159,12 +171,21 @@ class Factory {
   Handle<String> NewExternalStringFromTwoByte(
       const ExternalTwoByteString::Resource* resource);
 
+  // Create a symbol.
+  Handle<Symbol> NewSymbol();
+
   // Create a global (but otherwise uninitialized) context.
-  Handle<Context> NewGlobalContext();
+  Handle<Context> NewNativeContext();
+
+  // Create a global context.
+  Handle<Context> NewGlobalContext(Handle<JSFunction> function,
+                                   Handle<ScopeInfo> scope_info);
+
+  // Create a module context.
+  Handle<Context> NewModuleContext(Handle<ScopeInfo> scope_info);
 
   // Create a function context.
-  Handle<Context> NewFunctionContext(int length,
-                                     Handle<JSFunction> function);
+  Handle<Context> NewFunctionContext(int length, Handle<JSFunction> function);
 
   // Create a catch context.
   Handle<Context> NewCatchContext(Handle<JSFunction> function,
@@ -177,19 +198,23 @@ class Factory {
                                  Handle<Context> previous,
                                  Handle<JSObject> extension);
 
-  // Create a 'block' context.
+  // Create a block context.
   Handle<Context> NewBlockContext(Handle<JSFunction> function,
                                   Handle<Context> previous,
                                   Handle<ScopeInfo> scope_info);
 
-  // Return the Symbol matching the passed in string.
-  Handle<String> SymbolFromString(Handle<String> value);
+  // Return the internalized version of the passed in string.
+  Handle<String> InternalizedStringFromString(Handle<String> value);
 
   // Allocate a new struct.  The struct is pretenured (allocated directly in
   // the old generation).
   Handle<Struct> NewStruct(InstanceType type);
 
-  Handle<AccessorInfo> NewAccessorInfo();
+  Handle<DeclaredAccessorDescriptor> NewDeclaredAccessorDescriptor();
+
+  Handle<DeclaredAccessorInfo> NewDeclaredAccessorInfo();
+
+  Handle<ExecutableAccessorInfo> NewExecutableAccessorInfo();
 
   Handle<Script> NewScript(Handle<String> source);
 
@@ -210,27 +235,31 @@ class Factory {
       void* external_pointer,
       PretenureFlag pretenure = NOT_TENURED);
 
-  Handle<JSGlobalPropertyCell> NewJSGlobalPropertyCell(
-      Handle<Object> value);
+  Handle<Cell> NewCell(Handle<Object> value);
 
-  Handle<Map> NewMap(InstanceType type,
-                     int instance_size,
-                     ElementsKind elements_kind = FAST_ELEMENTS);
+  Handle<PropertyCell> NewPropertyCell(Handle<Object> value);
+
+  Handle<Map> NewMap(
+      InstanceType type,
+      int instance_size,
+      ElementsKind elements_kind = TERMINAL_FAST_ELEMENTS_KIND);
 
   Handle<JSObject> NewFunctionPrototype(Handle<JSFunction> function);
 
-  Handle<Map> CopyMapDropDescriptors(Handle<Map> map);
+  Handle<Map> CopyWithPreallocatedFieldDescriptors(Handle<Map> map);
 
   // Copy the map adding more inobject properties if possible without
   // overflowing the instance size.
   Handle<Map> CopyMap(Handle<Map> map, int extra_inobject_props);
-
-  Handle<Map> CopyMapDropTransitions(Handle<Map> map);
+  Handle<Map> CopyMap(Handle<Map> map);
 
   Handle<Map> GetElementsTransitionMap(Handle<JSObject> object,
                                        ElementsKind elements_kind);
 
   Handle<FixedArray> CopyFixedArray(Handle<FixedArray> array);
+
+  Handle<FixedArray> CopySizeFixedArray(Handle<FixedArray> array,
+                                        int new_length);
 
   Handle<FixedDoubleArray> CopyFixedDoubleArray(
       Handle<FixedDoubleArray> array);
@@ -243,6 +272,11 @@ class Factory {
                                   PretenureFlag pretenure = NOT_TENURED);
   Handle<Object> NewNumberFromUint(uint32_t value,
                                   PretenureFlag pretenure = NOT_TENURED);
+  inline Handle<Object> NewNumberFromSize(size_t value,
+                                   PretenureFlag pretenure = NOT_TENURED);
+  Handle<HeapNumber> NewHeapNumber(double value,
+                                   PretenureFlag pretenure = NOT_TENURED);
+
 
   // These objects are used by the api to create env-independent data
   // structures in the heap.
@@ -260,16 +294,22 @@ class Factory {
 
   // JS objects are pretenured when allocated by the bootstrapper and
   // runtime.
-  Handle<JSObject> NewJSObjectFromMap(Handle<Map> map);
+  Handle<JSObject> NewJSObjectFromMap(Handle<Map> map,
+                                      PretenureFlag pretenure = NOT_TENURED);
+
+  // JS modules are pretenured.
+  Handle<JSModule> NewJSModule(Handle<Context> context,
+                               Handle<ScopeInfo> scope_info);
 
   // JS arrays are pretenured when allocated by the parser.
-  Handle<JSArray> NewJSArray(int capacity,
-                             ElementsKind elements_kind = FAST_ELEMENTS,
-                             PretenureFlag pretenure = NOT_TENURED);
+  Handle<JSArray> NewJSArray(
+      int capacity,
+      ElementsKind elements_kind = TERMINAL_FAST_ELEMENTS_KIND,
+      PretenureFlag pretenure = NOT_TENURED);
 
   Handle<JSArray> NewJSArrayWithElements(
       Handle<FixedArrayBase> elements,
-      ElementsKind elements_kind = FAST_ELEMENTS,
+      ElementsKind elements_kind = TERMINAL_FAST_ELEMENTS_KIND,
       PretenureFlag pretenure = NOT_TENURED);
 
   void SetElementsCapacityAndLength(Handle<JSArray> array,
@@ -281,7 +321,12 @@ class Factory {
   void EnsureCanContainHeapObjectElements(Handle<JSArray> array);
   void EnsureCanContainElements(Handle<JSArray> array,
                                 Handle<FixedArrayBase> elements,
+                                uint32_t length,
                                 EnsureElementsMode mode);
+
+  Handle<JSArrayBuffer> NewJSArrayBuffer();
+
+  Handle<JSTypedArray> NewJSTypedArray(ExternalArrayType type);
 
   Handle<JSProxy> NewJSProxy(Handle<Object> handler, Handle<Object> prototype);
 
@@ -289,7 +334,7 @@ class Factory {
   void BecomeJSObject(Handle<JSReceiver> object);
   void BecomeJSFunction(Handle<JSReceiver> object);
 
-  void SetIdentityHash(Handle<JSObject> object, Object* hash);
+  void SetIdentityHash(Handle<JSObject> object, Smi* hash);
 
   Handle<JSFunction> NewFunction(Handle<String> name,
                                  Handle<Object> prototype);
@@ -312,10 +357,13 @@ class Factory {
 
   Handle<ScopeInfo> NewScopeInfo(int length);
 
+  Handle<JSObject> NewExternal(void* value);
+
   Handle<Code> NewCode(const CodeDesc& desc,
                        Code::Flags flags,
                        Handle<Object> self_reference,
-                       bool immovable = false);
+                       bool immovable = false,
+                       bool crankshafted = false);
 
   Handle<Code> CopyCode(Handle<Code> code);
 
@@ -323,36 +371,37 @@ class Factory {
 
   Handle<Object> ToObject(Handle<Object> object);
   Handle<Object> ToObject(Handle<Object> object,
-                          Handle<Context> global_context);
+                          Handle<Context> native_context);
 
   // Interface for creating error objects.
 
-  Handle<Object> NewError(const char* maker, const char* type,
+  Handle<Object> NewError(const char* maker, const char* message,
                           Handle<JSArray> args);
-  Handle<Object> NewError(const char* maker, const char* type,
+  Handle<String> EmergencyNewError(const char* message, Handle<JSArray> args);
+  Handle<Object> NewError(const char* maker, const char* message,
                           Vector< Handle<Object> > args);
-  Handle<Object> NewError(const char* type,
+  Handle<Object> NewError(const char* message,
                           Vector< Handle<Object> > args);
   Handle<Object> NewError(Handle<String> message);
   Handle<Object> NewError(const char* constructor,
                           Handle<String> message);
 
-  Handle<Object> NewTypeError(const char* type,
+  Handle<Object> NewTypeError(const char* message,
                               Vector< Handle<Object> > args);
   Handle<Object> NewTypeError(Handle<String> message);
 
-  Handle<Object> NewRangeError(const char* type,
+  Handle<Object> NewRangeError(const char* message,
                                Vector< Handle<Object> > args);
   Handle<Object> NewRangeError(Handle<String> message);
 
-  Handle<Object> NewSyntaxError(const char* type, Handle<JSArray> args);
+  Handle<Object> NewSyntaxError(const char* message, Handle<JSArray> args);
   Handle<Object> NewSyntaxError(Handle<String> message);
 
-  Handle<Object> NewReferenceError(const char* type,
+  Handle<Object> NewReferenceError(const char* message,
                                    Vector< Handle<Object> > args);
   Handle<Object> NewReferenceError(Handle<String> message);
 
-  Handle<Object> NewEvalError(const char* type,
+  Handle<Object> NewEvalError(const char* message,
                               Vector< Handle<Object> > args);
 
 
@@ -375,12 +424,6 @@ class Factory {
 
   Handle<JSFunction> NewFunctionWithoutPrototype(Handle<String> name,
                                                  Handle<Code> code);
-
-  Handle<DescriptorArray> CopyAppendForeignDescriptor(
-      Handle<DescriptorArray> array,
-      Handle<String> key,
-      Handle<Object> value,
-      PropertyAttributes attributes);
 
   Handle<String> NumberToString(Handle<Object> number);
   Handle<String> Uint32ToString(uint32_t value);
@@ -412,21 +455,22 @@ class Factory {
   ROOT_LIST(ROOT_ACCESSOR)
 #undef ROOT_ACCESSOR_ACCESSOR
 
-#define SYMBOL_ACCESSOR(name, str)                                             \
+#define STRING_ACCESSOR(name, str)                                             \
   inline Handle<String> name() {                                               \
     return Handle<String>(BitCast<String**>(                                   \
         &isolate()->heap()->roots_[Heap::k##name##RootIndex]));                \
   }
-  SYMBOL_LIST(SYMBOL_ACCESSOR)
-#undef SYMBOL_ACCESSOR
+  INTERNALIZED_STRING_LIST(STRING_ACCESSOR)
+#undef STRING_ACCESSOR
 
-  Handle<String> hidden_symbol() {
-    return Handle<String>(&isolate()->heap()->hidden_symbol_);
+  Handle<String> hidden_string() {
+    return Handle<String>(&isolate()->heap()->hidden_string_);
   }
 
   Handle<SharedFunctionInfo> NewSharedFunctionInfo(
       Handle<String> name,
       int number_of_literals,
+      bool is_generator,
       Handle<Code> code,
       Handle<ScopeInfo> scope_info);
   Handle<SharedFunctionInfo> NewSharedFunctionInfo(Handle<String> name);
@@ -454,7 +498,7 @@ class Factory {
   Handle<DebugInfo> NewDebugInfo(Handle<SharedFunctionInfo> shared);
 #endif
 
-  // Return a map using the map cache in the global context.
+  // Return a map using the map cache in the native context.
   // The key the an ordered set of property names.
   Handle<Map> ObjectLiteralMapFromCache(Handle<Context> context,
                                         Handle<FixedArray> keys);
@@ -493,18 +537,26 @@ class Factory {
       Handle<String> name,
       LanguageMode language_mode);
 
-  Handle<DescriptorArray> CopyAppendCallbackDescriptors(
-      Handle<DescriptorArray> array,
-      Handle<Object> descriptors);
-
   // Create a new map cache.
   Handle<MapCache> NewMapCache(int at_least_space_for);
 
-  // Update the map cache in the global context with (keys, map)
+  // Update the map cache in the native context with (keys, map)
   Handle<MapCache> AddToMapCache(Handle<Context> context,
                                  Handle<FixedArray> keys,
                                  Handle<Map> map);
 };
+
+
+Handle<Object> Factory::NewNumberFromSize(size_t value,
+                                          PretenureFlag pretenure) {
+  if (Smi::IsValid(static_cast<intptr_t>(value))) {
+    return Handle<Object>(Smi::FromIntptr(static_cast<intptr_t>(value)),
+                          isolate());
+  } else {
+    return NewNumber(static_cast<double>(value), pretenure);
+  }
+}
+
 
 
 } }  // namespace v8::internal

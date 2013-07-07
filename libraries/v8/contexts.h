@@ -96,23 +96,23 @@ enum BindingFlags {
 // must always be allocated via Heap::AllocateContext() or
 // Factory::NewContext.
 
-#define GLOBAL_CONTEXT_FIELDS(V) \
+#define NATIVE_CONTEXT_FIELDS(V) \
   V(GLOBAL_PROXY_INDEX, JSObject, global_proxy_object) \
   V(SECURITY_TOKEN_INDEX, Object, security_token) \
   V(BOOLEAN_FUNCTION_INDEX, JSFunction, boolean_function) \
   V(NUMBER_FUNCTION_INDEX, JSFunction, number_function) \
   V(STRING_FUNCTION_INDEX, JSFunction, string_function) \
   V(STRING_FUNCTION_PROTOTYPE_MAP_INDEX, Map, string_function_prototype_map) \
+  V(SYMBOL_FUNCTION_INDEX, JSFunction, symbol_function) \
   V(OBJECT_FUNCTION_INDEX, JSFunction, object_function) \
   V(INTERNAL_ARRAY_FUNCTION_INDEX, JSFunction, internal_array_function) \
   V(ARRAY_FUNCTION_INDEX, JSFunction, array_function) \
-  V(SMI_JS_ARRAY_MAP_INDEX, Object, smi_js_array_map) \
-  V(DOUBLE_JS_ARRAY_MAP_INDEX, Object, double_js_array_map) \
-  V(OBJECT_JS_ARRAY_MAP_INDEX, Object, object_js_array_map) \
+  V(JS_ARRAY_MAPS_INDEX, Object, js_array_maps) \
   V(DATE_FUNCTION_INDEX, JSFunction, date_function) \
   V(JSON_OBJECT_INDEX, JSObject, json_object) \
   V(REGEXP_FUNCTION_INDEX, JSFunction, regexp_function) \
   V(INITIAL_OBJECT_PROTOTYPE_INDEX, JSObject, initial_object_prototype) \
+  V(INITIAL_ARRAY_PROTOTYPE_INDEX, JSObject, initial_array_prototype) \
   V(CREATE_DATE_FUN_INDEX, JSFunction,  create_date_fun) \
   V(TO_NUMBER_FUN_INDEX, JSFunction, to_number_fun) \
   V(TO_STRING_FUN_INDEX, JSFunction, to_string_fun) \
@@ -124,14 +124,21 @@ enum BindingFlags {
   V(GLOBAL_EVAL_FUN_INDEX, JSFunction, global_eval_fun) \
   V(INSTANTIATE_FUN_INDEX, JSFunction, instantiate_fun) \
   V(CONFIGURE_INSTANCE_FUN_INDEX, JSFunction, configure_instance_fun) \
+  V(ARRAY_BUFFER_FUN_INDEX, JSFunction, array_buffer_fun) \
+  V(UINT8_ARRAY_FUN_INDEX, JSFunction, uint8_array_fun) \
+  V(INT8_ARRAY_FUN_INDEX, JSFunction, int8_array_fun) \
+  V(UINT16_ARRAY_FUN_INDEX, JSFunction, uint16_array_fun) \
+  V(INT16_ARRAY_FUN_INDEX, JSFunction, int16_array_fun) \
+  V(UINT32_ARRAY_FUN_INDEX, JSFunction, uint32_array_fun) \
+  V(INT32_ARRAY_FUN_INDEX, JSFunction, int32_array_fun) \
+  V(FLOAT_ARRAY_FUN_INDEX, JSFunction, float_array_fun) \
+  V(DOUBLE_ARRAY_FUN_INDEX, JSFunction, double_array_fun) \
+  V(UINT8C_ARRAY_FUN_INDEX, JSFunction, uint8c_array_fun) \
   V(FUNCTION_MAP_INDEX, Map, function_map) \
   V(STRICT_MODE_FUNCTION_MAP_INDEX, Map, strict_mode_function_map) \
   V(FUNCTION_WITHOUT_PROTOTYPE_MAP_INDEX, Map, function_without_prototype_map) \
   V(STRICT_MODE_FUNCTION_WITHOUT_PROTOTYPE_MAP_INDEX, Map, \
     strict_mode_function_without_prototype_map) \
-  V(FUNCTION_INSTANCE_MAP_INDEX, Map, function_instance_map) \
-  V(STRICT_MODE_FUNCTION_INSTANCE_MAP_INDEX, Map, \
-    strict_mode_function_instance_map) \
   V(REGEXP_RESULT_MAP_INDEX, Map, regexp_result_map)\
   V(ARGUMENTS_BOILERPLATE_INDEX, JSObject, arguments_boilerplate) \
   V(ALIASED_ARGUMENTS_BOILERPLATE_INDEX, JSObject, \
@@ -154,14 +161,29 @@ enum BindingFlags {
   V(CONTEXT_EXTENSION_FUNCTION_INDEX, JSFunction, context_extension_function) \
   V(OUT_OF_MEMORY_INDEX, Object, out_of_memory) \
   V(MAP_CACHE_INDEX, Object, map_cache) \
-  V(CONTEXT_DATA_INDEX, Object, data) \
+  V(EMBEDDER_DATA_INDEX, FixedArray, embedder_data) \
   V(ALLOW_CODE_GEN_FROM_STRINGS_INDEX, Object, allow_code_gen_from_strings) \
+  V(ERROR_MESSAGE_FOR_CODE_GEN_FROM_STRINGS_INDEX, Object, \
+    error_message_for_code_gen_from_strings) \
   V(TO_COMPLETE_PROPERTY_DESCRIPTOR_INDEX, JSFunction, \
     to_complete_property_descriptor) \
   V(DERIVED_HAS_TRAP_INDEX, JSFunction, derived_has_trap) \
   V(DERIVED_GET_TRAP_INDEX, JSFunction, derived_get_trap) \
   V(DERIVED_SET_TRAP_INDEX, JSFunction, derived_set_trap) \
-  V(PROXY_ENUMERATE, JSFunction, proxy_enumerate) \
+  V(PROXY_ENUMERATE_INDEX, JSFunction, proxy_enumerate) \
+  V(OBSERVERS_NOTIFY_CHANGE_INDEX, JSFunction, observers_notify_change) \
+  V(OBSERVERS_ENQUEUE_SPLICE_INDEX, JSFunction, observers_enqueue_splice) \
+  V(OBSERVERS_BEGIN_SPLICE_INDEX, JSFunction, \
+    observers_begin_perform_splice) \
+  V(OBSERVERS_END_SPLICE_INDEX, JSFunction, \
+    observers_end_perform_splice) \
+  V(OBSERVERS_DELIVER_CHANGES_INDEX, JSFunction, observers_deliver_changes) \
+  V(GENERATOR_FUNCTION_MAP_INDEX, Map, generator_function_map) \
+  V(STRICT_MODE_GENERATOR_FUNCTION_MAP_INDEX, Map, \
+    strict_mode_generator_function_map) \
+  V(GENERATOR_OBJECT_PROTOTYPE_MAP_INDEX, Map, \
+    generator_object_prototype_map) \
+  V(GENERATOR_RESULT_MAP_INDEX, Map, generator_result_map) \
   V(RANDOM_SEED_INDEX, ByteArray, random_seed)
 
 // JSFunctions are pairs (context, function code), sometimes also called
@@ -192,16 +214,19 @@ enum BindingFlags {
 //                Dynamically declared variables/functions are also added
 //                to lazily allocated extension object. Context::Lookup
 //                searches the extension object for properties.
+//                For global and block contexts, contains the respective
+//                ScopeInfo.
+//                For module contexts, points back to the respective JSModule.
 //
-// [ global    ]  A pointer to the global object. Provided for quick
+// [ global_object ]  A pointer to the global object. Provided for quick
 //                access to the global object from inside the code (since
 //                we always have a context pointer).
 //
 // In addition, function contexts may have statically allocated context slots
 // to store local variables/functions that are accessed from inner functions
 // (via static context addresses) or through 'eval' (dynamic context lookups).
-// Finally, the global context contains additional slots for fast access to
-// global properties.
+// Finally, the native context contains additional slots for fast access to
+// native properties.
 
 class Context: public FixedArray {
  public:
@@ -219,15 +244,15 @@ class Context: public FixedArray {
     // The extension slot is used for either the global object (in global
     // contexts), eval extension object (function contexts), subject of with
     // (with contexts), or the variable name (catch contexts), the serialized
-    // scope info (block contexts).
+    // scope info (block contexts), or the module instance (module contexts).
     EXTENSION_INDEX,
-    GLOBAL_INDEX,
+    GLOBAL_OBJECT_INDEX,
     MIN_CONTEXT_SLOTS,
 
     // This slot holds the thrown value in catch contexts.
     THROWN_OBJECT_INDEX = MIN_CONTEXT_SLOTS,
 
-    // These slots are only in global contexts.
+    // These slots are only in native contexts.
     GLOBAL_PROXY_INDEX = MIN_CONTEXT_SLOTS,
     SECURITY_TOKEN_INDEX,
     ARGUMENTS_BOILERPLATE_INDEX,
@@ -238,19 +263,17 @@ class Context: public FixedArray {
     STRICT_MODE_FUNCTION_MAP_INDEX,
     FUNCTION_WITHOUT_PROTOTYPE_MAP_INDEX,
     STRICT_MODE_FUNCTION_WITHOUT_PROTOTYPE_MAP_INDEX,
-    FUNCTION_INSTANCE_MAP_INDEX,
-    STRICT_MODE_FUNCTION_INSTANCE_MAP_INDEX,
     INITIAL_OBJECT_PROTOTYPE_INDEX,
+    INITIAL_ARRAY_PROTOTYPE_INDEX,
     BOOLEAN_FUNCTION_INDEX,
     NUMBER_FUNCTION_INDEX,
     STRING_FUNCTION_INDEX,
     STRING_FUNCTION_PROTOTYPE_MAP_INDEX,
+    SYMBOL_FUNCTION_INDEX,
     OBJECT_FUNCTION_INDEX,
     INTERNAL_ARRAY_FUNCTION_INDEX,
     ARRAY_FUNCTION_INDEX,
-    SMI_JS_ARRAY_MAP_INDEX,
-    DOUBLE_JS_ARRAY_MAP_INDEX,
-    OBJECT_JS_ARRAY_MAP_INDEX,
+    JS_ARRAY_MAPS_INDEX,
     DATE_FUNCTION_INDEX,
     JSON_OBJECT_INDEX,
     REGEXP_FUNCTION_INDEX,
@@ -266,6 +289,16 @@ class Context: public FixedArray {
     GLOBAL_EVAL_FUN_INDEX,
     INSTANTIATE_FUN_INDEX,
     CONFIGURE_INSTANCE_FUN_INDEX,
+    ARRAY_BUFFER_FUN_INDEX,
+    UINT8_ARRAY_FUN_INDEX,
+    INT8_ARRAY_FUN_INDEX,
+    UINT16_ARRAY_FUN_INDEX,
+    INT16_ARRAY_FUN_INDEX,
+    UINT32_ARRAY_FUN_INDEX,
+    INT32_ARRAY_FUN_INDEX,
+    FLOAT_ARRAY_FUN_INDEX,
+    DOUBLE_ARRAY_FUN_INDEX,
+    UINT8C_ARRAY_FUN_INDEX,
     MESSAGE_LISTENERS_INDEX,
     MAKE_MESSAGE_FUN_INDEX,
     GET_STACK_TRACE_LINE_INDEX,
@@ -280,13 +313,23 @@ class Context: public FixedArray {
     OPAQUE_REFERENCE_FUNCTION_INDEX,
     CONTEXT_EXTENSION_FUNCTION_INDEX,
     OUT_OF_MEMORY_INDEX,
-    CONTEXT_DATA_INDEX,
+    EMBEDDER_DATA_INDEX,
     ALLOW_CODE_GEN_FROM_STRINGS_INDEX,
+    ERROR_MESSAGE_FOR_CODE_GEN_FROM_STRINGS_INDEX,
     TO_COMPLETE_PROPERTY_DESCRIPTOR_INDEX,
     DERIVED_HAS_TRAP_INDEX,
     DERIVED_GET_TRAP_INDEX,
     DERIVED_SET_TRAP_INDEX,
-    PROXY_ENUMERATE,
+    PROXY_ENUMERATE_INDEX,
+    OBSERVERS_NOTIFY_CHANGE_INDEX,
+    OBSERVERS_ENQUEUE_SPLICE_INDEX,
+    OBSERVERS_BEGIN_SPLICE_INDEX,
+    OBSERVERS_END_SPLICE_INDEX,
+    OBSERVERS_DELIVER_CHANGES_INDEX,
+    GENERATOR_FUNCTION_MAP_INDEX,
+    STRICT_MODE_GENERATOR_FUNCTION_MAP_INDEX,
+    GENERATOR_OBJECT_PROTOTYPE_MAP_INDEX,
+    GENERATOR_RESULT_MAP_INDEX,
     RANDOM_SEED_INDEX,
 
     // Properties from here are treated as weak references by the full GC.
@@ -296,7 +339,7 @@ class Context: public FixedArray {
     NEXT_CONTEXT_LINK,  // Weak.
 
     // Total number of slots.
-    GLOBAL_CONTEXT_SLOTS,
+    NATIVE_CONTEXT_SLOTS,
 
     FIRST_WEAK_SLOT = OPTIMIZED_FUNCTIONS_LIST
   };
@@ -307,7 +350,7 @@ class Context: public FixedArray {
 
   Context* previous() {
     Object* result = unchecked_previous();
-    ASSERT(IsBootstrappingOrContext(result));
+    ASSERT(IsBootstrappingOrValidParentContext(result, this));
     return reinterpret_cast<Context*>(result);
   }
   void set_previous(Context* context) { set(PREVIOUS_INDEX, context); }
@@ -316,16 +359,21 @@ class Context: public FixedArray {
   Object* extension() { return get(EXTENSION_INDEX); }
   void set_extension(Object* object) { set(EXTENSION_INDEX, object); }
 
+  JSModule* module() { return JSModule::cast(get(EXTENSION_INDEX)); }
+  void set_module(JSModule* module) { set(EXTENSION_INDEX, module); }
+
   // Get the context where var declarations will be hoisted to, which
   // may be the context itself.
   Context* declaration_context();
 
-  GlobalObject* global() {
-    Object* result = get(GLOBAL_INDEX);
+  GlobalObject* global_object() {
+    Object* result = get(GLOBAL_OBJECT_INDEX);
     ASSERT(IsBootstrappingOrGlobalObject(result));
     return reinterpret_cast<GlobalObject*>(result);
   }
-  void set_global(GlobalObject* global) { set(GLOBAL_INDEX, global); }
+  void set_global_object(GlobalObject* object) {
+    set(GLOBAL_OBJECT_INDEX, object);
+  }
 
   // Returns a JSGlobalProxy object or null.
   JSObject* global_proxy();
@@ -334,12 +382,19 @@ class Context: public FixedArray {
   // The builtins object.
   JSBuiltinsObject* builtins();
 
-  // Compute the global context by traversing the context chain.
+  // Get the innermost global context by traversing the context chain.
   Context* global_context();
 
-  // Predicates for context types.  IsGlobalContext is defined on Object
-  // because we frequently have to know if arbitrary objects are global
+  // Compute the native context by traversing the context chain.
+  Context* native_context();
+
+  // Predicates for context types.  IsNativeContext is also defined on Object
+  // because we frequently have to know if arbitrary objects are natives
   // contexts.
+  bool IsNativeContext() {
+    Map* map = this->map();
+    return map == map->GetHeap()->native_context_map();
+  }
   bool IsFunctionContext() {
     Map* map = this->map();
     return map == map->GetHeap()->function_context_map();
@@ -360,44 +415,42 @@ class Context: public FixedArray {
     Map* map = this->map();
     return map == map->GetHeap()->module_context_map();
   }
+  bool IsGlobalContext() {
+    Map* map = this->map();
+    return map == map->GetHeap()->global_context_map();
+  }
 
-  // Tells whether the global context is marked with out of memory.
+  // Tells whether the native context is marked with out of memory.
   inline bool has_out_of_memory();
 
-  // Mark the global context with out of memory.
+  // Mark the native context with out of memory.
   inline void mark_out_of_memory();
 
-  // A global context hold a list of all functions which have been optimized.
+  // A native context hold a list of all functions which have been optimized.
   void AddOptimizedFunction(JSFunction* function);
   void RemoveOptimizedFunction(JSFunction* function);
   Object* OptimizedFunctionsListHead();
   void ClearOptimizedFunctions();
 
-  static int GetContextMapIndexFromElementsKind(
-      ElementsKind elements_kind) {
-    if (elements_kind == FAST_DOUBLE_ELEMENTS) {
-      return Context::DOUBLE_JS_ARRAY_MAP_INDEX;
-    } else if (elements_kind == FAST_ELEMENTS) {
-      return Context::OBJECT_JS_ARRAY_MAP_INDEX;
-    } else {
-      ASSERT(elements_kind == FAST_SMI_ONLY_ELEMENTS);
-      return Context::SMI_JS_ARRAY_MAP_INDEX;
-    }
-  }
+  Handle<Object> ErrorMessageForCodeGenerationFromStrings();
 
-#define GLOBAL_CONTEXT_FIELD_ACCESSORS(index, type, name) \
+#define NATIVE_CONTEXT_FIELD_ACCESSORS(index, type, name) \
   void  set_##name(type* value) {                         \
-    ASSERT(IsGlobalContext());                            \
+    ASSERT(IsNativeContext());                            \
     set(index, value);                                    \
   }                                                       \
+  bool is_##name(type* value) {                           \
+    ASSERT(IsNativeContext());                            \
+    return type::cast(get(index)) == value;               \
+  }                                                       \
   type* name() {                                          \
-    ASSERT(IsGlobalContext());                            \
+    ASSERT(IsNativeContext());                            \
     return type::cast(get(index));                        \
   }
-  GLOBAL_CONTEXT_FIELDS(GLOBAL_CONTEXT_FIELD_ACCESSORS)
-#undef GLOBAL_CONTEXT_FIELD_ACCESSORS
+  NATIVE_CONTEXT_FIELDS(NATIVE_CONTEXT_FIELD_ACCESSORS)
+#undef NATIVE_CONTEXT_FIELD_ACCESSORS
 
-  // Lookup the the slot called name, starting with the current context.
+  // Lookup the slot called name, starting with the current context.
   // There are three possibilities:
   //
   // 1) result->IsContext():
@@ -425,7 +478,17 @@ class Context: public FixedArray {
     return kHeaderSize + index * kPointerSize - kHeapObjectTag;
   }
 
-  static const int kSize = kHeaderSize + GLOBAL_CONTEXT_SLOTS * kPointerSize;
+  static int FunctionMapIndex(LanguageMode language_mode, bool is_generator) {
+    return is_generator
+      ? (language_mode == CLASSIC_MODE
+         ? GENERATOR_FUNCTION_MAP_INDEX
+         : STRICT_MODE_GENERATOR_FUNCTION_MAP_INDEX)
+      : (language_mode == CLASSIC_MODE
+         ? FUNCTION_MAP_INDEX
+         : STRICT_MODE_FUNCTION_MAP_INDEX);
+  }
+
+  static const int kSize = kHeaderSize + NATIVE_CONTEXT_SLOTS * kPointerSize;
 
   // GC support.
   typedef FixedBodyDescriptor<
@@ -442,9 +505,12 @@ class Context: public FixedArray {
 
 #ifdef DEBUG
   // Bootstrapping-aware type checks.
-  static bool IsBootstrappingOrContext(Object* object);
+  static bool IsBootstrappingOrValidParentContext(Object* object, Context* kid);
   static bool IsBootstrappingOrGlobalObject(Object* object);
 #endif
+
+  STATIC_CHECK(kHeaderSize == Internals::kContextHeaderSize);
+  STATIC_CHECK(EMBEDDER_DATA_INDEX == Internals::kContextEmbedderDataIndex);
 };
 
 } }  // namespace v8::internal

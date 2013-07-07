@@ -25,10 +25,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Expect $Object = global.Object;
-// Expect $Array = global.Array;
+// This file relies on the fact that the following declaration has been made
+// in runtime.js:
+// var $Object = global.Object;
+// var $Array = global.Array;
 
 var $RegExp = global.RegExp;
+
+// -------------------------------------------------------------------
 
 // A recursive descent parser for Patterns according to the grammar of
 // ECMA-262 15.10.1, with deviations noted below.
@@ -132,26 +136,15 @@ function BuildResultFromMatchInfo(lastMatchInfo, s) {
   var start = lastMatchInfo[CAPTURE0];
   var end = lastMatchInfo[CAPTURE1];
   var result = %_RegExpConstructResult(numResults, start, s);
-  if (start + 1 == end) {
-    result[0] = %_StringCharAt(s, start);
-  } else {
-    result[0] = %_SubString(s, start, end);
-  }
+  result[0] = %_SubString(s, start, end);
   var j = REGEXP_FIRST_CAPTURE + 2;
   for (var i = 1; i < numResults; i++) {
     start = lastMatchInfo[j++];
-    end = lastMatchInfo[j++];
-    if (end != -1) {
-      if (start + 1 == end) {
-        result[i] = %_StringCharAt(s, start);
-      } else {
-        result[i] = %_SubString(s, start, end);
-      }
-    } else {
-      // Make sure the element is present. Avoid reading the undefined
-      // property from the global object since this may change.
-      result[i] = void 0;
+    if (start != -1) {
+      end = lastMatchInfo[j];
+      result[i] = %_SubString(s, start, end);
     }
+    j++;
   }
   return result;
 }
@@ -164,6 +157,7 @@ function RegExpExecNoTests(regexp, string, start) {
     lastMatchInfoOverride = null;
     return BuildResultFromMatchInfo(matchInfo, string);
   }
+  regexp.lastIndex = 0;
   return null;
 }
 
@@ -196,7 +190,7 @@ function RegExpExec(string) {
   var matchIndices = %_RegExpExec(this, string, i, lastMatchInfo);
 
   if (matchIndices === null) {
-    if (global) this.lastIndex = 0;
+    this.lastIndex = 0;
     return null;
   }
 
@@ -259,7 +253,10 @@ function RegExpTest(string) {
     %_Log('regexp', 'regexp-exec,%0r,%1S,%2i', [regexp, string, lastIndex]);
     // matchIndices is either null or the lastMatchInfo array.
     var matchIndices = %_RegExpExec(regexp, string, 0, lastMatchInfo);
-    if (matchIndices === null) return false;
+    if (matchIndices === null) {
+      this.lastIndex = 0;
+      return false;
+    }
     lastMatchInfoOverride = null;
     return true;
   }
@@ -269,7 +266,7 @@ function TrimRegExp(regexp) {
   if (!%_ObjectEquals(regexp_key, regexp)) {
     regexp_key = regexp;
     regexp_val =
-      new $RegExp(SubString(regexp.source, 2, regexp.source.length),
+      new $RegExp(%_SubString(regexp.source, 2, regexp.source.length),
                   (regexp.ignoreCase ? regexp.multiline ? "im" : "i"
                                      : regexp.multiline ? "m" : ""));
   }
@@ -278,11 +275,11 @@ function TrimRegExp(regexp) {
 
 
 function RegExpToString() {
-  // If this.source is an empty string, output /(?:)/.
-  // http://bugzilla.mozilla.org/show_bug.cgi?id=225550
-  // ecma_2/RegExp/properties-001.js.
-  var src = this.source ? this.source : '(?:)';
-  var result = '/' + src + '/';
+  if (!IS_REGEXP(this)) {
+    throw MakeTypeError('incompatible_method_receiver',
+                        ['RegExp.prototype.toString', this]);
+  }
+  var result = '/' + this.source + '/';
   if (this.global) result += 'g';
   if (this.ignoreCase) result += 'i';
   if (this.multiline) result += 'm';
@@ -296,12 +293,12 @@ function RegExpToString() {
 // of the last successful match.
 function RegExpGetLastMatch() {
   if (lastMatchInfoOverride !== null) {
-    return lastMatchInfoOverride[0];
+    return OVERRIDE_MATCH(lastMatchInfoOverride);
   }
   var regExpSubject = LAST_SUBJECT(lastMatchInfo);
-  return SubString(regExpSubject,
-                   lastMatchInfo[CAPTURE0],
-                   lastMatchInfo[CAPTURE1]);
+  return %_SubString(regExpSubject,
+                     lastMatchInfo[CAPTURE0],
+                     lastMatchInfo[CAPTURE1]);
 }
 
 
@@ -320,7 +317,7 @@ function RegExpGetLastParen() {
   var start = lastMatchInfo[CAPTURE(length - 2)];
   var end = lastMatchInfo[CAPTURE(length - 1)];
   if (start != -1 && end != -1) {
-    return SubString(regExpSubject, start, end);
+    return %_SubString(regExpSubject, start, end);
   }
   return "";
 }
@@ -334,10 +331,10 @@ function RegExpGetLeftContext() {
     subject = LAST_SUBJECT(lastMatchInfo);
   } else {
     var override = lastMatchInfoOverride;
-    start_index = override[override.length - 2];
-    subject = override[override.length - 1];
+    start_index = OVERRIDE_POS(override);
+    subject = OVERRIDE_SUBJECT(override);
   }
-  return SubString(subject, 0, start_index);
+  return %_SubString(subject, 0, start_index);
 }
 
 
@@ -349,11 +346,11 @@ function RegExpGetRightContext() {
     subject = LAST_SUBJECT(lastMatchInfo);
   } else {
     var override = lastMatchInfoOverride;
-    subject = override[override.length - 1];
-    var pattern = override[override.length - 3];
-    start_index = override[override.length - 2] + pattern.length;
+    subject = OVERRIDE_SUBJECT(override);
+    var match = OVERRIDE_MATCH(override);
+    start_index = OVERRIDE_POS(override) + match.length;
   }
-  return SubString(subject, start_index, subject.length);
+  return %_SubString(subject, start_index, subject.length);
 }
 
 
@@ -363,7 +360,9 @@ function RegExpGetRightContext() {
 function RegExpMakeCaptureGetter(n) {
   return function() {
     if (lastMatchInfoOverride) {
-      if (n < lastMatchInfoOverride.length - 2) return lastMatchInfoOverride[n];
+      if (n < lastMatchInfoOverride.length - 2) {
+        return OVERRIDE_CAPTURE(lastMatchInfoOverride, n);
+      }
       return '';
     }
     var index = n * 2;
@@ -371,7 +370,7 @@ function RegExpMakeCaptureGetter(n) {
     var matchStart = lastMatchInfo[CAPTURE(index)];
     var matchEnd = lastMatchInfo[CAPTURE(index + 1)];
     if (matchStart == -1 || matchEnd == -1) return '';
-    return SubString(LAST_SUBJECT(lastMatchInfo), matchStart, matchEnd);
+    return %_SubString(LAST_SUBJECT(lastMatchInfo), matchStart, matchEnd);
   };
 }
 
@@ -382,7 +381,7 @@ function RegExpMakeCaptureGetter(n) {
 // pairs for the match and all the captured substrings), the invariant is
 // that there are at least two capture indeces.  The array also contains
 // the subject string for the last successful match.
-var lastMatchInfo = new InternalArray(
+var lastMatchInfo = new InternalPackedArray(
     2,                 // REGEXP_NUMBER_OF_CAPTURES
     "",                // Last subject.
     void 0,            // Last input - settable with RegExpSetInput.
@@ -425,6 +424,7 @@ function SetUpRegExp() {
     LAST_INPUT(lastMatchInfo) = ToString(string);
   };
 
+  %OptimizeObjectForAddingMultipleProperties($RegExp, 22);
   %DefineOrRedefineAccessorProperty($RegExp, 'input', RegExpGetInput,
                                     RegExpSetInput, DONT_DELETE);
   %DefineOrRedefineAccessorProperty($RegExp, '$_', RegExpGetInput,
@@ -479,6 +479,7 @@ function SetUpRegExp() {
                                       RegExpMakeCaptureGetter(i), NoOpSetter,
                                       DONT_DELETE);
   }
+  %ToFastProperties($RegExp);
 }
 
 SetUpRegExp();

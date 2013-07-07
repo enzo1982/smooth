@@ -25,42 +25,46 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef V8_SMART_ARRAY_POINTER_H_
-#define V8_SMART_ARRAY_POINTER_H_
+#ifndef V8_SMART_POINTERS_H_
+#define V8_SMART_POINTERS_H_
 
 namespace v8 {
 namespace internal {
 
 
-// A 'scoped array pointer' that calls DeleteArray on its pointer when the
-// destructor is called.
-template<typename T>
-class SmartArrayPointer {
+template<typename Deallocator, typename T>
+class SmartPointerBase {
  public:
   // Default constructor. Constructs an empty scoped pointer.
-  inline SmartArrayPointer() : p_(NULL) {}
+  inline SmartPointerBase() : p_(NULL) {}
 
   // Constructs a scoped pointer from a plain one.
-  explicit inline SmartArrayPointer(T* ptr) : p_(ptr) {}
+  explicit inline SmartPointerBase(T* ptr) : p_(ptr) {}
 
   // Copy constructor removes the pointer from the original to avoid double
   // freeing.
-  inline SmartArrayPointer(const SmartArrayPointer<T>& rhs) : p_(rhs.p_) {
-    const_cast<SmartArrayPointer<T>&>(rhs).p_ = NULL;
+  inline SmartPointerBase(const SmartPointerBase<Deallocator, T>& rhs)
+      : p_(rhs.p_) {
+    const_cast<SmartPointerBase<Deallocator, T>&>(rhs).p_ = NULL;
   }
 
   // When the destructor of the scoped pointer is executed the plain pointer
   // is deleted using DeleteArray.  This implies that you must allocate with
   // NewArray.
-  inline ~SmartArrayPointer() { if (p_) DeleteArray(p_); }
+  inline ~SmartPointerBase() { if (p_) Deallocator::Delete(p_); }
 
   inline T* operator->() const { return p_; }
 
   // You can get the underlying pointer out with the * operator.
   inline T* operator*() { return p_; }
 
-  // You can use [n] to index as if it was a plain pointer
+  // You can use [n] to index as if it was a plain pointer.
   inline T& operator[](size_t i) {
+    return p_[i];
+  }
+
+  // You can use [n] to index as if it was a plain pointer.
+  const inline T& operator[](size_t i) const {
     return p_[i];
   }
 
@@ -78,13 +82,19 @@ class SmartArrayPointer {
     return temp;
   }
 
+  inline void Reset(T* new_value) {
+    if (p_) Deallocator::Delete(p_);
+    p_ = new_value;
+  }
+
   // Assignment requires an empty (NULL) SmartArrayPointer as the receiver. Like
   // the copy constructor it removes the pointer in the original to avoid
   // double freeing.
-  inline SmartArrayPointer& operator=(const SmartArrayPointer<T>& rhs) {
+  inline SmartPointerBase<Deallocator, T>& operator=(
+      const SmartPointerBase<Deallocator, T>& rhs) {
     ASSERT(is_empty());
     T* tmp = rhs.p_;  // swap to handle self-assignment
-    const_cast<SmartArrayPointer<T>&>(rhs).p_ = NULL;
+    const_cast<SmartPointerBase<Deallocator, T>&>(rhs).p_ = NULL;
     p_ = tmp;
     return *this;
   }
@@ -95,6 +105,46 @@ class SmartArrayPointer {
   T* p_;
 };
 
+// A 'scoped array pointer' that calls DeleteArray on its pointer when the
+// destructor is called.
+
+template<typename T>
+struct ArrayDeallocator {
+  static void Delete(T* array) {
+    DeleteArray(array);
+  }
+};
+
+
+template<typename T>
+class SmartArrayPointer: public SmartPointerBase<ArrayDeallocator<T>, T> {
+ public:
+  inline SmartArrayPointer() { }
+  explicit inline SmartArrayPointer(T* ptr)
+      : SmartPointerBase<ArrayDeallocator<T>, T>(ptr) { }
+  inline SmartArrayPointer(const SmartArrayPointer<T>& rhs)
+      : SmartPointerBase<ArrayDeallocator<T>, T>(rhs) { }
+};
+
+
+template<typename T>
+struct ObjectDeallocator {
+  static void Delete(T* object) {
+    delete object;
+  }
+};
+
+
+template<typename T>
+class SmartPointer: public SmartPointerBase<ObjectDeallocator<T>, T> {
+ public:
+  inline SmartPointer() { }
+  explicit inline SmartPointer(T* ptr)
+      : SmartPointerBase<ObjectDeallocator<T>, T>(ptr) { }
+  inline SmartPointer(const SmartPointer<T>& rhs)
+      : SmartPointerBase<ObjectDeallocator<T>, T>(rhs) { }
+};
+
 } }  // namespace v8::internal
 
-#endif  // V8_SMART_ARRAY_POINTER_H_
+#endif  // V8_SMART_POINTERS_H_

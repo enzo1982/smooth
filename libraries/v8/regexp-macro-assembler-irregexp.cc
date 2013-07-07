@@ -38,12 +38,14 @@ namespace internal {
 
 #ifdef V8_INTERPRETED_REGEXP
 
-RegExpMacroAssemblerIrregexp::RegExpMacroAssemblerIrregexp(Vector<byte> buffer)
-    : buffer_(buffer),
+RegExpMacroAssemblerIrregexp::RegExpMacroAssemblerIrregexp(Vector<byte> buffer,
+                                                           Zone* zone)
+    : RegExpMacroAssembler(zone),
+      buffer_(buffer),
       pc_(0),
       own_buffer_(false),
-      advance_current_end_(kInvalidPC) {
-}
+      advance_current_end_(kInvalidPC),
+      isolate_(zone->isolate()) { }
 
 
 RegExpMacroAssemblerIrregexp::~RegExpMacroAssemblerIrregexp() {
@@ -203,8 +205,9 @@ void RegExpMacroAssemblerIrregexp::PushBacktrack(Label* l) {
 }
 
 
-void RegExpMacroAssemblerIrregexp::Succeed() {
+bool RegExpMacroAssemblerIrregexp::Succeed() {
   Emit(BC_SUCCEED, 0);
+  return false;  // Restart matching for global regexp not supported.
 }
 
 
@@ -352,6 +355,42 @@ void RegExpMacroAssemblerIrregexp::CheckNotCharacterAfterMinusAnd(
 }
 
 
+void RegExpMacroAssemblerIrregexp::CheckCharacterInRange(
+    uc16 from,
+    uc16 to,
+    Label* on_in_range) {
+  Emit(BC_CHECK_CHAR_IN_RANGE, 0);
+  Emit16(from);
+  Emit16(to);
+  EmitOrLink(on_in_range);
+}
+
+
+void RegExpMacroAssemblerIrregexp::CheckCharacterNotInRange(
+    uc16 from,
+    uc16 to,
+    Label* on_not_in_range) {
+  Emit(BC_CHECK_CHAR_NOT_IN_RANGE, 0);
+  Emit16(from);
+  Emit16(to);
+  EmitOrLink(on_not_in_range);
+}
+
+
+void RegExpMacroAssemblerIrregexp::CheckBitInTable(
+    Handle<ByteArray> table, Label* on_bit_set) {
+  Emit(BC_CHECK_BIT_IN_TABLE, 0);
+  EmitOrLink(on_bit_set);
+  for (int i = 0; i < kTableSize; i += kBitsPerByte) {
+    int byte = 0;
+    for (int j = 0; j < kBitsPerByte; j++) {
+      if (table->get(i + j) != 0) byte |= 1 << j;
+    }
+    Emit8(byte);
+  }
+}
+
+
 void RegExpMacroAssemblerIrregexp::CheckNotBackReference(int start_reg,
                                                          Label* on_not_equal) {
   ASSERT(start_reg >= 0);
@@ -368,39 +407,6 @@ void RegExpMacroAssemblerIrregexp::CheckNotBackReferenceIgnoreCase(
   ASSERT(start_reg <= kMaxRegister);
   Emit(BC_CHECK_NOT_BACK_REF_NO_CASE, start_reg);
   EmitOrLink(on_not_equal);
-}
-
-
-void RegExpMacroAssemblerIrregexp::CheckNotRegistersEqual(int reg1,
-                                                          int reg2,
-                                                          Label* on_not_equal) {
-  ASSERT(reg1 >= 0);
-  ASSERT(reg1 <= kMaxRegister);
-  Emit(BC_CHECK_NOT_REGS_EQUAL, reg1);
-  Emit32(reg2);
-  EmitOrLink(on_not_equal);
-}
-
-
-void RegExpMacroAssemblerIrregexp::CheckCharacters(
-  Vector<const uc16> str,
-  int cp_offset,
-  Label* on_failure,
-  bool check_end_of_string) {
-  ASSERT(cp_offset >= kMinCPOffset);
-  ASSERT(cp_offset + str.length() - 1 <= kMaxCPOffset);
-  // It is vital that this loop is backwards due to the unchecked character
-  // load below.
-  for (int i = str.length() - 1; i >= 0; i--) {
-    if (check_end_of_string && i == str.length() - 1) {
-      Emit(BC_LOAD_CURRENT_CHAR, cp_offset + i);
-      EmitOrLink(on_failure);
-    } else {
-      Emit(BC_LOAD_CURRENT_CHAR_UNCHECKED, cp_offset + i);
-    }
-    Emit(BC_CHECK_NOT_CHAR, str[i]);
-    EmitOrLink(on_failure);
-  }
 }
 
 
@@ -439,7 +445,7 @@ Handle<HeapObject> RegExpMacroAssemblerIrregexp::GetCode(
     Handle<String> source) {
   Bind(&backtrack_);
   Emit(BC_POP_BT, 0);
-  Handle<ByteArray> array = FACTORY->NewByteArray(length());
+  Handle<ByteArray> array = isolate_->factory()->NewByteArray(length());
   Copy(array->GetDataStartAddress());
   return array;
 }
@@ -451,7 +457,7 @@ int RegExpMacroAssemblerIrregexp::length() {
 
 
 void RegExpMacroAssemblerIrregexp::Copy(Address a) {
-  memcpy(a, buffer_.start(), length());
+  OS::MemCopy(a, buffer_.start(), length());
 }
 
 
@@ -460,7 +466,7 @@ void RegExpMacroAssemblerIrregexp::Expand() {
   Vector<byte> old_buffer = buffer_;
   buffer_ = Vector<byte>::New(old_buffer.length() * 2);
   own_buffer_ = true;
-  memcpy(buffer_.start(), old_buffer.start(), old_buffer.length());
+  OS::MemCopy(buffer_.start(), old_buffer.start(), old_buffer.length());
   if (old_buffer_was_our_own) {
     old_buffer.Dispose();
   }

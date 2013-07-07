@@ -1,4 +1,4 @@
-// Copyright 2011 the V8 project authors. All rights reserved.
+// Copyright 2012 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -94,6 +94,12 @@ void OS::Guard(void* address, const size_t size) {
 
 
 void* OS::GetRandomMmapAddr() {
+#if defined(__native_client__)
+  // TODO(bradchen): restore randomization once Native Client gets
+  // smarter about using mmap address hints.
+  // See http://code.google.com/p/nativeclient/issues/3341
+  return NULL;
+#endif
   Isolate* isolate = Isolate::UncheckedCurrent();
   // Note that the current isolate isn't set up in a call path via
   // CpuFeatures::Probe. We don't care about randomization in this case because
@@ -142,23 +148,27 @@ UNARY_MATH_FUNCTION(sin, CreateTranscendentalFunction(TranscendentalCache::SIN))
 UNARY_MATH_FUNCTION(cos, CreateTranscendentalFunction(TranscendentalCache::COS))
 UNARY_MATH_FUNCTION(tan, CreateTranscendentalFunction(TranscendentalCache::TAN))
 UNARY_MATH_FUNCTION(log, CreateTranscendentalFunction(TranscendentalCache::LOG))
+UNARY_MATH_FUNCTION(exp, CreateExpFunction())
 UNARY_MATH_FUNCTION(sqrt, CreateSqrtFunction())
 
 #undef MATH_FUNCTION
 
 
-void MathSetup() {
-  init_fast_sin_function();
-  init_fast_cos_function();
-  init_fast_tan_function();
-  init_fast_log_function();
-  init_fast_sqrt_function();
+void lazily_initialize_fast_exp() {
+  if (fast_exp_function == NULL) {
+    init_fast_exp_function();
+  }
 }
 
 
 double OS::nan_value() {
   // NAN from math.h is defined in C99 and not in POSIX.
   return NAN;
+}
+
+
+int OS::GetCurrentProcessId() {
+  return static_cast<int>(getpid());
 }
 
 
@@ -194,7 +204,7 @@ int64_t OS::Ticks() {
 
 
 double OS::DaylightSavingsOffset(double time) {
-  if (isnan(time)) return nan_value();
+  if (std::isnan(time)) return nan_value();
   time_t tv = static_cast<time_t>(floor(time/msPerSecond));
   struct tm* t = localtime(&tv);
   if (NULL == t) return nan_value();
@@ -312,29 +322,41 @@ int OS::VSNPrintF(Vector<char> str,
 
 
 #if defined(V8_TARGET_ARCH_IA32)
-static OS::MemCopyFunction memcopy_function = NULL;
-static LazyMutex memcopy_function_mutex = LAZY_MUTEX_INITIALIZER;
-// Defined in codegen-ia32.cc.
-OS::MemCopyFunction CreateMemCopyFunction();
+static void MemMoveWrapper(void* dest, const void* src, size_t size) {
+  memmove(dest, src, size);
+}
 
-// Copy memory area to disjoint memory area.
-void OS::MemCopy(void* dest, const void* src, size_t size) {
-  if (memcopy_function == NULL) {
-    ScopedLock lock(memcopy_function_mutex.Pointer());
-    if (memcopy_function == NULL) {
-      OS::MemCopyFunction temp = CreateMemCopyFunction();
-      MemoryBarrier();
-      memcopy_function = temp;
-    }
-  }
+// Initialize to library version so we can call this at any time during startup.
+static OS::MemMoveFunction memmove_function = &MemMoveWrapper;
+
+// Defined in codegen-ia32.cc.
+OS::MemMoveFunction CreateMemMoveFunction();
+
+// Copy memory area. No restrictions.
+void OS::MemMove(void* dest, const void* src, size_t size) {
+  if (size == 0) return;
   // Note: here we rely on dependent reads being ordered. This is true
   // on all architectures we currently support.
-  (*memcopy_function)(dest, src, size);
-#ifdef DEBUG
-  CHECK_EQ(0, memcmp(dest, src, size));
-#endif
+  (*memmove_function)(dest, src, size);
 }
+
 #endif  // V8_TARGET_ARCH_IA32
+
+
+void POSIXPostSetUp() {
+#if defined(V8_TARGET_ARCH_IA32)
+  OS::MemMoveFunction generated_memmove = CreateMemMoveFunction();
+  if (generated_memmove != NULL) {
+    memmove_function = generated_memmove;
+  }
+#endif
+  init_fast_sin_function();
+  init_fast_cos_function();
+  init_fast_tan_function();
+  init_fast_log_function();
+  // fast_exp is initialized lazily.
+  init_fast_sqrt_function();
+}
 
 // ----------------------------------------------------------------------------
 // POSIX string support.
@@ -427,7 +449,11 @@ Socket* POSIXSocket::Accept() const {
     return NULL;
   }
 
-  int socket = accept(socket_, NULL, NULL);
+  int socket;
+  do {
+    socket = accept(socket_, NULL, NULL);
+  } while (socket == -1 && errno == EINTR);
+
   if (socket == -1) {
     return NULL;
   } else {
@@ -454,7 +480,9 @@ bool POSIXSocket::Connect(const char* host, const char* port) {
   }
 
   // Connect.
-  status = connect(socket_, result->ai_addr, result->ai_addrlen);
+  do {
+    status = connect(socket_, result->ai_addr, result->ai_addrlen);
+  } while (status == -1 && errno == EINTR);
   freeaddrinfo(result);
   return status == 0;
 }
@@ -473,14 +501,29 @@ bool POSIXSocket::Shutdown() {
 
 
 int POSIXSocket::Send(const char* data, int len) const {
-  int status = send(socket_, data, len, 0);
-  return status;
+  if (len <= 0) return 0;
+  int written = 0;
+  while (written < len) {
+    int status = send(socket_, data + written, len - written, 0);
+    if (status == 0) {
+      break;
+    } else if (status > 0) {
+      written += status;
+    } else if (errno != EINTR) {
+      return 0;
+    }
+  }
+  return written;
 }
 
 
 int POSIXSocket::Receive(char* data, int len) const {
-  int status = recv(socket_, data, len, 0);
-  return status;
+  if (len <= 0) return 0;
+  int status;
+  do {
+    status = recv(socket_, data, len, 0);
+  } while (status == -1 && errno == EINTR);
+  return (status < 0) ? 0 : status;
 }
 
 

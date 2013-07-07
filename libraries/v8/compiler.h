@@ -35,20 +35,36 @@
 namespace v8 {
 namespace internal {
 
+static const int kPrologueOffsetNotSet = -1;
+
 class ScriptDataImpl;
+class HydrogenCodeStub;
+
+// ParseRestriction is used to restrict the set of valid statements in a
+// unit of compilation.  Restriction violations cause a syntax error.
+enum ParseRestriction {
+  NO_PARSE_RESTRICTION,         // All expressions are allowed.
+  ONLY_SINGLE_FUNCTION_LITERAL  // Only a single FunctionLiteral expression.
+};
+
+struct OffsetRange {
+  OffsetRange(int from, int to) : from(from), to(to) {}
+  int from;
+  int to;
+};
 
 // CompilationInfo encapsulates some information known at compile time.  It
 // is constructed based on the resources available at compile-time.
-class CompilationInfo BASE_EMBEDDED {
+class CompilationInfo {
  public:
-  explicit CompilationInfo(Handle<Script> script);
-  explicit CompilationInfo(Handle<SharedFunctionInfo> shared_info);
-  explicit CompilationInfo(Handle<JSFunction> closure);
+  CompilationInfo(Handle<JSFunction> closure, Zone* zone);
+  virtual ~CompilationInfo();
 
   Isolate* isolate() {
     ASSERT(Isolate::Current() == isolate_);
     return isolate_;
   }
+  Zone* zone() { return zone_; }
   bool is_lazy() const { return IsLazy::decode(flags_); }
   bool is_eval() const { return IsEval::decode(flags_); }
   bool is_global() const { return IsGlobal::decode(flags_); }
@@ -65,10 +81,15 @@ class CompilationInfo BASE_EMBEDDED {
   Handle<JSFunction> closure() const { return closure_; }
   Handle<SharedFunctionInfo> shared_info() const { return shared_info_; }
   Handle<Script> script() const { return script_; }
+  HydrogenCodeStub* code_stub() const {return code_stub_; }
   v8::Extension* extension() const { return extension_; }
   ScriptDataImpl* pre_parse_data() const { return pre_parse_data_; }
-  Handle<Context> calling_context() const { return calling_context_; }
-  int osr_ast_id() const { return osr_ast_id_; }
+  Handle<Context> context() const { return context_; }
+  BailoutId osr_ast_id() const { return osr_ast_id_; }
+  int opt_count() const { return opt_count_; }
+  int num_parameters() const;
+  int num_heap_slots() const;
+  Code::Flags flags() const;
 
   void MarkAsEval() {
     ASSERT(!is_lazy());
@@ -91,9 +112,55 @@ class CompilationInfo BASE_EMBEDDED {
   void MarkAsNative() {
     flags_ |= IsNative::encode(true);
   }
+
   bool is_native() const {
     return IsNative::decode(flags_);
   }
+
+  bool is_calling() const {
+    return is_deferred_calling() || is_non_deferred_calling();
+  }
+
+  void MarkAsDeferredCalling() {
+    flags_ |= IsDeferredCalling::encode(true);
+  }
+
+  bool is_deferred_calling() const {
+    return IsDeferredCalling::decode(flags_);
+  }
+
+  void MarkAsNonDeferredCalling() {
+    flags_ |= IsNonDeferredCalling::encode(true);
+  }
+
+  bool is_non_deferred_calling() const {
+    return IsNonDeferredCalling::decode(flags_);
+  }
+
+  void MarkAsSavesCallerDoubles() {
+    flags_ |= SavesCallerDoubles::encode(true);
+  }
+
+  bool saves_caller_doubles() const {
+    return SavesCallerDoubles::decode(flags_);
+  }
+
+  void MarkAsRequiresFrame() {
+    flags_ |= RequiresFrame::encode(true);
+  }
+
+  bool requires_frame() const {
+    return RequiresFrame::decode(flags_);
+  }
+
+  void SetParseRestriction(ParseRestriction restriction) {
+    flags_ = ParseRestricitonField::update(flags_, restriction);
+  }
+
+  ParseRestriction parse_restriction() const {
+    return ParseRestricitonField::decode(flags_);
+  }
+
   void SetFunction(FunctionLiteral* literal) {
     ASSERT(function_ == NULL);
     function_ = literal;
@@ -115,13 +182,8 @@ class CompilationInfo BASE_EMBEDDED {
     ASSERT(!is_lazy());
     pre_parse_data_ = pre_parse_data;
   }
-  void SetCallingContext(Handle<Context> context) {
-    ASSERT(is_eval());
-    calling_context_ = context;
-  }
-  void SetOsrAstId(int osr_ast_id) {
-    ASSERT(IsOptimizing());
-    osr_ast_id_ = osr_ast_id;
+  void SetContext(Handle<Context> context) {
+    context_ = context;
   }
   void MarkCompilingForDebugging(Handle<Code> current_code) {
     ASSERT(mode_ != OPTIMIZE);
@@ -138,17 +200,19 @@ class CompilationInfo BASE_EMBEDDED {
   }
 
   bool has_global_object() const {
-    return !closure().is_null() && (closure()->context()->global() != NULL);
+    return !closure().is_null() &&
+        (closure()->context()->global_object() != NULL);
   }
 
   GlobalObject* global_object() const {
-    return has_global_object() ? closure()->context()->global() : NULL;
+    return has_global_object() ? closure()->context()->global_object() : NULL;
   }
 
   // Accessors for the different compilation modes.
   bool IsOptimizing() const { return mode_ == OPTIMIZE; }
   bool IsOptimizable() const { return mode_ == BASE; }
-  void SetOptimizing(int osr_ast_id) {
+  bool IsStub() const { return mode_ == STUB; }
+  void SetOptimizing(BailoutId osr_ast_id) {
     SetMode(OPTIMIZE);
     osr_ast_id_ = osr_ast_id;
   }
@@ -170,6 +234,76 @@ class CompilationInfo BASE_EMBEDDED {
   // current compilation pipeline.
   void AbortOptimization();
 
+  void set_deferred_handles(DeferredHandles* deferred_handles) {
+    ASSERT(deferred_handles_ == NULL);
+    deferred_handles_ = deferred_handles;
+  }
+
+  ZoneList<Handle<Map> >* dependent_maps(DependentCode::DependencyGroup group) {
+    if (dependent_maps_[group] == NULL) {
+      dependent_maps_[group] = new(zone_) ZoneList<Handle<Map> >(2, zone_);
+    }
+    return dependent_maps_[group];
+  }
+
+  void CommitDependentMaps(Handle<Code> code);
+
+  void RollbackDependentMaps();
+
+  void SaveHandles() {
+    SaveHandle(&closure_);
+    SaveHandle(&shared_info_);
+    SaveHandle(&context_);
+    SaveHandle(&script_);
+  }
+
+  const char* bailout_reason() const { return bailout_reason_; }
+  void set_bailout_reason(const char* reason) { bailout_reason_ = reason; }
+
+  int prologue_offset() const {
+    ASSERT_NE(kPrologueOffsetNotSet, prologue_offset_);
+    return prologue_offset_;
+  }
+
+  void set_prologue_offset(int prologue_offset) {
+    ASSERT_EQ(kPrologueOffsetNotSet, prologue_offset_);
+    prologue_offset_ = prologue_offset;
+  }
+
+  // Adds offset range [from, to) where fp register does not point
+  // to the current frame base. Used in CPU profiler to detect stack
+  // samples where top frame is not set up.
+  inline void AddNoFrameRange(int from, int to) {
+    if (no_frame_ranges_) no_frame_ranges_->Add(OffsetRange(from, to));
+  }
+
+  List<OffsetRange>* ReleaseNoFrameRanges() {
+    List<OffsetRange>* result = no_frame_ranges_;
+    no_frame_ranges_ = NULL;
+    return result;
+  }
+
+  Handle<Foreign> object_wrapper() {
+    if (object_wrapper_.is_null()) {
+      object_wrapper_ =
+          isolate()->factory()->NewForeign(reinterpret_cast<Address>(this));
+    }
+    return object_wrapper_;
+  }
+
+  void AbortDueToDependentMap() {
+    mode_ = DEPENDENT_MAP_ABORT;
+  }
+
+  bool HasAbortedDueToDependentMap() {
+    return mode_ == DEPENDENT_MAP_ABORT;
+  }
+
+ protected:
+  CompilationInfo(Handle<Script> script, Zone* zone);
+  CompilationInfo(Handle<SharedFunctionInfo> shared_info, Zone* zone);
+  CompilationInfo(HydrogenCodeStub* stub, Isolate* isolate, Zone* zone);
+
  private:
   Isolate* isolate_;
 
@@ -181,22 +315,12 @@ class CompilationInfo BASE_EMBEDDED {
   enum Mode {
     BASE,
     OPTIMIZE,
-    NONOPT
+    NONOPT,
+    STUB,
+    DEPENDENT_MAP_ABORT
   };
 
-  CompilationInfo() : function_(NULL) {}
-
-  void Initialize(Mode mode) {
-    mode_ = V8::UseCrankshaft() ? mode : NONOPT;
-    ASSERT(!script_.is_null());
-    if (script_->type()->value() == Script::TYPE_NATIVE) {
-      MarkAsNative();
-    }
-    if (!shared_info_.is_null()) {
-      ASSERT(language_mode() == CLASSIC_MODE);
-      SetLanguageMode(shared_info_->language_mode());
-    }
-  }
+  void Initialize(Isolate* isolate, Mode mode, Zone* zone);
 
   void SetMode(Mode mode) {
     ASSERT(V8::UseCrankshaft());
@@ -222,7 +346,18 @@ class CompilationInfo BASE_EMBEDDED {
   // If compiling for debugging produce just full code matching the
   // initial mode setting.
   class IsCompilingForDebugging: public BitField<bool, 8, 1> {};
-
+  // If the compiled code contains calls that require building a frame
+  class IsCalling: public BitField<bool, 9, 1> {};
+  // If the compiled code contains calls that require building a frame
+  class IsDeferredCalling: public BitField<bool, 10, 1> {};
+  // If the compiled code contains calls that require building a frame
+  class IsNonDeferredCalling: public BitField<bool, 11, 1> {};
+  // If the compiled code saves double caller registers that it clobbers.
+  class SavesCallerDoubles: public BitField<bool, 12, 1> {};
+  // If the set of valid statements is restricted.
+  class ParseRestricitonField: public BitField<ParseRestriction, 13, 1> {};
+  // If the function requires a frame (for unspecified reasons)
+  class RequiresFrame: public BitField<bool, 14, 1> {};
 
   unsigned flags_;
 
@@ -234,6 +369,8 @@ class CompilationInfo BASE_EMBEDDED {
   Scope* scope_;
   // The global scope provided as a convenience.
   Scope* global_scope_;
+  // For compiled stubs, the stub object
+  HydrogenCodeStub* code_stub_;
   // The compiled code.
   Handle<Code> code_;
 
@@ -246,15 +383,167 @@ class CompilationInfo BASE_EMBEDDED {
   v8::Extension* extension_;
   ScriptDataImpl* pre_parse_data_;
 
-  // The context of the caller is needed for eval code, and will be a null
-  // handle otherwise.
-  Handle<Context> calling_context_;
+  // The context of the caller for eval code, and the global context for a
+  // global script. Will be a null handle otherwise.
+  Handle<Context> context_;
 
   // Compilation mode flag and whether deoptimization is allowed.
   Mode mode_;
-  int osr_ast_id_;
+  BailoutId osr_ast_id_;
+
+  // The zone from which the compilation pipeline working on this
+  // CompilationInfo allocates.
+  Zone* zone_;
+
+  DeferredHandles* deferred_handles_;
+
+  ZoneList<Handle<Map> >* dependent_maps_[DependentCode::kGroupCount];
+
+  template<typename T>
+  void SaveHandle(Handle<T> *object) {
+    if (!object->is_null()) {
+      Handle<T> handle(*(*object));
+      *object = handle;
+    }
+  }
+
+  const char* bailout_reason_;
+
+  int prologue_offset_;
+
+  List<OffsetRange>* no_frame_ranges_;
+
+  // A copy of shared_info()->opt_count() to avoid handle deref
+  // during graph optimization.
+  int opt_count_;
+
+  Handle<Foreign> object_wrapper_;
 
   DISALLOW_COPY_AND_ASSIGN(CompilationInfo);
+};
+
+
+// Exactly like a CompilationInfo, except also creates and enters a
+// Zone on construction and deallocates it on exit.
+class CompilationInfoWithZone: public CompilationInfo {
+ public:
+  explicit CompilationInfoWithZone(Handle<Script> script)
+      : CompilationInfo(script, &zone_),
+        zone_(script->GetIsolate()),
+        zone_scope_(&zone_, DELETE_ON_EXIT) {}
+  explicit CompilationInfoWithZone(Handle<SharedFunctionInfo> shared_info)
+      : CompilationInfo(shared_info, &zone_),
+        zone_(shared_info->GetIsolate()),
+        zone_scope_(&zone_, DELETE_ON_EXIT) {}
+  explicit CompilationInfoWithZone(Handle<JSFunction> closure)
+      : CompilationInfo(closure, &zone_),
+        zone_(closure->GetIsolate()),
+        zone_scope_(&zone_, DELETE_ON_EXIT) {}
+  CompilationInfoWithZone(HydrogenCodeStub* stub, Isolate* isolate)
+      : CompilationInfo(stub, isolate, &zone_),
+        zone_(isolate),
+        zone_scope_(&zone_, DELETE_ON_EXIT) {}
+
+  // Virtual destructor because a CompilationInfoWithZone has to exit the
+  // zone scope and get rid of dependent maps even when the destructor is
+  // called when cast as a CompilationInfo.
+  virtual ~CompilationInfoWithZone() {
+    RollbackDependentMaps();
+  }
+
+ private:
+  Zone zone_;
+  ZoneScope zone_scope_;
+};
+
+
+// A wrapper around a CompilationInfo that detaches the Handles from
+// the underlying DeferredHandleScope and stores them in info_ on
+// destruction.
+class CompilationHandleScope BASE_EMBEDDED {
+ public:
+  explicit CompilationHandleScope(CompilationInfo* info)
+      : deferred_(info->isolate()), info_(info) {}
+  ~CompilationHandleScope() {
+    info_->set_deferred_handles(deferred_.Detach());
+  }
+
+ private:
+  DeferredHandleScope deferred_;
+  CompilationInfo* info_;
+};
+
+
+class HGraph;
+class HOptimizedGraphBuilder;
+class LChunk;
+
+// A helper class that calls the three compilation phases in
+// Crankshaft and keeps track of its state.  The three phases
+// CreateGraph, OptimizeGraph and GenerateAndInstallCode can either
+// fail, bail-out to the full code generator or succeed.  Apart from
+// their return value, the status of the phase last run can be checked
+// using last_status().
+class OptimizingCompiler: public ZoneObject {
+ public:
+  explicit OptimizingCompiler(CompilationInfo* info)
+      : info_(info),
+        graph_builder_(NULL),
+        graph_(NULL),
+        chunk_(NULL),
+        time_taken_to_create_graph_(0),
+        time_taken_to_optimize_(0),
+        time_taken_to_codegen_(0),
+        last_status_(FAILED) { }
+
+  enum Status {
+    FAILED, BAILED_OUT, SUCCEEDED
+  };
+
+  MUST_USE_RESULT Status CreateGraph();
+  MUST_USE_RESULT Status OptimizeGraph();
+  MUST_USE_RESULT Status GenerateAndInstallCode();
+
+  Status last_status() const { return last_status_; }
+  CompilationInfo* info() const { return info_; }
+  Isolate* isolate() const { return info()->isolate(); }
+
+  MUST_USE_RESULT Status AbortOptimization() {
+    info_->AbortOptimization();
+    info_->shared_info()->DisableOptimization(info_->bailout_reason());
+    return SetLastStatus(BAILED_OUT);
+  }
+
+ private:
+  CompilationInfo* info_;
+  HOptimizedGraphBuilder* graph_builder_;
+  HGraph* graph_;
+  LChunk* chunk_;
+  int64_t time_taken_to_create_graph_;
+  int64_t time_taken_to_optimize_;
+  int64_t time_taken_to_codegen_;
+  Status last_status_;
+
+  MUST_USE_RESULT Status SetLastStatus(Status status) {
+    last_status_ = status;
+    return last_status_;
+  }
+  void RecordOptimizationStats();
+
+  struct Timer {
+    Timer(OptimizingCompiler* compiler, int64_t* location)
+        : compiler_(compiler),
+          start_(OS::Ticks()),
+          location_(location) { }
+
+    ~Timer() {
+      *location_ += (OS::Ticks() - start_);
+    }
+
+    OptimizingCompiler* compiler_;
+    int64_t start_;
+    int64_t* location_;
+  };
 };
 
 
@@ -271,10 +560,6 @@ class CompilationInfo BASE_EMBEDDED {
 
 class Compiler : public AllStatic {
  public:
-  // Default maximum number of function optimization attempts before we
-  // give up.
-  static const int kDefaultMaxOptCount = 10;
-
   static const int kMaxInliningLevels = 3;
 
   // Call count before primitive functions trigger their own optimization.
@@ -289,6 +574,7 @@ class Compiler : public AllStatic {
                                             Handle<Object> script_name,
                                             int line_offset,
                                             int column_offset,
+                                            Handle<Context> context,
                                             v8::Extension* extension,
                                             ScriptDataImpl* pre_data,
                                             Handle<Object> script_data,
@@ -299,11 +585,14 @@ class Compiler : public AllStatic {
                                                 Handle<Context> context,
                                                 bool is_global,
                                                 LanguageMode language_mode,
+                                                ParseRestriction restriction,
                                                 int scope_position);
 
   // Compile from function info (used for lazy compilation). Returns true on
   // success and false if the compilation resulted in a stack overflow.
   static bool CompileLazy(CompilationInfo* info);
+
+  static void RecompileParallel(Handle<JSFunction> function);
 
   // Compile a shared function info object (the function is possibly lazily
   // compiled).
@@ -315,6 +604,8 @@ class Compiler : public AllStatic {
                               FunctionLiteral* lit,
                               bool is_toplevel,
                               Handle<Script> script);
+
+  static void InstallOptimizedCode(OptimizingCompiler* info);
 
 #ifdef ENABLE_DEBUGGER_SUPPORT
   static bool MakeCodeForLiveEdit(CompilationInfo* info);

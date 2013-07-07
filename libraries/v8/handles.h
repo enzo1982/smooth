@@ -58,29 +58,23 @@ class Handle {
     a = b;  // Fake assignment to enforce type checks.
     USE(a);
 #endif
-    location_ = reinterpret_cast<T**>(handle.location());
+    location_ = reinterpret_cast<T**>(handle.location_);
   }
 
-  INLINE(T* operator ->() const) { return operator*(); }
+  INLINE(T* operator->() const) { return operator*(); }
 
   // Check if this handle refers to the exact same object as the other handle.
-  bool is_identical_to(const Handle<T> other) const {
-    return operator*() == *other;
-  }
+  INLINE(bool is_identical_to(const Handle<T> other) const);
 
   // Provides the C++ dereference operator.
   INLINE(T* operator*() const);
 
   // Returns the address to where the raw pointer is stored.
-  T** location() const {
-    ASSERT(location_ == NULL ||
-           reinterpret_cast<Address>(*location_) != kZapValue);
-    return location_;
-  }
+  INLINE(T** location() const);
 
   template <class S> static Handle<T> cast(Handle<S> that) {
-    T::cast(*that);
-    return Handle<T>(reinterpret_cast<T**>(that.location()));
+    T::cast(*reinterpret_cast<T**>(that.location_));
+    return Handle<T>(reinterpret_cast<T**>(that.location_));
   }
 
   static Handle<T> null() { return Handle<T>(); }
@@ -90,9 +84,29 @@ class Handle {
   // implementation in api.h.
   inline Handle<T> EscapeFrom(v8::HandleScope* scope);
 
+#ifdef DEBUG
+  enum DereferenceCheckMode { INCLUDE_DEFERRED_CHECK, NO_DEFERRED_CHECK };
+
+  bool IsDereferenceAllowed(DereferenceCheckMode mode) const;
+#endif  // DEBUG
+
  private:
   T** location_;
+
+  // Handles of different classes are allowed to access each other's location_.
+  template<class S> friend class Handle;
 };
+
+
+// Convenience wrapper.
+template<class T>
+inline Handle<T> handle(T* t, Isolate* isolate) {
+  return Handle<T>(t, isolate);
+}
+
+
+class DeferredHandles;
+class HandleScopeImplementer;
 
 
 // A stack-allocated class that governs a number of local handles.
@@ -109,24 +123,23 @@ class Handle {
 // for which the handle scope has been deleted is undefined.
 class HandleScope {
  public:
-  inline HandleScope();
   explicit inline HandleScope(Isolate* isolate);
 
   inline ~HandleScope();
 
   // Counts the number of allocated handles.
-  static int NumberOfHandles();
+  static int NumberOfHandles(Isolate* isolate);
 
   // Creates a new handle with the given value.
   template <typename T>
-  static inline T** CreateHandle(T* value, Isolate* isolate);
+  static inline T** CreateHandle(Isolate* isolate, T* value);
 
   // Deallocates any extensions used by the current scope.
   static void DeleteExtensions(Isolate* isolate);
 
-  static Address current_next_address();
-  static Address current_limit_address();
-  static Address current_level_address();
+  static Address current_next_address(Isolate* isolate);
+  static Address current_limit_address(Isolate* isolate);
+  static Address current_level_address(Isolate* isolate);
 
   // Closes the HandleScope (invalidating all handles
   // created in the scope of the HandleScope) and returns
@@ -144,20 +157,53 @@ class HandleScope {
   void* operator new(size_t size);
   void operator delete(void* size_t);
 
-  inline void CloseScope();
-
   Isolate* isolate_;
   Object** prev_next_;
   Object** prev_limit_;
 
-  // Extend the handle scope making room for more handles.
-  static internal::Object** Extend();
+  // Close the handle scope resetting limits to a previous state.
+  static inline void CloseScope(Isolate* isolate,
+                                Object** prev_next,
+                                Object** prev_limit);
 
+  // Extend the handle scope making room for more handles.
+  static internal::Object** Extend(Isolate* isolate);
+
+#ifdef ENABLE_EXTRA_CHECKS
   // Zaps the handles in the half-open interval [start, end).
-  static void ZapRange(internal::Object** start, internal::Object** end);
+  static void ZapRange(Object** start, Object** end);
+#endif
 
   friend class v8::HandleScope;
-  friend class v8::ImplementationUtilities;
+  friend class v8::internal::DeferredHandles;
+  friend class v8::internal::HandleScopeImplementer;
+  friend class v8::internal::Isolate;
+};
+
+
+class DeferredHandles;
+
+
+class DeferredHandleScope {
+ public:
+  explicit DeferredHandleScope(Isolate* isolate);
+  // The DeferredHandles object returned stores the Handles created
+  // since the creation of this DeferredHandleScope.  The Handles are
+  // alive as long as the DeferredHandles object is alive.
+  DeferredHandles* Detach();
+  ~DeferredHandleScope();
+
+ private:
+  Object** prev_limit_;
+  Object** prev_next_;
+  HandleScopeImplementer* impl_;
+
+#ifdef DEBUG
+  bool handles_detached_;
+  int prev_level_;
+#endif
+
+  friend class HandleScopeImplementer;
 };
 
 
@@ -174,9 +220,8 @@ void FlattenString(Handle<String> str);
 // string.
 Handle<String> FlattenGetString(Handle<String> str);
 
-int Utf8Length(Handle<String> str);
-
-Handle<Object> SetProperty(Handle<Object> object,
+Handle<Object> SetProperty(Isolate* isolate,
+                           Handle<Object> object,
                            Handle<Object> key,
                            Handle<Object> value,
                            PropertyAttributes attributes,
@@ -187,25 +232,26 @@ Handle<Object> ForceSetProperty(Handle<JSObject> object,
                                 Handle<Object> value,
                                 PropertyAttributes attributes);
 
-Handle<Object> ForceDeleteProperty(Handle<JSObject> object,
-                                   Handle<Object> key);
+Handle<Object> DeleteProperty(Handle<JSObject> object, Handle<Object> key);
 
-Handle<Object> GetProperty(Handle<JSReceiver> obj,
-                           const char* name);
+Handle<Object> ForceDeleteProperty(Handle<JSObject> object, Handle<Object> key);
 
-Handle<Object> GetProperty(Handle<Object> obj,
+Handle<Object> HasProperty(Handle<JSReceiver> obj, Handle<Object> key);
+
+Handle<Object> GetProperty(Handle<JSReceiver> obj, const char* name);
+
+Handle<Object> GetProperty(Isolate* isolate,
+                           Handle<Object> obj,
                            Handle<Object> key);
-
-Handle<Object> GetPropertyWithInterceptor(Handle<JSObject> receiver,
-                                          Handle<JSObject> holder,
-                                          Handle<String> name,
-                                          PropertyAttributes* attributes);
 
 Handle<Object> SetPrototype(Handle<JSObject> obj, Handle<Object> value);
 
-Handle<Object> LookupSingleCharacterStringFromCode(uint32_t index);
+Handle<Object> LookupSingleCharacterStringFromCode(Isolate* isolate,
+                                                   uint32_t index);
 
 Handle<JSObject> Copy(Handle<JSObject> obj);
+
+Handle<JSObject> DeepCopy(Handle<JSObject> obj);
 
 Handle<Object> SetAccessor(Handle<JSObject> obj, Handle<AccessorInfo> info);
 
@@ -216,7 +262,7 @@ Handle<FixedArray> AddKeysFromJSArray(Handle<FixedArray>,
 // if none exists.
 Handle<JSValue> GetScriptWrapper(Handle<Script> script);
 
-// Script line number computations.
+// Script line number computations. Note that the line number is zero-based.
 void InitScriptLineEnds(Handle<Script> script);
 // For string calculates an array of line end positions. If the string
 // does not end with a new line character, this character may optionally be
@@ -227,6 +273,7 @@ int GetScriptLineNumber(Handle<Script> script, int code_position);
 // The safe version does not make heap allocations but may work much slower.
 int GetScriptLineNumberSafe(Handle<Script> script, int code_position);
 int GetScriptColumnNumber(Handle<Script> script, int code_position);
+Handle<Object> GetScriptNameOrSourceURL(Handle<Script> script);
 
 // Computes the enumerable keys from interceptors. Used for debug mirrors and
 // by GetKeysInFixedArrayFor below.
@@ -243,6 +290,7 @@ Handle<FixedArray> GetKeysInFixedArrayFor(Handle<JSReceiver> object,
                                           KeyCollectionType type,
                                           bool* threw);
 Handle<JSArray> GetKeysFor(Handle<JSReceiver> object, bool* threw);
+Handle<FixedArray> ReduceFixedArrayTo(Handle<FixedArray> array, int length);
 Handle<FixedArray> GetEnumPropertyKeys(Handle<JSObject> object,
                                        bool cache_result);
 
@@ -284,15 +332,20 @@ Handle<ObjectHashTable> PutIntoObjectHashTable(Handle<ObjectHashTable> table,
                                                Handle<Object> key,
                                                Handle<Object> value);
 
-class NoHandleAllocation BASE_EMBEDDED {
+
+// Seal off the current HandleScope so that new handles can only be created
+// if a new HandleScope is entered.
+class SealHandleScope BASE_EMBEDDED {
  public:
 #ifndef DEBUG
-  NoHandleAllocation() {}
-  ~NoHandleAllocation() {}
+  explicit SealHandleScope(Isolate* isolate) {}
+  ~SealHandleScope() {}
 #else
-  inline NoHandleAllocation();
-  inline ~NoHandleAllocation();
+  explicit inline SealHandleScope(Isolate* isolate);
+  inline ~SealHandleScope();
  private:
+  Isolate* isolate_;
+  Object** limit_;
   int level_;
 #endif
 };

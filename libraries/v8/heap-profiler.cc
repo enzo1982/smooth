@@ -28,14 +28,13 @@
 #include "v8.h"
 
 #include "heap-profiler.h"
-#include "profile-generator.h"
+#include "heap-snapshot-generator-inl.h"
 
 namespace v8 {
 namespace internal {
 
-
-HeapProfiler::HeapProfiler()
-    : snapshots_(new HeapSnapshotsCollection()),
+HeapProfiler::HeapProfiler(Heap* heap)
+    : snapshots_(new HeapSnapshotsCollection(heap)),
       next_snapshot_uid_(1) {
 }
 
@@ -45,44 +44,10 @@ HeapProfiler::~HeapProfiler() {
 }
 
 
-void HeapProfiler::ResetSnapshots() {
+void HeapProfiler::DeleteAllSnapshots() {
+  Heap* the_heap = heap();
   delete snapshots_;
-  snapshots_ = new HeapSnapshotsCollection();
-}
-
-
-void HeapProfiler::SetUp() {
-  Isolate* isolate = Isolate::Current();
-  if (isolate->heap_profiler() == NULL) {
-    isolate->set_heap_profiler(new HeapProfiler());
-  }
-}
-
-
-void HeapProfiler::TearDown() {
-  Isolate* isolate = Isolate::Current();
-  delete isolate->heap_profiler();
-  isolate->set_heap_profiler(NULL);
-}
-
-
-HeapSnapshot* HeapProfiler::TakeSnapshot(const char* name,
-                                         int type,
-                                         v8::ActivityControl* control) {
-  ASSERT(Isolate::Current()->heap_profiler() != NULL);
-  return Isolate::Current()->heap_profiler()->TakeSnapshotImpl(name,
-                                                               type,
-                                                               control);
-}
-
-
-HeapSnapshot* HeapProfiler::TakeSnapshot(String* name,
-                                         int type,
-                                         v8::ActivityControl* control) {
-  ASSERT(Isolate::Current()->heap_profiler() != NULL);
-  return Isolate::Current()->heap_profiler()->TakeSnapshotImpl(name,
-                                                               type,
-                                                               control);
+  snapshots_ = new HeapSnapshotsCollection(the_heap);
 }
 
 
@@ -105,63 +70,69 @@ v8::RetainedObjectInfo* HeapProfiler::ExecuteWrapperClassCallback(
 }
 
 
-HeapSnapshot* HeapProfiler::TakeSnapshotImpl(const char* name,
-                                             int type,
-                                             v8::ActivityControl* control) {
-  HeapSnapshot::Type s_type = static_cast<HeapSnapshot::Type>(type);
-  HeapSnapshot* result =
-      snapshots_->NewSnapshot(s_type, name, next_snapshot_uid_++);
-  bool generation_completed = true;
-  switch (s_type) {
-    case HeapSnapshot::kFull: {
-      HeapSnapshotGenerator generator(result, control);
-      generation_completed = generator.GenerateSnapshot();
-      break;
+HeapSnapshot* HeapProfiler::TakeSnapshot(
+    const char* name,
+    v8::ActivityControl* control,
+    v8::HeapProfiler::ObjectNameResolver* resolver) {
+  HeapSnapshot* result = snapshots_->NewSnapshot(name, next_snapshot_uid_++);
+  {
+    HeapSnapshotGenerator generator(result, control, resolver, heap());
+    if (!generator.GenerateSnapshot()) {
+      delete result;
+      result = NULL;
     }
-    default:
-      UNREACHABLE();
-  }
-  if (!generation_completed) {
-    delete result;
-    result = NULL;
   }
   snapshots_->SnapshotGenerationFinished(result);
   return result;
 }
 
 
-HeapSnapshot* HeapProfiler::TakeSnapshotImpl(String* name,
-                                             int type,
-                                             v8::ActivityControl* control) {
-  return TakeSnapshotImpl(snapshots_->names()->GetName(name), type, control);
+HeapSnapshot* HeapProfiler::TakeSnapshot(
+    String* name,
+    v8::ActivityControl* control,
+    v8::HeapProfiler::ObjectNameResolver* resolver) {
+  return TakeSnapshot(snapshots_->names()->GetName(name), control, resolver);
+}
+
+void HeapProfiler::StartHeapObjectsTracking() {
+  snapshots_->StartHeapObjectsTracking();
+}
+
+
+SnapshotObjectId HeapProfiler::PushHeapObjectsStats(OutputStream* stream) {
+  return snapshots_->PushHeapObjectsStats(stream);
+}
+
+
+void HeapProfiler::StopHeapObjectsTracking() {
+  snapshots_->StopHeapObjectsTracking();
+}
+
+
+size_t HeapProfiler::GetMemorySizeUsedByProfiler() {
+  return snapshots_->GetUsedMemorySize();
 }
 
 
 int HeapProfiler::GetSnapshotsCount() {
-  HeapProfiler* profiler = Isolate::Current()->heap_profiler();
-  ASSERT(profiler != NULL);
-  return profiler->snapshots_->snapshots()->length();
+  return snapshots_->snapshots()->length();
 }
 
 
 HeapSnapshot* HeapProfiler::GetSnapshot(int index) {
-  HeapProfiler* profiler = Isolate::Current()->heap_profiler();
-  ASSERT(profiler != NULL);
-  return profiler->snapshots_->snapshots()->at(index);
+  return snapshots_->snapshots()->at(index);
 }
 
 
 HeapSnapshot* HeapProfiler::FindSnapshot(unsigned uid) {
-  HeapProfiler* profiler = Isolate::Current()->heap_profiler();
-  ASSERT(profiler != NULL);
-  return profiler->snapshots_->GetSnapshot(uid);
+  return snapshots_->GetSnapshot(uid);
 }
 
 
-void HeapProfiler::DeleteAllSnapshots() {
-  HeapProfiler* profiler = Isolate::Current()->heap_profiler();
-  ASSERT(profiler != NULL);
-  profiler->ResetSnapshots();
+SnapshotObjectId HeapProfiler::GetSnapshotObjectId(Handle<Object> obj) {
+  if (!obj->IsHeapObject())
+    return v8::HeapProfiler::kUnknownObjectId;
+  return snapshots_->FindObjectId(HeapObject::cast(*obj)->address());
 }
 
 
@@ -169,5 +140,10 @@ void HeapProfiler::ObjectMoveEvent(Address from, Address to) {
   snapshots_->ObjectMoveEvent(from, to);
 }
 
+void HeapProfiler::SetRetainedObjectInfo(UniqueId id,
+                                         RetainedObjectInfo* info) {
+  // TODO(yurus, marja): Don't route this information through GlobalHandles.
+  heap()->isolate()->global_handles()->SetRetainedObjectInfo(id, info);
+}
 
 } }  // namespace v8::internal

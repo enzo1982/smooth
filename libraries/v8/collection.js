@@ -1,4 +1,4 @@
-// Copyright 2011 the V8 project authors. All rights reserved.
+// Copyright 2012 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -27,16 +27,20 @@
 
 "use strict";
 
+// This file relies on the fact that the following declaration has been made
+// in runtime.js:
+// var $Array = global.Array;
+
 var $Set = global.Set;
 var $Map = global.Map;
 var $WeakMap = global.WeakMap;
-
-//-------------------------------------------------------------------
 
 // Global sentinel to be used instead of undefined keys, which are not
 // supported internally but required for Harmony sets and maps.
 var undefined_sentinel = {};
 
+// -------------------------------------------------------------------
+// Harmony Set
 
 function SetConstructor() {
   if (%_IsConstructCall()) {
@@ -79,9 +83,58 @@ function SetDelete(key) {
   if (IS_UNDEFINED(key)) {
     key = undefined_sentinel;
   }
-  return %SetDelete(this, key);
+  if (%SetHas(this, key)) {
+    %SetDelete(this, key);
+    return true;
+  } else {
+    return false;
+  }
 }
 
+
+function SetGetSize() {
+  if (!IS_SET(this)) {
+    throw MakeTypeError('incompatible_method_receiver',
+                        ['Set.prototype.size', this]);
+  }
+  return %SetGetSize(this);
+}
+
+
+function SetClear() {
+  if (!IS_SET(this)) {
+    throw MakeTypeError('incompatible_method_receiver',
+                        ['Set.prototype.clear', this]);
+  }
+  // Replace the internal table with a new empty table.
+  %SetInitialize(this);
+}
+
+
+// -------------------------------------------------------------------
+
+function SetUpSet() {
+  %CheckIsBootstrapping();
+
+  %SetCode($Set, SetConstructor);
+  %FunctionSetPrototype($Set, new $Object());
+  %SetProperty($Set.prototype, "constructor", $Set, DONT_ENUM);
+
+  // Set up the non-enumerable functions on the Set prototype object.
+  InstallGetter($Set.prototype, "size", SetGetSize);
+  InstallFunctions($Set.prototype, DONT_ENUM, $Array(
+    "add", SetAdd,
+    "has", SetHas,
+    "delete", SetDelete,
+    "clear", SetClear
+  ));
+}
+
+SetUpSet();
+
+
+// -------------------------------------------------------------------
+// Harmony Map
 
 function MapConstructor() {
   if (%_IsConstructCall()) {
@@ -124,7 +177,7 @@ function MapHas(key) {
   if (IS_UNDEFINED(key)) {
     key = undefined_sentinel;
   }
-  return !IS_UNDEFINED(%MapGet(this, key));
+  return %MapHas(this, key);
 }
 
 
@@ -136,14 +189,54 @@ function MapDelete(key) {
   if (IS_UNDEFINED(key)) {
     key = undefined_sentinel;
   }
-  if (!IS_UNDEFINED(%MapGet(this, key))) {
-    %MapSet(this, key, void 0);
-    return true;
-  } else {
-    return false;
-  }
+  return %MapDelete(this, key);
 }
 
+
+function MapGetSize() {
+  if (!IS_MAP(this)) {
+    throw MakeTypeError('incompatible_method_receiver',
+                        ['Map.prototype.size', this]);
+  }
+  return %MapGetSize(this);
+}
+
+
+function MapClear() {
+  if (!IS_MAP(this)) {
+    throw MakeTypeError('incompatible_method_receiver',
+                        ['Map.prototype.clear', this]);
+  }
+  // Replace the internal table with a new empty table.
+  %MapInitialize(this);
+}
+
+
+// -------------------------------------------------------------------
+
+function SetUpMap() {
+  %CheckIsBootstrapping();
+
+  %SetCode($Map, MapConstructor);
+  %FunctionSetPrototype($Map, new $Object());
+  %SetProperty($Map.prototype, "constructor", $Map, DONT_ENUM);
+
+  // Set up the non-enumerable functions on the Map prototype object.
+  InstallGetter($Map.prototype, "size", MapGetSize);
+  InstallFunctions($Map.prototype, DONT_ENUM, $Array(
+    "get", MapGet,
+    "set", MapSet,
+    "has", MapHas,
+    "delete", MapDelete,
+    "clear", MapClear
+  ));
+}
+
+SetUpMap();
+
+
+// -------------------------------------------------------------------
+// Harmony WeakMap
 
 function WeakMapConstructor() {
   if (%_IsConstructCall()) {
@@ -159,7 +252,7 @@ function WeakMapGet(key) {
     throw MakeTypeError('incompatible_method_receiver',
                         ['WeakMap.prototype.get', this]);
   }
-  if (!IS_SPEC_OBJECT(key)) {
+  if (!(IS_SPEC_OBJECT(key) || IS_SYMBOL(key))) {
     throw %MakeTypeError('invalid_weakmap_key', [this, key]);
   }
   return %WeakMapGet(this, key);
@@ -171,7 +264,7 @@ function WeakMapSet(key, value) {
     throw MakeTypeError('incompatible_method_receiver',
                         ['WeakMap.prototype.set', this]);
   }
-  if (!IS_SPEC_OBJECT(key)) {
+  if (!(IS_SPEC_OBJECT(key) || IS_SYMBOL(key))) {
     throw %MakeTypeError('invalid_weakmap_key', [this, key]);
   }
   return %WeakMapSet(this, key, value);
@@ -183,10 +276,10 @@ function WeakMapHas(key) {
     throw MakeTypeError('incompatible_method_receiver',
                         ['WeakMap.prototype.has', this]);
   }
-  if (!IS_SPEC_OBJECT(key)) {
+  if (!(IS_SPEC_OBJECT(key) || IS_SYMBOL(key))) {
     throw %MakeTypeError('invalid_weakmap_key', [this, key]);
   }
-  return !IS_UNDEFINED(%WeakMapGet(this, key));
+  return %WeakMapHas(this, key);
 }
 
 
@@ -195,49 +288,20 @@ function WeakMapDelete(key) {
     throw MakeTypeError('incompatible_method_receiver',
                         ['WeakMap.prototype.delete', this]);
   }
-  if (!IS_SPEC_OBJECT(key)) {
+  if (!(IS_SPEC_OBJECT(key) || IS_SYMBOL(key))) {
     throw %MakeTypeError('invalid_weakmap_key', [this, key]);
   }
-  if (!IS_UNDEFINED(%WeakMapGet(this, key))) {
-    %WeakMapSet(this, key, void 0);
-    return true;
-  } else {
-    return false;
-  }
+  return %WeakMapDelete(this, key);
 }
+
 
 // -------------------------------------------------------------------
 
-(function () {
+function SetUpWeakMap() {
   %CheckIsBootstrapping();
 
-  // Set up the Set and Map constructor function.
-  %SetCode($Set, SetConstructor);
-  %SetCode($Map, MapConstructor);
-
-  // Set up the constructor property on the Set and Map prototype object.
-  %SetProperty($Set.prototype, "constructor", $Set, DONT_ENUM);
-  %SetProperty($Map.prototype, "constructor", $Map, DONT_ENUM);
-
-  // Set up the non-enumerable functions on the Set prototype object.
-  InstallFunctions($Set.prototype, DONT_ENUM, $Array(
-    "add", SetAdd,
-    "has", SetHas,
-    "delete", SetDelete
-  ));
-
-  // Set up the non-enumerable functions on the Map prototype object.
-  InstallFunctions($Map.prototype, DONT_ENUM, $Array(
-    "get", MapGet,
-    "set", MapSet,
-    "has", MapHas,
-    "delete", MapDelete
-  ));
-
-  // Set up the WeakMap constructor function.
   %SetCode($WeakMap, WeakMapConstructor);
-
-  // Set up the constructor property on the WeakMap prototype object.
+  %FunctionSetPrototype($WeakMap, new $Object());
   %SetProperty($WeakMap.prototype, "constructor", $WeakMap, DONT_ENUM);
 
   // Set up the non-enumerable functions on the WeakMap prototype object.
@@ -247,4 +311,6 @@ function WeakMapDelete(key) {
     "has", WeakMapHas,
     "delete", WeakMapDelete
   ));
-})();
+}
+
+SetUpWeakMap();

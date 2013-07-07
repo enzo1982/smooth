@@ -33,7 +33,7 @@
 namespace v8 {
 namespace internal {
 
-const char* StringsStorage::GetFunctionName(String* name) {
+const char* StringsStorage::GetFunctionName(Name* name) {
   return GetFunctionName(GetName(name));
 }
 
@@ -55,7 +55,8 @@ CodeEntry::CodeEntry(Logger::LogEventsAndTags tag,
       resource_name_(resource_name),
       line_number_(line_number),
       shared_id_(0),
-      security_token_id_(security_token_id) {
+      security_token_id_(security_token_id),
+      no_frame_ranges_(NULL) {
 }
 
 
@@ -74,7 +75,8 @@ ProfileNode::ProfileNode(ProfileTree* tree, CodeEntry* entry)
       entry_(entry),
       total_ticks_(0),
       self_ticks_(0),
-      children_(CodeEntriesMatch) {
+      children_(CodeEntriesMatch),
+      id_(tree->next_node_id()) {
 }
 
 
@@ -92,26 +94,6 @@ CodeEntry* ProfileGenerator::EntryForVMState(StateTag tag) {
       return program_entry_;
     default: return NULL;
   }
-}
-
-
-SnapshotObjectId HeapObjectsMap::GetNthGcSubrootId(int delta) {
-  return kGcRootsFirstSubrootId + delta * kObjectIdStep;
-}
-
-
-HeapObject* V8HeapExplorer::GetNthGcSubrootObject(int delta) {
-  return reinterpret_cast<HeapObject*>(
-      reinterpret_cast<char*>(kFirstGcSubrootObject) +
-      delta * HeapObjectsMap::kObjectIdStep);
-}
-
-
-int V8HeapExplorer::GetGcSubrootOrder(HeapObject* subroot) {
-  return static_cast<int>(
-      (reinterpret_cast<char*>(subroot) -
-       reinterpret_cast<char*>(kFirstGcSubrootObject)) /
-      HeapObjectsMap::kObjectIdStep);
 }
 
 } }  // namespace v8::internal

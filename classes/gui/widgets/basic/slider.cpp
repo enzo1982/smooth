@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -99,25 +99,38 @@ S::Int S::GUI::Slider::Paint(Int message)
 
 S::Int S::GUI::Slider::SetRange(Int rangeStart, Int rangeEnd)
 {
-	startValue	= rangeStart;
-	endValue	= rangeEnd;
+	if (startValue == rangeStart &&
+	    endValue   == rangeEnd) return Success();
 
-	SetValue(*variable);
+	startValue = rangeStart;
+	endValue   = rangeEnd;
+
+	*variable  = Math::Min(Math::Max(*variable, startValue), endValue);
+
+	Paint(SP_PAINT);
+
+	UpdateHotspotPositions();
 
 	return Success();
 }
 
 S::Int S::GUI::Slider::SetValue(Int newValue)
 {
-	Int	 prevValue	= *variable;
+	Int	 prevValue = *variable;
 
 	*variable = Math::Min(Math::Max(newValue, startValue), endValue);
 
-	Paint(SP_PAINT);
+	if (*variable != prevValue)
+	{
+		if (!dragging)
+		{
+			Paint(SP_PAINT);
 
-	UpdateHotspotPositions();
+			UpdateHotspotPositions();
+		}
 
-	if (*variable != prevValue) onValueChange.Emit(*variable);
+		onValueChange.Emit(*variable);
+	}
 
 	return Success();
 }
@@ -181,12 +194,18 @@ S::Void S::GUI::Slider::OnMouseDrag(const Point &mousePos)
 	if (subtype == OR_HORZ)	value = Math::Round(((Float) (endValue - startValue)) / (((Float) realSize.cx - gripSize) / ((Float) (mousePos.x + mouseBias - (realPos.x + gripSize / 2)))));
 	else			value = Math::Round(((Float) (endValue - startValue)) / (((Float) realSize.cy - gripSize) / ((Float) (mousePos.y + mouseBias - (realPos.y + gripSize / 2)))));
 
+	dragging = False;
+
 	if (subtype == OR_HORZ)	SetValue(startValue + value);
 	else			SetValue(endValue - value);
+
+	dragging = True;
 }
 
 S::Void S::GUI::Slider::OnMouseDragEnd(const Point &mousePos)
 {
+	OnMouseDrag(mousePos);
+
 	dragging = False;
 
 	Paint(SP_PAINT);

@@ -658,7 +658,7 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::FindLeaderWindow()
 	{
 		WindowGDI	*backend = windowBackends.GetNth(i);
 
-		if (backend != this && backend->hwnd != NIL && !(backend->flags & WF_TOPMOST)) return backend;
+		if (backend != this && backend->hwnd != NIL && !(backend->flags & WF_TOPMOST) && GetWindowThreadProcessId(hwnd, NIL) == GetWindowThreadProcessId(backend->hwnd, NIL)) return backend;
 	}
 
 	return NIL;

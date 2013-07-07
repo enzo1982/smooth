@@ -3,6 +3,8 @@
 # Change these variables to fit this location:
 SMOOTH_PATH = ../..
 
+include $(SMOOTH_PATH)/Makefile-options
+
 # Change these variables to fit your project:
 LOCALEXE  = v8test
 
@@ -10,7 +12,11 @@ LOCALEXE  = v8test
 OBJECTS	  = v8test.o
 
 # Enter additional library dependencies here
+ifeq ($(BUILD_WIN32),True)
 LIBS	  = -lsmooth-js
+else
+LIBS	  = -lsmooth-js-$(VERSION)
+endif
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   =

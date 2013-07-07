@@ -10,33 +10,41 @@ using namespace v8;
 
 Int smooth::Main()
 {
-	// Create a stack-allocated handle scope.
-	HandleScope handle_scope;
+	// Create a new isolate.
+	Isolate			*isolate = v8::Isolate::New();
 
-	// Create a new context.
-	Persistent<Context> context = Context::New();
+	// Enter the created isolate. 
+	{
+		Isolate::Scope		 isolateScope(isolate);
 
-	// Enter the created context for compiling and
-	// running the hello world script. 
-	Context::Scope context_scope(context);
+		// Create a stack-allocated handle scope.
+		HandleScope		 handleScope(isolate);
 
-	// Create a string containing the JavaScript source code.
-	Handle<v8::String> source = v8::String::New("'Hello' + ', World!'");
-	Handle<v8::String> file = v8::String::New("unnamed");
+		// Create a new context.
+		Local<Context>		 context = Context::New(isolate);
 
-	// Compile the source code.
-	Local<Script> script = Script::Compile(source, file);
+		// Enter the created context for compiling and
+		// running the hello world script. 
+		Context::Scope		 contextScope(context);
 
-	// Run the script to get the result.
-	Handle<Value> result = script->Run();
+		// Create a string containing the JavaScript source code.
+		Handle<v8::String>	 source = v8::String::New("'Hello' + ', World!'");
+		Handle<v8::String>	 file = v8::String::New("unnamed");
 
-	// Dispose the persistent context.
-	context.Dispose();
+		// Compile the source code.
+		Local<Script>		 script = Script::Compile(source, file);
 
-	// Convert the result to an ASCII string and print it.
-	v8::String::AsciiValue ascii(result);
+		// Run the script to get the result.
+		Handle<Value>		 result = script->Run();
 
-	QuickMessage((char *) *ascii, "V8 Engine Test", GUI::Dialogs::Message::Buttons::Ok, GUI::Dialogs::Message::Icon::Information);
+		// Convert the result to an ASCII string and print it.
+		v8::String::AsciiValue ascii(result);
+
+		QuickMessage((char *) *ascii, "V8 Engine Test", GUI::Dialogs::Message::Buttons::Ok, GUI::Dialogs::Message::Icon::Information);
+	}
+
+	// Dispose the isolate.
+	isolate->Dispose();
 
 	return 0;
 }

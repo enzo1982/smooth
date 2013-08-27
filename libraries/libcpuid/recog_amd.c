@@ -63,6 +63,10 @@ enum _amd_code_t {
 	ATHLON_64_X2,
 	ATHLON_64_X3,
 	ATHLON_64_X4,
+	FUSION_C,
+	FUSION_E,
+	FUSION_EA,
+	FUSION_Z,
 };
 typedef enum _amd_code_t amd_code_t;
 
@@ -237,6 +241,31 @@ const struct match_entry_t cpudb_amd[] = {
 	{ 15,  4, -1, 16,   -1,   2,   512,    -1, ATHLON_64_X2            ,     0, "Athlon II X2 (Regor)"          },
 	{ 15,  5, -1, 16,    5,   3,   512,    -1, ATHLON_64_X3            ,     0, "Athlon II X3 (Rana)"           },
 	{ 15,  5, -1, 16,    5,   4,   512,    -1, ATHLON_64_X4            ,     0, "Athlon II X4 (Propus)"         },
+	/* 2011 CPUs with AMD fusion: */
+	{ 15, -1, -1, 20,    1,   1,   512,    -1, FUSION_C                ,     0, "Brazos Ontario"                },
+	{ 15, -1, -1, 20,    1,   2,   512,    -1, FUSION_C                ,     0, "Brazos Ontario (Dual-core)"    },
+	{ 15, -1, -1, 20,    1,   1,   512,    -1, FUSION_E                ,     0, "Brazos Zacate"                 },
+	{ 15, -1, -1, 20,    1,   2,   512,    -1, FUSION_E                ,     0, "Brazos Zacate (Dual-core)"     },
+	{ 15, -1, -1, 20,    1,   1,   512,    -1, FUSION_Z                ,     0, "Brazos Desna"                  },
+	{ 15, -1, -1, 18,    1,   2,   512,    -1, FUSION_EA               ,     0, "Llano X2"                      },
+	{ 15, -1, -1, 18,    1,   2,  1024,    -1, FUSION_EA               ,     0, "Llano X2"                      },
+	{ 15, -1, -1, 18,    1,   3,  1024,    -1, FUSION_EA               ,     0, "Llano X3"                      },
+	{ 15, -1, -1, 18,    1,   4,  1024,    -1, FUSION_EA               ,     0, "Llano X4"                      },
+	
+	/* Newer Opterons: */
+	{ 15,  9, -1, 16,    9,   8,    -1,    -1, OPTERON_GENERIC         ,     0, "Magny-Cours Opteron"           },
+	
+	/* Bulldozer CPUs: */
+	{ 15, -1, -1, 21,    1,   2,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X2"                  },
+	{ 15, -1, -1, 21,    1,   2,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X2"                  },
+	{ 15, -1, -1, 21,    1,   3,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X3"                  },
+	{ 15, -1, -1, 21,    1,   3,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X3"                  },
+	{ 15, -1, -1, 21,    1,   4,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X2"                  },
+	{ 15, -1, -1, 21,    1,   4,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X2"                  },
+	{ 15, -1, -1, 21,    1,   6,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X3"                  },
+	{ 15, -1, -1, 21,    1,   6,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X3"                  },
+	{ 15, -1, -1, 21,    1,   8,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X4"                  },
+	{ 15, -1, -1, 21,    1,   8,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X4"                  },
 };
 
 
@@ -259,9 +288,10 @@ static void load_amd_features(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
 		{  8, CPU_FEATURE_3DNOWPREFETCH },
 		{  9, CPU_FEATURE_OSVW },
 		{ 10, CPU_FEATURE_IBS },
-		{ 11, CPU_FEATURE_SSE5 },
+		{ 11, CPU_FEATURE_XOP },
 		{ 12, CPU_FEATURE_SKINIT },
 		{ 13, CPU_FEATURE_WDT },
+		{ 16, CPU_FEATURE_FMA4 },
 	};
 	const struct feature_map_t matchtable_edx87[] = {
 		{  0, CPU_FEATURE_TS },
@@ -274,12 +304,17 @@ static void load_amd_features(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
 		{  7, CPU_FEATURE_HWPSTATE },
 		{  8, CPU_FEATURE_CONSTANT_TSC },
 	};
-	if (raw->ext_cpuid[0][0] >= 1) {
+	if (raw->ext_cpuid[0][0] >= 0x80000001) {
 		match_features(matchtable_edx81, COUNT_OF(matchtable_edx81), raw->ext_cpuid[1][3], data);
 		match_features(matchtable_ecx81, COUNT_OF(matchtable_ecx81), raw->ext_cpuid[1][2], data);
 	}
-	if (raw->ext_cpuid[0][0] >= 7)
+	if (raw->ext_cpuid[0][0] >= 0x80000001)
 		match_features(matchtable_edx87, COUNT_OF(matchtable_edx87), raw->ext_cpuid[7][3], data);
+	if (raw->ext_cpuid[0][0] >= 0x8000001a) {
+		/* We have the extended info about SSE unit size */
+		data->detection_hints[CPU_HINT_SSE_SIZE_AUTH] = 1;
+		data->sse_size = (raw->ext_cpuid[0x1a][0] & 1) ? 128 : 64;
+	}
 }
 
 static void decode_amd_cache_info(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
@@ -403,6 +438,10 @@ static amd_code_t decode_amd_codename_part1(const char *bs)
 		if (strstr(bs, "Duron")) return DURON;
 		if (strstr(bs, "Athlon")) return ATHLON;
 	}
+	if (match_pattern(bs, "C-##")) return FUSION_C;
+	if (match_pattern(bs, "E-###")) return FUSION_E;
+	if (match_pattern(bs, "Z-##")) return FUSION_Z;
+	if (match_pattern(bs, "E#-####") || match_pattern(bs, "A#-####")) return FUSION_EA;
 	
 	return NO_CODE;
 }

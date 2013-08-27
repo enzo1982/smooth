@@ -6,6 +6,7 @@ xx.xx.13 xx:xx - smooth alpha 0.8.72.0
 
 - ported to Haiku
 - upgraded V8 to version 3.19.18.9
+- upgraded libcpuid to version 0.2.1
 
 15.06.13 14:48 - smooth alpha 0.8.71.0
 

@@ -85,12 +85,11 @@ void exec_cpuid(uint32_t *regs)
 #ifdef COMPILER_GCC
 #	ifdef PLATFORM_X64
 	__asm __volatile(
+		"	mov	%0,	%%rdi\n"
+
 		"	push	%%rbx\n"
 		"	push	%%rcx\n"
 		"	push	%%rdx\n"
-		"	push	%%rdi\n"
-		
-		"	mov	%0,	%%rdi\n"
 		
 		"	mov	(%%rdi),	%%eax\n"
 		"	mov	4(%%rdi),	%%ebx\n"
@@ -103,21 +102,20 @@ void exec_cpuid(uint32_t *regs)
 		"	movl	%%ebx,	4(%%rdi)\n"
 		"	movl	%%ecx,	8(%%rdi)\n"
 		"	movl	%%edx,	12(%%rdi)\n"
-		"	pop	%%rdi\n"
 		"	pop	%%rdx\n"
 		"	pop	%%rcx\n"
 		"	pop	%%rbx\n"
 		:
-		:"rdi"(regs)
-		:"memory", "eax"
+		:"m"(regs)
+		:"memory", "eax", "rdi"
 	);
 #	else
 	__asm __volatile(
+		"	mov	%0,	%%edi\n"
+
 		"	push	%%ebx\n"
 		"	push	%%ecx\n"
 		"	push	%%edx\n"
-		"	push	%%edi\n"
-		"	mov	%0,	%%edi\n"
 		
 		"	mov	(%%edi),	%%eax\n"
 		"	mov	4(%%edi),	%%ebx\n"
@@ -130,13 +128,12 @@ void exec_cpuid(uint32_t *regs)
 		"	mov	%%ebx,	4(%%edi)\n"
 		"	mov	%%ecx,	8(%%edi)\n"
 		"	mov	%%edx,	12(%%edi)\n"
-		"	pop	%%edi\n"
 		"	pop	%%edx\n"
 		"	pop	%%ecx\n"
 		"	pop	%%ebx\n"
 		:
 		:"m"(regs)
-		:"memory", "eax"
+		:"memory", "eax", "edi"
 	);
 #	endif /* COMPILER_GCC */
 #else
@@ -513,6 +510,311 @@ void busy_sse_loop(int cycles)
 	);
 #else
 #  ifdef COMPILER_MICROSOFT
+	__asm {
+		mov	eax,	cycles
+		xorps	xmm0,	xmm0
+		xorps	xmm1,	xmm1
+		xorps	xmm2,	xmm2
+		xorps	xmm3,	xmm3
+		xorps	xmm4,	xmm4
+		xorps	xmm5,	xmm5
+		xorps	xmm6,	xmm6
+		xorps	xmm7,	xmm7
+		//--
+		align 16
+bsLoop:
+		// 0:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 1:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 2:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 3:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 4:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 5:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 6:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 7:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 8:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 9:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 10:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 11:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 12:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 13:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 14:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 15:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 16:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 17:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 18:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 19:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 20:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 21:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 22:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 23:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 24:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 25:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 26:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 27:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 28:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 29:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 30:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		// 31:
+		addps	xmm0,	xmm1
+		addps	xmm1,	xmm2
+		addps	xmm2,	xmm3
+		addps	xmm3,	xmm4
+		addps	xmm4,	xmm5
+		addps	xmm5,	xmm6
+		addps	xmm6,	xmm7
+		addps	xmm7,	xmm0
+		//----------------------
+		dec		eax
+		jnz		bsLoop
+	}
 #  else
 #    error "Unsupported compiler"
 #  endif /* COMPILER_MICROSOFT */

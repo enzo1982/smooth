@@ -15,12 +15,12 @@ namespace smooth
 {
 	namespace System
 	{
-		classPointerXLib;
+		class PointerXLib;
 	};
 };
 
 #include "../pointerbackend.h"
-#include "../backends/xlib/backendxlib.h"
+#include "../../../backends/xlib/backendxlib.h"
 
 #include <X11/cursorfont.h>
 
@@ -30,13 +30,13 @@ namespace smooth
 	{
 		const Short	 POINTER_XLIB = 2;
 
-		class PoinerXLib : public PoinerBackend
+		class PointerXLib : public PointerBackend
 		{
 			private:
 				X11::Display	*display;
 			public:
-						 PoinerXLib();
-						~PoinerXLib();
+						 PointerXLib();
+						~PointerXLib();
 
 				Bool		 SetCursor(const GUI::Window *, Pointer::CursorType);
 		};

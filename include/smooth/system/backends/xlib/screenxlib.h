@@ -15,7 +15,7 @@ namespace smooth
 {
 	namespace System
 	{
-		classScreenXLib;
+		class ScreenXLib;
 	};
 };
 

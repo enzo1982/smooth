@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/backends/xlib/screenxlib.h>
+#include <smooth/backends/xlib/backendxlib.h>
 
 using namespace X11;
 

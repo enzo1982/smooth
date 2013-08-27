@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -202,6 +202,61 @@ S::Bool S::GUI::BitmapGDI::SetSystemBitmap(Void *nBitmap)
 S::Void *S::GUI::BitmapGDI::GetSystemBitmap() const
 {
 	return (Void *) bitmap;
+}
+
+S::Bool S::GUI::BitmapGDI::SetPixel(const Point &point, const Color &color)
+{
+	if (bytes == NIL)			      return False;
+	if (point.y >= size.cy || point.x >= size.cx) return False;
+
+	UnsignedByte	*data	= ((UnsignedByte *) bytes);
+	Int		 offset = 0;
+
+	switch (depth)
+	{
+		case 24:
+			offset = (size.cy - point.y - 1) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
+
+			data[offset + 0] = (color >> 16) & 255;
+			data[offset + 1] = (color >>  8) & 255;
+			data[offset + 2] =  color	 & 255;
+
+			return True;
+		case 32:
+			offset = (size.cy - point.y - 1) * (				      size.cx * 4) + point.x * 4;
+
+			data[offset + 0] = (color >> 16) & 255;
+			data[offset + 1] = (color >>  8) & 255;
+			data[offset + 2] =  color	 & 255;
+			data[offset + 3] = (color >> 24) & 255;
+
+			return True;
+	}
+
+	return False;
+}
+
+S::GUI::Color S::GUI::BitmapGDI::GetPixel(const Point &point) const
+{
+	if (bytes == NIL)			      return 0;
+	if (point.y >= size.cy || point.x >= size.cx) return 0;
+
+	UnsignedByte	*data	= ((UnsignedByte *) bytes);
+	Int		 offset = 0;
+
+	switch (depth)
+	{
+		case 24:
+			offset = (size.cy - point.y - 1) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
+
+			return Color(			      data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2]);
+		case 32:
+			offset = (size.cy - point.y - 1) * (				      size.cx * 4) + point.x * 4;
+
+			return Color(data[offset + 3] << 24 | data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2]);
+	}
+
+	return 0;
 }
 
 S::GUI::BitmapBackend &S::GUI::BitmapGDI::operator =(const BitmapBackend &newBitmap)

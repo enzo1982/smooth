@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -255,9 +255,14 @@ S::Int S::GUI::BitmapBackend::SetBackgroundColor(const Color &color)
 		{
 			Color	 pixel = GetPixel(point);
 
-			if (pixel.GetAlpha() != 255) SetPixel(point, Color((pixel.GetRed()   * pixel.GetAlpha() + color.GetRed()   * (255 - pixel.GetAlpha())) / 255,
-									   (pixel.GetGreen() * pixel.GetAlpha() + color.GetGreen() * (255 - pixel.GetAlpha())) / 255,
-									   (pixel.GetBlue()  * pixel.GetAlpha() + color.GetBlue()  * (255 - pixel.GetAlpha())) / 255));
+			if (pixel.GetAlpha() != 255)
+			{
+				Color	 result = Color((pixel.GetRed()   * pixel.GetAlpha() + color.GetRed()   * (255 - pixel.GetAlpha())) / 255,
+							(pixel.GetGreen() * pixel.GetAlpha() + color.GetGreen() * (255 - pixel.GetAlpha())) / 255,
+							(pixel.GetBlue()  * pixel.GetAlpha() + color.GetBlue()  * (255 - pixel.GetAlpha())) / 255);
+
+				SetPixel(point, 255 << 24 | result);
+			}
 		}
 	}
 
@@ -271,85 +276,12 @@ S::Int S::GUI::BitmapBackend::Scale(const Size &newSize)
 
 S::Bool S::GUI::BitmapBackend::SetPixel(const Point &iPoint, const Color &color)
 {
-	if (bytes == NIL)				return False;
-	if (iPoint.y >= size.cy || iPoint.x >= size.cx)	return False;
-
-	UnsignedByte	*data = ((UnsignedByte *) bytes);
-	Point		 point = iPoint;
-	Bool		 done = False;
-	Int		 offset = 0;
-
-	switch (depth)
-	{
-		case 24:
-#ifdef __WIN32__
-			offset = (size.cy - ++point.y) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
-#else
-			offset = 	      point.y  * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
-#endif
-
-			data[offset + 0] = (color >> 16) & 255;
-			data[offset + 1] = (color >>  8) & 255;
-			data[offset + 2] =  color	 & 255;
-
-			done = True;
-
-			break;
-		case 32:
-#ifdef __WIN32__
-			offset = (size.cy - ++point.y) * (((4 - ((size.cx * 4) & 3)) & 3) + size.cx * 4) + point.x * 4;
-#else
-			offset = 	      point.y  * (((4 - ((size.cx * 4) & 3)) & 3) + size.cx * 4) + point.x * 4;
-#endif
-
-			data[offset + 0] = (color >> 16) & 255;
-			data[offset + 1] = (color >>  8) & 255;
-			data[offset + 2] =  color	 & 255;
-			data[offset + 3] = (color >> 24) & 255;
-
-			done = True;
-
-			break;
-	}
-
-	return done;
+	return False;
 }
 
 S::GUI::Color S::GUI::BitmapBackend::GetPixel(const Point &iPoint) const
 {
-	if (bytes == NIL)				return 0;
-	if (iPoint.y >= size.cy || iPoint.x >= size.cx)	return 0;
-
-	UnsignedByte	*data = ((UnsignedByte *) bytes);
-	Point		 point = iPoint;
-	Color		 color = 0;
-	Int		 offset = 0;
-
-	switch (depth)
-	{
-		case 24:
-#ifdef __WIN32__
-			offset = (size.cy - ++point.y) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
-#else
-			offset = 	      point.y  * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
-#endif
-
-			color = Color(data[offset + 2], data[offset + 1], data[offset + 0]);
-
-			break;
-		case 32:
-#ifdef __WIN32__
-			offset = (size.cy - ++point.y) * (((4 - ((size.cx * 4) & 3)) & 3) + size.cx * 4) + point.x * 4;
-#else
-			offset = 	      point.y  * (((4 - ((size.cx * 4) & 3)) & 3) + size.cx * 4) + point.x * 4;
-#endif
-
-			color = Color(data[offset + 3] << 24 | data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2]);
-
-			break;
-	}
-
-	return color;
+	return 0;
 }
 
 S::GUI::BitmapBackend &S::GUI::BitmapBackend::operator =(const int nil)

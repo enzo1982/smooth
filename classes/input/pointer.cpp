@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,22 +9,16 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/input/pointer.h>
-#include <smooth/gui/window/window.h>
+#include <smooth/input/backends/pointerbackend.h>
+#include <smooth/init.h>
 
-#if defined __WIN32__
-#	include <windows.h>
-#elif defined __HAIKU__
-#	include <Application.h>
-#else
-#	include <smooth/backends/xlib/backendxlib.h>
+S::Int	 addPointerInitTmp = S::AddInitFunction(&S::Input::Pointer::Initialize);
+S::Int	 addPointerFreeTmp = S::AddFreeFunction(&S::Input::Pointer::Free);
 
-#	include <X11/cursorfont.h>
+S::Input::PointerBackend	*S::Input::Pointer::backend = NIL;
 
-	using namespace X11;
-#endif
-
-const S::GUI::Window	*S::Input::Pointer::pointerWindow = NIL;
-S::GUI::Point		 S::Input::Pointer::mousePosition = S::GUI::Point();
+const S::GUI::Window		*S::Input::Pointer::pointerWindow = NIL;
+S::GUI::Point			 S::Input::Pointer::mousePosition = S::GUI::Point();
 
 S::Input::Pointer::Pointer()
 {
@@ -34,50 +28,23 @@ S::Input::Pointer::Pointer(const Pointer &)
 {
 }
 
+S::Int S::Input::Pointer::Initialize()
+{
+	backend = PointerBackend::CreateBackendInstance();
+
+	return Success();
+}
+
+S::Int S::Input::Pointer::Free()
+{
+	delete backend;
+
+	return Success();
+}
+
 S::Bool S::Input::Pointer::SetCursor(const GUI::Window *window, CursorType mouseCursor)
 {
-#if defined __WIN32__
-	static HCURSOR	 hCursorArrow	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	static HCURSOR	 hCursorTextEdit = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32513), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	static HCURSOR	 hCursorHand	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32649), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	static HCURSOR	 hCursorHSize	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32644), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	static HCURSOR	 hCursorVSize	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32645), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-
-	if (hCursorHand == NIL) hCursorHand = hCursorArrow;
-
-	if (mouseCursor != CursorArrow)	SetClassLongPtrA((HWND) window->GetSystemWindow(), GCLP_HCURSOR, (LONG_PTR) NIL);
-	else				SetClassLongPtrA((HWND) window->GetSystemWindow(), GCLP_HCURSOR, (LONG_PTR) hCursorArrow);
-
-	if	(mouseCursor == CursorArrow)	::SetCursor(hCursorArrow);
-	else if	(mouseCursor == CursorTextEdit)	::SetCursor(hCursorTextEdit);
-	else if	(mouseCursor == CursorHand)	::SetCursor(hCursorHand);
-	else if	(mouseCursor == CursorHSize)	::SetCursor(hCursorHSize);
-	else if	(mouseCursor == CursorVSize)	::SetCursor(hCursorVSize);
-	else					return False;
-#elif defined __HAIKU__
-	if	(mouseCursor == CursorArrow)	be_app->SetCursor(B_CURSOR_SYSTEM_DEFAULT);
-	else if (mouseCursor == CursorTextEdit)	be_app->SetCursor(B_CURSOR_I_BEAM);
-	else if (mouseCursor == CursorHand)	be_app->SetCursor(B_CURSOR_SYSTEM_DEFAULT);
-	else if (mouseCursor == CursorHSize)	be_app->SetCursor(B_CURSOR_SYSTEM_DEFAULT);
-	else if (mouseCursor == CursorVSize)	be_app->SetCursor(B_CURSOR_SYSTEM_DEFAULT);
-	else					return False;
-#else
-	static Cursor	 hCursorTextEdit = XCreateFontCursor(Backends::BackendXLib::GetDisplay(), XC_xterm);
-	static Cursor	 hCursorHand	 = XCreateFontCursor(Backends::BackendXLib::GetDisplay(), XC_hand2);
-	static Cursor	 hCursorHSize	 = XCreateFontCursor(Backends::BackendXLib::GetDisplay(), XC_sb_h_double_arrow);
-	static Cursor	 hCursorVSize	 = XCreateFontCursor(Backends::BackendXLib::GetDisplay(), XC_sb_v_double_arrow);
-
-	if	(mouseCursor == CursorArrow)	XUndefineCursor(Backends::BackendXLib::GetDisplay(), (Window) window->GetSystemWindow());
-	else if (mouseCursor == CursorTextEdit)	XDefineCursor(Backends::BackendXLib::GetDisplay(), (Window) window->GetSystemWindow(), hCursorTextEdit);
-	else if (mouseCursor == CursorHand)	XDefineCursor(Backends::BackendXLib::GetDisplay(), (Window) window->GetSystemWindow(), hCursorHand);
-	else if (mouseCursor == CursorHSize)	XDefineCursor(Backends::BackendXLib::GetDisplay(), (Window) window->GetSystemWindow(), hCursorHSize);
-	else if (mouseCursor == CursorVSize)	XDefineCursor(Backends::BackendXLib::GetDisplay(), (Window) window->GetSystemWindow(), hCursorVSize);
-	else					return False;
-
-	XFlush(Backends::BackendXLib::GetDisplay());
-#endif
-
-	return True;
+	return backend->SetCursor(window, mouseCursor);
 }
 
 const S::GUI::Point &S::Input::Pointer::GetPosition()

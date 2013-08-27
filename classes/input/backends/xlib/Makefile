@@ -1,7 +1,7 @@
 ########## smooth directory makefile ##########
 
 # Change these variables to fit this location:
-SMOOTH_PATH = ../..
+SMOOTH_PATH = ../../../..
 
 include $(SMOOTH_PATH)/Makefile-options
 
@@ -19,11 +19,11 @@ endif
 endif
 
 # Enter object files here:
-OBJECTS	  = keyboard.o pointer.o
+OBJECTS	  = 
 
-# Enter addition commands for targets all and clean here:
-ALLCMD1   = cd backends && $(MAKE)
-CLEANCMD1 = cd backends && $(MAKE) clean
+ifeq ($(BUILD_XLIB),True)
+	OBJECTS += pointerxlib.o
+endif
 
 ## Do not change anything below this line. ##
 

@@ -78,7 +78,7 @@ S::Int S::Threads::ThreadPOSIX::Stop()
 	}
 
 	thread = NIL;
-	
+
 	return Success();
 }
 
@@ -87,7 +87,7 @@ S::Int S::Threads::ThreadPOSIX::Wait()
 	if (thread == NIL) return Error();
 
 	pthread_join(*thread, NIL);
-	
+
 	return Success();
 }
 

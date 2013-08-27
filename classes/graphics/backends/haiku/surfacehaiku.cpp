@@ -54,7 +54,7 @@ S::GUI::SurfaceHaiku::SurfaceHaiku(Void *iView, const Size &maxSize)
 
 		bitmap	   = new BBitmap(BRect(0, 0, size.cx, size.cy), screen.ColorSpace(), true);
 		bitmapView = new BView(bitmap->Bounds(), NULL, B_FOLLOW_ALL_SIDES, 0);
-		
+
 		bitmap->AddChild(bitmapView);
 
 		paintRects.Add(new Rect(Point(0, 0), size));
@@ -70,7 +70,7 @@ S::GUI::SurfaceHaiku::~SurfaceHaiku()
 	if (view != NIL)
 	{
 		bitmap->RemoveChild(bitmapView);
-		
+
 		delete bitmapView;
 		delete bitmap;
 
@@ -119,7 +119,7 @@ S::Int S::GUI::SurfaceHaiku::SetSize(const Size &nSize)
 	if (view != NIL && !painting)
 	{
 		bitmap->RemoveChild(bitmapView);
-		
+
 		delete bitmapView;
 		delete bitmap;
 
@@ -129,7 +129,7 @@ S::Int S::GUI::SurfaceHaiku::SetSize(const Size &nSize)
 
 		bitmap	   = new BBitmap(BRect(0, 0, size.cx, size.cy), B_RGB32, true);
 		bitmapView = new BView(bitmap->Bounds(), NULL, B_FOLLOW_ALL_SIDES, 0);
-		
+
 		bitmap->AddChild(bitmapView);
 
 		paintRects.Add(new Rect(Point(0, 0), size));
@@ -303,7 +303,7 @@ S::Int S::GUI::SurfaceHaiku::Box(const Rect &iRect, const Color &color, Int styl
 	else if (style & Rect::Dotted)
 	{
 		pattern	 pattern = {{ 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA }};
-		
+
 		if (!painting) view->StrokeRect(BRect(rect.left, rect.top, rect.right, rect.bottom), pattern);
 		bitmapView->StrokeRect(BRect(rect.left, rect.top, rect.right, rect.bottom), pattern);
 	}
@@ -340,10 +340,10 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 					 (font.GetStyle() & Font::StrikeOut ? B_STRIKEOUT_FACE  : 0) |
 					 (font.GetWeight() >= Font::Bold    ? B_BOLD_FACE       : 0));
 			viewFont.SetSize(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0));
-	
+
 			view->SetFont(&viewFont);
 			view->GetFontHeight(&height);
-			
+
 			view->SetDrawingMode(B_OP_OVER);
 			view->SetHighColor(font.GetColor().GetRed(), font.GetColor().GetGreen(), font.GetColor().GetBlue());
 			view->MovePenTo(BPoint(tRect.left, tRect.top + height.ascent * fontSize.TranslateY(96) / 72.0));
@@ -360,7 +360,7 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 				 (font.GetStyle() & Font::StrikeOut ? B_STRIKEOUT_FACE  : 0) |
 				 (font.GetWeight() >= Font::Bold    ? B_BOLD_FACE       : 0));
 		viewFont.SetSize(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0));
-	
+
 		bitmapView->SetFont(&viewFont);
 		bitmapView->GetFontHeight(&height);
 
@@ -414,7 +414,7 @@ S::Int S::GUI::SurfaceHaiku::Gradient(const Rect &iRect, const Color &color1, co
 
 	if (!painting) view->FillRect(BRect(rect.left, rect.top, rect.right, rect.bottom), *gradient);
 	bitmapView->FillRect(BRect(rect.left, rect.top, rect.right, rect.bottom), *gradient);
-	
+
 	delete gradient;
 
 	return Success();
@@ -457,10 +457,10 @@ S::Int S::GUI::SurfaceHaiku::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	/* Copy the image.
 	 */
 	destView->DrawBitmap(this->bitmap, BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom));
-	
+
 	destBitmap->Unlock();
 	destBitmap->RemoveChild(destView);
-	
+
 	delete destView;
 
 	return Success();

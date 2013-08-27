@@ -29,7 +29,7 @@ S::Backends::BackendGDIPlus::~BackendGDIPlus()
 S::Int S::Backends::BackendGDIPlus::Init()
 {
 	Gdiplus::GdiplusStartupInput	 gdiplusStartupInput;
-   
+
 	/* Initialize GDI+.
 	 */
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);

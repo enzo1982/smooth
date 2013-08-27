@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -300,8 +300,6 @@ S::Bool S::IO::OutStream::OutputNumberPBD(Long number, Int bits)
 
 	if (!pbdActive) InitPBD();
 
-	unsigned char	 out;
-
 	for (int j = 0; j < bits; j++)
 	{
 		pbdBuffer[pbdLength] = IOGetBit(number, j);
@@ -310,7 +308,7 @@ S::Bool S::IO::OutStream::OutputNumberPBD(Long number, Int bits)
 
 	while (pbdLength >= 8)
 	{
-		out = 0;
+		unsigned char	 out = 0;
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -352,11 +350,10 @@ S::Bool S::IO::OutStream::OutputString(const String &string)
 
 	int		 bytesleft	= strlen(value);
 	int		 databufferpos	= 0;
-	int		 amount		= 0;
 
 	while (bytesleft)
 	{
-		amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
+		int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
 		for (Int i = 0; i < amount; i++) ((char *) (((UnsignedByte *) dataBuffer) + currentBufferPos))[i] = value[databufferpos + i];
 
@@ -396,11 +393,10 @@ S::Bool S::IO::OutStream::OutputData(const Void *pointer, Int bytes)
 
 	int	 bytesleft	= bytes;
 	int	 databufferpos	= 0;
-	int	 amount		= 0;
 
 	while (bytesleft)
 	{
-		amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
+		int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
 		memcpy((void *) (((UnsignedByte *) dataBuffer) + currentBufferPos), (void *) ((unsigned char *) pointer + databufferpos), amount);
 

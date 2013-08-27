@@ -96,7 +96,7 @@ S::Number S::Number::FromIntString(const String &iString)
 {
 	String	 string = iString.ToLower();
 	Int	 sign	= (string[0] == '-' ? -1 : 1);
-	
+
 	if (string[0] == '-' || string[0] == '+') string = string.Tail(string.Length() - 1);
 
 	Int	 length = 0;
@@ -121,7 +121,7 @@ S::Number S::Number::FromFloatString(const String &iString)
 {
 	String	 string = iString.ToLower();
 	Int	 sign	= (string[0] == '-' ? -1 : 1);
-	
+
 	if (string[0] == '-' || string[0] == '+') string = string.Tail(string.Length() - 1);
 
 	Int	 length = 0;

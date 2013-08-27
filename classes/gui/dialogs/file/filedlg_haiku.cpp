@@ -36,12 +36,12 @@ class HaikuFileDialog : public BLooper
 					for (int i = 0; i >= 0; i++)
 					{
 						entry_ref	 ref;
-		
+
 						if (message->FindRef("refs", i, &ref) != B_OK) break;
-		
+
 						BEntry		 entry(&ref, true);
 						BPath		 path;
-		
+
 						entry.GetPath(&path);
 
 						S::String	 file;
@@ -49,9 +49,9 @@ class HaikuFileDialog : public BLooper
 						file.ImportFrom("UTF-8", path.Path());
 						files.Add(file);
 					}
-		
+
 					PostMessage(B_QUIT_REQUESTED);
-					
+
 					break;
 				case B_SAVE_REQUESTED:
 					{
@@ -120,7 +120,7 @@ class HaikuFileFilter : public BRefFilter
 
 				if (admit) return true;
 			}
-			
+
 			return false;
 		}
 };
@@ -140,9 +140,9 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 	thread_id	 thread = dialog->Run();
 	status_t	 status = B_OK;
-	
+
 	wait_for_thread(thread, &status);
-	
+
 	if (files.Length() == 0) error = Error();
 
 	return error;

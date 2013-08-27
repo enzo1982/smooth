@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -83,9 +83,7 @@ S::String S::GUI::ClipboardXLib::GetText(Atom clipboard) const
 
 	if (owner != None)
 	{
-		unsigned char *data = NIL;
-
-		data = QueryAtom(display, self, clipboard, XA_UTF8_STRING(display));
+		unsigned char *data = QueryAtom(display, self, clipboard, XA_UTF8_STRING(display));
 
 		if (data != NIL)
 		{
@@ -95,7 +93,7 @@ S::String S::GUI::ClipboardXLib::GetText(Atom clipboard) const
 		}
 		else
 		{
-			data = QueryAtom(display, self, clipboard, XA_STRING);
+			unsigned char *data = QueryAtom(display, self, clipboard, XA_STRING);
 
 			if (data != NIL)
 			{

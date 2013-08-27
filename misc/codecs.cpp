@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,12 +17,12 @@
 using namespace smooth;
 using namespace smooth::GUI;
 
-int	*lastline;
+Int	*previousLine;
 int	 palette[388];
-int	 palentries = 0;
-int	 bits = 0;
-int	 bitssaa = 0;
-int	 bitsnrle = 0;
+int	 palentries  = 0;
+int	 bits	     = 0;
+int	 bitssaa     = 0;
+int	 bitsnrle    = 0;
 int	 bitssaanrle = 0;
 
 int	 GetSLAL(int [], int [], int);
@@ -41,19 +41,20 @@ int	 RotatePalette(int);
 int	 RotatePaletteEntry(int);
 int	 GetPaletteEntry(int);
 
-bool PCIIO::CompressPCI(PCIOut out)
+Bool PCIIO::CompressPCI(PCIOut out)
 {
 	IO::FilterBZip2	*filter = NULL;
 
-	palentries = 0;
-	bits = 0;
-	bitssaa = 0;
-	bitsnrle = 0;
-	bitssaanrle = 0;
-	lastline = new int [sizex];
+	palentries   = 0;
+	bits	     = 0;
+	bitssaa	     = 0;
+	bitsnrle     = 0;
+	bitssaanrle  = 0;
 
-	for (int x1 = 0; x1 < sizex; x1++) lastline[x1] = 0;
-	for (int x2 = 0; x2 < 338; x2++) palette[x2] = 0;
+	previousLine = new Int [sizex];
+
+	for (Int x = 0; x < sizex; x++) previousLine[x] = 0;
+	for (Int x = 0; x < 338;   x++) palette[x]	= 0;
 
 	if (compression == BZIP2)
 	{
@@ -62,10 +63,7 @@ bool PCIIO::CompressPCI(PCIOut out)
 		out->AddFilter(filter);
 	}
 
-	for (int y = 0; y < sizey; y++)
-	{
-		WriteLine(out, y);
-	}
+	for (Int y = 0; y < sizey; y++) WriteLine(out, y);
 
 	if (compression == BZIP2)
 	{
@@ -74,24 +72,25 @@ bool PCIIO::CompressPCI(PCIOut out)
 		delete filter;
 	}
 
-	delete [] lastline;
+	delete [] previousLine;
 
-	return true;
+	return True;
 }
 
-bool PCIIO::DecompressPCI(PCIIn in)
+Bool PCIIO::DecompressPCI(PCIIn in)
 {
 	IO::FilterBZip2	*filter = NULL;
 
-	palentries = 0;
-	bits = 0;
-	bitssaa = 0;
-	bitsnrle = 0;
-	bitssaanrle = 0;
-	lastline = new int [sizex];
+	palentries   = 0;
+	bits	     = 0;
+	bitssaa	     = 0;
+	bitsnrle     = 0;
+	bitssaanrle  = 0;
 
-	for (int x1 = 0; x1 < sizex; x1++) lastline[x1] = 0;
-	for (int x2 = 0; x2 < 338; x2++) palette[x2] = 0;
+	previousLine = new Int [sizex];
+
+	for (Int x = 0; x < sizex; x++) previousLine[x] = 0;
+	for (Int x = 0; x < 338;   x++) palette[x]  = 0;
 
 	if (compression == BZIP2)
 	{
@@ -100,10 +99,7 @@ bool PCIIO::DecompressPCI(PCIIn in)
 		in->AddFilter(filter);
 	}
 
-	for (int y = 0; y < sizey; y++)
-	{
-		ReadLine(in, y);
-	}
+	for (Int y = 0; y < sizey; y++) ReadLine(in, y);
 
 	if (compression == BZIP2)
 	{
@@ -112,27 +108,16 @@ bool PCIIO::DecompressPCI(PCIIn in)
 		delete filter;
 	}
 
-	delete [] lastline;
+	delete [] previousLine;
 
-	return true;
+	return True;
 }
 
 bool PCIIO::WriteLine(PCIOut out, int y)
 {
 	int	*line = new int [sizex];
-	int	 rle;
 	int	 ctsize;
-	int	 dorle = 0;
-	int	 dosaa = 0;
-	int	 lastcol;
-	int	 pcirle;
-	int	 allinpal = 0;
-	int	 gallinpal = 0;
-	int	 lbits;
-	int	 mod04 = 0;
-	int	 mod16 = 0;
 	int	 maxpalentries;
-	int	 x;
 
 	switch (colorspace)
 	{
@@ -161,28 +146,21 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 			break;
 	}
 
-	for (x = 0; x < sizex; x++)
-	{
-		line[x] = Color(bmp.GetPixel(Point(x, y))).ConvertTo(colorspace).Downsample(bpcc);
-	}
+	for (int x = 0; x < sizex; x++) line[x] = Color(bmp.GetPixel(Point(x, y))).ConvertTo(colorspace).Downsample(bpcc);
 
 	switch (compression)
 	{
 		case BZIP2:
 		case UNCOMPRESSED:
-			for (x = 0; x < sizex; x++)
-			{
-				out->OutputNumberPBD(line[x], ctsize * bpcc);
-			}
+			for (int x = 0; x < sizex; x++) out->OutputNumberPBD(line[x], ctsize * bpcc);
 
 			break;
 		case RLE:
-			for (x = 0; x < sizex; x++)
+			for (int x = 0; x < sizex; x++)
 			{
+				int	 rle = GetRLE(line, sizex, x, rlebits);
+
 				out->OutputNumberPBD(line[x], ctsize * bpcc);
-
-				rle = GetRLE(line, sizex, x, rlebits);
-
 				out->OutputNumberPBD(rle, rlebits);
 
 				x += rle;
@@ -190,7 +168,7 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 
 			break;
 		case PCI:
-			if (GetSLAL(line, lastline, sizex))
+			if (GetSLAL(line, previousLine, sizex))
 			{
 				out->OutputNumberPBD(1, 1);
 			}
@@ -198,8 +176,11 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 			{
 				out->OutputNumberPBD(0, 1);
 
-				ProbeComp(0, sizex, line, lastline, sizex, ctsize, false, bits, bitssaa);
-				ProbeComp(0, sizex, line, lastline, sizex, ctsize, true, bitsnrle, bitssaanrle);
+				ProbeComp(0, sizex, line, previousLine, sizex, ctsize, false, bits, bitssaa);
+				ProbeComp(0, sizex, line, previousLine, sizex, ctsize, true, bitsnrle, bitssaanrle);
+
+				int	 dorle = 0;
+				int	 dosaa = 0;
 
 				if (bitssaa < bits)
 				{
@@ -234,10 +215,14 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 					}
 				}
 
-				for (x = 0; x < sizex; x++)
+				int	 allinpal = 0;
+				int	 gallinpal = 0;
+				int	 mod04 = 0;
+				int	 mod16 = 0;
+
+				for (int x = 0; x < sizex; x++)
 				{
-					if (x == 0) lastcol = 0;
-					else	    lastcol = line[x - 1];
+					int	 previousColor = (x > 0 ? line[x - 1] : 0);
 
 					if ((x % 16) == mod16)
 					{
@@ -269,11 +254,11 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 					{
 						out->OutputNumberPBD(0, 1);
 
-						if (GetDelta(line, lastline, x, ctsize))
+						if (GetDelta(line, previousLine, x, ctsize))
 						{
 							out->OutputNumberPBD(1, 1);
 
-							CompressDelta(line, lastline, x, ctsize, out);
+							CompressDelta(line, previousLine, x, ctsize, out);
 						}
 						else
 						{
@@ -295,7 +280,7 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 					{
 						if (!allinpal && !gallinpal) out->OutputNumberPBD(1, 1);
 
-						if (GetSAA(line, lastline, x) && dosaa)
+						if (GetSAA(line, previousLine, x) && dosaa)
 						{
 							out->OutputNumberPBD(1, 1);
 						}
@@ -314,12 +299,9 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 
 								if ((palentries - 1)-GetPaletteEntry(line[x]) < 18)
 								{
+									int	 lbits = Math::Min(GetMinimumBits(palentries - 2), 4);
+
 									out->OutputNumberPBD(1, 1);
-
-									lbits = GetMinimumBits(palentries - 2);
-
-									if (lbits > 4) lbits = 4;
-
 									out->OutputNumberPBD((palentries - 1) - GetPaletteEntry(line[x]) - 2, lbits);
 								}
 								else
@@ -328,12 +310,9 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 
 									if ((palentries - 1) - GetPaletteEntry(line[x]) < 82)
 									{
+										int	 lbits = Math::Min(GetMinimumBits(palentries - 18), 6);
+
 										out->OutputNumberPBD(1, 1);
-
-										lbits = GetMinimumBits(palentries - 18);
-
-										if (lbits > 6) lbits = 6;
-
 										out->OutputNumberPBD((palentries - 1)-GetPaletteEntry(line[x]) - 18, lbits);
 									}
 									else
@@ -348,9 +327,9 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 						RotatePaletteEntry(GetPaletteEntry(line[x]));
 					}
 
-					if (line[x] == lastcol)
+					if (line[x] == previousColor)
 					{
-						pcirle = GetRLE(line, sizex, x, 8);
+						int	 pcirle = GetRLE(line, sizex, x, 8);
 
 						if (pcirle >= 2)
 						{
@@ -380,9 +359,9 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 							out->OutputNumberPBD(0, 1);
 						}
 					}
-					else if ((line[x] == lastline[x]) && dorle)
+					else if ((line[x] == previousLine[x]) && dorle)
 					{
-						pcirle = GetVRLE(line, lastline, sizex, x, 8);
+						int	 pcirle = GetVRLE(line, previousLine, sizex, x, 8);
 
 						if (pcirle >= 2)
 						{
@@ -415,7 +394,7 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 				}
 			}
 
-			for (x = 0; x < sizex; x++) lastline[x] = line[x];
+			for (int x = 0; x < sizex; x++) previousLine[x] = line[x];
 
 			break;
 		default:
@@ -430,22 +409,8 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 bool PCIIO::ReadLine(PCIIn in, int y)
 {
 	int	*line = new int [sizex];
-	int	 rle;
-	int	 col;
 	int	 ctsize;
-	int	 dorle = 0;
-	int	 dosaa = 0;
-	int	 lastcol;
-	int	 pcirle;
-	int	 inpal;
-	int	 lbits;
-	int	 saa;
-	int	 allinpal = 0;
-	int	 gallinpal = 0;
-	int	 mod04 = 0;
-	int	 mod16 = 0;
 	int	 maxpalentries;
-	int	 x;
 
 	switch (colorspace)
 	{
@@ -478,22 +443,19 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 	{
 		case BZIP2:
 		case UNCOMPRESSED:
-			for (x = 0; x < sizex; x++)
+			for (int x = 0; x < sizex; x++)
 			{
 				line[x] = in->InputNumberPBD(ctsize * bpcc);
 			}
 
 			break;
 		case RLE:
-			for (x = 0; x < sizex; x++)
+			for (int x = 0; x < sizex; x++)
 			{
-				col = in->InputNumberPBD(ctsize * bpcc);
-				rle = in->InputNumberPBD(rlebits);
+				int	 col = in->InputNumberPBD(ctsize * bpcc);
+				int	 rle = in->InputNumberPBD(rlebits);
 
-				for (int i = x; i <= x + rle; i++)
-				{
-					line[i] = col;
-				}
+				for (int i = x; i <= x + rle; i++) line[i] = col;
 
 				x += rle;
 			}
@@ -502,41 +464,34 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 		case PCI:
 			if (in->InputNumberPBD(1) == 1)
 			{
-				DecompressSLAL(line, lastline, sizex);
+				DecompressSLAL(line, previousLine, sizex);
 			}
 			else
 			{
-				dosaa = in->InputNumberPBD(1);
-				dorle = in->InputNumberPBD(1);
+				int	 allinpal = 0;
+				int	 gallinpal = 0;
+				int	 mod04 = 0;
+				int	 mod16 = 0;
 
-				for (x = 0; x < sizex; x++)
+				int	 dosaa = in->InputNumberPBD(1);
+				int	 dorle = in->InputNumberPBD(1);
+
+				for (int x = 0; x < sizex; x++)
 				{
-					if (x == 0)	lastcol = 0;
-					else		lastcol = line[x - 1];
+					int	 previousColor = (x > 0 ? line[x - 1] : 0);
 
-					if ((x % 16) == mod16)
-					{
-						gallinpal = in->InputNumberPBD(1);
-					}
+					if ( (x % 16) == mod16		     ) gallinpal = in->InputNumberPBD(1);
+					if (((x %  4) == mod04) && !gallinpal) allinpal	 = in->InputNumberPBD(1);
 
-					if (((x % 4) == mod04) && !gallinpal)
-					{
-						allinpal = in->InputNumberPBD(1);
-					}
+					int	 col = 0;
+					int	 inpal = 1;
 
-					if (allinpal || gallinpal) inpal = 1;
-					else			   inpal = in->InputNumberPBD(1);
+					if (!allinpal && !gallinpal) inpal = in->InputNumberPBD(1);
 
 					if (inpal == 0)
 					{
-						if (in->InputNumberPBD(1))
-						{
-							col = DecompressDelta(line, lastline, x, ctsize, in);
-						}
-						else
-						{
-							col = in->InputNumberPBD(ctsize * bpcc);
-						}
+						if (in->InputNumberPBD(1)) col = DecompressDelta(line, previousLine, x, ctsize, in);
+						else			   col = in->InputNumberPBD(ctsize * bpcc);
 
 						if (palentries < maxpalentries)
 						{
@@ -550,12 +505,13 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 					}
 					else
 					{
+						int	 saa = 0;
+
 						if (dosaa) saa = in->InputNumberPBD(1);
-						else	   saa = 0;
 
 						if (saa)
 						{
-							col = lastline[x];
+							col = previousLine[x];
 						}
 						else
 						{
@@ -567,9 +523,7 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 							{
 								if (in->InputNumberPBD(1) == 1)
 								{
-									lbits = GetMinimumBits(palentries - 2);
-
-									if (lbits > 4) lbits = 4;
+									int	 lbits = Math::Min(GetMinimumBits(palentries - 2), 4);
 
 									col = palette[(palentries - 1) - in->InputNumberPBD(lbits) - 2];
 								}
@@ -577,9 +531,7 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 								{
 									if (in->InputNumberPBD(1) == 1)
 									{
-										lbits = GetMinimumBits(palentries - 18);
-
-										if (lbits > 6) lbits = 6;
+										int	 lbits = Math::Min(GetMinimumBits(palentries - 18), 6);
 
 										col = palette[(palentries - 1) - in->InputNumberPBD(lbits) - 18];
 									}
@@ -596,23 +548,16 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 
 					line[x] = col;
 
-					if (col == lastcol)
+					if (col == previousColor)
 					{
 						if (in->InputNumberPBD(1) == 1)
 						{
-							if (in->InputNumberPBD(1) == 1)
-							{
-								pcirle = in->InputNumberPBD(8) + 2;
-							}
-							else
-							{
-								pcirle = in->InputNumberPBD(3) + 2;
-							}
+							int	 pcirle;
 
-							for (int i = x + 1; i <= x + pcirle; i++)
-							{
-								line[i] = line[x];
-							}
+							if (in->InputNumberPBD(1) == 1) pcirle = in->InputNumberPBD(8) + 2;
+							else				pcirle = in->InputNumberPBD(3) + 2;
+
+							for (int i = x + 1; i <= x + pcirle; i++) line[i] = line[x];
 
 							x = x + pcirle;
 
@@ -623,23 +568,16 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 							mod16 = (x + 1) % 16;
 						}
 					}
-					else if ((col == lastline[x]) && dorle)
+					else if ((col == previousLine[x]) && dorle)
 					{
 						if (in->InputNumberPBD(1) == 1)
 						{
-							if (in->InputNumberPBD(1) == 1)
-							{
-								pcirle = in->InputNumberPBD(8) + 2;
-							}
-							else
-							{
-								pcirle = in->InputNumberPBD(3) + 2;
-							}
+							int	 pcirle;
 
-							for (int i = x + 1; i <= x + pcirle; i++)
-							{
-								line[i] = lastline[i];
-							}
+							if (in->InputNumberPBD(1) == 1) pcirle = in->InputNumberPBD(8) + 2;
+							else				pcirle = in->InputNumberPBD(3) + 2;
+
+							for (int i = x + 1; i <= x + pcirle; i++) line[i] = previousLine[i];
 
 							x = x + pcirle;
 
@@ -653,17 +591,14 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 				}
 			}
 
-			for (x = 0; x < sizex; x++) lastline[x] = line[x];
+			for (int x = 0; x < sizex; x++) previousLine[x] = line[x];
 
 			break;
 		default:
 			break;
 	}
 
-	for (x = 0; x < sizex; x++)
-	{
-		bmp.SetPixel(Point(x, y), Color(line[x], colorspace).Upsample(bpcc).ConvertTo(RGBA));
-	}
+	for (int x = 0; x < sizex; x++) bmp.SetPixel(Point(x, y), Color(line[x], colorspace).Upsample(bpcc).ConvertTo(RGBA));
 
 	delete [] line;
 
@@ -682,10 +617,7 @@ int GetSLAL(int line[], int prevline[], int sx)
 
 int DecompressSLAL(int line[], int prevline[], int sx)
 {
-	for (int x = 0; x < sx; x++)
-	{
-		line[x] = prevline[x];
-	}
+	for (int x = 0; x < sx; x++) line[x] = prevline[x];
 
 	return 1;
 }
@@ -733,10 +665,7 @@ int GetSAA(int line[], int prevline[], int x)
 
 int GetDelta(int line[], int prevline[], int x, int parts)
 {
-	int	 pixb1;
-
-	if (x == 0) pixb1 = 0;
-	else	    pixb1 = line[x - 1];
+	int	 pixb1 = (x > 0 ? line[x - 1] : 0);
 
 	int	 bias;
 	int	 redbias;
@@ -749,10 +678,7 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 		case 1:
 			bias = line[x] - (pixb1 + prevline[x]) / 2;
 
-			if ((bias > -Math::Pow(2l, 3)) && (bias <= Math::Pow(2l, 3)))
-			{
-				return 1;
-			}
+			if ((bias > -Math::Pow(2l, 3)) && (bias <= Math::Pow(2l, 3))) return 1;
 
 			break;
 		case 3:
@@ -760,10 +686,7 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 			greenbias = Color(line[x]).GetGreen() - (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
 			bluebias  = Color(line[x]).GetBlue()  - (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
 
-			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))))
-			{
-				return 1;
-			}
+			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5)))) return 1;
 
 			break;
 		case 4:
@@ -772,10 +695,7 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 			bluebias  = Color(line[x]).GetBlue()  - (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
 			alphabias = Color(line[x]).GetAlpha() - (Color(pixb1).GetAlpha() + Color(prevline[x]).GetAlpha()) / 2;
 
-			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))) && ((alphabias > -Math::Pow(2l, 5)) && (alphabias <= Math::Pow(2l, 5))))
-			{
-				return 1;
-			}
+			if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))) && ((alphabias > -Math::Pow(2l, 5)) && (alphabias <= Math::Pow(2l, 5)))) return 1;
 
 			break;
 	}
@@ -785,10 +705,7 @@ int GetDelta(int line[], int prevline[], int x, int parts)
 
 int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 {
-	int pixb1;
-
-	if (x == 0) pixb1 = 0;
-	else	    pixb1 = line[x - 1];
+	int	 pixb1 = (x > 0 ? line[x - 1] : 0);
 
 	int	 md = 0;
 	int	 bias;
@@ -800,17 +717,17 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 	switch (parts)
 	{
 		case 1:
-			bias = line[x]-(pixb1+prevline[x])/2;
+			bias = line[x] - (pixb1 + prevline[x]) / 2;
 
 			if (bias <= 0)
 			{
 				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0-bias, 3);
+				out->OutputNumberPBD(0 - bias, 3);
 			}
 			else
 			{
 				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(bias-1, 3);
+				out->OutputNumberPBD(bias - 1, 3);
 			}
 
 			break;
@@ -948,10 +865,7 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 
 int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 {
-	int	 pixb1;
-
-	if (x == 0) pixb1 = 0;
-	else	    pixb1 = line[x - 1];
+	int	 pixb1 = (x > 0 ? line[x - 1] : 0);
 
 	int	 md;
 	int	 bias;
@@ -970,14 +884,8 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 		case 1:
 			gray = (pixb1 + prevline[x]) / 2;
 
-			if (in->InputNumberPBD(1) == 1)
-			{
-				bias = in->InputNumberPBD(3) + 1;
-			}
-			else
-			{
-				bias = 0 - in->InputNumberPBD(3);
-			}
+			if (in->InputNumberPBD(1) == 1) bias = in->InputNumberPBD(3) + 1;
+			else				bias = 0 - in->InputNumberPBD(3);
 
 			return gray + bias;
 		case 3:
@@ -987,32 +895,14 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 
 			md = in->InputNumberPBD(2) + 2;
 
-			if (in->InputNumberPBD(1) == 1)
-			{
-				redbias = in->InputNumberPBD(md) + 1;
-			}
-			else
-			{
-				redbias = 0 - in->InputNumberPBD(md);
-			}
+			if (in->InputNumberPBD(1) == 1) redbias	  =	in->InputNumberPBD(md) + 1;
+			else				redbias	  = 0 - in->InputNumberPBD(md);
 
-			if (in->InputNumberPBD(1) == 1)
-			{
-				greenbias = in->InputNumberPBD(md) + 1;
-			}
-			else
-			{
-				greenbias = 0 - in->InputNumberPBD(md);
-			}
+			if (in->InputNumberPBD(1) == 1) greenbias =	in->InputNumberPBD(md) + 1;
+			else				greenbias = 0 - in->InputNumberPBD(md);
 
-			if (in->InputNumberPBD(1) == 1)
-			{
-				bluebias = in->InputNumberPBD(md) + 1;
-			}
-			else
-			{
-				bluebias = 0 - in->InputNumberPBD(md);
-			}
+			if (in->InputNumberPBD(1) == 1) bluebias  =	in->InputNumberPBD(md) + 1;
+			else				bluebias  = 0 - in->InputNumberPBD(md);
 
 			return Color(red + redbias, green + greenbias, blue + bluebias);
 		case 4:
@@ -1023,41 +913,17 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 
 			md = in->InputNumberPBD(2) + 2;
 
-			if (in->InputNumberPBD(1) == 1)
-			{
-				redbias = in->InputNumberPBD(md) + 1;
-			}
-			else
-			{
-				redbias = 0 - in->InputNumberPBD(md);
-			}
+			if (in->InputNumberPBD(1) == 1) redbias	  =	in->InputNumberPBD(md) + 1;
+			else				redbias	  = 0 - in->InputNumberPBD(md);
 
-			if (in->InputNumberPBD(1) == 1)
-			{
-				greenbias = in->InputNumberPBD(md) + 1;
-			}
-			else
-			{
-				greenbias = 0 - in->InputNumberPBD(md);
-			}
+			if (in->InputNumberPBD(1) == 1) greenbias =	in->InputNumberPBD(md) + 1;
+			else				greenbias = 0 - in->InputNumberPBD(md);
 
-			if (in->InputNumberPBD(1) == 1)
-			{
-				bluebias = in->InputNumberPBD(md) + 1;
-			}
-			else
-			{
-				bluebias = 0 - in->InputNumberPBD(md);
-			}
+			if (in->InputNumberPBD(1) == 1) bluebias  =	in->InputNumberPBD(md) + 1;
+			else				bluebias  = 0 - in->InputNumberPBD(md);
 
-			if (in->InputNumberPBD(1) == 1)
-			{
-				alphabias = in->InputNumberPBD(md) + 1;
-			}
-			else
-			{
-				alphabias = 0 - in->InputNumberPBD(md);
-			}
+			if (in->InputNumberPBD(1) == 1) alphabias =	in->InputNumberPBD(md) + 1;
+			else				alphabias = 0 - in->InputNumberPBD(md);
 
 			return Color(red + redbias, green + greenbias, blue + bluebias, alpha + alphabias);
 	}
@@ -1077,7 +943,7 @@ int GetMinimumBits(int number)
 
 int GetMinimumTriples(int number)
 {
-	for (int i = 0; i <= 20; i++)
+	for (Int i = 0; i <= 20; i++)
 	{
 		if (number < Math::Pow(3l, i)) return i;
 	}
@@ -1087,7 +953,7 @@ int GetMinimumTriples(int number)
 
 int GetMinimumDecades(int number)
 {
-	for (int i = 0; i <= 9; i++)
+	for (Int i = 0; i <= 9; i++)
 	{
 		if (number < Math::Pow(10l, i)) return i;
 	}
@@ -1097,10 +963,7 @@ int GetMinimumDecades(int number)
 
 int RotatePalette(int color)
 {
-	for (int x = 0; x < palentries - 1; x++)
-	{
-		palette[x] = palette[x + 1];
-	}
+	for (Int x = 0; x < palentries - 1; x++) palette[x] = palette[x + 1];
 
 	palette[palentries - 1] = color;
 
@@ -1109,12 +972,9 @@ int RotatePalette(int color)
 
 int RotatePaletteEntry(int entry)
 {
-	int col = palette[entry];
+	Int	 col = palette[entry];
 
-	for (int x = entry; x < palentries - 1; x++)
-	{
-		palette[x] = palette[x + 1];
-	}
+	for (Int x = entry; x < palentries - 1; x++) palette[x] = palette[x + 1];
 
 	palette[palentries - 1] = col;
 
@@ -1123,7 +983,7 @@ int RotatePaletteEntry(int entry)
 
 int GetPaletteEntry(int color)
 {
-	for (int i = palentries - 1; i >= 0; i--)
+	for (Int i = palentries - 1; i >= 0; i--)
 	{
 		if (palette[i] == color) return i;
 	}
@@ -1133,7 +993,6 @@ int GetPaletteEntry(int color)
 
 int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool nvRLE, int &rBits, int &rBitsSAA)
 {
-	int	 lastcol;
 	int	 pcirle;
 	int	 allinpal = 0;
 	int	 gallinpal = 0;
@@ -1142,7 +1001,6 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 	int	 mod16 = 0;
 	int	 comp = 0;
 	int	 compsaa = 0;
-	int	 saa = 0;
 
 	int	 oldpalette[388];
 	int	 oldpalentries = palentries;
@@ -1151,10 +1009,7 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 
 	for (int x = s; x < e; x++)
 	{
-		saa = 0;
-
-		if (x == 0) lastcol = 0;
-		else	    lastcol = line[x - 1];
+		int	 previousColor = (x > 0 ? line[x - 1] : 0);
 
 		if ((x % 16) == mod16)
 		{
@@ -1182,14 +1037,8 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 
 		if ((GetPaletteEntry(line[x]) == -1))
 		{
-			if (GetDelta(line, prevline, x, ctsize))
-			{
-				comp += 9;
-			}
-			else
-			{
-				comp += 26;
-			}
+			if (GetDelta(line, prevline, x, ctsize)) comp +=  9;
+			else					 comp += 26;
 
 			if (palentries < 338)
 			{
@@ -1207,6 +1056,8 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 
 			compsaa++;
 
+			int	 saa = 0;
+
 			if (GetSAA(line, prevline, x)) saa = 1;
 
 			if ((palentries - 1) - GetPaletteEntry(line[x]) < 2)
@@ -1219,9 +1070,7 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 			{
 				if ((palentries - 1)-GetPaletteEntry(line[x]) < 18)
 				{
-					lbits = GetMinimumBits(palentries-2);
-
-					if (lbits > 4) bits = 4;
+					lbits = Math::Min(GetMinimumBits(palentries - 2), 4);
 
 					comp += (lbits + 2);
 
@@ -1231,9 +1080,7 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 				{
 					if ((palentries - 1) - GetPaletteEntry(line[x]) < 82)
 					{
-						lbits = GetMinimumBits(palentries - 18);
-
-						if (lbits > 6) lbits = 6;
+						lbits = Math::Min(GetMinimumBits(palentries - 18), 6);
 
 						comp += (lbits + 3);
 
@@ -1251,20 +1098,14 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 			RotatePaletteEntry(GetPaletteEntry(line[x]));
 		}
 
-		if (line[x] == lastcol)
+		if (line[x] == previousColor)
 		{
 			pcirle = GetRLE(line, sx, x, 8);
 
 			if (pcirle >= 2)
 			{
-				if (pcirle > 9)
-				{
-					comp += 10;
-				}
-				else
-				{
-					comp += 5;
-				}
+				if (pcirle > 9) comp += 10;
+				else		comp += 5;
 
 				x = x + pcirle;
 
@@ -1285,14 +1126,8 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 
 			if (pcirle >= 2)
 			{
-				if (pcirle > 9)
-				{
-					comp += 10;
-				}
-				else
-				{
-					comp += 5;
-				}
+				if (pcirle > 9) comp += 10;
+				else		comp += 5;
 
 				x = x + pcirle;
 
@@ -1308,11 +1143,12 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 			}
 		}
 	}
+
 	palentries = oldpalentries;
 
 	for (int j = 0; j < 388; j++) palette[j] = oldpalette[j];
 
-	rBits = comp;
+	rBits	 = comp;
 	rBitsSAA = comp + compsaa;
 
 	return 0;

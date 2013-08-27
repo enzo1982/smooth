@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -282,8 +282,7 @@ S::Long S::IO::InStream::InputNumberPBD(Int bits)
 
 	if (!pbdActive) InitPBD();
 
-	unsigned char	 inp;
-	long		 rval = 0;
+	long	 rval = 0;
 
 	while (pbdLength < bits)
 	{
@@ -294,15 +293,14 @@ S::Long S::IO::InStream::InputNumberPBD(Int bits)
 			if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 		}
 
-		inp = dataBuffer[currentBufferPos];
-		currentBufferPos++;
-		currentFilePos++;
-
 		for (int i = 0; i < 8; i++)
 		{
-			pbdBuffer[pbdLength] = IOGetBit(inp, i);
+			pbdBuffer[pbdLength] = IOGetBit(dataBuffer[currentBufferPos], i);
 			pbdLength++;
 		}
+
+		currentBufferPos++;
+		currentFilePos++;
 	}
 
 	for (int i = 0; i < bits; i++)
@@ -329,7 +327,6 @@ S::String S::IO::InStream::InputString(Int bytes)
 
 	int	 bytesleft	= bytes;
 	int	 databufferpos	= 0;
-	int	 amount		= 0;
 
 	Buffer<UnsignedByte>	 stringBuffer(bytes + 1);
 
@@ -342,10 +339,14 @@ S::String S::IO::InStream::InputString(Int bytes)
 
 		while (currentBufferPos >= packageSize)
 		{
+			/* If no more data is available, set lastError and return NIL.
+			 */
 			if (!ReadData()) { lastError = IO_ERROR_NODATA; return NIL; }
 		}
 
-		amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
+		/* Get amount of data read and copy to string buffer.
+		 */
+		int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
 		for (Int i = 0; i < amount; i++) stringBuffer[databufferpos + i] = (((UnsignedByte *) dataBuffer) + currentBufferPos)[i];
 
@@ -414,7 +415,6 @@ S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 
 	int	 bytesleft	= bytes;
 	int	 databufferpos	= 0;
-	int	 amount		= 0;
 
 	while (bytesleft)
 	{
@@ -428,7 +428,9 @@ S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 			if (!ReadData()) { lastError = IO_ERROR_NODATA; return bytes - bytesleft; }
 		}
 
-		amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
+		/* Get amount of data read and copy to output buffer.
+		 */
+		int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
 		memcpy((void *) ((unsigned char *) pointer + databufferpos), (void *) (((UnsignedByte *) dataBuffer) + currentBufferPos), amount);
 

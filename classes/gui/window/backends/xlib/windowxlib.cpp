@@ -260,7 +260,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				if (e->xselectionrequest.target == XA_TARGETS(display))
 				{
 					Atom	 targets[] = { XA_STRING, XA_UTF8_STRING(display) };
-					
+
 					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_ATOM, 32, PropModeReplace, (unsigned char *) targets, 2);
 				}
 				else if (e->xselectionrequest.target == XA_STRING)

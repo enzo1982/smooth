@@ -20,7 +20,7 @@ S::Int	 backendCocoaTmp = S::Backends::Backend::AddBackend(&CreateBackendCocoa);
 S::Backends::BackendCocoa::BackendCocoa()
 {
 	type = BACKEND_COCOA;
-	
+
 	pool = nil;
 }
 
@@ -45,7 +45,7 @@ S::Int S::Backends::BackendCocoa::Init()
 	NSString	*language  = [languages objectAtIndex: 0];
 
 	setenv("LANG", [language UTF8String], False);
-	
+
 	return Success();
 }
 

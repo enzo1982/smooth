@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -55,7 +55,6 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 	}
 
 	int	 recbytes = 0;
-	int	 neededbytes;
 
 	if (uname == NIL)
 	{
@@ -187,8 +186,9 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 	}
 	else if (socksdata[3] == 3)
 	{
-		recbytes	= 0;
-		neededbytes	= socksdata[4] + 2;
+		int	 neededbytes = socksdata[4] + 2;
+
+		recbytes = 0;
 
 		while (recbytes != neededbytes)
 		{

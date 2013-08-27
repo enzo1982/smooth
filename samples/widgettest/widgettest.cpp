@@ -41,7 +41,7 @@ WidgetTest::WidgetTest()
 	title		= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	activearea	= new MyActiveArea(RGB(255, 255, 128), pos, size);
 	activearea->onAction.Connect(&WidgetTest::activeAreaProc, this);
-	
+
 	Add(wnd);
 
 	wnd->Add(title);

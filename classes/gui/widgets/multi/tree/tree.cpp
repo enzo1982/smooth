@@ -149,7 +149,7 @@ S::Int S::GUI::Tree::Paint(Int message)
 					{
 						ListEntry	*entry	       = GetNthEntry(i);
 						Size		 entryRealSize = entry->GetRealSize();
-	
+
 						entry->SetVisibleDirect(False);
 
 						if (entryRealPosition.y + entryRealSize.cy >= visibleArea.top && entryRealPosition.y <= visibleArea.bottom)

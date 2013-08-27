@@ -615,7 +615,7 @@ S::Int S::GUI::WindowGDI::Close()
 	/* Destroy window and unregister class.
 	 */
 	DestroyWindow(hwnd);
-	
+
 	if (Setup::enableUnicode)
 	{
 		UnregisterClassW(className, hDllInstance);
@@ -850,7 +850,7 @@ S::Void S::GUI::WindowGDI::InitMouseNotifier()
 S::Void S::GUI::WindowGDI::FreeMouseNotifier()
 {
 	mouseNotifyTimer->Stop();
-	
+
 	delete mouseNotifyTimer;
 }
 

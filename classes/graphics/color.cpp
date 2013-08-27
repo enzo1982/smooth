@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,13 +23,8 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 	double	h;
 	double	s;
 	double	v;
-	double	f;
-	double	p;
-	double	q;
-	double	t;
 	double	min;
 	double	max;
-	double	delta;
 
 	switch (colorSpace)
 	{
@@ -55,7 +50,7 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 
 					if (s != 0)
 					{
-						delta = max - min;
+						double	 delta = max - min;
 
 						if	(r == max) h =	   (g - b) / delta;
 						else if (g == max) h = 2 + (b - r) / delta;
@@ -127,10 +122,10 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 
 						h /= 60;
 
-						f = h - (int) h;
-						p = v * (1 -  s		  );
-						q = v * (1 - (s *      f ));
-						t = v * (1 - (s * (1 - f)));
+						double	 f = h - (int) h;
+						double	 p = v * (1 -  s	   );
+						double	 q = v * (1 - (s *      f ));
+						double	 t = v * (1 - (s * (1 - f)));
 
 						switch ((int) h)
 						{

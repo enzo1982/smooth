@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -355,7 +355,7 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 
 				onEvent.Call(SM_WINDOWMETRICS, ((	(int) windowRect.left			  + 32768) << 16) | (	    (int) windowRect.top		       + 32768),
 							       ((Math::Floor((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Floor((windowRect.Height() + 1) / fontSize) + 32768));
-							       
+
 				updateRect = Rect(Point(0, 0), Size(windowRect.Width(), windowRect.Height()) + Size(1, 1));
 
 				onEvent.Call(SM_PAINT, 0, 0);
@@ -463,7 +463,7 @@ S::Int S::GUI::WindowHaiku::Close()
 	/* Destroy window.
 	 */
 	BWindow	*oldwnd = wnd;
- 
+
 	wnd  = NIL;
 	view = NIL;
 

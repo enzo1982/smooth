@@ -184,7 +184,7 @@ S::Int S::GUI::TabWidget::SelectTab(const Widget *tabWidget)
 
 		return Success();
 	}
-	
+
 	return Error();
 }
 

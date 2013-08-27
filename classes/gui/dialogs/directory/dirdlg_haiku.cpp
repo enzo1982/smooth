@@ -32,15 +32,15 @@ class HaikuDirectoryDialog : public BLooper
 				case B_REFS_RECEIVED:
 					{
 						entry_ref	 dir;
-			
+
 						if (message->FindRef("refs", &dir) == B_OK)
 						{
 							BPath	 path(&dir);
-			
+
 							directory.ImportFrom("UTF-8", path.Path());
 						}
 					}
-			
+
 					PostMessage(B_QUIT_REQUESTED);
 
 					break;
@@ -88,7 +88,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 	thread_id	 thread = dialog->Run();
 	status_t	 status = B_OK;
-	
+
 	wait_for_thread(thread, &status);
 
 	if (directory == NIL) error = Error();

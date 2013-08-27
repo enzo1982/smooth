@@ -97,7 +97,7 @@ S::Void S::Hash::MD5::Transform(UnsignedByte *buffer)
 	UnsignedInt32	 c = state[2];
 	UnsignedInt32	 d = state[3];
 	UnsignedInt32	*x = (UnsignedInt32 *) buffer;
-  
+
 	/* Round 1 */
 	FF(a, b, c, d, x[ 0], S11, 0xd76aa478); /*  1 */
 	FF(d, a, b, c, x[ 1], S12, 0xe8c7b756); /*  2 */

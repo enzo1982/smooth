@@ -210,7 +210,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 				if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))
 				{
 					if (markStart == -1) markStart = promptPos;
-	
+
 					if (promptPos <= markStart)
 					{
 						MarkText(markStart, wordStart);

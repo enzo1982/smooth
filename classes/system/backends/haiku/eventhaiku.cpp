@@ -65,7 +65,7 @@ class HaikuEventDispatcher : public BApplication
 		HaikuEventDispatcher() : BApplication("application/x-vnd.smooth-haiku")
 		{
 		}
-		
+
 		void Start()
 		{
 			Lock();

@@ -110,7 +110,7 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 		paintRects.Add(new Rect(Point(0, 0), size));
 
 		paintContextCairo = cairo_create(paintSurfaceCairo);
-	
+
 		cairo_set_antialias(paintContextCairo, CAIRO_ANTIALIAS_NONE);
 
 		allocSize = size;

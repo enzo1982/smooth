@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -170,7 +170,7 @@ S::Int S::Configuration::RemoveConfiguration(const String &rConfig)
 	return Error();
 }
 
-S::Int S::Configuration::GetNOfConfigurations()
+S::Int S::Configuration::GetNOfConfigurations() const
 {
 	XML::Node	*root = configFile->GetRootNode();
 
@@ -190,7 +190,7 @@ S::Int S::Configuration::GetNOfConfigurations()
 	return count;
 }
 
-S::String S::Configuration::GetNthConfigurationName(Int n)
+S::String S::Configuration::GetNthConfigurationName(Int n) const
 {
 	XML::Node	*root = configFile->GetRootNode();
 
@@ -240,7 +240,7 @@ S::Int S::Configuration::SetParentConfiguration(const String &nParent)
 	return Success();
 }
 
-S::String S::Configuration::GetConfigurationName()
+S::String S::Configuration::GetConfigurationName() const
 {
 	if (configFile == NIL) return NIL;
 
@@ -382,7 +382,7 @@ S::Int S::Configuration::SetStringValue(const String &section, const String &nam
 	return Success();
 }
 
-S::XML::Node *S::Configuration::FindConfigurationNode(const String &configuration)
+S::XML::Node *S::Configuration::FindConfigurationNode(const String &configuration) const
 {
 	XML::Node	*root = configFile->GetRootNode();
 
@@ -405,7 +405,7 @@ S::XML::Node *S::Configuration::FindConfigurationNode(const String &configuratio
 	return NIL;
 }
 
-S::XML::Node *S::Configuration::FindSectionNode(const String &section)
+S::XML::Node *S::Configuration::FindSectionNode(const String &section) const
 {
 	XML::Node	*configuration = FindConfigurationNode(activeConfig);
 
@@ -425,7 +425,7 @@ S::XML::Node *S::Configuration::FindSectionNode(const String &section)
 	return NIL;
 }
 
-S::XML::Node *S::Configuration::FindValueNode(const String &sect, const String &name)
+S::XML::Node *S::Configuration::FindValueNode(const String &sect, const String &name) const
 {
 	XML::Node	*section = FindSectionNode(sect);
 

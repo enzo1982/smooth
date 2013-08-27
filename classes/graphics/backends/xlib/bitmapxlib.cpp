@@ -85,7 +85,7 @@ S::Bool S::GUI::BitmapXLib::CreateBitmap(Int cx, Int cy, Int bpp)
 
 	if (bpp == -1)				 bpp = XDefaultDepth(display, XDefaultScreen(display));
 	if (bpp != 16 && bpp != 24 && bpp != 32) bpp = 32;
-	
+
 	bitmap	= XCreatePixmap(display, DefaultRootWindow(display), cx, cy, bpp);
 	bytes	= NIL;
 

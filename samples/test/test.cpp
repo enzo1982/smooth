@@ -225,6 +225,8 @@ Test::~Test()
 
 	DeleteObject(menu_file);
 	DeleteObject(menu_dialogs);
+	DeleteObject(menu_menus);
+	DeleteObject(menu_2ndlevel);
 
 	DeleteObject(mainWnd_menubar);
 
@@ -253,17 +255,33 @@ Void Test::OnArrowsValueChange(Int value)
 
 	Surface	*surface = mainWnd->GetDrawSurface();
 
+	/* Boxes.
+	 */
 	surface->Box(Rect(Point(250, 150), Size(10, 10)), Color(255, 0, 0), Rect::Filled);
 	surface->Box(Rect(Point(250, 170), Size(10, 10)), Color(255, 0, 0), Rect::Dotted);
 	surface->Box(Rect(Point(250, 190), Size(10, 10)), Color(255, 0, 0), Rect::Outlined);
 
+	/* Gradient.
+	 */
 	surface->Gradient(Rect(Point(300, 150), Size(100, 10)), Color(255, 0, 0), Color(0, 0, 255), OR_HORZ);
 
+	/* Horizontal & vertical lines.
+	 */
 	surface->Line(Point(300, 170), Point(400, 170), Color(255, 0, 0));
+	surface->Line(Point(400, 180), Point(300, 180), Color(255, 0, 0));
 	surface->Line(Point(300, 190), Point(300, 200), Color(255, 0, 0));
-	surface->Line(Point(310, 190), Point(320, 200), Color(255, 0, 0));
+	surface->Line(Point(290, 200), Point(290, 190), Color(255, 0, 0));
 
-	surface->SetPixel(Point(350, 190), Color(255, 0, 0));
+	/* Diagonal lines.
+	 */
+	surface->Line(Point(310, 190), Point(320, 200), Color(255, 0, 0));
+	surface->Line(Point(330, 200), Point(340, 190), Color(255, 0, 0));
+	surface->Line(Point(360, 200), Point(350, 190), Color(255, 0, 0));
+	surface->Line(Point(380, 190), Point(370, 200), Color(255, 0, 0));
+
+	/* Single pixel.
+	 */
+	surface->SetPixel(Point(399, 190), Color(255, 0, 0));
 }
 
 Void Test::OnScrollbarValueChange(Int value)

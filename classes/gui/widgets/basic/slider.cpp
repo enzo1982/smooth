@@ -55,6 +55,8 @@ S::GUI::Slider::Slider(const Point &iPos, const Size &iSize, Int sType, Int *var
 	onChangeSize.Connect(&Slider::UpdateHotspotPositions, this);
 
 	SetValue(*variable);
+
+	UpdateHotspotPositions();
 }
 
 S::GUI::Slider::~Slider()
@@ -78,6 +80,8 @@ S::Int S::GUI::Slider::Paint(Int message)
 	{
 		case SP_SHOW:
 		case SP_PAINT:
+			surface->StartPaint(Rect(realPos, realSize));
+
 			surface->Box(Rect(realPos, realSize), GetBackgroundColor(), Rect::Filled);
 
 			if (subtype == OR_HORZ)	surface->Bar(realPos + Point((realGripSize - 1) / 2, (realSize.cy - 2) / 2), realPos + Point(realSize.cx - (realGripSize - 1) / 2, (realSize.cy - 2) / 2), OR_HORZ);
@@ -90,6 +94,8 @@ S::Int S::GUI::Slider::Paint(Int message)
 			else		surface->Box(sliderRect, Setup::LightGrayColor, Rect::Filled);
 
 			surface->Frame(sliderRect, FRAME_UP);
+
+			surface->EndPaint();
 
 			break;
 	}
@@ -124,9 +130,11 @@ S::Int S::GUI::Slider::SetValue(Int newValue)
 	{
 		if (!dragging)
 		{
-			Paint(SP_PAINT);
+			Point	 prevPosition = dragHotspot->GetPosition();
 
 			UpdateHotspotPositions();
+
+			if (dragHotspot->GetPosition() != prevPosition) Paint(SP_PAINT);
 		}
 
 		onValueChange.Emit(*variable);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,8 +32,6 @@ S::GUI::Progressbar::Progressbar(const Point &iPos, const Size &iSize, Int sType
 
 	if (GetWidth() == 0) SetWidth(subtype == OR_VERT ? 19 : 80);
 	if (GetHeight() == 0) SetHeight(subtype == OR_VERT ? 80 : 19);
-
-	CreateGradient(GetRealSize());
 }
 
 S::GUI::Progressbar::~Progressbar()
@@ -66,6 +64,10 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 
 				if (subtype == OR_HORZ)	frame.right = frame.left   + (Int) (frame.GetWidth() / ((Float) (endValue - startValue) / (Float) (value - startValue)));
 				else			frame.top   = frame.bottom - (Int) (frame.GetHeight() / ((Float) (endValue - startValue) / (Float) (value - startValue)));
+
+				/* Update gradient bitmap if necessary.
+				 */
+				if (gradient.GetSize() != GetRealSize() - Size(2, 2)) CreateGradient(GetRealSize());
 
 				gradient.BlitToSurface(Rect(Point(0 + (IsRightToLeft() ? frame.GetWidth() : 0), 0), Size(frame.GetWidth() * (IsRightToLeft() ? -1 : 1), frame.GetHeight())), surface, frame);
 			}
@@ -115,15 +117,6 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 	}
 
 	return Success();
-}
-
-S::Int S::GUI::Progressbar::SetMetrics(const Point &nPos, const Size &nSize)
-{
-	Surface	*surface = GetDrawSurface();
-
-	CreateGradient(nSize * surface->GetSurfaceDPI() / 96.0);
-
-	return Widget::SetMetrics(nPos, nSize);
 }
 
 S::Int S::GUI::Progressbar::SetValue(Int newValue)

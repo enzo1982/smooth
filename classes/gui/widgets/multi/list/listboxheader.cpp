@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -270,7 +270,7 @@ S::Void S::GUI::ListBoxHeader::OnMouseDragEnd(const Point &mousePos)
 
 S::Void S::GUI::ListBoxHeader::OnChangeSize(const Size &nSize)
 {
-	Int	 varSizeTabs = 0;
+	Int	 varSizeTabs	  = 0;
 	Int	 sumFixedTabSizes = 0;
 
 	for (Int i = 0; i < tabWidths.Length(); i++)
@@ -279,9 +279,12 @@ S::Void S::GUI::ListBoxHeader::OnChangeSize(const Size &nSize)
 		else				sumFixedTabSizes += tabWidths.GetNth(i);
 	}
 
-	for (Int j = 0; j < tabWidths.Length(); j++)
+	if (varSizeTabs > 0)
 	{
-		if (tabWidths.GetNth(j) <= 0) tabWidths.SetNth(j, -Math::Max(0, (GetWidth() - sumFixedTabSizes) / varSizeTabs));
+		for (Int i = 0; i < tabWidths.Length(); i++)
+		{
+			if (tabWidths.GetNth(i) <= 0) tabWidths.SetNth(i, -Math::Max(0, (GetWidth() - sumFixedTabSizes) / varSizeTabs));
+		}
 	}
 
 	dragHotspot->SetSize(nSize);

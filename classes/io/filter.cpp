@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,6 +13,8 @@
 
 S::IO::Filter::Filter()
 {
+	driver	    = NIL;
+
 	packageSize = 0;
 }
 
@@ -32,11 +34,15 @@ S::Bool S::IO::Filter::Deactivate()
 
 S::Int S::IO::Filter::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
+	if (driver == NIL) return -1;
+
 	return driver->WriteData(data, size);
 }
 
 S::Int S::IO::Filter::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	if (driver == NIL) return -1;
+
 	if (size > (driver->GetSize() - driver->GetPos())) size = driver->GetSize() - driver->GetPos();
 
 	data.Resize(size);

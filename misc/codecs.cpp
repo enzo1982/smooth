@@ -115,6 +115,15 @@ Bool PCIIO::DecompressPCI(PCIIn in)
 
 bool PCIIO::WriteLine(PCIOut out, int y)
 {
+	/* Check compression type.
+	 */
+	if (compression != PCI	 &&
+	    compression != RLE	 &&
+	    compression != BZIP2 &&
+	    compression != UNCOMPRESSED) return false;
+
+	/* Write image line.
+	 */
 	int	*line = new int [sizex];
 	int	 ctsize;
 	int	 maxpalentries;
@@ -397,8 +406,6 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 			for (int x = 0; x < sizex; x++) previousLine[x] = line[x];
 
 			break;
-		default:
-			break;
 	}
 
 	delete [] line;
@@ -408,6 +415,15 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 
 bool PCIIO::ReadLine(PCIIn in, int y)
 {
+	/* Check compression type.
+	 */
+	if (compression != PCI	 &&
+	    compression != RLE	 &&
+	    compression != BZIP2 &&
+	    compression != UNCOMPRESSED) return false;
+
+	/* Read image line.
+	 */
 	int	*line = new int [sizex];
 	int	 ctsize;
 	int	 maxpalentries;
@@ -543,7 +559,9 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 							}
 						}
 
-						RotatePaletteEntry(GetPaletteEntry(col));
+						int	 paletteEntry = GetPaletteEntry(col);
+
+						if (paletteEntry >= 0) RotatePaletteEntry(paletteEntry);
 					}
 
 					line[x] = col;
@@ -593,8 +611,6 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 
 			for (int x = 0; x < sizex; x++) previousLine[x] = line[x];
 
-			break;
-		default:
 			break;
 	}
 
@@ -1068,7 +1084,7 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 			}
 			else
 			{
-				if ((palentries - 1)-GetPaletteEntry(line[x]) < 18)
+				if ((palentries - 1) - GetPaletteEntry(line[x]) < 18)
 				{
 					lbits = Math::Min(GetMinimumBits(palentries - 2), 4);
 
@@ -1095,7 +1111,10 @@ int ProbeComp(int s, int e, int line[], int prevline[], int sx, int ctsize, bool
 				}
 			}
 
-			RotatePaletteEntry(GetPaletteEntry(line[x]));
+
+			int	 paletteEntry = GetPaletteEntry(line[x]);
+
+			if (paletteEntry >= 0) RotatePaletteEntry(paletteEntry);
 		}
 
 		if (line[x] == previousColor)

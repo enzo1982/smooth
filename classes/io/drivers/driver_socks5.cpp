@@ -43,9 +43,11 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 		{ lastError = IO_ERROR_UNEXPECTED; return; }
 	}
 
-	saddr.sin_family	= AF_INET;
-	saddr.sin_addr		= *((in_addr *) *host->h_addr_list);
-	saddr.sin_port		= htons((short) socksPort);
+	saddr.sin_family = AF_INET;
+	saddr.sin_addr	 = *((in_addr *) *host->h_addr_list);
+	saddr.sin_port	 = htons((short) socksPort);
+
+	memset(&saddr.sin_zero, 0, sizeof(saddr.sin_zero));
 
 	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1)
 	{

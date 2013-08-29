@@ -262,10 +262,10 @@ S::Bool S::File::Exists() const
 
 	if (handle == INVALID_HANDLE_VALUE) return False;
 
+	FindClose(handle);
+
 	if (Setup::enableUnicode) { if (findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) return False; }
 	else			  { if (findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) return False; }
-
-	FindClose(handle);
 #else
 	struct stat	 info;
 

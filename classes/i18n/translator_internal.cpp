@@ -105,27 +105,27 @@ S::Int S::I18n::TranslatorInternal::ActivateLanguage(const String &magic)
 {
 	foreach (Language *language, languages)
 	{
-		if (language->magic == magic)
+		if (language->magic != magic) continue;
+
+		activeLanguage = language;
+
+		/* Load actual language data.
+		 */
+		if (magic != "internal" && activeLanguage->strings.Length() == 0 && activeLanguage->sections.Length() == 0)
 		{
-			activeLanguage = language;
-
-			/* Load actual language data.
-			 */
-			if (magic != "internal" && activeLanguage->strings.Length() == 0 && activeLanguage->sections.Length() == 0)
+			for (Int i = 0; languageMagics[i] != NIL; i++)
 			{
-				const char	*xml = NIL;
-
-				for (Int i = 0; languageMagics[i] != NIL; i++) if (magic == languageMagics[i]) xml = languageXMLs[i];
+				if (magic != languageMagics[i]) continue;
 
 				XML::Document	*doc = new XML::Document();
 
-				if (doc->ParseMemory((void *) xml, strlen(xml)) == Success()) LoadData(doc, activeLanguage);
+				if (doc->ParseMemory((void *) languageXMLs[i], strlen(languageXMLs[i])) == Success()) LoadData(doc, activeLanguage);
 
 				delete doc;
 			}
-
-			return Success();
 		}
+
+		return Success();
 	}
 
 	return Error();

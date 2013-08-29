@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -56,7 +56,7 @@ S::Int S::Encoding::Base64::Decode(const String &string)
 
 	for (Int i = 0; i < string.Length(); i += 4)
 	{
-		Int	 val[4];
+		Int	 val[4] = { 64, 64, 64, 64 };
 
 		for (Int j = 0; j < 4; j++)
 		{
@@ -65,10 +65,11 @@ S::Int S::Encoding::Base64::Decode(const String &string)
 			else if (string[i + j] >= '0' && string[i + j] <= '9')	val[j] = string[i + j] - '0' + 52;
 			else if (string[i + j] == '+')				val[j] = 62;
 			else if (string[i + j] == '/')				val[j] = 63;
-			else if (string[i + j] == '=')				val[j] = 64;
 		}
 
-				  buffer[bytes++] = ( val[0]       << 2) | (val[1] >> 4);
+		if (val[0] == 64) break;
+
+		if (val[1] != 64) buffer[bytes++] = ( val[0]       << 2) | (val[1] >> 4);
 		if (val[2] != 64) buffer[bytes++] = ((val[1] & 15) << 4) | (val[2] >> 2);
 		if (val[3] != 64) buffer[bytes++] = ((val[2] &  3) << 6) | (val[3]);
 

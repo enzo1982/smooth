@@ -29,9 +29,11 @@
 
 S::IO::OutStream::OutStream(Int type, Driver *iDriver)
 {
+	inStream	= NIL;
+
 	if (type != STREAM_DRIVER)		   { lastError = IO_ERROR_BADPARAM;	 return; }
 
-	driver = iDriver;
+	driver		= iDriver;
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); return; }
 
@@ -45,12 +47,14 @@ S::IO::OutStream::OutStream(Int type, Driver *iDriver)
 
 S::IO::OutStream::OutStream(Int type, const String &fileName, Int mode)
 {
+	inStream	= NIL;
+
 	if (type != STREAM_FILE)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
 #ifdef __WIN32__
-	driver = new DriverWin32(File(fileName), mode);
+	driver		= new DriverWin32(File(fileName), mode);
 #else
-	driver = new DriverPOSIX(File(fileName), mode);
+	driver		= new DriverPOSIX(File(fileName), mode);
 #endif
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
@@ -64,15 +68,18 @@ S::IO::OutStream::OutStream(Int type, const String &fileName, Int mode)
 
 S::IO::OutStream::OutStream(Int type, FILE *openFile)
 {
+	inStream	= NIL;
+
 	if (type != STREAM_ANSI)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-	driver = new DriverANSI(openFile);
+	driver		= new DriverANSI(openFile);
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
 	streamType	= STREAM_DRIVER;
 	size		= driver->GetSize();
 	currentFilePos	= driver->GetPos();
+
 	packageSize	= 1; // low package size, 'cause openFile could point to the console
 	stdpacksize	= packageSize;
 	origpacksize	= packageSize;
@@ -82,14 +89,17 @@ S::IO::OutStream::OutStream(Int type, FILE *openFile)
 
 S::IO::OutStream::OutStream(Int type, Void *outBuffer, Long bufferSize)
 {
+	inStream	= NIL;
+
 	if (type != STREAM_BUFFER)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-	driver = new DriverMemory(outBuffer, bufferSize);
+	driver		= new DriverMemory(outBuffer, bufferSize);
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
 	streamType	= STREAM_DRIVER;
 	size		= driver->GetSize();
+
 	packageSize	= 1;
 	stdpacksize	= packageSize;
 	origpacksize	= packageSize;
@@ -99,10 +109,12 @@ S::IO::OutStream::OutStream(Int type, Void *outBuffer, Long bufferSize)
 
 S::IO::OutStream::OutStream(Int type, InStream *in)
 {
+	inStream	= NIL;
+
 	if (type != STREAM_STREAM)			      { lastError = IO_ERROR_BADPARAM;	 return; }
 	if (in->streamType == STREAM_NONE || in->crosslinked) { lastError = IO_ERROR_OPNOTAVAIL; return; }
 
-	streamType = STREAM_STREAM;
+	streamType	= STREAM_STREAM;
 
 	crosslinked		= true;
 	inStream		= in;
@@ -111,14 +123,16 @@ S::IO::OutStream::OutStream(Int type, InStream *in)
 
 	if (inStream->streamType == STREAM_DRIVER)
 	{
-		streamType	= STREAM_DRIVER;
-		closefile	= false;
 		driver		= inStream->driver;
+
+		streamType	= STREAM_DRIVER;
+		size		= inStream->origsize;
 		currentFilePos	= inStream->currentFilePos;
+		closefile	= false;
+
 		packageSize	= 1;
 		stdpacksize	= packageSize;
 		origpacksize	= packageSize;
-		size		= inStream->origsize;
 
 		dataBuffer.Resize(packageSize);
 	}

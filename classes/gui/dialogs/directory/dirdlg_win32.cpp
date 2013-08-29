@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -49,7 +49,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 		directory = NIL;
 
-		if (bufferw != NIL && bufferw[0] != 0) directory = bufferw;
+		if (bufferw[0] != 0) directory = bufferw;
 
 		delete [] bufferw;
 	}
@@ -79,7 +79,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 		directory = NIL;
 
-		if (buffera != NIL && buffera[0] != 0) directory = buffera;
+		if (buffera[0] != 0) directory = buffera;
 
 		delete [] buffera;
 	}

@@ -28,86 +28,100 @@
 
 S::IO::InStream::InStream(Int type, Driver *iDriver)
 {
+	outStream	 = NIL;
+
 	if (type != STREAM_DRIVER)		   { lastError = IO_ERROR_BADPARAM;	 return; }
 
-	driver = iDriver;
+	driver		 = iDriver;
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); return; }
 
-	streamType	= STREAM_DRIVER;
-	size		= driver->GetSize();
-	currentBufferPos= defaultPackageSize;
-	origsize	= size;
-	closefile	= false;
+	streamType	 = STREAM_DRIVER;
+	size		 = driver->GetSize();
+	closefile	 = false;
+
+	currentBufferPos = defaultPackageSize;
+	origsize	 = size;
 
 	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, const String &fileName, Int mode)
 {
+	outStream	 = NIL;
+
 	if (type != STREAM_FILE)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
 #ifdef __WIN32__
-	driver = new DriverWin32(File(fileName), mode);
+	driver		 = new DriverWin32(File(fileName), mode);
 #else
-	driver = new DriverPOSIX(File(fileName), mode);
+	driver		 = new DriverPOSIX(File(fileName), mode);
 #endif
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
-	streamType	= STREAM_DRIVER;
-	size		= driver->GetSize();
-	currentBufferPos= defaultPackageSize;
-	origsize	= size;
+	streamType	 = STREAM_DRIVER;
+	size		 = driver->GetSize();
+
+	currentBufferPos = defaultPackageSize;
+	origsize	 = size;
 
 	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, FILE *openFile)
 {
+	outStream	 = NIL;
+
 	if (type != STREAM_ANSI)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-	driver = new DriverANSI(openFile);
+	driver		 = new DriverANSI(openFile);
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
-	streamType	= STREAM_DRIVER;
-	size		= driver->GetSize();
-	currentFilePos	= driver->GetPos();
-	currentBufferPos= defaultPackageSize;
-	origsize	= size;
-	packageSize	= 1;
-	stdpacksize	= packageSize;
-	origpacksize	= packageSize;
+	streamType	 = STREAM_DRIVER;
+	size		 = driver->GetSize();
+	currentFilePos	 = driver->GetPos();
+
+	packageSize	 = 1;
+	stdpacksize	 = packageSize;
+	origpacksize	 = packageSize;
+	currentBufferPos = defaultPackageSize;
+	origsize	 = size;
 
 	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, Void *inBuffer, Long bufferSize)
 {
+	outStream	 = NIL;
+
 	if (type != STREAM_BUFFER)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-	driver = new DriverMemory(inBuffer, bufferSize);
+	driver		 = new DriverMemory(inBuffer, bufferSize);
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 
-	streamType	= STREAM_DRIVER;
-	size		= driver->GetSize();
-	packageSize	= 1;
-	stdpacksize	= packageSize;
-	origpacksize	= packageSize;
-	currentBufferPos= packageSize;
-	origsize	= size;
+	streamType	 = STREAM_DRIVER;
+	size		 = driver->GetSize();
+
+	packageSize	 = 1;
+	stdpacksize	 = packageSize;
+	origpacksize	 = packageSize;
+	currentBufferPos = packageSize;
+	origsize	 = size;
 
 	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, OutStream *out)
 {
+	outStream	 = NIL;
+
 	if (type != STREAM_STREAM)				{ lastError = IO_ERROR_BADPARAM;   return; }
 	if (out->streamType == STREAM_NONE || out->crosslinked)	{ lastError = IO_ERROR_OPNOTAVAIL; return; }
 
-	streamType = STREAM_STREAM;
+	streamType	 = STREAM_STREAM;
 
 	crosslinked		= true;
 	outStream		= out;
@@ -116,16 +130,18 @@ S::IO::InStream::InStream(Int type, OutStream *out)
 
 	if (outStream->streamType == STREAM_DRIVER)
 	{
-		streamType	= STREAM_DRIVER;
-		closefile	= false;
-		driver		= outStream->driver;
-		currentFilePos	= outStream->currentFilePos;
-		packageSize	= 1;
-		stdpacksize	= packageSize;
-		origpacksize	= packageSize;
-		currentBufferPos= packageSize;
-		size		= outStream->size;
-		origsize	= size;
+		driver		 = outStream->driver;
+
+		streamType	 = STREAM_DRIVER;
+		size		 = outStream->size;
+		currentFilePos	 = outStream->currentFilePos;
+		closefile	 = false;
+
+		packageSize	 = 1;
+		stdpacksize	 = packageSize;
+		origpacksize	 = packageSize;
+		currentBufferPos = packageSize;
+		origsize	 = size;
 
 		dataBuffer.Resize(packageSize);
 	}

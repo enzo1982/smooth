@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,6 +23,8 @@ S::IO::FilterXOR::~FilterXOR()
 
 S::Int S::IO::FilterXOR::WriteData(Buffer<UnsignedByte> &data, Int size)
 {
+	if (driver == NIL) return -1;
+
 	Int	 value = (data[3] + 256 * data[2] + 65536 * data[1] + 16777216 * data[0]) ^ modifier;
 
 	return driver->WriteData((unsigned char *) &value, size);
@@ -30,6 +32,8 @@ S::Int S::IO::FilterXOR::WriteData(Buffer<UnsignedByte> &data, Int size)
 
 S::Int S::IO::FilterXOR::ReadData(Buffer<UnsignedByte> &data, Int size)
 {
+	if (driver == NIL) return -1;
+
 	data.Resize(size);
 
 	driver->ReadData(data, size);

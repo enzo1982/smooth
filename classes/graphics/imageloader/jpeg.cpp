@@ -42,6 +42,10 @@ void my_error_exit(j_common_ptr cinfo)
 
 const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 {
+	/* Make sure bitmap is initialized.
+	 */
+	bitmap = NIL;
+
 	/* In this example we want to open the input file before doing anything else.
 	 * VERY IMPORTANT: use "b" option to fopen() if you are on a machine that
 	 * requires it in order to read binary files.
@@ -66,10 +70,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 	stream = fopen(fileName.ConvertTo("UTF-8"), "rb");
 #endif
 
-	if (stream == NIL)
-	{
-		return bitmap;
-	}
+	if (stream == NIL) return bitmap;
 
 	/* This struct contains the JPEG decompression parameters and pointers to
 	 * working space (which is allocated as needed by the JPEG library).

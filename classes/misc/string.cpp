@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -96,17 +96,17 @@ S::Int S::String::Free()
 const char *S::String::GetDefaultEncoding()
 {
 #ifdef __WIN32__
-	static char	 encoding[16] = { 0, };
+	static char	 encoding[16] = { };
 
 	if (strlen(encoding) == 0)
 	{
 		/* Find system codepage.
 		 */
 		Int	 codePage = GetACP();
-		char	 buffer[8];
+		char	 buffer[12];
 
-		strncpy(encoding, "CP", 2);
-		strcat(encoding, itoa(codePage, buffer, 10));
+		strncpy(encoding, "CP", 3);
+		strncat(encoding, itoa(codePage, buffer, 10), 12);
 	}
 
 	return encoding;

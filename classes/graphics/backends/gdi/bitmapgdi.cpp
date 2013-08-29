@@ -189,7 +189,7 @@ S::Bool S::GUI::BitmapGDI::SetSystemBitmap(Void *nBitmap)
 
 		BitBlt(dc2, 0, 0, size.cx, size.cy, dc1, 0, 0, SRCCOPY);
 
-		nBitmap	= (HBITMAP) SelectObject(dc1, backup1);
+			  (HBITMAP) SelectObject(dc1, backup1);
 		bitmap	= (HBITMAP) SelectObject(dc2, backup2);
 
 		DeleteDC(dc1);

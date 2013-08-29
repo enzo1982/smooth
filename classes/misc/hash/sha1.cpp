@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,6 +26,7 @@ static unsigned char PADDING[64] = {
 
 S::Hash::SHA1::SHA1(const Buffer<UnsignedByte> &iBuffer) : buffer(iBuffer)
 {
+	memset(&state, 0, sizeof(state));
 }
 
 S::Hash::SHA1::~SHA1()

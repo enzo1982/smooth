@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -60,13 +60,13 @@ S::String S::System::System::GetAPIVersion()
 S::UnsignedInt64 S::System::System::Clock()
 {
 #ifdef __WIN32__
-	return clock() * 1000 / CLOCKS_PER_SEC;
+	return clock() * UnsignedInt64(1000) / CLOCKS_PER_SEC;
 #else
 	timeval	 tv;
 
 	gettimeofday(&tv, NIL);
 
-	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	return tv.tv_sec * UnsignedInt64(1000) + tv.tv_usec / 1000;
 #endif
 }
 

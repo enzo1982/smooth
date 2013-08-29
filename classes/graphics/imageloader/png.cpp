@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -46,6 +46,14 @@ void my_png_read(png_structp png_ptr, png_bytep buffer, png_size_t size)
 
 const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 {
+	/* Make sure bitmap is initialized.
+	 */
+	bitmap = NIL;
+
+	/* Check if we either have a file or a buffer to load.
+	 */
+	if (!gotFileName && !gotBuffer) return bitmap;
+
 	/* Create and initialize the png_struct with the desired error handler
 	 * functions.  If you want to use the default stderr and longjump method,
 	 * you can supply NULL for the last three parameters.  We also supply the
@@ -54,12 +62,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	 */
 	png_structp	 png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NIL, &my_png_error, &my_png_warning);
 
-	if (png_ptr == NULL)
-	{
-		bitmap = NIL;
-
-		return bitmap;
-	}
+	if (png_ptr == NULL) return bitmap;
 
 	/* Allocate/initialize the memory for image information.
 	 */
@@ -69,8 +72,6 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	{
 		png_destroy_read_struct(&png_ptr, NULL, NULL);
 
-		bitmap = NIL;
-
 		return bitmap;
 	}
 
@@ -78,22 +79,14 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	 */
 	InStream	*in = NIL;
 
-	if (gotFileName)
-	{
-		in = new InStream(STREAM_FILE, fileName, IS_READ);
-	}
-	else if (gotBuffer)
-	{
-		in = new InStream(STREAM_BUFFER, buffer, buffer.Size());
-	}
+	if	(gotFileName) in = new InStream(STREAM_FILE, fileName, IS_READ);
+	else if (gotBuffer)   in = new InStream(STREAM_BUFFER, buffer, buffer.Size());
 
 	if (in->GetLastError() != IO_ERROR_OK)
 	{
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
 		delete in;
-
-		bitmap = NIL;
 
 		return bitmap;
 	}

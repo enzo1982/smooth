@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,7 +34,10 @@ S::Int	 protocolHTTPTmp = S::Net::Protocols::Protocol::AddProtocol(&CreateProtoc
 S::Net::Protocols::HTTP::HTTP(const String &iURL) : Protocol(iURL)
 {
 	mode	  = HTTP_METHOD_GET;
+	port	  = 80;
+
 	proxyMode = HTTP_PROXY_NONE;
+	proxyPort = 0;
 }
 
 S::Net::Protocols::HTTP::~HTTP()
@@ -155,6 +158,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 	else if (proxyMode == HTTP_PROXY_HTTPS)	 socket = new IO::DriverHTTPS(proxy, proxyPort, server, port, proxyUser, proxyPass);
 	else if (proxyMode == HTTP_PROXY_SOCKS4) socket = new IO::DriverSOCKS4(proxy, proxyPort, server, port);
 	else if (proxyMode == HTTP_PROXY_SOCKS5) socket = new IO::DriverSOCKS5(proxy, proxyPort, server, port, proxyUser, proxyPass);
+
+	if (socket == NIL) return Error();
 
 	IO::InStream	*in	= new IO::InStream(IO::STREAM_DRIVER, socket);
 	IO::OutStream	*out	= new IO::OutStream(IO::STREAM_STREAM, in);

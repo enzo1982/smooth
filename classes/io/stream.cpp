@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,23 +14,25 @@ S::Int	 S::IO::Stream::defaultPackageSize = 1048576;
 
 S::IO::Stream::Stream()
 {
-	streamType		= STREAM_NONE;
-	size			= 0;
-	currentFilePos		= 0;
-	currentBufferPos	= 0;
-	pbdActive		= false;
-	keepPbd			= false;
-	pbdLength		= 0;
-	closefile		= true;
-	crosslinked		= false;
-	driver			= NULL;
-	allowpackset		= true;
-	packageSize		= defaultPackageSize;
-	stdpacksize		= packageSize;
-	origpacksize		= packageSize;
-	origsize		= 0;
-	origfilepos		= 0;
-	lastError		= IO_ERROR_OK;
+	streamType	 = STREAM_NONE;
+	size		 = 0;
+	currentFilePos	 = 0;
+	currentBufferPos = 0;
+	pbdActive	 = false;
+	keepPbd		 = false;
+	pbdLength	 = 0;
+	closefile	 = true;
+	crosslinked	 = false;
+	driver		 = NULL;
+	allowpackset	 = true;
+	packageSize	 = defaultPackageSize;
+	stdpacksize	 = packageSize;
+	origpacksize	 = packageSize;
+	origsize	 = 0;
+	origfilepos	 = 0;
+	lastError	 = IO_ERROR_OK;
+
+	memset(&pbdBuffer, 0, sizeof(pbdBuffer));
 }
 
 S::IO::Stream::~Stream()

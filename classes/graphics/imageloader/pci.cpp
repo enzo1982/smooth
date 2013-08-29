@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,6 +25,12 @@ S::GUI::ImageLoaderPCI::~ImageLoaderPCI()
 
 const S::GUI::Bitmap &S::GUI::ImageLoaderPCI::Load()
 {
+	/* Make sure bitmap is initialized.
+	 */
+	bitmap = NIL;
+
+	/* Load PCI file.
+	 */
 	String	 pciFile = fileName;
 	String	 idString;
 
@@ -38,8 +44,6 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPCI::Load()
 	if (pci->GetLastError() != IO::IO_ERROR_OK)
 	{
 		ClosePCI(pci);
-
-		bitmap = NIL;
 
 		return bitmap;
 	}

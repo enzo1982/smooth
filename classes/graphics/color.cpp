@@ -182,6 +182,8 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 				default:
 					break;
 			}
+
+			break;
 		case YUV:
 			switch (cs)
 			{

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,6 +23,7 @@
 
 S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 {
+	stream	    = NIL;
 	closeStream = false;
 
 	static Bool	 enableUnicode = Setup::enableUnicode;
@@ -61,7 +62,7 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 			if (enableUnicode) stream = _wfopen(fileName, String("r+b"));
 			else		   stream =   fopen(fileName,	     "r+b" );
 
-			Seek(GetSize());
+			if (stream != NIL) Seek(GetSize());
 
 			break;
 		case OS_REPLACE:	   // create or overwrite a file
@@ -87,7 +88,9 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 	String::SetOutputFormat(previousOutputFormat);
 #endif
 
-	if (stream == NULL)
+	/* Check if stream was opened successfully.
+	 */
+	if (stream == NIL)
 	{
 		lastError = IO_ERROR_UNEXPECTED;
 

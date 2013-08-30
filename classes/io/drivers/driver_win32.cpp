@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,6 +15,11 @@
 
 S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 {
+	stream	    = INVALID_HANDLE_VALUE;
+	closeStream = False;
+
+	/* Find prefix for Unicode paths.
+	 */
 	static char	*unicodePathPrefix = NIL;
 
 	if (unicodePathPrefix == NIL)
@@ -29,8 +34,8 @@ S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 		else						 unicodePathPrefix = (char *) "";
 	}
 
-	closeStream = False;
-
+	/* Build real filename to pass to CreateFile.
+	 */
 	String	 fileName;
 
 	if (Setup::enableUnicode) fileName = String(iFileName.StartsWith("\\\\") ? "" : unicodePathPrefix).Append(iFileName);
@@ -40,26 +45,34 @@ S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 	{
 		default:
 			lastError = IO_ERROR_BADPARAM;
+
 			return;
 		case OS_APPEND:			  // open a file for appending data
 			if (Setup::enableUnicode) stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			else			  stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			Seek(GetSize());
+
+			if (stream != INVALID_HANDLE_VALUE) Seek(GetSize());
+
 			break;
 		case OS_REPLACE:		  // create or overwrite a file
 			if (Setup::enableUnicode) stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			else			  stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
 			break;
 		case IS_READ | IS_WRITE:	  // open a file for reading data
 			if (Setup::enableUnicode) stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 			else			  stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
 			break;
 		case IS_READ:			  // open a file in read only mode
 			if (Setup::enableUnicode) stream = CreateFileW(fileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 			else			  stream = CreateFileA(fileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
 			break;
 	}
 
+	/* Check if stream was opened successfully.
+	 */
 	if (stream == INVALID_HANDLE_VALUE)
 	{
 		lastError = IO_ERROR_UNEXPECTED;

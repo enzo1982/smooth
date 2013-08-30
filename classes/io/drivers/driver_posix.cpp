@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,6 +45,7 @@
 
 S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 {
+	stream	    = -1;
 	closeStream = false;
 
 	static Bool	 enableUnicode = Setup::enableUnicode;
@@ -83,7 +84,7 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 			if (enableUnicode) stream = _wopen(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
 			else		   stream =   open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
 
-			Seek(GetSize());
+			if (stream != -1) Seek(GetSize());
 
 			break;
 		case OS_REPLACE:	   // create or overwrite a file
@@ -109,6 +110,8 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 	String::SetOutputFormat(previousOutputFormat);
 #endif
 
+	/* Check if stream was opened successfully.
+	 */
 	if (stream == -1)
 	{
 		lastError = IO_ERROR_UNEXPECTED;

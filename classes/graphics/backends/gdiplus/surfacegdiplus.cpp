@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,9 +29,12 @@ S::Short	 S::GUI::SurfaceGDIPlus::surfaceDPI = -1;
 
 S::GUI::SurfaceGDIPlus::SurfaceGDIPlus(Void *iWindow, const Size &maxSize)
 {
-	type = SURFACE_GDIPLUS;
+	type	     = SURFACE_GDIPLUS;
 
-	window = (HWND) iWindow;
+	window	     = (HWND) iWindow;
+
+	paintBitmap  = NIL;
+	paintContext = NIL;
 
 	if (window != NIL)
 	{

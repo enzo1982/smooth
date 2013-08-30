@@ -51,23 +51,28 @@ S::Short	 S::GUI::SurfaceCairo::surfaceDPI = -1;
 
 S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 {
-	type	= SURFACE_CAIRO;
+	type	     = SURFACE_CAIRO;
 
 #ifdef __WIN32__
-	window	= (HWND) iWindow;
+	window	     = (HWND) iWindow;
 
-	gdi_dc	= NIL;
+	paintBitmap  = NIL;
+	paintContext = NIL;
+
+	gdi_dc	     = NIL;
 #else
-	window	= (Window) iWindow;
+	window	     = (Window) iWindow;
 
-	display	= Backends::BackendXLib::GetDisplay();
+	paintBitmap  = NIL;
+
+	display	     = Backends::BackendXLib::GetDisplay();
 
 	if (display != NIL) visual = XDefaultVisual(display, XDefaultScreen(display));
 	else		    visual = NIL;
 #endif
 
-	context = NIL;
-	surface = NIL;
+	context	     = NIL;
+	surface	     = NIL;
 
 	if (window != NIL)
 	{

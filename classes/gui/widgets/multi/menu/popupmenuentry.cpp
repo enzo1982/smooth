@@ -28,6 +28,7 @@ S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitma
 	type		= classID;
 	orientation	= OR_UPPERLEFT;
 	hotspot		= NIL;
+	owner		= NIL;
 	timer		= NIL;
 
 	shortcutOffset	= 0;

@@ -140,7 +140,9 @@ S::IO::OutStream::OutStream(Int type, InStream *in)
 
 S::IO::OutStream::~OutStream()
 {
-	Close(); // close stream; ignore return value
+	/* Close stream; ignore return value.
+	 */
+	Close();
 }
 
 S::Bool S::IO::OutStream::Flush()
@@ -166,7 +168,12 @@ S::Bool S::IO::OutStream::Flush()
 	{
 		packageSize = currentBufferPos;
 
-		WriteData();
+		if (!WriteData())
+		{
+			packageSize = ps;
+
+			{ lastError = IO_ERROR_UNKNOWN; return false; }
+		}
 
 		packageSize = ps;
 	}
@@ -324,20 +331,16 @@ S::Bool S::IO::OutStream::OutputNumberPBD(Long number, Int bits)
 	{
 		unsigned char	 out = 0;
 
-		for (int i = 0; i < 8; i++)
-		{
-			out = out | (pbdBuffer[i] << i);
-		}
+		for (int i = 0; i < 8; i++) out = out | (pbdBuffer[i] << i);
 
 		pbdLength = pbdLength - 8;
 
-		for (int j = 0; j < pbdLength; j++)
-		{
-			pbdBuffer[j] = pbdBuffer[j+8];
-		}
+		for (int j = 0; j < pbdLength; j++) pbdBuffer[j] = pbdBuffer[j+8];
 
 		dataBuffer[currentBufferPos] = out;
+
 		if (currentFilePos == size) size++;
+
 		currentBufferPos++;
 		currentFilePos++;
 
@@ -520,19 +523,12 @@ S::Bool S::IO::OutStream::RemoveFilter(Filter *oldFilter)
 
 	if (oldFilter->GetPackageSize() > 0 && currentBufferPos != 0)
 	{
-		for (int i = 0; i < (packageSize - oldcpos); i++)
-		{
-			OutputNumber(0, 1);
-		}
-	}
-	else if (oldFilter->GetPackageSize() == -1)
-	{
-		allowpackset = true;
-
-		Flush();
+		for (int i = 0; i < (packageSize - oldcpos); i++) OutputNumber(0, 1);
 	}
 	else
 	{
+		if (oldFilter->GetPackageSize() == -1) allowpackset = true;
+
 		Flush();
 	}
 

@@ -27,7 +27,8 @@ S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
 
 S::I18n::Translator::Translator(const String &iAppPrefix)
 {
-	appPrefix = iAppPrefix.ToLower();
+	appPrefix      = iAppPrefix.ToLower();
+	activeLanguage = NIL;
 
 	GetSupportedLanguages();
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,9 +33,12 @@ S::Short	 S::GUI::SurfaceHaiku::surfaceDPI = -1;
 
 S::GUI::SurfaceHaiku::SurfaceHaiku(Void *iView, const Size &maxSize)
 {
-	type	= SURFACE_HAIKU;
+	type	   = SURFACE_HAIKU;
 
-	view	= (BView *) iView;
+	view	   = (BView *) iView;
+
+	bitmap	   = NIL;
+	bitmapView = NIL;
 
 	if (view != NIL)
 	{

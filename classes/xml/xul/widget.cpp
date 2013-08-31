@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,31 +17,49 @@ const S::Short	 S::XML::XUL::Widget::VERTICAL	 = 1;
 
 S::XML::XUL::Widget::Widget(Node *node)
 {
-	defaultWidth = 100;
+	defaultWidth  = 100;
 	defaultHeight = 20;
 
 	if (node != NIL)
 	{
-		id = GetXMLAttributeValue(node, "id");
+		id	    = GetXMLAttributeValue(node, "id");
 
-		orient = (GetXMLAttributeValue(node, "orient") == "vertical") ? VERTICAL : HORIZONTAL;
+		orient	    = (GetXMLAttributeValue(node, "orient") == "vertical") ? VERTICAL : HORIZONTAL;
 
-		left = GetXMLAttributeValue(node, "left").ToInt();
-		top = GetXMLAttributeValue(node, "top").ToInt();
+		left	    = GetXMLAttributeValue(node, "left").ToInt();
+		top	    = GetXMLAttributeValue(node, "top").ToInt();
 
-		width = GetXMLAttributeValue(node, "width").ToInt();
-		height = GetXMLAttributeValue(node, "height").ToInt();
+		width	    = GetXMLAttributeValue(node, "width").ToInt();
+		height	    = GetXMLAttributeValue(node, "height").ToInt();
 
-		minwidth = GetXMLAttributeValue(node, "minwidth").ToInt();
-		minheight = GetXMLAttributeValue(node, "minheight").ToInt();
+		minwidth    = GetXMLAttributeValue(node, "minwidth").ToInt();
+		minheight   = GetXMLAttributeValue(node, "minheight").ToInt();
 
-		maxwidth = GetXMLAttributeValue(node, "maxwidth").ToInt();
-		maxheight = GetXMLAttributeValue(node, "maxheight").ToInt();
+		maxwidth    = GetXMLAttributeValue(node, "maxwidth").ToInt();
+		maxheight   = GetXMLAttributeValue(node, "maxheight").ToInt();
 
-		flex = GetXMLAttributeValue(node, "flex").ToInt();
+		flex	    = GetXMLAttributeValue(node, "flex").ToInt();
 
-		statustext = GetXMLAttributeValue(node, "statustext");
+		statustext  = GetXMLAttributeValue(node, "statustext");
 		tooltiptext = GetXMLAttributeValue(node, "tooltiptext");
+	}
+	else
+	{
+		orient	    = HORIZONTAL;
+
+		left	    = 0;
+		top	    = 0;
+
+		width	    = 0;
+		height	    = 0;
+
+		minwidth    = 0;
+		minheight   = 0;
+
+		maxwidth    = 0;
+		maxheight   = 0;
+
+		flex	    = 0;
 	}
 }
 

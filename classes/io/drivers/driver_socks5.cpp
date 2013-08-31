@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/io/drivers/driver_socks5.h>
+#include <smooth/misc/math.h>
 
 #if defined __WIN32__
 #	include <windows.h>
@@ -18,6 +19,8 @@
 
 S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const String &hostName, Int port, const String &uname, const String &passwd) : Driver()
 {
+	if (hostName.Length() > 255) { lastError = IO_ERROR_BADPARAM; return; }
+
 	closeStream = false;
 
 	size = -1;
@@ -62,19 +65,20 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 	{
 		socksdata = new unsigned char [3];
 
-		socksdata[0] = 5;
-		socksdata[1] = 1;
-		socksdata[2] = 0;
+		socksdata[0] = 5;	// SOCKS version 5
+		socksdata[1] = 1;	// One authentication method
+		socksdata[2] = 0x00;	// Method 1: No authentication
 
 		send(stream, (char *) socksdata, 3, 0);
 
-		while (recbytes != 2)
-		{
-			recbytes += recv(stream, (char *) socksdata + recbytes, 2 - recbytes, 0);
-		}
+		/* Read and evaluate response.
+		 */
+		while (recbytes != 2) recbytes += recv(stream, (char *) socksdata + recbytes, 2 - recbytes, 0);
 
-		if (socksdata[1] == 255)	// proxy requires authentication
+		if (socksdata[1] == 0xFF)
 		{
+			/* Proxy requires authentication.
+			 */
 			delete [] socksdata;
 
 			CloseSocket();
@@ -88,20 +92,21 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 	{
 		socksdata = new unsigned char [4];
 
-		socksdata[0] = 5;
-		socksdata[1] = 2;
-		socksdata[2] = 0;
-		socksdata[3] = 2;
+		socksdata[0] = 5;	// SOCKS version 5
+		socksdata[1] = 2;	// Two authentication methods
+		socksdata[2] = 0x00;	// Method 0x00: No authentication
+		socksdata[3] = 0x02;	// Method 0x02: Username / password
 
 		send(stream, (char *) socksdata, 4, 0);
 
-		while (recbytes != 2)
-		{
-			recbytes += recv(stream, (char *) socksdata + recbytes, 2 - recbytes, 0);
-		}
+		/* Read and evaluate response.
+		 */
+		while (recbytes != 2) recbytes += recv(stream, (char *) socksdata + recbytes, 2 - recbytes, 0);
 
-		if (socksdata[1] == 255)	// proxy needs authentication, but doesn't support username/password
+		if (socksdata[1] == 0xFF)
 		{
+			/* Proxy needs an unsupported authentication method.
+			 */
 			delete [] socksdata;
 
 			CloseSocket();
@@ -109,8 +114,10 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 			{ lastError = IO_ERROR_UNEXPECTED; return; }
 		}
 
-		if (socksdata[1] == 2)
+		if (socksdata[1] == 0x02)
 		{
+			/* Method 0x02: Username / password
+			 */
 			delete [] socksdata;
 
 			socksdata = new unsigned char [3 + strlen(uname) + strlen(passwd)];
@@ -118,23 +125,24 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 			socksdata[0] = 1;
 			socksdata[1] = strlen(uname);
 
-			for (int i = 0; i < (int) strlen(uname); i++) socksdata[2 + i] = uname[i];
+			for (Int i = 0; i < (Int) strlen(uname); i++) socksdata[2 + i] = uname[i];
 
 			socksdata[2 + strlen(uname)] = strlen(passwd);
 
-			for (int j = 0; j < (int) strlen(passwd); j++) socksdata[3 + strlen(uname) + j] = passwd[j];
+			for (Int i = 0; i < (Int) strlen(passwd); i++) socksdata[3 + strlen(uname) + i] = passwd[i];
 
 			send(stream, (char *) socksdata, 3 + strlen(uname) + strlen(passwd), 0);
 
+			/* Read and evaluate response.
+			 */
 			recbytes = 0;
 
-			while (recbytes != 2)
-			{
-				recbytes += recv(stream, (char *) socksdata + recbytes, 2 - recbytes, 0);
-			}
+			while (recbytes != 2) recbytes += recv(stream, (char *) socksdata + recbytes, 2 - recbytes, 0);
 
-			if (socksdata[1] != 0)	// proxy rejected username/password
+			if (socksdata[1] != 0x00)
 			{
+				/* Proxy rejected username/password.
+				 */
 				delete [] socksdata;
 
 				CloseSocket();
@@ -146,30 +154,31 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 		delete [] socksdata;
 	}
 
-	socksdata = new unsigned char [7 + strlen(hostName)];
+	socksdata = new unsigned char [5 + 255 + 2];
 
-	socksdata[0] = 5;
-	socksdata[1] = 1;
-	socksdata[2] = 0;
-	socksdata[3] = 3;
+	socksdata[0] = 5;	// SOCKS version 5
+	socksdata[1] = 0x01;	// Command: Connect
+	socksdata[2] = 0x00;	// Reserved field
+	socksdata[3] = 0x03;	// Connect type: Domain name
 	socksdata[4] = strlen(hostName);
 
-	for (int i = 0; i < (int) strlen(hostName); i++) socksdata[5 + i] = hostName[i];
+	for (Int i = 0; i < (Int) strlen(hostName); i++) socksdata[5 + i] = hostName[i];
 
 	socksdata[5 + strlen(hostName)] = htons((short) port) % 256;
 	socksdata[6 + strlen(hostName)] = htons((short) port) / 256;
 
 	send(stream, (char *) socksdata, 7 + strlen(hostName), 0);
 
+	/* Read and evaluate first 4 bytes of response.
+	 */
 	recbytes = 0;
 
-	while (recbytes != 5)
-	{
-		recbytes += recv(stream, (char *) socksdata + recbytes, 5 - recbytes, 0);
-	}
+	while (recbytes != 4) recbytes += recv(stream, (char *) socksdata + recbytes, 4 - recbytes, 0);
 
-	if (socksdata[1] != 0)	// an error occurred
+	if (socksdata[1] != 0x00)
 	{
+		/* An error occurred.
+		 */
 		delete [] socksdata;
 
 		CloseSocket();
@@ -177,25 +186,29 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 		{ lastError = IO_ERROR_UNEXPECTED; return; }
 	}
 
-	if (socksdata[3] == 1)
+	if (socksdata[3] == 0x01)
 	{
+		/* Read IP address and port.
+		 */
 		recbytes = 0;
 
-		while (recbytes != 5)
-		{
-			recbytes += recv(stream, (char *) socksdata + 5 + recbytes, 5 - recbytes, 0);
-		}
+		while (recbytes != 6) recbytes += recv(stream, (char *) socksdata + 4 + recbytes, 6 - recbytes, 0);
 	}
-	else if (socksdata[3] == 3)
+	else if (socksdata[3] == 0x03)
 	{
-		int	 neededbytes = socksdata[4] + 2;
+		/* Read length of hostname.
+		 */
+		recbytes = 0;
+
+		while (recbytes != 1) recbytes += recv(stream, (char *) socksdata + 4, 1, 0);
+
+		/* Read hostname and port.
+		 */
+		int	 neededbytes = Math::Min(255, socksdata[4]) + 2;
 
 		recbytes = 0;
 
-		while (recbytes != neededbytes)
-		{
-			recbytes += recv(stream, (char *) socksdata + 5 + recbytes, neededbytes - recbytes, 0);
-		}
+		while (recbytes != neededbytes) recbytes += recv(stream, (char *) socksdata + 5 + recbytes, neededbytes - recbytes, 0);
 	}
 
 	delete [] socksdata;
@@ -212,7 +225,7 @@ S::Int S::IO::DriverSOCKS5::ReadData(UnsignedByte *data, Int dataSize)
 {
 	int	 bytes = recv(stream, (char *) data, dataSize, 0);
 
-	if (bytes == 0) return -1; // connection closed
+	if (bytes == 0) return -1;
 	else		return bytes;
 }
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,25 +34,25 @@ PCIIO::PCIIO(const S::GUI::Bitmap &b)
 	cpNames[JPEG]	= "JPG";
 	cpNames[BZIP2]	= "BZ2";
 
-	majorversion = PCIMajorVersion;
-	minorversion = PCIMinorVersion;
-	compression = RAW;
-	colorspace = RGBA;
-	quality = 100;
-	description = NIL;
+	majorversion	= PCIMajorVersion;
+	minorversion	= PCIMinorVersion;
+	compression	= RAW;
+	colorspace	= RGBA;
+	quality		= 100;
+	description	= NIL;
 
-	dpix = 75;
-	dpiy = 75;
-	bpcc = 8;
-	overwrite = true;
-	imageid = 0;
-	imagename = NIL;
-	rlebits = 8;
+	dpix		= 75;
+	dpiy		= 75;
+	bpcc		= 8;
+	overwrite	= True;
+	imageid		= 0;
+	imagename	= NIL;
+	rlebits		= 8;
 
-	bmp = b;
+	bmp		= b;
 
-	sizex = bmp.GetSize().cx;
-	sizey = bmp.GetSize().cy;
+	sizex		= bmp.GetSize().cx;
+	sizey		= bmp.GetSize().cy;
 }
 
 PCIIO::PCIIO()
@@ -70,8 +70,23 @@ PCIIO::PCIIO()
 	cpNames[JPEG]	= "JPG";
 	cpNames[BZIP2]	= "BZ2";
 
-	rlebits = 8;
-	quality = 100;
+	majorversion	= PCIMajorVersion;
+	minorversion	= PCIMinorVersion;
+	compression	= RAW;
+	colorspace	= RGBA;
+	quality		= 100;
+	description	= NIL;
+
+	dpix		= 75;
+	dpiy		= 75;
+	bpcc		= 8;
+	overwrite	= True;
+	imageid		= 0;
+	imagename	= NIL;
+	rlebits		= 8;
+
+	sizex		= 0;
+	sizey		= 0;
 }
 
 PCIIO::~PCIIO()

@@ -123,17 +123,19 @@ namespace smooth
 
 S::GUI::WindowHaiku::WindowHaiku(Void *iWindow)
 {
-	type = WINDOW_HAIKU;
+	type	 = WINDOW_HAIKU;
 
-	wnd		= NIL;
-	view		= NIL;
+	wnd	 = NIL;
+	view	 = NIL;
 
-	id		= windowBackends.Add(this);
+	id	 = windowBackends.Add(this);
 
-	minSize		= Size(160, 24);
-	maxSize		= Size(32768, 32768);
+	minSize	 = Size(160, 24);
+	maxSize	 = Size(32768, 32768);
 
-	fontSize	= Surface().GetSurfaceDPI() / 96.0;
+	fontSize = Surface().GetSurfaceDPI() / 96.0;
+
+	flags	 = 0;
 }
 
 S::GUI::WindowHaiku::~WindowHaiku()

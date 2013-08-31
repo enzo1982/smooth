@@ -132,11 +132,11 @@ S::Int64 S::IO::DriverANSI::GetSize() const
 {
 	Int64	 oldPos = GetPos();
 
-	fseek(stream, 0, SEEK_END);
+	if (fseek(stream,      0, SEEK_END) != 0) return -1;
 
 	Int64	 size = GetPos();
 
-	fseek(stream, oldPos, SEEK_SET);
+	if (fseek(stream, oldPos, SEEK_SET) != 0) return -1;
 
 	return size;
 }

@@ -52,26 +52,31 @@ LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM
 
 S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 {
-	type = WINDOW_GDI;
+	type	       = WINDOW_GDI;
 
-	hwnd		= NIL;
-	wndclass	= NIL;
+	hwnd	       = NIL;
+	wndclass       = NIL;
 
-	className	= String::FromInt(System::System::RequestGUID());
+	className      = String::FromInt(System::System::RequestGUID());
 
-	id		= windowBackends.Add(this);
+	id	       = windowBackends.Add(this);
 
-	minSize		= Size(160, 24);
+	minSize	       = Size(160, 24);
 
-	maximized	= False;
+	minimized      = False;
+	maximized      = False;
 
-	frameSize	= Size(GetSystemMetrics(SM_CXFRAME), GetSystemMetrics(SM_CYFRAME));
-	fontSize	= Surface().GetSurfaceDPI() / 96.0;
+	frameSize      = Size(GetSystemMetrics(SM_CXFRAME), GetSystemMetrics(SM_CYFRAME));
+	fontSize       = Surface().GetSurfaceDPI() / 96.0;
+
+	flags	       = 0;
 
 	if (Setup::enableUnicode) sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 	else			  sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
-	destroyIcon	= False;
+	destroyIcon    = False;
+
+	nonMaxWndStyle = 0;
 }
 
 S::GUI::WindowGDI::~WindowGDI()

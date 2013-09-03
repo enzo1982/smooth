@@ -84,7 +84,12 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 			if (enableUnicode) stream = _wopen(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
 			else		   stream =   open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
 
-			if (stream != -1) Seek(GetSize());
+			if (stream != -1)
+			{
+				Int64	 size = GetSize();
+
+				if (size >= 0) Seek(size);
+			}
 
 			break;
 		case OS_REPLACE:	   // create or overwrite a file

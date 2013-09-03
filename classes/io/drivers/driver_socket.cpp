@@ -23,31 +23,31 @@
 
 S::IO::DriverSocket::DriverSocket(const String &hostName, Int port) : Driver()
 {
-	closeStream = false;
+	closeStream = False;
 
-	size = -1;
+	stream	    = -1;
+	size	    = -1;
 
-	mode = MODE_SOCKET_BLOCKING;
-	timeout = 0;
+	mode	    = MODE_SOCKET_BLOCKING;
+	timeout	    = 0;
 
+	if (hostName.Length() > 255) { lastError = IO_ERROR_BADPARAM; return; }
+
+	/* Open TCP/IP socket.
+	 */
 	stream = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (stream == (unsigned) (~0))
-	{
-		CloseSocket();
+	if (stream == (unsigned) (~0)) { lastError = IO_ERROR_UNEXPECTED; return; }
 
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
-
+	/* Get server hostname.
+	 */
 	hostent		*host = gethostbyname(hostName);
+
+	if (host == NIL) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+
+	/* Connect to server.
+	 */
 	sockaddr_in	 saddr;
-
-	if (host == NULL)
-	{
-		CloseSocket();
-
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
 
 	saddr.sin_family = AF_INET;
 	saddr.sin_addr	 = *((in_addr *) *host->h_addr_list);
@@ -55,23 +55,18 @@ S::IO::DriverSocket::DriverSocket(const String &hostName, Int port) : Driver()
 
 	memset(&saddr.sin_zero, 0, sizeof(saddr.sin_zero));
 
-	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1)
-	{
-		CloseSocket();
+	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
 
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
-
-	closeStream = true;
+	closeStream = True;
 }
 
 S::IO::DriverSocket::DriverSocket(unsigned int iStream) : Driver()
 {
-	size = -1;
+	size	    = -1;
 
-	stream		= iStream;
-	closeStream	= false;
-	timeout		= 0;
+	stream	    = iStream;
+	closeStream = False;
+	timeout	    = 0;
 
 	SetMode(MODE_SOCKET_BLOCKING);
 }
@@ -98,7 +93,7 @@ S::Int S::IO::DriverSocket::ReadData(UnsignedByte *data, Int dataSize)
 
 	int	 bytes = recv(stream, (char *) data, dataSize, 0);
 
-	if (bytes == 0) return -1; // connection closed
+	if (bytes <= 0) return -1;
 	else		return bytes;
 }
 
@@ -134,28 +129,30 @@ S::Bool S::IO::DriverSocket::SetMode(Int nm)
 	switch (nm)
 	{
 		default:
-			return false;
+			return False;
+
 		case MODE_SOCKET_BLOCKING:
 		case MODE_SOCKET_NONBLOCKING:
 			mode = nm;
+
 			break;
 	}
 
 #if defined __WIN32__
-	if (ioctlsocket(stream, FIONBIO, &mode) != 0)	return false;
-	else						return true;
+	if (ioctlsocket(stream, FIONBIO, &mode) != 0) return False;
+	else					      return True;
 #else
-	if (ioctl(stream, FIONBIO, &mode) != 0)	return false;
-	else					return true;
+	if (ioctl(stream, FIONBIO, &mode)	!= 0) return False;
+	else					      return True;
 #endif
 }
 
 S::Bool S::IO::DriverSocket::SetTimeout(Int nt)
 {
-	if (mode != MODE_SOCKET_BLOCKING)	return false;
-	if (timeout < 0)			return false;
+	if (mode != MODE_SOCKET_BLOCKING) return False;
+	if (timeout < 0)		  return False;
 
 	timeout = nt;
 
-	return true;
+	return True;
 }

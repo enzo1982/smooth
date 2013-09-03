@@ -19,31 +19,29 @@
 
 S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const String &hostName, Int port) : Driver()
 {
-	closeStream = false;
+	closeStream = False;
 
-	size = -1;
+	stream	    = -1;
+	size	    = -1;
 
-	unsigned char	*socksdata;
+	if (hostName.Length() > 255) { lastError = IO_ERROR_BADPARAM; return; }
 
+	/* Open TCP/IP socket.
+	 */
 	stream = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (stream == (unsigned) (~0))
-	{
-		CloseSocket();
+	if (stream == (unsigned) (~0)) { lastError = IO_ERROR_UNEXPECTED; return; }
 
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
-
-	hostent		*host = gethostbyname(proxy);
+	/* Get proxy and server hostname.
+	 */
+	hostent		*host		= gethostbyname(proxy);
 	hostent		*server_hostent = gethostbyname(hostName);
+
+	if (host == NIL) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+
+	/* Connect to proxy.
+	 */
 	sockaddr_in	 saddr;
-
-	if (host == NULL)
-	{
-		CloseSocket();
-
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
 
 	saddr.sin_family = AF_INET;
 	saddr.sin_addr	 = *((in_addr *) *host->h_addr_list);
@@ -51,16 +49,13 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 
 	memset(&saddr.sin_zero, 0, sizeof(saddr.sin_zero));
 
-	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1)
-	{
-		CloseSocket();
+	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
 
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
-
+	/* Send connect request.
+	 */
 	if (server_hostent != NULL)
 	{
-		socksdata = new unsigned char [9];
+		unsigned char	*socksdata = new unsigned char [9];
 
 		socksdata[0] = 4;
 		socksdata[1] = 1;
@@ -72,11 +67,13 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 		socksdata[7] = server_hostent->h_addr_list[0][3];
 		socksdata[8] = 0;
 
-		send(stream, (char *) socksdata, 9, 0);
+		if (send(stream, (char *) socksdata, 9, 0) < 9) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+
+		delete [] socksdata;
 	}
 	else if (inet_addr(hostName) != INADDR_NONE)
 	{
-		socksdata = new unsigned char [9];
+		unsigned char	*socksdata = new unsigned char [9];
 
 		socksdata[0] = 4;
 		socksdata[1] = 1;
@@ -88,11 +85,13 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 		socksdata[7] = IOGetByte(inet_addr(hostName), 3);
 		socksdata[8] = 0;
 
-		send(stream, (char *) socksdata, 9, 0);
+		if (send(stream, (char *) socksdata, 9, 0) < 9) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+
+		delete [] socksdata;
 	}
 	else
 	{
-		socksdata = new unsigned char [10 + strlen(hostName)];
+		unsigned char	*socksdata = new unsigned char [10 + strlen(hostName)];
 
 		socksdata[0] = 4;
 		socksdata[1] = 1;
@@ -108,28 +107,32 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 
 		socksdata[9 + strlen(hostName)] = 0;
 
-		send(stream, (char *) socksdata, 10 + strlen(hostName), 0);
+		if (send(stream, (char *) socksdata, 10 + strlen(hostName), 0) < signed(10 + strlen(hostName))) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+
+		delete [] socksdata;
 	}
 
-	int	 recbytes = 0;
+	/* Receive answer.
+	 */
+	unsigned char	*socksdata = new unsigned char [8];
+	int		 recbytes  = 0;
 
 	while (recbytes != 8)
 	{
-		recbytes += recv(stream, (char *) socksdata + recbytes, 8 - recbytes, 0);
+		int	 bytes = recv(stream, (char *) socksdata + recbytes, 8 - recbytes, 0);
+
+		if (bytes <= 0) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+
+		recbytes += bytes;
 	}
 
-	if (socksdata[1] != 90)	// proxy rejected request
-	{
-		delete [] socksdata;
-
-		CloseSocket();
-
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
+	/* Check if connect attempt was successful.
+	 */
+	if (socksdata[1] != 90) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	delete [] socksdata;
 
-	closeStream = true;
+	closeStream = True;
 }
 
 S::IO::DriverSOCKS4::~DriverSOCKS4()
@@ -141,7 +144,7 @@ S::Int S::IO::DriverSOCKS4::ReadData(UnsignedByte *data, Int dataSize)
 {
 	int	 bytes = recv(stream, (char *) data, dataSize, 0);
 
-	if (bytes == 0) return -1; // connection closed
+	if (bytes <= 0) return -1;
 	else		return bytes;
 }
 

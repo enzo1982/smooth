@@ -51,7 +51,12 @@ S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 			if (Setup::enableUnicode) stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			else			  stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-			if (stream != INVALID_HANDLE_VALUE) Seek(GetSize());
+			if (stream != INVALID_HANDLE_VALUE)
+			{
+				Int64	 size = GetSize();
+
+				if (size >= 0) Seek(size);
+			}
 
 			break;
 		case OS_REPLACE:		  // create or overwrite a file
@@ -117,6 +122,8 @@ S::Int64 S::IO::DriverWin32::Seek(Int64 newPos)
 	LONG	 hi32 = newPos >> 32;
 	LONG	 lo32 = SetFilePointer(stream, newPos, &hi32, FILE_BEGIN);
 
+	if (lo32 == INVALID_SET_FILE_POINTER && ::GetLastError() != NO_ERROR) return -1;
+
 	return (Int64) hi32 << 32 | lo32;
 }
 
@@ -125,6 +132,8 @@ S::Int64 S::IO::DriverWin32::GetSize() const
 	DWORD	 hi32 = 0;
 	DWORD	 lo32 = GetFileSize(stream, &hi32);
 
+	if (lo32 == INVALID_FILE_SIZE && ::GetLastError() != NO_ERROR) return -1;
+
 	return (Int64) hi32 << 32 | lo32;
 }
 
@@ -132,6 +141,8 @@ S::Int64 S::IO::DriverWin32::GetPos() const
 {
 	LONG	 hi32 = 0;
 	LONG	 lo32 = SetFilePointer(stream, 0, &hi32, FILE_CURRENT);
+
+	if (lo32 == INVALID_SET_FILE_POINTER && ::GetLastError() != NO_ERROR) return -1;
 
 	return (Int64) hi32 << 32 | lo32;
 }

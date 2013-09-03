@@ -19,28 +19,28 @@
 
 S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String &hostName, Int port, const String &uname, const String &passwd) : Driver()
 {
-	closeStream = false;
+	closeStream = False;
 
-	size = -1;
+	stream	    = -1;
+	size	    = -1;
 
+	if (hostName.Length() > 255) { lastError = IO_ERROR_BADPARAM; return; }
+
+	/* Open TCP/IP socket.
+	 */
 	stream = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (stream == (unsigned) (~0))
-	{
-		CloseSocket();
+	if (stream == (unsigned) (~0)) { lastError = IO_ERROR_UNEXPECTED; return; }
 
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
-
+	/* Get proxy hostname.
+	 */
 	hostent		*host = gethostbyname(proxy);
+
+	if (host == NIL) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+
+	/* Connect to proxy.
+	 */
 	sockaddr_in	 saddr;
-
-	if (host == NULL)
-	{
-		CloseSocket();
-
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
 
 	saddr.sin_family = AF_INET;
 	saddr.sin_addr	 = *((in_addr *) *host->h_addr_list);
@@ -48,34 +48,35 @@ S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String 
 
 	memset(&saddr.sin_zero, 0, sizeof(saddr.sin_zero));
 
-	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1)
-	{
-		CloseSocket();
+	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
 
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
-	}
-
+	/* Send connect request.
+	 */
 	String	 connect = String("CONNECT ").Append(hostName).Append(":").Append(String::FromInt(port)).Append(" HTTP/1.1\n");
 
 	if (uname != NIL) connect.Append("Proxy-authentication: Basic ").Append(String(String(uname).Append(":").Append(passwd)).EncodeBase64()).Append("\n");
 
 	connect.Append("\n");
 
-	send(stream, (char *) connect, connect.Length(), 0);
+	if (send(stream, (char *) connect, connect.Length(), 0) < connect.Length()) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
 
+	/* Receive answer.
+	 */
 	String	 answer;
 	char	 c[2] = { 0, 0 };
 
-	while (!(answer.EndsWith("\n\n") || answer.EndsWith("\r\n\r\n"))) { recv(stream, c, 1, 0); answer.Append(c); }
-
-	if (!answer.StartsWith("HTTP/1.1 200")) // connect attempt unsuccessful
+	while (!(answer.EndsWith("\n\n") || answer.EndsWith("\r\n\r\n")))
 	{
-		CloseSocket();
+		if (recv(stream, c, 1, 0) <= 0) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
 
-		{ lastError = IO_ERROR_UNEXPECTED; return; }
+		answer.Append(c);
 	}
 
-	closeStream = true;
+	/* Check if connect attempt was successful.
+	 */
+	if (!answer.StartsWith("HTTP/1.1 200")) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+
+	closeStream = True;
 }
 
 S::IO::DriverHTTPS::~DriverHTTPS()
@@ -85,7 +86,10 @@ S::IO::DriverHTTPS::~DriverHTTPS()
 
 S::Int S::IO::DriverHTTPS::ReadData(UnsignedByte *data, Int dataSize)
 {
-	return recv(stream, (char *) data, dataSize, 0);
+	int	 bytes = recv(stream, (char *) data, dataSize, 0);
+
+	if (bytes <= 0) return -1;
+	else		return bytes;
 }
 
 S::Int S::IO::DriverHTTPS::WriteData(UnsignedByte *data, Int dataSize)

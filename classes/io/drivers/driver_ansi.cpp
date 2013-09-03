@@ -62,7 +62,12 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 			if (enableUnicode) stream = _wfopen(fileName, String("r+b"));
 			else		   stream =   fopen(fileName,	     "r+b" );
 
-			if (stream != NIL) Seek(GetSize());
+			if (stream != NIL)
+			{
+				Int64	 size = GetSize();
+
+				if (size >= 0) Seek(size);
+			}
 
 			break;
 		case OS_REPLACE:	   // create or overwrite a file
@@ -125,7 +130,9 @@ S::Int S::IO::DriverANSI::WriteData(UnsignedByte *data, Int dataSize)
 
 S::Int64 S::IO::DriverANSI::Seek(Int64 newPos)
 {
-	return fseek(stream, newPos, SEEK_SET);
+	if (fseek(stream, newPos, SEEK_SET) != 0) return -1;
+
+	return GetPos();
 }
 
 S::Int64 S::IO::DriverANSI::GetSize() const

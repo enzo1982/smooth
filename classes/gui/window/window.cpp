@@ -698,7 +698,11 @@ S::Int S::GUI::Window::Paint(Int message)
 				Point	 p1 = Point(frameWidth, topoffset * fontSize - 2);
 				Point	 p2 = Point(realSize.cx - frameWidth, p1.y);
 
-				if (lastTopWidget->subtype == WO_NOSEPARATOR) { p1.y += Math::Round(3 * surface->GetSurfaceDPI() / 96.0); p2.y += Math::Round(3 * surface->GetSurfaceDPI() / 96.0); }
+				if (lastTopWidget != NIL && lastTopWidget->subtype == WO_NOSEPARATOR)
+				{
+					p1.y += Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
+					p2.y += Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
+				}
 
 				surface->Bar(p1, p2, OR_HORZ);
 				surface->Bar(p1 + Point(0, 2), p2 + Point(0, 2), OR_HORZ);
@@ -786,8 +790,10 @@ S::Void S::GUI::Window::CalculateOffsets()
 		}
 	}
 
-	if (positions & OR_TOP)	   innerOffset.top    += 3 + (lastTopWidget->subtype == WO_NOSEPARATOR ? 3 : 0);
+	if (positions & OR_TOP)	   innerOffset.top    += 3;
 	if (positions & OR_BOTTOM) innerOffset.bottom += 4;
+
+	if (lastTopWidget != NIL)  innerOffset.top    += (lastTopWidget->subtype == WO_NOSEPARATOR ? 3 : 0);
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{

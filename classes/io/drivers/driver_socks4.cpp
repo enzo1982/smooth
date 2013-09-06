@@ -34,8 +34,7 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 
 	/* Get proxy and server hostname.
 	 */
-	hostent		*host		= gethostbyname(proxy);
-	hostent		*server_hostent = gethostbyname(hostName);
+	hostent		*host = gethostbyname(proxy);
 
 	if (host == NIL) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
 
@@ -53,6 +52,8 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 
 	/* Send connect request.
 	 */
+	hostent		*server_hostent = gethostbyname(hostName);
+
 	if (server_hostent != NULL)
 	{
 		unsigned char	*socksdata = new unsigned char [9];

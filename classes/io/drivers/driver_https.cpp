@@ -74,7 +74,7 @@ S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String 
 
 	/* Check if connect attempt was successful.
 	 */
-	if (!answer.StartsWith("HTTP/1.1 200")) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (answer.SubString(9, 3) != "200") { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	closeStream = True;
 }

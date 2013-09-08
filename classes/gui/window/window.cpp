@@ -487,6 +487,7 @@ S::Void S::GUI::Window::OnCreate()
 S::Void S::GUI::Window::OnDestroy()
 {
 	destroyed = True;
+	visible	  = False;
 
 	if (nOfActiveWindows == 0 && loopActive)
 	{

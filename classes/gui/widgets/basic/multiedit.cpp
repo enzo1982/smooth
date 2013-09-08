@@ -122,6 +122,8 @@ S::Int S::GUI::MultiEdit::SetText(const String &newText)
 {
 	scrollbarPos = 0;
 
+	if (!IsVisible()) return cursor->SetText(newText);
+
 	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 

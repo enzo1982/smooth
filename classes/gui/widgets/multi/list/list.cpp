@@ -125,23 +125,22 @@ S::Int S::GUI::List::RemoveAllEntries()
 {
 	Surface	*surface = NIL;
 
-	if (IsRegistered()) surface = GetDrawSurface();
+	if (IsVisible()) surface = GetDrawSurface();
 
-	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
-	Bool	 visible = IsVisible();
+	Rect	 frame = Rect(GetRealPosition(), GetRealSize());
 
 	if (surface != NIL)
 	{
 		surface->StartPaint(frame);
 
-		if (visible) Hide();
+		Hide();
 	}
 
 	while (Length() > 0) Remove(GetNthEntry(Length() - 1));
 
 	if (surface != NIL)
 	{
-		if (visible) Show();
+		Show();
 
 		surface->EndPaint();
 	}

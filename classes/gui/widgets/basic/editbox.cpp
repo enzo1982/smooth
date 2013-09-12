@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -156,7 +156,7 @@ S::Int S::GUI::EditBox::SetCursorPos(Int nPos)
 	return cursor->SetCursorPos(nPos);
 }
 
-S::Int S::GUI::EditBox::GetCursorPos()
+S::Int S::GUI::EditBox::GetCursorPos() const
 {
 	return cursor->GetCursorPos();
 }

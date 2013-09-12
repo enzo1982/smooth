@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -178,9 +178,19 @@ S::Void S::GUI::MultiEdit::OnCursorScroll(Int scrollPos, Int maxScrollPos)
 	}
 }
 
-S::Int S::GUI::MultiEdit::GetCursorPos()
+S::Int S::GUI::MultiEdit::GetCursorPos() const
 {
 	return cursor->GetCursorPos();
+}
+
+S::Int S::GUI::MultiEdit::SetTabSize(Int nTabSize)
+{
+	return cursor->SetTabSize(nTabSize);
+}
+
+S::Int S::GUI::MultiEdit::GetTabSize() const
+{
+	return cursor->GetTabSize();
 }
 
 S::Void S::GUI::MultiEdit::OnChangeSize(const Size &nSize)

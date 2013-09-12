@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -46,6 +46,7 @@ S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSiz
 	maxScrollPos	= 0;
 	contextMenu	= NIL;
 	historyPos	= 0;
+	tabSize		= 4;
 
 	SetTabstopCapable(True);
 
@@ -403,7 +404,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 			if ((lineNumber - scrollPos) * (font.GetUnscaledTextSizeY() + 3) >= frame.GetHeight() && !fillLineIndices) break;
 
-			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line,				     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
+			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(ConvertTabs(line),		     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
 			else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
 
 			if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
@@ -506,7 +507,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 						surface->Box(markRect, bColor, Rect::Filled);
 
-						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(line,				     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(ConvertTabs(line),		     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
 						else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
 
 						surface->EndPaint();
@@ -1320,6 +1321,18 @@ S::Int S::GUI::Cursor::GetCursorPos() const
 	else		return -1;
 }
 
+S::Int S::GUI::Cursor::SetTabSize(Int nTabSize)
+{
+	tabSize = nTabSize;
+
+	return Success();
+}
+
+S::Int S::GUI::Cursor::GetTabSize() const
+{
+	return tabSize;
+}
+
 S::Int S::GUI::Cursor::SetMaxSize(Int newMaxSize)
 {
 	if (newMaxSize <= 0)	maxSize = 32768;
@@ -1393,8 +1406,24 @@ S::Int S::GUI::Cursor::GetDisplayCursorPositionFromVisual(const String &line, In
 			delete [] visual;
 		}
 
-		if (!IsRightToLeft())	position += font.GetScaledTextSizeX(vText.Head(promptPos)) - visibleOffset;
-		else			position += font.GetScaledTextSizeX(vText.Tail(length - promptPos)) - visibleOffset;
+		/* Convert tabs.
+		 */
+		Int	 offset = 0;
+
+		for (Int i = 0; i < vText.Length(); i++)
+		{
+			if (vText[i] != '\t') continue;
+
+			Int	 spaces = tabSize - i % tabSize;
+
+			vText	 = vText.Head(i).Append(String().FillN(' ', spaces)).Append(vText.Tail(vText.Length() - i - 1));
+			length	+= spaces - 1;
+
+			if (i < promptPos + offset) offset += spaces - 1;
+		}
+
+		if (!IsRightToLeft()) position += font.GetScaledTextSizeX(vText.Head(	      promptPos + offset)) - visibleOffset;
+		else		      position += font.GetScaledTextSizeX(vText.Tail(length - promptPos - offset)) - visibleOffset;
 	}
 	else
 	{
@@ -1484,6 +1513,24 @@ S::Int S::GUI::Cursor::GetVisualCursorPositionFromLogical(const String &line, In
 	}
 
 	return position;
+}
+
+/* Convert tabs in a string.
+ */
+S::String S::GUI::Cursor::ConvertTabs(const String &line) const
+{
+	String	 string = line;
+
+	for (Int i = 0; i < string.Length(); i++)
+	{
+		if (string[i] != '\t') continue;
+
+		Int	 spaces = tabSize - i % tabSize;
+
+		string = string.Head(i).Append(String().FillN(' ', spaces)).Append(string.Tail(string.Length() - i - 1));
+	}
+
+	return string;
 }
 
 /* Check if the string contains right-to-left characters.

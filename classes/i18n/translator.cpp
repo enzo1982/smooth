@@ -341,33 +341,60 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 {
 	foreach (Language *language, languages)
 	{
-		if (language->magic == magic)
+		if (language->magic != magic) continue;
+
+		activeLanguage = language;
+
+		/* Try to set application language for internal library strings.
+		 */
+		if (magic != "internal")
 		{
-			activeLanguage = language;
+			String	 code = magic.SubString(magic.Find("_") + 1, magic.Find(".xml") - magic.Find("_") - 1);
+			String	 id   = String("smooth_").Append(code).Append(".xml");
 
-			/* Load actual language data.
-			 */
-			if (magic != "internal" && activeLanguage->strings.Length() == 0 && activeLanguage->sections.Length() == 0)
+			if (defaultTranslator->ActivateLanguage(id) != Success())
 			{
-				Directory	 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
-
-#ifndef __WIN32__
-				if (Directory(GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
+				/* If failed, try the base language code if applicable.
+				 */
+				if (code.Find("_") >= 0)
 				{
-					dir = GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
+					id = String("smooth_").Append(code.Head(code.Find("_"))).Append(".xml");
+
+					defaultTranslator->ActivateLanguage(id);
 				}
-#endif
-
-				String		 file = String(dir).Append(Directory::GetDirectoryDelimiter()).Append(magic);
-				XML::Document	*doc  = new XML::Document();
-
-				if (doc->LoadFile(file) == Success()) LoadData(doc, activeLanguage);
-
-				delete doc;
 			}
 
-			return Success();
+			/* Activate user default language if setting the application language failed.
+			 */
+			if (defaultTranslator->GetActiveLanguageID() != id) defaultTranslator->SelectUserDefaultLanguage();
 		}
+
+		/* Activate internal language if application language is set to internal.
+		 */
+		if (magic == "internal" && defaultTranslator != NIL) defaultTranslator->ActivateLanguage(magic);
+
+		/* Load actual language data.
+		 */
+		if (magic != "internal" && activeLanguage->strings.Length() == 0 && activeLanguage->sections.Length() == 0)
+		{
+			Directory	 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
+
+#ifndef __WIN32__
+			if (Directory(GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
+			{
+				dir = GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
+			}
+#endif
+
+			String		 file = String(dir).Append(Directory::GetDirectoryDelimiter()).Append(magic);
+			XML::Document	*doc  = new XML::Document();
+
+			if (doc->LoadFile(file) == Success()) LoadData(doc, activeLanguage);
+
+			delete doc;
+		}
+
+		return Success();
 	}
 
 	return Error();

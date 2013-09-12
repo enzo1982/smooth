@@ -169,129 +169,134 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 	downloadProgress.Emit(0);
 	downloadSpeed.Emit(NIL);
 
-	if (in->GetLastError() == IO::IO_ERROR_OK)
+	if (in->GetLastError() != IO::IO_ERROR_OK) { delete in; delete out; delete socket; return Error(); }
+
+	Buffer<UnsignedByte>	&buffer = ComposeHTTPRequest();
+
+	uploadProgress.Emit(0);
+	uploadSpeed.Emit(NIL);
+
+	Int	 startTicks	= clock();
+	Int	 percent	= 0;
+
+	for (Int i = 0; i < buffer.Size(); i += 1024)
 	{
-		Buffer<UnsignedByte>	&buffer = ComposeHTTPRequest();
+		if (doCancelDownload.Call())								 { cancel = True; break; }
+		if (!out->OutputData(((UnsignedByte *) buffer) + i, Math::Min(1024, buffer.Size() - i))) { error  = True; break; }
 
-		uploadProgress.Emit(0);
-		uploadSpeed.Emit(NIL);
-
-		Int	 startTicks	= clock();
-		Int	 percent	= 0;
-
-		for (Int i = 0; i < buffer.Size(); i += 1024)
+		if (Math::Round(1000.0 * i / buffer.Size()) != percent)
 		{
-			if (doCancelDownload.Call())								 { cancel = True; break; }
-			if (!out->OutputData(((UnsignedByte *) buffer) + i, Math::Min(1024, buffer.Size() - i))) { error  = True; break; }
+			percent = Math::Round(1000.0 * i / buffer.Size());
 
-			if (Math::Round(1000.0 * i / buffer.Size()) != percent)
-			{
-				percent = Math::Round(1000.0 * i / buffer.Size());
-
-				uploadProgress.Emit(percent);
-				uploadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
-			}
-		}
-
-		out->Flush();
-
-		uploadProgress.Emit(1000);
-
-		if (!error && !cancel)
-		{
-			S::File(fileName).Delete();
-
-			/* Read header fields first.
-			 */
-			while (true)
-			{
-				String		 str	= in->InputLine();
-				Int		 colon	= str.Find(":");
-
-				if (colon >= 0)
-				{
-					Parameter	 field;
-
-					field.key	= str.Head(colon);
-					field.value	= str.Tail(str.Length() - colon - 2);
-
-					responseFields.Add(field);
-				}
-
-				if (str == NIL) break;
-			}
-
-			String	 encoding = GetResponseHeaderField("Transfer-Encoding");
-			Int	 bytes = GetResponseHeaderField("Content-Length").ToInt();
-
-			/* Continue to read data.
-			 */
-			while (true)
-			{
-				if (encoding == "chunked")
-				{
-					String	 str = in->InputLine();
-
-					bytes = (Int64) Number::FromHexString(str);
-
-					if (bytes == 0) break;
-				}
-
-				IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, fileName, IO::OS_APPEND);
-				UnsignedByte	*buffer		= new UnsignedByte [1024];
-				Int		 startTicks	= clock();
-
-				if (bytes > 0)
-				{
-					Int	 percent = 0;
-
-					for (Int i = 0; i < bytes; i += 1024)
-					{
-						if (doCancelDownload.Call()) { cancel = True; break; }
-
-						in->InputData((Void *) buffer, Math::Min(1024, bytes - i));
-						fOut->OutputData((Void *) buffer, Math::Min(1024, bytes - i));
-
-						if (Math::Round(1000.0 * i / bytes) != percent)
-						{
-							percent = Math::Round(1000.0 * i / bytes);
-
-							downloadProgress.Emit(percent);
-							downloadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
-						}
-					}
-				}
-				else
-				{
-					Int	 total = 0;
-
-					do
-					{
-						if (doCancelDownload.Call()) { cancel = True; break; }
-
-						bytes = in->InputData((Void *) buffer, 1024);
-						fOut->OutputData((Void *) buffer, bytes);
-
-						total += bytes;
-
-						downloadSpeed.Emit(String::FromInt(Math::Round((total / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
-					}
-					while (bytes > 0);
-				}
-
-				delete [] buffer;
-				delete fOut;
-
-				if (cancel) break;
-
-				if (encoding == "chunked") in->InputLine();
-				else			   break;
-			}
+			uploadProgress.Emit(percent);
+			uploadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
 		}
 	}
-	else
+
+	out->Flush();
+
+	uploadProgress.Emit(1000);
+
+	if (error)  { delete in; delete out; delete socket; return Error(); }
+	if (cancel) { delete in; delete out; delete socket; return Success(); }
+
+	S::File(fileName).Delete();
+
+	/* Read header fields first.
+	 */
+	Int	 responseCode = -1;
+
+	while (true)
 	{
-		error = True;
+		String	 str = in->InputLine();
+
+		if (str.StartsWith("HTTP/1."))
+		{
+			responseCode = str.SubString(9, 3).ToInt();
+		}
+		else if (str.Find(":") >= 0)
+		{
+			Parameter	 field;
+			Int		 colon	= str.Find(":");
+
+			field.key	= str.Head(colon);
+			field.value	= str.Tail(str.Length() - colon - 2);
+
+			responseFields.Add(field);
+		}
+
+		if (str == NIL) break;
+	}
+
+	if (responseCode >= 100 && responseCode <= 199)  { delete in; delete out; delete socket; return Success(); }
+	if (responseCode >= 300 && responseCode <= 399)  { delete in; delete out; delete socket; return Success(); }
+	if (responseCode >= 400 && responseCode <= 599)  { delete in; delete out; delete socket; return Error(); }
+
+	String	 encoding = GetResponseHeaderField("Transfer-Encoding");
+	Int	 bytes = GetResponseHeaderField("Content-Length").ToInt();
+
+	/* Continue to read data.
+	 */
+	while (true)
+	{
+		if (encoding == "chunked")
+		{
+			String	 str = in->InputLine();
+
+			bytes = (Int64) Number::FromHexString(str);
+
+			if (bytes == 0) break;
+		}
+
+		IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, fileName, IO::OS_APPEND);
+		UnsignedByte	*buffer		= new UnsignedByte [1024];
+		Int		 startTicks	= clock();
+
+		if (bytes > 0)
+		{
+			Int	 percent = 0;
+
+			for (Int i = 0; i < bytes; i += 1024)
+			{
+				if (doCancelDownload.Call()) { cancel = True; break; }
+
+				in->InputData((Void *) buffer, Math::Min(1024, bytes - i));
+				fOut->OutputData((Void *) buffer, Math::Min(1024, bytes - i));
+
+				if (Math::Round(1000.0 * i / bytes) != percent)
+				{
+					percent = Math::Round(1000.0 * i / bytes);
+
+					downloadProgress.Emit(percent);
+					downloadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
+				}
+			}
+		}
+		else
+		{
+			Int	 total = 0;
+
+			do
+			{
+				if (doCancelDownload.Call()) { cancel = True; break; }
+
+				bytes = in->InputData((Void *) buffer, 1024);
+				fOut->OutputData((Void *) buffer, bytes);
+
+				total += bytes;
+
+				downloadSpeed.Emit(String::FromInt(Math::Round((total / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
+			}
+			while (bytes > 0);
+		}
+
+		delete [] buffer;
+		delete fOut;
+
+		if (cancel) break;
+
+		if (encoding == "chunked") in->InputLine();
+		else			   break;
 	}
 
 	downloadProgress.Emit(1000);
@@ -300,8 +305,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 	delete out;
 	delete socket;
 
-	if (!error)	return Success();
-	else		return Error();
+	if (!error) return Success();
+	else	    return Error();
 }
 
 S::Errors::Error S::Net::Protocols::HTTP::DecodeURL()

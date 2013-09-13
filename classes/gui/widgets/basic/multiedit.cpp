@@ -94,11 +94,6 @@ S::Int S::GUI::MultiEdit::Paint(Int message)
 	return Widget::Paint(message);
 }
 
-S::Int S::GUI::MultiEdit::MarkAll()
-{
-	return cursor->MarkAll();
-}
-
 S::Int S::GUI::MultiEdit::GetNOfLines()
 {
 	Int	 lines = 1;
@@ -136,11 +131,6 @@ S::Int S::GUI::MultiEdit::SetText(const String &newText)
 	return Success();
 }
 
-const S::String &S::GUI::MultiEdit::GetText() const
-{
-	return cursor->GetText();
-}
-
 S::Void S::GUI::MultiEdit::OnScroll()
 {
 	cursor->Scroll(scrollbarPos);
@@ -176,21 +166,6 @@ S::Void S::GUI::MultiEdit::OnCursorScroll(Int scrollPos, Int maxScrollPos)
 		scrollbar->SetRange(0, maxScrollPos);
 		scrollbar->SetValue(scrollPos);
 	}
-}
-
-S::Int S::GUI::MultiEdit::GetCursorPos() const
-{
-	return cursor->GetCursorPos();
-}
-
-S::Int S::GUI::MultiEdit::SetTabSize(Int nTabSize)
-{
-	return cursor->SetTabSize(nTabSize);
-}
-
-S::Int S::GUI::MultiEdit::GetTabSize() const
-{
-	return cursor->GetTabSize();
 }
 
 S::Void S::GUI::MultiEdit::OnChangeSize(const Size &nSize)

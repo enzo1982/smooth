@@ -49,7 +49,7 @@ S::Int S::GUI::Dialogs::FileSelectionBase::SetDefaultExtension(const String &new
 	return Success();
 }
 
-S::Int S::GUI::Dialogs::FileSelectionBase::GetNumberOfFiles()
+S::Int S::GUI::Dialogs::FileSelectionBase::GetNumberOfFiles() const
 {
 	return files.Length();
 }
@@ -61,14 +61,18 @@ S::Int S::GUI::Dialogs::FileSelectionBase::SetFileName(const String &newDefFile)
 	return Success();
 }
 
-S::String S::GUI::Dialogs::FileSelectionBase::GetFileName()
+const S::String &S::GUI::Dialogs::FileSelectionBase::GetFileName() const
 {
+	static const String	 nil;
+
 	if (files.Length() > 0)	return files.GetFirst();
-	else			return NIL;
+	else			return nil;
 }
 
-S::String S::GUI::Dialogs::FileSelectionBase::GetNthFileName(Int n)
+const S::String &S::GUI::Dialogs::FileSelectionBase::GetNthFileName(Int n) const
 {
+	static const String	 nil;
+
 	if (files.Length() > n)	return files.GetNth(n);
-	else			return NIL;
+	else			return nil;
 }

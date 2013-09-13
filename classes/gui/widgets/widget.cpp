@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -222,23 +222,6 @@ S::GUI::Surface *S::GUI::Widget::GetDrawSurface() const
 {
 	if (IsRegistered()) return container->GetDrawSurface();
 	else		    return Surface::GetNullSurface();
-}
-
-S::Int S::GUI::Widget::SetContainer(Widget *newContainer)
-{
-	container = newContainer;
-
-	return Success();
-}
-
-S::GUI::Widget *S::GUI::Widget::GetContainer() const
-{
-	return container;
-}
-
-S::Void S::GUI::Widget::SetRegisteredFlag(Bool flag)
-{
-	registered = flag;
 }
 
 S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle) const
@@ -840,11 +823,6 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 	return Success();
 }
 
-const S::String &S::GUI::Widget::GetText() const
-{
-	return text;
-}
-
 S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 {
 	tooltipText  = nTooltipText;
@@ -853,34 +831,12 @@ S::Int S::GUI::Widget::SetTooltipText(const String &nTooltipText)
 	return Success();
 }
 
-const S::String &S::GUI::Widget::GetTooltipText() const
-{
-	return tooltipText;
-}
-
 S::Int S::GUI::Widget::SetTooltipLayer(Layer *nTooltipLayer)
 {
 	tooltipText  = NIL;
 	tooltipLayer = nTooltipLayer;
 
 	return Success();
-}
-
-S::GUI::Layer *S::GUI::Widget::GetTooltipLayer() const
-{
-	return tooltipLayer;
-}
-
-S::Int S::GUI::Widget::SetStatusText(const String &nStatusText)
-{
-	statusText = nStatusText;
-
-	return Success();
-}
-
-const S::String &S::GUI::Widget::GetStatusText() const
-{
-	return statusText;
 }
 
 S::Int S::GUI::Widget::SetFont(const Font &nFont)
@@ -898,11 +854,6 @@ S::Int S::GUI::Widget::SetFont(const Font &nFont)
 	return Success();
 }
 
-const S::GUI::Font &S::GUI::Widget::GetFont() const
-{
-	return font;
-}
-
 S::Int S::GUI::Widget::SetOrientation(Int nOrientation)
 {
 	Bool	 prevVisible = IsVisible();
@@ -914,11 +865,6 @@ S::Int S::GUI::Widget::SetOrientation(Int nOrientation)
 	if (registered && prevVisible) Show();
 
 	return Success();
-}
-
-S::Int S::GUI::Widget::GetOrientation() const
-{
-	return orientation;
 }
 
 S::GUI::Rect S::GUI::Widget::GetVisibleArea() const

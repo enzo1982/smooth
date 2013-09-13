@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -54,7 +54,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		GtkFileFilter		*filter = gtk_file_filter_new();
 		const Array<String>	&patterns = filters.GetNth(i).Explode(";");
 
-		foreach (String pattern, patterns) gtk_file_filter_add_pattern(filter, pattern.Trim());
+		foreach (const String &pattern, patterns) gtk_file_filter_add_pattern(filter, pattern.Trim());
 
 		String::ExplodeFinish();
 

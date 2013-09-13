@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -55,11 +55,6 @@ S::Int S::GUI::Divider::SetPos(Int nPosition)
 	if (IsRegistered() && prevVisible) Show();
 
 	return Success();
-}
-
-S::Int S::GUI::Divider::GetPos() const
-{
-	return position;
 }
 
 S::Int S::GUI::Divider::Paint(Int message)

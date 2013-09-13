@@ -119,20 +119,13 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 	return Success();
 }
 
-S::Int S::GUI::Progressbar::SetValue(Int newValue)
+S::Void S::GUI::Progressbar::SetValue(Int newValue)
 {
 	Int	 prevValue = value;
 
 	value = (Int) Math::Min(endValue, Math::Max(startValue, newValue));
 
 	if (prevValue != value) Paint(SP_UPDATE);
-
-	return Success();
-}
-
-S::Int S::GUI::Progressbar::GetValue()
-{
-	return value;
 }
 
 S::Void S::GUI::Progressbar::CreateGradient(const Size &gSize)

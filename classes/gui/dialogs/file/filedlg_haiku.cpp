@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -106,7 +106,7 @@ class HaikuFileFilter : public BRefFilter
 
 				for (int j = 0; j < patterns.Length(); j++)
 				{
-					S::String	 pattern = patterns.GetNth(j);
+					const S::String	&pattern = patterns.GetNth(j);
 
 					if (fnmatch(pattern, ref->name, 0) == 0)
 					{

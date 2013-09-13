@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,7 @@
 #include <smooth/gui/widgets/multi/list/list.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
+#include <smooth/foreach.h>
 
 const S::Short	 S::GUI::List::classID = S::Object::RequestClassID();
 
@@ -168,28 +169,15 @@ S::Int S::GUI::List::SwitchEntries(Int entry1n, Int entry2n)
 	return Success();
 }
 
-S::Int S::GUI::List::Length() const
+S::Int S::GUI::List::SelectEntry(const ListEntry *entryToSelect)
 {
-	return elementOrder.Length();
-}
-
-S::GUI::ListEntry *S::GUI::List::GetNthEntry(Int n) const
-{
-	return elementOrder.GetNth(n);
-}
-
-S::Int S::GUI::List::SelectEntry(ListEntry *entryToSelect)
-{
-	for (Int i = 0; i < elementOrder.Length(); i++)
+	foreach (ListEntry *entry, elementOrder)
 	{
-		ListEntry	*entry = GetNthEntry(i);
+		if (entry != entryToSelect) continue;
 
-		if (entry == entryToSelect)
-		{
-			entry->Select();
+		entry->Select();
 
-			return Success();
-		}
+		return Success();
 	}
 
 	return Error();
@@ -197,10 +185,8 @@ S::Int S::GUI::List::SelectEntry(ListEntry *entryToSelect)
 
 S::GUI::ListEntry *S::GUI::List::GetSelectedEntry() const
 {
-	for (Int i = 0; i < elementOrder.Length(); i++)
+	foreach (ListEntry *entry, elementOrder)
 	{
-		ListEntry	*entry = elementOrder.GetNth(i);
-
 		if (entry->IsSelected()) return entry;
 	}
 

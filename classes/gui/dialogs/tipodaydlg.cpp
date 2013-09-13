@@ -171,7 +171,7 @@ S::Int S::GUI::Dialogs::TipOfTheDay::SetMode(Int nMode, Int nOffset, Bool showOn
 	return Success();
 }
 
-S::Int S::GUI::Dialogs::TipOfTheDay::GetOffset()
+S::Int S::GUI::Dialogs::TipOfTheDay::GetOffset() const
 {
 	return offset;
 }

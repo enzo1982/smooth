@@ -56,9 +56,9 @@ S::Int S::Net::Protocols::HTTP::SetHeaderField(const String &key, const String &
 	return Success();
 }
 
-S::String S::Net::Protocols::HTTP::GetHeaderField(const String &key)
+S::String S::Net::Protocols::HTTP::GetHeaderField(const String &key) const
 {
-	foreach (Parameter field, requestFields)
+	foreach (const Parameter &field, requestFields)
 	{
 		if (field.key == key) return field.value;
 	}
@@ -133,9 +133,9 @@ S::Int S::Net::Protocols::HTTP::SetProxyAuth(const String &nProxyUser, const Str
 	return Success();
 }
 
-S::String S::Net::Protocols::HTTP::GetResponseHeaderField(const String &key)
+S::String S::Net::Protocols::HTTP::GetResponseHeaderField(const String &key) const
 {
-	foreach (Parameter field, responseFields)
+	foreach (const Parameter &field, responseFields)
 	{
 		if (field.key == key) return field.value;
 	}
@@ -416,7 +416,7 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 		{
 			out->OutputString(String("--").Append(separator).Append("\r\n"));
 
-			Parameter	 parameter = requestParameters.GetNth(i);
+			const Parameter	&parameter = requestParameters.GetNth(i);
 
 			if (!parameter.isFile)
 			{
@@ -499,7 +499,7 @@ S::String S::Net::Protocols::HTTP::ComposeHeader()
 
 	for (Int i = 0; i < requestFields.Length(); i++)
 	{
-		Parameter	 field = requestFields.GetNth(i);
+		const Parameter	&field = requestFields.GetNth(i);
 
 		str.Append(field.key).Append(": ").Append(field.value).Append("\r\n");
 	}
@@ -509,13 +509,13 @@ S::String S::Net::Protocols::HTTP::ComposeHeader()
 	return str;
 }
 
-S::String S::Net::Protocols::HTTP::GetParametersURLEncoded()
+S::String S::Net::Protocols::HTTP::GetParametersURLEncoded() const
 {
 	String	 str;
 
 	for (Int i = 0; i < requestParameters.Length(); i++)
 	{
-		Parameter	 parameter = requestParameters.GetNth(i);
+		const Parameter	&parameter = requestParameters.GetNth(i);
 
 		if (i > 0) str.Append("&");
 

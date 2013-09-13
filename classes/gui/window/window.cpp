@@ -125,11 +125,6 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 	return Success();
 }
 
-const S::GUI::Bitmap &S::GUI::Window::GetIcon() const
-{
-	return icon;
-}
-
 S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 {
 	Bitmap	 newIcon = nIcon;
@@ -156,11 +151,6 @@ S::Int S::GUI::Window::SetIconDirect(Void *nIcon)
 	backend->SetIconDirect(nIcon);
 
 	return Success();
-}
-
-S::GUI::Layer *S::GUI::Window::GetMainLayer() const
-{
-	return mainLayer;
 }
 
 S::Int S::GUI::Window::SetText(const String &nTitle)
@@ -357,11 +347,6 @@ S::Int S::GUI::Window::Raise()
 	return Success();
 }
 
-S::GUI::Point S::GUI::Window::GetRealPosition() const
-{
-	return Point(0, 0);
-}
-
 S::GUI::Rect S::GUI::Window::GetWindowRect() const
 {
 	return Rect(GetPosition(), GetSize());
@@ -376,18 +361,6 @@ S::GUI::Rect S::GUI::Window::GetRestoredWindowRect() const
 {
 	if (IsMaximized())	return backend->GetRestoredWindowRect();
 	else			return GetWindowRect();
-}
-
-const S::GUI::Rect &S::GUI::Window::GetUpdateRect() const
-{
-	return updateRect;
-}
-
-S::Int S::GUI::Window::SetUpdateRect(const Rect &newUpdateRect)
-{
-	updateRect = newUpdateRect;
-
-	return Success();
 }
 
 S::Int S::GUI::Window::SetMinimumSize(const Size &newMinSize)
@@ -466,11 +439,6 @@ S::Int S::GUI::Window::Close()
 	backend->RequestClose();
 
 	return Success();
-}
-
-S::Bool S::GUI::Window::IsInUse() const
-{
-	return (created && !destroyed);
 }
 
 S::Void S::GUI::Window::OnCreate()

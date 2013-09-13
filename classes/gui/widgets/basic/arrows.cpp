@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -155,18 +155,6 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	return Success();
 }
 
-S::Int S::GUI::Arrows::SetStepSize(UnsignedInt nStepSize)
-{
-	stepSize = nStepSize;
-
-	return Success();
-}
-
-S::UnsignedInt S::GUI::Arrows::GetStepSize() const
-{
-	return stepSize;
-}
-
 S::Void S::GUI::Arrows::OnMouseDownPlus()
 {
 	if (timer == NIL)
@@ -241,20 +229,13 @@ S::Int S::GUI::Arrows::SetRange(Int rangeStart, Int rangeEnd)
 	return Success();
 }
 
-S::Int S::GUI::Arrows::SetValue(Int newValue)
+S::Void S::GUI::Arrows::SetValue(Int newValue)
 {
-	Int	 prevValue	= *variable;
+	Int	 prevValue = *variable;
 
 	*variable = Math::Min(Math::Max(newValue, startValue), endValue);
 
 	if (*variable != prevValue) onValueChange.Emit(*variable);
-
-	return Success();
-}
-
-S::Int S::GUI::Arrows::GetValue()
-{
-	return *variable;
 }
 
 S::Void S::GUI::Arrows::OnChangeSize(const Size &nSize)

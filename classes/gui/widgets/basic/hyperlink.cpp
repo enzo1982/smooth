@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -148,21 +148,4 @@ S::Int S::GUI::Hyperlink::SetBitmap(const Bitmap &newBitmap)
 	Paint(SP_PAINT);
 
 	return Success();
-}
-
-const S::GUI::Bitmap &S::GUI::Hyperlink::GetBitmap()
-{
-	return linkBitmap;
-}
-
-S::Int S::GUI::Hyperlink::SetURL(const String &newUrl)
-{
-	linkURL = newUrl;
-
-	return Success();
-}
-
-const S::String &S::GUI::Hyperlink::GetURL()
-{
-	return linkURL;
 }

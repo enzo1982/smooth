@@ -153,20 +153,6 @@ S::Void S::GUI::Tooltip::OnToolWindowEvent(Int message, Int wParam, Int lParam)
 	forwarding = False;
 }
 
-S::Int S::GUI::Tooltip::SetTimeout(Int mSeconds)
-{
-	timeOut = mSeconds;
-
-	return Success();
-}
-
-S::Int S::GUI::Tooltip::SetLayer(Layer *nLayer)
-{
-	layer = nLayer;
-
-	return Success();
-}
-
 S::Void S::GUI::Tooltip::OnTimer()
 {
 	Hide();

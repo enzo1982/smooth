@@ -120,7 +120,7 @@ S::Int S::GUI::Slider::SetRange(Int rangeStart, Int rangeEnd)
 	return Success();
 }
 
-S::Int S::GUI::Slider::SetValue(Int newValue)
+S::Void S::GUI::Slider::SetValue(Int newValue)
 {
 	Int	 prevValue = *variable;
 
@@ -139,13 +139,6 @@ S::Int S::GUI::Slider::SetValue(Int newValue)
 
 		onValueChange.Emit(*variable);
 	}
-
-	return Success();
-}
-
-S::Int S::GUI::Slider::GetValue()
-{
-	return *variable;
 }
 
 S::Int S::GUI::Slider::SetGripSize(Int newGripSize)
@@ -157,11 +150,6 @@ S::Int S::GUI::Slider::SetGripSize(Int newGripSize)
 	UpdateHotspotPositions();
 
 	return Success();
-}
-
-S::Int S::GUI::Slider::GetGripSize()
-{
-	return gripSize;
 }
 
 S::Void S::GUI::Slider::OnMouseClick(const Point &mousePos)

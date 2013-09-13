@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -71,9 +71,4 @@ S::Int S::GUI::MenuEntry::SetBitmap(const Bitmap &newBitmap)
 	graymap.GrayscaleBitmap();
 
 	return Success();
-}
-
-const S::GUI::Bitmap &S::GUI::MenuEntry::GetBitmap() const
-{
-	return bitmap;
 }

@@ -1315,35 +1315,10 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 	return Success();
 }
 
-S::Int S::GUI::Cursor::GetCursorPos() const
+S::Void S::GUI::Cursor::SetMaxSize(Int newMaxSize)
 {
-	if (focussed)	return promptPos;
-	else		return -1;
-}
-
-S::Int S::GUI::Cursor::SetTabSize(Int nTabSize)
-{
-	tabSize = nTabSize;
-
-	return Success();
-}
-
-S::Int S::GUI::Cursor::GetTabSize() const
-{
-	return tabSize;
-}
-
-S::Int S::GUI::Cursor::SetMaxSize(Int newMaxSize)
-{
-	if (newMaxSize <= 0)	maxSize = 32768;
-	else			maxSize = newMaxSize;
-
-	return Success();
-}
-
-S::Int S::GUI::Cursor::GetMaxSize() const
-{
-	return maxSize;
+	if (newMaxSize <= 0) maxSize = 32768;
+	else		     maxSize = newMaxSize;
 }
 
 /* Returns the display cursor position

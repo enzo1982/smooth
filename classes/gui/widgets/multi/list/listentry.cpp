@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -163,7 +163,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 	return Widget::Paint(message);
 }
 
-S::String S::GUI::ListEntry::GetNthTabText(Int i)
+S::String S::GUI::ListEntry::GetNthTabText(Int i) const
 {
 	String	 tabText;
 	Int	 tabCount = 0;
@@ -206,11 +206,6 @@ S::Int S::GUI::ListEntry::SetMark(Bool nMarked)
 	return Success();
 }
 
-S::Bool S::GUI::ListEntry::IsMarked()
-{
-	return marked;
-}
-
 S::Int S::GUI::ListEntry::Select()
 {
 	selected = True;
@@ -235,11 +230,6 @@ S::Int S::GUI::ListEntry::Deselect()
 	onDeselect.Emit();
 
 	return Success();
-}
-
-S::Bool S::GUI::ListEntry::IsSelected()
-{
-	return selected;
 }
 
 S::Void S::GUI::ListEntry::InitDrag()

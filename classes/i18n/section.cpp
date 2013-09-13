@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,7 +21,7 @@ S::I18n::Section::~Section()
 	foreach (Section *section, sections) delete section;
 }
 
-const S::String &S::I18n::Section::GetString(const String &string)
+const S::String &S::I18n::Section::GetString(const String &string) const
 {
 	if (contextSection != NIL)
 	{
@@ -30,7 +30,7 @@ const S::String &S::I18n::Section::GetString(const String &string)
 		if (result != NIL) return result;
 	}
 
-	return strings.GetReference(string.ComputeCRC32());
+	return strings.Get(string.ComputeCRC32());
 }
 
 S::Bool S::I18n::Section::SetContext(const String &nContext)

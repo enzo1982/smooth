@@ -89,6 +89,6 @@ S::Void S::GUI::ImageEntry::OnChangeSize(const Size &newSize)
 
 S::Bool S::GUI::ImageEntry::IsTypeCompatible(Short compType) const
 {
-	if (compType == Object::classID || compType == Widget::classID || compType == ListEntry::classID)	return True;
-	else													return False;
+	if (compType == Object::classID || compType == Widget::classID || compType == ListEntry::classID) return True;
+	else												  return False;
 }

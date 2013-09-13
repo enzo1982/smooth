@@ -93,21 +93,6 @@ S::Int S::GUI::EditBox::Paint(Int message)
 	return Widget::Paint(message);
 }
 
-S::Int S::GUI::EditBox::MarkAll()
-{
-	return cursor->MarkAll();
-}
-
-S::Int S::GUI::EditBox::SetText(const String &newText)
-{
-	return cursor->SetText(newText);
-}
-
-const S::String &S::GUI::EditBox::GetText() const
-{
-	return cursor->GetText();
-}
-
 S::Int S::GUI::EditBox::SetDropDownList(List *nDropDownList)
 {
 	Surface	*surface = GetDrawSurface();
@@ -149,21 +134,6 @@ S::Void S::GUI::EditBox::OnSelectEntry(ListEntry *entry)
 
 	onSelectEntry.Emit(entry);
 	onInput.Emit(cursor->GetText());
-}
-
-S::Int S::GUI::EditBox::SetCursorPos(Int nPos)
-{
-	return cursor->SetCursorPos(nPos);
-}
-
-S::Int S::GUI::EditBox::GetCursorPos() const
-{
-	return cursor->GetCursorPos();
-}
-
-S::Bool S::GUI::EditBox::IsFocussed() const
-{
-	return cursor->IsFocussed();
 }
 
 S::Void S::GUI::EditBox::OnChangeSize(const Size &nSize)

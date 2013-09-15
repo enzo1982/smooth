@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -59,6 +59,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 	Point	 realPos  = GetRealPosition();
 	Size	 realSize = GetRealSize();
 	Rect	 bmpRect  = Rect(realPos + Point(2, 2) * surface->GetSurfaceDPI() / 96.0, bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0);
+
+	surface->StartPaint(Rect(realPos, realSize));
 
 	switch (message)
 	{
@@ -170,6 +172,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 			break;
 	}
+
+	surface->EndPaint();
 
 	return Success();
 }

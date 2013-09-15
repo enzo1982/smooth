@@ -71,6 +71,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 	Rect	 bmpRect = Rect(GetRealPosition() + Point(2, 2) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0);
 
+	surface->StartPaint(frame);
+
 	switch (message)
 	{
 		case SP_SHOW:
@@ -155,6 +157,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 			break;
 	}
+
+	surface->EndPaint();
 
 	return Success();
 }

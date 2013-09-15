@@ -12,7 +12,7 @@ LIBS = -lfribidi -lbz2 -lxml2 -ljpeg -lz -lstdc++
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += resources/*.o
 
-	ifneq ($(BUILD_X86_64),True)
+	ifeq ($(BUILD_X86),True)
 		LIBS += -lunicows
 	endif
 
@@ -63,15 +63,20 @@ endif
 
 LINKER	    = gcc
 REMOVE	    = rm
-LINKER_OPTS = -L$(LIBDIR) -s --shared -o $(DLLNAME)
+LINKER_OPTS = -pipe -L$(LIBDIR) -o $(DLLNAME)
 REMOVE_OPTS = -f
 
 ifeq ($(BUILD_OSX),True)
-	LINKER_OPTS += -arch x86_64 -arch i386
+ifeq ($(BUILD_X86),True)
+	LINKER_OPTS += -dynamiclib -arch i386
+endif
+ifeq ($(BUILD_X86_64),True)
+	LINKER_OPTS += -dynamiclib -arch x86_64
+endif
+else ifeq ($(BUILD_X86),True)
+	LINKER_OPTS += --shared -m32 -s
 else ifeq ($(BUILD_X86_64),True)
-	LINKER_OPTS += -m64
-else
-	LINKER_OPTS += -m32
+	LINKER_OPTS += --shared -m64 -s
 endif
 
 ifeq ($(BUILD_WIN32),True)

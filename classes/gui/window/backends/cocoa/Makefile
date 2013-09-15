@@ -1,20 +1,16 @@
 ########## smooth directory makefile ##########
 
 # Change these variables to fit this location:
-SMOOTH_PATH = ../../../..
+SMOOTH_PATH = ../../../../..
 
 include $(SMOOTH_PATH)/Makefile-options
 
 # Enter object files here:
 OBJECTS	  = 
 
-ifeq ($(BUILD_POSIXTHREADS),True)
-	OBJECTS += mutexposix.o semaphoreposix.o
-
-ifneq ($(BUILD_OSX),True)
-	OBJECTS += threadposix.o
-else ifeq ($(BUILD_XLIB),True)
-	OBJECTS += threadposix.o
+ifeq ($(BUILD_OSX),True)
+ifneq ($(BUILD_XLIB),True)
+	OBJECTS += windowcocoa.o
 endif
 endif
 

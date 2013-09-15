@@ -10,12 +10,41 @@
 
 #include <smooth/backends/cocoa/backendcocoa.h>
 
+#include <smooth/gui/window/window.h>
+
 S::Backends::Backend *CreateBackendCocoa()
 {
 	return new S::Backends::BackendCocoa();
 }
 
 S::Int	 backendCocoaTmp = S::Backends::Backend::AddBackend(&CreateBackendCocoa);
+
+#if defined MAC_OS_X_VERSION_10_6 && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+@interface CocoaApplicationDelegate : NSObject <NSApplicationDelegate> { }
+#else
+@interface CocoaApplicationDelegate : NSObject { }
+#endif
+	- (NSApplicationTerminateReply) applicationShouldTerminate: (NSApplication *) sender;
+@end
+
+@implementation CocoaApplicationDelegate
+	- (NSApplicationTerminateReply) applicationShouldTerminate: (NSApplication *) sender
+	{
+		/* Ask open windows to close.
+		 */
+		for (S::Int n = S::GUI::Window::GetNOfWindows() - 1; n >= 0; n--)
+		{
+			S::GUI::Window	*window	= S::GUI::Window::GetNthWindow(n);
+
+			if (window->IsVisible()) window->Close();
+		}
+
+		/* Cancel termination here. Terminate will be
+		 * called again when all windows did close.
+		 */
+		return NSTerminateCancel;
+	}
+@end
 
 S::Backends::BackendCocoa::BackendCocoa()
 {
@@ -37,6 +66,10 @@ S::Int S::Backends::BackendCocoa::Init()
 	/* Create a garbage collection pool.
 	 */
 	pool = [[NSAutoreleasePool alloc] init];
+	
+	/* Set application delegate.
+	 */
+	[NSApp setDelegate: [[[CocoaApplicationDelegate alloc] init] autorelease]];
 
 	/* Set default language if not set.
 	 */

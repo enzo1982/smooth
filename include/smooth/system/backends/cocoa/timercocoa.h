@@ -8,37 +8,41 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_SCREENHAIKU
-#define H_OBJSMOOTH_SCREENHAIKU
+#ifndef H_OBJSMOOTH_TIMERCOCOA
+#define H_OBJSMOOTH_TIMERCOCOA
+
+#include <Cocoa/Cocoa.h>
 
 namespace smooth
 {
 	namespace System
 	{
-		class ScreenHaiku;
+		class TimerCocoa;
 	};
 };
 
-#include "../screenbackend.h"
-
-#include <Screen.h>
+#include "../timerbackend.h"
 
 namespace smooth
 {
 	namespace System
 	{
-		const Short	 SCREEN_HAIKU = 4;
+		const Short	 TIMER_COCOA = 3;
 
-		class ScreenHaiku : public ScreenBackend
+		class TimerCocoa : public TimerBackend
 		{
+			private:
+				NSTimer	*timer;
+
+				void	*receiver;
 			public:
-						 ScreenHaiku();
-						~ScreenHaiku();
+					 TimerCocoa(Timer *);
+					~TimerCocoa();
 
-				GUI::Rect	 GetActiveScreenMetrics();
-				GUI::Rect	 GetActiveScreenWorkArea();
+				Int	 Start(Int);
+				Int	 Stop();
 
-				GUI::Rect	 GetVirtualScreenMetrics();
+				Int	 GetID() const;
 		};
 	};
 };

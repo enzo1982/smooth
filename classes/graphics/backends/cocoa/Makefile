@@ -8,13 +8,9 @@ include $(SMOOTH_PATH)/Makefile-options
 # Enter object files here:
 OBJECTS	  = 
 
-ifeq ($(BUILD_POSIXTHREADS),True)
-	OBJECTS += mutexposix.o semaphoreposix.o
-
-ifneq ($(BUILD_OSX),True)
-	OBJECTS += threadposix.o
-else ifeq ($(BUILD_XLIB),True)
-	OBJECTS += threadposix.o
+ifeq ($(BUILD_OSX),True)
+ifneq ($(BUILD_XLIB),True)
+	OBJECTS += bitmapcocoa.o fontcocoa.o surfacecocoa.o
 endif
 endif
 

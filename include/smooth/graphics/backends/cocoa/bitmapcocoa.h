@@ -8,38 +8,40 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_BITMAPHAIKU
-#define H_OBJSMOOTH_BITMAPHAIKU
+#ifndef H_OBJSMOOTH_BITMAPCOCOA
+#define H_OBJSMOOTH_BITMAPCOCOA
+
+#include <Cocoa/Cocoa.h>
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class BitmapHaiku;
+		class BitmapCocoa;
 	};
 };
 
 #include "../bitmapbackend.h"
 
-#include <Bitmap.h>
-
 namespace smooth
 {
 	namespace GUI
 	{
-		const Short	 BITMAP_HAIKU = 6;
+		const Short	 BITMAP_COCOA = 4;
 
-		class BitmapHaiku : public BitmapBackend
+		class BitmapCocoa : public BitmapBackend
 		{
 			private:
-				BBitmap			*bitmap;
-			public:
-							 BitmapHaiku(Void * = NIL);
-							 BitmapHaiku(Int, Int, Int);
-							 BitmapHaiku(const int);
-							 BitmapHaiku(const BitmapHaiku &);
+				NSBitmapImageRep	*bitmap;
 
-							~BitmapHaiku();
+				Void			 Initialize();
+			public:
+							 BitmapCocoa(Void * = NIL);
+							 BitmapCocoa(Int, Int, Int);
+							 BitmapCocoa(const int);
+							 BitmapCocoa(const BitmapCocoa &);
+
+							~BitmapCocoa();
 
 				Bool			 CreateBitmap(Int, Int, Int);
 				Bool			 DeleteBitmap();

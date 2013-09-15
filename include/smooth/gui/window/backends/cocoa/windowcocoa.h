@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,21 +8,16 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_WINDOWHAIKU
-#define H_OBJSMOOTH_WINDOWHAIKU
+#ifndef H_OBJSMOOTH_WINDOWCOCOA
+#define H_OBJSMOOTH_WINDOWCOCOA
 
-#include <Window.h>
+#include <Cocoa/Cocoa.h>
 
 namespace smooth
 {
-	namespace System
-	{
-		class Timer;
-	};
-
 	namespace GUI
 	{
-		class WindowHaiku;
+		class WindowCocoa;
 	};
 };
 
@@ -34,35 +29,44 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Short	 WINDOW_HAIKU	= 4;
+		const Short	 WINDOW_COCOA	= 3;
 
-		class WindowHaiku : public WindowBackend
+		class WindowCocoa : public WindowBackend
 		{
 			private:
-				static Array<WindowHaiku *, Void *>	 windowBackends;
-			protected:
-				Int					 id;
+				static Array<WindowCocoa *, Void *>	 windowBackends;
 
-				BWindow					*wnd;
-				BView					*view;
+				WindowCocoa				*FindLeaderWindow();
+
+				Bool					 IsModalWindowActive();
+			protected:
+				Int					 wid;
+
+				NSWindow				*wnd;
 
 				Float					 fontSize;
+
+				Point					 pos;
+				Size					 size;
 
 				Size					 minSize;
 				Size					 maxSize;
 
 				Int					 flags;
 
-				Input::Keyboard::Key			 ConvertKey(Int, const BMessage &);
+				String					 selection;
+				String					 clipboard;
+
+				Input::Keyboard::Key			 ConvertKey(Int);
 			public:
-									 WindowHaiku(Void * = NIL);
-									~WindowHaiku();
+									 WindowCocoa(Void * = NIL);
+									~WindowCocoa();
 
 				Void					*GetSystemWindow() const;
 
-				static WindowHaiku			*GetWindowBackend(BWindow *);
+				static WindowCocoa			*GetWindowBackend(NSWindow *);
 
-				Int					 ProcessSystemMessages(Int, Int, Int, const BMessage &);
+				Int					 ProcessSystemMessages(NSEvent *);
 
 				Int					 Open(const String &, const Point &, const Size &, Int);
 				Int					 Close();
@@ -78,6 +82,11 @@ namespace smooth
 				Int					 Hide();
 
 				Int					 SetMetrics(const Point &, const Size &);
+
+				Int					 Raise();
+			accessors:
+				Void					 SetSelection(const String &nSelection) { selection = nSelection; }
+				Void					 SetClipboard(const String &nClipboard) { clipboard = nClipboard; }
 		};
 	};
 };

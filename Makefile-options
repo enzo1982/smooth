@@ -1,15 +1,19 @@
 ########## smooth options makefile ##########
 
-VERSION	 = 0.8.71
+VERSION	 = 0.8.72
 REVISION = 0
 
 UNAME = $(shell uname)
 MACHINE = $(shell gcc -dumpmachine)
 
 ifneq ($(findstring x86_64,$(MACHINE)),)
-	BUILD_X86_64 = True
+	ifneq ($(BUILD_X86_64),False)
+		BUILD_X86_64 = True
+	endif
 else
-	BUILD_X86 = True
+	ifneq ($(BUILD_X86),False)
+		BUILD_X86 = True
+	endif
 endif
 
 ifndef SMOOTH_PATH
@@ -75,13 +79,20 @@ else
 #		Set shared object extension
 		SHARED = .dylib
 
-#		Build universal binaries.
-		BUILD_X86 = True
-		BUILD_X86_64 = True
+#		Build universal binaries
+		ifneq ($(BUILD_X86),False)
+			BUILD_X86 = True
+		endif
+		ifneq ($(BUILD_X86_64),False)
+			BUILD_X86_64 = True
+		endif
 
-# 		Enable threads based timers
+#		Disable XLib and Cairo backends
+		BUILD_XLIB = False
+		BUILD_CAIRO = False
+
+# 		Disable POSIX timers
 		BUILD_POSIXTIMER = False
-		BUILD_THREADSTIMER = True
 	else ifeq ($(UNAME),Haiku)
 		BUILD_HAIKU = True
 
@@ -108,17 +119,18 @@ else
 	endif
 endif
 
-ifeq ($(PREFIX),)
-	PREFIX = /usr/local
-	LIB    = lib
+LIB = lib
 
 ifeq ($(BUILD_X86_64),True)
-ifneq ($(BUILD_OSX),True)
-	LIB    = lib64
-endif
+	ifneq ($(BUILD_OSX),True)
+		LIB = lib64
+	endif
 endif
 
-ifeq ($(BUILD_HAIKU),True)
-	PREFIX = /boot/common
-endif
+ifeq ($(PREFIX),)
+	PREFIX = /usr/local
+
+	ifeq ($(BUILD_HAIKU),True)
+		PREFIX = /boot/common
+	endif
 endif

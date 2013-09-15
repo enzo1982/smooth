@@ -28,7 +28,7 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Short	 BITMAP_GDIPLUS = 4;
+		const Short	 BITMAP_GDIPLUS = 5;
 
 		class BitmapGDIPlus : public BitmapBackend
 		{

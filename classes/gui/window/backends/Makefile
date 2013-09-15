@@ -7,12 +7,14 @@ SMOOTH_PATH = ../../../..
 OBJECTS	  = windowbackend.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd gdi && $(MAKE)
-ALLCMD2   = cd haiku && $(MAKE)
-ALLCMD3   = cd xlib && $(MAKE)
-CLEANCMD1 = cd gdi && $(MAKE) clean
-CLEANCMD2 = cd haiku && $(MAKE) clean
-CLEANCMD3 = cd xlib && $(MAKE) clean
+ALLCMD1   = cd cocoa && $(MAKE)
+ALLCMD2   = cd gdi && $(MAKE)
+ALLCMD3   = cd haiku && $(MAKE)
+ALLCMD4   = cd xlib && $(MAKE)
+CLEANCMD1 = cd cocoa && $(MAKE) clean
+CLEANCMD2 = cd gdi && $(MAKE) clean
+CLEANCMD3 = cd haiku && $(MAKE) clean
+CLEANCMD4 = cd xlib && $(MAKE) clean
 
 ## Do not change anything below this line. ##
 

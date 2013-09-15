@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,7 +29,7 @@ namespace smooth
 		/* A threads based timer backend for use on systems
 		 * that provide only limited or no timer support.
 		 */
-		const Short	 TIMER_THREADS = 3;
+		const Short	 TIMER_THREADS = 4;
 
 		class TimerThreads : public TimerBackend
 		{

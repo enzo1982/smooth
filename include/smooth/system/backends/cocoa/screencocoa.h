@@ -8,32 +8,32 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_SCREENHAIKU
-#define H_OBJSMOOTH_SCREENHAIKU
+#ifndef H_OBJSMOOTH_SCREENCOCOA
+#define H_OBJSMOOTH_SCREENCOCOA
+
+#include <Cocoa/Cocoa.h>
 
 namespace smooth
 {
 	namespace System
 	{
-		class ScreenHaiku;
+		class ScreenCocoa;
 	};
 };
 
 #include "../screenbackend.h"
 
-#include <Screen.h>
-
 namespace smooth
 {
 	namespace System
 	{
-		const Short	 SCREEN_HAIKU = 4;
+		const Short	 SCREEN_COCOA = 3;
 
-		class ScreenHaiku : public ScreenBackend
+		class ScreenCocoa : public ScreenBackend
 		{
 			public:
-						 ScreenHaiku();
-						~ScreenHaiku();
+						 ScreenCocoa();
+						~ScreenCocoa();
 
 				GUI::Rect	 GetActiveScreenMetrics();
 				GUI::Rect	 GetActiveScreenWorkArea();

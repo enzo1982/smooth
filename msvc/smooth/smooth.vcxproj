@@ -175,6 +175,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\classes\backends\photon\backendphoton.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\classes\basic\object.cpp" />
     <ClCompile Include="..\..\classes\basic\objecttype.cpp" />
     <ClCompile Include="..\..\classes\basic\setup.cpp" />
@@ -196,6 +199,15 @@
     <ClCompile Include="..\..\classes\errors\misc\permissiondenied.cpp" />
     <ClCompile Include="..\..\classes\files\directory.cpp" />
     <ClCompile Include="..\..\classes\files\file.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\haiku\bitmaphaiku.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\haiku\fonthaiku.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\haiku\surfacehaiku.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\classes\graphics\bitmap.cpp" />
     <ClCompile Include="..\..\classes\graphics\color.cpp" />
     <ClCompile Include="..\..\classes\graphics\font.cpp" />
@@ -243,7 +255,19 @@
     </ClCompile>
     <ClCompile Include="..\..\classes\graphics\modifiers\fontsize.cpp" />
     <ClCompile Include="..\..\classes\graphics\modifiers\righttoleft.cpp" />
+    <ClCompile Include="..\..\classes\gui\clipboard\backends\haiku\clipboardhaiku.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\clipboard\backends\photon\clipboardphoton.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_haiku.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_photon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_haiku.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_photon.cpp">
@@ -306,6 +330,9 @@
     <ClCompile Include="..\..\classes\gui\widgets\special\tooltip.cpp" />
     <ClCompile Include="..\..\classes\gui\mdi\client.cpp" />
     <ClCompile Include="..\..\classes\gui\mdi\window.cpp" />
+    <ClCompile Include="..\..\classes\gui\window\backends\haiku\windowhaiku.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\classes\gui\window\toolwindow.cpp" />
     <ClCompile Include="..\..\classes\gui\window\window.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
@@ -367,6 +394,14 @@
     <ClCompile Include="..\..\classes\gui\clipboard\backends\xlib\clipboardxlib.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\classes\input\backends\haiku\pointerhaiku.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\input\backends\pointerbackend.cpp" />
+    <ClCompile Include="..\..\classes\input\backends\win32\pointerwin32.cpp" />
+    <ClCompile Include="..\..\classes\input\backends\xlib\pointerxlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\classes\input\keyboard.cpp" />
     <ClCompile Include="..\..\classes\misc\args.cpp" />
     <ClCompile Include="..\..\classes\misc\binary.cpp" />
@@ -390,6 +425,18 @@
     <ClCompile Include="..\..\classes\misc\hash\crc32.cpp" />
     <ClCompile Include="..\..\classes\misc\hash\md5.cpp" />
     <ClCompile Include="..\..\classes\misc\hash\sha1.cpp" />
+    <ClCompile Include="..\..\classes\system\backends\haiku\eventhaiku.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\haiku\screenhaiku.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\screenbackend.cpp" />
+    <ClCompile Include="..\..\classes\system\backends\win32\screenwin32.cpp" />
+    <ClCompile Include="..\..\classes\system\backends\xlib\screenxlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\screen.cpp" />
     <ClCompile Include="..\..\classes\threads\access.cpp" />
     <ClCompile Include="..\..\classes\xml\attribute.cpp" />
     <ClCompile Include="..\..\classes\xml\document.cpp" />
@@ -453,7 +500,6 @@
     <ClCompile Include="..\..\classes\system\cpu.cpp" />
     <ClCompile Include="..\..\classes\system\dynamicloader.cpp" />
     <ClCompile Include="..\..\classes\system\event.cpp" />
-    <ClCompile Include="..\..\classes\system\multimonitor.cpp" />
     <ClCompile Include="..\..\classes\system\system.cpp" />
     <ClCompile Include="..\..\classes\system\timer.cpp" />
     <ClCompile Include="..\..\classes\system\backends\eventbackend.cpp" />
@@ -578,26 +624,53 @@
     <ClInclude Include="..\..\classes\i18n\locales\smooth_zh_TW.h" />
     <ClInclude Include="..\..\include\smooth.h" />
     <ClInclude Include="..\..\include\smooth\args.h" />
+    <ClInclude Include="..\..\include\smooth\backends\cocoa\backendcocoa.h" />
+    <ClInclude Include="..\..\include\smooth\backends\photon\backendphoton.h" />
     <ClInclude Include="..\..\include\smooth\codecs.h" />
     <ClInclude Include="..\..\include\smooth\definitions.h" />
     <ClInclude Include="..\..\include\smooth\dll.h" />
     <ClInclude Include="..\..\include\smooth\foreach.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cocoa\bitmapcocoa.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cocoa\fontcocoa.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cocoa\surfacecocoa.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\bitmaphaiku.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\fonthaiku.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\surfacehaiku.h" />
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\cocoa\clipboardcocoa.h" />
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\haiku\clipboardhaiku.h" />
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\photon\clipboardphoton.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_cocoa.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_haiku.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_photon.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_cocoa.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_haiku.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_photon.h" />
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\cocoa\windowcocoa.h" />
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\haiku\windowhaiku.h" />
     <ClInclude Include="..\..\include\smooth\init.h" />
+    <ClInclude Include="..\..\include\smooth\input\backends\cocoa\pointercocoa.h" />
+    <ClInclude Include="..\..\include\smooth\input\backends\haiku\pointerhaiku.h" />
+    <ClInclude Include="..\..\include\smooth\input\backends\pointerbackend.h" />
+    <ClInclude Include="..\..\include\smooth\input\backends\win32\pointerwin32.h" />
+    <ClInclude Include="..\..\include\smooth\input\backends\xlib\pointerxlib.h" />
     <ClInclude Include="..\..\include\smooth\input\keyboard.h" />
     <ClInclude Include="..\..\include\smooth\main.h" />
     <ClInclude Include="..\..\include\smooth\pciio.h" />
     <ClInclude Include="..\..\include\smooth\resources.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\cocoa\eventcocoa.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\cocoa\screencocoa.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\cocoa\timercocoa.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\haiku\eventhaiku.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\haiku\screenhaiku.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\win32\screenwin32.h" />
+    <ClInclude Include="..\..\include\smooth\system\backends\xlib\screenxlib.h" />
+    <ClInclude Include="..\..\include\smooth\system\screen.h" />
     <ClInclude Include="..\..\include\smooth\threads\access.h" />
     <ClInclude Include="..\..\include\smooth\version.h" />
     <ClInclude Include="..\..\include\smooth\system\console.h" />
     <ClInclude Include="..\..\include\smooth\system\cpu.h" />
     <ClInclude Include="..\..\include\smooth\system\dynamicloader.h" />
     <ClInclude Include="..\..\include\smooth\system\event.h" />
-    <ClInclude Include="..\..\include\smooth\system\multimonitor.h" />
     <ClInclude Include="..\..\include\smooth\system\system.h" />
     <ClInclude Include="..\..\include\smooth\system\timer.h" />
     <ClInclude Include="..\..\include\smooth\system\backends\eventbackend.h" />
@@ -821,10 +894,40 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\classes\backends\cocoa\backendcocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\graphics\backends\cocoa\bitmapcocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\graphics\backends\cocoa\fontcocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\graphics\backends\cocoa\surfacecocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\gui\clipboard\backends\cocoa\clipboardcocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="..\..\classes\gui\dialogs\directory\dirdlg_cocoa.mm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </None>
     <None Include="..\..\classes\gui\dialogs\file\filedlg_cocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\gui\window\backends\cocoa\windowcocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\input\backends\cocoa\pointercocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\system\backends\cocoa\eventcocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\system\backends\cocoa\screencocoa.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\classes\system\backends\cocoa\timercocoa.mm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </None>
   </ItemGroup>

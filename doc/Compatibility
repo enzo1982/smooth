@@ -14,7 +14,7 @@ OpenBSD, GCC 4.x	since 0.8.71.0			complete support
 Solaris, GCC 4.x	since 0.8.71.0			complete support
 Hurd, GCC 4.x		since 0.8.71.0			complete support
 
-Mac OS X, GCC 4.x	since 0.8.71.0			X11 GUI only
+Mac OS X, GCC 4.x	since 0.8.71.0			X11 GUI only, Cocoa GUI in progress
 QNX, GCC 4.x		since 0.8.71.0			X11 GUI only
 Haiku, GCC 4.x		since 0.8.71.0			GUI still very unstable
 

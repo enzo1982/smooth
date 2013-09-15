@@ -8,37 +8,34 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_SCREENHAIKU
-#define H_OBJSMOOTH_SCREENHAIKU
+#ifndef H_OBJSMOOTH_FONTCOCOA
+#define H_OBJSMOOTH_FONTCOCOA
+
+#include <Cocoa/Cocoa.h>
 
 namespace smooth
 {
-	namespace System
+	namespace GUI
 	{
-		class ScreenHaiku;
+		class FontCocoa;
 	};
 };
 
-#include "../screenbackend.h"
-
-#include <Screen.h>
+#include "../fontbackend.h"
 
 namespace smooth
 {
-	namespace System
+	namespace GUI
 	{
-		const Short	 SCREEN_HAIKU = 4;
+		const Short	 FONT_COCOA	= 4;
 
-		class ScreenHaiku : public ScreenBackend
+		class FontCocoa : public FontBackend
 		{
 			public:
-						 ScreenHaiku();
-						~ScreenHaiku();
+					 FontCocoa(const String &, Short, Short, Short, const Color &);
+					~FontCocoa();
 
-				GUI::Rect	 GetActiveScreenMetrics();
-				GUI::Rect	 GetActiveScreenWorkArea();
-
-				GUI::Rect	 GetVirtualScreenMetrics();
+				Size	 GetTextSize(const String &, Bool) const;
 		};
 	};
 };

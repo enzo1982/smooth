@@ -3,11 +3,11 @@
 include $(SMOOTH_PATH)/Makefile-options
 
 CC	   = gcc
-CCOPTS	   = -g0 -Wall -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
+CCOPTS	   = -pipe -g0 -Wall -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
 RC	   = windres
 RCOPTS	   = -DSMOOTH_DLL -O coff
 LD	   = gcc
-LDOPTS	   = -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ -s $(LIBS)
+LDOPTS	   = -pipe -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
 ifneq ($(BUILD_SOLARIS),True)
 	CCOPTS += -Os
@@ -44,6 +44,10 @@ else
 		endif
 	endif
 
+ifeq ($(BUILD_OPENBSD),True)
+	LDOPTS += -L/usr/X11R6/lib -L/usr/local/lib
+endif
+
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
 ifneq ($(BUILD_QNX),True)
@@ -72,18 +76,26 @@ ifneq ($(EXCEPTION),True)
 endif
 
 ifeq ($(BUILD_OSX),True)
-	CCOPTS += -arch x86_64 -arch i386
-	LDOPTS += -arch x86_64 -arch i386
-else ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -m64
-	LDOPTS += -m64
+ifeq ($(BUILD_X86),True)
+	CCOPTS += -arch i386
+	LDOPTS += -arch i386
+endif
+ifeq ($(BUILD_X86_64),True)
+	CCOPTS += -arch x86_64
+	LDOPTS += -arch x86_64
+endif
 
-	RCOPTS += --target=pe-x86-64
-else
+	CCOPTS += -mmacosx-version-min=10.5
+else ifeq ($(BUILD_X86),True)
 	CCOPTS += -m32
-	LDOPTS += -m32
+	LDOPTS += -m32 -s
 
 	RCOPTS += --target=pe-i386
+else ifeq ($(BUILD_X86_64),True)
+	CCOPTS += -m64
+	LDOPTS += -m64 -s
+
+	RCOPTS += --target=pe-x86-64
 endif
 
 ifndef GLOBALLIB
@@ -145,7 +157,6 @@ all: $(OBJECTS) $(TARGETS)
 	$(ALLCMD2)
 	$(ALLCMD3)
 	$(ALLCMD4)
-	$(ALLCMD5)
 
 clean:
 ifdef OBJECTS
@@ -158,7 +169,6 @@ endif
 	$(CLEANCMD2)
 	$(CLEANCMD3)
 	$(CLEANCMD4)
-	$(CLEANCMD5)
 
 .c.o:
 	$(CC) $(CCOPTS) -c $< -o $@
@@ -195,7 +205,11 @@ else
 $(SMOOTH_PATH)/$(LIBDIR)/lib$(GLOBALDLL)-$(VERSION)$(SHARED): $(OBJECTS)
 endif
 	mkdir -p $(SMOOTH_PATH)/$(LIBDIR)
+ifneq ($(BUILD_OSX),True)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+else
+	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS)
+endif
 
 ifeq ($(BUILD_WIN32),True)
 $(SMOOTH_PATH)/$(LIBDIR)/$(IMPORTLIB): $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALDLL)$(SHARED)
@@ -209,7 +223,11 @@ endif
 
 ifdef LOCALDLL
 $(LOCALDLL)$(SHARED): $(OBJECTS)
+ifneq ($(BUILD_OSX),True)
 	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+else
+	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS)
+endif
 
 ifeq ($(BUILD_WIN32),True)
 $(IMPORTLIB): $(LOCALDLL)$(SHARED)

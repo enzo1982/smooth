@@ -27,7 +27,7 @@ namespace smooth
 {
 	namespace Input
 	{
-		const Short	 POINTER_HAIKU = 3;
+		const Short	 POINTER_HAIKU = 4;
 
 		class PointerHaiku : public PointerBackend
 		{

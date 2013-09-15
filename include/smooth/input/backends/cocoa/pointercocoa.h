@@ -8,37 +8,34 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_SCREENHAIKU
-#define H_OBJSMOOTH_SCREENHAIKU
+#ifndef H_OBJSMOOTH_POINTERCOCOA
+#define H_OBJSMOOTH_POINTERCOCOA
+
+#include <Cocoa/Cocoa.h>
 
 namespace smooth
 {
 	namespace System
 	{
-		class ScreenHaiku;
+		class PointerCocoa;
 	};
 };
 
-#include "../screenbackend.h"
-
-#include <Screen.h>
+#include "../pointerbackend.h"
 
 namespace smooth
 {
-	namespace System
+	namespace Input
 	{
-		const Short	 SCREEN_HAIKU = 4;
+		const Short	 POINTER_COCOA = 3;
 
-		class ScreenHaiku : public ScreenBackend
+		class PointerCocoa : public PointerBackend
 		{
 			public:
-						 ScreenHaiku();
-						~ScreenHaiku();
+					 PointerCocoa();
+					~PointerCocoa();
 
-				GUI::Rect	 GetActiveScreenMetrics();
-				GUI::Rect	 GetActiveScreenWorkArea();
-
-				GUI::Rect	 GetVirtualScreenMetrics();
+				Bool	 SetCursor(const GUI::Window *, Pointer::CursorType);
 		};
 	};
 };

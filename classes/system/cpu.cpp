@@ -115,3 +115,19 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 	return Error();
 #endif
 }
+
+S::System::Endianness S::System::CPU::GetEndianness() const
+{
+	uint32_t	 value;
+	uint8_t		*buffer = (uint8_t *) &value;
+
+	buffer[0] = 0x00;
+	buffer[1] = 0x01;
+	buffer[2] = 0x02;
+	buffer[3] = 0x03;
+
+	if	(value == 0x00010203) return EndianBig;
+	else if (value == 0x03020100) return EndianLittle;
+
+	return EndianUnknown;
+}

@@ -12,6 +12,7 @@
 #include <smooth/misc/number.h>
 #include <smooth/misc/encoding/base64.h>
 #include <smooth/misc/hash/crc32.h>
+#include <smooth/system/cpu.h>
 #include <smooth/threads/mutex.h>
 #include <smooth/templates/buffer.h>
 #include <smooth/init.h>
@@ -267,9 +268,11 @@ const char *S::String::GetInternalFormat()
 {
 	if (internalFormat == NIL)
 	{
+		System::Endianness	 endianness = System::CPU().GetEndianness();
+
 		if	(sizeof(wchar_t) == 1)	internalFormat = (char *) "UTF-8";
-		else if (sizeof(wchar_t) == 2)	internalFormat = (char *) "UTF-16LE";
-		else if (sizeof(wchar_t) == 4)	internalFormat = (char *) "UTF-32LE";
+		else if (sizeof(wchar_t) == 2)	internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-16LE" : "UTF-16BE");
+		else if (sizeof(wchar_t) == 4)	internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-32LE" : "UTF-32BE");
 	}
 
 	return internalFormat;

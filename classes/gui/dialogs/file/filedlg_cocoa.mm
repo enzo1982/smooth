@@ -80,7 +80,7 @@ S::Bool S::GUI::Dialogs::FileSelection::SetFilters(void *iSavePanel)
 	{
 		const Array<String>	&patterns = filters.GetNth(i).Explode(";");
 
-		foreach (const String &pattern, patterns)
+		foreach (String pattern, patterns)
 		{
 			if (pattern.FindLast(".") >= 0) pattern = pattern.Tail(pattern.Length() - pattern.FindLast(".") - 1);
 

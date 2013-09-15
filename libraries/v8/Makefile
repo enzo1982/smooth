@@ -5,6 +5,12 @@ SMOOTH_PATH = ../..
 
 include $(SMOOTH_PATH)/Makefile-options
 
+# Disable PowerPC builds of V8 on OS X for now.
+ifeq ($(BUILD_OSX),True)
+	BUILD_PPC   = False
+	BUILD_PPC64 = False
+endif
+
 # Change these variables to fit your project:
 GLOBALDLL   = smooth-js
 IMPORTLIB   = libsmooth-js.a
@@ -86,6 +92,24 @@ ifeq ($(BUILD_MIPS),True)
 	OBJECTS += mips/assembler-mips.o mips/builtins-mips.o mips/codegen-mips.o mips/code-stubs-mips.o mips/constants-mips.o mips/cpu-mips.o mips/debug-mips.o mips/deoptimizer-mips.o mips/disasm-mips.o mips/frames-mips.o mips/full-codegen-mips.o mips/ic-mips.o mips/lithium-mips.o mips/lithium-codegen-mips.o mips/lithium-gap-resolver-mips.o mips/macro-assembler-mips.o mips/regexp-macro-assembler-mips.o mips/simulator-mips.o mips/stub-cache-mips.o
 endif
 
+ifeq ($(BUILD_PPC),True)
+ifeq ($(BUILD_OSX),True)
+	MYCCOPTS += -Xarch_ppc
+endif
+	MYCCOPTS += -DV8_TARGET_ARCH_ARM
+
+	OBJECTS += arm/assembler-arm.o arm/builtins-arm.o arm/codegen-arm.o arm/code-stubs-arm.o arm/constants-arm.o arm/cpu-arm.o arm/debug-arm.o arm/deoptimizer-arm.o arm/disasm-arm.o arm/frames-arm.o arm/full-codegen-arm.o arm/ic-arm.o arm/lithium-arm.o arm/lithium-codegen-arm.o arm/lithium-gap-resolver-arm.o arm/macro-assembler-arm.o arm/regexp-macro-assembler-arm.o arm/simulator-arm.o arm/stub-cache-arm.o
+endif
+
+ifeq ($(BUILD_PPC64),True)
+ifeq ($(BUILD_OSX),True)
+	MYCCOPTS += -Xarch_ppc64
+endif
+	MYCCOPTS += -DV8_TARGET_ARCH_ARM
+
+	OBJECTS += arm/assembler-arm.o arm/builtins-arm.o arm/codegen-arm.o arm/code-stubs-arm.o arm/constants-arm.o arm/cpu-arm.o arm/debug-arm.o arm/deoptimizer-arm.o arm/disasm-arm.o arm/frames-arm.o arm/full-codegen-arm.o arm/ic-arm.o arm/lithium-arm.o arm/lithium-codegen-arm.o arm/lithium-gap-resolver-arm.o arm/macro-assembler-arm.o arm/regexp-macro-assembler-arm.o arm/simulator-arm.o arm/stub-cache-arm.o
+endif
+
 OBJECTS += extensions/externalize-string-extension.o extensions/gc-extension.o extensions/statistics-extension.o
 
 # Enter additional library dependencies here
@@ -110,9 +134,17 @@ include $(SMOOTH_PATH)/Makefile-directories
 include $(SMOOTH_PATH)/Makefile-commands
 
 libraries.cc: runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js debug-debugger.js mirror-debugger.js liveedit-debugger.js date.js json.js regexp.js macros.py
+ifeq ($(BUILD_HAIKU),True)
+	python ./js2c.py libraries.cc CORE off runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js debug-debugger.js mirror-debugger.js liveedit-debugger.js date.js json.js regexp.js macros.py
+else
 	chmod a+x ./js2c.py
 	./js2c.py libraries.cc CORE off runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js debug-debugger.js mirror-debugger.js liveedit-debugger.js date.js json.js regexp.js macros.py
+endif
 
 experimental-libraries.cc: symbol.js proxy.js collection.js object-observe.js arraybuffer.js typedarray.js generator.js macros.py
+ifeq ($(BUILD_HAIKU),True)
+	python ./js2c.py experimental-libraries.cc EXPERIMENTAL off symbol.js proxy.js collection.js object-observe.js arraybuffer.js typedarray.js generator.js macros.py
+else
 	chmod a+x ./js2c.py
 	./js2c.py experimental-libraries.cc EXPERIMENTAL off symbol.js proxy.js collection.js object-observe.js arraybuffer.js typedarray.js generator.js macros.py
+endif

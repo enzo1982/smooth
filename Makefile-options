@@ -6,7 +6,23 @@ REVISION = 0
 UNAME = $(shell uname)
 MACHINE = $(shell gcc -dumpmachine)
 
-ifneq ($(findstring x86_64,$(MACHINE)),)
+ifneq ($(findstring arm,$(MACHINE)),)
+	ifneq ($(BUILD_ARM),False)
+		BUILD_ARM = True
+	endif
+else ifneq ($(findstring mips,$(MACHINE)),)
+	ifneq ($(BUILD_MIPS),False)
+		BUILD_MIPS = True
+	endif
+else ifneq ($(findstring powerpc,$(MACHINE)),)
+	ifneq ($(BUILD_PPC),False)
+		BUILD_PPC = True
+	endif
+else ifneq ($(findstring powerpc64,$(MACHINE)),)
+	ifneq ($(BUILD_PPC64),False)
+		BUILD_PPC64 = True
+	endif
+else ifneq ($(findstring x86_64,$(MACHINE)),)
 	ifneq ($(BUILD_X86_64),False)
 		BUILD_X86_64 = True
 	endif
@@ -85,6 +101,9 @@ else
 		endif
 		ifneq ($(BUILD_X86_64),False)
 			BUILD_X86_64 = True
+		endif
+		ifneq ($(BUILD_PPC),False)
+			BUILD_PPC = True
 		endif
 
 #		Disable XLib and Cairo backends

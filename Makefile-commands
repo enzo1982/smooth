@@ -84,6 +84,14 @@ ifeq ($(BUILD_X86_64),True)
 	CCOPTS += -arch x86_64
 	LDOPTS += -arch x86_64
 endif
+ifeq ($(BUILD_PPC),True)
+	CCOPTS += -arch ppc
+	LDOPTS += -arch ppc
+endif
+ifeq ($(BUILD_PPC64),True)
+	CCOPTS += -arch ppc64
+	LDOPTS += -arch ppc64
+endif
 
 	CCOPTS += -mmacosx-version-min=10.5
 else ifeq ($(BUILD_X86),True)

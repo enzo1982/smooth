@@ -4,6 +4,7 @@ xx.xx.13 xx:xx - smooth alpha 0.8.72.0
 
 - pointer.cpp		- moved system dependent code to backends
 
+- allow building on PowerPC
 - ported to Cocoa
 - ported to Haiku
 - upgraded V8 to version 3.19.18.9

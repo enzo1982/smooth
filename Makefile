@@ -73,6 +73,12 @@ endif
 ifeq ($(BUILD_X86_64),True)
 	LINKER_OPTS += -dynamiclib -arch x86_64
 endif
+ifeq ($(BUILD_PPC),True)
+	LINKER_OPTS += -dynamiclib -arch ppc
+endif
+ifeq ($(BUILD_PPC64),True)
+	LINKER_OPTS += -dynamiclib -arch ppc64
+endif
 else ifeq ($(BUILD_X86),True)
 	LINKER_OPTS += --shared -m32 -s
 else ifeq ($(BUILD_X86_64),True)

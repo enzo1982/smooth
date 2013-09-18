@@ -84,10 +84,12 @@ S::Int S::GUI::EditBox::Paint(Int message)
 
 				surface->Frame(frame, FRAME_DOWN);
 
+				Widget::Paint(message);
+
 				surface->EndPaint();
 			}
 
-			break;
+			return Success();
 	}
 
 	return Widget::Paint(message);

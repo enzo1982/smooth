@@ -315,6 +315,8 @@ S::GUI::Size S::GUI::Widget::GetRealSize() const
 
 S::Int S::GUI::Widget::SetBackgroundColor(const Color &nColor)
 {
+	if (backgroundColorSet && backgroundColor == nColor) return Success();
+
 	backgroundColor = nColor;
 	backgroundColorSet = True;
 
@@ -841,6 +843,8 @@ S::Int S::GUI::Widget::SetTooltipLayer(Layer *nTooltipLayer)
 
 S::Int S::GUI::Widget::SetFont(const Font &nFont)
 {
+	if (font == nFont) return Success();
+
 	Bool	 prevVisible = IsVisible();
 
 	if (registered && prevVisible) Hide();
@@ -856,6 +860,8 @@ S::Int S::GUI::Widget::SetFont(const Font &nFont)
 
 S::Int S::GUI::Widget::SetOrientation(Int nOrientation)
 {
+	if (orientation == nOrientation) return Success();
+
 	Bool	 prevVisible = IsVisible();
 
 	if (registered && prevVisible) Hide();

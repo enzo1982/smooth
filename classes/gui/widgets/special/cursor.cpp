@@ -561,6 +561,11 @@ S::Int S::GUI::Cursor::SetText(const String &newText)
 
 	lineIndices.RemoveAll();
 
+	Surface	*surface = GetDrawSurface();
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+
+	surface->StartPaint(frame);
+
 	OnLoseFocus();
 
 	promptPos	= newText.Length();
@@ -572,6 +577,8 @@ S::Int S::GUI::Cursor::SetText(const String &newText)
 	Widget::SetText(newText);
 
 	AddHistoryEntry();
+
+	surface->EndPaint();
 
 	return Success();
 }

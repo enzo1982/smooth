@@ -97,6 +97,8 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 
 S::GUI::Window::~Window()
 {
+	backend->onEvent.Disconnect(&Window::Process, this);
+
 	if (created && !destroyed) backend->Close();
 
 	Remove(mainLayer);

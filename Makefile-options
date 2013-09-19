@@ -138,6 +138,17 @@ else
 	endif
 endif
 
+# Disable V8 when building on an unsupported platform
+ifneq ($(BUILD_X86),True)
+ifneq ($(BUILD_X86_64),True)
+ifneq ($(BUILD_ARM),True)
+ifneq ($(BUILD_MIPS),True)
+	BUILD_V8 = False
+endif
+endif
+endif
+endif
+
 LIB = lib
 
 ifeq ($(BUILD_X86_64),True)

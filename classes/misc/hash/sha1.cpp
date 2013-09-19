@@ -117,7 +117,7 @@ S::String S::Hash::SHA1::Compute()
 
 	String	 string;
 
-	for (Int i = 0; i < 20; i++) string.Append(Number((Int64) ((UnsignedByte *) state)[i + 3 - 2 * (i % 4)]).ToHexString(2));
+	for (Int i = 0; i < 5; i++) string.Append(Number((Int64) ((UnsignedInt32 *) state)[i]).ToHexString(8));
 
 	return string;
 }

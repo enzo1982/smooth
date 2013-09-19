@@ -101,6 +101,8 @@ S::IO::DriverWin32::~DriverWin32()
 
 S::Int S::IO::DriverWin32::ReadData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	DWORD	 bytes;
 
 	ReadFile(stream, (void *) data, (dataSize < (GetSize() - GetPos()) ? dataSize : (GetSize() - GetPos())), &bytes, NULL);
@@ -110,6 +112,8 @@ S::Int S::IO::DriverWin32::ReadData(UnsignedByte *data, Int dataSize)
 
 S::Int S::IO::DriverWin32::WriteData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	DWORD	 bytes;
 
 	WriteFile(stream, (void *) data, dataSize, &bytes, NULL);
@@ -120,7 +124,7 @@ S::Int S::IO::DriverWin32::WriteData(UnsignedByte *data, Int dataSize)
 S::Int64 S::IO::DriverWin32::Seek(Int64 newPos)
 {
 	LONG	 hi32 = newPos >> 32;
-	LONG	 lo32 = SetFilePointer(stream, newPos, &hi32, FILE_BEGIN);
+	DWORD	 lo32 = SetFilePointer(stream, newPos, &hi32, FILE_BEGIN);
 
 	if (lo32 == INVALID_SET_FILE_POINTER && ::GetLastError() != NO_ERROR) return -1;
 
@@ -140,7 +144,7 @@ S::Int64 S::IO::DriverWin32::GetSize() const
 S::Int64 S::IO::DriverWin32::GetPos() const
 {
 	LONG	 hi32 = 0;
-	LONG	 lo32 = SetFilePointer(stream, 0, &hi32, FILE_CURRENT);
+	DWORD	 lo32 = SetFilePointer(stream, 0, &hi32, FILE_CURRENT);
 
 	if (lo32 == INVALID_SET_FILE_POINTER && ::GetLastError() != NO_ERROR) return -1;
 

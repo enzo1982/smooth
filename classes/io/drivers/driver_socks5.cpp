@@ -233,6 +233,8 @@ S::IO::DriverSOCKS5::~DriverSOCKS5()
 
 S::Int S::IO::DriverSOCKS5::ReadData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	int	 bytes = recv(stream, (char *) data, dataSize, 0);
 
 	if (bytes <= 0) return -1;
@@ -241,6 +243,8 @@ S::Int S::IO::DriverSOCKS5::ReadData(UnsignedByte *data, Int dataSize)
 
 S::Int S::IO::DriverSOCKS5::WriteData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	return send(stream, (char *) data, dataSize, 0);
 }
 

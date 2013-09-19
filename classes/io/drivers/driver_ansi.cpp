@@ -120,11 +120,15 @@ S::IO::DriverANSI::~DriverANSI()
 
 S::Int S::IO::DriverANSI::ReadData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	return fread((Void *) data, 1, (dataSize < (GetSize() - GetPos()) ? dataSize : (GetSize() - GetPos())), stream);
 }
 
 S::Int S::IO::DriverANSI::WriteData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	return fwrite((Void *) data, 1, dataSize, stream);
 }
 

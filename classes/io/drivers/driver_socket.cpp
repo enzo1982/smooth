@@ -78,6 +78,8 @@ S::IO::DriverSocket::~DriverSocket()
 
 S::Int S::IO::DriverSocket::ReadData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	if (mode == MODE_SOCKET_BLOCKING && timeout != 0)
 	{
 #if defined __WIN32__
@@ -99,6 +101,8 @@ S::Int S::IO::DriverSocket::ReadData(UnsignedByte *data, Int dataSize)
 
 S::Int S::IO::DriverSocket::WriteData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	if (mode == MODE_SOCKET_BLOCKING && timeout != 0)
 	{
 #if defined __WIN32__

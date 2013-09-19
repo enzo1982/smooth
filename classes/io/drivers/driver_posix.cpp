@@ -142,11 +142,15 @@ S::IO::DriverPOSIX::~DriverPOSIX()
 
 S::Int S::IO::DriverPOSIX::ReadData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	return _read(stream, data, (dataSize < (GetSize() - GetPos()) ? dataSize : (GetSize() - GetPos())));
 }
 
 S::Int S::IO::DriverPOSIX::WriteData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	return _write(stream, data, dataSize);
 }
 

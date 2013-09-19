@@ -143,6 +143,8 @@ S::IO::DriverSOCKS4::~DriverSOCKS4()
 
 S::Int S::IO::DriverSOCKS4::ReadData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	int	 bytes = recv(stream, (char *) data, dataSize, 0);
 
 	if (bytes <= 0) return -1;
@@ -151,6 +153,8 @@ S::Int S::IO::DriverSOCKS4::ReadData(UnsignedByte *data, Int dataSize)
 
 S::Int S::IO::DriverSOCKS4::WriteData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	return send(stream, (char *) data, dataSize, 0);
 }
 

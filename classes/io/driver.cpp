@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,12 +13,12 @@
 
 S::IO::Driver::Driver()
 {
-	streamID	= NIL;
+	streamID  = NIL;
 
-	size		= 2147483647;
-	position	= 0;
+	size	  = 2147483647;
+	position  = 0;
 
-	lastError	= IO_ERROR_OK;
+	lastError = IO_ERROR_OK;
 }
 
 S::IO::Driver::~Driver()
@@ -32,6 +32,8 @@ S::Int S::IO::Driver::GetLastError() const
 
 S::Int S::IO::Driver::ReadData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	memset((Void *) data, 0, dataSize);
 
 	position += dataSize;
@@ -41,6 +43,8 @@ S::Int S::IO::Driver::ReadData(UnsignedByte *data, Int dataSize)
 
 S::Int S::IO::Driver::WriteData(UnsignedByte *data, Int dataSize)
 {
+	if (dataSize <= 0) return 0;
+
 	position += dataSize;
 
 	return dataSize;

@@ -17,6 +17,7 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/graphics/modifiers/righttoleft.h>
 #include <smooth/graphics/imageloader/imageloader.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
@@ -58,33 +59,33 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 	maximized	= False;
 	minimized	= False;
 
-	type = classID;
+	type		= classID;
 
-	order = 0;
+	order		= 0;
 
 	layoutDirection = LD_DEFAULT;
 
-	if (title != NIL)	text = title;
-	else			text = "smooth Application";
+	if (title != NIL) text = title;
+	else		  text = "smooth Application";
 
 #ifdef __WIN32__
-	frameWidth = GetSystemMetrics(SM_CXFRAME);
+	frameWidth	= GetSystemMetrics(SM_CXFRAME);
 #else
-	frameWidth = 1;
+	frameWidth	= 1;
 
 	backend->SetSizeModifier(Size(-6, -6));
 #endif
 
-	updateRect = Rect(Point(-1, -1), Size(0, 0));
+	updateRect	= Rect(Point(-1, -1), Size(0, 0));
 
-	icon = NIL;
+	icon		= NIL;
 
 	created		= False;
 	visible		= False;
 	destroyed	= False;
 	initshow	= False;
 
-	mainLayer = new Layer();
+	mainLayer	= new Layer();
 
 	Add(mainLayer);
 
@@ -113,8 +114,8 @@ S::Int S::GUI::Window::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	if (created && visible) backend->SetMetrics(nPos, nSize);
 
-	Bool	 resized	= (GetSize() != nSize);
-	Bool	 prevVisible	= visible;
+	Bool	 resized     = (GetSize() != nSize);
+	Bool	 prevVisible = visible;
 
 	visible = False;
 
@@ -232,6 +233,10 @@ S::Int S::GUI::Window::RestoreDefaultStatusText()
 
 S::Int S::GUI::Window::SetRightToLeft(Bool nRightToLeft)
 {
+	Surface	*surface = GetDrawSurface();
+
+	surface->SetRightToLeft(nRightToLeft);
+
 	layoutDirection = (nRightToLeft ? LD_RIGHTTOLEFT : LD_LEFTTORIGHT);
 
 	return Success();
@@ -361,8 +366,8 @@ S::GUI::Rect S::GUI::Window::GetClientRect() const
 
 S::GUI::Rect S::GUI::Window::GetRestoredWindowRect() const
 {
-	if (IsMaximized())	return backend->GetRestoredWindowRect();
-	else			return GetWindowRect();
+	if (IsMaximized()) return backend->GetRestoredWindowRect();
+	else		   return GetWindowRect();
 }
 
 S::Int S::GUI::Window::SetMinimumSize(const Size &newMinSize)
@@ -396,6 +401,10 @@ S::Bool S::GUI::Window::Create()
 
 		if (backend->Open(text, GetPosition(), GetSize(), flags) == Success())
 		{
+			Surface	*surface = GetDrawSurface();
+
+			surface->SetRightToLeft(IsRightToLeft());
+
 			visible = False;
 
 			return True;
@@ -415,8 +424,8 @@ S::Int S::GUI::Window::Stay()
 
 	SetFlags(flags | WF_MODAL);
 
-	if (!created)	Create();
-	if (!visible)	Show();
+	if (!created) Create();
+	if (!visible) Show();
 
 	stay = True;
 
@@ -590,17 +599,15 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 S::Int S::GUI::Window::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!created)		return Success();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!created)	     return Success();
+	if (!IsVisible())    return Success();
 
 	if (updateRect.GetWidth() == 0 || updateRect.GetHeight() == 0) return Success();
 
 	EnterProtectedRegion();
 
 	Surface	*surface = GetDrawSurface();
-
-	surface->SetRightToLeft(IsRightToLeft());
 
 	Size	 realSize = GetRealSize();
 	Float	 fontSize = surface->GetSurfaceDPI() / 96.0;
@@ -622,11 +629,12 @@ S::Int S::GUI::Window::Paint(Int message)
 	}
 	else
 	{
-		Bool	 preRTL = IsRightToLeft();
+		RightToLeftModifier	 rightToLeft;
 
-		surface->SetRightToLeft(False);
-		surface->StartPaint(updateRect);
-		surface->SetRightToLeft(preRTL);
+		rightToLeft.SetSurfaceSize(surface->GetSize());
+		rightToLeft.SetRightToLeft(IsRightToLeft());
+
+		surface->StartPaint(rightToLeft.TranslateRect(updateRect));
 
 		surface->Box(updateRect, Setup::BackgroundColor, Rect::Filled);
 
@@ -734,8 +742,8 @@ S::Void S::GUI::Window::CalculateOffsets()
 	Widget	*lastTopWidget	= NIL;
 	Int	 positions	= 0;
 
-	if (GetObjectType() == ToolWindow::classID)	innerOffset = Rect(Point(0, 0), Size(0, 0));
-	else						innerOffset = Rect(Point(frameWidth, frameWidth), Size(0, 0));
+	if (GetObjectType() == ToolWindow::classID) innerOffset = Rect(Point(0, 0), Size(0, 0));
+	else					    innerOffset = Rect(Point(frameWidth, frameWidth), Size(0, 0));
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
@@ -808,8 +816,8 @@ S::GUI::Point S::GUI::Window::GetMousePosition() const
 {
 	Point	 position = Input::Pointer::GetPosition();
 
-	if (IsRightToLeft())	position = Point(GetRealSize().cx - (position.x - GetX()) - 1, position.y - GetY());
-	else			position -= GetPosition();
+	if (IsRightToLeft()) position = Point(GetRealSize().cx - (position.x - GetX()) - 1, position.y - GetY());
+	else		     position -= GetPosition();
 
 	return position;
 }

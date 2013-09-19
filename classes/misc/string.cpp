@@ -206,20 +206,36 @@ S::Bool S::String::IsUnicode(const String &string)
 
 const char *S::String::GetInputFormat()
 {
+	if (inputFormat == NIL) return GetDefaultEncoding();
+
 	return inputFormat;
 }
 
-char *S::String::SetInputFormat(const char *iFormat)
+const char *S::String::SetInputFormat(const char *iFormat)
 {
 	if (iFormat == NIL) return SetInputFormat(GetDefaultEncoding());
 
+	/* Return immediately if requested format equals current.
+	 */
+	if (inputFormat != NIL && strcmp(iFormat, inputFormat) == 0) return inputFormat;
+
+	/* Backup input format and set new one.
+	 */
 	char	*previousInputFormat = inputFormat;
-	int	 length		     = strlen(iFormat) + 1;
 
-	inputFormat = new char [length];
+	inputFormat = NIL;
 
-	strncpy(inputFormat, iFormat, length);
+	if (strcmp(iFormat, GetDefaultEncoding()) != 0)
+	{
+		int	 length = strlen(iFormat) + 1;
 
+		inputFormat = new char [length];
+
+		strncpy(inputFormat, iFormat, length);
+	}
+
+	/* Add previous format to allocated buffers list.
+	 */
 	if (previousInputFormat != NIL)
 	{
 		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
@@ -229,27 +245,45 @@ char *S::String::SetInputFormat(const char *iFormat)
 		allocatedBuffers.Add(previousInputFormat);
 
 		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
+
+		return previousInputFormat;
 	}
 
-	return previousInputFormat;
+	return GetDefaultEncoding();
 }
 
 const char *S::String::GetOutputFormat()
 {
+	if (outputFormat == NIL) return GetDefaultEncoding();
+
 	return outputFormat;
 }
 
-char *S::String::SetOutputFormat(const char *oFormat)
+const char *S::String::SetOutputFormat(const char *oFormat)
 {
 	if (oFormat == NIL) return SetOutputFormat(GetDefaultEncoding());
 
+	/* Return immediately if requested format equals current.
+	 */
+	if (outputFormat != NIL && strcmp(oFormat, outputFormat) == 0) return outputFormat;
+
+	/* Backup output format and set new one.
+	 */
 	char	*previousOutputFormat = outputFormat;
-	int	 length		      = strlen(oFormat) + 1;
 
-	outputFormat = new char [length];
+	outputFormat = NIL;
 
-	strncpy(outputFormat, oFormat, length);
+	if (strcmp(oFormat, GetDefaultEncoding()) != 0)
+	{
+		int	 length = strlen(oFormat) + 1;
 
+		outputFormat = new char [length];
+
+		strncpy(outputFormat, oFormat, length);
+	}
+
+	/* Add previous format to allocated buffers list.
+	 */
 	if (previousOutputFormat != NIL)
 	{
 		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
@@ -259,9 +293,11 @@ char *S::String::SetOutputFormat(const char *oFormat)
 		allocatedBuffers.Add(previousOutputFormat);
 
 		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
+
+		return previousOutputFormat;
 	}
 
-	return previousOutputFormat;
+	return GetDefaultEncoding();
 }
 
 const char *S::String::GetInternalFormat()
@@ -270,9 +306,9 @@ const char *S::String::GetInternalFormat()
 	{
 		System::Endianness	 endianness = System::CPU().GetEndianness();
 
-		if	(sizeof(wchar_t) == 1)	internalFormat = (char *) "UTF-8";
-		else if (sizeof(wchar_t) == 2)	internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-16LE" : "UTF-16BE");
-		else if (sizeof(wchar_t) == 4)	internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-32LE" : "UTF-32BE");
+		if	(sizeof(wchar_t) == 1) internalFormat = (char *) "UTF-8";
+		else if (sizeof(wchar_t) == 2) internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-16LE" : "UTF-16BE");
+		else if (sizeof(wchar_t) == 4) internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-32LE" : "UTF-32BE");
 	}
 
 	return internalFormat;
@@ -286,18 +322,18 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	Int	 width = 1;
 
-	if	(strncmp(format, "UCS-4", 5)		== 0)	width = 4;
-	else if	(strncmp(format, "UCS-2", 5)		== 0)	width = 2;
-	else if	(strncmp(format, "UTF-32", 6)		== 0)	width = 4;
-	else if	(strncmp(format, "UTF-16", 6)		== 0)	width = 2;
-	else if	(strncmp(format, "CSUCS4", 6)		== 0)	width = 4;
-	else if	(strncmp(format, "ISO-10646-UCS-4", 15)	== 0)	width = 4;
-	else if	(strncmp(format, "ISO-10646-UCS-2", 15)	== 0)	width = 2;
-	else if	(strncmp(format, "UNICODELITTLE", 13)	== 0)	width = 2;
-	else if	(strncmp(format, "UNICODEBIG", 10)	== 0)	width = 2;
-	else if	(strncmp(format, "CSUNICODE", 9)	== 0)	width = 2;
-	else if	(strncmp(format, "UNICODE-1-1", 11)	== 0)	width = 2;
-	else if	(strncmp(format, "CSUNICODE11", 11)	== 0)	width = 2;
+	if	(strncmp(format, "UCS-4", 5)		== 0) width = 4;
+	else if	(strncmp(format, "UCS-2", 5)		== 0) width = 2;
+	else if	(strncmp(format, "UTF-32", 6)		== 0) width = 4;
+	else if	(strncmp(format, "UTF-16", 6)		== 0) width = 2;
+	else if	(strncmp(format, "CSUCS4", 6)		== 0) width = 4;
+	else if	(strncmp(format, "ISO-10646-UCS-4", 15)	== 0) width = 4;
+	else if	(strncmp(format, "ISO-10646-UCS-2", 15)	== 0) width = 2;
+	else if	(strncmp(format, "UNICODELITTLE", 13)	== 0) width = 2;
+	else if	(strncmp(format, "UNICODEBIG", 10)	== 0) width = 2;
+	else if	(strncmp(format, "CSUNICODE", 9)	== 0) width = 2;
+	else if	(strncmp(format, "UNICODE-1-1", 11)	== 0) width = 2;
+	else if	(strncmp(format, "CSUNICODE11", 11)	== 0) width = 2;
 
 	Int	 len = -1;
 
@@ -390,9 +426,7 @@ wchar_t S::String::operator [](int n) const
 
 S::String::operator char *() const
 {
-	if (outputFormat == NIL) SetOutputFormat(GetDefaultEncoding());
-
-	return ConvertTo(outputFormat);
+	return ConvertTo(GetOutputFormat());
 }
 
 S::String::operator wchar_t *() const
@@ -409,27 +443,18 @@ S::String &S::String::operator =(const int nil)
 
 S::String &S::String::operator =(const char *newString)
 {
-	if (newString == NIL)
-	{
-		Clean();
-	}
-	else
-	{
-		if (inputFormat == NIL) SetInputFormat(GetDefaultEncoding());
+	Clean();
 
-		ImportFrom(inputFormat, newString);
-	}
+	if (newString != NIL) ImportFrom(GetInputFormat(), newString);
 
 	return *this;
 }
 
 S::String &S::String::operator =(const wchar_t *newString)
 {
-	if (newString == NIL)
-	{
-		Clean();
-	}
-	else
+	Clean();
+
+	if (newString != NIL)
 	{
 		Int	 size = wcslen(newString) + 1;
 
@@ -445,11 +470,9 @@ S::String &S::String::operator =(const String &newString)
 {
 	if (&newString == this) return *this;
 
-	if (newString.wString.Size() == 0)
-	{
-		Clean();
-	}
-	else
+	Clean();
+
+	if (newString.wString.Size() > 0)
 	{
 		Int	 size = newString.wString.Size();
 
@@ -475,8 +498,8 @@ S::Bool S::String::operator ==(const char *str) const
 	if (wString.Size() != 0 && str == NIL) if (wString[0] == 0) return True;
 	if (wString.Size() == 0 || str == NIL) return False;
 
-	if (!Compare(str))	return True;
-	else			return False;
+	if (!Compare(str)) return True;
+	else		   return False;
 }
 
 S::Bool S::String::operator ==(const wchar_t *str) const
@@ -486,8 +509,8 @@ S::Bool S::String::operator ==(const wchar_t *str) const
 	if (wString.Size() != 0 && str == NIL) if (wString[0] == 0) return True;
 	if (wString.Size() == 0 || str == NIL) return False;
 
-	if (!Compare(str))	return True;
-	else			return False;
+	if (!Compare(str)) return True;
+	else		   return False;
 }
 
 S::Bool S::String::operator ==(const String &str) const
@@ -497,8 +520,8 @@ S::Bool S::String::operator ==(const String &str) const
 	if (wString.Size() != 0 && str.wString.Size() == 0) if (wString[0] == 0) return True;
 	if (wString.Size() == 0 || str.wString.Size() == 0) return False;
 
-	if (!Compare(str))	return True;
-	else			return False;
+	if (!Compare(str)) return True;
+	else		   return False;
 }
 
 S::Bool S::String::operator !=(const int nil) const
@@ -515,8 +538,8 @@ S::Bool S::String::operator !=(const char *str) const
 	if (wString.Size() != 0 && str == NIL)	if (wString[0] == 0) return False;
 	if (wString.Size() == 0 || str == NIL)	return True;
 
-	if (Compare(str) != 0)	return True;
-	else			return False;
+	if (Compare(str) != 0) return True;
+	else		       return False;
 }
 
 S::Bool S::String::operator !=(const wchar_t *str) const
@@ -526,8 +549,8 @@ S::Bool S::String::operator !=(const wchar_t *str) const
 	if (wString.Size() != 0 && str == NIL) if (wString[0] == 0) return False;
 	if (wString.Size() == 0 || str == NIL) return True;
 
-	if (Compare(str) != 0)	return True;
-	else			return False;
+	if (Compare(str) != 0) return True;
+	else		       return False;
 }
 
 S::Bool S::String::operator !=(const String &str) const
@@ -537,17 +560,15 @@ S::Bool S::String::operator !=(const String &str) const
 	if (wString.Size() != 0 && str.wString.Size() == 0) if (wString[0] == 0) return False;
 	if (wString.Size() == 0 || str.wString.Size() == 0) return True;
 
-	if (Compare(str) != 0)	return True;
-	else			return False;
+	if (Compare(str) != 0) return True;
+	else		       return False;
 }
 
 S::Int S::String::Length() const
 {
 	if (wString.Size() == 0) return 0;
 
-	Int	 size = wcslen(wString);
-
-	return size;
+	return wcslen(wString);
 }
 
 S::String &S::String::Append(const char *str)

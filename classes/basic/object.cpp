@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,8 +24,6 @@ S::System::Timer	*S::Object::cleanupTimer = NIL;
 
 S::Object::Object() : type(this)
 {
-	static String	 prefix = "Object::";
-
 	/* Enable R/W locking for object lists.
 	 */
 	if (objects.Length() == 0)
@@ -34,17 +32,17 @@ S::Object::Object() : type(this)
 		deleteable.EnableLocking();
 	}
 
-	type			= classID;
+	type	       = classID;
 
-	handle			= RequestObjectHandle();
-	name			= String(prefix).Append(String::FromInt(handle));
+	handle	       = RequestObjectHandle();
+	name	       = NIL;
 
-	lockingEnabled		= False;
+	lockingEnabled = False;
 
-	isDeleteable		= False;
-	isObjectInUse		= 0;
+	isDeleteable   = False;
+	isObjectInUse  = 0;
 
-	flags			= 0;
+	flags	       = 0;
 
 	objects.Add(this, handle);
 
@@ -76,6 +74,10 @@ S::Object::~Object()
 
 		DeleteObject(cleanupTimer);
 	}
+
+	/* Delete name string if it was created.
+	 */
+	if (name != NIL) delete name;
 }
 
 S::Int S::Object::EnableLocking(Bool enable)
@@ -101,15 +103,17 @@ S::Object *S::Object::GetObject(Int objectHandle, Short objectType)
 
 	if (object == NIL) return NIL;
 
-	if (object->GetObjectType() == objectType)	return object;
-	else						return NIL;
+	if (object->GetObjectType() == objectType) return object;
+	else					   return NIL;
 }
 
 S::Object *S::Object::GetObject(const String &objectName)
 {
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		if (GetNthObject(i)->GetName() == objectName) return GetNthObject(i);
+		Object	*object = GetNthObject(i);
+
+		if (object->name != NIL && *(object->name) == objectName) return object;
 	}
 
 	return NIL;
@@ -119,9 +123,20 @@ S::Int S::Object::SetName(const String &nName)
 {
 	if (GetObject(nName) != NIL) return Error();
 
-	name = nName;
+	if (name == NIL) name = new String();
+
+	*name = nName;
 
 	return Success();
+}
+
+const S::String &S::Object::GetName() const
+{
+	static String	 prefix = "Object::";
+
+	if (name == NIL) name = new String(String(prefix).Append(String::FromInt(handle)));
+
+	return *name;
 }
 
 S::Short S::Object::RequestClassID()

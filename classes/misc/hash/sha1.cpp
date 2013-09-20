@@ -46,28 +46,28 @@ S::Void S::Hash::SHA1::Init()
 
 S::Void S::Hash::SHA1::Transform(UnsignedByte *buffer)
 {
-	unsigned long	 word[80];
+	UnsignedInt32	 word[80];
 
-	for (int j =  0; j < 16; j++) word[j] = buffer[j * 4 + 0] * 0x1000000 + buffer[j * 4 + 1] * 0x10000 + buffer[j * 4 + 2] * 0x100 + buffer[j * 4 + 3];
-	for (int j = 16; j < 80; j++) word[j] = ROTATE_LEFT((word[j - 3] ^ word[j - 8] ^ word[j - 14] ^ word[j - 16]), 1);
+	for (Int j =  0; j < 16; j++) word[j] = buffer[j * 4 + 0] * 0x1000000 + buffer[j * 4 + 1] * 0x10000 + buffer[j * 4 + 2] * 0x100 + buffer[j * 4 + 3];
+	for (Int j = 16; j < 80; j++) word[j] = ROTATE_LEFT((word[j - 3] ^ word[j - 8] ^ word[j - 14] ^ word[j - 16]), 1);
 
-	unsigned long	 a = state[0];
-	unsigned long	 b = state[1];
-	unsigned long	 c = state[2];
-	unsigned long	 d = state[3];
-	unsigned long	 e = state[4];
+	UnsignedInt32	 a = state[0];
+	UnsignedInt32	 b = state[1];
+	UnsignedInt32	 c = state[2];
+	UnsignedInt32	 d = state[3];
+	UnsignedInt32	 e = state[4];
 
 	for (int m = 0; m < 80; m++)
 	{
-		unsigned long	 f = 0;
-		unsigned long	 k = 0;
+		UnsignedInt32	 f = 0;
+		UnsignedInt32	 k = 0;
 
 		if	(m <= 19) { f = (b & c) | ((~b) & d);	     k = 0x5a827999; }
 		else if (m <= 39) { f = b ^ c ^ d;		     k = 0x6ed9eba1; }
 		else if (m <= 59) { f = (b & c) | (b & d) | (c & d); k = 0x8f1bbcdc; }
 		else		  { f = b ^ c ^ d;		     k = 0xca62c1d6; }
 
-		unsigned long	 temp = (ROTATE_LEFT(a, 5) + f + e + k + word[m]) & 0xFFFFFFFF;
+		UnsignedInt32	 temp = (ROTATE_LEFT(a, 5) + f + e + k + word[m]) & 0xFFFFFFFF;
 
 		e = d;
 		d = c;

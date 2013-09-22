@@ -345,9 +345,9 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 			/* Reject if a modal window is active.
 			 */
 			if (([e type] == NSLeftMouseDown ||
-			     [e type] == NSRightMouseDown) && ( [NSApp modalWindow] != nil &&
-							        [NSApp modalWindow] != wnd &&
-							       [[NSApp modalWindow] isVisible])) break;
+			     [e type] == NSRightMouseDown) && !(flags & WF_TOPMOST) && ( [NSApp modalWindow] != nil &&
+											 [NSApp modalWindow] != wnd &&
+											[[NSApp modalWindow] isVisible])) break;
 
 			/* Grab the keyboard focus if we don't have it already.
 			 */
@@ -382,9 +382,9 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 			/* Reject if a modal window is active.
 			 */
-			if ([e type] == NSOtherMouseDown && ( [NSApp modalWindow] != nil &&
-							      [NSApp modalWindow] != wnd &&
-							     [[NSApp modalWindow] isVisible])) break;
+			if ([e type] == NSOtherMouseDown && !(flags & WF_TOPMOST) && ( [NSApp modalWindow] != nil &&
+										       [NSApp modalWindow] != wnd &&
+										      [[NSApp modalWindow] isVisible])) break;
 
 			/* Grab the keyboard focus if we don't have it already.
 			 */

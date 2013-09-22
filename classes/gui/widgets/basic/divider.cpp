@@ -59,18 +59,17 @@ S::Int S::GUI::Divider::SetPos(Int nPosition)
 
 S::Int S::GUI::Divider::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			{
 				UpdateMetrics();
 
 				Surface	*surface = GetDrawSurface();
-				Rect	 rect = Rect(GetRealPosition(), GetRealSize());
+				Rect	 rect	 = Rect(GetRealPosition(), GetRealSize());
 
 				if (Binary::IsFlagSet(flags, OR_VERT))	surface->Bar(rect.GetPosition(), Point(rect.left,      rect.bottom - 1), OR_VERT);
 				else					surface->Bar(rect.GetPosition(), Point(rect.right - 1, rect.top       ), OR_HORZ);

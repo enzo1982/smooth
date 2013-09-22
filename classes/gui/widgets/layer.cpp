@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,10 +18,10 @@ const S::Short	 S::GUI::Layer::classID = S::Object::RequestClassID();
 
 S::GUI::Layer::Layer(const String &name) : Widget(Point(0, 0), Size(32768, 32768))
 {
-	type		= classID;
+	type	    = classID;
 
-	text		= name;
-	orientation	= OR_CENTER;
+	text	    = name;
+	orientation = OR_CENTER;
 
 	ComputeTextSize();
 }
@@ -110,12 +110,11 @@ S::Int S::GUI::Layer::Hide()
 
 S::Int S::GUI::Layer::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			if (IsBackgroundColorSet())
 			{

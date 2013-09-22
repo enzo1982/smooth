@@ -58,16 +58,15 @@ S::GUI::Hyperlink::~Hyperlink()
 
 S::Int S::GUI::Hyperlink::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Rect	 rect		= Rect(GetRealPosition(), GetRealSize());
-				Surface	*surface	= GetDrawSurface();
+				Rect	 rect	 = Rect(GetRealPosition(), GetRealSize());
+				Surface	*surface = GetDrawSurface();
 
 				if (linkBitmap == NIL)
 				{

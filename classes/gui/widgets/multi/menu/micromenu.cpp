@@ -72,15 +72,14 @@ S::GUI::Rect S::GUI::MicroMenu::GetVisibleArea() const
 
 S::Int S::GUI::MicroMenu::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			if (IsBackgroundColorSet()) surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 

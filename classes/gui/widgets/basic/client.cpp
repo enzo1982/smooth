@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,8 +31,8 @@ S::GUI::Client::~Client()
 
 S::Int S::GUI::Client::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Surface	*surface = GetDrawSurface();
 	Rect	 client	 = Rect(GetRealPosition() + Point(2, 2), GetRealSize() - Size(3, 4));
@@ -69,11 +69,10 @@ S::Int S::GUI::Client::Paint(Int message)
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			if (Rect::DoRectsOverlap(updateRect, client) || (updateRect.left == 0 && updateRect.top == 0 && updateRect.right == 0 && updateRect.bottom == 0))
 			{
-				updateRect.right += 5;
+				updateRect.right  += 5;
 				updateRect.bottom += 5;
 
 				Rect	 intersectRect = Rect::OverlapRect(updateRect, client);

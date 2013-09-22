@@ -347,7 +347,7 @@ S::Int S::GUI::Widget::Show()
 
 	if (!registered) return Success();
 
-	if (IsVisible()) Paint(SP_SHOW);
+	if (IsVisible()) Paint(SP_PAINT);
 
 	onShow.Emit();
 
@@ -441,7 +441,6 @@ S::Int S::GUI::Widget::Paint(Int message)
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			foreach (Widget *widget, widgets)
 			{

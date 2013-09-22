@@ -64,8 +64,8 @@ S::GUI::PopupMenuEntry::~PopupMenuEntry()
 
 S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
@@ -75,7 +75,6 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 		case SP_MOUSEOUT:
 			if (text == NIL && bitmap == NIL)

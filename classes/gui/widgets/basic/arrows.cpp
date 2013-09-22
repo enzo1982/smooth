@@ -80,18 +80,17 @@ S::GUI::Arrows::~Arrows()
 
 S::Int S::GUI::Arrows::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
-	Surface	*surface	= GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
-	Int	 arrowColor	= Setup::TextColor;
+	Surface	*surface    = GetDrawSurface();
+	Rect	 frame	    = Rect(GetRealPosition(), GetRealSize());
+	Int	 arrowColor = Setup::TextColor;
 
 	if (!IsActive()) arrowColor = Setup::GrayTextColor;
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			surface->Frame(frame, FRAME_UP);
 

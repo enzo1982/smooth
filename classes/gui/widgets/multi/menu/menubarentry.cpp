@@ -52,8 +52,8 @@ S::GUI::MenubarEntry::~MenubarEntry()
 
 S::Int S::GUI::MenubarEntry::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Surface	*surface  = GetDrawSurface();
 	Point	 realPos  = GetRealPosition();
@@ -64,7 +64,6 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			if (text == NIL && bitmap == NIL)
 			{

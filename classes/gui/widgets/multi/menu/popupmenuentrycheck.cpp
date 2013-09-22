@@ -29,8 +29,8 @@ S::GUI::PopupMenuEntryCheck::~PopupMenuEntryCheck()
 
 S::Int S::GUI::PopupMenuEntryCheck::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
@@ -41,7 +41,6 @@ S::Int S::GUI::PopupMenuEntryCheck::Paint(Int message)
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 		case SP_MOUSEIN:
 		case SP_MOUSEOUT:

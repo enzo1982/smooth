@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,12 +16,12 @@ const S::Short	 S::GUI::GroupBox::classID = S::Object::RequestClassID();
 
 S::GUI::GroupBox::GroupBox(const String &iText, const Point &iPos, const Size &iSize) : Layer(iText)
 {
-	type		= classID;
-	orientation	= OR_UPPERLEFT;
+	type	    = classID;
+	orientation = OR_UPPERLEFT;
 
 	SetMetrics(iPos, iSize);
 
-	if (GetWidth() == 0) SetWidth(80);
+	if (GetWidth()	== 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(80);
 
 	ComputeTextSize();
@@ -38,20 +38,19 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			{
-				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+				Surface	*surface  = GetDrawSurface();
+				Rect	 frame	  = Rect(GetRealPosition(), GetRealSize());
 
 				surface->Frame(frame, FRAME_DOWN);
 				surface->Frame(frame + Point(1, 1) - Size(2, 2), FRAME_UP);
 
-				Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
+				Rect	 textRect = Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
 
 				surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
-				Font	 nFont		= font;
+				Font	 nFont	  = font;
 
 				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
 
@@ -68,11 +67,11 @@ S::Int S::GUI::GroupBox::Activate()
 {
 	active = True;
 
-	if (!IsRegistered())	return Success();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Success();
+	if (!IsVisible())    return Success();
 
-	Surface	*surface	= GetDrawSurface();
-	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
+	Surface	*surface  = GetDrawSurface();
+	Rect	 textRect = Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
 
 	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
@@ -92,15 +91,15 @@ S::Int S::GUI::GroupBox::Deactivate()
 {
 	active = False;
 
-	if (!IsRegistered())	return Success();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Success();
+	if (!IsVisible())    return Success();
 
-	Surface	*surface	= GetDrawSurface();
-	Rect	 textRect	= Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
+	Surface	*surface  = GetDrawSurface();
+	Rect	 textRect = Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
 
 	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
-	Font	 nFont		= font;
+	Font	 nFont	  = font;
 
 	nFont.SetColor(Setup::GrayTextColor);
 
@@ -120,7 +119,7 @@ S::Int S::GUI::GroupBox::Show()
 {
 	Int	 retVal = Layer::Show();
 
-	Paint(SP_SHOW);
+	Paint(SP_PAINT);
 
 	return retVal;
 }

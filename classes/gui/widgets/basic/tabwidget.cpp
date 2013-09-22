@@ -34,12 +34,11 @@ S::GUI::TabWidget::~TabWidget()
 
 S::Int S::GUI::TabWidget::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();

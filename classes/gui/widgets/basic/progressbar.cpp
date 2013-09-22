@@ -40,15 +40,14 @@ S::GUI::Progressbar::~Progressbar()
 
 S::Int S::GUI::Progressbar::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 		case SP_UPDATE:
 			surface->StartPaint(GetVisibleArea());

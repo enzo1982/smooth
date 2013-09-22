@@ -87,8 +87,8 @@ S::GUI::Titlebar::~Titlebar()
 
 S::Int S::GUI::Titlebar::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 #ifdef __WIN32__
 	Surface	*surface = GetDrawSurface();
@@ -108,7 +108,6 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			surface->Frame(titleFrame, FRAME_UP);
 

@@ -59,8 +59,8 @@ S::GUI::ComboBox::~ComboBox()
 
 S::Int S::GUI::ComboBox::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	if (GetSelectedEntry() == NIL && !(flags & CB_HOTSPOTONLY))
 	{
@@ -70,13 +70,14 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 	if (flags & CB_HOTSPOTONLY) hotspot->Deactivate();
 	else			    hotspot->Activate();
 
-	Surface		*surface	= GetDrawSurface();
-	Rect		 frame		= Rect(GetRealPosition(), GetRealSize());
+	Surface		*surface = GetDrawSurface();
+	Rect		 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
+			surface->StartPaint(frame);
+
 			if (!(flags & CB_HOTSPOTONLY))
 			{
 				if (IsActive())	surface->Box(frame, Setup::ClientColor, Rect::Filled);
@@ -118,14 +119,16 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 						for (Int k = 0; k < operat->GetText().Length(); k++)
 						{
-							if (operat->GetText()[k] == '\t')	nText[k] = 0;
-							else					nText[k] = operat->GetText()[k];
+							if (operat->GetText()[k] == '\t') nText[k] = 0;
+							else				  nText[k] = operat->GetText()[k];
 						}
 
 						surface->SetText(nText, frame + Point(3, 3) * surface->GetSurfaceDPI() / 96.0 - Size(frame.GetHeight() + 2, 0), font);
 					}
 				}
 			}
+
+			surface->EndPaint();
 
 			break;
 	}
@@ -154,19 +157,19 @@ S::Void S::GUI::ComboBox::OpenListBox()
 {
 	if (listBox == NIL)
 	{
-		Widget	*window		= container->GetContainerWindow();
- 		Surface	*surface	= GetDrawSurface();
+		Widget	*window	     = container->GetContainerWindow();
+ 		Surface	*surface     = GetDrawSurface();
 
-		Rect	 monitor	= System::Screen::GetActiveScreenMetrics();
-		Size	 listBoxSize	= Size(GetWidth(), 16 * Math::Min(Length(), Math::Max(5, Math::Min(16, Length() / 3))) + 4);
-		Point	 listBoxPos	= Point(GetRealPosition() + Point(0, GetRealSize().cy));
+		Rect	 monitor     = System::Screen::GetActiveScreenMetrics();
+		Size	 listBoxSize = Size(GetWidth(), 16 * Math::Min(Length(), Math::Max(5, Math::Min(16, Length() / 3))) + 4);
+		Point	 listBoxPos  = Point(GetRealPosition() + Point(0, GetRealSize().cy));
 
 		if (window->GetY() + listBoxPos.y + listBoxSize.cy >= monitor.GetHeight()) listBoxPos = Point(GetRealPosition() - Point(0, Math::Round(listBoxSize.cy * surface->GetSurfaceDPI() / 96.0)));
 
-		listBox		= new ListBox(Point(), listBoxSize);
+		listBox	   = new ListBox(Point(), listBoxSize);
 		listBox->onSelectEntry.Connect(&onSelectEntry);
 
-		toolWindow	= new ToolWindow(listBoxPos, listBoxSize);
+		toolWindow = new ToolWindow(listBoxPos, listBoxSize);
 
 		listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
 		listBox->AddTab(NIL, 32768);
@@ -227,7 +230,7 @@ S::Void S::GUI::ComboBox::CloseListBox()
 
 		DeleteObject(listBox);
 
-		listBox		= NIL;
+		listBox	   = NIL;
 
 		toolWindow->Close();
 
@@ -235,7 +238,7 @@ S::Void S::GUI::ComboBox::CloseListBox()
 
 		DeleteObject(toolWindow);
 
-		toolWindow	= NIL;
+		toolWindow = NIL;
 	}
 }
 

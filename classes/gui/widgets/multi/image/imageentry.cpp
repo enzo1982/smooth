@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -36,16 +36,15 @@ S::GUI::ImageEntry::~ImageEntry()
 
 S::Int S::GUI::ImageEntry::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
-	Surface	*surface	= GetDrawSurface();
-	Point	 realPos	= GetRealPosition();
-	Size	 realSize	= GetRealSize();
+	Surface	*surface  = GetDrawSurface();
+	Point	 realPos  = GetRealPosition();
+	Size	 realSize = GetRealSize();
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			surface->StartPaint(GetVisibleArea());
 

@@ -64,8 +64,8 @@ S::GUI::Scrollbar::~Scrollbar()
 
 S::Int S::GUI::Scrollbar::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	Surface	*surface	= GetDrawSurface();
 	Point	 realPos	= GetRealPosition();
@@ -82,7 +82,6 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			OnValueChange();
 
@@ -98,16 +97,16 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(realPos.x + (hotspotSize + 4) / 2 - size / 2 + i, realPos.y + realSize.cy / 2 - i);
-					Point	 lineEnd	= lineStart + Point(0, 2 * i + 1);
+					Point	 lineStart = Point(realPos.x + (hotspotSize + 4) / 2 - size / 2 + i, realPos.y + realSize.cy / 2 - i);
+					Point	 lineEnd   = lineStart + Point(0, 2 * i + 1);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
 
-				for (Int j = 0; j < size; j++)
+				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(realPos.x + realSize.cx - (hotspotSize + 4) / 2 - (size + 1) / 2 + j, realPos.y + realSize.cy / 2 - size + 1 + j);
-					Point	 lineEnd	= lineStart + Point(0, 2 * (size - j) - 1);
+					Point	 lineStart = Point(realPos.x + realSize.cx - (hotspotSize + 4) / 2 - (size + 1) / 2 + i, realPos.y + realSize.cy / 2 - size + 1 + i);
+					Point	 lineEnd   = lineStart + Point(0, 2 * (size - i) - 1);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
@@ -118,16 +117,16 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 
 				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(realPos.x + realSize.cx / 2 + (IsRightToLeft() ? 1 : 0) - i, (realPos.y + (hotspotSize + 4) / 2) - size / 2 + i);
-					Point	 lineEnd	= lineStart + Point(2 * i + 1, 0);
+					Point	 lineStart = Point(realPos.x + realSize.cx / 2 + (IsRightToLeft() ? 1 : 0) - i, (realPos.y + (hotspotSize + 4) / 2) - size / 2 + i);
+					Point	 lineEnd   = lineStart + Point(2 * i + 1, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
 
-				for (Int j = 0; j < size; j++)
+				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(realPos.x + realSize.cx / 2 + (IsRightToLeft() ? 1 : 0) - size + 1 + j, (realPos.y + realSize.cy - (hotspotSize + 4) / 2) - (size + 1) / 2 + j);
-					Point	 lineEnd	= lineStart + Point(2 * (size - j) - 1, 0);
+					Point	 lineStart = Point(realPos.x + realSize.cx / 2 + (IsRightToLeft() ? 1 : 0) - size + 1 + i, (realPos.y + realSize.cy - (hotspotSize + 4) / 2) - (size + 1) / 2 + i);
+					Point	 lineEnd   = lineStart + Point(2 * (size - i) - 1, 0);
 
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}

@@ -26,12 +26,11 @@ S::GUI::Image::~Image()
 
 S::Int S::GUI::Image::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();

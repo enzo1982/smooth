@@ -67,18 +67,17 @@ S::GUI::Slider::~Slider()
 
 S::Int S::GUI::Slider::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
-	Surface	*surface  = GetDrawSurface();
-	Point	 realPos  = GetRealPosition();
-	Size	 realSize = GetRealSize();
+	Surface	*surface      = GetDrawSurface();
+	Point	 realPos      = GetRealPosition();
+	Size	 realSize     = GetRealSize();
 	Int	 realGripSize = Math::Round(gripSize * surface->GetSurfaceDPI() / 96.0);
 	Rect	 sliderRect;
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			surface->StartPaint(Rect(realPos, realSize));
 

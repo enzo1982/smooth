@@ -57,12 +57,11 @@ S::GUI::MultiEdit::~MultiEdit()
 
 S::Int S::GUI::MultiEdit::Paint(Int message)
 {
-	if (!IsRegistered())	return Error();
-	if (!IsVisible())	return Success();
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
 
 	switch (message)
 	{
-		case SP_SHOW:
 		case SP_PAINT:
 			{
 				Surface	*surface = GetDrawSurface();

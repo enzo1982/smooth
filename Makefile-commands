@@ -94,16 +94,20 @@ ifeq ($(BUILD_PPC64),True)
 endif
 
 	CCOPTS += -mmacosx-version-min=10.5
-else ifeq ($(BUILD_X86),True)
+else
+	LDOPTS += -s
+
+ifeq ($(BUILD_X86),True)
 	CCOPTS += -m32
-	LDOPTS += -m32 -s
+	LDOPTS += -m32
 
 	RCOPTS += --target=pe-i386
 else ifeq ($(BUILD_X86_64),True)
 	CCOPTS += -m64
-	LDOPTS += -m64 -s
+	LDOPTS += -m64
 
 	RCOPTS += --target=pe-x86-64
+endif
 endif
 
 ifndef GLOBALLIB

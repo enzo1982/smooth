@@ -79,10 +79,14 @@ endif
 ifeq ($(BUILD_PPC64),True)
 	LINKER_OPTS += -dynamiclib -arch ppc64
 endif
-else ifeq ($(BUILD_X86),True)
-	LINKER_OPTS += --shared -m32 -s
+else
+	LINKER_OPTS += --shared -s
+
+ifeq ($(BUILD_X86),True)
+	LINKER_OPTS += -m32
 else ifeq ($(BUILD_X86_64),True)
-	LINKER_OPTS += --shared -m64 -s
+	LINKER_OPTS += -m64
+endif
 endif
 
 ifeq ($(BUILD_WIN32),True)

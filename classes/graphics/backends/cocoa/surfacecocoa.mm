@@ -495,44 +495,63 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 	const Array<String>	&lines	    = string.Explode("\n");
 
-	foreach (const String &line, lines)
+	/* Draw to window.
+	 */
+	if (!painting && [window isVisible])
 	{
 		Rect	 tRect = rightToLeft.TranslateRect(rect);
 
-		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
+		[[window contentView] lockFocus];
 
-		NSAttributedString	*string	    = [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: (line == NIL ? "" : line.ConvertTo("UTF-8"))]
-										      attributes: attributes];
-
-		if (!painting && [window isVisible])
-		{
-			NSSize	 size = [string size];
-
-			[[window contentView] lockFocus];
-
-			[NSGraphicsContext saveGraphicsState];
-
-			[[NSBezierPath bezierPathWithRect: NSMakeRect(tRect.left, tRect.top, tRect.right - tRect.left, tRect.bottom - tRect.top)] addClip];
-
-			[[NSGraphicsContext currentContext] setShouldAntialias: YES];
-
-			[string drawAtPoint: NSMakePoint(tRect.left, tRect.top - 1)];
-
-			[NSGraphicsContext restoreGraphicsState];
-
-			[[window contentView] unlockFocus];
-
-			[window flushWindow];
-		}
-
-		if (!painting) [paintBitmap lockFocus];
+		[[NSGraphicsContext currentContext] setShouldAntialias: YES];
 
 		[NSGraphicsContext saveGraphicsState];
 
 		[[NSBezierPath bezierPathWithRect: NSMakeRect(tRect.left, tRect.top, tRect.right - tRect.left, tRect.bottom - tRect.top)] addClip];
 
-		[[NSGraphicsContext currentContext] setShouldAntialias: YES];
+		foreach (const String &line, lines)
+		{
+			tRect	   = rightToLeft.TranslateRect(rect);
+			tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
 
+			NSAttributedString	*string	= [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: (line == NIL ? "" : line.ConvertTo("UTF-8"))]
+											  attributes: attributes];
+
+			[string drawAtPoint: NSMakePoint(tRect.left, tRect.top - 1)];
+
+			[string release];
+
+			rect.top += lineHeight;
+		}
+
+		[NSGraphicsContext restoreGraphicsState];
+
+		[[window contentView] unlockFocus];
+
+		[window flushWindow];
+	}
+
+	/* Draw to buffer.
+	 */
+	rect = iRect;
+
+	Rect	 tRect = rightToLeft.TranslateRect(rect);
+
+	if (!painting) [paintBitmap lockFocus];
+
+	[[NSGraphicsContext currentContext] setShouldAntialias: YES];
+
+	[NSGraphicsContext saveGraphicsState];
+
+	[[NSBezierPath bezierPathWithRect: NSMakeRect(tRect.left, tRect.top, tRect.right - tRect.left, tRect.bottom - tRect.top)] addClip];
+
+	foreach (const String &line, lines)
+	{
+		tRect	   = rightToLeft.TranslateRect(rect);
+		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
+
+		NSAttributedString	*string	   = [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: (line == NIL ? "" : line.ConvertTo("UTF-8"))]
+										     attributes: attributes];
 		NSAffineTransform	*transform = [NSAffineTransform transform];
 
 		[transform scaleXBy:	 1.0 yBy: -1.0];
@@ -542,16 +561,14 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 		[string drawAtPoint: NSMakePoint(tRect.left, tRect.top + 1)];
 
-		[[NSAffineTransform transform] set];
-
-		[NSGraphicsContext restoreGraphicsState];
-
-		if (!painting) [paintBitmap unlockFocus];
-
 		[string release];
 
 		rect.top += lineHeight;
 	}
+
+	[NSGraphicsContext restoreGraphicsState];
+
+	if (!painting) [paintBitmap unlockFocus];
 
 	String::ExplodeFinish();
 

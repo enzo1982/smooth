@@ -1213,8 +1213,8 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	while (p1.x > frame.right || p1.x < frame.left)
 	{
-		if (p1.x > frame.right)     { visibleOffset +=  5; p1.x -=  5; }
-		else if (p1.x < frame.left) { visibleOffset -= 20; p1.x += 20; }
+		if	(p1.x > frame.right) { visibleOffset +=  5; p1.x -=  5; }
+		else if (p1.x < frame.left)  { visibleOffset -= 20; p1.x += 20; }
 	}
 
 	if (visibleOffset < 0) { p1.x -= visibleOffset; visibleOffset = 0; }
@@ -1225,13 +1225,9 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 	{
 		while (line - scrollPos < 0)							 scrollPos--;
 		while ((font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()) scrollPos++;
-
-		onScroll.Emit(scrollPos, maxScrollPos);
-
-		System::System::Sleep(100);
-
-		return Success();
 	}
+
+	if (maxScrollPos > 0) onScroll.Emit(scrollPos, maxScrollPos);
 
 #ifdef __WIN32__
 	{

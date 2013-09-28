@@ -118,16 +118,11 @@ S::Int S::GUI::MultiEdit::SetText(const String &newText)
 {
 	scrollbarPos = 0;
 
-	if (!IsVisible()) return cursor->SetText(newText);
-
-	Surface	*surface = GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
-
-	surface->StartPaint(frame);
-
+	cursor->SetVisibleDirect(False);
 	cursor->SetText(newText);
+	cursor->SetVisibleDirect(True);
 
-	surface->EndPaint();
+	if (IsVisible()) Paint(SP_PAINT);
 
 	return Success();
 }
@@ -139,7 +134,7 @@ S::Void S::GUI::MultiEdit::OnScroll()
 
 S::Void S::GUI::MultiEdit::OnCursorScroll(Int scrollPos, Int maxScrollPos)
 {
-	if (maxScrollPos == NIL && scrollbar != NIL)
+	if (maxScrollPos == 0 && scrollbar != NIL)
 	{
 		DeleteObject(scrollbar);
 

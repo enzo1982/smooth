@@ -118,7 +118,11 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 	switch (PRIMARYLANGID(GetUserDefaultLangID()))
 	{
 		case LANG_ENGLISH:	code = "en";	break;
+		case LANG_AFRIKAANS:	code = "af";	break;
+		case LANG_ALBANIAN:	code = "sq";	break;
 		case LANG_ARABIC:	code = "ar";	break;
+		case LANG_ARMENIAN:	code = "hy";	break;
+		case LANG_AZERI:	code = "az";	break;
 		case LANG_BASQUE:	code = "eu";	break;
 		case LANG_BULGARIAN:	code = "bg";	break;
 		case LANG_CATALAN:	code = "ca";	break;
@@ -129,10 +133,10 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		case LANG_DANISH:	code = "da";	break;
 		case LANG_DUTCH:	code = "nl";	break;
 		case LANG_ESTONIAN:	code = "et";	break;
-		case LANG_FARSI:	code = "fa";	break;
 		case LANG_FINNISH:	code = "fi";	break;
 		case LANG_FRENCH:	code = "fr";	break;
 		case LANG_GALICIAN:	code = "gl";	break;
+		case LANG_GEORGIAN:	code = "ka";	break;
 		case LANG_GERMAN:	code = "de";	break;
 		case LANG_GREEK:	code = "el";	break;
 		case LANG_HEBREW:	code = "he";	break;
@@ -146,6 +150,8 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		case LANG_LATVIAN:	code = "lv";	break;
 		case LANG_MALAY:	code = "ms";	break;
 		case LANG_NORWEGIAN:	code = "no";	break;
+		case LANG_PASHTO:	code = "ps";	break;
+		case LANG_PERSIAN:	code = "fa";	break;
 		case LANG_POLISH:	code = "pl";	break;
 		case LANG_PORTUGUESE:	code = "pt";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_PORTUGUESE)		code = "pt";
 							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_PORTUGUESE_BRAZILIAN)	code = "pt_BR";
@@ -163,6 +169,7 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		case LANG_THAI:		code = "th";	break;
 		case LANG_TURKISH:	code = "tr";	break;
 		case LANG_UKRAINIAN:	code = "uk";	break;
+		case LANG_URDU:		code = "ur";	break;
 		case LANG_VIETNAMESE:	code = "vi";	break;
 	}
 #elif defined __HAIKU__

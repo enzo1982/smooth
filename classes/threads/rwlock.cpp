@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,14 +13,14 @@
 #include <smooth/threads/semaphore.h>
 #include <smooth/system/system.h>
 
-const S::Short	 S::Threads::RWLock::MAX_READ_LOCKS = 16;
+const S::Short	 S::Threads::RWLock::maxReadLocks = 16;
 
 S::Threads::RWLock::RWLock()
 {
 	writeLocked = False;
 
 	exclusiveAccessMutex  = new Mutex();
-	sharedAccessSemaphore = new Semaphore(MAX_READ_LOCKS);
+	sharedAccessSemaphore = new Semaphore(maxReadLocks);
 }
 
 S::Threads::RWLock::RWLock(const RWLock &oRWLock)
@@ -41,7 +41,7 @@ S::Threads::RWLock &S::Threads::RWLock::operator =(const RWLock &oRWLock)
 	writeLocked = False;
 
 	exclusiveAccessMutex  = new Mutex();
-	sharedAccessSemaphore = new Semaphore(MAX_READ_LOCKS);
+	sharedAccessSemaphore = new Semaphore(maxReadLocks);
 
 	return *this;
 }
@@ -63,7 +63,7 @@ S::Int S::Threads::RWLock::LockForWrite()
 
 	/* Wait for read operations to finish.
 	 */
-	for (Int i = 0; i < MAX_READ_LOCKS; i++) sharedAccessSemaphore->Wait();
+	for (Int i = 0; i < maxReadLocks; i++) sharedAccessSemaphore->Wait();
 
 	/* Mark ourself locked for write.
 	 */
@@ -84,7 +84,7 @@ S::Int S::Threads::RWLock::Release()
 
 		/* Release shared access semaphore.
 		 */
-		for (Int i = 0; i < MAX_READ_LOCKS; i++) sharedAccessSemaphore->Release();
+		for (Int i = 0; i < maxReadLocks; i++) sharedAccessSemaphore->Release();
 
 		/* Allow new read and write locks again.
 		 */

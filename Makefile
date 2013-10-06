@@ -67,17 +67,19 @@ LINKER_OPTS = -pipe -L$(LIBDIR) -o $(DLLNAME)
 REMOVE_OPTS = -f
 
 ifeq ($(BUILD_OSX),True)
+	LINKER_OPTS += -dynamiclib -Wl,-x
+
 ifeq ($(BUILD_X86),True)
-	LINKER_OPTS += -dynamiclib -arch i386
+	LINKER_OPTS += -arch i386
 endif
 ifeq ($(BUILD_X86_64),True)
-	LINKER_OPTS += -dynamiclib -arch x86_64
+	LINKER_OPTS += -arch x86_64
 endif
 ifeq ($(BUILD_PPC),True)
-	LINKER_OPTS += -dynamiclib -arch ppc
+	LINKER_OPTS += -arch ppc
 endif
 ifeq ($(BUILD_PPC64),True)
-	LINKER_OPTS += -dynamiclib -arch ppc64
+	LINKER_OPTS += -arch ppc64
 endif
 else
 	LINKER_OPTS += --shared -s

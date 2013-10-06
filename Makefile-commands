@@ -14,6 +14,8 @@ ifneq ($(BUILD_SOLARIS),True)
 endif
 
 ifndef GLOBALDLL
+	CCOPTS += -fvisibility=hidden
+
 ifeq ($(BUILD_WIN32),True)
 	LDOPTS += -lsmooth
 else
@@ -76,6 +78,9 @@ ifneq ($(EXCEPTION),True)
 endif
 
 ifeq ($(BUILD_OSX),True)
+	CCOPTS += -mmacosx-version-min=10.5
+	LDOPTS += -Wl,-x
+
 ifeq ($(BUILD_X86),True)
 	CCOPTS += -arch i386
 	LDOPTS += -arch i386
@@ -92,8 +97,6 @@ ifeq ($(BUILD_PPC64),True)
 	CCOPTS += -arch ppc64
 	LDOPTS += -arch ppc64
 endif
-
-	CCOPTS += -mmacosx-version-min=10.5
 else
 	LDOPTS += -s
 

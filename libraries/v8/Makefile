@@ -17,6 +17,10 @@ IMPORTLIB   = libsmooth-js.a
 
 MYCCOPTS    = -I. -I./include
 
+ifeq ($(BUILD_WIN32),True)
+	MYCCOPTS += -Wno-unused-local-typedefs
+endif
+
 ifeq ($(BUILD_FREEBSD),True)
 	MYCCOPTS += -I/usr/local/include
 endif

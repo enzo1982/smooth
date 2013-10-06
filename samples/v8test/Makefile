@@ -5,6 +5,12 @@ SMOOTH_PATH = ../..
 
 include $(SMOOTH_PATH)/Makefile-options
 
+# Disable PowerPC builds of V8 on OS X for now.
+ifeq ($(BUILD_OSX),True)
+	BUILD_PPC   = False
+	BUILD_PPC64 = False
+endif
+
 # Change these variables to fit your project:
 LOCALEXE  = v8test
 

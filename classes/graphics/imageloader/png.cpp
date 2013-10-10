@@ -101,11 +101,11 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	 */
 	png_read_info(png_ptr, info_ptr);
 
-	/* Tell libpng to strip 16 bit/color files down to 8 bits/color
+	/* Tell libpng to strip 16 bit/color files down to 8 bits/color.
 	 */
 	png_set_strip_16(png_ptr);
 
-	/* Get basic image information
+	/* Get basic image information and create bitmap.
 	 */
 	png_uint_32	 width	    = 0;
 	png_uint_32	 height	    = 0;
@@ -114,14 +114,39 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, NULL, NULL, NULL);
 
-	/* Get palette information
+	bitmap.CreateBitmap(width, height, (color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
+					    color_type == PNG_COLOR_TYPE_GRAY_ALPHA) ? 32 : 24);
+
+	/* Set background color if the image has an alpha
+	 * channel but we only have a non-alpha bitmap.
+	 */
+	if ((color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
+	     color_type == PNG_COLOR_TYPE_GRAY_ALPHA) && bitmap.GetDepth() != 32)
+	{
+		/* Set the background color to draw transparent and alpha images over.
+		 * It is possible to set the red, green, and blue components directly
+		 * for paletted images instead of supplying a palette index.
+		 */
+		png_color_16 my_background;
+
+		my_background.red = Setup::BackgroundColor.GetRed();
+		my_background.green = Setup::BackgroundColor.GetGreen();
+		my_background.blue = Setup::BackgroundColor.GetBlue();
+
+		png_set_background(png_ptr, &my_background, PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
+
+		if	(color_type == PNG_COLOR_TYPE_RGB_ALPHA)  color_type = PNG_COLOR_TYPE_RGB;
+		else if (color_type == PNG_COLOR_TYPE_GRAY_ALPHA) color_type = PNG_COLOR_TYPE_GRAY;
+	}
+
+	/* Get palette information.
 	 */
 	png_colorp	 palette     = NULL;
 	int		 num_palette = 0;
 
 	png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette);
 
-	/* The easiest way to read the image
+	/* The easiest way to read the image.
 	 */
 	png_bytep *row_pointers = (png_bytep *) malloc(height * sizeof(png_bytep));
 
@@ -130,8 +155,6 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	/* Now it's time to read the image.
 	 */
 	png_read_image(png_ptr, row_pointers);
-
-	bitmap.CreateBitmap(width, height, (color_type == PNG_COLOR_TYPE_RGB_ALPHA) ? 32 : 24);
 
 	for (UnsignedInt y = 0; y < height; y++)
 	{
@@ -151,16 +174,17 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 
 	free(row_pointers);
 
-	/* Read rest of file, and get additional chunks in info_ptr */
+	/* Read rest of file, and get additional chunks in info_ptr.
+	 */
 	png_read_end(png_ptr, info_ptr);
 
-	/* Clean up after the read, and free any memory allocated
+	/* Clean up after the read, and free any memory allocated.
 	 */
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
 	delete in;
 
-	/* That's it
+	/* That's it.
 	 */
 	return bitmap;
 }

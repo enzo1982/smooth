@@ -59,12 +59,10 @@ endif
 endif
 endif
 
-ifeq ($(BUILD_SOLARIS),True)
+ifneq ($(BUILD_WIN32),True)
+ifneq ($(BUILD_LINUX),True)
 	CCOPTS += -fPIC
-endif
-
-ifeq ($(BUILD_LINUX),True)
-ifeq ($(BUILD_X86_64),True)
+else ifneq ($(BUILD_X86),True)
 	CCOPTS += -fPIC
 endif
 endif

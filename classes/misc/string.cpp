@@ -15,6 +15,7 @@
 #include <smooth/system/cpu.h>
 #include <smooth/threads/mutex.h>
 #include <smooth/templates/buffer.h>
+#include <smooth/templates/threadlocal.h>
 #include <smooth/init.h>
 
 #include <iconv.h>
@@ -27,9 +28,9 @@
 
 namespace smooth
 {
-	static multithread char		*inputFormat	= NIL;
-	static multithread char		*outputFormat	= NIL;
-	static multithread char		*internalFormat	= NIL;
+	static multithread (char *)	 inputFormat	= NIL;
+	static multithread (char *)	 outputFormat	= NIL;
+	static multithread (char *)	 internalFormat	= NIL;
 
 	Int				 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
@@ -339,7 +340,7 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	if	(width == 1) while (true) { if (((char  *) str)[++len] == 0) { len *= 1; break; } }
 	else if (width == 2) while (true) { if (((short *) str)[++len] == 0) { len *= 2; break; } }
-	else if (width == 4) while (true) { if (((long  *) str)[++len] == 0) { len *= 4; break; } }
+	else if (width == 4) while (true) { if (((int   *) str)[++len] == 0) { len *= 4; break; } }
 
 	Int	 size = ConvertString(str, len, format, NIL, 0, GetInternalFormat());
 

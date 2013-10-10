@@ -79,12 +79,24 @@ S::Void S::GUI::BitmapXLib::Initialize()
 	display	= Backends::BackendXLib::GetDisplay();
 }
 
+S::Bool S::GUI::BitmapXLib::IsDepthSupported(Int bpp)
+{
+	Bool			 supported = False;
+	int			 count	   = 0;
+	XPixmapFormatValues	*values	   = XListPixmapFormats(display, &count);
+
+	for (int i = 0; i < count; i++) if (values[i].depth == bpp) { supported = True; break; }
+
+	XFree(values);
+
+	return supported;
+}
+
 S::Bool S::GUI::BitmapXLib::CreateBitmap(Int cx, Int cy, Int bpp)
 {
 	DeleteBitmap();
 
-	if (bpp == -1)				 bpp = XDefaultDepth(display, XDefaultScreen(display));
-	if (bpp != 16 && bpp != 24 && bpp != 32) bpp = 32;
+	if (bpp == -1 || !IsDepthSupported(bpp)) bpp = XDefaultDepth(display, XDefaultScreen(display));
 
 	bitmap	= XCreatePixmap(display, DefaultRootWindow(display), cx, cy, bpp);
 	bytes	= NIL;

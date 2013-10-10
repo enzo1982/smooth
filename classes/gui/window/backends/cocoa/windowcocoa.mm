@@ -46,6 +46,9 @@ const int	 NSApplicationUnfocus = 7;
 
 	- (void)	mouseMoved:	   (NSEvent *) event;
 
+	- (void)	mouseEntered:	   (NSEvent *) event;
+	- (void)	mouseExited:	   (NSEvent *) event;
+
 	- (void)	mouseDown:	   (NSEvent *) event;
 	- (void)	mouseDragged:	   (NSEvent *) event;
 	- (void)	mouseUp:	   (NSEvent *) event;
@@ -76,7 +79,7 @@ const int	 NSApplicationUnfocus = 7;
 		[super initWithFrame: frameRect];
 
 		trackingArea = [[[NSTrackingArea alloc] initWithRect: [self visibleRect]
-							     options: NSTrackingMouseMoved | NSTrackingActiveAlways
+							     options: NSTrackingMouseMoved | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways
 							       owner: self
 							    userInfo: nil] autorelease];
 
@@ -90,7 +93,7 @@ const int	 NSApplicationUnfocus = 7;
 		[self removeTrackingArea: trackingArea];
 
 		trackingArea = [[[NSTrackingArea alloc] initWithRect: [self visibleRect]
-							     options: NSTrackingMouseMoved | NSTrackingActiveAlways
+							     options: NSTrackingMouseMoved | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways
 							       owner: self
 							    userInfo: nil] autorelease];
 
@@ -105,6 +108,9 @@ const int	 NSApplicationUnfocus = 7;
 	}
 
 	- (void) mouseMoved:	    (NSEvent *) event { [self handleEvent: event]; }
+
+	- (void) mouseEntered:	    (NSEvent *) event { [self handleEvent: event]; }
+	- (void) mouseExited:	    (NSEvent *) event { [self handleEvent: event]; }
 
 	- (void) mouseDown:	    (NSEvent *) event { [self handleEvent: event]; }
 	- (void) mouseDragged:	    (NSEvent *) event { [self handleEvent: event]; }
@@ -332,15 +338,20 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 		/* Mouse events:
 		 */
 		case NSMouseMoved:
+		case NSMouseEntered:
+		case NSMouseExited:
+
 		case NSLeftMouseDown:
 		case NSLeftMouseDragged:
 		case NSLeftMouseUp:
+
 		case NSRightMouseDown:
 		case NSRightMouseDragged:
 		case NSRightMouseUp:
 			/* Update pointer position in Input::Pointer.
 			 */
-			Input::Pointer::UpdatePosition(Window::GetWindow((Void *) [e window]), [NSEvent mouseLocation].x, [[wnd screen] frame].size.height - [NSEvent mouseLocation].y);
+			if ([e type] == NSMouseExited) Input::Pointer::UpdatePosition(NIL,				      [NSEvent mouseLocation].x, [[wnd screen] frame].size.height - [NSEvent mouseLocation].y);
+			else			       Input::Pointer::UpdatePosition(Window::GetWindow((Void *) [e window]), [NSEvent mouseLocation].x, [[wnd screen] frame].size.height - [NSEvent mouseLocation].y);
 
 			/* Reject if a modal window is active.
 			 */
@@ -438,6 +449,7 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 			}
 
 			break;
+
 		case NSKeyUp:
 			Input::Keyboard::UpdateKeyState(ConvertKey([e keyCode]), False);
 
@@ -585,6 +597,8 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 		else						      drawSurface = new Surface((Void *) wnd);
 
 		drawSurface->SetSize(size * fontSize + sizeModifier);
+		
+		[wnd useOptimizedDrawing: YES];
 
 		/* Set window title.
 		 */
@@ -737,7 +751,8 @@ S::Int S::GUI::WindowCocoa::Show()
 
 	/* Show window.
 	 */
-	[wnd makeKeyAndOrderFront: nil];
+	if ([NSThread isMainThread]) [wnd makeKeyAndOrderFront: nil];
+	else			     [wnd performSelectorOnMainThread: @selector(makeKeyAndOrderFront:) withObject: nil waitUntilDone: YES];
 
 	/* Set minimum and maximum size.
 	 */
@@ -758,7 +773,7 @@ S::Int S::GUI::WindowCocoa::Show()
 
 	/* Set update rect and send paint event for new window.
 	 */
-	updateRect = Rect(Point(0,0),Size(contentRect.size.width,contentRect.size.height));
+	updateRect = Rect(Point(0, 0), Size(contentRect.size.width, contentRect.size.height));
 
 	onEvent.Call(SM_PAINT, 0, 0);
 
@@ -769,7 +784,8 @@ S::Int S::GUI::WindowCocoa::Hide()
 {
 	if (wnd == nil) return Success();
 
-	[wnd orderOut: nil];
+	if ([NSThread isMainThread]) [wnd orderOut: nil];
+	else			     [wnd performSelectorOnMainThread: @selector(orderOut:) withObject: nil waitUntilDone: YES];
 
 	return Success();
 }

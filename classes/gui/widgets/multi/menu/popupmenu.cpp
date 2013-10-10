@@ -30,14 +30,8 @@ S::GUI::PopupMenu::PopupMenu()
 
 	closedByClick	= False;
 
-	toolWindow = new ToolWindow(Point(), Size());
-	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
-	toolWindow->onLoseFocus.Connect(&internalRequestClose);
-
-	toolWindow->Hide();
-
-	Add(toolWindow);
-
+	toolWindow = NIL;
+	
 	internalRequestClose.SetParentObject(this);
 
 	internalOnOpenPopupMenu.Connect(&PopupMenu::OnOpenPopupMenu, this);
@@ -45,8 +39,6 @@ S::GUI::PopupMenu::PopupMenu()
 
 S::GUI::PopupMenu::~PopupMenu()
 {
-	DeleteObject(toolWindow);
-
 	internalOnOpenPopupMenu.Disconnect(&PopupMenu::OnOpenPopupMenu, this);
 }
 
@@ -77,6 +69,12 @@ S::Int S::GUI::PopupMenu::Show()
 
 	closedByClick = False;
 
+	/* Create tool window, add entries and display it.
+	 */
+	toolWindow = new ToolWindow(GetPosition(), GetSize());
+	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
+	toolWindow->onLoseFocus.Connect(&internalRequestClose);
+
 	for (Int k = 0; k < GetNOfObjects(); k++)
 	{
 		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(k);
@@ -88,11 +86,14 @@ S::Int S::GUI::PopupMenu::Show()
 		toolWindow->Add(entry);
 	}
 
-	toolWindow->SetMetrics(GetPosition(), GetSize());
-	toolWindow->Show();
+	Add(toolWindow);
 
 	internalOnOpenPopupMenu.Emit(GetHandle());
 
+	toolWindow->Show();
+
+	/* Notify subscribers of popup open.
+	 */
 	onShow.Emit();
 
 	return Success();
@@ -106,6 +107,8 @@ S::Int S::GUI::PopupMenu::Hide()
 
 	if (!IsRegistered()) return Success();
 
+	/* Hide tool window, remove entries and delete it.
+	 */
 	toolWindow->Hide();
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
@@ -120,6 +123,12 @@ S::Int S::GUI::PopupMenu::Hide()
 		entry->SetContainer(this);
 	}
 
+	DeleteObject(toolWindow);
+
+	toolWindow = NIL;
+
+	/* Notify subscribers of popup close.
+	 */
 	onHide.Emit();
 
 	return Success();

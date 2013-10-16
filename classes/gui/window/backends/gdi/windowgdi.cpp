@@ -209,11 +209,18 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		case WM_ACTIVATEAPP:
 			if (wParam == True && !IsWindowEnabled(hwnd))
 			{
+				/* If disabled, activate the next modal window.
+				 */
 				for (Int i = 0; i < windowBackends.Length(); i++)
 				{
 					WindowGDI	*backend = windowBackends.GetNth(i);
 
-					if (backend->hwnd != NIL && backend->id > id && (backend->flags & WF_MODAL)) backend->Raise();
+					if (backend->hwnd != NIL && backend->id > id && (backend->flags & WF_MODAL))
+					{
+						backend->Raise();
+
+						break;
+					}
 				}
 			}
 
@@ -279,26 +286,6 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			break;
 	}
 
-	/* Update cursor position when receiving mouse messages.
-	 */
-	if (message == WM_MOUSEMOVE	|| message == WM_NCMOUSEMOVE	 ||
-	    message == WM_LBUTTONDOWN	|| message == WM_NCLBUTTONDOWN	 ||
-	    message == WM_RBUTTONDOWN	|| message == WM_NCRBUTTONDOWN	 ||
-	    message == WM_MBUTTONDOWN	|| message == WM_NCMBUTTONDOWN	 ||
-	    message == WM_LBUTTONUP	|| message == WM_NCLBUTTONUP	 ||
-	    message == WM_RBUTTONUP	|| message == WM_NCRBUTTONUP	 ||
-	    message == WM_MBUTTONUP	|| message == WM_NCMBUTTONUP	 ||
-	    message == WM_LBUTTONDBLCLK	|| message == WM_NCLBUTTONDBLCLK ||
-	    message == WM_RBUTTONDBLCLK	|| message == WM_NCRBUTTONDBLCLK ||
-	    message == WM_MBUTTONDBLCLK	|| message == WM_NCMBUTTONDBLCLK)
-	{
-		POINT	 point;
-
-		GetCursorPos(&point);
-
-		Input::Pointer::UpdatePosition(Window::GetWindow(hwnd), point.x, point.y);
-	}
-
 	/* Convert Windows messages to smooth messages.
 	 */
 	switch (message)
@@ -307,36 +294,70 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		 */
 		case WM_MOUSEMOVE:
 		case WM_NCMOUSEMOVE:
+			/* Update pointer position in Input::Pointer.
+			 */
+			{
+				POINT	 point;
+
+				GetCursorPos(&point);
+
+				Input::Pointer::UpdatePosition(Window::GetWindow(hwnd), point.x, point.y);
+			}
+
 			return onEvent.Call(SM_MOUSEMOVE, 0, 0);
-		case WM_MOUSEWHEEL:
-			return onEvent.Call(SM_MOUSEWHEEL, (short) HIWORD(wParam), 0);
 		case WM_LBUTTONDOWN:
-		case WM_NCLBUTTONDOWN:
-			return onEvent.Call(SM_LBUTTONDOWN, 0, 0);
-		case WM_LBUTTONUP:
-		case WM_NCLBUTTONUP:
-			return onEvent.Call(SM_LBUTTONUP, 0, 0);
 		case WM_RBUTTONDOWN:
-		case WM_NCRBUTTONDOWN:
-			return onEvent.Call(SM_RBUTTONDOWN, 0, 0);
-		case WM_RBUTTONUP:
-		case WM_NCRBUTTONUP:
-			return onEvent.Call(SM_RBUTTONUP, 0, 0);
 		case WM_MBUTTONDOWN:
-		case WM_NCMBUTTONDOWN:
-			return onEvent.Call(SM_MBUTTONDOWN, 0, 0);
+		case WM_LBUTTONUP:
+		case WM_RBUTTONUP:
 		case WM_MBUTTONUP:
-		case WM_NCMBUTTONUP:
-			return onEvent.Call(SM_MBUTTONUP, 0, 0);
 		case WM_LBUTTONDBLCLK:
-		case WM_NCLBUTTONDBLCLK:
-			return onEvent.Call(SM_LBUTTONDBLCLK, 0, 0);
 		case WM_RBUTTONDBLCLK:
-		case WM_NCRBUTTONDBLCLK:
-			return onEvent.Call(SM_RBUTTONDBLCLK, 0, 0);
 		case WM_MBUTTONDBLCLK:
+		case WM_NCLBUTTONDOWN:
+		case WM_NCRBUTTONDOWN:
+		case WM_NCMBUTTONDOWN:
+		case WM_NCLBUTTONUP:
+		case WM_NCRBUTTONUP:
+		case WM_NCMBUTTONUP:
+		case WM_NCLBUTTONDBLCLK:
+		case WM_NCRBUTTONDBLCLK:
 		case WM_NCMBUTTONDBLCLK:
-			return onEvent.Call(SM_MBUTTONDBLCLK, 0, 0);
+			/* Update pointer position in Input::Pointer.
+			 */
+			{
+				POINT	 point;
+
+				GetCursorPos(&point);
+
+				Input::Pointer::UpdatePosition(Window::GetWindow(hwnd), point.x, point.y);
+			}
+
+			/* Pass message to smooth window.
+			 */
+			if	(message == WM_LBUTTONDOWN   || message == WM_NCLBUTTONDOWN)   return onEvent.Call(SM_LBUTTONDOWN, 0, 0);
+			else if (message == WM_LBUTTONUP     || message == WM_NCLBUTTONUP)     return onEvent.Call(SM_LBUTTONUP, 0, 0);
+			else if (message == WM_LBUTTONDBLCLK || message == WM_NCLBUTTONDBLCLK) return onEvent.Call(SM_LBUTTONDBLCLK, 0, 0);
+
+			else if	(message == WM_RBUTTONDOWN   || message == WM_NCRBUTTONDOWN)   return onEvent.Call(SM_RBUTTONDOWN, 0, 0);
+			else if (message == WM_RBUTTONUP     || message == WM_NCRBUTTONUP)     return onEvent.Call(SM_RBUTTONUP, 0, 0);
+			else if (message == WM_RBUTTONDBLCLK || message == WM_NCRBUTTONDBLCLK) return onEvent.Call(SM_RBUTTONDBLCLK, 0, 0);
+
+			else if	(message == WM_MBUTTONDOWN   || message == WM_NCMBUTTONDOWN)   return onEvent.Call(SM_MBUTTONDOWN, 0, 0);
+			else if (message == WM_MBUTTONUP     || message == WM_NCMBUTTONUP)     return onEvent.Call(SM_MBUTTONUP, 0, 0);
+			else if (message == WM_MBUTTONDBLCLK || message == WM_NCMBUTTONDBLCLK) return onEvent.Call(SM_MBUTTONDBLCLK, 0, 0);
+		case WM_MOUSEWHEEL:
+			/* Update pointer position in Input::Pointer.
+			 */
+			{
+				POINT	 point;
+
+				GetCursorPos(&point);
+
+				Input::Pointer::UpdatePosition(Window::GetWindow(hwnd), point.x, point.y);
+			}
+
+			return onEvent.Call(SM_MOUSEWHEEL, (short) HIWORD(wParam), 0);
 
 		/* Keyboard messages:
 		 */
@@ -663,7 +684,7 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::FindLeaderWindow()
 	{
 		WindowGDI	*backend = windowBackends.GetNth(i);
 
-		if (backend != this && backend->hwnd != NIL && !(backend->flags & WF_TOPMOST) && GetWindowThreadProcessId(hwnd, NIL) == GetWindowThreadProcessId(backend->hwnd, NIL)) return backend;
+		if (backend->id < id && backend->hwnd != NIL && !(backend->flags & WF_TOPMOST)) return backend;
 	}
 
 	return NIL;
@@ -838,7 +859,7 @@ S::Int S::GUI::WindowGDI::Restore()
 
 S::Int S::GUI::WindowGDI::Raise()
 {
-	SetActiveWindow(hwnd);
+	SetForegroundWindow(hwnd);
 	SetFocus(hwnd);
 
 	return Success();

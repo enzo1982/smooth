@@ -669,35 +669,6 @@ S::Int S::GUI::WindowCocoa::RequestClose()
 	return Success();
 }
 
-S::GUI::WindowCocoa *S::GUI::WindowCocoa::FindLeaderWindow()
-{
-	/* The leader window is the newest non topmost window.
-	 */
-	for (Int i = windowBackends.Length() - 1; i >= 0; i--)
-	{
-		WindowCocoa	*backend = windowBackends.GetNth(i);
-
-		if (backend != this && backend->wnd != NIL && !(backend->flags & WF_TOPMOST)) return backend;
-	}
-
-	return NIL;
-}
-
-S::Bool S::GUI::WindowCocoa::IsModalWindowActive()
-{
-	/* Look for modal windows opened after ourselves.
-	 */
-	for (Int i = windowBackends.Length() - 1; i >= 0; i--)
-	{
-		WindowCocoa	*backend = windowBackends.GetNth(i);
-
-		if	(backend == this)				   return False;
-		else if (backend->wnd != NIL && backend->flags & WF_MODAL) return True;
-	}
-
-	return False;
-}
-
 S::Int S::GUI::WindowCocoa::SetTitle(const String &nTitle)
 {
 	if (wnd == nil) return Error();

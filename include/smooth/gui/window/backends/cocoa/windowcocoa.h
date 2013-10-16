@@ -35,10 +35,6 @@ namespace smooth
 		{
 			private:
 				static Array<WindowCocoa *, Void *>	 windowBackends;
-
-				WindowCocoa				*FindLeaderWindow();
-
-				Bool					 IsModalWindowActive();
 			protected:
 				Int					 wid;
 

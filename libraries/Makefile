@@ -15,6 +15,7 @@ else ifeq ($(BUILD_QNX),True)
 	$(MAKE) -C libiconv
 	$(MAKE) -C libjpeg
 	$(MAKE) -C libpng
+	$(MAKE) -C libz
 else ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C bzlib
 	$(MAKE) -C libcpuid
@@ -45,6 +46,7 @@ else ifeq ($(BUILD_QNX),True)
 	$(MAKE) -C libiconv clean
 	$(MAKE) -C libjpeg clean
 	$(MAKE) -C libpng clean
+	$(MAKE) -C libz clean
 else ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C bzlib clean
 	$(MAKE) -C libcpuid clean

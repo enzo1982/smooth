@@ -118,8 +118,8 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 
 S::System::Endianness S::System::CPU::GetEndianness() const
 {
-	uint32_t	 value;
-	uint8_t		*buffer = (uint8_t *) &value;
+	UnsignedInt32	 value;
+	UnsignedInt8	*buffer = (UnsignedInt8 *) &value;
 
 	buffer[0] = 0x00;
 	buffer[1] = 0x01;

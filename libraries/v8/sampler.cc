@@ -71,6 +71,10 @@
 #include "simulator.h"
 #include "v8threads.h"
 
+#if defined(__QNX__)
+#define SA_RESTART 0
+#endif
+
 
 #if defined(__ANDROID__) && !defined(__BIONIC_HAVE_UCONTEXT_T)
 

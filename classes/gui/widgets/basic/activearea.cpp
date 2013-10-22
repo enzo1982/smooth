@@ -48,7 +48,7 @@ S::Int S::GUI::ActiveArea::Paint(Int message)
 				Surface	*surface = GetDrawSurface();
 				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
-				surface->Box(frame, areaColor, Rect::Filled);
+				surface->Box(frame + Point(1, 1) - Size(2, 2), areaColor, Rect::Filled);
 				surface->Frame(frame, FRAME_DOWN);
 			}
 

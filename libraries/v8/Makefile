@@ -37,6 +37,11 @@ ifeq ($(BUILD_HAIKU),True)
 	MYCCOPTS += -fpermissive -Wno-format
 endif
 
+ifeq ($(BUILD_ARM),True)
+#	Require ARMv5 for bkpt instruction.
+	MYCCOPTS += -march=armv5
+endif
+
 # Enter object files here:
 OBJECTS	    = accessors.o allocation.o api.o arguments.o assembler.o ast.o atomicops_internals_x86_gcc.o bignum.o bignum-dtoa.o bootstrapper.o builtins.o cached-powers.o checks.o circular-queue.o codegen.o code-stubs.o code-stubs-hydrogen.o compilation-cache.o compiler.o contexts.o conversions.o counters.o cpu-profiler.o data-flow.o date.o dateparser.o debug.o debug-agent.o deoptimizer.o disassembler.o diy-fp.o dtoa.o elements.o elements-kind.o execution.o experimental-libraries.o factory.o fast-dtoa.o fixed-dtoa.o flags.o frames.o full-codegen.o func-name-inferrer.o gdb-jit.o global-handles.o handles.o heap.o heap-profiler.o heap-snapshot-generator.o hydrogen.o hydrogen-environment-liveness.o hydrogen-gvn.o hydrogen-instructions.o ic.o incremental-marking.o interface.o interpreter-irregexp.o isolate.o jsregexp.o libraries.o lithium.o lithium-allocator.o liveedit.o log.o log-utils.o mark-compact.o marking-thread.o messages.o objects.o objects-printer.o objects-visiting.o once.o optimizing-compiler-thread.o parser.o preparse-data.o preparser.o profile-generator.o property.o regexp-macro-assembler.o regexp-macro-assembler-irregexp.o regexp-stack.o rewriter.o runtime.o runtime-profiler.o safepoint-table.o sampler.o scanner.o scanner-character-streams.o scopeinfo.o scopes.o serialize.o snapshot-common.o snapshot-empty.o spaces.o store-buffer.o string-search.o string-stream.o strtod.o stub-cache.o sweeper-thread.o token.o transitions.o type-info.o types.o typing.o unicode.o utils.o v8.o v8-counters.o v8conversions.o v8threads.o v8utils.o variables.o version.o zone.o
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -236,8 +236,6 @@ const Error &S::GUI::Dialogs::ColorSelection::ShowDialog()
 {
 	if (parentWindow != NIL) dlgwnd->SetMetrics(parentWindow->GetPosition() + Point(25, 25), Size(436, 286));
 	if (caption != NIL)	 dlgwnd->SetText(caption);
-
-	dlgwnd->Show();
 
 	ColorDlgUpdatePickers();
 
@@ -520,6 +518,8 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 	{
 		/* Update val/sat picker.
 		 */
+		surface->StartPaint(Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize)));
+
 		if ((lastval != -1) && (lastsat != -1))
 		{
 			for (int x = 0; x < hssize; x++)
@@ -550,6 +550,8 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 
 			surface->SetPixel(Point(xoffset + 1 + (int) (actval / (256.0 / hssize)), y + yoffset + 1), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
+
+		surface->EndPaint();
 
 		lastval = actval;
 		lastsat = actsat;

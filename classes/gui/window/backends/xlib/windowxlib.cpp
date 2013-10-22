@@ -297,18 +297,24 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 		/* Mouse events:
 		 */
 		case MotionNotify:
+			/* Update pointer position in Input::Pointer.
+			 */
 			Input::Pointer::UpdatePosition(Window::GetWindow((Void *) e->xmotion.window), e->xmotion.x_root, e->xmotion.y_root);
 
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
 			break;
 		case EnterNotify:
+			/* Update pointer position in Input::Pointer.
+			 */
 			Input::Pointer::UpdatePosition(Window::GetWindow((Void *) e->xcrossing.window), e->xcrossing.x_root, e->xcrossing.y_root);
 
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
 			break;
 		case LeaveNotify:
+			/* Update pointer position in Input::Pointer.
+			 */
 			Input::Pointer::UpdatePosition(NIL, e->xcrossing.x_root, e->xcrossing.y_root);
 
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
@@ -638,10 +644,10 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 		/* Create drawing surface.
 		 */
-		if ((flags & WF_THINBORDER) || (flags & WF_NORESIZE)) drawSurface = new Surface((Void *) wnd, size * fontSize);
+		if ((flags & WF_THINBORDER) || (flags & WF_NORESIZE)) drawSurface = new Surface((Void *) wnd, size * fontSize + sizeModifier);
 		else						      drawSurface = new Surface((Void *) wnd);
 
-		drawSurface->SetSize(size * fontSize);
+		drawSurface->SetSize(size * fontSize + sizeModifier);
 
 		/* Set window title.
 		 */
@@ -655,6 +661,11 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 			XChangeProperty(display, wnd, iconAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *) sysIcon, sysIconSize);
 		}
+
+		/* Adjust minimum and maximum size for current size modifier.
+		 */
+		if (minSize != Size(160, 24)) minSize = minSize + Size(6, 6) + sizeModifier;
+		if (maxSize != Size(0, 0))    maxSize = maxSize + Size(6, 6) + sizeModifier;
 
 		/* Set minimum and maximum size.
 		 */
@@ -752,7 +763,7 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::FindLeaderWindow()
 	{
 		WindowXLib	*backend = windowBackends.GetNth(i);
 
-		if (backend != this && backend->wnd != NIL && !(backend->flags & WF_TOPMOST)) return backend;
+		if (backend->id < id && backend->wnd != NIL && !(backend->flags & WF_TOPMOST)) return backend;
 	}
 
 	return NIL;
@@ -826,16 +837,24 @@ S::Int S::GUI::WindowXLib::SetIcon(const Bitmap &newIcon)
 	sysIcon[index++] = size.cx;
 	sysIcon[index++] = size.cy;
 
+	Color	 backgroundColor16 = ((Setup::BackgroundColor.GetBlue() >> 3) << 11) | ((Setup::BackgroundColor.GetGreen() >> 2) << 5) | (Setup::BackgroundColor.GetRed() >> 3);
+	Color	 backgroundColor24 = Setup::BackgroundColor;
+
+	XImage	*image = XGetImage(display, (Pixmap) newIcon.GetSystemBitmap(), 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+
 	for (Int y = 0; y < size.cy; y++)
 	{
 		for (Int x = 0; x < size.cx; x++)
 		{
-			Color	 pixel = newIcon.GetPixel(Point(x, y));
+			Long	 value = XGetPixel(image, x, y);
 
-			if (depth == 32) sysIcon[index++] =  pixel.GetAlpha()			      << 24 | Color(pixel.GetBlue(), pixel.GetGreen(), pixel.GetRed());
-			else		 sysIcon[index++] = (pixel == Color(192, 192, 192) ? 0 : 255) << 24 | Color(pixel.GetBlue(), pixel.GetGreen(), pixel.GetRed());
+			if	(depth == 16) sysIcon[index++] = (value == backgroundColor16 ? 0 : 255) << 24 | (((value >> 11) & 0x1F) << 19) | (((value >> 5) & 0x3F) << 10) | ((value & 0x1F) << 3);
+			else if (depth == 24) sysIcon[index++] = (value == backgroundColor24 ? 0 : 255) << 24 | value;
+			else if (depth == 32) sysIcon[index++] = 						value;
 		}
 	}
+
+	XDestroyImage(image);
 
 	return Success();
 }
@@ -846,6 +865,13 @@ S::Int S::GUI::WindowXLib::SetMinimumSize(const Size &nMinSize)
 
 	UpdateWMNormalHints();
 
+	if (wnd != NIL)
+	{
+		XResizeWindow(display, wnd, Math::Round(Math::Max(size.cx, minSize.cx) * fontSize),
+					    Math::Round(Math::Max(size.cy, minSize.cy) * fontSize));
+		XFlush(display);
+	}
+
 	return Success();
 }
 
@@ -854,6 +880,13 @@ S::Int S::GUI::WindowXLib::SetMaximumSize(const Size &nMaxSize)
 	maxSize = nMaxSize + sizeModifier;
 
 	UpdateWMNormalHints();
+
+	if (wnd != NIL)
+	{
+		XResizeWindow(display, wnd, Math::Round(Math::Min(size.cx, maxSize.cx) * fontSize),
+					    Math::Round(Math::Min(size.cy, maxSize.cy) * fontSize));
+		XFlush(display);
+	}
 
 	return Success();
 }
@@ -880,6 +913,8 @@ S::Int S::GUI::WindowXLib::Hide()
 
 S::Int S::GUI::WindowXLib::SetMetrics(const Point &nPos, const Size &nSize)
 {
+	if (wnd == NIL) return Success();
+
 	XMoveResizeWindow(display, wnd, nPos.x, nPos.y, Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy);
 	XFlush(display);
 

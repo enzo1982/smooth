@@ -24,6 +24,8 @@ S::GUI::Slider::Slider(const Point &iPos, const Size &iSize, Int sType, Int *var
 	endValue	= rangeEnd;
 
 	dummyVariable	= 0;
+	previousValue	= 0;
+
 	gripSize	= 9;
 
 	if (var == NIL)	variable = &dummyVariable;
@@ -67,12 +69,12 @@ S::GUI::Slider::~Slider()
 
 S::Int S::GUI::Slider::Paint(Int message)
 {
-	if (!IsRegistered()) return Error();
-	if (!IsVisible())    return Success();
+	if (!IsRegistered())	return Error();
+	if (!IsVisible())	return Success();
 
-	Surface	*surface      = GetDrawSurface();
-	Point	 realPos      = GetRealPosition();
-	Size	 realSize     = GetRealSize();
+	Surface	*surface  = GetDrawSurface();
+	Point	 realPos  = GetRealPosition();
+	Size	 realSize = GetRealSize();
 	Int	 realGripSize = Math::Round(gripSize * surface->GetSurfaceDPI() / 96.0);
 	Rect	 sliderRect;
 
@@ -107,8 +109,8 @@ S::Int S::GUI::Slider::SetRange(Int rangeStart, Int rangeEnd)
 	if (startValue == rangeStart &&
 	    endValue   == rangeEnd) return Success();
 
-	startValue = rangeStart;
-	endValue   = rangeEnd;
+	startValue	= rangeStart;
+	endValue	= rangeEnd;
 
 	*variable  = Math::Min(Math::Max(*variable, startValue), endValue);
 
@@ -121,11 +123,11 @@ S::Int S::GUI::Slider::SetRange(Int rangeStart, Int rangeEnd)
 
 S::Void S::GUI::Slider::SetValue(Int newValue)
 {
-	Int	 prevValue = *variable;
+	Int	 previousVariable = *variable;
 
 	*variable = Math::Min(Math::Max(newValue, startValue), endValue);
 
-	if (*variable != prevValue)
+	if (*variable != previousValue)
 	{
 		if (!dragging)
 		{
@@ -136,7 +138,9 @@ S::Void S::GUI::Slider::SetValue(Int newValue)
 			if (dragHotspot->GetPosition() != prevPosition) Paint(SP_PAINT);
 		}
 
-		onValueChange.Emit(*variable);
+		previousValue = *variable;
+
+		if (*variable != previousVariable) onValueChange.Emit(*variable);
 	}
 }
 

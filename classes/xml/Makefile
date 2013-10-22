@@ -10,7 +10,7 @@ ifneq ($(BUILD_WIN32),True)
 ifeq ($(BUILD_OSX),True)
 	MYCCOPTS += -I/usr/include/libxml2
 else ifeq ($(BUILD_HAIKU),True)
-	MYCCOPTS += -I/boot/common/include/libxml2
+	MYCCOPTS += -I/system/develop/headers/libxml2
 else ifneq ($(BUILD_QNX),True)
 	MYCCOPTS += $(shell pkg-config --cflags libxml-2.0)
 endif

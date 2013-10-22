@@ -7,7 +7,7 @@ include Makefile-directories
 
 OBJECTS = classes/*/*.o classes/*/*/*.o classes/*/*/*/*.o classes/*/*/*/*/*.o misc/*.o
 
-LIBS = -lfribidi -lbz2 -lxml2 -ljpeg -lz -lstdc++
+LIBS = -lfribidi -lbz2 -lxml2 -ljpeg -lstdc++
 
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += resources/*.o
@@ -33,11 +33,11 @@ else ifeq ($(BUILD_OSX),True)
 		LIBS += -lcairo
 	endif
 
-	LIBS += -lcpuid -lnsucd -liconv -lpng -lpthread -lX11 -lXmu
+	LIBS += -lcpuid -lnsucd -liconv -lpng -lz -lpthread -lX11 -lXmu
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_HAIKU),True)
-	LIBS += -lpng -lbe -ltracker
+	LIBS += -lpng -lz -lbe -ltracker
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_QNX),True)
@@ -157,8 +157,6 @@ else ifeq ($(BUILD_FREEBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
 	ldconfig
-else ifeq ($(BUILD_HAIKU),True)
-	ldconfig
 endif
 else
 	$(MKDIR) -p $(PREFIX)/$(LIB)
@@ -177,17 +175,17 @@ endif
 	$(COPY) $(BINDIR)/translator $(PREFIX)/bin
 	$(CHMOD) -R a=rX,u=rwX $(PREFIX)/bin/translator
 
-	$(MKDIR) -p $(PREFIX)/include
-	$(COPY) -r include/smooth $(PREFIX)/include
-	$(CHMOD) -R a=rX,u=rwX $(PREFIX)/include/smooth
+	$(MKDIR) -p $(PREFIX)/$(INCLUDE)
+	$(COPY) -r include/smooth $(PREFIX)/$(INCLUDE)
+	$(CHMOD) -R a=rX,u=rwX $(PREFIX)/$(INCLUDE)/smooth
 
 ifeq ($(BUILD_V8),True)
-	$(COPY) -r include/smooth-js $(PREFIX)/include
-	$(CHMOD) -R a=rX,u=rwX $(PREFIX)/include/smooth-js
+	$(COPY) -r include/smooth-js $(PREFIX)/$(INCLUDE)
+	$(CHMOD) -R a=rX,u=rwX $(PREFIX)/$(INCLUDE)/smooth-js
 endif
 
-	$(COPY) include/smooth.h $(PREFIX)/include
-	$(CHMOD) a=r,u=rw $(PREFIX)/include/smooth.h
+	$(COPY) include/smooth.h $(PREFIX)/$(INCLUDE)
+	$(CHMOD) a=r,u=rw $(PREFIX)/$(INCLUDE)/smooth.h
 endif
 
 uninstall:
@@ -209,8 +207,6 @@ else ifeq ($(BUILD_FREEBSD),True)
 	ldconfig
 else ifeq ($(BUILD_NETBSD),True)
 	ldconfig
-else ifeq ($(BUILD_HAIKU),True)
-	ldconfig
 endif
 else
 	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED)
@@ -224,13 +220,13 @@ endif
 
 	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/bin/translator
 
-	$(REMOVE) $(REMOVE_OPTS) -r $(PREFIX)/include/smooth
+	$(REMOVE) $(REMOVE_OPTS) -r $(PREFIX)/$(INCLUDE)/smooth
 
 ifeq ($(BUILD_V8),True)
-	$(REMOVE) $(REMOVE_OPTS) -r $(PREFIX)/include/smooth-js
+	$(REMOVE) $(REMOVE_OPTS) -r $(PREFIX)/$(INCLUDE)/smooth-js
 endif
 
-	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/include/smooth.h
+	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(INCLUDE)/smooth.h
 endif
 
 clean:

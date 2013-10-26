@@ -99,6 +99,17 @@ S::Int S::System::EventHaiku::ProcessNextEvent()
 
 			Message	*message = messages.GetFirst();
 
+			/* Process only the most recent B_MOUSE_MOVED message.
+			 */
+			while (messages.Length() > 1 && message->messageID == B_MOUSE_MOVED && messages.GetNth(1)->messageID == B_MOUSE_MOVED)
+			{
+				delete message;
+
+				messages.RemoveNth(0);
+
+				message = messages.GetFirst();
+			}
+
 			/* Find window and process message.
 			 */
 			GUI::WindowHaiku	*window = GUI::WindowHaiku::GetWindowBackend((BWindow *) message->window);

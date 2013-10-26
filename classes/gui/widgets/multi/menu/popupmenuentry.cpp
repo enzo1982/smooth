@@ -20,6 +20,7 @@
 #include <smooth/misc/binary.h>
 #include <smooth/system/timer.h>
 #include <smooth/system/screen.h>
+#include <smooth/system/system.h>
 
 const S::Short	 S::GUI::PopupMenuEntry::classID = S::Object::RequestClassID();
 
@@ -30,6 +31,8 @@ S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitma
 	hotspot		= NIL;
 	owner		= NIL;
 	timer		= NIL;
+
+	popupMenuClosed = 0;
 
 	shortcutOffset	= 0;
 
@@ -238,6 +241,8 @@ S::Void S::GUI::PopupMenuEntry::OnMouseOut()
 
 S::Void S::GUI::PopupMenuEntry::OnClickEntry()
 {
+	if (popup != NIL) return;
+
 	EnterProtectedRegion();
 
 	owner->SetClosedByClick(True);
@@ -256,6 +261,8 @@ S::Void S::GUI::PopupMenuEntry::OnChangeSize(const Size &nSize)
 S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 {
 	if (popup == NIL) return;
+
+	if (S::System::System::Clock() - popupMenuClosed < 100) return;
 
 	Widget	*window		= container->GetContainerWindow();
 	Surface	*surface	= GetDrawSurface();
@@ -293,29 +300,28 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 
 S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 {
-	if (popup == NIL) return;
+	if (popup == NIL || popup->GetContainer() != this) return;
 
-	if (popup->GetContainer() == this)
+	owner->SetFlags(owner->GetFlags() & ~MB_POPUPOPEN);
+
+	popup->internalRequestClose.Disconnect(&PopupMenuEntry::ClosePopupMenu, this);
+
+	Remove(popup);
+
+	hotspot->Activate();
+
+	if (popup->IsClosedByClick())
 	{
-		owner->SetFlags(owner->GetFlags() & ~MB_POPUPOPEN);
-
-		popup->internalRequestClose.Disconnect(&PopupMenuEntry::ClosePopupMenu, this);
-
-		Remove(popup);
-
-		hotspot->Activate();
-
-		if (popup->IsClosedByClick())
-		{
-			owner->SetClosedByClick(True);
-			owner->internalRequestClose.Emit();
-		}
-		else
-		{
-			if (!container->GetContainerWindow()->IsMouseOn(Rect(Point(), container->GetRealSize()))) owner->internalRequestClose.Emit();
-			else											  container->GetContainerWindow()->Raise();
-		}
+		owner->SetClosedByClick(True);
+		owner->internalRequestClose.Emit();
 	}
+	else
+	{
+		if (!container->GetContainerWindow()->IsMouseOn(Rect(Point(), container->GetRealSize()))) owner->internalRequestClose.Emit();
+		else											  container->GetContainerWindow()->Raise();
+	}
+
+	popupMenuClosed = S::System::System::Clock();
 }
 
 S::Bool S::GUI::PopupMenuEntry::IsTypeCompatible(Short compType) const

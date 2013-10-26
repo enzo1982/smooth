@@ -16,6 +16,7 @@
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/binary.h>
+#include <smooth/system/system.h>
 
 const S::Short	 S::GUI::MenubarEntry::classID = S::Object::RequestClassID();
 
@@ -27,8 +28,8 @@ S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, P
 	else if (text != NIL && bitmap == NIL) SetSize(Size(unscaledTextSize.cx + 7, 16));
 	else if (text == NIL && bitmap != NIL) SetSize(bitmap.GetSize() + Size(4 + (popup != NIL ? 12 : 0), 4));
 
-	hotspot = NIL;
-	actionHotspot = NIL;
+	hotspot		= NIL;
+	actionHotspot	= NIL;
 
 	if (text != NIL || bitmap != NIL)
 	{
@@ -42,6 +43,8 @@ S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, P
 		Add(hotspot);
 		Add(actionHotspot);
 	}
+
+	popupMenuClosed	= 0;
 }
 
 S::GUI::MenubarEntry::~MenubarEntry()
@@ -60,11 +63,11 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 	Size	 realSize = GetRealSize();
 	Rect	 bmpRect  = Rect(realPos + Point(2, 2) * surface->GetSurfaceDPI() / 96.0, bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0);
 
-	surface->StartPaint(Rect(realPos, realSize));
-
 	switch (message)
 	{
 		case SP_PAINT:
+			surface->StartPaint(Rect(realPos, realSize));
+
 			if (text == NIL && bitmap == NIL)
 			{
 				if (orientation == OR_LEFT || orientation == OR_RIGHT)
@@ -128,6 +131,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 				}
 			}
 
+			surface->EndPaint();
+
 			break;
 		case SP_MOUSEIN:
 		case SP_MOUSEUP:
@@ -135,6 +140,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 			if (bitmap != NIL)
 			{
+				surface->StartPaint(Rect(realPos, realSize));
 				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 
 				if (onAction.GetNOfConnectedSlots() > 0 && popup != NIL)
@@ -144,6 +150,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 					surface->Bar(p1, p2, OR_VERT);
 				}
+
+				surface->EndPaint();
 			}
 
 			break;
@@ -152,8 +160,10 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 			if (bitmap != NIL)
 			{
-				if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
-				else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmpRect);
+				surface->StartPaint(Rect(realPos, realSize));
+
+				if (flags & MB_COLOR) surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+				else		      surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmpRect);
 
 				if (onAction.GetNOfConnectedSlots() > 0 && popup != NIL)
 				{
@@ -167,12 +177,12 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 
 					surface->Line(p1, p2, Setup::BackgroundColor);
 				}
+
+				surface->EndPaint();
 			}
 
 			break;
 	}
-
-	surface->EndPaint();
 
 	return Success();
 }
@@ -190,6 +200,13 @@ S::Void S::GUI::MenubarEntry::OnMouseOver()
 S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 {
 	if (popup == NIL) return;
+
+	if (S::System::System::Clock() - popupMenuClosed < 100)
+	{
+		hotspot->Paint(SP_MOUSEUP);
+
+		return;
+	}
 
 	Window	*window	    = container->GetContainerWindow();
 	Surface	*surface    = GetDrawSurface();
@@ -213,25 +230,27 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 
 S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 {
-	if (popup == NIL) return;
+	if (popup == NIL || popup->GetContainer() != this) return;
 
-	if (popup->GetContainer() == this)
-	{
-		container->SetFlags(container->GetFlags() & ~MB_POPUPOPEN);
+	container->SetFlags(container->GetFlags() & ~MB_POPUPOPEN);
 
-		Remove(popup);
+	Remove(popup);
 
-		popup->internalRequestClose.Disconnect(&MenubarEntry::ClosePopupMenu, this);
+	popup->internalRequestClose.Disconnect(&MenubarEntry::ClosePopupMenu, this);
 
-		Window	*window	= container->GetContainerWindow();
-		Rect	 frame	= Rect(GetRealPosition(), GetRealSize());
+	Window	*window	 = container->GetContainerWindow();
+	Surface	*surface = GetDrawSurface();
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
-		if (!window->IsMouseOn(frame)) Paint(SP_MOUSEOUT);
+	surface->StartPaint(frame);
 
-		hotspot->Activate();
+	if (!window->IsMouseOn(frame)) Paint(SP_MOUSEOUT);
 
-		Process(SM_MOUSEMOVE, 0, 0);
-	}
+	hotspot->Activate();
+
+	surface->EndPaint();
+
+	popupMenuClosed = S::System::System::Clock();
 }
 
 S::Bool S::GUI::MenubarEntry::IsTypeCompatible(Short compType) const

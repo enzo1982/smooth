@@ -15,6 +15,7 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/system/screen.h>
+#include <smooth/system/system.h>
 
 const S::Short	 S::GUI::ComboBox::classID = S::Object::RequestClassID();
 
@@ -24,6 +25,8 @@ S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 
 	listBox		  = NIL;
 	toolWindow	  = NIL;
+
+	listBoxClosed	  = 0;
 
 	prevSelectedEntry = NIL;
 
@@ -138,10 +141,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 S::Void S::GUI::ComboBox::OnSelectEntry(ListEntry *entry)
 {
-	if (listBox != NIL)
-	{
-		CloseListBox();
-	}
+	if (listBox != NIL) CloseListBox();
 
 	if (prevSelectedEntry != entry)
 	{
@@ -155,91 +155,87 @@ S::Void S::GUI::ComboBox::OnSelectEntry(ListEntry *entry)
 
 S::Void S::GUI::ComboBox::OpenListBox()
 {
-	if (listBox == NIL)
+	if (listBox != NIL) return;
+
+	Window	*window	     = container->GetContainerWindow();
+	Surface	*surface     = GetDrawSurface();
+
+	if (S::System::System::Clock() - listBoxClosed < 100)
 	{
-		Widget	*window	     = container->GetContainerWindow();
- 		Surface	*surface     = GetDrawSurface();
+		if (window->IsMouseOn(Rect(buttonHotspot->GetRealPosition(), buttonHotspot->GetRealSize()))) buttonHotspot->Paint(SP_MOUSEUP);
 
-		Rect	 monitor     = System::Screen::GetActiveScreenMetrics();
-		Size	 listBoxSize = Size(GetWidth(), 16 * Math::Min(Length(), Math::Max(5, Math::Min(16, Length() / 3))) + 4);
-		Point	 listBoxPos  = Point(GetRealPosition() + Point(0, GetRealSize().cy));
-
-		if (window->GetY() + listBoxPos.y + listBoxSize.cy >= monitor.GetHeight()) listBoxPos = Point(GetRealPosition() - Point(0, Math::Round(listBoxSize.cy * surface->GetSurfaceDPI() / 96.0)));
-
-		listBox	   = new ListBox(Point(), listBoxSize);
-		listBox->onSelectEntry.Connect(&onSelectEntry);
-
-		toolWindow = new ToolWindow(listBoxPos, listBoxSize);
-
-		listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
-		listBox->AddTab(NIL, 32768);
-
-		prevSelectedEntry = GetSelectedEntry();
-
-		for (Int i = 0; i < GetNOfObjects(); i++)
-		{
-			if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
-
-			ListEntry	*entry = (ListEntry *) GetNthObject(i);
-
-			entry->SetRegisteredFlag(False);
-
-			listBox->Add(entry);
-
-			entry->Activate();
-		}
-
-		toolWindow->Add(listBox);
-
-		Add(toolWindow);
-
-		hotspot->onLeftButtonDown.Disconnect(&ComboBox::OpenListBox, this);
-		hotspot->onLeftButtonDown.Connect(&ComboBox::CloseListBox, this);
-
-		buttonHotspot->onLeftButtonDown.Disconnect(&ComboBox::OpenListBox, this);
-		buttonHotspot->onLeftButtonDown.Connect(&ComboBox::CloseListBox, this);
+		return;
 	}
+
+	Rect	 monitor     = System::Screen::GetActiveScreenMetrics();
+	Size	 listBoxSize = Size(GetWidth(), 16 * Math::Min(Length(), Math::Max(5, Math::Min(16, Length() / 3))) + 4);
+	Point	 listBoxPos  = Point(GetRealPosition() + Point(0, GetRealSize().cy));
+
+	if (window->GetY() + listBoxPos.y + listBoxSize.cy >= monitor.GetHeight()) listBoxPos = Point(GetRealPosition() - Point(0, Math::Round(listBoxSize.cy * surface->GetSurfaceDPI() / 96.0)));
+
+	listBox	   = new ListBox(Point(), listBoxSize);
+	listBox->onSelectEntry.Connect(&onSelectEntry);
+
+	toolWindow = new ToolWindow(listBoxPos, listBoxSize);
+	toolWindow->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
+
+	listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
+	listBox->AddTab(NIL, 32768);
+
+	prevSelectedEntry = GetSelectedEntry();
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
+
+		ListEntry	*entry = (ListEntry *) GetNthObject(i);
+
+		entry->SetRegisteredFlag(False);
+
+		listBox->Add(entry);
+
+		entry->Activate();
+	}
+
+	toolWindow->Add(listBox);
+
+	Add(toolWindow);
 }
 
 S::Void S::GUI::ComboBox::CloseListBox()
 {
-	if (listBox != NIL)
+	if (listBox == NIL) return;
+
+	listBox->RemoveAllEntries();
+
+	for (Int i = 0; i < GetNOfObjects(); i++)
 	{
-		hotspot->onLeftButtonDown.Disconnect(&ComboBox::CloseListBox, this);
-		hotspot->onLeftButtonDown.Connect(&ComboBox::OpenListBox, this);
+		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
 
-		buttonHotspot->onLeftButtonDown.Disconnect(&ComboBox::CloseListBox, this);
-		buttonHotspot->onLeftButtonDown.Connect(&ComboBox::OpenListBox, this);
+		ListEntry	*entry = (ListEntry *) GetNthObject(i);
 
-		listBox->RemoveAllEntries();
+		entry->Hide();
+		entry->Deactivate();
 
-		for (Int i = 0; i < GetNOfObjects(); i++)
-		{
-			if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
-
-			ListEntry	*entry = (ListEntry *) GetNthObject(i);
-
-			entry->Hide();
-			entry->Deactivate();
-
-			entry->SetRegisteredFlag(True);
-			entry->SetContainer(this);
-		}
-
-		toolWindow->Remove(listBox);
-
-		DeleteObject(listBox);
-
-		listBox	   = NIL;
-
-		toolWindow->Close();
-
-		Remove(toolWindow);
-
-		DeleteObject(toolWindow);
-
-		toolWindow = NIL;
+		entry->SetRegisteredFlag(True);
+		entry->SetContainer(this);
 	}
+
+	toolWindow->Remove(listBox);
+
+	DeleteObject(listBox);
+
+	listBox	   = NIL;
+
+	toolWindow->Close();
+
+	Remove(toolWindow);
+
+	DeleteObject(toolWindow);
+
+	toolWindow = NIL;
+
+	listBoxClosed = S::System::System::Clock();
 }
 
 S::Void S::GUI::ComboBox::OnChangeSize(const Size &nSize)

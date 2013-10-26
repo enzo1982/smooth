@@ -460,14 +460,15 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 	Window	*window	= container->GetContainerWindow();
 
-	if (window == NIL) return Success();
+	if (window == NIL)   return Success();
 
 	foreach (Widget *widget, widgets)
 	{
 		if (widget->Process(message, wParam, lParam) == Break) return Break;
 	}
 
-	if (!IsActive()) return Success();
+	if (!IsVisible())    return Success();
+	if (!IsActive())     return Success();
 
 	EnterProtectedRegion();
 

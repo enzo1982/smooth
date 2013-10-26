@@ -79,19 +79,11 @@ S::Int S::GUI::Application::Loop()
 		}
 	}
 
-#ifdef __WIN32__
-	if (GUI::Window::nOfActiveWindows == 0) PostQuitMessage(0);
-#endif
-
 	System::EventProcessor	*event = new System::EventProcessor();
-	Bool			 quit = False;
 
-	while (!quit)
+	while (GUI::Window::nOfActiveWindows > 0)
 	{
-		Int	 result = event->ProcessNextEvent();
-
-		if (result == Break)			quit = True;
-		if (GUI::Window::nOfActiveWindows == 0)	quit = True;
+		if (event->ProcessNextEvent() == Break) break;
 	}
 
 	delete event;

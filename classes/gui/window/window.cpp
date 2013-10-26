@@ -27,7 +27,7 @@
 #include <smooth/resources.h>
 
 #ifdef __WIN32__
-#	include <smooth/backends/win32/backendwin32.h>
+#	include <windows.h>
 
 #	undef GetObject
 #endif
@@ -431,16 +431,9 @@ S::Int S::GUI::Window::Stay()
 
 	System::EventProcessor	*event = new System::EventProcessor();
 
-	while (!destroyed)
-	{
-		event->ProcessNextEvent();
-	}
+	while (!destroyed) event->ProcessNextEvent();
 
 	delete event;
-
-#ifdef __WIN32__
-	if (nOfActiveWindows == 0 && !initializing) PostQuitMessage(0);
-#endif
 
 	return Success();
 }
@@ -468,16 +461,7 @@ S::Void S::GUI::Window::OnDestroy()
 	destroyed = True;
 	visible	  = False;
 
-	if (nOfActiveWindows == 0 && loopActive)
-	{
-#ifdef __WIN32__
-		PostQuitMessage(0);
-#endif
-	}
-	else
-	{
-		if (GetObjectType() != ToolWindow::classID) nOfActiveWindows--;
-	}
+	if (GetObjectType() != ToolWindow::classID) nOfActiveWindows--;
 }
 
 S::Void S::GUI::Window::OnMinimize()

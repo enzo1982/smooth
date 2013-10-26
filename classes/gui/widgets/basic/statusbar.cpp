@@ -38,7 +38,7 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
-				surface->SetText(text, frame + Point(4, 1) - Size(8, 2), font);
+				surface->SetText(text, frame + Point(4, 1) * surface->GetSurfaceDPI() / 96.0 - Size(8, 2) * surface->GetSurfaceDPI() / 96.0, font);
 			}
 
 			break;
@@ -57,13 +57,13 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 
 		if (object->GetOrientation() == OR_UPPERRIGHT)
 		{
-			object->SetPosition(Point(occupied_right + object->GetWidth(), (GetHeight() - object->GetHeight()) / 2 + 1));
+			object->SetPosition(Point(occupied_right + object->GetWidth(), (GetHeight() - object->GetHeight()) / 2));
 
 			occupied_right += object->GetWidth() + 5;
 		}
 		else if (object->GetOrientation() == OR_UPPERLEFT)
 		{
-			object->SetPosition(Point(occupied_left, (GetHeight() - object->GetHeight()) / 2 + 1));
+			object->SetPosition(Point(occupied_left, (GetHeight() - object->GetHeight()) / 2));
 
 			occupied_left += object->GetWidth() + 5;
 		}

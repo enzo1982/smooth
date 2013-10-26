@@ -419,7 +419,7 @@ S::Int S::GUI::WindowHaiku::Open(const String &title, const Point &pos, const Si
 	if (flags & WF_TOPMOST)		windowFeel  = B_FLOATING_ALL_WINDOW_FEEL;
 	if (flags & WF_MODAL)		windowFeel  = B_MODAL_APP_WINDOW_FEEL;
 
-	wnd = new HaikuWindow(BRect(pos.x, pos.y, pos.x + size.cx - 1, pos.y + size.cy - 1), title, windowLook, windowFeel, windowFlags);
+	wnd = new HaikuWindow(BRect(pos.x, pos.y, pos.x + Math::Round(size.cx * fontSize) + sizeModifier.cx, pos.y + Math::Round(size.cy * fontSize) + sizeModifier.cy), title, windowLook, windowFeel, windowFlags);
 
 	if (wnd != NIL)
 	{
@@ -438,7 +438,7 @@ S::Int S::GUI::WindowHaiku::Open(const String &title, const Point &pos, const Si
 
 		/* Set minimum and maximum size.
 		 */
-		if (!(flags & WF_NORESIZE || flags & WF_THINBORDER)) wnd->SetSizeLimits(minSize.cx, maxSize.cx, minSize.cy, maxSize.cy);
+		if (!(flags & WF_NORESIZE || flags & WF_THINBORDER)) wnd->SetSizeLimits(Math::Round(minSize.cx * fontSize) + sizeModifier.cx, Math::Round(maxSize.cx * fontSize) + sizeModifier.cx, Math::Round(minSize.cy * fontSize) + sizeModifier.cy, Math::Round(maxSize.cy * fontSize) + sizeModifier.cy);
 
 		return Success();
 	}
@@ -493,34 +493,34 @@ S::Int S::GUI::WindowHaiku::SetTitle(const String &nTitle)
 
 S::Int S::GUI::WindowHaiku::SetMinimumSize(const Size &nMinSize)
 {
-	minSize = nMinSize + sizeModifier;
+	minSize = nMinSize;
 
 	if (wnd == NIL) return Success();
 
-	wnd->SetSizeLimits(minSize.cx, maxSize.cx, minSize.cy, maxSize.cy);
+	wnd->SetSizeLimits(Math::Round(minSize.cx * fontSize) + sizeModifier.cx, Math::Round(maxSize.cx * fontSize) + sizeModifier.cx, Math::Round(minSize.cy * fontSize) + sizeModifier.cy, Math::Round(maxSize.cy * fontSize) + sizeModifier.cy);
 
 	BRect	 windowRect = wnd->Frame();
 
 	SetMetrics(Point(windowRect.left, windowRect.top),
-		   Size(Math::Max((Int) Math::Round((windowRect.right  - windowRect.left) / fontSize), minSize.cx),
-			Math::Max((Int) Math::Round((windowRect.bottom - windowRect.top)  / fontSize), minSize.cy)) - sizeModifier);
+		   Size(Math::Max((Int) Math::Round((windowRect.right  - windowRect.left - sizeModifier.cx) / fontSize), minSize.cx),
+			Math::Max((Int) Math::Round((windowRect.bottom - windowRect.top  - sizeModifier.cy) / fontSize), minSize.cy)));
 
 	return Success();
 }
 
 S::Int S::GUI::WindowHaiku::SetMaximumSize(const Size &nMaxSize)
 {
-	maxSize = nMaxSize + sizeModifier;
+	maxSize = nMaxSize;
 
 	if (wnd == NIL) return Success();
 
-	wnd->SetSizeLimits(minSize.cx, maxSize.cx, minSize.cy, maxSize.cy);
+	wnd->SetSizeLimits(Math::Round(minSize.cx * fontSize) + sizeModifier.cx, Math::Round(maxSize.cx * fontSize) + sizeModifier.cx, Math::Round(minSize.cy * fontSize) + sizeModifier.cy, Math::Round(maxSize.cy * fontSize) + sizeModifier.cy);
 
 	BRect	 windowRect = wnd->Frame();
 
 	SetMetrics(Point(windowRect.left, windowRect.top),
-		   Size(Math::Min((Int) Math::Round((windowRect.right  - windowRect.left) / fontSize), maxSize.cx),
-			Math::Min((Int) Math::Round((windowRect.bottom - windowRect.top)  / fontSize), maxSize.cy)) - sizeModifier);
+		   Size(Math::Min((Int) Math::Round((windowRect.right  - windowRect.left - sizeModifier.cx) / fontSize), maxSize.cx),
+			Math::Min((Int) Math::Round((windowRect.bottom - windowRect.top  - sizeModifier.cy) / fontSize), maxSize.cy)));
 
 	return Success();
 }
@@ -546,7 +546,7 @@ S::Int S::GUI::WindowHaiku::Hide()
 S::Int S::GUI::WindowHaiku::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	wnd->MoveTo(nPos.x, nPos.y);
-	wnd->ResizeTo(Math::Round(nSize.cx * fontSize) + sizeModifier.cx - 1, Math::Round(nSize.cy * fontSize) + sizeModifier.cy - 1);
+	wnd->ResizeTo(Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy);
 
 	return Success();
 }

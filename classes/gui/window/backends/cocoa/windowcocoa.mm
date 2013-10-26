@@ -604,11 +604,6 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 		 */
 		[wnd setTitle: [NSString stringWithUTF8String: title.ConvertTo("UTF-8")]];
 
-		/* Adjust minimum and maximum size for current size modifier.
-		 */
-		if (minSize != Size(160, 24))	   minSize = minSize + Size(6, 6) + sizeModifier;
-		if (maxSize != Size(32768, 32768)) maxSize = maxSize + Size(6, 6) + sizeModifier;
-
 		/* Set metrics to actually allocated window.
 		 */
 		NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
@@ -680,17 +675,17 @@ S::Int S::GUI::WindowCocoa::SetTitle(const String &nTitle)
 
 S::Int S::GUI::WindowCocoa::SetMinimumSize(const Size &nMinSize)
 {
-	minSize = nMinSize + sizeModifier;
+	minSize = nMinSize;
 
 	if (wnd == nil) return Success();
 
-	[wnd setContentMinSize: NSMakeSize(minSize.cx, minSize.cy)];
+	[wnd setContentMinSize: NSMakeSize(Math::Round(minSize.cx * fontSize) + sizeModifier.cx, Math::Round(minSize.cy * fontSize) + sizeModifier.cy)];
 
 	NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
 
-	if (contentRect.size.width < minSize.cx || contentRect.size.height < minSize.cy)
+	if (contentRect.size.width  < Math::Round(minSize.cx * fontSize) + sizeModifier.cx || contentRect.size.height < Math::Round(minSize.cy * fontSize) + sizeModifier.cy)
 	{
-		[wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(contentRect.origin.x, contentRect.origin.y + contentRect.size.height - Math::Max((Int) contentRect.size.height, minSize.cy), Math::Max((Int) contentRect.size.width, minSize.cx), Math::Max((Int) contentRect.size.height, minSize.cy))]
+		[wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(contentRect.origin.x, contentRect.origin.y + contentRect.size.height - Math::Max((Int) contentRect.size.height, (Int) Math::Round(minSize.cy * fontSize) + sizeModifier.cy), Math::Max((Int) contentRect.size.width, (Int) Math::Round(minSize.cx * fontSize) + sizeModifier.cx), Math::Max((Int) contentRect.size.height, (Int) Math::Round(minSize.cy * fontSize) + sizeModifier.cy))]
 		      display: YES];
 	}
 
@@ -699,17 +694,17 @@ S::Int S::GUI::WindowCocoa::SetMinimumSize(const Size &nMinSize)
 
 S::Int S::GUI::WindowCocoa::SetMaximumSize(const Size &nMaxSize)
 {
-	maxSize = nMaxSize + sizeModifier;
+	maxSize = nMaxSize;
 
 	if (wnd == nil) return Success();
 
-	[wnd setContentMaxSize: NSMakeSize(maxSize.cx, maxSize.cy)];
+	[wnd setContentMaxSize: NSMakeSize(Math::Round(maxSize.cx * fontSize) + sizeModifier.cx, Math::Round(maxSize.cy * fontSize) + sizeModifier.cy)];
 
 	NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
 
-	if (contentRect.size.width > maxSize.cx || contentRect.size.height > maxSize.cy)
+	if (contentRect.size.width  > Math::Round(maxSize.cx * fontSize) + sizeModifier.cx || contentRect.size.height > Math::Round(maxSize.cy * fontSize) + sizeModifier.cy)
 	{
-		[wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(contentRect.origin.x, contentRect.origin.y + contentRect.size.height - Math::Min((Int) contentRect.size.height, maxSize.cy), Math::Min((Int) contentRect.size.width, maxSize.cx), Math::Min((Int) contentRect.size.height, maxSize.cy))]
+		[wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(contentRect.origin.x, contentRect.origin.y + contentRect.size.height - Math::Min((Int) contentRect.size.height, (Int) Math::Round(maxSize.cy * fontSize) + sizeModifier.cy), Math::Min((Int) contentRect.size.width, (Int) Math::Round(maxSize.cx * fontSize) + sizeModifier.cx), Math::Min((Int) contentRect.size.height, (Int) Math::Round(maxSize.cy * fontSize) + sizeModifier.cy))]
 		      display: YES];
 	}
 
@@ -729,8 +724,8 @@ S::Int S::GUI::WindowCocoa::Show()
 	 */
 	if (!(flags & WF_THINBORDER))
 	{
-		SetMinimumSize(minSize - sizeModifier);
-		SetMaximumSize(maxSize - sizeModifier);
+		SetMinimumSize(minSize);
+		SetMaximumSize(maxSize);
 	}
 
 	/* Update window metrics.

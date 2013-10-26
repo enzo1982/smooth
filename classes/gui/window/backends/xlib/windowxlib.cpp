@@ -77,14 +77,14 @@ S::Void S::GUI::WindowXLib::UpdateWMNormalHints()
 	normal.x	   = pos.x;
 	normal.y	   = pos.y;
 
-	normal.width	   = size.cx * fontSize;
-	normal.height	   = size.cy * fontSize;
+	normal.width	   = Math::Round(size.cx * fontSize) + sizeModifier.cx;
+	normal.height	   = Math::Round(size.cy * fontSize) + sizeModifier.cy;
 
-	normal.min_width   = minSize.cx * fontSize;
-	normal.min_height  = minSize.cy * fontSize;
+	normal.min_width   = Math::Round(minSize.cx * fontSize) + sizeModifier.cx;
+	normal.min_height  = Math::Round(minSize.cy * fontSize) + sizeModifier.cy;
 
-	normal.max_width   = maxSize.cx * fontSize;
-	normal.max_height  = maxSize.cy * fontSize;
+	normal.max_width   = Math::Round(maxSize.cx * fontSize) + sizeModifier.cx;
+	normal.max_height  = Math::Round(maxSize.cy * fontSize) + sizeModifier.cy;
 
 	XSetWMNormalHints(display, wnd, &normal);
 }
@@ -220,13 +220,13 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				/* Set metrics and emit window metrics event.
 				 */
-				pos  = Point(attributes.x, attributes.y);
-				size = Size(attributes.width, attributes.height) / fontSize;
+				pos  =  Point(attributes.x, attributes.y);
+				size = (Size(attributes.width, attributes.height) - sizeModifier) / fontSize;
 
 				if (drawSurface != NIL) drawSurface->SetSize(Size(attributes.width, attributes.height));
 
 				onEvent.Call(SM_WINDOWMETRICS, ((	     attributes.x		  + 32768) << 16) | (		 attributes.y		       + 32768),
-							       ((Math::Floor(attributes.width / fontSize) + 32768) << 16) | (Math::Floor(attributes.height / fontSize) + 32768));
+							       ((Math::Round(attributes.width / fontSize) + 32768) << 16) | (Math::Round(attributes.height / fontSize) + 32768));
 			}
 
 			onEvent.Call(SM_GETFOCUS, 0, 0);
@@ -514,13 +514,13 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				/* Set metrics and emit window metrics event.
 				 */
-				pos  = Point(e->xconfigure.x, e->xconfigure.y);
-				size = Size(e->xconfigure.width, e->xconfigure.height) / fontSize;
+				pos  =  Point(e->xconfigure.x, e->xconfigure.y);
+				size = (Size(e->xconfigure.width, e->xconfigure.height) - sizeModifier) / fontSize;
 
 				if (drawSurface != NIL) drawSurface->SetSize(Size(e->xconfigure.width, e->xconfigure.height));
 
 				onEvent.Call(SM_WINDOWMETRICS, ((	     e->xconfigure.x		     + 32768) << 16) | (	    e->xconfigure.y		     + 32768),
-							       ((Math::Floor(e->xconfigure.width / fontSize) + 32768) << 16) | (Math::Floor(e->xconfigure.height / fontSize) + 32768));
+							       ((Math::Round(e->xconfigure.width / fontSize) + 32768) << 16) | (Math::Round(e->xconfigure.height / fontSize) + 32768));
 
 				/* Update window rect and emit paint event if necessary.
 				 */
@@ -662,17 +662,12 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 			XChangeProperty(display, wnd, iconAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *) sysIcon, sysIconSize);
 		}
 
-		/* Adjust minimum and maximum size for current size modifier.
-		 */
-		if (minSize != Size(160, 24)) minSize = minSize + Size(6, 6) + sizeModifier;
-		if (maxSize != Size(0, 0))    maxSize = maxSize + Size(6, 6) + sizeModifier;
-
 		/* Set minimum and maximum size.
 		 */
 		if (flags & WF_NORESIZE)
 		{
-			minSize = size * fontSize + sizeModifier;
-			maxSize = size * fontSize + sizeModifier;
+			minSize = size;
+			maxSize = size;
 		}
 
 		UpdateWMNormalHints();
@@ -861,14 +856,14 @@ S::Int S::GUI::WindowXLib::SetIcon(const Bitmap &newIcon)
 
 S::Int S::GUI::WindowXLib::SetMinimumSize(const Size &nMinSize)
 {
-	minSize = nMinSize + sizeModifier;
+	minSize = nMinSize;
 
 	UpdateWMNormalHints();
 
 	if (wnd != NIL)
 	{
-		XResizeWindow(display, wnd, Math::Round(Math::Max(size.cx, minSize.cx) * fontSize),
-					    Math::Round(Math::Max(size.cy, minSize.cy) * fontSize));
+		XResizeWindow(display, wnd, Math::Round(Math::Max(size.cx, minSize.cx) * fontSize) + sizeModifier.cx,
+					    Math::Round(Math::Max(size.cy, minSize.cy) * fontSize) + sizeModifier.cy);
 		XFlush(display);
 	}
 
@@ -877,14 +872,14 @@ S::Int S::GUI::WindowXLib::SetMinimumSize(const Size &nMinSize)
 
 S::Int S::GUI::WindowXLib::SetMaximumSize(const Size &nMaxSize)
 {
-	maxSize = nMaxSize + sizeModifier;
+	maxSize = nMaxSize;
 
 	UpdateWMNormalHints();
 
 	if (wnd != NIL)
 	{
-		XResizeWindow(display, wnd, Math::Round(Math::Min(size.cx, maxSize.cx) * fontSize),
-					    Math::Round(Math::Min(size.cy, maxSize.cy) * fontSize));
+		XResizeWindow(display, wnd, Math::Round(Math::Min(size.cx, maxSize.cx) * fontSize) + sizeModifier.cx,
+					    Math::Round(Math::Min(size.cy, maxSize.cy) * fontSize) + sizeModifier.cy);
 		XFlush(display);
 	}
 

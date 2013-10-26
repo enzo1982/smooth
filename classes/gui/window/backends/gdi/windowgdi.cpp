@@ -262,8 +262,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				if (windowStyle & WS_DLGFRAME)
 				{
-					POINT	 maxSize     = { (LONG) Math::Round((windowRect.right  - windowRect.left) * fontSize),
-								 (LONG) Math::Round((windowRect.bottom - windowRect.top)  * fontSize) };
+					POINT	 maxSize     = { windowRect.right - windowRect.left, windowRect.bottom - windowRect.top };
 					POINT	 maxPosition = { windowRect.left, windowRect.top };
 
 					minMaxInfo->ptMaxSize	  = maxSize;
@@ -271,11 +270,11 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 				}
 				else
 				{
-					minMaxInfo->ptMinTrackSize.x = minSize.cx * fontSize;
-					minMaxInfo->ptMinTrackSize.y = minSize.cy * fontSize;
+					minMaxInfo->ptMinTrackSize.x = Math::Round(minSize.cx * fontSize) + sizeModifier.cx;
+					minMaxInfo->ptMinTrackSize.y = Math::Round(minSize.cy * fontSize) + sizeModifier.cy;
 
-					if (maxSize.cx > 0) minMaxInfo->ptMaxTrackSize.x = maxSize.cx * fontSize;
-					if (maxSize.cy > 0) minMaxInfo->ptMaxTrackSize.y = maxSize.cy * fontSize;
+					if (maxSize.cx > 0) minMaxInfo->ptMaxTrackSize.x = Math::Round(maxSize.cx * fontSize) + sizeModifier.cx;
+					if (maxSize.cy > 0) minMaxInfo->ptMaxTrackSize.y = Math::Round(maxSize.cy * fontSize) + sizeModifier.cy;
 				}
 			}
 
@@ -755,30 +754,30 @@ S::Int S::GUI::WindowGDI::SetIconDirect(Void *newIcon)
 
 S::Int S::GUI::WindowGDI::SetMinimumSize(const Size &nMinSize)
 {
-	minSize = nMinSize + sizeModifier;
+	minSize = nMinSize;
 
 	RECT	 windowRect;
 
 	GetWindowRect(hwnd, &windowRect);
 
 	SetMetrics(Point(windowRect.left, windowRect.top),
-		   Size(Math::Max((Int) Math::Round((windowRect.right  - windowRect.left) / fontSize), minSize.cx),
-			Math::Max((Int) Math::Round((windowRect.bottom - windowRect.top)  / fontSize), minSize.cy)) - sizeModifier);
+		   Size(Math::Max((Int) Math::Round((windowRect.right  - windowRect.left - sizeModifier.cx) / fontSize), minSize.cx),
+			Math::Max((Int) Math::Round((windowRect.bottom - windowRect.top  - sizeModifier.cy) / fontSize), minSize.cy)));
 
 	return Success();
 }
 
 S::Int S::GUI::WindowGDI::SetMaximumSize(const Size &nMaxSize)
 {
-	maxSize = nMaxSize + sizeModifier;
+	maxSize = nMaxSize;
 
 	RECT	 windowRect;
 
 	GetWindowRect(hwnd, &windowRect);
 
 	SetMetrics(Point(windowRect.left, windowRect.top),
-		   Size(Math::Min((Int) Math::Round((windowRect.right  - windowRect.left) / fontSize), maxSize.cx),
-			Math::Min((Int) Math::Round((windowRect.bottom - windowRect.top)  / fontSize), maxSize.cy)) - sizeModifier);
+		   Size(Math::Min((Int) Math::Round((windowRect.right  - windowRect.left - sizeModifier.cx) / fontSize), maxSize.cx),
+			Math::Min((Int) Math::Round((windowRect.bottom - windowRect.top  - sizeModifier.cy) / fontSize), maxSize.cy)));
 
 	return Success();
 }
@@ -825,10 +824,10 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 		GetWindowRect(hwnd, &rect);
 
-		nonMaxRect = Rect(Point(rect.left, rect.top), Size(rect.right - rect.left, rect.bottom - rect.top) / fontSize);
+		nonMaxRect = Rect(Point(rect.left, rect.top), (Size(rect.right - rect.left, rect.bottom - rect.top) - sizeModifier) / fontSize);
 	}
 
-	SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.GetWidth() + (2 * frameSize.cx - 4), workArea.GetHeight() + (2 * frameSize.cy - 4)) / fontSize);
+	SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), (Size(workArea.GetWidth() + (2 * frameSize.cx - 4), workArea.GetHeight() + (2 * frameSize.cy - 4)) - sizeModifier) / fontSize);
 
 	if (Setup::enableUnicode) nonMaxWndStyle = GetWindowLongW(hwnd, GWL_STYLE);
 	else			  nonMaxWndStyle = GetWindowLongA(hwnd, GWL_STYLE);

@@ -144,6 +144,7 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 {
 	static Array<String>	 directories;
 
+#ifndef __WIN32__
 	if (directories.Length() == 0)
 	{
 		/* Look for /usr/lib and /usr/local/lib on all systems.
@@ -179,12 +180,14 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 		if (File("/etc/ld.so.conf").Exists())	    ParseDirectoryList("/etc/ld.so.conf", directories);
 #endif
 	}
+#endif
 
 	return directories;
 }
 
 S::Void S::System::DynamicLoader::ParseDirectoryList(const String &pattern, Array<String> &directories)
 {
+#ifndef __WIN32__
 	Directory		 directory(File(pattern).GetFilePath());
 	const Array<File>	&files = directory.GetFilesByPattern(File(pattern).GetFileName());
 
@@ -202,4 +205,5 @@ S::Void S::System::DynamicLoader::ParseDirectoryList(const String &pattern, Arra
 			else					directories.Add(line);
 		}
 	}
+#endif
 }

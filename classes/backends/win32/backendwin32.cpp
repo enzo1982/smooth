@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,6 @@
 
 #include <smooth/backends/win32/backendwin32.h>
 #include <smooth/gui/application/application.h>
-#include <smooth/gui/window/backends/gdi/windowgdi.h>
 
 #include <shlobj.h>
 #include <iconv.h>
@@ -110,19 +109,11 @@ S::Int S::Backends::BackendWin32::Init()
 
 	ReleaseDC(0, dc);
 
-	/* Start up mouse notifier.
-	 */
-	GUI::WindowGDI::InitMouseNotifier();
-
 	return Success();
 }
 
 S::Int S::Backends::BackendWin32::Deinit()
 {
-	/* Free mouse notifier.
-	 */
-	GUI::WindowGDI::FreeMouseNotifier();
-
 	/* Cleanup Windows sockets.
 	 */
 	WSACleanup();

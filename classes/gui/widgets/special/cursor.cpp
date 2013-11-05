@@ -24,12 +24,10 @@
 
 #include <fribidi.h>
 
-#ifdef __WIN32__
-#	include <windows.h>
-#	include <imm.h>
-#endif
-
 const S::Short	 S::GUI::Cursor::classID = S::Object::RequestClassID();
+
+S::Signal2<S::Void, S::GUI::Cursor *, const S::GUI::Point &>	 S::GUI::Cursor::internalSetCursor;
+S::Signal1<S::Void, S::GUI::Cursor *>				 S::GUI::Cursor::internalRemoveCursor;
 
 S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
@@ -47,6 +45,9 @@ S::GUI::Cursor::Cursor(const Point &iPos, const Size &iSize) : Widget(iPos, iSiz
 	contextMenu	= NIL;
 	historyPos	= 0;
 	tabSize		= 4;
+
+	imeAdvance	= 0;
+	imeCursor	= False;
 
 	SetTabstopCapable(True);
 
@@ -413,13 +414,6 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 				if (lineMarkStart < line.Length() && lineMarkEnd > 0)
 				{
-#ifdef __WIN32__
-					Int	 bColor = GetSysColor(COLOR_HIGHLIGHT);
-					Int	 tColor	= GetSysColor(COLOR_HIGHLIGHTTEXT);
-#else
-					Int	 bColor	= Color(55, 115, 215);
-					Int	 tColor = Color(255, 255, 255);
-#endif
 					Array<Int>	 markRegionStarts;
 					Array<Int>	 markRegionEnds;
 
@@ -500,14 +494,14 @@ S::Int S::GUI::Cursor::DrawWidget()
 						Rect	 markRect = Rect(realPos + Point(markRegionStart, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), Size(markRegionEnd - markRegionStart, font.GetScaledTextSizeY() + 3));
 						Font	 nFont = font;
 
-						nFont.SetColor(tColor);
+						nFont.SetColor(Setup::HighlightTextColor);
 
 						surface->StartPaint(markRect);
 
-						surface->Box(markRect, bColor, Rect::Filled);
+						surface->Box(markRect, Setup::HighlightColor, Rect::Filled);
 
-						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(ConvertTabs(line),		     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
-						else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),		     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+						else							     surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
 
 						surface->EndPaint();
 					}
@@ -528,6 +522,12 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 {
+	/* Cancel if cursor is displayed by the IME.
+	 */
+	if (imeCursor) return;
+
+	/* Cancel if cursor is already in the desired state.
+	 */
 	if (promptVisible == visible) return;
 
 	Surface	*surface = GetDrawSurface();
@@ -543,7 +543,7 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 		}
 	}
 
-	point.x += GetDisplayCursorPositionFromLogical(promptPos);
+	point.x += GetDisplayCursorPositionFromLogical(promptPos) + imeAdvance;
 	point.y += (font.GetScaledTextSizeY() + 3) * (line - scrollPos);
 
 	if (!(line - scrollPos < 0 || (font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()))
@@ -565,7 +565,16 @@ S::Int S::GUI::Cursor::SetText(const String &newText)
 
 	surface->StartPaint(frame);
 
-	OnLoseFocus();
+	ShowCursor(False);
+
+	MarkText(-1, -1);
+
+	if (timer != NIL)
+	{
+		DeleteObject(timer);
+
+		timer = NIL;
+	}
 
 	promptPos	= newText.Length();
 	visibleOffset	= 0;
@@ -756,6 +765,10 @@ S::Void S::GUI::Cursor::OnLoseFocus()
 
 		timer = NIL;
 	}
+
+	/* Notify listeners of removed cursor.
+	 */
+	internalRemoveCursor.Emit(this);
 }
 
 S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
@@ -975,6 +988,30 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 			DeleteSelectedText();
 
 			break;
+		case Input::Keyboard::KeyA:
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   MarkAll();
+
+			break;
+		case Input::Keyboard::KeyC:
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   CopyToClipboard();
+
+			break;
+		case Input::Keyboard::KeyX:
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl)) { CopyToClipboard(); DeleteSelectedText(); }
+
+			break;
+		case Input::Keyboard::KeyV:
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   InsertFromClipboard();
+
+			break;
+		case Input::Keyboard::KeyZ:
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   Undo();
+
+			break;
+		case Input::Keyboard::KeyY:
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   Redo();
+
+			break;
 	}
 }
 
@@ -982,52 +1019,7 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 {
 	/* Called when a character is entered.
 	 */
-	if (!focussed) return;
-
-	/* CTRL + A
-	 */
-	if (character == 0x01 && !(flags & (1 << 30)))
-	{
-		MarkAll();
-	}
-
-	/* CTRL + C
-	 */
-	if (character == 0x03 && !(flags & (1 << 30)))
-	{
-		CopyToClipboard();
-	}
-
-	/* CTRL + X
-	 */
-	if (character == 0x18 && !(flags & (1 << 30)) && IsActive())
-	{
-		CopyToClipboard();
-
-		DeleteSelectedText();
-	}
-
-	/* CTRL + V
-	 */
-	if (character == 0x16 && IsActive())
-	{
-		InsertFromClipboard();
-	}
-
-	/* CTRL + Z
-	 */
-	if (character == 0x1A && IsActive())
-	{
-		Undo();
-	}
-
-	/* CTRL + Y
-	 */
-	if (character == 0x19 && IsActive())
-	{
-		Redo();
-	}
-
+	if (!focussed)					      return;
 	if (text.Length() == maxSize && markStart == markEnd) return;
 
 	if (character >= 0x20 && character != 0x7F && IsActive())
@@ -1102,10 +1094,16 @@ S::Void S::GUI::Cursor::Undo()
 {
 	if (historyPos <= 1) return;
 
-	Int	 index = --historyPos - 1;
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(Rect(GetRealPosition(), GetRealSize()));
+
+	Int	 index	 = --historyPos - 1;
 
 	Widget::SetText(history.GetNth(index));
 	SetCursorPos(historyPrompt.GetNth(index));
+
+	surface->EndPaint();
 
 	onInput.Emit(text);
 }
@@ -1114,10 +1112,16 @@ S::Void S::GUI::Cursor::Redo()
 {
 	if (historyPos >= history.Length()) return;
 
-	Int	 index = historyPos++;
+	Surface	*surface = GetDrawSurface();
+
+	surface->StartPaint(Rect(GetRealPosition(), GetRealSize()));
+
+	Int	 index	 = historyPos++;
 
 	Widget::SetText(history.GetNth(index));
 	SetCursorPos(historyPrompt.GetNth(index));
+
+	surface->EndPaint();
 
 	onInput.Emit(text);
 }
@@ -1194,11 +1198,16 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	ShowCursor(False);
 
+	imeAdvance = 0;
+	imeCursor  = False;
+
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 	Point	 p1	 = GetRealPosition();
 
 	promptPos = newPos;
 
+	/* Compute line number.
+	 */
 	Int	 line = 0;
 
 	if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
@@ -1209,6 +1218,8 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 		}
 	}
 
+	/* Compute cursor position on screen.
+	 */
 	p1.x += GetDisplayCursorPositionFromLogical(promptPos);
 
 	while (p1.x > frame.right || p1.x < frame.left)
@@ -1229,80 +1240,12 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	if (maxScrollPos > 0) onScroll.Emit(scrollPos, maxScrollPos);
 
-#ifdef __WIN32__
-	{
-		Window	*window	 = GetContainerWindow();
-		Surface	*surface = GetDrawSurface();
+	/* Notify listeners of new cursor position.
+	 */
+	if (IsActive()) internalSetCursor.Emit(this, p1 + Point(1, 2));
 
-		HWND	 hwnd	 = (HWND) surface->GetSystemSurface();
-		HDC	 dc	 = GetWindowDC(hwnd);
-
-		HIMC		 hImc = ImmGetContext((HWND) window->GetSystemWindow());
-		COMPOSITIONFORM	 info;
-
-		info.dwStyle = CFS_POINT;
-		info.ptCurrentPos.x = p1.x - 3;
-		info.ptCurrentPos.y = p1.y - 2;
-
-		ImmSetCompositionWindow(hImc, &info);
-
-		if (Setup::enableUnicode)
-		{
-			LOGFONTW	 lFont;
-			int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
-
-			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(dc, LOGPIXELSY));
-			lFont.lfWidth		= 0;
-			lFont.lfEscapement	= 0;
-			lFont.lfOrientation	= 0;
-			lFont.lfWeight		= (font.GetWeight() == Font::Bold) ? FW_BOLD : FW_NORMAL;
-			lFont.lfItalic		= false;
-			lFont.lfUnderline	= false;
-			lFont.lfStrikeOut	= false;
-			lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
-			lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
-			lFont.lfCharSet		= DEFAULT_CHARSET;
-			lFont.lfQuality		= DEFAULT_QUALITY;
-			lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
-
-			memcpy(lFont.lfFaceName, (wchar_t *) font.GetName(), sizeof(wchar_t) * nameLength);
-
-			lFont.lfFaceName[nameLength - 1] = 0;
-
-			ImmSetCompositionFontW(hImc, &lFont);
-		}
-		else
-		{
-			LOGFONTA	 lFont;
-			int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
-
-			lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / GetDeviceCaps(dc, LOGPIXELSY));
-			lFont.lfWidth		= 0;
-			lFont.lfEscapement	= 0;
-			lFont.lfOrientation	= 0;
-			lFont.lfWeight		= (font.GetWeight() == Font::Bold) ? FW_BOLD : FW_NORMAL;
-			lFont.lfItalic		= false;
-			lFont.lfUnderline	= false;
-			lFont.lfStrikeOut	= false;
-			lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
-			lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
-			lFont.lfCharSet		= DEFAULT_CHARSET;
-			lFont.lfQuality		= DEFAULT_QUALITY;
-			lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
-
-			memcpy(lFont.lfFaceName, (char *) font.GetName(), sizeof(char) * nameLength);
-
-			lFont.lfFaceName[nameLength - 1] = 0;
-
-			ImmSetCompositionFontA(hImc, &lFont);
-		}
-
-		ImmDestroyContext(hImc);
-
-		ReleaseDC(hwnd, dc);
-	}
-#endif
-
+	/* Start blinking cursor timer.
+	 */
 	if (timer != NIL) DeleteObject(timer);
 
 	timer = new System::Timer();
@@ -1310,6 +1253,8 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 	timer->onInterval.Connect(&Cursor::OnTimer, this);
 	timer->Start(500);
 
+	/* Redraw and show cursor.
+	 */
 	Paint(SP_PAINT);
 
 	ShowCursor(True);
@@ -1321,6 +1266,20 @@ S::Void S::GUI::Cursor::SetMaxSize(Int newMaxSize)
 {
 	if (newMaxSize <= 0) maxSize = 32768;
 	else		     maxSize = newMaxSize;
+}
+
+S::Void S::GUI::Cursor::SetIMEAdvance(Int newIMEAdvance)
+{
+	ShowCursor(False);
+
+	imeAdvance = newIMEAdvance;
+}
+
+S::Void S::GUI::Cursor::SetIMECursor(Bool newIMECursor)
+{
+	ShowCursor(False);
+
+	imeCursor = newIMECursor;
 }
 
 /* Returns the display cursor position

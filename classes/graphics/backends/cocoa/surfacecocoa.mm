@@ -474,21 +474,18 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 	if (string == NIL)	return Error();
 	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
 
-	NSMutableDictionary	*attributes = [NSMutableDictionary dictionaryWithCapacity: 2];
-
 	NSFont			*nsFont	    = [[NSFontManager sharedFontManager] fontWithFamily: [NSString stringWithUTF8String: font.GetName().ConvertTo("UTF-8")]
 											 traits: (font.GetStyle() & Font::Italic ? NSItalicFontMask : 0) | (font.GetWeight() >= Font::Bold ? NSBoldFontMask : 0)
 											 weight: 5
 											   size: font.GetSize() * fontSize.TranslateY(96) / 72.0];
-	[attributes setObject: nsFont
-		       forKey: NSFontAttributeName];
 
 	NSColor			*nsColor    = [NSColor colorWithCalibratedRed: font.GetColor().GetRed()   / 255.0
 									green: font.GetColor().GetGreen() / 255.0
 									 blue: font.GetColor().GetBlue()  / 255.0
 									alpha: 1.0];
-	[attributes setObject: nsColor
-		       forKey: NSForegroundColorAttributeName];
+
+	NSMutableDictionary	*attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys: nsFont,  NSFontAttributeName,
+												   nsColor, NSForegroundColorAttributeName, nil];
 
 	Rect			 rect	    = iRect;
 	Int			 lineHeight = font.GetScaledTextSizeY() + 3;
@@ -571,6 +568,8 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 	if (!painting) [paintBitmap unlockFocus];
 
 	String::ExplodeFinish();
+
+	[attributes release];
 
 	return Success();
 }

@@ -10,6 +10,7 @@
 
 #include <smooth/gui/window/backends/gdi/windowgdi.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/gui/widgets/special/cursor.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
@@ -33,9 +34,13 @@ S::GUI::WindowBackend *CreateWindowGDI()
 
 S::Int	 windowGDITmp = S::GUI::WindowBackend::SetBackend(&CreateWindowGDI);
 
+S::Int	 addWindowGDIInitTmp = S::AddInitFunction(&S::GUI::WindowGDI::Initialize);
+S::Int	 addWindowGDIFreeTmp = S::AddFreeFunction(&S::GUI::WindowGDI::Free);
+
 S::Array<S::GUI::WindowGDI *, S::Void *>	 S::GUI::WindowGDI::windowBackends;
 
 S::System::Timer	*S::GUI::WindowGDI::mouseNotifyTimer = NIL;
+S::GUI::Cursor		*S::GUI::WindowGDI::activeCursor     = NIL;
 
 LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -48,6 +53,39 @@ LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM
 
 	if (Setup::enableUnicode) return DefWindowProcW(window, message, wParam, lParam);
 	else			  return DefWindowProcA(window, message, wParam, lParam);
+}
+
+S::Int S::GUI::WindowGDI::Initialize()
+{
+	/* Initialize mouse notifier.
+	 */
+	mouseNotifyTimer = new System::Timer();
+
+	mouseNotifyTimer->onInterval.Connect(&WindowGDI::MouseNotifier);
+	mouseNotifyTimer->Start(25);
+
+	/* Register for cursor events.
+	 */
+	Cursor::internalSetCursor.Connect(&WindowGDI::SetCursor);
+	Cursor::internalRemoveCursor.Connect(&WindowGDI::RemoveCursor);
+
+	return Success();
+}
+
+S::Int S::GUI::WindowGDI::Free()
+{
+	/* Unregister cursor event handlers.
+	 */
+	Cursor::internalSetCursor.Disconnect(&WindowGDI::SetCursor);
+	Cursor::internalRemoveCursor.Disconnect(&WindowGDI::RemoveCursor);
+
+	/* Stop and free mouse notifier.
+	 */
+	mouseNotifyTimer->Stop();
+
+	delete mouseNotifyTimer;
+
+	return Success();
 }
 
 S::GUI::WindowGDI::WindowGDI(Void *iWindow)
@@ -283,6 +321,14 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			GetColors();
 
 			break;
+		case WM_IME_STARTCOMPOSITION:
+			if (activeCursor != NIL) activeCursor->SetIMECursor(True);
+
+			break;
+		case WM_IME_ENDCOMPOSITION:
+			if (activeCursor != NIL) activeCursor->SetIMECursor(False);
+
+			break;
 	}
 
 	/* Convert Windows messages to smooth messages.
@@ -509,7 +555,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		/* Enable shadows for tool windows.
 		 */
-		if ((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER)) 
+		if ((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER))
 		{
 			OSVERSIONINFOA	 vInfo;
 
@@ -550,7 +596,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 		/* Enable shadows for tool windows.
 		 */
-		if ((flags & WF_NOTASKBUTTON) && (flags & WF_TOPMOST) && (flags & WF_THINBORDER)) 
+		if ((flags & WF_NOTASKBUTTON) && (flags & WF_TOPMOST) && (flags & WF_THINBORDER))
 		{
 			OSVERSIONINFOA	 vInfo;
 
@@ -864,21 +910,6 @@ S::Int S::GUI::WindowGDI::Raise()
 	return Success();
 }
 
-S::Void S::GUI::WindowGDI::InitMouseNotifier()
-{
-	mouseNotifyTimer = new System::Timer();
-
-	mouseNotifyTimer->onInterval.Connect(&WindowGDI::MouseNotifier);
-	mouseNotifyTimer->Start(25);
-}
-
-S::Void S::GUI::WindowGDI::FreeMouseNotifier()
-{
-	mouseNotifyTimer->Stop();
-
-	delete mouseNotifyTimer;
-}
-
 S::Void S::GUI::WindowGDI::MouseNotifier()
 {
 	static Point	 savedMousePos = Point(0, 0);
@@ -899,4 +930,119 @@ S::Void S::GUI::WindowGDI::MouseNotifier()
 
 		savedMousePos = Point(currentMousePos.x, currentMousePos.y);
 	}
+}
+
+S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
+{
+	Window	*window	 = cursor->GetContainerWindow();
+	Surface	*surface = cursor->GetDrawSurface();
+
+	HWND	 hwnd	 = (HWND) window->GetSystemWindow();
+	HIMC	 himc	 = ImmGetContext(hwnd);
+
+	/* Clear composition string.
+	 */
+	if (Setup::enableUnicode) ImmSetCompositionStringW(himc, SCS_SETSTR, NIL, 0, NIL, 0);
+	else			  ImmSetCompositionStringA(himc, SCS_SETSTR, NIL, 0, NIL, 0);
+
+	/* Set composition window information.
+	 */
+	COMPOSITIONFORM	 info;
+
+	info.dwStyle	    = CFS_DEFAULT;
+
+	ImmSetCompositionWindow(himc, &info);
+
+	info.dwStyle	    = CFS_POINT;
+	info.ptCurrentPos.x = point.x - GetSystemMetrics(SM_CXFRAME);
+	info.ptCurrentPos.y = point.y - GetSystemMetrics(SM_CYFRAME);
+
+	ImmSetCompositionWindow(himc, &info);
+
+	/* Set font information.
+	 */
+	if (Setup::enableUnicode)
+	{
+		LOGFONTW	 lFont;
+		const Font	&font	    = cursor->GetFont();
+		int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
+
+		lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / surface->GetSurfaceDPI());
+		lFont.lfWidth		= 0;
+		lFont.lfEscapement	= 0;
+		lFont.lfOrientation	= 0;
+		lFont.lfWeight		= (font.GetWeight() >= Font::Bold) ? FW_BOLD : FW_NORMAL;
+		lFont.lfItalic		= (font.GetStyle() & Font::Italic)    ? true : false;
+		lFont.lfUnderline	= (font.GetStyle() & Font::Underline) ? true : false;
+		lFont.lfStrikeOut	= (font.GetStyle() & Font::StrikeOut) ? true : false;
+		lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
+		lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
+		lFont.lfCharSet		= DEFAULT_CHARSET;
+		lFont.lfQuality		= DEFAULT_QUALITY;
+		lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
+
+		memcpy(lFont.lfFaceName, (wchar_t *) font.GetName(), sizeof(wchar_t) * nameLength);
+
+		lFont.lfFaceName[nameLength - 1] = 0;
+
+		ImmSetCompositionFontW(himc, &lFont);
+	}
+	else
+	{
+		LOGFONTA	 lFont;
+		const Font	&font	    = cursor->GetFont();
+		int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
+
+		lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / surface->GetSurfaceDPI());
+		lFont.lfWidth		= 0;
+		lFont.lfEscapement	= 0;
+		lFont.lfOrientation	= 0;
+		lFont.lfWeight		= (font.GetWeight() >= Font::Bold) ? FW_BOLD : FW_NORMAL;
+		lFont.lfItalic		= (font.GetStyle() & Font::Italic)    ? true : false;
+		lFont.lfUnderline	= (font.GetStyle() & Font::Underline) ? true : false;
+		lFont.lfStrikeOut	= (font.GetStyle() & Font::StrikeOut) ? true : false;
+		lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
+		lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
+		lFont.lfCharSet		= DEFAULT_CHARSET;
+		lFont.lfQuality		= DEFAULT_QUALITY;
+		lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
+
+		memcpy(lFont.lfFaceName, (char *) font.GetName(), sizeof(char) * nameLength);
+
+		lFont.lfFaceName[nameLength - 1] = 0;
+
+		ImmSetCompositionFontA(himc, &lFont);
+	}
+
+	ImmReleaseContext(hwnd, himc);
+
+	activeCursor = cursor;
+}
+
+S::Void S::GUI::WindowGDI::RemoveCursor(Cursor *cursor)
+{
+	if (activeCursor != cursor) return;
+
+	Window	*window	 = cursor->GetContainerWindow();
+
+	HWND	 hwnd	 = (HWND) window->GetSystemWindow();
+	HIMC	 himc	 = ImmGetContext(hwnd);
+
+	/* Clear composition string.
+	 */
+	if (Setup::enableUnicode) ImmSetCompositionStringW(himc, SCS_SETSTR, NIL, 0, NIL, 0);
+	else			  ImmSetCompositionStringA(himc, SCS_SETSTR, NIL, 0, NIL, 0);
+
+	/* Revert to default composition window.
+	 */
+	COMPOSITIONFORM	 info;
+
+	info.dwStyle = CFS_DEFAULT;
+
+	ImmSetCompositionWindow(himc, &info);
+	ImmSetCompositionWindow(himc, &info);
+
+	ImmReleaseContext(hwnd, himc);
+
+	activeCursor = NIL;
 }

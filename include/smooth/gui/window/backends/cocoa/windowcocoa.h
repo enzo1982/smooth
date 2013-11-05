@@ -17,6 +17,8 @@ namespace smooth
 {
 	namespace GUI
 	{
+		class Cursor;
+
 		class WindowCocoa;
 	};
 };
@@ -55,6 +57,9 @@ namespace smooth
 
 				Input::Keyboard::Key			 ConvertKey(Int);
 			public:
+				static Int				 Initialize();
+				static Int				 Free();
+
 									 WindowCocoa(Void * = NIL);
 									~WindowCocoa();
 
@@ -83,6 +88,9 @@ namespace smooth
 			accessors:
 				Void					 SetSelection(const String &nSelection) { selection = nSelection; }
 				Void					 SetClipboard(const String &nClipboard) { clipboard = nClipboard; }
+			slots:
+				static Void				 SetCursor(Cursor *, const Point &);
+				static Void				 RemoveCursor(Cursor *);
 		};
 	};
 };

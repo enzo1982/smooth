@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,7 @@
 #define H_OBJSMOOTH_WINDOWGDI
 
 #include <windows.h>
+#include <imm.h>
 
 namespace smooth
 {
@@ -22,6 +23,8 @@ namespace smooth
 
 	namespace GUI
 	{
+		class Cursor;
+
 		class WindowGDI;
 	};
 };
@@ -46,6 +49,7 @@ namespace smooth
 				static WindowGDI			*GetWindowBackend(HWND);
 
 				static System::Timer			*mouseNotifyTimer;
+				static Cursor				*activeCursor;
 
 				Int					 ProcessSystemMessages(Int, Int, Int);
 
@@ -77,6 +81,9 @@ namespace smooth
 
 				Input::Keyboard::Key			 ConvertKey(Int);
 			public:
+				static Int				 Initialize();
+				static Int				 Free();
+
 									 WindowGDI(Void * = NIL);
 									~WindowGDI();
 
@@ -108,11 +115,11 @@ namespace smooth
 				Int					 Restore();
 
 				Int					 Raise();
-
-				static Void				 InitMouseNotifier();
-				static Void				 FreeMouseNotifier();
 			slots:
 				static Void				 MouseNotifier();
+
+				static Void				 SetCursor(Cursor *, const Point &);
+				static Void				 RemoveCursor(Cursor *);
 		};
 	};
 };

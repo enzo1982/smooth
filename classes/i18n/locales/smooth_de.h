@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,58 +11,48 @@
 #ifndef H_OBJSMOOTH_I18N_DE
 #define H_OBJSMOOTH_I18N_DE
 
-namespace smooth
-{
-	namespace I18n
-	{
-		const char *smooth_de = 
+static const char *smooth_de = 
 
-			"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>					\
-			 <LangFile>										\
-			   <info>										\
-			     <property name=\"program\">smooth</property>					\
-			     <property name=\"version\">0.8</property>						\
-			     <property name=\"language\">German / Deutsch</property>				\
-			     <property name=\"righttoleft\">false</property>					\
-			     <property name=\"encoding\">ISO-8859-1</property>					\
-			     <property name=\"author\">Robert Kausch &lt;robert.kausch@gmx.net&gt;</property>	\
-			     <property name=\"url\">http://www.smooth-project.org/</property>			\
-			   </info>										\
-			   <data>										\
-			     <entry id=\"1\" string=\"OK\">OK</entry>						\
-			     <entry id=\"2\" string=\"Cancel\">Abbrechen</entry>				\
-			     <entry id=\"3\" string=\"Yes\">Ja</entry>						\
-			     <entry id=\"4\" string=\"No\">Nein</entry>						\
-			     <entry id=\"5\" string=\"Retry\">Wiederholen</entry>				\
-			     <entry id=\"6\" string=\"Abort\">Abbrechen</entry>					\
-			     <entry id=\"7\" string=\"Ignore\">Ignorieren</entry>				\
-			     <entry id=\"8\" string=\"Color selection\">Farbauswahl</entry>			\
-			     <entry id=\"9\" string=\"HTML code\">HTML-Code</entry>				\
-			     <entry id=\"10\" string=\"R\">R</entry>						\
-			     <entry id=\"11\" string=\"G\">G</entry>						\
-			     <entry id=\"12\" string=\"B\">B</entry>						\
-			     <entry id=\"13\" string=\"H\">F</entry>						\
-			     <entry id=\"14\" string=\"S\">S</entry>						\
-			     <entry id=\"15\" string=\"V\">H</entry>						\
-			     <entry id=\"16\" string=\"Open file\">Datei öffnen</entry>				\
-			     <entry id=\"17\" string=\"Save file\">Datei speichern</entry>			\
-			     <entry id=\"18\" string=\"Save file as\">Datei speichern unter</entry>		\
-			     <entry id=\"19\" string=\"Select directory\">Verzeichnis auswählen</entry>		\
-			     <entry id=\"20\" string=\"Select font\">Schriftart auswählen</entry>		\
-			     <entry id=\"21\" string=\"Tip of the day\">Tipp des Tages</entry>			\
-			     <entry id=\"22\" string=\"Did you know...\">Wussten Sie schon...</entry>		\
-			     <entry id=\"23\" string=\"Show tips on startup\">Tipps beim Start anzeigen</entry>	\
-			     <entry id=\"24\" string=\"Next tip\">Nächster Tipp</entry>				\
-			     <entry id=\"25\" string=\"Undo\">Rückgängig</entry>				\
-			     <entry id=\"26\" string=\"Cut\">Ausschneiden</entry>				\
-			     <entry id=\"27\" string=\"Copy\">Kopieren</entry>					\
-			     <entry id=\"28\" string=\"Paste\">Einfügen</entry>					\
-			     <entry id=\"29\" string=\"Clear\">Löschen</entry>					\
-			     <entry id=\"30\" string=\"Select all\">Alles auswählen</entry>			\
-			   </data>										\
-			 </LangFile>										\
-			";
-	};
-};
+	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>				\
+	 <LangFile>									\
+	   <info>									\
+	     <property name=\"program\">smooth</property>				\
+	     <property name=\"language\">German / Deutsch</property>			\
+	     <property name=\"righttoleft\">false</property>				\
+	     <property name=\"encoding\">ISO-8859-1</property>				\
+	   </info>									\
+	   <data>									\
+	     <entry string=\"OK\">OK</entry>						\
+	     <entry string=\"Cancel\">Abbrechen</entry>					\
+	     <entry string=\"Yes\">Ja</entry>						\
+	     <entry string=\"No\">Nein</entry>						\
+	     <entry string=\"Retry\">Wiederholen</entry>				\
+	     <entry string=\"Abort\">Abbrechen</entry>					\
+	     <entry string=\"Ignore\">Ignorieren</entry>				\
+	     <entry string=\"Color selection\">Farbauswahl</entry>			\
+	     <entry string=\"HTML code\">HTML-Code</entry>				\
+	     <entry string=\"R\">R</entry>						\
+	     <entry string=\"G\">G</entry>						\
+	     <entry string=\"B\">B</entry>						\
+	     <entry string=\"H\">F</entry>						\
+	     <entry string=\"S\">S</entry>						\
+	     <entry string=\"V\">H</entry>						\
+	     <entry string=\"Open file\">Datei öffnen</entry>				\
+	     <entry string=\"Save file\">Datei speichern</entry>			\
+	     <entry string=\"Save file as\">Datei speichern unter</entry>		\
+	     <entry string=\"Select directory\">Verzeichnis auswählen</entry>		\
+	     <entry string=\"Select font\">Schriftart auswählen</entry>			\
+	     <entry string=\"Tip of the day\">Tipp des Tages</entry>			\
+	     <entry string=\"Did you know...\">Wussten Sie schon...</entry>		\
+	     <entry string=\"Show tips on startup\">Tipps beim Start anzeigen</entry>	\
+	     <entry string=\"Next tip\">Nächster Tipp</entry>				\
+	     <entry string=\"Undo\">Rückgängig</entry>					\
+	     <entry string=\"Cut\">Ausschneiden</entry>					\
+	     <entry string=\"Copy\">Kopieren</entry>					\
+	     <entry string=\"Paste\">Einfügen</entry>					\
+	     <entry string=\"Clear\">Löschen</entry>					\
+	     <entry string=\"Select all\">Alles auswählen</entry>			\
+	   </data>									\
+	 </LangFile>";
 
 #endif

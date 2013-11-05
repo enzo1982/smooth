@@ -87,7 +87,7 @@ S::Int S::GUI::Arrows::Paint(Int message)
 	Rect	 frame	    = Rect(GetRealPosition(), GetRealSize());
 	Int	 arrowColor = Setup::TextColor;
 
-	if (!IsActive()) arrowColor = Setup::GrayTextColor;
+	if (!IsActive()) arrowColor = Setup::InactiveTextColor;
 
 	switch (message)
 	{

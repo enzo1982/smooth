@@ -227,19 +227,21 @@ S::Void S::GetColors()
 {
 #if defined __WIN32__
 	Setup::BackgroundColor		  = GetSysColor(COLOR_3DFACE);
-	Setup::TextColor		  = GetSysColor(COLOR_BTNTEXT);
-	Setup::GrayTextColor		  = GetSysColor(COLOR_GRAYTEXT);
 	Setup::ClientColor		  = GetSysColor(COLOR_WINDOW);
 	Setup::ClientTextColor		  = GetSysColor(COLOR_WINDOWTEXT);
+	Setup::LightGrayColor		  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+	Setup::DividerLightColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+	Setup::DividerDarkColor		  = GetSysColor(COLOR_3DSHADOW);
+	Setup::TextColor		  = GetSysColor(COLOR_BTNTEXT);
+	Setup::InactiveTextColor	  = GetSysColor(COLOR_GRAYTEXT);
+	Setup::HighlightColor		  = GetSysColor(COLOR_HIGHLIGHT);
+	Setup::HighlightTextColor	  = GetSysColor(COLOR_HIGHLIGHTTEXT);
 	Setup::GradientStartColor	  = GetSysColor(COLOR_ACTIVECAPTION);
 	Setup::GradientEndColor		  = GetSysColor(27);
 	Setup::GradientTextColor	  = GetSysColor(COLOR_CAPTIONTEXT);
 	Setup::InactiveGradientStartColor = GetSysColor(COLOR_INACTIVECAPTION);
 	Setup::InactiveGradientEndColor	  = GetSysColor(28);
 	Setup::InactiveGradientTextColor  = GetSysColor(COLOR_INACTIVECAPTIONTEXT);
-	Setup::DividerLightColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
-	Setup::DividerDarkColor		  = GetSysColor(COLOR_3DSHADOW);
-	Setup::LightGrayColor		  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
 	Setup::TooltipColor		  = GetSysColor(COLOR_INFOBK);
 	Setup::TooltipTextColor		  = GetSysColor(COLOR_INFOTEXT);
 #elif defined __APPLE__
@@ -257,17 +259,17 @@ S::Void S::GetColors()
 	rgb_color	 tooltipText	    = ui_color(B_TOOL_TIP_TEXT_COLOR);
 
 	Setup::BackgroundColor		  = GUI::Color(panelBackground.red, panelBackground.green, panelBackground.blue);
-	Setup::TextColor		  = GUI::Color(panelText.red, panelText.green, panelText.blue);
 	Setup::ClientColor		  = GUI::Color(documentBackground.red, documentBackground.green, documentBackground.blue);
 	Setup::ClientTextColor		  = GUI::Color(documentText.red, documentText.green, documentText.blue);
+	Setup::LightGrayColor		  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+	Setup::DividerLightColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+	Setup::TextColor		  = GUI::Color(panelText.red, panelText.green, panelText.blue);
 	Setup::GradientStartColor	  = GUI::Color(windowTab.red, windowTab.green, windowTab.blue);
 	Setup::GradientEndColor		  = GUI::Color(Setup::GradientStartColor.GetRed() + (255 - Setup::GradientStartColor.GetRed()) * 0.6, Setup::GradientStartColor.GetGreen() + (255 - Setup::GradientStartColor.GetGreen()) * 0.6, Setup::GradientStartColor.GetBlue() + (255 - Setup::GradientStartColor.GetBlue()) * 0.6);
 	Setup::GradientTextColor	  = GUI::Color(windowText.red, windowText.green, windowText.blue);
 	Setup::InactiveGradientStartColor = GUI::Color(windowInactiveTab.red, windowInactiveTab.green, windowInactiveTab.blue);
 	Setup::InactiveGradientEndColor	  = GUI::Color(Setup::InactiveGradientStartColor.GetRed() + (255 - Setup::InactiveGradientStartColor.GetRed()) * 0.6, Setup::InactiveGradientStartColor.GetGreen() + (255 - Setup::InactiveGradientStartColor.GetGreen()) * 0.6, Setup::InactiveGradientStartColor.GetBlue() + (255 - Setup::InactiveGradientStartColor.GetBlue()) * 0.6);
 	Setup::InactiveGradientTextColor  = GUI::Color(windowInactiveText.red, windowInactiveText.green, windowInactiveText.blue);
-	Setup::DividerLightColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
-	Setup::LightGrayColor		  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
 	Setup::TooltipColor		  = GUI::Color(tooltipBackground.red, tooltipBackground.green, tooltipBackground.blue);
 	Setup::TooltipTextColor		  = GUI::Color(tooltipText.red, tooltipText.green, tooltipText.blue);
 #endif

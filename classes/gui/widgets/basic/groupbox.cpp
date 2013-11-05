@@ -52,7 +52,7 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 
 				Font	 nFont	  = font;
 
-				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 				surface->SetText(text, textRect + Point(1, 0) * surface->GetSurfaceDPI() / 96.0, nFont);
 			}
@@ -101,7 +101,7 @@ S::Int S::GUI::GroupBox::Deactivate()
 
 	Font	 nFont	  = font;
 
-	nFont.SetColor(Setup::GrayTextColor);
+	nFont.SetColor(Setup::InactiveTextColor);
 
 	surface->SetText(text, textRect + Point(1, 0) * surface->GetSurfaceDPI() / 96.0, nFont);
 

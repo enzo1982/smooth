@@ -104,7 +104,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 				Rect	 textRect = Rect(realPos + Point(1, 1) + Point(2, 0) * surface->GetSurfaceDPI() / 96.0, realSize - Size(2, 2) - Size(2, 0) * surface->GetSurfaceDPI() / 96.0);
 				Font	 nFont	  = font;
 
-				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 				surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
 				surface->SetText(text, textRect, nFont);

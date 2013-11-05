@@ -69,7 +69,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 			{
 				Font	 nFont = font;
 
-				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 				surface->SetText(text, frame + Point(frame.GetHeight(), 2), nFont);
@@ -98,7 +98,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 
 						if (i == 1)
 						{
-							color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
+							color = IsActive() ? Setup::ClientTextColor : Setup::InactiveTextColor;
 
 							p1 -= Point((IsRightToLeft() ? -i : i), i);
 							p2 -= Point((IsRightToLeft() ? -i : i), i);

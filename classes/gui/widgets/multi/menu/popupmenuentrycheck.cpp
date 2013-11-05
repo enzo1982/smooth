@@ -57,7 +57,7 @@ S::Int S::GUI::PopupMenuEntryCheck::Paint(Int message)
 					if (i == 1)
 					{
 						if (IsActive())	color = (message == SP_MOUSEIN ? Setup::GradientTextColor : Setup::TextColor);
-						else		color = (message == SP_MOUSEIN ? Setup::GradientTextColor : Setup::GrayTextColor);
+						else		color = (message == SP_MOUSEIN ? Setup::GradientTextColor : Setup::InactiveTextColor);
 					}
 
 					surface->Line(p1 + Point(0, 0), p2 + Point( 0,  0), color);

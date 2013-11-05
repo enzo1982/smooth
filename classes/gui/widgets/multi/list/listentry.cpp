@@ -73,7 +73,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 		case SP_MOUSEIN:
 		case SP_MOUSEOUT:
 			if (mouseOver) nFont.SetColor(Setup::GradientTextColor);
-			if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+			if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 			for (Int r = 0; r < text.Length(); r++) if (text[r] == '\t') { gotTabs = True; break; }
 
@@ -91,14 +91,14 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 				if (cbRect.top <= cbRect.bottom - 1)
 				{
 					surface->Box(cbRect, Setup::ClientColor, Rect::Filled);
-					surface->Box(cbRect, Setup::GrayTextColor, Rect::Outlined);
+					surface->Box(cbRect, Setup::InactiveTextColor, Rect::Outlined);
 
 					if (marked && cbRect.top <= cbRect.bottom - 3)
 					{
-						Color	 lightColor = Setup::GrayTextColor;
+						Color	 lightColor = Setup::InactiveTextColor;
 						Color	 darkColor = Setup::ClientTextColor;
 
-						if (!IsActive()) darkColor = Setup::GrayTextColor;
+						if (!IsActive()) darkColor = Setup::InactiveTextColor;
 
 						Point	 p1 = Point(cbRect.left + 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
 						Point	 p2 = Point(cbRect.right - 2 + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
@@ -210,7 +210,7 @@ S::Int S::GUI::ListEntry::Select()
 
 	internalOnSelectEntry.Emit(container->GetHandle(), GetHandle());
 
-	Paint(SP_PAINT);	
+	Paint(SP_PAINT);
 
 	((List *) container)->onSelectEntry.Emit(this);
 

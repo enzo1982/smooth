@@ -143,7 +143,7 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 
 					Font	 nFont = font;
 
-					if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+					if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 					surface->SetText(tabNames.GetNth(i), frame, nFont);
 

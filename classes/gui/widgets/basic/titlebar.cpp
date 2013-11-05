@@ -128,8 +128,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			if (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON))
 			{
-				if (Binary::IsFlagSet(flags, TB_MINBUTTON))	buttonColor = Setup::TextColor;
-				else						buttonColor = Setup::GrayTextColor;
+				if (Binary::IsFlagSet(flags, TB_MINBUTTON)) buttonColor = Setup::TextColor;
+				else					    buttonColor = Setup::InactiveTextColor;
 
 				surface->Box(button, buttonColor, Rect::Filled);
 
@@ -140,8 +140,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			if (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON))
 			{
-				if (Binary::IsFlagSet(flags, TB_MAXBUTTON))	buttonColor = Setup::TextColor;
-				else						buttonColor = Setup::GrayTextColor;
+				if (Binary::IsFlagSet(flags, TB_MAXBUTTON)) buttonColor = Setup::TextColor;
+				else					    buttonColor = Setup::InactiveTextColor;
 
 				if (window->IsMaximized())
 				{
@@ -163,8 +163,8 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 			start	= Point(button.left + (IsRightToLeft() ? 1 : 0), button.top - 1);
 			end	= Point(button.right + (IsRightToLeft() ? 1 : 0), button.bottom);
 
-			if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON))	buttonColor = Setup::TextColor;
-			else						buttonColor = Setup::GrayTextColor;
+			if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) buttonColor = Setup::TextColor;
+			else					      buttonColor = Setup::InactiveTextColor;
 
 			surface->Line(start, end, buttonColor);
 			surface->Line(start + Point(1, 0), end - Point(0, 1), buttonColor);

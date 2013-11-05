@@ -18,7 +18,7 @@ S::GUI::ListEntrySeparator::ListEntrySeparator() : ListEntry(NIL)
 {
 	type		= classID;
 
-	font.SetColor(Setup::GrayTextColor);
+	font.SetColor(Setup::InactiveTextColor);
 
 	SetHeight(3);
 

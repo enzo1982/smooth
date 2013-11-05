@@ -78,7 +78,7 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 	Rect	 arrow2Frame	= Rect(realPos + Point(0, 0), subtype == OR_HORZ ? Size(hotspotSize + 4, realSize.cy) : Size(realSize.cx, hotspotSize + 4));
 	Int	 arrowColor	= Setup::TextColor;
 
-	if (!IsActive()) arrowColor = Setup::GrayTextColor;
+	if (!IsActive()) arrowColor = Setup::InactiveTextColor;
 
 	switch (message)
 	{

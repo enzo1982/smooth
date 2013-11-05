@@ -67,7 +67,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 			{
 				Font	 nFont = font;
 
-				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 				surface->SetText(text, frame + Point(frame.GetHeight(), 2), nFont);
@@ -159,7 +159,7 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 						if (j == 1)
 						{
-							color = IsActive() ? Setup::ClientTextColor : Setup::GrayTextColor;
+							color = IsActive() ? Setup::ClientTextColor : Setup::InactiveTextColor;
 
 							point -= Point((IsRightToLeft() ? -j : j), j);
 						}

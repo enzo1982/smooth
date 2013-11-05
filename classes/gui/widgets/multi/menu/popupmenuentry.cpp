@@ -92,7 +92,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, 0) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 2);
 				Font	 nFont	  = font;
 
-				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 				surface->SetText(text, textRect, nFont);

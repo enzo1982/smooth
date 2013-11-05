@@ -41,7 +41,7 @@ S::Int S::GUI::Text::Paint(Int message)
 			{
 				Font	 nFont = font;
 
-				if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 				Rect	 rect  = Rect(GetRealPosition(), GetRealSize());
 

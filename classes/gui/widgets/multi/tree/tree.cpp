@@ -132,7 +132,7 @@ S::Int S::GUI::Tree::Paint(Int message)
 				}
 
 				if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(),  Math::Round(16 * surface->GetSurfaceDPI() / 96.0))))) PaintText(Setup::GradientTextColor, True);
-				else																       PaintText(active ? font.GetColor() : Setup::GrayTextColor, False);
+				else																       PaintText(active ? font.GetColor() : Setup::InactiveTextColor, False);
 
 				if (IsMarked())
 				{
@@ -167,7 +167,7 @@ S::Int S::GUI::Tree::Paint(Int message)
 
 					for (Int i = Math::Round(16 * surface->GetSurfaceDPI() / 96.0); i < frame.GetHeight() - Math::Round(7 * surface->GetSurfaceDPI() / 96.0); i += 2)
 					{
-						surface->SetPixel(realPos + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), i), Setup::GrayTextColor);
+						surface->SetPixel(realPos + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), i), Setup::InactiveTextColor);
 					}
 				}
 
@@ -201,7 +201,7 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 	Font	 nFont		= font;
 	Bool	 gotTabs	= False;
 
-	if (!active)	nFont.SetColor(Setup::GrayTextColor);
+	if (!active)	nFont.SetColor(Setup::InactiveTextColor);
 	else		nFont.SetColor(color);
 
 	for (Int r = 0; r < text.Length(); r++) if (text[r] == '\t') { gotTabs = True; break; }
@@ -218,7 +218,7 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 	if (cbRect.top <= cbRect.bottom - 1)
 	{
 		surface->Box(cbRect, Setup::ClientColor, Rect::Filled);
-		surface->Box(cbRect, Setup::GrayTextColor, Rect::Outlined);
+		surface->Box(cbRect, Setup::InactiveTextColor, Rect::Outlined);
 
 		if (cbRect.top <= cbRect.bottom - 3)
 		{
@@ -227,7 +227,7 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 
 			Color	 darkColor = Setup::ClientTextColor;
 
-			if (!active) darkColor = Setup::GrayTextColor;
+			if (!active) darkColor = Setup::InactiveTextColor;
 
 			surface->Line(p1, p2, darkColor);
 

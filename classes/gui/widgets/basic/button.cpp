@@ -75,7 +75,7 @@ S::Int S::GUI::Button::Paint(Int message)
 
 					Font	 nFont = font;
 
-					if (!IsActive()) nFont.SetColor(Setup::GrayTextColor);
+					if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 					surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
 					surface->SetText(text, textRect, nFont);

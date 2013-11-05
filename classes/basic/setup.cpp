@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,7 +20,9 @@ S::GUI::Color	 S::Setup::LightGrayColor(248, 248, 248);
 S::GUI::Color	 S::Setup::DividerLightColor(237, 236, 232);
 S::GUI::Color	 S::Setup::DividerDarkColor(128, 128, 128);
 S::GUI::Color	 S::Setup::TextColor(0, 0, 0);
-S::GUI::Color	 S::Setup::GrayTextColor(128, 128, 128);
+S::GUI::Color	 S::Setup::InactiveTextColor(128, 128, 128);
+S::GUI::Color	 S::Setup::HighlightColor(55, 115, 215);
+S::GUI::Color	 S::Setup::HighlightTextColor(255, 255, 255);
 S::GUI::Color	 S::Setup::GradientStartColor(10, 36, 106);
 S::GUI::Color	 S::Setup::GradientEndColor(166, 202, 240);
 S::GUI::Color	 S::Setup::GradientTextColor(255, 255, 255);

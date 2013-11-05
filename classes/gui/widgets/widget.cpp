@@ -281,9 +281,9 @@ S::GUI::Point S::GUI::Widget::GetRealPosition() const
 
 	Surface	*surface = GetDrawSurface();
 
-	Point	 containerPos	= container->GetRealPosition();
-	Point	 scaledPos	= pos * surface->GetSurfaceDPI() / 96.0;
-	Point	 realPos	= containerPos + scaledPos;
+	Point	 containerPos  = container->GetRealPosition();
+	Point	 scaledPos     = pos * surface->GetSurfaceDPI() / 96.0;
+	Point	 realPos       = containerPos + scaledPos;
 
 	if (orientation == OR_UPPERLEFT) return realPos;
 
@@ -317,7 +317,7 @@ S::Int S::GUI::Widget::SetBackgroundColor(const Color &nColor)
 {
 	if (backgroundColorSet && backgroundColor == nColor) return Success();
 
-	backgroundColor = nColor;
+	backgroundColor	   = nColor;
 	backgroundColorSet = True;
 
 	Paint(SP_PAINT);
@@ -390,13 +390,15 @@ S::Int S::GUI::Widget::Activate()
 {
 	if (active) return Success();
 
-	Bool	 prevVisible = IsVisible();
+	Surface	*surface      = GetDrawSurface();
 
-	if (registered && prevVisible) Hide();
+	Bool	 prevVisible  = IsVisible();
+
+	if (registered && prevVisible) { surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
 
 	active = True;
 
-	if (registered && prevVisible) Show();
+	if (registered && prevVisible) { Show(); Process(SM_MOUSEMOVE, 0, 0); surface->EndPaint(); }
 
 	onActivate.Emit();
 
@@ -407,9 +409,11 @@ S::Int S::GUI::Widget::Deactivate()
 {
 	if (!active) return Success();
 
-	Bool	 prevVisible = IsVisible();
+	Surface	*surface      = GetDrawSurface();
 
-	if (registered && prevVisible) Hide();
+	Bool	 prevVisible  = IsVisible();
+
+	if (registered && prevVisible) { surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
 
 	active = False;
 
@@ -423,7 +427,7 @@ S::Int S::GUI::Widget::Deactivate()
 		widget->mouseDragging	= False;
 	}
 
-	if (registered && prevVisible) Show();
+	if (registered && prevVisible) { Show(); surface->EndPaint(); }
 
 	onDeactivate.Emit();
 
@@ -807,20 +811,20 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 {
 	if (text == newText) return Success();
 
+	Surface	*surface      = GetDrawSurface();
+
 	Bool	 prevVisible  = IsVisible();
 	Bool	 prevFocussed = focussed;
 
-	if (registered && prevFocussed) focussed = False;
-	if (registered && prevVisible)	Hide();
+	if (registered && prevFocussed) { focussed = False; }
+	if (registered && prevVisible)	{ surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
 
 	text = newText;
 
 	ComputeTextSize();
 
-	if (registered && prevVisible)	Show();
-	if (registered && prevFocussed) focussed = True;
-
-	Process(SM_MOUSEMOVE, 0, 0);
+	if (registered && prevVisible)  { Show(); Process(SM_MOUSEMOVE, 0, 0); surface->EndPaint(); }
+	if (registered && prevFocussed) { focussed = True; }
 
 	return Success();
 }
@@ -845,15 +849,20 @@ S::Int S::GUI::Widget::SetFont(const Font &nFont)
 {
 	if (font == nFont) return Success();
 
-	Bool	 prevVisible = IsVisible();
+	Surface	*surface      = GetDrawSurface();
 
-	if (registered && prevVisible) Hide();
+	Bool	 prevVisible  = IsVisible();
+	Bool	 prevFocussed = focussed;
+
+	if (registered && prevFocussed) { focussed = False; }
+	if (registered && prevVisible)	{ surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
 
 	font = nFont;
 
 	ComputeTextSize();
 
-	if (registered && prevVisible) Show();
+	if (registered && prevVisible)  { Show(); Process(SM_MOUSEMOVE, 0, 0); surface->EndPaint(); }
+	if (registered && prevFocussed) { focussed = True; }
 
 	return Success();
 }

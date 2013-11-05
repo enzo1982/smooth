@@ -101,7 +101,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 				for (Int i = 0; i < height; i++)
 				{
 					if (IsActive())	surface->Line(lineStart, lineEnd, Setup::TextColor);
-					else		surface->Line(lineStart, lineEnd, Setup::GrayTextColor);
+					else		surface->Line(lineStart, lineEnd, Setup::InactiveTextColor);
 
 					lineStart += Point(1, 1);
 					lineEnd	  += Point(-1, 1);
@@ -206,6 +206,9 @@ S::Void S::GUI::ComboBox::CloseListBox()
 {
 	if (listBox == NIL) return;
 
+	toolWindow->onLoseFocus.Disconnect(&ComboBox::CloseListBox, this);
+	toolWindow->Hide();
+
 	listBox->RemoveAllEntries();
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
@@ -223,16 +226,12 @@ S::Void S::GUI::ComboBox::CloseListBox()
 
 	toolWindow->Remove(listBox);
 
-	DeleteObject(listBox);
-
-	listBox	   = NIL;
-
-	toolWindow->Close();
-
 	Remove(toolWindow);
 
+	DeleteObject(listBox);
 	DeleteObject(toolWindow);
 
+	listBox	   = NIL;
 	toolWindow = NIL;
 
 	listBoxClosed = S::System::System::Clock();

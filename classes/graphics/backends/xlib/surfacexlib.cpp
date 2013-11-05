@@ -470,7 +470,7 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 
 				XDrawPoint(display, this->bitmap, gc, destRect.left + point.x, destRect.top + point.y);
 			}
-		}		
+		}
 	}
 
 	/* Delete copy if we created one earlier.

@@ -35,7 +35,7 @@ S::Int S::System::ScreenWin32::Initialize()
 
 	GetVersionExA(&vInfo);
 
-	if ((vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT      && vInfo.dwMajorVersion >= 5) || 
+	if ((vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT      && vInfo.dwMajorVersion >= 5) ||
 	    (vInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && vInfo.dwMinorVersion >= 1))
 	{
 		user32dll = LoadLibraryA("user32.dll");

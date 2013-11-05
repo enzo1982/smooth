@@ -84,7 +84,7 @@ S::Bool S::GUI::BitmapHaiku::CreateBitmap(Int cx, Int cy, Int bpp)
 
 	if (bitmap == NIL) return False;
 
-	bytes	= bitmap->Bits();	
+	bytes	= bitmap->Bits();
 
 	size	= Size(cx, cy);
 	depth	= bpp;

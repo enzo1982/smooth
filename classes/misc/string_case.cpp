@@ -1,20 +1,20 @@
- /* The smooth Class Library								
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>				
-  *												
-  * This library is free software; you can redistribute it and/or				
-  * modify it under the terms of "The Artistic License, Version 2.0".			
-  *												
-  * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR				
-  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED				
-  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */			
-												
-#include <smooth/misc/string.h>								
-												
-S::String S::String::ToUpper() const							
-{												
-	String	 retVal = *this;								
-												
-	for (Int i = 0; i < Length(); i++)							
+ /* The smooth Class Library
+  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of "The Artistic License, Version 2.0".
+  *
+  * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
+
+#include <smooth/misc/string.h>
+
+S::String S::String::ToUpper() const
+{
+	String	 retVal = *this;
+
+	for (Int i = 0; i < Length(); i++)
 	{
 		if	((*this)[i] >= 0x61 && (*this)[i] <= 0x7a)				retVal[i] = (*this)[i] - 0x20;	// Alphabet
 		else if	((*this)[i] == 0xb5)							retVal[i] =		 0x39c;	// Single character
@@ -176,17 +176,17 @@ S::String S::String::ToUpper() const
 		else if	((*this)[i] >= 0xa77a && (*this)[i] <= 0xa77c && !((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x1;	// Special letters
 		else if	((*this)[i] >= 0xa77f && (*this)[i] <= 0xa787 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x1;	// Special letters
 		else if	((*this)[i] == 0xa78c)							retVal[i] =		 0xa78b;	// Single character
-		else if	((*this)[i] >= 0xff41 && (*this)[i] <= 0xff5a)				retVal[i] = (*this)[i] - 0x20;	// Alphabet															
-	}							
-								
-	return retVal;						
-}								
-															
-S::String S::String::ToLower() const			
-{								
-	String	 retVal = *this;				
-								
-	for (Int i = 0; i < Length(); i++)			
+		else if	((*this)[i] >= 0xff41 && (*this)[i] <= 0xff5a)				retVal[i] = (*this)[i] - 0x20;	// Alphabet
+	}
+
+	return retVal;
+}
+
+S::String S::String::ToLower() const
+{
+	String	 retVal = *this;
+
+	for (Int i = 0; i < Length(); i++)
 	{
 		if	((*this)[i] >= 0x41 && (*this)[i] <= 0x5a)				retVal[i] = (*this)[i] + 0x20;	// Alphabet
 		else if	((*this)[i] >= 0xc0 && (*this)[i] <= 0xd6)				retVal[i] = (*this)[i] + 0x20;	// Alphabet
@@ -334,17 +334,17 @@ S::String S::String::ToLower() const
 		else if	((*this)[i] == 0xa77d)							retVal[i] =		 0x1d79;	// Single character
 		else if	((*this)[i] >= 0xa77e && (*this)[i] <= 0xa786 && !((*this)[i] & 1))	retVal[i] = (*this)[i] + 0x1;	// Special letters
 		else if	((*this)[i] == 0xa78b)							retVal[i] =		 0xa78c;	// Single character
-		else if	((*this)[i] >= 0xff21 && (*this)[i] <= 0xff3a)				retVal[i] = (*this)[i] + 0x20;	// Alphabet															
-	}							
-								
-	return retVal;						
-}								
-															
-S::String S::String::ToTitle() const			
-{								
-	String	 retVal = *this;				
-								
-	for (Int i = 0; i < Length(); i++)			
+		else if	((*this)[i] >= 0xff21 && (*this)[i] <= 0xff3a)				retVal[i] = (*this)[i] + 0x20;	// Alphabet
+	}
+
+	return retVal;
+}
+
+S::String S::String::ToTitle() const
+{
+	String	 retVal = *this;
+
+	for (Int i = 0; i < Length(); i++)
 	{
 		if	((*this)[i] >= 0x61 && (*this)[i] <= 0x7a)				retVal[i] = (*this)[i] - 0x20;	// Alphabet
 		else if	((*this)[i] == 0xb5)							retVal[i] =		 0x39c;	// Single character
@@ -508,8 +508,8 @@ S::String S::String::ToTitle() const
 		else if	((*this)[i] >= 0xa77a && (*this)[i] <= 0xa77c && !((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x1;	// Special letters
 		else if	((*this)[i] >= 0xa77f && (*this)[i] <= 0xa787 &&  ((*this)[i] & 1))	retVal[i] = (*this)[i] - 0x1;	// Special letters
 		else if	((*this)[i] == 0xa78c)							retVal[i] =		 0xa78b;	// Single character
-		else if	((*this)[i] >= 0xff41 && (*this)[i] <= 0xff5a)				retVal[i] = (*this)[i] - 0x20;	// Alphabet															
-	}							
-								
-	return retVal;						
-}								
+		else if	((*this)[i] >= 0xff41 && (*this)[i] <= 0xff5a)				retVal[i] = (*this)[i] - 0x20;	// Alphabet
+	}
+
+	return retVal;
+}

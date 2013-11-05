@@ -13,7 +13,7 @@ Int smooth::Main()
 	// Create a new isolate.
 	Isolate			*isolate = v8::Isolate::New();
 
-	// Enter the created isolate. 
+	// Enter the created isolate.
 	{
 		Isolate::Scope		 isolateScope(isolate);
 
@@ -24,7 +24,7 @@ Int smooth::Main()
 		Local<Context>		 context = Context::New(isolate);
 
 		// Enter the created context for compiling and
-		// running the hello world script. 
+		// running the hello world script.
 		Context::Scope		 contextScope(context);
 
 		// Create a string containing the JavaScript source code.

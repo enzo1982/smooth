@@ -31,7 +31,7 @@ S::GUI::PopupMenu::PopupMenu()
 	closedByClick	= False;
 
 	toolWindow = NIL;
-	
+
 	internalRequestClose.SetParentObject(this);
 
 	internalOnOpenPopupMenu.Connect(&PopupMenu::OnOpenPopupMenu, this);

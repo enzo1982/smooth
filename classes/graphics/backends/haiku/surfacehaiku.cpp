@@ -455,7 +455,7 @@ S::Int S::GUI::SurfaceHaiku::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	destBitmap->AddChild(destView);
 	destBitmap->Lock();
 
-	bitmapView->Sync();	
+	bitmapView->Sync();
 
 	/* Copy the image.
 	 */

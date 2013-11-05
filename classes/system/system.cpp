@@ -112,7 +112,7 @@ S::Bool S::System::System::OpenURL(const String &url)
 	}
 #else
 	/* Try the open commands from freedesktop.org and the Gnome and
-	 * KDE desktops first, then try some widely used browsers. 
+	 * KDE desktops first, then try some widely used browsers.
 	 */
 	static const char	*browsers[] = { "xdg-open", "gnome-open", "kde-open",
 						"firefox", "safari", "chrome", "opera", "mozilla", "netscape", "epiphany", "konqueror",

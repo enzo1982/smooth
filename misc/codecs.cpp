@@ -952,7 +952,7 @@ int GetMinimumBits(int number)
 	for (Int i = 0; i <= 32; i++)
 	{
 		if (number < Math::Pow(2l, i)) return i;
-	} 
+	}
 
 	return 0;
 }

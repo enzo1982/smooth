@@ -92,11 +92,11 @@ S::Bool S::GUI::BitmapGDIPlus::CreateBitmap(Int cx, Int cy, Int bpp)
 	bmpInfo->bmiHeader.biPlanes		= 1;
 	bmpInfo->bmiHeader.biBitCount		= bpp;
 	bmpInfo->bmiHeader.biCompression	= BI_RGB;
-	bmpInfo->bmiHeader.biSizeImage		= 0; 
-	bmpInfo->bmiHeader.biXPelsPerMeter	= 0; 
-	bmpInfo->bmiHeader.biYPelsPerMeter	= 0; 
-	bmpInfo->bmiHeader.biClrUsed		= 0; 
-	bmpInfo->bmiHeader.biClrImportant	= 0; 
+	bmpInfo->bmiHeader.biSizeImage		= 0;
+	bmpInfo->bmiHeader.biXPelsPerMeter	= 0;
+	bmpInfo->bmiHeader.biYPelsPerMeter	= 0;
+	bmpInfo->bmiHeader.biClrUsed		= 0;
+	bmpInfo->bmiHeader.biClrImportant	= 0;
 	bmpInfo->bmiColors[0].rgbBlue		= 0;
 	bmpInfo->bmiColors[0].rgbGreen		= 0;
 	bmpInfo->bmiColors[0].rgbRed		= 0;
@@ -106,7 +106,7 @@ S::Bool S::GUI::BitmapGDIPlus::CreateBitmap(Int cx, Int cy, Int bpp)
 
 	bitmap	= new Gdiplus::Bitmap(bmpInfo, bytes);
 
-	delete [] buffer; 
+	delete [] buffer;
 
 	if (bitmap == NIL) return False;
 

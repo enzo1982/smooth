@@ -66,7 +66,7 @@ S::Int S::Backends::BackendCocoa::Init()
 	/* Create a garbage collection pool.
 	 */
 	pool = [[NSAutoreleasePool alloc] init];
-	
+
 	/* Set application delegate.
 	 */
 	[NSApp setDelegate: [[[CocoaApplicationDelegate alloc] init] autorelease]];

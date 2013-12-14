@@ -20,6 +20,8 @@ S::GUI::Text::Text(const String &iText, const Point &iPos) : Widget(iPos, Size()
 	text	= iText;
 
 	ComputeTextSize();
+
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
 }
 
 S::GUI::Text::~Text()
@@ -31,19 +33,16 @@ S::Int S::GUI::Text::Paint(Int message)
 	if (!IsRegistered()) return Error();
 	if (!IsVisible())    return Success();
 
-	Surface	*surface = GetDrawSurface();
-
-	SetSize(scaledTextSize * 96.0 / surface->GetSurfaceDPI() + Size(0, 1));
-
 	switch (message)
 	{
 		case SP_PAINT:
 			{
-				Font	 nFont = font;
+				Font	 nFont	 = font;
 
 				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
-				Rect	 rect  = Rect(GetRealPosition(), GetRealSize());
+				Rect	 rect	 = Rect(GetRealPosition(), GetRealSize());
+				Surface	*surface = GetDrawSurface();
 
 				surface->Box(rect, GetBackgroundColor(), Rect::Filled);
 				surface->SetText(text, Rect::OverlapRect(Rect(GetRealPosition(), Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2))), GetVisibleArea()), nFont);
@@ -51,6 +50,17 @@ S::Int S::GUI::Text::Paint(Int message)
 
 			break;
 	}
+
+	return Success();
+}
+
+S::Int S::GUI::Text::SetText(const String &newText)
+{
+	Widget::SetText(newText);
+
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
+
+	Paint(SP_PAINT);
 
 	return Success();
 }

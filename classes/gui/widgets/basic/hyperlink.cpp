@@ -39,7 +39,7 @@ S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const St
 	{
 		ComputeTextSize();
 
-		SetSize(unscaledTextSize + Size(0, 2));
+		SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
 	}
 
 	hotspot	= new Hotspot(Point(0, 0), GetSize());
@@ -71,7 +71,7 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 				if (linkBitmap == NIL)
 				{
 					surface->Box(rect, GetBackgroundColor(), Rect::Filled);
-					surface->SetText(text, Rect(GetRealPosition(), scaledTextSize + Size(0, 1)), font);
+					surface->SetText(text, Rect::OverlapRect(Rect(GetRealPosition(), Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2))), GetVisibleArea()), font);
 				}
 				else
 				{
@@ -129,7 +129,7 @@ S::Int S::GUI::Hyperlink::SetText(const String &newText)
 
 	Widget::SetText(newText);
 
-	SetSize(unscaledTextSize + Size(0, 2));
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
 
 	hotspot->SetSize(GetSize());
 

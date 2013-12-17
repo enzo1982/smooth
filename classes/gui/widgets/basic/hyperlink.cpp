@@ -123,11 +123,24 @@ S::Void S::GUI::Hyperlink::OnClickLink()
 	onAction.Emit();
 }
 
-S::Int S::GUI::Hyperlink::SetText(const String &newText)
+S::Int S::GUI::Hyperlink::SetText(const String &nText)
 {
 	if (linkBitmap != NIL) linkBitmap = NIL;
 
-	Widget::SetText(newText);
+	Widget::SetText(nText);
+
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
+
+	hotspot->SetSize(GetSize());
+
+	Paint(SP_PAINT);
+
+	return Success();
+}
+
+S::Int S::GUI::Hyperlink::SetFont(const Font &nFont)
+{
+	Widget::SetFont(nFont);
 
 	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
 

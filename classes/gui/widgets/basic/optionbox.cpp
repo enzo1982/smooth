@@ -58,26 +58,26 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 	if (!IsRegistered()) return Error();
 	if (!IsVisible())    return Success();
 
-	Surface	*surface = GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
-
 	switch (message)
 	{
 		case SP_PAINT:
-			{
-				Font	 nFont = font;
-
-				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
-
-				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
-				surface->SetText(text, frame + Point(frame.GetHeight(), 2), nFont);
-			}
-
-			/* Fall through to SP_UPDATE here.
-			 */
-
 		case SP_UPDATE:
 			{
+				Surface	*surface = GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+
+				surface->StartPaint(frame);
+
+				if (message == SP_PAINT)
+				{
+					Font	 nFont = font;
+
+					if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
+
+					surface->Box(frame, GetBackgroundColor(), Rect::Filled);
+					surface->SetText(text, frame + Point(frame.GetHeight(), 2), nFont);
+				}
+
 				Int	 lightColor;
 
 				if (IsActive())	lightColor = Setup::ClientColor;
@@ -168,6 +168,8 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 						surface->Box(Rect(point + Point(0, 1), Size(3, 3) * surface->GetSurfaceDPI() / 96.0 + Size(2, 0)), color, Rect::Filled);
 					}
 				}
+
+				surface->EndPaint();
 			}
 
 			break;

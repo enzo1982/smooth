@@ -36,6 +36,8 @@ namespace smooth
 				virtual Int		 Paint(Int);
 			accessors:
 				Int			 SetText(const String &);
+
+				Int			 SetFont(const Font &);
 		};
 	};
 };

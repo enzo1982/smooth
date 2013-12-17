@@ -60,26 +60,26 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 	if (!IsRegistered()) return Error();
 	if (!IsVisible())    return Success();
 
-	Surface	*surface = GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
-
 	switch (message)
 	{
 		case SP_PAINT:
-			{
-				Font	 nFont = font;
-
-				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
-
-				surface->Box(frame, GetBackgroundColor(), Rect::Filled);
-				surface->SetText(text, frame + Point(frame.GetHeight(), 2), nFont);
-			}
-
-			/* Fall through to SP_UPDATE here.
-			 */
-
 		case SP_UPDATE:
 			{
+				Surface	*surface = GetDrawSurface();
+				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+
+				surface->StartPaint(frame);
+
+				if (message == SP_PAINT)
+				{
+					Font	 nFont = font;
+
+					if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
+
+					surface->Box(frame, GetBackgroundColor(), Rect::Filled);
+					surface->SetText(text, frame + Point(frame.GetHeight(), 2), nFont);
+				}
+
 				Rect	 valueFrame = Rect(GetRealPosition() + Point(3, 3) * surface->GetSurfaceDPI() / 96.0, Size(frame.GetHeight(), frame.GetHeight()) - (Size(3, 3) * surface->GetSurfaceDPI() / 96.0) * 2);
 
 				if (IsActive())	surface->Box(valueFrame, Setup::ClientColor, Rect::Filled);
@@ -112,6 +112,8 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 						surface->Line(p1 + Point(valueFrame.GetWidth() - 6, 0), p2 - Point(valueFrame.GetWidth() - 3, 1), color);
 					}
 				}
+
+				surface->EndPaint();
 			}
 
 			break;

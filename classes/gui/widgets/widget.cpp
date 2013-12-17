@@ -807,9 +807,9 @@ S::Void S::GUI::Widget::SetFocusByKeyboard()
 	}
 }
 
-S::Int S::GUI::Widget::SetText(const String &newText)
+S::Int S::GUI::Widget::SetText(const String &nText)
 {
-	if (text == newText) return Success();
+	if (text == nText) return Success();
 
 	Surface	*surface      = GetDrawSurface();
 
@@ -819,7 +819,7 @@ S::Int S::GUI::Widget::SetText(const String &newText)
 	if (registered && prevFocussed) { focussed = False; }
 	if (registered && prevVisible)	{ surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
 
-	text = newText;
+	text = nText;
 
 	ComputeTextSize();
 

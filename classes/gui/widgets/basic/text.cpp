@@ -54,9 +54,20 @@ S::Int S::GUI::Text::Paint(Int message)
 	return Success();
 }
 
-S::Int S::GUI::Text::SetText(const String &newText)
+S::Int S::GUI::Text::SetText(const String &nText)
 {
-	Widget::SetText(newText);
+	Widget::SetText(nText);
+
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
+
+	Paint(SP_PAINT);
+
+	return Success();
+}
+
+S::Int S::GUI::Text::SetFont(const Font &nFont)
+{
+	Widget::SetFont(nFont);
 
 	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
 

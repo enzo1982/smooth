@@ -48,7 +48,22 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	Int	 occupied_left	= 5;
 
 #ifdef __APPLE__
-	occupied_right += 10;
+	/* Check if OS X version is lower than 10.7 (Darwin 11.0) and
+	 * occupy ten pixels for the handle at the right in that case.
+	 */
+	Buffer<char>	 buffer(32);
+	FILE		*pstdin = popen("sysctl kern.osrelease", "r");
+
+	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+	pclose(pstdin);
+
+	String		 osrelease = (char *) buffer;
+
+	if (!osrelease.StartsWith("kern.osrelease: ") || osrelease.Tail(osrelease.Length() - 16).ToInt() < 11)
+	{
+		occupied_right += 10;
+	}
 #endif
 
 	for (Int i = 0; i < GetNOfObjects(); i++)

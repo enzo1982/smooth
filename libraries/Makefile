@@ -10,6 +10,10 @@ ifeq ($(BUILD_LINUX),True)
 else ifeq ($(BUILD_OSX),True)
 	$(MAKE) -C libcpuid
 	$(MAKE) -C libjpeg
+ifneq ($(BUILD_XLIB),True)
+	$(MAKE) -C libpng
+	$(MAKE) -C libz
+endif
 	$(MAKE) -C nsucd
 else ifeq ($(BUILD_QNX),True)
 	$(MAKE) -C libiconv
@@ -41,6 +45,10 @@ ifeq ($(BUILD_LINUX),True)
 else ifeq ($(BUILD_OSX),True)
 	$(MAKE) -C libcpuid clean
 	$(MAKE) -C libjpeg clean
+ifneq ($(BUILD_XLIB),True)
+	$(MAKE) -C libpng clean
+	$(MAKE) -C libz clean
+endif
 	$(MAKE) -C nsucd clean
 else ifeq ($(BUILD_QNX),True)
 	$(MAKE) -C libiconv clean

@@ -29,11 +29,17 @@ ifeq ($(BUILD_WIN32),True)
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
 else ifeq ($(BUILD_OSX),True)
+	ifeq ($(BUILD_XLIB),True)
+		LIBS += -lpng -lz -lX11 -lXmu
+	else
+		LIBS += $(LIBDIR)/libpng.a $(LIBDIR)/libz.a
+	endif
+
 	ifeq ($(BUILD_CAIRO),True)
 		LIBS += -lcairo
 	endif
 
-	LIBS += -lcpuid -lnsucd -liconv -lpng -lz -lpthread -lX11 -lXmu
+	LIBS += -lcpuid -lnsucd -liconv -lpthread
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_HAIKU),True)
@@ -94,7 +100,11 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	LINKER_OPTS += -mwindows -Wl,--dynamicbase,--nxcompat,--kill-at,--out-implib,$(LIBNAME)
 else ifeq ($(BUILD_OSX),True)
-	LINKER_OPTS += -framework Cocoa -L/usr/X11/lib -Wl,-dylib_install_name,libsmooth-$(VERSION).$(REVISION)$(SHARED)
+	LINKER_OPTS += -framework Cocoa -Wl,-dylib_install_name,libsmooth-$(VERSION).$(REVISION)$(SHARED)
+
+	ifeq ($(BUILD_XLIB),True)
+		LINKER_OPTS += -L/usr/X11/lib
+	endif
 else
 	LINKER_OPTS += -Wl,-soname,libsmooth-$(VERSION)$(SHARED).$(REVISION)
 

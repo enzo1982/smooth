@@ -7,10 +7,16 @@ include $(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 ifeq ($(BUILD_WIN32),True)
-	MYCCOPTS += -I$(SMOOTH_PATH)/include/support/libjpeg -I$(SMOOTH_PATH)/include/support/libpng
-else ifeq ($(BUILD_OSX),True)
-	MYCCOPTS += -I/usr/X11/include
 	MYCCOPTS += -I$(SMOOTH_PATH)/include/support/libjpeg
+	MYCCOPTS += -I$(SMOOTH_PATH)/include/support/libpng
+else ifeq ($(BUILD_OSX),True)
+	MYCCOPTS += -I$(SMOOTH_PATH)/include/support/libjpeg
+
+	ifneq ($(BUILD_XLIB),True)
+		MYCCOPTS += -I$(SMOOTH_PATH)/include/support/libpng
+	else
+		MYCCOPTS += -I/usr/X11/include
+	endif
 else ifeq ($(BUILD_QNX),True)
 	MYCCOPTS += -I$(SMOOTH_PATH)/include/support/libjpeg
 	MYCCOPTS += -I$(SMOOTH_PATH)/include/support/libpng

@@ -76,7 +76,6 @@ ifneq ($(EXCEPTION),True)
 endif
 
 ifeq ($(BUILD_OSX),True)
-	CCOPTS += -mmacosx-version-min=10.5
 	LDOPTS += -Wl,-x
 
 ifeq ($(BUILD_X86),True)

@@ -187,8 +187,9 @@ const int	 NSApplicationInsertText = 8;
 	{
 		if (![self hasMarkedText]) [self handleEvent: event];
 
-		S::Int	 keySym	       = [[event charactersIgnoringModifiers] characterAtIndex: 0];
-		S::Int	 modifierFlags = [event modifierFlags];
+		NSString	*characters    = [event charactersIgnoringModifiers];
+		S::Int		 keySym	       = [characters length] >= 1 ? [characters characterAtIndex: 0] : 0;
+		S::Int		 modifierFlags = [event modifierFlags];
 
 		if ([self hasMarkedText] || (keySym != NSTabCharacter		 &&
 					     keySym != NSBackTabCharacter	 &&
@@ -203,7 +204,7 @@ const int	 NSApplicationInsertText = 8;
 					     keySym != NSUpArrowFunctionKey	 &&
 					     keySym != NSRightArrowFunctionKey	 &&
 					     keySym != NSDownArrowFunctionKey    &&
-					     !(modifierFlags & NSControlKeyMask))) [[self inputContext] handleEvent:event];
+					     !(modifierFlags & NSControlKeyMask))) [self interpretKeyEvents: [NSArray arrayWithObject: event]];
 	}
 
 	- (void) keyUp:		    (NSEvent *) event { [self handleEvent: event]; }
@@ -717,17 +718,27 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 		/* Keyboard events:
 		 */
 		case NSKeyDown:
-			Input::Keyboard::UpdateKeyState(ConvertKey([[e charactersIgnoringModifiers] characterAtIndex: 0]), True);
+			if ([[e charactersIgnoringModifiers] length] >= 1)
+			{
+				NSString	*characters = [e charactersIgnoringModifiers];
 
-			onEvent.Call(SM_KEYDOWN, ConvertKey([[e charactersIgnoringModifiers] characterAtIndex: 0]), 0);
+				Input::Keyboard::UpdateKeyState(ConvertKey([characters characterAtIndex: 0]), True);
+
+				onEvent.Call(SM_KEYDOWN, ConvertKey([characters characterAtIndex: 0]), 0);
+			}
 
 			break;
 
 		case NSKeyUp:
-			Input::Keyboard::UpdateKeyState(ConvertKey([[e charactersIgnoringModifiers] characterAtIndex: 0]), False);
+			if ([[e charactersIgnoringModifiers] length] >= 1)
+			{
+				NSString	*characters = [e charactersIgnoringModifiers];
 
-			onEvent.Call(SM_KEYUP, ConvertKey([[e charactersIgnoringModifiers] characterAtIndex: 0]), 0);
+				Input::Keyboard::UpdateKeyState(ConvertKey([characters characterAtIndex: 0]), False);
 
+				onEvent.Call(SM_KEYUP, ConvertKey([characters characterAtIndex: 0]), 0);
+			}
+			
 			break;
 
 		case NSFlagsChanged:

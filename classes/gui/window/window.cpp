@@ -370,6 +370,11 @@ S::GUI::Rect S::GUI::Window::GetRestoredWindowRect() const
 	else		   return GetWindowRect();
 }
 
+S::GUI::Rect S::GUI::Window::GetVisibleArea() const
+{
+	return Rect(Point(frameWidth, frameWidth), GetRealSize() - Size(frameWidth, frameWidth) * 2);
+}
+
 S::Int S::GUI::Window::SetMinimumSize(const Size &newMinSize)
 {
 	backend->SetMinimumSize(newMinSize);
@@ -726,8 +731,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 	Widget	*lastTopWidget	= NIL;
 	Int	 positions	= 0;
 
-	if (GetObjectType() == ToolWindow::classID) innerOffset = Rect(Point(0, 0), Size(0, 0));
-	else					    innerOffset = Rect(Point(frameWidth, frameWidth), Size(0, 0));
+	innerOffset = Rect(Point(frameWidth, frameWidth), Size(0, 0));
 
 	for (Int i = 0; i < GetNOfObjects(); i++)
 	{

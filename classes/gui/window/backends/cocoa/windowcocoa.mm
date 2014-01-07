@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -888,17 +888,21 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 	if (!(flags & WF_NORESIZE  )) styleMask |= NSResizableWindowMask;
 	if (  flags & WF_THINBORDER ) styleMask  = NSBorderlessWindowMask;
 
-	wnd = [[[CocoaWindow alloc] initWithContentRect: frame
-					      styleMask: styleMask
-						backing: NSBackingStoreBuffered
-						  defer: YES] retain];
+	wnd = [[CocoaWindow alloc] initWithContentRect: frame
+					     styleMask: styleMask
+					       backing: NSBackingStoreBuffered
+						 defer: YES];
 
 	if (wnd != nil)
 	{
+		/* We will explicitly release the window later.
+		 */
+		[wnd setReleasedWhenClosed: NO];
+
 		/* Init content view and delegate.
 		 */
-		[wnd setContentView: [[CocoaView alloc] initWithFrame: frame]];
-		[wnd setDelegate: [[CocoaWindowDelegate alloc] init]];
+		[wnd setContentView: [[[CocoaView alloc] initWithFrame: frame] autorelease]];
+		[wnd setDelegate: [[[CocoaWindowDelegate alloc] init] autorelease]];
 
 		/* Create drawing surface.
 		*/
@@ -949,9 +953,6 @@ S::Int S::GUI::WindowCocoa::Close()
 	/* Destroy input context and window.
 	 */
 	[wnd close];
-
-	[[wnd contentView] release];
-	[[wnd delegate] release];
 
 	/* Emit onDestroy signal.
 	 */

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,18 +33,19 @@ S::GUI::Size S::GUI::FontCocoa::GetTextSize(const String &iText, Bool scaled) co
 
 	Float	 dpi = Surface().GetSurfaceDPI();
 
+	NSAutoreleasePool	*pool	    = [[NSAutoreleasePool alloc] init];
 	NSFont			*font	    = [[NSFontManager sharedFontManager] fontWithFamily: [NSString stringWithUTF8String: fontName.ConvertTo("UTF-8")]
 											 traits: (fontStyle & Font::Italic ? NSItalicFontMask : 0) | (fontWeight >= Font::Bold ? NSBoldFontMask : 0)
 											 weight: 5
 											   size: fontSize * dpi / 72.0];
 	NSDictionary		*attributes = [NSDictionary dictionaryWithObject: font
 									  forKey: NSFontAttributeName];
-	NSAttributedString	*string	    = [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: iText.ConvertTo("UTF-8")]
-									      attributes: attributes];
+	NSAttributedString	*string	    = [[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: iText.ConvertTo("UTF-8")]
+									       attributes: attributes] autorelease];
 
 	NSSize	 size = [string size];
 
-	[string release];
+	[pool release];
 
 	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(size.width, size.height - 2);
 	else					   return Size(size.width, size.height - 2) * 96.0 / dpi;

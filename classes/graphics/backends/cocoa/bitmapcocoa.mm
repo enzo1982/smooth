@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -83,17 +83,17 @@ S::Bool S::GUI::BitmapCocoa::CreateBitmap(Int cx, Int cy, Int bpp)
 	if (bpp == -1)		    bpp = [[NSScreen mainScreen] depth];
 	if (bpp != 24 && bpp != 32) bpp = 24;
 
-	bitmap	= [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
-							   pixelsWide: cx
-							   pixelsHigh: cy
-							bitsPerSample: 8
-						      samplesPerPixel: bpp == 32 ? 4 : 3
-							     hasAlpha: bpp == 32
-							     isPlanar: NO
-						       colorSpaceName: NSCalibratedRGBColorSpace
-							 bitmapFormat: 0
-							  bytesPerRow: ((4 - ((cx * (bpp == 32 ? 4 : 3)) & 3)) & 3) + cx * (bpp == 32 ? 4 : 3)
-							 bitsPerPixel: bpp] retain];
+	bitmap	= [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
+							  pixelsWide: cx
+							  pixelsHigh: cy
+						       bitsPerSample: 8
+						     samplesPerPixel: bpp == 32 ? 4 : 3
+							    hasAlpha: bpp == 32
+							    isPlanar: NO
+						      colorSpaceName: NSCalibratedRGBColorSpace
+							bitmapFormat: 0
+							 bytesPerRow: ((4 - ((cx * (bpp == 32 ? 4 : 3)) & 3)) & 3) + cx * (bpp == 32 ? 4 : 3)
+							bitsPerPixel: bpp];
 
 	if (bitmap == NIL) return False;
 

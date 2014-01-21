@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,39 @@ static const char *smooth_ca =
 	     <entry string=\"Retry\">Reintenta</entry>					\
 	     <entry string=\"Abort\">Interromp</entry>					\
 	     <entry string=\"Ignore\">Ignora</entry>					\
+											\
+	     <entry string=\"Undo\">Desfés</entry>					\
+	     <entry string=\"Cut\">Talla</entry>					\
+	     <entry string=\"Copy\">Copia</entry>					\
+	     <entry string=\"Paste\">Enganxa</entry>					\
+	     <entry string=\"Clear\">Neteja</entry>					\
+	     <entry string=\"Select all\">Selecciona-ho tot</entry>			\
+											\
+	     <entry string=\"Backspace\">Espai enrere</entry>				\
+	     <entry string=\"Tab\">Tab</entry>						\
+	     <entry string=\"Return\">Intro</entry>					\
+	     <entry string=\"Esc\">Esc</entry>						\
+	     <entry string=\"Space\">Espai</entry>					\
+	     <entry string=\"PgUp\">RePàg</entry>					\
+	     <entry string=\"PgDown\">AvPàg</entry>					\
+	     <entry string=\"End\">Fi</entry>						\
+	     <entry string=\"Home\">Inici</entry>					\
+	     <entry string=\"Left\">Esquerra</entry>					\
+	     <entry string=\"Up\">Amunt</entry>						\
+	     <entry string=\"Right\">Dreta</entry>					\
+	     <entry string=\"Down\">Avall</entry>					\
+	     <entry string=\"Ins\">Ins</entry>						\
+	     <entry string=\"Del\">Supr</entry>						\
+	     <entry string=\"Ctrl\">Ctrl</entry>					\
+	     <entry string=\"Alt\">Alt</entry>						\
+	     <entry string=\"Shift\">Majús</entry>					\
+											\
+	     <entry string=\"Open file\">Obre fitxer</entry>				\
+	     <entry string=\"Save file\">Desa el fitxer</entry>				\
+	     <entry string=\"Save file as\">Desa el fitxer com a</entry>		\
+	     <entry string=\"Select directory\">Tria carpeta</entry>			\
+	     <entry string=\"Select font\">Trieu tipus de lletra</entry>		\
+											\
 	     <entry string=\"Color selection\">Selecció de color</entry>		\
 	     <entry string=\"HTML code\">Codi HTML</entry>				\
 	     <entry string=\"R\">R</entry>						\
@@ -37,11 +70,7 @@ static const char *smooth_ca =
 	     <entry string=\"H\">H</entry>						\
 	     <entry string=\"S\">S</entry>						\
 	     <entry string=\"V\">V</entry>						\
-	     <entry string=\"Open file\">Obre fitxer</entry>				\
-	     <entry string=\"Save file\">Desa el fitxer</entry>				\
-	     <entry string=\"Save file as\">Desa el fitxer com a</entry>		\
-	     <entry string=\"Select directory\">Tria carpeta</entry>			\
-	     <entry string=\"Select font\">Trieu tipus de lletra</entry>		\
+											\
 	     <entry string=\"Tip of the day\">Pista del dia</entry>			\
 	     <entry string=\"Did you know...\">Sabíeu que...</entry>			\
 	     <entry string=\"Show tips on startup\">Mostra pistes en engegar</entry>	\

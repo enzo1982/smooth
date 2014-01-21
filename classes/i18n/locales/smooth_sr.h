@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,26 @@ static const char *smooth_sr =
 	     <entry string=\"Retry\">Ponovo pokušaj</entry>				\
 	     <entry string=\"Abort\">Prekini</entry>					\
 	     <entry string=\"Ignore\">Ignoriši</entry>					\
+											\
+	     <entry string=\"Undo\">Opozovi</entry>					\
+	     <entry string=\"Cut\">Iseci</entry>					\
+	     <entry string=\"Copy\">Kopiraj</entry>					\
+	     <entry string=\"Paste\">Prenesi</entry>					\
+	     <entry string=\"Clear\">Očisti</entry>					\
+	     <entry string=\"Select all\">Izaberi sve</entry>				\
+											\
+	     <entry string=\"Space\">Razmak</entry>					\
+	     <entry string=\"Left\">Levo</entry>					\
+	     <entry string=\"Up\">Gore</entry>						\
+	     <entry string=\"Right\">Desno</entry>					\
+	     <entry string=\"Down\">Dole</entry>					\
+											\
+	     <entry string=\"Open file\">Otvori fajl</entry>				\
+	     <entry string=\"Save file\">Sačuvaj fajl</entry>				\
+	     <entry string=\"Save file as\">Sačuvaj fajl kao ...</entry>		\
+	     <entry string=\"Select directory\">Odaberi folder</entry>			\
+	     <entry string=\"Select font\">Odaberi font</entry>				\
+											\
 	     <entry string=\"Color selection\">Izbor boje</entry>			\
 	     <entry string=\"HTML code\">HTML kod</entry>				\
 	     <entry string=\"R\">R</entry>						\
@@ -37,11 +57,7 @@ static const char *smooth_sr =
 	     <entry string=\"H\">H</entry>						\
 	     <entry string=\"S\">S</entry>						\
 	     <entry string=\"V\">V</entry>						\
-	     <entry string=\"Open file\">Otvori fajl</entry>				\
-	     <entry string=\"Save file\">Sačuvaj fajl</entry>				\
-	     <entry string=\"Save file as\">Sačuvaj fajl kao ...</entry>		\
-	     <entry string=\"Select directory\">Odaberi folder</entry>			\
-	     <entry string=\"Select font\">Odaberi font</entry>				\
+											\
 	     <entry string=\"Tip of the day\">Savet dana</entry>			\
 	     <entry string=\"Did you know...\">Da li znate ...</entry>			\
 	     <entry string=\"Show tips on startup\">Pokaži savete na početku</entry>	\

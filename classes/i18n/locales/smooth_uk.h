@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,26 @@ static const char *smooth_uk =
 	     <entry string=\"Retry\">Спробувати ще раз</entry>				\
 	     <entry string=\"Abort\">Перервати</entry>					\
 	     <entry string=\"Ignore\">Ігнорувати</entry>				\
+											\
+	     <entry string=\"Undo\">Вернути</entry>					\
+	     <entry string=\"Cut\">Вирізати</entry>					\
+	     <entry string=\"Copy\">Скопіювати</entry>					\
+	     <entry string=\"Paste\">Вставити</entry>					\
+	     <entry string=\"Clear\">Очистити</entry>					\
+	     <entry string=\"Select all\">Вибрати все</entry>				\
+											\
+	     <entry string=\"Space\">Пропуск</entry>					\
+	     <entry string=\"Left\">Стрілка ліворуч</entry>				\
+	     <entry string=\"Up\">Стрілка вгору</entry>					\
+	     <entry string=\"Right\">Стрілка праворуч</entry>				\
+	     <entry string=\"Down\">Стрілка вниз</entry>				\
+											\
+	     <entry string=\"Open file\">Відкрити файл</entry>				\
+	     <entry string=\"Save file\">Зберегти файл</entry>				\
+	     <entry string=\"Save file as\">Зберегти файл як</entry>			\
+	     <entry string=\"Select directory\">Виберіть каталог</entry>		\
+	     <entry string=\"Select font\">Виберіть шрифт</entry>			\
+											\
 	     <entry string=\"Color selection\">Виберіть колір</entry>			\
 	     <entry string=\"HTML code\">HTML код</entry>				\
 	     <entry string=\"R\">R</entry>						\
@@ -37,11 +57,7 @@ static const char *smooth_uk =
 	     <entry string=\"H\">H</entry>						\
 	     <entry string=\"S\">S</entry>						\
 	     <entry string=\"V\">V</entry>						\
-	     <entry string=\"Open file\">Відкрити файл</entry>				\
-	     <entry string=\"Save file\">Зберегти файл</entry>				\
-	     <entry string=\"Save file as\">Зберегти файл як</entry>			\
-	     <entry string=\"Select directory\">Виберіть каталог</entry>		\
-	     <entry string=\"Select font\">Виберіть шрифт</entry>			\
+											\
 	     <entry string=\"Tip of the day\">Порада дня</entry>			\
 	     <entry string=\"Did you know...\">Чи знаєте ви, що...</entry>		\
 	     <entry string=\"Show tips on startup\">Показати при запуску</entry>	\

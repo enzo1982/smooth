@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,26 @@ static const char *smooth_pt =
 	     <entry string=\"Retry\">Repetir</entry>					\
 	     <entry string=\"Abort\">Interromper</entry>				\
 	     <entry string=\"Ignore\">Ignorar</entry>					\
+											\
+	     <entry string=\"Undo\">Desfazer</entry>					\
+	     <entry string=\"Cut\">Cortar</entry>					\
+	     <entry string=\"Copy\">Copiar</entry>					\
+	     <entry string=\"Paste\">Colar</entry>					\
+	     <entry string=\"Clear\">Limpar</entry>					\
+	     <entry string=\"Select all\">Seleccionar tudo</entry>			\
+											\
+	     <entry string=\"Space\">Espaço</entry>					\
+	     <entry string=\"Left\">Esquerda</entry>					\
+	     <entry string=\"Up\">Cima</entry>						\
+	     <entry string=\"Right\">Direita</entry>					\
+	     <entry string=\"Down\">Baixo</entry>					\
+											\
+	     <entry string=\"Open file\">Abrir um ficheiro</entry>			\
+	     <entry string=\"Save file\">Gravar o ficheiro</entry>			\
+	     <entry string=\"Save file as\">Gravar o ficheiro como</entry>		\
+	     <entry string=\"Select directory\">Seleccionar a pasta</entry>		\
+	     <entry string=\"Select font\">Seleccione o tipo de letra</entry>		\
+											\
 	     <entry string=\"Color selection\">Seleccionar a cor</entry>		\
 	     <entry string=\"HTML code\">Código HTML</entry>				\
 	     <entry string=\"R\">R</entry>						\
@@ -37,11 +57,7 @@ static const char *smooth_pt =
 	     <entry string=\"H\">H</entry>						\
 	     <entry string=\"S\">S</entry>						\
 	     <entry string=\"V\">V</entry>						\
-	     <entry string=\"Open file\">Abrir um ficheiro</entry>			\
-	     <entry string=\"Save file\">Gravar o ficheiro</entry>			\
-	     <entry string=\"Save file as\">Gravar o ficheiro como</entry>		\
-	     <entry string=\"Select directory\">Seleccionar a pasta</entry>		\
-	     <entry string=\"Select font\">Seleccione o tipo de letra</entry>		\
+											\
 	     <entry string=\"Tip of the day\">Dica do dia</entry>			\
 	     <entry string=\"Did you know...\">Sabia que...</entry>			\
 	     <entry string=\"Show tips on startup\">Mostrar dicas no início</entry>	\

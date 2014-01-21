@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,20 @@ static const char *smooth_ar =
 	     <entry string=\"Retry\">أعِد المحاولة</entry>					\
 	     <entry string=\"Abort\">أجهض</entry>						\
 	     <entry string=\"Ignore\">تجاهل</entry>						\
+												\
+	     <entry string=\"Undo\">تراجع</entry>						\
+	     <entry string=\"Cut\">قص</entry>							\
+	     <entry string=\"Copy\">نسخ</entry>							\
+	     <entry string=\"Paste\">لصق</entry>						\
+	     <entry string=\"Clear\">محو</entry>						\
+	     <entry string=\"Select all\">اختر الكل</entry>					\
+												\
+	     <entry string=\"Open file\">افتح ملف</entry>					\
+	     <entry string=\"Save file\">احفظ ملف</entry>					\
+	     <entry string=\"Save file as\">احفظ ملف ك‍</entry>					\
+	     <entry string=\"Select directory\">اختر مجلد</entry>				\
+	     <entry string=\"Select font\">اختر الخط</entry>					\
+												\
 	     <entry string=\"Color selection\">اختر لون</entry>					\
 	     <entry string=\"HTML code\">الكود</entry>						\
 	     <entry string=\"R\">R</entry>							\
@@ -37,11 +51,7 @@ static const char *smooth_ar =
 	     <entry string=\"H\">H</entry>							\
 	     <entry string=\"S\">S</entry>							\
 	     <entry string=\"V\">V</entry>							\
-	     <entry string=\"Open file\">افتح ملف</entry>					\
-	     <entry string=\"Save file\">احفظ ملف</entry>					\
-	     <entry string=\"Save file as\">احفظ ملف ك‍</entry>					\
-	     <entry string=\"Select directory\">اختر مجلد</entry>				\
-	     <entry string=\"Select font\">اختر الخط</entry>					\
+												\
 	     <entry string=\"Tip of the day\">تلميحة اليوم</entry>				\
 	     <entry string=\"Did you know...\">هل تعلم أن...</entry>				\
 	     <entry string=\"Show tips on startup\">اعرض النصائح عند بدء التشغيل</entry>	\

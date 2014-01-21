@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,20 @@ static const char *smooth_af =
 	     <entry string=\"Retry\">Probeer weer</entry>					\
 	     <entry string=\"Abort\">Staak</entry>						\
 	     <entry string=\"Ignore\">Ignoreer</entry>						\
+												\
+	     <entry string=\"Undo\">Herstel</entry>						\
+	     <entry string=\"Cut\">Knip</entry>							\
+	     <entry string=\"Copy\">Kopie</entry>						\
+	     <entry string=\"Paste\">Plak</entry>						\
+	     <entry string=\"Clear\">Maak skoon</entry>						\
+	     <entry string=\"Select all\">Kies alle</entry>					\
+												\
+	     <entry string=\"Open file\">Open lêer</entry>					\
+	     <entry string=\"Save file\">Stoor lêer</entry>					\
+	     <entry string=\"Save file as\">Stoor lêer as</entry>				\
+	     <entry string=\"Select directory\">Kies gids</entry>				\
+	     <entry string=\"Select font\">Kies skrif tipe</entry>				\
+												\
 	     <entry string=\"Color selection\">Kies kleur</entry>				\
 	     <entry string=\"HTML code\">HTML-kode</entry>					\
 	     <entry string=\"R\">R</entry>							\
@@ -37,11 +51,7 @@ static const char *smooth_af =
 	     <entry string=\"H\">H</entry>							\
 	     <entry string=\"S\">S</entry>							\
 	     <entry string=\"V\">V</entry>							\
-	     <entry string=\"Open file\">Open lêer</entry>					\
-	     <entry string=\"Save file\">Stoor lêer</entry>					\
-	     <entry string=\"Save file as\">Stoor lêer as</entry>				\
-	     <entry string=\"Select directory\">Kies gids</entry>				\
-	     <entry string=\"Select font\">Kies skrif tipe</entry>				\
+												\
 	     <entry string=\"Tip of the day\">Leidraad van die dag</entry>			\
 	     <entry string=\"Did you know...\">Het jy geweet...</entry>				\
 	     <entry string=\"Show tips on startup\">Vertoon leidrade tydens opstart</entry>	\

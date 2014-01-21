@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,39 @@ static const char *smooth_it =
 	     <entry string=\"Retry\">Riprova</entry>						\
 	     <entry string=\"Abort\">Interrompi</entry>						\
 	     <entry string=\"Ignore\">Ignora</entry>						\
+												\
+	     <entry string=\"Undo\">Annulla</entry>						\
+	     <entry string=\"Cut\">Taglia</entry>						\
+	     <entry string=\"Copy\">Copia</entry>						\
+	     <entry string=\"Paste\">Incolla</entry>						\
+	     <entry string=\"Clear\">Pulisci</entry>						\
+	     <entry string=\"Select all\">Seleziona tutto</entry>				\
+												\
+	     <entry string=\"Backspace\">Backspace</entry>					\
+	     <entry string=\"Tab\">Tab</entry>							\
+	     <entry string=\"Return\">Invio</entry>						\
+	     <entry string=\"Esc\">Esc</entry>							\
+	     <entry string=\"Space\">Spazio</entry>						\
+	     <entry string=\"PgUp\">Pag su</entry>						\
+	     <entry string=\"PgDown\">Pag giù</entry>						\
+	     <entry string=\"End\">Fine</entry>							\
+	     <entry string=\"Home\">Inizio</entry>						\
+	     <entry string=\"Left\">Sinistra</entry>						\
+	     <entry string=\"Up\">Su</entry>							\
+	     <entry string=\"Right\">Destra</entry>						\
+	     <entry string=\"Down\">Giù</entry>							\
+	     <entry string=\"Ins\">Ins</entry>							\
+	     <entry string=\"Del\">Canc</entry>							\
+	     <entry string=\"Ctrl\">Ctrl</entry>						\
+	     <entry string=\"Alt\">Alt</entry>							\
+	     <entry string=\"Shift\">Shift</entry>						\
+												\
+	     <entry string=\"Open file\">Apri file</entry>					\
+	     <entry string=\"Save file\">Salva file</entry>					\
+	     <entry string=\"Save file as\">Salva file con nome</entry>				\
+	     <entry string=\"Select directory\">Seleziona cartella</entry>			\
+	     <entry string=\"Select font\">Seleziona carattere</entry>				\
+												\
 	     <entry string=\"Color selection\">Selezione colore</entry>				\
 	     <entry string=\"HTML code\">Codice HTML</entry>					\
 	     <entry string=\"R\">R</entry>							\
@@ -37,11 +70,7 @@ static const char *smooth_it =
 	     <entry string=\"H\">H</entry>							\
 	     <entry string=\"S\">S</entry>							\
 	     <entry string=\"V\">V</entry>							\
-	     <entry string=\"Open file\">Apri file</entry>					\
-	     <entry string=\"Save file\">Salva file</entry>					\
-	     <entry string=\"Save file as\">Salva file con nome</entry>				\
-	     <entry string=\"Select directory\">Seleziona cartella</entry>			\
-	     <entry string=\"Select font\">Seleziona carattere</entry>				\
+												\
 	     <entry string=\"Tip of the day\">Suggerimenti</entry>				\
 	     <entry string=\"Did you know...\">Non tutti sanno che...</entry>			\
 	     <entry string=\"Show tips on startup\">Mostra suggerimenti all'avvio</entry>	\

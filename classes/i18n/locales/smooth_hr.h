@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,26 @@ static const char *smooth_hr =
 	     <entry string=\"Retry\">Pokušaj ponovno</entry>				\
 	     <entry string=\"Abort\">Prekini</entry>					\
 	     <entry string=\"Ignore\">Zanemari</entry>					\
+											\
+	     <entry string=\"Undo\">Poništi</entry>					\
+	     <entry string=\"Cut\">Izreži</entry>					\
+	     <entry string=\"Copy\">Kopiraj</entry>					\
+	     <entry string=\"Paste\">Zalijepi</entry>					\
+	     <entry string=\"Clear\">Izbriši</entry>					\
+	     <entry string=\"Select all\">Odaberi sve</entry>				\
+											\
+	     <entry string=\"Space\">Razmaknica</entry>					\
+	     <entry string=\"Left\">Lijevo</entry>					\
+	     <entry string=\"Up\">Gore</entry>						\
+	     <entry string=\"Right\">Desno</entry>					\
+	     <entry string=\"Down\">Dolje</entry>					\
+											\
+	     <entry string=\"Open file\">Otvori dokument</entry>			\
+	     <entry string=\"Save file\">Spremi dokument</entry>			\
+	     <entry string=\"Save file as\">Spremi dokument kao ...</entry>		\
+	     <entry string=\"Select directory\">Odaberi mapu</entry>			\
+	     <entry string=\"Select font\">Odaberi font</entry>				\
+											\
 	     <entry string=\"Color selection\">Izbor boje</entry>			\
 	     <entry string=\"HTML code\">HTML kod</entry>				\
 	     <entry string=\"R\">R</entry>						\
@@ -37,11 +57,7 @@ static const char *smooth_hr =
 	     <entry string=\"H\">H</entry>						\
 	     <entry string=\"S\">S</entry>						\
 	     <entry string=\"V\">V</entry>						\
-	     <entry string=\"Open file\">Otvori dokument</entry>			\
-	     <entry string=\"Save file\">Spremi dokument</entry>			\
-	     <entry string=\"Save file as\">Spremi dokument kao ...</entry>		\
-	     <entry string=\"Select directory\">Odaberi mapu</entry>			\
-	     <entry string=\"Select font\">Odaberi font</entry>				\
+											\
 	     <entry string=\"Tip of the day\">Savjet dana</entry>			\
 	     <entry string=\"Did you know...\">Da li znate ...</entry>			\
 	     <entry string=\"Show tips on startup\">Pokaži savjete na početku</entry>	\

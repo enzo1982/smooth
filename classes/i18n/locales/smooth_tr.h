@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,29 @@ static const char *smooth_tr =
 	     <entry string=\"Retry\">Yeniden Dene</entry>					\
 	     <entry string=\"Abort\">İptal</entry>						\
 	     <entry string=\"Ignore\">Yoksay</entry>						\
+												\
+	     <entry string=\"Undo\">Geri al</entry>						\
+	     <entry string=\"Cut\">Kes</entry>							\
+	     <entry string=\"Copy\">Kopyala</entry>						\
+	     <entry string=\"Paste\">Yapıştır</entry>						\
+	     <entry string=\"Clear\">Temizle</entry>						\
+	     <entry string=\"Select all\">Hepsini seç</entry>					\
+												\
+	     <entry string=\"Backspace\">Sil</entry>						\
+	     <entry string=\"Space\">Boşluk</entry>						\
+	     <entry string=\"Left\">Sol</entry>							\
+	     <entry string=\"Up\">Yukarı</entry>						\
+	     <entry string=\"Right\">Sağ</entry>						\
+	     <entry string=\"Down\">Aşağı</entry>						\
+	     <entry string=\"Ins\">Ins</entry>							\
+	     <entry string=\"Del\">Sil</entry>							\
+												\
+	     <entry string=\"Open file\">Dosya aç</entry>					\
+	     <entry string=\"Save file\">Dosyayı kaydet</entry>					\
+	     <entry string=\"Save file as\">Dosyayı farklı kaydet</entry>			\
+	     <entry string=\"Select directory\">Dizin seç</entry>				\
+	     <entry string=\"Select font\">Yazı Tipi seç</entry>				\
+												\
 	     <entry string=\"Color selection\">Renk seç</entry>					\
 	     <entry string=\"HTML code\">HTML kodu</entry>					\
 	     <entry string=\"R\">R</entry>							\
@@ -37,11 +60,7 @@ static const char *smooth_tr =
 	     <entry string=\"H\">H</entry>							\
 	     <entry string=\"S\">S</entry>							\
 	     <entry string=\"V\">V</entry>							\
-	     <entry string=\"Open file\">Dosya aç</entry>					\
-	     <entry string=\"Save file\">Dosyayı kaydet</entry>					\
-	     <entry string=\"Save file as\">Dosyayı farklı kaydet</entry>			\
-	     <entry string=\"Select directory\">Dizin seç</entry>				\
-	     <entry string=\"Select font\">Yazı Tipi seç</entry>				\
+												\
 	     <entry string=\"Tip of the day\">Günün İpucu</entry>				\
 	     <entry string=\"Did you know...\">Biliyor muydunuz...</entry>			\
 	     <entry string=\"Show tips on startup\">Başlangıçta ipuçlarını göster</entry>	\

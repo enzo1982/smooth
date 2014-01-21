@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,27 @@ static const char *smooth_no =
 	     <entry string=\"Retry\">Prøv igjen</entry>				\
 	     <entry string=\"Abort\">Avbryt</entry>				\
 	     <entry string=\"Ignore\">Overse</entry>				\
+										\
+	     <entry string=\"Undo\">Angre</entry>				\
+	     <entry string=\"Cut\">Klipp ut</entry>				\
+	     <entry string=\"Copy\">Kopier</entry>				\
+	     <entry string=\"Paste\">Lim inn</entry>				\
+	     <entry string=\"Clear\">Tøm</entry>				\
+	     <entry string=\"Select all\">Velg alt</entry>			\
+										\
+	     <entry string=\"Backspace\">Rettetast</entry>			\
+	     <entry string=\"Space\">Mellomrom</entry>				\
+	     <entry string=\"Left\">Venstre</entry>				\
+	     <entry string=\"Up\">Opp</entry>					\
+	     <entry string=\"Right\">Høyre</entry>				\
+	     <entry string=\"Down\">Ned</entry>					\
+										\
+	     <entry string=\"Open file\">Åpne fil</entry>			\
+	     <entry string=\"Save file\">Lagre fil</entry>			\
+	     <entry string=\"Save file as\">Lagre fil som</entry>		\
+	     <entry string=\"Select directory\">Velg mappe</entry>		\
+	     <entry string=\"Select font\">Velg skrift</entry>			\
+										\
 	     <entry string=\"Color selection\">Velg farge</entry>		\
 	     <entry string=\"HTML code\">HTML-kode</entry>			\
 	     <entry string=\"R\">R</entry>					\
@@ -37,11 +58,7 @@ static const char *smooth_no =
 	     <entry string=\"H\">H</entry>					\
 	     <entry string=\"S\">S</entry>					\
 	     <entry string=\"V\">V</entry>					\
-	     <entry string=\"Open file\">Åpne fil</entry>			\
-	     <entry string=\"Save file\">Lagre fil</entry>			\
-	     <entry string=\"Save file as\">Lagre fil som</entry>		\
-	     <entry string=\"Select directory\">Velg mappe</entry>		\
-	     <entry string=\"Select font\">Velg skrift</entry>			\
+										\
 	     <entry string=\"Tip of the day\">Dagens tips</entry>		\
 	     <entry string=\"Did you know...\">Visste du...</entry>		\
 	     <entry string=\"Show tips on startup\">Vis ved oppstart</entry>	\

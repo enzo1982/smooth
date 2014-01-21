@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,39 @@ static const char *smooth_lt =
 	     <entry string=\"Retry\">Bandyti vėl</entry>			\
 	     <entry string=\"Abort\">Nutraukti</entry>				\
 	     <entry string=\"Ignore\">Ignoruoti</entry>				\
+										\
+	     <entry string=\"Undo\">Atšaukti</entry>				\
+	     <entry string=\"Cut\">Iškirpti</entry>				\
+	     <entry string=\"Copy\">Kopijuoti</entry>				\
+	     <entry string=\"Paste\">Padėti</entry>				\
+	     <entry string=\"Clear\">Valyti</entry>				\
+	     <entry string=\"Select all\">Žymėti viską</entry>			\
+										\
+	     <entry string=\"Backspace\">&lt;––</entry>				\
+	     <entry string=\"Tab\">Tab</entry>					\
+	     <entry string=\"Return\">Įvesti</entry>				\
+	     <entry string=\"Esc\">Gr</entry>					\
+	     <entry string=\"Space\">Tarpas</entry>				\
+	     <entry string=\"PgUp\">Psl.aukštyn</entry>				\
+	     <entry string=\"PgDown\">Psl.žemyn</entry>				\
+	     <entry string=\"End\">Pabaiga</entry>				\
+	     <entry string=\"Home\">Pradžia</entry>				\
+	     <entry string=\"Left\">Kairėn</entry>				\
+	     <entry string=\"Up\">Aukštyn</entry>				\
+	     <entry string=\"Right\">Dešinėn</entry>				\
+	     <entry string=\"Down\">Žemyn</entry>				\
+	     <entry string=\"Ins\">Įterpti</entry>				\
+	     <entry string=\"Del\">Šalinti</entry>				\
+	     <entry string=\"Ctrl\">Vald</entry>				\
+	     <entry string=\"Alt\">Alt</entry>					\
+	     <entry string=\"Shift\">Lyg2</entry>				\
+										\
+	     <entry string=\"Open file\">Atverti failą</entry>			\
+	     <entry string=\"Save file\">Įrašyti failą</entry>			\
+	     <entry string=\"Save file as\">Įrašyti failą kaip</entry>		\
+	     <entry string=\"Select directory\">Pasirinkite aplanką</entry>	\
+	     <entry string=\"Select font\">Pasirinkti šriftą</entry>		\
+										\
 	     <entry string=\"Color selection\">Pasirinkti spalvą</entry>	\
 	     <entry string=\"HTML code\">HTML kodas</entry>			\
 	     <entry string=\"R\">R</entry>					\
@@ -37,11 +70,7 @@ static const char *smooth_lt =
 	     <entry string=\"H\">H</entry>					\
 	     <entry string=\"S\">S</entry>					\
 	     <entry string=\"V\">V</entry>					\
-	     <entry string=\"Open file\">Atverti failą</entry>			\
-	     <entry string=\"Save file\">Įrašyti failą</entry>			\
-	     <entry string=\"Save file as\">Įrašyti failą kaip</entry>		\
-	     <entry string=\"Select directory\">Pasirinkite aplanką</entry>	\
-	     <entry string=\"Select font\">Pasirinkti šriftą</entry>		\
+										\
 	     <entry string=\"Tip of the day\">Dienos patarimas</entry>		\
 	     <entry string=\"Did you know...\">Ar Jūs žinote...</entry>		\
 	     <entry string=\"Show tips on startup\">Rodyti paleidžiant</entry>	\

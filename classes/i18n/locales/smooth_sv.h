@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,33 @@ static const char *smooth_sv =
 	     <entry string=\"Retry\">Försök igen</entry>			\
 	     <entry string=\"Abort\">Avbryt</entry>				\
 	     <entry string=\"Ignore\">Ignorera</entry>				\
+										\
+	     <entry string=\"Undo\">Ångra</entry>				\
+	     <entry string=\"Cut\">Klipp ut</entry>				\
+	     <entry string=\"Copy\">Kopiera</entry>				\
+	     <entry string=\"Paste\">Klistra in</entry>				\
+	     <entry string=\"Clear\">Töm</entry>				\
+	     <entry string=\"Select all\">Markera alla</entry>			\
+										\
+	     <entry string=\"Backspace\">Backsteg</entry>			\
+	     <entry string=\"Tab\">Tabulator</entry>				\
+	     <entry string=\"Return\">Retur</entry>				\
+	     <entry string=\"Esc\">Esc</entry>					\
+	     <entry string=\"Space\">Mellanslag</entry>				\
+	     <entry string=\"Left\">Vänster</entry>				\
+	     <entry string=\"Up\">Upp</entry>					\
+	     <entry string=\"Right\">Höger</entry>				\
+	     <entry string=\"Down\">Ner</entry>					\
+	     <entry string=\"Ctrl\">Strg</entry>				\
+	     <entry string=\"Alt\">Alt</entry>					\
+	     <entry string=\"Shift\">Skift</entry>				\
+										\
+	     <entry string=\"Open file\">Öppna fil</entry>			\
+	     <entry string=\"Save file\">Spara fil</entry>			\
+	     <entry string=\"Save file as\">Spara fil som</entry>		\
+	     <entry string=\"Select directory\">Välj katalog</entry>		\
+	     <entry string=\"Select font\">Välj teckensnitt</entry>		\
+										\
 	     <entry string=\"Color selection\">Välj färg</entry>		\
 	     <entry string=\"HTML code\">HTML-kod</entry>			\
 	     <entry string=\"R\">R</entry>					\
@@ -37,11 +64,7 @@ static const char *smooth_sv =
 	     <entry string=\"H\">H</entry>					\
 	     <entry string=\"S\">S</entry>					\
 	     <entry string=\"V\">V</entry>					\
-	     <entry string=\"Open file\">Öppna fil</entry>			\
-	     <entry string=\"Save file\">Spara fil</entry>			\
-	     <entry string=\"Save file as\">Spara fil som</entry>		\
-	     <entry string=\"Select directory\">Välj katalog</entry>		\
-	     <entry string=\"Select font\">Välj teckensnitt</entry>		\
+										\
 	     <entry string=\"Tip of the day\">Dagens tips</entry>		\
 	     <entry string=\"Did you know...\">Visste du...</entry>		\
 	     <entry string=\"Show tips on startup\">Visa tips vid start</entry>	\

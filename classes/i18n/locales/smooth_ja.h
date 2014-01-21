@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,25 @@ static const char *smooth_ja =
 	     <entry string=\"Retry\">再試行</entry>				\
 	     <entry string=\"Abort\">中止</entry>				\
 	     <entry string=\"Ignore\">無視</entry>				\
+										\
+	     <entry string=\"Undo\">元に戻す</entry>				\
+	     <entry string=\"Cut\">切り取り</entry>				\
+	     <entry string=\"Copy\">コピー</entry>					\
+	     <entry string=\"Paste\">貼り付け</entry>				\
+	     <entry string=\"Clear\">クリア</entry>				\
+	     <entry string=\"Select all\">すべて選択</entry>			\
+										\
+	     <entry string=\"Left\">左</entry>					\
+	     <entry string=\"Up\">上</entry>					\
+	     <entry string=\"Right\">右</entry>					\
+	     <entry string=\"Down\">下</entry>					\
+										\
+	     <entry string=\"Open file\">ファイルを開く</entry>			\
+	     <entry string=\"Save file\">ファイルを保存する</entry>			\
+	     <entry string=\"Save file as\">名前を付けてファイルを保存する</entry>	\
+	     <entry string=\"Select directory\">ディレクトリ選択</entry>		\
+	     <entry string=\"Select font\">フォント選択</entry>			\
+										\
 	     <entry string=\"Color selection\">カラー選択</entry>			\
 	     <entry string=\"HTML code\">HTMLコード</entry>			\
 	     <entry string=\"R\">R</entry>					\
@@ -37,11 +56,7 @@ static const char *smooth_ja =
 	     <entry string=\"H\">H</entry>					\
 	     <entry string=\"S\">S</entry>					\
 	     <entry string=\"V\">V</entry>					\
-	     <entry string=\"Open file\">ファイルを開く</entry>			\
-	     <entry string=\"Save file\">ファイルを保存する</entry>			\
-	     <entry string=\"Save file as\">名前を付けてファイルを保存する</entry>	\
-	     <entry string=\"Select directory\">ディレクトリ選択</entry>		\
-	     <entry string=\"Select font\">フォント選択</entry>			\
+										\
 	     <entry string=\"Tip of the day\">今日のヒント</entry>			\
 	     <entry string=\"Did you know...\">ご存知ですか...</entry>		\
 	     <entry string=\"Show tips on startup\">起動時に秘訣を表示する</entry>	\

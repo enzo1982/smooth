@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,26 @@ static const char *smooth_sk =
 	     <entry string=\"Retry\">Skúsiť znova</entry>				\
 	     <entry string=\"Abort\">Prerušiť</entry>					\
 	     <entry string=\"Ignore\">Ignorovať</entry>					\
+											\
+	     <entry string=\"Undo\">Vrátiť späť</entry>					\
+	     <entry string=\"Cut\">Vystrihnúť</entry>					\
+	     <entry string=\"Copy\">Kopírovať</entry>					\
+	     <entry string=\"Paste\">Vložiť</entry>					\
+	     <entry string=\"Clear\">Vyčistiť</entry>					\
+	     <entry string=\"Select all\">Vybrať všetko</entry>				\
+											\
+	     <entry string=\"Space\">Medzera</entry>					\
+	     <entry string=\"Left\">Šípka doľava</entry>				\
+	     <entry string=\"Up\">Šípka hore</entry>					\
+	     <entry string=\"Right\">Šípka doprava</entry>				\
+	     <entry string=\"Down\">Šípka dole</entry>					\
+											\
+	     <entry string=\"Open file\">Otvoriť súbor</entry>				\
+	     <entry string=\"Save file\">Uložiť súbor</entry>				\
+	     <entry string=\"Save file as\">Uložiť súbor ako</entry>			\
+	     <entry string=\"Select directory\">Vybrať priečinok</entry>		\
+	     <entry string=\"Select font\">Vybrať písmo</entry>				\
+											\
 	     <entry string=\"Color selection\">Vybrať farbu</entry>			\
 	     <entry string=\"HTML code\">HTML kód</entry>				\
 	     <entry string=\"R\">R</entry>						\
@@ -37,11 +57,7 @@ static const char *smooth_sk =
 	     <entry string=\"H\">H</entry>						\
 	     <entry string=\"S\">S</entry>						\
 	     <entry string=\"V\">V</entry>						\
-	     <entry string=\"Open file\">Otvoriť súbor</entry>				\
-	     <entry string=\"Save file\">Uložiť súbor</entry>				\
-	     <entry string=\"Save file as\">Uložiť súbor ako</entry>			\
-	     <entry string=\"Select directory\">Vybrať priečinok</entry>		\
-	     <entry string=\"Select font\">Vybrať písmo</entry>				\
+											\
 	     <entry string=\"Tip of the day\">Tip dňa</entry>				\
 	     <entry string=\"Did you know...\">Viete, že...</entry>			\
 	     <entry string=\"Show tips on startup\">Zobraziť tipy pri štarte</entry>	\

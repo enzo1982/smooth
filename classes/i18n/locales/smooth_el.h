@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,25 @@ static const char *smooth_el =
 	     <entry string=\"Retry\">Προσπάθεια ξανά</entry>				\
 	     <entry string=\"Abort\">Εγκατάλειψη</entry>				\
 	     <entry string=\"Ignore\">Παράβλεψη</entry>					\
+											\
+	     <entry string=\"Undo\">Αναίρεση</entry>					\
+	     <entry string=\"Cut\">Αποκοπή</entry>					\
+	     <entry string=\"Copy\">Αντιγραφή</entry>					\
+	     <entry string=\"Paste\">Επικόλληση</entry>					\
+	     <entry string=\"Clear\">Καθαρισμός</entry>					\
+	     <entry string=\"Select all\">Επιλογή όλων</entry>				\
+											\
+	     <entry string=\"Left\">Αριστερά</entry>					\
+	     <entry string=\"Up\">Πάνω</entry>						\
+	     <entry string=\"Right\">Δεξιά</entry>					\
+	     <entry string=\"Down\">Κάτω</entry>					\
+											\
+	     <entry string=\"Open file\">Άνοιγμα αρχείου</entry>			\
+	     <entry string=\"Save file\">Αποθήκευση αρχείου</entry>			\
+	     <entry string=\"Save file as\">Αποθήκευση αρχείου ως</entry>		\
+	     <entry string=\"Select directory\">Επιλογή φακέλου</entry>			\
+	     <entry string=\"Select font\">Επιλογή γραμματοσειράς</entry>		\
+											\
 	     <entry string=\"Color selection\">Επιλέξτε χρώμα</entry>			\
 	     <entry string=\"HTML code\">HTML κώδικα</entry>				\
 	     <entry string=\"R\">R</entry>						\
@@ -37,11 +56,7 @@ static const char *smooth_el =
 	     <entry string=\"H\">H</entry>						\
 	     <entry string=\"S\">S</entry>						\
 	     <entry string=\"V\">V</entry>						\
-	     <entry string=\"Open file\">Άνοιγμα αρχείου</entry>			\
-	     <entry string=\"Save file\">Αποθήκευση αρχείου</entry>			\
-	     <entry string=\"Save file as\">Αποθήκευση αρχείου ως</entry>		\
-	     <entry string=\"Select directory\">Επιλογή φακέλου</entry>			\
-	     <entry string=\"Select font\">Επιλογή γραμματοσειράς</entry>		\
+											\
 	     <entry string=\"Tip of the day\">Συμβουλή της ημέρας</entry>		\
 	     <entry string=\"Did you know...\">Ξέρατε...</entry>			\
 	     <entry string=\"Show tips on startup\">Εμφάνιση στην εκκίνηση</entry>	\

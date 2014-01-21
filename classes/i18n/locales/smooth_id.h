@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,20 @@ static const char *smooth_id =
 	     <entry string=\"Retry\">Ulangi</entry>						\
 	     <entry string=\"Abort\">Batalkan</entry>						\
 	     <entry string=\"Ignore\">Abaikan</entry>						\
+												\
+	     <entry string=\"Undo\">Tak jadi</entry>						\
+	     <entry string=\"Cut\">Potong</entry>						\
+	     <entry string=\"Copy\">Salin</entry>						\
+	     <entry string=\"Paste\">Tempel</entry>						\
+	     <entry string=\"Clear\">Bersihkan</entry>						\
+	     <entry string=\"Select all\">Pilih semua</entry>					\
+												\
+	     <entry string=\"Open file\">Buka berkas</entry>					\
+	     <entry string=\"Save file\">Simpan berkas</entry>					\
+	     <entry string=\"Save file as\">Simpan berkas sebagai</entry>			\
+	     <entry string=\"Select directory\">Pilih direktori</entry>				\
+	     <entry string=\"Select font\">Pilih fonta</entry>					\
+												\
 	     <entry string=\"Color selection\">Pilih warna</entry>				\
 	     <entry string=\"HTML code\">Kode HTML</entry>					\
 	     <entry string=\"R\">R</entry>							\
@@ -37,11 +51,7 @@ static const char *smooth_id =
 	     <entry string=\"H\">H</entry>							\
 	     <entry string=\"S\">S</entry>							\
 	     <entry string=\"V\">V</entry>							\
-	     <entry string=\"Open file\">Buka berkas</entry>					\
-	     <entry string=\"Save file\">Simpan berkas</entry>					\
-	     <entry string=\"Save file as\">Simpan berkas sebagai</entry>			\
-	     <entry string=\"Select directory\">Pilih direktori</entry>				\
-	     <entry string=\"Select font\">Pilih fonta</entry>					\
+												\
 	     <entry string=\"Tip of the day\">Tip hari ini</entry>				\
 	     <entry string=\"Did you know...\">Apakah anda tahu...</entry>			\
 	     <entry string=\"Show tips on startup\">Tampilkan pada mulai hidupkan</entry>	\

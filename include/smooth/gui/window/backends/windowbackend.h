@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -66,6 +66,9 @@ namespace smooth
 
 				virtual Int			 SetIcon(const Bitmap &);
 				virtual Int			 SetIconDirect(Void *);
+
+				virtual Int			 EnableDropFiles(Bool);
+				virtual const Array<String>	&GetDroppedFiles() const;
 
 				virtual Int			 SetMinimumSize(const Size &);
 				virtual Int			 SetMaximumSize(const Size &);

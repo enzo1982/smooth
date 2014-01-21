@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -59,7 +59,9 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 
 	alwaysActive	= False;
 	independent	= False;
+
 	tabstopCapable	= False;
+	dropTarget	= False;
 
 	tooltipText	= NIL;
 	tooltipLayer	= NIL;
@@ -780,6 +782,18 @@ S::Void S::GUI::Widget::CloseContextMenu()
 
 		onCloseContextMenu.Emit();
 	}
+}
+
+S::Bool S::GUI::Widget::IsDropTarget() const
+{
+	if (dropTarget) return True;
+
+	foreach (Widget *widget, widgets)
+	{
+		if (widget->IsDropTarget()) return True;
+	}
+
+	return False;
 }
 
 S::Int S::GUI::Widget::SetFocus()

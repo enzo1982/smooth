@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -229,6 +229,11 @@ S::Int S::GUI::Window::RestoreDefaultStatusText()
 	}
 
 	return Success();
+}
+
+const S::Array<S::String> &S::GUI::Window::GetDroppedFiles() const
+{
+	return backend->GetDroppedFiles();
 }
 
 S::Int S::GUI::Window::SetRightToLeft(Bool nRightToLeft)
@@ -841,10 +846,24 @@ S::Int S::GUI::Window::Add(Widget *widget)
 {
 	if (widget == NIL) return Error();
 
-	if (widget->GetOrientation() == OR_UPPERLEFT || widget->GetOrientation() == OR_UPPERRIGHT || widget->GetOrientation() == OR_LOWERLEFT || widget->GetOrientation() == OR_LOWERRIGHT) return mainLayer->Add(widget);
+	if (widget->GetOrientation() == OR_UPPERLEFT || widget->GetOrientation() == OR_UPPERRIGHT || widget->GetOrientation() == OR_LOWERLEFT || widget->GetOrientation() == OR_LOWERRIGHT)
+	{
+		if (mainLayer->Add(widget) == Success())
+		{
+			/* Enable drag & drop if the added widget is a target.
+			 */
+			if (IsDropTarget()) backend->EnableDropFiles(True);
+
+			return Success();
+		}
+
+		return Error();
+	}
 
 	if (Widget::Add(widget) == Success())
 	{
+		/* Special handling for title and status bars.
+		 */
 		if (widget->GetObjectType() == Titlebar::classID)
 		{
 			if (!Binary::IsFlagSet(widget->GetFlags(), TB_MAXBUTTON)) flags = flags | WF_NORESIZE;
@@ -856,7 +875,13 @@ S::Int S::GUI::Window::Add(Widget *widget)
 			SetDefaultStatusText(widget->GetText());
 		}
 
+		/* Recalculate offsets unless the added widget has free orientation.
+		 */
 		if (widget->GetOrientation() != OR_FREE) CalculateOffsets();
+
+		/* Enable drag & drop if the added widget is a target.
+		 */
+		if (IsDropTarget()) backend->EnableDropFiles(True);
 
 		return Success();
 	}
@@ -868,11 +893,29 @@ S::Int S::GUI::Window::Remove(Widget *widget)
 {
 	if (widget == NIL) return Error();
 
-	if (widget->GetOrientation() == OR_UPPERLEFT || widget->GetOrientation() == OR_UPPERRIGHT || widget->GetOrientation() == OR_LOWERLEFT || widget->GetOrientation() == OR_LOWERRIGHT) return mainLayer->Remove(widget);
+	if (widget->GetOrientation() == OR_UPPERLEFT || widget->GetOrientation() == OR_UPPERRIGHT || widget->GetOrientation() == OR_LOWERLEFT || widget->GetOrientation() == OR_LOWERRIGHT)
+	{
+		if (mainLayer->Remove(widget) == Success())
+		{
+			/* Disable drag & drop if the removed widget was a target.
+			 */
+			if (!IsDropTarget()) backend->EnableDropFiles(False);
+
+			return Success();
+		}
+
+		return Error();
+	}
 
 	if (Widget::Remove(widget) == Success())
 	{
+		/* Recalculate offsets unless the removed widget had free orientation.
+		 */
 		if (widget->GetOrientation() != OR_FREE) CalculateOffsets();
+
+		/* Disable drag & drop if the removed widget was a target.
+		 */
+		if (!IsDropTarget()) backend->EnableDropFiles(False);
 
 		return Success();
 	}

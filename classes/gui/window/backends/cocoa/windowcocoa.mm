@@ -36,6 +36,7 @@ const int	 NSApplicationResize	 = 5;
 const int	 NSApplicationFocus	 = 6;
 const int	 NSApplicationUnfocus	 = 7;
 const int	 NSApplicationInsertText = 8;
+const int	 NSApplicationDropFiles	 = 9;
 
 @interface CocoaView : NSView <NSTextInputClient>
 {
@@ -452,19 +453,29 @@ const int	 NSApplicationInsertText = 8;
 @end
 
 @interface CocoaWindow : NSWindow { }
-	- (BOOL) worksWhenModal;
+	- (BOOL)	    worksWhenModal;
 
-	- (void) processEvent:	       (int) type;
+	- (void)	    processEvent:	  (int) type;
+	- (void)	    processEvent:	  (int) type withData: (NSInteger) data;
 
-	- (void) orderFront:	       (id) sender;
-	- (void) orderOut:	       (id) sender;
-	- (void) makeKeyAndOrderFront: (id) sender;
+	- (void)	    orderFront:		  (id) sender;
+	- (void)	    orderOut:		  (id) sender;
+	- (void)	    makeKeyAndOrderFront: (id) sender;
+
+	- (NSDragOperation) draggingEntered:	  (id) sender;
+	- (BOOL)	    performDragOperation: (id) sender;
 @end
 
 @implementation CocoaWindow
 	- (BOOL) worksWhenModal { return YES; }
 
 	- (void) processEvent: (int) type
+	{
+		[self processEvent: type
+			  withData: nil];
+	}
+
+	- (void) processEvent: (int) type withData: (NSInteger) data
 	{
 		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend(self);
 		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
@@ -474,7 +485,7 @@ const int	 NSApplicationInsertText = 8;
 								  windowNumber: [self windowNumber]
 								       context: [self graphicsContext]
 								       subtype: type
-									 data1: nil
+									 data1: data
 									 data2: nil];
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
@@ -483,6 +494,27 @@ const int	 NSApplicationInsertText = 8;
 	- (void) orderFront:	       (id) sender { [super orderFront: sender];	   [self processEvent: NSApplicationMap];   }
 	- (void) orderOut:	       (id) sender { [super orderOut: sender];		   [self processEvent: NSApplicationUnmap]; }
 	- (void) makeKeyAndOrderFront: (id) sender { [super makeKeyAndOrderFront: sender]; [self processEvent: NSApplicationMap];   }
+
+	- (NSDragOperation) draggingEntered: (id) sender
+	{
+		NSPasteboard	*pasteBoard	= [sender draggingPasteboard];
+		NSDragOperation	 sourceDragMask = [sender draggingSourceOperationMask];
+
+		if ([[pasteBoard types] containsObject: NSFilenamesPboardType] && sourceDragMask & NSDragOperationGeneric)
+		{
+			return NSDragOperationGeneric;
+		}
+
+		return NSDragOperationNone;
+	}
+
+	- (BOOL) performDragOperation: (id) sender
+	{
+		[self processEvent: NSApplicationDropFiles
+			  withData: (NSInteger) sender];
+
+		return YES;
+	}
 @end
 
 S::Int S::GUI::WindowCocoa::Initialize()
@@ -507,18 +539,21 @@ S::Int S::GUI::WindowCocoa::Free()
 
 S::GUI::WindowCocoa::WindowCocoa(Void *iWindow)
 {
-	type	 = WINDOW_COCOA;
+	type		= WINDOW_COCOA;
 
-	wnd	 = nil;
+	wnd		= nil;
 
-	wid	 = windowBackends.Add(this);
+	wid		= windowBackends.Add(this);
 
-	minSize	 = Size(160, 24);
-	maxSize	 = Size(32768, 32768);
+	minSize		= Size(160, 24);
+	maxSize		= Size(32768, 32768);
 
-	fontSize = Surface().GetSurfaceDPI() / 96.0;
+	fontSize	= Surface().GetSurfaceDPI() / 96.0;
 
-	flags	 = 0;
+	flags		= 0;
+
+	pasteBoard	= NIL;
+	enableDropFiles	= False;
 }
 
 S::GUI::WindowCocoa::~WindowCocoa()
@@ -866,6 +901,18 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 				for (Int i = 0; i < string.Length(); i++) onEvent.Call(SM_CHAR, string[i], 0);
 			}
 
+			/* Drag & drop events:
+			 */
+			if ([e subtype] == NSApplicationDropFiles)
+			{
+				id	 info	  = (id) [e data1];
+				Point	 position = Window::GetWindow(wnd)->GetMousePosition();
+
+				pasteBoard = [info draggingPasteboard];
+
+				onEvent.Call(SM_DROPFILES, position.x, position.y);
+			}
+
 			break;
 	}
 
@@ -930,6 +977,10 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 		 */
 		if (flags & WF_TOPMOST) [wnd setLevel: NSPopUpMenuWindowLevel];
 
+		/* Enable dropping files if requested.
+		 */
+		if (enableDropFiles) EnableDropFiles(True);
+
 		/* Emit onCreate signal.
 		 */
 		onCreate.Emit();
@@ -981,6 +1032,47 @@ S::Int S::GUI::WindowCocoa::SetTitle(const String &nTitle)
 	[wnd setTitle: [NSString stringWithUTF8String: nTitle.ConvertTo("UTF-8")]];
 
 	return Success();
+}
+
+S::Int S::GUI::WindowCocoa::EnableDropFiles(Bool nEnableDropFiles)
+{
+	enableDropFiles = nEnableDropFiles;
+
+	if (wnd != nil)
+	{
+		if (enableDropFiles) [wnd registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+		else		     [wnd unregisterDraggedTypes];
+	}
+
+	return Success();
+}
+
+const S::Array<S::String> &S::GUI::WindowCocoa::GetDroppedFiles() const
+{
+	if (pasteBoard == NIL) return WindowBackend::GetDroppedFiles();
+
+	static Array<String>	 fileNames;
+
+	fileNames.RemoveAll();
+
+        NSArray	*files = [pasteBoard propertyListForType: NSFilenamesPboardType];
+
+	/* Query number of files dropped.
+	 */
+	Int	 nOfFiles = [files count];
+
+	/* Query dropped files.
+	 */
+	for (Int i = 0; i < nOfFiles; i++)
+	{
+		String	 fileName;
+
+		fileName.ImportFrom("UTF-8", [[files objectAtIndex: i] UTF8String]);
+
+		fileNames.Add(fileName);
+	}
+
+	return fileNames;
 }
 
 S::Int S::GUI::WindowCocoa::SetMinimumSize(const Size &nMinSize)

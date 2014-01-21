@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -90,31 +90,34 @@ S::Int S::GUI::WindowGDI::Free()
 
 S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 {
-	type	       = WINDOW_GDI;
+	type		= WINDOW_GDI;
 
-	hwnd	       = NIL;
-	wndclass       = NIL;
+	hwnd		= NIL;
+	wndclass	= NIL;
 
-	className      = String::FromInt(System::System::RequestGUID());
+	className	= String::FromInt(System::System::RequestGUID());
 
-	id	       = windowBackends.Add(this);
+	id		= windowBackends.Add(this);
 
-	minSize	       = Size(160, 24);
+	minSize		= Size(160, 24);
 
-	minimized      = False;
-	maximized      = False;
+	minimized	= False;
+	maximized	= False;
 
-	frameSize      = Size(GetSystemMetrics(SM_CXFRAME), GetSystemMetrics(SM_CYFRAME));
-	fontSize       = Surface().GetSurfaceDPI() / 96.0;
+	frameSize	= Size(GetSystemMetrics(SM_CXFRAME), GetSystemMetrics(SM_CYFRAME));
+	fontSize	= Surface().GetSurfaceDPI() / 96.0;
 
-	flags	       = 0;
+	flags		= 0;
 
 	if (Setup::enableUnicode) sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 	else			  sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
-	destroyIcon    = False;
+	destroyIcon	= False;
 
-	nonMaxWndStyle = 0;
+	hDrop		= NIL;
+	enableDropFiles	= False;
+
+	nonMaxWndStyle	= 0;
 }
 
 S::GUI::WindowGDI::~WindowGDI()
@@ -350,6 +353,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			return onEvent.Call(SM_MOUSEMOVE, 0, 0);
+
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
 		case WM_MBUTTONDOWN:
@@ -391,6 +395,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			else if	(message == WM_MBUTTONDOWN   || message == WM_NCMBUTTONDOWN)   return onEvent.Call(SM_MBUTTONDOWN, 0, 0);
 			else if (message == WM_MBUTTONUP     || message == WM_NCMBUTTONUP)     return onEvent.Call(SM_MBUTTONUP, 0, 0);
 			else if (message == WM_MBUTTONDBLCLK || message == WM_NCMBUTTONDBLCLK) return onEvent.Call(SM_MBUTTONDBLCLK, 0, 0);
+
 		case WM_MOUSEWHEEL:
 			/* Update pointer position in Input::Pointer.
 			 */
@@ -411,11 +416,13 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			Input::Keyboard::UpdateKeyState(ConvertKey(wParam), True);
 
 			return onEvent.Call(SM_KEYDOWN, ConvertKey(wParam), lParam);
+
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 			Input::Keyboard::UpdateKeyState(ConvertKey(wParam), False);
 
 			return onEvent.Call(SM_KEYUP, ConvertKey(wParam), lParam);
+
 		case WM_CHAR:
 			return onEvent.Call(SM_CHAR, wParam, lParam);
 
@@ -445,6 +452,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			return Break;
+
 		case WM_PAINT:
 			{
 				Int	 rVal = Break;
@@ -504,8 +512,10 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			return Success();
+
 		case WM_SETFOCUS:
 			return onEvent.Call(SM_GETFOCUS, 0, 0);
+
 		case WM_KILLFOCUS:
 			Input::Keyboard::ResetKeyState();
 
@@ -516,6 +526,25 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 
 				return onEvent.Call(SM_LOSEFOCUS, focusWnd != NIL ? focusWnd->GetHandle() : -1, 0);
 			}
+
+		/* Drag & drop messages:
+		 */
+		case WM_DROPFILES:
+			hDrop = (HDROP) wParam;
+
+			/* Get drop position and send event.
+			 */
+			{
+				POINT	 dropPos;
+
+				DragQueryPoint(hDrop, &dropPos);
+
+				onEvent.Call(SM_DROPFILES, dropPos.x, dropPos.y);
+			}
+
+			DragFinish(hDrop);
+
+			return Success();
 
 		/* Other messages:
 		 */
@@ -652,6 +681,10 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 				Raise();
 			}
 		}
+
+		/* Enable dropping files if requested.
+		 */
+		if (enableDropFiles) EnableDropFiles(True);
 
 		return Success();
 	}
@@ -796,6 +829,76 @@ S::Int S::GUI::WindowGDI::SetIconDirect(Void *newIcon)
 	destroyIcon = False;
 
 	return Success();
+}
+
+S::Int S::GUI::WindowGDI::EnableDropFiles(Bool nEnableDropFiles)
+{
+	/* Enable Drag & Drop only on the Windows NT family
+	 * for now, due to problems on Windows 9x.
+	 */
+	OSVERSIONINFOA	 vInfo;
+
+	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+	GetVersionExA(&vInfo);
+
+	if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) return Error();
+
+	enableDropFiles = nEnableDropFiles;
+
+	if (hwnd != NIL) DragAcceptFiles(hwnd, enableDropFiles);
+
+	return Success();
+}
+
+const S::Array<S::String> &S::GUI::WindowGDI::GetDroppedFiles() const
+{
+	if (hDrop == NIL) return WindowBackend::GetDroppedFiles();
+
+	static Array<String>	 fileNames;
+
+	fileNames.RemoveAll();
+
+	/* Query number of files dropped.
+	 */
+	Int	 nOfFiles;
+
+	if (Setup::enableUnicode) nOfFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0);
+	else			  nOfFiles = DragQueryFileA(hDrop, 0xFFFFFFFF, NULL, 0);
+
+	/* Create file name buffer.
+	 */
+	Int	 bufferSize = 32768;
+	wchar_t	*bufferW    = NIL;
+	char	*bufferA    = NIL;
+
+	if (Setup::enableUnicode) bufferW = new wchar_t [bufferSize];
+	else			  bufferA = new char [bufferSize];
+
+	/* Query dropped files.
+	 */
+	for (Int i = 0; i < nOfFiles; i++)
+	{
+		if (Setup::enableUnicode)
+		{
+			DragQueryFileW(hDrop, i, bufferW, bufferSize);
+
+			fileNames.Add(String(bufferW));
+		}
+		else
+		{
+			DragQueryFileA(hDrop, i, bufferA, bufferSize);
+
+			fileNames.Add(String(bufferA));
+		}
+	}
+
+	/* Delete file name buffer.
+	 */
+	if (Setup::enableUnicode) delete [] bufferW;
+	else			  delete [] bufferA;
+
+	return fileNames;
 }
 
 S::Int S::GUI::WindowGDI::SetMinimumSize(const Size &nMinSize)

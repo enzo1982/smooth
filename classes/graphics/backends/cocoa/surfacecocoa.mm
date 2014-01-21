@@ -707,41 +707,22 @@ S::Int S::GUI::SurfaceCocoa::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 
 	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
 
-	/* Create NSBitmapImageRep from background bitmap.
-	 */
-	[paintBitmap lockFocus];
-
-	NSBitmapImageRep	*destRep = (NSBitmapImageRep *) bitmap.GetSystemBitmap();
-	NSBitmapImageRep	*srcRep	 = [[NSBitmapImageRep alloc] initWithFocusedViewRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)];
-
-	[paintBitmap unlockFocus];
-
 	/* Copy the image.
 	 */
 	NSAutoreleasePool	*pool	 = [[NSAutoreleasePool alloc] init];
+	NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: (NSBitmapImageRep *) bitmap.GetSystemBitmap()];
 
-	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
-	{
-		for (Int x = 0; x < srcRect.GetWidth(); x++)
-		{
-			for (Int y = 0; y < srcRect.GetHeight(); y++)
-			{
-				[destRep setColor: [srcRep colorAtX: x y: y] atX: destRect.left + x y: destRect.top + y];
-			}
-		}
-	}
-	else
-	{
-		/* ToDo: Allow copying to bitmaps of different
-		 *	 size than original.
-		 */
-	}
+	[NSGraphicsContext saveGraphicsState];
+	[NSGraphicsContext setCurrentContext: context];
+
+	[paintBitmap drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top)
+		       fromRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)
+		      operation: NSCompositeCopy
+		       fraction: 1.0];
+
+	[NSGraphicsContext restoreGraphicsState];
 
 	[pool release];
-
-	/* Free NSBitmapImageRep.
-	 */
-	[srcRep release];
 
 	return Success();
 }

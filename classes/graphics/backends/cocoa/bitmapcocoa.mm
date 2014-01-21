@@ -92,8 +92,8 @@ S::Bool S::GUI::BitmapCocoa::CreateBitmap(Int cx, Int cy, Int bpp)
 							    isPlanar: NO
 						      colorSpaceName: NSCalibratedRGBColorSpace
 							bitmapFormat: 0
-							 bytesPerRow: ((4 - ((cx * (bpp == 32 ? 4 : 3)) & 3)) & 3) + cx * (bpp == 32 ? 4 : 3)
-							bitsPerPixel: bpp];
+							 bytesPerRow: 4 * cx
+							bitsPerPixel: 32];;
 
 	if (bitmap == NIL) return False;
 
@@ -102,7 +102,7 @@ S::Bool S::GUI::BitmapCocoa::CreateBitmap(Int cx, Int cy, Int bpp)
 	size	= Size(cx, cy);
 	depth	= bpp;
 
-	align	= cx * (bpp / 8);
+	align	= 4 * cx;;
 
 	return True;
 }
@@ -135,19 +135,19 @@ S::Bool S::GUI::BitmapCocoa::SetSystemBitmap(Void *nBitmap)
 	}
 	else
 	{
-		CreateBitmap([((NSBitmapImageRep *) nBitmap) pixelsWide], [((NSBitmapImageRep *) nBitmap) pixelsHigh], [((NSBitmapImageRep *) nBitmap) bitsPerPixel]);
+		CreateBitmap([(NSBitmapImageRep *) nBitmap pixelsWide], [(NSBitmapImageRep *) nBitmap pixelsHigh], 8 * [(NSBitmapImageRep *) nBitmap samplesPerPixel]);
 
 		/* Copy source bitmap to destination.
 		 */
-		NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
+		NSAutoreleasePool	*pool	 = [[NSAutoreleasePool alloc] init];
+		NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: bitmap];
 
-		for (Int x = 0; x < size.cx; x++)
-		{
-			for (Int y = 0; y < size.cy; y++)
-			{
-				[bitmap setColor: [((NSBitmapImageRep *) nBitmap) colorAtX: x y: y] atX: x y: y];
-			}
-		}
+		[NSGraphicsContext saveGraphicsState];
+		[NSGraphicsContext setCurrentContext: context];
+
+		[(NSBitmapImageRep *) nBitmap drawInRect: NSMakeRect(0, 0, size.cx, size.cy)];
+
+		[NSGraphicsContext restoreGraphicsState];
 
 		[pool release];
 	}
@@ -166,21 +166,17 @@ S::Bool S::GUI::BitmapCocoa::SetPixel(const Point &point, const Color &color)
 	if (point.y >= size.cy || point.x >= size.cx) return False;
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
-	Int		 offset = 0;
+	Int		 offset = (size.cy - point.y - 1) * (size.cx * 4) + point.x * 4;;
 
 	switch (depth)
 	{
 		case 24:
-			offset = (size.cy - point.y - 1) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
-
 			data[offset + 2] = (color >> 16) & 255;
 			data[offset + 1] = (color >>  8) & 255;
 			data[offset + 0] =  color	 & 255;
 
 			return True;
 		case 32:
-			offset = (size.cy - point.y - 1) * (				      size.cx * 4) + point.x * 4;
-
 			data[offset + 2] = (color >> 16) & 255;
 			data[offset + 1] = (color >>  8) & 255;
 			data[offset + 0] =  color	 & 255;
@@ -198,17 +194,13 @@ S::GUI::Color S::GUI::BitmapCocoa::GetPixel(const Point &point) const
 	if (point.y >= size.cy || point.x >= size.cx) return 0;
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
-	Int		 offset = 0;
+	Int		 offset = (size.cy - point.y - 1) * (size.cx * 4) + point.x * 4;;
 
 	switch (depth)
 	{
 		case 24:
-			offset = (size.cy - point.y - 1) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
-
 			return Color(			      data[offset + 2] << 16 | data[offset + 1] << 8 | data[offset + 0]);
-		case 32:
-			offset = (size.cy - point.y - 1) * (				      size.cx * 4) + point.x * 4;
-
+ 		case 32:
 			return Color(data[offset + 3] << 24 | data[offset + 2] << 16 | data[offset + 1] << 8 | data[offset + 0]);
 	}
 

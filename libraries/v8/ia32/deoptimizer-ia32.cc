@@ -27,7 +27,7 @@
 
 #include "v8.h"
 
-#if defined(V8_TARGET_ARCH_IA32)
+#if V8_TARGET_ARCH_IA32
 
 #include "codegen.h"
 #include "deoptimizer.h"
@@ -114,22 +114,8 @@ void Deoptimizer::EnsureRelocSpaceForLazyDeoptimization(Handle<Code> code) {
 }
 
 
-void Deoptimizer::DeoptimizeFunctionWithPreparedFunctionList(
-    JSFunction* function) {
-  Isolate* isolate = function->GetIsolate();
-  HandleScope scope(isolate);
-  DisallowHeapAllocation nha;
-
-  ASSERT(function->IsOptimized());
-  ASSERT(function->FunctionsInFunctionListShareSameCode());
-
-  // Get the optimized code.
-  Code* code = function->code();
+void Deoptimizer::PatchCodeForDeoptimization(Isolate* isolate, Code* code) {
   Address code_start_address = code->instruction_start();
-
-  // The optimized code is going to be patched, so we cannot use it any more.
-  function->shared()->EvictFromOptimizedCodeMap(code, "deoptimized function");
-
   // We will overwrite the code's relocation info in-place. Relocation info
   // is written backward. The relocation info is the payload of a byte
   // array.  Later on we will slide this to the start of the byte array and
@@ -188,25 +174,6 @@ void Deoptimizer::DeoptimizeFunctionWithPreparedFunctionList(
   ASSERT(junk_address <= reloc_end_address);
   isolate->heap()->CreateFillerObjectAt(junk_address,
                                         reloc_end_address - junk_address);
-
-  // Add the deoptimizing code to the list.
-  DeoptimizingCodeListNode* node = new DeoptimizingCodeListNode(code);
-  DeoptimizerData* data = isolate->deoptimizer_data();
-  node->set_next(data->deoptimizing_code_list_);
-  data->deoptimizing_code_list_ = node;
-
-  // We might be in the middle of incremental marking with compaction.
-  // Tell collector to treat this code object in a special way and
-  // ignore all slots that might have been recorded on it.
-  isolate->heap()->mark_compact_collector()->InvalidateCode(code);
-
-  ReplaceCodeForRelatedFunctions(function, code);
-
-  if (FLAG_trace_deopt) {
-    PrintF("[forced deoptimization: ");
-    function->PrintName();
-    PrintF(" / %x]\n", reinterpret_cast<uint32_t>(function));
-  }
 }
 
 
@@ -538,6 +505,13 @@ bool Deoptimizer::HasAlignmentPadding(JSFunction* function) {
 }
 
 
+Code* Deoptimizer::NotifyStubFailureBuiltin() {
+  Builtins::Name name = CpuFeatures::IsSupported(SSE2) ?
+      Builtins::kNotifyStubFailureSaveDoubles : Builtins::kNotifyStubFailure;
+  return isolate_->builtins()->builtin(name);
+}
+
+
 #define __ masm()->
 
 void Deoptimizer::EntryGenerator::Generate() {
@@ -566,15 +540,11 @@ void Deoptimizer::EntryGenerator::Generate() {
   // Get the bailout id from the stack.
   __ mov(ebx, Operand(esp, kSavedRegistersAreaSize));
 
-  // Get the address of the location in the code object if possible
+  // Get the address of the location in the code object
   // and compute the fp-to-sp delta in register edx.
-  if (type() == EAGER || type() == SOFT) {
-    __ Set(ecx, Immediate(0));
-    __ lea(edx, Operand(esp, kSavedRegistersAreaSize + 1 * kPointerSize));
-  } else {
-    __ mov(ecx, Operand(esp, kSavedRegistersAreaSize + 1 * kPointerSize));
-    __ lea(edx, Operand(esp, kSavedRegistersAreaSize + 2 * kPointerSize));
-  }
+  __ mov(ecx, Operand(esp, kSavedRegistersAreaSize + 1 * kPointerSize));
+  __ lea(edx, Operand(esp, kSavedRegistersAreaSize + 2 * kPointerSize));
+
   __ sub(edx, ebp);
   __ neg(edx);
 
@@ -620,12 +590,8 @@ void Deoptimizer::EntryGenerator::Generate() {
   // and check that the generated code never deoptimizes with unbalanced stack.
   __ fnclex();
 
-  // Remove the bailout id and the double registers from the stack.
-  if (type() == EAGER || type() == SOFT) {
-    __ add(esp, Immediate(kDoubleRegsSize + kPointerSize));
-  } else {
-    __ add(esp, Immediate(kDoubleRegsSize + 2 * kPointerSize));
-  }
+  // Remove the bailout id, return address and the double registers.
+  __ add(esp, Immediate(kDoubleRegsSize + 2 * kPointerSize));
 
   // Compute a pointer to the unwinding limit in register ecx; that is
   // the first stack slot not part of the input frame.
@@ -666,7 +632,7 @@ void Deoptimizer::EntryGenerator::Generate() {
     __ pop(ecx);
     if (FLAG_debug_code) {
       __ cmp(ecx, Immediate(kAlignmentZapValue));
-      __ Assert(equal, "alignment marker expected");
+      __ Assert(equal, kAlignmentMarkerExpected);
     }
     __ bind(&no_padding);
   } else {
@@ -748,6 +714,17 @@ void Deoptimizer::TableEntryGenerator::GeneratePrologue() {
   }
   __ bind(&done);
 }
+
+
+void FrameDescription::SetCallerPc(unsigned offset, intptr_t value) {
+  SetFrameSlot(offset, value);
+}
+
+
+void FrameDescription::SetCallerFp(unsigned offset, intptr_t value) {
+  SetFrameSlot(offset, value);
+}
+
 
 #undef __
 

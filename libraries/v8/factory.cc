@@ -31,6 +31,7 @@
 #include "debug.h"
 #include "execution.h"
 #include "factory.h"
+#include "isolate-inl.h"
 #include "macro-assembler.h"
 #include "objects.h"
 #include "objects-visiting.h"
@@ -177,12 +178,14 @@ Handle<String> Factory::InternalizeUtf8String(Vector<const char> string) {
                      String);
 }
 
+
 // Internalized strings are created in the old generation (data space).
 Handle<String> Factory::InternalizeString(Handle<String> string) {
   CALL_HEAP_FUNCTION(isolate(),
                      isolate()->heap()->InternalizeString(*string),
                      String);
 }
+
 
 Handle<String> Factory::InternalizeOneByteString(Vector<const uint8_t> string) {
   CALL_HEAP_FUNCTION(isolate(),
@@ -256,6 +259,32 @@ Handle<String> Factory::NewConsString(Handle<String> first,
   CALL_HEAP_FUNCTION(isolate(),
                      isolate()->heap()->AllocateConsString(*first, *second),
                      String);
+}
+
+
+template<typename SinkChar, typename StringType>
+Handle<String> ConcatStringContent(Handle<StringType> result,
+                                   Handle<String> first,
+                                   Handle<String> second) {
+  DisallowHeapAllocation pointer_stays_valid;
+  SinkChar* sink = result->GetChars();
+  String::WriteToFlat(*first, sink, 0, first->length());
+  String::WriteToFlat(*second, sink + first->length(), 0, second->length());
+  return result;
+}
+
+
+Handle<String> Factory::NewFlatConcatString(Handle<String> first,
+                                            Handle<String> second) {
+  int total_length = first->length() + second->length();
+  if (first->IsOneByteRepresentationUnderneath() &&
+      second->IsOneByteRepresentationUnderneath()) {
+    return ConcatStringContent<uint8_t>(
+        NewRawOneByteString(total_length), first, second);
+  } else {
+    return ConcatStringContent<uc16>(
+        NewRawTwoByteString(total_length), first, second);
+  }
 }
 
 
@@ -408,39 +437,27 @@ Handle<ExecutableAccessorInfo> Factory::NewExecutableAccessorInfo() {
 
 Handle<Script> Factory::NewScript(Handle<String> source) {
   // Generate id for this script.
-  int id;
   Heap* heap = isolate()->heap();
-  if (heap->last_script_id()->IsUndefined()) {
-    // Script ids start from one.
-    id = 1;
-  } else {
-    // Increment id, wrap when positive smi is exhausted.
-    id = Smi::cast(heap->last_script_id())->value();
-    id++;
-    if (!Smi::IsValid(id)) {
-      id = 0;
-    }
-  }
-  heap->SetLastScriptId(Smi::FromInt(id));
+  int id = heap->last_script_id()->value() + 1;
+  if (!Smi::IsValid(id) || id < 0) id = 1;
+  heap->set_last_script_id(Smi::FromInt(id));
 
   // Create and initialize script object.
   Handle<Foreign> wrapper = NewForeign(0, TENURED);
   Handle<Script> script = Handle<Script>::cast(NewStruct(SCRIPT_TYPE));
   script->set_source(*source);
   script->set_name(heap->undefined_value());
-  script->set_id(heap->last_script_id());
+  script->set_id(Smi::FromInt(id));
   script->set_line_offset(Smi::FromInt(0));
   script->set_column_offset(Smi::FromInt(0));
   script->set_data(heap->undefined_value());
   script->set_context_data(heap->undefined_value());
   script->set_type(Smi::FromInt(Script::TYPE_NORMAL));
-  script->set_compilation_type(Smi::FromInt(Script::COMPILATION_TYPE_HOST));
-  script->set_compilation_state(
-      Smi::FromInt(Script::COMPILATION_STATE_INITIAL));
   script->set_wrapper(*wrapper);
   script->set_line_ends(heap->undefined_value());
   script->set_eval_from_shared(heap->undefined_value());
   script->set_eval_from_instructions_offset(Smi::FromInt(0));
+  script->set_flags(Smi::FromInt(0));
 
   return script;
 }
@@ -497,6 +514,14 @@ Handle<PropertyCell> Factory::NewPropertyCell(Handle<Object> value) {
       isolate(),
       isolate()->heap()->AllocatePropertyCell(*value),
       PropertyCell);
+}
+
+
+Handle<AllocationSite> Factory::NewAllocationSite() {
+  CALL_HEAP_FUNCTION(
+      isolate(),
+      isolate()->heap()->AllocateAllocationSite(),
+      AllocationSite);
 }
 
 
@@ -644,7 +669,8 @@ Handle<JSFunction> Factory::NewFunctionFromSharedFunctionInfo(
       result->is_compiled() &&
       !function_info->is_toplevel() &&
       function_info->allows_lazy_compilation() &&
-      !function_info->optimization_disabled()) {
+      !function_info->optimization_disabled() &&
+      !isolate()->DebuggerHasBreakPoints()) {
     result->MarkForLazyRecompilation();
   }
   return result;
@@ -907,7 +933,7 @@ Handle<JSFunction> Factory::NewFunctionWithPrototype(Handle<String> name,
     initial_map->set_constructor(*function);
   }
 
-  SetPrototypeProperty(function, prototype);
+  JSFunction::SetPrototype(function, prototype);
   return function;
 }
 
@@ -997,10 +1023,11 @@ Handle<GlobalObject> Factory::NewGlobalObject(
 
 
 Handle<JSObject> Factory::NewJSObjectFromMap(Handle<Map> map,
-                                             PretenureFlag pretenure) {
+                                             PretenureFlag pretenure,
+                                             bool alloc_props) {
   CALL_HEAP_FUNCTION(
       isolate(),
-      isolate()->heap()->AllocateJSObjectFromMap(*map, pretenure),
+      isolate()->heap()->AllocateJSObjectFromMap(*map, pretenure, alloc_props),
       JSObject);
 }
 
@@ -1071,63 +1098,69 @@ void Factory::EnsureCanContainElements(Handle<JSArray> array,
 
 
 Handle<JSArrayBuffer> Factory::NewJSArrayBuffer() {
-  JSFunction* array_buffer_fun =
-      isolate()->context()->native_context()->array_buffer_fun();
+  Handle<JSFunction> array_buffer_fun(
+      isolate()->context()->native_context()->array_buffer_fun());
   CALL_HEAP_FUNCTION(
       isolate(),
-      isolate()->heap()->AllocateJSObject(array_buffer_fun),
+      isolate()->heap()->AllocateJSObject(*array_buffer_fun),
       JSArrayBuffer);
 }
 
 
-Handle<JSTypedArray> Factory::NewJSTypedArray(ExternalArrayType type) {
-  JSFunction* typed_array_fun;
-  Context* native_context = isolate()->context()->native_context();
+Handle<JSDataView> Factory::NewJSDataView() {
+  Handle<JSFunction> data_view_fun(
+      isolate()->context()->native_context()->data_view_fun());
+  CALL_HEAP_FUNCTION(
+      isolate(),
+      isolate()->heap()->AllocateJSObject(*data_view_fun),
+      JSDataView);
+}
+
+
+static JSFunction* GetTypedArrayFun(ExternalArrayType type,
+                                    Isolate* isolate) {
+  Context* native_context = isolate->context()->native_context();
   switch (type) {
     case kExternalUnsignedByteArray:
-      typed_array_fun = native_context->uint8_array_fun();
-      break;
+      return native_context->uint8_array_fun();
 
     case kExternalByteArray:
-      typed_array_fun = native_context->int8_array_fun();
-      break;
+      return native_context->int8_array_fun();
 
     case kExternalUnsignedShortArray:
-      typed_array_fun = native_context->uint16_array_fun();
-      break;
+      return native_context->uint16_array_fun();
 
     case kExternalShortArray:
-      typed_array_fun = native_context->int16_array_fun();
-      break;
+      return native_context->int16_array_fun();
 
     case kExternalUnsignedIntArray:
-      typed_array_fun = native_context->uint32_array_fun();
-      break;
+      return native_context->uint32_array_fun();
 
     case kExternalIntArray:
-      typed_array_fun = native_context->int32_array_fun();
-      break;
+      return native_context->int32_array_fun();
 
     case kExternalFloatArray:
-      typed_array_fun = native_context->float_array_fun();
-      break;
+      return native_context->float_array_fun();
 
     case kExternalDoubleArray:
-      typed_array_fun = native_context->double_array_fun();
-      break;
+      return native_context->double_array_fun();
 
     case kExternalPixelArray:
-      typed_array_fun = native_context->uint8c_array_fun();
-      break;
+      return native_context->uint8c_array_fun();
 
     default:
       UNREACHABLE();
-      return Handle<JSTypedArray>();
+      return NULL;
   }
+}
+
+
+Handle<JSTypedArray> Factory::NewJSTypedArray(ExternalArrayType type) {
+  Handle<JSFunction> typed_array_fun_handle(GetTypedArrayFun(type, isolate()));
 
   CALL_HEAP_FUNCTION(
       isolate(),
-      isolate()->heap()->AllocateJSObject(typed_array_fun),
+      isolate()->heap()->AllocateJSObject(*typed_array_fun_handle),
       JSTypedArray);
 }
 
@@ -1183,6 +1216,7 @@ Handle<SharedFunctionInfo> Factory::NewSharedFunctionInfo(
   shared->set_num_literals(literals_array_size);
   if (is_generator) {
     shared->set_instance_class_name(isolate()->heap()->Generator_string());
+    shared->DisableOptimization(kGenerator);
   }
   return shared;
 }
@@ -1206,6 +1240,7 @@ Handle<JSMessageObject> Factory::NewJSMessageObject(
                          *stack_frames),
                      JSMessageObject);
 }
+
 
 Handle<SharedFunctionInfo> Factory::NewSharedFunctionInfo(Handle<String> name) {
   CALL_HEAP_FUNCTION(isolate(),
@@ -1358,8 +1393,10 @@ Handle<JSFunction> Factory::CreateApiFunction(
         Smi::cast(instance_template->internal_field_count())->value();
   }
 
+  // TODO(svenpanne) Kill ApiInstanceType and refactor things by generalizing
+  // JSObject::GetHeaderSize.
   int instance_size = kPointerSize * internal_field_count;
-  InstanceType type = INVALID_TYPE;
+  InstanceType type;
   switch (instance_type) {
     case JavaScriptObject:
       type = JS_OBJECT_TYPE;
@@ -1374,9 +1411,10 @@ Handle<JSFunction> Factory::CreateApiFunction(
       instance_size += JSGlobalProxy::kSize;
       break;
     default:
+      UNREACHABLE();
+      type = JS_OBJECT_TYPE;  // Keep the compiler happy.
       break;
   }
-  ASSERT(type != INVALID_TYPE);
 
   Handle<JSFunction> result =
       NewFunction(Factory::empty_string(),

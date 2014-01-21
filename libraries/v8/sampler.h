@@ -29,6 +29,7 @@
 #define V8_SAMPLER_H_
 
 #include "atomicops.h"
+#include "frames.h"
 #include "v8globals.h"
 
 namespace v8 {
@@ -43,21 +44,25 @@ class Isolate;
 // (if used for profiling) the program counter and stack pointer for
 // the thread that created it.
 
+struct RegisterState {
+  RegisterState() : pc(NULL), sp(NULL), fp(NULL) {}
+  Address pc;      // Instruction pointer.
+  Address sp;      // Stack pointer.
+  Address fp;      // Frame pointer.
+};
+
 // TickSample captures the information collected for each sample.
 struct TickSample {
   TickSample()
       : state(OTHER),
         pc(NULL),
-        sp(NULL),
-        fp(NULL),
         external_callback(NULL),
         frames_count(0),
-        has_external_callback(false) {}
-  void Trace(Isolate* isolate);
+        has_external_callback(false),
+        top_frame_type(StackFrame::NONE) {}
+  void Init(Isolate* isolate, const RegisterState& state);
   StateTag state;  // The state of the VM.
   Address pc;      // Instruction pointer.
-  Address sp;      // Stack pointer.
-  Address fp;      // Frame pointer.
   union {
     Address tos;   // Top stack value (*sp).
     Address external_callback;
@@ -66,6 +71,7 @@ struct TickSample {
   Address stack[kMaxFramesCount];  // Call stack.
   int frames_count : 8;  // Number of captured frames.
   bool has_external_callback : 1;
+  StackFrame::Type top_frame_type : 4;
 };
 
 class Sampler {
@@ -82,11 +88,7 @@ class Sampler {
   int interval() const { return interval_; }
 
   // Performs stack sampling.
-  void SampleStack(TickSample* sample);
-
-  // This method is called for each sampling period with the current
-  // program counter.
-  virtual void Tick(TickSample* sample) = 0;
+  void SampleStack(const RegisterState& regs);
 
   // Start and stop sampler.
   void Start();
@@ -101,11 +103,21 @@ class Sampler {
   bool IsActive() const { return NoBarrier_Load(&active_); }
 
   // Used in tests to make sure that stack sampling is performed.
-  int samples_taken() const { return samples_taken_; }
-  void ResetSamplesTaken() { samples_taken_ = 0; }
+  unsigned js_and_external_sample_count() const {
+    return js_and_external_sample_count_;
+  }
+  void StartCountingSamples() {
+      is_counting_samples_ = true;
+      js_and_external_sample_count_ = 0;
+  }
 
   class PlatformData;
   PlatformData* platform_data() const { return data_; }
+
+ protected:
+  // This method is called for each sampling period with the current
+  // program counter.
+  virtual void Tick(TickSample* sample) = 0;
 
  private:
   void SetActive(bool value) { NoBarrier_Store(&active_, value); }
@@ -115,7 +127,9 @@ class Sampler {
   Atomic32 profiling_;
   Atomic32 active_;
   PlatformData* data_;  // Platform specific data.
-  int samples_taken_;  // Counts stack samples taken.
+  bool is_counting_samples_;
+  // Counts stack samples taken in JS VM state.
+  unsigned js_and_external_sample_count_;
   DISALLOW_IMPLICIT_CONSTRUCTORS(Sampler);
 };
 

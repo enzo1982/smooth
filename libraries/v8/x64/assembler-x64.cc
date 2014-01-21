@@ -27,7 +27,7 @@
 
 #include "v8.h"
 
-#if defined(V8_TARGET_ARCH_X64)
+#if V8_TARGET_ARCH_X64
 
 #include "macro-assembler.h"
 #include "serialize.h"
@@ -164,10 +164,7 @@ void CpuFeatures::Probe() {
 // Patch the code at the current PC with a call to the target address.
 // Additional guard int3 instructions can be added if required.
 void RelocInfo::PatchCodeWithCall(Address target, int guard_bytes) {
-  // Load register with immediate 64 and call through a register instructions
-  // takes up 13 bytes and int3 takes up one byte.
-  static const int kCallCodeSize = 13;
-  int code_size = kCallCodeSize + guard_bytes;
+  int code_size = Assembler::kCallSequenceLength + guard_bytes;
 
   // Create a code patcher.
   CodePatcher patcher(pc_, code_size);
@@ -183,7 +180,7 @@ void RelocInfo::PatchCodeWithCall(Address target, int guard_bytes) {
   patcher.masm()->call(r10);
 
   // Check that the size of the code generated is as expected.
-  ASSERT_EQ(kCallCodeSize,
+  ASSERT_EQ(Assembler::kCallSequenceLength,
             patcher.masm()->SizeOfCodeGeneratedSince(&check_codesize));
 
   // Add the requested number of int3 instructions after the call.
@@ -902,10 +899,12 @@ void Assembler::clc() {
   emit(0xF8);
 }
 
+
 void Assembler::cld() {
   EnsureSpace ensure_space(this);
   emit(0xFC);
 }
+
 
 void Assembler::cdq() {
   EnsureSpace ensure_space(this);
@@ -1375,7 +1374,7 @@ void Assembler::load_rax(void* value, RelocInfo::Mode mode) {
   EnsureSpace ensure_space(this);
   emit(0x48);  // REX.W
   emit(0xA1);
-  emitq(reinterpret_cast<uintptr_t>(value), mode);
+  emitp(value, mode);
 }
 
 
@@ -1527,7 +1526,7 @@ void Assembler::movq(Register dst, void* value, RelocInfo::Mode rmode) {
   EnsureSpace ensure_space(this);
   emit_rex_64(dst);
   emit(0xB8 | dst.low_bits());
-  emitq(reinterpret_cast<uintptr_t>(value), rmode);
+  emitp(value, rmode);
 }
 
 
@@ -1604,7 +1603,7 @@ void Assembler::movq(Register dst, Handle<Object> value, RelocInfo::Mode mode) {
     ASSERT(!HEAP->InNewSpace(*value));
     emit_rex_64(dst);
     emit(0xB8 | dst.low_bits());
-    emitq(reinterpret_cast<uintptr_t>(value.location()), mode);
+    emitp(value.location(), mode);
   }
 }
 
@@ -1996,7 +1995,7 @@ void Assembler::store_rax(void* dst, RelocInfo::Mode mode) {
   EnsureSpace ensure_space(this);
   emit(0x48);  // REX.W
   emit(0xA3);
-  emitq(reinterpret_cast<uintptr_t>(dst), mode);
+  emitp(dst, mode);
 }
 
 
@@ -2522,6 +2521,7 @@ void Assembler::emit_farith(int b1, int b2, int i) {
   emit(b2 + i);
 }
 
+
 // SSE 2 operations.
 
 void Assembler::movd(XMMRegister dst, Register src) {
@@ -2581,6 +2581,7 @@ void Assembler::movq(XMMRegister dst, XMMRegister src) {
     emit_sse_operand(src, dst);
   }
 }
+
 
 void Assembler::movdqa(const Operand& dst, XMMRegister src) {
   EnsureSpace ensure_space(this);
@@ -3035,9 +3036,11 @@ void Assembler::emit_sse_operand(XMMRegister dst, XMMRegister src) {
   emit(0xC0 | (dst.low_bits() << 3) | src.low_bits());
 }
 
+
 void Assembler::emit_sse_operand(XMMRegister dst, Register src) {
   emit(0xC0 | (dst.low_bits() << 3) | src.low_bits());
 }
+
 
 void Assembler::emit_sse_operand(Register dst, XMMRegister src) {
   emit(0xC0 | (dst.low_bits() << 3) | src.low_bits());
@@ -3074,6 +3077,7 @@ void Assembler::RecordRelocInfo(RelocInfo::Mode rmode, intptr_t data) {
   RelocInfo rinfo(pc_, rmode, data, NULL);
   reloc_info_writer.Write(&rinfo);
 }
+
 
 void Assembler::RecordJSReturn() {
   positions_recorder()->WriteRecordedPositions();

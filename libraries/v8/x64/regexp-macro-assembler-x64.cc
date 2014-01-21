@@ -27,8 +27,9 @@
 
 #include "v8.h"
 
-#if defined(V8_TARGET_ARCH_X64)
+#if V8_TARGET_ARCH_X64
 
+#include "cpu-profiler.h"
 #include "serialize.h"
 #include "unicode.h"
 #include "log.h"
@@ -396,7 +397,7 @@ void RegExpMacroAssemblerX64::CheckNotBackReference(
   // Fail on partial or illegal capture (start of capture after end of capture).
   // This must not happen (no back-reference can reference a capture that wasn't
   // closed before in the reg-exp).
-  __ Check(greater_equal, "Invalid capture referenced");
+  __ Check(greater_equal, kInvalidCaptureReferenced);
 
   // Succeed on empty capture (including non-participating capture)
   __ j(equal, &fallthrough);

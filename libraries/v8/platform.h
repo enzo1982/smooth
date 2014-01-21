@@ -91,6 +91,7 @@ int isless(double x, double y);
 // Microsoft Visual C++ specific stuff.
 #ifdef _MSC_VER
 
+#include "win32-headers.h"
 #include "win32-math.h"
 
 int strncasecmp(const char* s1, const char* s2, int n);
@@ -112,7 +113,6 @@ inline int lrint(double flt) {
   return intgr;
 }
 
-
 #endif  // _MSC_VER
 
 #ifndef __CYGWIN__
@@ -122,9 +122,7 @@ int random();
 
 #endif  // WIN32
 
-#include "atomicops.h"
 #include "lazy-instance.h"
-#include "platform-tls.h"
 #include "utils.h"
 #include "v8globals.h"
 
@@ -150,6 +148,60 @@ void lazily_initialize_fast_exp();
 
 // Forward declarations.
 class Socket;
+
+// ----------------------------------------------------------------------------
+// Fast TLS support
+
+#ifndef V8_NO_FAST_TLS
+
+#if defined(_MSC_VER) && V8_HOST_ARCH_IA32
+
+#define V8_FAST_TLS_SUPPORTED 1
+
+INLINE(intptr_t InternalGetExistingThreadLocal(intptr_t index));
+
+inline intptr_t InternalGetExistingThreadLocal(intptr_t index) {
+  const intptr_t kTibInlineTlsOffset = 0xE10;
+  const intptr_t kTibExtraTlsOffset = 0xF94;
+  const intptr_t kMaxInlineSlots = 64;
+  const intptr_t kMaxSlots = kMaxInlineSlots + 1024;
+  ASSERT(0 <= index && index < kMaxSlots);
+  if (index < kMaxInlineSlots) {
+    return static_cast<intptr_t>(__readfsdword(kTibInlineTlsOffset +
+                                               kPointerSize * index));
+  }
+  intptr_t extra = static_cast<intptr_t>(__readfsdword(kTibExtraTlsOffset));
+  ASSERT(extra != 0);
+  return *reinterpret_cast<intptr_t*>(extra +
+                                      kPointerSize * (index - kMaxInlineSlots));
+}
+
+#elif defined(__APPLE__) && (V8_HOST_ARCH_IA32 || V8_HOST_ARCH_X64)
+
+#define V8_FAST_TLS_SUPPORTED 1
+
+extern intptr_t kMacTlsBaseOffset;
+
+INLINE(intptr_t InternalGetExistingThreadLocal(intptr_t index));
+
+inline intptr_t InternalGetExistingThreadLocal(intptr_t index) {
+  intptr_t result;
+#if V8_HOST_ARCH_IA32
+  asm("movl %%gs:(%1,%2,4), %0;"
+      :"=r"(result)  // Output must be a writable register.
+      :"r"(kMacTlsBaseOffset), "r"(index));
+#else
+  asm("movq %%gs:(%1,%2,8), %0;"
+      :"=r"(result)
+      :"r"(kMacTlsBaseOffset), "r"(index));
+#endif
+  return result;
+}
+
+#endif
+
+#endif  // V8_NO_FAST_TLS
+
 
 // ----------------------------------------------------------------------------
 // OS
@@ -338,6 +390,9 @@ class OS {
   // Support runtime detection of Cpu implementer
   static CpuImplementer GetCpuImplementer();
 
+  // Support runtime detection of Cpu implementer
+  static CpuPart GetCpuPart(CpuImplementer implementer);
+
   // Support runtime detection of VFP3 on ARM CPUs.
   static bool ArmCpuHasFeature(CpuFeature feature);
 
@@ -351,8 +406,6 @@ class OS {
   // Returns the activation frame alignment constraint or zero if
   // the platform doesn't care. Guaranteed to be a power of two.
   static int ActivationFrameAlignment();
-
-  static void ReleaseStore(volatile AtomicWord* ptr, AtomicWord value);
 
 #if defined(V8_TARGET_ARCH_IA32)
   // Limit below which the extra overhead of the MemCopy function is likely
@@ -368,7 +421,42 @@ class OS {
   static void MemCopy(void* dest, const void* src, size_t size) {
     MemMove(dest, src, size);
   }
-#else  // V8_TARGET_ARCH_IA32
+#elif defined(V8_HOST_ARCH_ARM)
+  typedef void (*MemCopyUint8Function)(uint8_t* dest,
+                                       const uint8_t* src,
+                                       size_t size);
+  static MemCopyUint8Function memcopy_uint8_function;
+  static void MemCopyUint8Wrapper(uint8_t* dest,
+                                  const uint8_t* src,
+                                  size_t chars) {
+    memcpy(dest, src, chars);
+  }
+  // For values < 16, the assembler function is slower than the inlined C code.
+  static const int kMinComplexMemCopy = 16;
+  static void MemCopy(void* dest, const void* src, size_t size) {
+    (*memcopy_uint8_function)(reinterpret_cast<uint8_t*>(dest),
+                              reinterpret_cast<const uint8_t*>(src),
+                              size);
+  }
+  static void MemMove(void* dest, const void* src, size_t size) {
+    memmove(dest, src, size);
+  }
+
+  typedef void (*MemCopyUint16Uint8Function)(uint16_t* dest,
+                                             const uint8_t* src,
+                                             size_t size);
+  static MemCopyUint16Uint8Function memcopy_uint16_uint8_function;
+  static void MemCopyUint16Uint8Wrapper(uint16_t* dest,
+                                        const uint8_t* src,
+                                        size_t chars);
+  // For values < 12, the assembler function is slower than the inlined C code.
+  static const int kMinComplexConvertMemCopy = 12;
+  static void MemCopyUint16Uint8(uint16_t* dest,
+                                 const uint8_t* src,
+                                 size_t size) {
+    (*memcopy_uint16_uint8_function)(dest, src, size);
+  }
+#else
   // Copy memory area to disjoint memory area.
   static void MemCopy(void* dest, const void* src, size_t size) {
     memcpy(dest, src, size);

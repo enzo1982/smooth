@@ -28,6 +28,8 @@
 #include "v8.h"
 #include "arguments.h"
 
+#include "vm-state-inl.h"
+
 namespace v8 {
 namespace internal {
 
@@ -90,6 +92,8 @@ v8::Handle<v8::Value> FunctionCallbackArguments::Call(InvocationCallback f) {
   Isolate* isolate = this->isolate();
   void* f_as_void = CallbackTable::FunctionToVoidPtr(f);
   bool new_style = CallbackTable::ReturnsVoid(isolate, f_as_void);
+  VMState<EXTERNAL> state(isolate);
+  ExternalCallbackScope call_scope(isolate, FUNCTION_ADDR(f));
   if (new_style) {
     FunctionCallback c = reinterpret_cast<FunctionCallback>(f);
     FunctionCallbackInfo<v8::Value> info(end(),
@@ -114,6 +118,8 @@ v8::Handle<ReturnValue> PropertyCallbackArguments::Call(OldFunction f) {       \
   Isolate* isolate = this->isolate();                                          \
   void* f_as_void = CallbackTable::FunctionToVoidPtr(f);                       \
   bool new_style = CallbackTable::ReturnsVoid(isolate, f_as_void);             \
+  VMState<EXTERNAL> state(isolate);                                            \
+  ExternalCallbackScope call_scope(isolate, FUNCTION_ADDR(f));                 \
   if (new_style) {                                                             \
     NewFunction c = reinterpret_cast<NewFunction>(f);                          \
     PropertyCallbackInfo<ReturnValue> info(end());                             \
@@ -132,6 +138,8 @@ v8::Handle<ReturnValue> PropertyCallbackArguments::Call(OldFunction f,         \
   Isolate* isolate = this->isolate();                                          \
   void* f_as_void = CallbackTable::FunctionToVoidPtr(f);                       \
   bool new_style = CallbackTable::ReturnsVoid(isolate, f_as_void);             \
+  VMState<EXTERNAL> state(isolate);                                            \
+  ExternalCallbackScope call_scope(isolate, FUNCTION_ADDR(f));                 \
   if (new_style) {                                                             \
     NewFunction c = reinterpret_cast<NewFunction>(f);                          \
     PropertyCallbackInfo<ReturnValue> info(end());                             \
@@ -151,6 +159,8 @@ v8::Handle<ReturnValue> PropertyCallbackArguments::Call(OldFunction f,         \
   Isolate* isolate = this->isolate();                                          \
   void* f_as_void = CallbackTable::FunctionToVoidPtr(f);                       \
   bool new_style = CallbackTable::ReturnsVoid(isolate, f_as_void);             \
+  VMState<EXTERNAL> state(isolate);                                            \
+  ExternalCallbackScope call_scope(isolate, FUNCTION_ADDR(f));                 \
   if (new_style) {                                                             \
     NewFunction c = reinterpret_cast<NewFunction>(f);                          \
     PropertyCallbackInfo<ReturnValue> info(end());                             \
@@ -170,6 +180,8 @@ void PropertyCallbackArguments::Call(OldFunction f,                            \
   Isolate* isolate = this->isolate();                                          \
   void* f_as_void = CallbackTable::FunctionToVoidPtr(f);                       \
   bool new_style = CallbackTable::ReturnsVoid(isolate, f_as_void);             \
+  VMState<EXTERNAL> state(isolate);                                            \
+  ExternalCallbackScope call_scope(isolate, FUNCTION_ADDR(f));                 \
   if (new_style) {                                                             \
     NewFunction c = reinterpret_cast<NewFunction>(f);                          \
     PropertyCallbackInfo<ReturnValue> info(end());                             \
@@ -189,6 +201,14 @@ FOR_EACH_CALLBACK_TABLE_MAPPING_2_VOID_RETURN(WRITE_CALL_2_VOID)
 #undef WRITE_CALL_1
 #undef WRITE_CALL_2
 #undef WRITE_CALL_2_VOID
+
+
+double ClobberDoubleRegisters(double x1, double x2, double x3, double x4) {
+  // TODO(ulan): This clobbers only subset of registers depending on compiler,
+  // Rewrite this in assembly to really clobber all registers.
+  // GCC for ia32 uses the FPU and does not touch XMM registers.
+  return x1 * 1.01 + x2 * 2.02 + x3 * 3.03 + x4 * 4.04;
+}
 
 
 } }  // namespace v8::internal

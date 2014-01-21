@@ -31,6 +31,7 @@
 #include "arguments.h"
 #include "bootstrapper.h"
 #include "builtins.h"
+#include "cpu-profiler.h"
 #include "gdb-jit.h"
 #include "ic-inl.h"
 #include "heap-profiler.h"
@@ -181,6 +182,7 @@ static inline bool CalledAsConstructor(Isolate* isolate) {
   return result;
 }
 
+
 // ----------------------------------------------------------------------------
 
 BUILTIN(Illegal) {
@@ -209,23 +211,22 @@ static MaybeObject* ArrayCodeGenericCommon(Arguments* args,
     MaybeObject* maybe_array = array->Initialize(0);
     if (maybe_array->IsFailure()) return maybe_array;
 
-    if (FLAG_optimize_constructed_arrays) {
-      AllocationSiteInfo* info = AllocationSiteInfo::FindForJSObject(array);
-      ElementsKind to_kind = array->GetElementsKind();
-      if (info != NULL && info->GetElementsKindPayload(&to_kind)) {
-        if (IsMoreGeneralElementsKindTransition(array->GetElementsKind(),
-                                                to_kind)) {
-          // We have advice that we should change the elements kind
-          if (FLAG_trace_track_allocation_sites) {
-            PrintF("AllocationSiteInfo: pre-transitioning array %p(%s->%s)\n",
-                   reinterpret_cast<void*>(array),
-                   ElementsKindToString(array->GetElementsKind()),
-                   ElementsKindToString(to_kind));
-          }
-
-          maybe_array = array->TransitionElementsKind(to_kind);
-          if (maybe_array->IsFailure()) return maybe_array;
+    AllocationMemento* memento = AllocationMemento::FindForJSObject(array);
+    if (memento != NULL && memento->IsValid()) {
+      AllocationSite* site = memento->GetAllocationSite();
+      ElementsKind to_kind = site->GetElementsKind();
+      if (IsMoreGeneralElementsKindTransition(array->GetElementsKind(),
+                                              to_kind)) {
+        // We have advice that we should change the elements kind
+        if (FLAG_trace_track_allocation_sites) {
+          PrintF("AllocationSite: pre-transitioning array %p(%s->%s)\n",
+                 reinterpret_cast<void*>(array),
+                 ElementsKindToString(array->GetElementsKind()),
+                 ElementsKindToString(to_kind));
         }
+
+        maybe_array = array->TransitionElementsKind(to_kind);
+        if (maybe_array->IsFailure()) return maybe_array;
       }
     }
 
@@ -1154,6 +1155,7 @@ BUILTIN(StrictModePoisonPill) {
       "strict_poison_pill", HandleVector<Object>(NULL, 0)));
 }
 
+
 // -----------------------------------------------------------------------------
 //
 
@@ -1267,14 +1269,7 @@ MUST_USE_RESULT static MaybeObject* HandleApiCallHelper(
                                      args.length() - 1,
                                      is_construct);
 
-    v8::Handle<v8::Value> value;
-    {
-      // Leaving JavaScript.
-      VMState<EXTERNAL> state(isolate);
-      ExternalCallbackScope call_scope(isolate,
-                                       v8::ToCData<Address>(callback_obj));
-      value = custom.Call(callback);
-    }
+    v8::Handle<v8::Value> value = custom.Call(callback);
     if (value.IsEmpty()) {
       result = heap->undefined_value();
     } else {
@@ -1343,14 +1338,7 @@ MUST_USE_RESULT static MaybeObject* HandleApiCallAsFunctionOrConstructor(
                                      &args[0] - 1,
                                      args.length() - 1,
                                      is_construct_call);
-    v8::Handle<v8::Value> value;
-    {
-      // Leaving JavaScript.
-      VMState<EXTERNAL> state(isolate);
-      ExternalCallbackScope call_scope(isolate,
-                                       v8::ToCData<Address>(callback_obj));
-      value = custom.Call(callback);
-    }
+    v8::Handle<v8::Value> value = custom.Call(callback);
     if (value.IsEmpty()) {
       result = heap->undefined_value();
     } else {
@@ -1447,13 +1435,16 @@ static void Generate_KeyedLoadIC_PreMonomorphic(MacroAssembler* masm) {
   KeyedLoadIC::GeneratePreMonomorphic(masm);
 }
 
+
 static void Generate_KeyedLoadIC_IndexedInterceptor(MacroAssembler* masm) {
   KeyedLoadIC::GenerateIndexedInterceptor(masm);
 }
 
+
 static void Generate_KeyedLoadIC_NonStrictArguments(MacroAssembler* masm) {
   KeyedLoadIC::GenerateNonStrictArguments(masm);
 }
+
 
 static void Generate_StoreIC_Slow(MacroAssembler* masm) {
   StoreIC::GenerateSlow(masm);
@@ -1554,17 +1545,11 @@ static void Generate_KeyedStoreIC_Initialize_Strict(MacroAssembler* masm) {
   KeyedStoreIC::GenerateInitialize(masm);
 }
 
+
 static void Generate_KeyedStoreIC_NonStrictArguments(MacroAssembler* masm) {
   KeyedStoreIC::GenerateNonStrictArguments(masm);
 }
 
-static void Generate_TransitionElementsSmiToDouble(MacroAssembler* masm) {
-  KeyedStoreIC::GenerateTransitionElementsSmiToDouble(masm);
-}
-
-static void Generate_TransitionElementsDoubleToObject(MacroAssembler* masm) {
-  KeyedStoreIC::GenerateTransitionElementsDoubleToObject(masm);
-}
 
 #ifdef ENABLE_DEBUGGER_SUPPORT
 static void Generate_LoadIC_DebugBreak(MacroAssembler* masm) {
@@ -1730,6 +1715,7 @@ void Builtins::InitBuiltinFunctionTable() {
 #undef DEF_FUNCTION_PTR_C
 #undef DEF_FUNCTION_PTR_A
 }
+
 
 void Builtins::SetUp(bool create_heap_objects) {
   ASSERT(!initialized_);

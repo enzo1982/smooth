@@ -62,44 +62,8 @@
 namespace v8 {
 namespace internal {
 
-// 0 is never a valid thread id on FreeBSD since tids and pids share a
-// name space and pid 0 is used to kill the group (see man 2 kill).
-static const pthread_t kNoThread = (pthread_t) 0;
-
-
-double ceiling(double x) {
-    // Correct as on OS X
-    if (-1.0 < x && x < 0.0) {
-        return -0.0;
-    } else {
-        return ceil(x);
-    }
-}
-
 
 static Mutex* limit_mutex = NULL;
-
-
-void OS::PostSetUp() {
-  POSIXPostSetUp();
-}
-
-
-void OS::ReleaseStore(volatile AtomicWord* ptr, AtomicWord value) {
-  __asm__ __volatile__("" : : : "memory");
-  *ptr = value;
-}
-
-
-uint64_t OS::CpuFeaturesImpliedByPlatform() {
-  return 0;  // FreeBSD runs on anything.
-}
-
-
-int OS::ActivationFrameAlignment() {
-  // 16 byte alignment on FreeBSD
-  return 16;
-}
 
 
 const char* OS::LocalTimezone(double time) {
@@ -145,11 +109,6 @@ bool OS::IsOutsideAllocatedSpace(void* address) {
 }
 
 
-size_t OS::AllocateAlignment() {
-  return getpagesize();
-}
-
-
 void* OS::Allocate(const size_t requested,
                    size_t* allocated,
                    bool executable) {
@@ -167,62 +126,8 @@ void* OS::Allocate(const size_t requested,
 }
 
 
-void OS::Free(void* buf, const size_t length) {
-  // TODO(1240712): munmap has a return value which is ignored here.
-  int result = munmap(buf, length);
-  USE(result);
-  ASSERT(result == 0);
-}
-
-
-void OS::Sleep(int milliseconds) {
-  unsigned int ms = static_cast<unsigned int>(milliseconds);
-  usleep(1000 * ms);
-}
-
-
-int OS::NumberOfCores() {
-  return sysconf(_SC_NPROCESSORS_ONLN);
-}
-
-
-void OS::Abort() {
-  // Redirect to std abort to signal abnormal program termination.
-  abort();
-}
-
-
-void OS::DebugBreak() {
-#if (defined(__arm__) || defined(__thumb__))
-  asm("bkpt 0");
-#else
-  asm("int $3");
-#endif
-}
-
-
 void OS::DumpBacktrace() {
-  void* trace[100];
-  int size = backtrace(trace, ARRAY_SIZE(trace));
-  char** symbols = backtrace_symbols(trace, size);
-  fprintf(stderr, "\n==== C stack trace ===============================\n\n");
-  if (size == 0) {
-    fprintf(stderr, "(empty)\n");
-  } else if (symbols == NULL) {
-    fprintf(stderr, "(no symbols)\n");
-  } else {
-    for (int i = 1; i < size; ++i) {
-      fprintf(stderr, "%2d: ", i);
-      char mangled[201];
-      if (sscanf(symbols[i], "%*[^(]%*[(]%200[^)+]", mangled) == 1) {  // NOLINT
-        fprintf(stderr, "%s\n", mangled);
-      } else {
-        fprintf(stderr, "??\n");
-      }
-    }
-  }
-  fflush(stderr);
-  free(symbols);
+  POSIXBacktraceHelper<backtrace, backtrace_symbols>::DumpBacktrace();
 }
 
 
@@ -324,30 +229,7 @@ void OS::SignalCodeMovingGC() {
 
 
 int OS::StackWalk(Vector<OS::StackFrame> frames) {
-  int frames_size = frames.length();
-  ScopedVector<void*> addresses(frames_size);
-
-  int frames_count = backtrace(addresses.start(), frames_size);
-
-  char** symbols = backtrace_symbols(addresses.start(), frames_count);
-  if (symbols == NULL) {
-    return kStackWalkError;
-  }
-
-  for (int i = 0; i < frames_count; i++) {
-    frames[i].address = addresses[i];
-    // Format a text representation of the frame based on the information
-    // available.
-    SNPrintF(MutableCStrVector(frames[i].text, kStackWalkMaxTextLen),
-             "%s",
-             symbols[i]);
-    // Make sure line termination is in place.
-    frames[i].text[kStackWalkMaxTextLen - 1] = '\0';
-  }
-
-  free(symbols);
-
-  return frames_count;
+  return POSIXBacktraceHelper<backtrace, backtrace_symbols>::StackWalk(frames);
 }
 
 
@@ -487,140 +369,6 @@ bool VirtualMemory::ReleaseRegion(void* base, size_t size) {
 bool VirtualMemory::HasLazyCommits() {
   // TODO(alph): implement for the platform.
   return false;
-}
-
-
-class Thread::PlatformData : public Malloced {
- public:
-  pthread_t thread_;  // Thread handle for pthread.
-};
-
-
-Thread::Thread(const Options& options)
-    : data_(new PlatformData),
-      stack_size_(options.stack_size()),
-      start_semaphore_(NULL) {
-  set_name(options.name());
-}
-
-
-Thread::~Thread() {
-  delete data_;
-}
-
-
-static void* ThreadEntry(void* arg) {
-  Thread* thread = reinterpret_cast<Thread*>(arg);
-  // This is also initialized by the first argument to pthread_create() but we
-  // don't know which thread will run first (the original thread or the new
-  // one) so we initialize it here too.
-  thread->data()->thread_ = pthread_self();
-  ASSERT(thread->data()->thread_ != kNoThread);
-  thread->NotifyStartedAndRun();
-  return NULL;
-}
-
-
-void Thread::set_name(const char* name) {
-  strncpy(name_, name, sizeof(name_));
-  name_[sizeof(name_) - 1] = '\0';
-}
-
-
-void Thread::Start() {
-  pthread_attr_t* attr_ptr = NULL;
-  pthread_attr_t attr;
-  if (stack_size_ > 0) {
-    pthread_attr_init(&attr);
-    pthread_attr_setstacksize(&attr, static_cast<size_t>(stack_size_));
-    attr_ptr = &attr;
-  }
-  pthread_create(&data_->thread_, attr_ptr, ThreadEntry, this);
-  ASSERT(data_->thread_ != kNoThread);
-}
-
-
-void Thread::Join() {
-  pthread_join(data_->thread_, NULL);
-}
-
-
-Thread::LocalStorageKey Thread::CreateThreadLocalKey() {
-  pthread_key_t key;
-  int result = pthread_key_create(&key, NULL);
-  USE(result);
-  ASSERT(result == 0);
-  return static_cast<LocalStorageKey>(key);
-}
-
-
-void Thread::DeleteThreadLocalKey(LocalStorageKey key) {
-  pthread_key_t pthread_key = static_cast<pthread_key_t>(key);
-  int result = pthread_key_delete(pthread_key);
-  USE(result);
-  ASSERT(result == 0);
-}
-
-
-void* Thread::GetThreadLocal(LocalStorageKey key) {
-  pthread_key_t pthread_key = static_cast<pthread_key_t>(key);
-  return pthread_getspecific(pthread_key);
-}
-
-
-void Thread::SetThreadLocal(LocalStorageKey key, void* value) {
-  pthread_key_t pthread_key = static_cast<pthread_key_t>(key);
-  pthread_setspecific(pthread_key, value);
-}
-
-
-void Thread::YieldCPU() {
-  sched_yield();
-}
-
-
-class FreeBSDMutex : public Mutex {
- public:
-  FreeBSDMutex() {
-    pthread_mutexattr_t attrs;
-    int result = pthread_mutexattr_init(&attrs);
-    ASSERT(result == 0);
-    result = pthread_mutexattr_settype(&attrs, PTHREAD_MUTEX_RECURSIVE);
-    ASSERT(result == 0);
-    result = pthread_mutex_init(&mutex_, &attrs);
-    ASSERT(result == 0);
-    USE(result);
-  }
-
-  virtual ~FreeBSDMutex() { pthread_mutex_destroy(&mutex_); }
-
-  virtual int Lock() {
-    int result = pthread_mutex_lock(&mutex_);
-    return result;
-  }
-
-  virtual int Unlock() {
-    int result = pthread_mutex_unlock(&mutex_);
-    return result;
-  }
-
-  virtual bool TryLock() {
-    int result = pthread_mutex_trylock(&mutex_);
-    // Return false if the lock is busy and locking failed.
-    if (result == EBUSY) {
-      return false;
-    }
-    ASSERT(result == 0);  // Verify no other errors.
-    return true;
-  }
-
- private:
-  pthread_mutex_t mutex_;   // Pthread mutex for POSIX platforms.
-};
-
-
-Mutex* OS::CreateMutex() {
-  return new FreeBSDMutex();
 }
 
 

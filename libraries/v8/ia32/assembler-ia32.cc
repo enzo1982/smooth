@@ -36,7 +36,7 @@
 
 #include "v8.h"
 
-#if defined(V8_TARGET_ARCH_IA32)
+#if V8_TARGET_ARCH_IA32
 
 #include "disassembler.h"
 #include "macro-assembler.h"
@@ -65,7 +65,7 @@ int IntelDoubleRegister::NumAllocatableRegisters() {
   if (CpuFeatures::IsSupported(SSE2)) {
     return XMMRegister::kNumAllocatableRegisters;
   } else {
-    return X87TopOfStackRegister::kNumAllocatableRegisters;
+    return X87Register::kNumAllocatableRegisters;
   }
 }
 
@@ -74,7 +74,7 @@ int IntelDoubleRegister::NumRegisters() {
   if (CpuFeatures::IsSupported(SSE2)) {
     return XMMRegister::kNumRegisters;
   } else {
-    return X87TopOfStackRegister::kNumRegisters;
+    return X87Register::kNumRegisters;
   }
 }
 
@@ -83,7 +83,7 @@ const char* IntelDoubleRegister::AllocationIndexToString(int index) {
   if (CpuFeatures::IsSupported(SSE2)) {
     return XMMRegister::AllocationIndexToString(index);
   } else {
-    return X87TopOfStackRegister::AllocationIndexToString(index);
+    return X87Register::AllocationIndexToString(index);
   }
 }
 
@@ -1055,6 +1055,7 @@ void Assembler::rcr(Register dst, uint8_t imm8) {
   }
 }
 
+
 void Assembler::ror(Register dst, uint8_t imm8) {
   EnsureSpace ensure_space(this);
   ASSERT(is_uint5(imm8));  // illegal shift count
@@ -1067,6 +1068,7 @@ void Assembler::ror(Register dst, uint8_t imm8) {
     EMIT(imm8);
   }
 }
+
 
 void Assembler::ror_cl(Register dst) {
   EnsureSpace ensure_space(this);
@@ -1225,6 +1227,10 @@ void Assembler::test_b(Register reg, const Operand& op) {
 
 
 void Assembler::test(const Operand& op, const Immediate& imm) {
+  if (op.is_reg_only()) {
+    test(op.reg(), imm);
+    return;
+  }
   EnsureSpace ensure_space(this);
   EMIT(0xF7);
   emit_operand(eax, op);
@@ -1782,6 +1788,12 @@ void Assembler::fisub_s(const Operand& adr) {
 }
 
 
+void Assembler::fmul_i(int i) {
+  EnsureSpace ensure_space(this);
+  emit_farith(0xD8, 0xC8, i);
+}
+
+
 void Assembler::fmul(int i) {
   EnsureSpace ensure_space(this);
   emit_farith(0xDC, 0xC8, i);
@@ -2136,6 +2148,7 @@ void Assembler::roundsd(XMMRegister dst, XMMRegister src, RoundingMode mode) {
   // Mask precision exeption.
   EMIT(static_cast<byte>(mode) | 0x8);
 }
+
 
 void Assembler::movmskpd(Register dst, XMMRegister src) {
   ASSERT(IsEnabled(SSE2));

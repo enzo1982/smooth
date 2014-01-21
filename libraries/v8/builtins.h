@@ -113,6 +113,8 @@ enum BuiltinExtraArguments {
                                     Code::kNoExtraICState)              \
   V(NotifyStubFailure,              BUILTIN, UNINITIALIZED,             \
                                     Code::kNoExtraICState)              \
+  V(NotifyStubFailureSaveDoubles,   BUILTIN, UNINITIALIZED,             \
+                                    Code::kNoExtraICState)              \
   V(NotifyOSR,                      BUILTIN, UNINITIALIZED,             \
                                     Code::kNoExtraICState)              \
                                                                         \
@@ -194,10 +196,6 @@ enum BuiltinExtraArguments {
                                     kStrictMode)                        \
   V(KeyedStoreIC_NonStrictArguments, KEYED_STORE_IC, MONOMORPHIC,       \
                                      Code::kNoExtraICState)             \
-  V(TransitionElementsSmiToDouble,  BUILTIN, UNINITIALIZED,             \
-                                    Code::kNoExtraICState)              \
-  V(TransitionElementsDoubleToObject, BUILTIN, UNINITIALIZED,           \
-                                      Code::kNoExtraICState)            \
                                                                         \
   /* Uses KeyedLoadIC_Initialize; must be after in list. */             \
   V(FunctionCall,                   BUILTIN, UNINITIALIZED,             \
@@ -208,8 +206,6 @@ enum BuiltinExtraArguments {
   V(InternalArrayCode,              BUILTIN, UNINITIALIZED,             \
                                     Code::kNoExtraICState)              \
   V(ArrayCode,                      BUILTIN, UNINITIALIZED,             \
-                                    Code::kNoExtraICState)              \
-  V(CommonArrayConstructCode,       BUILTIN, UNINITIALIZED,             \
                                     Code::kNoExtraICState)              \
                                                                         \
   V(StringConstructCode,            BUILTIN, UNINITIALIZED,             \
@@ -265,8 +261,6 @@ enum BuiltinExtraArguments {
   V(BIT_OR, 1)                           \
   V(BIT_AND, 1)                          \
   V(BIT_XOR, 1)                          \
-  V(UNARY_MINUS, 0)                      \
-  V(BIT_NOT, 0)                          \
   V(SHL, 1)                              \
   V(SAR, 1)                              \
   V(SHR, 1)                              \
@@ -392,6 +386,7 @@ class Builtins {
   static void Generate_NotifyLazyDeoptimized(MacroAssembler* masm);
   static void Generate_NotifyOSR(MacroAssembler* masm);
   static void Generate_NotifyStubFailure(MacroAssembler* masm);
+  static void Generate_NotifyStubFailureSaveDoubles(MacroAssembler* masm);
   static void Generate_ArgumentsAdaptorTrampoline(MacroAssembler* masm);
 
   static void Generate_FunctionCall(MacroAssembler* masm);
@@ -399,7 +394,6 @@ class Builtins {
 
   static void Generate_InternalArrayCode(MacroAssembler* masm);
   static void Generate_ArrayCode(MacroAssembler* masm);
-  static void Generate_CommonArrayConstructCode(MacroAssembler* masm);
 
   static void Generate_StringConstructCode(MacroAssembler* masm);
   static void Generate_OnStackReplacement(MacroAssembler* masm);

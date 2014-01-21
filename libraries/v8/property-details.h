@@ -55,6 +55,8 @@ namespace v8 {
 namespace internal {
 
 class Smi;
+class Type;
+class TypeInfo;
 
 // Type of properties.
 // Order of properties is significant.
@@ -65,7 +67,7 @@ enum PropertyType {
   NORMAL                    = 0,
   // Only in fast mode.
   FIELD                     = 1,
-  CONSTANT_FUNCTION         = 2,
+  CONSTANT                  = 2,
   CALLBACKS                 = 3,
   // Only in lookup results, not in descriptors.
   HANDLER                   = 4,
@@ -100,6 +102,10 @@ class Representation {
   static Representation External() { return Representation(kExternal); }
 
   static Representation FromKind(Kind kind) { return Representation(kind); }
+
+  // TODO(rossberg): this should die eventually.
+  static Representation FromType(TypeInfo info);
+  static Representation FromType(Handle<Type> type);
 
   bool Equals(const Representation& other) const {
     return kind_ == other.kind_;

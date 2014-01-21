@@ -71,8 +71,7 @@ class RegExpImpl {
   // Returns false if compilation fails.
   static Handle<Object> Compile(Handle<JSRegExp> re,
                                 Handle<String> pattern,
-                                Handle<String> flags,
-                                Zone* zone);
+                                Handle<String> flags);
 
   // See ECMA-262 section 15.10.6.2.
   // This function calls the garbage collector if necessary.
@@ -1331,7 +1330,7 @@ class Trace {
   // A value for a property that is either known to be true, know to be false,
   // or not known.
   enum TriBool {
-    UNKNOWN = -1, FALSE = 0, TRUE = 1
+    UNKNOWN = -1, FALSE_VALUE = 0, TRUE_VALUE = 1
   };
 
   class DeferredAction {
@@ -1427,7 +1426,9 @@ class Trace {
            at_start_ == UNKNOWN;
   }
   TriBool at_start() { return at_start_; }
-  void set_at_start(bool at_start) { at_start_ = at_start ? TRUE : FALSE; }
+  void set_at_start(bool at_start) {
+    at_start_ = at_start ? TRUE_VALUE : FALSE_VALUE;
+  }
   Label* backtrack() { return backtrack_; }
   Label* loop_label() { return loop_label_; }
   RegExpNode* stop_node() { return stop_node_; }

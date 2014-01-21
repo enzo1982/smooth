@@ -39,7 +39,7 @@
 #include <sys/syscall.h>
 #endif  // USE_SIMULATOR.
 
-#if defined(V8_TARGET_ARCH_MIPS)
+#if V8_TARGET_ARCH_MIPS
 
 #include "cpu.h"
 #include "macro-assembler.h"

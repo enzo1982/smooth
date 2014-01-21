@@ -309,8 +309,13 @@ void DumpException(Handle<Message> message) {
 
 
 int main(int argc, char** argv) {
+  V8::InitializeICU();
+
   // By default, log code create information in the snapshot.
   i::FLAG_log_code = true;
+
+  // Disable the i18n extension, as it doesn't support being snapshotted yet.
+  i::FLAG_enable_i18n = false;
 
   // Print the usage if an error occurs when parsing the command line
   // flags or if the help flag is set.

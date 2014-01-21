@@ -75,27 +75,8 @@
 namespace v8 {
 namespace internal {
 
-// 0 is never a valid thread id on Linux since tids and pids share a
-// name space and pid 0 is reserved (see man 2 kill).
-static const pthread_t kNoThread = (pthread_t) 0;
-
-
-double ceiling(double x) {
-  return ceil(x);
-}
-
 
 static Mutex* limit_mutex = NULL;
-
-
-void OS::PostSetUp() {
-  POSIXPostSetUp();
-}
-
-
-uint64_t OS::CpuFeaturesImpliedByPlatform() {
-  return 0;  // Linux runs on anything.
-}
 
 
 #ifdef __arm__
@@ -145,6 +126,9 @@ bool OS::ArmCpuHasFeature(CpuFeature feature) {
   switch (feature) {
     case VFP3:
       search_string = "vfpv3";
+      break;
+    case NEON:
+      search_string = "neon";
       break;
     case ARMv7:
       search_string = "ARMv7";
@@ -200,6 +184,36 @@ CpuImplementer OS::GetCpuImplementer() {
 }
 
 
+CpuPart OS::GetCpuPart(CpuImplementer implementer) {
+  static bool use_cached_value = false;
+  static CpuPart cached_value = CPU_UNKNOWN;
+  if (use_cached_value) {
+    return cached_value;
+  }
+  if (implementer == ARM_IMPLEMENTER) {
+    if (CPUInfoContainsString("CPU part\t: 0xc0f")) {
+      cached_value = CORTEX_A15;
+    } else if (CPUInfoContainsString("CPU part\t: 0xc0c")) {
+      cached_value = CORTEX_A12;
+    } else if (CPUInfoContainsString("CPU part\t: 0xc09")) {
+      cached_value = CORTEX_A9;
+    } else if (CPUInfoContainsString("CPU part\t: 0xc08")) {
+      cached_value = CORTEX_A8;
+    } else if (CPUInfoContainsString("CPU part\t: 0xc07")) {
+      cached_value = CORTEX_A7;
+    } else if (CPUInfoContainsString("CPU part\t: 0xc05")) {
+      cached_value = CORTEX_A5;
+    } else {
+      cached_value = CPU_UNKNOWN;
+    }
+  } else {
+    cached_value = CPU_UNKNOWN;
+  }
+  use_cached_value = true;
+  return cached_value;
+}
+
+
 bool OS::ArmUsingHardFloat() {
   // GCC versions 4.6 and above define __ARM_PCS or __ARM_PCS_VFP to specify
   // the Floating Point ABI used (PCS stands for Procedure Call Standard).
@@ -225,7 +239,8 @@ bool OS::ArmUsingHardFloat() {
 #else
 #if defined(__ARM_PCS_VFP)
   return true;
-#elif defined(__ARM_PCS) || defined(__SOFTFP) || !defined(__VFP_FP__)
+#elif defined(__ARM_PCS) || defined(__SOFTFP__) || defined(__SOFTFP) || \
+      !defined(__VFP_FP__)
   return false;
 #else
 #error "Your version of GCC does not report the FP ABI compiled for."          \
@@ -294,33 +309,6 @@ bool OS::MipsCpuHasFeature(CpuFeature feature) {
 #endif  // def __mips__
 
 
-int OS::ActivationFrameAlignment() {
-#ifdef V8_TARGET_ARCH_ARM
-  // On EABI ARM targets this is required for fp correctness in the
-  // runtime system.
-  return 8;
-#elif V8_TARGET_ARCH_MIPS
-  return 8;
-#endif
-  // With gcc 4.4 the tree vectorization optimizer can generate code
-  // that requires 16 byte alignment such as movdqa on x86.
-  return 16;
-}
-
-
-void OS::ReleaseStore(volatile AtomicWord* ptr, AtomicWord value) {
-#if (defined(V8_TARGET_ARCH_ARM) && defined(__arm__)) || \
-    (defined(V8_TARGET_ARCH_MIPS) && defined(__mips__))
-  // Only use on ARM or MIPS hardware.
-  MemoryBarrier();
-#else
-  __asm__ __volatile__("" : : : "memory");
-  // An x86 store acts as a release barrier.
-#endif
-  *ptr = value;
-}
-
-
 const char* OS::LocalTimezone(double time) {
   if (std::isnan(time)) return "";
   time_t tv = static_cast<time_t>(floor(time/msPerSecond));
@@ -364,11 +352,6 @@ bool OS::IsOutsideAllocatedSpace(void* address) {
 }
 
 
-size_t OS::AllocateAlignment() {
-  return sysconf(_SC_PAGESIZE);
-}
-
-
 void* OS::Allocate(const size_t requested,
                    size_t* allocated,
                    bool is_executable) {
@@ -387,76 +370,10 @@ void* OS::Allocate(const size_t requested,
 }
 
 
-void OS::Free(void* address, const size_t size) {
-  // TODO(1240712): munmap has a return value which is ignored here.
-  int result = munmap(address, size);
-  USE(result);
-  ASSERT(result == 0);
-}
-
-
-void OS::Sleep(int milliseconds) {
-  unsigned int ms = static_cast<unsigned int>(milliseconds);
-  usleep(1000 * ms);
-}
-
-
-int OS::NumberOfCores() {
-  return sysconf(_SC_NPROCESSORS_ONLN);
-}
-
-
-void OS::Abort() {
-  // Redirect to std abort to signal abnormal program termination.
-  if (FLAG_break_on_abort) {
-    DebugBreak();
-  }
-  abort();
-}
-
-
-void OS::DebugBreak() {
-// TODO(lrn): Introduce processor define for runtime system (!= V8_ARCH_x,
-//  which is the architecture of generated code).
-#if (defined(__arm__) || defined(__thumb__))
-  asm("bkpt 0");
-#elif defined(__mips__)
-  asm("break");
-#elif defined(__native_client__)
-  asm("hlt");
-#else
-  asm("int $3");
-#endif
-}
-
-
 void OS::DumpBacktrace() {
+  // backtrace is a glibc extension.
 #if defined(__GLIBC__) && !defined(__UCLIBC__)
-  void* trace[100];
-  int size = backtrace(trace, ARRAY_SIZE(trace));
-  char** symbols = backtrace_symbols(trace, size);
-  fprintf(stderr, "\n==== C stack trace ===============================\n\n");
-  if (size == 0) {
-    fprintf(stderr, "(empty)\n");
-  } else if (symbols == NULL) {
-    fprintf(stderr, "(no symbols)\n");
-  } else {
-    for (int i = 1; i < size; ++i) {
-      fprintf(stderr, "%2d: ", i);
-      char mangled[201];
-      if (sscanf(symbols[i], "%*[^(]%*[(]%200[^)+]", mangled) == 1) {  // NOLINT
-        int status;
-        size_t length;
-        char* demangled = abi::__cxa_demangle(mangled, NULL, &length, &status);
-        fprintf(stderr, "%s\n", demangled ? demangled : mangled);
-        free(demangled);
-      } else {
-        fprintf(stderr, "??\n");
-      }
-    }
-  }
-  fflush(stderr);
-  free(symbols);
+  POSIXBacktraceHelper<backtrace, backtrace_symbols>::DumpBacktrace();
 #endif
 }
 
@@ -597,7 +514,13 @@ void OS::SignalCodeMovingGC() {
   }
   void* addr = mmap(OS::GetRandomMmapAddr(),
                     size,
+#if defined(__native_client__)
+                    // The Native Client port of V8 uses an interpreter,
+                    // so code pages don't need PROT_EXEC.
+                    PROT_READ,
+#else
                     PROT_READ | PROT_EXEC,
+#endif
                     MAP_PRIVATE,
                     fileno(f),
                     0);
@@ -610,33 +533,10 @@ void OS::SignalCodeMovingGC() {
 int OS::StackWalk(Vector<OS::StackFrame> frames) {
   // backtrace is a glibc extension.
 #if defined(__GLIBC__) && !defined(__UCLIBC__)
-  int frames_size = frames.length();
-  ScopedVector<void*> addresses(frames_size);
-
-  int frames_count = backtrace(addresses.start(), frames_size);
-
-  char** symbols = backtrace_symbols(addresses.start(), frames_count);
-  if (symbols == NULL) {
-    return kStackWalkError;
-  }
-
-  for (int i = 0; i < frames_count; i++) {
-    frames[i].address = addresses[i];
-    // Format a text representation of the frame based on the information
-    // available.
-    SNPrintF(MutableCStrVector(frames[i].text, kStackWalkMaxTextLen),
-             "%s",
-             symbols[i]);
-    // Make sure line termination is in place.
-    frames[i].text[kStackWalkMaxTextLen - 1] = '\0';
-  }
-
-  free(symbols);
-
-  return frames_count;
-#else  // defined(__GLIBC__) && !defined(__UCLIBC__)
+  return POSIXBacktraceHelper<backtrace, backtrace_symbols>::StackWalk(frames);
+#else
   return 0;
-#endif  // defined(__GLIBC__) && !defined(__UCLIBC__)
+#endif
 }
 
 
@@ -743,7 +643,13 @@ void* VirtualMemory::ReserveRegion(size_t size) {
 
 
 bool VirtualMemory::CommitRegion(void* base, size_t size, bool is_executable) {
+#if defined(__native_client__)
+  // The Native Client port of V8 uses an interpreter,
+  // so code pages don't need PROT_EXEC.
+  int prot = PROT_READ | PROT_WRITE;
+#else
   int prot = PROT_READ | PROT_WRITE | (is_executable ? PROT_EXEC : 0);
+#endif
   if (MAP_FAILED == mmap(base,
                          size,
                          prot,
@@ -775,151 +681,6 @@ bool VirtualMemory::ReleaseRegion(void* base, size_t size) {
 
 bool VirtualMemory::HasLazyCommits() {
   return true;
-}
-
-
-class Thread::PlatformData : public Malloced {
- public:
-  PlatformData() : thread_(kNoThread) {}
-
-  pthread_t thread_;  // Thread handle for pthread.
-};
-
-Thread::Thread(const Options& options)
-    : data_(new PlatformData()),
-      stack_size_(options.stack_size()),
-      start_semaphore_(NULL) {
-  set_name(options.name());
-}
-
-
-Thread::~Thread() {
-  delete data_;
-}
-
-
-static void* ThreadEntry(void* arg) {
-  Thread* thread = reinterpret_cast<Thread*>(arg);
-  // This is also initialized by the first argument to pthread_create() but we
-  // don't know which thread will run first (the original thread or the new
-  // one) so we initialize it here too.
-#ifdef PR_SET_NAME
-  prctl(PR_SET_NAME,
-        reinterpret_cast<unsigned long>(thread->name()),  // NOLINT
-        0, 0, 0);
-#endif
-  thread->data()->thread_ = pthread_self();
-  ASSERT(thread->data()->thread_ != kNoThread);
-  thread->NotifyStartedAndRun();
-  return NULL;
-}
-
-
-void Thread::set_name(const char* name) {
-  strncpy(name_, name, sizeof(name_));
-  name_[sizeof(name_) - 1] = '\0';
-}
-
-
-void Thread::Start() {
-  pthread_attr_t* attr_ptr = NULL;
-#if defined(__native_client__)
-  // use default stack size.
-#else
-  pthread_attr_t attr;
-  if (stack_size_ > 0) {
-    pthread_attr_init(&attr);
-    pthread_attr_setstacksize(&attr, static_cast<size_t>(stack_size_));
-    attr_ptr = &attr;
-  }
-#endif
-  int result = pthread_create(&data_->thread_, attr_ptr, ThreadEntry, this);
-  CHECK_EQ(0, result);
-  ASSERT(data_->thread_ != kNoThread);
-}
-
-
-void Thread::Join() {
-  pthread_join(data_->thread_, NULL);
-}
-
-
-Thread::LocalStorageKey Thread::CreateThreadLocalKey() {
-  pthread_key_t key;
-  int result = pthread_key_create(&key, NULL);
-  USE(result);
-  ASSERT(result == 0);
-  return static_cast<LocalStorageKey>(key);
-}
-
-
-void Thread::DeleteThreadLocalKey(LocalStorageKey key) {
-  pthread_key_t pthread_key = static_cast<pthread_key_t>(key);
-  int result = pthread_key_delete(pthread_key);
-  USE(result);
-  ASSERT(result == 0);
-}
-
-
-void* Thread::GetThreadLocal(LocalStorageKey key) {
-  pthread_key_t pthread_key = static_cast<pthread_key_t>(key);
-  return pthread_getspecific(pthread_key);
-}
-
-
-void Thread::SetThreadLocal(LocalStorageKey key, void* value) {
-  pthread_key_t pthread_key = static_cast<pthread_key_t>(key);
-  pthread_setspecific(pthread_key, value);
-}
-
-
-void Thread::YieldCPU() {
-  sched_yield();
-}
-
-
-class LinuxMutex : public Mutex {
- public:
-  LinuxMutex() {
-    pthread_mutexattr_t attrs;
-    int result = pthread_mutexattr_init(&attrs);
-    ASSERT(result == 0);
-    result = pthread_mutexattr_settype(&attrs, PTHREAD_MUTEX_RECURSIVE);
-    ASSERT(result == 0);
-    result = pthread_mutex_init(&mutex_, &attrs);
-    ASSERT(result == 0);
-    USE(result);
-  }
-
-  virtual ~LinuxMutex() { pthread_mutex_destroy(&mutex_); }
-
-  virtual int Lock() {
-    int result = pthread_mutex_lock(&mutex_);
-    return result;
-  }
-
-  virtual int Unlock() {
-    int result = pthread_mutex_unlock(&mutex_);
-    return result;
-  }
-
-  virtual bool TryLock() {
-    int result = pthread_mutex_trylock(&mutex_);
-    // Return false if the lock is busy and locking failed.
-    if (result == EBUSY) {
-      return false;
-    }
-    ASSERT(result == 0);  // Verify no other errors.
-    return true;
-  }
-
- private:
-  pthread_mutex_t mutex_;   // Pthread mutex for POSIX platforms.
-};
-
-
-Mutex* OS::CreateMutex() {
-  return new LinuxMutex();
 }
 
 

@@ -147,10 +147,11 @@ double ceiling(double x) {
 
 static Mutex* limit_mutex = NULL;
 
-#if defined(V8_TARGET_ARCH_IA32)
+#if V8_TARGET_ARCH_IA32
 static void MemMoveWrapper(void* dest, const void* src, size_t size) {
   memmove(dest, src, size);
 }
+
 
 // Initialize to library version so we can call this at any time during startup.
 static OS::MemMoveFunction memmove_function = &MemMoveWrapper;
@@ -177,6 +178,7 @@ ModuloFunction CreateModuloFunction();
 void init_modulo_function() {
   modulo_function = CreateModuloFunction();
 }
+
 
 double modulo(double x, double y) {
   // Note: here we rely on dependent reads being ordered. This is true
@@ -320,6 +322,7 @@ class Time {
 
   TimeStamp time_;
 };
+
 
 // Static variables.
 bool Time::tz_initialized_ = false;
@@ -580,7 +583,7 @@ void OS::PostSetUp() {
   // Math functions depend on CPU features therefore they are initialized after
   // CPU.
   MathSetup();
-#if defined(V8_TARGET_ARCH_IA32)
+#if V8_TARGET_ARCH_IA32
   OS::MemMoveFunction generated_memmove = CreateMemMoveFunction();
   if (generated_memmove != NULL) {
     memmove_function = generated_memmove;
@@ -615,6 +618,7 @@ double OS::TimeCurrentMillis() {
   t.SetToCurrentTime();
   return t.ToJSTime();
 }
+
 
 // Returns the tickcounter based on timeGetTime.
 int64_t OS::Ticks() {
@@ -888,7 +892,7 @@ size_t OS::AllocateAlignment() {
 }
 
 
-static void* GetRandomAddr() {
+void* OS::GetRandomMmapAddr() {
   Isolate* isolate = Isolate::UncheckedCurrent();
   // Note that the current isolate isn't set up in a call path via
   // CpuFeatures::Probe. We don't care about randomization in this case because
@@ -921,7 +925,7 @@ static void* RandomizedVirtualAlloc(size_t size, int action, int protection) {
   if (protection == PAGE_EXECUTE_READWRITE || protection == PAGE_NOACCESS) {
     // For exectutable pages try and randomize the allocation address
     for (size_t attempts = 0; base == NULL && attempts < 3; ++attempts) {
-      base = VirtualAlloc(GetRandomAddr(), size, action, protection);
+      base = VirtualAlloc(OS::GetRandomMmapAddr(), size, action, protection);
     }
   }
 
@@ -1449,6 +1453,7 @@ int OS::StackWalk(Vector<OS::StackFrame> frames) {
   return frames_count;
 }
 
+
 // Restore warnings to previous settings.
 #pragma warning(pop)
 
@@ -1479,15 +1484,13 @@ double OS::nan_value() {
 int OS::ActivationFrameAlignment() {
 #ifdef _WIN64
   return 16;  // Windows 64-bit ABI requires the stack to be 16-byte aligned.
+#elif defined(__MINGW32__)
+  // With gcc 4.4 the tree vectorization optimizer can generate code
+  // that requires 16 byte alignment such as movdqa on x86.
+  return 16;
 #else
   return 8;  // Floating-point math runs faster with 8-byte alignment.
 #endif
-}
-
-
-void OS::ReleaseStore(volatile AtomicWord* ptr, AtomicWord value) {
-  MemoryBarrier();
-  *ptr = value;
 }
 
 

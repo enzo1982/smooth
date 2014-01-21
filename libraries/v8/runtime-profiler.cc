@@ -153,9 +153,6 @@ void RuntimeProfiler::Optimize(JSFunction* function, const char* reason) {
 void RuntimeProfiler::AttemptOnStackReplacement(JSFunction* function) {
   // See AlwaysFullCompiler (in compiler.cc) comment on why we need
   // Debug::has_break_points().
-  ASSERT(function->IsMarkedForLazyRecompilation() ||
-         function->IsMarkedForParallelRecompilation() ||
-         function->IsOptimized());
   if (!FLAG_use_osr ||
       isolate_->DebuggerHasBreakPoints() ||
       function->IsBuiltin()) {
@@ -230,6 +227,8 @@ void RuntimeProfiler::AddSample(JSFunction* function, int weight) {
 void RuntimeProfiler::OptimizeNow() {
   HandleScope scope(isolate_);
 
+  if (isolate_->DebuggerHasBreakPoints()) return;
+
   if (FLAG_parallel_recompilation) {
     // Take this as opportunity to process the optimizing compiler thread's
     // output queue so that it does not unnecessarily keep objects alive.
@@ -248,7 +247,7 @@ void RuntimeProfiler::OptimizeNow() {
        frame_count++ < frame_count_limit && !it.done();
        it.Advance()) {
     JavaScriptFrame* frame = it.frame();
-    JSFunction* function = JSFunction::cast(frame->function());
+    JSFunction* function = frame->function();
 
     if (!FLAG_watch_ic_patching) {
       // Adjust threshold each time we have processed
@@ -273,12 +272,21 @@ void RuntimeProfiler::OptimizeNow() {
     if (shared_code->kind() != Code::FUNCTION) continue;
     if (function->IsInRecompileQueue()) continue;
 
-    // Attempt OSR if we are still running unoptimized code even though the
-    // the function has long been marked or even already been optimized.
-    if (!frame->is_optimized() &&
+    if (FLAG_always_osr &&
+        shared_code->allow_osr_at_loop_nesting_level() == 0) {
+      // Testing mode: always try an OSR compile for every function.
+      for (int i = 0; i < Code::kMaxLoopNestingMarker; i++) {
+        // TODO(titzer): fix AttemptOnStackReplacement to avoid this dumb loop.
+        shared_code->set_allow_osr_at_loop_nesting_level(i);
+        AttemptOnStackReplacement(function);
+      }
+      // Fall through and do a normal optimized compile as well.
+    } else if (!frame->is_optimized() &&
         (function->IsMarkedForLazyRecompilation() ||
          function->IsMarkedForParallelRecompilation() ||
          function->IsOptimized())) {
+      // Attempt OSR if we are still running unoptimized code even though the
+      // the function has long been marked or even already been optimized.
       int ticks = shared_code->profiler_ticks();
       int allowance = kOSRCodeSizeAllowanceBase +
                       ticks * kOSRCodeSizeAllowancePerTick;
@@ -397,11 +405,6 @@ void RuntimeProfiler::Reset() {
 
 void RuntimeProfiler::TearDown() {
   // Nothing to do.
-}
-
-
-int RuntimeProfiler::SamplerWindowSize() {
-  return kSamplerWindowSize;
 }
 
 

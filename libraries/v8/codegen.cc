@@ -30,6 +30,7 @@
 #include "bootstrapper.h"
 #include "codegen.h"
 #include "compiler.h"
+#include "cpu-profiler.h"
 #include "debug.h"
 #include "prettyprinter.h"
 #include "rewriter.h"
@@ -124,6 +125,7 @@ Handle<Code> CodeGenerator::MakeCodeEpilogue(MacroAssembler* masm,
 
 void CodeGenerator::PrintCode(Handle<Code> code, CompilationInfo* info) {
 #ifdef ENABLE_DISASSEMBLER
+  AllowDeferredHandleDereference allow_deference_for_print_code;
   bool print_code = Isolate::Current()->bootstrapper()->IsActive()
       ? FLAG_print_builtin_code
       : (FLAG_print_code ||
@@ -178,7 +180,7 @@ bool CodeGenerator::ShouldGenerateLog(Expression* type) {
       !isolate->cpu_profiler()->is_profiling()) {
     return false;
   }
-  Handle<String> name = Handle<String>::cast(type->AsLiteral()->handle());
+  Handle<String> name = Handle<String>::cast(type->AsLiteral()->value());
   if (FLAG_log_regexp) {
     if (name->IsOneByteEqualTo(STATIC_ASCII_VECTOR("regexp")))
       return true;

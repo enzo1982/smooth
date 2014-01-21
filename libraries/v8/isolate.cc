@@ -29,10 +29,12 @@
 
 #include "v8.h"
 
+#include "allocation-inl.h"
 #include "ast.h"
 #include "bootstrapper.h"
 #include "codegen.h"
 #include "compilation-cache.h"
+#include "cpu-profiler.h"
 #include "debug.h"
 #include "deoptimizer.h"
 #include "heap-profiler.h"
@@ -45,6 +47,7 @@
 #include "platform.h"
 #include "regexp-stack.h"
 #include "runtime-profiler.h"
+#include "sampler.h"
 #include "scopeinfo.h"
 #include "serialize.h"
 #include "simulator.h"
@@ -92,7 +95,7 @@ void ThreadLocalTop::InitializeInternal() {
   simulator_ = NULL;
 #endif
   js_entry_sp_ = NULL;
-  external_callback_ = NULL;
+  external_callback_scope_ = NULL;
   current_vm_state_ = EXTERNAL;
   try_catch_handler_address_ = NULL;
   context_ = NULL;
@@ -107,6 +110,7 @@ void ThreadLocalTop::InitializeInternal() {
   // is complete.
   pending_exception_ = NULL;
   has_pending_message_ = false;
+  rethrowing_message_ = false;
   pending_message_obj_ = NULL;
   pending_message_script_ = NULL;
   scheduled_exception_ = NULL;
@@ -116,7 +120,7 @@ void ThreadLocalTop::InitializeInternal() {
 void ThreadLocalTop::Initialize() {
   InitializeInternal();
 #ifdef USE_SIMULATOR
-#ifdef V8_TARGET_ARCH_ARM
+#if V8_TARGET_ARCH_ARM
   simulator_ = Simulator::current(isolate_);
 #elif V8_TARGET_ARCH_MIPS
   simulator_ = Simulator::current(isolate_);
@@ -486,7 +490,8 @@ void Isolate::Iterate(ObjectVisitor* v, ThreadLocalTop* thread) {
        block != NULL;
        block = TRY_CATCH_FROM_ADDRESS(block->next_)) {
     v->VisitPointer(BitCast<Object**>(&(block->exception_)));
-    v->VisitPointer(BitCast<Object**>(&(block->message_)));
+    v->VisitPointer(BitCast<Object**>(&(block->message_obj_)));
+    v->VisitPointer(BitCast<Object**>(&(block->message_script_)));
   }
 
   // Iterate over pointers on native execution stack.
@@ -503,6 +508,7 @@ void Isolate::Iterate(ObjectVisitor* v) {
   ThreadLocalTop* current_t = thread_local_top();
   Iterate(v, current_t);
 }
+
 
 void Isolate::IterateDeferredHandles(ObjectVisitor* visitor) {
   for (DeferredHandles* deferred = deferred_handles_head_;
@@ -616,10 +622,8 @@ static bool IsVisibleInStackTrace(StackFrame* raw_frame,
   // Only display JS frames.
   if (!raw_frame->is_java_script()) return false;
   JavaScriptFrame* frame = JavaScriptFrame::cast(raw_frame);
-  Object* raw_fun = frame->function();
-  // Not sure when this can happen but skip it just in case.
-  if (!raw_fun->IsJSFunction()) return false;
-  if ((raw_fun == caller) && !(*seen_caller)) {
+  JSFunction* fun = frame->function();
+  if ((fun == caller) && !(*seen_caller)) {
     *seen_caller = true;
     return false;
   }
@@ -631,7 +635,6 @@ static bool IsVisibleInStackTrace(StackFrame* raw_frame,
   // The --builtins-in-stack-traces command line flag allows including
   // internal call sites in the stack trace for debugging purposes.
   if (!FLAG_builtins_in_stack_traces) {
-    JSFunction* fun = JSFunction::cast(raw_fun);
     if (frame->receiver()->IsJSBuiltinsObject() ||
         (fun->IsBuiltin() && !fun->shared()->native())) {
       return false;
@@ -666,7 +669,7 @@ Handle<JSArray> Isolate::CaptureSimpleStackTrace(Handle<JSObject> error_object,
       JavaScriptFrame* frame = JavaScriptFrame::cast(raw_frame);
       // Set initial size to the maximum inlining level + 1 for the outermost
       // function.
-      List<FrameSummary> frames(Compiler::kMaxInliningLevels + 1);
+      List<FrameSummary> frames(FLAG_max_inlining_levels + 1);
       frame->Summarize(&frames);
       for (int i = frames.length() - 1; i >= 0; i--) {
         if (cursor + 4 > elements->length()) {
@@ -749,7 +752,7 @@ Handle<JSArray> Isolate::CaptureCurrentStackTrace(
     JavaScriptFrame* frame = it.frame();
     // Set initial size to the maximum inlining level + 1 for the outermost
     // function.
-    List<FrameSummary> frames(Compiler::kMaxInliningLevels + 1);
+    List<FrameSummary> frames(FLAG_max_inlining_levels + 1);
     frame->Summarize(&frames);
     for (int i = frames.length() - 1; i >= 0 && frames_seen < limit; i--) {
       // Create a JSObject to hold the information for the StackFrame.
@@ -813,9 +816,9 @@ Handle<JSArray> Isolate::CaptureCurrentStackTrace(
       }
 
       if (options & StackTrace::kIsEval) {
-        int type = Smi::cast(script->compilation_type())->value();
-        Handle<Object> is_eval = (type == Script::COMPILATION_TYPE_EVAL) ?
-            factory()->true_value() : factory()->false_value();
+        Handle<Object> is_eval =
+            script->compilation_type() == Script::COMPILATION_TYPE_EVAL ?
+                factory()->true_value() : factory()->false_value();
         CHECK_NOT_EMPTY_HANDLE(this,
                                JSObject::SetLocalPropertyIgnoreAttributes(
                                    stack_frame, eval_key, is_eval, NONE));
@@ -838,6 +841,11 @@ Handle<JSArray> Isolate::CaptureCurrentStackTrace(
 
   stack_trace->set_length(Smi::FromInt(frames_seen));
   return stack_trace;
+}
+
+
+void Isolate::PrintStack() {
+  PrintStack(stdout);
 }
 
 
@@ -1162,6 +1170,22 @@ void Isolate::ScheduleThrow(Object* exception) {
 }
 
 
+void Isolate::RestorePendingMessageFromTryCatch(v8::TryCatch* handler) {
+  ASSERT(handler == try_catch_handler());
+  ASSERT(handler->HasCaught());
+  ASSERT(handler->rethrow_);
+  ASSERT(handler->capture_message_);
+  Object* message = reinterpret_cast<Object*>(handler->message_obj_);
+  Object* script = reinterpret_cast<Object*>(handler->message_script_);
+  ASSERT(message->IsJSMessageObject() || message->IsTheHole());
+  ASSERT(script->IsScript() || script->IsTheHole());
+  thread_local_top()->pending_message_obj_ = message;
+  thread_local_top()->pending_message_script_ = script;
+  thread_local_top()->pending_message_start_pos_ = handler->message_start_pos_;
+  thread_local_top()->pending_message_end_pos_ = handler->message_end_pos_;
+}
+
+
 Failure* Isolate::PromoteScheduledException() {
   MaybeObject* thrown = scheduled_exception();
   clear_scheduled_exception();
@@ -1179,7 +1203,7 @@ void Isolate::PrintCurrentStackTrace(FILE* out) {
     int pos = frame->LookupCode()->SourcePosition(frame->pc());
     Handle<Object> pos_obj(Smi::FromInt(pos), this);
     // Fetch function and receiver.
-    Handle<JSFunction> fun(JSFunction::cast(frame->function()));
+    Handle<JSFunction> fun(frame->function());
     Handle<Object> recv(frame->receiver(), this);
     // Advance to the next JavaScript frame and determine if the
     // current frame is the top-level frame.
@@ -1203,7 +1227,7 @@ void Isolate::ComputeLocation(MessageLocation* target) {
   StackTraceFrameIterator it(this);
   if (!it.done()) {
     JavaScriptFrame* frame = it.frame();
-    JSFunction* fun = JSFunction::cast(frame->function());
+    JSFunction* fun = frame->function();
     Object* script = fun->shared()->script();
     if (script->IsScript() &&
         !(Script::cast(script)->source()->IsUndefined())) {
@@ -1280,8 +1304,11 @@ void Isolate::DoThrow(Object* exception, MessageLocation* location) {
       ShouldReportException(&can_be_caught_externally, catchable_by_javascript);
   bool report_exception = catchable_by_javascript && should_report_exception;
   bool try_catch_needs_message =
-      can_be_caught_externally && try_catch_handler()->capture_message_;
+      can_be_caught_externally && try_catch_handler()->capture_message_ &&
+      !thread_local_top()->rethrowing_message_;
   bool bootstrapping = bootstrapper()->IsActive();
+
+  thread_local_top()->rethrowing_message_ = false;
 
 #ifdef ENABLE_DEBUGGER_SUPPORT
   // Notify debugger of exception.
@@ -1464,8 +1491,9 @@ void Isolate::ReportPendingMessages() {
         HandleScope scope(this);
         Handle<Object> message_obj(thread_local_top_.pending_message_obj_,
                                    this);
-        if (thread_local_top_.pending_message_script_ != NULL) {
-          Handle<Script> script(thread_local_top_.pending_message_script_);
+        if (!thread_local_top_.pending_message_script_->IsTheHole()) {
+          Handle<Script> script(
+              Script::cast(thread_local_top_.pending_message_script_));
           int start_pos = thread_local_top_.pending_message_start_pos_;
           int end_pos = thread_local_top_.pending_message_end_pos_;
           MessageLocation location(script, start_pos, end_pos);
@@ -1487,8 +1515,9 @@ MessageLocation Isolate::GetMessageLocation() {
       thread_local_top_.pending_exception_ != heap()->termination_exception() &&
       thread_local_top_.has_pending_message_ &&
       !thread_local_top_.pending_message_obj_->IsTheHole() &&
-      thread_local_top_.pending_message_script_ != NULL) {
-    Handle<Script> script(thread_local_top_.pending_message_script_);
+      !thread_local_top_.pending_message_obj_->IsTheHole()) {
+    Handle<Script> script(
+        Script::cast(thread_local_top_.pending_message_script_));
     int start_pos = thread_local_top_.pending_message_start_pos_;
     int end_pos = thread_local_top_.pending_message_end_pos_;
     return MessageLocation(script, start_pos, end_pos);
@@ -1625,7 +1654,7 @@ char* Isolate::RestoreThread(char* from) {
   // This might be just paranoia, but it seems to be needed in case a
   // thread_local_top_ is restored on a separate OS thread.
 #ifdef USE_SIMULATOR
-#ifdef V8_TARGET_ARCH_ARM
+#if V8_TARGET_ARCH_ARM
   thread_local_top()->simulator_ = Simulator::current(this);
 #elif V8_TARGET_ARCH_MIPS
   thread_local_top()->simulator_ = Simulator::current(this);
@@ -1745,6 +1774,7 @@ Isolate::Isolate()
       inner_pointer_to_code_cache_(NULL),
       write_iterator_(NULL),
       global_handles_(NULL),
+      eternal_handles_(NULL),
       context_switcher_(NULL),
       thread_manager_(NULL),
       fp_stubs_generated_(false),
@@ -1753,14 +1783,16 @@ Isolate::Isolate()
       regexp_stack_(NULL),
       date_cache_(NULL),
       code_stub_interface_descriptors_(NULL),
-      context_exit_happened_(false),
+      initialized_from_snapshot_(false),
       cpu_profiler_(NULL),
       heap_profiler_(NULL),
+      function_entry_hook_(NULL),
       deferred_handles_head_(NULL),
       optimizing_compiler_thread_(this),
       marking_thread_(NULL),
       sweeper_thread_(NULL),
-      callback_table_(NULL) {
+      callback_table_(NULL),
+      stress_deopt_count_(0) {
   id_ = NoBarrier_AtomicIncrement(&isolate_counter_, 1);
   TRACE_ISOLATE(constructor);
 
@@ -1775,8 +1807,8 @@ Isolate::Isolate()
   thread_manager_ = new ThreadManager();
   thread_manager_->isolate_ = this;
 
-#if defined(V8_TARGET_ARCH_ARM) && !defined(__arm__) || \
-    defined(V8_TARGET_ARCH_MIPS) && !defined(__mips__)
+#if V8_TARGET_ARCH_ARM && !defined(__arm__) || \
+    V8_TARGET_ARCH_MIPS && !defined(__mips__)
   simulator_initialized_ = false;
   simulator_i_cache_ = NULL;
   simulator_redirection_ = NULL;
@@ -1848,6 +1880,10 @@ void Isolate::Deinit() {
   if (state_ == INITIALIZED) {
     TRACE_ISOLATE(deinit);
 
+#ifdef ENABLE_DEBUGGER_SUPPORT
+    debugger()->UnloadDebugger();
+#endif
+
     if (FLAG_parallel_recompilation) optimizing_compiler_thread_.Stop();
 
     if (FLAG_sweeper_threads > 0) {
@@ -1867,6 +1903,10 @@ void Isolate::Deinit() {
     }
 
     if (FLAG_hydrogen_stats) GetHStatistics()->Print();
+
+    if (FLAG_print_deopt_stress) {
+      PrintF(stdout, "=== Stress deopt counter: %u\n", stress_deopt_count_);
+    }
 
     // We must stop the logger before we tear down other components.
     Sampler* sampler = logger_->sampler();
@@ -1935,8 +1975,17 @@ void Isolate::SetIsolateThreadLocals(Isolate* isolate,
 Isolate::~Isolate() {
   TRACE_ISOLATE(destructor);
 
-  // Has to be called while counters_ are still alive.
+  // Has to be called while counters_ are still alive
   runtime_zone_.DeleteKeptSegment();
+
+  // The entry stack must be empty when we get here,
+  // except for the default isolate, where it can
+  // still contain up to one entry stack item
+  ASSERT(entry_stack_ == NULL || this == default_isolate_);
+  ASSERT(entry_stack_ == NULL || entry_stack_->previous_item == NULL);
+
+  delete entry_stack_;
+  entry_stack_ = NULL;
 
   delete[] assembler_spare_buffer_;
   assembler_spare_buffer_ = NULL;
@@ -2003,6 +2052,11 @@ Isolate::~Isolate() {
   code_range_ = NULL;
   delete global_handles_;
   global_handles_ = NULL;
+  delete eternal_handles_;
+  eternal_handles_ = NULL;
+
+  delete string_stream_debug_object_cache_;
+  string_stream_debug_object_cache_ = NULL;
 
   delete external_reference_table_;
   external_reference_table_ = NULL;
@@ -2041,15 +2095,24 @@ void Isolate::PropagatePendingExceptionToExternalTryCatch() {
     try_catch_handler()->has_terminated_ = true;
     try_catch_handler()->exception_ = heap()->null_value();
   } else {
+    v8::TryCatch* handler = try_catch_handler();
     // At this point all non-object (failure) exceptions have
     // been dealt with so this shouldn't fail.
     ASSERT(!pending_exception()->IsFailure());
-    try_catch_handler()->can_continue_ = true;
-    try_catch_handler()->has_terminated_ = false;
-    try_catch_handler()->exception_ = pending_exception();
-    if (!thread_local_top_.pending_message_obj_->IsTheHole()) {
-      try_catch_handler()->message_ = thread_local_top_.pending_message_obj_;
-    }
+    ASSERT(thread_local_top_.pending_message_obj_->IsJSMessageObject() ||
+           thread_local_top_.pending_message_obj_->IsTheHole());
+    ASSERT(thread_local_top_.pending_message_script_->IsScript() ||
+           thread_local_top_.pending_message_script_->IsTheHole());
+    handler->can_continue_ = true;
+    handler->has_terminated_ = false;
+    handler->exception_ = pending_exception();
+    // Propagate to the external try-catch only if we got an actual message.
+    if (thread_local_top_.pending_message_obj_->IsTheHole()) return;
+
+    handler->message_obj_ = thread_local_top_.pending_message_obj_;
+    handler->message_script_ = thread_local_top_.pending_message_script_;
+    handler->message_start_pos_ = thread_local_top_.pending_message_start_pos_;
+    handler->message_end_pos_ = thread_local_top_.pending_message_end_pos_;
   }
 }
 
@@ -2081,6 +2144,16 @@ bool Isolate::Init(Deserializer* des) {
   ASSERT(Isolate::Current() == this);
   TRACE_ISOLATE(init);
 
+  stress_deopt_count_ = FLAG_deopt_every_n_times;
+
+  if (function_entry_hook() != NULL) {
+    // When function entry hooking is in effect, we have to create the code
+    // stubs from scratch to get entry hooks, rather than loading the previously
+    // generated stubs from disk.
+    // If this assert fires, the initialization path has regressed.
+    ASSERT(des == NULL);
+  }
+
   // The initialization process does not handle memory exhaustion.
   DisallowAllocationFailure disallow_allocation_failure;
 
@@ -2099,7 +2172,7 @@ bool Isolate::Init(Deserializer* des) {
   isolate_addresses_[Isolate::k##CamelName##Address] =          \
       reinterpret_cast<Address>(hacker_name##_address());
   FOR_EACH_ISOLATE_ADDRESS_NAME(ASSIGN_ELEMENT)
-#undef C
+#undef ASSIGN_ELEMENT
 
   string_tracker_ = new StringTracker();
   string_tracker_->isolate_ = this;
@@ -2112,9 +2185,10 @@ bool Isolate::Init(Deserializer* des) {
   inner_pointer_to_code_cache_ = new InnerPointerToCodeCache(this);
   write_iterator_ = new ConsStringIteratorOp();
   global_handles_ = new GlobalHandles(this);
+  eternal_handles_ = new EternalHandles();
   bootstrapper_ = new Bootstrapper(this);
   handle_scope_implementer_ = new HandleScopeImplementer(this);
-  stub_cache_ = new StubCache(this, runtime_zone());
+  stub_cache_ = new StubCache(this);
   regexp_stack_ = new RegExpStack();
   regexp_stack_->isolate_ = this;
   date_cache_ = new DateCache();
@@ -2128,7 +2202,7 @@ bool Isolate::Init(Deserializer* des) {
 
   // Initialize other runtime facilities
 #if defined(USE_SIMULATOR)
-#if defined(V8_TARGET_ARCH_ARM) || defined(V8_TARGET_ARCH_MIPS)
+#if V8_TARGET_ARCH_ARM || V8_TARGET_ARCH_MIPS
   Simulator::Initialize(this);
 #endif
 #endif
@@ -2216,8 +2290,6 @@ bool Isolate::Init(Deserializer* des) {
     LOG(this, LogCompiledFunctions());
   }
 
-  CHECK_EQ(static_cast<int>(OFFSET_OF(Isolate, state_)),
-           Internals::kIsolateStateOffset);
   CHECK_EQ(static_cast<int>(OFFSET_OF(Isolate, embedder_data_)),
            Internals::kIsolateEmbedderDataOffset);
   CHECK_EQ(static_cast<int>(OFFSET_OF(Isolate, heap_.roots_)),
@@ -2259,47 +2331,24 @@ bool Isolate::Init(Deserializer* des) {
 
   if (FLAG_parallel_recompilation) optimizing_compiler_thread_.Start();
 
-  if (FLAG_parallel_marking && FLAG_marking_threads == 0) {
-    FLAG_marking_threads = SystemThreadManager::
-        NumberOfParallelSystemThreads(
-            SystemThreadManager::PARALLEL_MARKING);
-  }
   if (FLAG_marking_threads > 0) {
     marking_thread_ = new MarkingThread*[FLAG_marking_threads];
     for (int i = 0; i < FLAG_marking_threads; i++) {
       marking_thread_[i] = new MarkingThread(this);
       marking_thread_[i]->Start();
     }
-  } else {
-    FLAG_parallel_marking = false;
   }
 
-  if (FLAG_sweeper_threads == 0) {
-    if (FLAG_concurrent_sweeping) {
-      FLAG_sweeper_threads = SystemThreadManager::
-          NumberOfParallelSystemThreads(
-              SystemThreadManager::CONCURRENT_SWEEPING);
-    } else if (FLAG_parallel_sweeping) {
-      FLAG_sweeper_threads = SystemThreadManager::
-          NumberOfParallelSystemThreads(
-              SystemThreadManager::PARALLEL_SWEEPING);
-    }
-  }
   if (FLAG_sweeper_threads > 0) {
     sweeper_thread_ = new SweeperThread*[FLAG_sweeper_threads];
     for (int i = 0; i < FLAG_sweeper_threads; i++) {
       sweeper_thread_[i] = new SweeperThread(this);
       sweeper_thread_[i]->Start();
     }
-  } else {
-    FLAG_concurrent_sweeping = false;
-    FLAG_parallel_sweeping = false;
   }
-  if (FLAG_parallel_recompilation &&
-      SystemThreadManager::NumberOfParallelSystemThreads(
-          SystemThreadManager::PARALLEL_RECOMPILATION) == 0) {
-    FLAG_parallel_recompilation = false;
-  }
+
+  initialized_from_snapshot_ = (des != NULL);
+
   return true;
 }
 
@@ -2466,6 +2515,11 @@ bool Isolate::IsFastArrayConstructorPrototypeChainIntact() {
 CodeStubInterfaceDescriptor*
     Isolate::code_stub_interface_descriptor(int index) {
   return code_stub_interface_descriptors_ + index;
+}
+
+
+Object* Isolate::FindCodeObject(Address a) {
+  return inner_pointer_to_code_cache()->GcSafeFindCodeForInnerPointer(a);
 }
 
 

@@ -207,6 +207,26 @@ CpuFeatureScope::~CpuFeatureScope() {
 
 
 // -----------------------------------------------------------------------------
+// Implementation of PlatformFeatureScope
+
+PlatformFeatureScope::PlatformFeatureScope(CpuFeature f)
+    : old_supported_(CpuFeatures::supported_),
+      old_found_by_runtime_probing_only_(
+          CpuFeatures::found_by_runtime_probing_only_) {
+  uint64_t mask = static_cast<uint64_t>(1) << f;
+  CpuFeatures::supported_ |= mask;
+  CpuFeatures::found_by_runtime_probing_only_ &= ~mask;
+}
+
+
+PlatformFeatureScope::~PlatformFeatureScope() {
+  CpuFeatures::supported_ = old_supported_;
+  CpuFeatures::found_by_runtime_probing_only_ =
+      old_found_by_runtime_probing_only_;
+}
+
+
+// -----------------------------------------------------------------------------
 // Implementation of Label
 
 int Label::pos() const {
@@ -381,6 +401,7 @@ void RelocInfoWriter::WriteExtraTaggedIntData(int data_delta, int top_tag) {
   }
 }
 
+
 void RelocInfoWriter::WriteExtraTaggedConstPoolData(int data) {
   WriteExtraTag(kConstPoolExtraTag, kConstPoolTag);
   for (int i = 0; i < kIntSize; i++) {
@@ -389,6 +410,7 @@ void RelocInfoWriter::WriteExtraTaggedConstPoolData(int data) {
     data = data >> kBitsPerByte;
   }
 }
+
 
 void RelocInfoWriter::WriteExtraTaggedData(intptr_t data_delta, int top_tag) {
   WriteExtraTag(kDataJumpExtraTag, top_tag);
@@ -847,7 +869,7 @@ void RelocInfo::Verify() {
       CHECK(addr != NULL);
       // Check that we can find the right code object.
       Code* code = Code::GetCodeFromTargetAddress(addr);
-      Object* found = HEAP->FindCodeObject(addr);
+      Object* found = code->GetIsolate()->FindCodeObject(addr);
       CHECK(found->IsCode());
       CHECK(code->address() == HeapObject::cast(found)->address());
       break;
@@ -1071,6 +1093,11 @@ ExternalReference ExternalReference::date_cache_stamp(Isolate* isolate) {
 }
 
 
+ExternalReference ExternalReference::stress_deopt_count(Isolate* isolate) {
+  return ExternalReference(isolate->stress_deopt_count_address());
+}
+
+
 ExternalReference ExternalReference::transcendental_cache_array_address(
     Isolate* isolate) {
   return ExternalReference(
@@ -1120,6 +1147,12 @@ ExternalReference ExternalReference::keyed_lookup_cache_field_offsets(
 
 ExternalReference ExternalReference::roots_array_start(Isolate* isolate) {
   return ExternalReference(isolate->heap()->roots_array_start());
+}
+
+
+ExternalReference ExternalReference::allocation_sites_list_address(
+    Isolate* isolate) {
+  return ExternalReference(isolate->heap()->allocation_sites_list_address());
 }
 
 
@@ -1308,7 +1341,7 @@ ExternalReference ExternalReference::address_of_the_hole_nan() {
 ExternalReference ExternalReference::re_check_stack_guard_state(
     Isolate* isolate) {
   Address function;
-#ifdef V8_TARGET_ARCH_X64
+#if V8_TARGET_ARCH_X64
   function = FUNCTION_ADDR(RegExpMacroAssemblerX64::CheckStackGuardState);
 #elif V8_TARGET_ARCH_IA32
   function = FUNCTION_ADDR(RegExpMacroAssemblerIA32::CheckStackGuardState);
@@ -1322,6 +1355,7 @@ ExternalReference ExternalReference::re_check_stack_guard_state(
   return ExternalReference(Redirect(isolate, function));
 }
 
+
 ExternalReference ExternalReference::re_grow_stack(Isolate* isolate) {
   return ExternalReference(
       Redirect(isolate, FUNCTION_ADDR(NativeRegExpMacroAssembler::GrowStack)));
@@ -1333,6 +1367,7 @@ ExternalReference ExternalReference::re_case_insensitive_compare_uc16(
       isolate,
       FUNCTION_ADDR(NativeRegExpMacroAssembler::CaseInsensitiveCompareUC16)));
 }
+
 
 ExternalReference ExternalReference::re_word_character_map() {
   return ExternalReference(

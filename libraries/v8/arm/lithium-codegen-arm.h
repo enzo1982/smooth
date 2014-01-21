@@ -66,7 +66,8 @@ class LCodeGen BASE_EMBEDDED {
         frame_is_built_(false),
         safepoints_(info->zone()),
         resolver_(this),
-        expected_safepoint_kind_(Safepoint::kSimple) {
+        expected_safepoint_kind_(Safepoint::kSimple),
+        old_position_(RelocInfo::kNoPosition) {
     PopulateDeoptimizationLiteralsWithInlinedFunctions();
   }
 
@@ -79,7 +80,6 @@ class LCodeGen BASE_EMBEDDED {
   Heap* heap() const { return isolate()->heap(); }
   Zone* zone() const { return zone_; }
 
-  // TODO(svenpanne) Use this consistently.
   int LookupDestination(int block_id) const {
     return chunk()->LookupDestination(block_id);
   }
@@ -116,7 +116,8 @@ class LCodeGen BASE_EMBEDDED {
   DwVfpRegister EmitLoadDoubleRegister(LOperand* op,
                                        SwVfpRegister flt_scratch,
                                        DwVfpRegister dbl_scratch);
-  int ToInteger32(LConstantOperand* op) const;
+  int32_t ToRepresentation(LConstantOperand* op, const Representation& r) const;
+  int32_t ToInteger32(LConstantOperand* op) const;
   Smi* ToSmi(LConstantOperand* op) const;
   double ToDouble(LConstantOperand* op) const;
   Operand ToOperand(LOperand* op);
@@ -154,8 +155,7 @@ class LCodeGen BASE_EMBEDDED {
   void DoDeferredAllocate(LAllocate* instr);
   void DoDeferredInstanceOfKnownGlobal(LInstanceOfKnownGlobal* instr,
                                        Label* map_check);
-
-  void DoCheckMapCommon(Register map_reg, Handle<Map> map, LEnvironment* env);
+  void DoDeferredInstanceMigration(LCheckMaps* instr, Register object);
 
   // Parallel move support.
   void DoParallelMove(LParallelMove* move);
@@ -200,7 +200,7 @@ class LCodeGen BASE_EMBEDDED {
   HGraph* graph() const { return chunk()->graph(); }
 
   Register scratch0() { return r9; }
-  DwVfpRegister double_scratch0() { return kScratchDoubleReg; }
+  LowDwVfpRegister double_scratch0() { return kScratchDoubleReg; }
 
   int GetNextEmittedBlock() const;
   LInstruction* GetNextInstruction();
@@ -214,10 +214,13 @@ class LCodeGen BASE_EMBEDDED {
 
   int GetStackSlotCount() const { return chunk()->spill_slot_count(); }
 
-  void Abort(const char* reason);
+  void Abort(BailoutReason reason);
   void FPRINTF_CHECKING Comment(const char* format, ...);
 
   void AddDeferredCode(LDeferredCode* code) { deferred_.Add(code, zone()); }
+
+  void SaveCallerDoubles();
+  void RestoreCallerDoubles();
 
   // Code generation passes.  Returns true if code generation should
   // continue.
@@ -281,16 +284,19 @@ class LCodeGen BASE_EMBEDDED {
 
   void RegisterEnvironmentForDeoptimization(LEnvironment* environment,
                                             Safepoint::DeoptMode mode);
-  void DeoptimizeIf(Condition cc,
+  void DeoptimizeIf(Condition condition,
                     LEnvironment* environment,
                     Deoptimizer::BailoutType bailout_type);
-  void DeoptimizeIf(Condition cc, LEnvironment* environment);
-  void SoftDeoptimize(LEnvironment* environment);
+  void DeoptimizeIf(Condition condition, LEnvironment* environment);
+  void ApplyCheckIf(Condition condition, LBoundsCheck* check);
 
-  void AddToTranslation(Translation* translation,
+  void AddToTranslation(LEnvironment* environment,
+                        Translation* translation,
                         LOperand* op,
                         bool is_tagged,
-                        bool is_uint32);
+                        bool is_uint32,
+                        int* object_index_pointer,
+                        int* dematerialized_index_pointer);
   void RegisterDependentCodeForEmbeddedMaps(Handle<Code> code);
   void PopulateDeoptimizationData(Handle<Code> code);
   int DefineDeoptimizationLiteral(Handle<Object> literal);
@@ -316,10 +322,14 @@ class LCodeGen BASE_EMBEDDED {
                                               int arguments,
                                               Safepoint::DeoptMode mode);
   void RecordPosition(int position);
+  void RecordAndUpdatePosition(int position);
 
   static Condition TokenToCondition(Token::Value op, bool is_unsigned);
   void EmitGoto(int block);
-  void EmitBranch(int left_block, int right_block, Condition cc);
+  template<class InstrType>
+  void EmitBranch(InstrType instr, Condition condition);
+  template<class InstrType>
+  void EmitFalseBranch(InstrType instr, Condition condition);
   void EmitNumberUntagD(Register input,
                         DwVfpRegister result,
                         bool allow_undefined_as_nan,
@@ -348,17 +358,12 @@ class LCodeGen BASE_EMBEDDED {
   // true and false label should be made, to optimize fallthrough.
   Condition EmitIsString(Register input,
                          Register temp1,
-                         Label* is_not_string);
+                         Label* is_not_string,
+                         SmiCheck check_needed);
 
   // Emits optimized code for %_IsConstructCall().
   // Caller should branch on equal condition.
   void EmitIsConstructCall(Register temp1, Register temp2);
-
-  void EmitLoadFieldOrConstantFunction(Register result,
-                                       Register object,
-                                       Handle<Map> type,
-                                       Handle<String> name,
-                                       LEnvironment* env);
 
   // Emits optimized code to deep-copy the contents of statically known
   // object graphs (e.g. object literal boilerplate).
@@ -415,6 +420,8 @@ class LCodeGen BASE_EMBEDDED {
   LGapResolver resolver_;
 
   Safepoint::Kind expected_safepoint_kind_;
+
+  int old_position_;
 
   class PushSafepointRegistersScope BASE_EMBEDDED {
    public:

@@ -202,6 +202,7 @@ Object** RelocInfo::target_object_address() {
 
 void RelocInfo::set_target_object(Object* target, WriteBarrierMode mode) {
   ASSERT(IsCodeTarget(rmode_) || rmode_ == EMBEDDED_OBJECT);
+  ASSERT(!target->IsConsString());
   Assembler::set_target_address_at(pc_, reinterpret_cast<Address>(target));
   if (mode == UPDATE_WRITE_BARRIER &&
       host() != NULL &&
@@ -263,16 +264,14 @@ static const int kNoCodeAgeSequenceLength = 7;
 Code* RelocInfo::code_age_stub() {
   ASSERT(rmode_ == RelocInfo::CODE_AGE_SEQUENCE);
   return Code::GetCodeFromTargetAddress(
-      Memory::Address_at(pc_ + Assembler::kInstrSize *
-                         (kNoCodeAgeSequenceLength - 1)));
+      Assembler::target_address_at(pc_ + Assembler::kInstrSize));
 }
 
 
 void RelocInfo::set_code_age_stub(Code* stub) {
   ASSERT(rmode_ == RelocInfo::CODE_AGE_SEQUENCE);
-  Memory::Address_at(pc_ + Assembler::kInstrSize *
-                     (kNoCodeAgeSequenceLength - 1)) =
-      stub->instruction_start();
+  Assembler::set_target_address_at(pc_ + Assembler::kInstrSize,
+                                   stub->instruction_start());
 }
 
 

@@ -533,8 +533,7 @@ class LEnvironment: public ZoneObject {
         values_(value_count, zone),
         is_tagged_(value_count, zone),
         is_uint32_(value_count, zone),
-        spilled_registers_(NULL),
-        spilled_double_registers_(NULL),
+        object_mapping_(0, zone),
         outer_(outer),
         entry_(entry),
         zone_(zone) { }
@@ -548,10 +547,6 @@ class LEnvironment: public ZoneObject {
   int translation_size() const { return translation_size_; }
   int parameter_count() const { return parameter_count_; }
   int pc_offset() const { return pc_offset_; }
-  LOperand** spilled_registers() const { return spilled_registers_; }
-  LOperand** spilled_double_registers() const {
-    return spilled_double_registers_;
-  }
   const ZoneList<LOperand*>* values() const { return &values_; }
   LEnvironment* outer() const { return outer_; }
   HEnterInlined* entry() { return entry_; }
@@ -579,6 +574,38 @@ class LEnvironment: public ZoneObject {
     return is_uint32_.Contains(index);
   }
 
+  void AddNewObject(int length, bool is_arguments) {
+    uint32_t encoded = LengthOrDupeField::encode(length) |
+                       IsArgumentsField::encode(is_arguments) |
+                       IsDuplicateField::encode(false);
+    object_mapping_.Add(encoded, zone());
+  }
+
+  void AddDuplicateObject(int dupe_of) {
+    uint32_t encoded = LengthOrDupeField::encode(dupe_of) |
+                       IsDuplicateField::encode(true);
+    object_mapping_.Add(encoded, zone());
+  }
+
+  int ObjectDuplicateOfAt(int index) {
+    ASSERT(ObjectIsDuplicateAt(index));
+    return LengthOrDupeField::decode(object_mapping_[index]);
+  }
+
+  int ObjectLengthAt(int index) {
+    ASSERT(!ObjectIsDuplicateAt(index));
+    return LengthOrDupeField::decode(object_mapping_[index]);
+  }
+
+  bool ObjectIsArgumentsAt(int index) {
+    ASSERT(!ObjectIsDuplicateAt(index));
+    return IsArgumentsField::decode(object_mapping_[index]);
+  }
+
+  bool ObjectIsDuplicateAt(int index) {
+    return IsDuplicateField::decode(object_mapping_[index]);
+  }
+
   void Register(int deoptimization_index,
                 int translation_index,
                 int pc_offset) {
@@ -591,13 +618,15 @@ class LEnvironment: public ZoneObject {
     return deoptimization_index_ != Safepoint::kNoDeoptimizationIndex;
   }
 
-  void SetSpilledRegisters(LOperand** registers,
-                           LOperand** double_registers) {
-    spilled_registers_ = registers;
-    spilled_double_registers_ = double_registers;
-  }
-
   void PrintTo(StringStream* stream);
+
+  // Marker value indicating a de-materialized object.
+  static LOperand* materialization_marker() { return NULL; }
+
+  // Encoding used for the object_mapping map below.
+  class LengthOrDupeField : public BitField<int,   0, 30> { };
+  class IsArgumentsField  : public BitField<bool, 30,  1> { };
+  class IsDuplicateField  : public BitField<bool, 31,  1> { };
 
  private:
   Handle<JSFunction> closure_;
@@ -616,11 +645,8 @@ class LEnvironment: public ZoneObject {
   GrowableBitVector is_tagged_;
   GrowableBitVector is_uint32_;
 
-  // Allocation index indexed arrays of spill slot operands for registers
-  // that are also in spill slots at an OSR entry.  NULL for environments
-  // that do not correspond to an OSR entry.
-  LOperand** spilled_registers_;
-  LOperand** spilled_double_registers_;
+  // Map with encoded information about materialization_marker operands.
+  ZoneList<uint32_t> object_mapping_;
 
   LEnvironment* outer_;
   HEnterInlined* entry_;
@@ -768,13 +794,25 @@ class LChunk: public ZoneObject {
 };
 
 
-int ElementsKindToShiftSize(ElementsKind elements_kind);
 int StackSlotOffset(int index);
 
 enum NumberUntagDMode {
   NUMBER_CANDIDATE_IS_SMI,
-  NUMBER_CANDIDATE_IS_ANY_TAGGED,
-  NUMBER_CANDIDATE_IS_ANY_TAGGED_CONVERT_HOLE
+  NUMBER_CANDIDATE_IS_ANY_TAGGED
+};
+
+
+class LPhase : public CompilationPhase {
+ public:
+  LPhase(const char* name, LChunk* chunk)
+      : CompilationPhase(name, chunk->info()),
+        chunk_(chunk) { }
+  ~LPhase();
+
+ private:
+  LChunk* chunk_;
+
+  DISALLOW_COPY_AND_ASSIGN(LPhase);
 };
 
 

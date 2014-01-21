@@ -1,4 +1,4 @@
-// Copyright 2011 the V8 project authors. All rights reserved.
+// Copyright 2013 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -25,26 +25,46 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Platform and architecture specific thread local store functions.
+#ifndef V8_HYDROGEN_OSR_H_
+#define V8_HYDROGEN_OSR_H_
 
-#ifndef V8_PLATFORM_TLS_H_
-#define V8_PLATFORM_TLS_H_
+#include "hydrogen.h"
+#include "ast.h"
+#include "zone.h"
 
-#ifndef V8_NO_FAST_TLS
+namespace v8 {
+namespace internal {
 
-// When fast TLS is requested we include the appropriate
-// implementation header.
-//
-// The implementation header defines V8_FAST_TLS_SUPPORTED if it
-// provides fast TLS support for the current platform and architecture
-// combination.
+// Responsible for building graph parts related to OSR and otherwise
+// setting up the graph to do an OSR compile.
+class HOsrBuilder : public ZoneObject {
+ public:
+  explicit HOsrBuilder(HOptimizedGraphBuilder* builder)
+    : builder_(builder),
+      osr_entry_(NULL),
+      osr_loop_entry_(NULL),
+      osr_values_(NULL) { }
+  // Creates the loop entry block for the given statement, setting up OSR
+  // entries as necessary, and sets the current block to the new block.
+  HBasicBlock* BuildPossibleOsrLoopEntry(IterationStatement* statement);
 
-#if defined(_MSC_VER) && (defined(_WIN32) || defined(_WIN64))
-#include "platform-tls-win32.h"
-#elif defined(__APPLE__)
-#include "platform-tls-mac.h"
-#endif
+  // Process the hydrogen graph after it has been completed, performing
+  // any OSR-specific cleanups or changes.
+  void FinishGraph();
 
-#endif
+  // Process the OSR values and phis after initial graph optimization.
+  void FinishOsrValues();
 
-#endif  // V8_PLATFORM_TLS_H_
+ private:
+  HBasicBlock* BuildLoopEntry();
+  bool HasOsrEntryAt(IterationStatement* statement);
+
+  HOptimizedGraphBuilder* builder_;
+  HBasicBlock* osr_entry_;
+  HBasicBlock* osr_loop_entry_;
+  ZoneList<HUnknownOSRValue*>* osr_values_;
+};
+
+} }  // namespace v8::internal
+
+#endif  // V8_HYDROGEN_OSR_H_

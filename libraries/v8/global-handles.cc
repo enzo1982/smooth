@@ -71,6 +71,7 @@ class GlobalHandles::Node {
     STATIC_ASSERT(static_cast<int>(NodeState::kMask) ==
                   Internals::kNodeStateMask);
     STATIC_ASSERT(WEAK == Internals::kNodeStateIsWeakValue);
+    STATIC_ASSERT(PENDING == Internals::kNodeStateIsPendingValue);
     STATIC_ASSERT(NEAR_DEATH == Internals::kNodeStateIsNearDeathValue);
     STATIC_ASSERT(static_cast<int>(IsIndependent::kShift) ==
                   Internals::kNodeIsIndependentShift);
@@ -262,6 +263,7 @@ class GlobalHandles::Node {
              ExternalTwoByteString::cast(object_)->resource() != NULL);
       // Leaving V8.
       VMState<EXTERNAL> state(isolate);
+      HandleScope handle_scope(isolate);
       weak_reference_callback_(reinterpret_cast<v8::Isolate*>(isolate),
                                reinterpret_cast<Persistent<Value>*>(&object),
                                par);
@@ -634,6 +636,11 @@ bool GlobalHandles::PostGarbageCollectionProcessing(
     for (int i = 0; i < new_space_nodes_.length(); ++i) {
       Node* node = new_space_nodes_[i];
       ASSERT(node->is_in_new_space_list());
+      if (!node->IsRetainer()) {
+        // Free nodes do not have weak callbacks. Do not use them to compute
+        // the next_gc_likely_to_collect_more.
+        continue;
+      }
       // Skip dependent handles. Their weak callbacks might expect to be
       // called between two global garbage collection callbacks which
       // are not called for minor collections.
@@ -656,6 +663,11 @@ bool GlobalHandles::PostGarbageCollectionProcessing(
     }
   } else {
     for (NodeIterator it(this); !it.done(); it.Advance()) {
+      if (!it.node()->IsRetainer()) {
+        // Free nodes do not have weak callbacks. Do not use them to compute
+        // the next_gc_likely_to_collect_more.
+        continue;
+      }
       it.node()->clear_partially_dependent();
       if (it.node()->PostGarbageCollectionProcessing(isolate_)) {
         if (initial_post_gc_processing_count != post_gc_processing_count_) {
@@ -798,6 +810,7 @@ void GlobalHandles::PrintStats() {
   PrintF("  # free       = %d\n", destroyed);
   PrintF("  # total      = %d\n", total);
 }
+
 
 void GlobalHandles::Print() {
   PrintF("Global handles:\n");
@@ -1003,6 +1016,70 @@ void GlobalHandles::ComputeObjectGroupsAndImplicitReferences() {
   object_group_connections_.Initialize(kObjectGroupConnectionsCapacity);
   retainer_infos_.Clear();
   implicit_ref_connections_.Clear();
+}
+
+
+EternalHandles::EternalHandles() : size_(0) {
+  STATIC_ASSERT(v8::kUninitializedEternalIndex == kInvalidIndex);
+  for (unsigned i = 0; i < ARRAY_SIZE(singleton_handles_); i++) {
+    singleton_handles_[i] = kInvalidIndex;
+  }
+}
+
+
+EternalHandles::~EternalHandles() {
+  for (int i = 0; i < blocks_.length(); i++) delete[] blocks_[i];
+}
+
+
+void EternalHandles::IterateAllRoots(ObjectVisitor* visitor) {
+  int limit = size_;
+  for (int i = 0; i < blocks_.length(); i++) {
+    ASSERT(limit > 0);
+    Object** block = blocks_[i];
+    visitor->VisitPointers(block, block + Min(limit, kSize));
+    limit -= kSize;
+  }
+}
+
+
+void EternalHandles::IterateNewSpaceRoots(ObjectVisitor* visitor) {
+  for (int i = 0; i < new_space_indices_.length(); i++) {
+    visitor->VisitPointer(GetLocation(new_space_indices_[i]));
+  }
+}
+
+
+void EternalHandles::PostGarbageCollectionProcessing(Heap* heap) {
+  int last = 0;
+  for (int i = 0; i < new_space_indices_.length(); i++) {
+    int index = new_space_indices_[i];
+    if (heap->InNewSpace(*GetLocation(index))) {
+      new_space_indices_[last++] = index;
+    }
+  }
+  new_space_indices_.Rewind(last);
+}
+
+
+int EternalHandles::Create(Isolate* isolate, Object* object) {
+  if (object == NULL) return kInvalidIndex;
+  ASSERT_NE(isolate->heap()->the_hole_value(), object);
+  int block = size_ >> kShift;
+  int offset = size_ & kMask;
+  // need to resize
+  if (offset == 0) {
+    Object** next_block = new Object*[kSize];
+    Object* the_hole = isolate->heap()->the_hole_value();
+    MemsetPointer(next_block, the_hole, kSize);
+    blocks_.Add(next_block);
+  }
+  ASSERT_EQ(isolate->heap()->the_hole_value(), blocks_[block][offset]);
+  blocks_[block][offset] = object;
+  if (isolate->heap()->InNewSpace(object)) {
+    new_space_indices_.Add(size_);
+  }
+  return size_++;
 }
 
 

@@ -86,12 +86,6 @@ namespace internal {
 #define V8_HOST_ARCH_IA32 1
 #define V8_HOST_ARCH_32_BIT 1
 #define V8_HOST_CAN_READ_UNALIGNED 1
-#elif defined(__ppc__)
-#define V8_HOST_ARCH_PPC 1
-#define V8_HOST_ARCH_32_BIT 1
-#elif defined(__ppc64__)
-#define V8_HOST_ARCH_PPC64 1
-#define V8_HOST_ARCH_64_BIT 1
 #elif defined(__ARMEL__)
 #define V8_HOST_ARCH_ARM 1
 #define V8_HOST_ARCH_32_BIT 1
@@ -137,11 +131,11 @@ namespace internal {
 #if V8_TARGET_ARCH_X64 && !V8_HOST_ARCH_X64
 #error Target architecture x64 is only supported on x64 host
 #endif
-#if (V8_TARGET_ARCH_ARM && !(V8_HOST_ARCH_IA32 || V8_HOST_ARCH_PPC || V8_HOST_ARCH_ARM))
-#error Target architecture arm is only supported on arm, ia32 and ppc host
+#if (V8_TARGET_ARCH_ARM && !(V8_HOST_ARCH_IA32 || V8_HOST_ARCH_ARM))
+#error Target architecture arm is only supported on arm and ia32 host
 #endif
-#if (V8_TARGET_ARCH_MIPS && !(V8_HOST_ARCH_IA32 || V8_HOST_ARCH_PPC || V8_HOST_ARCH_MIPS))
-#error Target architecture mips is only supported on mips, ia32 and ppc host
+#if (V8_TARGET_ARCH_MIPS && !(V8_HOST_ARCH_IA32 || V8_HOST_ARCH_MIPS))
+#error Target architecture mips is only supported on mips and ia32 host
 #endif
 
 // Determine whether we are running in a simulated environment.
@@ -161,10 +155,6 @@ namespace internal {
 #define V8_TARGET_LITTLE_ENDIAN 1
 #elif V8_TARGET_ARCH_X64
 #define V8_TARGET_LITTLE_ENDIAN 1
-#elif V8_TARGET_ARCH_PPC
-
-#elif V8_TARGET_ARCH_PPC64
-
 #elif V8_TARGET_ARCH_ARM
 #define V8_TARGET_LITTLE_ENDIAN 1
 #elif V8_TARGET_ARCH_MIPS

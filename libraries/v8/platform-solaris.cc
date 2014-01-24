@@ -81,7 +81,7 @@ namespace std {
 
 // Test for type of x
 int fpclassify(double x) {
-  return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUPERNORMAL, FP_ZERO, x);
+  return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x);
 }
 
 int isfinite(double x) {

@@ -565,24 +565,6 @@ class SamplerThread : public Thread {
 #else
 #define REGISTER_FIELD(name) e ## name
 #endif  // __DARWIN_UNIX03
-#elif V8_HOST_ARCH_PPC64
-    thread_state_flavor_t flavor = PPC_THREAD_STATE64;
-    ppc_thread_state64_t thread_state;
-    mach_msg_type_number_t count = PPC_THREAD_STATE64_COUNT;
-#if __DARWIN_UNIX03
-#define REGISTER_FIELD(name) __ ## name
-#else
-#define REGISTER_FIELD(name) name
-#endif  // __DARWIN_UNIX03
-#elif V8_HOST_ARCH_PPC
-    thread_state_flavor_t flavor = PPC_THREAD_STATE;
-    ppc_thread_state_t thread_state;
-    mach_msg_type_number_t count = PPC_THREAD_STATE_COUNT;
-#if __DARWIN_UNIX03
-#define REGISTER_FIELD(name) __ ## name
-#else
-#define REGISTER_FIELD(name) name
-#endif  // __DARWIN_UNIX03
 #else
 #error Unsupported Mac OS X host architecture.
 #endif  // V8_HOST_ARCH
@@ -594,14 +576,10 @@ class SamplerThread : public Thread {
       RegisterState state;
 #if defined(USE_SIMULATOR)
       helper.FillRegisters(&state);
-#elif (V8_HOST_ARCH_IA32 || V8_HOST_ARCH_X64)
+#else
       state.pc = reinterpret_cast<Address>(thread_state.REGISTER_FIELD(ip));
       state.sp = reinterpret_cast<Address>(thread_state.REGISTER_FIELD(sp));
       state.fp = reinterpret_cast<Address>(thread_state.REGISTER_FIELD(bp));
-#elif (V8_HOST_ARCH_PPC ||V8_HOST_ARCH_PPC64)
-      state.pc = reinterpret_cast<Address>(thread_state.REGISTER_FIELD(srr0));
-      state.sp = reinterpret_cast<Address>(thread_state.REGISTER_FIELD(r1));
-      state.fp = reinterpret_cast<Address>(thread_state.REGISTER_FIELD(r31));
 #endif  // USE_SIMULATOR
 #undef REGISTER_FIELD
       sampler->SampleStack(state);

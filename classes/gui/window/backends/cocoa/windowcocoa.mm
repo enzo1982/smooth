@@ -94,6 +94,7 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	/* NSTextInputClient methods.
 	 */
+	- (void)		 insertText:	(id) string;
 	- (void)		 insertText:	(id) string replacementRange: (NSRange) replacementRange;
 	- (void)		 setMarkedText:	(id) string selectedRange:    (NSRange) selectedRange replacementRange: (NSRange) replacementRange;
 	- (BOOL)		 hasMarkedText;
@@ -241,7 +242,7 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	/* NSTextInputClient methods.
 	 */
-	- (void) insertText: (id) string replacementRange: (NSRange) replacementRange
+	- (void) insertText: (id) string
 	{
 		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([self window]);
 		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
@@ -266,6 +267,11 @@ const int	 NSApplicationDropFiles	 = 9;
 		}
 
 		[self unmarkText];
+	}
+
+	- (void) insertText: (id) string replacementRange: (NSRange) replacementRange
+	{
+		[self insertText: string];
 	}
 
 	- (void) setMarkedText: (id) string selectedRange: (NSRange) selectedRange replacementRange: (NSRange) replacementRange

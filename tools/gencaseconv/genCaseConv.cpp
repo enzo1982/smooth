@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -55,14 +55,14 @@ Void generateConversion(Int field, OutStream &out)
 				out.OutputString(String("if\t((*this)[i] >= 0x").Append(Number(seriesStart).ToHexString()).Append(" && (*this)[i] <= 0x").Append(Number(seriesStart + seriesLength - 1).ToHexString()).Append(")"));
 				out.OutputString("\t\t\t\t");
 				out.OutputString(String("retVal[i] = (*this)[i] ").Append(difference >= 0 ? "+" : "-").Append(" 0x"));
-				out.OutputString(String(Number(Math::Abs(difference)).ToHexString()).Append(";\t// Alphabet"));
+				out.OutputString(Number(Math::Abs(difference)).ToHexString().Append(";\t// Alphabet"));
 			}
 			else if (seriesType == 1)
 			{
 				out.OutputString(String("if\t((*this)[i] >= 0x").Append(Number(seriesStart).ToHexString()).Append(" && (*this)[i] <= 0x").Append(Number(seriesStart + 2 * (seriesLength - 1)).ToHexString()).Append(" && ").Append(seriesStart & 1 ? " " : "!").Append("((*this)[i] & 1)").Append(")"));
 				out.OutputString("\t");
 				out.OutputString(String("retVal[i] = (*this)[i] ").Append(difference >= 0 ? "+" : "-").Append(" 0x"));
-				out.OutputString(String(Number(Math::Abs(difference)).ToHexString()).Append(";\t// Special letters"));
+				out.OutputString(Number(Math::Abs(difference)).ToHexString().Append(";\t// Special letters"));
 			}
 
 			seriesCount++;

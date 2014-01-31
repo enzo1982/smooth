@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -572,18 +572,30 @@ S::Int S::String::Length() const
 	return wcslen(wString);
 }
 
-S::String &S::String::Append(const char *str)
+S::Int S::String::Find(const String &str) const
 {
-	String	 str2 = str;
+	Int	 len1 = Length();
+	Int	 len2 = str.Length();
 
-	return Append(str2);
+	for (Int i = 0; i <= len1 - len2; i++)
+	{
+		if (wcsncmp(wString + i, str.wString, len2) == 0) return i;
+	}
+
+	return -1;
 }
 
-S::String &S::String::Append(const wchar_t *str)
+S::Int S::String::FindLast(const String &str) const
 {
-	String	 str2 = str;
+	Int	 len1 = Length();
+	Int	 len2 = str.Length();
 
-	return Append(str2);
+	for (Int i = len1 - len2; i >= 0; i--)
+	{
+		if (wcsncmp(wString + i, str.wString, len2) == 0) return i;
+	}
+
+	return -1;
 }
 
 S::String &S::String::Append(const String &str)
@@ -600,88 +612,9 @@ S::String &S::String::Append(const String &str)
 	return *this;
 }
 
-S::Int S::String::Find(const char *str) const
+S::String S::String::Append(const String &str) const
 {
-	String 	 str2 = str;
-
-	return Find(str2);
-}
-
-S::Int S::String::Find(const wchar_t *str) const
-{
-	String 	 str2 = str;
-
-	return Find(str2);
-}
-
-S::Int S::String::Find(const String &str) const
-{
-	Int	 len1 = Length();
-	Int	 len2 = str.Length();
-
-	for (Int i = 0; i <= len1 - len2; i++)
-	{
-		if (wcsncmp(wString + i, str.wString, len2) == 0) return i;
-	}
-
-	return -1;
-}
-
-S::Int S::String::FindLast(const char *str) const
-{
-	String 	 str2 = str;
-
-	return FindLast(str2);
-}
-
-S::Int S::String::FindLast(const wchar_t *str) const
-{
-	String 	 str2 = str;
-
-	return FindLast(str2);
-}
-
-S::Int S::String::FindLast(const String &str) const
-{
-	Int	 len1 = Length();
-	Int	 len2 = str.Length();
-
-	for (Int i = len1 - len2; i >= 0; i--)
-	{
-		if (wcsncmp(wString + i, str.wString, len2) == 0) return i;
-	}
-
-	return -1;
-}
-
-S::String &S::String::Replace(const char *str1, const char *str2)
-{
-	String	 str3 = str1;
-	String	 str4 = str2;
-
-	return Replace(str3, str4);
-}
-
-S::String &S::String::Replace(const wchar_t *str1, const wchar_t *str2)
-{
-	String	 str3 = str1;
-	String	 str4 = str2;
-
-	return Replace(str3, str4);
-}
-
-S::String &S::String::Replace(const char *str1, const String &str2)
-{
-	String	 str3 = str1;
-
-	return Replace(str3, str2);
-}
-
-S::String &S::String::Replace(const wchar_t *str1, const String &str2)
-{
-	String	 str3 = str1;
-
-	return Replace(str3, str2);
+	return String(*this).Append(str);
 }
 
 S::String &S::String::Replace(const String &str1, const String &str2)
@@ -714,18 +647,9 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 	return *this;
 }
 
-S::String &S::String::Copy(const char *str)
+S::String S::String::Replace(const String &str1, const String &str2) const
 {
-	String 	 str2 = str;
-
-	return Copy(str2);
-}
-
-S::String &S::String::Copy(const wchar_t *str)
-{
-	String 	 str2 = str;
-
-	return Copy(str2);
+	return String(*this).Replace(str1, str2);
 }
 
 S::String &S::String::Copy(const String &str)
@@ -733,20 +657,6 @@ S::String &S::String::Copy(const String &str)
 	*this = str;
 
 	return *this;
-}
-
-S::String &S::String::CopyN(const char *str, const Int n)
-{
-	String 	 str2 = str;
-
-	return CopyN(str2, n);
-}
-
-S::String &S::String::CopyN(const wchar_t *str, const Int n)
-{
-	String 	 str2 = str;
-
-	return CopyN(str2, n);
 }
 
 S::String &S::String::CopyN(const String &str, const Int n)
@@ -762,38 +672,10 @@ S::String &S::String::CopyN(const String &str, const Int n)
 	return *this;
 }
 
-S::Bool S::String::Contains(const char *str) const
-{
-	String 	 str2 = str;
-
-	return Contains(str2);
-}
-
-S::Bool S::String::Contains(const wchar_t *str) const
-{
-	String 	 str2 = str;
-
-	return Contains(str2);
-}
-
 S::Bool S::String::Contains(const String &str) const
 {
 	if (Find(str) >= 0) return True;
 	else		    return False;
-}
-
-S::Int S::String::Compare(const char *str) const
-{
-	String 	 str2 = str;
-
-	return Compare(str2);
-}
-
-S::Int S::String::Compare(const wchar_t *str) const
-{
-	String 	 str2 = str;
-
-	return Compare(str2);
 }
 
 S::Int S::String::Compare(const String &str) const
@@ -807,20 +689,6 @@ S::Int S::String::Compare(const String &str) const
 	return 0;
 }
 
-S::Int S::String::CompareN(const char *str, Int n) const
-{
-	String 	 str2 = str;
-
-	return CompareN(str2, n);
-}
-
-S::Int S::String::CompareN(const wchar_t *str, Int n) const
-{
-	String 	 str2 = str;
-
-	return CompareN(str2, n);
-}
-
 S::Int S::String::CompareN(const String &str, Int n) const
 {
 	if (Length() < n) return 1;
@@ -828,20 +696,6 @@ S::Int S::String::CompareN(const String &str, Int n) const
 	if (wcsncmp(wString, str.wString, n) != 0) return 1;
 
 	return 0;
-}
-
-S::Bool S::String::StartsWith(const char *str) const
-{
-	String 	 str2 = str;
-
-	return StartsWith(str2);
-}
-
-S::Bool S::String::StartsWith(const wchar_t *str) const
-{
-	String 	 str2 = str;
-
-	return StartsWith(str2);
 }
 
 S::Bool S::String::StartsWith(const String &str) const
@@ -857,20 +711,6 @@ S::Bool S::String::StartsWith(const String &str) const
 	}
 
 	return False;
-}
-
-S::Bool S::String::EndsWith(const char *str) const
-{
-	String 	 str2 = str;
-
-	return EndsWith(str2);
-}
-
-S::Bool S::String::EndsWith(const wchar_t *str) const
-{
-	String 	 str2 = str;
-
-	return EndsWith(str2);
 }
 
 S::Bool S::String::EndsWith(const String &str) const

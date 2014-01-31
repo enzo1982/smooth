@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -101,8 +101,8 @@ S::String S::GUI::Shortcut::ToString() const
 	else if (key == Input::Keyboard::KeyInsert) keyString = I18n::Translator::defaultTranslator->TranslateString("Ins");
 	else if (key == Input::Keyboard::KeyDelete) keyString = I18n::Translator::defaultTranslator->TranslateString("Del");
 
-	return	(Binary::IsFlagSet(flags, SC_CTRL)  ? String(I18n::Translator::defaultTranslator->TranslateString("Ctrl")).Append("+")	: String())
-         .Append(Binary::IsFlagSet(flags, SC_ALT)   ? String(I18n::Translator::defaultTranslator->TranslateString("Alt")).Append("+")	: String())
-	 .Append(Binary::IsFlagSet(flags, SC_SHIFT) ? String(I18n::Translator::defaultTranslator->TranslateString("Shift")).Append("+")	: String())
+	return	(Binary::IsFlagSet(flags, SC_CTRL)  ? I18n::Translator::defaultTranslator->TranslateString("Ctrl").Append("+")	: String())
+         .Append(Binary::IsFlagSet(flags, SC_ALT)   ? I18n::Translator::defaultTranslator->TranslateString("Alt").Append("+")	: String())
+	 .Append(Binary::IsFlagSet(flags, SC_SHIFT) ? I18n::Translator::defaultTranslator->TranslateString("Shift").Append("+")	: String())
 	 .Append(keyString);
 }

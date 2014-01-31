@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -56,11 +56,11 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	divbar		= new Divider(39, OR_HORZ | OR_BOTTOM);
 
 	btn_ok		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, Point(87, 29), Size());
-	btn_ok->onAction.Connect(&TipOfTheDay::ButtonOK, this);
+	btn_ok->onAction.Connect(&TipOfTheDay::OnOK, this);
 	btn_ok->SetOrientation(OR_LOWERRIGHT);
 
 	btn_next	= new Button(I18n::Translator::defaultTranslator->TranslateString("Next tip"), NIL, Point(175, 29), Size());
-	btn_next->onAction.Connect(&TipOfTheDay::ButtonNext, this);
+	btn_next->onAction.Connect(&TipOfTheDay::OnNext, this);
 	btn_next->SetOrientation(OR_LOWERRIGHT);
 
 	check_showtips	= new CheckBox(I18n::Translator::defaultTranslator->TranslateString("Show tips on startup"), Point(7, 27), Size(150, 0), showTips);
@@ -107,7 +107,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 
 	layer_inner->Add(txt_tip);
 
-	dlgwnd->onPaint.Connect(&TipOfTheDay::Paint, this);
+	dlgwnd->onPaint.Connect(&TipOfTheDay::OnPaint, this);
 }
 
 S::GUI::Dialogs::TipOfTheDay::~TipOfTheDay()
@@ -133,7 +133,7 @@ const Error &S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 {
 	if (caption != NIL) dlgwnd->SetText(caption);
 
-	ButtonNext();
+	OnNext();
 
 	dlgwnd->Show();
 	dlgwnd->Stay();
@@ -176,12 +176,12 @@ S::Int S::GUI::Dialogs::TipOfTheDay::GetOffset() const
 	return offset;
 }
 
-S::Void S::GUI::Dialogs::TipOfTheDay::ButtonOK()
+S::Void S::GUI::Dialogs::TipOfTheDay::OnOK()
 {
 	dlgwnd->Close();
 }
 
-S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
+S::Void S::GUI::Dialogs::TipOfTheDay::OnNext()
 {
 	String	 tip;
 	time_t	 timer;
@@ -205,7 +205,7 @@ S::Void S::GUI::Dialogs::TipOfTheDay::ButtonNext()
 	txt_tip->SetText(tip);
 }
 
-S::Void S::GUI::Dialogs::TipOfTheDay::Paint()
+S::Void S::GUI::Dialogs::TipOfTheDay::OnPaint()
 {
 	dlgwnd->GetDrawSurface()->Box(Rect(layer_inner->GetRealPosition() - Point(1, 1), layer_inner->GetRealSize() + Size(2, 2)), 0, Rect::Outlined);
 }

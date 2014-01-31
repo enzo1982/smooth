@@ -83,7 +83,8 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 	created		= False;
 	visible		= False;
 	destroyed	= False;
-	initshow	= False;
+
+	visibilitySet	= False;
 
 	mainLayer	= new Layer();
 
@@ -263,7 +264,7 @@ S::Int S::GUI::Window::Show()
 	onChangePosition.Emit(GetPosition());
 	onChangeSize.Emit(GetSize());
 
-	if (maximized && !initshow)
+	if (maximized && !visibilitySet)
 	{
 		backend->Hide();
 
@@ -271,7 +272,7 @@ S::Int S::GUI::Window::Show()
 		Maximize();
 	}
 
-	if (minimized && !initshow)
+	if (minimized && !visibilitySet)
 	{
 		backend->Hide();
 
@@ -279,8 +280,8 @@ S::Int S::GUI::Window::Show()
 		Minimize();
 	}
 
-	initshow = True;
-	visible	 = True;
+	visible	      = True;
+	visibilitySet = True;
 
 	backend->Show();
 
@@ -295,8 +296,8 @@ S::Int S::GUI::Window::Hide()
 
 	if (created) backend->Hide();
 
-	initshow = True;
-	visible	 = False;
+	visible	      = False;
+	visibilitySet = True;
 
 	onHide.Emit();
 
@@ -496,8 +497,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	EnterProtectedRegion();
 
+	/* Forward event to subscribers.
+	 */
 	onEvent.Emit(message, wParam, lParam);
 
+	/* Process events we are interested in.
+	 */
 	Int	 rVal = Success();
 
 	switch (message)
@@ -569,6 +574,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			break;
 	}
 
+	/* Delegate event to widgets.
+	 */
 	if (rVal == Success())
 	{
 		for (Int i = GetNOfObjects() - 1; i >= 0; i--)

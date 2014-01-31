@@ -63,7 +63,7 @@ S::Int S::GUI::Application::Loop()
 		{
 			Window	*window = Window::GetNthWindow(i);
 
-			if (window != NIL && !window->initshow) window->Show();
+			if (window != NIL && !window->IsVisibilitySet()) window->Show();
 		}
 
 		/* Start waiting threads here.

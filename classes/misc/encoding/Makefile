@@ -4,7 +4,7 @@
 SMOOTH_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = base64.o
+OBJECTS	  = base64.o urlencode.o
 
 ## Do not change anything below this line. ##
 

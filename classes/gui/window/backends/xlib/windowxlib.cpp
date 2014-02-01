@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,8 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
+#include <smooth/misc/encoding/urlencode.h>
+#include <smooth/io/instream.h>
 #include <smooth/system/system.h>
 #include <smooth/init.h>
 #include <smooth/backends/xlib/backendxlib.h>
@@ -29,26 +31,30 @@ S::Array<S::GUI::WindowXLib *, S::Void *>	 S::GUI::WindowXLib::windowBackends;
 
 S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 {
-	type	    = WINDOW_XLIB;
+	type		= WINDOW_XLIB;
 
-	display	    = Backends::BackendXLib::GetDisplay();
-	im	    = Backends::BackendXLib::GetIM();
+	display		= Backends::BackendXLib::GetDisplay();
+	im		= Backends::BackendXLib::GetIM();
 
-	wnd	    = NIL;
-	oldwnd	    = NIL;
+	wnd		= NIL;
+	oldwnd		= NIL;
 
-	ic	    = NIL;
+	ic		= NIL;
 
-	id	    = windowBackends.Add(this);
+	id		= windowBackends.Add(this);
 
-	minSize	    = Size(160, 24);
+	minSize		= Size(160, 24);
 
-	fontSize    = Surface().GetSurfaceDPI() / 96.0;
+	fontSize	= Surface().GetSurfaceDPI() / 96.0;
 
-	flags	    = 0;
+	flags		= 0;
 
-	sysIcon	    = NIL;
-	sysIconSize = 0;
+	sysIcon		= NIL;
+	sysIconSize	= 0;
+
+	xdndTimeStamp	= 0;
+	acceptDrop	= False;
+	enableDropFiles	= False;
 }
 
 S::GUI::WindowXLib::~WindowXLib()
@@ -184,6 +190,23 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 {
 	static Int	 focusWndID = -1;
 
+	static Atom	 mimeURIListAtom       = XInternAtom(display, "text/uri-list", False);
+
+	static Atom	 wmProtocolsAtom       = XInternAtom(display, "WM_PROTOCOLS", False);
+	static Atom	 wmDeleteWindowAtom    = XInternAtom(display, "WM_DELETE_WINDOW", False);
+
+	static Atom	 wmPingAtom	       = XInternAtom(display, "_NET_WM_PING", False);
+
+	static Atom	 xdndEnterAtom	       = XInternAtom(display, "XdndEnter", False);
+	static Atom	 xdndTypeListAtom      = XInternAtom(display, "XdndTypeList", False);
+	static Atom	 xdndPositionAtom      = XInternAtom(display, "XdndPosition", False);
+	static Atom	 xdndStatusAtom	       = XInternAtom(display, "XdndStatus", False);
+	static Atom	 xdndDropAtom	       = XInternAtom(display, "XdndDrop", False);
+	static Atom	 xdndLeaveAtom	       = XInternAtom(display, "XdndLeave", False);
+	static Atom	 xdndFinishedAtom      = XInternAtom(display, "XdndFinished", False);
+
+	static Atom	 xdndActionPrivateAtom = XInternAtom(display, "XdndActionPrivate", False);
+
 	/* Process system events not relevant
 	 * to portable Window implementation.
 	 */
@@ -193,12 +216,14 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			onCreate.Emit();
 
 			break;
+
 		case DestroyNotify:
 			onDestroy.Emit();
 
 			oldwnd = NIL;
 
 			break;
+
 		case MapNotify:
 			/* Set internal focus window.
 			 */
@@ -232,12 +257,14 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			onEvent.Call(SM_GETFOCUS, 0, 0);
 
 			break;
+
 		case UnmapNotify:
 			/* Clear internal focus window.
 			 */
 			if (focusWndID == id) focusWndID = -1;
 
 			break;
+
 		case SelectionRequest:
 			{
 				String	 text;
@@ -283,6 +310,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			}
 
 			break;
+
 		case SelectionClear:
 			if	(e->xselectionclear.selection == XA_PRIMARY)		selection = NIL;
 			else if (e->xselectionclear.selection == XA_CLIPBOARD(display)) clipboard = NIL;
@@ -304,6 +332,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
 			break;
+
 		case EnterNotify:
 			/* Update pointer position in Input::Pointer.
 			 */
@@ -312,6 +341,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
 			break;
+
 		case LeaveNotify:
 			/* Update pointer position in Input::Pointer.
 			 */
@@ -320,6 +350,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
 			break;
+
 		case ButtonPress:
 			/* Update pointer position in Input::Pointer.
 			 */
@@ -403,6 +434,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
 			break;
+
 		case ButtonRelease:
 			/* Update pointer position in Input::Pointer.
 			 */
@@ -422,6 +454,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			XRefreshKeyboardMapping(&e->xmapping);
 
 			break;
+
 		case KeyPress:
 			Input::Keyboard::UpdateKeyState(ConvertKey(XkbKeycodeToKeysym(display, e->xkey.keycode, 0, 0)), True);
 
@@ -456,6 +489,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			}
 
 			break;
+
 		case KeyRelease:
 			Input::Keyboard::UpdateKeyState(ConvertKey(XkbKeycodeToKeysym(display, e->xkey.keycode, 0, 0)), False);
 
@@ -540,12 +574,14 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			}
 
 			break;
+
 		case FocusIn:
 			focusWndID = id;
 
 			onEvent.Call(SM_GETFOCUS, 0, 0);
 
 			break;
+
 		case FocusOut:
 			Input::Keyboard::ResetKeyState();
 
@@ -564,22 +600,127 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 
-		/* Window manager events:
+		/* Client message events:
 		 */
 		case ClientMessage:
-			if (e->xclient.message_type == XInternAtom(display, "WM_PROTOCOLS", False))
+			/* Handle window manager request.
+			 */
+			if (e->xclient.message_type == wmProtocolsAtom)
 			{
-				if ((Atom) e->xclient.data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", False))
+				if ((Atom) e->xclient.data.l[0] == wmDeleteWindowAtom)
 				{
 					if (doClose.Call()) Close();
 				}
-				else if ((Atom) e->xclient.data.l[0] == XInternAtom(display, "_NET_WM_PING", False))
+				else if ((Atom) e->xclient.data.l[0] == wmPingAtom)
 				{
 					e->xclient.window = RootWindow(display, DefaultScreen(display));
 
 					XSendEvent(display, e->xclient.window, 0, SubstructureNotifyMask | SubstructureRedirectMask, e);
 					XFlush(display);
 				}
+			}
+
+			/* Handle XdndEnter message.
+			 */
+			if (e->xclient.message_type == xdndEnterAtom)
+			{
+				/* Check if the dropped item is a file.
+				 */
+				::Window	 sourceWnd = e->xclient.data.l[0];
+
+				if (e->xclient.data.l[1] & 1)
+				{
+					Int		 typesRead	= 0;
+					unsigned long	 bytesRemaining = 4;
+
+					while (bytesRemaining)
+					{
+						Atom		 actualType;
+						int		 actualFormat;
+						unsigned long	 actualItems;
+						Atom		*xdndType;
+
+						XGetWindowProperty(display, sourceWnd, xdndTypeListAtom, typesRead++, 1, False, XA_ATOM, &actualType, &actualFormat, &actualItems, &bytesRemaining, (unsigned char **) &xdndType);
+
+						if (*xdndType == mimeURIListAtom) acceptDrop = True;
+
+						XFree(xdndType);
+					}
+				}
+				else if ((Atom) e->xclient.data.l[2] == mimeURIListAtom ||
+					 (Atom) e->xclient.data.l[3] == mimeURIListAtom ||
+					 (Atom) e->xclient.data.l[4] == mimeURIListAtom)
+				{
+					acceptDrop = True;
+				}
+			}
+
+			/* Handle XdndPosition message.
+			 */
+			if (e->xclient.message_type == xdndPositionAtom)
+			{
+				/* Send XdndStatus message.
+				 */
+				XEvent		 status;
+				::Window	 sourceWnd = e->xclient.data.l[0];
+
+				status.xclient.type	    = ClientMessage;
+				status.xclient.display	    = display;
+				status.xclient.window	    = sourceWnd;
+				status.xclient.message_type = xdndStatusAtom;
+				status.xclient.format	    = 32;
+
+				status.xclient.data.l[0]    = wnd;
+				status.xclient.data.l[1]    = acceptDrop;
+				status.xclient.data.l[2]    = (pos.x   << 16) | pos.y;
+				status.xclient.data.l[3]    = (size.cx << 16) | size.cy;
+				status.xclient.data.l[4]    = xdndActionPrivateAtom;
+
+				XSendEvent(display, sourceWnd, 0, 0, &status);
+				XFlush(display);
+			}
+
+			/* Handle XdndDrop message.
+			 */
+			if (e->xclient.message_type == xdndDropAtom)
+			{
+				/* Are we interested at all?
+				 */
+				if (acceptDrop)
+				{
+					Point	 position = Window::GetWindow((Void *) wnd)->GetMousePosition();
+
+					xdndTimeStamp = e->xclient.data.l[2];
+
+					onEvent.Call(SM_DROPFILES, position.x, position.y);
+				}
+
+				/* Send XdndFinished message.
+				 */
+				XEvent		 finished;
+				::Window	 sourceWnd = e->xclient.data.l[0];
+
+				finished.xclient.type	      = ClientMessage;
+				finished.xclient.display      = display;
+				finished.xclient.window	      = sourceWnd;
+				finished.xclient.message_type = xdndFinishedAtom;
+				finished.xclient.format	      = 32;
+
+				finished.xclient.data.l[0]    = wnd;
+				finished.xclient.data.l[1]    = acceptDrop;
+				finished.xclient.data.l[2]    = xdndActionPrivateAtom;
+ 
+				XSendEvent(display, sourceWnd, 0, 0, &finished);
+				XFlush(display);
+			}
+
+			/* Clean up after XdndDrop or on XdndLeave message.
+			 */
+			if (e->xclient.message_type == xdndDropAtom ||
+			    e->xclient.message_type == xdndLeaveAtom)
+			{
+				xdndTimeStamp = 0;
+				acceptDrop    = False;
 			}
 
 			break;
@@ -590,6 +731,19 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Size &size, Int iFlags)
 {
+	static Atom	 wmDeleteWindowAtom    = XInternAtom(display, "WM_DELETE_WINDOW", False);
+
+	static Atom	 wmPingAtom	       = XInternAtom(display, "_NET_WM_PING", False);
+	static Atom	 wmIconAtom	       = XInternAtom(display, "_NET_WM_ICON", False);
+
+	static Atom	 windowStateAtom       = XInternAtom(display, "_NET_WM_STATE", False);
+	static Atom	 windowStateModalAtom  = XInternAtom(display, "_NET_WM_STATE_MODAL", False);
+
+	static Atom	 windowTypeAtom	       = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
+	static Atom	 windowTypeNormalAtom  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
+	static Atom	 windowTypeDialogAtom  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+	static Atom	 windowTypeUtilityAtom = XInternAtom(display, "_NET_WM_WINDOW_TYPE_UTILITY", False);
+
 	flags = iFlags;
 
 	XSetWindowAttributes	 attributes;
@@ -628,8 +782,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 		/* Opt in to the WM_DELETE_WINDOW and _NET_WM_PING protocols.
 		 */
-		Atom	 protocols[2] = { XInternAtom(display, "WM_DELETE_WINDOW", False),
-					  XInternAtom(display, "_NET_WM_PING", False) };
+		Atom	 protocols[2] = { wmDeleteWindowAtom, wmPingAtom };
 
 		XSetWMProtocols(display, wnd, protocols, 2);
 
@@ -657,9 +810,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		 */
 		if (sysIcon != NIL)
 		{
-			Atom	 iconAtom = XInternAtom(display, "_NET_WM_ICON", False);
-
-			XChangeProperty(display, wnd, iconAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *) sysIcon, sysIconSize);
+			XChangeProperty(display, wnd, wmIconAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *) sysIcon, sysIconSize);
 		}
 
 		/* Set minimum and maximum size.
@@ -674,15 +825,6 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 		/* Configure window type.
 		 */
-		Atom	 windowTypeAtom	       = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
-		Atom	 windowStateAtom       = XInternAtom(display, "_NET_WM_STATE", False);
-
-		Atom	 windowTypeNormalAtom  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
-		Atom	 windowTypeDialogAtom  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
-		Atom	 windowTypeUtilityAtom = XInternAtom(display, "_NET_WM_WINDOW_TYPE_UTILITY", False);
-
-		Atom	 windowStateModalAtom  = XInternAtom(display, "_NET_WM_STATE_MODAL", False);
-
 		if ((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER))
 		{
 			XChangeProperty(display, wnd, windowTypeAtom, XA_ATOM, 32, PropModeReplace, (unsigned char *) &windowTypeUtilityAtom, 1);
@@ -709,6 +851,10 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 			if	(parent != NIL) XSetTransientForHint(display, wnd, (::Window) parent->GetSystemWindow());
 			else if (leader != NIL) XSetTransientForHint(display, wnd, leader->wnd);
 		}
+
+		/* Enable dropping files if requested.
+		 */
+		if (enableDropFiles) EnableDropFiles(True);
 
 		return Success();
 	}
@@ -783,10 +929,13 @@ S::Int S::GUI::WindowXLib::SetTitle(const String &nTitle)
 {
 	if (wnd == NIL) return Error();
 
+	static Atom	 wmNameAtom	= XInternAtom(display, "_NET_WM_NAME", False);
+	static Atom	 wmIconNameAtom = XInternAtom(display, "_NET_WM_ICON_NAME", False);
+
 	XTextProperty	 titleProp;
 	XTextProperty	 titlePropUTF8;
 
-	const char	*title = nTitle.ConvertTo("ISO-8859-1");
+	const char	*title	   = nTitle.ConvertTo("ISO-8859-1");
 	const char	*titleUTF8 = nTitle.ConvertTo("UTF-8");
 
 	/* Set ISO encoded window name.
@@ -803,8 +952,8 @@ S::Int S::GUI::WindowXLib::SetTitle(const String &nTitle)
 	 */
 	if (Xutf8TextListToTextProperty(display, (char **) &titleUTF8, 1, XUTF8StringStyle, &titlePropUTF8) == 0)
 	{
-		XSetTextProperty(display, wnd, &titlePropUTF8, XInternAtom(display, "_NET_WM_NAME", False));
-		XSetTextProperty(display, wnd, &titlePropUTF8, XInternAtom(display, "_NET_WM_ICON_NAME", False));
+		XSetTextProperty(display, wnd, &titlePropUTF8, wmNameAtom);
+		XSetTextProperty(display, wnd, &titlePropUTF8, wmIconNameAtom);
 
 		XFree(titlePropUTF8.value);
 	}
@@ -852,6 +1001,92 @@ S::Int S::GUI::WindowXLib::SetIcon(const Bitmap &newIcon)
 	XDestroyImage(image);
 
 	return Success();
+}
+
+S::Int S::GUI::WindowXLib::EnableDropFiles(Bool nEnableDropFiles)
+{
+	enableDropFiles = nEnableDropFiles;
+
+	if (wnd == NIL) return Success();
+
+	static Atom	 xdndAwareAtom = XInternAtom(display, "XdndAware", False);
+
+	Int32	 xdndVersion = 5;
+
+	if (enableDropFiles) XChangeProperty(display, wnd, xdndAwareAtom, XA_ATOM, 32, PropModeReplace, (unsigned char *) &xdndVersion, 1);
+	else		     XDeleteProperty(display, wnd, xdndAwareAtom);
+
+	return Success();
+}
+
+const S::Array<S::String> &S::GUI::WindowXLib::GetDroppedFiles() const
+{
+	if (xdndTimeStamp == 0) return WindowBackend::GetDroppedFiles();
+
+	static Atom	 mimeURIListAtom   = XInternAtom(display, "text/uri-list", False);
+
+	static Atom	 xdndSelectionAtom = XInternAtom(display, "XdndSelection", False);
+
+	static Array<String>	 fileNames;
+
+	fileNames.RemoveAll();
+
+	XConvertSelection(display, xdndSelectionAtom, mimeURIListAtom, XA_PRIMARY, wnd, xdndTimeStamp);
+	XFlush(display);
+
+	/* Wait for SelectionNotify event to be sent.
+	 */
+	XEvent	 event;
+
+	do
+	{
+		XNextEvent(display, &event);
+
+		WindowXLib	*backend = GUI::WindowXLib::GetWindowBackend(event.xany.window);
+
+		if (backend != NIL) backend->ProcessSystemMessages(&event);
+	}
+	while (event.type != SelectionNotify);
+
+	Atom		 type;
+	int		 format;
+	unsigned long	 items, bytes;
+	unsigned char	*data = NIL;
+
+	/* Do not get any data yet, see how much data is there.
+	 */
+	if (XGetWindowProperty(display, wnd, XA_PRIMARY, 0, 0, 0, AnyPropertyType, &type, &format, &items, &bytes, &data) == 0)
+	{
+		XFree(data);
+
+		/* Data is there!
+		 */
+		if (bytes > 0) XGetWindowProperty(display, wnd, XA_PRIMARY, 0, bytes, 0, AnyPropertyType, &type, &format, &items, &bytes, &data);
+	}
+
+	/* Query data.
+	 */
+	IO::InStream	 in(IO::STREAM_BUFFER, data, strlen((char *) data));
+
+	while (in.GetPos() < in.Size())
+	{
+		String	 line = in.InputLine();
+
+		if (line.StartsWith("#")) continue;
+
+		if (line.StartsWith("file://"))
+		{
+			String	 host = line.SubString(7, line.Tail(line.Length() - 7).Find("/"));
+
+			fileNames.Add(Encoding::URLEncode::Decode(line.Tail(line.Length() - 7 - host.Length())));
+		}
+	}
+
+	in.Close();
+
+	XFree(data);
+
+	return fileNames;
 }
 
 S::Int S::GUI::WindowXLib::SetMinimumSize(const Size &nMinSize)

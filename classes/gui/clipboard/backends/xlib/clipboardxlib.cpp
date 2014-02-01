@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -57,7 +57,7 @@ unsigned char *S::GUI::ClipboardXLib::QueryAtom(Display *display, ::Window self,
 	unsigned long	 items, bytes;
 	unsigned char	*data = NIL;
 
-	/* Do not get any data, see how much data is there.
+	/* Do not get any data yet, see how much data is there.
 	 */
 	if (XGetWindowProperty(display, self, atom, 0, 0, 0, AnyPropertyType, &type, &format, &items, &bytes, &data) == 0)
 	{

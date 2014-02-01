@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -233,10 +233,12 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			if (doClose.Call()) Close();
 
 			return Break;
+
 		case B_WINDOW_CREATED:
 			onCreate.Emit();
 
 			return Break;
+
 		case B_WINDOW_DESTROYED:
 			onDestroy.Emit();
 
@@ -270,10 +272,12 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 		 */
 		case B_MOUSE_MOVED:
 			return onEvent.Call(SM_MOUSEMOVE, 0, 0);
+
 		case B_MOUSE_WHEEL_CHANGED:
 			currentMessage.FindFloat("be:wheel_delta_y", &amount);
 
 			return onEvent.Call(SM_MOUSEWHEEL, amount * -120.0, 0);
+
 		case B_MOUSE_DOWN:
 			currentMessage.FindInt32("buttons", &buttons);
 			currentMessage.FindInt32("clicks", &clicks);
@@ -290,6 +294,7 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			}
 
 			break;
+
 		case B_MOUSE_UP:
 			if	(buttons == B_PRIMARY_MOUSE_BUTTON)   onEvent.Call(SM_LBUTTONUP, 0, 0);
 			else if (buttons == B_SECONDARY_MOUSE_BUTTON) onEvent.Call(SM_RBUTTONUP, 0, 0);
@@ -314,6 +319,7 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			}
 
 			break;
+
 		case B_KEY_UP:
 			currentMessage.FindString("bytes", &bytes);
 
@@ -364,6 +370,7 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			}
 
 			break;
+
 		case B_WINDOW_MOVED:
 			{
 				BRect	 windowRect = wnd->Frame();
@@ -373,10 +380,12 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			}
 
 			return Success();
+
 		case B_WINDOW_ACTIVATED:
 			onEvent.Call(SM_GETFOCUS, 0, 0);
 
 			break;
+
 		case B_WINDOW_DEACTIVATED:
 			Input::Keyboard::ResetKeyState();
 

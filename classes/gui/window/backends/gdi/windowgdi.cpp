@@ -222,14 +222,17 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			if (doClose.Call()) Close();
 
 			return Break;
+
 		case WM_CREATE:
 			onCreate.Emit();
 
 			return Break;
+
 		case WM_DESTROY:
 			onDestroy.Emit();
 
 			return Break;
+
 		case WM_ACTIVATE:
 			if (LOWORD(wParam) == WA_INACTIVE)
 			{
@@ -247,6 +250,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			return Break;
+
 		case WM_ACTIVATEAPP:
 			if (wParam == True && !IsWindowEnabled(hwnd))
 			{
@@ -266,6 +270,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			break;
+
 		case WM_SIZE:
 			if (!minimized && wParam == SIZE_MINIMIZED)
 			{
@@ -281,6 +286,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			break;
+
 		case WM_SETTINGCHANGE:
 			if ((wParam == SPI_SETWORKAREA) && maximized)
 			{
@@ -290,6 +296,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			return Break;
+
 		case WM_GETMINMAXINFO:
 			{
 				RECT		 windowRect;
@@ -320,14 +327,17 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			}
 
 			return Break;
+
 		case WM_SYSCOLORCHANGE:
 			GetColors();
 
 			break;
+
 		case WM_IME_STARTCOMPOSITION:
 			if (activeCursor != NIL) activeCursor->SetIMECursor(True);
 
 			break;
+
 		case WM_IME_ENDCOMPOSITION:
 			if (activeCursor != NIL) activeCursor->SetIMECursor(False);
 

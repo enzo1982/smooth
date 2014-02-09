@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -107,6 +107,9 @@ S::Int S::GUI::Tooltip::Hide()
 
 		if (layer != NIL) toolWindow->Remove(layer);
 
+		toolWindow->onPaint.Disconnect(&Tooltip::OnToolWindowPaint, this);
+		toolWindow->onEvent.Disconnect(&Tooltip::OnToolWindowEvent, this);
+
 		DeleteObject(toolWindow);
 
 		toolWindow = NIL;
@@ -139,6 +142,8 @@ S::Void S::GUI::Tooltip::OnToolWindowEvent(Int message, Int wParam, Int lParam)
 
 	forwarding = True;
 
+	EnterProtectedRegion();
+
 	switch (message)
 	{
 		case SM_MOUSEWHEEL:
@@ -149,6 +154,8 @@ S::Void S::GUI::Tooltip::OnToolWindowEvent(Int message, Int wParam, Int lParam)
 
 			break;
 	}
+
+	LeaveProtectedRegion();
 
 	forwarding = False;
 }

@@ -1017,7 +1017,8 @@ S::Int S::GUI::WindowCocoa::Close()
 
 	/* Stop active loop after the window is closed.
 	 */
-	if (Window::nOfActiveWindows == 0 || flags & WF_MODAL) [NSApp stop: nil];
+	if	(flags & WF_MODAL)		[NSApp abortModal];
+	else if (Window::nOfActiveWindows == 0) [NSApp stop: nil];
 
 	return Success();
 }

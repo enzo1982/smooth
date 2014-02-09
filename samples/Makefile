@@ -2,7 +2,6 @@
 
 all:
 	cd beatclock && $(MAKE)
-	cd mditest && $(MAKE)
 	cd test && $(MAKE)
 	cd testkey && $(MAKE)
 ifeq ($(BUILD_WIN32),True)
@@ -13,7 +12,6 @@ endif
 
 clean:
 	cd beatclock && $(MAKE) clean
-	cd mditest && $(MAKE) clean
 	cd test && $(MAKE) clean
 	cd testkey && $(MAKE) clean
 ifeq ($(BUILD_WIN32),True)

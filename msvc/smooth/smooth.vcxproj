@@ -328,8 +328,6 @@
     <ClCompile Include="..\..\classes\gui\widgets\special\droparea.cpp" />
     <ClCompile Include="..\..\classes\gui\widgets\special\shortcut.cpp" />
     <ClCompile Include="..\..\classes\gui\widgets\special\tooltip.cpp" />
-    <ClCompile Include="..\..\classes\gui\mdi\client.cpp" />
-    <ClCompile Include="..\..\classes\gui\mdi\window.cpp" />
     <ClCompile Include="..\..\classes\gui\window\backends\haiku\windowhaiku.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -407,6 +405,7 @@
     <ClCompile Include="..\..\classes\misc\binary.cpp" />
     <ClCompile Include="..\..\classes\misc\config.cpp" />
     <ClCompile Include="..\..\classes\misc\datetime.cpp" />
+    <ClCompile Include="..\..\classes\misc\encoding\urlencode.cpp" />
     <ClCompile Include="..\..\classes\misc\math.cpp" />
     <ClCompile Include="..\..\classes\misc\memory.cpp" />
     <ClCompile Include="..\..\classes\misc\number.cpp">
@@ -655,6 +654,7 @@
     <ClInclude Include="..\..\include\smooth\input\backends\xlib\pointerxlib.h" />
     <ClInclude Include="..\..\include\smooth\input\keyboard.h" />
     <ClInclude Include="..\..\include\smooth\main.h" />
+    <ClInclude Include="..\..\include\smooth\misc\encoding\urlencode.h" />
     <ClInclude Include="..\..\include\smooth\pciio.h" />
     <ClInclude Include="..\..\include\smooth\resources.h" />
     <ClInclude Include="..\..\include\smooth\system\backends\cocoa\eventcocoa.h" />
@@ -750,8 +750,6 @@
     <ClInclude Include="..\..\include\smooth\gui\window\backends\windowbackend.h" />
     <ClInclude Include="..\..\include\smooth\gui\window\backends\gdi\windowgdi.h" />
     <ClInclude Include="..\..\include\smooth\gui\window\backends\xlib\windowxlib.h" />
-    <ClInclude Include="..\..\include\smooth\gui\mdi\client.h" />
-    <ClInclude Include="..\..\include\smooth\gui\mdi\window.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\colordlg.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\dialog.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\fontdlg.h" />

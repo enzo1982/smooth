@@ -407,8 +407,9 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			else if (message == WM_MBUTTONDBLCLK || message == WM_NCMBUTTONDBLCLK) return onEvent.Call(SM_MBUTTONDBLCLK, 0, 0);
 
 		case WM_MOUSEWHEEL:
-			/* Update pointer position in Input::Pointer.
+			/* Update pointer position in Input::Pointer if this is not a tool window.
 			 */
+			if (!((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER)))
 			{
 				POINT	 point;
 
@@ -417,7 +418,15 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 				Input::Pointer::UpdatePosition(Window::GetWindow(hwnd), point.x, point.y);
 			}
 
-			return onEvent.Call(SM_MOUSEWHEEL, (short) HIWORD(wParam), 0);
+			/* Pass message to smooth window.
+			 */
+			onEvent.Call(SM_MOUSEWHEEL, (short) HIWORD(wParam), 0);
+
+			/* Send an event to update widget under cursor if necessary.
+			 */
+			onEvent.Call(SM_MOUSEMOVE, 0, 0);
+
+			return Success();
 
 		/* Keyboard messages:
 		 */

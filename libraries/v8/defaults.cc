@@ -25,65 +25,46 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "marking-thread.h"
+// The GYP based build ends up defining USING_V8_SHARED when compiling this
+// file.
+#undef USING_V8_SHARED
+#include "../include/v8-defaults.h"
 
+#include "platform.h"
+#include "globals.h"
 #include "v8.h"
 
-#include "isolate.h"
-#include "v8threads.h"
-
 namespace v8 {
-namespace internal {
-
-MarkingThread::MarkingThread(Isolate* isolate)
-     : Thread("MarkingThread"),
-       isolate_(isolate),
-       heap_(isolate->heap()),
-       start_marking_semaphore_(OS::CreateSemaphore(0)),
-       end_marking_semaphore_(OS::CreateSemaphore(0)),
-       stop_semaphore_(OS::CreateSemaphore(0)) {
-  NoBarrier_Store(&stop_thread_, static_cast<AtomicWord>(false));
-  id_ = NoBarrier_AtomicIncrement(&id_counter_, 1);
-}
 
 
-Atomic32 MarkingThread::id_counter_ = -1;
-
-
-void MarkingThread::Run() {
-  Isolate::SetIsolateThreadLocals(isolate_, NULL);
-  DisallowHeapAllocation no_allocation;
-  DisallowHandleAllocation no_handles;
-  DisallowHandleDereference no_deref;
-
-  while (true) {
-    start_marking_semaphore_->Wait();
-
-    if (Acquire_Load(&stop_thread_)) {
-      stop_semaphore_->Signal();
-      return;
-    }
-
-    end_marking_semaphore_->Signal();
+bool ConfigureResourceConstraintsForCurrentPlatform(
+    ResourceConstraints* constraints) {
+  if (constraints == NULL) {
+    return false;
   }
+
+  int lump_of_memory = (i::kPointerSize / 4) * i::MB;
+
+  // The young_space_size should be a power of 2 and old_generation_size should
+  // be a multiple of Page::kPageSize.
+#if V8_OS_ANDROID
+  constraints->set_max_young_space_size(8 * lump_of_memory);
+  constraints->set_max_old_space_size(256 * lump_of_memory);
+  constraints->set_max_executable_size(192 * lump_of_memory);
+#else
+  constraints->set_max_young_space_size(16 * lump_of_memory);
+  constraints->set_max_old_space_size(700 * lump_of_memory);
+  constraints->set_max_executable_size(256 * lump_of_memory);
+#endif
+  return true;
 }
 
 
-void MarkingThread::Stop() {
-  Release_Store(&stop_thread_, static_cast<AtomicWord>(true));
-  start_marking_semaphore_->Signal();
-  stop_semaphore_->Wait();
-  Join();
+bool SetDefaultResourceConstraintsForCurrentPlatform() {
+  ResourceConstraints constraints;
+  if (!ConfigureResourceConstraintsForCurrentPlatform(&constraints))
+    return false;
+  return SetResourceConstraints(&constraints);
 }
 
-
-void MarkingThread::StartMarking() {
-  start_marking_semaphore_->Signal();
-}
-
-
-void MarkingThread::WaitForMarkingThread() {
-  end_marking_semaphore_->Wait();
-}
-
-} }  // namespace v8::internal
+}  // namespace v8

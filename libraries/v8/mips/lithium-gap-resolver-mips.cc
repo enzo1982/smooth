@@ -28,7 +28,7 @@
 #include "v8.h"
 
 #if V8_TARGET_ARCH_MIPS
- 
+
 #include "mips/lithium-gap-resolver-mips.h"
 #include "mips/lithium-codegen-mips.h"
 

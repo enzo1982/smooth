@@ -1,4 +1,4 @@
-// Copyright 2010 the V8 project authors. All rights reserved.
+// Copyright 2013 the V8 project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
@@ -25,15 +25,36 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <windows.h>
+'use strict';
 
-#include "../include/v8-preparser.h"
+// ES6 draft 09-27-13, section 20.2.2.28.
+function MathSign(x) {
+  x = TO_NUMBER_INLINE(x);
+  if (x > 0) return 1;
+  if (x < 0) return -1;
+  if (x === 0) return x;
+  return NAN;
+}
 
-extern "C" {
-BOOL WINAPI DllMain(HANDLE hinstDLL,
-                    DWORD dwReason,
-                    LPVOID lpvReserved) {
-  // Do nothing.
-  return TRUE;
+
+// ES6 draft 09-27-13, section 20.2.2.34.
+function MathTrunc(x) {
+  x = TO_NUMBER_INLINE(x);
+  if (x > 0) return MathFloor(x);
+  if (x < 0) return MathCeil(x);
+  if (x === 0) return x;
+  return NAN;
 }
+
+
+function ExtendMath() {
+  %CheckIsBootstrapping();
+
+  // Set up the non-enumerable functions on the Math object.
+  InstallFunctions($Math, DONT_ENUM, $Array(
+    "sign", MathSign,
+    "trunc", MathTrunc
+  ));
 }
+
+ExtendMath();

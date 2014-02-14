@@ -49,7 +49,6 @@
 
 #include "v8.h"
 
-#include "platform-posix.h"
 #include "platform.h"
 #include "v8threads.h"
 #include "vm-state-inl.h"
@@ -57,9 +56,6 @@
 
 namespace v8 {
 namespace internal {
-
-
-static Mutex* limit_mutex = NULL;
 
 
 const char* OS::LocalTimezone(double time) {
@@ -80,51 +76,20 @@ double OS::LocalTimeOffset() {
 }
 
 
-// We keep the lowest and highest addresses mapped as a quick way of
-// determining that pointers are outside the heap (used mostly in assertions
-// and verification).  The estimate is conservative, i.e., not all addresses in
-// 'allocated' space are actually allocated to our heap.  The range is
-// [lowest, highest), inclusive on the low and and exclusive on the high end.
-static void* lowest_ever_allocated = reinterpret_cast<void*>(-1);
-static void* highest_ever_allocated = reinterpret_cast<void*>(0);
-
-
-static void UpdateAllocatedSpaceLimits(void* address, int size) {
-  ASSERT(limit_mutex != NULL);
-  ScopedLock lock(limit_mutex);
-
-  lowest_ever_allocated = Min(lowest_ever_allocated, address);
-  highest_ever_allocated =
-      Max(highest_ever_allocated,
-          reinterpret_cast<void*>(reinterpret_cast<char*>(address) + size));
-}
-
-
-bool OS::IsOutsideAllocatedSpace(void* address) {
-  return address < lowest_ever_allocated || address >= highest_ever_allocated;
-}
-
-
 void* OS::Allocate(const size_t requested,
                    size_t* allocated,
                    bool is_executable) {
   const size_t msize = RoundUp(requested, AllocateAlignment());
   int prot = PROT_READ | PROT_WRITE | (is_executable ? PROT_EXEC : 0);
   void* addr = OS::GetRandomMmapAddr();
-  void* mbase = mmap(addr, msize, prot, MAP_PRIVATE | MAP_ANON, -1, 0);
+  void* mbase = mmap(addr, msize, prot, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if (mbase == MAP_FAILED) {
     LOG(i::Isolate::Current(),
         StringEvent("OS::Allocate", "mmap failed"));
     return NULL;
   }
   *allocated = msize;
-  UpdateAllocatedSpaceLimits(mbase, msize);
   return mbase;
-}
-
-
-void OS::DumpBacktrace() {
-  // Currently unsupported.
 }
 
 
@@ -176,7 +141,7 @@ PosixMemoryMappedFile::~PosixMemoryMappedFile() {
 }
 
 
-void OS::LogSharedLibraryAddresses() {
+void OS::LogSharedLibraryAddresses(Isolate* isolate) {
   // This function assumes that the layout of the file is as follows:
   // hex_start_addr-hex_end_addr rwxp <unused data> [binary_file_name]
   // If we encounter an unexpected situation we abort scanning further entries.
@@ -187,7 +152,6 @@ void OS::LogSharedLibraryAddresses() {
   const int kLibNameLen = FILENAME_MAX + 1;
   char* lib_name = reinterpret_cast<char*>(malloc(kLibNameLen));
 
-  i::Isolate* isolate = ISOLATE;
   // This loop will terminate once the scanning hits an EOF.
   while (true) {
     uintptr_t start, end;
@@ -259,11 +223,6 @@ void OS::SignalCodeMovingGC() {
 }
 
 
-int OS::StackWalk(Vector<OS::StackFrame> frames) {
-  // Not supported on QNX.
-  return 0;
-}
-
 
 // Constants used for mmap.
 static const int kMmapFd = -1;
@@ -285,7 +244,7 @@ VirtualMemory::VirtualMemory(size_t size, size_t alignment)
   void* reservation = mmap(OS::GetRandomMmapAddr(),
                            request_size,
                            PROT_NONE,
-                           MAP_PRIVATE | MAP_ANON,
+                           MAP_PRIVATE | MAP_ANONYMOUS | MAP_LAZY,
                            kMmapFd,
                            kMmapFdOffset);
   if (reservation == MAP_FAILED) return;
@@ -357,7 +316,7 @@ void* VirtualMemory::ReserveRegion(size_t size) {
   void* result = mmap(OS::GetRandomMmapAddr(),
                       size,
                       PROT_NONE,
-                      MAP_PRIVATE | MAP_ANON,
+                      MAP_PRIVATE | MAP_ANONYMOUS | MAP_LAZY,
                       kMmapFd,
                       kMmapFdOffset);
 
@@ -372,13 +331,11 @@ bool VirtualMemory::CommitRegion(void* base, size_t size, bool is_executable) {
   if (MAP_FAILED == mmap(base,
                          size,
                          prot,
-                         MAP_PRIVATE | MAP_ANON | MAP_FIXED,
+                         MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED,
                          kMmapFd,
                          kMmapFdOffset)) {
     return false;
   }
-
-  UpdateAllocatedSpaceLimits(base, size);
   return true;
 }
 
@@ -387,7 +344,7 @@ bool VirtualMemory::UncommitRegion(void* base, size_t size) {
   return mmap(base,
               size,
               PROT_NONE,
-              MAP_PRIVATE | MAP_ANON | MAP_FIXED,
+              MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED | MAP_LAZY,
               kMmapFd,
               kMmapFdOffset) != MAP_FAILED;
 }
@@ -402,88 +359,5 @@ bool VirtualMemory::HasLazyCommits() {
   // TODO(alph): implement for the platform.
   return false;
 }
-
-
-class OpenBSDSemaphore : public Semaphore {
- public:
-  explicit OpenBSDSemaphore(int count) {  sem_init(&sem_, 0, count); }
-  virtual ~OpenBSDSemaphore() { sem_destroy(&sem_); }
-
-  virtual void Wait();
-  virtual bool Wait(int timeout);
-  virtual void Signal() { sem_post(&sem_); }
- private:
-  sem_t sem_;
-};
-
-
-void OpenBSDSemaphore::Wait() {
-  while (true) {
-    int result = sem_wait(&sem_);
-    if (result == 0) return;  // Successfully got semaphore.
-    CHECK(result == -1 && errno == EINTR);  // Signal caused spurious wakeup.
-  }
-}
-
-
-#ifndef TIMEVAL_TO_TIMESPEC
-#define TIMEVAL_TO_TIMESPEC(tv, ts) do {                            \
-    (ts)->tv_sec = (tv)->tv_sec;                                    \
-    (ts)->tv_nsec = (tv)->tv_usec * 1000;                           \
-} while (false)
-#endif
-
-
-bool OpenBSDSemaphore::Wait(int timeout) {
-  const long kOneSecondMicros = 1000000;  // NOLINT
-
-  // Split timeout into second and nanosecond parts.
-  struct timeval delta;
-  delta.tv_usec = timeout % kOneSecondMicros;
-  delta.tv_sec = timeout / kOneSecondMicros;
-
-  struct timeval current_time;
-  // Get the current time.
-  if (gettimeofday(&current_time, NULL) == -1) {
-    return false;
-  }
-
-  // Calculate time for end of timeout.
-  struct timeval end_time;
-  timeradd(&current_time, &delta, &end_time);
-
-  struct timespec ts;
-  TIMEVAL_TO_TIMESPEC(&end_time, &ts);
-
-  int to = ts.tv_sec;
-
-  while (true) {
-    int result = sem_trywait(&sem_);
-    if (result == 0) return true;  // Successfully got semaphore.
-    if (!to) return false;  // Timeout.
-    CHECK(result == -1 && errno == EINTR);  // Signal caused spurious wakeup.
-    usleep(ts.tv_nsec / 1000);
-    to--;
-  }
-}
-
-
-Semaphore* OS::CreateSemaphore(int count) {
-  return new OpenBSDSemaphore(count);
-}
-
-
-void OS::SetUp() {
-  // Seed the random number generator. We preserve microsecond resolution.
-  uint64_t seed = Ticks() ^ (getpid() << 16);
-  srandom(static_cast<unsigned int>(seed));
-  limit_mutex = CreateMutex();
-}
-
-
-void OS::TearDown() {
-  delete limit_mutex;
-}
-
 
 } }  // namespace v8::internal

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,12 +33,12 @@ class StringItem : public ListEntry
 
 		Bool			 IsTypeCompatible(Short) const;
 	accessors:
-		Int			 GetID()					{ return id; }
+		Int			 GetID() const					{ return id; }
 
-		const String		&GetOriginal()					{ return original; }
+		const String		&GetOriginal() const				{ return original; }
 		Void			 SetOriginal(const String &nOriginal)		{ original = nOriginal; UpdateText(); }
 
-		const String		&GetTranslation()				{ return translation; }
+		const String		&GetTranslation() const				{ return translation; }
 		Void			 SetTranslation(const String &nTranslation)	{ translation = nTranslation; UpdateText(); }
 };
 

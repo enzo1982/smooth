@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -129,6 +129,49 @@ Bool Section::Save(XML::Node *xmlSection, const String &templateName)
 
 		section->Save(node, templateName);
 	}
+
+	return True;
+}
+
+Bool Section::Filter(const String &string, List *list_filtered)
+{
+	for (Int i = 0; i < list->Length(); i++)
+	{
+		const ListEntry	*entry = list->GetNthEntry(i);
+
+		if (entry->GetObjectType() == Tree::classID)
+		{
+			Tree	*tree	 = new Tree(entry->GetText());
+
+			sections.Get(entry->GetText().ComputeCRC32())->Filter(string, tree->GetList());
+
+			if (tree->Length() > 0)
+			{
+				tree->Open();
+				list_filtered->Add(tree);
+			}
+			else
+			{
+				delete tree;
+			}
+		}
+		else if (entry->GetObjectType() == StringItem::classID && entry->GetText().ToLower().Find(string) >= 0)
+		{
+			StringItem	*item = new StringItem(((StringItem *) entry)->GetID(),
+							       ((StringItem *) entry)->GetOriginal(),
+							       ((StringItem *) entry)->GetTranslation());
+
+			item->SetFont(entry->GetFont());
+
+			list_filtered->Add(item);
+		}
+	}
+
+	/* OnSelectEntry may already be connected if we parsed a template
+	 * before, so try to disconnect before actually connecting it.
+	 */
+	list_filtered->onSelectEntry.Disconnect(&Section::OnSelectEntry, this);
+	list_filtered->onSelectEntry.Connect(&Section::OnSelectEntry, this);
 
 	return True;
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,6 +31,13 @@ class Translator : public Application
 		PopupMenu		*menu_file;
 		PopupMenu		*menu_entry;
 
+		Text			*text_filter;
+		EditBox			*edit_filter;
+		Button			*button_clear;
+
+		ListBox			*list_entries;
+		ListBox			*list_filtered;
+
 		Button			*button_new;
 		Text			*text_id;
 		EditBox			*edit_id;
@@ -40,7 +47,6 @@ class Translator : public Application
 		MultiEdit		*edit_translated;
 		Button			*button_save;
 		Button			*button_remove;
-		ListBox			*list_entries;
 
 		String			 fileName;
 		String			 templateName;
@@ -63,11 +69,17 @@ class Translator : public Application
 
 		Void			 ReplaceLineEndings(const String &);
 		Void			 FormatLines(const String &);
+
+		ListEntry		*GetSelectedEntry(List *);
+		List			*GetEntryList(List *, Int);
 	slots:
 		Void			 NewEntry();
 		Void			 SaveData();
 		Void			 RemoveEntry();
 		Void			 SelectEntry(ListEntry *);
+		Void			 FilterEntries();
+		Void			 ClearFilter();
+		Void			 ClearFilter(List *);
 
 		Void			 NewFile();
 		Void			 OpenFile();

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,19 +37,38 @@ Translator::Translator(const String &openFile)
 	fileName = NIL;
 	templateName = NIL;
 
-	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 450));
+	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 480));
 	title		= new Titlebar();
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
 
 	Section::onSelectItem.Connect(&Translator::SelectEntry, this);
 
-	list_entries	= new ListBox(Point(7, 7), Size(757, 191));
+	text_filter	= new Text("Filter:", Point(377, 10));
+	text_filter->SetOrientation(OR_UPPERRIGHT);
+
+	edit_filter	= new EditBox(NIL, Point(345, 7), Size(250, 0), 0);
+	edit_filter->onInput.Connect(&Translator::FilterEntries, this);
+	edit_filter->SetOrientation(OR_UPPERRIGHT);
+
+	button_clear	= new Button("Clear", NIL, Point(87, 6), Size());
+	button_clear->onAction.Connect(&Translator::ClearFilter, this);
+	button_clear->SetOrientation(OR_UPPERRIGHT);
+
+	list_entries	= new ListBox(Point(7, 34), Size(757, 161));
 	list_entries->onSelectEntry.Connect(&Translator::SelectEntry, this);
 	list_entries->SetFlags(LF_ALLOWRESELECT);
 	list_entries->AddTab("ID", 80);
 	list_entries->AddTab("String");
 	list_entries->AddTab("Translation");
+
+	list_filtered	= new ListBox(Point(7, 34), Size(757, 161));
+	list_filtered->onSelectEntry.Connect(&Translator::SelectEntry, this);
+	list_filtered->SetFlags(LF_ALLOWRESELECT);
+	list_filtered->AddTab("ID", 80);
+	list_filtered->AddTab("String");
+	list_filtered->AddTab("Translation");
+	list_filtered->Hide();
 
 	button_new	= new Button("New", NIL, Point(7, 164), Size());
 	button_new->onAction.Connect(&Translator::NewEntry, this);
@@ -148,8 +167,18 @@ Translator::Translator(const String &openFile)
 	button_remove->Deactivate();
 	button_new->Deactivate();
 	list_entries->Deactivate();
+	text_filter->Deactivate();
+	edit_filter->Deactivate();
+	button_clear->Deactivate();
 
 	Add(wnd);
+
+	wnd->Add(text_filter);
+	wnd->Add(edit_filter);
+	wnd->Add(button_clear);
+
+	wnd->Add(list_entries);
+	wnd->Add(list_filtered);
 
 	wnd->Add(text_id);
 	wnd->Add(edit_id);
@@ -160,7 +189,7 @@ Translator::Translator(const String &openFile)
 	wnd->Add(button_save);
 	wnd->Add(button_remove);
 	wnd->Add(button_new);
-	wnd->Add(list_entries);
+
 	wnd->Add(title);
 	wnd->Add(menubar);
 	wnd->Add(statusbar);
@@ -193,6 +222,14 @@ Translator::~Translator()
 	DeleteObject(menu_file);
 	DeleteObject(menu_entry);
 	DeleteObject(statusbar);
+
+	DeleteObject(text_filter);
+	DeleteObject(edit_filter);
+	DeleteObject(button_clear);
+
+	DeleteObject(list_entries);
+	DeleteObject(list_filtered);
+
 	DeleteObject(text_id);
 	DeleteObject(edit_id);
 	DeleteObject(text_original);
@@ -202,7 +239,6 @@ Translator::~Translator()
 	DeleteObject(button_save);
 	DeleteObject(button_remove);
 	DeleteObject(button_new);
-	DeleteObject(list_entries);
 }
 
 String Translator::GetShortFileName(const String &fileName)
@@ -247,7 +283,8 @@ Void Translator::ResizeProc()
 	Rect	 clientRect = wnd->GetClientRect();
 	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
-	list_entries->SetSize(Size(clientSize.cx - 14, clientSize.cy - 178));
+	list_entries->SetSize(Size(clientSize.cx - 14, clientSize.cy - 205));
+	list_filtered->SetSize(Size(clientSize.cx - 14, clientSize.cy - 205));
 
 	edit_original->SetWidth(clientSize.cx - 163);
 	edit_translated->SetWidth(clientSize.cx - 163);
@@ -272,6 +309,8 @@ Void Translator::NewFile()
 	button_remove->Activate();
 	button_new->Activate();
 	list_entries->Activate();
+	text_filter->Activate();
+	edit_filter->Activate();
 
 	menu_file->GetNthEntry(1)->Activate();
 	menu_file->GetNthEntry(4)->Activate();
@@ -349,7 +388,7 @@ Void Translator::NewFile()
 		entries.Add(entry, -7);
 	}
 
-	wnd->SetText(String(wnd->GetText()).Append(" - unnamed"));
+	wnd->SetText(wnd->GetText().Append(" - unnamed"));
 
 	list_entries->SelectNthEntry(0);
 
@@ -370,6 +409,8 @@ Void Translator::CloseFile()
 
 	wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION));
 
+	ClearFilter(list_filtered);
+
 	list_entries->RemoveAllEntries();
 
 	for (Int i = 0; i < numInfoItems;	     i++) DeleteObject(entries.GetNth(i));
@@ -380,23 +421,12 @@ Void Translator::CloseFile()
 
 	delete dataSection;
 
-	text_original->SetText("Original:");
-	text_translated->SetText("Translation:");
+	SelectEntry(NIL);
 
-	edit_id->SetText(NIL);
-	edit_original->SetText(NIL);
-	edit_translated->SetText(NIL);
-
-	text_id->Deactivate();
-	edit_id->Deactivate();
-	text_original->Deactivate();
-	edit_original->Deactivate();
-	text_translated->Deactivate();
-	edit_translated->Deactivate();
-	button_save->Deactivate();
-	button_remove->Deactivate();
 	button_new->Deactivate();
 	list_entries->Deactivate();
+	text_filter->Deactivate();
+	edit_filter->Deactivate();
 
 	menu_file->GetNthEntry(1)->Deactivate();
 	menu_file->GetNthEntry(4)->Deactivate();
@@ -460,16 +490,16 @@ Void Translator::OpenFileName(const String &openFile)
 		String		 property = info->GetNthNode(k)->GetAttributeByName("name")->GetContent();
 		InfoItem	*entry = NULL;
 
-		if	(property == "program")		entry = (InfoItem *) entries.GetNth(0);
-		else if (property == "version")		entry = (InfoItem *) entries.GetNth(1);
-		else if (property == "language")	entry = (InfoItem *) entries.GetNth(2);
-		else if (property == "righttoleft")	entry = (InfoItem *) entries.GetNth(3);
+		if	(property == "program")	    entry = (InfoItem *) entries.GetNth(0);
+		else if (property == "version")	    entry = (InfoItem *) entries.GetNth(1);
+		else if (property == "language")    entry = (InfoItem *) entries.GetNth(2);
+		else if (property == "righttoleft") entry = (InfoItem *) entries.GetNth(3);
 
 		else if (property == "template")
 		{
 			templateName = info->GetNthNode(k)->GetContent();
 
-			if (OpenTemplate(String(File(fileName).GetFilePath()).Append(Directory::GetDirectoryDelimiter()).Append(templateName)) != Success())
+			if (OpenTemplate(File(fileName).GetFilePath().Append(Directory::GetDirectoryDelimiter()).Append(templateName)) != Success())
 			{
 				templateName = NIL;
 			}
@@ -477,8 +507,8 @@ Void Translator::OpenFileName(const String &openFile)
 			entry = (InfoItem *) entries.GetNth(4);
 		}
 
-		else if (property == "author")		entry = (InfoItem *) entries.GetNth(5);
-		else if (property == "url")		entry = (InfoItem *) entries.GetNth(6);
+		else if (property == "author")	    entry = (InfoItem *) entries.GetNth(5);
+		else if (property == "url")	    entry = (InfoItem *) entries.GetNth(6);
 
 		if (entry != NIL)
 		{
@@ -649,13 +679,13 @@ Void Translator::SaveData()
 	{
 		Int	 index = -1;
 
-		if	(edit_original->GetText() == "Program")		index = 0;
-		else if (edit_original->GetText() == "Version")		index = 1;
-		else if (edit_original->GetText() == "Language")	index = 2;
-		else if (edit_original->GetText() == "RightToLeft")	index = 3;
-		else if (edit_original->GetText() == "Template")	index = 4;
-		else if (edit_original->GetText() == "Author")		index = 5;
-		else if (edit_original->GetText() == "URL")		index = 6;
+		if	(edit_original->GetText() == "Program")	    index = 0;
+		else if (edit_original->GetText() == "Version")	    index = 1;
+		else if (edit_original->GetText() == "Language")    index = 2;
+		else if (edit_original->GetText() == "RightToLeft") index = 3;
+		else if (edit_original->GetText() == "Template")    index = 4;
+		else if (edit_original->GetText() == "Author")	    index = 5;
+		else if (edit_original->GetText() == "URL")	    index = 6;
 
 		if (index >= 0)
 		{
@@ -730,33 +760,59 @@ Void Translator::SaveData()
 
 		redFont.SetColor(Color(255, 0, 0));
 
-		if (entry->GetTranslation() == NIL)	entry->SetFont(redFont);
-		else					entry->SetFont(blackFont);
+		if (entry->GetTranslation() == NIL) entry->SetFont(redFont);
+		else				    entry->SetFont(blackFont);
 
-		entry = (StringItem *) entries.GetNext();
-
-		if (entry != NIL)
+		/* Select next entry if no filter is active.
+		 */
+		if (edit_filter->GetText() == NIL)
 		{
-			entry->Select();
-		}
-		else
-		{
-			edit_id->SetText(String::FromInt(edit_id->GetText().ToInt() + 1));
-			edit_original->SetText(NIL);
-			edit_translated->SetText(NIL);
+			entry = (StringItem *) entries.GetNext();
 
-			edit_translated->MarkAll();
+			if (entry != NIL)
+			{
+				entry->Select();
+			}
+			else
+			{
+				edit_id->SetText(String::FromInt(edit_id->GetText().ToInt() + 1));
+				edit_original->SetText(NIL);
+				edit_translated->SetText(NIL);
+
+				edit_translated->MarkAll();
+			}
 		}
 	}
+
+	if (edit_filter->GetText() != NIL) FilterEntries();
 
 	modified = True;
 }
 
 Void Translator::SelectEntry(ListEntry *entry)
 {
-	if (entry == NIL) return;
+	if (entry == NIL)
+	{
+		edit_id->SetText(NIL);
+		edit_original->SetText(NIL);
+		edit_translated->SetText(NIL);
 
-	if (entry->GetObjectType() == InfoItem::classID)
+		text_id->Deactivate();
+		edit_id->Deactivate();
+		text_original->Deactivate();
+		edit_original->Deactivate();
+		text_translated->Deactivate();
+		edit_translated->Deactivate();
+		button_save->Deactivate();
+		button_remove->Deactivate();
+
+		menu_entry->GetNthEntry(2)->Deactivate();
+		menu_entry->GetNthEntry(3)->Deactivate();
+
+		text_original->SetText("Original:");
+		text_translated->SetText("Translation:");
+	}
+	else if (entry->GetObjectType() == InfoItem::classID)
 	{
 		edit_id->SetText(NIL);
 		edit_original->SetText(((InfoItem *) entry)->GetName());
@@ -764,32 +820,44 @@ Void Translator::SelectEntry(ListEntry *entry)
 
 		text_id->Deactivate();
 		edit_id->Deactivate();
+		text_original->Activate();
 		edit_original->Deactivate();
+		text_translated->Activate();
+		edit_translated->Activate();
+		button_save->Activate();
 		button_remove->Deactivate();
 
+		menu_entry->GetNthEntry(2)->Activate();
 		menu_entry->GetNthEntry(3)->Deactivate();
 
 		text_original->SetText("Field:");
 		text_translated->SetText("Value:");
+
+		edit_translated->MarkAll();
 	}
 	else
 	{
+		edit_id->SetText(String::FromInt(((StringItem *) entry)->GetID()));
+		edit_original->SetText(((StringItem *) entry)->GetOriginal());
+		edit_translated->SetText(((StringItem *) entry)->GetTranslation());
+
 		text_id->Activate();
 		edit_id->Activate();
+		text_original->Activate();
 		edit_original->Activate();
+		text_translated->Activate();
+		edit_translated->Activate();
+		button_save->Activate();
 		button_remove->Activate();
 
+		menu_entry->GetNthEntry(2)->Activate();
 		menu_entry->GetNthEntry(3)->Activate();
 
 		text_original->SetText("Original:");
 		text_translated->SetText("Translation:");
 
-		edit_id->SetText(String::FromInt(((StringItem *) entry)->GetID()));
-		edit_original->SetText(((StringItem *) entry)->GetOriginal());
-		edit_translated->SetText(((StringItem *) entry)->GetTranslation());
+		edit_translated->MarkAll();
 	}
-
-	edit_translated->MarkAll();
 }
 
 Void Translator::NewEntry()
@@ -805,9 +873,14 @@ Void Translator::NewEntry()
 
 	text_id->Activate();
 	edit_id->Activate();
+	text_original->Activate();
 	edit_original->Activate();
+	text_translated->Activate();
+	edit_translated->Activate();
+	button_save->Activate();
 	button_remove->Activate();
 
+	menu_entry->GetNthEntry(2)->Activate();
 	menu_entry->GetNthEntry(3)->Activate();
 
 	text_original->SetText("Original:");
@@ -822,12 +895,27 @@ Void Translator::NewEntry()
 
 Void Translator::RemoveEntry()
 {
-	StringItem	*entry = (StringItem *) list_entries->GetSelectedEntry();
-	Int		 id    = entry->GetID();
+	/* Get selected entry.
+	 */
+	StringItem	*entry = NIL;
 
+	if (edit_filter->GetText() == NIL) entry = (StringItem *) GetSelectedEntry(list_entries);
+	else				   entry = (StringItem *) GetSelectedEntry(list_filtered);
+
+	if (entry == NIL) return;
+
+	/* Find list corresponding to selected entry.
+	 */
+	Int	 id   = entry->GetID();
+	List	*list = GetEntryList(list_entries, id);
+
+	entry = (StringItem *) entries.Get(id);
+
+	/* Remove entry.
+	 */
 	entries.Remove(id);
 
-	list_entries->Remove(entry);
+	list->Remove(entry);
 
 	if (createdEntries.Get(id) != NIL)
 	{
@@ -836,8 +924,126 @@ Void Translator::RemoveEntry()
 		createdEntries.Remove(id);
 	}
 
-	edit_original->SetText(NIL);
-	edit_translated->SetText(NIL);
+	SelectEntry(NIL);
+
+	if (edit_filter->GetText() != NIL) FilterEntries();
+	else				   list_entries->Paint(SP_PAINT);
 
 	modified = True;
+}
+
+ListEntry *Translator::GetSelectedEntry(List *list)
+{
+	/* Recursively search for the list with the selected entry.
+	 */
+	for (Int i = list->Length() - 1; i >= 0; i--)
+	{
+		ListEntry	*entry = list->GetNthEntry(i);
+
+		if (entry->GetObjectType() == Tree::classID)
+		{
+			ListEntry	*selected = GetSelectedEntry(((Tree *) entry)->GetList());
+
+			if (selected != NIL) return selected;
+		}
+		else if (entry->IsSelected())
+		{
+			return entry;
+		}
+	}
+
+	return NIL;
+}
+
+List *Translator::GetEntryList(List *list, Int id)
+{
+	/* Recursively search for the list with the requested entry.
+	 */
+	for (Int i = list->Length() - 1; i >= 0; i--)
+	{
+		ListEntry	*entry = list->GetNthEntry(i);
+
+		if (entry->GetObjectType() == Tree::classID)
+		{
+			List	*selected = GetEntryList(((Tree *) entry)->GetList(), id);
+
+			if (selected != NIL) return selected;
+		}
+		else if (entry->GetObjectType() == StringItem::classID)
+		{
+			if (((StringItem *) entry)->GetID() == id) return list;
+		}
+	}
+
+	return NIL;
+}
+
+Void Translator::FilterEntries()
+{
+	/* Clean up if filter text is empty.
+	 */
+	if (edit_filter->GetText() == NIL)
+	{
+		ClearFilter();
+
+		return;
+	}
+
+	/* Update entries and exchange list widgets.
+	 */
+	Surface	*surface = wnd->GetDrawSurface();
+
+	surface->StartPaint(Rect(list_entries->GetRealPosition(), list_entries->GetRealSize()));
+
+	list_entries->Hide();
+
+	ClearFilter(list_filtered);
+
+	dataSection->Filter(edit_filter->GetText().ToLower(), list_filtered);
+
+	list_filtered->Show();
+
+	surface->EndPaint();
+
+	/* Activate clear button.
+	 */
+	button_clear->Activate();
+}
+
+Void Translator::ClearFilter()
+{
+	/* Clear filter box.
+	 */
+	edit_filter->SetText(NIL);
+	button_clear->Deactivate();
+
+	/* Clean up entries and exchange list widgets.
+	 */
+	Surface	*surface = wnd->GetDrawSurface();
+
+	surface->StartPaint(Rect(list_filtered->GetRealPosition(), list_filtered->GetRealSize()));
+
+	list_filtered->Hide();
+
+	ClearFilter(list_filtered);
+
+	list_entries->Show();
+
+	surface->EndPaint();
+}
+
+Void Translator::ClearFilter(List *list)
+{
+	/* Recursively clear this and subordinate sections.
+	 */
+	for (Int i = list->Length() - 1; i >= 0; i--)
+	{
+		ListEntry	*entry = list->GetNthEntry(i);
+
+		if (entry->GetObjectType() == Tree::classID) ClearFilter(((Tree *) entry)->GetList());
+
+		list->Remove(entry);
+
+		delete entry;
+	}
 }

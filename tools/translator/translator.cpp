@@ -995,11 +995,17 @@ Void Translator::FilterEntries()
 
 	surface->StartPaint(Rect(list_entries->GetRealPosition(), list_entries->GetRealSize()));
 
+	Int	 scrollbarPos = -1;
+
+	if (list_filtered->IsVisible()) scrollbarPos = ((Scrollbar *) list_filtered->GetNthObject(0))->GetValue();
+
 	list_entries->Hide();
 
 	ClearFilter(list_filtered);
 
 	dataSection->Filter(edit_filter->GetText().ToLower(), list_filtered);
+
+	((Scrollbar *) list_filtered->GetNthObject(0))->SetValue(scrollbarPos);
 
 	list_filtered->Show();
 

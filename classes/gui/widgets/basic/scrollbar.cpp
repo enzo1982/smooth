@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -83,6 +83,8 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 	switch (message)
 	{
 		case SP_PAINT:
+			surface->StartPaint(Rect(realPos, realSize));
+
 			OnValueChange();
 
 			surface->Box(arrow1Frame, Setup::BackgroundColor, Rect::Filled);
@@ -131,6 +133,8 @@ S::Int S::GUI::Scrollbar::Paint(Int message)
 					surface->Line(lineStart, lineEnd, arrowColor);
 				}
 			}
+
+			surface->EndPaint();
 
 			break;
 	}
@@ -223,11 +227,15 @@ S::Void S::GUI::Scrollbar::OnValueChange()
 	Rect	 backFrame	= Rect(realPos + (subtype == OR_HORZ ? Point(hotspotSize + 4, 0) : Point(0, hotspotSize + 4)), realSize - (subtype == OR_HORZ ? Size(2 * (hotspotSize + 4), 0) : Size(0, 2 * (hotspotSize + 4))));
 	Rect	 sliderFrame	= Rect(realPos + (subtype == OR_HORZ ? Point(hotspotSize + 4 + (Int) (((Float) realSize.cx - 3 * (hotspotSize + 4)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))), 0) : Point(0, hotspotSize + 4 + (Int) (((Float) realSize.cy - 3 * (hotspotSize + 4)) / ((Float) (endValue - startValue)) * ((Float) (*variable - startValue))))), subtype == OR_HORZ ? Size(hotspotSize + 4, realSize.cy) : Size(realSize.cx, hotspotSize + 4));
 
+	surface->StartPaint(backFrame);
+
 	surface->Box(backFrame, Setup::LightGrayColor, Rect::Filled);
 
 	if (!dragging) surface->Box(sliderFrame, Setup::BackgroundColor, Rect::Filled);
 
 	surface->Frame(sliderFrame, FRAME_UP);
+
+	surface->EndPaint();
 }
 
 S::Void S::GUI::Scrollbar::UpdateHotspotPositions()

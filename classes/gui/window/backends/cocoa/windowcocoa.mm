@@ -924,8 +924,11 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 	/* Return from the active loop after processing an event.
 	 */
-	if (([NSApp modalWindow] == wnd && ([NSApp keyWindow]	!= nil &&   [NSApp keyWindow] != wnd	  )) ||
-	    ([NSApp keyWindow]	 == wnd && ([NSApp modalWindow] == nil || ![[NSApp modalWindow] isVisible]))) [NSApp stop: nil];
+	NSWindow	*modalWindow = [NSApp keyWindow];
+	NSWindow	*keyWindow   = [NSApp modalWindow];
+	
+	if ((modalWindow == wnd && (keyWindow != nil && keyWindow != wnd && Window::GetWindow(keyWindow) != NIL)) ||
+	    (keyWindow	 == wnd && (modalWindow == nil || ![modalWindow isVisible]))) [NSApp stop: nil];
 
 	return Success();
 }

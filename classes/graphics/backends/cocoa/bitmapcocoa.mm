@@ -93,7 +93,7 @@ S::Bool S::GUI::BitmapCocoa::CreateBitmap(Int cx, Int cy, Int bpp)
 						      colorSpaceName: NSCalibratedRGBColorSpace
 							bitmapFormat: 0
 							 bytesPerRow: 4 * cx
-							bitsPerPixel: 32];;
+							bitsPerPixel: 32];
 
 	if (bitmap == NIL) return False;
 
@@ -123,6 +123,43 @@ S::Bool S::GUI::BitmapCocoa::DeleteBitmap()
 	}
 
 	return True;
+}
+
+S::Int S::GUI::BitmapCocoa::Scale(const Size &newSize)
+{
+	if (bitmap == NIL) return Error();
+
+	if (size == newSize) return Success();
+
+	NSBitmapImageRep	*backup = bitmap;
+	Size			 backupSize = size;
+
+	bitmap = NIL;
+
+	CreateBitmap(newSize.cx, newSize.cy, depth);
+
+	NSImage			*image	 = [[NSImage alloc] initWithSize: NSMakeSize(backupSize.cx, backupSize.cy)];
+
+	[image addRepresentation: backup];
+
+	NSAutoreleasePool	*pool	 = [[NSAutoreleasePool alloc] init];
+	NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: bitmap];
+
+	[NSGraphicsContext saveGraphicsState];
+	[NSGraphicsContext setCurrentContext: context];
+
+	[image drawInRect: NSMakeRect(0, 0, newSize.cx, newSize.cy)
+		 fromRect: NSMakeRect(0, 0, backupSize.cx, backupSize.cy)
+		operation: NSCompositeCopy
+		 fraction: 1.0];
+
+	[NSGraphicsContext restoreGraphicsState];
+
+	[pool release];
+	[image release];
+	[backup release];
+
+	return Success();
 }
 
 S::Bool S::GUI::BitmapCocoa::SetSystemBitmap(Void *nBitmap)

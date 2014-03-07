@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -127,6 +127,66 @@ S::Bool S::GUI::BitmapXLib::DeleteBitmap()
 	}
 
 	return True;
+}
+
+S::Int S::GUI::BitmapXLib::Scale(const Size &newSize)
+{
+	if (bitmap == NIL) return Error();
+
+	if (size == newSize) return Success();
+
+	Pixmap	 backup = bitmap;
+	Size	 backupSize = size;
+
+	bitmap = NIL;
+
+	CreateBitmap(newSize.cx, newSize.cy, depth);
+
+	GC		 gc = XCreateGC(display, bitmap, 0, NIL);
+	XImage		*image = XGetImage(display, backup, 0, 0, backupSize.cx, backupSize.cy, AllPlanes, XYPixmap);
+	Point		 point;
+	XGCValues	 gcValues;
+
+	Float	 scaleFactorX = backupSize.cx / newSize.cx;
+	Float	 scaleFactorY = backupSize.cy / newSize.cy;
+
+	for (point.y = 0; point.y < newSize.cy; point.y++)
+	{
+		for (point.x = 0; point.x < newSize.cx; point.x++)
+		{
+			Float	 red = 0, green = 0, blue = 0;
+
+			for (Int srcX = point.x * scaleFactorX; srcX < (point.x + 1) * scaleFactorX; srcX++)
+			{
+				for (Int srcY = point.y * scaleFactorY; srcY < (point.y + 1) * scaleFactorY; srcY++)
+				{
+					Long	 value = XGetPixel(image, srcX, srcY);
+
+					red   += Float((value >> 16) & 255) * (Math::Min(1.0, (point.x + 1) * scaleFactorX - srcX) * Math::Min(1.0, (point.y + 1) * scaleFactorY - srcY));
+					green += Float((value >> 8)  & 255) * (Math::Min(1.0, (point.x + 1) * scaleFactorX - srcX) * Math::Min(1.0, (point.y + 1) * scaleFactorY - srcY));
+					blue  += Float( value	     & 255) * (Math::Min(1.0, (point.x + 1) * scaleFactorX - srcX) * Math::Min(1.0, (point.y + 1) * scaleFactorY - srcY));
+				}
+			}
+
+			red   /= scaleFactorX * scaleFactorY;
+			green /= scaleFactorX * scaleFactorY;
+			blue  /= scaleFactorX * scaleFactorY;
+
+			if	(depth == 16) gcValues.foreground =		  ((Int(red) >> 3) << 11) | ((Int(green) >> 2) << 5) | (Int(blue) >> 3);
+			else if (depth == 24) gcValues.foreground =		  ( Int(red)       << 16) | ( Int(green) << 8)	     | (Int(blue)     );
+			else if (depth == 32) gcValues.foreground = (255 << 24) | ( Int(red)       << 16) | ( Int(green) << 8)	     | (Int(blue)     );
+
+			XChangeGC(display, gc, GCForeground, &gcValues);
+
+			XDrawPoint(display, bitmap, gc, point.x, point.y);
+		}
+	}
+
+	XFreeGC(display, gc);
+
+	XFreePixmap(display, backup);
+
+	return Success();
 }
 
 S::Bool S::GUI::BitmapXLib::SetSystemBitmap(Void *nBitmap)

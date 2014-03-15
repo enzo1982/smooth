@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -466,12 +466,16 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 	if (bitmap == NIL) return Error();
 
 	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
+
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
+
+	/* Copy the image.
+	 */
 	HDC	 gdi_dc	  = GetWindowDC(window);
 	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup	  = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
-	/* Copy the image.
-	 */
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
 		if (!painting)
@@ -507,11 +511,15 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, co
 	if (bitmap == NIL) return Error();
 
 	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
-	HDC	 cdc	 = CreateCompatibleDC(paintContext);
-	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
+
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
 
 	/* Copy the image.
 	 */
+	HDC	 cdc	 = CreateCompatibleDC(paintContext);
+	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
+
 	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
 	{
 		BitBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, paintContext, srcRect.left, srcRect.top, SRCCOPY);

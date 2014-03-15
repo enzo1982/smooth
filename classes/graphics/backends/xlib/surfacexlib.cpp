@@ -394,6 +394,9 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 
 	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
+
 	/* Convert format if depths do not match.
 	 */
 	const Bitmap	*srcBitmap = &bitmap;
@@ -486,6 +489,9 @@ S::Int S::GUI::SurfaceXLib::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, c
 	if (bitmap == NIL) return Error();
 
 	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
+
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
 
 	/* Copy the image.
 	 */

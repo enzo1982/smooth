@@ -747,13 +747,16 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
+
 #ifdef __WIN32__
+	/* Copy the image.
+	 */
 	HDC	 gdi_dc	  = GetWindowDC(window);
 	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
 	HBITMAP	 backup	  = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
-	/* Copy the image.
-	 */
 	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
 	{
 		if (!painting)
@@ -864,12 +867,15 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 
 	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
 
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
+
 #ifdef __WIN32__
+	/* Copy the image.
+	 */
 	HDC	 cdc	 = CreateCompatibleDC(paintContext);
 	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
-	/* Copy the image.
-	 */
 	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
 	{
 		BitBlt(cdc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), paintContext, srcRect.left, srcRect.top, SRCCOPY);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -430,6 +430,9 @@ S::Int S::GUI::SurfaceHaiku::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
+
 	/* Copy the image.
 	 */
 	if (!painting)
@@ -449,6 +452,11 @@ S::Int S::GUI::SurfaceHaiku::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 
 	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
 
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
+
+	/* Copy the image.
+	 */
 	BBitmap *destBitmap = (BBitmap *) bitmap.GetSystemBitmap();
 	BView	*destView   = new BView(destBitmap->Bounds(), NULL, B_FOLLOW_ALL_SIDES, 0);
 
@@ -457,8 +465,6 @@ S::Int S::GUI::SurfaceHaiku::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 
 	bitmapView->Sync();
 
-	/* Copy the image.
-	 */
 	destView->DrawBitmap(this->bitmap, BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom));
 
 	destBitmap->Unlock();

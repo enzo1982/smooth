@@ -661,6 +661,9 @@ S::Int S::GUI::SurfaceCocoa::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
+
 	/* Create NSImage from bitmap.
 	 */
 	NSBitmapImageRep	*imageRep = (NSBitmapImageRep *) bitmap.GetSystemBitmap();
@@ -706,6 +709,9 @@ S::Int S::GUI::SurfaceCocoa::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	if (bitmap == NIL) return Error();
 
 	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
+
+	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
+	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
 
 	/* Copy the image.
 	 */

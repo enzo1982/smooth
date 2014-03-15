@@ -190,8 +190,6 @@ S::Int S::GUI::SurfaceCocoa::SetPixel(const Point &iPoint, const Color &color)
 
 	Point	 point = rightToLeft.TranslatePoint(iPoint);
 
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-
 	if (!painting && [window isVisible])
 	{
 		[[window contentView] lockFocus];
@@ -223,8 +221,6 @@ S::Int S::GUI::SurfaceCocoa::SetPixel(const Point &iPoint, const Color &color)
 
 	if (!painting) [paintBitmap unlockFocus];
 
-	[pool release];
-
 	return Success();
 }
 
@@ -250,8 +246,6 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 	if (pos1.y == pos2.y) { pos1.y++; pos2.y++; }
 	if (pos1.x >  pos2.x) { pos1.x++; pos2.x++; }
 	if (pos1.y >  pos2.y) { pos1.y++; pos2.y++; }
-
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
 
 	if (!painting && [window isVisible])
 	{
@@ -314,8 +308,6 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 
 	if (!painting) [paintBitmap unlockFocus];
 
-	[pool release];
-
 	return Success();
 }
 
@@ -327,8 +319,6 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 
 	if (style & Rect::Filled)
 	{
-		NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-
 		if (style & Rect::Rounded)
 		{
 			if (!painting)
@@ -391,13 +381,9 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 
 			if (!painting) [paintBitmap unlockFocus];
 		}
-
-		[pool release];
 	}
 	else if (style == Rect::Outlined)
 	{
-		NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-
 		if (!painting && [window isVisible])
 		{
 			[[window contentView] lockFocus];
@@ -428,8 +414,6 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 		[NSBezierPath strokeRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
 
 		if (!painting) [paintBitmap unlockFocus];
-
-		[pool release];
 	}
 	else if (style & Rect::Inverted)
 	{
@@ -443,8 +427,6 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 	}
 	else if (style & Rect::Dotted)
 	{
-		NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-
 		if (!painting && [window isVisible])
 		{
 			[[window contentView] lockFocus];
@@ -485,8 +467,6 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 		[path stroke];
 
 		if (!painting) [paintBitmap unlockFocus];
-
-		[pool release];
 	}
 
 	return Success();
@@ -499,7 +479,6 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 	if (string == NIL)	return Error();
 	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
 
-	NSAutoreleasePool	*pool	    = [[NSAutoreleasePool alloc] init];
 	NSFont			*nsFont	    = [[NSFontManager sharedFontManager] fontWithFamily: [NSString stringWithUTF8String: font.GetName().ConvertTo("UTF-8")]
 											 traits: (font.GetStyle() & Font::Italic ? NSItalicFontMask : 0) | (font.GetWeight() >= Font::Bold ? NSBoldFontMask : 0)
 											 weight: 5
@@ -510,8 +489,8 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 									 blue: font.GetColor().GetBlue()  / 255.0
 									alpha: 1.0];
 
-	NSMutableDictionary	*attributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys: nsFont,  NSFontAttributeName,
-												    nsColor, NSForegroundColorAttributeName, nil] autorelease];
+	NSMutableDictionary	*attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys: nsFont,  NSFontAttributeName,
+												   nsColor, NSForegroundColorAttributeName, nil];
 
 	Rect			 rect	    = iRect;
 	Int			 lineHeight = font.GetScaledTextSizeY() + 3;
@@ -595,7 +574,7 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 	String::ExplodeFinish();
 
-	[pool release];
+	[attributes release];
 
 	return Success();
 }
@@ -606,25 +585,25 @@ S::Int S::GUI::SurfaceCocoa::Gradient(const Rect &iRect, const Color &color1, co
 
 	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
-	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
-
 	if (!painting && [window isVisible])
 	{
 		[[window contentView] lockFocus];
 
 		[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
-		NSGradient	*gradient = [[[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedRed: color1.GetRed()   / 255.0
-														  green: color1.GetGreen() / 255.0
-														   blue: color1.GetBlue()  / 255.0
-														  alpha: 1.0]
-									   endingColor: [NSColor colorWithCalibratedRed: color2.GetRed()   / 255.0
-														  green: color2.GetGreen() / 255.0
-														   blue: color2.GetBlue()  / 255.0
-														  alpha: 1.0]] autorelease];
+		NSGradient	*gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedRed: color1.GetRed()   / 255.0
+														 green: color1.GetGreen() / 255.0
+														  blue: color1.GetBlue()  / 255.0
+														 alpha: 1.0]
+									  endingColor: [NSColor colorWithCalibratedRed: color2.GetRed()   / 255.0
+														 green: color2.GetGreen() / 255.0
+														  blue: color2.GetBlue()  / 255.0
+														 alpha: 1.0]];
 
 		[gradient drawInRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top)
 			       angle: (style == OR_HORZ ? (rightToLeft.GetRightToLeft() ? 180 : 0.0) : 270)];
+
+		[gradient release];
 
 		[[window contentView] unlockFocus];
 
@@ -635,21 +614,21 @@ S::Int S::GUI::SurfaceCocoa::Gradient(const Rect &iRect, const Color &color1, co
 
 	[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
-	NSGradient	*gradient = [[[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedRed: color1.GetRed()   / 255.0
-													  green: color1.GetGreen() / 255.0
-													   blue: color1.GetBlue()  / 255.0
-													  alpha: 1.0]
-								   endingColor: [NSColor colorWithCalibratedRed: color2.GetRed()   / 255.0
-													  green: color2.GetGreen() / 255.0
-													   blue: color2.GetBlue()  / 255.0
-													  alpha: 1.0]] autorelease];
+	NSGradient	*gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedRed: color1.GetRed()   / 255.0
+													 green: color1.GetGreen() / 255.0
+													  blue: color1.GetBlue()  / 255.0
+													 alpha: 1.0]
+								  endingColor: [NSColor colorWithCalibratedRed: color2.GetRed()   / 255.0
+													 green: color2.GetGreen() / 255.0
+													  blue: color2.GetBlue()  / 255.0
+													 alpha: 1.0]];
 
 	[gradient drawInRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top)
 		       angle: (style == OR_HORZ ? (rightToLeft.GetRightToLeft() ? 180 : 0.0) : 270)];
 
-	if (!painting) [paintBitmap unlockFocus];
+	[gradient release];
 
-	[pool release];
+	if (!painting) [paintBitmap unlockFocus];
 
 	return Success();
 }

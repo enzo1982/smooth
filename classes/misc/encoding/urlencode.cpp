@@ -22,8 +22,9 @@ S::String S::Encoding::URLEncode::Encode(const String &string, Bool encodeReserv
 	/* Encode UTF-8 string using URL encode.
 	 */
 	String	 encoded;
+	Int	 length = utf8.Length();
 
-	for (Int i = 0, e = 0; i < utf8.Length(); i++)
+	for (Int i = 0, e = 0; i < length; i++)
 	{
 		if ((utf8[i] >= 'A' && utf8[i] <= 'Z') || (utf8[i] >= 'a' && utf8[i] <= 'z') || (utf8[i] >= '0' && utf8[i] <= '9') ||
 		    (utf8[i] == '-' || utf8[i] == '_' || utf8[i] == '.' || utf8[i] == '~') ||
@@ -51,8 +52,9 @@ S::String S::Encoding::URLEncode::Decode(const String &encoded)
 	/* Decode URL encoded string to UTF-8.
 	 */
 	String	 utf8;
+	Int	 length = encoded.Length();
 
-	for (Int i = 0, d = 0; i < encoded.Length(); i++)
+	for (Int i = 0, d = 0; i < length; i++)
 	{
 		if (encoded[i] == '%')
 		{

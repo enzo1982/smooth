@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -116,10 +116,11 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 				if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 				{
-					Int	 line = (window->GetMousePosition().y - frame.top) / (font.GetScaledTextSizeY() + 3);
+					Int	 line	   = (window->GetMousePosition().y - frame.top) / (font.GetScaledTextSizeY() + 3);
 					Int	 lineCount = 0;
+					Int	 length	   = text.Length();
 
-					for (Int i = 0; i <= text.Length(); i++)
+					for (Int i = 0; i <= length; i++)
 					{
 						if (text[i] == '\n' || text[i] == 0)
 						{
@@ -189,8 +190,10 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			{
 				/* Compute word start and end.
 				 */
+				Int	 length	   = text.Length();
+
 				Int	 wordStart = 0;
-				Int	 wordEnd   = text.Length();
+				Int	 wordEnd   = length;
 
 				for (Int i = promptPos - 2; i >= 0; i--)
 				{
@@ -199,7 +202,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 					     (text[i + 1] != ' ' && text[i + 1] != '\t' && text[i + 1] != '\n'))) { wordStart = i + 1; break; }
 				}
 
-				for (Int i = promptPos - 1; i < text.Length(); i++)
+				for (Int i = promptPos - 1; i < length; i++)
 				{
 					if ( (						   text[i + 1] == '\n') ||
 					    ((text[i    ] == ' ' || text[i    ] == '\t' || text[i    ] == '\n') &&
@@ -303,12 +306,13 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 					if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE))
 					{
-						Int	 line = (window->GetMousePosition().y - frame.top) / (font.GetScaledTextSizeY() + 3);
+						Int	 line	   = (window->GetMousePosition().y - frame.top) / (font.GetScaledTextSizeY() + 3);
 						Int	 lineCount = 0;
+						Int	 length	   = text.Length();
 
 						if (window->GetMousePosition().y - frame.top < 0) line--;
 
-						for (Int i = 0; i <= text.Length(); i++)
+						for (Int i = 0; i <= length; i++)
 						{
 							if (text[i] == '\n' || text[i] == 0)
 							{

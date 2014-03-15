@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -50,11 +50,12 @@ S::String S::Encoding::Base64::Encode(Int bytes) const
 
 S::Int S::Encoding::Base64::Decode(const String &string)
 {
-	buffer.Resize(string.Length() / 4 * 3 + 1);
+	Int	 bytes	= 0;
+	Int	 length = string.Length();
 
-	Int	 bytes = 0;
+	buffer.Resize(length / 4 * 3 + 1);
 
-	for (Int i = 0; i < string.Length(); i += 4)
+	for (Int i = 0; i < length; i += 4)
 	{
 		Int	 val[4] = { 64, 64, 64, 64 };
 

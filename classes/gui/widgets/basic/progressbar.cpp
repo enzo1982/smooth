@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -129,7 +129,7 @@ S::Void S::GUI::Progressbar::SetValue(Int newValue)
 
 S::Void S::GUI::Progressbar::CreateGradient(const Size &gSize)
 {
-	gradient.CreateBitmap(gSize.cx - 2, gSize.cy - 2);
+	gradient.CreateBitmap(gSize - Size(2, 2));
 
 	Int	 rs	= Setup::GradientStartColor.GetRed();
 	Int	 gs	= Setup::GradientStartColor.GetGreen();

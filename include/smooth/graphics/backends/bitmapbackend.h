@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,30 +34,31 @@ namespace smooth
 		{
 			private:
 				static BitmapBackend		*(*backend_creator_pV)(Void *);
-				static BitmapBackend		*(*backend_creator_III)(Int, Int, Int);
+				static BitmapBackend		*(*backend_creator_crSI)(const Size &, Int);
 				static BitmapBackend		*(*backend_creator_cI)(const int);
-				static BitmapBackend		*(*backend_creator_crS)(const BitmapBackend &);
+				static BitmapBackend		*(*backend_creator_crB)(const BitmapBackend &);
 			protected:
 				Short				 type;
 
-				Byte				 align;
 				Byte				 depth;
+				Byte				 bpp;
+				Byte				 align;
 
 				Size				 size;
 				Void				*bytes;
 			public:
 				static Int			 SetBackend(BitmapBackend *(*)(Void *));
-				static Int			 SetBackend(BitmapBackend *(*)(Int, Int, Int));
+				static Int			 SetBackend(BitmapBackend *(*)(const Size &, Int));
 				static Int			 SetBackend(BitmapBackend *(*)(const int));
 				static Int			 SetBackend(BitmapBackend *(*)(const BitmapBackend &));
 
 				static BitmapBackend		*CreateBackendInstance(Void *);
-				static BitmapBackend		*CreateBackendInstance(Int, Int, Int);
+				static BitmapBackend		*CreateBackendInstance(const Size &, Int);
 				static BitmapBackend		*CreateBackendInstance(const int);
 				static BitmapBackend		*CreateBackendInstance(const BitmapBackend &);
 
 								 BitmapBackend(Void * = NIL);
-								 BitmapBackend(Int, Int, Int);
+								 BitmapBackend(const Size &, Int);
 								 BitmapBackend(const int);
 								 BitmapBackend(const BitmapBackend &);
 
@@ -69,9 +70,10 @@ namespace smooth
 				Byte				 GetDepth() const;
 
 				UnsignedByte			*GetBytes() const;
+				Byte				 GetBitsPerPixel() const;
 				Byte				 GetLineAlignment() const;
 
-				virtual Bool			 CreateBitmap(Int, Int, Int);
+				virtual Bool			 CreateBitmap(const Size &, Int);
 				virtual Bool			 DeleteBitmap();
 
 				virtual Bool			 SetSystemBitmap(Void *);

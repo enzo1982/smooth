@@ -18,9 +18,9 @@ S::GUI::BitmapBackend *CreateBitmapXLib_pV(S::Void *iBitmap)
 	return new S::GUI::BitmapXLib(iBitmap);
 }
 
-S::GUI::BitmapBackend *CreateBitmapXLib_III(S::Int cx, S::Int cy, S::Int bpp)
+S::GUI::BitmapBackend *CreateBitmapXLib_crSI(const S::GUI::Size &iSize, S::Int iDepth)
 {
-	return new S::GUI::BitmapXLib(cx, cy, bpp);
+	return new S::GUI::BitmapXLib(iSize, iDepth);
 }
 
 S::GUI::BitmapBackend *CreateBitmapXLib_cI(const int nil)
@@ -28,15 +28,15 @@ S::GUI::BitmapBackend *CreateBitmapXLib_cI(const int nil)
 	return new S::GUI::BitmapXLib(nil);
 }
 
-S::GUI::BitmapBackend *CreateBitmapXLib_crS(const S::GUI::BitmapBackend &iBitmap)
+S::GUI::BitmapBackend *CreateBitmapXLib_crB(const S::GUI::BitmapBackend &iBitmap)
 {
 	return new S::GUI::BitmapXLib((const S::GUI::BitmapXLib &) iBitmap);
 }
 
 S::Int	 bitmapXLibTmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_pV);
-S::Int	 bitmapXLibTmp_III	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_III);
+S::Int	 bitmapXLibTmp_crSI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_crSI);
 S::Int	 bitmapXLibTmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_cI);
-S::Int	 bitmapXLibTmp_crS	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_crS);
+S::Int	 bitmapXLibTmp_crB	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_crB);
 
 S::GUI::BitmapXLib::BitmapXLib(Void *iBitmap)
 {
@@ -45,11 +45,11 @@ S::GUI::BitmapXLib::BitmapXLib(Void *iBitmap)
 	SetSystemBitmap(iBitmap);
 }
 
-S::GUI::BitmapXLib::BitmapXLib(Int cx, Int cy, Int bpp)
+S::GUI::BitmapXLib::BitmapXLib(const Size &iSize, Int iDepth)
 {
 	Initialize();
 
-	CreateBitmap(cx, cy, bpp);
+	CreateBitmap(iSize, iDepth);
 }
 
 S::GUI::BitmapXLib::BitmapXLib(const int nil)
@@ -92,21 +92,21 @@ S::Bool S::GUI::BitmapXLib::IsDepthSupported(Int bpp)
 	return supported;
 }
 
-S::Bool S::GUI::BitmapXLib::CreateBitmap(Int cx, Int cy, Int bpp)
+S::Bool S::GUI::BitmapXLib::CreateBitmap(const Size &nSize, Int nDepth)
 {
 	DeleteBitmap();
 
-	if (bpp == -1 || !IsDepthSupported(bpp)) bpp = XDefaultDepth(display, XDefaultScreen(display));
+	if (nDepth == -1 || !IsDepthSupported(nDepth)) nDepth = XDefaultDepth(display, XDefaultScreen(display));
 
-	bitmap	= XCreatePixmap(display, DefaultRootWindow(display), cx, cy, bpp);
+	bitmap	= XCreatePixmap(display, DefaultRootWindow(display), nSize.cx, nSize.cy, nDepth);
 	bytes	= NIL;
 
 	if (bitmap == NIL) return False;
 
-	size	= Size(cx, cy);
-	depth	= bpp;
-
-	align	= cx * (bpp / 8);
+	size	= nSize;
+	depth	= nDepth;
+	bpp	= depth;
+	align	= 4;
 
 	return True;
 }
@@ -123,6 +123,7 @@ S::Bool S::GUI::BitmapXLib::DeleteBitmap()
 		depth	= 0;
 
 		bytes	= NIL;
+		bpp	= 0;
 		align	= 0;
 	}
 
@@ -140,7 +141,7 @@ S::Int S::GUI::BitmapXLib::Scale(const Size &newSize)
 
 	bitmap = NIL;
 
-	CreateBitmap(newSize.cx, newSize.cy, depth);
+	CreateBitmap(newSize, depth);
 
 	GC		 gc = XCreateGC(display, bitmap, 0, NIL);
 	XImage		*image = XGetImage(display, backup, 0, 0, backupSize.cx, backupSize.cy, AllPlanes, XYPixmap);
@@ -208,7 +209,7 @@ S::Bool S::GUI::BitmapXLib::SetSystemBitmap(Void *nBitmap)
 
 		XGetGeometry(display, (Pixmap) nBitmap, &windowDummy, &intDummy, &intDummy, &cx, &cy, &uIntDummy, &bpp);
 
-		CreateBitmap(cx, cy, bpp);
+		CreateBitmap(Size(cx, cy), bpp);
 
 		GC	 gc = XCreateGC(display, bitmap, 0, NIL);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,9 +17,9 @@ S::GUI::Bitmap::Bitmap(Void *iBitmap)
 	backend = BitmapBackend::CreateBackendInstance(iBitmap);
 }
 
-S::GUI::Bitmap::Bitmap(Int cx, Int cy, Int bpp)
+S::GUI::Bitmap::Bitmap(const Size &iSize, Int iDepth)
 {
-	backend = BitmapBackend::CreateBackendInstance(cx, cy, bpp);
+	backend = BitmapBackend::CreateBackendInstance(iSize, iDepth);
 }
 
 S::GUI::Bitmap::Bitmap(const int nil)
@@ -57,14 +57,19 @@ S::UnsignedByte *S::GUI::Bitmap::GetBytes() const
 	return backend->GetBytes();
 }
 
+S::Byte S::GUI::Bitmap::GetBitsPerPixel() const
+{
+	return backend->GetBitsPerPixel();
+}
+
 S::Byte S::GUI::Bitmap::GetLineAlignment() const
 {
 	return backend->GetLineAlignment();
 }
 
-S::Bool S::GUI::Bitmap::CreateBitmap(Int cx, Int cy, Int bpp)
+S::Bool S::GUI::Bitmap::CreateBitmap(const Size &nSize, Int nDepth)
 {
-	return backend->CreateBitmap(cx, cy, bpp);
+	return backend->CreateBitmap(nSize, nDepth);
 }
 
 S::Bool S::GUI::Bitmap::DeleteBitmap()

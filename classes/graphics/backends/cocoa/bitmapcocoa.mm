@@ -15,9 +15,9 @@ S::GUI::BitmapBackend *CreateBitmapCocoa_pV(S::Void *iBitmap)
 	return new S::GUI::BitmapCocoa(iBitmap);
 }
 
-S::GUI::BitmapBackend *CreateBitmapCocoa_III(S::Int cx, S::Int cy, S::Int bpp)
+S::GUI::BitmapBackend *CreateBitmapCocoa_crSI(const S::GUI::Size &iSize, S::Int iDepth)
 {
-	return new S::GUI::BitmapCocoa(cx, cy, bpp);
+	return new S::GUI::BitmapCocoa(iSize, iDepth);
 }
 
 S::GUI::BitmapBackend *CreateBitmapCocoa_cI(const int null)
@@ -25,15 +25,15 @@ S::GUI::BitmapBackend *CreateBitmapCocoa_cI(const int null)
 	return new S::GUI::BitmapCocoa(null);
 }
 
-S::GUI::BitmapBackend *CreateBitmapCocoa_crS(const S::GUI::BitmapBackend &iBitmap)
+S::GUI::BitmapBackend *CreateBitmapCocoa_crB(const S::GUI::BitmapBackend &iBitmap)
 {
 	return new S::GUI::BitmapCocoa((const S::GUI::BitmapCocoa &) iBitmap);
 }
 
 S::Int	 bitmapCocoaTmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapCocoa_pV);
-S::Int	 bitmapCocoaTmp_III	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapCocoa_III);
+S::Int	 bitmapCocoaTmp_crSI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapCocoa_crSI);
 S::Int	 bitmapCocoaTmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapCocoa_cI);
-S::Int	 bitmapCocoaTmp_crS	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapCocoa_crS);
+S::Int	 bitmapCocoaTmp_crB	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapCocoa_crB);
 
 S::GUI::BitmapCocoa::BitmapCocoa(Void *iBitmap)
 {
@@ -42,11 +42,11 @@ S::GUI::BitmapCocoa::BitmapCocoa(Void *iBitmap)
 	SetSystemBitmap(iBitmap);
 }
 
-S::GUI::BitmapCocoa::BitmapCocoa(Int cx, Int cy, Int bpp)
+S::GUI::BitmapCocoa::BitmapCocoa(const Size &iSize, Int iDepth)
 {
 	Initialize();
 
-	CreateBitmap(cx, cy, bpp);
+	CreateBitmap(iSize, iDepth);
 }
 
 S::GUI::BitmapCocoa::BitmapCocoa(const int null)
@@ -76,33 +76,33 @@ S::Void S::GUI::BitmapCocoa::Initialize()
 	bitmap	= NIL;
 }
 
-S::Bool S::GUI::BitmapCocoa::CreateBitmap(Int cx, Int cy, Int bpp)
+S::Bool S::GUI::BitmapCocoa::CreateBitmap(const Size &nSize, Int nDepth)
 {
 	DeleteBitmap();
 
-	if (bpp == -1)		    bpp = [[NSScreen mainScreen] depth];
-	if (bpp != 24 && bpp != 32) bpp = 24;
+	if (nDepth == -1)		  nDepth = [[NSScreen mainScreen] depth];
+	if (nDepth != 24 && nDepth != 32) nDepth = 24;
 
 	bitmap	= [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
-							  pixelsWide: cx
-							  pixelsHigh: cy
+							  pixelsWide: nSize.cx
+							  pixelsHigh: nSize.cy
 						       bitsPerSample: 8
-						     samplesPerPixel: bpp == 32 ? 4 : 3
-							    hasAlpha: bpp == 32
+						     samplesPerPixel: nDepth == 32 ? 4 : 3
+							    hasAlpha: nDepth == 32
 							    isPlanar: NO
 						      colorSpaceName: NSCalibratedRGBColorSpace
 							bitmapFormat: 0
-							 bytesPerRow: 4 * cx
+							 bytesPerRow: 4 * nSize.cx
 							bitsPerPixel: 32];
 
 	if (bitmap == NIL) return False;
 
 	bytes	= [bitmap bitmapData];
 
-	size	= Size(cx, cy);
-	depth	= bpp;
-
-	align	= 4 * cx;;
+	size	= nSize;
+	depth	= nDepth;
+	bpp	= 32;
+	align	= 4;
 
 	return True;
 }
@@ -119,6 +119,7 @@ S::Bool S::GUI::BitmapCocoa::DeleteBitmap()
 		depth	= 0;
 
 		bytes	= NIL;
+		bpp	= 0;
 		align	= 0;
 	}
 
@@ -136,7 +137,7 @@ S::Int S::GUI::BitmapCocoa::Scale(const Size &newSize)
 
 	bitmap = NIL;
 
-	CreateBitmap(newSize.cx, newSize.cy, depth);
+	CreateBitmap(newSize, depth);
 
 	NSImage			*image	 = [[NSImage alloc] initWithSize: NSMakeSize(backupSize.cx, backupSize.cy)];
 
@@ -172,7 +173,7 @@ S::Bool S::GUI::BitmapCocoa::SetSystemBitmap(Void *nBitmap)
 	}
 	else
 	{
-		CreateBitmap([(NSBitmapImageRep *) nBitmap pixelsWide], [(NSBitmapImageRep *) nBitmap pixelsHigh], 8 * [(NSBitmapImageRep *) nBitmap samplesPerPixel]);
+		CreateBitmap(Size([(NSBitmapImageRep *) nBitmap pixelsWide], [(NSBitmapImageRep *) nBitmap pixelsHigh]), 8 * [(NSBitmapImageRep *) nBitmap samplesPerPixel]);
 
 		/* Copy source bitmap to destination.
 		 */

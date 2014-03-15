@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -498,7 +498,7 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 		}
 		else
 		{
-			Bitmap	 area(rect.right - rect.left, rect.bottom - rect.top);
+			Bitmap	 area(rect.GetSize());
 
 			BlitToBitmap(iRect, area, Rect(Point(0, 0), area.GetSize()));
 
@@ -789,7 +789,7 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	if (bitmap.GetDepth() != windowAttributes.depth)
 	{
 		Size	 size  = bitmap.GetSize();
-		Bitmap	*copy  = new Bitmap(size.cx, size.cy, windowAttributes.depth);
+		Bitmap	*copy  = new Bitmap(size, windowAttributes.depth);
 		XImage	*image = XGetImage(display, (Pixmap) bitmap.GetSystemBitmap(), 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
 		Point	 point;
 

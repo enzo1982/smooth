@@ -37,13 +37,13 @@ namespace smooth
 				Void			 Initialize();
 			public:
 							 BitmapCocoa(Void * = NIL);
-							 BitmapCocoa(Int, Int, Int);
+							 BitmapCocoa(const Size &, Int);
 							 BitmapCocoa(const int);
 							 BitmapCocoa(const BitmapCocoa &);
 
 							~BitmapCocoa();
 
-				Bool			 CreateBitmap(Int, Int, Int);
+				Bool			 CreateBitmap(const Size &, Int);
 				Bool			 DeleteBitmap();
 
 				Int			 Scale(const Size &);

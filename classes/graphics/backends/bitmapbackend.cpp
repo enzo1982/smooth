@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,9 +21,9 @@ S::GUI::BitmapBackend *CreateBitmapBackend_pV(S::Void *iBitmap)
 	return new S::GUI::BitmapBackend(iBitmap);
 }
 
-S::GUI::BitmapBackend *CreateBitmapBackend_III(S::Int cx, S::Int cy, S::Int bpp)
+S::GUI::BitmapBackend *CreateBitmapBackend_crSI(const S::GUI::Size &iSize, S::Int iDepth)
 {
-	return new S::GUI::BitmapBackend(cx, cy, bpp);
+	return new S::GUI::BitmapBackend(iSize, iDepth);
 }
 
 S::GUI::BitmapBackend *CreateBitmapBackend_cI(const int nil)
@@ -31,15 +31,15 @@ S::GUI::BitmapBackend *CreateBitmapBackend_cI(const int nil)
 	return new S::GUI::BitmapBackend(nil);
 }
 
-S::GUI::BitmapBackend *CreateBitmapBackend_crS(const S::GUI::BitmapBackend &iBitmap)
+S::GUI::BitmapBackend *CreateBitmapBackend_crB(const S::GUI::BitmapBackend &iBitmap)
 {
 	return new S::GUI::BitmapBackend(iBitmap);
 }
 
 S::GUI::BitmapBackend *(*S::GUI::BitmapBackend::backend_creator_pV)(S::Void *)				= &CreateBitmapBackend_pV;
-S::GUI::BitmapBackend *(*S::GUI::BitmapBackend::backend_creator_III)(S::Int, S::Int, S::Int)		= &CreateBitmapBackend_III;
+S::GUI::BitmapBackend *(*S::GUI::BitmapBackend::backend_creator_crSI)(const S::GUI::Size &, S::Int)	= &CreateBitmapBackend_crSI;
 S::GUI::BitmapBackend *(*S::GUI::BitmapBackend::backend_creator_cI)(const int)				= &CreateBitmapBackend_cI;
-S::GUI::BitmapBackend *(*S::GUI::BitmapBackend::backend_creator_crS)(const S::GUI::BitmapBackend &)	= &CreateBitmapBackend_crS;
+S::GUI::BitmapBackend *(*S::GUI::BitmapBackend::backend_creator_crB)(const S::GUI::BitmapBackend &)	= &CreateBitmapBackend_crB;
 
 S::Int S::GUI::BitmapBackend::SetBackend(BitmapBackend *(*backend)(Void *))
 {
@@ -50,11 +50,11 @@ S::Int S::GUI::BitmapBackend::SetBackend(BitmapBackend *(*backend)(Void *))
 	return Success();
 }
 
-S::Int S::GUI::BitmapBackend::SetBackend(BitmapBackend *(*backend)(Int, Int, Int))
+S::Int S::GUI::BitmapBackend::SetBackend(BitmapBackend *(*backend)(const Size &, Int))
 {
 	if (backend == NIL) return Error();
 
-	backend_creator_III = backend;
+	backend_creator_crSI = backend;
 
 	return Success();
 }
@@ -72,7 +72,7 @@ S::Int S::GUI::BitmapBackend::SetBackend(BitmapBackend *(*backend)(const BitmapB
 {
 	if (backend == NIL) return Error();
 
-	backend_creator_crS = backend;
+	backend_creator_crB = backend;
 
 	return Success();
 }
@@ -82,9 +82,9 @@ S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(Void *iBitma
 	return backend_creator_pV(iBitmap);
 }
 
-S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(Int cx, Int cy, Int bpp)
+S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(const Size &iSize, Int iDepth)
 {
-	return backend_creator_III(cx, cy, bpp);
+	return backend_creator_crSI(iSize, iDepth);
 }
 
 S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(const int nil)
@@ -94,7 +94,7 @@ S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(const int ni
 
 S::GUI::BitmapBackend *S::GUI::BitmapBackend::CreateBackendInstance(const BitmapBackend &iBitmap)
 {
-	return backend_creator_crS(iBitmap);
+	return backend_creator_crB(iBitmap);
 }
 
 S::GUI::BitmapBackend::BitmapBackend(Void *iBitmap)
@@ -111,17 +111,19 @@ S::GUI::BitmapBackend::BitmapBackend(Void *iBitmap)
 	depth	= 0;
 
 	bytes	= NIL;
+	bpp	= 0;
 	align	= 0;
 }
 
-S::GUI::BitmapBackend::BitmapBackend(Int cx, Int cy, Int bpp)
+S::GUI::BitmapBackend::BitmapBackend(const Size &iSize, Int iDepth)
 {
 	type	= BITMAP_NONE;
 
-	size	= Size(cx, cy);
-	depth	= bpp;
+	size	= iSize;
+	depth	= iDepth;
 
 	bytes	= NIL;
+	bpp	= 0;
 	align	= 0;
 }
 
@@ -133,6 +135,7 @@ S::GUI::BitmapBackend::BitmapBackend(const int nil)
 	depth	= 0;
 
 	bytes	= NIL;
+	bpp	= 0;
 	align	= 0;
 }
 
@@ -144,6 +147,7 @@ S::GUI::BitmapBackend::BitmapBackend(const BitmapBackend &iBitmap)
 	depth	= 0;
 
 	bytes	= NIL;
+	bpp	= 0;
 	align	= 0;
 }
 
@@ -171,12 +175,17 @@ S::UnsignedByte *S::GUI::BitmapBackend::GetBytes() const
 	return (UnsignedByte *) bytes;
 }
 
+S::Byte S::GUI::BitmapBackend::GetBitsPerPixel() const
+{
+	return bpp;
+}
+
 S::Byte S::GUI::BitmapBackend::GetLineAlignment() const
 {
 	return align;
 }
 
-S::Bool S::GUI::BitmapBackend::CreateBitmap(Int cx, Int cy, Int bpp)
+S::Bool S::GUI::BitmapBackend::CreateBitmap(const Size &nSize, Int nDepth)
 {
 	return False;
 }

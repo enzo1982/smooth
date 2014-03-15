@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -46,7 +46,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderIcon::Load()
 
 		Size	 size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
 
-		bitmap.CreateBitmap(size.cx, size.cy, 32);
+		bitmap.CreateBitmap(size, 32);
 
 		for (Int x = 0; x < size.cx; x++)
 		{

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,9 +15,9 @@ S::GUI::BitmapBackend *CreateBitmapGDI_pV(S::Void *iBitmap)
 	return new S::GUI::BitmapGDI(iBitmap);
 }
 
-S::GUI::BitmapBackend *CreateBitmapGDI_III(S::Int cx, S::Int cy, S::Int bpp)
+S::GUI::BitmapBackend *CreateBitmapGDI_crSI(const S::GUI::Size &iSize, S::Int iDepth)
 {
-	return new S::GUI::BitmapGDI(cx, cy, bpp);
+	return new S::GUI::BitmapGDI(iSize, iDepth);
 }
 
 S::GUI::BitmapBackend *CreateBitmapGDI_cI(const int nil)
@@ -25,15 +25,15 @@ S::GUI::BitmapBackend *CreateBitmapGDI_cI(const int nil)
 	return new S::GUI::BitmapGDI(nil);
 }
 
-S::GUI::BitmapBackend *CreateBitmapGDI_crS(const S::GUI::BitmapBackend &iBitmap)
+S::GUI::BitmapBackend *CreateBitmapGDI_crB(const S::GUI::BitmapBackend &iBitmap)
 {
 	return new S::GUI::BitmapGDI((const S::GUI::BitmapGDI &) iBitmap);
 }
 
 S::Int	 bitmapGDITmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_pV);
-S::Int	 bitmapGDITmp_III	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_III);
+S::Int	 bitmapGDITmp_crSI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_crSI);
 S::Int	 bitmapGDITmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_cI);
-S::Int	 bitmapGDITmp_crS	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_crS);
+S::Int	 bitmapGDITmp_crB	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_crB);
 
 S::GUI::BitmapGDI::BitmapGDI(Void *iBitmap)
 {
@@ -43,12 +43,12 @@ S::GUI::BitmapGDI::BitmapGDI(Void *iBitmap)
 	SetSystemBitmap(iBitmap);
 }
 
-S::GUI::BitmapGDI::BitmapGDI(Int cx, Int cy, Int bpp)
+S::GUI::BitmapGDI::BitmapGDI(const Size &iSize, Int iDepth)
 {
 	type	= BITMAP_GDI;
 	bitmap	= NIL;
 
-	CreateBitmap(cx, cy, bpp);
+	CreateBitmap(iSize, iDepth);
 }
 
 S::GUI::BitmapGDI::BitmapGDI(const int nil)
@@ -72,21 +72,21 @@ S::GUI::BitmapGDI::~BitmapGDI()
 	DeleteBitmap();
 }
 
-S::Bool S::GUI::BitmapGDI::CreateBitmap(Int cx, Int cy, Int bpp)
+S::Bool S::GUI::BitmapGDI::CreateBitmap(const Size &nSize, Int nDepth)
 {
 	DeleteBitmap();
 
-	if (bpp == -1)		    bpp = 24;
-	if (bpp != 24 && bpp != 32) bpp = 24;
+	if (nDepth == -1)		  nDepth = 24;
+	if (nDepth != 24 && nDepth != 32) nDepth = 24;
 
 	UnsignedByte	*buffer = new UnsignedByte [sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)];
 	BITMAPINFO	*bmpInfo = (BITMAPINFO *) buffer;
 
 	bmpInfo->bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
-	bmpInfo->bmiHeader.biWidth		= cx;
-	bmpInfo->bmiHeader.biHeight		= cy;
+	bmpInfo->bmiHeader.biWidth		= nSize.cx;
+	bmpInfo->bmiHeader.biHeight		= nSize.cy;
 	bmpInfo->bmiHeader.biPlanes		= 1;
-	bmpInfo->bmiHeader.biBitCount		= bpp;
+	bmpInfo->bmiHeader.biBitCount		= nDepth;
 	bmpInfo->bmiHeader.biCompression	= BI_RGB;
 	bmpInfo->bmiHeader.biSizeImage		= 0;
 	bmpInfo->bmiHeader.biXPelsPerMeter	= 0;
@@ -104,14 +104,10 @@ S::Bool S::GUI::BitmapGDI::CreateBitmap(Int cx, Int cy, Int bpp)
 
 	if (bitmap == NIL) return False;
 
-	size	= Size(cx, cy);
-	depth	= bpp;
-
-	BITMAP	 bmp;
-
-	GetObjectA(bitmap, sizeof(bmp), &bmp);
-
-	align	= bmp.bmWidthBytes;
+	size	= nSize;
+	depth	= nDepth;
+	bpp	= depth;
+	align	= 4;
 
 	return True;
 }
@@ -128,6 +124,7 @@ S::Bool S::GUI::BitmapGDI::DeleteBitmap()
 		depth	= 0;
 
 		bytes	= NIL;
+		bpp	= 0;
 		align	= 0;
 	}
 
@@ -145,7 +142,7 @@ S::Int S::GUI::BitmapGDI::Scale(const Size &newSize)
 
 	bitmap = NIL;
 
-	CreateBitmap(newSize.cx, newSize.cy, depth);
+	CreateBitmap(newSize, depth);
 
 	HDC	 dc1 = CreateCompatibleDC(NIL);
 	HDC	 dc2 = CreateCompatibleDC(NIL);
@@ -180,7 +177,7 @@ S::Bool S::GUI::BitmapGDI::SetSystemBitmap(Void *nBitmap)
 
 		GetObjectA(nBitmap, sizeof(bmp), &bmp);
 
-		CreateBitmap(bmp.bmWidth, bmp.bmHeight, bmp.bmBitsPixel);
+		CreateBitmap(Size(bmp.bmWidth, bmp.bmHeight), bmp.bmBitsPixel);
 
 		HDC	 dc1 = CreateCompatibleDC(NIL);
 		HDC	 dc2 = CreateCompatibleDC(NIL);

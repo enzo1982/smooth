@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,9 +17,9 @@ S::GUI::BitmapBackend *CreateBitmapHaiku_pV(S::Void *iBitmap)
 	return new S::GUI::BitmapHaiku(iBitmap);
 }
 
-S::GUI::BitmapBackend *CreateBitmapHaiku_III(S::Int cx, S::Int cy, S::Int bpp)
+S::GUI::BitmapBackend *CreateBitmapHaiku_crSI(const S::GUI::Size &iSize, S::Int iDepth)
 {
-	return new S::GUI::BitmapHaiku(cx, cy, bpp);
+	return new S::GUI::BitmapHaiku(iSize, iDepth);
 }
 
 S::GUI::BitmapBackend *CreateBitmapHaiku_cI(const int nil)
@@ -27,15 +27,15 @@ S::GUI::BitmapBackend *CreateBitmapHaiku_cI(const int nil)
 	return new S::GUI::BitmapHaiku(nil);
 }
 
-S::GUI::BitmapBackend *CreateBitmapHaiku_crS(const S::GUI::BitmapBackend &iBitmap)
+S::GUI::BitmapBackend *CreateBitmapHaiku_crB(const S::GUI::BitmapBackend &iBitmap)
 {
 	return new S::GUI::BitmapHaiku((const S::GUI::BitmapHaiku &) iBitmap);
 }
 
 S::Int	 bitmapHaikuTmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapHaiku_pV);
-S::Int	 bitmapHaikuTmp_III	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapHaiku_III);
+S::Int	 bitmapHaikuTmp_crSI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapHaiku_crSI);
 S::Int	 bitmapHaikuTmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapHaiku_cI);
-S::Int	 bitmapHaikuTmp_crS	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapHaiku_crS);
+S::Int	 bitmapHaikuTmp_crB	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapHaiku_crB);
 
 S::GUI::BitmapHaiku::BitmapHaiku(Void *iBitmap)
 {
@@ -45,12 +45,12 @@ S::GUI::BitmapHaiku::BitmapHaiku(Void *iBitmap)
 	SetSystemBitmap(iBitmap);
 }
 
-S::GUI::BitmapHaiku::BitmapHaiku(Int cx, Int cy, Int bpp)
+S::GUI::BitmapHaiku::BitmapHaiku(const Size &iSize, Int iDepth)
 {
 	type	= BITMAP_HAIKU;
 	bitmap	= NIL;
 
-	CreateBitmap(cx, cy, bpp);
+	CreateBitmap(iSize, iDepth);
 }
 
 S::GUI::BitmapHaiku::BitmapHaiku(const int nil)
@@ -74,22 +74,23 @@ S::GUI::BitmapHaiku::~BitmapHaiku()
 	DeleteBitmap();
 }
 
-S::Bool S::GUI::BitmapHaiku::CreateBitmap(Int cx, Int cy, Int bpp)
+S::Bool S::GUI::BitmapHaiku::CreateBitmap(const Size &nSize, Int nDepth)
 {
 	DeleteBitmap();
 
-	bpp = 32;
+	if (nDepth == -1) nDepth = 32;
+	if (nDepth != 32) nDepth = 32;
 
-	bitmap	= new BBitmap(BRect(0, 0, cx - 1, cy - 1), B_RGB32, true);
+	bitmap	= new BBitmap(BRect(0, 0, nSize.cx - 1, nSize.cy - 1), B_RGB32, true);
 
 	if (bitmap == NIL) return False;
 
 	bytes	= bitmap->Bits();
 
-	size	= Size(cx, cy);
-	depth	= bpp;
-
-	align	= cx * (bpp / 8);
+	size	= nSize;
+	depth	= nDepth;
+	bpp	= depth;
+	align	= 4;
 
 	return True;
 }
@@ -106,6 +107,7 @@ S::Bool S::GUI::BitmapHaiku::DeleteBitmap()
 		depth	= 0;
 
 		bytes	= NIL;
+		bpp	= 0;
 		align	= 0;
 	}
 
@@ -124,7 +126,7 @@ S::Bool S::GUI::BitmapHaiku::SetSystemBitmap(Void *nBitmap)
 	{
 		BRect	 bounds = ((BBitmap *) nBitmap)->Bounds();
 
-		CreateBitmap(bounds.right + 1, bounds.bottom + 1, 32);
+		CreateBitmap(Size(bounds.right + 1, bounds.bottom + 1), 32);
 
 		BView	*view = new BView(bounds, NULL, B_FOLLOW_ALL_SIDES, 0);
 

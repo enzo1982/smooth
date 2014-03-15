@@ -433,7 +433,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 	}
 	else if (style & Rect::Inverted)
 	{
-		Bitmap	 area(rect.right - rect.left, rect.bottom - rect.top);
+		Bitmap	 area(rect.GetSize());
 
 		BlitToBitmap(iRect, area, Rect(Point(0, 0), area.GetSize()));
 

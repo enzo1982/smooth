@@ -57,13 +57,13 @@ namespace smooth
 				Bool			 IsDepthSupported(Int);
 			public:
 							 BitmapXLib(Void * = NIL);
-							 BitmapXLib(Int, Int, Int);
+							 BitmapXLib(const Size &, Int);
 							 BitmapXLib(const int);
 							 BitmapXLib(const BitmapXLib &);
 
 							~BitmapXLib();
 
-				Bool			 CreateBitmap(Int, Int, Int);
+				Bool			 CreateBitmap(const Size &, Int);
 				Bool			 DeleteBitmap();
 
 				Int			 Scale(const Size &);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -281,7 +281,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 	Int		 hssize = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 	Int		 huexoffset = hssize + Math::Round(14.0 * surface->GetSurfaceDPI() / 96.0);
 	double		 huebias = 256 / (double) hssize;
-	Bitmap		 bmp(hssize, hssize);
+	Bitmap		 bmp(Size(hssize, hssize));
 
 	rect.left	= huexoffset;
 	rect.top	= yoffset;

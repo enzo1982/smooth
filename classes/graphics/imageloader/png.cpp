@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -114,8 +114,8 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, NULL, NULL, NULL);
 
-	bitmap.CreateBitmap(width, height, (color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
-					    color_type == PNG_COLOR_TYPE_GRAY_ALPHA) ? 32 : 24);
+	bitmap.CreateBitmap(Size(width, height), (color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
+						  color_type == PNG_COLOR_TYPE_GRAY_ALPHA) ? 32 : 24);
 
 	/* Set background color if the image has an alpha
 	 * channel but we only have a non-alpha bitmap.

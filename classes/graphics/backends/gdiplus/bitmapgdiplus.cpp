@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,9 +15,9 @@ S::GUI::BitmapBackend *CreateBitmapGDIPlus_pV(S::Void *iBitmap)
 	return new S::GUI::BitmapGDIPlus(iBitmap);
 }
 
-S::GUI::BitmapBackend *CreateBitmapGDIPlus_III(S::Int cx, S::Int cy, S::Int bpp)
+S::GUI::BitmapBackend *CreateBitmapGDIPlus_crSI(const S::GUI::Size &iSize, S::Int iDepth)
 {
-	return new S::GUI::BitmapGDIPlus(cx, cy, bpp);
+	return new S::GUI::BitmapGDIPlus(iSize, iDepth);
 }
 
 S::GUI::BitmapBackend *CreateBitmapGDIPlus_cI(const int nil)
@@ -25,15 +25,15 @@ S::GUI::BitmapBackend *CreateBitmapGDIPlus_cI(const int nil)
 	return new S::GUI::BitmapGDIPlus(nil);
 }
 
-S::GUI::BitmapBackend *CreateBitmapGDIPlus_crS(const S::GUI::BitmapBackend &iBitmap)
+S::GUI::BitmapBackend *CreateBitmapGDIPlus_crB(const S::GUI::BitmapBackend &iBitmap)
 {
 	return new S::GUI::BitmapGDIPlus((const S::GUI::BitmapGDIPlus &) iBitmap);
 }
 
 S::Int	 bitmapGDITmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_pV);
-S::Int	 bitmapGDITmp_III	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_III);
+S::Int	 bitmapGDITmp_crSI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_crSI);
 S::Int	 bitmapGDITmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_cI);
-S::Int	 bitmapGDITmp_crS	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_crS);
+S::Int	 bitmapGDITmp_crB	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_crB);
 
 S::GUI::BitmapGDIPlus::BitmapGDIPlus(Void *iBitmap)
 {
@@ -44,13 +44,13 @@ S::GUI::BitmapGDIPlus::BitmapGDIPlus(Void *iBitmap)
 	SetSystemBitmap(iBitmap);
 }
 
-S::GUI::BitmapGDIPlus::BitmapGDIPlus(Int cx, Int cy, Int bpp)
+S::GUI::BitmapGDIPlus::BitmapGDIPlus(const Size &iSize, Int iDepth)
 {
 	type	= BITMAP_GDIPLUS;
 	bitmap	= NIL;
 	hBitmap	= NIL;
 
-	CreateBitmap(cx, cy, bpp);
+	CreateBitmap(iSize, iDepth);
 }
 
 S::GUI::BitmapGDIPlus::BitmapGDIPlus(const int nil)
@@ -76,21 +76,21 @@ S::GUI::BitmapGDIPlus::~BitmapGDIPlus()
 	DeleteBitmap();
 }
 
-S::Bool S::GUI::BitmapGDIPlus::CreateBitmap(Int cx, Int cy, Int bpp)
+S::Bool S::GUI::BitmapGDIPlus::CreateBitmap(const Size &nSize, Int nDepth)
 {
 	DeleteBitmap();
 
-	if (bpp == -1) bpp = 32;
-	if (bpp != 32) bpp = 32;
+	if (nDepth == -1) nDepth = 32;
+	if (nDepth != 32) nDepth = 32;
 
 	UnsignedByte	*buffer = new UnsignedByte [sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)];
 	BITMAPINFO	*bmpInfo = (BITMAPINFO *) buffer;
 
 	bmpInfo->bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
-	bmpInfo->bmiHeader.biWidth		= cx;
-	bmpInfo->bmiHeader.biHeight		= cy;
+	bmpInfo->bmiHeader.biWidth		= nSize.cx;
+	bmpInfo->bmiHeader.biHeight		= nSize.cy;
 	bmpInfo->bmiHeader.biPlanes		= 1;
-	bmpInfo->bmiHeader.biBitCount		= bpp;
+	bmpInfo->bmiHeader.biBitCount		= nDepth;
 	bmpInfo->bmiHeader.biCompression	= BI_RGB;
 	bmpInfo->bmiHeader.biSizeImage		= 0;
 	bmpInfo->bmiHeader.biXPelsPerMeter	= 0;
@@ -102,17 +102,17 @@ S::Bool S::GUI::BitmapGDIPlus::CreateBitmap(Int cx, Int cy, Int bpp)
 	bmpInfo->bmiColors[0].rgbRed		= 0;
 	bmpInfo->bmiColors[0].rgbReserved	= 0;
 
-	bytes = new UnsignedByte [(bpp / 8) * cx * cy];
-
+	bytes	= new UnsignedByte [(nDepth / 8) * nSize.cx * nSize.cy];
 	bitmap	= new Gdiplus::Bitmap(bmpInfo, bytes);
 
 	delete [] buffer;
 
 	if (bitmap == NIL) return False;
 
-	size	= Size(cx, cy);
-	depth	= bpp;
-	align	= (bpp / 8) * cx;
+	size	= nSize;
+	depth	= nDepth;
+	bpp	= depth;
+	align	= 4;
 
 	return True;
 }
@@ -134,6 +134,7 @@ S::Bool S::GUI::BitmapGDIPlus::DeleteBitmap()
 		delete [] (UnsignedByte *) bytes;
 
 		bytes	= NIL;
+		bpp	= 0;
 		align	= 0;
 	}
 
@@ -154,7 +155,7 @@ S::Bool S::GUI::BitmapGDIPlus::SetSystemBitmap(Void *nBitmap)
 
 		GetObjectA(nBitmap, sizeof(bmp), &bmp);
 
-		CreateBitmap(bmp.bmWidth, bmp.bmHeight, bmp.bmBitsPixel);
+		CreateBitmap(Size(bmp.bmWidth, bmp.bmHeight), bmp.bmBitsPixel);
 
 		Gdiplus::Graphics	 graphics(bitmap);
 		Gdiplus::Bitmap		 nBitmapB((HBITMAP) nBitmap, NIL);

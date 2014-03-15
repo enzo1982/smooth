@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,13 +35,13 @@ namespace smooth
 				BBitmap			*bitmap;
 			public:
 							 BitmapHaiku(Void * = NIL);
-							 BitmapHaiku(Int, Int, Int);
+							 BitmapHaiku(const Size &, Int);
 							 BitmapHaiku(const int);
 							 BitmapHaiku(const BitmapHaiku &);
 
 							~BitmapHaiku();
 
-				Bool			 CreateBitmap(Int, Int, Int);
+				Bool			 CreateBitmap(const Size &, Int);
 				Bool			 DeleteBitmap();
 
 				Bool			 SetSystemBitmap(Void *);

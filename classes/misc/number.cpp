@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -221,7 +221,7 @@ S::String S::Number::ToFloatString() const
 	if	(nOfNull > 0) fract = (Int64) (fract / Math::Pow(10, nOfNull));
 	else if (nOfNine > 0) fract = (Int64) (fract / Math::Pow(10, nOfNine)) + 1;
 
-	String	 string = Number(Math::Floor(Math::Abs(floatValue))).ToIntString();;
+	String	 string = Number(Math::Floor(Math::Abs(floatValue))).ToIntString();
 
 	if (nOfNine == digits)
 	{

@@ -135,6 +135,8 @@ Bool Section::Save(XML::Node *xmlSection, const String &templateName)
 
 Bool Section::Filter(const String &string, List *list_filtered)
 {
+	if (list == NIL) return True;
+
 	for (Int i = 0; i < list->Length(); i++)
 	{
 		const ListEntry	*entry = list->GetNthEntry(i);

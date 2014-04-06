@@ -13,7 +13,7 @@ ifeq ($(BUILD_OSX),True)
 else ifeq ($(BUILD_QNX),True)
 	MYCCOPTS += -I/usr/X11R6/include
 else
-	MYCCOPTS += $(shell pkg-config --cflags x11)
+	MYCCOPTS += $(shell pkg-config --cflags x11) $(shell pkg-config --cflags xft)
 endif
 endif
 endif

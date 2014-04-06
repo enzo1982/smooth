@@ -19,6 +19,7 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <fribidi.h>
 
 using namespace X11;
 
@@ -350,31 +351,74 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 	Rect		 rect	    = iRect;
 	Int		 lineHeight = font.GetScaledTextSizeY() + 3;
 
-	XGCValues	 gcValues;
-	X11::Font	 xfont = XLoadFont(display, String("-*-").Append(font.GetName().ToLower()).Append("-").Append(font.GetWeight() >= Font::Bold ? "bold" : "medium").Append("-").Append(font.GetStyle() & Font::Italic ? "i" : "r").Append("-normal-*-").Append(String::FromInt(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0))).Append("-*-*-*-*-*-*-*"));
+	XftFont		*xfont = XftFontOpenName(display, XDefaultScreen(display), String(font.GetName()).Append("-").Append(String::FromInt(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0))).Append(":").Append(font.GetWeight() >= Font::Bold ? "bold" : "medium").Append(font.GetStyle() & Font::Italic ? ":italic" : ""));
+	XftDraw		*wdraw = XftDrawCreate(display, window, XDefaultVisual(display, XDefaultScreen(display)), XDefaultColormap(display, XDefaultScreen(display)));
+	XftDraw		*bdraw = XftDrawCreate(display, bitmap, XDefaultVisual(display, XDefaultScreen(display)), XDefaultColormap(display, XDefaultScreen(display)));
 
-	gcValues.foreground = Color(font.GetColor().GetBlue(), font.GetColor().GetGreen(), font.GetColor().GetRed());
-	gcValues.font	    = xfont;
+	/* Allocate text color.
+	 */
+	XRenderColor	 xrcolor;
+	XftColor	 xftcolor;
 
-	XChangeGC(display, gc, GCForeground | GCFont, &gcValues);
+	xrcolor.red   = font.GetColor().GetRed()   * 256;
+	xrcolor.green = font.GetColor().GetGreen() * 256;
+	xrcolor.blue  = font.GetColor().GetBlue()  * 256;
+	xrcolor.alpha = 0xffff;
 
+	XftColorAllocValue(display, DefaultVisual(display, DefaultScreen(display)), DefaultColormap(display, DefaultScreen(display)), &xrcolor, &xftcolor);
+
+	/* Set clipping area.
+	 */
+	Rect		 pRect = *(paintRects.GetLast());
+	XRectangle	 clipRect;
+
+	clipRect.x	= pRect.left;
+	clipRect.y	= pRect.top;
+	clipRect.width	= pRect.GetWidth();
+	clipRect.height	= pRect.GetHeight();
+
+	XftDrawSetClipRectangles(wdraw, 0, 0, &clipRect, 1);
+	XftDrawSetClipRectangles(bdraw, 0, 0, &clipRect, 1);
+
+	/* Draw text line by line.
+	 */
 	const Array<String>	&lines = string.Explode("\n");
 
-	foreach (const String &line, lines)
+	foreach (String line, lines)
 	{
+		Bool	 rtlCharacters = False;
+
+		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
+
 		Rect	 tRect = rightToLeft.TranslateRect(rect);
+
+		if (rtlCharacters && Setup::useIconv)
+		{
+			/* Reorder the string with fribidi.
+			 */
+			FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
+			FriBidiParType	 type = (rightToLeft.GetRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
+
+			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, NIL, NIL, NIL);
+
+			visual[line.Length()] = 0;
+
+			line.ImportFrom("UCS-4LE", (char *) visual);
+
+			delete [] visual;
+		}
 
 		if (Setup::enableUnicode)
 		{
-			if (!painting) XDrawString16(display, window, gc, tRect.left, tRect.top + lineHeight - 4, (XChar2b *) line.ConvertTo("UTF-16BE"), line.Length());
+			if (!painting) XftDrawString16(wdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), line.Length());
 
-			XDrawString16(display, bitmap, gc, tRect.left, tRect.top + lineHeight - 4, (XChar2b *) line.ConvertTo("UTF-16BE"), line.Length());
+			XftDrawString16(bdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), line.Length());
 		}
 		else
 		{
-			if (!painting) XDrawString(display, window, gc, tRect.left, tRect.top + lineHeight - 4, line, line.Length());
+			if (!painting) XftDrawString8(wdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar8 *) (char *) line, line.Length());
 
-			XDrawString(display, bitmap, gc, tRect.left, tRect.top + lineHeight - 4, line, line.Length());
+			XftDrawString8(bdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar8 *) (char *) line, line.Length());
 		}
 
 		rect.top += lineHeight;
@@ -382,7 +426,14 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 
 	String::ExplodeFinish();
 
-	XUnloadFont(display, xfont);
+	/* Clean up everything.
+	 */
+	XftColorFree(display, DefaultVisual(display, DefaultScreen(display)), DefaultColormap(display, DefaultScreen(display)), &xftcolor);
+
+	XftDrawDestroy(wdraw);
+	XftDrawDestroy(bdraw);
+
+	XftFontClose(display, xfont);
 
 	return Success();
 }

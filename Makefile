@@ -30,7 +30,7 @@ ifeq ($(BUILD_WIN32),True)
 	LIBNAME = $(LIBDIR)/libsmooth.a
 else ifeq ($(BUILD_OSX),True)
 	ifeq ($(BUILD_XLIB),True)
-		LIBS += -lpng -lz -lX11 -lXmu
+		LIBS += -lpng -lz -lX11 -lXmu -lXft
 	else
 		LIBS += $(LIBDIR)/libpng.a $(LIBDIR)/libz.a
 	endif
@@ -47,7 +47,7 @@ else ifeq ($(BUILD_HAIKU),True)
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_QNX),True)
-	LIBS += -liconv -lpng -lz -lsocket -lX11 -lXmu -lph
+	LIBS += -liconv -lpng -lz -lsocket -lX11 -lXmu -lXft -lph
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else
@@ -59,7 +59,7 @@ else
 		LIBS += -lXau -lXdmcp -lXxf86vm -lSM -lICE -lffi -ldrm -lpcre
 	endif
 
-	LIBS += $(shell pkg-config --libs libpng) $(shell pkg-config --libs xmu) $(shell pkg-config --libs gtk+-2.0)
+	LIBS += $(shell pkg-config --libs libpng) $(shell pkg-config --libs xmu) $(shell pkg-config --libs xft) $(shell pkg-config --libs gtk+-2.0)
 	LIBS += -lpthread
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,8 @@
 
 #include <smooth/graphics/backends/xlib/fontxlib.h>
 #include <smooth/graphics/surface.h>
+
+#include <fribidi.h>
 
 using namespace X11;
 
@@ -31,28 +33,46 @@ S::GUI::FontXLib::~FontXLib()
 {
 }
 
-S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &text, Bool scaled) const
+S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &iText, Bool scaled) const
 {
-	if (text == NIL) return Size();
+	if (iText == NIL) return Size();
 
-	Float		 dpi	    = Surface().GetSurfaceDPI();
-	Display		*display    = Backends::BackendXLib::GetDisplay();
-	XFontStruct	*fontStruct = XLoadQueryFont(display, String("-*-").Append(fontName.ToLower()).Append("-").Append(fontWeight >= Font::Bold ? "bold" : "medium").Append("-").Append(fontStyle & Font::Italic ? "i" : "r").Append("-normal-*-").Append(String::FromInt(Math::Round(fontSize * dpi / 72.0))).Append("-*-*-*-*-*-*-*"));
+	String	 text = iText;
+	Float	 dpi  = Surface().GetSurfaceDPI();
 
-	int		 direction  = 0;
-	int		 ascent	    = 0;
-	int		 descent    = 0;
-	XCharStruct	 overall;
+	Bool	 rtlCharacters = False;
 
-	if (Setup::enableUnicode) XTextExtents16(fontStruct, (XChar2b *) text.ConvertTo("UTF-16BE"), text.Length(), &direction, &ascent, &descent, &overall);
-	else			  XTextExtents(fontStruct, text, text.Length(), &direction, &ascent, &descent, &overall);
+	for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x07BF) { rtlCharacters = True; break; }
 
-	XFreeFont(display, fontStruct);
+	if (rtlCharacters && Setup::useIconv)
+	{
+		/* Reorder the string with fribidi.
+		 */
+		FriBidiChar	*visual = new FriBidiChar [text.Length() + 1];
+		FriBidiParType	 type = FRIBIDI_PAR_RTL;
+
+		fribidi_log2vis((FriBidiChar *) text.ConvertTo("UCS-4LE"), text.Length(), &type, visual, NIL, NIL, NIL);
+
+		visual[text.Length()] = 0;
+
+		text.ImportFrom("UCS-4LE", (char *) visual);
+
+		delete [] visual;
+	}
+
+	Display		*display = Backends::BackendXLib::GetDisplay();
+	XftFont		*font	 = XftFontOpenName(display, XDefaultScreen(display), String(fontName).Append("-").Append(String::FromInt(Math::Round(fontSize * dpi / 96.0))).Append(":").Append(fontWeight >= Font::Bold ? "bold" : "medium").Append(fontStyle & Font::Italic ? ":italic" : ""));
+	XGlyphInfo	 extents = { 0 };
+
+	if (Setup::enableUnicode) XftTextExtents16(display, font, (XftChar16 *) text.ConvertTo("UCS2"), text.Length(), &extents);
+	else			  XftTextExtents8(display, font, (XftChar8 *) (char *) text, text.Length(), &extents);
+
+	XftFontClose(display, font);
 
 	int		 lines	    = 1;
 
 	for (Int j = 0; j < text.Length(); j++) if (text[j] == '\n') lines++;
 
-	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(overall.width, (overall.ascent + overall.descent + 3) * lines);
-	else					   return Size(overall.width, (overall.ascent + overall.descent + 3) * lines) * 96.0 / dpi;
+	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(extents.width - 2, (font->ascent + 2) * lines);
+	else					   return Size(extents.width - 2, (font->ascent + 2) * lines) * 96.0 / dpi;
 }

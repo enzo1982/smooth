@@ -5,6 +5,7 @@ xx.xx.14 xx:xx - smooth alpha 0.8.72.0
 - pointer.cpp		- moved system dependent code to backends
 - windowgdi.cpp		- fixed handling of modal windows on Windows
 - windowxlib.cpp	- added drag & drop support
+			- added international language input support
 - translator.cpp	- added Afrikaans language support
 - cursor.cpp		- fixed CJK input method editor appearing offset in Windows Vista/7/8 default designs
 - urlencode.cpp		- new class: URLEncode, handles URL (percent) encoding/decoding

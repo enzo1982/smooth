@@ -15,6 +15,8 @@ namespace smooth
 {
 	namespace GUI
 	{
+		class Cursor;
+
 		class WindowXLib;
 	};
 };
@@ -59,6 +61,9 @@ namespace smooth
 			private:
 				static Array<WindowXLib *, Void *>	 windowBackends;
 
+				static Cursor				*activeCursor;
+				static Point				 activeCursorPos;
+
 				X11::Display				*display;
 				X11::XIM				 im;
 
@@ -72,6 +77,7 @@ namespace smooth
 				X11::Window				 oldwnd;
 
 				X11::XIC				 ic;
+				X11::Window				 iwnd;
 
 				X11::CARD32				*sysIcon;
 				Int					 sysIconSize;
@@ -97,6 +103,9 @@ namespace smooth
 
 				Input::Keyboard::Key			 ConvertKey(Int);
 			public:
+				static Int				 Initialize();
+				static Int				 Free();
+
 									 WindowXLib(Void * = NIL);
 									~WindowXLib();
 
@@ -130,6 +139,14 @@ namespace smooth
 			accessors:
 				Void					 SetSelection(const String &nSelection) { selection = nSelection; }
 				Void					 SetClipboard(const String &nClipboard) { clipboard = nClipboard; }
+			slots:
+				static Void				 SetCursor(Cursor *, const Point &);
+				static Void				 RemoveCursor(Cursor *);
+
+				Void					 OnXIMPreeditStart();
+				Void					 OnXIMPreeditDone();
+				Void					 OnXIMPreeditDraw(X11::XIMPreeditDrawCallbackStruct *);
+				Void					 OnXIMPreeditCaret(X11::XIMPreeditCaretCallbackStruct *);
 		};
 	};
 };

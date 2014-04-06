@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 
 using namespace X11;
 
@@ -38,6 +39,8 @@ S::Int S::Backends::BackendXLib::Init()
 {
 	XInitThreads();
 
+	/* Open display.
+	 */
 	display	= XOpenDisplay(NIL);
 
 	if (display == NIL)
@@ -49,8 +52,16 @@ S::Int S::Backends::BackendXLib::Init()
 		return Error();
 	}
 
+	/* Set locale and open input method.
+	 */
+	setlocale(LC_ALL, "");
+
+	XSetLocaleModifiers("");
+
 	im = XOpenIM(display, NIL, NIL, NIL);
 
+	/* Set default font size.
+	 */
 	Setup::FontSize = 1.00;
 
 	return Success();

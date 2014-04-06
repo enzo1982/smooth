@@ -10,6 +10,7 @@
 
 #include <smooth/gui/window/backends/xlib/windowxlib.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/gui/widgets/special/cursor.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/encoding/urlencode.h>
@@ -27,7 +28,61 @@ S::GUI::WindowBackend *CreateWindowXLib()
 
 S::Int	 windowXLibTmp = S::GUI::WindowBackend::SetBackend(&CreateWindowXLib);
 
+S::Int	 addWindowXLibInitTmp = S::AddInitFunction(&S::GUI::WindowXLib::Initialize);
+S::Int	 addWindowXLibFreeTmp = S::AddFreeFunction(&S::GUI::WindowXLib::Free);
+
 S::Array<S::GUI::WindowXLib *, S::Void *>	 S::GUI::WindowXLib::windowBackends;
+
+S::GUI::Cursor	*S::GUI::WindowXLib::activeCursor = NIL;
+S::GUI::Point	 S::GUI::WindowXLib::activeCursorPos;
+
+namespace smooth
+{
+	namespace GUI
+	{
+		static int OnXIMPreeditStart(XIC ic, XPointer backend, XPointer dummy)
+		{
+			((WindowXLib *) backend)->OnXIMPreeditStart();
+
+			return -1;
+		}
+
+		static void OnXIMPreeditDone(XIC ic, XPointer backend, XPointer dummy)
+		{
+			((WindowXLib *) backend)->OnXIMPreeditDone();
+		}
+
+		static void OnXIMPreeditDraw(XIC ic, XPointer backend, XIMPreeditDrawCallbackStruct *data)
+		{
+			((WindowXLib *) backend)->OnXIMPreeditDraw(data);
+		}
+
+		static void OnXIMPreeditCaret(XIC ic, XPointer backend, XIMPreeditCaretCallbackStruct *data)
+		{
+			((WindowXLib *) backend)->OnXIMPreeditCaret(data);
+		}
+	};
+};
+
+S::Int S::GUI::WindowXLib::Initialize()
+{
+	/* Register for cursor events.
+	 */
+	Cursor::internalSetCursor.Connect(&WindowXLib::SetCursor);
+	Cursor::internalRemoveCursor.Connect(&WindowXLib::RemoveCursor);
+
+	return Success();
+}
+
+S::Int S::GUI::WindowXLib::Free()
+{
+	/* Unregister cursor event handlers.
+	 */
+	Cursor::internalSetCursor.Disconnect(&WindowXLib::SetCursor);
+	Cursor::internalRemoveCursor.Disconnect(&WindowXLib::RemoveCursor);
+
+	return Success();
+}
 
 S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 {
@@ -40,6 +95,7 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 	oldwnd		= NIL;
 
 	ic		= NIL;
+	iwnd		= NIL;
 
 	id		= windowBackends.Add(this);
 
@@ -111,6 +167,7 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::GetWindowBackend(::Window wnd)
 		if (window != NIL)
 		{
 			if (window->wnd    == wnd ||
+			    window->iwnd   == wnd ||
 			    window->oldwnd == wnd) return window;
 		}
 	}
@@ -768,17 +825,44 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	{
 		/* Create input context.
 		 */
-		if (im != NIL) ic = XCreateIC(im, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, wnd, NULL);
+		if (im != NIL)
+		{
+			iwnd = XCreateWindow(display, wnd, 0, 0, 1, 1, 0, CopyFromParent, InputOnly, CopyFromParent, 0, NIL);
 
-		/* Get mask of filter events for IC.
-		 */
-		long	 filterEvents = 0;
+			XMapWindow(display, iwnd);
 
-		if (ic != NIL) XGetICValues(ic, XNFilterEvents, &filterEvents, NULL);
+			XIMCallback	 cbPeStart  = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditStart };
+			XIMCallback	 cbPeDone   = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditDone  };
+			XIMCallback	 cbPeDraw   = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditDraw  };
+			XIMCallback	 cbPeCaret  = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditCaret };
+
+			XVaNestedList	 preeditCbs = XVaCreateNestedList(0, XNPreeditStartCallback, &cbPeStart,
+									     XNPreeditDoneCallback,  &cbPeDone,
+									     XNPreeditDrawCallback,  &cbPeDraw,
+									     XNPreeditCaretCallback, &cbPeCaret, NULL);
+
+			ic = XCreateIC(im, XNClientWindow,	wnd,
+					   XNFocusWindow,	iwnd,
+					   XNInputStyle,	XIMPreeditCallbacks | XIMStatusNothing,
+					   XNPreeditAttributes,	preeditCbs, NULL);
+
+			XFree(preeditCbs);
+
+			/* Get mask of filter events for IC.
+			 */
+			if (ic != NIL)
+			{
+				long	 filterEvents = 0;
+
+				XGetICValues(ic, XNFilterEvents, &filterEvents, NULL);
+
+				XSelectInput(display, iwnd, filterEvents);
+			}
+		}
 
 		/* Select event types we want to receive.
 		 */
-		XSelectInput(display, wnd, ExposureMask | FocusChangeMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | StructureNotifyMask | filterEvents);
+		XSelectInput(display, wnd, ExposureMask | FocusChangeMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | StructureNotifyMask);
 
 		/* Opt in to the WM_DELETE_WINDOW and _NET_WM_PING protocols.
 		 */
@@ -872,15 +956,19 @@ S::Int S::GUI::WindowXLib::Close()
 
 	drawSurface = NIL;
 
-	/* Destroy input context and window.
+	/* Destroy input context.
 	 */
 	if (ic != NIL)
 	{
 		XDestroyIC(ic);
+		XDestroyWindow(display, iwnd);
 
-		ic = NIL;
+		ic   = NIL;
+		iwnd = NIL;
 	}
 
+	/* Destroy window.
+	 */
 	XDestroyWindow(display, wnd);
 
 	oldwnd	= wnd;
@@ -1160,4 +1248,114 @@ S::Int S::GUI::WindowXLib::Raise()
 	XFlush(display);
 
 	return Success();
+}
+
+S::Void S::GUI::WindowXLib::OnXIMPreeditStart()
+{
+}
+
+S::Void S::GUI::WindowXLib::OnXIMPreeditDone()
+{
+}
+
+S::Void S::GUI::WindowXLib::OnXIMPreeditDraw(XIMPreeditDrawCallbackStruct *data)
+{
+	if (activeCursor == NIL) return;
+
+	/* Get preedit string if any.
+	 */
+	String	 string;
+
+	if (data->text != NIL)
+	{
+		if (data->text->encoding_is_wchar) string = data->text->string.wide_char;
+		else				   string.ImportFrom("UTF-8", data->text->string.multi_byte);
+	}
+
+	/* Draw string at cursor position.
+	 */
+	Rect	 rect = Rect::OverlapRect(Rect(activeCursorPos - Point(1, 1), activeCursor->GetRealSize()), Rect(activeCursor->GetRealPosition(), activeCursor->GetRealSize()));
+
+	activeCursor->SetIMECursor(True);
+
+	drawSurface->StartPaint(rect);
+	drawSurface->Box(rect, activeCursor->GetBackgroundColor(), Rect::Filled);
+
+	if (data->text != NIL)
+	{
+		for (Int i = 0; i < data->text->length; i++)
+		{
+			Font	 font = activeCursor->GetFont();
+
+			if (data->text->feedback != NIL)
+			{
+				if (data->text->feedback[i] & XIMUnderline) font.SetStyle(Font::Underline);
+			}
+
+			drawSurface->SetText(string.SubString(i, 1), rect + Point(font.GetScaledTextSizeX(string.Head(i)), 0), font);
+		}
+	}
+
+	drawSurface->EndPaint();
+
+	activeCursor->SetIMEAdvance(activeCursor->GetFont().GetScaledTextSizeX(string.Head(data->caret)));
+	activeCursor->SetIMECursor(False);
+}
+
+S::Void S::GUI::WindowXLib::OnXIMPreeditCaret(XIMPreeditCaretCallbackStruct *data)
+{
+}
+
+S::Void S::GUI::WindowXLib::SetCursor(Cursor *cursor, const Point &point)
+{
+	WindowXLib	*window = GetWindowBackend((X11::Window) cursor->GetContainerWindow()->GetSystemWindow());
+
+	if (window->ic != NIL)
+	{
+		/* Remove active cursor.
+		 */
+		if (cursor != activeCursor && activeCursor != NIL) RemoveCursor(activeCursor);
+
+		/* Move input window to cursor position.
+		 */
+		XMoveWindow(window->display, window->iwnd, point.x - 3, point.y + cursor->GetFont().GetScaledTextSizeY() + 1);
+
+		XSetInputFocus(window->display, window->iwnd, RevertToParent, CurrentTime);
+
+		/* Set current input context.
+		 */
+		XSetICFocus(window->ic);
+	}
+
+	activeCursor	= cursor;
+	activeCursorPos = point;
+}
+
+S::Void S::GUI::WindowXLib::RemoveCursor(Cursor *cursor)
+{
+	if (activeCursor != cursor) return;
+
+	WindowXLib	*window = GetWindowBackend((X11::Window) cursor->GetContainerWindow()->GetSystemWindow());
+
+	if (window->ic != NIL)
+	{
+		/* Clear composition string.
+		 */
+		wchar_t	*string = XwcResetIC(window->ic);
+
+		if (string != NIL) XFree(string);
+
+		/* Clear preediting area.
+		 */
+		Rect	 rect = Rect::OverlapRect(Rect(activeCursorPos - Point(1, 1), activeCursor->GetRealSize()), Rect(activeCursor->GetRealPosition(), activeCursor->GetRealSize()));
+
+		activeCursor->SetIMECursor(True);
+
+		window->drawSurface->Box(rect, activeCursor->GetBackgroundColor(), Rect::Filled);
+
+		activeCursor->SetIMECursor(False);
+	}
+
+	activeCursor	= NIL;
+	activeCursorPos = Point();
 }

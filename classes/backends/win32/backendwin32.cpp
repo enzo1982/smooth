@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,12 +14,12 @@
 #include <shlobj.h>
 #include <iconv.h>
 
-size_t	 (*iconv)(iconv_t, char **, size_t *, char **, size_t *)	= NIL;
-iconv_t	 (*iconv_open)(const char *, const char *)			= NIL;
-int	 (*iconv_close)(iconv_t)					= NIL;
+size_t	 (*iconv)(iconv_t, char **, size_t *, char **, size_t *) = NIL;
+iconv_t	 (*iconv_open)(const char *, const char *)		 = NIL;
+int	 (*iconv_close)(iconv_t)				 = NIL;
 
-HINSTANCE  iconvDLL	= NIL;
-HINSTANCE  hDllInstance	= NIL;
+HINSTANCE	 iconvDLL     = NIL;
+HINSTANCE	 hDllInstance = NIL;
 
 S::Bool S::LoadIconvDLL()
 {
@@ -100,6 +100,15 @@ S::Int S::Backends::BackendWin32::Init()
 	WSADATA	 wsaData;
 
 	WSAStartup(wVersionRequested, &wsaData);
+
+	/* Declare the process DPI aware.
+	 */
+	HMODULE	 user32dll = LoadLibraryA("user32.dll");
+	BOOL	 (*ex_SetProcessDPIAware)() = (BOOL (*)()) GetProcAddress(user32dll, "SetProcessDPIAware");
+
+	if (ex_SetProcessDPIAware != NIL) ex_SetProcessDPIAware();
+
+//	FreeLibrary(user32dll);
 
 	/* Get default font size.
 	 */

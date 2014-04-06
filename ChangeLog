@@ -9,6 +9,7 @@ xx.xx.14 xx:xx - smooth alpha 0.8.72.0
 - cursor.cpp		- fixed CJK input method editor appearing offset in Windows Vista/7/8 default designs
 - urlencode.cpp		- new class: URLEncode, handles URL (percent) encoding/decoding
 
+- fixed blurry GUI on Windows with high resolution displays
 - removed unused multiple document interface (MDI) code
 - allow building on PowerPC
 - ported to Cocoa

@@ -160,13 +160,15 @@ ifeq ($(BUILD_V8),True)
 endif
 
 ifeq ($(BUILD_LINUX),True)
-	ldconfig
+	/sbin/ldconfig
 else ifeq ($(BUILD_GNU),True)
-	ldconfig
+	/sbin/ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
-	ldconfig
+	/sbin/ldconfig
 else ifeq ($(BUILD_NETBSD),True)
-	ldconfig
+	/sbin/ldconfig
+else ifeq ($(BUILD_OPENBSD),True)
+	/sbin/ldconfig
 endif
 else
 	$(MKDIR) -p $(PREFIX)/$(LIB)
@@ -210,13 +212,15 @@ ifeq ($(BUILD_V8),True)
 endif
 
 ifeq ($(BUILD_LINUX),True)
-	ldconfig
+	/sbin/ldconfig
 else ifeq ($(BUILD_GNU),True)
-	ldconfig
+	/sbin/ldconfig
 else ifeq ($(BUILD_FREEBSD),True)
-	ldconfig
+	/sbin/ldconfig
 else ifeq ($(BUILD_NETBSD),True)
-	ldconfig
+	/sbin/ldconfig
+else ifeq ($(BUILD_OPENBSD),True)
+	/sbin/ldconfig
 endif
 else
 	$(REMOVE) $(REMOVE_OPTS) $(PREFIX)/$(LIB)/libsmooth-$(VERSION)$(SHARED)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,7 +32,7 @@ Test::Test()
 	mainWnd_titlebar	= new Titlebar();
 	mainWnd_statusbar	= new Statusbar("Ready");
 
-	mainWnd_divider1	= new Divider(280, OR_HORZ | OR_TOP);
+	mainWnd_divider1	= new Divider(240, OR_HORZ | OR_TOP);
 	mainWnd_divider2	= new Divider(200, OR_VERT | OR_LEFT);
 
 	mainWnd_client		= new Client();
@@ -66,46 +66,46 @@ Test::Test()
 	mainWnd_menubar->AddEntry("Dialogs", NIL, menu_dialogs);
 	mainWnd_menubar->AddEntry("Menus", NIL, menu_menus);
 
-	text_arrows		= new Text("Arrows:", Point(10, 10));
-	widget_arrows		= new Arrows(Point(70, 10), Size(24, 17), OR_HORZ);
+	text_arrows		= new Text("Arrows:", Point(10, 12));
+	widget_arrows		= new Arrows(Point(80, 10), Size(24, 17), OR_HORZ);
 	widget_arrows->onValueChange.Connect(&Test::OnArrowsValueChange, this);
-	text_arrows_value	= new Text("0", Point(100, 10));
+	text_arrows_value	= new Text("0", Point(110, 12));
 
-	text_activearea		= new Text("ActiveArea:", Point(10, 35));
-	widget_activearea	= new ActiveArea(Color(255, 0, 0), Point(70, 35), Size(24, 17));
+	text_activearea		= new Text("ActiveArea:", Point(10, 37));
+	widget_activearea	= new ActiveArea(Color(255, 0, 0), Point(80, 35), Size(24, 17));
 	widget_activearea->onAction.Connect(&Test::OnWidgetAction, this);
 
-	text_button		= new Text("Button:", Point(10, 60));
-	widget_button		= new Button("Click", NIL, Point(70, 60), Size(80, 22));
+	text_button		= new Text("Button:", Point(10, 64));
+	widget_button		= new Button("Click", NIL, Point(80, 60), Size(80, 22));
 	widget_button->onAction.Connect(&Test::OnWidgetAction, this);
 
 	text_hyperlink		= new Text("Hyperlink:", Point(10, 85));
-	widget_hyperlink	= new Hyperlink("Click", NIL, "http://www.smooth-project.org/", Point(70, 85));
+	widget_hyperlink	= new Hyperlink("Click", NIL, "http://www.smooth-project.org/", Point(80, 85));
 
-	text_scrollbar		= new Text("Scrollbar:", Point(10, 110));
-	widget_scrollbar	= new Scrollbar(Point(70, 110), Size(120, 17), OR_HORZ);
+	text_scrollbar		= new Text("Scrollbar:", Point(10, 112));
+	widget_scrollbar	= new Scrollbar(Point(80, 110), Size(120, 17), OR_HORZ);
 	widget_scrollbar->onValueChange.Connect(&Test::OnScrollbarValueChange, this);
-	text_scrollbar_value	= new Text("0", Point(200, 110));
+	text_scrollbar_value	= new Text("0", Point(210, 112));
 
-	text_progressbar	= new Text("Progressbar:", Point(10, 135));
-	widget_progressbar	= new Progressbar(Point(70, 135), Size(120, 19), OR_HORZ);
+	text_progressbar	= new Text("Progressbar:", Point(10, 137));
+	widget_progressbar	= new Progressbar(Point(80, 135), Size(120, 19), OR_HORZ);
 
-	text_slider		= new Text("Slider:", Point(10, 160));
-	widget_slider		= new Slider(Point(70, 160), Size(120, 18), OR_HORZ);
+	text_slider		= new Text("Slider:", Point(10, 163));
+	widget_slider		= new Slider(Point(80, 160), Size(120, 18), OR_HORZ);
 	widget_slider->onValueChange.Connect(&Progressbar::SetValue, widget_progressbar);
 
-	text_checkbox		= new Text("CheckBox:", Point(10, 185));
-	widget_checkbox		= new CheckBox("Click", Point(70, 185), Size(60, 17), &checkbox_var);
+	text_checkbox		= new Text("CheckBox:", Point(10, 187));
+	widget_checkbox		= new CheckBox("Click", Point(80, 185), Size(60, 17), &checkbox_var);
 
-	text_optionbox		= new Text("OptionBox:", Point(10, 210));
-	widget_optionbox1	= new OptionBox("Click", Point(70, 210), Size(60, 17), &optionbox_var, 0);
-	widget_optionbox2	= new OptionBox("Click", Point(140, 210), Size(60, 17), &optionbox_var, 1);
+	text_optionbox		= new Text("OptionBox:", Point(10, 212));
+	widget_optionbox1	= new OptionBox("Click", Point(80, 210), Size(60, 17), &optionbox_var, 0);
+	widget_optionbox2	= new OptionBox("Click", Point(150, 210), Size(60, 17), &optionbox_var, 1);
 
-	text_editbox		= new Text("EditBox:", Point(250, 10));
-	widget_editbox		= new EditBox("MyEditBox", Point(310, 10), Size(100, 19));
+	text_editbox		= new Text("EditBox:", Point(250, 13));
+	widget_editbox		= new EditBox("MyEditBox", Point(320, 10), Size(100, 19));
 
-	text_combobox		= new Text("ComboBox:", Point(250, 35));
-	widget_combobox		= new ComboBox(Point(310, 35), Size(100, 19));
+	text_combobox		= new Text("ComboBox:", Point(250, 38));
+	widget_combobox		= new ComboBox(Point(320, 35), Size(100, 19));
 	widget_combobox->AddEntry("Red");
 	widget_combobox->AddEntry("Green");
 	widget_combobox->AddEntry("Blue");
@@ -113,16 +113,16 @@ Test::Test()
 
 	Widget	*selected_widget = widget_editbox;
 
-	button_show		= new Button("Show", NIL, Point(350, 185), Size(70, 22));
+	button_show		= new Button("Show", NIL, Point(300, 180), Size(70, 22));
 	button_show->onAction.Connect(&Widget::Show, selected_widget);
 
-	button_hide		= new Button("Hide", NIL, Point(422, 185), Size(70, 22));
+	button_hide		= new Button("Hide", NIL, Point(372, 180), Size(70, 22));
 	button_hide->onAction.Connect(&Widget::Hide, selected_widget);
 
-	button_activate		= new Button("Activate", NIL, Point(350, 209), Size(70, 22));
+	button_activate		= new Button("Activate", NIL, Point(300, 204), Size(70, 22));
 	button_activate->onAction.Connect(&Widget::Activate, selected_widget);
 
-	button_deactivate	= new Button("Deactivate", NIL, Point(422, 209), Size(70, 22));
+	button_deactivate	= new Button("Deactivate", NIL, Point(372, 204), Size(70, 22));
 	button_deactivate->onAction.Connect(&Widget::Deactivate, selected_widget);
 
 	Add(mainWnd);
@@ -176,6 +176,8 @@ Test::Test()
 	mainWnd->Add(button_hide);
 	mainWnd->Add(button_activate);
 	mainWnd->Add(button_deactivate);
+
+	mainWnd->SetMinimumSize(Size(470, 370));
 
 	mainWnd->SetIcon(NIL);
 }

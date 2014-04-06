@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -121,11 +121,11 @@ S::Void S::GUI::Divider::UpdateMetrics()
 			{
 				if (Binary::IsFlagSet(divider->flags, OR_BOTTOM))
 				{
-					if (container->GetHeight() - divider->position <= rect.bottom + 1) rect.bottom = container->GetHeight() - divider->position - 2;
+					if (container->GetHeight() - divider->GetY() <= rect.bottom + 1) rect.bottom = container->GetHeight() - divider->GetY() - 2;
 				}
 				else
 				{
-					if (divider->position >= rect.top - 2) rect.top = divider->position + 3;
+					if (divider->GetY() >= rect.top - 2) rect.top = divider->GetY() + 3;
 				}
 			}
 
@@ -165,11 +165,11 @@ S::Void S::GUI::Divider::UpdateMetrics()
 			{
 				if (Binary::IsFlagSet(divider->flags, OR_RIGHT))
 				{
-					if (container->GetWidth() - divider->position <= rect.right + 1) rect.right = container->GetWidth() - divider->position - 2;
+					if (container->GetWidth() - divider->GetX() <= rect.right + 1) rect.right = container->GetWidth() - divider->GetX() - 2;
 				}
 				else
 				{
-					if (divider->position >= rect.left - 2) rect.left = divider->position + 3;
+					if (divider->GetX() >= rect.left - 2) rect.left = divider->GetX() + 3;
 				}
 			}
 
@@ -177,7 +177,7 @@ S::Void S::GUI::Divider::UpdateMetrics()
 		}
 	}
 
-	SetMetrics(rect.GetPosition(), rect.GetSize() + Size(1, 1));
+	SetMetrics(rect.GetPosition(), rect.GetSize());
 
 	if (Binary::IsFlagSet(flags, OR_VERT))	dragHotspot->SetMetrics(Point(-1, 0), rect.GetSize() + Size(3, 1));
 	else					dragHotspot->SetMetrics(Point(0, -1), rect.GetSize() + Size(1, 3));

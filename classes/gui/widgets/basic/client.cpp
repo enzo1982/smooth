@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,7 +35,7 @@ S::Int S::GUI::Client::Paint(Int message)
 	if (!IsVisible())    return Success();
 
 	Surface	*surface = GetDrawSurface();
-	Rect	 client	 = Rect(GetRealPosition() + Point(2, 2), GetRealSize() - Size(3, 4));
+	Rect	 client	 = Rect(GetRealPosition() + Point(2, 2), GetRealSize() - Size(3, 3));
 
 	for (Int i = Object::GetNOfObjects() - 1; i >= 0; i--)
 	{
@@ -48,16 +48,19 @@ S::Int S::GUI::Client::Paint(Int message)
 				if (((Widget *) object)->GetContainer() == container)
 				{
 					Divider	*db    = (Divider *) object;
-					Int	 dbPos = Math::Round(db->GetPos() * surface->GetSurfaceDPI() / 96.0);
 
 					if (Binary::IsFlagSet(db->GetFlags(), OR_VERT))
 					{
-						if	( Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && dbPos >= client.left   - 3) client.left	  = 			     dbPos + 5;
+						Int	 dbPos = Math::Round(db->GetX() * surface->GetSurfaceDPI() / 96.0);
+
+						if	( Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && dbPos >= client.left   - 3) client.left	  = 			     dbPos + 4;
 						else if (!Binary::IsFlagSet(db->GetFlags(), OR_LEFT) && dbPos <= client.right  + 1) client.right  = container->GetWidth()  - dbPos - 2;
 					}
 					else if (Binary::IsFlagSet(db->GetFlags(), OR_HORZ))
 					{
-						if	( Binary::IsFlagSet(db->GetFlags(), OR_TOP)  && dbPos >= client.top    - 2) client.top	  = 			     dbPos + 5;
+						Int	 dbPos = Math::Round(db->GetY() * surface->GetSurfaceDPI() / 96.0);
+
+						if	( Binary::IsFlagSet(db->GetFlags(), OR_TOP)  && dbPos >= client.top    - 2) client.top	  = 			     dbPos + 4;
 						else if (!Binary::IsFlagSet(db->GetFlags(), OR_TOP)  && dbPos <= client.bottom + 1) client.bottom = container->GetHeight() - dbPos - 2;
 					}
 				}

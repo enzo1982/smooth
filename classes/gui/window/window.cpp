@@ -690,7 +690,7 @@ S::Int S::GUI::Window::Paint(Int message)
 
 			if (positions & OR_BOTTOM)
 			{
-				Point	 p1 = Point(frameWidth, realSize.cy - innerOffset.bottom * fontSize);
+				Point	 p1 = Point(frameWidth, realSize.cy - innerOffset.bottom * fontSize + 1);
 				Point	 p2 = Point(realSize.cx - frameWidth, p1.y);
 
 				surface->Bar(p1, p2, OR_HORZ);
@@ -700,7 +700,7 @@ S::Int S::GUI::Window::Paint(Int message)
 			if (positions & OR_LEFT)
 			{
 				Point	 p1 = Point(innerOffset.left * fontSize - 3, innerOffset.top);
-				Point	 p2 = Point(p1.x, realSize.cy - innerOffset.bottom - 2);
+				Point	 p2 = Point(p1.x, realSize.cy - innerOffset.bottom - 1);
 
 				surface->Bar(p1, p2, OR_VERT);
 			}
@@ -708,7 +708,7 @@ S::Int S::GUI::Window::Paint(Int message)
 			if (positions & OR_RIGHT)
 			{
 				Point	 p1 = Point(realSize.cx - innerOffset.right * fontSize + 1, innerOffset.top);
-				Point	 p2 = Point(p1.x, realSize.cy - innerOffset.bottom - 2);
+				Point	 p2 = Point(p1.x, realSize.cy - innerOffset.bottom - 1);
 
 				surface->Bar(p1, p2, OR_VERT);
 			}
@@ -770,7 +770,7 @@ S::Void S::GUI::Window::CalculateOffsets()
 	}
 
 	if (positions & OR_TOP)	   innerOffset.top    += 3;
-	if (positions & OR_BOTTOM) innerOffset.bottom += 4;
+	if (positions & OR_BOTTOM) innerOffset.bottom += 5;
 
 	if (lastTopWidget != NIL)  innerOffset.top    += (lastTopWidget->subtype == WO_NOSEPARATOR ? 3 : 0);
 

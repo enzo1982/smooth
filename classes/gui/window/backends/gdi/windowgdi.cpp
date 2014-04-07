@@ -952,14 +952,16 @@ S::Int S::GUI::WindowGDI::SetMaximumSize(const Size &nMaxSize)
 
 S::Int S::GUI::WindowGDI::Show()
 {
-	ShowWindow(hwnd, SW_SHOW);
+	if (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId()) ShowWindowAsync(hwnd, SW_SHOW);
+	else								 ShowWindow(hwnd, SW_SHOW);
 
 	return Success();
 }
 
 S::Int S::GUI::WindowGDI::Hide()
 {
-	ShowWindow(hwnd, SW_HIDE);
+	if (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId()) ShowWindowAsync(hwnd, SW_HIDE);
+	else								 ShowWindow(hwnd, SW_HIDE);
 
 	return Success();
 }
@@ -971,14 +973,15 @@ S::GUI::Rect S::GUI::WindowGDI::GetRestoredWindowRect() const
 
 S::Int S::GUI::WindowGDI::SetMetrics(const Point &nPos, const Size &nSize)
 {
-	SetWindowPos(hwnd, 0, nPos.x, nPos.y, Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy, SWP_NOZORDER);
+	SetWindowPos(hwnd, 0, nPos.x, nPos.y, Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy, SWP_NOZORDER | SWP_ASYNCWINDOWPOS);
 
 	return Success();
 }
 
 S::Int S::GUI::WindowGDI::Minimize()
 {
-	ShowWindow(hwnd, SW_MINIMIZE);
+	if (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId()) ShowWindowAsync(hwnd, SW_MINIMIZE);
+	else								 ShowWindow(hwnd, SW_MINIMIZE);
 
 	return Success();
 }

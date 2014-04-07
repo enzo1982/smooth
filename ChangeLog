@@ -4,6 +4,7 @@ xx.xx.14 xx:xx - smooth alpha 0.8.72.0
 
 - pointer.cpp		- moved system dependent code to backends
 - windowgdi.cpp		- fixed handling of modal windows on Windows
+			- use asynchronous versions of ShowWindow and SetWindowPos to prevent artifacts
 - windowxlib.cpp	- added drag & drop support
 			- added international language input support
 - translator.cpp	- added Afrikaans language support

@@ -555,14 +555,19 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		case WM_DROPFILES:
 			hDrop = (HDROP) wParam;
 
-			/* Get drop position and send event.
+			/* Compute window-relative drop position and emit event signal.
+			 *
+			 * Note that DragQueryPoint started to give incorrect values since
+			 * Windows 8 or 8.1, so we are using the mouse pointer position instead.
 			 */
 			{
-				POINT	 dropPos;
+				RECT	 windowRect;
+				POINT	 cursorPos;
 
-				DragQueryPoint(hDrop, &dropPos);
+				GetWindowRect(hwnd, &windowRect);
+				GetCursorPos(&cursorPos);
 
-				onEvent.Call(SM_DROPFILES, dropPos.x, dropPos.y);
+				onEvent.Call(SM_DROPFILES, cursorPos.x - windowRect.left, cursorPos.y - windowRect.top);
 			}
 
 			DragFinish(hDrop);

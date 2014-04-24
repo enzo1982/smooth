@@ -1071,8 +1071,11 @@ S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 
 	/* Clear composition string.
 	 */
-	if (Setup::enableUnicode) ImmSetCompositionStringW(himc, SCS_SETSTR, NIL, 0, NIL, 0);
-	else			  ImmSetCompositionStringA(himc, SCS_SETSTR, NIL, 0, NIL, 0);
+	if (cursor != activeCursor)
+	{
+		if (Setup::enableUnicode) ImmSetCompositionStringW(himc, SCS_SETSTR, NIL, 0, NIL, 0);
+		else			  ImmSetCompositionStringA(himc, SCS_SETSTR, NIL, 0, NIL, 0);
+	}
 
 	/* Set composition window information.
 	 */

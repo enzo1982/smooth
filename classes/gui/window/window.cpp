@@ -30,6 +30,10 @@
 #	include <windows.h>
 
 #	undef GetObject
+
+#	if !defined SM_CXPADDEDBORDER
+#		define SM_CXPADDEDBORDER 92
+#	endif
 #endif
 
 S::Array<S::GUI::Window *, S::Void *>	 S::GUI::Window::windows;
@@ -69,7 +73,7 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 	else		  text = "smooth Application";
 
 #ifdef __WIN32__
-	frameWidth	= GetSystemMetrics(SM_CXFRAME);
+	frameWidth	= GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
 #else
 	frameWidth	= 1;
 

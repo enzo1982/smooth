@@ -23,6 +23,10 @@
 #	define WM_MOUSEWHEEL 522
 #endif
 
+#if !defined SM_CXPADDEDBORDER
+#	define SM_CXPADDEDBORDER 92
+#endif
+
 #if !defined CS_DROPSHADOW
 #	define CS_DROPSHADOW 0x00020000
 #endif
@@ -104,7 +108,7 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 	minimized	= False;
 	maximized	= False;
 
-	frameSize	= Size(GetSystemMetrics(SM_CXFRAME), GetSystemMetrics(SM_CYFRAME));
+	frameSize	= Size(GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER), GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER));
 	fontSize	= Surface().GetSurfaceDPI() / 96.0;
 
 	flags		= 0;
@@ -1079,8 +1083,8 @@ S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 	ImmSetCompositionWindow(himc, &info);
 
 	info.dwStyle	    = CFS_POINT;
-	info.ptCurrentPos.x = point.x - GetSystemMetrics(SM_CXFRAME);
-	info.ptCurrentPos.y = point.y - GetSystemMetrics(SM_CYFRAME);
+	info.ptCurrentPos.x = point.x - GetSystemMetrics(SM_CXFRAME) - GetSystemMetrics(SM_CXPADDEDBORDER);
+	info.ptCurrentPos.y = point.y - GetSystemMetrics(SM_CYFRAME) - GetSystemMetrics(SM_CXPADDEDBORDER);
 
 	ImmSetCompositionWindow(himc, &info);
 

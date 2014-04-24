@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,7 +22,7 @@ S::Int	 screenWin32Tmp = S::System::ScreenBackend::SetBackend(&CreateScreenWin32
 S::Int	 addScreenWin32InitTmp = S::AddInitFunction(&S::System::ScreenWin32::Initialize);
 S::Int	 addScreenWin32FreeTmp = S::AddFreeFunction(&S::System::ScreenWin32::Free);
 
-static HMODULE	 user32dll;
+static HMODULE	 user32dll = NIL;
 
 static BOOL	 (*ex_GetMonitorInfo)(HMONITOR, LPMONITORINFO);
 static HMONITOR	 (*ex_MonitorFromPoint)(POINT, DWORD);
@@ -42,10 +42,6 @@ S::Int S::System::ScreenWin32::Initialize()
 
 		ex_GetMonitorInfo = (BOOL (*)(HMONITOR, LPMONITORINFO)) GetProcAddress(user32dll, "GetMonitorInfo");
 		ex_MonitorFromPoint = (HMONITOR (*)(POINT, DWORD)) GetProcAddress(user32dll, "MonitorFromPoint");
-	}
-	else
-	{
-		user32dll = NIL;
 	}
 
 	return Success();

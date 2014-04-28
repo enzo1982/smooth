@@ -138,6 +138,7 @@ S::Int S::GUI::SurfaceGDI::StartPaint(const Rect &iPRect)
 	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
 	HRGN	 region = CreateRectRgn(pRect.left, pRect.top, pRect.right, pRect.bottom);
 
+	SaveDC(paintContext);
 	SelectClipRgn(paintContext, region);
 
 	::DeleteObject(region);
@@ -161,12 +162,7 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 
 	paintRects.RemoveNth(paintRects.Length() - 1);
 
-	Rect	 pRect(*paintRects.GetLast());
-	HRGN	 region = CreateRectRgn(pRect.left, pRect.top, pRect.right, pRect.bottom);
-
-	SelectClipRgn(paintContext, region);
-
-	::DeleteObject(region);
+	RestoreDC(paintContext, -1);
 
 	return Success();
 }

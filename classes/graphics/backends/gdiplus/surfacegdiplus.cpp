@@ -145,6 +145,7 @@ S::Int S::GUI::SurfaceGDIPlus::StartPaint(const Rect &iPRect)
 
 	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
 
+	paintContext->Save();
 	paintContext->SetClip(Gdiplus::Rect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top));
 
 	paintRects.Add(new Rect(pRect));
@@ -166,9 +167,7 @@ S::Int S::GUI::SurfaceGDIPlus::EndPaint()
 
 	paintRects.RemoveNth(paintRects.Length() - 1);
 
-	Rect	 pRect(*paintRects.GetLast());
-
-	paintContext->SetClip(Gdiplus::Rect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top));
+	paintContext->Restore();
 
 	return Success();
 }

@@ -50,11 +50,9 @@ namespace smooth
 		{
 			private:
 				X11::Display		*display;
-				X11::Pixmap		 bitmap;
+				X11::XImage		*bitmap;
 
 				Void			 Initialize();
-
-				Bool			 IsDepthSupported(Int);
 			public:
 							 BitmapXLib(Void * = NIL);
 							 BitmapXLib(const Size &, Int);
@@ -66,15 +64,8 @@ namespace smooth
 				Bool			 CreateBitmap(const Size &, Int);
 				Bool			 DeleteBitmap();
 
-				Int			 Scale(const Size &);
-
 				Bool			 SetSystemBitmap(Void *);
 				Void			*GetSystemBitmap() const;
-
-				Int			 GrayscaleBitmap();
-				Int			 InvertColors();
-				Int			 ReplaceColor(const Color &, const Color &);
-				Int			 SetBackgroundColor(const Color &);
 
 				Bool			 SetPixel(const Point &, const Color &);
 				Color			 GetPixel(const Point &) const;

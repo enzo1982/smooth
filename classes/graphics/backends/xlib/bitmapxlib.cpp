@@ -79,34 +79,30 @@ S::Void S::GUI::BitmapXLib::Initialize()
 	display	= Backends::BackendXLib::GetDisplay();
 }
 
-S::Bool S::GUI::BitmapXLib::IsDepthSupported(Int bpp)
-{
-	Bool			 supported = False;
-	int			 count	   = 0;
-	XPixmapFormatValues	*values	   = XListPixmapFormats(display, &count);
-
-	for (int i = 0; i < count; i++) if (values[i].depth == bpp) { supported = True; break; }
-
-	XFree(values);
-
-	return supported;
-}
-
 S::Bool S::GUI::BitmapXLib::CreateBitmap(const Size &nSize, Int nDepth)
 {
 	DeleteBitmap();
 
-	if (nDepth == -1 || !IsDepthSupported(nDepth)) nDepth = XDefaultDepth(display, XDefaultScreen(display));
+	if (nDepth == -1)		  nDepth = XDefaultDepth(display, XDefaultScreen(display));
+	if (nDepth != 24 && nDepth != 32) nDepth = 24;
 
-	bitmap	= XCreatePixmap(display, DefaultRootWindow(display), nSize.cx, nSize.cy, nDepth);
-	bytes	= NIL;
+	int			 count	 = 0;
+	int			 index	 = -1;
+	XPixmapFormatValues	*formats = XListPixmapFormats(display, &count);
 
-	if (bitmap == NIL) return False;
+	for (int i = 0; i < count; i++) if (formats[i].depth == nDepth) { index = i; break; }
+
+	bytes	= new UnsignedByte [nSize.cy * nSize.cx * (formats[index].bits_per_pixel / 8) + nSize.cy * (((nSize.cx * formats[index].bits_per_pixel) % formats[index].scanline_pad) / 8)];
+	bitmap	= XCreateImage(display, XDefaultVisual(display, XDefaultScreen(display)), formats[index].depth, ZPixmap, 0, (char *) bytes, nSize.cx, nSize.cy, formats[index].scanline_pad, 0);
+
+	if (bitmap == NIL) { delete [] (UnsignedByte *) bytes; return False; }
 
 	size	= nSize;
-	depth	= nDepth;
-	bpp	= depth;
-	align	= 4;
+	depth	= formats[index].depth;
+	bpp	= formats[index].bits_per_pixel;
+	align	= formats[index].scanline_pad / 8;
+
+	XFree(formats);
 
 	return True;
 }
@@ -115,79 +111,23 @@ S::Bool S::GUI::BitmapXLib::DeleteBitmap()
 {
 	if (bitmap != NIL)
 	{
-		XFreePixmap(display, bitmap);
+		delete [] bitmap->data;
 
-		bitmap	= NIL;
+		bitmap->data = NIL;
 
-		size	= Size(0, 0);
-		depth	= 0;
+		XDestroyImage(bitmap);
 
-		bytes	= NIL;
-		bpp	= 0;
-		align	= 0;
+		bitmap	     = NIL;
+
+		size	     = Size(0, 0);
+		depth	     = 0;
+
+		bytes	     = NIL;
+		bpp	     = 0;
+		align	     = 0;
 	}
 
 	return True;
-}
-
-S::Int S::GUI::BitmapXLib::Scale(const Size &newSize)
-{
-	if (bitmap == NIL) return Error();
-
-	if (size == newSize) return Success();
-
-	Pixmap	 backup = bitmap;
-	Size	 backupSize = size;
-
-	bitmap = NIL;
-
-	CreateBitmap(newSize, depth);
-
-	GC		 gc = XCreateGC(display, bitmap, 0, NIL);
-	XImage		*image = XGetImage(display, backup, 0, 0, backupSize.cx, backupSize.cy, AllPlanes, XYPixmap);
-	Point		 point;
-	XGCValues	 gcValues;
-
-	Float	 scaleFactorX = backupSize.cx / newSize.cx;
-	Float	 scaleFactorY = backupSize.cy / newSize.cy;
-
-	for (point.y = 0; point.y < newSize.cy; point.y++)
-	{
-		for (point.x = 0; point.x < newSize.cx; point.x++)
-		{
-			Float	 red = 0, green = 0, blue = 0;
-
-			for (Int srcX = point.x * scaleFactorX; srcX < (point.x + 1) * scaleFactorX; srcX++)
-			{
-				for (Int srcY = point.y * scaleFactorY; srcY < (point.y + 1) * scaleFactorY; srcY++)
-				{
-					Long	 value = XGetPixel(image, srcX, srcY);
-
-					red   += Float((value >> 16) & 255) * (Math::Min(1.0, (point.x + 1) * scaleFactorX - srcX) * Math::Min(1.0, (point.y + 1) * scaleFactorY - srcY));
-					green += Float((value >> 8)  & 255) * (Math::Min(1.0, (point.x + 1) * scaleFactorX - srcX) * Math::Min(1.0, (point.y + 1) * scaleFactorY - srcY));
-					blue  += Float( value	     & 255) * (Math::Min(1.0, (point.x + 1) * scaleFactorX - srcX) * Math::Min(1.0, (point.y + 1) * scaleFactorY - srcY));
-				}
-			}
-
-			red   /= scaleFactorX * scaleFactorY;
-			green /= scaleFactorX * scaleFactorY;
-			blue  /= scaleFactorX * scaleFactorY;
-
-			if	(depth == 16) gcValues.foreground =		  ((Int(red) >> 3) << 11) | ((Int(green) >> 2) << 5) | (Int(blue) >> 3);
-			else if (depth == 24) gcValues.foreground =		  ( Int(red)       << 16) | ( Int(green) << 8)	     | (Int(blue)     );
-			else if (depth == 32) gcValues.foreground = (255 << 24) | ( Int(red)       << 16) | ( Int(green) << 8)	     | (Int(blue)     );
-
-			XChangeGC(display, gc, GCForeground, &gcValues);
-
-			XDrawPoint(display, bitmap, gc, point.x, point.y);
-		}
-	}
-
-	XFreeGC(display, gc);
-
-	XFreePixmap(display, backup);
-
-	return Success();
 }
 
 S::Bool S::GUI::BitmapXLib::SetSystemBitmap(Void *nBitmap)
@@ -200,22 +140,11 @@ S::Bool S::GUI::BitmapXLib::SetSystemBitmap(Void *nBitmap)
 	}
 	else
 	{
-		unsigned int	 cx		= 0;
-		unsigned int	 cy		= 0;
-		unsigned int	 bpp		= 0;
-		Window		 windowDummy	= NIL;
-		int		 intDummy	= 0;
-		unsigned int	 uIntDummy	= 0;
+		XImage	*image = (XImage *) nBitmap;
 
-		XGetGeometry(display, (Pixmap) nBitmap, &windowDummy, &intDummy, &intDummy, &cx, &cy, &uIntDummy, &bpp);
+		CreateBitmap(Size(image->width, image->height), image->depth);
 
-		CreateBitmap(Size(cx, cy), bpp);
-
-		GC	 gc = XCreateGC(display, bitmap, 0, NIL);
-
-		XCopyArea(display, (Pixmap) nBitmap, bitmap, gc, 0, 0, cx, cy, 0, 0);
-
-		XFreeGC(display, gc);
+		memcpy(bitmap->data, image->data, image->height * image->bytes_per_line);
 	}
 
 	return True;
@@ -226,116 +155,13 @@ S::Void *S::GUI::BitmapXLib::GetSystemBitmap() const
 	return (Void *) bitmap;
 }
 
-S::Int S::GUI::BitmapXLib::GrayscaleBitmap()
-{
-	if (bitmap == NIL) return Error();
-
-	XImage	*image = XGetImage(display, bitmap, 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
-	Point	 point;
-
-	for (point.y = 0; point.y < size.cy; point.y++)
-	{
-		for (point.x = 0; point.x < size.cx; point.x++)
-		{
-			Long	 value = XGetPixel(image, point.x, point.y);
-			Color	 pixel = Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255));
-
-			SetPixel(point, pixel.Grayscale());
-		}
-	}
-
-	XDestroyImage(image);
-
-	return Success();
-}
-
-S::Int S::GUI::BitmapXLib::InvertColors()
-{
-	if (bitmap == NIL) return Error();
-
-	XImage	*image = XGetImage(display, bitmap, 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
-	Point	 point;
-
-	for (point.y = 0; point.y < size.cy; point.y++)
-	{
-		for (point.x = 0; point.x < size.cx; point.x++)
-		{
-			Long	 value = XGetPixel(image, point.x, point.y);
-			Color	 pixel = Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255));
-
-			SetPixel(point, Color(255 - pixel.GetRed(), 255 - pixel.GetGreen(), 255 - pixel.GetBlue()));
-		}
-	}
-
-	XDestroyImage(image);
-
-	return Success();
-}
-
-S::Int S::GUI::BitmapXLib::ReplaceColor(const Color &color1, const Color &color2)
-{
-	if (bitmap == NIL) return Error();
-
-	XImage	*image = XGetImage(display, bitmap, 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
-	Point	 point;
-
-	for (point.y = 0; point.y < size.cy; point.y++)
-	{
-		for (point.x = 0; point.x < size.cx; point.x++)
-		{
-			Long	 value = XGetPixel(image, point.x, point.y);
-			Color	 pixel = Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255));
-
-			if (pixel == color1) SetPixel(point, color2);
-		}
-	}
-
-	XDestroyImage(image);
-
-	return Success();
-}
-
-S::Int S::GUI::BitmapXLib::SetBackgroundColor(const Color &color)
-{
-	if (bitmap == NIL) return Error();
-	if (depth  != 32)  return Success();
-
-	XImage	*image = XGetImage(display, bitmap, 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
-	Point	 point;
-
-	for (point.y = 0; point.y < size.cy; point.y++)
-	{
-		for (point.x = 0; point.x < size.cx; point.x++)
-		{
-			Long	 value = XGetPixel(image, point.x, point.y);
-			Color	 pixel = Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255));
-
-			if (pixel.GetAlpha() != 255) SetPixel(point, Color((pixel.GetRed()   * pixel.GetAlpha() + color.GetRed()   * (255 - pixel.GetAlpha())) / 255,
-									   (pixel.GetGreen() * pixel.GetAlpha() + color.GetGreen() * (255 - pixel.GetAlpha())) / 255,
-									   (pixel.GetBlue()  * pixel.GetAlpha() + color.GetBlue()  * (255 - pixel.GetAlpha())) / 255));
-		}
-	}
-
-	XDestroyImage(image);
-
-	return Success();
-}
-
 S::Bool S::GUI::BitmapXLib::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (bitmap == NIL) return Error();
 
-	XGCValues	 gcValues;
-
-	if	(depth == 16) gcValues.foreground =			       ((color.GetRed() >> 3) << 11) | ((color.GetGreen() >> 2) << 5) | (color.GetBlue() >> 3);
-	else if (depth == 24) gcValues.foreground =			       ( color.GetRed()	      << 16) | ( color.GetGreen()       << 8) | (color.GetBlue()     );
-	else if (depth == 32) gcValues.foreground = (color.GetAlpha() << 24) | ( color.GetRed()	      << 16) | ( color.GetGreen()	<< 8) | (color.GetBlue()     );
-
-	GC	 gc = XCreateGC(display, bitmap, GCForeground, &gcValues);
-
-	XDrawPoint(display, bitmap, gc, iPoint.x, iPoint.y);
-
-	XFreeGC(display, gc);
+	if	(depth == 16) XPutPixel(bitmap, iPoint.x, iPoint.y, 			       ((color.GetRed() >> 3) << 11) | ((color.GetGreen() >> 2) << 5) | (color.GetBlue() >> 3));
+	else if (depth == 24) XPutPixel(bitmap, iPoint.x, iPoint.y, 			       ( color.GetRed()	      << 16) | ( color.GetGreen()       << 8) | (color.GetBlue()     ));
+	else if (depth == 32) XPutPixel(bitmap, iPoint.x, iPoint.y, (color.GetAlpha() << 24) | ( color.GetRed()	      << 16) | ( color.GetGreen()	<< 8) | (color.GetBlue()     ));
 
 	return True;
 }
@@ -344,13 +170,10 @@ S::GUI::Color S::GUI::BitmapXLib::GetPixel(const Point &iPoint) const
 {
 	if (bitmap == NIL) return Color();
 
-	XImage	*image = XGetImage(display, bitmap, iPoint.x, iPoint.y, 1, 1, AllPlanes, XYPixmap);
-	Long	 value = XGetPixel(image, 0, 0);
+	Long	 value = XGetPixel(bitmap, iPoint.x, iPoint.y);
 
-	XDestroyImage(image);
-
-	if	(depth == 16) return	 255		   << 24 | Color(((value >> 11) &  31) << 3, ((value >> 5) &  63) << 2, (value &  31) << 3);
-	else if (depth == 24) return	 255		   << 24 | Color( (value >> 16) & 255,	      (value >> 8) & 255,	 value & 255      );
+	if	(depth == 16) return				   Color(((value >> 11) &  31) << 3, ((value >> 5) &  63) << 2, (value &  31) << 3);
+	else if (depth == 24) return				   Color( (value >> 16) & 255,	      (value >> 8) & 255,	 value & 255      );
 	else if (depth == 32) return ((value >> 24) & 255) << 24 | Color( (value >> 16) & 255,	      (value >> 8) & 255,	 value & 255      );
 
 	return Color();

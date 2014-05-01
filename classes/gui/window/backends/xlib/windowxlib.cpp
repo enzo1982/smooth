@@ -1072,7 +1072,7 @@ S::Int S::GUI::WindowXLib::SetIcon(const Bitmap &newIcon)
 	Color	 backgroundColor16 = ((Setup::BackgroundColor.GetBlue() >> 3) << 11) | ((Setup::BackgroundColor.GetGreen() >> 2) << 5) | (Setup::BackgroundColor.GetRed() >> 3);
 	Color	 backgroundColor24 = Setup::BackgroundColor;
 
-	XImage	*image = XGetImage(display, (Pixmap) newIcon.GetSystemBitmap(), 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+	XImage	*image = (XImage *) newIcon.GetSystemBitmap();
 
 	for (Int y = 0; y < size.cy; y++)
 	{
@@ -1085,8 +1085,6 @@ S::Int S::GUI::WindowXLib::SetIcon(const Bitmap &newIcon)
 			else if (depth == 32) sysIcon[index++] = 						value;
 		}
 	}
-
-	XDestroyImage(image);
 
 	return Success();
 }

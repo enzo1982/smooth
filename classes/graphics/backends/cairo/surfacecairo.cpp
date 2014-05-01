@@ -783,78 +783,36 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	DeleteDC(cdc);
 	ReleaseDC(window, gdi_dc);
 #else
-	GC	 gc = XCreateGC(display, window, 0, NIL);
-
-	/* Convert format if depths do not match.
-	 */
-	const Bitmap	*srcBitmap = &bitmap;
-
-	if (bitmap.GetDepth() != windowAttributes.depth)
-	{
-		Size	 size  = bitmap.GetSize();
-		Bitmap	*copy  = new Bitmap(size, windowAttributes.depth);
-		XImage	*image = XGetImage(display, (Pixmap) bitmap.GetSystemBitmap(), 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
-		Point	 point;
-
-		for (point.y = 0; point.y < size.cy; point.y++)
-		{
-			for (point.x = 0; point.x < size.cx; point.x++)
-			{
-				Long	 value = XGetPixel(image, point.x, point.y);
-
-				copy->SetPixel(point, Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255)));
-			}
-		}
-
-		XDestroyImage(image);
-
-		srcBitmap = copy;
-	}
-
 	/* Copy the image.
 	 */
-	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
+	cairo_surface_t	*srcSurface = cairo_image_surface_create_for_data(bitmap.GetBytes(), CAIRO_FORMAT_RGB24, bitmap.GetSize().cx, bitmap.GetSize().cy, bitmap.GetSize().cx * 4);
+
+	if (!painting)
 	{
-		if (!painting)
-		{
-			XCopyArea(display, (Pixmap) srcBitmap->GetSystemBitmap(), window, gc, srcRect.left, srcRect.top, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);
-		}
+		CreateCairoContext();
 
-		XCopyArea(display, (Pixmap) srcBitmap->GetSystemBitmap(), paintBitmap, gc, srcRect.left, srcRect.top, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);
-	}
-	else
-	{
-		X11::Pixmap	 destBitmap  = XCreatePixmap(display, DefaultRootWindow(display), destRect.GetWidth(), destRect.GetHeight(), windowAttributes.depth);
-
-		cairo_surface_t	*srcSurface  = cairo_xlib_surface_create(display, (Pixmap) srcBitmap->GetSystemBitmap(), visual, bitmap.GetSize().cx, bitmap.GetSize().cy);
-		cairo_surface_t	*destSurface = cairo_xlib_surface_create(display, destBitmap, visual, destRect.GetWidth(), destRect.GetHeight());
-
-		cairo_t		*context     = cairo_create(destSurface);
-
+		cairo_rectangle(context, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
+		cairo_clip(context);
+		cairo_translate(context, destRect.left, destRect.top);
 		cairo_scale(context, (float) destRect.GetWidth() / srcRect.GetWidth(), (float) destRect.GetHeight() / srcRect.GetHeight());
-		cairo_set_source_surface(context, srcSurface, -((float) srcRect.left * destRect.GetWidth() / srcRect.GetWidth()), -((float) srcRect.top * destRect.GetHeight() / srcRect.GetHeight()));
+		cairo_set_source_surface(context, srcSurface, -srcRect.left, -srcRect.top);
 		cairo_paint(context);
 
-		if (!painting)
-		{
-			XCopyArea(display, destBitmap, window, gc, 0, 0, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);
-		}
-
-		XCopyArea(display, destBitmap, paintBitmap, gc, 0, 0, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);
-
-		cairo_destroy(context);
-
-		cairo_surface_destroy(destSurface);
-		cairo_surface_destroy(srcSurface);
-
-		XFreePixmap(display, destBitmap);
+		DestroyCairoContext();
 	}
 
-	/* Delete copy if we created one earlier.
-	 */
-	if (bitmap.GetDepth() != windowAttributes.depth) delete srcBitmap;
+	cairo_save(paintContextCairo);
 
-	XFreeGC(display, gc);
+	cairo_rectangle(paintContextCairo, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
+	cairo_clip(paintContextCairo);
+	cairo_translate(paintContextCairo, destRect.left, destRect.top);
+	cairo_scale(paintContextCairo, (float) destRect.GetWidth() / srcRect.GetWidth(), (float) destRect.GetHeight() / srcRect.GetHeight());
+	cairo_set_source_surface(paintContextCairo, srcSurface, -srcRect.left, -srcRect.top);
+	cairo_paint(paintContextCairo);
+
+	cairo_restore(paintContextCairo);
+
+	cairo_surface_destroy(srcSurface);
 #endif
 
 	return Success();
@@ -890,22 +848,20 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 
 	DeleteDC(cdc);
 #else
-	GC	 gc = XCreateGC(display, (Pixmap) bitmap.GetSystemBitmap(), 0, NIL);
-
 	/* Copy the image.
 	 */
-	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
-	{
-		XCopyArea(display, paintBitmap, (Pixmap) bitmap.GetSystemBitmap(), gc, srcRect.left, srcRect.top, destRect.GetWidth(), destRect.GetHeight(), destRect.left, destRect.top);
-	}
-	else
-	{
-		/* ToDo: Allow copying to bitmaps of different
-		 *	 size than original.
-		 */
-	}
+	cairo_surface_t	*bitmapSurface = cairo_image_surface_create_for_data(bitmap.GetBytes(), CAIRO_FORMAT_RGB24, bitmap.GetSize().cx, bitmap.GetSize().cy, bitmap.GetSize().cx * 4);
+	cairo_t		*bitmapContext = cairo_create(bitmapSurface);
 
-	XFreeGC(display, gc);
+	cairo_rectangle(bitmapContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
+	cairo_clip(bitmapContext);
+	cairo_translate(bitmapContext, destRect.left, destRect.top);
+	cairo_scale(bitmapContext, (float) destRect.GetWidth() / srcRect.GetWidth(), (float) destRect.GetHeight() / srcRect.GetHeight());
+	cairo_set_source_surface(bitmapContext, surface, -srcRect.left, -srcRect.top);
+	cairo_paint(bitmapContext);
+
+	cairo_destroy(bitmapContext);
+	cairo_surface_destroy(bitmapSurface);
 #endif
 
 	return Success();

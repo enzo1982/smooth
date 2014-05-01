@@ -451,17 +451,17 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 	/* Convert format if depths do not match.
 	 */
 	const Bitmap	*srcBitmap = &bitmap;
+	Size		 srcSize   =  bitmap.GetSize();
 
 	if (bitmap.GetDepth() != windowAttributes.depth)
 	{
-		Size	 size  = bitmap.GetSize();
 		Bitmap	*copy  = new Bitmap(size, windowAttributes.depth);
-		XImage	*image = XGetImage(display, (Pixmap) bitmap.GetSystemBitmap(), 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+		XImage	*image = (XImage *) bitmap.GetSystemBitmap();
 		Point	 point;
 
-		for (point.y = 0; point.y < size.cy; point.y++)
+		for (point.y = 0; point.y < srcSize.cy; point.y++)
 		{
-			for (point.x = 0; point.x < size.cx; point.x++)
+			for (point.x = 0; point.x < srcSize.cx; point.x++)
 			{
 				Long	 value = XGetPixel(image, point.x, point.y);
 
@@ -469,23 +469,20 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 			}
 		}
 
-		XDestroyImage(image);
-
 		srcBitmap = copy;
 	}
 
 	/* Copy the image.
 	 */
-	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
+	if (destRect.GetSize() == srcRect.GetSize())
 	{
-		if (!painting) XCopyArea(display, (Drawable) srcBitmap->GetSystemBitmap(), window, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+		if (!painting) XPutImage(display, window, gc, (XImage *) srcBitmap->GetSystemBitmap(), srcRect.left, srcRect.top, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
 
-		XCopyArea(display, (Drawable) srcBitmap->GetSystemBitmap(), this->bitmap, gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+		XPutImage(display, this->bitmap, gc, (XImage *) srcBitmap->GetSystemBitmap(), srcRect.left, srcRect.top, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
 	}
 	else
 	{
-		Size		 size  = srcBitmap->GetSize();
-		XImage		*image = XGetImage(display, (Pixmap) srcBitmap->GetSystemBitmap(), 0, 0, size.cx, size.cy, AllPlanes, XYPixmap);
+		XImage		*image = (XImage *) srcBitmap->GetSystemBitmap();
 		Point		 point;
 		XGCValues	 gcValues;
 
@@ -546,16 +543,38 @@ S::Int S::GUI::SurfaceXLib::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, c
 
 	/* Copy the image.
 	 */
-	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
+	XImage	*image = XGetImage(display, this->bitmap, srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), AllPlanes, ZPixmap);
+	Point	 point;
+
+	Float	 scaleFactorX = Float(srcRect.GetWidth()) / Float(destRect.GetWidth());
+	Float	 scaleFactorY = Float(srcRect.GetHeight()) / Float(destRect.GetHeight());
+
+	for (point.y = 0; point.y < destRect.GetHeight(); point.y++)
 	{
-		XCopyArea(display, this->bitmap, (Drawable) bitmap.GetSystemBitmap(), gc, srcRect.left, srcRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, destRect.left, destRect.top);
+		for (point.x = 0; point.x < destRect.GetWidth(); point.x++)
+		{
+			Float	 red = 0, green = 0, blue = 0;
+
+			for (Int srcX = Math::Floor(Float(point.x) * scaleFactorX); srcX < Math::Ceil(Float(point.x + 1) * scaleFactorX); srcX++)
+			{
+				for (Int srcY = Math::Floor(Float(point.y) * scaleFactorY); srcY < Math::Ceil(Float(point.y + 1) * scaleFactorY); srcY++)
+				{
+					Long	 value	 = XGetPixel(image, srcX, srcY);
+
+					Float	 weightX = (1.0 - Math::Max(0.0, Float(point.x) * scaleFactorX - Float(srcX)) - Math::Max(0.0, Float(srcX + 1) - Float(point.x + 1) * scaleFactorX)) / scaleFactorX;
+					Float	 weightY = (1.0 - Math::Max(0.0, Float(point.y) * scaleFactorY - Float(srcY)) - Math::Max(0.0, Float(srcY + 1) - Float(point.y + 1) * scaleFactorY)) / scaleFactorY;
+
+					red   += Float((value >> 16) & 255) * weightX * weightY;
+					green += Float((value >> 8)  & 255) * weightX * weightY;
+					blue  += Float( value	     & 255) * weightX * weightY;
+				}
+			}
+
+			bitmap.SetPixel(point, Color(red, green, blue));
+		}
 	}
-	else
-	{
-		/* ToDo: Allow copying to bitmaps of different
-		 *	 size than original.
-		 */
-	}
+
+	XDestroyImage(image);
 
 	return Success();
 }

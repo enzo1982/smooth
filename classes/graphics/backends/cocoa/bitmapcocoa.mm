@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/cocoa/bitmapcocoa.h>
+#include <smooth/graphics/bitmap.h>
 
 S::GUI::BitmapBackend *CreateBitmapCocoa_pV(S::Void *iBitmap)
 {
@@ -126,31 +127,21 @@ S::Bool S::GUI::BitmapCocoa::DeleteBitmap()
 	return True;
 }
 
-S::Int S::GUI::BitmapCocoa::Scale(const Size &newSize)
+S::GUI::Bitmap S::GUI::BitmapCocoa::Scale(const Size &newSize) const
 {
-	if (bitmap == NIL) return Error();
+	Bitmap			 bitmap(newSize, depth);
+	NSImage			*image	 = [[NSImage alloc] initWithSize: NSMakeSize(size.cx, size.cy)];
 
-	if (size == newSize) return Success();
-
-	NSBitmapImageRep	*backup = bitmap;
-	Size			 backupSize = size;
-
-	bitmap = NIL;
-
-	CreateBitmap(newSize, depth);
-
-	NSImage			*image	 = [[NSImage alloc] initWithSize: NSMakeSize(backupSize.cx, backupSize.cy)];
-
-	[image addRepresentation: backup];
+	[image addRepresentation: (NSBitmapImageRep *) GetSystemBitmap()];
 
 	NSAutoreleasePool	*pool	 = [[NSAutoreleasePool alloc] init];
-	NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: bitmap];
+	NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: (NSBitmapImageRep *) bitmap.GetSystemBitmap()];
 
 	[NSGraphicsContext saveGraphicsState];
 	[NSGraphicsContext setCurrentContext: context];
 
 	[image drawInRect: NSMakeRect(0, 0, newSize.cx, newSize.cy)
-		 fromRect: NSMakeRect(0, 0, backupSize.cx, backupSize.cy)
+		 fromRect: NSMakeRect(0, 0, size.cx, size.cy)
 		operation: NSCompositeCopy
 		 fraction: 1.0];
 
@@ -158,9 +149,8 @@ S::Int S::GUI::BitmapCocoa::Scale(const Size &newSize)
 
 	[pool release];
 	[image release];
-	[backup release];
 
-	return Success();
+	return bitmap;
 }
 
 S::Bool S::GUI::BitmapCocoa::SetSystemBitmap(Void *nBitmap)

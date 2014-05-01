@@ -482,46 +482,14 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 	}
 	else
 	{
-		XImage		*image = (XImage *) srcBitmap->GetSystemBitmap();
-		Point		 point;
-		XGCValues	 gcValues;
+		Float	 scaleFactorX = Float(srcRect.GetWidth()) / Float(destRect.GetWidth());
+		Float	 scaleFactorY = Float(srcRect.GetHeight()) / Float(destRect.GetHeight());
 
-		Float	 scaleFactorX = srcRect.GetWidth() / destRect.GetWidth();
-		Float	 scaleFactorY = srcRect.GetHeight() / destRect.GetHeight();
+		const Bitmap	&bitmap = srcBitmap->Scale(Size(Float(srcSize.cx) / scaleFactorX, Float(srcSize.cy) / scaleFactorY));
 
-		for (point.y = 0; point.y < destRect.GetHeight(); point.y++)
-		{
-			for (point.x = 0; point.x < destRect.GetWidth(); point.x++)
-			{
-				Float	 red = 0, green = 0, blue = 0;
+		if (!painting) XPutImage(display, window, gc, (XImage *) bitmap.GetSystemBitmap(), Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
 
-				for (Int srcX = point.x * scaleFactorX; srcX < (point.x + 1) * scaleFactorX; srcX++)
-				{
-					for (Int srcY = point.y * scaleFactorY; srcY < (point.y + 1) * scaleFactorY; srcY++)
-					{
-						Long	 value = XGetPixel(image, srcRect.left + srcX, srcRect.top + srcY);
-
-						red   += Float((value >> 16) & 255) * (Math::Min(1.0, (point.x + 1) * scaleFactorX - srcX) * Math::Min(1.0, (point.y + 1) * scaleFactorY - srcY));
-						green += Float((value >> 8)  & 255) * (Math::Min(1.0, (point.x + 1) * scaleFactorX - srcX) * Math::Min(1.0, (point.y + 1) * scaleFactorY - srcY));
-						blue  += Float( value	     & 255) * (Math::Min(1.0, (point.x + 1) * scaleFactorX - srcX) * Math::Min(1.0, (point.y + 1) * scaleFactorY - srcY));
-					}
-				}
-
-				red   /= scaleFactorX * scaleFactorY;
-				green /= scaleFactorX * scaleFactorY;
-				blue  /= scaleFactorX * scaleFactorY;
-
-				if	(windowAttributes.depth == 16) gcValues.foreground =		   ((Int(red) >> 3) << 11) | ((Int(green) >> 2) << 5) | (Int(blue) >> 3);
-				else if (windowAttributes.depth == 24) gcValues.foreground =		   ( Int(red)       << 16) | ( Int(green) << 8)	      | (Int(blue)     );
-				else if (windowAttributes.depth == 32) gcValues.foreground = (255 << 24) | ( Int(red)       << 16) | ( Int(green) << 8)	      | (Int(blue)     );
-
-				XChangeGC(display, gc, GCForeground, &gcValues);
-
-				if (!painting) XDrawPoint(display, window, gc, destRect.left + point.x, destRect.top + point.y);
-
-				XDrawPoint(display, this->bitmap, gc, destRect.left + point.x, destRect.top + point.y);
-			}
-		}
+		XPutImage(display, this->bitmap, gc, (XImage *) bitmap.GetSystemBitmap(), Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
 	}
 
 	/* Delete copy if we created one earlier.

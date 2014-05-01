@@ -44,8 +44,6 @@ namespace smooth
 				Bool			 CreateBitmap(const Size &, Int);
 				Bool			 DeleteBitmap();
 
-				Int			 Scale(const Size &);
-
 				Bool			 SetSystemBitmap(Void *);
 				Void			*GetSystemBitmap() const;
 

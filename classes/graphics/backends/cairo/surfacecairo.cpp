@@ -755,30 +755,33 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	 */
 	HDC	 gdi_dc	  = GetWindowDC(window);
 	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
-	HBITMAP	 backup	  = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
-	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
+	if (destRect.GetSize() == srcRect.GetSize())
 	{
-		if (!painting)
-		{
-			BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
-		}
+		HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
+
+		if (!painting) BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
 
 		BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
+
+		SelectObject(cdc, backup);
 	}
 	else
 	{
-		if (!painting)
-		{
-			SetStretchBltMode(gdi_dc, HALFTONE);
-			StretchBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), SRCCOPY);
-		}
+		Float	 scaleFactorX = Float(srcRect.GetWidth()) / Float(destRect.GetWidth());
+		Float	 scaleFactorY = Float(srcRect.GetHeight()) / Float(destRect.GetHeight());
 
-		SetStretchBltMode(paintContext, HALFTONE);
-		StretchBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), SRCCOPY);
+		Size		 srcSize   = bitmap.GetSize();
+		const Bitmap	&srcBitmap = bitmap.Scale(Size(Float(srcSize.cx) / scaleFactorX, Float(srcSize.cy) / scaleFactorY));
+
+		HBITMAP	 backup = (HBITMAP) SelectObject(cdc, srcBitmap.GetSystemBitmap());
+
+		if (!painting) BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
+
+		BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
+
+		SelectObject(cdc, backup);
 	}
-
-	SelectObject(cdc, backup);
 
 	DeleteDC(cdc);
 	ReleaseDC(window, gdi_dc);

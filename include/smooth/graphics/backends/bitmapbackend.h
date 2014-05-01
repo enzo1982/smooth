@@ -16,6 +16,8 @@ namespace smooth
 	namespace GUI
 	{
 		class Surface;
+
+		class Bitmap;
 		class BitmapBackend;
 	};
 };
@@ -84,7 +86,7 @@ namespace smooth
 				virtual Int			 ReplaceColor(const Color &, const Color &);
 				virtual Int			 SetBackgroundColor(const Color &);
 
-				virtual Int			 Scale(const Size &);
+				virtual Bitmap			 Scale(const Size &) const;
 
 				virtual Bool			 SetPixel(const Point &, const Color &);
 				virtual Color			 GetPixel(const Point &) const;

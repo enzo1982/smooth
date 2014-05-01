@@ -107,8 +107,10 @@ S::Int S::GUI::Bitmap::SetBackgroundColor(const Color &color)
 	return backend->SetBackgroundColor(color);
 }
 
-S::Int S::GUI::Bitmap::Scale(const Size &newSize)
+S::GUI::Bitmap S::GUI::Bitmap::Scale(const Size &newSize) const
 {
+	if (GetSize() == Size() || GetSize() == newSize) return *this;
+
 	return backend->Scale(newSize);
 }
 

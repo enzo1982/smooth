@@ -278,9 +278,44 @@ S::Int S::GUI::BitmapBackend::SetBackgroundColor(const Color &color)
 	return Success();
 }
 
-S::Int S::GUI::BitmapBackend::Scale(const Size &newSize)
+S::GUI::Bitmap S::GUI::BitmapBackend::Scale(const Size &newSize) const
 {
-	return Error();
+	Bitmap	 bitmap(newSize, depth);
+
+	Point	 srcPoint;
+	Point	 destPoint;
+
+	Float	 scaleFactorX = Float(size.cx) / Float(newSize.cx);
+	Float	 scaleFactorY = Float(size.cy) / Float(newSize.cy);
+
+	for (destPoint.y = 0; destPoint.y < newSize.cy; destPoint.y++)
+	{
+		for (destPoint.x = 0; destPoint.x < newSize.cx; destPoint.x++)
+		{
+			Float	 red = 0, green = 0, blue = 0, alpha = 0;
+
+			for (srcPoint.x = Int(Float(destPoint.x) * scaleFactorX); srcPoint.x < Int(Float(destPoint.x + 1) * scaleFactorX + 0.9999); srcPoint.x++)
+			{
+				for (srcPoint.y = Int(Float(destPoint.y) * scaleFactorY); srcPoint.y < Int(Float(destPoint.y + 1) * scaleFactorY + 0.9999); srcPoint.y++)
+				{
+					Int	 color	 = GetPixel(srcPoint);
+
+					Float	 weightX = (1.0 - Math::Max(0.0, Float(destPoint.x) * scaleFactorX - Float(srcPoint.x)) - Math::Max(0.0, Float(srcPoint.x + 1) - Float(destPoint.x + 1) * scaleFactorX)) / scaleFactorX;
+					Float	 weightY = (1.0 - Math::Max(0.0, Float(destPoint.y) * scaleFactorY - Float(srcPoint.y)) - Math::Max(0.0, Float(srcPoint.y + 1) - Float(destPoint.y + 1) * scaleFactorY)) / scaleFactorY;
+
+					red   += Float(	color	     & 255) * weightX * weightY;
+					green += Float((color >>  8) & 255) * weightX * weightY;
+					blue  += Float((color >> 16) & 255) * weightX * weightY;
+
+					if (depth == 32) alpha += Float((color >> 24) & 255) * weightX * weightY;
+				}
+			}
+
+			bitmap.SetPixel(destPoint, Color(Int(red) | (Int(green) << 8) | (Int(blue) << 16) | (Int(alpha) << 24), Color::RGBA));
+		}
+	}
+
+	return bitmap;
 }
 
 S::Bool S::GUI::BitmapBackend::SetPixel(const Point &iPoint, const Color &color)

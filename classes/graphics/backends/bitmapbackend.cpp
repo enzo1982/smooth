@@ -237,8 +237,11 @@ S::Int S::GUI::BitmapBackend::InvertColors()
 	return Success();
 }
 
-S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &color1, const Color &color2)
+S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &iColor1, const Color &iColor2)
 {
+	Color	 color1 = iColor1.ConvertTo(depth == 32 ? Color::RGBA : Color::RGB);
+	Color	 color2 = iColor2.ConvertTo(depth == 32 ? Color::RGBA : Color::RGB);
+
 	Point	 point;
 
 	for (point.y = 0; point.y < size.cy; point.y++)
@@ -252,9 +255,11 @@ S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &color1, const Color &col
 	return Success();
 }
 
-S::Int S::GUI::BitmapBackend::SetBackgroundColor(const Color &color)
+S::Int S::GUI::BitmapBackend::SetBackgroundColor(const Color &iColor)
 {
 	if (depth != 32) return Success();
+
+	Color	 color = iColor.ConvertTo(Color::RGB);
 
 	Point	 point;
 

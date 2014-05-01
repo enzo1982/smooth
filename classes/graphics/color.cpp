@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,7 @@
 #include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
 
-S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
+S::GUI::Color S::GUI::Color::ConvertTo(ColorSpace cs) const
 {
 	double	p1 = 0;
 	double	p2 = 0;
@@ -28,11 +28,13 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 
 	switch (colorSpace)
 	{
-		case RGBA:
+		case RGB:
 			switch (cs)
 			{
-				case RGBA:
+				case RGB:
 					return *this;
+				case RGBA:
+					return Color(255 << 24 | color, RGBA);
 				case HSV:
 					r = GetRed();
 					g = GetGreen();
@@ -68,7 +70,7 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 					p1 = Math::Round(p1);
 					p2 = Math::Round(p2);
 
-					return Color((int) p1, (int) p2, (int) p3);
+					return Color((int) p1, (int) p2, (int) p3, HSV);
 				case YUV:
 					p1 = (GetRed() + GetGreen() + GetBlue()) / 3;
 					p2 =  GetBlue();
@@ -76,13 +78,13 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 
 					p1 = Math::Round(p1);
 
-					return Color((int) p1, (int) p2, (int) p3);
+					return Color((int) p1, (int) p2, (int) p3, YUV);
 				case CMY:
 					p1 = 255 - GetRed();
 					p2 = 255 - GetGreen();
 					p3 = 255 - GetBlue();
 
-					return Color((int) p1, (int) p2, (int) p3);
+					return Color((int) p1, (int) p2, (int) p3, CMY);
 				case CMYK:
 					r = GetRed();
 					g = GetGreen();
@@ -93,9 +95,31 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 					p2 = 255 - g - p4;
 					p3 = 255 - b - p4;
 
-					return Color(((Int) p1) | ((Int) p2) << 8 | ((Int) p3) << 16 | ((Int) p4) << 24);
+					return Color(((Int) p1) | ((Int) p2) << 8 | ((Int) p3) << 16 | ((Int) p4) << 24, CMYK);
 				case GRAY:
-					return Color((GetRed() + GetGreen() + GetBlue()) / 3);
+					return Color((GetRed() + GetGreen() + GetBlue()) / 3, GRAY);
+				default:
+					break;
+			}
+
+			break;
+		case RGBA:
+			switch (cs)
+			{
+				case RGB:
+					return Color(GetRed(), GetGreen(), GetBlue(), RGB);
+				case RGBA:
+					return *this;
+				case HSV:
+					return ConvertTo(RGB).ConvertTo(HSV);
+				case YUV:
+					return ConvertTo(RGB).ConvertTo(YUV);
+				case CMY:
+					return ConvertTo(RGB).ConvertTo(CMY);
+				case CMYK:
+					return ConvertTo(RGB).ConvertTo(CMYK);
+				case GRAY:
+					return ConvertTo(RGB).ConvertTo(GRAY);
 				default:
 					break;
 			}
@@ -104,7 +128,7 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 		case HSV:
 			switch (cs)
 			{
-				case RGBA:
+				case RGB:
 					h = ((double) GetRed()) / 255 * 360;
 					s = ((double) GetGreen()) / 255;
 					v = GetBlue();
@@ -168,17 +192,19 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 					p2 = Math::Round(p2);
 					p3 = Math::Round(p3);
 
-					return Color((int) p1, (int) p2, (int) p3);
+					return Color((int) p1, (int) p2, (int) p3, RGB);
+				case RGBA:
+					return ConvertTo(RGB).ConvertTo(RGBA);
 				case HSV:
 					return *this;
 				case YUV:
-					return ConvertTo(RGBA).ConvertTo(YUV);
+					return ConvertTo(RGB).ConvertTo(YUV);
 				case CMY:
-					return ConvertTo(RGBA).ConvertTo(CMY);
+					return ConvertTo(RGB).ConvertTo(CMY);
 				case CMYK:
-					return ConvertTo(RGBA).ConvertTo(CMYK);
+					return ConvertTo(RGB).ConvertTo(CMYK);
 				case GRAY:
-					return ConvertTo(RGBA).ConvertTo(GRAY);
+					return ConvertTo(RGB).ConvertTo(GRAY);
 				default:
 					break;
 			}
@@ -187,24 +213,26 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 		case YUV:
 			switch (cs)
 			{
-				case RGBA:
+				case RGB:
 					p1 =	 GetBlue();
 					p3 =	 GetGreen();
 					p2 = 3 * GetRed() - p1 - p3;
 
 					if (p2 < 0) p2 = 0;
 
-					return Color((int) p1, (int) p2, (int) p3);
+					return Color((int) p1, (int) p2, (int) p3, RGB);
+				case RGBA:
+					return ConvertTo(RGB).ConvertTo(RGBA);
 				case HSV:
-					return ConvertTo(RGBA).ConvertTo(HSV);
+					return ConvertTo(RGB).ConvertTo(HSV);
 				case YUV:
 					return *this;
 				case CMY:
-					return ConvertTo(RGBA).ConvertTo(CMY);
+					return ConvertTo(RGB).ConvertTo(CMY);
 				case CMYK:
-					return ConvertTo(RGBA).ConvertTo(CMYK);
+					return ConvertTo(RGB).ConvertTo(CMYK);
 				case GRAY:
-					return ConvertTo(RGBA).ConvertTo(GRAY);
+					return ConvertTo(RGB).ConvertTo(GRAY);
 				default:
 					break;
 			}
@@ -213,22 +241,24 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 		case CMY:
 			switch (cs)
 			{
-				case RGBA:
+				case RGB:
 					p1 = 255 - GetRed();
 					p2 = 255 - GetGreen();
 					p3 = 255 - GetBlue();
 
-					return Color((int) p1, (int) p2, (int) p3);
+					return Color((int) p1, (int) p2, (int) p3, RGB);
+				case RGBA:
+					return ConvertTo(RGB).ConvertTo(RGBA);
 				case HSV:
-					return ConvertTo(RGBA).ConvertTo(HSV);
+					return ConvertTo(RGB).ConvertTo(HSV);
 				case YUV:
-					return ConvertTo(RGBA).ConvertTo(YUV);
+					return ConvertTo(RGB).ConvertTo(YUV);
 				case CMY:
 					return *this;
 				case CMYK:
-					return ConvertTo(RGBA).ConvertTo(CMYK);
+					return ConvertTo(RGB).ConvertTo(CMYK);
 				case GRAY:
-					return ConvertTo(RGBA).ConvertTo(GRAY);
+					return ConvertTo(RGB).ConvertTo(GRAY);
 				default:
 					break;
 			}
@@ -237,23 +267,25 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 		case CMYK:
 			switch (cs)
 			{
-				case RGBA:
+				case RGB:
 					p4 =	   GetAlpha();
 					p1 = 255 - GetRed()   - p4;
 					p2 = 255 - GetGreen() - p4;
 					p3 = 255 - GetBlue()  - p4;
 
-					return Color((int) p1, (int) p2, (int) p3);
+					return Color((int) p1, (int) p2, (int) p3, RGB);
+				case RGBA:
+					return ConvertTo(RGB).ConvertTo(RGBA);
 				case HSV:
-					return ConvertTo(RGBA).ConvertTo(HSV);
+					return ConvertTo(RGB).ConvertTo(HSV);
 				case YUV:
-					return ConvertTo(RGBA).ConvertTo(YUV);
+					return ConvertTo(RGB).ConvertTo(YUV);
 				case CMY:
-					return ConvertTo(RGBA).ConvertTo(CMY);
+					return ConvertTo(RGB).ConvertTo(CMY);
 				case CMYK:
 					return *this;
 				case GRAY:
-					return ConvertTo(RGBA).ConvertTo(GRAY);
+					return ConvertTo(RGB).ConvertTo(GRAY);
 				default:
 					break;
 			}
@@ -262,16 +294,18 @@ S::GUI::Color S::GUI::Color::ConvertTo(Int cs) const
 		case GRAY:
 			switch (cs)
 			{
+				case RGB:
+					return Color(color, color, color, RGB);
 				case RGBA:
-					return Color(color, color, color);
+					return ConvertTo(RGB).ConvertTo(RGBA);
 				case HSV:
-					return ConvertTo(RGBA).ConvertTo(HSV);
+					return ConvertTo(RGB).ConvertTo(HSV);
 				case YUV:
-					return ConvertTo(RGBA).ConvertTo(YUV);
+					return ConvertTo(RGB).ConvertTo(YUV);
 				case CMY:
-					return ConvertTo(RGBA).ConvertTo(CMY);
+					return ConvertTo(RGB).ConvertTo(CMY);
 				case CMYK:
-					return ConvertTo(RGBA).ConvertTo(CMYK);
+					return ConvertTo(RGB).ConvertTo(CMYK);
 				case GRAY:
 					return *this;
 				default:

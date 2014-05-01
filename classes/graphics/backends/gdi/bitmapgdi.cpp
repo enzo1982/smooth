@@ -169,10 +169,12 @@ S::Void *S::GUI::BitmapGDI::GetSystemBitmap() const
 	return (Void *) bitmap;
 }
 
-S::Bool S::GUI::BitmapGDI::SetPixel(const Point &point, const Color &color)
+S::Bool S::GUI::BitmapGDI::SetPixel(const Point &point, const Color &iColor)
 {
 	if (bytes == NIL)			      return False;
 	if (point.y >= size.cy || point.x >= size.cx) return False;
+
+	Color		 color	= iColor.ConvertTo(Color::RGBA);
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
 	Int		 offset = 0;
@@ -226,6 +228,8 @@ S::GUI::Color S::GUI::BitmapGDI::GetPixel(const Point &point) const
 
 S::GUI::BitmapBackend &S::GUI::BitmapGDI::operator =(const BitmapBackend &newBitmap)
 {
+	if (&newBitmap == this) return *this;
+
 	SetSystemBitmap(((BitmapGDI &) newBitmap).bitmap);
 
 	return *this;

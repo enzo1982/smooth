@@ -160,11 +160,11 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	{
 		for (UnsignedInt x = 0; x < width; x++)
 		{
-			if	(color_type == PNG_COLOR_TYPE_GRAY	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(					  row_pointers[y][    x	   ] << 16 | row_pointers[y][	 x    ] << 8 | row_pointers[y][	   x]));
-			else if	(color_type == PNG_COLOR_TYPE_GRAY_ALPHA && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][2 * x + 1] << 24 | row_pointers[y][2 * x	   ] << 16 | row_pointers[y][2 * x    ] << 8 | row_pointers[y][2 * x]));
-			else if	(color_type == PNG_COLOR_TYPE_RGB	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(					  row_pointers[y][3 * x + 2] << 16 | row_pointers[y][3 * x + 1] << 8 | row_pointers[y][3 * x]));
-			else if	(color_type == PNG_COLOR_TYPE_RGB_ALPHA	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][4 * x + 3] << 24 | row_pointers[y][4 * x + 2] << 16 | row_pointers[y][4 * x + 1] << 8 | row_pointers[y][4 * x]));
-			else if (color_type == PNG_COLOR_TYPE_PALETTE	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(palette[row_pointers[y][x]].red, palette[row_pointers[y][x]].green, palette[row_pointers[y][x]].blue));
+			if	(color_type == PNG_COLOR_TYPE_GRAY	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(					  row_pointers[y][    x	   ] << 16 | row_pointers[y][	 x    ] << 8 | row_pointers[y][	   x], Color::RGB));
+			else if	(color_type == PNG_COLOR_TYPE_GRAY_ALPHA && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][2 * x + 1] << 24 | row_pointers[y][2 * x	   ] << 16 | row_pointers[y][2 * x    ] << 8 | row_pointers[y][2 * x], Color::RGBA));
+			else if	(color_type == PNG_COLOR_TYPE_RGB	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(					  row_pointers[y][3 * x + 2] << 16 | row_pointers[y][3 * x + 1] << 8 | row_pointers[y][3 * x], Color::RGB));
+			else if	(color_type == PNG_COLOR_TYPE_RGB_ALPHA	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(row_pointers[y][4 * x + 3] << 24 | row_pointers[y][4 * x + 2] << 16 | row_pointers[y][4 * x + 1] << 8 | row_pointers[y][4 * x], Color::RGBA));
+			else if (color_type == PNG_COLOR_TYPE_PALETTE	 && bit_depth == 8) bitmap.SetPixel(Point(x, y), Color(palette[row_pointers[y][x]].red, palette[row_pointers[y][x]].green, palette[row_pointers[y][x]].blue, Color::RGB));
 		}
 	}
 

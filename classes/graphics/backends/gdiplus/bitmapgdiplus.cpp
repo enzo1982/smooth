@@ -185,10 +185,12 @@ S::Void *S::GUI::BitmapGDIPlus::GetSystemBitmap() const
 	return (Void *) hBitmap;
 }
 
-S::Bool S::GUI::BitmapGDIPlus::SetPixel(const Point &point, const Color &color)
+S::Bool S::GUI::BitmapGDIPlus::SetPixel(const Point &point, const Color &iColor)
 {
 	if (bytes == NIL)			      return False;
 	if (point.y >= size.cy || point.x >= size.cx) return False;
+
+	Color		 color	= iColor.ConvertTo(Color::RGBA);
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
 	Int		 offset = 0;

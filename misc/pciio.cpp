@@ -16,77 +16,79 @@
 using namespace smooth;
 using namespace smooth::GUI;
 
-S::String	 cfNames[10];
-S::String	 cpNames[5];
+static S::String	 cfNames[7];
+static S::String	 cpNames[5];
 
 PCIIO::PCIIO(const S::GUI::Bitmap &b)
 {
-	cfNames[RGBA]	= "RGB";
-	cfNames[HSV]	= "HSV";
-	cfNames[YUV]	= "YUV";
-	cfNames[CMY]	= "CMY";
-	cfNames[CMYK]	= "CMK";
-	cfNames[GRAY]	= "GRY";
+	cfNames[Color::RGB]	= "RGB";
+	cfNames[Color::RGBA]	= "RGA";
+	cfNames[Color::HSV]	= "HSV";
+	cfNames[Color::YUV]	= "YUV";
+	cfNames[Color::CMY]	= "CMY";
+	cfNames[Color::CMYK]	= "CMK";
+	cfNames[Color::GRAY]	= "GRY";
 
-	cpNames[RAW]	= "RAW";
-	cpNames[PCI]	= "PCI";
-	cpNames[RLE]	= "RLE";
-	cpNames[JPEG]	= "JPG";
-	cpNames[BZIP2]	= "BZ2";
+	cpNames[RAW]		= "RAW";
+	cpNames[PCI]		= "PCI";
+	cpNames[RLE]		= "RLE";
+	cpNames[JPEG]		= "JPG";
+	cpNames[BZIP2]		= "BZ2";
 
-	majorversion	= PCIMajorVersion;
-	minorversion	= PCIMinorVersion;
-	compression	= RAW;
-	colorspace	= RGBA;
-	quality		= 100;
-	description	= NIL;
+	majorversion		= PCIMajorVersion;
+	minorversion		= PCIMinorVersion;
+	compression		= RAW;
+	colorspace		= Color::RGB;
+	quality			= 100;
+	description		= NIL;
 
-	dpix		= 75;
-	dpiy		= 75;
-	bpcc		= 8;
-	overwrite	= True;
-	imageid		= 0;
-	imagename	= NIL;
-	rlebits		= 8;
+	dpix			= 75;
+	dpiy			= 75;
+	bpcc			= 8;
+	overwrite		= True;
+	imageid			= 0;
+	imagename		= NIL;
+	rlebits			= 8;
 
-	bmp		= b;
+	bmp			= b;
 
-	sizex		= bmp.GetSize().cx;
-	sizey		= bmp.GetSize().cy;
+	sizex			= bmp.GetSize().cx;
+	sizey			= bmp.GetSize().cy;
 }
 
 PCIIO::PCIIO()
 {
-	cfNames[RGBA]	= "RGB";
-	cfNames[HSV]	= "HSV";
-	cfNames[YUV]	= "YUV";
-	cfNames[CMY]	= "CMY";
-	cfNames[CMYK]	= "CMK";
-	cfNames[GRAY]	= "GRY";
+	cfNames[Color::RGB]	= "RGB";
+	cfNames[Color::RGBA]	= "RGA";
+	cfNames[Color::HSV]	= "HSV";
+	cfNames[Color::YUV]	= "YUV";
+	cfNames[Color::CMY]	= "CMY";
+	cfNames[Color::CMYK]	= "CMK";
+	cfNames[Color::GRAY]	= "GRY";
 
-	cpNames[RAW]	= "RAW";
-	cpNames[PCI]	= "PCI";
-	cpNames[RLE]	= "RLE";
-	cpNames[JPEG]	= "JPG";
-	cpNames[BZIP2]	= "BZ2";
+	cpNames[RAW]		= "RAW";
+	cpNames[PCI]		= "PCI";
+	cpNames[RLE]		= "RLE";
+	cpNames[JPEG]		= "JPG";
+	cpNames[BZIP2]		= "BZ2";
 
-	majorversion	= PCIMajorVersion;
-	minorversion	= PCIMinorVersion;
-	compression	= RAW;
-	colorspace	= RGBA;
-	quality		= 100;
-	description	= NIL;
+	majorversion		= PCIMajorVersion;
+	minorversion		= PCIMinorVersion;
+	compression		= RAW;
+	colorspace		= Color::RGB;
+	quality			= 100;
+	description		= NIL;
 
-	dpix		= 75;
-	dpiy		= 75;
-	bpcc		= 8;
-	overwrite	= True;
-	imageid		= 0;
-	imagename	= NIL;
-	rlebits		= 8;
+	dpix			= 75;
+	dpiy			= 75;
+	bpcc			= 8;
+	overwrite		= True;
+	imageid			= 0;
+	imagename		= NIL;
+	rlebits			= 8;
 
-	sizex		= 0;
-	sizey		= 0;
+	sizex			= 0;
+	sizey			= 0;
 }
 
 PCIIO::~PCIIO()
@@ -99,7 +101,7 @@ void PCIIO::SetCompressionType(int t)
 	compression = t;
 }
 
-void PCIIO::SetColorspace(int cs)
+void PCIIO::SetColorspace(S::GUI::Color::ColorSpace cs)
 {
 	colorspace = cs;
 }
@@ -405,9 +407,9 @@ bool PCIIO::ReadFORMTAG(PCIIn in)
 
 					if (compression == RLE) rlebits = in->InputNumber(1);
 
-					for (int i = 0; i < 8; i++)
+					for (int i = 0; i < 7; i++)
 					{
-						if (cfName.Compare(cfNames[i]) == 0) colorspace = i;
+						if (cfName.Compare(cfNames[i]) == 0) colorspace = (S::GUI::Color::ColorSpace) i;
 					}
 
 					return true;

@@ -33,7 +33,7 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	{
 		for (int x = 0; x < 256; x++)
 		{
-			colortable[x][y] = Color(x, y, 255, HSV).ConvertTo(RGBA);
+			colortable[x][y] = Color(x, y, 255, Color::HSV).ConvertTo(Color::RGB);
 		}
 	}
 
@@ -46,9 +46,9 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	updatetext = true;
 	updatehextext = true;
 
-	acthue = color.ConvertTo(HSV).GetRed();
-	actsat = color.ConvertTo(HSV).GetGreen();
-	actval = color.ConvertTo(HSV).GetBlue();
+	acthue = color.ConvertTo(Color::HSV).GetRed();
+	actsat = color.ConvertTo(Color::HSV).GetGreen();
+	actval = color.ConvertTo(Color::HSV).GetBlue();
 	actred = color.GetRed();
 	actgreen = color.GetGreen();
 	actblue = color.GetBlue();
@@ -248,9 +248,9 @@ S::Int S::GUI::Dialogs::ColorSelection::SetColor(const Color &newColor)
 {
 	color = newColor;
 
-	acthue = color.ConvertTo(HSV).GetRed();
-	actsat = color.ConvertTo(HSV).GetGreen();
-	actval = color.ConvertTo(HSV).GetBlue();
+	acthue = color.ConvertTo(Color::HSV).GetRed();
+	actsat = color.ConvertTo(Color::HSV).GetGreen();
+	actval = color.ConvertTo(Color::HSV).GetBlue();
 	actred = color.GetRed();
 	actgreen = color.GetGreen();
 	actblue = color.GetBlue();
@@ -299,7 +299,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 			Point	 p1(huexoffset							     + 1, yoffset + 1 + ypos);
 			Point	 p2(huexoffset + Math::Round(16.0 * surface->GetSurfaceDPI() / 96.0) + 1, yoffset + 1 + ypos);
 
-			surface->Line(p1, p2, Color(255 - Math::Round(hue), 255, 255, HSV).ConvertTo(RGBA));
+			surface->Line(p1, p2, Color(255 - Math::Round(hue), 255, 255, Color::HSV).ConvertTo(Color::RGB));
 
 			hue += huebias;
 		}
@@ -367,7 +367,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 
 	surface->EndPaint();
 
-	ncarea->SetColor(Color(acthue, actsat, actval, HSV).ConvertTo(RGBA));
+	ncarea->SetColor(Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB));
 }
 
 void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wparam, Int lparam)
@@ -432,9 +432,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					dlgwnd->SetUpdateRect(Rect(Point(xoffset + 1, yoffset + 1), Size(hssize, hssize)));
 					ColorDlgPaintProc();
 
-					actred = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetRed();
-					actgreen = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetGreen();
-					actblue = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetBlue();
+					actred = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetRed();
+					actgreen = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetGreen();
+					actblue = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetBlue();
 
 					ColorDlgUpdateHexValue();
 
@@ -459,7 +459,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 					actval = newval;
 					actsat = newsat;
 
-					ncarea->SetColor(Color(acthue, actsat, actval, HSV).ConvertTo(RGBA));
+					ncarea->SetColor(Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB));
 
 					surface->StartPaint(Rect(Point(xoffset - 4, yoffset - 4), Size(hssize + 5, hssize + 5)));
 
@@ -467,9 +467,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgMessageProc(Int message, Int wpara
 
 					surface->EndPaint();
 
-					actred = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetRed();
-					actgreen = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetGreen();
-					actblue = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetBlue();
+					actred = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetRed();
+					actgreen = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetGreen();
+					actblue = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetBlue();
 
 					ColorDlgUpdateHexValue();
 
@@ -501,10 +501,10 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 			Point	 p1(huexoffset							     + 1, yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / hssize)));
 			Point	 p2(huexoffset + Math::Round(16.0 * surface->GetSurfaceDPI() / 96.0) + 1, yoffset + 1 + (int) ((255.0 - lasthue) / (256.0 / hssize)));
 
-			surface->Line(p1, p2, Color(lasthue, 255, 255, HSV).ConvertTo(RGBA));
+			surface->Line(p1, p2, Color(lasthue, 255, 255, Color::HSV).ConvertTo(Color::RGB));
 		}
 
-		Color	 ahrgb = Color(acthue, 255, 255, HSV).ConvertTo(RGBA);
+		Color	 ahrgb = Color(acthue, 255, 255, Color::HSV).ConvertTo(Color::RGB);
 
 		for (int x = huexoffset + 1; x < (huexoffset + Math::Round(16.0 * surface->GetSurfaceDPI() / 96.0) + 1); x++)
 		{
@@ -524,14 +524,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 		{
 			for (int x = 0; x < hssize; x++)
 			{
-				Color	 rgb = Color(acthue, lastsat, (int) (x * (256.0 / hssize)), HSV).ConvertTo(RGBA);
+				Color	 rgb = Color(acthue, lastsat, (int) (x * (256.0 / hssize)), Color::HSV).ConvertTo(Color::RGB);
 
 				surface->SetPixel(Point(x + xoffset + 1, yoffset + 1 + (int) ((255.0 - lastsat) / (256.0 / hssize))), rgb);
 			}
 
 			for (int y = 0; y < hssize; y++)
 			{
-				Color	 rgb = Color(acthue, (int) (255.0 - (y * (256.0 / hssize))), lastval, HSV).ConvertTo(RGBA);
+				Color	 rgb = Color(acthue, (int) (255.0 - (y * (256.0 / hssize))), lastval, Color::HSV).ConvertTo(Color::RGB);
 
 				surface->SetPixel(Point(xoffset + 1 + (int) (lastval / (256.0 / hssize)), y + yoffset + 1), rgb);
 			}
@@ -539,14 +539,14 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 
 		for (int x = 0; x < hssize; x++)
 		{
-			Color	 rgb = Color(acthue, actsat, (int) (x * (256.0 / hssize)), HSV).ConvertTo(RGBA);
+			Color	 rgb = Color(acthue, actsat, (int) (x * (256.0 / hssize)), Color::HSV).ConvertTo(Color::RGB);
 
 			surface->SetPixel(Point(x + xoffset + 1, yoffset + 1 + (int) ((255.0 - actsat) / (256.0 / hssize))), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
 
 		for (int y = 0; y < hssize; y++)
 		{
-			Color	 rgb = Color(acthue, (int) (255.0 - (y * (256.0 / hssize))), actval, HSV).ConvertTo(RGBA);
+			Color	 rgb = Color(acthue, (int) (255.0 - (y * (256.0 / hssize))), actval, Color::HSV).ConvertTo(Color::RGB);
 
 			surface->SetPixel(Point(xoffset + 1 + (int) (actval / (256.0 / hssize)), y + yoffset + 1), Color(255 - Color(rgb).GetRed(), 255 - Color(rgb).GetGreen(), 255 - Color(rgb).GetBlue()));
 		}
@@ -557,7 +557,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 		lastsat = actsat;
 	}
 
-	ncarea->SetColor(Color(acthue, actsat, actval, HSV).ConvertTo(RGBA));
+	ncarea->SetColor(Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB));
 
 	forcehupdate = false;
 	preventhupdate = false;
@@ -567,7 +567,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgUpdatePickers()
 
 S::Void S::GUI::Dialogs::ColorSelection::OnOK()
 {
-	color = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA);
+	color = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB);
 
 	dlgwnd->Close();
 }
@@ -587,9 +587,9 @@ S::Void S::GUI::Dialogs::ColorSelection::OnSelectOriginalColor()
 	lastsat = actsat;
 	lastval = actval;
 
-	acthue = color.ConvertTo(HSV).GetRed();
-	actsat = color.ConvertTo(HSV).GetGreen();
-	actval = color.ConvertTo(HSV).GetBlue();
+	acthue = color.ConvertTo(Color::HSV).GetRed();
+	actsat = color.ConvertTo(Color::HSV).GetGreen();
+	actval = color.ConvertTo(Color::HSV).GetBlue();
 	actred = color.GetRed();
 	actgreen = color.GetGreen();
 	actblue = color.GetBlue();
@@ -613,9 +613,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgHueSlider()
 	Surface	*surface = dlgwnd->GetDrawSurface();
 	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
-	actred = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetRed();
-	actgreen = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetGreen();
-	actblue = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetBlue();
+	actred = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetRed();
+	actgreen = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetGreen();
+	actblue = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetBlue();
 
 	if (updatetext)
 	{
@@ -646,9 +646,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgSatSlider()
 
 	ColorDlgUpdatePickers();
 
-	actred = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetRed();
-	actgreen = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetGreen();
-	actblue = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetBlue();
+	actred = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetRed();
+	actgreen = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetGreen();
+	actblue = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetBlue();
 
 	if (updatetext)
 	{
@@ -679,9 +679,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgValSlider()
 
 	ColorDlgUpdatePickers();
 
-	actred = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetRed();
-	actgreen = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetGreen();
-	actblue = Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetBlue();
+	actred = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetRed();
+	actgreen = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetGreen();
+	actblue = Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetBlue();
 
 	if (updatetext)
 	{
@@ -710,9 +710,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgRedSlider()
 	Surface	*surface = dlgwnd->GetDrawSurface();
 	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
-	acthue = Color(actred, actgreen, actblue).ConvertTo(HSV).GetRed();
-	actsat = Color(actred, actgreen, actblue).ConvertTo(HSV).GetGreen();
-	actval = Color(actred, actgreen, actblue).ConvertTo(HSV).GetBlue();
+	acthue = Color(actred, actgreen, actblue).ConvertTo(Color::HSV).GetRed();
+	actsat = Color(actred, actgreen, actblue).ConvertTo(Color::HSV).GetGreen();
+	actval = Color(actred, actgreen, actblue).ConvertTo(Color::HSV).GetBlue();
 
 	if (updatetext)
 	{
@@ -741,9 +741,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgGreenSlider()
 	Surface	*surface = dlgwnd->GetDrawSurface();
 	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
-	acthue = Color(actred, actgreen, actblue).ConvertTo(HSV).GetRed();
-	actsat = Color(actred, actgreen, actblue).ConvertTo(HSV).GetGreen();
-	actval = Color(actred, actgreen, actblue).ConvertTo(HSV).GetBlue();
+	acthue = Color(actred, actgreen, actblue).ConvertTo(Color::HSV).GetRed();
+	actsat = Color(actred, actgreen, actblue).ConvertTo(Color::HSV).GetGreen();
+	actval = Color(actred, actgreen, actblue).ConvertTo(Color::HSV).GetBlue();
 
 	if (updatetext)
 	{
@@ -772,9 +772,9 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgBlueSlider()
 	Surface	*surface = dlgwnd->GetDrawSurface();
 	int	 hssize	 = Math::Round(205.0 * surface->GetSurfaceDPI() / 96.0);
 
-	acthue = Color(actred, actgreen, actblue).ConvertTo(HSV).GetRed();
-	actsat = Color(actred, actgreen, actblue).ConvertTo(HSV).GetGreen();
-	actval = Color(actred, actgreen, actblue).ConvertTo(HSV).GetBlue();
+	acthue = Color(actred, actgreen, actblue).ConvertTo(Color::HSV).GetRed();
+	actsat = Color(actred, actgreen, actblue).ConvertTo(Color::HSV).GetGreen();
+	actval = Color(actred, actgreen, actblue).ConvertTo(Color::HSV).GetBlue();
 
 	if (updatetext)
 	{
@@ -844,7 +844,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgRedEdit()
 {
 	int newred = Math::Max(0, Math::Min(255, (Int) rededit->GetText().ToInt()));
 
-	if (newred != Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetRed())
+	if (newred != Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetRed())
 	{
 		actred = newred;
 
@@ -858,7 +858,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgGreenEdit()
 {
 	int newgreen = Math::Max(0, Math::Min(255, (Int) greenedit->GetText().ToInt()));
 
-	if (newgreen != Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetGreen())
+	if (newgreen != Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetGreen())
 	{
 		actgreen = newgreen;
 
@@ -872,7 +872,7 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgBlueEdit()
 {
 	int newblue = Math::Max(0, Math::Min(255, (Int) blueedit->GetText().ToInt()));
 
-	if (newblue != Color(acthue, actsat, actval, HSV).ConvertTo(RGBA).GetBlue())
+	if (newblue != Color(acthue, actsat, actval, Color::HSV).ConvertTo(Color::RGB).GetBlue())
 	{
 		actblue = newblue;
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -130,20 +130,20 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 
 	switch (colorspace)
 	{
-		case RGBA:
-		case YUV:
-		case HSV:
-		case CMY:
+		case Color::RGB:
+		case Color::YUV:
+		case Color::HSV:
+		case Color::CMY:
 			ctsize = 3;
 			maxpalentries = 338;
 
 			break;
-		case CMYK:
+		case Color::CMYK:
 			ctsize = 4;
 			maxpalentries = 338;
 
 			break;
-		case GRAY:
+		case Color::GRAY:
 			ctsize = 1;
 			maxpalentries = 338;
 
@@ -430,20 +430,20 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 
 	switch (colorspace)
 	{
-		case RGBA:
-		case YUV:
-		case HSV:
-		case CMY:
+		case Color::RGB:
+		case Color::YUV:
+		case Color::HSV:
+		case Color::CMY:
 			ctsize = 3;
 			maxpalentries = 338;
 
 			break;
-		case CMYK:
+		case Color::CMYK:
 			ctsize = 4;
 			maxpalentries = 338;
 
 			break;
-		case GRAY:
+		case Color::GRAY:
 			ctsize = 1;
 			maxpalentries = 338;
 
@@ -614,7 +614,7 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 			break;
 	}
 
-	for (int x = 0; x < sizex; x++) bmp.SetPixel(Point(x, y), Color(line[x], colorspace).Upsample(bpcc).ConvertTo(RGBA));
+	for (int x = 0; x < sizex; x++) bmp.SetPixel(Point(x, y), Color(line[x], colorspace).Upsample(bpcc).ConvertTo(Color::RGB));
 
 	delete [] line;
 
@@ -941,7 +941,10 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 			if (in->InputNumberPBD(1) == 1) alphabias =	in->InputNumberPBD(md) + 1;
 			else				alphabias = 0 - in->InputNumberPBD(md);
 
-			return Color(red + redbias, green + greenbias, blue + bluebias, alpha + alphabias);
+			return Color( (red   + redbias	)	 |
+				     ((green + greenbias) <<  8) |
+				     ((blue  + bluebias	) << 16) |
+				     ((alpha + alphabias) << 24));
 	}
 
 	return 1;

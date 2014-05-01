@@ -188,10 +188,12 @@ S::Void *S::GUI::BitmapCocoa::GetSystemBitmap() const
 	return (Void *) bitmap;
 }
 
-S::Bool S::GUI::BitmapCocoa::SetPixel(const Point &point, const Color &color)
+S::Bool S::GUI::BitmapCocoa::SetPixel(const Point &point, const Color &iColor)
 {
 	if (bytes == NIL)			      return False;
 	if (point.y >= size.cy || point.x >= size.cx) return False;
+
+	Color		 color	= iColor.ConvertTo(Color::RGBA);
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
 	Int		 offset = (size.cy - point.y - 1) * (size.cx * 4) + point.x * 4;;
@@ -237,6 +239,8 @@ S::GUI::Color S::GUI::BitmapCocoa::GetPixel(const Point &point) const
 
 S::GUI::BitmapBackend &S::GUI::BitmapCocoa::operator =(const BitmapBackend &newBitmap)
 {
+	if (&newBitmap == this) return *this;
+
 	SetSystemBitmap((Void *) ((BitmapCocoa &) newBitmap).bitmap);
 
 	return *this;

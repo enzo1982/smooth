@@ -149,10 +149,12 @@ S::Void *S::GUI::BitmapHaiku::GetSystemBitmap() const
 	return (Void *) bitmap;
 }
 
-S::Bool S::GUI::BitmapHaiku::SetPixel(const Point &point, const Color &color)
+S::Bool S::GUI::BitmapHaiku::SetPixel(const Point &point, const Color &iColor)
 {
 	if (bytes == NIL)			      return False;
 	if (point.y >= size.cy || point.x >= size.cx) return False;
+
+	Color		 color	= iColor.ConvertTo(Color::RGBA);
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
 	Int		 offset = 0;
@@ -206,6 +208,8 @@ S::GUI::Color S::GUI::BitmapHaiku::GetPixel(const Point &point) const
 
 S::GUI::BitmapBackend &S::GUI::BitmapHaiku::operator =(const BitmapBackend &newBitmap)
 {
+	if (&newBitmap == this) return *this;
+
 	SetSystemBitmap((Void *) ((BitmapHaiku &) newBitmap).bitmap);
 
 	return *this;

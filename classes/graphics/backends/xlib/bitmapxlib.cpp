@@ -155,9 +155,11 @@ S::Void *S::GUI::BitmapXLib::GetSystemBitmap() const
 	return (Void *) bitmap;
 }
 
-S::Bool S::GUI::BitmapXLib::SetPixel(const Point &iPoint, const Color &color)
+S::Bool S::GUI::BitmapXLib::SetPixel(const Point &iPoint, const Color &iColor)
 {
 	if (bitmap == NIL) return Error();
+
+	Color	 color	= iColor.ConvertTo(Color::RGBA);
 
 	if	(depth == 16) XPutPixel(bitmap, iPoint.x, iPoint.y, 			       ((color.GetRed() >> 3) << 11) | ((color.GetGreen() >> 2) << 5) | (color.GetBlue() >> 3));
 	else if (depth == 24) XPutPixel(bitmap, iPoint.x, iPoint.y, 			       ( color.GetRed()	      << 16) | ( color.GetGreen()       << 8) | (color.GetBlue()     ));
@@ -181,6 +183,8 @@ S::GUI::Color S::GUI::BitmapXLib::GetPixel(const Point &iPoint) const
 
 S::GUI::BitmapBackend &S::GUI::BitmapXLib::operator =(const BitmapBackend &newBitmap)
 {
+	if (&newBitmap == this) return *this;
+
 	SetSystemBitmap((Void *) ((BitmapXLib &) newBitmap).bitmap);
 
 	return *this;

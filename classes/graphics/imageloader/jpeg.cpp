@@ -151,7 +151,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 		 */
 		for (Int x = 0; x < (signed) cinfo.output_width; x++)
 		{
-			bitmap.SetPixel(Point(x, cinfo.output_scanline - 1), Color(buffer[0][3 * x], buffer[0][3 * x + 1], buffer[0][3 * x + 2]));
+			bitmap.SetPixel(Point(x, cinfo.output_scanline - 1), Color(buffer[0][3 * x], buffer[0][3 * x + 1], buffer[0][3 * x + 2], Color::RGB));
 		}
 	}
 

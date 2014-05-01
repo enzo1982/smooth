@@ -68,7 +68,12 @@ S::GUI::BitmapGDIPlus::BitmapGDIPlus(const BitmapGDIPlus &iBitmap)
 	bitmap	= NIL;
 	hBitmap	= NIL;
 
-	SetSystemBitmap(iBitmap.GetSystemBitmap());
+	if (iBitmap != NIL)
+	{
+		CreateBitmap(iBitmap.GetSize(), iBitmap.GetDepth());
+
+		memcpy(bytes, iBitmap.GetBytes(), (bpp / 8) * size.cx * size.cy);
+	}
 }
 
 S::GUI::BitmapGDIPlus::~BitmapGDIPlus()
@@ -143,8 +148,6 @@ S::Bool S::GUI::BitmapGDIPlus::DeleteBitmap()
 
 S::Bool S::GUI::BitmapGDIPlus::SetSystemBitmap(Void *nBitmap)
 {
-	if (hBitmap != NIL && nBitmap == hBitmap) return True;
-
 	if (nBitmap == NIL)
 	{
 		DeleteBitmap();
@@ -155,12 +158,17 @@ S::Bool S::GUI::BitmapGDIPlus::SetSystemBitmap(Void *nBitmap)
 
 		GetObjectA(nBitmap, sizeof(bmp), &bmp);
 
+		HBITMAP	 oBitmap = hBitmap;
+			 hBitmap = NIL;
+
 		CreateBitmap(Size(bmp.bmWidth, bmp.bmHeight), bmp.bmBitsPixel);
 
 		Gdiplus::Graphics	 graphics(bitmap);
 		Gdiplus::Bitmap		 nBitmapB((HBITMAP) nBitmap, NIL);
 
 		graphics.DrawImage(&nBitmapB, 0, 0, bmp.bmWidth, bmp.bmHeight);
+
+		if (oBitmap != NIL) ::DeleteObject(oBitmap);
 	}
 
 	return True;
@@ -234,7 +242,16 @@ S::GUI::Color S::GUI::BitmapGDIPlus::GetPixel(const Point &point) const
 
 S::GUI::BitmapBackend &S::GUI::BitmapGDIPlus::operator =(const BitmapBackend &newBitmap)
 {
-	SetSystemBitmap(((BitmapGDIPlus &) newBitmap).GetSystemBitmap());
+	if (&newBitmap == this) return *this;
+
+	DeleteBitmap();
+
+	if (newBitmap != NIL)
+	{
+		CreateBitmap(newBitmap.GetSize(), newBitmap.GetDepth());
+
+		memcpy(bytes, newBitmap.GetBytes(), (bpp / 8) * size.cx * size.cy);
+	}
 
 	return *this;
 }

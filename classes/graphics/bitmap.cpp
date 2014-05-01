@@ -119,7 +119,7 @@ S::Int S::GUI::Bitmap::BlitFromSurface(Surface *surface, const Rect &srcRect, co
 	return surface->BlitToBitmap(srcRect, *this, destRect);
 }
 
-S::Int S::GUI::Bitmap::BlitToSurface(const Rect &srcRect, Surface *surface, const Rect &destRect)
+S::Int S::GUI::Bitmap::BlitToSurface(const Rect &srcRect, Surface *surface, const Rect &destRect) const
 {
 	if (surface == NIL) return Error();
 

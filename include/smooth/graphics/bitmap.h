@@ -65,7 +65,7 @@ namespace smooth
 				Int			 Scale(const Size &);
 
 				Int			 BlitFromSurface(Surface *, const Rect &, const Rect &);
-				Int			 BlitToSurface(const Rect &, Surface *, const Rect &);
+				Int			 BlitToSurface(const Rect &, Surface *, const Rect &) const;
 
 				Bool			 SetPixel(const Point &, const Color &);
 				Color			 GetPixel(const Point &) const;

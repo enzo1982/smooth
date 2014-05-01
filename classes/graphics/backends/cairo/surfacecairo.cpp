@@ -576,6 +576,8 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		}
 #endif
 
+		Int	 utf8Length = (line != NIL ? strlen(line.ConvertTo("UTF-8")) : 0);
+
 		if (!painting)
 		{
 			CreateCairoContext();
@@ -607,6 +609,9 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 			PangoAttribute		*underline     = pango_attr_underline_new(font.GetStyle() & Font::Underline ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
 			PangoAttribute		*strikethrough = pango_attr_strikethrough_new(font.GetStyle() & Font::StrikeOut ? True : False);
 
+			underline->end_index	 = utf8Length;
+			strikethrough->end_index = utf8Length;
+
 			pango_attr_list_insert(attributes, underline);
 			pango_attr_list_insert(attributes, strikethrough);
 
@@ -614,7 +619,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 			pango_attr_list_unref(attributes);
 
-			if (line.Length() > 0) pango_layout_set_text(layout, line.ConvertTo("UTF-8"), -1);
+			if (line.Length() > 0) pango_layout_set_text(layout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
 
 			pango_layout_set_font_description(layout, desc);
 
@@ -658,6 +663,9 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		PangoAttribute		*underline     = pango_attr_underline_new(font.GetStyle() & Font::Underline ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
 		PangoAttribute		*strikethrough = pango_attr_strikethrough_new(font.GetStyle() & Font::StrikeOut ? True : False);
 
+		underline->end_index	 = utf8Length;
+		strikethrough->end_index = utf8Length;
+
 		pango_attr_list_insert(attributes, underline);
 		pango_attr_list_insert(attributes, strikethrough);
 
@@ -665,7 +673,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		pango_attr_list_unref(attributes);
 
-		if (line.Length() > 0) pango_layout_set_text(layout, line.ConvertTo("UTF-8"), -1);
+		if (line.Length() > 0) pango_layout_set_text(layout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
 
 		pango_layout_set_font_description(layout, desc);
 		pango_font_description_free(desc);

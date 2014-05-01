@@ -48,10 +48,12 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 	{
 		case SM_DROPFILES:
 			{
-				Point	 pos(wParam, lParam);
-				Point	 realPos = GetRealPosition();
+				Point	 mousePos = Point(wParam, lParam);
 
-				if (pos.x > realPos.x && pos.x < (realPos.x + GetWidth()) && pos.y > realPos.y && pos.y < (realPos.y + GetHeight()))
+				Point	 realPos  = GetRealPosition();
+				Size	 realSize = GetRealSize();
+
+				if (mousePos.x > realPos.x && mousePos.x < (realPos.x + realSize.cx) && mousePos.y > realPos.y && mousePos.y < (realPos.y + realSize.cy))
 				{
 					const Array<String>	&fileNames = GetContainerWindow()->GetDroppedFiles();
 

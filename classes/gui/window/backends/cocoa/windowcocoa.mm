@@ -41,18 +41,15 @@ const int	 NSApplicationDropFiles	 = 9;
 @interface CocoaView : NSView <NSTextInputClient>
 {
 	@private
-		NSTrackingArea		*trackingArea;
+		NSTrackingArea			*trackingArea;
 
-		NSTextStorage		*backingStore;
+		NSMutableAttributedString	*editString;
 
-		NSTextContainer		*textContainer;
-		NSLayoutManager		*layoutManager;
+		NSRange				 markedRange;
+		NSMutableDictionary		*markedAttributes;
 
-		NSRange			 markedRange;
-		NSMutableDictionary	*markedAttributes;
-
-		S::GUI::Cursor		*cursor;
-		S::GUI::Point		 cursorPosition;
+		S::GUI::Cursor			*cursor;
+		S::GUI::Point			 cursorPosition;
 }
 
 	/* NSView methods.
@@ -126,13 +123,7 @@ const int	 NSApplicationDropFiles	 = 9;
 
 		cursor		 = NIL;
 
-		backingStore	 = [[[NSTextStorage alloc] initWithString: @""] autorelease];
-
-		layoutManager	 = [[[NSLayoutManager alloc] init] autorelease];
-		textContainer	 = [[[NSTextContainer alloc] initWithContainerSize: NSMakeSize(0, 0)] autorelease];
-
-		[layoutManager addTextContainer: textContainer];
-		[backingStore addLayoutManager: layoutManager];
+		editString	 = [[[NSMutableAttributedString alloc] initWithString: @""] autorelease];
 
 		markedRange	 = NSMakeRange(NSNotFound, 0);
 		markedAttributes = [[[NSMutableDictionary alloc] init] autorelease];
@@ -227,7 +218,21 @@ const int	 NSApplicationDropFiles	 = 9;
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 
-		if (markedRange.location != NSNotFound && cursor != NIL) [layoutManager drawGlyphsForGlyphRange: markedRange atPoint: NSMakePoint(cursorPosition.x - 6, cursorPosition.y)];
+		if (markedRange.location != NSNotFound && cursor != NIL)
+		{
+			[[NSGraphicsContext currentContext] setShouldAntialias: YES];
+
+			[NSGraphicsContext saveGraphicsState];
+
+			[[NSBezierPath bezierPathWithRect: NSMakeRect(cursor->GetRealPosition().x, cursor->GetRealPosition().y, cursor->GetRealSize().cx, cursor->GetRealSize().cy)] addClip];
+
+			NSAttributedString	*range = [editString attributedSubstringFromRange: markedRange];
+
+			[range drawAtPoint: NSMakePoint(cursorPosition.x - 1,
+							cursorPosition.y + 1 + cursor->GetFont().GetScaledTextSizeY() - [range size].height)];
+
+			[NSGraphicsContext restoreGraphicsState];
+		}
 	}
 
 	- (BOOL) isFlipped
@@ -278,7 +283,7 @@ const int	 NSApplicationDropFiles	 = 9;
 	{
 		if (replacementRange.location == NSNotFound) replacementRange = NSMakeRange(0, 0);
 
-		[backingStore beginEditing];
+		[editString beginEditing];
 
 		if ([string length] == 0)
 		{
@@ -288,22 +293,22 @@ const int	 NSApplicationDropFiles	 = 9;
 		{
 			markedRange = NSMakeRange(replacementRange.location, [string length]);
 
-			if ([string isKindOfClass: [NSAttributedString class]]) [backingStore replaceCharactersInRange: replacementRange withAttributedString: string];
-			else							[backingStore replaceCharactersInRange: replacementRange withString: string];
+			if ([string isKindOfClass: [NSAttributedString class]]) [editString replaceCharactersInRange: replacementRange withAttributedString: string];
+			else							[editString replaceCharactersInRange: replacementRange withString: string];
 
-			[backingStore addAttributes: markedAttributes range: markedRange];
+			[editString addAttributes: markedAttributes range: markedRange];
 
 			if (cursor != NIL)
 			{
 				S::String	 string;
 
-				string.ImportFrom("UTF-8", [[[backingStore attributedSubstringFromRange: markedRange] string] UTF8String]);
+				string.ImportFrom("UTF-8", [[[editString attributedSubstringFromRange: markedRange] string] UTF8String]);
 
 				cursor->SetIMEAdvance(cursor->GetFont().GetScaledTextSizeX(string));
 			}
 		}
 
-		[backingStore endEditing];
+		[editString endEditing];
 
 		[self setNeedsDisplay: YES];
 	}
@@ -317,7 +322,7 @@ const int	 NSApplicationDropFiles	 = 9;
 	{
 		markedRange = NSMakeRange(NSNotFound, 0);
 
-		[backingStore setAttributedString: [[[NSAttributedString alloc] initWithString: @""] autorelease]];
+		[editString setAttributedString: [[[NSAttributedString alloc] initWithString: @""] autorelease]];
 
 		[[NSInputManager currentInputManager] markedTextAbandoned: self];
 
@@ -362,7 +367,7 @@ const int	 NSApplicationDropFiles	 = 9;
 	{
 		if (actualRange) *actualRange = aRange;
 
-		return [backingStore attributedSubstringFromRange: aRange];
+		return [editString attributedSubstringFromRange: aRange];
 	}
 
 	- (void) doCommandBySelector: (SEL) aSelector
@@ -383,8 +388,6 @@ const int	 NSApplicationDropFiles	 = 9;
 
 		[markedAttributes setObject: nsFont
 				     forKey: NSFontAttributeName];
-
-		[textContainer setContainerSize: NSMakeSize(aCursor->GetRealSize().cx - (aPoint.x - aCursor->GetRealPosition().x), aCursor->GetRealSize().cy)];
 
 		[self unmarkText];
 		[self setNeedsDisplay: YES];
@@ -779,7 +782,7 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 				onEvent.Call(SM_KEYUP, ConvertKey([characters characterAtIndex: 0]), 0);
 			}
-			
+
 			break;
 
 		case NSFlagsChanged:
@@ -926,7 +929,7 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 	 */
 	NSWindow	*modalWindow = [NSApp keyWindow];
 	NSWindow	*keyWindow   = [NSApp modalWindow];
-	
+
 	if ((modalWindow == wnd && (keyWindow != nil && keyWindow != wnd && Window::GetWindow(keyWindow) != NIL)) ||
 	    (keyWindow	 == wnd && (modalWindow == nil || ![modalWindow isVisible]))) [NSApp stop: nil];
 

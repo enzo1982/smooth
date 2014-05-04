@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,7 @@
 #include <smooth/backends/backend.h>
 #include <smooth/templates/nonblocking.h>
 #include <smooth/i18n/translator_internal.h>
+#include <smooth/files/file.h>
 #include <smooth/threads/thread.h>
 #include <smooth/graphics/font.h>
 #include <smooth/init.h>
@@ -27,6 +28,7 @@
 #	include <interface/InterfaceDefs.h>
 #else
 #	include <unistd.h>
+#	include <stdio.h>
 #endif
 
 #include <iconv.h>
@@ -40,20 +42,9 @@ __declspec (dllexport) HINSTANCE	 S::hPrevInstance = NIL;
 
 __declspec (dllexport) HICON		 S::SMOOTHICON	  = NIL;
 
-int CALLBACK EnumFontProcA(ENUMLOGFONTEXA *lpelfe, NEWTEXTMETRICEXA *lpntme, int fontType, LPARAM lParam)
+int CALLBACK EnumFontProc(const LOGFONTA *lpelfe, const TEXTMETRICA *lpntme, DWORD fontType, LPARAM lParam)
 {
-	static S::String	 fontName = "Microsoft Sans Serif";
-
-	if (S::String(lpelfe->elfLogFont.lfFaceName) == fontName) return 0;
-	else							  return 1;
-}
-
-int CALLBACK EnumFontProcW(ENUMLOGFONTEXW *lpelfe, NEWTEXTMETRICEXW *lpntme, int fontType, LPARAM lParam)
-{
-	static S::String	 fontName = "Microsoft Sans Serif";
-
-	if (S::String(lpelfe->elfLogFont.lfFaceName) == fontName) return 0;
-	else							  return 1;
+	return 0;
 }
 #endif
 
@@ -278,25 +269,21 @@ S::Void S::GetColors()
 S::Void S::GetDefaultFont()
 {
 #if defined __WIN32__
-	HDC		 dc = GetWindowDC(0);
-	LOGFONTA	 fontInfoA;
-	LOGFONTW	 fontInfoW;
+	static const char	*fonts[5] = { "Segoe UI", "Tahoma", "Microsoft Sans Serif", "MS Sans Serif", NIL };
 
-	fontInfoA.lfCharSet	   = DEFAULT_CHARSET;
-	fontInfoA.lfFaceName[0]	   = 0;
-	fontInfoA.lfPitchAndFamily = 0;
+	HDC	 dc = GetWindowDC(0);
 
-	fontInfoW.lfCharSet	   = DEFAULT_CHARSET;
-	fontInfoW.lfFaceName[0]	   = 0;
-	fontInfoW.lfPitchAndFamily = 0;
+	for (Int i = 0; fonts[i] != NIL; i++)
+	{
+		LOGFONTA	 fontInfo;
 
-	int	 result;
+		fontInfo.lfCharSet	  = DEFAULT_CHARSET;
+		fontInfo.lfPitchAndFamily = 0;
 
-	if (Setup::enableUnicode) result = EnumFontFamiliesExW(dc, &fontInfoW, (FONTENUMPROCW) &EnumFontProcW, 0, 0);
-	else			  result = EnumFontFamiliesExA(dc, &fontInfoA, (FONTENUMPROCA) &EnumFontProcA, 0, 0);
+		strcpy(fontInfo.lfFaceName, fonts[i]);
 
-	if (result == 0) GUI::Font::Default = "Microsoft Sans Serif";
-	else		 GUI::Font::Default = "MS Sans Serif";
+		if (EnumFontFamiliesExA(dc, &fontInfo, &EnumFontProc, 0, 0) == 0) { GUI::Font::Default = fonts[i]; break; }
+	}
 
 	ReleaseDC(0, dc);
 #elif defined __APPLE__
@@ -305,5 +292,40 @@ S::Void S::GetDefaultFont()
 	GUI::Font::Default = "DejaVu Sans";
 #else
 	GUI::Font::Default = "Helvetica";
+
+	/* Search the path for gsettings.
+	 */
+	String			 path  = getenv("PATH");
+	const Array<String>	&paths = path.Explode(":");
+
+	foreach (const String &path, paths)
+	{
+		/* Check for gsettings in this path.
+		 */
+		if (File(String(path).Append("/").Append("gsettings")).Exists())
+		{
+			/* If gsettings exists, use it to get the default font.
+			 */
+			FILE	*pstdin = popen("gsettings get org.gnome.desktop.interface font-name", "r");
+
+			if (pstdin != NIL)
+			{
+				char	 fontName[256];
+
+				if (fgets(fontName, 256, pstdin) != NIL)
+				{
+					String	 font = fontName;
+
+					GUI::Font::Default = font.SubString(1, font.FindLast(" ") - 1);
+				}
+
+				pclose(pstdin);
+			}
+
+			break;
+		}
+	}
+
+	String::ExplodeFinish();
 #endif
 }

@@ -578,22 +578,35 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			break;
 	}
 
-	/* Delegate event to widgets.
-	 */
-	if (rVal == Success())
+	if (rVal != Success())
 	{
-		for (Int i = GetNOfObjects() - 1; i >= 0; i--)
+		LeaveProtectedRegion();
+
+		return rVal;
+	}
+
+	/* Delegate event to main layer.
+	 */
+	if (mainLayer->Process(message, wParam, lParam) == Break)
+	{
+		LeaveProtectedRegion();
+
+		return Break;
+	}
+
+	/* Delegate event to other widgets.
+	 */
+	for (Int i = GetNOfObjects() - 1; i >= 0; i--)
+	{
+		Widget	*object = GetNthObject(i);
+
+		if (object == NIL || object == mainLayer) continue;
+
+		if (object->Process(message, wParam, lParam) == Break)
 		{
-			Widget	*object = GetNthObject(i);
+			rVal = Break;
 
-			if (object == NIL) continue;
-
-			if (object->Process(message, wParam, lParam) == Break)
-			{
-				rVal = Break;
-
-				break;
-			}
+			break;
 		}
 	}
 

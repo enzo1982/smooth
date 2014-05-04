@@ -343,7 +343,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_KEYDOWN:
-			OnSpecialKey(wParam);
+			if (OnSpecialKey(wParam)) return Break;
 
 			break;
 		case SM_CHAR:
@@ -775,12 +775,12 @@ S::Void S::GUI::Cursor::OnLoseFocus()
 	internalRemoveCursor.Emit(this);
 }
 
-S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
+S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 {
 	/* Called when a special key such as
 	 * return or an arrow key is hit.
 	 */
-	if (!focussed) return;
+	if (!focussed) return False;
 
 	Int	 newPos = 0;
 	Int	 linePos = 0;
@@ -969,6 +969,14 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 			}
 
 			break;
+		case Input::Keyboard::KeyEscape:
+			if (!IsActive()) break;
+
+			focussed = False;
+
+			onLoseFocus.Emit();
+
+			return True;
 		case Input::Keyboard::KeyBack:
 		case Input::Keyboard::KeyDelete:
 			if (!IsActive()) break;
@@ -1017,6 +1025,8 @@ S::Void S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			break;
 	}
+
+	return False;
 }
 
 S::Void S::GUI::Cursor::OnInput(Int character, Int flags)

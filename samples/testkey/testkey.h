@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,8 +22,6 @@ class TestKey : public Application
 		GUI::Window	*wnd;
 		Titlebar	*title;
 		Text		*text;
-
-		Int		 GetBits(Int, UnsignedInt, UnsignedInt);
 	public:
 				 TestKey();
 				~TestKey();

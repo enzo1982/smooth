@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,7 +30,7 @@ TestKey::TestKey()
 	pos.x = 85;
 	pos.y = 28;
 
-	wnd	= new GUI::Window("TestKey - by Robert Kausch 2000-2012", Point(80, 80), Size(300, 160));
+	wnd	= new GUI::Window("TestKey - by Robert Kausch 2000-2014", Point(80, 80), Size(300, 160));
 	title	= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	text	= new Text("ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000", pos);
 
@@ -62,12 +62,12 @@ Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 	{
 #ifdef __WIN32__
 		GetKeyboardState((UnsignedByte *) &keys);
-		ToAscii(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (UnsignedShort *) &asciiCode, 0);
+		ToAscii(wParam, Binary::GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (UnsignedShort *) &asciiCode, 0);
 
-		if (Setup::enableUnicode) ToUnicode(wParam, GetBits(lParam, 16, 23), (UnsignedByte *) &keys, &unicode, 1, 0);
+		if (Setup::enableUnicode) ToUnicode(wParam, Binary::GetBits(lParam, 16, 23), (UnsignedByte *) &keys, &unicode, 1, 0);
 #endif
 
-		scanCode	= GetBits(lParam, 16, 23);
+		scanCode	= Binary::GetBits(lParam, 16, 23);
 		vkCode		= wParam;
 
 		newText[12] = asciiCode / 100 + 48;
@@ -90,18 +90,4 @@ Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 
 		text->SetText(newText);
 	}
-}
-
-Int TestKey::GetBits(Int number, UnsignedInt startBit, UnsignedInt endBit)
-{
-	Int	retVal = 0;
-
-	if (startBit >= 64 || endBit >= 64) return -1;
-
-	for (UnsignedInt i = startBit; i <= endBit; i++)
-	{
-		retVal += Math::Pow(2l, (Int) (i - startBit)) * ((number >> i) % 2);
-	}
-
-	return retVal;
 }

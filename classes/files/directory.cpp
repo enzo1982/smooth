@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -155,21 +155,21 @@ const S::Array<S::Directory> &S::Directory::GetDirectories() const
 
 	FindClose(handle);
 #else
-	glob_t	*fileData = new glob_t;
+	glob_t	 fileData = { 0 };
 
-	if (glob(String(*this).Append("/*").ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, fileData) == 0)
+	if (glob(String(*this).Append("/*").ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, &fileData) == 0)
 	{
 		String	 previousInputFormat = String::SetInputFormat("UTF-8");
 
-		for (size_t i = 0; i < fileData->gl_pathc; i++)
+		for (size_t i = 0; i < fileData.gl_pathc; i++)
 		{
-			if (String(fileData->gl_pathv[i]).EndsWith("/")) directories.Add(Directory(fileData->gl_pathv[i]));
+			if (String(fileData.gl_pathv[i]).EndsWith("/")) directories.Add(Directory(fileData.gl_pathv[i]));
 		}
 
 		String::SetInputFormat(previousInputFormat);
-	}
 
-	globfree(fileData);
+		globfree(&fileData);
+	}
 
 	delete fileData;
 #endif
@@ -209,21 +209,21 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 
 	FindClose(handle);
 #else
-	glob_t	*fileData = new glob_t;
+	glob_t	 fileData = { 0 };
 
-	if (glob(String(*this).Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK, NIL, fileData) == 0)
+	if (glob(String(*this).Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK, NIL, &fileData) == 0)
 	{
 		String	 previousInputFormat = String::SetInputFormat("UTF-8");
 
-		for (size_t i = 0; i < fileData->gl_pathc; i++)
+		for (size_t i = 0; i < fileData.gl_pathc; i++)
 		{
-			if (!String(fileData->gl_pathv[i]).EndsWith("/")) files.Add(File(fileData->gl_pathv[i]));
+			if (!String(fileData.gl_pathv[i]).EndsWith("/")) files.Add(File(fileData.gl_pathv[i]));
 		}
 
 		String::SetInputFormat(previousInputFormat);
-	}
 
-	globfree(fileData);
+		globfree(&fileData);
+	}
 
 	delete fileData;
 #endif

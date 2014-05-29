@@ -88,7 +88,7 @@
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbzip2.lib;fribidi2.lib;libxml.lib;iconv.lib;libjpeg.lib;libpng.lib;libz.lib;imm32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbzip2.lib;fribidi2.lib;libxml.lib;iconv.lib;libjpeg.lib;libpng.lib;libz.lib;imm32.lib;gdiplus.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

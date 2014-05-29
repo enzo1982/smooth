@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,7 +39,7 @@ S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const St
 	{
 		ComputeTextSize();
 
-		SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
+		SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
 	}
 
 	hotspot	= new Hotspot(Point(0, 0), GetSize());
@@ -92,7 +92,7 @@ S::Void S::GUI::Hyperlink::OnMouseOver()
 	if (linkBitmap == NIL)
 	{
 		Surface	*surface  = GetDrawSurface();
-		Rect	 textRect = Rect(GetRealPosition(), scaledTextSize + Size(0, 1));
+		Rect	 textRect = Rect(GetRealPosition(), scaledTextSize + Size(0, 2));
 		Font	 nFont	  = font;
 
 		nFont.SetColor(Color(0, 128, 255));
@@ -109,7 +109,7 @@ S::Void S::GUI::Hyperlink::OnMouseOut()
 	if (linkBitmap == NIL)
 	{
 		Surface	*surface  = GetDrawSurface();
-		Rect	 textRect = Rect(GetRealPosition(), scaledTextSize + Size(0, 1));
+		Rect	 textRect = Rect(GetRealPosition(), scaledTextSize + Size(0, 2));
 
 		surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
 		surface->SetText(text, textRect, font);
@@ -129,7 +129,7 @@ S::Int S::GUI::Hyperlink::SetText(const String &nText)
 
 	Widget::SetText(nText);
 
-	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
 
 	hotspot->SetSize(GetSize());
 
@@ -142,7 +142,7 @@ S::Int S::GUI::Hyperlink::SetFont(const Font &nFont)
 {
 	Widget::SetFont(nFont);
 
-	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
 
 	hotspot->SetSize(GetSize());
 

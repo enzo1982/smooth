@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,7 +21,7 @@ S::GUI::Text::Text(const String &iText, const Point &iPos) : Widget(iPos, Size()
 
 	ComputeTextSize();
 
-	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
 }
 
 S::GUI::Text::~Text()
@@ -36,6 +36,7 @@ S::Int S::GUI::Text::Paint(Int message)
 	switch (message)
 	{
 		case SP_PAINT:
+			if (text != NIL)
 			{
 				Font	 nFont	 = font;
 
@@ -58,7 +59,7 @@ S::Int S::GUI::Text::SetText(const String &nText)
 {
 	Widget::SetText(nText);
 
-	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
 
 	Paint(SP_PAINT);
 
@@ -69,7 +70,7 @@ S::Int S::GUI::Text::SetFont(const Font &nFont)
 {
 	Widget::SetFont(nFont);
 
-	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 1));
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
 
 	Paint(SP_PAINT);
 

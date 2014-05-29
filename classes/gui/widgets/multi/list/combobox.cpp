@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -110,23 +110,17 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 			if (!(flags & CB_HOTSPOTONLY))
 			{
-				for (Int j = 0; j < GetNOfObjects(); j++)
+				for (Int i = 0; i < Length(); i++)
 				{
-					if (GetNthObject(j)->GetObjectType() != ListEntry::classID) continue;
+					ListEntry	*entry = GetNthEntry(i);
 
-					ListEntry	*operat = (ListEntry *) GetNthObject(j);
-
-					if (operat->IsSelected())
+					if (entry->IsSelected())
 					{
-						String	 nText = operat->GetText();
+						String	 entryText = entry->GetText();
 
-						for (Int k = 0; k < operat->GetText().Length(); k++)
-						{
-							if (operat->GetText()[k] == '\t') nText[k] = 0;
-							else				  nText[k] = operat->GetText()[k];
-						}
+						if (entryText.Find("\t") >= 0) entryText = entryText.Head(entryText.Find("\t"));
 
-						surface->SetText(nText, frame + Point(3, 3) * surface->GetSurfaceDPI() / 96.0 - Size(frame.GetHeight() + 2, 0), font);
+						surface->SetText(entryText, frame + Point(3, 3) * surface->GetSurfaceDPI() / 96.0 - Size(frame.GetHeight() + 2, 0), entry->GetFont());
 					}
 				}
 			}
@@ -184,11 +178,9 @@ S::Void S::GUI::ComboBox::OpenListBox()
 
 	prevSelectedEntry = GetSelectedEntry();
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < Length(); i++)
 	{
-		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
-
-		ListEntry	*entry = (ListEntry *) GetNthObject(i);
+		ListEntry	*entry = GetNthEntry(i);
 
 		entry->SetRegisteredFlag(False);
 
@@ -211,11 +203,9 @@ S::Void S::GUI::ComboBox::CloseListBox()
 
 	listBox->RemoveAllEntries();
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < Length(); i++)
 	{
-		if (GetNthObject(i)->GetObjectType() != ListEntry::classID) continue;
-
-		ListEntry	*entry = (ListEntry *) GetNthObject(i);
+		ListEntry	*entry = GetNthEntry(i);
 
 		entry->Hide();
 		entry->Deactivate();

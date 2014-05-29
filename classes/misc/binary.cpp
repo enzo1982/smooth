@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,7 +34,7 @@ S::Int S::Binary::GetBits(Int n, UnsignedInt startBit, UnsignedInt endBit)
 {
 	Int	retVal = 0;
 
-	if (startBit >= 64 || endBit >= 64) return -1;
+	if (startBit >= 32 || endBit >= 32) return -1;
 
 	for (UnsignedInt i = startBit; i <= endBit; i++)
 	{
@@ -46,7 +46,7 @@ S::Int S::Binary::GetBits(Int n, UnsignedInt startBit, UnsignedInt endBit)
 
 S::Int S::Binary::SetBits(Int &n, UnsignedInt startBit, UnsignedInt endBit, Int value)
 {
-	if (startBit >= 64 || endBit >= 64) return -1;
+	if (startBit >= 32 || endBit >= 32) return -1;
 
 	for (UnsignedInt i = startBit; i <= endBit; i++)
 	{

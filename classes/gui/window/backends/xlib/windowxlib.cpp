@@ -1345,13 +1345,16 @@ S::Void S::GUI::WindowXLib::RemoveCursor(Cursor *cursor)
 
 		/* Clear preediting area.
 		 */
-		Rect	 rect = Rect::OverlapRect(Rect(activeCursorPos - Point(1, 1), activeCursor->GetRealSize()), Rect(activeCursor->GetRealPosition(), activeCursor->GetRealSize()));
+		if (activeCursor->IsVisible())
+		{
+			Rect	 rect = Rect::OverlapRect(Rect(activeCursorPos - Point(1, 1), activeCursor->GetRealSize()), Rect(activeCursor->GetRealPosition(), activeCursor->GetRealSize()));
 
-		activeCursor->SetIMECursor(True);
+			activeCursor->SetIMECursor(True);
 
-		window->drawSurface->Box(rect, activeCursor->GetBackgroundColor(), Rect::Filled);
+			window->drawSurface->Box(rect, activeCursor->GetBackgroundColor(), Rect::Filled);
 
-		activeCursor->SetIMECursor(False);
+			activeCursor->SetIMECursor(False);
+		}
 	}
 
 	activeCursor	= NIL;

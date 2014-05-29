@@ -782,10 +782,16 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 	 */
 	if (!focussed) return False;
 
-	Int	 newPos = 0;
+#ifndef __APPLE__
+	Input::Keyboard::Key	 controlKey = Input::Keyboard::KeyControl;
+#else
+	Input::Keyboard::Key	 controlKey = Input::Keyboard::KeyCommand;
+#endif
+
+	Int	 newPos	 = 0;
 	Int	 linePos = 0;
 
-	Int	 i = 0;
+	Int	 i	 = 0;
 
 	switch (keyCode)
 	{
@@ -795,7 +801,7 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			/* Calculate new cursor pos.
 			 */
-			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))
+			if (Input::Keyboard::GetKeyState(controlKey))
 			{
 				Bool	 isLeft = ((keyCode == Input::Keyboard::KeyLeft  && !IsRightToLeft()) || (keyCode == Input::Keyboard::KeyRight && IsRightToLeft()));
 
@@ -848,7 +854,7 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			/* Calculate new cursor pos.
 			 */
-			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))
+			if (Input::Keyboard::GetKeyState(controlKey))
 			{
 				if	(keyCode == Input::Keyboard::KeyHome)	{ if (promptPos == 0)		  break; newPos = 0;		 }
 				else if (keyCode == Input::Keyboard::KeyEnd)	{ if (promptPos >= text.Length()) break; newPos = text.Length(); }
@@ -1001,27 +1007,27 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			break;
 		case Input::Keyboard::KeyA:
-			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   MarkAll();
+			if (Input::Keyboard::GetKeyState(controlKey))   MarkAll();
 
 			break;
 		case Input::Keyboard::KeyC:
-			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   CopyToClipboard();
+			if (Input::Keyboard::GetKeyState(controlKey))   CopyToClipboard();
 
 			break;
 		case Input::Keyboard::KeyX:
-			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl)) { CopyToClipboard(); DeleteSelectedText(); }
+			if (Input::Keyboard::GetKeyState(controlKey)) { CopyToClipboard(); DeleteSelectedText(); }
 
 			break;
 		case Input::Keyboard::KeyV:
-			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   InsertFromClipboard();
+			if (Input::Keyboard::GetKeyState(controlKey))   InsertFromClipboard();
 
 			break;
 		case Input::Keyboard::KeyZ:
-			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   Undo();
+			if (Input::Keyboard::GetKeyState(controlKey))   Undo();
 
 			break;
 		case Input::Keyboard::KeyY:
-			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))   Redo();
+			if (Input::Keyboard::GetKeyState(controlKey))   Redo();
 
 			break;
 	}

@@ -48,6 +48,7 @@ S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 			{
 				if ((((flags & SC_ALT) 	 && Input::Keyboard::GetKeyState(Input::Keyboard::KeyAlt))     || (!(flags & SC_ALT)   && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyAlt)))     &&
 				    (((flags & SC_CTRL)  && Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl)) || (!(flags & SC_CTRL)  && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl))) &&
+				    (((flags & SC_CMD)   && Input::Keyboard::GetKeyState(Input::Keyboard::KeyCommand)) || (!(flags & SC_CMD)   && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyCommand))) &&
 				    (((flags & SC_SHIFT) && Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))   || (!(flags & SC_SHIFT) && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))))
 				{
 					EnterProtectedRegion();
@@ -102,6 +103,7 @@ S::String S::GUI::Shortcut::ToString() const
 	else if (key == Input::Keyboard::KeyDelete) keyString = I18n::Translator::defaultTranslator->TranslateString("Del");
 
 	return	(Binary::IsFlagSet(flags, SC_CTRL)  ? I18n::Translator::defaultTranslator->TranslateString("Ctrl").Append("+")	: String())
+         .Append(Binary::IsFlagSet(flags, SC_CMD)   ? I18n::Translator::defaultTranslator->TranslateString("Cmd").Append("+")	: String())
          .Append(Binary::IsFlagSet(flags, SC_ALT)   ? I18n::Translator::defaultTranslator->TranslateString("Alt").Append("+")	: String())
 	 .Append(Binary::IsFlagSet(flags, SC_SHIFT) ? I18n::Translator::defaultTranslator->TranslateString("Shift").Append("+")	: String())
 	 .Append(keyString);

@@ -109,7 +109,7 @@ Translator::Translator(const String &openFile)
 
 	entry = menu_file->AddEntry("New");
 	entry->onAction.Connect(&Translator::NewFile, this);
-	entry->SetShortcut(SC_CTRL, 'N', wnd);
+	entry->SetShortcut(SC_CONTROL, 'N', wnd);
 
 	entry = menu_file->AddEntry("Close");
 	entry->onAction.Connect(&Translator::Close, this);
@@ -119,16 +119,16 @@ Translator::Translator(const String &openFile)
 
 	entry = menu_file->AddEntry("Open...");
 	entry->onAction.Connect(&Translator::OpenFile, this);
-	entry->SetShortcut(SC_CTRL, 'O', wnd);
+	entry->SetShortcut(SC_CONTROL, 'O', wnd);
 
 	entry = menu_file->AddEntry("Save");
 	entry->onAction.Connect(&Translator::SaveFile, this);
-	entry->SetShortcut(SC_CTRL, 'S', wnd);
+	entry->SetShortcut(SC_CONTROL, 'S', wnd);
 	entry->Deactivate();
 
 	entry = menu_file->AddEntry("Save as...");
 	entry->onAction.Connect(&Translator::SaveFileAs, this);
-	entry->SetShortcut(SC_CTRL | SC_SHIFT, 'S', wnd);
+	entry->SetShortcut(SC_CONTROL | SC_SHIFT, 'S', wnd);
 	entry->Deactivate();
 
 	menu_file->AddEntry();

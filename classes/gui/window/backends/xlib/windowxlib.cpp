@@ -1351,7 +1351,12 @@ S::Void S::GUI::WindowXLib::RemoveCursor(Cursor *cursor)
 
 			activeCursor->SetIMECursor(True);
 
+			window->drawSurface->StartPaint(rect);
 			window->drawSurface->Box(rect, activeCursor->GetBackgroundColor(), Rect::Filled);
+
+			activeCursor->Paint(SP_PAINT);
+
+			window->drawSurface->EndPaint();
 
 			activeCursor->SetIMECursor(False);
 		}

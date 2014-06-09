@@ -170,8 +170,6 @@ const S::Array<S::Directory> &S::Directory::GetDirectories() const
 
 		globfree(&fileData);
 	}
-
-	delete fileData;
 #endif
 
 	return directories;
@@ -224,8 +222,6 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 
 		globfree(&fileData);
 	}
-
-	delete fileData;
 #endif
 
 	return files;
@@ -306,6 +302,7 @@ S::Int S::Directory::Create()
 {
 	if (Exists()) return Success();
 
+	Bool	 result	   = False;
 	String	 directory = *this;
 
 	for (Int i = 1; i <= directory.Length(); i++)
@@ -315,15 +312,17 @@ S::Int S::Directory::Create()
 			String	 path = directory.Head(i);
 
 #ifdef __WIN32__
-			if (Setup::enableUnicode) CreateDirectoryW(String(GetUnicodePathPrefix(path)).Append(path), NIL);
-			else			  CreateDirectoryA(path, NIL);
+			if (Setup::enableUnicode) result = CreateDirectoryW(String(GetUnicodePathPrefix(path)).Append(path), NIL);
+			else			  result = CreateDirectoryA(path, NIL);
 #else
-			mkdir(path.ConvertTo("UTF-8"), 0755);
+			if (mkdir(path.ConvertTo("UTF-8"), 0755) == 0) result = True;
+			else					       result = False;
 #endif
 		}
 	}
 
-	return Success();
+	if (result == False) return Error();
+	else		     return Success();
 }
 
 S::Int S::Directory::Copy(const String &destination)

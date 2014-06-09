@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -319,15 +319,15 @@ S::Int S::File::Copy(const String &destination)
 		{
 			chunkSize = Math::Min(chunkSize, bytesLeft);
 
-			fread(buffer, chunkSize, 1, source);
-			fwrite(buffer, chunkSize, 1, dest);
+			if (fread(buffer, chunkSize, 1, source) == 1) fwrite(buffer, chunkSize, 1, dest);
+			else					      break;
 
 			bytesLeft -= chunkSize;
 		}
 
 		delete [] buffer;
 
-		result = True;
+		if (!bytesLeft) result = True;
 	}
 
 	if (source != NIL) fclose(source);

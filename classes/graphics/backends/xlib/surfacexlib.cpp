@@ -47,8 +47,6 @@ S::GUI::SurfaceXLib::SurfaceXLib(Void *iWindow, const Size &maxSize)
 	{
 		size = maxSize;
 
-		XGetWindowAttributes(display, window, &windowAttributes);
-
 		if (maxSize == Size())
 		{
 			size.cx = XDisplayWidth(display, XDefaultScreen(display)) + 2;
@@ -56,6 +54,10 @@ S::GUI::SurfaceXLib::SurfaceXLib(Void *iWindow, const Size &maxSize)
 		}
 
 		rightToLeft.SetSurfaceSize(size);
+
+		XWindowAttributes	 windowAttributes;
+
+		XGetWindowAttributes(display, window, &windowAttributes);
 
 		bitmap = XCreatePixmap(display, window, size.cx, size.cy, windowAttributes.depth);
 		gc     = XCreateGC(display, bitmap, 0, NIL);
@@ -95,6 +97,10 @@ S::Int S::GUI::SurfaceXLib::SetSize(const Size &nSize)
 		delete paintRects.GetFirst();
 
 		paintRects.RemoveAll();
+
+		XWindowAttributes	 windowAttributes;
+
+		XGetWindowAttributes(display, window, &windowAttributes);
 
 		bitmap = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
 		gc     = XCreateGC(display, bitmap, 0, NIL);
@@ -207,7 +213,7 @@ S::Short S::GUI::SurfaceXLib::GetSurfaceDPI() const
 			{
 				float	 factor = 1.0;
 
-				if (fscanf(pstdin, "%f", &factor) > 0) dpi = Math::Round(96.0 * factor);
+				if (fscanf(pstdin, "%f", &factor) > 0) dpi = Math::Round(96.0 * Math::Min(Math::Max(factor, 0.1), 100.0));
 
 				pclose(pstdin);
 			}

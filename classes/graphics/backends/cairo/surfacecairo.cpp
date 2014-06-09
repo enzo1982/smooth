@@ -74,6 +74,9 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 	context	     = NIL;
 	surface	     = NIL;
 
+	paintSurfaceCairo = NIL;
+	paintContextCairo = NIL;
+
 	if (window != NIL)
 	{
 		size = maxSize;
@@ -87,8 +90,6 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 			size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 		}
 #else
-		XGetWindowAttributes(display, window, &windowAttributes);
-
 		if (maxSize == Size())
 		{
 			size.cx = XDisplayWidth(display, XDefaultScreen(display)) + 2;
@@ -108,6 +109,10 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 
 		ReleaseDC(window, gdi_dc);
 #else
+		XWindowAttributes	 windowAttributes;
+
+		XGetWindowAttributes(display, window, &windowAttributes);
+
 		paintBitmap	  = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
 		paintSurfaceCairo = cairo_xlib_surface_create(display, paintBitmap, visual, size.cx, size.cy);
 #endif
@@ -179,6 +184,10 @@ S::Int S::GUI::SurfaceCairo::SetSize(const Size &nSize)
 
 		ReleaseDC(window, gdi_dc);
 #else
+		XWindowAttributes	 windowAttributes;
+
+		XGetWindowAttributes(display, window, &windowAttributes);
+
 		paintBitmap	  = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
 		paintSurfaceCairo = cairo_xlib_surface_create(display, paintBitmap, visual, size.cx, size.cy);
 #endif
@@ -294,7 +303,7 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 			{
 				float	 factor = 1.0;
 
-				if (fscanf(pstdin, "%f", &factor) > 0) dpi = Math::Round(96.0 * factor);
+				if (fscanf(pstdin, "%f", &factor) > 0) dpi = Math::Round(96.0 * Math::Min(Math::Max(factor, 0.1), 100.0));
 
 				pclose(pstdin);
 			}

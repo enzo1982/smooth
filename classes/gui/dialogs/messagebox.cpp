@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -107,12 +107,13 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	}
 #endif
 
-	buttons		= btns;
+	buttons	   = btns;
+	buttonCode = -1;
 
-	Int	 thissize = 0;
-	Int	 maxsize = 0;
-	Int	 titlesize = 0;
-	Int	 buttonWidth = 80;
+	Int	 thissize     = 0;
+	Int	 maxsize      = 0;
+	Int	 titlesize    = 0;
+	Int	 buttonWidth  = 80;
 	Int	 buttonHeight = 22;
 
 	lines = 1;
@@ -194,6 +195,10 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 		lay->Add(checkbox);
 	}
+	else
+	{
+		checkbox = NIL;
+	}
 
 	switch (buttons)
 	{
@@ -261,7 +266,7 @@ S::GUI::Dialogs::MessageDlg::~MessageDlg()
 	DeleteObject(titlebar);
 	DeleteObject(msgbox);
 
-	if (cVar != NIL) DeleteObject(checkbox);
+	if (checkbox != NIL) DeleteObject(checkbox);
 }
 
 const Error &S::GUI::Dialogs::MessageDlg::ShowDialog()

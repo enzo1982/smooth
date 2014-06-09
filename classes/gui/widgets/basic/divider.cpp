@@ -19,10 +19,13 @@ const S::Short	 S::GUI::Divider::classID = S::Object::RequestClassID();
 S::GUI::Divider::Divider(Int iPosition, Int iOrientation) : Widget(Point(), Size())
 {
 	type		= classID;
+
 	flags		= iOrientation;
 	orientation	= OR_FREE;
 	position	= iPosition;
+
 	dragging	= False;
+	startPos	= 0;
 
 	if (position == 0) position = 120;
 
@@ -200,9 +203,9 @@ S::Void S::GUI::Divider::OnMouseOut()
 
 S::Void S::GUI::Divider::OnMouseDragStart(const Point &mousePos)
 {
-	dragging = True;
+	dragging      = True;
 
-	startPos = GetPos();
+	startPos      = GetPos();
 	startMousePos = mousePos;
 }
 

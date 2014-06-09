@@ -30,7 +30,7 @@ S::GUI::EditBox::EditBox(const String &iText, const Point &iPos, const Size &iSi
 	if (GetWidth()	== 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(19);
 
-	cursor = new Cursor(Point(3, 2), GetSize() - Size(6, 4));
+	cursor = new Cursor(Point(3, Math::Ceil(Float(GetHeight() - font.GetUnscaledTextSizeY()) / 2) - 2), GetSize() - Size(6, 4));
 	cursor->SetMaxSize(maxSize);
 	cursor->SetBackgroundColor(Setup::ClientColor);
 	cursor->SetFont(font);
@@ -139,7 +139,7 @@ S::Void S::GUI::EditBox::OnSelectEntry(ListEntry *entry)
 
 S::Void S::GUI::EditBox::OnChangeSize(const Size &nSize)
 {
-	cursor->SetSize(nSize - Size(6 + (comboBox != NIL ? 17 : 0), 4));
+	cursor->SetMetrics(Point(3, Math::Ceil(Float(nSize.cy - font.GetUnscaledTextSizeY()) / 2) - 2), nSize - Size(6 + (comboBox != NIL ? 17 : 0), 4));
 
 	if (comboBox != NIL) comboBox->SetSize(nSize);
 }

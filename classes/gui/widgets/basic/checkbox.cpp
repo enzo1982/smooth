@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -77,7 +77,7 @@ S::Int S::GUI::CheckBox::Paint(Int message)
 					if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
 					surface->Box(frame, GetBackgroundColor(), Rect::Filled);
-					surface->SetText(text, frame + Point(frame.GetHeight(), 2), nFont);
+					surface->SetText(text, frame + Point(frame.GetHeight(), Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 1), nFont);
 				}
 
 				Rect	 valueFrame = Rect(GetRealPosition() + Point(3, 3) * surface->GetSurfaceDPI() / 96.0, Size(frame.GetHeight(), frame.GetHeight()) - (Size(3, 3) * surface->GetSurfaceDPI() / 96.0) * 2);

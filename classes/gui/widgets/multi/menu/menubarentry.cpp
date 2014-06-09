@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -101,7 +101,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 			}
 			else if (text != NIL && bitmap == NIL)
 			{
-				Rect	 textRect = Rect(realPos + Point(1, 1) + Point(2, 0) * surface->GetSurfaceDPI() / 96.0, realSize - Size(2, 2) - Size(2, 0) * surface->GetSurfaceDPI() / 96.0);
+				Rect	 textRect = Rect(realPos + Point(1, Math::Ceil(Float(realSize.cy - scaledTextSize.cy) / 2) - 1) + Point(2, 0) * surface->GetSurfaceDPI() / 96.0, realSize - Size(2, 2) - Size(2, 0) * surface->GetSurfaceDPI() / 96.0);
 				Font	 nFont	  = font;
 
 				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);

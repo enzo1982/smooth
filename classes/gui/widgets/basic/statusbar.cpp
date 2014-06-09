@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,7 +38,7 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
 				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
-				surface->SetText(text, frame + Point(4, 1) * surface->GetSurfaceDPI() / 96.0 - Size(8, 2) * surface->GetSurfaceDPI() / 96.0, font);
+				surface->SetText(text, frame + Point(4 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1) - Size(8, 2) * surface->GetSurfaceDPI() / 96.0, font);
 			}
 
 			break;

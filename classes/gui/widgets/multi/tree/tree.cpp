@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -245,7 +245,7 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 	{
 		for (Int i = 0; i < ((ListBox *) container)->GetNOfTabs(); i++)
 		{
-			Rect	 rect = Rect(GetRealPosition() + Point(1, 1) * surface->GetSurfaceDPI() / 96.0, GetSize() - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(1, 0));
+			Rect	 rect = Rect(GetRealPosition() + Point(0, Math::Ceil(Float(headHotspot->GetRealSize().cy - nFont.GetScaledTextSizeY()) / 2) - 2) + Point(1, 1) * surface->GetSurfaceDPI() / 96.0, GetSize() - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(1, 0));
 
 			rect.left += ((ListBox *) container)->GetNthTabOffset(i);
 			rect.left += (i == 0 ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0);
@@ -264,7 +264,7 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 	}
 	else
 	{
-		surface->SetText(text, frame + Point(1, 1) * surface->GetSurfaceDPI() / 96.0 + Point(Math::Round(12 * surface->GetSurfaceDPI() / 96.0), 0) - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(Math::Round(12 * surface->GetSurfaceDPI() / 96.0), 0), nFont);
+		surface->SetText(text, frame + Point(0, Math::Ceil(Float(headHotspot->GetRealSize().cy - nFont.GetScaledTextSizeY()) / 2) - 2) + Point(1, 1) * surface->GetSurfaceDPI() / 96.0 + Point(Math::Round(12 * surface->GetSurfaceDPI() / 96.0), 0) - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(Math::Round(12 * surface->GetSurfaceDPI() / 96.0), 0), nFont);
 	}
 
 	surface->EndPaint();

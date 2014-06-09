@@ -87,7 +87,7 @@ Test::Test()
 	widget_scrollbar->onValueChange.Connect(&Test::OnScrollbarValueChange, this);
 	text_scrollbar_value	= new Text("0", Point(210, 112));
 
-	text_progressbar	= new Text("Progressbar:", Point(10, 137));
+	text_progressbar	= new Text("Progressbar:", Point(10, 138));
 	widget_progressbar	= new Progressbar(Point(80, 135), Size(120, 19), OR_HORZ);
 
 	text_slider		= new Text("Slider:", Point(10, 163));

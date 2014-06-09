@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -89,7 +89,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 			}
 			else if (text != NIL || bitmap != NIL)
 			{
-				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, 0) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 2);
+				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 2) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 2);
 				Font	 nFont	  = font;
 
 				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
@@ -124,7 +124,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 		case SP_MOUSEIN:
 			if (text != NIL || bitmap != NIL)
 			{
-				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, 0) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 2);
+				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 2) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 2);
 				Font	 nFont	  = font;
 
 				nFont.SetColor(Setup::GradientTextColor);

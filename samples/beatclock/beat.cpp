@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -391,7 +391,7 @@ Void BeatClock::PaintAll()
 
 Void BeatClock::Info()
 {
-	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2013\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", Message::Buttons::Ok, Message::Icon::Asterisk);
+	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2014\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", Message::Buttons::Ok, Message::Icon::Asterisk);
 }
 
 Void BeatClock::StoreConfig()

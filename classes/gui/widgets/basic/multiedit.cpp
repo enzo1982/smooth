@@ -31,7 +31,7 @@ S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size 
 	if (GetWidth() == 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(19);
 
-	cursor = new Cursor(Point(3, 2), GetSize() - Size(6, 4));
+	cursor = new Cursor(Point(3, Math::Ceil(Float(19 - font.GetUnscaledTextSizeY()) / 2) - 2), GetSize() - Size(6, 4));
 	cursor->onScroll.Connect(&MultiEdit::OnCursorScroll, this);
 	cursor->SetMaxSize(maxSize);
 	cursor->SetBackgroundColor(Color(255, 255, 255));

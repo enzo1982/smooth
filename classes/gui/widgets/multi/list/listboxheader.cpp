@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,14 +19,17 @@ const S::Short	 S::GUI::ListBoxHeader::classID = S::Object::RequestClassID();
 
 S::GUI::ListBoxHeader::ListBoxHeader(const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
-	moveTab		= -1;
-	draggingTab	= False;
+	moveTab		  = -1;
+	draggingTab	  = False;
 
-	type		= classID;
+	moveTabStartWidth = 0;
+	lastTabStartWidth = 0;
+
+	type		  = classID;
 
 	font.SetWeight(Font::Bold);
 
-	dragHotspot	= new Hotspot(Point(0, 0), GetSize());
+	dragHotspot	  = new Hotspot(Point(0, 0), GetSize());
 	dragHotspot->SetIndependent(True);
 	dragHotspot->onMouseDragStart.Connect(&ListBoxHeader::OnMouseDragStart, this);
 	dragHotspot->onMouseDrag.Connect(&ListBoxHeader::OnMouseDrag, this);
@@ -138,17 +141,13 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 					surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 					surface->Frame(frame, FRAME_UP);
 
-					frame.left += 3;
-					frame.top += 1;
-
 					Font	 nFont = font;
 
 					if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
-					surface->SetText(tabNames.GetNth(i), frame, nFont);
+					surface->SetText(tabNames.GetNth(i), frame + Point(3, Math::Ceil(Float(frame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1) - Size(5, 0), nFont);
 
-					frame.top -= 1;
-					frame.left += (Int) (Math::Abs(Math::Round(tabWidths.GetNth(i) * surface->GetSurfaceDPI() / 96.0)) - 3);
+					frame.left += (Int) Math::Abs(Math::Round(tabWidths.GetNth(i) * surface->GetSurfaceDPI() / 96.0));
 				}
 			}
 
@@ -211,14 +210,14 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 					if (window->IsMouseOn(frame) && !tabChecked.GetNth(j) && moveTab == -1)
 					{
 						surface->Box(frame, Setup::LightGrayColor, Rect::Filled);
-						surface->SetText(tabNames.GetNth(j), frame + Point(2, 0) - Size(2, 0), font);
+						surface->SetText(tabNames.GetNth(j), frame + Point(2, Math::Ceil(Float(frame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1) - Size(2, 0), font);
 
 						tabChecked.Set(tabChecked.GetNthIndex(j), True);
 					}
 					else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNth(j))
 					{
 						surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
-						surface->SetText(tabNames.GetNth(j), frame + Point(2, 0) - Size(2, 0), font);
+						surface->SetText(tabNames.GetNth(j), frame + Point(2, Math::Ceil(Float(frame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1) - Size(2, 0), font);
 
 						tabChecked.Set(tabChecked.GetNthIndex(j), False);
 					}

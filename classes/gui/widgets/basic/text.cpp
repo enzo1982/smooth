@@ -14,10 +14,11 @@
 
 const S::Short	 S::GUI::Text::classID = S::Object::RequestClassID();
 
-S::GUI::Text::Text(const String &iText, const Point &iPos) : Widget(iPos, Size())
+S::GUI::Text::Text(const String &iText, const Point &iPos, const Size &iAlign) : Widget(iPos, Size())
 {
 	type	= classID;
 	text	= iText;
+	align	= iAlign;
 
 	ComputeTextSize();
 
@@ -38,15 +39,19 @@ S::Int S::GUI::Text::Paint(Int message)
 		case SP_PAINT:
 			if (text != NIL)
 			{
-				Font	 nFont	 = font;
+				Font	 nFont	    = font;
 
 				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
-				Rect	 rect	 = Rect(GetRealPosition(), GetRealSize());
-				Surface	*surface = GetDrawSurface();
+				Rect	 rect	    = Rect(GetRealPosition(), GetRealSize());
+				Surface	*surface    = GetDrawSurface();
 
-				surface->Box(rect, GetBackgroundColor(), Rect::Filled);
-				surface->SetText(text, Rect::OverlapRect(Rect(GetRealPosition(), Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2))), GetVisibleArea()), nFont);
+				Size	 alignToUse = Size(align.cx, (font.GetSize() == Font::DefaultSize && align.cy == 0) ? 13 : align.cy);
+				Point	 alignment  = Point(alignToUse.cx == 0 ? 0 : Math::Ceil(Float(Float(alignToUse.cx) * surface->GetSurfaceDPI() / 96.0 - font.GetScaledTextSizeX(text)) / 2) - 1,
+							    alignToUse.cy == 0 ? 0 : Math::Ceil(Float(Float(alignToUse.cy) * surface->GetSurfaceDPI() / 96.0 - font.GetScaledTextSizeY())     / 2) - 1);
+
+				surface->Box(rect + alignment, GetBackgroundColor(), Rect::Filled);
+				surface->SetText(text, Rect::OverlapRect(Rect(rect.GetPosition() + alignment, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2))), GetVisibleArea() + alignment), nFont);
 			}
 
 			break;

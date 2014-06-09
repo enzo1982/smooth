@@ -550,7 +550,7 @@ S::Void S::GUI::Cursor::ShowCursor(Bool visible)
 	point.x += GetDisplayCursorPositionFromLogical(promptPos) + imeAdvance;
 	point.y += (font.GetScaledTextSizeY() + 3) * (line - scrollPos);
 
-	if (!(line - scrollPos < 0 || (font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()))
+	if (!(Binary::IsFlagSet(GetFlags(), CF_MULTILINE) && (line - scrollPos < 0 || (font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight())))
 	{
 		if (IsVisible()) surface->Box(Rect(point, Size(1, font.GetScaledTextSizeY() + 3)), 0, Rect::Inverted);
 
@@ -1252,7 +1252,7 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 
 	p1.y += (font.GetScaledTextSizeY() + 3) * (line - scrollPos);
 
-	if (line - scrollPos < 0 || (font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight())
+	if (Binary::IsFlagSet(GetFlags(), CF_MULTILINE) && (line - scrollPos < 0 || (font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()))
 	{
 		while (line - scrollPos < 0)							 scrollPos--;
 		while ((font.GetUnscaledTextSizeY() + 3) * (line - scrollPos + 1) > GetHeight()) scrollPos++;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -46,7 +46,7 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 				surface->Frame(frame, FRAME_DOWN);
 				surface->Frame(frame + Point(1, 1) - Size(2, 2), FRAME_UP);
 
-				Rect	 textRect = Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
+				Rect	 textRect = Rect(GetRealPosition() + Point(10 * surface->GetSurfaceDPI() / 96.0, -Math::Ceil(Float(scaledTextSize.cy) / 2)), Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
 
 				surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
@@ -65,52 +65,26 @@ S::Int S::GUI::GroupBox::Paint(Int message)
 
 S::Int S::GUI::GroupBox::Activate()
 {
+	if (active) return Success();
+
 	active = True;
 
-	if (!IsRegistered()) return Success();
-	if (!IsVisible())    return Success();
+	Paint(SP_PAINT);
 
-	Surface	*surface  = GetDrawSurface();
-	Rect	 textRect = Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
-
-	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
-
-	surface->SetText(text, textRect + Point(1, 0) * surface->GetSurfaceDPI() / 96.0, font);
-
-	for (Int i = 0; i < GetNOfObjects(); i++)
-	{
-		Widget	*widget = GetNthObject(i);
-
-		widget->Paint(SP_PAINT);
-	}
+	onActivate.Emit();
 
 	return Success();
 }
 
 S::Int S::GUI::GroupBox::Deactivate()
 {
+	if (!active) return Success();
+
 	active = False;
 
-	if (!IsRegistered()) return Success();
-	if (!IsVisible())    return Success();
+	Paint(SP_PAINT);
 
-	Surface	*surface  = GetDrawSurface();
-	Rect	 textRect = Rect(GetRealPosition() + Point(10, -6) * surface->GetSurfaceDPI() / 96.0, Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2)) + Size(3, 0) * surface->GetSurfaceDPI() / 96.0);
-
-	surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
-
-	Font	 nFont	  = font;
-
-	nFont.SetColor(Setup::InactiveTextColor);
-
-	surface->SetText(text, textRect + Point(1, 0) * surface->GetSurfaceDPI() / 96.0, nFont);
-
-	for (Int i = 0; i < GetNOfObjects(); i++)
-	{
-		Widget	*widget = GetNthObject(i);
-
-		widget->Paint(SP_PAINT);
-	}
+	onDeactivate.Emit();
 
 	return Success();
 }

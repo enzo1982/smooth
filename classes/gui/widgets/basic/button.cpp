@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -69,7 +69,7 @@ S::Int S::GUI::Button::Paint(Int message)
 
 					if (bitmap != NIL) textRect.left = frame.left + ((frame.GetWidth() - scaledTextSize.cx - bitmap.GetSize().cx - 7) / 2) + bitmap.GetSize().cx + 7;
 
-					textRect.top	= frame.top + ((frame.GetHeight() - scaledTextSize.cy) / 2) - 1;
+					textRect.top	= frame.top + Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 1;
 					textRect.right	= textRect.left + scaledTextSize.cx + 1;
 					textRect.bottom	= textRect.top + Math::Round(scaledTextSize.cy * 1.2);
 

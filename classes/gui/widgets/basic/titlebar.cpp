@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -117,7 +117,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 			if (paintActive)	font.SetColor(Setup::GradientTextColor);
 			else			font.SetColor(Setup::InactiveGradientTextColor);
 
-			surface->SetText(text, titleFrame + Point(4, 3) - Size(9, 6), font);
+			surface->SetText(text, titleFrame + Point(4, Math::Ceil(Float(titleFrame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1) - Size(9, 6), font);
 
 			if (icon != NIL) surface->BlitFromBitmap(icon, Rect(Point(0, 0), icon.GetSize()), Rect(Point(titleFrame.left - 16 * surface->GetSurfaceDPI() / 96.0 - 2, titleFrame.top + 1), Size(16, 16) * surface->GetSurfaceDPI() / 96.0));
 

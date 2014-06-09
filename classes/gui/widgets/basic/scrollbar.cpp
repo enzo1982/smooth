@@ -32,6 +32,7 @@ S::GUI::Scrollbar::Scrollbar(const Point &iPos, const Size &iSize, Int sType, In
 
 	pageSize	= 6;
 	dragging	= False;
+	mouseBias	= 0;
 
 	clickHotspot->onLeftButtonDown.Connect(&Scrollbar::OnMouseClick, this);
 	clickHotspot->onLeftButtonUp.Connect(&System::Timer::Stop, clickTimer);

@@ -120,7 +120,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 
 						if (entryText.Find("\t") >= 0) entryText = entryText.Head(entryText.Find("\t"));
 
-						surface->SetText(entryText, frame + Point(3, 3) * surface->GetSurfaceDPI() / 96.0 - Size(frame.GetHeight() + 2, 0), entry->GetFont());
+						surface->SetText(entryText, frame + Point(3 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - entry->GetFont().GetScaledTextSizeY()) / 2) - 1) - Size(frame.GetHeight() + 2, 0), entry->GetFont());
 					}
 				}
 			}

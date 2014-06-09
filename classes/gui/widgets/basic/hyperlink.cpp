@@ -19,12 +19,13 @@
 
 const S::Short	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
 
-S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const String &link, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
+S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const String &link, const Point &iPos, const Size &iSize) : Text(iText, iPos, Size())
 {
 	type		= classID;
-	text		= iText;
 	linkURL		= link;
 	linkBitmap	= bitmap;
+
+	SetSize(iSize);
 
 	linkBitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 
@@ -64,25 +65,18 @@ S::Int S::GUI::Hyperlink::Paint(Int message)
 	switch (message)
 	{
 		case SP_PAINT:
+			if (linkBitmap != NIL)
 			{
 				Rect	 rect	 = Rect(GetRealPosition(), GetRealSize());
 				Surface	*surface = GetDrawSurface();
 
-				if (linkBitmap == NIL)
-				{
-					surface->Box(rect, GetBackgroundColor(), Rect::Filled);
-					surface->SetText(text, Rect::OverlapRect(Rect(GetRealPosition(), Size(scaledTextSize.cx, Math::Round(scaledTextSize.cy * 1.2))), GetVisibleArea()), font);
-				}
-				else
-				{
-					surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), rect);
-				}
+				surface->BlitFromBitmap(linkBitmap, Rect(Point(0, 0), linkBitmap.GetSize()), rect);
 			}
 
 			break;
 	}
 
-	return Success();
+	return Text::Paint(message);
 }
 
 S::Void S::GUI::Hyperlink::OnMouseOver()
@@ -91,14 +85,13 @@ S::Void S::GUI::Hyperlink::OnMouseOver()
 
 	if (linkBitmap == NIL)
 	{
-		Surface	*surface  = GetDrawSurface();
-		Rect	 textRect = Rect(GetRealPosition(), scaledTextSize + Size(0, 2));
-		Font	 nFont	  = font;
+		Font	 originalFont = font;
 
-		nFont.SetColor(Color(0, 128, 255));
+		font.SetColor(Color(0, 128, 255));
 
-		surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
-		surface->SetText(text, textRect, nFont);
+		Text::Paint(SP_PAINT);
+
+		font.SetColor(originalFont.GetColor());
 	}
 }
 
@@ -108,11 +101,7 @@ S::Void S::GUI::Hyperlink::OnMouseOut()
 
 	if (linkBitmap == NIL)
 	{
-		Surface	*surface  = GetDrawSurface();
-		Rect	 textRect = Rect(GetRealPosition(), scaledTextSize + Size(0, 2));
-
-		surface->Box(textRect, GetBackgroundColor(), Rect::Filled);
-		surface->SetText(text, textRect, font);
+		Text::Paint(SP_PAINT);
 	}
 }
 
@@ -127,26 +116,18 @@ S::Int S::GUI::Hyperlink::SetText(const String &nText)
 {
 	if (linkBitmap != NIL) linkBitmap = NIL;
 
-	Widget::SetText(nText);
-
-	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
+	Text::SetText(nText);
 
 	hotspot->SetSize(GetSize());
-
-	Paint(SP_PAINT);
 
 	return Success();
 }
 
 S::Int S::GUI::Hyperlink::SetFont(const Font &nFont)
 {
-	Widget::SetFont(nFont);
-
-	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
+	Text::SetFont(nFont);
 
 	hotspot->SetSize(GetSize());
-
-	Paint(SP_PAINT);
 
 	return Success();
 }

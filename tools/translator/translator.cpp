@@ -34,8 +34,11 @@ Int smooth::Main(const Array<String> &args)
 
 Translator::Translator(const String &openFile)
 {
-	fileName = NIL;
+	fileName     = NIL;
 	templateName = NIL;
+
+	dataSection  = NIL;
+	modified     = False;
 
 	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 480));
 	title		= new Titlebar();
@@ -47,7 +50,7 @@ Translator::Translator(const String &openFile)
 	text_filter	= new Text("Filter:", Point(377, 10));
 	text_filter->SetOrientation(OR_UPPERRIGHT);
 
-	edit_filter	= new EditBox(NIL, Point(345, 7), Size(250, 0), 0);
+	edit_filter	= new EditBox(NIL, Point(370 - text_filter->GetUnscaledTextWidth(), 7), Size(275 - text_filter->GetUnscaledTextWidth(), 0), 0);
 	edit_filter->onInput.Connect(&Translator::FilterEntries, this);
 	edit_filter->SetOrientation(OR_UPPERRIGHT);
 
@@ -77,10 +80,6 @@ Translator::Translator(const String &openFile)
 	text_id		= new Text("ID:", Point(94, 160));
 	text_id->SetOrientation(OR_LOWERLEFT);
 
-	edit_id		= new EditBox(NIL, Point(156, 163), Size(37, 0), 5);
-	edit_id->SetFlags(EDB_NUMERIC);
-	edit_id->SetOrientation(OR_LOWERLEFT);
-
 	button_save	= new Button("Save", NIL, Point(175, 164), Size());
 	button_save->onAction.Connect(&Translator::SaveData, this);
 	button_save->SetOrientation(OR_LOWERRIGHT);
@@ -92,13 +91,17 @@ Translator::Translator(const String &openFile)
 	text_original	= new Text("Original:", Point(94, 133));
 	text_original->SetOrientation(OR_LOWERLEFT);
 
-	edit_original	= new MultiEdit(NIL, Point(156, 136), Size(608, 60), 0);
-	edit_original->SetOrientation(OR_LOWERLEFT);
-
 	text_translated	= new Text("Translation:", Point(94, 65));
 	text_translated->SetOrientation(OR_LOWERLEFT);
 
-	edit_translated	= new MultiEdit(NIL, Point(156, 68), Size(608, 60), 0);
+	edit_id		= new EditBox(NIL, Point(221 - text_translated->GetUnscaledTextWidth(), 163), Size(37, 0), 5);
+	edit_id->SetFlags(EDB_NUMERIC);
+	edit_id->SetOrientation(OR_LOWERLEFT);
+
+	edit_original	= new MultiEdit(NIL, Point(221 - text_translated->GetUnscaledTextWidth(), 136), Size(608, 60), 0);
+	edit_original->SetOrientation(OR_LOWERLEFT);
+
+	edit_translated	= new MultiEdit(NIL, Point(221 - text_translated->GetUnscaledTextWidth(), 68), Size(608, 60), 0);
 	edit_translated->SetOrientation(OR_LOWERLEFT);
 
 	MenuEntry	*entry = NIL;
@@ -283,11 +286,11 @@ Void Translator::ResizeProc()
 	Rect	 clientRect = wnd->GetClientRect();
 	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
-	list_entries->SetSize(Size(clientSize.cx - 14, clientSize.cy - 205));
-	list_filtered->SetSize(Size(clientSize.cx - 14, clientSize.cy - 205));
+	list_entries->SetSize(Size(clientSize.cx - 14, clientSize.cy - 204));
+	list_filtered->SetSize(Size(clientSize.cx - 14, clientSize.cy - 204));
 
-	edit_original->SetWidth(clientSize.cx - 163);
-	edit_translated->SetWidth(clientSize.cx - 163);
+	edit_original->SetWidth(clientSize.cx - edit_original->GetX() - 7);
+	edit_translated->SetWidth(clientSize.cx - edit_original->GetX() - 7);
 }
 
 Void Translator::NewFile()
@@ -404,7 +407,7 @@ Void Translator::CloseFile()
 {
 	if (entries.Length() == 0) return;
 
-	fileName = NIL;
+	fileName     = NIL;
 	templateName = NIL;
 
 	wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION));
@@ -420,6 +423,9 @@ Void Translator::CloseFile()
 	createdEntries.RemoveAll();
 
 	delete dataSection;
+
+	dataSection = NIL;
+	modified    = False;
 
 	SelectEntry(NIL);
 

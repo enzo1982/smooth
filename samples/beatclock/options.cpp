@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,23 +23,23 @@ Options::Options(Int &itimeformat, Bool &icenti, Bool &iisalarm, Int &ialarmbeat
 	oldat = alarmtext;
 	oldao = alarmoption;
 
-	optionsdialog	= new GUI::Window("BeatClock Options", Point(100, 100), Size(399, 183));
+	optionsdialog	= new GUI::Window("BeatClock Options", Point(100, 100), Size(419, 183));
 	optitle		= new Titlebar(TB_CLOSEBUTTON);
 
 	/* Configuring "Display" Layer:
 	 */
 	display		= new Layer("Display");
 
-	display_group1	= new GroupBox("Time format", Point(7, 11), Size(230, 65));
+	display_group1	= new GroupBox("Time format", Point(7, 11), Size(250, 65));
 
-	display_option1 = new OptionBox("Internet Beats", Point(10, 13), Size(100, 0), &timeformat, 0);
+	display_option1 = new OptionBox("Internet Beats", Point(10, 13), Size(110, 0), &timeformat, 0);
 	display_option1->onAction.Connect(&Options::OptionsBeats, this);
 
-	display_option2 = new OptionBox("Standard (STF)", Point(10, 38), Size(100, 0), &timeformat, 1);
+	display_option2 = new OptionBox("Standard (STF)", Point(10, 38), Size(110, 0), &timeformat, 1);
 	display_option2->onAction.Connect(&Options::OptionsSTF, this);
 
-	if (timeformat == 0) display_check1 = new CheckBox("Show centibeats", Point(119, 13), Size(100, 0), &centi);
-	else		     display_check1 = new CheckBox("Show seconds", Point(119, 13), Size(100, 0), &centi);
+	if (timeformat == 0) display_check1 = new CheckBox("Show centibeats", Point(129, 13), Size(110, 0), &centi);
+	else		     display_check1 = new CheckBox("Show seconds", Point(129, 13), Size(110, 0), &centi);
 
 	display_check1->onAction.Connect(&onOptionChange);
 
@@ -47,7 +47,7 @@ Options::Options(Int &itimeformat, Bool &icenti, Bool &iisalarm, Int &ialarmbeat
 	display_group1->Add(display_option2);
 	display_group1->Add(display_check1);
 
-	display_group2	= new GroupBox("Timezone", Point(245, 11), Size(121, 65));
+	display_group2	= new GroupBox("Timezone", Point(265, 11), Size(121, 65));
 
 	display_option3 = new OptionBox("CET", Point(10, 13), Size(100, 0), &timezone, 0);
 	display_option3->onAction.Connect(&onOptionChange);
@@ -73,13 +73,13 @@ Options::Options(Int &itimeformat, Bool &icenti, Bool &iisalarm, Int &ialarmbeat
 	if (timeformat == 0) alarmtext = String::FromInt(alarmbeats);
 	else		     alarmtext = Time::SecondsToTimeString(alarmsecs);
 
-	alarm_edit1	= new EditBox(alarmtext, Point(53, 32), Size(34, 0), 5);
+	alarm_edit1	= new EditBox(alarmtext, Point(16 + alarm_text1->GetUnscaledTextWidth(), 32), Size(34, 0), 5);
 
-	if (timeformat == 0) alarm_text2 = new Text("Internet Beats", Point(94, 35));
-	else		     alarm_text2 = new Text("Hours/Minutes", Point(94, 35));
+	if (timeformat == 0) alarm_text2 = new Text("Internet Beats", Point(alarm_edit1->GetX() + 41, 35));
+	else		     alarm_text2 = new Text("Hours/Minutes", Point(alarm_edit1->GetX() + 41, 35));
 
-	alarm_option1	= new OptionBox("once", Point(172, 21), Size(0, 0), &alarmoption, 0);
-	alarm_option2	= new OptionBox("every day", Point(172, 46), Size(0, 0), &alarmoption, 1);
+	alarm_option1	= new OptionBox("once", Point(180, 21), Size(0, 0), &alarmoption, 0);
+	alarm_option2	= new OptionBox("every day", Point(180, 46), Size(0, 0), &alarmoption, 1);
 
 	alarm->Add(alarm_check1);
 	alarm->Add(alarm_text1);
@@ -94,14 +94,14 @@ Options::Options(Int &itimeformat, Bool &icenti, Bool &iisalarm, Int &ialarmbeat
 	 */
 	misc		= new Layer("Misc");
 
-	misc_group1	= new GroupBox("'Mode' button action", Point(7, 11), Size(359, 65));
+	misc_group1	= new GroupBox("'Mode' button action", Point(7, 11), Size(379, 65));
 
-	if (timeformat == 0) misc_option1 = new OptionBox("Show/hide centibeats", Point(10, 13), Size(164, 0), &modechange, 0);
-	else		     misc_option1 = new OptionBox("Show/hide seconds", Point(10, 13), Size(164, 0), &modechange, 0);
+	if (timeformat == 0) misc_option1 = new OptionBox("Show/hide centibeats", Point(10, 13), Size(174, 0), &modechange, 0);
+	else		     misc_option1 = new OptionBox("Show/hide seconds", Point(10, 13), Size(174, 0), &modechange, 0);
 
-	misc_option2	= new OptionBox("Change time format", Point(10, 38), Size(164, 0), &modechange, 1);
-	misc_option3	= new OptionBox("Change timezone", Point(184, 13), Size(164, 0), &modechange, 2);
-	misc_option4	= new OptionBox("Change format and timezone", Point(184, 38), Size(164, 0), &modechange, 3);
+	misc_option2	= new OptionBox("Change time format", Point(10, 38), Size(174, 0), &modechange, 1);
+	misc_option3	= new OptionBox("Change timezone", Point(194, 13), Size(174, 0), &modechange, 2);
+	misc_option4	= new OptionBox("Change format and timezone", Point(194, 38), Size(174, 0), &modechange, 3);
 
 	misc_group1->Add(misc_option1);
 	misc_group1->Add(misc_option2);
@@ -114,15 +114,15 @@ Options::Options(Int &itimeformat, Bool &icenti, Bool &iisalarm, Int &ialarmbeat
 	 */
 	info		= new Layer("Info");
 
-	info_text1	= new Text("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2012\nGive it to all your friends!", Point(6, 5));
-	info_text2	= new Text("\n\neMail: robert.kausch@gmx.net", Point(222, 5));
+	info_text1	= new Text("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2014\nGive it to all your friends!", Point(6, 5));
+	info_text2	= new Text("\n\neMail: robert.kausch@gmx.net", Point(227, 5));
 
 	info->Add(info_text1);
 	info->Add(info_text2);
 
 	/* Configuring main layer:
 	 */
-	main_reg1 = new TabWidget(Point(7, 7), Size(376, 105));
+	main_reg1 = new TabWidget(Point(7, 7), Size(396, 105));
 
 	main_reg1->Add(display);
 	main_reg1->Add(misc);

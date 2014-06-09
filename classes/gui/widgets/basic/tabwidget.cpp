@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -90,10 +90,14 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 					if (IsRightToLeft()) { frame.left--; frame.right--; }
 
-					surface->SetText(object->GetText(), Rect(Point(frame.left + 6 + (object->IsVisible() ? 1 : 0), frame.top + 2), Size(object->GetScaledTextWidth(), offset - 2)), object->GetFont());
+					if (object->IsVisible()) frame.bottom--;
+
+					surface->SetText(object->GetText(), Rect(Point(frame.left + 6 + (object->IsVisible() ? 1 : 0), frame.top + Math::Ceil(Float(frame.GetHeight() - object->GetFont().GetScaledTextSizeY()) / 2) - 1), Size(object->GetScaledTextWidth(), offset - 2)), object->GetFont());
 
 					if (object->IsVisible())
 					{
+						frame.bottom++;
+
 						surface->Line(Point(frame.left + 1, frame.bottom), Point(frame.right + (IsRightToLeft() ? 1 : 0), frame.bottom), Setup::BackgroundColor);
 						surface->SetPixel(Point(frame.left + (IsRightToLeft() ? 1 : 0), frame.bottom), (IsRightToLeft() ? Setup::DividerDarkColor : Setup::ClientColor));
 

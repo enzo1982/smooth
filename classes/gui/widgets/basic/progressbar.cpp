@@ -94,7 +94,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 				Point	 realPos	= GetRealPosition();
 
 				Int	 textSize	= font.GetScaledTextSizeX(text);
-				Rect	 textRect	= Rect(Point(realPos.x + (frame.GetWidth() / 2) - (textSize / 2), realPos.y + Math::Round(2 * surface->GetSurfaceDPI() / 96.0)), Size(textSize, frame.GetHeight() - Math::Round(2 * surface->GetSurfaceDPI() / 96.0) - 1));
+				Rect	 textRect	= Rect(Point(realPos.x + (frame.GetWidth() - textSize) / 2, realPos.y + Math::Ceil(Float(frame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1), Size(textSize, frame.GetHeight() - Math::Round(2 * surface->GetSurfaceDPI() / 96.0) - 1));
 
 				surface->SetText(text, textRect, font);
 

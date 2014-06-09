@@ -32,6 +32,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/i18n/translator.h>
 
+#include <smooth/foreach.h>
 #include <smooth/resources.h>
 
 #ifdef __WIN32__
@@ -48,9 +49,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	mode = TIP_ORDERED;
 	offset = 0;
 
-	Rect	 workArea = System::Screen::GetActiveScreenWorkArea();
-
-	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"), workArea.GetPosition() + Point((workArea.GetSize().cx - 350) / 2, (workArea.GetSize().cy - 300) / 2), Size(352, 302));
+	dlgwnd		= new Window(I18n::Translator::defaultTranslator->TranslateString("Tip of the day"), Point(200, 200), Size(350, 300));
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(39, OR_HORZ | OR_BOTTOM);
@@ -67,28 +66,23 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	check_showtips->SetOrientation(OR_LOWERLEFT);
 	check_showtips->SetWidth(check_showtips->GetUnscaledTextWidth() + 21);
 
-	Int	 additionalSize = Math::Max(0, check_showtips->GetUnscaledTextWidth() - 133);
-
-	dlgwnd->SetWidth(dlgwnd->GetWidth() + additionalSize);
-	dlgwnd->SetX(workArea.GetPosition().x + (workArea.GetSize().cx - 350 - additionalSize) / 2);
-
 	Bitmap	 bmp;
 
 #ifdef __WIN32__
 	bmp = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_LIGHT), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
 #endif
 
-	bmp.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+	bmp.ReplaceColor(Color(192, 192, 192, Color::RGBA), Setup::BackgroundColor);
 
 	img_light	= new Image(bmp, Point(5, 3), Size(32, 32));
 
 	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), Point(8 + bmp.GetSize().cx, 7));
 	txt_didyouknow->SetFont(Font(Font::Default, 14, Font::Bold));
 
-	txt_tip		= new Text(NIL, Point(6, 6));
+	txt_tip		= new Text(NIL, Point(6, 5));
 
 	layer_inner	= new Layer();
-	layer_inner->SetMetrics(Point(8, 39), Size(328 + additionalSize, 182));
+	layer_inner->SetMetrics(Point(8, 39), Size(328, 182));
 	layer_inner->SetBackgroundColor(Setup::TooltipColor);
 
 	Add(dlgwnd);
@@ -133,6 +127,21 @@ const Error &S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 {
 	if (caption != NIL) dlgwnd->SetText(caption);
 
+	/* Compute and set dialog size.
+	 */
+	Rect	 workArea	= System::Screen::GetActiveScreenWorkArea();
+	Int	 additionalSize = Math::Max(0, check_showtips->GetUnscaledTextWidth() - 133);
+	Size	 size		= Size(328 + additionalSize, 182);
+
+	foreach (const String &tip, tips) size = Size(Math::Max(size.cx, font.GetUnscaledTextSizeX(tip) + 12), Math::Max(size.cy, font.GetUnscaledTextSizeY(tip) + 12));
+
+	dlgwnd->SetSize(Size(24, 120) + size);
+	dlgwnd->SetPosition(workArea.GetPosition() + Point((workArea.GetSize().cx - dlgwnd->GetWidth()) / 2, (workArea.GetSize().cy - dlgwnd->GetHeight()) / 2));
+
+	layer_inner->SetSize(size);
+
+	/* Set next tip and display dialog.
+	 */
 	OnNext();
 
 	dlgwnd->Show();

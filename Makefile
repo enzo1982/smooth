@@ -72,6 +72,10 @@ REMOVE	    = rm
 LINKER_OPTS = -pipe -L$(LIBDIR) -o $(DLLNAME)
 REMOVE_OPTS = -f
 
+ifeq ($(BUILD_FREEBSD),True)
+	LINKER = clang
+endif
+
 ifeq ($(BUILD_OSX),True)
 	LINKER_OPTS += -dynamiclib -Wl,-x
 

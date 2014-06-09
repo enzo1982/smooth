@@ -9,6 +9,11 @@ RCOPTS	   = -DSMOOTH_DLL -O coff
 LD	   = gcc
 LDOPTS	   = -pipe -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
+ifeq ($(BUILD_FREEBSD),True)
+	CC = clang
+	LD = clang
+endif
+
 ifneq ($(BUILD_SOLARIS),True)
 	CCOPTS += -Os
 endif

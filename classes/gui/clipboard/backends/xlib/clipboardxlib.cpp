@@ -61,7 +61,7 @@ unsigned char *S::GUI::ClipboardXLib::QueryAtom(Display *display, ::Window self,
 	 */
 	if (XGetWindowProperty(display, self, atom, 0, 0, 0, AnyPropertyType, &type, &format, &items, &bytes, &data) == 0)
 	{
-		XFree(data);
+		if (data != NIL) { XFree(data); data = NIL; }
 
 		/* Data is there!
 		 */

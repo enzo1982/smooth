@@ -1143,7 +1143,7 @@ const S::Array<S::String> &S::GUI::WindowXLib::GetDroppedFiles() const
 	 */
 	if (XGetWindowProperty(display, wnd, XA_PRIMARY, 0, 0, 0, AnyPropertyType, &type, &format, &items, &bytes, &data) == 0)
 	{
-		XFree(data);
+		if (data != NIL) { XFree(data); data = NIL; }
 
 		/* Data is there!
 		 */

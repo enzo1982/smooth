@@ -51,18 +51,38 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	/* Check if OS X version is lower than 10.7 (Darwin 11.0) and
 	 * occupy ten pixels for the handle at the right in that case.
 	 */
-	Buffer<char>	 buffer(32);
-	FILE		*pstdin = popen("sysctl kern.osrelease", "r");
+	static Int	 resizeGripSize = -1;
 
-	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
-
-	pclose(pstdin);
-
-	String		 osrelease = (char *) buffer;
-
-	if (!osrelease.StartsWith("kern.osrelease: ") || osrelease.Tail(osrelease.Length() - 16).ToInt() < 11)
+	if (resizeGripSize == -1)
 	{
-		occupied_right += 10;
+		Buffer<char>	 buffer(32);
+		FILE		*pstdin = popen("sysctl kern.osrelease", "r");
+
+		fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+		pclose(pstdin);
+
+		String		 osrelease = (char *) buffer;
+
+		if (!osrelease.StartsWith("kern.osrelease: ") || osrelease.Tail(osrelease.Length() - 16).ToInt() < 11) resizeGripSize = 10;
+		else												       resizeGripSize =  0;
+	}
+
+	occupied_right += resizeGripSize;
+
+	if (resizeGripSize > 0)
+	{
+		Surface	*surface = GetDrawSurface();
+		Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+
+		surface->Line(Point(frame.right -  2, frame.bottom - 1), Point(frame.right, frame.bottom -  3), Color(116, 116, 116));
+		surface->Line(Point(frame.right -  3, frame.bottom - 1), Point(frame.right, frame.bottom -  4), Color(184, 184, 184));
+
+		surface->Line(Point(frame.right -  6, frame.bottom - 1), Point(frame.right, frame.bottom -  7), Color(116, 116, 116));
+		surface->Line(Point(frame.right -  7, frame.bottom - 1), Point(frame.right, frame.bottom -  8), Color(184, 184, 184));
+
+		surface->Line(Point(frame.right - 10, frame.bottom - 1), Point(frame.right, frame.bottom - 11), Color(116, 116, 116));
+		surface->Line(Point(frame.right - 11, frame.bottom - 1), Point(frame.right, frame.bottom - 12), Color(184, 184, 184));
 	}
 #endif
 

@@ -960,6 +960,10 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 		 */
 		[wnd setReleasedWhenClosed: NO];
 
+		/* Do not show the resize grip on older OS X versions.
+		 */
+		[wnd setShowsResizeIndicator: NO];
+
 		/* Init content view and delegate.
 		 */
 		[wnd setContentView: [[[CocoaView alloc] initWithFrame: frame] autorelease]];

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -156,56 +156,56 @@ S::Bool S::IO::InStream::ReadData()
 {
 	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
 
-	if (streamType == STREAM_DRIVER)
+	if (streamType != STREAM_DRIVER) return true;
+
+	Int	 decsize = 0;
+
+	size	       = origsize;
+	currentFilePos = origfilepos;
+
+	if (filters.Length() == 0)
 	{
-		Int	 decsize = 0;
+		/* Read unfiltered data.
+		 */
+		packageSize = stdpacksize;
 
-		if (filters.Length() > 0)
-		{
-			if (filters.GetFirst()->GetPackageSize() > 0)	packageSize = filters.GetFirst()->GetPackageSize();
-			else						packageSize = stdpacksize;
-		}
-		else	packageSize = stdpacksize;
+		dataBuffer.Resize(packageSize);
 
-		size		= origsize;
-		currentFilePos	= origfilepos;
+		driver->Seek(currentFilePos);
 
-		if (filters.Length() == 0)
-		{
-			dataBuffer.Resize(packageSize);
-
-			driver->Seek(currentFilePos);
-
-			if (size != -1)	decsize = driver->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
-			else		decsize = driver->ReadData(dataBuffer, packageSize);
-		}
-		else
-		{
-			if (size != -1)	decsize = filters.GetFirst()->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
-			else		decsize = filters.GetFirst()->ReadData(dataBuffer, packageSize);
-		}
-
-		if (packageSize <= size - currentFilePos || filters.Length() > 0 || size == -1)
-		{
-			origfilepos = currentFilePos + packageSize;
-
-			if (decsize == -1)
-			{
-				packageSize = 0;
-
-				return false;
-			}
-
-			packageSize	= decsize;
-			origsize	= size;
-
-			if (packageSize + currentFilePos > size && size != -1) size = packageSize + currentFilePos;
-		}
-
-		currentBufferPos = 0;
-
-		if (packageSize == 0) return ReadData();
+		if (size != -1)	decsize = driver->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
+		else		decsize = driver->ReadData(dataBuffer, packageSize);
 	}
+	else
+	{
+		/* Read filtered data.
+		 */
+		if (filters.GetFirst()->GetPackageSize() > 0) packageSize = filters.GetFirst()->GetPackageSize();
+		else					      packageSize = stdpacksize;
+
+		if (size != -1)	decsize = filters.GetFirst()->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
+		else		decsize = filters.GetFirst()->ReadData(dataBuffer, packageSize);
+	}
+
+	if (packageSize <= size - currentFilePos || filters.Length() > 0 || size == -1)
+	{
+		origfilepos = currentFilePos + packageSize;
+
+		if (decsize == -1) { packageSize = 0; return false; }
+
+		packageSize = decsize;
+		origsize    = size;
+
+		if (packageSize + currentFilePos > size && size != -1) size = packageSize + currentFilePos;
+	}
+	else
+	{
+		if (decsize <= 0) { packageSize = 0; return false; }
+	}
+
+	currentBufferPos = 0;
+
+	if (packageSize == 0) return ReadData();
 
 	return true;
 }

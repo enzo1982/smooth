@@ -528,7 +528,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				text[numChars] = 0;
 
-				if (status & XLookupChars)
+				if (status == XLookupChars)
 				{
 					String	 string;
 
@@ -827,9 +827,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		 */
 		if (im != NIL)
 		{
-			iwnd = XCreateWindow(display, wnd, 0, 0, 1, 1, 0, CopyFromParent, InputOnly, CopyFromParent, 0, NIL);
-
-			XMapWindow(display, iwnd);
+			XLockDisplay(display);
 
 			XIMCallback	 cbPeStart  = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditStart };
 			XIMCallback	 cbPeDone   = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditDone  };
@@ -842,22 +840,31 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 									     XNPreeditCaretCallback, &cbPeCaret, NULL);
 
 			ic = XCreateIC(im, XNClientWindow,	wnd,
-					   XNFocusWindow,	iwnd,
 					   XNInputStyle,	XIMPreeditCallbacks | XIMStatusNothing,
 					   XNPreeditAttributes,	preeditCbs, NULL);
 
 			XFree(preeditCbs);
 
-			/* Get mask of filter events for IC.
-			 */
 			if (ic != NIL)
 			{
+				/* Create anchor window and set focus.
+				 */
+				iwnd = XCreateWindow(display, wnd, 0, 0, 1, 1, 0, CopyFromParent, InputOnly, CopyFromParent, 0, NIL);
+
+				XMapWindow(display, iwnd);
+
+				XSetICValues(ic, XNFocusWindow, iwnd, NULL);
+
+				/* Get mask of filter events for IC.
+				 */
 				long	 filterEvents = 0;
 
 				XGetICValues(ic, XNFilterEvents, &filterEvents, NULL);
 
 				XSelectInput(display, iwnd, filterEvents);
 			}
+
+			XUnlockDisplay(display);
 		}
 
 		/* Select event types we want to receive.

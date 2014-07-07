@@ -120,59 +120,12 @@ const S::String &S::Directory::GetDirectoryPath() const
 
 const S::Array<S::File> &S::Directory::GetFiles() const
 {
-	return GetFilesByPattern("*.*");
+	return GetFilesByPattern("*");
 }
 
 const S::Array<S::Directory> &S::Directory::GetDirectories() const
 {
-	directories.RemoveAll();
-
-#ifdef __WIN32__
-	HANDLE		 handle;
-	WIN32_FIND_DATAW findDataW;
-	WIN32_FIND_DATAA findDataA;
-
-	if (Setup::enableUnicode) handle = FindFirstFileW(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\*.*"), &findDataW);
-	else			  handle = FindFirstFileA(String(*this).Append("\\*.*"), &findDataA);
-
-	Bool	 success = (handle != INVALID_HANDLE_VALUE);
-
-	while (success)
-	{
-		if (Setup::enableUnicode)
-		{
-			if ((findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataW.cFileName) != "." && String(findDataW.cFileName) != "..") directories.Add(Directory(findDataW.cFileName, *this));
-
-			success = FindNextFileW(handle, &findDataW);
-		}
-		else
-		{
-			if ((findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataA.cFileName) != "." && String(findDataA.cFileName) != "..") directories.Add(Directory(findDataA.cFileName, *this));
-
-			success = FindNextFileA(handle, &findDataA);
-		}
-	}
-
-	FindClose(handle);
-#else
-	glob_t	 fileData = { 0 };
-
-	if (glob(String(*this).Append("/*").ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, &fileData) == 0)
-	{
-		String	 previousInputFormat = String::SetInputFormat("UTF-8");
-
-		for (size_t i = 0; i < fileData.gl_pathc; i++)
-		{
-			if (String(fileData.gl_pathv[i]).EndsWith("/")) directories.Add(Directory(fileData.gl_pathv[i]));
-		}
-
-		String::SetInputFormat(previousInputFormat);
-
-		globfree(&fileData);
-	}
-#endif
-
-	return directories;
+	return GetDirectoriesByPattern("*");
 }
 
 const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) const
@@ -225,6 +178,58 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 #endif
 
 	return files;
+}
+
+const S::Array<S::Directory> &S::Directory::GetDirectoriesByPattern(const String &pattern) const
+{
+	directories.RemoveAll();
+
+#ifdef __WIN32__
+	HANDLE		 handle;
+	WIN32_FIND_DATAW findDataW;
+	WIN32_FIND_DATAA findDataA;
+
+	if (Setup::enableUnicode) handle = FindFirstFileW(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\").Append(pattern), &findDataW);
+	else			  handle = FindFirstFileA(String(*this).Append("\\").Append(pattern), &findDataA);
+
+	Bool	 success = (handle != INVALID_HANDLE_VALUE);
+
+	while (success)
+	{
+		if (Setup::enableUnicode)
+		{
+			if ((findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataW.cFileName) != "." && String(findDataW.cFileName) != "..") directories.Add(Directory(findDataW.cFileName, *this));
+
+			success = FindNextFileW(handle, &findDataW);
+		}
+		else
+		{
+			if ((findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataA.cFileName) != "." && String(findDataA.cFileName) != "..") directories.Add(Directory(findDataA.cFileName, *this));
+
+			success = FindNextFileA(handle, &findDataA);
+		}
+	}
+
+	FindClose(handle);
+#else
+	glob_t	 fileData = { 0 };
+
+	if (glob(String(*this).Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, &fileData) == 0)
+	{
+		String	 previousInputFormat = String::SetInputFormat("UTF-8");
+
+		for (size_t i = 0; i < fileData.gl_pathc; i++)
+		{
+			if (String(fileData.gl_pathv[i]).EndsWith("/")) directories.Add(Directory(fileData.gl_pathv[i]));
+		}
+
+		String::SetInputFormat(previousInputFormat);
+
+		globfree(&fileData);
+	}
+#endif
+
+	return directories;
 }
 
 S::DateTime S::Directory::GetCreateTime() const

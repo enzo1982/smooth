@@ -180,9 +180,6 @@ Translator::Translator(const String &openFile)
 	wnd->Add(edit_filter);
 	wnd->Add(button_clear);
 
-	wnd->Add(list_entries);
-	wnd->Add(list_filtered);
-
 	wnd->Add(text_id);
 	wnd->Add(edit_id);
 	wnd->Add(text_original);
@@ -192,6 +189,9 @@ Translator::Translator(const String &openFile)
 	wnd->Add(button_save);
 	wnd->Add(button_remove);
 	wnd->Add(button_new);
+
+	wnd->Add(list_entries);
+	wnd->Add(list_filtered);
 
 	wnd->Add(title);
 	wnd->Add(menubar);
@@ -395,7 +395,7 @@ Void Translator::NewFile()
 
 	list_entries->SelectNthEntry(0);
 
-	SelectEntry(NIL);
+	SelectEntry(entries.GetFirst());
 }
 
 Void Translator::Close()
@@ -555,7 +555,7 @@ Void Translator::OpenFileName(const String &openFile)
 
 	list_entries->SelectNthEntry(0);
 
-	SelectEntry(NIL);
+	SelectEntry(entries.GetFirst());
 }
 
 Void Translator::SaveFile()

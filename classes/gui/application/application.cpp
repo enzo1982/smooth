@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,8 +30,6 @@
 #	endif
 #endif
 
-S::Bool	 S::loopActive	= S::False;
-
 const S::Short	 S::GUI::Application::classID = S::Object::RequestClassID();
 
 S::String		 S::GUI::Application::command;
@@ -54,10 +52,11 @@ S::GUI::Application::~Application()
 
 S::Int S::GUI::Application::Loop()
 {
-	if (!loopActive)
+	/* Do initialization if we are called for the first time.
+	 */
+	if (initializing)
 	{
-		initializing = false;
-		loopActive = true;
+		initializing = False;
 
 		for (Int i = 0; i < Window::GetNOfWindows(); i++)
 		{
@@ -68,9 +67,9 @@ S::Int S::GUI::Application::Loop()
 
 		/* Start waiting threads here.
 		 */
-		for (Int j = 0; j < Object::GetNOfObjects(); j++)
+		for (Int i = 0; i < Object::GetNOfObjects(); i++)
 		{
-			Object	*object = Object::GetNthObject(j);
+			Object	*object = Object::GetNthObject(i);
 
 			if (object == NIL) continue;
 
@@ -79,6 +78,8 @@ S::Int S::GUI::Application::Loop()
 		}
 	}
 
+	/* Enter main application loop.
+	 */
 	System::EventProcessor	*event = new System::EventProcessor();
 
 	while (GUI::Window::nOfActiveWindows > 0)
@@ -87,8 +88,6 @@ S::Int S::GUI::Application::Loop()
 	}
 
 	delete event;
-
-	loopActive = false;
 
 	return Success();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -225,14 +225,14 @@ S::Bool S::IO::OutStream::WriteData()
 	return true;
 }
 
-S::Bool S::IO::OutStream::OutputNumber(Long number, Int bytes)
+S::Bool S::IO::OutStream::OutputNumber(Int64 number, Int bytes)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (bytes > 4 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
-	for (int i = 0; i < bytes; i++)
+	for (Int i = 0; i < bytes; i++)
 	{
 		if (currentBufferPos >= packageSize)
 		{
@@ -253,10 +253,10 @@ S::Bool S::IO::OutStream::OutputNumber(Long number, Int bytes)
 	return true;
 }
 
-S::Bool S::IO::OutStream::OutputNumberRaw(Long number, Int bytes)
+S::Bool S::IO::OutStream::OutputNumberRaw(Int64 number, Int bytes)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (bytes > 4 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
@@ -281,7 +281,7 @@ S::Bool S::IO::OutStream::OutputNumberRaw(Long number, Int bytes)
 	return true;
 }
 
-S::Bool S::IO::OutStream::OutputNumberPDP(Long number, Int bytes)
+S::Bool S::IO::OutStream::OutputNumberPDP(Int64 number, Int bytes)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
 	if (bytes > 4 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
@@ -314,10 +314,10 @@ S::Bool S::IO::OutStream::OutputNumberPDP(Long number, Int bytes)
 	return true;
 }
 
-S::Bool S::IO::OutStream::OutputNumberPBD(Long number, Int bits)
+S::Bool S::IO::OutStream::OutputNumberPBD(Int64 number, Int bits)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (bits > 32 || bits < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (bits > 64 || bits < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
 
 	if (!pbdActive) InitPBD();
 
@@ -335,7 +335,7 @@ S::Bool S::IO::OutStream::OutputNumberPBD(Long number, Int bits)
 
 		pbdLength = pbdLength - 8;
 
-		for (int j = 0; j < pbdLength; j++) pbdBuffer[j] = pbdBuffer[j+8];
+		for (int j = 0; j < pbdLength; j++) pbdBuffer[j] = pbdBuffer[j + 8];
 
 		dataBuffer[currentBufferPos] = out;
 

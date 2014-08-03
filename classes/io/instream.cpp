@@ -210,16 +210,16 @@ S::Bool S::IO::InStream::ReadData()
 	return true;
 }
 
-S::Long S::IO::InStream::InputNumber(Int bytes)	// Intel byte order DCBA
+S::Int64 S::IO::InStream::InputNumber(Int bytes)	// Intel byte order DCBA
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
-	if (bytes > 4 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
+	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
-	long	 rval = 0;
+	Int64	 rval = 0;
 
-	for (int i = 0; i < bytes; i++)
+	for (Int i = 0; i < bytes; i++)
 	{
 		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IO_ERROR_UNKNOWN; return -1; }
 
@@ -236,16 +236,16 @@ S::Long S::IO::InStream::InputNumber(Int bytes)	// Intel byte order DCBA
 	return rval;
 }
 
-S::Long S::IO::InStream::InputNumberRaw(Int bytes)	// Raw byte order ABCD
+S::Int64 S::IO::InStream::InputNumberRaw(Int bytes)	// Raw byte order ABCD
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
-	if (bytes > 4 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
+	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
-	long	 rval = 0;
+	Int64	 rval = 0;
 
-	for (int i = bytes - 1; i >= 0; i--)
+	for (Int i = bytes - 1; i >= 0; i--)
 	{
 		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IO_ERROR_UNKNOWN; return -1; }
 
@@ -262,16 +262,16 @@ S::Long S::IO::InStream::InputNumberRaw(Int bytes)	// Raw byte order ABCD
 	return rval;
 }
 
-S::Long S::IO::InStream::InputNumberPDP(Int bytes)	// PDP byte order BADC
+S::Int64 S::IO::InStream::InputNumberPDP(Int bytes)	// PDP byte order BADC
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
 	if (bytes > 4 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
 
 	if (pbdActive && !keepPbd) CompletePBD();
 
-	long	 rval = 0;
+	Int64	 rval = 0;
 
-	for (int i = 0; i < 4; i++)
+	for (Int i = 0; i < 4; i++)
 	{
 		if (bytes >= (i ^ 1) + 1)
 		{
@@ -291,14 +291,14 @@ S::Long S::IO::InStream::InputNumberPDP(Int bytes)	// PDP byte order BADC
 	return rval;
 }
 
-S::Long S::IO::InStream::InputNumberPBD(Int bits)
+S::Int64 S::IO::InStream::InputNumberPBD(Int bits)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
-	if (bits > 32 || bits < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
+	if (bits > 64 || bits < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
 
 	if (!pbdActive) InitPBD();
 
-	long	 rval = 0;
+	Int64	 rval = 0;
 
 	while (pbdLength < bits)
 	{
@@ -309,7 +309,7 @@ S::Long S::IO::InStream::InputNumberPBD(Int bits)
 			if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 		}
 
-		for (int i = 0; i < 8; i++)
+		for (Int i = 0; i < 8; i++)
 		{
 			pbdBuffer[pbdLength] = IOGetBit(dataBuffer[currentBufferPos], i);
 			pbdLength++;
@@ -319,16 +319,16 @@ S::Long S::IO::InStream::InputNumberPBD(Int bits)
 		currentFilePos++;
 	}
 
-	for (int i = 0; i < bits; i++)
+	for (Int i = 0; i < bits; i++)
 	{
 		rval = rval | (pbdBuffer[i] << i);
 	}
 
 	pbdLength = pbdLength - bits;
 
-	for (int j = 0; j < pbdLength; j++)
+	for (Int i = 0; i < pbdLength; i++)
 	{
-		pbdBuffer[j] = pbdBuffer[j + bits];
+		pbdBuffer[i] = pbdBuffer[i + bits];
 	}
 
 	return rval;

@@ -30,6 +30,8 @@ S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 16
 
 	font.SetColor(Setup::ClientTextColor);
 
+	ComputeTextSize();
+
 	hotspot		= new Hotspot(Point(), GetSize());
 	markHotspot	= new Hotspot(Point(2, 3), Size(9, 9));
 

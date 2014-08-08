@@ -121,6 +121,9 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 						if (entryText.Find("\t") >= 0) entryText = entryText.Head(entryText.Find("\t"));
 
 						surface->SetText(entryText, frame + Point(3 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - entry->GetFont().GetScaledTextSizeY()) / 2) - 1) - Size(frame.GetHeight() + 2, 0), entry->GetFont());
+
+						if (entry->GetUnscaledTextWidth() >= GetWidth() - 22) SetTooltipText(entryText);
+						else						      SetTooltipText(NIL);
 					}
 				}
 			}
@@ -186,6 +189,9 @@ S::Void S::GUI::ComboBox::OpenListBox()
 
 		listBox->Add(entry);
 
+		if (entry->GetUnscaledTextWidth() >= listBoxSize.cx - (listBoxSize.cy < 16 * Length() ? 22 : 5)) entry->SetTooltipText(entry->GetText());
+		else												 entry->SetTooltipText(NIL);
+
 		entry->Activate();
 	}
 
@@ -206,6 +212,8 @@ S::Void S::GUI::ComboBox::CloseListBox()
 	for (Int i = 0; i < Length(); i++)
 	{
 		ListEntry	*entry = GetNthEntry(i);
+
+		entry->SetTooltipText(NIL);
 
 		entry->Hide();
 		entry->Deactivate();

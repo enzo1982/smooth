@@ -238,7 +238,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			return Break;
 
 		case WM_ACTIVATE:
-			if (LOWORD(wParam) == WA_INACTIVE)
+			if (LOWORD(wParam) == WA_INACTIVE && IsWindowEnabled(hwnd))
 			{
 				const WindowGDI	*backend = WindowGDI::GetWindowBackend((HWND) lParam);
 
@@ -256,7 +256,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			return Break;
 
 		case WM_ACTIVATEAPP:
-			if (wParam == True && !IsWindowEnabled(hwnd))
+			if (wParam == True && GetForegroundWindow() == hwnd && !IsWindowEnabled(hwnd))
 			{
 				/* If disabled, activate the next modal window.
 				 */

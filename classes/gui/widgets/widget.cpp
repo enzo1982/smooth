@@ -667,19 +667,11 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				{
 					if ((focusWnd->GetObjectType() == ToolWindow::classID && focusWnd->GetOrder() >= window->GetOrder()) || focusWnd == window) break;
 				}
-			}
 
-			/* Fall through to WM_ACTIVATEAPP on Windows.
-			 */
-#ifdef __WIN32__
-		case WM_ACTIVATEAPP:
-			if (focussed)
-			{
 				focussed = False;
 
 				onLoseFocus.Emit();
 			}
-#endif
 
 			break;
 	}

@@ -34,6 +34,7 @@ S::GUI::ListBoxHeader::ListBoxHeader(const Point &iPos, const Size &iSize) : Wid
 	dragHotspot->onMouseDragStart.Connect(&ListBoxHeader::OnMouseDragStart, this);
 	dragHotspot->onMouseDrag.Connect(&ListBoxHeader::OnMouseDrag, this);
 	dragHotspot->onMouseDragEnd.Connect(&ListBoxHeader::OnMouseDragEnd, this);
+	dragHotspot->onLeftButtonClick.Connect(&ListBoxHeader::OnLeftButtonClick, this);
 
 	Add(dragHotspot);
 
@@ -230,6 +231,23 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 	}
 
 	return Widget::Process(message, wParam, lParam);
+}
+
+S::Void S::GUI::ListBoxHeader::OnLeftButtonClick(const Point &mousePos)
+{
+	if (draggingTab) return;
+
+	Point	 realPos = GetRealPosition();
+
+	for (Int n = 0; n < GetNOfTabs(); n++)
+	{
+		if (mousePos.x - realPos.x >= GetNthTabOffset(n) && mousePos.x - realPos.x < GetNthTabOffset(n) + GetNthTabWidth(n))
+		{
+			onClickTab.Emit(n);
+
+			break;
+		}
+	}
 }
 
 S::Void S::GUI::ListBoxHeader::OnMouseDragStart(const Point &mousePos)

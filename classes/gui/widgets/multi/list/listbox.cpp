@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,6 +42,7 @@ S::GUI::ListBox::ListBox(const Point &iPos, const Size &iSize)
 	scrollbar->Hide();
 
 	header = new ListBoxHeader(Point(1, 1), Size(GetWidth() - 2, 16));
+	header->onClickTab.Connect(&onClickTab);
 	header->Hide();
 
 	Add(scrollbar);

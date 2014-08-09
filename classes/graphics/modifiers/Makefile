@@ -4,7 +4,7 @@
 SMOOTH_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = fontsize.o righttoleft.o
+OBJECTS	  = fontsize.o righttoleft.o upsidedown.o
 
 ## Do not change anything below this line. ##
 

@@ -85,8 +85,6 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	- (void)	drawRect:	   (NSRect) rect;
 
-	- (BOOL)	isFlipped;
-
 	- (BOOL)	acceptsFirstResponder;
 
 	/* NSTextInputClient methods.
@@ -225,20 +223,15 @@ const int	 NSApplicationDropFiles	 = 9;
 
 			[NSGraphicsContext saveGraphicsState];
 
-			[[NSBezierPath bezierPathWithRect: NSMakeRect(cursor->GetRealPosition().x, cursor->GetRealPosition().y, cursor->GetRealSize().cx, cursor->GetRealSize().cy)] addClip];
+			[[NSBezierPath bezierPathWithRect: NSMakeRect(cursor->GetRealPosition().x, [self frame].size.height - cursor->GetRealPosition().y - cursor->GetRealSize().cy, cursor->GetRealSize().cx, cursor->GetRealSize().cy)] addClip];
 
 			NSAttributedString	*range = [editString attributedSubstringFromRange: markedRange];
 
 			[range drawAtPoint: NSMakePoint(cursorPosition.x - 1,
-							cursorPosition.y + 1 + cursor->GetFont().GetScaledTextSizeY() - [range size].height)];
+							[self frame].size.height - cursorPosition.y - 1 - cursor->GetFont().GetScaledTextSizeY())];
 
 			[NSGraphicsContext restoreGraphicsState];
 		}
-	}
-
-	- (BOOL) isFlipped
-	{
-		return YES;
 	}
 
 	- (BOOL) acceptsFirstResponder
@@ -356,7 +349,7 @@ const int	 NSApplicationDropFiles	 = 9;
 
 		NSRect	 rect = NSMakeRect(0, 0, 0, 0);
 
-		if (cursor != NIL) rect = NSMakeRect(cursorPosition.x, cursorPosition.y + cursor->GetFont().GetScaledTextSizeY(), 0, 0);
+		if (cursor != NIL) rect = NSMakeRect(cursorPosition.x, [self frame].size.height - cursorPosition.y - cursor->GetFont().GetScaledTextSizeY(), 0, 0);
 
 		rect	    = [self convertRectToBase: rect];
 		rect.origin = [[self window] convertBaseToScreen: rect.origin];

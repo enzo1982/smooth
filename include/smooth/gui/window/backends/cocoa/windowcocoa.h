@@ -47,9 +47,6 @@ namespace smooth
 
 				Float					 fontSize;
 
-				Point					 pos;
-				Size					 size;
-
 				Size					 minSize;
 				Size					 maxSize;
 

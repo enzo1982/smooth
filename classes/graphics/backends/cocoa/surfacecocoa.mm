@@ -47,6 +47,7 @@ S::GUI::SurfaceCocoa::SurfaceCocoa(Void *iWindow, const Size &maxSize)
 		}
 
 		rightToLeft.SetSurfaceSize(size);
+		upsideDown.SetSurfaceSize(size);
 
 		paintBitmap = [[NSImage alloc] initWithSize: NSMakeSize(size.cx, size.cy)];
 
@@ -75,6 +76,7 @@ S::Int S::GUI::SurfaceCocoa::SetSize(const Size &nSize)
 	size = nSize;
 
 	rightToLeft.SetSurfaceSize(size);
+	upsideDown.SetSurfaceSize(size);
 
 	if (allocSize.cx >= nSize.cx && allocSize.cy >= nSize.cy) return Success();
 
@@ -124,7 +126,7 @@ S::Int S::GUI::SurfaceCocoa::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
+	Rect	 pRect = Rect::OverlapRect(upsideDown.TranslateRect(rightToLeft.TranslateRect(iPRect)), *(paintRects.GetLast()));
 
 	if (painting == 0) [paintBitmap lockFocus];
 
@@ -188,7 +190,7 @@ S::Int S::GUI::SurfaceCocoa::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL) return Success();
 
-	Point	 point = rightToLeft.TranslatePoint(iPoint);
+	Point	 point = upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPoint));
 
 	if (!painting && [window isVisible])
 	{
@@ -228,24 +230,23 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 {
 	if (window == NIL) return Success();
 
-	Point	 pos1 = rightToLeft.TranslatePoint(iPos1);
-	Point	 pos2 = rightToLeft.TranslatePoint(iPos2);
+	Point	 pos1 = upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos1));
+	Point	 pos2 = upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos2));
 
 	/* Adjust to Windows GDI behavior for diagonal lines.
 	 */
 	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y))
 	{
-		if (pos1.x < pos2.x && pos1.y < pos2.y) { pos1.x++; pos1.y++; }
-		if (pos1.x > pos2.x && pos1.y < pos2.y) { pos1.x--; pos1.y++; }
-		if (pos1.x < pos2.x && pos1.y > pos2.y) { pos2.x--; pos2.y++; }
-		if (pos1.x > pos2.x && pos1.y > pos2.y) { pos2.x++; pos2.y++; }
+		if (pos1.x < pos2.x && pos1.y < pos2.y) { pos2.x--; pos2.y--; }
+		if (pos1.x > pos2.x && pos1.y < pos2.y) { pos2.x++; pos2.y--; }
+		if (pos1.x < pos2.x && pos1.y > pos2.y) { pos1.x++; pos1.y--; }
+		if (pos1.x > pos2.x && pos1.y > pos2.y) { pos1.x--; pos1.y--; }
 	}
 
 	/* Adjust to Windows GDI behaviour for horizontal and vertical lines.
 	 */
-	if (pos1.y == pos2.y) { pos1.y++; pos2.y++; }
-	if (pos1.x >  pos2.x) { pos1.x++; pos2.x++; }
-	if (pos1.y >  pos2.y) { pos1.y++; pos2.y++; }
+	if (pos1.x > pos2.x) { pos1.x++; pos2.x++; }
+	if (pos1.y > pos2.y) { pos1.y++; pos2.y++; }
 
 	if (!painting && [window isVisible])
 	{
@@ -271,22 +272,6 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 
 		[window flushWindow];
 	}
-
-	pos1 = rightToLeft.TranslatePoint(iPos1);
-	pos2 = rightToLeft.TranslatePoint(iPos2);
-
-	/* Adjust to Windows GDI behavior for diagonal lines.
-	 */
-	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y))
-	{
-		if (pos1.x < pos2.x && pos1.y < pos2.y) { pos2.x--; pos2.y--; }
-		if (pos1.x > pos2.x && pos1.y < pos2.y) { pos2.x++; pos2.y--; }
-	}
-
-	/* Adjust to Windows GDI behaviour for horizontal and vertical lines.
-	 */
-	if (pos1.x >  pos2.x) { pos1.x++; pos2.x++; }
-	if (pos1.y >  pos2.y) { pos1.y++; pos2.y++; }
 
 	if (!painting) [paintBitmap lockFocus];
 
@@ -315,7 +300,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 {
 	if (window == NIL) return Success();
 
-	Rect	 rect = rightToLeft.TranslateRect(iRect);
+	Rect	 rect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iRect));
 
 	if (style & Rect::Filled)
 	{
@@ -395,7 +380,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 						    blue: color.GetBlue()  / 255.0
 						   alpha: 1.0] set];
 
-			[NSBezierPath strokeRect: NSMakeRect(rect.left, rect.top + 1, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
+			[NSBezierPath strokeRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
 
 			[[window contentView] unlockFocus];
 
@@ -438,7 +423,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 						    blue: color.GetBlue()  / 255.0
 						   alpha: 1.0] set];
 
-			NSBezierPath	*path	    = [NSBezierPath bezierPathWithRect: NSMakeRect(rect.left, rect.top + 1, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
+			NSBezierPath	*path	    = [NSBezierPath bezierPathWithRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
 			CGFloat		 pattern[2] = { 1.0, 1.0 };
 
 			[path setLineDash: pattern count: 2 phase: 1];
@@ -501,7 +486,7 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 	 */
 	if (!painting && [window isVisible])
 	{
-		Rect	 tRect = rightToLeft.TranslateRect(rect);
+		Rect	 tRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(rect));
 
 		[[window contentView] lockFocus];
 
@@ -513,13 +498,14 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 		foreach (const String &line, lines)
 		{
-			tRect	   = rightToLeft.TranslateRect(rect);
+			tRect	   = upsideDown.TranslateRect(rightToLeft.TranslateRect(rect));
 			tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
+			tRect.top  = tRect.bottom - lineHeight + 1;
 
 			NSAttributedString	*string	= [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: (line == NIL ? "" : line.ConvertTo("UTF-8"))]
 											  attributes: attributes];
 
-			[string drawAtPoint: NSMakePoint(tRect.left, tRect.top - 1)];
+			[string drawAtPoint: NSMakePoint(tRect.left, tRect.top)];
 
 			[string release];
 
@@ -537,7 +523,7 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 	 */
 	rect = iRect;
 
-	Rect	 tRect = rightToLeft.TranslateRect(rect);
+	Rect	 tRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(rect));
 
 	if (!painting) [paintBitmap lockFocus];
 
@@ -549,19 +535,14 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 	foreach (const String &line, lines)
 	{
-		tRect	   = rightToLeft.TranslateRect(rect);
+		tRect	   = upsideDown.TranslateRect(rightToLeft.TranslateRect(rect));
 		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
+		tRect.top  = tRect.bottom - lineHeight + 1;
 
 		NSAttributedString	*string	   = [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: (line == NIL ? "" : line.ConvertTo("UTF-8"))]
 										     attributes: attributes];
-		NSAffineTransform	*transform = [NSAffineTransform transform];
 
-		[transform scaleXBy:	 1.0 yBy: -1.0];
-		[transform translateXBy: 0.0 yBy: -2.0 * tRect.top - lineHeight];
-
-		[transform set];
-
-		[string drawAtPoint: NSMakePoint(tRect.left, tRect.top + 1)];
+		[string drawAtPoint: NSMakePoint(tRect.left, tRect.top)];
 
 		[string release];
 
@@ -583,7 +564,7 @@ S::Int S::GUI::SurfaceCocoa::Gradient(const Rect &iRect, const Color &color1, co
 {
 	if (window == NIL) return Success();
 
-	Rect	 rect = rightToLeft.TranslateRect(iRect);
+	Rect	 rect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iRect));
 
 	if (!painting && [window isVisible])
 	{
@@ -638,7 +619,7 @@ S::Int S::GUI::SurfaceCocoa::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
-	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
+	Rect	 destRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iDestRect));
 
 	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
 	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
@@ -687,7 +668,7 @@ S::Int S::GUI::SurfaceCocoa::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	if (window == NIL) return Success();
 	if (bitmap == NIL) return Error();
 
-	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
+	Rect	 srcRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iSrcRect));
 
 	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
 	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();

@@ -51,11 +51,7 @@ S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 				    (((flags & SC_CMD)   && Input::Keyboard::GetKeyState(Input::Keyboard::KeyCommand)) || (!(flags & SC_CMD)   && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyCommand))) &&
 				    (((flags & SC_SHIFT) && Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))   || (!(flags & SC_SHIFT) && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift))))
 				{
-					EnterProtectedRegion();
-
 					onKeyDown.Emit(param);
-
-					LeaveProtectedRegion();
 
 					retVal = Break;
 				}

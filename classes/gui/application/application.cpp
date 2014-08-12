@@ -80,14 +80,12 @@ S::Int S::GUI::Application::Loop()
 
 	/* Enter main application loop.
 	 */
-	System::EventProcessor	*event = new System::EventProcessor();
+	System::EventProcessor	 event;
 
 	while (GUI::Window::nOfActiveWindows > 0)
 	{
-		if (event->ProcessNextEvent() == Break) break;
+		if (event.ProcessNextEvent() == Break) break;
 	}
-
-	delete event;
 
 	return Success();
 }

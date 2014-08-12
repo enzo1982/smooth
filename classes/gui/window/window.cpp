@@ -444,11 +444,11 @@ S::Int S::GUI::Window::Stay()
 
 	stay = True;
 
-	System::EventProcessor	*event = new System::EventProcessor();
+	/* Wait here until window is closed.
+	 */
+	System::EventProcessor	 event;
 
-	while (!destroyed) event->ProcessNextEvent();
-
-	delete event;
+	while (!destroyed) event.ProcessNextEvent();
 
 	return Success();
 }

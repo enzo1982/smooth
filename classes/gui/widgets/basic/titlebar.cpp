@@ -68,7 +68,9 @@ S::GUI::Titlebar::Titlebar(Int buttons) : Widget(Point(), Size(0, 19))
 	closeShortcut	= new Shortcut(0, Input::Keyboard::KeyEscape);
 	closeShortcut->onKeyDown.Connect(&Titlebar::OnCloseButtonClick, this);
 
-	if (Binary::IsFlagSet(flags, TB_CLOSEBUTTON)) Add(closeShortcut);
+	if ( Binary::IsFlagSet(flags, TB_CLOSEBUTTON) &&
+	    !Binary::IsFlagSet(flags, TB_MINBUTTON)   &&
+	    !Binary::IsFlagSet(flags, TB_MAXBUTTON)) Add(closeShortcut);
 #else
 	SetHeight(0);
 #endif

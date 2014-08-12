@@ -146,11 +146,26 @@ S::Void S::GUI::Tooltip::OnToolWindowEvent(Int message, Int wParam, Int lParam)
 
 	switch (message)
 	{
+		/* Forward mouse wheel messages posted to
+		 * the tool window to our parent window.
+		 */
 		case SM_MOUSEWHEEL:
-			/* Forward mouse wheel messages posted to
-			 * the tool window to our parent window.
-			 */
 			window->Process(message, wParam, lParam);
+
+			break;
+
+		/* Pass on keyboard events as well and hide
+		 * the tooltip immediately after char events.
+		 */
+		case SM_KEYDOWN:
+		case SM_KEYUP:
+			window->Process(message, wParam, lParam);
+
+			break;
+		case SM_CHAR:
+			window->Process(message, wParam, lParam);
+
+			Hide();
 
 			break;
 	}

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -52,7 +52,7 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText, Bool scaled) co
 #ifdef __WIN32__
 	Bool	 rtlCharacters = False;
 
-	for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x07BF) { rtlCharacters = True; break; }
+	for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x08FF) { rtlCharacters = True; break; }
 
 	if (rtlCharacters && Setup::useIconv)
 	{

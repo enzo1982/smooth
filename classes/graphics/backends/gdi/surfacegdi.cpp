@@ -353,7 +353,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	{
 		Bool	 rtlCharacters = False;
 
-		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
+		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 
 		Rect	 tRect = rightToLeft.TranslateRect(rect);
 		RECT	 wRect = { tRect.left, tRect.top, tRect.right, tRect.bottom };

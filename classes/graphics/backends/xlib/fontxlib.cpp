@@ -42,7 +42,7 @@ S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &iText, Bool scaled) con
 
 	Bool	 rtlCharacters = False;
 
-	for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x07BF) { rtlCharacters = True; break; }
+	for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x08FF) { rtlCharacters = True; break; }
 
 	if (rtlCharacters && Setup::useIconv)
 	{

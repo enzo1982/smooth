@@ -1520,7 +1520,7 @@ S::Bool S::GUI::Cursor::ContainsRTLCharacters(const String &line) const
 	{
 		for (Int i = 0; i < length; i++)
 		{
-			if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
+			if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 		}
 	}
 

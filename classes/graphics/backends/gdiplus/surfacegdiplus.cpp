@@ -379,7 +379,7 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 	{
 		Bool	 rtlCharacters = False;
 
-		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x07BF) { rtlCharacters = True; break; }
+		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 
 		Rect		 tRect = rightToLeft.TranslateRect(rect);
 		Gdiplus::RectF	 gdip_rect(tRect.left, tRect.top, tRect.right - tRect.left + 2, tRect.bottom - tRect.top);

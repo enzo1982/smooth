@@ -50,12 +50,6 @@ static const char *smooth_el =
 											\
 	     <entry string=\"Color selection\">Επιλέξτε χρώμα</entry>			\
 	     <entry string=\"HTML code\">HTML κώδικα</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">Συμβουλή της ημέρας</entry>		\
 	     <entry string=\"Did you know...\">Ξέρατε...</entry>			\

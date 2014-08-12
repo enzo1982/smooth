@@ -64,12 +64,6 @@ static const char *smooth_hi =
 										\
 	     <entry string=\"Color selection\">रंग चुनें</entry>			\
 	     <entry string=\"HTML code\">HTML कोड</entry>			\
-	     <entry string=\"R\">R</entry>					\
-	     <entry string=\"G\">G</entry>					\
-	     <entry string=\"B\">B</entry>					\
-	     <entry string=\"H\">H</entry>					\
-	     <entry string=\"S\">S</entry>					\
-	     <entry string=\"V\">V</entry>					\
 										\
 	     <entry string=\"Tip of the day\">आज का नुस्ख़ा</entry>		\
 	     <entry string=\"Did you know...\">क्या आप जानते हैं...</entry>		\

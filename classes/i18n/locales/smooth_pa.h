@@ -50,12 +50,6 @@ static const char *smooth_pa =
 										\
 	     <entry string=\"Color selection\">ਰੰਗ ਚੁਣ</entry>			\
 	     <entry string=\"HTML code\">HTML code</entry>			\
-	     <entry string=\"R\">R</entry>					\
-	     <entry string=\"G\">G</entry>					\
-	     <entry string=\"B\">B</entry>					\
-	     <entry string=\"H\">H</entry>					\
-	     <entry string=\"S\">S</entry>					\
-	     <entry string=\"V\">V</entry>					\
 										\
 	     <entry string=\"Tip of the day\">ਅੱਜ ਦਾ ਸੁਝਾਅ</entry>		\
 	     <entry string=\"Did you know...\">ਕੀ ਤੁਸੀਂ ਜਾਣਦੇ ਹੋ...</entry>		\

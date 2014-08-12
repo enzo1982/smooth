@@ -45,12 +45,6 @@ static const char *smooth_af =
 												\
 	     <entry string=\"Color selection\">Kies kleur</entry>				\
 	     <entry string=\"HTML code\">HTML-kode</entry>					\
-	     <entry string=\"R\">R</entry>							\
-	     <entry string=\"G\">G</entry>							\
-	     <entry string=\"B\">B</entry>							\
-	     <entry string=\"H\">H</entry>							\
-	     <entry string=\"S\">S</entry>							\
-	     <entry string=\"V\">V</entry>							\
 												\
 	     <entry string=\"Tip of the day\">Leidraad van die dag</entry>			\
 	     <entry string=\"Did you know...\">Het jy geweet...</entry>				\

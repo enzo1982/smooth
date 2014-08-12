@@ -50,12 +50,6 @@ static const char *smooth_ms =
 											\
 	     <entry string=\"Color selection\">Pilih warna</entry>			\
 	     <entry string=\"HTML code\">Kod HTML</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">Petua hari ini</entry>			\
 	     <entry string=\"Did you know...\">Adakah anda tahu...</entry>		\

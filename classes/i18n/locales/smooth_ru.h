@@ -50,12 +50,6 @@ static const char *smooth_ru =
 											\
 	     <entry string=\"Color selection\">Выбор цвета</entry>			\
 	     <entry string=\"HTML code\">код HTML</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">Совет дня</entry>				\
 	     <entry string=\"Did you know...\">Знаете ли вы ...</entry>			\

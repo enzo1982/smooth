@@ -51,12 +51,6 @@ static const char *smooth_cs =
 											\
 	     <entry string=\"Color selection\">Vyberte barvu</entry>			\
 	     <entry string=\"HTML code\">HTML kód</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">Tip dne</entry>				\
 	     <entry string=\"Did you know...\">Věděli jste...</entry>			\

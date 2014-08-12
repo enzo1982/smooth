@@ -47,12 +47,6 @@ static const char *smooth_ko =
 										\
 	     <entry string=\"Color selection\">색 선택</entry>			\
 	     <entry string=\"HTML code\">HTML 코드</entry>			\
-	     <entry string=\"R\">R</entry>					\
-	     <entry string=\"G\">G</entry>					\
-	     <entry string=\"B\">B</entry>					\
-	     <entry string=\"H\">H</entry>					\
-	     <entry string=\"S\">S</entry>					\
-	     <entry string=\"V\">V</entry>					\
 										\
 	     <entry string=\"Tip of the day\">오늘의 팁</entry>			\
 	     <entry string=\"Did you know...\">알고 계십니까...</entry>		\

@@ -45,12 +45,6 @@ static const char *smooth_zh_TW =
 											\
 	     <entry string=\"Color selection\">選擇顏色</entry>				\
 	     <entry string=\"HTML code\">HTML代碼</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">每日小祕訣</entry>				\
 	     <entry string=\"Did you know...\">您知道嗎...</entry>			\

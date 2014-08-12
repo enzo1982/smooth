@@ -64,12 +64,6 @@ static const char *smooth_es =
 												\
 	     <entry string=\"Color selection\">Seleccione un color</entry>			\
 	     <entry string=\"HTML code\">Código HTML</entry>					\
-	     <entry string=\"R\">R</entry>							\
-	     <entry string=\"G\">G</entry>							\
-	     <entry string=\"B\">B</entry>							\
-	     <entry string=\"H\">H</entry>							\
-	     <entry string=\"S\">S</entry>							\
-	     <entry string=\"V\">V</entry>							\
 												\
 	     <entry string=\"Tip of the day\">Sugerencia del día</entry>			\
 	     <entry string=\"Did you know...\">Sabía...</entry>					\

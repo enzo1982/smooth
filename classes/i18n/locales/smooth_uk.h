@@ -51,12 +51,6 @@ static const char *smooth_uk =
 											\
 	     <entry string=\"Color selection\">Виберіть колір</entry>			\
 	     <entry string=\"HTML code\">HTML код</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">Порада дня</entry>			\
 	     <entry string=\"Did you know...\">Чи знаєте ви, що...</entry>		\

@@ -64,9 +64,6 @@ static const char *smooth_de =
 											\
 	     <entry string=\"Color selection\">Farbauswahl</entry>			\
 	     <entry string=\"HTML code\">HTML-Code</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
 	     <entry string=\"H\">F</entry>						\
 	     <entry string=\"S\">S</entry>						\
 	     <entry string=\"V\">H</entry>						\

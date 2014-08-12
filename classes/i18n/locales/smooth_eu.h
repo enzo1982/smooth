@@ -64,12 +64,6 @@ static const char *smooth_eu =
 										\
 	     <entry string=\"Color selection\">Hautatu kolorea</entry>		\
 	     <entry string=\"HTML code\">HTML kode</entry>			\
-	     <entry string=\"R\">R</entry>					\
-	     <entry string=\"G\">G</entry>					\
-	     <entry string=\"B\">B</entry>					\
-	     <entry string=\"H\">H</entry>					\
-	     <entry string=\"S\">S</entry>					\
-	     <entry string=\"V\">V</entry>					\
 										\
 	     <entry string=\"Tip of the day\">Eguneko aholkua</entry>		\
 	     <entry string=\"Did you know...\">Bazenekien...</entry>		\

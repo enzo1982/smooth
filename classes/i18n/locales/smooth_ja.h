@@ -50,12 +50,6 @@ static const char *smooth_ja =
 										\
 	     <entry string=\"Color selection\">カラー選択</entry>			\
 	     <entry string=\"HTML code\">HTMLコード</entry>			\
-	     <entry string=\"R\">R</entry>					\
-	     <entry string=\"G\">G</entry>					\
-	     <entry string=\"B\">B</entry>					\
-	     <entry string=\"H\">H</entry>					\
-	     <entry string=\"S\">S</entry>					\
-	     <entry string=\"V\">V</entry>					\
 										\
 	     <entry string=\"Tip of the day\">今日のヒント</entry>			\
 	     <entry string=\"Did you know...\">ご存知ですか...</entry>		\

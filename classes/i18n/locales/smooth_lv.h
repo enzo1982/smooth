@@ -54,12 +54,6 @@ static const char *smooth_lv =
 											\
 	     <entry string=\"Color selection\">Izvēlieties krāsu</entry>		\
 	     <entry string=\"HTML code\">HTML kods</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">Dienas padoms</entry>			\
 	     <entry string=\"Did you know...\">Vai jūs zināt...</entry>			\

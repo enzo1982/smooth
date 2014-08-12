@@ -58,12 +58,6 @@ static const char *smooth_gl =
 												\
 	     <entry string=\"Color selection\">Escoller unha cor</entry>			\
 	     <entry string=\"HTML code\">Código HTML</entry>					\
-	     <entry string=\"R\">R</entry>							\
-	     <entry string=\"G\">G</entry>							\
-	     <entry string=\"B\">B</entry>							\
-	     <entry string=\"H\">H</entry>							\
-	     <entry string=\"S\">S</entry>							\
-	     <entry string=\"V\">V</entry>							\
 												\
 	     <entry string=\"Tip of the day\">Consello do día</entry>				\
 	     <entry string=\"Did you know...\">Sabía que...</entry>				\

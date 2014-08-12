@@ -51,12 +51,6 @@ static const char *smooth_nl =
 												\
 	     <entry string=\"Color selection\">Kleur selecteren</entry>				\
 	     <entry string=\"HTML code\">HTML-code</entry>					\
-	     <entry string=\"R\">R</entry>							\
-	     <entry string=\"G\">G</entry>							\
-	     <entry string=\"B\">B</entry>							\
-	     <entry string=\"H\">H</entry>							\
-	     <entry string=\"S\">S</entry>							\
-	     <entry string=\"V\">V</entry>							\
 												\
 	     <entry string=\"Tip of the day\">Tip van de dag</entry>				\
 	     <entry string=\"Did you know...\">Wist u dat...</entry>				\

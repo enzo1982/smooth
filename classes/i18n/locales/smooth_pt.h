@@ -51,12 +51,6 @@ static const char *smooth_pt =
 											\
 	     <entry string=\"Color selection\">Seleccionar a cor</entry>		\
 	     <entry string=\"HTML code\">Código HTML</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">Dica do dia</entry>			\
 	     <entry string=\"Did you know...\">Sabia que...</entry>			\

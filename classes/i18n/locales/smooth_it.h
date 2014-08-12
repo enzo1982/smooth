@@ -64,12 +64,6 @@ static const char *smooth_it =
 												\
 	     <entry string=\"Color selection\">Selezione colore</entry>				\
 	     <entry string=\"HTML code\">Codice HTML</entry>					\
-	     <entry string=\"R\">R</entry>							\
-	     <entry string=\"G\">G</entry>							\
-	     <entry string=\"B\">B</entry>							\
-	     <entry string=\"H\">H</entry>							\
-	     <entry string=\"S\">S</entry>							\
-	     <entry string=\"V\">V</entry>							\
 												\
 	     <entry string=\"Tip of the day\">Suggerimenti</entry>				\
 	     <entry string=\"Did you know...\">Non tutti sanno che...</entry>			\

@@ -51,12 +51,6 @@ static const char *smooth_sk =
 											\
 	     <entry string=\"Color selection\">Vybrať farbu</entry>			\
 	     <entry string=\"HTML code\">HTML kód</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">Tip dňa</entry>				\
 	     <entry string=\"Did you know...\">Viete, že...</entry>			\

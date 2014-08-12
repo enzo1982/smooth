@@ -47,12 +47,6 @@ static const char *smooth_zh_CN =
 											\
 	     <entry string=\"Color selection\">选择颜色</entry>				\
 	     <entry string=\"HTML code\">HTML 代码</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">今日提示</entry>				\
 	     <entry string=\"Did you know...\">你知道吗 ...</entry>			\

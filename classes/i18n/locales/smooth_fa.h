@@ -64,12 +64,6 @@ static const char *smooth_fa =
 											\
 	     <entry string=\"Color selection\">برگزیدن رنگ</entry>			\
 	     <entry string=\"HTML code\">کد اچ</entry>					\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">نکتۀ روز</entry>				\
 	     <entry string=\"Did you know...\">آیا می‌دانید...</entry>			\

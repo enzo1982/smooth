@@ -64,12 +64,6 @@ static const char *smooth_vi =
 										\
 	     <entry string=\"Color selection\">Chọn màu</entry>			\
 	     <entry string=\"HTML code\">Mã HTML</entry>			\
-	     <entry string=\"R\">R</entry>					\
-	     <entry string=\"G\">G</entry>					\
-	     <entry string=\"B\">B</entry>					\
-	     <entry string=\"H\">H</entry>					\
-	     <entry string=\"S\">S</entry>					\
-	     <entry string=\"V\">V</entry>					\
 										\
 	     <entry string=\"Tip of the day\">Thủ thuật cho bạn</entry>		\
 	     <entry string=\"Did you know...\">Bạn có biết ...</entry>		\

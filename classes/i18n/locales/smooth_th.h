@@ -51,12 +51,6 @@ static const char *smooth_th =
 										\
 	     <entry string=\"Color selection\">เลือกสี</entry>			\
 	     <entry string=\"HTML code\">รหัส HTML</entry>			\
-	     <entry string=\"R\">R</entry>					\
-	     <entry string=\"G\">G</entry>					\
-	     <entry string=\"B\">B</entry>					\
-	     <entry string=\"H\">H</entry>					\
-	     <entry string=\"S\">S</entry>					\
-	     <entry string=\"V\">V</entry>					\
 										\
 	     <entry string=\"Tip of the day\">เคล็ดลับประจำวัน</entry>		\
 	     <entry string=\"Did you know...\">คุณทราบหรือไม่ว่า...</entry>		\

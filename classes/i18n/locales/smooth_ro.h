@@ -51,12 +51,6 @@ static const char *smooth_ro =
 												\
 	     <entry string=\"Color selection\">Selectare culoare</entry>			\
 	     <entry string=\"HTML code\">Codul HTML</entry>					\
-	     <entry string=\"R\">R</entry>							\
-	     <entry string=\"G\">G</entry>							\
-	     <entry string=\"B\">B</entry>							\
-	     <entry string=\"H\">H</entry>							\
-	     <entry string=\"S\">S</entry>							\
-	     <entry string=\"V\">V</entry>							\
 												\
 	     <entry string=\"Tip of the day\">Sfatul zilei</entry>				\
 	     <entry string=\"Did you know...\">Știați că...</entry>				\

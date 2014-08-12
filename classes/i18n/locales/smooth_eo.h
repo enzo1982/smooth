@@ -64,12 +64,6 @@ static const char *smooth_eo =
 											\
 	     <entry string=\"Color selection\">Elekti koloron</entry>			\
 	     <entry string=\"HTML code\">HTML-kodo</entry>				\
-	     <entry string=\"R\">R</entry>						\
-	     <entry string=\"G\">G</entry>						\
-	     <entry string=\"B\">B</entry>						\
-	     <entry string=\"H\">H</entry>						\
-	     <entry string=\"S\">S</entry>						\
-	     <entry string=\"V\">V</entry>						\
 											\
 	     <entry string=\"Tip of the day\">Konsileto de la tago</entry>		\
 	     <entry string=\"Did you know...\">Ĉu vi sciis...</entry>			\

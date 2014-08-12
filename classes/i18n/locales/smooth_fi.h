@@ -52,12 +52,6 @@ static const char *smooth_fi =
 												\
 	     <entry string=\"Color selection\">Valitse väri</entry>				\
 	     <entry string=\"HTML code\">HTML-koodi</entry>					\
-	     <entry string=\"R\">R</entry>							\
-	     <entry string=\"G\">G</entry>							\
-	     <entry string=\"B\">B</entry>							\
-	     <entry string=\"H\">H</entry>							\
-	     <entry string=\"S\">S</entry>							\
-	     <entry string=\"V\">V</entry>							\
 												\
 	     <entry string=\"Tip of the day\">Päivän vihje</entry>				\
 	     <entry string=\"Did you know...\">Tiesitkö...</entry>				\

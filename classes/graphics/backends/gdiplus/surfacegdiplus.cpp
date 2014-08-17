@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <gdiplus.h>
 
+#include <smooth/backends/win32/backendwin32.h>
 #include <smooth/graphics/backends/gdiplus/surfacegdiplus.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
@@ -344,18 +345,27 @@ S::Int S::GUI::SurfaceGDIPlus::Box(const Rect &iRect, const Color &color, Int st
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, const Font &font, Bool shadow)
+S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, const Font &iFont, Bool shadow)
 {
-	if (window == NIL)	return Success();
+	if (window == NIL) return Success();
 
-	if (string == NIL)	return Error();
-	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
+	if (string == NIL) return Error();
+	if (shadow)	   return SurfaceBackend::SetText(string, iRect, iFont, shadow);
 
-	Rect			 rect	    = iRect;
-	Int			 lineHeight = font.GetScaledTextSizeY() + 3;
+	Font	 font	    = iFont;
+	Rect	 rect	    = iRect;
+	Int	 lineHeight = font.GetScaledTextSizeY() + 3;
+	Color	 color	    = font.GetColor();
 
-	Color			 color = font.GetColor();
+	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
+	 */
+	if (font.GetName() == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
+	{
+		for (Int i = 0; i < string.Length(); i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
+	}
 
+	/* Set up GDI+ font.
+	 */
 	Gdiplus::Font		 gdip_font(font.GetName(), fontSize.TranslateY(font.GetSize()), (font.GetWeight() >= Font::Bold    ? Gdiplus::FontStyleBold	 : Gdiplus::FontStyleRegular) |
 												(font.GetStyle() & Font::Italic    ? Gdiplus::FontStyleItalic    : Gdiplus::FontStyleRegular) |
 												(font.GetStyle() & Font::Underline ? Gdiplus::FontStyleUnderline : Gdiplus::FontStyleRegular) |
@@ -373,10 +383,14 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 		pGraphics = new Gdiplus::Graphics(gdi_dc);
 	}
 
+	/* Draw text line by line.
+	 */
 	const Array<String>	&lines = string.Explode("\n");
 
 	foreach (const String &line, lines)
 	{
+		/* Check for right to left characters in text.
+		 */
 		Bool	 rtlCharacters = False;
 
 		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }

@@ -17,6 +17,8 @@
 #include <smooth/foreach.h>
 
 #ifdef __WIN32__
+#	include <smooth/backends/win32/backendwin32.h>
+
 #	include <cairo/cairo-win32.h>
 #	include <fribidi.h>
 #else
@@ -541,16 +543,28 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 	return Success();
 }
 
-S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, const Font &font, Bool shadow)
+S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, const Font &iFont, Bool shadow)
 {
-	if (window == NIL)	return Success();
+	if (window == NIL) return Success();
 
-	if (string == NIL)	return Error();
-	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
+	if (string == NIL) return Error();
+	if (shadow)	   return SurfaceBackend::SetText(string, iRect, iFont, shadow);
 
+	Font	 font	    = iFont;
 	Rect	 rect	    = iRect;
 	Int	 lineHeight = font.GetScaledTextSizeY() + 3;
 
+#ifdef __WIN32__
+	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
+	 */
+	if (font.GetName() == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
+	{
+		for (Int i = 0; i < string.Length(); i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
+	}
+#endif
+
+	/* Draw text line by line.
+	 */
 	const Array<String>	&lines = string.Explode("\n");
 
 #ifdef __WIN32__
@@ -564,6 +578,8 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
 
 #ifdef __WIN32__
+		/* Check for right to left characters in text.
+		 */
 		Bool	 rtlCharacters = False;
 
 		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
@@ -598,9 +614,8 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 			cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
 
 #if defined __WIN32__ || defined __APPLE__
-			cairo_select_font_face(context, font.GetName(),
-					       (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-					       (font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
+			cairo_select_font_face(context, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+									(font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
 			cairo_set_font_size(context, Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
 
@@ -652,9 +667,8 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
 
 #if defined __WIN32__ || defined __APPLE__
-		cairo_select_font_face(paintContextCairo, font.GetName(),
-				       (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-				       (font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
+		cairo_select_font_face(paintContextCairo, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+									  (font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
 		cairo_set_font_size(paintContextCairo, Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
 

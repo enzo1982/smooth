@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <gdiplus.h>
 
+#include <smooth/backends/win32/backendwin32.h>
 #include <smooth/graphics/backends/gdiplus/fontgdiplus.h>
 #include <smooth/graphics/surface.h>
 
@@ -34,17 +35,28 @@ S::GUI::Size S::GUI::FontGDIPlus::GetTextSize(const String &text, Bool scaled) c
 {
 	if (text == NIL) return Size();
 
-	Float			 dpi = Surface().GetSurfaceDPI();
-	Gdiplus::Graphics	 context((HWND) NIL);
+	/* Fall back to Tahoma when trying to measure Hebrew on pre Windows 8 using Segoe UI.
+	 */
+	String	 fontName = this->fontName;
 
+	if (fontName == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
+	{
+		for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x05FF) { fontName = "Tahoma"; break; }
+	}
+
+	/* Set up GDI+ font and calculate text size.
+	 */
+	Float			 dpi = Surface().GetSurfaceDPI();
+
+	Gdiplus::Graphics	 gdip_context((HWND) NIL);
 	Gdiplus::Font		 gdip_font(fontName, fontSize * dpi / 96.0, fontWeight >= Font::Bold ? Gdiplus::FontStyleBold : Gdiplus::FontStyleRegular);
 	Gdiplus::StringFormat	 gdip_format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsMeasureTrailingSpaces);
-	Gdiplus::RectF		 rect;
+	Gdiplus::RectF		 gdip_rect;
 
 	gdip_format.SetAlignment(Gdiplus::StringAlignmentNear);
 
-	context.MeasureString(text, -1, &gdip_font, Gdiplus::PointF(0.0, 0.0), &gdip_format, &rect);
+	gdip_context.MeasureString(text, -1, &gdip_font, Gdiplus::PointF(0.0, 0.0), &gdip_format, &gdip_rect);
 
-	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(rect.Width, rect.Height - 2);
-	else					   return Size(rect.Width, rect.Height - 2) * 96.0 / dpi;
+	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(gdip_rect.Width, gdip_rect.Height - 2);
+	else					   return Size(gdip_rect.Width, gdip_rect.Height - 2) * 96.0 / dpi;
 }

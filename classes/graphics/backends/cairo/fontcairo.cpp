@@ -12,6 +12,8 @@
 #include <smooth/graphics/surface.h>
 
 #ifdef __WIN32__
+#	include <smooth/backends/win32/backendwin32.h>
+
 #	include <cairo/cairo-win32.h>
 #	include <fribidi.h>
 #else
@@ -47,9 +49,19 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText, Bool scaled) co
 	if (iText == NIL) return Size();
 
 	String	 text = iText;
-	Float	 dpi  = Surface().GetSurfaceDPI();
 
 #ifdef __WIN32__
+	/* Fall back to Tahoma when trying to measure Hebrew on pre Windows 8 using Segoe UI.
+	 */
+	String	 fontName = this->fontName;
+
+	if (fontName == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
+	{
+		for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x05FF) { fontName = "Tahoma"; break; }
+	}
+
+	/* Reorder the string.
+	 */
 	Bool	 rtlCharacters = False;
 
 	for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x08FF) { rtlCharacters = True; break; }
@@ -71,13 +83,16 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText, Bool scaled) co
 	}
 #endif
 
+	/* Set up Cairo font and calculate text size.
+	 */
+	Float		 dpi	 = Surface().GetSurfaceDPI();
+
 	cairo_surface_t	*surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
 	cairo_t		*context = cairo_create(surface);
 
 #if defined __WIN32__ || defined __APPLE__
-	cairo_select_font_face(context, fontName,
-			       (fontStyle & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-			       (fontWeight >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
+	cairo_select_font_face(context, fontName, (fontStyle & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+						  (fontWeight >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
 	cairo_set_font_size(context, fontSize * dpi / 72.0);
 

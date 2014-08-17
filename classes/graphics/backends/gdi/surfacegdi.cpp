@@ -8,6 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#include <smooth/backends/win32/backendwin32.h>
 #include <smooth/graphics/backends/gdi/surfacegdi.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
@@ -316,23 +317,33 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 	return Success();
 }
 
-S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, const Font &font, Bool shadow)
+S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, const Font &iFont, Bool shadow)
 {
-	if (window == NIL)	return Success();
+	if (window == NIL) return Success();
 
-	if (string == NIL)	return Error();
-	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
+	if (string == NIL) return Error();
+	if (shadow)	   return SurfaceBackend::SetText(string, iRect, iFont, shadow);
 
+	Font	 font	    = iFont;
 	Rect	 rect	    = iRect;
 	Int	 lineHeight = font.GetScaledTextSizeY() + 3;
 
-	HDC	 gdi_dc = GetWindowDC(window);
+	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
+	 */
+	if (font.GetName() == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
+	{
+		for (Int i = 0; i < string.Length(); i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
+	}
+
+	/* Set up Windows font.
+	 */
+	HDC	 gdi_dc	   = GetWindowDC(window);
 	HFONT	 hfont;
-	HFONT	 holdfont = NIL;
+	HFONT	 holdfont  = NIL;
 	HFONT	 holdfont2 = NIL;
 
-	if (Setup::enableUnicode)	hfont = CreateFontW(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
-	else				hfont = CreateFontA(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	if (Setup::enableUnicode) hfont = CreateFontW(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	else			  hfont = CreateFontA(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 
 	if (!painting)
 	{
@@ -347,14 +358,20 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	holdfont2 = (HFONT) SelectObject(paintContext, hfont);
 
+	/* Draw text line by line.
+	 */
 	const Array<String>	&lines = string.Explode("\n");
 
 	foreach (const String &line, lines)
 	{
+		/* Check for right to left characters in text.
+		 */
 		Bool	 rtlCharacters = False;
 
 		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 
+		/* Draw text, reordering if necessary.
+		 */
 		Rect	 tRect = rightToLeft.TranslateRect(rect);
 		RECT	 wRect = { tRect.left, tRect.top, tRect.right, tRect.bottom };
 
@@ -425,7 +442,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 		{
 			/* Let Windows do any reordering and ligating.
 			 * Works with Kanji, but RTL is only supported
-			 * on XP and later versions of Windows.
+			 * on XP and later versions of Windows and even
+			 * later versions get the base direction wrong.
 			 */
 			if (!painting)
 			{

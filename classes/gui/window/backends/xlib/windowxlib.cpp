@@ -16,6 +16,7 @@
 #include <smooth/misc/encoding/urlencode.h>
 #include <smooth/io/instream.h>
 #include <smooth/system/system.h>
+#include <smooth/foreach.h>
 #include <smooth/init.h>
 #include <smooth/backends/xlib/backendxlib.h>
 
@@ -160,16 +161,13 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::GetWindowBackend(::Window wnd)
 {
 	if (wnd == 0) return NIL;
 
-	for (Int i = 0; i < windowBackends.Length(); i++)
+	foreach (WindowXLib *window, windowBackends)
 	{
-		WindowXLib	*window = windowBackends.GetNth(i);
+		if (window == NIL) continue;
 
-		if (window != NIL)
-		{
-			if (window->wnd    == wnd ||
-			    window->iwnd   == wnd ||
-			    window->oldwnd == wnd) return window;
-		}
+		if (window->wnd    == wnd ||
+		    window->iwnd   == wnd ||
+		    window->oldwnd == wnd) return window;
 	}
 
 	return NIL;
@@ -995,11 +993,11 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::FindLeaderWindow()
 {
 	/* The leader window is the newest non topmost window.
 	 */
-	for (Int i = windowBackends.Length() - 1; i >= 0; i--)
+	foreachreverse (WindowXLib *backend, windowBackends)
 	{
-		WindowXLib	*backend = windowBackends.GetNth(i);
-
-		if (backend->id < id && backend->wnd != NIL && !(backend->flags & WF_TOPMOST)) return backend;
+		if (  backend->id    <	id  &&
+		      backend->wnd   != NIL &&
+		    !(backend->flags &	WF_TOPMOST)) return backend;
 	}
 
 	return NIL;
@@ -1009,10 +1007,8 @@ S::Bool S::GUI::WindowXLib::IsModalWindowActive()
 {
 	/* Look for modal windows opened after ourselves.
 	 */
-	for (Int i = windowBackends.Length() - 1; i >= 0; i--)
+	foreachreverse (WindowXLib *backend, windowBackends)
 	{
-		WindowXLib	*backend = windowBackends.GetNth(i);
-
 		if	(backend == this)				   return False;
 		else if (backend->wnd != NIL && backend->flags & WF_MODAL) return True;
 	}

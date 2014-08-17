@@ -16,6 +16,7 @@
 #include <smooth/system/system.h>
 #include <smooth/system/timer.h>
 #include <smooth/system/screen.h>
+#include <smooth/foreach.h>
 #include <smooth/init.h>
 #include <smooth/backends/win32/backendwin32.h>
 
@@ -140,14 +141,10 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::GetWindowBackend(HWND hwnd)
 {
 	if (hwnd == NIL) return NIL;
 
-	for (Int i = 0; i < windowBackends.Length(); i++)
+	foreach (WindowGDI *window, windowBackends)
 	{
-		WindowGDI	*window = windowBackends.GetNth(i);
-
-		if (window != NIL)
-		{
-			if (window->hwnd == hwnd) return window;
-		}
+		if (window	 != NIL &&
+		    window->hwnd == hwnd) return window;
 	}
 
 	return NIL;
@@ -260,16 +257,11 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 			{
 				/* If disabled, activate the next modal window.
 				 */
-				for (Int i = 0; i < windowBackends.Length(); i++)
+				foreach (WindowGDI *backend, windowBackends)
 				{
-					WindowGDI	*backend = windowBackends.GetNth(i);
-
-					if (backend->hwnd != NIL && backend->id > id && (backend->flags & WF_MODAL))
-					{
-						backend->Raise();
-
-						break;
-					}
+					if ( backend->hwnd  != NIL &&
+					     backend->id    >  id  &&
+					    (backend->flags &  WF_MODAL)) { backend->Raise(); break; }
 				}
 			}
 
@@ -766,11 +758,11 @@ S::GUI::WindowGDI *S::GUI::WindowGDI::FindLeaderWindow()
 {
 	/* The leader window is the newest non topmost window.
 	 */
-	for (Int i = windowBackends.Length() - 1; i >= 0; i--)
+	foreachreverse (WindowGDI *backend, windowBackends)
 	{
-		WindowGDI	*backend = windowBackends.GetNth(i);
-
-		if (backend->id < id && backend->hwnd != NIL && !(backend->flags & WF_TOPMOST)) return backend;
+		if (  backend->id    <  id  &&
+		      backend->hwnd  != NIL &&
+		    !(backend->flags &  WF_TOPMOST)) return backend;
 	}
 
 	return NIL;

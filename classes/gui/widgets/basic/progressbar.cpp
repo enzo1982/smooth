@@ -17,13 +17,15 @@ const S::Short	 S::GUI::Progressbar::classID = S::Object::RequestClassID();
 
 S::GUI::Progressbar::Progressbar(const Point &iPos, const Size &iSize, Int sType, Int iTextFlag, Int rangeStart, Int rangeEnd, Int iValue) : Widget(iPos, iSize)
 {
-	type		= classID;
-	subtype		= sType;
+	type		  = classID;
+	subtype		  = sType;
 
-	startValue	= rangeStart;
-	endValue	= rangeEnd;
+	startValue	  = rangeStart;
+	endValue	  = rangeEnd;
 
-	value		= startValue;
+	value		  = startValue;
+
+	gradientDirection = 0;
 
 	SetFlags(iTextFlag);
 	SetValue(iValue);
@@ -66,9 +68,9 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 
 				/* Update gradient bitmap if necessary.
 				 */
-				if (gradient.GetSize() != GetRealSize() - Size(2, 2)) CreateGradient(GetRealSize());
+				if (gradient.GetSize() != GetRealSize() - Size(2, 2) || gradientDirection != IsRightToLeft()) CreateGradient(GetRealSize());
 
-				gradient.BlitToSurface(Rect(Point(0 + (IsRightToLeft() ? frame.GetWidth() : 0), 0), Size(frame.GetWidth() * (IsRightToLeft() ? -1 : 1), frame.GetHeight())), surface, frame);
+				gradient.BlitToSurface(Rect(Point(0 + (IsRightToLeft() ? gradient.GetSize().cx - frame.GetWidth() : 0), 0), frame.GetSize()), surface, frame);
 			}
 
 			if (subtype == OR_HORZ)
@@ -130,13 +132,17 @@ S::Void S::GUI::Progressbar::SetValue(Int newValue)
 S::Void S::GUI::Progressbar::CreateGradient(const Size &gSize)
 {
 	gradient.CreateBitmap(gSize - Size(2, 2));
+	gradientDirection = IsRightToLeft();
 
-	Int	 rs	= Setup::GradientStartColor.GetRed();
-	Int	 gs	= Setup::GradientStartColor.GetGreen();
-	Int	 bs	= Setup::GradientStartColor.GetBlue();
-	Float	 rp	= ((Float) (Setup::GradientEndColor.GetRed() - rs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
-	Float	 gp	= ((Float) (Setup::GradientEndColor.GetGreen() - gs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
-	Float	 bp	= ((Float) (Setup::GradientEndColor.GetBlue() - bs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
+	Color	 startColor = IsRightToLeft() ? Setup::GradientEndColor : Setup::GradientStartColor;
+	Color	 endColor   = IsRightToLeft() ? Setup::GradientStartColor : Setup::GradientEndColor;
+
+	Int	 rs	    = startColor.GetRed();
+	Int	 gs	    = startColor.GetGreen();
+	Int	 bs	    = startColor.GetBlue();
+	Float	 rp	    = ((Float) (endColor.GetRed() - rs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
+	Float	 gp	    = ((Float) (endColor.GetGreen() - gs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
+	Float	 bp	    = ((Float) (endColor.GetBlue() - bs)) / ((subtype == OR_HORZ) ? (gSize.cx - 2) : (gSize.cy - 2));
 
 	if (subtype == OR_HORZ)
 	{

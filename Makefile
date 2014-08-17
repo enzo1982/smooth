@@ -133,16 +133,18 @@ MKDIR = mkdir
 
 ### Targets ###
 
-.PHONY: all objects programs libs install uninstall clean clean_all doc doc-clean
+.PHONY: all objects lib programs libs install uninstall clean clean_all doc doc-clean
 
-all: $(DLLNAME)
+all: lib programs
 
 objects:
 	$(MAKE) -C classes
 	$(MAKE) -C misc
 	$(MAKE) -C resources
 
-programs: $(DLLNAME)
+lib: $(DLLNAME)
+
+programs: lib
 	$(MAKE) -C tools
 	$(MAKE) -C samples
 

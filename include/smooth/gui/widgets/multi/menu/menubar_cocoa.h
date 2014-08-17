@@ -8,50 +8,35 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_MENUBAR
-#define H_OBJSMOOTH_MENUBAR
+#ifndef H_OBJSMOOTH_MENUBAR_COCOA
+#define H_OBJSMOOTH_MENUBAR_COCOA
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class Menubar;
-
-#ifdef __APPLE__
 		class MenubarCocoa;
-#endif
 	};
 };
 
-#include "menu.h"
+#include "menubar.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		const Short	 MB_GRAYSCALE	= 0;
-		const Short	 MB_COLOR	= 1;
-		const Short	 MB_POPUPOPEN	= 2;
-
-		class SMOOTHAPI Menubar : public Menu
+		class SMOOTHAPI MenubarCocoa : public Widget
 		{
 			private:
-#ifdef __APPLE__
-				MenubarCocoa		*menubarCocoa;
-#endif
+				const Menubar		*menubar;
+				Void			*menubarCocoa;
 			public:
 				static const Short	 classID;
 
-							 Menubar();
-				virtual			~Menubar();
+							 MenubarCocoa(Menubar *);
+				virtual			~MenubarCocoa();
 
-				virtual Int		 Paint(Int);
-				virtual Int		 Process(Int, Int, Int);
-
-				MenuEntry		*AddEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0);
-			slots:
-				Void			 OnRegister();
-				Void			 OnUnregister();
+				Int			 Paint(Int);
 		};
 	};
 };

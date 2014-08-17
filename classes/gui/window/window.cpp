@@ -679,7 +679,11 @@ S::Int S::GUI::Window::Paint(Int message)
 						Point	 p1 = Point(frameWidth * fontSize + 1, topoffset * fontSize - 2);
 						Point	 p2 = Point(realSize.cx - frameWidth, p1.y);
 
+#ifndef __APPLE__
 						if (icon != NIL) p1.x += Math::Round(18 * fontSize) - 1;
+#else
+						p1.x--;
+#endif
 
 						surface->Bar(p1, p2, OR_HORZ);
 					}

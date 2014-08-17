@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,7 +22,14 @@ S::GUI::Menubar::Menubar()
 	orientation	= OR_TOP;
 	subtype		= WO_SEPARATOR;
 
+#ifdef __APPLE__
+	menubarCocoa = NIL;
+#endif
+
 	SetSize(Size(18, 18));
+
+	onRegister.Connect(&Menubar::OnRegister, this);
+	onUnregister.Connect(&Menubar::OnUnregister, this);
 }
 
 S::GUI::Menubar::~Menubar()
@@ -46,14 +53,39 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	if (!IsRegistered()) return Error();
 	if (!IsVisible())    return Success();
 
+#ifdef __APPLE__
+	if (orientation == OR_FREE)
+	{
+		if (menubarCocoa != NIL) menubarCocoa->Paint(message);
+
+		return Success();
+	}
+#endif
+
 	Window	*window	 = GetContainerWindow();
 	Surface	*surface = GetDrawSurface();
 	Rect	 menubar = Rect(GetRealPosition(), GetRealSize() - Size(1, 1));
 
 	if (orientation == OR_TOP || orientation == OR_BOTTOM)
 	{
+#ifdef __APPLE__
+		Int	 leftWidth	= 0;
+		Int	 rightWidth	= 0;
+
+		for (Int i = 0; i < GetNOfObjects(); i++)
+		{
+			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+
+			if	(entry->GetOrientation() == OR_TOP    || entry->GetOrientation() == OR_LEFT)  leftWidth	 += entry->GetWidth() + 2;
+			else if (entry->GetOrientation() == OR_BOTTOM || entry->GetOrientation() == OR_RIGHT) rightWidth += entry->GetWidth() + 2;
+		}
+
+		Int	 nextXPosLeft	= (GetSize().cx - leftWidth - rightWidth + 2) / 2;
+		Int	 nextXPosRight	= nextXPosLeft + leftWidth + rightWidth - 2;
+#else
 		Int	 nextXPosLeft	= 7 + (window->GetIcon() != NIL ? 17 : 0);
 		Int	 nextXPosRight	= GetSize().cx - 1;
+#endif
 		Int	 highestEntry	= 0;
 
 		for (Int i = 0; i < GetNOfObjects(); i++)
@@ -144,6 +176,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		}
 	}
 
+#ifndef __APPLE__
 	switch (message)
 	{
 		case SP_PAINT:
@@ -170,6 +203,48 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 			break;
 	}
+#endif
 
 	return Widget::Paint(message);
+}
+
+S::Int S::GUI::Menubar::Process(Int message, Int wParam, Int lParam)
+{
+	if (!IsRegistered()) return Error();
+	if (!IsVisible())    return Success();
+
+	if (orientation == OR_FREE) return Success();
+
+	return Menu::Process(message, wParam, lParam);
+}
+
+S::Void S::GUI::Menubar::OnRegister()
+{
+#ifdef __APPLE__
+	Window	*window = GetContainerWindow();
+
+	for (Int i = 0; i < window->GetNOfObjects(); i++)
+	{
+		const Widget	*widget = window->GetNthObject(i);
+
+		if (widget->GetObjectType() == classID && widget != this) return;
+	}
+
+	orientation  = OR_FREE;
+
+	menubarCocoa = new MenubarCocoa(this);
+
+	Add(menubarCocoa);
+#endif
+}
+
+S::Void S::GUI::Menubar::OnUnregister()
+{
+#ifdef __APPLE__
+	if (menubarCocoa == NIL) return;
+
+	Remove(menubarCocoa);
+
+	DeleteObject(menubarCocoa);
+#endif
 }

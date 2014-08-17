@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -44,11 +44,13 @@ namespace smooth
 		class BackendWin32 : public Backend
 		{
 			public:
-					 BackendWin32();
-				virtual	~BackendWin32();
+				static Bool	 IsWindowsVersionAtLeast(UnsignedInt, UnsignedInt = 0, UnsignedInt = 0);
 
-				Int	 Init();
-				Int	 Deinit();
+						 BackendWin32();
+				virtual		~BackendWin32();
+
+				Int		 Init();
+				Int		 Deinit();
 		};
 	};
 };

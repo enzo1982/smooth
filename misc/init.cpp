@@ -106,25 +106,17 @@ S::Bool S::Init()
 
 	/* Decide if we want to use unicode.
 	 */
+	if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT))
 	{
-		OSVERSIONINFOA	 vInfo;
+		Setup::enableUnicode = True;
+	}
+	else
+	{
+		HMODULE	 hUnicows = LoadLibraryA("unicows.dll");
 
-		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+		if (hUnicows != NIL) Setup::enableUnicode = True;
 
-		GetVersionExA(&vInfo);
-
-		if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
-		{
-			Setup::enableUnicode = True;
-		}
-		else
-		{
-			HMODULE	 hUnicows = LoadLibraryA("unicows.dll");
-
-			if (hUnicows != NIL) Setup::enableUnicode = True;
-
-			FreeLibrary(hUnicows);
-		}
+		FreeLibrary(hUnicows);
 	}
 
 	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);

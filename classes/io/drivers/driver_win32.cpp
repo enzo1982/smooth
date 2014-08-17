@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,6 +13,8 @@
 #include <smooth/io/instream.h>
 #include <smooth/io/outstream.h>
 
+#include <smooth/backends/win32/backendwin32.h>
+
 S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 {
 	stream	    = INVALID_HANDLE_VALUE;
@@ -24,14 +26,8 @@ S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 
 	if (unicodePathPrefix == NIL)
 	{
-		OSVERSIONINFOA	 vInfo;
-
-		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-		GetVersionExA(&vInfo);
-
-		if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) unicodePathPrefix = (char *) "\\\\?\\";
-		else						 unicodePathPrefix = (char *) "";
+		if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT)) unicodePathPrefix = (char *) "\\\\?\\";
+		else									    unicodePathPrefix = (char *) "";
 	}
 
 	/* Build real filename to pass to CreateFile.

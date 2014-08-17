@@ -11,6 +11,8 @@
 #include <smooth/files/directory.h>
 
 #ifdef __WIN32__
+#	include <smooth/backends/win32/backendwin32.h>
+
 #	include <windows.h>
 #else
 #	include <glob.h>
@@ -458,14 +460,8 @@ const char *S::Directory::GetUnicodePathPrefix(const String &path)
 	if (unicodePathPrefix == NIL)
 	{
 #ifdef __WIN32__
-		OSVERSIONINFOA	 vInfo;
-
-		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-		GetVersionExA(&vInfo);
-
-		if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) unicodePathPrefix = (char *) "\\\\?\\";
-		else						 unicodePathPrefix = (char *) "";
+		if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT)) unicodePathPrefix = (char *) "\\\\?\\";
+		else									    unicodePathPrefix = (char *) "";
 #else
 		unicodePathPrefix = (char *) "";
 #endif

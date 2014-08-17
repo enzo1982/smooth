@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,6 +18,8 @@
 #endif
 
 #ifdef __WIN32__
+#	include <smooth/backends/win32/backendwin32.h>
+
 #	include <time.h>
 #	include <shlobj.h>
 #	include <shellapi.h>
@@ -279,11 +281,6 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 
 #ifdef __WIN32__
 	ITEMIDLIST	*idlist;
-	OSVERSIONINFOA	 vInfo;
-
-	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-	GetVersionExA(&vInfo);
 
 	switch (type)
 	{
@@ -295,17 +292,16 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 			SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
 			break;
 		case PersonalFilesPictures:
-			if ( vInfo.dwMajorVersion >= 5				    ) SHGetSpecialFolderLocation(NIL, CSIDL_MYPICTURES, &idlist);
-			else							      SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5)   ) SHGetSpecialFolderLocation(NIL, CSIDL_MYPICTURES, &idlist);
+			else										  SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
 			break;
 		case PersonalFilesMusic:
-			if ( vInfo.dwMajorVersion >= 5				    ) SHGetSpecialFolderLocation(NIL, CSIDL_MYMUSIC, &idlist);
-			else							      SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5)   ) SHGetSpecialFolderLocation(NIL, CSIDL_MYMUSIC, &idlist);
+			else										  SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
 			break;
 		case PersonalFilesMovies:
-			if ( vInfo.dwMajorVersion >= 6 ||
-			    (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)) SHGetSpecialFolderLocation(NIL, CSIDL_MYVIDEO, &idlist);
-			else							      SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5, 1)) SHGetSpecialFolderLocation(NIL, CSIDL_MYVIDEO, &idlist);
+			else										  SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
 			break;
 		case PersonalFilesDownloads:
 			SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);

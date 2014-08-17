@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/backends/win32/screenwin32.h>
+#include <smooth/backends/win32/backendwin32.h>
 #include <smooth/input/pointer.h>
 #include <smooth/init.h>
 
@@ -29,14 +30,8 @@ static HMONITOR	 (*ex_MonitorFromPoint)(POINT, DWORD);
 
 S::Int S::System::ScreenWin32::Initialize()
 {
-	OSVERSIONINFOA	 vInfo;
-
-	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-	GetVersionExA(&vInfo);
-
-	if ((vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT      && vInfo.dwMajorVersion >= 5) ||
-	    (vInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && vInfo.dwMinorVersion >= 1))
+	if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT,	5) ||
+	    Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_WINDOWS, 4, 1))
 	{
 		user32dll = LoadLibraryA("user32.dll");
 

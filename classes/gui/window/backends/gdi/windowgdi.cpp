@@ -614,17 +614,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 		 */
 		if ((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER))
 		{
-			OSVERSIONINFOA	 vInfo;
-
-			vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-			GetVersionExA(&vInfo);
-
-			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && ( vInfo.dwMajorVersion >= 6 ||
-									    (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)))
-			{
-				wndclassw->style = wndclassw->style | CS_DROPSHADOW;
-			}
+			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5, 1)) wndclassw->style = wndclassw->style | CS_DROPSHADOW;
 		}
 
 		wndclassw->lpfnWndProc	 = WindowProc;
@@ -655,17 +645,7 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 		 */
 		if ((flags & WF_NOTASKBUTTON) && (flags & WF_TOPMOST) && (flags & WF_THINBORDER))
 		{
-			OSVERSIONINFOA	 vInfo;
-
-			vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-			GetVersionExA(&vInfo);
-
-			if (vInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && ( vInfo.dwMajorVersion >= 6 ||
-									    (vInfo.dwMajorVersion == 5 && vInfo.dwMinorVersion >= 1)))
-			{
-				wndclassa->style = wndclassa->style | CS_DROPSHADOW;
-			}
+			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5, 1)) wndclassa->style = wndclassa->style | CS_DROPSHADOW;
 		}
 
 		wndclassa->lpfnWndProc	 = WindowProc;
@@ -814,14 +794,8 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 	Bitmap		 mask = newIcon;
 	Int		 transparentPixel = 0;
 
-	OSVERSIONINFOA	 vInfo;
-
-	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-	GetVersionExA(&vInfo);
-
-	if (vInfo.dwMajorVersion > 4) transparentPixel = 16777215;
-	else			      transparentPixel = 0;
+	if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5)) transparentPixel = 16777215;
+	else									       transparentPixel = 0;
 
 	Size	 size  = newIcon.GetSize();
 	Int	 depth = newIcon.GetDepth();
@@ -864,13 +838,7 @@ S::Int S::GUI::WindowGDI::EnableDropFiles(Bool nEnableDropFiles)
 	/* Enable Drag & Drop only on the Windows NT family
 	 * for now, due to problems on Windows 9x.
 	 */
-	OSVERSIONINFOA	 vInfo;
-
-	vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-	GetVersionExA(&vInfo);
-
-	if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) return Error();
+	if (!Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT)) return Error();
 
 	enableDropFiles = nEnableDropFiles;
 

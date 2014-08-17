@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,7 +16,7 @@
 #include <stdio.h>
 
 #if defined __WIN32__
-#	include <windows.h>
+#	include <smooth/backends/win32/backendwin32.h>
 #else
 #	define _wfopen fopen
 #endif
@@ -32,20 +32,7 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 	/* Disable Unicode functions on Windows 9x even if we
 	 * have Unicows as it does not work correctly there.
 	 */
-	static Bool	 enableUnicodeInitialized = False;
-
-	if (!enableUnicodeInitialized)
-	{
-		OSVERSIONINFOA	 vInfo;
-
-		vInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-
-		GetVersionExA(&vInfo);
-
-		if (vInfo.dwPlatformId != VER_PLATFORM_WIN32_NT) enableUnicode = False;
-
-		enableUnicodeInitialized = True;
-	}
+	enableUnicode = Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT);
 #else
 	/* Set output format to UTF-8 on non Windows systems.
 	 */

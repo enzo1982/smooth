@@ -133,3 +133,20 @@ S::Int S::Backends::BackendWin32::Deinit()
 
 	return Success();
 }
+
+S::Bool S::Backends::BackendWin32::IsWindowsVersionAtLeast(UnsignedInt platformId, UnsignedInt majorVersion, UnsignedInt minorVersion)
+{
+	static OSVERSIONINFOA	 versionInfo = { 0 };
+
+	if (versionInfo.dwOSVersionInfoSize == 0)
+	{
+		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+
+		GetVersionExA(&versionInfo);
+	}
+
+	if (versionInfo.dwPlatformId == platformId && ( versionInfo.dwMajorVersion  > majorVersion ||
+						       (versionInfo.dwMajorVersion == majorVersion && versionInfo.dwMinorVersion > minorVersion))) return True;
+
+	return False;
+}

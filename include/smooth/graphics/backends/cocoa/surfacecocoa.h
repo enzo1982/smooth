@@ -35,18 +35,17 @@ namespace smooth
 			private:
 				static Short			 surfaceDPI;
 			protected:
-				Size				 allocSize;
-
 				UpsideDownModifier		 upsideDown;
 
 				NSWindow			*window;
-
-				NSImage				*paintBitmap;
 
 				Array<Rect *, Void *>		 paintRects;
 			public:
 								 SurfaceCocoa(Void * = NIL, const Size & = Size());
 								~SurfaceCocoa();
+
+				Int				 Lock();
+				Int				 Release();
 
 				Int				 SetSize(const Size &);
 				const Size			&GetSize() const;

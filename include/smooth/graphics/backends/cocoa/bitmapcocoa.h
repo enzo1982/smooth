@@ -34,6 +34,8 @@ namespace smooth
 			private:
 				NSBitmapImageRep	*bitmap;
 
+				mutable NSImage		*image;
+
 				Void			 Initialize();
 			public:
 							 BitmapCocoa(Void * = NIL);

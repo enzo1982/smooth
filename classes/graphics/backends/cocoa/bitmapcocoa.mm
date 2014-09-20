@@ -74,7 +74,8 @@ S::GUI::BitmapCocoa::~BitmapCocoa()
 S::Void S::GUI::BitmapCocoa::Initialize()
 {
 	type	= BITMAP_COCOA;
-	bitmap	= NIL;
+	bitmap	= nil;
+	image   = nil;
 }
 
 S::Bool S::GUI::BitmapCocoa::CreateBitmap(const Size &nSize, Int nDepth)
@@ -96,7 +97,7 @@ S::Bool S::GUI::BitmapCocoa::CreateBitmap(const Size &nSize, Int nDepth)
 							 bytesPerRow: 4 * nSize.cx
 							bitsPerPixel: 32];
 
-	if (bitmap == NIL) return False;
+	if (bitmap == nil) return False;
 
 	bytes	= [bitmap bitmapData];
 
@@ -110,11 +111,18 @@ S::Bool S::GUI::BitmapCocoa::CreateBitmap(const Size &nSize, Int nDepth)
 
 S::Bool S::GUI::BitmapCocoa::DeleteBitmap()
 {
-	if (bitmap != NIL)
+	if (bitmap != nil)
 	{
+		if (image != nil)
+		{
+			[image release];
+
+			image = nil;
+		}
+	
 		[bitmap release];
 
-		bitmap	= NIL;
+		bitmap	= nil;
 
 		size	= Size(0, 0);
 		depth	= 0;
@@ -130,25 +138,25 @@ S::Bool S::GUI::BitmapCocoa::DeleteBitmap()
 S::GUI::Bitmap S::GUI::BitmapCocoa::Scale(const Size &newSize) const
 {
 	Bitmap			 bitmap(newSize, depth);
-	NSImage			*image	 = [[NSImage alloc] initWithSize: NSMakeSize(size.cx, size.cy)];
-
-	[image addRepresentation: (NSBitmapImageRep *) GetSystemBitmap()];
 
 	NSAutoreleasePool	*pool	 = [[NSAutoreleasePool alloc] init];
-	NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: (NSBitmapImageRep *) bitmap.GetSystemBitmap()];
+	NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: [[(NSImage *) bitmap.GetSystemBitmap() representations] objectAtIndex: 0]];
 
 	[NSGraphicsContext saveGraphicsState];
 	[NSGraphicsContext setCurrentContext: context];
+
+	if (image == nil) GetSystemBitmap();
 
 	[image drawInRect: NSMakeRect(0, 0, newSize.cx, newSize.cy)
 		 fromRect: NSMakeRect(0, 0, size.cx, size.cy)
 		operation: NSCompositeCopy
 		 fraction: 1.0];
 
+	[(NSImage *) bitmap.GetSystemBitmap() recache];
+
 	[NSGraphicsContext restoreGraphicsState];
 
 	[pool release];
-	[image release];
 
 	return bitmap;
 }
@@ -185,7 +193,14 @@ S::Bool S::GUI::BitmapCocoa::SetSystemBitmap(Void *nBitmap)
 
 S::Void *S::GUI::BitmapCocoa::GetSystemBitmap() const
 {
-	return (Void *) bitmap;
+	if (image == nil && bitmap != nil)
+	{
+		image = [[NSImage alloc] initWithSize: NSMakeSize(size.cx, size.cy)];
+
+		[image addRepresentation: bitmap];
+	}
+
+	return (Void *) image;
 }
 
 S::Bool S::GUI::BitmapCocoa::SetPixel(const Point &point, const Color &iColor)

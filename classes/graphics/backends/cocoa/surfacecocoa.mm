@@ -12,6 +12,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
+#include <smooth/system/system.h>
 #include <smooth/files/file.h>
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
@@ -31,8 +32,6 @@ S::GUI::SurfaceCocoa::SurfaceCocoa(Void *iWindow, const Size &maxSize)
 
 	window	    = (NSWindow *) iWindow;
 
-	paintBitmap = nil;
-
 	if (window != NIL)
 	{
 		size = maxSize;
@@ -49,13 +48,9 @@ S::GUI::SurfaceCocoa::SurfaceCocoa(Void *iWindow, const Size &maxSize)
 		rightToLeft.SetSurfaceSize(size);
 		upsideDown.SetSurfaceSize(size);
 
-		paintBitmap = [[NSImage alloc] initWithSize: NSMakeSize(size.cx, size.cy)];
-
 		paintRects.Add(new Rect(Point(0, 0), size));
 
 		[NSBezierPath setDefaultLineWidth: 0.0];
-
-		allocSize = size;
 	}
 
 	fontSize.SetFontSize(GetSurfaceDPI());
@@ -63,12 +58,22 @@ S::GUI::SurfaceCocoa::SurfaceCocoa(Void *iWindow, const Size &maxSize)
 
 S::GUI::SurfaceCocoa::~SurfaceCocoa()
 {
-	if (window != NIL)
-	{
-		delete paintRects.GetFirst();
+	if (window != NIL) delete paintRects.GetFirst();
+}
 
-		[paintBitmap release];
+S::Int S::GUI::SurfaceCocoa::Lock()
+{
+	if (window != NIL && [window isVisible])
+	{
+		while ([[window contentView] inLiveResize] && ![NSThread isMainThread]) S::System::System::Sleep(10);
 	}
+
+	return SurfaceBackend::Lock();
+}
+
+S::Int S::GUI::SurfaceCocoa::Release()
+{
+	return SurfaceBackend::Release();
 }
 
 S::Int S::GUI::SurfaceCocoa::SetSize(const Size &nSize)
@@ -78,20 +83,14 @@ S::Int S::GUI::SurfaceCocoa::SetSize(const Size &nSize)
 	rightToLeft.SetSurfaceSize(size);
 	upsideDown.SetSurfaceSize(size);
 
-	if (allocSize.cx >= nSize.cx && allocSize.cy >= nSize.cy) return Success();
-
 	if (window != NIL && !painting)
 	{
 		delete paintRects.GetFirst();
 
 		paintRects.RemoveAll();
 
-		[paintBitmap setSize: NSMakeSize(size.cx, size.cy)];
-
 		paintRects.Add(new Rect(Point(0, 0), size));
 	}
-
-	allocSize = nSize;
 
 	return Success();
 }
@@ -105,39 +104,24 @@ S::Int S::GUI::SurfaceCocoa::PaintRect(const Rect &pRect)
 {
 	if (painting) return Error();
 
-	if (window != NIL && [window isVisible])
-	{
-		[[window contentView] lockFocus];
-
-		[paintBitmap drawInRect: NSMakeRect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top)
-			       fromRect: NSMakeRect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top)
-			      operation: NSCompositeCopy
-			       fraction: 1.0];
-
-		[[window contentView] unlockFocus];
-
-		[window flushWindow];
-	}
+	if (window != NIL && [window isVisible]) [window flushWindowIfNeeded];
 
 	return Success();
 }
 
 S::Int S::GUI::SurfaceCocoa::StartPaint(const Rect &iPRect)
 {
-	if (window == NIL) return Success();
+	if (window == NIL || ![window isVisible]) return Success();
 
 	Rect	 pRect = Rect::OverlapRect(upsideDown.TranslateRect(rightToLeft.TranslateRect(iPRect)), *(paintRects.GetLast()));
 
-	if (painting == 0) [paintBitmap lockFocus];
+	if (painting == 0) [[window contentView] lockFocus];
+
+	[window disableFlushWindow];
 
 	[NSGraphicsContext saveGraphicsState];
 
-	NSBezierPath	*bezierPath = [[NSBezierPath alloc] init];
-
-	[bezierPath appendBezierPathWithRect: NSMakeRect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top)];
-	[bezierPath addClip];
-
-	[bezierPath release];
+	[[NSBezierPath bezierPathWithRect: NSMakeRect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top)] addClip];
 
 	paintRects.Add(new Rect(pRect));
 
@@ -160,9 +144,11 @@ S::Int S::GUI::SurfaceCocoa::EndPaint()
 
 	[NSGraphicsContext restoreGraphicsState];
 
+	[window enableFlushWindow];
+
 	if (painting == 0)
 	{
-		[paintBitmap unlockFocus];
+		[[window contentView] unlockFocus];
 
 		PaintRect(paintRect);
 	}
@@ -188,29 +174,11 @@ S::Short S::GUI::SurfaceCocoa::GetSurfaceDPI() const
 
 S::Int S::GUI::SurfaceCocoa::SetPixel(const Point &iPoint, const Color &color)
 {
-	if (window == NIL) return Success();
+	if (window == NIL || ![window isVisible]) return Success();
 
 	Point	 point = upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPoint));
 
-	if (!painting && [window isVisible])
-	{
-		[[window contentView] lockFocus];
-
-		[[NSGraphicsContext currentContext] setShouldAntialias: NO];
-
-		[[NSColor colorWithCalibratedRed: color.GetRed()   / 255.0
-					   green: color.GetGreen() / 255.0
-					    blue: color.GetBlue()  / 255.0
-					   alpha: 1.0] set];
-
-		[NSBezierPath fillRect: NSMakeRect(point.x, point.y, 1, 1)];
-
-		[[window contentView] unlockFocus];
-
-		[window flushWindow];
-	}
-
-	if (!painting) [paintBitmap lockFocus];
+	if (!painting) [[window contentView] lockFocus];
 
 	[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
@@ -221,14 +189,16 @@ S::Int S::GUI::SurfaceCocoa::SetPixel(const Point &iPoint, const Color &color)
 
 	[NSBezierPath fillRect: NSMakeRect(point.x, point.y, 1, 1)];
 
-	if (!painting) [paintBitmap unlockFocus];
+	if (!painting) [[window contentView] unlockFocus];
+
+	[window flushWindow];
 
 	return Success();
 }
 
 S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const Color &color)
 {
-	if (window == NIL) return Success();
+	if (window == NIL || ![window isVisible]) return Success();
 
 	Point	 pos1 = upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos1));
 	Point	 pos2 = upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos2));
@@ -248,32 +218,7 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 	if (pos1.x > pos2.x) { pos1.x++; pos2.x++; }
 	if (pos1.y > pos2.y) { pos1.y++; pos2.y++; }
 
-	if (!painting && [window isVisible])
-	{
-		[[window contentView] lockFocus];
-
-		[[NSGraphicsContext currentContext] setShouldAntialias: NO];
-
-		[[NSColor colorWithCalibratedRed: color.GetRed()   / 255.0
-					   green: color.GetGreen() / 255.0
-					    blue: color.GetBlue()  / 255.0
-					   alpha: 1.0] set];
-
-		NSBezierPath	*path	= [NSBezierPath bezierPath];
-
-		[path setLineWidth: 0.0];
-
-		[path moveToPoint: NSMakePoint(pos1.x, pos1.y)];
-		[path lineToPoint: NSMakePoint(pos2.x, pos2.y)];
-
-		[path stroke];
-
-		[[window contentView] unlockFocus];
-
-		[window flushWindow];
-	}
-
-	if (!painting) [paintBitmap lockFocus];
+	if (!painting) [[window contentView] lockFocus];
 
 	[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
@@ -291,14 +236,16 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 
 	[path stroke];
 
-	if (!painting) [paintBitmap unlockFocus];
+	if (!painting) [[window contentView] unlockFocus];
+
+	[window flushWindow];
 
 	return Success();
 }
 
 S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int style, const Size &ellipse)
 {
-	if (window == NIL) return Success();
+	if (window == NIL || ![window isVisible]) return Success();
 
 	Rect	 rect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iRect));
 
@@ -335,25 +282,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 */		}
 		else
 		{
-			if (!painting && [window isVisible])
-			{
-				[[window contentView] lockFocus];
-
-				[[NSGraphicsContext currentContext] setShouldAntialias: NO];
-
-				[[NSColor colorWithCalibratedRed: color.GetRed()   / 255.0
-							   green: color.GetGreen() / 255.0
-							    blue: color.GetBlue()  / 255.0
-							   alpha: 1.0] set];
-
-				[NSBezierPath fillRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top)];
-
-				[[window contentView] unlockFocus];
-
-				[window flushWindow];
-			}
-
-			if (!painting) [paintBitmap lockFocus];
+			if (!painting) [[window contentView] lockFocus];
 
 			[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
@@ -364,30 +293,14 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 
 			[NSBezierPath fillRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top)];
 
-			if (!painting) [paintBitmap unlockFocus];
+			if (!painting) [[window contentView] unlockFocus];
+
+			[window flushWindow];
 		}
 	}
 	else if (style == Rect::Outlined)
 	{
-		if (!painting && [window isVisible])
-		{
-			[[window contentView] lockFocus];
-
-			[[NSGraphicsContext currentContext] setShouldAntialias: NO];
-
-			[[NSColor colorWithCalibratedRed: color.GetRed()   / 255.0
-						   green: color.GetGreen() / 255.0
-						    blue: color.GetBlue()  / 255.0
-						   alpha: 1.0] set];
-
-			[NSBezierPath strokeRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
-
-			[[window contentView] unlockFocus];
-
-			[window flushWindow];
-		}
-
-		if (!painting) [paintBitmap lockFocus];
+		if (!painting) [[window contentView] lockFocus];
 
 		[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
@@ -398,7 +311,9 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 
 		[NSBezierPath strokeRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
 
-		if (!painting) [paintBitmap unlockFocus];
+		if (!painting) [[window contentView] unlockFocus];
+
+		[window flushWindow];
 	}
 	else if (style & Rect::Inverted)
 	{
@@ -412,30 +327,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 	}
 	else if (style & Rect::Dotted)
 	{
-		if (!painting && [window isVisible])
-		{
-			[[window contentView] lockFocus];
-
-			[[NSGraphicsContext currentContext] setShouldAntialias: NO];
-
-			[[NSColor colorWithCalibratedRed: color.GetRed()   / 255.0
-						   green: color.GetGreen() / 255.0
-						    blue: color.GetBlue()  / 255.0
-						   alpha: 1.0] set];
-
-			NSBezierPath	*path	    = [NSBezierPath bezierPathWithRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
-			CGFloat		 pattern[2] = { 1.0, 1.0 };
-
-			[path setLineDash: pattern count: 2 phase: 1];
-
-			[path stroke];
-
-			[[window contentView] unlockFocus];
-
-			[window flushWindow];
-		}
-
-		if (!painting) [paintBitmap lockFocus];
+		if (!painting) [[window contentView] lockFocus];
 
 		[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
@@ -451,7 +343,9 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 
 		[path stroke];
 
-		if (!painting) [paintBitmap unlockFocus];
+		if (!painting) [[window contentView] unlockFocus];
+
+		[window flushWindow];
 	}
 
 	return Success();
@@ -459,10 +353,10 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 
 S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, const Font &font, Bool shadow)
 {
-	if (window == NIL)	return Success();
+	if (window == NIL || ![window isVisible]) return Success();
 
-	if (string == NIL)	return Error();
-	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
+	if (string == NIL)			  return Error();
+	if (shadow)				  return SurfaceBackend::SetText(string, iRect, font, shadow);
 
 	NSFont			*nsFont	    = [[NSFontManager sharedFontManager] fontWithFamily: [NSString stringWithUTF8String: font.GetName().ConvertTo("UTF-8")]
 											 traits: (font.GetStyle() & Font::Italic ? NSItalicFontMask : 0) | (font.GetWeight() >= Font::Bold ? NSBoldFontMask : 0)
@@ -484,48 +378,9 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 	/* Draw to window.
 	 */
-	if (!painting && [window isVisible])
-	{
-		Rect	 tRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(rect));
-
-		[[window contentView] lockFocus];
-
-		[[NSGraphicsContext currentContext] setShouldAntialias: YES];
-
-		[NSGraphicsContext saveGraphicsState];
-
-		[[NSBezierPath bezierPathWithRect: NSMakeRect(tRect.left, tRect.top, tRect.right - tRect.left, tRect.bottom - tRect.top)] addClip];
-
-		foreach (const String &line, lines)
-		{
-			tRect	   = upsideDown.TranslateRect(rightToLeft.TranslateRect(rect));
-			tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
-			tRect.top  = tRect.bottom - lineHeight + 1;
-
-			NSAttributedString	*string	= [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: (line == NIL ? "" : line.ConvertTo("UTF-8"))]
-											  attributes: attributes];
-
-			[string drawAtPoint: NSMakePoint(tRect.left, tRect.top)];
-
-			[string release];
-
-			rect.top += lineHeight;
-		}
-
-		[NSGraphicsContext restoreGraphicsState];
-
-		[[window contentView] unlockFocus];
-
-		[window flushWindow];
-	}
-
-	/* Draw to buffer.
-	 */
-	rect = iRect;
-
 	Rect	 tRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(rect));
 
-	if (!painting) [paintBitmap lockFocus];
+	if (!painting) [[window contentView] lockFocus];
 
 	[[NSGraphicsContext currentContext] setShouldAntialias: YES];
 
@@ -539,8 +394,8 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
 		tRect.top  = tRect.bottom - lineHeight + 1;
 
-		NSAttributedString	*string	   = [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: (line == NIL ? "" : line.ConvertTo("UTF-8"))]
-										     attributes: attributes];
+		NSAttributedString	*string	= [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: (line == NIL ? "" : line.ConvertTo("UTF-8"))]
+										  attributes: attributes];
 
 		[string drawAtPoint: NSMakePoint(tRect.left, tRect.top)];
 
@@ -551,7 +406,9 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 	[NSGraphicsContext restoreGraphicsState];
 
-	if (!painting) [paintBitmap unlockFocus];
+	if (!painting) [[window contentView] unlockFocus];
+	
+	[window flushWindow];
 
 	String::ExplodeFinish();
 
@@ -562,36 +419,11 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 S::Int S::GUI::SurfaceCocoa::Gradient(const Rect &iRect, const Color &color1, const Color &color2, Int style)
 {
-	if (window == NIL) return Success();
+	if (window == NIL || ![window isVisible]) return Success();
 
 	Rect	 rect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iRect));
 
-	if (!painting && [window isVisible])
-	{
-		[[window contentView] lockFocus];
-
-		[[NSGraphicsContext currentContext] setShouldAntialias: NO];
-
-		NSGradient	*gradient = [[NSGradient alloc] initWithStartingColor: [NSColor colorWithCalibratedRed: color1.GetRed()   / 255.0
-														 green: color1.GetGreen() / 255.0
-														  blue: color1.GetBlue()  / 255.0
-														 alpha: 1.0]
-									  endingColor: [NSColor colorWithCalibratedRed: color2.GetRed()   / 255.0
-														 green: color2.GetGreen() / 255.0
-														  blue: color2.GetBlue()  / 255.0
-														 alpha: 1.0]];
-
-		[gradient drawInRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top)
-			       angle: (style == OR_HORZ ? (rightToLeft.GetRightToLeft() ? 180 : 0.0) : 270)];
-
-		[gradient release];
-
-		[[window contentView] unlockFocus];
-
-		[window flushWindow];
-	}
-
-	if (!painting) [paintBitmap lockFocus];
+	if (!painting) [[window contentView] lockFocus];
 
 	[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
@@ -609,86 +441,82 @@ S::Int S::GUI::SurfaceCocoa::Gradient(const Rect &iRect, const Color &color1, co
 
 	[gradient release];
 
-	if (!painting) [paintBitmap unlockFocus];
+	if (!painting) [[window contentView] unlockFocus];
+
+	[window flushWindow];
 
 	return Success();
 }
 
 S::Int S::GUI::SurfaceCocoa::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcRect, const Rect &iDestRect)
 {
-	if (window == NIL) return Success();
-	if (bitmap == NIL) return Error();
+	if (window == NIL || ![window isVisible]) return Success();
+	if (bitmap == NIL)			  return Error();
 
 	Rect	 destRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iDestRect));
 
 	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
 	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
 
-	/* Create NSImage from bitmap.
+	/* Copy the image.
 	 */
-	NSBitmapImageRep	*imageRep = (NSBitmapImageRep *) bitmap.GetSystemBitmap();
-	NSImage			*image	  = [[NSImage alloc] initWithSize: NSMakeSize([imageRep pixelsWide], [imageRep pixelsHigh])];
+	if (!painting) [[window contentView] lockFocus];
 
-	[image addRepresentation: imageRep];
-
-	/* Draw the image.
-	 */
-	if (!painting && [window isVisible])
-	{
-		[[window contentView] lockFocus];
-
-		[image drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top)
-			 fromRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)
-			operation: NSCompositeCopy
-			 fraction: 1.0];
-
-		[[window contentView] unlockFocus];
-
-		[window flushWindow];
-	}
-
-	if (!painting) [paintBitmap lockFocus];
+	NSImage	*image = (NSImage *) bitmap.GetSystemBitmap();
 
 	[image drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top)
 		 fromRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)
 		operation: NSCompositeCopy
 		 fraction: 1.0];
 
-	if (!painting) [paintBitmap unlockFocus];
+	if (!painting) [[window contentView] unlockFocus];
 
-	/* Free NSImage.
-	 */
-	[image release];
+	[window flushWindow];
 
 	return Success();
 }
 
 S::Int S::GUI::SurfaceCocoa::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, const Rect &destRect)
 {
-	if (window == NIL) return Success();
-	if (bitmap == NIL) return Error();
+	if (window == NIL || ![window isVisible]) return Success();
+	if (bitmap == NIL)			  return Error();
 
 	Rect	 srcRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iSrcRect));
 
 	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
 	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
 
+	/* Create image representing the area to be copied.
+	 */
+	[[window contentView] lockFocus];
+
+	NSBitmapImageRep	*imageRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)];
+	NSImage			*image	  = [[NSImage alloc] initWithSize: NSMakeSize([imageRep pixelsWide], [imageRep pixelsHigh])];
+
+	[image addRepresentation: imageRep];
+
+	[[window contentView] unlockFocus];
+
 	/* Copy the image.
 	 */
-	NSAutoreleasePool	*pool	 = [[NSAutoreleasePool alloc] init];
-	NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: (NSBitmapImageRep *) bitmap.GetSystemBitmap()];
+	NSGraphicsContext	*context  = [NSGraphicsContext graphicsContextWithBitmapImageRep: [[(NSImage *) bitmap.GetSystemBitmap() representations] objectAtIndex: 0]];
 
 	[NSGraphicsContext saveGraphicsState];
 	[NSGraphicsContext setCurrentContext: context];
 
-	[paintBitmap drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top)
-		       fromRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)
-		      operation: NSCompositeCopy
-		       fraction: 1.0];
+	[image drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top)
+		 fromRect: NSMakeRect(0, 0, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)
+		operation: NSCompositeCopy
+		 fraction: 1.0];
+
+	[(NSImage *) bitmap.GetSystemBitmap() recache];
 
 	[NSGraphicsContext restoreGraphicsState];
 
-	[pool release];
+	/* Free image and image representation.
+	 */
+	[image release];
+	[imageRep release];
 
 	return Success();
 }

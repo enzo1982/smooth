@@ -700,11 +700,14 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 			/* Pass message to smooth window.
 			 */
-			if	([e type] == NSLeftMouseDown)  onEvent.Call(SM_LBUTTONDOWN, 0, 0);
-			else if ([e type] == NSLeftMouseUp)    onEvent.Call(SM_LBUTTONUP,   0, 0);
-			else if	([e type] == NSRightMouseDown) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
-			else if ([e type] == NSRightMouseUp)   onEvent.Call(SM_RBUTTONUP,   0, 0);
-			else				       onEvent.Call(SM_MOUSEMOVE,   0, 0);
+			if	([e type] == NSLeftMouseDown)			      onEvent.Call(SM_LBUTTONDOWN,   0, 0);
+			else if ([e type] == NSLeftMouseUp)			      onEvent.Call(SM_LBUTTONUP,     0, 0);
+			else if	([e type] == NSRightMouseDown)			      onEvent.Call(SM_RBUTTONDOWN,   0, 0);
+			else if ([e type] == NSRightMouseUp)			      onEvent.Call(SM_RBUTTONUP,     0, 0);
+			else							      onEvent.Call(SM_MOUSEMOVE,     0, 0);
+
+			if	([e type] == NSLeftMouseDown  && [e clickCount] == 2) onEvent.Call(SM_LBUTTONDBLCLK, 0, 0);
+			else if	([e type] == NSRightMouseDown && [e clickCount] == 2) onEvent.Call(SM_RBUTTONDBLCLK, 0, 0);
 
 			break;
 
@@ -736,9 +739,11 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 			/* Pass message to smooth window.
 			 */
-			if	([e type] == NSOtherMouseDown) { if ([e buttonNumber] == 2) onEvent.Call(SM_MBUTTONDOWN, 0, 0); }
-			else if ([e type] == NSOtherMouseUp)   { if ([e buttonNumber] == 2) onEvent.Call(SM_MBUTTONUP,   0, 0); }
-			else				       				    onEvent.Call(SM_MOUSEMOVE,   0, 0);
+			if	([e type] == NSOtherMouseDown)			      { if ([e buttonNumber] == 2) onEvent.Call(SM_MBUTTONDOWN,	  0, 0); }
+			else if ([e type] == NSOtherMouseUp)			      { if ([e buttonNumber] == 2) onEvent.Call(SM_MBUTTONUP,	  0, 0); }
+			else											   onEvent.Call(SM_MOUSEMOVE,	  0, 0);
+
+			if	([e type] == NSOtherMouseDown && [e clickCount] == 2) { if ([e buttonNumber] == 2) onEvent.Call(SM_MBUTTONDBLCLK, 0, 0); }
 
 			break;
 
@@ -923,8 +928,8 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 	/* Return from the active loop after processing an event.
 	 */
-	NSWindow	*modalWindow = [NSApp keyWindow];
-	NSWindow	*keyWindow   = [NSApp modalWindow];
+	NSWindow	*modalWindow = [NSApp modalWindow];
+	NSWindow	*keyWindow   = [NSApp keyWindow];
 
 	if ((modalWindow == wnd && (keyWindow != nil && keyWindow != wnd && Window::GetWindow(keyWindow) != NIL)) ||
 	    (keyWindow	 == wnd && (modalWindow == nil || ![modalWindow isVisible]))) [NSApp stop: nil];
@@ -937,10 +942,10 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 	flags = iFlags;
 
 	NSRect		 frame	   = NSMakeRect(pos.x, [[NSScreen mainScreen] frame].size.height - (pos.y + Math::Round(size.cy * fontSize) + sizeModifier.cy), Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy);
-	NSUInteger	 styleMask = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
+	NSUInteger	 styleMask = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask;
 
-	if (!(flags & WF_NORESIZE  )) styleMask |= NSResizableWindowMask;
-	if (  flags & WF_THINBORDER ) styleMask  = NSBorderlessWindowMask;
+	if (flags & WF_NORESIZE  ) styleMask ^= NSResizableWindowMask;
+	if (flags & WF_THINBORDER) styleMask  = NSBorderlessWindowMask;
 
 	wnd = [[CocoaWindow alloc] initWithContentRect: frame
 					     styleMask: styleMask
@@ -1192,9 +1197,13 @@ S::Int S::GUI::WindowCocoa::Raise()
 S::Void S::GUI::WindowCocoa::SetCursor(Cursor *cursor, const Point &point)
 {
 	CocoaWindow	*window = (CocoaWindow *) cursor->GetContainerWindow()->GetSystemWindow();
-	CocoaView	*view	= (CocoaView *) [window contentView];
 
-	[view setCursor: cursor position: point];
+	if (window != NIL)
+	{
+		CocoaView	*view = (CocoaView *) [window contentView];
+
+		[view setCursor: cursor position: point];
+	}
 }
 
 S::Void S::GUI::WindowCocoa::RemoveCursor(Cursor *cursor)

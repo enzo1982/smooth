@@ -12,6 +12,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/i18n/translator.h>
 
 const S::Short	 S::GUI::Progressbar::classID = S::Object::RequestClassID();
 
@@ -75,8 +76,7 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 
 			if (subtype == OR_HORZ)
 			{
-				static String	 zeroString    = "0";
-				static String	 percentString = "%";
+				I18n::Translator	*i18n = I18n::Translator::defaultTranslator;
 
 				switch (GetFlags())
 				{
@@ -86,17 +86,16 @@ S::Int S::GUI::Progressbar::Paint(Int message)
 						text = String::FromInt((Int) Math::Max(value, startValue));
 						break;
 					case PB_PERCENT:
-						if (value > 0)	text = String::FromInt((Int) Math::Max(0, (Int) Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue)))));
-						else		text = zeroString;
+						if (value > 0)	text = i18n->TranslateString("%1%").Replace("%1", String::FromInt((Int) Math::Max(0, (Int) Math::Round(100 / ((Float) (endValue - startValue) / (Float) (value - startValue))))));
+						else		text = i18n->TranslateString("%1%").Replace("%1", "0");
 
-						text.Append(percentString);
 						break;
 				}
 
-				Point	 realPos	= GetRealPosition();
+				Point	 realPos  = GetRealPosition();
 
-				Int	 textSize	= font.GetScaledTextSizeX(text);
-				Rect	 textRect	= Rect(Point(realPos.x + (frame.GetWidth() - textSize) / 2, realPos.y + Math::Ceil(Float(frame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1), Size(textSize, frame.GetHeight() - Math::Round(2 * surface->GetSurfaceDPI() / 96.0) - 1));
+				Int	 textSize = font.GetScaledTextSizeX(text);
+				Rect	 textRect = Rect(Point(realPos.x + (frame.GetWidth() - textSize) / 2, realPos.y + Math::Ceil(Float(frame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1), Size(textSize, frame.GetHeight() - Math::Round(2 * surface->GetSurfaceDPI() / 96.0) - 1));
 
 				surface->SetText(text, textRect, font);
 

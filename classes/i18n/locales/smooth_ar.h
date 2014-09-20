@@ -1,4 +1,4 @@
- /* The smooth Class Library
+﻿ /* The smooth Class Library
   * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
@@ -22,6 +22,8 @@ static const char *smooth_ar =
 	     <property name=\"encoding\">UTF-8</property>					\
 	   </info>										\
 	   <data>										\
+	     <entry string=\"%1%\">%%1</entry>							\
+												\
 	     <entry string=\"OK\">موافق</entry>							\
 	     <entry string=\"Cancel\">ألغِ</entry>						\
 	     <entry string=\"Yes\">نعم</entry>							\

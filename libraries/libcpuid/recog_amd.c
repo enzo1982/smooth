@@ -212,8 +212,8 @@ const struct match_entry_t cpudb_amd[] = {
 	{ 15, -1, -1, 15, 0x4c,   1,   512,    -1, TURION_64               ,     0, "Turion 64 (Richmond)"          },
 	{ 15, -1, -1, 15, 0x68,   2,   256,    -1, TURION_X2               ,     0, "Turion X2 (Tyler/256K)"        },
 	{ 15, -1, -1, 15, 0x68,   2,   512,    -1, TURION_X2               ,     0, "Turion X2 (Tyler/512K)"        },
-	{ 15, -1, -1, 23,    3,   2,   512,    -1, TURION_X2               ,     0, "Turion X2 (Griffin/512K)"      },
-	{ 15, -1, -1, 23,    3,   2,  1024,    -1, TURION_X2               ,     0, "Turion X2 (Griffin/1024K)"     },
+	{ 15, -1, -1, 17,    3,   2,   512,    -1, TURION_X2               ,     0, "Turion X2 (Griffin/512K)"      },
+	{ 15, -1, -1, 17,    3,   2,  1024,    -1, TURION_X2               ,     0, "Turion X2 (Griffin/1024K)"     },
 	
 	/* K9 Architecture */
 	{ 15, -1, -1, 16,   -1,   1,    -1,    -1, PHENOM                  ,     0, "Unknown AMD Phenom"            },
@@ -256,16 +256,12 @@ const struct match_entry_t cpudb_amd[] = {
 	{ 15,  9, -1, 16,    9,   8,    -1,    -1, OPTERON_GENERIC         ,     0, "Magny-Cours Opteron"           },
 	
 	/* Bulldozer CPUs: */
-	{ 15, -1, -1, 21,    1,   2,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X2"                  },
-	{ 15, -1, -1, 21,    1,   2,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X2"                  },
-	{ 15, -1, -1, 21,    1,   3,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X3"                  },
-	{ 15, -1, -1, 21,    1,   3,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X3"                  },
 	{ 15, -1, -1, 21,    1,   4,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X2"                  },
-	{ 15, -1, -1, 21,    1,   4,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X2"                  },
 	{ 15, -1, -1, 21,    1,   6,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X3"                  },
-	{ 15, -1, -1, 21,    1,   6,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X3"                  },
 	{ 15, -1, -1, 21,    1,   8,  2048,    -1, NO_CODE                 ,     0, "Bulldozer X4"                  },
-	{ 15, -1, -1, 21,    1,   8,  4096,    -1, NO_CODE                 ,     0, "Bulldozer X4"                  },
+	{ 15, -1, -1, 21,    2,   4,  2048,    -1, NO_CODE                 ,     0, "Vishera X2"                    },
+	{ 15, -1, -1, 21,    2,   6,  2048,    -1, NO_CODE                 ,     0, "Vishera X3"                    },
+	{ 15, -1, -1, 21,    2,   8,  2048,    -1, NO_CODE                 ,     0, "Vishera X4"                    },
 };
 
 
@@ -302,7 +298,11 @@ static void load_amd_features(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
 		{  5, CPU_FEATURE_STC },
 		{  6, CPU_FEATURE_100MHZSTEPS },
 		{  7, CPU_FEATURE_HWPSTATE },
-		{  8, CPU_FEATURE_CONSTANT_TSC },
+		/* id 8 is handled in common */
+		{  9, CPU_FEATURE_CPB },
+		{ 10, CPU_FEATURE_APERFMPERF },
+		{ 11, CPU_FEATURE_PFI },
+		{ 12, CPU_FEATURE_PA },
 	};
 	if (raw->ext_cpuid[0][0] >= 0x80000001) {
 		match_features(matchtable_edx81, COUNT_OF(matchtable_edx81), raw->ext_cpuid[1][3], data);

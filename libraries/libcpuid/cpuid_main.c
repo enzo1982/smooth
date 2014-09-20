@@ -170,8 +170,10 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 		{  0, CPU_FEATURE_PNI },
 		{  3, CPU_FEATURE_MONITOR },
 		{  9, CPU_FEATURE_SSSE3 },
+		{ 12, CPU_FEATURE_FMA3 },
 		{ 13, CPU_FEATURE_CX16 },
 		{ 19, CPU_FEATURE_SSE4_1 },
+		{ 21, CPU_FEATURE_X2APIC },
 		{ 23, CPU_FEATURE_POPCNT },
 		{ 29, CPU_FEATURE_F16C },
 	};
@@ -182,19 +184,25 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 	const struct feature_map_t matchtable_ecx81[] = {
 		{  0, CPU_FEATURE_LAHF_LM },
 	};
+	const struct feature_map_t matchtable_edx87[] = {
+		{  8, CPU_FEATURE_CONSTANT_TSC },
+	};
 	if (raw->basic_cpuid[0][0] >= 1) {
 		match_features(matchtable_edx1, COUNT_OF(matchtable_edx1), raw->basic_cpuid[1][3], data);
 		match_features(matchtable_ecx1, COUNT_OF(matchtable_ecx1), raw->basic_cpuid[1][2], data);
 	}
-	if (raw->ext_cpuid[0][0] >= 1) {
+	if (raw->ext_cpuid[0][0] >= 0x80000001) {
 		match_features(matchtable_edx81, COUNT_OF(matchtable_edx81), raw->ext_cpuid[1][3], data);
 		match_features(matchtable_ecx81, COUNT_OF(matchtable_ecx81), raw->ext_cpuid[1][2], data);
+	}
+	if (raw->ext_cpuid[0][0] >= 0x80000007) {
+		match_features(matchtable_edx87, COUNT_OF(matchtable_edx87), raw->ext_cpuid[7][3], data);
 	}
 	if (data->flags[CPU_FEATURE_SSE]) {
 		/* apply guesswork to check if the SSE unit width is 128 bit */
 		switch (data->vendor) {
 			case VENDOR_AMD:
-				data->sse_size = (data->ext_family >= 16 && data->ext_family != 23) ? 128 : 64;
+				data->sse_size = (data->ext_family >= 16 && data->ext_family != 17) ? 128 : 64;
 				break;
 			case VENDOR_INTEL:
 				data->sse_size = (data->family == 6 && data->ext_model >= 15) ? 128 : 64;
@@ -347,7 +355,6 @@ int cpuid_serialize_raw_data(struct cpu_raw_data_t* data, const char* filename)
 	if (!f) return set_error(ERR_OPEN);
 	
 	fprintf(f, "version=%s\n", VERSION);
-	fprintf(f, "build_date=%s\n", __DATE__);
 	for (i = 0; i < MAX_CPUID_LEVEL; i++)
 		fprintf(f, "basic_cpuid[%d]=%08x %08x %08x %08x\n", i,
 			data->basic_cpuid[i][0], data->basic_cpuid[i][1],
@@ -505,6 +512,7 @@ const char* cpu_feature_str(cpu_feature_t feature)
 		{ CPU_FEATURE_SSE4_2, "sse4_2" },
 		{ CPU_FEATURE_SYSCALL, "syscall" },
 		{ CPU_FEATURE_XD, "xd" },
+		{ CPU_FEATURE_X2APIC, "x2apic"},
 		{ CPU_FEATURE_MOVBE, "movbe" },
 		{ CPU_FEATURE_POPCNT, "popcnt" },
 		{ CPU_FEATURE_AES, "aes" },
@@ -545,6 +553,10 @@ const char* cpu_feature_str(cpu_feature_t feature)
 		{ CPU_FEATURE_TBM, "tbm" },
 		{ CPU_FEATURE_F16C, "f16c" },
 		{ CPU_FEATURE_RDRAND, "rdrand" },
+		{ CPU_FEATURE_CPB, "cpb" },
+		{ CPU_FEATURE_APERFMPERF, "aperfmperf" },
+		{ CPU_FEATURE_PFI, "pfi" },
+		{ CPU_FEATURE_PA, "pa" },
 	};
 	unsigned i, n = COUNT_OF(matchtable);
 	if (n != NUM_CPU_FEATURES) {

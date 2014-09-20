@@ -29,7 +29,7 @@
  * @File     libcpuid.h
  * @Author   Veselin Georgiev
  * @Date     Oct 2008
- * @Version  0.2.0
+ * @Version  0.2.1
  *
  * Version history:
  *
@@ -349,6 +349,11 @@ typedef enum {
 	CPU_FEATURE_TBM,	/*!< Trailing bit manipulation instruction support */
 	CPU_FEATURE_F16C,	/*!< 16-bit FP convert instruction support */
 	CPU_FEATURE_RDRAND,     /*!< RdRand instruction */
+	CPU_FEATURE_X2APIC,     /*!< x2APIC, APIC_BASE.EXTD, MSRs 0000_0800h...0000_0BFFh 64-bit ICR (+030h but not +031h), no DFR (+00Eh), SELF_IPI (+040h) also see standard level 0000_000Bh */
+	CPU_FEATURE_CPB,	/*!< Core performance boost */
+	CPU_FEATURE_APERFMPERF,	/*!< MPERF/APERF MSRs support */
+	CPU_FEATURE_PFI,	/*!< Processor Feedback Interface support */
+	CPU_FEATURE_PA,		/*!< Processor accumulator */
 	/* termination: */
 	NUM_CPU_FEATURES,
 } cpu_feature_t;
@@ -673,6 +678,15 @@ int cpu_clock_measure(int millis, int quad_check);
  *
  * Recommended values - millis = 50, runs = 4. For more robustness,
  * increase the number of runs.
+ * 
+ * NOTE: on Bulldozer and later CPUs, the busy-wait cycle runs at 1.4 IPC, thus
+ * the results are skewed. This is corrected internally by dividing the resulting
+ * value by 1.4.
+ * However, this only occurs if the thread is executed on a single CMT
+ * module - if there are other threads competing for resources, the results are
+ * unpredictable. Make sure you run cpu_clock_by_ic() on a CPU that is free from
+ * competing threads, or if there are such threads, they shouldn't exceed the
+ * number of modules. On a Bulldozer X8, that means 4 threads.
  *
  * @returns the CPU clock frequency in MHz (within some measurement error
  * margin). If SSE is not supported, the result is -1. If the input parameters

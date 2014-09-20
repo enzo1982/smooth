@@ -18,6 +18,29 @@
 
 #ifdef __WIN32__
 #	include <windows.h>
+
+#	ifndef LANG_BANGLA
+#		define LANG_BANGLA			0x45
+
+#		define SUBLANG_BANGLA_BANGLADESH	0x02
+#		define SUBLANG_BANGLA_INDIA		0x01
+#	endif
+
+#	ifndef LANG_PULAR
+#		define LANG_PULAR			0x67
+#	endif
+
+#	ifndef LANG_TIGRINYA
+#		define LANG_TIGRINYA			0x73
+#	endif
+
+#	ifndef SUBLANG_PUNJABI_PAKISTAN
+#		define SUBLANG_PUNJABI_PAKISTAN		0x02
+#	endif
+
+#	ifndef SUBLANG_TAMIL_SRI_LANKA
+#		define SUBLANG_TAMIL_SRI_LANKA		0x02
+#	endif
 #else
 #	include <stdlib.h>
 #	include <unistd.h>
@@ -110,66 +133,68 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 	String	 code;
 
 #if defined __WIN32__
-	switch (PRIMARYLANGID(GetUserDefaultLangID()))
+	LANGID	 langid = GetUserDefaultLangID();
+
+	switch (PRIMARYLANGID(langid))
 	{
-		case LANG_ENGLISH:	code = "en";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ENGLISH_AUS)			code = "en_AU";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ENGLISH_CAN)			code = "en_CA";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ENGLISH_NZ)			code = "en_NZ";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ENGLISH_US)			code = "en_US";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ENGLISH_UK)			code = "en_UK";
+		case LANG_ENGLISH:	code = "en";	if	(SUBLANGID(langid) == SUBLANG_ENGLISH_AUS)		  code = "en_AU";
+							else if (SUBLANGID(langid) == SUBLANG_ENGLISH_CAN)		  code = "en_CA";
+							else if (SUBLANGID(langid) == SUBLANG_ENGLISH_NZ)		  code = "en_NZ";
+							else if (SUBLANGID(langid) == SUBLANG_ENGLISH_US)		  code = "en_US";
+							else if (SUBLANGID(langid) == SUBLANG_ENGLISH_UK)		  code = "en_UK";
 							break;
 		case LANG_AFRIKAANS:	code = "af";	break;
 		case LANG_ALBANIAN:	code = "sq";	break;
 		case LANG_AMHARIC:	code = "am";	break;
-		case LANG_ARABIC:	code = "ar";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_ALGERIA)			code = "ar_DZ";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_BAHRAIN)			code = "ar_BH";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_EGYPT)			code = "ar_EG";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_IRAQ)			code = "ar_IQ";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_JORDAN)			code = "ar_JO";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_KUWAIT)			code = "ar_KW";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_LEBANON)			code = "ar_LB";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_LIBYA)			code = "ar_LY";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_MOROCCO)			code = "ar_MO";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_OMAN)			code = "ar_OM";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_QATAR)			code = "ar_QA";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_SAUDI_ARABIA)		code = "ar_SA";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_SYRIA)			code = "ar_SY";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_TUNISIA)			code = "ar_TN";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_UAE)			code = "ar_AE";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_ARABIC_YEMEN)			code = "ar_YE";
+		case LANG_ARABIC:	code = "ar";	if	(SUBLANGID(langid) == SUBLANG_ARABIC_ALGERIA)		  code = "ar_DZ";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_BAHRAIN)		  code = "ar_BH";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_EGYPT)		  code = "ar_EG";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_IRAQ)		  code = "ar_IQ";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_JORDAN)		  code = "ar_JO";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_KUWAIT)		  code = "ar_KW";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_LEBANON)		  code = "ar_LB";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_LIBYA)		  code = "ar_LY";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_MOROCCO)		  code = "ar_MO";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_OMAN)		  code = "ar_OM";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_QATAR)		  code = "ar_QA";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_SAUDI_ARABIA)	  code = "ar_SA";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_SYRIA)		  code = "ar_SY";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_TUNISIA)		  code = "ar_TN";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_UAE)		  code = "ar_AE";
+							else if (SUBLANGID(langid) == SUBLANG_ARABIC_YEMEN)		  code = "ar_YE";
 							break;
 		case LANG_ARMENIAN:	code = "hy";	break;
 		case LANG_ASSAMESE:	code = "as";	break;
-		case LANG_AZERI:	code = "az";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_AZERI_LATIN)			code = "az_AZ@Latn";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_AZERI_CYRILLIC)			code = "az_AZ@Cyrl";
+		case LANG_AZERI:	code = "az";	if	(SUBLANGID(langid) == SUBLANG_AZERI_LATIN)		  code = "az_AZ@Latn";
+							else if (SUBLANGID(langid) == SUBLANG_AZERI_CYRILLIC)		  code = "az_AZ@Cyrl";
 							break;
-		case LANG_BANGLA:	code = "bn";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_BANGLA_BANGLADESH)		code = "bn_BD";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_BANGLA_INDIA)			code = "bn_IN";
+		case LANG_BANGLA:	code = "bn";	if	(SUBLANGID(langid) == SUBLANG_BANGLA_BANGLADESH)	  code = "bn_BD";
+							else if (SUBLANGID(langid) == SUBLANG_BANGLA_INDIA)		  code = "bn_IN";
 							break;
 		case LANG_BASQUE:	code = "eu";	break;
 		case LANG_BELARUSIAN:	code = "be";	break;
 		case LANG_BRETON:	code = "br";	break;
 		case LANG_BULGARIAN:	code = "bg";	break;
 		case LANG_CATALAN:	code = "ca";	break;
-		case LANG_CHINESE:	code = "zh_TW";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_CHINESE_SIMPLIFIED)		code = "zh_CN";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_CHINESE_TRADITIONAL)		code = "zh_TW";
+		case LANG_CHINESE:	code = "zh_TW";	if	(SUBLANGID(langid) == SUBLANG_CHINESE_SIMPLIFIED)	  code = "zh_CN";
+							else if (SUBLANGID(langid) == SUBLANG_CHINESE_TRADITIONAL)	  code = "zh_TW";
 							break;
 		case LANG_CZECH:	code = "cs";	break;
 		case LANG_DANISH:	code = "da";	break;
 		case LANG_DARI:		code = "prs";	break;
 		case LANG_DIVEHI:	code = "dv";	break;
-		case LANG_DUTCH:	code = "nl";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_DUTCH)				code = "nl_NL";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_DUTCH_BELGIAN)			code = "nl_BE";
+		case LANG_DUTCH:	code = "nl";	if	(SUBLANGID(langid) == SUBLANG_DUTCH)			  code = "nl_NL";
+							else if (SUBLANGID(langid) == SUBLANG_DUTCH_BELGIAN)		  code = "nl_BE";
 							break;
 		case LANG_ESTONIAN:	code = "et";	break;
 		case LANG_FILIPINO:	code = "fil";	break;
 		case LANG_FINNISH:	code = "fi";	break;
-		case LANG_FRENCH:	code = "fr";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_FRENCH)				code = "fr_FR";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_FRENCH_BELGIAN)			code = "fr_BE";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_FRENCH_CANADIAN)			code = "fr_CA";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_FRENCH_LUXEMBOURG)		code = "fr_LU";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_FRENCH_MONACO)			code = "fr_MC";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_FRENCH_SWISS)			code = "fr_CH";
+		case LANG_FRENCH:	code = "fr";	if	(SUBLANGID(langid) == SUBLANG_FRENCH)			  code = "fr_FR";
+							else if (SUBLANGID(langid) == SUBLANG_FRENCH_BELGIAN)		  code = "fr_BE";
+							else if (SUBLANGID(langid) == SUBLANG_FRENCH_CANADIAN)		  code = "fr_CA";
+							else if (SUBLANGID(langid) == SUBLANG_FRENCH_LUXEMBOURG)	  code = "fr_LU";
+							else if (SUBLANGID(langid) == SUBLANG_FRENCH_MONACO)		  code = "fr_MC";
+							else if (SUBLANGID(langid) == SUBLANG_FRENCH_SWISS)		  code = "fr_CH";
 							break;
 		case LANG_GALICIAN:	code = "gl";	break;
 		case LANG_GEORGIAN:	code = "ka";	break;
@@ -210,49 +235,49 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		case LANG_PASHTO:	code = "ps";	break;
 		case LANG_PERSIAN:	code = "fa";	break;
 		case LANG_POLISH:	code = "pl";	break;
-		case LANG_PORTUGUESE:	code = "pt";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_PORTUGUESE)			code = "pt_PT";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_PORTUGUESE_BRAZILIAN)		code = "pt_BR";
+		case LANG_PORTUGUESE:	code = "pt";	if	(SUBLANGID(langid) == SUBLANG_PORTUGUESE)		  code = "pt_PT";
+							else if (SUBLANGID(langid) == SUBLANG_PORTUGUESE_BRAZILIAN)	  code = "pt_BR";
 							break;
 		case LANG_PULAR:	code = "ff";	break;
-		case LANG_PUNJABI:	code = "pa";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_PUNJABI_INDIA)			code = "pa_IN";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_PUNJABI_PAKISTAN)			code = "pa_PK";
+		case LANG_PUNJABI:	code = "pa";	if	(SUBLANGID(langid) == SUBLANG_PUNJABI_INDIA)		  code = "pa_IN";
+							else if (SUBLANGID(langid) == SUBLANG_PUNJABI_PAKISTAN)		  code = "pa_PK";
 							break;
 		case LANG_QUECHUA:	code = "quz";	break;
 		case LANG_ROMANIAN:	code = "ro";	break;
 		case LANG_RUSSIAN:	code = "ru";	break;
-		case LANG_SERBIAN:	code = "sr";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_CROATIAN_CROATIA)			code = "hr_HR";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SERBIAN_LATIN)			code = "sr_RS@Latn";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SERBIAN_CYRILLIC)			code = "sr_RS@Cyrl";
+		case LANG_SERBIAN:	code = "sr";	if	(SUBLANGID(langid) == SUBLANG_CROATIAN_CROATIA)		  code = "hr_HR";
+							else if (SUBLANGID(langid) == SUBLANG_SERBIAN_LATIN)		  code = "sr_RS@Latn";
+							else if (SUBLANGID(langid) == SUBLANG_SERBIAN_CYRILLIC)		  code = "sr_RS@Cyrl";
 							break;
 		case LANG_SINHALESE:	code = "si";	break;
 		case LANG_SLOVAK:	code = "sk";	break;
 		case LANG_SLOVENIAN:	code = "sl";	break;
 		case LANG_SOTHO:	code = "sa";	break;
-		case LANG_SPANISH:	code = "es";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH)				code = "es_ES";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_ARGENTINA)		code = "es_AR";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_BOLIVIA)			code = "es_BO";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_CHILE)			code = "es_CL";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_COLOMBIA)			code = "es_CO";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_COSTA_RICA)		code = "es_CR";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_DOMINICAN_REPUBLIC)	code = "es_DO";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_ECUADOR)			code = "es_EC";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_EL_SALVADOR)		code = "es_SV";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_GUATEMALA)		code = "es_GT";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_HONDURAS)			code = "es_HN";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_MEXICAN)			code = "es_MX";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_NICARAGUA)		code = "es_NI";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_PANAMA)			code = "es_PA";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_PARAGUAY)			code = "es_PY";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_PERU)			code = "es_PE";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_PUERTO_RICO)		code = "es_PR";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_URUGUAY)			code = "es_UY";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_SPANISH_VENEZUELA)		code = "es_VE";
+		case LANG_SPANISH:	code = "es";	if	(SUBLANGID(langid) == SUBLANG_SPANISH)			  code = "es_ES";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_ARGENTINA)	  code = "es_AR";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_BOLIVIA)		  code = "es_BO";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_CHILE)		  code = "es_CL";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_COLOMBIA)		  code = "es_CO";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_COSTA_RICA)	  code = "es_CR";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_DOMINICAN_REPUBLIC) code = "es_DO";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_ECUADOR)		  code = "es_EC";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_EL_SALVADOR)	  code = "es_SV";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_GUATEMALA)	  code = "es_GT";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_HONDURAS)		  code = "es_HN";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_MEXICAN)		  code = "es_MX";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_NICARAGUA)	  code = "es_NI";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_PANAMA)		  code = "es_PA";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_PARAGUAY)		  code = "es_PY";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_PERU)		  code = "es_PE";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_PUERTO_RICO)	  code = "es_PR";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_URUGUAY)		  code = "es_UY";
+							else if (SUBLANGID(langid) == SUBLANG_SPANISH_VENEZUELA)	  code = "es_VE";
 							break;
 		case LANG_SWAHILI:	code = "sw";	break;
 		case LANG_SWEDISH:	code = "sv";	break;
 		case LANG_TAJIK:	code = "tg";	break;
-		case LANG_TAMIL:	code = "ta";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_TAMIL_INDIA)			code = "ta_IN";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_TAMIL_SRI_LANKA)			code = "ta_LK";
+		case LANG_TAMIL:	code = "ta";	if	(SUBLANGID(langid) == SUBLANG_TAMIL_INDIA)		  code = "ta_IN";
+							else if (SUBLANGID(langid) == SUBLANG_TAMIL_SRI_LANKA)		  code = "ta_LK";
 							break;
 		case LANG_TELUGU:	code = "te";	break;
 		case LANG_THAI:		code = "th";	break;
@@ -263,11 +288,11 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		case LANG_TURKMEN:	code = "tk";	break;
 		case LANG_UIGHUR:	code = "ug";	break;
 		case LANG_UKRAINIAN:	code = "uk";	break;
-		case LANG_URDU:		code = "ur";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_URDU_INDIA)			code = "ur_IN";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_URDU_PAKISTAN)			code = "ur_PK";
+		case LANG_URDU:		code = "ur";	if	(SUBLANGID(langid) == SUBLANG_URDU_INDIA)		  code = "ur_IN";
+							else if (SUBLANGID(langid) == SUBLANG_URDU_PAKISTAN)		  code = "ur_PK";
 							break;
-		case LANG_UZBEK:	code = "uz";	if	(SUBLANGID(GetUserDefaultLangID()) == SUBLANG_UZBEK_LATIN)			code = "uz_UZ@Latn";
-							else if (SUBLANGID(GetUserDefaultLangID()) == SUBLANG_UZBEK_CYRILLIC)			code = "uz_UZ@Cyrl";
+		case LANG_UZBEK:	code = "uz";	if	(SUBLANGID(langid) == SUBLANG_UZBEK_LATIN)		  code = "uz_UZ@Latn";
+							else if (SUBLANGID(langid) == SUBLANG_UZBEK_CYRILLIC)		  code = "uz_UZ@Cyrl";
 							break;
 		case LANG_VIETNAMESE:	code = "vi";	break;
 		case LANG_WELSH:	code = "cy";	break;

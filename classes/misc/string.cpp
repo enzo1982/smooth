@@ -70,7 +70,7 @@ S::String::~String()
 
 S::Int S::String::Initialize()
 {
-	/* Create static mutexecs.
+	/* Create static mutexes.
 	 */
 	explodeBuffersMutex   = new Threads::Mutex();
 	allocatedBuffersMutex = new Threads::Mutex();
@@ -84,7 +84,7 @@ S::Int S::String::Free()
 	 */
 	DeleteTemporaryBuffers(True);
 
-	/* Free static mutexecs.
+	/* Free static mutexes.
 	 */
 	delete explodeBuffersMutex;
 	delete allocatedBuffersMutex;

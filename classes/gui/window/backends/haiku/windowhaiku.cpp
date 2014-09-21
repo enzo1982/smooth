@@ -431,10 +431,11 @@ S::Int S::GUI::WindowHaiku::Open(const String &title, const Point &pos, const Si
 	Int	 windowFeel  = B_NORMAL_WINDOW_FEEL;
 	Int	 windowFlags = 0;
 
-	if (flags & WF_NORESIZE)	windowFlags = windowFlags | B_NOT_RESIZABLE;
-	if (flags & WF_THINBORDER)	windowLook  = B_NO_BORDER_WINDOW_LOOK;
-	if (flags & WF_TOPMOST)		windowFeel  = B_FLOATING_ALL_WINDOW_FEEL;
-	if (flags & WF_MODAL)		windowFeel  = B_MODAL_APP_WINDOW_FEEL;
+	if (flags & WF_NORESIZE	 ) windowFlags |= B_NOT_RESIZABLE;
+	if (flags & WF_NOTITLE	 ) windowLook  ^= B_TITLED_WINDOW_LOOK;
+	if (flags & WF_THINBORDER) windowLook	= B_NO_BORDER_WINDOW_LOOK;
+	if (flags & WF_TOPMOST	 ) windowFeel	= B_FLOATING_ALL_WINDOW_FEEL;
+	if (flags & WF_MODAL	 ) windowFeel	= B_MODAL_APP_WINDOW_FEEL;
 
 	wnd = new HaikuWindow(BRect(pos.x, pos.y, pos.x + Math::Round(size.cx * fontSize) + sizeModifier.cx, pos.y + Math::Round(size.cy * fontSize) + sizeModifier.cy), title, windowLook, windowFeel, windowFlags);
 

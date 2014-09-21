@@ -402,33 +402,41 @@ S::Int S::GUI::Window::SetMaximumSize(const Size &newMaxSize)
 
 S::Bool S::GUI::Window::Create()
 {
-	if (IsRegistered() && !created)
-	{
-		Rect	 monitorRect = System::Screen::GetActiveScreenMetrics();
+	if (!IsRegistered() || created) return False;
 
-		if (GetPosition().x >= 0 && GetPosition().y >= 0 && GetPosition().x < monitorRect.GetSize().cx && GetPosition().y < monitorRect.GetSize().cy)
-		{
-			SetPosition(Point(monitorRect.left, monitorRect.top) + GetPosition());
-		}
+	Rect	 monitorRect = System::Screen::GetActiveScreenMetrics();
+
+	if (GetPosition().x >= 0 && GetPosition().y >= 0 && GetPosition().x < monitorRect.GetSize().cx && GetPosition().y < monitorRect.GetSize().cy)
+	{
+		SetPosition(Point(monitorRect.left, monitorRect.top) + GetPosition());
+	}
 
 #ifdef __WIN32__
-		if (flags & WF_NORESIZE) frameWidth = 4;
+	if (flags & WF_NORESIZE) frameWidth = 4;
 #endif
 
-		if (backend->Open(text, GetPosition(), GetSize(), flags) == Success())
-		{
-			Surface	*surface = GetDrawSurface();
+	/* Check if there is a titlebar.
+	 */
+	flags |= WF_NOTITLE;
 
-			surface->SetRightToLeft(IsRightToLeft());
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*widget = GetNthObject(i);
 
-			visible = False;
+		if (widget->GetObjectType() == Titlebar::classID) { flags ^= WF_NOTITLE; break; }
+	}
 
-			return True;
-		}
-		else
-		{
-			return False;
-		}
+	/* Open the new window.
+	 */
+	if (backend->Open(text, GetPosition(), GetSize(), flags) == Success())
+	{
+		Surface	*surface = GetDrawSurface();
+
+		surface->SetRightToLeft(IsRightToLeft());
+
+		visible = False;
+
+		return True;
 	}
 
 	return False;

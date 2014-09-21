@@ -803,19 +803,15 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 	XSetWindowAttributes	 attributes;
 
-	attributes.background_pixel = Setup::BackgroundColor;
-	attributes.bit_gravity	    = NorthWestGravity;
+	attributes.background_pixel  = Setup::BackgroundColor;
+	attributes.bit_gravity	     = NorthWestGravity;
+	attributes.save_under	     = False;
+	attributes.override_redirect = False;
 
-	if ((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER))
-	{
-		attributes.save_under	     = True;
-		attributes.override_redirect = True;
-	}
-	else
-	{
-		attributes.save_under	     = False;
-		attributes.override_redirect = False;
-	}
+	if (flags & WF_NOTITLE	   ) attributes.override_redirect = True;
+	if (flags & WF_TOPMOST	    &&
+	    flags & WF_NOTASKBUTTON &&
+	    flags & WF_THINBORDER  ) attributes.save_under = True;
 
 	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBackPixel | CWBitGravity | CWSaveUnder | CWOverrideRedirect, &attributes);
 

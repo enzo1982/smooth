@@ -159,12 +159,14 @@ S::Void S::GUI::Tooltip::OnToolWindowEvent(Int message, Int wParam, Int lParam)
 		 */
 		case SM_KEYDOWN:
 		case SM_KEYUP:
+#ifdef __WIN32__
 			window->Process(message, wParam, lParam);
-
+#endif
 			break;
 		case SM_CHAR:
+#ifdef __WIN32__
 			window->Process(message, wParam, lParam);
-
+#endif
 			Hide();
 
 			break;

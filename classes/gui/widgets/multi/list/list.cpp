@@ -157,14 +157,7 @@ S::Int S::GUI::List::SwitchEntries(Int entry1n, Int entry2n)
 	if (entry1n >= Length() || entry2n >= Length()) return Error();
 	if (entry1n <  0	|| entry2n <  0	      ) return Error();
 
-	ListEntry	*entry1 = elementOrder.GetNth(Math::Min(entry1n, entry2n));
-	ListEntry	*entry2 = elementOrder.GetNth(Math::Max(entry1n, entry2n));
-
-	elementOrder.Remove(entry1->GetHandle());
-	elementOrder.Remove(entry2->GetHandle());
-
-	elementOrder.InsertAtPos(Math::Min(entry1n, entry2n), entry2, entry2->GetHandle());
-	elementOrder.InsertAtPos(Math::Max(entry1n, entry2n), entry1, entry1->GetHandle());
+	elementOrder.SwitchNth(entry1n, entry2n);
 
 	onChangeEntryOrder.Emit();
 

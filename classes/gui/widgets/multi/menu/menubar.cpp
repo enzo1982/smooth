@@ -14,6 +14,10 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
 
+#ifdef __APPLE__
+#	include <smooth/gui/widgets/multi/menu/menubar_cocoa.h>
+#endif
+
 const S::Short	 S::GUI::Menubar::classID = S::Object::RequestClassID();
 
 S::GUI::Menubar::Menubar()

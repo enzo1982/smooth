@@ -643,14 +643,15 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			/* Get the window that now has the focus.
 			 */
 			{
-				::Window	 xFocusWnd;
-				int		 revertTo;
+				::Window	 focusWnd = None;
+				int		 revertTo = RevertToNone;
 
-				XGetInputFocus(display, &xFocusWnd, &revertTo);
+				if (XGetInputFocus(display, &focusWnd, &revertTo) == 0)
+				{
+					Window	*window = Window::GetWindow((Void *) focusWnd);
 
-				Window		*focusWnd = Window::GetWindow((Void *) xFocusWnd);
-
-				onEvent.Call(SM_LOSEFOCUS, focusWnd != NIL ? focusWnd->GetHandle() : -1, 0);
+					onEvent.Call(SM_LOSEFOCUS, window != NIL ? window->GetHandle() : -1, 0);
+				}
 			}
 
 			break;
@@ -764,7 +765,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				finished.xclient.data.l[0]    = wnd;
 				finished.xclient.data.l[1]    = acceptDrop;
 				finished.xclient.data.l[2]    = xdndActionPrivateAtom;
- 
+
 				XSendEvent(display, sourceWnd, 0, 0, &finished);
 				XFlush(display);
 			}
@@ -1307,7 +1308,7 @@ S::Void S::GUI::WindowXLib::SetCursor(Cursor *cursor, const Point &point)
 {
 	WindowXLib	*window = GetWindowBackend((X11::Window) cursor->GetContainerWindow()->GetSystemWindow());
 
-	if (window->ic != NIL)
+	if (window != NIL && window->ic != NIL)
 	{
 		/* Remove active cursor.
 		 */
@@ -1317,7 +1318,18 @@ S::Void S::GUI::WindowXLib::SetCursor(Cursor *cursor, const Point &point)
 		 */
 		XMoveWindow(window->display, window->iwnd, point.x - 3, point.y + cursor->GetFont().GetScaledTextSizeY() + 1);
 
-		XSetInputFocus(window->display, window->iwnd, RevertToParent, CurrentTime);
+		/* Set input focus on input window.
+		 */
+		::Window	 focusWnd = None;
+		int		 revertTo = RevertToNone;
+
+		XGetInputFocus(window->display, &focusWnd, &revertTo);
+
+		if (focusWnd != window->iwnd)
+		{
+			XSetInputFocus(window->display, window->iwnd, RevertToParent, CurrentTime);
+			XFlush(window->display);
+		}
 
 		/* Set current input context.
 		 */
@@ -1334,7 +1346,7 @@ S::Void S::GUI::WindowXLib::RemoveCursor(Cursor *cursor)
 
 	WindowXLib	*window = GetWindowBackend((X11::Window) cursor->GetContainerWindow()->GetSystemWindow());
 
-	if (window->ic != NIL)
+	if (window != NIL && window->ic != NIL)
 	{
 		/* Clear composition string.
 		 */

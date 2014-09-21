@@ -1029,11 +1029,8 @@ S::Void S::GUI::WindowGDI::MouseNotifier()
 
 S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 {
-	Window	*window	 = cursor->GetContainerWindow();
-	Surface	*surface = cursor->GetDrawSurface();
-
-	HWND	 hwnd	 = (HWND) window->GetSystemWindow();
-	HIMC	 himc	 = ImmGetContext(hwnd);
+	HWND	 hwnd = (HWND) cursor->GetContainerWindow()->GetSystemWindow();
+	HIMC	 himc = ImmGetContext(hwnd);
 
 	/* Clear composition string.
 	 */
@@ -1065,7 +1062,7 @@ S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 		const Font	&font	    = cursor->GetFont();
 		int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
 
-		lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / surface->GetSurfaceDPI());
+		lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / Surface().GetSurfaceDPI());
 		lFont.lfWidth		= 0;
 		lFont.lfEscapement	= 0;
 		lFont.lfOrientation	= 0;
@@ -1091,7 +1088,7 @@ S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 		const Font	&font	    = cursor->GetFont();
 		int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
 
-		lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / surface->GetSurfaceDPI());
+		lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / Surface().GetSurfaceDPI());
 		lFont.lfWidth		= 0;
 		lFont.lfEscapement	= 0;
 		lFont.lfOrientation	= 0;
@@ -1121,10 +1118,8 @@ S::Void S::GUI::WindowGDI::RemoveCursor(Cursor *cursor)
 {
 	if (activeCursor != cursor) return;
 
-	Window	*window	 = cursor->GetContainerWindow();
-
-	HWND	 hwnd	 = (HWND) window->GetSystemWindow();
-	HIMC	 himc	 = ImmGetContext(hwnd);
+	HWND	 hwnd = (HWND) cursor->GetContainerWindow()->GetSystemWindow();
+	HIMC	 himc = ImmGetContext(hwnd);
 
 	/* Clear composition string.
 	 */

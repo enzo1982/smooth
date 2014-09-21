@@ -24,6 +24,7 @@
 #include <smooth/misc/binary.h>
 #include <smooth/system/event.h>
 #include <smooth/system/screen.h>
+#include <smooth/system/system.h>
 #include <smooth/resources.h>
 
 #ifdef __WIN32__
@@ -449,6 +450,10 @@ S::Int S::GUI::Window::Stay()
 	System::EventProcessor	 event;
 
 	while (!destroyed) event.ProcessNextEvent();
+
+	/* Sleep while Window is still in use.
+	 */
+	while (IsObjectInUse()) S::System::System::Sleep(10);
 
 	return Success();
 }

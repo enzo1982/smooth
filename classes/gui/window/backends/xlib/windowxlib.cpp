@@ -1151,7 +1151,7 @@ const S::Array<S::String> &S::GUI::WindowXLib::GetDroppedFiles() const
 
 	/* Query data.
 	 */
-	IO::InStream	 in(IO::STREAM_BUFFER, data, strlen((char *) data));
+	IO::InStream	 in(IO::STREAM_BUFFER, data, strlen((char *) data) + 1);
 
 	while (in.GetPos() < in.Size())
 	{

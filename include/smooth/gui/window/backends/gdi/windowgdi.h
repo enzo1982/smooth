@@ -42,8 +42,11 @@ namespace smooth
 		class WindowGDI : public WindowBackend
 		{
 			private:
+#if defined(__i386__) && (defined(__GNUC__) || defined(__clang__))
+				static LRESULT CALLBACK			 WindowProc(HWND, UINT, WPARAM, LPARAM) __attribute__((force_align_arg_pointer));
+#else
 				static LRESULT CALLBACK			 WindowProc(HWND, UINT, WPARAM, LPARAM);
-
+#endif
 				static Array<WindowGDI *, Void *>	 windowBackends;
 
 				static WindowGDI			*GetWindowBackend(HWND);

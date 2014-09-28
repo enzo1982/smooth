@@ -10,9 +10,7 @@
 
 #include <smooth/system/cpu.h>
 
-#if defined __WIN32__ || defined __APPLE__ || defined __linux__
-#	include <libcpuid.h>
-#endif
+#include <libcpuid.h>
 
 S::Int	 S::System::CPU::numCores	= 1;
 S::Int	 S::System::CPU::numLogicalCPUs	= 1;
@@ -55,17 +53,26 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 	if (initialized) return Success();
 	if (failed)	 return Error();
 
-#if defined __WIN32__ || defined __APPLE__ || defined __linux__
-	/* Fail if CPUID is not available.
+	/* Find total number of CPUs if CPUID is not available.
 	 */
-	failed	    = True;
+	if (!cpuid_present())
+	{
+		/* Set to initialized and get number of CPUs.
+		 */
+		initialized    = True;
 
-	if (!cpuid_present()) return Error();
+		numCores       = cpuid_get_total_cpus();
+		numLogicalCPUs = numCores;
+
+		return Success();
+	}
 
 	/* Get actual CPUID data.
 	 */
 	cpu_raw_data_t	 raw;
 	cpu_id_t	 data;
+
+	failed	    = True;
 
 	if (cpuid_get_raw_data(&raw)  < 0) return Error();
 	if (cpu_identify(&raw, &data) < 0) return Error();
@@ -106,14 +113,6 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 	hasSVM	    = data.flags[CPU_FEATURE_SVM];
 
 	return Success();
-#else
-	/* No libcpuid support.
-	 */
-	initialized = False;
-	failed	    = True;
-
-	return Error();
-#endif
 }
 
 S::System::Endianness S::System::CPU::GetEndianness() const

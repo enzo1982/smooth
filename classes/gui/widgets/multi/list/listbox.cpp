@@ -176,19 +176,19 @@ S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 	if (!(flags & LF_ALLOWREORDER)) return Error();
 
 	Int	 selectedEntryNumber = GetSelectedEntryNumber();
-	Int	 exchangedEntryNumber = selectedEntryNumber;
+	Int	 newEntryNumber	     = selectedEntryNumber;
 
-	if	( upDown && selectedEntryNumber != 0)		 exchangedEntryNumber = selectedEntryNumber - 1;
-	else if (!upDown && selectedEntryNumber != Length() - 1) exchangedEntryNumber = selectedEntryNumber + 1;
+	if	( upDown && selectedEntryNumber != 0)		 newEntryNumber = selectedEntryNumber - 1;
+	else if (!upDown && selectedEntryNumber != Length() - 1) newEntryNumber = selectedEntryNumber + 1;
 
 	Int	 oldSbPos = scrollbarPos;
 
-	if	(exchangedEntryNumber < scrollbarPos)		  scrollbarPos--;
-	else if (!GetNthEntry(exchangedEntryNumber)->IsVisible()) scrollbarPos++;
+	if	(newEntryNumber < scrollbarPos)		    scrollbarPos--;
+	else if (!GetNthEntry(newEntryNumber)->IsVisible()) scrollbarPos++;
 
-	if (selectedEntryNumber != exchangedEntryNumber)
+	if (selectedEntryNumber != newEntryNumber)
 	{
-		SwitchEntries(selectedEntryNumber, exchangedEntryNumber);
+		MoveEntry(selectedEntryNumber, newEntryNumber);
 
 		Paint(SP_PAINT);
 

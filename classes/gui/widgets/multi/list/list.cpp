@@ -151,13 +151,13 @@ S::Int S::GUI::List::RemoveAllEntries()
 	return Success();
 }
 
-S::Int S::GUI::List::SwitchEntries(Int entry1n, Int entry2n)
+S::Int S::GUI::List::MoveEntry(Int n, Int m)
 {
-	if (entry1n == entry2n)			        return Success();
-	if (entry1n >= Length() || entry2n >= Length()) return Error();
-	if (entry1n <  0	|| entry2n <  0	      ) return Error();
+	if (n == m)			    return Success();
+	if (n >= Length() || m >= Length()) return Error();
+	if (n <  0	  || m <  0	  ) return Error();
 
-	elementOrder.SwitchNth(entry1n, entry2n);
+	elementOrder.MoveNth(n, m);
 
 	onChangeEntryOrder.Emit();
 

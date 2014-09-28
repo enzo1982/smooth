@@ -113,13 +113,27 @@ static int get_total_cpus(void)
 #define GET_TOTAL_CPUS_DEFINED
 #endif
 
-#if defined linux || defined __linux__
+#if defined linux || defined __linux__ || defined __sun
 #include <sys/sysinfo.h>
 #include <unistd.h>
  
 static int get_total_cpus(void)
 {
 	return sysconf(_SC_NPROCESSORS_ONLN);
+}
+#define GET_TOTAL_CPUS_DEFINED
+#endif
+
+#if defined __FreeBSD__ || defined __OpenBSD__ || defined __NetBSD__ || defined __bsdi__ || defined __QNX__
+#include <sys/sysctl.h>
+
+static int get_total_cpus(void)
+{
+	int mib[2] = { CTL_HW, HW_NCPU };
+	int ncpus;
+	size_t len = sizeof(ncpus);
+	if (sysctl(mib, 2, &ncpus, &len, (void *) 0, 0) != 0) return 1;
+	return ncpus;
 }
 #define GET_TOTAL_CPUS_DEFINED
 #endif
@@ -179,6 +193,7 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 	};
 	const struct feature_map_t matchtable_edx81[] = {
 		{ 11, CPU_FEATURE_SYSCALL },
+		{ 27, CPU_FEATURE_RDTSCP },
 		{ 29, CPU_FEATURE_LM },
 	};
 	const struct feature_map_t matchtable_ecx81[] = {
@@ -301,6 +316,11 @@ static void make_list_from_string(const char* csv, struct cpu_list_t* list)
 
 
 /* Interface: */
+
+int cpuid_get_total_cpus(void)
+{
+	return get_total_cpus();
+}
 
 int cpuid_present(void)
 {
@@ -557,6 +577,7 @@ const char* cpu_feature_str(cpu_feature_t feature)
 		{ CPU_FEATURE_APERFMPERF, "aperfmperf" },
 		{ CPU_FEATURE_PFI, "pfi" },
 		{ CPU_FEATURE_PA, "pa" },
+		{ CPU_FEATURE_AVX2, "avx2" },
 	};
 	unsigned i, n = COUNT_OF(matchtable);
 	if (n != NUM_CPU_FEATURES) {

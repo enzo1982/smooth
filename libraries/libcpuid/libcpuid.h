@@ -354,6 +354,7 @@ typedef enum {
 	CPU_FEATURE_APERFMPERF,	/*!< MPERF/APERF MSRs support */
 	CPU_FEATURE_PFI,	/*!< Processor Feedback Interface support */
 	CPU_FEATURE_PA,		/*!< Processor accumulator */
+	CPU_FEATURE_AVX2,	/*!< AVX2 instructions */
 	/* termination: */
 	NUM_CPU_FEATURES,
 } cpu_feature_t;
@@ -397,6 +398,12 @@ struct cpu_mark_t {
 	uint64_t tsc;		/*!< Time-stamp from RDTSC */
 	uint64_t sys_clock;	/*!< In microsecond resolution */
 };
+
+/**
+ * @brief Returns the total number of CPUs even if CPUID is not present
+ * @retval Number of CPUs available
+ */
+int cpuid_get_total_cpus(void);
 
 /**
  * @brief Checks if the CPUID instruction is supported

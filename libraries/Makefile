@@ -4,11 +4,10 @@ include $(SMOOTH_PATH)/Makefile-options
 
 all:
 	$(MAKE) -C fribidi2
-ifeq ($(BUILD_LINUX),True)
 	$(MAKE) -C libcpuid
+ifeq ($(BUILD_LINUX),True)
 	$(MAKE) -C nsucd
 else ifeq ($(BUILD_OSX),True)
-	$(MAKE) -C libcpuid
 	$(MAKE) -C libjpeg
 ifneq ($(BUILD_XLIB),True)
 	$(MAKE) -C libpng
@@ -22,7 +21,6 @@ else ifeq ($(BUILD_QNX),True)
 	$(MAKE) -C libz
 else ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C bzlib
-	$(MAKE) -C libcpuid
 	$(MAKE) -C libiconv
 	$(MAKE) -C libjpeg
 	$(MAKE) -C libpng
@@ -39,11 +37,10 @@ endif
 
 clean:
 	$(MAKE) -C fribidi2 clean
-ifeq ($(BUILD_LINUX),True)
 	$(MAKE) -C libcpuid clean
+ifeq ($(BUILD_LINUX),True)
 	$(MAKE) -C nsucd clean
 else ifeq ($(BUILD_OSX),True)
-	$(MAKE) -C libcpuid clean
 	$(MAKE) -C libjpeg clean
 ifneq ($(BUILD_XLIB),True)
 	$(MAKE) -C libpng clean
@@ -57,7 +54,6 @@ else ifeq ($(BUILD_QNX),True)
 	$(MAKE) -C libz clean
 else ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C bzlib clean
-	$(MAKE) -C libcpuid clean
 	$(MAKE) -C libiconv clean
 	$(MAKE) -C libjpeg clean
 	$(MAKE) -C libpng clean

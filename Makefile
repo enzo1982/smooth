@@ -7,7 +7,7 @@ include Makefile-directories
 
 OBJECTS = classes/*/*.o classes/*/*/*.o classes/*/*/*/*.o classes/*/*/*/*/*.o misc/*.o
 
-LIBS = -lfribidi -lbz2 -lxml2 -ljpeg -lstdc++
+LIBS = -lfribidi -lcpuid -lbz2 -lxml2 -ljpeg -lstdc++
 
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += resources/*.o
@@ -24,7 +24,7 @@ ifeq ($(BUILD_WIN32),True)
 		LIBS += -lcairo.dll
 	endif
 
-	LIBS += -lcpuid -lnsucd -lpng -lz -lws2_32 -limm32 -lole32
+	LIBS += -lnsucd -lpng -lz -lws2_32 -limm32 -lole32
 
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
@@ -39,7 +39,7 @@ else ifeq ($(BUILD_OSX),True)
 		LIBS += -lcairo
 	endif
 
-	LIBS += -lcpuid -lnsucd -liconv -lpthread
+	LIBS += -lnsucd -liconv -lpthread
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_HAIKU),True)
@@ -52,7 +52,7 @@ else ifeq ($(BUILD_QNX),True)
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else
 	ifeq ($(BUILD_LINUX),True)
-		LIBS += -lcpuid -lnsucd
+		LIBS += -lnsucd
 	else ifeq ($(BUILD_FREEBSD),True)
 		LIBS += -lrt
 	else ifeq ($(BUILD_OPENBSD),True)

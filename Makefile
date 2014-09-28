@@ -59,8 +59,14 @@ else
 		LIBS += -lXau -lXdmcp -lXxf86vm -lSM -lICE -lffi -ldrm -lpcre
 	endif
 
-	LIBS += $(shell pkg-config --libs libpng) $(shell pkg-config --libs xmu) $(shell pkg-config --libs xft) $(shell pkg-config --libs gtk+-3.0)
+	LIBS += $(shell pkg-config --libs libpng) $(shell pkg-config --libs xmu) $(shell pkg-config --libs xft)
 	LIBS += -lpthread
+
+	ifeq ($(BUILD_SOLARIS),True)
+		LIBS += $(shell pkg-config --libs gtk+-2.0)
+	else
+		LIBS += $(shell pkg-config --libs gtk+-3.0)
+	endif
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 endif

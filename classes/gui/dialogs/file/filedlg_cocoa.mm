@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,13 +33,11 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 		if ([openPanel runModal] == NSOKButton)
 		{
-			NSArray *URLs = [openPanel URLs];
-
-			for (unsigned int i = 0; i < [URLs count]; i++)
+			for (NSURL *url in [openPanel URLs])
 			{
 				String	 file;
 
-				file.ImportFrom("UTF-8", [[[URLs objectAtIndex: i] path] UTF8String]);
+				file.ImportFrom("UTF-8", [[url path] UTF8String]);
 				files.Add(file);
 			}
 		}

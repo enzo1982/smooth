@@ -1072,19 +1072,15 @@ const S::Array<S::String> &S::GUI::WindowCocoa::GetDroppedFiles() const
 
 	fileNames.RemoveAll();
 
-        NSArray	*files = [pasteBoard propertyListForType: NSFilenamesPboardType];
-
-	/* Query number of files dropped.
+ 	/* Query dropped files.
 	 */
-	Int	 nOfFiles = [files count];
+	NSArray	*files = [pasteBoard propertyListForType: NSFilenamesPboardType];
 
-	/* Query dropped files.
-	 */
-	for (Int i = 0; i < nOfFiles; i++)
+	for (NSString *file in files)
 	{
 		String	 fileName;
 
-		fileName.ImportFrom("UTF-8", [[files objectAtIndex: i] UTF8String]);
+		fileName.ImportFrom("UTF-8", [file UTF8String]);
 
 		fileNames.Add(fileName);
 	}

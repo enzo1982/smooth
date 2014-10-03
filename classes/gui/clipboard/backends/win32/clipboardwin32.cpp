@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,7 +37,7 @@ S::String S::GUI::ClipboardWin32::GetClipboardText() const
 
 	OpenClipboard((HWND) window->GetSystemWindow());
 
-	if (Setup::enableUnicode && IsClipboardFormatAvailable(CF_UNICODETEXT))
+	if (IsClipboardFormatAvailable(CF_UNICODETEXT))
 	{
 		clipboardText = (wchar_t *) GetClipboardData(CF_UNICODETEXT);
 	}
@@ -57,24 +57,11 @@ S::Bool S::GUI::ClipboardWin32::SetClipboardText(const String &text)
 
 	OpenClipboard((HWND) window->GetSystemWindow());
 
-	HGLOBAL	 memory = NIL;
+	HGLOBAL	 memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(wchar_t) * (text.Length() + 1));
 
-	if (Setup::enableUnicode)
-	{
-		memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(wchar_t) * (text.Length() + 1));
+	memcpy(GlobalLock(memory), (wchar_t *) text, sizeof(wchar_t) * (text.Length() + 1));
 
-		memcpy(GlobalLock(memory), (wchar_t *) text, sizeof(wchar_t) * (text.Length() + 1));
-
-		SetClipboardData(CF_UNICODETEXT, memory);
-	}
-	else
-	{
-		memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(char) * (text.Length() + 1));
-
-		memcpy(GlobalLock(memory), (char *) text, sizeof(char) * (text.Length() + 1));
-
-		SetClipboardData(CF_TEXT, memory);
-	}
+	SetClipboardData(CF_UNICODETEXT, memory);
 
 	CloseClipboard();
 

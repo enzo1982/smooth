@@ -20,19 +20,19 @@
 #	include <smooth/backends/win32/backendwin32.h>
 
 #	include <io.h>
+
+#	define open _wopen
+#	define close _close
+
+#	define read _read
+#	define write _write
+
+#	define lseek64 _lseeki64
 #else
 #	include <unistd.h>
 
-#	define _open open
-#	define _wopen open
-#	define _close close
-#	define _read read
-#	define _write write
-
-#	ifdef __linux__
-#		define _lseeki64 lseek64
-#	else
-#		define _lseeki64 lseek
+#	if !defined __linux__ && !defined __sun && !defined __GNU__ && !defined __QNXNTO__
+#		define lseek64 lseek
 #	endif
 
 #	ifndef O_BINARY
@@ -49,15 +49,8 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 	stream	    = -1;
 	closeStream = false;
 
-	static Bool	 enableUnicode = Setup::enableUnicode;
-
-#if defined __WIN32__
-	/* Disable Unicode functions on Windows 9x even if we
-	 * have Unicows as it does not work correctly there.
-	 */
-	enableUnicode = Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT);
-#else
-	/* Set output format to UTF-8 on non Windows systems.
+#if !defined __WIN32__
+	/* Set output format to UTF-8 on non-Windows systems.
 	 */
 	const char	*previousOutputFormat = String::SetOutputFormat("UTF-8");
 #endif
@@ -69,8 +62,7 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 
 			return;
 		case OS_APPEND:		   // open a file for appending data
-			if (enableUnicode) stream = _wopen(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
-			else		   stream =   open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
+			stream = open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0600);
 
 			if (stream != -1)
 			{
@@ -81,18 +73,15 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 
 			break;
 		case OS_REPLACE:	   // create or overwrite a file
-			if (enableUnicode) stream = _wopen(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT | O_TRUNC, 0600);
-			else		   stream =   open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT | O_TRUNC, 0600);
+			stream = open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT | O_TRUNC, 0600);
 
 			break;
 		case IS_READ | IS_WRITE:   // open a file for reading data
-			if (enableUnicode) stream = _wopen(fileName, O_RDWR | O_BINARY);
-			else		   stream =   open(fileName, O_RDWR | O_BINARY);
+			stream = open(fileName, O_RDWR | O_BINARY);
 
 			break;
 		case IS_READ:		   // open a file in read only mode
-			if (enableUnicode) stream = _wopen(fileName, O_RDONLY | O_BINARY);
-			else		   stream =   open(fileName, O_RDONLY | O_BINARY);
+			stream = open(fileName, O_RDONLY | O_BINARY);
 
 			break;
 	}
@@ -125,39 +114,39 @@ S::IO::DriverPOSIX::DriverPOSIX(Int iStream) : Driver()
 
 S::IO::DriverPOSIX::~DriverPOSIX()
 {
-	if (closeStream) _close(stream);
+	if (closeStream) close(stream);
 }
 
 S::Int S::IO::DriverPOSIX::ReadData(UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	return _read(stream, data, (dataSize < (GetSize() - GetPos()) ? dataSize : (GetSize() - GetPos())));
+	return read(stream, data, (dataSize < (GetSize() - GetPos()) ? dataSize : (GetSize() - GetPos())));
 }
 
 S::Int S::IO::DriverPOSIX::WriteData(UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	return _write(stream, data, dataSize);
+	return write(stream, data, dataSize);
 }
 
 S::Int64 S::IO::DriverPOSIX::Seek(Int64 newPos)
 {
-	return _lseeki64(stream, newPos, SEEK_SET);
+	return lseek64(stream, newPos, SEEK_SET);
 }
 
 S::Int64 S::IO::DriverPOSIX::GetSize() const
 {
 	Int64	 oldPos = GetPos();
-	Int64	 size = _lseeki64(stream, 0, SEEK_END);
+	Int64	 size = lseek64(stream, 0, SEEK_END);
 
-	_lseeki64(stream, oldPos, SEEK_SET);
+	lseek64(stream, oldPos, SEEK_SET);
 
 	return size;
 }
 
 S::Int64 S::IO::DriverPOSIX::GetPos() const
 {
-	return _lseeki64(stream, 0, SEEK_CUR);
+	return lseek64(stream, 0, SEEK_CUR);
 }

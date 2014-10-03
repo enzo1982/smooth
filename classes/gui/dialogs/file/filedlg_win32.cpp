@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,234 +40,101 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 	 */
 	Int	 bpos = 0;
 
-	if (Setup::enableUnicode)
+	static OPENFILENAME	 ofn;
+	wchar_t			*filter = new wchar_t [32768];
+	wchar_t			*buffer = new wchar_t [32768];
+
+	for (Int i = 0; i < 32768; i++)		   buffer[i] = 0;
+	for (Int n = 0; n < defFile.Length(); n++) buffer[n] = defFile[n];
+
+	if (parentWindow != NIL) ofn.hwndOwner = (HWND) parentWindow->GetSystemWindow();
+	else			 ofn.hwndOwner = NIL;
+
+	ofn.lStructSize	    = sizeof(OPENFILENAMEW);
+	ofn.nFilterIndex    = filterIndex;
+	ofn.lpstrFile	    = buffer;
+	ofn.nMaxFile	    = 32768;
+	ofn.lpstrFileTitle  = NIL;
+	ofn.lpstrInitialDir = NIL;
+	ofn.lpstrTitle	    = caption;
+	ofn.Flags	    = OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | flags;
+	ofn.lpstrDefExt	    = defExt;
+
+	for (Int k = 0; k < filters.Length(); k++)
 	{
-		static OPENFILENAMEW	 ofnw;
-		wchar_t			*filterw = new wchar_t [32768];
-		wchar_t			*bufferw = new wchar_t [32768];
+		for (Int l = 0; l < filterNames.GetNth(k).Length(); l++) filter[bpos++] = filterNames.GetNth(k)[l];
 
-		for (Int i = 0; i < 32768; i++)		   bufferw[i] = 0;
-		for (Int n = 0; n < defFile.Length(); n++) bufferw[n] = defFile[n];
+		filter[bpos++] = 0;
 
-		if (parentWindow != NIL)	ofnw.hwndOwner = (HWND) parentWindow->GetSystemWindow();
-		else				ofnw.hwndOwner = NIL;
+		for (Int m = 0; m < filters.GetNth(k).Length(); m++) filter[bpos++] = filters.GetNth(k)[m];
 
-		ofnw.lStructSize	= sizeof(OPENFILENAMEW);
-		ofnw.nFilterIndex	= filterIndex;
-		ofnw.lpstrFile		= bufferw;
-		ofnw.nMaxFile		= 32768;
-		ofnw.lpstrFileTitle	= NIL;
-		ofnw.lpstrInitialDir	= NIL;
-		ofnw.lpstrTitle		= caption;
-		ofnw.Flags		= OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | flags;
-		ofnw.lpstrDefExt	= defExt;
+		filter[bpos++] = 0;
+	}
 
-		for (int k = 0; k < filters.Length(); k++)
+	filter[bpos++] = 0;
+
+	ofn.lpstrFilter = filter;
+
+	if	(mode == SFM_OPEN) { ofn.Flags |= OFN_FILEMUSTEXIST; result = GetOpenFileName(&ofn); }
+	else if (mode == SFM_SAVE) {				     result = GetSaveFileName(&ofn); }
+
+	if (result)
+	{
+		Int	 n;
+		Int	 pos = 0;
+		String	 dir;
+		String	 file;
+		wchar_t	*buffer2 = new wchar_t [32768];
+
+		for (n = 0; n < 32768; n++)
 		{
-			for (int l = 0; l < filterNames.GetNth(k).Length(); l++)
+			buffer2[pos++] = buffer[n];
+
+			if (buffer[n] == 0)
 			{
-				filterw[bpos++] = filterNames.GetNth(k)[l];
+				dir.Copy(buffer2);
+
+				break;
 			}
+		}
 
-			filterw[bpos++] = 0;
+		if (flags & SFD_ALLOWMULTISELECT)
+		{
+			n++;
+			pos = 0;
 
-			for (int m = 0; m < filters.GetNth(k).Length(); m++)
+			for (; n < 32768; n++)
 			{
-				filterw[bpos++] = filters.GetNth(k)[m];
-			}
+				buffer2[pos++] = buffer[n];
 
-			filterw[bpos++] = 0;
-		}
-
-		filterw[bpos++] = 0;
-
-		ofnw.lpstrFilter = filterw;
-
-		if (mode == SFM_OPEN)
-		{
-			ofnw.Flags |= OFN_FILEMUSTEXIST;
-
-			result = GetOpenFileNameW(&ofnw);
-		}
-		else if (mode == SFM_SAVE)
-		{
-			result = GetSaveFileNameW(&ofnw);
-		}
-
-		if (result)
-		{
-			Int	 n;
-			Int	 pos = 0;
-			String	 dir;
-			String	 file;
-			wchar_t	*buffer2w = new wchar_t [32768];
-
-			for (n = 0; n < 32768; n++)
-			{
-				buffer2w[pos++] = bufferw[n];
-
-				if (bufferw[n] == 0)
+				if (buffer[n] == 0)
 				{
-					dir.Copy(buffer2w);
+					file = file.Copy(dir).Append(Directory::GetDirectoryDelimiter()).Append(buffer2);
 
-					break;
+					if (file.EndsWith(Directory::GetDirectoryDelimiter())) file[file.Length() - 1] = 0;
+
+					files.Add(file);
+
+					pos = 0;
+
+					if (buffer[n + 1] == 0) break;
 				}
 			}
-
-			if (flags & SFD_ALLOWMULTISELECT)
-			{
-				n++;
-				pos = 0;
-
-				for (; n < 32768; n++)
-				{
-					buffer2w[pos++] = bufferw[n];
-
-					if (bufferw[n] == 0)
-					{
-						file = file.Copy(dir).Append(Directory::GetDirectoryDelimiter()).Append(buffer2w);
-
-						if (file.EndsWith(Directory::GetDirectoryDelimiter())) file[file.Length() - 1] = 0;
-
-						files.Add(file);
-
-						pos = 0;
-
-						if (bufferw[n + 1] == 0) break;
-					}
-				}
-			}
-			else
-			{
-				files.Add(dir);
-			}
-
-			delete [] buffer2w;
 		}
 		else
 		{
-			error = Error();
+			files.Add(dir);
 		}
 
-		delete [] bufferw;
-		delete [] filterw;
+		delete [] buffer2;
 	}
 	else
 	{
-		static OPENFILENAMEA	 ofna;
-		char			*filtera = new char [32768];
-		char			*buffera = new char [32768];
-
-		for (Int j = 0; j < 32768; j++)		   buffera[j] = 0;
-		for (Int n = 0; n < defFile.Length(); n++) buffera[n] = defFile[n];
-
-		if (parentWindow != NIL)	ofna.hwndOwner = (HWND) parentWindow->GetSystemWindow();
-		else				ofna.hwndOwner = NIL;
-
-		ofna.lStructSize	= sizeof(OPENFILENAMEA);
-		ofna.nFilterIndex	= filterIndex;
-		ofna.lpstrFile		= buffera;
-		ofna.nMaxFile		= 32768;
-		ofna.lpstrFileTitle	= NIL;
-		ofna.lpstrInitialDir	= NIL;
-		ofna.lpstrTitle		= caption;
-		ofna.Flags		= OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | flags;
-		ofna.lpstrDefExt	= defExt;
-
-		for (int k = 0; k < filters.Length(); k++)
-		{
-			char	*filterName = filterNames.GetNth(k);
-
-			for (int l = 0; l < filterNames.GetNth(k).Length(); l++)
-			{
-				filtera[bpos++] = filterName[l];
-			}
-
-			filtera[bpos++] = 0;
-
-			char	*filter = filters.GetNth(k);
-
-			for (int m = 0; m < filters.GetNth(k).Length(); m++)
-			{
-				filtera[bpos++] = filter[m];
-			}
-
-			filtera[bpos++] = 0;
-		}
-
-		filtera[bpos++] = 0;
-
-		ofna.lpstrFilter = filtera;
-
-		if (mode == SFM_OPEN)
-		{
-			ofna.Flags |= OFN_FILEMUSTEXIST;
-
-			result = GetOpenFileNameA(&ofna);
-		}
-		else if (mode == SFM_SAVE)
-		{
-			result = GetSaveFileNameA(&ofna);
-		}
-
-		if (result)
-		{
-			Int	 n;
-			Int	 pos = 0;
-			String	 dir;
-			String	 file;
-			char	*buffer2a = new char [32768];
-
-			for (n = 0; n < 32768; n++)
-			{
-				buffer2a[pos++] = buffera[n];
-
-				if (buffera[n] == 0)
-				{
-					dir.Copy(buffer2a);
-
-					break;
-				}
-			}
-
-			if (flags & SFD_ALLOWMULTISELECT)
-			{
-				n++;
-				pos = 0;
-
-				for (; n < 32768; n++)
-				{
-					buffer2a[pos++] = buffera[n];
-
-					if (buffera[n] == 0)
-					{
-						file = file.Copy(dir).Append(Directory::GetDirectoryDelimiter()).Append(buffer2a);
-
-						if (file.EndsWith(Directory::GetDirectoryDelimiter())) file[file.Length() - 1] = 0;
-
-						files.Add(file);
-
-						pos = 0;
-
-						if (buffera[n + 1] == 0) break;
-					}
-				}
-			}
-			else
-			{
-				files.Add(dir);
-			}
-
-			delete [] buffer2a;
-		}
-		else
-		{
-			error = Error();
-		}
-
-		delete [] buffera;
-		delete [] filtera;
+		error = Error();
 	}
+
+	delete [] buffer;
+	delete [] filter;
 
 	return error;
 }

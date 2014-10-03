@@ -32,10 +32,7 @@ S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 
 	/* Build real filename to pass to CreateFile.
 	 */
-	String	 fileName;
-
-	if (Setup::enableUnicode) fileName = String(iFileName.StartsWith("\\\\") ? "" : unicodePathPrefix).Append(iFileName);
-	else			  fileName = iFileName;
+	String	 fileName = String(iFileName.StartsWith("\\\\") ? "" : unicodePathPrefix).Append(iFileName);
 
 	switch (mode)
 	{
@@ -44,8 +41,7 @@ S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 
 			return;
 		case OS_APPEND:			  // open a file for appending data
-			if (Setup::enableUnicode) stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			else			  stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			stream = CreateFile(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 			if (stream != INVALID_HANDLE_VALUE)
 			{
@@ -56,18 +52,15 @@ S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 
 			break;
 		case OS_REPLACE:		  // create or overwrite a file
-			if (Setup::enableUnicode) stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			else			  stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			stream = CreateFile(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 			break;
 		case IS_READ | IS_WRITE:	  // open a file for reading data
-			if (Setup::enableUnicode) stream = CreateFileW(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-			else			  stream = CreateFileA(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			stream = CreateFile(fileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 			break;
 		case IS_READ:			  // open a file in read only mode
-			if (Setup::enableUnicode) stream = CreateFileW(fileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-			else			  stream = CreateFileA(fileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			stream = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 			break;
 	}

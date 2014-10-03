@@ -156,7 +156,7 @@ S::Bool S::GUI::BitmapGDIPlus::SetSystemBitmap(Void *nBitmap)
 	{
 		BITMAP	 bmp;
 
-		GetObjectA(nBitmap, sizeof(bmp), &bmp);
+		GetObject(nBitmap, sizeof(bmp), &bmp);
 
 		HBITMAP	 oBitmap = hBitmap;
 			 hBitmap = NIL;

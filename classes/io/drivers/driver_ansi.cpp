@@ -17,8 +17,8 @@
 
 #if defined __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
-#else
-#	define _wfopen fopen
+
+#	define fopen _wfopen
 #endif
 
 S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
@@ -26,15 +26,8 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 	stream	    = NIL;
 	closeStream = false;
 
-	static Bool	 enableUnicode = Setup::enableUnicode;
-
-#if defined __WIN32__
-	/* Disable Unicode functions on Windows 9x even if we
-	 * have Unicows as it does not work correctly there.
-	 */
-	enableUnicode = Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT);
-#else
-	/* Set output format to UTF-8 on non Windows systems.
+#if !defined __WIN32__
+	/* Set output format to UTF-8 on non-Windows systems.
 	 */
 	const char	*previousOutputFormat = String::SetOutputFormat("UTF-8");
 #endif
@@ -46,8 +39,7 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 
 			return;
 		case OS_APPEND:		   // open a file for appending data
-			if (enableUnicode) stream = _wfopen(fileName, String("r+b"));
-			else		   stream =   fopen(fileName,	     "r+b" );
+			stream = fopen(fileName, String("r+b"));
 
 			if (stream != NIL)
 			{
@@ -58,18 +50,15 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 
 			break;
 		case OS_REPLACE:	   // create or overwrite a file
-			if (enableUnicode) stream = _wfopen(fileName, String("w+b"));
-			else		   stream =   fopen(fileName,	     "w+b" );
+			stream = fopen(fileName, String("w+b"));
 
 			break;
 		case IS_READ | IS_WRITE:   // open a file for reading data
-			if (enableUnicode) stream = _wfopen(fileName, String("r+b"));
-			else		   stream =   fopen(fileName,	     "r+b" );
+			stream = fopen(fileName, String("r+b"));
 
 			break;
 		case IS_READ:		   // open a file in read only mode
-			if (enableUnicode) stream = _wfopen(fileName, String("rb"));
-			else		   stream =   fopen(fileName,	     "rb" );
+			stream = fopen(fileName, String("rb"));
 
 			break;
 	}

@@ -338,12 +338,9 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	/* Set up Windows font.
 	 */
 	HDC	 gdi_dc	   = GetWindowDC(window);
-	HFONT	 hfont;
+	HFONT	 hfont	   = CreateFont(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 	HFONT	 holdfont  = NIL;
 	HFONT	 holdfont2 = NIL;
-
-	if (Setup::enableUnicode) hfont = CreateFontW(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
-	else			  hfont = CreateFontA(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 
 	if (!painting)
 	{
@@ -395,20 +392,14 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 			delete [] visual;
 
-			GCP_RESULTSA	 resultsa;
-			GCP_RESULTSW	 resultsw;
+			GCP_RESULTS	 results;
 			wchar_t		*glyphs = new wchar_t [visualLine.Length() + 1];
 
-			ZeroMemory(&resultsa, sizeof(resultsa));
-			ZeroMemory(&resultsw, sizeof(resultsw));
+			ZeroMemory(&results, sizeof(results));
 
-			resultsa.lStructSize = sizeof(resultsa);
-			resultsa.lpGlyphs    = glyphs;
-			resultsa.nGlyphs     = visualLine.Length() + 1;
-
-			resultsw.lStructSize = sizeof(resultsw);
-			resultsw.lpGlyphs    = glyphs;
-			resultsw.nGlyphs     = visualLine.Length() + 1;
+			results.lStructSize = sizeof(results);
+			results.lpGlyphs    = glyphs;
+			results.nGlyphs     = visualLine.Length() + 1;
 
 			ZeroMemory(glyphs, 2 * (visualLine.Length() + 1));
 
@@ -421,20 +412,14 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			if (rightToLeft.GetRightToLeft()) SetTextAlign(paintContext, TA_RIGHT);
 			else				  SetTextAlign(paintContext, TA_LEFT);
 
-			if (Setup::enableUnicode) GetCharacterPlacementW(paintContext, visualLine, visualLine.Length(), 0, &resultsw, 0);
-			else			  GetCharacterPlacementA(paintContext, visualLine, visualLine.Length(), 0, &resultsa, 0);
+			GetCharacterPlacement(paintContext, visualLine, visualLine.Length(), 0, &results, 0);
 
 			if (rightToLeft.GetRightToLeft()) wRect.left -= 10;
 			else				  wRect.right += 10;
 
-			if (!painting)
-			{
-				if (Setup::enableUnicode) ExtTextOutW(gdi_dc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-				else			  ExtTextOutA(gdi_dc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
-			}
+			if (!painting) ExtTextOut(gdi_dc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, results.lpGlyphs, results.nGlyphs, NIL);
 
-			if (Setup::enableUnicode) ExtTextOutW(paintContext, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, resultsw.lpGlyphs, resultsw.nGlyphs, NIL);
-			else			  ExtTextOutA(paintContext, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, (char *) resultsa.lpGlyphs, resultsa.nGlyphs, NIL);
+			ExtTextOut(paintContext, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, results.lpGlyphs, results.nGlyphs, NIL);
 
 			delete [] glyphs;
 		}
@@ -449,14 +434,12 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			{
 				SetTextAlign(gdi_dc, TA_LEFT);
 
-				if (Setup::enableUnicode) DrawTextExW(gdi_dc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-				else			  DrawTextExA(gdi_dc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+				DrawTextEx(gdi_dc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 			}
 
 			SetTextAlign(paintContext, TA_LEFT);
 
-			if (Setup::enableUnicode) DrawTextExW(paintContext, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-			else			  DrawTextExA(paintContext, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
+			DrawTextEx(paintContext, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
 		}
 
 		rect.top += lineHeight;
@@ -465,6 +448,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	String::ExplodeFinish();
 
 	if (!painting) SelectObject(gdi_dc, holdfont);
+
 	SelectObject(paintContext, holdfont2);
 
 	::DeleteObject(hfont);

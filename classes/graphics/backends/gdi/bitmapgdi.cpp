@@ -143,7 +143,7 @@ S::Bool S::GUI::BitmapGDI::SetSystemBitmap(Void *nBitmap)
 	{
 		BITMAP	 bmp;
 
-		GetObjectA(nBitmap, sizeof(bmp), &bmp);
+		GetObject(nBitmap, sizeof(bmp), &bmp);
 
 		CreateBitmap(Size(bmp.bmWidth, bmp.bmHeight), bmp.bmBitsPixel);
 

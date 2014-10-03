@@ -23,8 +23,7 @@ HINSTANCE	 hDllInstance = NIL;
 
 S::Bool S::LoadIconvDLL()
 {
-	if (Setup::enableUnicode) iconvDLL = LoadLibraryW(GUI::Application::GetApplicationDirectory().Append("iconv"));
-	else			  iconvDLL = LoadLibraryA(GUI::Application::GetApplicationDirectory().Append("iconv"));
+	iconvDLL	= LoadLibrary(GUI::Application::GetApplicationDirectory().Append("iconv"));
 
 	iconv		= (size_t (*)(iconv_t, char **, size_t *, char **, size_t *)) GetProcAddress(iconvDLL, "iconv");
 	iconv_open	= (iconv_t (*)(const char *, const char *)) GetProcAddress(iconvDLL, "iconv_open");
@@ -103,7 +102,7 @@ S::Int S::Backends::BackendWin32::Init()
 
 	/* Declare the process DPI aware.
 	 */
-	HMODULE	 user32dll = LoadLibraryA("user32.dll");
+	HMODULE	 user32dll = LoadLibrary(L"user32.dll");
 	BOOL	 (*ex_SetProcessDPIAware)() = (BOOL (*)()) GetProcAddress(user32dll, "SetProcessDPIAware");
 
 	if (ex_SetProcessDPIAware != NIL) ex_SetProcessDPIAware();
@@ -136,13 +135,13 @@ S::Int S::Backends::BackendWin32::Deinit()
 
 S::Bool S::Backends::BackendWin32::IsWindowsVersionAtLeast(UnsignedInt platformId, UnsignedInt majorVersion, UnsignedInt minorVersion)
 {
-	static OSVERSIONINFOA	 versionInfo = { 0 };
+	static OSVERSIONINFO	 versionInfo = { 0 };
 
 	if (versionInfo.dwOSVersionInfoSize == 0)
 	{
-		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
-		GetVersionExA(&versionInfo);
+		GetVersionEx(&versionInfo);
 	}
 
 	if (versionInfo.dwPlatformId == platformId && ( versionInfo.dwMajorVersion  > majorVersion ||

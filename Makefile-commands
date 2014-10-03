@@ -3,7 +3,7 @@
 include $(SMOOTH_PATH)/Makefile-options
 
 CC	   = gcc
-CCOPTS	   = -pipe -g0 -Wall -I$(SMOOTH_PATH)/include -DUNICODE -D_UNICODE $(MYCCOPTS)
+CCOPTS	   = -pipe -g0 -Wall -I$(SMOOTH_PATH)/include $(MYCCOPTS)
 RC	   = windres
 RCOPTS	   = -DSMOOTH_DLL -O coff
 LD	   = gcc
@@ -29,6 +29,7 @@ endif
 endif
 
 ifeq ($(BUILD_WIN32),True)
+	CCOPTS += -DUNICODE -D_UNICODE -I$(SMOOTH_PATH)/include/support
 	LDOPTS += -mwindows -Wl,--dynamicbase,--nxcompat
 
 	ifdef IMPORTLIB
@@ -38,8 +39,6 @@ ifeq ($(BUILD_WIN32),True)
 			LDOPTS += -Wl,--out-implib,$(IMPORTLIB)
 		endif
 	endif
-
-	CCOPTS += -I$(SMOOTH_PATH)/include/support
 else
 	LDOPTS += -Wl,-rpath,.
 

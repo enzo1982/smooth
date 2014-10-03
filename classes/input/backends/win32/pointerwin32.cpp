@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,16 +28,16 @@ S::Input::PointerWin32::~PointerWin32()
 
 S::Bool S::Input::PointerWin32::SetCursor(const GUI::Window *window, Pointer::CursorType mouseCursor)
 {
-	static HCURSOR	 hCursorArrow	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	static HCURSOR	 hCursorTextEdit = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32513), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	static HCURSOR	 hCursorHand	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32649), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	static HCURSOR	 hCursorHSize	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32644), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-	static HCURSOR	 hCursorVSize	 = (HCURSOR) LoadImageA(NULL, MAKEINTRESOURCEA(32645), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+	static HCURSOR	 hCursorArrow	 = (HCURSOR) LoadImage(NULL, MAKEINTRESOURCE(32512), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+	static HCURSOR	 hCursorTextEdit = (HCURSOR) LoadImage(NULL, MAKEINTRESOURCE(32513), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+	static HCURSOR	 hCursorHand	 = (HCURSOR) LoadImage(NULL, MAKEINTRESOURCE(32649), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+	static HCURSOR	 hCursorHSize	 = (HCURSOR) LoadImage(NULL, MAKEINTRESOURCE(32644), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+	static HCURSOR	 hCursorVSize	 = (HCURSOR) LoadImage(NULL, MAKEINTRESOURCE(32645), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 
 	if (hCursorHand == NIL) hCursorHand = hCursorArrow;
 
-	if (mouseCursor != Pointer::CursorArrow) SetClassLongPtrA((HWND) window->GetSystemWindow(), GCLP_HCURSOR, (LONG_PTR) NIL);
-	else					 SetClassLongPtrA((HWND) window->GetSystemWindow(), GCLP_HCURSOR, (LONG_PTR) hCursorArrow);
+	if (mouseCursor != Pointer::CursorArrow) SetClassLongPtr((HWND) window->GetSystemWindow(), GCLP_HCURSOR, (LONG_PTR) NIL);
+	else					 SetClassLongPtr((HWND) window->GetSystemWindow(), GCLP_HCURSOR, (LONG_PTR) hCursorArrow);
 
 	if	(mouseCursor == Pointer::CursorArrow)	 ::SetCursor(hCursorArrow);
 	else if	(mouseCursor == Pointer::CursorTextEdit) ::SetCursor(hCursorTextEdit);

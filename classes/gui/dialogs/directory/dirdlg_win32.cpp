@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,66 +23,33 @@ int CALLBACK	 BrowseCallbackProc(HWND, UINT, LPARAM, LPARAM);
 
 const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 {
-	if (Setup::enableUnicode)
-	{
-		BROWSEINFOW	 infow;
-		wchar_t		*bufferw = new wchar_t [32768];
+	BROWSEINFO	 info;
+	wchar_t		*buffer = new wchar_t [32768];
 
-		for (Int i = 0; i < 32768; i++) bufferw[i] = 0;
+	for (Int i = 0; i < 32768; i++) buffer[i] = 0;
 
-		if (parentWindow != NIL)	infow.hwndOwner = (HWND) parentWindow->GetSystemWindow();
-		else				infow.hwndOwner = NIL;
+	if (parentWindow != NIL) info.hwndOwner = (HWND) parentWindow->GetSystemWindow();
+	else			 info.hwndOwner = NIL;
 
-		infow.pidlRoot		= NIL;
-		infow.pszDisplayName	= bufferw;
-		infow.lpszTitle		= caption;
-		infow.ulFlags		= BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
-		infow.lpfn		= &BrowseCallbackProc;
-		infow.lParam		= (LPARAM) this;
-		infow.iImage		= 0;
+	info.pidlRoot	    = NIL;
+	info.pszDisplayName = buffer;
+	info.lpszTitle	    = caption;
+	info.ulFlags	    = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
+	info.lpfn	    = &BrowseCallbackProc;
+	info.lParam	    = (LPARAM) this;
+	info.iImage	    = 0;
 
-		ITEMIDLIST	*idlist = SHBrowseForFolderW(&infow);
+	ITEMIDLIST	*idlist = SHBrowseForFolder(&info);
 
-		SHGetPathFromIDListW(idlist, bufferw);
+	SHGetPathFromIDList(idlist, buffer);
 
-		CoTaskMemFree(idlist);
+	CoTaskMemFree(idlist);
 
-		directory = NIL;
+	directory = NIL;
 
-		if (bufferw[0] != 0) directory = bufferw;
+	if (buffer[0] != 0) directory = buffer;
 
-		delete [] bufferw;
-	}
-	else
-	{
-		BROWSEINFOA	 infoa;
-		char		*buffera = new char [32768];
-
-		for (Int i = 0; i < 32768; i++) buffera[i] = 0;
-
-		if (parentWindow != NIL)	infoa.hwndOwner = (HWND) parentWindow->GetSystemWindow();
-		else				infoa.hwndOwner = NIL;
-
-		infoa.pidlRoot		= NIL;
-		infoa.pszDisplayName	= buffera;
-		infoa.lpszTitle		= caption;
-		infoa.ulFlags		= BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
-		infoa.lpfn		= &BrowseCallbackProc;
-		infoa.lParam		= (LPARAM) this;
-		infoa.iImage		= 0;
-
-		ITEMIDLIST	*idlist = SHBrowseForFolderA(&infoa);
-
-		SHGetPathFromIDListA(idlist, buffera);
-
-		CoTaskMemFree(idlist);
-
-		directory = NIL;
-
-		if (buffera[0] != 0) directory = buffera;
-
-		delete [] buffera;
-	}
+	delete [] buffer;
 
 	if (directory != NIL)
 	{
@@ -100,8 +67,7 @@ int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpDa
 {
 	if (uMsg == BFFM_INITIALIZED && ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName() != NIL)
 	{
-		if (S::Setup::enableUnicode)	SendMessageW(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
-		else				SendMessageA(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
+		SendMessage(hwnd, BFFM_SETSELECTION, true, (LPARAM) (wchar_t *) ((S::GUI::Dialogs::DirSelection *) lpData)->GetDirName());
 	}
 
 	return 0;

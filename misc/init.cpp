@@ -42,7 +42,7 @@ __declspec (dllexport) HINSTANCE	 S::hPrevInstance = NIL;
 
 __declspec (dllexport) HICON		 S::SMOOTHICON	  = NIL;
 
-int CALLBACK EnumFontProc(const LOGFONTA *lpelfe, const TEXTMETRICA *lpntme, DWORD fontType, LPARAM lParam)
+int CALLBACK EnumFontProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD fontType, LPARAM lParam)
 {
 	return 0;
 }
@@ -104,22 +104,7 @@ S::Bool S::Init()
 #if defined __WIN32__
 	if (hDllInstance == NIL) hDllInstance = hInstance;
 
-	/* Decide if we want to use unicode.
-	 */
-	if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT))
-	{
-		Setup::enableUnicode = True;
-	}
-	else
-	{
-		HMODULE	 hUnicows = LoadLibraryA("unicows.dll");
-
-		if (hUnicows != NIL) Setup::enableUnicode = True;
-
-		FreeLibrary(hUnicows);
-	}
-
-	SMOOTHICON = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+	SMOOTHICON = (HICON) LoadImage(hDllInstance, MAKEINTRESOURCE(IDI_ICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
 	if (LoadIconvDLL() == True) Setup::useIconv = True;
 
@@ -261,20 +246,20 @@ S::Void S::GetColors()
 S::Void S::GetDefaultFont()
 {
 #if defined __WIN32__
-	static const char	*fonts[5] = { "Segoe UI", "Tahoma", "Microsoft Sans Serif", "MS Sans Serif", NIL };
+	static const wchar_t	*fonts[5] = { L"Segoe UI", L"Tahoma", L"Microsoft Sans Serif", L"MS Sans Serif", NIL };
 
 	HDC	 dc = GetWindowDC(0);
 
 	for (Int i = 0; fonts[i] != NIL; i++)
 	{
-		LOGFONTA	 fontInfo;
+		LOGFONT	 fontInfo;
 
 		fontInfo.lfCharSet	  = DEFAULT_CHARSET;
 		fontInfo.lfPitchAndFamily = 0;
 
-		strcpy(fontInfo.lfFaceName, fonts[i]);
+		wcscpy(fontInfo.lfFaceName, fonts[i]);
 
-		if (EnumFontFamiliesExA(dc, &fontInfo, &EnumFontProc, 0, 0) == 0) { GUI::Font::Default = fonts[i]; break; }
+		if (EnumFontFamiliesEx(dc, &fontInfo, &EnumFontProc, 0, 0) == 0) { GUI::Font::Default = fonts[i]; break; }
 	}
 
 	ReleaseDC(0, dc);

@@ -28,21 +28,9 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderIcon::Load()
 	{
 		HICON	 icon = NIL;
 
-		if (iconID >= 32512 && iconID <= 32517)
-		{
-			if (Setup::enableUnicode) icon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-			else			  icon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-		}
-		else if (iconID >= 20000 && iconID <= 20999)
-		{
-			if (Setup::enableUnicode) icon = (HICON) LoadImageW(hDllInstance, MAKEINTRESOURCEW(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-			else			  icon = (HICON) LoadImageA(hDllInstance, MAKEINTRESOURCEA(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-		}
-		else
-		{
-			if (Setup::enableUnicode) icon = (HICON) LoadImageW(hInstance, MAKEINTRESOURCEW(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-			else			  icon = (HICON) LoadImageA(hInstance, MAKEINTRESOURCEA(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-		}
+		if	(iconID >= 32512 && iconID <= 32517) icon = (HICON) LoadImage(NIL,	    MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+		else if (iconID >= 20000 && iconID <= 20999) icon = (HICON) LoadImage(hDllInstance, MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+		else					     icon = (HICON) LoadImage(hInstance,    MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
 		Size	 size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
 

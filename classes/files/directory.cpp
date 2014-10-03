@@ -135,29 +135,16 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 	files.RemoveAll();
 
 #ifdef __WIN32__
-	HANDLE		 handle;
-	WIN32_FIND_DATAW findDataW;
-	WIN32_FIND_DATAA findDataA;
-
-	if (Setup::enableUnicode) handle = FindFirstFileW(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\").Append(pattern), &findDataW);
-	else			  handle = FindFirstFileA(String(*this).Append("\\").Append(pattern), &findDataA);
+	WIN32_FIND_DATA	 findData;
+	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\").Append(pattern), &findData);
 
 	Bool	 success = (handle != INVALID_HANDLE_VALUE);
 
 	while (success)
 	{
-		if (Setup::enableUnicode)
-		{
-			if (!(findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) files.Add(File(findDataW.cFileName, *this));
+		if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) files.Add(File(findData.cFileName, *this));
 
-			success = FindNextFileW(handle, &findDataW);
-		}
-		else
-		{
-			if (!(findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) files.Add(File(findDataA.cFileName, *this));
-
-			success = FindNextFileA(handle, &findDataA);
-		}
+		success = FindNextFile(handle, &findData);
 	}
 
 	FindClose(handle);
@@ -187,29 +174,16 @@ const S::Array<S::Directory> &S::Directory::GetDirectoriesByPattern(const String
 	directories.RemoveAll();
 
 #ifdef __WIN32__
-	HANDLE		 handle;
-	WIN32_FIND_DATAW findDataW;
-	WIN32_FIND_DATAA findDataA;
-
-	if (Setup::enableUnicode) handle = FindFirstFileW(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\").Append(pattern), &findDataW);
-	else			  handle = FindFirstFileA(String(*this).Append("\\").Append(pattern), &findDataA);
+	WIN32_FIND_DATA	 findData;
+	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\").Append(pattern), &findData);
 
 	Bool	 success = (handle != INVALID_HANDLE_VALUE);
 
 	while (success)
 	{
-		if (Setup::enableUnicode)
-		{
-			if ((findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataW.cFileName) != "." && String(findDataW.cFileName) != "..") directories.Add(Directory(findDataW.cFileName, *this));
+		if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findData.cFileName) != "." && String(findData.cFileName) != "..") directories.Add(Directory(findData.cFileName, *this));
 
-			success = FindNextFileW(handle, &findDataW);
-		}
-		else
-		{
-			if ((findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findDataA.cFileName) != "." && String(findDataA.cFileName) != "..") directories.Add(Directory(findDataA.cFileName, *this));
-
-			success = FindNextFileA(handle, &findDataA);
-		}
+		success = FindNextFile(handle, &findData);
 	}
 
 	FindClose(handle);
@@ -241,19 +215,14 @@ S::DateTime S::Directory::GetCreateTime() const
 	if (!Exists()) return dateTime;
 
 #ifdef __WIN32__
-	HANDLE		 handle;
-	WIN32_FIND_DATAW findDataW;
-	WIN32_FIND_DATAA findDataA;
-
-	if (Setup::enableUnicode) handle = FindFirstFileW(String(GetUnicodePathPrefix(*this)).Append(*this), &findDataW);
-	else			  handle = FindFirstFileA(String(*this), &findDataA);
+	WIN32_FIND_DATA findData;
+	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this), &findData);
 
 	FindClose(handle);
 
 	SYSTEMTIME	 time;
 
-	if (Setup::enableUnicode) FileTimeToSystemTime(&findDataW.ftCreationTime, &time);
-	else			  FileTimeToSystemTime(&findDataA.ftCreationTime, &time);
+	FileTimeToSystemTime(&findData.ftCreationTime, &time);
 
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
@@ -275,25 +244,14 @@ S::Bool S::Directory::Exists() const
 		else						  return False;
 	}
 
-	HANDLE			 handle;
-	WIN32_FIND_DATAW	 findDataW;
-	WIN32_FIND_DATAA	 findDataA;
-
-	if (Setup::enableUnicode) handle = FindFirstFileW(String(GetUnicodePathPrefix(*this)).Append(*this), &findDataW);
-	else			  handle = FindFirstFileA(String(*this), &findDataA);
+	WIN32_FIND_DATAW	 findData;
+	HANDLE			 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this), &findData);
 
 	if (handle == INVALID_HANDLE_VALUE) return False;
 
 	FindClose(handle);
 
-	if (Setup::enableUnicode)
-	{
-		if (!(findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return False;
-	}
-	else
-	{
-		if (!(findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return False;
-	}
+	if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return False;
 #else
 	struct stat	 info;
 
@@ -319,8 +277,7 @@ S::Int S::Directory::Create()
 			String	 path = directory.Head(i);
 
 #ifdef __WIN32__
-			if (Setup::enableUnicode) result = CreateDirectoryW(String(GetUnicodePathPrefix(path)).Append(path), NIL);
-			else			  result = CreateDirectoryA(path, NIL);
+			result = CreateDirectory(String(GetUnicodePathPrefix(path)).Append(path), NIL);
 #else
 			if (mkdir(path.ConvertTo("UTF-8"), 0755) == 0) result = True;
 			else					       result = False;
@@ -341,13 +298,10 @@ S::Int S::Directory::Move(const String &destination)
 {
 	if (!Exists()) return Error();
 
-	Bool	 result = False;
-
 #ifdef __WIN32__
-	if (Setup::enableUnicode) result = MoveFileW(String(GetUnicodePathPrefix(*this)).Append(*this), String(GetUnicodePathPrefix(destination)).Append(destination));
-	else			  result = MoveFileA(String(*this), destination);
+	Bool	 result = MoveFile(String(GetUnicodePathPrefix(*this)).Append(*this), String(GetUnicodePathPrefix(destination)).Append(destination));
 #else
-	result = (rename(String(*this).ConvertTo("UTF-8"), destination.ConvertTo("UTF-8")) == 0);
+	Bool	 result = (rename(String(*this).ConvertTo("UTF-8"), destination.ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False) return Error();
@@ -356,13 +310,10 @@ S::Int S::Directory::Move(const String &destination)
 
 S::Int S::Directory::Delete()
 {
-	Bool	 result = False;
-
 #ifdef __WIN32__
-	if (Setup::enableUnicode) result = RemoveDirectoryW(String(GetUnicodePathPrefix(*this)).Append(*this));
-	else			  result = RemoveDirectoryA(String(*this));
+	Bool	 result = RemoveDirectory(String(GetUnicodePathPrefix(*this)).Append(*this));
 #else
-	result = (rmdir(String(*this).ConvertTo("UTF-8")) == 0);
+	Bool	 result = (rmdir(String(*this).ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False) return Error();
@@ -376,57 +327,29 @@ S::Int S::Directory::Empty()
 	SetActiveDirectory(*this);
 
 #ifdef __WIN32__
-	WIN32_FIND_DATAW	 findDataW;
-	WIN32_FIND_DATAA	 findDataA;
-	HANDLE			 handle;
-
-	if (Setup::enableUnicode) handle = FindFirstFileW(String(GetUnicodePathPrefix("*")).Append("*"), &findDataW);
-	else			  handle = FindFirstFileA(String("*"), &findDataA);
+	WIN32_FIND_DATA	 findData;
+	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix("*")).Append("*"), &findData);
 
 	if (handle != INVALID_HANDLE_VALUE)
 	{
-		if (Setup::enableUnicode)
+		do
 		{
-			do
+			if (String(findData.cFileName) != "." && String(findData.cFileName) != "..")
 			{
-				if (String(findDataW.cFileName) != "." && String(findDataW.cFileName) != "..")
+				if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				{
-					if (findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-					{
-						Directory	 dir(NIL, findDataW.cFileName);
+					Directory	 dir(NIL, findData.cFileName);
 
-						dir.Empty();
-						dir.Delete();
-					}
-					else
-					{
-						DeleteFileW(findDataW.cFileName);
-					}
+					dir.Empty();
+					dir.Delete();
+				}
+				else
+				{
+					DeleteFile(findData.cFileName);
 				}
 			}
-			while (FindNextFileW(handle, &findDataW));
 		}
-		else
-		{
-			do
-			{
-				if (String(findDataA.cFileName) != "." && String(findDataA.cFileName) != "..")
-				{
-					if (findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-					{
-						Directory	 dir(NIL, findDataA.cFileName);
-
-						dir.Empty();
-						dir.Delete();
-					}
-					else
-					{
-						DeleteFileA(findDataA.cFileName);
-					}
-				}
-			}
-			while (FindNextFileA(handle, &findDataA));
-		}
+		while (FindNextFile(handle, &findData));
 
 		FindClose(handle);
 	}
@@ -472,32 +395,17 @@ const char *S::Directory::GetUnicodePathPrefix(const String &path)
 
 S::Directory S::Directory::GetActiveDirectory()
 {
-	String	 dir;
-
 #ifdef __WIN32__
-	if (Setup::enableUnicode)
-	{
-		Buffer<wchar_t>	 buffer(32768 + 1);
+	Buffer<wchar_t>	 buffer(32768 + 1);
 
-		GetCurrentDirectoryW(buffer.Size(), buffer);
+	GetCurrentDirectory(buffer.Size(), buffer);
 
-		dir = buffer;
-	}
-	else
-	{
-		Buffer<char>	 buffer(MAX_PATH + 1);
-
-		GetCurrentDirectoryA(buffer.Size(), buffer);
-
-		dir = buffer;
-	}
+	String		 dir = (wchar_t *) buffer;
 #else
 	Buffer<char>	 buffer(PATH_MAX + 1);
+	String		 dir;
 
-	if (getcwd(buffer, buffer.Size()) != NIL)
-	{
-		dir = buffer;
-	}
+	if (getcwd(buffer, buffer.Size()) != NIL) dir = buffer;
 #endif
 
 	return Directory(NIL, dir);
@@ -505,13 +413,10 @@ S::Directory S::Directory::GetActiveDirectory()
 
 S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 {
-	Bool	 result = False;
-
 #ifdef __WIN32__
-	if (Setup::enableUnicode) result = SetCurrentDirectoryW(String(GetUnicodePathPrefix(directory)).Append(directory));
-	else			  result = SetCurrentDirectoryA(String(directory));
+	Bool	 result = SetCurrentDirectory(String(GetUnicodePathPrefix(directory)).Append(directory));
 #else
-	result = (chdir(String(directory).ConvertTo("UTF-8")) == 0);
+	Bool	 result = (chdir(String(directory).ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False) return Error();

@@ -414,18 +414,9 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 			delete [] visual;
 		}
 
-		if (Setup::enableUnicode)
-		{
-			if (!painting) XftDrawString16(wdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), line.Length());
+		if (!painting) XftDrawString16(wdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), line.Length());
 
-			XftDrawString16(bdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), line.Length());
-		}
-		else
-		{
-			if (!painting) XftDrawString8(wdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar8 *) (char *) line, line.Length());
-
-			XftDrawString8(bdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar8 *) (char *) line, line.Length());
-		}
+		XftDrawString16(bdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), line.Length());
 
 		rect.top += lineHeight;
 	}

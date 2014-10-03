@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,8 +28,7 @@ S::System::Console::Console(const Console &)
 S::Int S::System::Console::SetTitle(const String &title)
 {
 #if defined __WIN32__
-	if (Setup::enableUnicode)	SetConsoleTitleW(title);
-	else				SetConsoleTitleA(title);
+	SetConsoleTitle(title);
 #endif
 
 	return Success();

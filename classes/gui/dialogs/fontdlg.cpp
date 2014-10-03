@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,54 +29,25 @@ S::GUI::Dialogs::FontSelection::~FontSelection()
 const Error &S::GUI::Dialogs::FontSelection::ShowDialog()
 {
 #ifdef __WIN32__
-	static CHOOSEFONTW	 cfw;
-	static CHOOSEFONTA	 cfa;
-	LOGFONTW		 lfw;
-	LOGFONTA		 lfa;
-	bool			 result;
+	static CHOOSEFONT	 cf;
 
-	if (parentWindow != NIL)
+	LOGFONT			 lf;
+
+	if (parentWindow != NIL) cf.hwndOwner = (HWND) parentWindow->GetSystemWindow();
+	else			 cf.hwndOwner = NIL;
+
+	cf.lStructSize	= sizeof(CHOOSEFONT);
+	cf.lpLogFont	= &lf;
+	cf.Flags	= CF_SCREENFONTS | CF_SCRIPTSONLY | CF_NOSCRIPTSEL | CF_EFFECTS | CF_NOOEMFONTS | CF_NOVERTFONTS;
+	cf.rgbColors	= 0;
+
+	if (ChooseFont(&cf))
 	{
-		cfw.hwndOwner = (HWND) parentWindow->GetSystemWindow();
-		cfa.hwndOwner = (HWND) parentWindow->GetSystemWindow();
-	}
-	else
-	{
-		cfw.hwndOwner = NIL;
-		cfa.hwndOwner = NIL;
-	}
-
-	cfw.lStructSize	= sizeof(CHOOSEFONTW);
-	cfw.lpLogFont	= &lfw;
-	cfw.Flags	= CF_SCREENFONTS | CF_SCRIPTSONLY | CF_NOSCRIPTSEL | CF_EFFECTS | CF_NOOEMFONTS | CF_NOVERTFONTS;
-	cfw.rgbColors	= 0;
-
-	cfa.lStructSize	= sizeof(CHOOSEFONTA);
-	cfa.lpLogFont	= &lfa;
-	cfa.Flags	= CF_SCREENFONTS | CF_SCRIPTSONLY | CF_NOSCRIPTSEL | CF_EFFECTS | CF_NOOEMFONTS | CF_NOVERTFONTS;
-	cfa.rgbColors	= 0;
-
-	if (Setup::enableUnicode) result = ChooseFontW(&cfw);
-	else			  result = ChooseFontA(&cfa);
-
-	if (result)
-	{
-		if (Setup::enableUnicode)
-		{
-			font.SetName(lfw.lfFaceName);
-			font.SetSize(cfw.iPointSize);
-			font.SetWeight(lfw.lfWeight == FW_BOLD ? Font::Bold : Font::Normal);
-			font.SetStyle((lfw.lfItalic ? Font::Italic : Font::Normal) | (lfw.lfUnderline ? Font::Underline : Font::Normal) | (lfw.lfStrikeOut ? Font::StrikeOut : Font::Normal));
-			font.SetColor(cfw.rgbColors);
-		}
-		else
-		{
-			font.SetName(lfa.lfFaceName);
-			font.SetSize(cfa.iPointSize);
-			font.SetWeight(lfa.lfWeight == FW_BOLD ? Font::Bold : Font::Normal);
-			font.SetStyle((lfa.lfItalic ? Font::Italic : Font::Normal) | (lfa.lfUnderline ? Font::Underline : Font::Normal) | (lfa.lfStrikeOut ? Font::StrikeOut : Font::Normal));
-			font.SetColor(cfa.rgbColors);
-		}
+		font.SetName(lf.lfFaceName);
+		font.SetSize(cf.iPointSize);
+		font.SetWeight(lf.lfWeight == FW_BOLD ? Font::Bold : Font::Normal);
+		font.SetStyle((lf.lfItalic ? Font::Italic : Font::Normal) | (lf.lfUnderline ? Font::Underline : Font::Normal) | (lf.lfStrikeOut ? Font::StrikeOut : Font::Normal));
+		font.SetColor(cf.rgbColors);
 	}
 	else
 	{

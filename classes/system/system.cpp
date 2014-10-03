@@ -98,8 +98,7 @@ S::Bool S::System::System::Sleep(UnsignedInt mSeconds)
 S::Bool S::System::System::OpenURL(const String &url)
 {
 #if defined __WIN32__
-	if (Setup::enableUnicode) ShellExecuteW(NULL, (wchar_t *) L"open", url, NULL, NULL, 0);
-	else			  ShellExecuteA(NULL, "open", url, NULL, NULL, 0);
+	ShellExecute(NULL, (wchar_t *) L"open", url, NULL, NULL, 0);
 #elif defined __APPLE__
 	if (!fork())
 	{
@@ -144,28 +143,15 @@ S::String S::System::System::GetWindowsRootDirectory()
 	String	 windowsDir;
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)
-	{
-		Buffer<wchar_t>	 buffer(32768 + 1);
+	Buffer<wchar_t>	 buffer(32768 + 1);
 
-		GetWindowsDirectoryW(buffer, buffer.Size());
+	GetWindowsDirectory(buffer, buffer.Size());
 
-		windowsDir = buffer;
-	}
-	else
-	{
-		Buffer<char>	 buffer(MAX_PATH + 1);
-
-		GetWindowsDirectoryA(buffer, buffer.Size());
-
-		windowsDir = buffer;
-	}
-#else
-	windowsDir = NIL;
+	windowsDir = buffer;
 #endif
 
 	if (!windowsDir.EndsWith(Directory::GetDirectoryDelimiter())) windowsDir.Append(Directory::GetDirectoryDelimiter());
-	if (windowsDir == Directory::GetDirectoryDelimiter()) windowsDir = NIL;
+	if ( windowsDir == Directory::GetDirectoryDelimiter())	      windowsDir = NIL;
 
 	return windowsDir;
 }
@@ -177,15 +163,12 @@ S::String S::System::System::GetProgramFilesDirectory()
 #ifdef __WIN32__
 	HKEY	 currentVersion;
 
-	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion", 0, KEY_QUERY_VALUE, &currentVersion) == ERROR_SUCCESS)
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion", 0, KEY_QUERY_VALUE, &currentVersion) == ERROR_SUCCESS)
 	{
-		/* We need to use the ANSI version of RegQueryValueEx, because
-		 * the Unicode version is not compatible with MSLU.
-		 */
-		DWORD		 size = MAX_PATH + 1;
+		DWORD		 size = 32768 + 1;
 		Buffer<char>	 buffer(size);
 
-		RegQueryValueExA(currentVersion, String("ProgramFilesDir"), 0, NIL, (BYTE *) (char *) buffer, &size);
+		RegQueryValueEx(currentVersion, L"ProgramFilesDir", 0, NIL, (BYTE *) (char *) buffer, &size);
 
 		programsDir = buffer;
 
@@ -197,29 +180,16 @@ S::String S::System::System::GetProgramFilesDirectory()
 		/* Failed to get the program files directory from the registry.
 		 * Get the directory name from the environment variable.
 		 */
-		if (Setup::enableUnicode)
-		{
-			Buffer<wchar_t>	 buffer(32768 + 1);
+		Buffer<wchar_t>	 buffer(32768 + 1);
 
-			ExpandEnvironmentStringsW(String("%ProgramFiles%"), buffer, buffer.Size());
+		ExpandEnvironmentStrings(String("%ProgramFiles%"), buffer, buffer.Size());
 
-			programsDir = buffer;
-		}
-		else
-		{
-			Buffer<char>	 buffer(MAX_PATH + 1);
-
-			ExpandEnvironmentStringsA(String("%ProgramFiles%"), buffer, buffer.Size());
-
-			programsDir = buffer;
-		}
+		programsDir = buffer;
 	}
-#else
-	programsDir = NIL;
 #endif
 
 	if (!programsDir.EndsWith(Directory::GetDirectoryDelimiter())) programsDir.Append(Directory::GetDirectoryDelimiter());
-	if (programsDir == Directory::GetDirectoryDelimiter()) programsDir = NIL;
+	if ( programsDir == Directory::GetDirectoryDelimiter())	       programsDir = NIL;
 
 	return programsDir;
 }
@@ -230,25 +200,12 @@ S::String S::System::System::GetApplicationDataDirectory()
 
 #if defined __WIN32__
 	ITEMIDLIST	*idlist;
+	Buffer<wchar_t>	 buffer(32768 + 1);
 
 	SHGetSpecialFolderLocation(NIL, CSIDL_APPDATA, &idlist);
+	SHGetPathFromIDList(idlist, buffer);
 
-	if (Setup::enableUnicode)
-	{
-		Buffer<wchar_t>	 buffer(32768 + 1);
-
-		SHGetPathFromIDListW(idlist, buffer);
-
-		configDir = buffer;
-	}
-	else
-	{
-		Buffer<char>	 buffer(MAX_PATH + 1);
-
-		SHGetPathFromIDListA(idlist, buffer);
-
-		configDir = buffer;
-	}
+	configDir = buffer;
 
 	CoTaskMemFree(idlist);
 #elif defined __HAIKU__
@@ -270,7 +227,7 @@ S::String S::System::System::GetApplicationDataDirectory()
 #endif
 
 	if (!configDir.EndsWith(Directory::GetDirectoryDelimiter())) configDir.Append(Directory::GetDirectoryDelimiter());
-	if (configDir == Directory::GetDirectoryDelimiter()) configDir = NIL;
+	if ( configDir == Directory::GetDirectoryDelimiter())	     configDir = NIL;
 
 	return configDir;
 }
@@ -281,6 +238,7 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 
 #ifdef __WIN32__
 	ITEMIDLIST	*idlist;
+	Buffer<wchar_t>	 buffer(32768 + 1);
 
 	switch (type)
 	{
@@ -308,22 +266,9 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 			break;
 	}
 
-	if (Setup::enableUnicode)
-	{
-		Buffer<wchar_t>	 buffer(32768 + 1);
+	SHGetPathFromIDList(idlist, buffer);
 
-		SHGetPathFromIDListW(idlist, buffer);
-
-		personalDir = buffer;
-	}
-	else
-	{
-		Buffer<char>	 buffer(MAX_PATH + 1);
-
-		SHGetPathFromIDListA(idlist, buffer);
-
-		personalDir = buffer;
-	}
+	personalDir = buffer;
 
 	CoTaskMemFree(idlist);
 
@@ -418,12 +363,9 @@ S::String S::System::System::GetTempDirectory()
 	String	 tempDir;
 
 #if defined __WIN32__
-	/* We need to use the ANSI version of GetTempPath, because
-	 * the Unicode version is not compatible with MSLU.
-	 */
-	Buffer<char>	 buffer(MAX_PATH + 1);
+	Buffer<wchar_t>	 buffer(32768 + 1);
 
-	GetTempPathA(buffer.Size(), buffer);
+	GetTempPath(buffer.Size(), buffer);
 
 	tempDir = buffer;
 #elif defined __HAIKU__
@@ -442,7 +384,7 @@ S::String S::System::System::GetTempDirectory()
 #endif
 
 	if (!tempDir.EndsWith(Directory::GetDirectoryDelimiter())) tempDir.Append(Directory::GetDirectoryDelimiter());
-	if (tempDir == Directory::GetDirectoryDelimiter()) tempDir = NIL;
+	if ( tempDir == Directory::GetDirectoryDelimiter())	   tempDir = NIL;
 
 	return tempDir;
 }

@@ -1052,19 +1052,7 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 
 		String	 insertText;
 
-		if (Setup::enableUnicode)
-		{
-			insertText[0] = character;
-		}
-		else
-		{
-			/* Non Unicode Windows puts ANSI character codes into wParam.
-			 * Import these using the current character input format.
-			 */
-			char  ansiText[2] = { (char) character, 0 };
-
-			insertText = ansiText;
-		}
+		insertText[0] = character;
 
 		if (selected) RemoveHistoryEntry();
 

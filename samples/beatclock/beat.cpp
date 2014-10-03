@@ -399,18 +399,18 @@ Void BeatClock::StoreConfig()
 #ifdef __WIN32__
 	HKEY	 beatclock;
 
-	RegCreateKeyA(HKEY_LOCAL_MACHINE, "Software\\BeatClock", &beatclock);
+	RegCreateKey(HKEY_LOCAL_MACHINE, L"Software\\BeatClock", &beatclock);
 
-	RegSetValueExA(beatclock, "TimeFormat", 0, REG_DWORD, (BYTE *) &timeformat, 4);
-	RegSetValueExA(beatclock, "TimeZone", 0, REG_DWORD, (BYTE *) &timezone, 4);
-	RegSetValueExA(beatclock, "CentiBeats", 0, REG_DWORD, (BYTE *) &centi, 4);
-	RegSetValueExA(beatclock, "ModeChange", 0, REG_DWORD, (BYTE *) &modechange, 4);
-	RegSetValueExA(beatclock, "Alarm", 0, REG_DWORD, (BYTE *) &isalarm, 4);
-	RegSetValueExA(beatclock, "AlarmBeats", 0, REG_DWORD, (BYTE *) &alarmbeats, 4);
-	RegSetValueExA(beatclock, "AlarmSecs", 0, REG_DWORD, (BYTE *) &alarmsecs, 4);
-	RegSetValueExA(beatclock, "AlarmOption", 0, REG_DWORD, (BYTE *) &alarmoption, 4);
-	RegSetValueExA(beatclock, "WindowPosX", 0, REG_DWORD, (BYTE *) &wpx, 4);
-	RegSetValueExA(beatclock, "WindowPosY", 0, REG_DWORD, (BYTE *) &wpy, 4);
+	RegSetValueEx(beatclock, L"TimeFormat", 0, REG_DWORD, (BYTE *) &timeformat, 4);
+	RegSetValueEx(beatclock, L"TimeZone", 0, REG_DWORD, (BYTE *) &timezone, 4);
+	RegSetValueEx(beatclock, L"CentiBeats", 0, REG_DWORD, (BYTE *) &centi, 4);
+	RegSetValueEx(beatclock, L"ModeChange", 0, REG_DWORD, (BYTE *) &modechange, 4);
+	RegSetValueEx(beatclock, L"Alarm", 0, REG_DWORD, (BYTE *) &isalarm, 4);
+	RegSetValueEx(beatclock, L"AlarmBeats", 0, REG_DWORD, (BYTE *) &alarmbeats, 4);
+	RegSetValueEx(beatclock, L"AlarmSecs", 0, REG_DWORD, (BYTE *) &alarmsecs, 4);
+	RegSetValueEx(beatclock, L"AlarmOption", 0, REG_DWORD, (BYTE *) &alarmoption, 4);
+	RegSetValueEx(beatclock, L"WindowPosX", 0, REG_DWORD, (BYTE *) &wpx, 4);
+	RegSetValueEx(beatclock, L"WindowPosY", 0, REG_DWORD, (BYTE *) &wpy, 4);
 
 	RegCloseKey(beatclock);
 #endif
@@ -423,41 +423,41 @@ Void BeatClock::ReadConfig()
 	DWORD	size;
 	DWORD	type;
 
-	if (RegOpenKeyA(HKEY_LOCAL_MACHINE, "Software\\BeatClock", &beatclock) != ERROR_SUCCESS)
+	if (RegOpenKey(HKEY_LOCAL_MACHINE, L"Software\\BeatClock", &beatclock) != ERROR_SUCCESS)
 	{
 		StoreConfig();
 	}
 	else
 	{
-		RegQueryValueExA(beatclock, "TimeFormat", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "TimeFormat", 0, &type, (BYTE *) &timeformat, &size);
+		RegQueryValueEx(beatclock, L"TimeFormat", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"TimeFormat", 0, &type, (BYTE *) &timeformat, &size);
 
-		RegQueryValueExA(beatclock, "TimeZone", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "TimeZone", 0, &type, (BYTE *) &timezone, &size);
+		RegQueryValueEx(beatclock, L"TimeZone", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"TimeZone", 0, &type, (BYTE *) &timezone, &size);
 
-		RegQueryValueExA(beatclock, "CentiBeats", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "CentiBeats", 0, &type, (BYTE *) &centi, &size);
+		RegQueryValueEx(beatclock, L"CentiBeats", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"CentiBeats", 0, &type, (BYTE *) &centi, &size);
 
-		RegQueryValueExA(beatclock, "ModeChange", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "ModeChange", 0, &type, (BYTE *) &modechange, &size);
+		RegQueryValueEx(beatclock, L"ModeChange", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"ModeChange", 0, &type, (BYTE *) &modechange, &size);
 
-		RegQueryValueExA(beatclock, "Alarm", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "Alarm", 0, &type, (BYTE *) &isalarm, &size);
+		RegQueryValueEx(beatclock, L"Alarm", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"Alarm", 0, &type, (BYTE *) &isalarm, &size);
 
-		RegQueryValueExA(beatclock, "AlarmBeats", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "AlarmBeats", 0, &type, (BYTE *) &alarmbeats, &size);
+		RegQueryValueEx(beatclock, L"AlarmBeats", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"AlarmBeats", 0, &type, (BYTE *) &alarmbeats, &size);
 
-		RegQueryValueExA(beatclock, "AlarmSecs", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "AlarmSecs", 0, &type, (BYTE *) &alarmsecs, &size);
+		RegQueryValueEx(beatclock, L"AlarmSecs", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"AlarmSecs", 0, &type, (BYTE *) &alarmsecs, &size);
 
-		RegQueryValueExA(beatclock, "AlarmOption", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "AlarmOption", 0, &type, (BYTE *) &alarmoption, &size);
+		RegQueryValueEx(beatclock, L"AlarmOption", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"AlarmOption", 0, &type, (BYTE *) &alarmoption, &size);
 
-		RegQueryValueExA(beatclock, "WindowPosX", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "WindowPosX", 0, &type, (BYTE *) &wpx, &size);
+		RegQueryValueEx(beatclock, L"WindowPosX", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"WindowPosX", 0, &type, (BYTE *) &wpx, &size);
 
-		RegQueryValueExA(beatclock, "WindowPosY", 0, &type, 0, &size);
-		RegQueryValueExA(beatclock, "WindowPosY", 0, &type, (BYTE *) &wpy, &size);
+		RegQueryValueEx(beatclock, L"WindowPosY", 0, &type, 0, &size);
+		RegQueryValueEx(beatclock, L"WindowPosY", 0, &type, (BYTE *) &wpy, &size);
 
 		RegCloseKey(beatclock);
 	}

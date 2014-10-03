@@ -1,32 +1,30 @@
-Status of smooth ports
-----------------------
+General requirements
+--------------------
 
-Windows, GCC 4.x	since 0.8.67.0			complete support
+smooth can be compiled using GCC 4.0+ or MSVC 10.0.
 
-Windows, MSVC 6.0	since 0.8.58.0, up to 0.8.69.0	complete support
-Windows, MSVC 8.0	since 0.8.69.1, up to 0.8.70.8	complete support
-Windows, MSVC 10.0	since 0.8.70.9			complete support
+Supported operating systems
+---------------------------
 
-Linux, GCC 4.x		since 0.8.71.0			complete support
-FreeBSD, GCC 4.x	since 0.8.71.0			complete support
-NetBSD, GCC 4.x		since 0.8.71.0			complete support
-OpenBSD, GCC 4.x	since 0.8.71.0			complete support
-Solaris, GCC 4.x	since 0.8.71.0			complete support
-Hurd, GCC 4.x		since 0.8.71.0			complete support
+Windows Vista/7/8	complete support
+Windows 2000/XP		complete support
 
-Mac OS X, GCC 4.x	since 0.8.71.0			X11 GUI only, Cocoa GUI in progress
-QNX, GCC 4.x		since 0.8.71.0			X11 GUI only
-Haiku, GCC 4.x		since 0.8.71.0			GUI still very unstable
+Mac OS X 10.5+		complete support
 
-Syllable, GCC 4.x	untested			no GUI support yet
+Linux			complete support
 
+Solaris 11.x		complete support
+FreeBSD	9.0+		complete support
+NetBSD 6.0+		complete support
+OpenBSD	5.1+		complete support
 
-Support for different version of Microsoft Windows
---------------------------------------------------
+GNU Hurd		complete support
 
-Windows Vista/7/8	since 0.8.69.0			complete support
-Windows 2000/XP/2003	all versions			complete support
-Windows NT 4.0		all versions			seems to work, no official support
+QNX 6.5			X11 GUI only
+Haiku			GUI still very unstable
 
-Windows 98/SE/ME	all versions			seems to work, no official support
-Windows 95		since 0.8.62.0			seems to work, no official support, requires: msvcrt.dll, ws2_32.dll, Shell Update
+Discontinued operating systems
+------------------------------
+
+Windows NT 4.0		no longer supported
+Windows 9x/ME		no longer supported

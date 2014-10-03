@@ -100,34 +100,15 @@ S::String S::GUI::Application::GetStartupDirectory()
 	if (startupDirectory != NIL) return startupDirectory;
 
 #ifdef __WIN32__
-	Int	 length = 0;
+	Buffer<wchar_t>	 buffer(32768 + 1);
 
-	if (Setup::enableUnicode)
-	{
-		Buffer<wchar_t>	 buffer(32768 + 1);
-
-		length = GetCurrentDirectoryW(buffer.Size(), buffer);
-
-		startupDirectory = buffer;
-	}
-
-	if (!Setup::enableUnicode || length == 0)
-	{
-		Buffer<char>	 buffer(MAX_PATH + 1);
-
-		GetCurrentDirectoryA(buffer.Size(), buffer);
-
-		startupDirectory = buffer;
-	}
+	if (GetCurrentDirectory(buffer.Size(), buffer))	startupDirectory = buffer;
 
 	if (!startupDirectory.EndsWith("\\")) startupDirectory.Append("\\");
 #else
 	Buffer<char>	 buffer(PATH_MAX + 1);
 
-	if (getcwd(buffer, buffer.Size()) != NIL)
-	{
-		startupDirectory = buffer;
-	}
+	if (getcwd(buffer, buffer.Size()) != NIL) startupDirectory = buffer;
 
 	if (!startupDirectory.EndsWith("/")) startupDirectory.Append("/");
 #endif
@@ -140,29 +121,11 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	if (applicationDirectory != NIL) return applicationDirectory;
 
 #if defined __WIN32__
-	Int	 length = 0;
+	Buffer<wchar_t>	 buffer(32768 + 1);
 
-	if (Setup::enableUnicode)
-	{
-		Buffer<wchar_t>	 buffer(32768 + 1);
+	buffer.Zero();
 
-		buffer.Zero();
-
-		length = GetModuleFileNameW(NIL, buffer, buffer.Size() - 1);
-
-		applicationDirectory = buffer;
-	}
-
-	if (!Setup::enableUnicode || length == 0)
-	{
-		Buffer<char>	 buffer(MAX_PATH + 1);
-
-		buffer.Zero();
-
-		GetModuleFileNameA(NIL, buffer, buffer.Size() - 1);
-
-		applicationDirectory = buffer;
-	}
+	if (GetModuleFileName(NIL, buffer, buffer.Size() - 1)) applicationDirectory = buffer;
 #else
 	Buffer<char>	 buffer(PATH_MAX + 1);
 

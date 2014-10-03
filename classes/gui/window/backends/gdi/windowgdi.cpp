@@ -56,8 +56,7 @@ LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM
 		if (smoothWindow->ProcessSystemMessages(message, wParam, lParam) == Break) return 0;
 	}
 
-	if (Setup::enableUnicode) return DefWindowProcW(window, message, wParam, lParam);
-	else			  return DefWindowProcA(window, message, wParam, lParam);
+	return DefWindowProc(window, message, wParam, lParam);
 }
 
 S::Int S::GUI::WindowGDI::Initialize()
@@ -114,8 +113,7 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 
 	flags		= 0;
 
-	if (Setup::enableUnicode) sysIcon = (HICON) LoadImageW(NIL, MAKEINTRESOURCEW(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-	else			  sysIcon = (HICON) LoadImageA(NIL, MAKEINTRESOURCEA(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+	sysIcon		= (HICON) LoadImage(NIL, MAKEINTRESOURCE(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
 	destroyIcon	= False;
 
@@ -296,13 +294,10 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lPa
 		case WM_GETMINMAXINFO:
 			{
 				RECT		 windowRect;
-				Int		 windowStyle;
-				LPMINMAXINFO	 minMaxInfo = (LPMINMAXINFO) lParam;
+				Int		 windowStyle = GetWindowLong(hwnd, GWL_STYLE);
+				LPMINMAXINFO	 minMaxInfo  = (LPMINMAXINFO) lParam;
 
 				GetWindowRect(hwnd, &windowRect);
-
-				if (Setup::enableUnicode) windowStyle = GetWindowLongW(hwnd, GWL_STYLE);
-				else			  windowStyle = GetWindowLongA(hwnd, GWL_STYLE);
 
 				if (windowStyle & WS_DLGFRAME)
 				{
@@ -594,68 +589,31 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 	if (flags & WF_TOPMOST	   )   extStyle |= WS_EX_TOPMOST;
 	if (flags & WF_NOTASKBUTTON)   extStyle |= WS_EX_TOOLWINDOW;
 
-	if (Setup::enableUnicode)
+	wndclass	 = new WNDCLASSEX;
+	wndclass->cbSize = sizeof(WNDCLASSEX);
+	wndclass->style	 = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+
+	/* Enable shadows for tool windows.
+	 */
+	if ((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER))
 	{
-		wndclass = new WNDCLASSEXW;
-
-		WNDCLASSEXW	*wndclassw = (WNDCLASSEXW *) wndclass;
-
-		wndclassw->cbSize	 = sizeof(WNDCLASSEXW);
-		wndclassw->style	 = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-
-		/* Enable shadows for tool windows.
-		 */
-		if ((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER))
-		{
-			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5, 1)) wndclassw->style = wndclassw->style | CS_DROPSHADOW;
-		}
-
-		wndclassw->lpfnWndProc	 = WindowProc;
-		wndclassw->cbClsExtra	 = 0;
-		wndclassw->cbWndExtra	 = 0;
-		wndclassw->hInstance	 = hDllInstance;
-		wndclassw->hIcon	 = sysIcon;
-		wndclassw->hCursor	 = LoadCursorW(NIL, MAKEINTRESOURCEW(32512));
-		wndclassw->hbrBackground = NIL;
-		wndclassw->lpszMenuName	 = NIL;
-		wndclassw->lpszClassName = className;
-		wndclassw->hIconSm	 = sysIcon;
-
-		RegisterClassExW(wndclassw);
-
-		hwnd = CreateWindowExW(extStyle, className, title, style, pos.x, pos.y, Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy, NIL, NIL, hDllInstance, NIL);
+		if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5, 1)) wndclass->style = wndclass->style | CS_DROPSHADOW;
 	}
-	else
-	{
-		wndclass = new WNDCLASSEXA;
 
-		WNDCLASSEXA	*wndclassa = (WNDCLASSEXA *) wndclass;
+	wndclass->lpfnWndProc	= WindowProc;
+	wndclass->cbClsExtra	= 0;
+	wndclass->cbWndExtra	= 0;
+	wndclass->hInstance	= hDllInstance;
+	wndclass->hIcon		= sysIcon;
+	wndclass->hCursor	= LoadCursor(NIL, MAKEINTRESOURCE(32512));
+	wndclass->hbrBackground = NIL;
+	wndclass->lpszMenuName	= NIL;
+	wndclass->lpszClassName = className;
+	wndclass->hIconSm	= sysIcon;
 
-		wndclassa->cbSize	 = sizeof(WNDCLASSEXA);
-		wndclassa->style	 = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	RegisterClassEx(wndclass);
 
-		/* Enable shadows for tool windows.
-		 */
-		if ((flags & WF_NOTASKBUTTON) && (flags & WF_TOPMOST) && (flags & WF_THINBORDER))
-		{
-			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5, 1)) wndclassa->style = wndclassa->style | CS_DROPSHADOW;
-		}
-
-		wndclassa->lpfnWndProc	 = WindowProc;
-		wndclassa->cbClsExtra	 = 0;
-		wndclassa->cbWndExtra	 = 0;
-		wndclassa->hInstance	 = hDllInstance;
-		wndclassa->hIcon	 = sysIcon;
-		wndclassa->hCursor	 = LoadCursorA(NIL, MAKEINTRESOURCEA(32512));
-		wndclassa->hbrBackground = NIL;
-		wndclassa->lpszMenuName	 = NIL;
-		wndclassa->lpszClassName = className;
-		wndclassa->hIconSm	 = sysIcon;
-
-		RegisterClassExA(wndclassa);
-
-		hwnd = CreateWindowExA(extStyle, className, title, style, pos.x, pos.y, Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy, NIL, NIL, hDllInstance, NIL);
-	}
+	hwnd = CreateWindowEx(extStyle, className, title, style, pos.x, pos.y, Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy, NIL, NIL, hDllInstance, NIL);
 
 	if (hwnd != NIL)
 	{
@@ -721,18 +679,9 @@ S::Int S::GUI::WindowGDI::Close()
 	 */
 	DestroyWindow(hwnd);
 
-	if (Setup::enableUnicode)
-	{
-		UnregisterClassW(className, hDllInstance);
+	UnregisterClass(className, hDllInstance);
 
-		delete (WNDCLASSEXW *) wndclass;
-	}
-	else
-	{
-		UnregisterClassA(className, hDllInstance);
-
-		delete (WNDCLASSEXA *) wndclass;
-	}
+	delete wndclass;
 
 	wndclass = NIL;
 
@@ -741,16 +690,8 @@ S::Int S::GUI::WindowGDI::Close()
 
 S::Int S::GUI::WindowGDI::RequestClose()
 {
-	if (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId())
-	{
-		if (Setup::enableUnicode) PostMessageW(hwnd, WM_CLOSE, 0, 0);
-		else			  PostMessageA(hwnd, WM_CLOSE, 0, 0);
-	}
-	else
-	{
-		if (Setup::enableUnicode) SendMessageW(hwnd, WM_CLOSE, 0, 0);
-		else			  SendMessageA(hwnd, WM_CLOSE, 0, 0);
-	}
+	if (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId()) PostMessage(hwnd, WM_CLOSE, 0, 0);
+	else								 SendMessage(hwnd, WM_CLOSE, 0, 0);
 
 	return Success();
 }
@@ -773,8 +714,7 @@ S::Int S::GUI::WindowGDI::SetTitle(const String &nTitle)
 {
 	if (hwnd == NIL) return Error();
 
-	if (Setup::enableUnicode) SetWindowTextW(hwnd, nTitle);
-	else			  SetWindowTextA(hwnd, nTitle);
+	SetWindowText(hwnd, nTitle);
 
 	return Success();
 }
@@ -850,42 +790,25 @@ const S::Array<S::String> &S::GUI::WindowGDI::GetDroppedFiles() const
 
 	/* Query number of files dropped.
 	 */
-	Int	 nOfFiles;
-
-	if (Setup::enableUnicode) nOfFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0);
-	else			  nOfFiles = DragQueryFileA(hDrop, 0xFFFFFFFF, NULL, 0);
+	Int	 nOfFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
 
 	/* Create file name buffer.
 	 */
 	Int	 bufferSize = 32768;
-	wchar_t	*bufferW    = NIL;
-	char	*bufferA    = NIL;
-
-	if (Setup::enableUnicode) bufferW = new wchar_t [bufferSize];
-	else			  bufferA = new char [bufferSize];
+	wchar_t	*buffer	    = new wchar_t [bufferSize];
 
 	/* Query dropped files.
 	 */
 	for (Int i = 0; i < nOfFiles; i++)
 	{
-		if (Setup::enableUnicode)
-		{
-			DragQueryFileW(hDrop, i, bufferW, bufferSize);
+		DragQueryFile(hDrop, i, buffer, bufferSize);
 
-			fileNames.Add(String(bufferW));
-		}
-		else
-		{
-			DragQueryFileA(hDrop, i, bufferA, bufferSize);
-
-			fileNames.Add(String(bufferA));
-		}
+		fileNames.Add(String(buffer));
 	}
 
 	/* Delete file name buffer.
 	 */
-	if (Setup::enableUnicode) delete [] bufferW;
-	else			  delete [] bufferA;
+	delete [] buffer;
 
 	return fileNames;
 }
@@ -970,11 +893,9 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 	SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), (Size(workArea.GetWidth() + (2 * frameSize.cx - 4), workArea.GetHeight() + (2 * frameSize.cy - 4)) - sizeModifier) / fontSize);
 
-	if (Setup::enableUnicode) nonMaxWndStyle = GetWindowLongW(hwnd, GWL_STYLE);
-	else			  nonMaxWndStyle = GetWindowLongA(hwnd, GWL_STYLE);
+	nonMaxWndStyle = GetWindowLong(hwnd, GWL_STYLE);
 
-	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, (nonMaxWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
-	else			  SetWindowLongA(hwnd, GWL_STYLE, (nonMaxWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+	SetWindowLong(hwnd, GWL_STYLE, (nonMaxWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
 
 	maximized = True;
 
@@ -987,8 +908,7 @@ S::Int S::GUI::WindowGDI::Restore()
 {
 	SetMetrics(Point(nonMaxRect.left, nonMaxRect.top), Size((Int) Math::Max(minSize.cx, nonMaxRect.GetWidth()), (Int) Math::Max(minSize.cy, nonMaxRect.GetHeight())));
 
-	if (Setup::enableUnicode) SetWindowLongW(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);
-	else			  SetWindowLongA(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);
+	SetWindowLong(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);
 
 	maximized = False;
 
@@ -1034,11 +954,7 @@ S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 
 	/* Clear composition string.
 	 */
-	if (cursor != activeCursor)
-	{
-		if (Setup::enableUnicode) ImmSetCompositionStringW(himc, SCS_SETSTR, NIL, 0, NIL, 0);
-		else			  ImmSetCompositionStringA(himc, SCS_SETSTR, NIL, 0, NIL, 0);
-	}
+	if (cursor != activeCursor) ImmSetCompositionString(himc, SCS_SETSTR, NIL, 0, NIL, 0);
 
 	/* Set composition window information.
 	 */
@@ -1056,58 +972,29 @@ S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 
 	/* Set font information.
 	 */
-	if (Setup::enableUnicode)
-	{
-		LOGFONTW	 lFont;
-		const Font	&font	    = cursor->GetFont();
-		int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
+	LOGFONT		 lFont;
+	const Font	&font	    = cursor->GetFont();
+	int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
 
-		lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / Surface().GetSurfaceDPI());
-		lFont.lfWidth		= 0;
-		lFont.lfEscapement	= 0;
-		lFont.lfOrientation	= 0;
-		lFont.lfWeight		= (font.GetWeight() >= Font::Bold) ? FW_BOLD : FW_NORMAL;
-		lFont.lfItalic		= (font.GetStyle() & Font::Italic)    ? true : false;
-		lFont.lfUnderline	= (font.GetStyle() & Font::Underline) ? true : false;
-		lFont.lfStrikeOut	= (font.GetStyle() & Font::StrikeOut) ? true : false;
-		lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
-		lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
-		lFont.lfCharSet		= DEFAULT_CHARSET;
-		lFont.lfQuality		= DEFAULT_QUALITY;
-		lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
+	lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / Surface().GetSurfaceDPI());
+	lFont.lfWidth		= 0;
+	lFont.lfEscapement	= 0;
+	lFont.lfOrientation	= 0;
+	lFont.lfWeight		= (font.GetWeight() >= Font::Bold) ? FW_BOLD : FW_NORMAL;
+	lFont.lfItalic		= (font.GetStyle() & Font::Italic)    ? true : false;
+	lFont.lfUnderline	= (font.GetStyle() & Font::Underline) ? true : false;
+	lFont.lfStrikeOut	= (font.GetStyle() & Font::StrikeOut) ? true : false;
+	lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
+	lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
+	lFont.lfCharSet		= DEFAULT_CHARSET;
+	lFont.lfQuality		= DEFAULT_QUALITY;
+	lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
 
-		memcpy(lFont.lfFaceName, (wchar_t *) font.GetName(), sizeof(wchar_t) * nameLength);
+	memcpy(lFont.lfFaceName, (wchar_t *) font.GetName(), sizeof(wchar_t) * nameLength);
 
-		lFont.lfFaceName[nameLength - 1] = 0;
+	lFont.lfFaceName[nameLength - 1] = 0;
 
-		ImmSetCompositionFontW(himc, &lFont);
-	}
-	else
-	{
-		LOGFONTA	 lFont;
-		const Font	&font	    = cursor->GetFont();
-		int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
-
-		lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / Surface().GetSurfaceDPI());
-		lFont.lfWidth		= 0;
-		lFont.lfEscapement	= 0;
-		lFont.lfOrientation	= 0;
-		lFont.lfWeight		= (font.GetWeight() >= Font::Bold) ? FW_BOLD : FW_NORMAL;
-		lFont.lfItalic		= (font.GetStyle() & Font::Italic)    ? true : false;
-		lFont.lfUnderline	= (font.GetStyle() & Font::Underline) ? true : false;
-		lFont.lfStrikeOut	= (font.GetStyle() & Font::StrikeOut) ? true : false;
-		lFont.lfOutPrecision	= OUT_DEFAULT_PRECIS;
-		lFont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
-		lFont.lfCharSet		= DEFAULT_CHARSET;
-		lFont.lfQuality		= DEFAULT_QUALITY;
-		lFont.lfPitchAndFamily	= DEFAULT_PITCH | FF_ROMAN;
-
-		memcpy(lFont.lfFaceName, (char *) font.GetName(), sizeof(char) * nameLength);
-
-		lFont.lfFaceName[nameLength - 1] = 0;
-
-		ImmSetCompositionFontA(himc, &lFont);
-	}
+	ImmSetCompositionFont(himc, &lFont);
 
 	ImmReleaseContext(hwnd, himc);
 
@@ -1123,8 +1010,7 @@ S::Void S::GUI::WindowGDI::RemoveCursor(Cursor *cursor)
 
 	/* Clear composition string.
 	 */
-	if (Setup::enableUnicode) ImmSetCompositionStringW(himc, SCS_SETSTR, NIL, 0, NIL, 0);
-	else			  ImmSetCompositionStringA(himc, SCS_SETSTR, NIL, 0, NIL, 0);
+	ImmSetCompositionString(himc, SCS_SETSTR, NIL, 0, NIL, 0);
 
 	/* Revert to default composition window.
 	 */

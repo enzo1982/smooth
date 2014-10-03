@@ -62,7 +62,7 @@ namespace smooth
 
 				HWND					 hwnd;
 
-				Void					*wndclass;
+				WNDCLASSEX				*wndclass;
 				String					 className;
 
 				HICON					 sysIcon;

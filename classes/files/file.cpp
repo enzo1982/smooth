@@ -31,10 +31,7 @@ namespace smooth
 		if (!file.Exists()) return Error();
 
 #ifdef __WIN32__
-		HANDLE	 handle;
-
-		if (Setup::enableUnicode) handle = CreateFileW(String(Directory::GetUnicodePathPrefix(file)).Append(file), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-		else			  handle = CreateFileA(String(file),						   GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+		HANDLE	 handle = CreateFile(String(Directory::GetUnicodePathPrefix(file)).Append(file), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
 		::GetFileTime(handle, cTime, aTime, wTime);
 
@@ -141,13 +138,10 @@ S::Int64 S::File::GetFileSize() const
 	if (!Exists()) return -1;
 
 #ifdef __WIN32__
-	HANDLE	 handle;
+	HANDLE	 handle	  = CreateFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
-	if (Setup::enableUnicode) handle = CreateFileW(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-	else			  handle = CreateFileA(String(*this),						     GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
-
-	DWORD	 sizeLow	= 0;
-	DWORD	 sizeHigh	= 0;
+	DWORD	 sizeLow  = 0;
+	DWORD	 sizeHigh = 0;
 
 	sizeLow = ::GetFileSize(handle, &sizeHigh);
 
@@ -253,19 +247,14 @@ S::DateTime S::File::GetWriteTime() const
 S::Bool S::File::Exists() const
 {
 #ifdef __WIN32__
-	HANDLE		 handle;
-	WIN32_FIND_DATAW findDataW;
-	WIN32_FIND_DATAA findDataA;
-
-	if (Setup::enableUnicode) handle = FindFirstFileW(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), &findDataW);
-	else			  handle = FindFirstFileA(String(*this), &findDataA);
+	WIN32_FIND_DATA	 findData;
+	HANDLE		 handle = FindFirstFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), &findData);
 
 	if (handle == INVALID_HANDLE_VALUE) return False;
 
 	FindClose(handle);
 
-	if (Setup::enableUnicode) { if (findDataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) return False; }
-	else			  { if (findDataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) return False; }
+	if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) return False;
 #else
 	struct stat	 info;
 
@@ -282,10 +271,7 @@ S::Int S::File::Create()
 	if (Exists()) return Error();
 
 #ifdef __WIN32__
-	HANDLE	 handle;
-
-	if (Setup::enableUnicode) handle = CreateFileW(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
-	else			  handle = CreateFileA(String(*this),						     GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
+	HANDLE	 handle = CreateFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
 
 	if (handle == INVALID_HANDLE_VALUE) return Error();
 
@@ -299,12 +285,11 @@ S::Int S::File::Copy(const String &destination)
 {
 	if (!Exists()) return Error();
 
+#ifdef __WIN32__
+	Bool	 result = CopyFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), String(Directory::GetUnicodePathPrefix(destination)).Append(destination), True);
+#else
 	Bool	 result = False;
 
-#ifdef __WIN32__
-	if (Setup::enableUnicode) result = CopyFileW(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), String(Directory::GetUnicodePathPrefix(destination)).Append(destination), True);
-	else			  result = CopyFileA(String(*this), destination, True);
-#else
 	FILE	*source	= fopen(String(*this).ConvertTo("UTF-8"), "rb");
 	FILE	*dest	= fopen(destination.ConvertTo("UTF-8"), "wb");
 
@@ -342,13 +327,10 @@ S::Int S::File::Move(const String &destination)
 {
 	if (!Exists()) return Error();
 
-	Bool	 result = False;
-
 #ifdef __WIN32__
-	if (Setup::enableUnicode) result = MoveFileW(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), String(Directory::GetUnicodePathPrefix(destination)).Append(destination));
-	else			  result = MoveFileA(String(*this), destination);
+	Bool	 result = MoveFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), String(Directory::GetUnicodePathPrefix(destination)).Append(destination));
 #else
-	result = (rename(String(*this).ConvertTo("UTF-8"), destination.ConvertTo("UTF-8")) == 0);
+	Bool	 result = (rename(String(*this).ConvertTo("UTF-8"), destination.ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False) return Error();
@@ -359,13 +341,10 @@ S::Int S::File::Delete()
 {
 	if (!Exists()) return Error();
 
-	Bool	 result = False;
-
 #ifdef __WIN32__
-	if (Setup::enableUnicode) result = DeleteFileW(String(Directory::GetUnicodePathPrefix(*this)).Append(*this));
-	else			  result = DeleteFileA(String(*this));
+	Bool	 result = DeleteFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this));
 #else
-	result = (remove(String(*this).ConvertTo("UTF-8")) == 0);
+	Bool	 result = (remove(String(*this).ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False) return Error();

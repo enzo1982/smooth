@@ -12,10 +12,6 @@ LIBS = -lfribidi -lcpuid -lbz2 -lxml2 -ljpeg -lstdc++
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += resources/*.o
 
-	ifeq ($(BUILD_X86),True)
-		LIBS += -lunicows
-	endif
-
 	ifeq ($(BUILD_GDIPLUS),True)
 		LIBS += -lgdiplus
 	endif

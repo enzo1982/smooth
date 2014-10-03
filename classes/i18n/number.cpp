@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,32 +23,16 @@ S::String S::I18n::Number::GetLocalizedNumberString(Int64 number)
 	String	 sGrouping = "3;0";
 
 #ifdef __WIN32__
-	if (Setup::enableUnicode)
-	{
-		wchar_t	 buffer[10];
+	wchar_t	 buffer[10];
 
-		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_INEGNUMBER, buffer, 2);
-		negFormat = String(buffer).ToInt();
+	GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_INEGNUMBER, buffer, 2);
+	negFormat = String(buffer).ToInt();
 
-		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, buffer, 4);
-		sThousand = buffer;
+	GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, buffer, 4);
+	sThousand = buffer;
 
-		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_SGROUPING, buffer, 10);
-		sGrouping = buffer;
-	}
-	else
-	{
-		char	 buffer[10];
-
-		GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_INEGNUMBER, buffer, 2);
-		negFormat = String(buffer).ToInt();
-
-		GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, buffer, 4);
-		sThousand = buffer;
-
-		GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SGROUPING, buffer, 10);
-		sGrouping = buffer;
-	}
+	GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SGROUPING, buffer, 10);
+	sGrouping = buffer;
 #endif
 
 	String	 nString = String::FromInt(number >= 0 ? number : -number);

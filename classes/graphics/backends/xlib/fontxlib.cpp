@@ -64,8 +64,7 @@ S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &iText, Bool scaled) con
 	XftFont		*font	 = XftFontOpenName(display, XDefaultScreen(display), String(fontName).Append("-").Append(String::FromInt(Math::Round(fontSize * dpi / 96.0))).Append(":").Append(fontWeight >= Font::Bold ? "bold" : "medium").Append(fontStyle & Font::Italic ? ":italic" : ""));
 	XGlyphInfo	 extents = { 0 };
 
-	if (Setup::enableUnicode) XftTextExtents16(display, font, (XftChar16 *) text.ConvertTo("UCS2"), text.Length(), &extents);
-	else			  XftTextExtents8(display, font, (XftChar8 *) (char *) text, text.Length(), &extents);
+	XftTextExtents16(display, font, (XftChar16 *) text.ConvertTo("UCS2"), text.Length(), &extents);
 
 	XftFontClose(display, font);
 

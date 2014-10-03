@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,16 +40,14 @@ S::System::DynamicLoader::DynamicLoader(const String &module) : handle(NIL)
 	{
 		/* Try the supplied module name in application directory.
 		 */
-		if (Setup::enableUnicode) handle = LoadLibraryW(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
-		else			  handle = LoadLibraryA(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
+		handle = LoadLibrary(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
 	}
 
 	if (handle == NIL)
 	{
 		/* Try the supplied module name system wide.
 		 */
-		if (Setup::enableUnicode) handle = LoadLibraryW(String(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
-		else			  handle = LoadLibraryA(String(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
+		handle = LoadLibrary(String(module).Append(module.EndsWith(dllExt) ? String() : dllExt));
 	}
 #else
 	Int	 dlopenFlags = RTLD_NOW | RTLD_LOCAL;

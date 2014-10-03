@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,27 +39,20 @@ S::Int S::System::EventWin32::ProcessNextEvent()
 	for (Int i = 0; i < 10; i++)
 	{
 		MSG	 msg;
-		Bool	 result = False;
 
-		if (Setup::enableUnicode) result = PeekMessageW(&msg, 0, 0, 0, PM_REMOVE);
-		else			  result = PeekMessageA(&msg, 0, 0, 0, PM_REMOVE);
-
-		if (result)
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			/* Process only the most recent WM_MOUSEMOVE message.
 			 */
 			if (msg.message == WM_MOUSEMOVE)
 			{
-				if (Setup::enableUnicode) while (PeekMessageW(&msg, msg.hwnd, WM_MOUSEMOVE, WM_MOUSEMOVE, PM_REMOVE)) { }
-				else			  while (PeekMessageA(&msg, msg.hwnd, WM_MOUSEMOVE, WM_MOUSEMOVE, PM_REMOVE)) { }
+				while (PeekMessage(&msg, msg.hwnd, WM_MOUSEMOVE, WM_MOUSEMOVE, PM_REMOVE)) { }
 			}
 
 			/* Translate and dispatch message.
 			 */
 			TranslateMessage(&msg);
-
-			if (Setup::enableUnicode) DispatchMessageW(&msg);
-			else			  DispatchMessageA(&msg);
+			DispatchMessage(&msg);
 
 			if (msg.message == WM_QUIT) return Break;
 

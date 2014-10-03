@@ -43,19 +43,15 @@ S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text, Bool scaled) const
 
 	/* Set up Windows font and calculate text size.
 	 */
-	Float	 dpi = Surface().GetSurfaceDPI();
+	Float	 dpi	  = Surface().GetSurfaceDPI();
 
-	HDC	 dc  = CreateCompatibleDC(NIL);
-	HFONT	 hFont;
-
-	if (Setup::enableUnicode) hFont = CreateFontW(-Math::Round(fontSize * dpi / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
-	else			  hFont = CreateFontA(-Math::Round(fontSize * dpi / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	HDC	 dc	  = CreateCompatibleDC(NIL);
+	HFONT	 hFont	  = CreateFont(-Math::Round(fontSize * dpi / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
 
 	HFONT	 hOldFont = (HFONT) SelectObject(dc, hFont);
 	SIZE	 tSize;
 
-	if (Setup::enableUnicode) GetTextExtentPoint32W(dc, text, text.Length(), &tSize);
-	else			  GetTextExtentPoint32A(dc, text, text.Length(), &tSize);
+	GetTextExtentPoint32(dc, text, text.Length(), &tSize);
 
 	SelectObject(dc, hOldFont);
 	::DeleteObject(hFont);

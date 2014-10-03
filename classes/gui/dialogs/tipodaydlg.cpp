@@ -69,7 +69,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	Bitmap	 bmp;
 
 #ifdef __WIN32__
-	bmp = Bitmap((HBITMAP) LoadImageA(hDllInstance, MAKEINTRESOURCEA(IDB_LIGHT), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
+	bmp = Bitmap((HBITMAP) LoadImage(hDllInstance, MAKEINTRESOURCE(IDB_LIGHT), IMAGE_BITMAP, 0, 0, LR_LOADMAP3DCOLORS | LR_SHARED));
 #endif
 
 	bmp.ReplaceColor(Color(192, 192, 192, Color::RGBA), Setup::BackgroundColor);

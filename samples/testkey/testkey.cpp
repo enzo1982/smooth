@@ -63,8 +63,7 @@ Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 #ifdef __WIN32__
 		GetKeyboardState((UnsignedByte *) &keys);
 		ToAscii(wParam, Binary::GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (UnsignedShort *) &asciiCode, 0);
-
-		if (Setup::enableUnicode) ToUnicode(wParam, Binary::GetBits(lParam, 16, 23), (UnsignedByte *) &keys, &unicode, 1, 0);
+		ToUnicode(wParam, Binary::GetBits(lParam, 16, 23), (UnsignedByte *) &keys, &unicode, 1, 0);
 #endif
 
 		scanCode	= Binary::GetBits(lParam, 16, 23);

@@ -20,3 +20,4 @@ xx.xx.14 xx:xx - smooth alpha 0.8.72.0
 - ported to Haiku
 - upgraded V8 to version 3.22.24.0
 - upgraded libcpuid to version 0.2.1
+- upgraded libxml2 to version 2.9.2

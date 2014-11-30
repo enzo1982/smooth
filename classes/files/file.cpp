@@ -328,7 +328,14 @@ S::Int S::File::Move(const String &destination)
 	if (!Exists()) return Error();
 
 #ifdef __WIN32__
-	Bool	 result = MoveFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), String(Directory::GetUnicodePathPrefix(destination)).Append(destination));
+	String		 fileName	= String(Directory::GetUnicodePathPrefix(*this)).Append(*this);
+	UnsignedInt	 fileAttributes	= GetFileAttributes(fileName);
+
+	SetFileAttributes(fileName, fileAttributes & ~FILE_ATTRIBUTE_READONLY);
+
+	Bool	 result = MoveFile(fileName, String(Directory::GetUnicodePathPrefix(destination)).Append(destination));
+
+	SetFileAttributes(fileName, fileAttributes);
 #else
 	Bool	 result = (rename(String(*this).ConvertTo("UTF-8"), destination.ConvertTo("UTF-8")) == 0);
 #endif
@@ -342,7 +349,11 @@ S::Int S::File::Delete()
 	if (!Exists()) return Error();
 
 #ifdef __WIN32__
-	Bool	 result = DeleteFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this));
+	String	 fileName = String(Directory::GetUnicodePathPrefix(*this)).Append(*this);
+
+	SetFileAttributes(fileName, GetFileAttributes(fileName) & ~FILE_ATTRIBUTE_READONLY);
+
+	Bool	 result = DeleteFile(fileName);
 #else
 	Bool	 result = (remove(String(*this).ConvertTo("UTF-8")) == 0);
 #endif

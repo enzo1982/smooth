@@ -149,9 +149,11 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 
 	FindClose(handle);
 #else
+	String	 path	  = String(*this).Replace("*", "\\*").Replace("?", "\\?").
+					  Replace("[", "\\[").Replace("]", "\\]");
 	glob_t	 fileData = { 0 };
 
-	if (glob(String(*this).Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK, NIL, &fileData) == 0)
+	if (glob(path.Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK, NIL, &fileData) == 0)
 	{
 		String	 previousInputFormat = String::SetInputFormat("UTF-8");
 
@@ -188,9 +190,11 @@ const S::Array<S::Directory> &S::Directory::GetDirectoriesByPattern(const String
 
 	FindClose(handle);
 #else
+	String	 path	  = String(*this).Replace("*", "\\*").Replace("?", "\\?").
+					  Replace("[", "\\[").Replace("]", "\\]");
 	glob_t	 fileData = { 0 };
 
-	if (glob(String(*this).Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, &fileData) == 0)
+	if (glob(path.Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, &fileData) == 0)
 	{
 		String	 previousInputFormat = String::SetInputFormat("UTF-8");
 

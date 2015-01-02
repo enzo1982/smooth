@@ -5008,6 +5008,7 @@ class Code: public HeapObject {
   // [relocation_info]: Code relocation information
   DECL_ACCESSORS(relocation_info, ByteArray)
   void InvalidateRelocation();
+  void InvalidateEmbeddedObjects();
 
   // [handler_table]: Fixed array containing offsets of exception handlers.
   DECL_ACCESSORS(handler_table, FixedArray)
@@ -7389,10 +7390,6 @@ class GlobalObject: public JSObject {
     return answer;
   }
 
-  // Ensure that the global object has a cell for the given property name.
-  static Handle<PropertyCell> EnsurePropertyCell(Handle<GlobalObject> global,
-                                                 Handle<Name> name);
-
   // Casting.
   static inline GlobalObject* cast(Object* obj);
 
@@ -7413,6 +7410,10 @@ class JSGlobalObject: public GlobalObject {
  public:
   // Casting.
   static inline JSGlobalObject* cast(Object* obj);
+
+  // Ensure that the global object has a cell for the given property name.
+  static Handle<PropertyCell> EnsurePropertyCell(Handle<JSGlobalObject> global,
+                                                 Handle<Name> name);
 
   // Dispatched behavior.
   DECLARE_PRINTER(JSGlobalObject)

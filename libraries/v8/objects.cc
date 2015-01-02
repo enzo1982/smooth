@@ -4186,9 +4186,12 @@ Handle<Object> JSObject::SetLocalPropertyIgnoreAttributes(
 
   // Check for accessor in prototype chain removed here in clone.
   if (!lookup.IsFound()) {
+    object->map()->LookupTransition(*object, *name, &lookup);
+    TransitionFlag flag = lookup.IsFound()
+        ? OMIT_TRANSITION : INSERT_TRANSITION;
     // Neither properties nor transitions found.
     return AddProperty(object, name, value, attributes, kNonStrictMode,
-        MAY_BE_STORE_FROM_KEYED, extensibility_check, value_type, mode);
+        MAY_BE_STORE_FROM_KEYED, extensibility_check, value_type, mode, flag);
   }
 
   Handle<Object> old_value = isolate->factory()->the_hole_value();
@@ -9568,7 +9571,7 @@ MaybeObject* SharedFunctionInfo::AddToOptimizedCodeMap(Context* native_context,
   if (value->IsSmi()) {
     // No optimized code map.
     ASSERT_EQ(0, Smi::cast(value)->value());
-    // Crate 3 entries per context {context, code, literals}.
+    // Create 3 entries per context {context, code, literals}.
     MaybeObject* maybe = heap->AllocateFixedArray(kInitialLength);
     if (!maybe->To(&new_code_map)) return maybe;
     new_code_map->set(kEntriesStart + 0, native_context);
@@ -10329,6 +10332,18 @@ void ObjectVisitor::VisitExternalReference(RelocInfo* rinfo) {
 
 void Code::InvalidateRelocation() {
   set_relocation_info(GetHeap()->empty_byte_array());
+}
+
+
+void Code::InvalidateEmbeddedObjects() {
+  Object* undefined = GetHeap()->undefined_value();
+  int mode_mask = RelocInfo::ModeMask(RelocInfo::EMBEDDED_OBJECT);
+  for (RelocIterator it(this, mode_mask); !it.done(); it.next()) {
+    RelocInfo::Mode mode = it.rinfo()->rmode();
+    if (mode == RelocInfo::EMBEDDED_OBJECT) {
+      it.rinfo()->set_target_object(undefined, SKIP_WRITE_BARRIER);
+    }
+  }
 }
 
 
@@ -11564,11 +11579,9 @@ Handle<DependentCode> DependentCode::Insert(Handle<DependentCode> entries,
   int start = starts.at(group);
   int end = starts.at(group + 1);
   int number_of_entries = starts.number_of_entries();
-  if (start < end && entries->object_at(end - 1) == *object) {
-    // Do not append the compilation info if it is already in the array.
-    // It is sufficient to just check only the last element because
-    // we process embedded maps of an optimized code in one batch.
-    return entries;
+  // Check for existing entry to avoid duplicates.
+  for (int i = start; i < end; i++) {
+    if (entries->object_at(i) == *object) return entries;
   }
   if (entries->length() < kCodesStartIndex + number_of_entries + 1) {
     Factory* factory = entries->GetIsolate()->factory();
@@ -14749,8 +14762,8 @@ PropertyCell* GlobalObject::GetPropertyCell(LookupResult* result) {
 }
 
 
-Handle<PropertyCell> GlobalObject::EnsurePropertyCell(
-    Handle<GlobalObject> global,
+Handle<PropertyCell> JSGlobalObject::EnsurePropertyCell(
+    Handle<JSGlobalObject> global,
     Handle<Name> name) {
   ASSERT(!global->HasFastProperties());
   int entry = global->property_dictionary()->FindEntry(*name);

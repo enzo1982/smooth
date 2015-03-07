@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,6 +40,10 @@ S::GUI::Color	 S::Setup::TooltipTextColor(0, 0, 0);
 
 S::Float	 S::Setup::FontSize    = 1.00;
 S::Bool		 S::Setup::rightToLeft = S::False;
+
+S::Int		 S::Setup::HoverTime   = 400;
+S::Int		 S::Setup::HoverWidth  = 4;
+S::Int		 S::Setup::HoverHeight = 4;
 
 S::Setup::Setup()
 {

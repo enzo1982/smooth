@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -496,10 +496,11 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 					if ((tooltipText != NIL || tooltipLayer != NIL) && window->IsFocussed())
 					{
+						tipPos	 = mousePos;
 						tipTimer = new System::Timer();
 
 						tipTimer->onInterval.Connect(&Widget::ActivateTooltip, this);
-						tipTimer->Start(500);
+						tipTimer->Start(Setup::HoverTime);
 					}
 
 					Paint(SP_MOUSEIN);
@@ -510,8 +511,8 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				{
 					mouseOver = False;
 
-					leftButtonDown = False;
-					rightButtonDown = False;
+					leftButtonDown	= False;
+					rightButtonDown	= False;
 
 					if (statusText != NIL && window->GetStatusText() == statusText) window->RestoreDefaultStatusText();
 
@@ -523,10 +524,12 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				}
 				else if (mouseOver && window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition))
 				{
-					if (tipTimer != NIL && wParam == 0)
+					if (tipTimer != NIL && wParam == 0 && (Math::Abs(tipPos.x - mousePos.x) > Setup::HoverWidth / 2 || Math::Abs(tipPos.y - mousePos.y) > Setup::HoverHeight / 2))
 					{
+						tipPos = mousePos;
+
 						tipTimer->Stop();
-						tipTimer->Start(500);
+						tipTimer->Start(Setup::HoverTime);
 					}
 				}
 			}
@@ -699,13 +702,13 @@ S::Void S::GUI::Widget::ActivateTooltip()
 		if (tooltipText != NIL)
 		{
 			tooltip->SetText(tooltipText);
-			tooltip->SetMetrics(window->GetMousePosition() - Point(tooltip->GetUnscaledTextWidth() > 0 ? Math::Round(0.2 * tooltip->GetUnscaledTextWidth()) : 20, 1), Size(0, 0));
+			tooltip->SetMetrics(window->GetMousePosition() - Point(tooltip->GetUnscaledTextWidth() > 0 ? Math::Round(0.2 * tooltip->GetUnscaledTextWidth()) : 20, Setup::HoverHeight / 2 + 1), Size(0, 0));
 			tooltip->SetTimeout(3000);
 		}
 		else if (tooltipLayer != NIL)
 		{
 			tooltip->SetLayer(tooltipLayer);
-			tooltip->SetPosition(window->GetMousePosition() - Point(tooltip->GetUnscaledTextWidth() > 0 ? Math::Round(0.2 * tooltip->GetUnscaledTextWidth()) : 20, 1));
+			tooltip->SetPosition(window->GetMousePosition() - Point(tooltip->GetUnscaledTextWidth() > 0 ? Math::Round(0.2 * tooltip->GetUnscaledTextWidth()) : 20, Setup::HoverHeight / 2 + 1));
 			tooltip->SetTimeout(3000);
 		}
 

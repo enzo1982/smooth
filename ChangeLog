@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 
+- widget.cpp		- added mouse jitter tolerance to tooltip code
 - pointer.cpp		- moved system dependent code to backends
 - windowgdi.cpp		- fixed handling of modal windows on Windows
 			- use asynchronous versions of ShowWindow and SetWindowPos to prevent artifacts

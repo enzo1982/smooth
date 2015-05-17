@@ -3,6 +3,7 @@ ChangeLog for smooth
 xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 
 - widget.cpp		- added mouse jitter tolerance to tooltip code
+			- fixed context menu placement at screen edges
 - pointer.cpp		- moved system dependent code to backends
 - window.cpp		- method Stay() renamed WaitModal()
 - windowgdi.cpp		- fixed handling of modal windows on Windows

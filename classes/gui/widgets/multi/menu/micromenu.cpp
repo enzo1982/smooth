@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -124,24 +124,26 @@ S::Void S::GUI::MicroMenu::OpenPopupMenu()
 {
 	if (popup == NIL) return;
 
-	Widget	*window		= container->GetContainerWindow();
-	Surface	*surface	= GetDrawSurface();
+	Widget	*window	   = container->GetContainerWindow();
 
 	if (window == NIL) return;
 
 	hotspot->Deactivate();
 
-	Rect	 monitor	= System::Screen::GetActiveScreenMetrics();
-	Point	 realPos	= GetRealPosition();
-	Size	 realSize	= GetRealSize();
-	Point	 popupPos	= realPos + Point(subtype == OR_HORZ ? realSize.cx : 0, subtype == OR_VERT ? realSize.cy : 0);
+	Rect	 monitor   = System::Screen::GetActiveScreenMetrics();
 
 	popup->CalculateSize();
 
-	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popup->GetWidth() >= monitor.GetWidth()) popupPos.x = realPos.x - Math::Round(popup->GetWidth() * surface->GetSurfaceDPI() / 96.0) + (subtype == OR_VERT ? realSize.cx : 0); }
-	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popup->GetWidth() <= 0)		  popupPos.x = realPos.x - Math::Round(popup->GetWidth() * surface->GetSurfaceDPI() / 96.0) + (subtype == OR_VERT ? realSize.cx : 0); }
+	Point	 realPos   = GetRealPosition();
+	Size	 realSize  = GetRealSize();
 
-	if (window->GetY() + popupPos.y + popup->GetHeight() >= monitor.GetHeight()) popupPos.y = realPos.y - popup->GetHeight() + (subtype == OR_HORZ ? GetHeight() : 0);
+	Point	 popupPos  = realPos + Point(subtype == OR_HORZ ? realSize.cx : 0, subtype == OR_VERT ? realSize.cy : 0);
+	Size	 popupSize = popup->GetRealSize();
+
+	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popupSize.cx >= monitor.GetWidth()) popupPos.x = realPos.x - popupSize.cx + (subtype == OR_VERT ? realSize.cx : 0); }
+	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popupSize.cx <= 0)		     popupPos.x = realPos.x - popupSize.cx + (subtype == OR_VERT ? realSize.cx : 0); }
+
+	if (window->GetY() + popupPos.y + popupSize.cy >= monitor.GetHeight()) popupPos.y = realPos.y - popupSize.cy + (subtype == OR_HORZ ? GetHeight() : 0);
 
 	popup->SetPosition(popupPos);
 	popup->internalRequestClose.Connect(&MicroMenu::ClosePopupMenu, this);

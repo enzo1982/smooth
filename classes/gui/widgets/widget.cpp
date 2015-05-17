@@ -16,6 +16,7 @@
 #include <smooth/gui/window/toolwindow.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
+#include <smooth/system/screen.h>
 #include <smooth/input/keyboard.h>
 #include <smooth/foreach.h>
 
@@ -751,12 +752,20 @@ S::Void S::GUI::Widget::OpenContextMenu()
 	{
 		onOpenContextMenu.Emit();
 
-		Window	*window	  = container->GetContainerWindow();
-		Point	 mousePos = window->GetMousePosition();
+		Window	*window	   = container->GetContainerWindow();
+		Rect	 monitor   = System::Screen::GetActiveScreenMetrics();
 
 		contextMenu->CalculateSize();
 
-		contextMenu->SetPosition(mousePos);
+		Point	 popupPos  = window->GetMousePosition();
+		Size	 popupSize = contextMenu->GetRealSize();
+
+		if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popupSize.cx >= monitor.GetWidth()) popupPos.x = popupPos.x - popupSize.cx; }
+		else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popupSize.cx <= 0)		     popupPos.x = popupPos.x - popupSize.cx; }
+
+		if (window->GetY() + popupPos.y + popupSize.cy >= monitor.GetHeight()) popupPos.y = popupPos.y - popupSize.cy;
+
+		contextMenu->SetPosition(popupPos);
 		contextMenu->SetAlwaysActive(True);
 		contextMenu->internalRequestClose.Connect(&Widget::CloseContextMenu, this);
 

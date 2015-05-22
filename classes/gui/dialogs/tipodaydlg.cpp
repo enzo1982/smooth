@@ -101,6 +101,7 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 
 	layer_inner->Add(txt_tip);
 
+	dlgwnd->SetFlags(dlgwnd->GetFlags() | WF_MODAL);
 	dlgwnd->onPaint.Connect(&TipOfTheDay::OnPaint, this);
 }
 

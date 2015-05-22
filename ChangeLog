@@ -5,7 +5,8 @@ xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 - widget.cpp		- added mouse jitter tolerance to tooltip code
 			- fixed context menu placement at screen edges
 - pointer.cpp		- moved system dependent code to backends
-- window.cpp		- method Stay() renamed WaitModal()
+- window.cpp		- method Stay() renamed WaitUntilClosed()
+			- WaitUntilClosed() no longer sets the WF_MODAL flag
 - windowgdi.cpp		- fixed handling of modal windows on Windows
 			- use asynchronous versions of ShowWindow and SetWindowPos to prevent artifacts
 - windowxlib.cpp	- added drag & drop support

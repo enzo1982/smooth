@@ -144,6 +144,7 @@ Options::Options(Int &itimeformat, Bool &icenti, Bool &iisalarm, Int &ialarmbeat
 
 	Add(optionsdialog);
 
+	optionsdialog->SetFlags(optionsdialog->GetFlags() | WF_MODAL);
 	optionsdialog->SetIcon(ImageLoader::Load("beat.pci:0"));
 }
 

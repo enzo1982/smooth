@@ -64,6 +64,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	msgbox		= new Window(title, Point(), Size());
 	msgbox->SetRightToLeft(defaultRightToLeft);
+	msgbox->SetFlags(msgbox->GetFlags() | WF_MODAL);
 
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	lay		= new Layer();

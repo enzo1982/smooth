@@ -197,6 +197,8 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	dlgwnd->onPaint.Connect(&ColorSelection::ColorDlgPaintProc, this);
 	dlgwnd->onEvent.Connect(&ColorSelection::ColorDlgMessageProc, this);
 
+	dlgwnd->SetFlags(dlgwnd->GetFlags() | WF_MODAL);
+
 	xoffset = Math::Round((dlgwnd->GetMainLayer()->GetX() - 1.0) * Surface().GetSurfaceDPI() / 96.0);
 	yoffset = Math::Round((dlgwnd->GetMainLayer()->GetY() - 1.0) * Surface().GetSurfaceDPI() / 96.0);
 }

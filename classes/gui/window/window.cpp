@@ -445,8 +445,6 @@ S::Int S::GUI::Window::WaitUntilClosed()
 {
 	if (!IsRegistered()) return Error();
 
-	SetFlags(flags | WF_MODAL);
-
 	if (!created) Create();
 	if (!visible) Show();
 
@@ -904,7 +902,7 @@ S::Int S::GUI::Window::Add(Widget *widget)
 		 */
 		if (widget->GetObjectType() == Titlebar::classID)
 		{
-			if (!Binary::IsFlagSet(widget->GetFlags(), TB_MAXBUTTON)) flags = flags | WF_NORESIZE;
+			if (!Binary::IsFlagSet(widget->GetFlags(), TB_MAXBUTTON)) flags |= WF_NORESIZE;
 
 			if (widget->GetHeight() == 0) backend->SetSizeModifier(backend->GetSizeModifier() - Size(0, 19) * Surface().GetSurfaceDPI() / 96.0);
 		}

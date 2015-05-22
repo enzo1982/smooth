@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -62,22 +62,50 @@ S::Int S::GUI::Text::Paint(Int message)
 
 S::Int S::GUI::Text::SetText(const String &nText)
 {
+	if (text == nText) return Success();
+
+	Surface	*surface = GetDrawSurface();
+
+	if (IsRegistered() && IsVisible())
+	{
+		Rect	 oldRect = Rect(GetRealPosition(), GetRealSize());
+		Rect	 newRect = Rect(oldRect.GetPosition(), Size(font.GetScaledTextSizeX(nText), font.GetScaledTextSizeY(nText)));
+
+		surface->StartPaint(Rect::EncloseRect(oldRect, newRect));
+	}
+
 	Widget::SetText(nText);
 
 	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
 
 	Paint(SP_PAINT);
 
+	if (IsRegistered() && IsVisible()) surface->EndPaint();
+
 	return Success();
 }
 
 S::Int S::GUI::Text::SetFont(const Font &nFont)
 {
+	if (font == nFont) return Success();
+
+	Surface	*surface = GetDrawSurface();
+
+	if (IsRegistered() && IsVisible())
+	{
+		Rect	 oldRect = Rect(GetRealPosition(), GetRealSize());
+		Rect	 newRect = Rect(oldRect.GetPosition(), Size(nFont.GetScaledTextSizeX(text), nFont.GetScaledTextSizeY(text)));
+
+		surface->StartPaint(Rect::EncloseRect(oldRect, newRect));
+	}
+
 	Widget::SetFont(nFont);
 
 	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
 
 	Paint(SP_PAINT);
+
+	if (IsRegistered() && IsVisible()) surface->EndPaint();
 
 	return Success();
 }

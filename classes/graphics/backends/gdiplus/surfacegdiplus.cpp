@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -127,8 +127,8 @@ S::Int S::GUI::SurfaceGDIPlus::PaintRect(const Rect &pRect)
 		HDC			 gdi_dc = GetWindowDC(window);
 		Gdiplus::Graphics	*graphics = new Gdiplus::Graphics(gdi_dc);
 
-		Gdiplus::RectF		 srcRect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top);
-		Gdiplus::RectF		 destRect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top);
+		Gdiplus::RectF		 srcRect(pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight());
+		Gdiplus::RectF		 destRect(pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight());
 
 		graphics->DrawImage(paintBitmap, destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, Gdiplus::UnitPixel);
 
@@ -149,7 +149,7 @@ S::Int S::GUI::SurfaceGDIPlus::StartPaint(const Rect &iPRect)
 	paintStates.Add(paintContext->Save());
 	paintRects.Add(new Rect(pRect));
 
-	paintContext->SetClip(Gdiplus::Rect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top));
+	paintContext->SetClip(Gdiplus::Rect(pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight()));
 
 	painting++;
 
@@ -274,7 +274,7 @@ S::Int S::GUI::SurfaceGDIPlus::Box(const Rect &iRect, const Color &color, Int st
 
 	Gdiplus::SolidBrush	 gdip_brush(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
 	Gdiplus::Pen		 gdip_pen(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
-	Gdiplus::Rect		 gdip_rect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+	Gdiplus::Rect		 gdip_rect(rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
 
 	HDC			 gdi_dc	   = NIL;
 	Gdiplus::Graphics	*pGraphics = NIL;
@@ -323,16 +323,16 @@ S::Int S::GUI::SurfaceGDIPlus::Box(const Rect &iRect, const Color &color, Int st
 	{
 		if (!painting)
 		{
-			for (Int x = rect.left								 + 1; x <  rect.right;	 x += 2) pGraphics->DrawLine(&gdip_pen, x, rect.top, x, rect.top - 1);
-			for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2; y <  rect.bottom;	 y += 2) pGraphics->DrawLine(&gdip_pen, rect.right - 1, y, rect.right, y);
-			for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2; x >= rect.left;	 x -= 2) pGraphics->DrawLine(&gdip_pen, x, rect.bottom - 1, x, rect.bottom);
-			for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1; y >= rect.top;	 y -= 2) pGraphics->DrawLine(&gdip_pen, rect.left, y, rect.left - 1, y);
+			for (Int x = rect.left						    + 1; x <  rect.right;  x += 2) pGraphics->DrawLine(&gdip_pen, x, rect.top, x, rect.top - 1);
+			for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2; y <  rect.bottom; y += 2) pGraphics->DrawLine(&gdip_pen, rect.right - 1, y, rect.right, y);
+			for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2; x >= rect.left;   x -= 2) pGraphics->DrawLine(&gdip_pen, x, rect.bottom - 1, x, rect.bottom);
+			for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1; y >= rect.top;	   y -= 2) pGraphics->DrawLine(&gdip_pen, rect.left, y, rect.left - 1, y);
 		}
 
-		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) paintContext->DrawLine(&gdip_pen, x, rect.top, x, rect.top - 1);
-		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) paintContext->DrawLine(&gdip_pen, rect.right - 1, y, rect.right, y);
-		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) paintContext->DrawLine(&gdip_pen, x, rect.bottom - 1, x, rect.bottom);
-		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) paintContext->DrawLine(&gdip_pen, rect.left, y, rect.left - 1, y);
+		for (Int x = rect.left						    + 1;  x <  rect.right;  x += 2) paintContext->DrawLine(&gdip_pen, x, rect.top, x, rect.top - 1);
+		for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2;  y <  rect.bottom; y += 2) paintContext->DrawLine(&gdip_pen, rect.right - 1, y, rect.right, y);
+		for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2;  x >= rect.left;   x -= 2) paintContext->DrawLine(&gdip_pen, x, rect.bottom - 1, x, rect.bottom);
+		for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1;  y >= rect.top;    y -= 2) paintContext->DrawLine(&gdip_pen, rect.left, y, rect.left - 1, y);
 	}
 
 	if (!painting)
@@ -396,7 +396,7 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 
 		Rect		 tRect = rightToLeft.TranslateRect(rect);
-		Gdiplus::RectF	 gdip_rect(tRect.left, tRect.top, tRect.right - tRect.left + 2, tRect.bottom - tRect.top);
+		Gdiplus::RectF	 gdip_rect(tRect.left, tRect.top, tRect.GetWidth() + 2, tRect.GetHeight());
 
 		if (rtlCharacters) gdip_format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsDirectionRightToLeft);
 		else		   gdip_format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);
@@ -424,6 +424,36 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 	return Success();
 }
 
+S::Int S::GUI::SurfaceGDIPlus::Gradient(const Rect &iRect, const Color &color1, const Color &color2, Int style)
+{
+	if (window == NIL) return Success();
+
+	Rect	 rect = rightToLeft.TranslateRect(iRect);
+
+	Gdiplus::LinearGradientBrush	 gdip_brush(Gdiplus::Point(rect.left, rect.top),
+						    Gdiplus::Point(rect.left + (style == OR_HORZ ? rect.GetWidth()  : 0),
+								   rect.top  + (style == OR_VERT ? rect.GetHeight() : 0)),
+						    Gdiplus::Color(color1.GetRed(), color1.GetGreen(), color1.GetBlue()),
+						    Gdiplus::Color(color2.GetRed(), color2.GetGreen(), color2.GetBlue()));
+	Gdiplus::Rect			 gdip_rect(rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
+
+	if (!painting)
+	{
+		HDC			 gdi_dc = GetWindowDC(window);
+		Gdiplus::Graphics	*pGraphics = new Gdiplus::Graphics(gdi_dc);
+
+		pGraphics->FillRectangle(&gdip_brush, gdip_rect);
+
+		delete pGraphics;
+
+		ReleaseDC(window, gdi_dc);
+	}
+
+	paintContext->FillRectangle(&gdip_brush, gdip_rect);
+
+	return Success();
+}
+
 S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcRect, const Rect &iDestRect)
 {
 	if (window == NIL) return Success();
@@ -442,10 +472,10 @@ S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &bitmap, const Rect &
 
 	if (!painting)
 	{
-		screen->DrawImage(&gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top), srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, Gdiplus::UnitPixel, NIL, NIL, NIL);
+		screen->DrawImage(&gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight()), srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), Gdiplus::UnitPixel, NIL, NIL, NIL);
 	}
 
-	paintContext->DrawImage(&gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top), srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, Gdiplus::UnitPixel, NIL, NIL, NIL);
+	paintContext->DrawImage(&gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight()), srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), Gdiplus::UnitPixel, NIL, NIL, NIL);
 
 	delete screen;
 
@@ -469,7 +499,7 @@ S::Int S::GUI::SurfaceGDIPlus::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap
 	Gdiplus::Bitmap		 gdip_bitmap((HBITMAP) bitmap.GetSystemBitmap(), NIL);
 	Gdiplus::Graphics	 gdip_graphics(&gdip_bitmap);
 
-	gdip_graphics.DrawImage(paintBitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top), srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, Gdiplus::UnitPixel, NIL, NIL, NIL);
+	gdip_graphics.DrawImage(paintBitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight()), srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), Gdiplus::UnitPixel, NIL, NIL, NIL);
 
 	HBITMAP			 hBitmap = NIL;
 

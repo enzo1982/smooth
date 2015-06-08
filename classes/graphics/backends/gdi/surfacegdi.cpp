@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -454,6 +454,32 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	::DeleteObject(hfont);
 
 	ReleaseDC(window, gdi_dc);
+
+	return Success();
+}
+
+S::Int S::GUI::SurfaceGDI::Gradient(const Rect &iRect, const Color &color1, const Color &color2, Int style)
+{
+	if (window == NIL) return Success();
+
+	Rect	 rect = rightToLeft.TranslateRect(iRect);
+
+	GRADIENT_RECT	 rects[1]    = { { 0, 1 } };
+	TRIVERTEX	 vertices[2] = { { rect.left,  rect.top,    COLOR16(color1.GetRed() << 8), COLOR16(color1.GetGreen() << 8), COLOR16(color1.GetBlue() << 8), 0 },
+					 { rect.right, rect.bottom, COLOR16(color2.GetRed() << 8), COLOR16(color2.GetGreen() << 8), COLOR16(color2.GetBlue() << 8), 0 } };
+
+	if (!painting)
+	{
+		HDC	 gdi_dc = GetWindowDC(window);
+
+		if (style == OR_HORZ) GdiGradientFill(gdi_dc, vertices, 2, rects, 1, GRADIENT_FILL_RECT_H);
+		else		      GdiGradientFill(gdi_dc, vertices, 2, rects, 1, GRADIENT_FILL_RECT_V);
+
+		ReleaseDC(window, gdi_dc);
+	}
+
+	if (style == OR_HORZ) GdiGradientFill(paintContext, vertices, 2, rects, 1, GRADIENT_FILL_RECT_H);
+	else		      GdiGradientFill(paintContext, vertices, 2, rects, 1, GRADIENT_FILL_RECT_V);
 
 	return Success();
 }

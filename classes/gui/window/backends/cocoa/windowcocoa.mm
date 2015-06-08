@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -426,8 +426,10 @@ const int	 NSApplicationDropFiles	 = 9;
 		{
 			if (backend->doClose.Call()) backend->Close();
 
-			if (backend->GetSystemWindow() == NIL) return YES;
-			else				       return NO;
+			/* Return no in any case. Either the user decided not to
+			 * close the window or we closed it on our own above.
+			 */
+			return NO;
 		}
 
 		return YES;
@@ -1017,9 +1019,9 @@ S::Int S::GUI::WindowCocoa::Close()
 
 	drawSurface = NIL;
 
-	/* Destroy input context and window.
+	/* Hide window.
 	 */
-	[wnd close];
+	[wnd orderOut: nil];
 
 	/* Emit onDestroy signal.
 	 */
@@ -1037,7 +1039,8 @@ S::Int S::GUI::WindowCocoa::RequestClose()
 {
 	if (wnd == nil) return Success();
 
-	[wnd performClose: nil];
+	if ([NSThread isMainThread]) [wnd performClose: nil];
+	else			     [wnd performSelectorOnMainThread: @selector(performClose:) withObject: nil waitUntilDone: YES];
 
 	return Success();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,7 +37,8 @@ S::Int S::System::EventCocoa::ProcessNextEvent()
 	{
 		/* Try to find active modal windows.
 		 */
-		NSWindow	*modalWindow = nil;
+		GUI::Window	*smoothWindow = NIL;
+		NSWindow	*modalWindow  = nil;
 
 		for (Int n = GUI::Window::GetNOfWindows() - 1; n >= 0; n--)
 		{
@@ -45,7 +46,8 @@ S::Int S::System::EventCocoa::ProcessNextEvent()
 
 			if (window->IsVisible() && window->GetFlags() & GUI::WF_MODAL)
 			{
-				modalWindow = (NSWindow *) window->GetSystemWindow();
+				smoothWindow = window;
+				modalWindow  = (NSWindow *) window->GetSystemWindow();
 
 				break;
 			}
@@ -67,8 +69,18 @@ S::Int S::System::EventCocoa::ProcessNextEvent()
 
 		/* Run modal or regular loop.
 		 */
-		if (modalWindow != nil && [modalWindow isVisible]) [NSApp runModalForWindow: modalWindow];
-		else						   [NSApp run];
+		if (modalWindow != nil && [modalWindow isVisible])
+		{
+			smoothWindow->EnterProtectedRegion();
+
+			[NSApp runModalForWindow: modalWindow];
+
+			smoothWindow->LeaveProtectedRegion();
+		}
+		else
+		{
+			[NSApp run];
+		}
 	}
 	else
 	{
@@ -76,7 +88,6 @@ S::Int S::System::EventCocoa::ProcessNextEvent()
 		 */
 		S::System::System::Sleep(10);
 	}
-
 
 	return Success();
 }

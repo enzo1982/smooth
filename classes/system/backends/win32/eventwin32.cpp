@@ -30,36 +30,32 @@ S::System::EventWin32::~EventWin32()
 
 S::Int S::System::EventWin32::ProcessNextEvent()
 {
-	/* Emulate a timeout of ~100ms by trying to find a message
-	 * 10 times while sleeping for 10ms between trying.
-	 *
-	 * We cannot use MsgWaitForMultipleObjects here as that
-	 * function is not available on pre Windows 2000 systems.
+	/* Look for and process a message or wait up
+	 * to 100ms if no message is available.
 	 */
-	for (Int i = 0; i < 10; i++)
+	MSG	 msg;
+
+	if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 	{
-		MSG	 msg;
-
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		/* Process only the most recent WM_MOUSEMOVE message.
+		 */
+		if (msg.message == WM_MOUSEMOVE)
 		{
-			/* Process only the most recent WM_MOUSEMOVE message.
-			 */
-			if (msg.message == WM_MOUSEMOVE)
-			{
-				while (PeekMessage(&msg, msg.hwnd, WM_MOUSEMOVE, WM_MOUSEMOVE, PM_REMOVE)) { }
-			}
-
-			/* Translate and dispatch message.
-			 */
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-
-			if (msg.message == WM_QUIT) return Break;
-
-			break;
+			while (PeekMessage(&msg, msg.hwnd, WM_MOUSEMOVE, WM_MOUSEMOVE, PM_REMOVE)) { }
 		}
 
-		S::System::System::Sleep(10);
+		/* Translate and dispatch message.
+		 */
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+
+		if (msg.message == WM_QUIT) return Break;
+	}
+	else
+	{
+		/* Wait for a message up to 100ms.
+		 */
+		MsgWaitForMultipleObjects(0, NIL, False, 100, QS_ALLEVENTS);
 	}
 
 	return Success();

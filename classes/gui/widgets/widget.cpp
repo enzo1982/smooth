@@ -44,6 +44,9 @@ S::GUI::Widget::Widget(const Point &iPos, const Size &iSize)
 	pos		= iPos;
 	size		= iSize;
 
+	realPosValid	= False;
+	realSizeValid	= False;
+
 	orientation	= OR_UPPERLEFT;
 
 	text		= NIL;
@@ -278,19 +281,26 @@ S::Void S::GUI::Widget::ComputeTextSize()
 	scaledTextSize.cy   = font.GetScaledTextSizeY(text);
 }
 
+S::Void S::GUI::Widget::InvalidateMetrics()
+{
+	realPosValid  = False;
+	realSizeValid = False;
+
+	foreach (Widget *widget, widgets) widget->InvalidateMetrics();
+}
+
 S::GUI::Point S::GUI::Widget::GetRealPosition() const
 {
-	if (!registered) return pos;
+	if (!registered)  return pos;
+	if (realPosValid) return realPos;
 
 	Surface	*surface = GetDrawSurface();
 
 	Point	 containerPos  = container->GetRealPosition();
-	Point	 scaledPos     = pos * surface->GetSurfaceDPI() / 96.0;
-	Point	 realPos       = containerPos + scaledPos;
-
-	if (orientation == OR_UPPERLEFT) return realPos;
-
 	Size	 containerSize = container->GetRealSize();
+	Point	 scaledPos     = pos * surface->GetSurfaceDPI() / 96.0;
+
+	realPos	= containerPos + scaledPos;
 
 	if (orientation == OR_UPPERRIGHT)
 	{
@@ -306,14 +316,22 @@ S::GUI::Point S::GUI::Widget::GetRealPosition() const
 		realPos.y = containerPos.y + containerSize.cy - scaledPos.y;
 	}
 
+	realPosValid = True;
+
 	return realPos;
 }
 
 S::GUI::Size S::GUI::Widget::GetRealSize() const
 {
+	if (!registered)   return size;
+	if (realSizeValid) return realSize;
+
 	Surface	*surface = GetDrawSurface();
 
-	return size * surface->GetSurfaceDPI() / 96.0;
+	realSize      = size * surface->GetSurfaceDPI() / 96.0;
+	realSizeValid = True;
+
+	return realSize;
 }
 
 S::Int S::GUI::Widget::SetBackgroundColor(const Color &nColor)
@@ -916,6 +934,8 @@ S::Int S::GUI::Widget::SetMetrics(const Point &nPos, const Size &nSize)
 	Bool	 prevVisible = IsVisible();
 
 	if (registered && prevVisible) Hide();
+
+	InvalidateMetrics();
 
 	if (nPos.x   != pos.x   || nPos.y   != pos.y  )	{ pos  = nPos;  onChangePosition.Emit(pos); }
 	if (nSize.cx != size.cx || nSize.cy != size.cy)	{ size = nSize; onChangeSize.Emit(size);    }
